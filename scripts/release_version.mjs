@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -13,6 +12,10 @@ const LINUX_APPIMAGE_RE = /world-of-claudecraft-\d+\.\d+\.\d+-linux-x86_64\.AppI
 const DESKTOP_VERSION_RE = /export const DESKTOP_VERSION = '(\d+\.\d+\.\d+)';/;
 const GAME_VERSION_RE = /(<div\b[^>]*\bid=["']game-version["'][^>]*>)v[^<]*(<\/div>)/;
 const README_VERSION_BADGE_SOURCE = String.raw`img\.shields\.io/badge/version-(\d+\.\d+\.\d+)-blue`;
+const DESKTOP_DOWNLOAD_COMING_SOON_RE =
+  /class=[^>]*(?:desktop-download-status|coming-soon-badge)[^>]*>[\s\S]{0,300}?coming soon/i;
+
+export const RELEASE_HTML_FILES = Object.freeze(['index.html', 'play.html', 'app.html']);
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const PATHS = {
@@ -21,7 +24,7 @@ const PATHS = {
   gradle: 'android/app/build.gradle',
   pbxproj: 'ios/App/App.xcodeproj/project.pbxproj',
   desktopModule: 'src/game/desktop_download.ts',
-  htmlFiles: ['index.html', 'play.html'],
+  htmlFiles: RELEASE_HTML_FILES,
   readmeRoot: 'README.md',
   readmeDir: 'docs/i18n',
 };
@@ -264,7 +267,7 @@ export function collectReleaseVersionFailures({
     if (LINUX_APPIMAGE_RE.test(html) && !html.includes(expectedLinuxArtifact)) {
       failures.push(`${path} has a stale Linux desktop download URL, expected ${expected}`);
     }
-    if (/coming soon/i.test(html)) {
+    if (DESKTOP_DOWNLOAD_COMING_SOON_RE.test(html)) {
       failures.push(`${path} still contains Coming Soon in the download panel`);
     }
   }

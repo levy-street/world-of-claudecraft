@@ -6986,4 +6986,66 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'landing.streamCommunityBody': '聊天、任務與驚喜都在等著你。',
   'landing.streamWorldTitle': '真實世界',
   'landing.streamWorldBody': '一個持續運轉的世界，無盡故事。',
+  'hudChrome.privacyConsent.bannerTitle': '您在 Claudemoon 的隱私',
+  'hudChrome.privacyConsent.bannerOptIn':
+    '選擇是否允許載入選用服務。必要服務一律保持啟用。',
+  'hudChrome.privacyConsent.bannerOptOut':
+    '選用服務已啟用。使用「拒絕選用服務」可選擇不出售或分享用於目標式廣告的資料，也可以自行選擇允許載入的內容。',
+  'hudChrome.privacyConsent.bannerGpc':
+    '我們尊重您瀏覽器發出的全球隱私控制（Global Privacy Control）訊號。分析與行銷功能將保持關閉。',
+  'hudChrome.privacyConsent.acceptAll': '全部接受',
+  'hudChrome.privacyConsent.rejectAll': '拒絕選用服務',
+  'hudChrome.privacyConsent.customize': '自訂',
+  'hudChrome.privacyConsent.launcher': '隱私選項',
+  'hudChrome.privacyConsent.dialogTitle': '隱私選項',
+  'hudChrome.privacyConsent.dialogIntro':
+    '選擇 World of ClaudeCraft 可以使用哪些選用服務。您可以隨時變更這些選擇。',
+  'hudChrome.privacyConsent.close': '關閉隱私選項',
+  'hudChrome.privacyConsent.necessaryTitle': '必要服務',
+  'hudChrome.privacyConsent.necessaryBody':
+    '用於安全、儲存偏好設定、身分驗證和核心遊戲功能。',
+  'hudChrome.privacyConsent.analyticsTitle': '分析',
+  'hudChrome.privacyConsent.analyticsBody':
+    '協助我們瞭解網站使用情況並診斷遊戲效能。',
+  'hudChrome.privacyConsent.marketingTitle': '行銷',
+  'hudChrome.privacyConsent.marketingBody':
+    '透過 Meta Pixel 等服務衡量行銷活動成效。',
+  'hudChrome.privacyConsent.xTitle': 'X 動態消息',
+  'hudChrome.privacyConsent.xBody':
+    '允許在新聞頁面載入嵌入的 @WoClaudecraft 時間軸。',
+  'hudChrome.privacyConsent.twitchTitle': 'Twitch 播放器',
+  'hudChrome.privacyConsent.twitchBody':
+    '允許載入嵌入的 Yuumiii 直播播放器。',
+  'hudChrome.privacyConsent.alwaysOn': '一律啟用',
+  'hudChrome.privacyConsent.save': '儲存選擇',
+  'hudChrome.privacyConsent.cookiePolicy': '閱讀我們的 Cookie 政策',
+  'hudChrome.privacyConsent.twitchBlocked':
+    '在您透過「隱私選項」允許 Twitch 之前，Twitch 播放器將保持暫停。',
+  'hudChrome.privacyConsent.twitchEnable': '選擇 Twitch 隱私設定',
+  'nav.communityBuilt': '由社群打造',
+  'footer.cookies': 'Cookie 聲明',
+  'footer.privacyChoices': '隱私選項',
+  'landing.newsXConsentTitle': 'X 動態消息需要取得許可',
+  'landing.newsXConsentBody':
+    '此即時動態消息需要取得連線至 X 的許可。X 可能會收到與您此次造訪相關的資訊。',
+  'landing.newsXConsentNote':
+    '請在「隱私選項」中啟用 X 內容。您可以隨時變更此設定。',
+  'landing.newsXPrivacyChoices': '隱私選項',
+  'landing.newsXUnavailableTitle': '無法載入 X 動態消息',
+  'landing.newsXUnavailableBody':
+    '可能遭到您的瀏覽器或擴充功能封鎖，也可能是 X 暫時發生問題。',
+  'landing.newsXHiddenTitle': '此處無法顯示即時動態消息',
+  'landing.newsXHiddenBody':
+    '嵌入式 X 動態消息無法在較小的螢幕或應用程式中使用。請在 X 上開啟 @WoClaudecraft 以查看最新貼文。',
+  'landing.newsPressPrimaryTitle':
+    '首款以 Vibe Coding 打造的 MMORPG：免費、開源，而且完整得令人驚喜',
+  'landing.newsPressPrimaryBody':
+    'MMORPG.com 深入介紹了 World of ClaudeCraft 背後的開放世界、共同冒險和快速演進的實驗。',
+  'landing.newsPressRead': '閱讀專題報導',
+  'landing.newsPressLinkAria': '在新分頁中閱讀 MMORPG.com 的專題報導',
+  'landing.newsPressPrimaryAlt':
+    '冒險者在 World of ClaudeCraft 中探索 Eastbrook Vale',
+  'landing.communityHeading': 'Claudemoon 由大家共同打造。',
+  'landing.communityBody':
+    '無論帶來的是技藝、好奇心，還是只是陪伴，公會的桌邊總有你的位置。',
 };

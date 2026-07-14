@@ -376,6 +376,16 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
   {
     dispatcher: DISPATCH.mainApi,
     method: 'GET',
+    path: '/api/privacy/region',
+    handler: 'handleApi arm: /api/privacy/region',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.public,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'GET',
     path: '/api/perf',
     handler: 'handleApi arm: /api/perf',
     contentType: PROBLEM_JSON,

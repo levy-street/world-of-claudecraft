@@ -8365,6 +8365,7 @@ function wireStartScreens(): void {
   $('#btn-charselect-back').addEventListener('click', () => show('#login-panel'));
 
   // Main Navigation View Switching
+  const navBtnPlay = $('#nav-btn-play');
   const navBtnWiki = $('#nav-btn-wiki');
   const navBtnCommunityBuilt = $('#nav-btn-community-built');
   const navBtnLogin = $('#nav-btn-login');
@@ -8454,6 +8455,12 @@ function wireStartScreens(): void {
       handleKeyboardActivation(e as KeyboardEvent, () => action(true));
     });
   };
+
+  // Keep Play as an in-shell action after the shared marketing header mounts.
+  // In particular, /play is online-only: intercepting the progressive-enhancement
+  // href prevents the header CTA from navigating back to the landing page's
+  // online/offline selector.
+  setupNavBtn(navBtnPlay, '#hero-view', enterOnlinePlayFlow);
 
   // The wiki is the curated guide SPA at /wiki (its own page), so this nav item
   // navigates there rather than switching an in-page view.

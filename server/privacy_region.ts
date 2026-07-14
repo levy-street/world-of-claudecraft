@@ -80,7 +80,7 @@ function requestCameFromTrustedEdge(req: http.IncomingMessage): boolean {
 
 function edgeCountry(req: http.IncomingMessage): string | null {
   if (!requestCameFromTrustedEdge(req)) return null;
-  const raw = firstHeader(req.headers[configuredCountryHeader()]).trim().toUpperCase();
+  const raw = firstHeader(req.headers?.[configuredCountryHeader()]).trim().toUpperCase();
   if (!/^[A-Z]{2}$/.test(raw) || UNKNOWN_COUNTRY_CODES.has(raw)) return null;
   return raw;
 }
@@ -93,7 +93,7 @@ export function privacyRegimeForCountry(country: string): PrivacyRegime {
 }
 
 export function globalPrivacyControlEnabled(req: http.IncomingMessage): boolean {
-  return firstHeader(req.headers['sec-gpc']).trim() === '1';
+  return firstHeader(req.headers?.['sec-gpc']).trim() === '1';
 }
 
 export function privacyRegionForRequest(req: http.IncomingMessage): PrivacyRegionResponse {
@@ -110,7 +110,7 @@ export function privacyChoicesForRequest(
   now = Date.now(),
 ): PrivacyChoices {
   const region = privacyRegionForRequest(req);
-  const record = parsePrivacyConsentCookie(req.headers.cookie, now);
+  const record = parsePrivacyConsentCookie(req.headers?.cookie, now);
   return effectivePrivacyChoices(record, region, now);
 }
 

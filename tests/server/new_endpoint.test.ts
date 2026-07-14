@@ -55,8 +55,8 @@ import {
 // tests/server/new_endpoint.test.ts -> the repo root is two directories up.
 const REPO = fileURLToPath(new URL('../../', import.meta.url));
 const SCRIPT = join(REPO, 'scripts', 'new_endpoint.mjs');
-const TSC = join(REPO, 'node_modules', '.bin', 'tsc');
-const VITEST = join(REPO, 'node_modules', '.bin', 'vitest');
+const TSC = join(REPO, 'node_modules', 'typescript', 'bin', 'tsc');
+const VITEST = join(REPO, 'node_modules', 'vitest', 'vitest.mjs');
 
 // Every file the generator appends to, seeded as a copy into each temp root.
 const APPEND_TARGETS = [
@@ -112,9 +112,11 @@ function runChildVitest(root: string, testPaths: string[]): { status: number; ou
   const config = join(root, 'vitest.golden.config.mjs');
   writeFileSync(
     config,
-    `export default { test: { include: ${JSON.stringify(testPaths)}, exclude: [] } };\n`,
+    `export default { test: { include: ${JSON.stringify(
+      testPaths.map((testPath) => testPath.replaceAll('\\', '/')),
+    )}, exclude: [] } };\n`,
   );
-  const result = spawnSync(VITEST, ['run', '--config', config], {
+  const result = spawnSync(process.execPath, [VITEST, 'run', '--config', config], {
     cwd: REPO,
     encoding: 'utf8',
     // CI runners color the piped child output (ANSI then sits between "Tests" and the
@@ -473,7 +475,10 @@ describe('golden: all three rungs emit, type-check, and pass (one temp root)', (
         files,
       }),
     );
-    const tsc = spawnSync(TSC, ['-p', tsconfig, '--noEmit'], { cwd: REPO, encoding: 'utf8' });
+    const tsc = spawnSync(process.execPath, [TSC, '-p', tsconfig, '--noEmit'], {
+      cwd: REPO,
+      encoding: 'utf8',
+    });
     expect(tsc.status, `tsc failed:\n${tsc.stdout}\n${tsc.stderr}`).toBe(0);
 
     // All three emitted tests PASS, plus the code-catalog snapshot stays green against the

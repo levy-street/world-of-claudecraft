@@ -1,3 +1,5 @@
+export const RELEASE_HTML_FILES: readonly ['index.html', 'play.html', 'app.html'];
+
 export function inferExpectedReleaseVersion(input?: {
   argv?: string[];
   env?: Record<string, string | undefined>;

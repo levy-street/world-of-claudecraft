@@ -27,7 +27,9 @@ function setUrl(path: string): void {
 // Start the app on `path`, returning a direct invoker for THIS app's popstate
 // handler. Calling it directly (rather than dispatching a global popstate)
 // isolates the test from popstate listeners that earlier apps left on window.
-function mountApp(path: string): { app: GuideApp; firePopstate: () => void } {
+async function mountApp(
+  path: string,
+): Promise<{ app: GuideApp; firePopstate: () => void }> {
   setUrl(path);
   const mount = document.createElement('div');
   document.body.appendChild(mount);
@@ -38,6 +40,7 @@ function mountApp(path: string): { app: GuideApp; firePopstate: () => void } {
     | EventListener
     | undefined;
   spy.mockRestore();
+  await vi.waitFor(() => expect(mount.dataset.guideReady).toBe('true'));
   return {
     app,
     firePopstate: () => handler?.(new PopStateEvent('popstate')),
@@ -61,13 +64,14 @@ afterEach(() => {
 });
 
 describe('Guide fragment handling on popstate and language change', () => {
-  it('scrolls to the anchor on Back/Forward to a deep-linked section, not to the top', () => {
-    const { firePopstate } = mountApp(DEEDS_PATH); // initial nav is hashless
+  it('scrolls to the anchor on Back/Forward to a deep-linked section, not to the top', async () => {
+    const { firePopstate } = await mountApp(DEEDS_PATH); // initial nav is hashless
     expect(scrollIntoView).not.toHaveBeenCalled();
 
     // A Back/Forward that lands on the hashed URL.
     setUrl(`${DEEDS_PATH}#${ANCHOR}`);
     firePopstate();
+    await vi.waitFor(() => expect(scrollIntoView).toHaveBeenCalledTimes(1));
 
     const target = document.getElementById(ANCHOR);
     expect(target).not.toBeNull();
@@ -78,12 +82,12 @@ describe('Guide fragment handling on popstate and language change', () => {
   });
 
   it('re-scrolls to the anchor after a language change on a deep-linked section', async () => {
-    const { app } = mountApp(DEEDS_PATH);
+    const { app } = await mountApp(DEEDS_PATH);
     setUrl(`${DEEDS_PATH}#${ANCHOR}`);
     scrollIntoView.mockClear();
 
     // changeLanguage is private; invoke it as the chrome's lang-select would.
-    // English stays resident, so the re-render is synchronous after the await.
+    // English stays resident, but the route module still loads asynchronously.
     await (app as unknown as { changeLanguage(lang: string): Promise<void> }).changeLanguage('en');
 
     const target = document.getElementById(ANCHOR);
@@ -93,14 +97,17 @@ describe('Guide fragment handling on popstate and language change', () => {
     expect(scrollTo).not.toHaveBeenCalled();
   });
 
-  it('still scrolls to top and focuses main on a hashless Back/Forward', () => {
-    const { firePopstate } = mountApp(DEEDS_PATH);
+  it('still scrolls to top and focuses main on a hashless Back/Forward', async () => {
+    const { firePopstate } = await mountApp(DEEDS_PATH);
     const mainEl = document.getElementById('guide-main') as HTMLElement;
     const focusSpy = vi.spyOn(mainEl, 'focus');
 
     // A hashless route (the home landing): the top-scroll + focus path.
     setUrl(GUIDE_BASE);
     firePopstate();
+    await vi.waitFor(() =>
+      expect(scrollTo).toHaveBeenCalledWith({ top: 0, behavior: 'instant' }),
+    );
 
     expect(scrollIntoView).not.toHaveBeenCalled();
     expect(scrollTo).toHaveBeenCalledWith({ top: 0, behavior: 'instant' });

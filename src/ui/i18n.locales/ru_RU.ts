@@ -7479,4 +7479,66 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'landing.streamCommunityBody': 'Чат, задания и сюрпризы уже ждут.',
   'landing.streamWorldTitle': 'Настоящий мир',
   'landing.streamWorldBody': 'Один постоянный мир. Бесконечные истории.',
+  'hudChrome.privacyConsent.bannerTitle': 'Ваша конфиденциальность в Claudemoon',
+  'hudChrome.privacyConsent.bannerOptIn':
+    'Выберите, разрешить ли загрузку необязательных сервисов. Необходимые сервисы всегда остаются активными.',
+  'hudChrome.privacyConsent.bannerOptOut':
+    'Необязательные сервисы активны. Нажмите «Отклонить необязательные», чтобы отказаться от продажи или передачи данных для таргетированной рекламы, либо выберите, что можно загружать.',
+  'hudChrome.privacyConsent.bannerGpc':
+    'Мы учитываем сигнал Global Privacy Control вашего браузера. Аналитика и маркетинг остаются отключёнными.',
+  'hudChrome.privacyConsent.acceptAll': 'Принять все',
+  'hudChrome.privacyConsent.rejectAll': 'Отклонить необязательные',
+  'hudChrome.privacyConsent.customize': 'Настроить',
+  'hudChrome.privacyConsent.launcher': 'Настройки конфиденциальности',
+  'hudChrome.privacyConsent.dialogTitle': 'Настройки конфиденциальности',
+  'hudChrome.privacyConsent.dialogIntro':
+    'Выберите, какие необязательные сервисы может использовать World of ClaudeCraft. Эти настройки можно изменить в любое время.',
+  'hudChrome.privacyConsent.close': 'Закрыть настройки конфиденциальности',
+  'hudChrome.privacyConsent.necessaryTitle': 'Необходимые',
+  'hudChrome.privacyConsent.necessaryBody':
+    'Требуются для безопасности, сохранения настроек, аутентификации и основных функций игры.',
+  'hudChrome.privacyConsent.analyticsTitle': 'Аналитика',
+  'hudChrome.privacyConsent.analyticsBody':
+    'Помогает нам понимать, как используется сайт, и диагностировать производительность игры.',
+  'hudChrome.privacyConsent.marketingTitle': 'Маркетинг',
+  'hudChrome.privacyConsent.marketingBody':
+    'Измеряет результаты кампаний с помощью таких сервисов, как Meta Pixel.',
+  'hudChrome.privacyConsent.xTitle': 'Лента X',
+  'hudChrome.privacyConsent.xBody':
+    'Разрешает загрузку встроенной ленты @WoClaudecraft на странице новостей.',
+  'hudChrome.privacyConsent.twitchTitle': 'Плеер Twitch',
+  'hudChrome.privacyConsent.twitchBody':
+    'Разрешает загрузку встроенного плеера прямой трансляции Yuumiii.',
+  'hudChrome.privacyConsent.alwaysOn': 'Всегда включено',
+  'hudChrome.privacyConsent.save': 'Сохранить настройки',
+  'hudChrome.privacyConsent.cookiePolicy': 'Прочитать нашу Политику использования файлов cookie',
+  'hudChrome.privacyConsent.twitchBlocked':
+    'Плеер Twitch приостановлен, пока вы не разрешите Twitch в настройках конфиденциальности.',
+  'hudChrome.privacyConsent.twitchEnable': 'Настроить доступ Twitch',
+  'nav.communityBuilt': 'Создано сообществом',
+  'footer.cookies': 'Уведомление о файлах cookie',
+  'footer.privacyChoices': 'Настройки конфиденциальности',
+  'landing.newsXConsentTitle': 'Для ленты X требуется разрешение',
+  'landing.newsXConsentBody':
+    'Для подключения этой ленты к X требуется разрешение. X может получить информацию о вашем посещении.',
+  'landing.newsXConsentNote':
+    'Разрешите контент X в настройках конфиденциальности. Это можно изменить в любое время.',
+  'landing.newsXPrivacyChoices': 'Настройки конфиденциальности',
+  'landing.newsXUnavailableTitle': 'Не удалось загрузить ленту X',
+  'landing.newsXUnavailableBody':
+    'Возможно, её блокирует браузер или расширение либо возникла временная проблема на стороне X.',
+  'landing.newsXHiddenTitle': 'Лента здесь недоступна',
+  'landing.newsXHiddenBody':
+    'Встроенная лента X недоступна на небольших экранах и в приложении. Откройте @WoClaudecraft в X, чтобы посмотреть последние публикации.',
+  'landing.newsPressPrimaryTitle':
+    'Первая MMORPG, созданная методом вайб-кодинга, — бесплатная, с открытым исходным кодом и на удивление полноценная',
+  'landing.newsPressPrimaryBody':
+    'MMORPG.com исследует открытый мир, совместные приключения и стремительно развивающийся эксперимент World of ClaudeCraft.',
+  'landing.newsPressRead': 'Читать материал',
+  'landing.newsPressLinkAria': 'Прочитать материал MMORPG.com в новой вкладке',
+  'landing.newsPressPrimaryAlt':
+    'Искатели приключений исследуют Eastbrook Vale в World of ClaudeCraft',
+  'landing.communityHeading': 'Claudemoon создаётся вместе.',
+  'landing.communityBody':
+    'Принесите своё мастерство, любопытство или просто составьте нам компанию — за столом гильдии найдётся место для каждого.',
 };

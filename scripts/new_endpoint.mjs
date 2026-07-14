@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 // Scaffold a new endpoint on the server/http/ REST pipeline from one descriptor.
 //
 // `npm run new:endpoint -- --domain <slug> --method <METHOD> --path </api/...> [--public]`

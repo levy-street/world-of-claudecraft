@@ -263,7 +263,7 @@ main {
 .community-button:hover,
 .community-button:focus-visible {
   filter: brightness(1.12);
-  outline: 2px solid #fff0be;
+  outline: 2px solid var(--color-border-focus);
   outline-offset: 3px;
   transform: translateY(-2px);
 }

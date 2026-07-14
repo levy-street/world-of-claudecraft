@@ -77,6 +77,7 @@ export const API_CONTENT_TYPE: Readonly<Record<string, ContentTypeClass>> = {
   '/api/perf-report': LEGACY_OKFALSE_405,
   '/api/project-stats': PROBLEM_JSON,
   '/api/status': PROBLEM_JSON,
+  '/api/privacy/region': PROBLEM_JSON,
   '/api/perf': PROBLEM_JSON,
   '/api/arena/leaderboard': PROBLEM_JSON,
   '/api/leaderboard': PROBLEM_JSON,

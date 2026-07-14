@@ -3,6 +3,7 @@ import {
   collectReleaseVersionFailures,
   inferExpectedReleaseVersion,
   planReleaseVersion,
+  RELEASE_HTML_FILES,
   setDesktopDownloadVersion,
   setDesktopModuleVersion,
   setGameVersionText,
@@ -61,6 +62,9 @@ const INDEX_HTML = `<a href="https://updates.worldofclaudecraft.com/desktop/worl
 const PLAY_HTML = `<a href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.20.0-mac-universal.dmg">Download</a>
 <div id="game-version">v0.10</div>`;
 
+const APP_HTML = `<a href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.20.0-mac-universal.dmg">Download</a>
+<div id="game-version">v0.10</div>`;
+
 const DESKTOP_TS = `export const DESKTOP_VERSION = '0.20.0';
 const DESKTOP_HOST = 'https://updates.worldofclaudecraft.com/desktop';`;
 
@@ -107,6 +111,12 @@ describe('inferExpectedReleaseVersion', () => {
         env: { GITHUB_HEAD_REF: 'feature/desktop-launcher-download' },
       }),
     ).toThrow(/release\/vX\.Y\.Z/);
+  });
+});
+
+describe('release HTML surfaces', () => {
+  it('keeps every shipped HTML shell under release-version management', () => {
+    expect(RELEASE_HTML_FILES).toEqual(['index.html', 'play.html', 'app.html']);
   });
 });
 
@@ -185,6 +195,7 @@ describe('planReleaseVersion', () => {
       htmlFiles: {
         'index.html': INDEX_HTML,
         'play.html': PLAY_HTML,
+        'app.html': APP_HTML,
       },
       readmeFiles: {
         'README.md': README_MD,
@@ -200,6 +211,10 @@ describe('planReleaseVersion', () => {
       'world-of-claudecraft-0.21.0-linux-x86_64.AppImage',
     );
     expect(plan.htmlFiles['play.html']).toContain('<div id="game-version">v0.21.0</div>');
+    expect(plan.htmlFiles['app.html']).toContain(
+      'world-of-claudecraft-0.21.0-mac-universal.dmg',
+    );
+    expect(plan.htmlFiles['app.html']).toContain('<div id="game-version">v0.21.0</div>');
     expect(plan.desktopModule).toContain("export const DESKTOP_VERSION = '0.21.0';");
     expect(plan.readmeFiles['README.md']).toContain('version-0.21.0-blue');
   });
@@ -248,7 +263,8 @@ describe('collectReleaseVersionFailures', () => {
       pbxproj: PBXPROJ,
       desktopModule: DESKTOP_TS,
       htmlFiles: {
-        'play.html': PLAY_HTML,
+        'play.html': `${PLAY_HTML}
+<div class="site-coming-soon">Coming Soon</div>`,
       },
       readmeFiles: {
         'README.md': README_MD,
@@ -256,5 +272,6 @@ describe('collectReleaseVersionFailures', () => {
     });
 
     expect(failures.filter((failure) => failure.includes('Linux'))).toEqual([]);
+    expect(failures.filter((failure) => failure.includes('Coming Soon'))).toEqual([]);
   });
 });

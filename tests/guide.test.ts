@@ -55,7 +55,8 @@ const serverMain = readFileSync(new URL('../server/main.ts', import.meta.url), '
 const guideMain = readFileSync(new URL('../src/guide/main.ts', import.meta.url), 'utf8').replace(
   /\r\n/g,
   '\n',
-);const sitemapXml = readFileSync(new URL('../public/sitemap.xml', import.meta.url), 'utf8').replace(
+);
+const sitemapXml = readFileSync(new URL('../public/sitemap.xml', import.meta.url), 'utf8').replace(
   /\r\n/g,
   '\n',
 );

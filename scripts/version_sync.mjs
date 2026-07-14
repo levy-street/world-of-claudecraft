@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 // Sync the app version across the three release manifests so a single
 // `npm version <x.y.z>` bumps all of them in one commit:
 //   - package.json                                "version"           (npm owns this)

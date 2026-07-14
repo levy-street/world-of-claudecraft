@@ -215,6 +215,7 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     { method: 'GET', path: '/api/releases' },
     { method: 'GET', path: '/api/project-stats' },
     { method: 'GET', path: '/api/status' },
+    { method: 'GET', path: '/api/privacy/region' },
     { method: 'GET', path: '/api/perf' },
     { method: 'GET', path: '/api/search' },
     { method: 'GET', path: '/api/realms' },

@@ -1,5 +1,6 @@
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { headerMarkup } from '../src/ui/shared_marketing_header';
 
 const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
 // The CSS extraction moved the :root tokens and the reset/base
@@ -55,6 +56,7 @@ const playHtml = readFileSync(new URL('../play.html', import.meta.url), 'utf8').
   /\r\n/g,
   '\n',
 );
+const sharedPlayHeader = headerMarkup('play').replace(/\r\n/g, '\n');
 const appHtml = readFileSync(new URL('../app.html', import.meta.url), 'utf8').replace(
   /\r\n/g,
   '\n',
@@ -632,8 +634,8 @@ describe('client HTML shell', () => {
   });
 
   it('keeps the Account nav tab hidden unless a session is restored', () => {
-    expect(html).toContain('<li class="nav-item" id="nav-item-account" hidden>');
-    expect(html).toContain('<li class="nav-item" id="nav-item-logout" hidden>');
+    expect(sharedPlayHeader).toContain('<li class="nav-item" id="nav-item-account" hidden>');
+    expect(sharedPlayHeader).toContain('<li class="nav-item" id="nav-item-logout" hidden>');
     expect(mainTs).toContain('if (api.restoreSession()) {');
     expect(mainTs).toContain(
       "} else {\n    enterLoggedOutChrome();\n    if (isDesktopLoginPage()) show('#login-panel');\n  }",
@@ -683,7 +685,8 @@ describe('client HTML shell', () => {
       ['index.html', html],
       ['play.html', playHtml],
     ] as const) {
-      const navPositions = orderedNavIds.map((id) => entry.indexOf(`id="${id}"`));
+      const renderedEntry = `${sharedPlayHeader}\n${entry}`;
+      const navPositions = orderedNavIds.map((id) => renderedEntry.indexOf(`id="${id}"`));
       expect(
         navPositions.every((position) => position >= 0),
         name,
@@ -698,10 +701,12 @@ describe('client HTML shell', () => {
         'id="main-view-status" class="visually-hidden" role="status" aria-live="polite"',
       );
 
-      const primaryNav = entry.match(/<nav[^>]*class="homepage-nav"[\s\S]*?<\/nav>/)?.[0] ?? '';
+      const primaryNav =
+        renderedEntry.match(/<nav[^>]*class="homepage-nav"[\s\S]*?<\/nav>/)?.[0] ?? '';
       expect(primaryNav, name).not.toContain('aria-selected=');
       expect(primaryNav, name).not.toContain('aria-pressed=');
-      expect(primaryNav, name).toMatch(/id="nav-btn-play"[^>]*aria-current="page"/);
+      const playNav = primaryNav.match(/<a[^>]*id="nav-btn-play"[^>]*>/)?.[0] ?? '';
+      expect(playNav, name).toContain('aria-current="page"');
     }
 
     expect(mainTs).toContain("'#patch-notes-view',");
@@ -711,8 +716,7 @@ describe('client HTML shell', () => {
       ['nav-btn-news', '/news'],
       ['nav-btn-download', '/download'],
     ]) {
-      expect(html).toContain(`id="${id}" href="${href}"`);
-      expect(playHtml).toContain(`id="${id}" href="${href}"`);
+      expect(sharedPlayHeader).toContain(`id="${id}" href="${href}"`);
     }
 
     expect(mainTs).toContain("'#news-view',");
@@ -730,10 +734,12 @@ describe('client HTML shell', () => {
   });
 
   it('shows a logged-in Logout nav item next to Account', () => {
-    expect(html).toContain('id="nav-btn-account"');
-    expect(html).toContain('id="nav-btn-logout"');
-    expect(html.indexOf('id="nav-btn-account"')).toBeLessThan(html.indexOf('id="nav-btn-logout"'));
-    expect(html).toContain('data-i18n="nav.logout"');
+    expect(sharedPlayHeader).toContain('id="nav-btn-account"');
+    expect(sharedPlayHeader).toContain('id="nav-btn-logout"');
+    expect(sharedPlayHeader.indexOf('id="nav-btn-account"')).toBeLessThan(
+      sharedPlayHeader.indexOf('id="nav-btn-logout"'),
+    );
+    expect(sharedPlayHeader).toContain('data-i18n="nav.logout"');
     expect(mainTs).toContain("const loggedInNavItems = ['#nav-item-account', '#nav-item-logout'];");
     expect(mainTs).toContain('function logoutAccount(): void {');
     expect(mainTs).toContain('void api.logout().finally(finish);');
@@ -756,8 +762,8 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain('const enterOnlinePlayFlow = () => {');
     expect(mainTs).toContain('if (api.token) {');
     expect(mainTs).toContain('goToLoggedInPlay();');
-    expect(html).toContain('id="nav-btn-play" href="/"');
-    expect(playHtml).toContain('id="nav-btn-play" href="/"');
+    expect(sharedPlayHeader).toContain('id="nav-btn-play" href="/"');
+    expect(mainTs).toContain("setupNavBtn(navBtnPlay, '#hero-view', enterOnlinePlayFlow);");
     expect(mainTs).toContain('const handleOnlineSelect = () => {');
     expect(mainTs).toContain("show('#login-panel');");
   });
@@ -981,12 +987,14 @@ describe('client HTML shell', () => {
       ['play.html', playHtml],
     ] as const) {
       expect(entry, name).toContain('id="mobile-discord"');
+      expect(entry.match(/\bid="mobile-discord"/g), name).toHaveLength(1);
       // Carries the icon hook (hydrateIcons swaps [data-icon] for the inline SVG).
       expect(entry, name).toMatch(/id="mobile-discord"[^>]*data-icon="discord"/);
       // Starts hidden; main.ts reveals it at boot on any build with Discord UI
       // enabled (it stays hidden in the native-app build).
       expect(entry, name).toMatch(/id="mobile-discord"\s+hidden/);
       expect(entry, name).toContain('id="mobile-donate"');
+      expect(entry.match(/\bid="mobile-donate"/g), name).toHaveLength(1);
       expect(entry, name).toMatch(/id="mobile-donate"[^>]*data-icon="donate"/);
       // Donate is never gated on the web: no hidden attribute on it.
       expect(entry, name).not.toMatch(/id="mobile-donate"\s+hidden/);
@@ -1009,7 +1017,11 @@ describe('client HTML shell', () => {
       ['index.html', html],
       ['play.html', playHtml],
     ] as const) {
-      expect(entry.match(/href="https:\/\/ko-fi\.com\/worldofclaudecraft"/g), name).toHaveLength(3);
+      expect(
+        sharedPlayHeader.match(/href="https:\/\/ko-fi\.com\/worldofclaudecraft"/g),
+        name,
+      ).toHaveLength(1);
+      expect(entry, name).toContain('href="https://ko-fi.com/worldofclaudecraft"');
       expect(entry, name).not.toContain('https://github.com/sponsors/levy-street');
     }
   });
@@ -1204,7 +1216,7 @@ describe('client HTML shell', () => {
     // homepage still use it); only the in-game touch HUD hides it, because
     // its two-person toggle icon under the minimap masqueraded as a Friends
     // button next to the real Social button in the top-left trio.
-    expect(html).toContain('<a class="donate-cta"');
+    expect(sharedPlayHeader).toContain('<a class="donate-cta"');
     expect(html).toContain('<details id="community-menu">');
     expect(html).toContain('<summary class="community-toggle"');
     expect(html).toContain('<div class="community-tray">');
@@ -1503,7 +1515,8 @@ describe('client HTML shell', () => {
     expect(currentSync).toBeGreaterThan(switchStart);
     expect(currentSync).toBeLessThan(sameViewReturn);
     expect(mainTs).toContain("setHeaderNavCurrent('nav-btn-login');");
-    expect(html).toContain('id="nav-btn-play" href="/"');
+    expect(sharedPlayHeader).toContain('id="nav-btn-play" href="/"');
+    expect(mainTs).toContain("setupNavBtn(navBtnPlay, '#hero-view', enterOnlinePlayFlow);");
     expect(mainTs).toContain("setupNavBtn(headerLogoBtn, '#hero-view', () => {");
     expect(mainTs).toContain("if (isCurrent) link.setAttribute('aria-current', currentKind);");
     expect(mainTs).toContain("else link.removeAttribute('aria-current');");

@@ -411,7 +411,7 @@
   body[data-site-home="true"] .site-project-panel .site-community-links a:focus-visible {
     z-index: 5;
     filter: none;
-    outline: 3px solid #fff1be;
+    outline: 3px solid var(--color-border-focus);
     outline-offset: 3px;
     transform: translateY(-2px);
   }

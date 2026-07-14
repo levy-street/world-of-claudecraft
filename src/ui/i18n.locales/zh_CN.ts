@@ -6986,4 +6986,66 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'landing.streamCommunityBody': '聊天、任务与惊喜都在等待你。',
   'landing.streamWorldTitle': '真实世界',
   'landing.streamWorldBody': '一个持续运转的世界，无尽故事。',
+  'hudChrome.privacyConsent.bannerTitle': '您在 Claudemoon 的隐私',
+  'hudChrome.privacyConsent.bannerOptIn':
+    '选择是否允许加载可选服务。必要服务始终保持启用。',
+  'hudChrome.privacyConsent.bannerOptOut':
+    '可选服务已启用。使用“拒绝可选服务”可选择不出售或共享用于定向广告的数据，也可以自行选择允许加载的内容。',
+  'hudChrome.privacyConsent.bannerGpc':
+    '我们尊重您浏览器发出的全球隐私控制（Global Privacy Control）信号。分析和营销功能将保持关闭。',
+  'hudChrome.privacyConsent.acceptAll': '全部接受',
+  'hudChrome.privacyConsent.rejectAll': '拒绝可选服务',
+  'hudChrome.privacyConsent.customize': '自定义',
+  'hudChrome.privacyConsent.launcher': '隐私选项',
+  'hudChrome.privacyConsent.dialogTitle': '隐私选项',
+  'hudChrome.privacyConsent.dialogIntro':
+    '选择 World of ClaudeCraft 可以使用哪些可选服务。您可以随时更改这些选择。',
+  'hudChrome.privacyConsent.close': '关闭隐私选项',
+  'hudChrome.privacyConsent.necessaryTitle': '必要服务',
+  'hudChrome.privacyConsent.necessaryBody':
+    '用于安全、保存偏好设置、身份验证和核心游戏功能。',
+  'hudChrome.privacyConsent.analyticsTitle': '分析',
+  'hudChrome.privacyConsent.analyticsBody':
+    '帮助我们了解网站使用情况并诊断游戏性能。',
+  'hudChrome.privacyConsent.marketingTitle': '营销',
+  'hudChrome.privacyConsent.marketingBody':
+    '通过 Meta Pixel 等服务衡量推广活动效果。',
+  'hudChrome.privacyConsent.xTitle': 'X 信息流',
+  'hudChrome.privacyConsent.xBody':
+    '允许在新闻页面加载嵌入的 @WoClaudecraft 时间线。',
+  'hudChrome.privacyConsent.twitchTitle': 'Twitch 播放器',
+  'hudChrome.privacyConsent.twitchBody':
+    '允许加载嵌入的 Yuumiii 直播播放器。',
+  'hudChrome.privacyConsent.alwaysOn': '始终启用',
+  'hudChrome.privacyConsent.save': '保存选择',
+  'hudChrome.privacyConsent.cookiePolicy': '阅读我们的 Cookie 政策',
+  'hudChrome.privacyConsent.twitchBlocked':
+    '在您通过“隐私选项”允许 Twitch 之前，Twitch 播放器将保持暂停。',
+  'hudChrome.privacyConsent.twitchEnable': '选择 Twitch 隐私设置',
+  'nav.communityBuilt': '由社区打造',
+  'footer.cookies': 'Cookie 声明',
+  'footer.privacyChoices': '隐私选项',
+  'landing.newsXConsentTitle': 'X 信息流需要获得许可',
+  'landing.newsXConsentBody':
+    '此实时信息流需要获得连接 X 的许可。X 可能会收到有关您此次访问的信息。',
+  'landing.newsXConsentNote':
+    '请在“隐私选项”中启用 X 内容。您可以随时更改此设置。',
+  'landing.newsXPrivacyChoices': '隐私选项',
+  'landing.newsXUnavailableTitle': '无法加载 X 信息流',
+  'landing.newsXUnavailableBody':
+    '可能被您的浏览器或扩展程序阻止，也可能是 X 暂时出现问题。',
+  'landing.newsXHiddenTitle': '此处无法显示实时信息流',
+  'landing.newsXHiddenBody':
+    '嵌入式 X 信息流无法在较小的屏幕或应用中使用。请在 X 上打开 @WoClaudecraft 以查看最新帖子。',
+  'landing.newsPressPrimaryTitle':
+    '首款“氛围编程”MMORPG：免费、开源，而且完整得出人意料',
+  'landing.newsPressPrimaryBody':
+    'MMORPG.com 深入介绍了 World of ClaudeCraft 背后的开放世界、共同冒险和快速演进的实验。',
+  'landing.newsPressRead': '阅读专题报道',
+  'landing.newsPressLinkAria': '在新标签页中阅读 MMORPG.com 的专题报道',
+  'landing.newsPressPrimaryAlt':
+    '冒险者在 World of ClaudeCraft 中探索 Eastbrook Vale',
+  'landing.communityHeading': 'Claudemoon 由大家共同打造。',
+  'landing.communityBody':
+    '无论带来的是技艺、好奇心，还是只是陪伴，公会的桌边总有你的位置。',
 };

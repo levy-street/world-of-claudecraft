@@ -14,6 +14,7 @@ const playHtml = read('play.html');
 const indexHtml = read('index.html');
 const mainTs = read('src/main.ts');
 const playExtraCss = read('src/styles/play.extra.css');
+const privacyConsentTs = read('src/ui/privacy_consent.ts');
 
 describe('/play is online-only', () => {
   it('play.html has no realm dropdown and no offline flow', () => {
@@ -87,7 +88,7 @@ describe('/play uses the landing hero backdrop', () => {
     // eager <source>, no autoplay, preload="none" (applyLandingBackdrop attaches
     // and plays the trailer only on capable devices).
     expect(playHtml).toContain('data-trailer-src="/home-bg.mp4"');
-    expect(playHtml).toContain('poster="/home-bg.png"');
+    expect(playHtml).toContain('poster="/home-bg-v1.webp"');
     expect(playHtml).not.toContain('<source src="/home-bg.mp4"');
     const playVideoTag = /<video id="bg-home"[^>]*>/.exec(playHtml)?.[0] ?? '';
     const indexVideoTag = /<video id="bg-home"[^>]*>/.exec(indexHtml)?.[0] ?? '';
@@ -98,10 +99,12 @@ describe('/play uses the landing hero backdrop', () => {
 });
 
 describe('/play keeps its tracking and SEO head', () => {
-  it('play.html keeps the Google tag with the localhost guard', () => {
-    expect(playHtml).toContain('googletagmanager.com/gtag/js?id=G-BR5Z7GT7C2');
-    expect(playHtml).toContain("gtag('config', 'G-BR5Z7GT7C2')");
-    expect(playHtml).toContain("['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)");
+  it('defers Google Analytics to the privacy-consent controller', () => {
+    expect(playHtml).not.toContain('googletagmanager.com/gtag/js');
+    expect(mainTs).toContain("import { initPrivacyConsent } from './ui/privacy_consent';");
+    expect(privacyConsentTs).toContain("export const GOOGLE_ANALYTICS_ID = 'G-BR5Z7GT7C2';");
+    expect(privacyConsentTs).toContain('if (isLocalPrivacyHost(window.location.hostname)) return;');
+    expect(privacyConsentTs).toContain('if (choices.analytics) loadGoogleAnalytics();');
   });
 
   it('play.html keeps its canonical /play SEO surface', () => {

@@ -166,7 +166,7 @@
   .privacy-dialog__close:focus-visible,
   .privacy-choice__input:focus-visible + .privacy-choice__track,
   .privacy-policy-link:focus-visible {
-    outline: 3px solid var(--color-focus, #fff2a6);
+    outline: 3px solid var(--color-border-focus);
     outline-offset: 3px;
   }
 

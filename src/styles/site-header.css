@@ -415,7 +415,7 @@
   body .homepage-header .nav-link:focus-visible,
   body .homepage-header .header-logo-btn:focus-visible,
   body .homepage-header .donate-cta:focus-visible {
-    outline: 3px solid #ffe499 !important;
+    outline: 3px solid var(--color-border-focus) !important;
     outline-offset: 3px !important;
     box-shadow: 0 0 0 2px #02050a !important;
   }

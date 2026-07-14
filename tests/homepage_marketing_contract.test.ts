@@ -271,15 +271,20 @@ describe('AAA homepage marketing contract', () => {
   });
 
   it('incorporates PR 1511 server availability and total-player semantics', () => {
-    for (const entry of [html, playHtml]) {
-      expect(entry).toContain('Select server mode: Server Online or Server Offline');
-      expect(entry).toContain('aria-labelledby="server-select-value"');
-      expect(entry).toContain('data-i18n="mode.serverOnline">Server Online</span>');
-      expect(entry).toContain('data-i18n="mode.serverOffline">Server Offline</span>');
-      expect(entry.match(/class="server-stat-line"/g)).toHaveLength(2);
-      expect(entry).toContain('data-i18n="stats.accountsCreated">Total players</span>');
-      expect(entry).not.toContain('data-i18n="stats.accountsCreated">Players</span>');
-    }
+    expect(html).toContain('Select server mode: Server Online or Server Offline');
+    expect(html).toContain('aria-labelledby="server-select-value"');
+    expect(html).toContain('data-i18n="mode.serverOnline">Server Online</span>');
+    expect(html).toContain('data-i18n="mode.serverOffline">Server Offline</span>');
+    expect(html.match(/class="server-stat-line"/g)).toHaveLength(2);
+    expect(html).toContain('data-i18n="stats.accountsCreated">Total players</span>');
+    expect(html).not.toContain('data-i18n="stats.accountsCreated">Players</span>');
+
+    // v0.26 keeps /play focused on the online realm. The homepage owns the
+    // online/offline selector; the dedicated entry has one direct online CTA.
+    expect(playHtml).not.toContain('id="server-select"');
+    expect(playHtml).not.toContain('id="btn-offline"');
+    expect(playHtml).toContain('id="btn-online"');
+    expect(playHtml).toContain('id="btn-play"');
     expect(mainTs).toContain('formatNumber(cached.accounts_created, { maximumFractionDigits: 0 })');
     expect(mainTs).toContain('formatNumber(data.accounts_created, { maximumFractionDigits: 0 })');
   });
@@ -571,7 +576,10 @@ describe('AAA homepage marketing contract', () => {
     expect(html).not.toContain('class="site-hero-heading" aria-hidden="true"');
     expect(html).toContain('https://x.com/WoClaudecraft');
     expect(html).toContain('https://github.com/levy-street/world-of-claudecraft');
-    expect(html).toContain('https://github.com/sponsors/levy-street');
+    expect(`${sharedPlayHeader}\n${html}`).toContain('https://ko-fi.com/worldofclaudecraft');
+    expect(`${sharedPlayHeader}\n${html}`).not.toContain(
+      'https://github.com/sponsors/levy-street',
+    );
     expect(html).toContain('https://discord.com/invite/worldofclaudecraft');
     expect(html).toContain('data-trailer-src="/home-bg.mp4"');
   });
@@ -607,7 +615,7 @@ describe('AAA homepage marketing contract', () => {
     expect(realmDataCss).toContain('max-height: 66svh;');
     expect(realmDataCss).toContain('margin-bottom: clamp(72px, 10svh, 108px);');
     expect(realmDataCss).toContain('filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.58));');
-    expect(realmDataCss).toContain('.realm-data-frame__ornaments {\n    display: none;');
+    expect(realmDataCss).toMatch(/\.realm-data-frame__ornaments\s*\{\s*display:\s*none;/);
     expect(realmDataCss).toContain('.social-tray__launcher');
   });
 
