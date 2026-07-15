@@ -1708,7 +1708,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'sha_r8_shock_efficiency',
           name: 'Returning Current',
-          description: 'Every 3rd Jolt restores 30 mana.',
+          description: 'Every 3rd Jolt restores 8% of your maximum mana.',
           icon: 'earth_shock',
           effect: {
             proc: {
@@ -1719,7 +1719,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
                 n: 3,
                 abilities: ['earth_shock', 'flame_shock', 'frost_shock'],
               },
-              responses: [{ kind: 'resource', amount: 30, resourceType: 'mana' }],
+              responses: [{ kind: 'resource', pctMax: 0.08, resourceType: 'mana' }],
             },
           },
         },

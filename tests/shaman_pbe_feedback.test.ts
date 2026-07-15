@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { onMeleeSwing } from '../src/sim/combat/talent_procs';
+import { onCastCompleted, onMeleeSwing } from '../src/sim/combat/talent_procs';
 import { ABILITIES } from '../src/sim/content/classes';
 import {
   rowForLevel,
@@ -87,6 +87,17 @@ function imbuedLifebloodHeal(level: number): { heal: number; maxHp: number } {
   return { heal: sim.player.hp - 1, maxHp };
 }
 
+function returningCurrentMana(level: number): { restored: number; maxMana: number } {
+  const sim = new Sim({ seed: 260716, playerClass: 'shaman', autoEquip: false });
+  sim.setPlayerLevel(level);
+  expect(sim.applyTalents({ spec: null, rows: { 11: 'sha_r8_shock_efficiency' } })).toBe(true);
+  sim.player.resource = 0;
+  for (let cast = 0; cast < 3; cast++) {
+    onCastCompleted(sim.ctx, sim.player, 'earth_shock');
+  }
+  return { restored: sim.player.resource, maxMana: sim.player.maxResource };
+}
+
 describe('Shaman PBE structural feedback', () => {
   it('reshuffles the four affected tiers into three distinct choices each', () => {
     expect(optionIds(5)).toEqual([
@@ -169,5 +180,19 @@ describe('Shaman PBE tuning feedback', () => {
     } finally {
       setLanguage('en');
     }
+  });
+
+  it('scales Returning Current to 8% maximum mana at its level 11 tier', () => {
+    const at11 = returningCurrentMana(11);
+    const at20 = returningCurrentMana(20);
+
+    expect(at11.restored / at11.maxMana).toBeCloseTo(0.08, 5);
+    expect(at20.restored / at20.maxMana).toBeCloseTo(0.08, 5);
+    expect(at20.restored).toBeGreaterThan(at11.restored);
+
+    const returningCurrent = rowForLevel('shaman', 11)?.options.find(
+      (option) => option.id === 'sha_r8_shock_efficiency',
+    );
+    expect(returningCurrent?.description).toContain('8% of your maximum mana');
   });
 });
