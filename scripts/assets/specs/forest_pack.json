@@ -1,0 +1,59 @@
+{
+  "note": "KayKit Forest Nature Pack 1.0 free tier (CC0). Trees and large bushes for the vale forest refresh; already low-poly, so no simplify. Built by scripts/assets/build_foliage.mjs.",
+  "items": [
+    {
+      "src": "tmp/asset_src/kaykit_forest/KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Tree_1_C_Color1.gltf",
+      "out": "models/foliage/forest_tree_1.glb",
+      "type": "static",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/kaykit_forest/KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Tree_2_D_Color1.gltf",
+      "out": "models/foliage/forest_tree_2.glb",
+      "type": "static",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/kaykit_forest/KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Tree_2_E_Color1.gltf",
+      "out": "models/foliage/forest_tree_3.glb",
+      "type": "static",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/kaykit_forest/KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Tree_3_C_Color1.gltf",
+      "out": "models/foliage/forest_tree_4.glb",
+      "type": "static",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/kaykit_forest/KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Tree_4_C_Color1.gltf",
+      "out": "models/foliage/forest_tree_5.glb",
+      "type": "static",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/kaykit_forest/KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Bush_1_F_Color1.gltf",
+      "out": "models/foliage/forest_bush_1.glb",
+      "type": "static",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/kaykit_forest/KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Bush_2_E_Color1.gltf",
+      "out": "models/foliage/forest_bush_2.glb",
+      "type": "static",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/kaykit_forest/KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Bush_3_C_Color1.gltf",
+      "out": "models/foliage/forest_bush_3.glb",
+      "type": "static",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/kaykit_forest/KayKit_Forest_Nature_Pack_1.0_FREE/Assets/gltf/Bush_4_E_Color1.gltf",
+      "out": "models/foliage/forest_bush_4.glb",
+      "type": "static",
+      "maxTex": 256
+    }
+  ]
+}
