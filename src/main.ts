@@ -33,12 +33,14 @@ import { GamepadBindings } from './game/gamepad_bindings';
 import { handleGatherNodeInteract } from './game/gather_node_interact';
 import { Input } from './game/input';
 import { InputActivityMeter, installInputActivityTracking } from './game/input_activity';
+import { stopAutorunForInteraction } from './game/interaction_autorun';
 import {
   activePvpOpponentIds,
   HoverPickGate,
   handlePickedEntity,
   hoverCursorKind,
   isAttackableEntity,
+  shouldApproachPickedEntity,
 } from './game/interactions';
 import { createIntroLogoOverlay } from './game/intro_logo_overlay';
 import { Keybinds } from './game/keybinds';
@@ -57,6 +59,7 @@ import { applyMobileHudLayout } from './game/mobile_hud_layout_applier';
 import { mouselookReleaseFacing } from './game/mouselook_release';
 import { diagonalMovementVisualFacing } from './game/movement_visual';
 import { music } from './game/music';
+import { tryNearbyInteraction } from './game/nearby_interaction';
 import { createPerfMonitor } from './game/perf';
 import { startPerfReporter } from './game/perf_reporter';
 import { adaptiveSelfAlphaLead } from './game/self_alpha_lead';
@@ -135,7 +138,6 @@ import { TAB_NEAR_RADIUS, TAB_QUERY_RADIUS, tabConeHalfAt } from './sim/tab_targ
 import {
   DT,
   dist2d,
-  INTERACT_RANGE,
   MELEE_RANGE,
   type PlayerClass,
   RUN_SPEED,
@@ -2028,100 +2030,18 @@ async function startGame(
     }
   }
   function interactKey(): void {
-    const p = world.player;
-    let bestCorpse: number | null = null,
-      bestCorpseD = INTERACT_RANGE;
-    let bestObj: number | null = null,
-      bestObjD = INTERACT_RANGE;
-    let bestNpc: number | null = null,
-      bestNpcD = INTERACT_RANGE + 1;
-    // Delve interactables (warded chest, cracked grave, sealed/tombstone passage,
-    // surface stairs) are driven through delveInteract, not the generic pickup
-    // path, the sim owns their per-object proximity + state gating and the
-    // lockpick offer. Selected a touch wider than INTERACT_RANGE so the sim can
-    // emit its precise "move closer to the chest/passage" hint.
-    let bestDelve: number | null = null,
-      bestDelveD = INTERACT_RANGE + 1;
-    // Gather nodes (#1866) are static content (src/sim/data GATHER_NODES), not
-    // entities, so they get their own nearest-in-range scan alongside the
-    // entity loop below rather than living inside it.
-    let bestNode: (typeof GATHER_NODES)[number] | null = null,
-      bestNodeD = INTERACT_RANGE;
-    for (const node of GATHER_NODES) {
-      const d = dist2d(p.pos, { x: node.pos.x, y: p.pos.y, z: node.pos.z });
-      if (d < bestNodeD) {
-        bestNode = node;
-        bestNodeD = d;
-      }
-    }
-    for (const e of world.entities.values()) {
-      const d = dist2d(p.pos, e.pos);
-      if (e.kind === 'mob' && e.lootable && d < bestCorpseD) {
-        bestCorpse = e.id;
-        bestCorpseD = d;
-      }
-      if (e.kind === 'object' && e.templateId?.startsWith('delve_')) {
-        if (d < bestDelveD) {
-          bestDelve = e.id;
-          bestDelveD = d;
-        }
-      } else if (e.kind === 'object' && e.lootable && d < bestObjD) {
-        bestObj = e.id;
-        bestObjD = d;
-      }
-      // The graveyard angel is hidden from (and not interactable by) the living,
-      // same filter renderer.pick() applies to the click path: skip it here too
-      // unless the local player is a released spirit, so it cannot starve a
-      // node sharing its graveyard's interact range for keyboard/gamepad/mobile.
-      if (e.kind === 'npc' && d < bestNpcD && (e.templateId !== 'spirit_healer' || p.ghost)) {
-        bestNpc = e.id;
-        bestNpcD = d;
-      }
-    }
-    if (bestCorpse !== null) {
-      world.lootCorpse(bestCorpse);
-      return;
-    }
-    if (bestDelve !== null) {
-      world.delveInteract(bestDelve);
-      return;
-    }
-    if (bestObj !== null) {
-      const obj = world.entities.get(bestObj)!;
-      if (obj.templateId === 'dungeon_door' && obj.dungeonId) {
-        world.enterDungeon(obj.dungeonId);
-        return;
-      }
-      if (obj.templateId === 'dungeon_exit') {
-        world.leaveDungeon();
-        return;
-      }
-      if (obj.templateId === 'mailbox') {
-        hud.openMailbox();
-        return;
-      }
-      world.pickUpObject(bestObj);
-      return;
-    }
-    if (bestNpc !== null) {
-      const npc = world.entities.get(bestNpc);
-      if (npc?.kind === 'npc' && npc.templateId === 'brother_halven') hud.openDelveBoard(bestNpc);
-      else hud.openQuestDialog(bestNpc);
-      return;
-    }
-    if (bestNode !== null) {
-      handleGatherNodeInteract(
+    stopAutorunForInteraction(
+      tryNearbyInteraction(
         world,
         hud,
-        p.pos,
-        bestNode.id,
-        bestNode.pos,
+        GATHER_NODES,
         t('questUi.errors.tooFar'),
         t('hudChrome.gathering.notReady'),
-      );
-      return;
-    }
-    hud.showError(t('errors.nothingInteract'));
+        t('errors.nothingInteract'),
+      ),
+      input,
+      mobileControls,
+    );
   }
 
   function attackNearest(): void {
@@ -2202,14 +2122,18 @@ async function startGame(
       const nodeId = renderer.pickGatherNode(x, y);
       const node = nodeId !== null ? GATHER_NODES.find((n) => n.id === nodeId) : undefined;
       if (node) {
-        handleGatherNodeInteract(
-          world,
-          hud,
-          world.player.pos,
-          node.id,
-          node.pos,
-          t('questUi.errors.tooFar'),
-          t('hudChrome.gathering.notReady'),
+        stopAutorunForInteraction(
+          handleGatherNodeInteract(
+            world,
+            hud,
+            world.player.pos,
+            node.id,
+            node.pos,
+            t('questUi.errors.tooFar'),
+            t('hudChrome.gathering.notReady'),
+          ),
+          input,
+          mobileControls,
         );
         return;
       }
@@ -2241,6 +2165,7 @@ async function startGame(
       return;
     }
     const e = world.entities.get(id);
+    const didInteract = handlePickedEntity(world, hud, id, button, x, y, online === null);
     if (e && e.id !== world.player.id) {
       // Mark the entity when you engage it: a left-click target, or the click-to-move
       // button that walks you to it, so both routes read the same (red on a hostile,
@@ -2251,12 +2176,15 @@ async function startGame(
       }
       // The configured click-to-move mouse button approaches the entity while the
       // regular click handler still performs target/interact behavior.
-      if (isClickMoveButton) {
+      if (
+        isClickMoveButton &&
+        shouldApproachPickedEntity(world.player, e, didInteract, online === null)
+      ) {
         const target = resolvedClickMoveTarget({ x: e.pos.x, z: e.pos.z });
         input.setClickMoveTarget(target, 3.5, e.id, clickMovePathTo(target));
       }
     }
-    handlePickedEntity(world, hud, id, button, x, y);
+    stopAutorunForInteraction(didInteract, input, mobileControls);
   }
 
   // Attack Move (MOBA-style): the Attack Move key walks the player toward the

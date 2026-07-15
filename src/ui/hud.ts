@@ -1,4 +1,5 @@
 import { audio } from '../game/audio';
+import { corpseLootAvailability } from '../game/corpse_loot_availability';
 import type { GamepadKind } from '../game/gamepad_map';
 import { type Keybinds, keyCapLabel } from '../game/keybinds';
 import { music, musicZoneForLocation, shouldResetMusicForDungeonEntry } from '../game/music';
@@ -12136,13 +12137,11 @@ export class Hud {
   openLoot(mobId: number, screenX: number, screenY: number): void {
     const mob = this.sim.entities.get(mobId);
     if (!mob) return;
-    const componentTags = MOBS[mob.templateId]?.componentTags;
-    const harvestable = !!componentTags?.length && mob.harvestClaimedBy === null;
-    const visibleItems = mob.loot
-      ? mob.loot.items.filter((s) => !s.personalFor || s.personalFor.includes(this.sim.playerId))
-      : [];
-    const hasLoot = !!mob.loot && (mob.loot.copper > 0 || visibleItems.length > 0);
-    if (!hasLoot && !harvestable) return;
+    const { canOpen, componentTags, harvestable, hasLoot, visibleItems } = corpseLootAvailability(
+      mob,
+      this.sim.playerId,
+    );
+    if (!canOpen) return;
     this.closeOtherWindows('#loot-window');
     this.openLootMobId = mobId;
     this.openLootChestId = null;

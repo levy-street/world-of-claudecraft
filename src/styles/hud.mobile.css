@@ -271,6 +271,8 @@
     border-color: #d8c46bb8;
   }
   body.mobile-touch #mobile-autorun-target.locked {
+    top: 50%;
+    transform: translate(-50%, -50%) scale(1);
     color: #fff7c7;
     border-color: var(--gold);
     box-shadow:

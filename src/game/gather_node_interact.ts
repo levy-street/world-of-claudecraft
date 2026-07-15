@@ -38,8 +38,8 @@ export interface GatherNodeInteractHud {
   showError(text: string): void;
 }
 
-/** Thin dispatch: resolves the verdict, then either calls `harvestNode` or
- *  surfaces the matching localized error. The server remains authoritative
+/** Thin dispatch: resolves the verdict, then either calls `harvestNode` and
+ *  reports success or surfaces the matching localized error. The server remains authoritative
  *  (a stale client-side `ready` read still gets rejected server-side); this
  *  is purely a client-side "don't bother sending the command" / feedback gate. */
 export function handleGatherNodeInteract(
@@ -50,15 +50,16 @@ export function handleGatherNodeInteract(
   nodePos: { x: number; z: number },
   tooFarText: string,
   notReadyText: string,
-): void {
+): boolean {
   const verdict = decideGatherNodeAction(playerPos, nodePos, world.nodeHarvestableByMe(nodeId));
   if (verdict === 'too_far') {
     hud.showError(tooFarText);
-    return;
+    return false;
   }
   if (verdict === 'not_ready') {
     hud.showError(notReadyText);
-    return;
+    return false;
   }
   world.harvestNode(nodeId);
+  return true;
 }

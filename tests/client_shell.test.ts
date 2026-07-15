@@ -1850,6 +1850,22 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain('top: -104px;');
     expect(hudMobileCss).toContain('body.mobile-touch #mobile-autorun-target.near,');
     expect(hudMobileCss).toContain('body.mobile-touch #mobile-autorun-target.locked {');
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-autorun-target.locked {\n    top: 50%;\n    transform: translate(-50%, -50%) scale(1);',
+    );
+    expect(mainTs).toContain(
+      "import { stopAutorunForInteraction } from './game/interaction_autorun';",
+    );
+    expect(mainTs).toContain("import { tryNearbyInteraction } from './game/nearby_interaction';");
+    expect(mainTs).toContain('stopAutorunForInteraction(\n      tryNearbyInteraction(');
+    expect(mainTs).toContain(
+      'const didInteract = handlePickedEntity(world, hud, id, button, x, y, online === null);',
+    );
+    expect(mainTs).toContain(
+      'isClickMoveButton &&\n        shouldApproachPickedEntity(world.player, e, didInteract, online === null)',
+    );
+    expect(mainTs).toContain('stopAutorunForInteraction(didInteract, input, mobileControls);');
+    expect(mainTs).toContain('stopAutorunForInteraction(\n          handleGatherNodeInteract(');
     expect(hudMobileCss).not.toContain('body.mobile-touch #mobile-utility-cluster');
     expect(hudMobileCss).not.toContain('body.mobile-touch #mobile-autorun {');
     // The cast bar sits at the classic centre seat above the bottom-centre
