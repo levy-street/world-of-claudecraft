@@ -44,25 +44,26 @@ const RAID_SECONDARY = 20; // 2.0%
 const RAID_SECONDARY_LEGENDARY = 30; // 3.0%
 
 // Apply the raid-tier dual rating to a variant, in place. The primary keeps the
-// base's rating TYPE (scaled to the tier allowance); the secondary is complementary
-// (hit pairs with crit, a non-hit primary pairs with hit so most raid pieces carry
-// some Hit for the +3 above-level content they drop in). The exception is a
-// spell-facing piece that carried no base rating (a caster/healer legendary like the
-// Heartwood staff): heals are not resisted by level, so, matching the five-man rule
-// that healer-facing pieces never take Hit, it defaults to throughput (haste + crit)
-// instead of the game's largest Hit allowance.
+// base's rating TYPE (scaled to the tier allowance); the secondary is complementary.
+// Physical Hit pairs with crit and a physical non-Hit primary pairs with Hit. A
+// spell-facing Hit seed marks caster DPS and keeps Hit, paired with haste. A
+// spell-facing throughput seed (or no seed, like the Heartwood healer staff) stays
+// throughput-only and pairs crit + haste, so healer-facing gear never gains Hit.
 function applyRaidVariantRatings(variant: ItemDef, base: ItemDef): void {
   const isLegendary = (base.quality ?? 'common') === 'legendary';
   const s = base.stats;
   // Spell-facing: carries caster stats (int/spirit/Spell Power) and no attack-power
-  // stats (strength/agility). Such a piece never defaults to Hit.
+  // stats (strength/agility). It only carries Hit when the authored base explicitly
+  // seeds Hit, which distinguishes caster-DPS pieces from throughput/healer pieces.
   const spellFacing =
     ((s?.int ?? 0) > 0 || (s?.spi ?? 0) > 0 || (base.spellPower ?? 0) > 0) &&
     (s?.str ?? 0) === 0 &&
     (s?.agi ?? 0) === 0;
   const baseRatingKey = RAID_RATING_KEYS.find((k) => (base[k] ?? 0) > 0);
   const primaryKey: RatingKey = baseRatingKey ?? (spellFacing ? 'hasteRating' : 'hitRating');
-  // A spell-facing piece never carries Hit; it pairs its two throughput ratings.
+  // Spell-facing pieces use the other throughput rating as their secondary: an
+  // authored Hit seed becomes Hit + haste, while crit/haste/rating-less bases remain
+  // throughput-only. Physical pieces retain the Hit <-> crit complement rule.
   const secondaryKey: RatingKey = spellFacing
     ? primaryKey === 'hasteRating'
       ? 'critRating'

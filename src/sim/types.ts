@@ -3222,8 +3222,9 @@ export function rageFromTaking(damage: number, attackerLevel: number): number {
 // at 21, so melee miss maxes at ~26% and spell resist at ~25%. Stored as an integer
 // table (level diffs are always integers) so it stays bit-for-bit deterministic across
 // engines. Beyond the last entry the penalty SATURATES at the cap (does not blow up).
-//   +1 -> 7   +2 -> 14   +3 -> 21   (+4 and beyond hold at 21)
-const ABOVE_LEVEL_MISS_PCT = [0, 7, 14, 21];
+// Preserve the established +1/+2 leveling curve; only the old +3 cliff is softened.
+//   +1 -> 2.5   +2 -> 14   +3 -> 21   (+4 and beyond hold at 21)
+const ABOVE_LEVEL_MISS_PCT = [0, 2.5, 14, 21];
 function aboveLevelMissPct(diff: number): number {
   if (diff <= 0) return 0;
   return diff < ABOVE_LEVEL_MISS_PCT.length

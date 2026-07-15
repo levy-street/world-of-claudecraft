@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { effectiveSpellHit, spellResistChance } from '../src/sim/combat/spell_resist';
 import { aggregateSetBonuses } from '../src/sim/content/item_sets';
 import { ITEMS } from '../src/sim/data';
+import { itemLevel } from '../src/sim/item_level';
 import { Sim } from '../src/sim/sim';
 import type { Entity, ItemDef } from '../src/sim/types';
 import {
@@ -143,31 +144,69 @@ describe('combat ratings', () => {
 // tiny primary-stat growth, differentiate the tiers. 0 ratings on ilvl-26 dungeon
 // epics -> 1 rating on every ilvl-31 heroic piece -> 2 on the ilvl-33/37 raid variants.
 describe('combat-rating tier ladder', () => {
-  const ratingCount = (item: ItemDef): number =>
-    [item.hitRating, item.critRating, item.hasteRating].filter((r) => (r ?? 0) > 0).length;
+  const ratingValues = (item: ItemDef): number[] =>
+    [item.hitRating, item.critRating, item.hasteRating].filter((r): r is number => (r ?? 0) > 0);
+  const ratingCount = (item: ItemDef): number => ratingValues(item).length;
 
   it('every ilvl-31 heroic boss-set piece carries exactly one rating', async () => {
     const { HEROIC_ITEMS } = await import('../src/sim/content/heroic_loot');
-    const pieces = Object.values(HEROIC_ITEMS);
-    expect(pieces.length).toBeGreaterThanOrEqual(27);
-    for (const item of pieces) expect(ratingCount(item), item.id).toBe(1);
+    const pieces = Object.values(HEROIC_ITEMS).filter((item) => itemLevel(item) === 31);
+    expect(pieces).toHaveLength(24);
+    for (const item of pieces) {
+      expect(ratingCount(item), item.id).toBe(1);
+      expect(ratingValues(item), item.id).toEqual([item.weapon ? 50 : 40]);
+    }
     // Hit is over-represented (the Heroic-defining stat): at least a third of the set.
     const hitPieces = pieces.filter((i) => (i.hitRating ?? 0) > 0).length;
     expect(hitPieces).toBeGreaterThanOrEqual(Math.ceil(pieces.length / 3));
   });
 
-  it('the ilvl-33 Heroic raid variants carry two ratings (dual-rating tier)', () => {
-    const raidVariant = ITEMS['heroic_crownforged_dreadhelm'];
-    expect(raidVariant, 'heroic raid variant should be generated').toBeTruthy();
-    if (raidVariant) {
-      expect(ratingCount(raidVariant)).toBe(2);
-      // The primary scales past the ilvl-29 seed (20) to the raid armor allowance.
-      const primary = Math.max(
-        raidVariant.hitRating ?? 0,
-        raidVariant.critRating ?? 0,
-        raidVariant.hasteRating ?? 0,
+  it('enforces the complete 0 -> 1 -> 2 rating ladder by live item level', async () => {
+    const { HEROIC_VENDOR_ITEMS } = await import('../src/sim/content/heroic_vendor');
+    const vendorIds = new Set(Object.keys(HEROIC_VENDOR_ITEMS));
+    const allGear = Object.values(ITEMS).filter(
+      (item) => item.slot && itemLevel(item) !== undefined,
+    );
+
+    const ilvl26 = allGear.filter((item) => itemLevel(item) === 26);
+    for (const item of ilvl26) {
+      if (vendorIds.has(item.id)) {
+        expect(ratingValues(item), item.id).toEqual([25]);
+      } else {
+        expect(ratingCount(item), item.id).toBe(0);
+      }
+    }
+    expect([...vendorIds]).toHaveLength(10);
+
+    for (const item of allGear.filter((gear) => itemLevel(gear) === 28)) {
+      expect(ratingCount(item), item.id).toBe(0);
+    }
+
+    const ilvl29 = allGear.filter((item) => itemLevel(item) === 29);
+    expect(ilvl29).toHaveLength(8);
+    for (const item of ilvl29) expect(ratingValues(item), item.id).toEqual([20]);
+
+    const directHeroicRaidWeapons = new Set([
+      'scepter_of_the_deathless_court',
+      'deathless_greatblade',
+      'stormcallers_focus',
+    ]);
+    const heroicRaidGear = allGear.filter((item) => {
+      const ilvl = itemLevel(item);
+      return (
+        (ilvl === 33 && (item.heroicOf !== undefined || directHeroicRaidWeapons.has(item.id))) ||
+        (ilvl === 37 && item.heroicOf !== undefined)
       );
-      expect(primary).toBeGreaterThan(20);
+    });
+    expect(heroicRaidGear).toHaveLength(13);
+    for (const item of heroicRaidGear) {
+      const ilvl = itemLevel(item);
+      const expectedPrimary = ilvl === 37 ? 70 : item.weapon ? 65 : 55;
+      const expectedSecondary = ilvl === 37 ? 30 : 20;
+      expect(
+        ratingValues(item).sort((a, b) => b - a),
+        item.id,
+      ).toEqual([expectedPrimary, expectedSecondary]);
     }
   });
 

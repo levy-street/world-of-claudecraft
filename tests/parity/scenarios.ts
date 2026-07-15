@@ -3487,6 +3487,50 @@ function c4bEffectDispatch(): Scenario {
   };
 }
 
+// Hit-rating parity pair: the same seeded mage casts once at a +3 target, with and
+// without four authored Hit pieces. The coverage test compares the two traces'
+// shared-RNG count + digest. Gear changes the existing spell-hit threshold and the
+// sampled entity state, but must not insert, remove, or reorder a draw.
+function hitRatingHeroic(withHitGear: boolean): Scenario {
+  return {
+    name: withHitGear ? 'hit_rating_heroic_geared' : 'hit_rating_heroic_ungeared',
+    coverage: [
+      'Hit rating from authored gear vs a +3 target',
+      'same shared-RNG draw count/order as the ungeared spell-resist path',
+    ],
+    sampleEvery: 10,
+    build: () => new Sim({ seed: 1021, playerClass: 'mage' }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      sim.setPlayerLevel(20);
+      if (withHitGear) {
+        for (const itemId of [
+          'shadowpulse_handwraps',
+          'sash_of_the_sunken_court',
+          'lunar_choir_leggings',
+          'lunar_tide_greatstaff',
+        ]) {
+          sim.addItem(itemId, 1);
+          sim.equipItem(itemId);
+        }
+      }
+      const p = sim.player as AnyEntity;
+      beef(p, 50000);
+      const mob = spawnMob(sim, 'forest_wolf', 23, p.pos.x, p.pos.y, p.pos.z + 2);
+      beef(mob, 50000);
+      mob.aiState = 'idle';
+      rec.track(mob.id);
+      face(p, mob);
+      sim.targetEntity(mob.id);
+      p.resource = p.maxResource;
+      sim.castAbility('fireball');
+      rec.tick(120);
+      rec.snapshot('fireball-landed');
+      rec.notes.mobId = mob.id;
+    },
+  };
+}
+
 // Player auto-attack + the melee/ranged white-hit table (C5). Drives the
 // updatePlayerAutoAttack tick driver across several swing intervals for five
 // builds at once: a warrior meleeing a spiked-hide boar (thorns reflect tail) with
@@ -4050,6 +4094,8 @@ export const SCENARIOS: Scenario[] = [
   mobLifecycle(),
   targetingMarkers(),
   c4bEffectDispatch(),
+  hitRatingHeroic(false),
+  hitRatingHeroic(true),
   c5AutoAttack(),
   marketRoundTrip(),
   inventoryVendor(),
