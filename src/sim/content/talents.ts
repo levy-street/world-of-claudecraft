@@ -111,7 +111,7 @@ export interface GlobalModEffect {
 export type ProcTrigger =
   | { on: 'castNth'; n: number; abilities: string[] }
   | { on: 'spellHit'; abilities: string[] }
-  | { on: 'spellCrit'; abilities?: string[] }
+  | { on: 'spellCrit'; abilities?: string[]; icd?: number }
   | { on: 'shieldConsumed'; ability: string }
   | { on: 'hotExpired'; ability: string }
   | { on: 'bigHitTaken'; hpFrac: number; icd: number }

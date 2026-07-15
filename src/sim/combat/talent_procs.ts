@@ -212,6 +212,11 @@ export function onSpellCrit(
     if (trigger.abilities && (abilityId === null || !trigger.abilities.includes(abilityId))) {
       continue;
     }
+    if (trigger.icd !== undefined) {
+      const procState = state(player);
+      if (procState.icds[def.id] !== undefined) continue;
+      procState.icds[def.id] = trigger.icd;
+    }
     fire(ctx, player, def, target);
   }
 }

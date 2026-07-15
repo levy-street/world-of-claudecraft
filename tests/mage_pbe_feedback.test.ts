@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { onCastCompleted, onDamageTaken } from '../src/sim/combat/talent_procs';
+import {
+  onCastCompleted,
+  onDamageTaken,
+  onSpellCrit,
+  tickProcState,
+} from '../src/sim/combat/talent_procs';
 import { MAGE_CHOICE_ROWS } from '../src/sim/content/choice_rows_classic';
 import { ABILITIES } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
@@ -33,6 +38,39 @@ describe('PBE-2 Mage feedback', () => {
         value: 0.5,
         remaining: 8,
       }),
+    );
+  });
+
+  it('auto-procs Racing Mind from spell criticals on a 15 second rhythm', () => {
+    const sim = mage({ 14: 'mag_r14_presence_of_mind' });
+    expect(sim.known.some((known) => known.def.id === 'presence_of_mind')).toBe(false);
+
+    onSpellCrit(sim.ctx, sim.player, 'fireball', sim.player);
+
+    expect(sim.player.auras).toContainEqual(
+      expect.objectContaining({
+        id: 'mag_racing_mind',
+        kind: 'next_cast_instant',
+        empowerAbilities: [
+          'fireball',
+          'frostbolt',
+          'polymorph',
+          'flamestrike',
+          'scorch',
+          'pyroblast',
+        ],
+        remaining: 8,
+      }),
+    );
+
+    sim.player.auras.length = 0;
+    onSpellCrit(sim.ctx, sim.player, 'frostbolt', sim.player);
+    expect(sim.player.auras).toEqual([]);
+
+    tickProcState(sim.player, 15);
+    onSpellCrit(sim.ctx, sim.player, 'frostbolt', sim.player);
+    expect(sim.player.auras).toContainEqual(
+      expect.objectContaining({ id: 'mag_racing_mind', kind: 'next_cast_instant' }),
     );
   });
 

@@ -35,6 +35,15 @@ const mageDamagingFireSpellAbilityIds = [
   'meteor',
 ];
 
+const mageCastTimeCombatSpellAbilityIds = [
+  'fireball',
+  'frostbolt',
+  'polymorph',
+  'flamestrike',
+  'scorch',
+  'pyroblast',
+];
+
 const hunterRangedShotAbilityIds = [
   'auto_shot',
   'serpent_sting',
@@ -262,9 +271,25 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'mag_r14_presence_of_mind',
           name: 'Racing Mind',
-          description: 'Grants Racing Mind.',
+          description:
+            'A spell critical strike makes your next cast-time combat spell within 8 sec instant. 15 sec internal cooldown.',
           icon: 'presence_of_mind',
-          effect: { grant: { ability: 'presence_of_mind' } },
+          effect: {
+            proc: {
+              id: 'mag_racing_mind',
+              name: 'Racing Mind',
+              school: 'arcane',
+              trigger: { on: 'spellCrit', icd: 15 },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_instant',
+                  abilities: mageCastTimeCombatSpellAbilityIds,
+                  duration: 8,
+                },
+              ],
+            },
+          },
         },
         {
           id: 'mag_r14_hot_streak',
