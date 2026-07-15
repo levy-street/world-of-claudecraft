@@ -310,6 +310,19 @@ export const sv_SE: EnTranslations = {
       "notInPartyError": "Du måste vara med i en grupp för att starta en beredskapskontroll.",
       "inProgressError": "En beredskapskontroll pågår redan."
     },
+    "arena": {
+      "windowTitle": "Battlegrounds",
+      "arenaIntro": "The ranked coliseum: duel one-on-one or in a team, win to climb the ladder and raise your rating.",
+      "yumiHeading": "Protect Yumi",
+      "yumiIntro": "A team objective fought in the maze, outside the coliseum. Unranked, so play it for glory rather than rating.",
+      "desc1v1": "One versus one. Pure skill, no teammates to lean on.",
+      "desc2v2": "Two versus two. Bring a partner, or solo-queue and be paired into a duo.",
+      "descFiesta": "A rowdy two-versus-two free-for-all with augments and power-ups.",
+      "descYumi3": "Three versus three. Guard your Yumi cat and hunt the enemy team's.",
+      "descYumi5": "Five versus five in a larger maze, and your cat holds far more health.",
+      "yumiRules": "Each team guards a passive Yumi cat and hunts the enemy team's. Both cats blink to fresh corners of the maze every minute. A downed fighter returns after {respawn} seconds. Mystery power-ups appear on the floor: hold Interact for a moment to grab one. The first team to destroy the enemy cat wins, and at {sudden} minutes sudden death breaks any stalemate.",
+      "queueCount": "{n} in queue"
+    },
     "death": {
       "resurrectAtCorpse": "Återuppstå vid liket",
       "resurrectAtHealer": "Den bleka väktaren (Väktartullen)",
@@ -4573,7 +4586,10 @@ export const sv_SE: EnTranslations = {
       "partyTooBig5": "Skydda Yumi 5 mot 5 tillåter ett sällskap på upp till fem."
     },
     "log": {
-      "start": "Skydda Yumi! Försvara din följeslagare och jaga deras."
+      "start": "Skydda Yumi! Försvara din följeslagare och jaga deras.",
+      "teamBlue": "You are in the blue team!",
+      "teamRed": "You are in the red team!",
+      "powerupGrabbed": "{player} grabbed a {name} power-up!"
     },
     "hud": {
       "title": "SKYDDA YUMI",
@@ -4584,14 +4600,36 @@ export const sv_SE: EnTranslations = {
       "enemyYumi": "Fiendens Yumi",
       "aria": "Din Yumi på {mine} av {max} hälsa, fiendens Yumi på {theirs}.",
       "collapse": "Dölj Skydda Yumi-staplarna",
-      "expand": "Visa Skydda Yumi-staplarna"
+      "expand": "Visa Skydda Yumi-staplarna",
+      "powerupIn": "Power-up in {s}s",
+      "powerupReady": "Power-up ready!"
     },
     "respawn": {
       "title": "NEDSLAGEN!"
     },
     "banner": {
       "sudden": "PLÖTSLIG DÖD! Yumierna håller ställningarna!",
-      "teleport": "Yumierna teleporterar!"
+      "teleport": "Yumierna teleporterar!",
+      "powerupSpawn": "A mystery power-up appeared!",
+      "powerupMine": "{name}!"
+    },
+    "powerup": {
+      "invuln": {
+        "name": "Invulnerable"
+      },
+      "stealth": {
+        "name": "Veilstep"
+      },
+      "endless_mana": {
+        "name": "Endless Mana"
+      },
+      "berserk": {
+        "name": "Warfever"
+      }
+    },
+    "grab": {
+      "channeling": "Grabbing… {s}s",
+      "aria": "Grabbing the mystery power-up"
     },
     "end": {
       "win": "SEGER! Yumi är trygg!",

@@ -1,6 +1,6 @@
 // Screenshot pack for the Protect Yumi PR: the play window (Arena + Protect
-// Yumi sections) on desktop and phone portrait, and, on the feature branch,
-// the in-match extras (the `(?)` mystery orb and the hold-to-grab bar).
+// Yumi sections) and, on the feature branch, the in-match extras (the `(?)`
+// mystery orb and the hold-to-grab bar). Captures are desktop-only.
 // Offline world, no server needed beyond `npm run dev`.
 //
 //   GAME_URL=http://localhost:5173 SHOT_PREFIX=after SHOTS=all \
@@ -87,13 +87,6 @@ await page.evaluate(() => {
 await sleep(900);
 await page.screenshot({ path: shot('play-window-desktop') });
 console.log(`wrote ${shot('play-window-desktop')}`);
-
-await page.setViewport({ width: 375, height: 812 });
-await sleep(900);
-await page.screenshot({ path: shot('play-window-mobile') });
-console.log(`wrote ${shot('play-window-mobile')}`);
-
-await page.setViewport({ width: 1280, height: 820 });
 await sleep(400);
 await page.evaluate(() => {
   window.__game.hud.toggleArena(); // close it again
@@ -174,11 +167,6 @@ if (SHOTS === 'all') {
   await sleep(1200);
   await page.screenshot({ path: shot('yumi-orb-grab-desktop') });
   console.log(`wrote ${shot('yumi-orb-grab-desktop')}`);
-
-  await page.setViewport({ width: 375, height: 812 });
-  await sleep(900);
-  await page.screenshot({ path: shot('yumi-orb-grab-mobile') });
-  console.log(`wrote ${shot('yumi-orb-grab-mobile')}`);
 }
 
 await browser.close();

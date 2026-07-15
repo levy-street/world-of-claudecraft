@@ -310,6 +310,19 @@ export const da_DK: EnTranslations = {
       "notInPartyError": "Du skal være i en gruppe for at starte et klar-tjek.",
       "inProgressError": "Et klar-tjek er allerede i gang."
     },
+    "arena": {
+      "windowTitle": "Battlegrounds",
+      "arenaIntro": "The ranked coliseum: duel one-on-one or in a team, win to climb the ladder and raise your rating.",
+      "yumiHeading": "Protect Yumi",
+      "yumiIntro": "A team objective fought in the maze, outside the coliseum. Unranked, so play it for glory rather than rating.",
+      "desc1v1": "One versus one. Pure skill, no teammates to lean on.",
+      "desc2v2": "Two versus two. Bring a partner, or solo-queue and be paired into a duo.",
+      "descFiesta": "A rowdy two-versus-two free-for-all with augments and power-ups.",
+      "descYumi3": "Three versus three. Guard your Yumi cat and hunt the enemy team's.",
+      "descYumi5": "Five versus five in a larger maze, and your cat holds far more health.",
+      "yumiRules": "Each team guards a passive Yumi cat and hunts the enemy team's. Both cats blink to fresh corners of the maze every minute. A downed fighter returns after {respawn} seconds. Mystery power-ups appear on the floor: hold Interact for a moment to grab one. The first team to destroy the enemy cat wins, and at {sudden} minutes sudden death breaks any stalemate.",
+      "queueCount": "{n} in queue"
+    },
     "death": {
       "resurrectAtCorpse": "Genopstå ved liget",
       "resurrectAtHealer": "Den Blege Vogter (Vogterens Klokke)",
@@ -4573,7 +4586,10 @@ export const da_DK: EnTranslations = {
       "partyTooBig5": "Beskyt Yumi 5 mod 5 tillader en gruppe på op til fem."
     },
     "log": {
-      "start": "Beskyt Yumi! Forsvar din følgesvend, og jag deres."
+      "start": "Beskyt Yumi! Forsvar din følgesvend, og jag deres.",
+      "teamBlue": "You are in the blue team!",
+      "teamRed": "You are in the red team!",
+      "powerupGrabbed": "{player} grabbed a {name} power-up!"
     },
     "hud": {
       "title": "BESKYT YUMI",
@@ -4584,14 +4600,36 @@ export const da_DK: EnTranslations = {
       "enemyYumi": "Fjendens Yumi",
       "aria": "Din Yumi på {mine} af {max} helbred, fjendens Yumi på {theirs}.",
       "collapse": "Skjul Beskyt Yumi-bjælkerne",
-      "expand": "Vis Beskyt Yumi-bjælkerne"
+      "expand": "Vis Beskyt Yumi-bjælkerne",
+      "powerupIn": "Power-up in {s}s",
+      "powerupReady": "Power-up ready!"
     },
     "respawn": {
       "title": "SLÅET NED!"
     },
     "banner": {
       "sudden": "PLUDSELIG DØD! Yumierne holder stand!",
-      "teleport": "Yumierne teleporterer!"
+      "teleport": "Yumierne teleporterer!",
+      "powerupSpawn": "A mystery power-up appeared!",
+      "powerupMine": "{name}!"
+    },
+    "powerup": {
+      "invuln": {
+        "name": "Invulnerable"
+      },
+      "stealth": {
+        "name": "Veilstep"
+      },
+      "endless_mana": {
+        "name": "Endless Mana"
+      },
+      "berserk": {
+        "name": "Warfever"
+      }
+    },
+    "grab": {
+      "channeling": "Grabbing… {s}s",
+      "aria": "Grabbing the mystery power-up"
     },
     "end": {
       "win": "SEJR! Yumi er i sikkerhed!",

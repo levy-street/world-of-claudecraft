@@ -310,6 +310,19 @@ export const nl_NL: EnTranslations = {
       "notInPartyError": "Je moet in een groep zitten om een gereedheidscontrole te starten.",
       "inProgressError": "Er is al een gereedheidscontrole bezig."
     },
+    "arena": {
+      "windowTitle": "Battlegrounds",
+      "arenaIntro": "The ranked coliseum: duel one-on-one or in a team, win to climb the ladder and raise your rating.",
+      "yumiHeading": "Protect Yumi",
+      "yumiIntro": "A team objective fought in the maze, outside the coliseum. Unranked, so play it for glory rather than rating.",
+      "desc1v1": "One versus one. Pure skill, no teammates to lean on.",
+      "desc2v2": "Two versus two. Bring a partner, or solo-queue and be paired into a duo.",
+      "descFiesta": "A rowdy two-versus-two free-for-all with augments and power-ups.",
+      "descYumi3": "Three versus three. Guard your Yumi cat and hunt the enemy team's.",
+      "descYumi5": "Five versus five in a larger maze, and your cat holds far more health.",
+      "yumiRules": "Each team guards a passive Yumi cat and hunts the enemy team's. Both cats blink to fresh corners of the maze every minute. A downed fighter returns after {respawn} seconds. Mystery power-ups appear on the floor: hold Interact for a moment to grab one. The first team to destroy the enemy cat wins, and at {sudden} minutes sudden death breaks any stalemate.",
+      "queueCount": "{n} in queue"
+    },
     "death": {
       "resurrectAtCorpse": "Herrijs bij je lijk",
       "resurrectAtHealer": "De Bleke Hoeder (Tol van de Hoeder)",
@@ -4573,7 +4586,10 @@ export const nl_NL: EnTranslations = {
       "partyTooBig5": "Bescherm Yumi 5v5 staat een groep van maximaal vijf toe."
     },
     "log": {
-      "start": "Bescherm Yumi! Verdedig je metgezel en bejaag die van hen."
+      "start": "Bescherm Yumi! Verdedig je metgezel en bejaag die van hen.",
+      "teamBlue": "You are in the blue team!",
+      "teamRed": "You are in the red team!",
+      "powerupGrabbed": "{player} grabbed a {name} power-up!"
     },
     "hud": {
       "title": "BESCHERM YUMI",
@@ -4584,14 +4600,36 @@ export const nl_NL: EnTranslations = {
       "enemyYumi": "Vijandige Yumi",
       "aria": "Jouw Yumi op {mine} van {max} gezondheid, vijandige Yumi op {theirs}.",
       "collapse": "De Bescherm Yumi-balken inklappen",
-      "expand": "De Bescherm Yumi-balken uitklappen"
+      "expand": "De Bescherm Yumi-balken uitklappen",
+      "powerupIn": "Power-up in {s}s",
+      "powerupReady": "Power-up ready!"
     },
     "respawn": {
       "title": "NEERGEHAALD!"
     },
     "banner": {
       "sudden": "PLOTSELINGE DOOD! De Yumi's houden stand!",
-      "teleport": "De Yumi's teleporteren!"
+      "teleport": "De Yumi's teleporteren!",
+      "powerupSpawn": "A mystery power-up appeared!",
+      "powerupMine": "{name}!"
+    },
+    "powerup": {
+      "invuln": {
+        "name": "Invulnerable"
+      },
+      "stealth": {
+        "name": "Veilstep"
+      },
+      "endless_mana": {
+        "name": "Endless Mana"
+      },
+      "berserk": {
+        "name": "Warfever"
+      }
+    },
+    "grab": {
+      "channeling": "Grabbing… {s}s",
+      "aria": "Grabbing the mystery power-up"
     },
     "end": {
       "win": "OVERWINNING! Yumi is veilig!",

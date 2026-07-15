@@ -310,6 +310,19 @@ export const zh_CN: EnTranslations = {
       "notInPartyError": "你必须加入队伍才能发起就绪确认。",
       "inProgressError": "就绪确认已在进行中。"
     },
+    "arena": {
+      "windowTitle": "战场",
+      "arenaIntro": "排名竞技场：单挑或组队对决，获胜可攀升排行榜并提升评分。",
+      "yumiHeading": "保护Yumi",
+      "yumiIntro": "在迷宫中进行的团队目标模式，不属于竞技场。无排名，为荣耀而战而非评分。",
+      "desc1v1": "一对一。纯粹技巧，没有队友可依靠。",
+      "desc2v2": "二对二。带上搭档，或单人排队被配成一对。",
+      "descFiesta": "喧闹的二对二混战，带有强化和道具。",
+      "descYumi3": "三对三。守护你的Yumi猫，猎杀敌队的。",
+      "descYumi5": "五对五，迷宫更大，你的猫拥有更多生命值。",
+      "yumiRules": "每队守护一只被动的Yumi猫，并猎杀敌队的。两只猫每分钟都会闪现到迷宫的新角落。阵亡的战士{respawn}秒后重生。神秘强化会出现在地面上：按住互动键片刻即可拾取。率先摧毁敌方猫的队伍获胜；{sudden}分钟时进入突然死亡，打破僵局。",
+      "queueCount": "排队中 {n} 人"
+    },
     "death": {
       "resurrectAtCorpse": "在尸体旁复活",
       "resurrectAtHealer": "灵魂医者（复活后遗症）",

@@ -310,6 +310,19 @@ export const it_IT: EnTranslations = {
       "notInPartyError": "Devi essere in un gruppo per avviare un controllo di prontezza.",
       "inProgressError": "È già in corso un controllo di prontezza."
     },
+    "arena": {
+      "windowTitle": "Battlegrounds",
+      "arenaIntro": "The ranked coliseum: duel one-on-one or in a team, win to climb the ladder and raise your rating.",
+      "yumiHeading": "Protect Yumi",
+      "yumiIntro": "A team objective fought in the maze, outside the coliseum. Unranked, so play it for glory rather than rating.",
+      "desc1v1": "One versus one. Pure skill, no teammates to lean on.",
+      "desc2v2": "Two versus two. Bring a partner, or solo-queue and be paired into a duo.",
+      "descFiesta": "A rowdy two-versus-two free-for-all with augments and power-ups.",
+      "descYumi3": "Three versus three. Guard your Yumi cat and hunt the enemy team's.",
+      "descYumi5": "Five versus five in a larger maze, and your cat holds far more health.",
+      "yumiRules": "Each team guards a passive Yumi cat and hunts the enemy team's. Both cats blink to fresh corners of the maze every minute. A downed fighter returns after {respawn} seconds. Mystery power-ups appear on the floor: hold Interact for a moment to grab one. The first team to destroy the enemy cat wins, and at {sudden} minutes sudden death breaks any stalemate.",
+      "queueCount": "{n} in queue"
+    },
     "death": {
       "resurrectAtCorpse": "Risorgi al cadavere",
       "resurrectAtHealer": "Il Custode Pallido (Mal di resurrezione)",
@@ -4573,7 +4586,10 @@ export const it_IT: EnTranslations = {
       "partyTooBig5": "Proteggi Yumi 5c5 ammette un gruppo di massimo cinque giocatori."
     },
     "log": {
-      "start": "Proteggi Yumi! Difendi il tuo famiglio e dai la caccia a quello nemico."
+      "start": "Proteggi Yumi! Difendi il tuo famiglio e dai la caccia a quello nemico.",
+      "teamBlue": "You are in the blue team!",
+      "teamRed": "You are in the red team!",
+      "powerupGrabbed": "{player} grabbed a {name} power-up!"
     },
     "hud": {
       "title": "PROTEGGI YUMI",
@@ -4584,14 +4600,36 @@ export const it_IT: EnTranslations = {
       "enemyYumi": "Yumi nemico",
       "aria": "Il tuo Yumi a {mine} di {max} salute, Yumi nemico a {theirs}.",
       "collapse": "Comprimi le barre di Proteggi Yumi",
-      "expand": "Espandi le barre di Proteggi Yumi"
+      "expand": "Espandi le barre di Proteggi Yumi",
+      "powerupIn": "Power-up in {s}s",
+      "powerupReady": "Power-up ready!"
     },
     "respawn": {
       "title": "ABBATTUTO!"
     },
     "banner": {
       "sudden": "MORTE IMPROVVISA! Gli Yumi tengono la posizione!",
-      "teleport": "Gli Yumi si teletrasportano!"
+      "teleport": "Gli Yumi si teletrasportano!",
+      "powerupSpawn": "A mystery power-up appeared!",
+      "powerupMine": "{name}!"
+    },
+    "powerup": {
+      "invuln": {
+        "name": "Invulnerable"
+      },
+      "stealth": {
+        "name": "Veilstep"
+      },
+      "endless_mana": {
+        "name": "Endless Mana"
+      },
+      "berserk": {
+        "name": "Warfever"
+      }
+    },
+    "grab": {
+      "channeling": "Grabbing… {s}s",
+      "aria": "Grabbing the mystery power-up"
     },
     "end": {
       "win": "VITTORIA! Yumi è al sicuro!",

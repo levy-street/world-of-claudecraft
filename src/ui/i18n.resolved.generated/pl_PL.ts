@@ -310,6 +310,19 @@ export const pl_PL: EnTranslations = {
       "notInPartyError": "Aby rozpocząć sprawdzenie gotowości, musisz należeć do grupy.",
       "inProgressError": "Sprawdzenie gotowości już trwa."
     },
+    "arena": {
+      "windowTitle": "Battlegrounds",
+      "arenaIntro": "The ranked coliseum: duel one-on-one or in a team, win to climb the ladder and raise your rating.",
+      "yumiHeading": "Protect Yumi",
+      "yumiIntro": "A team objective fought in the maze, outside the coliseum. Unranked, so play it for glory rather than rating.",
+      "desc1v1": "One versus one. Pure skill, no teammates to lean on.",
+      "desc2v2": "Two versus two. Bring a partner, or solo-queue and be paired into a duo.",
+      "descFiesta": "A rowdy two-versus-two free-for-all with augments and power-ups.",
+      "descYumi3": "Three versus three. Guard your Yumi cat and hunt the enemy team's.",
+      "descYumi5": "Five versus five in a larger maze, and your cat holds far more health.",
+      "yumiRules": "Each team guards a passive Yumi cat and hunts the enemy team's. Both cats blink to fresh corners of the maze every minute. A downed fighter returns after {respawn} seconds. Mystery power-ups appear on the floor: hold Interact for a moment to grab one. The first team to destroy the enemy cat wins, and at {sudden} minutes sudden death breaks any stalemate.",
+      "queueCount": "{n} in queue"
+    },
     "death": {
       "resurrectAtCorpse": "Odrodź się przy zwłokach",
       "resurrectAtHealer": "Blady Strażnik (Myto Strażnika)",
@@ -4573,7 +4586,10 @@ export const pl_PL: EnTranslations = {
       "partyTooBig5": "Ochrona Yumi 5 na 5 pozwala na drużynę liczącą do pięciu osób."
     },
     "log": {
-      "start": "Ochrona Yumi! Broń swojego chowańca i poluj na cudzego."
+      "start": "Ochrona Yumi! Broń swojego chowańca i poluj na cudzego.",
+      "teamBlue": "You are in the blue team!",
+      "teamRed": "You are in the red team!",
+      "powerupGrabbed": "{player} grabbed a {name} power-up!"
     },
     "hud": {
       "title": "OCHRONA YUMI",
@@ -4584,14 +4600,36 @@ export const pl_PL: EnTranslations = {
       "enemyYumi": "Wroga Yumi",
       "aria": "Twoja Yumi ma {mine} z {max} zdrowia, wroga Yumi ma {theirs}.",
       "collapse": "Zwiń paski Ochrony Yumi",
-      "expand": "Rozwiń paski Ochrony Yumi"
+      "expand": "Rozwiń paski Ochrony Yumi",
+      "powerupIn": "Power-up in {s}s",
+      "powerupReady": "Power-up ready!"
     },
     "respawn": {
       "title": "POWALONY!"
     },
     "banner": {
       "sudden": "NAGŁA ŚMIERĆ! Yumi trzymają pozycje!",
-      "teleport": "Yumi się teleportują!"
+      "teleport": "Yumi się teleportują!",
+      "powerupSpawn": "A mystery power-up appeared!",
+      "powerupMine": "{name}!"
+    },
+    "powerup": {
+      "invuln": {
+        "name": "Invulnerable"
+      },
+      "stealth": {
+        "name": "Veilstep"
+      },
+      "endless_mana": {
+        "name": "Endless Mana"
+      },
+      "berserk": {
+        "name": "Warfever"
+      }
+    },
+    "grab": {
+      "channeling": "Grabbing… {s}s",
+      "aria": "Grabbing the mystery power-up"
     },
     "end": {
       "win": "ZWYCIĘSTWO! Yumi jest bezpieczna!",

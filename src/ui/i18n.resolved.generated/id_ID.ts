@@ -310,6 +310,19 @@ export const id_ID: EnTranslations = {
       "notInPartyError": "Kamu harus berada dalam grup untuk memulai pemeriksaan kesiapan.",
       "inProgressError": "Pemeriksaan kesiapan sedang berlangsung."
     },
+    "arena": {
+      "windowTitle": "Battlegrounds",
+      "arenaIntro": "The ranked coliseum: duel one-on-one or in a team, win to climb the ladder and raise your rating.",
+      "yumiHeading": "Protect Yumi",
+      "yumiIntro": "A team objective fought in the maze, outside the coliseum. Unranked, so play it for glory rather than rating.",
+      "desc1v1": "One versus one. Pure skill, no teammates to lean on.",
+      "desc2v2": "Two versus two. Bring a partner, or solo-queue and be paired into a duo.",
+      "descFiesta": "A rowdy two-versus-two free-for-all with augments and power-ups.",
+      "descYumi3": "Three versus three. Guard your Yumi cat and hunt the enemy team's.",
+      "descYumi5": "Five versus five in a larger maze, and your cat holds far more health.",
+      "yumiRules": "Each team guards a passive Yumi cat and hunts the enemy team's. Both cats blink to fresh corners of the maze every minute. A downed fighter returns after {respawn} seconds. Mystery power-ups appear on the floor: hold Interact for a moment to grab one. The first team to destroy the enemy cat wins, and at {sudden} minutes sudden death breaks any stalemate.",
+      "queueCount": "{n} in queue"
+    },
     "death": {
       "resurrectAtCorpse": "Bangkit di Jasad",
       "resurrectAtHealer": "Sang Penjaga Pucat (Upeti Sang Penjaga)",
@@ -4573,7 +4586,10 @@ export const id_ID: EnTranslations = {
       "partyTooBig5": "Lindungi Yumi 5 lawan 5 hanya membolehkan party hingga lima orang."
     },
     "log": {
-      "start": "Lindungi Yumi! Bela peliharaanmu dan buru milik lawan."
+      "start": "Lindungi Yumi! Bela peliharaanmu dan buru milik lawan.",
+      "teamBlue": "You are in the blue team!",
+      "teamRed": "You are in the red team!",
+      "powerupGrabbed": "{player} grabbed a {name} power-up!"
     },
     "hud": {
       "title": "LINDUNGI YUMI",
@@ -4584,14 +4600,36 @@ export const id_ID: EnTranslations = {
       "enemyYumi": "Yumi Musuh",
       "aria": "Yumi-mu pada {mine} dari {max} kesehatan, Yumi musuh pada {theirs}.",
       "collapse": "Ciutkan bilah Lindungi Yumi",
-      "expand": "Bentangkan bilah Lindungi Yumi"
+      "expand": "Bentangkan bilah Lindungi Yumi",
+      "powerupIn": "Power-up in {s}s",
+      "powerupReady": "Power-up ready!"
     },
     "respawn": {
       "title": "TUMBANG!"
     },
     "banner": {
       "sudden": "KEMATIAN MENDADAK! Para Yumi bertahan di posisinya!",
-      "teleport": "Para Yumi berteleportasi!"
+      "teleport": "Para Yumi berteleportasi!",
+      "powerupSpawn": "A mystery power-up appeared!",
+      "powerupMine": "{name}!"
+    },
+    "powerup": {
+      "invuln": {
+        "name": "Invulnerable"
+      },
+      "stealth": {
+        "name": "Veilstep"
+      },
+      "endless_mana": {
+        "name": "Endless Mana"
+      },
+      "berserk": {
+        "name": "Warfever"
+      }
+    },
+    "grab": {
+      "channeling": "Grabbing… {s}s",
+      "aria": "Grabbing the mystery power-up"
     },
     "end": {
       "win": "KEMENANGAN! Yumi selamat!",

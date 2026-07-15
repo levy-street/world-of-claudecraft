@@ -8603,7 +8603,10 @@ export class Hud {
         case 'yumiPowerup': {
           // A fighter grabbed a mystery power-up: log for all, big cue for me.
           // The effect name is finally revealed here (localized by defId).
-          const puName = tOptional(`yumi.powerup.${ev.defId}.name`) ?? ev.defId;
+          const puName = tOptional(`yumi.powerup.${ev.defId}.name`);
+          // The sim emits only catalogued ids. Ignore a malformed wire event instead
+          // of leaking an internal id into player-visible text.
+          if (!puName) break;
           const puWho = sim.entities.get(ev.entityId)?.name ?? '?';
           this.log(t('yumi.log.powerupGrabbed', { player: puWho, name: puName }), '#ffd24a');
           if (ev.entityId === sim.playerId) {
