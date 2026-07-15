@@ -183,16 +183,17 @@ function legacyRectShellColliders(geo: LitanyModuleGeometry): Collider[] {
 // authored polygon edge before it is split into more pieces.
 const WALL_SEGMENT_MAX = 6;
 
-/** Chain of rotated OBB wall segments tracing a CCW simple polygon boundary.
- * Each edge is split into ceil(len / WALL_SEGMENT_MAX) equal segments so a
- * long straight run still reads as a wall of DUNGEON_WALL_HW thickness. The
- * OBB rotation aligns its local hw-axis (half-width, local x) with the edge
- * direction under colliders.ts's rotY convention (rotY(1,0,rot) =
- * {x:cos(rot), z:-sin(rot)} is the world direction of local +x), so
- * rot = atan2(-edgeDz, edgeDx) points the OBB's long axis along the edge:
- * the same atan2(-dz, dx) convention colliders.ts already uses for fences. */
-export function polygonShellColliders(points: readonly Point2D[]): Collider[] {
-  const out: Collider[] = [];
+export interface LitanyWallSegment {
+  x: number;
+  z: number;
+  halfLength: number;
+  rot: number;
+}
+
+/** Exact wall-module spans for a polygon shell. Render and collision both consume
+ * these segments so short or angled edges never draw past their solid footprint. */
+export function polygonWallSegments(points: readonly Point2D[]): LitanyWallSegment[] {
+  const out: LitanyWallSegment[] = [];
   const n = points.length;
   for (let i = 0; i < n; i++) {
     const a = points[i];
@@ -207,16 +208,33 @@ export function polygonShellColliders(points: readonly Point2D[]): Collider[] {
     for (let s = 0; s < segCount; s++) {
       const midT = (s + 0.5) / segCount;
       out.push({
-        type: 'obb',
         x: a.x + dx * midT,
         z: a.z + dz * midT,
-        hw: segLen / 2,
-        hd: DUNGEON_WALL_HW,
+        halfLength: segLen / 2,
         rot,
       });
     }
   }
   return out;
+}
+
+/** Chain of rotated OBB wall segments tracing a CCW simple polygon boundary.
+ * Each edge is split into ceil(len / WALL_SEGMENT_MAX) equal segments so a
+ * long straight run still reads as a wall of DUNGEON_WALL_HW thickness. The
+ * OBB rotation aligns its local hw-axis (half-width, local x) with the edge
+ * direction under colliders.ts's rotY convention (rotY(1,0,rot) =
+ * {x:cos(rot), z:-sin(rot)} is the world direction of local +x), so
+ * rot = atan2(-edgeDz, edgeDx) points the OBB's long axis along the edge:
+ * the same atan2(-dz, dx) convention colliders.ts already uses for fences. */
+export function polygonShellColliders(points: readonly Point2D[]): Collider[] {
+  return polygonWallSegments(points).map((segment) => ({
+    type: 'obb',
+    x: segment.x,
+    z: segment.z,
+    hw: segment.halfLength,
+    hd: DUNGEON_WALL_HW,
+    rot: segment.rot,
+  }));
 }
 
 function shellColliders(geo: LitanyModuleGeometry): Collider[] {

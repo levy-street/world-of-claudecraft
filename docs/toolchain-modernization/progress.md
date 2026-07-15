@@ -6,10 +6,10 @@
 |---|---|---|---|
 | Phase 1: Degit i18n aggregates | MERGED into release/v0.26.0 (PR #1931, merge 0313a58f6) | 2026-07-14 | 2026-07-14 |
 | Phase 1 QA | complete: PASS-WITH-FOLLOWUPS (criterion 2 re-scoped by the owner's OPEN item 8 decision; pending.ts durable fix specced as a follow-up); 2 SHOULD-FIX fixed | 2026-07-14 | 2026-07-14 |
-| Phase 2: Flat TranslationKey + baseUrl | implemented; PR #1940 ready for review after QA PASS (merge owner-scheduled) | 2026-07-14 | 2026-07-14 |
+| Phase 2: Flat TranslationKey + baseUrl | MERGED into release/v0.26.0 (PR #1940, merge 66b5eb6c5) | 2026-07-14 | 2026-07-14 |
 | Phase 2 QA | complete: PASS (0 BLOCKING; 2 SHOULD-FIX found and resolved: the committed teeth successor test + the recorded cadence deviation; 7 doc corrections) | 2026-07-14 | 2026-07-14 |
-| Phase 3: CI parallel checks + FFmpeg | not started | | |
-| Phase 3 QA | not started | | |
+| Phase 3: CI parallel checks + FFmpeg | implemented; PR #1945 ready for review (post-merge CI green), merge owner-scheduled | 2026-07-14 | 2026-07-14 |
+| Phase 3 QA | complete: PASS (0 BLOCKING; 8 SHOULD-FIX found and resolved; release base merged in as e0f442637; 2 tests added) | 2026-07-15 | 2026-07-15 |
 | Phase 4: Test sharding | not started | | |
 | Phase 4 QA | not started | | |
 | Phase 5: TypeScript 7 flip | not started | | |
@@ -78,17 +78,37 @@
 
 ## Phase 3 deliverables
 
-- [ ] Go/no-go recorded: the four sfx suites (sfx_conform, sfx_studio,
-      sfx_studio_server_security, sfx_export_bundle) green against
-      ffmpeg-static/ffprobe-static binaries
-- [ ] scripts/sfx_studio/audio_io.mjs and export_bundle.mjs repointed at ffmpeg-static
-      with PATH fallback; gate.mjs preflight and tests/sfx_gate_preflight.test.ts updated
-      coordinately; apt FFmpeg step removed from both CI jobs (fallback if no-go: CI
-      symlink step only, spawns untouched)
-- [ ] New pr-checks job parallel to pr-gate (i18n:gen + the Phase 1 audit-summary step +
-      freshness diff + security:gate + check:types + build:env + build:server + build),
-      merge-ref checkout preserved; those steps removed from pr-gate
-- [ ] tests/ci_workflow.test.ts pins and the ci.yml/gate.mjs sync comments updated
+- [x] Go/no-go recorded: verdict GO (2026-07-14). Static binaries verified by execution
+      first (ffmpeg-static 7.0.2, ffprobe-static 4.0.2), then the four sfx suites
+      (sfx_conform, sfx_studio, sfx_studio_server_security, sfx_export_bundle) ran green
+      (117 tests, including the ebur128/loudnorm loudness assertions) with PATH
+      ffmpeg/ffprobe pointing ONLY at the static binaries (this machine has no system
+      FFmpeg, so the shim was the only ffmpeg anywhere)
+- [x] scripts/sfx_studio/audio_io.mjs and export_bundle.mjs repointed via the new
+      scripts/sfx/ffmpeg_paths.mjs resolver (static packages first, bare PATH-name
+      fallback for scripts-skipped installs, WOC_FFMPEG_PATH/WOC_FFPROBE_PATH operator
+      overrides that win outright)
+      (CORRECTED 2026-07-15 by Phase 3 QA: after the release merge e0f442637 only
+      audio_io.mjs remains on the resolver; export_bundle.mjs's conformance call
+      site binds directly to ffmpeg-static/ffprobe-static per release PR #1930,
+      which won the merge conflict and pins that wiring in its test);
+      gate.mjs preflight now probes the RESOLVED binaries
+      by execution, with tests/sfx_gate_preflight.test.ts updated in the same commit
+      (both red paths: nonexistent override + empty PATH, and a present-but-broken
+      binary pinning probe-by-execution so it cannot degrade to existsSync); apt FFmpeg
+      step removed from both CI jobs; new tests/sfx_ffmpeg_paths.test.ts covers all
+      three resolver arms plus an execution probe of the resolved constants
+- [x] New pr-checks job parallel to pr-gate (i18n:gen, the Phase 1 audit-summary step
+      immediately after it, the union-inclusive freshness diff, security:gate,
+      check:types, build:env, build:server, build), same if-conditions, no needs edge,
+      merge-ref checkout preserved; those steps removed from pr-gate, which keeps
+      checkout/setup/npm ci/npm test (no FFmpeg provisioning needed on GO)
+- [x] tests/ci_workflow.test.ts pins updated in the same commits as their surfaces
+      (apt-absence + resolver-import pin with the sfx commit; the pr-checks moves, the
+      shared if-fragment and no-I18N_RELEASE_TIER pins for both PR jobs, and the
+      parallel-split step-coverage test with the ci.yml commit); keep-in-sync comments
+      updated in ci.yml (two-tier header + both job headers + both freshness comments,
+      closing the Phase 2 QA rider) and gate.mjs (serial-by-design wording)
 
 ## Phase 4 deliverables
 
@@ -177,7 +197,54 @@ tests added, dead code removed, deferrals.
   arbiter); typecheck and the env, server, and client builds green. PR #1940
   marked ready for review after PR CI green on the QA head; merge timing
   owner-scheduled.
-- Phase 3 QA:
+- Phase 3 QA: verdict PASS (2026-07-15). 0 BLOCKING; 8 SHOULD-FIX found, 8
+  resolved; 9 NICE-TO-HAVE/INFO items confirmed and recorded as deferrals in the
+  state.md Phase 3 QA notes. The release base moved before QA (812e4b223 to
+  61fd49975: the Windows publish job, the 2,095-row v0.26.0 locale fill, the
+  version-surface sync, plus 8 gameplay/server PRs), so QA began with the
+  packet-rule merge (single commit e0f442637; one conflict,
+  scripts/sfx_studio/export_bundle.mjs, resolved to the release side whose
+  PR #1930 binds export conformance validation directly to
+  ffmpeg-static/ffprobe-static and pins it; post-merge i18n:gen left a clean
+  tree) and the release-merge-audit skill (4 lenses, 0 BLOCKING). SHOULD-FIX
+  resolutions: audio_io.mjs now loads export_bundle.mjs lazily so the release
+  side's import-time throw on ffmpeg-static-null platforms cannot take down
+  Studio playback/encode (fix + source pin, commit 04fde718a); the preflight
+  suite gained the single-tool red path exercising the per-tool message
+  selection (test-coverage-auditor finding, same commit); stale resolver-scope
+  comments fixed (ffmpeg_paths.mjs header, ci_workflow.test.ts); contributor
+  docs' universal-PATH-fallback overclaims scoped correctly (README,
+  scripts/CLAUDE.md, sfx-studio-tutorial, qa-checklist agent; commit
+  7ae2969d7); packet records corrected with dated notes (both-spawn-sites
+  claim, OPEN item 8 pre-fill figures, pre-merge measured baselines, the
+  release-tier pending-red clauses in qa-checklist.md and phase-05-qa.md now
+  that pending=0); the branch-protection require-both note verified and
+  extended with the redundant-enforcement nuance at OPEN item 4. Tests added:
+  2 (the lazy-import pin in tests/sfx_studio.test.ts; the single-tool preflight
+  red path in tests/sfx_gate_preflight.test.ts). Dead code removed: none.
+  Audit evidence: the merged ci.yml proven a superset reordering of the
+  812e4b223 step set across all 6 jobs (only the two intended apt removals
+  dropped, if-expressions byte-identical, merge-ref checkout preserved,
+  audit-summary step directly after i18n:gen); every ci_workflow pin re-derived
+  by hand from the merged workflow; the four sfx suites green with no system
+  ffmpeg (118 tests, was 117 at go/no-go; the release pin added one). Probes
+  (both --no-verify, both removed after observation): staled-slice PR #1962 run
+  29413049770 red exactly at the pr-checks freshness step naming the union and
+  slices; type-error run 29413485950 red at Typecheck 77s into pr-checks
+  (about 2 minutes from push vs about 10 minutes pre-split), branch
+  force-reset, no probe commit remains. Live CI on the merged head: run
+  29412863470 all green, wall 564s = pr-gate 559s parallel with pr-checks 94s.
+  Gate (Node 24, bare ffmpeg-less PATH): steps 1 to 6 green (14,235 tests),
+  browser red only at the known environmental armory assertion, manual tail
+  (typecheck + three builds) green. Reviewers: privacy-security-review PASS,
+  test-coverage-auditor PASS, qa-checklist READY. Pre-push resync: the release
+  tip moved again during QA (to b3d789e83, the PR #1935 delve fix; zero
+  branch-surface overlap, merged clean as f80f8e522), and that GitHub-UI merge
+  carried biome errors in two delve test files that blocked the pre-push
+  floor; healed by a scoped biome --write as chore(tests) 0b6ff86a5. Final
+  QA-head run 29415139204 all green (wall 547s = pr-gate 544s parallel with
+  pr-checks 95s). PR #1945 marked ready for review; merge timing
+  owner-scheduled.
 - Phase 4 QA:
 - Phase 5 QA (includes the packet-teardown offer):
 
@@ -212,3 +279,39 @@ tests added, dead code removed, deferrals.
   at the known environmental armory_mobile_layout pixel assertion (reproduces on
   the untouched release tip; PR CI is the arbiter); typecheck and the env,
   server, and client builds green.
+
+- Phase 3 (2026-07-14): implemented as draft PR #1945 off release/v0.26.0 tip
+  812e4b223, three commits plus this docs commit. Go/no-go GO (see the checked
+  deliverable above). Base-tip finding: the PR #1937 merge (the release tip
+  itself) added the catalog key hudChrome.gathering.notReady from a branch that
+  predated the generated union, so the tip carried a one-key-stale committed
+  union and the local gate freshness step caught it before any Phase 3 edit ran;
+  healed by the documented mechanical regen as its own chore(i18n) commit (the
+  live recurrence of the e07b4aaeb failure mode; the merge --no-commit + regen
+  rule now applies to GitHub-UI merges of pre-union branches too, recorded in
+  state.md). Commit cadence: the phase doc's separate test(ci) repin commit was
+  folded into the two surface commits per the Phase 2 QA pin-rides-with-surface
+  rule; a post-review pin (the present-but-broken preflight probe) was folded
+  into the sfx commit by history rewrite before the branch was ever pushed, so
+  the pushed stack is clean and each commit is individually green. Live CI
+  (run 29388205976, all green): pr-gate 527s (tests only), pr-checks 92s
+  (npm ci 14s, i18n:gen 5s, summary + freshness 0s, malware 5s, typecheck 38s,
+  builds about 10s), fully overlapping windows, overall wall 531s vs the 658s
+  serial baseline (about 127s off the critical path, consistent with the
+  expected roughly 110s; the critical path is now the vitest step alone, which
+  Phase 4 attacks). Red-path probe PR #1946 (closed unmerged, branch deleted):
+  its pr-checks job failed exactly at the freshness step (run 29388336786) with
+  legible hunks naming the staled union line and the per-locale slices, i18n:gen
+  and the summary green, typecheck/builds never ran. Local gate on an
+  ffmpeg-less bare PATH under Node 24 (the strongest D8 evidence, no shim):
+  steps 1 to 6 green including the full vitest suite (13,957 passed), browser
+  red only at the known environmental armory assertion (green in this PR's CI
+  browser-gate on the same content), typecheck and all three builds green.
+  Reviews (all COVERAGE-prompted, 0 BLOCKING total): privacy-security-review
+  PASS (one operational note recorded at state.md OPEN item 4: when branch
+  protection is ever configured, require BOTH pr-gate and pr-checks);
+  test-coverage-auditor 0 blocking (its one SHOULD-FIX, no pin on
+  probe-by-execution, closed in-diff by the broken-binary preflight case; low
+  NITs recorded in state.md); qa-checklist READY (its SHOULD-FIX was this very
+  docs recording; its doc NIT, the scripts/CLAUDE.md SFX row understating
+  gen_ui_sfx's PATH default, fixed in this docs commit).

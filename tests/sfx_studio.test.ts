@@ -1143,6 +1143,18 @@ describe('SFX Studio project schema', () => {
   });
 });
 
+describe('SFX Studio module-load robustness', () => {
+  it('loads the export bundle validator lazily so its import-time ffmpeg-static throw cannot take down the Studio', () => {
+    // export_bundle.mjs throws at import time when ffmpeg-static exports null
+    // (unsupported platform, PR #1930). audio_io.mjs must reach it only through a
+    // dynamic import at the export call site: a top-level import would break the
+    // playback/encode paths that keep working via the resolver's PATH fallback.
+    const audioIoSrc = readFileSync(join(ROOT, 'scripts/sfx_studio/audio_io.mjs'), 'utf8');
+    expect(audioIoSrc).not.toMatch(/^import[^;]*from '\.\/export_bundle\.mjs';/m);
+    expect(audioIoSrc).toContain("await import('./export_bundle.mjs')");
+  });
+});
+
 describe('SFX Studio catalog associations', () => {
   it('provides an existing contextual model for every sampled cue', () => {
     const keys = SFX.map((entry: { key: string }) => entry.key);
