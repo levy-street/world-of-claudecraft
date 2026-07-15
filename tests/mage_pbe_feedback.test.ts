@@ -6,7 +6,7 @@ import {
   tickProcState,
 } from '../src/sim/combat/talent_procs';
 import { MAGE_CHOICE_ROWS } from '../src/sim/content/choice_rows_classic';
-import { ABILITIES } from '../src/sim/data';
+import { ABILITIES, ITEMS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 
 function mage(rows: Record<number, string> = {}): Sim {
@@ -72,6 +72,23 @@ describe('PBE-2 Mage feedback', () => {
     expect(sim.player.auras).toContainEqual(
       expect.objectContaining({ id: 'mag_racing_mind', kind: 'next_cast_instant' }),
     );
+  });
+
+  it('matches top-rank conjured food and water to the best vendor consumables', () => {
+    expect(ABILITIES.conjure_water.ranks?.at(-1)?.rank).toBe(3);
+    expect(ABILITIES.conjure_food.ranks?.at(-1)?.rank).toBe(3);
+    expect(ITEMS.conjured_water3.drinkMana).toBe(ITEMS.glacier_melt.drinkMana);
+    expect(ITEMS.conjured_bread3.foodHp).toBe(ITEMS.roast_mountain_goat.foodHp);
+    expect([
+      ITEMS.conjured_water.drinkMana,
+      ITEMS.conjured_water2.drinkMana,
+      ITEMS.conjured_water3.drinkMana,
+    ]).toEqual([76, 288, 900]);
+    expect([
+      ITEMS.conjured_bread.foodHp,
+      ITEMS.conjured_bread2.foodHp,
+      ITEMS.conjured_bread3.foodHp,
+    ]).toEqual([61, 243, 874]);
   });
 
   it('makes Flickerstep baseline and keeps three distinct level-17 choices', () => {
