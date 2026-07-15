@@ -4317,6 +4317,9 @@ export class GameServer {
       case 'frontier_leave':
         sim.frontierLeave(pid);
         break;
+      case 'arena_daily_claim':
+        sim.arenaDailyClaim(pid);
+        break;
 
       // The Vale Cup (boarball queue at the Sowfield, docs/prd/vale-cup.md).
       // Deliberately NOT in HEAVY_SELF_CMDS: queueing mutates no heavy self
@@ -5092,6 +5095,7 @@ export class GameServer {
     // Frontier incursion bar: the shared meter / live rare, but only while this viewer
     // is in the band (null otherwise). Delta-guarded, so it rides only on change.
     maybe('fincur', this.sim.frontierIncursionFor(anchorSession.pid));
+    maybe('adaily', this.sim.arenaDailyInfoFor(anchorSession.pid));
     if (this.sim.tickCount - session.lastArenaWireTick >= ARENA_WIRE_INTERVAL_TICKS) {
       session.lastArenaWireTick = this.sim.tickCount;
       maybe('arena', this.sim.arenaInfoFor(anchorSession.pid));

@@ -920,6 +920,9 @@ export interface PlayerMeta {
   // Where to teleport back to when leaving the Frostreach Frontier (the overworld
   // spot the player entered from). Persisted so leave works across a relog.
   frontierReturn?: { x: number; z: number; facing: number };
+  // Ashen Coliseum daily claim: the utcDay the player last entered a bout + last
+  // claimed, so the once-per-day honor+hero claim resets on the day boundary.
+  arenaDaily?: honorMod.ArenaDailyState;
   prestigeRank: number;
   unlockedMilestones: Set<string>;
   // Classic Rested XP pool (copper-less XP units). Accrues while resting in an
@@ -1125,6 +1128,7 @@ export interface CharacterState {
   honorArenaDaily?: HonorArenaDailyState;
   dailyQuests?: DailyQuestState;
   frontierReturn?: { x: number; z: number; facing: number };
+  arenaDaily?: honorMod.ArenaDailyState;
   prestigeRank?: number;
   unlockedMilestones?: string[];
   // Rested XP pool. Optional so pre-rested-XP saves load cleanly (defaults to 0).
@@ -2035,6 +2039,7 @@ export class Sim {
       );
       meta.honorArenaDaily = honorMod.normalizeHonorDailyState(s.honorArenaDaily);
       meta.dailyQuests = normalizeDailyQuestState(s.dailyQuests);
+      meta.arenaDaily = honorMod.normalizeArenaDaily(s.arenaDaily);
       if (
         s.frontierReturn &&
         Number.isFinite(s.frontierReturn.x) &&
@@ -2466,6 +2471,7 @@ export class Sim {
         ? { dailyQuests: { date: meta.dailyQuests.date, done: [...meta.dailyQuests.done] } }
         : {}),
       ...(meta.frontierReturn ? { frontierReturn: { ...meta.frontierReturn } } : {}),
+      ...(meta.arenaDaily ? { arenaDaily: { ...meta.arenaDaily } } : {}),
       prestigeRank: meta.prestigeRank,
       unlockedMilestones: [...meta.unlockedMilestones],
       restedXp: meta.restedXp,
@@ -7051,6 +7057,24 @@ export class Sim {
 
   get frontierIncursion(): import('../world_api').FrontierIncursionView | null {
     return this.frontierIncursionFor(this.primaryId);
+  }
+
+  // The Ashen Coliseum daily claim: once per host day, a player who entered a bout
+  // that day claims honor + hero points scaled by their best arena rating.
+  arenaDailyClaim(pid?: number): void {
+    honorMod.claimArenaDaily(this.ctx, pid);
+  }
+
+  arenaDailyInfoFor(pid: number): import('../world_api').ArenaDailyInfo {
+    const meta = this.players.get(pid);
+    if (!meta) return { status: 'unavailable', honor: 0, hero: 0 };
+    return honorMod.arenaDailyInfo(meta, this.utcDay);
+  }
+
+  get arenaDaily(): import('../world_api').ArenaDailyInfo {
+    return this.primaryId === -1
+      ? { status: 'unavailable', honor: 0, hero: 0 }
+      : this.arenaDailyInfoFor(this.primaryId);
   }
 
   private isArenaQueued(pid: number): boolean {

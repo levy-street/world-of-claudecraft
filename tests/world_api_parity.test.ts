@@ -78,8 +78,8 @@ interface IWorldMember {
   readonly kind: IWorldMemberKind;
 }
 
-// The 238 members of `interface IWorld`, in interface order (world_api.ts).
-// Partition: 65 `data` + 173 `method` (read-returning + command-void + async).
+// The 240 members of `interface IWorld`, in interface order (world_api.ts).
+// Partition: 66 `data` + 174 `method` (read-returning + command-void + async).
 // biome-ignore lint/suspicious/noExportsInTest: IWORLD_MEMBERS is the W0c pinned structural-parity contract (the authoritative IWorld member list)
 export const IWORLD_MEMBERS = [
   // --- core world / player roster + economy reads (data) ---
@@ -231,6 +231,8 @@ export const IWORLD_MEMBERS = [
   { name: 'frontierEnter', kind: 'method' },
   { name: 'frontierLeave', kind: 'method' },
   { name: 'frontierIncursion', kind: 'data' },
+  { name: 'arenaDaily', kind: 'data' },
+  { name: 'arenaDailyClaim', kind: 'method' },
   // --- the Vale Cup boarball minigame (IWorldValeCup) ---
   { name: 'vcupQueueJoin', kind: 'method' },
   { name: 'vcupQueueLeave', kind: 'method' },
@@ -439,9 +441,9 @@ beforeAll(() => {
 
 describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => {
   it('pins total / data / method counts', () => {
-    expect(IWORLD_MEMBERS.length).toBe(238);
-    expect(DATA_MEMBERS.length).toBe(65);
-    expect(METHOD_MEMBERS.length).toBe(173);
+    expect(IWORLD_MEMBERS.length).toBe(240);
+    expect(DATA_MEMBERS.length).toBe(66);
+    expect(METHOD_MEMBERS.length).toBe(174);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -470,6 +472,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'archetypeSwitchCount',
       'archetypeTitle',
       'arenaAugmentPick',
+      'arenaDaily',
+      'arenaDailyClaim',
       'arenaInfo',
       'arenaQueueJoin',
       'arenaQueueLeave',
@@ -703,6 +707,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'archetypeAmendsRequired',
       'archetypeSwitchCount',
       'archetypeTitle',
+      'arenaDaily',
       'arenaInfo',
       'bagCapacity',
       'bags',
@@ -775,6 +780,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'advanceAmendsProgress',
       'applyTalents',
       'arenaAugmentPick',
+      'arenaDailyClaim',
       'arenaQueueJoin',
       'arenaQueueLeave',
       'assignMasterLoot',
@@ -985,7 +991,7 @@ describe('membership, not equality: world extras do not fail the gate', () => {
 //       a MISSING name (if the array omits a key, Exclude<> is a non-never union and tsc
 //       fails) -- (1)+(2) together make each array EXACTLY its facet key-set;
 //   (3) the 27 arrays are pairwise DISJOINT (a member filed in two facets reddens);
-//   (4) their union, sorted, equals the pinned 238-name IWORLD_MEMBERS set (a member
+//   (4) their union, sorted, equals the pinned 240-name IWORLD_MEMBERS set (a member
 //       dropped from the split reddens).
 // This is the rigorous form, NOT the tautological `keyof IWorld === keyof (A & B & ...)`
 // (IWorld extends them, so that self-equality proves nothing): it asserts against the
@@ -1194,6 +1200,8 @@ const FACET_DUEL_ARENA = [
   'frontierEnter',
   'frontierLeave',
   'frontierIncursion',
+  'arenaDaily',
+  'arenaDailyClaim',
 ] as const satisfies readonly (keyof IWorldDuelArena)[];
 type _ExhaustDuelArena = AssertNever<
   Exclude<keyof IWorldDuelArena, (typeof FACET_DUEL_ARENA)[number]>
@@ -1420,10 +1428,10 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the 27 fa
     expect(overlaps, `members filed in more than one facet:\n${overlaps.join('\n')}`).toEqual([]);
   });
 
-  it('the union of the 27 facets equals the pinned 238-member IWORLD_MEMBERS set', () => {
+  it('the union of the 27 facets equals the pinned 240-member IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(238);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(238);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(240);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(240);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

@@ -10715,6 +10715,10 @@ export class Hud {
       'Not enough money.': 'itemUi.errors.notEnoughMoney',
       'Not enough honor.': 'hudChrome.warfare.notEnoughHonor',
       'Not enough hero points.': 'hudChrome.warfare.notEnoughHero',
+      'Enter an arena match today to claim your daily reward.':
+        'hudChrome.warfare.arenaDailyNotEntered',
+      'You have already claimed your daily arena reward today.':
+        'hudChrome.warfare.arenaDailyClaimed',
       'You must bring your goods to the Merchant.': 'itemUi.errors.bringGoods',
       'The Merchant will not broker quest items.': 'itemUi.errors.noQuestItems',
       'You do not have that many to sell.': 'itemUi.errors.notEnoughToSell',

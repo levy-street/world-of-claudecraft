@@ -175,4 +175,16 @@ export interface IWorldDuelArena {
   // The public Frontier incursion state for the top-screen bar, or null when the
   // viewer is not in the band (the bar hides).
   frontierIncursion: FrontierIncursionView | null;
+  // The Ashen Coliseum daily-claim state for the local player (status + the reward it
+  // would pay), driving the arena-window claim button.
+  arenaDaily: ArenaDailyInfo;
+  arenaDailyClaim(): void;
+}
+
+// The daily-claim readout: whether the local player can claim their Coliseum daily and
+// the honor + hero points it would grant. Recomputed each render.
+export interface ArenaDailyInfo {
+  status: 'unavailable' | 'ready' | 'claimed';
+  honor: number;
+  hero: number;
 }

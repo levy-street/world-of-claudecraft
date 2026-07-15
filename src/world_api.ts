@@ -132,6 +132,7 @@ export type {
   LockpickView,
 } from './world_api/delves';
 export type {
+  ArenaDailyInfo,
   ArenaInfo,
   ArenaLadderEntry,
   DuelInfo,
@@ -325,6 +326,7 @@ export const COMMAND_NAMES = [
   'arena_augment',
   'frontier_enter',
   'frontier_leave',
+  'arena_daily_claim',
   'prestige',
   'applyTalents',
   'respec',
@@ -550,6 +552,7 @@ export const COMMAND_FACETS = {
   arena_augment: 'IWorldDuelArena',
   frontier_enter: 'IWorldDuelArena',
   frontier_leave: 'IWorldDuelArena',
+  arena_daily_claim: 'IWorldDuelArena',
   // IWorldSocialGraph: friends/blocks/guild commands (online only; resolved
   // server-side by character name, handled by the #4 SocialService). socialInfo
   // arrives via the social/socialpos frames (no command); searchCharacters is a REST

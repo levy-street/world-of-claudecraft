@@ -13,6 +13,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.warfare.arenaDailyTitle': 'コロシアム日課',
+  'hudChrome.warfare.arenaDailyClaim': '日課報酬を受け取る',
+  'hudChrome.warfare.arenaDailyReward': '{honor} 名誉 + {hero} ヒーローポイント',
+  'hudChrome.warfare.arenaDailyClaimed': '本日の日課アリーナ報酬はすでに受け取っています。',
+  'hudChrome.warfare.arenaDailyNotEntered':
+    '日課報酬を受け取るには、本日アリーナの試合に参加してください。',
   'hudChrome.warfare.heroAmount': '{amount} ヒーローポイント',
   'hudChrome.warfare.heroBalance': 'ヒーローポイント：{amount}',
   'hudChrome.warfare.heroFloat': '+{amount} ヒーローポイント',

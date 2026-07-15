@@ -1280,7 +1280,7 @@ describe('i18n Localization Key Coverage', () => {
 
   it('should provide deed content translations for every supported locale', () => {
     const deedEntries = deedTranslationManifest();
-    expect(deedEntries.length).toBe(Object.keys(DEEDS).length * 2 + 19);
+    expect(deedEntries.length).toBe(Object.keys(DEEDS).length * 2 + 20);
 
     for (const lang of supportedLanguages) {
       setLanguage(lang);

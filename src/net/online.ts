@@ -1149,6 +1149,7 @@ export class ClientWorld implements IWorld {
   duelInfo: DuelInfo | null = null;
   arenaInfo: ArenaInfo | null = null;
   frontierIncursion: import('../world_api').FrontierIncursionView | null = null;
+  arenaDaily: import('../world_api').ArenaDailyInfo = { status: 'unavailable', honor: 0, hero: 0 };
   // --- IWorldDungeonFinder: group-finder state, mirrored from the snapshot
   // self (`s.df` personal blob + `s.dfb` shared board, both delta-omitted: a
   // missing key keeps the prior mirror, an explicit null clears it). ---
@@ -2196,6 +2197,8 @@ export class ClientWorld implements IWorld {
       if (s.hero !== undefined) this.heroPoints = s.hero ?? 0;
       if (s.lhero !== undefined) this.lifetimeHeroPoints = s.lhero ?? 0;
       if (s.fincur !== undefined) this.frontierIncursion = s.fincur ?? null;
+      if (s.adaily !== undefined)
+        this.arenaDaily = s.adaily ?? { status: 'unavailable', honor: 0, hero: 0 };
       if (s.vcup !== undefined) this.cupInfo = s.vcup;
       if (s.market !== undefined) this.marketInfo = s.market;
       if (s.mail !== undefined) this.mailInfo = s.mail;
@@ -2699,6 +2702,9 @@ export class ClientWorld implements IWorld {
   }
   frontierLeave(): void {
     this.cmd({ cmd: 'frontier_leave' });
+  }
+  arenaDailyClaim(): void {
+    this.cmd({ cmd: 'arena_daily_claim' });
   }
   // --- IWorldDungeonFinder: group-finder sends (dungeonFinderInfo and
   // dungeonFinderBoard are snapshot reads, decoded in applySnapshot). ---

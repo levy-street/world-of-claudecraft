@@ -13,6 +13,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.warfare.arenaDailyTitle': 'Ежедневная арена',
+  'hudChrome.warfare.arenaDailyClaim': 'Забрать ежедневную награду',
+  'hudChrome.warfare.arenaDailyReward': '{honor} чести + {hero} очков героя',
+  'hudChrome.warfare.arenaDailyClaimed': 'Вы уже забрали ежедневную награду арены сегодня.',
+  'hudChrome.warfare.arenaDailyNotEntered':
+    'Проведите бой на арене сегодня, чтобы забрать ежедневную награду.',
   'hudChrome.warfare.heroAmount': '{amount} очков героя',
   'hudChrome.warfare.heroBalance': 'Очки героя: {amount}',
   'hudChrome.warfare.heroFloat': '+{amount} очков героя',

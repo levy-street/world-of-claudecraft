@@ -13,6 +13,11 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.warfare.arenaDailyTitle': '콜로세움 일일',
+  'hudChrome.warfare.arenaDailyClaim': '일일 보상 받기',
+  'hudChrome.warfare.arenaDailyReward': '명예 {honor} + 영웅 점수 {hero}',
+  'hudChrome.warfare.arenaDailyClaimed': '오늘 일일 아레나 보상을 이미 받았습니다.',
+  'hudChrome.warfare.arenaDailyNotEntered': '일일 보상을 받으려면 오늘 아레나 경기에 참가하세요.',
   'hudChrome.warfare.heroAmount': '{amount} 영웅 점수',
   'hudChrome.warfare.heroBalance': '영웅 점수: {amount}',
   'hudChrome.warfare.heroFloat': '+{amount} 영웅 점수',

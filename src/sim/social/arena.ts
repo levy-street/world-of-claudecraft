@@ -26,7 +26,12 @@ import {
   ARENA_SPAWNS_B_2v2,
 } from '../dungeon_layout';
 import { recalcPlayerStats } from '../entity';
-import { awardFiestaCompletionHonor, awardRankedArenaWinHonor, honorTeamIdentity } from '../pvp';
+import {
+  awardFiestaCompletionHonor,
+  awardRankedArenaWinHonor,
+  honorTeamIdentity,
+  markArenaEntered,
+} from '../pvp';
 import type { ArenaMatch, ArenaQueueUnit, ArenaReturnPools, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import {
@@ -789,6 +794,9 @@ export function startArenaMatch(
     fiesta: isFiesta ? ctx.createFiestaState() : undefined,
   };
   for (const pid of allPids) ctx.arenaMatches.set(pid, match);
+  // Ashen Coliseum daily claim: entering a bout today makes the once-per-day
+  // honor + hero claim available (arena_daily.ts). Draws no rng.
+  for (const meta of metas) if (meta) markArenaEntered(meta, ctx.utcDay);
   const origin = arenaOrigin(slot);
   if (format === '1v1') {
     placeInArena(ctx, entities[0]!, origin, ARENA_SPAWN_A);

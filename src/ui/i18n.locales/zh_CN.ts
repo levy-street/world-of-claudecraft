@@ -13,6 +13,11 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.warfare.arenaDailyTitle': '竞技场每日',
+  'hudChrome.warfare.arenaDailyClaim': '领取每日奖励',
+  'hudChrome.warfare.arenaDailyReward': '{honor} 荣誉 + {hero} 英雄点数',
+  'hudChrome.warfare.arenaDailyClaimed': '你今天已经领取过每日竞技场奖励了。',
+  'hudChrome.warfare.arenaDailyNotEntered': '今天进行一场竞技场对战即可领取每日奖励。',
   'hudChrome.warfare.heroAmount': '{amount} 英雄点数',
   'hudChrome.warfare.heroBalance': '英雄点数：{amount}',
   'hudChrome.warfare.heroFloat': '+{amount} 英雄点数',

@@ -1,4 +1,18 @@
 export {
+  ARENA_DAILY_HERO_BASE,
+  ARENA_DAILY_HERO_PER_RATING,
+  ARENA_DAILY_HONOR_BASE,
+  ARENA_DAILY_HONOR_PER_RATING,
+  type ArenaDailyClaimStatus,
+  type ArenaDailyState,
+  arenaDailyClaimStatus,
+  arenaDailyInfo,
+  arenaDailyReward,
+  claimArenaDaily,
+  markArenaEntered,
+  normalizeArenaDaily,
+} from './arena_daily';
+export {
   FRONTIER_DAILY_HONOR,
   FRONTIER_ENTRY,
   FRONTIER_HUB,

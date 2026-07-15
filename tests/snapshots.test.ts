@@ -2455,6 +2455,7 @@ describe('lockpick view rebuilds from events on the online client', () => {
 // against the live `maybe(...)` calls scraped from server/game.ts source, so a
 // 45th unregistered delta key reddens this gate.
 const ALL_DELTA_KEYS = [
+  'adaily',
   'arena',
   'atitle',
   'bags',
@@ -2513,6 +2514,7 @@ const ALL_DELTA_KEYS = [
 // delta key whose IWorld name differs from its terse key (stats/weapon/delveDaily
 // keep their name; tal fans out to several members and is asserted directly).
 const TERSE_TO_IWORLD: Record<string, string> = {
+  adaily: 'arenaDaily',
   arena: 'arenaInfo',
   atitle: 'activeTitle',
   bags: 'bags',
@@ -2903,9 +2905,9 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 48 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(48);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(48);
+  it('ALL_DELTA_KEYS contains exactly 49 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(49);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(49);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2917,7 +2919,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.size).toBe(48);
+    expect(scraped.size).toBe(49);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
