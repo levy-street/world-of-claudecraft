@@ -761,9 +761,11 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     return { channel: 'party', message: clean };
   }
 
-  // "/g message": world-wide general channel (no pid = broadcast to all)
-  if (/^\/g(eneral)?\s/i.test(raw)) {
-    const clean = raw.replace(/^\/g(eneral)?\s+/i, '').trim();
+  // "/g message" / "/1 message": world-wide general channel (no pid = broadcast to
+  // all). "/1" is the classic numbered-channel shortcut for General; unlike "/g" it
+  // is never claimed by the online guild router, so it always reaches General.
+  if (/^\/(?:g(?:eneral)?|1)\s/i.test(raw)) {
+    const clean = raw.replace(/^\/(?:g(?:eneral)?|1)\s+/i, '').trim();
     if (!clean) return null;
     ctx.emit({
       type: 'chat',

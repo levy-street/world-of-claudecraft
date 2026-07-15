@@ -183,7 +183,7 @@ import {
   isChatOpenTab,
   isChatTabChannel,
   parseChatTabs,
-  sentLineChannel,
+  sentLineTarget,
   serializeChatTabs,
   WHISPER_TAB,
   WHISPER_TAB_LABEL_KEY,
@@ -1069,11 +1069,13 @@ export class Hud {
   // shown, and drives both the log filter and the send channel.
   private chatTabs: ChatOpenTab[] = [];
   private activeChatTab: ChatTabId = 'all';
-  // The last standing channel the player actually sent to (classic sticky-channel
-  // behavior). On the All/combat views a plain typed line goes here and the input
-  // is tinted with its color; a channel-bound tab always overrides it. `say` is
-  // the neutral default (no tint, generic placeholder). Whisper never sets it.
-  private stickyChannel: ChatTabChannel = 'say';
+  // The last target the player actually sent to (classic sticky-channel behavior):
+  // a standing channel OR the whisper collector (a `/r` reply). On the All/combat
+  // views a plain typed line goes here and the input is tinted to match; a
+  // channel-bound tab always overrides it. `say` is the neutral default (no tint,
+  // generic placeholder). Tracking whisper here is what keeps a reply conversation
+  // going instead of snapping the input back to the previous standing channel.
+  private stickyTarget: ChatInputTintTarget = 'say';
   // Bind the tab-strip wheel-to-horizontal-scroll listener exactly once (renderChatTabs
   // rebuilds the strip's children but the bar element itself persists).
   private chatTabsWheelBound = false;
@@ -3074,20 +3076,19 @@ export class Hud {
     return tab !== null && isChatTabChannel(tab) ? tab : null;
   }
 
-  // The standing channel a plain typed line actually reaches, honoring both the
-  // active tab and the sticky "last used" channel: a channel-bound tab wins (its
-  // bound channel), otherwise the All/combat views fall back to the sticky
-  // channel (`say` by default). The whisper tab is handled separately in
-  // composeChatSend (it has no standing channel), so this is only reached off it.
-  private effectiveSendChannel(): ChatTabChannel {
-    return this.chatSendChannel() ?? this.stickyChannel;
+  // The target a plain typed line actually reaches, honoring the active tab and the
+  // sticky "last used" target: the whisper collector wins on its own tab, else a
+  // channel-bound tab wins (its bound channel), else the All/combat views fall back
+  // to the sticky target (`say` by default, or `whisper` right after a reply).
+  private effectiveSendTarget(): ChatInputTintTarget {
+    if (this.activeChatTab === WHISPER_TAB) return WHISPER_TAB;
+    return this.chatSendChannel() ?? this.stickyTarget;
   }
 
-  // The channel the chat input's tint should signal: the whisper collector when
-  // on its tab (plain text replies as a whisper), else the effective send
-  // channel. chatInputTint maps `say` to no tint (the default input color).
+  // The target the chat input's tint should signal. chatInputTint maps `say` to no
+  // tint (the default input color) and `whisper` to the whisper color.
   private chatInputTintTarget(): ChatInputTintTarget {
-    return this.activeChatTab === WHISPER_TAB ? WHISPER_TAB : this.effectiveSendChannel();
+    return this.effectiveSendTarget();
   }
 
   private applyChatFilter(): void {
@@ -3120,12 +3121,13 @@ export class Hud {
     input.style.color = chatInputTint(this.chatInputTintTarget()) ?? '';
   }
 
-  // Remember the standing channel a just-sent line reached as the sticky default
-  // for the next chat open on the All tab. Whisper/reply, emotes, rolls, channel
-  // membership, and unknown commands leave the sticky channel unchanged.
+  // Remember the target a just-sent line reached as the sticky default for the next
+  // chat open on the All tab: a standing channel, or `whisper` for a `/r` reply so a
+  // whisper conversation keeps going. An explicit `/w Name`, emotes, rolls, channel
+  // membership, and unknown commands leave the sticky target unchanged.
   noteSentChannel(sentLine: string): void {
-    const ch = sentLineChannel(sentLine);
-    if (ch) this.stickyChannel = ch;
+    const target = sentLineTarget(sentLine);
+    if (target) this.stickyTarget = target;
   }
 
   // The line actually sent for what the player typed, honoring the active tab and
@@ -3135,8 +3137,9 @@ export class Hud {
   // the last whisperer (/r) instead of binding a channel.
   composeChatSend(typed: string): string {
     const withLinks = this.applyPendingChatLinks(typed);
-    if (this.activeChatTab === WHISPER_TAB) return composeWhisperReply(withLinks);
-    return composeChatLine(this.effectiveSendChannel(), withLinks);
+    const target = this.effectiveSendTarget();
+    if (target === WHISPER_TAB) return composeWhisperReply(withLinks);
+    return composeChatLine(target, withLinks);
   }
 
   // Shift-click a quest-log entry: open the chat input and insert a readable
@@ -3197,17 +3200,18 @@ export class Hud {
     return true;
   }
 
-  // Placeholder for the chat input reflecting the active tab and sticky channel.
+  // Placeholder for the chat input reflecting the active tab and sticky target.
   activeChatPlaceholder(): string {
-    if (this.activeChatTab === WHISPER_TAB)
+    const target = this.effectiveSendTarget();
+    // The whisper collector (its own tab, or a sticky `/r` reply) prompts "Whisper".
+    if (target === WHISPER_TAB)
       return t('hud.core.chatChannels.sendingTo', { channel: t(WHISPER_TAB_LABEL_KEY) });
     // A channel-bound tab keeps its "Message {channel}" prompt (unchanged, incl. a
     // Say tab). On the All/combat views a non-say sticky channel surfaces the same
     // "Message {channel}" prompt so the player sees where plain text will go.
     const bound = this.chatSendChannel();
-    const ch = bound ?? this.stickyChannel;
-    if (bound !== null || ch !== 'say')
-      return t('hud.core.chatChannels.sendingTo', { channel: t(CHANNEL_LABEL_KEYS[ch]) });
+    if (bound !== null || target !== 'say')
+      return t('hud.core.chatChannels.sendingTo', { channel: t(CHANNEL_LABEL_KEYS[target]) });
     // Default (All tab, sticky say): the compact touch composer has no room for the
     // desktop slash-command legend (/s, /w, /r, ...), so use a short prompt on the
     // mobile HUD. The channel-aware "Message {channel}" variants above are already

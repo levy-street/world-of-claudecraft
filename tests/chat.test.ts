@@ -189,6 +189,23 @@ describe('chat channels', () => {
     expect(msgs[0].text).toBe('LFG crypt');
   });
 
+  it('the /1 shortcut reaches the General channel, like /general', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const far = sim.addPlayer('mage', 'Bet');
+    teleport(sim, a, 0, -40);
+    teleport(sim, far, 0, -900);
+    sim.tick();
+
+    const sent = sim.chat('/1 anyone for crypt', a);
+    expect(sent).toEqual({ channel: 'general', message: 'anyone for crypt' });
+    const msgs = chatEvents(sim.tick());
+    expect(msgs).toHaveLength(1);
+    expect(msgs[0].channel).toBe('general');
+    expect(msgs[0].pid).toBeUndefined();
+    expect(msgs[0].text).toBe('anyone for crypt');
+  });
+
   it('unknown slash commands error instead of being said out loud', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'Aleph');

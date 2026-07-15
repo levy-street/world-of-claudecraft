@@ -141,10 +141,13 @@ export function chatInputTint(channel: ChatInputTintTarget | null): string | nul
 
 // Compose the text actually sent for a message typed while a channel tab is
 // active. An explicit slash command the player typed always wins (so "/w bob hi"
-// from the World tab still whispers); otherwise the channel prefix is prepended.
+// from the World tab still whispers); a "!" community command (lfg/wts/event/...)
+// is likewise passed through untouched, so the server's "!" relay intercept still
+// fires (prefixing it as "/say !lfg ..." would hide it from that gate); otherwise
+// the channel prefix is prepended.
 export function composeChatLine(channel: ChatTabChannel, typed: string): string {
   const text = typed.trim();
-  if (!text || text.startsWith('/')) return text;
+  if (!text || text.startsWith('/') || text.startsWith('!')) return text;
   return channelSendPrefix(channel) + text;
 }
 
@@ -178,10 +181,27 @@ export function sentLineChannel(line: string): ChatTabChannel | null {
   if (/^\/s(ay)?\s/i.test(text)) return 'say';
   if (/^\/gu(ild)?\s/i.test(text)) return 'guild';
   if (/^\/o(fficer)?\s/i.test(text)) return 'officer';
-  if (/^\/general\s/i.test(text)) return 'general';
+  // "/1" is the numbered-channel shortcut for General (see sentLineTarget below and
+  // the sim router); "/g" is intentionally NOT here because it routes to guild online.
+  if (/^\/(?:general|1)\s/i.test(text)) return 'general';
   if (/^\/world\s/i.test(text)) return 'world';
   if (/^\/lfg\s/i.test(text)) return 'lfg';
   return null;
+}
+
+// Like sentLineChannel, but ALSO recognizes a whisper REPLY (`/r`, `/reply`) as
+// the 'whisper' target. This is what makes the chat input STAY on the last thing
+// you sent: after you reply to a whisper, the next plain line keeps replying
+// (composeWhisperReply -> `/r`, which the server routes to the same last-whisperer)
+// instead of snapping back to your previous standing channel. Only `/r` sticks, not
+// an explicit `/w Name`: the latter is a deliberate one-off to a specific person,
+// and sticking it would send the NEXT plain line to whoever last whispered YOU (the
+// server's `/r` target), not that person. Emotes, rolls, channel membership, and
+// unknown commands still return null (sticky unchanged).
+export function sentLineTarget(line: string): ChatInputTintTarget | null {
+  const text = line.trim();
+  if (/^\/r(eply)?\s/i.test(text)) return WHISPER_TAB;
+  return sentLineChannel(line);
 }
 
 // Persistence: the ordered list of channel tabs the player has opened. The
