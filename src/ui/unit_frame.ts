@@ -60,8 +60,7 @@ export interface UnitFrameDescriptor {
   resFrac: number;
   /** Preformatted resource text; the painter omits it when there is no bar. */
   resText: string;
-  /** Preformatted level text, or null to show no level (party may hide it; a boss
-   *  target passes a skull glyph). The player passes its numeric level as a string. */
+  /** Preformatted level text, or null to show no level. */
   levelText: string | null;
   /** The unit's display name. */
   name: string;

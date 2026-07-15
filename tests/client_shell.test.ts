@@ -573,13 +573,19 @@ describe('client HTML shell', () => {
     expect(hudTs.match(/\$\('#tf-absorb'\)/g)).toHaveLength(1);
   });
 
-  it('routes the target elite class + name color + combo pips + hostile cue through the elided writers', () => {
-    // The two raw writes the four original writers cannot express (the elite class and
+  it('routes target rank classes + name color + combo pips + hostile cue through elided writers', () => {
+    // The raw writes the four original writers cannot express (the rank classes and
     // the hostile/friendly name color) go through the toggleClass / setStyleProp,
     // and the combo pip `on` toggle (now on the PLAYER frame: combo points are
     // character-bound) through toggleClass. No raw classList/style write on either
     // frame survives (those silently collapse the hot-DOM skip rate).
-    expect(hudTs).toContain("this.toggleClass(this.targetFrameEl, 'elite'");
+    expect(hudTs).toContain('const targetRank = targetRankView(targetTemplate);');
+    expect(hudTs).toContain('levelText: String(target.level),');
+    expect(hudTs).toContain(
+      "this.toggleClass(this.targetFrameEl, 'elite', targetUsesEliteFrame(targetRank));",
+    );
+    expect(hudTs).toContain("this.toggleClass(this.targetFrameEl, 'boss', targetRank === 'boss');");
+    expect(hudTs).toContain("targetRank === 'boss' ? t('hud.core.boss') : t('hud.core.elite'),");
     expect(hudTs).toMatch(/this\.setStyleProp\(\s*this\.targetNameEl,\s*'color',/);
     expect(hudTs).toContain("this.toggleClass(pips[i] as HTMLElement, 'on', i < p.comboPoints);");
     // The forced-colors hostile cue is a non-color redundant marker on the target
@@ -588,6 +594,7 @@ describe('client HTML shell', () => {
     expect(hudTs).toContain("this.toggleClass(this.targetNameEl, 'hostile', target.hostile);");
     expect(hudTs).not.toContain("this.targetNameEl.classList.toggle('hostile'");
     expect(hudTs).not.toContain("this.targetFrameEl.classList.toggle('elite'");
+    expect(hudTs).not.toContain("this.targetFrameEl.classList.toggle('boss'");
     expect(hudTs).not.toContain('this.targetNameEl.style.color');
     expect(hudTs).not.toContain("pip.classList.toggle('on'");
   });

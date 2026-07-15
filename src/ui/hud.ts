@@ -450,6 +450,8 @@ import { swingTimerState } from './swing_timer';
 import { SwingTimerPainter } from './swing_timer_painter';
 import { localizeTalentTitle, roleLabel, tTalent } from './talent_i18n';
 import { TalentsWindow } from './talents_window';
+import { targetPortraitUrl } from './target_portrait_view';
+import { targetRankView, targetUsesEliteFrame } from './target_rank_view';
 import type { PresetId, ThemeKnob, ThemeState } from './theme';
 import { SharedTooltipOwner } from './tooltip_owner';
 import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
@@ -634,10 +636,8 @@ const VCUP_WALKUP_EVENTS = new Set([
 // Stadium-scale: covers the pitch + stands + approach, but nowhere near another
 // match's pitch (the real Sowfield and practice instances are >600yd apart).
 const VCUP_THEATRE_RADIUS = 200;
-// The target frame's boss glyph (a skull replaces the numeric level chip for a
-// boss-rank target) and the number of combo pips, named so the per-frame target
-// paint carries no bare literal at the call site.
-const BOSS_SKULL_GLYPH = '☠';
+// The number of combo pips, named so the per-frame player paint carries no bare
+// literal at the call site.
 const COMBO_PIP_COUNT = 5;
 // The mob-hover tooltip's fixed desktop bottom-right slot (the WoW default
 // GameTooltip corner), in author-space px: the right margin clears the sidebar
@@ -4279,7 +4279,7 @@ export class Hud {
   // gate ONLY when the target identity changes (or after invalidatePortrait), never
   // per frame, and reads the subject set just before that frame's paint() call. A
   // player target shows its real 3D class headshot (rendered locally from the synced
-  // class + skin); any other entity shows its faction/family crest.
+  // class + skin); mobs use committed model portraits and NPCs use their crest.
   private drawTargetPortrait(): void {
     const target = this.targetPortraitSubject;
     if (!target) return;
@@ -4290,10 +4290,21 @@ export class Hud {
         target.skin ?? 0,
       );
     } else {
-      this.portraits.drawCrest(
-        this.targetPortraitEl,
-        crestIdForEntity(target.kind, MOBS[target.templateId]?.family),
-      );
+      const template = MOBS[target.templateId];
+      const faceUrl = targetPortraitUrl(target.templateId, Boolean(template));
+      if (faceUrl) {
+        this.portraits.drawHeadshot(this.targetPortraitEl, faceUrl, () => {
+          this.portraits.drawCrest(
+            this.targetPortraitEl,
+            crestIdForEntity(target.kind, template?.family),
+          );
+        });
+      } else {
+        this.portraits.drawCrest(
+          this.targetPortraitEl,
+          crestIdForEntity(target.kind, template?.family),
+        );
+      }
     }
   }
 
@@ -7275,7 +7286,8 @@ export class Hud {
     // target instance. (Targeting a world object hides the frame, like no target.)
     const target = p.targetId !== null ? sim.entities.get(p.targetId) : null;
     if (target && target.kind !== 'object') {
-      const isBoss = !!MOBS[target.templateId]?.boss;
+      const targetTemplate = MOBS[target.templateId];
+      const targetRank = targetRankView(targetTemplate);
       // The portrait gate fires inside paint(); hand it the subject to redraw.
       this.targetPortraitSubject = target;
       // The target is a NON-SELF frame; on low throttle its HP/level/
@@ -7336,7 +7348,7 @@ export class Hud {
               target.dead || !target.resourceType
                 ? ''
                 : `${Math.round(target.resource)} / ${target.maxResource}`,
-            levelText: isBoss ? BOSS_SKULL_GLYPH : String(target.level),
+            levelText: String(target.level),
             name: entityDisplayName(target),
             titlePre: this.targetTitleDecoration.pre,
             titlePost: this.targetTitleDecoration.post,
@@ -7352,8 +7364,12 @@ export class Hud {
       // Target-only sub-parts the family frame does not express, each routed through
       // the elided writers (the elite class + name color are the two writes the four
       // original writers cannot express, hence the toggleClass / setStyleProp).
-      this.toggleClass(this.targetFrameEl, 'elite', !!MOBS[target.templateId]?.elite);
-      this.setText(this.targetEliteTagEl, isBoss ? t('hud.core.boss') : t('hud.core.elite'));
+      this.toggleClass(this.targetFrameEl, 'elite', targetUsesEliteFrame(targetRank));
+      this.toggleClass(this.targetFrameEl, 'boss', targetRank === 'boss');
+      this.setText(
+        this.targetEliteTagEl,
+        targetRank === 'boss' ? t('hud.core.boss') : t('hud.core.elite'),
+      );
       // Linked-Discord players get their staff-role name color (else friendly/hostile),
       // plus a Discord info line (nickname + rank + role chips) under the healthbar.
       const tfRoleColor = target.kind === 'player' ? specialRoleColor(target.discordRole) : null;

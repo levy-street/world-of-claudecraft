@@ -1,8 +1,10 @@
-// Pre-renders one transparent WebP portrait per Dungeon Finder encounter
+// Pre-renders one transparent WebP portrait per Dungeon Finder encounter and
+// one head-focused portrait with a baked backdrop per mob template
 // (docs/prd/dungeon-finder.md): the finder window previews bosses with static
 // prerendered art, never a live Three.js scene. Output lands in
-// public/ui/dungeons/<mobId>.webp and is committed; the window reads the URL
-// baked by src/ui/dungeon_finder_view.ts (FINDER_PORTRAIT_DIR).
+// public/ui/dungeons/<mobId>.webp and public/ui/mobs/<mobId>.webp, and is
+// committed. The finder window reads the URL baked by
+// src/ui/dungeon_finder_view.ts (FINDER_PORTRAIT_DIR).
 //
 // A sibling of scripts/wiki/render_model_stills.mjs: it reuses that pipeline's
 // browser entry (window.renderStill over headless Chrome + swiftshader) but
@@ -15,7 +17,7 @@
 // Prereqs: a Chrome/Edge/Chromium binary (scripts/browser_path.mjs) and the
 // committed GLBs under public/. Run: node scripts/render_finder_portraits.mjs
 // (optionally ONLY=<mobId,mobId> to re-render a subset).
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import http from 'node:http';
 import path from 'node:path';
@@ -23,12 +25,15 @@ import * as esbuild from 'esbuild';
 import puppeteer from 'puppeteer-core';
 import sharp from 'sharp';
 import { BROWSER_PATH } from './browser_path.mjs';
+import { mobPortraitBackgroundSvg } from './lib/mob_portrait_background.mjs';
 
 const root = process.cwd();
 const publicDir = path.join(root, 'public');
 const outDir = path.join(publicDir, 'ui', 'dungeons');
+const mobOutDir = path.join(publicDir, 'ui', 'mobs');
 const OUT_PX = Number(process.env.PORTRAIT_PX || 128); // shipped size; the window shows 64px
 mkdirSync(outDir, { recursive: true });
+mkdirSync(mobOutDir, { recursive: true });
 
 // 1) Bundle the shared browser render entry (see render_model_stills.mjs for the
 //    import.meta.env define rationale).
@@ -64,8 +69,8 @@ const dataBuilt = await esbuild.build({
 const dataUrl = `data:text/javascript;base64,${Buffer.from(dataBuilt.outputFiles[0].text).toString('base64')}`;
 const { FINDER_ACTIVITIES, MOBS, VISUALS, visualKeyFor } = await import(dataUrl);
 
-// One job per distinct encounter mob id, resolved through the same visual
-// manifest the game renderer uses (model spec + entity/fixed tint).
+// One job per distinct encounter mob id or mob template, resolved through the
+// same visual manifest the game renderer uses (model spec + entity/fixed tint).
 function specFor(visualKey) {
   const def = VISUALS[visualKey];
   if (!def) return null;
@@ -80,20 +85,28 @@ function specFor(visualKey) {
 }
 
 const jobs = new Map();
+function addJob(mobId, finder) {
+  const existing = jobs.get(mobId);
+  if (existing) {
+    existing.finder ||= finder;
+    return;
+  }
+  const mob = MOBS[mobId];
+  if (!mob) throw new Error(`portrait job references unknown mob ${mobId}`);
+  const vk = visualKeyFor({ kind: 'mob', templateId: mobId, family: mob.family });
+  const spec = specFor(vk);
+  if (!spec) throw new Error(`no visual for portrait mob ${mobId} (visual key ${vk})`);
+  const def = VISUALS[vk];
+  const tint =
+    def.tint === undefined ? null : def.tint === 'entity' ? (mob.color ?? null) : def.tint;
+  jobs.set(mobId, { mobId, spec, tint, family: mob.family, finder });
+}
 for (const activity of FINDER_ACTIVITIES) {
   for (const enc of activity.encounters) {
-    if (jobs.has(enc.mobId)) continue;
-    const mob = MOBS[enc.mobId];
-    if (!mob) throw new Error(`finder encounter references unknown mob ${enc.mobId}`);
-    const vk = visualKeyFor({ kind: 'mob', templateId: enc.mobId, family: mob.family });
-    const spec = specFor(vk);
-    if (!spec) throw new Error(`no visual for finder mob ${enc.mobId} (visual key ${vk})`);
-    const def = VISUALS[vk];
-    const tint =
-      def.tint === undefined ? null : def.tint === 'entity' ? (mob.color ?? null) : def.tint;
-    jobs.set(enc.mobId, { mobId: enc.mobId, spec, tint });
+    addJob(enc.mobId, true);
   }
 }
+for (const mobId of Object.keys(MOBS)) addJob(mobId, false);
 
 // 3) Serve public/ + the harness, same-origin (mirrors render_model_stills.mjs).
 const HARNESS = `<!doctype html><html><head><meta charset="utf8"><style>html,body{margin:0;background:transparent}</style></head><body><script src="/__portraits_bundle.js"></script></body></html>`;
@@ -181,17 +194,45 @@ for (const job of jobs.values()) {
     const pngUrl = await page.evaluate((s, t) => window.renderStill(s, t), job.spec, tintNum);
     const png = Buffer.from(pngUrl.split(',')[1], 'base64');
     const alpha = (await sharp(png).stats()).channels[3];
-    if (!alpha || alpha.max < 8) {
-      throw new Error(`blank render (alpha max ${alpha ? alpha.max : 'none'})`);
+    if (!alpha || alpha.max < 8 || alpha.mean < 1) {
+      throw new Error(
+        `blank render (alpha max ${alpha ? alpha.max : 'none'}, mean ${alpha ? alpha.mean : 'none'})`,
+      );
     }
     const webp = await sharp(png)
       .resize(OUT_PX, OUT_PX, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
       .webp({ quality: 88, alphaQuality: 100, effort: 6 })
       .toBuffer();
-    writeFileSync(path.join(outDir, `${job.mobId}.webp`), webp);
+    if (job.finder) writeFileSync(path.join(outDir, `${job.mobId}.webp`), webp);
+    const trimmed = await sharp(png).trim().png().toBuffer();
+    const { width = 0, height = 0 } = await sharp(trimmed).metadata();
+    const bustHeight = height > width * 0.8 ? Math.max(1, Math.round(height * 0.65)) : height;
+    const inset = Math.max(1, Math.round(OUT_PX * 0.07));
+    const portraitLayer = await sharp(trimmed)
+      .extract({ left: 0, top: 0, width, height: bustHeight })
+      .resize(OUT_PX - inset * 2, OUT_PX - inset * 2, {
+        fit: 'contain',
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
+      })
+      .extend({
+        top: inset,
+        bottom: inset,
+        left: inset,
+        right: inset,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
+      })
+      .png()
+      .toBuffer();
+    const mobWebp = await sharp(Buffer.from(mobPortraitBackgroundSvg(job.family, OUT_PX)))
+      .composite([{ input: portraitLayer }])
+      .webp({ quality: 88, alphaQuality: 100, effort: 6 })
+      .toBuffer();
+    writeFileSync(path.join(mobOutDir, `${job.mobId}.webp`), mobWebp);
     ok++;
     console.log(`ok ${job.mobId}.webp (${(webp.length / 1024).toFixed(1)} KB)`);
   } catch (e) {
+    rmSync(path.join(mobOutDir, `${job.mobId}.webp`), { force: true });
+    if (job.finder) rmSync(path.join(outDir, `${job.mobId}.webp`), { force: true });
     console.error(`FAILED ${job.mobId}: ${e.message}`);
     failed++;
   }
@@ -200,6 +241,6 @@ for (const job of jobs.values()) {
 await browser.close();
 server.close();
 console.log(
-  `\nrendered ${ok}/${jobs.size} finder portraits to public/ui/dungeons/ (${OUT_PX}px, ${failed} failed, pageErrors=${pageErr})`,
+  `\nrendered ${ok}/${jobs.size} portrait jobs (${OUT_PX}px, ${failed} failed, pageErrors=${pageErr})`,
 );
 if (failed > 0 || pageErr > 0) process.exit(1);

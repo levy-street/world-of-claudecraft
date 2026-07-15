@@ -4593,6 +4593,54 @@
   #target-frame.elite #tf-elite-tag {
     display: block;
   }
+  /* Boss rank replaces both the creature portrait and the platform-dependent
+     Unicode glyph with one generic dragon emblem. The real numeric level stays
+     in the lower center chip, matching the classic fantasy target-frame read. */
+  #target-frame.boss .portrait-wrap::before {
+    content: "";
+    position: absolute;
+    inset: -15px;
+    z-index: 2;
+    background: url("/ui/ranks/elite-dragon-frame.webp") center / contain no-repeat;
+    pointer-events: none;
+  }
+  #target-frame.boss .tf-move-btn {
+    top: -18px;
+    right: -30px;
+  }
+  #target-frame.boss .portrait {
+    border-color: transparent;
+    outline: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  #target-frame.boss .level-chip {
+    left: 50%;
+    right: auto;
+    bottom: -7px;
+    width: 24px;
+    height: 24px;
+    border-color: var(--gold-dim);
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, #4a3a14, #241c08);
+    box-shadow:
+      0 0 0 1px var(--color-bg-deep),
+      0 0 7px color-mix(in srgb, var(--gold) 45%, transparent);
+    transform: translateX(-50%);
+    text-shadow: 1px 1px 1px #000;
+    z-index: 4;
+  }
+  #target-frame.boss #tf-elite-tag {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
 
   #tf-debuffs {
     display: flex;
