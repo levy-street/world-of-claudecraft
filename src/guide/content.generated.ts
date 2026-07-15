@@ -147,16 +147,16 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Iron Bellow"
       },
       {
-        "id": "commanding_shout",
-        "name": "Bolstering Cry"
-      },
-      {
         "id": "charge",
         "name": "Onrush"
       },
       {
         "id": "thunder_clap",
         "name": "Quaking Blow"
+      },
+      {
+        "id": "hamstring",
+        "name": "Hobbling Cut"
       }
     ],
     "abilities": [
@@ -173,10 +173,6 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Iron Bellow"
       },
       {
-        "id": "commanding_shout",
-        "name": "Bolstering Cry"
-      },
-      {
         "id": "charge",
         "name": "Onrush"
       },
@@ -187,10 +183,6 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "hamstring",
         "name": "Hobbling Cut"
-      },
-      {
-        "id": "rend",
-        "name": "Deep Gash"
       },
       {
         "id": "bloodrage",
@@ -211,10 +203,6 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "pummel",
         "name": "Jawcrack"
-      },
-      {
-        "id": "ironhold",
-        "name": "Ironhold"
       },
       {
         "id": "execute",

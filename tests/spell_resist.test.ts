@@ -98,7 +98,9 @@ describe('spell_resist: cast outcome labeling', () => {
     const { sim, p, meta } = makeSim('warrior', 12);
     expect(sim.setSpec('prot', p.id)).toBe(true);
     const mob = spawnTarget(sim, p, 60, 2);
-    sim.rng.chance = () => true; // meleeMissChance roll -> miss
+    // Physical swings use the raw hit-table roll, unlike spells which call
+    // rng.chance through isSpellResisted. Force the miss bucket directly.
+    sim.rng.next = () => 0;
 
     const events: any[] = [];
     sim.ctx.emit = (e: any) => events.push(e);

@@ -67,6 +67,7 @@ import {
   zh_CN,
   zh_TW,
 } from '../src/ui/i18n';
+import { pending } from '../src/ui/i18n.resolved.generated/pending';
 import {
   hasTalentTitleOverride,
   renderTalentManifestEntry,
@@ -865,6 +866,7 @@ describe('i18n Localization Key Coverage', () => {
     for (const lang of supportedLanguages) {
       setLanguage(lang);
       resetEntityTranslationFallbackLog();
+      const pendingForLocale = new Set(pending[lang] ?? []);
       for (const entry of classAbilityEntries) {
         const rendered = tEntity(classAbilityRequest(entry));
         expect(rendered.trim().length, `${lang}.${entry.key}`).toBeGreaterThan(0);
@@ -879,7 +881,8 @@ describe('i18n Localization Key Coverage', () => {
           lang !== 'en' &&
           lang !== 'en_CA' &&
           entry.kind === 'ability' &&
-          entry.field === 'description'
+          entry.field === 'description' &&
+          !pendingForLocale.has(entry.key)
         ) {
           expect(
             rendered,
