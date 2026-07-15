@@ -72,6 +72,10 @@ describe('spellbook_window: mobile action-ring page label (Phase 4, touch-only)'
   it('renders the label through t() with the localized page-label key', () => {
     expect(code).toContain("t('hudChrome.mobile.spellbookPageLabel'");
   });
+
+  it('converts the zero-indexed view page to a one-indexed user-facing label', () => {
+    expect(code).toContain('page: this.formatAbilityNumber(row.mobilePage + 1)');
+  });
 });
 
 describe('spellbook_window: no magic values (DOM painter)', () => {

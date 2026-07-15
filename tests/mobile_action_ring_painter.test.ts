@@ -18,6 +18,7 @@ import {
 } from '../src/ui/hud/action_bar/action_bar_view';
 import {
   clampMobilePage,
+  mobilePageCount,
   nextMobilePage,
   sourceSlotForMobileButton,
 } from '../src/ui/hud/action_bar/mobile_action_page_view';
@@ -228,13 +229,13 @@ describe('MobileActionRingPainter: page indicator + toggle aria', () => {
       (key) => `URL(${key})`,
       (key, values) => (values ? `${key}|${JSON.stringify(values)}` : key),
     );
-    const pageBox = { page: 0 };
+    const pageBox = { page: 3 };
     const view = createActionBarView({ slots: ringDescriptor(pageBox, new Map()) }, fakeDeps());
-    painter.paint(view.tick(idleWorld()), 0, 2);
+    painter.paint(view.tick(idleWorld()), pageBox.page, mobilePageCount());
 
     expect(calls).toContainEqual({
       m: 'setText',
-      args: [indicator, 'hudChrome.mobile.actionPageIndicator|{"page":1,"count":2}'],
+      args: [indicator, 'hudChrome.mobile.actionPageIndicator|{"page":4,"count":4}'],
     });
     expect(calls).toContainEqual({
       m: 'setAttr',
@@ -417,6 +418,12 @@ describe('Hud.buildMobileActionRing wiring (source scan)', () => {
   it('passes the live Show Attack Button setting into the mobile ring painter', () => {
     expect(hud).toMatch(
       /this\.mobileActionRingPainter\.paint\([\s\S]*?this\.attackSlotIsAttack\(\),[\s\S]*?\);/,
+    );
+  });
+
+  it('passes the shared mobile page count into the mobile ring painter', () => {
+    expect(hud).toMatch(
+      /this\.mobileActionRingPainter\.paint\([\s\S]*?mobilePageCount\(\),[\s\S]*?\);/,
     );
   });
 

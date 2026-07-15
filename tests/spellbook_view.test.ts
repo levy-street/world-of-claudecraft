@@ -139,12 +139,51 @@ describe('buildSpellbookView: mobilePage derivation (Phase 4)', () => {
     }
   });
 
-  it('assigns null for slot 11 (outside the ring pages)', () => {
+  it('assigns page 2 for a bar-assigned row on slots 11-15', () => {
+    for (const slot of [11, 12, 13, 14, 15]) {
+      const v = buildSpellbookView(
+        input({
+          known: [known('sim', KIT[0])],
+          barAbilityIds: [KIT[0]],
+          abilityIdByBarSlot: slotsWith(KIT[0], slot),
+        }),
+      );
+      expect(v.rows.find((r) => r.abilityId === KIT[0])!.mobilePage, `slot ${slot}`).toBe(2);
+    }
+  });
+
+  it('assigns page 3 for a bar-assigned row on slots 16-20', () => {
+    for (const slot of [16, 17, 18, 19, 20]) {
+      const v = buildSpellbookView(
+        input({
+          known: [known('sim', KIT[0])],
+          barAbilityIds: [KIT[0]],
+          abilityIdByBarSlot: slotsWith(KIT[0], slot),
+        }),
+      );
+      expect(v.rows.find((r) => r.abilityId === KIT[0])!.mobilePage, `slot ${slot}`).toBe(3);
+    }
+  });
+
+  it('assigns null for desktop-only slots 21-22', () => {
+    for (const slot of [21, 22]) {
+      const v = buildSpellbookView(
+        input({
+          known: [known('sim', KIT[0])],
+          barAbilityIds: [KIT[0]],
+          abilityIdByBarSlot: slotsWith(KIT[0], slot),
+        }),
+      );
+      expect(v.rows.find((r) => r.abilityId === KIT[0])!.mobilePage, `slot ${slot}`).toBeNull();
+    }
+  });
+
+  it('assigns null when the ability is absent from every source slot', () => {
     const v = buildSpellbookView(
       input({
         known: [known('sim', KIT[0])],
         barAbilityIds: [KIT[0]],
-        abilityIdByBarSlot: slotsWith(KIT[0], 11),
+        abilityIdByBarSlot: new Array(22).fill(null),
       }),
     );
     expect(v.rows.find((r) => r.abilityId === KIT[0])!.mobilePage).toBeNull();
