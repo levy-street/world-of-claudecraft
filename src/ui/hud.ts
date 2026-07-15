@@ -8976,7 +8976,15 @@ export class Hud {
             );
           }
           this.log(honorMessage, '#ffd100');
-          this.combatLog(honorMessage, '#ffd100');
+          // Mirror to the combat pane as a SILENT visual line (appendLog, not
+          // combatLog): the log() line above already announces via #chat-live, so
+          // routing it through the combat announcer too would make a screen reader hear
+          // every Honor gain twice. This matches the xp-float precedent and the announce
+          // contract (see appendLog / showSelfNote).
+          this.appendLog(this.combatLogEl, honorMessage, '#ffd100');
+          // Keep the character sheet's Honor balance live if the sheet is open (spending
+          // already refreshes via the inventory path; an award landing did not).
+          this.renderCharIfOpen();
           break;
         }
         case 'levelup': {
@@ -9589,7 +9597,9 @@ export class Hud {
             audio.death();
           }
           this.log(arenaResultLine, arenaResultColor);
-          this.combatLog(arenaResultLine, arenaResultColor);
+          // Combat-pane mirror without the announcer (log() above already announces the
+          // Arena result via #chat-live); see the Honor case and the announce contract.
+          this.appendLog(this.combatLogEl, arenaResultLine, arenaResultColor);
           break;
         }
         // The yumi events are personal per participant; offline the sim hands
