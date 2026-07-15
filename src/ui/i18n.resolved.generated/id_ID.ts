@@ -965,6 +965,7 @@ export const id_ID: EnTranslations = {
       "balance": "Kehormatan: {amount}",
       "honorFloat": "+{amount} Kehormatan",
       "honorGain": "Anda mendapatkan Kehormatan {amount} ({reason}).",
+      "heroAmount": "{amount} Hero Points",
       "heroBalance": "Hero Points: {amount}",
       "heroFloat": "+{amount} Hero Points",
       "heroGain": "You gain {amount} hero points ({reason}).",

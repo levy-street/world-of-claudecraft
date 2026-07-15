@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.warfare.heroAmount': '{amount} очков героя',
   'hudChrome.warfare.heroBalance': 'Очки героя: {amount}',
   'hudChrome.warfare.heroFloat': '+{amount} очков героя',
   'hudChrome.warfare.heroGain': 'Вы получаете {amount} очков героя ({reason}).',

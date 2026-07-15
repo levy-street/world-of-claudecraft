@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.warfare.heroAmount': '{amount} ヒーローポイント',
   'hudChrome.warfare.heroBalance': 'ヒーローポイント：{amount}',
   'hudChrome.warfare.heroFloat': '+{amount} ヒーローポイント',
   'hudChrome.warfare.heroGain': '{amount} ヒーローポイントを獲得（{reason}）。',

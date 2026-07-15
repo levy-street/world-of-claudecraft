@@ -28,11 +28,14 @@ export interface VendorPrice {
   copper: number;
   /** Honor is authored as a per-purchase price and is not stack-multiplied. */
   honor: number;
+  /** Hero points (the Season 1 frost-rare currency), per purchase, not multiplied. */
+  hero: number;
 }
 
 export interface VendorBalances {
   copper: number;
   honor: number;
+  hero: number;
 }
 
 export interface VendorBuybackRow {
@@ -48,6 +51,8 @@ export interface VendorView {
   buyback: VendorBuybackRow[];
   honorBalance: number;
   hasHonorGoods: boolean;
+  heroBalance: number;
+  hasHeroGoods: boolean;
 }
 
 /**
@@ -72,14 +77,18 @@ export function buildVendorView(
     const price: VendorPrice = {
       copper: Math.max(0, item.buyValue ?? 0) * quantity,
       honor: Math.max(0, Math.floor(item.priceHonor ?? 0)),
+      hero: Math.max(0, Math.floor(item.priceHero ?? 0)),
     };
-    if (price.copper <= 0 && price.honor <= 0) continue;
+    if (price.copper <= 0 && price.honor <= 0 && price.hero <= 0) continue;
     goods.push({
       itemId,
       item,
       price,
       quantity,
-      affordable: balances.copper >= price.copper && balances.honor >= price.honor,
+      affordable:
+        balances.copper >= price.copper &&
+        balances.honor >= price.honor &&
+        balances.hero >= price.hero,
     });
   }
   const buyback: VendorBuybackRow[] = [];
@@ -93,5 +102,7 @@ export function buildVendorView(
     buyback,
     honorBalance: Math.max(0, Math.floor(balances.honor)),
     hasHonorGoods: goods.some((row) => row.price.honor > 0),
+    heroBalance: Math.max(0, Math.floor(balances.hero)),
+    hasHeroGoods: goods.some((row) => row.price.hero > 0),
   };
 }

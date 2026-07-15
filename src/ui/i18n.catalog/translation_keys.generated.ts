@@ -5428,6 +5428,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.vcup.walkUp'
   | 'hudChrome.warfare.balance'
   | 'hudChrome.warfare.dualPrice'
+  | 'hudChrome.warfare.heroAmount'
   | 'hudChrome.warfare.heroBalance'
   | 'hudChrome.warfare.heroFloat'
   | 'hudChrome.warfare.heroGain'

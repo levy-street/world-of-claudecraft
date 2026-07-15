@@ -965,6 +965,7 @@ export const ko_KR: EnTranslations = {
       "balance": "명예: {amount}",
       "honorFloat": "명예 +{amount}",
       "honorGain": "명예를 {amount} 획득했습니다({reason}).",
+      "heroAmount": "{amount} 영웅 점수",
       "heroBalance": "영웅 점수: {amount}",
       "heroFloat": "+{amount} 영웅 점수",
       "heroGain": "영웅 점수 {amount}점 획득 ({reason}).",

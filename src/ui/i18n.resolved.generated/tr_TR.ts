@@ -965,6 +965,7 @@ export const tr_TR: EnTranslations = {
       "balance": "Onur: {amount}",
       "honorFloat": "+{amount} Onur",
       "honorGain": "{amount} Onur ({reason}) kazanırsınız.",
+      "heroAmount": "{amount} Hero Points",
       "heroBalance": "Hero Points: {amount}",
       "heroFloat": "+{amount} Hero Points",
       "heroGain": "You gain {amount} hero points ({reason}).",

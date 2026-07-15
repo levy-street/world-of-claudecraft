@@ -965,6 +965,7 @@ export const en_XA: EnTranslations = {
       "balance": "[Ĥóñóŕ: {amount}]",
       "honorFloat": "[+{amount} Ĥóñóŕ]",
       "honorGain": "[Ýóú ĝáíñ {amount} Ĥóñóŕ ({reason}).]",
+      "heroAmount": "[{amount} Ĥéŕó Þóíñţš]",
       "heroBalance": "[Ĥéŕó Þóíñţš: {amount}]",
       "heroFloat": "[+{amount} Ĥéŕó Þóíñţš]",
       "heroGain": "[Ýóú ĝáíñ {amount} ĥéŕó þóíñţš ({reason}).]",

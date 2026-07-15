@@ -965,6 +965,7 @@ export const zh_TW: EnTranslations = {
       "balance": "榮譽：{amount}",
       "honorFloat": "+{amount} 榮譽",
       "honorGain": "你獲得了 {amount} 點榮譽（{reason}）。",
+      "heroAmount": "{amount} 英雄點數",
       "heroBalance": "英雄點數：{amount}",
       "heroFloat": "+{amount} 英雄點數",
       "heroGain": "你獲得 {amount} 英雄點數（{reason}）。",

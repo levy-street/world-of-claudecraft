@@ -12269,6 +12269,7 @@ export class Hud {
       buildVendorView(npc.vendorItems, this.sim.vendorBuyback, ITEMS, {
         copper: this.sim.copper,
         honor: this.sim.honor,
+        hero: this.sim.heroPoints,
       }),
       {
         ...this.presentationBag,

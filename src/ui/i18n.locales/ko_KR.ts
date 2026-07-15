@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.warfare.heroAmount': '{amount} 영웅 점수',
   'hudChrome.warfare.heroBalance': '영웅 점수: {amount}',
   'hudChrome.warfare.heroFloat': '+{amount} 영웅 점수',
   'hudChrome.warfare.heroGain': '영웅 점수 {amount}점 획득 ({reason}).',

@@ -965,6 +965,7 @@ export const fr_FR: EnTranslations = {
       "balance": "Honneur : {amount}",
       "honorFloat": "+{amount} points d’honneur",
       "honorGain": "Vous gagnez {amount} points d’honneur ({reason}).",
+      "heroAmount": "{amount} Hero Points",
       "heroBalance": "Hero Points: {amount}",
       "heroFloat": "+{amount} Hero Points",
       "heroGain": "You gain {amount} hero points ({reason}).",

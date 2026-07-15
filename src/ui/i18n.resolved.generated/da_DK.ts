@@ -965,6 +965,7 @@ export const da_DK: EnTranslations = {
       "balance": "Ære: {amount}",
       "honorFloat": "+{amount} Ære",
       "honorGain": "Du opnår {amount} Ære ({reason}).",
+      "heroAmount": "{amount} Hero Points",
       "heroBalance": "Hero Points: {amount}",
       "heroFloat": "+{amount} Hero Points",
       "heroGain": "You gain {amount} hero points ({reason}).",

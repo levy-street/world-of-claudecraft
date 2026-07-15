@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.warfare.heroAmount': '{amount} 英雄點數',
   'hudChrome.warfare.heroBalance': '英雄點數：{amount}',
   'hudChrome.warfare.heroFloat': '+{amount} 英雄點數',
   'hudChrome.warfare.heroGain': '你獲得 {amount} 英雄點數（{reason}）。',

@@ -965,6 +965,7 @@ export const ja_JP: EnTranslations = {
       "balance": "名誉: {amount}",
       "honorFloat": "名誉 +{amount}",
       "honorGain": "名誉を {amount} 獲得しました（{reason}）。",
+      "heroAmount": "{amount} ヒーローポイント",
       "heroBalance": "ヒーローポイント：{amount}",
       "heroFloat": "+{amount} ヒーローポイント",
       "heroGain": "{amount} ヒーローポイントを獲得（{reason}）。",

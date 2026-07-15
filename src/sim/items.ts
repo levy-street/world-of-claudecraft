@@ -24,6 +24,7 @@ import { formatMoney } from './format_money';
 import { moveStackToCell } from './inventory_order';
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
 import { battlefieldExperienceTrickle } from './professions/battlefield_xp';
+import { spendHeroPoints } from './pvp';
 import type { ItemUseResult, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import {
@@ -394,9 +395,9 @@ export function buyItem(ctx: SimContext, npcId: number, itemId: string, pid?: nu
   }
   meta.copper -= copperCost;
   meta.honor -= honorCost;
-  // Hero points spend like honor: the spendable pool drops, lifetimeHeroPoints
-  // (earned total) is never touched.
-  meta.heroPoints -= heroCost;
+  // Hero points spend through the one owner of the wallet rule (spendable down,
+  // lifetimeHeroPoints untouched); the affordability check above already passed.
+  if (heroCost > 0) spendHeroPoints(meta, heroCost);
   ctx.addItem(itemId, qty, meta.entityId);
   ctx.emit({ type: 'vendor', action: 'buy', itemId, pid: meta.entityId });
 }

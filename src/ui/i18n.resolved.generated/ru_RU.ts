@@ -965,6 +965,7 @@ export const ru_RU: EnTranslations = {
       "balance": "Честь: {amount}",
       "honorFloat": "+{amount} чести",
       "honorGain": "Вы получаете {amount} очк. чести ({reason}).",
+      "heroAmount": "{amount} очков героя",
       "heroBalance": "Очки героя: {amount}",
       "heroFloat": "+{amount} очков героя",
       "heroGain": "Вы получаете {amount} очков героя ({reason}).",
