@@ -414,7 +414,8 @@ export const RETIRED_HEROIC_ITEMS: Record<string, ItemDef> = {
     requiredLevel: 20,
     stats: { armor: 172, agi: 12, sta: 10 },
     sellValue: 14000,
-    requiredClass: AGILE_WILD,
+    // Save-compat definitions preserve their original v0.24.2 identity exactly.
+    requiredClass: ['rogue', 'hunter', 'druid'],
   },
   soulforged_warplate: {
     id: 'soulforged_warplate',
