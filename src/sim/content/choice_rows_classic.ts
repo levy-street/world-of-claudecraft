@@ -1584,14 +1584,15 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'sha_r5_imbue_mastery',
           name: 'Imbued Lifeblood',
-          description: 'Each landed melee auto-attack with an active weapon imbue heals you for 8.',
+          description:
+            'Each landed melee auto-attack with an active weapon imbue heals you for 4% of your maximum health.',
           icon: 'rockbiter_weapon',
           effect: {
             proc: {
               id: 'sha_imbued_lifeblood',
               name: 'Imbued Lifeblood',
               trigger: { on: 'meleeSwingWhile', auraKind: 'imbue' },
-              responses: [{ kind: 'heal', amount: 8 }],
+              responses: [{ kind: 'heal', pctMax: 0.04 }],
             },
           },
         },

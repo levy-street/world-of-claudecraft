@@ -136,14 +136,14 @@ describe('retained v0.26 non-Warrior row runtime contracts', () => {
     const sim = simWithRows('shaman', { 5: 'sha_r5_imbue_mastery' });
     const rng = sim.ctx.rng as typeof sim.ctx.rng & { chance(probability: number): boolean };
     rng.chance = () => false;
-    sim.player.hp = sim.player.maxHp - 20;
+    sim.player.hp = sim.player.maxHp - 100;
 
     onMeleeSwing(sim.ctx, sim.player);
-    expect(sim.player.hp).toBe(sim.player.maxHp - 20);
+    expect(sim.player.hp).toBe(sim.player.maxHp - 100);
 
     sim.player.auras.push(aura('test_imbue', 'imbue', sim.playerId, 'nature'));
     onMeleeSwing(sim.ctx, sim.player);
-    expect(sim.player.hp).toBe(sim.player.maxHp - 12);
+    expect(sim.player.hp).toBe(sim.player.maxHp - 100 + Math.round(sim.player.maxHp * 0.04));
   });
 
   it('makes Consume mobile with Walking Hunger', () => {

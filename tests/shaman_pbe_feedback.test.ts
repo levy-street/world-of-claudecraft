@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { onMeleeSwing } from '../src/sim/combat/talent_procs';
 import { ABILITIES } from '../src/sim/content/classes';
 import {
   rowForLevel,
@@ -9,6 +10,9 @@ import {
   validateRowTree,
   validateTalentTree,
 } from '../src/sim/content/talents';
+import { Sim } from '../src/sim/sim';
+import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
+import { tTalent } from '../src/ui/talent_i18n';
 
 function optionIds(level: 5 | 8 | 11 | 14 | 17 | 20): string[] {
   const row = rowForLevel('shaman', level);
@@ -69,6 +73,20 @@ function isKnownBy(abilityId: string, rowLevel: TalentRowLevel): boolean {
   return ability?.class === 'shaman' && ability.learnLevel <= rowLevel;
 }
 
+function imbuedLifebloodHeal(level: number): { heal: number; maxHp: number } {
+  const sim = new Sim({ seed: 260716, playerClass: 'shaman', autoEquip: false });
+  sim.setPlayerLevel(level);
+  expect(sim.applyTalents({ spec: null, rows: { 5: 'sha_r5_imbue_mastery' } })).toBe(true);
+  sim.castAbility('rockbiter_weapon');
+  expect(sim.player.auras.some((aura) => aura.kind === 'imbue')).toBe(true);
+  const rng = sim.ctx.rng as typeof sim.ctx.rng & { chance(probability: number): boolean };
+  rng.chance = () => false;
+  const maxHp = sim.player.maxHp;
+  sim.player.hp = 1;
+  onMeleeSwing(sim.ctx, sim.player);
+  return { heal: sim.player.hp - 1, maxHp };
+}
+
 describe('Shaman PBE structural feedback', () => {
   it('reshuffles the four affected tiers into three distinct choices each', () => {
     expect(optionIds(5)).toEqual([
@@ -111,6 +129,45 @@ describe('Shaman PBE structural feedback', () => {
           ).toBe(true);
         }
       }
+    }
+  });
+});
+
+describe('Shaman PBE tuning feedback', () => {
+  it('scales Imbued Lifeblood from about 8 healing at level 5 to 4% maximum health', () => {
+    const at5 = imbuedLifebloodHeal(5);
+    const at20 = imbuedLifebloodHeal(20);
+
+    expect(at5.heal).toBe(Math.round(at5.maxHp * 0.04));
+    expect(at5.heal).toBe(8);
+    expect(at20.heal).toBe(Math.round(at20.maxHp * 0.04));
+    expect(at20.heal).toBeGreaterThan(at5.heal * 3);
+
+    const lifeblood = rowForLevel('shaman', 5)?.options.find(
+      (option) => option.id === 'sha_r5_imbue_mastery',
+    );
+    expect(lifeblood?.description).toContain('4% of your maximum health');
+  });
+
+  it('renders the percentage heal from data in non-Latin locales', async () => {
+    const lifeblood = rowForLevel('shaman', 5)?.options.find(
+      (option) => option.id === 'sha_r5_imbue_mastery',
+    );
+    if (!lifeblood) throw new Error('Missing Imbued Lifeblood');
+
+    await ensureLocaleLoaded('zh_CN');
+    setLanguage('zh_CN');
+    try {
+      const description = tTalent({
+        kind: 'talentChoice',
+        choice: lifeblood,
+        field: 'description',
+      });
+      expect(description).toMatch(/4\s?%/);
+      expect(description).not.toContain('maximum health');
+      expect(description).not.toContain('NaN');
+    } finally {
+      setLanguage('en');
     }
   });
 });

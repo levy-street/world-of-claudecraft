@@ -133,7 +133,7 @@ export type ProcResponse =
     ))
   | { kind: 'stackAura'; aura: 'icicles'; maxStacks: number; duration: number }
   | { kind: 'addAuraCharges'; ability: string; amount: number; maxCharges: number }
-  | { kind: 'heal'; amount: number }
+  | ({ kind: 'heal' } & ({ amount: number; pctMax?: never } | { amount?: never; pctMax: number }))
   | { kind: 'absorb'; amount: number; duration: number; name: string }
   | { kind: 'echo'; belowFrac: number; window: number; heal: number; name: string };
 

@@ -134,7 +134,7 @@ function fireOne(
       break;
     }
     case 'heal':
-      ctx.applyHeal(player, subject, response.amount, def.name);
+      ctx.applyHeal(player, subject, response.amount ?? player.maxHp * response.pctMax, def.name);
       break;
     case 'absorb':
       ctx.applyAura(subject, {

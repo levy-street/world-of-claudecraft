@@ -7803,7 +7803,7 @@ function procResponseDescription(
     case 'addAuraCharges':
       return `${abilityName(response.ability)}: +${formatNumber(response.amount, lang)} (<= ${formatNumber(response.maxCharges, lang)})`;
     case 'heal':
-      return `+${formatNumber(response.amount, lang)} ${t('hud.meters.healing')}`;
+      return `+${response.pctMax !== undefined ? formatPercent(response.pctMax, lang) : formatNumber(response.amount, lang)} ${t('hud.meters.healing')}`;
     case 'absorb':
       return `${t('hudChrome.auraEffect.absorb', { value: formatNumber(response.amount, lang) })} (${seconds(response.duration, lang)})`;
     case 'echo':
