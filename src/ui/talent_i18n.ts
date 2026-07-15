@@ -704,6 +704,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Venenos viles',
     'Cruel Wounds': 'Disparos mortales',
     Cryomancy: 'Escarcha',
+    Fulmination: 'Fulminación',
     Icicles: 'Carámbanos',
     'Dead Aim': 'Precisión',
     'Deathless Ardor': 'Defensor ferviente',
@@ -1047,6 +1048,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Venenos viles',
     'Cruel Wounds': 'Disparos mortales',
     Cryomancy: 'Escarcha',
+    Fulmination: 'Fulminación',
     Icicles: 'Carámbanos',
     'Dead Aim': 'Precisión',
     'Deathless Ardor': 'Defensor ardiente',
@@ -1390,6 +1392,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Poisons infâmes',
     'Cruel Wounds': 'Tirs fatals',
     Cryomancy: 'Givre',
+    Fulmination: 'Fulmination',
     Icicles: 'Glaçons',
     'Dead Aim': 'Précision',
     'Deathless Ardor': 'Défenseur ardent',
@@ -1733,6 +1736,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Poisons infâmes',
     'Cruel Wounds': 'Tirs fatals',
     Cryomancy: 'Givre',
+    Fulmination: 'Fulmination',
     Icicles: 'Glaçons',
     'Dead Aim': 'Précision',
     'Deathless Ardor': 'Défenseur ardent',
@@ -2076,6 +2080,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Veleni immondi',
     'Cruel Wounds': 'Colpi mortali',
     Cryomancy: 'Gelo',
+    Fulmination: 'Fulminazione',
     Icicles: 'Ghiaccioli',
     'Dead Aim': 'Precisione',
     'Deathless Ardor': 'Difensore ardente',
@@ -2419,6 +2424,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Üble Gifte',
     'Cruel Wounds': 'Todbringende Schüsse',
     Cryomancy: 'Frost',
+    Fulmination: 'Entladung',
     Icicles: 'Eiszapfen',
     'Dead Aim': 'Präzision',
     'Deathless Ardor': 'Glühender Verteidiger',
@@ -2762,6 +2768,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': '剧毒',
     'Cruel Wounds': '致死射击',
     Cryomancy: '冰霜',
+    Fulmination: '雷霆爆发',
     Icicles: '冰刺',
     'Dead Aim': '精准',
     'Deathless Ardor': '炽热防御者',
@@ -3105,6 +3112,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': '邪惡毒藥',
     'Cruel Wounds': '致死射擊',
     Cryomancy: '冰霜',
+    Fulmination: '雷霆爆發',
     Icicles: '冰刺',
     'Dead Aim': '精準',
     'Deathless Ardor': '熱忱防衛者',
@@ -3448,6 +3456,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': '사악한 독',
     'Cruel Wounds': '필멸의 사격',
     Cryomancy: '냉기',
+    Fulmination: '뇌전 폭발',
     Icicles: '고드름',
     'Dead Aim': '정밀함',
     'Deathless Ardor': '헌신적인 수호자',
@@ -3791,6 +3800,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': '邪悪なる毒',
     'Cruel Wounds': 'モータル・ショット',
     Cryomancy: 'フロスト',
+    Fulmination: '雷撃爆発',
     Icicles: '氷柱',
     'Dead Aim': '精密',
     'Deathless Ardor': '熱烈なる守護者',
@@ -4134,6 +4144,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Venenos Vis',
     'Cruel Wounds': 'Disparos Mortais',
     Cryomancy: 'Gelo',
+    Fulmination: 'Fulminação',
     Icicles: 'Sincelos',
     'Dead Aim': 'Precisão',
     'Deathless Ardor': 'Defensor Fervoroso',
@@ -4477,6 +4488,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Мерзкие яды',
     'Cruel Wounds': 'Смертельные выстрелы',
     Cryomancy: 'Лед',
+    Fulmination: 'Разряд',
     Icicles: 'Ледяные осколки',
     'Dead Aim': 'Меткость',
     'Deathless Ardor': 'Ярый защитник',
@@ -4820,6 +4832,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Kruté jedy',
     'Cruel Wounds': 'Kruté rány',
     Cryomancy: 'Mrazivá magie',
+    Fulmination: 'Fulminace',
     Icicles: 'Rampouchy',
     'Dead Aim': 'Smrtící muška',
     'Deathless Ardor': 'Nesmrtelný zápal',
@@ -5163,6 +5176,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Snode Vergiften',
     'Cruel Wounds': 'Fatale Schoten',
     Cryomancy: 'Vorst',
+    Fulmination: 'Fulminatie',
     Icicles: 'IJspegels',
     'Dead Aim': 'Precisie',
     'Deathless Ardor': 'Vurige Verdediger',
@@ -5506,6 +5520,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Plugawe trucizny',
     'Cruel Wounds': 'Śmiertelne strzały',
     Cryomancy: 'Mróz',
+    Fulmination: 'Fulminacja',
     Icicles: 'Sople',
     'Dead Aim': 'Precyzja',
     'Deathless Ardor': 'Żarliwy obrońca',
@@ -5849,6 +5864,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Racun Keji',
     'Cruel Wounds': 'Tembakan Maut',
     Cryomancy: 'Beku',
+    Fulmination: 'Ledakan Petir',
     Icicles: 'Es Runcing',
     'Dead Aim': 'Presisi',
     'Deathless Ardor': 'Pembela Gigih',
@@ -6192,6 +6208,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'İğrenç Zehirler',
     'Cruel Wounds': 'Ölümcül Atışlar',
     Cryomancy: 'Ayaz',
+    Fulmination: 'Yıldırım Patlaması',
     Icicles: 'Buz Sarkıtları',
     'Dead Aim': 'İsabet',
     'Deathless Ardor': 'Ateşli Savunucu',
@@ -6535,6 +6552,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Vidriga gifter',
     'Cruel Wounds': 'Dödsbringande skott',
     Cryomancy: 'Frost',
+    Fulmination: 'Urladdning',
     Icicles: 'Istappar',
     'Dead Aim': 'Precision',
     'Deathless Ardor': 'Brinnande försvarare',
@@ -6878,6 +6896,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Độc Tố Hèn Hạ',
     'Cruel Wounds': 'Phát Bắn Chí Mạng',
     Cryomancy: 'Băng Giá',
+    Fulmination: 'Bùng Nổ Sấm Sét',
     Icicles: 'Băng Nhọn',
     'Dead Aim': 'Chính Xác',
     'Deathless Ardor': 'Vệ Binh Nhiệt Thành',
@@ -7221,6 +7240,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Modbydelige Gifte',
     'Cruel Wounds': 'Dødbringende Skud',
     Cryomancy: 'Frost',
+    Fulmination: 'Udladning',
     Icicles: 'Istapper',
     'Dead Aim': 'Præcision',
     'Deathless Ardor': 'Ihærdig Forsvarer',
@@ -7760,6 +7780,8 @@ function procResponseDescription(
       return `+${formatNumber(response.amount, lang)} ${t('classDetails.labels.resource')}`;
     case 'stackAura':
       return `+1 (<= ${formatNumber(response.maxStacks, lang)})`;
+    case 'addAuraCharges':
+      return `${abilityName(response.ability)}: +${formatNumber(response.amount, lang)} (<= ${formatNumber(response.maxCharges, lang)})`;
     case 'heal':
       return `+${formatNumber(response.amount, lang)} ${t('hud.meters.healing')}`;
     case 'absorb':
@@ -7780,7 +7802,16 @@ function procDescription(proc: ProcDef, lang: SupportedLanguage, text: TalentLoc
 type DescribedAddedEffect = Extract<
   AbilityEffect,
   {
-    type: 'root' | 'aoeRoot' | 'slow' | 'absorb' | 'dot' | 'extendDot' | 'interrupt' | 'consumeDot';
+    type:
+      | 'root'
+      | 'aoeRoot'
+      | 'slow'
+      | 'absorb'
+      | 'dot'
+      | 'extendDot'
+      | 'interrupt'
+      | 'consumeDot'
+      | 'consumeAuraChargesDamage';
   }
 >;
 
@@ -7793,7 +7824,8 @@ function assertDescribedAddedEffect(effect: AbilityEffect): asserts effect is De
     effect.type !== 'dot' &&
     effect.type !== 'extendDot' &&
     effect.type !== 'interrupt' &&
-    effect.type !== 'consumeDot'
+    effect.type !== 'consumeDot' &&
+    effect.type !== 'consumeAuraChargesDamage'
   ) {
     throw new Error(`Unsupported talent rider effect: ${effect.type}`);
   }
@@ -7828,6 +7860,8 @@ function addedEffectDescription(
       return `${name}: ${t('hudChrome.auraEffect.lockout')} (${seconds(effect.lockout, lang)}).`;
     case 'consumeDot':
       return `${name} -> ${abilityName(effect.dot)}: ${formatPercent(1, lang)} ${text.statLabels.damage} / 0 s.`;
+    case 'consumeAuraChargesDamage':
+      return `${name}: ${abilityName(effect.auraId)} x ${formatNumber(effect.damagePerCharge, lang)} ${text.statLabels.damage}.`;
   }
 }
 

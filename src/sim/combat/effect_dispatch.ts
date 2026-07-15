@@ -353,6 +353,34 @@ export function runEffects(
         if (isSpell) runWeaponProcs(ctx, p, target, 'spellDamage');
         break;
       }
+      case 'consumeAuraChargesDamage': {
+        if (!target || !ctx.isHostileTo(p, target)) break;
+        const auraIndex = p.auras.findIndex(
+          (aura) =>
+            aura.id === eff.auraId && aura.sourceId === p.id && (aura.charges ?? 0) > 0,
+        );
+        if (auraIndex < 0) break;
+        const aura = p.auras[auraIndex];
+        const charges = aura.charges ?? 0;
+        p.auras.splice(auraIndex, 1);
+        ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
+        ctx.dealDamage(
+          p,
+          target,
+          charges * eff.damagePerCharge,
+          false,
+          ability.school,
+          ability.name,
+          'hit',
+          false,
+          threatOpts,
+          true,
+          attackAnimationStarted,
+          false,
+          ability.id,
+        );
+        break;
+      }
       case 'finisherDamage': {
         if (!target || spentCombo <= 0) break;
         let dmg =

@@ -124,14 +124,14 @@ export function applyAction(sim: Sim, action: number): void {
 const NEARBY_MOBS = 5;
 
 export function obsSize(): number {
-  return 17 + ABILITY_SLOTS * 2 + 9 + NEARBY_MOBS * 6 + 5 + QUEST_ORDER.length * 2;
+  return 18 + ABILITY_SLOTS * 2 + 9 + NEARBY_MOBS * 6 + 5 + QUEST_ORDER.length * 2;
 }
 
 export function encodeObs(sim: Sim): number[] {
   const p = sim.player;
   const obs: number[] = [];
 
-  // --- self (17) ---
+  // --- self (18) ---
   obs.push(p.hp / Math.max(1, p.maxHp));
   obs.push(p.resource / Math.max(1, p.maxResource));
   obs.push(p.level / MAX_LEVEL);
@@ -152,6 +152,9 @@ export function encodeObs(sim: Sim): number[] {
   obs.push(sim.time > p.overpowerUntil ? 0 : 1); // dodge proc available
   const icicles = p.auras.find((aura) => aura.kind === 'icicles')?.stacks ?? 0;
   obs.push(clamp(icicles / 5, 0, 1));
+  const lightningShieldCharges =
+    p.auras.find((aura) => aura.id === 'lightning_shield')?.charges ?? 0;
+  obs.push(clamp(lightningShieldCharges / 9, 0, 1));
 
   // --- abilities (10 x 2 = 20) ---
   for (let i = 0; i < ABILITY_SLOTS; i++) {

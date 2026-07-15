@@ -129,6 +129,7 @@ export type ProcResponse =
   | { kind: 'cooldownRefund'; ability: string; seconds: number | 'reset' }
   | { kind: 'resource'; amount: number; resourceType?: ResourceType }
   | { kind: 'stackAura'; aura: 'icicles'; maxStacks: number; duration: number }
+  | { kind: 'addAuraCharges'; ability: string; amount: number; maxCharges: number }
   | { kind: 'heal'; amount: number }
   | { kind: 'absorb'; amount: number; duration: number; name: string }
   | { kind: 'echo'; belowFrac: number; window: number; heal: number; name: string };

@@ -1604,7 +1604,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 11,
       theme: 'attunement',
-      decision: 'heal-crit tempo vs bolt-crit tempo vs healing-over-time spring',
+      decision: 'heal-crit tempo vs Thunder Ward charge weaving vs healing-over-time spring',
       options: [
         {
           id: 'sha_r11_ancestral_guidance',
@@ -1629,22 +1629,35 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
           },
         },
         {
-          id: 'sha_r11_elemental_attunement',
-          name: 'Elemental Attunement',
-          description: 'Arc Bolt critical strikes make your next Arc Bolt within 8 sec instant.',
-          icon: 'lightning_bolt',
+          id: 'sha_r11_fulmination',
+          name: 'Fulmination',
+          description:
+            'While Thunder Ward is active, each Arc Bolt adds a charge up to 9. Earthen Jolt consumes every charge for 8 Nature damage each.',
+          icon: 'lightning_shield',
           effect: {
+            ability: [
+              {
+                ability: 'earth_shock',
+                addEffects: [
+                  {
+                    type: 'consumeAuraChargesDamage',
+                    auraId: 'lightning_shield',
+                    damagePerCharge: 8,
+                  },
+                ],
+              },
+            ],
             proc: {
-              id: 'sha_elemental_attunement',
-              name: 'Elemental Attunement',
+              id: 'sha_fulmination',
+              name: 'Fulmination',
               school: 'nature',
-              trigger: { on: 'spellCrit', abilities: ['lightning_bolt'] },
+              trigger: { on: 'castNth', n: 1, abilities: ['lightning_bolt'] },
               responses: [
                 {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_instant',
-                  abilities: ['lightning_bolt'],
-                  duration: 8,
+                  kind: 'addAuraCharges',
+                  ability: 'lightning_shield',
+                  amount: 1,
+                  maxCharges: 9,
                 },
               ],
             },

@@ -118,9 +118,9 @@ describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
     expect(sniper).toContain('30%');
     expect(sniper).toContain('15%');
 
-    const attunement = render('shaman', (e) => e.id === 'sha_r11_elemental_attunement');
-    expect(attunement).toContain('critical strikes');
-    expect(attunement).toContain('instant');
+    const fulmination = render('shaman', (e) => e.id === 'sha_r11_fulmination');
+    expect(fulmination).toContain('up to 9');
+    expect(fulmination).toContain('8 Nature damage each');
 
     const mastery = render('warrior', (e) => e.id === 'war_row_blood_offering');
     expect(mastery).toContain('ability criticals deal 15% more damage');

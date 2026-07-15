@@ -115,6 +115,21 @@ function fireOne(
       });
       break;
     }
+    case 'addAuraCharges': {
+      const aura = player.auras.find(
+        (entry) => entry.id === response.ability && entry.sourceId === player.id,
+      );
+      if (!aura) break;
+      aura.charges = Math.min(response.maxCharges, (aura.charges ?? 0) + response.amount);
+      ctx.emit({
+        type: 'spellfx',
+        sourceId: player.id,
+        targetId: player.id,
+        school: def.school ?? 'nature',
+        fx: 'procSurge',
+      });
+      break;
+    }
     case 'heal':
       ctx.applyHeal(player, subject, response.amount, def.name);
       break;

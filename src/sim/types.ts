@@ -1506,6 +1506,7 @@ export type AbilityEffect =
       vsRootedMult?: number;
       consumeAuraStacks?: { auraId: string; maxStacks: number };
     }
+  | { type: 'consumeAuraChargesDamage'; auraId: string; damagePerCharge: number }
   | { type: 'interrupt'; lockout: number; rageOnInterrupt?: number }
   | {
       type: 'chainDamage';
