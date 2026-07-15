@@ -2,14 +2,36 @@
 
 ## Current phase
 
-Phase 1 (Degit the i18n aggregate artifacts): IMPLEMENTED 2026-07-14, PR #1931 against
-release/v0.26.0 marked READY FOR REVIEW 2026-07-14. Phase 1 QA ran 2026-07-14: initial
-verdict FAIL on acceptance criterion 2 only (the two-branch merge experiment conflicts
-in the pre-existing src/ui/i18n.resolved.generated/pending.ts); the owner decided OPEN
-item 8 the same day (criterion 2 re-scoped to the phase's artifacts, durable
-same-as-English-inversion fix specced as a follow-up), updating the verdict to
-PASS-WITH-FOLLOWUPS. Every other criterion verified, all SHOULD-FIX findings fixed.
-The merge stays owner-scheduled at a release cut (OPEN item 3).
+Phase 1 (Degit the i18n aggregate artifacts): MERGED into release/v0.26.0 on
+2026-07-14 (PR #1931, merge 0313a58f6). QA verdict PASS-WITH-FOLLOWUPS (initial FAIL
+on criterion 2 was resolved the same day by the owner's OPEN item 8 decision:
+criterion re-scoped to the phase's artifacts, durable same-as-English-inversion fix
+specced as a follow-up). The release-gate arm of the three i18n steps ran live and
+green on the merge push (run 29379864925), closing that deferral; the run's overall
+red is the pre-existing mid-cycle release-tier state (empty-pending plus release
+version surfaces), identical pre-merge. The packet directory is now ON the release
+base: fresh worktrees no longer need the bootstrap copy.
+
+Phase 2 (Generated flat TranslationKey union + baseUrl removal): IMPLEMENTED
+2026-07-14 on feature/flat-translationkey-union off release/v0.26.0 (tip
+0313a58f6). All deliverables landed: the generator emits
+src/ui/i18n.catalog/translation_keys.generated.ts (committed, line-item, D6
+clean), TranslationKey re-exports it, baseUrl deleted, the membership test
+retired, freshness wiring complete. PR #1940 against release/v0.26.0.
+Phase 2 QA ran 2026-07-14: verdict PASS (0 BLOCKING; 2 SHOULD-FIX found and
+resolved, one by the committed teeth successor tests/i18n_union_teeth.test.ts
+and one by the accepted cadence deviation recorded in the Phase 2 QA notes
+below; doc-record corrections applied; PR #1940 marked ready for review, merge
+timing owner-scheduled). Measured: tsc 5.9.3 27.4s -> 12.9s local (QA re-measured
+12.4 to 12.5s same machine); the typescript@7.0.2 forward probe exits 0 in 2.4s
+(QA re-run 2.31s; 7.0.2 still the newest stable 7.x); both negative probes fail
+tsc; resolved output byte-identical (QA re-proved: regen clean at HEAD and at
+the base tip, zero resolved-slice diffs in the phase range).
+The OPEN item 8 rider spike RAN and recorded its measured result in item 8
+below: mechanism validates, bundle premise fails, implementation deferred to
+its own PR (a recorded, measured deviation from the checklist's written
+fallback to (a); see item 8). Next: Phase 2 QA (phase-02-qa.md), then
+Phase 3 (phase-03-ci-parallel-checks-ffmpeg.md).
 
 ## Phase 1 execution notes (2026-07-14, for later phases)
 
@@ -82,6 +104,106 @@ The merge stays owner-scheduled at a release cut (OPEN item 3).
   regressions red ONLY at the known environmental armory_mobile_layout pixel assertion
   (PR CI green on the same HEAD is the arbiter); typecheck and the env, server, and
   client builds green.
+
+## Phase 2 QA notes (2026-07-14)
+
+- Verdict: PASS. 0 BLOCKING; 2 SHOULD-FIX found, both resolved; 7 doc-record
+  corrections applied; the adversarial panel vindicated every disputed factual
+  claim (details below). PR #1940 marked ready for review after PR CI green on
+  the QA head; merge timing stays owner-scheduled.
+- SHOULD-FIX 1 (fixed, the QA's most substantive finding): retiring
+  tests/i18n_overlay_key_membership.test.ts kept the membership guarantee
+  (strictly stronger under tsc, and broader: the old test imported only 14
+  overlays, tsc checks all 21) but lost its three anti-vacuity "teeth"
+  self-checks, leaving two silent-failure channels no gate covered: an overlay
+  losing its Partial<Record<TranslationKey, string>> annotation in a merge
+  (tsc goes silent for that overlay), and the generator ever gaining a widening
+  member such as `| (string & {})` (tsc vacuous repo-wide with regen, freshness,
+  and determinism all still green). Fix: tests/i18n_union_teeth.test.ts, the
+  committed successor. Type-level half: @ts-expect-error probes (the retired
+  test's same three synthetic keys plus a value-type tooth) and a
+  string-extends-TranslationKey anti-vacuity pin, compiled by every tsc run
+  (gate, pre-push floor, CI check:types, editors); the directives themselves
+  fail the build as unused the moment the union stops rejecting bad keys.
+  Runtime half: every overlay file carries the annotation, and the union file
+  keeps the D6 line-item shape (sorted, unique, one quoted literal per line, no
+  widening member, no count/hash/timestamp), which also closes the reviewer
+  NICE-TO-HAVE that nothing pinned the artifact's internal shape. Both red
+  paths were simulated before commit: a widening member fails tsc (TS2322 on
+  the pin plus three TS2578) AND the shape test; a dropped annotation fails the
+  annotation test naming the file.
+- SHOULD-FIX 2 (resolved as an accepted, recorded deviation): the union's
+  reproducibility pins (the i18n_resolved_equivalence blocks) and the
+  membership-test retirement ride the test(i18n) commit 386cfe3f4, two commits
+  after the artifact and type swap they pin (0dc33257d), which violates the
+  literal pin-rides-with-surface constraint. Root cause is a genuine conflict
+  between that constraint and the phase doc's own STEP 4 four-commit cadence
+  (which prescribes a separate test(i18n) commit); the rebuilt stack honored
+  the constraint for the EDITED pins (tests/ci_workflow.test.ts and
+  tests/i18n_emit_shape.test.ts ride 0dc33257d with their surfaces) and the
+  cadence for the NEW pins. Accepted because QA verified the intermediates:
+  at 0dc33257d, tsc exits 0 and the emit-shape, ci_workflow, equivalence, and
+  the not-yet-retired membership suites all pass, and the artifact was already
+  CI-freshness-guarded by that same commit; Phase 1 set the recorded-deviation
+  precedent. The PR #1940 body's overbroad "every pinned test rides the commit
+  of the surface it pins" sentence was amended to match. Rule for later phases:
+  the pin-rides-with-surface constraint outranks a phase doc's commit cadence;
+  put NEW pins in the surface's commit too.
+- Known red intermediate (recorded): the mid-phase merge commit e07b4aaeb
+  carries a stale committed union (PR #1861's two keys landed in the catalog;
+  the regen rides the next commit 926081074), so the freshness gates fail AT
+  the merge commit itself: bisect-hostile but head-green. Future base merges:
+  git merge --no-commit, npm run i18n:gen, then conclude the merge as one
+  commit.
+- Adversarial panel results (all other attacked claims held): the "85
+  template-literal pattern members" figure was VINDICATED by measuring the real
+  old type with the TypeScript 5.9.3 compiler API at the release base
+  (Leaves<typeof en, 6> normalizes to 5,761 constituents: 5,676 string literals
+  plus exactly 85 templates; a static reconstruction's 86 over-counted
+  q_mogger, whose objectives Record is replaced by a literal-keyed object via
+  the mergeEntities spread in src/ui/i18n.catalog/index.ts). The
+  nothing-got-weaker claim survived a dedicated refutation hunt (57
+  as-TranslationKey cast sites enumerated, all in files unchanged across the
+  range; the runtime lookup path is byte-identical; the strongest candidate,
+  the hud.ts companion-bark template key, is bounded by the runtime
+  KNOWN_BARKS allowlist with every key present in the union). The baseUrl
+  removal survived exhaustively (exactly two tsconfigs repo-wide;
+  tsconfig.admin.json extends the root from the same directory so the paths
+  anchor is unchanged; svelte-check clean; zero bare baseUrl-rooted imports;
+  the #bot-detector fallback arm exercised with private/ empty).
+- QA validation evidence beyond the recorded timings: canonical probe pair red
+  (bogus overlay key TS2353, bogus t() literal TS2345); a corrupted real call
+  site and a corrupted existing overlay row both red (tsc reports only the
+  FIRST excess property per object literal, so per-literal probes must stay
+  separate); deleting one union member breaks its real call sites AND every
+  overlay row carrying the key; a staled union (catalog key added, no regen)
+  turns the CI freshness diff red naming the file, and the bare-tsc contributor
+  error names TranslationKeyFlat, whose generated header already carries the
+  npm run i18n:gen hint (no hint fix needed); literal as-TranslationKey casts
+  compile identically on base and branch (TypeScript same-primitive
+  comparability), so cast sites are an unchanged escape hatch, not a
+  regression. The typeSafety auditor's 20-site t() sample covered all seven
+  TS2590-flagged files plus overlay rows and casts, every sampled key present
+  in the union; whole-repo tsc green subsumes the per-site checks. Reviewer
+  dispatch per the matrix: privacy-security-review PASS, frontend-seam-reviewer
+  PASS (the union proven ERASED from the runtime bundle by esbuild-transforming
+  the catalog index: no reference to the generated module survives),
+  qa-checklist PASS; cross-platform-sync correctly skipped (the pure
+  catalog-refactor case), architecture-reviewer and migration-safety not
+  applicable.
+- Deferrals (recorded, not blocking): the release-gate arm of the union
+  freshness diff has not run live (the pr-gate arm ran green on PR #1940; the
+  red path is proven by local simulation only); closes on the first
+  release/v0.26.0 push after merge, same class as Phase 1's closed deferral.
+  The ci.yml freshness-step comment still says "committed line-item slices"
+  and should mention the union; deferred to Phase 3, which restructures those
+  steps. The regen-freshness tests inherit an ambient I18N_OUT_DIR if a
+  launcher ever sets one (none does; consistent with the pre-existing
+  pattern). emitTranslationKeysModule emits syntactically invalid TS for an
+  empty key set (unreachable: the composed en catalog cannot be empty).
+- Environment note: QA ran under nvm Node 24 with the ffmpeg-static/ffprobe
+  shim per the Phase 1 execution notes; the armory_mobile_layout browser pixel
+  failure remains environmental (PR CI green is the arbiter).
 
 ## Locked design decisions (record once, reference forever)
 
@@ -224,6 +346,9 @@ Workstream C (Phases 3, 4 touch set):
 
 (Planned entries below; confirm or amend as phases complete.)
 - Phase 2: src/ui/i18n.catalog/translation_keys.generated.ts (committed, line-item).
+  CONFIRMED 2026-07-14: emitted exactly there by scripts/i18n_build.mjs (in
+  override mode it lands inside I18N_OUT_DIR instead, so the determinism harness
+  exercises it hermetically); no other new files.
 - Phase 4: the tests/vale_cup.test.ts split files (2 to 3, names chosen at split time)
   plus a possible shared local test util.
 
@@ -275,3 +400,51 @@ Workstream C (Phases 3, 4 touch set):
      surface for src/ui/i18n.ts and src/admin/i18n.ts (shape change vs accessor);
      determinism under the perturbed-env tests; measured bundle delta (expected near
      zero); and re-run the two-branch merge experiment as the acceptance proof.
+   - SPIKE RESULT (2026-07-14, run as the Phase 2 rider on
+     feature/flat-translationkey-union): the MECHANISM VALIDATES but the
+     near-zero-bundle premise FAILS MEASURABLY, so the implementation is
+     DEFERRED to its own PR instead of riding Phase 2. (Phase 2 QA wording
+     note: this is a recorded, measured deviation from the checklist's written
+     fallback above, which prescribed (a) on a snag; the measurement shows (d)
+     dominates (a) on every axis, so falling back would ship the worse option.
+     See the RECOMMENDATION at the end of this record.)
+     Measured probes (live data, release tip 0313a58f6 plus the Phase 2 diff):
+     (1) Lockstep soundness: derived pending (resolved[L][k] === resolved.en[k]
+     AND k not in sameAsEnglish[L]; en-dialects always empty) equals the
+     committed pending.ts EXACTLY for all 21 non-en locales (0 mismatches,
+     including es_ES/fr_CA dialect chains and en_CA). (2) Whitespace edge:
+     0 overlay rows carry a non-isPresent value today, so byte-derivation and
+     providedByLang agree; an implementation must add a build-time guard
+     rejecting whitespace-only overlay values to keep that equivalence forced.
+     (3) Tiny-list premise: FALSE. sameAsEnglish measures 3,753 keys total
+     (per locale 78 to 297: de_DE 297, id_ID 273, fr_FR 269, ..., zh_CN 78);
+     translators legitimately keep many values byte-identical (proper nouns,
+     cognate UI terms). (Phase 2 QA note: the 78-to-297 range describes the
+     non-English-dialect locales; en_CA is a divergence-only dialect overlay
+     whose sameAsEnglish is structurally ~0, so it sits below the range while
+     still counting toward the 21-locale total. Gzip figures in this record
+     are node zlib gzipSync at level 9; CLI gzip differs by a few percent.) (4) Measured bundle cost, the snag: a one-file
+     same_as_english.ts emit is 123,465 bytes raw / 8,168 bytes gzip and must be
+     EAGER (the runtime imports it to derive). Today's pending.ts is 70,259 raw
+     / 1,982 gzip mid-cycle (near-identical per-locale lists cross-compress) and
+     ~700 raw / ~150 gzip at release. So one-file (d) is a permanent ~+8 KB gzip
+     eager add at release vs today's ~0: not near zero, though 3 to 4x below
+     option (a)'s 25 to 35 KB estimate. (5) A near-zero variant exists but grows
+     the change: ship each locale's sameAsEnglish inside its lazy locale chunk
+     (the game client is already lazy-flipped) and derive that locale's pending
+     set when ensureLocaleLoaded resolves. Eager delta ~0, but it reshapes the
+     loaders.ts emit, the residency lifecycle, and the release hard-fail timing
+     (derive-on-load instead of static import), and the non-lazy admin runtime
+     still eats its (unmeasured, admin-scoped) list eagerly. That is standalone
+     PR scope. Also validated for whichever shape ships: the
+     i18n_t_behavior pending-injection mock re-points cleanly (inject the
+     synthetic key into the mocked en and es slices with byte-equal values;
+     no pending module left to mock); the release-tier empty-pending assertion
+     and the runtime surface should move behind a derivePendingKeys(lang)
+     accessor; runtime derivation cost is one ~6.2k-leaf walk per loaded locale,
+     negligible. RECOMMENDATION: implement (d) as its own follow-up PR in the
+     per-locale lazy shape (near-zero eager delta) with the whitespace guard and
+     the two-branch merge experiment as acceptance; if the owner prefers the
+     simple one-file shape, accept the measured ~8 KB gzip eager cost
+     explicitly. Do not fall back to (a): measured (d) dominates (a) on every
+     axis (cost, and it also shrinks what concurrent PRs can touch).

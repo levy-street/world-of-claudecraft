@@ -1654,15 +1654,20 @@ describe('The Drowned Litany (Phase 4 enemy kits)', () => {
       y: 0,
       z: p.pos.z + 14,
     });
+    // This test owns ranged behavior, not the spell-hit curve. Force the vial to
+    // connect and track peak damage so out-of-combat regen cannot hide the hit.
+    acolyte.hitBonus = 1;
     (sim as any).addEntity(acolyte);
     run.mobIds.push(acolyte.id);
     const hp0 = p.hp;
+    let minHp = hp0;
     let minDist = Number.POSITIVE_INFINITY;
     for (let i = 0; i < 20 * 12 && !acolyte.dead; i++) {
       sim.tick();
+      minHp = Math.min(minHp, p.hp);
       minDist = Math.min(minDist, Math.hypot(acolyte.pos.x - p.pos.x, acolyte.pos.z - p.pos.z));
     }
-    expect(p.hp, 'acolyte should land ranged Rotwater Vials').toBeLessThan(hp0);
+    expect(minHp, 'acolyte should land ranged Rotwater Vials').toBeLessThan(hp0);
     expect(minDist, 'acolyte should hold at range, never melee').toBeGreaterThan(8);
   });
 

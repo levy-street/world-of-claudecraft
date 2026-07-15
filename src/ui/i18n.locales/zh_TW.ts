@@ -5,246 +5,16 @@
 // translate that key. The build (scripts/i18n_build.mjs) unflattens this map and
 // overlays it onto nested `en` to produce the dense resolved table; any key here
 // must be a real `en` leaf path: keys are typed `Partial<Record<TranslationKey,
-// string>>` so tsc rejects a structurally-wrong key, plus
-// tests/i18n_overlay_key_membership.test.ts catches a typo'd entity id the
-// template-literal key type cannot. Overlays are SPARSE: an
+// string>>` against the build-generated flat key union, so tsc rejects any key
+// that is not an exact `en` leaf path, typo'd entity ids included. Overlays are SPARSE: an
 // untranslated key is omitted and the build fills it from English, then the
 // registry (src/ui/i18n.status.json) marks it `pending`.
 
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
-  'entities.items.eastbrook_greatsword.name': '東溪巨劍',
-  'entities.items.highwatch_greatsword.name': '高望巨劍',
-  'entities.items.highwatch_wallshield.name': '高望壁盾',
-  'entities.items.eastbrook_buckler.name': '東溪小圓盾',
-  'entities.abilities.avatar.name': '戰爭化身',
-  'entities.abilities.avatar.description':
-    '化身為巨像，持續 20 秒，解除你身上所有的控制效果，並使你造成的傷害提高 20%。',
-  'entities.abilities.bladestorm.name': '劍刃風暴',
-  'entities.abilities.bladestorm.description':
-    '化為一陣旋轉的鋼鐵風暴，每秒對 8 碼內的所有敵人造成 {damage} 點傷害，持續 4 秒。',
-  'entities.abilities.battle_stance.description':
-    '一種進攻性的戰鬥姿態：你產生的怒氣提高 10%。這是武器與防護的預設姿態。',
-  'entities.abilities.battle_stance.name': '戰鬥姿態',
-  'entities.abilities.berserker_stance.description':
-    '一種魯莽的戰鬥姿態：你的暴擊機率提高 3%，暴擊傷害提高 3%。狂怒戰士總是以這個姿態作戰。',
-  'entities.abilities.berserker_stance.name': '狂暴姿態',
-  'entities.abilities.breachmaker.description':
-    '重擊目標，造成武器傷害外加 {damage}，並破開它的防禦：你對它的攻擊在 8 秒內造成的傷害提高 20%。（武器）',
-  'entities.abilities.breachmaker.name': '破防者',
-  'entities.abilities.cleaving_blows.description': '血色收割必定返還一次雙擊的充能。（狂怒）',
-  'entities.abilities.cleaving_blows.name': '順劈連擊',
-  'entities.abilities.deep_wounds.description':
-    '被動：你的致殘打擊使目標在 6 秒內流血並受到物理傷害。（武器）',
-  'entities.abilities.deep_wounds.name': '撕裂創傷',
-  'entities.abilities.defiant_bellow.description':
-    '一聲挑釁的怒吼：10 碼內的每個敵人都被嘲諷，被迫攻擊你 3 秒。（防護）',
-  'entities.abilities.defiant_bellow.name': '挑釁怒吼',
-  'entities.abilities.diabolical_twinstrike.description':
-    '處於激怒狀態時，你的雙擊造成的傷害提高 15%。（狂怒）',
-  'entities.abilities.diabolical_twinstrike.name': '邪惡雙擊',
-  'entities.abilities.die_by_sword.description':
-    '防禦性冷卻技：持續 8 秒，你受到的傷害降低 30%，並大幅提高閃躲攻擊的機率。',
-  'entities.abilities.die_by_sword.name': '劍在人在',
-  'entities.abilities.emboldening_roar.description':
-    '發出壯膽的怒吼：你與 40 碼內的友方玩家獲得壯膽效果，且你接下來的 3 個技能必定是暴擊。（狂怒）',
-  'entities.abilities.emboldening_roar.name': '壯膽怒吼',
-  'entities.abilities.enrage_passive.description':
-    '被動：處於激怒狀態時，你造成的傷害提高 7%、攻擊速度提高 25%、移動速度提高 10%，持續 4 秒。深切裂傷有 30% 機率使你激怒；血色收割則必定使你激怒。（狂怒）',
-  'entities.abilities.enrage_passive.name': '狂亂',
-  'entities.abilities.faultline.description':
-    '沿地面送出一道衝擊波：你正面 8 碼內的敵人受到 {damage} 點傷害並昏迷 3 秒。（防護）',
-  'entities.abilities.faultline.name': '斷層',
-  'entities.abilities.furious_mending.description':
-    '持續 10 秒，你受到的傷害降低 20%，且在效果持續期間，你的深切裂傷會治療你 20% 的最大生命值。（狂怒）',
-  'entities.abilities.furious_mending.name': '狂怒療傷',
-  'entities.abilities.heroic_leap.description':
-    '躍向目標區域，落地時對附近的敵人造成 {damage} 點傷害。',
-  'entities.abilities.heroic_leap.name': '英勇飛躍',
-  'entities.abilities.intimidating_shout.description':
-    '一聲駭人的怒吼，使 8 碼內最多 5 個敵人陷入恐懼而逃竄，持續 8 秒。傷害可能會打破效果。',
-  'entities.abilities.intimidating_shout.name': '破膽怒吼',
-  'entities.abilities.iron_resolve.description':
-    '咬緊牙關、無視疼痛：消耗最多 40 點怒氣（至少 20 點），每消耗 1 點怒氣可吸收 4 點傷害，持續最多 10 秒。（防護）',
-  'entities.abilities.iron_resolve.name': '鋼鐵意志',
-  'entities.abilities.measured_fury.description':
-    '你節制的怒火磨利了你的資源運用：你的技能消耗的怒氣降低 10%。（武器）',
-  'entities.abilities.measured_fury.name': '節制之怒',
-  'entities.abilities.piercing_howl.description':
-    '一聲穿刺的吼叫，使 15 碼內的所有敵人減速 50%，持續 8 秒。',
-  'entities.abilities.piercing_howl.name': '穿刺怒吼',
-  'entities.abilities.raging_gale.description':
-    '立即以武器攻擊兩次，每擊造成 40% 武器傷害外加 {damage}，並產生 8 點怒氣。最多儲存 2 次充能。（狂怒）',
-  'entities.abilities.raging_gale.name': '雙擊',
-  'entities.abilities.raised_guard.description':
-    '舉盾防禦：你受到的物理傷害降低 50%，持續 6 秒。最多儲存 2 次充能。（防護）',
-  'entities.abilities.raised_guard.name': '舉盾防禦',
-  'entities.abilities.rallying_cry.description':
-    '發出英勇怒吼，使你與 40 碼內的隊伍成員最大生命值提高 20%，持續 10 秒。防護專精的受益者在此期間受到的傷害還會降低 5%。',
-  'entities.abilities.rallying_cry.name': '英勇怒吼',
-  'entities.abilities.recklessness.description':
-    '激怒：你的怒氣產生提高 50%，暴擊機率提高 20%，持續 12 秒。',
-  'entities.abilities.recklessness.name': '魯莽',
-  'entities.abilities.red_harvest.description':
-    '傾盡所有：在狂亂中攻擊三次，每擊造成65%武器傷害外加 {damage}，並必定使你激怒。（狂怒）',
-  'entities.abilities.red_harvest.name': '血色收割',
-  'entities.abilities.revenge.description':
-    '以大幅弧線攻擊，對你正面的所有敵人造成物理傷害。超過 5 個目標時傷害會降低。當你閃躲或招架時，你的下一次復仇可能不消耗怒氣。 (Protection)',
-  'entities.abilities.revenge.name': '復仇',
-  'entities.abilities.sanguine_aura.description':
-    '以敵人的鮮血浸染你的武器：你與你的近戰盟友獲得 10% 攻擊速度與 10% 傷害，持續 20 秒。',
-  'entities.abilities.sanguine_aura.name': '血色光環',
-  'entities.abilities.seasoned_soldier.description':
-    '你的自動攻擊暴擊時多產生 10% 的怒氣。（武器）',
-  'entities.abilities.seasoned_soldier.name': '沙場老兵',
-  'entities.abilities.storm_bolt.description':
-    '將你的武器擲向目標，造成 {damage} 點傷害，並使其昏迷 3 秒。',
-  'entities.abilities.storm_bolt.name': '風暴之錘',
-  'entities.abilities.sudden_death.description':
-    '你的自動攻擊有機率讓你能對任何生命值的目標施放提早入土，且不消耗怒氣。（武器）',
-  'entities.abilities.sudden_death.name': '猝死',
-  'entities.abilities.sweeping_strikes.description':
-    '持續 12 秒，你的單體攻擊還會以全額傷害額外打擊 1 名附近的敵人。（武器）',
-  'entities.abilities.sweeping_strikes.name': '擴弧斬',
-  'entities.abilities.victory_rush.description':
-    '攻擊造成武器傷害外加 {damage}，並治療你 20% 的最大生命值。只能在擊殺敵人後的 20 秒內使用。',
-  'entities.abilities.victory_rush.name': '乘勝追擊',
-  'hudChrome.specPanel.complexity': '複雜度',
-  'hudChrome.specPanel.complexityHigh': '高',
-  'hudChrome.specPanel.complexityLow': '低',
-  'hudChrome.specPanel.complexityMedium': '中等',
-  'hudChrome.specPanel.exampleAbilities': '範例技能',
-  'hudChrome.specPanel.primaryAttr': '主要屬性',
-  'hudChrome.specPanel.selectSpec': '選擇專精',
-  'hudChrome.specPanel.viewTalents': '檢視天賦',
-  'hudChrome.talentRows.comingSoon': '敬請期待',
-  'hudChrome.talentRows.defaultLoadout': '預設配置',
-  'hudChrome.talentRows.tab': '抉擇',
-  'hudChrome.talentRows.readoutSummary': '天賦：{head}，已選擇 {spent}/{total} 列。',
-  'entities.abilities.aspect_of_the_wild.name': '野牙偽裝',
-  'entities.abilities.aspect_of_the_wild.description':
-    '以野性力量激勵30碼內的盟友，使其攻擊強度提高45、攻擊速度提高5%，持續5分鐘。（獵人天賦）',
-  'entities.abilities.aura_surge.name': '曙光彈射',
-  'entities.abilities.aura_surge.description':
-    '擲出曙光鑄造的盾牌，造成{damage}點神聖傷害並使主要目標沉默2秒，隨後彈射至10碼內最多2個額外敵人，每次彈射造成75%傷害。（聖騎士天賦）',
-  'entities.abilities.avenging_wrath.name': '復仇之翼',
-  'entities.abilities.avenging_wrath.description':
-    '召喚復仇之力，使你的攻擊強度提高60、法術強度提高30，持續20秒。（聖騎士天賦）',
-  'entities.abilities.berserk.name': '赤紅迷霧',
-  'entities.abilities.berserk.description': '使你的攻擊強度提高70，持續15秒。（德魯伊天賦）',
-  'entities.abilities.blink.name': '閃爍步',
-  'entities.abilities.blink.description': '使你向前傳送15碼並解除定身效果。（法師天賦）',
-  'entities.abilities.bloodlust.name': '戰鼓',
-  'entities.abilities.bloodlust.description':
-    '使30碼內的盟友陷入狂亂，攻擊速度提高30%，持續15秒。（薩滿天賦）',
-  'entities.abilities.chain_lightning.name': '叉狀閃電',
-  'entities.abilities.chain_lightning.description':
-    '向目標區域投擲閃電，對附近的敵人造成{damage}點傷害。（薩滿天賦）',
-  'entities.abilities.chaos_bolt.name': '毀滅箭',
-  'entities.abilities.chaos_bolt.description':
-    '投擲一枚混沌火焰彈，造成{damage}點火焰傷害。（術士天賦）',
-  'entities.abilities.cleansing_verdict.name': '淨化裁決',
-  'entities.abilities.cleansing_verdict.description':
-    '淨化一個友方目標身上的有害魔法效果，並為其恢復{damage}點生命值。',
-  'entities.abilities.cloak_of_shadows.name': '暗影斗篷',
-  'entities.abilities.cloak_of_shadows.description':
-    '以暗影包裹你，在5秒內吸收420點傷害。（潛行者天賦）',
-  'entities.abilities.cone_of_cold.name': '寒霜橫掃',
-  'entities.abilities.cone_of_cold.description':
-    '以寒霜衝擊附近的敵人，造成{damage}點冰霜傷害。（冰霜專精招牌技能）',
-  'entities.abilities.curse_of_exhaustion.name': '鉛沉妖咒',
-  'entities.abilities.curse_of_exhaustion.description':
-    '詛咒目標，使其移動速度降低30%，持續12秒。（術士天賦）',
-  'entities.abilities.death_coil.name': '墓穴纏卷',
-  'entities.abilities.death_coil.description':
-    '攻擊敵人並造成{damage}點暗影傷害，隨後使其恐懼3秒。（術士天賦）',
-  'entities.abilities.deep_freeze.name': '死霜',
-  'entities.abilities.deep_freeze.description':
-    '將目標深度凍結，造成{damage}點冰霜傷害並使其昏迷4秒。（法師天賦）',
-  'entities.abilities.desperate_prayer.name': '最後祈禱',
-  'entities.abilities.desperate_prayer.description': '立即為你恢復{damage}點生命值。（牧師天賦）',
-  'entities.abilities.deterrence.name': '鬃刺守衛',
-  'entities.abilities.deterrence.description':
-    '使你的閃躲幾率提高50個百分點，持續10秒。（獵人天賦）',
-  'entities.abilities.divine_shield.name': '聖光守護',
-  'entities.abilities.divine_shield.description':
-    '以神聖之力保護你，在8秒內吸收900點傷害。（聖騎士天賦）',
-  'entities.abilities.earthbind.name': '攫握大地',
-  'entities.abilities.earthbind.description': '將附近的敵人束縛於大地，使其定身2秒。（薩滿天賦）',
-  'entities.abilities.evocation.name': '乙太之井',
-  'entities.abilities.evocation.description': '立即恢復220點法力值。（法師天賦）',
-  'entities.abilities.frenzied_regeneration.name': '野性癒合',
-  'entities.abilities.frenzied_regeneration.description':
-    '在10秒內恢復180點生命值。只能在熊形態下使用。（德魯伊天賦）',
-  'entities.abilities.frost_trap.name': '霜紋陷阱',
-  'entities.abilities.frost_trap.description':
-    '凍結目標區域內的敵人3秒，使其無法移動或行動。（獵人天賦）',
-  'entities.abilities.ghostly_strike.name': '幽魂打擊',
-  'entities.abilities.ghostly_strike.description':
-    '攻擊敵人，造成武器傷害加{damage}點傷害，短暫提高閃躲並獲得1個連擊點。（潛行者天賦）',
-  'entities.abilities.hammer_of_wrath.name': '鳴鐘之錘',
-  'entities.abilities.hammer_of_wrath.description':
-    '向受傷的敵人投擲神聖之錘，造成{damage}點神聖傷害。只能對生命值低於20%的目標使用。（聖騎士天賦）',
-  'entities.abilities.healing_stream.name': '泉湧',
-  'entities.abilities.healing_stream.description':
-    '在12秒內為一個友方目標恢復120點生命值。（薩滿天賦）',
-  'entities.abilities.holy_wrath.name': '聖徒之怒',
-  'entities.abilities.holy_wrath.description':
-    '釋放神聖之力，對附近的敵人造成{damage}點傷害。（聖騎士天賦）',
-  'entities.abilities.howl_of_terror.name': '恐懼嚎叫',
-  'entities.abilities.howl_of_terror.description':
-    '使附近的敵人恐懼，最多持續3秒。受到傷害可能打破該效果。（術士天賦）',
-  'entities.abilities.ice_block.name': '寒冰棺',
-  'entities.abilities.ice_block.description':
-    '將你封入寒冰，在8秒內吸收600點傷害。封入期間你無法行動。再次施放可取消效果。（法師天賦）',
-  'entities.abilities.inner_focus.name': '靜心',
-  'entities.abilities.inner_focus.description':
-    '使你的下一個法術不消耗資源。持續60秒。（牧師天賦）',
-  'entities.abilities.innervate.name': '生命樹液',
-  'entities.abilities.innervate.description':
-    '生命樹液在你體內湧動10秒，分波恢復20點當前資源，可恢復法力、怒氣或能量。變形不會中斷效果。睡眠、昏迷或停滯會使樹液停止湧動。（德魯伊天賦）',
-  'entities.abilities.meteor.name': '天石',
-  'entities.abilities.meteor.description':
-    '在目標區域召喚一顆隕石，造成{damage}點火焰傷害，隨後使區域內的敵人在6秒內每2秒受到12至18點火焰傷害。（法師天賦）',
-  'entities.abilities.mind_sear.name': '灼思',
-  'entities.abilities.mind_sear.description':
-    '在目標區域引導暗影能量，每秒對附近的敵人造成{damage}點傷害。（牧師天賦）',
-  'entities.abilities.multi_shot.name': '分裂射擊',
-  'entities.abilities.multi_shot.description':
-    '向目標區域射出散射箭，對8碼內的敵人造成{damage}點物理傷害。（獵人天賦）',
-  'entities.abilities.prayer_of_healing.name': '聖歌癒療',
-  'entities.abilities.prayer_of_healing.description':
-    '為附近的盟友恢復{damage}點生命值。（牧師天賦）',
-  'entities.abilities.preparation.name': '應變',
-  'entities.abilities.preparation.description': '結束疾跑、閃避和消失的冷卻時間。（潛行者天賦）',
-  'entities.abilities.presence_of_mind.name': '疾思',
-  'entities.abilities.presence_of_mind.description':
-    '使你的下一個有施法時間的法術變為瞬發。持續60秒。（法師天賦）',
-  'entities.abilities.psychic_scream.name': '心靈尖嘯',
-  'entities.abilities.psychic_scream.description':
-    '使附近的敵人恐懼，最多持續4秒。受到傷害可能打破該效果。（牧師天賦）',
-  'entities.abilities.shadowstep.name': '影步',
-  'entities.abilities.shadowstep.description': '穿過暗影，向你的目標邁進。（潛行者天賦）',
-  'entities.abilities.silence.name': '沉默',
-  'entities.abilities.silence.description': '使目標沉默4秒。（牧師天賦）',
-  'entities.abilities.smoke_screen.name': '煙幕',
-  'entities.abilities.smoke_screen.description': '遁入煙霧之中，使你的閃躲幾率提高30%，持續8秒。',
-  'entities.abilities.spellsteal.name': '奪法',
-  'entities.abilities.spellsteal.description': '從敵人身上竊取一個有益魔法效果並轉移到自己身上。',
-  'entities.abilities.startle_shot.name': '驚擾射擊',
-  'entities.abilities.startle_shot.description':
-    '狂野射擊使目標迷惑{duration}秒。受到任何傷害都會打破此效果。',
-  'entities.abilities.tranquility.name': '林地之歌',
-  'entities.abilities.tranquility.description':
-    '引導恢復能量4秒，每秒為30碼內的盟友恢復42至52點生命值。（德魯伊天賦）',
-  'entities.abilities.typhoon.name': '颱風',
-  'entities.abilities.typhoon.description':
-    '一陣狂風將8碼內的所有敵人擊退並使其昏亂，使其移動速度降低50%，持續4秒。',
-  'entities.abilities.voidfeast.name': '虛空盛宴',
-  'entities.abilities.voidfeast.description':
-    '吞噬一個魔法效果（敵人的增益或盟友的減益），並恢復你最大生命值的6%。',
-  'hudChrome.abilityError.shieldRequired': '你必須裝備盾牌。',
+  'hudChrome.discord.roleTag.legend': '傳奇',
+  'hudChrome.discord.roleTag.shill': '擁護者',
   'hudChrome.wocStore.title': 'WOC 商店',
   'hudChrome.wocStore.close': '關閉 WOC 商店',
   'hudChrome.wocStore.tabsLabel': 'WOC 商店分區',
@@ -782,6 +552,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.names.spellPower': '法術強度',
   'hudChrome.statInfo.names.critRating': '暴擊等級',
   'hudChrome.statInfo.names.hasteRating': '急速等級',
+  'hudChrome.statInfo.names.hitRating': '命中等級',
+  'hudChrome.statInfo.desc.hitRating':
+    '來自裝備和套裝獎勵的命中等級，降低你的攻擊被閃避和法術被抵抗的機率，對更高等級的敵人尤其有效。約每10點等級提供1%命中。',
   'hudChrome.statInfo.names.warfare': '戰爭',
   'hudChrome.statInfo.warfareValue': '造成傷害 +{increase}% / 承受傷害 -{reduction}%',
   'hudChrome.statInfo.desc.critRating':
@@ -1351,6 +1124,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'loading.connectionLost': '與伺服器的連線已中斷。',
   'loading.reconnecting': '連線已中斷。正在重新連線...',
   'loading.connectionRejected': '伺服器已關閉連線。',
+  'loading.realmFull': '這個世界目前已滿，請於幾分鐘後再試。',
+  'loading.tooManyConnections':
+    '您的網路對這個世界建立的連線過多。請關閉多餘的遊戲視窗，或於幾分鐘後再試。',
   'errors.nothingInteract': '附近沒有可互動目標。',
   'errors.noEnemyNearby': '附近沒有敵人。',
   'errors.characterNameRequired': '請輸入角色名稱。',
@@ -1397,9 +1173,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'realm.medium': '中',
   'realm.low': '低',
   'realm.popTipLow': '人數較少：目前在線玩家不足 15 人。空間充足，適合全新開始。',
-  'realm.popTipMedium': '人數適中：目前在線玩家 15 至 39 人。健康活躍的世界。',
-  'realm.popTipHigh': '人數較多：目前在線玩家 40 至 79 人。繁忙，玩家眾多。',
-  'realm.popTipFull': '人數已滿：目前在線玩家 80 人或以上。非常繁忙；登入時可能需要排隊。',
+  'realm.popTipMedium': '人數適中：目前在線玩家 15 至 79 人。健康活躍的世界。',
+  'realm.popTipHigh': '人數較多：目前在線玩家 80 人以上。繁忙，玩家眾多。',
+  'realm.popTipFull': '人數已滿：這個世界目前已達到玩家上限。在有玩家登出之前，新的登入將被拒絕。',
   'realm.popTipOffline': '離線：此世界目前無法連接，無法加入。',
   'realm.characterCountOne': '{count} 個角色',
   'realm.characterCountOther': '{count} 個角色',
@@ -1869,7 +1645,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.pet.defensiveDesc': '攻擊傷害你或你寵物的敵人。',
   'hud.pet.aggressiveDesc': '攻擊附近的敵對敵人。',
   'hud.pet.rename': '重新命名寵物',
-  'hud.pet.revive': '修補',
+  'hud.pet.revive': '復活寵物',
   'hud.pet.abandon': '放棄寵物',
   'hud.pet.cancel': '取消',
   'hud.pet.renameLabel': '選擇一個新的寵物名稱。',
@@ -2071,7 +1847,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.money.silver': '銀幣',
   'itemUi.money.copper': '銅幣',
   'itemUi.slots.mainhand': '主手',
-  'itemUi.slots.offhand': '副手',
   'itemUi.slots.chest': '胸部',
   'itemUi.slots.legs': '腿部',
   'itemUi.slots.feet': '腳部',
@@ -2262,12 +2037,17 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '一次強力攻擊，使近戰傷害提高 {damage}。在你的下一次揮擊時觸發。',
   'entities.abilities.battle_shout.name': '鐵嗓怒吼',
   'entities.abilities.battle_shout.description': '使你的攻擊強度提高 {buff}，持續 2 分鐘。',
+  'entities.abilities.commanding_shout.name': '激勵吶喊',
+  'entities.abilities.commanding_shout.description': '使你的耐力提高 {buff}，持續 2 分鐘。',
   'entities.abilities.demoralizing_shout.name': '厲嚎',
   'entities.abilities.demoralizing_shout.description':
     '發出可怕的怒吼，使附近所有敵人的攻擊強度降低 {buff}，持續 30 秒。',
   'entities.abilities.charge.name': '猛衝',
   'entities.abilities.charge.description':
     '向一名敵人衝鋒，產生 9 點怒氣並使其昏迷 1 秒。8-25 碼距離。',
+  'entities.abilities.rend.name': '深切裂傷',
+  'entities.abilities.rend.description':
+    '撕裂目標，使其在 {duration} 秒內流血並受到 {damage} 點傷害。',
   'entities.abilities.thunder_clap.name': '撼地一擊',
   'entities.abilities.thunder_clap.description':
     '轟擊附近敵人，造成 {damage} 點傷害，並使其攻擊速度降低 10%，持續 10 秒。',
@@ -2600,6 +2380,15 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '為一個友方目標恢復 {damage} 點生命值，並在 21 秒內額外恢復一定生命值。',
   'entities.abilities.barkskin.name': '橡樹皮術',
   'entities.abilities.barkskin.description': '你的皮膚硬化如樹皮，使護甲提高 150，持續 15 秒。',
+  'entities.abilities.ironhold.name': '鐵壁',
+  'entities.abilities.ironhold.description':
+    '以堅固的防禦自守，使受到的所有傷害降低 40%，持續 8 秒。',
+  'entities.abilities.sacred_bulwark.name': '神聖壁壘',
+  'entities.abilities.sacred_bulwark.description':
+    '在 {duration} 秒內，下一次會殺死你的敵人攻擊將被抵消，轉而將你恢復至 35% 生命值。',
+  'entities.abilities.primal_reflexes.name': '野性反射',
+  'entities.abilities.primal_reflexes.description':
+    '你的本能變得敏銳，使閃避機率提高 50%，持續 6 秒。',
   'entities.abilities.starfire.name': '隕天術',
   'entities.abilities.starfire.description': '召下一道星辰之火，造成 {damage} 點秘法傷害。',
   'entities.abilities.travel_form.name': '迅捷形態',
@@ -2675,9 +2464,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.name': '剮擊',
   'entities.abilities.rake.description':
     '一招隱匿起手技，以武器傷害外加 {damage} 撕裂敵人，並造成持續 9 秒的流血傷害。給予 1 點連擊點數。僅限狼形態。',
-  'entities.abilities.revive_pet.name': '修補',
-  'entities.abilities.revive_pet.description':
-    '修補你的寵物。若其存活，在 12 秒內每 3 秒恢復一次生命值，共恢復 {overTime} 點；若其死亡，則以 35% 生命值將其復活。',
+  'entities.abilities.revive_pet.name': '復活寵物',
+  'entities.abilities.revive_pet.description': '復活你已死亡的寵物，並使其重回你身邊。',
   'entities.abilities.holy_shock.name': '神聖震擊',
   'entities.abilities.holy_shock.description':
     '以神聖能量震擊一名友方目標，為其恢復{damage}點生命值。（神聖專精招牌）',
@@ -4816,6 +4604,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.blessing_of_might': '提升友方目標的攻擊強度，適合在開怪前施放。',
   'guide.abilityHook.charge': '衝向遠處的敵人，以短暫昏迷揭開戰鬥序幕。',
   'guide.abilityHook.cheap_shot': '從潛行中開場，造成昏迷並讓你預先取得連擊點。',
+  'guide.abilityHook.commanding_shout': '提升耐力，讓所有人在戰鬥中更有續航力。',
   'guide.abilityHook.concussive_shot': '使目標暈眩並減速，讓它無法接近你。',
   'guide.abilityHook.conjure_food': '製造食物，坐下進食時可恢復生命。',
   'guide.abilityHook.conjure_water': '製造飲品以恢復法力，讓你能在每次開怪之間補滿。',
@@ -4848,6 +4637,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.power_word_shield': '為友方罩上護盾，在傷害落下前先行吸收。',
   'guide.abilityHook.raptor_strike': '在有東西貼上你時可用的一記重力近戰揮擊。',
   'guide.abilityHook.rejuvenation': '瞬發施放，持續為友方回復生命，讓你能繼續行動。',
+  'guide.abilityHook.rend': '施加流血，隨時間慢慢磨耗目標。',
   'guide.abilityHook.renew': '隨時間持續跳動的治療，適合施放後繼續移動。',
   'guide.abilityHook.rockbiter_weapon': '為武器附魔，讓你近戰每一擊都更沉重。',
   'guide.abilityHook.seal_of_righteousness': '為你的攻擊附加神聖傷害，再以裁決將其釋放消耗。',
@@ -5651,6 +5441,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.attackSpeedFast': '攻擊速度提高 {pct}%',
   'hudChrome.auraEffect.haste': '攻擊與施法速度提高 {pct}%',
   'hudChrome.auraEffect.tongues': '施法時間增加 {pct}%',
+  'hudChrome.auraEffect.damageReduction': '受到的所有傷害降低 {pct}%',
+  'hudChrome.auraEffect.guardianWard': '下一次敵人的致命攻擊會改為將你的生命值恢復至 {pct}%',
   'hudChrome.auraEffect.increase.ap': '攻擊強度提高 {value}',
   'hudChrome.auraEffect.increase.armor': '護甲提高 {value}',
   'hudChrome.auraEffect.increase.int': '智力提高 {value}',
@@ -5878,8 +5670,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.roleTag.seniormods': '資深管理員',
   'hudChrome.discord.roleTag.juniormods': '初級管理員',
   'hudChrome.discord.roleTag.contentcreator': '內容創作者',
-  'hudChrome.discord.roleTag.legend': '傳奇',
-  'hudChrome.discord.roleTag.shill': '推廣者',
   'hudChrome.discord.voice.channel': '在 {channel}',
   'hudChrome.discord.swag.title': '周邊',
   'hudChrome.discord.swag.free': '免費',
@@ -6620,6 +6410,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.mining': '採礦',
   'hudChrome.gathering.logging': '伐木',
   'hudChrome.gathering.herbalism': '藥草學',
+  'hudChrome.gathering.notReady': '這個資源節點尚未為你重新生成。',
   'hudChrome.archetypeTitle.label': '稱號',
   'hudChrome.archetypeTitle.none': '無',
   'hudChrome.archetypeTitle.hobbyLabel': '愛好',
@@ -7224,6 +7015,4 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.social.slashBody':
     '有幾個日常指令值得記住：/w 名稱 可發送密語，/r 則回覆你最近收到的一則，/invite 邀請某人加入你的隊伍，/follow 跟隨在朋友身後，/roll 為隊伍擲骰讓大家看見，/who 顯示誰在線上，而 /afk 則標示你暫時離開。在遊戲中輸入 /help 可查看完整清單。',
   'guide.social.slashHeading': '實用的斜線指令',
-  'guide.abilityHook.revenge': '橫掃你前方的敵人，並可能在閃躲或招架後不消耗資源。',
-  'guide.abilityHook.hamstring': '妨礙敵人的移動，使其無法逃脫。',
 };

@@ -40,11 +40,15 @@ export const GCD = 1.5; // seconds
 // Combat ratings are gear-facing stats converted to fractions in recalcPlayerStats.
 export const HASTE_RATING_PER_PCT = 10; // 10 haste rating = 1% faster
 export const CRIT_RATING_PER_PCT = 10; // 10 crit rating = +1% crit chance
+export const HIT_RATING_PER_PCT = 10; // 10 hit rating = +1% hit (less miss/resist)
 export function hasteFractionFromRating(rating: number): number {
   return rating / (HASTE_RATING_PER_PCT * 100);
 }
 export function critFractionFromRating(rating: number): number {
   return rating / (CRIT_RATING_PER_PCT * 100);
+}
+export function hitFractionFromRating(rating: number): number {
+  return rating / (HIT_RATING_PER_PCT * 100);
 }
 
 export type HonorReason = 'arena_win' | 'fiesta_kill' | 'fiesta_complete' | 'fiesta_win';
@@ -507,6 +511,7 @@ interface BaseItemDef {
   // Combat ratings, converted to crit%/haste% in recalcPlayerStats.
   critRating?: number;
   hasteRating?: number;
+  hitRating?: number;
   // PvP-only ratings. recalcPlayerStats converts them into Stats fractions;
   // combat clamps them again at the PvP caps before applying damage.
   pvpOffenseRating?: number;
@@ -605,6 +610,7 @@ export interface SetBonusEffect {
   // (folded into Entity.meleeHaste/rangedHaste/spellHaste in recalcPlayerStats).
   haste?: number;
   hasteRating?: number; // haste rating (converted to % in recalcPlayerStats)
+  hitRating?: number; // hit rating (converted to % in recalcPlayerStats): less miss/resist
   castPushbackReduction?: number; // 0..1: fraction of damage cast-pushback removed (1 = immune)
   knockbackResistance?: number; // 0..1: fraction of on-hit knockback distance resisted (1 = immune)
   proc?: SetProc;
@@ -2083,6 +2089,8 @@ export interface Entity {
   critChance: number; // 0..1
   critRating: number; // accumulated crit rating from gear + set bonuses
   hasteRating: number; // accumulated haste rating from gear + set bonuses
+  hitRating: number; // accumulated hit rating from gear + set bonuses
+  hitBonus: number; // hit fraction (hitRating converted): reduces miss/resist, 0..1
   // Extra critical-strike damage from a spec mastery (0 = none), split by OUTPUT CHANNEL
   // so a mastery only strengthens the crits it is meant to. Added to the matching base
   // crit multiplier at the crit site: spell crits deal 1.5 + critDmgSpellBonus, physical
@@ -3450,16 +3458,15 @@ export function berserkerCritDamage(e: Entity): number {
   return e.auras.some((aura) => aura.kind === 'berserker_stance') ? BERSERKER_CRIT_DAMAGE : 0;
 }
 
-// Attacking a target ABOVE your level adds a steep miss penalty (extra miss %),
-// tuned so +2 is ~19% and +4 is ~85% miss: fighting way-above-level enemies is meant
-// to be near-futile. The curve approximates 2.5 * diff^2.5, but is stored as an integer
-// table (level diffs are always integers) so it stays bit-for-bit deterministic across
-// engines — Math.pow with a fractional exponent is not guaranteed identical browser vs node.
-//   +1 -> 2.5   +2 -> 14   +3 -> 39   +4 -> 80   (+5 and beyond saturate past the clamp)
-const ABOVE_LEVEL_MISS_PCT = [0, 2.5, 14, 39, 80];
+// Attacking a target ABOVE your level adds a miss/resist penalty on top of the
+// base miss/resist. The penalty is capped so Heroic content remains playable.
+// Stored as a table so it stays bit-for-bit deterministic across engines.
+const ABOVE_LEVEL_MISS_PCT = [0, 2.5, 14, 21];
 function aboveLevelMissPct(diff: number): number {
   if (diff <= 0) return 0;
-  return diff < ABOVE_LEVEL_MISS_PCT.length ? ABOVE_LEVEL_MISS_PCT[diff] : 100;
+  return diff < ABOVE_LEVEL_MISS_PCT.length
+    ? ABOVE_LEVEL_MISS_PCT[diff]
+    : ABOVE_LEVEL_MISS_PCT[ABOVE_LEVEL_MISS_PCT.length - 1];
 }
 
 // Spell hit by level difference (target - caster): 96% at equal level, a gentle
@@ -3493,7 +3500,8 @@ export function swingMissChance(attacker: Entity, target: Entity): number {
   const miss = meleeMissChance(attacker.level, target.level);
   const mobAttacker = attacker.kind === 'mob' && attacker.hostile && attacker.ownerId === null;
   const playerSide = target.kind === 'player' || target.ownerId !== null;
-  return mobAttacker && playerSide ? Math.min(miss, MOB_VS_PLAYER_MAX_MISS) : miss;
+  if (mobAttacker && playerSide) return Math.min(miss, MOB_VS_PLAYER_MAX_MISS);
+  return Math.max(0, miss - attacker.hitBonus);
 }
 
 export function armorReduction(armor: number, attackerLevel: number): number {

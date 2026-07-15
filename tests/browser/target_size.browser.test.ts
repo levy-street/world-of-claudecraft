@@ -150,6 +150,18 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
     expectAtLeastFloor(donate, '#mobile-donate');
   });
 
+  it('the Crafting button in the mobile More tray', () => {
+    document.body.className = 'mobile-touch game-active mobile-more-open';
+    const tray = el('div', { id: 'mobile-extra-controls', class: 'window panel' });
+    const grid = el('div', { id: 'mobile-extra-grid' });
+    const crafting = el('button', { id: 'mobile-crafting', class: 'mobile-btn' });
+    crafting.textContent = 'Crafting';
+    grid.appendChild(crafting);
+    tray.appendChild(grid);
+    document.body.appendChild(tray);
+    expectAtLeastFloor(crafting, '#mobile-crafting');
+  });
+
   it('the movement / camera joystick', () => {
     const controls = el('div', { id: 'mobile-controls' });
     const joystick = el('div', { id: 'mobile-move-joystick', class: 'mobile-joystick' });

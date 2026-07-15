@@ -620,9 +620,9 @@ export const sv_SE: EnTranslations = {
     "cameraPrompt": {
       "title": "Välj din kamera",
       "intro": "Välj hur kameran följer din karaktär.",
-      "mouseDesc": "Flytta musen för att vrida kameran utan att hålla inne en knapp.",
+      "mouseDesc": "Rör musen för att vrida kameran utan att hålla in någon knapp.",
       "classicTitle": "Klassisk kamera",
-      "classicDesc": "Håll inne höger musknapp och flytta musen för att vrida kameran.",
+      "classicDesc": "Håll in höger musknapp och rör musen för att vrida kameran.",
       "changeLater": "Du kan ändra detta senare under Esc, Tangentbindningar.",
       "confirm": "Bekräfta"
     },
@@ -672,11 +672,11 @@ export const sv_SE: EnTranslations = {
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m} m {s} s",
       "seconds": "{s} s",
-      "autoShowHint": "Rader visas automatiskt när din grupp orsakar skada eller läker, och det här segmentet stängs några sekunder efter att striden är över."
+      "autoShowHint": "Rader visas automatiskt när din grupp gör skada eller helar, och detta segment stängs några sekunder efter att striden avslutas."
     },
     "petFeed": {
-      "disabledFullHp": "Ditt husdjur har full hälsa",
-      "disabledNoFood": "Ingen mat i dina väskor kan läka ditt husdjur"
+      "disabledFullHp": "Husdjuret har fulla livspunkter",
+      "disabledNoFood": "Ingen mat i dina väskor kan hela ditt husdjur"
     },
     "keybinds": {
       "emoteWheel": "Gesthjul",
@@ -684,7 +684,7 @@ export const sv_SE: EnTranslations = {
       "targetFriendlyNext": "Växla vänligt mål",
       "discord": "Discord",
       "valecup": "Dalcupen",
-      "sheathe": "Sheathe/Unsheathe Weapon",
+      "sheathe": "Slida/Ta fram vapen",
       "categoryPet": "Djur",
       "petAttack": "Djur: Anfall",
       "petStop": "Djur: Stanna",
@@ -857,7 +857,7 @@ export const sv_SE: EnTranslations = {
       "aurasOnPlayerFrame": "Förstärkningar på spelarramen",
       "highContrastBackground": "Bakgrund med hög kontrast",
       "startAttackOnAbility": "Automatisk attack vid förmågeanvändning",
-      "showAttackButton": "Show Attack Button",
+      "showAttackButton": "Visa attackknapp",
       "walkByAutoloot": "Automatisk plundring i förbifarten",
       "groundReticle": "Markriktmedel",
       "showItemLevel": "Visa föremålsnivå",
@@ -869,23 +869,23 @@ export const sv_SE: EnTranslations = {
       "mobileLeftHanded": "Vänsterhänt layout"
     },
     "talentRows": {
-      "tab": "Val",
-      "defaultLoadout": "Standarduppsättning",
-      "comingSoon": "Kommer snart",
-      "readoutSummary": "Talanger: {head}, {spent}/{total} rader valda."
+      "tab": "Choices",
+      "defaultLoadout": "Default Loadout",
+      "comingSoon": "Coming soon",
+      "readoutSummary": "Talents: {head}, {spent}/{total} rows selected."
     },
     "abilityError": {
-      "shieldRequired": "Du måste ha en sköld utrustad."
+      "shieldRequired": "You must have a shield equipped."
     },
     "specPanel": {
-      "primaryAttr": "Primärt attribut",
-      "complexity": "Komplexitet",
-      "complexityLow": "Låg",
-      "complexityMedium": "Medel",
-      "complexityHigh": "Hög",
-      "exampleAbilities": "Exempelförmågor",
-      "viewTalents": "Visa talanger",
-      "selectSpec": "Välj specialisering"
+      "primaryAttr": "Primary attribute",
+      "complexity": "Complexity",
+      "complexityLow": "Low",
+      "complexityMedium": "Medium",
+      "complexityHigh": "High",
+      "exampleAbilities": "Example abilities",
+      "viewTalents": "View talents",
+      "selectSpec": "Select specialization"
     },
     "controller": {
       "title": "Handkontroll",
@@ -998,6 +998,7 @@ export const sv_SE: EnTranslations = {
         "spellPower": "Besvärjelsekraft",
         "critRating": "Kritvärde",
         "hasteRating": "Snabbhetsvärde",
+        "hitRating": "Träffvärde",
         "warfare": "Krigföring"
       },
       "warfareValue": "+{increase}% tillfogad / -{reduction}% mottagen",
@@ -1015,6 +1016,7 @@ export const sv_SE: EnTranslations = {
         "dodge": "Din chans att helt undvika en inkommande närstridsattack utan att ta skada.",
         "critRating": "Kritvärde från din utrustning och setbonusar, som höjer din chans till kritisk träff. Ungefär 10 i värde ger 1% krit.",
         "hasteRating": "Snabbhetsvärde från din utrustning och setbonusar, som snabbar upp dina attacker och besvärjelser. Ungefär 10 i värde ger 1% snabbhet.",
+        "hitRating": "Träffvärde från din utrustning och setbonusar, som minskar hur ofta dina attacker missar och dina besvärjelser motarbetas, framfor allt mot fiender av högre nivå. Ungefär 10 i värde ger 1% träff.",
         "warfare": "Ökar skadan mot spelare med {increase}% och minskar skadan från spelare med {reduction}%."
       },
       "effects": {
@@ -1090,10 +1092,10 @@ export const sv_SE: EnTranslations = {
         "other": "du är {rank}, {count} medlemmar"
       },
       "finderPartySize": {
-        "one": "{count} player",
-        "few": "{count} players",
-        "many": "{count} players",
-        "other": "{count} players"
+        "one": "{count} spelare",
+        "few": "{count} spelare",
+        "many": "{count} spelare",
+        "other": "{count} spelare"
       },
       "characterCount": {
         "one": "{count} rollfigur",
@@ -1304,10 +1306,10 @@ export const sv_SE: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "Det här föremålet kan inte förstöras.",
-      "rightClickDestroy": "Shift-högerklicka för att förstöra",
-      "dragEquipHint": "Drag onto your character to equip",
-      "dragDestroyHint": "Drag out into the world to destroy",
-      "reorderNeedsRecent": "Clear the filter and sort by Recent to rearrange your bags",
+      "rightClickDestroy": "Högerklicka för att förstöra",
+      "dragEquipHint": "Dra till din karaktär för att utrusta",
+      "dragDestroyHint": "Dra ut i världen för att förstöra",
+      "reorderNeedsRecent": "Rensa filtret och sortera efter Nyliga för att ordna om dina väskor",
       "filterGroupAria": "Filtrera väskor efter kategori",
       "filterAll": "Alla",
       "filterWeapon": "Vapen",
@@ -1382,6 +1384,8 @@ export const sv_SE: EnTranslations = {
       },
       "dodge": "Erhöht Ausweichchance um {pct}%",
       "dodgeReduce": "Verringert Ausweichchance um {pct}%",
+      "damageReduction": "Minskar all inkommande skada med {pct}%",
+      "guardianWard": "Nästa dödliga fiendeträff återger dig {pct}% av dina livspunkter i stället",
       "armorFlat": "Verringert Rüstung um {value}",
       "armorFlatStacks": "Verringert Rüstung um {value} ({stacks} Stapel)",
       "armorPct": "Minskar rustningen med {pct}%",
@@ -1510,7 +1514,7 @@ export const sv_SE: EnTranslations = {
         "benefits": "Länka ditt Discord för att tjäna poäng från spel och gemenskapsaktivitet, och klättra på statusnivåerna.",
         "error": "Det gick inte att länka Discord. Försök igen.",
         "success": "Discord länkat.",
-        "joinServer": "Gå bara med i Discord-servern"
+        "joinServer": "Gå med i Discord-servern"
       },
       "choice": {
         "title": "Fortsätt med Discord",
@@ -1558,13 +1562,13 @@ export const sv_SE: EnTranslations = {
         "admin": "Admin",
         "coredevs": "Kärnutvecklare",
         "devs": "Utvecklare",
-        "seniormods": "Senior moderator",
+        "seniormods": "Senior-mod",
         "mods": "Moderator",
-        "juniormods": "Junior moderator",
+        "juniormods": "Junior-mod",
         "artists": "Konstnär",
         "contentcreator": "Innehållsskapare",
         "legend": "LEGEND",
-        "shill": "PROMOTER"
+        "shill": "MARKNADSFÖRARE"
       },
       "guildMember": "Verifierad medlem",
       "notMember": "Inte med på servern ännu",
@@ -1831,7 +1835,8 @@ export const sv_SE: EnTranslations = {
       "title": "Insamling",
       "mining": "Gruvdrift",
       "logging": "Skogsavverkning",
-      "herbalism": "Örtkunskap"
+      "herbalism": "Örtkunskap",
+      "notReady": "Den här resursnoden har inte återspawnats för dig ännu."
     },
     "archetypeTitle": {
       "label": "Titel",
@@ -1865,104 +1870,104 @@ export const sv_SE: EnTranslations = {
       "recipeNotLearned": "Du har inte lärt dig det receptet än."
     },
     "finder": {
-      "title": "Dungeon Finder",
-      "close": "Close",
-      "back": "Back",
-      "syncing": "Waiting for the realm...",
-      "tabCatalogue": "Catalogue",
-      "tabQueue": "Quick Match",
-      "tabBoard": "Premade Groups",
+      "title": "Fängelsehålsletaren",
+      "close": "Stäng",
+      "back": "Tillbaka",
+      "syncing": "Väntar på riket...",
+      "tabCatalogue": "Katalog",
+      "tabQueue": "Snabbmatch",
+      "tabBoard": "Förberedda grupper",
       "normal": "Normal",
-      "heroic": "Heroic",
-      "kindDungeon": "Dungeon",
+      "heroic": "Heroisk",
+      "kindDungeon": "Fängelsehål",
       "kindRaid": "Raid",
-      "kindSolo": "Solo adventure",
-      "levels": "Levels {min} to {max}",
-      "levelOne": "Level {level}",
+      "kindSolo": "Soloäventyr",
+      "levels": "Nivåerna {min} till {max}",
+      "levelOne": "Nivå {level}",
       "clock": "{minutes}:{seconds}",
       "roleCount": "{count} {role}",
       "roleTank": "Tank",
-      "roleHealer": "Healer",
-      "roleDps": "Damage",
-      "freeRoles": "Any roles welcome",
-      "lockoutDaily": "Daily lockout on the final boss",
-      "lockoutNone": "No lockout",
-      "lockedFor": "Locked for about {minutes} min",
-      "attunement": "Requires attunement: {quest}",
-      "heroicMarks": "Heroic Marks: {count} per player",
-      "entrance": "Entrance: {zone}",
-      "showOnMap": "Show on Map",
-      "encounters": "Encounters",
-      "finalBoss": "Final boss",
-      "summoned": "Summoned guardian",
-      "lootGuaranteed": "One of these always drops:",
-      "lootMaybe": "At most one of these may drop:",
-      "lootChance": "Additional chance drops:",
-      "lootHeroic": "Heroic bonus, one of these always drops:",
+      "roleHealer": "Helaren",
+      "roleDps": "Skada",
+      "freeRoles": "Alla roller välkomna",
+      "lockoutDaily": "Daglig spärr på slutbossen",
+      "lockoutNone": "Ingen spärr",
+      "lockedFor": "Låst i ungefär {minutes} min",
+      "attunement": "Kräver länkning: {quest}",
+      "heroicMarks": "Heroiska märken: {count} per spelare",
+      "entrance": "Ingång: {zone}",
+      "showOnMap": "Visa på kartan",
+      "encounters": "Möten",
+      "finalBoss": "Slutboss",
+      "summoned": "Kallad väktare",
+      "lootGuaranteed": "Ett av dessa faller alltid:",
+      "lootMaybe": "Högst ett av dessa kan falla:",
+      "lootChance": "Extra chans till föremål:",
+      "lootHeroic": "Heroisk bonus, ett av dessa faller alltid:",
       "pct": "{pct}%",
-      "blockedLevel": "Levels {min} to {max} only",
-      "blockedSpec": "Requires a specialization",
-      "yourRoles": "Your roles",
-      "needsSpec": "Choose a specialization to use the Dungeon Finder.",
-      "leaderNote": "Only your party leader can queue the group.",
-      "chooseActivities": "Choose activities",
-      "joinQueue": "Join queue",
-      "leaveQueue": "Leave queue",
-      "waited": "Time in queue: {time}",
-      "cooldownNote": "You may queue again in {seconds}s.",
-      "travelNote": "The group forms where everyone stands. Travel to the entrance together; nobody is teleported.",
-      "proposalTitle": "Group found: {name}",
-      "proposalRole": "Your role: {role}",
-      "accepted": "{accepted} of {size} confirmed",
-      "remaining": "{seconds}s to answer",
-      "accept": "Accept",
-      "decline": "Decline",
-      "acceptedWait": "Waiting for the others...",
-      "slotState": "{role}: {accepted} of {total} ready",
-      "openListings": "Open listings",
-      "boardEmpty": "No listings right now. Publish one!",
-      "boardLeaderGate": "Only your party leader can publish a listing.",
-      "publishListing": "Publish a listing",
-      "activity": "Activity",
-      "publish": "Publish",
-      "yourListing": "Your listing",
-      "closeListing": "Close listing",
-      "applicants": "Applicants",
-      "noApplicants": "No applicants yet.",
-      "acceptApplicantAria": "Accept {name}",
-      "declineApplicantAria": "Decline {name}",
-      "levelClass": "Lv {level} {className}",
-      "leader": "Leader: {name}",
-      "needs": "Needs {roles}",
+      "blockedLevel": "Endast nivåerna {min} till {max}",
+      "blockedSpec": "Kräver en specialisering",
+      "yourRoles": "Dina roller",
+      "needsSpec": "Välj en specialisering för att använda Fängelsehålsletaren.",
+      "leaderNote": "Endast din grupplanledare kan ställa gruppen i kö.",
+      "chooseActivities": "Välj aktiviteter",
+      "joinQueue": "Ställ dig i kö",
+      "leaveQueue": "Lämna kön",
+      "waited": "Tid i kö: {time}",
+      "cooldownNote": "Du kan ställa dig i kö igen om {seconds}s.",
+      "travelNote": "Gruppen samlas där alla befinner sig. Res till ingången tillsammans, ingen teleporteras.",
+      "proposalTitle": "Grupp hittad: {name}",
+      "proposalRole": "Din roll: {role}",
+      "accepted": "{accepted} av {size} bekräftade",
+      "remaining": "{seconds}s att svara",
+      "accept": "Acceptera",
+      "decline": "Avvisa",
+      "acceptedWait": "Väntar på de övriga...",
+      "slotState": "{role}: {accepted} av {total} redo",
+      "openListings": "Öppna annonser",
+      "boardEmpty": "Inga annonser just nu. Publicera en!",
+      "boardLeaderGate": "Endast din grupplanledare kan publicera en annons.",
+      "publishListing": "Publicera en annons",
+      "activity": "Aktivitet",
+      "publish": "Publicera",
+      "yourListing": "Din annons",
+      "closeListing": "Stäng annons",
+      "applicants": "Sökande",
+      "noApplicants": "Inga sökande ännu.",
+      "acceptApplicantAria": "Acceptera {name}",
+      "declineApplicantAria": "Avvisa {name}",
+      "levelClass": "Nv {level} {className}",
+      "leader": "Ledare: {name}",
+      "needs": "Behöver {roles}",
       "slots": "{size}/{capacity}",
-      "apply": "Apply",
-      "withdraw": "Withdraw application",
-      "tagFirstRun": "First run",
-      "tagQuestRun": "Quest run",
-      "tagFullClear": "Full clear",
-      "tagLearning": "Learning welcome",
-      "tagFastRun": "Fast run",
+      "apply": "Ansök",
+      "withdraw": "Dra tillbaka ansökan",
+      "tagFirstRun": "Första genomgången",
+      "tagQuestRun": "Uppdragsgenomgång",
+      "tagFullClear": "Full rensning",
+      "tagLearning": "Nybörjare välkomna",
+      "tagFastRun": "Snabb genomgång",
       "mech": {
-        "shadow_pulse": "Shadow Pulse (pulsing area damage)",
-        "reaping_arc": "Reaping Arc (frontal cleave)",
-        "mist_surge": "Mist Surge (pulsing area damage)",
-        "summons_adds": "Summons reinforcements",
-        "lunar_tide": "Lunar Tide (pulsing area damage)",
-        "enrage": "Enrages at low health",
-        "shuddering_stomp": "Shuddering Stomp (area stun)",
-        "necrotic_shockwave": "Necrotic Shockwave (heavy area damage)",
-        "grave_cleaver": "Grave-Cleaver (frontal cleave)",
-        "shadow_nova": "Shadow Nova (area burst)",
-        "profane_mending": "Profane Mending (heals its allies)",
-        "mana_burn": "Withered Benediction (burns mana)",
-        "deathstalker_cleave": "Deathstalker Cleave (frontal cleave)",
-        "mortal_wound": "Forgotten Wound (reduces healing taken)",
-        "sealbreak_shockwave": "Sealbreak Shockwave (area burst)",
-        "gravebreaker": "Gravebreaker (frontal cone, face it away from the raid)",
-        "raise_fallen": "Raise Fallen (periodic waves of adds)",
-        "soul_rend": "Soul Rend (marked players must spread and be healed)",
-        "deathless_rage": "Deathless Rage (interrupted at the wardstones)",
-        "wardstones": "Wardstone channels (phase transition)"
+        "shadow_pulse": "Skuggpuls (pulserande områdesskada)",
+        "reaping_arc": "Skördebåge (frontalt huggsving)",
+        "mist_surge": "Dimstorm (pulserande områdesskada)",
+        "summons_adds": "Kallar förstärkningar",
+        "lunar_tide": "Månflod (pulserande områdesskada)",
+        "enrage": "Rasar vid låga livspunkter",
+        "shuddering_stomp": "Darrande trampling (områdeschock)",
+        "necrotic_shockwave": "Nekrotisk chockvåg (kraftig områdesskada)",
+        "grave_cleaver": "Grav-klyvare (frontalt huggsving)",
+        "shadow_nova": "Skuggnova (områdesburst)",
+        "profane_mending": "Vanhelgad läkning (helar sina allierade)",
+        "mana_burn": "Förvissnad välsignelse (bränner mana)",
+        "deathstalker_cleave": "Dödsstalkarens huggsving (frontalt huggsving)",
+        "mortal_wound": "Glömt sår (minskar mottagen läkning)",
+        "sealbreak_shockwave": "Sigelsbrytande chockvåg (områdesburst)",
+        "gravebreaker": "Gravkrossare (frontal kon, rikta den bort från raiden)",
+        "raise_fallen": "Res de fallna (periodiska vågor av tillskott)",
+        "soul_rend": "Själsrift (märkta spelare måste sprida sig och bli helade)",
+        "deathless_rage": "Dödsfri vrede (avbryts vid väktarstenarna)",
+        "wardstones": "Väktarstenarnas kanaler (fasövergång)"
       }
     },
     "deeds": {
@@ -2586,8 +2591,8 @@ export const sv_SE: EnTranslations = {
     },
     "abilityHook": {
       "heroic_strike": "Köar ett tyngre svingslag som förbrukar raseri på ditt nästa slag.",
-      "revenge": "Träffar fiender framför dig och kan bli kostnadsfri efter en undvikning eller parering.",
-      "hamstring": "Hämmar en fiendes rörelse så att den inte kan fly.",
+      "revenge": "Sweeps enemies in front of you, with a chance to become free after a dodge or parry.",
+      "hamstring": "Cripples an enemy's movement to keep it from escaping.",
       "battle_shout": "Ett samlande rop som höjer attackstyrkan för gruppen.",
       "charge": "Stormar mot en avlägsen fiende för att öppna striden med en kort bedövning.",
       "thunder_clap": "Slår allt runt omkring dig och saktar ner deras attacker.",
@@ -2647,7 +2652,9 @@ export const sv_SE: EnTranslations = {
       "mark_of_the_wild": "En varaktig välsignelse du lägger på dig själv eller en allierad före en strid.",
       "moonfire": "Slår omedelbart och lämnar målet brinnande, bra medan du rör dig.",
       "rejuvenation": "Kastas omedelbart och läker en allierad över tid, så du kan fortsätta agera.",
-      "thorns": "Skyddar en allierad så att närstridsangripare skadar sig själva när de slår."
+      "thorns": "Skyddar en allierad så att närstridsangripare skadar sig själva när de slår.",
+      "commanding_shout": "Stärker uthålligheten så alla har mer stryktålighet i en strid.",
+      "rend": "Öppnar en blödning som sliter ner målet över tid."
     },
     "petHook": {
       "emberkin": "En eldpilskastande demon på avstånd som naggar fiender från säkert håll.",
@@ -2717,7 +2724,7 @@ export const sv_SE: EnTranslations = {
       },
       "reptile": {
         "name": "Reptiler",
-        "desc": "Kallblodiga jägare med ett alldeles eget väsande och käftsmällande, skilda från varmblodiga bestar."
+        "desc": "Kallblodiga jägare med ett eget väsande och ett snäppande bett, skilda från de varmblodiga djuren."
       }
     },
     "worldPage": {
@@ -4628,6 +4635,8 @@ export const sv_SE: EnTranslations = {
     "connectionLost": "Anslutningen till servern bröts.",
     "reconnecting": "Anslutning förlorad. Återansluter...",
     "connectionRejected": "Servern stängde anslutningen.",
+    "realmFull": "Denna värld är full just nu. Försök igen om några minuter.",
+    "tooManyConnections": "För många anslutningar till denna värld kommer från ditt nätverk. Stäng extra spelfönster eller försök igen om några minuter.",
     "tips": {
       "classes": "Tips: var och en av de 9 klasserna spelas på sitt eget sätt. Prova några innan du bestämmer dig för en.",
       "talents": "Tips: du kan återställa dina talanger när du inte strider, så ett tidigt val blir aldrig en fälla.",
@@ -5285,7 +5294,7 @@ export const sv_SE: EnTranslations = {
       "defensiveDesc": "Angriper fiender som skadar dig eller ditt djur.",
       "aggressiveDesc": "Angriper närliggande fientliga motståndare.",
       "rename": "Byt namn på djur",
-      "revive": "Lappa ihop",
+      "revive": "Återuppliva djur",
       "abandon": "Överge djur",
       "cancel": "Avbryt",
       "renameLabel": "Välj ett nytt namn på djuret.",
@@ -5397,7 +5406,7 @@ export const sv_SE: EnTranslations = {
     "actionBar": {
       "attackName": "Anfall",
       "attackTooltip": "Växla automatiskt anfall mot ditt mål. Att högerklicka på en fiende anfaller också.",
-      "attackRemoveHint": "Right-click to remove it from the bar and free the slot.",
+      "attackRemoveHint": "Högerklicka för att ta bort det från fältet och frigöra platsen.",
       "emptySlot": "Tom plats",
       "slotAria": "Handlingsplats {slot}: {ability}",
       "emptySlotAria": "Handlingsplats {slot}: tom",
@@ -5541,7 +5550,7 @@ export const sv_SE: EnTranslations = {
     },
     "slots": {
       "mainhand": "Främre hand",
-      "offhand": "Andra hand",
+      "offhand": "Off Hand",
       "helmet": "Hjälm",
       "neck": "Hals",
       "shoulder": "Axlar",
@@ -6355,6 +6364,18 @@ export const sv_SE: EnTranslations = {
         "name": "Ekhud",
         "description": "Din hud hårdnar som bark och ökar rustning med 150 i 15 sek."
       },
+      "ironhold": {
+        "name": "Järngrepp",
+        "description": "Forsar dig bakom ditt skydd och minskar all inkommande skada med 40% i 8 sek."
+      },
+      "sacred_bulwark": {
+        "name": "Helig Bålverk",
+        "description": "I {duration} sek nekas nästa fiendeträff som annars skulle döda dig, och du återfår 35% av dina livspunkter i stället."
+      },
+      "primal_reflexes": {
+        "name": "Ursinnesreflexer",
+        "description": "Dina instinkter skärps och ökar din chans att undvika anfall med 50% i 6 sek."
+      },
       "starfire": {
         "name": "Himlafall",
         "description": "Kallar ner en pil av stjärneld och tillfogar {damage} arkan skada."
@@ -6540,304 +6561,304 @@ export const sv_SE: EnTranslations = {
         "description": "Binder en Wraithborn till din vilja, en elitdemon som öser tung skuggskada från avstånd. En lång nedkylning hindrar dess förödande kraft. Att frammana en ny demon avfärdar din nuvarande. Du kan ha en demon åt gången."
       },
       "battle_stance": {
-        "name": "Stridsställning",
-        "description": "En aggressiv stridsställning: du genererar 10 % mer raseri. Standardställningen för Vapen och Beskydd."
+        "name": "Battle Stance",
+        "description": "An aggressive combat stance: you generate 10% more rage. The default stance for Arms and Protection."
       },
       "berserker_stance": {
-        "name": "Bärsärkaställning",
-        "description": "En dumdristig stridsställning: dina kritiska träffar sker 3 % oftare och slår 3 % hårdare. Raserikrigaren strider alltid i den här ställningen."
+        "name": "Berserker Stance",
+        "description": "A reckless combat stance: your critical strikes land 3% more often and hit for 3% more. The Fury warrior always fights in this stance."
       },
       "sweeping_strikes": {
-        "name": "Vidgande båge",
-        "description": "I 12 sek träffar dina enmålsattacker även 1 närliggande fiende för full skada. (Vapen)"
+        "name": "Widening Arc",
+        "description": "For 12 sec your single-target attacks also strike 1 nearby enemy for full damage. (Arms)"
       },
       "deep_wounds": {
-        "name": "Gapande sår",
-        "description": "Passiv: ditt Stympande hugg får målet att blöda för fysisk skada över 6 sek. (Vapen)"
+        "name": "Gaping Wounds",
+        "description": "Passive: your Maiming Strike leaves the target bleeding for Physical damage over 6 sec. (Arms)"
       },
       "enrage_passive": {
-        "name": "Kalabalik",
-        "description": "Passiv: medan du är rasande vållar du 7 % mer skada, attackerar 25 % snabbare och rör dig 10 % snabbare i 4 sek. Åderlåtning har 30 % chans att göra dig rasande; Röd skörd gör det alltid. (Raseri)"
+        "name": "Mayhem",
+        "description": "Passive: while Enraged you deal 7% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)"
       },
       "raging_gale": {
-        "name": "Tvillingslag",
-        "description": "Slå omedelbart två gånger med ditt vapen, där varje träff vållar 40 % vapenskada plus {damage}, och generera 8 raseri. Lagrar upp till 2 laddningar. (Raseri)"
+        "name": "Twinstrike",
+        "description": "Instantly strike with your weapon twice, each hit dealing 40% weapon damage plus {damage}, and generate 8 rage. Stores up to 2 charges. (Fury)"
       },
       "red_harvest": {
-        "name": "Röd skörd",
-        "description": "Satsa allt: slå tre gånger i vilt raseri för 65 % vapenskada plus {damage} vardera, vilket alltid gör dig rasande. (Raseri)"
+        "name": "Red Harvest",
+        "description": "Spend everything: strike three times in a frenzy for 65% weapon damage plus {damage} each, always Enraging you. (Fury)"
       },
       "furious_mending": {
-        "name": "Rasande läkning",
-        "description": "I 10 sek tar du 20 % mindre skada, och medan det varar läker din Åderlåtning dig för 20 % av din maximala hälsa. (Raseri)"
+        "name": "Furious Mending",
+        "description": "For 10 sec you take 20% reduced damage, and while it lasts your Bloodletting heals you for 20% of your maximum health. (Fury)"
       },
       "emboldening_roar": {
-        "name": "Uppeldande vrål",
-        "description": "Släpper loss ett uppeldande vrål: du och vänligt sinnade spelare inom 40 meter blir uppeldade, och era nästa 3 förmågor blir garanterat kritiska träffar. (Raseri)"
+        "name": "Emboldening Roar",
+        "description": "Lets loose an emboldening roar: you and friendly players within 40 yards are Emboldened, and your next 3 abilities are guaranteed critical strikes. (Fury)"
       },
       "raised_guard": {
-        "name": "Höjd gard",
-        "description": "Förskansa dig bakom din sköld: du tar 50 % mindre fysisk skada i 6 sek. Lagrar upp till 2 laddningar. (Beskydd)"
+        "name": "Raised Guard",
+        "description": "Brace behind your shield: you take 50% reduced Physical damage for 6 sec. Stores up to 2 charges. (Protection)"
       },
       "iron_resolve": {
-        "name": "Järnvilja",
-        "description": "Bit ihop och ignorera smärtan: förbrukar upp till 40 raseri (minst 20) för att absorbera 4 skada per förbrukad raseripoäng i upp till 10 sek. (Beskydd)"
+        "name": "Iron Resolve",
+        "description": "Grit your teeth and ignore the pain: spends up to 40 rage (20 minimum) to absorb 4 damage per rage spent, lasting up to 10 sec. (Protection)"
       },
       "faultline": {
-        "name": "Förkastningslinje",
-        "description": "Skicka en chockvåg genom marken: fiender framför dig inom 8 meter tar {damage} skada och bedövas i 3 sek. (Beskydd)"
+        "name": "Faultline",
+        "description": "Send a shockwave through the ground: enemies in front of you within 8 yards take {damage} damage and are stunned for 3 sec. (Protection)"
       },
       "defiant_bellow": {
-        "name": "Trotsigt vrål",
-        "description": "Ett trotsigt vrål: varje fiende inom 10 meter eggas och tvingas anfalla dig i 3 sek. (Beskydd)"
+        "name": "Defiant Bellow",
+        "description": "A defiant bellow: every enemy within 10 yards is taunted, compelled to attack you for 3 sec. (Protection)"
       },
       "breachmaker": {
-        "name": "Bräschbrytare",
-        "description": "Slå målet för vapenskada plus {damage} och spräck dess gard: dina egna attacker mot det vållar 20 % mer skada i 8 sek. (Vapen)"
+        "name": "Breachmaker",
+        "description": "Batter the target for weapon damage plus {damage} and crack its guard: your own attacks against it deal 20% more damage for 8 sec. (Arms)"
       },
       "measured_fury": {
-        "name": "Avmätt raseri",
-        "description": "Ditt avmätta raseri skärper din hushållning: dina förmågor kostar 10 % mindre raseri. (Vapen)"
+        "name": "Measured Fury",
+        "description": "Your measured fury sharpens your economy: your abilities cost 10% less rage. (Arms)"
       },
       "seasoned_soldier": {
-        "name": "Härdad soldat",
-        "description": "Dina kritiska autoattacker genererar 10 % mer raseri. (Vapen)"
+        "name": "Seasoned Soldier",
+        "description": "Your critical auto-attacks generate 10% more rage. (Arms)"
       },
       "diabolical_twinstrike": {
-        "name": "Diaboliskt tvillingslag",
-        "description": "Medan du är rasande vållar ditt Tvillingslag 15 % mer skada. (Raseri)"
+        "name": "Diabolical Twinstrike",
+        "description": "While Enraged, your Twinstrike deals 15% more damage. (Fury)"
       },
       "cleaving_blows": {
-        "name": "Klyvande hugg",
-        "description": "Röd skörd återger alltid en laddning av Tvillingslag. (Raseri)"
+        "name": "Cleaving Blows",
+        "description": "Red Harvest always refunds a charge of Twinstrike. (Fury)"
       },
       "sudden_death": {
-        "name": "Plötslig död",
-        "description": "Dina autoattacker har en chans att låta dig använda Tidig grav på ett mål oavsett hälsa, utan raserikostnad. (Vapen)"
+        "name": "Sudden Death",
+        "description": "Your auto-attacks have a chance to let you cast Early Grave on a target at any health, costing no rage. (Arms)"
       },
       "storm_bolt": {
-        "name": "Stormbult",
-        "description": "Slunga ditt vapen mot målet för {damage} och bedöva det i 3 sek."
+        "name": "Storm Bolt",
+        "description": "Hurl your weapon at the target for {damage}, stunning it for 3 sec."
       },
       "piercing_howl": {
-        "name": "Genomträngande tjut",
-        "description": "Ett genomträngande rop som saktar ner alla fiender inom 15 meter med 50 % i 8 sek."
+        "name": "Piercing Howl",
+        "description": "A piercing shout that slows all enemies within 15 yards by 50% for 8 sec."
       },
       "die_by_sword": {
-        "name": "Dö för svärdet",
-        "description": "Defensiv nedkylning: i 8 sek tar du 30 % mindre skada och väjer undan för långt fler attacker."
+        "name": "Die by the Sword",
+        "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
       },
       "recklessness": {
-        "name": "Hänsynslöshet",
-        "description": "Försätter dig i raseri: din raserigenerering ökar med 50 % och din kritiska träffchans med 20 % i 12 sek."
+        "name": "Recklessness",
+        "description": "Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec."
       },
       "sanguine_aura": {
-        "name": "Blodröd aura",
-        "description": "Besjäla ditt vapen med dina fienders blod: du och dina närstridsallierade får 10 % attackhastighet och 10 % skada i 20 sek."
+        "name": "Sanguine Aura",
+        "description": "Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec."
       },
       "victory_rush": {
-        "name": "Segerrus",
-        "description": "Slå för vapenskada plus {damage} och läk 20 % av din maximala hälsa. Kan endast användas inom 20 sek efter att du dödat en fiende."
+        "name": "Victory Rush",
+        "description": "Strike for weapon damage plus {damage} and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy."
       },
       "intimidating_shout": {
-        "name": "Skräckinjagande rop",
-        "description": "Ett skräckinjagande rop som får upp till 5 fiender inom 8 meter att fly i skräck i 8 sek. Skada kan bryta effekten."
+        "name": "Intimidating Shout",
+        "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
       },
       "revenge": {
-        "name": "Hämnd",
-        "description": "Anfall i en vid båge och vålla fysisk skada mot alla fiender framför dig. Över 5 mål minskas skadan. När du väjer undan eller parerar kan din nästa Hämnd kosta inget raseri. (Protection)"
+        "name": "Revenge",
+        "description": "Attack in a wide arc, dealing Physical damage to all enemies in front of you. Above 5 targets the damage is reduced. When you dodge or parry, your next Revenge may cost no rage. (Protection)"
       },
       "heroic_leap": {
-        "name": "Krigssprång",
-        "description": "Hoppa till målområdet och orsaka {damage} skada på närliggande fiender när du landar."
+        "name": "Heroic Leap",
+        "description": "Leap to the target area, dealing {damage} damage to nearby enemies on landing."
       },
       "rallying_cry": {
-        "name": "Tapperhetsvrål",
-        "description": "Släpp lös ett tappert vrål som ger dig och gruppmedlemmar inom 40 meter 20% extra maximal hälsa i 10 sek. Beskydd: de tar även 5% mindre skada under tiden."
+        "name": "Valor Roar",
+        "description": "Lets loose a valorous roar, granting you and party members within 40 yards 20% additional maximum health for 10 sec. Protection: they also take 5% less damage for the duration."
       },
       "avatar": {
         "name": "Avatar",
-        "description": "Förvandla dig till en koloss i 20 sek., bryt alla kontrolleffekter på dig och öka din utdelade skada med 20%."
+        "description": "Transform into a colossus for 20 sec, breaking all control on you and increasing your damage dealt by 20%."
       },
       "bladestorm": {
-        "name": "Klingstorm",
-        "description": "Bli en virvlande storm av stål och träffa alla fiender inom 8 meter för {damage} skada varje sekund i 4 sek."
+        "name": "Bladestorm",
+        "description": "Become a whirling storm of steel, striking all enemies within 8 yards for {damage} every second for 4 sec."
       },
       "aspect_of_the_wild": {
-        "name": "Vildtands skepnad",
-        "description": "Inspirerar allierade inom 30 m med vild kraft och ökar deras attackkraft med 45 och attackhastighet med 5 % i 5 min. (jägartalang)"
+        "name": "Wildfang Rally",
+        "description": "Inspires allies within 30 yd with wild strength, increasing attack power by 45 and attack speed by 5% for 5 min. (Hunter talent)"
       },
       "aura_surge": {
-        "name": "Gryningsrikoschett",
-        "description": "Slungar en gryningssmidd sköld för {damage} Helig skada, tystar huvudmålet i 2 sek. och studsar sedan till upp till 2 ytterligare fiender inom 10 meter för 75% skada per studs. (Paladintalang)"
+        "name": "Dawnward Ricochet",
+        "description": "Hurl a dawnforged shield for {damage} Holy damage and silence the primary target for 2 sec. It bounces to up to 2 additional enemies within 10 yd for 75% damage per bounce. (Paladin talent)"
       },
       "avenging_wrath": {
-        "name": "Hämndvinge",
-        "description": "Åkallar hämnande kraft och ökar din attackkraft med 60 och besvärjelsekraft med 30 i 20 sek. (paladintalang)"
+        "name": "Wrathwing",
+        "description": "Calls down avenging power, increasing attack power by 60 and spell power by 30 for 20 sec. (Paladin talent)"
       },
       "berserk": {
-        "name": "Röd dimma",
-        "description": "Ökar din attackkraft med 70 i 15 sek. (druidtalang)"
+        "name": "Red Haze",
+        "description": "Increases attack power by 70 for 15 sec. (Druid talent)"
       },
       "blink": {
-        "name": "Flimmersteg",
-        "description": "Teleporterar dig 15 m framåt och bryter rotningseffekter. (magikertalang)"
+        "name": "Flickerstep",
+        "description": "Teleports you 15 yd forward and breaks roots. (Mage talent)"
       },
       "bloodlust": {
-        "name": "Krigstrummor",
-        "description": "Driver allierade inom 30 m till raseri och ökar deras attackhastighet med 30 % i 15 sek. (schamantalang)"
+        "name": "Storm Chorus",
+        "description": "Whips allies within 30 yd into a frenzy, increasing attack speed by 30% for 15 sec. (Shaman talent)"
       },
       "chain_lightning": {
-        "name": "Gaffelblixt",
-        "description": "Slungar blixtar mot målområdet och ger {damage} skada till fiender i närheten. (schamantalang)"
+        "name": "Skybranch",
+        "description": "Hurls lightning at the target area, damaging nearby enemies for {damage}. (Shaman talent)"
       },
       "chaos_bolt": {
-        "name": "Fördärvsbult",
-        "description": "Slungar en kaotisk eldblixt som ger {damage} Eldskada. (häxmästartalang)"
+        "name": "Ruinbolt",
+        "description": "Hurls a bolt of chaotic fire for {damage} Fire damage. (Warlock talent)"
       },
       "cleansing_verdict": {
-        "name": "Renande Domslut",
-        "description": "Rensar bort en skadlig magisk effekt från ett vänligt mål och helar det med Helig magi för {damage}."
+        "name": "Cleansing Verdict",
+        "description": "Purges a harmful magic effect from a friendly target and heals them for {damage} Holy."
       },
       "cloak_of_shadows": {
-        "name": "Skuggmantel",
-        "description": "Sveper in dig i skuggor och absorberar 420 skada i 5 sek. (skurktalang)"
+        "name": "Shadecloak",
+        "description": "Wraps you in shadows, absorbing 420 damage for 5 sec. (Rogue talent)"
       },
       "cone_of_cold": {
-        "name": "Frostsvep",
-        "description": "Träffar fiender i närheten med frost och ger {damage} Frostskada. (Frost-signaturförmåga)"
+        "name": "Frostsweep",
+        "description": "Blasts nearby enemies with frost for {damage} Frost damage. (Frost signature)"
       },
       "curse_of_exhaustion": {
-        "name": "Blytung förbannelse",
-        "description": "Förbannar målet och minskar dess rörelsehastighet med 30 % i 12 sek. (häxmästartalang)"
+        "name": "Leaden Hex",
+        "description": "Curses the target, slowing movement by 30% for 12 sec. (Warlock talent)"
       },
       "death_coil": {
-        "name": "Gravspiral",
-        "description": "Träffar fienden för {damage} Skuggskada och skrämmer den sedan i 3 sek. (häxmästartalang)"
+        "name": "Morrowlash",
+        "description": "Strikes the enemy for {damage} Shadow damage, then horrifies them for 3 sec. (Warlock talent)"
       },
       "deep_freeze": {
-        "name": "Dödfrost",
-        "description": "Djupfryser målet, ger {damage} Frostskada och bedövar det i 4 sek. (magikertalang)"
+        "name": "Deadfrost",
+        "description": "Deep freezes the target, dealing {damage} Frost damage and stunning it for 4 sec. (Mage talent)"
       },
       "desperate_prayer": {
-        "name": "Sista bön",
-        "description": "Helar dig omedelbart för {damage}. (prästtalang)"
+        "name": "Last Prayer",
+        "description": "Instantly heals you for {damage}. (Priest talent)"
       },
       "deterrence": {
-        "name": "Borstvakt",
-        "description": "Ökar din chans att undvika med 50 procentenheter i 10 sek. (jägartalang)"
+        "name": "Bristleguard",
+        "description": "Increases your dodge chance by 50 percentage points for 10 sec. (Hunter talent)"
       },
       "divine_shield": {
-        "name": "Ljusvärn",
-        "description": "Skyddar dig med helig kraft och absorberar 900 skada i 8 sek. (paladintalang)"
+        "name": "Lightward",
+        "description": "Shields you with holy power, absorbing 900 damage for 8 sec. (Paladin talent)"
       },
       "earthbind": {
-        "name": "Gripande jord",
-        "description": "Binder fiender i närheten till marken och rotar dem i 2 sek. (schamantalang)"
+        "name": "Gripping Earth",
+        "description": "Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)"
       },
       "evocation": {
-        "name": "Eterbrunn",
-        "description": "Återställer omedelbart 220 mana. (magikertalang)"
+        "name": "Aetherwell",
+        "description": "Instantly restores 220 mana. (Mage talent)"
       },
       "frenzied_regeneration": {
-        "name": "Vild läkning",
-        "description": "Återställer 180 hälsa under 10 sek. Endast i Björngestalt. (druidtalang)"
+        "name": "Savage Mending",
+        "description": "Restores 180 health over 10 sec. Bruin Form only. (Druid talent)"
       },
       "frost_trap": {
-        "name": "Rimfälla",
-        "description": "Fryser fiender i målområdet i 3 sek. så att de varken kan röra sig eller agera. (jägartalang)"
+        "name": "Rime Snare",
+        "description": "Freezes enemies at the target area for 3 sec, preventing movement and actions. (Hunter talent)"
       },
       "ghostly_strike": {
-        "name": "Vålnadsslag",
-        "description": "Träffar fienden för vapenskada plus {damage}, ökar undvikandet kortvarigt och ger 1 kombinationspoäng. (skurktalang)"
+        "name": "Wraith Strike",
+        "description": "Strikes the enemy for weapon damage plus {damage} and briefly increases dodge. Awards 1 combo point. (Rogue talent)"
       },
       "hammer_of_wrath": {
-        "name": "Klingande hammare",
-        "description": "Slungar en helig hammare mot en sårad fiende och ger {damage} Helig skada. Kan bara användas under 20 % hälsa. (paladintalang)"
+        "name": "Tolling Hammer",
+        "description": "Hurls a holy hammer at a wounded enemy for {damage} Holy damage. Only usable below 20% health. (Paladin talent)"
       },
       "healing_stream": {
-        "name": "Källbrunn",
-        "description": "Återställer 120 hälsa hos ett allierat mål under 12 sek. (schamantalang)"
+        "name": "Springwell",
+        "description": "Restores 120 health to a friendly target over 12 sec. (Shaman talent)"
       },
       "holy_wrath": {
-        "name": "Helgonvrede",
-        "description": "Släpper lös helig kraft och ger {damage} skada till fiender i närheten. (paladintalang)"
+        "name": "Saint's Ire",
+        "description": "Unleashes holy power, damaging nearby enemies for {damage}. (Paladin talent)"
       },
       "howl_of_terror": {
-        "name": "Skräckyl",
-        "description": "Skrämmer fiender i närheten i upp till 3 sek. Skada kan bryta effekten. (häxmästartalang)"
+        "name": "Dread Chorus",
+        "description": "Frightens nearby enemies for up to 3 sec. Damage may break the effect. (Warlock talent)"
       },
       "ice_block": {
-        "name": "Kall kista",
-        "description": "Kapslar in dig i is och absorberar 600 skada i 8 sek. Du kan inte agera medan du är inkapslad. Använd igen för att avbryta. (magikertalang)"
+        "name": "Cold Coffin",
+        "description": "Encases you in ice, absorbing 600 damage for 8 sec. You cannot act while encased. Recast to cancel. (Mage talent)"
       },
       "inner_focus": {
-        "name": "Stillat sinne",
-        "description": "Gör din nästa besvärjelse kostnadsfri. Varar i 60 sek. (prästtalang)"
+        "name": "Stilled Mind",
+        "description": "Makes your next spell free. Lasts 60 sec. (Priest talent)"
       },
       "innervate": {
-        "name": "Livssav",
-        "description": "Levande sav väller upp i dig i 10 sek. och återställer 20 av din aktuella resurs i vågor: mana, raseri eller energi. Formbyte avbryter den inte. Sömn, bedövning eller stasis stoppar saven. (druidtalang)"
+        "name": "Lifesap",
+        "description": "Living sap wells up in you for 10 sec, restoring 20 of your current resource in waves: mana, Rage, or Energy, and shifting forms does not break it. Sleep, stun, or stasis stills the sap. (Druid talent)"
       },
       "meteor": {
-        "name": "Himmelsten",
-        "description": "Kallar ner en meteor på målområdet och ger {damage} Eldskada. Därefter bränns fiender där för 12 till 18 Eldskada varannan sekund i 6 sek. (magikertalang)"
+        "name": "Skystone",
+        "description": "Calls down a meteor at the target area, dealing {damage} Fire damage, then burning enemies there for 12 to 18 Fire damage every 2 sec for 6 sec. (Mage talent)"
       },
       "mind_sear": {
-        "name": "Tankebrand",
-        "description": "Kanaliserar skuggenergi mot målområdet och ger {damage} skada varje sekund till fiender i närheten. (prästtalang)"
+        "name": "Thoughtburn",
+        "description": "Channels shadow energy at the target area, damaging nearby enemies each second for {damage}. (Priest talent)"
       },
       "multi_shot": {
-        "name": "Splitterskott",
-        "description": "Avfyrar en salva mot målområdet och ger {damage} Fysisk skada till fiender inom 8 m. (jägartalang)"
+        "name": "Splitshot",
+        "description": "Loose a spread at the target area, dealing {damage} Physical damage to enemies within 8 yd. (Hunter talent)"
       },
       "prayer_of_healing": {
-        "name": "Körläkning",
-        "description": "Helar allierade i närheten för {damage}. (prästtalang)"
+        "name": "Choirmend",
+        "description": "Heals nearby allies for {damage}. (Priest talent)"
       },
       "preparation": {
-        "name": "Reservplan",
-        "description": "Avslutar nedkylningen för Spurt, Undvikande och Försvinnande. (skurktalang)"
+        "name": "Contingency",
+        "description": "Finishes the cooldown on Sprint, Evasion, and Vanish. (Rogue talent)"
       },
       "presence_of_mind": {
-        "name": "Rusande sinne",
-        "description": "Gör din nästa besvärjelse med kasttid omedelbar. Varar i 60 sek. (magikertalang)"
+        "name": "Racing Mind",
+        "description": "Makes your next spell with a cast time instant. Lasts 60 sec. (Mage talent)"
       },
       "psychic_scream": {
-        "name": "Psykiskt skrik",
-        "description": "Skrämmer fiender i närheten i upp till 4 sek. Skada kan bryta effekten. (prästtalang)"
+        "name": "Terror Canticle",
+        "description": "Frightens nearby enemies for up to 4 sec. Damage may break the effect. (Priest talent)"
       },
       "shadowstep": {
-        "name": "Skuggkliv",
-        "description": "Kliver genom skuggorna mot ditt mål. (skurktalang)"
+        "name": "Shadeslip",
+        "description": "Steps through the shadows toward your target. (Rogue talent)"
       },
       "silence": {
-        "name": "Tystnad",
-        "description": "Tystar målet i 4 sek. (prästtalang)"
+        "name": "Hushword",
+        "description": "Silences the target for 4 sec. (Priest talent)"
       },
       "smoke_screen": {
-        "name": "Rökridå",
-        "description": "Du försvinner i ett rökmoln, vilket ökar din chans att undvika med 30 % i 8 sek."
+        "name": "Smoke Screen",
+        "description": "Vanish into a cloud of smoke, increasing your chance to dodge by 30% for 8 sec."
       },
       "spellsteal": {
-        "name": "Besvärjelsestöld",
-        "description": "Stjäl en gynnsam magisk effekt från en fiende och överför den till dig."
+        "name": "Spellsteal",
+        "description": "Steals a beneficial magic effect from an enemy, transferring it to yourself."
       },
       "startle_shot": {
-        "name": "Skrämselskott",
-        "description": "Ett vilt skott som desorienterar målet i {duration} sek. All skada bryter effekten."
+        "name": "Startle Shot",
+        "description": "A wild shot that disorients the target for {duration} sec. Any damage breaks the effect."
       },
       "tranquility": {
-        "name": "Gläntsång",
-        "description": "Kanaliserar återställande energi i 4 sek. och helar allierade inom 30 m för 42 till 52 varje sekund. (druidtalang)"
+        "name": "Gladesong",
+        "description": "Channels restorative energy for 4 sec, healing allies within 30 yd for 42 to 52 each second. (Druid talent)"
       },
       "typhoon": {
-        "name": "Tyfon",
-        "description": "En vindstöt slår tillbaka alla fiender inom 8 m och omtöcknar dem, vilket minskar deras rörelsehastighet med 50 % i 4 sek."
+        "name": "Typhoon",
+        "description": "A blast of wind knocks back all enemies within 8 yd and dazes them, slowing their movement by 50% for 4 sec."
       },
       "voidfeast": {
-        "name": "Tomhetsmåltid",
-        "description": "Slukar en magisk effekt (en gynnsam från en fiende eller en skadlig från en allierad) och helar dig med 6 % av din maximala hälsa."
+        "name": "Voidfeast",
+        "description": "Devours a magic effect (a beneficial one from an enemy, or a harmful one from an ally) and heals you for 6% of your maximum health."
       },
       "pummel": {
         "name": "Käkkross",
@@ -6884,8 +6905,16 @@ export const sv_SE: EnTranslations = {
         "description": "En smygöppnare som krafsar fienden för vapenskada plus {damage} och vållar blödningsskada över 9 sek. Ger 1 kombopoäng. Endast i vargform."
       },
       "revive_pet": {
-        "name": "Lappa ihop",
-        "description": "Lappar ihop ditt husdjur. Om det lever återställer det totalt {overTime} hälsa under 12 sek. med läkning var 3:e sek. Om det är dött återupplivas det med 35 % hälsa."
+        "name": "Återuppliva djur",
+        "description": "Återupplivar ditt döda djur och kallar det till din sida."
+      },
+      "commanding_shout": {
+        "description": "Ökar din uthållighet med {buff} i 2 min.",
+        "name": "Stärkande rop"
+      },
+      "rend": {
+        "description": "Sårar målet och får det att blöda för {damage} skada över {duration} sek.",
+        "name": "Djup skåra"
       }
     },
     "items": {
@@ -8099,16 +8128,16 @@ export const sv_SE: EnTranslations = {
         "name": "Heroiskt märke"
       },
       "eastbrook_buckler": {
-        "name": "Östbäcks rundsköld"
+        "name": "Eastbrook Buckler"
       },
       "eastbrook_greatsword": {
-        "name": "Östbäcks storsvärd"
+        "name": "Eastbrook Greatsword"
       },
       "highwatch_greatsword": {
-        "name": "Högvakts storsvärd"
+        "name": "Highwatch Greatsword"
       },
       "highwatch_wallshield": {
-        "name": "Högvakts mursköld"
+        "name": "Highwatch Wallshield"
       },
       "morthens_cryptforged_hauberk": {
         "name": "Morthens kryptsmidda brynja"

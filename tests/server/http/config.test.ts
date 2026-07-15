@@ -31,6 +31,7 @@ describe('loadConfig', () => {
     expect(cfg.allowDevCommands).toBe(false);
     expect(cfg.turnstileSecret).toBe('');
     expect(cfg.maxWsPerIpHard).toBe(20);
+    expect(cfg.maxPlayersPerRealm).toBe(5000);
     expect(cfg.githubRepo).toBe('levy-street/world-of-claudecraft');
     expect(cfg.githubToken).toBe('');
     expect(cfg.chatLogRetentionDays).toBe(90);
@@ -210,6 +211,22 @@ describe('loadConfig', () => {
     expect(cfg.port).toBe(8787);
     // An explicit 0 is preserved: the keep-forever contract stays reachable.
     expect(loadConfig({ ...MIN_ENV, CHAT_LOG_RETENTION_DAYS: '0' }).chatLogRetentionDays).toBe(0);
+  });
+
+  it('reads MAX_PLAYERS_PER_REALM: a number overrides, empty or whitespace is the default, 0 passes through', () => {
+    // A set value overrides the default.
+    expect(loadConfig({ ...MIN_ENV, MAX_PLAYERS_PER_REALM: '75' }).maxPlayersPerRealm).toBe(75);
+    // Set-but-empty (a stray '.env' placeholder line) reads as unset -> the default.
+    expect(loadConfig({ ...MIN_ENV, MAX_PLAYERS_PER_REALM: '' }).maxPlayersPerRealm).toBe(5000);
+    // Whitespace-only is trimmed to unset -> the default: Number('   ') is 0, so an
+    // untrimmed read would take a stray-spaces line as an explicit 0 and silently
+    // DISABLE the cap (fail-open, the unsafe direction for this key).
+    expect(loadConfig({ ...MIN_ENV, MAX_PLAYERS_PER_REALM: '   ' }).maxPlayersPerRealm).toBe(5000);
+    // An explicit 0 passes through numberOr unchanged: the disable rule lives at the
+    // admission site (server/ws_auth.ts, a cap > 0 test), never in the loader. Stray
+    // spaces around the 0 do not hide the intent.
+    expect(loadConfig({ ...MIN_ENV, MAX_PLAYERS_PER_REALM: '0' }).maxPlayersPerRealm).toBe(0);
+    expect(loadConfig({ ...MIN_ENV, MAX_PLAYERS_PER_REALM: ' 0 ' }).maxPlayersPerRealm).toBe(0);
   });
 
   it('returns a frozen Config whose fields cannot be mutated', () => {

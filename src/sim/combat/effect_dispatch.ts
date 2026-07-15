@@ -10,7 +10,7 @@
 // hooks, and the shared `pulseGroundAoE`/`applyTaunt`/`meleeSwing` entry points all
 // STAY on Sim and are consumed via the seam. The pure module fns/consts the switch
 // uses (preservesStealth, armorReduction, recalcPlayerStats, addThreat,
-// meleeMissChance, CHARGE_MAX_DURATION) are imported/inlined directly.
+// swingMissChance, CHARGE_MAX_DURATION) are imported/inlined directly.
 //
 // `src/sim`-pure: no DOM/Three, no Math.random/Date.now; all randomness is the
 // shared `ctx.rng` stream, drawn in the exact pre-move order.
@@ -40,9 +40,9 @@ import {
   FISHING_CAST_ID,
   MELEE_ARC,
   MELEE_CLASSES,
-  meleeMissChance,
   normAngle,
   rageGenAuraMult,
+  swingMissChance,
 } from '../types';
 import {
   abilityQualifiesForAreaEcho,
@@ -1876,7 +1876,7 @@ export function runEffects(
       case 'sunder': {
         if (!target || target.dead) break;
         // a sunder can miss like any melee attack — a miss causes no threat
-        if (ctx.rng.chance(meleeMissChance(p.level, target.level))) {
+        if (ctx.rng.chance(swingMissChance(p, target))) {
           ctx.emit({
             type: 'damage',
             sourceId: p.id,

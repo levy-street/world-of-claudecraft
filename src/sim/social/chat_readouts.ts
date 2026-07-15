@@ -168,10 +168,10 @@ export function dungeonsReadout(): string {
   return `Dungeons (${parts.length}): ${parts.join(', ')}.`;
 }
 // Readout for "/consider": sizes up the current target's level versus yours.
-// The verdict bands track the real combat model — meleeMissChance (types.ts)
-// applies a sharp miss penalty once the target is 3+ levels above you (its
-// `diff > 2` cliff), and dodge/crit also scale with the level gap — so a
-// target 3+ levels up is flagged as a steep step beyond a merely tough one.
+// The verdict bands track the real combat model: meleeMissChance (types.ts) ramps
+// the above-level miss penalty with the gap up to a cap at +3 (the [0,7,14,21]
+// table), and dodge/crit also scale with the level gap, so a target 3+ levels up
+// is flagged as a steep step beyond a merely tough one.
 // Reads only the live target Entity.level versus your own (no new fields).
 export function considerReadout(ctx: SimContext, self: Entity): string {
   const t = self.targetId !== null ? ctx.entities.get(self.targetId) : undefined;

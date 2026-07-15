@@ -102,7 +102,9 @@ sub `CLAUDE.md` files are the source of truth; this is the checklist.
 - Migration: schema is inline DDL re-applied every boot. Changes must be additive +
   idempotent (`ADD COLUMN IF NOT EXISTS`); JSONB load stays back-compat (old rows lack
   the field). Flag destructive/non-idempotent DDL. Hand to `migration-safety` /
-  `privacy-security-review` agents for anything non-trivial.
+  `privacy-security-review` agents for anything non-trivial. When the diff changes SQL, a
+  database call site, indexes, query cadence/cardinality, pool or lock behavior, timeout
+  policy, or stored-data growth, hand the scaling angle to `database-performance-reviewer`.
 - Privacy: no `password_hash` or other accounts' data returned to the client.
 - CLAUDE.md requires tests for sim/server behavior changes. A server change with no test
   is a finding.
@@ -176,7 +178,8 @@ with severity. Then YOU verify the consequential findings (Step 3) and write/pos
 review in your own voice. Do not let a subagent author the final review prose or post it,
 the voice and the verify-before-accuse bar are yours to hold. Prefer the purpose-built
 agents (`architecture-reviewer` for `src/sim/` determinism + the `SimContext` seam,
-`cross-platform-sync`, `migration-safety`, `privacy-security-review`, `qa-checklist`) for
+`cross-platform-sync`, `migration-safety`, `database-performance-reviewer`,
+`privacy-security-review`, `qa-checklist`) for
 their domains.
 
 ## Quick reference: domain -> first things to check

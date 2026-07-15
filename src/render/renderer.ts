@@ -821,6 +821,11 @@ export class Renderer {
   private groundAimReticle: GroundAimReticle | null = null;
   raycaster = new THREE.Raycaster();
   clickTargets: THREE.Object3D[] = [];
+  // Gather-node meshes (#1866), raycast separately from `clickTargets`/`pick()`:
+  // nodes are static content keyed by string id, not entities keyed by numeric
+  // id, so they get their own list and `pickGatherNode` instead of widening
+  // `pick()`'s numeric-id contract.
+  gatherNodeMeshes: THREE.Object3D[] = [];
   camYaw = Math.PI;
   camPitch = 0.32;
   camDist = 12;
@@ -1390,6 +1395,7 @@ export class Renderer {
     this.scene.add(gatherNodes.group);
     // Baked into world space at build with no per-frame update(), same as props.
     freezeStaticMatrices(gatherNodes.group);
+    this.gatherNodeMeshes = gatherNodes.group.children;
 
     // selection ring — a classic target reticle: a base ring plus four
     // inward-pointing ticks. The base ring is draped over the terrain each
@@ -5731,7 +5737,40 @@ export class Renderer {
     return this.raycaster.ray.intersectPlane(plane, hit) ? { x: hit.x, z: hit.z } : null;
   }
 
+  // Click/tap-to-harvest (#1866): raycasts the static gather-node meshes
+  // (`gatherNodeMeshes`, tagged with `userData.gatherNodeId` in
+  // src/render/gather_nodes.ts) and returns the hit node's content id, or null.
+  // A separate method from `pick()` on purpose: nodes are static content keyed
+  // by string id, not entities keyed by numeric id, so widening `pick()`'s
+  // return contract would force every existing caller to re-discriminate.
+  pickGatherNode(clientX: number, clientY: number): string | null {
+    const ndc = new THREE.Vector2(
+      (clientX / this.viewport.width) * 2 - 1,
+      -(clientY / this.viewport.height) * 2 + 1,
+    );
+    this.raycaster.setFromCamera(ndc, this.camera);
+    const hits = this.raycaster.intersectObjects(this.gatherNodeMeshes, true);
+    for (const hit of hits) {
+      let o: THREE.Object3D | null = hit.object;
+      while (o) {
+        if (typeof o.userData.gatherNodeId === 'string') return o.userData.gatherNodeId as string;
+        o = o.parent;
+      }
+    }
+    return null;
+  }
+
   pick(clientX: number, clientY: number): number | null {
+    const direct = this.pickDirect(clientX, clientY);
+    if (direct !== null) return direct;
+    return this.pickSloppy(clientX, clientY);
+  }
+
+  // The direct-raycast half of pick(): only a hit that actually lands on an
+  // entity's mesh. Split out so callers that also raycast gather nodes (a
+  // click that lands on a node must not be stolen by the sloppy assist below)
+  // can slot the node raycast in between this and pickSloppy.
+  pickDirect(clientX: number, clientY: number): number | null {
     const ndc = new THREE.Vector2(
       (clientX / this.viewport.width) * 2 - 1,
       -(clientY / this.viewport.height) * 2 + 1,
@@ -5760,12 +5799,13 @@ export class Renderer {
         o = o.parent;
       }
     }
-    const directPick = resolveDirectPickEntityId(
-      directHitIds,
-      this.sim.entities,
-      this.sim.player.targetId,
-    );
-    if (directHitIds.length > 0) return directPick;
+    if (directHitIds.length === 0) return null;
+    return resolveDirectPickEntityId(directHitIds, this.sim.entities, this.sim.player.targetId);
+  }
+
+  // The forgiving-assist half of pick(): snap to the nearest targetable
+  // character within a small screen radius when nothing was hit directly.
+  pickSloppy(clientX: number, clientY: number): number | null {
     // Forgiving assist: nothing under the ray, so snap to the nearest
     // targetable character within a small screen radius — chibi proportions
     // and melee scrums (often hidden behind the player's own model) make

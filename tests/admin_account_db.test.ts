@@ -6,6 +6,12 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('../server/db', () => ({
   pool: { query: mocks.query },
+  DB_HEAVY_STATEMENT_TIMEOUT_MS: 60_000,
+  // accountDetail runs its unbounded play_sessions aggregate on the raised
+  // allowance (server/admin_db.ts); pass the wrapped read straight through to
+  // the same spy so each test's mockResolvedValueOnce chain keeps its order.
+  runWithStatementTimeout: (_timeoutMs: number, fn: (q: typeof mocks.query) => unknown) =>
+    fn(mocks.query),
 }));
 
 vi.mock('../server/realm', () => ({

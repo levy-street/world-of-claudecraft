@@ -618,12 +618,12 @@ export const vi_VN: EnTranslations = {
       "update": "Cập Nhật"
     },
     "cameraPrompt": {
-      "title": "Chọn Camera",
-      "intro": "Chọn cách camera đi theo nhân vật của bạn.",
-      "mouseDesc": "Di chuyển chuột để xoay camera mà không cần giữ nút.",
-      "classicTitle": "Camera Cổ Điển",
-      "classicDesc": "Giữ chuột phải và di chuyển chuột để xoay camera.",
-      "changeLater": "Bạn có thể thay đổi tùy chọn này sau trong menu Esc, Gán Phím.",
+      "title": "Chọn Máy Ảnh Của Bạn",
+      "intro": "Chọn cách máy ảnh theo dõi nhân vật của bạn.",
+      "mouseDesc": "Di chuyển chuột để xoay máy ảnh mà không cần giữ nút.",
+      "classicTitle": "Máy Ảnh Cổ Điển",
+      "classicDesc": "Giữ chuột phải và di chuyển chuột để xoay máy ảnh.",
+      "changeLater": "Bạn có thể thay đổi sau trong Esc, Phím Tắt.",
       "confirm": "Xác Nhận"
     },
     "castBar": {
@@ -672,11 +672,11 @@ export const vi_VN: EnTranslations = {
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m}p {s}g",
       "seconds": "{s}g",
-      "autoShowHint": "Các hàng tự động xuất hiện khi tổ đội của bạn gây sát thương hoặc hồi máu, và phần này đóng vài giây sau khi giao tranh kết thúc."
+      "autoShowHint": "Các hàng xuất hiện tự động sau khi nhóm của bạn gây sát thương hoặc hồi máu, và phần này đóng lại vài giây sau khi chiến đấu kết thúc."
     },
     "petFeed": {
-      "disabledFullHp": "Thú cưng đã đầy máu",
-      "disabledNoFood": "Không có thức ăn nào trong túi có thể hồi máu cho thú cưng của bạn"
+      "disabledFullHp": "Thú cưng đang đầy máu",
+      "disabledNoFood": "Không có thức ăn nào trong túi đồ của bạn có thể chữa lành thú cưng"
     },
     "keybinds": {
       "emoteWheel": "Vòng Biểu Cảm",
@@ -684,7 +684,7 @@ export const vi_VN: EnTranslations = {
       "targetFriendlyNext": "Luân Phiên Mục Tiêu Đồng Minh",
       "discord": "Discord",
       "valecup": "Cúp Thung Lũng",
-      "sheathe": "Sheathe/Unsheathe Weapon",
+      "sheathe": "Tra/Rút Vũ Khí",
       "categoryPet": "Thú Cưng",
       "petAttack": "Thú Cưng: Tấn Công",
       "petStop": "Thú Cưng: Dừng",
@@ -857,7 +857,7 @@ export const vi_VN: EnTranslations = {
       "aurasOnPlayerFrame": "Hiệu Ứng Có Lợi Trên Khung Người Chơi",
       "highContrastBackground": "Nền Tương Phản Cao",
       "startAttackOnAbility": "Tự Đánh Khi Dùng Kỹ Năng",
-      "showAttackButton": "Show Attack Button",
+      "showAttackButton": "Hiển Thị Nút Tấn Công",
       "walkByAutoloot": "Tự Nhặt Đồ Khi Đi Ngang",
       "groundReticle": "Vòng ngắm mục tiêu mặt đất",
       "showItemLevel": "Hiển Thị Cấp Vật Phẩm",
@@ -869,23 +869,23 @@ export const vi_VN: EnTranslations = {
       "mobileLeftHanded": "Bố cục thuận tay trái"
     },
     "talentRows": {
-      "tab": "Lựa chọn",
-      "defaultLoadout": "Bộ trang bị mặc định",
-      "comingSoon": "Sắp ra mắt",
-      "readoutSummary": "Thiên phú: {head}, đã chọn {spent}/{total} hàng."
+      "tab": "Choices",
+      "defaultLoadout": "Default Loadout",
+      "comingSoon": "Coming soon",
+      "readoutSummary": "Talents: {head}, {spent}/{total} rows selected."
     },
     "abilityError": {
-      "shieldRequired": "Bạn phải trang bị khiên."
+      "shieldRequired": "You must have a shield equipped."
     },
     "specPanel": {
-      "primaryAttr": "Thuộc tính chính",
-      "complexity": "Độ phức tạp",
-      "complexityLow": "Thấp",
-      "complexityMedium": "Trung bình",
-      "complexityHigh": "Cao",
-      "exampleAbilities": "Kỹ năng tiêu biểu",
-      "viewTalents": "Xem thiên phú",
-      "selectSpec": "Chọn chuyên môn"
+      "primaryAttr": "Primary attribute",
+      "complexity": "Complexity",
+      "complexityLow": "Low",
+      "complexityMedium": "Medium",
+      "complexityHigh": "High",
+      "exampleAbilities": "Example abilities",
+      "viewTalents": "View talents",
+      "selectSpec": "Select specialization"
     },
     "controller": {
       "title": "Tay Cầm",
@@ -998,6 +998,7 @@ export const vi_VN: EnTranslations = {
         "spellPower": "Sức Mạnh Phép Thuật",
         "critRating": "Chỉ Số Chí Mạng",
         "hasteRating": "Chỉ Số Thần Tốc",
+        "hitRating": "Chỉ Số Trúng Đòn",
         "warfare": "Chiến Tranh"
       },
       "warfareValue": "+{increase}% gây ra / -{reduction}% nhận vào",
@@ -1015,6 +1016,7 @@ export const vi_VN: EnTranslations = {
         "dodge": "Tỉ lệ bạn né hoàn toàn một đòn cận chiến, không nhận sát thương.",
         "critRating": "Chỉ số chí mạng từ trang bị và phần thưởng bộ trang bị của bạn, nâng tỉ lệ chí mạng của bạn. Khoảng 10 điểm chỉ số ban 1% chí mạng.",
         "hasteRating": "Chỉ số thần tốc từ trang bị và phần thưởng bộ trang bị của bạn, đẩy nhanh các đòn tấn công và việc thi triển phép của bạn. Khoảng 10 điểm chỉ số ban 1% thần tốc.",
+        "hitRating": "Chỉ số trúng đòn từ trang bị và các chỉ số bộ của bạn, giảm tần suất tấn công bị hụt và phép thuật bị kháng, đặc biệt khi đối mặt với kẻ địch cấp cao hơn. Khoảng 10 chỉ số cho 1% trúng đòn.",
         "warfare": "Tăng sát thương gây ra cho người chơi thêm {increase}% và giảm sát thương nhận từ người chơi thêm {reduction}%."
       },
       "effects": {
@@ -1090,10 +1092,10 @@ export const vi_VN: EnTranslations = {
         "other": "bạn là {rank}, {count} thành viên"
       },
       "finderPartySize": {
-        "one": "{count} player",
-        "few": "{count} players",
-        "many": "{count} players",
-        "other": "{count} players"
+        "one": "{count} người chơi",
+        "few": "{count} người chơi",
+        "many": "{count} người chơi",
+        "other": "{count} người chơi"
       },
       "characterCount": {
         "one": "{count} nhân vật",
@@ -1304,10 +1306,10 @@ export const vi_VN: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "Không thể phá hủy vật phẩm này.",
-      "rightClickDestroy": "Shift-chuột phải để phá hủy",
-      "dragEquipHint": "Drag onto your character to equip",
-      "dragDestroyHint": "Drag out into the world to destroy",
-      "reorderNeedsRecent": "Clear the filter and sort by Recent to rearrange your bags",
+      "rightClickDestroy": "Nhấp chuột phải để hủy bỏ",
+      "dragEquipHint": "Kéo lên nhân vật để trang bị",
+      "dragDestroyHint": "Kéo ra ngoài thế giới để hủy bỏ",
+      "reorderNeedsRecent": "Xóa bộ lọc và sắp xếp theo Gần Đây để sắp xếp lại túi đồ",
       "filterGroupAria": "Lọc túi đồ theo danh mục",
       "filterAll": "Tất cả",
       "filterWeapon": "Vũ khí",
@@ -1382,6 +1384,8 @@ export const vi_VN: EnTranslations = {
       },
       "dodge": "Aumenta la probabilidad de esquivar un {pct}%",
       "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
+      "damageReduction": "Giảm {pct}% toàn bộ sát thương nhận vào",
+      "guardianWard": "Đòn chí mạng tiếp theo của kẻ địch thay vào đó hồi bạn lên {pct}% máu",
       "armorFlat": "Reduce la armadura en {value}",
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
       "armorPct": "Giảm giáp đi {pct}%",
@@ -1560,11 +1564,11 @@ export const vi_VN: EnTranslations = {
         "devs": "Lập Trình Viên",
         "seniormods": "Điều Hành Viên Cấp Cao",
         "mods": "Điều Hành Viên",
-        "juniormods": "Điều Hành Viên Cấp Dưới",
+        "juniormods": "Điều Hành Viên Mới",
         "artists": "Họa Sĩ",
         "contentcreator": "Nhà Sáng Tạo Nội Dung",
         "legend": "HUYỀN THOẠI",
-        "shill": "NGƯỜI QUẢNG BÁ"
+        "shill": "QUẢNG BÁ VIÊN"
       },
       "guildMember": "Thành viên đã xác minh",
       "notMember": "Chưa tham gia máy chủ",
@@ -1831,7 +1835,8 @@ export const vi_VN: EnTranslations = {
       "title": "Thu thập",
       "mining": "Khai mỏ",
       "logging": "Đốn gỗ",
-      "herbalism": "Thảo dược học"
+      "herbalism": "Thảo dược học",
+      "notReady": "Điểm tài nguyên này chưa hồi sinh lại dành cho bạn."
     },
     "archetypeTitle": {
       "label": "Danh hiệu",
@@ -1865,104 +1870,104 @@ export const vi_VN: EnTranslations = {
       "recipeNotLearned": "Bạn chưa học công thức đó."
     },
     "finder": {
-      "title": "Dungeon Finder",
-      "close": "Close",
-      "back": "Back",
-      "syncing": "Waiting for the realm...",
-      "tabCatalogue": "Catalogue",
-      "tabQueue": "Quick Match",
-      "tabBoard": "Premade Groups",
-      "normal": "Normal",
-      "heroic": "Heroic",
-      "kindDungeon": "Dungeon",
-      "kindRaid": "Raid",
-      "kindSolo": "Solo adventure",
-      "levels": "Levels {min} to {max}",
-      "levelOne": "Level {level}",
+      "title": "Tìm Hầm Ngục",
+      "close": "Đóng",
+      "back": "Quay Lại",
+      "syncing": "Đang chờ vương quốc...",
+      "tabCatalogue": "Danh Mục",
+      "tabQueue": "Ghép Nhanh",
+      "tabBoard": "Nhóm Thành Lập Sẵn",
+      "normal": "Thường",
+      "heroic": "Anh Hùng",
+      "kindDungeon": "Hầm Ngục",
+      "kindRaid": "Đột Kích",
+      "kindSolo": "Phiêu lưu đơn độc",
+      "levels": "Cấp độ {min} đến {max}",
+      "levelOne": "Cấp độ {level}",
       "clock": "{minutes}:{seconds}",
       "roleCount": "{count} {role}",
-      "roleTank": "Tank",
-      "roleHealer": "Healer",
-      "roleDps": "Damage",
-      "freeRoles": "Any roles welcome",
-      "lockoutDaily": "Daily lockout on the final boss",
-      "lockoutNone": "No lockout",
-      "lockedFor": "Locked for about {minutes} min",
-      "attunement": "Requires attunement: {quest}",
-      "heroicMarks": "Heroic Marks: {count} per player",
-      "entrance": "Entrance: {zone}",
-      "showOnMap": "Show on Map",
-      "encounters": "Encounters",
-      "finalBoss": "Final boss",
-      "summoned": "Summoned guardian",
-      "lootGuaranteed": "One of these always drops:",
-      "lootMaybe": "At most one of these may drop:",
-      "lootChance": "Additional chance drops:",
-      "lootHeroic": "Heroic bonus, one of these always drops:",
+      "roleTank": "Đỡ Đòn",
+      "roleHealer": "Chữa Lành",
+      "roleDps": "Gây Sát Thương",
+      "freeRoles": "Chào đón mọi vai trò",
+      "lockoutDaily": "Khóa hàng ngày trên trùm cuối",
+      "lockoutNone": "Không có khóa",
+      "lockedFor": "Bị khóa khoảng {minutes} phút",
+      "attunement": "Yêu cầu điều chỉnh: {quest}",
+      "heroicMarks": "Dấu Anh Hùng: {count} mỗi người chơi",
+      "entrance": "Lối vào: {zone}",
+      "showOnMap": "Hiển Thị Trên Bản Đồ",
+      "encounters": "Cuộc Đối Đầu",
+      "finalBoss": "Trùm cuối",
+      "summoned": "Hộ vệ được triệu hồi",
+      "lootGuaranteed": "Luôn rơi một trong số này:",
+      "lootMaybe": "Tối đa một trong số này có thể rơi:",
+      "lootChance": "Cơ hội rơi thêm:",
+      "lootHeroic": "Thưởng anh hùng, luôn rơi một trong số này:",
       "pct": "{pct}%",
-      "blockedLevel": "Levels {min} to {max} only",
-      "blockedSpec": "Requires a specialization",
-      "yourRoles": "Your roles",
-      "needsSpec": "Choose a specialization to use the Dungeon Finder.",
-      "leaderNote": "Only your party leader can queue the group.",
-      "chooseActivities": "Choose activities",
-      "joinQueue": "Join queue",
-      "leaveQueue": "Leave queue",
-      "waited": "Time in queue: {time}",
-      "cooldownNote": "You may queue again in {seconds}s.",
-      "travelNote": "The group forms where everyone stands. Travel to the entrance together; nobody is teleported.",
-      "proposalTitle": "Group found: {name}",
-      "proposalRole": "Your role: {role}",
-      "accepted": "{accepted} of {size} confirmed",
-      "remaining": "{seconds}s to answer",
-      "accept": "Accept",
-      "decline": "Decline",
-      "acceptedWait": "Waiting for the others...",
-      "slotState": "{role}: {accepted} of {total} ready",
-      "openListings": "Open listings",
-      "boardEmpty": "No listings right now. Publish one!",
-      "boardLeaderGate": "Only your party leader can publish a listing.",
-      "publishListing": "Publish a listing",
-      "activity": "Activity",
-      "publish": "Publish",
-      "yourListing": "Your listing",
-      "closeListing": "Close listing",
-      "applicants": "Applicants",
-      "noApplicants": "No applicants yet.",
-      "acceptApplicantAria": "Accept {name}",
-      "declineApplicantAria": "Decline {name}",
-      "levelClass": "Lv {level} {className}",
-      "leader": "Leader: {name}",
-      "needs": "Needs {roles}",
+      "blockedLevel": "Chỉ dành cho cấp độ {min} đến {max}",
+      "blockedSpec": "Yêu cầu chuyên môn hóa",
+      "yourRoles": "Vai trò của bạn",
+      "needsSpec": "Hãy chọn chuyên môn hóa để sử dụng Tìm Hầm Ngục.",
+      "leaderNote": "Chỉ trưởng nhóm mới có thể đưa cả nhóm vào hàng chờ.",
+      "chooseActivities": "Chọn hoạt động",
+      "joinQueue": "Vào hàng chờ",
+      "leaveQueue": "Rời hàng chờ",
+      "waited": "Thời gian trong hàng chờ: {time}",
+      "cooldownNote": "Bạn có thể vào hàng chờ lại sau {seconds} giây.",
+      "travelNote": "Nhóm được thành lập tại vị trí của mọi người. Hãy cùng nhau di chuyển đến lối vào; không ai được dịch chuyển.",
+      "proposalTitle": "Đã tìm được nhóm: {name}",
+      "proposalRole": "Vai trò của bạn: {role}",
+      "accepted": "{accepted} trên {size} đã xác nhận",
+      "remaining": "Còn {seconds} giây để trả lời",
+      "accept": "Chấp Nhận",
+      "decline": "Từ Chối",
+      "acceptedWait": "Đang chờ những người khác...",
+      "slotState": "{role}: {accepted} trên {total} sẵn sàng",
+      "openListings": "Thông báo đang mở",
+      "boardEmpty": "Chưa có thông báo nào. Hãy đăng một cái!",
+      "boardLeaderGate": "Chỉ trưởng nhóm của bạn mới có thể đăng thông báo.",
+      "publishListing": "Đăng thông báo",
+      "activity": "Hoạt Động",
+      "publish": "Đăng",
+      "yourListing": "Thông báo của bạn",
+      "closeListing": "Đóng thông báo",
+      "applicants": "Người Đăng Ký",
+      "noApplicants": "Chưa có người đăng ký.",
+      "acceptApplicantAria": "Chấp nhận {name}",
+      "declineApplicantAria": "Từ chối {name}",
+      "levelClass": "Cấp {level} {className}",
+      "leader": "Trưởng nhóm: {name}",
+      "needs": "Cần {roles}",
       "slots": "{size}/{capacity}",
-      "apply": "Apply",
-      "withdraw": "Withdraw application",
-      "tagFirstRun": "First run",
-      "tagQuestRun": "Quest run",
-      "tagFullClear": "Full clear",
-      "tagLearning": "Learning welcome",
-      "tagFastRun": "Fast run",
+      "apply": "Đăng Ký",
+      "withdraw": "Rút đơn đăng ký",
+      "tagFirstRun": "Lần đầu chạy",
+      "tagQuestRun": "Chạy nhiệm vụ",
+      "tagFullClear": "Dọn sạch",
+      "tagLearning": "Chào đón người học việc",
+      "tagFastRun": "Chạy nhanh",
       "mech": {
-        "shadow_pulse": "Shadow Pulse (pulsing area damage)",
-        "reaping_arc": "Reaping Arc (frontal cleave)",
-        "mist_surge": "Mist Surge (pulsing area damage)",
-        "summons_adds": "Summons reinforcements",
-        "lunar_tide": "Lunar Tide (pulsing area damage)",
-        "enrage": "Enrages at low health",
-        "shuddering_stomp": "Shuddering Stomp (area stun)",
-        "necrotic_shockwave": "Necrotic Shockwave (heavy area damage)",
-        "grave_cleaver": "Grave-Cleaver (frontal cleave)",
-        "shadow_nova": "Shadow Nova (area burst)",
-        "profane_mending": "Profane Mending (heals its allies)",
-        "mana_burn": "Withered Benediction (burns mana)",
-        "deathstalker_cleave": "Deathstalker Cleave (frontal cleave)",
-        "mortal_wound": "Forgotten Wound (reduces healing taken)",
-        "sealbreak_shockwave": "Sealbreak Shockwave (area burst)",
-        "gravebreaker": "Gravebreaker (frontal cone, face it away from the raid)",
-        "raise_fallen": "Raise Fallen (periodic waves of adds)",
-        "soul_rend": "Soul Rend (marked players must spread and be healed)",
-        "deathless_rage": "Deathless Rage (interrupted at the wardstones)",
-        "wardstones": "Wardstone channels (phase transition)"
+        "shadow_pulse": "Xung Bóng Tối (sát thương vùng theo nhịp)",
+        "reaping_arc": "Vòng Chém Gặt (chém ngang phía trước)",
+        "mist_surge": "Sóng Sương Mù (sát thương vùng theo nhịp)",
+        "summons_adds": "Triệu hồi quân tiếp viện",
+        "lunar_tide": "Triều Nguyệt (sát thương vùng theo nhịp)",
+        "enrage": "Nổi giận khi máu thấp",
+        "shuddering_stomp": "Giậm Chân Rùng Rợn (làm choáng vùng)",
+        "necrotic_shockwave": "Sóng Xung Hoại Tử (sát thương vùng nặng)",
+        "grave_cleaver": "Chém Mộ Phần (chém ngang phía trước)",
+        "shadow_nova": "Nova Bóng Tối (bùng nổ vùng)",
+        "profane_mending": "Chữa Lành Bất Thánh (hồi máu cho đồng minh)",
+        "mana_burn": "Chúc Phúc Khô Héo (đốt cháy mana)",
+        "deathstalker_cleave": "Chém Ngang Thần Chết (chém ngang phía trước)",
+        "mortal_wound": "Vết Thương Bị Lãng Quên (giảm lượng máu hồi nhận vào)",
+        "sealbreak_shockwave": "Sóng Xung Phá Ấn (bùng nổ vùng)",
+        "gravebreaker": "Phá Mộ (hình nón phía trước, quay lưng về phía đoàn đột kích)",
+        "raise_fallen": "Triệu Hồi Tử Giả (các đợt quân tiếp viện theo chu kỳ)",
+        "soul_rend": "Xé Hồn (người chơi bị đánh dấu phải tản ra và được hồi máu)",
+        "deathless_rage": "Thịnh Nộ Bất Tử (bị gián đoạn tại các đá hộ mệnh)",
+        "wardstones": "Kênh đá hộ mệnh (chuyển giai đoạn)"
       }
     },
     "deeds": {
@@ -2586,8 +2591,8 @@ export const vi_VN: EnTranslations = {
     },
     "abilityHook": {
       "heroic_strike": "Đặt sẵn một cú vung nặng tay tiêu nộ khí vào đòn đánh kế tiếp của bạn.",
-      "revenge": "Quét trúng kẻ địch phía trước và có thể không tốn tài nguyên sau khi né hoặc đỡ đòn.",
-      "hamstring": "Cản trở di chuyển của kẻ địch để chúng không thể chạy thoát.",
+      "revenge": "Sweeps enemies in front of you, with a chance to become free after a dodge or parry.",
+      "hamstring": "Cripples an enemy's movement to keep it from escaping.",
       "battle_shout": "Một tiếng hô cổ vũ giúp tăng sức tấn công cho cả tổ đội.",
       "charge": "Lao tới kẻ địch ở xa để mở màn trận đấu bằng một cú choáng ngắn.",
       "thunder_clap": "Đánh trúng mọi thứ quanh bạn và làm chậm đòn tấn công của chúng.",
@@ -2647,7 +2652,9 @@ export const vi_VN: EnTranslations = {
       "mark_of_the_wild": "Một phúc lành lâu dài bạn ban cho bản thân hoặc đồng đội trước trận đấu.",
       "moonfire": "Giáng đòn tức thời và khiến mục tiêu cháy âm ỉ, hữu dụng khi đang di chuyển.",
       "rejuvenation": "Niệm tức thời và hồi máu cho đồng đội theo thời gian, để bạn cứ tiếp tục hành động.",
-      "thorns": "Bảo hộ đồng đội để kẻ tấn công cận chiến tự làm mình bị thương khi ra đòn."
+      "thorns": "Bảo hộ đồng đội để kẻ tấn công cận chiến tự làm mình bị thương khi ra đòn.",
+      "commanding_shout": "Tăng cường thể lực để mọi người trụ vững lâu hơn trong trận.",
+      "rend": "Mở một vết chảy máu bào mòn mục tiêu dần theo thời gian."
     },
     "petHook": {
       "emberkin": "Một con quỷ bắn cầu lửa từ xa, gặm dần kẻ địch từ khoảng cách an toàn.",
@@ -2716,8 +2723,8 @@ export const vi_VN: EnTranslations = {
         "desc": "Những sinh vật có vảy, thân rắn từ vực sâu cổ xưa. Hiếm gặp, kiêu hãnh, và mạnh hơn vẻ ngoài của chúng rất nhiều."
       },
       "reptile": {
-        "name": "Loài Bò Sát",
-        "desc": "Những kẻ săn mồi máu lạnh với tiếng rít và cú ngoạm rất riêng, khác biệt với các loài thú máu nóng."
+        "name": "Bò Sát",
+        "desc": "Những thợ săn máu lạnh với tiếng rít và cú đớp rất riêng của chúng, khác biệt hoàn toàn so với các dã thú máu nóng."
       }
     },
     "worldPage": {
@@ -4628,6 +4635,8 @@ export const vi_VN: EnTranslations = {
     "connectionLost": "Đã mất kết nối tới máy chủ.",
     "reconnecting": "Mất kết nối. Đang kết nối lại...",
     "connectionRejected": "Máy chủ đã đóng kết nối.",
+    "realmFull": "Thế giới này đang đầy người chơi. Vui lòng thử lại sau vài phút.",
+    "tooManyConnections": "Có quá nhiều kết nối đến thế giới này từ mạng của bạn. Vui lòng đóng bớt cửa sổ trò chơi hoặc thử lại sau vài phút.",
     "tips": {
       "classes": "Mẹo: mỗi lớp trong 9 lớp nhân vật có lối chơi khác nhau. Hãy thử vài lớp trước khi quyết định gắn bó.",
       "talents": "Mẹo: bạn có thể đặt lại tài năng bất cứ lúc nào ngoài chiến đấu, nên lựa chọn ban đầu không bao giờ là cái bẫy.",
@@ -5285,7 +5294,7 @@ export const vi_VN: EnTranslations = {
       "defensiveDesc": "Tấn công kẻ thù làm hại bạn hoặc thú của bạn.",
       "aggressiveDesc": "Tấn công kẻ thù thù địch ở gần.",
       "rename": "Đổi Tên Thú",
-      "revive": "Băng Bó",
+      "revive": "Hồi Sinh Thú",
       "abandon": "Bỏ Rơi Thú",
       "cancel": "Hủy",
       "renameLabel": "Chọn một tên mới cho thú.",
@@ -5397,7 +5406,7 @@ export const vi_VN: EnTranslations = {
     "actionBar": {
       "attackName": "Tấn Công",
       "attackTooltip": "Bật/tắt tự động tấn công mục tiêu. Nhấp chuột phải vào kẻ địch cũng sẽ tấn công.",
-      "attackRemoveHint": "Right-click to remove it from the bar and free the slot.",
+      "attackRemoveHint": "Nhấp chuột phải để gỡ khỏi thanh và giải phóng ô trống.",
       "emptySlot": "Ô trống",
       "slotAria": "Ô hành động {slot}: {ability}",
       "emptySlotAria": "Ô hành động {slot}: trống",
@@ -5541,7 +5550,7 @@ export const vi_VN: EnTranslations = {
     },
     "slots": {
       "mainhand": "Tay Chính",
-      "offhand": "Tay Phụ",
+      "offhand": "Off Hand",
       "helmet": "Mũ Giáp",
       "neck": "Cổ",
       "shoulder": "Giáp Vai",
@@ -6355,6 +6364,18 @@ export const vi_VN: EnTranslations = {
         "name": "Da Sồi",
         "description": "Da ngươi rắn lại như vỏ cây, tăng 150 giáp trong 15 giây."
       },
+      "ironhold": {
+        "name": "Thiết Lũy",
+        "description": "Ẩn sau lá chắn bảo vệ, giảm 40% sát thương nhận vào trong 8 giây."
+      },
+      "sacred_bulwark": {
+        "name": "Phòng Bị Thánh Thần",
+        "description": "Trong {duration} giây, đòn tấn công tiếp theo của kẻ địch vốn sẽ giết chết bạn sẽ bị vô hiệu hóa, thay vào đó hồi phục bạn lên 35% máu."
+      },
+      "primal_reflexes": {
+        "name": "Phản Xạ Nguyên Thủy",
+        "description": "Bản năng của bạn trở nên sắc bén, tăng 50% cơ hội né đòn trong 6 giây."
+      },
       "starfire": {
         "name": "Thiên Giáng",
         "description": "Gọi xuống một tia lửa tinh tú, gây {damage} sát thương Bí Thuật."
@@ -6540,304 +6561,304 @@ export const vi_VN: EnTranslations = {
         "description": "Ràng buộc một Wraithborn theo ý chí của bạn, một con quỷ tinh nhuệ trút sát thương Bóng Tối nặng nề từ xa. Thời gian hồi chiêu dài kìm hãm sức mạnh tàn phá của nó. Triệu hồi một con quỷ mới sẽ giải tán con hiện tại. Bạn chỉ có thể có một con quỷ cùng lúc."
       },
       "battle_stance": {
-        "name": "Thế Công",
-        "description": "Thế đứng tấn công hung hãn: bạn tạo nộ khí nhiều hơn 10%. Thế đứng mặc định của nhánh Vũ Khí và nhánh Hộ Vệ."
+        "name": "Battle Stance",
+        "description": "An aggressive combat stance: you generate 10% more rage. The default stance for Arms and Protection."
       },
       "berserker_stance": {
-        "name": "Thế Cuồng Chiến",
-        "description": "Thế đứng liều lĩnh: các đòn chí mạng của bạn xuất hiện thường xuyên hơn 3% và đánh mạnh hơn 3%. Chiến Binh nhánh Cuồng Nộ luôn chiến đấu trong thế đứng này."
+        "name": "Berserker Stance",
+        "description": "A reckless combat stance: your critical strikes land 3% more often and hit for 3% more. The Fury warrior always fights in this stance."
       },
       "sweeping_strikes": {
-        "name": "Vòng Cung Mở Rộng",
-        "description": "Trong 12 giây, các đòn tấn công đơn mục tiêu của bạn cũng đánh trúng 1 kẻ địch lân cận với toàn bộ sát thương. (nhánh Vũ Khí)"
+        "name": "Widening Arc",
+        "description": "For 12 sec your single-target attacks also strike 1 nearby enemy for full damage. (Arms)"
       },
       "deep_wounds": {
-        "name": "Vết Thương Toác Rộng",
-        "description": "Nội tại: Đòn Tàn Phế của bạn khiến mục tiêu chảy máu, nhận sát thương Vật Lý trong 6 giây. (nhánh Vũ Khí)"
+        "name": "Gaping Wounds",
+        "description": "Passive: your Maiming Strike leaves the target bleeding for Physical damage over 6 sec. (Arms)"
       },
       "enrage_passive": {
-        "name": "Cuồng Loạn",
-        "description": "Nội tại: khi Cuồng Hóa, bạn gây thêm 7% sát thương, tấn công nhanh hơn 25% và di chuyển nhanh hơn 10% trong 4 giây. Trích Huyết có 30% cơ hội khiến bạn Cuồng Hóa; Mùa Gặt Đỏ thì luôn luôn. (nhánh Cuồng Nộ)"
+        "name": "Mayhem",
+        "description": "Passive: while Enraged you deal 7% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)"
       },
       "raging_gale": {
-        "name": "Song Kích",
-        "description": "Lập tức vung vũ khí đánh hai lần, mỗi đòn gây 40% sát thương vũ khí cộng thêm {damage}, và tạo 8 nộ khí. Tích trữ tối đa 2 lượt dùng. (nhánh Cuồng Nộ)"
+        "name": "Twinstrike",
+        "description": "Instantly strike with your weapon twice, each hit dealing 40% weapon damage plus {damage}, and generate 8 rage. Stores up to 2 charges. (Fury)"
       },
       "red_harvest": {
-        "name": "Mùa Gặt Đỏ",
-        "description": "Dốc cạn tất cả: chém ba lần trong cơn điên cuồng, mỗi đòn gây 65% sát thương vũ khí cộng thêm {damage}, và luôn khiến bạn Cuồng Hóa. (nhánh Cuồng Nộ)"
+        "name": "Red Harvest",
+        "description": "Spend everything: strike three times in a frenzy for 65% weapon damage plus {damage} each, always Enraging you. (Fury)"
       },
       "furious_mending": {
-        "name": "Hồi Phục Cuồng Nộ",
-        "description": "Trong 10 giây bạn nhận ít hơn 20% sát thương, và trong lúc hiệu ứng còn hiệu lực, Trích Huyết của bạn hồi cho bạn 20% máu tối đa. (nhánh Cuồng Nộ)"
+        "name": "Furious Mending",
+        "description": "For 10 sec you take 20% reduced damage, and while it lasts your Bloodletting heals you for 20% of your maximum health. (Fury)"
       },
       "emboldening_roar": {
-        "name": "Tiếng Gầm Khích Lệ",
-        "description": "Bật lên một tiếng gầm khích lệ: bạn và những người chơi thân thiện trong vòng 40 thước được Khích Lệ, và 3 kỹ năng tiếp theo của bạn chắc chắn là đòn chí mạng. (nhánh Cuồng Nộ)"
+        "name": "Emboldening Roar",
+        "description": "Lets loose an emboldening roar: you and friendly players within 40 yards are Emboldened, and your next 3 abilities are guaranteed critical strikes. (Fury)"
       },
       "raised_guard": {
-        "name": "Giương Khiên",
-        "description": "Ghì chặt sau tấm khiên: bạn nhận ít hơn 50% sát thương Vật Lý trong 6 giây. Tích trữ tối đa 2 lượt dùng. (nhánh Hộ Vệ)"
+        "name": "Raised Guard",
+        "description": "Brace behind your shield: you take 50% reduced Physical damage for 6 sec. Stores up to 2 charges. (Protection)"
       },
       "iron_resolve": {
-        "name": "Ý Chí Sắt Đá",
-        "description": "Nghiến răng chịu đau: tiêu hao tối đa 40 nộ khí (tối thiểu 20) để hấp thụ 4 sát thương cho mỗi điểm nộ khí đã dùng, kéo dài tối đa 10 giây. (Hộ Vệ)"
+        "name": "Iron Resolve",
+        "description": "Grit your teeth and ignore the pain: spends up to 40 rage (20 minimum) to absorb 4 damage per rage spent, lasting up to 10 sec. (Protection)"
       },
       "faultline": {
-        "name": "Vết Nứt Địa Tầng",
-        "description": "Truyền một chấn động xuyên qua mặt đất: kẻ địch phía trước bạn trong vòng 8 thước nhận {damage} sát thương và bị choáng trong 3 giây. (nhánh Hộ Vệ)"
+        "name": "Faultline",
+        "description": "Send a shockwave through the ground: enemies in front of you within 8 yards take {damage} damage and are stunned for 3 sec. (Protection)"
       },
       "defiant_bellow": {
-        "name": "Tiếng Gầm Thách Thức",
-        "description": "Một tiếng gầm thách thức: mọi kẻ địch trong vòng 10 thước bị khiêu khích, buộc phải tấn công bạn trong 3 giây. (nhánh Hộ Vệ)"
+        "name": "Defiant Bellow",
+        "description": "A defiant bellow: every enemy within 10 yards is taunted, compelled to attack you for 3 sec. (Protection)"
       },
       "breachmaker": {
-        "name": "Đòn Công Thành",
-        "description": "Nện mục tiêu gây sát thương vũ khí cộng thêm {damage} và phá vỡ thế thủ của nó: các đòn tấn công của chính bạn lên mục tiêu này gây thêm 20% sát thương trong 8 giây. (nhánh Vũ Khí)"
+        "name": "Breachmaker",
+        "description": "Batter the target for weapon damage plus {damage} and crack its guard: your own attacks against it deal 20% more damage for 8 sec. (Arms)"
       },
       "measured_fury": {
-        "name": "Thịnh Nộ Chừng Mực",
-        "description": "Cơn thịnh nộ chừng mực giúp bạn chi tiêu khôn ngoan hơn: các kỹ năng của bạn tốn ít hơn 10% nộ khí. (nhánh Vũ Khí)"
+        "name": "Measured Fury",
+        "description": "Your measured fury sharpens your economy: your abilities cost 10% less rage. (Arms)"
       },
       "seasoned_soldier": {
-        "name": "Người Lính Dày Dạn",
-        "description": "Các đòn đánh thường chí mạng của bạn tạo nộ khí nhiều hơn 10%. (nhánh Vũ Khí)"
+        "name": "Seasoned Soldier",
+        "description": "Your critical auto-attacks generate 10% more rage. (Arms)"
       },
       "diabolical_twinstrike": {
-        "name": "Song Kích Hiểm Ác",
-        "description": "Khi đang Cuồng Hóa, Song Kích của bạn gây thêm 15% sát thương. (nhánh Cuồng Nộ)"
+        "name": "Diabolical Twinstrike",
+        "description": "While Enraged, your Twinstrike deals 15% more damage. (Fury)"
       },
       "cleaving_blows": {
-        "name": "Đòn Chém Bổ",
-        "description": "Mùa Gặt Đỏ luôn hoàn lại một lượt dùng Song Kích. (nhánh Cuồng Nộ)"
+        "name": "Cleaving Blows",
+        "description": "Red Harvest always refunds a charge of Twinstrike. (Fury)"
       },
       "sudden_death": {
-        "name": "Đột Tử",
-        "description": "Các đòn đánh thường của bạn có cơ hội cho phép bạn tung Nấm Mồ Sớm lên mục tiêu ở bất kỳ mức máu nào mà không tốn nộ khí. (nhánh Vũ Khí)"
+        "name": "Sudden Death",
+        "description": "Your auto-attacks have a chance to let you cast Early Grave on a target at any health, costing no rage. (Arms)"
       },
       "storm_bolt": {
-        "name": "Cú Ném Bão Tố",
-        "description": "Ném vũ khí của bạn vào mục tiêu gây {damage} sát thương, làm choáng nó trong 3 giây."
+        "name": "Storm Bolt",
+        "description": "Hurl your weapon at the target for {damage}, stunning it for 3 sec."
       },
       "piercing_howl": {
-        "name": "Tiếng Hú Xuyên Thấu",
-        "description": "Một tiếng hét xuyên thấu làm chậm mọi kẻ địch trong vòng 15 thước đi 50% trong 8 giây."
+        "name": "Piercing Howl",
+        "description": "A piercing shout that slows all enemies within 15 yards by 50% for 8 sec."
       },
       "die_by_sword": {
-        "name": "Sống Chết Cùng Kiếm",
-        "description": "Kỹ năng phòng thủ hồi chiêu dài: trong 8 giây bạn nhận ít hơn 30% sát thương và né được nhiều đòn tấn công hơn hẳn."
+        "name": "Die by the Sword",
+        "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
       },
       "recklessness": {
-        "name": "Liều Lĩnh",
-        "description": "Cuồng Hóa: lượng nộ khí bạn tạo ra tăng 50% và tỉ lệ chí mạng tăng 20% trong 12 giây."
+        "name": "Recklessness",
+        "description": "Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec."
       },
       "sanguine_aura": {
-        "name": "Hào Quang Huyết Sắc",
-        "description": "Tẩm máu quân thù lên vũ khí của bạn: bạn và các đồng minh cận chiến nhận thêm 10% tốc độ tấn công và 10% sát thương trong 20 giây."
+        "name": "Sanguine Aura",
+        "description": "Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec."
       },
       "victory_rush": {
-        "name": "Đà Chiến Thắng",
-        "description": "Giáng đòn gây sát thương vũ khí cộng thêm {damage} và hồi 20% máu tối đa của bạn. Chỉ dùng được trong vòng 20 giây sau khi hạ gục một kẻ địch."
+        "name": "Victory Rush",
+        "description": "Strike for weapon damage plus {damage} and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy."
       },
       "intimidating_shout": {
-        "name": "Tiếng Hét Uy Hiếp",
-        "description": "Một tiếng hét kinh hoàng khiến tối đa 5 kẻ địch trong vòng 8 thước bỏ chạy trong sợ hãi suốt 8 giây. Sát thương có thể phá vỡ hiệu ứng."
+        "name": "Intimidating Shout",
+        "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
       },
       "revenge": {
-        "name": "Phục Thù",
-        "description": "Tấn công theo một vòng cung rộng, gây sát thương Vật Lý lên mọi kẻ địch phía trước bạn. Trên 5 mục tiêu thì sát thương bị giảm. Khi bạn né hoặc gạt đòn, Phục Thù tiếp theo của bạn có thể không tốn nộ khí. (Protection)"
+        "name": "Revenge",
+        "description": "Attack in a wide arc, dealing Physical damage to all enemies in front of you. Above 5 targets the damage is reduced. When you dodge or parry, your next Revenge may cost no rage. (Protection)"
       },
       "heroic_leap": {
-        "name": "Bước Nhảy Chiến",
-        "description": "Nhảy đến khu vực mục tiêu, gây {damage} sát thương lên kẻ địch lân cận khi tiếp đất."
+        "name": "Heroic Leap",
+        "description": "Leap to the target area, dealing {damage} damage to nearby enemies on landing."
       },
       "rallying_cry": {
-        "name": "Tiếng Gầm Quả Cảm",
-        "description": "Cất tiếng gầm quả cảm, tăng 20% máu tối đa cho bạn và các thành viên tổ đội trong phạm vi 40 mét trong 10 giây. Hộ Vệ: họ cũng nhận ít hơn 5% sát thương trong thời gian hiệu lực."
+        "name": "Valor Roar",
+        "description": "Lets loose a valorous roar, granting you and party members within 40 yards 20% additional maximum health for 10 sec. Protection: they also take 5% less damage for the duration."
       },
       "avatar": {
-        "name": "Hóa Thân",
-        "description": "Hóa thành một khổng tượng trong 20 giây, phá bỏ mọi hiệu ứng khống chế lên bạn và tăng 20% sát thương gây ra."
+        "name": "Avatar",
+        "description": "Transform into a colossus for 20 sec, breaking all control on you and increasing your damage dealt by 20%."
       },
       "bladestorm": {
-        "name": "Bão Kiếm",
-        "description": "Hóa thành một cơn bão thép cuồng xoáy, đánh trúng mọi kẻ địch trong phạm vi 8 mét với {damage} sát thương mỗi giây trong 4 giây."
+        "name": "Bladestorm",
+        "description": "Become a whirling storm of steel, striking all enemies within 8 yards for {damage} every second for 4 sec."
       },
       "aspect_of_the_wild": {
-        "name": "Dáng Nanh Hoang",
-        "description": "Truyền sức mạnh hoang dã cho đồng minh trong phạm vi 30 m, tăng 45 sức mạnh công kích và 5% tốc độ đánh của họ trong 5 phút. (thiên phú Thợ săn)"
+        "name": "Wildfang Rally",
+        "description": "Inspires allies within 30 yd with wild strength, increasing attack power by 45 and attack speed by 5% for 5 min. (Hunter talent)"
       },
       "aura_surge": {
-        "name": "Khiên Dội Bình Minh",
-        "description": "Ném một tấm khiên rèn từ bình minh gây {damage} sát thương Thánh, khiến mục tiêu chính câm lặng trong 2 giây, rồi dội sang tối đa 2 kẻ địch khác trong phạm vi 10 mét, gây 75% sát thương mỗi lần dội. (thiên phú Paladin)"
+        "name": "Dawnward Ricochet",
+        "description": "Hurl a dawnforged shield for {damage} Holy damage and silence the primary target for 2 sec. It bounces to up to 2 additional enemies within 10 yd for 75% damage per bounce. (Paladin talent)"
       },
       "avenging_wrath": {
-        "name": "Cánh Báo Thù",
-        "description": "Triệu hồi sức mạnh báo thù, tăng 60 sức mạnh công kích và 30 sức mạnh phép thuật của bạn trong 20 giây. (thiên phú Paladin)"
+        "name": "Wrathwing",
+        "description": "Calls down avenging power, increasing attack power by 60 and spell power by 30 for 20 sec. (Paladin talent)"
       },
       "berserk": {
-        "name": "Sương Đỏ",
-        "description": "Tăng 70 sức mạnh công kích của bạn trong 15 giây. (thiên phú Druid)"
+        "name": "Red Haze",
+        "description": "Increases attack power by 70 for 15 sec. (Druid talent)"
       },
       "blink": {
-        "name": "Bước Chớp",
-        "description": "Dịch chuyển bạn 15 m về phía trước và phá hiệu ứng trói chân. (thiên phú Pháp sư)"
+        "name": "Flickerstep",
+        "description": "Teleports you 15 yd forward and breaks roots. (Mage talent)"
       },
       "bloodlust": {
-        "name": "Trống Chiến",
-        "description": "Khiến đồng minh trong phạm vi 30 m trở nên cuồng nộ, tăng 30% tốc độ đánh của họ trong 15 giây. (thiên phú Shaman)"
+        "name": "Storm Chorus",
+        "description": "Whips allies within 30 yd into a frenzy, increasing attack speed by 30% for 15 sec. (Shaman talent)"
       },
       "chain_lightning": {
-        "name": "Sét Rẽ Nhánh",
-        "description": "Phóng sét vào khu vực mục tiêu, gây {damage} sát thương lên kẻ địch ở gần. (thiên phú Shaman)"
+        "name": "Skybranch",
+        "description": "Hurls lightning at the target area, damaging nearby enemies for {damage}. (Shaman talent)"
       },
       "chaos_bolt": {
-        "name": "Tia Hủy Diệt",
-        "description": "Phóng một luồng lửa hỗn loạn gây {damage} sát thương Lửa. (thiên phú Warlock)"
+        "name": "Ruinbolt",
+        "description": "Hurls a bolt of chaotic fire for {damage} Fire damage. (Warlock talent)"
       },
       "cleansing_verdict": {
-        "name": "Phán Quyết Thanh Tẩy",
-        "description": "Xóa một hiệu ứng phép thuật có hại khỏi mục tiêu đồng minh và hồi cho họ {damage} máu bằng phép Thánh."
+        "name": "Cleansing Verdict",
+        "description": "Purges a harmful magic effect from a friendly target and heals them for {damage} Holy."
       },
       "cloak_of_shadows": {
-        "name": "Áo Choàng Bóng",
-        "description": "Bao phủ bạn trong bóng tối, hấp thụ 420 sát thương trong 5 giây. (thiên phú Đạo tặc)"
+        "name": "Shadecloak",
+        "description": "Wraps you in shadows, absorbing 420 damage for 5 sec. (Rogue talent)"
       },
       "cone_of_cold": {
-        "name": "Quét Băng",
-        "description": "Đánh kẻ địch ở gần bằng băng giá, gây {damage} sát thương Băng. (kỹ năng đặc trưng hệ Băng)"
+        "name": "Frostsweep",
+        "description": "Blasts nearby enemies with frost for {damage} Frost damage. (Frost signature)"
       },
       "curse_of_exhaustion": {
-        "name": "Lời Nguyền Chì",
-        "description": "Nguyền rủa mục tiêu, giảm 30% tốc độ di chuyển trong 12 giây. (thiên phú Warlock)"
+        "name": "Leaden Hex",
+        "description": "Curses the target, slowing movement by 30% for 12 sec. (Warlock talent)"
       },
       "death_coil": {
-        "name": "Vòng Xoáy Mộ",
-        "description": "Đánh kẻ địch gây {damage} sát thương Bóng tối, rồi khiến chúng kinh hoàng trong 3 giây. (thiên phú Warlock)"
+        "name": "Morrowlash",
+        "description": "Strikes the enemy for {damage} Shadow damage, then horrifies them for 3 sec. (Warlock talent)"
       },
       "deep_freeze": {
-        "name": "Băng Chết",
-        "description": "Đóng băng sâu mục tiêu, gây {damage} sát thương Băng và làm choáng trong 4 giây. (thiên phú Pháp sư)"
+        "name": "Deadfrost",
+        "description": "Deep freezes the target, dealing {damage} Frost damage and stunning it for 4 sec. (Mage talent)"
       },
       "desperate_prayer": {
-        "name": "Lời Cầu Cuối",
-        "description": "Hồi ngay {damage} máu cho bạn. (thiên phú Tu sĩ)"
+        "name": "Last Prayer",
+        "description": "Instantly heals you for {damage}. (Priest talent)"
       },
       "deterrence": {
-        "name": "Hộ Vệ Gai",
-        "description": "Tăng 50 điểm phần trăm khả năng né tránh của bạn trong 10 giây. (thiên phú Thợ săn)"
+        "name": "Bristleguard",
+        "description": "Increases your dodge chance by 50 percentage points for 10 sec. (Hunter talent)"
       },
       "divine_shield": {
-        "name": "Hộ Vệ Ánh Sáng",
-        "description": "Bảo vệ bạn bằng sức mạnh thần thánh, hấp thụ 900 sát thương trong 8 giây. (thiên phú Paladin)"
+        "name": "Lightward",
+        "description": "Shields you with holy power, absorbing 900 damage for 8 sec. (Paladin talent)"
       },
       "earthbind": {
-        "name": "Đất Níu Giữ",
-        "description": "Trói kẻ địch ở gần xuống đất trong 2 giây. (thiên phú Shaman)"
+        "name": "Gripping Earth",
+        "description": "Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)"
       },
       "evocation": {
-        "name": "Giếng Ête",
-        "description": "Hồi ngay 220 mana. (thiên phú Pháp sư)"
+        "name": "Aetherwell",
+        "description": "Instantly restores 220 mana. (Mage talent)"
       },
       "frenzied_regeneration": {
-        "name": "Hồi Phục Hoang Dã",
-        "description": "Hồi 180 máu trong 10 giây. Chỉ dùng được ở Dạng Gấu. (thiên phú Druid)"
+        "name": "Savage Mending",
+        "description": "Restores 180 health over 10 sec. Bruin Form only. (Druid talent)"
       },
       "frost_trap": {
-        "name": "Bẫy Sương Giá",
-        "description": "Đóng băng kẻ địch trong khu vực mục tiêu trong 3 giây, khiến chúng không thể di chuyển hoặc hành động. (thiên phú Thợ săn)"
+        "name": "Rime Snare",
+        "description": "Freezes enemies at the target area for 3 sec, preventing movement and actions. (Hunter talent)"
       },
       "ghostly_strike": {
-        "name": "Đòn Ma Ảnh",
-        "description": "Đánh kẻ địch gây sát thương vũ khí cộng {damage}, tăng né tránh trong thời gian ngắn và cho 1 điểm liên kích. (thiên phú Đạo tặc)"
+        "name": "Wraith Strike",
+        "description": "Strikes the enemy for weapon damage plus {damage} and briefly increases dodge. Awards 1 combo point. (Rogue talent)"
       },
       "hammer_of_wrath": {
-        "name": "Búa Ngân Chuông",
-        "description": "Ném búa thần thánh vào kẻ địch bị thương, gây {damage} sát thương Thánh. Chỉ dùng được khi còn dưới 20% máu. (thiên phú Paladin)"
+        "name": "Tolling Hammer",
+        "description": "Hurls a holy hammer at a wounded enemy for {damage} Holy damage. Only usable below 20% health. (Paladin talent)"
       },
       "healing_stream": {
-        "name": "Giếng Suối",
-        "description": "Hồi 120 máu cho một mục tiêu đồng minh trong 12 giây. (thiên phú Shaman)"
+        "name": "Springwell",
+        "description": "Restores 120 health to a friendly target over 12 sec. (Shaman talent)"
       },
       "holy_wrath": {
-        "name": "Cơn Giận Thánh",
-        "description": "Giải phóng sức mạnh thần thánh, gây {damage} sát thương lên kẻ địch ở gần. (thiên phú Paladin)"
+        "name": "Saint's Ire",
+        "description": "Unleashes holy power, damaging nearby enemies for {damage}. (Paladin talent)"
       },
       "howl_of_terror": {
-        "name": "Tiếng Hú Kinh Hoàng",
-        "description": "Khiến kẻ địch ở gần sợ hãi trong tối đa 3 giây. Sát thương có thể phá hiệu ứng. (thiên phú Warlock)"
+        "name": "Dread Chorus",
+        "description": "Frightens nearby enemies for up to 3 sec. Damage may break the effect. (Warlock talent)"
       },
       "ice_block": {
-        "name": "Quan Tài Lạnh",
-        "description": "Bao bọc bạn trong băng, hấp thụ 600 sát thương trong 8 giây. Bạn không thể hành động khi bị bao bọc. Dùng lại để hủy. (thiên phú Pháp sư)"
+        "name": "Cold Coffin",
+        "description": "Encases you in ice, absorbing 600 damage for 8 sec. You cannot act while encased. Recast to cancel. (Mage talent)"
       },
       "inner_focus": {
-        "name": "Tâm Trí Tĩnh",
-        "description": "Khiến phép tiếp theo của bạn không tốn tài nguyên. Kéo dài 60 giây. (thiên phú Tu sĩ)"
+        "name": "Stilled Mind",
+        "description": "Makes your next spell free. Lasts 60 sec. (Priest talent)"
       },
       "innervate": {
-        "name": "Nhựa Sống",
-        "description": "Nhựa sống trào dâng trong bạn trong 10 giây và hồi 20 tài nguyên hiện tại theo từng đợt: mana, nộ khí hoặc năng lượng. Biến hình không làm gián đoạn. Ngủ, choáng hoặc đình trệ sẽ làm dòng nhựa ngừng lại. (thiên phú Druid)"
+        "name": "Lifesap",
+        "description": "Living sap wells up in you for 10 sec, restoring 20 of your current resource in waves: mana, Rage, or Energy, and shifting forms does not break it. Sleep, stun, or stasis stills the sap. (Druid talent)"
       },
       "meteor": {
-        "name": "Đá Trời",
-        "description": "Gọi thiên thạch xuống khu vực mục tiêu, gây {damage} sát thương Lửa, rồi thiêu đốt kẻ địch tại đó với 12 đến 18 sát thương Lửa mỗi 2 giây trong 6 giây. (thiên phú Pháp sư)"
+        "name": "Skystone",
+        "description": "Calls down a meteor at the target area, dealing {damage} Fire damage, then burning enemies there for 12 to 18 Fire damage every 2 sec for 6 sec. (Mage talent)"
       },
       "mind_sear": {
-        "name": "Thiêu Ý Nghĩ",
-        "description": "Niệm năng lượng Bóng tối lên khu vực mục tiêu, gây {damage} sát thương mỗi giây lên kẻ địch ở gần. (thiên phú Tu sĩ)"
+        "name": "Thoughtburn",
+        "description": "Channels shadow energy at the target area, damaging nearby enemies each second for {damage}. (Priest talent)"
       },
       "multi_shot": {
-        "name": "Bắn Tách",
-        "description": "Bắn một loạt tên vào khu vực mục tiêu, gây {damage} sát thương Vật lý lên kẻ địch trong bán kính 8 m. (thiên phú Thợ săn)"
+        "name": "Splitshot",
+        "description": "Loose a spread at the target area, dealing {damage} Physical damage to enemies within 8 yd. (Hunter talent)"
       },
       "prayer_of_healing": {
-        "name": "Hồi Phục Hợp Xướng",
-        "description": "Hồi {damage} máu cho đồng minh ở gần. (thiên phú Tu sĩ)"
+        "name": "Choirmend",
+        "description": "Heals nearby allies for {damage}. (Priest talent)"
       },
       "preparation": {
-        "name": "Dự Phòng",
-        "description": "Kết thúc thời gian hồi của Chạy nước rút, Né tránh và Biến mất. (thiên phú Đạo tặc)"
+        "name": "Contingency",
+        "description": "Finishes the cooldown on Sprint, Evasion, and Vanish. (Rogue talent)"
       },
       "presence_of_mind": {
-        "name": "Tâm Trí Tăng Tốc",
-        "description": "Khiến phép tiếp theo có thời gian niệm của bạn được thi triển tức thì. Kéo dài 60 giây. (thiên phú Pháp sư)"
+        "name": "Racing Mind",
+        "description": "Makes your next spell with a cast time instant. Lasts 60 sec. (Mage talent)"
       },
       "psychic_scream": {
-        "name": "Tiếng Thét Tâm Linh",
-        "description": "Khiến kẻ địch ở gần sợ hãi trong tối đa 4 giây. Sát thương có thể phá hiệu ứng. (thiên phú Tu sĩ)"
+        "name": "Terror Canticle",
+        "description": "Frightens nearby enemies for up to 4 sec. Damage may break the effect. (Priest talent)"
       },
       "shadowstep": {
-        "name": "Trượt Bóng",
-        "description": "Bước xuyên bóng tối về phía mục tiêu. (thiên phú Đạo tặc)"
+        "name": "Shadeslip",
+        "description": "Steps through the shadows toward your target. (Rogue talent)"
       },
       "silence": {
-        "name": "Câm Lặng",
-        "description": "Khiến mục tiêu câm lặng trong 4 giây. (thiên phú Tu sĩ)"
+        "name": "Hushword",
+        "description": "Silences the target for 4 sec. (Priest talent)"
       },
       "smoke_screen": {
-        "name": "Màn Khói",
-        "description": "Bạn biến mất trong đám khói, tăng 30% khả năng né tránh trong 8 giây."
+        "name": "Smoke Screen",
+        "description": "Vanish into a cloud of smoke, increasing your chance to dodge by 30% for 8 sec."
       },
       "spellsteal": {
-        "name": "Đánh Cắp Phép",
-        "description": "Đánh cắp một hiệu ứng phép thuật có lợi từ kẻ địch và chuyển nó sang bạn."
+        "name": "Spellsteal",
+        "description": "Steals a beneficial magic effect from an enemy, transferring it to yourself."
       },
       "startle_shot": {
-        "name": "Phát Bắn Giật Mình",
-        "description": "Một phát bắn hoang dại làm mục tiêu mất phương hướng trong {duration} giây. Bất kỳ sát thương nào cũng phá hiệu ứng."
+        "name": "Startle Shot",
+        "description": "A wild shot that disorients the target for {duration} sec. Any damage breaks the effect."
       },
       "tranquility": {
-        "name": "Khúc Ca Rừng Thưa",
-        "description": "Niệm năng lượng hồi phục trong 4 giây, hồi 42 đến 52 máu mỗi giây cho đồng minh trong phạm vi 30 m. (thiên phú Druid)"
+        "name": "Gladesong",
+        "description": "Channels restorative energy for 4 sec, healing allies within 30 yd for 42 to 52 each second. (Druid talent)"
       },
       "typhoon": {
-        "name": "Cuồng Phong",
-        "description": "Một luồng gió đẩy lùi mọi kẻ địch trong phạm vi 8 m và làm chúng choáng váng, giảm 50% tốc độ di chuyển trong 4 giây."
+        "name": "Typhoon",
+        "description": "A blast of wind knocks back all enemies within 8 yd and dazes them, slowing their movement by 50% for 4 sec."
       },
       "voidfeast": {
-        "name": "Yến Tiệc Hư Không",
-        "description": "Nuốt một hiệu ứng phép thuật (hiệu ứng có lợi từ kẻ địch hoặc có hại từ đồng minh) và hồi cho bạn 6% máu tối đa."
+        "name": "Voidfeast",
+        "description": "Devours a magic effect (a beneficial one from an enemy, or a harmful one from an ally) and heals you for 6% of your maximum health."
       },
       "pummel": {
         "name": "Đấm Dồn Dập",
@@ -6884,8 +6905,16 @@ export const vi_VN: EnTranslations = {
         "description": "Một đòn mở màn từ trạng thái ẩn thân cào xé kẻ địch gây sát thương vũ khí cộng thêm {damage} và gây sát thương chảy máu trong 9 giây. Tặng 1 điểm liên hoàn. Chỉ dùng được ở Hình Sói."
       },
       "revive_pet": {
-        "name": "Băng Bó",
-        "description": "Băng bó cho thú cưng. Nếu còn sống, thú cưng hồi tổng cộng {overTime} máu trong 12 giây, mỗi 3 giây hồi một lần. Nếu đã chết, thú cưng được hồi sinh với 35% máu."
+        "name": "Hồi Sinh Thú",
+        "description": "Hồi sinh thú cưng đã chết và đưa nó trở lại bên bạn."
+      },
+      "commanding_shout": {
+        "description": "Tăng Thể Lực của ngươi thêm {buff} trong 2 phút.",
+        "name": "Tiếng Hô Trợ Uy"
+      },
+      "rend": {
+        "description": "Gây vết thương cho mục tiêu, khiến chúng chảy máu nhận {damage} sát thương trong {duration} giây.",
+        "name": "Vết Rạch Sâu"
       }
     },
     "items": {
@@ -8099,16 +8128,16 @@ export const vi_VN: EnTranslations = {
         "name": "Dấu Ấn Anh Hùng"
       },
       "eastbrook_buckler": {
-        "name": "Khiên Nhỏ Đông Khê"
+        "name": "Eastbrook Buckler"
       },
       "eastbrook_greatsword": {
-        "name": "Đại Kiếm Đông Khê"
+        "name": "Eastbrook Greatsword"
       },
       "highwatch_greatsword": {
-        "name": "Đại Kiếm Highwatch"
+        "name": "Highwatch Greatsword"
       },
       "highwatch_wallshield": {
-        "name": "Khiên Tường Highwatch"
+        "name": "Highwatch Wallshield"
       },
       "morthens_cryptforged_hauberk": {
         "name": "Áo Giáp Lưới Rèn Hầm Mộ của Morthen"

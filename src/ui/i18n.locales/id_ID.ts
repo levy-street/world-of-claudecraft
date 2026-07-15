@@ -2,264 +2,160 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const id_ID: Partial<Record<TranslationKey, string>> = {
-  'entities.items.eastbrook_greatsword.name': 'Pedang Agung Eastbrook',
-  'entities.items.highwatch_greatsword.name': 'Pedang Agung Highwatch',
-  'entities.items.highwatch_wallshield.name': 'Perisai Tembok Highwatch',
-  'entities.items.eastbrook_buckler.name': 'Perisai Kecil Eastbrook',
-  'entities.abilities.avatar.name': 'Avatar',
-  'entities.abilities.avatar.description':
-    'Berubah menjadi kolosus selama 20 detik, melepaskan semua efek kontrol pada dirimu dan meningkatkan kerusakan yang kamu hasilkan sebesar 20%.',
-  'entities.abilities.bladestorm.name': 'Badai Pedang',
-  'entities.abilities.bladestorm.description':
-    'Menjadi badai baja yang berputar, menghantam semua musuh dalam jarak 8 meter sebesar {damage} setiap detik selama 4 detik.',
-  'entities.abilities.battle_stance.description':
-    'Kuda-kuda tempur agresif: kamu menghasilkan 10% lebih banyak amarah. Kuda-kuda bawaan untuk Arms dan Protection.',
-  'entities.abilities.battle_stance.name': 'Kuda-kuda Tempur',
-  'entities.abilities.berserker_stance.description':
-    'Kuda-kuda tempur nekat: serangan kritismu mendarat 3% lebih sering dan menghantam 3% lebih keras. Prajurit Fury selalu bertarung dalam kuda-kuda ini.',
-  'entities.abilities.berserker_stance.name': 'Kuda-kuda Berserker',
-  'entities.abilities.breachmaker.description':
-    'Menggempur target sebesar kerusakan senjata ditambah {damage} dan meretakkan pertahanannya: seranganmu sendiri terhadapnya memberikan 20% lebih banyak kerusakan selama 8 detik. (Arms)',
-  'entities.abilities.breachmaker.name': 'Breachmaker',
-  'entities.abilities.cleaving_blows.description':
-    'Panen Merah selalu mengembalikan satu muatan Twinstrike. (Fury)',
-  'entities.abilities.cleaving_blows.name': 'Pukulan Membelah',
-  'entities.abilities.deep_wounds.description':
-    'Pasif: Serangan Pelukai-mu membuat target berdarah, menerima kerusakan Fisik selama 6 detik. (Arms)',
-  'entities.abilities.deep_wounds.name': 'Luka Menganga',
-  'entities.abilities.defiant_bellow.description':
-    'Raungan penuh tantangan: semua musuh dalam 10 yard terhasut, terpaksa menyerangmu selama 3 detik. (Protection)',
-  'entities.abilities.defiant_bellow.name': 'Raungan Menantang',
-  'entities.abilities.diabolical_twinstrike.description':
-    'Saat Mengamuk, Twinstrike-mu memberikan 15% lebih banyak kerusakan. (Fury)',
-  'entities.abilities.diabolical_twinstrike.name': 'Twinstrike Diabolis',
-  'entities.abilities.die_by_sword.description':
-    'Kemampuan bertahan: selama 8 detik kamu menerima 30% lebih sedikit kerusakan dan mengelak jauh lebih banyak serangan.',
-  'entities.abilities.die_by_sword.name': 'Mati oleh Pedang',
-  'entities.abilities.emboldening_roar.description':
-    'Melepaskan auman penyemangat: kamu dan pemain kawan dalam 40 yard menjadi Bernyali, dan 3 kemampuanmu berikutnya dipastikan menjadi serangan kritis. (Fury)',
-  'entities.abilities.emboldening_roar.name': 'Auman Penyemangat',
-  'entities.abilities.enrage_passive.description':
-    'Pasif: saat Mengamuk kamu memberikan 7% lebih banyak kerusakan, menyerang 25% lebih cepat, dan bergerak 10% lebih cepat selama 4 detik. Pertumpahan Darah punya peluang 30% membuatmu Mengamuk; Panen Merah selalu melakukannya. (Fury)',
-  'entities.abilities.enrage_passive.name': 'Huru-hara',
-  'entities.abilities.faultline.description':
-    'Mengirim gelombang kejut melalui tanah: musuh di hadapanmu dalam 8 yard menerima {damage} kerusakan dan terpana selama 3 detik. (Protection)',
-  'entities.abilities.faultline.name': 'Faultline',
-  'entities.abilities.furious_mending.description':
-    'Selama 10 detik kamu menerima kerusakan 20% lebih sedikit, dan selama itu berlangsung Pertumpahan Darah-mu menyembuhkanmu sebesar 20% dari nyawa maksimummu. (Fury)',
-  'entities.abilities.furious_mending.name': 'Pemulihan Murka',
-  'entities.abilities.heroic_leap.description':
-    'Melompat ke area target dan memberikan {damage} kerusakan kepada musuh di sekitar saat mendarat.',
-  'entities.abilities.heroic_leap.name': 'Lompatan Perang',
-  'entities.abilities.intimidating_shout.description':
-    'Teriakan menggentarkan yang membuat hingga 5 musuh dalam 8 yard lari ketakutan selama 8 detik. Kerusakan dapat mematahkan efeknya.',
-  'entities.abilities.intimidating_shout.name': 'Teriakan Menggentarkan',
-  'entities.abilities.iron_resolve.description':
-    'Kertakkan gigi dan abaikan rasa sakit: menghabiskan hingga 40 amarah (minimal 20) untuk menyerap 4 kerusakan per amarah yang dihabiskan, bertahan hingga 10 detik. (Perlindungan)',
-  'entities.abilities.iron_resolve.name': 'Tekad Besi',
-  'entities.abilities.measured_fury.description':
-    'Amarah terukurmu mempertajam penghematanmu: kemampuanmu membutuhkan 10% lebih sedikit amarah. (Arms)',
-  'entities.abilities.measured_fury.name': 'Amarah Terukur',
-  'entities.abilities.piercing_howl.description':
-    'Teriakan menusuk yang memperlambat semua musuh dalam 15 yard sebesar 50% selama 8 detik.',
-  'entities.abilities.piercing_howl.name': 'Lolongan Menusuk',
-  'entities.abilities.raging_gale.description':
-    'Seketika menyerang dengan senjatamu dua kali, setiap pukulan memberikan 40% kerusakan senjata ditambah {damage}, dan menghasilkan 8 amarah. Menyimpan hingga 2 muatan. (Fury)',
-  'entities.abilities.raging_gale.name': 'Twinstrike',
-  'entities.abilities.raised_guard.description':
-    'Bersiaga di balik perisaimu: kamu menerima kerusakan Fisik 50% lebih sedikit selama 6 detik. Menyimpan hingga 2 muatan. (Protection)',
-  'entities.abilities.raised_guard.name': 'Perisai Terangkat',
-  'entities.abilities.rallying_cry.description':
-    'Lepaskan raungan gagah yang memberi kamu dan anggota party dalam jarak 40 meter tambahan 20% kesehatan maksimum selama 10 detik. Perlindungan: mereka juga menerima 5% lebih sedikit kerusakan selama durasinya.',
-  'entities.abilities.rallying_cry.name': 'Raungan Keberanian',
-  'entities.abilities.recklessness.description':
-    'Mengamuk: penghasilan amarahmu meningkat sebesar 50% dan peluang serangan kritismu sebesar 20% selama 12 detik.',
-  'entities.abilities.recklessness.name': 'Kenekatan',
-  'entities.abilities.red_harvest.description':
-    'Menghabiskan segalanya: menyerang tiga kali dalam amukan untuk 65% kerusakan senjata ditambah {damage} setiap serangan, selalu membuatmu Mengamuk. (Fury)',
-  'entities.abilities.red_harvest.name': 'Panen Merah',
-  'entities.abilities.revenge.description':
-    'Menyerang dalam busur lebar, memberikan kerusakan Fisik kepada semua musuh di hadapanmu. Di atas 5 target kerusakannya berkurang. Saat kamu mengelak atau menangkis, Balas Dendam berikutnya mungkin tidak membutuhkan amarah. (Protection)',
-  'entities.abilities.revenge.name': 'Balas Dendam',
-  'entities.abilities.sanguine_aura.description':
-    'Mengisi senjatamu dengan darah musuh-musuhmu: kamu dan sekutu jarak dekatmu mendapatkan 10% kecepatan serangan dan 10% kerusakan selama 20 detik.',
-  'entities.abilities.sanguine_aura.name': 'Aura Darah',
-  'entities.abilities.seasoned_soldier.description':
-    'Serangan otomatis kritismu menghasilkan 10% lebih banyak amarah. (Arms)',
-  'entities.abilities.seasoned_soldier.name': 'Serdadu Kawakan',
-  'entities.abilities.storm_bolt.description':
-    'Melemparkan senjatamu ke target sebesar {damage}, membuatnya terpana selama 3 detik.',
-  'entities.abilities.storm_bolt.name': 'Baut Badai',
-  'entities.abilities.sudden_death.description':
-    'Serangan otomatismu punya peluang membuatmu bisa merapal Ajal Dini pada target dengan kesehatan berapa pun, tanpa membutuhkan amarah. (Arms)',
-  'entities.abilities.sudden_death.name': 'Kematian Mendadak',
-  'entities.abilities.sweeping_strikes.description':
-    'Selama 12 detik serangan target-tunggalmu juga menghantam 1 musuh terdekat dengan kerusakan penuh. (Arms)',
-  'entities.abilities.sweeping_strikes.name': 'Busur Melebar',
-  'entities.abilities.victory_rush.description':
-    'Menyerang sebesar kerusakan senjata ditambah {damage} dan memulihkan 20% dari nyawa maksimummu. Hanya dapat digunakan dalam 20 detik setelah membunuh musuh.',
-  'entities.abilities.victory_rush.name': 'Terjangan Kemenangan',
-  'hudChrome.specPanel.complexity': 'Kompleksitas',
-  'hudChrome.specPanel.complexityHigh': 'Tinggi',
-  'hudChrome.specPanel.complexityLow': 'Rendah',
-  'hudChrome.specPanel.complexityMedium': 'Sedang',
-  'hudChrome.specPanel.exampleAbilities': 'Contoh kemampuan',
-  'hudChrome.specPanel.primaryAttr': 'Atribut utama',
-  'hudChrome.specPanel.selectSpec': 'Pilih spesialisasi',
-  'hudChrome.specPanel.viewTalents': 'Lihat talenta',
-  'hudChrome.talentRows.comingSoon': 'Segera hadir',
-  'hudChrome.talentRows.defaultLoadout': 'Setelan bawaan',
-  'hudChrome.talentRows.tab': 'Pilihan',
-  'hudChrome.talentRows.readoutSummary': 'Talenta: {head}, {spent}/{total} baris dipilih.',
-  'entities.abilities.aspect_of_the_wild.name': 'Rupa Taring Liar',
-  'entities.abilities.aspect_of_the_wild.description':
-    'Mengilhami sekutu dalam jarak 30 m dengan kekuatan liar, meningkatkan daya serang mereka sebesar 45 dan kecepatan serangan sebesar 5% selama 5 menit. (talenta Hunter)',
-  'entities.abilities.aura_surge.name': 'Pantulan Fajar',
-  'entities.abilities.aura_surge.description':
-    'Melempar perisai tempa fajar yang menghasilkan {damage} kerusakan Suci, membungkam target utama selama 2 detik, lalu memantul ke hingga 2 musuh lain dalam jarak 10 yard dengan 75% kerusakan tiap pantulan. (talenta Paladin)',
-  'entities.abilities.avenging_wrath.name': 'Sayap Pembalas',
-  'entities.abilities.avenging_wrath.description':
-    'Memanggil kekuatan pembalasan, meningkatkan daya serangmu sebesar 60 dan kekuatan sihir sebesar 30 selama 20 detik. (talenta Paladin)',
-  'entities.abilities.berserk.name': 'Kabut Merah',
-  'entities.abilities.berserk.description':
-    'Meningkatkan daya serangmu sebesar 70 selama 15 detik. (talenta Druid)',
-  'entities.abilities.blink.name': 'Langkah Kilat',
-  'entities.abilities.blink.description':
-    'Menteleportasimu 15 m ke depan dan membebaskan efek pengakaran. (talenta Mage)',
-  'entities.abilities.bloodlust.name': 'Genderang Perang',
-  'entities.abilities.bloodlust.description':
-    'Membuat sekutu dalam jarak 30 m mengamuk, meningkatkan kecepatan serangan mereka sebesar 30% selama 15 detik. (talenta Shaman)',
-  'entities.abilities.chain_lightning.name': 'Petir Bercabang',
-  'entities.abilities.chain_lightning.description':
-    'Melontarkan petir ke area target, menghasilkan {damage} kerusakan kepada musuh di dekatnya. (talenta Shaman)',
-  'entities.abilities.chaos_bolt.name': 'Baut Reruntuhan',
-  'entities.abilities.chaos_bolt.description':
-    'Melontarkan panah api kacau yang menghasilkan {damage} kerusakan Api. (talenta Warlock)',
-  'entities.abilities.cloak_of_shadows.name': 'Jubah Bayang',
-  'entities.abilities.cloak_of_shadows.description':
-    'Menyelimutimu dengan bayangan dan menyerap 420 kerusakan selama 5 detik. (talenta Rogue)',
-  'entities.abilities.cone_of_cold.name': 'Sapuan Beku',
-  'entities.abilities.cone_of_cold.description':
-    'Menghantam musuh di dekatnya dengan embun beku dan menghasilkan {damage} kerusakan Beku. (kemampuan khas Frost)',
-  'entities.abilities.curse_of_exhaustion.name': 'Kutuk Timah',
-  'entities.abilities.curse_of_exhaustion.description':
-    'Mengutuk target, mengurangi kecepatan geraknya sebesar 30% selama 12 detik. (talenta Warlock)',
-  'entities.abilities.death_coil.name': 'Kumparan Kubur',
-  'entities.abilities.death_coil.description':
-    'Menghantam musuh dengan {damage} kerusakan Bayangan, lalu membuatnya ketakutan selama 3 detik. (talenta Warlock)',
-  'entities.abilities.deep_freeze.name': 'Embun Mati',
-  'entities.abilities.deep_freeze.description':
-    'Membekukan target sepenuhnya, menghasilkan {damage} kerusakan Beku dan membuatnya pingsan selama 4 detik. (talenta Mage)',
-  'entities.abilities.desperate_prayer.name': 'Doa Terakhir',
-  'entities.abilities.desperate_prayer.description':
-    'Langsung memulihkan {damage} nyawamu. (talenta Priest)',
-  'entities.abilities.deterrence.name': 'Penjaga Duri',
-  'entities.abilities.deterrence.description':
-    'Meningkatkan peluang menghindarmu sebesar 50 poin persentase selama 10 detik. (talenta Hunter)',
-  'entities.abilities.divine_shield.name': 'Pelindung Cahaya',
-  'entities.abilities.divine_shield.description':
-    'Melindungimu dengan kekuatan suci dan menyerap 900 kerusakan selama 8 detik. (talenta Paladin)',
-  'entities.abilities.earthbind.name': 'Bumi Mencengkeram',
-  'entities.abilities.earthbind.description':
-    'Mengikat musuh di dekatnya ke tanah dan mengakarkan mereka selama 2 detik. (talenta Shaman)',
-  'entities.abilities.evocation.name': 'Sumur Eter',
-  'entities.abilities.evocation.description': 'Langsung memulihkan 220 mana. (talenta Mage)',
-  'entities.abilities.frenzied_regeneration.name': 'Pemulihan Liar',
-  'entities.abilities.frenzied_regeneration.description':
-    'Memulihkan 180 nyawa selama 10 detik. Hanya dalam Bentuk Beruang. (talenta Druid)',
-  'entities.abilities.frost_trap.name': 'Jerat Rima',
-  'entities.abilities.frost_trap.description':
-    'Membekukan musuh di area target selama 3 detik sehingga mereka tidak dapat bergerak atau bertindak. (talenta Hunter)',
-  'entities.abilities.ghostly_strike.name': 'Serangan Arwah',
-  'entities.abilities.ghostly_strike.description':
-    'Menghantam musuh dengan kerusakan senjata ditambah {damage}, meningkatkan penghindaran sejenak, dan memberikan 1 poin kombo. (talenta Rogue)',
-  'entities.abilities.hammer_of_wrath.name': 'Palu Berdentang',
-  'entities.abilities.hammer_of_wrath.description':
-    'Melempar palu suci kepada musuh yang terluka dan menghasilkan {damage} kerusakan Suci. Hanya dapat digunakan di bawah 20% nyawa. (talenta Paladin)',
-  'entities.abilities.healing_stream.name': 'Mata Air',
-  'entities.abilities.healing_stream.description':
-    'Memulihkan 120 nyawa target sekutu selama 12 detik. (talenta Shaman)',
-  'entities.abilities.holy_wrath.name': 'Murka Santo',
-  'entities.abilities.holy_wrath.description':
-    'Melepaskan kekuatan suci dan menghasilkan {damage} kerusakan kepada musuh di dekatnya. (talenta Paladin)',
-  'entities.abilities.howl_of_terror.name': 'Lolongan Ngeri',
-  'entities.abilities.howl_of_terror.description':
-    'Membuat musuh di dekatnya ketakutan hingga 3 detik. Kerusakan dapat membatalkan efek ini. (talenta Warlock)',
-  'entities.abilities.ice_block.name': 'Peti Es',
-  'entities.abilities.ice_block.description':
-    'Membungkusmu dalam es dan menyerap 600 kerusakan selama 8 detik. Kamu tidak dapat bertindak selama terbungkus. Gunakan lagi untuk membatalkan. (talenta Mage)',
-  'entities.abilities.inner_focus.name': 'Pikiran Hening',
-  'entities.abilities.inner_focus.description':
-    'Membuat mantra berikutnya tidak memerlukan biaya. Berlangsung 60 detik. (talenta Priest)',
-  'entities.abilities.innervate.name': 'Getah Hidup',
-  'entities.abilities.innervate.description':
-    'Getah hidup mengalir dalam dirimu selama 10 detik dan memulihkan 20 sumber dayamu saat ini dalam gelombang: mana, amarah, atau energi. Berganti wujud tidak memutusnya. Tidur, pingsan, atau stasis menghentikan aliran getah. (talenta Druid)',
-  'entities.abilities.meteor.name': 'Batu Langit',
-  'entities.abilities.meteor.description':
-    'Memanggil meteor ke area target dan menghasilkan {damage} kerusakan Api, lalu membakar musuh di sana dengan 12 sampai 18 kerusakan Api setiap 2 detik selama 6 detik. (talenta Mage)',
-  'entities.abilities.mind_sear.name': 'Bakar Pikir',
-  'entities.abilities.mind_sear.description':
-    'Menyalurkan energi Bayangan ke area target dan menghasilkan {damage} kerusakan setiap detik kepada musuh di dekatnya. (talenta Priest)',
-  'entities.abilities.multi_shot.name': 'Tembakan Pecah',
-  'entities.abilities.multi_shot.description':
-    'Menembakkan rentetan ke area target dan menghasilkan {damage} kerusakan Fisik kepada musuh dalam radius 8 m. (talenta Hunter)',
-  'entities.abilities.prayer_of_healing.name': 'Penyembuhan Koor',
-  'entities.abilities.prayer_of_healing.description':
-    'Memulihkan {damage} nyawa sekutu di dekatnya. (talenta Priest)',
-  'entities.abilities.preparation.name': 'Rencana Cadangan',
-  'entities.abilities.preparation.description':
-    'Mengakhiri waktu isi ulang Lari Cepat, Mengelak, dan Lenyap. (talenta Rogue)',
-  'entities.abilities.presence_of_mind.name': 'Pikiran Melaju',
-  'entities.abilities.presence_of_mind.description':
-    'Membuat mantra berikutnya yang memiliki waktu perapalan menjadi seketika. Berlangsung 60 detik. (talenta Mage)',
-  'entities.abilities.psychic_scream.name': 'Jerit Psikis',
-  'entities.abilities.psychic_scream.description':
-    'Membuat musuh di dekatnya ketakutan hingga 4 detik. Kerusakan dapat membatalkan efek ini. (talenta Priest)',
-  'entities.abilities.shadowstep.name': 'Selip Bayang',
-  'entities.abilities.shadowstep.description':
-    'Melangkah menembus bayangan menuju targetmu. (talenta Rogue)',
-  'entities.abilities.silence.name': 'Senyap',
-  'entities.abilities.silence.description': 'Membungkam target selama 4 detik. (talenta Priest)',
-  'entities.abilities.tranquility.name': 'Lagu Rimba',
-  'entities.abilities.tranquility.description':
-    'Menyalurkan energi pemulihan selama 4 detik, memulihkan 42 sampai 52 nyawa sekutu dalam jarak 30 m setiap detik. (talenta Druid)',
-  'entities.abilities.cleansing_verdict.name': 'Vonis Pemurnian',
-  'entities.abilities.cleansing_verdict.description':
-    'Menghapus efek sihir berbahaya dari target sekutu dan menyembuhkannya sebesar {damage} dengan sihir Suci.',
-  'entities.abilities.smoke_screen.name': 'Tabir Asap',
-  'entities.abilities.smoke_screen.description':
-    'Kamu menghilang ke dalam kepulan asap, meningkatkan peluang menghindar sebesar 30% selama 8 dtk.',
-  'entities.abilities.spellsteal.name': 'Pencurian Mantra',
-  'entities.abilities.spellsteal.description':
-    'Mencuri efek sihir menguntungkan dari musuh dan memindahkannya kepadamu.',
-  'entities.abilities.startle_shot.name': 'Tembakan Kejut',
-  'entities.abilities.startle_shot.description':
-    'Tembakan liar yang membuat target kehilangan arah selama {duration} dtk. Kerusakan apa pun mengakhiri efeknya.',
-  'entities.abilities.typhoon.name': 'Topan',
-  'entities.abilities.typhoon.description':
-    'Hembusan angin mendorong mundur semua musuh dalam jarak 8 m dan membuat mereka linglung, mengurangi kecepatan gerak sebesar 50% selama 4 dtk.',
-  'entities.abilities.voidfeast.name': 'Santapan Kehampaan',
-  'entities.abilities.voidfeast.description':
-    'Melahap efek sihir (efek menguntungkan dari musuh atau efek berbahaya dari sekutu) dan memulihkan 6% nyawa maksimummu.',
-  'hudChrome.abilityError.shieldRequired': 'Kamu harus memakai perisai.',
+  'entities.abilities.ironhold.description':
+    'Bertahan di balik perlindunganmu, mengurangi semua kerusakan yang diterima sebesar 40% selama 8 detik.',
+  'entities.abilities.ironhold.name': 'Cengkeraman Besi',
+  'entities.abilities.primal_reflexes.description':
+    'Nalurimu menajam, meningkatkan peluang menghindar sebesar 50% selama 6 detik.',
+  'entities.abilities.primal_reflexes.name': 'Refleks Purba',
+  'entities.abilities.sacred_bulwark.description':
+    'Selama {duration} detik, serangan musuh berikutnya yang seharusnya membunuhmu ditolak, dan kamu dipulihkan menjadi 35% kesehatan.',
+  'entities.abilities.sacred_bulwark.name': 'Benteng Suci',
   'guide.family.reptile.desc':
-    'Pemburu berdarah dingin dengan desis dan gertakan khas mereka sendiri, berbeda dari binatang berdarah panas.',
-  'guide.family.reptile.name': 'Reptilia',
-  'hudChrome.bags.rightClickDestroy': 'Shift-klik kanan untuk menghancurkan',
-  'hudChrome.cameraPrompt.changeLater':
-    'Kamu dapat mengubahnya nanti di menu Esc, Pengaturan Tombol.',
-  'hudChrome.cameraPrompt.classicDesc': 'Tahan klik kanan dan gerakkan mouse untuk memutar kamera.',
+    'Pemburu berdarah dingin dengan desis dan cakitan khas mereka sendiri, berbeda dari hewan berdarah panas.',
+  'guide.family.reptile.name': 'Reptil',
+  'hudChrome.auraEffect.damageReduction': 'Mengurangi semua kerusakan yang diterima sebesar {pct}%',
+  'hudChrome.auraEffect.guardianWard':
+    'Serangan musuh mematikan berikutnya memulihkanmu menjadi {pct}% kesehatan',
+  'hudChrome.bags.dragDestroyHint': 'Seret ke dunia untuk menghancurkan',
+  'hudChrome.bags.dragEquipHint': 'Seret ke karaktermu untuk memakai',
+  'hudChrome.bags.reorderNeedsRecent':
+    'Hapus filter dan urutkan berdasarkan Terbaru untuk mengatur ulang tasmu',
+  'hudChrome.bags.rightClickDestroy': 'Klik kanan untuk menghancurkan',
+  'hudChrome.cameraPrompt.changeLater': 'Kamu dapat mengubah ini nanti di Esc, Ikatan Tombol.',
+  'hudChrome.cameraPrompt.classicDesc':
+    'Tahan klik kanan dan gerakkan tetikus untuk memutar kamera.',
   'hudChrome.cameraPrompt.classicTitle': 'Kamera Klasik',
   'hudChrome.cameraPrompt.confirm': 'Konfirmasi',
-  'hudChrome.cameraPrompt.intro': 'Pilih bagaimana kamera mengikuti karaktermu.',
-  'hudChrome.cameraPrompt.mouseDesc': 'Gerakkan mouse untuk memutar kamera tanpa menahan tombol.',
+  'hudChrome.cameraPrompt.intro': 'Pilih cara kamera mengikuti karaktermu.',
+  'hudChrome.cameraPrompt.mouseDesc':
+    'Gerakkan tetikus untuk memutar kamera tanpa menahan tombol apa pun.',
   'hudChrome.cameraPrompt.title': 'Pilih Kameramu',
-  'hudChrome.discord.link.joinServer': 'Langsung bergabung dengan server Discord',
+  'hudChrome.discord.link.joinServer': 'Langsung bergabung ke server Discord',
+  'hudChrome.discord.roleTag.contentcreator': 'Kreator Konten',
+  'hudChrome.discord.roleTag.juniormods': 'Moderator Muda',
+  'hudChrome.discord.roleTag.legend': 'LEGENDA',
+  'hudChrome.discord.roleTag.seniormods': 'Moderator Senior',
+  'hudChrome.discord.roleTag.shill': 'PENDUKUNG',
+  'hudChrome.finder.accept': 'Terima',
+  'hudChrome.finder.acceptApplicantAria': 'Terima {name}',
+  'hudChrome.finder.accepted': '{accepted} dari {size} dikonfirmasi',
+  'hudChrome.finder.acceptedWait': 'Menunggu yang lainnya...',
+  'hudChrome.finder.activity': 'Aktivitas',
+  'hudChrome.finder.applicants': 'Pelamar',
+  'hudChrome.finder.apply': 'Lamar',
+  'hudChrome.finder.attunement': 'Memerlukan penyelarasan: {quest}',
+  'hudChrome.finder.back': 'Kembali',
+  'hudChrome.finder.blockedLevel': 'Khusus level {min} hingga {max}',
+  'hudChrome.finder.blockedSpec': 'Memerlukan spesialisasi',
+  'hudChrome.finder.boardEmpty': 'Tidak ada daftar saat ini. Buat satu!',
+  'hudChrome.finder.boardLeaderGate': 'Hanya pemimpin partaimu yang dapat menerbitkan daftar.',
+  'hudChrome.finder.chooseActivities': 'Pilih aktivitas',
+  'hudChrome.finder.clock': '{minutes} menit {seconds} detik',
+  'hudChrome.finder.close': 'Tutup',
+  'hudChrome.finder.closeListing': 'Tutup daftar',
+  'hudChrome.finder.cooldownNote': 'Kamu dapat mengantri lagi dalam {seconds} detik.',
+  'hudChrome.finder.decline': 'Tolak',
+  'hudChrome.finder.declineApplicantAria': 'Tolak {name}',
+  'hudChrome.finder.encounters': 'Pertemuan',
+  'hudChrome.finder.entrance': 'Pintu masuk: {zone}',
+  'hudChrome.finder.finalBoss': 'Bos terakhir',
+  'hudChrome.finder.freeRoles': 'Semua peran diterima',
+  'hudChrome.finder.heroic': 'Heroik',
+  'hudChrome.finder.heroicMarks': 'Tanda Heroik: {count} per pemain',
+  'hudChrome.finder.joinQueue': 'Masuk antrean',
+  'hudChrome.finder.kindDungeon': 'Penjara Bawah Tanah',
+  'hudChrome.finder.kindRaid': 'Serangan Massal',
+  'hudChrome.finder.kindSolo': 'Petualangan solo',
+  'hudChrome.finder.leader': 'Pemimpin: {name}',
+  'hudChrome.finder.leaderNote': 'Hanya pemimpin partaimu yang dapat mengantrekan grup.',
+  'hudChrome.finder.leaveQueue': 'Tinggalkan antrean',
+  'hudChrome.finder.levelClass': 'Lvl {level} {className}',
+  'hudChrome.finder.levelOne': 'Tingkat {level}',
+  'hudChrome.finder.levels': 'Level {min} hingga {max}',
+  'hudChrome.finder.lockedFor': 'Terkunci sekitar {minutes} menit',
+  'hudChrome.finder.lockoutDaily': 'Penguncian harian pada bos terakhir',
+  'hudChrome.finder.lockoutNone': 'Tanpa penguncian',
+  'hudChrome.finder.lootChance': 'Peluang jatuhan tambahan:',
+  'hudChrome.finder.lootGuaranteed': 'Salah satu dari ini selalu jatuh:',
+  'hudChrome.finder.lootHeroic': 'Bonus heroik, salah satu dari ini selalu jatuh:',
+  'hudChrome.finder.lootMaybe': 'Paling banyak salah satu dari ini mungkin jatuh:',
+  'hudChrome.finder.mech.deathless_rage': 'Murka Abadi (diputus di wardstone)',
+  'hudChrome.finder.mech.deathstalker_cleave': 'Tebasan Deathstalker (tebasan ke depan)',
+  'hudChrome.finder.mech.enrage': 'Mengamuk saat darah menipis',
+  'hudChrome.finder.mech.grave_cleaver': 'Penebas Kubur (tebasan ke depan)',
+  'hudChrome.finder.mech.gravebreaker': 'Pemecah Kubur (kerucut ke depan, arahkan menjauhi raid)',
+  'hudChrome.finder.mech.lunar_tide': 'Arus Bulan (kerusakan area berdenyut)',
+  'hudChrome.finder.mech.mana_burn': 'Berkah Layu (membakar mana)',
+  'hudChrome.finder.mech.mist_surge': 'Lonjakan Kabut (kerusakan area berdenyut)',
+  'hudChrome.finder.mech.mortal_wound': 'Luka Terlupakan (mengurangi penyembuhan yang diterima)',
+  'hudChrome.finder.mech.necrotic_shockwave': 'Gelombang Kejut Nekrotik (kerusakan area berat)',
+  'hudChrome.finder.mech.profane_mending': 'Pemulihan Najis (menyembuhkan sekutunya)',
+  'hudChrome.finder.mech.raise_fallen': 'Bangkitkan Yang Gugur (gelombang bala bantuan berkala)',
+  'hudChrome.finder.mech.reaping_arc': 'Busur Penuai (tebasan ke depan)',
+  'hudChrome.finder.mech.sealbreak_shockwave': 'Gelombang Kejut Pemecah Segel (ledakan area)',
+  'hudChrome.finder.mech.shadow_nova': 'Nova Bayangan (ledakan area)',
+  'hudChrome.finder.mech.shadow_pulse': 'Denyut Bayangan (kerusakan area berdenyut)',
+  'hudChrome.finder.mech.shuddering_stomp': 'Hentakan Gemetar (stun area)',
+  'hudChrome.finder.mech.soul_rend':
+    'Robek Jiwa (pemain yang ditandai harus menyebar dan disembuhkan)',
+  'hudChrome.finder.mech.summons_adds': 'Memanggil bala bantuan',
+  'hudChrome.finder.mech.wardstones': 'Saluran Wardstone (transisi fase)',
+  'hudChrome.finder.needs': 'Membutuhkan {roles}',
+  'hudChrome.finder.needsSpec': 'Pilih spesialisasi untuk menggunakan Pencari Dungeon.',
+  'hudChrome.finder.noApplicants': 'Belum ada pelamar.',
+  'hudChrome.finder.normal': 'Biasa',
+  'hudChrome.finder.openListings': 'Daftar terbuka',
+  'hudChrome.finder.pct': '{pct} persen',
+  'hudChrome.finder.proposalRole': 'Peranmu: {role}',
+  'hudChrome.finder.proposalTitle': 'Grup ditemukan: {name}',
+  'hudChrome.finder.publish': 'Terbitkan',
+  'hudChrome.finder.publishListing': 'Terbitkan daftar',
+  'hudChrome.finder.remaining': '{seconds} detik untuk menjawab',
+  'hudChrome.finder.roleCount': '{count} orang {role}',
+  'hudChrome.finder.roleDps': 'Penyerang',
+  'hudChrome.finder.roleHealer': 'Penyembuh',
+  'hudChrome.finder.roleTank': 'Pelindung',
+  'hudChrome.finder.showOnMap': 'Tampilkan di Peta',
+  'hudChrome.finder.slotState': '{role}: {accepted} dari {total} siap',
+  'hudChrome.finder.slots': '{size} dari {capacity}',
+  'hudChrome.finder.summoned': 'Wali yang dipanggil',
+  'hudChrome.finder.syncing': 'Menunggu realm...',
+  'hudChrome.finder.tabBoard': 'Grup Premade',
+  'hudChrome.finder.tabCatalogue': 'Katalog',
+  'hudChrome.finder.tabQueue': 'Pencocokan Cepat',
+  'hudChrome.finder.tagFastRun': 'Berlari cepat',
+  'hudChrome.finder.tagFirstRun': 'Kali pertama',
+  'hudChrome.finder.tagFullClear': 'Bersih tuntas',
+  'hudChrome.finder.tagLearning': 'Pemula diterima',
+  'hudChrome.finder.tagQuestRun': 'Misi pencarian',
+  'hudChrome.finder.title': 'Pencari Dungeon',
+  'hudChrome.finder.travelNote':
+    'Grup terbentuk di tempat semua orang berdiri. Berjalanlah bersama menuju pintu masuk; tidak ada yang diteleportasi.',
+  'hudChrome.finder.waited': 'Waktu dalam antrean: {time}',
+  'hudChrome.finder.withdraw': 'Cabut lamaran',
+  'hudChrome.finder.yourListing': 'Daftarmu',
+  'hudChrome.finder.yourRoles': 'Peranmu',
+  'hudChrome.gathering.notReady': 'Simpul sumber daya ini belum muncul kembali untukmu.',
+  'hudChrome.keybinds.sheathe': 'Sarungkan/Cabut Senjata',
   'hudChrome.meters.autoShowHint':
-    'Baris muncul secara otomatis setelah kelompokmu memberikan kerusakan atau penyembuhan, dan segmen ini menutup beberapa detik setelah pertarungan berakhir.',
-  'hudChrome.petFeed.disabledFullHp': 'Kesehatan peliharaan sudah penuh',
+    'Baris muncul secara otomatis setelah partaimu memberikan kerusakan atau penyembuhan, dan segmen ini tertutup beberapa detik setelah pertarungan berakhir.',
+  'hudChrome.options.showAttackButton': 'Tampilkan Tombol Serang',
+  'hudChrome.petFeed.disabledFullHp': 'Peliharaan sudah dalam kondisi darah penuh',
   'hudChrome.petFeed.disabledNoFood':
     'Tidak ada makanan di tasmu yang dapat menyembuhkan peliharaanmu',
+  'hudChrome.plurals.finderPartySize.few': '{count} pemain',
+  'hudChrome.plurals.finderPartySize.many': '{count} pemain',
+  'hudChrome.plurals.finderPartySize.one': '{count} pemain',
+  'hudChrome.plurals.finderPartySize.other': '{count} pemain',
+  'hudChrome.statInfo.desc.hitRating':
+    'Rating pukulan dari perlengkapan dan bonus setelanmu, mengurangi seberapa sering seranganmu meleset dan mantramu ditangkal, terutama melawan musuh level lebih tinggi. Sekitar 10 rating memberikan 1% hit.',
+  'hudChrome.statInfo.names.hitRating': 'Rating Pukulan',
+  'abilityUi.actionBar.attackRemoveHint':
+    'Klik kanan untuk menghapusnya dari bilah dan mengosongkan slot.',
+  'loading.realmFull': 'Dunia ini sedang penuh. Coba lagi dalam beberapa menit.',
+  'loading.tooManyConnections':
+    'Terlalu banyak koneksi ke dunia ini dari jaringanmu. Tutup jendela permainan ekstra atau coba lagi dalam beberapa menit.',
   'loading.tips.classes':
     'Kiat: masing-masing dari 9 kelas memiliki gaya bermain berbeda. Cobalah beberapa sebelum menetapkan pilihan.',
   'loading.tips.dungeons':
@@ -1920,6 +1816,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cleave.description':
     'Sabetan menyapu yang menghantam semua musuh di hadapanmu untuk {damage} kerusakan.',
   'entities.abilities.cleave.name': 'Busur Penuai',
+  'entities.abilities.commanding_shout.description':
+    'Meningkatkan Staminamu sebesar {buff} selama 2 menit.',
+  'entities.abilities.commanding_shout.name': 'Seruan Penguat',
   'entities.abilities.concussive_shot.description':
     'Membuat target linglung sebesar {damage} kerusakan, memperlambat gerakan sebesar 50% selama 4 detik.',
   'entities.abilities.concussive_shot.name': 'Tembakan Pengguncang',
@@ -2171,14 +2070,17 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rejuvenation.description':
     'Menyembuhkan target sebesar {damage} selama 12 detik.',
   'entities.abilities.rejuvenation.name': 'Wildbloom',
+  'entities.abilities.rend.description':
+    'Melukai target, membuatnya berdarah sebesar {damage} kerusakan selama {duration} detik.',
+  'entities.abilities.rend.name': 'Sayatan Dalam',
   'entities.abilities.renew.description': 'Menyembuhkan target sebesar {damage} selama 15 detik.',
   'entities.abilities.renew.name': 'Rahmat Berlanjut',
   'entities.abilities.retribution_aura.description':
     'Menyelimuti dirimu dengan energi suci selama 30 menit, memberikan 5 kerusakan Suci kepada musuh mana pun yang menyerangmu dari jarak dekat.',
   'entities.abilities.retribution_aura.name': 'Aura Ganjaran',
   'entities.abilities.revive_pet.description':
-    'Mengobati peliharaanmu. Jika masih hidup, memulihkan total {overTime} kesehatan selama 12 detik dengan pemulihan setiap 3 detik. Jika mati, menghidupkannya kembali dengan 35% kesehatan.',
-  'entities.abilities.revive_pet.name': 'Obati',
+    'Menghidupkan kembali peliharaanmu yang mati dan mengembalikannya ke sisimu.',
+  'entities.abilities.revive_pet.name': 'Hidupkan Peliharaan',
   'entities.abilities.righteous_fury.description':
     'Meningkatkan ancaman yang dihasilkan oleh kerusakan Suci-mu sebesar 60% selama 30 menit. Landasan utama paladin penahan serangan.',
   'entities.abilities.righteous_fury.name': 'Sumpah Membara',
@@ -3740,6 +3642,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.charge':
     'Menerjang musuh yang jauh untuk membuka pertarungan dengan pingsan singkat.',
   'guide.abilityHook.cheap_shot': 'Membuka dari siluman dengan pingsan dan awalan poin combo.',
+  'guide.abilityHook.commanding_shout':
+    'Memperkuat stamina agar semua orang lebih tahan lama dalam pertarungan.',
   'guide.abilityHook.concussive_shot':
     'Membuat sasaran limbung dan melambatkannya sehingga tak dapat menjangkaumu.',
   'guide.abilityHook.conjure_food':
@@ -3802,6 +3706,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Ayunan jarak dekat yang keras untuk saat sesuatu memperpendek jarak denganmu.',
   'guide.abilityHook.rejuvenation':
     'Dirapalkan seketika dan menyembuhkan sekutu seiring waktu, sehingga kamu bisa terus bertindak.',
+  'guide.abilityHook.rend': 'Membuka pendarahan yang menggerus sasaran seiring waktu.',
   'guide.abilityHook.renew':
     'Penyembuhan yang menggerogoti seiring waktu, bagus dirapalkan lalu terus bergerak.',
   'guide.abilityHook.rockbiter_weapon':
@@ -5129,7 +5034,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hud.pet.rename': 'Ganti Nama Peliharaan',
   'hud.pet.renameConfirm': 'Ganti Nama',
   'hud.pet.renameLabel': 'Pilih nama baru untuk peliharaan.',
-  'hud.pet.revive': 'Obati',
+  'hud.pet.revive': 'Hidupkan Peliharaan',
   'hud.pet.stanceDesc': 'Klik untuk memilih Pasif, Bertahan, atau Agresif.',
   'hud.pet.stanceTitle': 'Sikap Peliharaan',
   'hud.pet.taunt': 'Provokasi',
@@ -5830,7 +5735,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'itemUi.slots.helmet': 'Helm',
   'itemUi.slots.legs': 'Tungkai',
   'itemUi.slots.mainhand': 'Tangan Utama',
-  'itemUi.slots.offhand': 'Tangan Sekunder',
   'itemUi.slots.shoulder': 'Bahu',
   'itemUi.slots.waist': 'Pinggang',
   'itemUi.stats.agi': 'Kegesitan',
@@ -6586,11 +6490,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.roleTag.levyst': 'Levy St',
   'hudChrome.discord.roleTag.devs': 'Pengembang',
   'hudChrome.discord.roleTag.mods': 'Moderator',
-  'hudChrome.discord.roleTag.seniormods': 'Moderator Senior',
-  'hudChrome.discord.roleTag.juniormods': 'Moderator Junior',
-  'hudChrome.discord.roleTag.contentcreator': 'Kreator Konten',
-  'hudChrome.discord.roleTag.legend': 'LEGENDA',
-  'hudChrome.discord.roleTag.shill': 'PROMOTOR',
   'hudChrome.discord.roleTag.artists': 'Seniman',
   'hudChrome.discord.guildMember': 'Anggota terverifikasi',
   'hudChrome.discord.notMember': 'Belum berada di server',
@@ -7661,7 +7560,4 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.wtype.staff': 'Tongkat',
   'hudChrome.wocStore.wtype.sword': 'Pedang',
   'hudChrome.wocStore.wtype.wand': 'Tongkat sihir',
-  'guide.abilityHook.revenge':
-    'Menyapu musuh di depanmu dan dapat menjadi gratis setelah menghindar atau menangkis.',
-  'guide.abilityHook.hamstring': 'Melumpuhkan gerakan musuh agar tidak dapat melarikan diri.',
 };

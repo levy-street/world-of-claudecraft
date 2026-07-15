@@ -5,277 +5,172 @@
 // translate that key. The build (scripts/i18n_build.mjs) unflattens this map and
 // overlays it onto nested `en` to produce the dense resolved table; any key here
 // must be a real `en` leaf path: keys are typed `Partial<Record<TranslationKey,
-// string>>` so tsc rejects a structurally-wrong key, plus
-// tests/i18n_overlay_key_membership.test.ts catches a typo'd entity id the
-// template-literal key type cannot. Overlays are SPARSE: an
+// string>>` against the build-generated flat key union, so tsc rejects any key
+// that is not an exact `en` leaf path, typo'd entity ids included. Overlays are SPARSE: an
 // untranslated key is omitted and the build fills it from English, then the
 // registry (src/ui/i18n.status.json) marks it `pending`.
 
 import type { TranslationKey } from '../i18n.catalog';
 
 export const fr_FR: Partial<Record<TranslationKey, string>> = {
-  'entities.items.eastbrook_greatsword.name': "Espadon d'Eastbrook",
-  'entities.items.highwatch_greatsword.name': 'Espadon de Highwatch',
-  'entities.items.highwatch_wallshield.name': 'Pavois de Highwatch',
-  'entities.items.eastbrook_buckler.name': "Rondache d'Eastbrook",
-  'entities.abilities.avatar.name': 'Avatar',
-  'entities.abilities.avatar.description':
-    'Vous vous transformez en colosse pendant 20 s, ce qui dissipe tous les effets de contrôle vous affectant et augmente de 20% les dégâts que vous infligez.',
-  'entities.abilities.bladestorm.name': 'Tempête de lames',
-  'entities.abilities.bladestorm.description':
-    'Vous devenez une tempête d’acier tourbillonnante qui inflige {damage} points de dégâts chaque seconde pendant 4 s à tous les ennemis à moins de 8 mètres.',
-  'entities.abilities.battle_stance.description':
-    'Posture de combat agressive: vous générez 10% de rage en plus. La posture par défaut pour Armes et Protection.',
-  'entities.abilities.battle_stance.name': 'Posture de combat',
-  'entities.abilities.berserker_stance.description':
-    'Posture de combat téméraire: vos coups critiques surviennent 3% plus souvent et infligent 3% de dégâts en plus. Le guerrier Fureur combat toujours dans cette posture.',
-  'entities.abilities.berserker_stance.name': 'Posture berserker',
-  'entities.abilities.breachmaker.description':
-    "Martèle la cible pour les dégâts de l'arme plus {damage} et fissure sa garde : vos propres attaques contre elle infligent 20% de dégâts en plus pendant 8 s. (Armes)",
-  'entities.abilities.breachmaker.name': 'Brise-garde',
-  'entities.abilities.cleaving_blows.description':
-    'Moisson rouge rend toujours une charge de Double frappe. (Fureur)',
-  'entities.abilities.cleaving_blows.name': 'Coups pourfendeurs',
-  'entities.abilities.deep_wounds.description':
-    'Passif : votre Frappe mutilante fait saigner la cible, infligeant des dégâts physiques sur 6 s. (Armes)',
-  'entities.abilities.deep_wounds.name': 'Plaies béantes',
-  'entities.abilities.defiant_bellow.description':
-    'Un beuglement de défi : tous les ennemis dans un rayon de 10 mètres sont provoqués et forcés de vous attaquer pendant 3 s. (Protection)',
-  'entities.abilities.defiant_bellow.name': 'Beuglement de défi',
-  'entities.abilities.diabolical_twinstrike.description':
-    'Tant que vous êtes enragé, votre Double frappe inflige 15% de dégâts en plus. (Fureur)',
-  'entities.abilities.diabolical_twinstrike.name': 'Double frappe diabolique',
-  'entities.abilities.die_by_sword.description':
-    "Recours défensif : pendant 8 s, vous subissez 30% de dégâts en moins et esquivez bien plus d'attaques.",
-  'entities.abilities.die_by_sword.name': "Périr par l'épée",
-  'entities.abilities.emboldening_roar.description':
-    'Pousse un rugissement galvanisant : vous et les joueurs alliés dans un rayon de 40 mètres êtes galvanisés, et vos 3 prochaines techniques sont des coups critiques garantis. (Fureur)',
-  'entities.abilities.emboldening_roar.name': 'Rugissement galvanisant',
-  'entities.abilities.enrage_passive.description':
-    'Passif : tant que vous êtes enragé, vous infligez 7% de dégâts en plus, attaquez 25% plus vite et vous déplacez 10% plus vite pendant 4 s. Saignée a 30% de chances de vous enrager ; Moisson rouge le fait toujours. (Fureur)',
-  'entities.abilities.enrage_passive.name': 'Carnage',
-  'entities.abilities.faultline.description':
-    'Envoie une onde de choc dans le sol : les ennemis devant vous dans un rayon de 8 mètres subissent {damage} points de dégâts et sont étourdis pendant 3 s. (Protection)',
-  'entities.abilities.faultline.name': 'Ligne de faille',
-  'entities.abilities.furious_mending.description':
-    "Pendant 10 s, vous subissez 20% de dégâts en moins et, tant que l'effet dure, votre Saignée vous soigne de 20% de votre vie maximale. (Fureur)",
-  'entities.abilities.furious_mending.name': 'Guérison furieuse',
-  'entities.abilities.heroic_leap.description':
-    'Bondit vers la zone ciblée et inflige {damage} points de dégâts aux ennemis proches à l’atterrissage.',
-  'entities.abilities.heroic_leap.name': 'Bond de guerre',
-  'entities.abilities.intimidating_shout.description':
-    "Un cri terrifiant qui fait fuir jusqu'à 5 ennemis dans un rayon de 8 mètres pendant 8 s. Les dégâts peuvent briser l'effet.",
-  'entities.abilities.intimidating_shout.name': 'Cri intimidant',
-  'entities.abilities.iron_resolve.description':
-    'Serrez les dents et ignorez la douleur : dépense jusqu’à 40 points de rage (20 minimum) pour absorber 4 points de dégâts par point de rage dépensé, pendant un maximum de 10 s. (Protection)',
-  'entities.abilities.iron_resolve.name': 'Résolution de fer',
-  'entities.abilities.measured_fury.description':
-    'Votre fureur mesurée affine votre économie : vos techniques coûtent 10% de rage en moins. (Armes)',
-  'entities.abilities.measured_fury.name': 'Fureur mesurée',
-  'entities.abilities.piercing_howl.description':
-    'Un cri perçant qui ralentit de 50% tous les ennemis dans un rayon de 15 mètres pendant 8 s.',
-  'entities.abilities.piercing_howl.name': 'Hurlement perçant',
-  'entities.abilities.raging_gale.description':
-    "Frappe instantanément deux fois avec votre arme, chaque coup infligeant 40% des dégâts de l'arme plus {damage}, et génère 8 points de rage. Cumule jusqu'à 2 charges. (Fureur)",
-  'entities.abilities.raging_gale.name': 'Double frappe',
-  'entities.abilities.raised_guard.description':
-    "Arc-boutez-vous derrière votre bouclier : vous subissez 50% de dégâts physiques en moins pendant 6 s. Cumule jusqu'à 2 charges. (Protection)",
-  'entities.abilities.raised_guard.name': 'Garde haute',
-  'entities.abilities.rallying_cry.description':
-    'Pousse un rugissement vaillant qui vous confère, ainsi qu’aux membres du groupe à moins de 40 mètres, 20% de points de vie maximum supplémentaires pendant 10 s. Protection : ils subissent également 5% de dégâts en moins pendant la durée.',
-  'entities.abilities.rallying_cry.name': 'Rugissement de vaillance',
-  'entities.abilities.recklessness.description':
-    'Enrage : votre génération de rage augmente de 50% et vos chances de coup critique de 20% pendant 12 s.',
-  'entities.abilities.recklessness.name': 'Témérité',
-  'entities.abilities.red_harvest.description':
-    "Dépensez tout : frappez trois fois dans une frénésie, chaque coup infligeant 65% des dégâts de l'arme plus {damage}, ce qui vous rend toujours enragé. (Fureur)",
-  'entities.abilities.red_harvest.name': 'Moisson rouge',
-  'entities.abilities.revenge.description':
-    'Attaque dans un large arc et inflige des dégâts physiques à tous les ennemis devant vous. Au-delà de 5 cibles, les dégâts sont réduits. Quand vous esquivez ou parez, votre prochaine Vengeance peut ne coûter aucune rage. (Protection)',
-  'entities.abilities.revenge.name': 'Vengeance',
-  'entities.abilities.sanguine_aura.description':
-    "Imprégnez votre arme du sang de vos ennemis : vous et vos alliés de mêlée gagnez 10% de vitesse d'attaque et 10% de dégâts pendant 20 s.",
-  'entities.abilities.sanguine_aura.name': 'Aura sanguine',
-  'entities.abilities.seasoned_soldier.description':
-    'Vos attaques automatiques critiques génèrent 10% de rage en plus. (Armes)',
-  'entities.abilities.seasoned_soldier.name': 'Soldat aguerri',
-  'entities.abilities.storm_bolt.description':
-    "Lancez votre arme sur la cible, infligeant {damage} et l'étourdissant pendant 3 s.",
-  'entities.abilities.storm_bolt.name': 'Projectile-tempête',
-  'entities.abilities.sudden_death.description':
-    'Vos attaques automatiques ont une chance de vous permettre de lancer Tombe précoce sur une cible quel que soit son niveau de vie, sans coût de rage. (Armes)',
-  'entities.abilities.sudden_death.name': 'Mort subite',
-  'entities.abilities.sweeping_strikes.description':
-    'Pendant 12 s, vos attaques monocibles frappent aussi 1 ennemi proche pour la totalité des dégâts. (Armes)',
-  'entities.abilities.sweeping_strikes.name': 'Arc élargi',
-  'entities.abilities.victory_rush.description':
-    "Frappe infligeant les dégâts de l'arme plus {damage} et vous soignant de 20% de votre vie maximale. Utilisable seulement dans les 20 s suivant la mort d'un ennemi.",
-  'entities.abilities.victory_rush.name': 'Ruée victorieuse',
-  'hudChrome.specPanel.complexity': 'Complexité',
-  'hudChrome.specPanel.complexityHigh': 'Élevée',
-  'hudChrome.specPanel.complexityLow': 'Faible',
-  'hudChrome.specPanel.complexityMedium': 'Moyenne',
-  'hudChrome.specPanel.exampleAbilities': 'Exemples de techniques',
-  'hudChrome.specPanel.primaryAttr': 'Caractéristique principale',
-  'hudChrome.specPanel.selectSpec': 'Choisir une spécialisation',
-  'hudChrome.specPanel.viewTalents': 'Voir les talents',
-  'hudChrome.talentRows.comingSoon': 'Bientôt disponible',
-  'hudChrome.talentRows.defaultLoadout': 'Configuration par défaut',
-  'hudChrome.talentRows.tab': 'Choix',
-  'hudChrome.talentRows.readoutSummary': 'Talents : {head}, {spent}/{total} rangées sélectionnées.',
-  'entities.abilities.aspect_of_the_wild.name': 'Apparence du Croc-sauvage',
-  'entities.abilities.aspect_of_the_wild.description':
-    "Insuffle une force sauvage aux alliés à moins de 30 m, augmentant leur puissance d'attaque de 45 et leur vitesse d'attaque de 5 % pendant 5 min. (talent de Chasseur)",
-  'entities.abilities.aura_surge.name': "Ricochet de l'aube",
-  'entities.abilities.aura_surge.description':
-    "Projette un bouclier forgé à l'aube qui inflige {damage} dégâts sacrés, réduit la cible principale au silence pendant 2 s, puis rebondit sur jusqu'à 2 ennemis supplémentaires à moins de 10 m, infligeant 75 % des dégâts par rebond. (talent de Paladin)",
-  'entities.abilities.avenging_wrath.name': 'Aile vengeresse',
-  'entities.abilities.avenging_wrath.description':
-    "Invoque une puissance vengeresse, augmentant votre puissance d'attaque de 60 et votre puissance des sorts de 30 pendant 20 s. (talent de Paladin)",
-  'entities.abilities.berserk.name': 'Brume rouge',
-  'entities.abilities.berserk.description':
-    "Augmente votre puissance d'attaque de 70 pendant 15 s. (talent de Druide)",
-  'entities.abilities.blink.name': 'Pas scintillant',
-  'entities.abilities.blink.description':
-    "Vous téléporte de 15 m vers l'avant et brise les immobilisations. (talent de Mage)",
-  'entities.abilities.bloodlust.name': 'Tambours de guerre',
-  'entities.abilities.bloodlust.description':
-    "Plonge les alliés à moins de 30 m dans une frénésie, augmentant leur vitesse d'attaque de 30 % pendant 15 s. (talent de Chaman)",
-  'entities.abilities.chain_lightning.name': 'Éclair fourchu',
-  'entities.abilities.chain_lightning.description':
-    'Projette de la foudre sur la zone ciblée et inflige {damage} points de dégâts aux ennemis proches. (talent de Chaman)',
-  'entities.abilities.chaos_bolt.name': 'Trait de ruine',
-  'entities.abilities.chaos_bolt.description':
-    'Projette un trait de feu chaotique qui inflige {damage} points de dégâts de Feu. (talent de Démoniste)',
-  'entities.abilities.cloak_of_shadows.name': 'Cape d’ombre',
-  'entities.abilities.cloak_of_shadows.description':
-    "Vous enveloppe d'ombres et absorbe 420 points de dégâts pendant 5 s. (talent de Voleur)",
-  'entities.abilities.cone_of_cold.name': 'Balayage de givre',
-  'entities.abilities.cone_of_cold.description':
-    'Frappe les ennemis proches avec du givre et inflige {damage} points de dégâts de Givre. (technique distinctive de Givre)',
-  'entities.abilities.curse_of_exhaustion.name': 'Maléfice de plomb',
-  'entities.abilities.curse_of_exhaustion.description':
-    'Maudit la cible et réduit sa vitesse de déplacement de 30 % pendant 12 s. (talent de Démoniste)',
-  'entities.abilities.death_coil.name': 'Spirale funèbre',
-  'entities.abilities.death_coil.description':
-    "Frappe l'ennemi et lui inflige {damage} points de dégâts d'Ombre, puis l'horrifie pendant 3 s. (talent de Démoniste)",
-  'entities.abilities.deep_freeze.name': 'Gel mort',
-  'entities.abilities.deep_freeze.description':
-    "Gèle profondément la cible, lui inflige {damage} points de dégâts de Givre et l'étourdit pendant 4 s. (talent de Mage)",
-  'entities.abilities.desperate_prayer.name': 'Dernière prière',
-  'entities.abilities.desperate_prayer.description':
-    'Vous rend instantanément {damage} points de vie. (talent de Prêtre)',
-  'entities.abilities.deterrence.name': 'Garde-hérissée',
-  'entities.abilities.deterrence.description':
-    "Augmente vos chances d'esquiver de 50 points de pourcentage pendant 10 s. (talent de Chasseur)",
-  'entities.abilities.divine_shield.name': 'Garde-lumière',
-  'entities.abilities.divine_shield.description':
-    'Vous protège par la puissance sacrée, absorbant 900 points de dégâts pendant 8 s. (talent de Paladin)',
-  'entities.abilities.earthbind.name': 'Terre agrippante',
-  'entities.abilities.earthbind.description':
-    'Lie les ennemis proches à la terre et les immobilise pendant 2 s. (talent de Chaman)',
-  'entities.abilities.evocation.name': 'Puits d’éther',
-  'entities.abilities.evocation.description':
-    'Rend instantanément 220 points de mana. (talent de Mage)',
-  'entities.abilities.frenzied_regeneration.name': 'Régénération sauvage',
-  'entities.abilities.frenzied_regeneration.description':
-    "Rend 180 points de vie en 10 s. Forme d'ours uniquement. (talent de Druide)",
-  'entities.abilities.frost_trap.name': 'Piège de givre',
-  'entities.abilities.frost_trap.description':
-    "Gèle les ennemis dans la zone ciblée pendant 3 s, les empêchant de se déplacer et d'agir. (talent de Chasseur)",
-  'entities.abilities.ghostly_strike.name': 'Frappe spectrale',
-  'entities.abilities.ghostly_strike.description':
-    "Frappe l'ennemi et lui inflige les dégâts de l'arme plus {damage}, augmente brièvement l'esquive et octroie 1 point de combo. (talent de Voleur)",
-  'entities.abilities.hammer_of_wrath.name': 'Marteau sonnant',
-  'entities.abilities.hammer_of_wrath.description':
-    'Lance un marteau sacré sur un ennemi blessé et lui inflige {damage} points de dégâts du Sacré. Utilisable uniquement sous 20 % de points de vie. (talent de Paladin)',
-  'entities.abilities.healing_stream.name': 'Puits de source',
-  'entities.abilities.healing_stream.description':
-    'Rend 120 points de vie à une cible alliée en 12 s. (talent de Chaman)',
-  'entities.abilities.holy_wrath.name': 'Courroux du saint',
-  'entities.abilities.holy_wrath.description':
-    'Libère une puissance sacrée et inflige {damage} points de dégâts aux ennemis proches. (talent de Paladin)',
-  'entities.abilities.howl_of_terror.name': 'Hurlement d’effroi',
-  'entities.abilities.howl_of_terror.description':
-    "Effraie les ennemis proches pendant un maximum de 3 s. Les dégâts peuvent interrompre l'effet. (talent de Démoniste)",
-  'entities.abilities.ice_block.name': 'Cercueil froid',
-  'entities.abilities.ice_block.description':
-    'Vous enferme dans la glace et absorbe 600 points de dégâts pendant 8 s. Vous ne pouvez pas agir tant que vous êtes enfermé. Relancez pour annuler. (talent de Mage)',
-  'entities.abilities.inner_focus.name': 'Esprit apaisé',
-  'entities.abilities.inner_focus.description':
-    'Votre prochain sort ne coûte rien. Dure 60 s. (talent de Prêtre)',
-  'entities.abilities.innervate.name': 'Sève vitale',
-  'entities.abilities.innervate.description':
-    "De la sève vivante afflue en vous pendant 10 s et restaure par vagues 20 points de votre ressource actuelle : mana, rage ou énergie. Changer de forme ne l'interrompt pas. Le sommeil, l'étourdissement ou la stase immobilisent la sève. (talent de Druide)",
-  'entities.abilities.meteor.name': 'Pierre du ciel',
-  'entities.abilities.meteor.description':
-    "Fait tomber un météore sur la zone ciblée et inflige {damage} points de dégâts de Feu, puis brûle les ennemis qui s'y trouvent de 12 à 18 points de dégâts de Feu toutes les 2 s pendant 6 s. (talent de Mage)",
-  'entities.abilities.mind_sear.name': 'Brûle-pensée',
-  'entities.abilities.mind_sear.description':
-    "Canalise de l'énergie d'Ombre sur la zone ciblée et inflige {damage} points de dégâts chaque seconde aux ennemis proches. (talent de Prêtre)",
-  'entities.abilities.multi_shot.name': 'Tir fendu',
-  'entities.abilities.multi_shot.description':
-    'Décoche une volée sur la zone ciblée et inflige {damage} points de dégâts physiques aux ennemis dans un rayon de 8 m. (talent de Chasseur)',
-  'entities.abilities.prayer_of_healing.name': 'Soin du chœur',
-  'entities.abilities.prayer_of_healing.description':
-    'Rend {damage} points de vie aux alliés proches. (talent de Prêtre)',
-  'entities.abilities.preparation.name': 'Contingence',
-  'entities.abilities.preparation.description':
-    'Met fin au temps de recharge de Sprint, Évasion et Disparition. (talent de Voleur)',
-  'entities.abilities.presence_of_mind.name': 'Esprit fulgurant',
-  'entities.abilities.presence_of_mind.description':
-    "Votre prochain sort avec un temps d'incantation devient instantané. Dure 60 s. (talent de Mage)",
-  'entities.abilities.psychic_scream.name': 'Cri psychique',
-  'entities.abilities.psychic_scream.description':
-    "Effraie les ennemis proches pendant un maximum de 4 s. Les dégâts peuvent interrompre l'effet. (talent de Prêtre)",
-  'entities.abilities.shadowstep.name': 'Glissement d’ombre',
-  'entities.abilities.shadowstep.description':
-    'Vous fait traverser les ombres en direction de votre cible. (talent de Voleur)',
-  'entities.abilities.silence.name': 'Silence',
-  'entities.abilities.silence.description':
-    'Réduit la cible au silence pendant 4 s. (talent de Prêtre)',
-  'entities.abilities.tranquility.name': 'Chant du bosquet',
-  'entities.abilities.tranquility.description':
-    "Canalise de l'énergie réparatrice pendant 4 s et rend de 42 à 52 points de vie chaque seconde aux alliés à moins de 30 m. (talent de Druide)",
-  'entities.abilities.cleansing_verdict.name': 'Verdict purificateur',
-  'entities.abilities.cleansing_verdict.description':
-    'Dissipe un effet magique néfaste sur une cible alliée et lui rend {damage} points de vie par la magie du Sacré.',
-  'entities.abilities.smoke_screen.name': 'Écran de fumée',
-  'entities.abilities.smoke_screen.description':
-    'Vous disparaissez dans un nuage de fumée, ce qui augmente vos chances d’esquiver de 30 % pendant 8 s.',
-  'entities.abilities.spellsteal.name': 'Vol de sort',
-  'entities.abilities.spellsteal.description':
-    'Vole un effet magique bénéfique à un ennemi et vous le transfère.',
-  'entities.abilities.startle_shot.name': 'Tir de stupeur',
-  'entities.abilities.startle_shot.description':
-    'Un tir sauvage qui désoriente la cible pendant {duration} s. Tout dégât interrompt cet effet.',
-  'entities.abilities.typhoon.name': 'Typhon',
-  'entities.abilities.typhoon.description':
-    'Une rafale de vent repousse tous les ennemis dans un rayon de 8 m et les hébète, réduisant leur vitesse de déplacement de 50 % pendant 4 s.',
-  'entities.abilities.voidfeast.name': 'Festin du Vide',
-  'entities.abilities.voidfeast.description':
-    'Dévore un effet magique (un effet bénéfique sur un ennemi ou un effet néfaste sur un allié) et vous rend 6 % de votre maximum de points de vie.',
-  'hudChrome.abilityError.shieldRequired': 'Vous devez équiper un bouclier.',
+  'entities.abilities.ironhold.description':
+    'Vous vous retranchez derrière votre garde, réduisant tous les dégâts subis de 40 % pendant 8 sec.',
+  'entities.abilities.ironhold.name': 'Rempart de fer',
+  'entities.abilities.primal_reflexes.description':
+    "Vos instincts s'aiguisent, augmentant votre chance d'esquiver de 50 % pendant 6 sec.",
+  'entities.abilities.primal_reflexes.name': 'Réflexes primordiaux',
+  'entities.abilities.sacred_bulwark.description':
+    'Pendant {duration} sec, le prochain coup ennemi qui vous tuerait est annulé, vous restaurant à 35 % de vos points de vie à la place.',
+  'entities.abilities.sacred_bulwark.name': 'Rempart sacré',
   'guide.family.reptile.desc':
-    'Chasseurs à sang froid, avec un sifflement et un claquement qui leur sont propres, distincts des bêtes à sang chaud.',
+    "Des chasseurs à sang froid dotés d'un sifflement et d'un claquement qui leur sont propres, distincts des créatures à sang chaud.",
   'guide.family.reptile.name': 'Reptiles',
-  'hudChrome.bags.rightClickDestroy': 'Maj+clic droit pour détruire',
+  'hudChrome.auraEffect.damageReduction': 'Réduit tous les dégâts subis de {pct} %',
+  'hudChrome.auraEffect.guardianWard':
+    'Le prochain coup ennemi fatal vous restaure à {pct} % de vos points de vie à la place',
+  'hudChrome.bags.dragDestroyHint': 'Faites glisser dans le monde pour détruire',
+  'hudChrome.bags.dragEquipHint': 'Faites glisser sur votre personnage pour équiper',
+  'hudChrome.bags.reorderNeedsRecent':
+    'Effacez le filtre et triez par Récents pour réorganiser vos sacs',
+  'hudChrome.bags.rightClickDestroy': 'Clic droit pour détruire',
   'hudChrome.cameraPrompt.changeLater':
-    'Vous pourrez modifier ce choix plus tard dans le menu Échap, Raccourcis clavier.',
+    'Vous pouvez modifier ce réglage plus tard via Échap, Raccourcis clavier.',
   'hudChrome.cameraPrompt.classicDesc':
-    'Maintenez le clic droit et déplacez la souris pour tourner la caméra.',
+    'Maintenez le clic droit et déplacez la souris pour faire pivoter la caméra.',
   'hudChrome.cameraPrompt.classicTitle': 'Caméra classique',
   'hudChrome.cameraPrompt.confirm': 'Confirmer',
   'hudChrome.cameraPrompt.intro': 'Choisissez comment la caméra suit votre personnage.',
   'hudChrome.cameraPrompt.mouseDesc':
-    'Déplacez la souris pour tourner la caméra sans maintenir de bouton.',
+    'Déplacez la souris pour faire pivoter la caméra sans maintenir de bouton.',
   'hudChrome.cameraPrompt.title': 'Choisissez votre caméra',
-  'hudChrome.discord.link.joinServer': 'Rejoindre simplement le serveur Discord',
+  'hudChrome.discord.link.joinServer': 'Rejoignez simplement le serveur Discord',
+  'hudChrome.discord.roleTag.contentcreator': 'Créateur de contenu',
+  'hudChrome.discord.roleTag.juniormods': 'Modérateur junior',
+  'hudChrome.discord.roleTag.legend': 'LÉGENDE',
+  'hudChrome.discord.roleTag.seniormods': 'Modérateur senior',
+  'hudChrome.discord.roleTag.shill': 'COMPLICE',
+  'hudChrome.finder.accept': 'Accepter',
+  'hudChrome.finder.acceptApplicantAria': 'Accepter {name}',
+  'hudChrome.finder.accepted': '{accepted} sur {size} confirmés',
+  'hudChrome.finder.acceptedWait': 'En attente des autres...',
+  'hudChrome.finder.activity': 'Activité',
+  'hudChrome.finder.applicants': 'Candidats',
+  'hudChrome.finder.apply': 'Postuler',
+  'hudChrome.finder.attunement': 'Harmonisation requise: {quest}',
+  'hudChrome.finder.back': 'Retour',
+  'hudChrome.finder.blockedLevel': 'Niveaux {min} à {max} uniquement',
+  'hudChrome.finder.blockedSpec': 'Nécessite une spécialisation',
+  'hudChrome.finder.boardEmpty': 'Aucune annonce pour le moment. Publiez-en une !',
+  'hudChrome.finder.boardLeaderGate': 'Seul le chef de groupe peut publier une annonce.',
+  'hudChrome.finder.chooseActivities': 'Choisir des activités',
+  'hudChrome.finder.clock': '{minutes}:{seconds}',
+  'hudChrome.finder.close': 'Fermer',
+  'hudChrome.finder.closeListing': "Fermer l'annonce",
+  'hudChrome.finder.cooldownNote': 'Vous pourrez rejoindre la file dans {seconds} s.',
+  'hudChrome.finder.decline': 'Refuser',
+  'hudChrome.finder.declineApplicantAria': 'Refuser {name}',
+  'hudChrome.finder.encounters': 'Rencontres',
+  'hudChrome.finder.entrance': 'Entrée: {zone}',
+  'hudChrome.finder.finalBoss': 'Boss final',
+  'hudChrome.finder.freeRoles': 'Tous les rôles bienvenus',
+  'hudChrome.finder.heroic': 'Héroïque',
+  'hudChrome.finder.heroicMarks': 'Marques héroïques: {count} par joueur',
+  'hudChrome.finder.joinQueue': 'Rejoindre la file',
+  'hudChrome.finder.kindDungeon': 'Donjon',
+  'hudChrome.finder.kindRaid': 'Raid',
+  'hudChrome.finder.kindSolo': 'Aventure en solo',
+  'hudChrome.finder.leader': 'Chef: {name}',
+  'hudChrome.finder.leaderNote': "Seul le chef de groupe peut mettre le groupe en file d'attente.",
+  'hudChrome.finder.leaveQueue': 'Quitter la file',
+  'hudChrome.finder.levelClass': 'Nv {level} {className}',
+  'hudChrome.finder.levelOne': 'Niveau {level}',
+  'hudChrome.finder.levels': 'Niveaux {min} à {max}',
+  'hudChrome.finder.lockedFor': 'Verrouillé environ {minutes} min',
+  'hudChrome.finder.lockoutDaily': 'Verrouillage quotidien sur le boss final',
+  'hudChrome.finder.lockoutNone': 'Aucun verrouillage',
+  'hudChrome.finder.lootChance': 'Chances de butin supplémentaires:',
+  'hudChrome.finder.lootGuaranteed': "L'un de ces objets tombe toujours:",
+  'hudChrome.finder.lootHeroic': "Bonus héroïque, l'un de ces objets tombe toujours:",
+  'hudChrome.finder.lootMaybe': "Au plus l'un de ces objets peut tomber:",
+  'hudChrome.finder.mech.deathless_rage': 'Fureur immortelle (interrompue aux pierres de garde)',
+  'hudChrome.finder.mech.deathstalker_cleave': 'Balayage du traqueur de mort (cleave frontal)',
+  'hudChrome.finder.mech.enrage': 'Entre en rage à faible santé',
+  'hudChrome.finder.mech.grave_cleaver': 'Faucheur de tombes (cleave frontal)',
+  'hudChrome.finder.mech.gravebreaker':
+    "Brise-sépulcre (cône frontal, orientez-le à l'opposé du raid)",
+  'hudChrome.finder.mech.lunar_tide': 'Marée lunaire (dégâts de zone pulsés)',
+  'hudChrome.finder.mech.mana_burn': 'Bénédiction desséchée (brûle le mana)',
+  'hudChrome.finder.mech.mist_surge': 'Déferlante de brume (dégâts de zone pulsés)',
+  'hudChrome.finder.mech.mortal_wound': 'Blessure oubliée (réduit les soins reçus)',
+  'hudChrome.finder.mech.necrotic_shockwave': 'Onde de choc nécrotique (dégâts de zone importants)',
+  'hudChrome.finder.mech.profane_mending': 'Soins profanes (soigne ses alliés)',
+  'hudChrome.finder.mech.raise_fallen': 'Relever les morts (vagues périodiques de renforts)',
+  'hudChrome.finder.mech.reaping_arc': 'Arc faucheur (cleave frontal)',
+  'hudChrome.finder.mech.sealbreak_shockwave': 'Onde de brise-sceau (explosion de zone)',
+  'hudChrome.finder.mech.shadow_nova': 'Nova des ombres (explosion de zone)',
+  'hudChrome.finder.mech.shadow_pulse': "Pulsation d'ombre (dégâts de zone pulsés)",
+  'hudChrome.finder.mech.shuddering_stomp': 'Piétinement tremblant (étourdissement de zone)',
+  'hudChrome.finder.mech.soul_rend':
+    "Déchirement de l'âme (les joueurs marqués doivent s'écarter et être soignés)",
+  'hudChrome.finder.mech.summons_adds': 'Invoque des renforts',
+  'hudChrome.finder.mech.wardstones': 'Canaux des pierres de garde (transition de phase)',
+  'hudChrome.finder.needs': 'Recherche {roles}',
+  'hudChrome.finder.needsSpec':
+    'Choisissez une spécialisation pour utiliser le Chercheur de donjons.',
+  'hudChrome.finder.noApplicants': "Aucun candidat pour l'instant.",
+  'hudChrome.finder.normal': 'Normal',
+  'hudChrome.finder.openListings': 'Annonces ouvertes',
+  'hudChrome.finder.pct': '{pct} %',
+  'hudChrome.finder.proposalRole': 'Votre rôle: {role}',
+  'hudChrome.finder.proposalTitle': 'Groupe trouvé: {name}',
+  'hudChrome.finder.publish': 'Publier',
+  'hudChrome.finder.publishListing': 'Publier une annonce',
+  'hudChrome.finder.remaining': '{seconds} s pour répondre',
+  'hudChrome.finder.roleCount': '{count} {role}',
+  'hudChrome.finder.roleDps': 'Dégâts',
+  'hudChrome.finder.roleHealer': 'Soigneur',
+  'hudChrome.finder.roleTank': 'Tank',
+  'hudChrome.finder.showOnMap': 'Afficher sur la carte',
+  'hudChrome.finder.slotState': '{role}: {accepted} sur {total} prêts',
+  'hudChrome.finder.slots': '{size}/{capacity}',
+  'hudChrome.finder.summoned': 'Gardien invoqué',
+  'hudChrome.finder.syncing': 'En attente du royaume...',
+  'hudChrome.finder.tabBoard': 'Groupes formés',
+  'hudChrome.finder.tabCatalogue': 'Catalogue',
+  'hudChrome.finder.tabQueue': 'Partie rapide',
+  'hudChrome.finder.tagFastRun': 'Run rapide',
+  'hudChrome.finder.tagFirstRun': 'Première visite',
+  'hudChrome.finder.tagFullClear': 'Nettoyage complet',
+  'hudChrome.finder.tagLearning': 'Débutants bienvenus',
+  'hudChrome.finder.tagQuestRun': 'Run de quête',
+  'hudChrome.finder.title': 'Chercheur de donjons',
+  'hudChrome.finder.travelNote':
+    "Le groupe se forme là où se trouvent les membres. Rejoignez l'entrée ensemble: personne n'est téléporté.",
+  'hudChrome.finder.waited': 'Temps en file: {time}',
+  'hudChrome.finder.withdraw': 'Retirer la candidature',
+  'hudChrome.finder.yourListing': 'Votre annonce',
+  'hudChrome.finder.yourRoles': 'Vos rôles',
+  'hudChrome.gathering.notReady': "Ce nœud de ressource n'a pas encore réapparu pour vous.",
+  'hudChrome.keybinds.sheathe': "Ranger/Dégainer l'arme",
   'hudChrome.meters.autoShowHint':
-    'Les lignes apparaissent automatiquement dès que votre groupe inflige des dégâts ou prodigue des soins, et ce segment se ferme quelques secondes après la fin du combat.',
-  'hudChrome.petFeed.disabledFullHp': 'Le familier a tous ses points de vie',
+    'Les lignes apparaissent automatiquement dès que votre groupe inflige des dégâts ou des soins, et ce panneau se ferme quelques secondes après la fin du combat.',
+  'hudChrome.options.showAttackButton': "Afficher le bouton d'attaque",
+  'hudChrome.petFeed.disabledFullHp': 'Le familier est à pleine santé',
   'hudChrome.petFeed.disabledNoFood':
     'Aucune nourriture dans vos sacs ne peut soigner votre familier',
+  'hudChrome.plurals.finderPartySize.few': '{count} joueurs',
+  'hudChrome.plurals.finderPartySize.many': '{count} joueurs',
+  'hudChrome.plurals.finderPartySize.one': '{count} joueur',
+  'hudChrome.plurals.finderPartySize.other': '{count} joueurs',
+  'hudChrome.statInfo.desc.hitRating':
+    "La précision provenant de votre équipement et de vos bonus d'ensemble, réduisant la fréquence à laquelle vos attaques ratent et vos sorts sont résistés, notamment contre les ennemis de niveau supérieur. Environ 10 points de précision accordent 1 % de toucher.",
+  'hudChrome.statInfo.names.hitRating': 'Précision',
+  'abilityUi.actionBar.attackRemoveHint':
+    "Clic droit pour le retirer de la barre et libérer l'emplacement.",
+  'loading.realmFull':
+    'Ce monde est complet en ce moment. Veuillez réessayer dans quelques minutes.',
+  'loading.tooManyConnections':
+    'Trop de connexions à ce monde proviennent de votre réseau. Veuillez fermer les fenêtres de jeu superflues ou réessayer dans quelques minutes.',
   'entities.abilities.chain_heal.description':
     'Rend une grande quantité de points de vie à une cible alliée, puis rebondit sur un maximum de 2 autres alliés proches, avec des soins réduits de 50 % à chaque rebond. (signature Restauration)',
   'entities.abilities.chain_heal.name': 'Salve de guérison',
@@ -3013,7 +2908,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hud.pet.defensiveDesc': 'Attaque les ennemis qui vous blessent, vous ou votre familier.',
   'hud.pet.aggressiveDesc': 'Attaque les ennemis hostiles proches.',
   'hud.pet.rename': 'Renommer le familier',
-  'hud.pet.revive': 'Rafistoler',
+  'hud.pet.revive': 'Ranimer le familier',
   'hud.pet.abandon': 'Abandonner le familier',
   'hud.pet.cancel': 'Annuler',
   'hud.pet.renameLabel': 'Choisissez un nouveau nom de familier.',
@@ -3225,7 +3120,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'itemUi.money.silver': 'argent',
   'itemUi.money.copper': 'cuivre',
   'itemUi.slots.mainhand': 'Main droite',
-  'itemUi.slots.offhand': 'Main gauche',
   'itemUi.slots.chest': 'Torse',
   'itemUi.slots.legs': 'Jambes',
   'itemUi.slots.feet': 'Pieds',
@@ -3424,12 +3318,18 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.battle_shout.name': 'Beuglement de fer',
   'entities.abilities.battle_shout.description':
     "Augmente votre puissance d'attaque de {buff} pendant 2 min.",
+  'entities.abilities.commanding_shout.name': 'Cri fortifiant',
+  'entities.abilities.commanding_shout.description':
+    'Augmente votre Endurance de {buff} pendant 2 min.',
   'entities.abilities.demoralizing_shout.name': 'Direhowl',
   'entities.abilities.demoralizing_shout.description':
     "Pousse un cri terrifiant qui réduit la puissance d'attaque de tous les ennemis proches de {buff} pendant 30 s.",
   'entities.abilities.charge.name': 'Ruée',
   'entities.abilities.charge.description':
     "Charge un ennemi, génère 9 rage et l'étourdit pendant 1 s. Portée de 8-25 m.",
+  'entities.abilities.rend.name': 'Entaille profonde',
+  'entities.abilities.rend.description':
+    'Blesse la cible et la fait saigner pour {damage} points de dégâts en {duration} s.',
   'entities.abilities.thunder_clap.name': 'Coup sismique',
   'entities.abilities.thunder_clap.description':
     'Frappe les ennemis proches pour {damage} points de dégâts et ralentit leurs attaques de 10% pendant 10 s.',
@@ -3864,9 +3764,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.name': 'Écorcher',
   'entities.abilities.rake.description':
     "Une attaque d'ouverture en camouflage qui lacère l'ennemi pour les dégâts de l'arme plus {damage} et inflige des dégâts de saignement sur 9 sec. Octroie 1 point de combo. Forme de loup uniquement.",
-  'entities.abilities.revive_pet.name': 'Rafistoler',
+  'entities.abilities.revive_pet.name': 'Ranimer le familier',
   'entities.abilities.revive_pet.description':
-    "Rafistole votre familier et lui rend {overTime} points de vie en 12 s, par pulsations toutes les 3 s, s'il est vivant. S'il est mort, le ranime avec 35 % de ses points de vie.",
+    'Ranime votre familier mort et le ramène à vos côtés.',
   'entities.abilities.holy_shock.name': 'Horion sacré',
   'entities.abilities.holy_shock.description':
     'Frappe une cible alliée avec de l’énergie sacrée et lui rend {damage} points de vie. (signature Sacré)',
@@ -5851,6 +5751,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Fonce sur un ennemi lointain pour ouvrir le combat avec un bref étourdissement.',
   'guide.abilityHook.cheap_shot':
     'Ouvrez depuis le camouflage avec un étourdissement et une avance sur vos points de combo.',
+  'guide.abilityHook.commanding_shout':
+    "Renforce l'endurance pour que chacun tienne plus longtemps au combat.",
   'guide.abilityHook.concussive_shot':
     "Hébète la cible et la ralentit pour qu'elle ne puisse pas vous atteindre.",
   'guide.abilityHook.conjure_food':
@@ -5915,6 +5817,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Un coup de mêlée puissant pour quand quelque chose comble la distance.',
   'guide.abilityHook.rejuvenation':
     "S'incante instantanément et soigne un allié dans la durée, pour continuer d'agir.",
+  'guide.abilityHook.rend': 'Ouvre un saignement qui use la cible dans la durée.',
   'guide.abilityHook.renew':
     "Un soin qui s'égrène dans la durée, pratique à lancer en continuant de bouger.",
   'guide.abilityHook.rockbiter_weapon':
@@ -6976,11 +6879,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.roleTag.levyst': 'Levy St',
   'hudChrome.discord.roleTag.devs': 'Dév',
   'hudChrome.discord.roleTag.mods': 'Modo',
-  'hudChrome.discord.roleTag.seniormods': 'Modérateur senior',
-  'hudChrome.discord.roleTag.juniormods': 'Modérateur junior',
-  'hudChrome.discord.roleTag.contentcreator': 'Créateur de contenu',
-  'hudChrome.discord.roleTag.legend': 'LÉGENDE',
-  'hudChrome.discord.roleTag.shill': 'PROMOTEUR',
   'hudChrome.discord.roleTag.artists': 'Artiste',
   'hudChrome.discord.guildMember': 'Membre vérifié',
   'hudChrome.discord.notMember': 'Pas encore sur le serveur',
@@ -7769,7 +7667,4 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.worldBossBody':
     "Tout là-haut sur Thornpeak, la tempête au-dessus de Stormcrag prend parfois forme. Thunzharr, le Pic éveillé s'y dresse à un rythme régulier, un élémentaire de la puissance d'un raid affronté en monde ouvert par quiconque répond à l'appel, et il devient d'autant plus redoutable que les prétendants se dressent nombreux contre lui. Chacun de ceux qui rejoignent le combat gagne son propre tirage de son butin, honoré selon les règles de verrouillage de raid, et sa chute s'attarde assez longtemps pour que les tombés reviennent en courant réclamer leur dû. Rassemblez plus d'épées que vous ne le pensez nécessaire.",
   'guide.worldPage.worldBossTitle': "Quand le pic s'éveille : le boss de monde",
-  'guide.abilityHook.revenge':
-    'Frappe les ennemis devant vous et peut devenir gratuite après une esquive ou une parade.',
-  'guide.abilityHook.hamstring': 'Entrave les déplacements d’un ennemi pour l’empêcher de fuir.',
 };

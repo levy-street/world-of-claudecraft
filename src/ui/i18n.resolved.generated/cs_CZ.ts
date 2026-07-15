@@ -618,12 +618,12 @@ export const cs_CZ: EnTranslations = {
       "update": "Aktualizovat"
     },
     "cameraPrompt": {
-      "title": "Vyber si kameru",
-      "intro": "Vyber, jak má kamera sledovat tvou postavu.",
-      "mouseDesc": "Pohybem myši otáčej kamerou bez držení tlačítka.",
+      "title": "Zvolte si kameru",
+      "intro": "Zvol, jak kamera sleduje tvou postavu.",
+      "mouseDesc": "Pohybuj myší pro otáčení kamery bez nutnosti přidržovat tlačítko.",
       "classicTitle": "Klasická kamera",
-      "classicDesc": "Podrž pravé tlačítko myši a pohybem myši otáčej kamerou.",
-      "changeLater": "Později to můžeš změnit v nabídce Esc, Klávesové zkratky.",
+      "classicDesc": "Přidržte pravé tlačítko myši a pohybujte myší pro otáčení kamery.",
+      "changeLater": "Toto nastavení můžeš změnit později v nabídce Esc, Klávesové zkratky.",
       "confirm": "Potvrdit"
     },
     "castBar": {
@@ -672,11 +672,11 @@ export const cs_CZ: EnTranslations = {
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m} min {s} s",
       "seconds": "{s} s",
-      "autoShowHint": "Řádky se zobrazí automaticky, jakmile tvoje skupina způsobí poškození nebo léčení, a tento panel se několik sekund po skončení boje zavře."
+      "autoShowHint": "Řádky se zobrazí automaticky, jakmile tvoje skupina způsobí poškození nebo léčení, a tento segment se zavře několik sekund po skončení boje."
     },
     "petFeed": {
       "disabledFullHp": "Mazlíček má plné zdraví",
-      "disabledNoFood": "Žádné jídlo v tvých brašnách mazlíčka nevyléčí"
+      "disabledNoFood": "V batohách nemáš žádné jídlo, které by vyléčilo tvého mazlíčka"
     },
     "keybinds": {
       "emoteWheel": "Kruh emotů",
@@ -684,7 +684,7 @@ export const cs_CZ: EnTranslations = {
       "targetFriendlyNext": "Procházet spojenecké cíle",
       "discord": "Discord",
       "valecup": "Pohár údolí",
-      "sheathe": "Sheathe/Unsheathe Weapon",
+      "sheathe": "Zasunout/Vytasit zbraň",
       "categoryPet": "Mazlíček",
       "petAttack": "Mazlíček: Útok",
       "petStop": "Mazlíček: Zastavit",
@@ -857,7 +857,7 @@ export const cs_CZ: EnTranslations = {
       "aurasOnPlayerFrame": "Buffy na rámu hráče",
       "highContrastBackground": "Vysoce kontrastní pozadí",
       "startAttackOnAbility": "Automatický útok při použití schopnosti",
-      "showAttackButton": "Show Attack Button",
+      "showAttackButton": "Zobrazit tlačítko útoku",
       "walkByAutoloot": "Automatická kořist při průchodu",
       "groundReticle": "Zaměřovací kruh na zemi",
       "showItemLevel": "Zobrazit úroveň předmětu",
@@ -869,23 +869,23 @@ export const cs_CZ: EnTranslations = {
       "mobileLeftHanded": "Rozvržení pro leváky"
     },
     "talentRows": {
-      "tab": "Volby",
-      "defaultLoadout": "Výchozí sestava",
-      "comingSoon": "Již brzy",
-      "readoutSummary": "Talenty: {head}, vybráno {spent}/{total} řad."
+      "tab": "Choices",
+      "defaultLoadout": "Default Loadout",
+      "comingSoon": "Coming soon",
+      "readoutSummary": "Talents: {head}, {spent}/{total} rows selected."
     },
     "abilityError": {
-      "shieldRequired": "Musíte mít nasazený štít."
+      "shieldRequired": "You must have a shield equipped."
     },
     "specPanel": {
-      "primaryAttr": "Primární atribut",
-      "complexity": "Složitost",
-      "complexityLow": "Nízká",
-      "complexityMedium": "Střední",
-      "complexityHigh": "Vysoká",
-      "exampleAbilities": "Ukázkové schopnosti",
-      "viewTalents": "Zobrazit talenty",
-      "selectSpec": "Vybrat specializaci"
+      "primaryAttr": "Primary attribute",
+      "complexity": "Complexity",
+      "complexityLow": "Low",
+      "complexityMedium": "Medium",
+      "complexityHigh": "High",
+      "exampleAbilities": "Example abilities",
+      "viewTalents": "View talents",
+      "selectSpec": "Select specialization"
     },
     "controller": {
       "title": "Ovladač",
@@ -998,6 +998,7 @@ export const cs_CZ: EnTranslations = {
         "spellPower": "Síla kouzel",
         "critRating": "Hodnocení kritického zásahu",
         "hasteRating": "Hodnocení rychlosti",
+        "hitRating": "Hodnocení zásahu",
         "warfare": "Válečnictví"
       },
       "warfareValue": "+{increase} % způsobeno / -{reduction} % utrpěno",
@@ -1015,6 +1016,7 @@ export const cs_CZ: EnTranslations = {
         "dodge": "Tvoje šance úplně se vyhnout příchozímu útoku na blízko a neutrpět poškození.",
         "critRating": "Hodnocení kritického zásahu z tvé výbavy a bonusů sad, které zvyšuje tvoji šanci na kritický zásah. Přibližně 10 hodnocení dá 1 % kritického zásahu.",
         "hasteRating": "Hodnocení rychlosti z tvé výbavy a bonusů sad, které zrychluje tvé útoky a sesílání kouzel. Přibližně 10 hodnocení dá 1 % rychlosti.",
+        "hitRating": "Hodnocení zásahu z vybavení a bonusů sady, snižující četnost mašení tvých útoků a odolávání tvým kouzlům, zejména proti nepřátelům vyšší úrovně. Přibližně 10 bodů hodnocení přidá 1 % zásahu.",
         "warfare": "Zvýší poškození způsobené hráčům o {increase} % a sníží poškození utrpěné od hráčů o {reduction} %."
       },
       "effects": {
@@ -1090,10 +1092,10 @@ export const cs_CZ: EnTranslations = {
         "other": "jste {rank}, {count} členů"
       },
       "finderPartySize": {
-        "one": "{count} player",
-        "few": "{count} players",
-        "many": "{count} players",
-        "other": "{count} players"
+        "one": "{count} hráč",
+        "few": "{count} hráči",
+        "many": "{count} hráčů",
+        "other": "{count} hráčů"
       },
       "characterCount": {
         "one": "{count} postava",
@@ -1304,10 +1306,10 @@ export const cs_CZ: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "Tento předmět nelze zničit.",
-      "rightClickDestroy": "Shift+kliknutí pravým tlačítkem pro zničení",
-      "dragEquipHint": "Drag onto your character to equip",
-      "dragDestroyHint": "Drag out into the world to destroy",
-      "reorderNeedsRecent": "Clear the filter and sort by Recent to rearrange your bags",
+      "rightClickDestroy": "Kliknutím pravým tlačítkem zničíš",
+      "dragEquipHint": "Přetáhni na svou postavu a předmět bude vybaven",
+      "dragDestroyHint": "Přetáhni do světa a předmět bude zničen",
+      "reorderNeedsRecent": "Zruš filtr a seřaď podle Nedávných, chceš-li přeuspořádat batohy",
       "filterGroupAria": "Filtrovat batohy podle kategorie",
       "filterAll": "Vše",
       "filterWeapon": "Zbraně",
@@ -1382,6 +1384,8 @@ export const cs_CZ: EnTranslations = {
       },
       "dodge": "Zvyšuje šanci na vyhnutí o {pct} %",
       "dodgeReduce": "Snižuje šanci na vyhnutí o {pct} %",
+      "damageReduction": "Snižuje veškeré utrpěné poškození o {pct} %",
+      "guardianWard": "Příští smrtící nepřátelský útok místo toho obnoví tvoje zdraví na {pct} %",
       "armorFlat": "Snižuje brnění o {value}",
       "armorFlatStacks": "Snižuje brnění o {value} ({stacks} stacků)",
       "armorPct": "Snižuje brnění o {pct} %",
@@ -1510,7 +1514,7 @@ export const cs_CZ: EnTranslations = {
         "benefits": "Propoj Discord, získávej body za hraní a komunitní aktivitu a stoupej ve statusových stupních.",
         "error": "Discord se nepodařilo propojit. Zkus to prosím znovu.",
         "success": "Discord propojen.",
-        "joinServer": "Jen se připojit k serveru Discord"
+        "joinServer": "Připojit se na Discord server"
       },
       "choice": {
         "title": "Pokračovat přes Discord",
@@ -1558,13 +1562,13 @@ export const cs_CZ: EnTranslations = {
         "admin": "Admin",
         "coredevs": "Hlavní dev",
         "devs": "Dev",
-        "seniormods": "Starší moderátor",
+        "seniormods": "Senior moderátor",
         "mods": "Mod",
-        "juniormods": "Mladší moderátor",
+        "juniormods": "Junior moderátor",
         "artists": "Umělec",
         "contentcreator": "Tvůrce obsahu",
         "legend": "LEGENDA",
-        "shill": "PROPAGÁTOR"
+        "shill": "HLASATEL"
       },
       "guildMember": "Ověřený člen",
       "notMember": "Zatím nejsi na serveru",
@@ -1831,7 +1835,8 @@ export const cs_CZ: EnTranslations = {
       "title": "Sběr",
       "mining": "Těžba",
       "logging": "Dřevorubectví",
-      "herbalism": "Bylinkářství"
+      "herbalism": "Bylinkářství",
+      "notReady": "Tento zdroj pro tebe ještě neobnovil zásoby."
     },
     "archetypeTitle": {
       "label": "Titul",
@@ -1865,104 +1870,104 @@ export const cs_CZ: EnTranslations = {
       "recipeNotLearned": "Tento recept ses ještě nenaučil."
     },
     "finder": {
-      "title": "Dungeon Finder",
-      "close": "Close",
-      "back": "Back",
-      "syncing": "Waiting for the realm...",
-      "tabCatalogue": "Catalogue",
-      "tabQueue": "Quick Match",
-      "tabBoard": "Premade Groups",
-      "normal": "Normal",
-      "heroic": "Heroic",
+      "title": "Hledač dungeonů",
+      "close": "Zavřít",
+      "back": "Zpět",
+      "syncing": "Čeká se na realm...",
+      "tabCatalogue": "Katalog",
+      "tabQueue": "Rychlé přiřazení",
+      "tabBoard": "Předem sestavené skupiny",
+      "normal": "Normální",
+      "heroic": "Hrdinský",
       "kindDungeon": "Dungeon",
       "kindRaid": "Raid",
-      "kindSolo": "Solo adventure",
-      "levels": "Levels {min} to {max}",
-      "levelOne": "Level {level}",
+      "kindSolo": "Sólové dobrodružství",
+      "levels": "Úrovně {min} až {max}",
+      "levelOne": "Úroveň {level}",
       "clock": "{minutes}:{seconds}",
       "roleCount": "{count} {role}",
       "roleTank": "Tank",
-      "roleHealer": "Healer",
-      "roleDps": "Damage",
-      "freeRoles": "Any roles welcome",
-      "lockoutDaily": "Daily lockout on the final boss",
-      "lockoutNone": "No lockout",
-      "lockedFor": "Locked for about {minutes} min",
-      "attunement": "Requires attunement: {quest}",
-      "heroicMarks": "Heroic Marks: {count} per player",
-      "entrance": "Entrance: {zone}",
-      "showOnMap": "Show on Map",
-      "encounters": "Encounters",
-      "finalBoss": "Final boss",
-      "summoned": "Summoned guardian",
-      "lootGuaranteed": "One of these always drops:",
-      "lootMaybe": "At most one of these may drop:",
-      "lootChance": "Additional chance drops:",
-      "lootHeroic": "Heroic bonus, one of these always drops:",
-      "pct": "{pct}%",
-      "blockedLevel": "Levels {min} to {max} only",
-      "blockedSpec": "Requires a specialization",
-      "yourRoles": "Your roles",
-      "needsSpec": "Choose a specialization to use the Dungeon Finder.",
-      "leaderNote": "Only your party leader can queue the group.",
-      "chooseActivities": "Choose activities",
-      "joinQueue": "Join queue",
-      "leaveQueue": "Leave queue",
-      "waited": "Time in queue: {time}",
-      "cooldownNote": "You may queue again in {seconds}s.",
-      "travelNote": "The group forms where everyone stands. Travel to the entrance together; nobody is teleported.",
-      "proposalTitle": "Group found: {name}",
-      "proposalRole": "Your role: {role}",
-      "accepted": "{accepted} of {size} confirmed",
-      "remaining": "{seconds}s to answer",
-      "accept": "Accept",
-      "decline": "Decline",
-      "acceptedWait": "Waiting for the others...",
-      "slotState": "{role}: {accepted} of {total} ready",
-      "openListings": "Open listings",
-      "boardEmpty": "No listings right now. Publish one!",
-      "boardLeaderGate": "Only your party leader can publish a listing.",
-      "publishListing": "Publish a listing",
-      "activity": "Activity",
-      "publish": "Publish",
-      "yourListing": "Your listing",
-      "closeListing": "Close listing",
-      "applicants": "Applicants",
-      "noApplicants": "No applicants yet.",
-      "acceptApplicantAria": "Accept {name}",
-      "declineApplicantAria": "Decline {name}",
-      "levelClass": "Lv {level} {className}",
-      "leader": "Leader: {name}",
-      "needs": "Needs {roles}",
+      "roleHealer": "Léčitel",
+      "roleDps": "Útočník",
+      "freeRoles": "Vítány jsou libovolné role",
+      "lockoutDaily": "Denní uzamčení na závěrečného bosse",
+      "lockoutNone": "Žádné uzamčení",
+      "lockedFor": "Uzamčeno přibližně na {minutes} min",
+      "attunement": "Vyžaduje naladění: {quest}",
+      "heroicMarks": "Hrdinská znamení: {count} za hráče",
+      "entrance": "Vstup: {zone}",
+      "showOnMap": "Zobrazit na mapě",
+      "encounters": "Střety",
+      "finalBoss": "Závěrečný boss",
+      "summoned": "Přivolaný strážce",
+      "lootGuaranteed": "Vždy vypadne jedno z těchto:",
+      "lootMaybe": "Může vypadnout nejvýše jeden z těchto předmětů:",
+      "lootChance": "Dodatečné šance na kořist:",
+      "lootHeroic": "Hrdinský bonus, vždy vypadne jedno z těchto:",
+      "pct": "{pct} %",
+      "blockedLevel": "Pouze úrovně {min} až {max}",
+      "blockedSpec": "Vyžaduje specializaci",
+      "yourRoles": "Tvoje role",
+      "needsSpec": "Zvol specializaci, abys mohl/a využívat Hledač dungeonů.",
+      "leaderNote": "Do fronty může skupinu zařadit pouze vůdce skupiny.",
+      "chooseActivities": "Zvolte aktivity",
+      "joinQueue": "Vstoupit do fronty",
+      "leaveQueue": "Opustit frontu",
+      "waited": "Čas ve frontě: {time}",
+      "cooldownNote": "Do fronty se můžeš znovu přidat za {seconds} s.",
+      "travelNote": "Skupina se sestaví tam, kde každý stojí. Cestujte ke vchodu společně; nikdo není přenesen teleportem.",
+      "proposalTitle": "Skupina nalezena: {name}",
+      "proposalRole": "Tvoje role: {role}",
+      "accepted": "{accepted} z {size} potvrzeno",
+      "remaining": "{seconds} s na odpověď",
+      "accept": "Přijmout",
+      "decline": "Odmítnout",
+      "acceptedWait": "Čeká se na ostatní...",
+      "slotState": "{role}: {accepted} z {total} připraveno",
+      "openListings": "Otevřené nabídky",
+      "boardEmpty": "Momentálně žádné nabídky. Přidej svou!",
+      "boardLeaderGate": "Nabídku může zveřejnit pouze vůdce skupiny.",
+      "publishListing": "Zveřejnit nabídku",
+      "activity": "Aktivita",
+      "publish": "Zveřejnit",
+      "yourListing": "Tvoje nabídka",
+      "closeListing": "Uzavřít nabídku",
+      "applicants": "Uchazeči",
+      "noApplicants": "Zatím žádní uchazeči.",
+      "acceptApplicantAria": "Přijmout {name}",
+      "declineApplicantAria": "Odmítnout {name}",
+      "levelClass": "Úr. {level} {className}",
+      "leader": "Vůdce: {name}",
+      "needs": "Potřebuje {roles}",
       "slots": "{size}/{capacity}",
-      "apply": "Apply",
-      "withdraw": "Withdraw application",
-      "tagFirstRun": "First run",
-      "tagQuestRun": "Quest run",
-      "tagFullClear": "Full clear",
-      "tagLearning": "Learning welcome",
-      "tagFastRun": "Fast run",
+      "apply": "Přihlásit se",
+      "withdraw": "Odvolat přihlášku",
+      "tagFirstRun": "První průběh",
+      "tagQuestRun": "Průběh za questem",
+      "tagFullClear": "Úplné vyčištění",
+      "tagLearning": "Vítáni začátečníci",
+      "tagFastRun": "Rychlý průběh",
       "mech": {
-        "shadow_pulse": "Shadow Pulse (pulsing area damage)",
-        "reaping_arc": "Reaping Arc (frontal cleave)",
-        "mist_surge": "Mist Surge (pulsing area damage)",
-        "summons_adds": "Summons reinforcements",
-        "lunar_tide": "Lunar Tide (pulsing area damage)",
-        "enrage": "Enrages at low health",
-        "shuddering_stomp": "Shuddering Stomp (area stun)",
-        "necrotic_shockwave": "Necrotic Shockwave (heavy area damage)",
-        "grave_cleaver": "Grave-Cleaver (frontal cleave)",
-        "shadow_nova": "Shadow Nova (area burst)",
-        "profane_mending": "Profane Mending (heals its allies)",
-        "mana_burn": "Withered Benediction (burns mana)",
-        "deathstalker_cleave": "Deathstalker Cleave (frontal cleave)",
-        "mortal_wound": "Forgotten Wound (reduces healing taken)",
-        "sealbreak_shockwave": "Sealbreak Shockwave (area burst)",
-        "gravebreaker": "Gravebreaker (frontal cone, face it away from the raid)",
-        "raise_fallen": "Raise Fallen (periodic waves of adds)",
-        "soul_rend": "Soul Rend (marked players must spread and be healed)",
-        "deathless_rage": "Deathless Rage (interrupted at the wardstones)",
-        "wardstones": "Wardstone channels (phase transition)"
+        "shadow_pulse": "Stínový puls (pulzující plošné poškození)",
+        "reaping_arc": "Žací oblouk (čelní sek)",
+        "mist_surge": "Mlžný příval (pulzující plošné poškození)",
+        "summons_adds": "Přivolává posily",
+        "lunar_tide": "Měsíční příboj (pulzující plošné poškození)",
+        "enrage": "Zuří při nízkém zdraví",
+        "shuddering_stomp": "Třesoucí dupnutí (plošné ochromení)",
+        "necrotic_shockwave": "Nekrotická rázová vlna (silné plošné poškození)",
+        "grave_cleaver": "Hrobní sekáč (čelní sek)",
+        "shadow_nova": "Stínová nova (plošný výbuch)",
+        "profane_mending": "Znesvěcené léčení (léčí spojence)",
+        "mana_burn": "Vyschlé požehnání (spaluje manu)",
+        "deathstalker_cleave": "Sek smrtilovcovy zbraně (čelní sek)",
+        "mortal_wound": "Zapomenutá rána (snižuje přijímané léčení)",
+        "sealbreak_shockwave": "Rázová vlna zlomení pečeti (plošný výbuch)",
+        "gravebreaker": "Rozbíječ hrobů (čelní kužel, otočte jej od raidu)",
+        "raise_fallen": "Povstání padlých (periodické vlny přivolávek)",
+        "soul_rend": "Trhání duše (označení hráči se musí rozejít a být vyléčeni)",
+        "deathless_rage": "Nesmrtelný hněv (přerušen u ochranných kamenů)",
+        "wardstones": "Kanály ochranných kamenů (přechod fáze)"
       }
     },
     "deeds": {
@@ -2586,8 +2591,8 @@ export const cs_CZ: EnTranslations = {
     },
     "abilityHook": {
       "heroic_strike": "Zařadí těžší švih, který utratí vztek při příštím zásahu.",
-      "revenge": "Sekne nepřátele před tebou a po úhybu nebo odražení může být zdarma.",
-      "hamstring": "Zmrzačí pohyb nepřítele, aby nemohl uniknout.",
+      "revenge": "Sweeps enemies in front of you, with a chance to become free after a dodge or parry.",
+      "hamstring": "Cripples an enemy's movement to keep it from escaping.",
       "battle_shout": "Povzbuzující pokřik, který zvedne sílu útoku party.",
       "charge": "Vyrazí k vzdálenému nepříteli a otevře boj krátkým omráčením.",
       "thunder_clap": "Zasáhne vše kolem tebe a zpomalí jejich útoky.",
@@ -2647,7 +2652,9 @@ export const cs_CZ: EnTranslations = {
       "mark_of_the_wild": "Trvalé požehnání, které dáváš sobě nebo spojenci před bojem.",
       "moonfire": "Zasáhne okamžitě a nechá cíl hořet, dobré během pohybu.",
       "rejuvenation": "Sesílá se okamžitě a léčí spojence v čase, takže můžeš dál jednat.",
-      "thorns": "Ochrání spojence tak, že útočníci na blízko si sami ublíží za každý zásah."
+      "thorns": "Ochrání spojence tak, že útočníci na blízko si sami ublíží za každý zásah.",
+      "commanding_shout": "Posílí výdrž, aby všichni v boji vydrželi déle.",
+      "rend": "Otevře krvácení, které cíl postupně opotřebuje."
     },
     "petHook": {
       "emberkin": "Démon s ohnivou střelou na dálku, který ukrajuje nepřátele z bezpečné vzdálenosti.",
@@ -2717,7 +2724,7 @@ export const cs_CZ: EnTranslations = {
       },
       "reptile": {
         "name": "Plazi",
-        "desc": "Chladnokrevní lovci s nezaměnitelným syčením a cvakáním čelistí, odlišní od teplokrevných šelem."
+        "desc": "Studenokrevní lovci s vlastním syčením a lupem čelistí, odlišní od teplokrevných bestií."
       }
     },
     "worldPage": {
@@ -4628,6 +4635,8 @@ export const cs_CZ: EnTranslations = {
     "connectionLost": "Připojení k serveru bylo ztraceno.",
     "reconnecting": "Připojení ztraceno. Znovu se připojuje...",
     "connectionRejected": "Server ukončil připojení.",
+    "realmFull": "Tento svět je momentálně plný. Zkus to prosím znovu za několik minut.",
+    "tooManyConnections": "Z tvé sítě se k tomuto světu připojuje příliš mnoho spojení. Zavři nadbytečná herní okna nebo to zkus znovu za několik minut.",
     "tips": {
       "classes": "Tip: každá z 9 tříd se hraje jinak. Než se pro jednu rozhodneš, několik jich vyzkoušej.",
       "talents": "Tip: kdykoli nejsi v boji, můžeš resetovat své talenty, takže časná volba nikdy není past.",
@@ -5285,7 +5294,7 @@ export const cs_CZ: EnTranslations = {
       "defensiveDesc": "Útočí na nepřátele, kteří zraní tebe nebo tvého mazlíčka.",
       "aggressiveDesc": "Útočí na blízké nepřátelské protivníky.",
       "rename": "Přejmenovat mazlíčka",
-      "revive": "Ošetření",
+      "revive": "Oživit mazlíčka",
       "abandon": "Opustit mazlíčka",
       "cancel": "Zrušit",
       "renameLabel": "Vyber nové jméno mazlíčka.",
@@ -5397,7 +5406,7 @@ export const cs_CZ: EnTranslations = {
     "actionBar": {
       "attackName": "Útok",
       "attackTooltip": "Přepne automatický útok na cíl. Kliknutí pravým tlačítkem na nepřítele také zaútočí.",
-      "attackRemoveHint": "Right-click to remove it from the bar and free the slot.",
+      "attackRemoveHint": "Klikni pravým tlačítkem pro odebrání z lišty a uvolnění slotu.",
       "emptySlot": "Prázdný slot",
       "slotAria": "Akční slot {slot}: {ability}",
       "emptySlotAria": "Akční slot {slot}: prázdný",
@@ -5541,7 +5550,7 @@ export const cs_CZ: EnTranslations = {
     },
     "slots": {
       "mainhand": "Hlavní ruka",
-      "offhand": "Vedlejší ruka",
+      "offhand": "Off Hand",
       "helmet": "Helma",
       "neck": "Krk",
       "shoulder": "Ramena",
@@ -6355,6 +6364,18 @@ export const cs_CZ: EnTranslations = {
         "name": "Dubová kůže",
         "description": "Tvoje kůže ztvrdne jako kůra a zvýší zbroj o 150 na 15 s."
       },
+      "ironhold": {
+        "name": "Železný hmat",
+        "description": "Zapři se za svůj štít a sniž veškeré utrpěné poškození o 40 % po dobu 8 sekund."
+      },
+      "sacred_bulwark": {
+        "name": "Posvátná hradba",
+        "description": "Po dobu {duration} sekund je odvrácen příští nepřátelský úder, který by tě zabil, a místo toho ti obnoví 35 % zdraví."
+      },
+      "primal_reflexes": {
+        "name": "Prvotní reflexy",
+        "description": "Tvoje instinkty se zostří a tvá šance na vyhnutí se útoku vzroste o 50 % po dobu 6 sekund."
+      },
       "starfire": {
         "name": "Pád nebes",
         "description": "Přivolá šíp hvězdného ohně a způsobí {damage} arkánního poškození."
@@ -6540,304 +6561,304 @@ export const cs_CZ: EnTranslations = {
         "description": "Spoutá Zrozence přízraků do tvé vůle, elitního démona, který z dálky sesílá těžké stínové poškození. Jeho ničivou sílu omezuje dlouhý cooldown. Vyvolání nového démona propustí toho současného. Můžeš mít vždy jen jednoho démona."
       },
       "battle_stance": {
-        "name": "Bojový postoj",
-        "description": "Útočný bojový postoj: vytváříš o 10 % více vzteku. Výchozí postoj pro Arms a Protection."
+        "name": "Battle Stance",
+        "description": "An aggressive combat stance: you generate 10% more rage. The default stance for Arms and Protection."
       },
       "berserker_stance": {
-        "name": "Postoj berserka",
-        "description": "Lehkomyslný bojový postoj: tvoje kritické zásahy padají o 3 % častěji a udeří o 3 % silněji. Válečník Fury bojuje vždy v tomto postoji."
+        "name": "Berserker Stance",
+        "description": "A reckless combat stance: your critical strikes land 3% more often and hit for 3% more. The Fury warrior always fights in this stance."
       },
       "sweeping_strikes": {
-        "name": "Široký oblouk",
-        "description": "Po dobu 12 s tvoje útoky na jeden cíl zasáhnou také 1 blízkého nepřítele za plné poškození. (Arms)"
+        "name": "Widening Arc",
+        "description": "For 12 sec your single-target attacks also strike 1 nearby enemy for full damage. (Arms)"
       },
       "deep_wounds": {
-        "name": "Zející rány",
-        "description": "Pasivní: tvůj Mrzačící úder nechá cíl krvácet a působí mu fyzické poškození během 6 s. (Arms)"
+        "name": "Gaping Wounds",
+        "description": "Passive: your Maiming Strike leaves the target bleeding for Physical damage over 6 sec. (Arms)"
       },
       "enrage_passive": {
-        "name": "Vřava",
-        "description": "Pasivní: když jsi rozzuřen(a), způsobuješ o 7 % více poškození, útočíš o 25 % rychleji a pohybuješ se o 10 % rychleji po dobu 4 s. Pouštění žilou má 30% šanci tě rozzuřit; Rudá žeň tě rozzuří vždy. (Fury)"
+        "name": "Mayhem",
+        "description": "Passive: while Enraged you deal 7% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)"
       },
       "raging_gale": {
-        "name": "Dvojúder",
-        "description": "Okamžitě dvakrát udeříš zbraní, každý zásah způsobí 40 % poškození zbraně plus {damage}, a vygeneruješ 8 vzteku. Ukládá až 2 nabití. (Fury)"
+        "name": "Twinstrike",
+        "description": "Instantly strike with your weapon twice, each hit dealing 40% weapon damage plus {damage}, and generate 8 rage. Stores up to 2 charges. (Fury)"
       },
       "red_harvest": {
-        "name": "Rudá žeň",
-        "description": "Vydej ze sebe vše: v šílenství třikrát udeříš, každý úder za 65 % poškození zbraně plus {damage}, a vždy tě to rozzuří. (Fury)"
+        "name": "Red Harvest",
+        "description": "Spend everything: strike three times in a frenzy for 65% weapon damage plus {damage} each, always Enraging you. (Fury)"
       },
       "furious_mending": {
-        "name": "Zuřivé zacelení",
-        "description": "Po dobu 10 s utrpíš o 20 % méně poškození, a dokud efekt trvá, Pouštění žilou tě léčí za 20 % tvého maximálního zdraví. (Fury)"
+        "name": "Furious Mending",
+        "description": "For 10 sec you take 20% reduced damage, and while it lasts your Bloodletting heals you for 20% of your maximum health. (Fury)"
       },
       "emboldening_roar": {
-        "name": "Osmělující řev",
-        "description": "Vydáš osmělující řev: ty a spřátelení hráči do 40 yardů jste Osměleni a vaše další 3 schopnosti budou zaručeně kritické zásahy. (Fury)"
+        "name": "Emboldening Roar",
+        "description": "Lets loose an emboldening roar: you and friendly players within 40 yards are Emboldened, and your next 3 abilities are guaranteed critical strikes. (Fury)"
       },
       "raised_guard": {
-        "name": "Zvednutý kryt",
-        "description": "Zapři se za štítem: po dobu 6 s utrpíš o 50 % méně fyzického poškození. Ukládá až 2 nabití. (Protection)"
+        "name": "Raised Guard",
+        "description": "Brace behind your shield: you take 50% reduced Physical damage for 6 sec. Stores up to 2 charges. (Protection)"
       },
       "iron_resolve": {
-        "name": "Železné odhodlání",
-        "description": "Zatneš zuby a ignoruješ bolest: spotřebuješ až 40 vzteku (nejméně 20) a za každý spotřebovaný bod vzteku absorbuješ 4 poškození po dobu až 10 s. (Ochrana)"
+        "name": "Iron Resolve",
+        "description": "Grit your teeth and ignore the pain: spends up to 40 rage (20 minimum) to absorb 4 damage per rage spent, lasting up to 10 sec. (Protection)"
       },
       "faultline": {
-        "name": "Zlomová linie",
-        "description": "Vyšle zemí tlakovou vlnu: nepřátelé před tebou do 8 yardů utrpí {damage} poškození a jsou na 3 s omráčeni. (Protection)"
+        "name": "Faultline",
+        "description": "Send a shockwave through the ground: enemies in front of you within 8 yards take {damage} damage and are stunned for 3 sec. (Protection)"
       },
       "defiant_bellow": {
-        "name": "Vzdorný řev",
-        "description": "Vzdorný řev: každý nepřítel do 10 yardů je vyprovokován a nucen na tebe 3 s útočit. (Protection)"
+        "name": "Defiant Bellow",
+        "description": "A defiant bellow: every enemy within 10 yards is taunted, compelled to attack you for 3 sec. (Protection)"
       },
       "breachmaker": {
-        "name": "Prolamovač",
-        "description": "Ztluče cíl za poškození zbraně plus {damage} a prolomí jeho kryt: tvoje vlastní útoky proti němu způsobují o 20 % více poškození po dobu 8 s. (Arms)"
+        "name": "Breachmaker",
+        "description": "Batter the target for weapon damage plus {damage} and crack its guard: your own attacks against it deal 20% more damage for 8 sec. (Arms)"
       },
       "measured_fury": {
-        "name": "Odměřená zuřivost",
-        "description": "Tvá odměřená zuřivost zostřuje tvé hospodaření: schopnosti tě stojí o 10 % méně vzteku. (Arms)"
+        "name": "Measured Fury",
+        "description": "Your measured fury sharpens your economy: your abilities cost 10% less rage. (Arms)"
       },
       "seasoned_soldier": {
-        "name": "Ostřílený voják",
-        "description": "Tvoje kritické automatické útoky generují o 10 % více vzteku. (Arms)"
+        "name": "Seasoned Soldier",
+        "description": "Your critical auto-attacks generate 10% more rage. (Arms)"
       },
       "diabolical_twinstrike": {
-        "name": "Ďábelský dvojúder",
-        "description": "Když jsi rozzuřen(a), tvůj Dvojúder způsobuje o 15 % více poškození. (Fury)"
+        "name": "Diabolical Twinstrike",
+        "description": "While Enraged, your Twinstrike deals 15% more damage. (Fury)"
       },
       "cleaving_blows": {
-        "name": "Rozpolcující údery",
-        "description": "Rudá žeň vždy vrátí jedno nabití Dvojúderu. (Fury)"
+        "name": "Cleaving Blows",
+        "description": "Red Harvest always refunds a charge of Twinstrike. (Fury)"
       },
       "sudden_death": {
-        "name": "Náhlá smrt",
-        "description": "Tvoje automatické útoky mají šanci ti dovolit seslat Předčasný hrob na cíl s libovolným zdravím, a to zcela bez ceny vzteku. (Arms)"
+        "name": "Sudden Death",
+        "description": "Your auto-attacks have a chance to let you cast Early Grave on a target at any health, costing no rage. (Arms)"
       },
       "storm_bolt": {
-        "name": "Bouřná střela",
-        "description": "Mrštíš zbraní po cíli za {damage} poškození a omráčíš ho na 3 s."
+        "name": "Storm Bolt",
+        "description": "Hurl your weapon at the target for {damage}, stunning it for 3 sec."
       },
       "piercing_howl": {
-        "name": "Pronikavé zavytí",
-        "description": "Pronikavý pokřik, který na 8 s zpomalí všechny nepřátele do 15 yardů o 50 %."
+        "name": "Piercing Howl",
+        "description": "A piercing shout that slows all enemies within 15 yards by 50% for 8 sec."
       },
       "die_by_sword": {
-        "name": "Smrt s mečem v ruce",
-        "description": "Obranná schopnost: po dobu 8 s utrpíš o 30 % méně poškození a vyhneš se mnohem více útokům."
+        "name": "Die by the Sword",
+        "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
       },
       "recklessness": {
-        "name": "Bezhlavost",
-        "description": "Rozzuření: tvoje generování vzteku se zvýší o 50 % a šance na kritický zásah o 20 % na 12 s."
+        "name": "Recklessness",
+        "description": "Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec."
       },
       "sanguine_aura": {
-        "name": "Krvavá aura",
-        "description": "Naplň svou zbraň krví nepřátel: ty a tvoji spojenci na blízko získáte na 20 s o 10 % vyšší rychlost útoku a o 10 % vyšší poškození."
+        "name": "Sanguine Aura",
+        "description": "Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec."
       },
       "victory_rush": {
-        "name": "Vítězný nápor",
-        "description": "Udeříš za poškození zbraně plus {damage} a vyléčíš se za 20 % svého maximálního zdraví. Použitelné jen do 20 s od zabití nepřítele."
+        "name": "Victory Rush",
+        "description": "Strike for weapon damage plus {damage} and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy."
       },
       "intimidating_shout": {
-        "name": "Zastrašující pokřik",
-        "description": "Děsivý pokřik, který až 5 nepřátel do 8 yardů zažene na 8 s na útěk hrůzou. Poškození může efekt přerušit."
+        "name": "Intimidating Shout",
+        "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
       },
       "revenge": {
-        "name": "Odveta",
-        "description": "Zaútočíš širokým obloukem a způsobíš fyzické poškození všem nepřátelům před tebou. Při více než 5 cílech je poškození sníženo. Když se vyhneš útoku nebo ho odrazíš, tvá příští Odveta nemusí stát žádný vztek. (Protection)"
+        "name": "Revenge",
+        "description": "Attack in a wide arc, dealing Physical damage to all enemies in front of you. Above 5 targets the damage is reduced. When you dodge or parry, your next Revenge may cost no rage. (Protection)"
       },
       "heroic_leap": {
-        "name": "Válečný skok",
-        "description": "Skočíš do cílové oblasti a při dopadu způsobíš okolním nepřátelům {damage} poškození."
+        "name": "Heroic Leap",
+        "description": "Leap to the target area, dealing {damage} damage to nearby enemies on landing."
       },
       "rallying_cry": {
-        "name": "Řev odvahy",
-        "description": "Vydáš odvážný řev, který tobě a členům skupiny do 40 metrů na 10 s zvýší maximální zdraví o 20 %. Ochrana: po dobu trvání také utrpí o 5 % méně poškození."
+        "name": "Valor Roar",
+        "description": "Lets loose a valorous roar, granting you and party members within 40 yards 20% additional maximum health for 10 sec. Protection: they also take 5% less damage for the duration."
       },
       "avatar": {
         "name": "Avatar",
-        "description": "Na 20 s se proměníš v kolosa, zrušíš všechny ovládací efekty a zvýšíš své způsobené poškození o 20 %."
+        "description": "Transform into a colossus for 20 sec, breaking all control on you and increasing your damage dealt by 20%."
       },
       "bladestorm": {
-        "name": "Bouře čepelí",
-        "description": "Proměníš se ve vířící bouři oceli a po dobu 4 s každou sekundu zasáhneš všechny nepřátele do 8 metrů za {damage} poškození."
+        "name": "Bladestorm",
+        "description": "Become a whirling storm of steel, striking all enemies within 8 yards for {damage} every second for 4 sec."
       },
       "aspect_of_the_wild": {
-        "name": "Maska divokého tesáku",
-        "description": "Povzbudí spojence do 30 m divokou silou a na 5 min. jim zvýší útočnou sílu o 45 a rychlost útoku o 5 %. (lovecký talent)"
+        "name": "Wildfang Rally",
+        "description": "Inspires allies within 30 yd with wild strength, increasing attack power by 45 and attack speed by 5% for 5 min. (Hunter talent)"
       },
       "aura_surge": {
-        "name": "Úsvitový odraz",
-        "description": "Vrhne úsvitem kovaný štít za {damage} bodů Svatého poškození, umlčí hlavní cíl na 2 sek. a poté se odrazí až ke 2 dalším nepřátelům do 10 yardů; každý odraz způsobí 75% poškození. (Paladinský talent)"
+        "name": "Dawnward Ricochet",
+        "description": "Hurl a dawnforged shield for {damage} Holy damage and silence the primary target for 2 sec. It bounces to up to 2 additional enemies within 10 yd for 75% damage per bounce. (Paladin talent)"
       },
       "avenging_wrath": {
-        "name": "Křídlo odplaty",
-        "description": "Přivolá moc pomsty a na 20 s vám zvýší útočnou sílu o 60 a sílu kouzel o 30. (paladinský talent)"
+        "name": "Wrathwing",
+        "description": "Calls down avenging power, increasing attack power by 60 and spell power by 30 for 20 sec. (Paladin talent)"
       },
       "berserk": {
-        "name": "Rudý opar",
-        "description": "Na 15 s vám zvýší útočnou sílu o 70. (druidský talent)"
+        "name": "Red Haze",
+        "description": "Increases attack power by 70 for 15 sec. (Druid talent)"
       },
       "blink": {
-        "name": "Mihokrok",
-        "description": "Teleportuje vás o 15 m vpřed a zruší účinky zakořenění. (mágský talent)"
+        "name": "Flickerstep",
+        "description": "Teleports you 15 yd forward and breaks roots. (Mage talent)"
       },
       "bloodlust": {
-        "name": "Válečné bubny",
-        "description": "Uvede spojence do 30 m do běsnění a na 15 s jim zvýší rychlost útoku o 30 %. (šamanský talent)"
+        "name": "Storm Chorus",
+        "description": "Whips allies within 30 yd into a frenzy, increasing attack speed by 30% for 15 sec. (Shaman talent)"
       },
       "chain_lightning": {
-        "name": "Rozvětvený blesk",
-        "description": "Sešle blesk na cílovou oblast a způsobí blízkým nepřátelům {damage} bodů poškození. (šamanský talent)"
+        "name": "Skybranch",
+        "description": "Hurls lightning at the target area, damaging nearby enemies for {damage}. (Shaman talent)"
       },
       "chaos_bolt": {
-        "name": "Zkázný šíp",
-        "description": "Vrhne střelu chaotického ohně, která způsobí {damage} bodů ohnivého poškození. (černokněžnický talent)"
+        "name": "Ruinbolt",
+        "description": "Hurls a bolt of chaotic fire for {damage} Fire damage. (Warlock talent)"
       },
       "cleansing_verdict": {
-        "name": "Očistný rozsudek",
-        "description": "Odstraní škodlivý magický účinek ze spojeneckého cíle a vyléčí jej svatou magií za {damage}."
+        "name": "Cleansing Verdict",
+        "description": "Purges a harmful magic effect from a friendly target and heals them for {damage} Holy."
       },
       "cloak_of_shadows": {
-        "name": "Stínoplášť",
-        "description": "Zahalí vás do stínů a po dobu 5 s absorbuje 420 bodů poškození. (lotrovský talent)"
+        "name": "Shadecloak",
+        "description": "Wraps you in shadows, absorbing 420 damage for 5 sec. (Rogue talent)"
       },
       "cone_of_cold": {
-        "name": "Mrazivý smyk",
-        "description": "Zasáhne blízké nepřátele mrazem za {damage} bodů mrazivého poškození. (charakteristická schopnost Mrazu)"
+        "name": "Frostsweep",
+        "description": "Blasts nearby enemies with frost for {damage} Frost damage. (Frost signature)"
       },
       "curse_of_exhaustion": {
-        "name": "Olověná kletba",
-        "description": "Prokleje cíl a na 12 s mu sníží rychlost pohybu o 30 %. (černokněžnický talent)"
+        "name": "Leaden Hex",
+        "description": "Curses the target, slowing movement by 30% for 12 sec. (Warlock talent)"
       },
       "death_coil": {
-        "name": "Hrobová spirála",
-        "description": "Zasáhne nepřítele za {damage} bodů stínového poškození a poté ho na 3 s vyděsí. (černokněžnický talent)"
+        "name": "Morrowlash",
+        "description": "Strikes the enemy for {damage} Shadow damage, then horrifies them for 3 sec. (Warlock talent)"
       },
       "deep_freeze": {
-        "name": "Mrtvý mráz",
-        "description": "Hluboce zmrazí cíl, způsobí mu {damage} bodů mrazivého poškození a na 4 s ho omráčí. (mágský talent)"
+        "name": "Deadfrost",
+        "description": "Deep freezes the target, dealing {damage} Frost damage and stunning it for 4 sec. (Mage talent)"
       },
       "desperate_prayer": {
-        "name": "Poslední modlitba",
-        "description": "Okamžitě vás vyléčí o {damage}. (kněžský talent)"
+        "name": "Last Prayer",
+        "description": "Instantly heals you for {damage}. (Priest talent)"
       },
       "deterrence": {
-        "name": "Štětinová stráž",
-        "description": "Na 10 s zvýší vaši šanci na úhyb o 50 procentních bodů. (lovecký talent)"
+        "name": "Bristleguard",
+        "description": "Increases your dodge chance by 50 percentage points for 10 sec. (Hunter talent)"
       },
       "divine_shield": {
-        "name": "Světelný štít",
-        "description": "Ochrání vás svatou mocí, která po dobu 8 s absorbuje 900 bodů poškození. (paladinský talent)"
+        "name": "Lightward",
+        "description": "Shields you with holy power, absorbing 900 damage for 8 sec. (Paladin talent)"
       },
       "earthbind": {
-        "name": "Svírající země",
-        "description": "Připoutá blízké nepřátele k zemi a na 2 s je zakoření. (šamanský talent)"
+        "name": "Gripping Earth",
+        "description": "Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)"
       },
       "evocation": {
-        "name": "Éterická studna",
-        "description": "Okamžitě obnoví 220 bodů many. (mágský talent)"
+        "name": "Aetherwell",
+        "description": "Instantly restores 220 mana. (Mage talent)"
       },
       "frenzied_regeneration": {
-        "name": "Divoké zacelení",
-        "description": "Během 10 s obnoví 180 bodů zdraví. Pouze v Medvědí podobě. (druidský talent)"
+        "name": "Savage Mending",
+        "description": "Restores 180 health over 10 sec. Bruin Form only. (Druid talent)"
       },
       "frost_trap": {
-        "name": "Jinovatková léčka",
-        "description": "Na 3 s zmrazí nepřátele v cílové oblasti, takže se nemohou pohybovat ani jednat. (lovecký talent)"
+        "name": "Rime Snare",
+        "description": "Freezes enemies at the target area for 3 sec, preventing movement and actions. (Hunter talent)"
       },
       "ghostly_strike": {
-        "name": "Přízračný úder",
-        "description": "Zasáhne nepřítele za poškození zbraně plus {damage}, krátce zvýší úhyb a udělí 1 kombinovaný bod. (lotrovský talent)"
+        "name": "Wraith Strike",
+        "description": "Strikes the enemy for weapon damage plus {damage} and briefly increases dodge. Awards 1 combo point. (Rogue talent)"
       },
       "hammer_of_wrath": {
-        "name": "Zvonící kladivo",
-        "description": "Vrhne svaté kladivo na zraněného nepřítele za {damage} bodů Svatého poškození. Lze použít pouze pod 20 % zdraví. (paladinský talent)"
+        "name": "Tolling Hammer",
+        "description": "Hurls a holy hammer at a wounded enemy for {damage} Holy damage. Only usable below 20% health. (Paladin talent)"
       },
       "healing_stream": {
-        "name": "Pramenná studna",
-        "description": "Během 12 s obnoví spojeneckému cíli 120 bodů zdraví. (šamanský talent)"
+        "name": "Springwell",
+        "description": "Restores 120 health to a friendly target over 12 sec. (Shaman talent)"
       },
       "holy_wrath": {
-        "name": "Hněv světce",
-        "description": "Uvolní svatou moc a způsobí blízkým nepřátelům {damage} bodů poškození. (paladinský talent)"
+        "name": "Saint's Ire",
+        "description": "Unleashes holy power, damaging nearby enemies for {damage}. (Paladin talent)"
       },
       "howl_of_terror": {
-        "name": "Děsivé zavytí",
-        "description": "Vyděsí blízké nepřátele až na 3 s. Poškození může účinek zrušit. (černokněžnický talent)"
+        "name": "Dread Chorus",
+        "description": "Frightens nearby enemies for up to 3 sec. Damage may break the effect. (Warlock talent)"
       },
       "ice_block": {
-        "name": "Ledová rakev",
-        "description": "Uzavře vás do ledu, který po dobu 8 s absorbuje 600 bodů poškození. V ledu nemůžete jednat. Opětovným sesláním účinek zrušíte. (mágský talent)"
+        "name": "Cold Coffin",
+        "description": "Encases you in ice, absorbing 600 damage for 8 sec. You cannot act while encased. Recast to cancel. (Mage talent)"
       },
       "inner_focus": {
-        "name": "Ztišená mysl",
-        "description": "Vaše příští kouzlo bude zdarma. Trvá 60 s. (kněžský talent)"
+        "name": "Stilled Mind",
+        "description": "Makes your next spell free. Lasts 60 sec. (Priest talent)"
       },
       "innervate": {
-        "name": "Míza života",
-        "description": "Po dobu 10 s ve vás proudí živá míza a ve vlnách obnoví 20 bodů vašeho aktuálního zdroje: many, zuřivosti nebo energie. Změna podoby ji nepřeruší. Spánek, omráčení nebo stáze proud mízy zastaví. (druidský talent)"
+        "name": "Lifesap",
+        "description": "Living sap wells up in you for 10 sec, restoring 20 of your current resource in waves: mana, Rage, or Energy, and shifting forms does not break it. Sleep, stun, or stasis stills the sap. (Druid talent)"
       },
       "meteor": {
-        "name": "Nebeský kámen",
-        "description": "Přivolá meteor na cílovou oblast za {damage} bodů ohnivého poškození. Poté nepřátelé v oblasti utrpí každé 2 s po dobu 6 s dalších 12 až 18 bodů ohnivého poškození. (mágský talent)"
+        "name": "Skystone",
+        "description": "Calls down a meteor at the target area, dealing {damage} Fire damage, then burning enemies there for 12 to 18 Fire damage every 2 sec for 6 sec. (Mage talent)"
       },
       "mind_sear": {
-        "name": "Spálení mysli",
-        "description": "Usměrní stínovou energii na cílovou oblast a každou sekundu způsobí blízkým nepřátelům {damage} bodů poškození. (kněžský talent)"
+        "name": "Thoughtburn",
+        "description": "Channels shadow energy at the target area, damaging nearby enemies each second for {damage}. (Priest talent)"
       },
       "multi_shot": {
-        "name": "Tříštivý výstřel",
-        "description": "Vystřelí salvu na cílovou oblast a způsobí nepřátelům v okruhu 8 m {damage} bodů fyzického poškození. (lovecký talent)"
+        "name": "Splitshot",
+        "description": "Loose a spread at the target area, dealing {damage} Physical damage to enemies within 8 yd. (Hunter talent)"
       },
       "prayer_of_healing": {
-        "name": "Sborové zacelení",
-        "description": "Vyléčí blízké spojence o {damage}. (kněžský talent)"
+        "name": "Choirmend",
+        "description": "Heals nearby allies for {damage}. (Priest talent)"
       },
       "preparation": {
-        "name": "Záložní plán",
-        "description": "Dokončí přebíjení Sprintu, Úhybu a Zmizení. (lotrovský talent)"
+        "name": "Contingency",
+        "description": "Finishes the cooldown on Sprint, Evasion, and Vanish. (Rogue talent)"
       },
       "presence_of_mind": {
-        "name": "Zrychlená mysl",
-        "description": "Vaše příští kouzlo s dobou sesílání bude okamžité. Trvá 60 s. (mágský talent)"
+        "name": "Racing Mind",
+        "description": "Makes your next spell with a cast time instant. Lasts 60 sec. (Mage talent)"
       },
       "psychic_scream": {
-        "name": "Výkřik hrůzy",
-        "description": "Vyděsí blízké nepřátele až na 4 s. Poškození může účinek zrušit. (kněžský talent)"
+        "name": "Terror Canticle",
+        "description": "Frightens nearby enemies for up to 4 sec. Damage may break the effect. (Priest talent)"
       },
       "shadowstep": {
-        "name": "Stínový skluz",
-        "description": "Vykročíte stíny směrem ke svému cíli. (lotrovský talent)"
+        "name": "Shadeslip",
+        "description": "Steps through the shadows toward your target. (Rogue talent)"
       },
       "silence": {
-        "name": "Umlčení",
-        "description": "Na 4 s umlčí cíl. (kněžský talent)"
+        "name": "Hushword",
+        "description": "Silences the target for 4 sec. (Priest talent)"
       },
       "smoke_screen": {
-        "name": "Kouřová clona",
-        "description": "Zmizíte v oblaku kouře a na 8 s zvýšíte svou šanci na úhyb o 30 %."
+        "name": "Smoke Screen",
+        "description": "Vanish into a cloud of smoke, increasing your chance to dodge by 30% for 8 sec."
       },
       "spellsteal": {
-        "name": "Krádež kouzla",
-        "description": "Ukradne nepříteli prospěšný magický účinek a přenese jej na vás."
+        "name": "Spellsteal",
+        "description": "Steals a beneficial magic effect from an enemy, transferring it to yourself."
       },
       "startle_shot": {
-        "name": "Lekavý výstřel",
-        "description": "Divoký výstřel, který na {duration} s dezorientuje cíl. Jakékoli poškození účinek zruší."
+        "name": "Startle Shot",
+        "description": "A wild shot that disorients the target for {duration} sec. Any damage breaks the effect."
       },
       "tranquility": {
-        "name": "Píseň háje",
-        "description": "Po dobu 4 s usměrňuje léčivou energii a každou sekundu vyléčí spojence do 30 m o 42 až 52. (druidský talent)"
+        "name": "Gladesong",
+        "description": "Channels restorative energy for 4 sec, healing allies within 30 yd for 42 to 52 each second. (Druid talent)"
       },
       "typhoon": {
-        "name": "Tajfun",
-        "description": "Poryv větru odhodí všechny nepřátele do 8 m a omráčí je, čímž na 4 s sníží jejich rychlost pohybu o 50 %."
+        "name": "Typhoon",
+        "description": "A blast of wind knocks back all enemies within 8 yd and dazes them, slowing their movement by 50% for 4 sec."
       },
       "voidfeast": {
-        "name": "Hostina prázdnoty",
-        "description": "Pohltí magický účinek (prospěšný z nepřítele nebo škodlivý ze spojence) a vyléčí vás o 6 % maximálního zdraví."
+        "name": "Voidfeast",
+        "description": "Devours a magic effect (a beneficial one from an enemy, or a harmful one from an ally) and heals you for 6% of your maximum health."
       },
       "pummel": {
         "name": "Drtič čelistí",
@@ -6884,8 +6905,16 @@ export const cs_CZ: EnTranslations = {
         "description": "Zahajovací útok z plížení, který rozdrásá nepřítele za poškození zbraně plus {damage} a způsobí krvácení během 9 s. Udělí 1 combo bod. Pouze ve vlčí podobě."
       },
       "revive_pet": {
-        "name": "Ošetření",
-        "description": "Ošetří tvého mazlíčka. Pokud žije, obnoví mu celkem {overTime} zdraví během 12 s v intervalech po 3 s. Pokud je mrtvý, oživí ho s 35 % zdraví."
+        "name": "Oživit mazlíčka",
+        "description": "Oživí tvého mrtvého mazlíčka a vrátí ho po tvém boku."
+      },
+      "commanding_shout": {
+        "description": "Zvýší tvoji výdrž o {buff} na 2 min.",
+        "name": "Povzbuzující pokřik"
+      },
+      "rend": {
+        "description": "Zraní cíl a způsobí mu krvácení za {damage} poškození během {duration} s.",
+        "name": "Hluboká rána"
       }
     },
     "items": {
@@ -8099,16 +8128,16 @@ export const cs_CZ: EnTranslations = {
         "name": "Hrdinská značka"
       },
       "eastbrook_buckler": {
-        "name": "Eastbrookský pukléř"
+        "name": "Eastbrook Buckler"
       },
       "eastbrook_greatsword": {
-        "name": "Eastbrookský obouruční meč"
+        "name": "Eastbrook Greatsword"
       },
       "highwatch_greatsword": {
-        "name": "Highwatchský obouruční meč"
+        "name": "Highwatch Greatsword"
       },
       "highwatch_wallshield": {
-        "name": "Highwatchský hradební štít"
+        "name": "Highwatch Wallshield"
       },
       "morthens_cryptforged_hauberk": {
         "name": "Morthenův kryptově kovaný hauberk"

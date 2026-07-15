@@ -181,8 +181,13 @@ The locale data is split; touch the right file (full model + locked-terms glossa
 `docs/i18n-scaling/translation-workflow.md`):
 - **`i18n.catalog/`** is the authoritative English source catalog (nested domain modules
   `shell`/`hud`/`hud_chrome`/`abilities`/`quests`/`items`/`game`/`merge`/`guide`/`editor`/
-  `api_error` + an `index.ts` barrel) that drives `TranslationKey = Leaves<typeof en, 6>`, the
-  dotted-path type every `t()` uses. Add a new English string in the matching domain module.
+  `api_error` + an `index.ts` barrel) that drives `TranslationKey`, the dotted-path type every
+  `t()` uses. `TranslationKey` re-exports the BUILD-GENERATED flat literal union of every `en`
+  leaf path (`i18n.catalog/translation_keys.generated.ts`, emitted by `scripts/i18n_build.mjs`,
+  committed, freshness-gated like the resolved table); it replaced the recursive
+  `Leaves<typeof en, 6>` computation, which TypeScript 7's native compiler rejects (TS2590) and
+  whose template-literal members accepted any entity id. Add a new English string in the
+  matching domain module, then `npm run i18n:gen` regenerates the union in the same command.
 - **`i18n.locales/<lang>.ts`** are the non-English flat sparse overlays
   (`Partial<Record<TranslationKey,string>>`), the ONLY files a translator edits (the
   contributor rules are in the workflow below).

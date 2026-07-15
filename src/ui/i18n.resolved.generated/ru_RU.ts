@@ -869,23 +869,23 @@ export const ru_RU: EnTranslations = {
       "mobileLeftHanded": "Раскладка для левшей"
     },
     "talentRows": {
-      "tab": "Выбор",
-      "defaultLoadout": "Стандартная сборка",
-      "comingSoon": "Скоро",
-      "readoutSummary": "Таланты: {head}, выбрано рядов: {spent}/{total}."
+      "tab": "Choices",
+      "defaultLoadout": "Default Loadout",
+      "comingSoon": "Coming soon",
+      "readoutSummary": "Talents: {head}, {spent}/{total} rows selected."
     },
     "abilityError": {
-      "shieldRequired": "Необходимо экипировать щит."
+      "shieldRequired": "You must have a shield equipped."
     },
     "specPanel": {
-      "primaryAttr": "Основная характеристика",
-      "complexity": "Сложность",
-      "complexityLow": "Низкая",
-      "complexityMedium": "Средняя",
-      "complexityHigh": "Высокая",
-      "exampleAbilities": "Примеры способностей",
-      "viewTalents": "Смотреть таланты",
-      "selectSpec": "Выбрать специализацию"
+      "primaryAttr": "Primary attribute",
+      "complexity": "Complexity",
+      "complexityLow": "Low",
+      "complexityMedium": "Medium",
+      "complexityHigh": "High",
+      "exampleAbilities": "Example abilities",
+      "viewTalents": "View talents",
+      "selectSpec": "Select specialization"
     },
     "controller": {
       "title": "Геймпад",
@@ -998,6 +998,7 @@ export const ru_RU: EnTranslations = {
         "spellPower": "Сила заклинаний",
         "critRating": "Рейтинг крит. удара",
         "hasteRating": "Рейтинг ускорения",
+        "hitRating": "Рейтинг меткости",
         "warfare": "Боевая мощь"
       },
       "warfareValue": "+{increase}% к урону / -{reduction}% получаемого",
@@ -1015,6 +1016,7 @@ export const ru_RU: EnTranslations = {
         "dodge": "Ваш шанс полностью уклониться от входящей атаки в ближнем бою, не получив урона.",
         "critRating": "Рейтинг критического удара от снаряжения и бонусов комплекта повышает шанс критического удара. Примерно 10 рейтинга дают 1% крит. удара.",
         "hasteRating": "Рейтинг ускорения от снаряжения и бонусов комплекта ускоряет ваши атаки и заклинания. Примерно 10 рейтинга дают 1% ускорения.",
+        "hitRating": "Рейтинг меткости от снаряжения и бонусов комплекта снижает частоту промахов ваших атак и сопротивления вашим заклинаниям, особенно против противников более высокого уровня. Примерно 10 рейтинга дают 1% меткости.",
         "warfare": "Увеличивает урон по игрокам на {increase}% и снижает получаемый от игроков урон на {reduction}%."
       },
       "effects": {
@@ -1382,6 +1384,8 @@ export const ru_RU: EnTranslations = {
       },
       "dodge": "Повышает шанс уклонения на {pct}%",
       "dodgeReduce": "Снижает шанс уклонения на {pct}%",
+      "damageReduction": "Уменьшает весь получаемый урон на {pct}%",
+      "guardianWard": "Следующий смертельный удар противника вместо этого восстанавливает здоровье до {pct}%",
       "armorFlat": "Снижает броню на {value}",
       "armorFlatStacks": "Снижает броню на {value} ({stacks} зарядов)",
       "armorPct": "Снижает броню на {pct}%",
@@ -1564,7 +1568,7 @@ export const ru_RU: EnTranslations = {
         "artists": "Художник",
         "contentcreator": "Контент-мейкер",
         "legend": "ЛЕГЕНДА",
-        "shill": "ПРОМОУТЕР"
+        "shill": "ГЛАШАТАЙ"
       },
       "guildMember": "Подтвержденный участник",
       "notMember": "Еще не на сервере",
@@ -1831,7 +1835,8 @@ export const ru_RU: EnTranslations = {
       "title": "Собирательство",
       "mining": "Горное дело",
       "logging": "Лесозаготовка",
-      "herbalism": "Травничество"
+      "herbalism": "Травничество",
+      "notReady": "Этот ресурсный узел еще не восстановился для вас."
     },
     "archetypeTitle": {
       "label": "Титул",
@@ -2586,8 +2591,8 @@ export const ru_RU: EnTranslations = {
     },
     "abilityHook": {
       "heroic_strike": "Готовит более тяжелый замах, который потратит ярость на следующем ударе.",
-      "revenge": "Поражает противников перед вами и может не требовать затрат после уклонения или парирования.",
-      "hamstring": "Ограничивает передвижение противника, не позволяя ему сбежать.",
+      "revenge": "Sweeps enemies in front of you, with a chance to become free after a dodge or parry.",
+      "hamstring": "Cripples an enemy's movement to keep it from escaping.",
       "battle_shout": "Боевой клич, повышающий силу атаки всей группы.",
       "charge": "Рывок к далекому врагу, открывающий бой коротким оглушением.",
       "thunder_clap": "Бьет по всем вокруг вас и замедляет их атаки.",
@@ -2647,7 +2652,9 @@ export const ru_RU: EnTranslations = {
       "mark_of_the_wild": "Длительное благословение, которое вы накладываете на себя или союзника перед боем.",
       "moonfire": "Бьет мгновенно и оставляет цель гореть, удобно использовать в движении.",
       "rejuvenation": "Накладывается мгновенно и лечит союзника со временем, так что вы можете продолжать действовать.",
-      "thorns": "Защищает союзника так, что атакующие в ближнем бою ранят себя при ударе."
+      "thorns": "Защищает союзника так, что атакующие в ближнем бою ранят себя при ударе.",
+      "commanding_shout": "Повышает выносливость, так что у всех становится больше запаса прочности в бою.",
+      "rend": "Открывает кровотечение, которое изматывает цель со временем."
     },
     "petHook": {
       "emberkin": "Дальнобойный демон с огненными стрелами, который понемногу бьет врагов с безопасного расстояния.",
@@ -4628,6 +4635,8 @@ export const ru_RU: EnTranslations = {
     "connectionLost": "Соединение с сервером потеряно.",
     "reconnecting": "Соединение потеряно. Повторное подключение...",
     "connectionRejected": "Сервер закрыл соединение.",
+    "realmFull": "Этот мир сейчас переполнен. Пожалуйста, попробуйте снова через несколько минут.",
+    "tooManyConnections": "Из вашей сети открыто слишком много подключений к этому миру. Пожалуйста, закройте лишние игровые окна или попробуйте снова через несколько минут.",
     "tips": {
       "classes": "Совет: все 9 классов играются по-разному. Попробуйте несколько, прежде чем выбрать один.",
       "talents": "Совет: вы можете сбросить таланты в любое время вне боя, так что ранний выбор никогда не станет ловушкой.",
@@ -4705,9 +4714,9 @@ export const ru_RU: EnTranslations = {
     "medium": "Средняя",
     "low": "Низкая",
     "popTipLow": "Низкая населённость: сейчас в сети менее 15 игроков. Много места; отлично для нового старта.",
-    "popTipMedium": "Средняя населённость: сейчас в сети от 15 до 39 игроков. Активный и живой мир.",
-    "popTipHigh": "Высокая населённость: сейчас в сети от 40 до 79 игроков. Оживлённо, много игроков.",
-    "popTipFull": "Полная населённость: сейчас в сети 80 и более игроков. Очень оживлённо; возможна очередь на вход.",
+    "popTipMedium": "Средняя населённость: сейчас в сети от 15 до 79 игроков. Активный и живой мир.",
+    "popTipHigh": "Высокая населённость: сейчас в сети 80 и более игроков. Оживлённо, много игроков.",
+    "popTipFull": "Полная населённость: этот мир достиг лимита игроков. Новые подключения отклоняются, пока кто-то из игроков не выйдет.",
     "popTipOffline": "Не в сети: этот мир сейчас недоступен и к нему нельзя подключиться.",
     "characterCountOne": "{count} персонаж",
     "characterCountOther": "{count} персонажа",
@@ -5285,7 +5294,7 @@ export const ru_RU: EnTranslations = {
       "defensiveDesc": "Атакует врагов, которые ранят вас или питомца.",
       "aggressiveDesc": "Атакует ближайших враждебных врагов.",
       "rename": "Переименовать питомца",
-      "revive": "Подлатать",
+      "revive": "Воскресить питомца",
       "abandon": "Оставить питомца",
       "cancel": "Отмена",
       "renameLabel": "Выберите новое имя питомца.",
@@ -5541,7 +5550,7 @@ export const ru_RU: EnTranslations = {
     },
     "slots": {
       "mainhand": "Правая рука",
-      "offhand": "Левая рука",
+      "offhand": "Off Hand",
       "helmet": "Голова",
       "neck": "Шея",
       "shoulder": "Плечи",
@@ -6355,6 +6364,18 @@ export const ru_RU: EnTranslations = {
         "name": "Дубовая шкура",
         "description": "Ваша кожа твердеет, как кора, повышая броню на 150 на 15 сек."
       },
+      "ironhold": {
+        "name": "Железная стена",
+        "description": "Укрывшись за щитом, вы снижаете весь получаемый урон на 40% на 8 сек."
+      },
+      "sacred_bulwark": {
+        "name": "Священный оплот",
+        "description": "В течение {duration} сек. следующий смертельный удар противника не убьет вас, а восстановит здоровье до 35% от максимума."
+      },
+      "primal_reflexes": {
+        "name": "Первобытные рефлексы",
+        "description": "Ваши инстинкты обостряются, повышая шанс уклонения на 50% на 6 сек."
+      },
       "starfire": {
         "name": "Падение небес",
         "description": "Обрушивает вспышку звездного огня, нанося {damage} ед. урона от тайной магии."
@@ -6540,304 +6561,304 @@ export const ru_RU: EnTranslations = {
         "description": "Подчиняет вашей воле Духорождённого, элитного демона, который издалека обрушивает тяжёлый урон от Тьмы. Долгое время восстановления сдерживает его разрушительную мощь. Призыв нового демона отпускает текущего. Одновременно у вас может быть только один демон."
       },
       "battle_stance": {
-        "name": "Боевая стойка",
-        "description": "Агрессивная боевая стойка: вы создаете на 10% больше ярости. Стандартная стойка для веток «Оружие» и «Защита»."
+        "name": "Battle Stance",
+        "description": "An aggressive combat stance: you generate 10% more rage. The default stance for Arms and Protection."
       },
       "berserker_stance": {
-        "name": "Стойка берсерка",
-        "description": "Безрассудная боевая стойка: ваши критические удары проходят на 3% чаще и бьют на 3% сильнее. Воин ветки «Неистовство» всегда сражается в этой стойке."
+        "name": "Berserker Stance",
+        "description": "A reckless combat stance: your critical strikes land 3% more often and hit for 3% more. The Fury warrior always fights in this stance."
       },
       "sweeping_strikes": {
-        "name": "Расширяющаяся дуга",
-        "description": "В течение 12 сек ваши атаки по одной цели также поражают 1 ближайшего врага с полным уроном. (ветка «Оружие»)"
+        "name": "Widening Arc",
+        "description": "For 12 sec your single-target attacks also strike 1 nearby enemy for full damage. (Arms)"
       },
       "deep_wounds": {
-        "name": "Зияющие раны",
-        "description": "Пассивно: ваш Калечащий удар оставляет на цели кровотечение, нанося физический урон за 6 сек. (ветка «Оружие»)"
+        "name": "Gaping Wounds",
+        "description": "Passive: your Maiming Strike leaves the target bleeding for Physical damage over 6 sec. (Arms)"
       },
       "enrage_passive": {
-        "name": "Буйство",
-        "description": "Пассивно: пока вы в Бешенстве, вы наносите на 7% больше урона, атакуете на 25% быстрее и двигаетесь на 10% быстрее в течение 4 сек. Кровопускание с вероятностью 30% приводит вас в Бешенство; Кровавая жатва делает это всегда. (ветка «Неистовство»)"
+        "name": "Mayhem",
+        "description": "Passive: while Enraged you deal 7% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)"
       },
       "raging_gale": {
-        "name": "Двойной удар",
-        "description": "Мгновенно бьет оружием дважды, каждый удар наносит 40% урона оружием плюс {damage}, и создает 8 ярости. Хранит до 2 зарядов. (ветка «Неистовство»)"
+        "name": "Twinstrike",
+        "description": "Instantly strike with your weapon twice, each hit dealing 40% weapon damage plus {damage}, and generate 8 rage. Stores up to 2 charges. (Fury)"
       },
       "red_harvest": {
-        "name": "Кровавая жатва",
-        "description": "Отдайте все: наносит три удара в исступлении, каждый на 65% урона оружием плюс {damage}, и всегда приводит вас в исступление. (ветка «Неистовство»)"
+        "name": "Red Harvest",
+        "description": "Spend everything: strike three times in a frenzy for 65% weapon damage plus {damage} each, always Enraging you. (Fury)"
       },
       "furious_mending": {
-        "name": "Яростное исцеление",
-        "description": "В течение 10 сек вы получаете на 20% меньше урона, и пока эффект длится, ваше Кровопускание исцеляет вас на 20% от максимального здоровья. (ветка «Неистовство»)"
+        "name": "Furious Mending",
+        "description": "For 10 sec you take 20% reduced damage, and while it lasts your Bloodletting heals you for 20% of your maximum health. (Fury)"
       },
       "emboldening_roar": {
-        "name": "Ободряющий рев",
-        "description": "Издает ободряющий рев: вы и дружественные игроки в пределах 40 м воодушевлены, а ваши следующие 3 способности гарантированно станут критическими ударами. (ветка «Неистовство»)"
+        "name": "Emboldening Roar",
+        "description": "Lets loose an emboldening roar: you and friendly players within 40 yards are Emboldened, and your next 3 abilities are guaranteed critical strikes. (Fury)"
       },
       "raised_guard": {
-        "name": "Заслон щитом",
-        "description": "Прикрывается щитом: вы получаете на 50% меньше физического урона в течение 6 сек. Хранит до 2 зарядов. (ветка «Защита»)"
+        "name": "Raised Guard",
+        "description": "Brace behind your shield: you take 50% reduced Physical damage for 6 sec. Stores up to 2 charges. (Protection)"
       },
       "iron_resolve": {
-        "name": "Железная решимость",
-        "description": "Стисните зубы и игнорируйте боль: расходует до 40 ед. ярости (минимум 20), поглощая 4 ед. урона за каждую потраченную единицу ярости в течение не более 10 сек. (ветка «Защита»)"
+        "name": "Iron Resolve",
+        "description": "Grit your teeth and ignore the pain: spends up to 40 rage (20 minimum) to absorb 4 damage per rage spent, lasting up to 10 sec. (Protection)"
       },
       "faultline": {
-        "name": "Разлом",
-        "description": "Посылает ударную волну по земле: враги перед вами в пределах 8 м получают {damage} ед. урона и оглушаются на 3 сек. (ветка «Защита»)"
+        "name": "Faultline",
+        "description": "Send a shockwave through the ground: enemies in front of you within 8 yards take {damage} damage and are stunned for 3 sec. (Protection)"
       },
       "defiant_bellow": {
-        "name": "Дерзкий рев",
-        "description": "Дерзкий рев: каждый враг в пределах 10 м провоцируется и вынужден атаковать вас 3 сек. (ветка «Защита»)"
+        "name": "Defiant Bellow",
+        "description": "A defiant bellow: every enemy within 10 yards is taunted, compelled to attack you for 3 sec. (Protection)"
       },
       "breachmaker": {
-        "name": "Брешь",
-        "description": "Обрушивается на цель на урон оружием плюс {damage} и ломает ее защиту: ваши собственные атаки по ней наносят на 20% больше урона в течение 8 сек. (ветка «Оружие»)"
+        "name": "Breachmaker",
+        "description": "Batter the target for weapon damage plus {damage} and crack its guard: your own attacks against it deal 20% more damage for 8 sec. (Arms)"
       },
       "measured_fury": {
-        "name": "Размеренная ярость",
-        "description": "Ваша размеренная ярость оттачивает расход: ваши способности стоят на 10% меньше ярости. (ветка «Оружие»)"
+        "name": "Measured Fury",
+        "description": "Your measured fury sharpens your economy: your abilities cost 10% less rage. (Arms)"
       },
       "seasoned_soldier": {
-        "name": "Бывалый солдат",
-        "description": "Ваши критические автоатаки создают на 10% больше ярости. (ветка «Оружие»)"
+        "name": "Seasoned Soldier",
+        "description": "Your critical auto-attacks generate 10% more rage. (Arms)"
       },
       "diabolical_twinstrike": {
-        "name": "Дьявольский двойной удар",
-        "description": "Пока вы в Бешенстве, ваш Двойной удар наносит на 15% больше урона. (ветка «Неистовство»)"
+        "name": "Diabolical Twinstrike",
+        "description": "While Enraged, your Twinstrike deals 15% more damage. (Fury)"
       },
       "cleaving_blows": {
-        "name": "Рассекающие удары",
-        "description": "Кровавая жатва всегда возвращает заряд Двойного удара. (ветка «Неистовство»)"
+        "name": "Cleaving Blows",
+        "description": "Red Harvest always refunds a charge of Twinstrike. (Fury)"
       },
       "sudden_death": {
-        "name": "Внезапная смерть",
-        "description": "Ваши автоатаки могут позволить применить Раннюю могилу к цели с любым запасом здоровья, не потратив ярости. (ветка «Оружие»)"
+        "name": "Sudden Death",
+        "description": "Your auto-attacks have a chance to let you cast Early Grave on a target at any health, costing no rage. (Arms)"
       },
       "storm_bolt": {
-        "name": "Громовой разряд",
-        "description": "Метает ваше оружие в цель на {damage}, оглушая ее на 3 сек."
+        "name": "Storm Bolt",
+        "description": "Hurl your weapon at the target for {damage}, stunning it for 3 sec."
       },
       "piercing_howl": {
-        "name": "Пронзительный вой",
-        "description": "Пронзительный крик, замедляющий всех врагов в пределах 15 м на 50% на 8 сек."
+        "name": "Piercing Howl",
+        "description": "A piercing shout that slows all enemies within 15 yards by 50% for 8 sec."
       },
       "die_by_sword": {
-        "name": "Погибель от меча",
-        "description": "Защитная способность: в течение 8 сек вы получаете на 30% меньше урона и уклоняетесь от гораздо большего числа атак."
+        "name": "Die by the Sword",
+        "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
       },
       "recklessness": {
-        "name": "Безрассудство",
-        "description": "Бешенство: создание вашей ярости повышается на 50%, а шанс критического удара на 20% в течение 12 сек."
+        "name": "Recklessness",
+        "description": "Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec."
       },
       "sanguine_aura": {
-        "name": "Кровавая аура",
-        "description": "Пропитывает ваше оружие кровью врагов: вы и ваши союзники ближнего боя получают 10% скорости атаки и 10% урона в течение 20 сек."
+        "name": "Sanguine Aura",
+        "description": "Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec."
       },
       "victory_rush": {
-        "name": "Порыв победы",
-        "description": "Бьет на урон оружием плюс {damage} и исцеляет на 20% от максимального здоровья. Можно использовать только в течение 20 сек после убийства врага."
+        "name": "Victory Rush",
+        "description": "Strike for weapon damage plus {damage} and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy."
       },
       "intimidating_shout": {
-        "name": "Устрашающий крик",
-        "description": "Устрашающий крик, обращающий в бегство до 5 врагов в пределах 8 м на 8 сек. Урон может снять эффект."
+        "name": "Intimidating Shout",
+        "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
       },
       "revenge": {
-        "name": "Месть",
-        "description": "Атака широкой дугой, наносящая физический урон всем врагам перед вами. При более чем 5 целях урон снижается. При уклонении или парировании ваша следующая Месть может не потребовать ярости. (Protection)"
+        "name": "Revenge",
+        "description": "Attack in a wide arc, dealing Physical damage to all enemies in front of you. Above 5 targets the damage is reduced. When you dodge or parry, your next Revenge may cost no rage. (Protection)"
       },
       "heroic_leap": {
-        "name": "Героический прыжок",
-        "description": "Прыгает в указанную область и при приземлении наносит {damage} ед. урона находящимся рядом противникам."
+        "name": "Heroic Leap",
+        "description": "Leap to the target area, dealing {damage} damage to nearby enemies on landing."
       },
       "rallying_cry": {
-        "name": "Рёв доблести",
-        "description": "Издаёт доблестный рёв, на 10 сек. увеличивая максимальный запас здоровья вашего персонажа и членов группы в радиусе 40 м на 20%. Для участников со специализацией «Защита» получаемый урон также снижается на 5%."
+        "name": "Valor Roar",
+        "description": "Lets loose a valorous roar, granting you and party members within 40 yards 20% additional maximum health for 10 sec. Protection: they also take 5% less damage for the duration."
       },
       "avatar": {
-        "name": "Аватара",
-        "description": "Превращает вас в колосса на 20 сек., снимая с вас все эффекты контроля и повышая наносимый урон на 20%."
+        "name": "Avatar",
+        "description": "Transform into a colossus for 20 sec, breaking all control on you and increasing your damage dealt by 20%."
       },
       "bladestorm": {
-        "name": "Клинковая буря",
-        "description": "Становится вихрем стали, поражая всех врагов в радиусе 8 м на {damage} ед. урона каждую секунду в течение 4 сек."
+        "name": "Bladestorm",
+        "description": "Become a whirling storm of steel, striking all enemies within 8 yards for {damage} every second for 4 sec."
       },
       "aspect_of_the_wild": {
-        "name": "Облик дикого клыка",
-        "description": "Воодушевляет союзников в радиусе 30 м дикой силой, повышая их силу атаки на 45 и скорость атаки на 5% на 5 мин. (талант охотника)"
+        "name": "Wildfang Rally",
+        "description": "Inspires allies within 30 yd with wild strength, increasing attack power by 45 and attack speed by 5% for 5 min. (Hunter talent)"
       },
       "aura_surge": {
-        "name": "Рикошет рассвета",
-        "description": "Бросает выкованный на рассвете щит, наносящий {damage} ед. урона от Света и лишающий основную цель возможности произносить заклинания на 2 сек. Затем щит отскакивает не более чем к 2 другим противникам в радиусе 10 м, нанося 75% урона за отскок. (талант паладина)"
+        "name": "Dawnward Ricochet",
+        "description": "Hurl a dawnforged shield for {damage} Holy damage and silence the primary target for 2 sec. It bounces to up to 2 additional enemies within 10 yd for 75% damage per bounce. (Paladin talent)"
       },
       "avenging_wrath": {
-        "name": "Крыло возмездия",
-        "description": "Призывает силу возмездия, повышая вашу силу атаки на 60 и силу заклинаний на 30 на 20 сек. (талант паладина)"
+        "name": "Wrathwing",
+        "description": "Calls down avenging power, increasing attack power by 60 and spell power by 30 for 20 sec. (Paladin talent)"
       },
       "berserk": {
-        "name": "Багровая дымка",
-        "description": "Повышает вашу силу атаки на 70 на 15 сек. (талант друида)"
+        "name": "Red Haze",
+        "description": "Increases attack power by 70 for 15 sec. (Druid talent)"
       },
       "blink": {
-        "name": "Мерцающий шаг",
-        "description": "Телепортирует вас на 15 м вперед и снимает эффекты обездвиживания. (талант мага)"
+        "name": "Flickerstep",
+        "description": "Teleports you 15 yd forward and breaks roots. (Mage talent)"
       },
       "bloodlust": {
-        "name": "Боевые барабаны",
-        "description": "Приводит союзников в радиусе 30 м в исступление, повышая их скорость атаки на 30% на 15 сек. (талант шамана)"
+        "name": "Storm Chorus",
+        "description": "Whips allies within 30 yd into a frenzy, increasing attack speed by 30% for 15 sec. (Shaman talent)"
       },
       "chain_lightning": {
-        "name": "Разветвленная молния",
-        "description": "Обрушивает молнию на выбранную область, нанося ближайшим противникам {damage} ед. урона. (талант шамана)"
+        "name": "Skybranch",
+        "description": "Hurls lightning at the target area, damaging nearby enemies for {damage}. (Shaman talent)"
       },
       "chaos_bolt": {
-        "name": "Стрела погибели",
-        "description": "Выпускает сгусток хаотического огня, наносящий {damage} ед. урона от Огня. (талант чернокнижника)"
+        "name": "Ruinbolt",
+        "description": "Hurls a bolt of chaotic fire for {damage} Fire damage. (Warlock talent)"
       },
       "cleansing_verdict": {
-        "name": "Очищающий приговор",
-        "description": "Рассеивает вредоносный магический эффект с союзника и восстанавливает ему {damage} ед. здоровья."
+        "name": "Cleansing Verdict",
+        "description": "Purges a harmful magic effect from a friendly target and heals them for {damage} Holy."
       },
       "cloak_of_shadows": {
-        "name": "Плащ теней",
-        "description": "Окутывает вас тенями, поглощающими 420 ед. урона в течение 5 сек. (талант разбойника)"
+        "name": "Shadecloak",
+        "description": "Wraps you in shadows, absorbing 420 damage for 5 sec. (Rogue talent)"
       },
       "cone_of_cold": {
-        "name": "Ледяной взмах",
-        "description": "Поражает ближайших противников морозом, нанося {damage} ед. урона от Льда. (ключевая способность специализации «Лед»)"
+        "name": "Frostsweep",
+        "description": "Blasts nearby enemies with frost for {damage} Frost damage. (Frost signature)"
       },
       "curse_of_exhaustion": {
-        "name": "Свинцовое проклятие",
-        "description": "Проклинает цель, снижая ее скорость передвижения на 30% на 12 сек. (талант чернокнижника)"
+        "name": "Leaden Hex",
+        "description": "Curses the target, slowing movement by 30% for 12 sec. (Warlock talent)"
       },
       "death_coil": {
-        "name": "Могильная спираль",
-        "description": "Поражает противника, нанося {damage} ед. урона от Темной магии, а затем повергает его в ужас на 3 сек. (талант чернокнижника)"
+        "name": "Morrowlash",
+        "description": "Strikes the enemy for {damage} Shadow damage, then horrifies them for 3 sec. (Warlock talent)"
       },
       "deep_freeze": {
-        "name": "Мертвый мороз",
-        "description": "Глубоко замораживает цель, наносит {damage} ед. урона от Льда и оглушает ее на 4 сек. (талант мага)"
+        "name": "Deadfrost",
+        "description": "Deep freezes the target, dealing {damage} Frost damage and stunning it for 4 sec. (Mage talent)"
       },
       "desperate_prayer": {
-        "name": "Последняя молитва",
-        "description": "Мгновенно восстанавливает вам {damage} ед. здоровья. (талант жреца)"
+        "name": "Last Prayer",
+        "description": "Instantly heals you for {damage}. (Priest talent)"
       },
       "deterrence": {
-        "name": "Колючий страж",
-        "description": "Повышает вероятность уклонения на 50 процентных пунктов на 10 сек. (талант охотника)"
+        "name": "Bristleguard",
+        "description": "Increases your dodge chance by 50 percentage points for 10 sec. (Hunter talent)"
       },
       "divine_shield": {
-        "name": "Световой оберег",
-        "description": "Защищает вас святой силой, поглощающей 900 ед. урона в течение 8 сек. (талант паладина)"
+        "name": "Lightward",
+        "description": "Shields you with holy power, absorbing 900 damage for 8 sec. (Paladin talent)"
       },
       "earthbind": {
-        "name": "Хватка земли",
-        "description": "Привязывает ближайших противников к земле, обездвиживая их на 2 сек. (талант шамана)"
+        "name": "Gripping Earth",
+        "description": "Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)"
       },
       "evocation": {
-        "name": "Эфирный колодец",
-        "description": "Мгновенно восстанавливает 220 ед. маны. (талант мага)"
+        "name": "Aetherwell",
+        "description": "Instantly restores 220 mana. (Mage talent)"
       },
       "frenzied_regeneration": {
-        "name": "Дикое исцеление",
-        "description": "Восстанавливает 180 ед. здоровья за 10 сек. Только в облике медведя. (талант друида)"
+        "name": "Savage Mending",
+        "description": "Restores 180 health over 10 sec. Bruin Form only. (Druid talent)"
       },
       "frost_trap": {
-        "name": "Инейная ловушка",
-        "description": "Замораживает противников в выбранной области на 3 сек., не позволяя им двигаться или действовать. (талант охотника)"
+        "name": "Rime Snare",
+        "description": "Freezes enemies at the target area for 3 sec, preventing movement and actions. (Hunter talent)"
       },
       "ghostly_strike": {
-        "name": "Призрачный удар",
-        "description": "Наносит противнику урон от оружия плюс {damage}, ненадолго повышает уклонение и дает 1 прием в серии. (талант разбойника)"
+        "name": "Wraith Strike",
+        "description": "Strikes the enemy for weapon damage plus {damage} and briefly increases dodge. Awards 1 combo point. (Rogue talent)"
       },
       "hammer_of_wrath": {
-        "name": "Звонкий молот",
-        "description": "Бросает священный молот в раненого противника, нанося {damage} ед. урона от Света. Можно использовать только при запасе здоровья ниже 20%. (талант паладина)"
+        "name": "Tolling Hammer",
+        "description": "Hurls a holy hammer at a wounded enemy for {damage} Holy damage. Only usable below 20% health. (Paladin talent)"
       },
       "healing_stream": {
-        "name": "Источник",
-        "description": "Восстанавливает союзной цели 120 ед. здоровья за 12 сек. (талант шамана)"
+        "name": "Springwell",
+        "description": "Restores 120 health to a friendly target over 12 sec. (Shaman talent)"
       },
       "holy_wrath": {
-        "name": "Гнев святого",
-        "description": "Высвобождает святую силу, нанося ближайшим противникам {damage} ед. урона. (талант паладина)"
+        "name": "Saint's Ire",
+        "description": "Unleashes holy power, damaging nearby enemies for {damage}. (Paladin talent)"
       },
       "howl_of_terror": {
-        "name": "Вой ужаса",
-        "description": "Пугает ближайших противников на срок до 3 сек. Урон может прервать эффект. (талант чернокнижника)"
+        "name": "Dread Chorus",
+        "description": "Frightens nearby enemies for up to 3 sec. Damage may break the effect. (Warlock talent)"
       },
       "ice_block": {
-        "name": "Холодный гроб",
-        "description": "Заключает вас в лед, поглощающий 600 ед. урона в течение 8 сек. В это время вы не можете действовать. Примените повторно, чтобы отменить эффект. (талант мага)"
+        "name": "Cold Coffin",
+        "description": "Encases you in ice, absorbing 600 damage for 8 sec. You cannot act while encased. Recast to cancel. (Mage talent)"
       },
       "inner_focus": {
-        "name": "Утихший разум",
-        "description": "Ваше следующее заклинание не требует затрат. Действует 60 сек. (талант жреца)"
+        "name": "Stilled Mind",
+        "description": "Makes your next spell free. Lasts 60 sec. (Priest talent)"
       },
       "innervate": {
-        "name": "Живой сок",
-        "description": "Живой сок наполняет вас в течение 10 сек. и волнами восполняет 20 ед. текущего ресурса: маны, ярости или энергии. Смена облика не прерывает эффект. Сон, оглушение или стазис останавливают течение сока. (талант друида)"
+        "name": "Lifesap",
+        "description": "Living sap wells up in you for 10 sec, restoring 20 of your current resource in waves: mana, Rage, or Energy, and shifting forms does not break it. Sleep, stun, or stasis stills the sap. (Druid talent)"
       },
       "meteor": {
-        "name": "Небесный камень",
-        "description": "Обрушивает метеор на выбранную область, нанося {damage} ед. урона от Огня. Затем противники в этой области получают от 12 до 18 ед. урона от Огня раз в 2 сек. в течение 6 сек. (талант мага)"
+        "name": "Skystone",
+        "description": "Calls down a meteor at the target area, dealing {damage} Fire damage, then burning enemies there for 12 to 18 Fire damage every 2 sec for 6 sec. (Mage talent)"
       },
       "mind_sear": {
-        "name": "Выжигание мыслей",
-        "description": "Поддерживает поток темной энергии в выбранной области, нанося ближайшим противникам {damage} ед. урона каждую секунду. (талант жреца)"
+        "name": "Thoughtburn",
+        "description": "Channels shadow energy at the target area, damaging nearby enemies each second for {damage}. (Priest talent)"
       },
       "multi_shot": {
-        "name": "Раздвоенный выстрел",
-        "description": "Выпускает веер стрел в выбранную область, нанося противникам в радиусе 8 м {damage} ед. физического урона. (талант охотника)"
+        "name": "Splitshot",
+        "description": "Loose a spread at the target area, dealing {damage} Physical damage to enemies within 8 yd. (Hunter talent)"
       },
       "prayer_of_healing": {
-        "name": "Хоровое исцеление",
-        "description": "Восстанавливает ближайшим союзникам {damage} ед. здоровья. (талант жреца)"
+        "name": "Choirmend",
+        "description": "Heals nearby allies for {damage}. (Priest talent)"
       },
       "preparation": {
-        "name": "Запасной план",
-        "description": "Завершает восстановление «Спринта», «Уклонения» и «Исчезновения». (талант разбойника)"
+        "name": "Contingency",
+        "description": "Finishes the cooldown on Sprint, Evasion, and Vanish. (Rogue talent)"
       },
       "presence_of_mind": {
-        "name": "Быстрый разум",
-        "description": "Ваше следующее заклинание со временем произнесения применяется мгновенно. Действует 60 сек. (талант мага)"
+        "name": "Racing Mind",
+        "description": "Makes your next spell with a cast time instant. Lasts 60 sec. (Mage talent)"
       },
       "psychic_scream": {
-        "name": "Психический крик",
-        "description": "Пугает ближайших противников на срок до 4 сек. Урон может прервать эффект. (талант жреца)"
+        "name": "Terror Canticle",
+        "description": "Frightens nearby enemies for up to 4 sec. Damage may break the effect. (Priest talent)"
       },
       "shadowstep": {
-        "name": "Теневой шаг",
-        "description": "Вы проходите сквозь тени к своей цели. (талант разбойника)"
+        "name": "Shadeslip",
+        "description": "Steps through the shadows toward your target. (Rogue talent)"
       },
       "silence": {
-        "name": "Безмолвие",
-        "description": "Лишает цель возможности произносить заклинания на 4 сек. (талант жреца)"
+        "name": "Hushword",
+        "description": "Silences the target for 4 sec. (Priest talent)"
       },
       "smoke_screen": {
-        "name": "Дымовая завеса",
-        "description": "Вы скрываетесь в облаке дыма, повышая шанс уклонения на 30% на 8 сек."
+        "name": "Smoke Screen",
+        "description": "Vanish into a cloud of smoke, increasing your chance to dodge by 30% for 8 sec."
       },
       "spellsteal": {
-        "name": "Похищение чар",
-        "description": "Похищает один положительный магический эффект у противника и переносит его на вас."
+        "name": "Spellsteal",
+        "description": "Steals a beneficial magic effect from an enemy, transferring it to yourself."
       },
       "startle_shot": {
-        "name": "Ошеломляющий выстрел",
-        "description": "Дикий выстрел дезориентирует цель на {duration} сек. Любой полученный урон прерывает эффект."
+        "name": "Startle Shot",
+        "description": "A wild shot that disorients the target for {duration} sec. Any damage breaks the effect."
       },
       "tranquility": {
-        "name": "Песнь рощи",
-        "description": "Поддерживает поток целительной энергии в течение 4 сек., восстанавливая союзникам в радиусе 30 м от 42 до 52 ед. здоровья каждую секунду. (талант друида)"
+        "name": "Gladesong",
+        "description": "Channels restorative energy for 4 sec, healing allies within 30 yd for 42 to 52 each second. (Druid talent)"
       },
       "typhoon": {
-        "name": "Тайфун",
-        "description": "Порыв ветра отбрасывает всех врагов в радиусе 8 м и дезориентирует их, снижая скорость передвижения на 50% на 4 сек."
+        "name": "Typhoon",
+        "description": "A blast of wind knocks back all enemies within 8 yd and dazes them, slowing their movement by 50% for 4 sec."
       },
       "voidfeast": {
-        "name": "Пир Бездны",
-        "description": "Поглощает один магический эффект (положительный с врага или отрицательный с союзника) и восстанавливает 6% от максимального запаса здоровья."
+        "name": "Voidfeast",
+        "description": "Devours a magic effect (a beneficial one from an enemy, or a harmful one from an ally) and heals you for 6% of your maximum health."
       },
       "pummel": {
         "name": "Челюстолом",
@@ -6884,8 +6905,16 @@ export const ru_RU: EnTranslations = {
         "description": "Скрытная атака из засады, наносящая врагу урон оружием плюс {damage} и вызывающая кровотечение в течение 9 сек. Даёт 1 очко серии приёмов. Только в облике волка."
       },
       "revive_pet": {
-        "name": "Подлатать",
-        "description": "Подлечивает питомца: если он жив, восстанавливает ему {overTime} ед. здоровья за 12 сек. с шагом в 3 сек. Если питомец мёртв, воскрешает его с 35% здоровья."
+        "name": "Оживление питомца",
+        "description": "Оживляет вашего павшего питомца и возвращает его к вам."
+      },
+      "commanding_shout": {
+        "name": "Ободряющий клич",
+        "description": "Повышает вашу выносливость на {buff} на 2 мин."
+      },
+      "rend": {
+        "name": "Глубокий разрез",
+        "description": "Ранит цель, вызывая кровотечение на {damage} ед. урона за {duration} сек."
       }
     },
     "items": {
@@ -8099,16 +8128,16 @@ export const ru_RU: EnTranslations = {
         "name": "Героический знак"
       },
       "eastbrook_buckler": {
-        "name": "Истврукский баклер"
+        "name": "Eastbrook Buckler"
       },
       "eastbrook_greatsword": {
-        "name": "Истврукский двуручный меч"
+        "name": "Eastbrook Greatsword"
       },
       "highwatch_greatsword": {
-        "name": "Двуручный меч Хайвотча"
+        "name": "Highwatch Greatsword"
       },
       "highwatch_wallshield": {
-        "name": "Стенной щит Хайвотча"
+        "name": "Highwatch Wallshield"
       },
       "morthens_cryptforged_hauberk": {
         "name": "Кольчуга Мортена из гробничной стали"

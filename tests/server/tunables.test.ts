@@ -8,7 +8,7 @@
 import * as fs from 'node:fs';
 import * as http from 'node:http';
 import * as path from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { DESKTOP_LOGIN_TTL_MS } from '../../server/desktop_login';
 import {
   ASSET_UPLOAD_POLICY,
@@ -308,6 +308,118 @@ describe('byte caps + page sizes hold their literal values', () => {
   });
 });
 
+describe('db pool timeouts hold their literal values and the query_timeout layering', () => {
+  it('pins each literal and the strict layering the SET LOCAL exemption depends on', async () => {
+    const {
+      DB_POOL_CONNECT_TIMEOUT_MS,
+      DB_STATEMENT_TIMEOUT_MS,
+      DB_HEAVY_STATEMENT_TIMEOUT_MS,
+      DB_QUERY_TIMEOUT_MS,
+      getPoolClientErrorCount,
+      pool,
+    } = await import('../../server/db');
+    // (b) values: each named timeout holds its literal.
+    expect(DB_POOL_CONNECT_TIMEOUT_MS).toBe(5_000);
+    expect(DB_STATEMENT_TIMEOUT_MS).toBe(15_000);
+    expect(DB_HEAVY_STATEMENT_TIMEOUT_MS).toBe(60_000);
+    expect(DB_QUERY_TIMEOUT_MS).toBe(65_000);
+    // (a) derivation: the client-side backstop is defined as heavy + 5s, pinned as a
+    // relation so the two cannot silently drift together (the constant-self-comparison
+    // trap). query_timeout is per-connection and cannot be lifted by SET LOCAL, so it
+    // MUST sit strictly above the heaviest server-side allowance or it would kill the
+    // very queries runWithStatementTimeout raises the heavy allowance for.
+    expect(DB_QUERY_TIMEOUT_MS).toBe(DB_HEAVY_STATEMENT_TIMEOUT_MS + 5_000);
+    expect(DB_QUERY_TIMEOUT_MS).toBeGreaterThan(DB_HEAVY_STATEMENT_TIMEOUT_MS);
+    // The ladder: heavy > default > connect wait, so an exempted read gets real
+    // headroom, an ordinary query is bounded tighter, and a checkout fails fastest.
+    expect(DB_HEAVY_STATEMENT_TIMEOUT_MS).toBeGreaterThan(DB_STATEMENT_TIMEOUT_MS);
+    expect(DB_STATEMENT_TIMEOUT_MS).toBeGreaterThan(DB_POOL_CONNECT_TIMEOUT_MS);
+    // The idle-client error handler is actually REGISTERED on the real pool (this
+    // suite does not mock pg), not just present in source: emitting the pool's
+    // 'error' event runs it, so the counter the getter exposes advances by one. An
+    // unregistered handler would instead let node throw on an unhandled 'error'.
+    const before = getPoolClientErrorCount();
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    pool.emit('error', new Error('idle client boom'));
+    errSpy.mockRestore();
+    expect(getPoolClientErrorCount()).toBe(before + 1);
+  });
+
+  it('runWithStatementTimeout rejects a non-integer or negative timeout before touching the pool', async () => {
+    // SET LOCAL cannot bind a parameter, so the timeout is interpolated into the
+    // statement text as an integer; the safe-integer validation is therefore the
+    // injection guard. It must throw BEFORE any client is checked out (so a bad
+    // value can never reach the SQL, and fn never runs).
+    const { runWithStatementTimeout } = await import('../../server/db');
+    const fn = vi.fn();
+    await expect(runWithStatementTimeout(-1, fn)).rejects.toThrow(/non-negative safe integer/);
+    await expect(runWithStatementTimeout(1.5, fn)).rejects.toThrow(/non-negative safe integer/);
+    await expect(runWithStatementTimeout(Number.NaN, fn)).rejects.toThrow(
+      /non-negative safe integer/,
+    );
+    expect(fn).not.toHaveBeenCalled();
+  });
+
+  it('runWithStatementTimeout opens the transaction before the raise and unwinds on error', async () => {
+    // BEGIN must precede SET LOCAL (outside a transaction SET LOCAL is a silent
+    // no-op, leaving the heavy read on the 15s default), fn's statements must run
+    // on the SAME checked-out client, and both exits must return the client to
+    // the pool: a leaked client on the heavy path eats one of the 10 slots
+    // forever. Recorded on a stubbed checkout, no database touched.
+    const { runWithStatementTimeout, pool } = await import('../../server/db');
+    const calls: string[] = [];
+    let released = 0;
+    const client = {
+      query: (text: string) => {
+        calls.push(text);
+        return Promise.resolve({ rows: [], rowCount: 0 });
+      },
+      release: () => {
+        released++;
+      },
+    };
+    const connectSpy = vi.spyOn(pool, 'connect').mockResolvedValue(client as never);
+    try {
+      const out = await runWithStatementTimeout(1234, async (query) => {
+        await query('SELECT 1');
+        return 'ok';
+      });
+      expect(out).toBe('ok');
+      expect(calls).toEqual(['BEGIN', 'SET LOCAL statement_timeout = 1234', 'SELECT 1', 'COMMIT']);
+      expect(released).toBe(1);
+
+      // fn rejects: ROLLBACK (never COMMIT), the original error rethrows, and the
+      // client is STILL released.
+      calls.length = 0;
+      await expect(
+        runWithStatementTimeout(1234, async () => {
+          throw new Error('boom');
+        }),
+      ).rejects.toThrow('boom');
+      expect(calls).toEqual(['BEGIN', 'SET LOCAL statement_timeout = 1234', 'ROLLBACK']);
+      expect(released).toBe(2);
+
+      // A ROLLBACK that itself fails (dead connection) must neither mask the
+      // original error nor skip the release.
+      calls.length = 0;
+      client.query = (text: string) => {
+        calls.push(text);
+        return text === 'ROLLBACK'
+          ? Promise.reject(new Error('conn gone'))
+          : Promise.resolve({ rows: [], rowCount: 0 });
+      };
+      await expect(
+        runWithStatementTimeout(1234, async () => {
+          throw new Error('original');
+        }),
+      ).rejects.toThrow('original');
+      expect(released).toBe(3);
+    } finally {
+      connectSpy.mockRestore();
+    }
+  });
+});
+
 // Source-scan guard: each consolidated literal must live in exactly ONE place (its
 // owning module) and every call site must reference the named constant, never a
 // re-inlined magic number. Scoped to the SPECIFIC literals consolidated here
@@ -364,6 +476,132 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
   it('the pg pool max references DB_POOL_MAX_CLIENTS', () => {
     expect(dbSrc).toContain('max: DB_POOL_MAX_CLIENTS');
     expect(dbSrc).not.toContain('max: 10 }');
+  });
+
+  it('the pg pool timeouts wire the named constants at construction, never a re-inlined literal', () => {
+    // Pool construction reads each timeout from its named constant.
+    expect(dbSrc).toContain('connectionTimeoutMillis: DB_POOL_CONNECT_TIMEOUT_MS');
+    expect(dbSrc).toContain('statement_timeout: DB_STATEMENT_TIMEOUT_MS');
+    expect(dbSrc).toContain('query_timeout: DB_QUERY_TIMEOUT_MS');
+    // No re-inlined magic number at the construction call site (the owner defs above
+    // are `= 5000` / `= 15_000` / `= DB_HEAVY_STATEMENT_TIMEOUT_MS + 5000`, never the
+    // `key: literal` spellings banned here).
+    expect(dbSrc).not.toContain('connectionTimeoutMillis: 5000');
+    expect(dbSrc).not.toContain('statement_timeout: 15000');
+    expect(dbSrc).not.toContain('query_timeout: 65000');
+  });
+
+  it('an idle pooled-client error is handled, never left to crash the process', () => {
+    expect(dbSrc).toContain("pool.on('error'");
+  });
+
+  it('every heavy-aggregate call site runs through the raised allowance, per function body', () => {
+    // Dropping runWithStatementTimeout at ONE call site silently reverts that
+    // read to the 15s session default while its own suite stays green (the
+    // suites answer BEGIN/SET LOCAL and forward the real query through the same
+    // spy), so pin each function BODY to the wrapper. Slices run to the next
+    // export so a neighbor's wrapper cannot satisfy a body that lost its own.
+    const bodyOf = (source: string, decl: string): string => {
+      const start = source.indexOf(decl);
+      expect(start, `${decl} not found`).toBeGreaterThan(-1);
+      const next = source.indexOf('\nexport ', start + decl.length);
+      return next === -1 ? source.slice(start) : source.slice(start, next);
+    };
+    for (const decl of [
+      'export async function topArenaRatings',
+      'export async function topLifetimeXp',
+      'export async function topGuilds',
+      'export async function deedsBoardRanked',
+      'export async function saveCharacterState',
+    ]) {
+      expect(bodyOf(dbSrc, decl)).toContain(
+        'runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS',
+      );
+    }
+    // saveCharacterAndMarketState owns its escrow transaction and inlines the raise.
+    expect(bodyOf(dbSrc, 'export async function saveCharacterAndMarketState')).toContain(
+      'SET LOCAL statement_timeout = ${DB_HEAVY_STATEMENT_TIMEOUT_MS}',
+    );
+    const adminSrc = read('server/admin_db.ts');
+    expect(bodyOf(adminSrc, 'export async function overviewCounts')).toContain(
+      'runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS',
+    );
+    expect(bodyOf(read('server/deeds_db.ts'), 'export async function deedRarityCounts')).toContain(
+      'runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS',
+    );
+    expect(
+      bodyOf(
+        read('server/client_perf_metrics_db.ts'),
+        'export async function clientPerfMetricRows',
+      ),
+    ).toContain('runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS');
+    // The on-demand admin reads carry the wrapper in the body that owns their
+    // heaviest scan: sessionsByDay and accountDetail wrap directly; clientPerfSummary
+    // threads the bound query into its private perf helpers from ONE wrapper call, so
+    // the wrapper lives in its own body. pruneChatLogs (db.ts) wraps its delete.
+    for (const decl of [
+      'export async function sessionsByDay',
+      'export async function clientPerfSummary',
+      'export async function accountDetail',
+    ]) {
+      expect(bodyOf(adminSrc, decl)).toContain(
+        'runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS',
+      );
+    }
+    // clientPerfSummary inherits the allowance ONLY if it hands the bound query to
+    // both perf helpers; pin the threading so a helper cannot silently drop back to a
+    // pool.query outside the raised transaction without reddening this.
+    const perfSummaryBody = bodyOf(adminSrc, 'export async function clientPerfSummary');
+    expect(perfSummaryBody).toContain('perfAggregate(query,');
+    expect(perfSummaryBody).toContain('perfBuckets(query,');
+    // accountDetail wraps ONLY the account row whose correlated play_sessions sum
+    // grows without bound; its four LIMIT-capped companion reads stay on the default.
+    // Slice from the wrapper to the next pool.query and require the playtime
+    // aggregate inside it, so moving the wrapper onto one of the capped reads (and
+    // silently dropping the unbounded scan back to the default) reddens this.
+    const accountDetailBody = bodyOf(adminSrc, 'export async function accountDetail');
+    const wrapStart = accountDetailBody.indexOf(
+      'runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS',
+    );
+    expect(wrapStart).toBeGreaterThan(-1);
+    const nextPoolQuery = accountDetailBody.indexOf('pool.query', wrapStart);
+    const wrappedRead =
+      nextPoolQuery === -1
+        ? accountDetailBody.slice(wrapStart)
+        : accountDetailBody.slice(wrapStart, nextPoolQuery);
+    expect(wrappedRead).toContain('playtime_seconds');
+    expect(wrappedRead).toContain('FROM accounts WHERE id = $1');
+    expect(bodyOf(dbSrc, 'export async function pruneChatLogs')).toContain(
+      'runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS',
+    );
+  });
+
+  it('the player character-select read stays on the default statement timeout', () => {
+    // db.ts listCharacters is the login-path character-select read: it deliberately
+    // stays on the 15s default so it fails fast during a database brownout rather than
+    // pinning a client for up to the heavy allowance. It must NEVER gain the wrapper.
+    const bodyOf = (source: string, decl: string): string => {
+      const start = source.indexOf(decl);
+      expect(start, `${decl} not found`).toBeGreaterThan(-1);
+      const next = source.indexOf('\nexport ', start + decl.length);
+      return next === -1 ? source.slice(start) : source.slice(start, next);
+    };
+    expect(bodyOf(dbSrc, 'export async function listCharacters')).not.toContain(
+      'runWithStatementTimeout',
+    );
+  });
+
+  it('the heavy-statement exemption interpolates the named constant and validates the integer', () => {
+    // runWithStatementTimeout is the single SET LOCAL site; it interpolates the raw
+    // integer (SET LOCAL cannot bind a parameter) after a safe-integer guard, which
+    // is the injection guard. The named heavy constant is what the exempt call sites
+    // pass, never a re-inlined 60000.
+    expect(dbSrc).toMatch(/SET LOCAL statement_timeout = \$\{timeoutMs\}/);
+    expect(dbSrc).toContain('Number.isSafeInteger(timeoutMs)');
+    expect(dbSrc).toMatch(/SET LOCAL statement_timeout = \$\{DB_HEAVY_STATEMENT_TIMEOUT_MS\}/);
+    // Boot DDL disables the timeout entirely for its advisory-lock-serialized wait.
+    expect(dbSrc).toContain('SET LOCAL statement_timeout = 0');
+    expect(dbSrc).not.toContain('SET LOCAL statement_timeout = 60000');
   });
 
   it('the rateLimited default budget binds AUTH_MAX_PER_MINUTE, not a re-inlined 20', () => {

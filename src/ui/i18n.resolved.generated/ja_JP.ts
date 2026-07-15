@@ -869,23 +869,23 @@ export const ja_JP: EnTranslations = {
       "mobileLeftHanded": "左利き用レイアウト"
     },
     "talentRows": {
-      "tab": "選択",
-      "defaultLoadout": "デフォルト構成",
-      "comingSoon": "近日公開",
-      "readoutSummary": "タレント：{head}、{spent}/{total}行を選択済み。"
+      "tab": "Choices",
+      "defaultLoadout": "Default Loadout",
+      "comingSoon": "Coming soon",
+      "readoutSummary": "Talents: {head}, {spent}/{total} rows selected."
     },
     "abilityError": {
-      "shieldRequired": "盾を装備する必要があります。"
+      "shieldRequired": "You must have a shield equipped."
     },
     "specPanel": {
-      "primaryAttr": "主要能力値",
-      "complexity": "複雑さ",
-      "complexityLow": "低",
-      "complexityMedium": "中",
-      "complexityHigh": "高",
-      "exampleAbilities": "代表的なアビリティ",
-      "viewTalents": "タレントを見る",
-      "selectSpec": "スペシャライゼーションを選択"
+      "primaryAttr": "Primary attribute",
+      "complexity": "Complexity",
+      "complexityLow": "Low",
+      "complexityMedium": "Medium",
+      "complexityHigh": "High",
+      "exampleAbilities": "Example abilities",
+      "viewTalents": "View talents",
+      "selectSpec": "Select specialization"
     },
     "controller": {
       "title": "コントローラー",
@@ -998,6 +998,7 @@ export const ja_JP: EnTranslations = {
         "spellPower": "呪文威力",
         "critRating": "クリティカルレーティング",
         "hasteRating": "ヘイストレーティング",
+        "hitRating": "命中レーティング",
         "warfare": "ウォーフェア"
       },
       "warfareValue": "与ダメージ +{increase}% / 被ダメージ -{reduction}%",
@@ -1015,6 +1016,7 @@ export const ja_JP: EnTranslations = {
         "dodge": "迫り来る近接攻撃を完全に回避し、ダメージを受けない確率です。",
         "critRating": "装備とセットボーナスによるクリティカルレーティング。クリティカル率が上昇します。約10レーティングで1%クリティカル。",
         "hasteRating": "装備とセットボーナスによるヘイストレーティング。攻撃と詠唱の速度が上昇します。約10レーティングで1%ヘイスト。",
+        "hitRating": "装備とセットボーナスによる命中レーティング。攻撃がミスする頻度と呪文が抵抗される頻度を減らし、特に高レベルの敵に有効です。約10レーティングで1%命中。",
         "warfare": "プレイヤーに与えるダメージが {increase}% 増加し、プレイヤーから受けるダメージが {reduction}% 減少します。"
       },
       "effects": {
@@ -1382,6 +1384,8 @@ export const ja_JP: EnTranslations = {
       },
       "dodge": "回避率を{pct}%上昇させる",
       "dodgeReduce": "回避率を{pct}%低下させる",
+      "damageReduction": "受けるすべてのダメージを{pct}%軽減する",
+      "guardianWard": "次に受ける敵の致死攻撃を防ぎ、代わりに体力を{pct}%まで回復する",
       "armorFlat": "防御力を{value}低下させる",
       "armorFlatStacks": "防御力を{value}低下させる({stacks}スタック)",
       "armorPct": "防御力を{pct}%低下させる",
@@ -1564,7 +1568,7 @@ export const ja_JP: EnTranslations = {
         "artists": "アーティスト",
         "contentcreator": "コンテンツクリエイター",
         "legend": "レジェンド",
-        "shill": "宣伝役"
+        "shill": "サポーター"
       },
       "guildMember": "認証済みメンバー",
       "notMember": "まだサーバーに参加していません",
@@ -1831,7 +1835,8 @@ export const ja_JP: EnTranslations = {
       "title": "採集",
       "mining": "採掘",
       "logging": "伐採",
-      "herbalism": "薬草学"
+      "herbalism": "薬草学",
+      "notReady": "この資源ノードはまだあなたのために再生していません。"
     },
     "archetypeTitle": {
       "label": "称号",
@@ -2586,8 +2591,8 @@ export const ja_JP: EnTranslations = {
     },
     "abilityHook": {
       "heroic_strike": "次の一撃にレイジを乗せ、より重い攻撃を予約します。",
-      "revenge": "前方の敵を薙ぎ払い、回避または受け流しの後に消費なしで使えることがある。",
-      "hamstring": "敵の移動を妨げ、逃走を阻止する。",
+      "revenge": "Sweeps enemies in front of you, with a chance to become free after a dodge or parry.",
+      "hamstring": "Cripples an enemy's movement to keep it from escaping.",
       "battle_shout": "パーティの攻撃力を高める鼓舞の雄叫びです。",
       "charge": "離れた敵に突進し、短いスタンで戦闘の口火を切ります。",
       "thunder_clap": "周囲のすべてに当たり、相手の攻撃を遅くします。",
@@ -2647,7 +2652,9 @@ export const ja_JP: EnTranslations = {
       "mark_of_the_wild": "戦闘の前に自分や味方に付与する、持続する祝福です。",
       "moonfire": "即座に当たり標的を燃焼させるため、移動中にも向いています。",
       "rejuvenation": "即座に唱えられ、味方を継続的に回復するので、行動を続けられます。",
-      "thorns": "味方を守り、近接で攻撃してきた相手に反射ダメージを与えます。"
+      "thorns": "味方を守り、近接で攻撃してきた相手に反射ダメージを与えます。",
+      "commanding_shout": "持久力を底上げし、長い戦いでも全員が粘り強く戦えるようにします。",
+      "rend": "出血を与え、時間をかけて標的を削っていきます。"
     },
     "petHook": {
       "emberkin": "安全な距離から敵を削る、ファイアボルトを放つ遠距離のデーモンです。",
@@ -4628,6 +4635,8 @@ export const ja_JP: EnTranslations = {
     "connectionLost": "サーバーとの接続が切断されました。",
     "reconnecting": "サーバーとの接続が切断されました。再接続しています...",
     "connectionRejected": "サーバーが接続を閉じました。",
+    "realmFull": "このワールドは現在満員です。数分後にもう一度お試しください。",
+    "tooManyConnections": "お使いのネットワークからこのワールドへの接続が多すぎます。余分なゲームウィンドウを閉じるか、数分後にもう一度お試しください。",
     "tips": {
       "classes": "ヒント：9つのクラスはそれぞれ遊び方が異なります。決める前にいくつか試してみましょう。",
       "talents": "ヒント：非戦闘中ならいつでも特性をリセットできるので、最初の選択が失敗になることはありません。",
@@ -4705,9 +4714,9 @@ export const ja_JP: EnTranslations = {
     "medium": "中",
     "low": "低",
     "popTipLow": "低人口：現在オンラインのプレイヤーは15人未満。余裕があり、新規スタートに最適です。",
-    "popTipMedium": "中人口：現在オンラインのプレイヤーは15〜39人。健全で活発なワールドです。",
-    "popTipHigh": "高人口：現在オンラインのプレイヤーは40〜79人。混雑しており、多くのプレイヤーがいます。",
-    "popTipFull": "満員：現在オンラインのプレイヤーは80人以上。非常に混雑しており、ログイン待ちが発生する場合があります。",
+    "popTipMedium": "中人口：現在オンラインのプレイヤーは15〜79人。健全で活発なワールドです。",
+    "popTipHigh": "高人口：現在オンラインのプレイヤーは80人以上。混雑しており、多くのプレイヤーがいます。",
+    "popTipFull": "満員：このワールドは現在プレイヤー数の上限に達しています。他のプレイヤーがログアウトするまで、新規ログインは拒否されます。",
     "popTipOffline": "オフライン：このワールドは現在接続できず、参加できません。",
     "characterCountOne": "{count}キャラクター",
     "characterCountOther": "{count}キャラクター",
@@ -5285,7 +5294,7 @@ export const ja_JP: EnTranslations = {
       "defensiveDesc": "あなたまたはペットを傷つけた敵を攻撃します。",
       "aggressiveDesc": "近くの敵対的な敵を攻撃します。",
       "rename": "ペット名変更",
-      "revive": "応急処置",
+      "revive": "ペット蘇生",
       "abandon": "ペット放棄",
       "cancel": "キャンセル",
       "renameLabel": "新しいペット名を選んでください。",
@@ -5541,7 +5550,7 @@ export const ja_JP: EnTranslations = {
     },
     "slots": {
       "mainhand": "メインハンド",
-      "offhand": "オフハンド",
+      "offhand": "Off Hand",
       "helmet": "頭",
       "neck": "首",
       "shoulder": "肩",
@@ -6355,6 +6364,18 @@ export const ja_JP: EnTranslations = {
         "name": "樫の肌",
         "description": "肌が樹皮のように硬くなり、15秒間アーマーが150増加します。"
       },
+      "ironhold": {
+        "name": "鉄壁",
+        "description": "堅固な守りで身を固め、8秒間、受けるすべてのダメージを40%軽減します。"
+      },
+      "sacred_bulwark": {
+        "name": "聖なる防壁",
+        "description": "{duration}秒間、次に敵から受ける致命的な一撃を無効化し、代わりに体力を最大値の35%まで回復します。"
+      },
+      "primal_reflexes": {
+        "name": "原始の反射",
+        "description": "本能が研ぎ澄まされ、6秒間、回避率が50%上昇します。"
+      },
       "starfire": {
         "name": "天墜",
         "description": "星の炎を呼び下ろし、{damage} の秘術ダメージを与えます。"
@@ -6540,304 +6561,304 @@ export const ja_JP: EnTranslations = {
         "description": "レイスボーンを意のままに束縛します。遠方から強力なシャドウダメージを降らせるエリート悪魔です。長い再使用時間がその破壊的な力を制限します。新たな悪魔を召喚すると現在の悪魔は解放されます。悪魔は一度に1体しか従えられません。"
       },
       "battle_stance": {
-        "name": "バトルスタンス",
-        "description": "攻撃的な戦闘スタンスです。怒りの生成量が10%増加します。武器と防御の基本スタンスです。"
+        "name": "Battle Stance",
+        "description": "An aggressive combat stance: you generate 10% more rage. The default stance for Arms and Protection."
       },
       "berserker_stance": {
-        "name": "バーサーカースタンス",
-        "description": "無謀な戦闘スタンスです。クリティカルの発生率が3%上昇し、ダメージが3%増加します。狂怒ウォリアーは常にこのスタンスで戦います。"
+        "name": "Berserker Stance",
+        "description": "A reckless combat stance: your critical strikes land 3% more often and hit for 3% more. The Fury warrior always fights in this stance."
       },
       "sweeping_strikes": {
-        "name": "広がる弧",
-        "description": "12秒間、単体攻撃が近くの敵1体にも100%のダメージで命中します。（武器）"
+        "name": "Widening Arc",
+        "description": "For 12 sec your single-target attacks also strike 1 nearby enemy for full damage. (Arms)"
       },
       "deep_wounds": {
-        "name": "抉れた傷",
-        "description": "パッシブ: あなたの重傷の一撃が対象に出血を残し、6秒かけて物理ダメージを与えます。（武器）"
+        "name": "Gaping Wounds",
+        "description": "Passive: your Maiming Strike leaves the target bleeding for Physical damage over 6 sec. (Arms)"
       },
       "enrage_passive": {
-        "name": "狂乱",
-        "description": "パッシブ: 激昂している間、与えるダメージが7%増加し、攻撃速度が25%、移動速度が10%上昇します（4秒間）。瀉血には30%の確率で激昂させる効果があり、赤い収穫は必ず激昂させます。（狂怒）"
+        "name": "Mayhem",
+        "description": "Passive: while Enraged you deal 7% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)"
       },
       "raging_gale": {
-        "name": "双撃",
-        "description": "武器で即座に2回攻撃し、それぞれ武器ダメージの40%に{damage}を加えたダメージを与え、怒りを8生成します。最大2チャージまで蓄積します。（狂怒）"
+        "name": "Twinstrike",
+        "description": "Instantly strike with your weapon twice, each hit dealing 40% weapon damage plus {damage}, and generate 8 rage. Stores up to 2 charges. (Fury)"
       },
       "red_harvest": {
-        "name": "赤い収穫",
-        "description": "すべてを注ぎ込み、狂乱のうちに3回攻撃し、それぞれ武器ダメージの65%に{damage}を加えたダメージを与え、必ず激怒状態になります。（狂怒）"
+        "name": "Red Harvest",
+        "description": "Spend everything: strike three times in a frenzy for 65% weapon damage plus {damage} each, always Enraging you. (Fury)"
       },
       "furious_mending": {
-        "name": "憤怒の癒し",
-        "description": "10秒間、受けるダメージが20%減少し、効果中は瀉血が最大体力の20%を回復します。（狂怒）"
+        "name": "Furious Mending",
+        "description": "For 10 sec you take 20% reduced damage, and while it lasts your Bloodletting heals you for 20% of your maximum health. (Fury)"
       },
       "emboldening_roar": {
-        "name": "奮起の咆哮",
-        "description": "奮い立たせる咆哮を上げ、40yd以内の自分と味方プレイヤーを鼓舞します。次の3回のアビリティが必ずクリティカルになります。（狂怒）"
+        "name": "Emboldening Roar",
+        "description": "Lets loose an emboldening roar: you and friendly players within 40 yards are Emboldened, and your next 3 abilities are guaranteed critical strikes. (Fury)"
       },
       "raised_guard": {
-        "name": "守りの構え",
-        "description": "盾の陰に身を構え、6秒間、受ける物理ダメージが50%減少します。最大2チャージまで蓄積します。（防御）"
+        "name": "Raised Guard",
+        "description": "Brace behind your shield: you take 50% reduced Physical damage for 6 sec. Stores up to 2 charges. (Protection)"
       },
       "iron_resolve": {
-        "name": "鉄の決意",
-        "description": "歯を食いしばって痛みを堪え、最大40の怒り（最低20）を消費し、消費した怒り1につき4のダメージを吸収します。最大10秒間持続します。（防御）"
+        "name": "Iron Resolve",
+        "description": "Grit your teeth and ignore the pain: spends up to 40 rage (20 minimum) to absorb 4 damage per rage spent, lasting up to 10 sec. (Protection)"
       },
       "faultline": {
-        "name": "断層",
-        "description": "地面に衝撃波を走らせ、前方8yd以内の敵に{damage}のダメージを与え、3秒間スタンさせます。（防御）"
+        "name": "Faultline",
+        "description": "Send a shockwave through the ground: enemies in front of you within 8 yards take {damage} damage and are stunned for 3 sec. (Protection)"
       },
       "defiant_bellow": {
-        "name": "不屈の雄叫び",
-        "description": "不屈の雄叫びを上げ、10yd以内のすべての敵を挑発し、3秒間あなたを攻撃するよう強制します。（防御）"
+        "name": "Defiant Bellow",
+        "description": "A defiant bellow: every enemy within 10 yards is taunted, compelled to attack you for 3 sec. (Protection)"
       },
       "breachmaker": {
-        "name": "崩し手",
-        "description": "対象を打ち据えて武器ダメージに{damage}を加えたダメージを与え、その守りを崩します。8秒間、あなたがその対象に与えるダメージが20%増加します。（武器）"
+        "name": "Breachmaker",
+        "description": "Batter the target for weapon damage plus {damage} and crack its guard: your own attacks against it deal 20% more damage for 8 sec. (Arms)"
       },
       "measured_fury": {
-        "name": "制御された怒り",
-        "description": "制御された怒りが効率を高め、アビリティの怒りコストが10%減少します。（武器）"
+        "name": "Measured Fury",
+        "description": "Your measured fury sharpens your economy: your abilities cost 10% less rage. (Arms)"
       },
       "seasoned_soldier": {
-        "name": "歴戦の兵",
-        "description": "クリティカルの通常攻撃が生成する怒りが10%増加します。（武器）"
+        "name": "Seasoned Soldier",
+        "description": "Your critical auto-attacks generate 10% more rage. (Arms)"
       },
       "diabolical_twinstrike": {
-        "name": "極悪の双撃",
-        "description": "激昂している間、双撃のダメージが15%増加します。（狂怒）"
+        "name": "Diabolical Twinstrike",
+        "description": "While Enraged, your Twinstrike deals 15% more damage. (Fury)"
       },
       "cleaving_blows": {
-        "name": "切り裂く連撃",
-        "description": "赤い収穫は必ず双撃のチャージを1つ回復します。（狂怒）"
+        "name": "Cleaving Blows",
+        "description": "Red Harvest always refunds a charge of Twinstrike. (Fury)"
       },
       "sudden_death": {
-        "name": "突然死",
-        "description": "通常攻撃に、体力に関係なく早すぎる墓を怒りコストなしで使用できるようになる確率があります。（武器）"
+        "name": "Sudden Death",
+        "description": "Your auto-attacks have a chance to let you cast Early Grave on a target at any health, costing no rage. (Arms)"
       },
       "storm_bolt": {
-        "name": "嵐の一投",
-        "description": "武器を対象に投げつけて{damage}のダメージを与え、3秒間スタンさせます。"
+        "name": "Storm Bolt",
+        "description": "Hurl your weapon at the target for {damage}, stunning it for 3 sec."
       },
       "piercing_howl": {
-        "name": "貫く咆哮",
-        "description": "劈くような叫びを上げ、15yd以内のすべての敵の移動速度を8秒間、50%低下させます。"
+        "name": "Piercing Howl",
+        "description": "A piercing shout that slows all enemies within 15 yards by 50% for 8 sec."
       },
       "die_by_sword": {
-        "name": "剣に死す",
-        "description": "防御的クールダウン。8秒間、受けるダメージが30%減少し、攻撃を回避する確率が大幅に上昇します。"
+        "name": "Die by the Sword",
+        "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
       },
       "recklessness": {
-        "name": "無謀",
-        "description": "激昂。12秒間、怒りの生成量が50%、クリティカル率が20%増加します。"
+        "name": "Recklessness",
+        "description": "Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec."
       },
       "sanguine_aura": {
-        "name": "血のオーラ",
-        "description": "武器に敵の血を宿し、20秒間、自分と近接の味方の攻撃速度が10%、ダメージが10%増加します。"
+        "name": "Sanguine Aura",
+        "description": "Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec."
       },
       "victory_rush": {
-        "name": "勝利の追撃",
-        "description": "武器ダメージに{damage}を加えたダメージを与え、最大体力の20%を回復します。敵を倒してから20秒以内にのみ使用できます。"
+        "name": "Victory Rush",
+        "description": "Strike for weapon damage plus {damage} and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy."
       },
       "intimidating_shout": {
-        "name": "威圧の雄叫び",
-        "description": "恐ろしい叫びを上げ、8yd以内の最大5体の敵を8秒間、恐怖で逃げ惑わせます。ダメージを受けると効果が解除されることがあります。"
+        "name": "Intimidating Shout",
+        "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
       },
       "revenge": {
-        "name": "意趣返し",
-        "description": "大きく弧を描いて攻撃し、前方のすべての敵に物理ダメージを与えます。対象が5体を超えるとダメージが減少します。回避または受け流しに成功すると、次の意趣返しの怒りコストが0になることがあります。 (Protection)"
+        "name": "Revenge",
+        "description": "Attack in a wide arc, dealing Physical damage to all enemies in front of you. Above 5 targets the damage is reduced. When you dodge or parry, your next Revenge may cost no rage. (Protection)"
       },
       "heroic_leap": {
-        "name": "英雄的跳躍",
-        "description": "対象地点へ跳躍し、着地時に周囲の敵へ{damage}のダメージを与えます。"
+        "name": "Heroic Leap",
+        "description": "Leap to the target area, dealing {damage} damage to nearby enemies on landing."
       },
       "rallying_cry": {
-        "name": "勇気の雄叫び",
-        "description": "勇壮な雄叫びを上げ、自分と40ヤード以内のパーティメンバーの最大体力を10秒間20%増加させます。防御の対象は、効果中に受けるダメージも5%減少します。"
+        "name": "Valor Roar",
+        "description": "Lets loose a valorous roar, granting you and party members within 40 yards 20% additional maximum health for 10 sec. Protection: they also take 5% less damage for the duration."
       },
       "avatar": {
-        "name": "化身",
-        "description": "20秒間コロッサスに変身し、あらゆる行動妨害を解除し、与えるダメージが20%増加します。"
+        "name": "Avatar",
+        "description": "Transform into a colossus for 20 sec, breaking all control on you and increasing your damage dealt by 20%."
       },
       "bladestorm": {
-        "name": "剣の嵐",
-        "description": "鋼の嵐と化し、4秒間、8ヤード以内のすべての敵に毎秒{damage}のダメージを与えます。"
+        "name": "Bladestorm",
+        "description": "Become a whirling storm of steel, striking all enemies within 8 yards for {damage} every second for 4 sec."
       },
       "aspect_of_the_wild": {
-        "name": "野牙の装い",
-        "description": "30ヤード以内の味方を野生の力で鼓舞し、攻撃力を45、攻撃速度を5%上昇させる。効果時間5分。（ハンターのタレント）"
+        "name": "Wildfang Rally",
+        "description": "Inspires allies within 30 yd with wild strength, increasing attack power by 45 and attack speed by 5% for 5 min. (Hunter talent)"
       },
       "aura_surge": {
-        "name": "曙光の跳弾",
-        "description": "曙光で鍛えた盾を投げて{damage}の聖属性ダメージを与え、最初の対象を2秒間沈黙させる。その後、10ヤード以内の追加の敵最大2体へ跳ね返り、1回ごとに75%のダメージを与える。（パラディンのタレント）"
+        "name": "Dawnward Ricochet",
+        "description": "Hurl a dawnforged shield for {damage} Holy damage and silence the primary target for 2 sec. It bounces to up to 2 additional enemies within 10 yd for 75% damage per bounce. (Paladin talent)"
       },
       "avenging_wrath": {
-        "name": "復讐の翼",
-        "description": "復讐の力を呼び起こし、攻撃力を60、魔力を30上昇させる。効果時間20秒。（パラディンのタレント）"
+        "name": "Wrathwing",
+        "description": "Calls down avenging power, increasing attack power by 60 and spell power by 30 for 20 sec. (Paladin talent)"
       },
       "berserk": {
-        "name": "赤き霞",
-        "description": "攻撃力を70上昇させる。効果時間15秒。（ドルイドのタレント）"
+        "name": "Red Haze",
+        "description": "Increases attack power by 70 for 15 sec. (Druid talent)"
       },
       "blink": {
-        "name": "瞬き歩み",
-        "description": "前方15ヤードへ瞬間移動し、移動不能効果を解除する。（メイジのタレント）"
+        "name": "Flickerstep",
+        "description": "Teleports you 15 yd forward and breaks roots. (Mage talent)"
       },
       "bloodlust": {
-        "name": "戦の太鼓",
-        "description": "30ヤード以内の味方を狂乱させ、攻撃速度を30%上昇させる。効果時間15秒。（シャーマンのタレント）"
+        "name": "Storm Chorus",
+        "description": "Whips allies within 30 yd into a frenzy, increasing attack speed by 30% for 15 sec. (Shaman talent)"
       },
       "chain_lightning": {
-        "name": "枝分かれの稲妻",
-        "description": "対象地点へ雷を放ち、周囲の敵に{damage}のダメージを与える。（シャーマンのタレント）"
+        "name": "Skybranch",
+        "description": "Hurls lightning at the target area, damaging nearby enemies for {damage}. (Shaman talent)"
       },
       "chaos_bolt": {
-        "name": "破滅の矢",
-        "description": "混沌の炎を放ち、{damage}の火属性ダメージを与える。（ウォーロックのタレント）"
+        "name": "Ruinbolt",
+        "description": "Hurls a bolt of chaotic fire for {damage} Fire damage. (Warlock talent)"
       },
       "cleansing_verdict": {
-        "name": "浄化の裁定",
-        "description": "味方1体の有害な魔法効果を解除し、{damage}の体力を回復する。"
+        "name": "Cleansing Verdict",
+        "description": "Purges a harmful magic effect from a friendly target and heals them for {damage} Holy."
       },
       "cloak_of_shadows": {
-        "name": "影まとい",
-        "description": "影で身を包み、5秒間に420のダメージを吸収する。（ローグのタレント）"
+        "name": "Shadecloak",
+        "description": "Wraps you in shadows, absorbing 420 damage for 5 sec. (Rogue talent)"
       },
       "cone_of_cold": {
-        "name": "霜払い",
-        "description": "周囲の敵を冷気で攻撃し、{damage}の氷属性ダメージを与える。（フロストのシグネチャー）"
+        "name": "Frostsweep",
+        "description": "Blasts nearby enemies with frost for {damage} Frost damage. (Frost signature)"
       },
       "curse_of_exhaustion": {
-        "name": "鉛の呪い",
-        "description": "対象を呪い、移動速度を30%低下させる。効果時間12秒。（ウォーロックのタレント）"
+        "name": "Leaden Hex",
+        "description": "Curses the target, slowing movement by 30% for 12 sec. (Warlock talent)"
       },
       "death_coil": {
-        "name": "墓所の螺旋",
-        "description": "敵に{damage}の闇属性ダメージを与え、その後3秒間恐怖状態にする。（ウォーロックのタレント）"
+        "name": "Morrowlash",
+        "description": "Strikes the enemy for {damage} Shadow damage, then horrifies them for 3 sec. (Warlock talent)"
       },
       "deep_freeze": {
-        "name": "死霜",
-        "description": "対象を深く凍結させ、{damage}の氷属性ダメージを与えて4秒間スタンさせる。（メイジのタレント）"
+        "name": "Deadfrost",
+        "description": "Deep freezes the target, dealing {damage} Frost damage and stunning it for 4 sec. (Mage talent)"
       },
       "desperate_prayer": {
-        "name": "最後の祈り",
-        "description": "自分の体力を即座に{damage}回復する。（プリーストのタレント）"
+        "name": "Last Prayer",
+        "description": "Instantly heals you for {damage}. (Priest talent)"
       },
       "deterrence": {
-        "name": "針毛の守り",
-        "description": "回避率を50パーセントポイント上昇させる。効果時間10秒。（ハンターのタレント）"
+        "name": "Bristleguard",
+        "description": "Increases your dodge chance by 50 percentage points for 10 sec. (Hunter talent)"
       },
       "divine_shield": {
-        "name": "光の護り",
-        "description": "聖なる力で身を守り、8秒間に900のダメージを吸収する。（パラディンのタレント）"
+        "name": "Lightward",
+        "description": "Shields you with holy power, absorbing 900 damage for 8 sec. (Paladin talent)"
       },
       "earthbind": {
-        "name": "大地の縛り",
-        "description": "周囲の敵を大地に縛り、2秒間移動不能にする。（シャーマンのタレント）"
+        "name": "Gripping Earth",
+        "description": "Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)"
       },
       "evocation": {
-        "name": "エーテルの井戸",
-        "description": "マナを即座に220回復する。（メイジのタレント）"
+        "name": "Aetherwell",
+        "description": "Instantly restores 220 mana. (Mage talent)"
       },
       "frenzied_regeneration": {
-        "name": "野生の癒し",
-        "description": "10秒かけて体力を180回復する。熊形態でのみ使用可能。（ドルイドのタレント）"
+        "name": "Savage Mending",
+        "description": "Restores 180 health over 10 sec. Bruin Form only. (Druid talent)"
       },
       "frost_trap": {
-        "name": "霧氷の罠",
-        "description": "対象地点の敵を3秒間凍結させ、移動と行動を封じる。（ハンターのタレント）"
+        "name": "Rime Snare",
+        "description": "Freezes enemies at the target area for 3 sec, preventing movement and actions. (Hunter talent)"
       },
       "ghostly_strike": {
-        "name": "亡霊の一撃",
-        "description": "敵に武器ダメージと{damage}の追加ダメージを与え、短時間、回避率を上昇させる。コンボポイントを1獲得する。（ローグのタレント）"
+        "name": "Wraith Strike",
+        "description": "Strikes the enemy for weapon damage plus {damage} and briefly increases dodge. Awards 1 combo point. (Rogue talent)"
       },
       "hammer_of_wrath": {
-        "name": "鐘鳴りの槌",
-        "description": "傷ついた敵に聖なるハンマーを投げ、{damage}の聖属性ダメージを与える。体力が20%未満の対象にのみ使用可能。（パラディンのタレント）"
+        "name": "Tolling Hammer",
+        "description": "Hurls a holy hammer at a wounded enemy for {damage} Holy damage. Only usable below 20% health. (Paladin talent)"
       },
       "healing_stream": {
-        "name": "湧き水",
-        "description": "味方1体の体力を12秒かけて120回復する。（シャーマンのタレント）"
+        "name": "Springwell",
+        "description": "Restores 120 health to a friendly target over 12 sec. (Shaman talent)"
       },
       "holy_wrath": {
-        "name": "聖者の怒り",
-        "description": "聖なる力を解き放ち、周囲の敵に{damage}のダメージを与える。（パラディンのタレント）"
+        "name": "Saint's Ire",
+        "description": "Unleashes holy power, damaging nearby enemies for {damage}. (Paladin talent)"
       },
       "howl_of_terror": {
-        "name": "恐怖の遠吠え",
-        "description": "周囲の敵を最大3秒間恐怖状態にする。ダメージを受けると解除されることがある。（ウォーロックのタレント）"
+        "name": "Dread Chorus",
+        "description": "Frightens nearby enemies for up to 3 sec. Damage may break the effect. (Warlock talent)"
       },
       "ice_block": {
-        "name": "冷たき棺",
-        "description": "氷に身を閉じ、8秒間に600のダメージを吸収する。閉じ込められている間は行動できない。再使用すると解除する。（メイジのタレント）"
+        "name": "Cold Coffin",
+        "description": "Encases you in ice, absorbing 600 damage for 8 sec. You cannot act while encased. Recast to cancel. (Mage talent)"
       },
       "inner_focus": {
-        "name": "静まる心",
-        "description": "次に使用するスペルの消費をなくす。効果時間60秒。（プリーストのタレント）"
+        "name": "Stilled Mind",
+        "description": "Makes your next spell free. Lasts 60 sec. (Priest talent)"
       },
       "innervate": {
-        "name": "生命の樹液",
-        "description": "生命の樹液が10秒間あふれ、現在のリソースを波状に20回復する。マナ、怒り、エナジーに対応し、変身しても中断されない。睡眠、スタン、ステイシス中は樹液が止まる。（ドルイドのタレント）"
+        "name": "Lifesap",
+        "description": "Living sap wells up in you for 10 sec, restoring 20 of your current resource in waves: mana, Rage, or Energy, and shifting forms does not break it. Sleep, stun, or stasis stills the sap. (Druid talent)"
       },
       "meteor": {
-        "name": "天の石",
-        "description": "対象地点へ隕石を落とし、{damage}の火属性ダメージを与える。その後6秒間、その場の敵に2秒ごとに12から18の火属性ダメージを与える。（メイジのタレント）"
+        "name": "Skystone",
+        "description": "Calls down a meteor at the target area, dealing {damage} Fire damage, then burning enemies there for 12 to 18 Fire damage every 2 sec for 6 sec. (Mage talent)"
       },
       "mind_sear": {
-        "name": "思念焼き",
-        "description": "対象地点へ闇のエネルギーをチャネリングし、周囲の敵に毎秒{damage}のダメージを与える。（プリーストのタレント）"
+        "name": "Thoughtburn",
+        "description": "Channels shadow energy at the target area, damaging nearby enemies each second for {damage}. (Priest talent)"
       },
       "multi_shot": {
-        "name": "分裂射撃",
-        "description": "対象地点へ矢の一斉射撃を放ち、8ヤード以内の敵に{damage}の物理ダメージを与える。（ハンターのタレント）"
+        "name": "Splitshot",
+        "description": "Loose a spread at the target area, dealing {damage} Physical damage to enemies within 8 yd. (Hunter talent)"
       },
       "prayer_of_healing": {
-        "name": "聖歌の癒し",
-        "description": "周囲の味方の体力を{damage}回復する。（プリーストのタレント）"
+        "name": "Choirmend",
+        "description": "Heals nearby allies for {damage}. (Priest talent)"
       },
       "preparation": {
-        "name": "備え",
-        "description": "スプリント、回避、バニッシュのクールダウンを完了させる。（ローグのタレント）"
+        "name": "Contingency",
+        "description": "Finishes the cooldown on Sprint, Evasion, and Vanish. (Rogue talent)"
       },
       "presence_of_mind": {
-        "name": "駆ける心",
-        "description": "次に使用する詠唱時間のあるスペルを即時発動にする。効果時間60秒。（メイジのタレント）"
+        "name": "Racing Mind",
+        "description": "Makes your next spell with a cast time instant. Lasts 60 sec. (Mage talent)"
       },
       "psychic_scream": {
-        "name": "精神の絶叫",
-        "description": "周囲の敵を最大4秒間恐怖状態にする。ダメージを受けると解除されることがある。（プリーストのタレント）"
+        "name": "Terror Canticle",
+        "description": "Frightens nearby enemies for up to 4 sec. Damage may break the effect. (Priest talent)"
       },
       "shadowstep": {
-        "name": "影すべり",
-        "description": "影を通り抜けて対象へ近づく。（ローグのタレント）"
+        "name": "Shadeslip",
+        "description": "Steps through the shadows toward your target. (Rogue talent)"
       },
       "silence": {
-        "name": "沈黙",
-        "description": "対象を4秒間沈黙させる。（プリーストのタレント）"
+        "name": "Hushword",
+        "description": "Silences the target for 4 sec. (Priest talent)"
       },
       "smoke_screen": {
-        "name": "スモークスクリーン",
-        "description": "煙幕に紛れ、8秒間、回避率を30%上昇させる。"
+        "name": "Smoke Screen",
+        "description": "Vanish into a cloud of smoke, increasing your chance to dodge by 30% for 8 sec."
       },
       "spellsteal": {
-        "name": "魔法奪取",
-        "description": "敵の有益な魔法効果を1つ奪い、自分へ移す。"
+        "name": "Spellsteal",
+        "description": "Steals a beneficial magic effect from an enemy, transferring it to yourself."
       },
       "startle_shot": {
-        "name": "驚愕射撃",
-        "description": "荒々しい一射で対象を{duration}秒間混乱させる。ダメージを受けると解除される。"
+        "name": "Startle Shot",
+        "description": "A wild shot that disorients the target for {duration} sec. Any damage breaks the effect."
       },
       "tranquility": {
-        "name": "木立の歌",
-        "description": "4秒間、回復エネルギーをチャネリングし、30ヤード以内の味方の体力を毎秒42から52回復する。（ドルイドのタレント）"
+        "name": "Gladesong",
+        "description": "Channels restorative energy for 4 sec, healing allies within 30 yd for 42 to 52 each second. (Druid talent)"
       },
       "typhoon": {
-        "name": "タイフーン",
-        "description": "突風で8ヤード以内のすべての敵を吹き飛ばしてよろめかせ、4秒間、移動速度を50%低下させる。"
+        "name": "Typhoon",
+        "description": "A blast of wind knocks back all enemies within 8 yd and dazes them, slowing their movement by 50% for 4 sec."
       },
       "voidfeast": {
-        "name": "虚無の饗宴",
-        "description": "魔法効果（敵の有益効果または味方の有害効果）を貪り、自分の最大体力の6%を回復する。"
+        "name": "Voidfeast",
+        "description": "Devours a magic effect (a beneficial one from an enemy, or a harmful one from an ally) and heals you for 6% of your maximum health."
       },
       "pummel": {
         "name": "顎砕き",
@@ -6884,8 +6905,16 @@ export const ja_JP: EnTranslations = {
         "description": "ステルス状態からの先制攻撃で、武器ダメージに加えて{damage}のダメージを与え、9秒かけて出血ダメージを与える。コンボポイントを1獲得する。ウルフフォーム時のみ使用可能。"
       },
       "revive_pet": {
-        "name": "応急処置",
-        "description": "ペットを応急処置する。生存している場合は12秒間、3秒ごとに回復し、合計{overTime}の体力を回復する。死亡している場合は体力35%で蘇生する。"
+        "name": "ペット蘇生",
+        "description": "死んだペットを蘇生させ、自分のそばに呼び戻す。"
+      },
+      "commanding_shout": {
+        "name": "鼓舞の号令",
+        "description": "2分間、スタミナが{buff}増加します。"
+      },
+      "rend": {
+        "name": "深き裂傷",
+        "description": "対象を負傷させ、{duration}秒かけて{damage}の出血ダメージを与えます。"
       }
     },
     "items": {
@@ -8099,16 +8128,16 @@ export const ja_JP: EnTranslations = {
         "name": "英雄の証"
       },
       "eastbrook_buckler": {
-        "name": "イーストブルックのバックラー"
+        "name": "Eastbrook Buckler"
       },
       "eastbrook_greatsword": {
-        "name": "イーストブルックの大剣"
+        "name": "Eastbrook Greatsword"
       },
       "highwatch_greatsword": {
-        "name": "ハイウォッチの大剣"
+        "name": "Highwatch Greatsword"
       },
       "highwatch_wallshield": {
-        "name": "ハイウォッチの壁盾"
+        "name": "Highwatch Wallshield"
       },
       "morthens_cryptforged_hauberk": {
         "name": "モルセンの墓鋳ホーバーク"

@@ -62,7 +62,8 @@ export type UiIconName =
   | 'mail'
   | 'ball'
   | 'book'
-  | 'trash';
+  | 'trash'
+  | 'crafting';
 
 // Inner SVG markup per icon (one or more <path>). Default fill rule is nonzero
 // (correct for game-icons.net art incl. overlaps); the two hand-authored cut-out
@@ -171,6 +172,9 @@ const ICONS: Record<UiIconName, string> = {
   // hand-authored open book (the Book of Deeds): two page leaves meeting at a
   // spine dip, each page hollowed so the glyph reads at micro-button size
   book: '<path fill-rule="evenodd" d="M256 118c-44-26-104-38-172-38v312c68 0 128 12 172 38 44-26 104-38 172-38V80c-68 0-128 12-172 38zM124 122c40 4 76 13 104 28v246c-30-13-66-21-104-24V122zm264 0v250c-38 3-74 11-104 24V150c28-15 64-24 104-28z"/>',
+  // hand-authored anvil (the Crafting window): a horned top slab over a waisted
+  // body and flared base, one solid silhouette so it reads at micro-button size
+  crafting: '<path d="M60 102l90-11h300v85h-100l-30 92v97h68v54H124v-54h68v-97l-30-92h-12z"/>',
 };
 
 export function hasUiIcon(name: string): name is UiIconName {

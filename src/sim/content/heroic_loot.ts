@@ -31,6 +31,20 @@ export const HEROIC_LOOT_SOURCE_LEVEL = 25;
 export const NYTHRAXIS_RAID_BOSS_ID = 'nythraxis_scourge_of_thornpeak';
 export const NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL = 27;
 
+// Combat-rating allowance for the ilvl-31 five-player heroic set: ONE rating
+// (hit/crit/haste) per piece, the tier's differentiator over ilvl 26/28 gear.
+// The three Heroic Nythraxis weapons below are item level 33 instead and carry the
+// raid tier's 65-point primary plus a 20-point complementary secondary. Ratings are
+// off the primary-stat budget (like spellPower), so stat sums stay budget-enforced.
+// Roughly half the set is Hit (the Heroic +3 answer); crit/haste fill throughput by
+// archetype; healer-facing pieces never take Hit (heals are not resisted by level).
+// The ilvl 33/37 raid variants scale these up + add a secondary rating (see
+// heroic_variants.ts). See docs/prd/combat-ratings-and-jewelry.md.
+const ARMOR_RATING = 40; // 40 rating = 4.0%
+const FIVE_MAN_WEAPON_RATING = 50; // 50 rating = 5.0%
+const RAID_WEAPON_PRIMARY_RATING = 65; // 65 rating = 6.5%
+const RAID_SECONDARY_RATING = 20; // 20 rating = 2.0%
+
 const HEAVY = ['warrior', 'paladin', 'shaman'] as ItemDef['requiredClass']; // plate/mail
 const HEAVY_ONE_HAND = ['warrior', 'paladin', 'shaman', 'swordmaster'] as ItemDef['requiredClass'];
 const HEAL_MAIL = ['paladin', 'shaman'] as ItemDef['requiredClass']; // int/spi mail wearers
@@ -49,6 +63,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 335, str: 12, sta: 10 },
+    hitRating: ARMOR_RATING,
     sellValue: 14000,
     requiredClass: HEAVY,
   },
@@ -61,6 +76,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 52, int: 9, spi: 6 },
+    hitRating: ARMOR_RATING,
     sellValue: 9500,
     requiredClass: CASTER,
   },
@@ -73,6 +89,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 96, agi: 9, sta: 5 },
+    hitRating: ARMOR_RATING,
     sellValue: 9500,
     requiredClass: AGILE,
   },
@@ -85,6 +102,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 292, str: 10, sta: 8 },
+    hitRating: ARMOR_RATING,
     sellValue: 12000,
     requiredClass: HEAVY,
   },
@@ -97,6 +115,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 44, int: 8, spi: 6 },
+    critRating: ARMOR_RATING,
     sellValue: 9500,
     requiredClass: CASTER,
   },
@@ -109,6 +128,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 100, agi: 9, sta: 6 },
+    hitRating: ARMOR_RATING,
     sellValue: 9500,
     requiredClass: AGILE_WILD,
   },
@@ -122,6 +142,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     requiredLevel: 20,
     weapon: { min: 22, max: 36, speed: 1.8 },
     stats: { agi: 13, sta: 9 },
+    critRating: FIVE_MAN_WEAPON_RATING,
     sellValue: 15000,
     requiredClass: AGILE,
   },
@@ -134,6 +155,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 148, agi: 10, sta: 6 },
+    critRating: ARMOR_RATING,
     sellValue: 11000,
     requiredClass: AGILE_WILD,
   },
@@ -146,6 +168,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 48, int: 9, sta: 6 },
+    hitRating: ARMOR_RATING,
     sellValue: 9500,
     requiredClass: CASTER,
   },
@@ -158,6 +181,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 240, str: 9, sta: 7 },
+    critRating: ARMOR_RATING,
     sellValue: 11000,
     requiredClass: HEAVY,
   },
@@ -170,6 +194,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 168, agi: 10, sta: 8 },
+    critRating: ARMOR_RATING,
     sellValue: 12000,
     requiredClass: AGILE,
   },
@@ -182,6 +207,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 56, int: 9, spi: 7 },
+    hasteRating: ARMOR_RATING,
     sellValue: 11000,
     requiredClass: CASTER,
   },
@@ -195,6 +221,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     requiredLevel: 20,
     weapon: { min: 36, max: 60, speed: 3.0 },
     stats: { int: 13, spi: 9 },
+    hitRating: FIVE_MAN_WEAPON_RATING,
     sellValue: 15000,
     requiredClass: CASTER,
   },
@@ -207,6 +234,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 132, agi: 12, sta: 8 },
+    hitRating: ARMOR_RATING,
     sellValue: 12000,
     requiredClass: AGILE,
   },
@@ -219,6 +247,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 292, int: 10, spi: 8 },
+    hasteRating: ARMOR_RATING,
     sellValue: 12000,
     requiredClass: HEAL_MAIL,
   },
@@ -231,6 +260,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 72, int: 12, spi: 8 },
+    hitRating: ARMOR_RATING,
     sellValue: 12000,
     requiredClass: CASTER,
   },
@@ -243,6 +273,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 240, int: 9, spi: 7 },
+    critRating: ARMOR_RATING,
     sellValue: 11000,
     requiredClass: HEAL_MAIL,
   },
@@ -255,6 +286,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 212, str: 8, sta: 6 },
+    hitRating: ARMOR_RATING,
     sellValue: 9500,
     requiredClass: HEAVY,
   },
@@ -268,6 +300,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     requiredLevel: 20,
     weapon: { min: 31, max: 52, speed: 2.6 },
     stats: { str: 13, sta: 9 },
+    critRating: FIVE_MAN_WEAPON_RATING,
     sellValue: 15000,
     requiredClass: HEAVY_ONE_HAND,
   },
@@ -280,6 +313,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 90, int: 12, spi: 10 },
+    critRating: ARMOR_RATING,
     sellValue: 14000,
     requiredClass: CASTER,
   },
@@ -292,6 +326,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 104, agi: 9, sta: 6 },
+    hitRating: ARMOR_RATING,
     sellValue: 9500,
     requiredClass: AGILE_WILD,
   },
@@ -304,6 +339,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 224, str: 9, sta: 6 },
+    critRating: ARMOR_RATING,
     sellValue: 9500,
     requiredClass: HEAVY,
   },
@@ -316,6 +352,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 224, str: 9, sta: 6 },
+    hitRating: ARMOR_RATING,
     sellValue: 9500,
     requiredClass: HEAVY,
   },
@@ -328,6 +365,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { armor: 224, int: 9, spi: 6 },
+    hasteRating: ARMOR_RATING,
     sellValue: 9500,
     requiredClass: HEAL_MAIL,
   },
@@ -341,6 +379,8 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     requiredLevel: 20,
     weapon: { min: 29, max: 51, speed: 2.4 },
     stats: { int: 13, spi: 10 },
+    hasteRating: RAID_WEAPON_PRIMARY_RATING,
+    critRating: RAID_SECONDARY_RATING,
     sellValue: 16000,
     requiredClass: CASTER,
   },
@@ -349,11 +389,12 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     name: 'Deathless Greatblade',
     kind: 'weapon',
     slot: 'mainhand',
-    hand: 'twohand',
     quality: 'epic',
     requiredLevel: 20,
     weapon: { min: 45, max: 68, speed: 3.4 },
-    stats: { str: 28, sta: 18 },
+    stats: { str: 14, sta: 9 },
+    hitRating: RAID_WEAPON_PRIMARY_RATING,
+    critRating: RAID_SECONDARY_RATING,
     sellValue: 16000,
     requiredClass: HEAVY,
   },
@@ -366,6 +407,8 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     requiredLevel: 20,
     weapon: { min: 31, max: 52, speed: 2.5 },
     stats: { int: 14, spi: 9 },
+    hasteRating: RAID_WEAPON_PRIMARY_RATING,
+    critRating: RAID_SECONDARY_RATING,
     sellValue: 16000,
     requiredClass: HEAL_MAIL,
   },
@@ -414,8 +457,7 @@ export const RETIRED_HEROIC_ITEMS: Record<string, ItemDef> = {
     requiredLevel: 20,
     stats: { armor: 172, agi: 12, sta: 10 },
     sellValue: 14000,
-    // Save-compat definitions preserve their original v0.24.2 identity exactly.
-    requiredClass: ['rogue', 'hunter', 'druid'],
+    requiredClass: AGILE_WILD,
   },
   soulforged_warplate: {
     id: 'soulforged_warplate',

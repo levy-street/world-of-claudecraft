@@ -17,6 +17,7 @@ import {
   runDespawnDecay,
   tickGroundAoEs,
 } from '../src/sim/entity_roster';
+import { createMobScanCounters } from '../src/sim/mob/scan_counters';
 import { Rng } from '../src/sim/rng';
 import { createSimContext, type SimContextHost } from '../src/sim/sim_context';
 import { createVcState } from '../src/sim/social/vale_cup';
@@ -223,6 +224,7 @@ function makeCtx() {
     worldBossEntityIds: [],
     deedRuntime: createDeedRuntime(),
     fiestaBotPids: [],
+    mobScanCounters: createMobScanCounters(),
     bumpDeedStat: vi.fn(),
     markItemDiscovered: vi.fn(),
     markVisited: vi.fn(),

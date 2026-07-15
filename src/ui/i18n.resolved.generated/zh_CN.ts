@@ -869,23 +869,23 @@ export const zh_CN: EnTranslations = {
       "mobileLeftHanded": "左手布局"
     },
     "talentRows": {
-      "tab": "抉择",
-      "defaultLoadout": "默认配置",
-      "comingSoon": "敬请期待",
-      "readoutSummary": "天赋：{head}，已选择 {spent}/{total} 行。"
+      "tab": "Choices",
+      "defaultLoadout": "Default Loadout",
+      "comingSoon": "Coming soon",
+      "readoutSummary": "Talents: {head}, {spent}/{total} rows selected."
     },
     "abilityError": {
-      "shieldRequired": "你必须装备一面盾牌。"
+      "shieldRequired": "You must have a shield equipped."
     },
     "specPanel": {
-      "primaryAttr": "主属性",
-      "complexity": "复杂度",
-      "complexityLow": "低",
-      "complexityMedium": "中等",
-      "complexityHigh": "高",
-      "exampleAbilities": "示例技能",
-      "viewTalents": "查看天赋",
-      "selectSpec": "选择专精"
+      "primaryAttr": "Primary attribute",
+      "complexity": "Complexity",
+      "complexityLow": "Low",
+      "complexityMedium": "Medium",
+      "complexityHigh": "High",
+      "exampleAbilities": "Example abilities",
+      "viewTalents": "View talents",
+      "selectSpec": "Select specialization"
     },
     "controller": {
       "title": "手柄",
@@ -998,6 +998,7 @@ export const zh_CN: EnTranslations = {
         "spellPower": "法术强度",
         "critRating": "暴击等级",
         "hasteRating": "急速等级",
+        "hitRating": "命中等级",
         "warfare": "战争"
       },
       "warfareValue": "造成伤害 +{increase}% / 承受伤害 -{reduction}%",
@@ -1015,6 +1016,7 @@ export const zh_CN: EnTranslations = {
         "dodge": "你完全躲开来袭近战攻击、不受任何伤害的几率。",
         "critRating": "来自装备和套装奖励的暴击等级，提升你的暴击几率。约每10点等级提供1%暴击。",
         "hasteRating": "来自装备和套装奖励的急速等级，加快你的攻击和施法速度。约每10点等级提供1%急速。",
+        "hitRating": "来自装备和套装奖励的命中等级，降低你的攻击被闪避和法术被抵抗的几率，对更高等级的敌人尤其有效。约每10点等级提供1%命中。",
         "warfare": "对玩家造成的伤害提高 {increase}%，受到玩家造成的伤害降低 {reduction}%。"
       },
       "effects": {
@@ -1382,6 +1384,8 @@ export const zh_CN: EnTranslations = {
       },
       "dodge": "躲闪几率提高 {pct}%",
       "dodgeReduce": "躲闪几率降低 {pct}%",
+      "damageReduction": "受到的所有伤害降低 {pct}%",
+      "guardianWard": "下一次敌人的致命攻击会改为将你的生命值恢复至 {pct}%",
       "armorFlat": "护甲降低 {value}",
       "armorFlatStacks": "护甲降低 {value}（{stacks} 层）",
       "armorPct": "护甲降低 {pct}%",
@@ -1564,7 +1568,7 @@ export const zh_CN: EnTranslations = {
         "artists": "画师",
         "contentcreator": "内容创作者",
         "legend": "传奇",
-        "shill": "推广者"
+        "shill": "布道者"
       },
       "guildMember": "已验证成员",
       "notMember": "尚未加入服务器",
@@ -1831,7 +1835,8 @@ export const zh_CN: EnTranslations = {
       "title": "采集",
       "mining": "采矿",
       "logging": "伐木",
-      "herbalism": "草药学"
+      "herbalism": "草药学",
+      "notReady": "这个资源节点尚未为你重新生成。"
     },
     "archetypeTitle": {
       "label": "称号",
@@ -2586,8 +2591,8 @@ export const zh_CN: EnTranslations = {
     },
     "abilityHook": {
       "heroic_strike": "预备一次更重的挥击，在下次攻击时消耗怒气。",
-      "revenge": "横扫你前方的敌人，并可能在躲闪或招架后不消耗资源。",
-      "hamstring": "妨碍敌人的移动，使其无法逃脱。",
+      "revenge": "Sweeps enemies in front of you, with a chance to become free after a dodge or parry.",
+      "hamstring": "Cripples an enemy's movement to keep it from escaping.",
       "battle_shout": "一声号召呐喊，提升全队的攻击强度。",
       "charge": "冲向远处的敌人，以一次短暂的昏迷开场。",
       "thunder_clap": "打击你周围的一切，并减缓它们的攻击速度。",
@@ -2647,7 +2652,9 @@ export const zh_CN: EnTranslations = {
       "mark_of_the_wild": "开战前为自己或盟友施加的持续祝福。",
       "moonfire": "瞬间命中并让目标持续燃烧，移动时也很好用。",
       "rejuvenation": "瞬发施放，持续治疗盟友，让你可以继续行动。",
-      "thorns": "守护盟友，让近战攻击者在打击时反伤自己。"
+      "thorns": "守护盟友，让近战攻击者在打击时反伤自己。",
+      "commanding_shout": "提升耐力，让所有人在战斗中更耐打。",
+      "rend": "造成一道流血，让目标随时间逐渐被消耗。"
     },
     "petHook": {
       "emberkin": "一只远程火焰箭恶魔，从安全距离外消磨敌人。",
@@ -4628,6 +4635,8 @@ export const zh_CN: EnTranslations = {
     "connectionLost": "与服务器的连接已断开。",
     "reconnecting": "连接已断开。正在重新连接...",
     "connectionRejected": "服务器关闭了连接。",
+    "realmFull": "当前服务器已满，请稍后几分钟再试。",
+    "tooManyConnections": "您的网络向该服务器发起的连接过多。请关闭多余的游戏窗口，或稍后几分钟再试。",
     "tips": {
       "classes": "提示：9 个职业玩法各不相同，投入之前不妨都试一试。",
       "talents": "提示：你可以在任意脱离战斗的时候重置天赋，因此早期的选择永远不会成为陷阱。",
@@ -4705,9 +4714,9 @@ export const zh_CN: EnTranslations = {
     "medium": "中",
     "low": "低",
     "popTipLow": "人数较少：当前在线玩家不足 15 人。空间充足，适合全新开始。",
-    "popTipMedium": "人数适中：当前在线玩家 15 至 39 人。健康活跃的服务器。",
-    "popTipHigh": "人数较多：当前在线玩家 40 至 79 人。繁忙，玩家众多。",
-    "popTipFull": "人数已满：当前在线玩家 80 人或以上。非常繁忙；登录时可能需要排队。",
+    "popTipMedium": "人数适中：当前在线玩家 15 至 79 人。健康活跃的服务器。",
+    "popTipHigh": "人数较多：当前在线玩家 80 人以上。繁忙，玩家众多。",
+    "popTipFull": "人数已满：当前服务器已达到玩家上限。在有玩家退出之前，新的登录会被拒绝。",
     "popTipOffline": "离线：此服务器当前无法连接，无法加入。",
     "characterCountOne": "{count} 个角色",
     "characterCountOther": "{count} 个角色",
@@ -5285,7 +5294,7 @@ export const zh_CN: EnTranslations = {
       "defensiveDesc": "攻击伤害你或你宠物的敌人。",
       "aggressiveDesc": "攻击附近的敌对敌人。",
       "rename": "重命名宠物",
-      "revive": "修补",
+      "revive": "复活宠物",
       "abandon": "放弃宠物",
       "cancel": "取消",
       "renameLabel": "选择一个新的宠物名称。",
@@ -5541,7 +5550,7 @@ export const zh_CN: EnTranslations = {
     },
     "slots": {
       "mainhand": "主手",
-      "offhand": "副手",
+      "offhand": "Off Hand",
       "helmet": "头部",
       "neck": "颈部",
       "shoulder": "肩部",
@@ -6355,6 +6364,18 @@ export const zh_CN: EnTranslations = {
         "name": "橡树皮",
         "description": "你的皮肤硬化如树皮，使护甲提高 150，持续 15 秒。"
       },
+      "ironhold": {
+        "name": "铁壁",
+        "description": "以坚固的防御自守，使受到的所有伤害降低 40%，持续 8 秒。"
+      },
+      "sacred_bulwark": {
+        "name": "神圣壁垒",
+        "description": "在 {duration} 秒内，下一次会杀死你的敌人攻击将被抵消，转而将你恢复至 35% 生命值。"
+      },
+      "primal_reflexes": {
+        "name": "野性反射",
+        "description": "你的本能变得敏锐，使闪避几率提高 50%，持续 6 秒。"
+      },
       "starfire": {
         "name": "天陨",
         "description": "召下一道星辰之火，造成 {damage} 点奥术伤害。"
@@ -6540,304 +6561,304 @@ export const zh_CN: EnTranslations = {
         "description": "将一只亡魂裔束缚于你的意志之下，这是一种精英恶魔，会从远处倾泻沉重的暗影伤害。漫长的冷却时间限制了它的毁灭性威力。召唤新的恶魔会驱散你当前的恶魔。你同时只能拥有一只恶魔。"
       },
       "battle_stance": {
-        "name": "战斗姿态",
-        "description": "一种具有侵略性的战斗姿态：你产生的怒气提高 10%。武器和防护专精的默认姿态。"
+        "name": "Battle Stance",
+        "description": "An aggressive combat stance: you generate 10% more rage. The default stance for Arms and Protection."
       },
       "berserker_stance": {
-        "name": "狂暴姿态",
-        "description": "一种鲁莽的战斗姿态：你的暴击几率提高 3%，暴击伤害提高 3%。狂怒战士始终以此姿态作战。"
+        "name": "Berserker Stance",
+        "description": "A reckless combat stance: your critical strikes land 3% more often and hit for 3% more. The Fury warrior always fights in this stance."
       },
       "sweeping_strikes": {
-        "name": "扩弧斩",
-        "description": "持续 12 秒，你的单体攻击还会以全额伤害额外打击 1 个附近的敌人。（武器）"
+        "name": "Widening Arc",
+        "description": "For 12 sec your single-target attacks also strike 1 nearby enemy for full damage. (Arms)"
       },
       "deep_wounds": {
-        "name": "裂创",
-        "description": "被动：你的致残打击会使目标流血，在 6 秒内造成物理伤害。（武器）"
+        "name": "Gaping Wounds",
+        "description": "Passive: your Maiming Strike leaves the target bleeding for Physical damage over 6 sec. (Arms)"
       },
       "enrage_passive": {
-        "name": "暴乱",
-        "description": "被动：处于激怒状态时，你造成的伤害提高 7%，攻击速度提高 25%，移动速度提高 10%，持续 4 秒。放血有 30% 几率使你激怒；血色收割则必定触发。（狂怒）"
+        "name": "Mayhem",
+        "description": "Passive: while Enraged you deal 7% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)"
       },
       "raging_gale": {
-        "name": "双重打击",
-        "description": "立即用武器攻击两次，每次命中造成 40% 武器伤害加 {damage}，并产生 8 点怒气。最多储存 2 次充能。（狂怒）"
+        "name": "Twinstrike",
+        "description": "Instantly strike with your weapon twice, each hit dealing 40% weapon damage plus {damage}, and generate 8 rage. Stores up to 2 charges. (Fury)"
       },
       "red_harvest": {
-        "name": "血色收割",
-        "description": "倾尽所有：在狂乱中攻击三次，每次造成65%武器伤害加 {damage}，并必定使你激怒。（狂怒）"
+        "name": "Red Harvest",
+        "description": "Spend everything: strike three times in a frenzy for 65% weapon damage plus {damage} each, always Enraging you. (Fury)"
       },
       "furious_mending": {
-        "name": "狂怒愈合",
-        "description": "持续 10 秒，你受到的伤害降低 20%，并且在此期间你的放血会为你治疗相当于最大生命值 20% 的生命。（狂怒）"
+        "name": "Furious Mending",
+        "description": "For 10 sec you take 20% reduced damage, and while it lasts your Bloodletting heals you for 20% of your maximum health. (Fury)"
       },
       "emboldening_roar": {
-        "name": "鼓舞怒吼",
-        "description": "发出一声鼓舞的怒吼：你和 40 码内的友方玩家获得鼓舞，你接下来的 3 个技能必定暴击。（狂怒）"
+        "name": "Emboldening Roar",
+        "description": "Lets loose an emboldening roar: you and friendly players within 40 yards are Emboldened, and your next 3 abilities are guaranteed critical strikes. (Fury)"
       },
       "raised_guard": {
-        "name": "举盾格挡",
-        "description": "举盾防身：你受到的物理伤害降低 50%，持续 6 秒。最多储存 2 次充能。（防护）"
+        "name": "Raised Guard",
+        "description": "Brace behind your shield: you take 50% reduced Physical damage for 6 sec. Stores up to 2 charges. (Protection)"
       },
       "iron_resolve": {
-        "name": "钢铁意志",
-        "description": "咬紧牙关、无视疼痛：消耗最多 40 点怒气（至少 20 点），每消耗 1 点怒气可吸收 4 点伤害，持续最多 10 秒。（防护）"
+        "name": "Iron Resolve",
+        "description": "Grit your teeth and ignore the pain: spends up to 40 rage (20 minimum) to absorb 4 damage per rage spent, lasting up to 10 sec. (Protection)"
       },
       "faultline": {
-        "name": "地裂",
-        "description": "沿地面发出一道冲击波：你前方 8 码内的敌人受到 {damage} 点伤害，并昏迷 3 秒。（防护）"
+        "name": "Faultline",
+        "description": "Send a shockwave through the ground: enemies in front of you within 8 yards take {damage} damage and are stunned for 3 sec. (Protection)"
       },
       "defiant_bellow": {
-        "name": "挑衅怒吼",
-        "description": "一声挑衅的怒吼：10 码内的每个敌人都被嘲讽，被迫攻击你 3 秒。（防护）"
+        "name": "Defiant Bellow",
+        "description": "A defiant bellow: every enemy within 10 yards is taunted, compelled to attack you for 3 sec. (Protection)"
       },
       "breachmaker": {
-        "name": "破防者",
-        "description": "重击目标，造成武器伤害加 {damage}，并破开其防御：你对它的攻击造成的伤害提高 20%，持续 8 秒。（武器）"
+        "name": "Breachmaker",
+        "description": "Batter the target for weapon damage plus {damage} and crack its guard: your own attacks against it deal 20% more damage for 8 sec. (Arms)"
       },
       "measured_fury": {
-        "name": "蓄怒",
-        "description": "你收放自如的怒火让消耗更精打细算：你的技能怒气消耗降低 10%。（武器）"
+        "name": "Measured Fury",
+        "description": "Your measured fury sharpens your economy: your abilities cost 10% less rage. (Arms)"
       },
       "seasoned_soldier": {
-        "name": "沙场老兵",
-        "description": "你的自动攻击暴击时产生的怒气提高 10%。（武器）"
+        "name": "Seasoned Soldier",
+        "description": "Your critical auto-attacks generate 10% more rage. (Arms)"
       },
       "diabolical_twinstrike": {
-        "name": "邪恶双重打击",
-        "description": "处于激怒状态时，你的双重打击造成的伤害提高 15%。（狂怒）"
+        "name": "Diabolical Twinstrike",
+        "description": "While Enraged, your Twinstrike deals 15% more damage. (Fury)"
       },
       "cleaving_blows": {
-        "name": "顺劈打击",
-        "description": "血色收割必定返还一次双重打击的充能。（狂怒）"
+        "name": "Cleaving Blows",
+        "description": "Red Harvest always refunds a charge of Twinstrike. (Fury)"
       },
       "sudden_death": {
-        "name": "骤死",
-        "description": "你的自动攻击有几率让你对任意生命值的目标施放早赴黄泉，且不消耗怒气。（武器）"
+        "name": "Sudden Death",
+        "description": "Your auto-attacks have a chance to let you cast Early Grave on a target at any health, costing no rage. (Arms)"
       },
       "storm_bolt": {
-        "name": "风暴之锤",
-        "description": "将你的武器掷向目标，造成 {damage} 点伤害，并使其昏迷 3 秒。"
+        "name": "Storm Bolt",
+        "description": "Hurl your weapon at the target for {damage}, stunning it for 3 sec."
       },
       "piercing_howl": {
-        "name": "穿刺怒吼",
-        "description": "一声穿刺的呼喝，使 15 码内的所有敌人减速 50%，持续 8 秒。"
+        "name": "Piercing Howl",
+        "description": "A piercing shout that slows all enemies within 15 yards by 50% for 8 sec."
       },
       "die_by_sword": {
-        "name": "剑在人在",
-        "description": "防御性冷却技能：持续 8 秒，你受到的伤害降低 30%，并大幅提高躲闪攻击的几率。"
+        "name": "Die by the Sword",
+        "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
       },
       "recklessness": {
-        "name": "鲁莽",
-        "description": "激怒：你的怒气产生提高 50%，暴击几率提高 20%，持续 12 秒。"
+        "name": "Recklessness",
+        "description": "Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec."
       },
       "sanguine_aura": {
-        "name": "血色光环",
-        "description": "以敌人之血浸染你的武器：你和你的近战盟友获得 10% 攻击速度和 10% 伤害加成，持续 20 秒。"
+        "name": "Sanguine Aura",
+        "description": "Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec."
       },
       "victory_rush": {
-        "name": "乘胜追击",
-        "description": "攻击造成武器伤害加 {damage}，并治疗相当于最大生命值 20% 的生命。仅可在击杀敌人后 20 秒内使用。"
+        "name": "Victory Rush",
+        "description": "Strike for weapon damage plus {damage} and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy."
       },
       "intimidating_shout": {
-        "name": "破胆怒吼",
-        "description": "一声骇人的怒吼，使 8 码内至多 5 个敌人恐惧逃散 8 秒。伤害可能打破效果。"
+        "name": "Intimidating Shout",
+        "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
       },
       "revenge": {
-        "name": "复仇",
-        "description": "以宽阔的弧线攻击，对你前方所有敌人造成物理伤害。目标超过 5 个时伤害降低。当你躲闪或招架时，你的下一次复仇可能不消耗怒气。 (Protection)"
+        "name": "Revenge",
+        "description": "Attack in a wide arc, dealing Physical damage to all enemies in front of you. Above 5 targets the damage is reduced. When you dodge or parry, your next Revenge may cost no rage. (Protection)"
       },
       "heroic_leap": {
-        "name": "英勇飞跃",
-        "description": "跃向目标区域，在落地时对附近的敌人造成 {damage} 点伤害。"
+        "name": "Heroic Leap",
+        "description": "Leap to the target area, dealing {damage} damage to nearby enemies on landing."
       },
       "rallying_cry": {
-        "name": "英勇怒吼",
-        "description": "发出英勇怒吼，使你和 40 码内的队伍成员的最大生命值提高 20%，持续 10 秒。防护专精的受益者在此期间受到的伤害还会降低 5%。"
+        "name": "Valor Roar",
+        "description": "Lets loose a valorous roar, granting you and party members within 40 yards 20% additional maximum health for 10 sec. Protection: they also take 5% less damage for the duration."
       },
       "avatar": {
-        "name": "战争化身",
-        "description": "化身为巨像，持续 20 秒，解除你身上的所有控制效果，并使你造成的伤害提高 20%。"
+        "name": "Avatar",
+        "description": "Transform into a colossus for 20 sec, breaking all control on you and increasing your damage dealt by 20%."
       },
       "bladestorm": {
-        "name": "剑刃风暴",
-        "description": "化身为一道旋转的钢铁风暴，在 4 秒内每秒对 8 码内的所有敌人造成 {damage} 点伤害。"
+        "name": "Bladestorm",
+        "description": "Become a whirling storm of steel, striking all enemies within 8 yards for {damage} every second for 4 sec."
       },
       "aspect_of_the_wild": {
-        "name": "野牙伪装",
-        "description": "以野性力量激励30码内的盟友，使其攻击强度提高45、攻击速度提高5%，持续5分钟。（猎人天赋）"
+        "name": "Wildfang Rally",
+        "description": "Inspires allies within 30 yd with wild strength, increasing attack power by 45 and attack speed by 5% for 5 min. (Hunter talent)"
       },
       "aura_surge": {
-        "name": "曙光弹射",
-        "description": "掷出曙光铸造的盾牌，造成{damage}点神圣伤害并使首要目标沉默2秒，随后弹射至10码内最多2个额外敌人，每次弹射造成75%伤害。（圣骑士天赋）"
+        "name": "Dawnward Ricochet",
+        "description": "Hurl a dawnforged shield for {damage} Holy damage and silence the primary target for 2 sec. It bounces to up to 2 additional enemies within 10 yd for 75% damage per bounce. (Paladin talent)"
       },
       "avenging_wrath": {
-        "name": "复仇之翼",
-        "description": "召唤复仇之力，使你的攻击强度提高60、法术强度提高30，持续20秒。（圣骑士天赋）"
+        "name": "Wrathwing",
+        "description": "Calls down avenging power, increasing attack power by 60 and spell power by 30 for 20 sec. (Paladin talent)"
       },
       "berserk": {
-        "name": "赤红迷雾",
-        "description": "使你的攻击强度提高70，持续15秒。（德鲁伊天赋）"
+        "name": "Red Haze",
+        "description": "Increases attack power by 70 for 15 sec. (Druid talent)"
       },
       "blink": {
-        "name": "闪烁步",
-        "description": "使你向前传送15码并解除定身效果。（法师天赋）"
+        "name": "Flickerstep",
+        "description": "Teleports you 15 yd forward and breaks roots. (Mage talent)"
       },
       "bloodlust": {
-        "name": "战鼓",
-        "description": "使30码内的盟友陷入狂乱，攻击速度提高30%，持续15秒。（萨满天赋）"
+        "name": "Storm Chorus",
+        "description": "Whips allies within 30 yd into a frenzy, increasing attack speed by 30% for 15 sec. (Shaman talent)"
       },
       "chain_lightning": {
-        "name": "叉状闪电",
-        "description": "向目标区域投掷闪电，对附近的敌人造成{damage}点伤害。（萨满天赋）"
+        "name": "Skybranch",
+        "description": "Hurls lightning at the target area, damaging nearby enemies for {damage}. (Shaman talent)"
       },
       "chaos_bolt": {
-        "name": "毁灭箭",
-        "description": "投掷一枚混沌火焰弹，造成{damage}点火焰伤害。（术士天赋）"
+        "name": "Ruinbolt",
+        "description": "Hurls a bolt of chaotic fire for {damage} Fire damage. (Warlock talent)"
       },
       "cleansing_verdict": {
-        "name": "净化裁决",
-        "description": "净化一个友方目标身上的有害魔法效果，并为其恢复{damage}点生命值。"
+        "name": "Cleansing Verdict",
+        "description": "Purges a harmful magic effect from a friendly target and heals them for {damage} Holy."
       },
       "cloak_of_shadows": {
-        "name": "暗影斗篷",
-        "description": "以暗影包裹你，在5秒内吸收420点伤害。（潜行者天赋）"
+        "name": "Shadecloak",
+        "description": "Wraps you in shadows, absorbing 420 damage for 5 sec. (Rogue talent)"
       },
       "cone_of_cold": {
-        "name": "寒霜横扫",
-        "description": "以寒霜冲击附近的敌人，造成{damage}点冰霜伤害。（冰霜专精招牌技能）"
+        "name": "Frostsweep",
+        "description": "Blasts nearby enemies with frost for {damage} Frost damage. (Frost signature)"
       },
       "curse_of_exhaustion": {
-        "name": "铅沉妖咒",
-        "description": "诅咒目标，使其移动速度降低30%，持续12秒。（术士天赋）"
+        "name": "Leaden Hex",
+        "description": "Curses the target, slowing movement by 30% for 12 sec. (Warlock talent)"
       },
       "death_coil": {
-        "name": "墓穴缠卷",
-        "description": "攻击敌人并造成{damage}点暗影伤害，随后使其恐惧3秒。（术士天赋）"
+        "name": "Morrowlash",
+        "description": "Strikes the enemy for {damage} Shadow damage, then horrifies them for 3 sec. (Warlock talent)"
       },
       "deep_freeze": {
-        "name": "死霜",
-        "description": "将目标深度冻结，造成{damage}点冰霜伤害并使其昏迷4秒。（法师天赋）"
+        "name": "Deadfrost",
+        "description": "Deep freezes the target, dealing {damage} Frost damage and stunning it for 4 sec. (Mage talent)"
       },
       "desperate_prayer": {
-        "name": "最后祈祷",
-        "description": "立即为你恢复{damage}点生命值。（牧师天赋）"
+        "name": "Last Prayer",
+        "description": "Instantly heals you for {damage}. (Priest talent)"
       },
       "deterrence": {
-        "name": "鬃刺守卫",
-        "description": "使你的躲闪几率提高50个百分点，持续10秒。（猎人天赋）"
+        "name": "Bristleguard",
+        "description": "Increases your dodge chance by 50 percentage points for 10 sec. (Hunter talent)"
       },
       "divine_shield": {
-        "name": "圣光守护",
-        "description": "以神圣之力保护你，在8秒内吸收900点伤害。（圣骑士天赋）"
+        "name": "Lightward",
+        "description": "Shields you with holy power, absorbing 900 damage for 8 sec. (Paladin talent)"
       },
       "earthbind": {
-        "name": "攫握大地",
-        "description": "将附近的敌人束缚于大地，使其定身2秒。（萨满天赋）"
+        "name": "Gripping Earth",
+        "description": "Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)"
       },
       "evocation": {
-        "name": "以太之井",
-        "description": "立即恢复220点法力值。（法师天赋）"
+        "name": "Aetherwell",
+        "description": "Instantly restores 220 mana. (Mage talent)"
       },
       "frenzied_regeneration": {
-        "name": "野性愈合",
-        "description": "在10秒内恢复180点生命值。只能在熊形态下使用。（德鲁伊天赋）"
+        "name": "Savage Mending",
+        "description": "Restores 180 health over 10 sec. Bruin Form only. (Druid talent)"
       },
       "frost_trap": {
-        "name": "霜纹陷阱",
-        "description": "冻结目标区域内的敌人3秒，使其无法移动或行动。（猎人天赋）"
+        "name": "Rime Snare",
+        "description": "Freezes enemies at the target area for 3 sec, preventing movement and actions. (Hunter talent)"
       },
       "ghostly_strike": {
-        "name": "幽魂打击",
-        "description": "攻击敌人，造成武器伤害加{damage}点伤害，短暂提高躲闪并获得1个连击点。（潜行者天赋）"
+        "name": "Wraith Strike",
+        "description": "Strikes the enemy for weapon damage plus {damage} and briefly increases dodge. Awards 1 combo point. (Rogue talent)"
       },
       "hammer_of_wrath": {
-        "name": "鸣钟之锤",
-        "description": "向受伤的敌人投掷神圣之锤，造成{damage}点神圣伤害。只能对生命值低于20%的目标使用。（圣骑士天赋）"
+        "name": "Tolling Hammer",
+        "description": "Hurls a holy hammer at a wounded enemy for {damage} Holy damage. Only usable below 20% health. (Paladin talent)"
       },
       "healing_stream": {
-        "name": "泉涌",
-        "description": "在12秒内为一个友方目标恢复120点生命值。（萨满天赋）"
+        "name": "Springwell",
+        "description": "Restores 120 health to a friendly target over 12 sec. (Shaman talent)"
       },
       "holy_wrath": {
-        "name": "圣徒之怒",
-        "description": "释放神圣之力，对附近的敌人造成{damage}点伤害。（圣骑士天赋）"
+        "name": "Saint's Ire",
+        "description": "Unleashes holy power, damaging nearby enemies for {damage}. (Paladin talent)"
       },
       "howl_of_terror": {
-        "name": "恐惧嚎叫",
-        "description": "使附近的敌人恐惧，最多持续3秒。受到伤害可能打破该效果。（术士天赋）"
+        "name": "Dread Chorus",
+        "description": "Frightens nearby enemies for up to 3 sec. Damage may break the effect. (Warlock talent)"
       },
       "ice_block": {
-        "name": "寒冰棺",
-        "description": "将你封入寒冰，在8秒内吸收600点伤害。封入期间你无法行动。再次施放可取消效果。（法师天赋）"
+        "name": "Cold Coffin",
+        "description": "Encases you in ice, absorbing 600 damage for 8 sec. You cannot act while encased. Recast to cancel. (Mage talent)"
       },
       "inner_focus": {
-        "name": "静心",
-        "description": "使你的下一个法术不消耗资源。持续60秒。（牧师天赋）"
+        "name": "Stilled Mind",
+        "description": "Makes your next spell free. Lasts 60 sec. (Priest talent)"
       },
       "innervate": {
-        "name": "生命树液",
-        "description": "生命树液在你体内涌动10秒，分波恢复20点当前资源，可恢复法力、怒气或能量。变形不会中断效果。睡眠、昏迷或停滞会使树液停止涌动。（德鲁伊天赋）"
+        "name": "Lifesap",
+        "description": "Living sap wells up in you for 10 sec, restoring 20 of your current resource in waves: mana, Rage, or Energy, and shifting forms does not break it. Sleep, stun, or stasis stills the sap. (Druid talent)"
       },
       "meteor": {
-        "name": "天石",
-        "description": "在目标区域召唤一颗陨石，造成{damage}点火焰伤害，随后使区域内的敌人在6秒内每2秒受到12至18点火焰伤害。（法师天赋）"
+        "name": "Skystone",
+        "description": "Calls down a meteor at the target area, dealing {damage} Fire damage, then burning enemies there for 12 to 18 Fire damage every 2 sec for 6 sec. (Mage talent)"
       },
       "mind_sear": {
-        "name": "灼思",
-        "description": "在目标区域引导暗影能量，每秒对附近的敌人造成{damage}点伤害。（牧师天赋）"
+        "name": "Thoughtburn",
+        "description": "Channels shadow energy at the target area, damaging nearby enemies each second for {damage}. (Priest talent)"
       },
       "multi_shot": {
-        "name": "分裂射击",
-        "description": "向目标区域射出散射箭，对8码内的敌人造成{damage}点物理伤害。（猎人天赋）"
+        "name": "Splitshot",
+        "description": "Loose a spread at the target area, dealing {damage} Physical damage to enemies within 8 yd. (Hunter talent)"
       },
       "prayer_of_healing": {
-        "name": "圣歌愈疗",
-        "description": "为附近的盟友恢复{damage}点生命值。（牧师天赋）"
+        "name": "Choirmend",
+        "description": "Heals nearby allies for {damage}. (Priest talent)"
       },
       "preparation": {
-        "name": "应变",
-        "description": "结束疾跑、闪避和消失的冷却时间。（潜行者天赋）"
+        "name": "Contingency",
+        "description": "Finishes the cooldown on Sprint, Evasion, and Vanish. (Rogue talent)"
       },
       "presence_of_mind": {
-        "name": "疾思",
-        "description": "使你的下一个有施法时间的法术变为瞬发。持续60秒。（法师天赋）"
+        "name": "Racing Mind",
+        "description": "Makes your next spell with a cast time instant. Lasts 60 sec. (Mage talent)"
       },
       "psychic_scream": {
-        "name": "心灵尖啸",
-        "description": "使附近的敌人恐惧，最多持续4秒。受到伤害可能打破该效果。（牧师天赋）"
+        "name": "Terror Canticle",
+        "description": "Frightens nearby enemies for up to 4 sec. Damage may break the effect. (Priest talent)"
       },
       "shadowstep": {
-        "name": "影步",
-        "description": "穿过暗影，向你的目标迈进。（潜行者天赋）"
+        "name": "Shadeslip",
+        "description": "Steps through the shadows toward your target. (Rogue talent)"
       },
       "silence": {
-        "name": "沉默",
-        "description": "使目标沉默4秒。（牧师天赋）"
+        "name": "Hushword",
+        "description": "Silences the target for 4 sec. (Priest talent)"
       },
       "smoke_screen": {
-        "name": "烟幕",
-        "description": "遁入烟雾之中，使你的躲闪几率提高30%，持续8秒。"
+        "name": "Smoke Screen",
+        "description": "Vanish into a cloud of smoke, increasing your chance to dodge by 30% for 8 sec."
       },
       "spellsteal": {
-        "name": "夺法",
-        "description": "从敌人身上窃取一个有益魔法效果并转移到自己身上。"
+        "name": "Spellsteal",
+        "description": "Steals a beneficial magic effect from an enemy, transferring it to yourself."
       },
       "startle_shot": {
-        "name": "惊扰射击",
-        "description": "狂野射击使目标迷惑{duration}秒。受到任何伤害都会打破该效果。"
+        "name": "Startle Shot",
+        "description": "A wild shot that disorients the target for {duration} sec. Any damage breaks the effect."
       },
       "tranquility": {
-        "name": "林地之歌",
-        "description": "引导恢复能量4秒，每秒为30码内的盟友恢复42至52点生命值。（德鲁伊天赋）"
+        "name": "Gladesong",
+        "description": "Channels restorative energy for 4 sec, healing allies within 30 yd for 42 to 52 each second. (Druid talent)"
       },
       "typhoon": {
-        "name": "台风",
-        "description": "一阵狂风将8码内的所有敌人击退并使其昏乱，使其移动速度降低50%，持续4秒。"
+        "name": "Typhoon",
+        "description": "A blast of wind knocks back all enemies within 8 yd and dazes them, slowing their movement by 50% for 4 sec."
       },
       "voidfeast": {
-        "name": "虚空盛宴",
-        "description": "吞噬一个魔法效果（敌人的增益或盟友的减益），并恢复你最大生命值的6%。"
+        "name": "Voidfeast",
+        "description": "Devours a magic effect (a beneficial one from an enemy, or a harmful one from an ally) and heals you for 6% of your maximum health."
       },
       "pummel": {
         "name": "碎颚击",
@@ -6884,8 +6905,16 @@ export const zh_CN: EnTranslations = {
         "description": "一记潜行起手技，以武器伤害外加{damage}撕抓敌人，并造成持续9秒的流血伤害。获得1点连击点数。仅限狼形态使用。"
       },
       "revive_pet": {
-        "name": "修补",
-        "description": "修补你的宠物。若其存活，在12秒内每3秒恢复一次生命值，共恢复{overTime}点；若其死亡，则以35%生命值将其复活。"
+        "name": "复活宠物",
+        "description": "复活你死去的宠物，并将其召回身边。"
+      },
+      "commanding_shout": {
+        "name": "鼓舞呐喊",
+        "description": "使你的耐力提高 {buff}，持续 2 分钟。"
+      },
+      "rend": {
+        "name": "深创",
+        "description": "撕裂目标，使其流血，在 {duration} 秒内受到 {damage} 点伤害。"
       }
     },
     "items": {
@@ -8099,16 +8128,16 @@ export const zh_CN: EnTranslations = {
         "name": "英雄徽记"
       },
       "eastbrook_buckler": {
-        "name": "东溪小圆盾"
+        "name": "Eastbrook Buckler"
       },
       "eastbrook_greatsword": {
-        "name": "东溪巨剑"
+        "name": "Eastbrook Greatsword"
       },
       "highwatch_greatsword": {
-        "name": "高望巨剑"
+        "name": "Highwatch Greatsword"
       },
       "highwatch_wallshield": {
-        "name": "高望壁盾"
+        "name": "Highwatch Wallshield"
       },
       "morthens_cryptforged_hauberk": {
         "name": "莫尔森的墓铸锁甲"

@@ -619,11 +619,11 @@ export const da_DK: EnTranslations = {
     },
     "cameraPrompt": {
       "title": "Vælg dit kamera",
-      "intro": "Vælg, hvordan kameraet følger din figur.",
+      "intro": "Vælg, hvordan kameraet følger din karakter.",
       "mouseDesc": "Bevæg musen for at dreje kameraet uden at holde en knap nede.",
-      "classicTitle": "Klassisk kamera",
-      "classicDesc": "Hold højre museknap nede, og bevæg musen for at dreje kameraet.",
-      "changeLater": "Du kan ændre dette senere under Esc, Tastebindinger.",
+      "classicTitle": "Klassisk Kamera",
+      "classicDesc": "Hold højreklik nede og bevæg musen for at dreje kameraet.",
+      "changeLater": "Du kan ændre dette senere under Escape, Tastebindinger.",
       "confirm": "Bekræft"
     },
     "castBar": {
@@ -672,11 +672,11 @@ export const da_DK: EnTranslations = {
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m}m {s}s",
       "seconds": "{s}s",
-      "autoShowHint": "Rækker vises automatisk, når din gruppe gør skade eller heler, og dette segment lukker få sekunder efter kampens afslutning."
+      "autoShowHint": "Rækker vises automatisk, når din gruppe påfører skade eller heling, og dette segment lukker et par sekunder efter kampens afslutning."
     },
     "petFeed": {
-      "disabledFullHp": "Dit kæledyr har fuldt helbred",
-      "disabledNoFood": "Ingen mad i dine tasker kan helbrede dit kæledyr"
+      "disabledFullHp": "Kæledyret har fuldt helbred",
+      "disabledNoFood": "Ingen mad i dine tasker vil hele dit kæledyr"
     },
     "keybinds": {
       "emoteWheel": "Følelseshjul",
@@ -684,7 +684,7 @@ export const da_DK: EnTranslations = {
       "targetFriendlyNext": "Skift allieret mål",
       "discord": "Discord",
       "valecup": "Dalpokalen",
-      "sheathe": "Sheathe/Unsheathe Weapon",
+      "sheathe": "Gem/fremvis våben",
       "categoryPet": "Kæledyr",
       "petAttack": "Kæledyr: Angrib",
       "petStop": "Kæledyr: Stop",
@@ -857,7 +857,7 @@ export const da_DK: EnTranslations = {
       "aurasOnPlayerFrame": "Buffs på spillerrammen",
       "highContrastBackground": "Baggrund med høj kontrast",
       "startAttackOnAbility": "Autoangreb ved brug af evne",
-      "showAttackButton": "Show Attack Button",
+      "showAttackButton": "Vis angrebsknap",
       "walkByAutoloot": "Auto-plyndring i forbifarten",
       "groundReticle": "Jordsigte-retikel",
       "showItemLevel": "Vis genstandsniveau",
@@ -869,23 +869,23 @@ export const da_DK: EnTranslations = {
       "mobileLeftHanded": "Venstrehånds layout"
     },
     "talentRows": {
-      "tab": "Valg",
-      "defaultLoadout": "Standardopsætning",
-      "comingSoon": "Kommer snart",
-      "readoutSummary": "Talenter: {head}, {spent}/{total} rækker valgt."
+      "tab": "Choices",
+      "defaultLoadout": "Default Loadout",
+      "comingSoon": "Coming soon",
+      "readoutSummary": "Talents: {head}, {spent}/{total} rows selected."
     },
     "abilityError": {
-      "shieldRequired": "Du skal have et skjold udstyret."
+      "shieldRequired": "You must have a shield equipped."
     },
     "specPanel": {
-      "primaryAttr": "Primær egenskab",
-      "complexity": "Kompleksitet",
-      "complexityLow": "Lav",
-      "complexityMedium": "Mellem",
-      "complexityHigh": "Høj",
-      "exampleAbilities": "Eksempler på evner",
-      "viewTalents": "Se talenter",
-      "selectSpec": "Vælg specialisering"
+      "primaryAttr": "Primary attribute",
+      "complexity": "Complexity",
+      "complexityLow": "Low",
+      "complexityMedium": "Medium",
+      "complexityHigh": "High",
+      "exampleAbilities": "Example abilities",
+      "viewTalents": "View talents",
+      "selectSpec": "Select specialization"
     },
     "controller": {
       "title": "Controller",
@@ -998,6 +998,7 @@ export const da_DK: EnTranslations = {
         "spellPower": "Besværgelseskraft",
         "critRating": "Kritvurdering",
         "hasteRating": "Hastevurdering",
+        "hitRating": "Rammevurdering",
         "warfare": "Krigsførelse"
       },
       "warfareValue": "+{increase}% givet / -{reduction}% modtaget",
@@ -1015,6 +1016,7 @@ export const da_DK: EnTranslations = {
         "dodge": "Din chance for helt at undgå et indkommende nærkampsangreb og tage ingen skade.",
         "critRating": "Kritvurdering fra dit udstyr og sætbonusser, der hæver din chance for kritisk slag. Cirka 10 vurdering giver 1% krit.",
         "hasteRating": "Hastevurdering fra dit udstyr og sætbonusser, der fremskynder dine angreb og besværgelser. Cirka 10 vurdering giver 1% hast.",
+        "hitRating": "Rammevurdering fra dit udstyr og sætbonusser, der reducerer, hvor ofte dine angreb misser og dine trylleformularer modstås, navnlig mod fjender af højere niveau. Cirka 10 vurdering giver 1% ramme.",
         "warfare": "Øger skade givet til spillere med {increase}% og reducerer skade modtaget fra spillere med {reduction}%."
       },
       "effects": {
@@ -1090,10 +1092,10 @@ export const da_DK: EnTranslations = {
         "other": "du er {rank}, {count} medlemmer"
       },
       "finderPartySize": {
-        "one": "{count} player",
-        "few": "{count} players",
-        "many": "{count} players",
-        "other": "{count} players"
+        "one": "{count} spiller",
+        "few": "{count} spillere",
+        "many": "{count} spillere",
+        "other": "{count} spillere"
       },
       "characterCount": {
         "one": "{count} karakter",
@@ -1304,10 +1306,10 @@ export const da_DK: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "Denne genstand kan ikke ødelægges.",
-      "rightClickDestroy": "Shift-højreklik for at ødelægge",
-      "dragEquipHint": "Drag onto your character to equip",
-      "dragDestroyHint": "Drag out into the world to destroy",
-      "reorderNeedsRecent": "Clear the filter and sort by Recent to rearrange your bags",
+      "rightClickDestroy": "Højreklik for at ødelægge",
+      "dragEquipHint": "Træk hen på din karakter for at udruste",
+      "dragDestroyHint": "Træk ud i verden for at ødelægge",
+      "reorderNeedsRecent": "Ryd filteret og sortér efter Seneste for at omarrangere dine tasker",
       "filterGroupAria": "Filtrér tasker efter kategori",
       "filterAll": "Alle",
       "filterWeapon": "Våben",
@@ -1382,6 +1384,8 @@ export const da_DK: EnTranslations = {
       },
       "dodge": "Erhöht Ausweichchance um {pct}%",
       "dodgeReduce": "Verringert Ausweichchance um {pct}%",
+      "damageReduction": "Reducerer al skade modtaget med {pct}%",
+      "guardianWard": "Det næste dødelige fjendtlige slag genopretter dig til {pct}% helbred i stedet",
       "armorFlat": "Verringert Rüstung um {value}",
       "armorFlatStacks": "Verringert Rüstung um {value} ({stacks} Stapel)",
       "armorPct": "Reducerer rustning med {pct}%",
@@ -1510,7 +1514,7 @@ export const da_DK: EnTranslations = {
         "benefits": "Forbind din Discord for at optjene point fra spil og fællesskabsaktivitet og stige i statusrangene.",
         "error": "Kunne ikke forbinde Discord. Prøv igen.",
         "success": "Discord forbundet.",
-        "joinServer": "Bare tilslut dig Discord-serveren"
+        "joinServer": "Tilslut dig Discord-serveren"
       },
       "choice": {
         "title": "Fortsæt med Discord",
@@ -1558,13 +1562,13 @@ export const da_DK: EnTranslations = {
         "admin": "Admin",
         "coredevs": "Kerneudvikler",
         "devs": "Udvikler",
-        "seniormods": "Senior-moderator",
+        "seniormods": "Senior-mod",
         "mods": "Moderator",
-        "juniormods": "Junior-moderator",
+        "juniormods": "Junior-mod",
         "artists": "Kunstner",
         "contentcreator": "Indholdsskaber",
         "legend": "LEGENDE",
-        "shill": "PROMOTER"
+        "shill": "FORKÆMPER"
       },
       "guildMember": "Verificeret medlem",
       "notMember": "Ikke på serveren endnu",
@@ -1831,7 +1835,8 @@ export const da_DK: EnTranslations = {
       "title": "Indsamling",
       "mining": "Minedrift",
       "logging": "Skovhugst",
-      "herbalism": "Urtekundskab"
+      "herbalism": "Urtekundskab",
+      "notReady": "Denne ressourcekilde er endnu ikke genskabt for dig."
     },
     "archetypeTitle": {
       "label": "Titel",
@@ -1865,104 +1870,104 @@ export const da_DK: EnTranslations = {
       "recipeNotLearned": "Du har ikke lært den opskrift endnu."
     },
     "finder": {
-      "title": "Dungeon Finder",
-      "close": "Close",
-      "back": "Back",
-      "syncing": "Waiting for the realm...",
-      "tabCatalogue": "Catalogue",
-      "tabQueue": "Quick Match",
-      "tabBoard": "Premade Groups",
-      "normal": "Normal",
-      "heroic": "Heroic",
-      "kindDungeon": "Dungeon",
-      "kindRaid": "Raid",
-      "kindSolo": "Solo adventure",
-      "levels": "Levels {min} to {max}",
-      "levelOne": "Level {level}",
-      "clock": "{minutes}:{seconds}",
-      "roleCount": "{count} {role}",
-      "roleTank": "Tank",
-      "roleHealer": "Healer",
-      "roleDps": "Damage",
-      "freeRoles": "Any roles welcome",
-      "lockoutDaily": "Daily lockout on the final boss",
-      "lockoutNone": "No lockout",
-      "lockedFor": "Locked for about {minutes} min",
-      "attunement": "Requires attunement: {quest}",
-      "heroicMarks": "Heroic Marks: {count} per player",
-      "entrance": "Entrance: {zone}",
-      "showOnMap": "Show on Map",
-      "encounters": "Encounters",
-      "finalBoss": "Final boss",
-      "summoned": "Summoned guardian",
-      "lootGuaranteed": "One of these always drops:",
-      "lootMaybe": "At most one of these may drop:",
-      "lootChance": "Additional chance drops:",
-      "lootHeroic": "Heroic bonus, one of these always drops:",
-      "pct": "{pct}%",
-      "blockedLevel": "Levels {min} to {max} only",
-      "blockedSpec": "Requires a specialization",
-      "yourRoles": "Your roles",
-      "needsSpec": "Choose a specialization to use the Dungeon Finder.",
-      "leaderNote": "Only your party leader can queue the group.",
-      "chooseActivities": "Choose activities",
-      "joinQueue": "Join queue",
-      "leaveQueue": "Leave queue",
-      "waited": "Time in queue: {time}",
-      "cooldownNote": "You may queue again in {seconds}s.",
-      "travelNote": "The group forms where everyone stands. Travel to the entrance together; nobody is teleported.",
-      "proposalTitle": "Group found: {name}",
-      "proposalRole": "Your role: {role}",
-      "accepted": "{accepted} of {size} confirmed",
-      "remaining": "{seconds}s to answer",
-      "accept": "Accept",
-      "decline": "Decline",
-      "acceptedWait": "Waiting for the others...",
-      "slotState": "{role}: {accepted} of {total} ready",
-      "openListings": "Open listings",
-      "boardEmpty": "No listings right now. Publish one!",
-      "boardLeaderGate": "Only your party leader can publish a listing.",
-      "publishListing": "Publish a listing",
-      "activity": "Activity",
-      "publish": "Publish",
-      "yourListing": "Your listing",
-      "closeListing": "Close listing",
-      "applicants": "Applicants",
-      "noApplicants": "No applicants yet.",
-      "acceptApplicantAria": "Accept {name}",
-      "declineApplicantAria": "Decline {name}",
-      "levelClass": "Lv {level} {className}",
-      "leader": "Leader: {name}",
-      "needs": "Needs {roles}",
-      "slots": "{size}/{capacity}",
-      "apply": "Apply",
-      "withdraw": "Withdraw application",
-      "tagFirstRun": "First run",
-      "tagQuestRun": "Quest run",
-      "tagFullClear": "Full clear",
-      "tagLearning": "Learning welcome",
-      "tagFastRun": "Fast run",
+      "title": "Fangekældersfinder",
+      "close": "Luk",
+      "back": "Tilbage",
+      "syncing": "Venter på verdenen...",
+      "tabCatalogue": "Katalog",
+      "tabQueue": "Hurtig Matchning",
+      "tabBoard": "Forhåndssammensatte Grupper",
+      "normal": "Sædvanlig",
+      "heroic": "Heroisk",
+      "kindDungeon": "Fangekælder",
+      "kindRaid": "Stor raid",
+      "kindSolo": "Soloæventyr",
+      "levels": "Niveauer {min} til {max}",
+      "levelOne": "Niveau {level}",
+      "clock": "{minutes} min. {seconds} sek.",
+      "roleCount": "{count} af rollen {role}",
+      "roleTank": "Forsvarer",
+      "roleHealer": "Heler",
+      "roleDps": "Skade",
+      "freeRoles": "Alle roller velkomne",
+      "lockoutDaily": "Daglig låsning på den endelige chef",
+      "lockoutNone": "Ingen låsning",
+      "lockedFor": "Låst i ca. {minutes} min.",
+      "attunement": "Kræver indstilling: {quest}",
+      "heroicMarks": "Heroiske mærker: {count} pr. spiller",
+      "entrance": "Indgang: {zone}",
+      "showOnMap": "Vis på kortet",
+      "encounters": "Møder",
+      "finalBoss": "Endelig chef",
+      "summoned": "Tilkaldt vogter",
+      "lootGuaranteed": "Et af disse falder altid:",
+      "lootMaybe": "Højst et af disse kan falde:",
+      "lootChance": "Chancedråb ekstra:",
+      "lootHeroic": "Heroisk bonus, et af disse falder altid:",
+      "pct": "{pct} pct.",
+      "blockedLevel": "Kun niveau {min} til {max}",
+      "blockedSpec": "Kræver en specialisering",
+      "yourRoles": "Dine roller",
+      "needsSpec": "Vælg en specialisering for at bruge Fangekældersfinderen.",
+      "leaderNote": "Kun din gruppeleder kan stille gruppen i kø.",
+      "chooseActivities": "Vælg aktiviteter",
+      "joinQueue": "Stil dig i kø",
+      "leaveQueue": "Forlad køen",
+      "waited": "Tid i kø: {time}",
+      "cooldownNote": "Du kan stille igen i kø om {seconds}s.",
+      "travelNote": "Gruppen dannes, hvor alle befinder sig. Rejs til indgangen sammen; ingen teleporteres.",
+      "proposalTitle": "Gruppe fundet: {name}",
+      "proposalRole": "Din rolle: {role}",
+      "accepted": "{accepted} af {size} bekræftet",
+      "remaining": "{seconds}s til at svare",
+      "accept": "Accepter",
+      "decline": "Afvis",
+      "acceptedWait": "Venter på de andre...",
+      "slotState": "{role}: {accepted} af {total} klar",
+      "openListings": "Åbne opslag",
+      "boardEmpty": "Ingen opslag i øjeblikket. Opret ét!",
+      "boardLeaderGate": "Kun din gruppeleder kan oprette et opslag.",
+      "publishListing": "Publicér et opslag",
+      "activity": "Aktivitet",
+      "publish": "Publicér",
+      "yourListing": "Dit opslag",
+      "closeListing": "Luk opslag",
+      "applicants": "Ansøgere",
+      "noApplicants": "Ingen ansøgere endnu.",
+      "acceptApplicantAria": "Accepter {name}",
+      "declineApplicantAria": "Afvis {name}",
+      "levelClass": "Nv. {level} {className}",
+      "leader": "Leder: {name}",
+      "needs": "Mangler {roles}",
+      "slots": "{size} af {capacity}",
+      "apply": "Ansøg",
+      "withdraw": "Træk ansøgning tilbage",
+      "tagFirstRun": "Første runde",
+      "tagQuestRun": "Opgaverunde",
+      "tagFullClear": "Fuld oprydning",
+      "tagLearning": "Begyndere velkomne",
+      "tagFastRun": "Hurtig runde",
       "mech": {
-        "shadow_pulse": "Shadow Pulse (pulsing area damage)",
-        "reaping_arc": "Reaping Arc (frontal cleave)",
-        "mist_surge": "Mist Surge (pulsing area damage)",
-        "summons_adds": "Summons reinforcements",
-        "lunar_tide": "Lunar Tide (pulsing area damage)",
-        "enrage": "Enrages at low health",
-        "shuddering_stomp": "Shuddering Stomp (area stun)",
-        "necrotic_shockwave": "Necrotic Shockwave (heavy area damage)",
-        "grave_cleaver": "Grave-Cleaver (frontal cleave)",
-        "shadow_nova": "Shadow Nova (area burst)",
-        "profane_mending": "Profane Mending (heals its allies)",
-        "mana_burn": "Withered Benediction (burns mana)",
-        "deathstalker_cleave": "Deathstalker Cleave (frontal cleave)",
-        "mortal_wound": "Forgotten Wound (reduces healing taken)",
-        "sealbreak_shockwave": "Sealbreak Shockwave (area burst)",
-        "gravebreaker": "Gravebreaker (frontal cone, face it away from the raid)",
-        "raise_fallen": "Raise Fallen (periodic waves of adds)",
-        "soul_rend": "Soul Rend (marked players must spread and be healed)",
-        "deathless_rage": "Deathless Rage (interrupted at the wardstones)",
-        "wardstones": "Wardstone channels (phase transition)"
+        "shadow_pulse": "Skyggeimpuls (pulserende omradesskade)",
+        "reaping_arc": "Mejende Bue (frontal mejning)",
+        "mist_surge": "Tågebølge (pulserende omradesskade)",
+        "summons_adds": "Tilkalder forstærkninger",
+        "lunar_tide": "Manetide (pulserende omradesskade)",
+        "enrage": "Raserer ved lavt helbred",
+        "shuddering_stomp": "Rystende Tramp (omradesbedøvelse)",
+        "necrotic_shockwave": "Nekrotisk Chokbølge (kraftig omradesskade)",
+        "grave_cleaver": "Gravhugger (frontal mejning)",
+        "shadow_nova": "Skyggeudbrud (omradesudbrud)",
+        "profane_mending": "Vanhellig Heling (heler sine allierede)",
+        "mana_burn": "Visnet Velsignelse (forbrænder mana)",
+        "deathstalker_cleave": "Dødsstalkers Mejning (frontal mejning)",
+        "mortal_wound": "Glemt Sår (reducerer modtaget heling)",
+        "sealbreak_shockwave": "Segelbrudets Chokbølge (omradesudbrud)",
+        "gravebreaker": "Gravknuser (frontal kegle, vend den væk fra raidet)",
+        "raise_fallen": "Rejse de Faldne (periodiske bølger af tilkaldelser)",
+        "soul_rend": "Sjælerivning (markerede spillere skal sprede sig og heles)",
+        "deathless_rage": "Udødelig Raseri (afbrydes ved vardstene)",
+        "wardstones": "Vardstenskanaler (faseovergang)"
       }
     },
     "deeds": {
@@ -2586,8 +2591,8 @@ export const da_DK: EnTranslations = {
     },
     "abilityHook": {
       "heroic_strike": "Sætter et tungere sving i kø der bruger raseri på dit næste slag.",
-      "revenge": "Svinger gennem fjender foran dig og kan blive gratis efter en undvigelse eller parering.",
-      "hamstring": "Hæmmer en fjendes bevægelse, så den ikke kan flygte.",
+      "revenge": "Sweeps enemies in front of you, with a chance to become free after a dodge or parry.",
+      "hamstring": "Cripples an enemy's movement to keep it from escaping.",
       "battle_shout": "Et samlende råb der hæver angrebsstyrken for gruppen.",
       "charge": "Stormer mod en fjern fjende for at åbne kampen med en kort lammelse.",
       "thunder_clap": "Rammer alt omkring dig og sløver deres angreb.",
@@ -2647,7 +2652,9 @@ export const da_DK: EnTranslations = {
       "mark_of_the_wild": "En vedvarende velsignelse du lægger på dig selv eller en allieret før en kamp.",
       "moonfire": "Rammer øjeblikkeligt og efterlader målet brændende, god mens du bevæger dig.",
       "rejuvenation": "Kastes øjeblikkeligt og helbreder en allieret over tid, så du kan blive ved med at handle.",
-      "thorns": "Beskytter en allieret så nærkampsangribere skader sig selv når de slår."
+      "thorns": "Beskytter en allieret så nærkampsangribere skader sig selv når de slår.",
+      "commanding_shout": "Styrker udholdenheden så alle har mere modstandskraft i en kamp.",
+      "rend": "Åbner en blødning der nedslider målet over tid."
     },
     "petHook": {
       "emberkin": "En fjernkamps-ildboltdæmon der pikker på fjender fra sikker afstand.",
@@ -2717,7 +2724,7 @@ export const da_DK: EnTranslations = {
       },
       "reptile": {
         "name": "Krybdyr",
-        "desc": "Koldblodede jægere med deres helt egen hvislen og snappen, tydeligt forskellige fra varmblodede bæster."
+        "desc": "Koldblodede jægere med en hvislen og et snap, der er helt deres egne, og som adskiller sig fra de varmblodede dyr."
       }
     },
     "worldPage": {
@@ -4628,6 +4635,8 @@ export const da_DK: EnTranslations = {
     "connectionLost": "Forbindelsen til serveren gik tabt.",
     "reconnecting": "Forbindelse mistet. Genopretter forbindelse...",
     "connectionRejected": "Serveren lukkede forbindelsen.",
+    "realmFull": "Denne verden er fuld i øjeblikket. Prøv igen om et par minutter.",
+    "tooManyConnections": "Der kommer for mange forbindelser til denne verden fra dit netværk. Luk ekstra spilvinduer, eller prøv igen om et par minutter.",
     "tips": {
       "classes": "Tip: Hver af de 9 klasser spilles forskelligt. Prøv nogle stykker, før du vælger én.",
       "talents": "Tip: Du kan nulstille dine talenter, når du er ude af kamp, så et tidligt valg er aldrig en fælde.",
@@ -5285,7 +5294,7 @@ export const da_DK: EnTranslations = {
       "defensiveDesc": "Angriber fjender, der skader dig eller dit kæledyr.",
       "aggressiveDesc": "Angriber fjendtlige modstandere i nærheden.",
       "rename": "Omdøb kæledyr",
-      "revive": "Lappe sammen",
+      "revive": "Genopliv kæledyr",
       "abandon": "Forlad kæledyr",
       "cancel": "Annuller",
       "renameLabel": "Vælg et nyt kæledyrsnavn.",
@@ -5397,7 +5406,7 @@ export const da_DK: EnTranslations = {
     "actionBar": {
       "attackName": "Angrib",
       "attackTooltip": "Slå automatisk angreb til/fra på dit mål. Højreklik på en fjende angriber også.",
-      "attackRemoveHint": "Right-click to remove it from the bar and free the slot.",
+      "attackRemoveHint": "Højreklik for at fjerne den fra bjælken og frigøre pladsen.",
       "emptySlot": "Tom plads",
       "slotAria": "Handlingsplads {slot}: {ability}",
       "emptySlotAria": "Handlingsplads {slot}: tom",
@@ -5541,7 +5550,7 @@ export const da_DK: EnTranslations = {
     },
     "slots": {
       "mainhand": "Hovedhånd",
-      "offhand": "Sekundær hånd",
+      "offhand": "Off Hand",
       "helmet": "Hjelm",
       "neck": "Hals",
       "shoulder": "Skulder",
@@ -6355,6 +6364,18 @@ export const da_DK: EnTranslations = {
         "name": "Egehud",
         "description": "Din hud hærder som bark, og øger rustning med 150 i 15 sek."
       },
+      "ironhold": {
+        "name": "Jernhold",
+        "description": "Slut dig bag dit skjold og reducer al skade med 40% i 8 sek."
+      },
+      "sacred_bulwark": {
+        "name": "Hellig Bolværk",
+        "description": "I {duration} sek. nægtes det næste fjendtlige ramte slag, der ville dræbe dig, og du genvinder 35% helbred i stedet."
+      },
+      "primal_reflexes": {
+        "name": "Primalreflekser",
+        "description": "Dine instinkter skærpes og øger din chance for at undvige med 50% i 6 sek."
+      },
       "starfire": {
         "name": "Himmelfald",
         "description": "Nedkalder et lyn af stjerneild og forårsager {damage} Arkan skade."
@@ -6540,304 +6561,304 @@ export const da_DK: EnTranslations = {
         "description": "Binder en Wraithborn til din vilje, en elitedæmon der regner tung Skygge skade ned på afstand. En lang nedkøling holder dens ødelæggende kraft i skak. At tilkalde en ny dæmon bortsender din nuværende. Du kan have én dæmon ad gangen."
       },
       "battle_stance": {
-        "name": "Kampstilling",
-        "description": "En aggressiv kampstilling: du genererer 10% mere raseri. Standardstillingen for Arms og Beskyttelse."
+        "name": "Battle Stance",
+        "description": "An aggressive combat stance: you generate 10% more rage. The default stance for Arms and Protection."
       },
       "berserker_stance": {
-        "name": "Berserkerstilling",
-        "description": "En dumdristig kampstilling: dine kritiske slag rammer 3% oftere og slår 3% hårdere. Furie-krigeren kæmper altid i denne stilling."
+        "name": "Berserker Stance",
+        "description": "A reckless combat stance: your critical strikes land 3% more often and hit for 3% more. The Fury warrior always fights in this stance."
       },
       "sweeping_strikes": {
-        "name": "Voksende Bue",
-        "description": "I 12 sek rammer dine enkeltmålsangreb også 1 nærliggende fjende for fuld skade. (Arms)"
+        "name": "Widening Arc",
+        "description": "For 12 sec your single-target attacks also strike 1 nearby enemy for full damage. (Arms)"
       },
       "deep_wounds": {
-        "name": "Gabende Sår",
-        "description": "Passiv: dit Lemlæstende Slag efterlader målet blødende for fysisk skade over 6 sek. (Arms)"
+        "name": "Gaping Wounds",
+        "description": "Passive: your Maiming Strike leaves the target bleeding for Physical damage over 6 sec. (Arms)"
       },
       "enrage_passive": {
-        "name": "Amok",
-        "description": "Passiv: mens du er Rasende, volder du 7% mere skade, angriber 25% hurtigere og bevæger dig 10% hurtigere i 4 sek. Åreladning har 30% chance for at gøre dig Rasende; Rød Høst gør det altid. (Furie)"
+        "name": "Mayhem",
+        "description": "Passive: while Enraged you deal 7% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)"
       },
       "raging_gale": {
-        "name": "Tvillingeslag",
-        "description": "Slå øjeblikkeligt to gange med dit våben, hvor hvert slag volder 40% våbenskade plus {damage}, og generér 8 raseri. Gemmer op til 2 ladninger. (Furie)"
+        "name": "Twinstrike",
+        "description": "Instantly strike with your weapon twice, each hit dealing 40% weapon damage plus {damage}, and generate 8 rage. Stores up to 2 charges. (Fury)"
       },
       "red_harvest": {
-        "name": "Rød Høst",
-        "description": "Brug alt: slå tre gange i vildskab for 65% våbenskade plus {damage} hver, og bliv altid Rasende. (Furie)"
+        "name": "Red Harvest",
+        "description": "Spend everything: strike three times in a frenzy for 65% weapon damage plus {damage} each, always Enraging you. (Fury)"
       },
       "furious_mending": {
-        "name": "Rasende Heling",
-        "description": "I 10 sek tager du 20% mindre skade, og så længe det varer, helbreder din Åreladning dig for 20% af dit maksimale helbred. (Furie)"
+        "name": "Furious Mending",
+        "description": "For 10 sec you take 20% reduced damage, and while it lasts your Bloodletting heals you for 20% of your maximum health. (Fury)"
       },
       "emboldening_roar": {
-        "name": "Opildnende Brøl",
-        "description": "Udstøder et opildnende brøl: du og venlige spillere inden for 40 m bliver Opildnet, og de næste 3 evner er garanterede kritiske slag. (Furie)"
+        "name": "Emboldening Roar",
+        "description": "Lets loose an emboldening roar: you and friendly players within 40 yards are Emboldened, and your next 3 abilities are guaranteed critical strikes. (Fury)"
       },
       "raised_guard": {
-        "name": "Hævet Garde",
-        "description": "Sæt dig fast bag dit skjold: du tager 50% mindre fysisk skade i 6 sek. Gemmer op til 2 ladninger. (Beskyttelse)"
+        "name": "Raised Guard",
+        "description": "Brace behind your shield: you take 50% reduced Physical damage for 6 sec. Stores up to 2 charges. (Protection)"
       },
       "iron_resolve": {
-        "name": "Jernvilje",
-        "description": "Bid tænderne sammen og ignorér smerten: bruger op til 40 raseri (mindst 20) for at absorbere 4 skade pr. brugt raseripoint i op til 10 sek. (Beskyttelse)"
+        "name": "Iron Resolve",
+        "description": "Grit your teeth and ignore the pain: spends up to 40 rage (20 minimum) to absorb 4 damage per rage spent, lasting up to 10 sec. (Protection)"
       },
       "faultline": {
-        "name": "Jordspalte",
-        "description": "Send en chokbølge gennem jorden: fjender foran dig inden for 8 m tager {damage} skade og bedøves i 3 sek. (Beskyttelse)"
+        "name": "Faultline",
+        "description": "Send a shockwave through the ground: enemies in front of you within 8 yards take {damage} damage and are stunned for 3 sec. (Protection)"
       },
       "defiant_bellow": {
-        "name": "Trodsigt Brøl",
-        "description": "Et trodsigt brøl: hver fjende inden for 10 m hånes og tvinges til at angribe dig i 3 sek. (Beskyttelse)"
+        "name": "Defiant Bellow",
+        "description": "A defiant bellow: every enemy within 10 yards is taunted, compelled to attack you for 3 sec. (Protection)"
       },
       "breachmaker": {
-        "name": "Murbryder",
-        "description": "Hamrer løs på målet for våbenskade plus {damage} og slår hul i dets garde: dine egne angreb mod det volder 20% mere skade i 8 sek. (Arms)"
+        "name": "Breachmaker",
+        "description": "Batter the target for weapon damage plus {damage} and crack its guard: your own attacks against it deal 20% more damage for 8 sec. (Arms)"
       },
       "measured_fury": {
-        "name": "Afmålt Raseri",
-        "description": "Dit afmålte raseri skærper din økonomi: dine evner koster 10% mindre raseri. (Arms)"
+        "name": "Measured Fury",
+        "description": "Your measured fury sharpens your economy: your abilities cost 10% less rage. (Arms)"
       },
       "seasoned_soldier": {
-        "name": "Garvet Soldat",
-        "description": "Dine kritiske autoangreb genererer 10% mere raseri. (Arms)"
+        "name": "Seasoned Soldier",
+        "description": "Your critical auto-attacks generate 10% more rage. (Arms)"
       },
       "diabolical_twinstrike": {
-        "name": "Diabolsk Tvillingeslag",
-        "description": "Mens du er Rasende, volder dit Tvillingeslag 15% mere skade. (Furie)"
+        "name": "Diabolical Twinstrike",
+        "description": "While Enraged, your Twinstrike deals 15% more damage. (Fury)"
       },
       "cleaving_blows": {
-        "name": "Kløvende Slag",
-        "description": "Rød Høst refunderer altid en ladning Tvillingeslag. (Furie)"
+        "name": "Cleaving Blows",
+        "description": "Red Harvest always refunds a charge of Twinstrike. (Fury)"
       },
       "sudden_death": {
-        "name": "Pludselig Død",
-        "description": "Dine autoangreb har en chance for at lade dig kaste Tidlig Grav på et mål uanset helbred, uden at det koster raseri. (Arms)"
+        "name": "Sudden Death",
+        "description": "Your auto-attacks have a chance to let you cast Early Grave on a target at any health, costing no rage. (Arms)"
       },
       "storm_bolt": {
-        "name": "Stormbolt",
-        "description": "Slyng dit våben mod målet for {damage} og bedøv det i 3 sek."
+        "name": "Storm Bolt",
+        "description": "Hurl your weapon at the target for {damage}, stunning it for 3 sec."
       },
       "piercing_howl": {
-        "name": "Gennemtrængende Hyl",
-        "description": "Et gennemtrængende råb, der sænker alle fjender inden for 15 m med 50% i 8 sek."
+        "name": "Piercing Howl",
+        "description": "A piercing shout that slows all enemies within 15 yards by 50% for 8 sec."
       },
       "die_by_sword": {
-        "name": "Dø ved Sværdet",
-        "description": "Defensiv nedkøling: i 8 sek tager du 30% mindre skade og undviger langt flere angreb."
+        "name": "Die by the Sword",
+        "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
       },
       "recklessness": {
-        "name": "Dumdristighed",
-        "description": "Gør dig Rasende: din raserigenerering øges med 50% og din chance for kritiske slag med 20% i 12 sek."
+        "name": "Recklessness",
+        "description": "Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec."
       },
       "sanguine_aura": {
-        "name": "Blodrød Aura",
-        "description": "Gennemtræng dit våben med dine fjenders blod: du og dine nærkampsallierede får 10% angrebshastighed og 10% skade i 20 sek."
+        "name": "Sanguine Aura",
+        "description": "Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec."
       },
       "victory_rush": {
-        "name": "Sejrsrus",
-        "description": "Slå for våbenskade plus {damage}, og helbred 20% af dit maksimale helbred. Kan kun bruges inden for 20 sek efter at have dræbt en fjende."
+        "name": "Victory Rush",
+        "description": "Strike for weapon damage plus {damage} and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy."
       },
       "intimidating_shout": {
-        "name": "Frygtindgydende Råb",
-        "description": "Et rædselsvækkende råb, der sender op til 5 fjender inden for 8 m på flugt i frygt i 8 sek. Skade kan bryde effekten."
+        "name": "Intimidating Shout",
+        "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
       },
       "revenge": {
-        "name": "Hævn",
-        "description": "Angrib i en bred bue og vold fysisk skade på alle fjender foran dig. Over 5 mål reduceres skaden. Når du undviger eller parerer, koster din næste Hævn muligvis intet raseri. (Protection)"
+        "name": "Revenge",
+        "description": "Attack in a wide arc, dealing Physical damage to all enemies in front of you. Above 5 targets the damage is reduced. When you dodge or parry, your next Revenge may cost no rage. (Protection)"
       },
       "heroic_leap": {
-        "name": "Krigsspring",
-        "description": "Spring til målområdet og påfør {damage} skade på fjender i nærheden, når du lander."
+        "name": "Heroic Leap",
+        "description": "Leap to the target area, dealing {damage} damage to nearby enemies on landing."
       },
       "rallying_cry": {
-        "name": "Tapperhedsbrøl",
-        "description": "Udstød et tappert brøl, som giver dig og gruppemedlemmer inden for 40 meter 20% ekstra maksimal sundhed i 10 sek. Beskyttelse: de tager også 5% mindre skade i varigheden."
+        "name": "Valor Roar",
+        "description": "Lets loose a valorous roar, granting you and party members within 40 yards 20% additional maximum health for 10 sec. Protection: they also take 5% less damage for the duration."
       },
       "avatar": {
         "name": "Avatar",
-        "description": "Forvandl dig til en kolos i 20 sek., bryd alle kontroleffekter på dig, og øg din skade med 20%."
+        "description": "Transform into a colossus for 20 sec, breaking all control on you and increasing your damage dealt by 20%."
       },
       "bladestorm": {
-        "name": "Klingestorm",
-        "description": "Bliv til en hvirvlende storm af stål, og ram alle fjender inden for 8 meter for {damage} skade hvert sekund i 4 sek."
+        "name": "Bladestorm",
+        "description": "Become a whirling storm of steel, striking all enemies within 8 yards for {damage} every second for 4 sec."
       },
       "aspect_of_the_wild": {
-        "name": "Vildtands skikkelse",
-        "description": "Indgyder vild styrke i allierede inden for 30 m og øger deres angrebskraft med 45 og angrebshastighed med 5 % i 5 min. (jægertalent)"
+        "name": "Wildfang Rally",
+        "description": "Inspires allies within 30 yd with wild strength, increasing attack power by 45 and attack speed by 5% for 5 min. (Hunter talent)"
       },
       "aura_surge": {
-        "name": "Daggryets rikochet",
-        "description": "Kaster et daggrysmedet skjold for {damage} Hellig skade, bringer det primære mål til tavshed i 2 sek. og hopper derefter til op til 2 yderligere fjender inden for 10 meter for 75% skade pr. hop. (Paladintalent)"
+        "name": "Dawnward Ricochet",
+        "description": "Hurl a dawnforged shield for {damage} Holy damage and silence the primary target for 2 sec. It bounces to up to 2 additional enemies within 10 yd for 75% damage per bounce. (Paladin talent)"
       },
       "avenging_wrath": {
-        "name": "Hævnerfløj",
-        "description": "Påkalder hævnende kraft og øger din angrebskraft med 60 og magikraft med 30 i 20 sek. (paladintalent)"
+        "name": "Wrathwing",
+        "description": "Calls down avenging power, increasing attack power by 60 and spell power by 30 for 20 sec. (Paladin talent)"
       },
       "berserk": {
-        "name": "Rød dis",
-        "description": "Øger din angrebskraft med 70 i 15 sek. (druidentalent)"
+        "name": "Red Haze",
+        "description": "Increases attack power by 70 for 15 sec. (Druid talent)"
       },
       "blink": {
-        "name": "Flimmertrin",
-        "description": "Teleporterer dig 15 m fremad og bryder forankringseffekter. (magikertalent)"
+        "name": "Flickerstep",
+        "description": "Teleports you 15 yd forward and breaks roots. (Mage talent)"
       },
       "bloodlust": {
-        "name": "Krigstrommer",
-        "description": "Pisker allierede inden for 30 m ind i et raseri og øger deres angrebshastighed med 30 % i 15 sek. (shamantalent)"
+        "name": "Storm Chorus",
+        "description": "Whips allies within 30 yd into a frenzy, increasing attack speed by 30% for 15 sec. (Shaman talent)"
       },
       "chain_lightning": {
-        "name": "Gaffellyn",
-        "description": "Kaster lyn mod målområdet og giver {damage} skade til fjender i nærheden. (shamantalent)"
+        "name": "Skybranch",
+        "description": "Hurls lightning at the target area, damaging nearby enemies for {damage}. (Shaman talent)"
       },
       "chaos_bolt": {
         "name": "Ruinbolt",
-        "description": "Kaster en kaotisk ildkugle, der giver {damage} Ildskade. (troldmandstalent)"
+        "description": "Hurls a bolt of chaotic fire for {damage} Fire damage. (Warlock talent)"
       },
       "cleansing_verdict": {
-        "name": "Rensende Dom",
-        "description": "Fjerner en skadelig magisk effekt fra et venligt mål og helbreder det med Hellig magi for {damage}."
+        "name": "Cleansing Verdict",
+        "description": "Purges a harmful magic effect from a friendly target and heals them for {damage} Holy."
       },
       "cloak_of_shadows": {
-        "name": "Skyggekappe",
-        "description": "Indhyller dig i skygger og absorberer 420 skade i 5 sek. (slyngeltalent)"
+        "name": "Shadecloak",
+        "description": "Wraps you in shadows, absorbing 420 damage for 5 sec. (Rogue talent)"
       },
       "cone_of_cold": {
-        "name": "Frostfej",
-        "description": "Rammer fjender i nærheden med frost og giver {damage} Frostskade. (Frost-signaturevne)"
+        "name": "Frostsweep",
+        "description": "Blasts nearby enemies with frost for {damage} Frost damage. (Frost signature)"
       },
       "curse_of_exhaustion": {
-        "name": "Blytung forbandelse",
-        "description": "Forbander målet og reducerer dets bevægelseshastighed med 30 % i 12 sek. (troldmandstalent)"
+        "name": "Leaden Hex",
+        "description": "Curses the target, slowing movement by 30% for 12 sec. (Warlock talent)"
       },
       "death_coil": {
-        "name": "Gravspiral",
-        "description": "Rammer fjenden for {damage} Skyggeskade og skræmmer den derefter i 3 sek. (troldmandstalent)"
+        "name": "Morrowlash",
+        "description": "Strikes the enemy for {damage} Shadow damage, then horrifies them for 3 sec. (Warlock talent)"
       },
       "deep_freeze": {
-        "name": "Dødfrost",
-        "description": "Dybfryser målet, giver {damage} Frostskade og bedøver det i 4 sek. (magikertalent)"
+        "name": "Deadfrost",
+        "description": "Deep freezes the target, dealing {damage} Frost damage and stunning it for 4 sec. (Mage talent)"
       },
       "desperate_prayer": {
-        "name": "Sidste bøn",
-        "description": "Helbreder dig øjeblikkeligt for {damage}. (præstetalent)"
+        "name": "Last Prayer",
+        "description": "Instantly heals you for {damage}. (Priest talent)"
       },
       "deterrence": {
-        "name": "Børsteværn",
-        "description": "Øger din undvigelseschance med 50 procentpoint i 10 sek. (jægertalent)"
+        "name": "Bristleguard",
+        "description": "Increases your dodge chance by 50 percentage points for 10 sec. (Hunter talent)"
       },
       "divine_shield": {
-        "name": "Lysværn",
-        "description": "Beskytter dig med hellig kraft og absorberer 900 skade i 8 sek. (paladintalent)"
+        "name": "Lightward",
+        "description": "Shields you with holy power, absorbing 900 damage for 8 sec. (Paladin talent)"
       },
       "earthbind": {
-        "name": "Gribende jord",
-        "description": "Binder fjender i nærheden til jorden og forankrer dem i 2 sek. (shamantalent)"
+        "name": "Gripping Earth",
+        "description": "Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)"
       },
       "evocation": {
-        "name": "Æterbrønd",
-        "description": "Genopretter øjeblikkeligt 220 mana. (magikertalent)"
+        "name": "Aetherwell",
+        "description": "Instantly restores 220 mana. (Mage talent)"
       },
       "frenzied_regeneration": {
-        "name": "Vild heling",
-        "description": "Genopretter 180 helbred over 10 sek. Kun i Bjørneform. (druidentalent)"
+        "name": "Savage Mending",
+        "description": "Restores 180 health over 10 sec. Bruin Form only. (Druid talent)"
       },
       "frost_trap": {
-        "name": "Rimfælde",
-        "description": "Fryser fjender i målområdet i 3 sek., så de hverken kan bevæge sig eller handle. (jægertalent)"
+        "name": "Rime Snare",
+        "description": "Freezes enemies at the target area for 3 sec, preventing movement and actions. (Hunter talent)"
       },
       "ghostly_strike": {
-        "name": "Genfærdsslag",
-        "description": "Rammer fjenden for våbenskade plus {damage}, øger kortvarigt undvigelse og giver 1 kombinationspoint. (slyngeltalent)"
+        "name": "Wraith Strike",
+        "description": "Strikes the enemy for weapon damage plus {damage} and briefly increases dodge. Awards 1 combo point. (Rogue talent)"
       },
       "hammer_of_wrath": {
-        "name": "Klanghammer",
-        "description": "Kaster en hellig hammer mod en såret fjende for {damage} Hellig skade. Kan kun bruges under 20 % helbred. (paladintalent)"
+        "name": "Tolling Hammer",
+        "description": "Hurls a holy hammer at a wounded enemy for {damage} Holy damage. Only usable below 20% health. (Paladin talent)"
       },
       "healing_stream": {
-        "name": "Kildebrønd",
-        "description": "Genopretter 120 helbred hos et allieret mål over 12 sek. (shamantalent)"
+        "name": "Springwell",
+        "description": "Restores 120 health to a friendly target over 12 sec. (Shaman talent)"
       },
       "holy_wrath": {
-        "name": "Helgenvrede",
-        "description": "Udløser hellig kraft og giver {damage} skade til fjender i nærheden. (paladintalent)"
+        "name": "Saint's Ire",
+        "description": "Unleashes holy power, damaging nearby enemies for {damage}. (Paladin talent)"
       },
       "howl_of_terror": {
-        "name": "Rædselshyl",
-        "description": "Skræmmer fjender i nærheden i op til 3 sek. Skade kan bryde effekten. (troldmandstalent)"
+        "name": "Dread Chorus",
+        "description": "Frightens nearby enemies for up to 3 sec. Damage may break the effect. (Warlock talent)"
       },
       "ice_block": {
-        "name": "Kold kiste",
-        "description": "Indkapsler dig i is og absorberer 600 skade i 8 sek. Du kan ikke handle, mens du er indkapslet. Kast igen for at annullere. (magikertalent)"
+        "name": "Cold Coffin",
+        "description": "Encases you in ice, absorbing 600 damage for 8 sec. You cannot act while encased. Recast to cancel. (Mage talent)"
       },
       "inner_focus": {
-        "name": "Stillet sind",
-        "description": "Gør din næste besværgelse gratis. Varer 60 sek. (præstetalent)"
+        "name": "Stilled Mind",
+        "description": "Makes your next spell free. Lasts 60 sec. (Priest talent)"
       },
       "innervate": {
-        "name": "Livssaft",
-        "description": "Levende saft vælder op i dig i 10 sek. og genopretter 20 af din aktuelle ressource i bølger: mana, raseri eller energi. Formskifte afbryder den ikke. Søvn, bedøvelse eller stase standser saften. (druidentalent)"
+        "name": "Lifesap",
+        "description": "Living sap wells up in you for 10 sec, restoring 20 of your current resource in waves: mana, Rage, or Energy, and shifting forms does not break it. Sleep, stun, or stasis stills the sap. (Druid talent)"
       },
       "meteor": {
-        "name": "Himmelsten",
-        "description": "Nedkalder en meteor på målområdet og giver {damage} Ildskade. Derefter brændes fjender i området for 12 til 18 Ildskade hvert 2. sek. i 6 sek. (magikertalent)"
+        "name": "Skystone",
+        "description": "Calls down a meteor at the target area, dealing {damage} Fire damage, then burning enemies there for 12 to 18 Fire damage every 2 sec for 6 sec. (Mage talent)"
       },
       "mind_sear": {
-        "name": "Tankebrand",
-        "description": "Kanaliserer skyggeenergi mod målområdet og giver {damage} skade hvert sekund til fjender i nærheden. (præstetalent)"
+        "name": "Thoughtburn",
+        "description": "Channels shadow energy at the target area, damaging nearby enemies each second for {damage}. (Priest talent)"
       },
       "multi_shot": {
-        "name": "Splitskud",
-        "description": "Affyrer en salve mod målområdet og giver {damage} Fysisk skade til fjender inden for en radius af 8 m. (jægertalent)"
+        "name": "Splitshot",
+        "description": "Loose a spread at the target area, dealing {damage} Physical damage to enemies within 8 yd. (Hunter talent)"
       },
       "prayer_of_healing": {
-        "name": "Korhelbredelse",
-        "description": "Helbreder allierede i nærheden for {damage}. (præstetalent)"
+        "name": "Choirmend",
+        "description": "Heals nearby allies for {damage}. (Priest talent)"
       },
       "preparation": {
-        "name": "Nødplan",
-        "description": "Afslutter nedkølingen på Sprint, Undvigelse og Forsvinden. (slyngeltalent)"
+        "name": "Contingency",
+        "description": "Finishes the cooldown on Sprint, Evasion, and Vanish. (Rogue talent)"
       },
       "presence_of_mind": {
-        "name": "Ræsende sind",
-        "description": "Gør din næste besværgelse med kastetid øjeblikkelig. Varer 60 sek. (magikertalent)"
+        "name": "Racing Mind",
+        "description": "Makes your next spell with a cast time instant. Lasts 60 sec. (Mage talent)"
       },
       "psychic_scream": {
-        "name": "Psykisk skrig",
-        "description": "Skræmmer fjender i nærheden i op til 4 sek. Skade kan bryde effekten. (præstetalent)"
+        "name": "Terror Canticle",
+        "description": "Frightens nearby enemies for up to 4 sec. Damage may break the effect. (Priest talent)"
       },
       "shadowstep": {
-        "name": "Skyggesmut",
-        "description": "Træder gennem skyggerne mod dit mål. (slyngeltalent)"
+        "name": "Shadeslip",
+        "description": "Steps through the shadows toward your target. (Rogue talent)"
       },
       "silence": {
-        "name": "Tavshed",
-        "description": "Bringer målet til tavshed i 4 sek. (præstetalent)"
+        "name": "Hushword",
+        "description": "Silences the target for 4 sec. (Priest talent)"
       },
       "smoke_screen": {
-        "name": "Røgslør",
-        "description": "Du forsvinder i en røgsky, hvilket øger din undvigelseschance med 30 % i 8 sek."
+        "name": "Smoke Screen",
+        "description": "Vanish into a cloud of smoke, increasing your chance to dodge by 30% for 8 sec."
       },
       "spellsteal": {
-        "name": "Magityveri",
-        "description": "Stjæler en gavnlig magisk effekt fra en fjende og overfører den til dig."
+        "name": "Spellsteal",
+        "description": "Steals a beneficial magic effect from an enemy, transferring it to yourself."
       },
       "startle_shot": {
-        "name": "Forskrækkelsesskud",
-        "description": "Et vildt skud, der desorienterer målet i {duration} sek. Enhver skade bryder effekten."
+        "name": "Startle Shot",
+        "description": "A wild shot that disorients the target for {duration} sec. Any damage breaks the effect."
       },
       "tranquility": {
-        "name": "Lundens sang",
-        "description": "Kanaliserer helbredende energi i 4 sek. og helbreder allierede inden for 30 m for 42 til 52 hvert sekund. (druidentalent)"
+        "name": "Gladesong",
+        "description": "Channels restorative energy for 4 sec, healing allies within 30 yd for 42 to 52 each second. (Druid talent)"
       },
       "typhoon": {
-        "name": "Tyfon",
-        "description": "Et vindstød slår alle fjender inden for 8 m tilbage og omtåger dem, så deres bevægelseshastighed reduceres med 50 % i 4 sek."
+        "name": "Typhoon",
+        "description": "A blast of wind knocks back all enemies within 8 yd and dazes them, slowing their movement by 50% for 4 sec."
       },
       "voidfeast": {
-        "name": "Tomhedsfest",
-        "description": "Fortærer en magisk effekt (en gavnlig fra en fjende eller en skadelig fra en allieret) og helbreder dig for 6 % af dit maksimale helbred."
+        "name": "Voidfeast",
+        "description": "Devours a magic effect (a beneficial one from an enemy, or a harmful one from an ally) and heals you for 6% of your maximum health."
       },
       "pummel": {
         "name": "Kæbeknuser",
@@ -6884,8 +6905,16 @@ export const da_DK: EnTranslations = {
         "description": "En snigeåbner der kradser fjenden for våbenskade plus {damage} og volder blødningsskade over 9 sek. Giver 1 kombopoint. Kun i Ulveform."
       },
       "revive_pet": {
-        "name": "Lappe sammen",
-        "description": "Lapper dit kæledyr sammen. Hvis det lever, genopretter det i alt {overTime} helbred over 12 sek. med helbredelse hvert 3. sek. Hvis det er dødt, genopliver det med 35 % helbred."
+        "name": "Genoplive Kæledyr",
+        "description": "Genopliver dit døde kæledyr og bringer det tilbage til din side."
+      },
+      "commanding_shout": {
+        "description": "Øger din Udholdenhed med {buff} i 2 min.",
+        "name": "Styrkende Råb"
+      },
+      "rend": {
+        "description": "Sårer målet og får det til at bløde for {damage} skade over {duration} sek.",
+        "name": "Dyb Flænge"
       }
     },
     "items": {
@@ -8099,16 +8128,16 @@ export const da_DK: EnTranslations = {
         "name": "Heroisk Mærke"
       },
       "eastbrook_buckler": {
-        "name": "Østbæk Rundskjold"
+        "name": "Eastbrook Buckler"
       },
       "eastbrook_greatsword": {
-        "name": "Østbæk Storsværd"
+        "name": "Eastbrook Greatsword"
       },
       "highwatch_greatsword": {
-        "name": "Højvagt Storsværd"
+        "name": "Highwatch Greatsword"
       },
       "highwatch_wallshield": {
-        "name": "Højvagt Murskjold"
+        "name": "Highwatch Wallshield"
       },
       "morthens_cryptforged_hauberk": {
         "name": "Morthens Kryptsmedede Brynje"

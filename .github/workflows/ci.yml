@@ -156,7 +156,7 @@ jobs:
       # only the committed line-item slices are diffed; the test suite also enforces
       # this, this just surfaces it sooner.
       - name: Verify committed i18n artifacts are fresh
-        run: git diff --exit-code -- src/ui/i18n.resolved.generated src/admin/i18n.resolved.generated
+        run: git diff --exit-code -- src/ui/i18n.resolved.generated src/admin/i18n.resolved.generated src/ui/i18n.catalog/translation_keys.generated.ts
 
       # Post the coverage counts of the gitignored i18n.status.summary.json to the job summary as the out-of-band audit trail.
       - name: Post i18n coverage summary
@@ -224,7 +224,7 @@ jobs:
       # only the committed line-item slices are diffed; the test suite also enforces
       # this, this just surfaces it sooner.
       - name: Verify committed i18n artifacts are fresh
-        run: git diff --exit-code -- src/ui/i18n.resolved.generated src/admin/i18n.resolved.generated
+        run: git diff --exit-code -- src/ui/i18n.resolved.generated src/admin/i18n.resolved.generated src/ui/i18n.catalog/translation_keys.generated.ts
 
       # Post the coverage counts of the gitignored i18n.status.summary.json to the job summary as the out-of-band audit trail.
       - name: Post i18n coverage summary

@@ -99,8 +99,9 @@ import {
   type SocialInfo,
   type TradeInfo,
 } from '../world_api';
+import { computeBackoffDelay } from './backoff';
 import { optimisticQuestState } from './quest_state_optimistic';
-import { isTransientReconnectRejection } from './reconnect_policy';
+import { isTransientReconnectRejection, isTransientTimeoutRejection } from './reconnect_policy';
 
 // ---------------------------------------------------------------------------
 // REST
@@ -276,14 +277,17 @@ export class Api {
   }
 
   // Live status for a realm (population + reachability), for the realm picker.
-  async realmStatus(url: string): Promise<{ online: boolean; players: number }> {
+  // `cap` is the realm admission cap (players_cap): a positive number is the real
+  // refusal point; 0 means the cap is disabled or the server predates the field.
+  async realmStatus(url: string): Promise<{ online: boolean; players: number; cap: number }> {
     try {
       const res = await fetch(apiUrl('/api/status', url), { signal: AbortSignal.timeout(3000) });
-      if (!res.ok) return { online: false, players: 0 };
+      if (!res.ok) return { online: false, players: 0, cap: 0 };
       const d = await res.json();
-      return { online: true, players: d.players_online ?? 0 };
+      const cap = typeof d.players_cap === 'number' && d.players_cap > 0 ? d.players_cap : 0;
+      return { online: true, players: d.players_online ?? 0, cap };
     } catch {
-      return { online: false, players: 0 };
+      return { online: false, players: 0, cap: 0 };
     }
   }
 
@@ -905,8 +909,13 @@ const DESPAWN_GRACE_MS = 600;
 // Auto-reconnect backoff for an unexpectedly dropped game socket. The server
 // holds the character in-world (linkdead) for five minutes; the retry window
 // is deliberately longer, since past the grace a successful auth simply
-// performs a fresh join from the last save. 1s, 2s, 4s, 8s, then 15s apart:
-// 40 attempts spans roughly nine minutes before giving up for good.
+// performs a fresh join from the last save. Roughly 1s, 2s, 4s, 8s, then 15s
+// apart, with each delay spread over a 0.5x to 1.5x jitter band and clamped at
+// the 15s cap (computeBackoffDelay) so many clients dropped by one server blip
+// do not retry in lockstep. The clamp trims the band's upper half once the
+// schedule reaches the cap, so across 40 attempts the total runs from roughly
+// 4.6 minutes (every draw at the floor) to 9.4 minutes (every draw at the
+// ceiling), with an expected total near 8 minutes, before giving up for good.
 const RECONNECT_BASE_DELAY_MS = 1_000;
 const RECONNECT_MAX_DELAY_MS = 15_000;
 const RECONNECT_MAX_ATTEMPTS = 40;
@@ -976,6 +985,8 @@ function blankEntity(id: number): Entity {
     critChance: 0.05,
     critRating: 0,
     hasteRating: 0,
+    hitRating: 0,
+    hitBonus: 0,
     critDmgSpellBonus: 0,
     critDmgPhysBonus: 0,
     critDmgHealBonus: 0,
@@ -1223,15 +1234,16 @@ export class ClientWorld implements IWorld {
   professionsState: PlayerProfessionsView = { skills: [] };
   // #1143: persistent town focus allocation, mirrored from the self-wire `tfocus`.
   townFocus: Record<string, number> = {};
-  // Stub for #1121: per-node respawn state is server-authoritative and not yet
-  // wired onto the snapshot (see src/sim/professions/CLAUDE.md), so the client
-  // cannot know another player's, or even its own, real per-node timer yet.
-  // Always reports harvestable; the server re-validates and denies via a
-  // normal error event on an actual attempt, same as every other authoritative
-  // action (see src/net/CLAUDE.md "Never predict an outcome"). Wiring the real
-  // per-player timer is future work once the snapshot carries it.
-  nodeHarvestableByMe(_nodeId: string): boolean {
-    return true;
+  // Per-node respawn readiness (#1121, wired #1866): mirrored from the `ncd`
+  // self-wire delta below, same shape/semantics as `cooldowns` (remaining
+  // seconds as of the last snapshot that changed it; a node with no entry is
+  // ready). The server remains authoritative and re-validates on the actual
+  // `harvest_node` command; this is purely the client's own read of its own
+  // per-player timer, not a prediction of the harvest outcome (src/net/CLAUDE.md
+  // "Never predict an outcome").
+  private nodeCooldowns: Map<string, number> | undefined = new Map();
+  nodeHarvestableByMe(nodeId: string): boolean {
+    return !this.nodeCooldowns?.has(nodeId);
   }
   // Static content read (#1127, extended #1132): the full recipe list (common
   // tier plus combo recipes) ships with the client bundle like every other
@@ -1300,6 +1312,11 @@ export class ClientWorld implements IWorld {
   // consecutive 'character already in world' rejections during a reconnect;
   // see src/net/reconnect_policy.ts for why these are tolerated (bounded)
   private conflictRejections = 0;
+  // consecutive 'authentication timed out' rejections during a reconnect (a
+  // server event-loop stall under saturation, or a database failure that
+  // interrupted the handshake server-side); tolerated on its own bound,
+  // see src/net/reconnect_policy.ts
+  private timeoutRejections = 0;
   private reconnectTimer: number | undefined;
   // set by close() and by a server 'error' frame: the session is over for
   // good, so a subsequent socket close must not schedule a reconnect
@@ -1364,9 +1381,17 @@ export class ClientWorld implements IWorld {
     if (this.sessionEnded) return;
     if (this.ws.readyState === WebSocket.OPEN) return;
     if (this.reconnectTimer !== undefined) {
+      // Retry soon, but with a short random spread (0 to 1000 ms) rather than
+      // instantly, so a fleet of tabs foregrounded together (a phone unlock, a
+      // laptop wake) does not stampede the reconnect endpoint on the same beat.
+      // Reusing reconnectTimer means endSession still clears it and a second
+      // visibilitychange while it is pending takes the clearTimeout branch
+      // below: never two live timers, never a double openSocket.
       clearTimeout(this.reconnectTimer);
-      this.reconnectTimer = undefined;
-      this.openSocket();
+      this.reconnectTimer = window.setTimeout(() => {
+        this.reconnectTimer = undefined;
+        this.openSocket();
+      }, Math.random() * 1000);
       return;
     }
     // No reconnect scheduled yet but the socket is not open: onclose was
@@ -1401,6 +1426,16 @@ export class ClientWorld implements IWorld {
   private socketClosed(): void {
     this.connected = false;
     if (this.sessionEnded) return;
+    // A pending reconnect timer means this close is a duplicate signal of the
+    // SAME physical drop: on the zombie-socket path the visibility handler
+    // drives socketClosed manually and the socket's late real onclose lands
+    // right behind it. One drop counts once: keep the already-scheduled retry
+    // and return, rather than burning a second attempt, re-firing
+    // onConnectionLost, or, at the attempt cap, ending the session while a
+    // legitimate final retry is still pending. (A pending timer can never
+    // belong to a different drop: no socket is open while one is pending, and
+    // the timer clears its own handle before opening the next socket.)
+    if (this.reconnectTimer !== undefined) return;
     if (this.reconnectAttempts >= RECONNECT_MAX_ATTEMPTS) {
       this.endSession();
       this.onDisconnect?.('Connection to the server was lost.');
@@ -1408,11 +1443,19 @@ export class ClientWorld implements IWorld {
     }
     this.reconnectAttempts++;
     this.onConnectionLost?.();
-    const delayMs = Math.min(
+    const delayMs = computeBackoffDelay(
+      this.reconnectAttempts,
+      RECONNECT_BASE_DELAY_MS,
       RECONNECT_MAX_DELAY_MS,
-      RECONNECT_BASE_DELAY_MS * 2 ** (this.reconnectAttempts - 1),
+      Math.random,
     );
-    this.reconnectTimer = window.setTimeout(() => this.openSocket(), delayMs);
+    // Clear our own handle when the timer fires: a stale handle left in
+    // reconnectTimer would make a later visibility event (while the socket is
+    // still CONNECTING) take the pending-timer branch and open a second socket.
+    this.reconnectTimer = window.setTimeout(() => {
+      this.reconnectTimer = undefined;
+      this.openSocket();
+    }, delayMs);
   }
 
   private endSession(): void {
@@ -1585,6 +1628,7 @@ export class ClientWorld implements IWorld {
         // any stale mirrored entities fall out via the snapshot prune
         this.reconnectAttempts = 0;
         this.conflictRejections = 0;
+        this.timeoutRejections = 0;
         this.inputSeq = 0;
         this.lastInputSig = '';
         this.lastInputSentAt = 0;
@@ -1638,6 +1682,15 @@ export class ClientWorld implements IWorld {
         isTransientReconnectRejection(msg.error, this.reconnectAttempts, this.conflictRejections)
       ) {
         this.conflictRejections++;
+        return; // the server closes this socket; onclose schedules the retry
+      }
+      // Mid-reconnect, 'authentication timed out' is the other transient
+      // window: a server event-loop stall kept the handshake from processing
+      // the first auth frame in time, or a database failure interrupted the
+      // handshake server-side. Keep backing off; the next retry lands after
+      // the stall clears or the database recovers. Bounded on its own counter.
+      if (isTransientTimeoutRejection(msg.error, this.reconnectAttempts, this.timeoutRejections)) {
+        this.timeoutRejections++;
         return; // the server closes this socket; onclose schedules the retry
       }
       // any other server rejection (kick, moderation, takeover, failed auth)
@@ -2023,6 +2076,13 @@ export class ClientWorld implements IWorld {
         e.cooldowns.clear();
         for (const k in s.cds) e.cooldowns.set(k, Number(s.cds[k]));
       }
+      // Reassigns rather than clear()+rebuild: unlike the per-Entity `cooldowns`
+      // Map (always constructed by the shared entity factory), this field lives
+      // on ClientWorld itself, and a hand-built test fixture (`Object.create`,
+      // see tests/CLAUDE.md) may not have pre-initialized it.
+      if (s.ncd !== undefined) {
+        this.nodeCooldowns = new Map(Object.entries(s.ncd).map(([k, v]) => [k, Number(v)]));
+      }
       e.gcdRemaining = s.gcd ?? 0;
       e.potionCdRemaining = s.pcd ?? 0;
       e.comboPoints = s.combo ?? 0;
@@ -2044,11 +2104,13 @@ export class ClientWorld implements IWorld {
       e.spellHaste = s.sh ?? 0;
       e.critChance = s.crit ?? 0.05;
       e.dodgeChance = s.dodge ?? 0.05;
-      // Crit/haste RATING are informational paper-doll stats (combat values ride
-      // crit/sh above); sent always like the other self stats so the online
-      // character sheet shows them instead of the blankEntity 0. Server-recomputed.
+      // Crit/haste/hit RATING are informational paper-doll stats (combat values ride
+      // crit/sh above, and hit resolves server-side); sent always like the other self
+      // stats so the online character sheet shows them instead of the blankEntity 0.
+      // Server-recomputed.
       e.critRating = s.crat ?? 0;
       e.hasteRating = s.hrat ?? 0;
+      e.hitRating = s.hirat ?? 0;
       e.weapon = s.weapon ?? e.weapon;
       e.eating = s.eat
         ? { itemId: '', kind: 'food', hpPer2s: 0, manaPer2s: 0, remaining: s.eat.remaining }

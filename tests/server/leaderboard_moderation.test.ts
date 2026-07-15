@@ -52,10 +52,31 @@ async function capturedSql(run: () => Promise<unknown>): Promise<string[]> {
   const spy = vi
     .spyOn(pool, 'query')
     .mockImplementation(() => Promise.resolve(emptyResult()) as never);
+  // The heavy board reads (topArenaRatings / topLifetimeXp / topGuilds /
+  // deedsBoardRanked) run inside runWithStatementTimeout (server/db.ts): a
+  // dedicated pooled client issues BEGIN, SET LOCAL statement_timeout, the real
+  // read(s), then COMMIT. Route the control statements past the spy and forward the
+  // real reads through the spied pool.query, so the captured list is exactly the
+  // real reads (in order). Non-transacted reads (lifetimeXpStanding, ...) still hit
+  // pool.query directly and are unaffected.
+  const connectSpy = vi.spyOn(pool, 'connect').mockImplementation(
+    async () =>
+      ({
+        query: (text: string, values?: unknown[]) =>
+          text === 'BEGIN' ||
+          text === 'COMMIT' ||
+          text === 'ROLLBACK' ||
+          text.startsWith('SET LOCAL')
+            ? Promise.resolve(emptyResult())
+            : (pool.query as (t: string, v?: unknown[]) => Promise<unknown>)(text, values),
+        release() {},
+      }) as unknown as PoolClient,
+  );
   try {
     await run();
     return spy.mock.calls.map((call) => String(call[0]));
   } finally {
+    connectSpy.mockRestore();
     spy.mockRestore();
   }
 }

@@ -74,6 +74,7 @@ Linux artifacts on Linux). Cross-building is not part of this runbook.
 | App Store Connect API key (Team Key, App Manager role) | notarization (notarytool) | CI secrets `APPLE_API_KEY` (path to .p8), `APPLE_API_KEY_ID`, `APPLE_API_ISSUER` |
 | Azure subscription + Artifact Signing account (Basic, USD 9.99/mo, 5000 sigs) | Windows signing | account + certificate profile in the Azure portal (needs identity validation; individuals: US/Canada only, orgs also EU/UK) |
 | Azure service principal with "Trusted Signing Certificate Profile Signer" role | CI auth for signing | CI secrets `AZURE_TENANT_ID`, `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET` |
+| Alternative: a code-signing certificate in Azure Key Vault (Route B, what CI uses) | Windows signing via AzureSignTool | CI secrets `AZURE_KEY_VAULT_URL`, `AZURE_KEY_VAULT_CERTIFICATE` (plus the service principal secrets above, granted vault sign/get access) |
 | Update host: a static HTTPS host / bucket serving `https://updates.worldofclaudecraft.com/desktop/` | website auto-update feed + installer downloads | e.g. Cloudflare R2 bucket behind that hostname (any static host works; the app only GETs) |
 | Steam partner account + app ID + three depot IDs | Steam distribution | partner.steamgames.com |
 | Steamworks publisher Web API key (+ `STEAM_ENABLED=1`, `STEAM_APP_ID`) | the Book of Deeds achievement mirror + account link (`server/steam/`) | game-server runtime env `STEAM_WEB_API_KEY` (see `DEPLOY.md`) |
@@ -139,9 +140,10 @@ the nested Electron frameworks).
 - Verify after a signed build: `codesign --verify --deep --strict "release/mac-universal/World of ClaudeCraft.app"`
   and `spctl -a -t exec -vv <app>` says "accepted, source=Notarized Developer ID".
 
-## Windows: Azure Artifact Signing
+## Windows: Azure signing (two routes)
 
-Signing activates when all four `WIN_SIGN_*` env vars are present at build time on a
+Route A, Azure Artifact Signing (Trusted Signing, electron-builder native):
+activates when all four `WIN_SIGN_*` env vars are present at build time on a
 Windows runner (injected as `win.azureSignOptions` by `scripts/electron-build.mjs`):
 
 - `WIN_SIGN_PUBLISHER_NAME`: must EXACTLY match the certificate subject CN (the
@@ -153,6 +155,29 @@ Windows runner (injected as `win.azureSignOptions` by `scripts/electron-build.mj
 Auth comes from `AZURE_TENANT_ID` + `AZURE_CLIENT_ID` + `AZURE_CLIENT_SECRET`
 (electron-builder drives the TrustedSigning PowerShell module, which reads the
 standard Azure EnvironmentCredential). Timestamping defaults to Microsoft's server.
+
+Route B, Azure Key Vault certificate (what CI uses): activates when the five
+`AZURE_*` env vars below are all present (and the `WIN_SIGN_*` set is not; Route A
+wins if both are configured). `scripts/electron-builder-config.mjs` injects the
+custom sign hook `scripts/electron-win-sign.mjs` as `win.signtoolOptions.sign`
+(pinned to a single sha256 pass); electron-builder invokes the hook for every
+signable file it emits (the NSIS installer, the app exe inside the per-arch zips,
+the uninstaller), and the hook shells out to the
+[AzureSignTool](https://github.com/vcsjones/AzureSignTool) dotnet global tool:
+
+- `AZURE_KEY_VAULT_URL`: the vault URL, e.g. `https://<vault>.vault.azure.net`.
+- `AZURE_TENANT_ID`, `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`: the service
+  principal with certificate/key access to the vault.
+- `AZURE_KEY_VAULT_CERTIFICATE`: the certificate NAME inside the vault (not a URL).
+- Optional: `CODE_SIGN_TIMESTAMP_URL` (only honored when it is an http(s) URL,
+  otherwise the hook defaults to `http://timestamp.digicert.com`),
+  `CODE_SIGN_FILE_DIGEST` and `CODE_SIGN_TIMESTAMP_DIGEST` (default `sha256`).
+
+Note: `WINDOWS_PUBLISHER_NAME` and `CSC_NAME` are NOT read by the Key Vault route.
+`CSC_NAME` is a macOS keychain identity concept, and the publisher name plays no
+part in an AzureSignTool invocation; `WINDOWS_PUBLISHER_NAME` should simply match
+the certificate subject CN so humans comparing the installer's signature details
+against the secret see the same name.
 
 SmartScreen reality: a newly signed app STILL shows "Windows protected your PC" until
 the file hash + publisher accumulate reputation (weeks, hundreds of clean installs).
@@ -170,9 +195,9 @@ website download page offers the AppImage (not the deb): it runs on immutable
 Fedora atomic desktops (Bazzite, Steam Deck) with no system install, just
 `chmod +x` and launch, which the deb cannot do there.
 
-## Publishing from CI (Linux + macOS)
+## Publishing from CI (all three platforms)
 
-The `.github/workflows/desktop-publish.yml` workflow publishes two of the three
+The `.github/workflows/desktop-publish.yml` workflow publishes all three
 platforms automatically:
 
 - Linux: AppImage + deb (x64 + arm64), `SHA256SUMS-linux`, and both per-arch
@@ -182,10 +207,18 @@ platforms automatically:
   (`codesign --verify --deep --strict`, `spctl -a -t exec`) before uploading
   and refuses to run at all without the Apple secrets, so an ad-hoc build can
   never publish.
+- Windows: the Key-Vault-signed universal NSIS installer (one exe covering
+  x64 + arm64) + its `.exe.blockmap` + the per-arch zips, `SHA256SUMS-windows`,
+  and `latest.yml`. The job verifies the installer is Authenticode-signed
+  (`Get-AuthenticodeSignature` must report `Valid`) before uploading and
+  refuses to run at all without the Azure Key Vault secrets, so an unsigned
+  build can never publish. Because the universal installer's exact filename is
+  defined by what electron-builder emits, the job takes the artifact list from
+  `latest.yml` (and rejects a `dev*.yml` misbake) instead of pinning literal
+  names like the linux/mac jobs do.
 
-Windows stays on the manual steps below until Azure Artifact Signing is
-provisioned in CI. The platform jobs are independent: a mac signing failure
-never blocks the Linux publish and vice versa.
+The platform jobs are independent: a mac signing failure never blocks the
+Linux publish and vice versa.
 
 Triggers:
 
@@ -227,7 +260,13 @@ One-time provisioning (maintainer):
      `.p8` file (the workflow writes it to disk and points `APPLE_API_KEY` at
      it; note the manual flow passes a file path here instead).
    - `APPLE_API_KEY_ID`, `APPLE_API_ISSUER`: as in the manual flow.
-5. Public read: the custom domain makes the bucket publicly readable through
+5. GitHub repo secrets, Azure set (the five required ones or the windows job
+   refuses to run): `AZURE_TENANT_ID`, `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`,
+   `AZURE_KEY_VAULT_URL`, `AZURE_KEY_VAULT_CERTIFICATE`, plus the optional
+   `CODE_SIGN_TIMESTAMP_URL`, `CODE_SIGN_FILE_DIGEST`,
+   `CODE_SIGN_TIMESTAMP_DIGEST` (see "Windows: Azure signing", Route B;
+   `WINDOWS_PUBLISHER_NAME` and `CSC_NAME` are not consumed by this path).
+6. Public read: the custom domain makes the bucket publicly readable through
    that hostname only, which is exactly what the updater and download page need;
    do not additionally enable the `r2.dev` public URL.
 
@@ -248,13 +287,12 @@ SHA256SUMS-mac --ignore-missing` on macOS) from their download directory.
 1. Bump `version` in `package.json` (the feed is version-ordered; see rollback),
    and match `DESKTOP_VERSION` in `src/game/desktop_download.ts` so the download
    page links point at the new build (the static hrefs in `index.html` are the
-   no-JS fallback; keep them on the same version). The page offers macOS (dmg)
-   and Linux (AppImage); Windows stays "pending" until its installer is uploaded.
+   no-JS fallback; keep them on the same version).
 2. Build on each OS runner with signing env present: `npm run electron:build`,
-   with `VITE_DESKTOP_API_ORIGIN` unset or set to the production origin. macOS
-   and Linux are built and published by CI on the release tag (see "Publishing
-   from CI"); CI leaves the origin unset, so it always bakes production. Only
-   Windows still needs a manual runner. A
+   with `VITE_DESKTOP_API_ORIGIN` unset or set to the production origin. All
+   three platforms are built and published by CI on the release tag (see
+   "Publishing from CI"); CI leaves the origin unset, so it always bakes
+   production. A
    production release MUST emit `latest*.yml` feed files (`latest.yml` on
    Windows, `latest-mac.yml`, `latest-linux*.yml`); if the build produced
    `dev*.yml` instead, it was baked with a non-production origin: rebuild, do
@@ -273,7 +311,9 @@ SHA256SUMS-mac --ignore-missing` on macOS) from their download directory.
    - macOS: handled by CI; the manual list, should CI ever be bypassed:
      `world-of-claudecraft-<v>-mac-universal.dmg` (download page),
      `...-mac-universal.zip` + `.zip.blockmap` (updater), `latest-mac.yml`.
-   - Windows: with x64+arm64 and no `nsis` block, electron-builder's
+   - Windows: handled by CI (which takes the artifact list from `latest.yml`,
+     see "Publishing from CI"). For a manual upload, should CI ever be
+     bypassed: with x64+arm64 and no `nsis` block, electron-builder's
      `buildUniversalInstaller` default (true) emits ONE combined NSIS installer
      covering both arches (not per-arch `-win-x64.exe` / `-win-arm64.exe`), plus
      its `.exe.blockmap` and `latest.yml`. Upload exactly what `release/` holds;

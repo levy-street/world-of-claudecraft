@@ -34,7 +34,7 @@ describe('CI workflow parity', () => {
     for (const job of [prGate, releaseGate]) {
       expect(job).toContain('run: node scripts/i18n_coverage_summary.mjs');
       expect(job).toContain(
-        'run: git diff --exit-code -- src/ui/i18n.resolved.generated src/admin/i18n.resolved.generated',
+        'run: git diff --exit-code -- src/ui/i18n.resolved.generated src/admin/i18n.resolved.generated src/ui/i18n.catalog/translation_keys.generated.ts',
       );
       expect(job).not.toContain('src/ui/i18n.status.summary.json');
     }

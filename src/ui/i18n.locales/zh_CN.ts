@@ -5,246 +5,16 @@
 // translate that key. The build (scripts/i18n_build.mjs) unflattens this map and
 // overlays it onto nested `en` to produce the dense resolved table; any key here
 // must be a real `en` leaf path: keys are typed `Partial<Record<TranslationKey,
-// string>>` so tsc rejects a structurally-wrong key, plus
-// tests/i18n_overlay_key_membership.test.ts catches a typo'd entity id the
-// template-literal key type cannot. Overlays are SPARSE: an
+// string>>` against the build-generated flat key union, so tsc rejects any key
+// that is not an exact `en` leaf path, typo'd entity ids included. Overlays are SPARSE: an
 // untranslated key is omitted and the build fills it from English, then the
 // registry (src/ui/i18n.status.json) marks it `pending`.
 
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
-  'entities.items.eastbrook_greatsword.name': '东溪巨剑',
-  'entities.items.highwatch_greatsword.name': '高望巨剑',
-  'entities.items.highwatch_wallshield.name': '高望壁盾',
-  'entities.items.eastbrook_buckler.name': '东溪小圆盾',
-  'entities.abilities.avatar.name': '战争化身',
-  'entities.abilities.avatar.description':
-    '化身为巨像，持续 20 秒，解除你身上的所有控制效果，并使你造成的伤害提高 20%。',
-  'entities.abilities.bladestorm.name': '剑刃风暴',
-  'entities.abilities.bladestorm.description':
-    '化身为一道旋转的钢铁风暴，在 4 秒内每秒对 8 码内的所有敌人造成 {damage} 点伤害。',
-  'entities.abilities.battle_stance.description':
-    '一种具有侵略性的战斗姿态：你产生的怒气提高 10%。武器和防护专精的默认姿态。',
-  'entities.abilities.battle_stance.name': '战斗姿态',
-  'entities.abilities.berserker_stance.description':
-    '一种鲁莽的战斗姿态：你的暴击几率提高 3%，暴击伤害提高 3%。狂怒战士始终以此姿态作战。',
-  'entities.abilities.berserker_stance.name': '狂暴姿态',
-  'entities.abilities.breachmaker.description':
-    '重击目标，造成武器伤害加 {damage}，并破开其防御：你对它的攻击造成的伤害提高 20%，持续 8 秒。（武器）',
-  'entities.abilities.breachmaker.name': '破防者',
-  'entities.abilities.cleaving_blows.description': '血色收割必定返还一次双重打击的充能。（狂怒）',
-  'entities.abilities.cleaving_blows.name': '顺劈打击',
-  'entities.abilities.deep_wounds.description':
-    '被动：你的致残打击会使目标流血，在 6 秒内造成物理伤害。（武器）',
-  'entities.abilities.deep_wounds.name': '裂创',
-  'entities.abilities.defiant_bellow.description':
-    '一声挑衅的怒吼：10 码内的每个敌人都被嘲讽，被迫攻击你 3 秒。（防护）',
-  'entities.abilities.defiant_bellow.name': '挑衅怒吼',
-  'entities.abilities.diabolical_twinstrike.description':
-    '处于激怒状态时，你的双重打击造成的伤害提高 15%。（狂怒）',
-  'entities.abilities.diabolical_twinstrike.name': '邪恶双重打击',
-  'entities.abilities.die_by_sword.description':
-    '防御性冷却技能：持续 8 秒，你受到的伤害降低 30%，并大幅提高躲闪攻击的几率。',
-  'entities.abilities.die_by_sword.name': '剑在人在',
-  'entities.abilities.emboldening_roar.description':
-    '发出一声鼓舞的怒吼：你和 40 码内的友方玩家获得鼓舞，你接下来的 3 个技能必定暴击。（狂怒）',
-  'entities.abilities.emboldening_roar.name': '鼓舞怒吼',
-  'entities.abilities.enrage_passive.description':
-    '被动：处于激怒状态时，你造成的伤害提高 7%，攻击速度提高 25%，移动速度提高 10%，持续 4 秒。放血有 30% 几率使你激怒；血色收割则必定触发。（狂怒）',
-  'entities.abilities.enrage_passive.name': '暴乱',
-  'entities.abilities.faultline.description':
-    '沿地面发出一道冲击波：你前方 8 码内的敌人受到 {damage} 点伤害，并昏迷 3 秒。（防护）',
-  'entities.abilities.faultline.name': '地裂',
-  'entities.abilities.furious_mending.description':
-    '持续 10 秒，你受到的伤害降低 20%，并且在此期间你的放血会为你治疗相当于最大生命值 20% 的生命。（狂怒）',
-  'entities.abilities.furious_mending.name': '狂怒愈合',
-  'entities.abilities.heroic_leap.description':
-    '跃向目标区域，在落地时对附近的敌人造成 {damage} 点伤害。',
-  'entities.abilities.heroic_leap.name': '英勇飞跃',
-  'entities.abilities.intimidating_shout.description':
-    '一声骇人的怒吼，使 8 码内至多 5 个敌人恐惧逃散 8 秒。伤害可能打破效果。',
-  'entities.abilities.intimidating_shout.name': '破胆怒吼',
-  'entities.abilities.iron_resolve.description':
-    '咬紧牙关、无视疼痛：消耗最多 40 点怒气（至少 20 点），每消耗 1 点怒气可吸收 4 点伤害，持续最多 10 秒。（防护）',
-  'entities.abilities.iron_resolve.name': '钢铁意志',
-  'entities.abilities.measured_fury.description':
-    '你收放自如的怒火让消耗更精打细算：你的技能怒气消耗降低 10%。（武器）',
-  'entities.abilities.measured_fury.name': '蓄怒',
-  'entities.abilities.piercing_howl.description':
-    '一声穿刺的呼喝，使 15 码内的所有敌人减速 50%，持续 8 秒。',
-  'entities.abilities.piercing_howl.name': '穿刺怒吼',
-  'entities.abilities.raging_gale.description':
-    '立即用武器攻击两次，每次命中造成 40% 武器伤害加 {damage}，并产生 8 点怒气。最多储存 2 次充能。（狂怒）',
-  'entities.abilities.raging_gale.name': '双重打击',
-  'entities.abilities.raised_guard.description':
-    '举盾防身：你受到的物理伤害降低 50%，持续 6 秒。最多储存 2 次充能。（防护）',
-  'entities.abilities.raised_guard.name': '举盾格挡',
-  'entities.abilities.rallying_cry.description':
-    '发出英勇怒吼，使你和 40 码内的队伍成员的最大生命值提高 20%，持续 10 秒。防护专精的受益者在此期间受到的伤害还会降低 5%。',
-  'entities.abilities.rallying_cry.name': '英勇怒吼',
-  'entities.abilities.recklessness.description':
-    '激怒：你的怒气产生提高 50%，暴击几率提高 20%，持续 12 秒。',
-  'entities.abilities.recklessness.name': '鲁莽',
-  'entities.abilities.red_harvest.description':
-    '倾尽所有：在狂乱中攻击三次，每次造成65%武器伤害加 {damage}，并必定使你激怒。（狂怒）',
-  'entities.abilities.red_harvest.name': '血色收割',
-  'entities.abilities.revenge.description':
-    '以宽阔的弧线攻击，对你前方所有敌人造成物理伤害。目标超过 5 个时伤害降低。当你躲闪或招架时，你的下一次复仇可能不消耗怒气。 (Protection)',
-  'entities.abilities.revenge.name': '复仇',
-  'entities.abilities.sanguine_aura.description':
-    '以敌人之血浸染你的武器：你和你的近战盟友获得 10% 攻击速度和 10% 伤害加成，持续 20 秒。',
-  'entities.abilities.sanguine_aura.name': '血色光环',
-  'entities.abilities.seasoned_soldier.description':
-    '你的自动攻击暴击时产生的怒气提高 10%。（武器）',
-  'entities.abilities.seasoned_soldier.name': '沙场老兵',
-  'entities.abilities.storm_bolt.description':
-    '将你的武器掷向目标，造成 {damage} 点伤害，并使其昏迷 3 秒。',
-  'entities.abilities.storm_bolt.name': '风暴之锤',
-  'entities.abilities.sudden_death.description':
-    '你的自动攻击有几率让你对任意生命值的目标施放早赴黄泉，且不消耗怒气。（武器）',
-  'entities.abilities.sudden_death.name': '骤死',
-  'entities.abilities.sweeping_strikes.description':
-    '持续 12 秒，你的单体攻击还会以全额伤害额外打击 1 个附近的敌人。（武器）',
-  'entities.abilities.sweeping_strikes.name': '扩弧斩',
-  'entities.abilities.victory_rush.description':
-    '攻击造成武器伤害加 {damage}，并治疗相当于最大生命值 20% 的生命。仅可在击杀敌人后 20 秒内使用。',
-  'entities.abilities.victory_rush.name': '乘胜追击',
-  'hudChrome.specPanel.complexity': '复杂度',
-  'hudChrome.specPanel.complexityHigh': '高',
-  'hudChrome.specPanel.complexityLow': '低',
-  'hudChrome.specPanel.complexityMedium': '中等',
-  'hudChrome.specPanel.exampleAbilities': '示例技能',
-  'hudChrome.specPanel.primaryAttr': '主属性',
-  'hudChrome.specPanel.selectSpec': '选择专精',
-  'hudChrome.specPanel.viewTalents': '查看天赋',
-  'hudChrome.talentRows.comingSoon': '敬请期待',
-  'hudChrome.talentRows.defaultLoadout': '默认配置',
-  'hudChrome.talentRows.tab': '抉择',
-  'hudChrome.talentRows.readoutSummary': '天赋：{head}，已选择 {spent}/{total} 行。',
-  'entities.abilities.aspect_of_the_wild.name': '野牙伪装',
-  'entities.abilities.aspect_of_the_wild.description':
-    '以野性力量激励30码内的盟友，使其攻击强度提高45、攻击速度提高5%，持续5分钟。（猎人天赋）',
-  'entities.abilities.aura_surge.name': '曙光弹射',
-  'entities.abilities.aura_surge.description':
-    '掷出曙光铸造的盾牌，造成{damage}点神圣伤害并使首要目标沉默2秒，随后弹射至10码内最多2个额外敌人，每次弹射造成75%伤害。（圣骑士天赋）',
-  'entities.abilities.avenging_wrath.name': '复仇之翼',
-  'entities.abilities.avenging_wrath.description':
-    '召唤复仇之力，使你的攻击强度提高60、法术强度提高30，持续20秒。（圣骑士天赋）',
-  'entities.abilities.berserk.name': '赤红迷雾',
-  'entities.abilities.berserk.description': '使你的攻击强度提高70，持续15秒。（德鲁伊天赋）',
-  'entities.abilities.blink.name': '闪烁步',
-  'entities.abilities.blink.description': '使你向前传送15码并解除定身效果。（法师天赋）',
-  'entities.abilities.bloodlust.name': '战鼓',
-  'entities.abilities.bloodlust.description':
-    '使30码内的盟友陷入狂乱，攻击速度提高30%，持续15秒。（萨满天赋）',
-  'entities.abilities.chain_lightning.name': '叉状闪电',
-  'entities.abilities.chain_lightning.description':
-    '向目标区域投掷闪电，对附近的敌人造成{damage}点伤害。（萨满天赋）',
-  'entities.abilities.chaos_bolt.name': '毁灭箭',
-  'entities.abilities.chaos_bolt.description':
-    '投掷一枚混沌火焰弹，造成{damage}点火焰伤害。（术士天赋）',
-  'entities.abilities.cleansing_verdict.name': '净化裁决',
-  'entities.abilities.cleansing_verdict.description':
-    '净化一个友方目标身上的有害魔法效果，并为其恢复{damage}点生命值。',
-  'entities.abilities.cloak_of_shadows.name': '暗影斗篷',
-  'entities.abilities.cloak_of_shadows.description':
-    '以暗影包裹你，在5秒内吸收420点伤害。（潜行者天赋）',
-  'entities.abilities.cone_of_cold.name': '寒霜横扫',
-  'entities.abilities.cone_of_cold.description':
-    '以寒霜冲击附近的敌人，造成{damage}点冰霜伤害。（冰霜专精招牌技能）',
-  'entities.abilities.curse_of_exhaustion.name': '铅沉妖咒',
-  'entities.abilities.curse_of_exhaustion.description':
-    '诅咒目标，使其移动速度降低30%，持续12秒。（术士天赋）',
-  'entities.abilities.death_coil.name': '墓穴缠卷',
-  'entities.abilities.death_coil.description':
-    '攻击敌人并造成{damage}点暗影伤害，随后使其恐惧3秒。（术士天赋）',
-  'entities.abilities.deep_freeze.name': '死霜',
-  'entities.abilities.deep_freeze.description':
-    '将目标深度冻结，造成{damage}点冰霜伤害并使其昏迷4秒。（法师天赋）',
-  'entities.abilities.desperate_prayer.name': '最后祈祷',
-  'entities.abilities.desperate_prayer.description': '立即为你恢复{damage}点生命值。（牧师天赋）',
-  'entities.abilities.deterrence.name': '鬃刺守卫',
-  'entities.abilities.deterrence.description':
-    '使你的躲闪几率提高50个百分点，持续10秒。（猎人天赋）',
-  'entities.abilities.divine_shield.name': '圣光守护',
-  'entities.abilities.divine_shield.description':
-    '以神圣之力保护你，在8秒内吸收900点伤害。（圣骑士天赋）',
-  'entities.abilities.earthbind.name': '攫握大地',
-  'entities.abilities.earthbind.description': '将附近的敌人束缚于大地，使其定身2秒。（萨满天赋）',
-  'entities.abilities.evocation.name': '以太之井',
-  'entities.abilities.evocation.description': '立即恢复220点法力值。（法师天赋）',
-  'entities.abilities.frenzied_regeneration.name': '野性愈合',
-  'entities.abilities.frenzied_regeneration.description':
-    '在10秒内恢复180点生命值。只能在熊形态下使用。（德鲁伊天赋）',
-  'entities.abilities.frost_trap.name': '霜纹陷阱',
-  'entities.abilities.frost_trap.description':
-    '冻结目标区域内的敌人3秒，使其无法移动或行动。（猎人天赋）',
-  'entities.abilities.ghostly_strike.name': '幽魂打击',
-  'entities.abilities.ghostly_strike.description':
-    '攻击敌人，造成武器伤害加{damage}点伤害，短暂提高躲闪并获得1个连击点。（潜行者天赋）',
-  'entities.abilities.hammer_of_wrath.name': '鸣钟之锤',
-  'entities.abilities.hammer_of_wrath.description':
-    '向受伤的敌人投掷神圣之锤，造成{damage}点神圣伤害。只能对生命值低于20%的目标使用。（圣骑士天赋）',
-  'entities.abilities.healing_stream.name': '泉涌',
-  'entities.abilities.healing_stream.description':
-    '在12秒内为一个友方目标恢复120点生命值。（萨满天赋）',
-  'entities.abilities.holy_wrath.name': '圣徒之怒',
-  'entities.abilities.holy_wrath.description':
-    '释放神圣之力，对附近的敌人造成{damage}点伤害。（圣骑士天赋）',
-  'entities.abilities.howl_of_terror.name': '恐惧嚎叫',
-  'entities.abilities.howl_of_terror.description':
-    '使附近的敌人恐惧，最多持续3秒。受到伤害可能打破该效果。（术士天赋）',
-  'entities.abilities.ice_block.name': '寒冰棺',
-  'entities.abilities.ice_block.description':
-    '将你封入寒冰，在8秒内吸收600点伤害。封入期间你无法行动。再次施放可取消效果。（法师天赋）',
-  'entities.abilities.inner_focus.name': '静心',
-  'entities.abilities.inner_focus.description':
-    '使你的下一个法术不消耗资源。持续60秒。（牧师天赋）',
-  'entities.abilities.innervate.name': '生命树液',
-  'entities.abilities.innervate.description':
-    '生命树液在你体内涌动10秒，分波恢复20点当前资源，可恢复法力、怒气或能量。变形不会中断效果。睡眠、昏迷或停滞会使树液停止涌动。（德鲁伊天赋）',
-  'entities.abilities.meteor.name': '天石',
-  'entities.abilities.meteor.description':
-    '在目标区域召唤一颗陨石，造成{damage}点火焰伤害，随后使区域内的敌人在6秒内每2秒受到12至18点火焰伤害。（法师天赋）',
-  'entities.abilities.mind_sear.name': '灼思',
-  'entities.abilities.mind_sear.description':
-    '在目标区域引导暗影能量，每秒对附近的敌人造成{damage}点伤害。（牧师天赋）',
-  'entities.abilities.multi_shot.name': '分裂射击',
-  'entities.abilities.multi_shot.description':
-    '向目标区域射出散射箭，对8码内的敌人造成{damage}点物理伤害。（猎人天赋）',
-  'entities.abilities.prayer_of_healing.name': '圣歌愈疗',
-  'entities.abilities.prayer_of_healing.description':
-    '为附近的盟友恢复{damage}点生命值。（牧师天赋）',
-  'entities.abilities.preparation.name': '应变',
-  'entities.abilities.preparation.description': '结束疾跑、闪避和消失的冷却时间。（潜行者天赋）',
-  'entities.abilities.presence_of_mind.name': '疾思',
-  'entities.abilities.presence_of_mind.description':
-    '使你的下一个有施法时间的法术变为瞬发。持续60秒。（法师天赋）',
-  'entities.abilities.psychic_scream.name': '心灵尖啸',
-  'entities.abilities.psychic_scream.description':
-    '使附近的敌人恐惧，最多持续4秒。受到伤害可能打破该效果。（牧师天赋）',
-  'entities.abilities.shadowstep.name': '影步',
-  'entities.abilities.shadowstep.description': '穿过暗影，向你的目标迈进。（潜行者天赋）',
-  'entities.abilities.silence.name': '沉默',
-  'entities.abilities.silence.description': '使目标沉默4秒。（牧师天赋）',
-  'entities.abilities.smoke_screen.name': '烟幕',
-  'entities.abilities.smoke_screen.description': '遁入烟雾之中，使你的躲闪几率提高30%，持续8秒。',
-  'entities.abilities.spellsteal.name': '夺法',
-  'entities.abilities.spellsteal.description': '从敌人身上窃取一个有益魔法效果并转移到自己身上。',
-  'entities.abilities.startle_shot.name': '惊扰射击',
-  'entities.abilities.startle_shot.description':
-    '狂野射击使目标迷惑{duration}秒。受到任何伤害都会打破该效果。',
-  'entities.abilities.tranquility.name': '林地之歌',
-  'entities.abilities.tranquility.description':
-    '引导恢复能量4秒，每秒为30码内的盟友恢复42至52点生命值。（德鲁伊天赋）',
-  'entities.abilities.typhoon.name': '台风',
-  'entities.abilities.typhoon.description':
-    '一阵狂风将8码内的所有敌人击退并使其昏乱，使其移动速度降低50%，持续4秒。',
-  'entities.abilities.voidfeast.name': '虚空盛宴',
-  'entities.abilities.voidfeast.description':
-    '吞噬一个魔法效果（敌人的增益或盟友的减益），并恢复你最大生命值的6%。',
-  'hudChrome.abilityError.shieldRequired': '你必须装备一面盾牌。',
+  'hudChrome.discord.roleTag.legend': '传奇',
+  'hudChrome.discord.roleTag.shill': '布道者',
   'hudChrome.wocStore.title': 'WOC 商店',
   'hudChrome.wocStore.close': '关闭 WOC 商店',
   'hudChrome.wocStore.tabsLabel': 'WOC 商店分区',
@@ -782,6 +552,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.names.spellPower': '法术强度',
   'hudChrome.statInfo.names.critRating': '暴击等级',
   'hudChrome.statInfo.names.hasteRating': '急速等级',
+  'hudChrome.statInfo.names.hitRating': '命中等级',
+  'hudChrome.statInfo.desc.hitRating':
+    '来自装备和套装奖励的命中等级，降低你的攻击被闪避和法术被抵抗的几率，对更高等级的敌人尤其有效。约每10点等级提供1%命中。',
   'hudChrome.statInfo.names.warfare': '战争',
   'hudChrome.statInfo.warfareValue': '造成伤害 +{increase}% / 承受伤害 -{reduction}%',
   'hudChrome.statInfo.desc.critRating':
@@ -1350,6 +1123,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'loading.connectionLost': '与服务器的连接已断开。',
   'loading.reconnecting': '连接已断开。正在重新连接...',
   'loading.connectionRejected': '服务器关闭了连接。',
+  'loading.realmFull': '当前服务器已满，请稍后几分钟再试。',
+  'loading.tooManyConnections':
+    '您的网络向该服务器发起的连接过多。请关闭多余的游戏窗口，或稍后几分钟再试。',
   'errors.nothingInteract': '附近没有可互动目标。',
   'errors.noEnemyNearby': '附近没有敌人。',
   'errors.characterNameRequired': '请输入角色名称。',
@@ -1396,9 +1172,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'realm.medium': '中',
   'realm.low': '低',
   'realm.popTipLow': '人数较少：当前在线玩家不足 15 人。空间充足，适合全新开始。',
-  'realm.popTipMedium': '人数适中：当前在线玩家 15 至 39 人。健康活跃的服务器。',
-  'realm.popTipHigh': '人数较多：当前在线玩家 40 至 79 人。繁忙，玩家众多。',
-  'realm.popTipFull': '人数已满：当前在线玩家 80 人或以上。非常繁忙；登录时可能需要排队。',
+  'realm.popTipMedium': '人数适中：当前在线玩家 15 至 79 人。健康活跃的服务器。',
+  'realm.popTipHigh': '人数较多：当前在线玩家 80 人以上。繁忙，玩家众多。',
+  'realm.popTipFull': '人数已满：当前服务器已达到玩家上限。在有玩家退出之前，新的登录会被拒绝。',
   'realm.popTipOffline': '离线：此服务器当前无法连接，无法加入。',
   'realm.characterCountOne': '{count} 个角色',
   'realm.characterCountOther': '{count} 个角色',
@@ -1867,7 +1643,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.pet.defensiveDesc': '攻击伤害你或你宠物的敌人。',
   'hud.pet.aggressiveDesc': '攻击附近的敌对敌人。',
   'hud.pet.rename': '重命名宠物',
-  'hud.pet.revive': '修补',
+  'hud.pet.revive': '复活宠物',
   'hud.pet.abandon': '放弃宠物',
   'hud.pet.cancel': '取消',
   'hud.pet.renameLabel': '选择一个新的宠物名称。',
@@ -2069,7 +1845,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.money.silver': '银币',
   'itemUi.money.copper': '铜币',
   'itemUi.slots.mainhand': '主手',
-  'itemUi.slots.offhand': '副手',
   'itemUi.slots.chest': '胸部',
   'itemUi.slots.legs': '腿部',
   'itemUi.slots.feet': '脚部',
@@ -2260,12 +2035,17 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '一次强力攻击，使近战伤害提高 {damage}。在你的下一次挥击时触发。',
   'entities.abilities.battle_shout.name': '铁血怒吼',
   'entities.abilities.battle_shout.description': '使你的攻击强度提高 {buff}，持续 2 分钟。',
+  'entities.abilities.commanding_shout.name': '鼓舞呐喊',
+  'entities.abilities.commanding_shout.description': '使你的耐力提高 {buff}，持续 2 分钟。',
   'entities.abilities.demoralizing_shout.name': '恐怖嚎叫',
   'entities.abilities.demoralizing_shout.description':
     '发出可怕的怒吼，使附近所有敌人的攻击强度降低 {buff}，持续 30 秒。',
   'entities.abilities.charge.name': '突进',
   'entities.abilities.charge.description':
     '向一名敌人冲锋，产生 9 点怒气并使其昏迷 1 秒。8-25 码距离。',
+  'entities.abilities.rend.name': '深创',
+  'entities.abilities.rend.description':
+    '撕裂目标，使其流血，在 {duration} 秒内受到 {damage} 点伤害。',
   'entities.abilities.thunder_clap.name': '震地一击',
   'entities.abilities.thunder_clap.description':
     '轰击附近敌人，造成 {damage} 点伤害，并使其攻击速度降低 10%，持续 10 秒。',
@@ -2598,6 +2378,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '为一个友方目标恢复 {damage} 点生命值，并在 21 秒内额外恢复一定生命值。',
   'entities.abilities.barkskin.name': '橡树皮',
   'entities.abilities.barkskin.description': '你的皮肤硬化如树皮，使护甲提高 150，持续 15 秒。',
+  'entities.abilities.ironhold.name': '铁壁',
+  'entities.abilities.ironhold.description':
+    '以坚固的防御自守，使受到的所有伤害降低 40%，持续 8 秒。',
+  'entities.abilities.sacred_bulwark.name': '神圣壁垒',
+  'entities.abilities.sacred_bulwark.description':
+    '在 {duration} 秒内，下一次会杀死你的敌人攻击将被抵消，转而将你恢复至 35% 生命值。',
+  'entities.abilities.primal_reflexes.name': '野性反射',
+  'entities.abilities.primal_reflexes.description':
+    '你的本能变得敏锐，使闪避几率提高 50%，持续 6 秒。',
   'entities.abilities.starfire.name': '天陨',
   'entities.abilities.starfire.description': '召下一道星辰之火，造成 {damage} 点奥术伤害。',
   'entities.abilities.travel_form.name': '迅捷形态',
@@ -2673,9 +2462,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.name': '剐削',
   'entities.abilities.rake.description':
     '一记潜行起手技，以武器伤害外加{damage}撕抓敌人，并造成持续9秒的流血伤害。获得1点连击点数。仅限狼形态使用。',
-  'entities.abilities.revive_pet.name': '修补',
-  'entities.abilities.revive_pet.description':
-    '修补你的宠物。若其存活，在12秒内每3秒恢复一次生命值，共恢复{overTime}点；若其死亡，则以35%生命值将其复活。',
+  'entities.abilities.revive_pet.name': '复活宠物',
+  'entities.abilities.revive_pet.description': '复活你死去的宠物，并将其召回身边。',
   'entities.abilities.holy_shock.name': '神圣震击',
   'entities.abilities.holy_shock.description':
     '以神圣能量震击一个友方目标，为其恢复{damage}点生命值。（神圣专精招牌）',
@@ -4802,6 +4590,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.blessing_of_might': '提升友方目标的攻击强度，开怪前施放正合适。',
   'guide.abilityHook.charge': '冲向远处的敌人，以一次短暂的昏迷开场。',
   'guide.abilityHook.cheap_shot': '从潜行中起手，眩晕目标并抢先积攒连击点。',
+  'guide.abilityHook.commanding_shout': '提升耐力，让所有人在战斗中更耐打。',
   'guide.abilityHook.concussive_shot': '使目标晕头转向并减速，让它无法接近你。',
   'guide.abilityHook.conjure_food': '制造食物，坐下进食时可以恢复生命值。',
   'guide.abilityHook.conjure_water': '制造饮品以恢复法力，让你在两次开怪之间补给。',
@@ -4834,6 +4623,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.power_word_shield': '为盟友裹上一层护盾，在伤害落地前先吸收。',
   'guide.abilityHook.raptor_strike': '一记沉重的近战挥击，用于有东西贴近你时。',
   'guide.abilityHook.rejuvenation': '瞬发施放，持续治疗盟友，让你可以继续行动。',
+  'guide.abilityHook.rend': '造成一道流血，让目标随时间逐渐被消耗。',
   'guide.abilityHook.renew': '随时间持续跳动的治疗，适合施放后继续移动。',
   'guide.abilityHook.rockbiter_weapon': '为你的武器附魔，让每一次近战挥击更重。',
   'guide.abilityHook.seal_of_righteousness': '为你的挥击附加神圣伤害，再用裁决将其释放出去。',
@@ -5650,6 +5440,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.attackSpeedFast': '攻击速度提高 {pct}%',
   'hudChrome.auraEffect.haste': '攻击速度和施法速度提高 {pct}%',
   'hudChrome.auraEffect.tongues': '施法时间延长 {pct}%',
+  'hudChrome.auraEffect.damageReduction': '受到的所有伤害降低 {pct}%',
+  'hudChrome.auraEffect.guardianWard': '下一次敌人的致命攻击会改为将你的生命值恢复至 {pct}%',
   'hudChrome.auraEffect.increase.ap': '攻击强度提高 {value}',
   'hudChrome.auraEffect.increase.armor': '护甲提高 {value}',
   'hudChrome.auraEffect.increase.int': '智力提高 {value}',
@@ -5878,8 +5670,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.roleTag.seniormods': '高级管理员',
   'hudChrome.discord.roleTag.juniormods': '初级管理员',
   'hudChrome.discord.roleTag.contentcreator': '内容创作者',
-  'hudChrome.discord.roleTag.legend': '传奇',
-  'hudChrome.discord.roleTag.shill': '推广者',
   'hudChrome.discord.voice.channel': '在{channel}',
   'hudChrome.discord.swag.title': '周边',
   'hudChrome.discord.swag.free': '免费',
@@ -6619,6 +6409,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.mining': '采矿',
   'hudChrome.gathering.logging': '伐木',
   'hudChrome.gathering.herbalism': '草药学',
+  'hudChrome.gathering.notReady': '这个资源节点尚未为你重新生成。',
   'hudChrome.archetypeTitle.label': '称号',
   'hudChrome.archetypeTitle.none': '无',
   'hudChrome.archetypeTitle.hobbyLabel': '爱好',
@@ -7224,6 +7015,4 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.social.slashBody':
     '有几条日常命令值得记住：/w 名字 发送密语，/r 回复你最近收到的一条，/invite 邀请某人加入你的小队，/follow 跟随一位好友的脚步，/roll 为全队掷骰，/who 显示谁在线，/afk 将你标记为离开。在游戏中输入 /help 可查看完整列表。',
   'guide.social.slashHeading': '实用的斜杠命令',
-  'guide.abilityHook.revenge': '横扫你前方的敌人，并可能在躲闪或招架后不消耗资源。',
-  'guide.abilityHook.hamstring': '妨碍敌人的移动，使其无法逃脱。',
 };

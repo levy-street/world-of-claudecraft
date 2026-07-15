@@ -618,12 +618,12 @@ export const es_ES: EnTranslations = {
       "update": "Actualizar"
     },
     "cameraPrompt": {
-      "title": "Elige tu cámara",
-      "intro": "Elige cómo sigue la cámara a tu personaje.",
-      "mouseDesc": "Mueve el ratón para girar la cámara sin mantener pulsado ningún botón.",
-      "classicTitle": "Cámara clásica",
-      "classicDesc": "Mantén pulsado el botón derecho y mueve el ratón para girar la cámara.",
-      "changeLater": "Puedes cambiar esto más tarde en Esc, Atajos de teclado.",
+      "title": "Elige tu camara",
+      "intro": "Elige como la camara sigue a tu personaje.",
+      "mouseDesc": "Mueve el raton para girar la camara sin mantener ningun boton.",
+      "classicTitle": "Camara Clasica",
+      "classicDesc": "Mantén el clic derecho y mueve el raton para girar la camara.",
+      "changeLater": "Puedes cambiarlo mas adelante en Esc, Asignacion de teclas.",
       "confirm": "Confirmar"
     },
     "castBar": {
@@ -672,11 +672,11 @@ export const es_ES: EnTranslations = {
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m} min {s} s",
       "seconds": "{s} s",
-      "autoShowHint": "Las filas aparecen automáticamente cuando tu grupo inflige daño o sana, y este segmento se cierra unos segundos después de que termine el combate."
+      "autoShowHint": "Las filas aparecen automaticamente cuando tu grupo inflige dano o curacion, y este panel se cierra unos segundos despues de que el combate termine."
     },
     "petFeed": {
-      "disabledFullHp": "La mascota tiene la salud al máximo",
-      "disabledNoFood": "Ningún alimento de tus bolsas curará a tu mascota"
+      "disabledFullHp": "La mascota tiene la salud al maximo",
+      "disabledNoFood": "No hay comida en tus bolsas que cure a tu mascota"
     },
     "keybinds": {
       "emoteWheel": "Rueda de gestos",
@@ -684,7 +684,7 @@ export const es_ES: EnTranslations = {
       "targetFriendlyNext": "Objetivo amistoso siguiente",
       "discord": "Discord",
       "valecup": "Copa del Valle",
-      "sheathe": "Sheathe/Unsheathe Weapon",
+      "sheathe": "Envainar/Desenvainar arma",
       "categoryPet": "Mascota",
       "petAttack": "Mascota: atacar",
       "petStop": "Mascota: detenerse",
@@ -857,7 +857,7 @@ export const es_ES: EnTranslations = {
       "aurasOnPlayerFrame": "Beneficios en el marco del jugador",
       "highContrastBackground": "Fondo de alto contraste",
       "startAttackOnAbility": "Ataque automático al usar habilidad",
-      "showAttackButton": "Show Attack Button",
+      "showAttackButton": "Mostrar boton de ataque",
       "walkByAutoloot": "Saqueo automático al pasar",
       "groundReticle": "Retícula de objetivo terrestre",
       "showItemLevel": "Mostrar nivel de objeto",
@@ -869,23 +869,23 @@ export const es_ES: EnTranslations = {
       "mobileLeftHanded": "Diseño para zurdos"
     },
     "talentRows": {
-      "tab": "Opciones",
-      "defaultLoadout": "Configuración predeterminada",
-      "comingSoon": "Próximamente",
-      "readoutSummary": "Talentos: {head}, {spent}/{total} filas seleccionadas."
+      "tab": "Choices",
+      "defaultLoadout": "Default Loadout",
+      "comingSoon": "Coming soon",
+      "readoutSummary": "Talents: {head}, {spent}/{total} rows selected."
     },
     "abilityError": {
-      "shieldRequired": "Debes tener un escudo equipado."
+      "shieldRequired": "You must have a shield equipped."
     },
     "specPanel": {
-      "primaryAttr": "Atributo principal",
-      "complexity": "Complejidad",
-      "complexityLow": "Baja",
-      "complexityMedium": "Media",
-      "complexityHigh": "Alta",
-      "exampleAbilities": "Habilidades de ejemplo",
-      "viewTalents": "Ver talentos",
-      "selectSpec": "Seleccionar especialización"
+      "primaryAttr": "Primary attribute",
+      "complexity": "Complexity",
+      "complexityLow": "Low",
+      "complexityMedium": "Medium",
+      "complexityHigh": "High",
+      "exampleAbilities": "Example abilities",
+      "viewTalents": "View talents",
+      "selectSpec": "Select specialization"
     },
     "controller": {
       "title": "Mando",
@@ -998,6 +998,7 @@ export const es_ES: EnTranslations = {
         "spellPower": "Poder con hechizos",
         "critRating": "Índice de golpe crítico",
         "hasteRating": "Índice de celeridad",
+        "hitRating": "Puntuacion de impacto",
         "warfare": "Pericia bélica"
       },
       "warfareValue": "+{increase}% infligido / -{reduction}% recibido",
@@ -1015,6 +1016,7 @@ export const es_ES: EnTranslations = {
         "dodge": "Tu probabilidad de evitar por completo un ataque cuerpo a cuerpo entrante, sin recibir daño.",
         "critRating": "Índice de golpe crítico de tu equipo y bonificaciones de conjunto, que aumenta tu probabilidad de golpe crítico. Unos 10 de índice otorgan un 1% de crítico.",
         "hasteRating": "Índice de celeridad de tu equipo y bonificaciones de conjunto, que acelera tus ataques y lanzamientos de hechizos. Unos 10 de índice otorgan un 1% de celeridad.",
+        "hitRating": "Puntuacion de impacto proveniente de tu equipo y bonificaciones de conjunto, que reduce la frecuencia con que tus ataques fallan y tus hechizos son resistidos, especialmente contra enemigos de nivel superior. Aproximadamente 10 puntos de puntuacion otorgan un 1% de impacto.",
         "warfare": "Aumenta un {increase}% el daño infligido a jugadores y reduce un {reduction}% el daño recibido de jugadores."
       },
       "effects": {
@@ -1090,10 +1092,10 @@ export const es_ES: EnTranslations = {
         "other": "eres {rank}, {count} miembros"
       },
       "finderPartySize": {
-        "one": "{count} player",
-        "few": "{count} players",
-        "many": "{count} players",
-        "other": "{count} players"
+        "one": "{count} jugador",
+        "few": "{count} jugadores",
+        "many": "{count} jugadores",
+        "other": "{count} jugadores"
       },
       "characterCount": {
         "one": "{count} personaje",
@@ -1304,10 +1306,10 @@ export const es_ES: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "Este elemento no se puede destruir.",
-      "rightClickDestroy": "Shift+clic derecho para destruir",
-      "dragEquipHint": "Drag onto your character to equip",
-      "dragDestroyHint": "Drag out into the world to destroy",
-      "reorderNeedsRecent": "Clear the filter and sort by Recent to rearrange your bags",
+      "rightClickDestroy": "Clic derecho para destruir",
+      "dragEquipHint": "Arrastra sobre tu personaje para equipar",
+      "dragDestroyHint": "Arrastra fuera del inventario para destruir",
+      "reorderNeedsRecent": "Limpia el filtro y ordena por Reciente para reorganizar tus bolsas",
       "filterGroupAria": "Filtrar bolsas por categoría",
       "filterAll": "Todos",
       "filterWeapon": "Armas",
@@ -1382,6 +1384,8 @@ export const es_ES: EnTranslations = {
       },
       "dodge": "Incrementa la probabilidad de esquivar un {pct}%",
       "dodgeReduce": "Disminuye la probabilidad de esquivar un {pct}%",
+      "damageReduction": "Reduce el dano recibido en un {pct}%",
+      "guardianWard": "El siguiente golpe enemigo letal te restaura al {pct}% de salud en su lugar",
       "armorFlat": "Disminuye la armadura en {value}",
       "armorFlatStacks": "Disminuye la armadura en {value} ({stacks} acumulaciones)",
       "armorPct": "Reduce la armadura un {pct}%",
@@ -1510,7 +1514,7 @@ export const es_ES: EnTranslations = {
         "benefits": "Vincula tu Discord para ganar puntos jugando y participando en la comunidad, y escalar los niveles de estatus.",
         "error": "No se pudo vincular Discord. Inténtalo de nuevo.",
         "success": "Discord vinculado.",
-        "joinServer": "Únete directamente al servidor de Discord"
+        "joinServer": "Unete al servidor de Discord"
       },
       "choice": {
         "title": "Continuar con Discord",
@@ -1558,9 +1562,9 @@ export const es_ES: EnTranslations = {
         "admin": "Admin",
         "coredevs": "Desarrollador principal",
         "devs": "Dev",
-        "seniormods": "Moderador sénior",
+        "seniormods": "Moderador senior",
         "mods": "Mod",
-        "juniormods": "Moderador júnior",
+        "juniormods": "Moderador junior",
         "artists": "Artista",
         "contentcreator": "Creador de contenido",
         "legend": "LEYENDA",
@@ -1831,7 +1835,8 @@ export const es_ES: EnTranslations = {
       "title": "Recolección",
       "mining": "Minería",
       "logging": "Tala",
-      "herbalism": "Herboristería"
+      "herbalism": "Herboristería",
+      "notReady": "Este nodo de recursos aun no ha reaparecido para ti."
     },
     "archetypeTitle": {
       "label": "Título",
@@ -1865,104 +1870,104 @@ export const es_ES: EnTranslations = {
       "recipeNotLearned": "Aún no has aprendido esa receta."
     },
     "finder": {
-      "title": "Dungeon Finder",
-      "close": "Close",
-      "back": "Back",
-      "syncing": "Waiting for the realm...",
-      "tabCatalogue": "Catalogue",
-      "tabQueue": "Quick Match",
-      "tabBoard": "Premade Groups",
-      "normal": "Normal",
-      "heroic": "Heroic",
-      "kindDungeon": "Dungeon",
-      "kindRaid": "Raid",
-      "kindSolo": "Solo adventure",
-      "levels": "Levels {min} to {max}",
-      "levelOne": "Level {level}",
+      "title": "Buscador de Mazmorras",
+      "close": "Cerrar",
+      "back": "Volver",
+      "syncing": "Esperando al reino...",
+      "tabCatalogue": "Catalogo",
+      "tabQueue": "Busqueda rapida",
+      "tabBoard": "Grupos preformados",
+      "normal": "Estandar",
+      "heroic": "Heroico",
+      "kindDungeon": "Mazmorra",
+      "kindRaid": "Banda",
+      "kindSolo": "Aventura en solitario",
+      "levels": "Niveles {min} a {max}",
+      "levelOne": "Nivel {level}",
       "clock": "{minutes}:{seconds}",
       "roleCount": "{count} {role}",
-      "roleTank": "Tank",
-      "roleHealer": "Healer",
-      "roleDps": "Damage",
-      "freeRoles": "Any roles welcome",
-      "lockoutDaily": "Daily lockout on the final boss",
-      "lockoutNone": "No lockout",
-      "lockedFor": "Locked for about {minutes} min",
-      "attunement": "Requires attunement: {quest}",
-      "heroicMarks": "Heroic Marks: {count} per player",
-      "entrance": "Entrance: {zone}",
-      "showOnMap": "Show on Map",
-      "encounters": "Encounters",
-      "finalBoss": "Final boss",
-      "summoned": "Summoned guardian",
-      "lootGuaranteed": "One of these always drops:",
-      "lootMaybe": "At most one of these may drop:",
-      "lootChance": "Additional chance drops:",
-      "lootHeroic": "Heroic bonus, one of these always drops:",
-      "pct": "{pct}%",
-      "blockedLevel": "Levels {min} to {max} only",
-      "blockedSpec": "Requires a specialization",
-      "yourRoles": "Your roles",
-      "needsSpec": "Choose a specialization to use the Dungeon Finder.",
-      "leaderNote": "Only your party leader can queue the group.",
-      "chooseActivities": "Choose activities",
-      "joinQueue": "Join queue",
-      "leaveQueue": "Leave queue",
-      "waited": "Time in queue: {time}",
-      "cooldownNote": "You may queue again in {seconds}s.",
-      "travelNote": "The group forms where everyone stands. Travel to the entrance together; nobody is teleported.",
-      "proposalTitle": "Group found: {name}",
-      "proposalRole": "Your role: {role}",
-      "accepted": "{accepted} of {size} confirmed",
-      "remaining": "{seconds}s to answer",
-      "accept": "Accept",
-      "decline": "Decline",
-      "acceptedWait": "Waiting for the others...",
-      "slotState": "{role}: {accepted} of {total} ready",
-      "openListings": "Open listings",
-      "boardEmpty": "No listings right now. Publish one!",
-      "boardLeaderGate": "Only your party leader can publish a listing.",
-      "publishListing": "Publish a listing",
-      "activity": "Activity",
-      "publish": "Publish",
-      "yourListing": "Your listing",
-      "closeListing": "Close listing",
-      "applicants": "Applicants",
-      "noApplicants": "No applicants yet.",
-      "acceptApplicantAria": "Accept {name}",
-      "declineApplicantAria": "Decline {name}",
-      "levelClass": "Lv {level} {className}",
-      "leader": "Leader: {name}",
-      "needs": "Needs {roles}",
+      "roleTank": "Tanque",
+      "roleHealer": "Sanador",
+      "roleDps": "Dano",
+      "freeRoles": "Cualquier rol es bienvenido",
+      "lockoutDaily": "Bloqueo diario en el jefe final",
+      "lockoutNone": "Sin bloqueo",
+      "lockedFor": "Bloqueado aproximadamente {minutes} min",
+      "attunement": "Requiere sintonizacion: {quest}",
+      "heroicMarks": "Marcas heroicas: {count} por jugador",
+      "entrance": "Entrada: {zone}",
+      "showOnMap": "Mostrar en el mapa",
+      "encounters": "Encuentros",
+      "finalBoss": "Jefe final",
+      "summoned": "Guardian invocado",
+      "lootGuaranteed": "Siempre cae uno de estos:",
+      "lootMaybe": "Puede caer como maximo uno de estos:",
+      "lootChance": "Objetos con probabilidad de caer:",
+      "lootHeroic": "Bonus heroico, siempre cae uno de estos:",
+      "pct": "{pct} %",
+      "blockedLevel": "Solo niveles {min} a {max}",
+      "blockedSpec": "Requiere una especializacion",
+      "yourRoles": "Tus roles",
+      "needsSpec": "Elige una especializacion para usar el Buscador de Mazmorras.",
+      "leaderNote": "Solo el lider del grupo puede poner al grupo completo en cola.",
+      "chooseActivities": "Elige actividades",
+      "joinQueue": "Unirse a la cola",
+      "leaveQueue": "Abandonar la cola",
+      "waited": "Tiempo en cola: {time}",
+      "cooldownNote": "Podras unirte a la cola de nuevo en {seconds} segundos.",
+      "travelNote": "El grupo se forma donde cada uno se encuentra. Viajad juntos a la entrada; nadie es teletransportado.",
+      "proposalTitle": "Grupo encontrado: {name}",
+      "proposalRole": "Tu rol: {role}",
+      "accepted": "{accepted} de {size} confirmados",
+      "remaining": "{seconds}s para responder",
+      "accept": "Aceptar",
+      "decline": "Rechazar",
+      "acceptedWait": "Esperando a los demas...",
+      "slotState": "{role}: {accepted} de {total} listos",
+      "openListings": "Anuncios abiertos",
+      "boardEmpty": "Sin anuncios por ahora. Publica uno.",
+      "boardLeaderGate": "Solo el lider del grupo puede publicar un anuncio.",
+      "publishListing": "Publicar un anuncio",
+      "activity": "Actividad",
+      "publish": "Publicar",
+      "yourListing": "Tu anuncio",
+      "closeListing": "Cerrar anuncio",
+      "applicants": "Solicitantes",
+      "noApplicants": "Aun no hay solicitantes.",
+      "acceptApplicantAria": "Aceptar a {name}",
+      "declineApplicantAria": "Rechazar a {name}",
+      "levelClass": "Nv {level} {className}",
+      "leader": "Lider: {name}",
+      "needs": "Necesita {roles}",
       "slots": "{size}/{capacity}",
-      "apply": "Apply",
-      "withdraw": "Withdraw application",
-      "tagFirstRun": "First run",
-      "tagQuestRun": "Quest run",
-      "tagFullClear": "Full clear",
-      "tagLearning": "Learning welcome",
-      "tagFastRun": "Fast run",
+      "apply": "Solicitar",
+      "withdraw": "Retirar solicitud",
+      "tagFirstRun": "Primera vez",
+      "tagQuestRun": "Mision en curso",
+      "tagFullClear": "Limpieza completa",
+      "tagLearning": "Aprendizaje bienvenido",
+      "tagFastRun": "Rapido",
       "mech": {
-        "shadow_pulse": "Shadow Pulse (pulsing area damage)",
-        "reaping_arc": "Reaping Arc (frontal cleave)",
-        "mist_surge": "Mist Surge (pulsing area damage)",
-        "summons_adds": "Summons reinforcements",
-        "lunar_tide": "Lunar Tide (pulsing area damage)",
-        "enrage": "Enrages at low health",
-        "shuddering_stomp": "Shuddering Stomp (area stun)",
-        "necrotic_shockwave": "Necrotic Shockwave (heavy area damage)",
-        "grave_cleaver": "Grave-Cleaver (frontal cleave)",
-        "shadow_nova": "Shadow Nova (area burst)",
-        "profane_mending": "Profane Mending (heals its allies)",
-        "mana_burn": "Withered Benediction (burns mana)",
-        "deathstalker_cleave": "Deathstalker Cleave (frontal cleave)",
-        "mortal_wound": "Forgotten Wound (reduces healing taken)",
-        "sealbreak_shockwave": "Sealbreak Shockwave (area burst)",
-        "gravebreaker": "Gravebreaker (frontal cone, face it away from the raid)",
-        "raise_fallen": "Raise Fallen (periodic waves of adds)",
-        "soul_rend": "Soul Rend (marked players must spread and be healed)",
-        "deathless_rage": "Deathless Rage (interrupted at the wardstones)",
-        "wardstones": "Wardstone channels (phase transition)"
+        "shadow_pulse": "Pulso de Sombra (dano de area pulsante)",
+        "reaping_arc": "Arco Segador (tajo frontal)",
+        "mist_surge": "Oleada de Niebla (dano de area pulsante)",
+        "summons_adds": "Invoca refuerzos",
+        "lunar_tide": "Marea Lunar (dano de area pulsante)",
+        "enrage": "Entra en furia al tener poca salud",
+        "shuddering_stomp": "Pisada Estremecedora (aturdimiento de area)",
+        "necrotic_shockwave": "Onda de Choque Necrotica (dano de area intenso)",
+        "grave_cleaver": "Hacha Funebra (tajo frontal)",
+        "shadow_nova": "Nova de Sombra (explosion de area)",
+        "profane_mending": "Restauracion Profana (cura a sus aliados)",
+        "mana_burn": "Bendicion Marchita (quema el mana)",
+        "deathstalker_cleave": "Tajo del Acechador de la Muerte (tajo frontal)",
+        "mortal_wound": "Herida Olvidada (reduce la curacion recibida)",
+        "sealbreak_shockwave": "Onda Rompesello (explosion de area)",
+        "gravebreaker": "Rompatumbas (cono frontal, alejarlo de la banda)",
+        "raise_fallen": "Despertar a los Caidos (oleadas periodicas de refuerzos)",
+        "soul_rend": "Desgarro de Alma (los jugadores marcados deben dispersarse y recibir curacion)",
+        "deathless_rage": "Furia Inmortal (se interrumpe en las piedras de guardia)",
+        "wardstones": "Canalizacion de piedras de guardia (transicion de fase)"
       }
     },
     "deeds": {
@@ -2586,8 +2591,8 @@ export const es_ES: EnTranslations = {
     },
     "abilityHook": {
       "heroic_strike": "Prepara un golpe más fuerte que gasta ira en tu próximo ataque.",
-      "revenge": "Golpea a los enemigos frente a ti y puede volverse gratis después de esquivar o parar.",
-      "hamstring": "Entorpece el movimiento de un enemigo para impedir que escape.",
+      "revenge": "Sweeps enemies in front of you, with a chance to become free after a dodge or parry.",
+      "hamstring": "Cripples an enemy's movement to keep it from escaping.",
       "battle_shout": "Un grito de aliento que aumenta el poder de ataque del grupo.",
       "charge": "Embiste a un enemigo lejano para abrir el combate con un breve aturdimiento.",
       "thunder_clap": "Golpea a los enemigos a tu alrededor y ralentiza sus ataques.",
@@ -2647,7 +2652,9 @@ export const es_ES: EnTranslations = {
       "mark_of_the_wild": "Una bendición duradera que pones sobre ti o un aliado antes de un combate.",
       "moonfire": "Golpea al instante y deja al objetivo ardiendo, ideal mientras te mueves.",
       "rejuvenation": "Se lanza al instante y sana a un aliado con el tiempo, para que puedas seguir actuando.",
-      "thorns": "Protege a un aliado para que los atacantes cuerpo a cuerpo se hieran al golpearlo."
+      "thorns": "Protege a un aliado para que los atacantes cuerpo a cuerpo se hieran al golpearlo.",
+      "commanding_shout": "Refuerza el aguante para que todos resistan más en combate.",
+      "rend": "Abre una hemorragia que va desgastando al objetivo con el tiempo."
     },
     "petHook": {
       "emberkin": "Un demonio de descargas de fuego a distancia que merma a los enemigos desde un lugar seguro.",
@@ -2716,8 +2723,8 @@ export const es_ES: EnTranslations = {
         "desc": "Criaturas escamosas y serpentinas de las viejas profundidades. Raras, orgullosas y mucho más fuertes de lo que aparentan."
       },
       "reptile": {
-        "name": "Reptiles",
-        "desc": "Cazadores de sangre fría con un siseo y un mordisco inconfundibles, distintos de las bestias de sangre caliente."
+        "name": "Reptilidos",
+        "desc": "Cazadores de sangre fria con su propio silbido y mordisco, bien distintos de las bestias de sangre caliente."
       }
     },
     "worldPage": {
@@ -4628,6 +4635,8 @@ export const es_ES: EnTranslations = {
     "connectionLost": "Se perdió la conexión con el servidor.",
     "reconnecting": "Conexión perdida. Reconectando...",
     "connectionRejected": "El servidor cerró la conexión.",
+    "realmFull": "Este mundo esta lleno en este momento. Por favor, intentalo de nuevo en unos minutos.",
+    "tooManyConnections": "Hay demasiadas conexiones a este mundo desde tu red. Cierra ventanas adicionales del juego o intentalo de nuevo en unos minutos.",
     "tips": {
       "classes": "Consejo: cada una de las 9 clases se juega de forma distinta. Prueba varias antes de decidirte por una.",
       "talents": "Consejo: puedes restablecer tus talentos cuando estés fuera de combate, así que una elección temprana nunca es definitiva.",
@@ -5285,7 +5294,7 @@ export const es_ES: EnTranslations = {
       "defensiveDesc": "Ataca a enemigos que te dañen a ti o a tu mascota.",
       "aggressiveDesc": "Ataca a enemigos hostiles cercanos.",
       "rename": "Renombrar mascota",
-      "revive": "Remendar",
+      "revive": "Revivir mascota",
       "abandon": "Abandonar mascota",
       "cancel": "Cancelar",
       "renameLabel": "Elige un nuevo nombre para la mascota.",
@@ -5397,7 +5406,7 @@ export const es_ES: EnTranslations = {
     "actionBar": {
       "attackName": "Atacar",
       "attackTooltip": "Activa o desactiva el autoataque sobre tu objetivo. Hacer clic derecho en un enemigo también ataca.",
-      "attackRemoveHint": "Right-click to remove it from the bar and free the slot.",
+      "attackRemoveHint": "Clic derecho para quitarlo de la barra y liberar el espacio.",
       "emptySlot": "Ranura vacía",
       "slotAria": "Ranura de acción {slot}: {ability}",
       "emptySlotAria": "Ranura de acción {slot}: vacía",
@@ -5541,7 +5550,7 @@ export const es_ES: EnTranslations = {
     },
     "slots": {
       "mainhand": "Mano principal",
-      "offhand": "Mano secundaria",
+      "offhand": "Off Hand",
       "helmet": "Cabeza",
       "neck": "Cuello",
       "shoulder": "Hombros",
@@ -6355,6 +6364,18 @@ export const es_ES: EnTranslations = {
         "name": "Piel de Roble",
         "description": "Tu piel se endurece como corteza y aumenta la armadura en 150 durante 15 s."
       },
+      "ironhold": {
+        "name": "Bastion de Hierro",
+        "description": "Te parapetas tras tu guardia, reduciendo el dano recibido en un 40% durante 8 segundos."
+      },
+      "sacred_bulwark": {
+        "name": "Baluarte Sagrado",
+        "description": "Durante {duration} segundos, el siguiente golpe enemigo que te mataria es anulado y recuperas el 35% de tu salud en su lugar."
+      },
+      "primal_reflexes": {
+        "name": "Reflejos Primigenios",
+        "description": "Tus instintos se agudizan, aumentando tu probabilidad de esquivar un 50% durante 6 segundos."
+      },
       "starfire": {
         "name": "Caída Celeste",
         "description": "Invoca una descarga de fuego estelar que causa {damage} de daño Arcano."
@@ -6540,304 +6561,304 @@ export const es_ES: EnTranslations = {
         "description": "Somete a un Wraithborn a tu voluntad: un demonio de élite que descarga un fuerte daño de las Sombras desde lejos. Un largo tiempo de reutilización refrena su poder devastador. Invocar un nuevo demonio descarta el actual. Solo puedes tener un demonio a la vez."
       },
       "battle_stance": {
-        "name": "Actitud de Batalla",
-        "description": "Actitud de combate agresiva: generas un 10% más de ira. La actitud predeterminada de Armas y Protección."
+        "name": "Battle Stance",
+        "description": "An aggressive combat stance: you generate 10% more rage. The default stance for Arms and Protection."
       },
       "berserker_stance": {
-        "name": "Actitud Rabiosa",
-        "description": "Actitud de combate temeraria: tus golpes críticos aciertan un 3% más a menudo y golpean un 3% más fuerte. El guerrero de Furia siempre lucha en esta actitud."
+        "name": "Berserker Stance",
+        "description": "A reckless combat stance: your critical strikes land 3% more often and hit for 3% more. The Fury warrior always fights in this stance."
       },
       "sweeping_strikes": {
-        "name": "Arco Creciente",
-        "description": "Durante 12 s, tus ataques a un solo objetivo golpean también a 1 enemigo cercano con el daño completo. (Armas)"
+        "name": "Widening Arc",
+        "description": "For 12 sec your single-target attacks also strike 1 nearby enemy for full damage. (Arms)"
       },
       "deep_wounds": {
-        "name": "Heridas Abiertas",
-        "description": "Pasiva: tu Golpe Mutilador deja al objetivo sangrando por daño Físico durante 6 s. (Armas)"
+        "name": "Gaping Wounds",
+        "description": "Passive: your Maiming Strike leaves the target bleeding for Physical damage over 6 sec. (Arms)"
       },
       "enrage_passive": {
-        "name": "Estrago",
-        "description": "Pasiva: mientras estás Enfurecido infliges un 7% más de daño, atacas un 25% más rápido y te mueves un 10% más rápido durante 4 s. Sangría tiene un 30% de probabilidad de Enfurecerte; Cosecha Roja siempre lo hace. (Furia)"
+        "name": "Mayhem",
+        "description": "Passive: while Enraged you deal 7% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)"
       },
       "raging_gale": {
-        "name": "Golpe Gemelo",
-        "description": "Golpeas al instante dos veces con tu arma; cada golpe inflige un 40% de daño de arma más {damage}, y generas 8 de ira. Almacena hasta 2 cargas. (Furia)"
+        "name": "Twinstrike",
+        "description": "Instantly strike with your weapon twice, each hit dealing 40% weapon damage plus {damage}, and generate 8 rage. Stores up to 2 charges. (Fury)"
       },
       "red_harvest": {
-        "name": "Cosecha Roja",
-        "description": "Gasta toda tu ira: golpea tres veces en un frenesí; cada golpe inflige un 65% de daño de arma más {damage} y siempre te enfurece. (Furia)"
+        "name": "Red Harvest",
+        "description": "Spend everything: strike three times in a frenzy for 65% weapon damage plus {damage} each, always Enraging you. (Fury)"
       },
       "furious_mending": {
-        "name": "Remiendo Furioso",
-        "description": "Durante 10 s recibes un 20% menos de daño y, mientras dura, tu Sangría te sana un 20% de tu salud máxima. (Furia)"
+        "name": "Furious Mending",
+        "description": "For 10 sec you take 20% reduced damage, and while it lasts your Bloodletting heals you for 20% of your maximum health. (Fury)"
       },
       "emboldening_roar": {
-        "name": "Rugido Envalentonador",
-        "description": "Sueltas un rugido envalentonador: tú y los jugadores aliados en un radio de 40 m quedáis Envalentonados, y tus siguientes 3 habilidades son golpes críticos garantizados. (Furia)"
+        "name": "Emboldening Roar",
+        "description": "Lets loose an emboldening roar: you and friendly players within 40 yards are Emboldened, and your next 3 abilities are guaranteed critical strikes. (Fury)"
       },
       "raised_guard": {
-        "name": "Guardia Alzada",
-        "description": "Te afianzas tras tu escudo: recibes un 50% menos de daño Físico durante 6 s. Almacena hasta 2 cargas. (Protección)"
+        "name": "Raised Guard",
+        "description": "Brace behind your shield: you take 50% reduced Physical damage for 6 sec. Stores up to 2 charges. (Protection)"
       },
       "iron_resolve": {
-        "name": "Temple de Hierro",
-        "description": "Aprietas los dientes e ignoras el dolor: gasta hasta 40 de ira (20 como mínimo) para absorber 4 de daño por cada punto de ira gastado, durante un máximo de 10 s. (Protección)"
+        "name": "Iron Resolve",
+        "description": "Grit your teeth and ignore the pain: spends up to 40 rage (20 minimum) to absorb 4 damage per rage spent, lasting up to 10 sec. (Protection)"
       },
       "faultline": {
-        "name": "Falla",
-        "description": "Envía una onda de choque por el suelo: los enemigos frente a ti en un radio de 8 m reciben {damage} de daño y quedan aturdidos durante 3 s. (Protección)"
+        "name": "Faultline",
+        "description": "Send a shockwave through the ground: enemies in front of you within 8 yards take {damage} damage and are stunned for 3 sec. (Protection)"
       },
       "defiant_bellow": {
-        "name": "Bramido Desafiante",
-        "description": "Un bramido desafiante: todos los enemigos en un radio de 10 m quedan provocados y obligados a atacarte durante 3 s. (Protección)"
+        "name": "Defiant Bellow",
+        "description": "A defiant bellow: every enemy within 10 yards is taunted, compelled to attack you for 3 sec. (Protection)"
       },
       "breachmaker": {
-        "name": "Abrebrechas",
-        "description": "Machaca al objetivo con daño de arma más {damage} y quiebra su guardia: tus propios ataques contra él infligen un 20% más de daño durante 8 s. (Armas)"
+        "name": "Breachmaker",
+        "description": "Batter the target for weapon damage plus {damage} and crack its guard: your own attacks against it deal 20% more damage for 8 sec. (Arms)"
       },
       "measured_fury": {
-        "name": "Furia Mesurada",
-        "description": "Tu furia mesurada afina tu economía: tus habilidades cuestan un 10% menos de ira. (Armas)"
+        "name": "Measured Fury",
+        "description": "Your measured fury sharpens your economy: your abilities cost 10% less rage. (Arms)"
       },
       "seasoned_soldier": {
-        "name": "Soldado Veterano",
-        "description": "Tus ataques automáticos críticos generan un 10% más de ira. (Armas)"
+        "name": "Seasoned Soldier",
+        "description": "Your critical auto-attacks generate 10% more rage. (Arms)"
       },
       "diabolical_twinstrike": {
-        "name": "Golpe Gemelo Diabólico",
-        "description": "Mientras estás Enfurecido, tu Golpe Gemelo inflige un 15% más de daño. (Furia)"
+        "name": "Diabolical Twinstrike",
+        "description": "While Enraged, your Twinstrike deals 15% more damage. (Fury)"
       },
       "cleaving_blows": {
-        "name": "Golpes Hendedores",
-        "description": "Cosecha Roja siempre devuelve una carga de Golpe Gemelo. (Furia)"
+        "name": "Cleaving Blows",
+        "description": "Red Harvest always refunds a charge of Twinstrike. (Fury)"
       },
       "sudden_death": {
-        "name": "Muerte Súbita",
-        "description": "Tus ataques automáticos tienen una probabilidad de permitirte lanzar Tumba Temprana contra un objetivo con cualquier nivel de salud, sin coste de ira. (Armas)"
+        "name": "Sudden Death",
+        "description": "Your auto-attacks have a chance to let you cast Early Grave on a target at any health, costing no rage. (Arms)"
       },
       "storm_bolt": {
-        "name": "Proyectil de Tormenta",
-        "description": "Lanza tu arma al objetivo, inflige {damage} y lo aturde durante 3 s."
+        "name": "Storm Bolt",
+        "description": "Hurl your weapon at the target for {damage}, stunning it for 3 sec."
       },
       "piercing_howl": {
-        "name": "Aullido Penetrante",
-        "description": "Un grito penetrante que ralentiza un 50% a todos los enemigos en un radio de 15 m durante 8 s."
+        "name": "Piercing Howl",
+        "description": "A piercing shout that slows all enemies within 15 yards by 50% for 8 sec."
       },
       "die_by_sword": {
-        "name": "Morir por la Espada",
-        "description": "Recurso defensivo: durante 8 s recibes un 30% menos de daño y esquivas muchos más ataques."
+        "name": "Die by the Sword",
+        "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
       },
       "recklessness": {
-        "name": "Temeridad",
-        "description": "Te enfureces: tu generación de ira aumenta un 50% y tu probabilidad de golpe crítico un 20% durante 12 s."
+        "name": "Recklessness",
+        "description": "Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec."
       },
       "sanguine_aura": {
-        "name": "Aura Sanguínea",
-        "description": "Imbuye tu arma con la sangre de tus enemigos: tú y tus aliados cuerpo a cuerpo obtenéis un 10% de velocidad de ataque y un 10% de daño durante 20 s."
+        "name": "Sanguine Aura",
+        "description": "Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec."
       },
       "victory_rush": {
-        "name": "Ímpetu de Victoria",
-        "description": "Golpea con daño de arma más {damage} y te sana un 20% de tu salud máxima. Solo usable durante los 20 s posteriores a matar a un enemigo."
+        "name": "Victory Rush",
+        "description": "Strike for weapon damage plus {damage} and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy."
       },
       "intimidating_shout": {
-        "name": "Grito Intimidante",
-        "description": "Un grito aterrador que hace huir despavoridos hasta a 5 enemigos en un radio de 8 m durante 8 s. El daño puede romper el efecto."
+        "name": "Intimidating Shout",
+        "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
       },
       "revenge": {
-        "name": "Venganza",
-        "description": "Atacas en un arco amplio e infliges daño Físico a todos los enemigos frente a ti. Por encima de 5 objetivos el daño se reduce. Cuando esquivas o paras un golpe, tu siguiente Venganza puede no costar ira. (Protection)"
+        "name": "Revenge",
+        "description": "Attack in a wide arc, dealing Physical damage to all enemies in front of you. Above 5 targets the damage is reduced. When you dodge or parry, your next Revenge may cost no rage. (Protection)"
       },
       "heroic_leap": {
-        "name": "Salto de Guerra",
-        "description": "Salta al área objetivo e inflige {damage} de daño a los enemigos cercanos al aterrizar."
+        "name": "Heroic Leap",
+        "description": "Leap to the target area, dealing {damage} damage to nearby enemies on landing."
       },
       "rallying_cry": {
-        "name": "Rugido de Valor",
-        "description": "Profieres un rugido de valor que os otorga a ti y a los miembros del grupo en un radio de 40 yardas un 20% de salud máxima adicional durante 10 s. Protección: además reciben un 5% menos de daño mientras dura."
+        "name": "Valor Roar",
+        "description": "Lets loose a valorous roar, granting you and party members within 40 yards 20% additional maximum health for 10 sec. Protection: they also take 5% less damage for the duration."
       },
       "avatar": {
         "name": "Avatar",
-        "description": "Te transforma en un coloso durante 20 s, elimina todos los efectos de control sobre ti y aumenta un 20% el daño que infliges."
+        "description": "Transform into a colossus for 20 sec, breaking all control on you and increasing your damage dealt by 20%."
       },
       "bladestorm": {
-        "name": "Tormenta de cuchillas",
-        "description": "Te conviertes en una tormenta giratoria de acero y golpeas a todos los enemigos en un radio de 8 m, infligiéndoles {damage} de daño cada segundo durante 4 s."
+        "name": "Bladestorm",
+        "description": "Become a whirling storm of steel, striking all enemies within 8 yards for {damage} every second for 4 sec."
       },
       "aspect_of_the_wild": {
-        "name": "Atuendo Colmillo Salvaje",
-        "description": "Inspira a los aliados en un radio de 30 m con fuerza salvaje, aumentando su poder de ataque en 45 y su velocidad de ataque un 5% durante 5 min. (talento de Cazador)"
+        "name": "Wildfang Rally",
+        "description": "Inspires allies within 30 yd with wild strength, increasing attack power by 45 and attack speed by 5% for 5 min. (Hunter talent)"
       },
       "aura_surge": {
-        "name": "Rebote del Alba",
-        "description": "Lanza un escudo forjado al alba que inflige {damage} de daño Sagrado, silencia al objetivo principal durante 2 s y rebota hasta en 2 enemigos adicionales en un radio de 10 m, infligiendo un 75% de daño por rebote. (talento de Paladín)"
+        "name": "Dawnward Ricochet",
+        "description": "Hurl a dawnforged shield for {damage} Holy damage and silence the primary target for 2 sec. It bounces to up to 2 additional enemies within 10 yd for 75% damage per bounce. (Paladin talent)"
       },
       "avenging_wrath": {
-        "name": "Ala de Venganza",
-        "description": "Invoca poder vengador, aumentando tu poder de ataque en 60 y tu poder con hechizos en 30 durante 20 s. (talento de Paladín)"
+        "name": "Wrathwing",
+        "description": "Calls down avenging power, increasing attack power by 60 and spell power by 30 for 20 sec. (Paladin talent)"
       },
       "berserk": {
-        "name": "Bruma Roja",
-        "description": "Aumenta tu poder de ataque en 70 durante 15 s. (talento de Druida)"
+        "name": "Red Haze",
+        "description": "Increases attack power by 70 for 15 sec. (Druid talent)"
       },
       "blink": {
-        "name": "Paso Fugaz",
-        "description": "Te teletransporta 15 m hacia delante y rompe los efectos de inmovilización. (talento de Mago)"
+        "name": "Flickerstep",
+        "description": "Teleports you 15 yd forward and breaks roots. (Mage talent)"
       },
       "bloodlust": {
-        "name": "Tambores de Guerra",
-        "description": "Lleva al frenesí a los aliados en un radio de 30 m, aumentando su velocidad de ataque un 30% durante 15 s. (talento de Chamán)"
+        "name": "Storm Chorus",
+        "description": "Whips allies within 30 yd into a frenzy, increasing attack speed by 30% for 15 sec. (Shaman talent)"
       },
       "chain_lightning": {
-        "name": "Relámpago Bifurcado",
-        "description": "Lanza un relámpago en el área objetivo que inflige {damage} de daño a los enemigos cercanos. (talento de Chamán)"
+        "name": "Skybranch",
+        "description": "Hurls lightning at the target area, damaging nearby enemies for {damage}. (Shaman talent)"
       },
       "chaos_bolt": {
-        "name": "Descarga de Ruina",
-        "description": "Lanza una descarga de fuego caótico que inflige {damage} de daño de Fuego. (talento de Brujo)"
+        "name": "Ruinbolt",
+        "description": "Hurls a bolt of chaotic fire for {damage} Fire damage. (Warlock talent)"
       },
       "cleansing_verdict": {
-        "name": "Veredicto Purificador",
-        "description": "Purga un efecto mágico perjudicial de un objetivo amistoso y lo sana con {damage} de magia Sagrada."
+        "name": "Cleansing Verdict",
+        "description": "Purges a harmful magic effect from a friendly target and heals them for {damage} Holy."
       },
       "cloak_of_shadows": {
-        "name": "Capa Sombría",
-        "description": "Te envuelve en sombras y absorbe 420 de daño durante 5 s. (talento de Pícaro)"
+        "name": "Shadecloak",
+        "description": "Wraps you in shadows, absorbing 420 damage for 5 sec. (Rogue talent)"
       },
       "cone_of_cold": {
-        "name": "Barrido de Escarcha",
-        "description": "Golpea a los enemigos cercanos con escarcha e inflige {damage} de daño de Escarcha. (habilidad distintiva de Escarcha)"
+        "name": "Frostsweep",
+        "description": "Blasts nearby enemies with frost for {damage} Frost damage. (Frost signature)"
       },
       "curse_of_exhaustion": {
-        "name": "Maleficio Plomizo",
-        "description": "Maldice al objetivo y reduce su velocidad de movimiento un 30% durante 12 s. (talento de Brujo)"
+        "name": "Leaden Hex",
+        "description": "Curses the target, slowing movement by 30% for 12 sec. (Warlock talent)"
       },
       "death_coil": {
-        "name": "Espiral de Tumba",
-        "description": "Golpea al enemigo e inflige {damage} de daño de las Sombras, y después lo aterroriza durante 3 s. (talento de Brujo)"
+        "name": "Morrowlash",
+        "description": "Strikes the enemy for {damage} Shadow damage, then horrifies them for 3 sec. (Warlock talent)"
       },
       "deep_freeze": {
-        "name": "Escarcha Muerta",
-        "description": "Congela profundamente al objetivo, inflige {damage} de daño de Escarcha y lo aturde durante 4 s. (talento de Mago)"
+        "name": "Deadfrost",
+        "description": "Deep freezes the target, dealing {damage} Frost damage and stunning it for 4 sec. (Mage talent)"
       },
       "desperate_prayer": {
-        "name": "Última Plegaria",
-        "description": "Te sana al instante por {damage}. (talento de Sacerdote)"
+        "name": "Last Prayer",
+        "description": "Instantly heals you for {damage}. (Priest talent)"
       },
       "deterrence": {
-        "name": "Guardia de Zarzas",
-        "description": "Aumenta tu probabilidad de esquivar en 50 puntos porcentuales durante 10 s. (talento de Cazador)"
+        "name": "Bristleguard",
+        "description": "Increases your dodge chance by 50 percentage points for 10 sec. (Hunter talent)"
       },
       "divine_shield": {
-        "name": "Resguardo de Luz",
-        "description": "Te protege con poder sagrado y absorbe 900 de daño durante 8 s. (talento de Paladín)"
+        "name": "Lightward",
+        "description": "Shields you with holy power, absorbing 900 damage for 8 sec. (Paladin talent)"
       },
       "earthbind": {
-        "name": "Tierra Prensora",
-        "description": "Ata a la tierra a los enemigos cercanos y los inmoviliza durante 2 s. (talento de Chamán)"
+        "name": "Gripping Earth",
+        "description": "Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)"
       },
       "evocation": {
-        "name": "Pozo de Éter",
-        "description": "Restaura al instante 220 de maná. (talento de Mago)"
+        "name": "Aetherwell",
+        "description": "Instantly restores 220 mana. (Mage talent)"
       },
       "frenzied_regeneration": {
-        "name": "Remiendo Salvaje",
-        "description": "Restaura 180 de salud durante 10 s. Solo en Forma de Oso. (talento de Druida)"
+        "name": "Savage Mending",
+        "description": "Restores 180 health over 10 sec. Bruin Form only. (Druid talent)"
       },
       "frost_trap": {
-        "name": "Trampa de Cencellada",
-        "description": "Congela a los enemigos del área objetivo durante 3 s e impide que se muevan o actúen. (talento de Cazador)"
+        "name": "Rime Snare",
+        "description": "Freezes enemies at the target area for 3 sec, preventing movement and actions. (Hunter talent)"
       },
       "ghostly_strike": {
-        "name": "Golpe Espectral",
-        "description": "Golpea al enemigo e inflige el daño del arma más {damage}, aumenta brevemente la esquiva y otorga 1 punto de combo. (talento de Pícaro)"
+        "name": "Wraith Strike",
+        "description": "Strikes the enemy for weapon damage plus {damage} and briefly increases dodge. Awards 1 combo point. (Rogue talent)"
       },
       "hammer_of_wrath": {
-        "name": "Martillo Tañoso",
-        "description": "Lanza un martillo sagrado contra un enemigo herido e inflige {damage} de daño Sagrado. Solo se puede usar por debajo del 20% de salud. (talento de Paladín)"
+        "name": "Tolling Hammer",
+        "description": "Hurls a holy hammer at a wounded enemy for {damage} Holy damage. Only usable below 20% health. (Paladin talent)"
       },
       "healing_stream": {
-        "name": "Manantial",
-        "description": "Restaura 120 de salud a un objetivo aliado durante 12 s. (talento de Chamán)"
+        "name": "Springwell",
+        "description": "Restores 120 health to a friendly target over 12 sec. (Shaman talent)"
       },
       "holy_wrath": {
-        "name": "Ira del Santo",
-        "description": "Desata poder sagrado e inflige {damage} de daño a los enemigos cercanos. (talento de Paladín)"
+        "name": "Saint's Ire",
+        "description": "Unleashes holy power, damaging nearby enemies for {damage}. (Paladin talent)"
       },
       "howl_of_terror": {
-        "name": "Aullido Pavoroso",
-        "description": "Aterroriza a los enemigos cercanos hasta 3 s. El daño puede romper el efecto. (talento de Brujo)"
+        "name": "Dread Chorus",
+        "description": "Frightens nearby enemies for up to 3 sec. Damage may break the effect. (Warlock talent)"
       },
       "ice_block": {
-        "name": "Ataúd Helado",
-        "description": "Te encierra en hielo y absorbe 600 de daño durante 8 s. No puedes actuar mientras estás encerrado. Vuelve a lanzarlo para cancelarlo. (talento de Mago)"
+        "name": "Cold Coffin",
+        "description": "Encases you in ice, absorbing 600 damage for 8 sec. You cannot act while encased. Recast to cancel. (Mage talent)"
       },
       "inner_focus": {
-        "name": "Mente Serena",
-        "description": "Hace que tu siguiente hechizo sea gratuito. Dura 60 s. (talento de Sacerdote)"
+        "name": "Stilled Mind",
+        "description": "Makes your next spell free. Lasts 60 sec. (Priest talent)"
       },
       "innervate": {
-        "name": "Savia Vital",
-        "description": "La savia viva brota en ti durante 10 s y restaura en oleadas 20 de tu recurso actual: maná, ira o energía. Cambiar de forma no la interrumpe. El sueño, el aturdimiento o la estasis detienen la savia. (talento de Druida)"
+        "name": "Lifesap",
+        "description": "Living sap wells up in you for 10 sec, restoring 20 of your current resource in waves: mana, Rage, or Energy, and shifting forms does not break it. Sleep, stun, or stasis stills the sap. (Druid talent)"
       },
       "meteor": {
-        "name": "Piedra Celeste",
-        "description": "Hace caer un meteorito en el área objetivo e inflige {damage} de daño de Fuego. Después quema a los enemigos de la zona, infligiendo entre 12 y 18 de daño de Fuego cada 2 s durante 6 s. (talento de Mago)"
+        "name": "Skystone",
+        "description": "Calls down a meteor at the target area, dealing {damage} Fire damage, then burning enemies there for 12 to 18 Fire damage every 2 sec for 6 sec. (Mage talent)"
       },
       "mind_sear": {
-        "name": "Ardeideas",
-        "description": "Canaliza energía de las Sombras en el área objetivo e inflige {damage} de daño cada segundo a los enemigos cercanos. (talento de Sacerdote)"
+        "name": "Thoughtburn",
+        "description": "Channels shadow energy at the target area, damaging nearby enemies each second for {damage}. (Priest talent)"
       },
       "multi_shot": {
-        "name": "Disparo Dividido",
-        "description": "Dispara una salva al área objetivo e inflige {damage} de daño físico a los enemigos en un radio de 8 m. (talento de Cazador)"
+        "name": "Splitshot",
+        "description": "Loose a spread at the target area, dealing {damage} Physical damage to enemies within 8 yd. (Hunter talent)"
       },
       "prayer_of_healing": {
-        "name": "Coro Sanador",
-        "description": "Sana a los aliados cercanos por {damage}. (talento de Sacerdote)"
+        "name": "Choirmend",
+        "description": "Heals nearby allies for {damage}. (Priest talent)"
       },
       "preparation": {
-        "name": "Contingencia",
-        "description": "Termina el tiempo de reutilización de Sprint, Evasión y Esfumarse. (talento de Pícaro)"
+        "name": "Contingency",
+        "description": "Finishes the cooldown on Sprint, Evasion, and Vanish. (Rogue talent)"
       },
       "presence_of_mind": {
-        "name": "Mente Veloz",
-        "description": "Hace que tu siguiente hechizo con tiempo de lanzamiento sea instantáneo. Dura 60 s. (talento de Mago)"
+        "name": "Racing Mind",
+        "description": "Makes your next spell with a cast time instant. Lasts 60 sec. (Mage talent)"
       },
       "psychic_scream": {
-        "name": "Alarido Psíquico",
-        "description": "Aterroriza a los enemigos cercanos hasta 4 s. El daño puede romper el efecto. (talento de Sacerdote)"
+        "name": "Terror Canticle",
+        "description": "Frightens nearby enemies for up to 4 sec. Damage may break the effect. (Priest talent)"
       },
       "shadowstep": {
-        "name": "Paso Sombrío",
-        "description": "Avanzas entre las sombras hacia tu objetivo. (talento de Pícaro)"
+        "name": "Shadeslip",
+        "description": "Steps through the shadows toward your target. (Rogue talent)"
       },
       "silence": {
-        "name": "Silencio",
-        "description": "Silencia al objetivo durante 4 s. (talento de Sacerdote)"
+        "name": "Hushword",
+        "description": "Silences the target for 4 sec. (Priest talent)"
       },
       "smoke_screen": {
-        "name": "Cortina de Humo",
-        "description": "Desapareces en una nube de humo, lo que aumenta tu probabilidad de esquivar un 30% durante 8 s."
+        "name": "Smoke Screen",
+        "description": "Vanish into a cloud of smoke, increasing your chance to dodge by 30% for 8 sec."
       },
       "spellsteal": {
-        "name": "Robar Hechizo",
-        "description": "Roba un efecto mágico beneficioso de un enemigo y te lo transfiere."
+        "name": "Spellsteal",
+        "description": "Steals a beneficial magic effect from an enemy, transferring it to yourself."
       },
       "startle_shot": {
-        "name": "Disparo Sobresaltante",
-        "description": "Un disparo salvaje que desorienta al objetivo durante {duration} s. Cualquier daño rompe el efecto."
+        "name": "Startle Shot",
+        "description": "A wild shot that disorients the target for {duration} sec. Any damage breaks the effect."
       },
       "tranquility": {
-        "name": "Canto del Claro",
-        "description": "Canaliza energía restauradora durante 4 s y sana cada segundo entre 42 y 52 a los aliados en un radio de 30 m. (talento de Druida)"
+        "name": "Gladesong",
+        "description": "Channels restorative energy for 4 sec, healing allies within 30 yd for 42 to 52 each second. (Druid talent)"
       },
       "typhoon": {
-        "name": "Tifón",
-        "description": "Una ráfaga de viento repele a todos los enemigos en un radio de 8 m y los aturde, reduciendo su velocidad de movimiento un 50% durante 4 s."
+        "name": "Typhoon",
+        "description": "A blast of wind knocks back all enemies within 8 yd and dazes them, slowing their movement by 50% for 4 sec."
       },
       "voidfeast": {
-        "name": "Festín del Vacío",
-        "description": "Devora un efecto mágico (uno beneficioso de un enemigo o uno perjudicial de un aliado) y te sana un 6% de tu salud máxima."
+        "name": "Voidfeast",
+        "description": "Devours a magic effect (a beneficial one from an enemy, or a harmful one from an ally) and heals you for 6% of your maximum health."
       },
       "pummel": {
         "name": "Rompequijadas",
@@ -6884,8 +6905,16 @@ export const es_ES: EnTranslations = {
         "description": "Una apertura sigilosa que desgarra al enemigo causando el daño del arma más {damage} y provoca daño por sangrado durante 9 s. Otorga 1 punto de combo. Solo en Forma de lobo."
       },
       "revive_pet": {
-        "name": "Remendar",
-        "description": "Remienda a tu mascota y restaura {overTime} de salud durante 12 s en pulsos cada 3 s mientras esté viva. Si está muerta, la revive con un 35% de salud."
+        "name": "Revivir mascota",
+        "description": "Revive a tu mascota muerta y la devuelve a tu lado."
+      },
+      "commanding_shout": {
+        "name": "Grito Alentador",
+        "description": "Aumenta tu Aguante en {buff} durante 2 min."
+      },
+      "rend": {
+        "name": "Tajo Profundo",
+        "description": "Hiere al objetivo y le hace sangrar por {damage} de daño durante {duration} s."
       }
     },
     "items": {
@@ -8099,16 +8128,16 @@ export const es_ES: EnTranslations = {
         "name": "Marca Heroica"
       },
       "eastbrook_buckler": {
-        "name": "Rodela de Eastbrook"
+        "name": "Eastbrook Buckler"
       },
       "eastbrook_greatsword": {
-        "name": "Espadón de Eastbrook"
+        "name": "Eastbrook Greatsword"
       },
       "highwatch_greatsword": {
-        "name": "Espadón de Highwatch"
+        "name": "Highwatch Greatsword"
       },
       "highwatch_wallshield": {
-        "name": "Escudo Mural de Highwatch"
+        "name": "Highwatch Wallshield"
       },
       "morthens_cryptforged_hauberk": {
         "name": "Loriga forjada en cripta de Morthen"
