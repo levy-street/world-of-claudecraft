@@ -15270,9 +15270,13 @@ export class Hud {
       const item = ITEMS[s.itemId];
       const label = `${item ? itemDisplayName(item) : s.itemId}${s.count > 1 ? ` x${formatNumber(s.count, { maximumFractionDigits: 0 })}` : ''}`;
       const inner = `${this.itemIcon(item)}<span>${esc(label)}</span>`;
+      // Both sides carry data-item so either can be hovered/focused to inspect it.
+      // Their (read-only) rows are non-interactive divs, so give them tabindex="0"
+      // to keep the inspect tooltip keyboard- and long-press-reachable like the
+      // clickable "mine" buttons.
       return mine
         ? `<button type="button" class="trade-item mine" data-item="${esc(s.itemId)}">${inner}</button>`
-        : `<div class="trade-item">${inner}</div>`;
+        : `<div class="trade-item" data-item="${esc(s.itemId)}" tabindex="0">${inner}</div>`;
     };
     el.innerHTML = `
       <div class="panel-title"><span>${esc(t('hud.trade.title', { name: info.otherName }))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.trade.cancel'))}">${svgIcon('close')}</button></div>
@@ -15316,6 +15320,13 @@ export class Hud {
           this.pushTradeOffer();
         }
       });
+    });
+    // Trade item preview: hover, focus, or long-press any offered item (yours or
+    // theirs) to inspect it, reusing the shared item tooltip that bags, the vendor,
+    // and loot rows use. Guarded on a resolvable item so a stale id never throws.
+    el.querySelectorAll('.trade-item').forEach((row) => {
+      const item = ITEMS[(row as HTMLElement).dataset.item ?? ''];
+      if (item) this.attachTooltip(row as HTMLElement, () => this.itemTooltip(item));
     });
     const goldInput = el.querySelector('#trade-g') as HTMLInputElement;
     const silverInput = el.querySelector('#trade-s') as HTMLInputElement;
