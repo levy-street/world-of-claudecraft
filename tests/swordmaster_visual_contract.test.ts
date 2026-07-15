@@ -8,10 +8,14 @@ import {
   visualKeyFor,
 } from '../src/render/characters/manifest';
 import { isSpinAttackAbility } from '../src/render/characters/weapon_attack_style_core';
+import { weaponAuraPlan } from '../src/render/characters/weapon_aura_core';
 import { paintWeaponAura } from '../src/render/characters/weapon_aura_painter';
-import { weaponAuraPlan } from '../src/render/characters/weapon_aura_plan';
+import {
+  swordmasterDamageEventVisualPlan,
+  swordmasterDamageVisualPlan,
+  swordmasterSpellVisualPlan,
+} from '../src/render/swordmaster_fx_core';
 import { SwordmasterFxPainter } from '../src/render/swordmaster_fx_painter';
-import { swordmasterDamageVisualPlan } from '../src/render/swordmaster_fx_plan';
 import { CLASS_DETAILS, SIGNATURE_ABILITIES } from '../src/ui/class_details_data';
 import { hasCrestRecipe } from '../src/ui/icons';
 
@@ -184,6 +188,23 @@ describe('SwordMaster procedural VFX plans', () => {
     expect(swordmasterDamageVisualPlan('heroic_strike')).toBeNull();
   });
 
+  it('paints area arcs from activation even without a hit and excludes later damage events', () => {
+    expect(swordmasterSpellVisualPlan('flourish', 'crescent_sweep')).toMatchObject({
+      kind: 'sweep',
+      anchor: 'source',
+    });
+    expect(swordmasterSpellVisualPlan('flourish', 'blade_cyclone')).toMatchObject({
+      kind: 'cyclone',
+      anchor: 'source',
+    });
+    expect(swordmasterSpellVisualPlan('nova', 'blade_cyclone')).toBeNull();
+    expect(swordmasterDamageEventVisualPlan('blade_cyclone')).toBeNull();
+    expect(swordmasterDamageEventVisualPlan('twin_slash')).toMatchObject({
+      kind: 'twin-cut',
+      anchor: 'target',
+    });
+  });
+
   it('paints one two-arc pair for the paired mainhand and offhand damage events', () => {
     const scene = new THREE.Scene();
     const painter = new SwordmasterFxPainter(scene, (entityId, heightFraction) =>
@@ -204,6 +225,23 @@ describe('SwordMaster procedural VFX plans', () => {
     painter.dispose();
     expect(scene.children).toHaveLength(0);
   });
+
+  it('orients a source-centered Crescent Sweep to the live player facing', () => {
+    const scene = new THREE.Scene();
+    const painter = new SwordmasterFxPainter(
+      scene,
+      (_entityId, heightFraction) => new THREE.Vector3(0, heightFraction * 2, 0),
+    );
+    const plan = swordmasterDamageVisualPlan('crescent_sweep');
+    if (!plan) throw new Error('Crescent Sweep VFX plan missing');
+    const facing = Math.PI * 0.75;
+
+    painter.paint(plan, 1, 1, facing);
+
+    const arc = scene.children.find((child) => child.visible);
+    expect(arc?.rotation.z).toBeCloseTo(facing, 8);
+    painter.dispose();
+  });
 });
 
 describe('SwordMaster character selector surface', () => {
@@ -222,6 +260,9 @@ describe('SwordMaster character selector surface', () => {
       expect(row).toContain('swordmaster');
     }
     expect(shellCss).toContain('width: min(966px, calc(100vw - 32px))');
+    expect(shellCss).toMatch(
+      /mini-class\[data-class="swordmaster"\][\s\S]*?font-size: 11px;[\s\S]*?white-space: nowrap;/,
+    );
     expect(shellCss).toMatch(
       /body\.mobile-touch #charcreate-panel \.mini-class-row\s*\{\s*grid-template-columns: repeat\(2/,
     );

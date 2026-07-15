@@ -33,8 +33,8 @@ import { disposeMaterialVariants, restoreOriginalMaterials } from './material_st
 import { SKIN_ATTACK_CLIP_NAMES, weaponSkinAttackClips, weaponSkinOrientPin } from './skin_attack';
 import { createStowTransition, forceStow, requestStow, tickStow } from './stow_transition';
 import { weaponAttackStyle } from './weapon_attack_style_core';
+import type { WeaponAuraPlan } from './weapon_aura_core';
 import { paintWeaponAura, type WeaponAuraHandle } from './weapon_aura_painter';
-import type { WeaponAuraPlan } from './weapon_aura_plan';
 import {
   disposeOwnedWeaponSkinMaterials,
   markOwnedWeaponSkinMaterials,

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import type { WeaponAuraPlan } from './weapon_aura_plan';
+import type { WeaponAuraPlan } from './weapon_aura_core';
 
 export interface WeaponAuraHandle {
   readonly meshCount: number;

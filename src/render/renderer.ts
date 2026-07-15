@@ -57,7 +57,7 @@ import {
   playerRangedAttackStartsAtLaunch,
 } from './characters/skin_attack';
 import { attackAbilityId, isSpinAttackAbility } from './characters/weapon_attack_style_core';
-import { weaponAuraPlan } from './characters/weapon_aura_plan';
+import { weaponAuraPlan } from './characters/weapon_aura_core';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { trackWebGLContext } from './context_release';
 import { buildCritters, type CritterField } from './critters';
@@ -120,8 +120,11 @@ import { buildClouds, buildSky, type SkyView } from './sky';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
 import { freezeStaticMatrices } from './static_matrix';
 import { shouldRenderStealthGhost } from './stealth';
+import {
+  swordmasterDamageEventVisualPlan,
+  swordmasterSpellVisualPlan,
+} from './swordmaster_fx_core';
 import { SwordmasterFxPainter } from './swordmaster_fx_painter';
-import { swordmasterDamageVisualPlan } from './swordmaster_fx_plan';
 import { buildFlaredConeFan, buildRingXZ, drapeConeWorld } from './target_cone_debug';
 import { buildTerrain, type TerrainView } from './terrain';
 import { sparkleTexture } from './textures';
@@ -2962,9 +2965,14 @@ export class Renderer {
         }
         if (warriorCast?.kind === 'gesture') {
           this.triggerAttack(ev.sourceId, warriorCast.abilityId);
-          const swordmasterPlan = swordmasterDamageVisualPlan(warriorCast.abilityId);
-          if (swordmasterPlan?.kind === 'twin-cut')
-            this.swordmasterFx.paint(swordmasterPlan, ev.sourceId, ev.targetId);
+          const swordmasterPlan = swordmasterSpellVisualPlan(ev.fx, warriorCast.abilityId);
+          if (swordmasterPlan)
+            this.swordmasterFx.paint(
+              swordmasterPlan,
+              ev.sourceId,
+              ev.targetId,
+              this.sim.entities.get(ev.sourceId)?.facing,
+            );
           break;
         }
         if (ev.fx === 'projectile') this.vfx.projectile(ev.sourceId, ev.targetId, ev.school);
@@ -3020,9 +3028,14 @@ export class Renderer {
           this.triggerHit(ev.targetId);
           if (ev.school === 'physical') {
             this.vfx.meleeSpark(ev.targetId, ev.crit);
-            const swordmasterPlan = swordmasterDamageVisualPlan(abilityId);
+            const swordmasterPlan = swordmasterDamageEventVisualPlan(abilityId);
             if (swordmasterPlan)
-              this.swordmasterFx.paint(swordmasterPlan, ev.sourceId, ev.targetId);
+              this.swordmasterFx.paint(
+                swordmasterPlan,
+                ev.sourceId,
+                ev.targetId,
+                this.sim.entities.get(ev.sourceId)?.facing,
+              );
           }
         }
         break;

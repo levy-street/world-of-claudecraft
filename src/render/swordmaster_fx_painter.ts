@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import type { SwordmasterDamageVisualPlan } from './swordmaster_fx_plan';
+import type { SwordmasterDamageVisualPlan } from './swordmaster_fx_core';
 
 type EntityAnchor = (entityId: number, heightFraction: number) => THREE.Vector3 | null;
 
@@ -52,7 +52,12 @@ export class SwordmasterFxPainter {
     }
   }
 
-  paint(plan: SwordmasterDamageVisualPlan, sourceId: number, targetId: number): void {
+  paint(
+    plan: SwordmasterDamageVisualPlan,
+    sourceId: number,
+    targetId: number,
+    sourceFacing = 0,
+  ): void {
     const source = this.anchor(sourceId, plan.anchor === 'source' ? 0.08 : 0.5);
     const target = this.anchor(targetId, 0.5);
     const at = plan.anchor === 'source' ? source : target;
@@ -63,7 +68,12 @@ export class SwordmasterFxPainter {
       return;
     }
 
-    const facing = source && target ? Math.atan2(target.x - source.x, target.z - source.z) : 0;
+    const targetFacing =
+      source && target ? Math.atan2(target.x - source.x, target.z - source.z) : sourceFacing;
+    // Source-centered flourishes carry a self target, so their direction cannot
+    // be inferred from the source-to-target vector. Use the entity's live
+    // facing supplied by the renderer instead.
+    const facing = plan.anchor === 'source' ? sourceFacing : targetFacing;
     for (let i = 0; i < plan.arcs; i++) {
       const slot = this.slots[this.nextSlot];
       this.nextSlot = (this.nextSlot + 1) % this.slots.length;

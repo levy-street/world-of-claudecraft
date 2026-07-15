@@ -51,7 +51,7 @@ const AOE_PLANS: Readonly<Record<string, Omit<SwordmasterDamageVisualPlan, 'abil
   },
 };
 
-/** Stable presentation routing for the SwordMaster's physical damage events. */
+/** Stable presentation routing for the SwordMaster's authored blade effects. */
 export function swordmasterDamageVisualPlan(
   abilityId: string | undefined,
 ): SwordmasterDamageVisualPlan | null {
@@ -65,4 +65,22 @@ export function swordmasterDamageVisualPlan(
   }
   const plan = AOE_PLANS[abilityId];
   return plan ? { abilityId, ...plan } : null;
+}
+
+/** Area arcs belong to the activation event, so they remain visible on a miss
+ * or an empty cast and never multiply once per damaged target. */
+export function swordmasterSpellVisualPlan(
+  fx: string,
+  abilityId: string | undefined,
+): SwordmasterDamageVisualPlan | null {
+  return fx === 'flourish' ? swordmasterDamageVisualPlan(abilityId) : null;
+}
+
+/** Paired single-target cuts originate from damage events. Area plans are
+ * intentionally excluded because their activation event already painted them. */
+export function swordmasterDamageEventVisualPlan(
+  abilityId: string | undefined,
+): SwordmasterDamageVisualPlan | null {
+  const plan = swordmasterDamageVisualPlan(abilityId);
+  return plan?.kind === 'twin-cut' ? plan : null;
 }

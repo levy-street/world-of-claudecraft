@@ -2868,6 +2868,14 @@
       max-width: 100%;
       overflow-wrap: anywhere;
     }
+    #offline-select.cs-wow .mini-class[data-class="swordmaster"] .mini-class-label,
+    body:not(.mobile-touch)
+      #charcreate-panel.cs-wow
+      .mini-class[data-class="swordmaster"]
+      .mini-class-label {
+      font-size: 11px;
+      white-space: nowrap;
+    }
     #offline-select.cs-wow .mini-class.sel .mini-class-label,
     body:not(.mobile-touch) #charcreate-panel.cs-wow .mini-class.sel .mini-class-label {
       color: #ffd100;

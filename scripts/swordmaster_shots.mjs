@@ -47,17 +47,33 @@ async function preparePage(viewport) {
   return page;
 }
 
-async function openSwordmasterSelector(page) {
+async function activateSelector(page, selector, useTouch) {
+  await page.waitForSelector(selector, { visible: true, timeout: 30_000 });
+  if (!useTouch) {
+    await page.click(selector);
+    return;
+  }
+  const center = await page.$eval(selector, (element) => {
+    const rect = element.getBoundingClientRect();
+    return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+  });
+  const receivesTouch = await page.evaluate(
+    ({ query, x, y }) => {
+      const target = document.querySelector(query);
+      const hit = document.elementFromPoint(x, y);
+      return target instanceof HTMLElement && hit instanceof Element && target.contains(hit);
+    },
+    { query: selector, ...center },
+  );
+  if (!receivesTouch) throw new Error(`${selector} does not receive pointer input at its center`);
+  await page.touchscreen.tap(center.x, center.y);
+}
+
+async function openSwordmasterSelector(page, useTouch = false) {
   await page.goto(URL, { waitUntil: 'networkidle0', timeout: 60_000 });
   await page.waitForSelector('#btn-offline', { timeout: 60_000 });
   await page.evaluate(() => document.querySelector('#btn-offline')?.click());
-  await page.waitForSelector('#offline-select .mini-class[data-class="swordmaster"]', {
-    visible: true,
-    timeout: 30_000,
-  });
-  await page.evaluate(() => {
-    document.querySelector('#offline-select .mini-class[data-class="swordmaster"]')?.click();
-  });
+  await activateSelector(page, '#offline-select .mini-class[data-class="swordmaster"]', useTouch);
   await wait(1_200);
   return page.evaluate(() => {
     const selected = document.querySelector('#offline-select .mini-class.sel');
@@ -72,6 +88,7 @@ async function openSwordmasterSelector(page) {
 
 let desktopSelector = null;
 let mobileSelector = null;
+let mobileLandscapeSelector = null;
 if (!COMBAT_ONLY) {
   const desktop = await preparePage({ width: 1440, height: 960 });
   desktopSelector = await openSwordmasterSelector(desktop);
@@ -85,9 +102,62 @@ if (!COMBAT_ONLY) {
     isMobile: true,
     hasTouch: true,
   });
-  mobileSelector = await openSwordmasterSelector(mobile);
+  mobileSelector = await openSwordmasterSelector(mobile, true);
   await capture(mobile, 'after-mobile');
   await mobile.close();
+
+  const mobileLandscape = await preparePage({
+    width: 844,
+    height: 390,
+    deviceScaleFactor: 1,
+    isMobile: true,
+    hasTouch: true,
+  });
+  mobileLandscapeSelector = await openSwordmasterSelector(mobileLandscape, true);
+  const landscapeReachability = await mobileLandscape.evaluate(() => {
+    const panel = document.querySelector('#offline-select');
+    const leftColumn = panel?.querySelector('.charselect-col-left');
+    const enter = panel?.querySelector('#btn-start-offline');
+    const back = panel?.querySelector('#btn-offline-back');
+    if (!(panel instanceof HTMLElement) || !(leftColumn instanceof HTMLElement)) return null;
+    leftColumn.scrollTop = leftColumn.scrollHeight;
+    const panelRect = panel.getBoundingClientRect();
+    const visibleBottom = Math.min(window.innerHeight, panelRect.bottom);
+    const buttonState = (element) => {
+      if (!(element instanceof HTMLElement)) return { visible: false, touchReachable: false };
+      const rect = element.getBoundingClientRect();
+      const visible =
+        rect.width > 0 &&
+        rect.height >= 30 &&
+        rect.top >= panelRect.top &&
+        rect.bottom <= visibleBottom;
+      const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+      return {
+        visible,
+        touchReachable: visible && hit instanceof Element && element.contains(hit),
+      };
+    };
+    const enterState = buttonState(enter);
+    const backState = buttonState(back);
+    return {
+      touchPoints: navigator.maxTouchPoints,
+      panelWithinViewport:
+        panelRect.left >= 0 &&
+        panelRect.right <= window.innerWidth &&
+        panelRect.top >= 0 &&
+        panelRect.bottom <= window.innerHeight,
+      scrollReachable:
+        leftColumn.scrollHeight <= leftColumn.clientHeight + 1 || leftColumn.scrollTop > 0,
+      enterVisible: enterState.visible,
+      backVisible: backState.visible,
+      enterTouchReachable: enterState.touchReachable,
+      backTouchReachable: backState.touchReachable,
+    };
+  });
+  mobileLandscapeSelector = { ...mobileLandscapeSelector, ...landscapeReachability };
+  await wait(200);
+  await capture(mobileLandscape, 'after-mobile-landscape');
+  await mobileLandscape.close();
 }
 
 const page = await preparePage({ width: 1440, height: 960, deviceScaleFactor: 1 });
@@ -290,7 +360,16 @@ await page.evaluate(() => window.__game.hud.toggleTalents());
 
 console.log(
   JSON.stringify(
-    { desktopSelector, mobileSelector, staged, auraCast, auraActive, cyclone, browserErrors },
+    {
+      desktopSelector,
+      mobileSelector,
+      mobileLandscapeSelector,
+      staged,
+      auraCast,
+      auraActive,
+      cyclone,
+      browserErrors,
+    },
     null,
     2,
   ),
@@ -309,8 +388,17 @@ const ok =
   (COMBAT_ONLY ||
     (desktopSelector?.selected === 'swordmaster' &&
       mobileSelector?.selected === 'swordmaster' &&
+      mobileLandscapeSelector?.selected === 'swordmaster' &&
       desktopSelector?.classCount === 10 &&
-      mobileSelector?.classCount === 10)) &&
+      mobileSelector?.classCount === 10 &&
+      mobileLandscapeSelector?.classCount === 10 &&
+      mobileLandscapeSelector?.touchPoints > 0 &&
+      mobileLandscapeSelector?.panelWithinViewport &&
+      mobileLandscapeSelector?.scrollReachable &&
+      mobileLandscapeSelector?.enterVisible &&
+      mobileLandscapeSelector?.backVisible &&
+      mobileLandscapeSelector?.enterTouchReachable &&
+      mobileLandscapeSelector?.backTouchReachable)) &&
   staged.playerClass === 'swordmaster' &&
   staged.mainhand === 'worn_sword' &&
   staged.offhand === 'worn_sword' &&
