@@ -303,6 +303,29 @@ describe('POST /api/card', () => {
     expect(insert?.[1][4]).toBe('Sir Test - Level 12 Paladin');
   });
 
+  it('uses the canonical SwordMaster label while a locale awaits its release translation', async () => {
+    characterRows = [
+      {
+        id: 5,
+        account_id: 1,
+        name: 'Azure',
+        class: 'swordmaster',
+        level: 7,
+        state: { level: 7 },
+      },
+    ];
+    slugRows = [];
+
+    const { status } = await callUpload('/api/card?character=5&lang=es_ES', validCardPng);
+
+    expect(status).toBe(200);
+    const insert = dbMock.query.mock.calls.find((c) =>
+      String(c[0]).includes('INSERT INTO player_cards'),
+    );
+    expect(insert?.[1][4]).toBe('Azure - Nivel 7 SwordMaster');
+    expect(insert?.[1][6]).toBe('es_ES');
+  });
+
   it('uses the saved level when level query params are absent or forged', async () => {
     characterRows = [{ id: 5, account_id: 1, name: 'Sir Test', class: 'paladin', level: 12 }];
     for (const url of [

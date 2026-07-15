@@ -15,11 +15,11 @@ import { requiredClassesForTooltip } from '../src/ui/item_class_restriction';
 // classes (and weapons have no equivalent badge at all), so the line must always
 // render when the item carries a class restriction.
 describe('requiredClassesForTooltip', () => {
-  it('names the classes for a rogue/hunter-only weapon (Fang of Korzul)', () => {
+  it('names every class eligible for Fang of Korzul', () => {
     const item = ITEMS.fang_of_korzul;
     expect(item).toBeDefined();
     expect(canEquipItem('druid', item)).toBe(false);
-    expect(requiredClassesForTooltip(item)).toEqual(['rogue', 'hunter']);
+    expect(requiredClassesForTooltip(item)).toEqual(['rogue', 'hunter', 'swordmaster']);
   });
 
   it('does not advertise Rogue for a future two-handed weapon', () => {
@@ -55,11 +55,12 @@ describe('requiredClassesForTooltip', () => {
   });
 
   it('derives the enforced classes for unrestricted two-handed vendor weapons', () => {
-    const expected = ALL_CLASSES.filter((cls) => cls !== 'rogue');
+    const expected = ALL_CLASSES.filter((cls) => cls !== 'rogue' && cls !== 'swordmaster');
     for (const id of ['eastbrook_greatsword', 'highwatch_greatsword'] as const) {
       const item = ITEMS[id];
       expect(item.requiredClass).toBeUndefined();
       expect(canEquipItem('rogue', item)).toBe(false);
+      expect(canEquipItem('swordmaster', item)).toBe(false);
       expect(requiredClassesForTooltip(item)).toEqual(expected);
     }
   });

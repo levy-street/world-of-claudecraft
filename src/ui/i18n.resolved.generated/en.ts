@@ -1357,6 +1357,7 @@ export const en: EnTranslations = {
         "armor": "Increases armor by {value}",
         "int": "Increases Intellect by {value}",
         "agi": "Increases Agility by {value}",
+        "strAgi": "Increases Strength and Agility by {value}",
         "sta": "Increases Stamina by {value}",
         "spi": "Increases Spirit by {value}",
         "allStats": "Increases all attributes by {value}"
@@ -1366,6 +1367,7 @@ export const en: EnTranslations = {
         "armor": "Reduces armor by {value}",
         "int": "Reduces Intellect by {value}",
         "agi": "Reduces Agility by {value}",
+        "strAgi": "Reduces Strength and Agility by {value}",
         "sta": "Reduces Stamina by {value}",
         "spi": "Reduces Spirit by {value}",
         "allStats": "Reduces all attributes by {value}"
@@ -2226,14 +2228,14 @@ export const en: EnTranslations = {
         "heading": "A classic MMO, made to be picked up",
         "pillarPlayTitle": "Play in your browser",
         "pillarPlayBody": "No download, no launcher. Make a character and you are in the world in seconds, on desktop or phone.",
-        "pillarClassesTitle": "Nine classes, three roles",
+        "pillarClassesTitle": "Ten classes, three roles",
         "pillarClassesBody": "Tank, heal, or deal the damage. Every class plays the way its archetype should, with talents to make it yours.",
         "pillarOpenTitle": "Free and open source",
         "pillarOpenBody": "Free to play to the level cap, with the whole game open source. No pay to win, ever."
       },
       "classes": {
         "heading": "Choose your class",
-        "sub": "Nine classic archetypes, each with its own feel and party role.",
+        "sub": "Ten classic archetypes, each with its own feel and party role.",
         "cta": "Explore the classes"
       },
       "world": {
@@ -2505,7 +2507,7 @@ export const en: EnTranslations = {
       "q4": "Can I play offline or solo?",
       "a4": "Yes. There is an instant single-player offline mode, and the online world is fully soloable apart from dungeons, the raid, and the world boss.",
       "q5": "How many classes are there?",
-      "a5": "Nine, covering the classic tank, healer, and damage roles, each with a resource system (rage, mana, or energy) and its own signature abilities.",
+      "a5": "Ten, covering the classic tank, healer, and damage roles, each with a resource system (rage, mana, or energy) and its own signature abilities.",
       "q6": "What is the level cap?",
       "a6": "Level {cap}, reached across three connected zones of quests, dungeons, and exploration.",
       "q7": "Will my character be saved?",
@@ -2520,7 +2522,7 @@ export const en: EnTranslations = {
       "a11": "Invite anyone you meet to a party, ask in chat, or team up at a dungeon. Most of the world is soloable, so grouping is a choice, not a requirement."
     },
     "classList": {
-      "heading": "The nine classes",
+      "heading": "The ten classes",
       "sub": "Tank, heal, or deal the damage. Pick the fantasy that calls to you, then make it your own with talents."
     },
     "role": {
@@ -2555,7 +2557,8 @@ export const en: EnTranslations = {
       "shaman": "A spirit-caller who bends storm, fire, and water, and mends allies between the lightning.",
       "mage": "A spellweaver of fire, frost, and arcane who controls the battlefield from afar.",
       "warlock": "A dark conjurer who commands demons and curses, trading life for devastating power.",
-      "druid": "A shapeshifter who tanks as a bear, savages foes as a cat, or heals in the thick of it."
+      "druid": "A shapeshifter who tanks as a bear, savages foes as a cat, or heals in the thick of it.",
+      "swordmaster": "A swift dual-blade fighter who builds momentum through precision, speed, and sweeping attacks."
     },
     "tag": {
       "melee": "Melee",
@@ -2588,6 +2591,15 @@ export const en: EnTranslations = {
       "battle_shout": "A rallying cry that raises attack power for the party.",
       "charge": "Rushes a distant enemy to open the fight with a brief stun.",
       "thunder_clap": "Hits everything around you and slows their attacks.",
+      "twin_slash": "Cuts with both blades in one quick sequence to build momentum.",
+      "crescent_sweep": "Carves a wide arc through nearby enemies.",
+      "fleet_step": "Sharpens your footwork for a burst of movement speed.",
+      "sword_aura": "Focuses briefly to wreathe both blades in blue energy, empowering strength and agility.",
+      "wind_lunge": "Breaks roots and lunges forward in your facing direction.",
+      "parrying_flow": "Flows between incoming blows to evade more attacks for a short time.",
+      "blade_cyclone": "Whirls both blades through nearby enemies, turning gathered momentum into a sweeping burst.",
+      "duelist_flurry": "Sets a measured cadence that greatly accelerates your attacks.",
+      "azure_rush": "Surges forward in a blue flash and slows nearby enemies.",
       "seal_of_righteousness": "Imbues your swings with Holy damage, then spend it with Verdict.",
       "holy_light": "A steady, sizable heal for topping off an ally or yourself.",
       "devotion_aura": "A lasting self-buff that raises armor so hits land softer.",
@@ -3988,6 +4000,7 @@ export const en: EnTranslations = {
     "mage": "Mage",
     "warlock": "Warlock",
     "druid": "Druid",
+    "swordmaster": "SwordMaster",
     "warriorAria": "Warrior class",
     "paladinAria": "Paladin class",
     "hunterAria": "Hunter class",
@@ -3996,7 +4009,8 @@ export const en: EnTranslations = {
     "shamanAria": "Shaman class",
     "mageAria": "Mage class",
     "warlockAria": "Warlock class",
-    "druidAria": "Druid class"
+    "druidAria": "Druid class",
+    "swordmasterAria": "SwordMaster class"
   },
   "controls": {
     "title": "Controls Guide",
@@ -4615,7 +4629,7 @@ export const en: EnTranslations = {
     "reconnecting": "Connection lost. Reconnecting...",
     "connectionRejected": "The server closed the connection.",
     "tips": {
-      "classes": "Tip: each of the 9 classes plays differently. Try a few before committing to one.",
+      "classes": "Tip: each of the 10 classes plays differently. Try a few before committing to one.",
       "talents": "Tip: you can reset your talents any time you are out of combat, so an early pick is never a trap.",
       "dungeons": "Tip: try a dungeon on heroic difficulty once you outgear normal for a tougher, more rewarding fight.",
       "market": "Tip: the World Market lets you buy and sell with players across the whole realm.",
@@ -4760,6 +4774,7 @@ export const en: EnTranslations = {
       "paladin": "Healer / Tank / Melee DPS",
       "hunter": "Ranged DPS",
       "rogue": "Melee DPS",
+      "swordmaster": "Mobile Melee DPS",
       "priest": "Healer / Ranged DPS",
       "shaman": "Healer / Melee or Ranged DPS",
       "mage": "Ranged DPS",
@@ -4776,6 +4791,7 @@ export const en: EnTranslations = {
       "swordsMaces": "Swords, Maces",
       "axesSwords": "Axes, Swords",
       "daggersSwords": "Daggers, Swords",
+      "twinOneHanders": "Two One-Handed Weapons",
       "staves": "Staves",
       "macesAxes": "Maces, Axes"
     },
@@ -4788,7 +4804,8 @@ export const en: EnTranslations = {
       "shaman": "Shaman command the elements, imbuing weapons with power, shocking enemies with lightning, and restoring allies.",
       "mage": "Mages bend Fire, Frost, and arcane force to destroy enemies, summon water, and freeze threats in place.",
       "warlock": "Warlocks summon demons, apply curses and damage-over-time magic, and leech life from enemies to endure.",
-      "druid": "Druids channel nature, healing wounds, entangling foes, and shifting into animal forms for defense or damage."
+      "druid": "Druids channel nature, healing wounds, entangling foes, and shifting into animal forms for defense or damage.",
+      "swordmaster": "SwordMasters build momentum with precise twin-blade strikes, then turn speed into sweeping attacks that cut through whole groups."
     },
     "aria": "Class details for {className}: role {role}. Starting stats: Strength {str}, Agility {agi}, Stamina {sta}, Intellect {int}, Spirit {spi}.",
     "statBarAria": "{stat}: {value} out of 25"
@@ -5777,6 +5794,54 @@ export const en: EnTranslations = {
       "sport_second_wind": {
         "name": "Fresh Legs",
         "description": "Find your legs: move 50% faster for 4 sec."
+      },
+      "twin_slash": {
+        "name": "Twin Slash",
+        "description": "Strike the target with both swords in main-hand then off-hand order."
+      },
+      "crescent_sweep": {
+        "name": "Crescent Sweep",
+        "description": "Sweep both swords through up to 5 enemies in a 6 yard frontal arc."
+      },
+      "fleet_step": {
+        "name": "Fleet Step",
+        "description": "Increase movement speed for 5 sec. Higher ranks increase the bonus."
+      },
+      "sword_aura": {
+        "name": "Sword Aura",
+        "description": "Imbue both swords with azure power, gaining 12 Strength and 12 Agility for 5 min."
+      },
+      "wind_lunge": {
+        "name": "Wind Lunge",
+        "description": "Break roots and lunge 8 yards in your facing direction."
+      },
+      "parrying_flow": {
+        "name": "Parrying Flow",
+        "description": "Flow between incoming blows, gaining 20% dodge for 8 sec."
+      },
+      "quickening": {
+        "name": "Quickening",
+        "description": "Accelerate your attack speed by 25% for 12 sec."
+      },
+      "blade_dance": {
+        "name": "Blade Dance",
+        "description": "Dance through nearby enemies, striking up to 6 targets with both swords."
+      },
+      "twin_finisher": {
+        "name": "Twin Finisher",
+        "description": "Commit both swords to a heavy two-part finishing strike."
+      },
+      "blade_cyclone": {
+        "name": "Blade Cyclone",
+        "description": "Become a cyclone of steel, striking up to 8 enemies within 9 yards with both swords."
+      },
+      "duelist_flurry": {
+        "name": "Duelist Flurry",
+        "description": "Enter a measured flurry, increasing attack speed by 35% for 12 sec."
+      },
+      "azure_rush": {
+        "name": "Azure Rush",
+        "description": "Rush 12 yards in a flash of azure steel and slow nearby enemies by 50% for 3 sec."
       },
       "flamestrike": {
         "name": "Flamestrike",

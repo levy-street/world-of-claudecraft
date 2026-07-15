@@ -499,6 +499,30 @@ describe('create handler', () => {
     });
   });
 
+  it('accepts SwordMaster and threads its canonical id through state creation and persistence', async () => {
+    const initialCharacterState = vi.fn(() => st());
+    const createCharacterCapped = vi.fn(async () =>
+      charRow({ id: 13, name: 'Azure', class: 'swordmaster', state: st({ skin: 4 }) }),
+    );
+    installRuntime({ initialCharacterState });
+    setCharactersDbForTests({ createCharacterCapped });
+
+    const res = await callHandler('POST', '/api/characters', {
+      account: { accountId: 7, scope: 'full' },
+      body: { name: 'Azure', class: 'swordmaster', skin: 4 },
+    });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ class: 'swordmaster', skin: 4 });
+    expect(initialCharacterState).toHaveBeenCalledWith('swordmaster', 'Azure', 4);
+    expect(createCharacterCapped.mock.calls[0]?.slice(0, 4)).toEqual([
+      7,
+      'Azure',
+      'swordmaster',
+      10,
+    ]);
+  });
+
   it('increments the characters-created counter on the created path', async () => {
     let created = 0;
     const counters: GameMetricsCounters = {

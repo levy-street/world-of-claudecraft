@@ -628,11 +628,14 @@ export interface SimContextCallbacks {
     abilityName: string | null,
     opts: {
       cannotBeDodged?: boolean;
+      weapon?: Entity['weapon'];
       weaponMult?: number;
+      apSwingSpeed?: number;
       threatFlat?: number;
       threatMult?: number;
       forceCrit?: boolean;
       onDealt?: (amount: number) => void;
+      whiteDualWieldPenalty?: boolean;
     },
   ): boolean;
   effectiveAttackPower(e: Entity): number;

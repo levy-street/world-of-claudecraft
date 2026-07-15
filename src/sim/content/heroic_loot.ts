@@ -32,9 +32,10 @@ export const NYTHRAXIS_RAID_BOSS_ID = 'nythraxis_scourge_of_thornpeak';
 export const NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL = 27;
 
 const HEAVY = ['warrior', 'paladin', 'shaman'] as ItemDef['requiredClass']; // plate/mail
+const HEAVY_ONE_HAND = ['warrior', 'paladin', 'shaman', 'swordmaster'] as ItemDef['requiredClass'];
 const HEAL_MAIL = ['paladin', 'shaman'] as ItemDef['requiredClass']; // int/spi mail wearers
-const AGILE = ['rogue', 'hunter'] as ItemDef['requiredClass'];
-const AGILE_WILD = ['rogue', 'hunter', 'druid'] as ItemDef['requiredClass'];
+const AGILE = ['rogue', 'hunter', 'swordmaster'] as ItemDef['requiredClass'];
+const AGILE_WILD = ['rogue', 'hunter', 'druid', 'swordmaster'] as ItemDef['requiredClass'];
 const CASTER = ['mage', 'priest', 'warlock', 'druid'] as ItemDef['requiredClass'];
 
 export const HEROIC_ITEMS: Record<string, ItemDef> = {
@@ -268,7 +269,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 31, max: 52, speed: 2.6 },
     stats: { str: 13, sta: 9 },
     sellValue: 15000,
-    requiredClass: HEAVY,
+    requiredClass: HEAVY_ONE_HAND,
   },
   shroud_of_the_gravewyrm: {
     id: 'shroud_of_the_gravewyrm',

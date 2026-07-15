@@ -1256,8 +1256,9 @@ export const ZONE2_OBJECTS: GroundObjectDef[] = [
 // Archetype groups for class-locked rewards (REWARD_ARCHETYPE hands warrior
 // rewards to paladins/shamans etc., so the lock must admit the whole group).
 const WAR: PlayerClass[] = ['warrior', 'paladin', 'shaman'];
+const WAR_WEAPON: PlayerClass[] = ['warrior', 'paladin', 'shaman', 'swordmaster'];
 const MAG: PlayerClass[] = ['mage', 'priest', 'warlock', 'druid'];
-const ROG: PlayerClass[] = ['rogue', 'hunter'];
+const ROG: PlayerClass[] = ['rogue', 'hunter', 'swordmaster'];
 
 export const ZONE2_ITEMS: Record<string, ItemDef> = {
   // --- quest items ---
@@ -1532,7 +1533,7 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 11, max: 18, speed: 2.4 },
     stats: { str: 4 },
     sellValue: 300,
-    requiredClass: WAR,
+    requiredClass: WAR_WEAPON,
   },
   staff_of_drowned_prayers: {
     id: 'staff_of_drowned_prayers',
@@ -1663,7 +1664,7 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 17, max: 28, speed: 2.5 },
     stats: { str: 5, sta: 4 },
     sellValue: 1400,
-    requiredClass: WAR,
+    requiredClass: WAR_WEAPON,
   },
   sloomtooth_tidefang: {
     id: 'sloomtooth_tidefang',
@@ -1707,7 +1708,7 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 16, max: 26, speed: 2.4 },
     stats: { str: 5, sta: 3 },
     sellValue: 1400,
-    requiredClass: WAR,
+    requiredClass: WAR_WEAPON,
   },
   nhalias_dirgeblade: {
     id: 'nhalias_dirgeblade',
@@ -1741,7 +1742,7 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 14, max: 23, speed: 2.3 },
     stats: { str: 4, sta: 3 },
     sellValue: 1200,
-    requiredClass: WAR,
+    requiredClass: WAR_WEAPON,
   },
   vaels_mist_staff: {
     id: 'vaels_mist_staff',

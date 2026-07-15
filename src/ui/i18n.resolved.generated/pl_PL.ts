@@ -1357,6 +1357,7 @@ export const pl_PL: EnTranslations = {
         "armor": "Erhöht Rüstung um {value}",
         "int": "Erhöht Intelligenz um {value}",
         "agi": "Erhöht Beweglichkeit um {value}",
+        "strAgi": "Increases Strength and Agility by {value}",
         "sta": "Erhöht Ausdauer um {value}",
         "spi": "Erhöht Willenskraft um {value}",
         "allStats": "Erhöht alle Attribute um {value}"
@@ -1366,6 +1367,7 @@ export const pl_PL: EnTranslations = {
         "armor": "Verringert Rüstung um {value}",
         "int": "Verringert Intelligenz um {value}",
         "agi": "Verringert Beweglichkeit um {value}",
+        "strAgi": "Reduces Strength and Agility by {value}",
         "sta": "Verringert Ausdauer um {value}",
         "spi": "Verringert Willenskraft um {value}",
         "allStats": "Verringert alle Attribute um {value}"
@@ -2555,7 +2557,8 @@ export const pl_PL: EnTranslations = {
       "shaman": "Przywoływacz duchów, który nagina burzę, ogień i wodę, a między błyskawicami leczy sojuszników.",
       "mage": "Tkacz zaklęć ognia, mrozu i magii arkanicznej, który panuje nad polem bitwy z oddali.",
       "warlock": "Mroczny przywoływacz, który rozkazuje demonom i klątwom, oddając życie za niszczycielską potęgę.",
-      "druid": "Zmiennokształtny, który tankuje jako niedźwiedź, rozszarpuje wrogów jako kot lub leczy w samym środku walki."
+      "druid": "Zmiennokształtny, który tankuje jako niedźwiedź, rozszarpuje wrogów jako kot lub leczy w samym środku walki.",
+      "swordmaster": "A swift dual-blade fighter who builds momentum through precision, speed, and sweeping attacks."
     },
     "tag": {
       "melee": "Walka wręcz",
@@ -2588,6 +2591,15 @@ export const pl_PL: EnTranslations = {
       "battle_shout": "Mobilizujący okrzyk, który zwiększa siłę ataku całej drużyny.",
       "charge": "Szarżujesz na odległego wroga, otwierając walkę krótkim ogłuszeniem.",
       "thunder_clap": "Uderza we wszystko wokół ciebie i spowalnia ataki wrogów.",
+      "twin_slash": "Cuts with both blades in one quick sequence to build momentum.",
+      "crescent_sweep": "Carves a wide arc through nearby enemies.",
+      "fleet_step": "Sharpens your footwork for a burst of movement speed.",
+      "sword_aura": "Focuses briefly to wreathe both blades in blue energy, empowering strength and agility.",
+      "wind_lunge": "Breaks roots and lunges forward in your facing direction.",
+      "parrying_flow": "Flows between incoming blows to evade more attacks for a short time.",
+      "blade_cyclone": "Whirls both blades through nearby enemies, turning gathered momentum into a sweeping burst.",
+      "duelist_flurry": "Sets a measured cadence that greatly accelerates your attacks.",
+      "azure_rush": "Surges forward in a blue flash and slows nearby enemies.",
       "seal_of_righteousness": "Nasyca twoje ciosy świętymi obrażeniami, które potem zużywasz Verdictem.",
       "holy_light": "Stabilne, pokaźne leczenie do uzupełnienia zdrowia sojusznika lub własnego.",
       "devotion_aura": "Trwałe wzmocnienie, które zwiększa pancerz, by ciosy mniej bolały.",
@@ -3988,6 +4000,7 @@ export const pl_PL: EnTranslations = {
     "mage": "Mag",
     "warlock": "Czarnoksiężnik",
     "druid": "Druid",
+    "swordmaster": "SwordMaster",
     "warriorAria": "Klasa Wojownik",
     "paladinAria": "Klasa Paladyn",
     "hunterAria": "Klasa Łowca",
@@ -3996,7 +4009,8 @@ export const pl_PL: EnTranslations = {
     "shamanAria": "Klasa Szaman",
     "mageAria": "Klasa Mag",
     "warlockAria": "Klasa Czarnoksiężnik",
-    "druidAria": "Klasa Druid"
+    "druidAria": "Klasa Druid",
+    "swordmasterAria": "SwordMaster class"
   },
   "controls": {
     "title": "Przewodnik sterowania",
@@ -4760,6 +4774,7 @@ export const pl_PL: EnTranslations = {
       "paladin": "Uzdrowiciel / Tank / DPS wręcz",
       "hunter": "Dystansowy DPS",
       "rogue": "DPS wręcz",
+      "swordmaster": "Mobile Melee DPS",
       "priest": "Uzdrowiciel / Dystansowy DPS",
       "shaman": "Uzdrowiciel / Walka wręcz lub dystansowa DPS",
       "mage": "Dystansowy DPS",
@@ -4776,6 +4791,7 @@ export const pl_PL: EnTranslations = {
       "swordsMaces": "Miecze, Buławy",
       "axesSwords": "Topory, Miecze",
       "daggersSwords": "Sztylety, Miecze",
+      "twinOneHanders": "Two One-Handed Weapons",
       "staves": "Kostury",
       "macesAxes": "Buławy, Topory"
     },
@@ -4788,7 +4804,8 @@ export const pl_PL: EnTranslations = {
       "shaman": "Szamani rozkazują żywiołom, napełniając oręż mocą, rażąc wrogów błyskawicami i przywracając siły sojusznikom.",
       "mage": "Magowie naginają Ogień, Mróz i arkaniczną moc, by niszczyć wrogów, przyzywać wodę i zamrażać zagrożenia w miejscu.",
       "warlock": "Czarnoksiężnicy przyzywają demony, rzucają klątwy i magię obrażeń w czasie oraz wysysają życie z wrogów, by przetrwać.",
-      "druid": "Druidzi czerpią z natury, lecząc rany, pętając wrogów i przemieniając się w postacie zwierząt dla obrony lub zadawania obrażeń."
+      "druid": "Druidzi czerpią z natury, lecząc rany, pętając wrogów i przemieniając się w postacie zwierząt dla obrony lub zadawania obrażeń.",
+      "swordmaster": "SwordMasters build momentum with precise twin-blade strikes, then turn speed into sweeping attacks that cut through whole groups."
     },
     "aria": "Szczegóły klasy {className}: rola {role}. Statystyki początkowe: Siła {str}, Zręczność {agi}, Wytrzymałość {sta}, Intelekt {int}, Duch {spi}.",
     "statBarAria": "{stat}: {value} z 25"
@@ -5777,6 +5794,54 @@ export const pl_PL: EnTranslations = {
       "sport_second_wind": {
         "name": "Świeże Nogi",
         "description": "Łapiesz oddech: poruszasz się o 50% szybciej przez 4 s."
+      },
+      "twin_slash": {
+        "name": "Twin Slash",
+        "description": "Strike the target with both swords in main-hand then off-hand order."
+      },
+      "crescent_sweep": {
+        "name": "Crescent Sweep",
+        "description": "Sweep both swords through up to 5 enemies in a 6 yard frontal arc."
+      },
+      "fleet_step": {
+        "name": "Fleet Step",
+        "description": "Increase movement speed for 5 sec. Higher ranks increase the bonus."
+      },
+      "sword_aura": {
+        "name": "Sword Aura",
+        "description": "Imbue both swords with azure power, gaining 12 Strength and 12 Agility for 5 min."
+      },
+      "wind_lunge": {
+        "name": "Wind Lunge",
+        "description": "Break roots and lunge 8 yards in your facing direction."
+      },
+      "parrying_flow": {
+        "name": "Parrying Flow",
+        "description": "Flow between incoming blows, gaining 20% dodge for 8 sec."
+      },
+      "quickening": {
+        "name": "Quickening",
+        "description": "Accelerate your attack speed by 25% for 12 sec."
+      },
+      "blade_dance": {
+        "name": "Blade Dance",
+        "description": "Dance through nearby enemies, striking up to 6 targets with both swords."
+      },
+      "twin_finisher": {
+        "name": "Twin Finisher",
+        "description": "Commit both swords to a heavy two-part finishing strike."
+      },
+      "blade_cyclone": {
+        "name": "Blade Cyclone",
+        "description": "Become a cyclone of steel, striking up to 8 enemies within 9 yards with both swords."
+      },
+      "duelist_flurry": {
+        "name": "Duelist Flurry",
+        "description": "Enter a measured flurry, increasing attack speed by 35% for 12 sec."
+      },
+      "azure_rush": {
+        "name": "Azure Rush",
+        "description": "Rush 12 yards in a flash of azure steel and slow nearby enemies by 50% for 3 sec."
       },
       "flamestrike": {
         "name": "Ognista nawała",

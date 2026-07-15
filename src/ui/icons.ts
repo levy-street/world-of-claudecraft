@@ -67,6 +67,13 @@ const PALETTES = {
     accent: '#0d2e0a',
   },
   sky: { base: '#6fb6ff', light: '#d4ecff', dark: '#1f5a9e', glow: '#a0d4ff', accent: '#0c2c50' },
+  azure: {
+    base: '#22d3ee',
+    light: '#cffafe',
+    dark: '#0e7490',
+    glow: '#67e8f9',
+    accent: '#083344',
+  },
   earthBrown: {
     base: '#a8703c',
     light: '#e0b070',
@@ -2864,6 +2871,15 @@ const CREST_RECIPES: Record<string, IconRecipe> = {
     ],
     ['motion'],
   ),
+  class_swordmaster: r(
+    'storm',
+    'azure',
+    [
+      { p: 'sword', x: -6, rot: -0.42 },
+      { p: 'sword', x: 6, rot: 0.42 },
+    ],
+    ['motion', 'glow'],
+  ),
   class_priest: r('holy', 'silverWhite', ['cross'], ['glow', 'sparkle']),
   class_shaman: r('storm', 'sky', ['lightning'], ['glow']),
   class_mage: r('arcane', 'arcanePink', ['sigil_rune'], ['sparkle', 'glow']),
@@ -3424,6 +3440,20 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'double_charge',
   'crushing_charge',
   'combat_mastery',
+  // swordmaster (project-owned atlas generated for this class). The base kit and all
+  // three specialization signatures share one deliberate azure dual-blade family.
+  'twin_slash',
+  'crescent_sweep',
+  'fleet_step',
+  'sword_aura',
+  'wind_lunge',
+  'parrying_flow',
+  'quickening',
+  'blade_dance',
+  'twin_finisher',
+  'blade_cyclone',
+  'duelist_flurry',
+  'azure_rush',
   // mage (CraftPix premium pyromancer/cryomancer/lightning-mage packs — fire/frost/arcane;
   // aeromancer unused, mage has no wind). conjure_food and polymorph have no fit (no
   // bread/food or sheep art) and stay procedural.
@@ -3878,12 +3908,14 @@ function resolveRecipe(kind: IconKind, id: string): IconRecipe {
 }
 
 // Introspection helpers (no canvas needed), used by tests/ability_icons.test.ts
-// to assert every ability has a deliberate, distinct icon recipe.
-export function abilityIconRecipe(id: string): IconRecipe {
-  return resolveRecipe('ability', id);
+// to assert every ability has a deliberate, distinct authored source. Painted
+// images identify themselves by path; procedural icons expose their recipe.
+export function abilityIconRecipe(id: string): IconRecipe | { image: string } {
+  const image = abilityImageUrl(id);
+  return image ? { image } : resolveRecipe('ability', id);
 }
 export function hasExplicitAbilityIcon(id: string): boolean {
-  return id in ABILITY_RECIPES;
+  return ABILITY_IMAGE_IDS.has(id) || id in ABILITY_RECIPES;
 }
 
 const DEFAULT_ICON_SIZE = 96; // crisp at 46px buttons on 2x displays

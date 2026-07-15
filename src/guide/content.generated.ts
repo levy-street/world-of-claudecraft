@@ -321,6 +321,101 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     "still": "/guide-stills/player_warrior.webp"
   },
   {
+    "id": "swordmaster",
+    "color": "#22d3ee",
+    "resource": "energy",
+    "roles": [
+      "dps"
+    ],
+    "specs": [
+      {
+        "id": "tempest",
+        "name": "Tempest",
+        "role": "dps",
+        "signature": "blade_cyclone"
+      },
+      {
+        "id": "duelist",
+        "name": "Duelist",
+        "role": "dps",
+        "signature": "duelist_flurry"
+      },
+      {
+        "id": "azure_blade",
+        "name": "Azure Blade",
+        "role": "dps",
+        "signature": "azure_rush"
+      }
+    ],
+    "signatureAbilities": [
+      {
+        "id": "twin_slash",
+        "name": "Twin Slash"
+      },
+      {
+        "id": "crescent_sweep",
+        "name": "Crescent Sweep"
+      },
+      {
+        "id": "fleet_step",
+        "name": "Fleet Step"
+      },
+      {
+        "id": "sword_aura",
+        "name": "Sword Aura"
+      },
+      {
+        "id": "wind_lunge",
+        "name": "Wind Lunge"
+      },
+      {
+        "id": "parrying_flow",
+        "name": "Parrying Flow"
+      }
+    ],
+    "abilities": [
+      {
+        "id": "twin_slash",
+        "name": "Twin Slash"
+      },
+      {
+        "id": "crescent_sweep",
+        "name": "Crescent Sweep"
+      },
+      {
+        "id": "fleet_step",
+        "name": "Fleet Step"
+      },
+      {
+        "id": "sword_aura",
+        "name": "Sword Aura"
+      },
+      {
+        "id": "wind_lunge",
+        "name": "Wind Lunge"
+      },
+      {
+        "id": "parrying_flow",
+        "name": "Parrying Flow"
+      },
+      {
+        "id": "quickening",
+        "name": "Quickening"
+      },
+      {
+        "id": "blade_dance",
+        "name": "Blade Dance"
+      },
+      {
+        "id": "twin_finisher",
+        "name": "Twin Finisher"
+      }
+    ],
+    "model": "player_swordmaster",
+    "tint": "#22d3ee",
+    "still": "/guide-stills/player_swordmaster__22d3ee.webp"
+  },
+  {
     "id": "paladin",
     "color": "#f58cba",
     "resource": "mana",
@@ -3471,6 +3566,25 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
         "bone": "handslot.l"
       }
     ]
+  },
+  "player_swordmaster": {
+    "url": "models/chars/players/rogue.glb",
+    "idle": "Idle",
+    "height": 2.6,
+    "show": [
+      "Rogue_Cape"
+    ],
+    "attach": [
+      {
+        "url": "models/weapons/sword_1handed.glb",
+        "bone": "handslot.r"
+      },
+      {
+        "url": "models/weapons/sword_1handed.glb",
+        "bone": "handslot.l"
+      }
+    ],
+    "tintStrength": 0.38
   },
   "player_paladin": {
     "url": "models/chars/players/paladin.glb",

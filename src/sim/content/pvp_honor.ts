@@ -585,7 +585,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     priceHonor: 800,
     sellValue: 0,
     soulbound: true,
-    requiredClass: ['warrior', 'paladin', 'shaman'],
+    requiredClass: ['warrior', 'paladin', 'shaman', 'swordmaster'],
   },
   first_blood_razor: {
     id: 'first_blood_razor',
@@ -601,7 +601,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     priceHonor: 800,
     sellValue: 0,
     soulbound: true,
-    requiredClass: ['rogue', 'hunter', 'druid'],
+    requiredClass: ['rogue', 'hunter', 'druid', 'swordmaster'],
   },
   emberglass_warstaff: {
     id: 'emberglass_warstaff',

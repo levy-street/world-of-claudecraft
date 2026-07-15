@@ -764,6 +764,7 @@ const CLASS_MODELS = {
   paladin: 'paladin',
   hunter: 'ranger',
   rogue: 'rogue',
+  swordmaster: 'rogue',
   priest: 'mage',
   mage: 'mage',
   warlock: 'mage',

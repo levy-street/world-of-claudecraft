@@ -33,6 +33,8 @@ import { disposeMaterialVariants, restoreOriginalMaterials } from './material_st
 import { SKIN_ATTACK_CLIP_NAMES, weaponSkinAttackClips, weaponSkinOrientPin } from './skin_attack';
 import { createStowTransition, forceStow, requestStow, tickStow } from './stow_transition';
 import { weaponAttackStyle } from './weapon_attack_style_core';
+import { paintWeaponAura, type WeaponAuraHandle } from './weapon_aura_painter';
+import type { WeaponAuraPlan } from './weapon_aura_plan';
 import {
   disposeOwnedWeaponSkinMaterials,
   markOwnedWeaponSkinMaterials,
@@ -193,8 +195,8 @@ export class CharacterVisual {
   private shadowProxy: THREE.Mesh | null = null;
   private casters: THREE.Mesh[] = [];
   private originalMaterials = new Map<THREE.Mesh, THREE.Material | THREE.Material[]>();
-  private weaponAuraMeshes: THREE.Mesh[] = [];
-  private weaponAuraOn = false;
+  private weaponAuraHandle: WeaponAuraHandle | null = null;
+  private weaponAura: WeaponAuraPlan | null = null;
   private ghostMaterials = new Map<THREE.Material, THREE.Material>();
   private soulRendMaterials = new Map<THREE.Material, THREE.Material>();
   private shadowformMaterials = new Map<THREE.Material, THREE.Material>();
@@ -786,52 +788,20 @@ export class CharacterVisual {
     this.rebuildWeaponAura();
   }
 
-  setWeaponAura(on: boolean): void {
-    if (on === this.weaponAuraOn) return;
-    this.weaponAuraOn = on;
+  setWeaponAura(plan: WeaponAuraPlan | null): void {
+    if (plan?.id === this.weaponAura?.id) return;
+    this.weaponAura = plan;
     this.rebuildWeaponAura();
   }
 
   private rebuildWeaponAura(): void {
     this.disposeWeaponAura();
-    if (!this.weaponAuraOn) return;
-
-    const weaponHolders: THREE.Object3D[] = [];
-    this.model.traverse((o) => {
-      if (o.userData.swapWeaponHolder) weaponHolders.push(o);
-    });
-    const mainhand = weaponHolders.find((o) => o.userData.heldSlot === 0) ?? weaponHolders[0];
-    if (!mainhand) return;
-    mainhand.traverse((o) => {
-      const mesh = o as THREE.Mesh;
-      if (!mesh.isMesh || !mesh.userData.weaponMesh || !mesh.parent) return;
-      const aura = new THREE.Mesh(
-        mesh.geometry,
-        new THREE.MeshBasicMaterial({
-          color: 0x45ff9a,
-          transparent: true,
-          opacity: 0.42,
-          depthWrite: false,
-          blending: THREE.AdditiveBlending,
-          side: THREE.DoubleSide,
-        }),
-      );
-      aura.position.copy(mesh.position);
-      aura.quaternion.copy(mesh.quaternion);
-      aura.scale.copy(mesh.scale).multiplyScalar(1.08);
-      aura.renderOrder = 3;
-      aura.userData.weaponVfxMesh = true;
-      mesh.parent.add(aura);
-      this.weaponAuraMeshes.push(aura);
-    });
+    if (this.weaponAura) this.weaponAuraHandle = paintWeaponAura(this.model, this.weaponAura);
   }
 
   private disposeWeaponAura(): void {
-    for (const mesh of this.weaponAuraMeshes) {
-      mesh.removeFromParent();
-      (mesh.material as THREE.Material).dispose();
-    }
-    this.weaponAuraMeshes.length = 0;
+    this.weaponAuraHandle?.dispose();
+    this.weaponAuraHandle = null;
   }
 
   private weaponSkinVfxSpec() {

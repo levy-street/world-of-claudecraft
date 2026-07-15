@@ -4,7 +4,9 @@ import { avatarPng, isPlayerClass, isValidSkin, MAX_SKIN, PLAYER_CLASSES } from 
 const PNG_SIGNATURE = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 
 describe('avatar validation', () => {
-  it('accepts the nine classes and rejects others', () => {
+  it('accepts all ten classes, including SwordMaster, and rejects others', () => {
+    expect(PLAYER_CLASSES).toHaveLength(10);
+    expect(PLAYER_CLASSES).toContain('swordmaster');
     for (const c of PLAYER_CLASSES) expect(isPlayerClass(c)).toBe(true);
     expect(isPlayerClass('deathknight')).toBe(false);
     expect(isPlayerClass('')).toBe(false);
@@ -34,6 +36,8 @@ describe('avatarPng', () => {
   it('differs across class and across skin', () => {
     expect(avatarPng('mage', 2).equals(avatarPng('warlock', 2))).toBe(false);
     expect(avatarPng('mage', 2).equals(avatarPng('mage', 5))).toBe(false);
+    expect(avatarPng('swordmaster', 2).equals(avatarPng('mage', 2))).toBe(false);
+    expect(avatarPng('swordmaster', 2).equals(avatarPng('shaman', 2))).toBe(false);
   });
 
   it('throws on invalid inputs', () => {

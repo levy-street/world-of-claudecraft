@@ -15,6 +15,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const SKILLS_DIR = 'public/ui/skills';
 const CLASSES = [
   'warrior',
+  'swordmaster',
   'paladin',
   'hunter',
   'rogue',
@@ -26,6 +27,7 @@ const CLASSES = [
 ];
 const THEME = {
   warrior: ['#ff9d6e', '#150f0c'],
+  swordmaster: ['#22d3ee', '#081319'],
   paladin: ['#f6d98a', '#15110b'],
   hunter: ['#bfe89a', '#0f140d'],
   rogue: ['#7fe0a0', '#0d130f'],
@@ -37,6 +39,7 @@ const THEME = {
 };
 const TITLE = {
   warrior: 'Warrior',
+  swordmaster: 'SwordMaster',
   paladin: 'Paladin',
   hunter: 'Hunter',
   rogue: 'Rogue',

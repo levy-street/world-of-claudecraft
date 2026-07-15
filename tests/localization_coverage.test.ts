@@ -767,6 +767,27 @@ describe('i18n Localization Key Coverage', () => {
 
     expect(entityCount('class', 'name')).toBe(Object.keys(CLASSES).length);
     expect(entityCount('class', 'description')).toBe(Object.keys(CLASSES).length);
+    expect(
+      manifest.filter((entry) => entry.kind === 'class' && entry.id === 'swordmaster'),
+    ).toEqual([
+      {
+        kind: 'class',
+        id: 'swordmaster',
+        field: 'name',
+        source: 'SwordMaster',
+        group: 'classAbility',
+        key: 'classes.swordmaster',
+      },
+      {
+        kind: 'class',
+        id: 'swordmaster',
+        field: 'description',
+        source:
+          'SwordMasters build momentum with precise twin-blade strikes, then turn speed into sweeping attacks that cut through whole groups.',
+        group: 'classAbility',
+        key: 'classDetails.lore.swordmaster',
+      },
+    ]);
     expect(entityCount('ability', 'name')).toBe(Object.keys(ABILITIES).length);
     expect(entityCount('ability', 'description')).toBe(Object.keys(ABILITIES).length);
     // Heroic upgraded variants (heroicOf) have no name key: they share the base

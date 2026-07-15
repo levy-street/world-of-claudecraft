@@ -67,6 +67,11 @@ const SPEC_SIGS = {
     ['feral', 'feral_charge'],
     ['restoration', 'swiftmend'],
   ],
+  swordmaster: [
+    ['tempest', 'blade_cyclone'],
+    ['duelist', 'duelist_flurry'],
+    ['azure_blade', 'azure_rush'],
+  ],
 };
 
 const CLASSES = [
@@ -79,6 +84,7 @@ const CLASSES = [
   'shaman',
   'warlock',
   'druid',
+  'swordmaster',
 ];
 
 for (const cls of CLASSES) {

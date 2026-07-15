@@ -58,8 +58,9 @@ import { consumeAuraKind, consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
 import { exclusiveAuraConflicts } from './exclusive_aura';
 import { armHeroicLeap, relocateSwept } from './heroic_leap';
-import { hasCastShield, noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
+import { noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
 import { consumeSureCritCharge, hasSureCritAura } from './sure_crit';
+import { resolveSwordmasterDualAoe, strikeWithBothWeapons } from './swordmaster';
 
 export { SWEEP_MULT } from './area_echo';
 
@@ -266,6 +267,25 @@ export function runEffects(
           comboAwarded = true;
         }
         if (ability.requiresDodgeProc) p.overpowerUntil = -1;
+        break;
+      }
+      case 'dualWeaponStrike': {
+        if (!target) break;
+        const connected = strikeWithBothWeapons(ctx, p, target, ability.name, eff, {
+          threatFlat: res.threatFlat,
+          threatMult: res.threatMult,
+          forceCrit: sureCrit,
+        });
+        if (connected > 0 && sureCrit) sureCritRolled = true;
+        break;
+      }
+      case 'dualWeaponAoe': {
+        const connected = resolveSwordmasterDualAoe(ctx, p, ability.name, eff, {
+          threatFlat: res.threatFlat,
+          threatMult: res.threatMult,
+          forceCrit: sureCrit,
+        });
+        if (connected > 0 && sureCrit) sureCritRolled = true;
         break;
       }
       case 'directDamage': {
@@ -628,7 +648,8 @@ export function runEffects(
           interruptedDef?.uninterruptible
         )
           break;
-        const school = interruptedDef?.school ?? scriptedChannel!.school;
+        const school = interruptedDef?.school ?? scriptedChannel?.school;
+        if (!school) break;
         const remaining = ctx.diminishedCrowdControlDuration(p, target, 'lockout', eff.lockout);
         ctx.cancelCast(target);
         if (eff.rageOnInterrupt && meta.cls === 'warrior' && p.resourceType === 'rage') {

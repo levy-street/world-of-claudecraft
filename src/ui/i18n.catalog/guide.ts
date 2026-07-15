@@ -133,7 +133,7 @@ export const guideStrings = {
       pillarPlayTitle: 'Play in your browser',
       pillarPlayBody:
         'No download, no launcher. Make a character and you are in the world in seconds, on desktop or phone.',
-      pillarClassesTitle: 'Nine classes, three roles',
+      pillarClassesTitle: 'Ten classes, three roles',
       pillarClassesBody:
         'Tank, heal, or deal the damage. Every class plays the way its archetype should, with talents to make it yours.',
       pillarOpenTitle: 'Free and open source',
@@ -144,7 +144,7 @@ export const guideStrings = {
     // Class chooser teaser.
     classes: {
       heading: 'Choose your class',
-      sub: 'Nine classic archetypes, each with its own feel and party role.',
+      sub: 'Ten classic archetypes, each with its own feel and party role.',
       cta: 'Explore the classes',
     },
 
@@ -525,7 +525,7 @@ export const guideStrings = {
     q4: 'Can I play offline or solo?',
     a4: 'Yes. There is an instant single-player offline mode, and the online world is fully soloable apart from dungeons, the raid, and the world boss.',
     q5: 'How many classes are there?',
-    a5: 'Nine, covering the classic tank, healer, and damage roles, each with a resource system (rage, mana, or energy) and its own signature abilities.',
+    a5: 'Ten, covering the classic tank, healer, and damage roles, each with a resource system (rage, mana, or energy) and its own signature abilities.',
     q6: 'What is the level cap?',
     a6: 'Level {cap}, reached across three connected zones of quests, dungeons, and exploration.',
     q7: 'Will my character be saved?',
@@ -542,7 +542,7 @@ export const guideStrings = {
 
   // Classes index + per-class pages.
   classList: {
-    heading: 'The nine classes',
+    heading: 'The ten classes',
     sub: 'Tank, heal, or deal the damage. Pick the fantasy that calls to you, then make it your own with talents.',
   },
   role: {
@@ -589,6 +589,8 @@ export const guideStrings = {
     warlock: 'A dark conjurer who commands demons and curses, trading life for devastating power.',
     druid:
       'A shapeshifter who tanks as a bear, savages foes as a cat, or heals in the thick of it.',
+    swordmaster:
+      'A swift dual-blade fighter who builds momentum through precision, speed, and sweeping attacks.',
   },
 
   // Qualitative "feel" tags for the class chooser and class headers. Relative labels, never
@@ -606,7 +608,7 @@ export const guideStrings = {
     goodFirst: 'Great first class',
   },
 
-  // The class chooser on the Classes index: filter the nine by how you want to play.
+  // The class chooser on the Classes index: filter the ten by how you want to play.
   chooser: {
     heading: 'Find your class',
     intro:
@@ -630,6 +632,17 @@ export const guideStrings = {
     battle_shout: 'A rallying cry that raises attack power for the party.',
     charge: 'Rushes a distant enemy to open the fight with a brief stun.',
     thunder_clap: 'Hits everything around you and slows their attacks.',
+    twin_slash: 'Cuts with both blades in one quick sequence to build momentum.',
+    crescent_sweep: 'Carves a wide arc through nearby enemies.',
+    fleet_step: 'Sharpens your footwork for a burst of movement speed.',
+    sword_aura:
+      'Focuses briefly to wreathe both blades in blue energy, empowering strength and agility.',
+    wind_lunge: 'Breaks roots and lunges forward in your facing direction.',
+    parrying_flow: 'Flows between incoming blows to evade more attacks for a short time.',
+    blade_cyclone:
+      'Whirls both blades through nearby enemies, turning gathered momentum into a sweeping burst.',
+    duelist_flurry: 'Sets a measured cadence that greatly accelerates your attacks.',
+    azure_rush: 'Surges forward in a blue flash and slows nearby enemies.',
     seal_of_righteousness: 'Imbues your swings with Holy damage, then spend it with Verdict.',
     holy_light: 'A steady, sizable heal for topping off an ally or yourself.',
     devotion_aura: 'A lasting self-buff that raises armor so hits land softer.',

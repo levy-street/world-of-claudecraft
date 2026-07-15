@@ -1357,6 +1357,7 @@ export const tr_TR: EnTranslations = {
         "armor": "Aumenta la armadura en {value}",
         "int": "Aumenta el intelecto en {value}",
         "agi": "Aumenta la agilidad en {value}",
+        "strAgi": "Increases Strength and Agility by {value}",
         "sta": "Aumenta el aguante en {value}",
         "spi": "Aumenta el espíritu en {value}",
         "allStats": "Aumenta todos los atributos en {value}"
@@ -1366,6 +1367,7 @@ export const tr_TR: EnTranslations = {
         "armor": "Reduce la armadura en {value}",
         "int": "Reduce el intelecto en {value}",
         "agi": "Reduce la agilidad en {value}",
+        "strAgi": "Reduces Strength and Agility by {value}",
         "sta": "Reduce el aguante en {value}",
         "spi": "Reduce el espíritu en {value}",
         "allStats": "Reduce todos los atributos en {value}"
@@ -2555,7 +2557,8 @@ export const tr_TR: EnTranslations = {
       "shaman": "Fırtınayı, ateşi ve suyu büken, yıldırımlar arasında dostları iyileştiren bir ruh çağırıcı.",
       "mage": "Savaş alanını uzaktan kontrol eden ateş, buz ve gizem dokuyan bir büyücü.",
       "warlock": "İblislere ve lanetlere hükmeden, yıkıcı güç için can takas eden karanlık bir çağırıcı.",
-      "druid": "Ayı olarak tank yapan, kedi olarak düşmanları parçalayan ya da göbeğinde iyileştiren bir şekil değiştiren."
+      "druid": "Ayı olarak tank yapan, kedi olarak düşmanları parçalayan ya da göbeğinde iyileştiren bir şekil değiştiren.",
+      "swordmaster": "A swift dual-blade fighter who builds momentum through precision, speed, and sweeping attacks."
     },
     "tag": {
       "melee": "Yakın dövüş",
@@ -2588,6 +2591,15 @@ export const tr_TR: EnTranslations = {
       "battle_shout": "Grubun saldırı gücünü yükselten coşturucu bir nara.",
       "charge": "Uzaktaki bir düşmana atılarak kısa bir sersemletmeyle dövüşü başlatır.",
       "thunder_clap": "Çevrendeki her şeye vurur ve saldırılarını yavaşlatır.",
+      "twin_slash": "Cuts with both blades in one quick sequence to build momentum.",
+      "crescent_sweep": "Carves a wide arc through nearby enemies.",
+      "fleet_step": "Sharpens your footwork for a burst of movement speed.",
+      "sword_aura": "Focuses briefly to wreathe both blades in blue energy, empowering strength and agility.",
+      "wind_lunge": "Breaks roots and lunges forward in your facing direction.",
+      "parrying_flow": "Flows between incoming blows to evade more attacks for a short time.",
+      "blade_cyclone": "Whirls both blades through nearby enemies, turning gathered momentum into a sweeping burst.",
+      "duelist_flurry": "Sets a measured cadence that greatly accelerates your attacks.",
+      "azure_rush": "Surges forward in a blue flash and slows nearby enemies.",
       "seal_of_righteousness": "Savuruşlarını Kutsal hasarla güçlendirir, sonra onu Verdict ile harca.",
       "holy_light": "Bir dostu ya da kendini tam doldurmak için istikrarlı, hatırı sayılır bir iyileştirme.",
       "devotion_aura": "Zırhı yükselten kalıcı bir öz güçlendirmesi, böylece darbeler daha hafif gelir.",
@@ -3988,6 +4000,7 @@ export const tr_TR: EnTranslations = {
     "mage": "Büyücü",
     "warlock": "Karabüyücü",
     "druid": "Druid",
+    "swordmaster": "SwordMaster",
     "warriorAria": "Savaşçı sınıfı",
     "paladinAria": "Paladin sınıfı",
     "hunterAria": "Avcı sınıfı",
@@ -3996,7 +4009,8 @@ export const tr_TR: EnTranslations = {
     "shamanAria": "Şaman sınıfı",
     "mageAria": "Büyücü sınıfı",
     "warlockAria": "Karabüyücü sınıfı",
-    "druidAria": "Druid sınıfı"
+    "druidAria": "Druid sınıfı",
+    "swordmasterAria": "SwordMaster class"
   },
   "controls": {
     "title": "Kontrol Kılavuzu",
@@ -4760,6 +4774,7 @@ export const tr_TR: EnTranslations = {
       "paladin": "Şifacı / Tank / Yakın DPS",
       "hunter": "Menzilli DPS",
       "rogue": "Yakın DPS",
+      "swordmaster": "Mobile Melee DPS",
       "priest": "Şifacı / Menzilli DPS",
       "shaman": "Şifacı / Yakın veya Menzilli DPS",
       "mage": "Menzilli DPS",
@@ -4776,6 +4791,7 @@ export const tr_TR: EnTranslations = {
       "swordsMaces": "Kılıçlar, Topuzlar",
       "axesSwords": "Baltalar, Kılıçlar",
       "daggersSwords": "Hançerler, Kılıçlar",
+      "twinOneHanders": "Two One-Handed Weapons",
       "staves": "Asalar",
       "macesAxes": "Topuzlar, Baltalar"
     },
@@ -4788,7 +4804,8 @@ export const tr_TR: EnTranslations = {
       "shaman": "Şamanlar elementlere komuta eder; silahlara güç katar, düşmanları yıldırımla sarsar ve müttefikleri iyileştirir.",
       "mage": "Büyücüler Ateş, Buz ve gizem gücünü bükerek düşmanları yok eder, su çağırır ve tehditleri olduğu yerde dondurur.",
       "warlock": "Karabüyücüler şeytanlar çağırır, lanetler ve süregelen hasar büyüleri uygular ve dayanmak için düşmanlardan can emer.",
-      "druid": "Druidler doğayı yönlendirir; yaraları iyileştirir, düşmanları kıskaca alır ve savunma ya da hasar için hayvan formlarına bürünür."
+      "druid": "Druidler doğayı yönlendirir; yaraları iyileştirir, düşmanları kıskaca alır ve savunma ya da hasar için hayvan formlarına bürünür.",
+      "swordmaster": "SwordMasters build momentum with precise twin-blade strikes, then turn speed into sweeping attacks that cut through whole groups."
     },
     "aria": "{className} sınıf ayrıntıları: rol {role}. Başlangıç nitelikleri: Kuvvet {str}, Çeviklik {agi}, Dayanıklılık {sta}, Zeka {int}, Ruh {spi}.",
     "statBarAria": "{stat}: 25 üzerinden {value}"
@@ -5777,6 +5794,54 @@ export const tr_TR: EnTranslations = {
       "sport_second_wind": {
         "name": "Taze Bacaklar",
         "description": "Bacaklarını topla: 4 sn boyunca %50 daha hızlı hareket et."
+      },
+      "twin_slash": {
+        "name": "Twin Slash",
+        "description": "Strike the target with both swords in main-hand then off-hand order."
+      },
+      "crescent_sweep": {
+        "name": "Crescent Sweep",
+        "description": "Sweep both swords through up to 5 enemies in a 6 yard frontal arc."
+      },
+      "fleet_step": {
+        "name": "Fleet Step",
+        "description": "Increase movement speed for 5 sec. Higher ranks increase the bonus."
+      },
+      "sword_aura": {
+        "name": "Sword Aura",
+        "description": "Imbue both swords with azure power, gaining 12 Strength and 12 Agility for 5 min."
+      },
+      "wind_lunge": {
+        "name": "Wind Lunge",
+        "description": "Break roots and lunge 8 yards in your facing direction."
+      },
+      "parrying_flow": {
+        "name": "Parrying Flow",
+        "description": "Flow between incoming blows, gaining 20% dodge for 8 sec."
+      },
+      "quickening": {
+        "name": "Quickening",
+        "description": "Accelerate your attack speed by 25% for 12 sec."
+      },
+      "blade_dance": {
+        "name": "Blade Dance",
+        "description": "Dance through nearby enemies, striking up to 6 targets with both swords."
+      },
+      "twin_finisher": {
+        "name": "Twin Finisher",
+        "description": "Commit both swords to a heavy two-part finishing strike."
+      },
+      "blade_cyclone": {
+        "name": "Blade Cyclone",
+        "description": "Become a cyclone of steel, striking up to 8 enemies within 9 yards with both swords."
+      },
+      "duelist_flurry": {
+        "name": "Duelist Flurry",
+        "description": "Enter a measured flurry, increasing attack speed by 35% for 12 sec."
+      },
+      "azure_rush": {
+        "name": "Azure Rush",
+        "description": "Rush 12 yards in a flash of azure steel and slow nearby enemies by 50% for 3 sec."
       },
       "flamestrike": {
         "name": "Alev Vuruşu",

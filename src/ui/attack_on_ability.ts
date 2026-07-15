@@ -23,6 +23,8 @@ type AutoAttackClass = 'damage' | 'breakCC' | 'other';
 const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   weaponDamage: 'damage',
   weaponStrike: 'damage',
+  dualWeaponStrike: 'damage',
+  dualWeaponAoe: 'damage',
   directDamage: 'damage',
   interrupt: 'other',
   dispel: 'other',

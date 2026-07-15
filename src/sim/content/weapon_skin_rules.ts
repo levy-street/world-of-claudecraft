@@ -198,6 +198,7 @@ export function withWeaponSkinApplied(
 // union order in ../types.ts).
 const CLASS_ORDER: readonly PlayerClass[] = [
   'warrior',
+  'swordmaster',
   'paladin',
   'hunter',
   'rogue',

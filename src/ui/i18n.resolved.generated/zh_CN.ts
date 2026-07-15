@@ -1357,6 +1357,7 @@ export const zh_CN: EnTranslations = {
         "armor": "护甲提高 {value}",
         "int": "智力提高 {value}",
         "agi": "敏捷提高 {value}",
+        "strAgi": "Increases Strength and Agility by {value}",
         "sta": "耐力提高 {value}",
         "spi": "精神提高 {value}",
         "allStats": "所有属性提高 {value}"
@@ -1366,6 +1367,7 @@ export const zh_CN: EnTranslations = {
         "armor": "护甲降低 {value}",
         "int": "智力降低 {value}",
         "agi": "敏捷降低 {value}",
+        "strAgi": "Reduces Strength and Agility by {value}",
         "sta": "耐力降低 {value}",
         "spi": "精神降低 {value}",
         "allStats": "所有属性降低 {value}"
@@ -2555,7 +2557,8 @@ export const zh_CN: EnTranslations = {
       "shaman": "召唤元素之灵者,操纵风暴、烈火与流水,在闪电之间治愈盟友。",
       "mage": "驾驭火焰、冰霜与奥术的编织法术者,远距离掌控整个战场。",
       "warlock": "黑暗的咒法师,驱使恶魔与诅咒,以生命换取毁灭性的力量。",
-      "druid": "变形大师,化身为熊时担当坦克,化身为豹时撕裂敌人,亦能在激战中施展治疗。"
+      "druid": "变形大师,化身为熊时担当坦克,化身为豹时撕裂敌人,亦能在激战中施展治疗。",
+      "swordmaster": "A swift dual-blade fighter who builds momentum through precision, speed, and sweeping attacks."
     },
     "tag": {
       "melee": "近战",
@@ -2588,6 +2591,15 @@ export const zh_CN: EnTranslations = {
       "battle_shout": "一声号召呐喊，提升全队的攻击强度。",
       "charge": "冲向远处的敌人，以一次短暂的昏迷开场。",
       "thunder_clap": "打击你周围的一切，并减缓它们的攻击速度。",
+      "twin_slash": "Cuts with both blades in one quick sequence to build momentum.",
+      "crescent_sweep": "Carves a wide arc through nearby enemies.",
+      "fleet_step": "Sharpens your footwork for a burst of movement speed.",
+      "sword_aura": "Focuses briefly to wreathe both blades in blue energy, empowering strength and agility.",
+      "wind_lunge": "Breaks roots and lunges forward in your facing direction.",
+      "parrying_flow": "Flows between incoming blows to evade more attacks for a short time.",
+      "blade_cyclone": "Whirls both blades through nearby enemies, turning gathered momentum into a sweeping burst.",
+      "duelist_flurry": "Sets a measured cadence that greatly accelerates your attacks.",
+      "azure_rush": "Surges forward in a blue flash and slows nearby enemies.",
       "seal_of_righteousness": "为你的挥击附加神圣伤害，再用裁决将其释放出去。",
       "holy_light": "稳健而可观的治疗，用于把盟友或自己奶满。",
       "devotion_aura": "持续的自我增益，提升护甲让攻击伤害更低。",
@@ -3988,6 +4000,7 @@ export const zh_CN: EnTranslations = {
     "mage": "法师",
     "warlock": "术士",
     "druid": "德鲁伊",
+    "swordmaster": "SwordMaster",
     "warriorAria": "战士职业",
     "paladinAria": "圣骑士职业",
     "hunterAria": "猎人职业",
@@ -3996,7 +4009,8 @@ export const zh_CN: EnTranslations = {
     "shamanAria": "萨满祭司职业",
     "mageAria": "法师职业",
     "warlockAria": "术士职业",
-    "druidAria": "德鲁伊职业"
+    "druidAria": "德鲁伊职业",
+    "swordmasterAria": "SwordMaster class"
   },
   "controls": {
     "title": "操作指南",
@@ -4760,6 +4774,7 @@ export const zh_CN: EnTranslations = {
       "paladin": "治疗 / 坦克 / 近战 DPS",
       "hunter": "远程 DPS",
       "rogue": "近战 DPS",
+      "swordmaster": "Mobile Melee DPS",
       "priest": "治疗 / 远程 DPS",
       "shaman": "治疗 / 近战或远程 DPS",
       "mage": "远程 DPS",
@@ -4776,6 +4791,7 @@ export const zh_CN: EnTranslations = {
       "swordsMaces": "剑、锤",
       "axesSwords": "斧、剑",
       "daggersSwords": "匕首、剑",
+      "twinOneHanders": "Two One-Handed Weapons",
       "staves": "法杖",
       "macesAxes": "锤、斧"
     },
@@ -4788,7 +4804,8 @@ export const zh_CN: EnTranslations = {
       "shaman": "萨满掌控元素，强化武器，以闪电震击敌人，并恢复盟友。",
       "mage": "法师操纵火焰、冰霜与奥术之力来毁灭敌人，召唤清水，并冻结威胁。",
       "warlock": "术士召唤恶魔，施放诅咒和持续伤害魔法，并从敌人身上吸取生命来维持自身。",
-      "druid": "德鲁伊引导自然之力，治疗伤口，缠绕敌人，并变形成动物来防御或输出。"
+      "druid": "德鲁伊引导自然之力，治疗伤口，缠绕敌人，并变形成动物来防御或输出。",
+      "swordmaster": "SwordMasters build momentum with precise twin-blade strikes, then turn speed into sweeping attacks that cut through whole groups."
     },
     "aria": "{className} 职业详情：职责 {role}。初始属性：力量 {str}，敏捷 {agi}，耐力 {sta}，智力 {int}，精神 {spi}。",
     "statBarAria": "{stat}：{value}/25"
@@ -5777,6 +5794,54 @@ export const zh_CN: EnTranslations = {
       "sport_second_wind": {
         "name": "重振旗鼓",
         "description": "找回状态：移动速度提高50%，持续4秒。"
+      },
+      "twin_slash": {
+        "name": "Twin Slash",
+        "description": "Strike the target with both swords in main-hand then off-hand order."
+      },
+      "crescent_sweep": {
+        "name": "Crescent Sweep",
+        "description": "Sweep both swords through up to 5 enemies in a 6 yard frontal arc."
+      },
+      "fleet_step": {
+        "name": "Fleet Step",
+        "description": "Increase movement speed for 5 sec. Higher ranks increase the bonus."
+      },
+      "sword_aura": {
+        "name": "Sword Aura",
+        "description": "Imbue both swords with azure power, gaining 12 Strength and 12 Agility for 5 min."
+      },
+      "wind_lunge": {
+        "name": "Wind Lunge",
+        "description": "Break roots and lunge 8 yards in your facing direction."
+      },
+      "parrying_flow": {
+        "name": "Parrying Flow",
+        "description": "Flow between incoming blows, gaining 20% dodge for 8 sec."
+      },
+      "quickening": {
+        "name": "Quickening",
+        "description": "Accelerate your attack speed by 25% for 12 sec."
+      },
+      "blade_dance": {
+        "name": "Blade Dance",
+        "description": "Dance through nearby enemies, striking up to 6 targets with both swords."
+      },
+      "twin_finisher": {
+        "name": "Twin Finisher",
+        "description": "Commit both swords to a heavy two-part finishing strike."
+      },
+      "blade_cyclone": {
+        "name": "Blade Cyclone",
+        "description": "Become a cyclone of steel, striking up to 8 enemies within 9 yards with both swords."
+      },
+      "duelist_flurry": {
+        "name": "Duelist Flurry",
+        "description": "Enter a measured flurry, increasing attack speed by 35% for 12 sec."
+      },
+      "azure_rush": {
+        "name": "Azure Rush",
+        "description": "Rush 12 yards in a flash of azure steel and slow nearby enemies by 50% for 3 sec."
       },
       "flamestrike": {
         "name": "烈焰风暴",

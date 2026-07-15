@@ -53,9 +53,10 @@ function known(spec: 'arms' | 'fury' | 'prot', abilityId: string) {
 }
 
 describe('v0.26 winning Warrior release contracts', () => {
-  it('keeps exactly the canonical nine classes and stable warrior id', () => {
+  it('keeps the canonical class order and stable warrior id', () => {
     expect(ALL_CLASSES).toEqual([
       'warrior',
+      'swordmaster',
       'paladin',
       'hunter',
       'rogue',

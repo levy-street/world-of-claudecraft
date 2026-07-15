@@ -9,7 +9,7 @@
 // the editor's code never enters the shipped game bundle. Defensive: any
 // malformed blob yields null and the normal start screen runs instead.
 
-import type { PlayerClass, WorldContent } from '../sim/types';
+import { ALL_CLASSES, type PlayerClass, type WorldContent } from '../sim/types';
 
 export const EDITOR_PLAYTEST_KEY = 'woc_editor_playtest';
 
@@ -20,17 +20,7 @@ export interface EditorPlaytestRequest {
   playerName: string;
 }
 
-const VALID_CLASSES: ReadonlySet<string> = new Set([
-  'warrior',
-  'paladin',
-  'hunter',
-  'rogue',
-  'priest',
-  'mage',
-  'warlock',
-  'druid',
-  'shaman',
-]);
+const VALID_CLASSES: ReadonlySet<string> = new Set(ALL_CLASSES);
 
 // Shape-check the content enough that the Sim ctor and terrain function won't trip
 // on it. Full validation lives in the editor; this is the safety net at the door.

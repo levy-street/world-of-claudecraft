@@ -42,11 +42,7 @@ import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
 import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink';
 import { type BirdsView, buildBirds } from './birds';
 import { type CameraOcclusionState, stepCameraOcclusion } from './camera_collision';
-import {
-  characterRecklessnessActive,
-  characterSanguineAuraActive,
-  characterSoulRendActive,
-} from './character_effects';
+import { characterRecklessnessActive, characterSoulRendActive } from './character_effects';
 import {
   type AnimState,
   type CharacterVisual,
@@ -61,6 +57,7 @@ import {
   playerRangedAttackStartsAtLaunch,
 } from './characters/skin_attack';
 import { attackAbilityId, isSpinAttackAbility } from './characters/weapon_attack_style_core';
+import { weaponAuraPlan } from './characters/weapon_aura_plan';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { trackWebGLContext } from './context_release';
 import { buildCritters, type CritterField } from './critters';
@@ -123,6 +120,8 @@ import { buildClouds, buildSky, type SkyView } from './sky';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
 import { freezeStaticMatrices } from './static_matrix';
 import { shouldRenderStealthGhost } from './stealth';
+import { SwordmasterFxPainter } from './swordmaster_fx_painter';
+import { swordmasterDamageVisualPlan } from './swordmaster_fx_plan';
 import { buildFlaredConeFan, buildRingXZ, drapeConeWorld } from './target_cone_debug';
 import { buildTerrain, type TerrainView } from './terrain';
 import { sparkleTexture } from './textures';
@@ -815,6 +814,7 @@ export class Renderer {
   private aoeRings: AoeRingSlot[] = [];
   private aoeRingNext = 0;
   private recklessSkulls = new RecklessSkullPainter();
+  private swordmasterFx: SwordmasterFxPainter;
   private groundAimReticle: GroundAimReticle | null = null;
   raycaster = new THREE.Raycaster();
   clickTargets: THREE.Object3D[] = [];
@@ -1526,13 +1526,15 @@ export class Renderer {
     }
 
     // particle system: projectiles, impacts, heal glows, ambience
-    this.vfx = new Vfx(this.scene, (id, frac) => {
+    const entityAnchor = (id: number, frac: number): THREE.Vector3 | null => {
       const v = this.views.get(id);
       if (!v) return null;
       const e = this.sim.entities.get(id);
       const h = v.height * (e?.scale ?? 1) * frac;
       return new THREE.Vector3(v.group.position.x, v.group.position.y + h, v.group.position.z);
-    });
+    };
+    this.vfx = new Vfx(this.scene, entityAnchor);
+    this.swordmasterFx = new SwordmasterFxPainter(this.scene, entityAnchor);
     this.vfx.setViewportScale(this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(), 60);
 
     // ambient precipitation: biome-driven snow/rain that rides with the camera
@@ -2960,6 +2962,9 @@ export class Renderer {
         }
         if (warriorCast?.kind === 'gesture') {
           this.triggerAttack(ev.sourceId, warriorCast.abilityId);
+          const swordmasterPlan = swordmasterDamageVisualPlan(warriorCast.abilityId);
+          if (swordmasterPlan?.kind === 'twin-cut')
+            this.swordmasterFx.paint(swordmasterPlan, ev.sourceId, ev.targetId);
           break;
         }
         if (ev.fx === 'projectile') this.vfx.projectile(ev.sourceId, ev.targetId, ev.school);
@@ -3007,12 +3012,18 @@ export class Renderer {
           source?.kind,
           ev.attackAnimationStarted,
         );
+        const abilityId = ev.school === 'physical' ? attackAbilityId(ev.ability) : undefined;
         if (ev.school === 'physical' && ev.sourceId !== -1 && !rangedShotAlreadyStarted)
-          this.triggerAttack(ev.sourceId, attackAbilityId(ev.ability));
+          this.triggerAttack(ev.sourceId, abilityId);
         if (ev.kind === 'hit' && ev.amount > 0) {
           // landed blows flinch the victim (rate-limited inside the visual)
           this.triggerHit(ev.targetId);
-          if (ev.school === 'physical') this.vfx.meleeSpark(ev.targetId, ev.crit);
+          if (ev.school === 'physical') {
+            this.vfx.meleeSpark(ev.targetId, ev.crit);
+            const swordmasterPlan = swordmasterDamageVisualPlan(abilityId);
+            if (swordmasterPlan)
+              this.swordmasterFx.paint(swordmasterPlan, ev.sourceId, ev.targetId);
+          }
         }
         break;
       }
@@ -4571,7 +4582,7 @@ export class Renderer {
         v.visual.setWeaponSkin(e.weaponSkinId);
         this.reconcileViewLights(v);
       }
-      v.visual.setWeaponAura(characterSanguineAuraActive(e));
+      v.visual.setWeaponAura(weaponAuraPlan(e.auras, e.castingAbility));
 
       // live sheathe toggle (Z key): the sim's weaponStowed bit moves held
       // props between the hands and the on-back pose (self or a peer)
@@ -5004,6 +5015,7 @@ export class Renderer {
     this.waterView.update(this.time);
     worldStart = markWorldPhase('water', worldStart);
     this.vfx.update(dt);
+    this.swordmasterFx.update(dt);
     this.updateFiestaRing(dt);
     this.updateFiestaPowerups(dt);
     this.tickFiestaGlows(dt);

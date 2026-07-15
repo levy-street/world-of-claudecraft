@@ -1,5 +1,6 @@
 import type { AbilityEffect, ResourceType } from '../types';
 import { ALL_CLASSES, MAX_LEVEL, type PlayerClass } from '../types';
+import { SWORDMASTER_TALENTS } from './swordmaster_talents';
 import {
   isTalentRowLevel,
   ROW_LEVELS,
@@ -212,6 +213,7 @@ export interface TalentModifiers {
 
 export const TALENTS = {
   warrior: WARRIOR_TALENTS,
+  swordmaster: SWORDMASTER_TALENTS,
   paladin: PALADIN_TALENTS,
   hunter: HUNTER_TALENTS,
   rogue: ROGUE_TALENTS,

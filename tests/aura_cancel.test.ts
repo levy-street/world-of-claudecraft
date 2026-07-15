@@ -50,6 +50,7 @@ describe('isDebuffAura', () => {
     for (const kind of [
       'buff_armor',
       'buff_allstats',
+      'buff_str_agi',
       'hot',
       'absorb',
       'imbue',
@@ -68,6 +69,7 @@ describe('isDebuffAura', () => {
 describe('auraAffectsStats', () => {
   it('is true for stat buffs and forms, false for hot/absorb/imbue', () => {
     expect(auraAffectsStats(aura('x', 'buff_armor'))).toBe(true);
+    expect(auraAffectsStats(aura('x', 'buff_str_agi'))).toBe(true);
     expect(auraAffectsStats(aura('x', 'form_bear'))).toBe(true);
     expect(auraAffectsStats(aura('x', 'hot'))).toBe(false);
     expect(auraAffectsStats(aura('x', 'absorb'))).toBe(false);

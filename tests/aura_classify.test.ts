@@ -35,6 +35,7 @@ const HELPFUL: AuraKind[] = [
   'buff_armor',
   'buff_int',
   'buff_agi',
+  'buff_str_agi',
   'buff_dodge',
   'buff_speed',
   'buff_haste',

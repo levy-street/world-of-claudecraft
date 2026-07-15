@@ -43,7 +43,7 @@ export const shellStrings = {
       connectionRejected: 'The server closed the connection.',
       tips: {
         classes:
-          'Tip: each of the 9 classes plays differently. Try a few before committing to one.',
+          'Tip: each of the 10 classes plays differently. Try a few before committing to one.',
         talents:
           'Tip: you can reset your talents any time you are out of combat, so an early pick is never a trap.',
         dungeons:
@@ -203,6 +203,7 @@ export const shellStrings = {
         paladin: 'Healer / Tank / Melee DPS',
         hunter: 'Ranged DPS',
         rogue: 'Melee DPS',
+        swordmaster: 'Mobile Melee DPS',
         priest: 'Healer / Ranged DPS',
         shaman: 'Healer / Melee or Ranged DPS',
         mage: 'Ranged DPS',
@@ -219,6 +220,7 @@ export const shellStrings = {
         swordsMaces: 'Swords, Maces',
         axesSwords: 'Axes, Swords',
         daggersSwords: 'Daggers, Swords',
+        twinOneHanders: 'Two One-Handed Weapons',
         staves: 'Staves',
         macesAxes: 'Maces, Axes',
       },
@@ -240,6 +242,8 @@ export const shellStrings = {
           'Warlocks summon demons, apply curses and damage-over-time magic, and leech life from enemies to endure.',
         druid:
           'Druids channel nature, healing wounds, entangling foes, and shifting into animal forms for defense or damage.',
+        swordmaster:
+          'SwordMasters build momentum with precise twin-blade strikes, then turn speed into sweeping attacks that cut through whole groups.',
       },
       aria: 'Class details for {className}: role {role}. Starting stats: Strength {str}, Agility {agi}, Stamina {sta}, Intellect {int}, Spirit {spi}.',
       statBarAria: '{stat}: {value} out of 25',

@@ -1357,6 +1357,7 @@ export const cs_CZ: EnTranslations = {
         "armor": "Zvyšuje brnění o {value}",
         "int": "Zvyšuje Intelekt o {value}",
         "agi": "Zvyšuje Obratnost o {value}",
+        "strAgi": "Increases Strength and Agility by {value}",
         "sta": "Zvyšuje Výdrž o {value}",
         "spi": "Zvyšuje Ducha o {value}",
         "allStats": "Zvyšuje všechny vlastnosti o {value}"
@@ -1366,6 +1367,7 @@ export const cs_CZ: EnTranslations = {
         "armor": "Snižuje brnění o {value}",
         "int": "Snižuje Intelekt o {value}",
         "agi": "Snižuje Obratnost o {value}",
+        "strAgi": "Reduces Strength and Agility by {value}",
         "sta": "Snižuje Výdrž o {value}",
         "spi": "Snižuje Ducha o {value}",
         "allStats": "Snižuje všechny vlastnosti o {value}"
@@ -2555,7 +2557,8 @@ export const cs_CZ: EnTranslations = {
       "shaman": "Volající duchů, který ohýbá bouři, oheň a vodu a mezi blesky napravuje spojence.",
       "mage": "Tkaleč kouzel ohně, mrazu a arkánní síly, který ovládá bojiště z dálky.",
       "warlock": "Temný vyvolávač, který velí démonům a kletbám a mění život za ničivou sílu.",
-      "druid": "Měňavec, který tankuje jako medvěd, trhá protivníky jako vlk nebo léčí uprostřed boje."
+      "druid": "Měňavec, který tankuje jako medvěd, trhá protivníky jako vlk nebo léčí uprostřed boje.",
+      "swordmaster": "A swift dual-blade fighter who builds momentum through precision, speed, and sweeping attacks."
     },
     "tag": {
       "melee": "Na blízko",
@@ -2588,6 +2591,15 @@ export const cs_CZ: EnTranslations = {
       "battle_shout": "Povzbuzující pokřik, který zvedne sílu útoku party.",
       "charge": "Vyrazí k vzdálenému nepříteli a otevře boj krátkým omráčením.",
       "thunder_clap": "Zasáhne vše kolem tebe a zpomalí jejich útoky.",
+      "twin_slash": "Cuts with both blades in one quick sequence to build momentum.",
+      "crescent_sweep": "Carves a wide arc through nearby enemies.",
+      "fleet_step": "Sharpens your footwork for a burst of movement speed.",
+      "sword_aura": "Focuses briefly to wreathe both blades in blue energy, empowering strength and agility.",
+      "wind_lunge": "Breaks roots and lunges forward in your facing direction.",
+      "parrying_flow": "Flows between incoming blows to evade more attacks for a short time.",
+      "blade_cyclone": "Whirls both blades through nearby enemies, turning gathered momentum into a sweeping burst.",
+      "duelist_flurry": "Sets a measured cadence that greatly accelerates your attacks.",
+      "azure_rush": "Surges forward in a blue flash and slows nearby enemies.",
       "seal_of_righteousness": "Naplní tvé švihy svatým poškozením, které potom utratíš Verdiktem.",
       "holy_light": "Stabilní, výrazné léčení pro doléčení spojence nebo sebe.",
       "devotion_aura": "Trvalý self-buff zvedající zbroj, takže zásahy dopadají měkčeji.",
@@ -3988,6 +4000,7 @@ export const cs_CZ: EnTranslations = {
     "mage": "Mág",
     "warlock": "Černokněžník",
     "druid": "Druid",
+    "swordmaster": "SwordMaster",
     "warriorAria": "Třída válečník",
     "paladinAria": "Třída paladin",
     "hunterAria": "Třída lovec",
@@ -3996,7 +4009,8 @@ export const cs_CZ: EnTranslations = {
     "shamanAria": "Třída šaman",
     "mageAria": "Třída mág",
     "warlockAria": "Třída černokněžník",
-    "druidAria": "Třída druid"
+    "druidAria": "Třída druid",
+    "swordmasterAria": "SwordMaster class"
   },
   "controls": {
     "title": "Průvodce ovládáním",
@@ -4760,6 +4774,7 @@ export const cs_CZ: EnTranslations = {
       "paladin": "Léčitel / tank / DPS na blízko",
       "hunter": "DPS na dálku",
       "rogue": "DPS na blízko",
+      "swordmaster": "Mobile Melee DPS",
       "priest": "Léčitel / DPS na dálku",
       "shaman": "Léčitel / DPS na blízko nebo na dálku",
       "mage": "DPS na dálku",
@@ -4776,6 +4791,7 @@ export const cs_CZ: EnTranslations = {
       "swordsMaces": "Meče, palcáty",
       "axesSwords": "Sekery, meče",
       "daggersSwords": "Dýky, meče",
+      "twinOneHanders": "Two One-Handed Weapons",
       "staves": "Hole",
       "macesAxes": "Palcáty, sekery"
     },
@@ -4788,7 +4804,8 @@ export const cs_CZ: EnTranslations = {
       "shaman": "Šamani ovládají živly, naplňují zbraně silou, zasahují nepřátele blesky a obnovují spojence.",
       "mage": "Mágové ohýbají oheň, mráz a arkánní sílu, aby ničili nepřátele, vyvolávali vodu a zmrazovali hrozby na místě.",
       "warlock": "Černokněžníci vyvolávají démony, sesílají kletby a průběžné poškození a vysávají život z nepřátel, aby vydrželi.",
-      "druid": "Druidové usměrňují síly přírody, léčí zranění, spoutávají nepřátele a mění se do zvířecích podob pro obranu nebo poškození."
+      "druid": "Druidové usměrňují síly přírody, léčí zranění, spoutávají nepřátele a mění se do zvířecích podob pro obranu nebo poškození.",
+      "swordmaster": "SwordMasters build momentum with precise twin-blade strikes, then turn speed into sweeping attacks that cut through whole groups."
     },
     "aria": "Detaily třídy {className}: role {role}. Počáteční statistiky: Síla {str}, Obratnost {agi}, Výdrž {sta}, Intelekt {int}, Duch {spi}.",
     "statBarAria": "{stat}: {value} z 25"
@@ -5777,6 +5794,54 @@ export const cs_CZ: EnTranslations = {
       "sport_second_wind": {
         "name": "Čerstvé nohy",
         "description": "Najdi druhý dech: pohybuješ se o 50 % rychleji po dobu 4 s."
+      },
+      "twin_slash": {
+        "name": "Twin Slash",
+        "description": "Strike the target with both swords in main-hand then off-hand order."
+      },
+      "crescent_sweep": {
+        "name": "Crescent Sweep",
+        "description": "Sweep both swords through up to 5 enemies in a 6 yard frontal arc."
+      },
+      "fleet_step": {
+        "name": "Fleet Step",
+        "description": "Increase movement speed for 5 sec. Higher ranks increase the bonus."
+      },
+      "sword_aura": {
+        "name": "Sword Aura",
+        "description": "Imbue both swords with azure power, gaining 12 Strength and 12 Agility for 5 min."
+      },
+      "wind_lunge": {
+        "name": "Wind Lunge",
+        "description": "Break roots and lunge 8 yards in your facing direction."
+      },
+      "parrying_flow": {
+        "name": "Parrying Flow",
+        "description": "Flow between incoming blows, gaining 20% dodge for 8 sec."
+      },
+      "quickening": {
+        "name": "Quickening",
+        "description": "Accelerate your attack speed by 25% for 12 sec."
+      },
+      "blade_dance": {
+        "name": "Blade Dance",
+        "description": "Dance through nearby enemies, striking up to 6 targets with both swords."
+      },
+      "twin_finisher": {
+        "name": "Twin Finisher",
+        "description": "Commit both swords to a heavy two-part finishing strike."
+      },
+      "blade_cyclone": {
+        "name": "Blade Cyclone",
+        "description": "Become a cyclone of steel, striking up to 8 enemies within 9 yards with both swords."
+      },
+      "duelist_flurry": {
+        "name": "Duelist Flurry",
+        "description": "Enter a measured flurry, increasing attack speed by 35% for 12 sec."
+      },
+      "azure_rush": {
+        "name": "Azure Rush",
+        "description": "Rush 12 yards in a flash of azure steel and slow nearby enemies by 50% for 3 sec."
       },
       "flamestrike": {
         "name": "Plamenný úder",

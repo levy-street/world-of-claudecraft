@@ -67,6 +67,17 @@ describe('auraEffectDescriptor', () => {
     });
   });
 
+  it('describes Sword Aura as one Strength and Agility effect in either direction', () => {
+    expect(desc({ kind: 'buff_str_agi', value: 12 })).toEqual({
+      key: 'hudChrome.auraEffect.increase.strAgi',
+      nums: { value: 12 },
+    });
+    expect(desc({ kind: 'buff_str_agi', value: -7 })).toEqual({
+      key: 'hudChrome.auraEffect.reduce.strAgi',
+      nums: { value: 7 },
+    });
+  });
+
   it('shows Sunder Armor as a percent reduction scaling with stacks', () => {
     // Sunder is now a PERCENT debuff (2% per stack); the aura value carries the threat
     // constant and is ignored for the tooltip. 5 stacks = 10%.

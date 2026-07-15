@@ -330,7 +330,10 @@ export function recalcPlayerStats(
     else if (a.kind === 'buff_armor') s.armor += a.value;
     else if (a.kind === 'buff_int') s.int += a.value;
     else if (a.kind === 'buff_agi') s.agi += a.value;
-    else if (a.kind === 'buff_spi') s.spi += a.value;
+    else if (a.kind === 'buff_str_agi') {
+      s.str += a.value;
+      s.agi += a.value;
+    } else if (a.kind === 'buff_spi') s.spi += a.value;
     else if (a.kind === 'buff_sta') s.sta += a.value;
     else if (a.kind === 'buff_allstats') {
       s.str += a.value;
@@ -494,7 +497,7 @@ export function recalcPlayerStats(
   const apFromStats =
     cls === 'warrior' || cls === 'paladin' || cls === 'shaman' || cls === 'druid'
       ? s.str * 2
-      : cls === 'rogue' || cls === 'hunter'
+      : cls === 'rogue' || cls === 'hunter' || cls === 'swordmaster'
         ? s.str + s.agi
         : s.str;
   // Floor at 0 so a heavy debuff_ap stack can never bake a negative attack power

@@ -15,7 +15,7 @@ describe('Talents V2 icon routing', () => {
     return option;
   };
 
-  const spec = (cls: 'warrior' | 'mage', specId?: string): SpecDef => {
+  const spec = (cls: 'warrior' | 'swordmaster' | 'mage', specId?: string): SpecDef => {
     const talents = talentsFor(cls);
     const found = specId
       ? talents?.specs.find((candidate) => candidate.id === specId)
@@ -36,6 +36,15 @@ describe('Talents V2 icon routing', () => {
       kind: 'image',
       url: '/ui/specs/warrior/fury.webp',
     });
+  });
+
+  it('uses authored art for every SwordMaster specialization', () => {
+    for (const specId of ['tempest', 'duelist', 'azure_blade']) {
+      expect(talentSpecIconRef(spec('swordmaster', specId))).toEqual({
+        kind: 'image',
+        url: `/ui/specs/swordmaster/${specId}.webp`,
+      });
+    }
   });
 
   it('maps Charge modifiers and Combat Mastery to their exact authored icons', () => {

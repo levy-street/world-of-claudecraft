@@ -192,9 +192,9 @@ export function strApPerPoint(cls: PlayerClass): number {
   return cls === 'warrior' || cls === 'paladin' || cls === 'shaman' || cls === 'druid' ? 2 : 1;
 }
 
-/** Melee attack power gained per point of Agility: 1 for rogue/hunter, else 0. */
+/** Melee attack power gained per point of Agility: 1 for Agility weapon classes, else 0. */
 export function agiMeleeApPerPoint(cls: PlayerClass): number {
-  return cls === 'rogue' || cls === 'hunter' ? 1 : 0;
+  return cls === 'rogue' || cls === 'hunter' || cls === 'swordmaster' ? 1 : 0;
 }
 
 /** First 20 stamina give 1 hp each, the rest 10 (entity.ts hpFromStamina). */
@@ -367,12 +367,12 @@ export function buildStatTooltip(stat: StatId, input: StatTooltipInput): StatToo
 }
 
 // --- upstream source attribution --------------------------------------------
-// Primary attributes (str/agi/sta/int/spi) have no flat per-class buff aura except
-// agi/sta/int/spi/armor and the all-stats buff; Strength is only ever raised by the
-// all-stats buff. This maps each primary to the aura kinds that feed it directly.
+// Maps each primary attribute to the aura kinds that feed it directly. Sword Aura
+// contributes the same flat value to Strength and Agility, so both cells itemize
+// the named source while still reconciling independently.
 const PRIMARY_BUFF_KINDS: Record<'str' | 'agi' | 'sta' | 'int' | 'spi' | 'armor', AuraKind[]> = {
-  str: ['buff_allstats'],
-  agi: ['buff_agi', 'buff_allstats'],
+  str: ['buff_str_agi', 'buff_allstats'],
+  agi: ['buff_agi', 'buff_str_agi', 'buff_allstats'],
   sta: ['buff_sta', 'buff_allstats'],
   int: ['buff_int', 'buff_allstats'],
   spi: ['buff_spi', 'buff_allstats'],

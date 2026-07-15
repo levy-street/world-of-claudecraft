@@ -386,6 +386,7 @@ import { createVcState, type VcState } from './social/vale_cup';
 import * as valeCupBotsMod from './social/vale_cup_bots';
 import { SpatialGrid } from './spatial';
 import { isStunDrCategory } from './stun_dr';
+import { usesFastGcd } from './swordmaster_rules';
 import { Targeting } from './targeting';
 import {
   addThreat,
@@ -2976,7 +2977,7 @@ export class Sim {
   }
 
   playerGcdFor(cls: PlayerClass): number {
-    return cls === 'rogue' ? 1.0 : GCD; // rogue GCD is 1.0 sec
+    return usesFastGcd(cls) ? 1.0 : GCD;
   }
   get playerGcd(): number {
     return this.playerGcdFor(this.primary.cls);
@@ -4844,11 +4845,14 @@ export class Sim {
     abilityName: string | null,
     opts: {
       cannotBeDodged?: boolean;
+      weapon?: Entity['weapon'];
       weaponMult?: number;
+      apSwingSpeed?: number;
       threatFlat?: number;
       threatMult?: number;
       forceCrit?: boolean;
       onDealt?: (amount: number) => void;
+      whiteDualWieldPenalty?: boolean;
     },
   ): boolean {
     return meleeSwingImpl(this.ctx, attacker, target, bonus, abilityName, opts);

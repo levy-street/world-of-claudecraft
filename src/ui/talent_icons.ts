@@ -29,7 +29,10 @@ const TALENT_STAT_CREST: Record<string, string> = {
   haste: 'talent_haste',
 };
 
-const WARRIOR_SPEC_ART = new Set(['arms', 'fury', 'prot']);
+const AUTHORED_SPEC_ART: Readonly<Record<string, ReadonlySet<string>>> = {
+  warrior: new Set(['arms', 'fury', 'prot']),
+  swordmaster: new Set(['tempest', 'duelist', 'azure_blade']),
+};
 
 export function talentEffectIconRef(effect: TalentEffect | undefined): TalentIconRef {
   const chargeMod = effect?.ability?.find((mod) => mod.ability === 'charge');
@@ -63,8 +66,8 @@ export function talentRowOptionIconRef(option: TalentRowOption): TalentIconRef {
 }
 
 export function talentSpecIconRef(spec: SpecDef): TalentSpecIconRef {
-  if (spec.class === 'warrior' && WARRIOR_SPEC_ART.has(spec.id)) {
-    return { kind: 'image', url: `/ui/specs/warrior/${spec.id}.webp` };
+  if (AUTHORED_SPEC_ART[spec.class]?.has(spec.id)) {
+    return { kind: 'image', url: `/ui/specs/${spec.class}/${spec.id}.webp` };
   }
   if (ABILITIES[spec.signature]) return { kind: 'ability', id: spec.signature };
   return { kind: 'text', text: spec.icon };

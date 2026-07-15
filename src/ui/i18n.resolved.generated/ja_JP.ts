@@ -1357,6 +1357,7 @@ export const ja_JP: EnTranslations = {
         "armor": "防御力を{value}上昇させる",
         "int": "知力を{value}上昇させる",
         "agi": "敏捷性を{value}上昇させる",
+        "strAgi": "Increases Strength and Agility by {value}",
         "sta": "耐久力を{value}上昇させる",
         "spi": "精神力を{value}上昇させる",
         "allStats": "すべての能力値を{value}上昇させる"
@@ -1366,6 +1367,7 @@ export const ja_JP: EnTranslations = {
         "armor": "防御力を{value}低下させる",
         "int": "知力を{value}低下させる",
         "agi": "敏捷性を{value}低下させる",
+        "strAgi": "Reduces Strength and Agility by {value}",
         "sta": "耐久力を{value}低下させる",
         "spi": "精神力を{value}低下させる",
         "allStats": "すべての能力値を{value}低下させる"
@@ -2555,7 +2557,8 @@ export const ja_JP: EnTranslations = {
       "shaman": "嵐、炎、水を操り、稲妻の合間に味方を癒す霊の呼び手。",
       "mage": "炎、フロスト、アーケインを操り、遠くから戦場を制する呪文の織り手。",
       "warlock": "デーモンと呪いを操り、生命と引き換えに壊滅的な力を得る闇の召喚者。",
-      "druid": "ベアとなって受け、キャットとなって敵を切り裂き、乱戦の中で癒す変身者。"
+      "druid": "ベアとなって受け、キャットとなって敵を切り裂き、乱戦の中で癒す変身者。",
+      "swordmaster": "A swift dual-blade fighter who builds momentum through precision, speed, and sweeping attacks."
     },
     "tag": {
       "melee": "近接",
@@ -2588,6 +2591,15 @@ export const ja_JP: EnTranslations = {
       "battle_shout": "パーティの攻撃力を高める鼓舞の雄叫びです。",
       "charge": "離れた敵に突進し、短いスタンで戦闘の口火を切ります。",
       "thunder_clap": "周囲のすべてに当たり、相手の攻撃を遅くします。",
+      "twin_slash": "Cuts with both blades in one quick sequence to build momentum.",
+      "crescent_sweep": "Carves a wide arc through nearby enemies.",
+      "fleet_step": "Sharpens your footwork for a burst of movement speed.",
+      "sword_aura": "Focuses briefly to wreathe both blades in blue energy, empowering strength and agility.",
+      "wind_lunge": "Breaks roots and lunges forward in your facing direction.",
+      "parrying_flow": "Flows between incoming blows to evade more attacks for a short time.",
+      "blade_cyclone": "Whirls both blades through nearby enemies, turning gathered momentum into a sweeping burst.",
+      "duelist_flurry": "Sets a measured cadence that greatly accelerates your attacks.",
+      "azure_rush": "Surges forward in a blue flash and slows nearby enemies.",
       "seal_of_righteousness": "一振りごとにホーリーダメージを付与し、ヴァーディクトで消費します。",
       "holy_light": "味方や自分の体力を満タンに戻す、安定した大きめのヒールです。",
       "devotion_aura": "アーマーを上げて被弾を和らげる、持続する自己強化です。",
@@ -3988,6 +4000,7 @@ export const ja_JP: EnTranslations = {
     "mage": "メイジ",
     "warlock": "ウォーロック",
     "druid": "ドルイド",
+    "swordmaster": "SwordMaster",
     "warriorAria": "戦士クラス",
     "paladinAria": "パラディンクラス",
     "hunterAria": "ハンタークラス",
@@ -3996,7 +4009,8 @@ export const ja_JP: EnTranslations = {
     "shamanAria": "シャーマンクラス",
     "mageAria": "メイジクラス",
     "warlockAria": "ウォーロッククラス",
-    "druidAria": "ドルイドクラス"
+    "druidAria": "ドルイドクラス",
+    "swordmasterAria": "SwordMaster class"
   },
   "controls": {
     "title": "操作ガイド",
@@ -4760,6 +4774,7 @@ export const ja_JP: EnTranslations = {
       "paladin": "ヒーラー / タンク / 近接DPS",
       "hunter": "遠隔DPS",
       "rogue": "近接DPS",
+      "swordmaster": "Mobile Melee DPS",
       "priest": "ヒーラー / 遠隔DPS",
       "shaman": "ヒーラー / 近接または遠隔DPS",
       "mage": "遠隔DPS",
@@ -4776,6 +4791,7 @@ export const ja_JP: EnTranslations = {
       "swordsMaces": "剣、メイス",
       "axesSwords": "斧、剣",
       "daggersSwords": "短剣、剣",
+      "twinOneHanders": "Two One-Handed Weapons",
       "staves": "杖",
       "macesAxes": "メイス、斧"
     },
@@ -4788,7 +4804,8 @@ export const ja_JP: EnTranslations = {
       "shaman": "シャーマンは元素を操り、武器に力を宿し、稲妻で敵を打ち、味方を回復します。",
       "mage": "メイジは火炎、氷霜、秘術の力で敵を破壊し、水を召喚し、脅威をその場で凍りつかせます。",
       "warlock": "ウォーロックは悪魔を召喚し、呪いと継続ダメージ魔法をかけ、敵から生命力を吸収して耐えます。",
-      "druid": "ドルイドは自然の力を導き、傷を癒やし、敵を絡め取り、動物形態に変身して守りまたは攻めます。"
+      "druid": "ドルイドは自然の力を導き、傷を癒やし、敵を絡め取り、動物形態に変身して守りまたは攻めます。",
+      "swordmaster": "SwordMasters build momentum with precise twin-blade strikes, then turn speed into sweeping attacks that cut through whole groups."
     },
     "aria": "{className}のクラス詳細: 役割 {role}。開始ステータス: 筋力 {str}、敏捷性 {agi}、スタミナ {sta}、知力 {int}、精神力 {spi}。",
     "statBarAria": "{stat}: {value}/25"
@@ -5777,6 +5794,54 @@ export const ja_JP: EnTranslations = {
       "sport_second_wind": {
         "name": "フレッシュレッグス",
         "description": "脚を取り戻す:4秒間、移動速度が50%上昇する。"
+      },
+      "twin_slash": {
+        "name": "Twin Slash",
+        "description": "Strike the target with both swords in main-hand then off-hand order."
+      },
+      "crescent_sweep": {
+        "name": "Crescent Sweep",
+        "description": "Sweep both swords through up to 5 enemies in a 6 yard frontal arc."
+      },
+      "fleet_step": {
+        "name": "Fleet Step",
+        "description": "Increase movement speed for 5 sec. Higher ranks increase the bonus."
+      },
+      "sword_aura": {
+        "name": "Sword Aura",
+        "description": "Imbue both swords with azure power, gaining 12 Strength and 12 Agility for 5 min."
+      },
+      "wind_lunge": {
+        "name": "Wind Lunge",
+        "description": "Break roots and lunge 8 yards in your facing direction."
+      },
+      "parrying_flow": {
+        "name": "Parrying Flow",
+        "description": "Flow between incoming blows, gaining 20% dodge for 8 sec."
+      },
+      "quickening": {
+        "name": "Quickening",
+        "description": "Accelerate your attack speed by 25% for 12 sec."
+      },
+      "blade_dance": {
+        "name": "Blade Dance",
+        "description": "Dance through nearby enemies, striking up to 6 targets with both swords."
+      },
+      "twin_finisher": {
+        "name": "Twin Finisher",
+        "description": "Commit both swords to a heavy two-part finishing strike."
+      },
+      "blade_cyclone": {
+        "name": "Blade Cyclone",
+        "description": "Become a cyclone of steel, striking up to 8 enemies within 9 yards with both swords."
+      },
+      "duelist_flurry": {
+        "name": "Duelist Flurry",
+        "description": "Enter a measured flurry, increasing attack speed by 35% for 12 sec."
+      },
+      "azure_rush": {
+        "name": "Azure Rush",
+        "description": "Rush 12 yards in a flash of azure steel and slow nearby enemies by 50% for 3 sec."
       },
       "flamestrike": {
         "name": "フレイムストライク",

@@ -1357,6 +1357,7 @@ export const id_ID: EnTranslations = {
         "armor": "Aumenta la armadura en {value}",
         "int": "Aumenta el intelecto en {value}",
         "agi": "Aumenta la agilidad en {value}",
+        "strAgi": "Increases Strength and Agility by {value}",
         "sta": "Aumenta el aguante en {value}",
         "spi": "Aumenta el espíritu en {value}",
         "allStats": "Aumenta todos los atributos en {value}"
@@ -1366,6 +1367,7 @@ export const id_ID: EnTranslations = {
         "armor": "Reduce la armadura en {value}",
         "int": "Reduce el intelecto en {value}",
         "agi": "Reduce la agilidad en {value}",
+        "strAgi": "Reduces Strength and Agility by {value}",
         "sta": "Reduce el aguante en {value}",
         "spi": "Reduce el espíritu en {value}",
         "allStats": "Reduce todos los atributos en {value}"
@@ -2555,7 +2557,8 @@ export const id_ID: EnTranslations = {
       "shaman": "Pemanggil roh yang melengkungkan badai, api, dan air, serta memulihkan sekutu di sela petir.",
       "mage": "Perajut mantra api, beku, dan arkana yang mengendalikan medan tempur dari kejauhan.",
       "warlock": "Pemanggil kegelapan yang menguasai iblis dan kutukan, menukar nyawa demi kekuatan dahsyat.",
-      "druid": "Penjelma yang menjadi tank sebagai beruang, mencabik lawan sebagai kucing, atau menyembuhkan di tengah kekalutan."
+      "druid": "Penjelma yang menjadi tank sebagai beruang, mencabik lawan sebagai kucing, atau menyembuhkan di tengah kekalutan.",
+      "swordmaster": "A swift dual-blade fighter who builds momentum through precision, speed, and sweeping attacks."
     },
     "tag": {
       "melee": "Jarak dekat",
@@ -2588,6 +2591,15 @@ export const id_ID: EnTranslations = {
       "battle_shout": "Pekik penggugah semangat yang menaikkan daya serang seluruh kelompok.",
       "charge": "Menerjang musuh yang jauh untuk membuka pertarungan dengan pingsan singkat.",
       "thunder_clap": "Menghantam segala sesuatu di sekitarmu dan melambatkan serangan mereka.",
+      "twin_slash": "Cuts with both blades in one quick sequence to build momentum.",
+      "crescent_sweep": "Carves a wide arc through nearby enemies.",
+      "fleet_step": "Sharpens your footwork for a burst of movement speed.",
+      "sword_aura": "Focuses briefly to wreathe both blades in blue energy, empowering strength and agility.",
+      "wind_lunge": "Breaks roots and lunges forward in your facing direction.",
+      "parrying_flow": "Flows between incoming blows to evade more attacks for a short time.",
+      "blade_cyclone": "Whirls both blades through nearby enemies, turning gathered momentum into a sweeping burst.",
+      "duelist_flurry": "Sets a measured cadence that greatly accelerates your attacks.",
+      "azure_rush": "Surges forward in a blue flash and slows nearby enemies.",
       "seal_of_righteousness": "Mengisi ayunanmu dengan kerusakan Suci, lalu habiskan dengan Vonis.",
       "holy_light": "Penyembuhan mantap berukuran besar untuk memenuhi nyawa sekutu atau dirimu sendiri.",
       "devotion_aura": "Penguat-diri tahan lama yang menaikkan zirah sehingga pukulan terasa lebih ringan.",
@@ -3988,6 +4000,7 @@ export const id_ID: EnTranslations = {
     "mage": "Penyihir",
     "warlock": "Penyihir Iblis",
     "druid": "Druid",
+    "swordmaster": "SwordMaster",
     "warriorAria": "Kelas Prajurit",
     "paladinAria": "Kelas Paladin",
     "hunterAria": "Kelas Pemburu",
@@ -3996,7 +4009,8 @@ export const id_ID: EnTranslations = {
     "shamanAria": "Kelas Dukun",
     "mageAria": "Kelas Penyihir",
     "warlockAria": "Kelas Penyihir Iblis",
-    "druidAria": "Kelas Druid"
+    "druidAria": "Kelas Druid",
+    "swordmasterAria": "SwordMaster class"
   },
   "controls": {
     "title": "Panduan Kontrol",
@@ -4760,6 +4774,7 @@ export const id_ID: EnTranslations = {
       "paladin": "Penyembuh / Tank / DPS Jarak Dekat",
       "hunter": "DPS Jarak Jauh",
       "rogue": "DPS Jarak Dekat",
+      "swordmaster": "Mobile Melee DPS",
       "priest": "Penyembuh / DPS Jarak Jauh",
       "shaman": "Penyembuh / DPS Jarak Dekat atau Jauh",
       "mage": "DPS Jarak Jauh",
@@ -4776,6 +4791,7 @@ export const id_ID: EnTranslations = {
       "swordsMaces": "Pedang, Gada",
       "axesSwords": "Kapak, Pedang",
       "daggersSwords": "Belati, Pedang",
+      "twinOneHanders": "Two One-Handed Weapons",
       "staves": "Tongkat",
       "macesAxes": "Gada, Kapak"
     },
@@ -4788,7 +4804,8 @@ export const id_ID: EnTranslations = {
       "shaman": "Dukun memerintah unsur-unsur alam, mengisi senjata dengan kekuatan, mengejutkan musuh dengan petir, dan memulihkan sekutu.",
       "mage": "Penyihir menundukkan kekuatan Api, Beku, dan Arkana untuk membinasakan musuh, memanggil air, dan membekukan ancaman di tempat.",
       "warlock": "Penyihir Iblis memanggil iblis, menebar kutukan dan sihir kerusakan berkelanjutan, serta menyedot nyawa musuh untuk bertahan.",
-      "druid": "Druid menyalurkan kekuatan alam, menyembuhkan luka, membelit musuh, dan berubah ke wujud hewan untuk bertahan atau menyerang."
+      "druid": "Druid menyalurkan kekuatan alam, menyembuhkan luka, membelit musuh, dan berubah ke wujud hewan untuk bertahan atau menyerang.",
+      "swordmaster": "SwordMasters build momentum with precise twin-blade strikes, then turn speed into sweeping attacks that cut through whole groups."
     },
     "aria": "Detail kelas untuk {className}: peran {role}. Statistik awal: Kekuatan {str}, Kegesitan {agi}, Stamina {sta}, Kecerdasan {int}, Semangat {spi}.",
     "statBarAria": "{stat}: {value} dari 25"
@@ -5777,6 +5794,54 @@ export const id_ID: EnTranslations = {
       "sport_second_wind": {
         "name": "Kaki Segar",
         "description": "Temukan kembali tenagamu: bergerak 50% lebih cepat selama 4 detik."
+      },
+      "twin_slash": {
+        "name": "Twin Slash",
+        "description": "Strike the target with both swords in main-hand then off-hand order."
+      },
+      "crescent_sweep": {
+        "name": "Crescent Sweep",
+        "description": "Sweep both swords through up to 5 enemies in a 6 yard frontal arc."
+      },
+      "fleet_step": {
+        "name": "Fleet Step",
+        "description": "Increase movement speed for 5 sec. Higher ranks increase the bonus."
+      },
+      "sword_aura": {
+        "name": "Sword Aura",
+        "description": "Imbue both swords with azure power, gaining 12 Strength and 12 Agility for 5 min."
+      },
+      "wind_lunge": {
+        "name": "Wind Lunge",
+        "description": "Break roots and lunge 8 yards in your facing direction."
+      },
+      "parrying_flow": {
+        "name": "Parrying Flow",
+        "description": "Flow between incoming blows, gaining 20% dodge for 8 sec."
+      },
+      "quickening": {
+        "name": "Quickening",
+        "description": "Accelerate your attack speed by 25% for 12 sec."
+      },
+      "blade_dance": {
+        "name": "Blade Dance",
+        "description": "Dance through nearby enemies, striking up to 6 targets with both swords."
+      },
+      "twin_finisher": {
+        "name": "Twin Finisher",
+        "description": "Commit both swords to a heavy two-part finishing strike."
+      },
+      "blade_cyclone": {
+        "name": "Blade Cyclone",
+        "description": "Become a cyclone of steel, striking up to 8 enemies within 9 yards with both swords."
+      },
+      "duelist_flurry": {
+        "name": "Duelist Flurry",
+        "description": "Enter a measured flurry, increasing attack speed by 35% for 12 sec."
+      },
+      "azure_rush": {
+        "name": "Azure Rush",
+        "description": "Rush 12 yards in a flash of azure steel and slow nearby enemies by 50% for 3 sec."
       },
       "flamestrike": {
         "name": "Hantaman Api",

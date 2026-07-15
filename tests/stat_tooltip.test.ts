@@ -61,7 +61,7 @@ describe('stat tooltip math reconciles with recalcPlayerStats', () => {
       it(`${cls} L${level}: attack power breakdown sums to entity.attackPower`, () => {
         const p = freshPlayer(cls, level);
         const strAp = statEffectVal(cls, p, 'str', 'attackPower') ?? 0;
-        const agiAp = statEffectVal(cls, p, 'agi', 'attackPower') ?? 0; // present for rogue/hunter only
+        const agiAp = statEffectVal(cls, p, 'agi', 'attackPower') ?? 0;
         expect(strAp + agiAp).toBe(p.attackPower);
       });
 
@@ -133,9 +133,10 @@ describe('class-aware effect selection', () => {
     expect(strApPerPoint('warlock')).toBe(1);
   });
 
-  it('Agility melee AP applies only to rogue and hunter', () => {
+  it('Agility melee AP applies only to rogue, hunter, and SwordMaster', () => {
     expect(agiMeleeApPerPoint('rogue')).toBe(1);
     expect(agiMeleeApPerPoint('hunter')).toBe(1);
+    expect(agiMeleeApPerPoint('swordmaster')).toBe(1);
     for (const cls of [
       'warrior',
       'paladin',
@@ -363,6 +364,32 @@ describe('upstream source breakdown reconciles to the displayed stat', () => {
     expect(buffLine?.value).toBe(20);
     const sum = sta.sources.reduce((acc, s) => acc + s.value, 0);
     expect(sum).toBe(sta.statValue);
+  });
+
+  it('itemizes Sword Aura in both Strength and Agility without double-counting either cell', () => {
+    const sim = new Sim({ seed: 1, playerClass: 'swordmaster' });
+    sim.setPlayerLevel(20);
+    const p = sim.player;
+    p.auras.push({
+      id: 'sword_aura',
+      name: 'Sword Aura',
+      kind: 'buff_str_agi',
+      remaining: 300,
+      duration: 300,
+      value: 12,
+      sourceId: p.id,
+      school: 'arcane',
+    });
+    recalcPlayerStats(p, 'swordmaster', sim.equipment, undefined, {});
+    const input = inputWithGear(sim, 'swordmaster');
+
+    for (const stat of ['str', 'agi'] as const) {
+      const model = buildStatTooltip(stat, input);
+      expect(model.sources.filter((source) => source.kind === 'buff')).toEqual([
+        { kind: 'buff', name: 'Sword Aura', value: 12 },
+      ]);
+      expect(model.sources.reduce((sum, source) => sum + source.value, 0)).toBe(model.statValue);
+    }
   });
 
   it('spellPower breaks down into Intellect + flat gear/buff Spell Power', () => {

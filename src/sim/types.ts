@@ -95,6 +95,7 @@ export const DELVE_COMPANION_HEAL_INTERVAL = 3;
 
 export type PlayerClass =
   | 'warrior'
+  | 'swordmaster'
   | 'paladin'
   | 'hunter'
   | 'rogue'
@@ -108,6 +109,7 @@ export type PlayerClass =
 // casters and Hunter, whose primary attack loop is ranged.
 export const MELEE_CLASSES: ReadonlySet<PlayerClass> = new Set([
   'warrior',
+  'swordmaster',
   'paladin',
   'rogue',
   'shaman',
@@ -159,6 +161,7 @@ export interface ArenaCombatant {
 }
 export const ALL_CLASSES: PlayerClass[] = [
   'warrior',
+  'swordmaster',
   'paladin',
   'hunter',
   'rogue',
@@ -213,6 +216,7 @@ export type AuraKind =
   | 'buff_armor'
   | 'buff_int'
   | 'buff_agi'
+  | 'buff_str_agi'
   | 'buff_dodge'
   | 'buff_speed'
   | 'buff_haste'
@@ -1504,6 +1508,19 @@ export type AbilityEffect =
       requiresBehind?: boolean;
       weaponMult?: number;
     } // instant special attack (sinister strike, overpower, backstab)
+  | {
+      type: 'dualWeaponStrike';
+      mainhandMult: number;
+      offhandMult: number;
+    }
+  | {
+      type: 'dualWeaponAoe';
+      mainhandMult: number;
+      offhandMult: number;
+      radius: number;
+      frontal?: boolean;
+      maxTargets?: number;
+    }
   | { type: 'directDamage'; min: number; max: number; vsRootedMult?: number }
   | { type: 'interrupt'; lockout: number; rageOnInterrupt?: number }
   | {

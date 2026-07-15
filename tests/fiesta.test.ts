@@ -3,7 +3,7 @@ import { Sim } from '../src/sim/sim';
 import { groundHeight } from '../src/sim/world';
 import { arenaOrigin } from '../src/sim/data';
 import { AUGMENTS, AUGMENTS_BY_ID, eligibleAugments, tierForWave } from '../src/sim/content/augments';
-import type { PlayerClass } from '../src/sim/types';
+import { ALL_CLASSES, type PlayerClass } from '../src/sim/types';
 
 function makeWorld() {
   return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
@@ -292,8 +292,7 @@ describe('fiesta: augment catalog integrity', () => {
   });
 
   it('every class can be offered three augments at every tier', () => {
-    const classes: PlayerClass[] = ['warrior', 'paladin', 'hunter', 'rogue', 'priest', 'shaman', 'mage', 'warlock', 'druid'];
-    for (const cls of classes) {
+    for (const cls of ALL_CLASSES) {
       for (const tier of ['silver', 'gold', 'prismatic'] as const) {
         // role null is the worst case (healer-only augments excluded)
         const pool = eligibleAugments(tier, cls, null, new Set());

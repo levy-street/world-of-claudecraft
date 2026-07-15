@@ -1,4 +1,4 @@
-// Classes: the index (a filterable chooser over all nine, with crests, role badges, and
+// Classes: the index (a filterable chooser over all ten, with crests, role badges, and
 // the canonical class description) and the rich per-class page (/guide/classes/<id>).
 //
 // Data sources, all live from the project so nothing drifts:
@@ -136,7 +136,7 @@ function indexHtml(): string {
     </div>`;
 }
 
-// Client-side facet filter over the nine cards. Multi-select OR within a group, AND across
+// Client-side facet filter over the ten cards. Multi-select OR within a group, AND across
 // groups; a "both" class matches either melee or ranged. Pure DOM, cleaned up on navigate.
 function mountChooser(root: HTMLElement): (() => void) | undefined {
   const chooser = root.querySelector<HTMLElement>('.guide-chooser');

@@ -21,7 +21,7 @@ import {
   type TalentAllocation,
   type TalentModifiers,
 } from '../src/sim/content/talents';
-import { zoneAt } from '../src/sim/data';
+import { CLASSES, zoneAt } from '../src/sim/data';
 import { characterDerivedStats } from '../src/sim/entity';
 import type { CharacterState } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
@@ -140,18 +140,6 @@ export interface CharacterSheet {
   pos?: { x: number; z: number };
 }
 
-const CLASS_LABELS: Record<PlayerClass, string> = {
-  warrior: 'Warrior',
-  paladin: 'Paladin',
-  hunter: 'Hunter',
-  rogue: 'Rogue',
-  priest: 'Priest',
-  shaman: 'Shaman',
-  mage: 'Mage',
-  warlock: 'Warlock',
-  druid: 'Druid',
-};
-
 export function splitCopper(copper: number): MoneySplit {
   const c = Math.max(0, Math.floor(copper));
   return { gold: Math.floor(c / 10000), silver: Math.floor(c / 100) % 100, copper: c % 100 };
@@ -220,7 +208,7 @@ export function characterSheet(input: CharacterSheetInput): CharacterSheet {
     name: row.name,
     realm,
     class: cls,
-    classLabel: CLASS_LABELS[cls] ?? cls,
+    classLabel: CLASSES[cls]?.name ?? cls,
     spec: specLabel(cls, normalizeAllocation(cls, state, level)),
     level,
     virtualLevel: virtualLevel(lifetimeXp),

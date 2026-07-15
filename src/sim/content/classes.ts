@@ -1,12 +1,7 @@
-import type {
-  AbilityDef,
-  AbilityEffect,
-  AuraKind,
-  CoreStats,
-  PlayerClass,
-  WeaponInfo,
-} from '../types';
+import type { AbilityDef, AbilityEffect, CoreStats, PlayerClass, WeaponInfo } from '../types';
+import { SWORDMASTER_ABILITIES, SWORDMASTER_CLASS } from './swordmaster';
 import { TALENT_ABILITIES_V2 } from './talent_abilities_v2';
+import { SCALABLE_FLAT_BUFF_KINDS, scaleTalentBuffValue } from './talent_buff_scaling';
 import type { TalentModifiers } from './talents';
 import { SPORT_ABILITIES } from './vale_cup';
 
@@ -112,6 +107,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     ],
     color: 0xc79c6e,
   },
+  swordmaster: SWORDMASTER_CLASS,
   mage: {
     id: 'mage',
     name: 'Mage',
@@ -4817,6 +4813,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // so every ABILITIES consumer (casting, icons, hotbar validation, tooltips)
   // resolves sport ids; no class lists them, so abilitiesKnownAt never grants
   // them outside a match (resolveSportKit is the only entry).
+  ...SWORDMASTER_ABILITIES,
   ...SPORT_ABILITIES,
 };
 
@@ -4839,23 +4836,6 @@ export interface KnownAbility {
   bonusCharges?: number; // talent-added uses, distinct from def.maxCharges
 }
 
-// The buff kinds whose value is a flat MAGNITUDE (armor, attack power, a flat primary
-// stat, spell power) and so scales with an ability/global damage-power mod. Every other
-// selfBuff/buffTarget kind is a rate, multiplier, percent, or a locked caster-form value
-// and passes through scaleEffect untouched (see the selfBuff/buffTarget arm).
-const SCALABLE_BUFF_KINDS = new Set<AuraKind>([
-  'buff_ap',
-  'buff_armor',
-  'buff_int',
-  'buff_agi',
-  'buff_spi',
-  'buff_sta',
-  'buff_spellpower',
-  // Thorns is flat reflect DAMAGE (Retribution Aura, thornshield), so it scales with a
-  // damage-power mod exactly like the other flat magnitudes above.
-  'thorns',
-]);
-
 // Scale one effect's damage/heal magnitudes, returning a NEW effect object — the
 // base content arrays are shared module data and must never be mutated. `flat`
 // is added once to the effect's primary magnitude.
@@ -4876,6 +4856,13 @@ function scaleEffect(
         ...eff,
         bonus: Math.round(eff.bonus * dmgMult + flat),
         weaponMult: (eff.weaponMult ?? 1) * dmgMult,
+      };
+    case 'dualWeaponStrike':
+    case 'dualWeaponAoe':
+      return {
+        ...eff,
+        mainhandMult: eff.mainhandMult * dmgMult,
+        offhandMult: eff.offhandMult * dmgMult,
       };
     case 'directDamage':
       return {
@@ -4971,7 +4958,7 @@ function scaleEffect(
     // buffPct pass in applyTalentMods.
     case 'buffTarget':
     case 'selfBuff':
-      return SCALABLE_BUFF_KINDS.has(eff.kind)
+      return SCALABLE_FLAT_BUFF_KINDS.has(eff.kind)
         ? { ...eff, value: Math.round(eff.value * dmgMult + flat) }
         : eff;
     // lifeTap / gainResource fall through: a damage/heal mod must not inflate a mana or
@@ -5024,14 +5011,11 @@ function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): void {
     // buffPct strengthens the value of a (self/target) buff, e.g. Improved Devotion Aura
     // giving more armor. Only the buff effects scale; damage on the same ability does not.
     if (am.buffPct) {
-      const mul = 1 + am.buffPct;
       entry.effects = entry.effects.map((e) =>
-        (e.type === 'selfBuff' || e.type === 'buffTarget') && Math.abs(e.value) >= 1
+        e.type === 'selfBuff' || e.type === 'buffTarget'
           ? {
               ...e,
-              // Flat magnitudes stay integer-valued, while percentage/rate buffs
-              // retain authored fractional values (for example 5% * 1.5 = 7.5%).
-              value: SCALABLE_BUFF_KINDS.has(e.kind) ? Math.round(e.value * mul) : e.value * mul,
+              value: scaleTalentBuffValue(e.kind, e.value, am.buffPct),
             }
           : e,
       );

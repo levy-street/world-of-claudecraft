@@ -6,7 +6,7 @@ import { talentsFor } from '../src/sim/content/talents';
 import { zoneAt } from '../src/sim/data';
 import { createPlayer, recalcPlayerStats } from '../src/sim/entity';
 import type { CharacterState } from '../src/sim/sim';
-import { type PlayerClass, virtualLevel } from '../src/sim/types';
+import { ALL_CLASSES, type PlayerClass, virtualLevel } from '../src/sim/types';
 
 function makeState(over: Partial<CharacterState> = {}): CharacterState {
   return {
@@ -89,6 +89,17 @@ describe('characterSheet: shared fields', () => {
     expect(sheet.virtualLevel).toBe(12);
   });
 
+  it('uses the canonical SwordMaster display label on public sheets', () => {
+    const sheet = characterSheet(
+      input({
+        visibility: 'public',
+        row: makeRow('swordmaster', 1, makeState({ level: 1, lifetimeXp: 0 })),
+      }),
+    );
+    expect(sheet.class).toBe('swordmaster');
+    expect(sheet.classLabel).toBe('SwordMaster');
+  });
+
   it('preserves a valid specialization while ignoring legacy point-tree state', () => {
     const fury = talentsFor('warrior')?.specs.find((spec) => spec.id === 'fury');
     if (!fury) throw new Error('warrior Fury fixture missing');
@@ -167,18 +178,7 @@ describe('characterSheet: public variant leaks nothing sensitive', () => {
   });
 
   it('property check: no owner-only key survives across many class/level combos', () => {
-    const classes: PlayerClass[] = [
-      'warrior',
-      'paladin',
-      'hunter',
-      'rogue',
-      'priest',
-      'shaman',
-      'mage',
-      'warlock',
-      'druid',
-    ];
-    for (const cls of classes) {
+    for (const cls of ALL_CLASSES) {
       for (const level of [1, 10, 20]) {
         const sheet = characterSheet(
           input({ visibility: 'public', row: makeRow(cls, level, makeState({ level })) }),

@@ -12,7 +12,9 @@ export function validateAction(value: unknown): number | null {
 }
 
 export function validatePlayerClass(value: unknown): PlayerClass | null {
-  return (ALL_CLASSES as string[]).includes(value as string) ? (value as PlayerClass) : null;
+  return typeof value === 'string' && (ALL_CLASSES as readonly string[]).includes(value)
+    ? (value as PlayerClass)
+    : null;
 }
 
 export function validatePlayerLevel(value: unknown): number | null {

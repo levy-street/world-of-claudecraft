@@ -1357,6 +1357,7 @@ export const ko_KR: EnTranslations = {
         "armor": "방어도를 {value} 증가시킵니다",
         "int": "지능을 {value} 증가시킵니다",
         "agi": "민첩성을 {value} 증가시킵니다",
+        "strAgi": "Increases Strength and Agility by {value}",
         "sta": "체력을 {value} 증가시킵니다",
         "spi": "정신력을 {value} 증가시킵니다",
         "allStats": "모든 능력치를 {value} 증가시킵니다"
@@ -1366,6 +1367,7 @@ export const ko_KR: EnTranslations = {
         "armor": "방어도를 {value} 감소시킵니다",
         "int": "지능을 {value} 감소시킵니다",
         "agi": "민첩성을 {value} 감소시킵니다",
+        "strAgi": "Reduces Strength and Agility by {value}",
         "sta": "체력을 {value} 감소시킵니다",
         "spi": "정신력을 {value} 감소시킵니다",
         "allStats": "모든 능력치를 {value} 감소시킵니다"
@@ -2555,7 +2557,8 @@ export const ko_KR: EnTranslations = {
       "shaman": "폭풍과 불, 물을 다스리고 번개 사이로 아군을 치유하는 정령 소환사.",
       "mage": "불과 냉기, 비전을 엮어 멀리서 전장을 지배하는 주문 직조사.",
       "warlock": "악마와 저주를 부리며 생명을 대가로 파멸적인 힘을 얻는 어둠의 술사.",
-      "druid": "곰으로 방어하고, 표범으로 적을 난도질하며, 격전 속에서 치유하는 변신술사."
+      "druid": "곰으로 방어하고, 표범으로 적을 난도질하며, 격전 속에서 치유하는 변신술사.",
+      "swordmaster": "A swift dual-blade fighter who builds momentum through precision, speed, and sweeping attacks."
     },
     "tag": {
       "melee": "근접",
@@ -2588,6 +2591,15 @@ export const ko_KR: EnTranslations = {
       "battle_shout": "파티 전체의 공격력을 높여 주는 사기를 북돋우는 외침입니다.",
       "charge": "멀리 있는 적에게 돌진해 잠시 기절시키며 전투를 시작합니다.",
       "thunder_clap": "주위의 모든 적을 타격하고 그들의 공격 속도를 늦춥니다.",
+      "twin_slash": "Cuts with both blades in one quick sequence to build momentum.",
+      "crescent_sweep": "Carves a wide arc through nearby enemies.",
+      "fleet_step": "Sharpens your footwork for a burst of movement speed.",
+      "sword_aura": "Focuses briefly to wreathe both blades in blue energy, empowering strength and agility.",
+      "wind_lunge": "Breaks roots and lunges forward in your facing direction.",
+      "parrying_flow": "Flows between incoming blows to evade more attacks for a short time.",
+      "blade_cyclone": "Whirls both blades through nearby enemies, turning gathered momentum into a sweeping burst.",
+      "duelist_flurry": "Sets a measured cadence that greatly accelerates your attacks.",
+      "azure_rush": "Surges forward in a blue flash and slows nearby enemies.",
       "seal_of_righteousness": "공격에 신성 피해를 부여하고, 선고로 그 기운을 소모합니다.",
       "holy_light": "아군이나 자신의 체력을 채워 주는 안정적이고 큰 치유입니다.",
       "devotion_aura": "방어도를 높여 받는 타격을 줄여 주는 지속형 자기 강화입니다.",
@@ -3988,6 +4000,7 @@ export const ko_KR: EnTranslations = {
     "mage": "마법사",
     "warlock": "흑마법사",
     "druid": "드루이드",
+    "swordmaster": "SwordMaster",
     "warriorAria": "전사 직업",
     "paladinAria": "성기사 직업",
     "hunterAria": "사냥꾼 직업",
@@ -3996,7 +4009,8 @@ export const ko_KR: EnTranslations = {
     "shamanAria": "주술사 직업",
     "mageAria": "마법사 직업",
     "warlockAria": "흑마법사 직업",
-    "druidAria": "드루이드 직업"
+    "druidAria": "드루이드 직업",
+    "swordmasterAria": "SwordMaster class"
   },
   "controls": {
     "title": "조작 가이드",
@@ -4760,6 +4774,7 @@ export const ko_KR: EnTranslations = {
       "paladin": "치유 / 탱커 / 근접 DPS",
       "hunter": "원거리 DPS",
       "rogue": "근접 DPS",
+      "swordmaster": "Mobile Melee DPS",
       "priest": "치유 / 원거리 DPS",
       "shaman": "치유 / 근접 또는 원거리 DPS",
       "mage": "원거리 DPS",
@@ -4776,6 +4791,7 @@ export const ko_KR: EnTranslations = {
       "swordsMaces": "검, 둔기",
       "axesSwords": "도끼, 검",
       "daggersSwords": "단검, 검",
+      "twinOneHanders": "Two One-Handed Weapons",
       "staves": "지팡이",
       "macesAxes": "둔기, 도끼"
     },
@@ -4788,7 +4804,8 @@ export const ko_KR: EnTranslations = {
       "shaman": "주술사는 정령을 다루고 무기에 힘을 불어넣으며 번개로 적을 충격시키고 아군을 회복시킵니다.",
       "mage": "마법사는 화염, 냉기, 비전의 힘으로 적을 파괴하고 물을 만들어내며 위협을 얼립니다.",
       "warlock": "흑마법사는 악마를 소환하고 저주와 지속 피해 마법을 걸며 적에게서 생명력을 흡수해 버팁니다.",
-      "druid": "드루이드는 자연의 힘으로 치유하고 적을 묶으며 동물 형태로 변신해 방어하거나 피해를 줍니다."
+      "druid": "드루이드는 자연의 힘으로 치유하고 적을 묶으며 동물 형태로 변신해 방어하거나 피해를 줍니다.",
+      "swordmaster": "SwordMasters build momentum with precise twin-blade strikes, then turn speed into sweeping attacks that cut through whole groups."
     },
     "aria": "{className} 직업 세부 정보: 역할 {role}. 시작 능력치: 힘 {str}, 민첩 {agi}, 체력 {sta}, 지능 {int}, 정신력 {spi}.",
     "statBarAria": "{stat}: {value}/25"
@@ -5777,6 +5794,54 @@ export const ko_KR: EnTranslations = {
       "sport_second_wind": {
         "name": "재도약",
         "description": "기운을 되찾습니다: 4초 동안 이동 속도가 50% 증가합니다."
+      },
+      "twin_slash": {
+        "name": "Twin Slash",
+        "description": "Strike the target with both swords in main-hand then off-hand order."
+      },
+      "crescent_sweep": {
+        "name": "Crescent Sweep",
+        "description": "Sweep both swords through up to 5 enemies in a 6 yard frontal arc."
+      },
+      "fleet_step": {
+        "name": "Fleet Step",
+        "description": "Increase movement speed for 5 sec. Higher ranks increase the bonus."
+      },
+      "sword_aura": {
+        "name": "Sword Aura",
+        "description": "Imbue both swords with azure power, gaining 12 Strength and 12 Agility for 5 min."
+      },
+      "wind_lunge": {
+        "name": "Wind Lunge",
+        "description": "Break roots and lunge 8 yards in your facing direction."
+      },
+      "parrying_flow": {
+        "name": "Parrying Flow",
+        "description": "Flow between incoming blows, gaining 20% dodge for 8 sec."
+      },
+      "quickening": {
+        "name": "Quickening",
+        "description": "Accelerate your attack speed by 25% for 12 sec."
+      },
+      "blade_dance": {
+        "name": "Blade Dance",
+        "description": "Dance through nearby enemies, striking up to 6 targets with both swords."
+      },
+      "twin_finisher": {
+        "name": "Twin Finisher",
+        "description": "Commit both swords to a heavy two-part finishing strike."
+      },
+      "blade_cyclone": {
+        "name": "Blade Cyclone",
+        "description": "Become a cyclone of steel, striking up to 8 enemies within 9 yards with both swords."
+      },
+      "duelist_flurry": {
+        "name": "Duelist Flurry",
+        "description": "Enter a measured flurry, increasing attack speed by 35% for 12 sec."
+      },
+      "azure_rush": {
+        "name": "Azure Rush",
+        "description": "Rush 12 yards in a flash of azure steel and slow nearby enemies by 50% for 3 sec."
       },
       "flamestrike": {
         "name": "화염 폭발",

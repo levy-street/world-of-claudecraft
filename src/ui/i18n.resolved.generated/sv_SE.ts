@@ -1357,6 +1357,7 @@ export const sv_SE: EnTranslations = {
         "armor": "Erhöht Rüstung um {value}",
         "int": "Erhöht Intelligenz um {value}",
         "agi": "Erhöht Beweglichkeit um {value}",
+        "strAgi": "Increases Strength and Agility by {value}",
         "sta": "Erhöht Ausdauer um {value}",
         "spi": "Erhöht Willenskraft um {value}",
         "allStats": "Erhöht alle Attribute um {value}"
@@ -1366,6 +1367,7 @@ export const sv_SE: EnTranslations = {
         "armor": "Verringert Rüstung um {value}",
         "int": "Verringert Intelligenz um {value}",
         "agi": "Verringert Beweglichkeit um {value}",
+        "strAgi": "Reduces Strength and Agility by {value}",
         "sta": "Verringert Ausdauer um {value}",
         "spi": "Verringert Willenskraft um {value}",
         "allStats": "Verringert alle Attribute um {value}"
@@ -2555,7 +2557,8 @@ export const sv_SE: EnTranslations = {
       "shaman": "En andekallare som böjer storm, eld och vatten, och botar allierade mellan blixtarna.",
       "mage": "En besvärjare av eld, frost och arkan som kontrollerar slagfältet på avstånd.",
       "warlock": "En mörk frammanare som befaller demoner och förbannelser, och byter liv mot förödande makt.",
-      "druid": "En hamnskiftare som tankar som björn, sliter fiender i stycken som katt, eller läker mitt i tumultet."
+      "druid": "En hamnskiftare som tankar som björn, sliter fiender i stycken som katt, eller läker mitt i tumultet.",
+      "swordmaster": "A swift dual-blade fighter who builds momentum through precision, speed, and sweeping attacks."
     },
     "tag": {
       "melee": "Närstrid",
@@ -2588,6 +2591,15 @@ export const sv_SE: EnTranslations = {
       "battle_shout": "Ett samlande rop som höjer attackstyrkan för gruppen.",
       "charge": "Stormar mot en avlägsen fiende för att öppna striden med en kort bedövning.",
       "thunder_clap": "Slår allt runt omkring dig och saktar ner deras attacker.",
+      "twin_slash": "Cuts with both blades in one quick sequence to build momentum.",
+      "crescent_sweep": "Carves a wide arc through nearby enemies.",
+      "fleet_step": "Sharpens your footwork for a burst of movement speed.",
+      "sword_aura": "Focuses briefly to wreathe both blades in blue energy, empowering strength and agility.",
+      "wind_lunge": "Breaks roots and lunges forward in your facing direction.",
+      "parrying_flow": "Flows between incoming blows to evade more attacks for a short time.",
+      "blade_cyclone": "Whirls both blades through nearby enemies, turning gathered momentum into a sweeping burst.",
+      "duelist_flurry": "Sets a measured cadence that greatly accelerates your attacks.",
+      "azure_rush": "Surges forward in a blue flash and slows nearby enemies.",
       "seal_of_righteousness": "Besjälar dina sving med helig skada, förbruka den sedan med Verdict.",
       "holy_light": "En stadig, rejäl läkning för att toppa upp en allierad eller dig själv.",
       "devotion_aura": "En varaktig självförstärkning som höjer rustningen så slag landar mjukare.",
@@ -3988,6 +4000,7 @@ export const sv_SE: EnTranslations = {
     "mage": "Magiker",
     "warlock": "Häxmästare",
     "druid": "Druid",
+    "swordmaster": "SwordMaster",
     "warriorAria": "Krigarklass",
     "paladinAria": "Paladinklass",
     "hunterAria": "Jägarklass",
@@ -3996,7 +4009,8 @@ export const sv_SE: EnTranslations = {
     "shamanAria": "Schamanklass",
     "mageAria": "Magikerklass",
     "warlockAria": "Häxmästarklass",
-    "druidAria": "Druidklass"
+    "druidAria": "Druidklass",
+    "swordmasterAria": "SwordMaster class"
   },
   "controls": {
     "title": "Kontrollguide",
@@ -4760,6 +4774,7 @@ export const sv_SE: EnTranslations = {
       "paladin": "Helare / Tank / Närstrids-DPS",
       "hunter": "Distans-DPS",
       "rogue": "Närstrids-DPS",
+      "swordmaster": "Mobile Melee DPS",
       "priest": "Helare / Distans-DPS",
       "shaman": "Helare / Närstrids- eller Distans-DPS",
       "mage": "Distans-DPS",
@@ -4776,6 +4791,7 @@ export const sv_SE: EnTranslations = {
       "swordsMaces": "Svärd, Spiror",
       "axesSwords": "Yxor, Svärd",
       "daggersSwords": "Dolkar, Svärd",
+      "twinOneHanders": "Two One-Handed Weapons",
       "staves": "Stavar",
       "macesAxes": "Spiror, Yxor"
     },
@@ -4788,7 +4804,8 @@ export const sv_SE: EnTranslations = {
       "shaman": "Schamaner befaller elementen, fyller vapen med kraft, chockar fiender med blixtar och återställer allierade.",
       "mage": "Magiker böjer Eld, Frost och arkankraft för att förgöra fiender, frammana vatten och frysa hot på plats.",
       "warlock": "Häxmästare frammanar demoner, lägger förbannelser och skada-över-tid-magi, och suger liv från fiender för att överleva.",
-      "druid": "Druider kanaliserar naturen, läker sår, snärjer fiender och skiftar till djurformer för försvar eller skada."
+      "druid": "Druider kanaliserar naturen, läker sår, snärjer fiender och skiftar till djurformer för försvar eller skada.",
+      "swordmaster": "SwordMasters build momentum with precise twin-blade strikes, then turn speed into sweeping attacks that cut through whole groups."
     },
     "aria": "Klassdetaljer för {className}: roll {role}. Startvärden: Styrka {str}, Smidighet {agi}, Uthållighet {sta}, Intellekt {int}, Ande {spi}.",
     "statBarAria": "{stat}: {value} av 25"
@@ -5777,6 +5794,54 @@ export const sv_SE: EnTranslations = {
       "sport_second_wind": {
         "name": "Fräscha ben",
         "description": "Hitta benen: rör dig 50 % snabbare i 4 sek."
+      },
+      "twin_slash": {
+        "name": "Twin Slash",
+        "description": "Strike the target with both swords in main-hand then off-hand order."
+      },
+      "crescent_sweep": {
+        "name": "Crescent Sweep",
+        "description": "Sweep both swords through up to 5 enemies in a 6 yard frontal arc."
+      },
+      "fleet_step": {
+        "name": "Fleet Step",
+        "description": "Increase movement speed for 5 sec. Higher ranks increase the bonus."
+      },
+      "sword_aura": {
+        "name": "Sword Aura",
+        "description": "Imbue both swords with azure power, gaining 12 Strength and 12 Agility for 5 min."
+      },
+      "wind_lunge": {
+        "name": "Wind Lunge",
+        "description": "Break roots and lunge 8 yards in your facing direction."
+      },
+      "parrying_flow": {
+        "name": "Parrying Flow",
+        "description": "Flow between incoming blows, gaining 20% dodge for 8 sec."
+      },
+      "quickening": {
+        "name": "Quickening",
+        "description": "Accelerate your attack speed by 25% for 12 sec."
+      },
+      "blade_dance": {
+        "name": "Blade Dance",
+        "description": "Dance through nearby enemies, striking up to 6 targets with both swords."
+      },
+      "twin_finisher": {
+        "name": "Twin Finisher",
+        "description": "Commit both swords to a heavy two-part finishing strike."
+      },
+      "blade_cyclone": {
+        "name": "Blade Cyclone",
+        "description": "Become a cyclone of steel, striking up to 8 enemies within 9 yards with both swords."
+      },
+      "duelist_flurry": {
+        "name": "Duelist Flurry",
+        "description": "Enter a measured flurry, increasing attack speed by 35% for 12 sec."
+      },
+      "azure_rush": {
+        "name": "Azure Rush",
+        "description": "Rush 12 yards in a flash of azure steel and slow nearby enemies by 50% for 3 sec."
       },
       "flamestrike": {
         "name": "Flamslag",

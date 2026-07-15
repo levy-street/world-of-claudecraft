@@ -48,8 +48,8 @@ function requiredTree(cls: PlayerClass) {
 }
 
 describe('canonical Talents V2 row registry', () => {
-  it('has exactly one six-row tree for each of the nine playable classes', () => {
-    expect(ALL_CLASSES).toHaveLength(9);
+  it('has exactly one six-row tree for each of the ten playable classes', () => {
+    expect(ALL_CLASSES).toHaveLength(10);
     expect(Object.keys(ROW_TREES).sort()).toEqual([...ALL_CLASSES].sort());
     expect(Object.keys(TALENTS).sort()).toEqual([...ALL_CLASSES].sort());
 
@@ -70,8 +70,8 @@ describe('canonical Talents V2 row registry', () => {
       rowCount += tree.length;
       optionCount += tree.reduce((sum, row) => sum + row.options.length, 0);
     }
-    expect(rowCount).toBe(54);
-    expect(optionCount).toBe(162);
+    expect(rowCount).toBe(60);
+    expect(optionCount).toBe(180);
   });
 
   it('registers only the authored winning Warrior options', () => {
@@ -98,7 +98,7 @@ describe('canonical Talents V2 row registry', () => {
 
   it('keeps the evolved non-Warrior spec identities and only the winning Warrior masteries', () => {
     for (const cls of ALL_CLASSES) expect(TALENTS[cls].specs, cls).toHaveLength(3);
-    expect(ALL_CLASSES.flatMap((cls) => TALENTS[cls].specs)).toHaveLength(27);
+    expect(ALL_CLASSES.flatMap((cls) => TALENTS[cls].specs)).toHaveLength(30);
 
     expect(TALENTS.mage.specs.find((spec) => spec.id === 'fire')?.mastery.effect).toEqual({
       global: { critDmgSpellPct: 0.5 },

@@ -9,6 +9,7 @@ import {
   SHAMAN_CHOICE_ROWS,
   WARLOCK_CHOICE_ROWS,
 } from './choice_rows_classic';
+import { SWORDMASTER_ROWS } from './swordmaster_rows';
 import type { TalentEffect } from './talents';
 import { WARRIOR_ROWS } from './warrior_rows';
 
@@ -41,6 +42,7 @@ export interface ClassChoiceRows {
 
 export const ROW_TREES = {
   warrior: WARRIOR_ROWS,
+  swordmaster: SWORDMASTER_ROWS,
   paladin: PALADIN_CHOICE_ROWS.rows,
   hunter: HUNTER_CHOICE_ROWS.rows,
   rogue: ROGUE_CHOICE_ROWS.rows,

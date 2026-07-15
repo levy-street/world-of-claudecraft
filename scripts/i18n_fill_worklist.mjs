@@ -73,7 +73,7 @@ const isPresent = (v) => typeof v === 'string' && v.trim().length > 0;
 // PROSE (human-required, NEVER auto-filled): all content proper nouns + narrative.
 const PROSE_MAIN_PREFIXES = [
   'entities.', // quest narratives + ability/item/mob/npc/zone/dungeon names & lore
-  'classes.', // the 9 class names (and their aria wrappers)
+  'classes.', // the 10 class names (and their aria wrappers)
   'classDetails.lore.', // class lore narrative
   'seo.', // marketing copy + the embedded brand name
 ];

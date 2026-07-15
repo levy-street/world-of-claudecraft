@@ -599,6 +599,58 @@ const classAbilityNamesEn = {
       ],
       ['sport_second_wind', 'Fresh Legs', 'Find your legs: move 50% faster for 4 sec.'],
       [
+        'twin_slash',
+        'Twin Slash',
+        'Strike the target with both swords in main-hand then off-hand order.',
+      ],
+      [
+        'crescent_sweep',
+        'Crescent Sweep',
+        'Sweep both swords through up to 5 enemies in a 6 yard frontal arc.',
+      ],
+      [
+        'fleet_step',
+        'Fleet Step',
+        'Increase movement speed for 5 sec. Higher ranks increase the bonus.',
+      ],
+      [
+        'sword_aura',
+        'Sword Aura',
+        'Imbue both swords with azure power, gaining 12 Strength and 12 Agility for 5 min.',
+      ],
+      ['wind_lunge', 'Wind Lunge', 'Break roots and lunge 8 yards in your facing direction.'],
+      [
+        'parrying_flow',
+        'Parrying Flow',
+        'Flow between incoming blows, gaining 20% dodge for 8 sec.',
+      ],
+      ['quickening', 'Quickening', 'Accelerate your attack speed by 25% for 12 sec.'],
+      [
+        'blade_dance',
+        'Blade Dance',
+        'Dance through nearby enemies, striking up to 6 targets with both swords.',
+      ],
+      [
+        'twin_finisher',
+        'Twin Finisher',
+        'Commit both swords to a heavy two-part finishing strike.',
+      ],
+      [
+        'blade_cyclone',
+        'Blade Cyclone',
+        'Become a cyclone of steel, striking up to 8 enemies within 9 yards with both swords.',
+      ],
+      [
+        'duelist_flurry',
+        'Duelist Flurry',
+        'Enter a measured flurry, increasing attack speed by 35% for 12 sec.',
+      ],
+      [
+        'azure_rush',
+        'Azure Rush',
+        'Rush 12 yards in a flash of azure steel and slow nearby enemies by 50% for 3 sec.',
+      ],
+      [
         'flamestrike',
         'Flamestrike',
         'Calls down a burst of flame at the target area, dealing {damage} Fire damage to enemies caught in the blast.',

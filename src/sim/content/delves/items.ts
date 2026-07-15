@@ -3,8 +3,9 @@ import type { ItemDef, PlayerClass } from '../../types';
 // Archetype groups, mirrors the pattern in content/items.ts so class-locked
 // delve rewards admit the whole archetype (warrior/paladin/shaman etc.).
 const WAR: PlayerClass[] = ['warrior', 'paladin', 'shaman'];
+const WAR_WEAPON: PlayerClass[] = ['warrior', 'paladin', 'shaman', 'swordmaster'];
 const MAG: PlayerClass[] = ['mage', 'priest', 'warlock', 'druid'];
-const ROG: PlayerClass[] = ['rogue', 'hunter'];
+const ROG: PlayerClass[] = ['rogue', 'hunter', 'swordmaster'];
 
 // ---------------------------------------------------------------------------
 // Delve items, Collapsed Reliquary loot & Marks vendor stock
@@ -151,7 +152,7 @@ export const DELVE_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 38, max: 58, speed: 3.5 },
     stats: { str: 3, sta: 2 },
     sellValue: 560,
-    requiredClass: WAR,
+    requiredClass: WAR_WEAPON,
   },
   reedstalker_jerkin: {
     id: 'reedstalker_jerkin',

@@ -1357,6 +1357,7 @@ export const ru_RU: EnTranslations = {
         "armor": "Повышает броню на {value}",
         "int": "Повышает интеллект на {value}",
         "agi": "Повышает ловкость на {value}",
+        "strAgi": "Increases Strength and Agility by {value}",
         "sta": "Повышает выносливость на {value}",
         "spi": "Повышает дух на {value}",
         "allStats": "Повышает все характеристики на {value}"
@@ -1366,6 +1367,7 @@ export const ru_RU: EnTranslations = {
         "armor": "Снижает броню на {value}",
         "int": "Снижает интеллект на {value}",
         "agi": "Снижает ловкость на {value}",
+        "strAgi": "Reduces Strength and Agility by {value}",
         "sta": "Снижает выносливость на {value}",
         "spi": "Снижает дух на {value}",
         "allStats": "Снижает все характеристики на {value}"
@@ -2555,7 +2557,8 @@ export const ru_RU: EnTranslations = {
       "shaman": "Призыватель духов, что повелевает бурей, огнём и водой и врачует союзников между молниями.",
       "mage": "Ткач заклинаний огня, льда и тайной магии, что управляет полем боя издалека.",
       "warlock": "Тёмный чародей, что повелевает демонами и проклятиями, обменивая жизнь на сокрушительную мощь.",
-      "druid": "Оборотень, что танкует в облике медведя, рвёт врагов в облике кошки или лечит в самой гуще боя."
+      "druid": "Оборотень, что танкует в облике медведя, рвёт врагов в облике кошки или лечит в самой гуще боя.",
+      "swordmaster": "A swift dual-blade fighter who builds momentum through precision, speed, and sweeping attacks."
     },
     "tag": {
       "melee": "Ближний бой",
@@ -2588,6 +2591,15 @@ export const ru_RU: EnTranslations = {
       "battle_shout": "Боевой клич, повышающий силу атаки всей группы.",
       "charge": "Рывок к далекому врагу, открывающий бой коротким оглушением.",
       "thunder_clap": "Бьет по всем вокруг вас и замедляет их атаки.",
+      "twin_slash": "Cuts with both blades in one quick sequence to build momentum.",
+      "crescent_sweep": "Carves a wide arc through nearby enemies.",
+      "fleet_step": "Sharpens your footwork for a burst of movement speed.",
+      "sword_aura": "Focuses briefly to wreathe both blades in blue energy, empowering strength and agility.",
+      "wind_lunge": "Breaks roots and lunges forward in your facing direction.",
+      "parrying_flow": "Flows between incoming blows to evade more attacks for a short time.",
+      "blade_cyclone": "Whirls both blades through nearby enemies, turning gathered momentum into a sweeping burst.",
+      "duelist_flurry": "Sets a measured cadence that greatly accelerates your attacks.",
+      "azure_rush": "Surges forward in a blue flash and slows nearby enemies.",
       "seal_of_righteousness": "Наполняет ваши удары священным уроном, который затем тратится Приговором.",
       "holy_light": "Ровное, ощутимое лечение, чтобы долечить союзника или себя.",
       "devotion_aura": "Длительное усиление на себя, которое повышает броню, так что удары проходят мягче.",
@@ -3988,6 +4000,7 @@ export const ru_RU: EnTranslations = {
     "mage": "Маг",
     "warlock": "Чернокнижник",
     "druid": "Друид",
+    "swordmaster": "SwordMaster",
     "warriorAria": "Класс Воин",
     "paladinAria": "Класс Паладин",
     "hunterAria": "Класс Охотник",
@@ -3996,7 +4009,8 @@ export const ru_RU: EnTranslations = {
     "shamanAria": "Класс Шаман",
     "mageAria": "Класс Маг",
     "warlockAria": "Класс Чернокнижник",
-    "druidAria": "Класс Друид"
+    "druidAria": "Класс Друид",
+    "swordmasterAria": "SwordMaster class"
   },
   "controls": {
     "title": "Руководство по управлению",
@@ -4760,6 +4774,7 @@ export const ru_RU: EnTranslations = {
       "paladin": "Лекарь / танк / ближний DPS",
       "hunter": "Дальний DPS",
       "rogue": "Ближний DPS",
+      "swordmaster": "Mobile Melee DPS",
       "priest": "Лекарь / дальний DPS",
       "shaman": "Лекарь / ближний или дальний DPS",
       "mage": "Дальний DPS",
@@ -4776,6 +4791,7 @@ export const ru_RU: EnTranslations = {
       "swordsMaces": "Мечи, дробящее",
       "axesSwords": "Топоры, мечи",
       "daggersSwords": "Кинжалы, мечи",
+      "twinOneHanders": "Two One-Handed Weapons",
       "staves": "Посохи",
       "macesAxes": "Дробящее, топоры"
     },
@@ -4788,7 +4804,8 @@ export const ru_RU: EnTranslations = {
       "shaman": "Шаманы повелевают стихиями, усиливают оружие, поражают врагов молниями и восстанавливают союзников.",
       "mage": "Маги управляют огнём, льдом и тайной силой, уничтожают врагов, призывают воду и замораживают угрозы.",
       "warlock": "Чернокнижники призывают демонов, накладывают проклятия и длительный урон, затем вытягивают жизнь врагов, чтобы выжить.",
-      "druid": "Друиды направляют силу природы, лечат раны, оплетают врагов и принимают звериные формы для защиты или урона."
+      "druid": "Друиды направляют силу природы, лечат раны, оплетают врагов и принимают звериные формы для защиты или урона.",
+      "swordmaster": "SwordMasters build momentum with precise twin-blade strikes, then turn speed into sweeping attacks that cut through whole groups."
     },
     "aria": "Описание класса {className}: роль {role}. Начальные характеристики: Сила {str}, Ловкость {agi}, Выносливость {sta}, Интеллект {int}, Дух {spi}.",
     "statBarAria": "{stat}: {value} из 25"
@@ -5777,6 +5794,54 @@ export const ru_RU: EnTranslations = {
       "sport_second_wind": {
         "name": "Второе дыхание",
         "description": "Обретите ноги: скорость передвижения повышена на 50% на 4 сек."
+      },
+      "twin_slash": {
+        "name": "Twin Slash",
+        "description": "Strike the target with both swords in main-hand then off-hand order."
+      },
+      "crescent_sweep": {
+        "name": "Crescent Sweep",
+        "description": "Sweep both swords through up to 5 enemies in a 6 yard frontal arc."
+      },
+      "fleet_step": {
+        "name": "Fleet Step",
+        "description": "Increase movement speed for 5 sec. Higher ranks increase the bonus."
+      },
+      "sword_aura": {
+        "name": "Sword Aura",
+        "description": "Imbue both swords with azure power, gaining 12 Strength and 12 Agility for 5 min."
+      },
+      "wind_lunge": {
+        "name": "Wind Lunge",
+        "description": "Break roots and lunge 8 yards in your facing direction."
+      },
+      "parrying_flow": {
+        "name": "Parrying Flow",
+        "description": "Flow between incoming blows, gaining 20% dodge for 8 sec."
+      },
+      "quickening": {
+        "name": "Quickening",
+        "description": "Accelerate your attack speed by 25% for 12 sec."
+      },
+      "blade_dance": {
+        "name": "Blade Dance",
+        "description": "Dance through nearby enemies, striking up to 6 targets with both swords."
+      },
+      "twin_finisher": {
+        "name": "Twin Finisher",
+        "description": "Commit both swords to a heavy two-part finishing strike."
+      },
+      "blade_cyclone": {
+        "name": "Blade Cyclone",
+        "description": "Become a cyclone of steel, striking up to 8 enemies within 9 yards with both swords."
+      },
+      "duelist_flurry": {
+        "name": "Duelist Flurry",
+        "description": "Enter a measured flurry, increasing attack speed by 35% for 12 sec."
+      },
+      "azure_rush": {
+        "name": "Azure Rush",
+        "description": "Rush 12 yards in a flash of azure steel and slow nearby enemies by 50% for 3 sec."
       },
       "flamestrike": {
         "name": "Огненный удар",

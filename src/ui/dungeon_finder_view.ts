@@ -142,7 +142,7 @@ export interface FinderProposalPanelView {
 
 export interface FinderQueuePanelView {
   roles: FinderRoleOptionView[];
-  needsSpec: boolean; // level 10+ with no active spec: the finder is closed
+  needsSpec: boolean; // first talent level or higher with no active spec: finder is closed
   inParty: boolean;
   isLeader: boolean; // solo counts as leader of self
   queuedActivities: string[]; // live selection while queued ([] otherwise)

@@ -32,7 +32,7 @@ const SKIN_MODEL_CLASSES = {
   knight: ['warrior'],
   paladin: ['paladin'],
   ranger: ['hunter'],
-  rogue: ['rogue'],
+  rogue: ['rogue', 'swordmaster'],
   mage: ['priest', 'mage', 'warlock'],
   barbarian: ['shaman'],
   druid: ['druid'],

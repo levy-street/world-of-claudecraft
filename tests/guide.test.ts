@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { assertFamiliesKnown } from '../scripts/wiki/family_guard.mjs';
 import { BIND_ACTIONS } from '../src/game/keybinds';
+import { CLASS_META } from '../src/guide/class_meta';
 import {
   GUIDE_CLASSES,
   GUIDE_DEEDS,
@@ -16,6 +17,7 @@ import {
   GUIDE_WARLOCK_PETS,
   GUIDE_ZONES,
 } from '../src/guide/content.generated';
+import { CLASS_CHIPS } from '../src/guide/data';
 import { pageFor } from '../src/guide/pages';
 import { controls as controlsPage } from '../src/guide/pages/controls';
 import { catalogSections, deeds as deedsPage } from '../src/guide/pages/deeds';
@@ -183,8 +185,8 @@ describe('guide.html shell', () => {
 });
 
 describe('Guide generated class content', () => {
-  it('covers all nine classes with grounded data', () => {
-    expect(GUIDE_CLASSES).toHaveLength(9);
+  it('covers all ten classes with grounded data', () => {
+    expect(GUIDE_CLASSES).toHaveLength(10);
     for (const c of GUIDE_CLASSES) {
       expect(c.color).toMatch(/^#[0-9a-f]{6}$/);
       expect(['rage', 'mana', 'energy']).toContain(c.resource);
@@ -205,6 +207,56 @@ describe('Guide generated class content', () => {
         expect(t(`guide.abilityHook.${a.id}` as never).length).toBeGreaterThan(0);
       }
     }
+  });
+
+  it('publishes the complete SwordMaster class sheet and curated guide metadata', () => {
+    const swordmaster = GUIDE_CLASSES.find((candidate) => candidate.id === 'swordmaster');
+    expect(swordmaster).toMatchObject({
+      color: '#22d3ee',
+      resource: 'energy',
+      roles: ['dps'],
+      specs: [
+        {
+          id: 'tempest',
+          name: 'Tempest',
+          role: 'dps',
+          signature: 'blade_cyclone',
+        },
+        {
+          id: 'duelist',
+          name: 'Duelist',
+          role: 'dps',
+          signature: 'duelist_flurry',
+        },
+        {
+          id: 'azure_blade',
+          name: 'Azure Blade',
+          role: 'dps',
+          signature: 'azure_rush',
+        },
+      ],
+      signatureAbilities: [
+        { id: 'twin_slash', name: 'Twin Slash' },
+        { id: 'crescent_sweep', name: 'Crescent Sweep' },
+        { id: 'fleet_step', name: 'Fleet Step' },
+        { id: 'sword_aura', name: 'Sword Aura' },
+        { id: 'wind_lunge', name: 'Wind Lunge' },
+        { id: 'parrying_flow', name: 'Parrying Flow' },
+      ],
+    });
+    expect(CLASS_META.swordmaster).toEqual({
+      style: 'melee',
+      play: 'flexible',
+      complexity: 'high',
+      goodFirst: false,
+    });
+    expect(CLASS_CHIPS.find((candidate) => candidate.id === 'swordmaster')).toEqual({
+      id: 'swordmaster',
+      nameKey: 'classes.swordmaster',
+      color: '#22d3ee',
+    });
+    expect(guideStrings.home.what.pillarClassesTitle).toBe('Ten classes, three roles');
+    expect(guideStrings.classList.heading).toBe('The ten classes');
   });
 
   it('resolves the new class-page and chooser keys (cast keys are not tsc-checked)', () => {

@@ -11,7 +11,7 @@ import {
 type WeaponArchetype = 'warrior' | 'caster' | 'rogue';
 
 const MAIL_CLASSES = new Set<PlayerClass>(['warrior', 'paladin', 'shaman']);
-const LEATHER_CLASSES = new Set<PlayerClass>(['druid', 'rogue', 'hunter']);
+const LEATHER_CLASSES = new Set<PlayerClass>(['druid', 'rogue', 'hunter', 'swordmaster']);
 const WARRIOR_WEAPON_CLASSES = new Set<PlayerClass>([
   'warrior',
   'rogue',
@@ -27,7 +27,7 @@ const CASTER_WEAPON_CLASSES = new Set<PlayerClass>([
   'paladin',
   'druid',
 ]);
-const ROGUE_WEAPON_CLASSES = new Set<PlayerClass>(['rogue', 'hunter']);
+const ROGUE_WEAPON_CLASSES = new Set<PlayerClass>(['rogue', 'hunter', 'swordmaster']);
 
 const ARMOR_RANK: Record<ArmorType, number> = {
   cloth: 0,
@@ -110,7 +110,7 @@ export function classesThatCanEquipArmorType(armorType: ArmorType): PlayerClass[
 }
 
 export function canDualWield(cls: PlayerClass, spec?: string | null): boolean {
-  return cls === 'rogue' || (cls === 'warrior' && spec === 'fury');
+  return cls === 'rogue' || cls === 'swordmaster' || (cls === 'warrior' && spec === 'fury');
 }
 
 export function canDualWieldTwoHand(cls: PlayerClass, spec?: string | null): boolean {
@@ -123,6 +123,7 @@ export function weaponHand(item: WeaponItemDef): WeaponItemDef['hand'] {
 
 export function canEquipItem(cls: PlayerClass, item: ItemDef): boolean {
   if (isShieldItem(item)) {
+    if (cls === 'swordmaster') return false;
     return !item.requiredClass || item.requiredClass.includes(cls);
   }
   const armorType = armorTypeForItem(item);
@@ -130,7 +131,11 @@ export function canEquipItem(cls: PlayerClass, item: ItemDef): boolean {
   // Rogues may dual wield one-handed weapons, but can never equip a two-hander.
   // Keep this at the equipment boundary so future items cannot bypass it through
   // a missing or overly broad requiredClass list.
-  if (cls === 'rogue' && item.kind === 'weapon' && weaponHand(item) === 'twohand') {
+  if (
+    item.kind === 'weapon' &&
+    ((cls === 'rogue' && weaponHand(item) === 'twohand') ||
+      (cls === 'swordmaster' && weaponHand(item) !== 'onehand'))
+  ) {
     return false;
   }
   const weaponArchetype = weaponArchetypeForItem(item);

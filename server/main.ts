@@ -11,8 +11,7 @@ import {
   paginateLeaderboard,
 } from '../src/sim/leaderboard_page';
 import { Sim } from '../src/sim/sim';
-import type { PlayerClass } from '../src/sim/types';
-import { virtualLevel } from '../src/sim/types';
+import { type PlayerClass, virtualLevel } from '../src/sim/types';
 import type {
   DeedsLeaderboardEntry,
   DeedsLeaderboardSelf,
@@ -223,6 +222,7 @@ import {
   handleCardRoutes,
   handleCardUpload,
 } from './player_card';
+import { isPlayerClass } from './player_class';
 import { handleAvatar, handleCharacterSitemap, handleProfilePage } from './profile_page';
 import { recordUsageCacheEvent, recordUsageMetric, setUsageCacheSize } from './provider_usage';
 import {
@@ -1262,18 +1262,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
             error: 'character name is not allowed',
             code: 'character.name_not_allowed',
           });
-        const validClasses = [
-          'warrior',
-          'paladin',
-          'hunter',
-          'rogue',
-          'priest',
-          'shaman',
-          'mage',
-          'warlock',
-          'druid',
-        ];
-        if (!validClasses.includes(body.class))
+        if (!isPlayerClass(body.class))
           return json(res, 400, { error: 'invalid class', code: 'character.invalid_class' });
         const skin = Math.max(
           0,
