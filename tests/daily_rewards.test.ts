@@ -2,6 +2,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type {
   DailyRewardDb,
   DailyRewardInternalPayoutRow,
+  DailyRewardPayoutActor,
+  DailyRewardPayoutAttemptClaimResult,
+  DailyRewardPayoutClaimResult,
+  DailyRewardPayoutModerationResult,
   DailyRewardPayoutRow,
   DailyRewardScoreRow,
   DailyRewardSpinRow,
@@ -173,6 +177,30 @@ class FakeDailyRewardDb implements DailyRewardDb {
   }
   async markPayout(): Promise<boolean> {
     return true;
+  }
+  async claimPayout(): Promise<DailyRewardPayoutClaimResult> {
+    return { outcome: 'not_found' };
+  }
+  async claimPayoutResend(): Promise<DailyRewardPayoutAttemptClaimResult> {
+    return { outcome: 'not_found' };
+  }
+  async markPayoutResend(): Promise<boolean> {
+    return true;
+  }
+  async voidPayout(
+    _day: string,
+    _rank: number,
+    _reason: string,
+    _actor: DailyRewardPayoutActor,
+  ): Promise<DailyRewardPayoutModerationResult> {
+    return { outcome: 'not_found' };
+  }
+  async restorePayout(
+    _day: string,
+    _rank: number,
+    _actor: DailyRewardPayoutActor,
+  ): Promise<DailyRewardPayoutModerationResult> {
+    return { outcome: 'not_found' };
   }
 }
 

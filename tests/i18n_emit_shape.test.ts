@@ -154,6 +154,12 @@ describe('i18n emit determinism + orphan-sweep (I18N_OUT_DIR override)', () => {
     'loaders.ts',
     'pending.ts',
   ].sort();
+  // The game build ALSO emits the flat TranslationKey union into the override dir
+  // when I18N_OUT_DIR is set (its committed home, src/ui/i18n.catalog/, sits
+  // outside the resolved directory, so the override redirect is what keeps this
+  // test's scratch runs from touching the committed file). The admin build has no
+  // key union.
+  const EXPECTED_GAME_FILES = [...EXPECTED_FILES, 'translation_keys.generated.ts'].sort();
 
   function runBuild(scriptRel: string, outDir: string) {
     execFileSync(process.execPath, [path.join(root, scriptRel)], {
@@ -171,13 +177,13 @@ describe('i18n emit determinism + orphan-sweep (I18N_OUT_DIR override)', () => {
     return out;
   }
 
-  function checkEmit(scriptRel: string, prefix: string) {
+  function checkEmit(scriptRel: string, prefix: string, expectedFiles: string[]) {
     const scratch = mkdtempSync(path.join(os.tmpdir(), prefix));
     try {
       runBuild(scriptRel, scratch);
       const first = snapshotTs(scratch);
       expect(Object.keys(first).sort(), 'emits exactly the expected module set').toEqual(
-        EXPECTED_FILES,
+        expectedFiles,
       );
       expect(
         readdirSync(scratch).some((f) => f.endsWith('.tmp')),
@@ -202,10 +208,10 @@ describe('i18n emit determinism + orphan-sweep (I18N_OUT_DIR override)', () => {
   }
 
   it('game build is deterministic and prunes orphans', () => {
-    checkEmit('scripts/i18n_build.mjs', 'i18n-emit-ui-');
+    checkEmit('scripts/i18n_build.mjs', 'i18n-emit-ui-', EXPECTED_GAME_FILES);
   }, 60_000);
 
   it('admin build is deterministic and prunes orphans', () => {
-    checkEmit('scripts/i18n_admin_build.mjs', 'i18n-emit-admin-');
+    checkEmit('scripts/i18n_admin_build.mjs', 'i18n-emit-admin-', EXPECTED_FILES);
   }, 60_000);
 });

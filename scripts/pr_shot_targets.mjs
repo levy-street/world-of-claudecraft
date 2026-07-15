@@ -197,6 +197,28 @@ export const TARGETS = [
       return { clip: '#chatlog-wrap' };
     },
   },
+  {
+    key: 'gather-node',
+    label: 'Gather node (click/tap-to-harvest, #1866)',
+    when: ['gather_node', 'gather_nodes'],
+    // Walks the player up to the first gather node the renderer actually built
+    // (`renderer.gatherNodeMeshes`, the same list `pickGatherNode` raycasts),
+    // so the frame shows the node the way a player would approach and click it.
+    async capture(page) {
+      await page.evaluate(() => {
+        const game = window.__game;
+        const mesh = game?.renderer?.gatherNodeMeshes?.[0];
+        const p = game?.world?.player;
+        if (!mesh || !p) return;
+        p.pos.x = mesh.position.x + 2.5;
+        p.pos.y = mesh.position.y;
+        p.pos.z = mesh.position.z + 2.5;
+        p.facing = Math.atan2(mesh.position.x - p.pos.x, mesh.position.z - p.pos.z);
+      });
+      await wait(1200);
+      return {};
+    },
+  },
 ];
 
 // Map a list of changed file paths to the targets they imply (deduped, registry order).

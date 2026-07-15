@@ -7,6 +7,7 @@ const abilityStringsEn = {
     actionBar: {
       attackName: 'Attack',
       attackTooltip: 'Toggle auto-attack on your target. Right-clicking an enemy also attacks.',
+      attackRemoveHint: 'Right-click to remove it from the bar and free the slot.',
       emptySlot: 'Empty slot',
       slotAria: 'Action slot {slot}: {ability}',
       emptySlotAria: 'Action slot {slot}: empty',

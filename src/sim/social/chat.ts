@@ -1006,6 +1006,27 @@ export function handleDevChat(
     else ctx.emit({ type: 'log', text: okText, pid });
     return null;
   }
+  const lfgM = /^\/(?:dev\s+lfg|devlfg)(?:\s+(\S+))?\s*$/i.exec(raw);
+  if (lfgM) {
+    const mode = (lfgM[1] ?? 'queue').toLowerCase();
+    // Dev-only English diagnostics, routed through vars so they read as
+    // dev-channel text (matching the /dev bot arm above).
+    if (mode !== 'queue' && mode !== 'raid' && mode !== 'board') {
+      const usageText = '[dev] Usage: /dev lfg [queue|raid|board].';
+      ctx.error(pid, usageText);
+      return null;
+    }
+    const res = ctx.seedDungeonFinderDev(mode, pid);
+    const okText = `[dev] Spawned ${res.spawned} finder bots (${mode}). Open the Dungeon Finder to play the flow.`;
+    const rolesText =
+      '[dev] Pick your Dungeon Finder role first (Quick Match tab), then rerun /dev lfg.';
+    const noneText = '[dev] No finder activity matches your current level band.';
+    const text =
+      res.note === 'needRoles' ? rolesText : res.note === 'noneEligible' ? noneText : okText;
+    if (res.note === 'ok') ctx.emit({ type: 'log', text, pid });
+    else ctx.error(pid, text);
+    return null;
+  }
   if (/^\/(?:dev\s+attune|devattune)\s*$/i.test(raw)) {
     // [dev] Mark every quest complete so all attunement / requiresQuest gates open.
     completeAllQuestsForDev(ctx, pid);

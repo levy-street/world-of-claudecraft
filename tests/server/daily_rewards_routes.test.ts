@@ -43,6 +43,11 @@ const h = vi.hoisted(() => {
     recentPayouts: [] as unknown[],
     pendingPayouts: [] as unknown[],
     markPayoutOk: true,
+    claimPayoutResult: { outcome: 'not_found' } as unknown,
+    claimPayoutResendResult: { outcome: 'not_found' } as unknown,
+    markPayoutResendOk: true,
+    voidPayoutResult: { outcome: 'not_found' } as unknown,
+    restorePayoutResult: { outcome: 'not_found' } as unknown,
     ensureDayThrows: false,
     wallet: null as { account_id: number; pubkey: string; linked_at: string } | null,
     balance: null as number | null,
@@ -78,6 +83,11 @@ const h = vi.hoisted(() => {
     unannouncedWinnerDays: vi.fn(async () => [] as unknown[]),
     markWinnersAnnounced: vi.fn(async () => true),
     markPayout: vi.fn(async () => state.markPayoutOk),
+    claimPayout: vi.fn(async () => state.claimPayoutResult),
+    claimPayoutResend: vi.fn(async () => state.claimPayoutResendResult),
+    markPayoutResend: vi.fn(async () => state.markPayoutResendOk),
+    voidPayout: vi.fn(async () => state.voidPayoutResult),
+    restorePayout: vi.fn(async () => state.restorePayoutResult),
   };
   const wallet = { walletForAccount: vi.fn(async (_accountId: number) => state.wallet) };
   const balance = { cachedWocBalance: vi.fn(async (_pubkey: string) => state.balance) };
@@ -112,6 +122,11 @@ vi.mock('../../server/daily_rewards_db', async (importOriginal) => {
     unannouncedWinnerDays = h.db.unannouncedWinnerDays;
     markWinnersAnnounced = h.db.markWinnersAnnounced;
     markPayout = h.db.markPayout;
+    claimPayout = h.db.claimPayout;
+    claimPayoutResend = h.db.claimPayoutResend;
+    markPayoutResend = h.db.markPayoutResend;
+    voidPayout = h.db.voidPayout;
+    restorePayout = h.db.restorePayout;
   }
   return { ...actual, PgDailyRewardDb: FakePgDailyRewardDb };
 });
@@ -153,8 +168,7 @@ const OPS_SECRET_ENV = 'WOC_DAILY_REWARD_SERVICE_SECRET';
 const OPS_SECRET = 'ops-secret';
 const OPS_HEADERS = { [OPS_HEADER]: OPS_SECRET };
 
-// The eight routes, in declared order, as `${method} ${path}` (v0.20.0 added
-// the paginated leaderboard read to each family).
+// The ten routes, in declared order: four player reads/mutations and six payout ops.
 const PLAYER_PATHS: ReadonlyArray<readonly [Method, string]> = [
   ['GET', '/api/daily-rewards'],
   ['GET', '/api/daily-rewards/leaderboard'],
@@ -166,6 +180,8 @@ const OPS_PATHS: ReadonlyArray<readonly [Method, string]> = [
   ['POST', '/internal/daily-rewards/payout-history'],
   ['POST', '/internal/daily-rewards/leaderboard'],
   ['POST', '/internal/daily-rewards/mark-payout'],
+  ['POST', '/internal/daily-rewards/void-payout'],
+  ['POST', '/internal/daily-rewards/restore-payout'],
 ];
 
 /** A full DailyRewardPayoutRow, so history/payout-history map to a known shape. */
@@ -182,6 +198,12 @@ function payoutRow(rank: number) {
     status: 'pending',
     txSignature: null,
     paidAt: null,
+    voidReason: null,
+    voidedById: null,
+    voidedByUsername: null,
+    voidedAt: null,
+    realm: 'test-realm',
+    signedTransaction: null,
   };
 }
 
@@ -316,6 +338,11 @@ beforeEach(() => {
   h.state.recentPayouts = [];
   h.state.pendingPayouts = [];
   h.state.markPayoutOk = true;
+  h.state.claimPayoutResult = { outcome: 'not_found' };
+  h.state.claimPayoutResendResult = { outcome: 'not_found' };
+  h.state.markPayoutResendOk = true;
+  h.state.voidPayoutResult = { outcome: 'not_found' };
+  h.state.restorePayoutResult = { outcome: 'not_found' };
   h.state.ensureDayThrows = false;
   h.state.wallet = null;
   h.state.balance = null;
@@ -341,7 +368,7 @@ afterEach(() => {
 // ---------------------------------------------------------------------------
 
 describe('daily-rewards route table', () => {
-  it('registers exactly the eight routes in the declared order', () => {
+  it('registers the player and payout-operations routes in the declared order', () => {
     expect(routes.map((r) => `${r.method} ${r.path}`)).toEqual([
       'GET /api/daily-rewards',
       'GET /api/daily-rewards/leaderboard',
@@ -351,6 +378,8 @@ describe('daily-rewards route table', () => {
       'POST /internal/daily-rewards/payout-history',
       'POST /internal/daily-rewards/leaderboard',
       'POST /internal/daily-rewards/mark-payout',
+      'POST /internal/daily-rewards/void-payout',
+      'POST /internal/daily-rewards/restore-payout',
     ]);
   });
 
@@ -380,7 +409,7 @@ describe('daily-rewards route table', () => {
   it('shares one activeGuard across the player family and one gate across the ops family, distinct from each other', () => {
     const playerGuards = new Set(PLAYER_PATHS.map(([m, p]) => routeFor(m, p).middleware?.[0]));
     const opsGates = new Set(OPS_PATHS.map(([m, p]) => routeFor(m, p).middleware?.[0]));
-    // All three player routes carry the SAME guard instance; all three ops routes the SAME
+    // All four player routes carry the SAME guard instance; all six ops routes the SAME
     // gate instance; the guard is not the gate.
     expect(playerGuards.size).toBe(1);
     expect(opsGates.size).toBe(1);
@@ -606,7 +635,37 @@ describe('ops routes: fail-closed secret gate', () => {
       error: null,
     });
     expect(r.reached).toBe(true);
-    expect(h.db.pendingPayouts).toHaveBeenCalledWith(20);
+    expect(h.db.pendingPayouts).toHaveBeenCalledWith(20, undefined);
+  });
+
+  it('filters pending payouts to a validated reward day', async () => {
+    process.env[OPS_SECRET_ENV] = OPS_SECRET;
+    const r = await runRoute('POST', '/internal/daily-rewards/pending-payouts', {
+      url: '/internal/daily-rewards/pending-payouts?day=2026-07-01&limit=100',
+      headers: OPS_HEADERS,
+    });
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({ success: true, data: { payouts: [] }, error: null });
+    expect(h.db.pendingPayouts).toHaveBeenCalledWith(100, '2026-07-01');
+  });
+
+  it.each([
+    '2026-7-01',
+    '2026/07/01',
+    'not-a-day',
+  ])('rejects an invalid pending-payout day filter: %s', async (day) => {
+    process.env[OPS_SECRET_ENV] = OPS_SECRET;
+    const r = await runRoute('POST', '/internal/daily-rewards/pending-payouts', {
+      url: `/internal/daily-rewards/pending-payouts?day=${encodeURIComponent(day)}`,
+      headers: OPS_HEADERS,
+    });
+    expect(r.status).toBe(400);
+    expect(r.body).toEqual({
+      success: false,
+      data: null,
+      error: 'invalid reward day',
+    });
+    expect(h.db.pendingPayouts).not.toHaveBeenCalled();
   });
 
   it('runs payout-history to a 200 admin envelope on the correct secret', async () => {
@@ -676,11 +735,11 @@ describe('ops mark-payout validation', () => {
     h.state.markPayoutOk = false;
     const r = await runRoute('POST', '/internal/daily-rewards/mark-payout', {
       headers: OPS_HEADERS,
-      body: { day: '2026-07-01', rank: 1, status: 'paid' },
+      body: { day: '2026-07-01', rank: 1, status: 'paid', txSignature: 'signature' },
     });
     expect(r.status).toBe(404);
     expect(r.body).toEqual({ success: false, data: null, error: 'payout not found' });
-    expect(h.db.markPayout).toHaveBeenCalledWith('2026-07-01', 1, 'paid', null, null);
+    expect(h.db.markPayout).toHaveBeenCalledWith('2026-07-01', 1, 'paid', 'signature', null);
   });
 
   it('200s { ok: true } when markPayout succeeds', async () => {
@@ -692,6 +751,234 @@ describe('ops mark-payout validation', () => {
     expect(r.status).toBe(200);
     expect(r.body).toEqual({ success: true, data: { ok: true }, error: null });
     expect(h.db.markPayout).toHaveBeenCalledWith('2026-07-01', 1, 'paid', 'sig', null);
+  });
+
+  it('claims and returns the authoritative signed transaction before broadcast', async () => {
+    h.state.claimPayoutResult = {
+      outcome: 'claimed',
+      payout: {
+        ...payoutRow(1),
+        status: 'processing',
+        txSignature: 'authoritative-signature',
+        signedTransaction: 'authoritative-transaction',
+      },
+    };
+    const r = await runRoute('POST', '/internal/daily-rewards/mark-payout', {
+      headers: OPS_HEADERS,
+      body: {
+        day: '2026-07-01',
+        rank: 1,
+        status: 'processing',
+        txSignature: 'proposed-signature',
+        signedTransaction: 'proposed-transaction',
+      },
+    });
+
+    expect(r.status).toBe(200);
+    expect(r.body).toMatchObject({
+      success: true,
+      data: {
+        ok: true,
+        payout: {
+          txSignature: 'authoritative-signature',
+          signedTransaction: 'authoritative-transaction',
+        },
+      },
+    });
+    expect(h.db.claimPayout).toHaveBeenCalledWith(
+      '2026-07-01',
+      1,
+      'proposed-signature',
+      'proposed-transaction',
+    );
+  });
+
+  it('claims a durable resend attempt before broadcast', async () => {
+    h.state.claimPayoutResendResult = {
+      outcome: 'claimed',
+      attempt: {
+        status: 'prepared',
+        operationId: 'operation-one',
+        txSignature: 'resend-signature',
+        signedTransaction: 'resend-transaction',
+      },
+    };
+    const r = await runRoute('POST', '/internal/daily-rewards/mark-payout', {
+      headers: OPS_HEADERS,
+      body: {
+        day: '2026-07-01',
+        rank: 1,
+        status: 'resend_processing',
+        operationId: 'operation-one',
+        txSignature: 'resend-signature',
+        signedTransaction: 'resend-transaction',
+      },
+    });
+
+    expect(r.status).toBe(200);
+    expect(h.db.claimPayoutResend).toHaveBeenCalledWith(
+      '2026-07-01',
+      1,
+      'operation-one',
+      'resend-signature',
+      'resend-transaction',
+    );
+    expect(h.db.markPayout).not.toHaveBeenCalled();
+    expect(r.body).toMatchObject({
+      success: true,
+      data: {
+        attempt: {
+          status: 'prepared',
+          operationId: 'operation-one',
+          txSignature: 'resend-signature',
+          signedTransaction: 'resend-transaction',
+        },
+      },
+    });
+  });
+
+  it('requires an explicit operation id for resend idempotency', async () => {
+    const r = await runRoute('POST', '/internal/daily-rewards/mark-payout', {
+      headers: OPS_HEADERS,
+      body: {
+        day: '2026-07-01',
+        rank: 1,
+        status: 'resend_processing',
+        txSignature: 'resend-signature',
+        signedTransaction: 'resend-transaction',
+      },
+    });
+
+    expect(r.status).toBe(400);
+    expect(r.body).toMatchObject({
+      success: false,
+      error: 'valid resend operation id is required',
+    });
+    expect(h.db.claimPayoutResend).not.toHaveBeenCalled();
+  });
+
+  it('marks the prepared resend attempt paid without changing the original payout', async () => {
+    const r = await runRoute('POST', '/internal/daily-rewards/mark-payout', {
+      headers: OPS_HEADERS,
+      body: {
+        day: '2026-07-01',
+        rank: 1,
+        status: 'resent',
+        operationId: 'operation-one',
+        txSignature: 'resend-signature',
+      },
+    });
+
+    expect(r.status).toBe(200);
+    expect(h.db.markPayoutResend).toHaveBeenCalledWith(
+      '2026-07-01',
+      1,
+      'operation-one',
+      'paid',
+      'resend-signature',
+      null,
+    );
+    expect(h.db.markPayout).not.toHaveBeenCalled();
+  });
+});
+
+describe('ops payout moderation', () => {
+  beforeEach(() => {
+    process.env[OPS_SECRET_ENV] = OPS_SECRET;
+  });
+
+  it.each(['', 'ab', 'x'.repeat(501)])('rejects an invalid void reason', async (reason) => {
+    const r = await runRoute('POST', '/internal/daily-rewards/void-payout', {
+      headers: OPS_HEADERS,
+      body: {
+        day: '2026-07-01',
+        rank: 1,
+        reason,
+        actorId: 'operator-7',
+        actorUsername: 'moderator',
+      },
+    });
+    expect(r.status).toBe(400);
+    expect(r.body).toEqual({ success: false, data: null, error: 'invalid void reason' });
+    expect(h.db.voidPayout).not.toHaveBeenCalled();
+  });
+
+  it('rejects missing actor identity', async () => {
+    const r = await runRoute('POST', '/internal/daily-rewards/restore-payout', {
+      headers: OPS_HEADERS,
+      body: { day: '2026-07-01', rank: 1 },
+    });
+    expect(r.status).toBe(400);
+    expect(r.body).toEqual({ success: false, data: null, error: 'invalid payout actor' });
+    expect(h.db.restorePayout).not.toHaveBeenCalled();
+  });
+
+  it('voids a payout with the authenticated operator metadata', async () => {
+    const payout = { ...payoutRow(1), status: 'voided', voidReason: 'Duplicate account' };
+    h.state.voidPayoutResult = {
+      outcome: 'updated',
+      payout,
+    };
+    const r = await runRoute('POST', '/internal/daily-rewards/void-payout', {
+      headers: OPS_HEADERS,
+      body: {
+        day: '2026-07-01',
+        rank: 1,
+        reason: '  Duplicate account  ',
+        actorId: 'operator-7',
+        actorUsername: 'moderator',
+      },
+    });
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({
+      success: true,
+      data: { ok: true, payout },
+      error: null,
+    });
+    expect(h.db.voidPayout).toHaveBeenCalledWith('2026-07-01', 1, 'Duplicate account', {
+      id: 'operator-7',
+      username: 'moderator',
+    });
+  });
+
+  it('returns conflict when a paid payout cannot be voided', async () => {
+    h.state.voidPayoutResult = { outcome: 'invalid_status', status: 'paid' };
+    const r = await runRoute('POST', '/internal/daily-rewards/void-payout', {
+      headers: OPS_HEADERS,
+      body: {
+        day: '2026-07-01',
+        rank: 1,
+        reason: 'Manual review required',
+        actorId: 'operator-7',
+        actorUsername: 'moderator',
+      },
+    });
+    expect(r.status).toBe(409);
+    expect(r.body).toEqual({ success: false, data: null, error: 'payout cannot be voided' });
+  });
+
+  it('restores a voided payout to pending', async () => {
+    const payout = payoutRow(1);
+    h.state.restorePayoutResult = { outcome: 'updated', payout };
+    const r = await runRoute('POST', '/internal/daily-rewards/restore-payout', {
+      headers: OPS_HEADERS,
+      body: {
+        day: '2026-07-01',
+        rank: 1,
+        actorId: 'operator-8',
+        actorUsername: 'reviewer',
+      },
+    });
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({
+      success: true,
+      data: { ok: true, payout },
+      error: null,
+    });
+    expect(h.db.restorePayout).toHaveBeenCalledWith('2026-07-01', 1, {
+      id: 'operator-8',
+      username: 'reviewer',
+    });
   });
 });
 

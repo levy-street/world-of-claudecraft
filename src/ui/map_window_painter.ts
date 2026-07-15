@@ -52,6 +52,11 @@ const PLAYER_ARROW_HALF_WIDTH = 5;
 const PLAYER_ARROW_BASE_Y = 6;
 // Building footprint outline width in the detail overlay.
 const BUILDING_LINE_WIDTH = 1;
+// Dungeon Finder "Show on Map" highlight: a steady double ring (no animation,
+// reduced-motion safe) around the pinged entrance.
+const PING_RADIUS_INNER = 9;
+const PING_RADIUS_OUTER = 14;
+const PING_LINE_WIDTH = 3;
 // Active-quest objective area (the translucent quest-POI blob) ring width.
 const QUEST_AREA_LINE_WIDTH = 2;
 // The numbered quest badge on each area (the WoW-style gold circle whose
@@ -69,6 +74,7 @@ const MAP_COLOR_TOKENS = {
   outline: '--color-map-outline',
   portalDot: '--color-map-portal-dot',
   portalLabel: '--color-map-portal-label',
+  ping: '--color-map-ping',
   npcQuest: '--color-map-npc-quest',
   questAreaFill: '--color-map-quest-area-fill',
   questAreaStroke: '--color-map-quest-area-stroke',
@@ -105,6 +111,8 @@ export interface MapPaintOptions {
   canvasSize: number;
   zoom: number;
   center: { x: number; z: number } | null;
+  /** Dungeon Finder "Show on Map" highlight in world coords, or null. */
+  ping?: { x: number; z: number } | null;
 }
 
 /** What the painter reports back so Hud can update its drag state + cursor,
@@ -153,6 +161,7 @@ export class MapWindowPainter {
       center: opts.center,
       canvasSize: opts.canvasSize,
       decorations: this.decorations,
+      ping: opts.ping ?? null,
     });
     const colors = this.resolveColors();
     this.draw(ctx, model, opts.bg, opts.canvasSize, colors);
@@ -256,6 +265,20 @@ export class MapWindowPainter {
       const dungeonName = dungeonDisplayName(portal.dungeonId);
       ctx.strokeText(dungeonName, portal.mx, portal.my - PORTAL_NAME_OFFSET_Y);
       ctx.fillText(dungeonName, portal.mx, portal.my - PORTAL_NAME_OFFSET_Y);
+    }
+
+    // Dungeon Finder "Show on Map" highlight: a steady double ring around the
+    // pinged entrance (drawn over the portal dot; no animation by design).
+    if (model.ping) {
+      ctx.strokeStyle = colors.ping;
+      ctx.lineWidth = PING_LINE_WIDTH;
+      ctx.beginPath();
+      ctx.arc(model.ping.mx, model.ping.my, PING_RADIUS_INNER, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(model.ping.mx, model.ping.my, PING_RADIUS_OUTER, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.lineWidth = LABEL_LINE_WIDTH;
     }
 
     // Quest-giver glyphs ('?' turn-in ready, '!' available). Color + font are

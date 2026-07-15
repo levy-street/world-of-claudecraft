@@ -122,6 +122,8 @@ const simFiles = walk(simRoot);
 const UI_PURE_CORES = [
   'src/ui/camera_prompt_core.ts',
   'src/ui/chat_ignore_core.ts',
+  'src/ui/char_bags_pairing_core.ts',
+  'src/ui/equip_drop_core.ts',
   'src/ui/log_event_route.ts',
   'src/ui/unit_portrait.ts',
   'src/ui/xp_bar.ts',
@@ -160,6 +162,7 @@ const UI_PURE_CORES = [
   'src/ui/map_window_view.ts',
   'src/ui/map_quest_list_view.ts',
   'src/ui/arena_window_view.ts',
+  'src/ui/dungeon_finder_view.ts',
   'src/ui/yumi_match_view.ts',
   'src/ui/vale_cup_window_view.ts',
   'src/ui/vale_cup_indicator_view.ts',
