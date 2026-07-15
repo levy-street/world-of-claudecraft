@@ -7506,6 +7506,46 @@ function statAmount(stat: StatKey, value: number, lang: SupportedLanguage): stri
     : formatNumber(Math.abs(value), lang);
 }
 
+const CJK_TITLE_FALLBACKS: Readonly<
+  Record<string, Readonly<Partial<Record<SupportedLanguage, string>>>>
+> = Object.fromEntries(
+  [
+    ['Tolling Hammer', '钟鸣之锤', '鐘鳴之錘', '鳴り響く槌', '울리는 망치'],
+    ['Dawnward Ricochet', '晨光弹射', '晨光彈射', '暁光の跳弾', '새벽빛 도탄'],
+    ['Startle Shot', '惊扰射击', '驚擾射擊', '驚愕の一矢', '기습 사격'],
+    ['Rime Snare', '霜缚陷阱', '霜縛陷阱', '霜の罠', '서리 덫'],
+    ['Splitshot', '分裂射击', '分裂射擊', '分裂射撃', '분열 사격'],
+    ['Wildfang Rally', '野牙集结', '野牙集結', '野牙の号令', '야성 송곳니 집결'],
+    ['Smoke Screen', '烟幕', '煙幕', '煙幕', '연막'],
+    ['Wraith Strike', '幽魂打击', '幽魂打擊', '亡霊の一撃', '망령의 일격'],
+    ['Shadecloak', '暗影斗篷', '暗影斗篷', '影の外套', '그림자 망토'],
+    ['Hushword', '静默之言', '靜默之言', '静寂の言葉', '침묵의 말'],
+    ['Terror Canticle', '恐惧圣歌', '恐懼聖歌', '恐怖の聖歌', '공포의 성가'],
+    ['Choirmend', '合唱疗愈', '合唱療癒', '聖歌の癒やし', '합창 치유'],
+    ['Thoughtburn', '焚心', '焚心', '思念の灼熱', '사념 연소'],
+    ['Springwell', '泉涌', '泉湧', '泉の湧き出し', '샘물'],
+    ['Skybranch', '天枝', '天枝', '天空の枝', '하늘가지'],
+    ['Gripping Earth', '缚地', '縛地', '大地の束縛', '대지의 속박'],
+    ['Storm Chorus', '风暴合唱', '風暴合唱', '嵐の合唱', '폭풍의 합창'],
+    ['Spellsteal', '法术窃取', '法術竊取', '呪文奪取', '주문 훔치기'],
+    ['Frostsweep', '霜扫', '霜掃', '霜の薙ぎ払い', '서리 휩쓸기'],
+    ['Flickerstep', '闪烁步', '閃爍步', '瞬きの歩み', '점멸 걸음'],
+    ['Cold Coffin', '寒冰棺', '寒冰棺', '氷の棺', '얼음 관'],
+    ['Deadfrost', '死霜', '死霜', '死の霜', '죽음의 서리'],
+    ['Skystone', '天石', '天石', '空の石', '하늘 돌'],
+    ['Aetherwell', '以太之井', '以太之井', '霊気の泉', '에테르 샘'],
+    ['Voidfeast', '虚空盛宴', '虛空盛宴', '虚無の饗宴', '공허의 향연'],
+    ['Dread Chorus', '惊惧合唱', '驚懼合唱', '恐怖の合唱', '공포의 합창'],
+    ['Leaden Hex', '铅重诅咒', '鉛重詛咒', '鉛の呪い', '납빛 저주'],
+    ['Morrowlash', '明日之鞭', '明日之鞭', '明日の鞭', '내일의 채찍'],
+    ['Ruinbolt', '毁灭箭', '毀滅箭', '破滅の矢', '파멸의 화살'],
+    ['Typhoon', '台风', '颱風', '台風', '태풍'],
+    ['Savage Mending', '野性治愈', '野性治癒', '野生の癒やし', '야성 치유'],
+    ['Red Haze', '赤色迷雾', '赤色迷霧', '赤い霞', '붉은 안개'],
+    ['Gladesong', '林地之歌', '林地之歌', '林間の歌', '숲의 노래'],
+  ].map(([source, zh_CN, zh_TW, ja_JP, ko_KR]) => [source, { zh_CN, zh_TW, ja_JP, ko_KR }]),
+);
+
 function translateTitle(source: string, lang: SupportedLanguage): string {
   if (lang === 'en' || lang === 'en_CA') return source;
   const abilityId = abilityIdByName.get(source) ?? grantAbilityIdByTitle.get(source);
@@ -7517,24 +7557,8 @@ function translateTitle(source: string, lang: SupportedLanguage): string {
   if (retained !== undefined) return retained;
   const override = titleOverrides[lang]?.[source];
   if (override !== undefined) return override;
-  const swordMasterTitles = new Set([
-    'Tempest', 'Gathering Storm', 'Duelist', 'Measured Tempo', 'Azure Blade', 'Azure Current',
-    'Gale Footwork', 'Slipstream', 'Long Stride', 'Keen Twins', 'Wide Crescent', 'Flowing Edge',
-    'Relentless Rhythm', 'Efficient Dance', 'Inner Current', 'Parrying Current', 'Quicksilver',
-    'Azure Tempering', 'Cyclone Edge', 'Duelist Tempo', 'Azure Momentum', 'Storm of Steel',
-    'Perfect Pair', 'Unbound Motion',
-  ]);
-  if (swordMasterTitles.has(source)) return source;
-  const cjkFallback: Partial<Record<SupportedLanguage, string>> = {
-    zh_CN: '天赋选择',
-    zh_TW: '天賦選擇',
-    ja_JP: '才能の選択',
-    ko_KR: '특성 선택',
-  };
-  if (cjkFallback[lang] !== undefined) {
-    const code = [...source].reduce((sum, char) => sum + char.codePointAt(0)!, 0);
-    return `${cjkFallback[lang]} ${code}`;
-  }
+  const cjkFallback = CJK_TITLE_FALLBACKS[source]?.[lang];
+  if (cjkFallback !== undefined) return cjkFallback;
   // Every shipped talent name has an explicit override (enforced by tests) or is an
   // ability name (resolved above). A bare return here only triggers for a newly-added
   // talent that still needs a localized override — clean English is preferable to a

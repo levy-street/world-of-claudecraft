@@ -147,16 +147,16 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Iron Bellow"
       },
       {
+        "id": "commanding_shout",
+        "name": "Bolstering Cry"
+      },
+      {
         "id": "charge",
         "name": "Onrush"
       },
       {
         "id": "thunder_clap",
         "name": "Quaking Blow"
-      },
-      {
-        "id": "hamstring",
-        "name": "Hobbling Cut"
       }
     ],
     "abilities": [
@@ -173,6 +173,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Iron Bellow"
       },
       {
+        "id": "commanding_shout",
+        "name": "Bolstering Cry"
+      },
+      {
         "id": "charge",
         "name": "Onrush"
       },
@@ -183,6 +187,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "hamstring",
         "name": "Hobbling Cut"
+      },
+      {
+        "id": "rend",
+        "name": "Deep Gash"
       },
       {
         "id": "bloodrage",
@@ -534,6 +542,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "rebuke",
         "name": "Reproach"
+      },
+      {
+        "id": "sacred_bulwark",
+        "name": "Sacred Bulwark"
       }
     ],
     "model": "player_paladin",
@@ -1455,6 +1467,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "skull_bash",
         "name": "Headbutt"
+      },
+      {
+        "id": "primal_reflexes",
+        "name": "Primal Reflexes"
       }
     ],
     "model": "player_druid",
