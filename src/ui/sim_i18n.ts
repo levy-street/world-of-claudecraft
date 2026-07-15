@@ -369,7 +369,6 @@ export type SimMessageKey = keyof typeof enTable;
 // back to English here until the release localization pass fills them.
 const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, string>>> = {
   en: {
-    'log.deathwardSaves': 'A deathward saves you!',
     'error.lineOfSight': 'Line of sight.',
     'error.bagsFull': 'Your bags are full.',
     'error.bagSocketsFull': 'All your bag slots are full.',
@@ -538,7 +537,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.resurrectionSickness': "The Keeper's Toll",
   },
   es: {
-    'log.deathwardSaves': '¡Una protección contra la muerte te salva!',
     'dfinder.needSpec': 'Elige una especializacion para usar el Buscador de Mazmorras.',
     'dfinder.badRole': 'No puedes ocupar ese rol.',
     'dfinder.alreadyQueued': 'Ya estas en la cola del Buscador de Mazmorras.',
@@ -827,7 +825,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.soulblaze': 'Fulgor del Alma',
   },
   es_ES: {
-    'log.deathwardSaves': '¡Una protección contra la muerte te salva!',
     'dfinder.needSpec': 'Elige una especializacion para usar el Buscador de Mazmorras.',
     'dfinder.badRole': 'No puedes ocupar ese rol.',
     'dfinder.alreadyQueued': 'Ya estas en la cola del Buscador de Mazmorras.',
@@ -1116,7 +1113,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.soulblaze': 'Fulgor del Alma',
   },
   fr_FR: {
-    'log.deathwardSaves': 'Une protection contre la mort vous sauve !',
     'dfinder.needSpec': 'Choisissez une spécialisation pour utiliser le Chercheur de donjons.',
     'dfinder.badRole': 'Vous ne pouvez pas remplir ce rôle.',
     'dfinder.alreadyQueued': 'Vous êtes déjà dans la file du Chercheur de donjons.',
@@ -1408,7 +1404,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.soulblaze': "Embrasement d'âme",
   },
   fr_CA: {
-    'log.deathwardSaves': 'Une protection contre la mort vous sauve !',
     'dfinder.needSpec': 'Choisissez une spécialisation pour utiliser le Chercheur de donjons.',
     'dfinder.badRole': 'Vous ne pouvez pas remplir ce rôle.',
     'dfinder.alreadyQueued': 'Vous êtes déjà dans la file du Chercheur de donjons.',
@@ -1700,7 +1695,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.soulblaze': "Embrasement d'âme",
   },
   en_CA: {
-    'log.deathwardSaves': 'A deathward saves you!',
     'log.learnedAbility': 'You have learned a new ability: {name}.',
     'log.abilityRankUp': 'Your {name} has improved to Rank {rank}.',
     'log.stopFollowing': 'You stop following.',

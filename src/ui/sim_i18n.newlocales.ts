@@ -2,7 +2,6 @@
 /* eslint-disable */
 export const BASE_NEW = {
   cs_CZ: {
-    'log.deathwardSaves': 'Ochrana před smrtí tě zachránila!',
     'dfinder.needSpec': 'Zvol specializaci, abys mohl/a využívat Hledač dungeonů.',
     'dfinder.badRole': 'Tuto roli nemůžeš zastávat.',
     'dfinder.alreadyQueued': 'Již jsi ve frontě Hledače dungeonů.',
@@ -283,7 +282,6 @@ export const BASE_NEW = {
     'mechanic.siltHide': 'Bahenní kůže',
   },
   da_DK: {
-    'log.deathwardSaves': 'Et dødsværn redder dig!',
     'dfinder.needSpec': 'Vælg en specialisering for at bruge Fangekældersfinder.',
     'dfinder.badRole': 'Du kan ikke udfylde den rolle.',
     'dfinder.alreadyQueued': 'Du er allerede i Fangekældersfinder-køen.',
@@ -566,7 +564,6 @@ export const BASE_NEW = {
     'mechanic.siltHide': 'Dyndskjul',
   },
   id_ID: {
-    'log.deathwardSaves': 'Perlindungan maut menyelamatkanmu!',
     'dfinder.needSpec': 'Pilih spesialisasi untuk menggunakan Pencari Dungeon.',
     'dfinder.badRole': 'Kamu tidak dapat mengisi peran tersebut.',
     'dfinder.alreadyQueued': 'Kamu sudah berada dalam antrean Pencari Dungeon.',
@@ -854,7 +851,6 @@ export const BASE_NEW = {
     'aura.soulblaze': 'Nyala Jiwa',
   },
   nl_NL: {
-    'log.deathwardSaves': 'Een bescherming tegen de dood redt je!',
     'dfinder.needSpec': 'Kies een specialisatie om de Kerkerzoekmachine te gebruiken.',
     'dfinder.badRole': 'Je kunt die rol niet vervullen.',
     'dfinder.alreadyQueued': 'Je staat al in de wachtrij van de Kerkerzoekmachine.',
@@ -1142,7 +1138,6 @@ export const BASE_NEW = {
     'mechanic.siltHide': 'Slibhuid',
   },
   pl_PL: {
-    'log.deathwardSaves': 'Ochrona przed śmiercią cię ratuje!',
     'dfinder.needSpec': 'Wybierz specjalizację, aby korzystać ze Znajdywacza Lochów.',
     'dfinder.badRole': 'Nie możesz pełnić tej roli.',
     'dfinder.alreadyQueued': 'Jesteś już w kolejce Znajdywacza Lochów.',
@@ -1428,7 +1423,6 @@ export const BASE_NEW = {
     'mechanic.siltHide': 'Mułowa skóra',
   },
   sv_SE: {
-    'log.deathwardSaves': 'Ett dödsskydd räddar dig!',
     'dfinder.needSpec': 'Välj en specialisering för att använda Fängelsehålsletaren.',
     'dfinder.badRole': 'Du kan inte fylla den rollen.',
     'dfinder.alreadyQueued': 'Du är redan i Fängelsehålsletarens kö.',
@@ -1712,7 +1706,6 @@ export const BASE_NEW = {
     'mechanic.siltHide': 'Slamhud',
   },
   tr_TR: {
-    'log.deathwardSaves': 'Ölüm muhafazası seni kurtarıyor!',
     'dfinder.needSpec': "Zindan Bulucu'yu kullanmak için bir uzmanlaşma seç.",
     'dfinder.badRole': 'Bu rolü üstlenemezsin.',
     'dfinder.alreadyQueued': 'Zaten Zindan Bulucu sırasındasın.',
@@ -1992,7 +1985,6 @@ export const BASE_NEW = {
     'aura.soulblaze': 'Ruhalazı',
   },
   vi_VN: {
-    'log.deathwardSaves': 'Lá chắn tử thần cứu bạn!',
     'dfinder.needSpec': 'Hãy chọn chuyên môn hóa để sử dụng Tìm Hầm Ngục.',
     'dfinder.badRole': 'Bạn không thể đảm nhận vai trò đó.',
     'dfinder.alreadyQueued': 'Bạn đã có trong hàng chờ Tìm Hầm Ngục rồi.',
