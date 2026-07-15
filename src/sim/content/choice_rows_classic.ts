@@ -1538,7 +1538,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 5,
       theme: 'elements',
-      decision: 'Arc Bolt-fed free jolt vs Jolt-fed mana vs imbued sustain',
+      decision: 'Arc Bolt-fed free jolt vs imbued-melee Jolt cooldowns vs imbued sustain',
       options: [
         {
           id: 'sha_r5_concussion',
@@ -1563,20 +1563,21 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
           },
         },
         {
-          id: 'sha_r8_shock_efficiency',
-          name: 'Returning Current',
-          description: 'Every 3rd Jolt restores 30 mana.',
-          icon: 'earth_shock',
+          id: 'sha_r14_weapon_fury',
+          name: 'Imbued Tempo',
+          description:
+            'Landed melee auto-attacks with an imbued weapon shave 0.5 sec off your Jolt cooldowns.',
+          icon: 'stormstrike',
           effect: {
             proc: {
-              id: 'sha_returning_current',
-              name: 'Returning Current',
-              trigger: {
-                on: 'castNth',
-                n: 3,
-                abilities: ['earth_shock', 'flame_shock', 'frost_shock'],
-              },
-              responses: [{ kind: 'resource', amount: 30, resourceType: 'mana' }],
+              id: 'sha_weapon_fury',
+              name: 'Imbued Tempo',
+              trigger: { on: 'meleeSwingWhile', auraKind: 'imbue' },
+              responses: [
+                { kind: 'cooldownRefund', ability: 'earth_shock', seconds: 0.5 },
+                { kind: 'cooldownRefund', ability: 'flame_shock', seconds: 0.5 },
+                { kind: 'cooldownRefund', ability: 'frost_shock', seconds: 0.5 },
+              ],
             },
           },
         },
@@ -1599,7 +1600,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 8,
       theme: 'jolts',
-      decision: 'interrupting Earthen Jolt vs rooting Rime Jolt vs reflected-hit instant bolt',
+      decision: 'interrupting Earthen Jolt vs reflected-hit instant bolt vs healing spring',
       options: [
         {
           id: 'sha_r8_improved_earth_shock',
@@ -1608,15 +1609,6 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
           icon: 'earth_shock',
           effect: {
             ability: [{ ability: 'earth_shock', addEffects: [{ type: 'interrupt', lockout: 2 }] }],
-          },
-        },
-        {
-          id: 'sha_r8_frost_bind',
-          name: 'Rime Lock',
-          description: 'Rime Jolt also roots the target for 2 sec.',
-          icon: 'frost_shock',
-          effect: {
-            ability: [{ ability: 'frost_shock', addEffects: [{ type: 'root', duration: 2 }] }],
           },
         },
         {
@@ -1641,12 +1633,19 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
             },
           },
         },
+        {
+          id: 'sha_r11_healing_stream',
+          name: 'Springwell',
+          description: 'Grants Springwell.',
+          icon: 'healing_stream',
+          effect: { grant: { ability: 'healing_stream' } },
+        },
       ],
     },
     {
       level: 11,
       theme: 'attunement',
-      decision: 'heal-crit tempo vs Thunder Ward charge weaving vs healing-over-time spring',
+      decision: 'heal-crit tempo vs Thunder Ward charge weaving vs Jolt-fed mana',
       options: [
         {
           id: 'sha_r11_ancestral_guidance',
@@ -1706,18 +1705,29 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
           },
         },
         {
-          id: 'sha_r11_healing_stream',
-          name: 'Springwell',
-          description: 'Grants Springwell.',
-          icon: 'healing_stream',
-          effect: { grant: { ability: 'healing_stream' } },
+          id: 'sha_r8_shock_efficiency',
+          name: 'Returning Current',
+          description: 'Every 3rd Jolt restores 30 mana.',
+          icon: 'earth_shock',
+          effect: {
+            proc: {
+              id: 'sha_returning_current',
+              name: 'Returning Current',
+              trigger: {
+                on: 'castNth',
+                n: 3,
+                abilities: ['earth_shock', 'flame_shock', 'frost_shock'],
+              },
+              responses: [{ kind: 'resource', amount: 30, resourceType: 'mana' }],
+            },
+          },
         },
       ],
     },
     {
       level: 14,
       theme: 'storm',
-      decision: 'area lightning vs DoT detonation vs imbued-melee Jolt cooldowns',
+      decision: 'area lightning vs DoT detonation vs rooting Rime Jolt',
       options: [
         {
           id: 'sha_r14_chain_lightning',
@@ -1739,22 +1749,12 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
           },
         },
         {
-          id: 'sha_r14_weapon_fury',
-          name: 'Imbued Tempo',
-          description:
-            'Landed melee auto-attacks with an imbued weapon shave 0.5 sec off your Jolt cooldowns.',
-          icon: 'stormstrike',
+          id: 'sha_r8_frost_bind',
+          name: 'Rime Lock',
+          description: 'Rime Jolt also roots the target for 2 sec.',
+          icon: 'frost_shock',
           effect: {
-            proc: {
-              id: 'sha_weapon_fury',
-              name: 'Imbued Tempo',
-              trigger: { on: 'meleeSwingWhile', auraKind: 'imbue' },
-              responses: [
-                { kind: 'cooldownRefund', ability: 'earth_shock', seconds: 0.5 },
-                { kind: 'cooldownRefund', ability: 'flame_shock', seconds: 0.5 },
-                { kind: 'cooldownRefund', ability: 'frost_shock', seconds: 0.5 },
-              ],
-            },
+            ability: [{ ability: 'frost_shock', addEffects: [{ type: 'root', duration: 2 }] }],
           },
         },
       ],
