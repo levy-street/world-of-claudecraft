@@ -1166,6 +1166,18 @@ const NPC_KEYS: Record<string, string> = {
   // The graveyard angel: a robed figure, rendered translucent (ethereal) with a
   // holy shimmer by the renderer (see the spirit_healer branches there).
   spirit_healer: 'npc_villager_robed',
+  // Gauntlet contestants wear real adventurer kits: one per-class NPC def
+  // (sim/content/gauntlet.ts rolls the class and skin per contestant), mapped
+  // to the matching class model so the field reads as varied challengers.
+  gauntlet_contestant_warrior: 'player_warrior',
+  gauntlet_contestant_paladin: 'player_paladin',
+  gauntlet_contestant_hunter: 'player_hunter',
+  gauntlet_contestant_rogue: 'player_rogue',
+  gauntlet_contestant_priest: 'player_priest',
+  gauntlet_contestant_mage: 'player_mage',
+  gauntlet_contestant_warlock: 'player_warlock',
+  gauntlet_contestant_shaman: 'player_shaman',
+  gauntlet_contestant_druid: 'player_druid',
 };
 
 export function visualKeyFor(e: Entity): string {

@@ -17,6 +17,7 @@
 // ui_tier_knobs.nameplateIntervalSec), which the renderer reads, not the painter.
 
 import * as THREE from 'three';
+import { GAUNTLET_CONTESTANT_NPC_ID } from '../sim/content/gauntlet';
 import { ABILITIES, MOBS, QUESTS } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
 import { type Entity, isQuestTurnInNpc } from '../sim/types';
@@ -243,9 +244,14 @@ export class NameplatePainter {
         this.setNameplateTitle(v, suppressSelf ? undefined : e.title);
         this.setNameplateHp(v, e);
       } else if (e.kind === 'npc' || (!e.hostile && e.questIds.length > 0)) {
+        // Gauntlet contestants carry rolled proper-noun names (like player
+        // names, never translated); every other NPC shows its localized
+        // template name.
         const npcName =
           e.kind === 'npc'
-            ? npcDisplayName(e.templateId)
+            ? e.templateId.startsWith(GAUNTLET_CONTESTANT_NPC_ID)
+              ? e.name
+              : npcDisplayName(e.templateId)
             : tEntity({ kind: 'mob', id: e.templateId, field: 'name' });
         let marker = '';
         let cls = '';

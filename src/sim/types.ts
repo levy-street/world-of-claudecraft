@@ -147,6 +147,23 @@ export interface ArenaCombatant {
   cls: PlayerClass;
   level: number;
 }
+
+// Hodric's Castle Gauntlet event payload shapes. The obstacle that launched a
+// racer (for the HUD cue), the roster reveal row, and the final placement row.
+export type HcKnockKind = 'flail' | 'axe' | 'log' | 'boulder' | 'piston';
+
+export interface HcFieldEntry {
+  name: string;
+  cls: PlayerClass;
+  bot: boolean;
+}
+
+export interface HcResultRow {
+  name: string;
+  place: number;
+  bot: boolean;
+  timeS: number | null;
+}
 export const ALL_CLASSES: PlayerClass[] = [
   'warrior',
   'paladin',
@@ -2411,6 +2428,26 @@ export type SimEvent = { pid?: number } & (
       allies: ArenaCombatant[];
       enemies: ArenaCombatant[];
     }
+  // Hodric's Castle Gauntlet: queue state, race lifecycle, and the placement
+  // result. All carry pid (personal, delivered to each racer).
+  // `hodricsWindow`: the Herald was talked to, open the race window (mailbox shape).
+  | { type: 'hodricsWindow' }
+  | { type: 'hcQueued'; position: number }
+  | { type: 'hcUnqueued' }
+  | { type: 'hcFound'; field: HcFieldEntry[] }
+  | { type: 'hcCountdown'; seconds: number }
+  | { type: 'hcStart' }
+  // `hcRoundStart`: a round is being plated (1..3); Hodric rebuilds between.
+  | { type: 'hcRoundStart'; round: number }
+  // `hcQualified`: banked a spot in the next round.
+  | { type: 'hcQualified'; round: number }
+  // `hcEliminated`: cut this round; final placement is already assigned.
+  | { type: 'hcEliminated'; place: number; round: number }
+  | { type: 'hcKnocked'; kind: HcKnockKind }
+  | { type: 'hcFall' }
+  | { type: 'hcCheckpoint'; index: number }
+  | { type: 'hcFinish'; place: number; timeS: number }
+  | { type: 'hcEnd'; place: number; won: boolean; field: HcResultRow[] }
   // 2v2 Fiesta party mode. All carry pid (personal — delivered to each combatant).
   // `fiestaScore`: the running team tally changed. `fiestaWave`: a new augment
   // wave just opened. `fiestaWord`: an exaggerated word-pop cue (the client maps
@@ -2655,7 +2692,312 @@ export type SimEvent = { pid?: number } & (
       itemId: string;
       rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
     }
+  // The Gauntlet survival event. All personal (pid-scoped: each event is emitted
+  // once per run participant) and text-free on purpose (see skinEvent above): the
+  // client renders its own localized copy off the structured fields, so no
+  // sim/server i18n matcher rules are needed.
+  // `gauntletPhase`: the run advanced to a new phase (lobby fill, staging, a
+  // trial opening, interlude, podium), or the lobby roster changed. `remainingS`
+  // is the seconds left in the phase AT EMIT TIME: a point-in-time sample the
+  // client clock estimator calibrates against (a late lobby joiner would
+  // otherwise count down from the full window; see ui/gauntlet_clock.ts).
+  // `gauntletLight`: the watcher flipped
+  // (trial 1); `until` is the absolute sim-time the current light holds.
+  // `gauntletDamage`: your own vitality took a hit (`vitality` = your new value).
+  // `gauntletPoof`: a contestant was knocked out at (x, z) (drives the knockout
+  // VFX/SFX and the survivor counter). `gauntletEliminated`: YOU were knocked
+  // out (the client shows the eliminated overlay + spectator chrome).
+  // `gauntletEchoJudge`: the sim graded YOUR echo stone tap (trial 4); the
+  // client flashes the clicked stone green (`ok`) or red so every click has
+  // visible success/failure feedback.
+  // `gauntletPodium`: the run resolved; `won` is whether you took first.
+  | {
+      type: 'gauntletPhase';
+      phase: GauntletPhase;
+      trialIndex: number;
+      survivors: number;
+      remainingS: number;
+    }
+  | { type: 'gauntletLight'; light: 'green' | 'red'; until: number }
+  | {
+      type: 'gauntletDamage';
+      amount: number;
+      cause: GauntletDamageCause;
+      vitality: number;
+    }
+  | { type: 'gauntletEchoJudge'; stone: number; ok: boolean }
+  | {
+      type: 'gauntletPoof';
+      entityId: number;
+      name: string;
+      x: number;
+      z: number;
+      survivors: number;
+    }
+  | { type: 'gauntletEliminated'; trialIndex: number }
+  | { type: 'gauntletPodium'; first: string; second: string; third: string; won: boolean }
 );
+
+// ---------------------------------------------------------------------------
+// The Gauntlet, a time-limited survival event: a lobby of players plus an NPC
+// contestant field runs a fixed sequence of trials inside an instanced slot in
+// the gauntlet band (see data.ts gauntletOrigin). Trials deal vitality damage
+// scaled by performance; zero vitality knocks a contestant out. Run state lives
+// in src/sim/gauntlet/state.ts; EVERY numeric knob lives in the tuning blocks
+// below, authored in content/gauntlet.ts (data-as-code, no magic numbers in
+// module logic).
+// ---------------------------------------------------------------------------
+
+export type GauntletPhase = 'lobby' | 'staging' | 'trial' | 'interlude' | 'podium' | 'done';
+
+// What dealt a vitality hit. 'caught' = a trial hard fail (moved on red light);
+// 'trial' = the end-of-trial performance score; 'timeout' = the trial clock ran
+// out before the contestant resolved.
+export type GauntletDamageCause = 'caught' | 'trial' | 'timeout';
+
+export type GauntletTrialKind = 'sentinel' | 'sigils' | 'pull' | 'echo' | 'span' | 'court';
+
+// Trial 1, Sentinel's Crossing (red light / green light). Distances are yards in
+// instance-local coordinates (origin at the staging area), times are seconds.
+export interface GauntletSentinelTuning {
+  durationS: number; // trial time limit
+  fieldLength: number; // start line (z=0) to finish line (z=fieldLength)
+  fieldHalfWidth: number; // |x| beyond this is out of bounds (treated as caught-still)
+  greenMinS: number; // green-light window drawn from [greenMinS, greenMaxS]
+  greenMaxS: number;
+  redMinS: number; // red-light window drawn from [redMinS, redMaxS]
+  redMaxS: number;
+  accelPerCycle: number; // green window multiplier per completed cycle (< 1 accelerates)
+  greenFloorS: number; // green window never shrinks below this
+  telegraphS: number; // watcher turn animation lead time before red starts
+  graceS: number; // motion forgiveness after red starts (reaction budget)
+  redMoveEps: number; // per-tick displacement (yards) beyond this while red = caught
+  hardFailDamage: number; // vitality chunk when caught moving
+  stunS: number; // root applied on a catch
+  pushbackYards: number; // set back toward the start line on a catch
+  momentumDecay: number; // residual per-tick velocity multiplier after input release
+  momentumStopEps: number; // residual speed (yards/tick) below this snaps to a stop
+  damageMax: number; // end-of-trial vitality damage at score 0 (scales down to ~0 at 1)
+  finishBonusMax: number; // score bonus for finishing with the full clock remaining
+  // NPC contestant improv: green-light pace is skill-lerped between the speed
+  // bounds (yards/s; compare RUN_SPEED), then each light window rolls fresh
+  // hesitation, stop lag, a speed multiplier, and sometimes a mid-run stutter,
+  // so the field reads as a crowd of people rather than a conveyor belt.
+  npcSpeedMin: number; // green-light pace at skill 0
+  npcSpeedMax: number; // green-light pace at skill 1
+  npcSpeedJitter: number; // per-green speed multiplier drawn from [1-j, 1+j]
+  npcReactMinS: number; // seconds after a green flip before a bot starts moving
+  npcReactMaxS: number;
+  npcStopLagMaxS: number; // seconds a bot keeps sliding after a red flip (cosmetic)
+  npcHesitateChance: number; // chance per green window of a mid-run stutter
+  npcHesitateMinS: number; // stutter length bounds
+  npcHesitateMaxS: number;
+}
+
+// Trial 2, Sugarglass Sigils: freedraw the seeded etched outline without
+// cracking it. The sim owns scoring: the client streams quantized trace points;
+// each on-band point carves the outline vertices near its arc position (any
+// order, any direction), and off-band points accrue crack.
+export interface GauntletSigilsTuning {
+  durationS: number;
+  outlinePoints: number; // polyline resolution a shape is sampled at
+  tolerance: number; // max shape-local distance from the outline before crack accrues
+  // Max NEW outline vertices carved per second (a clean continuous drag never
+  // hits it; packet spam and teleport-taps buy nothing past it).
+  coverageCapPerS: number;
+  crackMax: number; // the crack meter
+  crackOffPath: number; // crack per second while tracing outside the tolerance
+  thinSectionMult: number; // crack multiplier on a shape's marked thin segments
+  shatterDamage: number; // vitality chunk on a shatter (a fresh shape follows)
+  damageMax: number; // end-of-trial damage at zero progress
+}
+
+// Trial 3, The Great Pull: team tug of war played on shrinking circles. Each
+// player faces one circle at a time: it spawns after a rolled gap, shrinks at
+// a rolled speed, and a click is graded sim-side by how close the size is to
+// the target when it arrives; a circle that shrinks to nothing unclicked is a
+// miss. Sizes are ABSTRACT UNITS the client renders as CSS px 1:1.
+export interface GauntletPullTuning {
+  durationS: number; // soft cap; the marker usually decides earlier
+  leadInS: number; // pause after the trial opens before the first circle and NPC heave
+  circleSpawnMinS: number; // gap bounds between a circle resolving and the next spawn
+  circleSpawnMaxS: number;
+  circleShrinkMinS: number; // full-shrink duration bounds (the per-circle "random speed")
+  circleShrinkMaxS: number;
+  circleStartSize: number; // spawn size (abstract units, rendered as px 1:1)
+  circleTargetSize: number; // click as close to this size as possible
+  pullForceMax: number; // marker yards for a click at exactly the target size
+  gradePower: number; // exponent sharpening the force falloff with size error
+  npcHeavePeriodS: number; // cadence of the per-team NPC field heave
+  npcForceMin: number; // per-heave per-team NPC force draw bounds
+  npcForceMax: number;
+  winThreshold: number; // |marker| that decides the pull
+  lossDamage: number; // vitality damage dealt to every loser (big chunk, not death)
+}
+
+// Trial 4, the Keeper's Echo: a memory duel against the Keeper's rune stones.
+// Each round the stones flash a seeded sequence; the player clicks them back
+// in the same order. Rounds grow one step at a time; a wrong stone or a
+// timeout costs vitality and deals a FRESH sequence for the same round;
+// clearing every round finishes the trial.
+export interface GauntletEchoTuning {
+  durationS: number;
+  stones: number; // rune stones on the table (sequence values are 0..stones-1)
+  rounds: number; // rounds to clear the trial
+  baseLen: number; // round r's sequence length = baseLen + r
+  stepS: number; // seconds per flash during the watch phase
+  inputS: number; // answer window once the flashes end
+  missDamage: number; // vitality per wrong stone or timed-out round
+  damageMax: number; // end-of-trial damage at zero rounds cleared
+}
+
+// Trial 5, The Brittle Span: paired floor panels over the pit; one of each
+// pair is brittle. Steps are position-detected; reveals are shared knowledge.
+export interface GauntletSpanTuning {
+  durationS: number;
+  steps: number; // panel pairs
+  panelLength: number; // yards along the crossing axis
+  panelWidth: number; // per-panel width
+  panelGap: number; // lateral gap between the pair
+  fallDamage: number; // brittle-panel chunk; respawn at the span start
+  npcAheadCount: number; // seeded crossers that go first and reveal early panels
+  npcStepPeriodS: number; // cadence of the crossers
+  damageMax: number; // end-of-trial damage at zero progress
+}
+
+// Trial 6, The Final Court: the closing duel. Attacker reaches the head zone,
+// defender pushes them out; roles swap on a timer; damage goes to vitality.
+export interface GauntletCourtTuning {
+  durationS: number;
+  courtLength: number; // yards, entry line to the head zone
+  courtHalfWidth: number;
+  neckZ: number; // past this the attacker's movement penalty lifts
+  preNeckSpeedMult: number; // attacker speed multiplier before the neck (one-foot rule)
+  shoveCooldownS: number;
+  shoveRange: number;
+  shovePush: number; // yards of knockback per landed shove
+  shoveDamage: number; // vitality per landed shove
+  outDamage: number; // vitality chunk for being pushed out of bounds
+  roleSwapS: number; // attacker/defender swap timer
+  rivalReactionS: number; // NPC rival decision latency
+}
+
+// The viewer-scoped wire projection of a run (the `grun` self-wire key and the
+// IWorldGauntlet.gauntletRun member; the facet re-exports it). Deadlines are
+// ABSOLUTE sim-time (`endsAt`, `until`): the client derives countdowns from
+// world.time, so the serialized view only changes on real state changes and
+// the wire delta-elides it on quiet ticks.
+export interface GauntletRunView {
+  phase: GauntletPhase;
+  trialIndex: number;
+  trialCount: number;
+  endsAt: number; // current phase deadline (absolute sim time)
+  survivors: number;
+  total: number;
+  prizePool: number; // theater in v1 (copper)
+  vitality: number; // the viewer's own vitality
+  vitalityMax: number;
+  spectating: boolean;
+  finished: boolean; // the viewer resolved the current trial (crossed the line)
+  originX: number; // instance origin, so presentation can derive field-local coords
+  originZ: number;
+  sentinel: { light: 'green' | 'red'; until: number; fieldLength: number } | null;
+  // The viewer's own per-trial substate, one member per trial kind (only the
+  // active trial's member is non-null). Values are quantized at the wire
+  // projection so quiet ticks still delta-elide.
+  sigils: {
+    shapeSeed: number;
+    shapeId: number;
+    crack: number;
+    crackMax: number;
+    progress: number; // 0..1 covered fraction of the outline
+    // 24-bit coverage mask: bit k is set when any vertex in the k-th 24th of
+    // the arc is covered (the venue tints its outline segments from this).
+    coveredMask: number;
+  } | null;
+  pull: {
+    // ABSOLUTE marker, + = team 0 winning. Both teams stand ON the rope
+    // (team 0 grips the -x half); the meter is the physical rope, not a
+    // viewer-relative bar.
+    marker: number;
+    winThreshold: number;
+    // The sim's eased rope translation (instance-local yards, + toward team
+    // 0's side), the SAME value the players' grips and pins are dragged by,
+    // so the venue rope and the pulling lines move as one body. Quantized to
+    // 0.05 so quiet ticks delta-elide.
+    kx: number;
+    // The viewer's live shrinking circle (the trial's input), or null for
+    // spectators. spawnAt is absolute; spawnAt + shrinkS fully determine the
+    // size curve client-side (startSize at spawnAt, 0 at spawnAt + shrinkS).
+    // Sizes are abstract units the client renders as CSS px 1:1; the screen
+    // POSITION is client-chosen (cosmetic, never scored). The member only
+    // changes when a circle resolves, so quiet ticks delta-elide.
+    circle: {
+      id: number;
+      spawnAt: number;
+      shrinkS: number;
+      startSize: number;
+      targetSize: number;
+    } | null;
+  } | null;
+  echo: {
+    stones: number;
+    round: number; // 0-based current round
+    rounds: number; // total rounds to clear
+    // This round's flash sequence (stone indices); the client renders the
+    // flashes from the absolute schedule below, so quiet ticks delta-elide.
+    seq: number[];
+    showStartAt: number; // absolute; flashes run seq.length * stepS from here
+    stepS: number;
+    inputEndsAt: number; // absolute answer deadline
+    progress: number; // matched steps this round
+    done: boolean;
+  } | null;
+  span: {
+    steps: number;
+    // Per step: -1 unknown, else the KNOWN SAFE side (0 = left, 1 = right).
+    // Reveals are shared: every crosser's fate teaches the whole field.
+    revealed: number[];
+  } | null;
+  court: {
+    attacker: boolean;
+    swapAt: number;
+    shoveReadyAt: number;
+    neckZ: number;
+    rivalId: number; // entity id of the rival (another player or the NPC)
+  } | null;
+  podium: { first: string; second: string; third: string } | null;
+}
+
+// The whole event, one record: run pacing, the contestant field, and one tuning
+// block per trial. `trials` is the ordered sequence a run plays; later phases
+// append kinds to GauntletTrialKind and blocks here.
+export interface GauntletDef {
+  fieldSize: number; // total contestants per run, players + NPC backfill
+  vitalityMax: number; // the normalized event vitality pool (same for everyone)
+  lobbyFillS: number; // how long a lobby waits for more players before starting
+  maxRealPlayers: number; // lobby starts early when this many have joined
+  joinRadius: number; // yards from the recruiter within which gauntletJoin works
+  emptyTimeoutS: number; // a run with no player attached disposes after this
+  stagingS: number; // seconds contestants stand on the staging area before trial 1
+  interludeS: number; // between-trials beat (survivor count / next-trial teaser)
+  podiumS: number; // podium ceremony length before the run disposes
+  prizeBase: number; // theater only in v1: the advertised pool baseline (copper)
+  prizePerElimination: number; // theater: pool growth per knockout
+  // NPC attrition targets: after trials[i] resolves, the field is culled toward
+  // targetSurvivorsPerTrial[i] survivors (players are never culled by targets;
+  // they live and die by their own vitality).
+  targetSurvivorsPerTrial: number[];
+  npcSkillMin: number; // seeded per-contestant skill range (0..1)
+  npcSkillMax: number;
+  trials: GauntletTrialKind[];
+  sentinel: GauntletSentinelTuning;
+  sigils: GauntletSigilsTuning;
+  pull: GauntletPullTuning;
+  echo: GauntletEchoTuning;
+  span: GauntletSpanTuning;
+  court: GauntletCourtTuning;
+}
 
 export interface MoveInput {
   forward: boolean;
@@ -2770,6 +3112,17 @@ export interface SimConfig {
   // authoritative server uses its realm-local 3 AM daily reset; offline/headless omit
   // this and fall back to a flat 24h day. Keeps the time zone out of the sim core.
   raidResetMs?: (nowMs: number) => number;
+  // The Gauntlet event window's initial state. The offline client sets true (the
+  // event is always joinable offline); the server leaves the default false and
+  // feeds sim.gauntletEventOpen each loop pass from its world_state/env window
+  // (the utcDay idiom). Headless/parity worlds keep the default: closed, so the
+  // recruiter never spawns and existing golden traces are untouched.
+  gauntletAlwaysOpen?: boolean;
+  // Skip the gauntlet lobby fill window: joining starts the run immediately with
+  // full NPC backfill. The offline client sets true (no other player can ever
+  // join a single-player world, so waiting is pure dead time); the server keeps
+  // the default false so online lobbies gather real players.
+  gauntletInstantLobby?: boolean;
   // Offline play-test: a custom world to run instead of the built-in one. The Sim
   // ctor reads spawns from here; render/terrain read it via the data.ts registry,
   // so callers that set this MUST also call setActiveWorldContent() with content

@@ -4571,6 +4571,13 @@
     background: var(--panel-bg, #17120a);
     padding: 4px 0;
   }
+
+  body.mobile-touch #gauntlet-recruit,
+  body.mobile-touch #gauntlet-sigils,
+  body.mobile-touch #gauntlet-wager,
+  body.mobile-touch #hodrics-window {
+    max-height: calc(100% - 20px);
+  }
   /* 40x40 touch floor for every tappable finder control. */
   body.mobile-touch #dungeon-finder-window .df-tab,
   body.mobile-touch #dungeon-finder-window .df-row,

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { DUNGEON_X_THRESHOLD } from '../sim/data';
+import { DUNGEON_X_THRESHOLD, isHodricsPos } from '../sim/data';
 import { GFX } from './gfx';
 
 // Ambient high-altitude BIRD FLOCK — a render-only flourish, no sim state.
@@ -137,8 +137,9 @@ export function buildBirds(seed: number): BirdsView {
   }
 
   function update(px: number, pz: number, dt: number): void {
-    // No birds inside dungeons / arena interiors — the sky isn't rendered there.
-    group.visible = px <= DUNGEON_X_THRESHOLD;
+    // No birds inside dungeons / arena interiors (the sky isn't rendered
+    // there). Hodric's Castle is the one instance band that IS open-air.
+    group.visible = px <= DUNGEON_X_THRESHOLD || isHodricsPos(px);
     if (!group.visible) return;
 
     if (!seeded) {

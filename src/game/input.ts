@@ -138,6 +138,24 @@ export class Input {
   camDist = 12;
   autorun = false;
   suspendMovement = false;
+  // World-pointer hook: an in-world minigame surface (the Gauntlet sigil slab)
+  // claims the pointer. When set and its 'down' returns true, that press never
+  // becomes a camera drag or a click-pick: the moves and the release stream to
+  // the hook until 'up'. Left button / single touch only; the camera's right
+  // drag stays free. Wired by main.ts to the world-aim glue.
+  worldPointerHook: ((phase: 'down' | 'move' | 'up', x: number, y: number) => boolean) | null =
+    null;
+  private worldPointerStroke = false;
+
+  /**
+   * True while a claimed world-pointer stroke is live. The per-frame
+   * suspendMovement driver in main.ts ORs this in so the player holds still
+   * while tracing, and release is automatic when the stroke ends, however it
+   * ends (up, cancel, or the surface vanishing mid-stroke).
+   */
+  isWorldPointerStroking(): boolean {
+    return this.worldPointerStroke;
+  }
   // click-to-move (#95): a world destination the player clicked; the frame loop
   // walks toward it until arrival or until the player takes manual control.
   // null when inactive. clickMoveTarget is the current waypoint; clickMoveGoal
@@ -264,6 +282,19 @@ export class Input {
     canvas.addEventListener('mousedown', (e) => this.onMouseDown(e));
     window.addEventListener('mouseup', (e) => this.onMouseUp(e));
     window.addEventListener('mousemove', (e) => this.onMouseMove(e));
+    // Touch strokes for the world-pointer hook only: a claimed single-finger
+    // drag traces on an in-world surface; everything unclaimed passes through
+    // untouched so the mobile camera joystick behavior never changes.
+    canvas.addEventListener('touchstart', (e) => this.onWorldTouch(e, 'down'), {
+      passive: false,
+    });
+    canvas.addEventListener('touchmove', (e) => this.onWorldTouch(e, 'move'), {
+      passive: false,
+    });
+    canvas.addEventListener('touchend', (e) => this.onWorldTouch(e, 'up'), { passive: false });
+    canvas.addEventListener('touchcancel', (e) => this.onWorldTouch(e, 'up'), {
+      passive: false,
+    });
     canvas.addEventListener(
       'wheel',
       (e) => {
@@ -924,7 +955,34 @@ export class Input {
     }
   }
 
+  private onWorldTouch(e: TouchEvent, phase: 'down' | 'move' | 'up'): void {
+    if (phase === 'down') {
+      if (this.worldPointerStroke || e.touches.length !== 1 || !this.worldPointerHook) return;
+      const t = e.touches[0];
+      if (this.worldPointerHook('down', t.clientX, t.clientY)) {
+        this.worldPointerStroke = true;
+        e.preventDefault();
+      }
+      return;
+    }
+    if (!this.worldPointerStroke) return;
+    e.preventDefault();
+    if (phase === 'move') {
+      const t = e.touches[0];
+      if (t) this.worldPointerHook?.('move', t.clientX, t.clientY);
+      return;
+    }
+    const t = e.changedTouches[0];
+    this.worldPointerStroke = false;
+    this.worldPointerHook?.('up', t?.clientX ?? 0, t?.clientY ?? 0);
+  }
+
   private onMouseDown(e: MouseEvent): void {
+    if (e.button === 0 && this.worldPointerHook?.('down', e.clientX, e.clientY)) {
+      this.worldPointerStroke = true;
+      e.preventDefault?.();
+      return;
+    }
     if (e.button === 0) this.leftDown = true;
     if (e.button === 2) this.rightDown = true;
     if (e.button === 0 || e.button === 2) e.preventDefault?.();
@@ -967,6 +1025,11 @@ export class Input {
   }
 
   private onMouseUp(e: MouseEvent): void {
+    if (this.worldPointerStroke && e.button === 0) {
+      this.worldPointerStroke = false;
+      this.worldPointerHook?.('up', e.clientX, e.clientY);
+      return;
+    }
     if (e.button === 0) this.leftDown = false;
     if (e.button === 2) this.rightDown = false;
     if (e.button === 0 || e.button === 2) this.noteIntent(e.button === 2 ? 'look' : 'move');
@@ -1006,6 +1069,10 @@ export class Input {
     if (e.target === this.canvas) {
       this.hoverX = e.clientX;
       this.hoverY = e.clientY;
+    }
+    if (this.worldPointerStroke) {
+      this.worldPointerHook?.('move', e.clientX, e.clientY);
+      return;
     }
     if (!this.leftDown && !this.rightDown) return;
     // Normalize the raw movement delta to Chromium's physical-pixel unit so

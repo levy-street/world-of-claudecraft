@@ -579,6 +579,54 @@ export class Vfx {
     }
   }
 
+  // A soft, non-graphic knockout "poof": a pale puff of smoke plus a quick
+  // sparkle pop with a gentle upward drift, tone-appropriate for the stylized
+  // Gauntlet survival event (no gore). HDR-tinted so it blooms softly on the
+  // composer tiers. Cheap and pooled like burst; `at` is any {x,y,z}.
+  poof(at: { x: number; y: number; z: number }): void {
+    const smoke = new THREE.Color(0xf2ecff).multiplyScalar(hdr(1.3));
+    const spark = new THREE.Color(0xfff2c8).multiplyScalar(hdr(1.8));
+    // pale smoke ring drifting up and gently outward (negative gravity keeps it
+    // rising softly as it fades)
+    const puffs = this.scaledCount(12);
+    for (let i = 0; i < puffs; i++) {
+      const a = (i / puffs) * Math.PI * 2 + Math.random() * 0.5;
+      const r = 0.15 + Math.random() * 0.35;
+      this.spawn(
+        at.x + Math.sin(a) * r,
+        at.y + 0.3 + Math.random() * 0.3,
+        at.z + Math.cos(a) * r,
+        Math.sin(a) * 0.8,
+        1.2 + Math.random() * 0.9,
+        Math.cos(a) * 0.8,
+        smoke,
+        0.5 + Math.random() * 0.4,
+        0.5 + Math.random() * 0.3,
+        -0.4,
+        SPR.smoke,
+      );
+    }
+    // a quick sparkle pop that sells the "here one moment, gone the next" beat
+    const sparks = this.scaledCount(9);
+    for (let i = 0; i < sparks; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const sp = 1.5 + Math.random() * 2.5;
+      this.spawn(
+        at.x,
+        at.y + 0.35,
+        at.z,
+        Math.sin(a) * sp,
+        1.4 + Math.random() * 1.6,
+        Math.cos(a) * sp,
+        spark,
+        0.28 + Math.random() * 0.2,
+        0.4 + Math.random() * 0.3,
+        2.5,
+        i % 2 === 0 ? SPR.sparkle : SPR.star,
+      );
+    }
+  }
+
   healGlow(targetId: number): void {
     const at = this.anchor(targetId, 0.1);
     if (!at) return;

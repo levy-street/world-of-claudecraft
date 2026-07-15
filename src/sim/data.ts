@@ -37,6 +37,7 @@ import {
 } from './content/delves';
 import { DUNGEON_DEFS, DUNGEON_MOBS } from './content/dungeons';
 import { GATHER_NODES as GATHER_NODES_CONTENT } from './content/gather_nodes';
+import { GAUNTLET_NPCS } from './content/gauntlet';
 import {
   type GraveyardDef,
   OVERWORLD_GRAVEYARDS,
@@ -44,6 +45,7 @@ import {
   SPIRIT_HEALER_NPC_ID,
 } from './content/graveyards';
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
+import { HC_HERALD, HC_HERALD_NPC_ID } from './content/hodrics';
 import {
   ALL_RECIPES as ALL_RECIPES_CONTENT,
   COMMON_RECIPES as COMMON_RECIPES_CONTENT,
@@ -205,6 +207,12 @@ export const NPCS: Record<string, NpcDef> = {
   // loop skips it). Kept in NPCS so the online client and world_entity_i18n can
   // resolve its name; spirit.ts spawns a copy at every graveyard.
   [SPIRIT_HEALER_NPC_ID]: SPIRIT_HEALER,
+  // The Gauntlet event NPCs (all dynamic: the recruiter spawns only while the
+  // event window is open; the watcher/contestants spawn per run in the band).
+  ...GAUNTLET_NPCS,
+  // The Gauntlet Herald (dynamic: true): spawned guarded at world init with a
+  // reserved out-of-band id (social/hodrics.ts spawnHcHerald), zero rng.
+  [HC_HERALD_NPC_ID]: HC_HERALD,
 };
 
 // Graveyards + the Spirit Healer: re-exported so the Sim and spirit.ts import the
@@ -501,6 +509,12 @@ export function delveOrigin(delveIndex: number, slot: number): { x: number; z: n
   return { x: DELVE_X_MIN + delveIndex * 600, z: DELVE_Z0 + slot * DELVE_SLOT_SPACING };
 }
 
+// East edge of the delve band. Delve rooms sit at DELVE_X_MIN + index*600, so
+// the cap leaves room for indices 0..6; a delve at index 7+ would cross into
+// the Hodric's Castle band beyond and must move the cap first (pinned by
+// tests/hodrics_course.test.ts's band-footprint checks).
+export const DELVE_BAND_X_MAX = 9000;
+
 export function isDelvePos(x: number): boolean {
   // Capped east by the Protect Yumi maze band, the same move the delve band
   // made to isArenaPos when it was added.
@@ -556,11 +570,67 @@ export function yumiMazeOriginAt(z: number): { x: number; z: number; slot: numbe
   return { x: o.x, z: o.z, slot: best };
 }
 
+// ---------------------------------------------------------------------------
+// The Gauntlet, the survival-event band after the Protect Yumi maze. Like the other
+// far-off bands: x beyond DUNGEON_X_THRESHOLD means flat ground
+// (world.groundHeight), and the band has NO static colliders (an open field;
+// colliders.ts never classifies it as a delve, arena, or maze interior).
+// Slots stack along z. Its bounds leave the Protect Yumi band (8000 to 12000)
+// and the Vale Cup practice pitches (x = 30000) disjoint.
+// ---------------------------------------------------------------------------
+
+export const GAUNTLET_X = 12400; // gauntlet instances share this x; slots stack along z
+export const GAUNTLET_BAND_X_MIN = 12000;
+export const GAUNTLET_BAND_X_MAX = 20000;
+export const GAUNTLET_SLOT_COUNT = 8; // concurrent runs the world can host
+const GAUNTLET_Z0 = -1250;
+// Covers the sentinel field (~90 long) + staging/spectator dressing with wide margin.
+const GAUNTLET_SLOT_SPACING = 400;
+
+export function gauntletOrigin(slot: number): { x: number; z: number } {
+  return { x: GAUNTLET_X, z: GAUNTLET_Z0 + slot * GAUNTLET_SLOT_SPACING };
+}
+
+/** The nearest slot origin to a band z (the arenaOriginAt idiom): venue
+ * physics resolves platform heights and colliders instance-locally. */
+export function gauntletOriginAt(z: number): { x: number; z: number } {
+  const slot = Math.round((z - GAUNTLET_Z0) / GAUNTLET_SLOT_SPACING);
+  return gauntletOrigin(Math.max(0, Math.min(GAUNTLET_SLOT_COUNT - 1, slot)));
+}
+
+export function isGauntletPos(x: number): boolean {
+  return x >= GAUNTLET_BAND_X_MIN && x < GAUNTLET_BAND_X_MAX;
+}
+
 export const DELVES: Record<string, DelveDef> = {
   [COLLAPSED_RELIQUARY_DELVE.id]: COLLAPSED_RELIQUARY_DELVE,
   [DROWNED_LITANY_DELVE.id]: DROWNED_LITANY_DELVE,
 };
 export const DELVE_LIST: DelveDef[] = Object.values(DELVES).sort((a, b) => a.index - b.index);
+
+// ---------------------------------------------------------------------------
+// Hodric's Castle, the obstacle-race gauntlet. Its race instances live in
+// their own far-off x-band, after the survival Gauntlet and before the Vale
+// Cup practice pitches. Unlike the other instance bands the ground here is
+// NOT flat: world.groundHeight routes the band to the course terraces in
+// sim/hodrics_layout.ts.
+// ---------------------------------------------------------------------------
+
+export const HODRICS_X = 20300; // race instances share this x; slots stack along z
+export const HODRICS_X_MIN = 20000;
+export const HODRICS_X_MAX = 20600;
+export const HODRICS_SLOT_COUNT = 2; // concurrent races the world can host
+const HODRICS_Z0 = -1250;
+const HODRICS_SLOT_SPACING = 800; // clears the course footprint (~280yd) + interest radius
+
+export function hodricsOrigin(slot: number): { x: number; z: number } {
+  return { x: HODRICS_X, z: HODRICS_Z0 + slot * HODRICS_SLOT_SPACING };
+}
+
+export function isHodricsPos(x: number): boolean {
+  return x >= HODRICS_X_MIN && x < HODRICS_X_MAX;
+}
+
 export const DELVE_MODULES: Record<string, DelveModuleDef> = {
   ...COLLAPSED_RELIQUARY_MODULES,
   ...DROWNED_LITANY_MODULES,

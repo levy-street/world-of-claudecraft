@@ -8,6 +8,7 @@ import {
   isAttackableEntity,
   isAttackHoverTarget,
 } from '../src/game/interactions';
+import { HC_HERALD_NPC_ID } from '../src/sim/content/hodrics';
 import type { Entity } from '../src/sim/types';
 
 function stubEntity(partial: Partial<Entity> & Pick<Entity, 'id' | 'kind'>): Entity {
@@ -311,6 +312,8 @@ describe('handlePickedEntity', () => {
       openLoot: () => {},
       openQuestDialog: () => {},
       openDelveBoard: () => {},
+      openGauntletRecruit: () => {},
+      toggleHodricsWindow: () => {},
       openMailbox: () => {},
       showError: () => {},
       closeContextMenu: () => {},
@@ -350,6 +353,8 @@ describe('handlePickedEntity', () => {
       openLoot: () => {},
       openQuestDialog: () => {},
       openDelveBoard: () => {},
+      openGauntletRecruit: () => {},
+      toggleHodricsWindow: () => {},
       openMailbox: () => {},
       showError: () => {},
       closeContextMenu: () => {},
@@ -387,6 +392,8 @@ describe('handlePickedEntity while dead (the ghost/death loop)', () => {
       openLoot: () => calls.push('openLoot'),
       openQuestDialog: () => calls.push('openQuestDialog'),
       openDelveBoard: () => calls.push('openDelveBoard'),
+      openGauntletRecruit: () => calls.push('openGauntletRecruit'),
+      toggleHodricsWindow: () => calls.push('toggleHodricsWindow'),
       openMailbox: () => calls.push('openMailbox'),
       showError: () => calls.push('showError'),
       closeContextMenu: () => {},
@@ -450,6 +457,29 @@ describe('handlePickedEntity while dead (the ghost/death loop)', () => {
     const { world, hud, calls } = rig({}, questNpc());
     handlePickedEntity(world, hud, 2, 2, 10, 20);
     expect(calls).toContain('openQuestDialog');
+  });
+
+  it("clicking Hodric's Herald opens the Gauntlet window, not the generic quest dialog", () => {
+    // Regression: handlePickedEntity has its own copy of the NPC-dispatch
+    // fallthrough (a scene raycast pick), separate from main.ts's F-key
+    // interactKey (a proximity scan); only the key-press path special-cased
+    // the Herald, so clicking him directly still fell through to the
+    // generic gossip dialog.
+    const herald = stubEntity({
+      id: 2,
+      kind: 'npc',
+      templateId: HC_HERALD_NPC_ID,
+      pos: { x: 3, y: 0, z: 0 },
+    });
+    const left = rig({}, herald);
+    handlePickedEntity(left.world, left.hud, 2, 0, 10, 20);
+    expect(left.calls).toContain('toggleHodricsWindow');
+    expect(left.calls).not.toContain('openQuestDialog');
+
+    const right = rig({}, herald);
+    handlePickedEntity(right.world, right.hud, 2, 2, 10, 20);
+    expect(right.calls).toContain('toggleHodricsWindow');
+    expect(right.calls).not.toContain('openQuestDialog');
   });
 });
 

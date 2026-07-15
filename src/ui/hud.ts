@@ -1,6 +1,7 @@
 import { audio } from '../game/audio';
 import type { GamepadKind } from '../game/gamepad_map';
 import { type Keybinds, keyCapLabel } from '../game/keybinds';
+import { loadHapticsEnabled, triggerHaptic } from '../game/mobile_controls';
 import { music, musicZoneForLocation, shouldResetMusicForDungeonEntry } from '../game/music';
 import type { GameSettings, Settings } from '../game/settings';
 import { sfx } from '../game/sfx';
@@ -14,6 +15,7 @@ import {
   targetFrameNonSelfIntervalMs,
 } from '../game/ui_tier_knobs';
 import { voice, voiceDistanceGain } from '../game/voice';
+import type { WorldAimSurface } from '../game/world_aim';
 import type { ClaudiumStoreItem } from '../net/economy_sdk';
 import { castBarState, consumeBarState } from '../render/cast_bar';
 import { CharacterPreview } from '../render/characters';
@@ -34,6 +36,7 @@ import {
 import { type AugmentCategory, augmentCategory } from '../sim/content/augments';
 import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
 import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
+import { GAUNTLET, GAUNTLET_CONTESTANT_NPC_ID, GAUNTLET_VENUE } from '../sim/content/gauntlet';
 import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
 import {
   EVENT_SKIN_TIERS,
@@ -58,6 +61,7 @@ import {
   dungeonAt,
   ITEMS,
   isDelvePos,
+  isHodricsPos,
   MOBS,
   NPCS,
   QUESTS,
@@ -273,6 +277,14 @@ import {
   resetFramePositionsOnce,
   TARGET_FRAME_POS_KEY,
 } from './frame_pos_reset';
+import { GauntletCirclesPainter } from './gauntlet_circles_painter';
+import { gauntletCircleModel } from './gauntlet_circles_view';
+import { GauntletClock } from './gauntlet_clock';
+import { GauntletHudPainter } from './gauntlet_hud_painter';
+import { gauntletHudModel } from './gauntlet_hud_view';
+import { GauntletOverlay } from './gauntlet_overlay';
+import { GauntletRecruitWindow } from './gauntlet_recruit_window';
+import { GauntletTraceBatcher, shapeLocalFromFraction } from './gauntlet_trace_core';
 import { gossipMenuIsEmpty } from './gossip_menu';
 import {
   type AimPoint,
@@ -286,6 +298,8 @@ import {
 } from './ground_aim';
 import { buildHeroicVendorView } from './heroic_vendor_view';
 import { renderHeroicVendorWindow } from './heroic_vendor_window';
+import { HodricsHud } from './hodrics_hud';
+import { HodricsWindow } from './hodrics_window';
 import {
   holderTierBadgeDataUrl,
   holderTierByIndex,
@@ -1164,6 +1178,7 @@ export class Hud {
   private targetCastbarLabelEl = this.targetCastbarEl.querySelector('.label') as HTMLElement;
   private targetCastbarTimerEl = this.targetCastbarEl.querySelector('.timer') as HTMLElement;
   private actionbarEl = $('#actionbar');
+  private actionbar2El = $('#actionbar2');
   private xpFillEl = $('#xpbar .fill');
   private xpLabelEl = $('#xpbar .label');
   // XP + swing bar element refs cached once for their painters (the #xpbar /
@@ -2376,6 +2391,9 @@ export class Hud {
       case 'valecup-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.valeCupWindow.close();
+        break;
+      case 'hodrics-window':
+        this.hodricsWindow.close();
         break;
       case 'vendor-window':
         this.closeVendor();
@@ -3754,6 +3772,77 @@ export class Hud {
   private readonly minimapPainter = new MinimapPainter(this.writerFacet, classCss, (zoneId) =>
     zoneDisplayName(zoneId),
   );
+  // The Gauntlet HUD cluster painter (vitality / countdown / chips / light pill),
+  // driven per frame from the gauntletRun wire view via gauntletHudModel. All writes
+  // route through the shared elided-writer facet, like the other hot painters.
+  private readonly gauntletHudPainter = new GauntletHudPainter(this.writerFacet, {
+    root: $('#gauntlet-hud'),
+    phase: $('#gauntlet-phase'),
+    countdownBar: $('#gauntlet-countdown'),
+    countdownFill: $('#gauntlet-countdown .fill'),
+    countdownTimer: $('#gauntlet-countdown .timer'),
+    survivors: $('#gauntlet-survivors'),
+    prize: $('#gauntlet-prize'),
+    light: $('#gauntlet-light'),
+    hint: $('#gauntlet-hint'),
+    tutorial: $('#gauntlet-tutorial'),
+    echoStrip: $('#gauntlet-echo-strip'),
+    echoRound: $('#gauntlet-echo-round'),
+    echoClock: $('#gauntlet-echo-clock'),
+    court: $('#gauntlet-court'),
+    courtRole: $('#gauntlet-court-role'),
+  });
+  // The Great Pull's shrinking-circle input overlay: one pooled circle driven
+  // per frame from the viewer's wire schedule (pure size math in
+  // gauntlet_circles_view). The painter rolls the cosmetic screen point per
+  // spawn; the ring's pointerdown sends the authoritative pull by id.
+  private readonly gauntletCirclesPainter = new GauntletCirclesPainter(
+    this.writerFacet,
+    {
+      circle: $('#gauntlet-circle'),
+      ring: $('#gauntlet-circles .gc-ring'),
+    },
+    {
+      onCircleClick: (id) => {
+        this.sim.gauntletPullCircle(id);
+        triggerHaptic(10, loadHapticsEnabled());
+      },
+      viewport: () => ({ w: window.innerWidth, h: window.innerHeight }),
+      random: Math.random,
+    },
+  );
+  // The in-world sigils stage: while trial 2 is live for a live contestant,
+  // updateGauntletHud registers the venue's lectern slab as the world-aim
+  // surface (main.ts routes claimed pointer strokes back through onPoint),
+  // holds the authored camera focus pose, and streams the traced shape-local
+  // points to the sim through the trace batcher. All state below is released
+  // the moment the trial's view member goes null, the viewer spectates, or the
+  // run ends (releaseSigilsStage).
+  private worldAim: { set(surface: WorldAimSurface | null): void } | null = null;
+  private sigilsSurface: WorldAimSurface | null = null;
+  private sigilsOrigin: { x: number; z: number } | null = null;
+  private readonly sigilsTrace = new GauntletTraceBatcher();
+  private sigilsLastCrack = 0;
+  // Which desk-style trial currently holds the authored camera focus pose
+  // (movement trials keep the chase cam and never appear here).
+  private gauntletFocusKey: keyof typeof GAUNTLET_VENUE.focus | null = null;
+  // Edge detector for the court trial's shove-ready ring flash on the rival.
+  private gauntletShoveWasReady = false;
+  // Wall-clock estimator for the countdown (IWorld exposes no sim clock online); see
+  // gauntlet_clock.ts.
+  private readonly gauntletClock = new GauntletClock();
+  // The knockout / spectator / podium overlay; builds its own DOM lazily on show.
+  private readonly gauntletOverlay = new GauntletOverlay({
+    onLeave: () => this.sim.gauntletLeave(),
+  });
+  // The recruiter dialog (opened from the gauntlet_recruiter interact path).
+  private readonly gauntletRecruit = new GauntletRecruitWindow({
+    root: () => $('#gauntlet-recruit'),
+    closeOthers: () => this.closeOtherWindows('#gauntlet-recruit'),
+    ...this.windowFocus('#gauntlet-recruit'),
+    onJoin: () => this.sim.gauntletJoin(),
+    onLeave: () => this.sim.gauntletLeave(),
+  });
   private readonly presentationBag: PainterHostPresentation = {
     itemIcon: (item) => this.itemIcon(item),
     moneyHtml: (copper) => this.moneyHtml(copper),
@@ -4035,6 +4124,15 @@ export class Hud {
   });
   // Latch for the kickoff auto-close of the queue window (arena pattern).
   private vcupMatchSeen = false;
+  private readonly hodricsWindow = new HodricsWindow({
+    root: () => $('#hodrics-window'),
+    world: () => this.sim,
+    closeOthers: () => this.closeOtherWindows('#hodrics-window'),
+    ...this.windowFocus('#hodrics-window'),
+  });
+  private readonly hodricsHud = new HodricsHud({
+    root: () => $('#hodrics-hud'),
+  });
   // Character window painter (char_view.ts paperdoll core + char_window.ts painter).
   // It composes the presentation bag (icon/tooltip) for the equip slots and routes
   // the HUD-built stat / talent / progression fragments plus the unequip + drag
@@ -5043,6 +5141,8 @@ export class Hud {
     this.vcupMatchHud.relocalize();
     this.vcupBriefing.relocalize();
     this.vcupCharge.relocalize();
+    this.hodricsWindow.relocalize();
+    this.hodricsHud.relocalize();
     const dialog = $('#quest-dialog');
     if (dialog.style.display !== 'block' || this.openGossipNpcId === null) return;
     const npc = this.sim.entities.get(this.openGossipNpcId);
@@ -7165,6 +7265,7 @@ export class Hud {
     }
     this.meters.update();
     this.lockpickWindow.repaintIfChanged();
+    this.updateGauntletCircles();
     this.tutorial.update(sim, this.renderer, this.keybinds);
     this.reconcileLootRolls();
     this.reconcileLootRollStatus(now);
@@ -7196,11 +7297,20 @@ export class Hud {
     // className swap on the player hot path). updateLowHealthVignette +
     // updateLowResource are player-only side effects with their own cores and stay
     // here, OUT of the shared family (target/party must not inherit them).
+    // A live Gauntlet contestant's frame shows the EVENT VITALITY meter in the
+    // health slot (the run's one health that matters; the sim also mirrors it
+    // onto entity hp so everyone else's nameplates agree). Class hp returns the
+    // moment they are knocked out or leave.
+    const gauntletRun = this.gauntletContestantRun();
     this.playerFramePainter.paint(
       unitFrameView({
         present: true,
-        hpFrac: p.hp / Math.max(1, p.maxHp),
-        hpText: `${p.hp} / ${p.maxHp}`,
+        hpFrac: gauntletRun
+          ? gauntletRun.vitality / Math.max(1, gauntletRun.vitalityMax)
+          : p.hp / Math.max(1, p.maxHp),
+        hpText: gauntletRun
+          ? `${gauntletRun.vitality} / ${gauntletRun.vitalityMax}`
+          : `${p.hp} / ${p.maxHp}`,
         resourceKind: p.resourceType,
         resFrac: p.resource / Math.max(1, p.maxResource),
         resText: `${Math.round(p.resource)} / ${p.maxResource}`,
@@ -7594,16 +7704,21 @@ export class Hud {
       // override inside Eastbrook Vale; the zone LABEL stays Eastbrook Vale,
       // the Sowfield is a poi, not a zone).
       const atSowfield = !inDungeon && isAtSowfield(p.pos.x, p.pos.z);
+      // Hodric's Castle is open-air (the zone banner/subzone suppression above
+      // is still correct: it is an instance), so it takes the ordinary
+      // outdoor zone theme instead of the dungeon murk.
+      const inHodrics = isHodricsPos(p.pos.x);
+      const musicInDungeon = (inDungeon && !inHodrics) || inNythraxisArena;
       const zone = atSowfield
         ? 'vale_cup'
         : musicZoneForLocation(
             currentZone.id,
             currentZone.biome,
             inHub,
-            inDungeon || inNythraxisArena,
+            musicInDungeon,
             instanceId,
           );
-      const musicDungeonId = inDungeon || inNythraxisArena ? instanceId : null;
+      const musicDungeonId = (inDungeon && !inHodrics) || inNythraxisArena ? instanceId : null;
       if (shouldResetMusicForDungeonEntry(this.lastMusicDungeonId, musicDungeonId)) {
         music.resetForDungeonEntry(musicDungeonId);
       }
@@ -7669,6 +7784,8 @@ export class Hud {
       if ($('#dungeon-finder-window').style.display === 'flex') this.dungeonFinderWindow.render();
       if (this.dungeonFinderProposalPopup.isOpen) this.dungeonFinderProposalPopup.render();
       if ($('#valecup-window').style.display === 'block') this.valeCupWindow.render();
+      if ($('#hodrics-window').style.display === 'block') this.hodricsWindow.render();
+      this.hodricsHud.render(sim.hcInfo);
       if (this.openLootMobId !== null) {
         const mob = sim.entities.get(this.openLootMobId);
         if (!mob?.lootable || dist2d(p.pos, mob.pos) > 7) this.closeLoot();
@@ -8750,6 +8867,14 @@ export class Hud {
   /** Offline builds enable the Vale Cup practice-vs-bots button (main.ts). */
   setVcupPracticeAvailable(on: boolean): void {
     this.valeCupWindow.setPracticeAvailable(on);
+  }
+
+  setHcPracticeHook(fn: (() => void) | null): void {
+    this.hodricsWindow.setPracticeHook(fn);
+  }
+
+  toggleHodricsWindow(): void {
+    this.hodricsWindow.toggle();
   }
 
   // The pinned in-match banner: opponent name + countdown / live match timer.
@@ -10125,6 +10250,101 @@ export class Hud {
             audio.death();
           }
           break;
+        case 'hodricsWindow':
+          if (!this.hodricsWindow.isOpen) this.hodricsWindow.toggle();
+          break;
+        case 'hcQueued':
+          this.log(
+            t('hudChrome.hc.log.queued', {
+              position: formatNumber(ev.position, { maximumFractionDigits: 0 }),
+            }),
+            '#c9a2ff',
+          );
+          break;
+        case 'hcUnqueued':
+          this.log(t('hudChrome.hc.log.unqueued'), '#c9a2ff');
+          break;
+        case 'hcFound':
+          this.showBanner(t('hudChrome.hc.banner.found'));
+          audio.duelChallenge();
+          break;
+        case 'hcCountdown':
+          audio.duelCountdownTick();
+          break;
+        case 'hcStart':
+          this.showBanner(t('hudChrome.hc.banner.go'));
+          audio.duelStart();
+          triggerHaptic([15, 40, 25], loadHapticsEnabled());
+          break;
+        case 'hcRoundStart':
+          this.showBanner(
+            t('hudChrome.hc.banner.round', {
+              round: formatNumber(ev.round, { maximumFractionDigits: 0 }),
+            }),
+          );
+          break;
+        case 'hcQualified':
+          this.showBanner(t('hudChrome.hc.banner.qualified'));
+          this.log(t('hudChrome.hc.log.qualified'), '#7ee787');
+          audio.duelEnd();
+          this.renderer.fiestaAugmentBurst(this.sim.playerId);
+          triggerHaptic([20, 40, 45], loadHapticsEnabled());
+          break;
+        case 'hcEliminated':
+          this.showBanner(t('hudChrome.hc.banner.eliminated'));
+          this.log(
+            t('hudChrome.hc.log.eliminated', {
+              round: formatNumber(ev.round, { maximumFractionDigits: 0 }),
+            }),
+            '#ff9a6a',
+          );
+          this.renderer.addShake(0.45);
+          this.renderer.fiestaKillBurst(this.sim.playerId, 'fire');
+          triggerHaptic([40, 60, 80], loadHapticsEnabled());
+          break;
+        case 'hcKnocked':
+          this.renderer.addShake(0.5);
+          audio.fiestaWord(1);
+          break;
+        case 'hcFall':
+          this.log(t('hudChrome.hc.log.fall'), '#ff9a6a');
+          break;
+        case 'hcCheckpoint':
+          this.log(
+            t('hudChrome.hc.log.checkpoint', {
+              index: formatNumber(ev.index, { maximumFractionDigits: 0 }),
+            }),
+            '#c9a2ff',
+          );
+          triggerHaptic(12, loadHapticsEnabled());
+          break;
+        case 'hcFinish':
+          this.showBanner(
+            t('hudChrome.hc.banner.finish', {
+              place: formatNumber(ev.place, { maximumFractionDigits: 0 }),
+            }),
+          );
+          audio.duelEnd();
+          this.renderer.addShake(0.3);
+          this.renderer.fiestaAugmentBurst(this.sim.playerId);
+          triggerHaptic([20, 40, 20, 40, 70], loadHapticsEnabled());
+          break;
+        case 'hcEnd':
+          if (ev.won) {
+            this.showBanner(t('hudChrome.hc.banner.crown'));
+            this.combatLog(t('hudChrome.hc.banner.crown'), '#ffd75e');
+            audio.fiestaWave();
+            this.renderer.fiestaKillBurst(this.sim.playerId, 'holy');
+            triggerHaptic([30, 50, 30, 50, 90], loadHapticsEnabled());
+          } else {
+            this.combatLog(
+              t('hudChrome.hc.log.placed', {
+                place: formatNumber(ev.place, { maximumFractionDigits: 0 }),
+              }),
+              '#c9a2ff',
+            );
+          }
+          break;
         case 'fiestaWord': {
           const { text, tier, color } = this.fiestaWordParts(ev.flavor, ev.n);
           this.fiestaWordPop(text, color, tier);
@@ -10173,6 +10393,61 @@ export class Hud {
             this.showBanner(t('fiesta.banner.powerup', { name }));
             this.fiestaWordPop(name.toUpperCase(), '#32e0ff', 2);
           }
+          break;
+        }
+        case 'gauntletLight': {
+          if (ev.light === 'green') {
+            this.showBanner(t('hudChrome.gauntlet.greenLight'));
+            audio.gauntletChant(Math.max(0, ev.until - this.gauntletTimeNow()));
+          } else {
+            this.showBanner(t('hudChrome.gauntlet.redLight'));
+            audio.gauntletRedStinger();
+          }
+          break;
+        }
+        case 'gauntletDamage': {
+          this.combatLog(
+            t('hudChrome.gauntlet.vitalityLost', {
+              amount: formatNumber(ev.amount, { maximumFractionDigits: 0 }),
+            }),
+            '#ff7a6a',
+          );
+          this.renderer.addShake(0.14);
+          break;
+        }
+        case 'gauntletEchoJudge': {
+          // The sim's verdict for the viewer's own stone tap: the venue
+          // flashes the clicked stone green (correct) or red (a miss).
+          const run = this.sim.gauntletRun;
+          if (run) this.renderer.gauntletEchoJudge(run.originX, run.originZ, ev.stone, ev.ok);
+          break;
+        }
+        case 'gauntletPoof': {
+          audio.gauntletPoof();
+          this.fiestaWordPop(
+            t('hudChrome.gauntlet.contestantOut', { name: ev.name }),
+            '#c98bff',
+            1,
+          );
+          break;
+        }
+        case 'gauntletEliminated': {
+          this.gauntletOverlay.showEliminated(this.sim.gauntletRun?.survivors ?? 0);
+          this.fiestaWordPop(t('hudChrome.gauntlet.eliminated'), '#ff5a4a', 3);
+          break;
+        }
+        case 'gauntletPodium': {
+          this.gauntletOverlay.showPodium(
+            { first: ev.first, second: ev.second, third: ev.third },
+            ev.won,
+          );
+          if (ev.won) audio.gauntletFanfare();
+          break;
+        }
+        case 'gauntletPhase': {
+          this.gauntletClock.calibrate(ev.remainingS, performance.now());
+          const line = this.gauntletPhaseBanner(ev.phase, ev.trialIndex);
+          if (line) this.showSubzone(line);
           break;
         }
         case 'lockpickOffer':
@@ -10759,6 +11034,12 @@ export class Hud {
       'Trade cancelled.': 'hud.logs.tradeCancelled',
       'Loot method set to Group Loot.': 'hudChrome.masterLoot.methodGroup',
       'Loot Settings: Group Loot.': 'hudChrome.masterLoot.summaryGroup',
+      'You join the Gauntlet queue. Lord Hodric oils the flails in your honor.':
+        'hudChrome.hc.flavor.queueJoin',
+      "The gates of Hodric's Castle grind open. Race to the crown!":
+        'hudChrome.hc.flavor.gatesOpen',
+      'GO! The Gauntlet is open!': 'hudChrome.hc.flavor.go',
+      'Lord Hodric rebuilds his gauntlet. New course, same crown!': 'hudChrome.hc.flavor.rebuild',
     };
     const key = exact[text];
     if (key) return t(key);
@@ -11098,6 +11379,270 @@ export class Hud {
     this.renderFiestaRespawn(f);
     this.renderFiestaOffer(f);
     this.renderFiestaPending(f);
+  }
+
+  // -------------------------------------------------------------------------
+  // The Gauntlet: the live HUD cluster + the recruiter dialog + knockout/podium
+  // overlay. The cluster/overlay/recruit modules own the logic; Hud only feeds them
+  // the wire view and the estimated sim time each frame and routes the SimEvents.
+  // -------------------------------------------------------------------------
+
+  // The Great Pull's screen-space circle, on the EVERY-FRAME tier (never a
+  // cadence band): the shrinking size is the trial's actionable input, so it
+  // must glide at frame rate; a 4Hz repaint reads as the circle snapping down
+  // in steps. The elided writers keep an unchanged frame free.
+  private updateGauntletCircles(): void {
+    const run = this.sim.gauntletRun;
+    this.gauntletCirclesPainter.paint(gauntletCircleModel({ run, time: this.gauntletTimeNow() }));
+  }
+
+  private updateGauntletHud(): void {
+    const run = this.sim.gauntletRun;
+    const time = this.gauntletTimeNow();
+    this.gauntletHudPainter.paint(gauntletHudModel({ run, time }));
+    // Trials are legs-only (the sim rejects every cast; see casting_lifecycle):
+    // the ability rows hide so the bar cannot even suggest pressing one. The
+    // frame stack (player frame, xp bar) stays.
+    const legsOnly = this.gauntletContestantRun() !== null;
+    this.setDisplay(this.actionbarEl, legsOnly ? 'none' : '');
+    this.setDisplay(this.actionbar2El, legsOnly ? 'none' : '');
+    if (this.gauntletRecruit.isOpen)
+      this.gauntletRecruit.update({ eventOpen: this.sim.gauntletOpen, run, time });
+    // Trial input surfaces live in the world (the lectern slab, the echo
+    // table); the desk-style trials also hold an authored camera focus pose.
+    this.updateGauntletFocus();
+    this.updateSigilsStage();
+    // Final Court: the moment the shove comes off cooldown, flash a ground
+    // ring at the rival sized to the shove range; clicking them IS the shove
+    // (the SHOVE button is gone), so the cue lives in the world too.
+    const court = this.gauntletContestantRun()?.court ?? null;
+    const shoveReady = !!court && time >= court.shoveReadyAt;
+    if (shoveReady && !this.gauntletShoveWasReady && court) {
+      const rival = this.sim.entities.get(court.rivalId);
+      if (rival)
+        this.renderer.spawnAoeRing(rival.pos.x, rival.pos.z, GAUNTLET.court.shoveRange, 'arcane');
+    }
+    this.gauntletShoveWasReady = shoveReady;
+    // The court Space shortcut is only meaningful during a run; bind it lazily.
+    if (run) this.bindGauntletKeys();
+    if (run) this.gauntletOverlay.update(run.survivors);
+    else if (this.gauntletOverlay.shown) this.gauntletOverlay.hide();
+  }
+
+  // The authored camera focus for the desk-style trials: glide in when one of
+  // them goes live for a LIVE contestant, release (glide back to the chase
+  // cam) when its view member goes null, the viewer spectates, or the run
+  // ends. Key-diffed so the renderer sees one set per transition.
+  private updateGauntletFocus(): void {
+    const live = this.gauntletContestantRun();
+    // The pull holds no pose: it is standard third person, locked in place by
+    // the station pin, with the circle overlay as its input.
+    const key = live?.sigils ? ('sigils' as const) : live?.echo ? ('echo' as const) : null;
+    if (key === this.gauntletFocusKey) return;
+    this.gauntletFocusKey = key;
+    if (!key || !live) {
+      this.renderer.setCameraFocus(null);
+      return;
+    }
+    const f = GAUNTLET_VENUE.focus[key];
+    // The echo pose slides to the viewer's own table row: players spread
+    // along z, and the sim has already seated the viewer at their mat when
+    // the trial's view member appears.
+    let dz = 0;
+    if (key === 'echo') {
+      const pz = this.sim.player?.pos.z;
+      if (pz !== undefined) {
+        const w = GAUNTLET_VENUE.echo;
+        const half = w.size / 2 - 1.5;
+        const rowZ = Math.max(w.z - half, Math.min(w.z + half, pz - live.originZ));
+        dz = rowZ - w.z;
+      }
+    }
+    this.renderer.setCameraFocus({
+      pos: { x: f.pos.x + live.originX, y: f.pos.y, z: f.pos.z + live.originZ + dz },
+      lookAt: { x: f.lookAt.x + live.originX, y: f.lookAt.y, z: f.lookAt.z + live.originZ + dz },
+    });
+  }
+
+  // The in-world sigils stage. While the trial is live for the viewer (a LIVE
+  // contestant, not spectating), register the venue lectern's interaction rect
+  // as the world-aim surface; when the trial ends however it ends, release
+  // everything. The registration is once-per-trial (the surface field is the
+  // latch); the venue may still be streaming in on the first frames, so
+  // registration retries until the rect exists. Pending trace points flush
+  // here on the batch cadence too, so a held-still pointer mid-stroke still
+  // delivers its tail batch.
+  private updateSigilsStage(): void {
+    const live = this.gauntletContestantRun();
+    const sigils = live?.sigils ?? null;
+    if (!live || !sigils || !this.worldAim) {
+      this.releaseSigilsStage();
+      return;
+    }
+    // Crack only ever DROPS on a fresh pane after a shatter: announce it on the
+    // polite combat live region (the deleted 2D panel's .gs-live equivalent).
+    if (sigils.crack < this.sigilsLastCrack)
+      this.combatAnnouncer.push(t('hudChrome.gauntlet.sigilsShattered'), performance.now());
+    this.sigilsLastCrack = sigils.crack;
+    if (!this.sigilsSurface) {
+      const rect = this.renderer.gauntletSigilSlabRect(live.originX, live.originZ);
+      if (!rect) return; // venue still streaming in; retry next frame
+      this.sigilsOrigin = { x: live.originX, z: live.originZ };
+      this.sigilsTrace.reset();
+      const surface: WorldAimSurface = {
+        rect,
+        onPoint: (u, v, phase) => this.onSigilPoint(u, v, phase),
+      };
+      this.sigilsSurface = surface;
+      this.worldAim.set(surface);
+    }
+    const pts = this.sigilsTrace.drain(false, performance.now());
+    if (pts.length > 0) this.sim.gauntletTrace(pts);
+  }
+
+  private releaseSigilsStage(): void {
+    this.sigilsLastCrack = 0;
+    if (!this.sigilsSurface) return;
+    this.sigilsSurface = null;
+    this.worldAim?.set(null);
+    if (this.sigilsOrigin)
+      this.renderer.setGauntletSigilCursor(this.sigilsOrigin.x, this.sigilsOrigin.z, null);
+    this.sigilsOrigin = null;
+    this.sigilsTrace.reset();
+  }
+
+  // A claimed stroke event on the slab, in rect-local 0..1 face coordinates
+  // (u = down-slope = the shape's y axis; v = across = the shape's x axis).
+  // Points quantize through the shared trace core exactly as the old canvas
+  // panel did; the venue's cursor mote follows the raw face point.
+  private onSigilPoint(u: number, v: number, phase: 'down' | 'move' | 'up'): void {
+    if (!this.sigilsSurface || !this.sigilsOrigin) return;
+    const now = performance.now();
+    if (phase === 'up') {
+      this.renderer.setGauntletSigilCursor(this.sigilsOrigin.x, this.sigilsOrigin.z, null);
+    } else {
+      this.sigilsTrace.sample(
+        shapeLocalFromFraction(v),
+        shapeLocalFromFraction(u),
+        now,
+        phase === 'move',
+      );
+      this.renderer.setGauntletSigilCursor(this.sigilsOrigin.x, this.sigilsOrigin.z, { u, v });
+    }
+    const pts = this.sigilsTrace.drain(phase === 'up', now);
+    if (pts.length > 0) this.sim.gauntletTrace(pts);
+  }
+
+  /** Wired by main.ts: the world-aim registry the sigils stage registers into. */
+  attachWorldAim(aim: { set(surface: WorldAimSurface | null): void }): void {
+    this.worldAim = aim;
+  }
+
+  /** main.ts handlePick intercept: during the court trial, clicking the RIVAL
+   * while the shove is ready IS the shove. A click during cooldown falls
+   * through to normal targeting (the ground ring flash marks readiness). */
+  gauntletCourtClick(id: number): boolean {
+    const run = this.gauntletContestantRun();
+    if (!run?.court || id !== run.court.rivalId) return false;
+    if (this.gauntletTimeNow() < run.court.shoveReadyAt) return false;
+    this.gauntletShoveNow();
+    return true;
+  }
+
+  /** main.ts handlePick pre-empt: during a live echo duel, clicks on the
+   * table's rune stones are the input (the sim only counts them inside the
+   * answer window). Returns true when a stone consumed the click. */
+  gauntletEchoClick(x: number, y: number): boolean {
+    const run = this.gauntletContestantRun();
+    const e = run?.echo;
+    if (!e || e.done) return false;
+    const id = this.renderer.pickVenueTarget(x, y);
+    if (!id || !id.startsWith('echo:')) return false;
+    this.sim.gauntletEcho(Number(id.slice('echo:'.length)));
+    triggerHaptic(10, loadHapticsEnabled());
+    return true;
+  }
+
+  // Throw a shove, gated client-side on the shove cooldown so a spammed button (or
+  // the Space shortcut) does not flood the server with rejected sends.
+  private gauntletShoveNow(): void {
+    const run = this.sim.gauntletRun;
+    if (!run?.court) return;
+    if (this.gauntletTimeNow() < run.court.shoveReadyAt) return;
+    this.sim.gauntletCourt();
+    triggerHaptic(14, loadHapticsEnabled());
+  }
+
+  // Capture-phase Space handler for the court trial: Space fires the shove and
+  // is swallowed so it never doubles as jump. When the trial is not live it
+  // does nothing, so jump is untouched everywhere else. Bound once (idempotent).
+  private gauntletKeyHandler: ((e: KeyboardEvent) => void) | null = null;
+  private bindGauntletKeys(): void {
+    if (this.gauntletKeyHandler) return;
+    const handler = (e: KeyboardEvent): void => {
+      if (e.code !== 'Space' || e.repeat) return;
+      const run = this.sim.gauntletRun;
+      if (run?.court) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        this.gauntletShoveNow();
+      }
+    };
+    this.gauntletKeyHandler = handler;
+    window.addEventListener('keydown', handler, true); // capture: beats game input
+  }
+
+  // The viewer's run while they are a LIVE contestant (staging through podium,
+  // not a lobby wait, not knocked out to the spectator seats), else null. The
+  // legs-only hotbar hide and the vitality-for-health frame swap key off this.
+  private gauntletContestantRun(): import('../world_api').GauntletRunView | null {
+    const run = this.sim.gauntletRun;
+    if (!run || run.phase === 'lobby' || run.phase === 'done' || run.spectating) return null;
+    return run;
+  }
+
+  // Open the recruiter dialog (the gauntlet_recruiter interact branch).
+  openGauntletRecruit(): void {
+    this.gauntletRecruit.open({
+      eventOpen: this.sim.gauntletOpen,
+      run: this.sim.gauntletRun,
+      time: this.gauntletTimeNow(),
+    });
+  }
+
+  // The estimated absolute sim time for the active run's countdowns (0 when idle).
+  private gauntletTimeNow(): number {
+    const run = this.sim.gauntletRun;
+    return run ? this.gauntletClock.estimate(run, performance.now()) : 0;
+  }
+
+  private gauntletPhaseBanner(phase: GauntletPhase, trialIndex: number): string {
+    switch (phase) {
+      case 'staging':
+        return t('hudChrome.gauntlet.phaseStaging');
+      case 'trial':
+        // One banner per game; the sentinel keeps the original key.
+        switch (GAUNTLET.trials[trialIndex]) {
+          case 'sigils':
+            return t('hudChrome.gauntlet.phaseTrialSigils');
+          case 'pull':
+            return t('hudChrome.gauntlet.phaseTrialPull');
+          case 'echo':
+            return t('hudChrome.gauntlet.phaseTrialEcho');
+          case 'span':
+            return t('hudChrome.gauntlet.phaseTrialSpan');
+          case 'court':
+            return t('hudChrome.gauntlet.phaseTrialCourt');
+          default:
+            return t('hudChrome.gauntlet.phaseTrial');
+        }
+      case 'interlude':
+        return t('hudChrome.gauntlet.phaseInterlude');
+      case 'podium':
+        return t('hudChrome.gauntlet.phasePodium');
+      default:
+        return '';
+    }
   }
 
   // "Augment pending" indicator: a banked offer waiting for the player's next
@@ -15570,7 +16115,12 @@ function dungeonDisplayNameFromSource(name: string): string {
 function entityDisplayName(entity: Entity): string {
   if (entity.kind === 'mob')
     return entity.ownerId !== null ? entity.name : mobDisplayName(entity.templateId);
-  if (entity.kind === 'npc') return npcDisplayName(entity.templateId);
+  // Gauntlet contestants carry rolled proper-noun names (like player names,
+  // never translated); every other NPC shows its localized template name.
+  if (entity.kind === 'npc')
+    return entity.templateId.startsWith(GAUNTLET_CONTESTANT_NPC_ID)
+      ? entity.name
+      : npcDisplayName(entity.templateId);
   return entity.name;
 }
 

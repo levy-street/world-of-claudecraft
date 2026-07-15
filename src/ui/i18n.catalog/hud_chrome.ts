@@ -23,6 +23,147 @@ export const hudChromeStrings = {
     notInPartyError: 'You must be in a party to start a ready check.',
     inProgressError: 'A ready check is already in progress.',
   },
+  // The Gauntlet survival event: the recruiter dialog, the live HUD cluster, the
+  // green-light/red-light banners + logs, and the knockout / podium overlay.
+  // {placeholder} tokens: {count}/{total}/{n} are formatNumber counts, {seconds} a
+  // whole-second countdown, {name} a contestant name; {amount} is a formatMoney
+  // value in prizeAria but a plain formatNumber vitality amount in vitalityLost.
+  gauntlet: {
+    title: 'The Gauntlet',
+    pitch: 'Outlast every trial. The last one standing takes the purse.',
+    join: 'Join the Gauntlet',
+    withdraw: 'Withdraw',
+    lobbyJoined: '{count} in the lobby',
+    lobbyCountdown: 'The run begins in {seconds}s',
+    vitality: 'Vitality',
+    survivorsAria: '{count} of {total} still standing',
+    prizeAria: 'Prize pool: {amount}',
+    trialLabel: 'Trial {n} of {total}',
+    go: 'Go',
+    stop: 'Stop',
+    phaseLobby: 'Gathering challengers',
+    phaseStaging: 'Take your marks',
+    phaseTrial: 'The Crossing begins',
+    phaseTrialSigils: 'The etching begins',
+    phaseTrialPull: 'Take up the rope',
+    phaseTrialEcho: "The Keeper's Echo begins",
+    phaseTrialSpan: 'The Brittle Span awaits',
+    phaseTrialCourt: 'The Final Court is drawn',
+    phaseInterlude: 'Trial cleared',
+    phasePodium: 'The Gauntlet is decided',
+    greenLight: 'Green light!',
+    redLight: 'Red light!',
+    vitalityLost: 'You lost {amount} vitality.',
+    contestantOut: '{name} is out!',
+    eliminated: 'ELIMINATED',
+    survivorsLeft: '{count} still standing',
+    spectating: 'Spectating',
+    leave: 'Leave',
+    victory: 'Victory',
+    podiumTitle: 'Final Standings',
+    placeFirst: '1st',
+    placeSecond: '2nd',
+    placeThird: '3rd',
+    // Trial chrome remnants: the trials play out IN THE WORLD (the sigil slab,
+    // the rope and drum, the echo stones, the rival shove), so only the court
+    // role chip, the shatter announcement, and the echo round strip keep HUD
+    // text. {n}/{total} are formatNumber counts, {seconds} a whole-second
+    // countdown.
+    roleAttacker: 'Attacker',
+    roleDefender: 'Defender',
+    sigilsShattered: 'The pane shattered!',
+    echoRound: 'Round {n} of {total}',
+    echoSeconds: '{seconds}s',
+    // The per-trial teaching line: one short sentence on how the live trial
+    // is played, shown under the meta row only while the viewer can act
+    // (hidden for spectators and finishers).
+    hint: {
+      sentinel: 'Run on green. Freeze on red.',
+      sigils: 'Hold the mouse and trace the etched line on the slab.',
+      pull: 'Click each circle just as it shrinks to the inner ring.',
+      echoWatch: 'Watch the stones light up.',
+      echoAnswer: 'Click the stones in the same order.',
+      span: 'Cross the glass. Each pair hides one brittle panel.',
+      court: 'Click your rival when the ring flashes to shove them out.',
+    },
+  },
+  // Hodric's Castle Gauntlet: the Herald's race window, the in-race HUD strip
+  // and board, banners, and log lines.
+  hc: {
+    title: "Hodric's Castle",
+    close: 'Close the Gauntlet window',
+    zoneName: "Hodric's Castle",
+    offlineNote: 'The Gauntlet desk has not synced yet. One moment.',
+    howto:
+      'Three rounds, ten racers, one crown. Lord Hodric rebuilds his gauntlet every round: survive the cut each time (six advance, then three) and win the final. Falls only cost time.',
+    joinQueue: 'Join the Gauntlet',
+    leaveQueue: 'Leave the queue',
+    queuedAt: 'In the queue at position {position}. The field fills to ten.',
+    inMatchNote: 'You are racing. Eyes forward!',
+    practice: 'Practice vs the Court',
+    practiceNote: "Race Lord Hodric's own court: nine challengers, no waiting.",
+    record: 'Crowns {wins} / Races {races}',
+    bestTime: 'Best run {seconds}s',
+    bestNone: 'No finish on the books yet',
+    rank: 'Position {rank} / {total}',
+    finishPlace: 'Finished #{place}',
+    timeLeft: '{seconds}s',
+    overWon: 'The crown is yours!',
+    overPlaced: 'Race over: #{place}',
+    round: 'Round {round}/{rounds}',
+    advance: '{count} advance',
+    spectating: 'Spectating from the gallery',
+    intermissionRebuild: 'Lord Hodric rebuilds his gauntlet!',
+    intermissionQualified: 'You are through. Next round soon.',
+    intermissionEliminated: 'Eliminated! Enjoy the gallery view.',
+    section: {
+      start_yard: 'Start Yard',
+      hammer_bridge: 'The Hammer Bridge',
+      rotor_court: 'The Rotor Court',
+      axe_walk: 'The Axe Walk',
+      drawspan: 'The Drawspan',
+      boulder_climb: 'The Boulder Climb',
+      piston_ledge: 'The Piston Ledge',
+      spinner_court: 'The Spinner Court',
+      landing: 'The Landing',
+      red_ascent: 'The Red Ascent',
+      finish_keep: 'The Finish Keep',
+    },
+    banner: {
+      found: 'The Gauntlet calls!',
+      go: 'GO!',
+      round: 'Round {round}!',
+      qualified: 'QUALIFIED!',
+      eliminated: 'ELIMINATED',
+      finish: 'Finished #{place}!',
+      crown: "You take Hodric's crown!",
+    },
+    log: {
+      queued: 'You join the Gauntlet queue (position {position}).',
+      unqueued: 'You leave the Gauntlet queue.',
+      fall: 'The chasm takes you. Back to the checkpoint.',
+      checkpoint: 'Checkpoint {index} banked.',
+      qualified: 'You qualify for the next round.',
+      eliminated: 'Eliminated in round {round}. The gallery has snacks.',
+      placed: 'You finish the Gauntlet in place {place}.',
+    },
+    // Sim-emitted flavor text (re-localized client-side via the hud.ts
+    // localizeSystemText exact map; see sim/social/hodrics.ts).
+    flavor: {
+      queueJoin: 'You join the Gauntlet queue. Lord Hodric oils the flails in your honor.',
+      gatesOpen: "The gates of Hodric's Castle grind open. Race to the crown!",
+      go: 'GO! The Gauntlet is open!',
+      rebuild: 'Lord Hodric rebuilds his gauntlet. New course, same crown!',
+    },
+    // Sim-emitted error toasts (re-localized client-side via the hud.ts
+    // localizeErrorText exact map).
+    err: {
+      legsOnly: 'Legs only in the Gauntlet: abilities are barred.',
+      inMatch: 'You are already racing the Gauntlet.',
+      dead: 'You cannot queue for the Gauntlet while dead.',
+      arenaConflict: 'Leave the Coliseum before racing the Gauntlet.',
+    },
+  },
   // WoW-style death loop overlay (release -> ghost run -> resurrect). The release
   // button and "You have died." title reuse the hud.core.* keys; these are the
   // ghost-state additions shown once the spirit has been released.

@@ -75,6 +75,7 @@ import {
 import { resolveUiEffectsProfile } from './game/ui_effects_profile';
 import { currentUtcDay } from './game/utc_day';
 import { voice } from './game/voice';
+import { WorldAim } from './game/world_aim';
 import {
   CHAR_SORT_MODES,
   type CharSortMode,
@@ -125,6 +126,7 @@ import { desktopBridge } from './runtime';
 import { pathCrossesFence } from './sim/colliders';
 import { isStunned } from './sim/combat/cc';
 import { ABILITIES, CLASSES } from './sim/content/classes';
+import { HC_HERALD_NPC_ID } from './sim/content/hodrics';
 import { ITEMS, isDelvePos, setActiveWorldContent } from './sim/data';
 import { canEquipItem } from './sim/equipment_rules';
 import { findPlayerPath, resolvePlayerDestination } from './sim/pathfind';
@@ -995,6 +997,10 @@ async function startGame(
   // through IWorld). Private instanced practice works online AND offline, so the
   // button is always available.
   hud.setVcupPracticeAvailable(true);
+  // Offline only: the Gauntlet practice race vs Lord Hodric's court.
+  if (offlineSim) hud.setHcPracticeHook(() => void offlineSim.hcPracticeStart());
+  // Offline only: the Gauntlet practice race vs Lord Hodric's court.
+  if (offlineSim) hud.setHcPracticeHook(() => void offlineSim.hcPracticeStart());
 
   const chatInput = $('#chat-input') as unknown as HTMLTextAreaElement;
   const clickMoveMarker = $('#click-move-marker') as HTMLDivElement;
@@ -2087,6 +2093,8 @@ async function startGame(
     if (bestNpc !== null) {
       const npc = world.entities.get(bestNpc);
       if (npc?.kind === 'npc' && npc.templateId === 'brother_halven') hud.openDelveBoard(bestNpc);
+      else if (npc?.kind === 'npc' && npc.templateId === HC_HERALD_NPC_ID)
+        hud.toggleHodricsWindow();
       else hud.openQuestDialog(bestNpc);
       return;
     }
@@ -2148,7 +2156,28 @@ async function startGame(
     );
   }
 
+  // World-aim glue: while a trial registers an in-world surface (the Gauntlet
+  // sigil slab), a left press that lands on it claims the whole stroke; the
+  // rect-local 0..1 points stream to the surface. A press off the surface
+  // falls through to the normal click path. Movement holds still during a
+  // stroke via the per-frame suspendMovement driver (isWorldPointerStroking),
+  // which also releases it automatically if the trial ends mid-stroke.
+  const worldAim = new WorldAim();
+  hud.attachWorldAim(worldAim);
+  input.worldPointerHook = (phase, x, y) => {
+    const surf = worldAim.surface();
+    if (!surf) return false;
+    const local = renderer.rectPoint(x, y, surf.rect);
+    if (phase === 'down' && !local) return false; // pressed off the surface: normal click
+    if (local) surf.onPoint(local.u, local.v, phase);
+    else if (phase === 'up') surf.onPoint(0, 0, 'up');
+    return true;
+  };
+
   function handlePick(x: number, y: number, button: number): void {
+    // The Keeper's Echo: clicks on the table's rune stones are the input;
+    // anything off the stones falls through to the normal pick.
+    if (button === 0 && hud.gauntletEchoClick(x, y)) return;
     if (hud.isGroundAimActive()) {
       if (button === 2) {
         hud.cancelGroundAim();
@@ -2160,6 +2189,10 @@ async function startGame(
       }
     }
     const id = renderer.pick(x, y);
+    // The Final Court: clicking the rival while the shove is ready IS the
+    // shove (the ring flash marks readiness); on cooldown the click falls
+    // through and just targets them.
+    if (button === 0 && id !== null && hud.gauntletCourtClick(id)) return;
     // OSRS-style click feedback (its own toggle): a brief ground marker, gold for a
     // neutral click and red on a hostile. Both reference games only mark a real action,
     // so the marker stamps where a click actually does something: the click-to-move
@@ -2645,7 +2678,11 @@ async function startGame(
     // character behind it (other windows stay non-modal, as before); the
     // first-spawn intro cinematic holds movement the same way until it lands
     input.setSuspendMovement(
-      !gameInputReady || hud.isModalOpen() || cameraPromptOpen() || intro !== null,
+      !gameInputReady ||
+        hud.isModalOpen() ||
+        cameraPromptOpen() ||
+        intro !== null ||
+        input.isWorldPointerStroking(),
     );
     const playerDead = world.player.dead;
     if (shouldClearAutorunOnDeath(playerWasDead, playerDead)) {
@@ -3118,6 +3155,12 @@ async function startOffline(
     playerName: name,
     devCommands: import.meta.env.DEV,
     valeCupShowcase: true, // idle Sowfield auto-runs a bot exhibition to watch/bet on
+    // The Gauntlet is always joinable offline (the server gates its own window
+    // via GAUNTLET_EVENT / the ops toggle; headless keeps the default closed),
+    // and the lobby starts instantly: no other player can join a single-player
+    // world, so the run backfills with contestants on the spot.
+    gauntletAlwaysOpen: true,
+    gauntletInstantLobby: true,
     world,
   });
   sim.setPlayerSkin(sim.playerId, skin);

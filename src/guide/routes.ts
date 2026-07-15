@@ -169,6 +169,13 @@ export const GUIDE_ROUTES: GuideRoute[] = [
     descKey: 'guide.deedsPage.intro',
   },
   {
+    id: 'hodrics-castle',
+    sub: 'hodrics-castle',
+    navKey: 'guide.nav.hodricsCastle',
+    group: 'compendium',
+    descKey: 'guide.hodricsCastlePage.intro',
+  },
+  {
     id: 'controls',
     sub: 'reference/controls',
     navKey: 'guide.nav.controls',

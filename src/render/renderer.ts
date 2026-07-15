@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { coerceFxTier, nameplateIntervalSec } from '../game/ui_tier_knobs';
 import { cameraOcclusion } from '../sim/colliders';
+import { GAUNTLET_LAYOUT } from '../sim/content/gauntlet';
 import {
   ABILITIES,
   ARENA_SLOT_COUNT,
@@ -16,11 +17,17 @@ import {
   delveOrigin,
   delveSlotAt,
   dungeonAt,
+  GAUNTLET_SLOT_COUNT,
+  gauntletOrigin,
+  HODRICS_SLOT_COUNT,
+  hodricsOrigin,
   INSTANCE_SLOT_COUNT,
   ITEM_SETS,
   instanceOrigin,
   isArenaPos,
   isDelvePos,
+  isGauntletPos,
+  isHodricsPos,
   isYumiMazePos,
   MOBS,
   NPCS,
@@ -31,6 +38,8 @@ import {
   ZONES,
 } from '../sim/data';
 import type { DelveModuleId } from '../sim/delve_layout';
+import { hcCourseFor, hcIdleCourseSeed, hodricsSlotAt } from '../sim/hodrics_course';
+import { HC_HALF_Z } from '../sim/hodrics_layout';
 import type { BiomeId } from '../sim/types';
 import { ALL_CLASSES, type Entity, type SimEvent } from '../sim/types';
 import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
@@ -42,6 +51,7 @@ import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
 import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink';
 import { type BirdsView, buildBirds } from './birds';
 import { type CameraOcclusionState, stepCameraOcclusion } from './camera_collision';
+import { CameraFocus, type CameraFocusPose } from './camera_focus';
 import { characterSoulRendActive } from './character_effects';
 import {
   type AnimState,
@@ -74,6 +84,7 @@ import {
   type FoliageView,
 } from './foliage';
 import { buildGatherNodes } from './gather_nodes';
+import { buildGauntletVenue, type GauntletVenueView } from './gauntlet_venue';
 import {
   GFX,
   type GfxBucketBands,
@@ -84,6 +95,7 @@ import {
   sharedUniforms,
   urlForcedTier,
 } from './gfx';
+import { buildHodricsCastle, type HodricsCastleView } from './hodrics_castle';
 import { buildImpactSite, type ImpactSiteView } from './impact_site';
 import { ensureDelveInteriorKit } from './interior_kit';
 import { buildJailScene } from './jail_scene';
@@ -810,6 +822,12 @@ export class Renderer {
   camYaw = Math.PI;
   camPitch = 0.32;
   camDist = 12;
+  // In-world minigame camera focus (the Gauntlet slab/table/trench framings).
+  private cameraFocus = new CameraFocus();
+  /** Glide the camera to an authored framing; null releases the chase cam. */
+  setCameraFocus(pose: CameraFocusPose | null): void {
+    this.cameraFocus.set(pose);
+  }
   // Map-editor 3D mode: when set, the camera uses this free-cam pose instead of
   // chasing the player (updateCamera honors it and returns early). Editor-only;
   // always null in the shipped game.
@@ -845,6 +863,10 @@ export class Renderer {
   private sloppyCandidates: SloppyPickCandidate[] = [];
   private tmpV2 = new THREE.Vector3();
   private tmpV3 = new THREE.Vector3();
+  // Scratch for rectPoint: it runs at pointer-move rate during a world-aim
+  // stroke (the Gauntlet sigil slab), so no per-call allocation.
+  private tmpNdc = new THREE.Vector2();
+  private tmpPlane = new THREE.Plane();
   // Manual frustum cull for characters. Their skinned meshes keep
   // frustumCulled=false (a skinned mesh's bind-pose bounds don't follow the
   // animated pose, so Three's own cull pops visible rigs out), which means an
@@ -3104,6 +3126,32 @@ export class Renderer {
         }
         break;
       }
+      case 'gauntletPoof': {
+        const gy = groundHeight(ev.x, ev.z, this.sim.cfg.seed);
+        this.vfx.poof({ x: ev.x, y: gy + 0.5, z: ev.z });
+        break;
+      }
+      case 'gauntletPodium': {
+        // The run resolved: a firework volley over the podium steps (the
+        // ceremony anchor lives in the layout data; the run view carries the
+        // instance origin). Winners get a little camera kick on top.
+        const run = this.sim.gauntletRun;
+        if (!run) break;
+        const px = run.originX;
+        const pz = run.originZ + GAUNTLET_LAYOUT.podiumZ - 4;
+        const gy = groundHeight(px, pz, this.sim.cfg.seed);
+        const schools = ['holy', 'arcane', 'fire', 'holy', 'arcane'];
+        for (let i = 0; i < schools.length; i++) {
+          this.vfx.burst(
+            new THREE.Vector3(px - 6 + i * 3, gy + 7 + (i % 2) * 3, pz - 2 + (i % 3)),
+            schools[i],
+            26,
+            1.6,
+          );
+        }
+        if (ev.won) this.addShake(0.5);
+        break;
+      }
     }
   }
 
@@ -3796,9 +3844,80 @@ export class Renderer {
     | 'temple'
     | 'nythraxis'
     | 'delve'
+    | 'gauntlet'
     | 'yumiMaze'
     | 'underwater'
     | 'practice' = 'outdoor';
+  // Hodric's Castle: built once per race slot on approach, kept for the
+  // session (the builtInteriors precedent, no teardown), and driven every
+  // frame with the renderer's interpolated clock (this.time). A slot only
+  // ever enters `hodricsCastles` once its async build resolves; `pending`
+  // tracks in-flight builds so the approach gate does not re-schedule one.
+  private hodricsCastles = new Map<number, HodricsCastleView>();
+  private pendingHodricsSlots = new Set<number>();
+  // The Gauntlet venue: static dressing built once per slot on approach (the
+  // hodrics idiom minus the seed rebuilds), driven per frame for its
+  // light-reactive signal pieces.
+  private gauntletVenues = new Map<number, GauntletVenueView>();
+  private pendingGauntletSlots = new Set<number>();
+
+  // The venue for a run's instance origin (the run view carries originX/Z), or
+  // null while that slot's venue is still streaming in.
+  private gauntletVenueAt(ox: number, oz: number): GauntletVenueView | null {
+    for (const [slot, view] of this.gauntletVenues) {
+      const o = gauntletOrigin(slot);
+      if (o.x === ox && o.z === oz) return view;
+    }
+    return null;
+  }
+
+  /** The sigil lectern's interaction rect (world space) for a run origin, if built. */
+  gauntletSigilSlabRect(
+    ox: number,
+    oz: number,
+  ): {
+    center: { x: number; y: number; z: number };
+    u: { x: number; y: number; z: number };
+    v: { x: number; y: number; z: number };
+  } | null {
+    return this.gauntletVenueAt(ox, oz)?.sigilSlabRect() ?? null;
+  }
+
+  /** Place (or hide, null) the sigil trace cursor mote at a rect-local point. */
+  setGauntletSigilCursor(ox: number, oz: number, p: { u: number; v: number } | null): void {
+    this.gauntletVenueAt(ox, oz)?.setSigilCursor(p);
+  }
+
+  /** Flash the clicked echo stone with the sim's verdict (green ok, red miss). */
+  gauntletEchoJudge(ox: number, oz: number, stone: number, ok: boolean): void {
+    this.gauntletVenueAt(ox, oz)?.echoJudge(stone, ok);
+  }
+
+  /**
+   * Raycast the venues' live click targets (the echo table's rune stones)
+   * and return the nearest hit id, or null. Only visible targets count, so
+   * outside an echo duel this is a handful of cheap bounding checks at most.
+   */
+  pickVenueTarget(clientX: number, clientY: number): string | null {
+    const ndc = this.tmpNdc.set(
+      (clientX / this.viewport.width) * 2 - 1,
+      -(clientY / this.viewport.height) * 2 + 1,
+    );
+    this.raycaster.setFromCamera(ndc, this.camera);
+    let bestId: string | null = null;
+    let bestDist = Number.POSITIVE_INFINITY;
+    for (const venue of this.gauntletVenues.values()) {
+      for (const target of venue.pickTargets()) {
+        if (!target.object.visible) continue;
+        const hits = this.raycaster.intersectObject(target.object, true);
+        if (hits.length > 0 && hits[0].distance < bestDist) {
+          bestDist = hits[0].distance;
+          bestId = target.id;
+        }
+      }
+    }
+    return bestId;
+  }
 
   private buildInterior(interior: string, ox: number, oz: number): void {
     this.dungeons ??= new DungeonInteriors(this.scene, this.lowGfx, this.flames, this.fireLights);
@@ -3908,6 +4027,7 @@ export class Renderer {
     // non-zero pitch origin (the real Sowfield match is {0,0}).
     const po = this.sim.cupInfo?.match?.origin;
     const inPractice = !!po && (po.x !== 0 || po.z !== 0);
+    const inGauntlet = inside && isGauntletPos(px);
     if (inPractice) {
       const idx = this.practiceSkyVariant();
       this.valeCupSky.setVariant(idx);
@@ -3934,6 +4054,24 @@ export class Renderer {
           this.yumiMazeViews.set(i, view);
         }
       }
+    } else if (inGauntlet) {
+      // Open-air venue, no interior copies: raise the event complex for the
+      // slot the player is approaching (once; kept for the session).
+      for (let i = 0; i < GAUNTLET_SLOT_COUNT; i++) {
+        if (this.gauntletVenues.has(i) || this.pendingGauntletSlots.has(i)) continue;
+        const o = gauntletOrigin(i);
+        if (Math.abs(px - o.x) >= 220 || Math.abs(pz - o.z) >= 220) continue;
+        this.pendingGauntletSlots.add(i);
+        void buildGauntletVenue(this.scene, o.x, o.z, (x, y, z) => this.vfx.poof({ x, y, z }))
+          .then((view) => {
+            this.gauntletVenues.set(i, view);
+            this.pendingGauntletSlots.delete(i);
+          })
+          .catch((err) => {
+            this.pendingGauntletSlots.delete(i);
+            console.error('Failed to build the Gauntlet venue:', err);
+          });
+      }
     } else if (inside && isArenaPos(px)) {
       void ensureDungeonAssets().catch(() => undefined);
       // build the Ashen Coliseum copy the player was matched into
@@ -3945,6 +4083,43 @@ export class Renderer {
           this.builtInteriors.add(key);
           this.buildInterior('arena', o.x, o.z);
         }
+      }
+    } else if (inside && isHodricsPos(px)) {
+      // Build (or REBUILD) the Hodric's Castle race slot the player is in.
+      // Lord Hodric regenerates his course every round, so the desired seed
+      // comes from the live match info (idle attract seed between matches);
+      // a seed change tears the old build down and raises the new castle.
+      for (let i = 0; i < HODRICS_SLOT_COUNT; i++) {
+        if (this.pendingHodricsSlots.has(i)) continue;
+        const o = hodricsOrigin(i);
+        if (Math.abs(px - o.x) >= 60 || Math.abs(pz - o.z) >= HC_HALF_Z + 40) continue;
+        const match = this.sim.hcInfo?.match ?? null;
+        const mySlot = hodricsSlotAt(pz);
+        const seed = match && i === mySlot ? match.courseSeed : hcIdleCourseSeed(i);
+        const difficulty = match && i === mySlot ? Math.max(0, match.round - 1) : 0;
+        const built = this.hodricsCastles.get(i);
+        if (built && built.seed === seed) continue;
+        // Read-only: the active-course registry (which collision/camera
+        // sampling reads) is authored by the WORLD, not the renderer, keeping
+        // "render never mutates the world" intact. The offline Sim writes it
+        // in the match module; the online ClientWorld writes it from the wire
+        // (net/online.ts). Both go through the same memoized hcCourseFor, so
+        // what we build here always matches what the sim collides against.
+        const course = hcCourseFor(seed, difficulty);
+        if (built) {
+          built.dispose(this.scene);
+          this.hodricsCastles.delete(i);
+        }
+        this.pendingHodricsSlots.add(i);
+        void buildHodricsCastle(this.scene, o.x, o.z, course)
+          .then((view) => {
+            this.hodricsCastles.set(i, view);
+            this.pendingHodricsSlots.delete(i);
+          })
+          .catch((err) => {
+            this.pendingHodricsSlots.delete(i);
+            console.error("Failed to build Hodric's Castle:", err);
+          });
       }
     } else if (inside) {
       void ensureDungeonAssets().catch(() => undefined);
@@ -3966,7 +4141,9 @@ export class Renderer {
     const inDelve = inside && isDelvePos(px);
     const inYumiMaze = inside && isYumiMazePos(px);
     const interior =
-      inside && !inDelve && !inYumiMaze && !isArenaPos(px) ? dungeonAt(px)?.interior : null;
+      inside && !inDelve && !inYumiMaze && !inGauntlet && !isArenaPos(px)
+        ? dungeonAt(px)?.interior
+        : null;
     const inTemple = interior === 'temple';
     const inNythraxis = interior === 'nythraxis';
     const desired = inPractice
@@ -3979,11 +4156,15 @@ export class Renderer {
             ? 'temple'
             : inNythraxis
               ? 'nythraxis'
-              : inside
-                ? 'dungeon'
-                : camY < waterLevelAt(px, pz) - 0.05
-                  ? 'underwater'
-                  : 'outdoor';
+              : inGauntlet
+                ? 'gauntlet'
+                : isHodricsPos(px)
+                  ? 'outdoor'
+                  : inside && !inGauntlet
+                    ? 'dungeon'
+                    : camY < waterLevelAt(px, pz) - 0.05
+                      ? 'underwater'
+                      : 'outdoor';
     const fog = this.scene.fog as THREE.Fog;
     if (desired !== this.fogState) {
       this.fogState = desired;
@@ -4022,6 +4203,13 @@ export class Renderer {
         fog.color.setHex(this.valeCupSky.fogFor(this.practiceSkyVariant()));
         fog.near = 60;
         fog.far = 420;
+      } else if (desired === 'gauntlet') {
+        // A warm dust haze over the venue: far enough that the Stone Warden
+        // (~100yd from the start line) stays readable, close enough that the
+        // empty band beyond the backdrop dome never shows.
+        fog.color.setHex(0xd3b48c);
+        fog.near = 60;
+        fog.far = 290;
       } else if (desired === 'underwater') {
         fog.color.setHex(0x17506e);
         fog.near = 2;
@@ -4975,6 +5163,16 @@ export class Renderer {
       this.cameraLookAt.y,
       this.cameraLookAt.z,
     );
+    // Hodric's Castle obstacles: analytic pose at the render-interpolated
+    // clock. this.time already tracks sim.time + alpha*DT (both advance from
+    // the same tick origin), so this matches the sim's collision poses phase
+    // for phase, the whole "what you see is what you collide with" contract.
+    for (const castle of this.hodricsCastles.values()) castle.update(this.time);
+    // The Gauntlet venue reacts to the viewer's own run: the Warden's gaze and
+    // the signal pylons follow the sentinel light state (idle amber otherwise).
+    // The viewer's position anchors the echo table rig to their own row.
+    for (const venue of this.gauntletVenues.values())
+      venue.update(this.time, this.sim.gauntletRun, p.pos);
     worldStart = markWorldPhase('props', worldStart);
     this.foliage.update(
       p.pos.x,
@@ -5533,6 +5731,10 @@ export class Renderer {
       this.camera.updateProjectionMatrix();
     }
     this.cameraLookAt.set(px, eyeY, pz);
+    // Minigame focus: mix the chase pose toward the authored framing (and back
+    // out on release), after collision so the glide starts from what the
+    // player actually saw. Focus poses are authored clear of geometry.
+    this.cameraFocus.apply(this.camera.position, this.cameraLookAt, dt);
     this.camera.lookAt(this.cameraLookAt);
     this.camera.updateMatrixWorld();
 
@@ -5547,7 +5749,9 @@ export class Renderer {
         fz = pz - cpz;
       const fl = Math.hypot(fx, fy, fz) || 1;
       sink.setListener(cpx, cpy, cpz, fx / fl, fy / fl, fz / fl);
-      const inDungeon = px > DUNGEON_X_THRESHOLD;
+      // Hodric's Castle is open-air (wind/birds), never the dungeon drone; its
+      // chasm floor is a long fall, not water, so it never reads as a shoreline.
+      const inDungeon = px > DUNGEON_X_THRESHOLD && !isHodricsPos(px);
       const biome = zoneBiomeAt(pz);
       const precip =
         !this.weatherOn || inDungeon
@@ -5559,7 +5763,8 @@ export class Renderer {
               : null;
       // Only at the water's edge / in it — sampled at the player, so a loose
       // threshold made the loop bleed across the low marsh from far off.
-      const nearWater = !inDungeon && groundHeight(px, pz, seed) < waterLevelAt(px, pz) + 0.4;
+      const nearWater =
+        !inDungeon && !isHodricsPos(px) && groundHeight(px, pz, seed) < waterLevelAt(px, pz) + 0.4;
       // Sowfield crowd bed: murmurs near the ground, swells while a match is
       // live (cupInfo is the IWorld mirror, so this works online too).
       const crowd = crowdAmbienceAt(px, pz, inDungeon, !!this.sim.cupInfo?.live);
@@ -5631,6 +5836,49 @@ export class Renderer {
     const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -planeY);
     const hit = new THREE.Vector3();
     return this.raycaster.ray.intersectPlane(plane, hit) ? { x: hit.x, z: hit.z } : null;
+  }
+
+  // In-world minigame surfaces (the Gauntlet sigil slab): where a screen point
+  // meets an authored world-space rectangle, in the rect's local 0..1 face
+  // coordinates. u/v are HALF-extent vectors from the center to the face edges.
+  // A hit just off the face (5% forgiveness) still resolves, clamped, so a
+  // stroke survives a wobbly finger at the rim; further out returns null.
+  rectPoint(
+    clientX: number,
+    clientY: number,
+    rect: {
+      center: { x: number; y: number; z: number };
+      u: { x: number; y: number; z: number };
+      v: { x: number; y: number; z: number };
+    },
+  ): { u: number; v: number } | null {
+    const ndc = this.tmpNdc.set(
+      (clientX / window.innerWidth) * 2 - 1,
+      -(clientY / window.innerHeight) * 2 + 1,
+    );
+    this.raycaster.setFromCamera(ndc, this.camera);
+    const { center, u, v } = rect;
+    const normal = this.tmpV
+      .set(u.y * v.z - u.z * v.y, u.z * v.x - u.x * v.z, u.x * v.y - u.y * v.x)
+      .normalize();
+    this.tmpPlane.setFromNormalAndCoplanarPoint(
+      normal,
+      this.tmpV2.set(center.x, center.y, center.z),
+    );
+    const hit = this.tmpV3;
+    if (!this.raycaster.ray.intersectPlane(this.tmpPlane, hit)) return null;
+    const dx = hit.x - center.x;
+    const dy = hit.y - center.y;
+    const dz = hit.z - center.z;
+    const lu = (dx * u.x + dy * u.y + dz * u.z) / (u.x * u.x + u.y * u.y + u.z * u.z);
+    const lv = (dx * v.x + dy * v.y + dz * v.z) / (v.x * v.x + v.y * v.y + v.z * v.z);
+    const u01 = lu * 0.5 + 0.5;
+    const v01 = lv * 0.5 + 0.5;
+    if (u01 < -0.05 || u01 > 1.05 || v01 < -0.05 || v01 > 1.05) return null;
+    return {
+      u: Math.min(1, Math.max(0, u01)),
+      v: Math.min(1, Math.max(0, v01)),
+    };
   }
 
   pick(clientX: number, clientY: number): number | null {

@@ -267,6 +267,8 @@ export const SIM_LAP_PHASES = [
   'lootRolls',
   'instances',
   'delves',
+  'gauntlet',
+  'hodrics',
   'valecup',
   'dfinder',
   'market',
@@ -305,6 +307,8 @@ export function mobZonePhase(mob: Entity): string {
 
 const ARENA_WIRE_HZ = 0.1;
 const ARENA_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * ARENA_WIRE_HZ)));
+const HC_WIRE_HZ = 2;
+const HC_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * HC_WIRE_HZ)));
 // Vale Cup readout cadence: the CupInfo payload carries whole-second clocks and
 // queue sizes, so 2 Hz keeps the window/indicator live without re-serializing
 // the rosters at 20 Hz. Instant transitions ride the pid-scoped vcup* events.
@@ -621,6 +625,7 @@ export interface ClientSession {
   lastVcupWireTick: number;
   // Dungeon Finder readout, same idea at its own cadence (DF_WIRE_HZ)
   lastDfWireTick: number;
+  lastHcWireTick: number;
   // set when a command or sim event that can change a heavy self field (bags,
   // gear, quests, talents, stats, ...) lands for this session, so the next
   // snapshot re-diffs those fields. Otherwise they're skipped (see
@@ -1061,6 +1066,7 @@ export interface PerfCaptureStatus {
 
 export class GameServer {
   sim: Sim;
+  gauntletWindowOpen = process.env.GAUNTLET_EVENT === '1';
   clients = new Map<number, ClientSession>(); // by pid
   private readonly sessionsByCharacterId = new Map<number, ClientSession>();
   private readonly accountCosmeticsByAccount = new Map<number, AccountCosmetics>();
@@ -1321,6 +1327,7 @@ export class GameServer {
     moderator.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
     moderator.lastVcupWireTick = -VC_WIRE_INTERVAL_TICKS;
     moderator.lastDfWireTick = -DF_WIRE_INTERVAL_TICKS;
+    moderator.lastHcWireTick = -HC_WIRE_INTERVAL_TICKS;
     moderator.sentEnts.clear();
     this.send(moderator, { t: 'spectate', name: target.name });
     this.sendSystemNotice(moderator, `Now spectating ${target.name}.`);
@@ -1346,6 +1353,7 @@ export class GameServer {
     moderator.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
     moderator.lastVcupWireTick = -VC_WIRE_INTERVAL_TICKS;
     moderator.lastDfWireTick = -DF_WIRE_INTERVAL_TICKS;
+    moderator.lastHcWireTick = -HC_WIRE_INTERVAL_TICKS;
     moderator.sentEnts.clear();
     this.send(moderator, { t: 'spectate', name: null });
     if (announce) this.sendSystemNotice(moderator, 'Stopped spectating.');
@@ -1649,6 +1657,7 @@ export class GameServer {
           // Feed the authoritative UTC day to the sim so the delve daily reset (FR-5.1)
           // works without the sim reading the wall clock itself (determinism invariant).
           this.sim.utcDay = new Date().toISOString().slice(0, 10);
+          this.sim.gauntletEventOpen = this.gauntletWindowOpen;
           this.bcastGridNs = 0n;
           this.bcastSelfNs = 0n;
           this.bcSerializeNs = 0n;
@@ -2456,6 +2465,7 @@ export class GameServer {
       lastArenaWireTick: -ARENA_WIRE_INTERVAL_TICKS,
       lastVcupWireTick: -VC_WIRE_INTERVAL_TICKS,
       lastDfWireTick: -DF_WIRE_INTERVAL_TICKS,
+      lastHcWireTick: -HC_WIRE_INTERVAL_TICKS,
       selfHeavyDirty: true,
       lastWireRev: -1,
       sentEnts: new Map(),
@@ -2617,6 +2627,9 @@ export class GameServer {
     session.selfHeavyDirty = true;
     session.lastWireRev = -1;
     session.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
+    session.lastVcupWireTick = -VC_WIRE_INTERVAL_TICKS;
+    session.lastDfWireTick = -DF_WIRE_INTERVAL_TICKS;
+    session.lastHcWireTick = -HC_WIRE_INTERVAL_TICKS;
     this.send(session, {
       t: 'hello',
       pid: session.pid,
@@ -4152,6 +4165,12 @@ export class GameServer {
           sim.arenaAugmentPick(msg.augment, pid);
         break;
       }
+      case 'hc_queue':
+        sim.hcQueueJoin(pid);
+        break;
+      case 'hc_leave':
+        sim.hcQueueLeave(pid);
+        break;
 
       // The Vale Cup (boarball queue at the Sowfield, docs/prd/vale-cup.md).
       // Deliberately NOT in HEAVY_SELF_CMDS: queueing mutates no heavy self
@@ -4582,6 +4601,41 @@ export class GameServer {
         sim.delveRiteChoose(msg.intensity, pid);
         break;
       }
+      case 'gauntlet_join': {
+        sim.gauntletJoin(pid);
+        break;
+      }
+      case 'gauntlet_leave': {
+        sim.gauntletLeave(pid);
+        break;
+      }
+      // Trial inputs: shape-validate the payloads here (bounded sizes, finite
+      // numbers); the sim validates the GAME state (live trial, live
+      // contestant, speed caps) and silently drops stale sends.
+      case 'gauntlet_trace': {
+        if (!Array.isArray(msg.pts) || msg.pts.length === 0 || msg.pts.length > 64) break;
+        if (msg.pts.length % 2 !== 0) break;
+        const pts = msg.pts.map(Number);
+        if (pts.some((v: number) => !Number.isFinite(v) || v < -0.5 || v > 1.5)) break;
+        sim.gauntletTrace(pts, pid);
+        break;
+      }
+      case 'gauntlet_pull_circle': {
+        const id = Number(msg.id);
+        if (!Number.isInteger(id) || id < 0 || id > 100000) break;
+        sim.gauntletPullCircle(id, pid);
+        break;
+      }
+      case 'gauntlet_echo': {
+        const stone = Number(msg.stone);
+        if (!Number.isInteger(stone) || stone < 0 || stone > 7) break;
+        sim.gauntletEcho(stone, pid);
+        break;
+      }
+      case 'gauntlet_court': {
+        sim.gauntletCourt(pid);
+        break;
+      }
       case 'delve_buy': {
         if (typeof msg.delveId !== 'string' || typeof msg.itemId !== 'string') break;
         const e = sim.entities.get(pid);
@@ -4928,6 +4982,10 @@ export class GameServer {
       maybe('df', this.sim.dungeonFinderInfoFor(anchorSession.pid));
       maybe('dfb', this.sim.dungeonFinderBoardView());
     }
+    if (this.sim.tickCount - session.lastHcWireTick >= HC_WIRE_INTERVAL_TICKS) {
+      session.lastHcWireTick = this.sim.tickCount;
+      maybe('hc', this.sim.hcInfoFor(anchorSession.pid));
+    }
     // market info is null unless the player is standing at the Merchant, so it
     // only rides the wire for players actually browsing the World Market
     maybe('market', this.sim.marketInfoFor(anchorSession.pid));
@@ -4964,6 +5022,8 @@ export class GameServer {
     // shape used by the `/dev gather` chat cheat and existing consumers. Wire
     // key `gprof`; see TERSE_TO_IWORLD/ALL_DELTA_KEYS in tests/snapshots.test.ts.
     maybe('gprof', this.sim.gatheringProficiencyFor(anchorSession.pid));
+    maybe('gopen', this.sim.gauntletEventOpen);
+    maybe('grun', this.sim.gauntletRunWire(anchorSession.pid));
     // Book of Deeds: the Renown total and the selected title id, cheap
     // scalars diffed per tick (grants land from sim sites that never mark
     // this session dirty, and the title echo must not wait on the heavy gate).

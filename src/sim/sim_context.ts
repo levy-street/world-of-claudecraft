@@ -15,6 +15,7 @@
 import type { TalentModifiers } from './content/talents';
 import type { DeedRuntime } from './deeds';
 import type { DelayedEvent, GroundAoE } from './entity_roster';
+import type { GauntletRun } from './gauntlet/state';
 import type { PendingLootRoll } from './loot/loot_roll';
 import type { MarketListing } from './market';
 import type { PendingProjectile } from './projectile_travel';
@@ -34,6 +35,7 @@ import type {
   ResolvedAbility,
   TradeSession,
 } from './sim';
+import type { HcMatch, HcQueueUnit } from './social/hodrics';
 import type { FinderFormationUnit } from './social/party';
 import type { VcState } from './social/vale_cup';
 import type { SpatialGrid } from './spatial';
@@ -136,6 +138,13 @@ export interface SimContextPrimitives {
   arenaQueueYumi5: ArenaQueueUnit[];
   readonly yumiBusySlots: Set<number>;
   readonly yumiCatMatches: Map<number, ArenaMatch>;
+  // Hodric's Castle Gauntlet state (social/hodrics.ts), the arena shape: the
+  // queue is reassigned by prune filters (read-write), matches/slots mutate in
+  // place, and the match-id counter is bumped via `ctx.nextHcMatchId++`.
+  hcQueue: HcQueueUnit[];
+  readonly hcMatches: Map<number, HcMatch>;
+  readonly hcBusySlots: Set<number>;
+  nextHcMatchId: number;
   // I2a delve runs: the live run pool (seeded in the Sim ctor, never reassigned) and
   // the transient pet stash both stay Sim-owned (the disconnect path + serializePet
   // poke them); exposed here as live views the run module reads/mutates in place.
@@ -143,6 +152,17 @@ export interface SimContextPrimitives {
   // P1b's nextId dedupes with I1's declaration above.)
   readonly delveRuns: DelveRun[];
   readonly delvePetStash: Map<number, PetState>;
+  // The Gauntlet event (gauntlet/runs.ts). `gauntletRuns` is a dynamic pool
+  // (a run is pushed when a lobby opens and spliced on dispose; the ARRAY
+  // identity stays Sim-owned, mutated in place, so read-only view).
+  // `gauntletEventOpen` is the host-fed window flag (the utcDay idiom: the
+  // server feeds it each loop pass, offline inits it from cfg, headless leaves
+  // the default closed). The recruiter entity id and the run-id counter are
+  // read-write primitives the module assigns.
+  readonly gauntletRuns: GauntletRun[];
+  readonly gauntletEventOpen: boolean;
+  gauntletRecruiterId: number | null;
+  nextGauntletRunId: number;
   // Host-supplied UTC day string ('' = unknown) gating the delve daily reset.
   readonly utcDay: string;
   // Wild-respawn queue (P1b: completeTame pushes the tamed beast's respawn). Live view;
@@ -878,11 +898,47 @@ export function createSimContext(host: SimContextHost): SimContext {
     set nextArenaMatchId(v) {
       host.nextArenaMatchId = v;
     },
+    get hcQueue() {
+      return host.hcQueue;
+    },
+    set hcQueue(v) {
+      host.hcQueue = v;
+    },
+    get hcMatches() {
+      return host.hcMatches;
+    },
+    get hcBusySlots() {
+      return host.hcBusySlots;
+    },
+    get nextHcMatchId() {
+      return host.nextHcMatchId;
+    },
+    set nextHcMatchId(v) {
+      host.nextHcMatchId = v;
+    },
     get delveRuns() {
       return host.delveRuns;
     },
     get delvePetStash() {
       return host.delvePetStash;
+    },
+    get gauntletRuns() {
+      return host.gauntletRuns;
+    },
+    get gauntletEventOpen() {
+      return host.gauntletEventOpen;
+    },
+    get gauntletRecruiterId() {
+      return host.gauntletRecruiterId;
+    },
+    set gauntletRecruiterId(v) {
+      host.gauntletRecruiterId = v;
+    },
+    get nextGauntletRunId() {
+      return host.nextGauntletRunId;
+    },
+    set nextGauntletRunId(v) {
+      host.nextGauntletRunId = v;
     },
     get utcDay() {
       return host.utcDay;

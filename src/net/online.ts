@@ -28,6 +28,7 @@ import { WEAPON_SKINS } from '../sim/content/weapon_skins';
 import { ALL_RECIPES, abilitiesKnownAt, CLASSES, NPCS, resolveDelveShopOffers } from '../sim/data';
 import { deadTargetSelectable } from '../sim/dead_target';
 import { freshDeedStats } from '../sim/deeds';
+import { hcCourseFor, hodricsSlotAt, setActiveHodricsCourse } from '../sim/hodrics_course';
 import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
 import type { Ante, PickAction } from '../sim/lockpick';
 import type { MarketQuery } from '../sim/market_query';
@@ -80,6 +81,7 @@ import {
   type DevLeaderboardPage,
   type DuelInfo,
   type FriendInfo,
+  type GauntletRunView,
   type GuildLeaderboardPage,
   type IWorld,
   isOverheadEmoteId,
@@ -1154,6 +1156,10 @@ export class ClientWorld implements IWorld {
   // resolveSportKit instead of the class/level/talent derivation, so the
   // ONLINE action bar shows the sport kit (docs/prd/vale-cup.md wire trap).
   sportRole: SportRole | null = null;
+  // --- IWorldHodrics: the Gauntlet race view, mirrored from the snapshot self
+  // (`s.hc`, delta-omitted, throttled server-side). ---
+  hcInfo: import('../world_api').HcInfo | null = null;
+  private lastHcCourseSeed = -1;
   // --- IWorldSocialGraph: persistent friends/blocks/guild, set ONLY by the
   // `social`/`socialpos` frames (there is no `s.social` snapshot field). ---
   socialInfo: SocialInfo | null = null;
@@ -1207,6 +1213,8 @@ export class ClientWorld implements IWorld {
   // delveShopOffers can resolve the shop lock badge client-side.
   delveClears: Record<string, number> = {};
   delveDaily: DelveDailyInfo = { date: '', firstClearXp: [], markClears: 0 };
+  gauntletOpen = false;
+  gauntletRun: GauntletRunView | null = null;
   // Gathering profession proficiency (Mining/Logging/Herbalism), the real
   // read surface for #1119; mirrored from the `prof` wire delta below.
   // Crafting/secondary professions still contribute nothing until later
@@ -2129,6 +2137,17 @@ export class ClientWorld implements IWorld {
       if (s.honor !== undefined) this.honor = s.honor ?? 0;
       if (s.lhonor !== undefined) this.lifetimeHonor = s.lhonor ?? 0;
       if (s.vcup !== undefined) this.cupInfo = s.vcup;
+      if (s.hc !== undefined) {
+        this.hcInfo = s.hc;
+        const hcm = s.hc?.match ?? null;
+        if (hcm && hcm.courseSeed !== this.lastHcCourseSeed) {
+          this.lastHcCourseSeed = hcm.courseSeed;
+          const slot = hodricsSlotAt(this.player.pos.z);
+          setActiveHodricsCourse(slot, hcCourseFor(hcm.courseSeed, Math.max(0, hcm.round - 1)));
+        } else if (!hcm) {
+          this.lastHcCourseSeed = -1;
+        }
+      }
       if (s.market !== undefined) this.marketInfo = s.market;
       if (s.mail !== undefined) this.mailInfo = s.mail;
       if (s.mailU !== undefined) this.mailUnread = s.mailU ?? 0;
@@ -2164,6 +2183,8 @@ export class ClientWorld implements IWorld {
       if (s.tfocus !== undefined) this.townFocus = s.tfocus ?? {};
       if (s.gprof !== undefined) this.gatheringProficiency = s.gprof ?? {};
       if (s.prof !== undefined) this.professionsState = s.prof ?? { skills: [] };
+      if (s.gopen !== undefined) this.gauntletOpen = s.gopen ?? false;
+      if (s.grun !== undefined) this.gauntletRun = s.grun;
       // camera follows server-side facing changes when not mouselooking
       if (prevSelfFacing !== undefined && this.mouselookFacing === null) {
         let d = e.facing - prevSelfFacing;
@@ -2686,6 +2707,17 @@ export class ClientWorld implements IWorld {
   vcupPracticeStart(bracket: VcBracket): void {
     this.cmd({ cmd: 'vcup_practice', bracket });
   }
+  // --- IWorldHodrics: the Gauntlet race queue. Practice is an offline harness;
+  // online it is a no-op (the server fields full races with backfill bots). ---
+  hcQueueJoin(): void {
+    this.cmd({ cmd: 'hc_queue' });
+  }
+  hcQueueLeave(): void {
+    this.cmd({ cmd: 'hc_leave' });
+  }
+  hcPracticeStart(): boolean {
+    return false;
+  }
   // --- IWorldSocialGraph: persistent social command sends (resolved server-side by
   // character name) + the REST character typeahead. socialInfo arrives via the
   // social/socialpos frames; searchCharacters is a GET, not a cmd(). ---
@@ -2984,6 +3016,26 @@ export class ClientWorld implements IWorld {
   }
   collectDelveChestLoot(chestId: number): void {
     this.cmd({ cmd: 'collect_delve_chest_loot', objectId: chestId });
+  }
+  gauntletJoin(): void {
+    this.cmd({ cmd: 'gauntlet_join' });
+  }
+  gauntletLeave(): void {
+    this.cmd({ cmd: 'gauntlet_leave' });
+  }
+  // Trial inputs. The sigils trace batches ~24 quantized points per send (a
+  // few hundred bytes, far under the WS frame cap); the rest are tiny.
+  gauntletTrace(pts: number[]): void {
+    this.cmd({ cmd: 'gauntlet_trace', pts });
+  }
+  gauntletPullCircle(id: number): void {
+    this.cmd({ cmd: 'gauntlet_pull_circle', id });
+  }
+  gauntletEcho(stone: number): void {
+    this.cmd({ cmd: 'gauntlet_echo', stone });
+  }
+  gauntletCourt(): void {
+    this.cmd({ cmd: 'gauntlet_court' });
   }
   // Mirror the authoritative craftResult event into lastCraftResult (#1127).
   // The event still flows to the HUD (drainEvents) for a toast/log line.

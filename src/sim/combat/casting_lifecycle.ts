@@ -244,6 +244,30 @@ export function castAbility(
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
+  // Hodric's Gauntlet is legs-only: no ability may fire during a race, so
+  // speed buffs, travel forms, and mounts can never decide it (fairness by
+  // construction; run speed is identical for every racer). Gated here, the
+  // single choke point every cast entry point (castSlot, /cast, ground-target)
+  // funnels through, rather than on one wrapper a sibling entry could bypass.
+  const hcMatch = ctx.hcMatches.get(p.id);
+  if (hcMatch && hcMatch.state !== 'over') {
+    ctx.error(p.id, 'Legs only in the Gauntlet: abilities are barred.');
+    return;
+  }
+  // The Gauntlet event runs under the same law (and the same registered
+  // string): a live contestant may not cast from staging through the podium,
+  // so movement abilities can never cheat a red light or the staging hold.
+  // Knocked-out spectators are free again.
+  const gauntletRun = ctx.gauntletRuns.find((run) => run.playerStates.has(p.id));
+  if (
+    gauntletRun &&
+    gauntletRun.phase !== 'lobby' &&
+    gauntletRun.phase !== 'done' &&
+    !gauntletRun.playerStates.get(p.id)?.spectating
+  ) {
+    ctx.error(p.id, 'Legs only in the Gauntlet: abilities are barred.');
+    return;
+  }
   let res = ctx.resolvedAbility(abilityId, p.id);
   if (!res || p.dead) return;
   meta.lastActiveTick = ctx.tickCount; // a cast attempt is a deliberate action

@@ -162,6 +162,127 @@ export const it_IT: EnTranslations = {
       "notInPartyError": "Devi essere in un gruppo per avviare un controllo di prontezza.",
       "inProgressError": "È già in corso un controllo di prontezza."
     },
+    "gauntlet": {
+      "title": "The Gauntlet",
+      "pitch": "Outlast every trial. The last one standing takes the purse.",
+      "join": "Join the Gauntlet",
+      "withdraw": "Withdraw",
+      "lobbyJoined": "{count} in the lobby",
+      "lobbyCountdown": "The run begins in {seconds}s",
+      "vitality": "Vitality",
+      "survivorsAria": "{count} of {total} still standing",
+      "prizeAria": "Prize pool: {amount}",
+      "trialLabel": "Trial {n} of {total}",
+      "go": "Go",
+      "stop": "Stop",
+      "phaseLobby": "Gathering challengers",
+      "phaseStaging": "Take your marks",
+      "phaseTrial": "The Crossing begins",
+      "phaseTrialSigils": "The etching begins",
+      "phaseTrialPull": "Take up the rope",
+      "phaseTrialEcho": "The Keeper's Echo begins",
+      "phaseTrialSpan": "The Brittle Span awaits",
+      "phaseTrialCourt": "The Final Court is drawn",
+      "phaseInterlude": "Trial cleared",
+      "phasePodium": "The Gauntlet is decided",
+      "greenLight": "Green light!",
+      "redLight": "Red light!",
+      "vitalityLost": "You lost {amount} vitality.",
+      "contestantOut": "{name} is out!",
+      "eliminated": "ELIMINATED",
+      "survivorsLeft": "{count} still standing",
+      "spectating": "Spectating",
+      "leave": "Leave",
+      "victory": "Victory",
+      "podiumTitle": "Final Standings",
+      "placeFirst": "1st",
+      "placeSecond": "2nd",
+      "placeThird": "3rd",
+      "roleAttacker": "Attacker",
+      "roleDefender": "Defender",
+      "sigilsShattered": "The pane shattered!",
+      "echoRound": "Round {n} of {total}",
+      "echoSeconds": "{seconds}s",
+      "hint": {
+        "sentinel": "Run on green. Freeze on red.",
+        "sigils": "Hold the mouse and trace the etched line on the slab.",
+        "pull": "Click each circle just as it shrinks to the inner ring.",
+        "echoWatch": "Watch the stones light up.",
+        "echoAnswer": "Click the stones in the same order.",
+        "span": "Cross the glass. Each pair hides one brittle panel.",
+        "court": "Click your rival when the ring flashes to shove them out."
+      }
+    },
+    "hc": {
+      "title": "Hodric's Castle",
+      "close": "Close the Gauntlet window",
+      "zoneName": "Hodric's Castle",
+      "offlineNote": "The Gauntlet desk has not synced yet. One moment.",
+      "howto": "Three rounds, ten racers, one crown. Lord Hodric rebuilds his gauntlet every round: survive the cut each time (six advance, then three) and win the final. Falls only cost time.",
+      "joinQueue": "Join the Gauntlet",
+      "leaveQueue": "Leave the queue",
+      "queuedAt": "In the queue at position {position}. The field fills to ten.",
+      "inMatchNote": "You are racing. Eyes forward!",
+      "practice": "Practice vs the Court",
+      "practiceNote": "Race Lord Hodric's own court: nine challengers, no waiting.",
+      "record": "Crowns {wins} / Races {races}",
+      "bestTime": "Best run {seconds}s",
+      "bestNone": "No finish on the books yet",
+      "rank": "Position {rank} / {total}",
+      "finishPlace": "Finished #{place}",
+      "timeLeft": "{seconds}s",
+      "overWon": "The crown is yours!",
+      "overPlaced": "Race over: #{place}",
+      "round": "Round {round}/{rounds}",
+      "advance": "{count} advance",
+      "spectating": "Spectating from the gallery",
+      "intermissionRebuild": "Lord Hodric rebuilds his gauntlet!",
+      "intermissionQualified": "You are through. Next round soon.",
+      "intermissionEliminated": "Eliminated! Enjoy the gallery view.",
+      "section": {
+        "start_yard": "Start Yard",
+        "hammer_bridge": "The Hammer Bridge",
+        "rotor_court": "The Rotor Court",
+        "axe_walk": "The Axe Walk",
+        "drawspan": "The Drawspan",
+        "boulder_climb": "The Boulder Climb",
+        "piston_ledge": "The Piston Ledge",
+        "spinner_court": "The Spinner Court",
+        "landing": "The Landing",
+        "red_ascent": "The Red Ascent",
+        "finish_keep": "The Finish Keep"
+      },
+      "banner": {
+        "found": "The Gauntlet calls!",
+        "go": "GO!",
+        "round": "Round {round}!",
+        "qualified": "QUALIFIED!",
+        "eliminated": "ELIMINATED",
+        "finish": "Finished #{place}!",
+        "crown": "You take Hodric's crown!"
+      },
+      "log": {
+        "queued": "You join the Gauntlet queue (position {position}).",
+        "unqueued": "You leave the Gauntlet queue.",
+        "fall": "The chasm takes you. Back to the checkpoint.",
+        "checkpoint": "Checkpoint {index} banked.",
+        "qualified": "You qualify for the next round.",
+        "eliminated": "Eliminated in round {round}. The gallery has snacks.",
+        "placed": "You finish the Gauntlet in place {place}."
+      },
+      "flavor": {
+        "queueJoin": "You join the Gauntlet queue. Lord Hodric oils the flails in your honor.",
+        "gatesOpen": "The gates of Hodric's Castle grind open. Race to the crown!",
+        "go": "GO! The Gauntlet is open!",
+        "rebuild": "Lord Hodric rebuilds his gauntlet. New course, same crown!"
+      },
+      "err": {
+        "legsOnly": "Legs only in the Gauntlet: abilities are barred.",
+        "inMatch": "You are already racing the Gauntlet.",
+        "dead": "You cannot queue for the Gauntlet while dead.",
+        "arenaConflict": "Leave the Coliseum before racing the Gauntlet."
+      }
+    },
     "death": {
       "resurrectAtCorpse": "Risorgi al cadavere",
       "resurrectAtHealer": "Il Custode Pallido (Mal di resurrezione)",
@@ -2141,6 +2262,7 @@ export const it_IT: EnTranslations = {
       "arena": "Arena e PvP",
       "valeCup": "Coppa della Valle",
       "deeds": "Libro delle Imprese",
+      "hodricsCastle": "Hodric's Castle",
       "glossary": "Glossario",
       "wishIKnew": "Cose che avrei voluto sapere",
       "faq": "FAQ",
@@ -2925,6 +3047,20 @@ export const it_IT: EnTranslations = {
         "exploration": "Esplorazione",
         "feat": "Prodezze"
       }
+    },
+    "hodricsCastlePage": {
+      "heading": "Hodric's Castle",
+      "intro": "Lord Hodric opens his castle causeway to any challenger. Race the gauntlet of his old defenses and take the crown, whoever you are, whatever your level.",
+      "heraldHeading": "The Herald",
+      "heraldBody": "Find Herald Osric at the edge of Eastbrook to join the Gauntlet queue. A race starts once ten racers are seated, real players and challengers from Hodric's own court alike, so a race always starts before long.",
+      "courseHeading": "Three rounds, one crown",
+      "courseBody": "The Gauntlet is an elimination show: ten racers start round one, six survive the cut, three reach the final, and one takes the crown. Lord Hodric rebuilds his course between every round, so no two runs are the same: hammer bridges, spinning log courts, axe walks, sliding drawspans, boulder climbs, piston ledges, and rotating platforms, in whatever order pleases his lordship that day. Every obstacle swings, spins, or rolls on its own clockwork rhythm, never at random, so a careful eye can always find the safe window.",
+      "fairnessHeading": "Legs only",
+      "fairnessBody": "Nobody casts a spell here: abilities are barred for the whole race, and every racer runs at the same pace. The Gauntlet is decided by nerve and timing, never by gear or level.",
+      "fallsHeading": "Falls cost time, not blood",
+      "fallsBody": "A knock from an obstacle or a tumble into the chasm only sends you back to your last checkpoint. Nobody dies on the causeway: the only real cost of a fall is the seconds it takes to catch back up. Racers cut at the end of a round are flung to the gallery balcony in style, where they watch the rest of the show with snacks.",
+      "standingsHeading": "The crown",
+      "standingsBody": "First across the final round's finish line takes Hodric's Crown for that show. Your race count, wins, and best final time are yours to build on every time you queue."
     },
     "wishPage": {
       "heading": "Cose che avrei voluto sapere",
@@ -8471,6 +8607,71 @@ export const it_IT: EnTranslations = {
         "name": "Cronista Zenzie",
         "title": "La Cronaca delle Vette",
         "greeting": "La montagna non dimentica nulla, {playerName}, e nemmeno io. Vediamo che cosa hai compiuto."
+      },
+      "gauntlet_recruiter": {
+        "name": "Maro Half-Mask",
+        "title": "Herald of the Gauntlet",
+        "greeting": "Step onto the sand with the rest of them, {className}. Outlast every trial and the podium is yours."
+      },
+      "gauntlet_watcher": {
+        "name": "The Stone Warden",
+        "title": "Keeper of the Crossing",
+        "greeting": "The Warden does not blink."
+      },
+      "gauntlet_contestant": {
+        "name": "Gauntlet Contestant",
+        "title": "Contestant",
+        "greeting": "Eyes forward. The Warden is watching."
+      },
+      "gauntlet_contestant_warrior": {
+        "name": "Gauntlet Contestant",
+        "title": "Contestant",
+        "greeting": "Eyes forward. The Warden is watching."
+      },
+      "gauntlet_contestant_paladin": {
+        "name": "Gauntlet Contestant",
+        "title": "Contestant",
+        "greeting": "Eyes forward. The Warden is watching."
+      },
+      "gauntlet_contestant_hunter": {
+        "name": "Gauntlet Contestant",
+        "title": "Contestant",
+        "greeting": "Eyes forward. The Warden is watching."
+      },
+      "gauntlet_contestant_rogue": {
+        "name": "Gauntlet Contestant",
+        "title": "Contestant",
+        "greeting": "Eyes forward. The Warden is watching."
+      },
+      "gauntlet_contestant_priest": {
+        "name": "Gauntlet Contestant",
+        "title": "Contestant",
+        "greeting": "Eyes forward. The Warden is watching."
+      },
+      "gauntlet_contestant_mage": {
+        "name": "Gauntlet Contestant",
+        "title": "Contestant",
+        "greeting": "Eyes forward. The Warden is watching."
+      },
+      "gauntlet_contestant_warlock": {
+        "name": "Gauntlet Contestant",
+        "title": "Contestant",
+        "greeting": "Eyes forward. The Warden is watching."
+      },
+      "gauntlet_contestant_shaman": {
+        "name": "Gauntlet Contestant",
+        "title": "Contestant",
+        "greeting": "Eyes forward. The Warden is watching."
+      },
+      "gauntlet_contestant_druid": {
+        "name": "Gauntlet Contestant",
+        "title": "Contestant",
+        "greeting": "Eyes forward. The Warden is watching."
+      },
+      "hodrics_herald": {
+        "name": "Herald Osric",
+        "title": "Hodric's Gauntlet Herald",
+        "greeting": "Lord Hodric opens his causeway to all comers! Race the Gauntlet, dodge the flails, take the crown!"
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",

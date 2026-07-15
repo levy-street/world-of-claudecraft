@@ -261,6 +261,46 @@
 
     <div id="castbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" data-i18n-aria="hudChrome.castBar.playerAria" aria-label="Your Cast Bar"><div class="fill"></div><div class="label"></div><div class="timer"></div></div>
     <div id="swingbar" aria-hidden="true"><div class="fill"></div><div class="label"></div></div>
+    <div id="gauntlet-hud" role="group" data-i18n-aria="hudChrome.gauntlet.title" aria-label="The Gauntlet">
+      <div id="gauntlet-phase"></div>
+      <div id="gauntlet-countdown"><div class="fill"></div><div class="timer"></div></div>
+      <div id="gauntlet-meta">
+        <span id="gauntlet-survivors" class="gh-chip" role="status"></span>
+        <span id="gauntlet-prize" class="gh-chip"></span>
+        <span id="gauntlet-light" class="gh-light"></span>
+      </div>
+      <!-- The per-trial teaching line: one short sentence on how the live
+           trial is played (hidden for spectators and finishers). -->
+      <div id="gauntlet-hint"></div>
+      <!-- The Keeper's Echo strip (trial 4): the round counter + answer clock;
+           the duel itself plays out on the table (the flashing rune stones). -->
+      <div id="gauntlet-echo-strip" class="gh-echo">
+        <span id="gauntlet-echo-round" class="gh-chip"></span>
+        <span id="gauntlet-echo-clock" class="gh-chip"></span>
+      </div>
+      <!-- The Final Court role chip (trial 6); the shove is a click on the
+           rival in the world. -->
+      <div id="gauntlet-court" class="gh-court">
+        <span id="gauntlet-court-role" class="gh-court-role"></span>
+      </div>
+    </div>
+
+    <!-- The pre-trial tutorial banner: the upcoming trial's teaching line,
+         big and centered, during the last seconds of staging/interlude
+         (painted by gauntlet_hud_painter from the same hint keys). -->
+    <div id="gauntlet-tutorial" role="status"></div>
+
+    <!-- The Great Pull's shrinking-circle input overlay (trial 3): one pooled
+         circle, positioned per spawn and shrunk per frame by
+         gauntlet_circles_painter from the viewer's wire schedule. The layer is
+         pointer-transparent; only the ring takes the tap. Game input like the
+         canvas, so it stays out of the accessibility tree. -->
+    <div id="gauntlet-circles" aria-hidden="true">
+      <div id="gauntlet-circle">
+        <div class="gc-ring"></div>
+        <div class="gc-target"></div>
+      </div>
+    </div>
 
     <div id="minimap-wrap">
       <div id="zone-label" data-i18n="entities.zones.eastbrook_vale.name">Eastbrook Vale</div>
@@ -386,8 +426,11 @@
     <div id="spellbook" class="window panel"></div>
     <div id="talents-window" class="window panel"></div>
     <div id="quest-log-window" class="window panel"></div>
-    <div id="vendor-window" class="window panel"></div>
-    <div id="town-focus-window" class="window panel"></div>
+      <div id="vendor-window" class="window panel"></div>
+      <div id="town-focus-window" class="window panel"></div>
+      <div id="gauntlet-recruit" class="window panel"></div>
+      <div id="gauntlet-sigils" class="window panel gauntlet-trial-panel"></div>
+      <div id="gauntlet-wager" class="window panel gauntlet-trial-panel"></div>
     <div id="crafting-window" class="window panel"></div>
     <div id="map-window" class="window panel">
       <button type="button" class="x-btn" id="map-close" data-i18n-title="hud.core.closeMap" data-i18n-aria="hud.core.closeMap" title="Close map" aria-label="Close map" data-icon="close"></button>
@@ -402,6 +445,8 @@
     <div id="dungeon-finder-window" class="window panel"></div>
     <div id="dfinder-proposal-popup" class="panel"></div>
     <div id="valecup-window" class="window panel"></div>
+    <div id="hodrics-window" class="window panel"></div>
+    <div id="hodrics-hud"></div>
     <div id="leaderboard-window" class="window panel"></div>
     <div id="daily-rewards-window" class="window panel"></div>
     <div id="claudium-window" class="window panel"></div>

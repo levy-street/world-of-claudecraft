@@ -4662,4 +4662,40 @@
     pointer-events: none;
     filter: drop-shadow(0 2px 14px #000a);
   }
+
+  /* ---------- gauntlet court role chip (trial 6) ---------- */
+  /* The shove is a click on the rival in the world; the chip only names the
+     viewer's current role. */
+  .gh-court {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .gh-court-role {
+    font: 700 12px / 18px var(--title-font);
+    letter-spacing: 1px;
+    color: #fff;
+    border-radius: 9px;
+    padding: 2px 12px;
+    text-shadow: 1px 1px 2px #000;
+    border: 1px solid #000;
+    background: var(--color-text-muted);
+  }
+  .gh-court.attacker .gh-court-role {
+    background: linear-gradient(var(--color-hostile), #b62c22);
+  }
+  .gh-court.defender .gh-court-role {
+    background: linear-gradient(#4a86c8, #2a5a8a);
+  }
+
+  /* ---------- gauntlet echo strip (trial 4) ---------- */
+  /* The round counter + answer clock row inside the gauntlet cluster; the
+     duel itself plays out on the table (the flashing rune stones). */
+  .gh-echo {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
 }

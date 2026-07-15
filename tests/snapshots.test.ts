@@ -10,6 +10,7 @@ vi.mock('../server/db', () => ({
   touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
   insertChatLogs: vi.fn(async () => {}),
+  loadAccountFlair: vi.fn(async () => ({ ai: false, streamer: false, links: {} })),
   walletForAccount: vi.fn(async () => null),
   markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
@@ -25,7 +26,8 @@ import { saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer, wireEntity } from '../server/game';
 import { ClientWorld } from '../src/net/online';
 import { mechHeldWeaponOverride, visualKeyFor } from '../src/render/characters/manifest';
-import { DELVES } from '../src/sim/data';
+import { DELVES, gauntletOrigin } from '../src/sim/data';
+import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
 import { type Aura, DT, type PlayerClass } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
@@ -2472,7 +2474,10 @@ const ALL_DELTA_KEYS = [
   'dstats',
   'duel',
   'equip',
+  'gopen',
   'gprof',
+  'grun',
+  'hc',
   'honor',
   'inv',
   'lhonor',
@@ -2524,7 +2529,10 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   dstats: 'deedStats',
   duel: 'duelInfo',
   equip: 'equipment',
+  gopen: 'gauntletOpen',
   gprof: 'gatheringProficiency',
+  grun: 'gauntletRun',
+  hc: 'hcInfo',
   inv: 'inventory',
   lhonor: 'lifetimeHonor',
   lockouts: 'selfLockouts',
@@ -2658,6 +2666,65 @@ function dirtyEveryDeltaField(): {
     weaponSkinIds: [],
     weaponSkinLoadout: {},
   };
+
+  // `gopen`/`grun`: The Gauntlet event flag + the viewer's run view. A real
+  // gauntlet join is mutually exclusive with the delve run above (the join gate
+  // refuses in-delve players), so seed the run pool the encoder reads directly
+  // with a minimal lobby-phase run holding the leader.
+  sim.gauntletEventOpen = true;
+  sim.gauntletRuns.push({
+    id: 1,
+    slot: 0,
+    seed: 1,
+    rng: new Rng(1),
+    origin: gauntletOrigin(0),
+    phase: 'lobby',
+    trialIndex: 0,
+    phaseEndsAt: 60,
+    prizePool: 10000,
+    contestants: [
+      {
+        entityId: lp,
+        player: true,
+        name: 'Alld',
+        vitality: 100,
+        skill: 0,
+        cls: 'warrior' as const,
+        skin: 0,
+        eliminatedAtTrial: null,
+        script: {
+          speed: 0,
+          fumbleOnFlip: null,
+          planKey: -1,
+          goAt: 0,
+          stopAt: 0,
+          mult: 1,
+          pauseAt: 0,
+          pauseUntil: 0,
+        },
+      },
+    ],
+    playerStates: new Map([
+      [
+        lp,
+        {
+          savedPos: { ...p.pos },
+          savedHp: p.hp,
+          spectating: false,
+          momentumX: 0,
+          momentumZ: 0,
+          heldAt: null,
+          heldUntil: 0,
+          finishedAt: null,
+          bestZ: 0,
+        },
+      ],
+    ]),
+    trial: null,
+    watcherId: null,
+    podium: null,
+    emptyFor: 0,
+  });
 
   // Player Entity fields.
   p.cooldowns.set('heroic_strike', 5);
@@ -2848,9 +2915,9 @@ describe('full self-state snapshot delta fixture', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 44 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(44);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(44);
+  it('ALL_DELTA_KEYS contains exactly 47 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(47);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(47);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2862,7 +2929,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.size).toBe(44);
+    expect(scraped.size).toBe(47);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

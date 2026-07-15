@@ -115,10 +115,13 @@ import {
   FISHING_RARE_ID,
   FISHING_TABLES,
   getActiveWorldContent,
+  hodricsOrigin,
   INSTANCE_SLOT_COUNT,
   ITEMS,
   isArenaPos,
   isDelvePos,
+  isGauntletPos,
+  isHodricsPos,
   MOBS,
   NPCS,
   QUESTS,
@@ -165,6 +168,9 @@ import {
 import { canEquipItem, resolveEquipSlot } from './equipment_rules';
 import { fleeSpeed } from './flee_speed';
 import { formatMoney } from './format_money';
+import * as gauntletMod from './gauntlet/runs';
+import type { GauntletRun } from './gauntlet/state';
+import { hcProgressFrac, hcSectionAt } from './hodrics_course';
 import * as interaction from './interaction';
 import { meetsLevelRequirement } from './item_level_req';
 import * as items from './items';
@@ -349,6 +355,9 @@ export { computeQuestState } from './quests/quest_commands';
 import { completeCurrentQuestsForDev, completeQuestForDev } from './quests/dev_quest_commands';
 import * as arenaMod from './social/arena';
 import * as duelMod from './social/duel';
+import type { HcMatch, HcQueueUnit } from './social/hodrics';
+import * as hodricsMod from './social/hodrics';
+import * as hcBotsMod from './social/hodrics_bots';
 // A4: Protect Yumi (formats yumi3/yumi5); match logic in social/yumi.ts, reached
 // via ctx callbacks + the two hostility arms in isHostileTo/isFriendlyTo.
 import * as yumiMod from './social/yumi';
@@ -414,6 +423,7 @@ import {
   FAERIE_FIRE_ARMOR_PCT,
   FISHING_CAST_ID,
   FISHING_CAST_TIME,
+  type GauntletRunView,
   GCD,
   type HonorArenaDailyState,
   type InvSlot,
@@ -977,6 +987,10 @@ export interface PlayerMeta {
   vcupBetWins: number;
   vcupBetLosses: number;
   vcupBetNet: number;
+  hcRaces?: number;
+  hcWins?: number;
+  hcBest?: number;
+  isHcBot?: boolean;
   // Talents & Specializations. `talents` is the active allocation; `talentMods`
   // is its precomputed flat struct — resolved only on allocation/respec/loadout
   // change (recomputeTalents), never walked on the combat or stat hot path.
@@ -1054,6 +1068,10 @@ export interface PlayerMeta {
   // first persistence await. Session-only: reward and lockout snapshots ignore
   // the departing player so no post-save mutation is discarded on removal.
   leaving?: boolean;
+  // The Gauntlet event stats (persisted in CharacterState). `runs` counts runs
+  // actually started (lobby withdrawals do not count), `wins` podium firsts,
+  // `bestTrial` the most trials ever cleared in one run (trials.length = won).
+  gauntletStats: { runs: number; wins: number; bestTrial: number };
   // World-boss loot lockouts live in `raidLockouts` (keyed worldboss:<mobId>), so the
   // eligibility gate and the rendered raid-lockout countdown are one value. See
   // world_boss.ts (markWorldBossLooted / isWorldBossLootEligible).
@@ -1161,6 +1179,10 @@ export interface CharacterState {
   vcupBetWins?: number;
   vcupBetLosses?: number;
   vcupBetNet?: number;
+  hcRaces?: number;
+  hcWins?: number;
+  hcBest?: number;
+  hcReturnPos?: { x: number; z: number; facing: number } | null;
   // Talents & Specializations (JSONB; no schema migration). All optional so
   // characters saved before talents existed load cleanly (default: no points spent).
   talents?: TalentAllocation;
@@ -1201,6 +1223,8 @@ export interface CharacterState {
   delveLoreUnlocked?: string[];
   delveDaily?: { date: string; firstClearXp: string[]; markClears: number };
   heroicDaily?: { date: string; marked: string[] };
+  // The Gauntlet event stats (JSONB; optional so older saves load as zeroes).
+  gauntletStats?: { runs: number; wins: number; bestTrial: number };
   // Ravenpost welcome letter already sent (optional so pre-mail saves load
   // cleanly and receive the announcement letter once on their next login).
   mailWelcomed?: boolean;
@@ -1368,6 +1392,12 @@ export class Sim {
   // per-bracket queues, the single Sowfield match slot, the Groundskeeper's
   // deserter book, and the live bot pids), exposed as the live ctx.vcup view.
   vcup: VcState = createVcState();
+  hcQueue: HcQueueUnit[] = [];
+  hcMatches = new Map<number, HcMatch>();
+  private hcBusySlots = new Set<number>();
+  private nextHcMatchId = 1;
+  hcPracticeBotPids: number[] = [];
+  hcFillBotPids: number[] = [];
   // per-player chat token bucket (anti-spam); refilled lazily by sim time
   private chatTokens = new Map<number, { tokens: number; at: number }>();
   // per-player set of opt-in global channels (world, lfg) joined via /join
@@ -1377,6 +1407,15 @@ export class Sim {
   // delve instances (separate slot pool from dungeons)
   delveRuns: DelveRun[] = [];
   private delvePetStash = new Map<number, PetState>();
+  // The Gauntlet event (gauntlet/runs.ts): the live run pool (a run is pushed
+  // when a lobby opens and spliced on dispose), the recruiter's live entity id,
+  // and the run-id counter. `gauntletEventOpen` is the host-fed window flag:
+  // the server sets it each loop pass from its event window (the utcDay idiom);
+  // offline inits it from cfg.gauntletAlwaysOpen; headless keeps it closed.
+  gauntletRuns: GauntletRun[] = [];
+  gauntletRecruiterId: number | null = null;
+  nextGauntletRunId = 1;
+  gauntletEventOpen: boolean;
   // Real-world UTC day ('YYYY-MM-DD') for the delve daily reset (FR-5.1). The sim
   // core must stay deterministic, so it never reads the wall clock itself: the host
   // (server/offline client) sets this each tick from `new Date()`. Empty string =
@@ -1432,11 +1471,14 @@ export class Sim {
       lockoutNowMs: cfg.lockoutNowMs ?? (() => Math.floor(this.time * 1000)),
       raidResetMs: cfg.raidResetMs ?? ((nowMs: number) => nowMs + DEFAULT_RAID_LOCKOUT_MS),
       valeCupShowcase: cfg.valeCupShowcase ?? false,
+      gauntletAlwaysOpen: cfg.gauntletAlwaysOpen ?? false,
+      gauntletInstantLobby: cfg.gauntletInstantLobby ?? false,
       // Carried through so the renderer (which reaches the Sim as IWorld) can read
       // the same custom world via sim.cfg.world. Undefined for the built-in world.
       world: cfg.world,
       perfLap: cfg.perfLap,
     };
+    this.gauntletEventOpen = this.cfg.gauntletAlwaysOpen;
     this.rng = new Rng(cfg.seed);
     // Live server opt-in (worldBossAtBoot): the first world-boss rise is due
     // immediately instead of one interval out, so a freshly (re)started realm
@@ -1630,6 +1672,9 @@ export class Sim {
     // Per-instance dungeon/raid healers spawn on claim (instances/dungeons.ts).
     // createNpc draws no rng, so world-gen determinism is preserved.
     spawnOverworldSpiritHealers(this.ctx);
+    // The Gauntlet Herald: guarded, reserved-id, zero rng (goldens never see
+    // him). See social/hodrics.ts spawnHcHerald and HC_HERALD_ID.
+    hodricsMod.spawnHcHerald(this.ctx);
 
     // Groundskeeper Bram at the Sowfield gate (Vale Cup). Placed through the
     // SAME findSafePos path as the generic NPC loop above, but under a RESERVED
@@ -1839,6 +1884,18 @@ export class Sim {
     if (savedPos && isDelvePos(savedPos.x)) {
       const delve = delveAt(savedPos.x) ?? DELVE_LIST[0];
       savedPos = { x: delve.doorPos.x, z: delve.doorPos.z - 4 };
+    } else if (savedPos && isHodricsPos(savedPos.x)) {
+      // Saved mid-race at Hodric's Castle: rejoin where they queued from (the
+      // race instance is long gone); no return recorded falls back to the
+      // world start below.
+      const ret = savedState?.hcReturnPos;
+      savedPos = ret ? { x: ret.x, z: ret.z } : null;
+    } else if (savedPos && isGauntletPos(savedPos.x)) {
+      // Saved mid-run in the Gauntlet band: their run is long gone, and
+      // without this branch the generic dungeon fallback below would eject
+      // them to an unrelated dungeon door. Rejoin at the world start (the
+      // recruiter stands in town when the event is open).
+      savedPos = null;
     } else if (savedPos && savedPos.x > DUNGEON_X_THRESHOLD) {
       const dungeon = dungeonAt(savedPos.x) ?? DUNGEON_LIST[0];
       savedPos = { x: dungeon.doorPos.x, z: dungeon.doorPos.z - 4 };
@@ -1945,6 +2002,7 @@ export class Sim {
       deedStats: freshDeedStats(),
       activeTitle: null,
       renown: 0,
+      gauntletStats: { runs: 0, wins: 0, bestTrial: 0 },
     };
     // A fresh character sets out provisioned (class-defined starter rations);
     // a saved character loads its own bags from savedState below.
@@ -2060,6 +2118,17 @@ export class Sim {
       meta.companionUpgrades = { ...(s.companionUpgrades ?? {}) };
       meta.townFocus = { ...(s.townFocus ?? {}) };
       if (s.delveLoreUnlocked) for (const id of s.delveLoreUnlocked) meta.delveLoreUnlocked.add(id);
+      if (s.gauntletStats) {
+        meta.gauntletStats = {
+          runs: s.gauntletStats.runs ?? 0,
+          wins: s.gauntletStats.wins ?? 0,
+          bestTrial: s.gauntletStats.bestTrial ?? 0,
+        };
+      }
+      if (Number.isSafeInteger(s.hcRaces) && s.hcRaces >= 0) meta.hcRaces = s.hcRaces;
+      if (Number.isSafeInteger(s.hcWins) && s.hcWins >= 0) meta.hcWins = s.hcWins;
+      if (typeof s.hcBest === 'number' && Number.isFinite(s.hcBest) && s.hcBest >= 0)
+        meta.hcBest = s.hcBest;
       if (s.delveDaily) {
         meta.delveDaily = {
           date: s.delveDaily.date,
@@ -2241,6 +2310,15 @@ export class Sim {
     // before the leave save (vcupResolveDesertion is a public delegate).
     valeCupMod.vcupDequeue(this.ctx, pid);
     valeCupMod.vcupResolveDesertion(this.ctx, pid);
+    hodricsMod.hcQueueLeave(this.ctx, pid);
+    const hcMatch = this.hcMatches.get(pid);
+    if (hcMatch) {
+      const racer = hcMatch.racers.get(pid);
+      if (racer) racer.left = true;
+      this.hcMatches.delete(pid);
+      const anyLive = [...hcMatch.racers.values()].some((r) => !r.left && this.entities.has(r.pid));
+      if (!anyLive) hodricsMod.returnFromHcMatch(this.ctx, hcMatch);
+    }
     this.party.partyInvites.delete(pid);
     this.tradeInvites.delete(pid);
     this.duelInvites.delete(pid);
@@ -2286,6 +2364,11 @@ export class Sim {
     const meta = this.players.get(pid);
     if (!meta) return;
     meta.leaving = true;
+    // A Gauntlet participant leaving the world detaches from the run while
+    // their entity and roster are still live. This must happen before the
+    // persistence await in the server leave path, so the run cannot progress
+    // against a disconnecting contestant.
+    gauntletMod.gauntletOnPlayerRemoved(this.ctx, pid);
     // Dungeon Finder teardown FIRST, while the leaver's party/roster still resolves
     // (drops their queue unit, fails their proposal, closes their listing, withdraws
     // their application). It runs HERE, not in removePlayer, because the server calls
@@ -2458,6 +2541,10 @@ export class Sim {
             vcupBetNet: meta.vcupBetNet,
           }
         : {}),
+      ...(meta.hcRaces || meta.hcWins || meta.hcBest !== undefined
+        ? { hcRaces: meta.hcRaces, hcWins: meta.hcWins, hcBest: meta.hcBest }
+        : {}),
+      hcReturnPos: this.hcMatches.get(pid)?.returns.get(pid) ?? undefined,
       talents: cloneAllocation(restore ? restore.talents : meta.talents),
       loadouts: meta.loadouts.map((l) => ({
         name: l.name,
@@ -2488,6 +2575,7 @@ export class Sim {
         markClears: meta.delveDaily.markClears,
       },
       heroicDaily: { date: meta.heroicDaily.date, marked: [...meta.heroicDaily.marked] },
+      gauntletStats: { ...meta.gauntletStats },
       mailWelcomed: meta.mailWelcomed,
       townFocus: { ...meta.townFocus },
       // World-boss lockouts serialize via raidLockouts (above), not a separate field.
@@ -3124,11 +3212,50 @@ export class Sim {
       set nextArenaMatchId(v) {
         sim.nextArenaMatchId = v;
       },
+      get hcQueue() {
+        return sim.hcQueue;
+      },
+      set hcQueue(v) {
+        sim.hcQueue = v;
+      },
+      get hcMatches() {
+        return sim.hcMatches;
+      },
+      get hcBusySlots() {
+        return sim.hcBusySlots;
+      },
+      get nextHcMatchId() {
+        return sim.nextHcMatchId;
+      },
+      set nextHcMatchId(v) {
+        sim.nextHcMatchId = v;
+      },
       get delveRuns() {
         return sim.delveRuns;
       },
       get delvePetStash() {
         return sim.delvePetStash;
+      },
+      // The Gauntlet event live views (gauntlet/runs.ts): the run pool array
+      // identity stays Sim-owned (mutated in place); the recruiter id and the
+      // run-id counter are read-write primitives the module assigns.
+      get gauntletRuns() {
+        return sim.gauntletRuns;
+      },
+      get gauntletEventOpen() {
+        return sim.gauntletEventOpen;
+      },
+      get gauntletRecruiterId() {
+        return sim.gauntletRecruiterId;
+      },
+      set gauntletRecruiterId(v) {
+        sim.gauntletRecruiterId = v;
+      },
+      get nextGauntletRunId() {
+        return sim.nextGauntletRunId;
+      },
+      set nextGauntletRunId(v) {
+        sim.nextGauntletRunId = v;
       },
       get utcDay() {
         return sim.utcDay;
@@ -3874,6 +4001,8 @@ export class Sim {
     lap?.('duels');
     this.updateArena();
     lap?.('arena');
+    this.updateHodrics();
+    lap?.('hodrics');
     this.updateTradesAndInvites();
     this.updateReadyChecks();
     lap?.('trades');
@@ -3883,6 +4012,8 @@ export class Sim {
     lap?.('instances');
     this.updateDelveRuns();
     lap?.('delves');
+    this.updateGauntletRuns();
+    lap?.('gauntlet');
     // The Vale Cup phase draws ZERO shared rng (pure ball physics + timers +
     // tick-staggered bots), so appending it here cannot fork the draw order.
     this.updateValeCup();
@@ -4095,6 +4226,7 @@ export class Sim {
 
   // Body moved to player_motion.ts (MV1); thin delegate (also bound on the seam).
   isSwimming(e: Entity): boolean {
+    if (isHodricsPos(e.pos.x)) return false;
     return isSwimmingImpl(e, this.cfg.seed);
   }
 
@@ -6934,6 +7066,82 @@ export class Sim {
     arenaMod.updateArena(this.ctx);
   }
 
+  private updateHodrics(): void {
+    hodricsMod.updateHodrics(this.ctx);
+    hcBotsMod.updateHcBots(this);
+  }
+
+  hcQueueJoin(pid?: number): void {
+    hodricsMod.hcQueueJoin(this.ctx, pid);
+  }
+  hcQueueLeave(pid?: number): void {
+    hodricsMod.hcQueueLeave(this.ctx, pid);
+  }
+  hcInfoFor(pid: number): import('../world_api').HcInfo | null {
+    const meta = this.players.get(pid);
+    if (!meta) return null;
+    const match = this.hcMatches.get(pid) ?? null;
+    const queuedAt = hodricsMod.hcQueuePosition(this.ctx, pid);
+    const standing = hodricsMod.hcStanding(meta);
+    let matchInfo: import('../world_api').HcMatchInfo | null = null;
+    if (match) {
+      const origin = hodricsOrigin(match.slot);
+      const me = match.racers.get(pid) ?? null;
+      const e = this.entities.get(pid);
+      const myZ = e ? e.pos.z - origin.z : (match.course.checkpoints[0]?.z ?? 0);
+      const racers = [...match.racers.values()]
+        .map((r) => {
+          const re = this.entities.get(r.pid);
+          const liveZ = re && !r.left ? Math.max(r.furthestZ, re.pos.z - origin.z) : r.furthestZ;
+          return {
+            name: r.name,
+            cls: r.cls,
+            bot: r.bot,
+            you: r.pid === pid,
+            progress: r.finished ? 1 : hcProgressFrac(match.course, liveZ),
+            finished: r.finished,
+            place: r.place > 0 ? r.place : null,
+            eliminated: r.eliminatedRound > 0,
+            left: r.left,
+          };
+        })
+        .sort((a, b) => {
+          if (a.place !== null && b.place !== null) return a.place - b.place;
+          if (a.place !== null) return -1;
+          if (b.place !== null) return 1;
+          return b.progress - a.progress;
+        });
+      matchInfo = {
+        state: match.state,
+        countdown: match.state === 'countdown' ? Math.max(0, Math.ceil(match.timer)) : 0,
+        clock: match.clock,
+        round: match.round,
+        rounds: hodricsMod.HC_ROUNDS,
+        qualify: hodricsMod.HC_QUALIFY[match.round - 1] ?? 1,
+        courseSeed: match.courseSeed,
+        timeLeft: Math.max(0, (hodricsMod.HC_ROUND_TIME[match.round - 1] ?? 0) - match.clock),
+        section: hcSectionAt(match.course, myZ).id,
+        checkpoint: me?.checkpoint ?? 0,
+        finished: me?.finished ?? false,
+        place: me && me.place > 0 ? me.place : null,
+        eliminated: (me?.eliminatedRound ?? 0) > 0,
+        falls: me?.falls ?? 0,
+        racers,
+      };
+    }
+    return {
+      queued: queuedAt > 0 ? { position: queuedAt } : null,
+      standing: standing.races > 0 ? standing : null,
+      match: matchInfo,
+    };
+  }
+  hcPracticeStart(): boolean {
+    return hcBotsMod.startHcPractice(this);
+  }
+  get hcInfo(): import('../world_api').HcInfo | null {
+    return this.primaryId === -1 ? null : this.hcInfoFor(this.primaryId);
+  }
+
   // A3: createFiestaState (FiestaState factory + per-match sub-Rng seed) moved to
   // social/fiesta.ts. Thin delegate keeps the ctx.createFiestaState seam binding
   // (consumed by the moved arena startArenaMatch) resolving into the module.
@@ -7835,6 +8043,47 @@ export class Sim {
 
   private updateDelveRuns(): void {
     runsMod.updateDelveRuns(this.ctx);
+  }
+
+  // --- The Gauntlet event (gauntlet/runs.ts): thin delegates + the IWorld
+  // --- surface. Run state lives on `this.gauntletRuns`; the module reaches it
+  // --- through the seam.
+  private updateGauntletRuns(): void {
+    gauntletMod.updateGauntletRuns(this.ctx);
+  }
+
+  gauntletJoin(pid?: number): void {
+    gauntletMod.gauntletJoin(this.ctx, pid);
+  }
+
+  gauntletLeave(pid?: number): void {
+    gauntletMod.gauntletLeave(this.ctx, pid);
+  }
+  gauntletTrace(pts: number[], pid?: number): void {
+    gauntletMod.gauntletTrace(this.ctx, pid, pts);
+  }
+  gauntletPullCircle(id: number, pid?: number): void {
+    gauntletMod.gauntletPullCircle(this.ctx, pid, id);
+  }
+  gauntletEcho(stone: number, pid?: number): void {
+    gauntletMod.gauntletEcho(this.ctx, pid, stone);
+  }
+  gauntletCourt(pid?: number): void {
+    gauntletMod.gauntletCourt(this.ctx, pid);
+  }
+
+  gauntletRunWire(pid: number): GauntletRunView | null {
+    return gauntletMod.gauntletRunWire(this.ctx, pid);
+  }
+
+  // IWorldGauntlet data members (offline Sim side; ClientWorld mirrors the
+  // `grun` self-wire key and the recruiter's presence online).
+  get gauntletRun(): GauntletRunView | null {
+    return this.gauntletRunWire(this.primaryId);
+  }
+
+  get gauntletOpen(): boolean {
+    return this.gauntletEventOpen;
   }
 
   private ejectToDelveDoor(pid: number, delve: DelveDef): void {

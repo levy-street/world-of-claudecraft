@@ -24,6 +24,7 @@
 // (enforced by tests/architecture.test.ts).
 
 import { bagCapacity, fitsAll } from './bags';
+import { HC_HERALD_NPC_ID } from './content/hodrics';
 import { ITEMS, MOBS, QUESTS, SPIRIT_HEALER_NPC_ID } from './data';
 import * as deedsMod from './deeds';
 import {
@@ -413,6 +414,11 @@ export function interact(ctx: SimContext, pid?: number): void {
         ctx.emit({ type: 'bank', pid: p.id });
         return;
       }
+      if (target.kind === 'npc' && target.templateId === HC_HERALD_NPC_ID) {
+        // The Gauntlet Herald opens the race window (the mailbox shape).
+        ctx.emit({ type: 'hodricsWindow', pid: p.id });
+        return;
+      }
       if (ctx.isQuestInteractionEntity(target)) {
         ctx.talkToNpc(target.id, p.id);
         return;
@@ -425,6 +431,8 @@ export function interact(ctx: SimContext, pid?: number): void {
   let bestObjD2 = INTERACT_RANGE * INTERACT_RANGE;
   let bestQuestEntity: Entity | null = null;
   let bestQuestD2 = INTERACT_RANGE * INTERACT_RANGE;
+  let bestHerald: Entity | null = null;
+  let bestHeraldD2 = INTERACT_RANGE * INTERACT_RANGE;
   ctx.grid.forEachInRadius(p.pos.x, p.pos.z, INTERACT_RANGE, (e, d2) => {
     if (e.kind === 'mob' && e.lootable && d2 < bestCorpseD2) {
       bestCorpse = e;
@@ -438,11 +446,16 @@ export function interact(ctx: SimContext, pid?: number): void {
       bestQuestEntity = e;
       bestQuestD2 = d2;
     }
+    if (e.kind === 'npc' && e.templateId === HC_HERALD_NPC_ID && d2 < bestHeraldD2) {
+      bestHerald = e;
+      bestHeraldD2 = d2;
+    }
   });
   // re-read through wider types: TS cannot see the closure assignments above
   const corpse = bestCorpse as Entity | null;
   const obj = bestObj as Entity | null;
   const questEntity = bestQuestEntity as Entity | null;
+  const herald = bestHerald as Entity | null;
   if (corpse) {
     lootCorpse(ctx, corpse.id, p.id);
     return;
@@ -468,6 +481,14 @@ export function interact(ctx: SimContext, pid?: number): void {
     // Opening the bank window counts as banker business for the NPC ledger.
     deedsMod.onBankerBusinessForDeeds(ctx, r.meta, questEntity.templateId);
     ctx.emit({ type: 'bank', pid: p.id });
+    return;
+  }
+  // The Herald check must resolve BEFORE the generic quest-interaction check:
+  // isQuestInteractionEntity(e) is true for every npc-kind entity regardless
+  // of questIds, so the Herald (a plain npc with no quests) also satisfies it
+  // and would otherwise open an empty gossip dialog instead of the race window.
+  if (herald) {
+    ctx.emit({ type: 'hodricsWindow', pid: p.id });
     return;
   }
   if (questEntity) ctx.talkToNpc(questEntity.id, p.id);
