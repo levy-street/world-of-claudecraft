@@ -286,6 +286,18 @@ converting the bank into Earthen Jolt burst. Neither mechanic adds random draws.
 - Cinderbolt burns for 8 damage per tick at top rank, Pyrelance burns for 12, and both
   tooltips show the complete over-time total.
 
+### Shaman structural + tuning pass
+
+- A Shaman row option must be useful when its row unlocks. No trigger or modified ability
+  may require an ability learned only at a later level.
+- Rebounding Current moves from level 5 to level 8 with Thunder Ward. Rime Lock moves from
+  level 8 to level 14 with Rime Jolt.
+- Springwell moves from level 11 to level 8, while Returning Current moves from level 8 to
+  level 11. Imbued Tempo moves from level 14 to level 5 as the live-at-unlock backfill.
+- Imbued Lifeblood heals for 4% of maximum health per landed imbued auto-attack, scaling
+  from about 8 healing at level 5 to a meaningful cap-level value.
+- Returning Current restores 8% of maximum mana every third Jolt at its new level 11 tier.
+
 ### Mastery rating readiness (owner directive 2026-07-07)
 
 Every spec's mastery must be improvable by a FUTURE mastery stat (an item
