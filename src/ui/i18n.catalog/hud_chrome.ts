@@ -1623,6 +1623,10 @@ export const hudChromeStrings = {
   nameplate: {
     mob: '[{level}] {name}',
     mobElite: '[{level}+] {name}',
+    // Level-only badge rendered in a separate element so the con color applies
+    // to the bracket only, not the mob name text.
+    mobLevel: '{level}',
+    mobEliteLevel: '{level}+',
   },
   // World mouseover tooltip shown when hovering a mob (mob_tooltip_view.ts):
   // name (colored by the nameplate con-color), then "Level N <type>" ({family}

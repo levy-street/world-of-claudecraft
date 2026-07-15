@@ -5176,6 +5176,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.mobile.toggleHaptics'
   | 'hudChrome.nameplate.mob'
   | 'hudChrome.nameplate.mobElite'
+  | 'hudChrome.nameplate.mobEliteLevel'
+  | 'hudChrome.nameplate.mobLevel'
   | 'hudChrome.nativeUpdate.body'
   | 'hudChrome.nativeUpdate.bodyWithVersion'
   | 'hudChrome.nativeUpdate.notNow'

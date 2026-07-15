@@ -1616,7 +1616,9 @@ export const it_IT: EnTranslations = {
     },
     "nameplate": {
       "mob": "[{level}] {name}",
-      "mobElite": "[{level}+] {name}"
+      "mobElite": "[{level}+] {name}",
+      "mobLevel": "{level}",
+      "mobEliteLevel": "{level}+"
     },
     "mobTooltip": {
       "levelFamily": "{family} di livello {level}",

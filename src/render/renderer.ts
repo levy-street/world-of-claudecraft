@@ -579,6 +579,8 @@ export interface EntityView {
   discordEl: HTMLImageElement; // linked-Discord PFP next to the name (other players)
   discordAvatarSig: string; // last-applied discord avatar URL, to diff cheaply
   aiEl: HTMLSpanElement; // operator-set [AI] account tag, inline before the name
+  levelEl: HTMLSpanElement; // mob level badge (e.g. "[5]"), inline before the name; hidden for non-mobs
+  levelSig: string; // cheap-diff for the level badge (levelText|color)
   sparkle?: THREE.Sprite; // ground objects
   objectMesh?: THREE.Object3D;
   objectPoolKey: string | null;
@@ -3537,6 +3539,12 @@ export class Renderer {
     // role colour on the name. Hidden by CSS until the painter toggles .ai-tag on.
     const aiEl = document.createElement('span');
     aiEl.className = 'np-ai';
+    // Mob level badge (e.g. "[5]" / "[5+]"), displayed inline to the left of the
+    // name. Gets the con (difficulty) color from the painter; the name stays white.
+    // Hidden for all non-mob entity kinds (players, NPCs, objects).
+    const levelEl = document.createElement('span');
+    levelEl.className = 'np-level';
+    levelEl.style.display = 'none';
     const nameEl = document.createElement('div');
     nameEl.className = 'np-name';
     nameEl.textContent = e.kind === 'object' ? objectDisplayName(e) : e.name;
@@ -3572,6 +3580,7 @@ export class Renderer {
       devTierEl,
       discordEl,
       aiEl,
+      levelEl,
       nameEl,
       titleEl,
       guildEl,
@@ -3626,6 +3635,7 @@ export class Renderer {
       devTierEl,
       discordEl,
       aiEl,
+      levelEl,
       sparkle,
       objectMesh,
       objectPoolKey,
@@ -3640,6 +3650,7 @@ export class Renderer {
       tierValue: 0,
       devTierValue: 0,
       discordAvatarSig: '',
+      levelSig: '',
       objectCasters,
       viewLights,
       shadowOn: true,

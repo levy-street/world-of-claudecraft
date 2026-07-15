@@ -29,6 +29,9 @@
     text-shadow: 1px 1px 2px #000;
     white-space: nowrap;
     will-change: transform;
+    --nameplate-width: 80px;
+    --nameplate-text-shadow: 1px 1px 3px #000, -1px -1px 3px #000;
+    --nameplate-text-shadow-active: 2px 2px 8px #000, -2px -2px 8px #000;
   }
   .nameplate.has-emote {
     z-index: 30;
@@ -37,17 +40,35 @@
     font-size: 12px;
     font-weight: bold;
     font-family: var(--title-font);
+    color: #fff;
+    text-shadow: var(--nameplate-text-shadow);
     letter-spacing: 0.3px;
     display: inline-block;
+    transition: font-size 0.1s linear;
     vertical-align: middle;
   }
+
+  .np-level {
+    font-size: 19px;
+    font-weight: bold;
+    font-family: var(--title-font);
+    text-shadow: var(--nameplate-text-shadow);
+    letter-spacing: 0.2px;
+    display: inline-block;
+    vertical-align: middle;
+    text-align: right;
+    line-height: 12px;
+    margin-right: 6px;
+  }
   .np-guild {
-    font-size: 10px;
+    text-shadow: var(--nameplate-text-shadow);
+    font-size: 11px;
     font-weight: 700;
     color: #c9dcfb;
     font-family: var(--title-font);
     letter-spacing: 0.2px;
     margin-top: -1px;
+    transition: font-size 0.1s linear;
   }
   /* Book of Deeds title: a subtitle line under a player's name */
   .np-title {
@@ -117,10 +138,11 @@
       0 1px 1px #000;
   }
   .np-hpbar {
-    width: 78px;
-    height: 6px;
+    box-sizing: content-box;
+    width: var(--nameplate-width, 80px);
+    height: 4px;
     background: #2a0000;
-    border: 1px solid #000;
+    border: 1px solid #0000;
     margin: 1px auto 0;
     border-radius: 2px;
   }
@@ -131,7 +153,7 @@
   }
   .np-castbar {
     position: relative;
-    width: 78px;
+    width: var(--nameplate-width, 80px);
     height: 8px;
     background: #1a1205;
     border: 1px solid #000;
@@ -160,25 +182,74 @@
   }
   /* threat plate: this mob is aggroed on me, red bar + soft glow */
   .nameplate.np-threat .np-hpbar {
-    border-color: #ff5a4a;
-    box-shadow: 0 0 6px #ff3b2e99;
+    box-shadow: 0 0 4px 4px #c0392b;
   }
+
   .nameplate.np-threat .np-hpfill {
     background: linear-gradient(#ff6b5e, #a01818);
   }
+
+  .nameplate.np-current-target .np-hpbar {
+    outline: solid 2px #fff8;
+  }
+
+  .nameplate.np-current-target .np-name {
+    font-size: 14px;
+    text-shadow: var(--nameplate-text-shadow);
+  }
+
+  .nameplate.np-current-target .np-guild {
+    font-size: 13px;
+  }
+
+  /* Hostile mobs: red name and red HP bar */
+  .nameplate.np-hostile .np-name {
+    color: #ff5555;
+  }
+
+  .nameplate.np-dead-enemy .np-name {
+    color: #bbb;
+  }
+
+  .nameplate.np-hostile .np-hpbar {
+    border-color: #2e0000;
+  }
+
+  .nameplate.np-hostile .np-hpfill {
+    background: linear-gradient(#ff5555, #cc0000);
+  }
+
+  /* Friendly pet: green name and green HP bar */
+  .nameplate.np-friendly-pet .np-hpbar {
+    border-color: #153701;
+  }
+
+  .nameplate.np-friendly-pet .np-hpfill {
+    background: linear-gradient(#9fdc7f, #5fa040);
+  }
+
+  /* Your pet: blue name and blue HP bar */
+  .nameplate.np-my-pet .np-hpbar {
+    border-color: #042243;
+  }
+
+  .nameplate.np-my-pet .np-hpfill {
+    background: linear-gradient(#7fb8ff, #4080ff);
+  }
+
   /* classic "dragon frame" cue: elite mobs get a golden bar frame, bosses a red one */
-  .np-hpbar.elite {
+  .nameplate .np-hpbar.elite {
     border-color: #f2c84b;
     box-shadow:
       0 0 5px 1px #f2c84baa,
       inset 0 0 2px #ffe9a0cc;
   }
-  .np-hpbar.boss {
-    border-color: #ff5a3c;
-    box-shadow:
-      0 0 7px 1px #ff5a3ccc,
-      inset 0 0 2px #ffd2a0dd;
+
+  .nameplate .np-hpbar.boss {
+    width: calc(1.25 * var(--nameplate-width, 80px));
+    border-width: 2px;
   }
+
   .np-marker {
     font-size: 24px;
     font-weight: bold;

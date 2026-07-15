@@ -1616,7 +1616,9 @@ export const en_XA: EnTranslations = {
     },
     "nameplate": {
       "mob": "[[{level}] {name}]",
-      "mobElite": "[[{level}+] {name}]"
+      "mobElite": "[[{level}+] {name}]",
+      "mobLevel": "[{level}]",
+      "mobEliteLevel": "[{level}+]"
     },
     "mobTooltip": {
       "levelFamily": "[Ļéʋéļ {level} {family}]",

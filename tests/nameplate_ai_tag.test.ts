@@ -56,6 +56,9 @@ function view(): EntityView {
   const nameplate = div('nameplate');
   const aiEl = document.createElement('span');
   aiEl.className = 'np-ai';
+  const levelEl = document.createElement('span');
+  levelEl.className = 'np-level';
+  levelEl.style.display = 'none';
   const group = new THREE.Group();
   group.position.set(0, 0, 0);
   return {
@@ -81,6 +84,7 @@ function view(): EntityView {
     devTierEl: img(),
     discordEl: img(),
     aiEl,
+    levelEl,
     nameplateDisplay: 'none',
     nameplateTransform: '',
     nameplateSig: '',
@@ -92,6 +96,7 @@ function view(): EntityView {
     tierValue: 0,
     devTierValue: 0,
     discordAvatarSig: '',
+    levelSig: '',
   } as unknown as EntityView;
 }
 
