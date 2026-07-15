@@ -468,6 +468,7 @@ export const ko_KR: AdminTranslations = {
   "money.silver": "실버",
   "money.copper": "쿠퍼",
   "class.warrior": "전사",
+  "class.swordmaster": "SwordMaster",
   "class.paladin": "성기사",
   "class.hunter": "사냥꾼",
   "class.rogue": "도적",

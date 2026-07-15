@@ -468,6 +468,7 @@ export const en_XA: AdminTranslations = {
   "money.silver": "[š]",
   "money.copper": "[ç]",
   "class.warrior": "[Ŵáŕŕíóŕ]",
+  "class.swordmaster": "[ŠŵóŕðⱮášţéŕ]",
   "class.paladin": "[Þáļáðíñ]",
   "class.hunter": "[Ĥúñţéŕ]",
   "class.rogue": "[Ŕóĝúé]",

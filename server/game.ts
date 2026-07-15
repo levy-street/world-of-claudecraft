@@ -148,6 +148,7 @@ import {
   ModerationService,
 } from './moderation_service';
 import { consumeMsgToken, createMsgRateBucket, type MsgRateBucketState } from './msg_rate_limit';
+import { canonicalPlayerClassName } from './player_class';
 import { nextRaidResetMs } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
 import { createSerialWriter } from './serial_writer';
@@ -1913,7 +1914,7 @@ export class GameServer {
     this.relayCooldown.set(session.accountId, now);
     const { command, message } = parsed;
     const e = this.sim.entities.get(session.pid);
-    const cls = e ? e.templateId.charAt(0).toUpperCase() + e.templateId.slice(1) : '';
+    const cls = canonicalPlayerClassName(e?.templateId);
     const zone = e
       ? e.dungeonId
         ? (DUNGEONS[e.dungeonId]?.name ?? e.dungeonId)

@@ -468,6 +468,7 @@ export const da_DK: AdminTranslations = {
   "money.silver": "s",
   "money.copper": "k",
   "class.warrior": "Kriger",
+  "class.swordmaster": "SwordMaster",
   "class.paladin": "Paladin",
   "class.hunter": "Jæger",
   "class.rogue": "Slyngel",

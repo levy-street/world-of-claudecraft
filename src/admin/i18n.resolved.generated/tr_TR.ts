@@ -468,6 +468,7 @@ export const tr_TR: AdminTranslations = {
   "money.silver": "g",
   "money.copper": "b",
   "class.warrior": "Savaşçı",
+  "class.swordmaster": "SwordMaster",
   "class.paladin": "Paladin",
   "class.hunter": "Avcı",
   "class.rogue": "Hırsız",

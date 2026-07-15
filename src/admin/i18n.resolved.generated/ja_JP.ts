@@ -468,6 +468,7 @@ export const ja_JP: AdminTranslations = {
   "money.silver": "S",
   "money.copper": "C",
   "class.warrior": "戦士",
+  "class.swordmaster": "SwordMaster",
   "class.paladin": "パラディン",
   "class.hunter": "ハンター",
   "class.rogue": "ローグ",

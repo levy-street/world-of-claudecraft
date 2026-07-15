@@ -5,6 +5,7 @@ import { resolveReportTarget } from '../server/report_target';
 import { DICT as adminDICT, classLabel, setAdminLanguage } from '../src/admin/i18n';
 import { DELVE_MOBS } from '../src/sim/content/delves/mobs';
 import { ABILITIES } from '../src/sim/data';
+import { ALL_CLASSES } from '../src/sim/types';
 import {
   cs_CZ,
   da_DK,
@@ -721,21 +722,10 @@ describe("R2: bug-report errors map to the server's exact emitted bytes", () => 
 
 // --- A1: admin class column is localized (MED-5) ---
 describe('A1: admin classLabel localizes the raw class id', () => {
-  const classIds = [
-    'warrior',
-    'paladin',
-    'hunter',
-    'rogue',
-    'priest',
-    'shaman',
-    'mage',
-    'warlock',
-    'druid',
-  ];
   it('returns a non-id localized label for every class in every locale', () => {
     for (const lang of supportedLanguages) {
       setAdminLanguage(lang);
-      for (const id of classIds) {
+      for (const id of ALL_CLASSES) {
         const label = classLabel(id);
         expect(label.trim().length, `${lang}.${id}`).toBeGreaterThan(0);
         if (lang !== 'en' && lang !== 'en_CA') {

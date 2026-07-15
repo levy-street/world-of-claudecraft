@@ -24,6 +24,7 @@ import {
 import { logger } from './http/logger';
 import { isUniqueViolation, json, parsePngInfo, readBinaryBody } from './http_util';
 import { PLAYERCARD_NEW } from './player_card.newlocales';
+import { isPlayerClass } from './player_class';
 import { recordUsageMetric } from './provider_usage';
 import { REALM_PUBLIC_ORIGIN } from './realm';
 
@@ -470,8 +471,8 @@ function interpolate(template: string, values: Record<string, string | number>):
 
 function classDisplay(cls: string, locale: PublicCardLocale): string {
   const copy = PUBLIC_CARD_COPY[locale];
-  const classId = cls as PlayerClassKey;
-  return copy.classes[classId] ?? EN_CLASSES[classId] ?? copy.unknownClass;
+  if (!isPlayerClass(cls)) return copy.unknownClass;
+  return copy.classes[cls] ?? EN_CLASSES[cls] ?? copy.unknownClass;
 }
 
 // Build a URL/file-safe slug from a character name. Lowercased, non-alphanumerics

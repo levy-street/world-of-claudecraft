@@ -224,17 +224,12 @@ export function localizeAdminError(message: string): string {
 // Operator-facing class label for the dashboard tables/charts. The class id is the
 // raw PlayerClass enum value (e.g. "mage"); render the localized name to match the
 // game client. Unknown ids fall back to the raw id.
-const CLASS_LABEL_IDS = new Set([
-  'warrior',
-  'paladin',
-  'hunter',
-  'rogue',
-  'priest',
-  'shaman',
-  'mage',
-  'warlock',
-  'druid',
-]);
+const CLASS_LABEL_PREFIX = 'class.';
+const CLASS_LABEL_IDS = new Set(
+  Object.keys(DICT.en)
+    .filter((key) => key.startsWith(CLASS_LABEL_PREFIX))
+    .map((key) => key.slice(CLASS_LABEL_PREFIX.length)),
+);
 export function classLabel(classId: string): string {
   return CLASS_LABEL_IDS.has(classId) ? t(`class.${classId}`) : classId;
 }
