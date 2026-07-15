@@ -4513,7 +4513,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 10,
     cost: 0,
     castTime: 0,
-    cooldown: 180,
+    cooldown: 120,
     range: 0,
     school: 'frost',
     requiresTarget: false,

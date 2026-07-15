@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { onDamageTaken } from '../src/sim/combat/talent_procs';
 import { MAGE_CHOICE_ROWS } from '../src/sim/content/choice_rows_classic';
+import { ABILITIES } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 
 function mage(rows: Record<number, string> = {}): Sim {
@@ -11,6 +12,11 @@ function mage(rows: Record<number, string> = {}): Sim {
 }
 
 describe('PBE-2 Mage feedback', () => {
+  it('aligns the Icy Veins cooldown with Flashfire at 120 seconds', () => {
+    expect(ABILITIES.icy_veins.cooldown).toBe(120);
+    expect(ABILITIES.icy_veins.cooldown).toBe(ABILITIES.combustion.cooldown);
+  });
+
   it('makes Flickerstep baseline and keeps three distinct level-17 choices', () => {
     const baseline = mage();
     expect(baseline.known.some((known) => known.def.id === 'blink')).toBe(true);
