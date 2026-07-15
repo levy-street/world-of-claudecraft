@@ -1538,7 +1538,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 5,
       theme: 'elements',
-      decision: 'Arc Bolt-fed free jolt vs reflected-hit instant bolt vs imbued sustain',
+      decision: 'Arc Bolt-fed free jolt vs Jolt-fed mana vs imbued sustain',
       options: [
         {
           id: 'sha_r5_concussion',
@@ -1563,24 +1563,20 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
           },
         },
         {
-          id: 'sha_r5_improved_lightning_shield',
-          name: 'Rebounding Current',
-          description:
-            'When your Thunder Ward reflects a strike, your next Arc Bolt within 8 sec is instant.',
-          icon: 'lightning_shield',
+          id: 'sha_r8_shock_efficiency',
+          name: 'Returning Current',
+          description: 'Every 3rd Jolt restores 30 mana.',
+          icon: 'earth_shock',
           effect: {
             proc: {
-              id: 'sha_ward_surge',
-              name: 'Rebounding Current',
-              trigger: { on: 'thornsReflect', ability: 'lightning_shield' },
-              responses: [
-                {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_instant',
-                  abilities: ['lightning_bolt'],
-                  duration: 8,
-                },
-              ],
+              id: 'sha_returning_current',
+              name: 'Returning Current',
+              trigger: {
+                on: 'castNth',
+                n: 3,
+                abilities: ['earth_shock', 'flame_shock', 'frost_shock'],
+              },
+              responses: [{ kind: 'resource', amount: 30, resourceType: 'mana' }],
             },
           },
         },
@@ -1603,7 +1599,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 8,
       theme: 'jolts',
-      decision: 'interrupting Earthen Jolt vs rooting Rime Jolt vs Jolt-fed mana',
+      decision: 'interrupting Earthen Jolt vs rooting Rime Jolt vs reflected-hit instant bolt',
       options: [
         {
           id: 'sha_r8_improved_earth_shock',
@@ -1624,20 +1620,24 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
           },
         },
         {
-          id: 'sha_r8_shock_efficiency',
-          name: 'Returning Current',
-          description: 'Every 3rd Jolt restores 30 mana.',
-          icon: 'earth_shock',
+          id: 'sha_r5_improved_lightning_shield',
+          name: 'Rebounding Current',
+          description:
+            'When your Thunder Ward reflects a strike, your next Arc Bolt within 8 sec is instant.',
+          icon: 'lightning_shield',
           effect: {
             proc: {
-              id: 'sha_returning_current',
-              name: 'Returning Current',
-              trigger: {
-                on: 'castNth',
-                n: 3,
-                abilities: ['earth_shock', 'flame_shock', 'frost_shock'],
-              },
-              responses: [{ kind: 'resource', amount: 30, resourceType: 'mana' }],
+              id: 'sha_ward_surge',
+              name: 'Rebounding Current',
+              trigger: { on: 'thornsReflect', ability: 'lightning_shield' },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_instant',
+                  abilities: ['lightning_bolt'],
+                  duration: 8,
+                },
+              ],
             },
           },
         },
