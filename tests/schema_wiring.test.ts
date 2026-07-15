@@ -28,11 +28,23 @@ const h = vi.hoisted(() => {
     state,
     query,
     connect: vi.fn(() => Promise.resolve({ query, release: vi.fn() })),
+    clientConfigs: [] as unknown[],
   };
 });
 vi.mock('pg', () => ({
   Pool: vi.fn(function Pool() {
     return { query: h.query, connect: h.connect };
+  }),
+  // ensureSchema boots on a dedicated Client (resolved at call time), never a
+  // pool checkout; record each construction config so a test can pin that the
+  // boot client escapes the pool's timeout configuration.
+  Client: vi.fn(function Client(config: unknown) {
+    h.clientConfigs.push(config);
+    return {
+      connect: vi.fn(() => Promise.resolve()),
+      query: h.query,
+      end: vi.fn(() => Promise.resolve()),
+    };
   }),
 }));
 
@@ -46,6 +58,22 @@ describe('ensureSchema wires every schema module at boot', () => {
   beforeEach(() => {
     h.calls.length = 0;
     h.state.rateLimitsExists = true;
+    h.clientConfigs.length = 0;
+  });
+
+  it('boots on a dedicated client with no pool timeout config (the driver query_timeout must never cap the advisory-lock wait or the backfill)', async () => {
+    h.connect.mockClear();
+    await ensureSchema();
+    expect(h.clientConfigs.length).toBeGreaterThan(0);
+    const cfg = h.clientConfigs.at(-1) as Record<string, unknown>;
+    expect(typeof cfg.connectionString).toBe('string');
+    // query_timeout is a driver-side per-query timer that SET LOCAL cannot
+    // lift; the boot client must not carry it (nor any other pool deadline).
+    expect('query_timeout' in cfg).toBe(false);
+    expect('statement_timeout' in cfg).toBe(false);
+    expect('connectionTimeoutMillis' in cfg).toBe(false);
+    // The pool was never dipped into for boot work.
+    expect(h.connect).not.toHaveBeenCalled();
   });
 
   it('applies the Discord schema so its tables exist before the feature is enabled', async () => {
@@ -111,6 +139,19 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain('password_set');
   });
 
+  it('disables the statement timeout for the boot transaction before the advisory lock', async () => {
+    // Boot DDL serializes on the advisory lock across concurrent realm processes and
+    // may legitimately wait far past any request budget, so the boot transaction runs
+    // with statement_timeout disabled (SET LOCAL, reverts at COMMIT). The pool's own
+    // default statement_timeout would otherwise cancel schema setup under a pile-up.
+    await ensureSchema();
+    const setLocalIdx = h.calls.findIndex((c) => c === 'SET LOCAL statement_timeout = 0');
+    const lockIdx = h.calls.findIndex((c) => c.includes('pg_advisory_xact_lock'));
+    expect(setLocalIdx).toBeGreaterThanOrEqual(0);
+    // It must run before the advisory-lock wait it exists to protect.
+    expect(setLocalIdx).toBeLessThan(lockIdx);
+  });
+
   it('applies payout void metadata and append-only moderation audit storage', async () => {
     await ensureSchema();
     const applied = h.calls.join('\n');
@@ -154,6 +195,11 @@ describe('ensureSchema wires every schema module at boot', () => {
     const applied = h.calls.join('\n');
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS character_leases');
     expect(applied).toContain('CREATE INDEX IF NOT EXISTS character_leases_holder');
+    // The same-account takeover column is added at boot on existing databases (the
+    // owner reclaiming a lease stranded by a dead process); additive and idempotent.
+    expect(applied).toContain(
+      'ALTER TABLE character_leases ADD COLUMN IF NOT EXISTS account_id INT',
+    );
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS bank_ledger');
     expect(applied).toContain('CREATE INDEX IF NOT EXISTS bank_ledger_character');
     expect(applied).toContain('CREATE INDEX IF NOT EXISTS bank_ledger_created');

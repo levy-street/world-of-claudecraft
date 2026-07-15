@@ -12,6 +12,7 @@ import {
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import ffmpegPath from 'ffmpeg-static';
+import ffprobeStatic from 'ffprobe-static';
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error untyped zero-dependency authoring tool (scripts/*.mjs convention)
 import * as exportBundleModule from '../scripts/sfx_studio/export_bundle.mjs';
@@ -164,6 +165,34 @@ describe('SFX production bundle', () => {
       rmSync(fixture, { recursive: true, force: true });
     }
   }, 30_000);
+
+  it('measures the production-conformance verdict with the bundled ffmpeg toolchain', () => {
+    // The export validator must resolve the same binaries that gate the checked-in
+    // assets (scripts/sfx_conform.mjs / npm run sfx:check use ffmpeg-static and
+    // ffprobe-static), not the PATH ffmpeg the Studio spawns for playback. A newer
+    // PATH ffmpeg measures MP3 duration a few tens of milliseconds shorter, which
+    // flips these clips across the one-second peak/LUFS branch boundary and rejects a
+    // clip the gate accepts. Pinning the resolution keeps that regression from
+    // silently returning.
+    expect(exportBundleModule.CONFORMANCE_FFMPEG_PATH).toBe(ffmpegPath);
+    expect(exportBundleModule.CONFORMANCE_FFPROBE_PATH).toBe(ffprobeStatic.path);
+    // The constants alone do not prove the validator USES them: pin the call-site
+    // wiring so a revert to the PATH binaries (which only misbehaves on machines
+    // whose PATH ffmpeg diverges from the bundled one) reds deterministically.
+    const exportSrc = readFileSync(join(ROOT, 'scripts/sfx_studio/export_bundle.mjs'), 'utf8');
+    expect(exportSrc).toContain('ffmpegPath: CONFORMANCE_FFMPEG_PATH');
+    expect(exportSrc).toContain('ffprobePath: CONFORMANCE_FFPROBE_PATH');
+    for (const clip of [
+      'mob_demon_hurt',
+      'mob_humanoid_hurt_2',
+      'mob_troll_hurt',
+      'mob_reptile_death_2',
+    ]) {
+      expect(assertExportableSfxTrack(join(ROOT, `public/audio/sfx/${clip}.mp3`)), clip).toMatch(
+        /^[a-f0-9]{64}$/,
+      );
+    }
+  });
 
   it('is byte deterministic and includes the exact published runtime state', () => {
     const first = buildSfxProductionBundle(ROOT);

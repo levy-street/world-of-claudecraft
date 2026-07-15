@@ -329,7 +329,7 @@ describe('GameServer sessions', () => {
     const slowSave = new Promise<void>((resolve) => {
       resolveSave = resolve;
     });
-    vi.mocked(saveCharacterAndMarketState).mockImplementationOnce(() => slowSave);
+    vi.mocked(saveCharacterAndMarketState).mockImplementationOnce(() => slowSave.then(() => true));
 
     const leaving = server.leave(first, 'test');
     await vi.waitFor(() => {
@@ -364,7 +364,7 @@ describe('GameServer sessions', () => {
       resolveSave = resolve;
     });
     const savesBefore = vi.mocked(saveCharacterAndMarketState).mock.calls.length;
-    vi.mocked(saveCharacterAndMarketState).mockImplementationOnce(() => slowSave);
+    vi.mocked(saveCharacterAndMarketState).mockImplementationOnce(() => slowSave.then(() => true));
 
     const leaving = server.leave(leaver, 'test');
     await vi.waitFor(() => {
@@ -396,7 +396,7 @@ describe('GameServer sessions', () => {
       resolveSave = resolve;
     });
     const savesBefore = vi.mocked(saveCharacterAndMarketState).mock.calls.length;
-    vi.mocked(saveCharacterAndMarketState).mockImplementationOnce(() => slowSave);
+    vi.mocked(saveCharacterAndMarketState).mockImplementationOnce(() => slowSave.then(() => true));
 
     const leaving = server.leave(leaver, 'test');
     await vi.waitFor(() => {
@@ -454,7 +454,7 @@ describe('GameServer sessions', () => {
       resolveSave = resolve;
     });
     const savesBefore = vi.mocked(saveCharacterAndMarketState).mock.calls.length;
-    vi.mocked(saveCharacterAndMarketState).mockImplementationOnce(() => slowSave);
+    vi.mocked(saveCharacterAndMarketState).mockImplementationOnce(() => slowSave.then(() => true));
 
     const leaving = server.leave(leaver, 'test');
     await vi.waitFor(() => {
@@ -558,7 +558,7 @@ describe('GameServer sessions', () => {
       resolveSave = resolve;
     });
     const savesBefore = vi.mocked(saveCharacterAndMarketState).mock.calls.length;
-    vi.mocked(saveCharacterAndMarketState).mockImplementationOnce(() => slowSave);
+    vi.mocked(saveCharacterAndMarketState).mockImplementationOnce(() => slowSave.then(() => true));
 
     const leaving = server.leave(leaver, 'test');
     await vi.waitFor(() => {
@@ -622,7 +622,7 @@ describe('GameServer sessions', () => {
       resolveSave = resolve;
     });
     const savesBefore = vi.mocked(saveCharacterAndMarketState).mock.calls.length;
-    vi.mocked(saveCharacterAndMarketState).mockImplementationOnce(() => slowSave);
+    vi.mocked(saveCharacterAndMarketState).mockImplementationOnce(() => slowSave.then(() => true));
 
     const leaving = server.leave(leaver, 'test');
     await vi.waitFor(() => {
@@ -667,7 +667,7 @@ describe('GameServer sessions', () => {
     vi.mocked(saveCharacterAndMarketState)
       .mockRejectedValueOnce(new Error('temporary database outage'))
       .mockRejectedValueOnce(new Error('temporary database outage'))
-      .mockResolvedValueOnce(undefined);
+      .mockResolvedValueOnce(true);
 
     try {
       const server = new GameServer();
@@ -698,7 +698,7 @@ describe('GameServer sessions', () => {
 
   it('serializes overlapping saves for one character so an older write cannot land last', async () => {
     vi.mocked(saveCharacterState).mockReset();
-    vi.mocked(saveCharacterState).mockResolvedValue(undefined);
+    vi.mocked(saveCharacterState).mockResolvedValue(true);
 
     const server = new GameServer();
     const session = expectJoined(server.join(fakeWs(), 11, 101, 'Saverace', 'warrior', null));
@@ -707,7 +707,7 @@ describe('GameServer sessions', () => {
     const firstSave = new Promise<void>((resolve) => {
       resolveFirstSave = resolve;
     });
-    vi.mocked(saveCharacterState).mockImplementationOnce(() => firstSave);
+    vi.mocked(saveCharacterState).mockImplementationOnce(() => firstSave.then(() => true));
 
     const first = server.saveCharacter(session);
     await vi.waitFor(() => {
@@ -794,7 +794,7 @@ describe('GameServer sessions', () => {
   // The per-IP session count backs the hard connection cap (countIpSessions in
   // main.ts). It is bookkeeping no other test now drives, so pin it directly.
   it('tracks per-IP session counts across join/leave and deletes the entry at zero', async () => {
-    vi.mocked(saveCharacterState).mockResolvedValue(undefined);
+    vi.mocked(saveCharacterState).mockResolvedValue(true);
     const server = new GameServer();
     const ip = '203.0.113.7';
     expect(server.countIpSessions(ip)).toBe(0);
@@ -818,7 +818,7 @@ describe('GameServer sessions', () => {
     // A kick that both closes the socket and calls leave() must not
     // double-decrement, or the count would drift below the live total and
     // weaken the hard cap. leave() is guarded by session.left, so it is idempotent.
-    vi.mocked(saveCharacterState).mockResolvedValue(undefined);
+    vi.mocked(saveCharacterState).mockResolvedValue(true);
     const server = new GameServer();
     const ip = '203.0.113.8';
     const a = expectJoined(
@@ -836,7 +836,7 @@ describe('GameServer sessions', () => {
   });
 
   it('keeps per-IP session counts independent across different IPs', async () => {
-    vi.mocked(saveCharacterState).mockResolvedValue(undefined);
+    vi.mocked(saveCharacterState).mockResolvedValue(true);
     const server = new GameServer();
     const ip1 = '198.51.100.1';
     const ip2 = '198.51.100.2';
@@ -853,7 +853,7 @@ describe('GameServer sessions', () => {
   });
 
   it('takeOverCharacter frees a live session and lets the same character re-join', async () => {
-    vi.mocked(saveCharacterState).mockResolvedValue(undefined);
+    vi.mocked(saveCharacterState).mockResolvedValue(true);
     const server = new GameServer();
     const ws = fakeWs();
     expectJoined(server.join(ws, 70, 700, 'Takeoverme', 'warrior', null));
@@ -875,7 +875,7 @@ describe('GameServer sessions', () => {
   });
 
   it('takeOverCharacter refuses to disconnect a session owned by another account', async () => {
-    vi.mocked(saveCharacterState).mockResolvedValue(undefined);
+    vi.mocked(saveCharacterState).mockResolvedValue(true);
     const server = new GameServer();
     const ws = fakeWs();
     expectJoined(server.join(ws, 80, 800, 'Owned', 'mage', null));
@@ -890,7 +890,7 @@ describe('GameServer sessions', () => {
     // The character was removed from the world but the client stayed wedged
     // "connected" — no onclose/error fired, so the app never returned to
     // character select and the player could not rejoin.
-    vi.mocked(saveCharacterState).mockResolvedValue(undefined);
+    vi.mocked(saveCharacterState).mockResolvedValue(true);
     const server = new GameServer();
     const ws = fakeWs();
     expectJoined(server.join(ws, 90, 900, 'Imdutha', 'warrior', null));

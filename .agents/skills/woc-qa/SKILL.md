@@ -52,6 +52,9 @@ references. Use only the agents relevant to the diff:
 - `woc_sim_architecture` for simulation behavior, determinism, or module boundaries.
 - `woc_cross_platform` for world, network, wire, RL, matcher, or client parity.
 - `woc_persistence` for DDL, stored JSONB, save paths, or compatibility.
+- `woc_database_performance` for SQL, indexes, query call sites, pool or lock behavior,
+  timeout policy, background database work, driver/dependency upgrades, PostgreSQL
+  engine/resource/configuration/topology changes, or features that increase stored-data cardinality.
 - `woc_security` for server, admin, auth, deployment, secrets, or trust boundaries.
 - `woc_test_coverage` for changed behavior, acceptance criteria, and regression tests.
 - `woc_frontend` for UI, render, CSS, i18n, accessibility, responsive, or fairness work.

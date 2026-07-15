@@ -262,6 +262,7 @@ Skip if no `src/sim/content/` files are in scope.
 |---|---|
 | `server/`, `src/admin/`, `src/net/`, a deploy/secret file, new SQL/auth/secret/wallet code, or a new `Math.random`/`Date.now`/`performance.now` in `src/sim/` or a pure core | privacy-security-review |
 | `server/*_db.ts` DDL or any persisted JSONB shape (`characters.state`, a `world_state` row incl. market/mail, `accounts.cosmetics`) | migration-safety |
+| SQL or a database call site, schema/indexes, query cadence or cardinality, pool/lock/timeout behavior, scheduled database work, a database driver or Postgres engine/config change, or stored-data growth | database-performance-reviewer |
 | `src/world_api.ts` (IWorld), `src/sim/`, `src/net/online.ts`, `server/game.ts` wire/dispatch, or the sim/server i18n matchers | cross-platform-sync |
 | `src/sim/` (determinism, rng draw-order, tick-phase, SimContext seam, move-not-rewrite on a relocation) | architecture-reviewer |
 | `src/ui/`, `src/styles/`, or `src/render/` presentation change (HUD windows/painters, CSS, mobile, graphics tiering) | frontend-seam-reviewer |

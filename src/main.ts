@@ -107,6 +107,7 @@ import {
   NATIVE_APP,
   type ReleaseEntry,
 } from './net/online';
+import { realmPopulation } from './net/realm_population';
 import { openStripeCheckout } from './net/stripe_checkout';
 // The wallet module is loaded lazily via dynamic import() in the wallet
 // controller below, so it stays out of the main entry chunk and only loads when
@@ -1318,6 +1319,7 @@ async function startGame(
     onQuestLog: () => hud.toggleQuestLog(),
     onCharacter: () => hud.toggleChar(),
     onBags: () => hud.toggleBags(),
+    onCrafting: () => hud.toggleCrafting(),
     onSpellbook: () => hud.toggleSpellbook(),
     onTalents: () => hud.toggleTalents(),
     onMap: () => hud.toggleMap(),
@@ -3653,20 +3655,6 @@ function loginError(text: string): void {
 
 const LAST_REALM_KEY = 'woc_last_realm';
 
-// Classic-MMO population bands, derived from the realm's current online count
-// (the classic MMO's own labels are relative to peak; current count is a fair
-// local stand-in).
-function realmPopulation(
-  online: boolean,
-  players: number,
-): { labelKey: TranslationKey; tipKey: TranslationKey; cls: string } {
-  if (!online) return { labelKey: 'realm.offline', tipKey: 'realm.popTipOffline', cls: 'offline' };
-  if (players >= 80) return { labelKey: 'realm.full', tipKey: 'realm.popTipFull', cls: 'full' };
-  if (players >= 40) return { labelKey: 'realm.high', tipKey: 'realm.popTipHigh', cls: 'high' };
-  if (players >= 15) return { labelKey: 'realm.medium', tipKey: 'realm.popTipMedium', cls: 'med' };
-  return { labelKey: 'realm.low', tipKey: 'realm.popTipLow', cls: 'low' };
-}
-
 // After login the classic MMO drops you onto a Realm List screen (then character select for
 // the chosen realm). We remember the last realm and jump straight to its
 // characters, with a "Change Realm" button back to this list.
@@ -4172,7 +4160,7 @@ function showRealmList(dir?: import('./net/online').RealmDirectory): void {
           `.realm-row[data-name="${CSS.escape(r.name)}"]`,
         ) as HTMLElement | null;
         if (!row) return;
-        const pop = realmPopulation(st.online, st.players);
+        const pop = realmPopulation(st.online, st.players, st.cap);
         const popEl = row.querySelector('[data-pop]') as HTMLElement;
         popEl.textContent = t(pop.labelKey);
         popEl.className = `realm-pop ${pop.cls}`;
@@ -4274,7 +4262,7 @@ function renderRealmDropdown(): void {
           `.realm-row[data-name="${CSS.escape(r.name)}"]`,
         ) as HTMLElement | null;
         if (!row) return;
-        const pop = realmPopulation(st.online, st.players);
+        const pop = realmPopulation(st.online, st.players, st.cap);
         const popEl = row.querySelector('[data-pop]') as HTMLElement;
         popEl.textContent = t(pop.labelKey);
         popEl.className = `realm-pop ${pop.cls}`;

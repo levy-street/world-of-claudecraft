@@ -1175,6 +1175,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'loading.connectionLost': 'サーバーとの接続が切断されました。',
   'loading.reconnecting': 'サーバーとの接続が切断されました。再接続しています...',
   'loading.connectionRejected': 'サーバーが接続を閉じました。',
+  'loading.realmFull': 'このワールドは現在満員です。数分後にもう一度お試しください。',
+  'loading.tooManyConnections':
+    'お使いのネットワークからこのワールドへの接続が多すぎます。余分なゲームウィンドウを閉じるか、数分後にもう一度お試しください。',
   'errors.nothingInteract': '操作できるものがありません。',
   'errors.noEnemyNearby': '近くに敵がいません。',
   'errors.characterNameRequired': 'キャラクター名を入力してください。',
@@ -1224,11 +1227,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'realm.low': '低',
   'realm.popTipLow':
     '低人口：現在オンラインのプレイヤーは15人未満。余裕があり、新規スタートに最適です。',
-  'realm.popTipMedium': '中人口：現在オンラインのプレイヤーは15〜39人。健全で活発なワールドです。',
+  'realm.popTipMedium': '中人口：現在オンラインのプレイヤーは15〜79人。健全で活発なワールドです。',
   'realm.popTipHigh':
-    '高人口：現在オンラインのプレイヤーは40〜79人。混雑しており、多くのプレイヤーがいます。',
+    '高人口：現在オンラインのプレイヤーは80人以上。混雑しており、多くのプレイヤーがいます。',
   'realm.popTipFull':
-    '満員：現在オンラインのプレイヤーは80人以上。非常に混雑しており、ログイン待ちが発生する場合があります。',
+    '満員：このワールドは現在プレイヤー数の上限に達しています。他のプレイヤーがログアウトするまで、新規ログインは拒否されます。',
   'realm.popTipOffline': 'オフライン：このワールドは現在接続できず、参加できません。',
   'realm.characterCountOne': '{count}キャラクター',
   'realm.characterCountOther': '{count}キャラクター',

@@ -17,6 +17,13 @@ regression coverage.
 
 Apply canonical architecture rules to the concrete change without copying them here.
 
+Before implementing database-backed behavior, invoke `woc_database_performance` for a
+read-only checkpoint when the change can affect SQL or query call sites, schema or indexes,
+query frequency or cardinality, pool configuration, lock scope, timeout policy, or stored-data
+growth, including database driver/dependency upgrades and PostgreSQL
+engine/resource/configuration/topology changes. Carry its concrete bounds and evidence
+requirements into the test-first contract.
+
 ## Choose the workflow
 
 For a bug fix:
@@ -50,6 +57,7 @@ npx tsc --noEmit
 ```
 
 Run domain guards for architecture, localization, persistence, parity, or security when
-applicable. Before declaring the implementation ready, run `npm run gate`.
+applicable. Re-run `woc_database_performance` on the finished diff when its database triggers
+match. Before declaring the implementation ready, run `npm run gate`.
 
 Report the selected seam, behavior covered, commands run, and remaining manual checks.
