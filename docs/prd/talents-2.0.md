@@ -288,8 +288,8 @@ converting the bank into Earthen Jolt burst. Neither mechanic adds random draws.
 
 ### Shaman structural + tuning pass
 
-- A Shaman row option must be useful when its row unlocks. No trigger or modified ability
-  may require an ability learned only at a later level.
+- A Shaman row option must have at least one live trigger or benefit when its row unlocks;
+  later ability unlocks may broaden that option without leaving it dead at unlock.
 - Rebounding Current moves from level 5 to level 8 with Thunder Ward. Rime Lock moves from
   level 8 to level 14 with Rime Jolt.
 - Springwell moves from level 11 to level 8, while Returning Current moves from level 8 to

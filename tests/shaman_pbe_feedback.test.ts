@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { onCastCompleted, onMeleeSwing } from '../src/sim/combat/talent_procs';
-import { ABILITIES } from '../src/sim/content/classes';
+import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
 import {
   rowForLevel,
   rowTreeFor,
@@ -69,8 +69,7 @@ function prerequisiteGroups(effect: TalentEffect): string[][] {
 }
 
 function isKnownBy(abilityId: string, rowLevel: TalentRowLevel): boolean {
-  const ability = ABILITIES[abilityId];
-  return ability?.class === 'shaman' && ability.learnLevel <= rowLevel;
+  return abilitiesKnownAt('shaman', rowLevel).some((known) => known.def.id === abilityId);
 }
 
 function imbuedLifebloodHeal(level: number): { heal: number; maxHp: number } {
@@ -141,6 +140,15 @@ describe('Shaman PBE structural feedback', () => {
         }
       }
     }
+  });
+
+  it('grants Springwell when its new level-8 row unlocks', () => {
+    const sim = new Sim({ seed: 260716, playerClass: 'shaman', autoEquip: false });
+    sim.setPlayerLevel(8);
+
+    expect(sim.resolvedAbility('healing_stream')).toBeNull();
+    expect(sim.applyTalents({ spec: null, rows: { 8: 'sha_r11_healing_stream' } })).toBe(true);
+    expect(sim.resolvedAbility('healing_stream')).toBeDefined();
   });
 });
 
