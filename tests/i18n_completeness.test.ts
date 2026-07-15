@@ -235,7 +235,7 @@ describe('i18n whole-catalog completeness', () => {
           wordy(enValue) &&
           flat[key] === enValue &&
           !BRAND_ALLOW.has(key) &&
-          !SWORDMASTER_ENGLISH_ONLY_PENDING.has(key)
+          !pendingForLocale.has(key)
         ) {
           leaks.push(`${lang} ${key}: "${enValue}"`);
         }
