@@ -26,6 +26,16 @@ import {
   runMarketBackfill,
 } from './market_backfill';
 import { OAUTH_SCHEMA } from './oauth_db';
+import {
+  closeOrphanPlayerSessions,
+  closePlayerSession,
+  openPlayerSession,
+  PLAYER_METRICS_CONCURRENT_INDEX_SQL,
+  PLAYER_METRICS_INVALID_INDEX_CHECK_SQL,
+  PLAYER_METRICS_INVALID_INDEX_DROP_SQL,
+  PLAYER_METRICS_SCHEMA,
+  recordCharacterCreation,
+} from './player_metrics_db';
 import { RATELIMIT_PRUNE_SQL, RATELIMIT_SCHEMA } from './ratelimit_db';
 import { REALM } from './realm';
 import { chooseArchiveName } from './reclaim_name';
@@ -951,6 +961,8 @@ CREATE INDEX IF NOT EXISTS character_deeds_character_earned
   ON character_deeds(character_id, earned_at DESC);
 `;
 
+const SCHEMA_ADVISORY_LOCK_KEY = 0x57_4f_43_01; // "WOC\x01"
+
 export async function ensureSchema(): Promise<void> {
   // In the process-per-realm model several server processes boot against the
   // same database at once. Their idempotent CREATE/ALTER statements would
@@ -980,8 +992,12 @@ export async function ensureSchema(): Promise<void> {
     // overrides any database- or role-level statement_timeout an operator may
     // have set server-side (SET LOCAL reverts at COMMIT).
     await client.query('SET LOCAL statement_timeout = 0');
-    await client.query('SELECT pg_advisory_xact_lock($1)', [0x57_4f_43_01]); // "WOC\x01"
+    await client.query('SELECT pg_advisory_xact_lock($1)', [SCHEMA_ADVISORY_LOCK_KEY]);
     await client.query(SCHEMA);
+    // Compact player analytics facts depend on accounts, characters, and
+    // play_sessions from the core schema. The tables start empty and collect
+    // lifecycle facts prospectively, so boot never runs a production backfill.
+    await client.query(PLAYER_METRICS_SCHEMA);
     await client.query(SOCIAL_SCHEMA);
     await client.query(OAUTH_SCHEMA);
     // Discord integration tables (links, oauth states, pending logins, reward
@@ -1051,6 +1067,33 @@ export async function ensureSchema(): Promise<void> {
       );
     }
     await client.query('COMMIT');
+    // CREATE INDEX CONCURRENTLY cannot run inside the schema transaction. Keep
+    // the session-level form of the same advisory lock while running this
+    // post-commit migration so simultaneous realm boots cannot race the index
+    // name. The concurrent build permits normal play_sessions writes to continue.
+    // The boot transaction's SET LOCAL statement_timeout = 0 reverted at the
+    // COMMIT above, so re-disable it session-wide first: the advisory-lock wait
+    // and the concurrent build can both outlast an operator-set database- or
+    // role-level statement_timeout, and this dedicated client closes right
+    // after, so the session setting never leaks to pooled connections.
+    await client.query('SET statement_timeout = 0');
+    let concurrentMigrationLocked = false;
+    try {
+      await client.query('SELECT pg_advisory_lock($1)', [SCHEMA_ADVISORY_LOCK_KEY]);
+      concurrentMigrationLocked = true;
+      // A prior boot's build may have died mid-CONCURRENTLY (a deploy-watchdog
+      // restart, a crash), stranding an INVALID index that IF NOT EXISTS would
+      // treat as existing forever. Drop the carcass so the build self-heals.
+      const invalidIndex = await client.query(PLAYER_METRICS_INVALID_INDEX_CHECK_SQL);
+      if ((invalidIndex.rowCount ?? 0) > 0) {
+        await client.query(PLAYER_METRICS_INVALID_INDEX_DROP_SQL);
+      }
+      await client.query(PLAYER_METRICS_CONCURRENT_INDEX_SQL);
+    } finally {
+      if (concurrentMigrationLocked) {
+        await client.query('SELECT pg_advisory_unlock($1)', [SCHEMA_ADVISORY_LOCK_KEY]);
+      }
+    }
     // Open the market write gate only AFTER a successful COMMIT, so no market
     // write can land before the marker is durable. Opens on the no-op path too
     // (backfill.ran === false, i.e. the marker already existed).
@@ -2471,19 +2514,6 @@ export async function guildNameForCharacter(characterId: number): Promise<string
   return res.rows[0]?.name ?? null;
 }
 
-export async function createCharacter(
-  accountId: number,
-  name: string,
-  cls: PlayerClass,
-  state: CharacterState | null = null,
-): Promise<CharacterRow> {
-  const res = await pool.query(
-    'INSERT INTO characters (account_id, name, class, realm, state) VALUES ($1, $2, $3, $4, $5) RETURNING id, account_id, name, class, level, state, is_gm, force_rename',
-    [accountId, name, cls, REALM, state ? JSON.stringify(state) : null],
-  );
-  return res.rows[0];
-}
-
 export async function createCharacterCapped(
   accountId: number,
   name: string,
@@ -2513,6 +2543,7 @@ export async function createCharacterCapped(
       'INSERT INTO characters (account_id, name, class, realm, state) VALUES ($1, $2, $3, $4, $5) RETURNING id, account_id, name, class, level, state, is_gm, force_rename',
       [accountId, name, cls, REALM, state ? JSON.stringify(state) : null],
     );
+    await recordCharacterCreation(client, accountId, REALM);
     await client.query('COMMIT');
     return res.rows[0];
   } catch (err) {
@@ -3343,26 +3374,21 @@ export async function openPlaySession(
   characterId: number,
   characterName: string,
   meta: RequestMetadata = {},
+  initialLevel = 1,
 ): Promise<number> {
-  const res = await pool.query(
-    `INSERT INTO play_sessions (account_id, character_id, character_name, ip_address, user_agent)
-     VALUES ($1, $2, $3, $4, $5)
-     RETURNING id`,
-    [
-      accountId,
-      characterId,
-      characterName,
-      cleanMetadataText(meta.ip, 128),
-      cleanMetadataText(meta.userAgent, 512),
-    ],
-  );
-  return res.rows[0].id;
+  return openPlayerSession(pool, {
+    accountId,
+    characterId,
+    characterName,
+    realm: REALM,
+    initialLevel,
+    ipAddress: cleanMetadataText(meta.ip, 128),
+    userAgent: cleanMetadataText(meta.userAgent, 512),
+  });
 }
 
-export async function closePlaySession(sessionId: number): Promise<void> {
-  await pool.query('UPDATE play_sessions SET ended_at = now() WHERE id = $1 AND ended_at IS NULL', [
-    sessionId,
-  ]);
+export async function closePlaySession(sessionId: number, maxLevel = 1): Promise<void> {
+  await closePlayerSession(pool, sessionId, REALM, maxLevel);
 }
 
 // Sessions left open by a crash have an unknown duration; close them at their
@@ -3370,16 +3396,7 @@ export async function closePlaySession(sessionId: number): Promise<void> {
 // current realm: in the process-per-realm model peers share one database, and
 // an unscoped UPDATE would force-close sessions still live on other realms.
 export async function closeOrphanSessions(): Promise<number> {
-  const res = await pool.query(
-    `UPDATE play_sessions ps
-        SET ended_at = ps.started_at
-       FROM characters c
-      WHERE ps.character_id = c.id
-        AND c.realm = $1
-        AND ps.ended_at IS NULL`,
-    [REALM],
-  );
-  return res.rowCount ?? 0;
+  return closeOrphanPlayerSessions(pool, REALM);
 }
 
 // ---------------------------------------------------------------------------

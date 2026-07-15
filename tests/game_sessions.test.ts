@@ -754,7 +754,55 @@ describe('GameServer sessions', () => {
     resolveOpen(99);
     await Promise.resolve();
     await Promise.resolve();
-    expect(closePlaySession).toHaveBeenCalledWith(99);
+    expect(closePlaySession).toHaveBeenCalledWith(99, 1);
+  });
+
+  it('closes the session with the highest level reached for first-session activation', async () => {
+    openPlaySession.mockReset();
+    openPlaySession.mockResolvedValue(77);
+    closePlaySession.mockReset();
+    closePlaySession.mockResolvedValue(undefined);
+    const server = new GameServer();
+    const session = expectJoined(server.join(fakeWs(), 22, 202, 'Levelmetric', 'warrior', null));
+    await vi.waitFor(() => expect(session.dbSessionId).toBe(77));
+
+    (server as any).detectActivity([{ type: 'levelup', level: 5, pid: session.pid }]);
+    await server.leave(session, 'test');
+
+    expect(closePlaySession).toHaveBeenCalledWith(77, 5);
+  });
+
+  it('seeds session metrics from the loaded character level', async () => {
+    openPlaySession.mockReset();
+    openPlaySession.mockResolvedValue(78);
+    const server = new GameServer();
+    const seedPid = server.sim.addPlayer('warrior', 'Metricseed');
+    const saved = server.sim.serializeCharacter(seedPid);
+    server.sim.removePlayer(seedPid);
+    if (!saved) throw new Error('seed character state missing');
+
+    const session = expectJoined(
+      server.join(fakeWs(), 23, 203, 'Veteranmetric', 'warrior', { ...saved, level: 12 }),
+    );
+
+    await vi.waitFor(() => expect(openPlaySession).toHaveBeenCalledOnce());
+    expect(openPlaySession).toHaveBeenCalledWith(23, 203, 'Veteranmetric', {}, 12);
+    expect(session.metricsMaxLevel).toBe(12);
+  });
+
+  it('closes sessions at shutdown with their highest observed level', async () => {
+    openPlaySession.mockReset();
+    openPlaySession.mockResolvedValue(79);
+    closePlaySession.mockReset();
+    closePlaySession.mockResolvedValue(undefined);
+    const server = new GameServer();
+    const session = expectJoined(server.join(fakeWs(), 24, 204, 'Shutdownmetric', 'mage', null));
+    await vi.waitFor(() => expect(session.dbSessionId).toBe(79));
+
+    (server as any).detectActivity([{ type: 'levelup', level: 6, pid: session.pid }]);
+    await server.endAllPlaySessions();
+
+    expect(closePlaySession).toHaveBeenCalledWith(79, 6);
   });
 
   it('allows one ONLINE character per account, and lets the account back in once it leaves', async () => {

@@ -12,9 +12,18 @@ const h = vi.hoisted(() => {
   // and throws when it is null. Answer that one query from a mutable flag so a test
   // can flip it to null to exercise the throw; every other query returns empty rows
   // (the existing assertions only inspect `calls`, so they are unaffected).
-  const state = { rateLimitsExists: true };
+  const state = { rateLimitsExists: true, invalidMetricsIndexExists: false };
   const query = vi.fn((sql: string) => {
     calls.push(String(sql));
+    // The invalid-carcass check for the post-commit metrics index build; a test
+    // flips the flag to exercise the repair arm. Checked before the to_regclass
+    // arm because the check SQL also resolves the index via to_regclass.
+    if (String(sql).includes('indisvalid')) {
+      return Promise.resolve({
+        rows: state.invalidMetricsIndexExists ? [{ found: 1 }] : [],
+        rowCount: state.invalidMetricsIndexExists ? 1 : 0,
+      });
+    }
     if (String(sql).includes('to_regclass')) {
       return Promise.resolve({
         rows: [{ reg: state.rateLimitsExists ? 'public.rate_limits' : null }],
@@ -58,6 +67,7 @@ describe('ensureSchema wires every schema module at boot', () => {
   beforeEach(() => {
     h.calls.length = 0;
     h.state.rateLimitsExists = true;
+    h.state.invalidMetricsIndexExists = false;
     h.clientConfigs.length = 0;
   });
 
@@ -262,6 +272,67 @@ describe('ensureSchema wires every schema module at boot', () => {
     const applied = h.calls.join('\n');
     expect(applied).toContain('pg_advisory_xact_lock');
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS rate_limits');
+  });
+
+  it('applies the compact player-metrics schema without a boot backfill', async () => {
+    await ensureSchema();
+    const applied = h.calls.join('\n');
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS player_account_facts');
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS player_activity_daily');
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS player_business_daily');
+    const ddl = h.calls.find((sql) =>
+      sql.includes('CREATE TABLE IF NOT EXISTS player_account_facts'),
+    );
+    expect(ddl).toBeDefined();
+    expect(ddl).not.toMatch(/INSERT INTO|UPDATE |DELETE FROM/);
+
+    const commitIndex = h.calls.indexOf('COMMIT');
+    const concurrentIndex = h.calls.findIndex((sql) =>
+      sql.includes('CREATE INDEX CONCURRENTLY IF NOT EXISTS play_sessions_account_started_id'),
+    );
+    const sessionLock = h.calls.findIndex((sql) => sql.includes('pg_advisory_lock($1)'));
+    const sessionUnlock = h.calls.findIndex((sql) => sql.includes('pg_advisory_unlock($1)'));
+    expect(commitIndex).toBeGreaterThan(-1);
+    expect(concurrentIndex).toBeGreaterThan(commitIndex);
+    expect(sessionLock).toBeGreaterThan(commitIndex);
+    expect(sessionLock).toBeLessThan(concurrentIndex);
+    expect(sessionUnlock).toBeGreaterThan(concurrentIndex);
+
+    // The boot transaction's SET LOCAL statement_timeout = 0 reverts at COMMIT,
+    // so the post-commit migration must re-disable it session-wide before taking
+    // the session lock: the advisory-lock wait and the concurrent build can both
+    // outlast an operator-set database- or role-level statement_timeout.
+    const postCommitTimeoutOff = h.calls.findIndex(
+      (sql, i) => i > commitIndex && sql === 'SET statement_timeout = 0',
+    );
+    expect(postCommitTimeoutOff).toBeGreaterThan(commitIndex);
+    expect(postCommitTimeoutOff).toBeLessThan(sessionLock);
+
+    // The invalid-carcass check runs under the session lock, before the create
+    // it protects; on a healthy boot (no carcass) nothing is dropped.
+    const carcassCheck = h.calls.findIndex((sql) => sql.includes('indisvalid'));
+    expect(carcassCheck).toBeGreaterThan(sessionLock);
+    expect(carcassCheck).toBeLessThan(concurrentIndex);
+    expect(h.calls.some((sql) => sql.includes('DROP INDEX CONCURRENTLY'))).toBe(false);
+  });
+
+  it('drops an INVALID metrics-index carcass before rebuilding it (a killed CONCURRENTLY build self-heals)', async () => {
+    // A CREATE INDEX CONCURRENTLY killed mid-build (a deploy-watchdog restart,
+    // a crash) strands an INVALID index that IF NOT EXISTS treats as existing
+    // on every later boot: never rebuilt, unusable to the planner, yet
+    // maintained on every play_sessions write. Boot must drop the carcass and
+    // rebuild.
+    h.state.invalidMetricsIndexExists = true;
+    await ensureSchema();
+    const sessionLock = h.calls.findIndex((sql) => sql.includes('pg_advisory_lock($1)'));
+    const drop = h.calls.findIndex((sql) =>
+      sql.includes('DROP INDEX CONCURRENTLY IF EXISTS play_sessions_account_started_id'),
+    );
+    const create = h.calls.findIndex((sql) =>
+      sql.includes('CREATE INDEX CONCURRENTLY IF NOT EXISTS play_sessions_account_started_id'),
+    );
+    expect(drop).toBeGreaterThan(sessionLock);
+    expect(drop).toBeLessThan(create);
   });
 
   it('applies the rate-limit schema idempotently (a second boot re-issues the same DDL)', async () => {

@@ -2376,6 +2376,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '为一个友方目标恢复 {damage} 点生命值，并在 21 秒内额外恢复一定生命值。',
   'entities.abilities.barkskin.name': '橡树皮',
   'entities.abilities.barkskin.description': '你的皮肤硬化如树皮，使护甲提高 150，持续 15 秒。',
+  'entities.abilities.ironhold.name': '铁壁',
+  'entities.abilities.ironhold.description':
+    '以坚固的防御自守，使受到的所有伤害降低 40%，持续 8 秒。',
+  'entities.abilities.sacred_bulwark.name': '神圣壁垒',
+  'entities.abilities.sacred_bulwark.description':
+    '在 {duration} 秒内，下一次会杀死你的敌人攻击将被抵消，转而将你恢复至 35% 生命值。',
+  'entities.abilities.primal_reflexes.name': '野性反射',
+  'entities.abilities.primal_reflexes.description':
+    '你的本能变得敏锐，使闪避几率提高 50%，持续 6 秒。',
   'entities.abilities.starfire.name': '天陨',
   'entities.abilities.starfire.description': '召下一道星辰之火，造成 {damage} 点奥术伤害。',
   'entities.abilities.travel_form.name': '迅捷形态',
@@ -5429,6 +5438,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.attackSpeedFast': '攻击速度提高 {pct}%',
   'hudChrome.auraEffect.haste': '攻击速度和施法速度提高 {pct}%',
   'hudChrome.auraEffect.tongues': '施法时间延长 {pct}%',
+  'hudChrome.auraEffect.damageReduction': '受到的所有伤害降低 {pct}%',
+  'hudChrome.auraEffect.guardianWard': '下一次敌人的致命攻击会改为将你的生命值恢复至 {pct}%',
   'hudChrome.auraEffect.increase.ap': '攻击强度提高 {value}',
   'hudChrome.auraEffect.increase.armor': '护甲提高 {value}',
   'hudChrome.auraEffect.increase.int': '智力提高 {value}',

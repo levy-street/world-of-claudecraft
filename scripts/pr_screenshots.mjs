@@ -50,6 +50,7 @@ if (DIFF_FILE) {
 
 const errors = [];
 const captured = [];
+let failedTargets = 0;
 
 // Nothing visual changed: write an empty manifest and exit clean. No browser launch.
 if (!plan.isVisual) {
@@ -120,22 +121,63 @@ function watch(page, tag) {
 
 // Specific window targets: bring each one up in one desktop world and clip to it.
 async function shootSpecific(targets) {
-  const page = await browser.newPage();
-  watch(page, 'desktop');
-  await page.goto(URL, { waitUntil: 'networkidle0', timeout: 60000 });
-  await enterOfflineGame(page, { charClass: 'warrior', charName: 'Thorgar', settleMs: 3000 });
+  let sharedPage;
   let i = 1;
   for (const t of targets) {
-    const idx = String(i).padStart(2, '0');
-    try {
-      const region = await t.capture(page);
-      await shoot(page, `${idx}-${t.key}`, region?.clip);
-    } catch (e) {
-      errors.push(`TARGET ${t.key}: ${e.message}`);
+    const variants = t.variants ?? [null];
+    for (const variant of variants) {
+      const idx = String(i).padStart(2, '0');
+      let page = sharedPage;
+      const standalone = variant !== null;
+      try {
+        if (standalone) {
+          page = await browser.newPage();
+          watch(page, `${t.key}-${variant.key}`);
+          if (variant.mobile) {
+            await page.emulate({
+              viewport: {
+                width: 844,
+                height: 390,
+                isMobile: true,
+                hasTouch: true,
+                deviceScaleFactor: 2,
+              },
+              userAgent:
+                'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+            });
+          }
+          await page.goto(URL, { waitUntil: 'networkidle0', timeout: 60000 });
+          if (variant.mobile)
+            await page.evaluate(() => document.body.classList.add('mobile-touch'));
+          await enterOfflineGame(page, {
+            charClass: variant.charClass,
+            charName: variant.charName,
+            settleMs: 3000,
+          });
+        } else if (!page) {
+          page = await browser.newPage();
+          sharedPage = page;
+          watch(page, 'desktop');
+          await page.goto(URL, { waitUntil: 'networkidle0', timeout: 60000 });
+          await enterOfflineGame(page, {
+            charClass: 'warrior',
+            charName: 'Thorgar',
+            settleMs: 3000,
+          });
+        }
+        const region = await t.capture(page, variant);
+        const suffix = variant ? `-${variant.key}` : '';
+        await shoot(page, `${idx}-${t.key}${suffix}`, region?.clip);
+      } catch (e) {
+        failedTargets++;
+        errors.push(`TARGET ${t.key}${variant ? `/${variant.key}` : ''}: ${e.message}`);
+      } finally {
+        if (standalone && page) await page.close();
+      }
+      i++;
     }
-    i++;
   }
-  await page.close();
+  if (sharedPage) await sharedPage.close();
 }
 
 // Generic HUD frames for a visual change that maps to no specific window: the in-world
@@ -188,4 +230,4 @@ if (errors.length) console.log(`notes during capture:\n${errors.join('\n')}`);
 console.log(`captured ${captured.length} screenshot(s) into ${OUT}/`);
 // Non-zero only if a visual change captured nothing at all, so a partial run still keeps
 // its frames while a total capture failure surfaces in the job log.
-process.exit(captured.length > 0 ? 0 : 1);
+process.exit(captured.length > 0 && failedTargets === 0 ? 0 : 1);
