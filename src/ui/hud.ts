@@ -6753,7 +6753,12 @@ export class Hud {
       this.updateTradeWindow();
       this.updateArenaStatus();
       this.updateFiestaHud();
-      this.yumiPainter.update(this.sim.arenaInfo);
+      const yumiPowerup = p.auras.find((a) => a.kind.startsWith('pu_'));
+      this.yumiPainter.update(
+        this.sim.arenaInfo,
+        yumiPowerup ? auraDisplayNameFromSource(yumiPowerup.name) : '',
+        yumiPowerup?.remaining ?? 0,
+      );
       this.yumiGrabBarPainter.update(this.sim);
       // Vale Cup surfaces (mediumHud like the arena/fiesta ones): the indicator
       // button, the in-match strip, and the open window redraw.

@@ -4602,7 +4602,8 @@ export const ru_RU: EnTranslations = {
       "collapse": "Свернуть полосы Protect Yumi",
       "expand": "Развернуть полосы Protect Yumi",
       "powerupIn": "Усиление через {s}с",
-      "powerupReady": "Усиление готово!"
+      "powerupReady": "Усиление готово!",
+      "powerupActive": "{name}: {s}s remaining"
     },
     "respawn": {
       "title": "ВЫ ПАЛИ!"

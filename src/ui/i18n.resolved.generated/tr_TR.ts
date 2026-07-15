@@ -4602,7 +4602,8 @@ export const tr_TR: EnTranslations = {
       "collapse": "Yumi'yi Koru çubuklarını daralt",
       "expand": "Yumi'yi Koru çubuklarını genişlet",
       "powerupIn": "Power-up in {s}s",
-      "powerupReady": "Power-up ready!"
+      "powerupReady": "Power-up ready!",
+      "powerupActive": "{name}: {s}s remaining"
     },
     "respawn": {
       "title": "DÜŞTÜN!"

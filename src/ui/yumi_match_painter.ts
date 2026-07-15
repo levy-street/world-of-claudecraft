@@ -99,7 +99,7 @@ export class YumiMatchPainter {
     this.respawnLeft = 0;
   }
 
-  update(info: ArenaInfo | null): void {
+  update(info: ArenaInfo | null, activePowerupName = '', activePowerupRemaining = 0): void {
     // UI-clock countdown for the bench overlay (presentation only; the sim's
     // own timer revives the entity, this just animates toward it).
     const now = performance.now();
@@ -108,7 +108,13 @@ export class YumiMatchPainter {
     }
     this.lastNow = now;
 
-    const m = yumiMatchView(info, this.live, this.respawnLeft);
+    const m = yumiMatchView(
+      info,
+      this.live,
+      this.respawnLeft,
+      activePowerupName,
+      activePowerupRemaining,
+    );
     if (!m.active) {
       if (this.els) {
         this.w.setDisplay(this.els.root, 'none');
@@ -154,16 +160,23 @@ export class YumiMatchPainter {
     // Mystery power-up availability: a subtle countdown to the next spawn, or a
     // "ready" call once an orb is on the maze. Only in normal active play (spawns
     // freeze in sudden death, and none exist during the countdown).
-    const showPowerup = m.phase === 'active' && !m.suddenDeath;
+    const hasActivePowerup = m.activePowerupRemaining > 0;
+    const showPowerup = hasActivePowerup || (m.phase === 'active' && !m.suddenDeath);
     this.w.setDisplay(els.powerup, showPowerup ? 'block' : 'none');
     if (showPowerup) {
       this.w.setText(
         els.powerup,
-        m.nextPowerupIn > 0
-          ? t('yumi.hud.powerupIn', { s: num(m.nextPowerupIn) })
-          : t('yumi.hud.powerupReady'),
+        hasActivePowerup
+          ? t('yumi.hud.powerupActive', {
+              name: m.activePowerupName,
+              s: num(Math.ceil(m.activePowerupRemaining)),
+            })
+          : m.nextPowerupIn > 0
+            ? t('yumi.hud.powerupIn', { s: num(m.nextPowerupIn) })
+            : t('yumi.hud.powerupReady'),
       );
-      this.w.toggleClass(els.powerup, 'ready', m.nextPowerupIn === 0);
+      this.w.toggleClass(els.powerup, 'ready', !hasActivePowerup && m.nextPowerupIn === 0);
+      this.w.toggleClass(els.powerup, 'active', hasActivePowerup);
     }
     this.w.setText(els.mineName, t('yumi.hud.yourYumi'));
     this.w.setText(els.theirsName, t('yumi.hud.enemyYumi'));

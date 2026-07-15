@@ -4602,7 +4602,8 @@ export const de_DE: EnTranslations = {
       "collapse": "Die Yumi-beschützen-Leisten einklappen",
       "expand": "Die Yumi-beschützen-Leisten ausklappen",
       "powerupIn": "Power-up in {s}s",
-      "powerupReady": "Power-up ready!"
+      "powerupReady": "Power-up ready!",
+      "powerupActive": "{name}: {s}s remaining"
     },
     "respawn": {
       "title": "AM BODEN!"

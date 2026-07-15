@@ -4602,7 +4602,8 @@ export const id_ID: EnTranslations = {
       "collapse": "Ciutkan bilah Lindungi Yumi",
       "expand": "Bentangkan bilah Lindungi Yumi",
       "powerupIn": "Power-up in {s}s",
-      "powerupReady": "Power-up ready!"
+      "powerupReady": "Power-up ready!",
+      "powerupActive": "{name}: {s}s remaining"
     },
     "respawn": {
       "title": "TUMBANG!"

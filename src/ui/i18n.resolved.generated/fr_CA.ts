@@ -4602,7 +4602,8 @@ export const fr_CA: EnTranslations = {
       "collapse": "Réduire les barres de Protégez Yumi",
       "expand": "Développer les barres de Protégez Yumi",
       "powerupIn": "Power-up in {s}s",
-      "powerupReady": "Power-up ready!"
+      "powerupReady": "Power-up ready!",
+      "powerupActive": "{name}: {s}s remaining"
     },
     "respawn": {
       "title": "À TERRE !"

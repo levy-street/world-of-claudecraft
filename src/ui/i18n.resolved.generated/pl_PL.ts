@@ -4602,7 +4602,8 @@ export const pl_PL: EnTranslations = {
       "collapse": "Zwiń paski Ochrony Yumi",
       "expand": "Rozwiń paski Ochrony Yumi",
       "powerupIn": "Power-up in {s}s",
-      "powerupReady": "Power-up ready!"
+      "powerupReady": "Power-up ready!",
+      "powerupActive": "{name}: {s}s remaining"
     },
     "respawn": {
       "title": "POWALONY!"

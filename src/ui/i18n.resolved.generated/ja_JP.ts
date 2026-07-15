@@ -4602,7 +4602,8 @@ export const ja_JP: EnTranslations = {
       "collapse": "Protect Yumiのバーを折りたたむ",
       "expand": "Protect Yumiのバーを展開する",
       "powerupIn": "パワーアップまで {s}秒",
-      "powerupReady": "パワーアップ出現！"
+      "powerupReady": "パワーアップ出現！",
+      "powerupActive": "{name}: {s}s remaining"
     },
     "respawn": {
       "title": "ダウン！"

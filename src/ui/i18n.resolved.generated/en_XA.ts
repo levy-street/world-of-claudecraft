@@ -4602,7 +4602,8 @@ export const en_XA: EnTranslations = {
       "collapse": "[Çóļļáþšé ţĥé Þŕóţéçţ Ýúɱí ƀáŕš]",
       "expand": "[Éẋþáñð ţĥé Þŕóţéçţ Ýúɱí ƀáŕš]",
       "powerupIn": "[Þóŵéŕ-úþ íñ {s}š]",
-      "powerupReady": "[Þóŵéŕ-úþ ŕéáðý!]"
+      "powerupReady": "[Þóŵéŕ-úþ ŕéáðý!]",
+      "powerupActive": "[{name}: {s}š ŕéɱáíñíñĝ]"
     },
     "respawn": {
       "title": "[ÐÓŴÑÉÐ!]"

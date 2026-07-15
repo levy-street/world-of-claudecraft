@@ -160,6 +160,7 @@ export const pending: Record<string, readonly string[]> = {
     "yumi.banner.powerupSpawn",
     "yumi.grab.aria",
     "yumi.grab.channeling",
+    "yumi.hud.powerupActive",
     "yumi.hud.powerupIn",
     "yumi.hud.powerupReady",
     "yumi.log.powerupGrabbed",
@@ -321,6 +322,7 @@ export const pending: Record<string, readonly string[]> = {
     "yumi.banner.powerupSpawn",
     "yumi.grab.aria",
     "yumi.grab.channeling",
+    "yumi.hud.powerupActive",
     "yumi.hud.powerupIn",
     "yumi.hud.powerupReady",
     "yumi.log.powerupGrabbed",
@@ -482,6 +484,7 @@ export const pending: Record<string, readonly string[]> = {
     "yumi.banner.powerupSpawn",
     "yumi.grab.aria",
     "yumi.grab.channeling",
+    "yumi.hud.powerupActive",
     "yumi.hud.powerupIn",
     "yumi.hud.powerupReady",
     "yumi.log.powerupGrabbed",
@@ -643,6 +646,7 @@ export const pending: Record<string, readonly string[]> = {
     "yumi.banner.powerupSpawn",
     "yumi.grab.aria",
     "yumi.grab.channeling",
+    "yumi.hud.powerupActive",
     "yumi.hud.powerupIn",
     "yumi.hud.powerupReady",
     "yumi.log.powerupGrabbed",
@@ -805,6 +809,7 @@ export const pending: Record<string, readonly string[]> = {
     "yumi.banner.powerupSpawn",
     "yumi.grab.aria",
     "yumi.grab.channeling",
+    "yumi.hud.powerupActive",
     "yumi.hud.powerupIn",
     "yumi.hud.powerupReady",
     "yumi.log.powerupGrabbed",
@@ -966,6 +971,7 @@ export const pending: Record<string, readonly string[]> = {
     "yumi.banner.powerupSpawn",
     "yumi.grab.aria",
     "yumi.grab.channeling",
+    "yumi.hud.powerupActive",
     "yumi.hud.powerupIn",
     "yumi.hud.powerupReady",
     "yumi.log.powerupGrabbed",
@@ -1069,7 +1075,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.partyFrames.sortName",
     "hudChrome.partyFrames.sortRole",
     "welcome.news.new",
-    "yumi.banner.powerupMine"
+    "yumi.banner.powerupMine",
+    "yumi.hud.powerupActive"
   ],
   "zh_TW": [
     "devCommand.actions.attune.description",
@@ -1164,7 +1171,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.partyFrames.sortName",
     "hudChrome.partyFrames.sortRole",
     "welcome.news.new",
-    "yumi.banner.powerupMine"
+    "yumi.banner.powerupMine",
+    "yumi.hud.powerupActive"
   ],
   "ko_KR": [
     "devCommand.actions.attune.description",
@@ -1259,7 +1267,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.partyFrames.sortName",
     "hudChrome.partyFrames.sortRole",
     "welcome.news.new",
-    "yumi.banner.powerupMine"
+    "yumi.banner.powerupMine",
+    "yumi.hud.powerupActive"
   ],
   "ja_JP": [
     "devCommand.actions.attune.description",
@@ -1354,7 +1363,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.partyFrames.sortName",
     "hudChrome.partyFrames.sortRole",
     "welcome.news.new",
-    "yumi.banner.powerupMine"
+    "yumi.banner.powerupMine",
+    "yumi.hud.powerupActive"
   ],
   "pt_BR": [
     "apiError.welcome.invalid_input",
@@ -1507,6 +1517,7 @@ export const pending: Record<string, readonly string[]> = {
     "yumi.banner.powerupSpawn",
     "yumi.grab.aria",
     "yumi.grab.channeling",
+    "yumi.hud.powerupActive",
     "yumi.hud.powerupIn",
     "yumi.hud.powerupReady",
     "yumi.log.powerupGrabbed",
@@ -1610,7 +1621,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.partyFrames.sortName",
     "hudChrome.partyFrames.sortRole",
     "welcome.news.new",
-    "yumi.banner.powerupMine"
+    "yumi.banner.powerupMine",
+    "yumi.hud.powerupActive"
   ],
   "cs_CZ": [
     "apiError.welcome.invalid_input",
@@ -1763,6 +1775,7 @@ export const pending: Record<string, readonly string[]> = {
     "yumi.banner.powerupSpawn",
     "yumi.grab.aria",
     "yumi.grab.channeling",
+    "yumi.hud.powerupActive",
     "yumi.hud.powerupIn",
     "yumi.hud.powerupReady",
     "yumi.log.powerupGrabbed",
@@ -1924,6 +1937,7 @@ export const pending: Record<string, readonly string[]> = {
     "yumi.banner.powerupSpawn",
     "yumi.grab.aria",
     "yumi.grab.channeling",
+    "yumi.hud.powerupActive",
     "yumi.hud.powerupIn",
     "yumi.hud.powerupReady",
     "yumi.log.powerupGrabbed",
@@ -2085,6 +2099,7 @@ export const pending: Record<string, readonly string[]> = {
     "yumi.banner.powerupSpawn",
     "yumi.grab.aria",
     "yumi.grab.channeling",
+    "yumi.hud.powerupActive",
     "yumi.hud.powerupIn",
     "yumi.hud.powerupReady",
     "yumi.log.powerupGrabbed",
@@ -2246,6 +2261,7 @@ export const pending: Record<string, readonly string[]> = {
     "yumi.banner.powerupSpawn",
     "yumi.grab.aria",
     "yumi.grab.channeling",
+    "yumi.hud.powerupActive",
     "yumi.hud.powerupIn",
     "yumi.hud.powerupReady",
     "yumi.log.powerupGrabbed",
@@ -2407,6 +2423,7 @@ export const pending: Record<string, readonly string[]> = {
     "yumi.banner.powerupSpawn",
     "yumi.grab.aria",
     "yumi.grab.channeling",
+    "yumi.hud.powerupActive",
     "yumi.hud.powerupIn",
     "yumi.hud.powerupReady",
     "yumi.log.powerupGrabbed",
@@ -2568,6 +2585,7 @@ export const pending: Record<string, readonly string[]> = {
     "yumi.banner.powerupSpawn",
     "yumi.grab.aria",
     "yumi.grab.channeling",
+    "yumi.hud.powerupActive",
     "yumi.hud.powerupIn",
     "yumi.hud.powerupReady",
     "yumi.log.powerupGrabbed",
@@ -2729,6 +2747,7 @@ export const pending: Record<string, readonly string[]> = {
     "yumi.banner.powerupSpawn",
     "yumi.grab.aria",
     "yumi.grab.channeling",
+    "yumi.hud.powerupActive",
     "yumi.hud.powerupIn",
     "yumi.hud.powerupReady",
     "yumi.log.powerupGrabbed",
@@ -2890,6 +2909,7 @@ export const pending: Record<string, readonly string[]> = {
     "yumi.banner.powerupSpawn",
     "yumi.grab.aria",
     "yumi.grab.channeling",
+    "yumi.hud.powerupActive",
     "yumi.hud.powerupIn",
     "yumi.hud.powerupReady",
     "yumi.log.powerupGrabbed",

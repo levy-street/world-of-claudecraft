@@ -4602,7 +4602,8 @@ export const cs_CZ: EnTranslations = {
       "collapse": "Sbalit lišty Ochraňte Yumi",
       "expand": "Rozbalit lišty Ochraňte Yumi",
       "powerupIn": "Power-up in {s}s",
-      "powerupReady": "Power-up ready!"
+      "powerupReady": "Power-up ready!",
+      "powerupActive": "{name}: {s}s remaining"
     },
     "respawn": {
       "title": "K ZEMI!"

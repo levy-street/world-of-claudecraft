@@ -4602,7 +4602,8 @@ export const ko_KR: EnTranslations = {
       "collapse": "Protect Yumi 게이지 접기",
       "expand": "Protect Yumi 게이지 펼치기",
       "powerupIn": "파워업까지 {s}초",
-      "powerupReady": "파워업 준비 완료!"
+      "powerupReady": "파워업 준비 완료!",
+      "powerupActive": "{name}: {s}s remaining"
     },
     "respawn": {
       "title": "쓰러졌습니다!"

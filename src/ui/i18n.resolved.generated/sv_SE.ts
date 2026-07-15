@@ -4602,7 +4602,8 @@ export const sv_SE: EnTranslations = {
       "collapse": "Dölj Skydda Yumi-staplarna",
       "expand": "Visa Skydda Yumi-staplarna",
       "powerupIn": "Power-up in {s}s",
-      "powerupReady": "Power-up ready!"
+      "powerupReady": "Power-up ready!",
+      "powerupActive": "{name}: {s}s remaining"
     },
     "respawn": {
       "title": "NEDSLAGEN!"

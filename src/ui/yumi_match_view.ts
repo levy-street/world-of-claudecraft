@@ -55,6 +55,9 @@ export interface YumiHudModel {
   respawnIn: number;
   /** Whole seconds until the next mystery power-up spawns; 0 while one is out. */
   nextPowerupIn: number;
+  /** Localized name + raw remaining time for the power-up I currently carry. */
+  activePowerupName: string;
+  activePowerupRemaining: number;
 }
 
 const model: YumiHudModel = {
@@ -74,6 +77,8 @@ const model: YumiHudModel = {
   down: false,
   respawnIn: 0,
   nextPowerupIn: 0,
+  activePowerupName: '',
+  activePowerupRemaining: 0,
 };
 
 /**
@@ -85,6 +90,8 @@ export function yumiMatchView(
   info: ArenaInfo | null,
   live: YumiLiveState | null,
   localRespawn: number,
+  activePowerupName = '',
+  activePowerupRemaining = 0,
 ): YumiHudModel {
   const y = info?.match?.yumi;
   if (!y || y.phase === 'over') {
@@ -93,6 +100,8 @@ export function yumiMatchView(
     model.down = false;
     model.respawnIn = 0;
     model.nextPowerupIn = 0;
+    model.activePowerupName = '';
+    model.activePowerupRemaining = 0;
     return model;
   }
   const useLive = live !== null && live.seen && y.phase !== 'countdown';
@@ -116,5 +125,7 @@ export function yumiMatchView(
   // The event heartbeat is the fresh source online (the snapshot is rate-limited);
   // fall back to the snapshot offline / before the first heartbeat.
   model.nextPowerupIn = useLive ? live.nextPowerupIn : y.nextPowerupIn;
+  model.activePowerupName = activePowerupRemaining > 0 ? activePowerupName : '';
+  model.activePowerupRemaining = Math.max(0, activePowerupRemaining);
   return model;
 }

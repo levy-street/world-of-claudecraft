@@ -979,6 +979,7 @@ export const en = {
       expand: 'Expand the Protect Yumi bars',
       powerupIn: 'Power-up in {s}s',
       powerupReady: 'Power-up ready!',
+      powerupActive: '{name}: {s}s remaining',
     },
     respawn: {
       title: 'DOWNED!',

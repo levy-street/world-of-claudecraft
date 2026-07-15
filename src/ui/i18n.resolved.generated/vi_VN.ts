@@ -4602,7 +4602,8 @@ export const vi_VN: EnTranslations = {
       "collapse": "Thu gọn thanh Bảo Vệ Yumi",
       "expand": "Mở rộng thanh Bảo Vệ Yumi",
       "powerupIn": "Power-up in {s}s",
-      "powerupReady": "Power-up ready!"
+      "powerupReady": "Power-up ready!",
+      "powerupActive": "{name}: {s}s remaining"
     },
     "respawn": {
       "title": "GỤC NGÃ!"

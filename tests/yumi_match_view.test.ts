@@ -109,6 +109,16 @@ describe('yumi match view', () => {
     expect(yumiMatchView(stubInfo(), { ...live, nextPowerupIn: 0 }, 0).nextPowerupIn).toBe(0);
   });
 
+  it('surfaces the local active power-up name and remaining duration', () => {
+    const active = yumiMatchView(stubInfo(), live, 0, 'Warfever', 14.25);
+    expect(active.activePowerupName).toBe('Warfever');
+    expect(active.activePowerupRemaining).toBe(14.25);
+
+    const expired = yumiMatchView(stubInfo(), live, 0, 'Warfever', 0);
+    expect(expired.activePowerupName).toBe('');
+    expect(expired.activePowerupRemaining).toBe(0);
+  });
+
   it('sudden death zeroes the teleport countdown from either source', () => {
     const snap = yumiMatchView(stubInfo({ phase: 'sudden' }), null, 0);
     expect(snap.suddenDeath).toBe(true);

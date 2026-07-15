@@ -6400,6 +6400,7 @@ export type TranslationKeyFlat =
   | 'yumi.hud.enemyYumi'
   | 'yumi.hud.expand'
   | 'yumi.hud.getReady'
+  | 'yumi.hud.powerupActive'
   | 'yumi.hud.powerupIn'
   | 'yumi.hud.powerupReady'
   | 'yumi.hud.suddenDeath'

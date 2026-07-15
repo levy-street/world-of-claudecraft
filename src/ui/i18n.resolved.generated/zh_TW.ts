@@ -4602,7 +4602,8 @@ export const zh_TW: EnTranslations = {
       "collapse": "摺疊Protect Yumi血條",
       "expand": "展開Protect Yumi血條",
       "powerupIn": "強化 {s}秒後出現",
-      "powerupReady": "強化已就緒！"
+      "powerupReady": "強化已就緒！",
+      "powerupActive": "{name}: {s}s remaining"
     },
     "respawn": {
       "title": "倒下了！"

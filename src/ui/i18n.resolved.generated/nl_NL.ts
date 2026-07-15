@@ -4602,7 +4602,8 @@ export const nl_NL: EnTranslations = {
       "collapse": "De Bescherm Yumi-balken inklappen",
       "expand": "De Bescherm Yumi-balken uitklappen",
       "powerupIn": "Power-up in {s}s",
-      "powerupReady": "Power-up ready!"
+      "powerupReady": "Power-up ready!",
+      "powerupActive": "{name}: {s}s remaining"
     },
     "respawn": {
       "title": "NEERGEHAALD!"

@@ -9771,6 +9771,9 @@
   .yh-powerup.ready {
     color: #ffe27a;
   }
+  .yh-powerup.active {
+    color: #ffb36b;
+  }
   /* Hold-to-grab bar (yumi_grab_bar_painter.ts): a cast-style timer centred in
      the mid-lower screen, clear of the bottom control cluster + action bar on
      desktop and mobile. Painter toggles display:flex; hidden by default. */

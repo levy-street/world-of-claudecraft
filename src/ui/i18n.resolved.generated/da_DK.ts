@@ -4602,7 +4602,8 @@ export const da_DK: EnTranslations = {
       "collapse": "Skjul Beskyt Yumi-bjælkerne",
       "expand": "Vis Beskyt Yumi-bjælkerne",
       "powerupIn": "Power-up in {s}s",
-      "powerupReady": "Power-up ready!"
+      "powerupReady": "Power-up ready!",
+      "powerupActive": "{name}: {s}s remaining"
     },
     "respawn": {
       "title": "SLÅET NED!"
