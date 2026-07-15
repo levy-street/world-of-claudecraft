@@ -5744,7 +5744,7 @@ export const cs_CZ: EnTranslations = {
       },
       "fireball": {
         "name": "Škvárový šíp",
-        "description": "Vrhe ohnivou kouli, která způsobí {damage} ohnivého poškození plus další poškození v čase."
+        "description": "Vrhe ohnivou kouli, která způsobí {damage} ohnivého poškození plus {overTime} ohnivého poškození v čase."
       },
       "frost_armor": {
         "name": "Plášť jinovatky",
@@ -5796,7 +5796,7 @@ export const cs_CZ: EnTranslations = {
       },
       "pyroblast": {
         "name": "Žárové kopí",
-        "description": "Vrhe obrovský ohnivý balvan, který způsobí {damage} ohnivého poškození plus další poškození v čase."
+        "description": "Vrhe obrovský ohnivý balvan, který způsobí {damage} ohnivého poškození plus {overTime} ohnivého poškození během 12 s."
       },
       "ice_barrier": {
         "name": "Mrazivý závoj",

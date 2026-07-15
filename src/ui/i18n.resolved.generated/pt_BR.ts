@@ -5744,7 +5744,7 @@ export const pt_BR: EnTranslations = {
       },
       "fireball": {
         "name": "Raio de Brasa",
-        "description": "Arremessa uma bola flamejante que causa {damage} de dano de Fogo e dano adicional ao longo do tempo."
+        "description": "Arremessa uma bola flamejante que causa {damage} de dano de Fogo e mais {overTime} de dano de Fogo ao longo do tempo."
       },
       "frost_armor": {
         "name": "Manto de Geada",
@@ -5796,7 +5796,7 @@ export const pt_BR: EnTranslations = {
       },
       "pyroblast": {
         "name": "Lança Ígnea",
-        "description": "Arremessa uma imensa rocha flamejante que causa {damage} de dano de Fogo mais dano adicional ao longo do tempo."
+        "description": "Arremessa uma imensa rocha flamejante que causa {damage} de dano de Fogo e mais {overTime} de dano de Fogo em 12 s."
       },
       "ice_barrier": {
         "name": "Véu de Gelo",

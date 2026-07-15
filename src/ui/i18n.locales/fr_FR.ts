@@ -3474,7 +3474,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flamestrike.description':
     "Fait s'abattre une explosion de flammes sur la zone visée, infligeant {damage} points de dégâts de Feu aux ennemis pris dans la déflagration.",
   'entities.abilities.fireball.description':
-    'Lance une boule enflammée qui inflige {damage} points de dégâts de Feu plus des dégâts supplémentaires sur la durée.',
+    'Lance une boule enflammée qui inflige {damage} points de dégâts de Feu plus {overTime} points de dégâts de Feu sur la durée.',
   'entities.abilities.frost_armor.name': 'Manteau de givre',
   'entities.abilities.frost_armor.description':
     "Vous enveloppe de givre et augmente l'armure de {buff} pendant 30 min.",
@@ -3510,7 +3510,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Brûle l'ennemi pour {damage} points de dégâts de Feu. Incantation rapide.",
   'entities.abilities.pyroblast.name': 'Pyrelance',
   'entities.abilities.pyroblast.description':
-    'Projette un immense rocher enflammé qui inflige {damage} points de dégâts de Feu plus des dégâts supplémentaires sur la durée.',
+    'Projette un immense rocher enflammé qui inflige {damage} points de dégâts de Feu plus {overTime} points de dégâts de Feu en 12 s.',
   'entities.abilities.ice_barrier.name': 'Voile de givre',
   'entities.abilities.ice_barrier.description':
     'Vous protège dans la glace et absorbe {damage} points de dégâts pendant 60 s.',

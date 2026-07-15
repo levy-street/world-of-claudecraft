@@ -5744,7 +5744,7 @@ export const es_ES: EnTranslations = {
       },
       "fireball": {
         "name": "Descarga de Ascuas",
-        "description": "Lanza una bola ígnea que causa {damage} de daño de Fuego y daño adicional en el tiempo."
+        "description": "Lanza una bola ígnea que causa {damage} de daño de Fuego y {overTime} de daño de Fuego en el tiempo."
       },
       "frost_armor": {
         "name": "Manto de Escarcha",
@@ -5796,7 +5796,7 @@ export const es_ES: EnTranslations = {
       },
       "pyroblast": {
         "name": "Lanza Ígnea",
-        "description": "Lanza una enorme roca ígnea que causa {damage} de daño de Fuego y daño adicional en el tiempo."
+        "description": "Lanza una enorme roca ígnea que causa {damage} de daño de Fuego y {overTime} de daño de Fuego durante 12 s."
       },
       "ice_barrier": {
         "name": "Velo de Escarcha",

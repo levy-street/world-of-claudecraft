@@ -3073,7 +3073,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flamestrike.description':
     'Invoca uma explosão de chamas no local-alvo, causando {damage} de dano de Fogo aos inimigos atingidos pela explosão.',
   'entities.abilities.fireball.description':
-    'Arremessa uma bola flamejante que causa {damage} de dano de Fogo e dano adicional ao longo do tempo.',
+    'Arremessa uma bola flamejante que causa {damage} de dano de Fogo e mais {overTime} de dano de Fogo ao longo do tempo.',
   'entities.abilities.frost_armor.name': 'Manto de Geada',
   'entities.abilities.frost_armor.description':
     'Envolve você em gelo, aumentando a armadura em {buff} por 30 min.',
@@ -3108,7 +3108,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Chamusca o inimigo com {damage} de dano de Fogo. Lançamento rápido.',
   'entities.abilities.pyroblast.name': 'Lança Ígnea',
   'entities.abilities.pyroblast.description':
-    'Arremessa uma imensa rocha flamejante que causa {damage} de dano de Fogo mais dano adicional ao longo do tempo.',
+    'Arremessa uma imensa rocha flamejante que causa {damage} de dano de Fogo e mais {overTime} de dano de Fogo em 12 s.',
   'entities.abilities.ice_barrier.name': 'Véu de Gelo',
   'entities.abilities.ice_barrier.description':
     'Protege você em gelo, absorvendo {damage} de dano por 60 s.',

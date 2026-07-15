@@ -9,9 +9,9 @@ import { MAGE_CHOICE_ROWS } from '../src/sim/content/choice_rows_classic';
 import { ABILITIES, ITEMS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 
-function mage(rows: Record<number, string> = {}): Sim {
+function mage(rows: Record<number, string> = {}, level = 20): Sim {
   const sim = new Sim({ seed: 2026, playerClass: 'mage', autoEquip: false });
-  sim.setPlayerLevel(20);
+  sim.setPlayerLevel(level);
   expect(sim.applyTalents({ spec: null, rows })).toBe(true);
   return sim;
 }
@@ -89,6 +89,39 @@ describe('PBE-2 Mage feedback', () => {
       ITEMS.conjured_bread2.foodHp,
       ITEMS.conjured_bread3.foodHp,
     ]).toEqual([61, 243, 874]);
+  });
+
+  it('raises Fire spell DoTs and exposes their totals through the over-time token', () => {
+    const cinderboltRanks = [
+      { level: 1, total: 4, duration: 4, interval: 2, perTick: 2 },
+      { level: 6, total: 9, duration: 6, interval: 2, perTick: 3 },
+      { level: 12, total: 18, duration: 6, interval: 2, perTick: 6 },
+      { level: 18, total: 32, duration: 8, interval: 2, perTick: 8 },
+    ];
+
+    for (const expected of cinderboltRanks) {
+      const cinderbolt = mage({}, expected.level).resolvedAbility('fireball');
+      const cinderboltDot = cinderbolt?.effects.find((effect) => effect.type === 'dot');
+      expect(cinderboltDot).toMatchObject({
+        total: expected.total,
+        duration: expected.duration,
+        interval: expected.interval,
+      });
+      expect(
+        cinderboltDot && cinderboltDot.total / (cinderboltDot.duration / cinderboltDot.interval),
+      ).toBe(expected.perTick);
+    }
+
+    const sim = mage();
+    const pyrelance = sim.resolvedAbility('pyroblast');
+    const pyrelanceDot = pyrelance?.effects.find((effect) => effect.type === 'dot');
+
+    expect(pyrelanceDot).toMatchObject({ total: 72, duration: 12, interval: 2 });
+    expect(
+      pyrelanceDot && pyrelanceDot.total / (pyrelanceDot.duration / pyrelanceDot.interval),
+    ).toBe(12);
+    expect(ABILITIES.fireball.description).toContain('$o');
+    expect(ABILITIES.pyroblast.description).toContain('$o');
   });
 
   it('makes Flickerstep baseline and keeps three distinct level-17 choices', () => {

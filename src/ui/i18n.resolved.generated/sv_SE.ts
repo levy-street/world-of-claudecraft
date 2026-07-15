@@ -5744,7 +5744,7 @@ export const sv_SE: EnTranslations = {
       },
       "fireball": {
         "name": "Glödbult",
-        "description": "Slungar ett brinnande klot som vållar {damage} eldskada plus ytterligare skada över tid."
+        "description": "Slungar ett brinnande klot som vållar {damage} eldskada plus {overTime} eldskada över tid."
       },
       "frost_armor": {
         "name": "Rimfrostmantel",
@@ -5796,7 +5796,7 @@ export const sv_SE: EnTranslations = {
       },
       "pyroblast": {
         "name": "Pyrolans",
-        "description": "Slungar ett väldigt brinnande stenblock som vållar {damage} eldskada plus ytterligare skada över tid."
+        "description": "Slungar ett väldigt brinnande stenblock som vållar {damage} eldskada plus {overTime} eldskada över 12 sek."
       },
       "ice_barrier": {
         "name": "Frostslöja",

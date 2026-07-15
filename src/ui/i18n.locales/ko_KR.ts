@@ -2386,7 +2386,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flamestrike.description':
     '지정한 지역에 화염 폭발을 일으켜 폭발 범위 안의 적에게 {damage}의 화염 피해를 입힙니다.',
   'entities.abilities.fireball.description':
-    '불덩이를 날려 {damage}의 화염 피해와 추가 지속 피해를 입힙니다.',
+    '불덩이를 날려 {damage}의 화염 피해와 {overTime}의 지속 화염 피해를 입힙니다.',
   'entities.abilities.frost_armor.name': '서리 망토',
   'entities.abilities.frost_armor.description':
     '자신을 냉기로 감싸 30분 동안 방어도를 {buff}만큼 증가시킵니다.',
@@ -2424,7 +2424,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '적을 불태워 {damage}의 화염 피해를 입힙니다. 빠르게 시전합니다.',
   'entities.abilities.pyroblast.name': '화염 창',
   'entities.abilities.pyroblast.description':
-    '거대한 불덩이를 던져 {damage}의 화염 피해와 추가 지속 피해를 입힙니다.',
+    '거대한 불덩이를 던져 {damage}의 화염 피해와 12초에 걸쳐 {overTime}의 화염 피해를 입힙니다.',
   'entities.abilities.ice_barrier.name': '서리 장막',
   'entities.abilities.ice_barrier.description':
     '얼음으로 자신을 보호해 60초 동안 {damage}의 피해를 흡수합니다.',

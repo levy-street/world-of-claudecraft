@@ -2406,7 +2406,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flamestrike.description':
     '対象地点に炎の爆発を呼び出し、爆発に巻き込まれた敵に{damage}の火炎ダメージを与えます。',
   'entities.abilities.fireball.description':
-    '炎の球を放ち、{damage} の火炎ダメージと追加の継続ダメージを与えます。',
+    '炎の球を放ち、{damage}の火炎ダメージと{overTime}の継続火炎ダメージを与えます。',
   'entities.abilities.frost_armor.name': '白霜の外套',
   'entities.abilities.frost_armor.description':
     '霜で身を包み、30分間アーマーを{buff}増加させます。',
@@ -2444,7 +2444,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '敵を焼き、{damage} の火炎ダメージを与えます。詠唱が速い呪文です。',
   'entities.abilities.pyroblast.name': '火焔槍',
   'entities.abilities.pyroblast.description':
-    '巨大な炎の岩塊を放ち、{damage} の火炎ダメージと追加の継続ダメージを与えます。',
+    '巨大な炎の岩塊を放ち、{damage}の火炎ダメージと12秒間で{overTime}の火炎ダメージを与えます。',
   'entities.abilities.ice_barrier.name': '氷の帳',
   'entities.abilities.ice_barrier.description':
     '氷で身を守り、60秒間{damage}ダメージを吸収します。',

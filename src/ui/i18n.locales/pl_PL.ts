@@ -1918,7 +1918,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Razi wroga, zadając {damage} obrażeń od ognia. Natychmiastowe.',
   'entities.abilities.fire_blast.name': 'Deszcz żaru',
   'entities.abilities.fireball.description':
-    'Ciska ognistą kulą, która zadaje {damage} obrażeń od ognia oraz dodatkowe obrażenia w czasie.',
+    'Ciska ognistą kulą, która zadaje {damage} obrażeń od ognia oraz {overTime} obrażeń od ognia w czasie.',
   'entities.abilities.fireball.name': 'Żarowy pocisk',
   'entities.abilities.rain_of_fire.name': 'Deszcz ognia',
   'entities.abilities.rain_of_fire.description':
@@ -2065,7 +2065,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Wchodzi w skradanie w postaci wilka, poruszając się o 50% wolniej. Nie można użyć w walce.',
   'entities.abilities.prowl.name': 'Podchody',
   'entities.abilities.pyroblast.description':
-    'Ciska ogromnym ognistym głazem, który zadaje {damage} obrażeń od ognia oraz dodatkowe obrażenia w czasie.',
+    'Ciska ogromnym ognistym głazem, który zadaje {damage} obrażeń od ognia oraz {overTime} obrażeń od ognia przez 12 sek.',
   'entities.abilities.pyroblast.name': 'Ognista lanca',
   'entities.abilities.rake.description':
     'Otwarcie ze skradania, które rozdziera wroga za obrażenia broni plus {damage} i powoduje krwawienie w ciągu 9 sek. Przyznaje 1 punkt kombinacji. Tylko w postaci wilka.',

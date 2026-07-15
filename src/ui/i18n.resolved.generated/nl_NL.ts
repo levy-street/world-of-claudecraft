@@ -5744,7 +5744,7 @@ export const nl_NL: EnTranslations = {
       },
       "fireball": {
         "name": "Sintelbout",
-        "description": "Werpt een vurige bal die {damage} Vuurschade toebrengt plus extra schade over tijd."
+        "description": "Werpt een vurige bal die {damage} Vuurschade plus {overTime} Vuurschade over tijd toebrengt."
       },
       "frost_armor": {
         "name": "Rijpmantel",
@@ -5796,7 +5796,7 @@ export const nl_NL: EnTranslations = {
       },
       "pyroblast": {
         "name": "Pyrelans",
-        "description": "Werpt een immense vurige kei die {damage} Vuurschade toebrengt plus extra schade over tijd."
+        "description": "Werpt een immense vurige kei die {damage} Vuurschade plus {overTime} Vuurschade over 12 sec. toebrengt."
       },
       "ice_barrier": {
         "name": "Vorstsluier",

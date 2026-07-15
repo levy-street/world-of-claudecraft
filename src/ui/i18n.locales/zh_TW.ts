@@ -2309,7 +2309,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flamestrike.description':
     '在目標區域召喚一次烈焰爆發，對爆炸範圍內的敵人造成 {damage} 點火焰傷害。',
   'entities.abilities.fireball.description':
-    '投擲一團火球，造成 {damage} 點火焰傷害，並附加持續傷害。',
+    '投擲一團火球，造成 {damage} 點火焰傷害，並附加 {overTime} 點持續火焰傷害。',
   'entities.abilities.frost_armor.name': '白霜披風',
   'entities.abilities.frost_armor.description': '以寒霜包裹自身，使護甲提高 {buff}，持續 30 分鐘。',
   'entities.abilities.arcane_intellect.name': '乙太洞察',
@@ -2344,7 +2344,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.scorch.description': '灼燒敵人，造成 {damage} 點火焰傷害。施法迅速。',
   'entities.abilities.pyroblast.name': '烈焰長矛',
   'entities.abilities.pyroblast.description':
-    '投擲一顆巨大的火焰隕石，造成 {damage} 點火焰傷害，並在一段時間內造成額外傷害。',
+    '投擲一顆巨大的火焰隕石，造成 {damage} 點火焰傷害，並在 12 秒內造成 {overTime} 點火焰傷害。',
   'entities.abilities.ice_barrier.name': '冰霜帷幕',
   'entities.abilities.ice_barrier.description':
     '以冰霜護盾保護你，吸收 {damage} 點傷害，持續 60 秒。',

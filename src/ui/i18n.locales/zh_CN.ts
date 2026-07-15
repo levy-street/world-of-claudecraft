@@ -2307,7 +2307,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flamestrike.description':
     '在目标区域召唤一次烈焰爆发，对爆炸范围内的敌人造成 {damage} 点火焰伤害。',
   'entities.abilities.fireball.description':
-    '投掷一团火球，造成 {damage} 点火焰伤害，并附加持续伤害。',
+    '投掷一团火球，造成 {damage} 点火焰伤害，并附加 {overTime} 点持续火焰伤害。',
   'entities.abilities.frost_armor.name': '白霜护罩',
   'entities.abilities.frost_armor.description': '以寒霜包裹自身，使护甲提高 {buff}，持续 30 分钟。',
   'entities.abilities.arcane_intellect.name': '以太睿智',
@@ -2342,7 +2342,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.scorch.description': '灼烧敌人，造成 {damage} 点火焰伤害。施法迅速。',
   'entities.abilities.pyroblast.name': '烈焰长矛',
   'entities.abilities.pyroblast.description':
-    '投掷一颗巨大的火焰陨石，造成 {damage} 点火焰伤害，并在一段时间内造成额外伤害。',
+    '投掷一颗巨大的火焰陨石，造成 {damage} 点火焰伤害，并在 12 秒内造成 {overTime} 点火焰伤害。',
   'entities.abilities.ice_barrier.name': '霜帷',
   'entities.abilities.ice_barrier.description':
     '以冰霜护盾保护你，吸收 {damage} 点伤害，持续 60 秒。',

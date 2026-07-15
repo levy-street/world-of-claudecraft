@@ -1227,7 +1227,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [
       { type: 'directDamage', min: 16, max: 25 },
-      { type: 'dot', total: 2, duration: 4, interval: 2 },
+      { type: 'dot', total: 4, duration: 4, interval: 2 },
     ],
     ranks: [
       {
@@ -1237,7 +1237,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         castTime: 2.0,
         effects: [
           { type: 'directDamage', min: 22, max: 31 },
-          { type: 'dot', total: 3, duration: 6, interval: 2 },
+          { type: 'dot', total: 9, duration: 6, interval: 2 },
         ],
       },
       {
@@ -1247,7 +1247,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         castTime: 2.5,
         effects: [
           { type: 'directDamage', min: 36, max: 48 },
-          { type: 'dot', total: 6, duration: 6, interval: 2 },
+          { type: 'dot', total: 18, duration: 6, interval: 2 },
         ],
       },
       {
@@ -1257,11 +1257,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
         castTime: 3.0,
         effects: [
           { type: 'directDamage', min: 58, max: 78 },
-          { type: 'dot', total: 12, duration: 8, interval: 2 },
+          { type: 'dot', total: 32, duration: 8, interval: 2 },
         ],
       },
     ],
-    description: 'Hurls a fiery ball that causes $d Fire damage plus additional damage over time.',
+    description: 'Hurls a fiery ball that causes $d Fire damage plus $o Fire damage over time.',
   },
   frost_armor: {
     id: 'frost_armor',
@@ -1598,10 +1598,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [
       { type: 'directDamage', min: 170, max: 225 },
-      { type: 'dot', total: 48, duration: 12, interval: 2 },
+      { type: 'dot', total: 72, duration: 12, interval: 2 },
     ],
     description:
-      'Hurls an immense fiery boulder that causes $d Fire damage plus additional damage over time.',
+      'Hurls an immense fiery boulder that causes $d Fire damage plus $o Fire damage over 12 sec.',
   },
   ice_barrier: {
     id: 'ice_barrier',

@@ -5744,7 +5744,7 @@ export const ko_KR: EnTranslations = {
       },
       "fireball": {
         "name": "잉걸 화살",
-        "description": "불덩이를 날려 {damage}의 화염 피해와 추가 지속 피해를 입힙니다."
+        "description": "불덩이를 날려 {damage}의 화염 피해와 {overTime}의 지속 화염 피해를 입힙니다."
       },
       "frost_armor": {
         "name": "서리 망토",
@@ -5796,7 +5796,7 @@ export const ko_KR: EnTranslations = {
       },
       "pyroblast": {
         "name": "화염 창",
-        "description": "거대한 불덩이를 던져 {damage}의 화염 피해와 추가 지속 피해를 입힙니다."
+        "description": "거대한 불덩이를 던져 {damage}의 화염 피해와 12초에 걸쳐 {overTime}의 화염 피해를 입힙니다."
       },
       "ice_barrier": {
         "name": "서리 장막",

@@ -5744,7 +5744,7 @@ export const de_DE: EnTranslations = {
       },
       "fireball": {
         "name": "Feuerball",
-        "description": "Schleudert einen feurigen Ball, der {damage} Feuerschaden sowie zusätzlichen Schaden über Zeit verursacht."
+        "description": "Schleudert einen feurigen Ball, der {damage} Feuerschaden sowie {overTime} Feuerschaden über Zeit verursacht."
       },
       "frost_armor": {
         "name": "Raureifmantel",
@@ -5796,7 +5796,7 @@ export const de_DE: EnTranslations = {
       },
       "pyroblast": {
         "name": "Pyrelance",
-        "description": "Schleudert einen gewaltigen Feuerbrocken, der {damage} Feuerschaden sowie zusätzlichen Schaden über Zeit verursacht."
+        "description": "Schleudert einen gewaltigen Feuerbrocken, der {damage} Feuerschaden sowie {overTime} Feuerschaden über 12 Sek. verursacht."
       },
       "ice_barrier": {
         "name": "Frostschleier",

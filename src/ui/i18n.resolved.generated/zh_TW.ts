@@ -5744,7 +5744,7 @@ export const zh_TW: EnTranslations = {
       },
       "fireball": {
         "name": "燼焰彈",
-        "description": "投擲一團火球，造成 {damage} 點火焰傷害，並附加持續傷害。"
+        "description": "投擲一團火球，造成 {damage} 點火焰傷害，並附加 {overTime} 點持續火焰傷害。"
       },
       "frost_armor": {
         "name": "白霜披風",
@@ -5796,7 +5796,7 @@ export const zh_TW: EnTranslations = {
       },
       "pyroblast": {
         "name": "烈焰長矛",
-        "description": "投擲一顆巨大的火焰隕石，造成 {damage} 點火焰傷害，並在一段時間內造成額外傷害。"
+        "description": "投擲一顆巨大的火焰隕石，造成 {damage} 點火焰傷害，並在 12 秒內造成 {overTime} 點火焰傷害。"
       },
       "ice_barrier": {
         "name": "冰霜帷幕",

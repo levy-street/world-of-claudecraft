@@ -4085,7 +4085,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Odstřelí nepřítele za {damage} ohnivého poškození. Okamžité.',
   'entities.abilities.fire_blast.name': 'Pád škváry',
   'entities.abilities.fireball.description':
-    'Vrhe ohnivou kouli, která způsobí {damage} ohnivého poškození plus další poškození v čase.',
+    'Vrhe ohnivou kouli, která způsobí {damage} ohnivého poškození plus {overTime} ohnivého poškození v čase.',
   'entities.abilities.fireball.name': 'Škvárový šíp',
   'entities.abilities.flame_shock.description':
     'Sežehne cíl ohněm za {damage} poškození plus {overTime} během 12 s.',
@@ -4220,7 +4220,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Vstoupíš do plížení ve vlčí podobě a pohybuješ se o 50 % pomaleji. Nelze použít v boji.',
   'entities.abilities.prowl.name': 'Plížení',
   'entities.abilities.pyroblast.description':
-    'Vrhe obrovský ohnivý balvan, který způsobí {damage} ohnivého poškození plus další poškození v čase.',
+    'Vrhe obrovský ohnivý balvan, který způsobí {damage} ohnivého poškození plus {overTime} ohnivého poškození během 12 s.',
   'entities.abilities.pyroblast.name': 'Žárové kopí',
   'entities.abilities.rain_of_fire.description':
     'Přivolá ohnivý déšť do cílové oblasti na 4 s a spálí nepřátele za {damage} ohnivého poškození každou sekundu.',

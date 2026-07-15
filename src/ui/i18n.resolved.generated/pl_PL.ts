@@ -5744,7 +5744,7 @@ export const pl_PL: EnTranslations = {
       },
       "fireball": {
         "name": "Żarowy pocisk",
-        "description": "Ciska ognistą kulą, która zadaje {damage} obrażeń od ognia oraz dodatkowe obrażenia w czasie."
+        "description": "Ciska ognistą kulą, która zadaje {damage} obrażeń od ognia oraz {overTime} obrażeń od ognia w czasie."
       },
       "frost_armor": {
         "name": "Płaszcz szronu",
@@ -5796,7 +5796,7 @@ export const pl_PL: EnTranslations = {
       },
       "pyroblast": {
         "name": "Ognista lanca",
-        "description": "Ciska ogromnym ognistym głazem, który zadaje {damage} obrażeń od ognia oraz dodatkowe obrażenia w czasie."
+        "description": "Ciska ogromnym ognistym głazem, który zadaje {damage} obrażeń od ognia oraz {overTime} obrażeń od ognia przez 12 sek."
       },
       "ice_barrier": {
         "name": "Lodowa zasłona",

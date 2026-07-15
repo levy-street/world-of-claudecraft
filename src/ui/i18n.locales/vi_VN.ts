@@ -1983,7 +1983,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Nổ tung kẻ địch, gây {damage} sát thương Hỏa. Tức thời.',
   'entities.abilities.fire_blast.name': 'Mưa Tàn Lửa',
   'entities.abilities.fireball.description':
-    'Ném ra một quả cầu lửa rực cháy gây {damage} sát thương Hỏa cùng sát thương cộng dồn theo thời gian.',
+    'Ném ra một quả cầu lửa rực cháy gây {damage} sát thương Hỏa cùng {overTime} sát thương Hỏa theo thời gian.',
   'entities.abilities.fireball.name': 'Tia Tàn Lửa',
   'entities.abilities.rain_of_fire.name': 'Mưa Lửa',
   'entities.abilities.rain_of_fire.description':
@@ -2130,7 +2130,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Vào trạng thái ẩn thân khi ở Hình Sói, di chuyển chậm hơn 50%. Không thể dùng trong chiến đấu.',
   'entities.abilities.prowl.name': 'Rình Rập',
   'entities.abilities.pyroblast.description':
-    'Ném ra một tảng lửa khổng lồ gây {damage} sát thương Hỏa cùng sát thương cộng dồn theo thời gian.',
+    'Ném ra một tảng lửa khổng lồ gây {damage} sát thương Hỏa cùng {overTime} sát thương Hỏa trong 12 giây.',
   'entities.abilities.pyroblast.name': 'Thương Liệt Hỏa',
   'entities.abilities.rake.description':
     'Một đòn mở màn từ trạng thái ẩn thân cào xé kẻ địch gây sát thương vũ khí cộng thêm {damage} và gây sát thương chảy máu trong 9 giây. Tặng 1 điểm liên hoàn. Chỉ dùng được ở Hình Sói.',

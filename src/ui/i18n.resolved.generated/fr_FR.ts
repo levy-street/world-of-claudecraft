@@ -5744,7 +5744,7 @@ export const fr_FR: EnTranslations = {
       },
       "fireball": {
         "name": "Cinderbolt",
-        "description": "Lance une boule enflammée qui inflige {damage} points de dégâts de Feu plus des dégâts supplémentaires sur la durée."
+        "description": "Lance une boule enflammée qui inflige {damage} points de dégâts de Feu plus {overTime} points de dégâts de Feu sur la durée."
       },
       "frost_armor": {
         "name": "Manteau de givre",
@@ -5796,7 +5796,7 @@ export const fr_FR: EnTranslations = {
       },
       "pyroblast": {
         "name": "Pyrelance",
-        "description": "Projette un immense rocher enflammé qui inflige {damage} points de dégâts de Feu plus des dégâts supplémentaires sur la durée."
+        "description": "Projette un immense rocher enflammé qui inflige {damage} points de dégâts de Feu plus {overTime} points de dégâts de Feu en 12 s."
       },
       "ice_barrier": {
         "name": "Voile de givre",

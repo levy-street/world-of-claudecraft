@@ -5744,7 +5744,7 @@ export const it_IT: EnTranslations = {
       },
       "fireball": {
         "name": "Dardo di Braci",
-        "description": "Scaglia una palla infuocata che infligge {damage} danni da Fuoco più danni aggiuntivi nel tempo."
+        "description": "Scaglia una palla infuocata che infligge {damage} danni da Fuoco più {overTime} danni da Fuoco nel tempo."
       },
       "frost_armor": {
         "name": "Manto di Brina",
@@ -5796,7 +5796,7 @@ export const it_IT: EnTranslations = {
       },
       "pyroblast": {
         "name": "Lancia di Pira",
-        "description": "Scaglia un immenso masso infuocato che infligge {damage} danni da Fuoco più danni aggiuntivi nel tempo."
+        "description": "Scaglia un immenso masso infuocato che infligge {damage} danni da Fuoco più {overTime} danni da Fuoco in 12 s."
       },
       "ice_barrier": {
         "name": "Velo di Gelo",

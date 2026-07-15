@@ -5744,7 +5744,7 @@ export const id_ID: EnTranslations = {
       },
       "fireball": {
         "name": "Cinderbolt",
-        "description": "Melontarkan bola berkobar yang menimbulkan {damage} kerusakan Api ditambah kerusakan tambahan seiring waktu."
+        "description": "Melontarkan bola berkobar yang menimbulkan {damage} kerusakan Api ditambah {overTime} kerusakan Api seiring waktu."
       },
       "frost_armor": {
         "name": "Mantel Embun Beku",
@@ -5796,7 +5796,7 @@ export const id_ID: EnTranslations = {
       },
       "pyroblast": {
         "name": "Pyrelance",
-        "description": "Melontarkan bongkahan berkobar raksasa yang menimbulkan {damage} kerusakan Api ditambah kerusakan tambahan seiring waktu."
+        "description": "Melontarkan bongkahan berkobar raksasa yang menimbulkan {damage} kerusakan Api ditambah {overTime} kerusakan Api selama 12 dtk."
       },
       "ice_barrier": {
         "name": "Selubung Beku",

@@ -5744,7 +5744,7 @@ export const vi_VN: EnTranslations = {
       },
       "fireball": {
         "name": "Tia Tàn Lửa",
-        "description": "Ném ra một quả cầu lửa rực cháy gây {damage} sát thương Hỏa cùng sát thương cộng dồn theo thời gian."
+        "description": "Ném ra một quả cầu lửa rực cháy gây {damage} sát thương Hỏa cùng {overTime} sát thương Hỏa theo thời gian."
       },
       "frost_armor": {
         "name": "Áo Choàng Sương Giá",
@@ -5796,7 +5796,7 @@ export const vi_VN: EnTranslations = {
       },
       "pyroblast": {
         "name": "Thương Liệt Hỏa",
-        "description": "Ném ra một tảng lửa khổng lồ gây {damage} sát thương Hỏa cùng sát thương cộng dồn theo thời gian."
+        "description": "Ném ra một tảng lửa khổng lồ gây {damage} sát thương Hỏa cùng {overTime} sát thương Hỏa trong 12 giây."
       },
       "ice_barrier": {
         "name": "Màn Băng",

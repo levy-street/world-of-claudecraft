@@ -5744,7 +5744,7 @@ export const ja_JP: EnTranslations = {
       },
       "fireball": {
         "name": "灰燼の矢",
-        "description": "炎の球を放ち、{damage} の火炎ダメージと追加の継続ダメージを与えます。"
+        "description": "炎の球を放ち、{damage}の火炎ダメージと{overTime}の継続火炎ダメージを与えます。"
       },
       "frost_armor": {
         "name": "白霜の外套",
@@ -5796,7 +5796,7 @@ export const ja_JP: EnTranslations = {
       },
       "pyroblast": {
         "name": "火焔槍",
-        "description": "巨大な炎の岩塊を放ち、{damage} の火炎ダメージと追加の継続ダメージを与えます。"
+        "description": "巨大な炎の岩塊を放ち、{damage}の火炎ダメージと12秒間で{overTime}の火炎ダメージを与えます。"
       },
       "ice_barrier": {
         "name": "氷の帳",

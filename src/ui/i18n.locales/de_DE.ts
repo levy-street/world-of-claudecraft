@@ -3099,7 +3099,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flamestrike.description':
     'Lässt am Zielort eine Feuerexplosion niedergehen, die allen Gegnern im Wirkungsbereich {damage} Feuerschaden zufügt.',
   'entities.abilities.fireball.description':
-    'Schleudert einen feurigen Ball, der {damage} Feuerschaden sowie zusätzlichen Schaden über Zeit verursacht.',
+    'Schleudert einen feurigen Ball, der {damage} Feuerschaden sowie {overTime} Feuerschaden über Zeit verursacht.',
   'entities.abilities.frost_armor.name': 'Raureifmantel',
   'entities.abilities.frost_armor.description':
     'Hüllt euch in Frost und erhöht die Rüstung 30 Min. lang um {buff}.',
@@ -3135,7 +3135,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Versengt den Gegner für {damage} Feuerschaden. Schnell zu wirken.',
   'entities.abilities.pyroblast.name': 'Pyrelance',
   'entities.abilities.pyroblast.description':
-    'Schleudert einen gewaltigen Feuerbrocken, der {damage} Feuerschaden sowie zusätzlichen Schaden über Zeit verursacht.',
+    'Schleudert einen gewaltigen Feuerbrocken, der {damage} Feuerschaden sowie {overTime} Feuerschaden über 12 Sek. verursacht.',
   'entities.abilities.ice_barrier.name': 'Frostschleier',
   'entities.abilities.ice_barrier.description':
     'Schützt euch mit Eis und absorbiert 60 Sek. lang {damage} Schaden.',

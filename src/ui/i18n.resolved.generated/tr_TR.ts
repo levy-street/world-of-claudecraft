@@ -5744,7 +5744,7 @@ export const tr_TR: EnTranslations = {
       },
       "fireball": {
         "name": "Köz Oku",
-        "description": "Ateşli bir top fırlatarak {damage} Ateş hasarı ve ek olarak zamana yayılı hasar verir."
+        "description": "Ateşli bir top fırlatarak {damage} Ateş hasarı ve zamana yayılı {overTime} Ateş hasarı verir."
       },
       "frost_armor": {
         "name": "Kırağı Pelerini",
@@ -5796,7 +5796,7 @@ export const tr_TR: EnTranslations = {
       },
       "pyroblast": {
         "name": "Alev Mızrağı",
-        "description": "Devasa ateşli bir kaya fırlatarak {damage} Ateş hasarı ve ek olarak zamana yayılı hasar verir."
+        "description": "Devasa ateşli bir kaya fırlatarak {damage} Ateş hasarı ve 12 sn. boyunca {overTime} Ateş hasarı verir."
       },
       "ice_barrier": {
         "name": "Buz Örtüsü",

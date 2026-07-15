@@ -3083,7 +3083,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flamestrike.description':
     "Evoca un'esplosione di fiamme sulla zona bersaglio, infliggendo {damage} danni da Fuoco ai nemici investiti dalla deflagrazione.",
   'entities.abilities.fireball.description':
-    'Scaglia una palla infuocata che infligge {damage} danni da Fuoco più danni aggiuntivi nel tempo.',
+    'Scaglia una palla infuocata che infligge {damage} danni da Fuoco più {overTime} danni da Fuoco nel tempo.',
   'entities.abilities.frost_armor.name': 'Manto di Brina',
   'entities.abilities.frost_armor.description':
     "Ti avvolge nel gelo, aumentando l'armatura di {buff} per 30 min.",
@@ -3118,7 +3118,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Brucia il nemico per {damage} danni da Fuoco. Lancio rapido.',
   'entities.abilities.pyroblast.name': 'Lancia di Pira',
   'entities.abilities.pyroblast.description':
-    'Scaglia un immenso masso infuocato che infligge {damage} danni da Fuoco più danni aggiuntivi nel tempo.',
+    'Scaglia un immenso masso infuocato che infligge {damage} danni da Fuoco più {overTime} danni da Fuoco in 12 s.',
   'entities.abilities.ice_barrier.name': 'Velo di Gelo',
   'entities.abilities.ice_barrier.description':
     'Ti protegge nel ghiaccio, assorbendo {damage} danni per 60 sec.',

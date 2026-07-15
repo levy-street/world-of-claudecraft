@@ -5744,7 +5744,7 @@ export const en: EnTranslations = {
       },
       "fireball": {
         "name": "Cinderbolt",
-        "description": "Hurls a fiery ball that causes {damage} Fire damage plus additional damage over time."
+        "description": "Hurls a fiery ball that causes {damage} Fire damage plus {overTime} Fire damage over time."
       },
       "frost_armor": {
         "name": "Hoarfrost Mantle",
@@ -5796,7 +5796,7 @@ export const en: EnTranslations = {
       },
       "pyroblast": {
         "name": "Pyrelance",
-        "description": "Hurls an immense fiery boulder that causes {damage} Fire damage plus additional damage over time."
+        "description": "Hurls an immense fiery boulder that causes {damage} Fire damage plus {overTime} Fire damage over 12 sec."
       },
       "ice_barrier": {
         "name": "Frostveil",

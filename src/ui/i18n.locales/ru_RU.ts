@@ -2429,7 +2429,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flamestrike.description':
     'Обрушивает огненный взрыв на указанную область, нанося {damage} ед. урона от огня врагам в зоне взрыва.',
   'entities.abilities.fireball.description':
-    'Бросает огненный шар, наносящий {damage} ед. урона от огня и дополнительный периодический урон.',
+    'Бросает огненный шар, наносящий {damage} ед. урона от огня и еще {overTime} ед. периодического урона от огня.',
   'entities.abilities.frost_armor.name': 'Мантия инея',
   'entities.abilities.frost_armor.description':
     'Окутывает вас морозом, повышая броню на {buff} на 30 мин.',
@@ -2467,7 +2467,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Обжигает врага, нанося {damage} ед. урона от огня. Быстрое заклинание.',
   'entities.abilities.pyroblast.name': 'Огненное копьё',
   'entities.abilities.pyroblast.description':
-    'Обрушивает на врага громадный пылающий камень, наносящий {damage} ед. урона от огня и дополнительный урон с течением времени.',
+    'Обрушивает на врага громадный пылающий камень, наносящий {damage} ед. урона от огня и еще {overTime} ед. урона от огня за 12 сек.',
   'entities.abilities.ice_barrier.name': 'Морозная завеса',
   'entities.abilities.ice_barrier.description':
     'Защищает вас льдом, поглощая {damage} ед. урона в течение 60 сек.',

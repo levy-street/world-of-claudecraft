@@ -5744,7 +5744,7 @@ export const da_DK: EnTranslations = {
       },
       "fireball": {
         "name": "Glødlyn",
-        "description": "Slynger en flammende kugle, der volder {damage} ildskade plus yderligere skade over tid."
+        "description": "Slynger en flammende kugle, der volder {damage} ildskade plus {overTime} ildskade over tid."
       },
       "frost_armor": {
         "name": "Rimfrost-Kappe",
@@ -5796,7 +5796,7 @@ export const da_DK: EnTranslations = {
       },
       "pyroblast": {
         "name": "Bållanse",
-        "description": "Slynger en enorm flammende kampesten, der volder {damage} ildskade plus yderligere skade over tid."
+        "description": "Slynger en enorm flammende kampesten, der volder {damage} ildskade plus {overTime} ildskade over 12 sek."
       },
       "ice_barrier": {
         "name": "Frostslør",

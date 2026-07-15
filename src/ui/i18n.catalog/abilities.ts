@@ -687,7 +687,7 @@ const classAbilityNamesEn = {
       [
         'fireball',
         'Cinderbolt',
-        'Hurls a fiery ball that causes {damage} Fire damage plus additional damage over time.',
+        'Hurls a fiery ball that causes {damage} Fire damage plus {overTime} Fire damage over time.',
       ],
       [
         'frost_armor',
@@ -744,7 +744,7 @@ const classAbilityNamesEn = {
       [
         'pyroblast',
         'Pyrelance',
-        'Hurls an immense fiery boulder that causes {damage} Fire damage plus additional damage over time.',
+        'Hurls an immense fiery boulder that causes {damage} Fire damage plus {overTime} Fire damage over 12 sec.',
       ],
       ['ice_barrier', 'Frostveil', 'Shields you in ice, absorbing {damage} damage for 60 sec.'],
       [
