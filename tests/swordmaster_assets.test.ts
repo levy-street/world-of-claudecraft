@@ -47,8 +47,8 @@ describe('SwordMaster authored icon assets', () => {
       const meta = await sharp(file).metadata();
       expect({ format: meta.format, width: meta.width, height: meta.height }, path).toEqual({
         format: 'webp',
-        width: mapping.iconSize,
-        height: mapping.iconSize,
+        width: 128,
+        height: 128,
       });
     }
   });

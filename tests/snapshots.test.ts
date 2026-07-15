@@ -2047,6 +2047,31 @@ describe('active title wire (Book of Deeds)', () => {
 // renderer can show each player's held weapon models. Recomputed in
 // recalcPlayerStats; the renderer maps them to GLBs (ITEM_WEAPON_VARIANTS).
 describe('held weapon wire (mainhandItemId/offhandItemId)', () => {
+  it('encodes and decodes SwordMaster identity with both starter swords', () => {
+    const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('swordmaster', 'Aozora');
+    const entity = sim.entities.get(pid);
+    if (!entity) throw new Error('SwordMaster entity missing');
+    const wire = wireEntity(entity);
+
+    expect(wire).toMatchObject({
+      tid: 'swordmaster',
+      mh: 'worn_sword',
+      oh: 'worn_sword',
+    });
+
+    const client = bareClient(99);
+    (client as unknown as { applySnapshot(snapshot: unknown): void }).applySnapshot({
+      t: 'snap',
+      ents: [wire],
+    });
+    const mirrored = client.entities.get(pid);
+    if (!mirrored) throw new Error('SwordMaster wire entity missing');
+    expect(mirrored.templateId).toBe('swordmaster');
+    expect(mirrored.mainhandItemId).toBe('worn_sword');
+    expect(mirrored.offhandItemId).toBe('worn_sword');
+  });
+
   it('carries both equipped hand item ids through wireEntity', () => {
     const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
     const pid = sim.addPlayer('warrior', 'Thaldrin');

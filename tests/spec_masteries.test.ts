@@ -339,6 +339,11 @@ describe('spec masteries', () => {
         fury: { stat: 'crit', value: 0.05 },
         prot: { global: 'threatPct', value: 0.3 },
       },
+      swordmaster: {
+        tempest: { global: 'meleeDmgPct', value: 0.12 },
+        duelist: { global: 'meleeHastePct', value: 0.12 },
+        azure_blade: { stat: 'agiPct', value: 0.12 },
+      },
       paladin: {
         holy: { global: 'critDmgHealPct', value: 0.5 },
         protection: { global: 'threatPct', value: 0.5 },
