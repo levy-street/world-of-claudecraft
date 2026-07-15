@@ -5046,7 +5046,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.flame_shock': '前面に一撃を与え、その後も継続して焼き続ける即時の燃焼です。',
   'guide.abilityHook.frost_armor': '戦闘の前にアーマーを固める、持続する自己強化です。',
   'guide.abilityHook.frostbolt': '遠距離から攻撃し、標的を減速させて近づけなくします。',
-  'guide.abilityHook.blink': '前方へ瞬間移動して移動不能を解除し、すべてのメイジに確実な脱出手段を与えます。',
+  'guide.abilityHook.blink':
+    '前方へ瞬間移動して移動不能を解除し、すべてのメイジに確実な脱出手段を与えます。',
   'guide.abilityHook.garrote': 'ステルスから仕掛け、ワイヤーで標的を継続的に出血させます。',
   'guide.abilityHook.gouge': '標的を短時間行動不能にし、立ち位置を直したりピールしたりできます。',
   'guide.abilityHook.healing_touch':

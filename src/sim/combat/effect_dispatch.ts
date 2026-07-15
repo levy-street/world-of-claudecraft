@@ -356,8 +356,7 @@ export function runEffects(
       case 'consumeAuraChargesDamage': {
         if (!target || !ctx.isHostileTo(p, target)) break;
         const auraIndex = p.auras.findIndex(
-          (aura) =>
-            aura.id === eff.auraId && aura.sourceId === p.id && (aura.charges ?? 0) > 0,
+          (aura) => aura.id === eff.auraId && aura.sourceId === p.id && (aura.charges ?? 0) > 0,
         );
         if (auraIndex < 0) break;
         const aura = p.auras[auraIndex];

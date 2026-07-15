@@ -111,9 +111,7 @@ describe('Elemental Fulmination', () => {
     const baselineTarget = targetFor(baseline);
     onCastCompleted(baseline.ctx, baseline.player, 'lightning_bolt', baselineTarget);
 
-    expect(
-      baseline.player.auras.find((aura) => aura.id === 'lightning_shield')?.charges,
-    ).toBe(3);
+    expect(baseline.player.auras.find((aura) => aura.id === 'lightning_shield')?.charges).toBe(3);
     expect(
       resolved(baseline, 'earth_shock').effects.some(
         (effect) => effect.type === 'consumeAuraChargesDamage',
