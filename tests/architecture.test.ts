@@ -125,6 +125,7 @@ const UI_PURE_CORES = [
   'src/ui/log_event_route.ts',
   'src/ui/unit_portrait.ts',
   'src/ui/xp_bar.ts',
+  'src/ui/frontier_incursion_view.ts',
   'src/ui/absorb_bar.ts',
   'src/ui/party_frames.ts',
   'src/ui/party_collapse.ts',

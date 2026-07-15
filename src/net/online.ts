@@ -1136,6 +1136,7 @@ export class ClientWorld implements IWorld {
   // arenaInfo.match.fiesta and its dynamics flow over the events queue. ---
   duelInfo: DuelInfo | null = null;
   arenaInfo: ArenaInfo | null = null;
+  frontierIncursion: import('../world_api').FrontierIncursionView | null = null;
   honor = 0;
   lifetimeHonor = 0;
   // --- IWorldValeCup: Vale Cup queue/match state, mirrored from the snapshot
@@ -2119,6 +2120,7 @@ export class ClientWorld implements IWorld {
       if (s.arena !== undefined) this.arenaInfo = s.arena;
       if (s.honor !== undefined) this.honor = s.honor ?? 0;
       if (s.lhonor !== undefined) this.lifetimeHonor = s.lhonor ?? 0;
+      if (s.fincur !== undefined) this.frontierIncursion = s.fincur ?? null;
       if (s.vcup !== undefined) this.cupInfo = s.vcup;
       if (s.market !== undefined) this.marketInfo = s.market;
       if (s.mail !== undefined) this.mailInfo = s.mail;

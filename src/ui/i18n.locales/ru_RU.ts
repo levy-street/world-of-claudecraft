@@ -14,6 +14,8 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.frontier.incursionTitle': 'Вторжение Морозного Предела',
+  'entities.mobs.rimebound_wisp.name': 'Морозный дух',
   'hudChrome.frontier.title': 'Морозный Фронтир',
   'hudChrome.frontier.enter': 'Отправиться на Фронтир',
   'hudChrome.frontier.leave': 'Вернуться с Фронтира',

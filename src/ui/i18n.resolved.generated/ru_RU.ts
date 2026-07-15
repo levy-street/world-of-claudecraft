@@ -979,7 +979,8 @@ export const ru_RU: EnTranslations = {
       "title": "Морозный Фронтир",
       "enter": "Отправиться на Фронтир",
       "leave": "Вернуться с Фронтира",
-      "note": "Постоянная зона открытого PvP. За пределами безопасного хаба все игроки враги."
+      "note": "Постоянная зона открытого PvP. За пределами безопасного хаба все игроки враги.",
+      "incursionTitle": "Вторжение Морозного Предела"
     },
     "statInfo": {
       "fromYour": "От вашей характеристики ({value} {stat}):",
@@ -7949,6 +7950,9 @@ export const ru_RU: EnTranslations = {
       },
       "frostbound_revenant": {
         "name": "Мороженый ревенант"
+      },
+      "rimebound_wisp": {
+        "name": "Морозный дух"
       },
       "deeprock_kobold": {
         "name": "Глубокоскальный туннельщик"

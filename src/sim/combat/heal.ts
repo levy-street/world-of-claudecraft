@@ -25,6 +25,7 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
+import { frontierIncursionOnHeal } from '../pvp';
 import type { SimContext } from '../sim_context';
 import { addThreat, HEAL_THREAT_FACTOR } from '../threat';
 import type { Entity } from '../types';
@@ -114,6 +115,10 @@ export function applyHeal(
   // Legendary on-heal weapon procs (e.g. Deathless Heartwood's Lifebloom). No-op
   // (no rng draw) unless the healer wields a proc weapon with a heal proc.
   runWeaponProcs(ctx, source, target, 'heal');
+  // Frontier incursion: healing a hurt ally in the band drives the public meter, and
+  // healing during an active rare adds the healer to its contributor roster so the kill
+  // rewards them too. No-op outside the band. Draws no rng.
+  frontierIncursionOnHeal(ctx, source, target, healed);
 }
 
 // Classic healing threat: 0.5 per point of EFFECTIVE healing (overheal is

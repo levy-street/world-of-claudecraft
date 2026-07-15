@@ -979,7 +979,8 @@ export const sv_SE: EnTranslations = {
       "title": "Frostreach Frontier",
       "enter": "Travel to the Frontier",
       "leave": "Return from the Frontier",
-      "note": "An always-on open-PvP zone. Beyond the safe hub, all players are enemies."
+      "note": "An always-on open-PvP zone. Beyond the safe hub, all players are enemies.",
+      "incursionTitle": "Frostreach Incursion"
     },
     "statInfo": {
       "fromYour": "Från dina {value} {stat}:",
@@ -7949,6 +7950,9 @@ export const sv_SE: EnTranslations = {
       },
       "frostbound_revenant": {
         "name": "Frostbound Revenant"
+      },
+      "rimebound_wisp": {
+        "name": "Rimebound Wisp"
       },
       "deeprock_kobold": {
         "name": "Djupbergsgrävare"

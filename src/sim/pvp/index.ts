@@ -4,15 +4,32 @@ export {
   FRONTIER_HUB,
   FRONTIER_HUB_RADIUS,
   FRONTIER_KILL_HONOR_MULT,
+  FRONTIER_MUSTER,
   FRONTIER_RARE_HERO_POINTS,
   FRONTIER_RARE_HONOR,
+  FRONTIER_TRASH_HONOR,
   FRONTIER_X_MAX,
   FRONTIER_X_MIN,
   frontierDepth,
+  INCURSION_ENRAGE_SECONDS,
+  INCURSION_HEAL_CAP_PER_CAST,
+  INCURSION_HEAL_PCT_PER_HP,
+  INCURSION_PASSIVE_FULL_SECONDS,
+  INCURSION_PLAYER_KILL_PCT,
+  INCURSION_TRASH_CAP,
+  INCURSION_TRASH_KILL_PCT,
+  INCURSION_TRASH_RESPAWN_SECONDS,
   inFrontierHub,
   isFrontierPos,
 } from './frontier';
 export { frontierEnter, frontierLeave } from './frontier_entry';
+export {
+  createFrontierIncursionState,
+  type FrontierIncursionState,
+  frontierIncursionOnHeal,
+  frontierIncursionOnKill,
+  updateFrontierIncursion,
+} from './frontier_incursion';
 export { awardFrontierRareKill } from './frontier_rewards';
 export { grantHeroPoints, normalizeHeroPoints, spendHeroPoints } from './hero_points';
 export {

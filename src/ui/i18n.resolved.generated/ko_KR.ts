@@ -979,7 +979,8 @@ export const ko_KR: EnTranslations = {
       "title": "서리절경 변경",
       "enter": "변경으로 이동",
       "leave": "변경에서 귀환",
-      "note": "상시 개방형 PvP 구역. 안전 허브를 벗어나면 모든 플레이어가 적이다."
+      "note": "상시 개방형 PvP 구역. 안전 허브를 벗어나면 모든 플레이어가 적이다.",
+      "incursionTitle": "서리절경 침공"
     },
     "statInfo": {
       "fromYour": "당신의 {value} {stat}에서:",
@@ -7949,6 +7950,9 @@ export const ko_KR: EnTranslations = {
       },
       "frostbound_revenant": {
         "name": "서리결계 망령"
+      },
+      "rimebound_wisp": {
+        "name": "서리 결속 도깨비불"
       },
       "deeprock_kobold": {
         "name": "깊은바위 굴꾼"

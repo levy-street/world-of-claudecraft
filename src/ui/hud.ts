@@ -484,6 +484,7 @@ import {
 import { makeWindowFocus } from './window_focus';
 import { installWindowResize, markResizableWindow } from './window_resize';
 import { stackedWindowsVisible } from './window_stack_state_core';
+import { FrontierIncursionPainter } from './frontier_incursion_painter';
 import { formatXp, xpBarView } from './xp_bar';
 import { XpBarPainter } from './xp_bar_painter';
 import { YumiMatchPainter } from './yumi_match_painter';
@@ -1155,6 +1156,9 @@ export class Hud {
   // every frame, the leak this fixes).
   private xpbarEl = $('#xpbar');
   private xpRestedEl = $('#xpbar .rested');
+  private frontierIncursionEl = $('#frontier-incursion');
+  private frontierIncursionFillEl = $('#frontier-incursion .fill');
+  private frontierIncursionLabelEl = $('#frontier-incursion .label');
   private playerFrameEl = $('#player-frame');
   // The party-frames container, resolved once (was re-queried every frame); the
   // keyed-pool party painter owns its children.
@@ -3463,6 +3467,12 @@ export class Hud {
     this.xpRestedEl,
     this.xpLabelEl,
     this.playerFrameEl,
+  );
+  private readonly frontierIncursionPainter = new FrontierIncursionPainter(
+    this.writerFacet,
+    this.frontierIncursionEl,
+    this.frontierIncursionFillEl,
+    this.frontierIncursionLabelEl,
   );
   private readonly swingTimerPainter = new SwingTimerPainter(
     this.writerFacet,
@@ -7300,6 +7310,10 @@ export class Hud {
       showOverflow,
     });
     this.xpBarPainter.paint(bar);
+
+    // Frontier incursion bar: shown only while in the band (null hides it), the shared
+    // meter while building and the live rare's name + HP while a rare is up.
+    this.frontierIncursionPainter.paint(sim.frontierIncursion);
 
     // FCT painter: drive the pooled floating-combat-text ring on the every-frame
     // tier (folded into the existing `hud` perf bucket, not a second rAF).

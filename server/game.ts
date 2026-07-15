@@ -4812,6 +4812,9 @@ export class GameServer {
     // session receives both, then they ride only on earn/spend changes.
     maybe('honor', meta.honor);
     maybe('lhonor', meta.lifetimeHonor);
+    // Frontier incursion bar: the shared meter / live rare, but only while this viewer
+    // is in the band (null otherwise). Delta-guarded, so it rides only on change.
+    maybe('fincur', this.sim.frontierIncursionFor(anchorSession.pid));
     if (this.sim.tickCount - session.lastArenaWireTick >= ARENA_WIRE_INTERVAL_TICKS) {
       session.lastArenaWireTick = this.sim.tickCount;
       maybe('arena', this.sim.arenaInfoFor(anchorSession.pid));

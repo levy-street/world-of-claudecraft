@@ -137,6 +137,7 @@ export type {
   FiestaMatchInfo,
   FiestaPowerupView,
   FiestaScoreboardPlayer,
+  FrontierIncursionView,
 } from './world_api/duel_arena';
 export type { RaidLockout } from './world_api/dungeons';
 export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';

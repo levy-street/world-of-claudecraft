@@ -979,7 +979,8 @@ export const en_XA: EnTranslations = {
       "title": "[Ƒŕóšţŕéáçĥ Ƒŕóñţíéŕ]",
       "enter": "[Ţŕáʋéļ ţó ţĥé Ƒŕóñţíéŕ]",
       "leave": "[Ŕéţúŕñ ƒŕóɱ ţĥé Ƒŕóñţíéŕ]",
-      "note": "[Áñ áļŵáýš-óñ óþéñ-ÞʋÞ žóñé. Ɓéýóñð ţĥé šáƒé ĥúƀ, áļļ þļáýéŕš áŕé éñéɱíéš.]"
+      "note": "[Áñ áļŵáýš-óñ óþéñ-ÞʋÞ žóñé. Ɓéýóñð ţĥé šáƒé ĥúƀ, áļļ þļáýéŕš áŕé éñéɱíéš.]",
+      "incursionTitle": "[Ƒŕóšţŕéáçĥ Íñçúŕšíóñ]"
     },
     "statInfo": {
       "fromYour": "[Ƒŕóɱ ýóúŕ {value} {stat}:]",
@@ -7949,6 +7950,9 @@ export const en_XA: EnTranslations = {
       },
       "frostbound_revenant": {
         "name": "[Ƒŕóšţƀóúñð Ŕéʋéñáñţ]"
+      },
+      "rimebound_wisp": {
+        "name": "[Ŕíɱéƀóúñð Ŵíšþ]"
       },
       "deeprock_kobold": {
         "name": "[Ðééþŕóçķ Ţúññéļéŕ]"

@@ -14,6 +14,8 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.frontier.incursionTitle': 'フロストリーチの侵攻',
+  'entities.mobs.rimebound_wisp.name': '霜縛のウィスプ',
   'hudChrome.frontier.title': 'フロストリーチ辺境',
   'hudChrome.frontier.enter': '辺境へ向かう',
   'hudChrome.frontier.leave': '辺境から戻る',

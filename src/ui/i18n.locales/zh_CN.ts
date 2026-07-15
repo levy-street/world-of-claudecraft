@@ -14,6 +14,8 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.frontier.incursionTitle': '霜达入侵',
+  'entities.mobs.rimebound_wisp.name': '缚霜幽光',
   'hudChrome.frontier.title': '霜达边境',
   'hudChrome.frontier.enter': '前往边境',
   'hudChrome.frontier.leave': '离开边境',

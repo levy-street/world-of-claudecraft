@@ -28,7 +28,7 @@ import { DELVES, GROUP_XP_BONUS, MOBS } from '../data';
 import * as deedsMod from '../deeds';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
-import { awardFrontierRareKill, pvpDamageMultiplier } from '../pvp';
+import { awardFrontierRareKill, frontierIncursionOnKill, pvpDamageMultiplier } from '../pvp';
 import { aurasSurvivingDeath } from '../resurrection';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -666,6 +666,10 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
   e.castingAbility = null;
   e.castTargetId = null;
   ctx.emit({ type: 'death', entityId: e.id, killerId: killer?.id ?? -1 });
+
+  // Frontier incursion: a trash or PvP kill inside the band feeds the public meter
+  // (and a trash kill pays a small honor trickle). No-op outside the band. Draws no rng.
+  frontierIncursionOnKill(ctx, e, killer);
 
   // a dead mob keeps no raid marker — respawnMob reuses the same entity id,
   // so a stale mark would otherwise reappear on the respawn

@@ -14,6 +14,8 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.frontier.incursionTitle': '서리절경 침공',
+  'entities.mobs.rimebound_wisp.name': '서리 결속 도깨비불',
   'hudChrome.frontier.title': '서리절경 변경',
   'hudChrome.frontier.enter': '변경으로 이동',
   'hudChrome.frontier.leave': '변경에서 귀환',

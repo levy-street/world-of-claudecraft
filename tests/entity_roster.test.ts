@@ -17,6 +17,7 @@ import {
   runDespawnDecay,
   tickGroundAoEs,
 } from '../src/sim/entity_roster';
+import { createFrontierIncursionState } from '../src/sim/pvp';
 import { Rng } from '../src/sim/rng';
 import { createSimContext, type SimContextHost } from '../src/sim/sim_context';
 import { createVcState } from '../src/sim/social/vale_cup';
@@ -217,6 +218,7 @@ function makeCtx() {
     marketListings: [],
     bankerIds: [],
     vcup: createVcState(),
+    frontierIncursionState: createFrontierIncursionState(),
     deedDirtyPids: new Set<number>(),
     deedDirtyKeys: new Map<number, Set<string>>(),
     worldBossEntityIds: [],

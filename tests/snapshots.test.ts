@@ -2470,6 +2470,7 @@ const ALL_DELTA_KEYS = [
   'dstats',
   'duel',
   'equip',
+  'fincur',
   'gprof',
   'honor',
   'inv',
@@ -2520,6 +2521,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   dstats: 'deedStats',
   duel: 'duelInfo',
   equip: 'equipment',
+  fincur: 'frontierIncursion',
   gprof: 'gatheringProficiency',
   inv: 'inventory',
   lhonor: 'lifetimeHonor',
@@ -2697,6 +2699,10 @@ describe('full self-state snapshot delta fixture', () => {
     expect(snap).not.toBeNull();
     for (const key of ALL_DELTA_KEYS) {
       expect(snap.self, `self.${key} missing from first snapshot`).toHaveProperty(key);
+      // fincur (the Frontier incursion bar) is position-gated: it is null unless the
+      // viewer is in the far-off band, which is mutually exclusive with the delve-door
+      // position this fixture needs to dirty `drun`. It rides as null here by design.
+      if (key === 'fincur') continue;
       // each was dirtied to a non-default value, so none rides the wire as null
       expect(snap.self[key], `self.${key} arrived null`).not.toBeNull();
     }
@@ -2845,8 +2851,8 @@ describe('full self-state snapshot delta fixture', () => {
 
 describe('delta-key contract pins (anti-drift)', () => {
   it('ALL_DELTA_KEYS contains exactly 42 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(42);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(42);
+    expect(ALL_DELTA_KEYS).toHaveLength(43);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(43);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2858,7 +2864,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.size).toBe(42);
+    expect(scraped.size).toBe(43);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

@@ -51,3 +51,31 @@ export const FRONTIER_RARE_HERO_POINTS = 3;
 export const FRONTIER_KILL_HONOR_MULT = 2;
 /** Honor for completing a Frontier daily quest. */
 export const FRONTIER_DAILY_HONOR = 100;
+/** Small honor trickle for a frost-trash (Rimebound Wisp) kill in the band. */
+export const FRONTIER_TRASH_HONOR = 2;
+
+// --- Incursion constants (the public Greater-Rift-style spawn meter) ----------
+// The whole system is player-gated (nothing ticks with an empty band) and draws no
+// rng, so the parity goldens (which never place a player at x >= FRONTIER_X_MIN)
+// stay untouched. See src/sim/pvp/frontier_incursion.ts.
+
+/** Live frost trash the spawner keeps roaming the band while players are present. */
+export const INCURSION_TRASH_CAP = 8;
+/** Meter gain (0..1) per trash kill: 20 kills fill it without the passive drip. */
+export const INCURSION_TRASH_KILL_PCT = 0.05;
+/** Meter gain per PvP kill inside the band (a bigger bump than a trash kill). */
+export const INCURSION_PLAYER_KILL_PCT = 0.08;
+/** Meter gain per HP healed to a hurt ally in the band (healer incentive #1). */
+export const INCURSION_HEAL_PCT_PER_HP = 0.0002;
+/** HP counted from any one heal, so a single big heal cannot spike the meter. */
+export const INCURSION_HEAL_CAP_PER_CAST = 500;
+/** The public-timer floor: the passive drip alone fills the meter in this many seconds. */
+export const INCURSION_PASSIVE_FULL_SECONDS = 600;
+/** An uncleared rare despawns and the meter rebuilds after this long. */
+export const INCURSION_ENRAGE_SECONDS = 180;
+/** Seconds between trash respawns while below the cap (deterministic, no rng). */
+export const INCURSION_TRASH_RESPAWN_SECONDS = 6;
+
+/** The muster point a rare spawns at: out in the band, away from the safe hub, so
+ *  the zone travels to it. Deterministic, well outside FRONTIER_HUB_RADIUS. */
+export const FRONTIER_MUSTER = { x: FRONTIER_HUB.x + 140, z: 0 } as const;

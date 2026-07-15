@@ -8,6 +8,7 @@
 
 import { describe, expect, it, vi } from 'vitest';
 import { createDeedRuntime } from '../src/sim/deeds';
+import { createFrontierIncursionState } from '../src/sim/pvp';
 import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
 import { createSimContext, type SimContextHost } from '../src/sim/sim_context';
@@ -283,6 +284,7 @@ function makeFakeHost() {
     marketListings: [],
     bankerIds: [],
     vcup: createVcState(),
+    frontierIncursionState: createFrontierIncursionState(),
     deedDirtyPids: new Set<number>(),
     deedDirtyKeys: new Map<number, Set<string>>(),
     worldBossEntityIds: [],

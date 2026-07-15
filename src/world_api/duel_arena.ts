@@ -6,6 +6,17 @@ export interface DuelInfo {
   state: 'countdown' | 'active';
 }
 
+// The shared Frontier incursion state, surfaced to a viewer ONLY while they are in the
+// band (null otherwise, so the top-screen bar hides). While building it carries the
+// meter fraction; while a rare is up it carries the rare's mob id + HP fraction so the
+// bar can flip to the shared boss. The mob id is localized client-side (string-free seam).
+export interface FrontierIncursionView {
+  progress: number; // 0..1 meter, while building
+  active: boolean; // a rare is up
+  rareTemplateId: string | null; // the live rare's mob id, while active
+  rareHpFrac: number; // 0..1, while active
+}
+
 export interface ArenaLadderEntry {
   pid: number;
   name: string;
@@ -157,4 +168,7 @@ export interface IWorldDuelArena {
   // (remembering the return spot); leave teleports back.
   frontierEnter(): void;
   frontierLeave(): void;
+  // The public Frontier incursion state for the top-screen bar, or null when the
+  // viewer is not in the band (the bar hides).
+  frontierIncursion: FrontierIncursionView | null;
 }

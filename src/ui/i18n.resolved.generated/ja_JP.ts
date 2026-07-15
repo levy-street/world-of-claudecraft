@@ -979,7 +979,8 @@ export const ja_JP: EnTranslations = {
       "title": "フロストリーチ辺境",
       "enter": "辺境へ向かう",
       "leave": "辺境から戻る",
-      "note": "常時稼働のオープンPvPゾーン。安全なハブの外では、すべてのプレイヤーが敵となる。"
+      "note": "常時稼働のオープンPvPゾーン。安全なハブの外では、すべてのプレイヤーが敵となる。",
+      "incursionTitle": "フロストリーチの侵攻"
     },
     "statInfo": {
       "fromYour": "あなたの{stat}{value}による効果:",
@@ -7949,6 +7950,9 @@ export const ja_JP: EnTranslations = {
       },
       "frostbound_revenant": {
         "name": "霜縛の亡霊"
+      },
+      "rimebound_wisp": {
+        "name": "霜縛のウィスプ"
       },
       "deeprock_kobold": {
         "name": "ディープロックの坑夫"

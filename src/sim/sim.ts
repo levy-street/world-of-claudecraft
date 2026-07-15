@@ -1377,6 +1377,10 @@ export class Sim {
   // per-bracket queues, the single Sowfield match slot, the Groundskeeper's
   // deserter book, and the live bot pids), exposed as the live ctx.vcup view.
   vcup: VcState = createVcState();
+  // The Frostreach Frontier incursion event (pvp/frontier_incursion.ts): a live
+  // holder mutated in place, exposed as a read-only SimContext view. Session-only
+  // (not persisted): the meter and any live rare rebuild on a fresh boot.
+  frontierIncursionState: honorMod.FrontierIncursionState = honorMod.createFrontierIncursionState();
   // per-player chat token bucket (anti-spam); refilled lazily by sim time
   private chatTokens = new Map<number, { tokens: number; at: number }>();
   // per-player set of opt-in global channels (world, lfg) joined via /join
@@ -3216,6 +3220,11 @@ export class Sim {
       get vcup() {
         return sim.vcup;
       },
+      // The Frontier incursion holder (mutated in place; the meter/rare/trash roster
+      // live inside it, so a read-only live view suffices).
+      get frontierIncursionState() {
+        return sim.frontierIncursionState;
+      },
       // Book of Deeds live views (all mutated in place, never reassigned).
       get deedDirtyPids() {
         return sim.deedDirtyPids;
@@ -3924,6 +3933,11 @@ export class Sim {
     lap?.('postOffice');
     drainDelayedEvents(this.ctx);
     lap?.('delayedEv');
+    // The Frontier incursion (pvp/frontier_incursion.ts) draws ZERO shared rng
+    // (deterministic spawns/positions/ids, player-gated), so appending it in the
+    // zero-rng tail cannot fork the draw order (the Vale Cup precedent).
+    honorMod.updateFrontierIncursion(this.ctx);
+    lap?.('frontierIncursionState');
     // The Book of Deeds evaluator runs at the very end of the tail: it sees
     // same-tick delayed-event results, and because it draws ZERO rng (pure
     // predicate checks over dirty players plus a 1 Hz proximity sweep) its
@@ -6771,6 +6785,31 @@ export class Sim {
 
   frontierLeave(pid?: number): void {
     honorMod.frontierLeave(this.ctx, pid);
+  }
+
+  // The incursion bar read: the shared meter / live rare, but ONLY for a viewer who
+  // is inside the band (null otherwise, so the bar hides). Server calls the per-pid
+  // form; the IWorld getter serves the offline primary player.
+  frontierIncursionFor(pid: number): import('../world_api').FrontierIncursionView | null {
+    const p = this.entities.get(pid);
+    if (!p || !honorMod.isFrontierPos(p.pos.x)) return null;
+    const inc = this.frontierIncursionState;
+    if (inc.phase === 'active' && inc.rareId !== null) {
+      const rare = this.entities.get(inc.rareId);
+      if (rare && !rare.dead) {
+        return {
+          progress: 0,
+          active: true,
+          rareTemplateId: inc.rareTemplateId,
+          rareHpFrac: rare.maxHp > 0 ? rare.hp / rare.maxHp : 0,
+        };
+      }
+    }
+    return { progress: inc.progress, active: false, rareTemplateId: null, rareHpFrac: 0 };
+  }
+
+  get frontierIncursion(): import('../world_api').FrontierIncursionView | null {
+    return this.frontierIncursionFor(this.primaryId);
   }
 
   private isArenaQueued(pid: number): boolean {

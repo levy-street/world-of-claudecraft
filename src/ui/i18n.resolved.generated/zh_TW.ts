@@ -979,7 +979,8 @@ export const zh_TW: EnTranslations = {
       "title": "霜達邊境",
       "enter": "前往邊境",
       "leave": "離開邊境",
-      "note": "常駐的開放PvP區域。走出安全樞紐後，所有玩家都是敵人。"
+      "note": "常駐的開放PvP區域。走出安全樞紐後，所有玩家都是敵人。",
+      "incursionTitle": "霜達入侵"
     },
     "statInfo": {
       "fromYour": "來自你的 {value} 點{stat}：",
@@ -7949,6 +7950,9 @@ export const zh_TW: EnTranslations = {
       },
       "frostbound_revenant": {
         "name": "霜縛亡魂"
+      },
+      "rimebound_wisp": {
+        "name": "縛霜幽光"
       },
       "deeprock_kobold": {
         "name": "深岩鑿道者"

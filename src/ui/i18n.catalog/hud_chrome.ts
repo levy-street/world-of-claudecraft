@@ -964,6 +964,9 @@ export const hudChromeStrings = {
     enter: 'Travel to the Frontier',
     leave: 'Return from the Frontier',
     note: 'An always-on open-PvP zone. Beyond the safe hub, all players are enemies.',
+    // The top-screen incursion bar: while building it shows this title + the meter
+    // percent; while a rare is up it shows the rare's name + its HP percent instead.
+    incursionTitle: 'Frostreach Incursion',
   },
   // Character-screen stat tooltips (hover a stat on the C panel). The stat NAMES
   // reuse itemUi.stats.*; only these descriptions / effect lines / notes are new.

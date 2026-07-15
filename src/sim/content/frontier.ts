@@ -1,17 +1,21 @@
-// Frostreach Frontier content: the frost rares that roam the Season 1 PvP band.
-// Killing one drops honor + hero points to every contributor (the reward loop is
-// in src/sim/pvp/frontier_rewards.ts, hooked from handleDeath). Cap-level rare
-// elites; loot is empty here (the honor/hero reward is the point, not a drop
-// table). Names are IP-safe frost coinages. Spawn camps + the zone label land in
-// a follow-up (kept out of this slice so world-gen spawn rng, and parity, are
-// untouched).
+// Frostreach Frontier content: the frost rares the public Incursion spawns, plus the
+// weak trash the spawner keeps roaming the band. Killing a rare drops honor + hero
+// points to every contributor incl. healers (the reward loop is in
+// src/sim/pvp/frontier_rewards.ts, hooked from handleDeath). The rares are UNKITABLE
+// group content (2.2x move + ccImmune + slowImmune, like the world boss Thunzharr) and
+// tanky/hard enough to want 2 to 3 players plus a healer, so the zone cooperates on a
+// spawn instead of a lone tap-and-grab. Loot is empty here (honor/hero is the reward,
+// not a drop table). The spawning + meter live in pvp/frontier_incursion.ts; names are
+// IP-safe frost coinages.
 
 import { FRONTIER_DAILY_HONOR } from '../pvp/frontier';
 import type { MobTemplate, QuestDef } from '../types';
 import { FRONTIER_MARSHAL_NPC_ID, FRONTIER_QM_NPC_ID } from './frontier_vendor';
 
 export const FRONTIER_MOBS: Record<string, MobTemplate> = {
-  // Rimefang Stalker: a fast frost beast that opens with a chilling bite.
+  // Rimefang Stalker: a hard, unkitable frost beast. Faster than 2x player run speed,
+  // immune to stun/root/snare, so it cannot be kited: a lone player without a healer
+  // dies; 2 to 3 grouped players bring it down.
   rimefang_stalker: {
     id: 'rimefang_stalker',
     name: 'Rimefang Stalker',
@@ -20,19 +24,22 @@ export const FRONTIER_MOBS: Record<string, MobTemplate> = {
     family: 'beast',
     elite: true,
     rare: true,
-    hpBase: 260,
+    hpBase: 3200,
     hpPerLevel: 0,
-    dmgBase: 30,
+    dmgBase: 80,
     dmgPerLevel: 0,
     attackSpeed: 1.8,
     armorPerLevel: 30,
-    moveSpeed: 9,
-    aggroRadius: 16,
+    moveSpeed: 15.4,
+    ccImmune: true,
+    slowImmune: true,
+    aggroRadius: 18,
     loot: [],
-    scale: 1.3,
+    scale: 1.4,
     color: 0x8fc7e8,
   },
-  // Frostbound Revenant: a slower, harder-hitting undead sentinel of the band.
+  // Frostbound Revenant: the tankier, harder-hitting undead sentinel, with a frozen
+  // cleave. Same unkitable rules; wants a third body to soak the cleave.
   frostbound_revenant: {
     id: 'frostbound_revenant',
     name: 'Frostbound Revenant',
@@ -41,18 +48,43 @@ export const FRONTIER_MOBS: Record<string, MobTemplate> = {
     family: 'undead',
     elite: true,
     rare: true,
-    hpBase: 340,
+    hpBase: 4200,
     hpPerLevel: 0,
-    dmgBase: 36,
+    dmgBase: 95,
     dmgPerLevel: 0,
     attackSpeed: 2.4,
     armorPerLevel: 40,
-    moveSpeed: 6.5,
-    aggroRadius: 16,
+    moveSpeed: 15.4,
+    ccImmune: true,
+    slowImmune: true,
+    aggroRadius: 18,
     cleave: { radius: 8, mult: 0.6, name: 'Frozen Sweep' },
     loot: [],
-    scale: 1.35,
+    scale: 1.45,
     color: 0xbfe6ff,
+  },
+  // Rimebound Wisp: the weak frost trash the Incursion spawner keeps roaming the band.
+  // Farming these fills the shared incursion meter (the Greater-Rift core); each kill
+  // also pays a small honor trickle (FRONTIER_TRASH_HONOR, granted in the kill hook).
+  rimebound_wisp: {
+    id: 'rimebound_wisp',
+    name: 'Rimebound Wisp',
+    minLevel: 19,
+    maxLevel: 19,
+    family: 'elemental',
+    elite: false,
+    rare: false,
+    hpBase: 120,
+    hpPerLevel: 0,
+    dmgBase: 16,
+    dmgPerLevel: 0,
+    attackSpeed: 2,
+    armorPerLevel: 12,
+    moveSpeed: 7,
+    aggroRadius: 14,
+    loot: [],
+    scale: 0.9,
+    color: 0xd6f0ff,
   },
 };
 
