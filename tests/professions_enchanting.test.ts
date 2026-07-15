@@ -5,6 +5,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { ENCHANTS } from '../src/sim/content/enchants';
+import { ITEMS } from '../src/sim/data';
 import { characterDerivedStats } from '../src/sim/entity';
 import { removePreferFungible } from '../src/sim/items';
 import {
@@ -423,5 +424,88 @@ describe('applyEnchant', () => {
     expect(result.reason).toBe('insufficient_materials');
     expect(sim.countItem('arcane_dust', pid)).toBe(3);
     expect(sim.countItem('recruit_tunic', pid)).toBe(1);
+  });
+});
+
+describe('ENCHANTS table integrity', () => {
+  // The valid enchant target slots: every EquipSlot plus 'ring' (rings declare
+  // ItemDef.slot 'ring', covering both ring1 and ring2 via resolveEquipSlot),
+  // and NOT the two positional ring slots themselves (an enchant never targets
+  // ring1/ring2 directly). Kept as a literal set so a typo in a new enchant's
+  // itemSlot fails here rather than silently making the enchant unusable.
+  const VALID_ITEM_SLOTS = new Set([
+    'mainhand',
+    'helmet',
+    'neck',
+    'shoulder',
+    'chest',
+    'waist',
+    'legs',
+    'gloves',
+    'feet',
+    'ring',
+  ]);
+  const VALID_STAT_KEYS = new Set(['str', 'agi', 'sta', 'int', 'spi', 'armor']);
+
+  it('every enchant is well-formed: id matches its key, a valid slot, real reagents, a real bonus', () => {
+    for (const [key, e] of Object.entries(ENCHANTS)) {
+      expect(e.id).toBe(key);
+      expect(VALID_ITEM_SLOTS.has(e.itemSlot)).toBe(true);
+      // A real, non-empty stat bonus using only categories recalcPlayerStats reads.
+      const bonusKeys = Object.keys(e.statBonus);
+      expect(bonusKeys.length).toBeGreaterThan(0);
+      for (const k of bonusKeys) {
+        expect(VALID_STAT_KEYS.has(k)).toBe(true);
+        expect(e.statBonus[k as keyof typeof e.statBonus]).toBeGreaterThan(0);
+      }
+      // Every reagent is a defined item, in a positive quantity (a typo'd
+      // reagent id would make the enchant impossible to ever afford).
+      expect(e.reagents.length).toBeGreaterThan(0);
+      for (const r of e.reagents) {
+        expect(ITEMS[r.itemId], `enchant ${e.id} reagent ${r.itemId}`).toBeDefined();
+        expect(r.count).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it('every enchantable slot has at least one enchant (full slot coverage)', () => {
+    const slotsWithEnchant = new Set<string>(Object.values(ENCHANTS).map((e) => e.itemSlot));
+    for (const slot of VALID_ITEM_SLOTS) {
+      expect(slotsWithEnchant.has(slot), `slot ${slot} has no enchant`).toBe(true);
+    }
+  });
+
+  it('arcane_shard is not a dead-end: at least one enchant consumes it (the epic disenchant sink)', () => {
+    // An epic/legendary disenchant yields arcane_shard
+    // (DISENCHANT_MATERIAL_BY_QUALITY in ../src/sim/professions/enchanting.ts).
+    // If no enchant ever consumes it, the material is an unspendable dead-end.
+    const shardConsumers = Object.values(ENCHANTS).filter((e) =>
+      e.reagents.some((r) => r.itemId === 'arcane_shard'),
+    );
+    expect(shardConsumers.length).toBeGreaterThan(0);
+  });
+
+  it('applies a Greater (arcane_shard-consuming) enchant end to end and grants its bonus', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const baseStr = sim.player.stats.str;
+    sim.addItem('eastbrook_arming_sword', 1, pid);
+    // Exactly the reagents enchant_weapon_greater_might needs: 1 shard + 2 essence.
+    sim.addItem('arcane_shard', 1, pid);
+    sim.addItem('arcane_essence', 2, pid);
+    const applied = resolveApplyEnchant(
+      sim.ctx,
+      pid,
+      'eastbrook_arming_sword',
+      'enchant_weapon_greater_might',
+    );
+    expect(applied.ok).toBe(true);
+    // Both reagents fully consumed (the shard now has a real sink).
+    expect(sim.countItem('arcane_shard', pid)).toBe(0);
+    expect(sim.countItem('arcane_essence', pid)).toBe(0);
+    // Pin the Greater magnitude to a literal once, then verify equipping applies it.
+    expect(ENCHANTS.enchant_weapon_greater_might.statBonus.str).toBe(8);
+    sim.equipItem('eastbrook_arming_sword');
+    expect(sim.player.stats.str).toBe(baseStr + 8);
   });
 });
