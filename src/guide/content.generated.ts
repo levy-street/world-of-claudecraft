@@ -1029,6 +1029,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "counterspell",
         "name": "Spellbreak"
+      },
+      {
+        "id": "icefall",
+        "name": "Icefall"
       }
     ],
     "model": "player_mage",

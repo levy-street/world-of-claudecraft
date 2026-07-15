@@ -2415,6 +2415,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.frostbolt.name': '霧氷の槍',
   'entities.abilities.frostbolt.description':
     '氷の矢を放ち、{damage} の冷気ダメージを与え、移動速度を40%低下させます。',
+  'entities.abilities.icefall.name': '氷瀑',
+  'entities.abilities.icefall.description':
+    '蓄えた氷柱をすべて対象へ放ち、1本につき{damage}の冷気ダメージを与えます。移動不能または冷却状態の対象には2倍のダメージを与えます。（氷術）',
   'entities.abilities.conjure_water.name': '水の召喚',
   'entities.abilities.conjure_water.description':
     '飲むとマナを回復する水の瓶を2本召喚します。高ランクではより純粋な水を召喚します。',

@@ -5757,6 +5757,10 @@ export const es_ES: EnTranslations = {
         "name": "Lanza de Escarcha",
         "description": "Lanza una descarga de escarcha que causa {damage} de daño de Escarcha y reduce la velocidad de movimiento un 40%."
       },
+      "icefall": {
+        "name": "Icefall",
+        "description": "Launches every stored Icicle at the target for {damage} Frost damage each. Deals double damage to rooted or chilled targets. (Cryomancy)"
+      },
       "conjure_water": {
         "name": "Conjurar Agua",
         "description": "Crea 2 botellas de agua que restauran maná al beberlas. Los rangos superiores crean agua más pura."

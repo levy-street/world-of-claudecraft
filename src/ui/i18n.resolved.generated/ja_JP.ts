@@ -5757,6 +5757,10 @@ export const ja_JP: EnTranslations = {
         "name": "霧氷の槍",
         "description": "氷の矢を放ち、{damage} の冷気ダメージを与え、移動速度を40%低下させます。"
       },
+      "icefall": {
+        "name": "氷瀑",
+        "description": "蓄えた氷柱をすべて対象へ放ち、1本につき{damage}の冷気ダメージを与えます。移動不能または冷却状態の対象には2倍のダメージを与えます。（氷術）"
+      },
       "conjure_water": {
         "name": "水の召喚",
         "description": "飲むとマナを回復する水の瓶を2本召喚します。高ランクではより純粋な水を召喚します。"

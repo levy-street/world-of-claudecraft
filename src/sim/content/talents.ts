@@ -110,6 +110,7 @@ export interface GlobalModEffect {
 
 export type ProcTrigger =
   | { on: 'castNth'; n: number; abilities: string[] }
+  | { on: 'spellHit'; abilities: string[] }
   | { on: 'spellCrit'; abilities?: string[] }
   | { on: 'shieldConsumed'; ability: string }
   | { on: 'hotExpired'; ability: string }
@@ -127,6 +128,7 @@ export type ProcResponse =
     }
   | { kind: 'cooldownRefund'; ability: string; seconds: number | 'reset' }
   | { kind: 'resource'; amount: number; resourceType?: ResourceType }
+  | { kind: 'stackAura'; aura: 'icicles'; maxStacks: number; duration: number }
   | { kind: 'heal'; amount: number }
   | { kind: 'absorb'; amount: number; duration: number; name: string }
   | { kind: 'echo'; belowFrac: number; window: number; heal: number; name: string };

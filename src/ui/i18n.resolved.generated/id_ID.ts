@@ -5757,6 +5757,10 @@ export const id_ID: EnTranslations = {
         "name": "Rimelance",
         "description": "Melepaskan panah embun beku, menimbulkan {damage} kerusakan Beku dan memperlambat gerakan sebesar 40%."
       },
+      "icefall": {
+        "name": "Icefall",
+        "description": "Launches every stored Icicle at the target for {damage} Frost damage each. Deals double damage to rooted or chilled targets. (Cryomancy)"
+      },
       "conjure_water": {
         "name": "Waterbind",
         "description": "Menciptakan 2 botol air, memulihkan mana saat diminum. Tingkat lebih tinggi menciptakan air yang lebih murni."

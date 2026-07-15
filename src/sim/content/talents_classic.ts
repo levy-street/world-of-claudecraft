@@ -142,7 +142,7 @@ const MAGE_SPECS: SpecDef[] = [
     'A controlling caster who trades peak burst for survival and slows.',
     'icy_veins',
     'Brittlebreak',
-    'Increases your Frost spell damage by 25%. Increases armor by 10%.',
+    'Increases your Frost spell damage by 25% and armor by 10%. Rimelance hits store an Icicle, up to 5. Grants Icefall, which consumes them for 12 Frost damage each and deals double damage to rooted or chilled targets.',
     // The scalable mastery axis is the Frost-kit damage (ability-scoped so the
     // mage's fire/arcane baseline spells stay untouched); armor is the static
     // secondary. Crit-vs-rooted identity returns as a Shatter-style row option.
@@ -152,6 +152,14 @@ const MAGE_SPECS: SpecDef[] = [
         { ability: 'frost_nova', dmgPct: 0.25 },
       ],
       stats: { armorPct: 0.1 },
+      grant: { ability: 'icefall' },
+      proc: {
+        id: 'mag_icicles',
+        name: 'Icicles',
+        school: 'frost',
+        trigger: { on: 'spellHit', abilities: ['frostbolt'] },
+        responses: [{ kind: 'stackAura', aura: 'icicles', maxStacks: 5, duration: 3600 }],
+      },
     },
   ),
 ];

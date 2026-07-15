@@ -82,8 +82,9 @@ function effectAbilityReferences(effect: TalentEffect): string[] {
   if (!proc) return references;
 
   const trigger = proc.trigger;
-  if (trigger.on === 'castNth') references.push(...trigger.abilities);
-  else if (trigger.on === 'spellCrit' && trigger.abilities) references.push(...trigger.abilities);
+  if (trigger.on === 'castNth' || trigger.on === 'spellHit') {
+    references.push(...trigger.abilities);
+  } else if (trigger.on === 'spellCrit' && trigger.abilities) references.push(...trigger.abilities);
   else if (
     trigger.on === 'shieldConsumed' ||
     trigger.on === 'hotExpired' ||
@@ -93,6 +94,7 @@ function effectAbilityReferences(effect: TalentEffect): string[] {
   }
   for (const response of proc.responses) {
     if (response.kind === 'cooldownRefund') references.push(response.ability);
+    if (response.kind === 'addAuraCharges') references.push(response.ability);
     if (response.kind === 'empowerNext' && response.abilities) {
       references.push(...response.abilities);
     }

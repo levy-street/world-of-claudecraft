@@ -137,7 +137,11 @@ const classes = ALL_CLASSES.map((id) => {
     signature: s.signature,
   }));
   const roles = ROLE_ORDER.filter((r) => specs.some((s) => s.role === r));
-  const kit = def.abilities ?? [];
+  const masteryGrants = specDefs.flatMap((specDef) => {
+    const granted = specDef.mastery.effect.grant?.ability;
+    return granted ? [granted] : [];
+  });
+  const kit = [...new Set([...(def.abilities ?? []), ...masteryGrants])];
   // The class preview uses the same model + white tint the in-game character creator does.
   const vk = playerVisualKey(id);
   const tint = tintFor(vk, 0xffffff);

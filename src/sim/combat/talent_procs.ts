@@ -85,6 +85,36 @@ function fireOne(
       }
       player.resource = Math.min(player.maxResource, player.resource + response.amount);
       break;
+    case 'stackAura': {
+      const existing = player.auras.find(
+        (aura) => aura.id === def.id && aura.sourceId === player.id,
+      );
+      if (existing) {
+        existing.stacks = Math.min(response.maxStacks, (existing.stacks ?? 0) + 1);
+        existing.remaining = response.duration;
+        existing.duration = response.duration;
+      } else {
+        ctx.applyAura(player, {
+          id: def.id,
+          name: def.name,
+          kind: response.aura,
+          remaining: response.duration,
+          duration: response.duration,
+          value: 0,
+          stacks: 1,
+          sourceId: player.id,
+          school: def.school ?? 'frost',
+        });
+      }
+      ctx.emit({
+        type: 'spellfx',
+        sourceId: player.id,
+        targetId: player.id,
+        school: def.school ?? 'frost',
+        fx: 'procSurge',
+      });
+      break;
+    }
     case 'heal':
       ctx.applyHeal(player, subject, response.amount, def.name);
       break;
@@ -164,6 +194,19 @@ export function onSpellCrit(
     if (trigger.abilities && (abilityId === null || !trigger.abilities.includes(abilityId))) {
       continue;
     }
+    fire(ctx, player, def, target);
+  }
+}
+
+export function onSpellHit(
+  ctx: SimContext,
+  player: Entity,
+  abilityId: string,
+  target: Entity,
+): void {
+  for (const def of procsFor(ctx, player)) {
+    const trigger = def.trigger;
+    if (trigger.on !== 'spellHit' || !trigger.abilities.includes(abilityId)) continue;
     fire(ctx, player, def, target);
   }
 }

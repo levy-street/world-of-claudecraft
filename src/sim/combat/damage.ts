@@ -56,7 +56,13 @@ import {
   xpForLevel,
 } from '../types';
 import { WORLD_BOSS_CORPSE_SECONDS, worldBossLootContributors } from '../world_boss';
-import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
+import {
+  onDamageTaken,
+  onShieldConsumed,
+  onSpellCrit,
+  onSpellHit,
+  resetProcState,
+} from './talent_procs';
 
 // How long a slain mob's corpse persists (seconds) before it is cleared. Sole user
 // is handleDeath, so the constant lives here with the death-domain code.
@@ -685,6 +691,9 @@ export function dealDamage(
   if (source && source.kind === 'player' && source.id !== target.id) {
     const meta = ctx.players.get(source.id);
     if (meta) meta.counters.damageDealt += amount;
+    if (amount > 0 && school !== 'physical' && abilityId) {
+      onSpellHit(ctx, source, abilityId, target);
+    }
     if (crit && school !== 'physical' && ability) {
       onSpellCrit(ctx, source, abilityId, target);
     }

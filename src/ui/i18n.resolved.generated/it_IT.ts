@@ -5757,6 +5757,10 @@ export const it_IT: EnTranslations = {
         "name": "Lancia di Brina",
         "description": "Lancia un dardo di gelo, infliggendo {damage} danni da Gelo e rallentando il movimento del 40%."
       },
+      "icefall": {
+        "name": "Icefall",
+        "description": "Launches every stored Icicle at the target for {damage} Frost damage each. Deals double damage to rooted or chilled targets. (Cryomancy)"
+      },
       "conjure_water": {
         "name": "Vincolo dell'Acqua",
         "description": "Evoca 2 bottiglie d'acqua che ripristinano mana quando bevute. I ranghi superiori evocano acqua più pura."

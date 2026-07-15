@@ -705,6 +705,11 @@ const classAbilityNamesEn = {
         'Launches a bolt of frost, causing {damage} Frost damage and slowing movement by 40%.',
       ],
       [
+        'icefall',
+        'Icefall',
+        'Launches every stored Icicle at the target for {damage} Frost damage each. Deals double damage to rooted or chilled targets. (Cryomancy)',
+      ],
+      [
         'conjure_water',
         'Waterbind',
         'Conjures 2 bottles of water, restoring mana when drunk. Higher ranks conjure purer water.',

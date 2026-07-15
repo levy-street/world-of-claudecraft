@@ -5757,6 +5757,10 @@ export const zh_CN: EnTranslations = {
         "name": "凛霜之矛",
         "description": "发射一支寒冰箭，造成 {damage} 点冰霜伤害，并使移动速度降低 40%。"
       },
+      "icefall": {
+        "name": "冰瀑",
+        "description": "向目标发射所有储存的冰刺，每枚造成 {damage} 点冰霜伤害。对被定身或寒冷的目标造成双倍伤害。（冰霜术）"
+      },
       "conjure_water": {
         "name": "束水术",
         "description": "制造 2 瓶水，饮用后恢复法力。更高等级可制造更纯净的水。"

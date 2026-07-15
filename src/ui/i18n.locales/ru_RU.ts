@@ -2438,6 +2438,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.frostbolt.name': 'Копьё изморози',
   'entities.abilities.frostbolt.description':
     'Выпускает ледяную стрелу, наносящую {damage} ед. урона от магии льда и замедляющую передвижение на 40%.',
+  'entities.abilities.icefall.name': 'Ледопад',
+  'entities.abilities.icefall.description':
+    'Выпускает в цель все накопленные сосульки. Каждая наносит {damage} ед. урона от магии льда. Урон удваивается по обездвиженным или охлажденным целям. (Криомантия)',
   'entities.abilities.conjure_water.name': 'Сотворение воды',
   'entities.abilities.conjure_water.description':
     'Создает 2 бутылки воды, восстанавливающей ману при питье. Более высокие ранги создают более чистую воду.',

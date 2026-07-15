@@ -319,7 +319,8 @@ export type AuraKind =
   | 'aoe_echo'
   | 'sure_crit'
   | 'buff_dr'
-  | 'buff_dr_phys';
+  | 'buff_dr_phys'
+  | 'icicles';
 
 export interface Aura {
   id: string; // ability id that applied it
@@ -1498,7 +1499,13 @@ export type AbilityEffect =
       requiresBehind?: boolean;
       weaponMult?: number;
     } // instant special attack (sinister strike, overpower, backstab)
-  | { type: 'directDamage'; min: number; max: number; vsRootedMult?: number }
+  | {
+      type: 'directDamage';
+      min: number;
+      max: number;
+      vsRootedMult?: number;
+      consumeAuraStacks?: { auraId: string; maxStacks: number };
+    }
   | { type: 'interrupt'; lockout: number; rageOnInterrupt?: number }
   | {
       type: 'chainDamage';

@@ -5757,6 +5757,10 @@ export const sv_SE: EnTranslations = {
         "name": "Rimlans",
         "description": "Avfyrar en frostpil som vållar {damage} frostskada och saktar förflyttningen med 40 %."
       },
+      "icefall": {
+        "name": "Icefall",
+        "description": "Launches every stored Icicle at the target for {damage} Frost damage each. Deals double damage to rooted or chilled targets. (Cryomancy)"
+      },
       "conjure_water": {
         "name": "Vattenbindning",
         "description": "Frammanar 2 flaskor vatten som återställer mana när de dricks. Högre rang frammanar renare vatten."

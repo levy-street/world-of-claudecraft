@@ -5757,6 +5757,10 @@ export const nl_NL: EnTranslations = {
         "name": "Rijplans",
         "description": "Lanceert een bout van vorst die {damage} Vorstschade toebrengt en de beweging met 40% vertraagt."
       },
+      "icefall": {
+        "name": "Icefall",
+        "description": "Launches every stored Icicle at the target for {damage} Frost damage each. Deals double damage to rooted or chilled targets. (Cryomancy)"
+      },
       "conjure_water": {
         "name": "Waterbinding",
         "description": "Roept 2 flessen water op die mana herstellen wanneer ze worden gedronken. Hogere rangen roepen zuiverder water op."

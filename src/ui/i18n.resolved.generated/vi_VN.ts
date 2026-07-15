@@ -5757,6 +5757,10 @@ export const vi_VN: EnTranslations = {
         "name": "Thương Băng Giá",
         "description": "Phóng ra một mũi tiễn băng, gây {damage} sát thương Băng và làm chậm di chuyển 40%."
       },
+      "icefall": {
+        "name": "Icefall",
+        "description": "Launches every stored Icicle at the target for {damage} Frost damage each. Deals double damage to rooted or chilled targets. (Cryomancy)"
+      },
       "conjure_water": {
         "name": "Kết Nước",
         "description": "Tạo ra 2 chai nước, hồi pháp lực khi uống. Cấp cao hơn tạo ra nước tinh khiết hơn."

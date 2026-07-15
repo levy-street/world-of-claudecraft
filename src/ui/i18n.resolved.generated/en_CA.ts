@@ -5757,6 +5757,10 @@ export const en_CA: EnTranslations = {
         "name": "Rimelance",
         "description": "Launches a bolt of frost, causing {damage} Frost damage and slowing movement by 40%."
       },
+      "icefall": {
+        "name": "Icefall",
+        "description": "Launches every stored Icicle at the target for {damage} Frost damage each. Deals double damage to rooted or chilled targets. (Cryomancy)"
+      },
       "conjure_water": {
         "name": "Waterbind",
         "description": "Conjures 2 bottles of water, restoring mana when drunk. Higher ranks conjure purer water."

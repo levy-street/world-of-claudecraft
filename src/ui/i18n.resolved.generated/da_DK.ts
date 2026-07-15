@@ -5757,6 +5757,10 @@ export const da_DK: EnTranslations = {
         "name": "Rimlanse",
         "description": "Affyrer et frostlyn, der volder {damage} frostskade og sænker bevægelsen med 40%."
       },
+      "icefall": {
+        "name": "Icefall",
+        "description": "Launches every stored Icicle at the target for {damage} Frost damage each. Deals double damage to rooted or chilled targets. (Cryomancy)"
+      },
       "conjure_water": {
         "name": "Vandbinding",
         "description": "Frembringer 2 flasker vand, der genopretter mana, når de drikkes. Højere rang frembringer renere vand."

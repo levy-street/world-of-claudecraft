@@ -5757,6 +5757,10 @@ export const fr_CA: EnTranslations = {
         "name": "Rimelance",
         "description": "Lance un éclair de givre, inflige {damage} points de dégâts de Givre et ralentit le déplacement de 40%."
       },
+      "icefall": {
+        "name": "Icefall",
+        "description": "Launches every stored Icicle at the target for {damage} Frost damage each. Deals double damage to rooted or chilled targets. (Cryomancy)"
+      },
       "conjure_water": {
         "name": "Waterbind",
         "description": "Invoque 2 bouteilles d'eau qui restaurent du mana une fois bues. Les rangs supérieurs invoquent une eau plus pure."

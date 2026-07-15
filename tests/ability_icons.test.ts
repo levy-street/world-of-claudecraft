@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { ABILITIES } from '../src/sim/data';
-import { abilityIconRecipe, hasExplicitAbilityIcon } from '../src/ui/icons';
+import { abilityIconRecipe, hasExplicitAbilityIcon, hasExplicitAuraIcon } from '../src/ui/icons';
 
 // Every class ability must have a deliberate, visually distinct icon.
 // The procedural fallback (school + name keywords) collides for many ids
@@ -23,7 +23,13 @@ describe('ability icons', () => {
 
   it('every ability has an explicit (non-fallback) icon recipe', () => {
     const missing = abilityIds.filter((id) => !hasExplicitAbilityIcon(id));
-    expect(missing, `abilities relying on the procedural fallback: ${missing.join(', ')}`).toEqual([]);
+    expect(missing, `abilities relying on the procedural fallback: ${missing.join(', ')}`).toEqual(
+      [],
+    );
+  });
+
+  it('has an explicit icon for the Icicles stack meter', () => {
+    expect(hasExplicitAuraIcon('aura_icicles')).toBe(true);
   });
 
   it('no two abilities resolve to an identical icon', () => {

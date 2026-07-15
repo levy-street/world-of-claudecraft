@@ -5757,6 +5757,10 @@ export const pl_PL: EnTranslations = {
         "name": "Szronowa lanca",
         "description": "Wystrzeliwuje pocisk mrozu, zadając {damage} obrażeń od mrozu i spowalniając ruch o 40%."
       },
+      "icefall": {
+        "name": "Icefall",
+        "description": "Launches every stored Icicle at the target for {damage} Frost damage each. Deals double damage to rooted or chilled targets. (Cryomancy)"
+      },
       "conjure_water": {
         "name": "Przywołanie wody",
         "description": "Przywołuje 2 butelki wody, które po wypiciu przywracają manę. Wyższe rangi przywołują czystszą wodę."

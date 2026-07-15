@@ -5757,6 +5757,10 @@ export const pt_BR: EnTranslations = {
         "name": "Lança de Geada",
         "description": "Lança uma seta de gelo, causando {damage} de dano de Gelo e reduzindo a velocidade de movimento em 40%."
       },
+      "icefall": {
+        "name": "Icefall",
+        "description": "Launches every stored Icicle at the target for {damage} Frost damage each. Deals double damage to rooted or chilled targets. (Cryomancy)"
+      },
       "conjure_water": {
         "name": "Vínculo de Água",
         "description": "Conjura 2 garrafas de água que restauram mana quando bebidas. Graus superiores conjuram água mais pura."

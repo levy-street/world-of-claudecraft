@@ -271,6 +271,20 @@ export function runEffects(
       case 'directDamage': {
         if (!target) break;
         if (!ctx.isHostileTo(p, target)) break;
+        let stackMultiplier = 1;
+        if (eff.consumeAuraStacks) {
+          const auraIndex = p.auras.findIndex(
+            (aura) =>
+              aura.id === eff.consumeAuraStacks?.auraId &&
+              aura.sourceId === p.id &&
+              (aura.stacks ?? 0) > 0,
+          );
+          if (auraIndex < 0) break;
+          const aura = p.auras[auraIndex];
+          stackMultiplier = Math.min(eff.consumeAuraStacks.maxStacks, aura.stacks ?? 0);
+          p.auras.splice(auraIndex, 1);
+          ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
+        }
         const rooted = isRootedOrChilled(target);
         const critChance =
           isSpell && rooted
@@ -278,7 +292,7 @@ export function runEffects(
             : isSpell
               ? ctx.spellCrit(p)
               : p.critChance;
-        let dmg = ctx.rng.range(eff.min, eff.max);
+        let dmg = ctx.rng.range(eff.min, eff.max) * stackMultiplier;
         // The flat rider scales with the school's rating: Spell Power for spells,
         // Ranged AP for hunter shots, melee Attack Power for physical specials.
         // abilityScalingPower picks the rating; powerScale (inside directHitBonus)

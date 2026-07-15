@@ -233,6 +233,16 @@ describe('createAurasView: derivation per mode', () => {
     expect(v.tick(entity([aura({ id: 'a', stacks: 4 })])).slots[0].stacksText).toBe('4');
   });
 
+  it('badges the Icicles meter from its first stack', () => {
+    const v = createAurasView('all', deps());
+    expect(
+      v.tick(entity([aura({ id: 'mag_icicles', kind: 'icicles', stacks: 1 })])).slots[0].stacksText,
+    ).toBe('1');
+    expect(
+      v.tick(entity([aura({ id: 'mag_icicles', kind: 'icicles', stacks: 5 })])).slots[0].stacksText,
+    ).toBe('5');
+  });
+
   it('badges remaining charges (shown even at 1) and prefers charges over stacks', () => {
     // A charge-limited aura (Lightning Shield) badges its charge count, unlike stacks it
     // shows at 1, and when both are present charges wins (it is the meaningful count).

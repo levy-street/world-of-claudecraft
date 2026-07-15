@@ -2,6 +2,30 @@ import type { AbilityDef } from '../types';
 
 /** Retained Talents V2 active grants: Mage, Warlock, and Druid. */
 export const TALENT_ABILITIES_V2_B = {
+  icefall: {
+    id: 'icefall',
+    name: 'Icefall',
+    class: 'mage',
+    learnLevel: 5,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 30,
+    school: 'frost',
+    requiresTarget: true,
+    offGcd: true,
+    effects: [
+      {
+        type: 'directDamage',
+        min: 12,
+        max: 12,
+        vsRootedMult: 2,
+        consumeAuraStacks: { auraId: 'mag_icicles', maxStacks: 5 },
+      },
+    ],
+    description:
+      'Launches every stored Icicle at the target for $d Frost damage each. Deals double damage to rooted or chilled targets. (Cryomancy)',
+  },
   spellsteal: {
     id: 'spellsteal',
     name: 'Spellsteal',

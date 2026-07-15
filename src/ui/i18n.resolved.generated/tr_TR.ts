@@ -5757,6 +5757,10 @@ export const tr_TR: EnTranslations = {
         "name": "Ayaz Mızrağı",
         "description": "Bir ayaz oku fırlatarak {damage} Ayaz hasarı verir ve hareketi %40 yavaşlatır."
       },
+      "icefall": {
+        "name": "Icefall",
+        "description": "Launches every stored Icicle at the target for {damage} Frost damage each. Deals double damage to rooted or chilled targets. (Cryomancy)"
+      },
       "conjure_water": {
         "name": "Su Bağlama",
         "description": "İçildiğinde mana geri kazandıran 2 şişe su çağırır. Daha yüksek rütbeler daha saf su çağırır."

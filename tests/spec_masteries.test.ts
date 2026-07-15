@@ -69,6 +69,14 @@ describe('spec masteries', () => {
         { ability: 'frost_nova', dmgPct: 0.25 },
       ],
       stats: { armorPct: 0.1 },
+      grant: { ability: 'icefall' },
+      proc: {
+        id: 'mag_icicles',
+        name: 'Icicles',
+        school: 'frost',
+        trigger: { on: 'spellHit', abilities: ['frostbolt'] },
+        responses: [{ kind: 'stackAura', aura: 'icicles', maxStacks: 5, duration: 3600 }],
+      },
     });
     expect(TALENTS.hunter?.specs.find((s) => s.id === 'beast_mastery')?.mastery.effect).toEqual({
       global: { petDmgPct: 0.35 },

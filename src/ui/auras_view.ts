@@ -297,13 +297,13 @@ export function createAurasView(
           TOGGLE_KINDS.has(a.kind) || TOGGLE_IDS.has(a.id)
             ? ''
             : compactAuraDuration(a.remaining, units);
-        // A charge-limited aura badges its remaining charges (shown even at 1); otherwise the
-        // badge shows a stack count, and only when it stacks past 1.
+        // A charge-limited aura and the Icicles meter badge their count even at 1; ordinary
+        // stack auras keep the compact badge only when they stack past 1.
         slot.stacksText =
           a.charges !== undefined
             ? deps.formatStacks(a.charges)
-            : a.stacks && a.stacks > 1
-              ? deps.formatStacks(a.stacks)
+            : a.kind === 'icicles' || (a.stacks && a.stacks > 1)
+              ? deps.formatStacks(a.stacks ?? 1)
               : '';
         slot.name = deps.auraName(a);
         slot.remaining = a.remaining;

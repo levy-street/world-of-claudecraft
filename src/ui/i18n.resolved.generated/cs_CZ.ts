@@ -5757,6 +5757,10 @@ export const cs_CZ: EnTranslations = {
         "name": "Kopí jinovatky",
         "description": "Vypustí mrazivý šíp, způsobí {damage} mrazového poškození a zpomalí pohyb o 40 %."
       },
+      "icefall": {
+        "name": "Icefall",
+        "description": "Launches every stored Icicle at the target for {damage} Frost damage each. Deals double damage to rooted or chilled targets. (Cryomancy)"
+      },
       "conjure_water": {
         "name": "Vodní pouto",
         "description": "Vyvolá 2 lahve vody, které po vypití obnovují manu. Vyšší ranky vyvolají čistší vodu."

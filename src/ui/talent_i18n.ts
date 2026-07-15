@@ -704,6 +704,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Venenos viles',
     'Cruel Wounds': 'Disparos mortales',
     Cryomancy: 'Escarcha',
+    Icicles: 'Carámbanos',
     'Dead Aim': 'Precisión',
     'Deathless Ardor': 'Defensor ferviente',
     'Deathless Will': 'Instintos de supervivencia',
@@ -1046,6 +1047,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Venenos viles',
     'Cruel Wounds': 'Disparos mortales',
     Cryomancy: 'Escarcha',
+    Icicles: 'Carámbanos',
     'Dead Aim': 'Precisión',
     'Deathless Ardor': 'Defensor ardiente',
     'Deathless Will': 'Instintos de supervivencia',
@@ -1388,6 +1390,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Poisons infâmes',
     'Cruel Wounds': 'Tirs fatals',
     Cryomancy: 'Givre',
+    Icicles: 'Glaçons',
     'Dead Aim': 'Précision',
     'Deathless Ardor': 'Défenseur ardent',
     'Deathless Will': 'Instincts de survie',
@@ -1730,6 +1733,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Poisons infâmes',
     'Cruel Wounds': 'Tirs fatals',
     Cryomancy: 'Givre',
+    Icicles: 'Glaçons',
     'Dead Aim': 'Précision',
     'Deathless Ardor': 'Défenseur ardent',
     'Deathless Will': 'Instincts de survie',
@@ -2072,6 +2076,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Veleni immondi',
     'Cruel Wounds': 'Colpi mortali',
     Cryomancy: 'Gelo',
+    Icicles: 'Ghiaccioli',
     'Dead Aim': 'Precisione',
     'Deathless Ardor': 'Difensore ardente',
     'Deathless Will': 'Istinti di sopravvivenza',
@@ -2414,6 +2419,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Üble Gifte',
     'Cruel Wounds': 'Todbringende Schüsse',
     Cryomancy: 'Frost',
+    Icicles: 'Eiszapfen',
     'Dead Aim': 'Präzision',
     'Deathless Ardor': 'Glühender Verteidiger',
     'Deathless Will': 'Überlebensinstinkte',
@@ -2756,6 +2762,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': '剧毒',
     'Cruel Wounds': '致死射击',
     Cryomancy: '冰霜',
+    Icicles: '冰刺',
     'Dead Aim': '精准',
     'Deathless Ardor': '炽热防御者',
     'Deathless Will': '生存本能',
@@ -3098,6 +3105,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': '邪惡毒藥',
     'Cruel Wounds': '致死射擊',
     Cryomancy: '冰霜',
+    Icicles: '冰刺',
     'Dead Aim': '精準',
     'Deathless Ardor': '熱忱防衛者',
     'Deathless Will': '生存本能',
@@ -3440,6 +3448,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': '사악한 독',
     'Cruel Wounds': '필멸의 사격',
     Cryomancy: '냉기',
+    Icicles: '고드름',
     'Dead Aim': '정밀함',
     'Deathless Ardor': '헌신적인 수호자',
     'Deathless Will': '생존 본능',
@@ -3782,6 +3791,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': '邪悪なる毒',
     'Cruel Wounds': 'モータル・ショット',
     Cryomancy: 'フロスト',
+    Icicles: '氷柱',
     'Dead Aim': '精密',
     'Deathless Ardor': '熱烈なる守護者',
     'Deathless Will': '生存本能',
@@ -4124,6 +4134,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Venenos Vis',
     'Cruel Wounds': 'Disparos Mortais',
     Cryomancy: 'Gelo',
+    Icicles: 'Sincelos',
     'Dead Aim': 'Precisão',
     'Deathless Ardor': 'Defensor Fervoroso',
     'Deathless Will': 'Instintos de Sobrevivência',
@@ -4466,6 +4477,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Мерзкие яды',
     'Cruel Wounds': 'Смертельные выстрелы',
     Cryomancy: 'Лед',
+    Icicles: 'Ледяные осколки',
     'Dead Aim': 'Меткость',
     'Deathless Ardor': 'Ярый защитник',
     'Deathless Will': 'Инстинкт выживания',
@@ -4808,6 +4820,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Kruté jedy',
     'Cruel Wounds': 'Kruté rány',
     Cryomancy: 'Mrazivá magie',
+    Icicles: 'Rampouchy',
     'Dead Aim': 'Smrtící muška',
     'Deathless Ardor': 'Nesmrtelný zápal',
     'Deathless Will': 'Nesmrtelná vůle',
@@ -5150,6 +5163,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Snode Vergiften',
     'Cruel Wounds': 'Fatale Schoten',
     Cryomancy: 'Vorst',
+    Icicles: 'IJspegels',
     'Dead Aim': 'Precisie',
     'Deathless Ardor': 'Vurige Verdediger',
     'Deathless Will': 'Overlevingsinstincten',
@@ -5492,6 +5506,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Plugawe trucizny',
     'Cruel Wounds': 'Śmiertelne strzały',
     Cryomancy: 'Mróz',
+    Icicles: 'Sople',
     'Dead Aim': 'Precyzja',
     'Deathless Ardor': 'Żarliwy obrońca',
     'Deathless Will': 'Instynkty przetrwania',
@@ -5834,6 +5849,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Racun Keji',
     'Cruel Wounds': 'Tembakan Maut',
     Cryomancy: 'Beku',
+    Icicles: 'Es Runcing',
     'Dead Aim': 'Presisi',
     'Deathless Ardor': 'Pembela Gigih',
     'Deathless Will': 'Naluri Bertahan Hidup',
@@ -6176,6 +6192,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'İğrenç Zehirler',
     'Cruel Wounds': 'Ölümcül Atışlar',
     Cryomancy: 'Ayaz',
+    Icicles: 'Buz Sarkıtları',
     'Dead Aim': 'İsabet',
     'Deathless Ardor': 'Ateşli Savunucu',
     'Deathless Will': 'Hayatta Kalma İçgüdüleri',
@@ -6518,6 +6535,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Vidriga gifter',
     'Cruel Wounds': 'Dödsbringande skott',
     Cryomancy: 'Frost',
+    Icicles: 'Istappar',
     'Dead Aim': 'Precision',
     'Deathless Ardor': 'Brinnande försvarare',
     'Deathless Will': 'Överlevnadsinstinkter',
@@ -6860,6 +6878,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Độc Tố Hèn Hạ',
     'Cruel Wounds': 'Phát Bắn Chí Mạng',
     Cryomancy: 'Băng Giá',
+    Icicles: 'Băng Nhọn',
     'Dead Aim': 'Chính Xác',
     'Deathless Ardor': 'Vệ Binh Nhiệt Thành',
     'Deathless Will': 'Bản Năng Sinh Tồn',
@@ -7202,6 +7221,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Modbydelige Gifte',
     'Cruel Wounds': 'Dødbringende Skud',
     Cryomancy: 'Frost',
+    Icicles: 'Istapper',
     'Dead Aim': 'Præcision',
     'Deathless Ardor': 'Ihærdig Forsvarer',
     'Deathless Will': 'Overlevelsesinstinkter',
@@ -7702,6 +7722,8 @@ function procTriggerDescription(
   switch (trigger.on) {
     case 'castNth':
       return `${abilityList(trigger.abilities)}${trigger.n > 1 ? ` x${trigger.n}` : ''}`;
+    case 'spellHit':
+      return abilityList(trigger.abilities);
     case 'spellCrit':
       return `${text.statLabels.crit}: ${abilityList(trigger.abilities)}`;
     case 'shieldConsumed':
@@ -7736,6 +7758,8 @@ function procResponseDescription(
       return `${abilityName(response.ability)}: -${response.seconds === 'reset' ? formatPercent(1, lang) : seconds(response.seconds, lang)} ${text.statLabels.cooldown}`;
     case 'resource':
       return `+${formatNumber(response.amount, lang)} ${t('classDetails.labels.resource')}`;
+    case 'stackAura':
+      return `+1 (<= ${formatNumber(response.maxStacks, lang)})`;
     case 'heal':
       return `+${formatNumber(response.amount, lang)} ${t('hud.meters.healing')}`;
     case 'absorb':

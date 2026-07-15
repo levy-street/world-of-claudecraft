@@ -5757,6 +5757,10 @@ export const de_DE: EnTranslations = {
         "name": "Rimelance",
         "description": "Schleudert einen Frostblitz, verursacht {damage} Frostschaden und verlangsamt die Bewegung um 40%."
       },
+      "icefall": {
+        "name": "Icefall",
+        "description": "Launches every stored Icicle at the target for {damage} Frost damage each. Deals double damage to rooted or chilled targets. (Cryomancy)"
+      },
       "conjure_water": {
         "name": "Waterbind",
         "description": "Beschwört 2 Flaschen Wasser, die beim Trinken Mana wiederherstellen. Höhere Ränge beschwören reineres Wasser."
