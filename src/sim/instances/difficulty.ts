@@ -15,22 +15,31 @@ export function claimDifficultyForDungeon(
   return selected === 'heroic' && HEROIC_DUNGEON_IDS.has(dungeonId) ? 'heroic' : 'normal';
 }
 
+// Boss-summoned add waves (spawnBossAdds passes { summonedAdd: true }) swing at
+// the tuning table's softer addDamageMultiplier; everything else, including the
+// spawn-list guards flanking a boss, uses the dungeon-wide damageMultiplier.
+export interface HeroicSpawnRole {
+  summonedAdd?: boolean;
+}
+
 export function mobTemplateForDungeonDifficulty(
   template: MobTemplate,
   dungeonId: string,
   difficulty: DungeonDifficulty,
+  role?: HeroicSpawnRole,
 ): MobTemplate {
   if (difficulty !== 'heroic') return template;
   const tuning = HEROIC_DUNGEON_TUNING[dungeonId];
   if (!tuning) return template;
+  const dmgMult = role?.summonedAdd ? tuning.addDamageMultiplier : tuning.damageMultiplier;
   return {
     ...template,
     minLevel: tuning.level,
     maxLevel: tuning.level,
     hpBase: template.hpBase * tuning.healthMultiplier,
     hpPerLevel: template.hpPerLevel * tuning.healthMultiplier,
-    dmgBase: template.dmgBase * tuning.damageMultiplier,
-    dmgPerLevel: template.dmgPerLevel * tuning.damageMultiplier,
+    dmgBase: template.dmgBase * dmgMult,
+    dmgPerLevel: template.dmgPerLevel * dmgMult,
     armorPerLevel: template.armorPerLevel * tuning.armorMultiplier,
     moveSpeed: Math.max(template.moveSpeed, HEROIC_MIN_MOVE_SPEED),
   };
@@ -58,11 +67,12 @@ export function applyHeroicMobTuning(
   mob: Entity,
   dungeonId: string,
   difficulty: DungeonDifficulty,
+  role?: HeroicSpawnRole,
 ): void {
   if (difficulty !== 'heroic') return;
   const tuning = HEROIC_DUNGEON_TUNING[dungeonId];
   if (!tuning) return;
-  mob.mechanicDamageMult = tuning.damageMultiplier;
+  mob.mechanicDamageMult = role?.summonedAdd ? tuning.addDamageMultiplier : tuning.damageMultiplier;
   mob.mechanicHealMult = tuning.healthMultiplier;
   if (MOBS[mob.templateId]?.boss) {
     mob.ccImmune = true;
