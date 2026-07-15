@@ -13,6 +13,23 @@ export const hudChromeStrings = {
   spectate: {
     banner: 'Spectating {name}',
   },
+  // End-of-match scoreboard modal (1v1 / 2v2 / Fiesta / Protect Yumi). The banner,
+  // the per-player column headers, the local rating change, and the honor earned.
+  arenaEnd: {
+    victory: 'Victory',
+    defeat: 'Defeat',
+    draw: 'Draw',
+    colName: 'Name',
+    colKills: 'Killing Blows',
+    colDamage: 'Damage Done',
+    colHealing: 'Healing Done',
+    colRating: 'Rating',
+    colChange: 'Change',
+    yourRating: 'Your Rating: {before} to {after}',
+    honorEarned: '+{honor} Honor',
+    leave: 'Leave',
+    close: 'Close',
+  },
   // Raid/party ready-check prompt (the leader ran /ready). The buttons answer the
   // yes/no prompt; the outcome is announced in chat by the sim.
   readyCheck: {

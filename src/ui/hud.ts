@@ -144,6 +144,8 @@ import {
   EMPTY_ICON_KEY,
   ITEM_ICON_PREFIX,
 } from './action_bar_view';
+import { buildArenaEndView } from './arena_end_view';
+import { renderArenaEndWindow } from './arena_end_window';
 import { ArenaWindow } from './arena_window';
 import {
   abilityStartsAutoAttack,
@@ -9911,6 +9913,10 @@ export class Hud {
           audio.duelStart();
           break;
         case 'arenaEnd': {
+          // Open the end-of-match scoreboard for the local player (the event is
+          // personal; offline the sim hands every fighter's copy to the one HUD,
+          // so keep only ours). The banners/combat-log below still fire.
+          if (ev.pid === undefined || ev.pid === sim.playerId) this.openArenaEndScreen(ev);
           if (ev.format === 'fiesta') {
             if (ev.draw) {
               this.showBanner(t('fiesta.end.draw'));
@@ -15433,6 +15439,32 @@ export class Hud {
     this.hideTooltip();
   }
 
+  // End-of-match scoreboard modal (arena_end_view.ts model + arena_end_window.ts
+  // painter). Opened by the arenaEnd SimEvent, dismissed by its Leave button or
+  // Escape. A cold modal: it is not a managed window, so closeAll checks it directly.
+  private openArenaEndScreen(ev: Extract<SimEvent, { type: 'arenaEnd' }>): void {
+    const root = $('#arena-end-window');
+    if (!root) return;
+    const view = buildArenaEndView({
+      format: ev.format,
+      won: ev.won,
+      draw: ev.draw,
+      ratingBefore: ev.ratingBefore,
+      ratingAfter: ev.ratingAfter,
+      scoreboard: ev.scoreboard,
+      myTeam: ev.myTeam,
+      honor: ev.honor,
+      localPid: this.sim.playerId,
+    });
+    renderArenaEndWindow(root, view, { onClose: () => this.closeArenaEndScreen() });
+    root.style.display = 'block';
+  }
+
+  private closeArenaEndScreen(): void {
+    const root = $('#arena-end-window');
+    if (root) root.style.display = 'none';
+  }
+
   // Closes the topmost UI. Returns true if something was closed.
   closeAll(): boolean {
     if (this.openLootChestId !== null) {
@@ -15454,6 +15486,10 @@ export class Hud {
     }
     if ($('#delve-rite-panel').style.display === 'block') {
       this.closeRitePanel();
+      return true;
+    }
+    if ($('#arena-end-window').style.display === 'block') {
+      this.closeArenaEndScreen();
       return true;
     }
     const top = this.topmostOpenWindow();
