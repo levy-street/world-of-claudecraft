@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { preloadMechAssets } from '../src/render/characters/assets';
 import { mechHeldWeaponOverride } from '../src/render/characters/manifest';
-import { CharacterPreview } from '../src/render/characters/preview';
+import { CharacterPreview, cardCaptureCameraZ } from '../src/render/characters/preview';
 import {
   appearanceSignature,
   type PreviewAppearance,
@@ -67,6 +67,16 @@ beforeEach(() => {
   mechAssets.promise = null;
   mechAssets.resolve = null;
   vi.mocked(preloadMechAssets).mockClear();
+});
+
+describe('player-card capture framing', () => {
+  it('adds headroom only when SwordMaster raises both blades', () => {
+    const standard = cardCaptureCameraZ('warrior', ['Spellcast_Raise']);
+
+    expect(cardCaptureCameraZ('swordmaster', ['Spellcast_Raise'])).toBeGreaterThan(standard);
+    expect(cardCaptureCameraZ('swordmaster', ['Dualwield_Melee_Attack_Chop'])).toBe(standard);
+    expect(cardCaptureCameraZ('rogue', ['Spellcast_Raise'])).toBe(standard);
+  });
 });
 
 describe('previewAppearanceVisual', () => {

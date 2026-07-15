@@ -26,6 +26,17 @@ const PREVIEW_ANIM_STATE = {
 };
 
 const LIVE_PREVIEW_X = 0;
+const CARD_CAPTURE_Z = 4.6;
+const DUAL_RAISE_CAPTURE_Z = 6.0;
+
+export function cardCaptureCameraZ(
+  playerClass: PlayerClass | undefined,
+  poseClips: readonly string[] | undefined,
+): number {
+  return playerClass === 'swordmaster' && poseClips?.includes('Spellcast_Raise')
+    ? DUAL_RAISE_CAPTURE_Z
+    : CARD_CAPTURE_Z;
+}
 
 export class CharacterPreview {
   private container: HTMLElement;
@@ -311,6 +322,7 @@ export class CharacterPreview {
       width?: number;
       height?: number;
       angle?: number;
+      playerClass?: PlayerClass;
       poseClips?: readonly string[];
       poseFraction?: number;
     } = {},
@@ -338,12 +350,12 @@ export class CharacterPreview {
     this.renderer.setPixelRatio(1);
     this.renderer.setSize(width, height, false);
     this.camera.aspect = width / height;
-    // Pulled back to z=4.6, aimed at y=1.55 (eye 1.62) so the 45°/0.75-aspect
-    // frustum spans roughly y in [-0.3, 3.5] at the figure plane: enough headroom
-    // above the 2.6 head-top to clear the raised weapon/arms of the hero & victory
-    // poses (~3.3u) while the feet stay inside (BUG: card character was out of
-    // bounds). The card's drawCharacter() fit math then frames the whole capture.
-    this.camera.position.set(-0.1, 1.62, 4.6);
+    // The standard z=4.6 framing keeps normal poses prominent. SwordMaster's
+    // raised pose needs extra distance because both full-length blades extend
+    // above the rig at once. The card's drawCharacter() fit math then frames the
+    // whole capture without shrinking every other class and pose.
+    const captureZ = cardCaptureCameraZ(opts.playerClass, opts.poseClips);
+    this.camera.position.set(-0.1, 1.62, captureZ);
     this.camera.lookAt(new THREE.Vector3(-0.1, 1.55, 0));
     this.camera.updateProjectionMatrix();
     this.characterGroup.rotation.y = angle;

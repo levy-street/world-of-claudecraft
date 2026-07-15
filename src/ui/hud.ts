@@ -13318,6 +13318,7 @@ export class Hud {
       selectPose(poseIndex);
       try {
         const characterImage = preview.captureCloseup({
+          playerClass: this.sim.cfg.playerClass,
           poseClips: pose.clips,
           poseFraction: pose.fraction,
         });
