@@ -965,6 +965,9 @@ export const cs_CZ: EnTranslations = {
       "balance": "Čest: {amount}",
       "honorFloat": "+{amount} cti",
       "honorGain": "Získáváš {amount} cti ({reason}).",
+      "heroBalance": "Hero Points: {amount}",
+      "heroFloat": "+{amount} Hero Points",
+      "heroGain": "You gain {amount} hero points ({reason}).",
       "notEnoughHonor": "Nemáš dost cti.",
       "notEnoughHero": "Not enough hero points.",
       "reasons": {
@@ -974,7 +977,8 @@ export const cs_CZ: EnTranslations = {
         "fiestaWin": "Vítězství ve Fiestě",
         "frontierKill": "Frontier kill",
         "frontierRare": "Frostreach rare",
-        "frontierDaily": "Frontier daily"
+        "frontierDaily": "Frontier daily",
+        "arenaDaily": "Coliseum daily"
       }
     },
     "frontier": {

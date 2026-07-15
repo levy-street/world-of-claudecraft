@@ -949,6 +949,9 @@ export const hudChromeStrings = {
     balance: 'Honor: {amount}',
     honorFloat: '+{amount} Honor',
     honorGain: 'You gain {amount} Honor ({reason}).',
+    heroBalance: 'Hero Points: {amount}',
+    heroFloat: '+{amount} Hero Points',
+    heroGain: 'You gain {amount} hero points ({reason}).',
     notEnoughHonor: 'Not enough Honor.',
     notEnoughHero: 'Not enough hero points.',
     reasons: {
@@ -959,6 +962,7 @@ export const hudChromeStrings = {
       frontierKill: 'Frontier kill',
       frontierRare: 'Frostreach rare',
       frontierDaily: 'Frontier daily',
+      arenaDaily: 'Coliseum daily',
     },
   },
   // The Frostreach Frontier enter/leave control in the PvP window (alongside the

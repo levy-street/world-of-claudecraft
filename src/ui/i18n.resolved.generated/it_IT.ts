@@ -965,6 +965,9 @@ export const it_IT: EnTranslations = {
       "balance": "Onore: {amount}",
       "honorFloat": "+{amount} Onore",
       "honorGain": "Ottieni {amount} Onore ({reason}).",
+      "heroBalance": "Hero Points: {amount}",
+      "heroFloat": "+{amount} Hero Points",
+      "heroGain": "You gain {amount} hero points ({reason}).",
       "notEnoughHonor": "Onore insufficiente.",
       "notEnoughHero": "Not enough hero points.",
       "reasons": {
@@ -974,7 +977,8 @@ export const it_IT: EnTranslations = {
         "fiestaWin": "Vittoria nella Fiesta",
         "frontierKill": "Frontier kill",
         "frontierRare": "Frostreach rare",
-        "frontierDaily": "Frontier daily"
+        "frontierDaily": "Frontier daily",
+        "arenaDaily": "Coliseum daily"
       }
     },
     "frontier": {

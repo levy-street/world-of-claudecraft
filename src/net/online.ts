@@ -1156,6 +1156,8 @@ export class ClientWorld implements IWorld {
   dungeonFinderBoard: import('../world_api').DungeonFinderBoard | null = null;
   honor = 0;
   lifetimeHonor = 0;
+  heroPoints = 0;
+  lifetimeHeroPoints = 0;
   // --- IWorldValeCup: Vale Cup queue/match state, mirrored from the snapshot
   // self (`s.vcup`, delta-omitted: a missing key keeps the prior mirror, an
   // explicit null clears it, same as `s.arena`). ---
@@ -2191,6 +2193,8 @@ export class ClientWorld implements IWorld {
       if (s.dfb !== undefined) this.dungeonFinderBoard = s.dfb;
       if (s.honor !== undefined) this.honor = s.honor ?? 0;
       if (s.lhonor !== undefined) this.lifetimeHonor = s.lhonor ?? 0;
+      if (s.hero !== undefined) this.heroPoints = s.hero ?? 0;
+      if (s.lhero !== undefined) this.lifetimeHeroPoints = s.lhero ?? 0;
       if (s.fincur !== undefined) this.frontierIncursion = s.fincur ?? null;
       if (s.vcup !== undefined) this.cupInfo = s.vcup;
       if (s.market !== undefined) this.marketInfo = s.market;

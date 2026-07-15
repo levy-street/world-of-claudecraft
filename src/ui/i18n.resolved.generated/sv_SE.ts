@@ -965,6 +965,9 @@ export const sv_SE: EnTranslations = {
       "balance": "Heder: {amount}",
       "honorFloat": "+{amount} Heder",
       "honorGain": "Du får {amount} Heder ({reason}).",
+      "heroBalance": "Hero Points: {amount}",
+      "heroFloat": "+{amount} Hero Points",
+      "heroGain": "You gain {amount} hero points ({reason}).",
       "notEnoughHonor": "Inte tillräckligt med heder.",
       "notEnoughHero": "Not enough hero points.",
       "reasons": {
@@ -974,7 +977,8 @@ export const sv_SE: EnTranslations = {
         "fiestaWin": "Fiesta-seger",
         "frontierKill": "Frontier kill",
         "frontierRare": "Frostreach rare",
-        "frontierDaily": "Frontier daily"
+        "frontierDaily": "Frontier daily",
+        "arenaDaily": "Coliseum daily"
       }
     },
     "frontier": {

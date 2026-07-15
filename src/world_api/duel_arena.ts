@@ -159,6 +159,10 @@ export interface IWorldDuelArena {
   honor: number;
   /** Monotonic total Honor earned by the local/observed character. */
   lifetimeHonor: number;
+  /** Spendable Season 1 hero points (the frost-rare currency), soulbound. */
+  heroPoints: number;
+  /** Monotonic total hero points earned. */
+  lifetimeHeroPoints: number;
   arenaQueueJoin(format?: ArenaFormat): void;
   arenaQueueLeave(): void;
   // 2v2 Fiesta: lock in one of the augments currently on offer

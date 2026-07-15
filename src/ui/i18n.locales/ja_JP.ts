@@ -13,6 +13,10 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.warfare.heroBalance': 'ヒーローポイント：{amount}',
+  'hudChrome.warfare.heroFloat': '+{amount} ヒーローポイント',
+  'hudChrome.warfare.heroGain': '{amount} ヒーローポイントを獲得（{reason}）。',
+  'hudChrome.warfare.reasons.arenaDaily': 'コロシアム日課',
   'hudChrome.frontier.incursionTitle': 'フロストリーチの侵攻',
   'entities.mobs.rimebound_wisp.name': '霜縛のウィスプ',
   'hudChrome.frontier.title': 'フロストリーチ辺境',

@@ -965,6 +965,9 @@ export const ru_RU: EnTranslations = {
       "balance": "Честь: {amount}",
       "honorFloat": "+{amount} чести",
       "honorGain": "Вы получаете {amount} очк. чести ({reason}).",
+      "heroBalance": "Очки героя: {amount}",
+      "heroFloat": "+{amount} очков героя",
+      "heroGain": "Вы получаете {amount} очков героя ({reason}).",
       "notEnoughHonor": "Недостаточно чести.",
       "notEnoughHero": "Недостаточно очков героя.",
       "reasons": {
@@ -974,7 +977,8 @@ export const ru_RU: EnTranslations = {
         "fiestaWin": "Победа на Фиесте",
         "frontierKill": "Убийство во Фронтире",
         "frontierRare": "Редкий во Фростриче",
-        "frontierDaily": "Ежедневное во Фронтире"
+        "frontierDaily": "Ежедневное во Фронтире",
+        "arenaDaily": "Ежедневная арена"
       }
     },
     "frontier": {

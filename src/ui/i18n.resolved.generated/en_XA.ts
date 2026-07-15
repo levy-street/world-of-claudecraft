@@ -965,6 +965,9 @@ export const en_XA: EnTranslations = {
       "balance": "[Ĥóñóŕ: {amount}]",
       "honorFloat": "[+{amount} Ĥóñóŕ]",
       "honorGain": "[Ýóú ĝáíñ {amount} Ĥóñóŕ ({reason}).]",
+      "heroBalance": "[Ĥéŕó Þóíñţš: {amount}]",
+      "heroFloat": "[+{amount} Ĥéŕó Þóíñţš]",
+      "heroGain": "[Ýóú ĝáíñ {amount} ĥéŕó þóíñţš ({reason}).]",
       "notEnoughHonor": "[Ñóţ éñóúĝĥ Ĥóñóŕ.]",
       "notEnoughHero": "[Ñóţ éñóúĝĥ ĥéŕó þóíñţš.]",
       "reasons": {
@@ -974,7 +977,8 @@ export const en_XA: EnTranslations = {
         "fiestaWin": "[Ƒíéšţá ʋíçţóŕý]",
         "frontierKill": "[Ƒŕóñţíéŕ ķíļļ]",
         "frontierRare": "[Ƒŕóšţŕéáçĥ ŕáŕé]",
-        "frontierDaily": "[Ƒŕóñţíéŕ ðáíļý]"
+        "frontierDaily": "[Ƒŕóñţíéŕ ðáíļý]",
+        "arenaDaily": "[Çóļíšéúɱ ðáíļý]"
       }
     },
     "frontier": {

@@ -965,6 +965,9 @@ export const vi_VN: EnTranslations = {
       "balance": "Danh dự: {amount}",
       "honorFloat": "+{amount} Danh dự",
       "honorGain": "Bạn nhận được Danh dự {amount} ({reason}).",
+      "heroBalance": "Hero Points: {amount}",
+      "heroFloat": "+{amount} Hero Points",
+      "heroGain": "You gain {amount} hero points ({reason}).",
       "notEnoughHonor": "Không đủ danh dự.",
       "notEnoughHero": "Not enough hero points.",
       "reasons": {
@@ -974,7 +977,8 @@ export const vi_VN: EnTranslations = {
         "fiestaWin": "Chiến thắng Fiesta",
         "frontierKill": "Frontier kill",
         "frontierRare": "Frostreach rare",
-        "frontierDaily": "Frontier daily"
+        "frontierDaily": "Frontier daily",
+        "arenaDaily": "Coliseum daily"
       }
     },
     "frontier": {

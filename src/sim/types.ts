@@ -61,10 +61,12 @@ export type HonorReason =
   | 'fiesta_win'
   | 'frontier_kill'
   | 'frontier_rare'
-  | 'frontier_daily';
+  | 'frontier_daily'
+  | 'arena_daily';
 
-// The Season 1 Frontier PvP currency (hero points), earned from frost-rare kills.
-export type HeroPointsReason = 'frontier_rare';
+// The Season 1 PvP currency (hero points), earned from frost-rare kills and the
+// Ashen Coliseum daily claim.
+export type HeroPointsReason = 'frontier_rare' | 'arena_daily';
 
 // Persisted anti-win-trading window for ranked honor. `winsByOpponent` is keyed
 // by bracket plus the stable, sorted opposing-team identity; `totalWins` drives

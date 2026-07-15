@@ -965,6 +965,9 @@ export const id_ID: EnTranslations = {
       "balance": "Kehormatan: {amount}",
       "honorFloat": "+{amount} Kehormatan",
       "honorGain": "Anda mendapatkan Kehormatan {amount} ({reason}).",
+      "heroBalance": "Hero Points: {amount}",
+      "heroFloat": "+{amount} Hero Points",
+      "heroGain": "You gain {amount} hero points ({reason}).",
       "notEnoughHonor": "Tidak cukup Kehormatan.",
       "notEnoughHero": "Not enough hero points.",
       "reasons": {
@@ -974,7 +977,8 @@ export const id_ID: EnTranslations = {
         "fiestaWin": "Kemenangan Fiesta",
         "frontierKill": "Frontier kill",
         "frontierRare": "Frostreach rare",
-        "frontierDaily": "Frontier daily"
+        "frontierDaily": "Frontier daily",
+        "arenaDaily": "Coliseum daily"
       }
     },
     "frontier": {

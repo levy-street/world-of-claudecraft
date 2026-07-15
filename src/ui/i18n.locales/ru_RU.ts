@@ -13,6 +13,10 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.warfare.heroBalance': 'Очки героя: {amount}',
+  'hudChrome.warfare.heroFloat': '+{amount} очков героя',
+  'hudChrome.warfare.heroGain': 'Вы получаете {amount} очков героя ({reason}).',
+  'hudChrome.warfare.reasons.arenaDaily': 'Ежедневная арена',
   'hudChrome.frontier.incursionTitle': 'Вторжение Морозного Предела',
   'entities.mobs.rimebound_wisp.name': 'Морозный дух',
   'hudChrome.frontier.title': 'Морозный Фронтир',

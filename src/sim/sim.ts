@@ -7810,6 +7810,14 @@ export class Sim {
     return this.primaryId === -1 ? 0 : (this.players.get(this.primaryId)?.lifetimeHonor ?? 0);
   }
 
+  get heroPoints(): number {
+    return this.primaryId === -1 ? 0 : (this.players.get(this.primaryId)?.heroPoints ?? 0);
+  }
+
+  get lifetimeHeroPoints(): number {
+    return this.primaryId === -1 ? 0 : (this.players.get(this.primaryId)?.lifetimeHeroPoints ?? 0);
+  }
+
   get marketInfo(): import('../world_api').MarketInfo | null {
     return this.primaryId === -1 ? null : this.marketInfoFor(this.primaryId);
   }

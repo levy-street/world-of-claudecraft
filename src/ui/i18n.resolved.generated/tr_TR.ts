@@ -965,6 +965,9 @@ export const tr_TR: EnTranslations = {
       "balance": "Onur: {amount}",
       "honorFloat": "+{amount} Onur",
       "honorGain": "{amount} Onur ({reason}) kazanırsınız.",
+      "heroBalance": "Hero Points: {amount}",
+      "heroFloat": "+{amount} Hero Points",
+      "heroGain": "You gain {amount} hero points ({reason}).",
       "notEnoughHonor": "Yeterli Onur yok.",
       "notEnoughHero": "Not enough hero points.",
       "reasons": {
@@ -974,7 +977,8 @@ export const tr_TR: EnTranslations = {
         "fiestaWin": "Fiesta zaferi",
         "frontierKill": "Frontier kill",
         "frontierRare": "Frostreach rare",
-        "frontierDaily": "Frontier daily"
+        "frontierDaily": "Frontier daily",
+        "arenaDaily": "Coliseum daily"
       }
     },
     "frontier": {

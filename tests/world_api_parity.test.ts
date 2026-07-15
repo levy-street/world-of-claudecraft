@@ -78,8 +78,8 @@ interface IWorldMember {
   readonly kind: IWorldMemberKind;
 }
 
-// The 236 members of `interface IWorld`, in interface order (world_api.ts).
-// Partition: 63 `data` + 173 `method` (read-returning + command-void + async).
+// The 238 members of `interface IWorld`, in interface order (world_api.ts).
+// Partition: 65 `data` + 173 `method` (read-returning + command-void + async).
 // biome-ignore lint/suspicious/noExportsInTest: IWORLD_MEMBERS is the W0c pinned structural-parity contract (the authoritative IWorld member list)
 export const IWORLD_MEMBERS = [
   // --- core world / player roster + economy reads (data) ---
@@ -170,6 +170,8 @@ export const IWORLD_MEMBERS = [
   { name: 'arenaInfo', kind: 'data' },
   { name: 'honor', kind: 'data' },
   { name: 'lifetimeHonor', kind: 'data' },
+  { name: 'heroPoints', kind: 'data' },
+  { name: 'lifetimeHeroPoints', kind: 'data' },
   { name: 'cupInfo', kind: 'data' },
   { name: 'marketInfo', kind: 'data' },
   // --- party / raid commands + marker read ---
@@ -437,8 +439,8 @@ beforeAll(() => {
 
 describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => {
   it('pins total / data / method counts', () => {
-    expect(IWORLD_MEMBERS.length).toBe(236);
-    expect(DATA_MEMBERS.length).toBe(63);
+    expect(IWORLD_MEMBERS.length).toBe(238);
+    expect(DATA_MEMBERS.length).toBe(65);
     expect(METHOD_MEMBERS.length).toBe(173);
   });
   it('has no duplicate member names', () => {
@@ -569,6 +571,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'harvestCorpse',
       'harvestNode',
       'healPet',
+      'heroPoints',
       'hobbyCraft',
       'honor',
       'ignoreAdd',
@@ -580,6 +583,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'leaderboard',
       'leaveDelve',
       'leaveDungeon',
+      'lifetimeHeroPoints',
       'lifetimeHonor',
       'lifetimeXp',
       'loadouts',
@@ -721,11 +725,13 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'equipment',
       'frontierIncursion',
       'gatheringProficiency',
+      'heroPoints',
       'hobbyCraft',
       'honor',
       'inventory',
       'known',
       'lastCraftResult',
+      'lifetimeHeroPoints',
       'lifetimeHonor',
       'lifetimeXp',
       'loadouts',
@@ -979,7 +985,7 @@ describe('membership, not equality: world extras do not fail the gate', () => {
 //       a MISSING name (if the array omits a key, Exclude<> is a non-never union and tsc
 //       fails) -- (1)+(2) together make each array EXACTLY its facet key-set;
 //   (3) the 27 arrays are pairwise DISJOINT (a member filed in two facets reddens);
-//   (4) their union, sorted, equals the pinned 236-name IWORLD_MEMBERS set (a member
+//   (4) their union, sorted, equals the pinned 238-name IWORLD_MEMBERS set (a member
 //       dropped from the split reddens).
 // This is the rigorous form, NOT the tautological `keyof IWorld === keyof (A & B & ...)`
 // (IWorld extends them, so that self-equality proves nothing): it asserts against the
@@ -1180,6 +1186,8 @@ const FACET_DUEL_ARENA = [
   'arenaInfo',
   'honor',
   'lifetimeHonor',
+  'heroPoints',
+  'lifetimeHeroPoints',
   'arenaQueueJoin',
   'arenaQueueLeave',
   'arenaAugmentPick',
@@ -1412,10 +1420,10 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the 27 fa
     expect(overlaps, `members filed in more than one facet:\n${overlaps.join('\n')}`).toEqual([]);
   });
 
-  it('the union of the 27 facets equals the pinned 236-member IWORLD_MEMBERS set', () => {
+  it('the union of the 27 facets equals the pinned 238-member IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(236);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(236);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(238);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(238);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

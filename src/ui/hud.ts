@@ -83,6 +83,7 @@ import type {
   AbilityDef,
   CalendarResultCode,
   EquipSlot,
+  HeroPointsReason,
   HonorReason,
   InvSlot,
   ItemSlot,
@@ -273,6 +274,7 @@ import {
   resetFramePositionsOnce,
   TARGET_FRAME_POS_KEY,
 } from './frame_pos_reset';
+import { FrontierIncursionPainter } from './frontier_incursion_painter';
 import { gossipMenuIsEmpty } from './gossip_menu';
 import {
   type AimPoint,
@@ -494,7 +496,6 @@ import {
 import { makeWindowFocus } from './window_focus';
 import { installWindowResize, markResizableWindow } from './window_resize';
 import { stackedWindowsVisible } from './window_stack_state_core';
-import { FrontierIncursionPainter } from './frontier_incursion_painter';
 import { installWorldDropTarget } from './world_drop_target';
 import { formatXp, xpBarView } from './xp_bar';
 import { XpBarPainter } from './xp_bar_painter';
@@ -742,6 +743,11 @@ const HONOR_REASON_KEYS: Record<HonorReason, TranslationKey> = {
   frontier_kill: 'hudChrome.warfare.reasons.frontierKill',
   frontier_rare: 'hudChrome.warfare.reasons.frontierRare',
   frontier_daily: 'hudChrome.warfare.reasons.frontierDaily',
+  arena_daily: 'hudChrome.warfare.reasons.arenaDaily',
+};
+const HERO_REASON_KEYS: Record<HeroPointsReason, TranslationKey> = {
+  frontier_rare: 'hudChrome.warfare.reasons.frontierRare',
+  arena_daily: 'hudChrome.warfare.reasons.arenaDaily',
 };
 const RAID_MARKER_LABEL_KEYS = [
   'hud.markers.names.star',
@@ -9402,6 +9408,28 @@ export class Hud {
               reason: t(HONOR_REASON_KEYS[ev.reason]),
             }),
             '#ffd100',
+          );
+          break;
+        }
+        case 'heroPoints': {
+          const amount = formatNumber(ev.amount, { maximumFractionDigits: 0 });
+          const heroShape = fctSpawnShape({ type: 'honor' });
+          if (heroShape) {
+            this.fctPainter.spawn(
+              {
+                ...heroShape,
+                text: t('hudChrome.warfare.heroFloat', { amount }),
+                target: sim.player,
+              },
+              now,
+            );
+          }
+          this.combatLog(
+            t('hudChrome.warfare.heroGain', {
+              amount,
+              reason: t(HERO_REASON_KEYS[ev.reason]),
+            }),
+            '#8fc7e8',
           );
           break;
         }

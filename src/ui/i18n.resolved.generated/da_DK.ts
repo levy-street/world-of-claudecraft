@@ -965,6 +965,9 @@ export const da_DK: EnTranslations = {
       "balance": "Ære: {amount}",
       "honorFloat": "+{amount} Ære",
       "honorGain": "Du opnår {amount} Ære ({reason}).",
+      "heroBalance": "Hero Points: {amount}",
+      "heroFloat": "+{amount} Hero Points",
+      "heroGain": "You gain {amount} hero points ({reason}).",
       "notEnoughHonor": "Ikke nok Ære.",
       "notEnoughHero": "Not enough hero points.",
       "reasons": {
@@ -974,7 +977,8 @@ export const da_DK: EnTranslations = {
         "fiestaWin": "Fiesta-sejr",
         "frontierKill": "Frontier kill",
         "frontierRare": "Frostreach rare",
-        "frontierDaily": "Frontier daily"
+        "frontierDaily": "Frontier daily",
+        "arenaDaily": "Coliseum daily"
       }
     },
     "frontier": {

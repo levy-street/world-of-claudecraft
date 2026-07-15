@@ -13,6 +13,10 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.warfare.heroBalance': '英雄點數：{amount}',
+  'hudChrome.warfare.heroFloat': '+{amount} 英雄點數',
+  'hudChrome.warfare.heroGain': '你獲得 {amount} 英雄點數（{reason}）。',
+  'hudChrome.warfare.reasons.arenaDaily': '競技場每日',
   'hudChrome.frontier.incursionTitle': '霜達入侵',
   'entities.mobs.rimebound_wisp.name': '縛霜幽光',
   'hudChrome.frontier.title': '霜達邊境',

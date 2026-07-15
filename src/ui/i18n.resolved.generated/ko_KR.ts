@@ -965,6 +965,9 @@ export const ko_KR: EnTranslations = {
       "balance": "명예: {amount}",
       "honorFloat": "명예 +{amount}",
       "honorGain": "명예를 {amount} 획득했습니다({reason}).",
+      "heroBalance": "영웅 점수: {amount}",
+      "heroFloat": "+{amount} 영웅 점수",
+      "heroGain": "영웅 점수 {amount}점 획득 ({reason}).",
       "notEnoughHonor": "명예가 부족합니다.",
       "notEnoughHero": "영웅 점수가 부족합니다.",
       "reasons": {
@@ -974,7 +977,8 @@ export const ko_KR: EnTranslations = {
         "fiestaWin": "피에스타 승리",
         "frontierKill": "변경 처치",
         "frontierRare": "서리손길 희귀",
-        "frontierDaily": "변경 일일"
+        "frontierDaily": "변경 일일",
+        "arenaDaily": "콜로세움 일일"
       }
     },
     "frontier": {

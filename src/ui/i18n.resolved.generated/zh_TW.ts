@@ -965,6 +965,9 @@ export const zh_TW: EnTranslations = {
       "balance": "榮譽：{amount}",
       "honorFloat": "+{amount} 榮譽",
       "honorGain": "你獲得了 {amount} 點榮譽（{reason}）。",
+      "heroBalance": "英雄點數：{amount}",
+      "heroFloat": "+{amount} 英雄點數",
+      "heroGain": "你獲得 {amount} 英雄點數（{reason}）。",
       "notEnoughHonor": "榮譽不足。",
       "notEnoughHero": "英雄點數不足。",
       "reasons": {
@@ -974,7 +977,8 @@ export const zh_TW: EnTranslations = {
         "fiestaWin": "嘉年華勝利",
         "frontierKill": "邊境擊殺",
         "frontierRare": "霜達稀有精英",
-        "frontierDaily": "邊境每日任務"
+        "frontierDaily": "邊境每日任務",
+        "arenaDaily": "競技場每日"
       }
     },
     "frontier": {

@@ -965,6 +965,9 @@ export const ja_JP: EnTranslations = {
       "balance": "名誉: {amount}",
       "honorFloat": "名誉 +{amount}",
       "honorGain": "名誉を {amount} 獲得しました（{reason}）。",
+      "heroBalance": "ヒーローポイント：{amount}",
+      "heroFloat": "+{amount} ヒーローポイント",
+      "heroGain": "{amount} ヒーローポイントを獲得（{reason}）。",
       "notEnoughHonor": "名誉が足りません。",
       "notEnoughHero": "ヒーローポイントが足りません。",
       "reasons": {
@@ -974,7 +977,8 @@ export const ja_JP: EnTranslations = {
         "fiestaWin": "フィエスタ勝利",
         "frontierKill": "辺境の討伐",
         "frontierRare": "フロストリーチの珍しい敵",
-        "frontierDaily": "辺境デイリー"
+        "frontierDaily": "辺境デイリー",
+        "arenaDaily": "コロシアム日課"
       }
     },
     "frontier": {

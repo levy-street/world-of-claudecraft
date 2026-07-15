@@ -2477,8 +2477,10 @@ const ALL_DELTA_KEYS = [
   'equip',
   'fincur',
   'gprof',
+  'hero',
   'honor',
   'inv',
+  'lhero',
   'lhonor',
   'lockouts',
   'lroll',
@@ -2531,7 +2533,9 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   equip: 'equipment',
   fincur: 'frontierIncursion',
   gprof: 'gatheringProficiency',
+  hero: 'heroPoints',
   inv: 'inventory',
+  lhero: 'lifetimeHeroPoints',
   lhonor: 'lifetimeHonor',
   lockouts: 'selfLockouts',
   lroll: 'lootRollPrompts',
@@ -2899,9 +2903,9 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 46 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(46);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(46);
+  it('ALL_DELTA_KEYS contains exactly 48 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(48);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(48);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2913,7 +2917,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.size).toBe(46);
+    expect(scraped.size).toBe(48);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
