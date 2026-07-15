@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { ABILITIES } from '../src/sim/data';
 import { abilityIconRecipe, hasExplicitAbilityIcon } from '../src/ui/icons';
 
@@ -22,7 +22,9 @@ describe('ability icons', () => {
 
   it('every ability has an explicit non-fallback icon source', () => {
     const missing = abilityIds.filter((id) => !hasExplicitAbilityIcon(id));
-    expect(missing, `abilities relying on the procedural fallback: ${missing.join(', ')}`).toEqual([]);
+    expect(missing, `abilities relying on the procedural fallback: ${missing.join(', ')}`).toEqual(
+      [],
+    );
   });
 
   it('no two abilities resolve to an identical icon', () => {

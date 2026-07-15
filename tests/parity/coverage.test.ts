@@ -78,12 +78,12 @@ describe('coverage: each scenario fires its subsystem', () => {
 
     const dealt = ev.filter((e) => e.type === 'damage' && e.sourceId === pid);
     expect(dealt.filter((e) => e.ability === 'Twin Slash').length).toBe(2);
-    expect(new Set(dealt.filter((e) => e.ability === 'Crescent Sweep').map((e) => e.targetId)).size).toBe(
-      4,
-    );
-    expect(new Set(dealt.filter((e) => e.ability === 'Blade Cyclone').map((e) => e.targetId)).size).toBe(
-      4,
-    );
+    expect(
+      new Set(dealt.filter((e) => e.ability === 'Crescent Sweep').map((e) => e.targetId)).size,
+    ).toBe(4);
+    expect(
+      new Set(dealt.filter((e) => e.ability === 'Blade Cyclone').map((e) => e.targetId)).size,
+    ).toBe(4);
   });
 
   it('affix_mob: frenzyOnHit buff on mob + bleed on player + player-cast taunt (4279)', () => {

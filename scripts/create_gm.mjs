@@ -64,7 +64,9 @@ try {
     'INSERT INTO characters (account_id, name, class, level, is_gm) VALUES ($1, $2, $3, 20, TRUE) RETURNING id',
     [acct.rows[0].id, name, cls],
   );
-  console.log(`created ${name} (${cls}, level 20, invulnerable) — character id ${res.rows[0].id} on account '${username}'`);
+  console.log(
+    `created ${name} (${cls}, level 20, invulnerable) — character id ${res.rows[0].id} on account '${username}'`,
+  );
 } finally {
   await pool.end();
 }

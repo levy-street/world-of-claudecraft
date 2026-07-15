@@ -100,9 +100,7 @@ describe('SwordMaster procedural VFX plans', () => {
       slots: [0, 1],
       opacity: 0.24,
     });
-    expect(weaponAuraPlan([{ id: 'sanguine_aura' }], 'sword_aura')?.id).toBe(
-      'sword_aura_cast',
-    );
+    expect(weaponAuraPlan([{ id: 'sanguine_aura' }], 'sword_aura')?.id).toBe('sword_aura_cast');
     expect(weaponAuraPlan([])).toBeNull();
   });
 
