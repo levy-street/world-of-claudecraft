@@ -28,6 +28,111 @@ async function pollForSize(page, selector, attempts = 20, intervalMs = 500) {
 
 export const TARGETS = [
   {
+    key: 'tank-defensive-cds',
+    label: 'Tank defensive cooldowns',
+    when: ['tests/tank_defensive_cds.test.ts'],
+    variants: [
+      {
+        key: 'warrior-desktop',
+        charClass: 'warrior',
+        charName: 'Ironward',
+        abilityId: 'ironhold',
+        nearbyAbilityId: 'defensive_stance',
+      },
+      {
+        key: 'paladin-desktop',
+        charClass: 'paladin',
+        charName: 'Dawnward',
+        abilityId: 'sacred_bulwark',
+        nearbyAbilityId: 'divine_protection',
+      },
+      {
+        key: 'druid-desktop',
+        charClass: 'druid',
+        charName: 'Leafward',
+        abilityId: 'primal_reflexes',
+        nearbyAbilityId: 'barkskin',
+      },
+      {
+        key: 'paladin-mobile',
+        charClass: 'paladin',
+        charName: 'Sunward',
+        abilityId: 'sacred_bulwark',
+        nearbyAbilityId: 'divine_protection',
+        mobile: true,
+      },
+    ],
+    async capture(page, variant) {
+      await page.keyboard.press('Escape');
+      await wait(400);
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+      });
+      await wait(300);
+      const setup = await page.evaluate((shot) => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!sim || !player) return { known: false };
+        sim.setPlayerLevel?.(20, player.id);
+        player.gm = true;
+        player.resource = player.maxResource;
+        const resolved = sim.resolvedAbility?.(shot.abilityId);
+        const known = !!resolved;
+        if (known) {
+          game.hud.hotbarActions[0] = { type: 'ability', id: shot.abilityId };
+          game.hud.saveSlotMap?.();
+          sim.castAbility?.(shot.abilityId, player.id);
+        }
+        game.hud.toggleSpellbook?.();
+        return { known, abilityName: resolved?.def.name ?? shot.abilityId };
+      }, variant);
+      if (!setup.known) throw new Error(`${variant.abilityId} is not known at level 20`);
+      const open = await pollForSize(page, '#spellbook', 20, 250);
+      if (!open) throw new Error('spellbook did not open');
+      await page.evaluate((shot) => {
+        const row =
+          document.querySelector(`.spell-row[data-ability-id="${shot.abilityId}"]`) ??
+          document.querySelector(`.spell-row[data-ability-id="${shot.nearbyAbilityId}"]`);
+        row?.scrollIntoView({ block: 'center' });
+        if (row?.dataset.abilityId === shot.abilityId) {
+          row.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+          row.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+        }
+      }, variant);
+      await wait(500);
+      const surfaces = await page.evaluate(
+        (shot, abilityName) => {
+          const row = document.querySelector(`.spell-row[data-ability-id="${shot.abilityId}"]`);
+          const actionSelector = shot.mobile
+            ? '#mobile-action-ring .mobile-action-slot'
+            : '#actionbar .action-btn';
+          const action = Array.from(document.querySelectorAll(actionSelector)).find((button) =>
+            button.getAttribute('aria-label')?.includes(abilityName),
+          );
+          const actionIcon = action?.querySelector('.icon-label');
+          const game = window.__game;
+          const player = game?.sim?.player;
+          return {
+            exactSpellRow: !!row && getComputedStyle(row).display !== 'none',
+            exactAction: !!action && getComputedStyle(action).display !== 'none',
+            actionIcon: !!actionIcon && getComputedStyle(actionIcon).backgroundImage !== 'none',
+            auraActive: !!player?.auras.some((a) => a.id === shot.abilityId),
+            auraPainted: document.querySelectorAll('#buff-bar .buff').length > 0,
+            cooldownArmed: (player?.cooldowns.get(shot.abilityId) ?? 0) > 0,
+          };
+        },
+        variant,
+        setup.abilityName,
+      );
+      if (Object.values(surfaces).some((present) => !present)) {
+        throw new Error(`missing ability surfaces: ${JSON.stringify(surfaces)}`);
+      }
+      return {};
+    },
+  },
+  {
     key: 'inventory',
     label: 'Inventory / bags',
     when: ['ui/bags', 'ui/inventory', 'ui/item', 'ui/vendor', 'ui/loot', 'sim/content/items'],

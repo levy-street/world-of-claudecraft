@@ -979,6 +979,7 @@ export const zh_CN: EnTranslations = {
         "spellPower": "法术强度",
         "critRating": "暴击等级",
         "hasteRating": "急速等级",
+        "hitRating": "命中等级",
         "warfare": "战争"
       },
       "warfareValue": "造成伤害 +{increase}% / 承受伤害 -{reduction}%",
@@ -996,6 +997,7 @@ export const zh_CN: EnTranslations = {
         "dodge": "你完全躲开来袭近战攻击、不受任何伤害的几率。",
         "critRating": "来自装备和套装奖励的暴击等级，提升你的暴击几率。约每10点等级提供1%暴击。",
         "hasteRating": "来自装备和套装奖励的急速等级，加快你的攻击和施法速度。约每10点等级提供1%急速。",
+        "hitRating": "来自装备和套装奖励的命中等级，降低你的攻击被闪避和法术被抵抗的几率，对更高等级的敌人尤其有效。约每10点等级提供1%命中。",
         "warfare": "对玩家造成的伤害提高 {increase}%，受到玩家造成的伤害降低 {reduction}%。"
       },
       "effects": {
@@ -1361,6 +1363,8 @@ export const zh_CN: EnTranslations = {
       },
       "dodge": "躲闪几率提高 {pct}%",
       "dodgeReduce": "躲闪几率降低 {pct}%",
+      "damageReduction": "受到的所有伤害降低 {pct}%",
+      "guardianWard": "下一次敌人的致命攻击会改为将你的生命值恢复至 {pct}%",
       "armorFlat": "护甲降低 {value}",
       "armorFlatStacks": "护甲降低 {value}（{stacks} 层）",
       "armorPct": "护甲降低 {pct}%",
@@ -1542,8 +1546,8 @@ export const zh_CN: EnTranslations = {
         "juniormods": "初级管理员",
         "artists": "画师",
         "contentcreator": "内容创作者",
-        "legend": "LEGEND",
-        "shill": "SHILL"
+        "legend": "传奇",
+        "shill": "布道者"
       },
       "guildMember": "已验证成员",
       "notMember": "尚未加入服务器",
@@ -3709,6 +3713,7 @@ export const zh_CN: EnTranslations = {
     "title": "下载电脑版启动器",
     "desc": "获取独立启动器，以获得更优化的性能和全屏游戏体验。",
     "macCta": "下载 macOS 版",
+    "windowsCta": "下载 Windows 版",
     "linuxCta": "下载 Linux 版",
     "linuxHint": "AppImage 格式：赋予可执行权限后直接运行，无需安装。",
     "windowsPending": "Windows 版本即将推出。"
@@ -4596,6 +4601,8 @@ export const zh_CN: EnTranslations = {
     "connectionLost": "与服务器的连接已断开。",
     "reconnecting": "连接已断开。正在重新连接...",
     "connectionRejected": "服务器关闭了连接。",
+    "realmFull": "当前服务器已满，请稍后几分钟再试。",
+    "tooManyConnections": "您的网络向该服务器发起的连接过多。请关闭多余的游戏窗口，或稍后几分钟再试。",
     "tips": {
       "classes": "提示：9 个职业玩法各不相同，投入之前不妨都试一试。",
       "talents": "提示：你可以在任意脱离战斗的时候重置天赋，因此早期的选择永远不会成为陷阱。",
@@ -4673,9 +4680,9 @@ export const zh_CN: EnTranslations = {
     "medium": "中",
     "low": "低",
     "popTipLow": "人数较少：当前在线玩家不足 15 人。空间充足，适合全新开始。",
-    "popTipMedium": "人数适中：当前在线玩家 15 至 39 人。健康活跃的服务器。",
-    "popTipHigh": "人数较多：当前在线玩家 40 至 79 人。繁忙，玩家众多。",
-    "popTipFull": "人数已满：当前在线玩家 80 人或以上。非常繁忙；登录时可能需要排队。",
+    "popTipMedium": "人数适中：当前在线玩家 15 至 79 人。健康活跃的服务器。",
+    "popTipHigh": "人数较多：当前在线玩家 80 人以上。繁忙，玩家众多。",
+    "popTipFull": "人数已满：当前服务器已达到玩家上限。在有玩家退出之前，新的登录会被拒绝。",
     "popTipOffline": "离线：此服务器当前无法连接，无法加入。",
     "characterCountOne": "{count} 个角色",
     "characterCountOther": "{count} 个角色",
@@ -6278,6 +6285,18 @@ export const zh_CN: EnTranslations = {
       "barkskin": {
         "name": "橡树皮",
         "description": "你的皮肤硬化如树皮，使护甲提高 150，持续 15 秒。"
+      },
+      "ironhold": {
+        "name": "铁壁",
+        "description": "以坚固的防御自守，使受到的所有伤害降低 40%，持续 8 秒。"
+      },
+      "sacred_bulwark": {
+        "name": "神圣壁垒",
+        "description": "在 {duration} 秒内，下一次会杀死你的敌人攻击将被抵消，转而将你恢复至 35% 生命值。"
+      },
+      "primal_reflexes": {
+        "name": "野性反射",
+        "description": "你的本能变得敏锐，使闪避几率提高 50%，持续 6 秒。"
       },
       "starfire": {
         "name": "天陨",

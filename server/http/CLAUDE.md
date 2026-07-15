@@ -43,12 +43,13 @@ PR (see the flag model and Dual-edit below).
 | `registry.ts` | Imports each domain module's `routes` (the import block at the top IS the list of registered domains), spreads them into `apiRoutes`, sorts most-specific-first, runs `assertNoOwnedRouteShadowing`, and exposes `resolve(method, path)`. |
 | `dispatch.ts` | `createApiDispatcher` (the dispatcher-in-front) + `selectApiEntry` (the flag switch). |
 | `config.ts` | `loadConfig` validates env into the boot `Config` once at boot; owns `DispatchMode` and the `API_DISPATCH` flag. |
+| `health.ts` | the ops probes: `/livez` answers 200 while the world loop is completing passes and 503 once the last completed tick is older than `LIVEZ_STALE_MS` (a wedged loop, what the compose healthcheck and `deploy/game_watchdog.sh` act on), with two deliberate carve-outs: DRAINING always reads live (a graceful shutdown must never be misread as a wedge and restarted mid-save) and a cold boot reads from loop start until the first tick lands. `/readyz` is the drain signal (503 while shutting down). `registerLivenessSource` wires the game loop in at boot (pinned by `tests/server/game_boot_order.test.ts`); `/metrics` stays `METRICS_TOKEN`-gated. All three are 404ed at the public edge by Caddy (see DEPLOY.md); never expose `/livez` publicly, a wedge oracle invites kick-them-while-down timing. |
 | `index.ts` | The public barrel: re-exports router / compose / context / schema / errors / error_codes / registry / dispatch + the type contracts. Excludes the seam-reached internals (`path_pattern`, `config`, the individual `middleware/*`). |
 | `middleware/*` | The onion frames (`ls server/http/middleware/` for the live set). GLOBAL, mounted by `dispatch.ts` on every matched route: `with_errors`, `metric_sink`, `origin_check`, `content_type`; `security_headers` runs even earlier, in `main.ts`'s top-level `routeHttpRequest` wrapper so both arms carry it. Everything else (`body`/`raw_body`, the `require_*` guards, `bearer_active_guard`, `turnstile`, `rate_limit`) is ROUTE-LOCAL, composed as each RouteDef declares. Two are built but INTENTIONALLY UNMOUNTED: `cors` (CORS stays in `main.ts`'s single top-level wrapper, shared with the legacy ladder, so it is identical on both arms) and `request_id` (the X-Request-Id echo is deferred to the ladder deletion; mounting it now would break the parity harness, see the note in `dispatch.ts`). Do not double-mount either. |
 
 ## Observability (the /metrics exporter)
 Every series registers on the ONE prom-client `Registry` built by `metrics.ts`; `main.ts`
-wires each half at boot. Three source patterns:
+wires each active exporter at boot. Three source patterns:
 - **Request-layer RED** (`metrics.ts`): the request counter/histogram fed by the
   `metric_sink` frame, plus the attack-signal counters. Their scattered emission sites
   (rate_limit, ratelimit.ts auth failures, require_owned, the tier-2 pg store) emit
@@ -56,12 +57,12 @@ wires each half at boot. Three source patterns:
 - **Game-state** (`game_metrics.ts`): gauges (players online, tick rate) read live at
   scrape time from a captured `GameStateSource`; throughput counters emit through the
   `game_signals.ts` slot (same pattern as attack_signals; an unwired slot no-ops).
-- **DB-backed aggregates** (`business_metrics.ts`, `client_perf_metrics.ts`): a
+- **DB-backed aggregates** (`business_metrics.ts`): a
   Postgres-backed value MUST go through a `PeriodicCollector` (`periodic_collector.ts`)
   that runs one batched query on an interval and caches it; gauges publish the cached
   snapshot at scrape time. A scrape NEVER queries Postgres (a scrape storm must never
-  become a query storm). SQL is reused from existing query modules (`business_metrics.ts`
-  reuses `admin_db.overviewCounts`), never written in a metrics module.
+  become a query storm). SQL lives in the owning query module
+  (`player_metrics_db.ts`), never in a metrics module.
 Labels are bounded everywhere (policy / kind / key_kind / route TEMPLATE); never label with
 an ip, account, token, or concrete id. `mismatch_warn_throttle.ts` caps the two log-only
 mismatch sinks (content_type, origin_check), keyed on route template + method.

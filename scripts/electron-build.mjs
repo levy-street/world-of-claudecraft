@@ -7,6 +7,7 @@ import {
   azureSignOptionsFromEnv,
   desktopBuilderConfig,
   isChannelFeedFile,
+  keyVaultSignConfigFromEnv,
   stampChannelFeedFiles,
 } from './electron-builder-config.mjs';
 import { buildElectronVendor } from './electron-vendor.mjs';
@@ -101,6 +102,9 @@ const config = desktopBuilderConfig({
   loginOrigin,
   crashSubmitUrl: process.env.WOC_CRASH_SUBMIT_URL ?? '',
   azureSign: process.platform === 'win32' ? azureSignOptionsFromEnv(process.env) : null,
+  // The Azure Key Vault certificate route (the AzureSignTool hook); the config
+  // derivation prefers azureSign when both credential sets are present.
+  keyVaultSign: process.platform === 'win32' ? keyVaultSignConfigFromEnv(process.env) : null,
   // The update track defaults from apiOrigin (production origin publishes the
   // 'latest' feed, anything else 'dev'); WOC_UPDATE_CHANNEL=dev stages a
   // production-origin artifact on the dev track for update-pipeline testing.

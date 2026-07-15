@@ -1116,6 +1116,13 @@ const MOB_KEYS: Record<string, string> = {
   fallen_captain_aldren: 'skel_warrior',
   corrupted_priest_malric: 'skel_necromancer',
   deathstalker_voss: 'skel_rogue',
+  // The Nythraxis phase-2 heroic court is Aldren / Malric / Voss risen again, so
+  // the "Spirit of X" adds reuse each character's crypt visual above. Without these
+  // the ids fall through to FAMILY_KEYS.undead (skel_minion) and the whole court
+  // renders as identical generic skeletons. See spawnNythraxisHeroicAdds.
+  nythraxis_heroic_warrior_add: 'skel_warrior', // Spirit of Aldren
+  nythraxis_heroic_priest_add: 'skel_necromancer', // Spirit of Malric
+  nythraxis_heroic_rogue_add: 'skel_rogue', // Spirit of Voss
   vision_aldren_warrior: 'player_warrior',
   vision_malric_mage: 'player_mage',
   vision_deathstalker_voss: 'player_rogue',

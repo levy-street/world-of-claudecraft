@@ -13,6 +13,8 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.discord.roleTag.legend': 'ЛЕГЕНДА',
+  'hudChrome.discord.roleTag.shill': 'ГЛАШАТАЙ',
   'hudChrome.wocStore.title': 'Магазин WOC',
   'hudChrome.wocStore.close': 'Закрыть магазин WOC',
   'hudChrome.wocStore.tabsLabel': 'Разделы магазина WOC',
@@ -571,6 +573,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.names.spellPower': 'Сила заклинаний',
   'hudChrome.statInfo.names.critRating': 'Рейтинг крит. удара',
   'hudChrome.statInfo.names.hasteRating': 'Рейтинг ускорения',
+  'hudChrome.statInfo.names.hitRating': 'Рейтинг меткости',
+  'hudChrome.statInfo.desc.hitRating':
+    'Рейтинг меткости от снаряжения и бонусов комплекта снижает частоту промахов ваших атак и сопротивления вашим заклинаниям, особенно против противников более высокого уровня. Примерно 10 рейтинга дают 1% меткости.',
   'hudChrome.statInfo.names.warfare': 'Боевая мощь',
   'hudChrome.statInfo.warfareValue': '+{increase}% к урону / -{reduction}% получаемого',
   'hudChrome.statInfo.desc.critRating':
@@ -909,6 +914,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'download.linuxCta': 'Скачать для Linux',
   'download.linuxHint':
     'Формат AppImage: сделайте файл исполняемым и запустите его, установка не требуется.',
+  'download.windowsCta': 'Скачать для Windows',
   'download.windowsPending': 'Сборка для Windows готовится.',
   'download.desc':
     'Загрузите отдельный клиент для оптимальной производительности и игры на весь экран.',
@@ -1187,6 +1193,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'loading.connectionLost': 'Соединение с сервером потеряно.',
   'loading.reconnecting': 'Соединение потеряно. Повторное подключение...',
   'loading.connectionRejected': 'Сервер закрыл соединение.',
+  'loading.realmFull':
+    'Этот мир сейчас переполнен. Пожалуйста, попробуйте снова через несколько минут.',
+  'loading.tooManyConnections':
+    'Из вашей сети открыто слишком много подключений к этому миру. Пожалуйста, закройте лишние игровые окна или попробуйте снова через несколько минут.',
   'errors.nothingInteract': 'Нет объекта для взаимодействия.',
   'errors.noEnemyNearby': 'Рядом нет врагов.',
   'errors.characterNameRequired': 'Введите имя персонажа.',
@@ -1238,11 +1248,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'realm.popTipLow':
     'Низкая населённость: сейчас в сети менее 15 игроков. Много места; отлично для нового старта.',
   'realm.popTipMedium':
-    'Средняя населённость: сейчас в сети от 15 до 39 игроков. Активный и живой мир.',
+    'Средняя населённость: сейчас в сети от 15 до 79 игроков. Активный и живой мир.',
   'realm.popTipHigh':
-    'Высокая населённость: сейчас в сети от 40 до 79 игроков. Оживлённо, много игроков.',
+    'Высокая населённость: сейчас в сети 80 и более игроков. Оживлённо, много игроков.',
   'realm.popTipFull':
-    'Полная населённость: сейчас в сети 80 и более игроков. Очень оживлённо; возможна очередь на вход.',
+    'Полная населённость: этот мир достиг лимита игроков. Новые подключения отклоняются, пока кто-то из игроков не выйдет.',
   'realm.popTipOffline': 'Не в сети: этот мир сейчас недоступен и к нему нельзя подключиться.',
   'realm.characterCountOne': '{count} персонаж',
   'realm.characterCountOther': '{count} персонажа',
@@ -2508,6 +2518,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.barkskin.name': 'Дубовая шкура',
   'entities.abilities.barkskin.description':
     'Ваша кожа твердеет, как кора, повышая броню на 150 на 15 сек.',
+  'entities.abilities.ironhold.name': 'Железная стена',
+  'entities.abilities.ironhold.description':
+    'Укрывшись за щитом, вы снижаете весь получаемый урон на 40% на 8 сек.',
+  'entities.abilities.sacred_bulwark.name': 'Священный оплот',
+  'entities.abilities.sacred_bulwark.description':
+    'В течение {duration} сек. следующий смертельный удар противника не убьет вас, а восстановит здоровье до 35% от максимума.',
+  'entities.abilities.primal_reflexes.name': 'Первобытные рефлексы',
+  'entities.abilities.primal_reflexes.description':
+    'Ваши инстинкты обостряются, повышая шанс уклонения на 50% на 6 сек.',
   'entities.abilities.starfire.name': 'Падение небес',
   'entities.abilities.starfire.description':
     'Обрушивает вспышку звездного огня, нанося {damage} ед. урона от тайной магии.',
@@ -5786,6 +5805,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.attackSpeedFast': 'Повышает скорость атаки на {pct}%',
   'hudChrome.auraEffect.haste': 'Повышает скорость атаки и произнесения заклинаний на {pct}%',
   'hudChrome.auraEffect.tongues': 'Увеличивает время произнесения заклинаний на {pct}%',
+  'hudChrome.auraEffect.damageReduction': 'Уменьшает весь получаемый урон на {pct}%',
+  'hudChrome.auraEffect.guardianWard':
+    'Следующий смертельный удар противника вместо этого восстанавливает здоровье до {pct}%',
   'hudChrome.auraEffect.increase.ap': 'Повышает силу атаки на {value}',
   'hudChrome.auraEffect.increase.armor': 'Повышает броню на {value}',
   'hudChrome.auraEffect.increase.int': 'Повышает интеллект на {value}',

@@ -17,6 +17,7 @@ import type { DeedRuntime } from './deeds';
 import type { DelayedEvent, GroundAoE } from './entity_roster';
 import type { PendingLootRoll } from './loot/loot_roll';
 import type { MarketListing } from './market';
+import type { MobScanCounters } from './mob/scan_counters';
 import type { PendingProjectile } from './projectile_travel';
 import type { Rng } from './rng';
 import type {
@@ -207,6 +208,12 @@ export interface SimContextPrimitives {
   // seat means practice; the online server never seats fiesta bots). Sim-owned,
   // mutated in place, read-only view like bankerIds.
   readonly fiestaBotPids: number[];
+  // Mob-AI scan visit counters (observability): the aggro proximity scan and the
+  // threat-table walks bump these to attribute mob.update cost. Sim-owned holder
+  // reset at the top of each tick and mutated in place (field increments, never
+  // reassigned), so a read-only live view; the fields themselves stay writable so
+  // the hot paths can increment them. Feeds no gameplay branch and draws no rng.
+  readonly mobScanCounters: MobScanCounters;
 }
 
 // Cross-system callbacks. Each signature mirrors the still-on-`Sim` method it
@@ -937,6 +944,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get fiestaBotPids() {
       return host.fiestaBotPids;
+    },
+    get mobScanCounters() {
+      return host.mobScanCounters;
     },
     emit: host.emit,
     error: host.error,

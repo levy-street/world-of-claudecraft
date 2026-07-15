@@ -2,7 +2,9 @@
 // candles/ropes and destroyable baptistry egg-sacs gate the module exit.
 
 import { DELVES, delveModuleZOffset as delveModuleZOffsetLayout, MOBS } from '../data';
+import { litanyModuleColliders, litanyModuleGeometry } from '../delve_litany_layout';
 import { createMob } from '../entity';
+import { polygonContainsPoint } from '../geometry2d';
 import type { SimContext } from '../sim_context';
 import { DELVE_PLATE_RADIUS, type DelveRun, dist2d, type Entity, type Vec3 } from '../types';
 export const LITANY_PUZZLE_KINDS = new Set([
@@ -27,7 +29,7 @@ const BELL_ROPE_DAMAGE = 18;
 // Sinkhole Baptistry egg-sac spawn points, on the pit-rim walkway, clear of the
 // two flanking stubs and the four pit pillars (same spots the old widow_egg_sac
 // interactables used).
-const BAPTISTRY_EGG_SAC_SPOTS: Array<{ x: number; z: number }> = [
+export const BAPTISTRY_EGG_SAC_SPOTS: Array<{ x: number; z: number }> = [
   { x: 15, z: 10 },
   { x: -15, z: 6 },
   { x: 0, z: 58 },
@@ -120,6 +122,50 @@ function onBellRopePulled(ctx: SimContext, run: DelveRun): void {
 
 // How long the burst VFX plays before the corpse is removed from the world.
 const EGG_SAC_BURST_DESPAWN = 1.1;
+const HATCHLING_BODY_R = 0.8;
+const HATCHLING_SPAWN_ATTEMPTS = 12;
+
+/** True when a Baptistry hatchling center is on authored floor and clear of
+ * the exact rotated shell/interior colliders. Coordinates are world-space. */
+export function litanyHatchlingSpawnClear(
+  run: DelveRun,
+  worldX: number,
+  worldZ: number,
+  r = HATCHLING_BODY_R,
+): boolean {
+  const geo = litanyModuleGeometry('litany_baptistry');
+  if (!geo) return false;
+  const zBase = delveModuleZOffsetLayout(run.modules, run.moduleIndex);
+  const x = worldX - run.origin.x;
+  const z = worldZ - run.origin.z - zBase;
+  const polygon = geo.walkable[0]?.points;
+  if (!polygon || !polygonContainsPoint(polygon, x, z)) return false;
+  for (const c of litanyModuleColliders('litany_baptistry')) {
+    if (c.type === 'circle') {
+      if (Math.hypot(x - c.x, z - c.z) < c.r + r) return false;
+      continue;
+    }
+    const cos = Math.cos(-c.rot);
+    const sin = Math.sin(-c.rot);
+    const lx = (x - c.x) * cos + (z - c.z) * sin;
+    const lz = -(x - c.x) * sin + (z - c.z) * cos;
+    if (Math.abs(lx) < c.hw + r && Math.abs(lz) < c.hd + r) return false;
+  }
+  return true;
+}
+
+function hatchlingSpawnPos(ctx: SimContext, run: DelveRun, dead: Entity): Vec3 {
+  for (let attempt = 0; attempt < HATCHLING_SPAWN_ATTEMPTS; attempt++) {
+    const ang = ctx.rng.range(0, Math.PI * 2);
+    const dist = ctx.rng.range(2, 4.5);
+    const x = dead.pos.x + Math.sin(ang) * dist;
+    const z = dead.pos.z + Math.cos(ang) * dist;
+    if (litanyHatchlingSpawnClear(run, x, z)) return ctx.groundPos(x, z);
+  }
+  // Every authored sac site is itself collider-clear. Falling back to the sac
+  // center guarantees a valid spawn even under an adversarial RNG sequence.
+  return ctx.groundPos(dead.pos.x, dead.pos.z);
+}
 
 /** Fires once a spawned spider_egg_sac mob dies: a burst VFX, small nature-damage
  * tick on nearby players, 2 mirefen_widowling adds hatching out near the corpse,
@@ -151,9 +197,7 @@ function onEggSacBurst(ctx: SimContext, run: DelveRun, dead: Entity): void {
   // itself), so they are not 3 levels grey under the rest of the room.
   const enemyLevelBonus = litanyEnemyLevelBonus(run);
   for (let i = 0; i < 2; i++) {
-    const ang = ctx.rng.range(0, Math.PI * 2);
-    const dist = ctx.rng.range(2, 4.5);
-    const pos = ctx.groundPos(dead.pos.x + Math.sin(ang) * dist, dead.pos.z + Math.cos(ang) * dist);
+    const pos = hatchlingSpawnPos(ctx, run, dead);
     const add = createMob(ctx.nextId++, tmpl, tmpl.minLevel + enemyLevelBonus, pos);
     add.facing = Math.PI;
     ctx.addEntity(add);

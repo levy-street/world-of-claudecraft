@@ -209,6 +209,11 @@ import * as lifecycle from './mob/lifecycle';
 import { resetEvadingMob as resetEvadingMobFn, updateMob as updateMobFn } from './mob/locomotion';
 import { runMobSwingAffixes } from './mob/mob_swing';
 import {
+  createMobScanCounters,
+  type MobScanCounters,
+  resetMobScanCounters,
+} from './mob/scan_counters';
+import {
   retargetMob as retargetMobFn,
   updateMobTarget as updateMobTargetFn,
 } from './mob/targeting';
@@ -1411,6 +1416,11 @@ export class Sim {
   deedDirtyPids = new Set<number>();
   deedDirtyKeys = new Map<number, Set<string>>();
   deedRuntime: DeedRuntime = createDeedRuntime();
+  // Mob-AI scan visit counters (observability): reset at the top of each tick,
+  // incremented in place by the aggro-scan and threat-table hot paths through
+  // ctx, and read by the host after tick() returns. Not persisted, never a
+  // gameplay input; exposed as a live SimContext view and via mobScanCounters.
+  private readonly _mobScanCounters = createMobScanCounters();
   // World-boss scheduler, one slot per WORLD_BOSSES entry. `nextAt` is the next
   // sim-time (seconds) a boss is due to rise; `entityId` is the live boss entity
   // (null once none is alive). Driven by updateWorldBosses() in the tick prologue.
@@ -2994,6 +3004,13 @@ export class Sim {
     return out;
   }
 
+  // Mob-AI scan visit counters for the tick that just ran (observability). The
+  // host reads this after tick() returns to attribute mob.update cost; typed
+  // Readonly so no external reader mutates the live tally the sim owns.
+  get mobScanCounters(): Readonly<MobScanCounters> {
+    return this._mobScanCounters;
+  }
+
   // Build the shared SimContext seam (S0b). Pure plumbing: it exposes the live core
   // primitives (rng/time/tickCount/entities via getters) and binds the still-on-Sim
   // methods the early extracted slices call. It MOVES NO behavior - every callback
@@ -3195,6 +3212,11 @@ export class Sim {
       },
       get deedRuntime() {
         return sim.deedRuntime;
+      },
+      // Mob-AI scan visit counters: the live Sim-owned holder (reset at the top
+      // of tick, incremented in place by the scan hot paths through ctx).
+      get mobScanCounters() {
+        return sim._mobScanCounters;
       },
       // Offline Fiesta practice-bot roster (fiesta_bots.ts mutates it in place);
       // the deeds real-bout gate reads it through the seam.
@@ -3766,6 +3788,10 @@ export class Sim {
     // The mob loop additionally passes the mob it just updated as a sub-phase tag so
     // the host can split mob.update per zone; every other call omits it.
     const lap = this.cfg.perfLap;
+    // Zero the mob-AI scan visit counters for this tick before any tick work runs, so
+    // the getter reads this tick's totals once tick() returns (observability only,
+    // draws no rng, mutates no gameplay state).
+    resetMobScanCounters(this._mobScanCounters);
     this.updatePendingMobRespawns();
     lap?.('respawns');
     this.updateWorldBosses();
@@ -5183,7 +5209,7 @@ export class Sim {
         school: spell.school,
         fx: 'projectile',
       });
-      if (isSpellResisted(this.rng, pet.level, target.level)) {
+      if (isSpellResisted(this.rng, pet.level, target.level, pet.hitBonus)) {
         this.emit({
           type: 'damage',
           sourceId: pet.id,

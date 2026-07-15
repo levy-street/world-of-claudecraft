@@ -7,6 +7,7 @@ import {
   azureSignOptionsFromEnv,
   desktopBuilderConfig,
   isChannelFeedFile,
+  keyVaultSignConfigFromEnv,
   stampChannelFeedFiles,
   stampFeedFile,
 } from '../scripts/electron-builder-config.mjs';
@@ -295,6 +296,27 @@ describe('desktopBuilderConfig', () => {
     expect(plain.win.azureSignOptions).toBeUndefined();
   });
 
+  it('injects the Key Vault sign hook only when provided, and Trusted Signing wins', () => {
+    const keyVaultSign = {
+      sign: './scripts/electron-win-sign.mjs',
+      signingHashAlgorithms: ['sha256'],
+    };
+    const config = desktopBuilderConfig({ base, distribution: 'website', keyVaultSign });
+    expect(config.win.signtoolOptions).toEqual(keyVaultSign);
+    expect(config.win.azureSignOptions).toBeUndefined();
+    const azureSign = {
+      publisherName: 'CN=Example Corp',
+      endpoint: 'https://eus.codesigning.azure.net',
+      codeSigningAccountName: 'example-account',
+      certificateProfileName: 'example-profile',
+    };
+    const both = desktopBuilderConfig({ base, distribution: 'website', azureSign, keyVaultSign });
+    expect(both.win.azureSignOptions).toEqual(azureSign);
+    expect(both.win.signtoolOptions).toBeUndefined();
+    const plain = desktopBuilderConfig({ base, distribution: 'website' });
+    expect(plain.win.signtoolOptions).toBeUndefined();
+  });
+
   it('rejects an unknown distribution loudly', () => {
     expect(() => desktopBuilderConfig({ base, distribution: 'beta' })).toThrow(
       /unknown desktop distribution/,
@@ -439,5 +461,30 @@ describe('azureSignOptionsFromEnv', () => {
     expect(azureSignOptionsFromEnv({ ...full, WIN_SIGN_ENDPOINT: '' })).toBeNull();
     const { WIN_SIGN_PROFILE_NAME, ...partial } = full;
     expect(azureSignOptionsFromEnv(partial)).toBeNull();
+  });
+});
+
+describe('keyVaultSignConfigFromEnv', () => {
+  const full = {
+    AZURE_KEY_VAULT_URL: 'https://example.vault.azure.net',
+    AZURE_TENANT_ID: 'tenant-id',
+    AZURE_CLIENT_ID: 'client-id',
+    AZURE_CLIENT_SECRET: 'client-secret',
+    AZURE_KEY_VAULT_CERTIFICATE: 'woc-code-signing',
+  };
+
+  it('returns the sign-hook signtoolOptions only when every env var is set and non-empty', () => {
+    expect(keyVaultSignConfigFromEnv(full)).toEqual({
+      sign: './scripts/electron-win-sign.mjs',
+      signingHashAlgorithms: ['sha256'],
+    });
+  });
+
+  it('returns null on any missing or empty variable (unsigned local builds)', () => {
+    expect(keyVaultSignConfigFromEnv({})).toBeNull();
+    expect(keyVaultSignConfigFromEnv()).toBeNull();
+    expect(keyVaultSignConfigFromEnv({ ...full, AZURE_CLIENT_SECRET: '' })).toBeNull();
+    const { AZURE_KEY_VAULT_CERTIFICATE, ...partial } = full;
+    expect(keyVaultSignConfigFromEnv(partial)).toBeNull();
   });
 });

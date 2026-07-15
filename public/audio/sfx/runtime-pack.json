@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "0f08c240f956222d47c41f9b345724ee41ce59559accb7c8ffa7aea8e671dfcd",
-  "catalogHash": "5465d5cc1ffb7d30921f47c5bc5b873659d81c63660e547e28bbc70888b32708",
+  "bundleId": "48f2d9f7942735c34835cc7b08bd84cadfbe7f6b4174fa074891c30e7afb58aa",
+  "catalogHash": "4b8d9131fcad9b42c207d58905914bfa3938fea088f4e5fceb5907076b92c1a2",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -1594,6 +1594,18 @@
       "gain": 1,
       "playbackRate": 1
     },
+    "ui_achievement": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_achievement.mp3?v=d473d495d1bb",
+          "bytes": 65871,
+          "sha256": "d473d495d1bbd2c7b0b77817a89663a3a1551b83fd8624e8175805bda2074161"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
     "ui_bag_close": {
       "variants": [
         {
@@ -1838,9 +1850,9 @@
       "variants": [
         {
           "id": "main",
-          "url": "/audio/sfx/ui_level_up.mp3?v=61b1e4f944c8",
-          "bytes": 24493,
-          "sha256": "61b1e4f944c895ae0c2358e90093afb8a83b86af33647a0bc26cc1d6cb0937eb"
+          "url": "/audio/sfx/ui_level_up.mp3?v=b8dac64b9735",
+          "bytes": 88441,
+          "sha256": "b8dac64b97351188fd104df8042be0ead0be9836ea7fad7bfb58f3fd629cddd8"
         }
       ],
       "gain": 1,

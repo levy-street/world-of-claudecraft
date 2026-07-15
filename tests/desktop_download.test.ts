@@ -56,8 +56,13 @@ describe('desktopDownloadUrl', () => {
     );
   });
 
+  it('builds the combined Windows NSIS installer URL', () => {
+    expect(desktopDownloadUrl('win')).toBe(
+      `https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-${DESKTOP_VERSION}-win.exe`,
+    );
+  });
+
   it('returns null for platforms with no published artifact', () => {
-    expect(desktopDownloadUrl('win')).toBeNull();
     expect(desktopDownloadUrl('other')).toBeNull();
   });
 });

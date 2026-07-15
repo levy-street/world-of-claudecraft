@@ -8,6 +8,7 @@
 
 import { describe, expect, it, vi } from 'vitest';
 import { createDeedRuntime } from '../src/sim/deeds';
+import { createMobScanCounters } from '../src/sim/mob/scan_counters';
 import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
 import { createSimContext, type SimContextHost } from '../src/sim/sim_context';
@@ -290,6 +291,7 @@ function makeFakeHost() {
     worldBossEntityIds: [],
     deedRuntime: createDeedRuntime(),
     fiestaBotPids: [],
+    mobScanCounters: createMobScanCounters(),
     bumpDeedStat: vi.fn(),
     markItemDiscovered: vi.fn(),
     markVisited: vi.fn(),

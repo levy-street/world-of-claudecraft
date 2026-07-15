@@ -1,6 +1,7 @@
 // Delve module stacking, slot detection, and render prop shapes.
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
+import { DungeonInteriors } from '../src/render/dungeon';
 import {
   DELVE_MODULE_Z_START,
   DELVE_MODULES,
@@ -12,6 +13,11 @@ import {
   delveSlotAt,
 } from '../src/sim/data';
 import { DELVE_MODULE_LAYOUTS, type DelveModuleId } from '../src/sim/delve_layout';
+import {
+  LITANY_MODULE_IDS,
+  polygonShellColliders,
+  polygonWallSegments,
+} from '../src/sim/delve_litany_layout';
 import { DUNGEON_WALK_HALF_X } from '../src/sim/dungeon_layout';
 
 const FOUR_MODULE_RUN: DelveModuleId[] = [
@@ -140,10 +146,11 @@ describe('delve walkable width', () => {
   });
 });
 
+import { delveInteractableVisible } from '../src/render/delve_interactable_visibility_core';
 // ---------------------------------------------------------------------------
 // buildDelveInteractable -- procedural mesh shape tests
 // ---------------------------------------------------------------------------
-import { buildDelveInteractable } from '../src/render/delve_props';
+import { buildDelveInteractable, syncDelveInteractableVisibility } from '../src/render/delve_props';
 
 const ALL_DELVE_IDS = [
   'delve_locked_door',
@@ -158,6 +165,34 @@ const ALL_DELVE_IDS = [
 ] as const;
 
 describe('buildDelveInteractable', () => {
+  it('keeps every Litany puzzle state visible after the renderer rebuilds its mesh', () => {
+    const puzzleTemplates = [
+      'delve_sluice_valve',
+      'delve_sluice_valve_open',
+      'delve_grave_tablet',
+      'delve_grave_tablet_lit',
+      'delve_corpse_candle',
+      'delve_corpse_candle_lit',
+      'delve_bell_rope',
+      'delve_bell_rope_pulled',
+    ];
+    for (const templateId of puzzleTemplates) {
+      expect(delveInteractableVisible(templateId, false), templateId).toBe(true);
+      const rebuilt = buildDelveInteractable(templateId, 42).group;
+      syncDelveInteractableVisibility(rebuilt, templateId, false);
+      expect(rebuilt.visible, `${templateId} rebuilt mesh`).toBe(true);
+    }
+    expect(delveInteractableVisible('ordinary_hidden_object', false)).toBe(false);
+    expect(delveInteractableVisible('ordinary_loot', true)).toBe(true);
+    expect(delveInteractableVisible(null, false)).toBe(false);
+
+    const rangeCulled = buildDelveInteractable('delve_bell_rope_pulled', 43).group;
+    expect(
+      syncDelveInteractableVisibility(rangeCulled, 'delve_bell_rope_pulled', false, false),
+    ).toBe(false);
+    expect(rangeCulled.visible).toBe(false);
+  });
+
   it('returns a non-empty group for every templateId', () => {
     for (const id of ALL_DELVE_IDS) {
       const { group, height } = buildDelveInteractable(id, 42);
@@ -214,4 +249,72 @@ describe('buildDelveInteractable', () => {
       expect(g2.children.length, `${id} entityId=999`).toBeGreaterThan(0);
     }
   });
+});
+
+describe('Litany polygon wall spans', () => {
+  for (const moduleId of LITANY_MODULE_IDS) {
+    it(`renders ${moduleId} wall modules on the exact collider spans`, () => {
+      const points = DELVE_MODULE_LAYOUTS[moduleId].shellPolygon;
+      expect(points).toBeDefined();
+      if (!points) throw new Error(`${moduleId} must have an authored shell polygon`);
+      const segments = polygonWallSegments(points);
+      const colliders = polygonShellColliders(points);
+      const placements: Array<{
+        kind: string;
+        x: number;
+        z: number;
+        rot: number;
+        scale: number | [number, number, number];
+      }> = [];
+      const sink = {
+        add(
+          kind: string,
+          x: number,
+          _y: number,
+          z: number,
+          rot = 0,
+          scale: number | [number, number, number] = 1,
+        ): void {
+          placements.push({ kind, x, z, rot, scale });
+        },
+      };
+      const interiors = new DungeonInteriors(new THREE.Scene(), true, [], []);
+      const placePolygonWalls = (
+        interiors as unknown as {
+          placePolygonWalls(
+            target: typeof sink,
+            polygon: ReadonlyArray<{ x: number; z: number }>,
+            variant: string,
+          ): void;
+        }
+      ).placePolygonWalls.bind(interiors);
+      const variant = moduleId === 'litany_apse' ? 'delve_marsh_apse' : 'delve_marsh';
+      placePolygonWalls(sink, points, variant);
+      const renderedWalls = placements.filter(
+        ({ kind }) => kind === 'wall' || kind.startsWith('wall_'),
+      );
+
+      expect(renderedWalls).toHaveLength(segments.length);
+      expect(colliders).toHaveLength(segments.length);
+      for (let i = 0; i < segments.length; i++) {
+        const wall = renderedWalls[i];
+        const collider = colliders[i];
+        expect(collider.type).toBe('obb');
+        if (collider.type !== 'obb') throw new Error('polygon shell collider must be an OBB');
+        expect(wall.x).toBeCloseTo(collider.x);
+        expect(wall.z).toBeCloseTo(collider.z);
+        expect(wall.rot).toBeCloseTo(collider.rot ?? 0);
+        expect(Array.isArray(wall.scale)).toBe(true);
+        const renderedHalfLength = (wall.scale as [number, number, number])[0] * 2;
+        expect(renderedHalfLength).toBeCloseTo(collider.hw);
+        expect(collider).toMatchObject({
+          type: 'obb',
+          x: segments[i].x,
+          z: segments[i].z,
+          hw: segments[i].halfLength,
+          rot: segments[i].rot,
+        });
+      }
+    });
+  }
 });

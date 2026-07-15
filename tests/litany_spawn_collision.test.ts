@@ -6,15 +6,14 @@ import {
   litanyModuleLosColliders,
 } from '../src/sim/delve_litany_layout';
 import { riteSiteLocalOffsets } from '../src/sim/delves/drowned_litany_rite';
-import { BAPTISTRY_WAVES } from '../src/sim/delves/drowned_litany_rooms';
+import { BAPTISTRY_EGG_SAC_SPOTS, BAPTISTRY_WAVES } from '../src/sim/delves/drowned_litany_rooms';
 
 // Every authored Drowned Litany spawn (trash packs, baptistry waves, room
 // interactables, and the finale rite objects) must sit on walkable floor: inside
 // the outer walls and clear of the interior obstacle colliders (stubs, pillars,
 // tombs, clutter). Blackwater hazards are deliberately NOT obstacles (they are
 // shallow, walkable and damaging), so they are excluded here, matching
-// litanyModuleLosColliders. All delve colliders are rot:0 (circle = radius test,
-// obb = AABB test).
+// litanyModuleLosColliders. Polygon-shell OBBs retain their authored rotation.
 function blockedAt(
   cols: ReturnType<typeof litanyModuleLosColliders>,
   x: number,
@@ -25,7 +24,11 @@ function blockedAt(
     if (c.type === 'circle') {
       if (Math.hypot(x - c.x, z - c.z) < c.r + r) return true;
     } else if (c.type === 'obb') {
-      if (Math.abs(x - c.x) < c.hw + r && Math.abs(z - c.z) < c.hd + r) return true;
+      const cos = Math.cos(-c.rot);
+      const sin = Math.sin(-c.rot);
+      const lx = (x - c.x) * cos + (z - c.z) * sin;
+      const lz = -(x - c.x) * sin + (z - c.z) * cos;
+      if (Math.abs(lx) < c.hw + r && Math.abs(lz) < c.hd + r) return true;
     }
   }
   return false;
@@ -71,6 +74,15 @@ describe('The Drowned Litany: every authored spawn is on walkable floor', () => 
       }
     }
     expect(issues, issues.join('\n')).toEqual([]);
+  });
+
+  it('all Baptistry egg-sac fallback sites are clear for hatchlings', () => {
+    const obstacles = litanyModuleLosColliders('litany_baptistry');
+    for (const spot of BAPTISTRY_EGG_SAC_SPOTS) {
+      expect(blockedAt(obstacles, spot.x, spot.z, 0.8), `egg sac (${spot.x},${spot.z})`).toBe(
+        false,
+      );
+    }
   });
 
   it('the Drowned Reliquary Rite reliquary and four shrines clear the apse cover', () => {

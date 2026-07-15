@@ -1124,6 +1124,22 @@ const classAbilityNamesEn = {
         'Heals a friendly target for {damage} and an additional amount over 21 sec.',
       ],
       ['barkskin', 'Oakhide', 'Your skin hardens like bark, increasing armor by 150 for 15 sec.'],
+      // Tank defensive cooldowns (warrior / paladin / druid), one distinct mechanic each.
+      [
+        'ironhold',
+        'Ironhold',
+        'Brace behind your guard, reducing all damage taken by 40% for 8 sec.',
+      ],
+      [
+        'sacred_bulwark',
+        'Sacred Bulwark',
+        'For {duration} sec, the next enemy hit that would kill you is denied, restoring you to 35% health instead.',
+      ],
+      [
+        'primal_reflexes',
+        'Primal Reflexes',
+        'Your instincts sharpen, increasing your chance to dodge by 50% for 6 sec.',
+      ],
       ['starfire', 'Skyfall', 'Calls down a bolt of stellar fire, causing {damage} Arcane damage.'],
       [
         'travel_form',

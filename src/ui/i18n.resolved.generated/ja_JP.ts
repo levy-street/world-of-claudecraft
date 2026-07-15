@@ -979,6 +979,7 @@ export const ja_JP: EnTranslations = {
         "spellPower": "呪文威力",
         "critRating": "クリティカルレーティング",
         "hasteRating": "ヘイストレーティング",
+        "hitRating": "命中レーティング",
         "warfare": "ウォーフェア"
       },
       "warfareValue": "与ダメージ +{increase}% / 被ダメージ -{reduction}%",
@@ -996,6 +997,7 @@ export const ja_JP: EnTranslations = {
         "dodge": "迫り来る近接攻撃を完全に回避し、ダメージを受けない確率です。",
         "critRating": "装備とセットボーナスによるクリティカルレーティング。クリティカル率が上昇します。約10レーティングで1%クリティカル。",
         "hasteRating": "装備とセットボーナスによるヘイストレーティング。攻撃と詠唱の速度が上昇します。約10レーティングで1%ヘイスト。",
+        "hitRating": "装備とセットボーナスによる命中レーティング。攻撃がミスする頻度と呪文が抵抗される頻度を減らし、特に高レベルの敵に有効です。約10レーティングで1%命中。",
         "warfare": "プレイヤーに与えるダメージが {increase}% 増加し、プレイヤーから受けるダメージが {reduction}% 減少します。"
       },
       "effects": {
@@ -1361,6 +1363,8 @@ export const ja_JP: EnTranslations = {
       },
       "dodge": "回避率を{pct}%上昇させる",
       "dodgeReduce": "回避率を{pct}%低下させる",
+      "damageReduction": "受けるすべてのダメージを{pct}%軽減する",
+      "guardianWard": "次に受ける敵の致死攻撃を防ぎ、代わりに体力を{pct}%まで回復する",
       "armorFlat": "防御力を{value}低下させる",
       "armorFlatStacks": "防御力を{value}低下させる({stacks}スタック)",
       "armorPct": "防御力を{pct}%低下させる",
@@ -1542,8 +1546,8 @@ export const ja_JP: EnTranslations = {
         "juniormods": "ジュニアモデレーター",
         "artists": "アーティスト",
         "contentcreator": "コンテンツクリエイター",
-        "legend": "LEGEND",
-        "shill": "SHILL"
+        "legend": "レジェンド",
+        "shill": "サポーター"
       },
       "guildMember": "認証済みメンバー",
       "notMember": "まだサーバーに参加していません",
@@ -3709,6 +3713,7 @@ export const ja_JP: EnTranslations = {
     "title": "デスクトップランチャーのダウンロード",
     "desc": "最適化されたパフォーマンスと全画面表示でのプレイのために、スタンドアロン版ランチャーを入手してください。",
     "macCta": "macOS版をダウンロード",
+    "windowsCta": "Windows版をダウンロード",
     "linuxCta": "Linux版をダウンロード",
     "linuxHint": "AppImage形式です。実行権限を付けてそのまま起動でき、インストールは不要です。",
     "windowsPending": "Windows版は準備中です。"
@@ -4596,6 +4601,8 @@ export const ja_JP: EnTranslations = {
     "connectionLost": "サーバーとの接続が切断されました。",
     "reconnecting": "サーバーとの接続が切断されました。再接続しています...",
     "connectionRejected": "サーバーが接続を閉じました。",
+    "realmFull": "このワールドは現在満員です。数分後にもう一度お試しください。",
+    "tooManyConnections": "お使いのネットワークからこのワールドへの接続が多すぎます。余分なゲームウィンドウを閉じるか、数分後にもう一度お試しください。",
     "tips": {
       "classes": "ヒント：9つのクラスはそれぞれ遊び方が異なります。決める前にいくつか試してみましょう。",
       "talents": "ヒント：非戦闘中ならいつでも特性をリセットできるので、最初の選択が失敗になることはありません。",
@@ -4673,9 +4680,9 @@ export const ja_JP: EnTranslations = {
     "medium": "中",
     "low": "低",
     "popTipLow": "低人口：現在オンラインのプレイヤーは15人未満。余裕があり、新規スタートに最適です。",
-    "popTipMedium": "中人口：現在オンラインのプレイヤーは15〜39人。健全で活発なワールドです。",
-    "popTipHigh": "高人口：現在オンラインのプレイヤーは40〜79人。混雑しており、多くのプレイヤーがいます。",
-    "popTipFull": "満員：現在オンラインのプレイヤーは80人以上。非常に混雑しており、ログイン待ちが発生する場合があります。",
+    "popTipMedium": "中人口：現在オンラインのプレイヤーは15〜79人。健全で活発なワールドです。",
+    "popTipHigh": "高人口：現在オンラインのプレイヤーは80人以上。混雑しており、多くのプレイヤーがいます。",
+    "popTipFull": "満員：このワールドは現在プレイヤー数の上限に達しています。他のプレイヤーがログアウトするまで、新規ログインは拒否されます。",
     "popTipOffline": "オフライン：このワールドは現在接続できず、参加できません。",
     "characterCountOne": "{count}キャラクター",
     "characterCountOther": "{count}キャラクター",
@@ -6278,6 +6285,18 @@ export const ja_JP: EnTranslations = {
       "barkskin": {
         "name": "樫の肌",
         "description": "肌が樹皮のように硬くなり、15秒間アーマーが150増加します。"
+      },
+      "ironhold": {
+        "name": "鉄壁",
+        "description": "堅固な守りで身を固め、8秒間、受けるすべてのダメージを40%軽減します。"
+      },
+      "sacred_bulwark": {
+        "name": "聖なる防壁",
+        "description": "{duration}秒間、次に敵から受ける致命的な一撃を無効化し、代わりに体力を最大値の35%まで回復します。"
+      },
+      "primal_reflexes": {
+        "name": "原始の反射",
+        "description": "本能が研ぎ澄まされ、6秒間、回避率が50%上昇します。"
       },
       "starfire": {
         "name": "天墜",

@@ -551,6 +551,12 @@ export const SFX = [
   // These are generated locally by scripts/gen_ui_sfx.mjs. Keeping them in the
   // authoritative catalog makes every live GameAudio cue editable in SFX Studio.
   ...UI_SFX_CATALOG,
+
+  // Book of Deeds unlock chime (custom recording, not ElevenLabs/generated).
+  // Previously deed unlocks reused ui_level_up (audio.levelUp()), so the same
+  // sound fired for both real level-ups and every achievement, wearing thin
+  // fast. See handleDeedUnlocks in src/ui/hud.ts.
+  { key: 'ui_achievement', custom: true },
 ];
 
 // Family ids that have creature vocalizations (used by the integration layer to

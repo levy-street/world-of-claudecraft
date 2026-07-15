@@ -1,6 +1,13 @@
+import type { QueryResult } from 'pg';
 import { normalizeAccountFlair, type StreamerLinks } from '../src/sim/account_flair';
-import { pool } from './db';
+import { DB_HEAVY_STATEMENT_TIMEOUT_MS, pool, runWithStatementTimeout } from './db';
 import { REALM } from './realm';
+
+// The bound query runWithStatementTimeout hands its callback: one client, one
+// transaction, the raised statement timeout in force. Threading it into a private
+// read helper lets that helper run under the raised allowance without opening its
+// own transaction.
+type BoundQuery = (text: string, values?: unknown[]) => Promise<QueryResult>;
 
 // Read-side queries for the admin dashboard. All inputs are parameterized;
 // sort columns are whitelisted before they reach SQL.
@@ -23,8 +30,13 @@ export interface OverviewCounts {
 }
 
 export async function overviewCounts(): Promise<OverviewCounts> {
-  const res = await pool.query(
-    `
+  // A big multi-subquery aggregate over accounts / characters / play_sessions,
+  // driven on an interval by the business-metrics PeriodicCollector: run it on the
+  // raised allowance so a growing play_sessions table cannot trip the default
+  // statement timeout.
+  const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
+    query(
+      `
     SELECT
       (SELECT count(*) FROM accounts)::int                                               AS accounts,
       (SELECT count(*) FROM characters)::int                                             AS characters,
@@ -54,7 +66,8 @@ export async function overviewCounts(): Promise<OverviewCounts> {
       (SELECT count(*) FROM site_presence_sessions
         WHERE last_seen_at > now() - interval '2 minutes')::int AS site_users_now
   `,
-    [REALM],
+      [REALM],
+    ),
   );
   const r = res.rows[0];
   return {
@@ -99,16 +112,21 @@ export interface SessionDayPoint {
 }
 
 export async function sessionsByDay(days: number): Promise<SessionDayPoint[]> {
-  const res = await pool.query(
-    `SELECT
-       to_char(date_trunc('day', started_at), 'YYYY-MM-DD') AS day,
-       count(*)::int AS sessions,
-       count(DISTINCT account_id)::int AS unique_accounts,
-       COALESCE(sum(EXTRACT(EPOCH FROM (COALESCE(ended_at, now()) - started_at))), 0)::bigint AS playtime_seconds
-     FROM play_sessions
-     WHERE started_at > now() - ($1 || ' days')::interval
-     GROUP BY 1 ORDER BY 1`,
-    [String(days)],
+  // A grouped scan over play_sessions on an admin-triggered read; run it on the
+  // raised allowance so a growing play_sessions table cannot trip the default
+  // statement timeout.
+  const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
+    query(
+      `SELECT
+         to_char(date_trunc('day', started_at), 'YYYY-MM-DD') AS day,
+         count(*)::int AS sessions,
+         count(DISTINCT account_id)::int AS unique_accounts,
+         COALESCE(sum(EXTRACT(EPOCH FROM (COALESCE(ended_at, now()) - started_at))), 0)::bigint AS playtime_seconds
+       FROM play_sessions
+       WHERE started_at > now() - ($1 || ' days')::interval
+       GROUP BY 1 ORDER BY 1`,
+      [String(days)],
+    ),
   );
   return res.rows.map((r) => ({
     day: r.day,
@@ -362,8 +380,8 @@ function perfAggregateFromRow(r: Record<string, unknown>): PerfAggregate {
   };
 }
 
-async function perfAggregate(hours: number): Promise<PerfAggregate> {
-  const res = await pool.query(
+async function perfAggregate(query: BoundQuery, hours: number): Promise<PerfAggregate> {
+  const res = await query(
     `SELECT
        count(*)::int AS sample_count,
        COALESCE(percentile_cont(0.5) WITHIN GROUP (ORDER BY fps_avg), 0)::real AS median_fps,
@@ -380,13 +398,14 @@ async function perfAggregate(hours: number): Promise<PerfAggregate> {
 }
 
 async function perfBuckets(
+  query: BoundQuery,
   column: string,
   hours: number,
   limit: number,
   worstFirst = false,
 ): Promise<PerfBucket[]> {
   const order = worstFirst ? 'p95_frame_ms DESC, sample_count DESC' : 'sample_count DESC, key ASC';
-  const res = await pool.query(
+  const res = await query(
     `SELECT
        ${column} AS key,
        count(*)::int AS sample_count,
@@ -408,17 +427,22 @@ async function perfBuckets(
 
 export async function clientPerfSummary(hoursInput = 24): Promise<PerfSummary> {
   const hours = cleanHours(hoursInput);
-  const [totals, byPreset, byGpu, byBrowser, byOs, byScenario, worstGpuBuckets] = await Promise.all(
-    [
-      perfAggregate(hours),
-      perfBuckets('graphics_preset', hours, 20),
-      perfBuckets('gl_renderer_bucket', hours, 50),
-      perfBuckets('browser_family', hours, 20),
-      perfBuckets('os_family', hours, 20),
-      perfBuckets('zone_or_scenario', hours, 30),
-      perfBuckets('gl_renderer_bucket', hours, 20, true),
-    ],
-  );
+  // Seven aggregate scans over client_perf_reports on an admin-triggered read; run
+  // them in ONE raised-timeout transaction (threading the bound query through the
+  // helpers) so a large table cannot trip the default statement timeout on any of
+  // them and the whole read holds a single pooled client instead of seven.
+  const [totals, byPreset, byGpu, byBrowser, byOs, byScenario, worstGpuBuckets] =
+    await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
+      Promise.all([
+        perfAggregate(query, hours),
+        perfBuckets(query, 'graphics_preset', hours, 20),
+        perfBuckets(query, 'gl_renderer_bucket', hours, 50),
+        perfBuckets(query, 'browser_family', hours, 20),
+        perfBuckets(query, 'os_family', hours, 20),
+        perfBuckets(query, 'zone_or_scenario', hours, 30),
+        perfBuckets(query, 'gl_renderer_bucket', hours, 20, true),
+      ]),
+    );
   return {
     hours,
     generatedAt: new Date().toISOString(),
@@ -1002,22 +1026,28 @@ export async function listModerationActions(
 
 export async function accountDetail(accountId: number): Promise<AccountDetail | null> {
   const [account, characters, sessions, moderationHistory, dailyRewardsIpBans] = await Promise.all([
-    pool.query(
-      `SELECT id, username, created_at, last_login, is_admin, banned_at, suspended_until,
-              COALESCE(moderation_reason, '') AS moderation_reason,
-              chat_muted_until,
-              COALESCE(chat_mute_reason, '') AS chat_mute_reason,
-              COALESCE(chat_strikes, 0) AS chat_strikes,
-              is_ai, is_streamer, streamer_links,
-              (SELECT reason FROM daily_reward_bans WHERE account_id = accounts.id)
-                AS daily_rewards_ban_reason,
-              (SELECT created_at FROM daily_reward_bans WHERE account_id = accounts.id)
-                AS daily_rewards_banned_at,
-              last_login_ip,
-              COALESCE((SELECT sum(EXTRACT(EPOCH FROM (COALESCE(s.ended_at, now()) - s.started_at)))
-                        FROM play_sessions s WHERE s.account_id = accounts.id), 0)::bigint AS playtime_seconds
-       FROM accounts WHERE id = $1`,
-      [accountId],
+    // The account row carries a correlated sum over ALL of this account's
+    // play_sessions, the one scan here that grows without bound, so run it on the
+    // raised allowance; the remaining reads stay bounded (LIMIT-capped or indexed
+    // lookups) on the default timeout.
+    runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
+      query(
+        `SELECT id, username, created_at, last_login, is_admin, banned_at, suspended_until,
+                COALESCE(moderation_reason, '') AS moderation_reason,
+                chat_muted_until,
+                COALESCE(chat_mute_reason, '') AS chat_mute_reason,
+                COALESCE(chat_strikes, 0) AS chat_strikes,
+                is_ai, is_streamer, streamer_links,
+                (SELECT reason FROM daily_reward_bans WHERE account_id = accounts.id)
+                  AS daily_rewards_ban_reason,
+                (SELECT created_at FROM daily_reward_bans WHERE account_id = accounts.id)
+                  AS daily_rewards_banned_at,
+                last_login_ip,
+                COALESCE((SELECT sum(EXTRACT(EPOCH FROM (COALESCE(s.ended_at, now()) - s.started_at)))
+                          FROM play_sessions s WHERE s.account_id = accounts.id), 0)::bigint AS playtime_seconds
+         FROM accounts WHERE id = $1`,
+        [accountId],
+      ),
     ),
     pool.query(
       `SELECT id, name, class, level,

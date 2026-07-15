@@ -164,11 +164,13 @@ describe('self stat wire round-trip', () => {
         rtype: 'mana',
         crat: 20,
         hrat: 150,
+        hirat: 30,
       },
     });
     // Without the wire fields these read the blankEntity default 0 (the bug this guards).
     expect(client.player.critRating).toBe(20);
     expect(client.player.hasteRating).toBe(150);
+    expect(client.player.hitRating).toBe(30);
   });
 
   it('backfills WARFARE fractions when an older server sends the legacy six-field stats shape', () => {
@@ -1259,7 +1261,7 @@ describe('chat moderation', () => {
 describe('autosaves', () => {
   beforeEach(() => {
     vi.mocked(saveCharacterState).mockReset();
-    vi.mocked(saveCharacterState).mockResolvedValue(undefined);
+    vi.mocked(saveCharacterState).mockResolvedValue(true);
   });
 
   it('skips overlapping saveAll runs while saving each current session once', async () => {
@@ -1272,7 +1274,7 @@ describe('autosaves', () => {
     const firstSave = new Promise<void>((resolve) => {
       resolveFirstSave = resolve;
     });
-    vi.mocked(saveCharacterState).mockImplementationOnce(() => firstSave);
+    vi.mocked(saveCharacterState).mockImplementationOnce(() => firstSave.then(() => true));
 
     const firstRun = server.saveAll('test');
     await vi.waitFor(() => {
@@ -1298,7 +1300,7 @@ describe('autosaves', () => {
     const firstSave = new Promise<void>((resolve) => {
       resolveFirstSave = resolve;
     });
-    vi.mocked(saveCharacterState).mockImplementationOnce(() => firstSave);
+    vi.mocked(saveCharacterState).mockImplementationOnce(() => firstSave.then(() => true));
 
     const autosave = server.saveAll('autosave');
     await vi.waitFor(() => {

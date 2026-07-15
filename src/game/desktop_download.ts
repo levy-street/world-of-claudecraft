@@ -10,15 +10,16 @@ export type DesktopPlatform = 'mac' | 'win' | 'linux' | 'other';
 // artifacts uploaded to updates.worldofclaudecraft.com/desktop/ at release
 // (see docs/desktop-release.md). The static hrefs in index.html carry the same
 // version as a no-JS fallback.
-export const DESKTOP_VERSION = '0.25.0';
+export const DESKTOP_VERSION = '0.26.0';
 const DESKTOP_HOST = 'https://updates.worldofclaudecraft.com/desktop';
 
 // electron-builder website-channel artifact names (docs/desktop-release.md):
 // mac ships one universal dmg; the x64 Linux AppImage is named x86_64 (that is
-// electron-builder's arch token for AppImage, not "x64"). Windows is not
-// published yet, so it has no entry here.
+// electron-builder's arch token for AppImage, not "x64"). Windows ships one
+// combined NSIS installer that selects its x64 or arm64 payload at install time.
 const ARTIFACT: Partial<Record<DesktopPlatform, string>> = {
   mac: `world-of-claudecraft-${DESKTOP_VERSION}-mac-universal.dmg`,
+  win: `world-of-claudecraft-${DESKTOP_VERSION}-win.exe`,
   linux: `world-of-claudecraft-${DESKTOP_VERSION}-linux-x86_64.AppImage`,
 };
 

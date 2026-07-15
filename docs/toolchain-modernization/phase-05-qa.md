@@ -51,9 +51,10 @@ Whole-packet agent (the integration close):
   experiment, the byte-identical resolved-output proof, the canonical stronger-typing
   probe pair (a bogus overlay key entities.itemSets.bogus_zzz.name and a bogus t()
   literal, both failing tsc), the three-run CI timing check, and full npm run gate on
-  this branch plus release-tier on the release branch (release-tier counts as green if
-  the only reds are pre-existing pending-row locale failures unrelated to this packet;
-  record them).
+  this branch plus release-tier on the release branch (2026-07-15, Phase 3 QA: the
+  v0.26.0 fill emptied pending, so pending-row locale reds are no longer an expected
+  mid-cycle state; treat a red release tier as a real regression unless a post-fill
+  catalog key legitimately reintroduced pending rows, and record exactly which).
 
 Multi-agent review dispatch per the implementation-plan.md matrix, plus qa-checklist
 (the agent) for phase completion. Standard truncation-resume message.

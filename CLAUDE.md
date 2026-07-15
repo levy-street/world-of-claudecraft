@@ -48,7 +48,8 @@ Most directories above have their own `CLAUDE.md` with local conventions; read i
 - `npm test`: Vitest. **Prefer a single file while iterating:** `npx vitest run tests/sim.test.ts`.
 - `npm run gate`: the full CI-equivalent pre-merge gate (i18n gen + freshness, malware scan,
   changed-files biome, SFX conformance, full tests with bounded workers, `tsc`, all builds;
-  release-tier automatically on a `release/**` branch; needs FFmpeg/ffprobe on PATH). Exit-code-safe;
+  release-tier automatically on a `release/**` branch; FFmpeg/ffprobe come from the bundled
+  ffmpeg-static/ffprobe-static packages, PATH is the fallback). Exit-code-safe;
   use it instead of an ad-hoc `&&` chain before calling a change done (piping `npm test` through
   `tail` masks its exit code, and an unbounded run flakes heavy suites under core contention).
 - `npm run build`: regen all generated artifacts (i18n, wiki content, sitemap, SFX + media
@@ -156,7 +157,10 @@ with `npm run gate` (above) before calling it done.
   text, or player-facing copy. Use commas, colons, parentheses, or "to" for ranges.
   (An emoji that stands in for a real label still needs its real `t()` text.)
 - **Commits:** Conventional Commits with a scope (`feat(talents): ...`, `fix(net): ...`,
-  `test(sim): ...`). Branches: `feature/<slug>`, `fix/<slug>`.
+  `test(sim): ...`), and every commit carries a BODY, never a title alone: after a
+  blank line, 1 to 4 plain sentences or short bullet lines saying what changed and
+  why (the intent or finding behind it, not a file list), wrapped near 72 columns.
+  Branches: `feature/<slug>`, `fix/<slug>`.
 - **Docs follow the anchor rule:** cite stable paths, exported symbols, and pinned tests;
   never literal counts or line numbers that rot (see `docs/qa-gate.md`).
 
@@ -263,7 +267,8 @@ correct.
   pass. The repo ships purpose-built reviewers in `.claude/agents/` (dispatch via `/qa`):
   `qa-checklist` (the end-of-contribution gate), `architecture-reviewer` (determinism + the
   `SimContext` seam for `src/sim/`), `frontend-seam-reviewer` (ui/styles/render seams),
-  `cross-platform-sync`, `migration-safety`, `privacy-security-review`,
+  `cross-platform-sync`, `migration-safety`, `database-performance-reviewer` (query
+  cost/cadence, indexes, pool/lock/deadline scaling), `privacy-security-review`,
   `test-coverage-auditor` (assertion decisiveness + pin quality), and the
   `release-malware-audit` release gate; plus the `feature-plan`, `extract-and-test`,
   `release-merge-audit` (after any release merge into a feature branch), `i18n-locale-fill`

@@ -1625,6 +1625,20 @@
     transform: translate(-50%, -50%) rotate(-45deg);
     pointer-events: none;
   }
+  /* Short-viewport rescue: #side-buttons is bottom-anchored and grows upward,
+     so on a maximized 1366x768 laptop (about 660px usable height) the topmost
+     button (the Daily Rewards chest) is pushed off the top of the screen and
+     becomes unclickable. Compact the rail (shorter buttons, tighter gap) so
+     every launcher, including the chest, stays on screen. Pinned by the
+     rail-height budget test in tests/crafting_launcher.test.ts. */
+  @media (max-height: 720px) {
+    #side-buttons {
+      gap: 3px;
+    }
+    #side-buttons .micro-btn {
+      height: 25px;
+    }
+  }
 
   /* ---------- chat frame ---------- */
   /* width shrinks on narrower screens so the chat never overlaps the centred

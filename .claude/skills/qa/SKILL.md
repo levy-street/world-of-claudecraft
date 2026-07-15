@@ -32,7 +32,9 @@ called done.
    prompted for COVERAGE (report every gap with confidence and severity), not filtering.
 
 4. Dispatch the domain reviewer agents that `qa-checklist` names for the surfaces this diff
-   touches (for example `privacy-security-review`, `migration-safety`, `cross-platform-sync`,
+   touches (for example `privacy-security-review`, `migration-safety`,
+   `database-performance-reviewer` for SQL, indexes, query call sites, pool or lock behavior,
+   timeout policy, or stored-data growth, `cross-platform-sync`,
    `architecture-reviewer`, and on a release branch `release-malware-audit`). Spawn them fresh;
    never have the implementer review its own work.
 

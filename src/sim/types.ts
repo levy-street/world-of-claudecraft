@@ -40,11 +40,18 @@ export const GCD = 1.5; // seconds
 // Combat ratings are gear-facing stats converted to fractions in recalcPlayerStats.
 export const HASTE_RATING_PER_PCT = 10; // 10 haste rating = 1% faster
 export const CRIT_RATING_PER_PCT = 10; // 10 crit rating = +1% crit chance
+export const HIT_RATING_PER_PCT = 10; // 10 hit rating = +1% hit (less miss/resist)
 export function hasteFractionFromRating(rating: number): number {
   return rating / (HASTE_RATING_PER_PCT * 100);
 }
 export function critFractionFromRating(rating: number): number {
   return rating / (CRIT_RATING_PER_PCT * 100);
+}
+// Hit rating converts to a hit fraction that reduces both physical miss and spell
+// resist by the same amount (both share the above-level penalty table). One unified
+// stat: a warrior and a mage both want hit. Applied in recalcPlayerStats.
+export function hitFractionFromRating(rating: number): number {
+  return rating / (HIT_RATING_PER_PCT * 100);
 }
 
 export type HonorReason = 'arena_win' | 'fiesta_kill' | 'fiesta_complete' | 'fiesta_win';
@@ -213,6 +220,13 @@ export type AuraKind =
   | 'hot'
   | 'absorb'
   | 'imbue'
+  // Warrior Ironhold: a big, short, all-school damage-taken reduction (value =
+  // fraction less, e.g. 0.4 = 40% less), applied in damage.ts.
+  | 'shield_wall'
+  // Paladin Sacred Bulwark: a divine cheat-death ward. While it holds, a lethal
+  // enemy hit is denied in damage.ts and the wearer is restored by value (a
+  // fraction of max health, e.g. 0.35 = 35%) before the ward is consumed.
+  | 'guardian_ward'
   | 'buff_sta'
   | 'buff_allstats'
   // Percentage drain on the whole stat block (value is a signed fraction, e.g.
@@ -434,9 +448,13 @@ interface BaseItemDef {
   // Kept off `Stats` because Spell Power is a derived combat rating (like attackPower),
   // not one of the six primary attributes.
   spellPower?: number;
-  // Combat ratings, converted to crit%/haste% in recalcPlayerStats.
+  // Combat ratings, converted to crit%/haste%/hit% in recalcPlayerStats.
   critRating?: number;
   hasteRating?: number;
+  // Hit rating: reduces melee/ranged miss AND spell resist by the same percent.
+  // The endgame differentiator (jewelry + ilvl 31+/heroic gear); off the primary
+  // stat budget like spellPower.
+  hitRating?: number;
   // PvP-only ratings. recalcPlayerStats converts them into Stats fractions;
   // combat clamps them again at the PvP caps before applying damage.
   pvpOffenseRating?: number;
@@ -535,6 +553,7 @@ export interface SetBonusEffect {
   // (folded into Entity.meleeHaste/rangedHaste/spellHaste in recalcPlayerStats).
   haste?: number;
   hasteRating?: number; // haste rating (converted to % in recalcPlayerStats)
+  hitRating?: number; // hit rating (converted to % in recalcPlayerStats): less miss/resist
   castPushbackReduction?: number; // 0..1: fraction of damage cast-pushback removed (1 = immune)
   knockbackResistance?: number; // 0..1: fraction of on-hit knockback distance resisted (1 = immune)
   proc?: SetProc;
@@ -1906,6 +1925,8 @@ export interface Entity {
   critChance: number; // 0..1
   critRating: number; // accumulated crit rating from gear + set bonuses
   hasteRating: number; // accumulated haste rating from gear + set bonuses
+  hitRating: number; // accumulated hit rating from gear + set bonuses
+  hitBonus: number; // hit fraction (hitRating converted): reduces miss/resist, 0..1
   // Extra critical-strike damage from a spec mastery (0 = none), split by OUTPUT CHANNEL
   // so a mastery only strengthens the crits it is meant to. Added to the matching base
   // crit multiplier at the crit site: spell crits deal 1.5 + critDmgSpellBonus, physical
@@ -3202,20 +3223,25 @@ export function rageFromTaking(damage: number, attackerLevel: number): number {
   return damage / (Math.max(1, attackerLevel) * 1.5);
 }
 
-// Attacking a target ABOVE your level adds a steep miss penalty (extra miss %),
-// tuned so +2 is ~19% and +4 is ~85% miss: fighting way-above-level enemies is meant
-// to be near-futile. The curve approximates 2.5 * diff^2.5, but is stored as an integer
+// Attacking a target ABOVE your level adds a miss/resist penalty (extra %) on top of
+// the base miss (5%) / resist (4%). It ramps with the level gap but is CAPPED so even
+// far-above content (Heroic is +3) never feels like a coin flip: the penalty tops out
+// at 21, so melee miss maxes at ~26% and spell resist at ~25%. Stored as an integer
 // table (level diffs are always integers) so it stays bit-for-bit deterministic across
-// engines — Math.pow with a fractional exponent is not guaranteed identical browser vs node.
-//   +1 -> 2.5   +2 -> 14   +3 -> 39   +4 -> 80   (+5 and beyond saturate past the clamp)
-const ABOVE_LEVEL_MISS_PCT = [0, 2.5, 14, 39, 80];
+// engines. Beyond the last entry the penalty SATURATES at the cap (does not blow up).
+// Preserve the established +1/+2 leveling curve; only the old +3 cliff is softened.
+//   +1 -> 2.5   +2 -> 14   +3 -> 21   (+4 and beyond hold at 21)
+const ABOVE_LEVEL_MISS_PCT = [0, 2.5, 14, 21];
 function aboveLevelMissPct(diff: number): number {
   if (diff <= 0) return 0;
-  return diff < ABOVE_LEVEL_MISS_PCT.length ? ABOVE_LEVEL_MISS_PCT[diff] : 100;
+  return diff < ABOVE_LEVEL_MISS_PCT.length
+    ? ABOVE_LEVEL_MISS_PCT[diff]
+    : ABOVE_LEVEL_MISS_PCT[ABOVE_LEVEL_MISS_PCT.length - 1];
 }
 
 // Spell hit by level difference (target - caster): 96% at equal level, a gentle
-// +1%/level bonus below you, and the steep above-level penalty above. cap 99%, floor 5%.
+// +1%/level bonus below you, and the capped above-level penalty above (resist tops
+// out at ~25%). cap 99%, floor 5%.
 export function spellHitChance(casterLevel: number, targetLevel: number): number {
   const diff = targetLevel - casterLevel;
   const hit = diff <= 0 ? 96 + -diff * 1 : 96 - aboveLevelMissPct(diff);
@@ -3223,7 +3249,7 @@ export function spellHitChance(casterLevel: number, targetLevel: number): number
 }
 
 // Melee miss vs target by level difference: 5% base, a gentle -0.2%/level below you,
-// and the steep above-level penalty above. cap 95%, floor 0.5%.
+// and the capped above-level penalty above (miss tops out at ~26%). cap 95%, floor 0.5%.
 export function meleeMissChance(attackerLevel: number, targetLevel: number): number {
   const diff = targetLevel - attackerLevel;
   const miss = diff > 0 ? 5 + aboveLevelMissPct(diff) : 5 + diff * 0.2;
@@ -3245,7 +3271,11 @@ export function swingMissChance(attacker: Entity, target: Entity): number {
   const miss = meleeMissChance(attacker.level, target.level);
   const mobAttacker = attacker.kind === 'mob' && attacker.hostile && attacker.ownerId === null;
   const playerSide = target.kind === 'player' || target.ownerId !== null;
-  return mobAttacker && playerSide ? Math.min(miss, MOB_VS_PLAYER_MAX_MISS) : miss;
+  if (mobAttacker && playerSide) return Math.min(miss, MOB_VS_PLAYER_MAX_MISS);
+  // Player/pet -> mob keeps the full above-level scaling, minus gear Hit rating
+  // (attacker.hitBonus, 0 for anything without hit gear so parity is unchanged),
+  // floored at 0 so a hit-capped attacker can reach 0% miss.
+  return Math.max(0, miss - attacker.hitBonus);
 }
 
 export function armorReduction(armor: number, attackerLevel: number): number {

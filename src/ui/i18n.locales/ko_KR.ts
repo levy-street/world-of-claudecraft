@@ -13,6 +13,8 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.discord.roleTag.legend': '전설',
+  'hudChrome.discord.roleTag.shill': '홍보대사',
   'hudChrome.wocStore.title': 'WOC 상점',
   'hudChrome.wocStore.close': 'WOC 상점 닫기',
   'hudChrome.wocStore.tabsLabel': 'WOC 상점 구역',
@@ -564,6 +566,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.names.spellPower': '주문력',
   'hudChrome.statInfo.names.critRating': '치명타 등급',
   'hudChrome.statInfo.names.hasteRating': '가속 등급',
+  'hudChrome.statInfo.names.hitRating': '명중 등급',
+  'hudChrome.statInfo.desc.hitRating':
+    '장비와 세트 보너스에서 얻는 명중 등급으로 공격이 빗나가거나 주문이 저항되는 빈도를 줄이며, 특히 더 높은 레벨의 적에게 효과적입니다. 약 10등급당 1% 명중.',
   'hudChrome.statInfo.names.warfare': '워페어',
   'hudChrome.statInfo.warfareValue': '주는 피해 +{increase}% / 받는 피해 -{reduction}%',
   'hudChrome.statInfo.desc.critRating':
@@ -893,6 +898,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'download.linuxCta': 'Linux용 다운로드',
   'download.linuxHint':
     'AppImage 형식입니다. 실행 권한만 부여하면 바로 실행되며, 설치는 필요 없습니다.',
+  'download.windowsCta': 'Windows용 다운로드',
   'download.windowsPending': 'Windows 빌드는 준비 중입니다.',
   'download.desc': '최적화된 성능과 전체 화면 플레이를 위해 독립형 런처를 다운로드하세요.',
   'comingSoon.placeholder': '준비 중...',
@@ -1162,6 +1168,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'loading.connectionLost': '서버와의 연결이 끊어졌습니다.',
   'loading.reconnecting': '연결이 끊어졌습니다. 다시 연결하는 중...',
   'loading.connectionRejected': '서버가 연결을 종료했습니다.',
+  'loading.realmFull': '이 월드는 현재 포화 상태입니다. 몇 분 후에 다시 시도해 주세요.',
+  'loading.tooManyConnections':
+    '사용 중인 네트워크에서 이 월드로 연결이 너무 많습니다. 추가 게임 창을 닫거나 몇 분 후에 다시 시도해 주세요.',
   'errors.nothingInteract': '상호작용할 대상이 없습니다.',
   'errors.noEnemyNearby': '근처에 적이 없습니다.',
   'errors.characterNameRequired': '캐릭터 이름을 입력하세요.',
@@ -1209,10 +1218,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'realm.medium': '보통',
   'realm.low': '낮음',
   'realm.popTipLow': '낮은 인구: 현재 접속자 15명 미만. 여유롭고 새로 시작하기에 좋습니다.',
-  'realm.popTipMedium': '보통 인구: 현재 접속자 15~39명. 건강하고 활발한 월드입니다.',
-  'realm.popTipHigh': '높은 인구: 현재 접속자 40~79명. 붐비고 플레이어가 많습니다.',
+  'realm.popTipMedium': '보통 인구: 현재 접속자 15~79명. 건강하고 활발한 월드입니다.',
+  'realm.popTipHigh': '높은 인구: 현재 접속자 80명 이상. 붐비고 플레이어가 많습니다.',
   'realm.popTipFull':
-    '포화 인구: 현재 접속자 80명 이상. 매우 붐비며 로그인 대기열이 있을 수 있습니다.',
+    '포화 인구: 이 월드는 현재 플레이어 정원에 도달했습니다. 다른 플레이어가 로그아웃할 때까지 새 로그인이 거부됩니다.',
   'realm.popTipOffline': '오프라인: 이 월드는 현재 연결할 수 없어 입장할 수 없습니다.',
   'realm.characterCountOne': '캐릭터 {count}개',
   'realm.characterCountOther': '캐릭터 {count}개',
@@ -2463,6 +2472,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.barkskin.name': '참나무 가죽',
   'entities.abilities.barkskin.description':
     '피부가 나무껍질처럼 단단해져 15초 동안 방어도가 150만큼 증가합니다.',
+  'entities.abilities.ironhold.name': '철벽',
+  'entities.abilities.ironhold.description':
+    '굳건한 방어 태세로 8초 동안 받는 모든 피해를 40% 감소시킵니다.',
+  'entities.abilities.sacred_bulwark.name': '신성한 방벽',
+  'entities.abilities.sacred_bulwark.description':
+    '{duration}초 동안 다음 적의 치명적인 공격을 무효화하고, 대신 생명력을 최대치의 35%까지 회복합니다.',
+  'entities.abilities.primal_reflexes.name': '원시의 반사',
+  'entities.abilities.primal_reflexes.description':
+    '본능이 예리해져 6초 동안 회피율이 50% 증가합니다.',
   'entities.abilities.starfire.name': '창공 낙하',
   'entities.abilities.starfire.description':
     '별의 불꽃을 불러 내려 {damage}의 비전 피해를 입힙니다.',
@@ -5685,6 +5703,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.attackSpeedFast': '공격 속도를 {pct}% 증가시킵니다',
   'hudChrome.auraEffect.haste': '공격 속도와 시전 속도를 {pct}% 증가시킵니다',
   'hudChrome.auraEffect.tongues': '시전 시간을 {pct}% 증가시킵니다',
+  'hudChrome.auraEffect.damageReduction': '받는 모든 피해가 {pct}% 감소합니다',
+  'hudChrome.auraEffect.guardianWard':
+    '다음 적의 치명적인 공격을 막고 대신 생명력을 {pct}%까지 회복합니다',
   'hudChrome.auraEffect.increase.ap': '공격력을 {value} 증가시킵니다',
   'hudChrome.auraEffect.increase.armor': '방어도를 {value} 증가시킵니다',
   'hudChrome.auraEffect.increase.int': '지능을 {value} 증가시킵니다',

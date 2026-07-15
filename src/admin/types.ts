@@ -550,6 +550,10 @@ export interface PerfCaptureResult {
   maxTicksPerCallback: number;
   online: number;
   simEntities: number;
+  aggroVisitsTotal: number;
+  aggroVisitsMaxPerTick: number;
+  threatVisitsTotal: number;
+  threatVisitsMaxPerTick: number;
   profile: {
     samples: number;
     windowTicks: number;

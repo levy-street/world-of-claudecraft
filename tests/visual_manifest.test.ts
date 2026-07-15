@@ -106,6 +106,24 @@ describe('character visual manifest', () => {
     expect(VISUALS.mob_boar.deathTimeScale).toBeUndefined();
   });
 
+  it('renders the Nythraxis phase-2 court as Aldren / Malric / Voss, not generic skeletons', () => {
+    // The heroic "Spirit of X" adds are the same characters risen again, so they
+    // must reuse each named crypt boss's visual. Without the MOB_KEYS entries they
+    // fall through to FAMILY_KEYS.undead (skel_minion) and the court renders as
+    // three identical grunts. Each add is pinned to its counterpart's key.
+    const court: Array<[string, string]> = [
+      ['nythraxis_heroic_warrior_add', 'fallen_captain_aldren'],
+      ['nythraxis_heroic_priest_add', 'corrupted_priest_malric'],
+      ['nythraxis_heroic_rogue_add', 'deathstalker_voss'],
+    ];
+    for (const [addId, namedId] of court) {
+      const addKey = visualKeyFor({ kind: 'mob', templateId: addId } as never);
+      const namedKey = visualKeyFor({ kind: 'mob', templateId: namedId } as never);
+      expect(addKey, addId).toBe(namedKey);
+      expect(addKey, addId).not.toBe('skel_minion');
+    }
+  });
+
   it('points the Combat Mech manifest at animation clips baked into the GLB', async () => {
     const visual = VISUALS.player_mech;
     const animationNames = await glbAnimationNames(`public/${visual.url}`);
