@@ -25,8 +25,8 @@ import { LOCALE_LOADERS, SUPPORTED_LANGUAGES } from './i18n.resolved.generated/l
 import { pending } from './i18n.resolved.generated/pending';
 
 // Re-export the dense per-locale objects so const-importers of './i18n' keep an unchanged
-// surface: the S3 guard (tests/localization_fixes.test.ts) and the SHA harness
-// (scripts/i18n_resolved_hash.mjs) read every locale const by name. This is a PURE
+// surface: the S3 guard (tests/localization_fixes.test.ts) and the byte-equivalence
+// diagnostic (scripts/i18n_resolved_hash.mjs) read every locale const by name. This is a PURE
 // re-export (export-from, NO local binding): the app runtime references none of these names
 // through './i18n' - every read-path below (t, translationValue, hasTranslation, tOptional)
 // reads the lazy `resident` table instead - so Rollup drops the unused re-export and

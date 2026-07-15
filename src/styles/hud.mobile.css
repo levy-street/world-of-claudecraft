@@ -456,6 +456,7 @@
      body.mobile-touch (hidden below); xpbar/player-frame/petbar keep rendering
      (their own mobile rules are untouched).
 
+
      GEOMETRY: the 5 paged buttons sit on one circular arc centred on the attack
      button's centre, a quarter sweep from due-left (180deg) to due-up (90deg) in
      22.5deg steps, so every adjacent pair has the same centre distance
@@ -1936,7 +1937,11 @@
     width: min(220px, calc(50vw - 144px));
     min-width: 142px;
     max-height: min(170px, calc(var(--app-vh) / var(--ui-scale, 1) - 128px));
-    overflow: hidden;
+    /* Scroll vertically instead of clipping: the empty-state discoverability
+       hint can wrap to several lines in this narrow column, and a clipped hint
+       with no scroll affordance would silently hide it. */
+    overflow-y: auto;
+    overflow-x: hidden;
     z-index: 25;
   }
   /* Left-handed mirror: swap the move joystick (and the utility cluster and
@@ -2398,6 +2403,7 @@
   body.mobile-touch #mailbox-window,
   body.mobile-touch #emote-editor,
   body.mobile-touch #arena-window,
+  body.mobile-touch #dungeon-finder-window,
   body.mobile-touch #valecup-window,
   body.mobile-touch #delve-board,
   body.mobile-touch #leaderboard-window,
@@ -2759,6 +2765,53 @@
     box-sizing: border-box;
     overflow-x: hidden;
     overflow-y: auto;
+  }
+  /* The character sheet docks its bags companion side by side on touch, exactly like
+     the bank cluster (body.bank-open above): a full-height panel split 50/50 at the
+     viewport centre, driven by body.char-bags-paired (hud.ts syncCharBagsPairing).
+     Without it the bags would cover the paperdoll on a phone and the drag-to-equip
+     gesture would have no visible socket to land on. The bank/vendor clusters own the
+     bags companion when they are up, so the pure core stands down there. */
+  body.mobile-touch.char-bags-paired #char-window,
+  body.mobile-touch.char-bags-paired #bags {
+    position: fixed;
+    top: max(10px, env(safe-area-inset-top));
+    bottom: calc(72px + env(safe-area-inset-bottom));
+    width: auto;
+    max-width: none;
+    max-height: none;
+    transform: none;
+    box-sizing: border-box;
+    z-index: 95;
+  }
+  /* Sheet LEFT (its own body scrolls), bags RIGHT (the .bag-grid scrolls). */
+  body.mobile-touch.char-bags-paired #char-window {
+    left: max(10px, env(safe-area-inset-left));
+    right: calc(var(--app-vw) / var(--ui-scale, 1) / 2);
+    overflow-y: auto;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right-width: 1px;
+  }
+  body.mobile-touch.char-bags-paired #bags {
+    left: calc(var(--app-vw) / var(--ui-scale, 1) / 2);
+    right: max(10px, env(safe-area-inset-right));
+    overflow: hidden;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left: 0;
+  }
+  /* The six category chips wrap to two rows at half-viewport width and eat the grid,
+     so keep them one horizontally scrollable row inside the cluster (the bank pairing
+     does the same); nothing is hidden and every chip keeps its full tap height. */
+  body.mobile-touch.char-bags-paired #bags .bag-chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  body.mobile-touch.char-bags-paired #bags .bag-chip {
+    flex: 0 0 auto;
   }
   /* Keep the character sheet in one vertical flow on touch. Vertical scrolling is
      acceptable here, while CSS multi-column can create off-screen columns in short
@@ -4446,5 +4499,89 @@
      so re-point the low tier at the non-crit mobile rise here too. */
   :root[data-fx-level="low"] body.mobile-touch .fct.crit {
     animation-name: fct-rise-mobile;
+  }
+  @keyframes fct-xp-pop-mobile {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+      scale: 1;
+    }
+    15% {
+      scale: 1.2;
+    }
+    100% {
+      opacity: 0;
+      translate: -50% calc(-50% - 56px);
+      scale: 1;
+    }
+  }
+  /* Same treatment as .fct.crit above: the mobile .fct-xp/.fct-rested-xp selectors
+     are more specific than the desktop hud.css ones (body.mobile-touch adds a
+     selector), so they must be re-declared here or the desktop pop/size is lost
+     on touch. */
+  body.mobile-touch .fct-xp,
+  body.mobile-touch .fct-rested-xp {
+    font-size: calc(17px * var(--fct-scale, 1));
+    animation-name: fct-xp-pop-mobile;
+  }
+  :root[data-fx-level="low"] body.mobile-touch .fct-xp,
+  :root[data-fx-level="low"] body.mobile-touch .fct-rested-xp {
+    animation-name: fct-rise-mobile;
+  }
+
+  /* ---------- Dungeon Finder (mobile) ---------- */
+  /* One navigable pane: the catalogue rail and the detail never compete for
+     width; the painter's df-pane-* class picks which one shows, and the Back
+     button (hidden on desktop) returns to the list.
+     No `display` on the root here: the closed state (components.css) and the
+     painter's inline `flex` on open own it; a layer rule that forced `block`
+     would both re-show the closed window at boot and defeat the flex-column
+     bounds while open. */
+  body.mobile-touch #dungeon-finder-window {
+    max-height: calc(100% - 20px);
+  }
+  body.mobile-touch #dungeon-finder-window .df-body {
+    overflow: visible;
+    min-height: auto;
+  }
+  body.mobile-touch #dungeon-finder-window .df-body-catalogue {
+    display: block;
+  }
+  body.mobile-touch #dungeon-finder-window .df-cols {
+    display: block;
+  }
+  body.mobile-touch #dungeon-finder-window .df-rail,
+  body.mobile-touch #dungeon-finder-window .df-detail {
+    max-height: none;
+    overflow: visible;
+  }
+  body.mobile-touch #dungeon-finder-window .df-pane-list .df-detail {
+    display: none;
+  }
+  body.mobile-touch #dungeon-finder-window .df-pane-detail .df-rail {
+    display: none;
+  }
+  body.mobile-touch #dungeon-finder-window .df-back {
+    display: inline-block;
+  }
+  /* Bottom action bar: the primary queue action stays reachable by thumb. */
+  body.mobile-touch #dungeon-finder-window .df-footer {
+    position: sticky;
+    bottom: 0;
+    background: var(--panel-bg, #17120a);
+    padding: 4px 0;
+  }
+  /* 40x40 touch floor for every tappable finder control. */
+  body.mobile-touch #dungeon-finder-window .df-tab,
+  body.mobile-touch #dungeon-finder-window .df-row,
+  body.mobile-touch #dungeon-finder-window .df-role,
+  body.mobile-touch #dungeon-finder-window .df-opt,
+  body.mobile-touch #dungeon-finder-window .df-tag,
+  body.mobile-touch #dungeon-finder-window .df-map-btn,
+  body.mobile-touch #dungeon-finder-window .btn,
+  body.mobile-touch #dungeon-finder-window select,
+  body.mobile-touch #dfinder-proposal-popup .btn {
+    min-height: 40px;
+    box-sizing: border-box;
   }
 }

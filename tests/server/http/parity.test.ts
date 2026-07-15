@@ -450,6 +450,39 @@ describe('/api dispatch parity (legacy flag vs new flag)', () => {
     expect(JSON.parse(newCap.body as string).steam).toEqual({ enabled: true });
   });
 
+  it('the /api/status players_cap AGREES on both arms and clamps a negative cap to 0', async () => {
+    // players_cap is served by BOTH arms through the same canonicalPlayersCap
+    // (the legacy handleApi twin inline, the migrated statusHandler via the
+    // injected leaderboard runtime), but /api/status is a known-deviation path
+    // (the name-list trim), so the corpus filter masks the WHOLE route: a
+    // players_cap drift between the arms would pass the corpus silently. This is
+    // the dedicated cross-arm agreement pin, in the steam-advert test's shape.
+    // The config is memoized at first read, so each scenario drops the cache
+    // before capturing and restores it after (later tests re-memoize the
+    // harness default). The negative scenario also exercises the
+    // canonicalPlayersCap Math.max(0, ...) clamp, asserted nowhere else: a
+    // negative configured cap must advertise 0 (cap disabled), never a negative.
+    const main = (await import('../../../server/main')) as MainModule;
+    const capsUnder = async (value: string) => {
+      main.resetActiveConfigForTests();
+      try {
+        const { oldCap, newCap } = await captureWithEnv({ MAX_PLAYERS_PER_REALM: value }, () =>
+          makeReq({ method: 'GET', url: '/api/status' }),
+        );
+        expect(oldCap.status).toBe(200);
+        expect(newCap.status).toBe(200);
+        return {
+          legacy: JSON.parse(oldCap.body as string).players_cap,
+          migrated: JSON.parse(newCap.body as string).players_cap,
+        };
+      } finally {
+        main.resetActiveConfigForTests();
+      }
+    };
+    expect(await capsUnder('250')).toEqual({ legacy: 250, migrated: 250 });
+    expect(await capsUnder('-5')).toEqual({ legacy: 0, migrated: 0 });
+  });
+
   it('the Steam link surface 404s on the legacy ladder but is served on the new arm', async () => {
     // /api/steam/status is a registry-only RouteDef. Under legacy dispatch the ladder
     // has no such arm, so it falls through to 404; under new dispatch the router

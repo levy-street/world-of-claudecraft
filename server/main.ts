@@ -176,7 +176,13 @@ import {
 } from './http/dispatch';
 import { type GameStateSource, registerGameStateMetrics } from './http/game_metrics';
 import { setGameMetricsCounters } from './http/game_signals';
-import { handleLivez, handleMetricsGate, handleReadyz, markDraining } from './http/health';
+import {
+  handleLivez,
+  handleMetricsGate,
+  handleReadyz,
+  markDraining,
+  registerLivenessSource,
+} from './http/health';
 import { type Logger, logger } from './http/logger';
 import { createHttpMetrics } from './http/metrics';
 import { teeMetricSink } from './http/middleware/metric_sink';
@@ -298,6 +304,15 @@ export function resetActiveConfigForTests(): void {
     throw new Error('resetActiveConfigForTests must not be called in production');
   }
   activeConfigCache = null;
+}
+
+// The realm player cap advertised on /api/status, canonicalized for the wire: a
+// configured 0 or negative (the cap disabled) is normalized to 0 so the field is
+// always a non-negative count. Both /api/status arms (the legacy handleApi twin
+// below and the migrated statusHandler via the injected leaderboard runtime) read
+// it here, so the players_cap field stays byte-identical across the two arms.
+function canonicalPlayersCap(): number {
+  return Math.max(0, activeConfig().maxPlayersPerRealm);
 }
 
 const STATIC_DIR = path.join(__dirname, '..', 'dist');
@@ -1632,6 +1647,10 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         ok: true,
         realm: REALM,
         players_online: liveGame().clients.size,
+        // The configured realm player cap so the client realm list can display
+        // honestly; 0 means the cap is disabled. Dual-arm edit: the migrated
+        // statusHandler (server/leaderboard.ts) carries the same players_cap field.
+        players_cap: canonicalPlayersCap(),
         names: [...liveGame().clients.values()].map((s) => s.name),
         steam: { enabled: false },
       });
@@ -2175,6 +2194,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
 // `routes` array registry.ts already spread in can serve.
 configureLeaderboardRuntime({
   playersOnline: () => liveGame().clients.size,
+  playersCap: canonicalPlayersCap,
   perfProfile: () => liveGame().perfProfile(),
   getLeaderboard,
   getGuildLeaderboard,
@@ -2703,6 +2723,7 @@ export async function startServer(): Promise<http.Server> {
     bufferHandshakeMessages,
     requestMetadata,
     maxWsPerIpHard: config.maxWsPerIpHard,
+    maxPlayersPerRealm: config.maxPlayersPerRealm,
     acquireCharacterLease,
     releaseCharacterLease,
     bankBonusForAccount: async (id) => computeBankBonus(await bankBonusFactsForAccount(id)),
@@ -2721,8 +2742,15 @@ export async function startServer(): Promise<http.Server> {
     simEntities: () => game.sim.entities.size,
     simTickHz: () => game.simTickHz(),
     tickPhaseMillis: () => game.tickPhaseMillis(),
+    lastTickAt: () => game.lastTickAt(),
+    loopStartedAt: () => game.loopStartedAt(),
   };
   setGameMetricsCounters(registerGameStateMetrics(httpMetrics.registry, gameStateSource));
+  // Hand the same live source to /livez, so a wedged loop answers 503 from outside
+  // the process. Registered HERE rather than read from the route arm: the /livez arm
+  // must never touch liveGame() (a health probe constructing a GameServer is the bug
+  // tests/server/game_boot_order.test.ts pins against).
+  registerLivenessSource(gameStateSource);
 
   // Business gauges run one bounded, timeout-protected fact query every 15 minutes.
   // Scrapes publish only the cached snapshot and never query Postgres. Client FPS

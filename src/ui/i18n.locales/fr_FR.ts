@@ -5,9 +5,8 @@
 // translate that key. The build (scripts/i18n_build.mjs) unflattens this map and
 // overlays it onto nested `en` to produce the dense resolved table; any key here
 // must be a real `en` leaf path: keys are typed `Partial<Record<TranslationKey,
-// string>>` so tsc rejects a structurally-wrong key, plus
-// tests/i18n_overlay_key_membership.test.ts catches a typo'd entity id the
-// template-literal key type cannot. Overlays are SPARSE: an
+// string>>` against the build-generated flat key union, so tsc rejects any key
+// that is not an exact `en` leaf path, typo'd entity ids included. Overlays are SPARSE: an
 // untranslated key is omitted and the build fills it from English, then the
 // registry (src/ui/i18n.status.json) marks it `pending`.
 
@@ -668,6 +667,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.choirmothers_casque.name': 'Casque de la Mère du Choeur',
   'entities.items.cryptplate_helm.name': 'Heaume de plaques sépulcrales',
   'entities.items.deathless_greatblade.name': 'Grande lame immortelle',
+  'entities.items.deathless_warguard_legmail.name': 'Cotte de jambes de la garde immortelle',
   'entities.items.gravescale_girdle.name': "Ceinturon d'écailles sépulcrales",
   'entities.items.gravewyrm_claws.name': 'Griffes du Gravewyrm',
   'entities.items.gravewyrm_cleaver.name': 'Fendoir du Gravewyrm',
@@ -683,10 +683,13 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.sanctum_prowlers_grips.name': 'Poignes du Rôdeur du Sanctuaire',
   'entities.items.sash_of_the_sunken_court.name': 'Écharpe de la Cour engloutie',
   'entities.items.scepter_of_the_deathless_court.name': 'Sceptre de la Cour immortelle',
+  'entities.items.scourgehide_carapace.name': 'Carapace en peau de Fléau',
   'entities.items.seal_of_the_nine_oaths.name': 'Sceau des Neuf Serments',
   'entities.items.shadowpulse_handwraps.name': "Bandes de mains d'Ombre pulsante",
   'entities.items.shadowpulse_slippers.name': "Chaussons d'Ombre pulsante",
   'entities.items.shroud_of_the_gravewyrm.name': 'Suaire du Gravewyrm',
+  'entities.items.soulforged_warplate.name': 'Harnois de guerre forgé dans les âmes',
+  'entities.items.soulrend_diadem.name': 'Diadème Déchire-âme',
   'entities.items.stormcallers_focus.name': "Focalisateur de l'Invocateur de tempêtes",
   'entities.items.sunken_court_mantle.name': 'Mantelet de la Cour engloutie',
   'entities.items.sutils_gambit.name': 'Gambit de Sutil',

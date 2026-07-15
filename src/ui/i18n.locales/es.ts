@@ -5,9 +5,8 @@
 // translate that key. The build (scripts/i18n_build.mjs) unflattens this map and
 // overlays it onto nested `en` to produce the dense resolved table; any key here
 // must be a real `en` leaf path: keys are typed `Partial<Record<TranslationKey,
-// string>>` so tsc rejects a structurally-wrong key, plus
-// tests/i18n_overlay_key_membership.test.ts catches a typo'd entity id the
-// template-literal key type cannot. Overlays are SPARSE: an
+// string>>` against the build-generated flat key union, so tsc rejects any key
+// that is not an exact `en` leaf path, typo'd entity ids included. Overlays are SPARSE: an
 // untranslated key is omitted and the build fills it from English, then the
 // registry (src/ui/i18n.status.json) marks it `pending`.
 
@@ -311,6 +310,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.choirmothers_casque.name': 'Casco de la Madre del Coro',
   'entities.items.cryptplate_helm.name': 'Yelmo Placacripta',
   'entities.items.deathless_greatblade.name': 'Mandoble Imperecedero',
+  'entities.items.deathless_warguard_legmail.name': 'Malla de piernas del Guardián Imperecedero',
   'entities.items.gravescale_girdle.name': 'Ceñidor de Escamas Sepulcrales',
   'entities.items.gravewyrm_claws.name': 'Garras del Gravewyrm',
   'entities.items.gravewyrm_cleaver.name': 'Hendedor del Gravewyrm',
@@ -326,10 +326,13 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.sanctum_prowlers_grips.name': 'Empuñaduras del Merodeador del Santuario',
   'entities.items.sash_of_the_sunken_court.name': 'Faja de la Corte Sumergida',
   'entities.items.scepter_of_the_deathless_court.name': 'Cetro de la Corte Imperecedera',
+  'entities.items.scourgehide_carapace.name': 'Caparazón de piel de Azote',
   'entities.items.seal_of_the_nine_oaths.name': 'Sello de los Nueve Juramentos',
   'entities.items.shadowpulse_handwraps.name': 'Vendas Pulso de Sombra',
   'entities.items.shadowpulse_slippers.name': 'Escarpines Pulso de Sombra',
   'entities.items.shroud_of_the_gravewyrm.name': 'Sudario del Gravewyrm',
+  'entities.items.soulforged_warplate.name': 'Coraza de guerra forjada en almas',
+  'entities.items.soulrend_diadem.name': 'Diadema Desgarralmas',
   'entities.items.stormcallers_focus.name': 'Foco del Invocador de Tormentas',
   'entities.items.sunken_court_mantle.name': 'Manto de la Corte Sumergida',
   'entities.items.sutils_gambit.name': 'Gambito de Sutil',

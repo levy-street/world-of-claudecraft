@@ -5,9 +5,8 @@
 // translate that key. The build (scripts/i18n_build.mjs) unflattens this map and
 // overlays it onto nested `en` to produce the dense resolved table; any key here
 // must be a real `en` leaf path: keys are typed `Partial<Record<TranslationKey,
-// string>>` so tsc rejects a structurally-wrong key, plus
-// tests/i18n_overlay_key_membership.test.ts catches a typo'd entity id the
-// template-literal key type cannot. Overlays are SPARSE: an
+// string>>` against the build-generated flat key union, so tsc rejects any key
+// that is not an exact `en` leaf path, typo'd entity ids included. Overlays are SPARSE: an
 // untranslated key is omitted and the build fills it from English, then the
 // registry (src/ui/i18n.status.json) marks it `pending`.
 
@@ -310,6 +309,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.choirmothers_casque.name': 'Helm der Chormutter',
   'entities.items.cryptplate_helm.name': 'Gruftplatten-Helm',
   'entities.items.deathless_greatblade.name': 'Todlose Großklinge',
+  'entities.items.deathless_warguard_legmail.name': 'Todlose Beinkette der Kriegswache',
   'entities.items.gravescale_girdle.name': 'Grabschuppen-Gürtel',
   'entities.items.gravewyrm_claws.name': 'Grabwyrm-Klauen',
   'entities.items.gravewyrm_cleaver.name': 'Grabwyrm-Spalter',
@@ -325,10 +325,13 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.sanctum_prowlers_grips.name': 'Griffe des Sanktum-Pirschers',
   'entities.items.sash_of_the_sunken_court.name': 'Schärpe des Versunkenen Hofes',
   'entities.items.scepter_of_the_deathless_court.name': 'Zepter des Todlosen Hofes',
+  'entities.items.scourgehide_carapace.name': 'Geißelhaut-Panzer',
   'entities.items.seal_of_the_nine_oaths.name': 'Siegel der Neun Eide',
   'entities.items.shadowpulse_handwraps.name': 'Schattenpuls-Handwickel',
   'entities.items.shadowpulse_slippers.name': 'Schattenpuls-Schuhe',
   'entities.items.shroud_of_the_gravewyrm.name': 'Leichentuch des Grabwyrms',
+  'entities.items.soulforged_warplate.name': 'Seelengeschmiedete Kriegsplatte',
+  'entities.items.soulrend_diadem.name': 'Seelenriss-Diadem',
   'entities.items.stormcallers_focus.name': 'Fokus des Sturmrufers',
   'entities.items.sunken_court_mantle.name': 'Umhang des Versunkenen Hofes',
   'entities.items.sutils_gambit.name': 'Sutils Gambit',

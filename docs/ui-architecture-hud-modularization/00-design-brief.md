@@ -75,7 +75,7 @@ The conclusion: small, independently verifiable, low-conflict modules matter **m
 
 ### 3.3 i18n safety net (the most mature subsystem; do not weaken it)
 
-- `t()` is the sole runtime render sink. Keys are typed `TranslationKey = Leaves<typeof en, 6>`, so `tsc` rejects invalid keys.
+- `t()` is the sole runtime render sink. Keys are typed `TranslationKey = Leaves<typeof en, 6>`, so `tsc` rejects invalid keys. (2026-07-14: TranslationKey is now the build-generated flat union `src/ui/i18n.catalog/translation_keys.generated.ts` per toolchain-modernization decision D2; the tsc-rejects-invalid-keys guarantee is unchanged and strictly stronger.)
 - The dense resolved table `src/ui/i18n.resolved.generated.ts` types every locale `: typeof en` (`EnTranslations`), so a missing or renamed key red-fails `tsc`.
 - Source-agnostic layers stay English (`src/sim/`, `server/`) and are re-localized at the client boundary via the matchers plus `sim_i18n.ts` and `server_i18n.ts` mirrors.
 - Registry `src/ui/i18n.status.json` (currently 0 pending, 46 blocked cognates). Two-tier CI: PR-tier permits English-only; release-tier (`I18N_RELEASE_TIER=1`) hard-fails on any pending key.

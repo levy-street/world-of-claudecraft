@@ -188,6 +188,7 @@ export function armDeathThroes(ctx: SimContext, dead: Entity): void {
     text: `${dead.name} begins to swell — get clear!`,
     color: '#9acd32',
     entityId: dead.id,
+    telegraph: true,
   });
 }
 

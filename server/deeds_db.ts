@@ -7,7 +7,12 @@
 // retro re-emits and crash-replays collapse into no-ops, and nothing here can
 // grant, deny, or mutate a deed in gameplay terms.
 
-import { ELIGIBLE_ACCOUNT_SQL, pool } from './db';
+import {
+  DB_HEAVY_STATEMENT_TIMEOUT_MS,
+  ELIGIBLE_ACCOUNT_SQL,
+  pool,
+  runWithStatementTimeout,
+} from './db';
 
 /** One earned-deed record. realm is passed explicitly on every insert (the
  *  table carries no DEFAULT; the interpolated-default pattern is
@@ -66,6 +71,15 @@ export interface DeedRarityAggregate {
 export const DEED_RARITY_MIN_LEVEL = 5;
 
 export async function deedRarityCounts(): Promise<DeedRarityAggregate> {
+  // Two full-table aggregate scans over character_deeds / characters, so run both
+  // in ONE raised-timeout transaction: a large table can legitimately exceed the
+  // default statement timeout. The shared transaction raises the allowance once
+  // and reuses one client; it does NOT give the two scans a single snapshot
+  // (READ COMMITTED, see the runWithStatementTimeout header), so an earn
+  // committing between them can skew a percentage by one refresh cycle. The
+  // shared eligibility predicate below is what keeps the pair mutually
+  // consistent; the read is TTL-cached and cosmetic, so one-cycle skew is fine.
+  //
   // Numerator and denominator share ONE eligibility predicate on TWO axes so
   // they stay mutually consistent: (1) the level floor plus state IS NOT NULL,
   // because counting every earner while the denominator holds only level-floor
@@ -75,25 +89,27 @@ export async function deedRarityCounts(): Promise<DeedRarityAggregate> {
   // every public board read does (db.ts), so a banned or suspended account
   // leaves the numerator and the denominator together and can never inflate a
   // deed's percentage past the eligible population it is measured against.
-  const counts = await pool.query(
-    `SELECT cd.deed_id, COUNT(*)::int AS earned
+  return runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, async (query) => {
+    const counts = await query(
+      `SELECT cd.deed_id, COUNT(*)::int AS earned
        FROM character_deeds cd
        JOIN characters c ON c.id = cd.character_id
        JOIN accounts a ON a.id = cd.account_id
       WHERE c.level >= $1 AND c.state IS NOT NULL AND ${ELIGIBLE_ACCOUNT_SQL}
       GROUP BY cd.deed_id`,
-    [DEED_RARITY_MIN_LEVEL],
-  );
-  const eligible = await pool.query(
-    `SELECT COUNT(*)::int AS eligible
+      [DEED_RARITY_MIN_LEVEL],
+    );
+    const eligible = await query(
+      `SELECT COUNT(*)::int AS eligible
        FROM characters c
        JOIN accounts a ON a.id = c.account_id
       WHERE c.level >= $1 AND c.state IS NOT NULL AND ${ELIGIBLE_ACCOUNT_SQL}`,
-    [DEED_RARITY_MIN_LEVEL],
-  );
-  const earned: Record<string, number> = {};
-  for (const row of counts.rows) earned[row.deed_id] = row.earned;
-  return { totalEligible: eligible.rows[0]?.eligible ?? 0, earned };
+      [DEED_RARITY_MIN_LEVEL],
+    );
+    const earned: Record<string, number> = {};
+    for (const row of counts.rows) earned[row.deed_id] = row.earned;
+    return { totalEligible: eligible.rows[0]?.eligible ?? 0, earned };
+  });
 }
 
 /** One row of the sheet's recent-deeds strip (earnedAt as an ISO string). */

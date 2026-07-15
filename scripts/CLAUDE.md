@@ -42,7 +42,7 @@ imported by a type-checked Vitest suite carries a hand-written `.d.mts` next to 
 | Perf / profiling | `profile.mjs` (scenario CLI, see its `SCENARIOS` map) over `scripts/profiler/` (own CLAUDE.md); `perf_tour.mjs` (`perf:tour`), `prewarm_travel_bench.mjs` (`perf:prewarm`), `server_load_jitter.mjs` (`perf:load`), `feel_smoke.mjs` (`feel:smoke`), `asset_budget.mjs` (`asset:budget`) | dev (some + server) |
 | Screenshot tours | `visual_tour.mjs`, `arena_visual.mjs`, `market_visual.mjs`, `social_visual.mjs`, `tour_expansion.mjs` | dev (some + server) |
 | SEO / homepage / i18n | `homepage_verify.mjs`, `seo_audit.mjs`, `localization_e2e.mjs` (locale-matrix homepage E2E) | dev (+ server) |
-| i18n pipeline | `i18n_build.mjs`+`i18n_admin_build.mjs` (resolved tables), `i18n_scan.mjs` (status registry), `i18n_resolved_hash.mjs` (game-table SHA gate); seed `i18n_blocked_seed.mjs` owns `V07_SLASH`/`COPIED_ALLOW_IDS`; `i18n_pseudo.mjs` (en_XA dev pseudo-locale), `i18n_modulepreload.mjs` (lazy-locale boot modulepreload); `i18n_fill_worklist.mjs` (`i18n:worklist`, emits the gitignored `docs/i18n-scaling/worklist/` for the maintainer release fill) | `i18n:gen`; SHA via `i18n:hash` |
+| i18n pipeline | `i18n_build.mjs`+`i18n_admin_build.mjs` (resolved tables), `i18n_scan.mjs` (status registry), `i18n_resolved_hash.mjs` (`i18n:hash`, print-only diagnostic: prints locales/bytes/sha256 for ad-hoc byte-equivalence comparison; no committed baseline, the committed line-item locale slices plus the CI freshness diff and the determinism tests enforce equivalence), `i18n_coverage_summary.mjs` (CI step, posts the coverage counts to the GitHub job summary); seed `i18n_blocked_seed.mjs` owns `V07_SLASH`/`COPIED_ALLOW_IDS`; `i18n_pseudo.mjs` (en_XA dev pseudo-locale), `i18n_modulepreload.mjs` (lazy-locale boot modulepreload); `i18n_fill_worklist.mjs` (`i18n:worklist`, emits the gitignored `docs/i18n-scaling/worklist/` for the maintainer release fill) | `i18n:gen` |
 | Scaffold / release | `new_endpoint.mjs` (`new:endpoint`, scaffolds a `RouteDef` module on the `server/http/` pipeline, see `server/http/CLAUDE.md`), `release_version.mjs` (`release:check`/`release:prepare`), `version_sync.mjs` (`version:sync`), `electron-dev.mjs`/`electron-build.mjs` (`electron:*`; both bundle vendor deps via `electron-vendor.mjs`) | none |
 | Data export | `export_loot_spreadsheet.mjs` (esbuild-bundles `src/sim` to a loot sheet in `docs/`) | none |
 | Admin / dev utils | `grant_admin.mjs`, `create_gm.mjs`; one-off DB migrations are `.ts` via `tsx` (`db:*` scripts) | `DATABASE_URL` |
@@ -79,6 +79,7 @@ imported by a type-checked Vitest suite carries a hand-written `.d.mts` next to 
   (`ws`, `pg`, `puppeteer-core`). Most never touch `src/`. Scripts that need sim or i18n
   data bundle the TS with `esbuild` themselves (e.g. `export_loot_spreadsheet.mjs` and the
   `i18n_*` builders); follow that pattern and never `import` the TS sources raw.
-- Don't hand-edit the generated i18n artifacts: regenerate with `npm run i18n:gen`; after
-  a real translation-content change re-baseline the SHA with `npm run i18n:hash -- --write`
+- Don't hand-edit the generated i18n artifacts: regenerate with `npm run i18n:gen` and
+  commit the regenerated line-item slices; there is no SHA baseline to update, the
+  committed slices plus the CI freshness diff carry the byte-equivalence signal
   (canonical model: `src/ui/CLAUDE.md`).

@@ -103,7 +103,7 @@ class Sfx {
   private loading = new Map<string, Promise<AudioBuffer | null>>();
   private failedLoads = new Set<string>();
   private pendingOneShots = new Set<string>();
-  private variantCursor = new Map<string, number>();
+  private lastVariant = new Map<string, number>(); // last played index per key (no-repeat-biased random)
   private pendingLoops = new Map<string, PendingLoop>();
   private pendingLoopLoads = new Map<string, string>();
   private pendingLoopVariants = new Map<string, number>();
@@ -171,19 +171,39 @@ class Sfx {
     return this.entry(key)?.playbackRate ?? 1;
   }
 
+  // Weighted so the immediately previous variant is heavily deprioritized, not
+  // outright excluded. A hard exclusion on a 2-take pool degenerates into rigid
+  // A-B-A-B alternation, which reads as just as metronomic as the round-robin
+  // it replaces; a low but nonzero weight keeps a small pool sounding genuinely
+  // random while still making an audible back-to-back repeat rare.
+  private static readonly REPEAT_VARIANT_WEIGHT = 0.15;
+
+  /** No-repeat-biased random variant selection. Picks a weighted-random usable
+   *  variant each play; the immediately previous one is downweighted (not
+   *  excluded) so it can still recur occasionally, just rarely, instead of
+   *  double-hitting on a predictable cadence. A variant that failed to load is
+   *  skipped entirely, same as the old round-robin scan. */
   private nextVariantIndex(key: string): number {
     const count = Math.max(1, this.entry(key)?.variants.length ?? 1);
-    const start = (this.variantCursor.get(key) ?? 0) % count;
-    for (let offset = 0; offset < count; offset++) {
-      const index = (start + offset) % count;
-      if (!this.failedLoads.has(assetCacheKey(key, index))) return index;
+    const usable: number[] = [];
+    for (let index = 0; index < count; index++) {
+      if (!this.failedLoads.has(assetCacheKey(key, index))) usable.push(index);
     }
-    return start;
+    if (usable.length === 0) return 0;
+    if (usable.length === 1) return usable[0];
+    const last = this.lastVariant.get(key);
+    const weights = usable.map((index) => (index === last ? Sfx.REPEAT_VARIANT_WEIGHT : 1));
+    const total = weights.reduce((sum, weight) => sum + weight, 0);
+    let roll = Math.random() * total;
+    for (let i = 0; i < usable.length; i++) {
+      roll -= weights[i];
+      if (roll <= 0) return usable[i];
+    }
+    return usable[usable.length - 1];
   }
 
   private commitVariant(key: string, variantIndex: number): void {
-    const count = Math.max(1, this.entry(key)?.variants.length ?? 1);
-    this.variantCursor.set(key, (variantIndex + 1) % count);
+    this.lastVariant.set(key, variantIndex);
   }
 
   private loadBuffer(key: string, variantIndex = 0): Promise<AudioBuffer | null> {

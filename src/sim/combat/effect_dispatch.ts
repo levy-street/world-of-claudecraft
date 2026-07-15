@@ -45,7 +45,10 @@ function isStealthToggle(ability: AbilityDef): boolean {
 }
 
 function preservesStealth(ability: AbilityDef): boolean {
-  return isStealthToggle(ability) || ability.id === 'sprint';
+  // Sap is the classic no-reveal opener: it incapacitates from range without a
+  // melee swing, so unlike Cheap Shot/Ambush/Garrote it must not blow the
+  // caster's own stealth (issue #1890).
+  return isStealthToggle(ability) || ability.id === 'sprint' || ability.id === 'sap';
 }
 
 function consumeMatchingAura(

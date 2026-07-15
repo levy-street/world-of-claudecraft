@@ -671,7 +671,12 @@ export const ja_JP: EnTranslations = {
       "perSecond": "{value}/秒",
       "perSecondRow": "{total}（{rate}）",
       "minutesSeconds": "{m}分{s}秒",
-      "seconds": "{s}秒"
+      "seconds": "{s}秒",
+      "autoShowHint": "パーティがダメージまたは回復を与えると行が自動的に表示され、戦闘終了の数秒後にこのセグメントは閉じます。"
+    },
+    "petFeed": {
+      "disabledFullHp": "ペットは満タンの体力です",
+      "disabledNoFood": "バッグの中にペットを回復できる食べ物がありません"
     },
     "keybinds": {
       "emoteWheel": "エモートホイール",
@@ -679,6 +684,7 @@ export const ja_JP: EnTranslations = {
       "targetFriendlyNext": "味方ターゲットを順に切り替え",
       "discord": "Discord",
       "valecup": "ヴェイルカップ",
+      "sheathe": "武器を納刀/抜刀",
       "categoryPet": "ペット",
       "petAttack": "ペット：攻撃",
       "petStop": "ペット：停止",
@@ -851,6 +857,7 @@ export const ja_JP: EnTranslations = {
       "aurasOnPlayerFrame": "バフをプレイヤーフレームに表示",
       "highContrastBackground": "高コントラスト背景",
       "startAttackOnAbility": "アビリティ使用時に自動攻撃",
+      "showAttackButton": "攻撃ボタンを表示",
       "walkByAutoloot": "通りがかり自動ルート",
       "groundReticle": "地面ターゲットのレティクル",
       "showItemLevel": "アイテムレベルを表示",
@@ -1063,6 +1070,12 @@ export const ja_JP: EnTranslations = {
         "many": "あなたは{rank}、{count}人のメンバー",
         "other": "あなたは{rank}、{count}人のメンバー"
       },
+      "finderPartySize": {
+        "one": "{count} 人",
+        "few": "{count} 人",
+        "many": "{count} 人",
+        "other": "{count} 人"
+      },
       "characterCount": {
         "one": "{count}キャラクター",
         "few": "{count}キャラクター",
@@ -1272,7 +1285,10 @@ export const ja_JP: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "このアイテムは破壊できません。",
-      "rightClickDestroy": "Shift+右クリックで破壊",
+      "rightClickDestroy": "右クリックで破壊",
+      "dragEquipHint": "キャラクターにドラッグして装備",
+      "dragDestroyHint": "世界へドラッグして破壊",
+      "reorderNeedsRecent": "絞り込みを解除し並び順を「最近」にすると持ち物を並べ替えられます",
       "filterGroupAria": "バッグをカテゴリーで絞り込む",
       "filterAll": "すべて",
       "filterWeapon": "武器",
@@ -1521,8 +1537,13 @@ export const ja_JP: EnTranslations = {
         "admin": "管理者",
         "coredevs": "コア開発者",
         "devs": "開発者",
+        "seniormods": "シニアモデレーター",
         "mods": "モデレーター",
-        "artists": "アーティスト"
+        "juniormods": "ジュニアモデレーター",
+        "artists": "アーティスト",
+        "contentcreator": "コンテンツクリエイター",
+        "legend": "LEGEND",
+        "shill": "SHILL"
       },
       "guildMember": "認証済みメンバー",
       "notMember": "まだサーバーに参加していません",
@@ -1789,7 +1810,8 @@ export const ja_JP: EnTranslations = {
       "title": "採集",
       "mining": "採掘",
       "logging": "伐採",
-      "herbalism": "薬草学"
+      "herbalism": "薬草学",
+      "notReady": "この資源ノードはまだあなたのために再生していません。"
     },
     "archetypeTitle": {
       "label": "称号",
@@ -1821,6 +1843,107 @@ export const ja_JP: EnTranslations = {
       "notAtHub": "それを製作するには、必要なレベルで製作拠点にいる必要があります。",
       "throttled": "製作が速すぎます。少し待ってからもう一度お試しください。",
       "recipeNotLearned": "そのレシピはまだ習得していません。"
+    },
+    "finder": {
+      "title": "ダンジョンファインダー",
+      "close": "閉じる",
+      "back": "戻る",
+      "syncing": "レルムに接続中...",
+      "tabCatalogue": "カタログ",
+      "tabQueue": "クイックマッチ",
+      "tabBoard": "募集掲示板",
+      "normal": "ノーマル",
+      "heroic": "ヒロイック",
+      "kindDungeon": "ダンジョン",
+      "kindRaid": "レイド",
+      "kindSolo": "ソロ攻略",
+      "levels": "レベル {min} ～ {max}",
+      "levelOne": "レベル {level}",
+      "clock": "{minutes}:{seconds}",
+      "roleCount": "{count} {role}",
+      "roleTank": "タンク",
+      "roleHealer": "ヒーラー",
+      "roleDps": "ダメージ",
+      "freeRoles": "ロール自由",
+      "lockoutDaily": "最終ボスにデイリーロックアウト",
+      "lockoutNone": "ロックアウトなし",
+      "lockedFor": "約 {minutes} 分ロック中",
+      "attunement": "前提クエストが必要：{quest}",
+      "heroicMarks": "ヒロイックの証：1 人 {count} 個",
+      "entrance": "入口：{zone}",
+      "showOnMap": "マップに表示",
+      "encounters": "ボス戦",
+      "finalBoss": "最終ボス",
+      "summoned": "召喚される守護者",
+      "lootGuaranteed": "以下のいずれかが必ずドロップ：",
+      "lootMaybe": "以下のうち最大 1 つがドロップ：",
+      "lootChance": "追加の低確率ドロップ：",
+      "lootHeroic": "ヒロイック報酬、以下のいずれかが必ずドロップ：",
+      "pct": "{pct}%",
+      "blockedLevel": "レベル {min} ～ {max} 限定",
+      "blockedSpec": "特性の選択が必要",
+      "yourRoles": "あなたのロール",
+      "needsSpec": "ダンジョンファインダーを使うには特性を選択してください。",
+      "leaderNote": "キューに入れられるのはパーティリーダーだけです。",
+      "chooseActivities": "コンテンツを選択",
+      "joinQueue": "キューに参加",
+      "leaveQueue": "キューを離脱",
+      "waited": "待機時間：{time}",
+      "cooldownNote": "あと {seconds} 秒で再びキューに入れます。",
+      "travelNote": "パーティはその場で結成されます。全員で入口まで移動してください。テレポートはしません。",
+      "proposalTitle": "グループ成立：{name}",
+      "proposalRole": "あなたのロール：{role}",
+      "accepted": "{accepted}/{size} 人が承認",
+      "remaining": "残り {seconds} 秒",
+      "accept": "承認",
+      "decline": "辞退",
+      "acceptedWait": "他のメンバーを待っています...",
+      "slotState": "{role}：{total} 人中 {accepted} 人が準備完了",
+      "openListings": "公開中の募集",
+      "boardEmpty": "現在募集はありません。作成してみましょう！",
+      "boardLeaderGate": "募集を出せるのはパーティリーダーだけです。",
+      "publishListing": "募集を作成",
+      "activity": "コンテンツ",
+      "publish": "掲載",
+      "yourListing": "あなたの募集",
+      "closeListing": "募集を終了",
+      "applicants": "応募者",
+      "noApplicants": "まだ応募者はいません。",
+      "acceptApplicantAria": "{name} を承認",
+      "declineApplicantAria": "{name} を辞退",
+      "levelClass": "Lv {level} {className}",
+      "leader": "リーダー：{name}",
+      "needs": "募集中：{roles}",
+      "slots": "{size}/{capacity}",
+      "apply": "応募",
+      "withdraw": "応募を取り下げる",
+      "tagFirstRun": "初見",
+      "tagQuestRun": "クエスト消化",
+      "tagFullClear": "フルクリア",
+      "tagLearning": "初心者歓迎",
+      "tagFastRun": "高速周回",
+      "mech": {
+        "shadow_pulse": "シャドウパルス（周期的な範囲ダメージ）",
+        "reaping_arc": "リーピングアーク（前方クリーブ）",
+        "mist_surge": "ミストサージ（周期的な範囲ダメージ）",
+        "summons_adds": "増援を召喚",
+        "lunar_tide": "ルナタイド（周期的な範囲ダメージ）",
+        "enrage": "低体力で激怒",
+        "shuddering_stomp": "身震いの踏みつけ（範囲スタン）",
+        "necrotic_shockwave": "ネクロティック衝撃波（大範囲ダメージ）",
+        "grave_cleaver": "グレイブクリーバー（前方クリーブ）",
+        "shadow_nova": "シャドウノヴァ（範囲バースト）",
+        "profane_mending": "冒涜の治癒（味方を回復）",
+        "mana_burn": "枯れた祝福（マナバーン）",
+        "deathstalker_cleave": "デスストーカークリーブ（前方クリーブ）",
+        "mortal_wound": "忘れられた傷（被回復量低下）",
+        "sealbreak_shockwave": "封印破りの衝撃波（範囲バースト）",
+        "gravebreaker": "グレイブブレイカー（前方扇形、レイドに向けない）",
+        "raise_fallen": "死者蘇生（周期的な増援ウェーブ）",
+        "soul_rend": "ソウルレンド（対象は散開して回復を受ける）",
+        "deathless_rage": "不死の憤怒（ウォードストーンで妨害）",
+        "wardstones": "ウォードストーンの詠唱（フェーズ移行）"
+      }
     },
     "deeds": {
       "title": "功績の書",
@@ -4473,6 +4596,8 @@ export const ja_JP: EnTranslations = {
     "connectionLost": "サーバーとの接続が切断されました。",
     "reconnecting": "サーバーとの接続が切断されました。再接続しています...",
     "connectionRejected": "サーバーが接続を閉じました。",
+    "realmFull": "このワールドは現在満員です。数分後にもう一度お試しください。",
+    "tooManyConnections": "お使いのネットワークからこのワールドへの接続が多すぎます。余分なゲームウィンドウを閉じるか、数分後にもう一度お試しください。",
     "tips": {
       "classes": "ヒント：9つのクラスはそれぞれ遊び方が異なります。決める前にいくつか試してみましょう。",
       "talents": "ヒント：非戦闘中ならいつでも特性をリセットできるので、最初の選択が失敗になることはありません。",
@@ -4550,9 +4675,9 @@ export const ja_JP: EnTranslations = {
     "medium": "中",
     "low": "低",
     "popTipLow": "低人口：現在オンラインのプレイヤーは15人未満。余裕があり、新規スタートに最適です。",
-    "popTipMedium": "中人口：現在オンラインのプレイヤーは15〜39人。健全で活発なワールドです。",
-    "popTipHigh": "高人口：現在オンラインのプレイヤーは40〜79人。混雑しており、多くのプレイヤーがいます。",
-    "popTipFull": "満員：現在オンラインのプレイヤーは80人以上。非常に混雑しており、ログイン待ちが発生する場合があります。",
+    "popTipMedium": "中人口：現在オンラインのプレイヤーは15〜79人。健全で活発なワールドです。",
+    "popTipHigh": "高人口：現在オンラインのプレイヤーは80人以上。混雑しており、多くのプレイヤーがいます。",
+    "popTipFull": "満員：このワールドは現在プレイヤー数の上限に達しています。他のプレイヤーがログアウトするまで、新規ログインは拒否されます。",
     "popTipOffline": "オフライン：このワールドは現在接続できず、参加できません。",
     "characterCountOne": "{count}キャラクター",
     "characterCountOther": "{count}キャラクター",
@@ -5239,6 +5364,7 @@ export const ja_JP: EnTranslations = {
     "actionBar": {
       "attackName": "攻撃",
       "attackTooltip": "対象への自動攻撃を切り替えます。敵を右クリックしても攻撃します。",
+      "attackRemoveHint": "右クリックでバーから外し、スロットを空けます。",
       "emptySlot": "空きスロット",
       "slotAria": "アクションスロット {slot}: {ability}",
       "emptySlotAria": "アクションスロット {slot}: 空き",
@@ -7637,6 +7763,15 @@ export const ja_JP: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "不死の宮廷の笏"
       },
+      "deathless_warguard_legmail": {
+        "name": "不死の戦衛レッグメイル"
+      },
+      "soulrend_diadem": {
+        "name": "ソウルレンドの宝冠"
+      },
+      "scourgehide_carapace": {
+        "name": "スカージハイドの甲殻"
+      },
       "cryptplate_helm": {
         "name": "クリプトプレートヘルム"
       },
@@ -7675,6 +7810,9 @@ export const ja_JP: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "不死の大剣"
+      },
+      "soulforged_warplate": {
+        "name": "魂鍛の戦甲"
       },
       "stormcallers_focus": {
         "name": "ストームコーラーの焦点"

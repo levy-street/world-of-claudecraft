@@ -215,7 +215,8 @@ describe('FctPainter: pooled ring over the elided writers', () => {
 
   it('recycles on TTL: a floater past its lifetime is removed and its slot returns to free', () => {
     const painter = makePainter({ cap: 4 });
-    painter.spawn(evt({ kind: 'xp', text: '+10 XP' }), 0);
+    // Use 'heal' (FCT_TTL_MS) rather than 'xp', which now lives longer (FCT_XP_TTL_MS).
+    painter.spawn(evt({ kind: 'heal', text: '+10' }), 0);
     expect(painter.liveCount()).toBe(1);
     painter.step(FCT_TTL_MS - 1); // still alive just before ttl
     expect(painter.liveCount()).toBe(1);
@@ -225,7 +226,7 @@ describe('FctPainter: pooled ring over the elided writers', () => {
     expect(liveNodes()).toHaveLength(0);
     // The freed slot is reused (no new node allocated): the recycled node reappears.
     const before = liveNodes().length;
-    painter.spawn(evt({ kind: 'xp', text: '+20 XP' }), FCT_TTL_MS);
+    painter.spawn(evt({ kind: 'heal', text: '+20' }), FCT_TTL_MS);
     expect(painter.liveCount()).toBe(1);
     expect(liveNodes().length).toBe(before + 1);
   });
@@ -593,8 +594,8 @@ describe('FCT colour tokens: the .fct-<token> hex stays byte-faithful to the old
     'fct-damage-done-ability': '#ffe97a',
     'fct-damage-taken': '#ff5544',
     'fct-heal': '#3ce63c',
-    'fct-xp': '#b974ff',
-    'fct-rested-xp': '#4a9eff',
+    'fct-xp': '#d9a3ff',
+    'fct-rested-xp': '#6db8ff',
     'fct-honor': '#ffd100',
     'fct-self-note': '#ff8c66',
   };

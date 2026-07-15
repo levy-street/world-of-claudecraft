@@ -46,6 +46,7 @@ export interface DailyRewardSpinRow {
 
 export interface DailyRewardPayoutRow {
   day: string;
+  realm: string;
   rank: number;
   accountId: number;
   username: string;
@@ -56,11 +57,43 @@ export interface DailyRewardPayoutRow {
   status: string;
   txSignature: string | null;
   paidAt: string | null;
+  voidReason: string | null;
+  voidedById: string | null;
+  voidedByUsername: string | null;
+  voidedAt: string | null;
 }
 
 export interface DailyRewardInternalPayoutRow extends DailyRewardPayoutRow {
   realm: string;
+  signedTransaction: string | null;
 }
+
+export interface DailyRewardPayoutActor {
+  id: string;
+  username: string;
+}
+
+export type DailyRewardPayoutModerationResult =
+  | { outcome: 'updated'; payout: DailyRewardInternalPayoutRow }
+  | { outcome: 'not_found' }
+  | { outcome: 'invalid_status'; status: string };
+
+export type DailyRewardPayoutClaimResult =
+  | { outcome: 'claimed' | 'existing'; payout: DailyRewardInternalPayoutRow }
+  | { outcome: 'not_found' }
+  | { outcome: 'invalid_status'; status: string };
+
+export interface DailyRewardPayoutAttemptRow {
+  status: 'prepared' | 'paid' | 'failed';
+  operationId: string;
+  txSignature: string;
+  signedTransaction: string | null;
+}
+
+export type DailyRewardPayoutAttemptClaimResult =
+  | { outcome: 'claimed' | 'existing'; attempt: DailyRewardPayoutAttemptRow }
+  | { outcome: 'not_found' }
+  | { outcome: 'invalid_status'; status: string };
 
 export interface DailyRewardWinnerAnnouncement {
   day: string;
@@ -105,7 +138,7 @@ export interface DailyRewardDb {
   ): Promise<boolean>;
   recentPayouts(limit: number): Promise<DailyRewardPayoutRow[]>;
   finalizeDay(day: string, prizePoolUsd: number, splits: readonly number[]): Promise<void>;
-  pendingPayouts(limit: number): Promise<DailyRewardInternalPayoutRow[]>;
+  pendingPayouts(limit: number, day?: string): Promise<DailyRewardInternalPayoutRow[]>;
   unannouncedWinnerDays(limit: number): Promise<DailyRewardWinnerAnnouncement[]>;
   markWinnersAnnounced(day: string): Promise<boolean>;
   markPayout(
@@ -115,6 +148,38 @@ export interface DailyRewardDb {
     txSignature: string | null,
     error: string | null,
   ): Promise<boolean>;
+  claimPayout(
+    day: string,
+    rank: number,
+    txSignature: string,
+    signedTransaction: string | null,
+  ): Promise<DailyRewardPayoutClaimResult>;
+  claimPayoutResend(
+    day: string,
+    rank: number,
+    operationId: string,
+    txSignature: string,
+    signedTransaction: string | null,
+  ): Promise<DailyRewardPayoutAttemptClaimResult>;
+  markPayoutResend(
+    day: string,
+    rank: number,
+    operationId: string,
+    status: 'paid' | 'failed',
+    txSignature: string,
+    error: string | null,
+  ): Promise<boolean>;
+  voidPayout(
+    day: string,
+    rank: number,
+    reason: string,
+    actor: DailyRewardPayoutActor,
+  ): Promise<DailyRewardPayoutModerationResult>;
+  restorePayout(
+    day: string,
+    rank: number,
+    actor: DailyRewardPayoutActor,
+  ): Promise<DailyRewardPayoutModerationResult>;
 }
 
 export interface DailyRewardTaskSeed {
@@ -142,6 +207,7 @@ function recordConfig(value: unknown): Record<string, unknown> {
 function payoutRow(row: Record<string, unknown>): DailyRewardPayoutRow {
   return {
     day: String(row.day),
+    realm: String(row.realm),
     rank: Number(row.rank),
     accountId: Number(row.account_id),
     username: String(row.username),
@@ -151,7 +217,19 @@ function payoutRow(row: Record<string, unknown>): DailyRewardPayoutRow {
     prizeUsd: Number(row.prize_usd),
     status: String(row.status),
     txSignature: optionalString(row.tx_signature),
-    paidAt: optionalString(row.paid_at),
+    paidAt: dateString(row.paid_at),
+    voidReason: optionalString(row.void_reason),
+    voidedById: optionalString(row.voided_by_id),
+    voidedByUsername: optionalString(row.voided_by_username),
+    voidedAt: dateString(row.voided_at),
+  };
+}
+
+function internalPayoutRow(row: Record<string, unknown>): DailyRewardInternalPayoutRow {
+  return {
+    ...payoutRow(row),
+    realm: String(row.realm),
+    signedTransaction: optionalString(row.signed_transaction),
   };
 }
 
@@ -513,14 +591,16 @@ export class PgDailyRewardDb implements DailyRewardDb {
 
   async recentPayouts(limit: number): Promise<DailyRewardPayoutRow[]> {
     const res = await pool.query(
-      `SELECT p.day, p.rank, p.account_id, p.username,
+      `SELECT p.day, p.realm, p.rank, p.account_id, p.username,
               COALESCE(p.wallet_pubkey, wl.pubkey) AS wallet_pubkey, p.points, p.prize_percent,
-              p.prize_usd, p.status, p.tx_signature, p.paid_at
+              p.prize_usd, p.status, p.tx_signature, p.paid_at, p.void_reason,
+              p.voided_by_id, p.voided_by_username, p.voided_at
          FROM daily_reward_payouts p
          LEFT JOIN wallet_links wl ON wl.account_id = p.account_id
+        WHERE p.realm = $1
         ORDER BY p.day DESC, p.rank ASC
-        LIMIT $1`,
-      [Math.max(1, Math.min(100, limit))],
+        LIMIT $2`,
+      [REALM, Math.max(1, Math.min(100, limit))],
     );
     return res.rows.map(payoutRow);
   }
@@ -578,22 +658,29 @@ export class PgDailyRewardDb implements DailyRewardDb {
     }
   }
 
-  async pendingPayouts(limit: number): Promise<DailyRewardInternalPayoutRow[]> {
+  async pendingPayouts(limit: number, day?: string): Promise<DailyRewardInternalPayoutRow[]> {
+    const boundedLimit = Math.max(1, Math.min(100, limit));
+    const dayFilter = day ? 'AND p.day = $2' : '';
+    const limitPlaceholder = day ? '$3' : '$2';
     const res = await pool.query(
       `SELECT p.day, p.realm, p.rank, p.account_id, p.username,
               COALESCE(p.wallet_pubkey, wl.pubkey) AS wallet_pubkey, p.points,
-              p.prize_percent, p.prize_usd, p.status, p.tx_signature, p.paid_at
+              p.prize_percent, p.prize_usd, p.status, p.tx_signature, p.paid_at,
+              p.signed_transaction, p.void_reason, p.voided_by_id,
+              p.voided_by_username, p.voided_at
          FROM daily_reward_payouts p
          LEFT JOIN wallet_links wl ON wl.account_id = p.account_id
-        WHERE p.status IN ('pending', 'failed')
+        WHERE p.realm = $1
+          AND p.status IN ('pending', 'failed', 'processing')
+          ${dayFilter}
           AND EXISTS (SELECT 1 FROM accounts a
                        WHERE a.id = p.account_id AND ${ELIGIBLE_ACCOUNT_SQL})
           AND NOT EXISTS (SELECT 1 FROM daily_reward_excluded_accounts b WHERE b.account_id = p.account_id)
         ORDER BY p.day ASC, p.rank ASC
-        LIMIT $1`,
-      [Math.max(1, Math.min(100, limit))],
+        LIMIT ${limitPlaceholder}`,
+      day ? [REALM, day, boundedLimit] : [REALM, boundedLimit],
     );
-    return res.rows.map((row) => ({ ...payoutRow(row), realm: String(row.realm) }));
+    return res.rows.map(internalPayoutRow);
   }
 
   async unannouncedWinnerDays(limit: number): Promise<DailyRewardWinnerAnnouncement[]> {
@@ -617,7 +704,8 @@ export class PgDailyRewardDb implements DailyRewardDb {
       const payouts = await pool.query(
         `SELECT p.day, p.realm, p.rank, p.account_id, p.username,
                 COALESCE(p.wallet_pubkey, wl.pubkey) AS wallet_pubkey, p.points,
-                p.prize_percent, p.prize_usd, p.status, p.tx_signature, p.paid_at
+                p.prize_percent, p.prize_usd, p.status, p.tx_signature, p.paid_at,
+                p.void_reason, p.voided_by_id, p.voided_by_username, p.voided_at
            FROM daily_reward_payouts p
            LEFT JOIN wallet_links wl ON wl.account_id = p.account_id
           WHERE p.day = $1 AND p.realm = $2
@@ -631,7 +719,7 @@ export class PgDailyRewardDb implements DailyRewardDb {
         realm: String(day.realm),
         prizePoolUsd: Number(day.prize_pool_usd),
         finalizedAt: dateString(day.finalized_at),
-        payouts: payouts.rows.map((row) => ({ ...payoutRow(row), realm: String(row.realm) })),
+        payouts: payouts.rows.map(internalPayoutRow),
       });
     }
     return out;
@@ -654,16 +742,388 @@ export class PgDailyRewardDb implements DailyRewardDb {
     txSignature: string | null,
     error: string | null,
   ): Promise<boolean> {
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      const res = await client.query(
+        `UPDATE daily_reward_payouts
+            SET status = $4,
+                error = $6,
+                paid_at = CASE WHEN $4 = 'paid' THEN now() ELSE paid_at END,
+                updated_at = now()
+          WHERE day = $1 AND realm = $2 AND rank = $3
+            AND (
+              (status = 'processing' AND tx_signature = $5)
+              OR (status IN ('pending', 'failed') AND $4 = 'failed' AND $5 IS NULL)
+            )`,
+        [day, REALM, rank, status, txSignature, error],
+      );
+      let updated = (res.rowCount ?? 0) === 1;
+      if (!updated && status === 'paid' && txSignature) {
+        const existing = await client.query(
+          `SELECT 1
+             FROM daily_reward_payouts
+            WHERE day = $1 AND realm = $2 AND rank = $3
+              AND status = 'paid' AND tx_signature = $4`,
+          [day, REALM, rank, txSignature],
+        );
+        updated = (existing.rowCount ?? 0) === 1;
+      }
+      if ((res.rowCount ?? 0) === 1 && txSignature) {
+        await client.query(
+          `UPDATE daily_reward_payout_attempts
+              SET status = $4, error = $5, updated_at = now()
+            WHERE day = $1 AND realm = $2 AND rank = $3
+              AND tx_signature = $6 AND kind = 'payout'`,
+          [day, REALM, rank, status, error, txSignature],
+        );
+      }
+      await client.query('COMMIT');
+      return updated;
+    } catch (err) {
+      await client.query('ROLLBACK').catch(() => undefined);
+      throw err;
+    } finally {
+      client.release();
+    }
+  }
+
+  async claimPayout(
+    day: string,
+    rank: number,
+    txSignature: string,
+    signedTransaction: string | null,
+  ): Promise<DailyRewardPayoutClaimResult> {
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      const current = await client.query(
+        `SELECT p.day, p.realm, p.rank, p.account_id, p.username,
+                COALESCE(p.wallet_pubkey, wl.pubkey) AS wallet_pubkey, p.points,
+                p.prize_percent, p.prize_usd, p.status, p.tx_signature, p.paid_at,
+                p.signed_transaction, p.void_reason, p.voided_by_id,
+                p.voided_by_username, p.voided_at
+           FROM daily_reward_payouts p
+           LEFT JOIN wallet_links wl ON wl.account_id = p.account_id
+          WHERE p.day = $1 AND p.realm = $2 AND p.rank = $3
+          FOR UPDATE OF p`,
+        [day, REALM, rank],
+      );
+      const row = current.rows[0] as Record<string, unknown> | undefined;
+      if (!row) {
+        await client.query('COMMIT');
+        return { outcome: 'not_found' };
+      }
+      const status = String(row.status);
+      if (status === 'processing' || status === 'paid') {
+        await client.query('COMMIT');
+        return { outcome: 'existing', payout: internalPayoutRow(row) };
+      }
+      if (status !== 'pending' && status !== 'failed') {
+        await client.query('COMMIT');
+        return { outcome: 'invalid_status', status };
+      }
+      await client.query(
+        `INSERT INTO daily_reward_payout_attempts
+          (day, realm, rank, kind, status, tx_signature, signed_transaction)
+         VALUES ($1, $2, $3, 'payout', 'prepared', $4, $5)`,
+        [day, REALM, rank, txSignature, signedTransaction],
+      );
+      await client.query(
+        `UPDATE daily_reward_payouts
+            SET status = 'processing', tx_signature = $4, signed_transaction = $5,
+                error = NULL, updated_at = now()
+          WHERE day = $1 AND realm = $2 AND rank = $3`,
+        [day, REALM, rank, txSignature, signedTransaction],
+      );
+      await client.query('COMMIT');
+      return {
+        outcome: 'claimed',
+        payout: internalPayoutRow({
+          ...row,
+          status: 'processing',
+          tx_signature: txSignature,
+          signed_transaction: signedTransaction,
+        }),
+      };
+    } catch (err) {
+      await client.query('ROLLBACK').catch(() => undefined);
+      throw err;
+    } finally {
+      client.release();
+    }
+  }
+
+  async claimPayoutResend(
+    day: string,
+    rank: number,
+    operationId: string,
+    txSignature: string,
+    signedTransaction: string | null,
+  ): Promise<DailyRewardPayoutAttemptClaimResult> {
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      const payout = await client.query(
+        `SELECT status
+           FROM daily_reward_payouts
+          WHERE day = $1 AND realm = $2 AND rank = $3
+          FOR UPDATE`,
+        [day, REALM, rank],
+      );
+      if (!payout.rows[0]) {
+        await client.query('COMMIT');
+        return { outcome: 'not_found' };
+      }
+      if (String(payout.rows[0].status) !== 'paid') {
+        await client.query('COMMIT');
+        return { outcome: 'invalid_status', status: String(payout.rows[0].status) };
+      }
+      const existing = await client.query(
+        `SELECT status, operation_id, tx_signature, signed_transaction
+           FROM daily_reward_payout_attempts
+          WHERE day = $1 AND realm = $2 AND rank = $3
+            AND kind = 'resend' AND operation_id = $4
+          ORDER BY id DESC
+          LIMIT 1`,
+        [day, REALM, rank, operationId],
+      );
+      if (existing.rows[0]) {
+        await client.query('COMMIT');
+        return {
+          outcome: 'existing',
+          attempt: {
+            status: String(existing.rows[0].status) as 'prepared' | 'paid' | 'failed',
+            operationId: String(existing.rows[0].operation_id),
+            txSignature: String(existing.rows[0].tx_signature),
+            signedTransaction: optionalString(existing.rows[0].signed_transaction),
+          },
+        };
+      }
+      await client.query(
+        `INSERT INTO daily_reward_payout_attempts
+          (day, realm, rank, kind, operation_id, status, tx_signature, signed_transaction)
+         VALUES ($1, $2, $3, 'resend', $4, 'prepared', $5, $6)`,
+        [day, REALM, rank, operationId, txSignature, signedTransaction],
+      );
+      await client.query('COMMIT');
+      return {
+        outcome: 'claimed',
+        attempt: { status: 'prepared', operationId, txSignature, signedTransaction },
+      };
+    } catch (err) {
+      await client.query('ROLLBACK').catch(() => undefined);
+      throw err;
+    } finally {
+      client.release();
+    }
+  }
+
+  async markPayoutResend(
+    day: string,
+    rank: number,
+    operationId: string,
+    status: 'paid' | 'failed',
+    txSignature: string,
+    error: string | null,
+  ): Promise<boolean> {
     const res = await pool.query(
-      `UPDATE daily_reward_payouts
-          SET status = $4,
-              tx_signature = $5,
-              error = $6,
-              paid_at = CASE WHEN $4 = 'paid' THEN now() ELSE paid_at END,
-              updated_at = now()
-        WHERE day = $1 AND realm = $2 AND rank = $3`,
-      [day, REALM, rank, status, txSignature, error],
+      `UPDATE daily_reward_payout_attempts a
+          SET status = $5, error = $7, updated_at = now()
+        WHERE a.day = $1 AND a.realm = $2 AND a.rank = $3
+          AND a.kind = 'resend' AND a.operation_id = $4
+          AND a.status = 'prepared' AND a.tx_signature = $6
+          AND EXISTS (
+            SELECT 1 FROM daily_reward_payouts p
+             WHERE p.day = a.day AND p.realm = a.realm AND p.rank = a.rank
+               AND p.status = 'paid'
+          )`,
+      [day, REALM, rank, operationId, status, txSignature, error],
     );
-    return (res.rowCount ?? 0) > 0;
+    if ((res.rowCount ?? 0) > 0) return true;
+    if (status !== 'paid') return false;
+    const existing = await pool.query(
+      `SELECT 1 FROM daily_reward_payout_attempts
+        WHERE day = $1 AND realm = $2 AND rank = $3
+          AND kind = 'resend' AND operation_id = $4
+          AND status = 'paid' AND tx_signature = $5`,
+      [day, REALM, rank, operationId, txSignature],
+    );
+    return (existing.rowCount ?? 0) > 0;
+  }
+
+  async voidPayout(
+    day: string,
+    rank: number,
+    reason: string,
+    actor: DailyRewardPayoutActor,
+  ): Promise<DailyRewardPayoutModerationResult> {
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      const current = await client.query(
+        `SELECT p.day, p.realm, p.rank, p.account_id, p.username,
+                COALESCE(p.wallet_pubkey, wl.pubkey) AS wallet_pubkey, p.points,
+                p.prize_percent, p.prize_usd, p.status, p.tx_signature, p.paid_at,
+                p.void_reason, p.voided_by_id, p.voided_by_username, p.voided_at
+           FROM daily_reward_payouts p
+           LEFT JOIN wallet_links wl ON wl.account_id = p.account_id
+          WHERE p.day = $1 AND p.realm = $2 AND p.rank = $3
+          FOR UPDATE OF p`,
+        [day, REALM, rank],
+      );
+      const row = current.rows[0] as Record<string, unknown> | undefined;
+      if (!row) {
+        await client.query('COMMIT');
+        return { outcome: 'not_found' };
+      }
+      const previousStatus = String(row.status);
+      if (previousStatus !== 'pending' && previousStatus !== 'failed') {
+        await client.query('COMMIT');
+        return { outcome: 'invalid_status', status: previousStatus };
+      }
+      const updated = await client.query(
+        `UPDATE daily_reward_payouts
+            SET status = 'voided',
+                void_reason = $4,
+                voided_by_id = $5,
+                voided_by_username = $6,
+                voided_at = now(),
+                updated_at = now()
+          WHERE day = $1 AND realm = $2 AND rank = $3
+            AND status IN ('pending', 'failed')
+        RETURNING voided_at`,
+        [day, REALM, rank, reason, actor.id, actor.username],
+      );
+      if ((updated.rowCount ?? 0) !== 1) throw new Error('payout void transition lost its lock');
+      await client.query(
+        `INSERT INTO daily_reward_payout_moderation_audit
+          (day, realm, rank, account_id, action, previous_status, next_status, reason,
+           actor_id, actor_username)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+        [
+          day,
+          REALM,
+          rank,
+          Number(row.account_id),
+          'void',
+          previousStatus,
+          'voided',
+          reason,
+          actor.id,
+          actor.username,
+        ],
+      );
+      await client.query('COMMIT');
+      return {
+        outcome: 'updated',
+        payout: {
+          ...internalPayoutRow({
+            ...row,
+            status: 'voided',
+            void_reason: reason,
+            voided_by_id: actor.id,
+            voided_by_username: actor.username,
+            voided_at: updated.rows[0]?.voided_at,
+          }),
+        },
+      };
+    } catch (err) {
+      await client.query('ROLLBACK').catch(() => undefined);
+      throw err;
+    } finally {
+      client.release();
+    }
+  }
+
+  async restorePayout(
+    day: string,
+    rank: number,
+    actor: DailyRewardPayoutActor,
+  ): Promise<DailyRewardPayoutModerationResult> {
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      const current = await client.query(
+        `SELECT p.day, p.realm, p.rank, p.account_id, p.username,
+                COALESCE(p.wallet_pubkey, wl.pubkey) AS wallet_pubkey, p.points,
+                p.prize_percent, p.prize_usd, p.status, p.tx_signature, p.paid_at,
+                p.void_reason, p.voided_by_id, p.voided_by_username, p.voided_at
+           FROM daily_reward_payouts p
+           LEFT JOIN wallet_links wl ON wl.account_id = p.account_id
+          WHERE p.day = $1 AND p.realm = $2 AND p.rank = $3
+          FOR UPDATE OF p`,
+        [day, REALM, rank],
+      );
+      const row = current.rows[0] as Record<string, unknown> | undefined;
+      if (!row) {
+        await client.query('COMMIT');
+        return { outcome: 'not_found' };
+      }
+      const previousStatus = String(row.status);
+      if (previousStatus !== 'voided') {
+        await client.query('COMMIT');
+        return { outcome: 'invalid_status', status: previousStatus };
+      }
+      const reason = optionalString(row.void_reason) ?? 'Unknown void reason';
+      const updated = await client.query(
+        `UPDATE daily_reward_payouts
+            SET status = 'pending',
+                tx_signature = NULL,
+                signed_transaction = NULL,
+                error = NULL,
+                void_reason = NULL,
+                voided_by_id = NULL,
+                voided_by_username = NULL,
+                voided_at = NULL,
+                updated_at = now()
+          WHERE day = $1 AND realm = $2 AND rank = $3
+            AND status = 'voided'
+        RETURNING status`,
+        [day, REALM, rank],
+      );
+      if ((updated.rowCount ?? 0) !== 1) {
+        throw new Error('payout restore transition lost its lock');
+      }
+      await client.query(
+        `INSERT INTO daily_reward_payout_moderation_audit
+          (day, realm, rank, account_id, action, previous_status, next_status, reason,
+           actor_id, actor_username)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+        [
+          day,
+          REALM,
+          rank,
+          Number(row.account_id),
+          'restore',
+          previousStatus,
+          'pending',
+          reason,
+          actor.id,
+          actor.username,
+        ],
+      );
+      await client.query('COMMIT');
+      return {
+        outcome: 'updated',
+        payout: {
+          ...internalPayoutRow({
+            ...row,
+            status: 'pending',
+            tx_signature: null,
+            signed_transaction: null,
+            void_reason: null,
+            voided_by_id: null,
+            voided_by_username: null,
+            voided_at: null,
+          }),
+        },
+      };
+    } catch (err) {
+      await client.query('ROLLBACK').catch(() => undefined);
+      throw err;
+    } finally {
+      client.release();
+    }
   }
 }

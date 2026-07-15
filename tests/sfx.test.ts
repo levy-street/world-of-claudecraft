@@ -195,8 +195,9 @@ describe('hasVariants', () => {
 // crit-only cue like hurt has exactly one trigger, so it can lose the race
 // to fetch+decode unless warmed ahead of time or checked before playing).
 // Both must account for EVERY variant a key can have, not just index 0:
-// playAt round-robins variants, so a two-take family (mob_dragonkin_hurt,
-// mob_spider_hurt) can have variant 0 warm and variant 1 still cold.
+// playAt no-repeat-randoms across variants, so a two-take family
+// (mob_dragonkin_hurt, mob_spider_hurt) can have variant 0 warm and variant 1
+// still cold.
 describe('isBuffered/preload', () => {
   it('reports false until every variant of a multi-take key is buffered', () => {
     const key = 'mob_dragonkin_hurt';

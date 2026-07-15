@@ -554,6 +554,18 @@ export const hudChromeStrings = {
     perSecondRow: '{total} ({rate})',
     minutesSeconds: '{m}m {s}s',
     seconds: '{s}s',
+    // Shown alongside the empty state so a first-time viewer understands the
+    // panel is not broken: rows populate once party combat starts, and the
+    // segment closes itself a few seconds after the fight ends.
+    autoShowHint:
+      'Rows appear automatically once your party deals damage or healing, and this segment closes a few seconds after combat ends.',
+  },
+  // Pet action bar disabled-state tooltips: the feed/heal-pet button stays
+  // visible (never hidden) while it cannot currently be used, so a hunter
+  // sees WHY instead of a button that looks broken.
+  petFeed: {
+    disabledFullHp: 'Pet is at full health',
+    disabledNoFood: 'No food in your bags will heal your pet',
   },
   // Key Bindings panel action labels that the in-file BIND_ACTION_LABEL_KEYS map
   // (hud.ts) routes through t(). Kept here (not the constrained `hud` catalog
@@ -565,6 +577,7 @@ export const hudChromeStrings = {
     // Discord is a brand name; it stays identical across locales.
     discord: 'Discord',
     valecup: 'Vale Cup',
+    sheathe: 'Sheathe/Unsheathe Weapon',
     // Pet bar (Ctrl+1..5 by default) key-binding rows + category header.
     categoryPet: 'Pet',
     petAttack: 'Pet: Attack',
@@ -799,6 +812,9 @@ export const hudChromeStrings = {
     // Interface panel toggle: also engage auto-attack when using an offensive
     // ability, so white swings start without a separate Attack press (on by default).
     startAttackOnAbility: 'Auto-Attack on Ability Use',
+    // Interface panel toggle: show the fixed Attack (auto-attack) button in slot 0
+    // of the action bar (on by default). Off frees slot 0 for a normal action.
+    showAttackButton: 'Show Attack Button',
     // Interface panel toggle: loot corpses by walking past them (off by default).
     walkByAutoloot: 'Walk-by Autoloot',
     groundReticle: 'Ground-Targeting Reticle',
@@ -1083,6 +1099,12 @@ export const hudChromeStrings = {
       many: 'you are {rank}, {count} members',
       other: 'you are {rank}, {count} members',
     },
+    finderPartySize: {
+      one: '{count} player',
+      few: '{count} players',
+      many: '{count} players',
+      other: '{count} players',
+    },
     characterCount: {
       one: '{count} character',
       few: '{count} characters',
@@ -1354,10 +1376,21 @@ export const hudChromeStrings = {
     // Right-click destroy affordance: rejected when the item is flagged noDiscard
     // (soulbound quest keys, etc.), which the sim's discardItem also refuses.
     cannotDestroy: 'This item cannot be destroyed.',
-    // Tooltip sub-line advertising the shift+right-click destroy affordance, shown
-    // only for a destroyable item so junk is removable without hunting for a menu. A
-    // plain right-click equips/uses the item instead (issue 1852).
-    rightClickDestroy: 'Shift+right-click to destroy',
+    // Tooltip sub-line advertising the right-click destroy affordance, shown only
+    // for a destroyable item so junk is removable without hunting for a menu.
+    // DEAD: right-click now uses/equips (the classic binding) and destroying is the
+    // drag-out gesture below. Kept so the locale overlays keep resolving; drop it
+    // (and its overlay rows) at the next locale fill.
+    rightClickDestroy: 'Right-click to destroy',
+    // Tooltip sub-lines for the two drag gestures that replaced right-click-destroy:
+    // drag a gear piece onto the character sheet to equip it, drag any destroyable
+    // stack out onto the world to throw it away (which opens the destroy prompt).
+    dragEquipHint: 'Drag onto your character to equip',
+    dragDestroyHint: 'Drag out into the world to destroy',
+    // Refusal when a stack is dropped on a square of a FILTERED / SEARCHED / SORTED grid:
+    // that grid is a derived list, its squares hold no bag position, so honoring the drop
+    // would move a stack the player never aimed at. Say so instead of doing nothing.
+    reorderNeedsRecent: 'Clear the filter and sort by Recent to rearrange your bags',
     filterGroupAria: 'Filter bags by category',
     filterAll: 'All',
     filterWeapon: 'Weapons',
@@ -1680,8 +1713,13 @@ export const hudChromeStrings = {
       admin: 'Admin',
       coredevs: 'Core Dev',
       devs: 'Dev',
+      seniormods: 'Senior Mod',
       mods: 'Mod',
+      juniormods: 'Junior Mod',
       artists: 'Artist',
+      contentcreator: 'Content Creator',
+      legend: 'LEGEND',
+      shill: 'SHILL',
     },
     guildMember: 'Verified member',
     notMember: 'Not in the server yet',
@@ -1975,6 +2013,9 @@ export const hudChromeStrings = {
     mining: 'Mining',
     logging: 'Logging',
     herbalism: 'Herbalism',
+    // #1866: click/tap/interact-key error when a targeted node's per-viewer
+    // respawn timer has not elapsed yet (IWorldProfessions#nodeHarvestableByMe).
+    notReady: 'This resource node has not respawned for you yet.',
   },
   // Archetype title (#1130): the named title granted by a character's currently
   // active craft archetype (see src/sim/professions/archetype.ts). `none` is shown
@@ -2022,6 +2063,117 @@ export const hudChromeStrings = {
     throttled: 'You are crafting too quickly. Wait a moment and try again.',
     // #1299: the recipe exists but this player has not learned it yet.
     recipeNotLearned: 'You have not learned that recipe yet.',
+  },
+  // Dungeon Finder window (docs/prd/dungeon-finder.md). Dungeon, creature,
+  // item, quest, and zone NAMES resolve through tEntity/world_entity_i18n,
+  // never through these keys.
+  finder: {
+    title: 'Dungeon Finder',
+    close: 'Close',
+    back: 'Back',
+    syncing: 'Waiting for the realm...',
+    tabCatalogue: 'Catalogue',
+    tabQueue: 'Quick Match',
+    tabBoard: 'Premade Groups',
+    normal: 'Normal',
+    heroic: 'Heroic',
+    kindDungeon: 'Dungeon',
+    kindRaid: 'Raid',
+    kindSolo: 'Solo adventure',
+    levels: 'Levels {min} to {max}',
+    levelOne: 'Level {level}',
+    // Group size renders through tPlural(hudChrome.plurals.finderPartySize).
+    // The mm:ss clock separator is a token pattern, like every other HUD clock.
+    clock: '{minutes}:{seconds}',
+    // Count-plus-role composition ({count} tanks): a token pattern so a locale
+    // owns the ORDER, never a `${n} ${label}` concat at the call site.
+    roleCount: '{count} {role}',
+    roleTank: 'Tank',
+    roleHealer: 'Healer',
+    roleDps: 'Damage',
+    freeRoles: 'Any roles welcome',
+    lockoutDaily: 'Daily lockout on the final boss',
+    lockoutNone: 'No lockout',
+    lockedFor: 'Locked for about {minutes} min',
+    attunement: 'Requires attunement: {quest}',
+    heroicMarks: 'Heroic Marks: {count} per player',
+    entrance: 'Entrance: {zone}',
+    showOnMap: 'Show on Map',
+    encounters: 'Encounters',
+    finalBoss: 'Final boss',
+    summoned: 'Summoned guardian',
+    lootGuaranteed: 'One of these always drops:',
+    lootMaybe: 'At most one of these may drop:',
+    lootChance: 'Additional chance drops:',
+    lootHeroic: 'Heroic bonus, one of these always drops:',
+    pct: '{pct}%',
+    blockedLevel: 'Levels {min} to {max} only',
+    blockedSpec: 'Requires a specialization',
+    yourRoles: 'Your roles',
+    needsSpec: 'Choose a specialization to use the Dungeon Finder.',
+    leaderNote: 'Only your party leader can queue the group.',
+    chooseActivities: 'Choose activities',
+    joinQueue: 'Join queue',
+    leaveQueue: 'Leave queue',
+    waited: 'Time in queue: {time}',
+    cooldownNote: 'You may queue again in {seconds}s.',
+    travelNote:
+      'The group forms where everyone stands. Travel to the entrance together; nobody is teleported.',
+    proposalTitle: 'Group found: {name}',
+    proposalRole: 'Your role: {role}',
+    accepted: '{accepted} of {size} confirmed',
+    remaining: '{seconds}s to answer',
+    accept: 'Accept',
+    decline: 'Decline',
+    acceptedWait: 'Waiting for the others...',
+    slotState: '{role}: {accepted} of {total} ready',
+    openListings: 'Open listings',
+    boardEmpty: 'No listings right now. Publish one!',
+    boardLeaderGate: 'Only your party leader can publish a listing.',
+    publishListing: 'Publish a listing',
+    activity: 'Activity',
+    publish: 'Publish',
+    yourListing: 'Your listing',
+    closeListing: 'Close listing',
+    applicants: 'Applicants',
+    noApplicants: 'No applicants yet.',
+    acceptApplicantAria: 'Accept {name}',
+    declineApplicantAria: 'Decline {name}',
+    levelClass: 'Lv {level} {className}',
+    leader: 'Leader: {name}',
+    needs: 'Needs {roles}',
+    slots: '{size}/{capacity}',
+    apply: 'Apply',
+    withdraw: 'Withdraw application',
+    tagFirstRun: 'First run',
+    tagQuestRun: 'Quest run',
+    tagFullClear: 'Full clear',
+    tagLearning: 'Learning welcome',
+    tagFastRun: 'Fast run',
+    // Notable encounter mechanics (stable keys authored in
+    // src/sim/content/dungeon_finder.ts encounter records).
+    mech: {
+      shadow_pulse: 'Shadow Pulse (pulsing area damage)',
+      reaping_arc: 'Reaping Arc (frontal cleave)',
+      mist_surge: 'Mist Surge (pulsing area damage)',
+      summons_adds: 'Summons reinforcements',
+      lunar_tide: 'Lunar Tide (pulsing area damage)',
+      enrage: 'Enrages at low health',
+      shuddering_stomp: 'Shuddering Stomp (area stun)',
+      necrotic_shockwave: 'Necrotic Shockwave (heavy area damage)',
+      grave_cleaver: 'Grave-Cleaver (frontal cleave)',
+      shadow_nova: 'Shadow Nova (area burst)',
+      profane_mending: 'Profane Mending (heals its allies)',
+      mana_burn: 'Withered Benediction (burns mana)',
+      deathstalker_cleave: 'Deathstalker Cleave (frontal cleave)',
+      mortal_wound: 'Forgotten Wound (reduces healing taken)',
+      sealbreak_shockwave: 'Sealbreak Shockwave (area burst)',
+      gravebreaker: 'Gravebreaker (frontal cone, face it away from the raid)',
+      raise_fallen: 'Raise Fallen (periodic waves of adds)',
+      soul_rend: 'Soul Rend (marked players must spread and be healed)',
+      deathless_rage: 'Deathless Rage (interrupted at the wardstones)',
+      wardstones: 'Wardstone channels (phase transition)',
+    },
   },
   // The Book of Deeds window: the deed catalog browser (summary strip,
   // category rail, entry cards, title picker), the watchlist HUD tracker, and

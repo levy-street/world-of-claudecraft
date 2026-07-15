@@ -369,6 +369,65 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
   },
 };
 
+// RETIRED, save-compat only. v0.25.0 replaced the standalone heroic Nythraxis
+// armor drops with the heroic loot swap and deleted these four defs, orphaning
+// the ids players earned during the v0.24.x window: an equipped orphan rendered
+// its paperdoll slot as Empty and granted zero stats while the id sat dormant
+// in the persisted save. Item ids that ever reached a player are permanent API:
+// these defs (byte-identical to v0.24.2) exist so those saves resolve again,
+// and they must NEVER return to a loot table, vendor, or the heroic variant
+// builder (tests/retired_heroic_items.test.ts pins all of that).
+export const RETIRED_HEROIC_ITEMS: Record<string, ItemDef> = {
+  deathless_warguard_legmail: {
+    id: 'deathless_warguard_legmail',
+    name: 'Deathless Warguard Legmail',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'legs',
+    quality: 'epic',
+    requiredLevel: 20,
+    stats: { armor: 315, str: 11, sta: 9 },
+    sellValue: 13000,
+    requiredClass: HEAVY,
+  },
+  soulrend_diadem: {
+    id: 'soulrend_diadem',
+    name: 'Soulrend Diadem',
+    kind: 'armor',
+    armorType: 'cloth',
+    slot: 'helmet',
+    quality: 'epic',
+    requiredLevel: 20,
+    stats: { armor: 76, int: 10, spi: 8 },
+    sellValue: 12000,
+    requiredClass: CASTER,
+  },
+  scourgehide_carapace: {
+    id: 'scourgehide_carapace',
+    name: 'Scourgehide Carapace',
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'chest',
+    quality: 'epic',
+    requiredLevel: 20,
+    stats: { armor: 172, agi: 12, sta: 10 },
+    sellValue: 14000,
+    requiredClass: AGILE_WILD,
+  },
+  soulforged_warplate: {
+    id: 'soulforged_warplate',
+    name: 'Soulforged Warplate',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'chest',
+    quality: 'epic',
+    requiredLevel: 20,
+    stats: { armor: 335, int: 12, spi: 10 },
+    sellValue: 14000,
+    requiredClass: HEAL_MAIL,
+  },
+};
+
 // Heroic-only drop tables per final boss, TWO rollGroups each (chances inside a
 // group sum to 1.0, so exactly one item drops per group => two heroic epics per
 // heroic kill). loot_roll.ts rolls these only for a heroic-claimed instance.

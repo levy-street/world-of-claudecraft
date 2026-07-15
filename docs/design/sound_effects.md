@@ -264,7 +264,7 @@ pitched-up `attack`. Families: `beast`, `boar`, `spider`, `mudfin`, `burrower`,
 | `amb_wind_marsh` | ✓ | global | eerie damp marshland wind, low mournful breeze with distant frogs and insects |
 | `amb_wind_peaks` | ✓ | global | cold howling mountain wind across high rocky peaks, bleak and gusty |
 | `amb_birds` | ✓ | global | calm daytime forest ambience with gentle birdsong |
-| `amb_water` | ✓ | global | gentle lake water lapping at the shore, soft flowing ripples |
+| `amb_water` | yes | global | gentle lake water lapping at the shore, soft flowing ripples |
 | `amb_campfire` | ✓ | point | a crackling campfire, popping embers and flames |
 | `amb_forge` | ✓ | point | a blacksmith forge, roaring furnace with rhythmic hammer strikes on an anvil |
 | `amb_dungeon` | ✓ | global | a dark stone dungeon interior, dripping water echoes and a low ominous drone |

@@ -52,7 +52,7 @@ interface SlotOpts {
 function slot(slotIndex: number, opts: SlotOpts = {}): ActionBarSlotDescriptor {
   return {
     slotIndex,
-    isAttack: opts.attack ?? false,
+    isAttack: () => opts.attack ?? false,
     hasAction: () => opts.hasAction ?? (opts.ability != null || opts.item != null),
     ability: () => opts.ability ?? null,
     item: () => opts.item ?? null,
@@ -91,6 +91,7 @@ interface WorldOpts {
   targetPos?: { x: number; y: number; z: number } | null;
   targetDead?: boolean;
   inventory?: { itemId: string; count: number }[];
+  stealthed?: boolean;
 }
 
 function world(opts: WorldOpts = {}): ActionBarWorldInput {
@@ -105,6 +106,7 @@ function world(opts: WorldOpts = {}): ActionBarWorldInput {
       potionCdRemaining: opts.potionCdRemaining ?? 0,
       queuedOnSwing: opts.queuedOnSwing ?? null,
       pos: opts.playerPos ?? { x: 0, y: 0, z: 0 },
+      stealthed: opts.stealthed ?? false,
     },
     target: targetPos === null ? null : { dead: opts.targetDead ?? false, pos: targetPos },
     inventory: opts.inventory ?? [],
@@ -141,6 +143,42 @@ describe('actionBarView: the four slot kinds classify correctly', () => {
     expect(s[3].iconKey).toBe(EMPTY_ICON_KEY);
     expect(s[3].abilityId).toBeNull();
     expect(s[3].itemId).toBeNull();
+  });
+
+  it('slot 0 stops being Attack when isAttack() is false, rendering its assigned action', () => {
+    // The removable Attack button: with "Show Attack Button" off, the HUD makes
+    // slot 0's isAttack() return false and actionForSlot(0) resolve the assigned
+    // action, so the first slot renders as a normal ability slot, not Attack.
+    const view = createActionBarView(
+      descriptor(slot(0, { attack: false, ability: ability('frostbolt') })),
+      fakeDeps(),
+    );
+    const s = view.tick(world()).slots;
+    expect(s[0].kind).toBe('ability');
+    expect(s[0].iconKey).toBe(`${ABILITY_ICON_PREFIX}frostbolt`);
+    expect(s[0].abilityId).toBe('frostbolt');
+  });
+
+  it('slot 0 honors the live isAttack() accessor across ticks (toggle on/off)', () => {
+    // The Interface toggle flips slot 0 between Attack and a normal slot at runtime
+    // with no rebuild; the view must consult the accessor every tick, not cache it.
+    let showAttack = true;
+    const s0: ActionBarSlotDescriptor = {
+      slotIndex: 0,
+      isAttack: () => showAttack,
+      hasAction: () => !showAttack,
+      ability: () => (showAttack ? null : ability('fireball')),
+      item: () => null,
+      keybindLabel: () => 'K0',
+    };
+    const view = createActionBarView(descriptor(s0), fakeDeps());
+    expect(view.tick(world()).slots[0].kind).toBe('attack');
+    showAttack = false;
+    const off = view.tick(world()).slots[0];
+    expect(off.kind).toBe('ability');
+    expect(off.abilityId).toBe('fireball');
+    showAttack = true;
+    expect(view.tick(world()).slots[0].kind).toBe('attack');
   });
 
   it('an item slot wins over a stale ability binding (item-first precedence)', () => {
@@ -198,6 +236,27 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
     const near = view.tick(world({ resource: 60, targetPos: { x: 1, y: 1, z: 1 } })).slots[0];
     expect(near.usable).toBe(true);
     expect(near.outOfRange).toBe(false);
+  });
+
+  it('a requiresStealth ability is usable only while the player is stealthed (issue #1890)', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('cheap_shot', { cost: 60, requiresStealth: true }) })),
+      fakeDeps(),
+    );
+    const outOfStealth = view.tick(world({ stealthed: false })).slots[0];
+    expect(outOfStealth.usable).toBe(false);
+
+    const inStealth = view.tick(world({ stealthed: true })).slots[0];
+    expect(inStealth.usable).toBe(true);
+  });
+
+  it('an ability with no stealth requirement ignores the stealthed flag', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('sinister_strike', { cost: 45 }) })),
+      fakeDeps(),
+    );
+    expect(view.tick(world({ stealthed: false })).slots[0].usable).toBe(true);
+    expect(view.tick(world({ stealthed: true })).slots[0].usable).toBe(true);
   });
 
   it('respects both range boundaries for an ability with a minimum range', () => {

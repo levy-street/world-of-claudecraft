@@ -5,9 +5,8 @@
 // translate that key. The build (scripts/i18n_build.mjs) unflattens this map and
 // overlays it onto nested `en` to produce the dense resolved table; any key here
 // must be a real `en` leaf path: keys are typed `Partial<Record<TranslationKey,
-// string>>` so tsc rejects a structurally-wrong key, plus
-// tests/i18n_overlay_key_membership.test.ts catches a typo'd entity id the
-// template-literal key type cannot. Overlays are SPARSE: an
+// string>>` against the build-generated flat key union, so tsc rejects any key
+// that is not an exact `en` leaf path, typo'd entity ids included. Overlays are SPARSE: an
 // untranslated key is omitted and the build fills it from English, then the
 // registry (src/ui/i18n.status.json) marks it `pending`.
 
@@ -310,6 +309,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.choirmothers_casque.name': 'Elmo da Mãe do Coro',
   'entities.items.cryptplate_helm.name': 'Elmo de Placas da Cripta',
   'entities.items.deathless_greatblade.name': 'Grande Lâmina Imortal',
+  'entities.items.deathless_warguard_legmail.name': 'Malha de Pernas Imortal da Guarda de Guerra',
   'entities.items.gravescale_girdle.name': 'Cinto de Escamas Tumulares',
   'entities.items.gravewyrm_claws.name': 'Garras do Verme Tumular',
   'entities.items.gravewyrm_cleaver.name': 'Cutelo do Verme Tumular',
@@ -325,10 +325,13 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.sanctum_prowlers_grips.name': 'Manoplas do Espreitador do Santuário',
   'entities.items.sash_of_the_sunken_court.name': 'Faixa da Corte Submersa',
   'entities.items.scepter_of_the_deathless_court.name': 'Cetro da Corte Imortal',
+  'entities.items.scourgehide_carapace.name': 'Carapaça de Couro do Flagelo',
   'entities.items.seal_of_the_nine_oaths.name': 'Selo dos Nove Juramentos',
   'entities.items.shadowpulse_handwraps.name': 'Faixas de Mãos do Pulso Sombrio',
   'entities.items.shadowpulse_slippers.name': 'Sapatilhas do Pulso Sombrio',
   'entities.items.shroud_of_the_gravewyrm.name': 'Mortalha do Verme Tumular',
+  'entities.items.soulforged_warplate.name': 'Placa de Guerra Forjada na Alma',
+  'entities.items.soulrend_diadem.name': 'Diadema Dilacera-Almas',
   'entities.items.stormcallers_focus.name': 'Foco do Invocador da Tempestade',
   'entities.items.sunken_court_mantle.name': 'Manto da Corte Submersa',
   'entities.items.sutils_gambit.name': 'O Estratagema de Sutil',

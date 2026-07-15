@@ -279,6 +279,7 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       'landingHighContrast',
       'invertLookY',
       'startAttackOnAbilityUse',
+      'showAttackButton',
       'walkByAutoloot',
       'groundReticle',
       'aurasOnPlayerFrame',

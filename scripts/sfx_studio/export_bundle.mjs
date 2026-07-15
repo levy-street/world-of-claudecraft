@@ -14,6 +14,8 @@ import {
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { basename, join } from 'node:path';
+import ffmpegStaticPath from 'ffmpeg-static';
+import ffprobeStatic from 'ffprobe-static';
 import { inspectSfxConformance } from '../sfx/conform_audio.mjs';
 import {
   buildSfxManifestData,
@@ -36,6 +38,21 @@ const EXPORT_FORMAT = 'woc-sfx-production-bundle';
 const EXPORT_VERSION = 1;
 const MAX_CONFORMANCE_CACHE_ENTRIES = 1024;
 const conformanceCache = new Set();
+
+// The published-conformance verdict must be measured with the same toolchain that
+// gates the checked-in assets: npm run sfx:check (scripts/sfx_conform.mjs) and the
+// SFX generators resolve ffmpeg-static/ffprobe-static, not the PATH ffmpeg the
+// Studio spawns for playback and encoding. A newer PATH ffmpeg reports MP3 duration
+// a few tens of milliseconds shorter, enough to flip a clip across the one-second
+// peak/LUFS branch boundary and demand the wrong loudness target, so a clip the gate
+// accepts would fail export. Keep validation bound to the bundled binaries.
+if (!ffmpegStaticPath || !ffprobeStatic?.path) {
+  // ffmpeg-static exports null on an unsupported platform; fail here with a
+  // clear message instead of handing inspectSfxConformance a null binary path.
+  throw new Error('sfx export: bundled ffmpeg-static/ffprobe-static unavailable on this platform');
+}
+export const CONFORMANCE_FFMPEG_PATH = ffmpegStaticPath;
+export const CONFORMANCE_FFPROBE_PATH = ffprobeStatic.path;
 
 function sha256(bytes) {
   return createHash('sha256').update(bytes).digest('hex');
@@ -63,8 +80,8 @@ function validateProductionTrack(path, identity, bytes) {
   try {
     writeFileSync(validationPath, bytes, { flag: 'wx', mode: 0o600 });
     report = inspectSfxConformance(validationPath, {
-      ffmpegPath: 'ffmpeg',
-      ffprobePath: 'ffprobe',
+      ffmpegPath: CONFORMANCE_FFMPEG_PATH,
+      ffprobePath: CONFORMANCE_FFPROBE_PATH,
     });
   } catch (error) {
     throw new Error(
