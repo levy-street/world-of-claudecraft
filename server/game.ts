@@ -267,6 +267,8 @@ export const SIM_LAP_PHASES = [
   'lootRolls',
   'instances',
   'delves',
+  'gauntlet',
+  'hodrics',
   'valecup',
   'dfinder',
   'market',
