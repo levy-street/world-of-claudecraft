@@ -31,6 +31,8 @@ import {
   closePlayerSession,
   openPlayerSession,
   PLAYER_METRICS_CONCURRENT_INDEX_SQL,
+  PLAYER_METRICS_INVALID_INDEX_CHECK_SQL,
+  PLAYER_METRICS_INVALID_INDEX_DROP_SQL,
   PLAYER_METRICS_SCHEMA,
   recordCharacterCreation,
 } from './player_metrics_db';
@@ -1079,6 +1081,13 @@ export async function ensureSchema(): Promise<void> {
     try {
       await client.query('SELECT pg_advisory_lock($1)', [SCHEMA_ADVISORY_LOCK_KEY]);
       concurrentMigrationLocked = true;
+      // A prior boot's build may have died mid-CONCURRENTLY (a deploy-watchdog
+      // restart, a crash), stranding an INVALID index that IF NOT EXISTS would
+      // treat as existing forever. Drop the carcass so the build self-heals.
+      const invalidIndex = await client.query(PLAYER_METRICS_INVALID_INDEX_CHECK_SQL);
+      if ((invalidIndex.rowCount ?? 0) > 0) {
+        await client.query(PLAYER_METRICS_INVALID_INDEX_DROP_SQL);
+      }
       await client.query(PLAYER_METRICS_CONCURRENT_INDEX_SQL);
     } finally {
       if (concurrentMigrationLocked) {

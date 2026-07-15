@@ -7,6 +7,8 @@ import {
   closePlayerSession,
   openPlayerSession,
   PLAYER_METRICS_CONCURRENT_INDEX_SQL,
+  PLAYER_METRICS_INVALID_INDEX_CHECK_SQL,
+  PLAYER_METRICS_INVALID_INDEX_DROP_SQL,
   PLAYER_METRICS_SCHEMA,
   playerBusinessSnapshot,
   recordCharacterCreation,
@@ -264,5 +266,52 @@ describeDb('player metrics lifecycle SQL (real Postgres)', () => {
     const today = snapshot.days.find((day) => day.period === 'today');
     expect(today?.activeNew).toBe(0);
     expect(today?.activeReturning).toBe(1);
+  });
+
+  it('repairs an INVALID index carcass left by a killed concurrent build', async () => {
+    const db = await scopedClient();
+    try {
+      // Reproduce the real failure shape: a CREATE INDEX CONCURRENTLY that dies
+      // mid-build (here a unique build over duplicate rows; in production a
+      // deploy-watchdog restart) leaves the index INVALID, and IF NOT EXISTS
+      // would then treat it as existing on every later boot.
+      await db.query('INSERT INTO accounts DEFAULT VALUES');
+      await db.query('INSERT INTO play_sessions (account_id) VALUES (1), (1)');
+      await db.query('DROP INDEX IF EXISTS play_sessions_account_started_id');
+      await expect(
+        db.query(
+          `CREATE UNIQUE INDEX CONCURRENTLY play_sessions_account_started_id
+             ON play_sessions(account_id)`,
+        ),
+      ).rejects.toThrow();
+      const invalid = await db.query(
+        `SELECT i.indisvalid FROM pg_index i
+          WHERE i.indexrelid = to_regclass('play_sessions_account_started_id')`,
+      );
+      expect(invalid.rows[0]?.indisvalid).toBe(false);
+
+      // The boot repair drops the carcass...
+      const carcass = await db.query(PLAYER_METRICS_INVALID_INDEX_CHECK_SQL);
+      expect(carcass.rowCount).toBe(1);
+      await db.query(PLAYER_METRICS_INVALID_INDEX_DROP_SQL);
+      const afterRepair = await db.query(
+        "SELECT to_regclass('play_sessions_account_started_id') AS reg",
+      );
+      expect(afterRepair.rows[0]?.reg).toBeNull();
+
+      // ...and the migration then rebuilds it valid.
+      await db.query(PLAYER_METRICS_CONCURRENT_INDEX_SQL);
+      const rebuilt = await db.query(
+        `SELECT i.indisvalid FROM pg_index i
+          WHERE i.indexrelid = to_regclass('play_sessions_account_started_id')`,
+      );
+      expect(rebuilt.rows[0]?.indisvalid).toBe(true);
+
+      // A healthy index is not a carcass: the check must not match it.
+      const healthy = await db.query(PLAYER_METRICS_INVALID_INDEX_CHECK_SQL);
+      expect(healthy.rowCount).toBe(0);
+    } finally {
+      db.release();
+    }
   });
 });
