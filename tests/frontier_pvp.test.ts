@@ -128,6 +128,23 @@ describe('Open-world PvP flagging in the Frontier', () => {
     const b = placePlayer('Fff', 5, 5);
     expect(sim.isHostileTo(a, b)).toBe(false);
   });
+
+  it('floors player-vs-player damage (a bleed carried in) to 0 inside the safe hub', () => {
+    const a = placePlayer('Ggg', FRONTIER_X_MIN + 300, 40);
+    const b = placePlayer('Hhh', FRONTIER_X_MIN + 305, 42);
+    // Out in the band: hostile, so a bleed tick (dealDamage, what a DoT calls) lands.
+    const hpOutside = b.hp;
+    sim.dealDamage(a, b, 60, false, 'physical', null, 'hit');
+    expect(b.hp).toBeLessThan(hpOutside);
+    // The victim reaches the hub: the same carried-in bleed tick is floored to 0, so
+    // it can never finish them at the vendor.
+    b.pos = { x: FRONTIER_HUB.x, y: 1, z: FRONTIER_HUB.z };
+    b.prevPos = { ...b.pos };
+    sim.rebucket(b);
+    const hpInHub = b.hp;
+    sim.dealDamage(a, b, 60, false, 'physical', null, 'hit');
+    expect(b.hp).toBe(hpInHub);
+  });
 });
 
 describe('Frost rare kill reward', () => {

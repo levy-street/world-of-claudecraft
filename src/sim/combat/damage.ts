@@ -28,7 +28,12 @@ import { DELVES, GROUP_XP_BONUS, MOBS } from '../data';
 import * as deedsMod from '../deeds';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
-import { awardFrontierRareKill, frontierIncursionOnKill, pvpDamageMultiplier } from '../pvp';
+import {
+  awardFrontierRareKill,
+  frontierIncursionOnKill,
+  inFrontierHub,
+  pvpDamageMultiplier,
+} from '../pvp';
 import { aurasSurvivingDeath } from '../resurrection';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -205,6 +210,21 @@ export function dealDamage(
   if (amount > 0 && sourcePlayer && target.kind === 'player') {
     const cupMatch = ctx.vcup.match;
     if (cupMatch && vcupBothSeated(cupMatch, sourcePlayer.id, target.id)) amount = 0;
+  }
+
+  // The Frostreach Frontier safe hub: no PvP damage lands inside it (the promise in
+  // pvp/frontier.ts). A DoT/bleed or an in-flight projectile applied out in the band
+  // keeps calling dealDamage after the victim reaches the hub, and isHostileTo already
+  // reads false there (so the PvP multiplier above is skipped) but the BASE hit would
+  // still land, finishing someone at the vendor. Floor any player-vs-player damage to 0
+  // while the target stands in the hub, BEFORE absorb shields soak it.
+  if (
+    amount > 0 &&
+    sourcePlayer &&
+    target.kind === 'player' &&
+    inFrontierHub(target.pos.x, target.pos.z)
+  ) {
+    amount = 0;
   }
 
   // absorb shields soak damage first
