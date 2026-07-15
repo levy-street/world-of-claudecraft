@@ -7587,6 +7587,18 @@ export const de_DE: EnTranslations = {
       "necromancers_soulspire_mantle": {
         "name": "Mournweave-Seelenspitzenmantel"
       },
+      "spiritbinder_hauberk": {
+        "name": "Spiritbinder Hauberk"
+      },
+      "spiritbinder_legguards": {
+        "name": "Spiritbinder Legguards"
+      },
+      "spiritbinder_pauldrons": {
+        "name": "Spiritbinder Pauldrons"
+      },
+      "spiritbinder_treads": {
+        "name": "Spiritbinder Treads"
+      },
       "wyrmshadow_talongrips": {
         "name": "Nightfang-Krallengriffe"
       },
@@ -9567,6 +9579,12 @@ export const de_DE: EnTranslations = {
         "bonus2": "Ihr könnt nicht zurückgestoßen werden (100% Rückstoßwiderstand).",
         "bonus3": "Erhöht Intelligenz um 15, Willenskraft um 15 sowie Angriffs- und Zaubertempo um 15%.",
         "bonus4": "Eure Zauber haben eine Chance von 10%, Seelenbrand zu gewähren, was die Zaubermacht 10 Sek. lang um 40 erhöht."
+      },
+      "spiritbinder": {
+        "name": "Spiritbinder Regalia",
+        "bonus2": "Increases spell power by 20. You cannot be knocked back (100% knockback resistance).",
+        "bonus3": "Increases Intellect by 10 and Stamina by 10.",
+        "bonus4": "Your spells have a 10% chance to grant Clearcasting, making your next spell free."
       },
       "stormcallers": {
         "name": "Galecall-Gewänder",

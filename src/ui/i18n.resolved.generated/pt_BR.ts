@@ -7587,6 +7587,18 @@ export const pt_BR: EnTranslations = {
       "necromancers_soulspire_mantle": {
         "name": "Manto Pináculo de Alma Mournweave"
       },
+      "spiritbinder_hauberk": {
+        "name": "Spiritbinder Hauberk"
+      },
+      "spiritbinder_legguards": {
+        "name": "Spiritbinder Legguards"
+      },
+      "spiritbinder_pauldrons": {
+        "name": "Spiritbinder Pauldrons"
+      },
+      "spiritbinder_treads": {
+        "name": "Spiritbinder Treads"
+      },
       "wyrmshadow_talongrips": {
         "name": "Pegas Garra Nightfang"
       },
@@ -9567,6 +9579,12 @@ export const pt_BR: EnTranslations = {
         "bonus2": "Você não pode ser repelido (100% de resistência a repulsão).",
         "bonus3": "Aumenta o intelecto em 15, o espírito em 15 e a velocidade de ataque e de lançamento em 15%.",
         "bonus4": "Suas magias têm 10% de chance de conceder Chama da Alma, aumentando o poder mágico em 40 por 10 s."
+      },
+      "spiritbinder": {
+        "name": "Spiritbinder Regalia",
+        "bonus2": "Increases spell power by 20. You cannot be knocked back (100% knockback resistance).",
+        "bonus3": "Increases Intellect by 10 and Stamina by 10.",
+        "bonus4": "Your spells have a 10% chance to grant Clearcasting, making your next spell free."
       },
       "stormcallers": {
         "name": "Vestes Galecall",

@@ -7587,6 +7587,18 @@ export const da_DK: EnTranslations = {
       "necromancers_soulspire_mantle": {
         "name": "Mournweave Sjælespir-Kappe"
       },
+      "spiritbinder_hauberk": {
+        "name": "Spiritbinder Hauberk"
+      },
+      "spiritbinder_legguards": {
+        "name": "Spiritbinder Legguards"
+      },
+      "spiritbinder_pauldrons": {
+        "name": "Spiritbinder Pauldrons"
+      },
+      "spiritbinder_treads": {
+        "name": "Spiritbinder Treads"
+      },
       "wyrmshadow_talongrips": {
         "name": "Nightfang-Klogreb"
       },
@@ -9567,6 +9579,12 @@ export const da_DK: EnTranslations = {
         "bonus2": "Du kan ikke stødes tilbage (100% modstand mod tilbagestød).",
         "bonus3": "Øger intellekt med 15, ånd med 15 og angrebs- og magihastighed med 15%.",
         "bonus4": "Dine besværgelser har 10% chance for at give Sjælebrand og øge besværgelseskraft med 40 i 10 sek."
+      },
+      "spiritbinder": {
+        "name": "Spiritbinder Regalia",
+        "bonus2": "Increases spell power by 20. You cannot be knocked back (100% knockback resistance).",
+        "bonus3": "Increases Intellect by 10 and Stamina by 10.",
+        "bonus4": "Your spells have a 10% chance to grant Clearcasting, making your next spell free."
       },
       "stormcallers": {
         "name": "Galecall klæder",

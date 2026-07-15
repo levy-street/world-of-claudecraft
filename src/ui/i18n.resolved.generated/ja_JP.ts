@@ -7587,6 +7587,18 @@ export const ja_JP: EnTranslations = {
       "necromancers_soulspire_mantle": {
         "name": "モーンウィーヴの魂尖塔マントル"
       },
+      "spiritbinder_hauberk": {
+        "name": "スピリットバインダーの胸鎧"
+      },
+      "spiritbinder_legguards": {
+        "name": "スピリットバインダーの脚甲"
+      },
+      "spiritbinder_pauldrons": {
+        "name": "スピリットバインダーの肩当て"
+      },
+      "spiritbinder_treads": {
+        "name": "スピリットバインダーのブーツ"
+      },
       "wyrmshadow_talongrips": {
         "name": "ナイトファングの鉤爪握り"
       },
@@ -9567,6 +9579,12 @@ export const ja_JP: EnTranslations = {
         "bonus2": "ノックバックされなくなります（ノックバック耐性100%）。",
         "bonus3": "知力が15、精神力が15上昇し、攻撃速度と詠唱速度が15%上昇します。",
         "bonus4": "呪文に10%の確率で「ソウルブレイズ」が発動し、呪文の威力が10秒間40上昇します。"
+      },
+      "spiritbinder": {
+        "name": "スピリットバインダーの法衣",
+        "bonus2": "呪文威力が20上昇します。ノックバックされなくなります（ノックバック耐性100%）。",
+        "bonus3": "知力が10、スタミナが10上昇します。",
+        "bonus4": "呪文に10%の確率でクリアキャスティングが発動し、次の呪文が無償になります。"
       },
       "stormcallers": {
         "name": "ゲイルコールの法衣",

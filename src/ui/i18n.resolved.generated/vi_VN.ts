@@ -7587,6 +7587,18 @@ export const vi_VN: EnTranslations = {
       "necromancers_soulspire_mantle": {
         "name": "Áo Choàng Hồn Tháp Mournweave"
       },
+      "spiritbinder_hauberk": {
+        "name": "Spiritbinder Hauberk"
+      },
+      "spiritbinder_legguards": {
+        "name": "Spiritbinder Legguards"
+      },
+      "spiritbinder_pauldrons": {
+        "name": "Spiritbinder Pauldrons"
+      },
+      "spiritbinder_treads": {
+        "name": "Spiritbinder Treads"
+      },
       "wyrmshadow_talongrips": {
         "name": "Bao Tay Trảo Nightfang"
       },
@@ -9567,6 +9579,12 @@ export const vi_VN: EnTranslations = {
         "bonus2": "Bạn không thể bị đẩy lùi (kháng đẩy lùi 100%).",
         "bonus3": "Tăng trí tuệ thêm 15, tinh thần thêm 15 và tốc độ tấn công cùng thi triển thêm 15%.",
         "bonus4": "Các phép của bạn có 10% cơ hội ban Hồn Hỏa, tăng sức mạnh phép thuật thêm 40 trong 10 giây."
+      },
+      "spiritbinder": {
+        "name": "Spiritbinder Regalia",
+        "bonus2": "Increases spell power by 20. You cannot be knocked back (100% knockback resistance).",
+        "bonus3": "Increases Intellect by 10 and Stamina by 10.",
+        "bonus4": "Your spells have a 10% chance to grant Clearcasting, making your next spell free."
       },
       "stormcallers": {
         "name": "Áo Lễ Galecall",

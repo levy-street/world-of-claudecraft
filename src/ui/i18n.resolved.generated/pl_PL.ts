@@ -7587,6 +7587,18 @@ export const pl_PL: EnTranslations = {
       "necromancers_soulspire_mantle": {
         "name": "Płaszcz iglicy dusz Mournweave"
       },
+      "spiritbinder_hauberk": {
+        "name": "Spiritbinder Hauberk"
+      },
+      "spiritbinder_legguards": {
+        "name": "Spiritbinder Legguards"
+      },
+      "spiritbinder_pauldrons": {
+        "name": "Spiritbinder Pauldrons"
+      },
+      "spiritbinder_treads": {
+        "name": "Spiritbinder Treads"
+      },
       "wyrmshadow_talongrips": {
         "name": "Szponiaste chwyty Nightfang"
       },
@@ -9567,6 +9579,12 @@ export const pl_PL: EnTranslations = {
         "bonus2": "Nie można cię odrzucić (100% odporności na odrzucenie).",
         "bonus3": "Zwiększa intelekt o 15, ducha o 15 oraz szybkość ataku i rzucania zaklęć o 15%.",
         "bonus4": "Twoje zaklęcia mają 10% szansy na udzielenie Płomienia Duszy, zwiększającego moc zaklęć o 40 na 10 s."
+      },
+      "spiritbinder": {
+        "name": "Spiritbinder Regalia",
+        "bonus2": "Increases spell power by 20. You cannot be knocked back (100% knockback resistance).",
+        "bonus3": "Increases Intellect by 10 and Stamina by 10.",
+        "bonus4": "Your spells have a 10% chance to grant Clearcasting, making your next spell free."
       },
       "stormcallers": {
         "name": "Szaty Galecall",
