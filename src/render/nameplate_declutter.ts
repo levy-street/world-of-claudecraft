@@ -37,6 +37,11 @@ const STACK_OFFSET_PX = 20;
 function cellCoord(v: number, size: number): number | null {
   if (!Number.isFinite(v)) return null;
   const coord = Math.floor(v / size);
+  // Beyond safe integer cell ids, division can collapse distinct representable
+  // screen coordinates into one bucket. At that magnitude the float ULP is
+  // already wider than the overlap threshold, so only equal coordinates can
+  // collide; keying by the original value preserves that distinction.
+  if (!Number.isSafeInteger(coord)) return v === 0 ? 0 : v;
   return coord === 0 ? 0 : coord;
 }
 
@@ -45,14 +50,19 @@ function cellCoord(v: number, size: number): number | null {
 // module-level scratch is safe and keeps the pass allocation-free after its
 // high-water capacity is established.
 // ---------------------------------------------------------------------------
-const order: number[] = [];
 const cluster: number[] = [];
-let visited = new Uint8Array(64);
+const cellQueue: number[] = [];
+const occupiedSlots: number[] = [];
+const spatialOrder: number[] = [];
 let cellX = new Float64Array(128);
 let cellY = new Float64Array(128);
-let cellHead = new Int32Array(128);
 let cellStamp = new Uint32Array(128);
-let nextInCell = new Int32Array(64);
+let cellVisitedStamp = new Uint32Array(128);
+let cellSortedStart = new Int32Array(128);
+let cellSortedEnd = new Int32Array(128);
+let anchorCellSlot = new Int32Array(64);
+let suffixMinY = new Float64Array(64);
+let suffixMaxY = new Float64Array(64);
 const neighborSlots = new Int32Array(9);
 let cellEpoch = 0;
 const hashFloat = new Float64Array(1);
@@ -65,20 +75,25 @@ function ensureSpatialHashCapacity(count: number): number {
   if (cellStamp.length < tableCapacity) {
     cellX = new Float64Array(tableCapacity);
     cellY = new Float64Array(tableCapacity);
-    cellHead = new Int32Array(tableCapacity);
     cellStamp = new Uint32Array(tableCapacity);
+    cellVisitedStamp = new Uint32Array(tableCapacity);
+    cellSortedStart = new Int32Array(tableCapacity);
+    cellSortedEnd = new Int32Array(tableCapacity);
     cellEpoch = 0;
     resizes++;
   }
-  if (nextInCell.length < count) {
-    let linkCapacity = nextInCell.length;
-    while (linkCapacity < count) linkCapacity *= 2;
-    nextInCell = new Int32Array(linkCapacity);
+  if (anchorCellSlot.length < count) {
+    let anchorCapacity = anchorCellSlot.length;
+    while (anchorCapacity < count) anchorCapacity *= 2;
+    anchorCellSlot = new Int32Array(anchorCapacity);
+    suffixMinY = new Float64Array(anchorCapacity);
+    suffixMaxY = new Float64Array(anchorCapacity);
     resizes++;
   }
   cellEpoch = (cellEpoch + 1) >>> 0;
   if (cellEpoch === 0) {
     cellStamp.fill(0);
+    cellVisitedStamp.fill(0);
     cellEpoch = 1;
   }
   return resizes;
@@ -102,15 +117,84 @@ function findCellSlot(cx: number, cy: number, create: boolean): number {
   cellStamp[slot] = cellEpoch;
   cellX[slot] = cx;
   cellY[slot] = cy;
-  cellHead[slot] = -1;
+  occupiedSlots.push(slot);
   return slot;
+}
+
+function firstAnchorInCell(slot: number): number {
+  return spatialOrder[cellSortedStart[slot]];
+}
+
+function lastAnchorInCell(slot: number): number {
+  return spatialOrder[cellSortedEnd[slot] - 1];
+}
+
+/**
+ * Cells are cliques because their width and height equal the inclusive overlap
+ * thresholds. This tests whether two neighbouring cliques share at least one
+ * edge without enumerating their Cartesian product.
+ */
+function cellsOverlap(
+  aSlot: number,
+  bSlot: number,
+  anchors: NameplateAnchor[],
+  metrics?: NameplateDeclutterMetrics,
+): boolean {
+  if (cellY[aSlot] === cellY[bSlot]) {
+    const left = cellX[aSlot] < cellX[bSlot] ? aSlot : bSlot;
+    const right = left === aSlot ? bSlot : aSlot;
+    return (
+      anchors[firstAnchorInCell(right)].sx - anchors[lastAnchorInCell(left)].sx <=
+      OVERLAP_THRESHOLD_X_PX
+    );
+  }
+
+  if (cellX[aSlot] === cellX[bSlot]) {
+    const lower = cellY[aSlot] < cellY[bSlot] ? aSlot : bSlot;
+    const upper = lower === aSlot ? bSlot : aSlot;
+    return (
+      suffixMinY[cellSortedStart[upper]] - suffixMaxY[cellSortedStart[lower]] <=
+      OVERLAP_THRESHOLD_Y_PX
+    );
+  }
+
+  // Diagonal cells need a two-dimensional dominance query: independent x/y
+  // bounds can claim an overlap even when different anchors provide each bound.
+  // The left cell is sorted by x; suffix extrema answer each right-cell query
+  // in O(log cell-size), so dense non-overlapping neighbours stay subquadratic.
+  const left = cellX[aSlot] < cellX[bSlot] ? aSlot : bSlot;
+  const right = left === aSlot ? bSlot : aSlot;
+  const leftStart = cellSortedStart[left];
+  const leftEnd = cellSortedEnd[left];
+  const leftIsLower = cellY[left] < cellY[right];
+  for (let p = cellSortedStart[right]; p < cellSortedEnd[right]; p++) {
+    if (metrics) metrics.candidateChecks++;
+    const candidate = anchors[spatialOrder[p]];
+    let low = leftStart;
+    let high = leftEnd;
+    while (low < high) {
+      const mid = (low + high) >>> 1;
+      if (candidate.sx - anchors[spatialOrder[mid]].sx > OVERLAP_THRESHOLD_X_PX) low = mid + 1;
+      else high = mid;
+    }
+    if (low >= leftEnd) continue;
+    if (
+      leftIsLower
+        ? candidate.sy - suffixMaxY[low] <= OVERLAP_THRESHOLD_Y_PX
+        : suffixMinY[low] - candidate.sy <= OVERLAP_THRESHOLD_Y_PX
+    ) {
+      return true;
+    }
+  }
+  return false;
 }
 
 /**
  * Stack overlapping anchors apart, MUTATING `anchors` in place.
  *
- * Anchors are processed in ascending id order so the same entities always stack
- * the same way frame to frame, independent of render order.
+ * Members of each collision component are stacked in ascending id order so the
+ * same entities always stack the same way frame to frame, independent of render
+ * order.
  *
  * `count` bounds the live prefix, so the caller can hand in a pooled array that
  * is longer than this frame's anchor list without any slicing.
@@ -127,65 +211,90 @@ export function declutterNameplatesInPlace(
   }
   if (n < 2) return anchors;
 
-  if (visited.length < n) visited = new Uint8Array(Math.max(n, visited.length * 2));
-  else visited.fill(0, 0, n);
   const spatialHashResizes = ensureSpatialHashCapacity(n);
   if (metrics) metrics.spatialHashResizes = spatialHashResizes;
 
-  order.length = 0;
-  for (let i = 0; i < n; i++) order.push(i);
-  order.sort((a, b) => anchors[a].id - anchors[b].id);
-
+  occupiedSlots.length = 0;
+  spatialOrder.length = 0;
   for (let i = 0; i < n; i++) {
     const cx = cellCoord(anchors[i].sx, OVERLAP_THRESHOLD_X_PX);
     const cy = cellCoord(anchors[i].sy, OVERLAP_THRESHOLD_Y_PX);
     if (cx === null || cy === null) continue;
     const slot = findCellSlot(cx, cy, true);
-    nextInCell[i] = cellHead[slot];
-    cellHead[slot] = i;
+    anchorCellSlot[i] = slot;
+    spatialOrder.push(i);
   }
 
-  for (let o = 0; o < n; o++) {
-    const i = order[o];
-    if (visited[i]) continue;
-    const ax = anchors[i].sx;
-    const ay = anchors[i].sy;
-
-    // gather this anchor's collision cluster from the 3x3 cell neighbourhood
-    cluster.length = 0;
-    const cx = cellCoord(ax, OVERLAP_THRESHOLD_X_PX);
-    const cy = cellCoord(ay, OVERLAP_THRESHOLD_Y_PX);
-    if (cx === null || cy === null) {
-      visited[i] = 1;
-      continue;
+  // Group each cell into one x-sorted segment and build suffix y-extrema for
+  // exact diagonal neighbour checks. Every collection reuses high-water space.
+  spatialOrder.sort((a, b) => {
+    const slotDelta = anchorCellSlot[a] - anchorCellSlot[b];
+    if (slotDelta !== 0) return slotDelta;
+    const xDelta = anchors[a].sx - anchors[b].sx;
+    if (xDelta !== 0) return xDelta;
+    const yDelta = anchors[a].sy - anchors[b].sy;
+    return yDelta !== 0 ? yDelta : anchors[a].id - anchors[b].id;
+  });
+  for (const slot of occupiedSlots) {
+    cellSortedStart[slot] = -1;
+    cellSortedEnd[slot] = -1;
+  }
+  for (let p = 0; p < spatialOrder.length; p++) {
+    const slot = anchorCellSlot[spatialOrder[p]];
+    if (cellSortedStart[slot] < 0) cellSortedStart[slot] = p;
+    cellSortedEnd[slot] = p + 1;
+  }
+  for (const slot of occupiedSlots) {
+    let minY = Number.POSITIVE_INFINITY;
+    let maxY = Number.NEGATIVE_INFINITY;
+    for (let p = cellSortedEnd[slot] - 1; p >= cellSortedStart[slot]; p--) {
+      const sy = anchors[spatialOrder[p]].sy;
+      minY = Math.min(minY, sy);
+      maxY = Math.max(maxY, sy);
+      suffixMinY[p] = minY;
+      suffixMaxY[p] = maxY;
     }
-    let neighborSlotCount = 0;
-    for (let dx = -1; dx <= 1; dx++) {
-      for (let dy = -1; dy <= 1; dy++) {
-        const slot = findCellSlot(cx + dx, cy + dy, false);
-        if (slot < 0) continue;
-        let seenSlot = false;
-        for (let s = 0; s < neighborSlotCount; s++) {
-          if (neighborSlots[s] !== slot) continue;
-          seenSlot = true;
-          break;
-        }
-        if (seenSlot) continue;
-        neighborSlots[neighborSlotCount++] = slot;
-        for (let j = cellHead[slot]; j >= 0; j = nextInCell[j]) {
-          if (metrics) metrics.candidateChecks++;
-          if (visited[j]) continue;
-          if (Math.abs(anchors[j].sx - ax) > OVERLAP_THRESHOLD_X_PX) continue;
-          if (Math.abs(anchors[j].sy - ay) > OVERLAP_THRESHOLD_Y_PX) continue;
-          cluster.push(j);
+  }
+
+  for (const seedSlot of occupiedSlots) {
+    if (cellVisitedStamp[seedSlot] === cellEpoch) continue;
+
+    // Walk the connected component of occupied cells. A cell is an atomic
+    // clique, so this preserves transitive anchor overlap without rescanning
+    // dense buckets once per member.
+    cluster.length = 0;
+    cellQueue.length = 0;
+    cellQueue.push(seedSlot);
+    cellVisitedStamp[seedSlot] = cellEpoch;
+    for (let q = 0; q < cellQueue.length; q++) {
+      const slot = cellQueue[q];
+      const start = cellSortedStart[slot];
+      const end = cellSortedEnd[slot];
+      for (let p = start; p < end; p++) cluster.push(spatialOrder[p]);
+      if (metrics) metrics.candidateChecks += end - start;
+
+      let neighborSlotCount = 0;
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dy = -1; dy <= 1; dy++) {
+          const neighbor = findCellSlot(cellX[slot] + dx, cellY[slot] + dy, false);
+          if (neighbor < 0 || neighbor === slot) continue;
+          let seenSlot = false;
+          for (let s = 0; s < neighborSlotCount; s++) {
+            if (neighborSlots[s] !== neighbor) continue;
+            seenSlot = true;
+            break;
+          }
+          if (seenSlot) continue;
+          neighborSlots[neighborSlotCount++] = neighbor;
+          if (cellVisitedStamp[neighbor] === cellEpoch) continue;
+          if (!cellsOverlap(slot, neighbor, anchors, metrics)) continue;
+          cellVisitedStamp[neighbor] = cellEpoch;
+          cellQueue.push(neighbor);
         }
       }
     }
 
-    if (cluster.length < 2) {
-      visited[i] = 1;
-      continue;
-    }
+    if (cluster.length < 2) continue;
     // the whole pass stacks in ascending id order
     cluster.sort((a, b) => anchors[a].id - anchors[b].id);
 
@@ -196,7 +305,6 @@ export function declutterNameplatesInPlace(
     for (let k = 0; k < cluster.length; k++) {
       const j = cluster[k];
       anchors[j].sy = baseSy + (k - mid) * STACK_OFFSET_PX;
-      visited[j] = 1;
     }
   }
 

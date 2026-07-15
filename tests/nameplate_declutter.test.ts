@@ -7,8 +7,8 @@ import {
 } from '../src/render/nameplate_declutter';
 
 /**
- * The original O(N^2) rescan, kept verbatim as the oracle: the spatial-hash hot
- * path must agree with it anchor-for-anchor on every input, or nameplates would
+ * Straightforward O(N^2) connected-component oracle: the spatial-hash hot path
+ * must agree with it anchor-for-anchor on every input, or nameplates would
  * silently stack differently in a crowd than they do in the unit tests.
  */
 function declutterReference(anchors: NameplateAnchor[]): NameplateAnchor[] {
@@ -21,16 +21,29 @@ function declutterReference(anchors: NameplateAnchor[]): NameplateAnchor[] {
   const ordered = [...out].sort((a, b) => a.id - b.id);
   for (const anchor of ordered) {
     if (visited.has(anchor.id)) continue;
-    const cluster = ordered.filter(
-      (other) =>
-        !visited.has(other.id) &&
-        Math.abs(other.sx - anchor.sx) <= OVERLAP_X &&
-        Math.abs(other.sy - anchor.sy) <= OVERLAP_Y,
-    );
+
+    const cluster: NameplateAnchor[] = [];
+    const queue = [anchor];
+    const discovered = new Set([anchor.id]);
+    for (let q = 0; q < queue.length; q++) {
+      const current = queue[q];
+      cluster.push(current);
+      for (const other of ordered) {
+        if (visited.has(other.id) || discovered.has(other.id)) continue;
+        if (
+          Math.abs(other.sx - current.sx) <= OVERLAP_X &&
+          Math.abs(other.sy - current.sy) <= OVERLAP_Y
+        ) {
+          discovered.add(other.id);
+          queue.push(other);
+        }
+      }
+    }
     if (cluster.length < 2) {
       visited.add(anchor.id);
       continue;
     }
+    cluster.sort((a, b) => a.id - b.id);
     const baseSy = cluster.reduce((sum, a) => sum + a.sy, 0) / cluster.length;
     cluster.forEach((member, i) => {
       const target = byId.get(member.id);
@@ -102,6 +115,20 @@ describe('nameplate declutter', () => {
     expect(ys[2] - ys[0]).toBeLessThan(200);
   });
 
+  it('stacks a transitive chain where the endpoints do not directly overlap', () => {
+    // A overlaps B (70px apart) and B overlaps C (70px apart), but A and C
+    // are 140px apart, beyond OVERLAP_THRESHOLD_X_PX (80px). All three still
+    // belong to the same collision component and must be stacked together.
+    const anchors: NameplateAnchor[] = [
+      { id: 1, sx: 0, sy: 100 },
+      { id: 2, sx: 70, sy: 100 },
+      { id: 3, sx: 140, sy: 100 },
+    ];
+
+    const out = declutterNameplates(anchors);
+    expect(out.map((anchor) => anchor.sy)).toEqual([80, 100, 120]);
+  });
+
   it('orders a cluster stably by id regardless of input order', () => {
     const anchors: NameplateAnchor[] = [
       { id: 9, sx: 400, sy: 400 },
@@ -148,12 +175,16 @@ describe('nameplate declutter: spatial-hash hot path', () => {
         anchors.push({
           // a tight screen box, so clusters genuinely form and overlap
           id: Math.floor(rng() * 100000),
-          sx: Math.round(rng() * 400),
-          sy: Math.round(rng() * 90),
+          sx: Math.round(rng() * 400 - (trial % 2 === 0 ? 0 : 200)),
+          sy: Math.round(rng() * 90 - (trial % 2 === 0 ? 0 : 45)),
         });
       // ids must be unique (entity ids are)
       const seen = new Set<number>();
-      const uniq = anchors.filter((a) => !seen.has(a.id) && (seen.add(a.id), true));
+      const uniq = anchors.filter((anchor) => {
+        if (seen.has(anchor.id)) return false;
+        seen.add(anchor.id);
+        return true;
+      });
 
       const expected = declutterReference(uniq);
       const actual = declutterNameplatesInPlace(uniq.map((a) => ({ ...a })));
@@ -197,6 +228,8 @@ describe('nameplate declutter: spatial-hash hot path', () => {
     ['outside horizontal threshold', { sx: 0, sy: 0 }, { sx: 80.0001, sy: 0 }, false],
     ['inclusive vertical threshold', { sx: 0, sy: 0 }, { sx: 0, sy: 18 }, true],
     ['outside vertical threshold', { sx: 0, sy: 0 }, { sx: 0, sy: 18.0001 }, false],
+    ['inclusive diagonal threshold', { sx: 0, sy: 0 }, { sx: 80, sy: 18 }, true],
+    ['inclusive opposite diagonal', { sx: 0, sy: 18 }, { sx: 80, sy: 0 }, true],
     ['negative to positive cell boundary', { sx: -40, sy: 0 }, { sx: 40, sy: 0 }, true],
   ])('pins the %s', (_label, a, b, collides) => {
     const anchors: NameplateAnchor[] = [
@@ -235,16 +268,67 @@ describe('nameplate declutter: spatial-hash hot path', () => {
     expect(metrics.candidateChecks).toBe(anchors.length);
   });
 
+  it('keeps a long transitive chain local to nearby hash cells', () => {
+    const anchors: NameplateAnchor[] = [];
+    for (let i = 0; i < 4_000; i++) {
+      anchors.push({ id: i, sx: i * 70, sy: 100 });
+    }
+    const metrics: NameplateDeclutterMetrics = { candidateChecks: 0, spatialHashResizes: 0 };
+
+    declutterNameplatesInPlace(anchors, anchors.length, metrics);
+
+    expect(anchors[1].sy - anchors[0].sy).toBe(20);
+    expect(anchors[anchors.length - 1].sy - anchors[anchors.length - 2].sy).toBe(20);
+    expect(metrics.candidateChecks).toBeLessThan(anchors.length * 8);
+  });
+
+  it('does not rescan a dense collision bucket for every component member', () => {
+    const anchors: NameplateAnchor[] = [];
+    for (let i = 0; i < 4_000; i++) {
+      anchors.push({ id: i, sx: 100, sy: 100 });
+    }
+    const metrics: NameplateDeclutterMetrics = { candidateChecks: 0, spatialHashResizes: 0 };
+
+    declutterNameplatesInPlace(anchors, anchors.length, metrics);
+
+    expect(anchors[1].sy - anchors[0].sy).toBe(20);
+    expect(anchors[anchors.length - 1].sy - anchors[anchors.length - 2].sy).toBe(20);
+    expect(metrics.candidateChecks).toBe(anchors.length);
+  });
+
+  it('does not repeatedly scan a dense non-overlapping neighbour bucket', () => {
+    const anchors: NameplateAnchor[] = [];
+    for (let i = 0; i < 4_000; i++) anchors.push({ id: i, sx: 0, sy: 100 });
+    for (let i = 0; i < 4_000; i++) anchors.push({ id: 4_000 + i, sx: 159, sy: 100 });
+    const metrics: NameplateDeclutterMetrics = { candidateChecks: 0, spatialHashResizes: 0 };
+
+    declutterNameplatesInPlace(anchors, anchors.length, metrics);
+
+    expect(metrics.candidateChecks).toBe(anchors.length);
+  });
+
+  it('rejects dense diagonal neighbour buckets without a quadratic cross-product', () => {
+    const anchors: NameplateAnchor[] = [];
+    for (let i = 0; i < 2_000; i++) anchors.push({ id: i, sx: 79, sy: 0 });
+    for (let i = 0; i < 2_000; i++) anchors.push({ id: 2_000 + i, sx: 0, sy: 17 });
+    for (let i = 0; i < 4_000; i++) anchors.push({ id: 4_000 + i, sx: 158, sy: 34 });
+    const metrics: NameplateDeclutterMetrics = { candidateChecks: 0, spatialHashResizes: 0 };
+
+    declutterNameplatesInPlace(anchors, anchors.length, metrics);
+
+    expect(metrics.candidateChecks).toBeLessThan(anchors.length * 2);
+  });
+
   it('does not resize the spatial hash after its high-water capacity is warm', () => {
     const anchors: NameplateAnchor[] = [];
-    for (let i = 0; i < 5_000; i++) {
+    for (let i = 0; i < 10_000; i++) {
       anchors.push({ id: i, sx: i * 1_000, sy: i * 1_000 });
     }
     const metrics = { candidateChecks: 0, spatialHashResizes: -1 };
     declutterNameplatesInPlace(anchors, anchors.length, metrics);
     expect(metrics.spatialHashResizes).toBeGreaterThan(0);
 
-    for (const count of [anchors.length, 2_500, 500, 50]) {
+    for (const count of [anchors.length, 5_000, 500, 50]) {
       metrics.spatialHashResizes = -1;
       declutterNameplatesInPlace(anchors, count, metrics);
       expect(metrics.spatialHashResizes).toBe(0);
@@ -266,6 +350,53 @@ describe('nameplate declutter: spatial-hash hot path', () => {
       { id: 2, sx: -farX, sy: 500 },
     ]);
     expect(metrics.candidateChecks).toBe(anchors.length);
+  });
+
+  it('does not merge distinct far coordinates whose quotient rounds to one cell id', () => {
+    const farX = 1.2501 * 2 ** 60;
+    const anchors: NameplateAnchor[] = [
+      { id: 1, sx: farX, sy: 100 },
+      { id: 2, sx: farX + 256, sy: 100 },
+    ];
+
+    declutterNameplatesInPlace(anchors);
+
+    expect(anchors).toEqual([
+      { id: 1, sx: farX, sy: 100 },
+      { id: 2, sx: farX + 256, sy: 100 },
+    ]);
+  });
+
+  it('does not round a far diagonal gap down into the overlap threshold', () => {
+    const anchors: NameplateAnchor[] = [
+      { id: 1, sx: 576460752303423700, sy: 67108871.674485 },
+      { id: 2, sx: 576460752303423900, sy: 67108855.61777681 },
+    ];
+    const before = anchors.map((anchor) => ({ ...anchor }));
+
+    declutterNameplatesInPlace(anchors);
+
+    expect(anchors).toEqual(before);
+  });
+
+  it.each([
+    [
+      'left cell below right',
+      { id: 1, sx: 70, sy: 144115188075856000 },
+      { id: 2, sx: 100, sy: 144115188075856030 },
+    ],
+    [
+      'left cell above right',
+      { id: 1, sx: 70, sy: 144115188075856030 },
+      { id: 2, sx: 100, sy: 144115188075856000 },
+    ],
+  ])('does not round a far y gap down for a diagonal with the %s', (_label, a, b) => {
+    const anchors: NameplateAnchor[] = [a, b];
+    const before = anchors.map((anchor) => ({ ...anchor }));
+
+    declutterNameplatesInPlace(anchors);
+
+    expect(anchors).toEqual(before);
   });
 
   it('treats signed zero cell coordinates as the same cell', () => {
@@ -300,6 +431,7 @@ describe('nameplate declutter: spatial-hash hot path', () => {
       expect(Object.is(anchors[i].sy, invalidBefore[i].sy)).toBe(true);
     }
     expect(Math.abs(anchors[6].sy - anchors[7].sy)).toBeGreaterThanOrEqual(18);
+    // Resolved finite candidates are consumed from the bucket instead of rescanned.
     expect(metrics.candidateChecks).toBe(2);
   });
 
