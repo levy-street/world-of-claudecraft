@@ -2594,7 +2594,9 @@ export const en: EnTranslations = {
       "revenge": "Sweeps enemies in front of you, with a chance to become free after a dodge or parry.",
       "hamstring": "Cripples an enemy's movement to keep it from escaping.",
       "battle_shout": "A rallying cry that raises attack power for the party.",
+      "commanding_shout": "Bolsters stamina so everyone has more staying power in a fight.",
       "charge": "Rushes a distant enemy to open the fight with a brief stun.",
+      "rend": "Opens a bleed that wears the target down over time.",
       "thunder_clap": "Hits everything around you and slows their attacks.",
       "twin_slash": "Cuts with both blades in one quick sequence to build momentum.",
       "crescent_sweep": "Carves a wide arc through nearby enemies.",
@@ -5878,6 +5880,10 @@ export const en: EnTranslations = {
         "name": "Iron Bellow",
         "description": "A shout that increases the attack power of all party members by {buff}% for 2 min."
       },
+      "commanding_shout": {
+        "name": "Bolstering Cry",
+        "description": "Increases your Stamina by {buff} for 2 min."
+      },
       "demoralizing_shout": {
         "name": "Direhowl",
         "description": "Lets out a fearsome shout, reducing the attack power of all nearby enemies by {buff} for 30 sec."
@@ -5885,6 +5891,10 @@ export const en: EnTranslations = {
       "charge": {
         "name": "Onrush",
         "description": "Charges an enemy, generating 9 rage and stunning it for 1 sec. 8-25 yd range."
+      },
+      "rend": {
+        "name": "Deep Gash",
+        "description": "Wounds the target, causing them to bleed for {damage} damage over {duration} sec."
       },
       "thunder_clap": {
         "name": "Quaking Blow",

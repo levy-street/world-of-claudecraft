@@ -2594,7 +2594,9 @@ export const tr_TR: EnTranslations = {
       "revenge": "Sweeps enemies in front of you, with a chance to become free after a dodge or parry.",
       "hamstring": "Cripples an enemy's movement to keep it from escaping.",
       "battle_shout": "Grubun saldırı gücünü yükselten coşturucu bir nara.",
+      "commanding_shout": "Dayanıklılığı artırır, böylece dövüşte herkesin daha çok direnci olur.",
       "charge": "Uzaktaki bir düşmana atılarak kısa bir sersemletmeyle dövüşü başlatır.",
+      "rend": "Hedefi zamanla yıpratan bir kanama açar.",
       "thunder_clap": "Çevrendeki her şeye vurur ve saldırılarını yavaşlatır.",
       "twin_slash": "Cuts with both blades in one quick sequence to build momentum.",
       "crescent_sweep": "Carves a wide arc through nearby enemies.",
@@ -2652,9 +2654,7 @@ export const tr_TR: EnTranslations = {
       "mark_of_the_wild": "Dövüşten önce kendine ya da bir dosta koyduğun kalıcı bir kutsama.",
       "moonfire": "Anında vurur ve hedefi yanar halde bırakır, hareket halindeyken iyidir.",
       "rejuvenation": "Anında okunur ve bir dostu zamanla iyileştirir, böylece harekete devam edebilirsin.",
-      "thorns": "Bir dostu korur, böylece yakın dövüş saldırganları vurdukları için kendilerine zarar verir.",
-      "commanding_shout": "Dayanıklılığı artırır, böylece dövüşte herkesin daha çok direnci olur.",
-      "rend": "Hedefi zamanla yıpratan bir kanama açar."
+      "thorns": "Bir dostu korur, böylece yakın dövüş saldırganları vurdukları için kendilerine zarar verir."
     },
     "petHook": {
       "emberkin": "Düşmanları güvenli bir mesafeden ateş oklarıyla hırpalayan menzilli bir iblis.",
@@ -5880,6 +5880,10 @@ export const tr_TR: EnTranslations = {
         "name": "Demir Nara",
         "description": "Saldırı gücünü 2 dakika boyunca {buff} artırır."
       },
+      "commanding_shout": {
+        "name": "Güçlendiren Nara",
+        "description": "Dayanıklılığını 2 dakika boyunca {buff} artırır."
+      },
       "demoralizing_shout": {
         "name": "Vahim Uluma",
         "description": "Korkunç bir nara atarak yakındaki tüm düşmanların saldırı gücünü 30 saniye boyunca {buff} azaltır."
@@ -5887,6 +5891,10 @@ export const tr_TR: EnTranslations = {
       "charge": {
         "name": "Atılım",
         "description": "Bir düşmana hücum ederek 9 öfke üretir ve onu 1 saniye sersemletir. 8-25 yarda menzil."
+      },
+      "rend": {
+        "name": "Derin Yarık",
+        "description": "Hedefi yaralar, {duration} saniye boyunca {damage} kanama hasarı vermesine yol açar."
       },
       "thunder_clap": {
         "name": "Sarsan Darbe",
@@ -6907,14 +6915,6 @@ export const tr_TR: EnTranslations = {
       "revive_pet": {
         "name": "Evcili Diriltme",
         "description": "Ölü evcilini diriltir ve yanına geri getirir."
-      },
-      "commanding_shout": {
-        "description": "Dayanıklılığını 2 dakika boyunca {buff} artırır.",
-        "name": "Güçlendiren Nara"
-      },
-      "rend": {
-        "description": "Hedefi yaralar, {duration} saniye boyunca {damage} kanama hasarı vermesine yol açar.",
-        "name": "Derin Yarık"
       }
     },
     "items": {

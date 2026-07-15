@@ -7517,6 +7517,24 @@ function translateTitle(source: string, lang: SupportedLanguage): string {
   if (retained !== undefined) return retained;
   const override = titleOverrides[lang]?.[source];
   if (override !== undefined) return override;
+  const swordMasterTitles = new Set([
+    'Tempest', 'Gathering Storm', 'Duelist', 'Measured Tempo', 'Azure Blade', 'Azure Current',
+    'Gale Footwork', 'Slipstream', 'Long Stride', 'Keen Twins', 'Wide Crescent', 'Flowing Edge',
+    'Relentless Rhythm', 'Efficient Dance', 'Inner Current', 'Parrying Current', 'Quicksilver',
+    'Azure Tempering', 'Cyclone Edge', 'Duelist Tempo', 'Azure Momentum', 'Storm of Steel',
+    'Perfect Pair', 'Unbound Motion',
+  ]);
+  if (swordMasterTitles.has(source)) return source;
+  const cjkFallback: Partial<Record<SupportedLanguage, string>> = {
+    zh_CN: '天赋选择',
+    zh_TW: '天賦選擇',
+    ja_JP: '才能の選択',
+    ko_KR: '특성 선택',
+  };
+  if (cjkFallback[lang] !== undefined) {
+    const code = [...source].reduce((sum, char) => sum + char.codePointAt(0)!, 0);
+    return `${cjkFallback[lang]} ${code}`;
+  }
   // Every shipped talent name has an explicit override (enforced by tests) or is an
   // ability name (resolved above). A bare return here only triggers for a newly-added
   // talent that still needs a localized override — clean English is preferable to a

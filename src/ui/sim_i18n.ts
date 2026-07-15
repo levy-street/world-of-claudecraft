@@ -26,6 +26,8 @@ import {
 import { ARENA_NEW, BASE_NEW, ITEM_NEW, PET_NEW, QUEST_NEW, RAID_NEW } from './sim_i18n.newlocales';
 
 const baseEnTable = {
+  'error.shieldRequired': 'You must have a shield equipped.',
+  'log.deathwardSaves': 'A deathward saves you!',
   'error.lineOfSight': 'Line of sight.',
   'error.bagsFull': 'Your bags are full.',
   'error.bagSocketsFull': 'All your bag slots are full.',
@@ -5907,6 +5909,15 @@ const RULES: Rule[] = [
         total: m[3],
         breakdown: locTalentBreakdown(m[4]),
       }) + (m[5] ? locTalentTail(m[5]) : ''),
+  },
+  {
+    re: /^Talents: (.+) - (.+)\/(.+) rows selected\.(.*)$/,
+    build: (m) =>
+      t('hudChrome.talentRows.readoutSummary', {
+        head: m[1],
+        spent: m[2],
+        total: m[3],
+      }) + (m[4] ? locTalentTail(m[4]) : ''),
   },
   {
     re: /^The ritual circle is silent without the Crypt Keystone\.$/,
