@@ -483,11 +483,13 @@
   #player-frame > :not(.tf-move-btn) {
     zoom: var(--player-frame-scale, 1);
   }
+  /* A compact plate (the old 520px cap stretched the name plate across the
+     whole action-bar width, which read as a giant empty banner). */
   #player-frame .uf-bars {
     flex: 1;
     width: auto;
     min-width: 0;
-    max-width: 520px;
+    max-width: 300px;
   }
   /* The player frame once MOVED (MovableFrame sets pf-detached alongside the
      saved left/top): hud.ts reparents it from the action-bar stack to #ui (a
@@ -704,7 +706,7 @@
     background: var(--panel-bg);
     border: 2px solid var(--border);
     outline: 1px solid #000;
-    border-radius: 0 6px 6px 0;
+    border-radius: 0 9px 9px 0;
     box-shadow: 0 2px 10px #000a;
   }
   #target-frame .portrait-wrap {
@@ -792,10 +794,10 @@
   .bar {
     position: relative;
     height: 15px;
-    background: #1a1a1a;
+    background: #101014;
     border: 1px solid #000;
     margin-top: 3px;
-    border-radius: 2px;
+    border-radius: 3px;
     overflow: hidden;
   }
   .bar-fill {
@@ -1224,7 +1226,7 @@
     outline: 1px solid #3a3148;
     margin: 0 auto 4px;
     position: relative;
-    border-radius: 2px;
+    border-radius: 5px;
     overflow: hidden;
   }
   #xpbar .fill {
@@ -1391,6 +1393,10 @@
     display: flex;
     gap: 4px;
     padding: 6px;
+    border: 1px solid #060509;
+    outline: 1px solid #3f3418;
+    border-radius: 10px;
+    background: linear-gradient(180deg, #14131cf0, #0a0a0ff0);
   }
   /* The optional second action bar (second-action-bar feature) sits just under the
      primary one; a tighter bottom pad keeps the pair compact. It is OFF by default
@@ -1410,16 +1416,17 @@
     width: 46px;
     height: 46px;
     position: relative;
-    border: 2px solid #4a3d1d;
-    border-radius: 6px;
-    background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f);
+    border: 1px solid #060509;
+    outline: 1px solid #554620;
+    border-radius: 7px;
+    background: linear-gradient(160deg, #23222e, #131219);
     color: #fff;
     cursor: var(--cursor-point);
     font-family: var(--title-font);
     text-shadow: 1px 1px 2px #000;
     box-shadow:
-      inset 0 1px 0 #ffffff18,
-      0 2px 4px #0009;
+      inset 0 1px 0 #ffffff14,
+      0 3px 6px #000a;
   }
   .action-btn .icon-label {
     position: absolute;
@@ -1431,29 +1438,45 @@
     pointer-events: none;
   }
   .action-btn:hover {
-    border-color: var(--gold);
+    outline-color: var(--gold);
+  }
+  /* The decorative bezel above rides `outline` in @layer components, which
+     would silently beat the base-layer keyboard focus ring (a later layer
+     wins the cascade regardless of specificity), so the accent ring is
+     re-declared here for both bezel-on-outline controls. */
+  .action-btn:focus-visible,
+  .micro-btn:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
   }
   .action-btn:active {
     transform: translateY(1px);
   }
   .action-btn.used {
-    border-color: var(--color-border-focus);
+    outline-color: var(--color-border-focus);
     box-shadow:
       0 0 10px #ffd100aa,
       inset 0 0 0 1px #ffd10077,
       inset 0 1px 0 #ffffff28;
   }
+  /* Empty slots recede (dimmer plate, quieter ring) so a sparse bar stops
+     reading as a row of loud dark boxes; the keybind stays readable. */
   .action-btn.empty {
-    background: #0d0d13;
+    background: #0b0b11aa;
+    outline-color: #3a321c;
     cursor: default;
     box-shadow: inset 0 0 10px #000;
   }
   .action-btn .keybind {
     position: absolute;
-    top: 1px;
-    right: 3px;
+    top: 2px;
+    right: 2px;
+    padding: 0 3px;
     font-size: 10px;
-    color: #ddd;
+    line-height: 13px;
+    color: #d8cfae;
+    background: #000000a6;
+    border-radius: 3px;
     font-family: var(--ui-font);
   }
   .action-btn .item-count {
@@ -1494,7 +1517,7 @@
     filter: brightness(0.55) saturate(0.4);
   }
   .action-btn.queued {
-    border-color: #fff;
+    outline-color: #fff;
     box-shadow:
       0 0 9px #ffd100cc,
       inset 0 1px 0 #ffffff18;
@@ -1503,50 +1526,53 @@
     cursor: grab;
   }
   .action-btn.drop-target {
-    border-color: #7fd1ff;
+    outline-color: #7fd1ff;
     box-shadow: 0 0 8px #7fd1ff88;
   }
-  /* micro-menu: bottom-right, stacked upward, sitting just above the
-     Discord/GitHub buttons (both right-aligned to the same edge). */
+  /* micro-menu: a compact horizontal dock in the bottom-right corner (classic
+     micro-menu placement), wrapping into a second row above when the buttons
+     outgrow the dock width, so the right edge of the screen stays clear for
+     the 3D world. wrap-reverse keeps the FIRST buttons in DOM order (store,
+     character, spellbook, ...) on the BOTTOM row. */
   #side-buttons {
     position: absolute;
-    right: 16px;
-    bottom: 74px;
+    right: 10px;
+    bottom: 8px;
+    width: 348px;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap-reverse;
+    justify-content: flex-end;
     align-items: flex-end;
-    gap: 4px;
+    gap: 3px;
     z-index: 19;
   }
   .micro-btn {
     width: 34px;
     height: 30px;
-    border: 2px solid #4a3d1d;
-    border-radius: 5px;
-    background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f);
+    border: 1px solid #060509;
+    outline: 1px solid #4a3d1d;
+    border-radius: 6px;
+    background: linear-gradient(160deg, #262532, #12111a);
     color: var(--color-text-muted);
     cursor: var(--cursor-point);
     font-size: 12px;
     font-weight: bold;
     box-shadow:
-      inset 0 1px 0 #ffffff18,
-      0 2px 4px #0009;
+      inset 0 1px 0 #ffffff16,
+      0 2px 5px #000a;
     position: relative;
   }
-  /* hover flyout: the button's background grows leftward to reveal its label.
-     The panel tucks 6px under the button (z-index:-1) so it reads as one surface. */
+  /* hover label: a small floating caption above the button (the dock is a
+     horizontal row now, so the old grow-leftward flyout would cover its
+     neighbours). Fades in on hover and keyboard focus alike. */
   .micro-btn::before {
     content: attr(aria-label);
     position: absolute;
-    right: calc(100% - 6px);
-    top: 0;
-    height: 100%;
-    display: flex;
-    align-items: center;
+    right: 0;
+    bottom: calc(100% + 8px);
     box-sizing: border-box;
-    max-width: 0;
-    padding: 0;
-    overflow: hidden;
+    padding: 4px 10px;
     opacity: 0;
     white-space: nowrap;
     font-family: var(--font-ui);
@@ -1554,34 +1580,43 @@
     font-weight: 600;
     letter-spacing: 0.3px;
     line-height: 1;
-    color: var(--color-text-muted);
-    background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f);
-    border: 2px solid #4a3d1d;
-    border-right: none;
-    border-radius: 5px 0 0 5px;
+    color: var(--color-text-light);
+    background: linear-gradient(170deg, #1d1c28f2, #0c0b12f2);
+    border: 1px solid #4a3d1d;
+    border-radius: 6px;
     box-shadow:
-      inset 0 1px 0 #ffffff18,
-      0 2px 4px #0009;
+      inset 0 1px 0 #ffffff14,
+      0 3px 8px #000b;
     pointer-events: none;
-    z-index: -1;
+    z-index: 30;
+    transform: translateY(3px);
     transition:
-      max-width 0.2s ease,
-      opacity 0.15s ease,
-      padding 0.2s ease,
-      border-color 0.12s ease,
-      color 0.12s ease;
+      opacity 0.14s ease,
+      transform 0.14s ease;
   }
-  .micro-btn:hover::before {
-    max-width: 220px;
+  .micro-btn:hover::before,
+  .micro-btn:focus-visible::before {
     opacity: 1;
-    padding: 0 18px 0 12px;
+    transform: translateY(0);
   }
-  .micro-btn:hover,
-  .micro-btn:hover::before {
-    border-color: var(--gold);
+  /* Reduced motion: the caption still fades, but never translates. */
+  @media (prefers-reduced-motion: reduce) {
+    .micro-btn::before {
+      transform: none;
+      transition: opacity 0.14s ease;
+    }
+  }
+  .micro-btn:hover {
+    outline-color: var(--gold);
     color: #fff;
   }
   /* talent button glows while unspent talent points are available */
+  /* Only the micro-btn's bezel rides `outline`; the mobile-btn keeps border,
+     so the outline tint stays off the shared rule (see the focus-ring guard,
+     tests/hud_focus_ring_layers.test.ts). */
+  .micro-btn.has-points {
+    outline-color: var(--gold);
+  }
   .micro-btn.has-points,
   .mobile-btn.has-points {
     border-color: var(--gold);
@@ -1663,24 +1698,25 @@
        box), so suppress the browser's own touch gesture here. Mobile has no move
        gesture and overrides this to pan-x so overflowed tabs stay swipeable. */
     touch-action: none;
-    gap: 2px;
-    margin-left: 6px;
-    margin-bottom: -1px;
+    gap: 3px;
+    margin-left: 4px;
+    margin-bottom: 3px;
     position: relative;
     z-index: 2;
   }
   #chatlog-tabs::-webkit-scrollbar {
     display: none;
   }
+  /* Tabs are floating pills above the frame (the old squared folder-tabs fused
+     into the panel border and read as extra chrome). */
   .chat-tab {
     /* keep each tab its natural width and let the strip scroll, never squish */
     flex: 0 0 auto;
     height: 22px;
     padding: 0 12px;
     border: 1px solid #3a321d;
-    border-bottom: none;
-    border-radius: 6px 6px 0 0;
-    background: linear-gradient(#1c1824, #0d0b13);
+    border-radius: 999px;
+    background: #0d0b13b8;
     color: #95886a;
     cursor: var(--cursor-point);
     font-family: var(--title-font);
@@ -1711,11 +1747,17 @@
   .chat-pane .chat-hidden {
     display: none;
   }
+  /* Softer panel: thin ring + translucent gradient instead of the default
+     heavy 2px .panel border, so the chat sits back from the world. */
   #chatlog-frame {
     height: 184px;
     padding: 0;
     overflow: hidden;
-    border-radius: 0 6px 6px 6px;
+    border: 1px solid #060509;
+    outline: 1px solid #3f3418;
+    border-radius: 10px;
+    background: linear-gradient(180deg, #101018d9, #08080de6);
+    box-shadow: 0 4px 14px #0009;
     position: relative;
   }
   /* the empty area of the tab strip is a move handle (the tab buttons sit above it) */
@@ -1882,8 +1924,8 @@
     height: 100%;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 7px 10px;
-    font-size: 11px;
+    padding: 8px 11px;
+    font-size: 12px;
     line-height: 1.45;
   }
   .chat-pane.active {
@@ -2050,7 +2092,7 @@
   #right-tracker-stack {
     position: absolute;
     right: 14px;
-    top: 262px;
+    top: 258px;
     width: 240px;
     display: flex;
     flex-direction: column;
@@ -2075,14 +2117,16 @@
     gap: 6px;
     width: 100%;
     font-family: var(--title-font);
-    font-size: 14px;
-    color: var(--color-text-overlay);
+    font-size: 13px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--gold);
     text-align: left;
     background: none;
     border: 0;
     border-bottom: 1px solid color-mix(in srgb, var(--gold) 27%, transparent);
     margin: 0 0 4px;
-    padding: 0 0 2px;
+    padding: 0 0 3px;
     cursor: pointer;
     pointer-events: auto;
     text-shadow: 1px 1px 2px #000;
@@ -2146,10 +2190,12 @@
        only blurs it, so drop it inside the badge */
     text-shadow: none;
   }
+  /* Objectives indent past the acceptance-order badge so they hang under the
+     quest title text, not under the badge circle. */
   #quest-tracker .qt-obj {
     color: var(--color-text-overlay);
     font-size: 11px;
-    margin-left: 8px;
+    margin-left: 21px;
   }
   #quest-tracker .qt-obj.done,
   .qd-obj.done,
@@ -2175,14 +2221,16 @@
     gap: 6px;
     width: 100%;
     font-family: var(--title-font);
-    font-size: 14px;
-    color: var(--color-text-overlay);
+    font-size: 13px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--gold);
     text-align: left;
     background: none;
     border: 0;
     border-bottom: 1px solid color-mix(in srgb, var(--gold) 27%, transparent);
     margin: 0 0 4px;
-    padding: 0 0 2px;
+    padding: 0 0 3px;
     cursor: pointer;
     pointer-events: auto;
     text-shadow: 1px 1px 2px #000;
@@ -2253,10 +2301,12 @@
   }
   #delve-tracker .dt-header {
     font-family: var(--title-font);
-    font-size: 14px;
+    font-size: 13px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
     border-bottom: 1px solid #ffd10044;
     margin-bottom: 4px;
-    padding-bottom: 2px;
+    padding-bottom: 3px;
   }
   #delve-tracker .dt-title {
     font-weight: bold;
@@ -2401,13 +2451,27 @@
     width: 170px;
     text-align: center;
   }
+  /* Zone name on a slim plate spanning the cluster width (classic zone bar). */
   #zone-label {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 3px 12px;
+    margin-bottom: 6px;
     font-size: 13px;
     color: var(--gold);
     font-family: var(--title-font);
     text-shadow: 1px 1px 3px #000;
-    margin-bottom: 3px;
     letter-spacing: 0.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    background: linear-gradient(180deg, #15151fd9, #0a0a10d9);
+    border: 1px solid #4a3d1d;
+    border-radius: 999px;
+    box-shadow:
+      inset 0 1px 0 #ffffff10,
+      0 2px 6px #0009;
   }
   #minimap {
     border-radius: 50%;
@@ -2417,61 +2481,61 @@
       0 0 14px #000c,
       inset 0 0 20px #0008;
   }
-  /* Digital clock pinned to the bottom of the minimap ring, classic style. */
+  /* Clock + coordinates: two small pills on one centred row under the disc
+     (the clock used to hang absolutely over the compass, hidden by the zoom
+     pill; both now sit in flow so nothing overlaps). */
   #minimap-clock {
-    position: absolute;
-    left: 50%;
-    bottom: -3px;
-    transform: translateX(-50%);
-    min-width: 52px;
-    padding: 1px 8px;
+    display: inline-block;
+    vertical-align: middle;
+    margin: 5px 2px 0 0;
+    padding: 2px 9px;
     cursor: pointer;
     user-select: none;
     font-family: var(--font-ui);
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.4px;
+    font-variant-numeric: tabular-nums;
     color: var(--gold);
     text-shadow: 1px 1px 2px #000;
-    background: radial-gradient(circle at 50% 30%, #2c2c3a, #14141d);
-    border: 2px solid var(--border);
-    border-radius: 8px;
-    box-shadow:
-      0 2px 4px #0009,
-      inset 0 1px 0 #ffffff14;
+    background: #0a0a10b8;
+    border: 1px solid #4a3d1d;
+    border-radius: 999px;
   }
   #minimap-clock:hover {
     color: #fff;
     border-color: #c9a86a;
   }
   #minimap-coords {
-    margin-top: 4px;
+    margin: 5px 0 0 2px;
     display: inline-block;
-    padding: 1px 8px;
+    vertical-align: middle;
+    padding: 2px 9px;
     font-size: 11px;
     font-variant-numeric: tabular-nums;
     color: #e8d9b0;
-    background: #0008;
-    border: 1px solid var(--border);
-    border-radius: 9px;
+    background: #0a0a10b8;
+    border: 1px solid #4a3d1d;
+    border-radius: 999px;
     text-shadow: 1px 1px 2px #000;
     letter-spacing: 0.3px;
   }
 
-  /* heading compass, a horizontal rose strip beneath the minimap */
+  /* heading compass: a quiet borderless rose strip beneath the minimap (the old
+     heavy-bordered box read as yet another panel in the cluster) */
   #compass {
     position: relative;
-    width: 162px;
+    width: 150px;
     margin: 5px auto 0;
   }
   #compass-strip {
     position: relative;
-    height: 18px;
+    height: 15px;
     overflow: hidden;
-    border: 2px solid var(--border);
-    border-radius: 5px;
-    background: linear-gradient(#1c1a14, #100f0b);
-    box-shadow: inset 0 0 8px #000a;
+    border: none;
+    border-radius: 8px;
+    background: #0a0a10a6;
+    box-shadow: inset 0 0 6px #000c;
     -webkit-mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
     mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
   }
@@ -2484,14 +2548,14 @@
     top: 50%;
     transform: translate(-50%, -50%);
     font-family: var(--title-font);
-    font-size: 11px;
+    font-size: 10px;
     color: #b9ad86;
     text-shadow: 1px 1px 2px #000;
     pointer-events: none;
     white-space: nowrap;
   }
   .compass-mark.major {
-    font-size: 13px;
+    font-size: 12px;
     color: var(--gold);
     font-weight: 700;
   }
@@ -2508,30 +2572,40 @@
     border-top: 6px solid var(--gold);
     filter: drop-shadow(0 1px 1px #000);
   }
+  /* The big heading letter under the strip is redundant with the strip's own
+     centre caret (mobile already hides it); dropping it removes one more row
+     of chrome from the cluster. */
   #compass-heading {
-    margin-top: 2px;
-    font-family: var(--title-font);
-    font-size: 12px;
-    color: var(--gold);
-    letter-spacing: 1px;
-    text-shadow: 1px 1px 2px #000;
+    display: none;
   }
-  /* minimap zoom control: a compact gold pill pinned to the bottom rim of the
-     round minimap. Vertical centre holds the live zoom readout (e.g. "2×"). */
+  /* minimap zoom control: a compact pill riding the bottom rim of the round
+     minimap (a child of #minimap-disc). Hidden until the disc is hovered or a
+     zoom button holds keyboard focus, so the resting cluster stays clean; it
+     no longer overlaps the compass strip and clock the way the old
+     wrap-anchored pill did. */
   #minimap-zoom {
     position: absolute;
     left: 50%;
-    bottom: -6px;
+    bottom: 8px;
     transform: translateX(-50%);
     display: flex;
     align-items: center;
     gap: 4px;
     padding: 1px 4px;
-    z-index: 2;
-    background: radial-gradient(circle at 50% 30%, #2c2c3a, #15151f);
+    z-index: 3;
+    line-height: normal;
+    background: #0a0a10cc;
     border: 1px solid #4a3d1d;
-    border-radius: 9px;
+    border-radius: 999px;
     box-shadow: 0 1px 3px #000a;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+  }
+  #minimap-disc:hover #minimap-zoom,
+  #minimap-disc:focus-within #minimap-zoom {
+    opacity: 1;
+    pointer-events: auto;
   }
   .minimap-zoom-btn {
     width: 17px;
@@ -2617,10 +2691,12 @@
       0 0 8px #c9a86a66,
       0 1px 3px #000a;
   }
+  /* WOC store chest: the one oversized "jewel" button of the micro dock; no
+     bottom margin (it sits in the horizontal dock row, aligned to its baseline). */
   #daily-rewards-button {
     position: relative;
-    width: 50px;
-    height: 46px;
+    width: 46px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2629,7 +2705,7 @@
     pointer-events: auto;
     touch-action: manipulation;
     border-radius: 8px;
-    margin-bottom: 14px;
+    margin-right: 4px;
     background: transparent;
     border: 0;
     box-shadow: none;
@@ -2673,8 +2749,8 @@
   #daily-rewards-button .daily-rewards-icon {
     position: relative;
     z-index: 1;
-    width: 64px;
-    height: 64px;
+    width: 54px;
+    height: 54px;
     display: block;
     object-fit: contain;
     pointer-events: none;
@@ -2740,17 +2816,18 @@
   }
 
   /* ---------- community HUD ---------- */
-  /* Discord/GitHub: bottom-right, directly below the micro-menu, right-aligned with it. */
+  /* GitHub/Donate: right-aligned just above the horizontal micro dock, so the
+     bottom-right corner keeps a single tidy column of chrome. */
   /* Discord/GitHub: standalone square buttons matching the micro-menu (no panel
      container), only the hover border keeps each service's brand colour. */
   #community-hud {
     position: absolute;
-    right: 16px;
-    bottom: 14px;
+    right: 10px;
+    bottom: 88px;
     display: flex;
     align-items: center;
     gap: 4px;
-    z-index: 19;
+    z-index: 18;
   }
   #community-menu {
     display: contents;

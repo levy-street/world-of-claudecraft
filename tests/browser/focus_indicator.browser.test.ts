@@ -94,3 +94,26 @@ describe('pre-game shell focus indicators are present and steady (the box-shadow
     );
   });
 });
+
+// In-game HUD controls whose decorative bezel rides `outline` (.action-btn and
+// .micro-btn since the micro-dock redesign): keyboard focus must compute a ring at
+// least the 2px accent width, never the 1px resting bezel. NOTE: this live check runs
+// against the dev-served stylesheet, where Vite flattens the @layer structure, so a
+// cascade-LAYER defeat of the base focus ring is NOT reproducible here; the decisive
+// guard for that class is the source-layer scan in tests/hud_focus_ring_layers.test.ts.
+// This check still catches a same-layer clobber or an outline:none regression live.
+describe('in-game bezel-on-outline controls keep the 2px keyboard focus ring', () => {
+  for (const cls of ['action-btn', 'micro-btn']) {
+    it(`.${cls} widens its outline to the accent focus ring on keyboard focus`, async () => {
+      const node = await keyboardFocus(cls);
+      await vi.waitFor(() => {
+        const cs = getComputedStyle(node);
+        expect(cs.outlineStyle, `.${cls} :focus-visible outline-style`).not.toBe('none');
+        expect(
+          Number.parseFloat(cs.outlineWidth),
+          `.${cls} :focus-visible outline-width`,
+        ).toBeGreaterThanOrEqual(2);
+      });
+    });
+  }
+});
