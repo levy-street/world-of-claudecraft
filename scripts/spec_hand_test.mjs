@@ -4,6 +4,7 @@
 // Needs `npm run dev` (GAME_URL overrides the port). Exits 1 on any failure.
 import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH as EDGE } from './browser_path.mjs';
+import { PLAYABLE_CLASSES } from './lib/playable_classes.mjs';
 
 const URL = process.env.GAME_URL ?? 'http://localhost:5173';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -74,20 +75,7 @@ const SPEC_SIGS = {
   ],
 };
 
-const CLASSES = [
-  'warrior',
-  'paladin',
-  'hunter',
-  'mage',
-  'rogue',
-  'priest',
-  'shaman',
-  'warlock',
-  'druid',
-  'swordmaster',
-];
-
-for (const cls of CLASSES) {
+for (const cls of PLAYABLE_CLASSES) {
   const page = await browser.newPage();
   const pageErrors = [];
   page.on('pageerror', (e) => pageErrors.push(e.message));

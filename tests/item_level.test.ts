@@ -14,6 +14,7 @@ import {
   RAID_ILVL_BONUS,
   resetItemLevelCache,
 } from '../src/sim/item_level';
+import { ALL_CLASSES } from '../src/sim/types';
 
 // The showcase tiers wired up in src/sim/content/items.ts: two trios, each one
 // piece per archetype, dropping from the same place so they share an item level.
@@ -331,17 +332,6 @@ describe('item level: purity and determinism', () => {
 
 describe('heroic set: class coverage', () => {
   it('every class can use a broad slot spread of heroic epics', () => {
-    const ALL_CLASSES = [
-      'warrior',
-      'paladin',
-      'shaman',
-      'rogue',
-      'hunter',
-      'druid',
-      'mage',
-      'priest',
-      'warlock',
-    ] as const;
     const ids = Object.values(HEROIC_BOSS_LOOT)
       .flat()
       .flatMap((e) => (e.itemId ? [e.itemId] : []));

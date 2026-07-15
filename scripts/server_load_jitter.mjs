@@ -20,6 +20,7 @@
 
 import fs from 'node:fs';
 import WebSocket from 'ws';
+import { LOAD_ATTACK_ABILITIES, PLAYABLE_CLASSES } from './lib/playable_classes.mjs';
 
 const BASE = process.env.SERVER_URL ?? 'http://localhost:8787';
 const WS_BASE = BASE.replace(/^http/, 'ws');
@@ -55,18 +56,6 @@ const lettersOf = (n) =>
       })();
 // a distinct public-looking IP per client → distinct rate-limit + WS-cap bucket
 const ipFor = (n) => `9.${(n >> 8) & 255}.${n & 255}.7`;
-const CLASSES = [
-  'warrior',
-  'mage',
-  'hunter',
-  'rogue',
-  'priest',
-  'paladin',
-  'warlock',
-  'druid',
-  'shaman',
-];
-
 async function api(path, body, token, ip) {
   const res = await fetch(BASE + path, {
     method: 'POST',
@@ -243,7 +232,9 @@ async function main() {
   }
 
   const bots = [];
-  for (let i = 0; i < BOTS; i++) bots.push(new Client(i + 1, CLASSES[i % CLASSES.length], 'Ldr'));
+  for (let i = 0; i < BOTS; i++) {
+    bots.push(new Client(i + 1, PLAYABLE_CLASSES[i % PLAYABLE_CLASSES.length], 'Ldr'));
+  }
   const observer = WANT_OBSERVER ? new Client(50000, 'mage', 'Obs') : null;
 
   // ---- join (staggered so the WS upgrade flood doesn't trip anything) ----
@@ -292,17 +283,6 @@ async function main() {
   }
 
   // ---- run: every bot circles, jumps, and fights whatever's near ----
-  const ATTACK_ABILITY = {
-    warrior: 'heroic_strike',
-    mage: 'fireball',
-    hunter: 'arcane_shot',
-    rogue: 'sinister_strike',
-    priest: 'smite',
-    paladin: 'judgement',
-    warlock: 'shadow_bolt',
-    druid: 'wrath',
-    shaman: 'lightning_bolt',
-  };
   const start = performance.now();
   let step = 0;
   while (performance.now() - start < DURATION_MS) {
@@ -330,7 +310,7 @@ async function main() {
         if (b.self.target !== near.id) b.cmd({ cmd: 'target', id: near.id });
         b.cmd({ cmd: 'attack' });
         if ((b.self.gcd ?? 0) <= 0 && !b.self.cast)
-          b.cmd({ cmd: 'cast', ability: ATTACK_ABILITY[b.cls] });
+          b.cmd({ cmd: 'cast', ability: LOAD_ATTACK_ABILITIES[b.cls] });
       } else if (step % 8 === 0) {
         b.cmd({ cmd: 'targetNearest' });
       }

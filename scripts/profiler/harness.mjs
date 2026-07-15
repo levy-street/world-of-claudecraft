@@ -8,20 +8,10 @@ import fs from 'node:fs';
 import puppeteer from 'puppeteer-core';
 import WebSocket from 'ws';
 import { BROWSER_PATH } from '../browser_path.mjs';
+import { PLAYABLE_CLASSES } from '../lib/playable_classes.mjs';
 import { attributeFreezes, frameStats, normalizeReport } from './metrics.mjs';
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const CLASSES = [
-  'warrior',
-  'paladin',
-  'priest',
-  'mage',
-  'hunter',
-  'rogue',
-  'warlock',
-  'druid',
-  'shaman',
-];
 
 // Injected once per session. A rAF loop records per-frame {dt, programs, views}
 // plus longtasks (so the profiler gets real 1%/0.1% lows + freeze attribution),
@@ -153,7 +143,7 @@ class Bot {
     this.server = server;
     this.wsBase = wsBase;
     this.i = i;
-    this.cls = CLASSES[i % CLASSES.length];
+    this.cls = PLAYABLE_CLASSES[i % PLAYABLE_CLASSES.length];
     this.level = 1 + ((i * 7) % 40);
     const li = String(i)
       .split('')

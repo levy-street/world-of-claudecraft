@@ -11,10 +11,26 @@
 import fs from 'node:fs';
 import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH as EDGE } from './browser_path.mjs';
+import { PLAYABLE_CLASSES } from './lib/playable_classes.mjs';
 
 const URL = `${process.env.GAME_URL ?? 'http://localhost:5173'}/?gfx=ultra`;
 fs.mkdirSync('tmp', { recursive: true });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const RAID_BOT_NAMES = {
+  warrior: 'Ironhowl',
+  swordmaster: 'Azureedge',
+  hunter: 'Swiftarrow',
+  rogue: 'Nightblade',
+  priest: 'Holyverse',
+  shaman: 'Stormcaller',
+  mage: 'Emberlyn',
+  warlock: 'Grimfang',
+  druid: 'Brightoak',
+};
+const RAID_ROSTER = PLAYABLE_CLASSES.filter((cls) => cls !== 'paladin').map((cls) => [
+  RAID_BOT_NAMES[cls],
+  cls,
+]);
 
 const PROFILE =
   process.env.CHROME_PROFILE_DIR ?? `${process.env.TMPDIR ?? '/tmp'}/raid-shot-profile`;
@@ -40,6 +56,9 @@ const page = await browser.newPage();
 page.on('pageerror', (e) => console.log('PAGEERROR:', e.message));
 
 await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
+// This is a roster capture, so resolve the unrelated one-shot camera choice
+// before world entry. Its delayed spawn can otherwise cover the finished shot.
+await page.evaluate(() => localStorage.setItem('woc.cameraModePrompt.shown', '1'));
 const clk = (sel) => page.evaluate((s) => document.querySelector(s)?.click(), sel);
 await page.waitForSelector('#btn-offline', { timeout: 20000 });
 await clk('#btn-offline');
@@ -55,23 +74,13 @@ await page.waitForFunction(() => window.__game?.renderer && window.__game.sim, {
 });
 await sleep(2500);
 
-// Build a real raid in the Sim: invite bots to form a 5-player party, convert to
-// a raid, then fill it out to two subgroups. Every step goes through the real
-// sim methods so the roster is genuine, not faked.
-const built = await page.evaluate(() => {
+// Build a real raid in the Sim: invite four bots to form a full party, convert
+// it to a raid, then invite the remaining five. Every step goes through the
+// public party methods so this follows the live PartyMachine seam.
+const built = await page.evaluate((roster) => {
   const sim = window.__game.sim;
   const me = sim.primaryId;
   const p = sim.player;
-  const roster = [
-    ['Brightoak', 'druid', 1],
-    ['Stormcaller', 'shaman', 1],
-    ['Nightblade', 'rogue', 1],
-    ['Emberlyn', 'mage', 1],
-    ['Holyverse', 'priest', 2],
-    ['Ironhowl', 'warrior', 2],
-    ['Grimfang', 'warlock', 2],
-    ['Swiftarrow', 'hunter', 2],
-  ];
   // Spawn bots in a cluster near the leader so the in-world frames have live units.
   const pids = roster.map(([name, cls], i) => {
     const pid = sim.addPlayer(cls, name);
@@ -82,27 +91,18 @@ const built = await page.evaluate(() => {
     }
     return pid;
   });
-  // Build the raid party directly. Going through invite/accept in a single-HUD
-  // offline context queues local invite prompt cards (the bots accept
-  // programmatically, leaving stale cards over the panel), so we assemble the
-  // Party struct the roster reads (leader/members/raidGroups/raid) by hand.
-  const party = {
-    id: sim.nextPartyId++,
-    leader: me,
-    members: [me, ...pids],
-    raid: true,
-    raidGroups: new Map(),
-    lootStrategies: {},
-  };
-  party.raidGroups.set(me, 1);
-  roster.forEach(([, , group], i) => {
-    party.raidGroups.set(pids[i], group);
-  });
-  sim.parties.set(party.id, party);
-  sim.partyByPid.set(me, party.id);
-  pids.forEach((p) => {
-    sim.partyByPid.set(p, party.id);
-  });
+  for (const pid of pids.slice(0, 4)) {
+    sim.partyInvite(pid, me);
+    sim.partyAccept(pid);
+  }
+  sim.convertPartyToRaid(me);
+  for (const pid of pids.slice(4)) {
+    sim.partyInvite(pid, me);
+    sim.partyAccept(pid);
+  }
+  // The local HUD never needs to render the programmatically accepted invite
+  // prompts that were emitted while constructing this screenshot state.
+  sim.drainEvents();
 
   const info = sim.partyInfo;
   return {
@@ -110,7 +110,7 @@ const built = await page.evaluate(() => {
     members: info?.members?.length ?? 0,
     groups: info?.members?.map((m) => m.group) ?? [],
   };
-});
+}, RAID_ROSTER);
 console.log('raid built:', JSON.stringify(built));
 
 // Dismiss the new-adventurer tutorial card so it does not overlay the panel.
