@@ -499,6 +499,25 @@ describe('physics feel', () => {
 });
 
 describe('mid-race save and reload', () => {
+  it('preserves race standings across a save and reload', () => {
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'Champion');
+    const meta = sim.players.get(pid)!;
+    meta.hcRaces = 12;
+    meta.hcWins = 4;
+    meta.hcBest = 37.25;
+
+    const state = sim.serializeCharacter(pid)!;
+    const sim2 = makeSim();
+    const pid2 = sim2.addPlayer('warrior', 'Champion', { state });
+
+    expect(sim2.players.get(pid2)).toMatchObject({
+      hcRaces: 12,
+      hcWins: 4,
+      hcBest: 37.25,
+    });
+  });
+
   it('serializes hcReturnPos while racing and relocates there on reload', () => {
     const sim = makeSim();
     const events: SimEvent[] = [];

@@ -2125,6 +2125,10 @@ export class Sim {
           bestTrial: s.gauntletStats.bestTrial ?? 0,
         };
       }
+      if (Number.isSafeInteger(s.hcRaces) && s.hcRaces >= 0) meta.hcRaces = s.hcRaces;
+      if (Number.isSafeInteger(s.hcWins) && s.hcWins >= 0) meta.hcWins = s.hcWins;
+      if (typeof s.hcBest === 'number' && Number.isFinite(s.hcBest) && s.hcBest >= 0)
+        meta.hcBest = s.hcBest;
       if (s.delveDaily) {
         meta.delveDaily = {
           date: s.delveDaily.date,
