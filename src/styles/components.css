@@ -3227,6 +3227,10 @@
     gap: 6px;
     margin: 8px 0 6px;
   }
+  .tal-class-name {
+    color: var(--color-text-muted);
+    font-size: 11px;
+  }
   .tal-tab {
     position: relative;
     flex: 1;
@@ -3276,6 +3280,115 @@
     border-radius: 9px;
     font-family: var(--body-font);
   }
+  /* Talents V2 choice rows: six level bands, each with three mutually exclusive
+     options. Desktop keeps every band readable in one view; narrow touch layouts
+     stack the options inside the existing full-screen talents window. */
+  .tal-rows {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: min(48vh, 520px);
+    gap: 8px;
+    margin: 8px 0 4px;
+  }
+  .tal-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 12px;
+    background: rgb(0 0 0 / 18%);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+  .tal-row-lv {
+    display: inline-grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--gold-dim);
+    border-radius: 50%;
+    color: var(--gold);
+    font-size: 13px;
+  }
+  .tal-row-lv.locked {
+    border-color: var(--border);
+    color: var(--color-text-muted);
+  }
+  .tal-row-opts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    flex: 1;
+    min-width: 0;
+    gap: 12px;
+  }
+  .tal-row.locked .tal-row-opts {
+    opacity: 0.45;
+  }
+  .tal-row-opt {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    min-height: 48px;
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--panel-bg);
+    color: var(--color-text-light);
+    font: inherit;
+    text-align: left;
+    cursor: var(--cursor-point);
+  }
+  .tal-row-opt img {
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+    border-radius: 6px;
+  }
+  .tal-row-opt b {
+    overflow: hidden;
+    font-size: 13px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .tal-row-opt:hover:not(:disabled) {
+    border-color: var(--gold-dim);
+  }
+  .tal-row-opt:focus-visible,
+  .tal-spec:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .tal-row-opt.picked {
+    border-color: var(--gold);
+    box-shadow: inset 0 0 0 1px var(--gold-dim);
+  }
+  .tal-row-opt.picked b {
+    color: var(--gold);
+  }
+  .tal-row-opt:disabled {
+    cursor: var(--cursor-arrow);
+  }
+  .tal-row-opt.pending {
+    opacity: 0.55;
+  }
+  .tal-row-opt.pending img {
+    filter: grayscale(0.8);
+  }
+  .tal-soon {
+    flex: 0 0 auto;
+    margin-left: auto;
+    padding: 2px 6px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--color-text-muted);
+    font-size: 10px;
+    font-style: normal;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
   .tal-head {
     display: flex;
     justify-content: space-between;
@@ -3293,168 +3406,6 @@
     padding: 0 8px 8px;
     margin: 0 -8px;
   }
-  .tal-tree {
-    position: relative;
-    margin: 6px auto;
-  }
-  .tal-arrows {
-    position: absolute;
-    left: 0;
-    top: 0;
-    pointer-events: none;
-    z-index: 0;
-  }
-  .tal-node {
-    position: absolute;
-    width: 46px;
-    height: 46px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: var(--cursor-point);
-    background: #15110a;
-    border: 2px solid #5a4a22;
-    color: #e8dcb0;
-    user-select: none;
-    box-sizing: border-box;
-    z-index: 1;
-  }
-  .tal-node .tal-icon {
-    position: absolute;
-    inset: 2px;
-    display: block;
-    background-color: #15110a;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    z-index: 1;
-  }
-  .tal-node.circle {
-    border-radius: 50%;
-  }
-  .tal-node.circle .tal-icon {
-    border-radius: 50%;
-  }
-  .tal-node.square {
-    border-radius: 7px;
-  }
-  .tal-node.square .tal-icon {
-    border-radius: 5px;
-  }
-  .tal-node.octagon {
-    border-radius: 8px;
-  }
-  .tal-node.octagon .tal-icon {
-    inset: 3px;
-    border-radius: 6px;
-    clip-path: polygon(24% 0, 76% 0, 100% 24%, 100% 76%, 76% 100%, 24% 100%, 0 76%, 0 24%);
-  }
-  .tal-node.avail {
-    border-color: #b98b27;
-    box-shadow:
-      0 0 0 1px #0b0804,
-      0 0 7px #9a772855;
-  }
-  .tal-node.avail::after {
-    content: "+";
-    position: absolute;
-    left: -6px;
-    top: -7px;
-    min-width: 15px;
-    height: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #120d04;
-    background: #f5c843;
-    border: 1px solid #332403;
-    border-radius: 50%;
-    font: 700 12px / 1 var(--body-font);
-    z-index: 3;
-  }
-  .tal-node.filled {
-    border-color: #f5c843;
-    color: #fff;
-    background: #2c2410;
-    box-shadow:
-      inset 0 0 0 2px #120d04,
-      0 0 10px #b8902a99;
-  }
-  .tal-node.filled::after,
-  .tal-node.maxed::after {
-    content: "✓";
-    position: absolute;
-    left: -6px;
-    top: -7px;
-    min-width: 16px;
-    height: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #120d04;
-    background: #ffd100;
-    border: 1px solid #332403;
-    border-radius: 50%;
-    font: 700 11px / 1 var(--body-font);
-    z-index: 3;
-  }
-  .tal-node.maxed {
-    border-color: #ffe27a;
-    box-shadow:
-      inset 0 0 0 2px #120d04,
-      0 0 13px #ffd100cc;
-  }
-  .tal-node.maxed::after {
-    content: "★";
-    font-size: 10px;
-  }
-  .tal-node.locked {
-    opacity: 0.48;
-    filter: grayscale(0.75) brightness(0.72);
-    cursor: not-allowed;
-  }
-  .tal-node.dormant {
-    border-color: #ff6d5a;
-    box-shadow:
-      inset 0 0 0 2px #2a0905,
-      0 0 10px #c0392bcc;
-  }
-  .tal-node.dormant::after {
-    content: "!";
-    position: absolute;
-    left: -6px;
-    top: -7px;
-    min-width: 16px;
-    height: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff6e8;
-    /* literal, NOT --color-debuff: the value matches but a dormant-node warning badge is not a
-       combat debuff, and its sibling .tal-node.dormant border / shadow reds are literals too,
-       so keep the hand-tuned dormant-red palette cohesive. */
-    background: #c0392b;
-    border: 1px solid #3a0803;
-    border-radius: 50%;
-    font: 800 11px / 1 var(--body-font);
-    z-index: 3;
-  }
-  .tal-rank {
-    position: absolute;
-    right: -6px;
-    bottom: -7px;
-    min-width: 20px;
-    text-align: center;
-    font-size: 10px;
-    color: #fff6d5;
-    background: #171006;
-    border: 1px solid #ffd100;
-    border-radius: 8px;
-    padding: 0 4px;
-    line-height: 14px;
-    z-index: 4;
-    box-shadow: 0 1px 4px #000a;
-  }
   .tal-specs {
     display: flex;
     gap: 8px;
@@ -3469,6 +3420,8 @@
     background: #1a1409;
     cursor: var(--cursor-point);
     text-align: center;
+    color: inherit;
+    font: inherit;
   }
   .tal-spec.sel {
     border-color: #ffd100;
@@ -3510,21 +3463,37 @@
       var(--body-font);
     text-shadow: 0 1px 2px #000;
   }
+  .tal-spec .ts-icon.ts-icon-art {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
   .tal-spec.sel .ts-icon {
     border-color: #ffd100;
     box-shadow: 0 0 8px #ffd10066;
   }
   .tal-spec .ts-name {
+    display: block;
     font-size: 12px;
     color: #fff;
     font-family: var(--title-font);
     margin-top: 2px;
   }
   .tal-spec .ts-role {
+    display: block;
     font-size: 10px;
     color: var(--gold);
     text-transform: uppercase;
     letter-spacing: 0.4px;
+  }
+  .tal-spec .ts-action {
+    display: block;
+    margin-top: 6px;
+    color: var(--color-text-muted);
+    font-size: 10px;
+  }
+  .tal-spec.sel .ts-action {
+    color: var(--gold);
   }
   .tal-mastery {
     font-size: 11px;
@@ -3670,6 +3639,13 @@
     }
     .tal-spec .ts-role {
       font-size: 9px;
+    }
+    .tal-row {
+      flex-wrap: wrap;
+    }
+    .tal-row-opts {
+      grid-template-columns: 1fr;
+      flex-basis: 100%;
     }
   }
 
@@ -3851,98 +3827,6 @@
     bottom: auto;
     top: calc(100% + 4px);
   }
-  /* Choice-node option flyout */
-  .tal-choice-pop {
-    position: fixed;
-    z-index: 90;
-    width: 252px;
-    background: #1a140a;
-    border: 1px solid var(--gold);
-    border-radius: 6px;
-    box-shadow:
-      0 10px 24px #000c,
-      inset 0 0 0 1px #ffd10022;
-    padding: 5px;
-  }
-  .tal-choice-pop::before {
-    content: "";
-    position: absolute;
-    left: var(--tal-choice-caret-left, 50%);
-    top: -6px;
-    width: 10px;
-    height: 10px;
-    background: #1a140a;
-    border-left: 1px solid var(--gold);
-    border-top: 1px solid var(--gold);
-    transform: translateX(-50%) rotate(45deg);
-  }
-  .tal-choice-opt {
-    position: relative;
-    display: flex;
-    gap: 8px;
-    align-items: flex-start;
-    padding: 8px 28px 8px 8px;
-    border: 1px solid transparent;
-    border-radius: 4px;
-    cursor: var(--cursor-point);
-  }
-  .tal-choice-opt:hover,
-  .tal-choice-opt:focus-visible {
-    background: #ffffff10;
-    border-color: #6f5a2a;
-  }
-  /* The roving choice-menu option is the keyboard centerpiece, so the focused
-     option gets the same steady, tokenized outline ring the rest of the chrome draws
-     on :focus-visible, not just the hover tint, so keyboard roving is
-     clearly visible. Inset offset keeps the ring inside the popup's scroll edge. */
-  .tal-choice-opt:focus-visible {
-    outline: 2px solid var(--color-border-focus);
-    outline-offset: -2px;
-  }
-  .tal-choice-opt.sel {
-    background: #2c2410;
-    border-color: var(--gold);
-    box-shadow: inset 0 0 0 1px #ffd10033;
-  }
-  .tal-choice-opt.sel::after {
-    content: "✓";
-    position: absolute;
-    right: 8px;
-    top: 8px;
-    width: 15px;
-    height: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #120d04;
-    background: #ffd100;
-    border-radius: 50%;
-    font: 700 10px / 1 var(--body-font);
-  }
-  .tco-icon {
-    width: 28px;
-    height: 28px;
-    flex: none;
-    border-radius: 4px;
-    display: block;
-    background-color: #15110a;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    border: 1px solid #5a4a22;
-  }
-  .tco-text {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    font-size: 11px;
-    color: #c8b888;
-  }
-  .tco-text b {
-    color: #fff;
-    font-size: 12px;
-  }
-
   /* generic confirm dialog (prestige) */
   #confirm-dialog {
     left: 50%;

@@ -1,14 +1,11 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
-// Source-level guards for the talents painter. The window paints DOM (not a Canvas),
-// so its colors flow through inline `var(--color-*)` references rather than a
-// getComputedStyle resolve; the contract is the same: NO raw hex survives
-// in the painter, the accents reference design tokens, and those tokens exist in the
-// sheet. The DOM painting itself is covered by the byte-faithful extraction (the pure
-// core is unit-tested in talents_view.test.ts; the painter markup mirrors the prior
-// inline hud.ts code).
+// Source-level guards for the Talents V2 painter. DOM behavior is exercised in the
+// browser suite; these checks keep the painter on canonical allocation/world APIs and
+// prevent the removed point-tree staging model from creeping back in.
 const painter = readFileSync(new URL('../src/ui/talents_window.ts', import.meta.url), 'utf8');
+const styles = readFileSync(new URL('../src/styles/components.css', import.meta.url), 'utf8');
 
 describe('talents_window: no magic values', () => {
   it('carries no literal hex color in TS (colors flow through --color-* tokens)', () => {
@@ -16,33 +13,51 @@ describe('talents_window: no magic values', () => {
     expect(hex, `hex colors must move to tokens: ${hex.join(', ')}`).toEqual([]);
   });
 
-  it('drives the tree-arrow + accent colors through CSS custom properties', () => {
+  it('drives row and accent colors through CSS custom properties', () => {
     for (const token of [
-      'var(--color-talent-arrow)',
-      'var(--color-talent-arrow-dim)',
       'var(--color-talent-opt-dim)',
       'var(--color-talent-hint)',
-      'var(--color-talent-req)',
-      'var(--color-talent-dormant)',
-      'var(--color-text-muted)',
       'var(--gold)',
     ]) {
       expect(painter, `expected ${token}`).toContain(token);
     }
+    expect(styles).toContain('var(--color-text-muted)');
   });
 
   it('defines the talent color tokens it reads in the design-token sheet', () => {
     const tokens = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8');
-    for (const tok of [
-      '--color-talent-arrow',
-      '--color-talent-arrow-dim',
-      '--color-talent-opt-dim',
-      '--color-talent-hint',
-      '--color-talent-req',
-      '--color-talent-dormant',
-    ]) {
+    for (const tok of ['--color-talent-opt-dim', '--color-talent-hint']) {
       expect(tokens, `missing ${tok}`).toContain(`${tok}:`);
     }
+  });
+
+  it('uses the canonical authoritative row-selection bridge without local staging', () => {
+    expect(painter).toContain('this.deps.currentAllocation()');
+    expect(painter).toContain('this.deps.commitSpec(entry.spec.id)');
+    expect(painter).toContain('this.deps.selectRow(');
+    expect(painter).toContain('AUTHORITATIVE_REFRESH_MS');
+
+    for (const removed of [
+      'getStage',
+      'setStage',
+      'stage.ranks',
+      'stage.rows',
+      'rowPicks',
+      'pickRow',
+    ]) {
+      expect(painter, `removed point-tree/staging token survived: ${removed}`).not.toContain(
+        removed,
+      );
+    }
+  });
+
+  it('renders accessible choice rows and explicit spec actions', () => {
+    expect(painter).toContain("t('hudChrome.specPanel.selectSpec')");
+    expect(painter).toContain("t('hudChrome.specPanel.viewTalents')");
+    expect(styles).toContain('.tal-rows');
+    expect(styles).toContain('.tal-row-opts');
+    expect(styles).toContain('.tal-row-opt.picked');
+    expect(styles).toContain('.tal-row-opt:focus-visible');
   });
 
   it('uses no em or en dashes (ASCII separators only)', () => {
@@ -58,7 +73,7 @@ describe('talents_window: no magic values', () => {
     // again, or ~120px too small at uiScale 1.4.
     expect(painter).toContain("import { getUiScale } from './ui_scale';");
     expect(painter).toMatch(/const uiScale = getUiScale\(\);/);
-    expect(painter).toMatch(/bodyTop = \(.*\) \/ uiScale;/);
+    expect(painter).toMatch(/bodyTop =\s*\([\s\S]*?\) \/ uiScale;/);
     expect(painter).toMatch(/footHeight = foot\.getBoundingClientRect\(\)\.height \/ uiScale;/);
   });
 });

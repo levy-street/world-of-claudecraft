@@ -46,9 +46,12 @@ const RAID_WEAPON_PRIMARY_RATING = 65; // 65 rating = 6.5%
 const RAID_SECONDARY_RATING = 20; // 20 rating = 2.0%
 
 const HEAVY = ['warrior', 'paladin', 'shaman'] as ItemDef['requiredClass']; // plate/mail
+const HEAVY_ONE_HAND = ['warrior', 'paladin', 'shaman', 'swordmaster'] as ItemDef['requiredClass'];
 const HEAL_MAIL = ['paladin', 'shaman'] as ItemDef['requiredClass']; // int/spi mail wearers
-const AGILE = ['rogue', 'hunter'] as ItemDef['requiredClass'];
-const AGILE_WILD = ['rogue', 'hunter', 'druid'] as ItemDef['requiredClass'];
+const AGILE = ['rogue', 'hunter', 'swordmaster'] as ItemDef['requiredClass'];
+const AGILE_WILD = ['rogue', 'hunter', 'druid', 'swordmaster'] as ItemDef['requiredClass'];
+// Save-compat definitions preserve the class restrictions they shipped with.
+const RETIRED_AGILE_WILD = ['rogue', 'hunter', 'druid'] as ItemDef['requiredClass'];
 const CASTER = ['mage', 'priest', 'warlock', 'druid'] as ItemDef['requiredClass'];
 
 export const HEROIC_ITEMS: Record<string, ItemDef> = {
@@ -301,7 +304,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     stats: { str: 13, sta: 9 },
     critRating: FIVE_MAN_WEAPON_RATING,
     sellValue: 15000,
-    requiredClass: HEAVY,
+    requiredClass: HEAVY_ONE_HAND,
   },
   shroud_of_the_gravewyrm: {
     id: 'shroud_of_the_gravewyrm',
@@ -388,10 +391,11 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     name: 'Deathless Greatblade',
     kind: 'weapon',
     slot: 'mainhand',
+    hand: 'twohand',
     quality: 'epic',
     requiredLevel: 20,
     weapon: { min: 45, max: 68, speed: 3.4 },
-    stats: { str: 14, sta: 9 },
+    stats: { str: 28, sta: 18 },
     hitRating: RAID_WEAPON_PRIMARY_RATING,
     critRating: RAID_SECONDARY_RATING,
     sellValue: 16000,
@@ -456,7 +460,7 @@ export const RETIRED_HEROIC_ITEMS: Record<string, ItemDef> = {
     requiredLevel: 20,
     stats: { armor: 172, agi: 12, sta: 10 },
     sellValue: 14000,
-    requiredClass: AGILE_WILD,
+    requiredClass: RETIRED_AGILE_WILD,
   },
   soulforged_warplate: {
     id: 'soulforged_warplate',

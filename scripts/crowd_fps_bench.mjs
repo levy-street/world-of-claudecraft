@@ -18,6 +18,7 @@ import fs from 'node:fs';
 import puppeteer from 'puppeteer-core';
 import WebSocket from 'ws';
 import { BROWSER_PATH } from './browser_path.mjs';
+import { PLAYABLE_CLASSES } from './lib/playable_classes.mjs';
 
 // Stream every sampled row to a file immediately, so a kill/timeout (the render
 // client + dozens of bots can outrun a foreground budget) never loses results.
@@ -42,17 +43,6 @@ const DPR = Number(process.env.CROWD_DPR ?? 1);
 const SETTLE_MS = Number(process.env.CROWD_SETTLE_MS ?? 3500);
 const CLUSTER_R = Number(process.env.CROWD_R ?? 9);
 
-const CLASSES = [
-  'warrior',
-  'paladin',
-  'priest',
-  'mage',
-  'hunter',
-  'rogue',
-  'warlock',
-  'druid',
-  'shaman',
-];
 const uniq = Date.now().toString(36);
 const alpha = uniq.replace(/[0-9]/g, (d) => 'abcdefghij'[Number(d)]).slice(-5);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -76,7 +66,7 @@ async function api(path, body, token, xff) {
 class Bot {
   constructor(i) {
     this.i = i;
-    this.cls = CLASSES[i % CLASSES.length];
+    this.cls = PLAYABLE_CLASSES[i % PLAYABLE_CLASSES.length];
     this.level = 1 + ((i * 7) % 40); // spread levels 1..40 for gear variety
     // Character names are letters-only + globally unique: map the index digits to
     // letters and prefix the per-run alpha tag.

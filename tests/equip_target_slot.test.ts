@@ -49,6 +49,13 @@ describe('slotAcceptsItem (pure)', () => {
     expect(slotAcceptsItem(helm, 'chest')).toBe(false);
   });
 
+  it('accepts a weapon structurally in either hand before class and spec policy', () => {
+    const weapon = ITEMS.keen_dirk;
+    expect(slotAcceptsItem(weapon, 'mainhand')).toBe(true);
+    expect(slotAcceptsItem(weapon, 'offhand')).toBe(true);
+    expect(slotAcceptsItem(weapon, 'helmet')).toBe(false);
+  });
+
   it('refuses a slotless item (a consumable can never be worn)', () => {
     const potion = ITEMS.minor_healing_potion;
     expect(potion.slot).toBeUndefined();
@@ -130,6 +137,25 @@ describe('Sim.equipItemToSlot', () => {
     sim.addItem(RING_A, 1, pid);
     sim.equipItem(RING_A, pid);
     expect(equipmentOf(sim, pid).ring1).toBe(RING_A);
+  });
+
+  it('equips a one-hand weapon into an aimed legal offhand and rejects it for Arms', () => {
+    const rogue = new Sim({ seed: 17, playerClass: 'rogue', noPlayer: true }) as AnySim;
+    const roguePid = rogue.addPlayer('rogue', 'Lefty');
+    rogue.setPlayerLevel(20, roguePid);
+    rogue.addItem('keen_dirk', 1, roguePid);
+    rogue.equipItemToSlot('keen_dirk', 'offhand', roguePid);
+    expect(equipmentOf(rogue, roguePid).offhand).toBe('keen_dirk');
+
+    const warrior = new Sim({ seed: 18, playerClass: 'warrior', noPlayer: true }) as AnySim;
+    const warriorPid = warrior.addPlayer('warrior', 'OneHand');
+    warrior.setPlayerLevel(20, warriorPid);
+    expect(warrior.setSpec('arms', warriorPid)).toBe(true);
+    const originalOffhand = equipmentOf(warrior, warriorPid).offhand;
+    warrior.addItem('redbrook_blade', 1, warriorPid);
+    warrior.equipItemToSlot('redbrook_blade', 'offhand', warriorPid);
+    expect(equipmentOf(warrior, warriorPid).offhand).toBe(originalOffhand);
+    expect(warrior.countItem('redbrook_blade', warriorPid)).toBe(1);
   });
 });
 

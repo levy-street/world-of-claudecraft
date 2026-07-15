@@ -43,7 +43,7 @@ function input(over: Partial<DungeonFinderViewInput> = {}): DungeonFinderViewInp
     playerLevel: 8,
     playerClass: 'warrior',
     playerId: 1,
-    specRole: null,
+    specRole: 'tank',
     party: null,
     lockouts: [],
     tab: 'catalogue',
@@ -86,7 +86,7 @@ describe('dungeon finder view core', () => {
     expect(byId.get('nythraxis_boss_arena_normal')?.blocked).toBe('level');
   });
 
-  it('flags the missing-spec gate at level 10+ and closes Quick Match', () => {
+  it('flags the missing-spec gate after specializations unlock and closes Quick Match', () => {
     const view = live(buildDungeonFinderView(input({ playerLevel: 20, specRole: null })));
     expect(view.queue.needsSpec).toBe(true);
     expect(view.rows.find((r) => r.id === 'hollow_crypt_heroic')?.blocked).toBe('spec');
@@ -262,6 +262,7 @@ describe('dungeon finder view core', () => {
           board: [listing],
           info: makeInfo('sim', { roles: ['dps'], eligibleRoles: ['dps'] }),
           playerClass: 'mage',
+          specRole: 'dps',
         }),
       ),
     );
@@ -274,6 +275,7 @@ describe('dungeon finder view core', () => {
           board: [listing],
           info: makeInfo('sim', { roles: ['dps'], myApplication: { listingId: 99 } }),
           playerClass: 'mage',
+          specRole: 'dps',
         }),
       ),
     );

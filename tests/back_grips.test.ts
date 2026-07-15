@@ -7,6 +7,7 @@ import {
   backGripFor,
   quatFromEulerXYZ,
 } from '../src/render/characters/back_grips';
+import { KAYKIT_SHIELD_ACCESSORIES } from '../src/render/characters/held_item_grips';
 
 function quatLength(q: [number, number, number, number]): number {
   return Math.hypot(q[0], q[1], q[2], q[3]);
@@ -112,7 +113,9 @@ describe('every weapon grip family has a tuned on-back carry', () => {
   });
 
   it('covers every family a held item model resolves to', () => {
-    const families = [...new Set(accessoryFamilies())];
+    const families = [
+      ...new Set([...accessoryFamilies(), ...Object.values(KAYKIT_SHIELD_ACCESSORIES)]),
+    ];
     expect(families.length).toBeGreaterThan(5);
     const missing = families.filter((f) => !BACK_GRIP_FAMILIES.has(f));
     expect(missing, `item families with no BACK_GRIPS carry: ${missing.join(', ')}`).toEqual([]);

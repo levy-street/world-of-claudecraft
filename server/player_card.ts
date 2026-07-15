@@ -11,6 +11,7 @@
 // shared link resolves no matter which realm serves the request. Referral
 // capture only records the relationship; reward payout is out of scope.
 import type http from 'node:http';
+import type { PlayerClass } from '../src/sim/types';
 import {
   accountForSlug,
   getCharacter,
@@ -23,6 +24,7 @@ import {
 import { logger } from './http/logger';
 import { isUniqueViolation, json, parsePngInfo, readBinaryBody } from './http_util';
 import { PLAYERCARD_NEW } from './player_card.newlocales';
+import { isPlayerClass } from './player_class';
 import { recordUsageMetric } from './provider_usage';
 import { REALM_PUBLIC_ORIGIN } from './realm';
 
@@ -76,16 +78,7 @@ export const PUBLIC_CARD_LOCALES = [
 ] as const;
 export type PublicCardLocale = (typeof PUBLIC_CARD_LOCALES)[number];
 
-type PlayerClassKey =
-  | 'warrior'
-  | 'paladin'
-  | 'hunter'
-  | 'rogue'
-  | 'priest'
-  | 'shaman'
-  | 'mage'
-  | 'warlock'
-  | 'druid';
+type PlayerClassKey = PlayerClass;
 
 export interface PublicCardCopy {
   gameName: string;
@@ -97,7 +90,9 @@ export interface PublicCardCopy {
   missingHeading: string;
   missingDescription: string;
   missingCta: string;
-  classes: Record<PlayerClassKey, string>;
+  // Locale tables may lag a newly added class until the release translation
+  // batch. classDisplay falls back to the canonical English label in that gap.
+  classes: Partial<Record<PlayerClassKey, string>>;
 }
 
 const EN_CLASSES: Record<PlayerClassKey, string> = {
@@ -110,6 +105,7 @@ const EN_CLASSES: Record<PlayerClassKey, string> = {
   mage: 'Mage',
   warlock: 'Warlock',
   druid: 'Druid',
+  swordmaster: 'SwordMaster',
 };
 
 export const PUBLIC_CARD_COPY: Record<PublicCardLocale, PublicCardCopy> = {
@@ -475,7 +471,8 @@ function interpolate(template: string, values: Record<string, string | number>):
 
 function classDisplay(cls: string, locale: PublicCardLocale): string {
   const copy = PUBLIC_CARD_COPY[locale];
-  return Object.hasOwn(copy.classes, cls) ? copy.classes[cls as PlayerClassKey] : copy.unknownClass;
+  if (!isPlayerClass(cls)) return copy.unknownClass;
+  return copy.classes[cls] ?? EN_CLASSES[cls] ?? copy.unknownClass;
 }
 
 // Build a URL/file-safe slug from a character name. Lowercased, non-alphanumerics

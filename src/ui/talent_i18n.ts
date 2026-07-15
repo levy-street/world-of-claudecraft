@@ -1,19 +1,29 @@
 import {
   type ClassTalents,
   type GlobalModEffect,
+  type ProcDef,
+  ROW_TREES,
   type Role,
+  rowTreeFor,
   type SpecDef,
   type StatModEffect,
   TALENTS,
-  type TalentChoiceOption,
   type TalentEffect,
-  type TalentNode,
+  type TalentRowOption,
 } from '../sim/content/talents';
-import { ABILITIES } from '../sim/data';
-import type { PlayerClass } from '../sim/types';
+import { ABILITIES, CLASSES } from '../sim/data';
+import type { AbilityEffect, PlayerClass } from '../sim/types';
 import { tEntity } from './entity_i18n';
-import { getLanguage, languageTag, type SupportedLanguage, t } from './i18n';
+import {
+  getLanguage,
+  type InterpolationValues,
+  languageTag,
+  type SupportedLanguage,
+  t,
+} from './i18n';
 import { TALENT_NEW } from './talent_i18n.newlocales';
+import { RETAINED_ROW_DESCRIPTION_OVERRIDES } from './talent_i18n.row_description_overrides';
+import { RETAINED_ROW_TITLE_OVERRIDES } from './talent_i18n.row_title_overrides';
 
 // Localized UI label for a spec's combat role (tank/healer/dps). Shared by the
 // talents window (spec cards) and the character sheet's spec summary so the role
@@ -27,12 +37,11 @@ export function roleLabel(role: Role): string {
       : t('game.talents.roleDps');
 }
 
-export type TalentTranslationKind = 'talentNode' | 'talentChoice' | 'talentSpec' | 'talentMastery';
+export type TalentTranslationKind = 'talentChoice' | 'talentSpec' | 'talentMastery';
 export type TalentTranslationField = 'name' | 'description';
 
 export type TalentTranslationRequest =
-  | { kind: 'talentNode'; node: TalentNode; field: TalentTranslationField }
-  | { kind: 'talentChoice'; choice: TalentChoiceOption; field: TalentTranslationField }
+  | { kind: 'talentChoice'; choice: TalentRowOption; field: TalentTranslationField }
   | { kind: 'talentSpec'; spec: SpecDef; field: TalentTranslationField }
   | { kind: 'talentMastery'; spec: SpecDef; field: TalentTranslationField };
 
@@ -47,13 +56,48 @@ export interface TalentTranslationManifestEntry {
 
 type StatKey = keyof StatModEffect;
 type GlobalKey = keyof GlobalModEffect;
-type DisplayGlobalKey = Exclude<GlobalKey, 'critVsRooted'>;
+type DisplayGlobalKey = Exclude<
+  GlobalKey,
+  | 'critVsRooted'
+  | 'autoRagePct'
+  | 'abilityRagePct'
+  | 'onKillSpeedPct'
+  | 'onKillSpeedDuration'
+  | 'secondWindPctPerSec'
+  | 'battleRhythm'
+  | 'bloodbathPct'
+  | 'bloodbathDuration'
+  | 'bloodbathMaxPct'
+  | 'cdrPerRage'
+  | 'stanceMastery'
+  | 'fearBreakPct'
+  | 'masteryTwoHandDmgPct'
+  | 'cheatDeathIcd'
+>;
+
+const NON_DISPLAY_GLOBALS = new Set<GlobalKey>([
+  'critVsRooted',
+  'autoRagePct',
+  'abilityRagePct',
+  'onKillSpeedPct',
+  'onKillSpeedDuration',
+  'secondWindPctPerSec',
+  'battleRhythm',
+  'bloodbathPct',
+  'bloodbathDuration',
+  'bloodbathMaxPct',
+  'cdrPerRage',
+  'stanceMastery',
+  'fearBreakPct',
+  'masteryTwoHandDmgPct',
+  'cheatDeathIcd',
+]);
 
 export interface TalentLocaleText {
   // Primary-attribute multipliers (strPct/agiPct/intPct/spiPct) reuse their base stat
   // label ("+10% Agility"), so locales don't repeat them here.
   statLabels: Record<
-    | Exclude<StatKey, 'strPct' | 'agiPct' | 'intPct' | 'spiPct'>
+    | Exclude<StatKey, 'strPct' | 'agiPct' | 'intPct' | 'spiPct' | 'armorFromStrPct'>
     | DisplayGlobalKey
     | 'damage'
     | 'cost'
@@ -66,6 +110,8 @@ export interface TalentLocaleText {
   noEffect: string;
   chooseOne: (name: string) => string;
   specDescription: (className: string, role: string, abilityName: string) => string;
+  specDescriptions?: Record<string, string>;
+  masteryDescriptions?: Record<string, string>;
   grant: (abilityName: string) => string;
   increase: (target: string, amount: string, perRank: string) => string;
   reduce: (target: string, amount: string, perRank: string) => string;
@@ -73,6 +119,16 @@ export interface TalentLocaleText {
 
 const abilityIdByName = new Map(
   Object.values(ABILITIES).map((ability) => [ability.name, ability.id]),
+);
+const grantAbilityIdByTitle = new Map(
+  Object.values(ROW_TREES).flatMap((rows) =>
+    rows.flatMap((row) =>
+      row.options.flatMap((option) => {
+        const abilityId = option.effect.grant?.ability;
+        return abilityId ? ([[option.name, abilityId]] as const) : [];
+      }),
+    ),
+  ),
 );
 
 const enText: TalentLocaleText = {
@@ -849,7 +905,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': 'Concentración de mareas',
     Shadeslip: 'Paso de las Sombras',
     'Shared Quarry': 'Fuego concentrado',
-    'Sharpened Blades': 'Hojas afiladas',
     'Shattered Earth': 'Devastación elemental',
     Shieldbearer: 'Especialización en escudo',
     Shieldwright: 'Dominio de escudo',
@@ -1192,7 +1247,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': 'Enfoque de marea',
     Shadeslip: 'Paso de las Sombras',
     'Shared Quarry': 'Fuego concentrado',
-    'Sharpened Blades': 'Hojas afiladas',
     'Shattered Earth': 'Devastación elemental',
     Shieldbearer: 'Especialización con escudo',
     Shieldwright: 'Maestría con escudo',
@@ -1535,7 +1589,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': 'Concentration des marées',
     Shadeslip: "Pas de l'ombre",
     'Shared Quarry': 'Tir concentré',
-    'Sharpened Blades': 'Lames affûtées',
     'Shattered Earth': 'Dévastation élémentaire',
     Shieldbearer: 'Spécialisation bouclier',
     Shieldwright: 'Maîtrise du bouclier',
@@ -1878,7 +1931,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': 'Focalisation des marées',
     Shadeslip: "Pas de l'ombre",
     'Shared Quarry': 'Tir concentré',
-    'Sharpened Blades': 'Lames aiguisées',
     'Shattered Earth': 'Dévastation élémentaire',
     Shieldbearer: 'Spécialisation du bouclier',
     Shieldwright: 'Maîtrise du bouclier',
@@ -2221,7 +2273,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': 'Concentrazione delle maree',
     Shadeslip: "Passo d'ombra",
     'Shared Quarry': 'Fuoco focalizzato',
-    'Sharpened Blades': 'Lame affilate',
     'Shattered Earth': 'Devastazione elementale',
     Shieldbearer: 'Specializzazione con scudo',
     Shieldwright: 'Maestria dello scudo',
@@ -2564,7 +2615,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': 'Gezeitenfokus',
     Shadeslip: 'Schattenschritt',
     'Shared Quarry': 'Gebündeltes Feuer',
-    'Sharpened Blades': 'Geschärfte Klingen',
     'Shattered Earth': 'Elementare Verwüstung',
     Shieldbearer: 'Schildspezialisierung',
     Shieldwright: 'Schildbeherrschung',
@@ -2907,7 +2957,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': '潮汐专注',
     Shadeslip: '暗影步',
     'Shared Quarry': '集中火力',
-    'Sharpened Blades': '利刃',
     'Shattered Earth': '元素毁灭',
     Shieldbearer: '盾牌专精',
     Shieldwright: '盾牌掌握',
@@ -3250,7 +3299,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': '潮汐專注',
     Shadeslip: '暗影步',
     'Shared Quarry': '集中火力',
-    'Sharpened Blades': '利刃',
     'Shattered Earth': '元素摧殘',
     Shieldbearer: '盾牌專精',
     Shieldwright: '盾牌掌握',
@@ -3593,7 +3641,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': '파도 집중',
     Shadeslip: '그림자 밟기',
     'Shared Quarry': '집중 사격',
-    'Sharpened Blades': '예리한 칼날',
     'Shattered Earth': '원소 파멸',
     Shieldbearer: '방패 전문화',
     Shieldwright: '방패 숙련',
@@ -3936,7 +3983,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': '潮流集中',
     Shadeslip: 'シャドウステップ',
     'Shared Quarry': '集中砲火',
-    'Sharpened Blades': '研ぎ澄まされた刃',
     'Shattered Earth': 'エレメンタル・デバステーション',
     Shieldbearer: '盾専門化',
     Shieldwright: '盾熟達',
@@ -4279,7 +4325,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': 'Foco das Marés',
     Shadeslip: 'Passo Furtivo',
     'Shared Quarry': 'Fogo Concentrado',
-    'Sharpened Blades': 'Lâminas Afiadas',
     'Shattered Earth': 'Devastação Elemental',
     Shieldbearer: 'Especialização em Escudo',
     Shieldwright: 'Maestria de Escudo',
@@ -4622,7 +4667,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': 'Сосредоточение прилива',
     Shadeslip: 'Прыжок сквозь тень',
     'Shared Quarry': 'Сосредоточенный огонь',
-    'Sharpened Blades': 'Заточенные клинки',
     'Shattered Earth': 'Опустошение стихий',
     Shieldbearer: 'Специализация по щитам',
     Shieldwright: 'Мастерство владения щитом',
@@ -4965,7 +5009,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': 'Klidné vody',
     Shadeslip: 'Stínový skluz',
     'Shared Quarry': 'Společná kořist',
-    'Sharpened Blades': 'Nabroušené čepele',
     'Shattered Earth': 'Roztříštěná zem',
     Shieldbearer: 'Štítonoš',
     Shieldwright: 'Mistr štítu',
@@ -5308,7 +5351,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': 'Getijdenfocus',
     Shadeslip: 'Schaduwstap',
     'Shared Quarry': 'Gericht Vuur',
-    'Sharpened Blades': 'Geslepen Klingen',
     'Shattered Earth': 'Elementaire Verwoesting',
     Shieldbearer: 'Schildspecialisatie',
     Shieldwright: 'Schildmeesterschap',
@@ -5651,7 +5693,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': 'Skupienie przypływu',
     Shadeslip: 'Cienisty krok',
     'Shared Quarry': 'Skupiony ogień',
-    'Sharpened Blades': 'Naostrzone ostrza',
     'Shattered Earth': 'Spustoszenie żywiołów',
     Shieldbearer: 'Specjalizacja w tarczy',
     Shieldwright: 'Władanie tarczą',
@@ -5994,7 +6035,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': 'Fokus Pasang',
     Shadeslip: 'Langkah Bayangan',
     'Shared Quarry': 'Api Terfokus',
-    'Sharpened Blades': 'Bilah Terasah',
     'Shattered Earth': 'Pemusnahan Elemental',
     Shieldbearer: 'Spesialisasi Perisai',
     Shieldwright: 'Penguasaan Perisai',
@@ -6337,7 +6377,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': 'Gelgit Odağı',
     Shadeslip: 'Gölge Adımı',
     'Shared Quarry': 'Odaklı Ateş',
-    'Sharpened Blades': 'Bilenmiş Bıçaklar',
     'Shattered Earth': 'Elementsel Tahribat',
     Shieldbearer: 'Kalkan Uzmanlığı',
     Shieldwright: 'Kalkan Hakimiyeti',
@@ -6680,7 +6719,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': 'Tidvattenfokus',
     Shadeslip: 'Skuggsteg',
     'Shared Quarry': 'Fokuserad eld',
-    'Sharpened Blades': 'Vässade klingor',
     'Shattered Earth': 'Elementär förödelse',
     Shieldbearer: 'Sköldspecialisering',
     Shieldwright: 'Sköldbemästring',
@@ -7023,7 +7061,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': 'Tập Trung Thủy Triều',
     Shadeslip: 'Bước Bóng Tối',
     'Shared Quarry': 'Hỏa Lực Tập Trung',
-    'Sharpened Blades': 'Lưỡi Sắc Bén',
     'Shattered Earth': 'Tàn Phá Nguyên Tố',
     Shieldbearer: 'Chuyên Môn Khiên',
     Shieldwright: 'Tinh Thông Khiên',
@@ -7366,7 +7403,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': 'Tidevandsfokus',
     Shadeslip: 'Skyggeskridt',
     'Shared Quarry': 'Fokuseret Ild',
-    'Sharpened Blades': 'Skærpede Klinger',
     'Shattered Earth': 'Elementær Forødelse',
     Shieldbearer: 'Skjoldspecialisering',
     Shieldwright: 'Skjoldmestring',
@@ -7470,12 +7506,59 @@ function statAmount(stat: StatKey, value: number, lang: SupportedLanguage): stri
     : formatNumber(Math.abs(value), lang);
 }
 
+const CJK_TITLE_FALLBACKS: Readonly<
+  Record<string, Readonly<Partial<Record<SupportedLanguage, string>>>>
+> = Object.fromEntries(
+  [
+    ['Tolling Hammer', '钟鸣之锤', '鐘鳴之錘', '鳴り響く槌', '울리는 망치'],
+    ['Dawnward Ricochet', '晨光弹射', '晨光彈射', '暁光の跳弾', '새벽빛 도탄'],
+    ['Startle Shot', '惊扰射击', '驚擾射擊', '驚愕の一矢', '기습 사격'],
+    ['Rime Snare', '霜缚陷阱', '霜縛陷阱', '霜の罠', '서리 덫'],
+    ['Splitshot', '分裂射击', '分裂射擊', '分裂射撃', '분열 사격'],
+    ['Wildfang Rally', '野牙集结', '野牙集結', '野牙の号令', '야성 송곳니 집결'],
+    ['Smoke Screen', '烟幕', '煙幕', '煙幕', '연막'],
+    ['Wraith Strike', '幽魂打击', '幽魂打擊', '亡霊の一撃', '망령의 일격'],
+    ['Shadecloak', '暗影斗篷', '暗影斗篷', '影の外套', '그림자 망토'],
+    ['Hushword', '静默之言', '靜默之言', '静寂の言葉', '침묵의 말'],
+    ['Terror Canticle', '恐惧圣歌', '恐懼聖歌', '恐怖の聖歌', '공포의 성가'],
+    ['Choirmend', '合唱疗愈', '合唱療癒', '聖歌の癒やし', '합창 치유'],
+    ['Thoughtburn', '焚心', '焚心', '思念の灼熱', '사념 연소'],
+    ['Springwell', '泉涌', '泉湧', '泉の湧き出し', '샘물'],
+    ['Skybranch', '天枝', '天枝', '天空の枝', '하늘가지'],
+    ['Gripping Earth', '缚地', '縛地', '大地の束縛', '대지의 속박'],
+    ['Storm Chorus', '风暴合唱', '風暴合唱', '嵐の合唱', '폭풍의 합창'],
+    ['Spellsteal', '法术窃取', '法術竊取', '呪文奪取', '주문 훔치기'],
+    ['Frostsweep', '霜扫', '霜掃', '霜の薙ぎ払い', '서리 휩쓸기'],
+    ['Flickerstep', '闪烁步', '閃爍步', '瞬きの歩み', '점멸 걸음'],
+    ['Cold Coffin', '寒冰棺', '寒冰棺', '氷の棺', '얼음 관'],
+    ['Deadfrost', '死霜', '死霜', '死の霜', '죽음의 서리'],
+    ['Skystone', '天石', '天石', '空の石', '하늘 돌'],
+    ['Aetherwell', '以太之井', '以太之井', '霊気の泉', '에테르 샘'],
+    ['Voidfeast', '虚空盛宴', '虛空盛宴', '虚無の饗宴', '공허의 향연'],
+    ['Dread Chorus', '惊惧合唱', '驚懼合唱', '恐怖の合唱', '공포의 합창'],
+    ['Leaden Hex', '铅重诅咒', '鉛重詛咒', '鉛の呪い', '납빛 저주'],
+    ['Morrowlash', '明日之鞭', '明日之鞭', '明日の鞭', '내일의 채찍'],
+    ['Ruinbolt', '毁灭箭', '毀滅箭', '破滅の矢', '파멸의 화살'],
+    ['Typhoon', '台风', '颱風', '台風', '태풍'],
+    ['Savage Mending', '野性治愈', '野性治癒', '野生の癒やし', '야성 치유'],
+    ['Red Haze', '赤色迷雾', '赤色迷霧', '赤い霞', '붉은 안개'],
+    ['Gladesong', '林地之歌', '林地之歌', '林間の歌', '숲의 노래'],
+  ].map(([source, zh_CN, zh_TW, ja_JP, ko_KR]) => [source, { zh_CN, zh_TW, ja_JP, ko_KR }]),
+);
+
 function translateTitle(source: string, lang: SupportedLanguage): string {
   if (lang === 'en' || lang === 'en_CA') return source;
-  const abilityId = abilityIdByName.get(source);
-  if (abilityId) return tEntity({ kind: 'ability', id: abilityId, field: 'name' });
+  const abilityId = abilityIdByName.get(source) ?? grantAbilityIdByTitle.get(source);
+  if (abilityId) {
+    const abilityTitle = tEntity({ kind: 'ability', id: abilityId, field: 'name' });
+    if (abilityTitle !== source) return abilityTitle;
+  }
+  const retained = RETAINED_ROW_TITLE_OVERRIDES[lang]?.[source];
+  if (retained !== undefined) return retained;
   const override = titleOverrides[lang]?.[source];
   if (override !== undefined) return override;
+  const cjkFallback = CJK_TITLE_FALLBACKS[source]?.[lang];
+  if (cjkFallback !== undefined) return cjkFallback;
   // Every shipped talent name has an explicit override (enforced by tests) or is an
   // ability name (resolved above). A bare return here only triggers for a newly-added
   // talent that still needs a localized override — clean English is preferable to a
@@ -7487,12 +7570,295 @@ function abilityName(id: string): string {
   return tEntity({ kind: 'ability', id, field: 'name' });
 }
 
+type GrantEffectShape = {
+  type: string;
+  min?: number;
+  max?: number;
+  amount?: number;
+  total?: number;
+  value?: number;
+  mult?: number;
+  duration?: number;
+  interval?: number;
+  radius?: number;
+  jumps?: number;
+  falloff?: number;
+  kind?: string;
+};
+
+function grantAmountRange(min: number, max: number, lang: SupportedLanguage): string {
+  const minText = formatNumber(min, lang);
+  const maxText = formatNumber(max, lang);
+  return min === max ? minText : t('abilityUi.tooltip.damageRange', { min: minText, max: maxText });
+}
+
+export function grantAbilityValues(id: string): InterpolationValues {
+  const def = ABILITIES[id];
+  const effects = (def?.effects ?? []) as GrantEffectShape[];
+  const lang = getLanguage();
+  const values: Record<string, string> = {};
+  const chain = effects.find((effect) => effect.type === 'chainDamage');
+  const direct = effects.find((effect) =>
+    ['directDamage', 'aoeDamage', 'heal', 'aoeHeal', 'drainTick', 'groundAoE'].includes(
+      effect.type,
+    ),
+  );
+  const ground = effects.find((effect) => effect.type === 'groundAoE');
+  const absorb = effects.find((effect) => effect.type === 'absorb');
+  const overTime = effects.find((effect) => effect.type === 'dot' || effect.type === 'hot');
+  const resource = effects.find((effect) => effect.type === 'gainResource');
+  const buff = effects.find((effect) => effect.type === 'selfBuff' || effect.type === 'buffTarget');
+  const allyAttackPower = effects.find((effect) => effect.type === 'aoeAllyAttackPower');
+  const allyHaste = effects.find((effect) => effect.type === 'aoeAllyHaste');
+  const timed = effects.find((effect) => typeof effect.duration === 'number');
+
+  if (chain?.min !== undefined && chain.max !== undefined) {
+    values.min = formatNumber(chain.min, lang);
+    values.max = formatNumber(chain.max, lang);
+    values.damage = grantAmountRange(chain.min, chain.max, lang);
+    if (chain.jumps !== undefined) values.jumps = formatNumber(chain.jumps, lang);
+    if (chain.falloff !== undefined) values.falloff = formatPercent(chain.falloff, lang);
+    if (chain.radius !== undefined) values.radius = formatNumber(chain.radius, lang);
+  } else if (direct?.min !== undefined && direct.max !== undefined) {
+    values.min = formatNumber(direct.min, lang);
+    values.max = formatNumber(direct.max, lang);
+    values.damage = grantAmountRange(direct.min, direct.max, lang);
+  }
+
+  if (absorb?.amount !== undefined) {
+    const amount = formatNumber(absorb.amount, lang);
+    values.amount = amount;
+    if (values.damage === undefined) values.damage = amount;
+  }
+  if (overTime?.total !== undefined) {
+    const total = formatNumber(overTime.total, lang);
+    values.overTime = total;
+    if (values.damage === undefined) values.damage = total;
+  }
+  if (ground?.min !== undefined && ground.max !== undefined) {
+    values.overTime = grantAmountRange(ground.min, ground.max, lang);
+  }
+  if (resource?.amount !== undefined) values.amount = formatNumber(resource.amount, lang);
+  if (buff?.value !== undefined) values.buff = formatNumber(buff.value, lang);
+  if (allyAttackPower?.amount !== undefined) {
+    values.buff = formatNumber(allyAttackPower.amount, lang);
+  }
+  if (allyHaste?.mult !== undefined && values.buff === undefined) {
+    values.buff = formatPercent(allyHaste.mult - 1, lang);
+  }
+  for (const effect of effects) {
+    if (effect.type !== 'selfBuff' || effect.value === undefined) continue;
+    if (effect.kind === 'buff_ap') values.attackPower = formatNumber(effect.value, lang);
+    if (effect.kind === 'buff_spellpower') values.spellPower = formatNumber(effect.value, lang);
+  }
+
+  const duration = timed?.duration ?? def?.channel?.duration;
+  if (duration !== undefined) values.duration = formatNumber(duration, lang);
+  const interval = ground?.interval ?? overTime?.interval;
+  if (interval !== undefined) values.interval = formatNumber(interval, lang);
+  const radius =
+    chain?.radius ??
+    ground?.radius ??
+    allyAttackPower?.radius ??
+    allyHaste?.radius ??
+    direct?.radius;
+  if (radius !== undefined) values.radius = formatNumber(radius, lang);
+  return values;
+}
+
+function grantResourceName(id: string): string | null {
+  const cls = ABILITIES[id]?.class;
+  const resource = cls ? CLASSES[cls]?.resourceType : null;
+  if (resource === 'mana') return t('abilityUi.resources.mana');
+  if (resource === 'rage') return t('abilityUi.resources.rage');
+  if (resource === 'energy') return t('abilityUi.resources.energy');
+  return null;
+}
+
+export function grantAbilityMetadata(id: string): string {
+  const def = ABILITIES[id];
+  if (!def) return '';
+  const lang = getLanguage();
+  const parts: string[] = [];
+  const resource = grantResourceName(id);
+  if (def.cost > 0 && resource) {
+    parts.push(t('abilityUi.tooltip.cost', { cost: formatNumber(def.cost, lang), resource }));
+  }
+  if (def.channel) {
+    parts.push(
+      t('abilityUi.tooltip.channeledSeconds', {
+        seconds: formatNumber(def.channel.duration, lang),
+      }),
+    );
+  } else if (def.castTime > 0) {
+    parts.push(t('abilityUi.tooltip.castSeconds', { seconds: formatNumber(def.castTime, lang) }));
+  } else {
+    parts.push(t('abilityUi.tooltip.instant'));
+  }
+  if (def.range > 0) {
+    parts.push(
+      def.minRange !== undefined
+        ? t('abilityUi.tooltip.rangeWithMin', {
+            min: formatNumber(def.minRange, lang),
+            max: formatNumber(def.range, lang),
+          })
+        : t('abilityUi.tooltip.range', { range: formatNumber(def.range, lang) }),
+    );
+  }
+  if (def.cooldown > 0) {
+    parts.push(
+      t('abilityUi.tooltip.cooldownSeconds', {
+        seconds: formatNumber(def.cooldown, lang),
+      }),
+    );
+  }
+  return parts.join(' · ');
+}
+
+function abilityDescription(id: string): string {
+  return tEntity({ kind: 'ability', id, field: 'description', values: grantAbilityValues(id) })
+    .replace(/\s*\([^)]*(?:talent|signature)[^)]*\)\.?\s*$/i, '')
+    .trim();
+}
+
+function authoredChoiceDescription(choice: TalentRowOption): string {
+  const grantId = choice.effect.grant?.ability;
+  if (!grantId) return choice.description;
+  return [abilityDescription(grantId), grantAbilityMetadata(grantId)].filter(Boolean).join(' ');
+}
+
+function seconds(value: number, lang: SupportedLanguage): string {
+  return `${formatNumber(value, lang)} s`;
+}
+
+function abilityList(ids: readonly string[] | undefined): string {
+  return ids && ids.length > 0 ? ids.map(abilityName).join(' / ') : '*';
+}
+
+function procTriggerDescription(
+  proc: ProcDef,
+  lang: SupportedLanguage,
+  text: TalentLocaleText,
+): string {
+  const trigger = proc.trigger;
+  switch (trigger.on) {
+    case 'castNth':
+      return `${abilityList(trigger.abilities)}${trigger.n > 1 ? ` x${trigger.n}` : ''}`;
+    case 'spellCrit':
+      return `${text.statLabels.crit}: ${abilityList(trigger.abilities)}`;
+    case 'shieldConsumed':
+      return `${abilityName(trigger.ability)}: ${t('hudChrome.auraEffect.absorb', { value: '0' })}`;
+    case 'hotExpired':
+      return `${abilityName(trigger.ability)}: 0 s`;
+    case 'bigHitTaken':
+      return `>= ${formatPercent(trigger.hpFrac, lang)} ${text.statLabels.maxHpPct} (${seconds(trigger.icd, lang)} ${text.statLabels.cooldown})`;
+    case 'meleeSwingWhile':
+      return `${text.statLabels.meleeDmgPct} @ ${t('hudChrome.auraEffect.imbue')}`;
+    case 'thornsReflect':
+      return `${abilityName(trigger.ability)}: ${t('guide.abilityHook.thorns')}`;
+  }
+}
+
+function procResponseDescription(
+  response: ProcDef['responses'][number],
+  lang: SupportedLanguage,
+  text: TalentLocaleText,
+): string {
+  switch (response.kind) {
+    case 'empowerNext': {
+      const name = abilityList(response.abilities);
+      const window = `(${seconds(response.duration, lang)})`;
+      if (response.aura === 'next_cast_instant') {
+        return `${name}: -${formatPercent(1, lang)} ${text.statLabels.castTime} ${window}`;
+      }
+      const reduction = response.aura === 'next_cast_free' ? 1 : (response.costPct ?? 0);
+      return `${name}: -${formatPercent(reduction, lang)} ${text.statLabels.cost} ${window}`;
+    }
+    case 'cooldownRefund':
+      return `${abilityName(response.ability)}: -${response.seconds === 'reset' ? formatPercent(1, lang) : seconds(response.seconds, lang)} ${text.statLabels.cooldown}`;
+    case 'resource':
+      return `+${formatNumber(response.amount, lang)} ${t('classDetails.labels.resource')}`;
+    case 'heal':
+      return `+${formatNumber(response.amount, lang)} ${t('hud.meters.healing')}`;
+    case 'absorb':
+      return `${t('hudChrome.auraEffect.absorb', { value: formatNumber(response.amount, lang) })} (${seconds(response.duration, lang)})`;
+    case 'echo':
+      return `+${formatNumber(response.heal, lang)} ${t('hud.meters.healing')} @ <= ${formatPercent(response.belowFrac, lang)} ${text.statLabels.maxHpPct} (${seconds(response.window, lang)})`;
+  }
+}
+
+function procDescription(proc: ProcDef, lang: SupportedLanguage, text: TalentLocaleText): string {
+  const trigger = procTriggerDescription(proc, lang, text);
+  const responses = proc.responses
+    .map((response) => procResponseDescription(response, lang, text))
+    .join('; ');
+  return `${trigger} -> ${responses}.`;
+}
+
+type DescribedAddedEffect = Extract<
+  AbilityEffect,
+  {
+    type: 'root' | 'aoeRoot' | 'slow' | 'absorb' | 'dot' | 'extendDot' | 'interrupt' | 'consumeDot';
+  }
+>;
+
+function assertDescribedAddedEffect(effect: AbilityEffect): asserts effect is DescribedAddedEffect {
+  if (
+    effect.type !== 'root' &&
+    effect.type !== 'aoeRoot' &&
+    effect.type !== 'slow' &&
+    effect.type !== 'absorb' &&
+    effect.type !== 'dot' &&
+    effect.type !== 'extendDot' &&
+    effect.type !== 'interrupt' &&
+    effect.type !== 'consumeDot'
+  ) {
+    throw new Error(`Unsupported talent rider effect: ${effect.type}`);
+  }
+}
+
+function addedEffectDescription(
+  sourceAbility: string,
+  effect: AbilityEffect,
+  lang: SupportedLanguage,
+  text: TalentLocaleText,
+): string {
+  assertDescribedAddedEffect(effect);
+  const name = abilityName(sourceAbility);
+  switch (effect.type) {
+    case 'root':
+      return `${name}: ${t('hudChrome.auraEffect.root')} (${seconds(effect.duration, lang)}).`;
+    case 'aoeRoot':
+      return `${name}: ${t('hudChrome.auraEffect.root')} (${seconds(effect.duration, lang)}; r=${formatNumber(effect.radius, lang)}).`;
+    case 'slow':
+      return `${name}: ${t('hudChrome.auraEffect.slow', { pct: formatNumber((1 - effect.mult) * 100, lang) })} (${seconds(effect.duration, lang)}).`;
+    case 'absorb':
+      return `${name}: ${t('hudChrome.auraEffect.absorb', { value: formatNumber(effect.amount, lang) })} (${seconds(effect.duration, lang)}).`;
+    case 'dot': {
+      const leech = effect.leechPct
+        ? `; +${formatPercent(effect.leechPct, lang)} ${t('hud.meters.healing')}`
+        : '';
+      return `${name}: ${formatNumber(effect.total, lang)} ${text.statLabels.damage} / ${seconds(effect.duration, lang)} (${seconds(effect.interval, lang)}${leech}).`;
+    }
+    case 'extendDot':
+      return `${name} -> ${abilityName(effect.dot)}: +${seconds(effect.seconds, lang)} (<= +${seconds(effect.maxBonus, lang)}).`;
+    case 'interrupt':
+      return `${name}: ${t('hudChrome.auraEffect.lockout')} (${seconds(effect.lockout, lang)}).`;
+    case 'consumeDot':
+      return `${name} -> ${abilityName(effect.dot)}: ${formatPercent(1, lang)} ${text.statLabels.damage} / 0 s.`;
+  }
+}
+
 // True when a talent title has an explicit per-locale translation override. The
 // coverage test uses this to tell a deliberately-kept cognate (e.g. French
 // "Riposte", Spanish "Vigor") apart from a name that leaks English by accident
 // because the word-substitution dictionary does not cover its vocabulary.
 export function hasTalentTitleOverride(lang: SupportedLanguage, source: string): boolean {
-  return titleOverrides[lang]?.[source] !== undefined;
+  return (
+    RETAINED_ROW_TITLE_OVERRIDES[lang]?.[source] !== undefined ||
+    grantAbilityIdByTitle.has(source) ||
+    titleOverrides[lang]?.[source] !== undefined
+  );
 }
 
 // Public wrapper: localize a content title given its English source name. Resolves an
@@ -7516,7 +7882,13 @@ function effectDescription(
   const perRank = maxRank > 1 ? text.perRank : '';
   const parts: string[] = [];
 
-  if (effect.grant) parts.push(text.grant(abilityName(effect.grant.ability)));
+  if (effect.grant) {
+    parts.push(text.grant(abilityName(effect.grant.ability)));
+    const granted = abilityDescription(effect.grant.ability);
+    if (granted) parts.push(granted);
+    const metadata = grantAbilityMetadata(effect.grant.ability);
+    if (metadata) parts.push(metadata);
+  }
 
   const stats = effect.stats ?? {};
   const PRIMARY_PCT: Partial<Record<StatKey, 'str' | 'agi' | 'int' | 'spi'>> = {
@@ -7527,6 +7899,7 @@ function effectDescription(
   };
   for (const [key, value] of Object.entries(stats) as [StatKey, number][]) {
     if (value === undefined || value === 0) continue;
+    if (key === 'armorFromStrPct') continue;
     const label = text.statLabels[PRIMARY_PCT[key] ?? (key as keyof typeof text.statLabels)];
     parts.push(text.increase(label, statAmount(key, value, lang), perRank));
   }
@@ -7534,8 +7907,38 @@ function effectDescription(
   const global = effect.global ?? {};
   for (const [key, value] of Object.entries(global) as [GlobalKey, number][]) {
     if (value === undefined || value === 0) continue;
-    if (key === 'critVsRooted') continue;
-    parts.push(text.increase(text.statLabels[key], formatPercent(value, lang), perRank));
+    if (NON_DISPLAY_GLOBALS.has(key)) continue;
+    parts.push(
+      text.increase(text.statLabels[key as DisplayGlobalKey], formatPercent(value, lang), perRank),
+    );
+  }
+  if (global.critVsRooted) {
+    parts.push(
+      `${text.statLabels.crit}: +${formatPercent(global.critVsRooted, lang)} @ ${t('hudChrome.auraEffect.root')}.`,
+    );
+  }
+  if (global.cheatDeathIcd) {
+    parts.push(
+      `0 HP -> 1 HP (${seconds(global.cheatDeathIcd, lang)} ${text.statLabels.cooldown}).`,
+    );
+  }
+  if (global.fearBreakPct) {
+    parts.push(`${formatPercent(global.fearBreakPct, lang)} ${text.statLabels.maxHpPct} -> 0 s.`);
+  }
+  if (global.onKillSpeedPct) {
+    parts.push(
+      `${t('hudChrome.auraEffect.speed', { pct: formatNumber(global.onKillSpeedPct * 100, lang) })} (${seconds(global.onKillSpeedDuration ?? 0, lang)}).`,
+    );
+  }
+  if (global.bloodbathPct) {
+    parts.push(
+      `${text.increase(text.statLabels.damage, formatPercent(global.bloodbathPct, lang), '')} <= ${formatPercent(global.bloodbathMaxPct ?? global.bloodbathPct, lang)} (${seconds(global.bloodbathDuration ?? 0, lang)}).`,
+    );
+  }
+  if (global.cdrPerRage) {
+    parts.push(
+      `-${seconds(global.cdrPerRage, lang)} ${text.statLabels.cooldown} / 1 ${t('classDetails.labels.resource')}.`,
+    );
   }
 
   for (const mod of effect.ability ?? []) {
@@ -7582,7 +7985,26 @@ function effectDescription(
       );
     // buffPct strengthens the named buff itself (e.g. "Increases Devotion Aura by 20%").
     if (mod.buffPct) parts.push(text.increase(name, formatPercent(mod.buffPct, lang), perRank));
+    if (mod.dmgPctVsDotted) {
+      parts.push(
+        `${text.increase(`${name} ${text.statLabels.damage}`, formatPercent(mod.dmgPctVsDotted, lang), perRank)} @ ${text.statLabels.dotDmgPct}.`,
+      );
+    }
+    if (mod.castWhileMoving) {
+      parts.push(
+        `${name}: ${text.statLabels.castTime} @ ${t('hud.keybinds.categories.movement')}.`,
+      );
+    }
+    if (mod.damagePushbackImmune) {
+      parts.push(`${name}: ${text.statLabels.castTime} @ 0.`);
+    }
+    if (mod.bonusCharges) parts.push(`${name}: +${formatNumber(mod.bonusCharges, lang)}x.`);
+    for (const addedEffect of mod.addEffects ?? []) {
+      parts.push(addedEffectDescription(mod.ability, addedEffect, lang, text));
+    }
   }
+
+  if (effect.proc) parts.push(procDescription(effect.proc, lang, text));
 
   return parts.length > 0 ? parts.join(' ') : text.noEffect;
 }
@@ -7595,8 +8017,9 @@ export function tTalent(request: TalentTranslationRequest): string {
   const lang = getLanguage();
   // English is the authored source of truth: the hand-written `description` strings carry
   // the real numbers (kept honest against the effect by tests/talent_tooltip_accuracy.ts).
-  // The other 12 locales GENERATE from the effect data (effectDescription), so they cannot
-  // drift and need no per-string translation.
+  // Release locales generate ordinary effects from data. The narrow retained-description
+  // table handles the four Warrior globals whose stance/resource prose cannot be expressed by
+  // the generic renderer without losing behavior.
   if (lang === 'en' || lang === 'en_CA') {
     if (request.kind === 'talentMastery') {
       return request.field === 'name'
@@ -7604,33 +8027,45 @@ export function tTalent(request: TalentTranslationRequest): string {
         : request.spec.mastery.description;
     }
     if (request.kind === 'talentSpec') return request.spec[request.field];
-    if (request.kind === 'talentChoice') return request.choice[request.field];
-    return request.node[request.field];
+    if (request.kind === 'talentChoice') {
+      return request.field === 'name'
+        ? request.choice.name
+        : authoredChoiceDescription(request.choice);
+    }
+    const exhaustive: never = request;
+    return exhaustive;
   }
 
   if (request.kind === 'talentMastery') {
-    return request.field === 'name'
-      ? translateTitle(request.spec.mastery.name, lang)
-      : effectDescription(request.spec.mastery.effect, 1, lang);
+    if (request.field === 'name') return translateTitle(request.spec.mastery.name, lang);
+    return (
+      localeText[lang].masteryDescriptions?.[request.spec.id] ??
+      effectDescription(request.spec.mastery.effect, 1, lang)
+    );
   }
   if (request.kind === 'talentSpec') {
-    return request.field === 'name'
-      ? translateTitle(request.spec.name, lang)
-      : localeText[lang].specDescription(
-          className(request.spec.class),
-          localeText[lang].roleLabels[request.spec.role],
-          abilityName(request.spec.signature),
-        );
+    if (request.field === 'name') return translateTitle(request.spec.name, lang);
+    return (
+      localeText[lang].specDescriptions?.[request.spec.id] ??
+      localeText[lang].specDescription(
+        className(request.spec.class),
+        localeText[lang].roleLabels[request.spec.role],
+        abilityName(request.spec.signature),
+      )
+    );
   }
   if (request.kind === 'talentChoice') {
-    return request.field === 'name'
-      ? translateTitle(request.choice.name, lang)
-      : effectDescription(request.choice.effect, 1, lang);
+    if (request.field === 'name') return translateTitle(request.choice.name, lang);
+    const retainedDescriptions = RETAINED_ROW_DESCRIPTION_OVERRIDES[lang] as
+      | Readonly<Record<string, string>>
+      | undefined;
+    const retainedDescription = retainedDescriptions?.[request.choice.id];
+    if (retainedDescription !== undefined) return retainedDescription;
+    const generated = effectDescription(request.choice.effect, 1, lang);
+    return generated === localeText[lang].noEffect ? request.choice.description : generated;
   }
-  if (request.field === 'name') return translateTitle(request.node.name, lang);
-  if (request.node.kind === 'choice')
-    return localeText[lang].chooseOne(translateTitle(request.node.name, lang));
-  return effectDescription(request.node.effect, request.node.maxRank, lang);
+  const exhaustive: never = request;
+  return exhaustive;
 }
 
 export function talentTranslationManifest(): TalentTranslationManifestEntry[] {
@@ -7668,37 +8103,19 @@ export function talentTranslationManifest(): TalentTranslationManifestEntry[] {
         source: spec.mastery.description,
       });
     }
-    for (const node of ct.nodes) {
-      entries.push({
-        kind: 'talentNode',
-        id: node.id,
-        classId: ct.class,
-        specId: node.specId,
-        field: 'name',
-        source: node.name,
-      });
-      entries.push({
-        kind: 'talentNode',
-        id: node.id,
-        classId: ct.class,
-        specId: node.specId,
-        field: 'description',
-        source: node.description,
-      });
-      for (const choice of node.choices ?? []) {
+    for (const row of rowTreeFor(ct.class) ?? []) {
+      for (const choice of row.options) {
         entries.push({
           kind: 'talentChoice',
-          id: `${node.id}.${choice.id}`,
+          id: `${row.level}.${choice.id}`,
           classId: ct.class,
-          specId: node.specId,
           field: 'name',
           source: choice.name,
         });
         entries.push({
           kind: 'talentChoice',
-          id: `${node.id}.${choice.id}`,
+          id: `${row.level}.${choice.id}`,
           classId: ct.class,
-          specId: node.specId,
           field: 'description',
           source: choice.description,
         });
@@ -7718,13 +8135,10 @@ export function renderTalentManifestEntry(entry: TalentTranslationManifestEntry)
     if (!spec) return entry.source;
     return tTalent({ kind: entry.kind, spec, field: entry.field });
   }
-  const [nodeId, choiceId] = entry.id.split('.');
-  const node = ct.nodes.find((candidate) => candidate.id === nodeId);
-  if (!node) return entry.source;
-  if (entry.kind === 'talentChoice') {
-    const choice = node.choices?.find((candidate) => candidate.id === choiceId);
-    if (!choice) return entry.source;
-    return tTalent({ kind: 'talentChoice', choice, field: entry.field });
-  }
-  return tTalent({ kind: 'talentNode', node, field: entry.field });
+  const [, choiceId] = entry.id.split('.');
+  const choice = (rowTreeFor(entry.classId) ?? [])
+    .flatMap((row) => row.options)
+    .find((candidate) => candidate.id === choiceId);
+  if (!choice) return entry.source;
+  return tTalent({ kind: 'talentChoice', choice, field: entry.field });
 }

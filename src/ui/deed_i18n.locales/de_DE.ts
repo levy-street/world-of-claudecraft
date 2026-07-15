@@ -35,8 +35,8 @@ export const table: DeedLocaleTable = {
     desc: 'Verteile einen Talentpunkt auf ein Talent der letzten Reihe.',
   },
   prog_full_build: {
-    name: 'Die volle Elf',
-    desc: 'Verteile alle elf Talentpunkte auf eine einzige Skillung.',
+    name: 'Die vollen Sechs',
+    desc: 'Wähle in allen sechs Talentreihen einer einzigen Skillung jeweils eine Option.',
   },
   prog_veteran: { name: 'Veteran', desc: 'Sammle insgesamt 250.000 Erfahrung.', title: 'Veteran' },
   prog_champion: {

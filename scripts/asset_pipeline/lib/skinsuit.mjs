@@ -100,13 +100,13 @@ export const SUIT_PROMPTS = {
   },
 };
 
-// Class MODELS (7) and the class visual keys that share each (9 classes). The
+// Class MODELS (7) and the class visual keys that share each (10 classes). The
 // three caster classes share the mage model+atlas, so they share its suit.
 export const MODEL_CLASSES = {
   knight: ['warrior'],
   paladin: ['paladin'],
   ranger: ['hunter'],
-  rogue: ['rogue'],
+  rogue: ['rogue', 'swordmaster'],
   mage: ['priest', 'mage', 'warlock'],
   barbarian: ['shaman'],
   druid: ['druid'],

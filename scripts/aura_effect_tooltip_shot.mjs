@@ -55,8 +55,8 @@ await page.evaluate(() => {
       school: 'physical',
     },
     {
-      id: 'rend',
-      name: 'Rend',
+      id: 'deep_wounds',
+      name: 'Gaping Wounds',
       kind: 'dot',
       remaining: 12,
       duration: 15,

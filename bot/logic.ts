@@ -123,8 +123,9 @@ export function computeRoleSync(opts: {
 // ── Level-on-name (Discord nickname) ─────────────────────────────────────────
 // A class "icon" + the in-game level attached to the member's Discord name, so a
 // linked player's level shows next to their name in the server (e.g. "Aldric ⚔20").
-const CLASS_EMOJI: Record<string, string> = {
+const CLASS_ICON: Record<string, string> = {
   warrior: '⚔',
+  swordmaster: 'SM',
   paladin: '🛡',
   hunter: '🏹',
   rogue: '🗡',
@@ -139,8 +140,8 @@ const CLASS_EMOJI: Record<string, string> = {
 export const NICK_MAX = 32; // Discord server-nickname length limit
 
 export function levelNickSuffix(level: number, className: string): string {
-  const emoji = CLASS_EMOJI[className.toLowerCase()] ?? '';
-  return ` ${emoji}${level}`;
+  const icon = CLASS_ICON[className.toLowerCase()] ?? '';
+  return ` ${icon}${level}`;
 }
 
 /**

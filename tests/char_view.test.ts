@@ -13,6 +13,7 @@ const FULL: Partial<Record<EquipSlot, string>> = {
   shoulder: 'cryptbone_pauldrons',
   chest: 'recruit_tunic',
   mainhand: 'worn_sword',
+  offhand: 'eastbrook_buckler',
   gloves: 'mistveil_grips',
   waist: 'mistveil_cord',
   legs: 'quilted_trousers',
@@ -20,8 +21,15 @@ const FULL: Partial<Record<EquipSlot, string>> = {
 };
 
 describe('char_view: paperdoll data model', () => {
-  it('lays the classic two columns: head/neck/shoulder/chest/weapon, then hands/waist/legs/feet/rings', () => {
-    expect(PAPERDOLL_LEFT_SLOTS).toEqual(['helmet', 'neck', 'shoulder', 'chest', 'mainhand']);
+  it('lays the classic two columns with both weapon hands visible', () => {
+    expect(PAPERDOLL_LEFT_SLOTS).toEqual([
+      'helmet',
+      'neck',
+      'shoulder',
+      'chest',
+      'mainhand',
+      'offhand',
+    ]);
     expect(PAPERDOLL_RIGHT_SLOTS).toEqual(['gloves', 'waist', 'legs', 'feet', 'ring1', 'ring2']);
   });
 
@@ -33,6 +41,7 @@ describe('char_view: paperdoll data model', () => {
       'shoulder',
       'chest',
       'mainhand',
+      'offhand',
     ]);
     expect(view.right.map((c) => c.slot)).toEqual([
       'gloves',
@@ -44,6 +53,7 @@ describe('char_view: paperdoll data model', () => {
     ]);
     expect(view.left[0].item).toBe(ITEMS.cryptbone_helm);
     expect(view.left[4].item).toBe(ITEMS.worn_sword);
+    expect(view.left[5].item).toBe(ITEMS.eastbrook_buckler);
     expect(view.right[3].item).toBe(ITEMS.oiled_boots);
   });
 

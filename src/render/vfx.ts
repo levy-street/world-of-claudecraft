@@ -579,6 +579,59 @@ export class Vfx {
     }
   }
 
+  shoutwave(centerId: number, colorHex: number): void {
+    const at = this.anchor(centerId, 0.12);
+    if (!at) return;
+    const bright = new THREE.Color(colorHex).multiplyScalar(hdr(1.7));
+    const dim = new THREE.Color(colorHex).multiplyScalar(hdr(0.9));
+    this.spawn(at.x, at.y + 0.25, at.z, 0, 0.25, 0, bright, 2, 0.45, 0, SPR.ring, 0);
+    const count = this.scaledCount(52);
+    for (let i = 0; i < count; i++) {
+      const angle = (i / count) * Math.PI * 2 + Math.random() * 0.12;
+      const speed = 9.5 + Math.random() * 2;
+      const flame = i % 3 === 0;
+      this.spawn(
+        at.x + Math.sin(angle) * 0.5,
+        at.y + 0.15,
+        at.z + Math.cos(angle) * 0.5,
+        Math.sin(angle) * speed,
+        flame ? 1.4 + Math.random() * 0.8 : 0.35,
+        Math.cos(angle) * speed,
+        flame ? bright : dim,
+        flame ? 0.85 : 0.55,
+        0.8,
+        flame ? -1.5 : 3,
+        flame ? SPR.flame : SPR.sparkle,
+      );
+    }
+    this.spawn(at.x, at.y + 1.25, at.z, 0, 2.4, 0, bright, 1.5, 0.4, 0, SPR.flash, 0);
+    this.spawn(at.x, at.y + 1, at.z, 0, 1.2, 0, dim, 1.1, 0.5, 0, SPR.firePuff);
+  }
+
+  recklessFlame(entityId: number, dt: number): void {
+    if (!this.emitChance(26, dt)) return;
+    const at = this.anchor(entityId, 0.25);
+    if (!at) return;
+    const hot = new THREE.Color(0xff2a12).multiplyScalar(hdr(1.5));
+    const ember = new THREE.Color(0xff6a2a).multiplyScalar(hdr(1));
+    const angle = Math.random() * Math.PI * 2;
+    const radius = 0.28 + Math.random() * 0.18;
+    const flame = Math.random() < 0.65;
+    this.spawn(
+      at.x + Math.sin(angle) * radius,
+      at.y + Math.random() * 0.9,
+      at.z + Math.cos(angle) * radius,
+      Math.sin(angle) * 0.15,
+      1.1 + Math.random() * 0.9,
+      Math.cos(angle) * 0.15,
+      flame ? hot : ember,
+      flame ? 0.5 : 0.3,
+      0.55,
+      -1.2,
+      flame ? SPR.flame : SPR.firePuff,
+    );
+  }
+
   healGlow(targetId: number): void {
     const at = this.anchor(targetId, 0.1);
     if (!at) return;

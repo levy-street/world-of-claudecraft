@@ -49,6 +49,12 @@ describe('paperdollDropAction', () => {
     expect(paperdollDropAction(HELM, 'helmet', 'warrior', 20)).toBe('equip');
   });
 
+  it('matches the specialization policy for an aimed offhand weapon', () => {
+    const blade = ITEMS.redbrook_blade;
+    expect(paperdollDropAction(blade, 'offhand', 'warrior', 20, 'arms')).toBe('blockedClass');
+    expect(paperdollDropAction(blade, 'offhand', 'warrior', 20, 'fury')).toBe('equip');
+  });
+
   it('refuses gear above the level gate, naming the LEVEL reason', () => {
     const gate = dropRequiredLevel(RING);
     expect(gate).toBeGreaterThan(1);
@@ -106,6 +112,11 @@ describe('resolveDropTargetAt (touch release)', () => {
   it('resolves a paperdoll socket by its data-equip-slot', () => {
     const el = stubEl('<div class="equip-slot" data-equip-slot="ring2"><img></div>');
     expect(resolveDropTargetAt(10, 10, () => el)).toEqual({ kind: 'equip', slot: 'ring2' });
+  });
+
+  it('resolves the additive offhand socket on touch', () => {
+    const el = stubEl('<div class="equip-slot" data-equip-slot="offhand"><img></div>');
+    expect(resolveDropTargetAt(10, 10, () => el)).toEqual({ kind: 'equip', slot: 'offhand' });
   });
 
   it('resolves through a CHILD of the socket (the finger lands on the icon)', () => {

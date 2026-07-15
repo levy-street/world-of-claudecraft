@@ -105,7 +105,7 @@ const PROFILES: readonly Profile[] = [
   },
   {
     name: 'Agility leather',
-    classes: ['rogue', 'hunter', 'druid'],
+    classes: ['rogue', 'hunter', 'druid', 'swordmaster'],
     armor: ASHSTALKER,
     neck: 'razorwind_torque',
     rings: ['fleetblood_band', 'last_step_signet'],

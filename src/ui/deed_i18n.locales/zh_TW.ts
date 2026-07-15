@@ -16,7 +16,10 @@ export const table: DeedLocaleTable = {
   prog_talented: { name: '用在刀口上', desc: '花費你的第一點天賦點數。' },
   prog_specialized: { name: '志向宣言', desc: '選擇一項專精並習得其招牌技能。' },
   prog_deep_roots: { name: '根深柢固', desc: '將一點天賦點數投入最後一列的天賦。' },
-  prog_full_build: { name: '十一點全滿', desc: '將全部十一點天賦點數投入同一套配置。' },
+  prog_full_build: {
+    name: '六列俱全',
+    desc: '在同一套配置的六列天賦中各選擇一個選項。',
+  },
   prog_veteran: { name: '老兵', desc: '生涯累計獲得250,000點經驗值。', title: '老兵' },
   prog_champion: { name: '冠軍', desc: '生涯累計獲得500,000點經驗值。', title: '冠軍' },
   prog_paragon: { name: '典範', desc: '生涯累計獲得1,000,000點經驗值。', title: '典範' },

@@ -11,8 +11,7 @@ import {
   paginateLeaderboard,
 } from '../src/sim/leaderboard_page';
 import { Sim } from '../src/sim/sim';
-import type { PlayerClass } from '../src/sim/types';
-import { virtualLevel } from '../src/sim/types';
+import { type PlayerClass, virtualLevel } from '../src/sim/types';
 import type {
   DeedsLeaderboardEntry,
   DeedsLeaderboardSelf,
@@ -228,6 +227,7 @@ import {
   handleCardRoutes,
   handleCardUpload,
 } from './player_card';
+import { isPlayerClass } from './player_class';
 import { handleAvatar, handleCharacterSitemap, handleProfilePage } from './profile_page';
 import { recordUsageCacheEvent, recordUsageMetric, setUsageCacheSize } from './provider_usage';
 import {
@@ -741,6 +741,7 @@ function characterListPayload(chars: CharacterRow[]): {
     playtimeSeconds: number;
     skinCatalog: 'class' | 'mech';
     mainhandItemId: string | null;
+    offhandItemId: string | null;
   }[];
 } {
   return {
@@ -756,9 +757,10 @@ function characterListPayload(chars: CharacterRow[]): {
       lastPlayed: c.last_played ? new Date(c.last_played).toISOString() : null,
       playtimeSeconds: Number(c.playtime_seconds ?? 0),
       // Real appearance for the char-select 3D preview (the client renders the
-      // Combat Mech cosmetic body and the equipped mainhand, matching the world).
+      // Combat Mech cosmetic body and both equipped hands, matching the world).
       skinCatalog: c.state?.skinCatalog === 'mech' ? 'mech' : 'class',
       mainhandItemId: c.state?.equipment?.mainhand ?? null,
+      offhandItemId: c.state?.equipment?.offhand ?? null,
     })),
   };
 }
@@ -1274,18 +1276,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
             error: 'character name is not allowed',
             code: 'character.name_not_allowed',
           });
-        const validClasses = [
-          'warrior',
-          'paladin',
-          'hunter',
-          'rogue',
-          'priest',
-          'shaman',
-          'mage',
-          'warlock',
-          'druid',
-        ];
-        if (!validClasses.includes(body.class))
+        if (!isPlayerClass(body.class))
           return json(res, 400, { error: 'invalid class', code: 'character.invalid_class' });
         const skin = Math.max(
           0,

@@ -29,7 +29,8 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
   plumbing, one-shot triggers, death/revive edge logic.
 - `preview.ts`: `CharacterPreview`, the character-creation turntable (own scene/
   camera/loop), driven from `src/main.ts`; `preview_appearance.ts` resolves a
-  `PreviewAppearance` (class, skin, mech, mainhand) to its visual key + weapon layout.
+  `PreviewAppearance` (class, skin, mech, mainhand, offhand) to its visual key and
+  independent held-item layout.
 - `portrait.ts`: offscreen-WebGL headshot factory: renders a (class/visual-key, skin)
   head-and-shoulders PNG from the real model, caches the data URL.
 - `index.ts`: public exports + `createCharacterVisual(e, formKey?)` factory.
@@ -44,15 +45,15 @@ live in `manifest.ts`), falling back to `mob_bandit`; NPCs to `NPC_KEYS`. Forms
 
 ## Animation
 - `AnimState` (the renderer-derived input) and `BaseState`
-  (`idle|walk|walkBack|run|cast|swim|sit|jump`) live in `anim_state.ts`, which
+  (`idle|walk|walkBack|run|cast|spin|swim|sit|jump`) live in `anim_state.ts`, which
   also owns `desiredBaseState()` (pose selection) and `locomotionTimeScale()`
   (foot-speed matching). Clip *names* are per source rig in the `ClipMap`
   factories (`manifest.ts`); names differ per rig (e.g. KayKit `Walking_A`,
   Quaternius `Gallop`), `baseAction()` falls back gracefully.
 - **`src/render/renderer.ts` is the sole driver.** It builds `AnimState` each
   frame (swimming/sitting derived there, sim is unaware), calls `update(dt, s,
-  animate)`, fires `playAttack()`/`playHit()` from sim events, and toggles
-  `setFar`/`setShadow`/`setProxyShadow`/`setGhost`. Don't drive visuals elsewhere.
+  animate)`, fires `playAttack()`/`playHit()` from sim events, and toggles live
+  held items and effects. Don't drive visuals elsewhere.
 - **Crowd scaling:** the renderer consults `src/render/crowd_lod.ts` (pure,
   unit-tested) for shadow/anim-cadence ranges as rig counts climb; the policy
   is cosmetic-only and exempts anything a player reacts to.

@@ -5,6 +5,7 @@ import { resolveReportTarget } from '../server/report_target';
 import { DICT as adminDICT, classLabel, setAdminLanguage } from '../src/admin/i18n';
 import { DELVE_MOBS } from '../src/sim/content/delves/mobs';
 import { ABILITIES } from '../src/sim/data';
+import { ALL_CLASSES } from '../src/sim/types';
 import {
   cs_CZ,
   da_DK,
@@ -196,11 +197,20 @@ describe('L3/L4: additional server-message coverage', () => {
 describe('H1: every talent name resolves via override or ability name', () => {
   const abilityNames = new Set(Object.values(ABILITIES).map((a) => a.name));
   const nameEntries = talentTranslationManifest().filter((e) => e.field === 'name');
+  const translatedNameEntries = nameEntries.filter((entry) => entry.classId !== 'swordmaster');
+
+  it('tracks the English-only SwordMaster talent titles as one explicit pending batch', () => {
+    const pending = nameEntries.filter((entry) => entry.classId === 'swordmaster');
+    expect(pending).toHaveLength(24);
+    expect(new Set(pending.map((entry) => entry.kind))).toEqual(
+      new Set(['talentChoice', 'talentSpec', 'talentMastery']),
+    );
+  });
 
   it('each talent name has an explicit override or is an ability name in every translated locale', () => {
     for (const lang of supportedLanguages) {
       if (lang === 'en' || lang === 'en_CA') continue;
-      for (const e of nameEntries) {
+      for (const e of translatedNameEntries) {
         const ok = hasTalentTitleOverride(lang, e.source) || abilityNames.has(e.source);
         expect(
           ok,
@@ -213,7 +223,7 @@ describe('H1: every talent name resolves via override or ability name', () => {
   it('CJK talent names contain no leftover Latin words', () => {
     for (const lang of ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR'] as const) {
       setLanguage(lang);
-      for (const e of nameEntries) {
+      for (const e of translatedNameEntries) {
         const rendered = renderTalentManifestEntry(e);
         expect(
           /[A-Za-z]{2,}/.test(rendered),
@@ -456,6 +466,7 @@ describe('H4b: talent-name resolution is complete (no silent English fallthrough
         const rendered = renderTalentManifestEntry(e);
         expect(rendered.trim().length, `${lang}: "${e.source}" rendered empty`).toBeGreaterThan(0);
         if (lang !== 'en' && lang !== 'en_CA') {
+          if (e.classId === 'swordmaster') continue;
           // must resolve via an explicit override or be an ability name (which tEntity localizes)
           const resolved = hasTalentTitleOverride(lang, e.source) || abilityNames.has(e.source);
           expect(
@@ -711,21 +722,10 @@ describe("R2: bug-report errors map to the server's exact emitted bytes", () => 
 
 // --- A1: admin class column is localized (MED-5) ---
 describe('A1: admin classLabel localizes the raw class id', () => {
-  const classIds = [
-    'warrior',
-    'paladin',
-    'hunter',
-    'rogue',
-    'priest',
-    'shaman',
-    'mage',
-    'warlock',
-    'druid',
-  ];
   it('returns a non-id localized label for every class in every locale', () => {
     for (const lang of supportedLanguages) {
       setAdminLanguage(lang);
-      for (const id of classIds) {
+      for (const id of ALL_CLASSES) {
         const label = classLabel(id);
         expect(label.trim().length, `${lang}.${id}`).toBeGreaterThan(0);
         if (lang !== 'en' && lang !== 'en_CA') {

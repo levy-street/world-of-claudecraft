@@ -31,6 +31,7 @@ import {
   zh_CN,
   zh_TW,
 } from '../src/ui/i18n';
+import { pending } from '../src/ui/i18n.resolved.generated/pending';
 
 // Whole-catalog i18n completeness guards that the per-key sample tests in
 // localization_coverage.test.ts do not cover: full interpolation-token parity
@@ -83,6 +84,52 @@ function placeholders(value: string): string[] {
 }
 
 const enFlat = flatten(en);
+
+// SwordMaster intentionally lands its English catalog before locale-overlay work.
+// Pin the exact pending batch so no unrelated English fallback can hide here.
+const SWORDMASTER_ENGLISH_ONLY_PENDING = new Set([
+  'classDetails.lore.swordmaster',
+  'classDetails.roles.swordmaster',
+  'classDetails.weapons.twinOneHanders',
+  'classes.swordmaster',
+  'classes.swordmasterAria',
+  'entities.abilities.azure_rush.description',
+  'entities.abilities.azure_rush.name',
+  'entities.abilities.blade_cyclone.description',
+  'entities.abilities.blade_cyclone.name',
+  'entities.abilities.blade_dance.description',
+  'entities.abilities.blade_dance.name',
+  'entities.abilities.crescent_sweep.description',
+  'entities.abilities.crescent_sweep.name',
+  'entities.abilities.duelist_flurry.description',
+  'entities.abilities.duelist_flurry.name',
+  'entities.abilities.fleet_step.description',
+  'entities.abilities.fleet_step.name',
+  'entities.abilities.parrying_flow.description',
+  'entities.abilities.parrying_flow.name',
+  'entities.abilities.quickening.description',
+  'entities.abilities.quickening.name',
+  'entities.abilities.sword_aura.description',
+  'entities.abilities.sword_aura.name',
+  'entities.abilities.twin_finisher.description',
+  'entities.abilities.twin_finisher.name',
+  'entities.abilities.twin_slash.description',
+  'entities.abilities.twin_slash.name',
+  'entities.abilities.wind_lunge.description',
+  'entities.abilities.wind_lunge.name',
+  'guide.abilityHook.azure_rush',
+  'guide.abilityHook.blade_cyclone',
+  'guide.abilityHook.crescent_sweep',
+  'guide.abilityHook.duelist_flurry',
+  'guide.abilityHook.fleet_step',
+  'guide.abilityHook.parrying_flow',
+  'guide.abilityHook.sword_aura',
+  'guide.abilityHook.twin_slash',
+  'guide.abilityHook.wind_lunge',
+  'guide.classHook.swordmaster',
+  'hudChrome.auraEffect.increase.strAgi',
+  'hudChrome.auraEffect.reduce.strAgi',
+]);
 
 describe('i18n whole-catalog completeness', () => {
   beforeAll(async () => {
@@ -143,14 +190,14 @@ describe('i18n whole-catalog completeness', () => {
     expect(deMoney).not.toContain('12,345');
   });
 
-  // M16: no untranslated English in the non-Latin locales. A "wordy" en leaf (>=4
+  // M16: no untracked untranslated English in the non-Latin locales. A "wordy" en leaf (>=4
   // consecutive lowercase ASCII letters AFTER removing {placeholder} tokens - i.e.
   // real English prose, not an acronym or a token-only template) that is byte-
   // identical in a CJK/Cyrillic locale is an untranslated-English leak. The ONLY
   // leaves that legitimately stay identical are brand / URL strings, kept verbatim
   // in every locale on purpose; everything else must differ. Add a key here only if
   // it is a genuine brand/URL that should never be translated.
-  it('non-Latin locales ship no untranslated English (only brand/URL leaves stay identical)', () => {
+  it('non-Latin locales ship no untracked untranslated English', () => {
     const BRAND_ALLOW = new Set([
       'footer.copyright', // "{year} World of ClaudeCraft" - brand
       'footer.githubLink', // repository URL
@@ -176,10 +223,20 @@ describe('i18n whole-catalog completeness', () => {
     const wordy = (v: string) => /[a-z]{4,}/.test(v.replace(/\{[^}]*\}/g, ''));
     const nonLatin: SupportedLanguage[] = ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'];
     const leaks: string[] = [];
+    expect(SWORDMASTER_ENGLISH_ONLY_PENDING.size).toBe(41);
     for (const lang of nonLatin) {
       const flat = flatten(TABLES[lang]);
+      const pendingForLocale = new Set(pending[lang] ?? []);
+      for (const key of SWORDMASTER_ENGLISH_ONLY_PENDING) {
+        expect(pendingForLocale.has(key), `${lang} no longer marks ${key} pending`).toBe(true);
+      }
       for (const [key, enValue] of Object.entries(enFlat)) {
-        if (wordy(enValue) && flat[key] === enValue && !BRAND_ALLOW.has(key)) {
+        if (
+          wordy(enValue) &&
+          flat[key] === enValue &&
+          !BRAND_ALLOW.has(key) &&
+          !pendingForLocale.has(key)
+        ) {
           leaks.push(`${lang} ${key}: "${enValue}"`);
         }
       }

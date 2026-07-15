@@ -38,8 +38,8 @@ export const table: DeedLocaleTable = {
     desc: 'Besteed een talentpunt aan een talent uit de onderste rij.',
   },
   prog_full_build: {
-    name: 'Het Volle Elftal',
-    desc: 'Besteed alle elf talentpunten binnen één build.',
+    name: 'Het Volle Zestal',
+    desc: 'Kies binnen één build één optie in alle zes talentrijen.',
   },
   prog_veteran: {
     name: 'Veteraan',

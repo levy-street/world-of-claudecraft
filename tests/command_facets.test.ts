@@ -69,6 +69,7 @@ const W7_TAGS: Readonly<Record<string, string>> = {
   applyTalents: 'IWorldTalents',
   respec: 'IWorldTalents',
   setSpec: 'IWorldTalents',
+  selectTalentRow: 'IWorldTalents',
   saveLoadout: 'IWorldTalents',
   switchLoadout: 'IWorldTalents',
   deleteLoadout: 'IWorldTalents',

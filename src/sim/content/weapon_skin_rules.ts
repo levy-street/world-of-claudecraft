@@ -21,6 +21,7 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   redbrook_blade: 'sword',
   valeborn_spellblade: 'sword',
   eastbrook_arming_sword: 'sword',
+  eastbrook_greatsword: 'sword',
   gravecaller_blade: 'sword',
   verlans_oathblade: 'sword',
   maldrecs_soulbinder: 'sword',
@@ -31,6 +32,7 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   wyrmfang_greatblade: 'sword',
   kingsbane_last_oath: 'sword',
   highwatch_warblade: 'sword',
+  highwatch_greatsword: 'sword',
   moonscale_saber: 'sword',
   deathless_greatblade: 'sword',
   final_argument_greatblade: 'sword',
@@ -196,6 +198,7 @@ export function withWeaponSkinApplied(
 // union order in ../types.ts).
 const CLASS_ORDER: readonly PlayerClass[] = [
   'warrior',
+  'swordmaster',
   'paladin',
   'hunter',
   'rogue',

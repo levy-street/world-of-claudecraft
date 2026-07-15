@@ -319,6 +319,10 @@ describe('combat SFX policy', () => {
     expect(weaponSwingCue(druid)).toBe('melee_unarmed');
   });
 
+  it('gives SwordMaster the fast light-blade swing cue', () => {
+    expect(weaponSwingCue(target('player', 'swordmaster'))).toBe('melee_swing_light');
+  });
+
   it('plays attempted physical swings for avoidance but not magic or Auto Shot impact', () => {
     const warrior = target('player', 'warrior');
     expect(playerSwingCueForDamage(damage({ kind: 'miss' }), warrior)).toBe('melee_swing_blade');

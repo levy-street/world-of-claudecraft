@@ -3,8 +3,9 @@ import type { ItemDef, PlayerClass } from '../types';
 // Archetype groups for class-locked rewards (REWARD_ARCHETYPE hands warrior
 // rewards to paladins/shamans etc., so the lock must admit the whole group).
 const WAR: PlayerClass[] = ['warrior', 'paladin', 'shaman'];
+const WAR_WEAPON: PlayerClass[] = ['warrior', 'paladin', 'shaman', 'swordmaster'];
 const MAG: PlayerClass[] = ['mage', 'priest', 'warlock', 'druid'];
-const ROG: PlayerClass[] = ['rogue', 'hunter'];
+const ROG: PlayerClass[] = ['rogue', 'hunter', 'swordmaster'];
 
 // ---------------------------------------------------------------------------
 // Items
@@ -98,7 +99,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 6, max: 11, speed: 2.2 },
     stats: { str: 2 },
     sellValue: 120,
-    requiredClass: WAR,
+    requiredClass: WAR_WEAPON,
   },
   apprentice_staff: {
     id: 'apprentice_staff',
@@ -207,7 +208,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 7, max: 12, speed: 2.8 },
     stats: { str: 2, sta: 1 },
     sellValue: 160,
-    requiredClass: WAR,
+    requiredClass: WAR_WEAPON,
   },
   sableweb_slippers: {
     id: 'sableweb_slippers',
@@ -229,7 +230,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 8, max: 13, speed: 2.4 },
     stats: { str: 2, sta: 1 },
     sellValue: 180,
-    requiredClass: WAR,
+    requiredClass: WAR_WEAPON,
   },
   tunnelkings_spade: {
     id: 'tunnelkings_spade',
@@ -240,7 +241,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 9, max: 15, speed: 2.7 },
     stats: { str: 3, sta: 2 },
     sellValue: 190,
-    requiredClass: WAR,
+    requiredClass: WAR_WEAPON,
   },
   moggers_stomper_boots: {
     id: 'moggers_stomper_boots',
@@ -262,7 +263,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 9, max: 15, speed: 2.6 },
     stats: { str: 3, sta: 2 },
     sellValue: 850,
-    requiredClass: WAR,
+    requiredClass: WAR_WEAPON,
   },
   moggers_shiv: {
     id: 'moggers_shiv',
@@ -902,6 +903,17 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 140,
     buyValue: 1400,
   },
+  eastbrook_greatsword: {
+    id: 'eastbrook_greatsword',
+    name: 'Eastbrook Greatsword',
+    kind: 'weapon',
+    slot: 'mainhand',
+    hand: 'twohand',
+    quality: 'common',
+    weapon: { min: 9, max: 15, speed: 3.4 },
+    sellValue: 160,
+    buyValue: 1600,
+  },
   bronzework_mace: {
     id: 'bronzework_mace',
     name: 'Bronzework Mace',
@@ -932,6 +944,20 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     stats: { int: 1 },
     sellValue: 150,
     buyValue: 1500,
+  },
+  eastbrook_buckler: {
+    id: 'eastbrook_buckler',
+    name: 'Eastbrook Buckler',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'offhand',
+    shield: true,
+    blockValue: 6,
+    quality: 'common',
+    stats: { armor: 34, sta: 1 },
+    sellValue: 130,
+    buyValue: 1300,
+    requiredClass: ['warrior', 'paladin', 'shaman'],
   },
   eastbrook_chain_vest: {
     id: 'eastbrook_chain_vest',
@@ -1135,7 +1161,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 10, max: 16, speed: 2.5 },
     stats: { str: 4, sta: 2 },
     sellValue: 880,
-    requiredClass: WAR,
+    requiredClass: WAR_WEAPON,
   },
   hollow_vigil_staff: {
     id: 'hollow_vigil_staff',
@@ -1497,7 +1523,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 8, max: 14, speed: 2.5 },
     stats: { str: 3 },
     sellValue: 180,
-    requiredClass: WAR,
+    requiredClass: WAR_WEAPON,
   },
   mossy_handwraps: {
     id: 'mossy_handwraps',

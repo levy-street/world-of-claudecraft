@@ -103,6 +103,8 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
       return flatStat('int', a.value);
     case 'buff_agi':
       return flatStat('agi', a.value);
+    case 'buff_str_agi':
+      return flatStat('strAgi', a.value);
     case 'buff_sta':
       return flatStat('sta', a.value);
     case 'buff_spi':

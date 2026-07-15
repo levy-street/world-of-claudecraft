@@ -9,18 +9,9 @@
 
 import { deflateSync } from 'node:zlib';
 import type { PlayerClass } from '../src/sim/types';
+import { isPlayerClass } from './player_class';
 
-export const PLAYER_CLASSES: readonly PlayerClass[] = [
-  'warrior',
-  'paladin',
-  'hunter',
-  'rogue',
-  'priest',
-  'shaman',
-  'mage',
-  'warlock',
-  'druid',
-];
+export { isPlayerClass, PLAYER_CLASSES } from './player_class';
 
 export const MAX_SKIN = 7;
 
@@ -35,11 +26,8 @@ const CLASS_COLOR: Record<PlayerClass, [number, number, number]> = {
   mage: [0x69, 0xcc, 0xf0],
   warlock: [0x94, 0x82, 0xc9],
   druid: [0xff, 0x7d, 0x0a],
+  swordmaster: [0x22, 0xd3, 0xee],
 };
-
-export function isPlayerClass(s: string): s is PlayerClass {
-  return (PLAYER_CLASSES as readonly string[]).includes(s);
-}
 
 export function isValidSkin(n: number): boolean {
   return Number.isInteger(n) && n >= 0 && n <= MAX_SKIN;

@@ -1,7 +1,7 @@
 # World of ClaudeCraft
 
 > A classic-style micro-MMO you play free in your browser. Quest, group up, and explore a
-> hand-built world across nine classes and three zones, with dungeons, a raid, an arena,
+> hand-built world across ten classes and three zones, with dungeons, a raid, an arena,
 > and a shared online realm. The whole game is open source and free to the level cap.
 
 This file indexes the official guide for AI answer engines and crawlers. The guide is a
@@ -10,7 +10,7 @@ curated, spoiler-light handbook. The community-edited encyclopedia lives at /wik
 ## Guide
 
 - [How to Play](https://worldofclaudecraft.com/wiki/how-to-play): The newcomer walkthrough, from making a character to your first quest, combat, and leveling.
-- [Classes](https://worldofclaudecraft.com/wiki/classes): The nine playable classes, their roles (tank, healer, damage), resources, and signature abilities.
+- [Classes](https://worldofclaudecraft.com/wiki/classes): The ten playable classes, their roles (tank, healer, damage), resources, and signature abilities.
 - [Bestiary](https://worldofclaudecraft.com/wiki/bestiary): The creatures of the open world, grouped by family, with level bands.
 - [World](https://worldofclaudecraft.com/wiki/world): The three zones laid south to north, their hubs, and notable places.
 - [Quests](https://worldofclaudecraft.com/wiki/quests): How quests work and why they are the fastest way to level.

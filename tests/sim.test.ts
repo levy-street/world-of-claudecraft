@@ -181,7 +181,7 @@ describe('classic formulas', () => {
 
   it('abilities unlock at the right levels with ranks', () => {
     const w1 = abilitiesKnownAt('warrior', 1).map((k) => k.def.id);
-    expect(w1).toEqual(['heroic_strike', 'battle_shout']);
+    expect(w1).toEqual(['heroic_strike', 'battle_shout', 'battle_stance']);
     const w10 = abilitiesKnownAt('warrior', 10);
     expect(w10.map((k) => k.def.id)).toContain('overpower');
     const hs10 = w10.find((k) => k.def.id === 'heroic_strike')!;
@@ -192,8 +192,9 @@ describe('classic formulas', () => {
   });
 
   it('ranks and new abilities carry the kit through the 10-20 band', () => {
-    // warrior: heroic strike rank 4 at 20; execute unlocks at 14, not before
-    expect(abilitiesKnownAt('warrior', 13).map((k) => k.def.id)).not.toContain('execute');
+    // warrior: Heroic Strike reaches rank 4 at 20; Early Grave unlocks at 12
+    expect(abilitiesKnownAt('warrior', 11).map((k) => k.def.id)).not.toContain('execute');
+    expect(abilitiesKnownAt('warrior', 12).map((k) => k.def.id)).toContain('execute');
     const w20 = abilitiesKnownAt('warrior', 20);
     expect(w20.map((k) => k.def.id)).toContain('execute');
     const hs20 = w20.find((k) => k.def.id === 'heroic_strike')!;
@@ -387,7 +388,9 @@ describe('combat', () => {
     wolf.level = 20;
     sim.player.resource = 0;
     (sim as any).dealDamage(wolf, sim.player, 30, false, 'physical', null, 'hit');
-    expect(sim.player.resource).toBeCloseTo(1, 5);
+    // Redesigned Warrior incoming rage is damage / attacker level, then the
+    // default Battle Stance raises rage generation by 10%.
+    expect(sim.player.resource).toBeCloseTo((30 / 20) * 1.1, 5);
   });
 
   it('mob can kill the player; release rises as a ghost, healer resurrects', () => {
@@ -599,7 +602,7 @@ describe('combat', () => {
     expect(wolf.auras.some((a: any) => a.kind === 'polymorph')).toBe(false);
   });
 
-  it('overpower requires a dodge proc', () => {
+  it('Redhand is usable without a dodge proc', () => {
     const sim = makeSim('warrior');
     sim.setPlayerLevel(10);
     const wolf = nearestMob(sim, 'forest_wolf');
@@ -608,13 +611,7 @@ describe('combat', () => {
     facePlayerAt(sim, wolf);
     sim.player.resource = 50;
     sim.castAbility('overpower');
-    let _events = sim.tick();
-    // without a dodge proc it errors
-    expect(sim.counters.damageDealt).toBe(0);
-    // simulate a dodge proc
-    sim.player.overpowerUntil = sim.time + 5;
-    sim.castAbility('overpower');
-    _events = sim.tick();
+    sim.tick();
     expect(sim.counters.damageDealt).toBeGreaterThan(0);
   });
 });
@@ -1478,13 +1475,17 @@ describe('food, drink, vendor', () => {
 describe('leveling', () => {
   it('levels up, heals to full, and learns new abilities', () => {
     const sim = makeSim('warrior');
-    expect(sim.known.map((k) => k.def.id)).toEqual(['heroic_strike', 'battle_shout']);
+    expect(sim.known.map((k) => k.def.id)).toEqual([
+      'heroic_strike',
+      'battle_shout',
+      'battle_stance',
+    ]);
     const _events: any[] = [];
     (sim as any).grantXp(xpForLevel(1) + xpForLevel(2) + xpForLevel(3) + 10);
     expect(sim.player.level).toBe(4);
     expect(sim.player.hp).toBe(sim.player.maxHp);
     expect(sim.known.map((k) => k.def.id)).toContain('charge');
-    expect(sim.known.map((k) => k.def.id)).toContain('rend');
+    expect(sim.known.map((k) => k.def.id)).toContain('overpower');
   });
 
   it('caps at max level', () => {

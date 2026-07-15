@@ -3,7 +3,7 @@
 //
 //   -> {"cmd":"info"}
 //   <- {"obs_size":...,"num_actions":...,"actions":[...]}  (sizes are content-dependent; query, don't hardcode)
-//   -> {"cmd":"reset","seed":123,"player_class":"warrior","config":{...}}
+//   -> {"cmd":"reset","seed":123,"player_class":"warrior","player_level":20,"talents":{"spec":"arms","rows":{}},"config":{...}}
 //   <- {"obs":[...],"info":{...}}
 //   -> {"cmd":"step","action":4}
 //   <- {"obs":[...],"reward":0.01,"terminated":false,"truncated":false,"info":{...}}
@@ -12,10 +12,16 @@
 // Run `node dist-env/env_server.cjs --bench` for a throughput benchmark.
 
 import * as readline from 'node:readline';
-import { Sim, RewardCounters } from '../src/sim/sim';
-import { ACTIONS, NUM_ACTIONS, applyAction, encodeObs, obsSize } from '../src/sim/obs';
-import { ALL_CLASSES, MAX_LEVEL, PlayerClass } from '../src/sim/types';
-import { MAX_INPUT_LINE_LENGTH, validateAction, validatePlayerClass } from './protocol';
+import type { TalentAllocation } from '../src/sim/content/talents';
+import { ACTIONS, applyAction, encodeObs, NUM_ACTIONS, obsSize } from '../src/sim/obs';
+import { type RewardCounters, Sim } from '../src/sim/sim';
+import { ALL_CLASSES, MAX_LEVEL, type PlayerClass } from '../src/sim/types';
+import {
+  MAX_INPUT_LINE_LENGTH,
+  parseTalentResetRequest,
+  validateAction,
+  validatePlayerClass,
+} from './protocol';
 
 interface EnvConfig {
   frameSkip: number; // sim ticks per env step (20 ticks = 1 second)
@@ -61,7 +67,13 @@ class Env {
   stepCount = 0;
   prev: RewardCounters | null = null;
 
-  reset(seed: number, playerClass: PlayerClass, cfg: Partial<EnvConfig> & { rewards?: Partial<EnvConfig['rewards']> }): object {
+  reset(
+    seed: number,
+    playerClass: PlayerClass,
+    cfg: Partial<EnvConfig> & { rewards?: Partial<EnvConfig['rewards']> },
+    playerLevel = 1,
+    talents?: TalentAllocation,
+  ): object {
     this.config = {
       ...DEFAULT_CONFIG,
       ...cfg,
@@ -74,6 +86,8 @@ class Env {
       respawnSeconds: this.config.respawnSeconds,
       autoEquip: true,
     });
+    if (playerLevel !== 1) this.sim.setPlayerLevel(playerLevel);
+    if (talents && !this.sim.applyTalents(talents)) throw new Error('invalid talents');
     this.stepCount = 0;
     this.prev = { ...this.sim.counters };
     return { obs: encodeObs(this.sim), info: this.infoDict() };
@@ -101,8 +115,7 @@ class Env {
     const died = c.deaths > this.prev.deaths;
     this.prev = { ...c };
 
-    const terminated =
-      (this.config.terminateOnDeath && died) || sim.player.level >= MAX_LEVEL;
+    const terminated = (this.config.terminateOnDeath && died) || sim.player.level >= MAX_LEVEL;
     const truncated = this.config.maxSteps > 0 && this.stepCount >= this.config.maxSteps;
 
     return {
@@ -169,7 +182,12 @@ function serve(): void {
     try {
       switch (msg.cmd) {
         case 'info':
-          send({ obs_size: obsSize(), num_actions: NUM_ACTIONS, actions: ACTIONS, max_level: MAX_LEVEL });
+          send({
+            obs_size: obsSize(),
+            num_actions: NUM_ACTIONS,
+            actions: ACTIONS,
+            max_level: MAX_LEVEL,
+          });
           break;
         case 'reset':
           {
@@ -178,7 +196,20 @@ function serve(): void {
               send({ error: `invalid player_class: expected one of ${ALL_CLASSES.join(', ')}` });
               break;
             }
-            send(env.reset(msg.seed ?? 0, playerClass, msg.config ?? {}));
+            const reset = parseTalentResetRequest(msg);
+            if (!reset.ok) {
+              send({ error: reset.error });
+              break;
+            }
+            send(
+              env.reset(
+                msg.seed ?? 0,
+                playerClass,
+                msg.config ?? {},
+                reset.playerLevel,
+                reset.talents,
+              ),
+            );
           }
           break;
         case 'step':

@@ -32,7 +32,11 @@ import { recalcPlayerStats } from '../entity';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
+import { isStunned } from './cc';
+import { onHotExpired, tickProcState } from './talent_procs';
 import { tickThornsCooldown } from './thorns_charge';
+
+const SECOND_WIND_THRESHOLD = 0.35;
 
 // Friendly NPCs reject hostile control / debuff auras: any aura of these kinds is
 // stripped on the NPC's tick (cleanseFriendlyNpcAuras). Moved here with that method
@@ -65,8 +69,17 @@ function pctValue(value: number): number {
   return value > 1 ? value / 100 : value;
 }
 
-export function updateRegen(ctx: SimContext, p: Entity, _meta: PlayerMeta): void {
+export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
   if (ctx.tickCount % 40 !== 0) return; // every 2 seconds (the classic tick)
+  // Lifesap restores whichever resource bar is currently live, including across
+  // form changes. Hard control stills the sap rather than banking free resource.
+  if (!isStunned(p)) {
+    for (const aura of p.auras) {
+      if (aura.kind === 'resource_sap') {
+        p.resource = Math.min(p.maxResource, p.resource + Math.round(aura.value));
+      }
+    }
+  }
   if (p.resourceType === 'mana') {
     if (p.fiveSecondRule >= 5) {
       // out-of-combat mana regen: faster than before and scales with spirit
@@ -86,6 +99,14 @@ export function updateRegen(ctx: SimContext, p: Entity, _meta: PlayerMeta): void
   if (!p.inCombat && p.hp < p.maxHp && !p.eating) {
     const regen = p.stats.sta * 0.3 + 2;
     p.hp = Math.min(p.maxHp, p.hp + Math.round(regen));
+  }
+  const secondWindPct = ctx.playerMods(meta).global.secondWindPctPerSec;
+  if (secondWindPct > 0 && p.hp > 0 && p.hp < p.maxHp * SECOND_WIND_THRESHOLD) {
+    const heal = Math.min(Math.round(p.maxHp * secondWindPct * 2), p.maxHp - p.hp);
+    if (heal > 0) {
+      p.hp += heal;
+      ctx.emit({ type: 'heal', targetId: p.id, amount: heal });
+    }
   }
   // food and drink tick independently, so both can run at once
   for (const slot of ['eating', 'drinking'] as const) {
@@ -111,8 +132,15 @@ export function updateTimers(p: Entity): void {
   p.combatTimer += DT;
   for (const [k, v] of p.cooldowns) {
     const nv = v - DT;
-    if (nv <= 0) p.cooldowns.delete(k);
-    else p.cooldowns.set(k, nv);
+    if (nv <= 0) {
+      p.cooldowns.delete(k);
+      const chargeState = p.charges?.get(k);
+      if (chargeState) {
+        chargeState.spent -= 1;
+        if (chargeState.spent > 0) p.cooldowns.set(k, chargeState.cdMax);
+        else p.charges?.delete(k);
+      }
+    } else p.cooldowns.set(k, nv);
   }
 }
 
@@ -142,6 +170,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
     return;
   }
   let statsDirty = false;
+  tickProcState(e, DT);
   for (let i = e.auras.length - 1; i >= 0; i--) {
     const a = e.auras[i];
     a.remaining -= DT;
@@ -226,9 +255,23 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
       e.auras.splice(i, 1);
       ctx.applyNonPlayerStatAura(e, a, -1);
       ctx.emit({ type: 'aura', targetId: e.id, name: a.name, gained: false });
+      if (a.kind === 'hot') {
+        const source = ctx.entities.get(a.sourceId);
+        if (source && !source.dead && source.kind === 'player') {
+          onHotExpired(ctx, source, a.id, e);
+        }
+      }
       // debuff_ap is the one non-buff kind recalcPlayerStats folds, so it must
       // mark stats dirty on expiry or the AP cut would persist after the fade.
-      if (a.kind.startsWith('buff') || a.kind.startsWith('form') || a.kind === 'debuff_ap')
+      if (
+        a.kind.startsWith('buff') ||
+        a.kind.startsWith('form') ||
+        a.kind === 'debuff_ap' ||
+        a.kind === 'die_by_sword' ||
+        a.kind === 'enrage' ||
+        a.kind === 'bloodbath' ||
+        a.kind === 'berserker_stance'
+      )
         statsDirty = true;
     }
   }

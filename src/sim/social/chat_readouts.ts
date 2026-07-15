@@ -615,22 +615,11 @@ export function talentsReadout(meta: PlayerMeta, e: Entity): string {
   if (total <= 0)
     return `You have not unlocked talents yet — they begin at level ${FIRST_TALENT_LEVEL}.`;
   const spent = pointsSpent(meta.talents);
-  // Split spent points by tree (cold path: walk the allocation once on demand).
-  const byId = new Map(ct.nodes.map((n) => [n.id, n] as const));
-  let classPts = 0;
-  let specPts = 0;
-  for (const id in meta.talents.ranks) {
-    const node = byId.get(id);
-    if (!node) continue;
-    if (node.tree === 'class') classPts += meta.talents.ranks[id];
-    else specPts += meta.talents.ranks[id];
-  }
   const specName = meta.talents.spec
     ? (ct.specs.find((s) => s.id === meta.talents.spec)?.name ?? meta.talents.spec)
     : null;
   const head = specName ?? 'no specialization';
-  const breakdown = specName ? `Class ${classPts}, ${specName} ${specPts}` : `Class ${classPts}`;
   const unspent = total - spent;
   const tail = unspent > 0 ? ` ${unspent} unspent.` : '';
-  return `Talents: ${head} — ${spent}/${total} points spent (${breakdown}).${tail}`;
+  return `Talents: ${head} - ${spent}/${total} rows selected.${tail}`;
 }

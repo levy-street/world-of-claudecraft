@@ -868,6 +868,25 @@ export const fr_FR: EnTranslations = {
       "mobileCameraJoystick": "Manette de caméra",
       "mobileLeftHanded": "Disposition pour gaucher"
     },
+    "talentRows": {
+      "tab": "Choices",
+      "defaultLoadout": "Default Loadout",
+      "comingSoon": "Coming soon",
+      "readoutSummary": "Talents: {head}, {spent}/{total} rows selected."
+    },
+    "abilityError": {
+      "shieldRequired": "You must have a shield equipped."
+    },
+    "specPanel": {
+      "primaryAttr": "Primary attribute",
+      "complexity": "Complexity",
+      "complexityLow": "Low",
+      "complexityMedium": "Medium",
+      "complexityHigh": "High",
+      "exampleAbilities": "Example abilities",
+      "viewTalents": "View talents",
+      "selectSpec": "Select specialization"
+    },
     "controller": {
       "title": "Manette",
       "enable": "Activer la manette",
@@ -1340,6 +1359,7 @@ export const fr_FR: EnTranslations = {
         "armor": "Augmente l'armure de {value}",
         "int": "Augmente l'intelligence de {value}",
         "agi": "Augmente l'agilité de {value}",
+        "strAgi": "Increases Strength and Agility by {value}",
         "sta": "Augmente l'endurance de {value}",
         "spi": "Augmente l'esprit de {value}",
         "allStats": "Augmente tous les attributs de {value}"
@@ -1349,6 +1369,7 @@ export const fr_FR: EnTranslations = {
         "armor": "Réduit l'armure de {value}",
         "int": "Réduit l'intelligence de {value}",
         "agi": "Réduit l'agilité de {value}",
+        "strAgi": "Reduces Strength and Agility by {value}",
         "sta": "Réduit l'endurance de {value}",
         "spi": "Réduit l'esprit de {value}",
         "allStats": "Réduit tous les attributs de {value}"
@@ -2541,7 +2562,8 @@ export const fr_FR: EnTranslations = {
       "shaman": "Un appelant des esprits qui ploie la tempête, le feu et l'eau, et soigne ses alliés entre deux éclairs.",
       "mage": "Un tisseur de sorts de feu, de givre et d'Arcanes qui contrôle le champ de bataille à distance.",
       "warlock": "Un sombre conjurateur qui commande démons et malédictions, échangeant sa vie contre une puissance dévastatrice.",
-      "druid": "Un métamorphe qui encaisse en ours, taille les ennemis en fauve ou soigne au cœur de la mêlée."
+      "druid": "Un métamorphe qui encaisse en ours, taille les ennemis en fauve ou soigne au cœur de la mêlée.",
+      "swordmaster": "A swift dual-blade fighter who builds momentum through precision, speed, and sweeping attacks."
     },
     "tag": {
       "melee": "Mêlée",
@@ -2569,11 +2591,22 @@ export const fr_FR: EnTranslations = {
     },
     "abilityHook": {
       "heroic_strike": "Prépare un coup plus lourd qui dépense de la rage sur votre prochaine attaque.",
+      "revenge": "Sweeps enemies in front of you, with a chance to become free after a dodge or parry.",
+      "hamstring": "Cripples an enemy's movement to keep it from escaping.",
       "battle_shout": "Un cri de ralliement qui augmente la puissance d'attaque du groupe.",
       "commanding_shout": "Renforce l'endurance pour que chacun tienne plus longtemps au combat.",
       "charge": "Fonce sur un ennemi lointain pour ouvrir le combat avec un bref étourdissement.",
       "rend": "Ouvre un saignement qui use la cible dans la durée.",
       "thunder_clap": "Frappe tout autour de vous et ralentit les attaques des ennemis.",
+      "twin_slash": "Cuts with both blades in one quick sequence to build momentum.",
+      "crescent_sweep": "Carves a wide arc through nearby enemies.",
+      "fleet_step": "Sharpens your footwork for a burst of movement speed.",
+      "sword_aura": "Focuses briefly to wreathe both blades in blue energy, empowering strength and agility.",
+      "wind_lunge": "Breaks roots and lunges forward in your facing direction.",
+      "parrying_flow": "Flows between incoming blows to evade more attacks for a short time.",
+      "blade_cyclone": "Whirls both blades through nearby enemies, turning gathered momentum into a sweeping burst.",
+      "duelist_flurry": "Sets a measured cadence that greatly accelerates your attacks.",
+      "azure_rush": "Surges forward in a blue flash and slows nearby enemies.",
       "seal_of_righteousness": "Imprègne vos coups de dégâts sacrés, à dépenser ensuite avec Verdict.",
       "holy_light": "Un soin régulier et conséquent pour remettre d'aplomb un allié ou vous-même.",
       "devotion_aura": "Une amélioration personnelle durable qui augmente l'armure pour amortir les coups.",
@@ -3975,6 +4008,7 @@ export const fr_FR: EnTranslations = {
     "mage": "Mage",
     "warlock": "Démoniste",
     "druid": "Druide",
+    "swordmaster": "SwordMaster",
     "warriorAria": "Classe Guerrier",
     "paladinAria": "Classe Paladin",
     "hunterAria": "Classe Chasseur",
@@ -3983,7 +4017,8 @@ export const fr_FR: EnTranslations = {
     "shamanAria": "Classe Chaman",
     "mageAria": "Classe Mage",
     "warlockAria": "Classe Démoniste",
-    "druidAria": "Classe Druide"
+    "druidAria": "Classe Druide",
+    "swordmasterAria": "SwordMaster class"
   },
   "controls": {
     "title": "Guide des contrôles",
@@ -4749,6 +4784,7 @@ export const fr_FR: EnTranslations = {
       "paladin": "Soigneur / Tank / DPS mêlée",
       "hunter": "DPS à distance",
       "rogue": "DPS mêlée",
+      "swordmaster": "Mobile Melee DPS",
       "priest": "Soigneur / DPS à distance",
       "shaman": "Soigneur / DPS mêlée ou distance",
       "mage": "DPS à distance",
@@ -4765,6 +4801,7 @@ export const fr_FR: EnTranslations = {
       "swordsMaces": "Épées, masses",
       "axesSwords": "Haches, épées",
       "daggersSwords": "Dagues, épées",
+      "twinOneHanders": "Two One-Handed Weapons",
       "staves": "Bâtons",
       "macesAxes": "Masses, haches"
     },
@@ -4777,7 +4814,8 @@ export const fr_FR: EnTranslations = {
       "shaman": "Les chamans commandent les éléments, imprègnent leurs armes, foudroient leurs ennemis et restaurent leurs alliés.",
       "mage": "Les mages plient le Feu, le Givre et la force des Arcanes pour détruire leurs ennemis, invoquer de l'eau et figer les menaces sur place.",
       "warlock": "Les démonistes invoquent des démons, lancent des malédictions et des dégâts sur la durée, et siphonnent la vie de leurs ennemis pour tenir.",
-      "druid": "Les druides canalisent la nature, soignent, entravent les ennemis et prennent des formes animales pour défendre ou attaquer."
+      "druid": "Les druides canalisent la nature, soignent, entravent les ennemis et prennent des formes animales pour défendre ou attaquer.",
+      "swordmaster": "SwordMasters build momentum with precise twin-blade strikes, then turn speed into sweeping attacks that cut through whole groups."
     },
     "aria": "Détails de classe pour {className}: rôle {role}. Caractéristiques initiales: Force {str}, Agilité {agi}, Endurance {sta}, Intelligence {int}, Esprit {spi}.",
     "statBarAria": "{stat}: {value} sur 25"
@@ -5513,6 +5551,7 @@ export const fr_FR: EnTranslations = {
     },
     "slots": {
       "mainhand": "Main droite",
+      "offhand": "Off Hand",
       "helmet": "Tête",
       "neck": "Cou",
       "shoulder": "Épaules",
@@ -5765,6 +5804,54 @@ export const fr_FR: EnTranslations = {
       "sport_second_wind": {
         "name": "Jambes fraîches",
         "description": "Retrouvez vos jambes : déplacement 50 % plus rapide pendant 4 sec."
+      },
+      "twin_slash": {
+        "name": "Twin Slash",
+        "description": "Strike the target with both swords in main-hand then off-hand order."
+      },
+      "crescent_sweep": {
+        "name": "Crescent Sweep",
+        "description": "Sweep both swords through up to 5 enemies in a 6 yard frontal arc."
+      },
+      "fleet_step": {
+        "name": "Fleet Step",
+        "description": "Increase movement speed for 5 sec. Higher ranks increase the bonus."
+      },
+      "sword_aura": {
+        "name": "Sword Aura",
+        "description": "Imbue both swords with azure power, gaining 12 Strength and 12 Agility for 5 min."
+      },
+      "wind_lunge": {
+        "name": "Wind Lunge",
+        "description": "Break roots and lunge 8 yards in your facing direction."
+      },
+      "parrying_flow": {
+        "name": "Parrying Flow",
+        "description": "Flow between incoming blows, gaining 20% dodge for 8 sec."
+      },
+      "quickening": {
+        "name": "Quickening",
+        "description": "Accelerate your attack speed by 25% for 12 sec."
+      },
+      "blade_dance": {
+        "name": "Blade Dance",
+        "description": "Dance through nearby enemies, striking up to 6 targets with both swords."
+      },
+      "twin_finisher": {
+        "name": "Twin Finisher",
+        "description": "Commit both swords to a heavy two-part finishing strike."
+      },
+      "blade_cyclone": {
+        "name": "Blade Cyclone",
+        "description": "Become a cyclone of steel, striking up to 8 enemies within 9 yards with both swords."
+      },
+      "duelist_flurry": {
+        "name": "Duelist Flurry",
+        "description": "Enter a measured flurry, increasing attack speed by 35% for 12 sec."
+      },
+      "azure_rush": {
+        "name": "Azure Rush",
+        "description": "Rush 12 yards in a flash of azure steel and slow nearby enemies by 50% for 3 sec."
       },
       "flamestrike": {
         "name": "Frappe enflammée",
@@ -6481,6 +6568,306 @@ export const fr_FR: EnTranslations = {
       "summon_doomguard": {
         "name": "Invoquer un Wraithborn",
         "description": "Soumet un Wraithborn à votre volonté, un démon d'élite qui déverse de lourds dégâts d'Ombre à distance. Un long temps de recharge bride sa puissance dévastatrice. Invoquer un nouveau démon renvoie celui que vous avez. Vous ne pouvez avoir qu'un démon à la fois."
+      },
+      "battle_stance": {
+        "name": "Battle Stance",
+        "description": "An aggressive combat stance: you generate 10% more rage. The default stance for Arms and Protection."
+      },
+      "berserker_stance": {
+        "name": "Berserker Stance",
+        "description": "A reckless combat stance: your critical strikes land 3% more often and hit for 3% more. The Fury warrior always fights in this stance."
+      },
+      "sweeping_strikes": {
+        "name": "Widening Arc",
+        "description": "For 12 sec your single-target attacks also strike 1 nearby enemy for full damage. (Arms)"
+      },
+      "deep_wounds": {
+        "name": "Gaping Wounds",
+        "description": "Passive: your Maiming Strike leaves the target bleeding for Physical damage over 6 sec. (Arms)"
+      },
+      "enrage_passive": {
+        "name": "Mayhem",
+        "description": "Passive: while Enraged you deal 7% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)"
+      },
+      "raging_gale": {
+        "name": "Twinstrike",
+        "description": "Instantly strike with your weapon twice, each hit dealing 40% weapon damage plus {damage}, and generate 8 rage. Stores up to 2 charges. (Fury)"
+      },
+      "red_harvest": {
+        "name": "Red Harvest",
+        "description": "Spend everything: strike three times in a frenzy for 65% weapon damage plus {damage} each, always Enraging you. (Fury)"
+      },
+      "furious_mending": {
+        "name": "Furious Mending",
+        "description": "For 10 sec you take 20% reduced damage, and while it lasts your Bloodletting heals you for 20% of your maximum health. (Fury)"
+      },
+      "emboldening_roar": {
+        "name": "Emboldening Roar",
+        "description": "Lets loose an emboldening roar: you and friendly players within 40 yards are Emboldened, and your next 3 abilities are guaranteed critical strikes. (Fury)"
+      },
+      "raised_guard": {
+        "name": "Raised Guard",
+        "description": "Brace behind your shield: you take 50% reduced Physical damage for 6 sec. Stores up to 2 charges. (Protection)"
+      },
+      "iron_resolve": {
+        "name": "Iron Resolve",
+        "description": "Grit your teeth and ignore the pain: spends up to 40 rage (20 minimum) to absorb 4 damage per rage spent, lasting up to 10 sec. (Protection)"
+      },
+      "faultline": {
+        "name": "Faultline",
+        "description": "Send a shockwave through the ground: enemies in front of you within 8 yards take {damage} damage and are stunned for 3 sec. (Protection)"
+      },
+      "defiant_bellow": {
+        "name": "Defiant Bellow",
+        "description": "A defiant bellow: every enemy within 10 yards is taunted, compelled to attack you for 3 sec. (Protection)"
+      },
+      "breachmaker": {
+        "name": "Breachmaker",
+        "description": "Batter the target for weapon damage plus {damage} and crack its guard: your own attacks against it deal 20% more damage for 8 sec. (Arms)"
+      },
+      "measured_fury": {
+        "name": "Measured Fury",
+        "description": "Your measured fury sharpens your economy: your abilities cost 10% less rage. (Arms)"
+      },
+      "seasoned_soldier": {
+        "name": "Seasoned Soldier",
+        "description": "Your critical auto-attacks generate 10% more rage. (Arms)"
+      },
+      "diabolical_twinstrike": {
+        "name": "Diabolical Twinstrike",
+        "description": "While Enraged, your Twinstrike deals 15% more damage. (Fury)"
+      },
+      "cleaving_blows": {
+        "name": "Cleaving Blows",
+        "description": "Red Harvest always refunds a charge of Twinstrike. (Fury)"
+      },
+      "sudden_death": {
+        "name": "Sudden Death",
+        "description": "Your auto-attacks have a chance to let you cast Early Grave on a target at any health, costing no rage. (Arms)"
+      },
+      "storm_bolt": {
+        "name": "Storm Bolt",
+        "description": "Hurl your weapon at the target for {damage}, stunning it for 3 sec."
+      },
+      "piercing_howl": {
+        "name": "Piercing Howl",
+        "description": "A piercing shout that slows all enemies within 15 yards by 50% for 8 sec."
+      },
+      "die_by_sword": {
+        "name": "Die by the Sword",
+        "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
+      },
+      "recklessness": {
+        "name": "Recklessness",
+        "description": "Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec."
+      },
+      "sanguine_aura": {
+        "name": "Sanguine Aura",
+        "description": "Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec."
+      },
+      "victory_rush": {
+        "name": "Victory Rush",
+        "description": "Strike for weapon damage plus {damage} and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy."
+      },
+      "intimidating_shout": {
+        "name": "Intimidating Shout",
+        "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
+      },
+      "revenge": {
+        "name": "Revenge",
+        "description": "Attack in a wide arc, dealing Physical damage to all enemies in front of you. Above 5 targets the damage is reduced. When you dodge or parry, your next Revenge may cost no rage. (Protection)"
+      },
+      "heroic_leap": {
+        "name": "Heroic Leap",
+        "description": "Leap to the target area, dealing {damage} damage to nearby enemies on landing."
+      },
+      "rallying_cry": {
+        "name": "Valor Roar",
+        "description": "Lets loose a valorous roar, granting you and party members within 40 yards 20% additional maximum health for 10 sec. Protection: they also take 5% less damage for the duration."
+      },
+      "avatar": {
+        "name": "Avatar",
+        "description": "Transform into a colossus for 20 sec, breaking all control on you and increasing your damage dealt by 20%."
+      },
+      "bladestorm": {
+        "name": "Bladestorm",
+        "description": "Become a whirling storm of steel, striking all enemies within 8 yards for {damage} every second for 4 sec."
+      },
+      "aspect_of_the_wild": {
+        "name": "Wildfang Rally",
+        "description": "Inspires allies within 30 yd with wild strength, increasing attack power by 45 and attack speed by 5% for 5 min. (Hunter talent)"
+      },
+      "aura_surge": {
+        "name": "Dawnward Ricochet",
+        "description": "Hurl a dawnforged shield for {damage} Holy damage and silence the primary target for 2 sec. It bounces to up to 2 additional enemies within 10 yd for 75% damage per bounce. (Paladin talent)"
+      },
+      "avenging_wrath": {
+        "name": "Wrathwing",
+        "description": "Calls down avenging power, increasing attack power by 60 and spell power by 30 for 20 sec. (Paladin talent)"
+      },
+      "berserk": {
+        "name": "Red Haze",
+        "description": "Increases attack power by 70 for 15 sec. (Druid talent)"
+      },
+      "blink": {
+        "name": "Flickerstep",
+        "description": "Teleports you 15 yd forward and breaks roots. (Mage talent)"
+      },
+      "bloodlust": {
+        "name": "Storm Chorus",
+        "description": "Whips allies within 30 yd into a frenzy, increasing attack speed by 30% for 15 sec. (Shaman talent)"
+      },
+      "chain_lightning": {
+        "name": "Skybranch",
+        "description": "Hurls lightning at the target area, damaging nearby enemies for {damage}. (Shaman talent)"
+      },
+      "chaos_bolt": {
+        "name": "Ruinbolt",
+        "description": "Hurls a bolt of chaotic fire for {damage} Fire damage. (Warlock talent)"
+      },
+      "cleansing_verdict": {
+        "name": "Cleansing Verdict",
+        "description": "Purges a harmful magic effect from a friendly target and heals them for {damage} Holy."
+      },
+      "cloak_of_shadows": {
+        "name": "Shadecloak",
+        "description": "Wraps you in shadows, absorbing 420 damage for 5 sec. (Rogue talent)"
+      },
+      "cone_of_cold": {
+        "name": "Frostsweep",
+        "description": "Blasts nearby enemies with frost for {damage} Frost damage. (Frost signature)"
+      },
+      "curse_of_exhaustion": {
+        "name": "Leaden Hex",
+        "description": "Curses the target, slowing movement by 30% for 12 sec. (Warlock talent)"
+      },
+      "death_coil": {
+        "name": "Morrowlash",
+        "description": "Strikes the enemy for {damage} Shadow damage, then horrifies them for 3 sec. (Warlock talent)"
+      },
+      "deep_freeze": {
+        "name": "Deadfrost",
+        "description": "Deep freezes the target, dealing {damage} Frost damage and stunning it for 4 sec. (Mage talent)"
+      },
+      "desperate_prayer": {
+        "name": "Last Prayer",
+        "description": "Instantly heals you for {damage}. (Priest talent)"
+      },
+      "deterrence": {
+        "name": "Bristleguard",
+        "description": "Increases your dodge chance by 50 percentage points for 10 sec. (Hunter talent)"
+      },
+      "divine_shield": {
+        "name": "Lightward",
+        "description": "Shields you with holy power, absorbing 900 damage for 8 sec. (Paladin talent)"
+      },
+      "earthbind": {
+        "name": "Gripping Earth",
+        "description": "Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)"
+      },
+      "evocation": {
+        "name": "Aetherwell",
+        "description": "Instantly restores 220 mana. (Mage talent)"
+      },
+      "frenzied_regeneration": {
+        "name": "Savage Mending",
+        "description": "Restores 180 health over 10 sec. Bruin Form only. (Druid talent)"
+      },
+      "frost_trap": {
+        "name": "Rime Snare",
+        "description": "Freezes enemies at the target area for 3 sec, preventing movement and actions. (Hunter talent)"
+      },
+      "ghostly_strike": {
+        "name": "Wraith Strike",
+        "description": "Strikes the enemy for weapon damage plus {damage} and briefly increases dodge. Awards 1 combo point. (Rogue talent)"
+      },
+      "hammer_of_wrath": {
+        "name": "Tolling Hammer",
+        "description": "Hurls a holy hammer at a wounded enemy for {damage} Holy damage. Only usable below 20% health. (Paladin talent)"
+      },
+      "healing_stream": {
+        "name": "Springwell",
+        "description": "Restores 120 health to a friendly target over 12 sec. (Shaman talent)"
+      },
+      "holy_wrath": {
+        "name": "Saint's Ire",
+        "description": "Unleashes holy power, damaging nearby enemies for {damage}. (Paladin talent)"
+      },
+      "howl_of_terror": {
+        "name": "Dread Chorus",
+        "description": "Frightens nearby enemies for up to 3 sec. Damage may break the effect. (Warlock talent)"
+      },
+      "ice_block": {
+        "name": "Cold Coffin",
+        "description": "Encases you in ice, absorbing 600 damage for 8 sec. You cannot act while encased. Recast to cancel. (Mage talent)"
+      },
+      "inner_focus": {
+        "name": "Stilled Mind",
+        "description": "Makes your next spell free. Lasts 60 sec. (Priest talent)"
+      },
+      "innervate": {
+        "name": "Lifesap",
+        "description": "Living sap wells up in you for 10 sec, restoring 20 of your current resource in waves: mana, Rage, or Energy, and shifting forms does not break it. Sleep, stun, or stasis stills the sap. (Druid talent)"
+      },
+      "meteor": {
+        "name": "Skystone",
+        "description": "Calls down a meteor at the target area, dealing {damage} Fire damage, then burning enemies there for 12 to 18 Fire damage every 2 sec for 6 sec. (Mage talent)"
+      },
+      "mind_sear": {
+        "name": "Thoughtburn",
+        "description": "Channels shadow energy at the target area, damaging nearby enemies each second for {damage}. (Priest talent)"
+      },
+      "multi_shot": {
+        "name": "Splitshot",
+        "description": "Loose a spread at the target area, dealing {damage} Physical damage to enemies within 8 yd. (Hunter talent)"
+      },
+      "prayer_of_healing": {
+        "name": "Choirmend",
+        "description": "Heals nearby allies for {damage}. (Priest talent)"
+      },
+      "preparation": {
+        "name": "Contingency",
+        "description": "Finishes the cooldown on Sprint, Evasion, and Vanish. (Rogue talent)"
+      },
+      "presence_of_mind": {
+        "name": "Racing Mind",
+        "description": "Makes your next spell with a cast time instant. Lasts 60 sec. (Mage talent)"
+      },
+      "psychic_scream": {
+        "name": "Terror Canticle",
+        "description": "Frightens nearby enemies for up to 4 sec. Damage may break the effect. (Priest talent)"
+      },
+      "shadowstep": {
+        "name": "Shadeslip",
+        "description": "Steps through the shadows toward your target. (Rogue talent)"
+      },
+      "silence": {
+        "name": "Hushword",
+        "description": "Silences the target for 4 sec. (Priest talent)"
+      },
+      "smoke_screen": {
+        "name": "Smoke Screen",
+        "description": "Vanish into a cloud of smoke, increasing your chance to dodge by 30% for 8 sec."
+      },
+      "spellsteal": {
+        "name": "Spellsteal",
+        "description": "Steals a beneficial magic effect from an enemy, transferring it to yourself."
+      },
+      "startle_shot": {
+        "name": "Startle Shot",
+        "description": "A wild shot that disorients the target for {duration} sec. Any damage breaks the effect."
+      },
+      "tranquility": {
+        "name": "Gladesong",
+        "description": "Channels restorative energy for 4 sec, healing allies within 30 yd for 42 to 52 each second. (Druid talent)"
+      },
+      "typhoon": {
+        "name": "Typhoon",
+        "description": "A blast of wind knocks back all enemies within 8 yd and dazes them, slowing their movement by 50% for 4 sec."
+      },
+      "voidfeast": {
+        "name": "Voidfeast",
+        "description": "Devours a magic effect (a beneficial one from an enemy, or a harmful one from an ally) and heals you for 6% of your maximum health."
       },
       "pummel": {
         "name": "Casse-mâchoire",
@@ -7740,6 +8127,18 @@ export const fr_FR: EnTranslations = {
       },
       "heroic_mark": {
         "name": "Marque héroïque"
+      },
+      "eastbrook_buckler": {
+        "name": "Eastbrook Buckler"
+      },
+      "eastbrook_greatsword": {
+        "name": "Eastbrook Greatsword"
+      },
+      "highwatch_greatsword": {
+        "name": "Highwatch Greatsword"
+      },
+      "highwatch_wallshield": {
+        "name": "Highwatch Wallshield"
       },
       "morthens_cryptforged_hauberk": {
         "name": "Haubert Cryptforged de Morthen"

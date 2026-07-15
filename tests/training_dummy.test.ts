@@ -71,6 +71,52 @@ describe('Highwatch training dummy', () => {
     expect(d.inCombat).toBe(false);
   });
 
+  it('records Goad threat without turning and eventually releases combat', () => {
+    const sim = makeWorld();
+    const d = dummyOf(sim);
+    const pid = meleePlayerAt(sim, d.pos.x + 1, d.pos.z);
+    const player = sim.entities.get(pid)!;
+    player.targetId = d.id;
+
+    sim.castAbility('taunt', pid);
+
+    expect(d.threat.get(pid)).toBeGreaterThan(0);
+    expect(d.aiState).toBe('idle');
+    expect(d.aggroTargetId).toBe(null);
+    for (let i = 0; i < 20 * 7; i++) sim.tick();
+    expect(player.inCombat).toBe(false);
+    expect(d.inCombat).toBe(false);
+    expect(d.threat.size).toBe(0);
+  });
+
+  it('keeps Defiant Bellow inert and fully repairs any hostile dummy state', () => {
+    const sim = makeWorld();
+    const d = dummyOf(sim);
+    const pid = meleePlayerAt(sim, d.pos.x + 1, d.pos.z);
+    const player = sim.entities.get(pid)!;
+    expect(sim.setSpec('prot', pid)).toBe(true);
+
+    sim.castAbility('defiant_bellow', pid);
+    expect(d.threat.get(pid)).toBeGreaterThan(0);
+    expect(d.aiState).toBe('idle');
+    expect(d.aggroTargetId).toBe(null);
+
+    d.aiState = 'attack';
+    d.aggroTargetId = pid;
+    d.forcedTargetId = pid;
+    d.forcedTargetTimer = 6;
+    d.threat.set(pid, 100);
+    d.combatTimer = 0;
+    for (let i = 0; i < 20 * 7; i++) sim.tick();
+
+    expect(d.aiState).toBe('idle');
+    expect(d.aggroTargetId).toBe(null);
+    expect(d.forcedTargetId).toBe(null);
+    expect(d.forcedTargetTimer).toBe(0);
+    expect(d.threat.size).toBe(0);
+    expect(player.inCombat).toBe(false);
+  });
+
   it('respawns on its own short timer when felled', () => {
     const sim = makeWorld();
     const d = dummyOf(sim);

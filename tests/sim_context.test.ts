@@ -110,6 +110,7 @@ const CALLBACK_KEYS = [
   'frenzyPackmates',
   'armDeathThroes',
   'refreshKnownAbilities',
+  'revalidateOffhandForSpec',
   'syncPetLevel',
   // M2 mob-locomotion surface.
   'moveToward',
@@ -397,6 +398,7 @@ function makeFakeHost() {
     frenzyPackmates: vi.fn(),
     armDeathThroes: vi.fn(),
     refreshKnownAbilities: vi.fn(),
+    revalidateOffhandForSpec: vi.fn(),
     syncPetLevel: vi.fn(),
     moveToward: vi.fn(() => false),
     mobSwing: vi.fn(),

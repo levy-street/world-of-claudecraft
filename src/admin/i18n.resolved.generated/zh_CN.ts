@@ -468,6 +468,7 @@ export const zh_CN: AdminTranslations = {
   "money.silver": "银",
   "money.copper": "铜",
   "class.warrior": "战士",
+  "class.swordmaster": "SwordMaster",
   "class.paladin": "圣骑士",
   "class.hunter": "猎人",
   "class.rogue": "潜行者",

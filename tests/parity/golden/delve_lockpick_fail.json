@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 409,
-      "state": "20380ff5",
+      "state": "ee4a773d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -70,8 +70,7 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -134,7 +133,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 420,
-      "state": "24589aab",
+      "state": "9796e3d3",
       "events": "36e6ec57",
       "rng": {
         "draws": 3,
@@ -145,7 +144,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 420,
-      "state": "d31021cb",
+      "state": "00815a73",
       "events": "e8535d0d",
       "rng": {
         "draws": 3,
@@ -156,7 +155,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 420,
-      "state": "8b39a0a1",
+      "state": "8756df69",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -167,7 +166,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 420,
-      "state": "68eb175b",
+      "state": "ecb085a3",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -178,7 +177,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 420,
-      "state": "a6ed73a5",
+      "state": "7b78f3b5",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -189,7 +188,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 420,
-      "state": "d9ca13a7",
+      "state": "553aad37",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -200,7 +199,7 @@
       "tick": 69,
       "time": 3.45,
       "nextId": 421,
-      "state": "11dc8ea1",
+      "state": "1152fd69",
       "events": "1ea15824",
       "rng": {
         "draws": 3,
@@ -281,8 +280,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 25,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {},
           "xp": 198
@@ -383,7 +381,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 421,
-      "state": "55a75491",
+      "state": "61309fb9",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -394,7 +392,7 @@
       "tick": 71,
       "time": 3.55,
       "nextId": 421,
-      "state": "95955ce5",
+      "state": "03c763f5",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -475,8 +473,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 25,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {},
           "xp": 198

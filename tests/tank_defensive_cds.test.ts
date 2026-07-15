@@ -4,7 +4,7 @@
 //   - Druid Primal Reflexes: a dodge cooldown (buff_dodge), usable while shapeshifted.
 // Also covers the druid parity buff (Dire Bruin now +20% threat / +15% armor).
 import { describe, expect, it } from 'vitest';
-import { TALENTS } from '../src/sim/content/talents';
+import { rowTreeFor } from '../src/sim/content/talents';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { type ArenaMatch, Sim } from '../src/sim/sim';
@@ -380,12 +380,11 @@ describe('Primal Reflexes (druid): dodge cooldown', () => {
   });
 });
 
-describe('Druid parity: Dire Bruin threat/armor buff', () => {
+describe('Druid parity: Ironhide Reflex threat/armor buff', () => {
   it('grants +20% threat and +15% armor', () => {
-    const druid = TALENTS.druid!;
-    const choice = druid.nodes.find((n: any) => n.id === 'feral_choice');
-    const bruin = choice?.choices?.find((c: any) => c.id === 'feral_choice_bear');
-    expect(bruin?.effect.global?.threatPct).toBe(0.2);
-    expect(bruin?.effect.stats?.armorPct).toBe(0.15);
+    const row = rowTreeFor('druid')!.find((candidate) => candidate.level === 17)!;
+    const ironhide = row.options.find((option) => option.id === 'dru_r17_survival_of_the_fittest');
+    expect(ironhide?.effect.global?.threatPct).toBe(0.2);
+    expect(ironhide?.effect.stats?.armorPct).toBe(0.15);
   });
 });

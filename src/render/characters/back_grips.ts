@@ -82,11 +82,11 @@ const BACK_GRIPS: Record<string, BackGripSpec> = {
   VAR_BOOK: { position: [0.5, -0.38, -0.08], euler: [0.05, 0.15, Math.PI * 0.72] },
   VAR_CROSSBOW: { position: [0.0, 0.1, -0.3], euler: [0, Math.PI / 2, Math.PI] },
   VAR_BOW: { position: [0.0, 0.1, -0.32], euler: [0, Math.PI / 2, Math.PI] },
-  // Off-hand gear from the two-slot loadout (release/v0.24.0-ptr): a left-hand
-  // prop of any family above mirrors automatically via backGripFor's side
-  // argument. Families that branch introduces (shields, held off-hands like
-  // lanterns) get their own entries here when it merges; until then an unknown
-  // family falls back to DEFAULT_BACK instead of vanishing.
+  // Shields lie flat and centered across the shoulder blades. They are keyed by
+  // the KayKit accessory family, not by the source GLB basename.
+  Round_Shield: { position: [0, 0.08, -0.31], euler: [0, 0, 0] },
+  Rectangle_Shield: { position: [0, 0.08, -0.31], euler: [0, 0, 0] },
+  Badge_Shield: { position: [0, 0.08, -0.31], euler: [0, 0, 0] },
 };
 
 /** The grip families that have a tuned on-back carry. Every family the character

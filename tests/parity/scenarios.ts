@@ -2,7 +2,7 @@
 // behavior so that any future extraction is checked against a committed golden.
 //
 // Coverage matrix (every item is mandatory per the S0a brief):
-//  - multiple classes:        warrior / mage / rogue / hunter / warlock / paladin
+//  - multiple classes:        warrior / swordmaster / mage / rogue / hunter / warlock / paladin
 //  - meleeSwing weaponStrike:  heroic_strike (warrior), sinister_strike (rogue)
 //  - auto-attack + mobSwing:   solo_warrior (mob swings back)
 //  - frenzy + on-hit affix:    affix_mob (old_greyjaw frenzyOnHit + ridge_stalker bleed)
@@ -207,6 +207,64 @@ function soloRogue(): Scenario {
         rec.tick(12);
         face(p, mob);
       }
+    },
+  };
+}
+
+// SwordMaster: a real 2 sec Sword Aura cast, paired main-hand then off-hand
+// strikes, and two capped area attacks against a stable target set.
+function soloSwordmaster(): Scenario {
+  return {
+    name: 'solo_swordmaster',
+    coverage: [
+      'class:swordmaster',
+      'Sword Aura casting lifecycle + buff_str_agi',
+      'dualWeaponStrike main-hand then off-hand resolution',
+      'dualWeaponAoe stable capped target selection',
+      'Tempest signature: blade_cyclone',
+    ],
+    build: () => new Sim({ seed: 1032, playerClass: 'swordmaster', autoEquip: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      sim.setPlayerLevel(20);
+      sim.setSpec('tempest');
+      const p = sim.player as AnyEntity;
+      beef(p);
+      const beforeAura = { str: p.stats.str, agi: p.stats.agi };
+
+      p.resource = p.maxResource;
+      sim.castAbility('sword_aura');
+      rec.snapshot('aura-cast-start');
+      rec.tick(41);
+      rec.notes.beforeAura = beforeAura;
+      rec.notes.afterAura = { str: p.stats.str, agi: p.stats.agi };
+      rec.snapshot('aura-active');
+
+      const mobs = [
+        spawnMob(sim, 'forest_wolf', 20, p.pos.x - 1.5, p.pos.y, p.pos.z + 2.5),
+        spawnMob(sim, 'forest_wolf', 20, p.pos.x + 1.5, p.pos.y, p.pos.z + 2.5),
+        spawnMob(sim, 'forest_wolf', 20, p.pos.x - 2.5, p.pos.y, p.pos.z + 4),
+        spawnMob(sim, 'forest_wolf', 20, p.pos.x + 2.5, p.pos.y, p.pos.z + 4),
+      ];
+      for (const mob of mobs) beef(mob, 50000);
+      rec.track(...mobs.map((mob) => mob.id));
+      p.facing = 0;
+      sim.targetEntity(mobs[0].id);
+
+      p.resource = p.maxResource;
+      sim.castAbility('twin_slash');
+      rec.snapshot('twin-slash');
+      rec.tick(21);
+
+      p.resource = p.maxResource;
+      sim.castAbility('crescent_sweep');
+      rec.snapshot('crescent-sweep');
+      rec.tick(81);
+
+      p.resource = p.maxResource;
+      sim.castAbility('blade_cyclone');
+      rec.snapshot('blade-cyclone');
+      rec.tick(8);
     },
   };
 }
@@ -1243,6 +1301,16 @@ function drownedLitany(): Scenario {
         addThreat(boss, p.id, 5000);
         aggroOnto(boss, p);
         sim.startAutoAttack();
+        // `beef` is a synthetic parity-only health override. Live stat-aura
+        // recalculation can legitimately restore the authored max HP during the
+        // pull, so refresh the override one tick at a time; otherwise a single
+        // Tolling Bell can kill the driver before Blackwater Mark is exercised.
+        const bossTicks = (ticks: number) => {
+          for (let i = 0; i < ticks; i++) {
+            rec.tick(1);
+            beef(p);
+          }
+        };
         // Past the 70% gate -> cantor phase 1 (shield adds), then ride out the
         // 14s mark timer + ~12s first volley window on the driver's rng draws.
         sim.dealDamage(
@@ -1256,7 +1324,7 @@ function drownedLitany(): Scenario {
           true,
         );
         for (let round = 0; round < 15; round++) {
-          rec.tick(20);
+          bossTicks(20);
           if (!boss.dead) face(p, boss);
         }
         rec.notes.marksSeen = (run.nhaliaBoss?.marks?.length ?? 0) as number;
@@ -1270,7 +1338,7 @@ function drownedLitany(): Scenario {
           const m = sim.entities.get(id) as AnyEntity | undefined;
           if (m && !m.dead && m.templateId === 'drowned_cantor') lethal(sim, p, m);
         }
-        rec.tick(20);
+        bossTicks(20);
         sim.dealDamage(
           p,
           boss,
@@ -1281,7 +1349,7 @@ function drownedLitany(): Scenario {
           'hit',
           true,
         );
-        rec.tick(40);
+        bossTicks(40);
         sim.dealDamage(
           p,
           boss,
@@ -1292,7 +1360,7 @@ function drownedLitany(): Scenario {
           'hit',
           true,
         );
-        rec.tick(40);
+        bossTicks(40);
         lethal(sim, p, boss);
       }
       rec.tick(6); // reliquary + shrines rise, rite awaits the intensity choice
@@ -2002,7 +2070,7 @@ function partyRaid(): Scenario {
 
 // Talent application (G1a): exercise every sim-side talent method (applyTalents /
 // respec / saveLoadout + switchLoadout / setSpec) on a max-level warrior so the flat
-// `talentMods` struct re-bakes and the known-ability list flips on each change. Drives
+// canonical row modifiers re-bake and the known-ability list flips on each change. Drives
 // NO rng (talent application is deterministic validation + struct baking), so the draw
 // digest stays empty/byte-identical across the extraction. Pure snapshots, no ticks, so
 // the player never enters combat and the talent-lock guard never trips.
@@ -2010,10 +2078,10 @@ function talentsProgression(): Scenario {
   return {
     name: 'talents_progression',
     coverage: [
-      'applyTalents valid spec build (G1a) + recomputeTalents flat-struct bake',
-      'respec wipes ranks, keeps spec',
+      'applyTalents valid spec+rows build (G1a) + recomputeTalents flat-struct bake',
+      'respec wipes row choices, keeps spec',
       'saveLoadout (object-alloc overload) + switchLoadout (2 of 4 slots)',
-      'setSpec drops the prior spec tree points',
+      'setSpec preserves class-wide row choices',
       'refreshKnownAbilities(announce=false): known-ability list flips per change',
     ],
     sampleEvery: 2,
@@ -2024,25 +2092,26 @@ function talentsProgression(): Scenario {
       // (1) Apply a valid Arms build: the flat talentMods bakes + known list changes.
       sim.applyTalents({
         spec: 'arms',
-        ranks: { war_cruelty: 2, arms_imp_overpower: 2 },
-        choices: {},
+        rows: {
+          5: 'war_row_double_charge',
+          8: 'war_row_die_by_the_sword',
+        },
       });
       rec.snapshot('apply-arms');
-      // (2) Respec: ranks wiped, spec retained, stats revert.
+      // (2) Respec: row choices wiped, spec retained.
       sim.respec();
       rec.snapshot('respec');
       // (3) Save the respec'd build as a loadout (the HUD positional-alloc overload),
       // apply a different build, then switch back to slot 0.
       sim.saveLoadout('Arms', ['mortal_strike', 'overpower', null], {
         spec: 'arms',
-        ranks: { arms_imp_overpower: 2 },
-        choices: {},
+        rows: { 8: 'war_row_die_by_the_sword' },
       });
-      sim.applyTalents({ spec: 'arms', ranks: { war_cruelty: 3 }, choices: {} });
+      sim.applyTalents({ spec: 'arms', rows: { 8: 'war_row_victory_rush' } });
       rec.snapshot('second-build');
       sim.switchLoadout(0);
       rec.snapshot('switch-loadout');
-      // (4) Set spec to Fury: the prior (Arms) spec tree's points drop; class points stay.
+      // (4) Set spec to Fury: the class-wide level-8 choice stays selected.
       sim.setSpec('fury');
       rec.snapshot('set-spec');
     },
@@ -2719,6 +2788,10 @@ function nythraxisFullPull(): Scenario {
       const sim = rec.sim as AnySim;
       const tankPid = sim.addPlayer('warrior', 'NyxTank') as number;
       sim.setPlayerLevel(MAX_LEVEL, tankPid);
+      // Exercise the winning tank identity explicitly. A level-cap raid tank
+      // with no committed specialization is not a representative v0.26 player
+      // state and bypasses Protection's equipment/mastery revalidation.
+      sim.setSpec('prot', tankPid);
       (sim.players.get(tankPid) as any).questsDone.add('q_nythraxis_bound_guardian'); // attune
       const dpsPids: number[] = [];
       for (let i = 0; i < 4; i++) {
@@ -3379,6 +3452,9 @@ function c4bEffectDispatch(): Scenario {
       ];
       for (const pid of [warrior, mage, rogue, paladin, druid, warlock])
         sim.setPlayerLevel(20, pid);
+      // Armor Shear is an authored Protection ability in the winning Warrior
+      // kit; make the scenario's intended dispatch arm reachable explicitly.
+      sim.setSpec('prot', warrior);
       for (const [x, e] of cells) {
         teleport(sim, e, x, -45);
         beef(e, 50000);
@@ -4053,6 +4129,7 @@ function chatSocial(): Scenario {
 
 export const SCENARIOS: Scenario[] = [
   soloWarrior(),
+  soloSwordmaster(),
   soloMage(),
   soloRogue(),
   affixMob(),

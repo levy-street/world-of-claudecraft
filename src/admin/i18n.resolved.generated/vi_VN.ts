@@ -468,6 +468,7 @@ export const vi_VN: AdminTranslations = {
   "money.silver": "b",
   "money.copper": "đ",
   "class.warrior": "Chiến Binh",
+  "class.swordmaster": "SwordMaster",
   "class.paladin": "Thánh Kỵ Sĩ",
   "class.hunter": "Thợ Săn",
   "class.rogue": "Đạo Tặc",

@@ -50,11 +50,20 @@ function cloneCcDr(
   return out;
 }
 
+function cloneAbilityCharges(
+  src: ReadonlyMap<string, { spent: number; cdMax: number }> | undefined,
+): Map<string, { spent: number; cdMax: number }> {
+  const out = new Map<string, { spent: number; cdMax: number }>();
+  if (src) for (const [id, state] of src) out.set(id, { ...state });
+  return out;
+}
+
 export function snapshotArenaReturnPools(e: Entity): ArenaReturnPools {
   return {
     hp: e.hp,
     resource: e.resource,
     cooldowns: new Map(e.cooldowns),
+    charges: cloneAbilityCharges(e.charges),
     ccDr: cloneCcDr(e.ccDr),
   };
 }
@@ -883,6 +892,7 @@ export function readyArenaFighter(ctx: SimContext, e: Entity, opts: { clearPrep:
     // never carries into a normalized match.
     e.auras = [];
     e.cooldowns.clear();
+    e.charges = undefined;
     e.ccDr.clear();
   }
   const meta = ctx.players.get(e.id);
@@ -898,6 +908,7 @@ export function readyArenaFighter(ctx: SimContext, e: Entity, opts: { clearPrep:
   if (meta) Object.assign(meta.moveInput, emptyMoveInput());
   e.queuedOnSwing = null;
   delete e.queuedOnSwingFree;
+  delete e.queuedOnSwingCostMultiplier;
   e.queuedCastAbility = null;
   e.queuedCastAim = null;
   e.castingAbility = null;
@@ -910,6 +921,7 @@ export function readyArenaFighter(ctx: SimContext, e: Entity, opts: { clearPrep:
   e.swingTimer = 0;
   e.chargeTargetId = null;
   e.chargePath = [];
+  if (e.leap !== undefined) e.leap = null;
   e.followTargetId = null;
   e.combatTimer = 99;
   e.inCombat = false;
@@ -1072,6 +1084,7 @@ export function returnFromArena(ctx: SimContext, match: ArenaMatch): void {
     const pools = match.preMatchPools?.get(pid);
     if (pools) {
       e.cooldowns = new Map(pools.cooldowns);
+      e.charges = pools.charges.size > 0 ? cloneAbilityCharges(pools.charges) : undefined;
       e.ccDr = cloneCcDr(pools.ccDr);
       e.hp = Math.max(0, Math.min(pools.hp, e.maxHp));
       e.resource = Math.max(0, Math.min(pools.resource, e.maxResource));

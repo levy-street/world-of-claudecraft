@@ -67,6 +67,13 @@ const PALETTES = {
     accent: '#0d2e0a',
   },
   sky: { base: '#6fb6ff', light: '#d4ecff', dark: '#1f5a9e', glow: '#a0d4ff', accent: '#0c2c50' },
+  azure: {
+    base: '#22d3ee',
+    light: '#cffafe',
+    dark: '#0e7490',
+    glow: '#67e8f9',
+    accent: '#083344',
+  },
   earthBrown: {
     base: '#a8703c',
     light: '#e0b070',
@@ -2276,12 +2283,10 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   counter_shot: r('nature', 'gold', ['sword', { p: 'sunburst', ...TR }]),
   rebuke: r('holy', 'gold', ['fist'], ['glow']),
   skull_bash: r('earth', 'earthBrown', ['paw'], ['motion']),
-  spell_lock: r('shadow', 'steel', ['fist'], ['glow']),
+  spell_lock: r('shadow', 'venom', ['sigil_rune', { p: 'fang', ...BR }], ['arcs']),
   battle_shout: r('fury', 'gold', ['fist'], ['arcs']),
-  commanding_shout: r('fury', 'earthBrown', ['shield'], ['arcs']),
   demoralizing_shout: r('shadow', 'steel', ['fist'], ['arcs']),
   charge: r('fury', 'steel', ['boot', { p: 'sword', ...BR }], ['motion']),
-  rend: r('blood', 'blood', ['sword'], ['drips']),
   thunder_clap: r('storm', 'sky', ['lightning'], ['arcs']),
   hamstring: r('blood', 'blood', ['boot', { p: 'claw_slash', ...TR }]),
   bloodrage: r('blood', 'blood', ['heart'], ['drips', 'glow']),
@@ -2512,6 +2517,106 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   moonkin_form: r('nature', 'sky', ['moon'], ['sparkle']),
   feral_charge: r('nature', 'earthBrown', ['paw'], ['motion']),
   swiftmend: r('nature', 'leafGreen', ['droplet'], ['glow']),
+  // Talents V2 and the winning Warrior overlay. These explicit recipes remain
+  // the deterministic fallback contract even when authored painted art wins at
+  // render time, and every recipe is deliberately distinct.
+  // warrior
+  battle_stance: r('fury', 'gold', ['sword'], ['arcs']),
+  berserker_stance: r('blood', 'blood', ['skull'], ['glow']),
+  enrage_passive: r('fury', 'blood', ['flame', { p: 'fist', ...BIG }], ['glow', 'motion']),
+  raging_gale: r('fury', 'steel', ['sword', { p: 'sword', rot: Math.PI / 2 }], ['motion']),
+  red_harvest: r('blood', 'blood', ['axe', { p: 'droplet', ...BR }], ['drips']),
+  emboldening_roar: r('fury', 'gold', ['roar', { p: 'sunburst', ...TR }], ['glow']),
+  furious_mending: r('blood', 'gold', ['heart', { p: 'droplet', ...BR }], ['glow']),
+  raised_guard: r('steel', 'steel', ['shield', { p: 'shield', ...TR }], ['glow']),
+  iron_resolve: r('steel', 'gold', ['shield', { p: 'heart', ...TR }], ['glow']),
+  faultline: r('earth', 'earthBrown', [{ p: 'sunburst', ...BIG }, 'fist'], ['crack']),
+  defiant_bellow: r('steel', 'steel', ['roar', { p: 'shield', ...TR }], ['arcs']),
+  breachmaker: r('fury', 'gold', ['sword', { p: 'sunburst', ...BIG }], ['crack', 'glow']),
+  measured_fury: r('steel', 'steel', ['helm', { p: 'heart', ...BR }], ['glow']),
+  sweeping_strikes: r('fury', 'steel', ['claw_slash', { p: 'sword', ...BR }], ['arcs', 'motion']),
+  deep_wounds: r('blood', 'blood', ['claw_slash', { p: 'droplet', ...BR }], ['drips']),
+  seasoned_soldier: r('steel', 'gold', ['helm', { p: 'fist', ...BR }], ['glow']),
+  sudden_death: r('shadow', 'bone', ['skull', { p: 'sword', ...BR }], ['glow']),
+  diabolical_twinstrike: r('shadow', 'blood', ['dagger', { p: 'dagger', ...TR }], ['glow']),
+  cleaving_blows: r('blood', 'steel', ['axe', { p: 'axe', ...BR }], ['arcs', 'motion']),
+  revenge: r('steel', 'steel', ['sword', { p: 'claw_slash', ...BIG }], ['arcs']),
+  heroic_leap: r('earth', 'steel', [{ p: 'sunburst', ...BIG }, 'boot'], ['crack']),
+  rallying_cry: r('fury', 'gold', ['roar', { p: 'heart', ...BR }], ['arcs']),
+  storm_bolt: r('storm', 'steel', ['mace', { p: 'lightning', ...TR }], ['motion']),
+  intimidating_shout: r('shadow', 'blood', ['roar', { p: 'skull', ...TR }], ['arcs']),
+  bladestorm: r(
+    'storm',
+    'steel',
+    ['sword', { p: 'sword', rot: Math.PI * 0.5 }],
+    ['arcs', 'motion'],
+  ),
+  victory_rush: r('fury', 'gold', ['sword', { p: 'heart', ...BR }], ['glow']),
+  piercing_howl: r('storm', 'steel', ['roar', { p: 'boot', ...BR }], ['arcs']),
+  die_by_sword: r('steel', 'gold', ['shield', { p: 'sword', ...TR }], ['glow', 'arcs']),
+  recklessness: r('fury', 'blood', ['axe', { p: 'sunburst', ...TL }], ['glow']),
+  avatar: r('earth', 'earthBrown', ['helm', { p: 'fist', ...BR }], ['crack', 'glow']),
+  sanguine_aura: r('blood', 'blood', ['droplet', { p: 'heart', ...TL }], ['arcs', 'glow']),
+  // paladin
+  cleansing_verdict: r('holy', 'gold', ['sunburst'], ['glow']),
+  holy_wrath: r('holy', 'holyGold', ['sunburst', { p: 'cross', ...BR }], ['arcs']),
+  divine_shield: r('holy', 'gold', ['shield', { p: 'cross', ...BR }], ['glow']),
+  avenging_wrath: r('holy', 'gold', ['wing', { p: 'sunburst', ...BR }], ['glow']),
+  hammer_of_wrath: r('holy', 'holyGold', ['mace', { p: 'lightning', ...BR }], ['glow']),
+  aura_surge: r('holy', 'holyGold', ['shield', { p: 'sunburst', ...BR }], ['motion', 'glow']),
+  // hunter
+  startle_shot: r('nature', 'venom', ['sunburst'], ['glow']),
+  frost_trap: r('frost', 'ice', ['snowflake', { p: 'tendrils', ...BR }], ['glow']),
+  multi_shot: r('steel', 'gold', ['bow', { p: 'arrow', ...BR }], ['motion']),
+  deterrence: r('steel', 'leafGreen', ['shield', { p: 'paw', ...BR }], ['arcs']),
+  aspect_of_the_wild: r('nature', 'leafGreen', ['paw', { p: 'sunburst', ...BR }], ['glow']),
+  // rogue
+  smoke_screen: r('shadow', 'steel', ['fist'], ['glow']),
+  preparation: r('shadow', 'steel', ['scroll', { p: 'dagger', ...BR }], ['sparkle']),
+  ghostly_strike: r('shadow', 'silverWhite', ['dagger', { p: 'eye', ...TR }], ['glow']),
+  cloak_of_shadows: r('shadow', 'shadowPurple', ['shield', { p: 'eye', ...BR }], ['glow']),
+  shadowstep: r('shadow', 'shadowPurple', ['boot', { p: 'dagger', ...BR }], ['motion']),
+  // priest
+  silence: r('shadow', 'shadowPurple', ['sigil_rune', { p: 'eye', ...BR }], ['arcs']),
+  psychic_scream: r('shadow', 'shadowPurple', ['roar', { p: 'eye', ...BR }], ['glow']),
+  inner_focus: r('holy', 'arcanePink', ['eye', { p: 'cross', ...BR }], ['sparkle']),
+  desperate_prayer: r('holy', 'holyGold', ['hand', { p: 'heart', ...BR }], ['sparkle']),
+  prayer_of_healing: r('holy', 'holyGold', ['cross', { p: 'sunburst', ...BR }], ['sparkle']),
+  mind_sear: r('shadow', 'shadowPurple', ['eye', { p: 'flame', ...BR }], ['motion']),
+  // shaman
+  healing_stream: r('nature', 'sky', ['droplet', { p: 'heart', ...BR }], ['sparkle']),
+  chain_lightning: r(
+    'storm',
+    'sky',
+    [
+      { p: 'lightning', x: -9, s: 0.72 },
+      { p: 'lightning', x: 9, y: 6, s: 0.72, rot: 0.4 },
+    ],
+    ['arcs'],
+  ),
+  earthbind: r('earth', 'earthBrown', ['tendrils', { p: 'mace', ...BR }], ['crack']),
+  bloodlust: r('fury', 'blood', ['fist', { p: 'lightning', ...BR }], ['glow']),
+  // mage
+  spellsteal: r('arcane', 'arcanePink', ['sunburst'], ['glow']),
+  cone_of_cold: r('frost', 'ice', ['snowflake'], ['arcs']),
+  presence_of_mind: r('arcane', 'silverWhite', ['eye', { p: 'sunburst', ...BR }], ['sparkle']),
+  blink: r('arcane', 'arcanePink', ['boot', { p: 'lightning', ...TR }], ['motion']),
+  ice_block: r('frost', 'ice', ['gem', { p: 'shield', ...BR }], ['glow']),
+  deep_freeze: r('frost', 'ice', ['snowflake', { p: 'fist', ...BR }], ['glow']),
+  meteor: r('fire', 'ember', ['meteor', { p: 'flame', ...BR }], ['drips']),
+  evocation: r('arcane', 'arcanePink', ['hand', { p: 'gem', ...BR }], ['sparkle']),
+  // warlock
+  voidfeast: r('shadow', 'venom', ['flame'], ['glow']),
+  howl_of_terror: r('shadow', 'blood', ['roar', { p: 'skull', ...BR }], ['glow']),
+  curse_of_exhaustion: r('shadow', 'shadowPurple', ['boot', { p: 'skull', ...TR }], ['motion']),
+  death_coil: r('shadow', 'blood', ['skull', { p: 'heart', ...BR }], ['drips']),
+  chaos_bolt: r('fire', 'shadowPurple', ['bolt', { p: 'flame', ...BR }], ['crack']),
+  // druid
+  typhoon: r('nature', 'sky', ['sunburst'], ['glow']),
+  innervate: r('nature', 'leafGreen', ['leaf', { p: 'gem', ...BR }], ['sparkle']),
+  frenzied_regeneration: r('nature', 'blood', ['heart', { p: 'paw', ...BR }], ['glow']),
+  berserk: r('fury', 'blood', ['paw', { p: 'fist', ...BR }], ['glow']),
+  tranquility: r('nature', 'silverWhite', ['heart', { p: 'leaf', ...BR }], ['sparkle']),
 };
 
 const ITEM_RECIPES: Record<string, IconRecipe> = {
@@ -2768,6 +2873,15 @@ const CREST_RECIPES: Record<string, IconRecipe> = {
       { p: 'dagger', x: 6, rot: 0.42 },
     ],
     ['motion'],
+  ),
+  class_swordmaster: r(
+    'storm',
+    'azure',
+    [
+      { p: 'sword', x: -6, rot: -0.42 },
+      { p: 'sword', x: 6, rot: 0.42 },
+    ],
+    ['motion', 'glow'],
   ),
   class_priest: r('holy', 'silverWhite', ['cross'], ['glow', 'sparkle']),
   class_shaman: r('storm', 'sky', ['lightning'], ['glow']),
@@ -3277,24 +3391,72 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   // drew from berserker). taunt has no provoke art and stays procedural.
   'heroic_strike',
   'battle_shout',
-  'commanding_shout',
   'charge',
-  'rend',
   'thunder_clap',
   'hamstring',
   'bloodrage',
   'overpower',
+  'raging_gale',
   'execute',
   'slam',
+  'red_harvest',
   'cleave',
+  'battle_stance',
   'defensive_stance',
   'demoralizing_shout',
+  'intimidating_shout',
   'sunder_armor',
   'mortal_strike',
   'bloodthirst',
   'shield_slam',
+  'furious_mending',
+  'emboldening_roar',
+  'raised_guard',
+  'iron_resolve',
+  'faultline',
+  'defiant_bellow',
+  'revenge',
+  'rallying_cry',
+  'berserker_stance',
+  'die_by_sword',
+  'storm_bolt',
+  'victory_rush',
+  'piercing_howl',
+  'bladestorm',
+  'colossal_might',
+  'second_wind',
+  'pursuit',
+  'lingering_dread',
+  'anger_management',
+  'battle_rhythm',
+  'recklessness',
+  'avatar',
+  'bloodbath',
+  'sanguine_aura',
+  'pummel',
+  'sweeping_strikes',
+  'breachmaker',
+  'heroic_leap',
+  'attack',
   'whirlwind',
   'berserker_rage',
+  'double_charge',
+  'crushing_charge',
+  'combat_mastery',
+  // swordmaster (project-owned atlas generated for this class). The base kit and all
+  // three specialization signatures share one deliberate azure dual-blade family.
+  'twin_slash',
+  'crescent_sweep',
+  'fleet_step',
+  'sword_aura',
+  'wind_lunge',
+  'parrying_flow',
+  'quickening',
+  'blade_dance',
+  'twin_finisher',
+  'blade_cyclone',
+  'duelist_flurry',
+  'azure_rush',
   // mage (CraftPix premium pyromancer/cryomancer/lightning-mage packs — fire/frost/arcane;
   // aeromancer unused, mage has no wind). conjure_food and polymorph have no fit (no
   // bread/food or sheep art) and stay procedural.
@@ -3378,7 +3540,21 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
 /** Static URL of an ability's image icon, or null if it uses a recipe. */
 export function abilityImageUrl(id: string): string | null {
   if (!ABILITY_IMAGE_IDS.has(id)) return null;
-  const cls = ABILITIES[id]?.class;
+  const cls =
+    ABILITIES[id]?.class ??
+    (id === 'colossal_might' ||
+    id === 'second_wind' ||
+    id === 'pursuit' ||
+    id === 'lingering_dread' ||
+    id === 'anger_management' ||
+    id === 'battle_rhythm' ||
+    id === 'bloodbath' ||
+    id === 'attack' ||
+    id === 'double_charge' ||
+    id === 'crushing_charge' ||
+    id === 'combat_mastery'
+      ? 'warrior'
+      : null);
   return cls ? `${SKILL_ICON_DIR}/${cls}/${id}.webp` : null;
 }
 
@@ -3735,12 +3911,14 @@ function resolveRecipe(kind: IconKind, id: string): IconRecipe {
 }
 
 // Introspection helpers (no canvas needed), used by tests/ability_icons.test.ts
-// to assert every ability has a deliberate, distinct icon recipe.
-export function abilityIconRecipe(id: string): IconRecipe {
-  return resolveRecipe('ability', id);
+// to assert every ability has a deliberate, distinct authored source. Painted
+// images identify themselves by path; procedural icons expose their recipe.
+export function abilityIconRecipe(id: string): IconRecipe | { image: string } {
+  const image = abilityImageUrl(id);
+  return image ? { image } : resolveRecipe('ability', id);
 }
 export function hasExplicitAbilityIcon(id: string): boolean {
-  return id in ABILITY_RECIPES;
+  return ABILITY_IMAGE_IDS.has(id) || id in ABILITY_RECIPES;
 }
 
 const DEFAULT_ICON_SIZE = 96; // crisp at 46px buttons on 2x displays

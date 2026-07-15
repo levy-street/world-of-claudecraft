@@ -19,9 +19,9 @@ export function createCharacterVisual(
   // forms (sheep/bear/cat/travel) are their own models — skins and held weapons
   // only apply to the base body
   const key = formKey ?? visualKeyFor(e);
-  // The class-agnostic Combat Mech adopts the wearer class's hand layout, so a
-  // rogue-skinned mech dual-wields the equipped weapon in both hands. e.templateId
-  // is the player's class on every host, so this matches offline and online.
+  // The class-agnostic Combat Mech adopts the wearer's independent mainhand and
+  // offhand layout. e.templateId is the player's class on every host, so this
+  // matches offline and online.
   const weaponOverride =
     !formKey && key === 'player_mech' && e.kind === 'player'
       ? mechHeldWeaponOverride(e.templateId as PlayerClass)
@@ -32,5 +32,6 @@ export function createCharacterVisual(
     formKey ? 0 : (e.skin ?? 0),
     formKey ? null : e.mainhandItemId,
     weaponOverride,
+    formKey ? null : e.offhandItemId,
   );
 }

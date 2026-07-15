@@ -1,0 +1,103 @@
+{
+  "class": "swordmaster",
+  "license": "Project asset",
+  "iconSize": 128,
+  "sourcePacks": [
+    "Original SwordMaster atlas generated for World of ClaudeCraft with OpenAI image generation on 2026-07-15"
+  ],
+  "runtimeDir": "public/ui/skills/swordmaster",
+  "abilities": [
+    {
+      "abilityId": "twin_slash",
+      "sourcePack": "project-openai-imagegen",
+      "sourceFile": "SwordMaster icon atlas row 1 column 1",
+      "output": "twin_slash.webp"
+    },
+    {
+      "abilityId": "crescent_sweep",
+      "sourcePack": "project-openai-imagegen",
+      "sourceFile": "SwordMaster icon atlas row 1 column 2",
+      "output": "crescent_sweep.webp"
+    },
+    {
+      "abilityId": "fleet_step",
+      "sourcePack": "project-openai-imagegen",
+      "sourceFile": "SwordMaster icon atlas row 1 column 3",
+      "output": "fleet_step.webp"
+    },
+    {
+      "abilityId": "sword_aura",
+      "sourcePack": "project-openai-imagegen",
+      "sourceFile": "SwordMaster icon atlas row 1 column 4",
+      "output": "sword_aura.webp"
+    },
+    {
+      "abilityId": "wind_lunge",
+      "sourcePack": "project-openai-imagegen",
+      "sourceFile": "SwordMaster icon atlas row 2 column 1",
+      "output": "wind_lunge.webp"
+    },
+    {
+      "abilityId": "parrying_flow",
+      "sourcePack": "project-openai-imagegen",
+      "sourceFile": "SwordMaster icon atlas row 2 column 2",
+      "output": "parrying_flow.webp"
+    },
+    {
+      "abilityId": "quickening",
+      "sourcePack": "project-openai-imagegen",
+      "sourceFile": "SwordMaster icon atlas row 2 column 3",
+      "output": "quickening.webp"
+    },
+    {
+      "abilityId": "blade_dance",
+      "sourcePack": "project-openai-imagegen",
+      "sourceFile": "SwordMaster icon atlas row 2 column 4",
+      "output": "blade_dance.webp"
+    },
+    {
+      "abilityId": "twin_finisher",
+      "sourcePack": "project-openai-imagegen",
+      "sourceFile": "SwordMaster icon atlas row 3 column 1",
+      "output": "twin_finisher.webp"
+    },
+    {
+      "abilityId": "blade_cyclone",
+      "sourcePack": "project-openai-imagegen",
+      "sourceFile": "SwordMaster icon atlas row 3 column 2",
+      "output": "blade_cyclone.webp"
+    },
+    {
+      "abilityId": "duelist_flurry",
+      "sourcePack": "project-openai-imagegen",
+      "sourceFile": "SwordMaster icon atlas row 3 column 3",
+      "output": "duelist_flurry.webp"
+    },
+    {
+      "abilityId": "azure_rush",
+      "sourcePack": "project-openai-imagegen",
+      "sourceFile": "SwordMaster icon atlas row 3 column 4",
+      "output": "azure_rush.webp"
+    }
+  ],
+  "specializations": [
+    {
+      "specId": "tempest",
+      "sourcePack": "project-openai-imagegen",
+      "sourceFile": "SwordMaster icon atlas row 4 column 1",
+      "output": "public/ui/specs/swordmaster/tempest.webp"
+    },
+    {
+      "specId": "duelist",
+      "sourcePack": "project-openai-imagegen",
+      "sourceFile": "SwordMaster icon atlas row 4 column 2",
+      "output": "public/ui/specs/swordmaster/duelist.webp"
+    },
+    {
+      "specId": "azure_blade",
+      "sourcePack": "project-openai-imagegen",
+      "sourceFile": "SwordMaster icon atlas row 4 column 3",
+      "output": "public/ui/specs/swordmaster/azure_blade.webp"
+    }
+  ]
+}

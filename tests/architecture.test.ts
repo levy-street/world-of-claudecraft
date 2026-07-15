@@ -219,6 +219,10 @@ const RENDER_PURE_CORES = [
   'src/render/net_interp_core.ts',
   'src/render/terrain_region_core.ts',
   'src/render/water_core.ts',
+  'src/render/warrior_cast_fx_core.ts',
+  'src/render/swordmaster_fx_core.ts',
+  'src/render/characters/weapon_aura_core.ts',
+  'src/render/characters/weapon_attack_style_core.ts',
 ].map((rel) => join(repoRoot, rel));
 
 // Bare-named pure cores: registered cores (from UI_PURE_CORES + RENDER_PURE_CORES)

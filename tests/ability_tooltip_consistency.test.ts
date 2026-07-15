@@ -38,6 +38,11 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   // Bear form's "armor +90%" is the recalcPlayerStats multiplier (1.9) in
   // entity.ts, not the form effect's value.
   defensive_stance: [30],
+  // Battle Stance's rage multiplier is applied by resourceGainMultiplier.
+  battle_stance: [10],
+  // Valor Roar's Protection-only damage reduction is applied when the party
+  // maximum-health aura is created, rather than stored on its shared effect.
+  rallying_cry: [5],
   bear_form: [30, 90],
   // "compelled to attack you for 3 sec": the taunt compel window in threat.ts.
   taunt: [3],
@@ -53,6 +58,9 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   // "Conjures 2 ...": the stack size hardcoded in casting_lifecycle.ts.
   conjure_water: [2],
   conjure_food: [2],
+  // Patch Up's dead-pet revive fraction is owned by the pet lifecycle branch;
+  // the living-pet HoT remains fully data-driven by the ability effect.
+  revive_pet: [35],
 };
 
 // Every resolved rank of every class ability (deduped by rank).

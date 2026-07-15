@@ -32,8 +32,8 @@ export const table: DeedLocaleTable = {
     desc: 'Utrať talentový bod za talent z poslední řady.',
   },
   prog_full_build: {
-    name: 'Celá jedenáctka',
-    desc: 'Utrať všech jedenáct talentových bodů v jedné sestavě.',
+    name: 'Plná šestka',
+    desc: 'Vyber jednu možnost ve všech šesti řadách talentů v jedné sestavě.',
   },
   prog_veteran: {
     name: 'Veterán',

@@ -14,6 +14,7 @@
 import { randomBytes } from 'node:crypto';
 import pg from 'pg';
 import WebSocket from 'ws';
+import { PLAYABLE_CLASSES } from './lib/playable_classes.mjs';
 
 try {
   process.loadEnvFile?.();
@@ -46,18 +47,6 @@ const RUN_ID =
   (process.env.LOAD_RUN_ID ?? randomLetters(5)).replace(/[^A-Za-z]/g, '').slice(0, 8) ||
   randomLetters(5);
 const CLEANUP = process.env.CLEANUP === '1';
-
-const CLASSES = [
-  'warrior',
-  'paladin',
-  'hunter',
-  'rogue',
-  'priest',
-  'shaman',
-  'mage',
-  'warlock',
-  'druid',
-];
 
 const SPOTS = [
   { name: 'wolves west', x: -15, z: 55, radius: 22 },
@@ -190,7 +179,9 @@ function isAliveMob(entity) {
 }
 
 function classRange(cls) {
-  return cls === 'warrior' || cls === 'paladin' || cls === 'rogue' ? 4 : 26;
+  return cls === 'warrior' || cls === 'swordmaster' || cls === 'paladin' || cls === 'rogue'
+    ? 4
+    : 26;
 }
 
 function shouldCast(bot, ability, cost, cooldownMs) {
@@ -207,6 +198,8 @@ function castForClass(bot) {
   switch (bot.cls) {
     case 'warrior':
       return shouldCast(bot, 'heroic_strike', 15, 1_000);
+    case 'swordmaster':
+      return shouldCast(bot, 'twin_slash', 30, 1_000);
     case 'paladin':
       if (!(bot.self?.auras ?? []).some((a) => a.kind === 'imbue'))
         return shouldCast(bot, 'seal_of_righteousness', 0, 2_000);
@@ -447,7 +440,7 @@ async function seedBots(pool) {
   for (let i = 0; i < BOT_COUNT; i += 1) {
     const username = `load_${RUN_ID.toLowerCase()}_${String(i).padStart(3, '0')}`;
     const name = charName(i);
-    const cls = CLASSES[i % CLASSES.length];
+    const cls = PLAYABLE_CLASSES[i % PLAYABLE_CLASSES.length];
     const token = randomBytes(32).toString('hex');
     const account = await pool.query(
       `INSERT INTO accounts (username, password_hash)

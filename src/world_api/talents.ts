@@ -1,4 +1,4 @@
-import type { Role, SavedLoadout, TalentAllocation } from '../sim/content/talents';
+import type { Role, SavedLoadout, TalentAllocation, TalentRowLevel } from '../sim/content/talents';
 
 export interface IWorldTalents {
   // Talents & Specializations. State is server-authoritative; the client stages
@@ -12,6 +12,7 @@ export interface IWorldTalents {
   applyTalents(alloc: TalentAllocation): void;
   respec(): void;
   setSpec(specId: string | null): void;
+  selectTalentRow(level: TalentRowLevel, optionId: string | null): void;
   saveLoadout(name: string, bar: (string | null)[], alloc?: TalentAllocation): void;
   switchLoadout(index: number): void;
   deleteLoadout(index: number): void;

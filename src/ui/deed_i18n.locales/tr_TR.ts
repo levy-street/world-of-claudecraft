@@ -32,8 +32,8 @@ export const table: DeedLocaleTable = {
   },
   prog_deep_roots: { name: 'Derin Kökler', desc: 'Son sıradaki bir yeteneğe yetenek puanı harca.' },
   prog_full_build: {
-    name: 'On Birin Tamamı',
-    desc: 'On bir yetenek puanının tamamını tek bir dizilişe harca.',
+    name: 'Altının Tamamı',
+    desc: 'Tek bir dizilimde altı yetenek sırasının her birinden bir seçenek seç.',
   },
   prog_veteran: {
     name: 'Kıdemli',

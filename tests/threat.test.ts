@@ -86,6 +86,7 @@ describe('threat from damage', () => {
   it('defensive stance: -10% damage dealt, x1.3 threat on what lands', () => {
     const sim = makeSim('warrior');
     sim.setPlayerLevel(10);
+    expect(sim.setSpec('arms')).toBe(true);
     sim.castAbility('defensive_stance');
     sim.tick();
     expect(sim.player.auras.some((a) => a.kind === 'defensive_stance')).toBe(true);
@@ -161,6 +162,7 @@ describe('threat from damage', () => {
     sim.setPlayerLevel(8);
     expect(sim.resolvedAbility('heroic_strike')!.threatFlat).toBe(39);
     sim.setPlayerLevel(10);
+    expect(sim.setSpec('prot')).toBe(true);
     expect(sim.resolvedAbility('sunder_armor')!.threatFlat).toBe(100);
   });
 });
@@ -468,6 +470,7 @@ describe('sunder armor', () => {
   it('stacks an armor debuff and generates stance-scaled flat threat', () => {
     const sim = makeSim('warrior');
     sim.setPlayerLevel(10);
+    expect(sim.setSpec('prot')).toBe(true);
     const wolf = nearestMob(sim, 'forest_wolf');
     teleport(sim, sim.player, wolf.pos.x + 2, wolf.pos.z);
     sim.targetEntity(wolf.id);

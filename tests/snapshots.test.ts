@@ -347,26 +347,28 @@ describe('raid lockouts over the wire', () => {
   });
 });
 
-// The held-weapon-on-the-mech fix is client render, but it depends on three wire
-// fields the server must ship for a player: class (tid), cosmetic body (cat), and
-// equipped mainhand (mh). This drives the REAL server emit (wireEntity) into the
-// REAL client mirror (applySnapshot) and checks the visual layer's inputs, so the
-// mech weapon (and rogue dual-wield) is proven to work online, not just offline.
+// The held-items-on-the-mech fix is client render, but it depends on four wire
+// fields the server must ship for a player: class (tid), cosmetic body (cat),
+// equipped mainhand (mh), and equipped offhand (oh). This drives the real server
+// emit into the real client mirror and checks the visual layer's inputs.
 describe('Combat Mech held weapon over the wire', () => {
-  it('mirrors class + mech skin + equipped weapon so a rogue mech dual-wields client-side', () => {
+  it('mirrors a Rogue mech with independent mainhand and offhand weapons', () => {
     const sim = new Sim({ seed: 7, playerClass: 'rogue', autoEquip: true });
     const pid = sim.playerId;
+    sim.setPlayerLevel(20, pid);
     sim.setPlayerSkin(pid, 0, 'mech');
     sim.addItem('keen_dirk', 1, pid);
     sim.equipItem('keen_dirk', pid);
     const e = sim.entities.get(pid)!;
-    expect(e.mainhandItemId).toBe('keen_dirk'); // recalcPlayerStats set the held-weapon id
+    expect(e.mainhandItemId).toBe('rusty_dagger');
+    expect(e.offhandItemId).toBe('keen_dirk');
 
     // server emit
     const w = wireEntity(e);
-    expect(w.tid).toBe('rogue'); // class drives visualKeyFor + the dual-wield override
+    expect(w.tid).toBe('rogue'); // class drives visualKeyFor and the hand-layout override
     expect(w.cat).toBe('mech'); // cosmetic body
-    expect(w.mh).toBe('keen_dirk'); // equipped mainhand -> held weapon model
+    expect(w.mh).toBe('rusty_dagger');
+    expect(w.oh).toBe('keen_dirk');
 
     // client mirror: a DIFFERENT local player seeing this rogue-mech in the world
     const client = bareClient(pid + 1000);
@@ -374,15 +376,17 @@ describe('Combat Mech held weapon over the wire', () => {
     const mirrored = client.entities.get(e.id)!;
     expect(mirrored.templateId).toBe('rogue');
     expect(mirrored.skinCatalog).toBe('mech');
-    expect(mirrored.mainhandItemId).toBe('keen_dirk');
+    expect(mirrored.mainhandItemId).toBe('rusty_dagger');
+    expect(mirrored.offhandItemId).toBe('keen_dirk');
 
     // what the renderer derives from the mirrored entity
     expect(visualKeyFor(mirrored)).toBe('player_mech');
     const override = mechHeldWeaponOverride(mirrored.templateId as PlayerClass);
-    expect(override?.weaponSlots).toEqual([0, 1]); // equipped weapon shows in BOTH hands
+    expect(override?.weaponSlots).toEqual([0]);
+    expect(override?.offhandSlot).toBe(1);
   });
 
-  it('keeps a non-dual class (warrior) mech to a single mainhand over the wire', () => {
+  it('mirrors a winning Warrior mech with its real shield offhand', () => {
     const sim = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true });
     const pid = sim.playerId;
     sim.setPlayerSkin(pid, 0, 'mech');
@@ -395,8 +399,12 @@ describe('Combat Mech held weapon over the wire', () => {
     const mirrored = client.entities.get(e.id)!;
     expect(mirrored.skinCatalog).toBe('mech');
     expect(mirrored.mainhandItemId).toBe('worn_sword');
+    expect(mirrored.offhandItemId).toBe('eastbrook_buckler');
     expect(visualKeyFor(mirrored)).toBe('player_mech');
-    expect(mechHeldWeaponOverride(mirrored.templateId as PlayerClass)).toBeNull();
+    expect(mechHeldWeaponOverride(mirrored.templateId as PlayerClass)).toMatchObject({
+      weaponSlots: [0],
+      offhandSlot: 1,
+    });
   });
 });
 
@@ -1537,8 +1545,8 @@ describe('client-side delta merge', () => {
     const e = sim.entities.get(sim.playerId)!;
     e.auras.push(
       {
-        id: 'rend',
-        name: 'Rend',
+        id: 'deep_wounds',
+        name: 'Gaping Wounds',
         kind: 'dot',
         remaining: 9,
         duration: 9,
@@ -1558,7 +1566,7 @@ describe('client-side delta merge', () => {
       },
     );
     const w = wireEntity(e) as { auras: { id: string; src?: number }[] };
-    expect(w.auras.find((a) => a.id === 'rend')?.src, 'server ships the caster id').toBe(42);
+    expect(w.auras.find((a) => a.id === 'deep_wounds')?.src, 'server ships the caster id').toBe(42);
     expect(
       'src' in (w.auras.find((a) => a.id === 'battle_shout') ?? {}),
       'a sourceless aura omits src to stay lean',
@@ -1567,9 +1575,10 @@ describe('client-side delta merge', () => {
     const client = bareClient(e.id + 1000);
     (client as any).applySnapshot({ t: 'snap', ents: [w] });
     const mirrored = client.entities.get(e.id)?.auras;
-    expect(mirrored?.find((a) => a.id === 'rend')?.sourceId, 'client mirrors the caster id').toBe(
-      42,
-    );
+    expect(
+      mirrored?.find((a) => a.id === 'deep_wounds')?.sourceId,
+      'client mirrors the caster id',
+    ).toBe(42);
     expect(
       mirrored?.find((a) => a.id === 'battle_shout')?.sourceId,
       'an omitted src decodes to 0',
@@ -2037,20 +2046,47 @@ describe('active title wire (Book of Deeds)', () => {
   });
 });
 
-// Equipped mainhand item id rides the identity wire (terse key `mh`) so the
-// renderer can show each player's held weapon model. Recomputed in
-// recalcPlayerStats; the renderer maps it to a GLB (ITEM_WEAPON_VARIANTS).
-describe('held weapon wire (mainhandItemId)', () => {
-  it('carries the equipped mainhand item through wireEntity', () => {
+// Equipped hand item ids ride the identity wire (terse keys `mh`/`oh`) so the
+// renderer can show each player's held weapon models. Recomputed in
+// recalcPlayerStats; the renderer maps them to GLBs (ITEM_WEAPON_VARIANTS).
+describe('held weapon wire (mainhandItemId/offhandItemId)', () => {
+  it('encodes and decodes SwordMaster identity with both starter swords', () => {
+    const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('swordmaster', 'Aozora');
+    const entity = sim.entities.get(pid);
+    if (!entity) throw new Error('SwordMaster entity missing');
+    const wire = wireEntity(entity);
+
+    expect(wire).toMatchObject({
+      tid: 'swordmaster',
+      mh: 'worn_sword',
+      oh: 'worn_sword',
+    });
+
+    const client = bareClient(99);
+    (client as unknown as { applySnapshot(snapshot: unknown): void }).applySnapshot({
+      t: 'snap',
+      ents: [wire],
+    });
+    const mirrored = client.entities.get(pid);
+    if (!mirrored) throw new Error('SwordMaster wire entity missing');
+    expect(mirrored.templateId).toBe('swordmaster');
+    expect(mirrored.mainhandItemId).toBe('worn_sword');
+    expect(mirrored.offhandItemId).toBe('worn_sword');
+  });
+
+  it('carries both equipped hand item ids through wireEntity', () => {
     const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
     const pid = sim.addPlayer('warrior', 'Thaldrin');
     const e = sim.entities.get(pid)!;
     // a fresh warrior starts holding its class startWeapon
     expect(e.mainhandItemId).toBe('worn_sword');
+    e.offhandItemId = 'eastbrook_buckler';
     expect(wireEntity(e).mh).toBe('worn_sword');
+    expect(wireEntity(e).oh).toBe('eastbrook_buckler');
   });
 
-  it('restores entity.mainhandItemId on the client from a full record', () => {
+  it('restores both held item ids on the client from a full record', () => {
     const client = bareClient(99);
     const base = {
       id: 7,
@@ -2066,12 +2102,17 @@ describe('held weapon wire (mainhandItemId)', () => {
       mhp: 100,
     };
 
-    (client as any).applySnapshot({ t: 'snap', ents: [{ ...base, mh: 'zealotsbane_blade' }] });
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [{ ...base, mh: 'zealotsbane_blade', oh: 'eastbrook_buckler' }],
+    });
     expect(client.entities.get(7)?.mainhandItemId).toBe('zealotsbane_blade');
+    expect(client.entities.get(7)?.offhandItemId).toBe('eastbrook_buckler');
 
-    // a later full record without `mh` means "no equipped weapon" → reset to null
+    // A later full record without either hand means "nothing equipped" → reset both.
     (client as any).applySnapshot({ t: 'snap', ents: [base] });
     expect(client.entities.get(7)?.mainhandItemId).toBeNull();
+    expect(client.entities.get(7)?.offhandItemId).toBeNull();
   });
 });
 
@@ -2640,7 +2681,7 @@ function dirtyEveryDeltaField(): {
   // seconds and nodeHarvestableByMe reports it not ready.
   meta.nodeHarvestReadyAt[GATHER_NODES[0].id] = sim.time + 30;
   meta.delveDaily = { date: '2099-01-01', firstClearXp: new Set(['x']), markClears: 4 };
-  meta.talents = { spec: 'arms', ranks: {}, choices: {} };
+  meta.talents = { spec: 'arms', rows: {} };
   // Book of Deeds: two earned deeds with DISTINCT utcDay stamps (an empty map
   // would be a vacuous pin), a non-zero stat block covering the counter, both
   // sets, and a clear record, a renown total, and an active title
@@ -2656,7 +2697,7 @@ function dirtyEveryDeltaField(): {
   // the Vale Cup sport kit swap ('sport' heavy key) and queue readout ('vcup')
   meta.sportRole = 'keeper';
   meta.talentMods.spec = 'arms';
-  meta.loadouts = [{ name: 'PvP', alloc: { spec: 'arms', ranks: {}, choices: {} }, bar: [] }];
+  meta.loadouts = [{ name: 'PvP', alloc: { spec: 'arms', rows: {} }, bar: [] }];
   meta.activeLoadout = 0;
 
   // Session-scoped account cosmetics.
@@ -2811,11 +2852,9 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.renown).toBe(15); // renown (same name both sides, no rename)
     expect(client.activeTitle).toBe('prog_veteran'); // atitle -> activeTitle
     // tal -> talents / talentSpec / loadouts / activeLoadout
-    expect(client.talents).toEqual({ spec: 'arms', ranks: {}, choices: {} });
+    expect(client.talents).toEqual({ spec: 'arms', rows: {} });
     expect(client.talentSpec).toBe('arms');
-    expect(client.loadouts).toEqual([
-      { name: 'PvP', alloc: { spec: 'arms', ranks: {}, choices: {} }, bar: [] },
-    ]);
+    expect(client.loadouts).toEqual([{ name: 'PvP', alloc: { spec: 'arms', rows: {} }, bar: [] }]);
     expect(client.activeLoadout).toBe(0);
   });
 

@@ -26,6 +26,17 @@ const PREVIEW_ANIM_STATE = {
 };
 
 const LIVE_PREVIEW_X = 0;
+const CARD_CAPTURE_Z = 4.6;
+const DUAL_RAISE_CAPTURE_Z = 6.0;
+
+export function cardCaptureCameraZ(
+  playerClass: PlayerClass | undefined,
+  poseClips: readonly string[] | undefined,
+): number {
+  return playerClass === 'swordmaster' && poseClips?.includes('Spellcast_Raise')
+    ? DUAL_RAISE_CAPTURE_Z
+    : CARD_CAPTURE_Z;
+}
 
 export class CharacterPreview {
   private container: HTMLElement;
@@ -105,23 +116,23 @@ export class CharacterPreview {
     this.animate();
   }
 
-  /** Set the active character model by player class. Pass `weaponItemId` to hold a
-   *  specific weapon (e.g. the character sheet shows the equipped mainhand); omit it
-   *  to default to the class start weapon (so the creation turntable matches the
-   *  freshly created character in-world). */
-  setClass(cls: PlayerClass, weaponItemId?: string | null): void {
+  /** Set the active character model by player class. Pass explicit hand ids for a
+   *  character sheet; omit them to show the class starter equipment in creation. */
+  setClass(cls: PlayerClass, weaponItemId?: string | null, offhandItemId?: string | null): void {
     if (this.destroyed) return;
     // A class-driven selection (create/offline picker, or a panel switch) supersedes
     // any pending async mech re-apply, so invalidate the tracked appearance.
     this.appearanceSig = null;
     const weapon = weaponItemId !== undefined ? weaponItemId : (CLASSES[cls].startWeapon ?? null);
-    this.setVisualKey(`player_${cls}`, weapon);
+    const offhand =
+      offhandItemId !== undefined ? offhandItemId : (CLASSES[cls].startOffhand ?? null);
+    this.setVisualKey(`player_${cls}`, weapon, null, offhand);
   }
 
   /** Show a character's real, in-world appearance: the class rig or the Combat Mech
-   *  cosmetic body, its appearance skin, and the actually-equipped mainhand (no
-   *  weapon when unarmed). Mirrors createCharacterVisual so the char-select roster
-   *  and the character sheet match the world. The mech's cosmetic assets load
+   *  cosmetic body, its appearance skin, and the actually-equipped hands. Mirrors
+   *  createCharacterVisual so the char-select roster and character sheet match the
+   *  world. The mech's cosmetic assets load
    *  lazily; while they are not ready this shows the class body and re-applies once
    *  loaded, unless a newer selection has superseded this one. */
   setAppearance(a: PreviewAppearance): void {
@@ -130,24 +141,25 @@ export class CharacterPreview {
     const sig = appearanceSignature(a);
     this.appearanceSig = sig;
     if (a.skinCatalog === 'mech' && !mechAssetsReady()) {
-      this.setVisualKey(`player_${a.cls}`, a.mainhandItemId ?? null);
+      this.setVisualKey(`player_${a.cls}`, a.mainhandItemId ?? null, null, a.offhandItemId ?? null);
       void preloadMechAssets().then(() => {
         if (!this.destroyed && this.appearanceSig === sig) this.setAppearance(a);
       });
       return;
     }
     const v = previewAppearanceVisual(a);
-    this.setVisualKey(v.visualKey, v.weaponItemId, v.weaponOverride);
+    this.setVisualKey(v.visualKey, v.weaponItemId, v.weaponOverride, v.offhandItemId);
   }
 
   /** Set the active model by raw visual key (e.g. `player_mech` for the cosmetic
    *  turntable). The asset must already be loaded — callers preload first.
-   *  `weaponOverride` lets a cosmetic body adopt a class hand layout (rogue mech
-   *  dual-wields), matching the in-world render. */
+   *  `weaponOverride` lets a cosmetic body adopt a class hand layout (including
+   *  shields and dual wield), matching the in-world render. */
   setVisualKey(
     visualKey: string,
     weaponItemId: string | null = null,
     weaponOverride: WeaponLayoutOverride | null = null,
+    offhandItemId: string | null = null,
   ): void {
     if (this.destroyed) return;
     // Clean up current visual if it exists
@@ -164,6 +176,7 @@ export class CharacterPreview {
         this.currentSkin,
         weaponItemId,
         weaponOverride,
+        offhandItemId,
       );
       this.characterGroup.add(this.currentVisual.root);
 
@@ -309,6 +322,7 @@ export class CharacterPreview {
       width?: number;
       height?: number;
       angle?: number;
+      playerClass?: PlayerClass;
       poseClips?: readonly string[];
       poseFraction?: number;
     } = {},
@@ -336,12 +350,12 @@ export class CharacterPreview {
     this.renderer.setPixelRatio(1);
     this.renderer.setSize(width, height, false);
     this.camera.aspect = width / height;
-    // Pulled back to z=4.6, aimed at y=1.55 (eye 1.62) so the 45°/0.75-aspect
-    // frustum spans roughly y in [-0.3, 3.5] at the figure plane: enough headroom
-    // above the 2.6 head-top to clear the raised weapon/arms of the hero & victory
-    // poses (~3.3u) while the feet stay inside (BUG: card character was out of
-    // bounds). The card's drawCharacter() fit math then frames the whole capture.
-    this.camera.position.set(-0.1, 1.62, 4.6);
+    // The standard z=4.6 framing keeps normal poses prominent. SwordMaster's
+    // raised pose needs extra distance because both full-length blades extend
+    // above the rig at once. The card's drawCharacter() fit math then frames the
+    // whole capture without shrinking every other class and pose.
+    const captureZ = cardCaptureCameraZ(opts.playerClass, opts.poseClips);
+    this.camera.position.set(-0.1, 1.62, captureZ);
     this.camera.lookAt(new THREE.Vector3(-0.1, 1.55, 0));
     this.camera.updateProjectionMatrix();
     this.characterGroup.rotation.y = angle;

@@ -140,7 +140,10 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // Regenerate after a DELIBERATE catalog change, then paste the printed hex
   // into FROZEN_CATALOG_SHA256 below (run from the repo root):
   //   npx tsx -e "import {DEED_ORDER,DEEDS} from './src/sim/content/deeds'; import {createHash} from 'node:crypto'; console.log(createHash('sha256').update(JSON.stringify(DEED_ORDER.map((id)=>[id,DEEDS[id].trigger,DEEDS[id].renown])),'utf8').digest('hex'))"
-  const FROZEN_CATALOG_SHA256 = 'e61f98af54cf091cd06f3e62f7852cc36b8b009665802584e3025427ea6495e3';
+  // v0.26 replaces the point tree before release, so prog_full_build's unreachable
+  // eleven-point threshold is deliberately migrated once to the canonical six rows.
+  // This new digest freezes that release contract; it is not permission for later edits.
+  const FROZEN_CATALOG_SHA256 = '7b0624617e4cff351a20f1ae348bdd0ed29d7f854e2215b1806dfcdacb78ca72';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(

@@ -6,6 +6,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH } from './browser_path.mjs';
+import { PLAYABLE_CLASSES } from './lib/playable_classes.mjs';
 
 const URL = process.env.GAME_URL ?? 'http://localhost:5173';
 const OUT = 'tmp/sheets';
@@ -13,19 +14,9 @@ fs.mkdirSync(OUT, { recursive: true });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const SKILLS_DIR = 'public/ui/skills';
-const CLASSES = [
-  'warrior',
-  'paladin',
-  'hunter',
-  'rogue',
-  'priest',
-  'mage',
-  'warlock',
-  'shaman',
-  'druid',
-];
 const THEME = {
   warrior: ['#ff9d6e', '#150f0c'],
+  swordmaster: ['#22d3ee', '#081319'],
   paladin: ['#f6d98a', '#15110b'],
   hunter: ['#bfe89a', '#0f140d'],
   rogue: ['#7fe0a0', '#0d130f'],
@@ -37,6 +28,7 @@ const THEME = {
 };
 const TITLE = {
   warrior: 'Warrior',
+  swordmaster: 'SwordMaster',
   paladin: 'Paladin',
   hunter: 'Hunter',
   rogue: 'Rogue',
@@ -145,7 +137,7 @@ console.log('loaded', Object.keys(abil).length, 'ability defs');
 // render on a blank page so the dev-server homepage's /api polling can't block networkidle
 await page.goto('about:blank');
 
-for (const cls of CLASSES) {
+for (const cls of PLAYABLE_CLASSES) {
   // in-game action bar intentionally omitted; these are icon+name+description sheets.
   const barDataUrl = null;
   try {

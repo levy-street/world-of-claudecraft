@@ -35,14 +35,17 @@
 import {
   cloneAllocation,
   computeTalentModifiers,
-  FIRST_TALENT_LEVEL,
   MAX_LOADOUTS,
-  pointsSpent,
+  ROW_LEVELS,
   repairAllocation,
+  rowForLevel,
+  rowsPicked,
+  rowsUnlockedAtLevel,
   SAVED_LOADOUT_BAR_SLOTS,
   type SavedLoadout,
   type TalentAllocation,
-  talentPointsAtLevel,
+  type TalentModifiers,
+  type TalentRowLevel,
   talentsFor,
   validateAllocation,
 } from '../content/talents';
@@ -51,10 +54,88 @@ import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 
+function cleanRemovedProcState(
+  ctx: SimContext,
+  player: Entity,
+  previous: TalentModifiers,
+  next: TalentModifiers,
+): void {
+  const nextIds = new Set(next.procs.map((proc) => proc.id));
+  const removedIds = new Set(
+    previous.procs.map((proc) => proc.id).filter((procId) => !nextIds.has(procId)),
+  );
+  if (
+    removedIds.size === 0 &&
+    !(previous.global.cheatDeathIcd > 0 && next.global.cheatDeathIcd <= 0)
+  )
+    return;
+
+  if (player.procState) {
+    for (const procId of removedIds) {
+      delete player.procState.counters[procId];
+      delete player.procState.icds[procId];
+    }
+    if (previous.global.cheatDeathIcd > 0 && next.global.cheatDeathIcd <= 0) {
+      delete player.procState.icds.cheat_death;
+    }
+  }
+
+  for (const entity of ctx.entities.values()) {
+    for (let index = entity.auras.length - 1; index >= 0; index--) {
+      const aura = entity.auras[index];
+      if (aura.sourceId !== player.id || !removedIds.has(aura.id)) continue;
+      ctx.applyNonPlayerStatAura(entity, aura, -1);
+      entity.auras.splice(index, 1);
+      ctx.emit({ type: 'aura', targetId: entity.id, name: aura.name, gained: false });
+    }
+  }
+}
+
+function normalizeAbilityCharges(
+  player: Entity,
+  meta: PlayerMeta,
+  previousCaps: ReadonlyMap<string, number>,
+): void {
+  for (const ability of meta.known) {
+    const nextCap = ability.charges ?? 1;
+    const previousCap = previousCaps.get(ability.def.id) ?? 1;
+    if (
+      nextCap > 1 &&
+      previousCap <= 1 &&
+      player.cooldowns.has(ability.def.id) &&
+      !player.charges?.has(ability.def.id)
+    ) {
+      player.charges ??= new Map();
+      player.charges.set(ability.def.id, { spent: 1, cdMax: ability.cooldown });
+    }
+  }
+  if (!player.charges) return;
+  for (const [abilityId, state] of player.charges) {
+    const ability = meta.known.find((known) => known.def.id === abilityId);
+    if (!ability || ability.cooldown <= 0) {
+      player.charges.delete(abilityId);
+      player.cooldowns.delete(abilityId);
+      continue;
+    }
+    const maxCharges = ability.charges ?? 1;
+    state.spent = Math.min(state.spent, maxCharges);
+    state.cdMax = ability.cooldown;
+    if (state.spent <= 0) {
+      player.charges.delete(abilityId);
+      player.cooldowns.delete(abilityId);
+    }
+  }
+  if (player.charges.size === 0) player.charges = undefined;
+}
+
 // The ONLY place a talent tree is walked. Re-resolves the flat modifier struct and
 // refreshes the stat pass + known-ability resolver that consume it.
 function recomputeTalents(ctx: SimContext, meta: PlayerMeta): void {
   const e = ctx.entities.get(meta.entityId);
+  const previousMods = meta.talentMods;
+  const previousChargeCaps = new Map(
+    meta.known.map((ability) => [ability.def.id, ability.charges ?? 1] as const),
+  );
   meta.talentMods = computeTalentModifiers(meta.cls, meta.talents, e?.level ?? 20);
   if (e)
     recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
@@ -65,6 +146,14 @@ function recomputeTalents(ctx: SimContext, meta: PlayerMeta): void {
   // addPlayer/restore block), so this never spams on login. refreshKnownAbilities only
   // fires for abilities genuinely new since the last known-set.
   ctx.refreshKnownAbilities(meta, true);
+  if (e) {
+    cleanRemovedProcState(ctx, e, previousMods, meta.talentMods);
+    normalizeAbilityCharges(e, meta, previousChargeCaps);
+  }
+  // The heavy talent snapshot is wireRev-gated. Every live allocation change
+  // reaches this one choke point, while character load uses the silent path in
+  // Sim.addPlayer and therefore does not create learned events or a fake rev.
+  meta.wireRev++;
 }
 
 function talentLockReason(ctx: SimContext, p: Entity): string | null {
@@ -76,20 +165,50 @@ function talentLockReason(ctx: SimContext, p: Entity): string | null {
 export function talentPointBudget(ctx: SimContext, pid?: number): { total: number; spent: number } {
   const r = ctx.resolve(pid);
   if (!r) return { total: 0, spent: 0 };
-  return { total: talentPointsAtLevel(r.e.level), spent: pointsSpent(r.meta.talents) };
+  return { total: rowsUnlockedAtLevel(r.e.level), spent: rowsPicked(r.meta.talents) };
 }
 
 function sanitizeTalentAllocation(alloc: TalentAllocation): TalentAllocation {
-  const sanitized: TalentAllocation = {
-    spec: alloc.spec ?? null,
-    ranks: {},
-    choices: { ...alloc.choices },
-  };
-  for (const id in alloc.ranks) {
-    const v = Math.floor(alloc.ranks[id]);
-    if (v > 0) sanitized.ranks[id] = v;
+  return cloneAllocation(alloc);
+}
+
+function allocationsEqual(a: TalentAllocation, b: TalentAllocation): boolean {
+  if (a.spec !== b.spec) return false;
+  return ROW_LEVELS.every((level) => a.rows[level] === b.rows[level]);
+}
+
+function markTalentSnapshotDirty(meta: PlayerMeta, revisionBeforeMutation: number): void {
+  // An allocation recompute already dirties the heavy talent snapshot. Loadout
+  // metadata can also change without a recompute, so cover that path exactly once.
+  if (meta.wireRev === revisionBeforeMutation) meta.wireRev++;
+}
+
+function commitTalentAllocation(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  player: Entity,
+  alloc: TalentAllocation,
+  successText: string | null,
+): boolean {
+  const lock = talentLockReason(ctx, player);
+  if (lock) {
+    ctx.error(player.id, lock);
+    return false;
   }
-  return sanitized;
+  const check = validateAllocation(meta.cls, alloc, player.level);
+  if (!check.ok) {
+    ctx.error(player.id, check.reason ?? 'Invalid talent build.');
+    return false;
+  }
+  const sanitized = sanitizeTalentAllocation(alloc);
+  if (allocationsEqual(meta.talents, sanitized)) return true;
+
+  const previousSpec = meta.talents.spec;
+  meta.talents = sanitized;
+  recomputeTalents(ctx, meta);
+  if (previousSpec !== sanitized.spec) ctx.revalidateOffhandForSpec(player.id);
+  if (successText) ctx.emit({ type: 'log', pid: player.id, text: successText, color: '#ffd100' });
+  return true;
 }
 
 // Commit a whole staged allocation in one shot (the UI's "Apply"). Rejects any
@@ -101,25 +220,7 @@ export function applyTalentAllocation(
 ): boolean {
   const r = ctx.resolve(pid);
   if (!r) return false;
-  const lock = talentLockReason(ctx, r.e);
-  if (lock) {
-    ctx.error(r.e.id, lock);
-    return false;
-  }
-  const sanitized = sanitizeTalentAllocation(alloc);
-  if (sanitized.spec && r.e.level < FIRST_TALENT_LEVEL) {
-    ctx.error(r.e.id, `You may choose a specialization at level ${FIRST_TALENT_LEVEL}.`);
-    return false;
-  }
-  const check = validateAllocation(r.meta.cls, sanitized, talentPointsAtLevel(r.e.level));
-  if (!check.ok) {
-    ctx.error(r.e.id, check.reason ?? 'Invalid talent build.');
-    return false;
-  }
-  r.meta.talents = sanitized;
-  recomputeTalents(ctx, r.meta);
-  ctx.emit({ type: 'log', pid: r.e.id, text: 'Talents updated.', color: '#ffd100' });
-  return true;
+  return commitTalentAllocation(ctx, r.meta, r.e, alloc, 'Talents updated.');
 }
 
 // Spend a single point into a node (incremental API; the UI mostly stages then
@@ -127,9 +228,8 @@ export function applyTalentAllocation(
 export function spendTalentPoint(ctx: SimContext, nodeId: string, pid?: number): boolean {
   const r = ctx.resolve(pid);
   if (!r) return false;
-  const cand = cloneAllocation(r.meta.talents);
-  cand.ranks[nodeId] = (cand.ranks[nodeId] ?? 0) + 1;
-  return applyTalentAllocation(ctx, cand, pid);
+  ctx.error(r.e.id, 'Invalid talent build.');
+  return false;
 }
 
 // Choose / change specialization. Switching specs drops the previous spec
@@ -137,11 +237,6 @@ export function spendTalentPoint(ctx: SimContext, nodeId: string, pid?: number):
 export function setTalentSpec(ctx: SimContext, specId: string | null, pid?: number): boolean {
   const r = ctx.resolve(pid);
   if (!r) return false;
-  const lock = talentLockReason(ctx, r.e);
-  if (lock) {
-    ctx.error(r.e.id, lock);
-    return false;
-  }
   const ct = talentsFor(r.meta.cls);
   if (specId !== null && !ct?.specs.some((s) => s.id === specId)) {
     ctx.error(r.e.id, 'Unknown specialization.');
@@ -149,13 +244,30 @@ export function setTalentSpec(ctx: SimContext, specId: string | null, pid?: numb
   }
   const cand = cloneAllocation(r.meta.talents);
   cand.spec = specId;
-  for (const id of Object.keys(cand.ranks)) {
-    const node = ct?.nodes.find((n) => n.id === id);
-    if (node?.tree === 'spec' && node.specId !== specId) {
-      delete cand.ranks[id];
-      delete cand.choices[id];
-    }
+  return applyTalentAllocation(ctx, cand, pid);
+}
+
+/** Select or clear one canonical class-wide row through the apply choke point. */
+export function selectTalentRow(
+  ctx: SimContext,
+  level: TalentRowLevel,
+  optionId: string | null,
+  pid?: number,
+): boolean {
+  const r = ctx.resolve(pid);
+  if (!r) return false;
+  const row = rowForLevel(r.meta.cls, level);
+  if (!row || r.e.level < level) {
+    ctx.error(r.e.id, 'Invalid talent build.');
+    return false;
   }
+  if (optionId !== null && !row.options.some((option) => option.id === optionId)) {
+    ctx.error(r.e.id, 'Invalid talent build.');
+    return false;
+  }
+  const cand = cloneAllocation(r.meta.talents);
+  if (optionId === null) delete cand.rows[level];
+  else cand.rows[level] = optionId;
   return applyTalentAllocation(ctx, cand, pid);
 }
 
@@ -163,15 +275,13 @@ export function setTalentSpec(ctx: SimContext, specId: string | null, pid?: numb
 export function respecTalents(ctx: SimContext, pid?: number): boolean {
   const r = ctx.resolve(pid);
   if (!r) return false;
-  const lock = talentLockReason(ctx, r.e);
-  if (lock) {
-    ctx.error(r.e.id, lock);
-    return false;
-  }
-  r.meta.talents = { spec: r.meta.talents.spec, ranks: {}, choices: {} };
-  recomputeTalents(ctx, r.meta);
-  ctx.emit({ type: 'log', pid: r.e.id, text: 'Talents reset.', color: '#ffd100' });
-  return true;
+  return commitTalentAllocation(
+    ctx,
+    r.meta,
+    r.e,
+    { spec: r.meta.talents.spec, rows: {} },
+    'Talents reset.',
+  );
 }
 
 // Save the current build (talents + spec + the given action-bar slot map) as a
@@ -188,25 +298,8 @@ export function saveTalentLoadout(
   const alloc = typeof pidOrAlloc === 'object' ? pidOrAlloc : allocMaybe;
   const r = ctx.resolve(pid);
   if (!r) return -1;
-  if (alloc) {
-    const lock = talentLockReason(ctx, r.e);
-    if (lock) {
-      ctx.error(r.e.id, lock);
-      return -1;
-    }
-    const sanitized = sanitizeTalentAllocation(alloc);
-    if (sanitized.spec && r.e.level < FIRST_TALENT_LEVEL) {
-      ctx.error(r.e.id, `You may choose a specialization at level ${FIRST_TALENT_LEVEL}.`);
-      return -1;
-    }
-    const check = validateAllocation(r.meta.cls, sanitized, talentPointsAtLevel(r.e.level));
-    if (!check.ok) {
-      ctx.error(r.e.id, check.reason ?? 'Invalid talent build.');
-      return -1;
-    }
-    r.meta.talents = sanitized;
-    recomputeTalents(ctx, r.meta);
-  }
+  const revisionBeforeMutation = r.meta.wireRev;
+  if (alloc && !commitTalentAllocation(ctx, r.meta, r.e, alloc, null)) return -1;
   const clean = (name || 'Build').toString().slice(0, 24);
   const safeBar = Array.isArray(bar)
     ? bar.slice(0, SAVED_LOADOUT_BAR_SLOTS).map((b) => (typeof b === 'string' ? b : null))
@@ -214,8 +307,9 @@ export function saveTalentLoadout(
   const lo: SavedLoadout = { name: clean, alloc: cloneAllocation(r.meta.talents), bar: safeBar };
   const existing = r.meta.loadouts.findIndex((l) => l.name === clean);
   if (existing >= 0) {
-    r.meta.loadouts[existing] = lo;
+    r.meta.loadouts = r.meta.loadouts.map((saved, index) => (index === existing ? lo : saved));
     r.meta.activeLoadout = existing;
+    markTalentSnapshotDirty(r.meta, revisionBeforeMutation);
     ctx.emit({ type: 'log', pid: r.e.id, text: `Saved build "${clean}".`, color: '#ffd100' });
     return existing;
   }
@@ -223,8 +317,9 @@ export function saveTalentLoadout(
     ctx.error(r.e.id, `You can save at most ${MAX_LOADOUTS} loadouts.`);
     return -1;
   }
-  r.meta.loadouts.push(lo);
+  r.meta.loadouts = [...r.meta.loadouts, lo];
   r.meta.activeLoadout = r.meta.loadouts.length - 1;
+  markTalentSnapshotDirty(r.meta, revisionBeforeMutation);
   ctx.emit({ type: 'log', pid: r.e.id, text: `Saved build "${clean}".`, color: '#ffd100' });
   return r.meta.activeLoadout;
 }
@@ -234,28 +329,16 @@ export function saveTalentLoadout(
 export function switchTalentLoadout(ctx: SimContext, index: number, pid?: number): boolean {
   const r = ctx.resolve(pid);
   if (!r) return false;
-  const lock = talentLockReason(ctx, r.e);
-  if (lock) {
-    ctx.error(r.e.id, lock);
-    return false;
-  }
+  if (!Number.isSafeInteger(index) || index < 0 || index >= MAX_LOADOUTS) return false;
   const lo = r.meta.loadouts[index];
   if (!lo) {
     ctx.error(r.e.id, 'No such loadout.');
     return false;
   }
-  if (lo.alloc.spec && r.e.level < FIRST_TALENT_LEVEL) {
-    ctx.error(r.e.id, 'That loadout needs a higher level.');
-    return false;
-  }
-  const check = validateAllocation(r.meta.cls, lo.alloc, talentPointsAtLevel(r.e.level));
-  if (!check.ok) {
-    ctx.error(r.e.id, `Loadout invalid: ${check.reason ?? 'unknown'}`);
-    return false;
-  }
-  r.meta.talents = cloneAllocation(lo.alloc);
+  const revisionBeforeMutation = r.meta.wireRev;
+  if (!commitTalentAllocation(ctx, r.meta, r.e, lo.alloc, null)) return false;
   r.meta.activeLoadout = index;
-  recomputeTalents(ctx, r.meta);
+  markTalentSnapshotDirty(r.meta, revisionBeforeMutation);
   ctx.emit({
     type: 'log',
     pid: r.e.id,
@@ -267,22 +350,39 @@ export function switchTalentLoadout(ctx: SimContext, index: number, pid?: number
 
 export function deleteTalentLoadout(ctx: SimContext, index: number, pid?: number): boolean {
   const r = ctx.resolve(pid);
-  if (!r || index < 0 || index >= r.meta.loadouts.length) return false;
+  if (
+    !r ||
+    !Number.isSafeInteger(index) ||
+    index < 0 ||
+    index >= MAX_LOADOUTS ||
+    index >= r.meta.loadouts.length
+  ) {
+    return false;
+  }
+  const lock = talentLockReason(ctx, r.e);
+  if (lock) {
+    ctx.error(r.e.id, lock);
+    return false;
+  }
   const wasActive = r.meta.activeLoadout === index;
+  const revisionBeforeMutation = r.meta.wireRev;
   const name = r.meta.loadouts[index].name;
-  r.meta.loadouts.splice(index, 1);
+  const loadouts = r.meta.loadouts.filter((_, savedIndex) => savedIndex !== index);
+  let activeLoadout = r.meta.activeLoadout;
   if (wasActive) {
-    r.meta.activeLoadout =
-      r.meta.loadouts.length > 0 ? Math.min(index, r.meta.loadouts.length - 1) : -1;
-    const next = r.meta.activeLoadout >= 0 ? r.meta.loadouts[r.meta.activeLoadout] : null;
+    activeLoadout = loadouts.length > 0 ? Math.min(index, loadouts.length - 1) : -1;
+    const next = activeLoadout >= 0 ? loadouts[activeLoadout] : null;
     if (next) {
       // This is an AUTO-apply (no user gate), so repair against the level budget
       // first: switchTalentLoadout validates on its path, but here a stale or
       // tampered next loadout would otherwise be baked into live mods wholesale.
-      r.meta.talents = repairAllocation(r.meta.cls, next.alloc, talentPointsAtLevel(r.e.level));
-      recomputeTalents(ctx, r.meta);
+      const repaired = repairAllocation(r.meta.cls, next.alloc, r.e.level);
+      if (!commitTalentAllocation(ctx, r.meta, r.e, repaired, null)) return false;
     }
-  } else if (r.meta.activeLoadout > index) r.meta.activeLoadout -= 1;
+  } else if (activeLoadout > index) activeLoadout -= 1;
+  r.meta.loadouts = loadouts;
+  r.meta.activeLoadout = activeLoadout;
+  markTalentSnapshotDirty(r.meta, revisionBeforeMutation);
   ctx.emit({ type: 'log', pid: r.e.id, text: `Deleted build "${name}".`, color: '#ffd100' });
   return true;
 }

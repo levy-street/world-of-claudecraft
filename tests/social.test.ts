@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { computeTalentModifiers, TALENTS } from '../src/sim/content/talents';
 import {
   abilitiesKnownAt,
   CLASSES,
@@ -88,7 +89,7 @@ function nearestMob(
   return best;
 }
 
-describe('nine classes', () => {
+describe('all playable classes', () => {
   it('every class spawns with a working kit and stats', () => {
     for (const cls of ALL_CLASSES) {
       const sim = new Sim({ seed: 42, playerClass: cls });
@@ -98,15 +99,21 @@ describe('nine classes', () => {
       // Expanded kits can exceed the 12 action-bar slots; overflow remains
       // available from the spellbook and can be dragged onto the bar.
       expect(CLASSES[cls].abilities.length).toBeGreaterThan(0);
-      // the full kit resolves at MAX_LEVEL; the 10-20 band still has things to learn
+      // The no-spec baseline resolves at MAX_LEVEL. Spec-gated abilities are
+      // reachable across the class's three committed specializations.
       const kit = abilitiesKnownAt(cls, MAX_LEVEL);
-      expect(kit.length).toBe(CLASSES[cls].abilities.length);
+      const reachable = new Set(kit.map((known) => known.def.id));
+      for (const spec of TALENTS[cls].specs) {
+        const mods = computeTalentModifiers(cls, { spec: spec.id, rows: {} }, MAX_LEVEL);
+        for (const known of abilitiesKnownAt(cls, MAX_LEVEL, mods)) reachable.add(known.def.id);
+      }
+      expect(CLASSES[cls].abilities.every((abilityId) => reachable.has(abilityId))).toBe(true);
       expect(abilitiesKnownAt(cls, 10).length).toBeLessThan(kit.length);
       // every class's core kit keeps scaling: something reaches rank 3+ by 20
       expect(kit.some((k) => k.rank >= 3)).toBe(true);
       // resource type sane
       if (cls === 'warrior') expect(p.resourceType).toBe('rage');
-      else if (cls === 'rogue') expect(p.resourceType).toBe('energy');
+      else if (cls === 'rogue' || cls === 'swordmaster') expect(p.resourceType).toBe('energy');
       else expect(p.resourceType).toBe('mana');
     }
   });

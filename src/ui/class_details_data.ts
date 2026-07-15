@@ -45,6 +45,12 @@ export const CLASS_DETAILS: Record<PlayerClass, ClassDetails> = {
     armorKey: 'classDetails.armor.leatherCloth',
     weaponsKey: 'classDetails.weapons.daggersSwords',
   },
+  swordmaster: {
+    roleKey: 'classDetails.roles.swordmaster',
+    roleType: 'dps',
+    armorKey: 'classDetails.armor.leatherCloth',
+    weaponsKey: 'classDetails.weapons.twinOneHanders',
+  },
   priest: {
     roleKey: 'classDetails.roles.priest',
     roleType: 'healer',
@@ -74,20 +80,21 @@ export const CLASS_DETAILS: Record<PlayerClass, ClassDetails> = {
     roleType: 'hybrid',
     armorKey: 'classDetails.armor.leatherCloth',
     weaponsKey: 'classDetails.weapons.staves',
-  }
+  },
 };
 
 // Three curated "signature" abilities per class, shown on the select screen.
 // Each entry MUST be a real ability that the class can learn, enforced by
 // tests/charselect_class_details.test.ts so this never drifts from the sim.
 export const SIGNATURE_ABILITIES: Record<PlayerClass, string[]> = {
-  warrior: ['charge', 'heroic_strike', 'rend'],
+  warrior: ['charge', 'heroic_strike', 'execute'],
   paladin: ['holy_light', 'judgement', 'seal_of_righteousness'],
   hunter: ['serpent_sting', 'aimed_shot', 'arcane_shot'],
   rogue: ['sinister_strike', 'eviscerate', 'evasion'],
+  swordmaster: ['crescent_sweep', 'sword_aura', 'blade_cyclone'],
   priest: ['smite', 'power_word_shield', 'shadow_word_pain'],
   shaman: ['lightning_bolt', 'rockbiter_weapon', 'ghost_wolf'],
   mage: ['fireball', 'frostbolt', 'polymorph'],
   warlock: ['shadow_bolt', 'corruption', 'life_tap'],
-  druid: ['wrath', 'bear_form', 'rejuvenation']
+  druid: ['wrath', 'bear_form', 'rejuvenation'],
 };

@@ -42,7 +42,7 @@ import {
   type SkinTier,
   skinRankOrder,
 } from '../sim/content/skins';
-import { FIRST_TALENT_LEVEL, type TalentAllocation, talentsFor } from '../sim/content/talents';
+import { FIRST_TALENT_LEVEL, talentsFor } from '../sim/content/talents';
 import { SPORT_ABILITIES } from '../sim/content/vale_cup';
 import type { ZoneDef } from '../sim/data';
 import {
@@ -766,6 +766,7 @@ const PET_MODE_DESC_KEYS: Record<PetMode, TranslationKey> = {
 type ItemQuality = NonNullable<ItemDef['quality']>;
 const ITEM_SLOT_LABEL_KEYS: Record<ItemSlot, TranslationKey> = {
   mainhand: 'itemUi.slots.mainhand',
+  offhand: 'itemUi.slots.offhand',
   helmet: 'itemUi.slots.helmet',
   neck: 'itemUi.slots.neck',
   shoulder: 'itemUi.slots.shoulder',
@@ -1470,10 +1471,6 @@ export class Hud {
   private lastMailUnread = -1;
   private pendingPetFeed = false;
   private petModeMenuOpen = false;
-  // Talents: the local staged allocation the user edits before committing it on save
-  // or loadout switch. Owned here; TalentsWindow reads/replaces it via its deps.
-  private talentStage: TalentAllocation | null = null;
-
   constructor(
     private sim: IWorld,
     private renderer: Renderer,
@@ -3761,25 +3758,23 @@ export class Hud {
     itemTooltip: (item) => this.itemTooltip(item),
     attachTooltip: (el, html) => this.attachTooltip(el, html),
   };
-  // The interactive talents window. Hud stays the coordinator (closeOtherWindows
-  // needs its private window state) and owns the single staged edit buffer
-  // (talentStage); the painter reads/replaces it via getStage/setStage and mutates
-  // it in place. All closures are lazy, so this field initializer is safe even
-  // though this.sim is assigned in the ctor body.
+  // The interactive talents window. All allocation reads and mutations cross the
+  // IWorld seam; the painter owns no optimistic talent state. All closures are
+  // lazy, so this field initializer is safe before the ctor assigns this.sim.
   private readonly talentsWindow = new TalentsWindow({
     ...this.presentationBag,
     root: () => $('#talents-window'),
     hideTooltip: () => this.hideTooltip(),
     ...this.windowFocus('#talents-window'),
-    getStage: () => this.talentStage,
-    setStage: (s) => {
-      this.talentStage = s;
-    },
     playerClass: () => this.sim.cfg.playerClass,
-    totalPoints: () => this.sim.talentPoints().total,
+    playerLevel: () => this.sim.player.level,
     currentAllocation: () => this.sim.talents,
     activeLoadout: () => this.sim.activeLoadout,
     loadouts: () => this.sim.loadouts,
+    commitSpec: (specId) => this.sim.setSpec(specId),
+    selectRow: (level, optionId) => this.sim.selectTalentRow(level, optionId),
+    applyTalents: (allocation) => this.sim.applyTalents(allocation),
+    respec: () => this.sim.respec(),
     currentBar: () => this.hotbarActions.map((a) => (a && a.type === 'ability' ? a.id : null)),
     saveLoadout: (name, bar, alloc) => this.sim.saveLoadout(name, bar, alloc),
     switchLoadout: (i) => this.sim.switchLoadout(i),
@@ -12721,17 +12716,17 @@ export class Hud {
     } else {
       this.charPreview.setContainer(container);
     }
-    // Show the player's currently equipped mainhand on the character sheet, so the
-    // 3D model reflects gear changes (the char window repaints the preview after an
-    // equip via charWindow.renderIfOpen -> renderPreview).
+    // Show both currently equipped hands on the character sheet, so the 3D model
+    // reflects shields and dual wield as well as mainhand gear changes.
     const weapon = this.sim.equipment.mainhand ?? null;
+    const offhand = this.sim.equipment.offhand ?? null;
     if (previewKey) {
-      // mech is class-agnostic; mirror the wearer class's hand layout (rogue
-      // dual-wields) so the paperdoll matches the in-world render
+      // Mech is class-agnostic; mirror the wearer class's hand layout so the
+      // paperdoll matches the in-world render.
       const override = previewKey === 'player_mech' ? mechHeldWeaponOverride(cls) : null;
-      this.charPreview.setVisualKey(previewKey, weapon, override);
+      this.charPreview.setVisualKey(previewKey, weapon, override, offhand);
     } else {
-      this.charPreview.setClass(cls, weapon);
+      this.charPreview.setClass(cls, weapon, offhand);
     }
     this.charPreview.setSkin(skin);
   }
@@ -13339,6 +13334,7 @@ export class Hud {
       selectPose(poseIndex);
       try {
         const characterImage = preview.captureCloseup({
+          playerClass: this.sim.cfg.playerClass,
           poseClips: pose.clips,
           poseFraction: pose.fraction,
         });
@@ -15752,6 +15748,10 @@ function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling): stri
       case 'groundAoE':
       case 'drainTick':
         return abilityAmountRange(primary.min, primary.max) + suffix(primary);
+      case 'repositionToAim':
+        return primary.landingAoe
+          ? abilityAmountRange(primary.landingAoe.min, primary.landingAoe.max)
+          : '';
       case 'consumeAura':
         if (primary.deal) {
           return abilityAmountRange(primary.deal.min, primary.deal.max) + suffix(primary);

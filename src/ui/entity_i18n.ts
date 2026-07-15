@@ -136,6 +136,7 @@ const CLASS_NAME_KEYS: Record<PlayerClass, string> = {
   mage: 'classes.mage',
   warlock: 'classes.warlock',
   druid: 'classes.druid',
+  swordmaster: 'classes.swordmaster',
 };
 
 const CLASS_DESCRIPTION_KEYS: Record<PlayerClass, string> = {
@@ -148,6 +149,7 @@ const CLASS_DESCRIPTION_KEYS: Record<PlayerClass, string> = {
   mage: 'classDetails.lore.mage',
   warlock: 'classDetails.lore.warlock',
   druid: 'classDetails.lore.druid',
+  swordmaster: 'classDetails.lore.swordmaster',
 };
 
 const fallbackLog = new Map<string, EntityTranslationFallback>();

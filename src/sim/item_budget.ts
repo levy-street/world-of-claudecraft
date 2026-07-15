@@ -43,6 +43,7 @@ export const QUALITY_STAT_MULT: Record<string, number> = {
 // (head ~1.0, shoulder ~0.75, gloves ~0.65, waist ~0.55) applied to stat points.
 export const SLOT_STAT_MULT: Record<ItemSlot, number> = {
   mainhand: 1.0,
+  offhand: 0.75,
   chest: 1.0,
   legs: 0.9,
   helmet: 0.85,
@@ -61,6 +62,11 @@ export const SLOT_STAT_MULT: Record<ItemSlot, number> = {
 
 // Primary-stat points granted per item level at full (rare-mult x chest-mult = 1).
 export const STAT_PER_ILVL = 0.7;
+
+// A two-handed weapon occupies both hands, so it carries both hands' primary
+// stats: twice the one-handed mainhand line. Consumers apply this only when an
+// ItemDef is a weapon with hand 'twohand'.
+export const TWOHAND_STAT_MULT = 2;
 
 // The source level the "Heroic X" upgraded drop variants read as: one heroic tier
 // above the level-20 dungeons, so epics land at item level 28 (22 + the epic bump

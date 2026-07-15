@@ -1,7 +1,8 @@
-import { describe, it, expect } from 'vitest';
-import { CLASS_DETAILS, SIGNATURE_ABILITIES } from '../src/ui/class_details_data';
-import { CLASSES, ABILITIES } from '../src/sim/content/classes';
+import { describe, expect, it } from 'vitest';
+import { ABILITIES, CLASSES } from '../src/sim/content/classes';
+import { talentsFor } from '../src/sim/content/talents';
 import type { PlayerClass } from '../src/sim/types';
+import { CLASS_DETAILS, SIGNATURE_ABILITIES } from '../src/ui/class_details_data';
 
 // Guards the hand-maintained character-select showcase data against drift from
 // the sim's source of truth. If a class's ability kit or roster changes, these
@@ -33,9 +34,10 @@ describe('character-select class details parity', () => {
           const ability = ABILITIES[id];
           expect(ability, `ability "${id}" does not exist`).toBeTruthy();
           expect(ability.class, `"${id}" belongs to ${ability?.class}, not ${cls}`).toBe(cls);
+          const specSignatures = (talentsFor(cls)?.specs ?? []).map((spec) => spec.signature);
           expect(
-            CLASSES[cls].abilities,
-            `"${id}" is not in ${cls}'s learnable ability list`,
+            [...CLASSES[cls].abilities, ...specSignatures],
+            `"${id}" is neither in ${cls}'s base kit nor a specialization signature`,
           ).toContain(id);
         });
       }

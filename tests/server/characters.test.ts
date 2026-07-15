@@ -316,7 +316,11 @@ describe('character list handlers', () => {
       name: 'Aaa',
       class: 'warrior',
       level: 10,
-      state: st({ skin: 3 }),
+      state: st({
+        skin: 3,
+        skinCatalog: 'mech',
+        equipment: { mainhand: 'worn_sword', offhand: 'eastbrook_buckler' },
+      }),
       force_rename: false,
       last_played: new Date('2026-01-02T03:04:05.000Z'),
       playtime_seconds: '120',
@@ -348,6 +352,9 @@ describe('character list handlers', () => {
           forceRename: false,
           lastPlayed: '2026-01-02T03:04:05.000Z',
           playtimeSeconds: 120,
+          skinCatalog: 'mech',
+          mainhandItemId: 'worn_sword',
+          offhandItemId: 'eastbrook_buckler',
         },
         {
           id: 2,
@@ -359,6 +366,9 @@ describe('character list handlers', () => {
           forceRename: true,
           lastPlayed: null,
           playtimeSeconds: 0, // null -> 0
+          skinCatalog: 'class',
+          mainhandItemId: null,
+          offhandItemId: null,
         },
       ],
     };
@@ -487,6 +497,30 @@ describe('create handler', () => {
       skin: 2,
       forceRename: false,
     });
+  });
+
+  it('accepts SwordMaster and threads its canonical id through state creation and persistence', async () => {
+    const initialCharacterState = vi.fn(() => st());
+    const createCharacterCapped = vi.fn(async () =>
+      charRow({ id: 13, name: 'Azure', class: 'swordmaster', state: st({ skin: 4 }) }),
+    );
+    installRuntime({ initialCharacterState });
+    setCharactersDbForTests({ createCharacterCapped });
+
+    const res = await callHandler('POST', '/api/characters', {
+      account: { accountId: 7, scope: 'full' },
+      body: { name: 'Azure', class: 'swordmaster', skin: 4 },
+    });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ class: 'swordmaster', skin: 4 });
+    expect(initialCharacterState).toHaveBeenCalledWith('swordmaster', 'Azure', 4);
+    expect(createCharacterCapped.mock.calls[0]?.slice(0, 4)).toEqual([
+      7,
+      'Azure',
+      'swordmaster',
+      10,
+    ]);
   });
 
   it('increments the characters-created counter on the created path', async () => {

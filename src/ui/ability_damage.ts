@@ -128,6 +128,7 @@ export function abilityPrimaryEffect(res: ResolvedAbility): AbilityEffect | unde
       eff.type === 'aoeHeal' ||
       eff.type === 'aoeRoot' ||
       eff.type === 'groundAoE' ||
+      (eff.type === 'repositionToAim' && eff.landingAoe !== undefined) ||
       eff.type === 'consumeAura' ||
       eff.type === 'finisherDamage' ||
       eff.type === 'drainTick' ||

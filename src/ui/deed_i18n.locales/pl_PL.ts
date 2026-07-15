@@ -32,8 +32,8 @@ export const table: DeedLocaleTable = {
     desc: 'Wydaj punkt talentu na talent z ostatniego rzędu.',
   },
   prog_full_build: {
-    name: 'Pełna Jedenastka',
-    desc: 'Wydaj wszystkie jedenaście punktów talentów w jednej rozpisce.',
+    name: 'Pełna Szóstka',
+    desc: 'Wybierz po jednej opcji we wszystkich sześciu rzędach talentów w jednej konfiguracji.',
   },
   prog_veteran: {
     name: 'Weteran',

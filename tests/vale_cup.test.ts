@@ -27,6 +27,7 @@ import {
   VC_MATCH_DURATION,
   vcupPackTeams,
 } from '../src/sim/social/vale_cup';
+import { VC_BOT_CLASSES } from '../src/sim/social/vale_cup_bots';
 import type { SimEvent } from '../src/sim/types';
 import {
   GOAL_LINE_EAST_X,
@@ -558,6 +559,19 @@ describe('Vale Cup: bot showcase', () => {
 });
 
 describe('Vale Cup: bot backfill and practice', () => {
+  it('uses every non-pet class for deterministic cosmetic variety', () => {
+    expect(VC_BOT_CLASSES).toEqual([
+      'warrior',
+      'swordmaster',
+      'paladin',
+      'rogue',
+      'priest',
+      'shaman',
+      'mage',
+      'druid',
+    ]);
+  });
+
   it('backfills both sides with bots after the human unit waits out the timer (unrated)', () => {
     const sim = makeWorld();
     const a = addAt(sim, 'warrior', 'Aleph');

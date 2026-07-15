@@ -55,9 +55,12 @@ import {
   healingThreat as healingThreatImpl,
   hexOutputMult as hexOutputMultImpl,
 } from './combat/heal';
+import { advanceHeroicLeap } from './combat/heroic_leap';
 import { applySetProcs as applySetProcsImpl } from './combat/set_procs';
 import { spellCritBonusFromAuras, spellDamageMultFromAuras } from './combat/spell_combat';
 import { isSpellResisted } from './combat/spell_resist';
+import { warriorMeleeDefense } from './combat/warrior_hit_table';
+import { ensureWarriorStance } from './combat/warrior_stances';
 // A3: the augment/power-up content helpers used by the Fiesta match logic
 // (AUGMENTS_BY_ID/AugmentDef/eligibleAugments/POWERUPS/PowerupDef/tierForWave)
 // moved to social/fiesta.ts with that logic; sim.ts keeps only the type used by
@@ -88,7 +91,7 @@ import {
   TALENTS,
   type TalentAllocation,
   type TalentModifiers,
-  talentPointsAtLevel,
+  type TalentRowLevel,
 } from './content/talents';
 import {
   resolveActiveWeaponSkin,
@@ -282,6 +285,7 @@ import {
   deleteTalentLoadout,
   respecTalents,
   saveTalentLoadout,
+  selectTalentRow as selectTalentRowImpl,
   setTalentSpec,
   spendTalentPoint,
   switchTalentLoadout,
@@ -305,6 +309,11 @@ import {
   revivePlayerAt,
   spawnOverworldSpiritHealers,
 } from './spirit';
+import { repairTalentLoadouts } from './talent_loadouts';
+import {
+  CURRENT_CHARACTER_CONTENT_REVISION,
+  migrateCharacterTalentsV2,
+} from './talent_save_migration';
 import {
   rollWorldBossLoot as rollWorldBossLootImpl,
   scaleWorldBossHp,
@@ -382,6 +391,7 @@ import { createVcState, type VcState } from './social/vale_cup';
 import * as valeCupBotsMod from './social/vale_cup_bots';
 import { SpatialGrid } from './spatial';
 import { isStunDrCategory } from './stun_dr';
+import { usesFastGcd } from './swordmaster_rules';
 import { Targeting } from './targeting';
 import {
   addThreat,
@@ -444,6 +454,8 @@ import {
   type PlayerClass,
   type QuestProgress,
   type QuestState,
+  REVENGE_FREE_CHANCE,
+  REVENGE_FREE_DURATION,
   type ReadyCheck,
   type RiteIntensity,
   RUN_SPEED,
@@ -684,6 +696,7 @@ export interface ArenaReturnPools {
   hp: number;
   resource: number;
   cooldowns: Map<string, number>;
+  charges: Map<string, { spent: number; cdMax: number }>;
   ccDr: Map<CrowdControlDrCategory, CrowdControlDrState>;
 }
 
@@ -807,6 +820,9 @@ export interface ResolvedAbility {
   threatFlat: number; // classic bonus threat on a successful use
   threatMult: number; // classic multiplier on this ability's damage-threat
   castWhileMoving?: boolean; // talent-granted mobility (def.castWhileMoving covers baseline)
+  damagePushbackImmune?: boolean; // talent-granted immunity to damage-driven cast pushback
+  charges?: number; // authored stored uses; undefined means one use
+  bonusCharges?: number; // talent-added uses, kept distinct from native maxCharges
 }
 
 export interface RewardCounters {
@@ -987,6 +1003,9 @@ export interface PlayerMeta {
   // change (recomputeTalents), never walked on the combat or stat hot path.
   talents: TalentAllocation;
   talentMods: TalentModifiers;
+  // Battle Rhythm's every-third-ability counter. Session-only: a new login
+  // starts a fresh rhythm and persistence never needs to migrate it.
+  abilityRhythm: number;
   // 2v2 Fiesta (session-only, never persisted). `fiestaAugments` is the ordered
   // list of augment ids picked this bout; `fiestaMods` is talentMods with those
   // augments folded in (the effective modifier the stat/ability hot paths use
@@ -1094,6 +1113,9 @@ export interface AwayStatus {
 // are optional so characters saved before the Ashen Coliseum existed load
 // cleanly (addPlayer falls back to the unranked defaults).
 export interface CharacterState {
+  // Production content migration revision. Revision 1 is the v0.26 all-class
+  // Talents V2 migration; absent means a pre-v0.26 character JSONB save.
+  contentRevision?: number;
   level: number;
   xp: number;
   // Post-cap progression. All optional so characters saved before the Max-Level
@@ -1166,8 +1188,8 @@ export interface CharacterState {
   vcupBetWins?: number;
   vcupBetLosses?: number;
   vcupBetNet?: number;
-  // Talents & Specializations (JSONB; no schema migration). All optional so
-  // characters saved before talents existed load cleanly (default: no points spent).
+  // Talents & Specializations (JSONB). All optional so characters saved before
+  // talents existed load cleanly; contentRevision owns point-tree -> row migration.
   talents?: TalentAllocation;
   loadouts?: SavedLoadout[];
   activeLoadout?: number;
@@ -1837,7 +1859,9 @@ export class Sim {
       bankBonus?: { bonusSlots: number; sources: BankBonusSource[] };
     },
   ): number {
-    const savedState = opts?.state ? sanitizeRemovedZone1Content(opts.state).state : undefined;
+    const savedState = opts?.state
+      ? sanitizeRemovedZone1Content(migrateCharacterTalentsV2(cls, opts.state)).state
+      : undefined;
     // Characters saved inside a dungeon instance rejoin at its entrance —
     // their old instance is gone (or belongs to someone else) by now.
     let savedPos = savedState?.pos ?? null;
@@ -1888,7 +1912,11 @@ export class Sim {
       bankBonusSources: [],
       vendorBuyback: [],
       copper: 0,
-      equipment: { mainhand: classDef.startWeapon, chest: classDef.startChest },
+      equipment: {
+        mainhand: classDef.startWeapon,
+        chest: classDef.startChest,
+        ...(classDef.startOffhand ? { offhand: classDef.startOffhand } : {}),
+      },
       equipmentInstance: {},
       xp: 0,
       lifetimeXp: 0,
@@ -1929,6 +1957,7 @@ export class Sim {
       vcupBetNet: savedState?.vcupBetNet ?? 0,
       talents: emptyAllocation(),
       talentMods: emptyModifiers(),
+      abilityRhythm: 0,
       fiestaAugments: [],
       fiestaMods: null,
       fiestaSpecial: {},
@@ -2039,22 +2068,10 @@ export class Sim {
         // verbatim on load, so without this an over-budget, prereq-broken, or gated
         // build (stale tuning, a level-down, or a tampered save) would still grant
         // its stats/abilities. An honest in-budget build is returned unchanged.
-        meta.talents = repairAllocation(
-          cls,
-          {
-            spec: s.talents.spec ?? null,
-            ranks: { ...s.talents.ranks },
-            choices: { ...s.talents.choices },
-          },
-          talentPointsAtLevel(player.level),
-        );
-      if (s.loadouts)
-        meta.loadouts = s.loadouts.map((l) => ({
-          name: l.name,
-          alloc: cloneAllocation(l.alloc),
-          bar: [...(l.bar ?? [])],
-        }));
-      if (typeof s.activeLoadout === 'number') meta.activeLoadout = s.activeLoadout;
+        meta.talents = repairAllocation(cls, s.talents, player.level);
+      const repairedLoadouts = repairTalentLoadouts(cls, player.level, s.loadouts, s.activeLoadout);
+      meta.loadouts = repairedLoadouts.loadouts;
+      meta.activeLoadout = repairedLoadouts.activeLoadout;
       if (s.raidLockouts) {
         const now = this.lockoutNowMs();
         for (const [dungeonId, until] of Object.entries(s.raidLockouts)) {
@@ -2137,7 +2154,14 @@ export class Sim {
     player.swingTimer = 0;
     // Restore ability/potion cooldowns so a relog cannot reset them (see
     // cooldown_persist.ts). Re-anchored to this sim's clock; a fresh character has none.
-    player.potionCooldownUntil = applyCooldowns(savedState?.cooldowns, player.cooldowns, this.time);
+    const restoredCharges = new Map<string, { spent: number; cdMax: number }>();
+    player.potionCooldownUntil = applyCooldowns(
+      savedState?.cooldowns,
+      player.cooldowns,
+      this.time,
+      restoredCharges,
+    );
+    if (restoredCharges.size > 0) player.charges = restoredCharges;
     // Re-derive the display copy from the restored authority; otherwise a relog inside
     // the shared potion cooldown paints the action bar as READY (no swipe) while the
     // use-gate (which reads potionCooldownUntil) still rejects the quaff.
@@ -2373,6 +2397,7 @@ export class Sim {
     // delvePetStash fallback; known/sportRole are session-derived, not saved.
     const cupReturn = valeCupMod.vcupReturnFor(this.ctx, pid);
     const state: CharacterState = {
+      contentRevision: CURRENT_CHARACTER_CONTENT_REVISION,
       level: restore ? restore.level : e.level,
       xp: restore ? restore.xp : meta.xp,
       lifetimeXp: meta.lifetimeXp,
@@ -2479,7 +2504,7 @@ export class Sim {
         [...meta.raidLockouts].filter(([, until]) => until > this.lockoutNowMs()),
       ),
       pet: petCommands.isDemonPetState(petSnapshot) ? null : petSnapshot,
-      cooldowns: serializeCooldowns(e.cooldowns, e.potionCooldownUntil, this.time),
+      cooldowns: serializeCooldowns(e.cooldowns, e.potionCooldownUntil, this.time, e.charges),
       skin: meta.skin,
       skinCatalog: meta.skinCatalog,
       pendingSkinRank: meta.pendingSkinRank,
@@ -2962,7 +2987,7 @@ export class Sim {
   }
 
   playerGcdFor(cls: PlayerClass): number {
-    return cls === 'rogue' ? 1.0 : GCD; // rogue GCD is 1.0 sec
+    return usesFastGcd(cls) ? 1.0 : GCD;
   }
   get playerGcd(): number {
     return this.playerGcdFor(this.primary.cls);
@@ -3544,6 +3569,7 @@ export class Sim {
         sim.unlockMechChromaFromItem(meta, itemId, chromaId),
       openSkinSelect: (meta, catalog, itemId) => sim.openSkinSelect(meta, catalog, itemId),
       isSwimming: (e) => sim.isSwimming(e),
+      revalidateOffhandForSpec: (pid) => items.revalidateOffhandForSpec(sim.ctx, pid),
       // Interaction (W3): the moved interaction.interact dispatches into the quest-NPC
       // surface that STAYS on Sim (W4 owns talkToNpc / interactNpcForQuests /
       // isQuestInteractionEntity). Late-bound arrows (call-time lookup, not `.bind`d) so
@@ -3701,6 +3727,10 @@ export class Sim {
     return this.markTalentDeeds(setTalentSpec(this.ctx, specId, pid), pid);
   }
 
+  selectTalentRow(level: TalentRowLevel, optionId: string | null, pid?: number): boolean {
+    return this.markTalentDeeds(selectTalentRowImpl(this.ctx, level, optionId, pid), pid);
+  }
+
   // Free respec (out of combat): wipe all talent points. Spec is retained.
   respec(pid?: number): boolean {
     return this.markTalentDeeds(respecTalents(this.ctx, pid), pid);
@@ -3757,9 +3787,17 @@ export class Sim {
     // checks/spends read, so the affordability check and the spend stay in
     // lockstep. Return a shallow copy so the cached known-list entry is never
     // mutated.
+    let cost = found.cost;
+    if (
+      cost > 0 &&
+      this.playerMods(r.meta).spec === 'arms' &&
+      r.meta.known.some((known) => known.def.id === 'measured_fury' && known.def.passive)
+    ) {
+      cost = Math.max(0, Math.round(cost * 0.9));
+    }
     const tax = this.costTaxMult(r.e);
-    if (tax > 1 && found.cost > 0) return { ...found, cost: Math.ceil(found.cost * tax) };
-    return found;
+    if (tax > 1 && cost > 0) cost = Math.ceil(cost * tax);
+    return cost === found.cost ? found : { ...found, cost };
   }
 
   // Highest active cost_tax aura, expressed as a cost multiplier (1 = no tax).
@@ -3810,6 +3848,7 @@ export class Sim {
       const p = this.entities.get(meta.entityId);
       if (!p) continue;
       if (!p.dead) {
+        ensureWarriorStance(this.ctx, p, meta);
         this.updatePlayerMovement(p, meta);
         lap?.('p.move');
         this.updateDoorTriggers(p);
@@ -4107,7 +4146,7 @@ export class Sim {
   swingIntervalMult(e: Entity): number {
     let m = 1;
     for (const a of e.auras) {
-      if (a.kind === 'attackspeed') m *= a.value;
+      if (a.kind === 'attackspeed' || a.kind === 'sanguine') m *= a.value;
       if (a.kind === 'buff_haste') m /= a.value;
     }
     // Enrage frenzy: an enraged mob swings faster (mirrors the inline dmgMult
@@ -4262,6 +4301,7 @@ export class Sim {
     ) {
       meta.lastActiveTick = this.tickCount;
     }
+    if (advanceHeroicLeap(this.ctx, p)) return;
     if (this.updateChargeMovement(p)) return;
     if (this.updateFollowMovement(p, meta)) return;
     if (this.updateFearMovement(p)) return;
@@ -4438,8 +4478,14 @@ export class Sim {
     return critVulnBonusImpl(this.ctx, target);
   }
 
-  private applyHeal(source: Entity, target: Entity, amount: number, ability: string): void {
-    applyHealImpl(this.ctx, source, target, amount, ability);
+  private applyHeal(
+    source: Entity,
+    target: Entity,
+    amount: number,
+    ability: string,
+    abilityId?: string | null,
+  ): void {
+    applyHealImpl(this.ctx, source, target, amount, ability, abilityId);
   }
 
   private healingThreat(source: Entity, target: Entity, healed: number): void {
@@ -4825,9 +4871,14 @@ export class Sim {
     abilityName: string | null,
     opts: {
       cannotBeDodged?: boolean;
+      weapon?: Entity['weapon'];
       weaponMult?: number;
+      apSwingSpeed?: number;
       threatFlat?: number;
       threatMult?: number;
+      forceCrit?: boolean;
+      onDealt?: (amount: number) => void;
+      whiteDualWieldPenalty?: boolean;
     },
   ): boolean {
     return meleeSwingImpl(this.ctx, attacker, target, bonus, abilityName, opts);
@@ -4850,6 +4901,7 @@ export class Sim {
     direct = true,
     attackAnimationStarted = false,
     alreadyFinal = false,
+    abilityId: string | null = null,
   ): void {
     dealDamageImpl(
       this.ctx,
@@ -4865,6 +4917,7 @@ export class Sim {
       direct,
       attackAnimationStarted,
       alreadyFinal,
+      abilityId,
     );
   }
 
@@ -5125,6 +5178,7 @@ export class Sim {
   mobSwing(mob: Entity, target: Entity): void {
     const missChance = swingMissChance(mob, target);
     const dodgeChance = target.kind === 'player' ? target.dodgeChance : 0.05;
+    const { parryChance, blockChance } = warriorMeleeDefense(target, mob);
     const roll = this.rng.next();
     if (roll < missChance) {
       this.emit({
@@ -5150,6 +5204,21 @@ export class Sim {
         ability: null,
         kind: 'dodge',
       });
+      this.tryRevengeFree(target);
+      return;
+    }
+    if (roll < missChance + dodgeChance + parryChance) {
+      this.emit({
+        type: 'damage',
+        sourceId: mob.id,
+        targetId: target.id,
+        amount: 0,
+        crit: false,
+        school: 'physical',
+        ability: null,
+        kind: 'parry',
+      });
+      this.tryRevengeFree(target);
       return;
     }
     let dmg =
@@ -5162,9 +5231,33 @@ export class Sim {
     dmg *= this.petDamageMult(mob);
     const rawDmg = dmg; // pre-armor, post-crit/enrage — basis for cleave splash
     dmg *= 1 - armorReduction(this.effectiveArmor(target), mob.level);
+    if (blockChance > 0 && roll < missChance + dodgeChance + parryChance + blockChance) {
+      dmg = Math.max(1, dmg - target.blockValue);
+    }
     const dealt = Math.max(1, Math.round(dmg));
     this.dealDamage(mob, target, dealt, crit, 'physical', null, 'hit');
     runMobSwingAffixes(this.ctx, mob, target, { dealt, crit, rawDmg });
+  }
+
+  private tryRevengeFree(target: Entity): void {
+    if (target.kind !== 'player') return;
+    const meta = this.players.get(target.id);
+    if (
+      !meta?.known.some((known) => known.def.id === 'revenge') ||
+      !this.rng.chance(REVENGE_FREE_CHANCE)
+    ) {
+      return;
+    }
+    this.applyAura(target, {
+      id: 'revenge_free',
+      name: 'Revenge!',
+      kind: 'revenge_free',
+      remaining: REVENGE_FREE_DURATION,
+      duration: REVENGE_FREE_DURATION,
+      value: 0,
+      sourceId: target.id,
+      school: 'physical',
+    });
   }
 
   // Recompute a player victim's derived stats after the Devour Magic cascade in

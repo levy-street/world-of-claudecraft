@@ -24,8 +24,9 @@ import type {
 // Archetype class-locks (match content/items.ts so REWARD_ARCHETYPE hand-offs
 // land on an item the whole group can equip).
 const WAR: PlayerClass[] = ['warrior', 'paladin', 'shaman'];
+const WAR_WEAPON: PlayerClass[] = ['warrior', 'paladin', 'shaman', 'swordmaster'];
 const MAG: PlayerClass[] = ['mage', 'priest', 'warlock', 'druid'];
-const ROG: PlayerClass[] = ['rogue', 'hunter'];
+const ROG: PlayerClass[] = ['rogue', 'hunter', 'swordmaster'];
 
 // The moongate sits on the south shore of the Glimmermere tarn (-70, 760) in
 // Thornpeak Heights; the surface camp and Ondrel cluster just south of it.
@@ -542,7 +543,7 @@ export const TEMPLE_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 17, max: 28, speed: 2.4 },
     stats: { str: 5, sta: 2 },
     sellValue: 700,
-    requiredClass: WAR,
+    requiredClass: WAR_WEAPON,
   },
   palecoil_rod: {
     id: 'palecoil_rod',
@@ -610,7 +611,7 @@ export const TEMPLE_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 24, max: 38, speed: 2.6 },
     stats: { str: 8, sta: 4 },
     sellValue: 2200,
-    requiredClass: WAR,
+    requiredClass: WAR_WEAPON,
   },
   drownedmoon_scepter: {
     id: 'drownedmoon_scepter',

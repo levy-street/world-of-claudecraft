@@ -19,6 +19,8 @@ export interface SavedCooldowns {
   abilities?: Record<string, number>;
   /** remaining seconds on the shared combat-potion cooldown (#103) */
   potion?: number;
+  /** abilityId -> sequential-recharge state for native multi-charge abilities */
+  charges?: Record<string, { spent: number; cdMax: number }>;
 }
 
 const positive = (n: number): boolean => Number.isFinite(n) && n > 0;
@@ -29,6 +31,7 @@ export function serializeCooldowns(
   cooldowns: Map<string, number>,
   potionCooldownUntil: number,
   now: number,
+  chargeStates?: ReadonlyMap<string, { spent: number; cdMax: number }>,
 ): SavedCooldowns | undefined {
   const abilities: Record<string, number> = {};
   for (const [id, remaining] of cooldowns) {
@@ -38,7 +41,21 @@ export function serializeCooldowns(
   const out: SavedCooldowns = {};
   if (Object.keys(abilities).length > 0) out.abilities = abilities;
   if (positive(potion)) out.potion = potion;
-  return out.abilities || out.potion !== undefined ? out : undefined;
+  if (chargeStates) {
+    const charges: Record<string, { spent: number; cdMax: number }> = {};
+    for (const [id, state] of chargeStates) {
+      if (
+        cooldowns.has(id) &&
+        Number.isInteger(state.spent) &&
+        state.spent > 0 &&
+        positive(state.cdMax)
+      ) {
+        charges[id] = { spent: state.spent, cdMax: state.cdMax };
+      }
+    }
+    if (Object.keys(charges).length > 0) out.charges = charges;
+  }
+  return out.abilities || out.potion !== undefined || out.charges ? out : undefined;
 }
 
 /** Re-anchor a saved snapshot onto a fresh entity's (empty) cooldown map at the
@@ -49,11 +66,24 @@ export function applyCooldowns(
   saved: SavedCooldowns | undefined,
   cooldowns: Map<string, number>,
   now: number,
+  chargeStates?: Map<string, { spent: number; cdMax: number }>,
 ): number {
   if (!saved) return -1;
   if (saved.abilities) {
     for (const [id, remaining] of Object.entries(saved.abilities)) {
       if (positive(remaining)) cooldowns.set(id, remaining);
+    }
+  }
+  if (saved.charges && chargeStates) {
+    for (const [id, state] of Object.entries(saved.charges)) {
+      if (
+        cooldowns.has(id) &&
+        Number.isInteger(state.spent) &&
+        state.spent > 0 &&
+        positive(state.cdMax)
+      ) {
+        chargeStates.set(id, { spent: state.spent, cdMax: state.cdMax });
+      }
     }
   }
   return positive(saved.potion ?? -1) ? now + (saved.potion as number) : -1;

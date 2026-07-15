@@ -22,12 +22,14 @@ function teleport(sim: Sim, pid: number, x: number, z: number) {
 function queueDuo(
   aClass: PlayerClass = 'warrior',
   bClass: PlayerClass = 'mage',
+  beforeQueue?: (sim: Sim, a: number, b: number) => void,
 ): { sim: Sim; a: number; b: number } {
   const sim = makeWorld();
   const a = sim.addPlayer(aClass, 'Aleph');
   const b = sim.addPlayer(bClass, 'Bet');
   teleport(sim, a, 0, -40);
   teleport(sim, b, 6, -40);
+  beforeQueue?.(sim, a, b);
   sim.arenaQueueJoin(a);
   sim.arenaQueueJoin(b);
   sim.tick(); // updateArena() matchmakes the pair
@@ -632,9 +634,18 @@ describe('arena: class ability target filters', () => {
     cls: PlayerClass;
     ability: string;
     level: number;
+    beforeQueue?: (sim: Sim, pid: number) => void;
     setup?: (sim: Sim, pid: number) => void;
   }> = [
-    { cls: 'warrior', ability: 'thunder_clap', level: 20 },
+    {
+      cls: 'warrior',
+      ability: 'thunder_clap',
+      level: 20,
+      beforeQueue: (sim, pid) => {
+        sim.setPlayerLevel(20, pid);
+        expect(sim.setSpec('prot', pid)).toBe(true);
+      },
+    },
     { cls: 'mage', ability: 'arcane_explosion', level: 20 },
     { cls: 'paladin', ability: 'consecration', level: 20 },
     {
@@ -654,18 +665,19 @@ describe('arena: class ability target filters', () => {
     cls,
     ability,
     level,
+    beforeQueue,
     setup,
   }) => {
-    const { sim, a, b } = queueDuo(cls, 'warrior');
-    startBout(sim);
+    const { sim, a, b } = queueDuo(cls, 'warrior', (world, a) => beforeQueue?.(world, a));
     const caster = sim.entities.get(a)!;
     const target = sim.entities.get(b)!;
     sim.setPlayerLevel(level, a);
     sim.setPlayerLevel(level, b);
+    setup?.(sim, a);
+    startBout(sim);
     teleport(sim, b, caster.pos.x, caster.pos.z + 3);
     caster.resource = caster.maxResource;
     caster.gcdRemaining = 0;
-    setup?.(sim, a);
 
     const startHp = target.hp;
     sim.castAbility(ability, a);

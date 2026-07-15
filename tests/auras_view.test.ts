@@ -103,7 +103,7 @@ describe('createAurasView: derivation per mode', () => {
   it("mode 'all' keeps every aura; mode 'debuffs' keeps only debuffs", () => {
     const auras = [
       aura({ id: 'might', kind: 'buff_ap', value: 50 }),
-      aura({ id: 'rend', kind: 'dot', value: 5 }),
+      aura({ id: 'deep_wounds', kind: 'dot', value: 5 }),
       aura({ id: 'sunder', kind: 'sunder', value: 0, stacks: 3 }),
     ];
     const all = createAurasView('all', deps()).tick(entity(auras));
@@ -111,7 +111,7 @@ describe('createAurasView: derivation per mode', () => {
 
     const debuffs = createAurasView('debuffs', deps()).tick(entity(auras));
     expect(debuffs.count).toBe(2);
-    expect(debuffs.slots.slice(0, 2).map((s) => s.key)).toEqual(['rend', 'sunder']);
+    expect(debuffs.slots.slice(0, 2).map((s) => s.key)).toEqual(['deep_wounds', 'sunder']);
   });
 
   it('emits one slot PER aura even when two share an id (no core-side dedup)', () => {
@@ -132,16 +132,23 @@ describe('createAurasView: derivation per mode', () => {
   it('derives icon key, debuff flag, duration text, stacks text, name, and remaining', () => {
     const state = createAurasView('all', deps()).tick(
       entity([
-        aura({ id: 'rend', name: 'Rend', kind: 'dot', remaining: 4.2, value: 5, stacks: 5 }),
+        aura({
+          id: 'deep_wounds',
+          name: 'Gaping Wounds',
+          kind: 'dot',
+          remaining: 4.2,
+          value: 5,
+          stacks: 5,
+        }),
       ]),
     );
     const s = state.slots[0];
-    expect(s.key).toBe('rend');
-    expect(s.iconKey).toBe('rend');
+    expect(s.key).toBe('deep_wounds');
+    expect(s.iconKey).toBe('deep_wounds');
     expect(s.isDebuff).toBe(true);
     expect(s.durationText).toBe('5s'); // ceil(4.2) = 5
     expect(s.stacksText).toBe('5');
-    expect(s.name).toBe('name:Rend');
+    expect(s.name).toBe('name:Gaping Wounds');
     expect(s.remaining).toBe(4.2);
   });
 
@@ -150,7 +157,7 @@ describe('createAurasView: derivation per mode', () => {
       entity([
         aura({ id: 'venom', kind: 'dot', school: 'nature' }),
         // No school on the aura (the wire omits 'physical') -> the physical fallback.
-        aura({ id: 'rend', kind: 'dot' }),
+        aura({ id: 'deep_wounds', kind: 'dot' }),
         // A buff never tints: school stays '' even when the aura carries one.
         aura({ id: 'might', kind: 'buff_ap', value: 50, school: 'holy' }),
       ]),
@@ -244,7 +251,10 @@ describe('createAurasView: derivation per mode', () => {
   it('is deterministic: identical inputs produce deep-equal slot state', () => {
     const build = () => {
       const state = createAurasView('all', deps()).tick(
-        entity([aura({ id: 'might', value: 50 }), aura({ id: 'rend', kind: 'dot', value: 5 })]),
+        entity([
+          aura({ id: 'might', value: 50 }),
+          aura({ id: 'deep_wounds', kind: 'dot', value: 5 }),
+        ]),
       );
       // Snapshot the PRIMITIVE fields (the slots are reused objects, so deep-compare
       // values, never the slot references).
@@ -296,14 +306,20 @@ describe('Sim-shaped and ClientWorld-mirror-shaped auras derive identically', ()
     // online mirror presents stacks:undefined where the Sim presents stacks:1. Both must
     // render no stacks badge and otherwise identical state.
     const simShaped = aura({
-      id: 'rend',
-      name: 'Rend',
+      id: 'deep_wounds',
+      name: 'Gaping Wounds',
       kind: 'dot',
       remaining: 6,
       value: 5,
       stacks: 1,
     });
-    const clientShaped = aura({ id: 'rend', name: 'Rend', kind: 'dot', remaining: 6, value: 5 });
+    const clientShaped = aura({
+      id: 'deep_wounds',
+      name: 'Gaping Wounds',
+      kind: 'dot',
+      remaining: 6,
+      value: 5,
+    });
     const fromSim = createAurasView('all', deps()).tick(entity([simShaped])).slots[0];
     const fromClient = createAurasView('all', deps()).tick(entity([clientShaped])).slots[0];
     expect({ ...fromClient }).toEqual({ ...fromSim });
@@ -367,7 +383,13 @@ describe('allocation budget (the reused-reference proxy)', () => {
       return view.tick(
         entity([
           aura({ id: 'might', value: 50, remaining: 30 - frame * 0.1 }),
-          aura({ id: 'rend', kind: 'dot', value: 5, remaining: 12 - frame * 0.05, stacks: frame }),
+          aura({
+            id: 'deep_wounds',
+            kind: 'dot',
+            value: 5,
+            remaining: 12 - frame * 0.05,
+            stacks: frame,
+          }),
         ]),
       );
     };

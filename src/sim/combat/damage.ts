@@ -17,17 +17,18 @@
 // not move.
 //
 // Crit/dodge/miss/armor are resolved UPSTREAM (meleeSwing/rangedSwing, C5): dealDamage
-// receives an already-mitigated integer. There is no parry and no separate overkill
-// calc (overkill is implicit via Math.max(0, hp - amount)).
+// receives an already-mitigated integer. Parry and block resolve upstream in the
+// shared melee hit tables; overkill is implicit via Math.max(0, hp - amount).
 //
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
 import { computeTalentModifiers } from '../content/talents';
-import { DELVES, GROUP_XP_BONUS, MOBS } from '../data';
+import { ABILITIES, DELVES, GROUP_XP_BONUS, ITEMS, MOBS } from '../data';
 import * as deedsMod from '../deeds';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
+import { weaponHand } from '../equipment_rules';
 import { pvpDamageMultiplier } from '../pvp';
 import { aurasSurvivingDeath } from '../resurrection';
 import type { PlayerMeta } from '../sim';
@@ -36,6 +37,7 @@ import { vcupBothSeated } from '../social/vale_cup';
 import { addThreat, clearThreat } from '../threat';
 import type { Entity } from '../types';
 import {
+  berserkerCritDamage,
   dist2d,
   FISHING_CAST_ID,
   isConsuming,
@@ -43,23 +45,38 @@ import {
   mobXpValue,
   NYTHRAXIS_BOSS_ID,
   PARTY_XP_RANGE,
+  rageConversion,
   rageFromDealing,
   rageFromTaking,
+  rageGenAuraMult,
+  STANCE_MASTERY_BATTLE_CRIT_DMG,
+  STANCE_MASTERY_GUARDED_CUT,
+  STANCE_MASTERY_GUARDED_HP_PCT,
   virtualLevel,
   xpForLevel,
 } from '../types';
 import { WORLD_BOSS_CORPSE_SECONDS, worldBossLootContributors } from '../world_boss';
+import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
 
 // How long a slain mob's corpse persists (seconds) before it is cleared. Sole user
 // is handleDeath, so the constant lives here with the death-domain code.
 const CORPSE_DURATION = 60;
 // Self attack-speed buff a wounded frenzyOnHit mob gains; sole user maybeFrenzyOnHit.
 const BLOOD_FRENZY_AURA_ID = 'blood_frenzy';
+const VICTORY_RUSH_WINDOW = 20;
+const PURSUIT_SPEED_DURATION = 6;
+const BLOODBATH_DURATION = 8;
+const BLOODBATH_MAX_STACKS = 5;
 
-// A handful of casts ignore classic-era spell pushback (e.g. ghost_wolf). Sole user is
-// the dealDamage pushback branch, so the predicate lives here with it.
-function ignoresDamagePushback(abilityId: string): boolean {
-  return abilityId === 'ghost_wolf';
+// Baseline uninterruptible casts and a resolved talent modifier can each block
+// classic-era damage pushback. The resolved check is player-only and reads the
+// same flat ability record as casting/tooltips; mobs fall back to authored defs.
+function ignoresDamagePushback(ctx: SimContext, target: Entity, abilityId: string): boolean {
+  return (
+    abilityId === 'ghost_wolf' ||
+    ABILITIES[abilityId]?.uninterruptible === true ||
+    ctx.resolvedAbility(abilityId, target.id)?.damagePushbackImmune === true
+  );
 }
 
 export function dealDamage(
@@ -84,6 +101,8 @@ export function dealDamage(
   // Weakening Hex) so they are not applied a second time. Target-side amps, absorb, death,
   // and events still run so the redirected hit lands normally on the pet.
   alreadyFinal = false,
+  // Stable content id for talent-proc filters. `ability` remains the display label.
+  abilityId: string | null = null,
 ): void {
   if (target.dead) return;
   if (target.gm || target.devGod) return; // GMs and /dev god are invulnerable (every damage path funnels here)
@@ -101,6 +120,20 @@ export function dealDamage(
   // marks real, non-fighting game masters). Draws no rng.
   if (source?.devGod && source.kind === 'player' && ctx.devCommands)
     amount = Math.round(amount * 100);
+
+  // Master Armorer is a live equipment condition, not a stat baked at talent
+  // recompute time. It applies to every school while the Arms warrior's current
+  // mainhand is two-handed. Redirected already-final damage skips source output
+  // modifiers so the same original hit cannot receive the mastery twice.
+  if (!alreadyFinal && source?.kind === 'player' && source.id !== target.id && amount > 0) {
+    const sourceMeta = ctx.players.get(source.id);
+    const twoHandPct = sourceMeta ? ctx.playerMods(sourceMeta).global.masteryTwoHandDmgPct : 0;
+    const mainhandId = sourceMeta?.equipment.mainhand;
+    const mainhand = mainhandId ? ITEMS[mainhandId] : undefined;
+    if (twoHandPct > 0 && mainhand?.kind === 'weapon' && weaponHand(mainhand) === 'twohand') {
+      amount = Math.round(amount * (1 + twoHandPct));
+    }
+  }
 
   // Defensive Stance, classic: deal 10% less, take 10% less (and +30% threat below)
   if (
@@ -157,11 +190,58 @@ export function dealDamage(
     if (vuln > 0) amount = Math.round(amount * (1 + vuln));
   }
 
+  // Breachmaker only sharpens the originating Warrior's attacks. It must not
+  // become a raid-wide vulnerability when another attacker hits the target.
+  if (source && amount > 0) {
+    let sourceVulnerability = 0;
+    for (const aura of target.auras) {
+      if (aura.kind === 'vuln_source' && aura.sourceId === source.id) {
+        sourceVulnerability += aura.value;
+      }
+    }
+    if (sourceVulnerability > 0) {
+      amount = Math.round(amount * (1 + sourceVulnerability));
+    }
+  }
+
   // Weakening Hex: a hexed source deals less damage (mirrors the healing cut in
   // applyHeal). Self-damage paths (source === target) are left untouched.
   if (!alreadyFinal && source && source.id !== target.id) {
     const hexMult = ctx.hexOutputMult(source);
     if (hexMult !== 1) amount = Math.round(amount * hexMult);
+  }
+
+  if (!alreadyFinal && source && source.id !== target.id && amount > 0) {
+    let damageDone = 0;
+    for (const aura of source.auras) {
+      if (
+        aura.kind === 'buff_dmg_done' ||
+        aura.kind === 'bloodbath' ||
+        aura.kind === 'buff_avatar' ||
+        aura.kind === 'enrage'
+      ) {
+        damageDone += aura.value;
+      } else if (aura.kind === 'sanguine') {
+        damageDone += aura.value2 ?? 0;
+      }
+    }
+    if (damageDone !== 0) amount = Math.round(amount * Math.max(0, 1 + damageDone));
+  }
+
+  if (source && source.id !== target.id && amount > 0) {
+    let reduction = 0;
+    for (const aura of target.auras) {
+      if (aura.kind === 'buff_dr' || aura.kind === 'die_by_sword') reduction += aura.value;
+    }
+    if (reduction > 0) amount = Math.round(amount * Math.max(0, 1 - reduction));
+  }
+
+  if (source && source.id !== target.id && amount > 0 && school === 'physical') {
+    let reduction = 0;
+    for (const aura of target.auras) {
+      if (aura.kind === 'buff_dr_phys') reduction += aura.value;
+    }
+    if (reduction > 0) amount = Math.round(amount * Math.max(0, 1 - reduction));
   }
 
   // Gloamveil Form (Shadowform): while in the form, the caster's SHADOW-school damage
@@ -180,6 +260,29 @@ export function dealDamage(
   if (crit && amount > 0 && source && source.id !== target.id) {
     const bonus = ctx.critVulnBonus(target);
     if (bonus > 0) amount = Math.round(amount * (1 + bonus));
+  }
+
+  // Berserker Stance increases the resolved critical hit without changing how
+  // that critical was rolled. The alreadyFinal guard keeps redirected damage
+  // from applying the source-side bonus a second time.
+  if (!alreadyFinal && crit && amount > 0 && source && source.id !== target.id) {
+    const bonus = berserkerCritDamage(source);
+    if (bonus > 0) amount = Math.round(amount * (1 + bonus));
+  }
+
+  if (
+    !alreadyFinal &&
+    crit &&
+    amount > 0 &&
+    ability !== null &&
+    source &&
+    source.id !== target.id &&
+    source.auras.some((aura) => aura.kind === 'battle_stance')
+  ) {
+    const sourceMeta = ctx.players.get(source.id);
+    if (sourceMeta && ctx.playerMods(sourceMeta).global.stanceMastery > 0) {
+      amount = Math.round(amount * (1 + STANCE_MASTERY_BATTLE_CRIT_DMG));
+    }
   }
 
   const sourcePlayer = ctx.pvpController(source);
@@ -207,6 +310,18 @@ export function dealDamage(
     if (cupMatch && vcupBothSeated(cupMatch, sourcePlayer.id, target.id)) amount = 0;
   }
 
+  if (
+    source &&
+    source.id !== target.id &&
+    amount >= target.maxHp * STANCE_MASTERY_GUARDED_HP_PCT &&
+    target.auras.some((aura) => aura.kind === 'defensive_stance')
+  ) {
+    const targetMeta = ctx.players.get(target.id);
+    if (targetMeta && ctx.playerMods(targetMeta).global.stanceMastery > 0) {
+      amount = Math.round(amount * (1 - STANCE_MASTERY_GUARDED_CUT));
+    }
+  }
+
   // absorb shields soak damage first
   if (amount > 0) {
     for (let i = target.auras.length - 1; i >= 0 && amount > 0; i--) {
@@ -218,6 +333,10 @@ export function dealDamage(
       if (a.value <= 0) {
         target.auras.splice(i, 1);
         ctx.emit({ type: 'aura', targetId: target.id, name: a.name, gained: false });
+        const shielder = ctx.entities.get(a.sourceId);
+        if (shielder && !shielder.dead && shielder.kind === 'player') {
+          onShieldConsumed(ctx, shielder, a.id, target);
+        }
       }
     }
   }
@@ -423,6 +542,34 @@ export function dealDamage(
     }
   }
 
+  // Deterministic row talent: a lethal hit leaves the player at 1 HP, then
+  // arms the authored internal cooldown. Ranked eliminations above remain
+  // authoritative and intentionally bypass this world-combat save.
+  if (target.kind === 'player' && amount >= target.hp && !target.dead) {
+    const meta = ctx.players.get(target.id);
+    const icd = meta ? ctx.playerMods(meta).global.cheatDeathIcd : 0;
+    if (icd > 0) {
+      if (!target.procState) target.procState = { counters: {}, icds: {} };
+      if (target.procState.icds.cheat_death === undefined) {
+        target.procState.icds.cheat_death = icd;
+        amount = Math.max(0, target.hp - 1);
+        ctx.emit({
+          type: 'spellfx',
+          sourceId: target.id,
+          targetId: target.id,
+          school: 'holy',
+          fx: 'wardBloom',
+        });
+        ctx.emit({
+          type: 'log',
+          pid: target.id,
+          text: 'A deathward saves you!',
+          color: '#ffd100',
+        });
+      }
+    }
+  }
+
   // A Protect Yumi cat: the yumi module owns the clamp, the sudden-death
   // taken-multiplier, tiebreak bookkeeping, and win detection. Amps and
   // absorb shields already resolved above, so a shielded cat soaks first.
@@ -465,14 +612,42 @@ export function dealDamage(
       target.damageIdleDespawnTimer = DAMAGE_IDLE_DESPAWN_SECONDS;
     }
     for (let i = target.auras.length - 1; i >= 0; i--) {
-      if (target.auras[i].breaksOnDamage) {
+      const breakable = target.auras[i];
+      if (breakable.breaksOnDamage) {
+        if (breakable.breakThreshold !== undefined && breakable.breakThreshold > amount) {
+          breakable.breakThreshold -= amount;
+          continue;
+        }
         ctx.emit({
           type: 'aura',
           targetId: target.id,
-          name: target.auras[i].name,
+          name: breakable.name,
           gained: false,
         });
         target.auras.splice(i, 1);
+      }
+    }
+  }
+
+  // A proc echo fires once its carrier falls below the stored health fraction.
+  // The heal is source-owned and consumes no RNG.
+  if (amount > 0 && !target.dead && target.maxHp > 0) {
+    for (let i = target.auras.length - 1; i >= 0; i--) {
+      const aura = target.auras[i];
+      if (aura.kind !== 'heal_echo') continue;
+      if (target.hp >= target.maxHp * (aura.value2 ?? 0)) continue;
+      target.auras.splice(i, 1);
+      ctx.emit({ type: 'aura', targetId: target.id, name: aura.name, gained: false });
+      const healer = ctx.entities.get(aura.sourceId);
+      if (healer && !healer.dead) {
+        ctx.applyHeal(healer, target, aura.value, aura.name);
+        ctx.emit({
+          type: 'spellfx',
+          sourceId: aura.sourceId,
+          targetId: target.id,
+          school: aura.school,
+          fx: 'echoBurst',
+        });
       }
     }
   }
@@ -553,20 +728,41 @@ export function dealDamage(
   if (source && source.kind === 'player' && source.id !== target.id) {
     const meta = ctx.players.get(source.id);
     if (meta) meta.counters.damageDealt += amount;
+    if (crit && school !== 'physical' && ability) {
+      onSpellCrit(ctx, source, abilityId, target);
+    }
     if (source.resourceType === 'rage' && !noRage && school === 'physical' && !ability) {
+      const isWarrior = meta?.cls === 'warrior';
+      const seasonedCrit =
+        isWarrior &&
+        crit &&
+        ctx.playerMods(meta).spec === 'arms' &&
+        meta.known.some((known) => known.def.id === 'seasoned_soldier' && known.def.passive)
+          ? 1.1
+          : 1;
+      const baseRage = isWarrior
+        ? (9 * amount) / rageConversion(source.level)
+        : rageFromDealing(amount, source.level);
+      const talentMult = isWarrior ? 1 + ctx.playerMods(meta).global.autoRagePct : 1;
       source.resource = Math.min(
         source.maxResource,
-        source.resource + rageFromDealing(amount, source.level),
+        source.resource +
+          baseRage * (isWarrior ? talentMult * rageGenAuraMult(source) * seasonedCrit : 1),
       );
     }
   }
   if (target.kind === 'player') {
     const meta = ctx.players.get(target.id);
     if (meta) meta.counters.damageTaken += amount;
+    if (amount > 0 && !target.dead) onDamageTaken(ctx, target, amount);
     if (target.resourceType === 'rage' && source && source.id !== target.id) {
+      const isWarrior = meta?.cls === 'warrior';
+      const baseRage = isWarrior
+        ? amount / Math.max(1, source.level)
+        : rageFromTaking(amount, source.level);
       target.resource = Math.min(
         target.maxResource,
-        target.resource + rageFromTaking(amount, source.level),
+        target.resource + baseRage * (isWarrior ? rageGenAuraMult(target) : 1),
       );
     }
     if (isConsuming(target)) {
@@ -584,7 +780,7 @@ export function dealDamage(
       kind === 'hit'
     ) {
       if (target.castingAbility === FISHING_CAST_ID) ctx.cancelCast(target);
-      else if (!ignoresDamagePushback(target.castingAbility)) ctx.pushbackCast(target);
+      else if (!ignoresDamagePushback(ctx, target, target.castingAbility)) ctx.pushbackCast(target);
     }
   }
 
@@ -698,6 +894,7 @@ function reflectSpellWard(
 }
 
 export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): void {
+  resetProcState(e);
   e.dead = true;
   e.hp = 0;
   ctx.clearNonPlayerStatAuras(e);
@@ -741,6 +938,7 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     e.autoAttack = false;
     e.queuedOnSwing = null;
     delete e.queuedOnSwingFree;
+    delete e.queuedOnSwingCostMultiplier;
     e.queuedCastAbility = null;
     e.queuedCastAim = null;
     e.comboPoints = 0;
@@ -749,6 +947,7 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     e.sitting = false;
     e.chargeTargetId = null;
     e.chargePath = [];
+    if (e.leap !== undefined) e.leap = null;
     e.followTargetId = null;
     ctx.emit({ type: 'playerDeath', pid: e.id });
     for (const m of ctx.entities.values()) {
@@ -900,6 +1099,64 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
 
       meta.counters.kills++;
       if (creditEntity.targetId === e.id) creditEntity.autoAttack = false;
+      if (!creditEntity.dead) {
+        const killMods = ctx.playerMods(meta).global;
+        if (killMods.onKillSpeedPct > 0) {
+          ctx.applyAura(creditEntity, {
+            id: 'pursuit',
+            name: 'Pursuit',
+            kind: 'buff_speed',
+            value: 1 + killMods.onKillSpeedPct,
+            remaining: PURSUIT_SPEED_DURATION,
+            duration: PURSUIT_SPEED_DURATION,
+            sourceId: creditEntity.id,
+            school: 'physical',
+          });
+        }
+        if (killMods.bloodbathPct > 0) {
+          const existing = creditEntity.auras.find((aura) => aura.kind === 'bloodbath');
+          if (existing) {
+            existing.stacks = Math.min(BLOODBATH_MAX_STACKS, (existing.stacks ?? 1) + 1);
+            existing.value = killMods.bloodbathPct * existing.stacks;
+            existing.remaining = BLOODBATH_DURATION;
+            existing.duration = BLOODBATH_DURATION;
+          } else {
+            ctx.applyAura(creditEntity, {
+              id: 'bloodbath',
+              name: 'Bloodbath',
+              kind: 'bloodbath',
+              value: killMods.bloodbathPct,
+              remaining: BLOODBATH_DURATION,
+              duration: BLOODBATH_DURATION,
+              sourceId: creditEntity.id,
+              school: 'physical',
+              stacks: 1,
+            });
+          }
+          recalcPlayerStats(
+            creditEntity,
+            meta.cls,
+            meta.equipment,
+            ctx.playerMods(meta),
+            meta.equipmentInstance,
+          );
+        }
+      }
+      if (
+        meta.cls === 'warrior' &&
+        ctx.playerMods(meta).grants.some((grant) => grant.ability === 'victory_rush')
+      ) {
+        ctx.applyAura(creditEntity, {
+          id: 'victory_rush',
+          name: 'Victory Rush',
+          kind: 'victory_rush',
+          value: 0,
+          remaining: VICTORY_RUSH_WINDOW,
+          duration: VICTORY_RUSH_WINDOW,
+          sourceId: creditEntity.id,
+          school: 'physical',
+        });
+      }
       // combo points are character-bound: unspent points survive the kill and
       // carry to the next target (they fade on their own via updateComboExpiry)
       for (const member of eligible) {

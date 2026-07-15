@@ -139,24 +139,24 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Reaver Strike"
       },
       {
-        "id": "battle_shout",
-        "name": "Iron Bellow"
+        "id": "revenge",
+        "name": "Revenge"
       },
       {
-        "id": "commanding_shout",
-        "name": "Bolstering Cry"
+        "id": "battle_shout",
+        "name": "Iron Bellow"
       },
       {
         "id": "charge",
         "name": "Onrush"
       },
       {
-        "id": "rend",
-        "name": "Deep Gash"
-      },
-      {
         "id": "thunder_clap",
         "name": "Quaking Blow"
+      },
+      {
+        "id": "hamstring",
+        "name": "Hobbling Cut"
       }
     ],
     "abilities": [
@@ -165,20 +165,16 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Reaver Strike"
       },
       {
+        "id": "revenge",
+        "name": "Revenge"
+      },
+      {
         "id": "battle_shout",
         "name": "Iron Bellow"
       },
       {
-        "id": "commanding_shout",
-        "name": "Bolstering Cry"
-      },
-      {
         "id": "charge",
         "name": "Onrush"
-      },
-      {
-        "id": "rend",
-        "name": "Deep Gash"
       },
       {
         "id": "thunder_clap",
@@ -197,16 +193,72 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Redhand"
       },
       {
+        "id": "raging_gale",
+        "name": "Twinstrike"
+      },
+      {
+        "id": "raised_guard",
+        "name": "Raised Guard"
+      },
+      {
+        "id": "pummel",
+        "name": "Jawcrack"
+      },
+      {
         "id": "execute",
         "name": "Early Grave"
+      },
+      {
+        "id": "furious_mending",
+        "name": "Furious Mending"
+      },
+      {
+        "id": "iron_resolve",
+        "name": "Iron Resolve"
       },
       {
         "id": "slam",
         "name": "Brute Swing"
       },
       {
+        "id": "red_harvest",
+        "name": "Red Harvest"
+      },
+      {
+        "id": "whirlwind",
+        "name": "Bladed Gyre"
+      },
+      {
+        "id": "faultline",
+        "name": "Faultline"
+      },
+      {
+        "id": "heroic_leap",
+        "name": "Heroic Leap"
+      },
+      {
         "id": "cleave",
         "name": "Reaping Arc"
+      },
+      {
+        "id": "rallying_cry",
+        "name": "Valor Roar"
+      },
+      {
+        "id": "emboldening_roar",
+        "name": "Emboldening Roar"
+      },
+      {
+        "id": "defiant_bellow",
+        "name": "Defiant Bellow"
+      },
+      {
+        "id": "battle_stance",
+        "name": "Battle Stance"
+      },
+      {
+        "id": "berserker_stance",
+        "name": "Berserker Stance"
       },
       {
         "id": "defensive_stance",
@@ -217,6 +269,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Direhowl"
       },
       {
+        "id": "intimidating_shout",
+        "name": "Intimidating Shout"
+      },
+      {
         "id": "sunder_armor",
         "name": "Armor Shear"
       },
@@ -225,16 +281,139 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Goad"
       },
       {
-        "id": "pummel",
-        "name": "Jawcrack"
+        "id": "measured_fury",
+        "name": "Measured Fury"
       },
       {
-        "id": "ironhold",
-        "name": "Ironhold"
+        "id": "seasoned_soldier",
+        "name": "Seasoned Soldier"
+      },
+      {
+        "id": "sudden_death",
+        "name": "Sudden Death"
+      },
+      {
+        "id": "diabolical_twinstrike",
+        "name": "Diabolical Twinstrike"
+      },
+      {
+        "id": "cleaving_blows",
+        "name": "Cleaving Blows"
+      },
+      {
+        "id": "breachmaker",
+        "name": "Breachmaker"
+      },
+      {
+        "id": "sweeping_strikes",
+        "name": "Widening Arc"
+      },
+      {
+        "id": "deep_wounds",
+        "name": "Gaping Wounds"
+      },
+      {
+        "id": "enrage_passive",
+        "name": "Mayhem"
       }
     ],
     "model": "player_warrior",
     "still": "/guide-stills/player_warrior.webp"
+  },
+  {
+    "id": "swordmaster",
+    "color": "#22d3ee",
+    "resource": "energy",
+    "roles": [
+      "dps"
+    ],
+    "specs": [
+      {
+        "id": "tempest",
+        "name": "Tempest",
+        "role": "dps",
+        "signature": "blade_cyclone"
+      },
+      {
+        "id": "duelist",
+        "name": "Duelist",
+        "role": "dps",
+        "signature": "duelist_flurry"
+      },
+      {
+        "id": "azure_blade",
+        "name": "Azure Blade",
+        "role": "dps",
+        "signature": "azure_rush"
+      }
+    ],
+    "signatureAbilities": [
+      {
+        "id": "twin_slash",
+        "name": "Twin Slash"
+      },
+      {
+        "id": "crescent_sweep",
+        "name": "Crescent Sweep"
+      },
+      {
+        "id": "fleet_step",
+        "name": "Fleet Step"
+      },
+      {
+        "id": "sword_aura",
+        "name": "Sword Aura"
+      },
+      {
+        "id": "wind_lunge",
+        "name": "Wind Lunge"
+      },
+      {
+        "id": "parrying_flow",
+        "name": "Parrying Flow"
+      }
+    ],
+    "abilities": [
+      {
+        "id": "twin_slash",
+        "name": "Twin Slash"
+      },
+      {
+        "id": "crescent_sweep",
+        "name": "Crescent Sweep"
+      },
+      {
+        "id": "fleet_step",
+        "name": "Fleet Step"
+      },
+      {
+        "id": "sword_aura",
+        "name": "Sword Aura"
+      },
+      {
+        "id": "wind_lunge",
+        "name": "Wind Lunge"
+      },
+      {
+        "id": "parrying_flow",
+        "name": "Parrying Flow"
+      },
+      {
+        "id": "quickening",
+        "name": "Quickening"
+      },
+      {
+        "id": "blade_dance",
+        "name": "Blade Dance"
+      },
+      {
+        "id": "twin_finisher",
+        "name": "Twin Finisher"
+      }
+    ],
+    "model": "player_swordmaster",
+    "tint": "#22d3ee",
+    "still": "/guide-stills/player_swordmaster__22d3ee.webp"
   },
   {
     "id": "paladin",
@@ -452,7 +631,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "revive_pet",
-        "name": "Revive Pet"
+        "name": "Patch Up"
       },
       {
         "id": "aspect_of_the_monkey",
@@ -1963,7 +2142,7 @@ export const GUIDE_DEEDS: GuideDeed[] = [
   },
   {
     "id": "prog_full_build",
-    "name": "The Full Eleven",
+    "name": "The Full Six",
     "category": "progression",
     "renown": 25,
     "feat": false,
@@ -3389,8 +3568,31 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
       {
         "url": "models/weapons/sword_1handed.glb",
         "bone": "handslot.r"
+      },
+      {
+        "url": "models/weapons/shield_round.glb",
+        "bone": "handslot.l"
       }
     ]
+  },
+  "player_swordmaster": {
+    "url": "models/chars/players/rogue.glb",
+    "idle": "Idle",
+    "height": 2.6,
+    "show": [
+      "Rogue_Cape"
+    ],
+    "attach": [
+      {
+        "url": "models/weapons/sword_1handed.glb",
+        "bone": "handslot.r"
+      },
+      {
+        "url": "models/weapons/sword_1handed.glb",
+        "bone": "handslot.l"
+      }
+    ],
+    "tintStrength": 0.38
   },
   "player_paladin": {
     "url": "models/chars/players/paladin.glb",
@@ -3400,6 +3602,10 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
       {
         "url": "models/weapons/axe_1handed.glb",
         "bone": "handslot.r"
+      },
+      {
+        "url": "models/weapons/shield_square.glb",
+        "bone": "handslot.l"
       }
     ]
   },
@@ -3456,6 +3662,10 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
       {
         "url": "models/weapons/axe_1handed.glb",
         "bone": "handslot.r"
+      },
+      {
+        "url": "models/weapons/shield_round.glb",
+        "bone": "handslot.l"
       }
     ],
     "tintStrength": 0.4

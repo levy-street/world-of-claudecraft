@@ -2,6 +2,11 @@ import { existsSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 import {
+  KAYKIT_SHIELD_ACCESSORIES,
+  KAYKIT_SHIELD_GRIPS,
+} from '../src/render/characters/held_item_grips';
+import {
+  itemOffhandModelUrl,
   itemWeaponModelUrl,
   manifestUrls,
   mechHeldWeaponOverride,
@@ -29,9 +34,78 @@ describe('held weapon models', () => {
   it('itemWeaponModelUrl resolves mapped items and ignores everything else', () => {
     expect(itemWeaponModelUrl('worn_sword')).toBe('models/weapons/sword_a.glb');
     expect(itemWeaponModelUrl('fen_reaver_glaive')).toBe('models/weapons/scythe.glb');
+    expect(itemWeaponModelUrl('eastbrook_greatsword')).toBe('models/weapons/adv_sword_2handed.glb');
+    expect(itemWeaponModelUrl('highwatch_greatsword')).toBe('models/weapons/adv_sword_2handed.glb');
+    expect(itemWeaponModelUrl('deathless_greatblade')).toBe(
+      'models/weapons/adv_sword_2handed_color.glb',
+    );
+    expect(itemWeaponModelUrl('heroic_wyrmfang_greatblade')).toBe(
+      'models/weapons/adv_sword_2handed_color.glb',
+    );
     expect(itemWeaponModelUrl('chest_armor_not_a_weapon')).toBeNull();
     expect(itemWeaponModelUrl(null)).toBeNull();
     expect(itemWeaponModelUrl(undefined)).toBeNull();
+  });
+
+  it('resolves actual offhands independently from the mainhand model', () => {
+    expect(itemOffhandModelUrl('eastbrook_buckler')).toBe('models/weapons/shield_round.glb');
+    expect(itemOffhandModelUrl('highwatch_wallshield')).toBe('models/weapons/shield_square.glb');
+    expect(itemOffhandModelUrl('rusty_dagger')).toBe('models/weapons/dagger_a.glb');
+    expect(itemOffhandModelUrl('heroic_moggers_shiv')).toBe('models/weapons/dagger_c.glb');
+    expect(itemOffhandModelUrl('chest_armor_not_an_offhand')).toBeNull();
+    expect(itemOffhandModelUrl(null)).toBeNull();
+    expect(itemOffhandModelUrl(undefined)).toBeNull();
+  });
+
+  it('preloads every live shield model used by an actual offhand', () => {
+    const manifest = new Set(manifestUrls());
+    for (const url of [
+      itemOffhandModelUrl('eastbrook_buckler'),
+      itemOffhandModelUrl('highwatch_wallshield'),
+    ]) {
+      expect(url).not.toBeNull();
+      if (!url) continue;
+      expect(existsSync(`public/${url}`), `${url} missing`).toBe(true);
+      expect(manifest.has(url), `${url} missing from manifestUrls()`).toBe(true);
+    }
+  });
+
+  it('uses KayKit authored per-variant shield seats in both hands', () => {
+    const seats = [
+      [
+        'shield_round',
+        'Round_Shield',
+        {
+          position: [0, 0.017, 0.1771],
+          scale: 0.4413,
+        },
+      ],
+      [
+        'shield_square',
+        'Rectangle_Shield',
+        {
+          position: [0, 0.017, 0.1617],
+          scale: 0.5964,
+        },
+      ],
+      [
+        'shield_badge',
+        'Badge_Shield',
+        {
+          position: [0, -0.0123, 0.1341],
+          scale: 0.5108,
+        },
+      ],
+    ] as const;
+
+    for (const [file, node, grip] of seats) {
+      expect(KAYKIT_SHIELD_ACCESSORIES[file]).toBe(node);
+      expect(KAYKIT_SHIELD_GRIPS[node]).toEqual({
+        r: { ...grip, quaternion: [0, 1, 0, 0] },
+        l: { ...grip, quaternion: [0, 0, 0, 1] },
+      });
+    }
+    expect(KAYKIT_SHIELD_GRIPS).not.toHaveProperty('Shield');
   });
 
   // Every weapon variant must belong to a family that has a hand-grip mapping in
@@ -78,29 +152,60 @@ describe('held weapon models', () => {
         expect(def.weaponSlots?.includes(0), `${key} should swap its mainhand`).toBe(true);
       }
     }
-    // the rogue dual-wields: both hand slots swap so a dagger shows in BOTH hands
-    expect(VISUALS.player_rogue.weaponSlots).toEqual([0, 1]);
+    // The rogue dual-wields through independent mainhand and offhand slots.
+    expect(VISUALS.player_rogue.weaponSlots).toEqual([0]);
+    expect(VISUALS.player_rogue.offhandSlot).toBe(1);
   });
 
-  // The class-agnostic Combat Mech adopts the WEARER class's hand layout, so a
-  // rogue wearing the mech still dual-wields (weapon in both hands), while every
-  // single-wield class keeps the mech's own one-hand default (no override).
-  it('the Combat Mech mirrors a dual-wield class so a rogue mech holds both hands', () => {
+  it('gives winning Warrior one mainhand swap and one independent live offhand', () => {
+    expect(VISUALS.player_warrior.weaponSlots).toEqual([0]);
+    expect(VISUALS.player_warrior.offhandSlot).toBe(1);
+    expect(VISUALS.player_warrior.attach).toEqual([
+      { url: 'models/weapons/sword_1handed.glb', bone: 'handslot.r' },
+      { url: 'models/weapons/shield_round.glb', bone: 'handslot.l' },
+    ]);
+  });
+
+  it('keeps every real offhand independent from mainhand cosmetics', () => {
+    expect(VISUALS.player_rogue.offhandSlot).toBe(1);
+    expect(VISUALS.player_paladin).toMatchObject({
+      weaponSlots: [0],
+      offhandSlot: 1,
+      attach: [
+        { url: 'models/weapons/axe_1handed.glb', bone: 'handslot.r' },
+        { url: 'models/weapons/shield_square.glb', bone: 'handslot.l' },
+      ],
+    });
+    expect(VISUALS.player_shaman).toMatchObject({
+      weaponSlots: [0],
+      offhandSlot: 1,
+      attach: [
+        { url: 'models/weapons/axe_1handed.glb', bone: 'handslot.r' },
+        { url: 'models/weapons/shield_round.glb', bone: 'handslot.l' },
+      ],
+    });
+  });
+
+  // The class-agnostic Combat Mech adopts the wearer's real offhand layout, so
+  // rogues keep their second weapon and shield classes keep their shield.
+  it('the Combat Mech mirrors every class with an independent offhand', () => {
     const rogue = mechHeldWeaponOverride('rogue');
-    expect(rogue?.weaponSlots).toEqual([0, 1]);
+    expect(rogue?.weaponSlots).toEqual([0]);
+    expect(rogue?.offhandSlot).toBe(1);
     expect(rogue?.attach?.length).toBe(2);
-    for (const cls of [
-      'warrior',
-      'paladin',
-      'hunter',
-      'priest',
-      'mage',
-      'warlock',
-      'shaman',
-      'druid',
-    ] as const) {
-      expect(mechHeldWeaponOverride(cls), `${cls} should not dual-wield on the mech`).toBeNull();
+    expect(mechHeldWeaponOverride('paladin')?.offhandSlot).toBe(1);
+    expect(mechHeldWeaponOverride('shaman')?.offhandSlot).toBe(1);
+    for (const cls of ['hunter', 'priest', 'mage', 'warlock', 'druid'] as const) {
+      expect(mechHeldWeaponOverride(cls), `${cls} should keep the mech default`).toBeNull();
     }
+
+    const warrior = mechHeldWeaponOverride('warrior');
+    expect(warrior?.weaponSlots).toEqual([0]);
+    expect(warrior?.offhandSlot).toBe(1);
+    expect(warrior?.attach?.[1]).toEqual({
+      url: 'models/weapons/shield_round.glb',
+      bone: 'handslot.l',
+    });
   });
 });
 

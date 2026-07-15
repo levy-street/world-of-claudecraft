@@ -20,7 +20,16 @@
 import { isRooted, isStunned } from './combat/cc';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from './pathfind';
 import { GHOST_RUN_MULT } from './spirit';
-import { DT, type Entity, type MoveInput, normAngle, RUN_SPEED, TURN_SPEED } from './types';
+import { classBaseMoveSpeedMult } from './swordmaster_rules';
+import {
+  DT,
+  ENRAGE_MOVE_MULT,
+  type Entity,
+  type MoveInput,
+  normAngle,
+  RUN_SPEED,
+  TURN_SPEED,
+} from './types';
 import {
   groundHeight,
   terrainDownhill,
@@ -56,12 +65,15 @@ export function moveSpeedMult(e: Entity, extraSpeedPct = 0): number {
   if (e.ghost) return GHOST_RUN_MULT;
   let slow = 1,
     speed = 1;
+  const classBaseSpeed = classBaseMoveSpeedMult(e);
   for (const a of e.auras) {
     if (a.kind === 'slow' || a.kind === 'stealth') slow = Math.min(slow, a.value);
     // buff_speed and form_travel both carry a 1+fraction multiplier (1.4 = +40%).
     if (a.kind === 'buff_speed' || a.kind === 'form_travel') speed = Math.max(speed, a.value);
+    if (a.kind === 'enrage') speed = Math.max(speed, ENRAGE_MOVE_MULT);
   }
   // Fiesta move-speed augments (only ever non-zero inside a Fiesta bout).
+  speed *= classBaseSpeed;
   if (extraSpeedPct) speed += extraSpeedPct;
   return slow * speed;
 }

@@ -293,6 +293,7 @@ function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
 // Quest reward fallback by archetype: classes without an explicit entry use these.
 export const REWARD_ARCHETYPE: Record<PlayerClass, PlayerClass> = {
   warrior: 'warrior',
+  swordmaster: 'rogue',
   paladin: 'warrior',
   shaman: 'warrior',
   rogue: 'rogue',

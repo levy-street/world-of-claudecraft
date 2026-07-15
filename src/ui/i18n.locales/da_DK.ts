@@ -1714,8 +1714,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cleave.description':
     'Et fejende slag, der rammer alle fjender foran dig for {damage} skade.',
   'entities.abilities.cleave.name': 'Mejende Bue',
-  'entities.abilities.commanding_shout.description': 'Øger din Udholdenhed med {buff} i 2 min.',
-  'entities.abilities.commanding_shout.name': 'Styrkende Råb',
   'entities.abilities.concussive_shot.description':
     'Lammer målet for {damage} skade og nedsætter bevægelse med 50% i 4 sek.',
   'entities.abilities.concussive_shot.name': 'Rystende Skud',

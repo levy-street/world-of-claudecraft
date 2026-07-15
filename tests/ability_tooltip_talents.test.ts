@@ -20,12 +20,15 @@ function modsFor(
   const m = emptyModifiers();
   m.abilities[ability] = {
     dmgPct: 0,
+    dmgPctVsDotted: 0,
     flatDmg: 0,
     costPct: 0,
     cooldownPct: 0,
     castPct: 0,
     buffPct: 0,
     castWhileMoving: false,
+    damagePushbackImmune: false,
+    bonusCharges: 0,
     addEffects: [],
     ...mod,
   };

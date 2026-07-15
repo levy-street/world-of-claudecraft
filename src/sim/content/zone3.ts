@@ -1113,7 +1113,13 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     facing: 2.8,
     color: 0x717d7e,
     questIds: [],
-    vendorItems: ['highwatch_warblade', 'craghorn_staff', 'icevein_dirk'],
+    vendorItems: [
+      'highwatch_warblade',
+      'highwatch_greatsword',
+      'highwatch_wallshield',
+      'craghorn_staff',
+      'icevein_dirk',
+    ],
     greeting: 'Forge is hot and the grindstone is turning. If it cuts, I sell it.',
   },
   heroic_quartermaster: {
@@ -2230,7 +2236,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'uncommon',
     stats: { armor: 105, agi: 6, sta: 2 },
     sellValue: 800,
-    requiredClass: ['rogue', 'hunter'],
+    requiredClass: ['rogue', 'hunter', 'swordmaster'],
   },
   zealotsbane_blade: {
     id: 'zealotsbane_blade',
@@ -2241,7 +2247,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 18, max: 29, speed: 2.3 },
     stats: { str: 6, sta: 2 },
     sellValue: 900,
-    requiredClass: ['warrior', 'rogue', 'hunter', 'shaman', 'paladin'],
+    requiredClass: ['warrior', 'rogue', 'hunter', 'shaman', 'paladin', 'swordmaster'],
   },
   emberwood_staff: {
     id: 'emberwood_staff',
@@ -2263,7 +2269,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 12, max: 19, speed: 1.7, dagger: true },
     stats: { agi: 8 },
     sellValue: 900,
-    requiredClass: ['rogue', 'hunter'],
+    requiredClass: ['rogue', 'hunter', 'swordmaster'],
   },
   drogmar_warboots: {
     id: 'drogmar_warboots',
@@ -2285,7 +2291,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 13, max: 21, speed: 1.8, dagger: true },
     stats: { agi: 7, sta: 2 },
     sellValue: 950,
-    requiredClass: ['rogue', 'hunter'],
+    requiredClass: ['rogue', 'hunter', 'swordmaster'],
   },
   ironvein_lantern_staff: {
     id: 'ironvein_lantern_staff',
@@ -2348,7 +2354,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 26, max: 41, speed: 2.5 },
     stats: { str: 8, sta: 3 },
     sellValue: 2400,
-    requiredClass: ['warrior', 'rogue', 'hunter', 'shaman', 'paladin'],
+    requiredClass: ['warrior', 'rogue', 'hunter', 'shaman', 'paladin', 'swordmaster'],
   },
   // --- quest & dungeon blues (rare) ---
   // Brutok Skullsmasher chase weapons (mutually exclusive: brutok_chase)
@@ -2361,7 +2367,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 24, max: 37, speed: 2.7 },
     stats: { str: 8, sta: 3 },
     sellValue: 2000,
-    requiredClass: ['warrior', 'rogue', 'hunter', 'shaman', 'paladin'],
+    requiredClass: ['warrior', 'rogue', 'hunter', 'shaman', 'paladin', 'swordmaster'],
   },
   crag_warden_cudgel: {
     id: 'crag_warden_cudgel',
@@ -2383,7 +2389,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 15, max: 23, speed: 1.7, dagger: true },
     stats: { agi: 8, sta: 3 },
     sellValue: 2000,
-    requiredClass: ['rogue', 'hunter'],
+    requiredClass: ['rogue', 'hunter', 'swordmaster'],
   },
   drogmars_skullcleaver: {
     id: 'drogmars_skullcleaver',
@@ -2394,7 +2400,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 22, max: 35, speed: 2.6 },
     stats: { str: 7, sta: 4 },
     sellValue: 2000,
-    requiredClass: ['warrior', 'rogue', 'hunter', 'shaman', 'paladin'],
+    requiredClass: ['warrior', 'rogue', 'hunter', 'shaman', 'paladin', 'swordmaster'],
   },
   ogre_bonecharm_staff: {
     id: 'ogre_bonecharm_staff',
@@ -2416,7 +2422,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 14, max: 22, speed: 1.7, dagger: true },
     stats: { agi: 8, sta: 3 },
     sellValue: 2000,
-    requiredClass: ['rogue', 'hunter'],
+    requiredClass: ['rogue', 'hunter', 'swordmaster'],
   },
   stormshard_leggings: {
     id: 'stormshard_leggings',
@@ -2469,7 +2475,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'rare',
     stats: { armor: 130, agi: 9, sta: 4 },
     sellValue: 2500,
-    requiredClass: ['rogue', 'hunter'],
+    requiredClass: ['rogue', 'hunter', 'swordmaster'],
   },
   gravewyrm_scale_hauberk: {
     id: 'gravewyrm_scale_hauberk',
@@ -2502,7 +2508,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'rare',
     stats: { armor: 145, agi: 9, sta: 4 },
     sellValue: 3000,
-    requiredClass: ['rogue', 'hunter'],
+    requiredClass: ['rogue', 'hunter', 'swordmaster'],
   },
   gravewyrm_stalkers_treads: {
     id: 'gravewyrm_stalkers_treads',
@@ -2513,7 +2519,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'rare',
     stats: { armor: 105, agi: 5, sta: 3 },
     sellValue: 3200,
-    requiredClass: ['rogue', 'hunter'],
+    requiredClass: ['rogue', 'hunter', 'swordmaster'],
   },
   gravewyrm_sabatons: {
     id: 'gravewyrm_sabatons',
@@ -2571,7 +2577,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     stats: { armor: 170, agi: 12, sta: 6 },
     sellValue: 9000,
-    requiredClass: ['rogue', 'hunter'],
+    requiredClass: ['rogue', 'hunter', 'swordmaster'],
   },
   deathlord_legguards: {
     id: 'deathlord_legguards',
@@ -2631,7 +2637,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     stats: { armor: 145, agi: 7, sta: 5 },
     sellValue: 9000,
-    requiredClass: ['rogue', 'hunter'],
+    requiredClass: ['rogue', 'hunter', 'swordmaster'],
   },
   wyrmshadow_legguards: {
     id: 'wyrmshadow_legguards',
@@ -2643,7 +2649,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     stats: { armor: 155, agi: 10, sta: 6 },
     sellValue: 9000,
-    requiredClass: ['rogue', 'hunter'],
+    requiredClass: ['rogue', 'hunter', 'swordmaster'],
   },
   // --- the three epics (Korzul drops) ---
   wyrmfang_greatblade: {
@@ -2651,11 +2657,12 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     name: 'Wyrmfang Greatblade',
     kind: 'weapon',
     slot: 'mainhand',
+    hand: 'twohand',
     quality: 'epic',
     weapon: { min: 30, max: 48, speed: 2.6 },
-    stats: { str: 11, sta: 7 },
+    stats: { str: 22, sta: 14 },
     sellValue: 8000,
-    requiredClass: ['warrior', 'rogue', 'hunter', 'shaman', 'paladin'],
+    requiredClass: ['warrior', 'hunter', 'shaman', 'paladin'],
   },
   staff_of_the_gravewyrm: {
     id: 'staff_of_the_gravewyrm',
@@ -2677,7 +2684,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 19, max: 30, speed: 1.7, dagger: true },
     stats: { agi: 12, sta: 6 },
     sellValue: 8000,
-    requiredClass: ['rogue', 'hunter'],
+    requiredClass: ['rogue', 'hunter', 'swordmaster'],
   },
   // --- Inventory 2.0 epics: one per armor archetype, filling the new slots and
   // named into the existing Barrowlord/Mournweave/Nightfang Korzul epic families.
@@ -2717,7 +2724,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     stats: { armor: 110, agi: 9, sta: 4 },
     sellValue: 9000,
-    requiredClass: ['rogue', 'hunter'],
+    requiredClass: ['rogue', 'hunter', 'swordmaster'],
   },
   // --- Thunzharr, the Waking Peak (world boss): epic GLOVES that extend the
   // Tier-2 set families to a third piece. Named and stat-shaped to match each
@@ -2743,7 +2750,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     stats: { armor: 110, agi: 8, sta: 5 },
     sellValue: 3600,
-    requiredClass: ['rogue', 'hunter', 'druid'],
+    requiredClass: ['rogue', 'hunter', 'druid', 'swordmaster'],
     set: 'nighttalon', // 3rd Direfang piece, unlocks the set's 3-piece bonus
   },
   soulflame_gloves: {
@@ -2793,7 +2800,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     stats: { armor: 95, agi: 8, sta: 5 },
     sellValue: 3600,
-    requiredClass: ['rogue', 'hunter', 'druid'],
+    requiredClass: ['rogue', 'hunter', 'druid', 'swordmaster'],
     set: 'nighttalon',
   },
   soulflame_cord: {
@@ -2875,7 +2882,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     // crit) while it stays usable by its warrior/paladin owners.
     stats: { str: 15, agi: 15, sta: 14 },
     sellValue: 25000,
-    requiredClass: ['warrior', 'rogue', 'hunter', 'shaman', 'paladin'],
+    requiredClass: ['warrior', 'rogue', 'hunter', 'shaman', 'paladin', 'swordmaster'],
     // Thunderfury-style on-hit: a nature arc that blasts the target and chains to
     // nearby foes, and slows the primary target's attack speed.
     weaponProcs: [
@@ -2932,7 +2939,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 190, agi: 10, sta: 7 },
     hitRating: 20,
     sellValue: 12000,
-    requiredClass: ['rogue', 'hunter', 'druid'],
+    requiredClass: ['rogue', 'hunter', 'druid', 'swordmaster'],
   },
   nighttalon_shoulderguards: {
     id: 'nighttalon_shoulderguards',
@@ -2945,7 +2952,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 165, agi: 9, sta: 6 },
     hitRating: 20,
     sellValue: 12000,
-    requiredClass: ['rogue', 'hunter', 'druid'],
+    requiredClass: ['rogue', 'hunter', 'druid', 'swordmaster'],
   },
   soulflame_cowl: {
     id: 'soulflame_cowl',
@@ -3046,6 +3053,31 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 15, max: 24, speed: 2.3 },
     sellValue: 600,
     buyValue: 6000,
+  },
+  highwatch_greatsword: {
+    id: 'highwatch_greatsword',
+    name: 'Highwatch Greatsword',
+    kind: 'weapon',
+    slot: 'mainhand',
+    hand: 'twohand',
+    quality: 'common',
+    weapon: { min: 26, max: 40, speed: 3.4 },
+    sellValue: 680,
+    buyValue: 6800,
+  },
+  highwatch_wallshield: {
+    id: 'highwatch_wallshield',
+    name: 'Highwatch Wallshield',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'offhand',
+    shield: true,
+    blockValue: 14,
+    quality: 'common',
+    stats: { armor: 112, sta: 2 },
+    sellValue: 560,
+    buyValue: 5600,
+    requiredClass: ['warrior', 'paladin', 'shaman'],
   },
   craghorn_staff: {
     id: 'craghorn_staff',

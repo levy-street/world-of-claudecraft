@@ -32,8 +32,8 @@ export const table: DeedLocaleTable = {
     desc: 'Tiêu một điểm thiên phú vào một thiên phú thuộc hàng cuối.',
   },
   prog_full_build: {
-    name: 'Trọn Bộ Mười Một',
-    desc: 'Tiêu trọn cả mười một điểm thiên phú vào một lối xây dựng duy nhất.',
+    name: 'Trọn Bộ Sáu',
+    desc: 'Chọn một phương án ở cả sáu hàng thiên phú trong cùng một lối xây dựng.',
   },
   prog_veteran: {
     name: 'Kỳ Cựu',

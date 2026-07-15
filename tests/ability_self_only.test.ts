@@ -42,11 +42,12 @@ describe('isSelfOnlyAbility', () => {
     ['bloodrage', true], // selfDamagePctMax + gainResource
     ['summon_imp', true], // summonDemon
     ['dismiss_pet', true], // dismissPet
-    // Empty-effects abilities are special-cased elsewhere (bag items / the pet), so
-    // `[].every(...)` must NOT read as self-only. This is the regression the fix pins.
+    // Empty-effects bag abilities are special-cased elsewhere, so `[].every(...)`
+    // must NOT read as self-only. This is the regression the fix pins.
     ['conjure_water', false],
     ['conjure_food', false],
-    ['revive_pet', false],
+    // Patch Up acts on the hunter's companion, not the hunter.
+    ['revive_pet', false], // hot
     // Hostile self-centered AoEs: `requiresTarget` false but not caster-only.
     ['frost_nova', false], // aoeRoot
     ['arcane_explosion', false], // aoeDamage

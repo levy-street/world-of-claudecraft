@@ -29,6 +29,7 @@ import type { SimContext } from '../sim_context';
 import { addThreat, HEAL_THREAT_FACTOR } from '../threat';
 import type { Entity } from '../types';
 import { runWeaponProcs } from './equip_procs';
+import { onSpellCrit } from './talent_procs';
 
 // Combined incoming-healing multiplier from Mortal Wound debuffs (classic
 // Mortal Strike): each reduces healing the target receives; multiple stack
@@ -90,6 +91,7 @@ export function applyHeal(
   target: Entity,
   amount: number,
   ability: string,
+  abilityId: string | null = null,
 ): void {
   if (target.dead) return;
   const crit = ctx.rng.chance(ctx.spellCrit(source));
@@ -111,6 +113,7 @@ export function applyHeal(
     ability,
   });
   healingThreat(ctx, source, target, healed);
+  if (crit && source.kind === 'player') onSpellCrit(ctx, source, abilityId, target);
   // Legendary on-heal weapon procs (e.g. Deathless Heartwood's Lifebloom). No-op
   // (no rng draw) unless the healer wields a proc weapon with a heal proc.
   runWeaponProcs(ctx, source, target, 'heal');

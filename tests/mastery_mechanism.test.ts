@@ -49,17 +49,22 @@ describe('mastery does not corrupt utility rate buffs (F1)', () => {
     expect(retThorns && 'value' in retThorns ? retThorns.value : null).toBe(6);
   });
 
-  it('Improved Wildward strengthens its stat buff via buffPct, not the buff-exempt dmgPct', () => {
-    // The talent buffs a percent stat buff; with damage mods no longer scaling percent
-    // buffs, it must ride buffPct. 2 ranks (buffPct 0.4) scale the +5% buff to +7%.
+  it('Resolve Unbroken strengthens its stat buff via buffPct, not the buff-exempt dmgPct', () => {
+    // The active Talents V2 row buffs a percent stat buff; with damage mods no longer
+    // scaling percent buffs, it must ride buffPct. The row's 50% modifier scales the
+    // +5% base buff to the authored +7.5%, without rounding the percentage to 8%.
     const mods = computeTalentModifiers(
-      'druid',
-      { spec: null, ranks: { dru_imp_mark: 2 }, choices: {} },
+      'priest',
+      { spec: null, rows: { 17: 'pri_r17_improved_fortitude' } },
       20,
     );
-    const motw = abilitiesKnownAt('druid', 20, mods).find((a) => a.def.id === 'mark_of_the_wild');
-    const buff = motw?.effects.find((e) => e.type === 'buffTarget' && e.kind === 'buff_stats_pct');
-    expect(buff && 'value' in buff ? buff.value : null).toBe(7);
+    const fortitude = abilitiesKnownAt('priest', 20, mods).find(
+      (a) => a.def.id === 'power_word_fortitude',
+    );
+    const buff = fortitude?.effects.find(
+      (e) => e.type === 'buffTarget' && e.kind === 'buff_sta_pct',
+    );
+    expect(buff && 'value' in buff ? buff.value : null).toBe(7.5);
   });
 });
 
@@ -285,5 +290,35 @@ describe('Demonology damage redirect is not double-modified (F7)', () => {
     (sim as any).dealDamage(source, wl, 100, false, 'physical', null, 'hit');
     expect(pet0 - pet.hp).toBe(18); // not 16 (would be 18 * 0.9 double-cut)
     expect(wl0 - wl.hp).toBe(72); // 90 - 18
+  });
+
+  it("a source's Battle Combat Mastery bonus is applied once before the pet share", () => {
+    const sim = new Sim({ seed: 2, playerClass: 'warlock', autoEquip: true });
+    sim.setPlayerLevel(20);
+    expect(sim.setSpec('demonology')).toBe(true);
+    const wl = sim.player;
+    wl.maxHp = wl.hp = 1_000_000;
+    wl.resource = wl.maxResource;
+    sim.castAbility('summon_voidwalker');
+    for (let i = 0; i < 20 * 12 && wl.castingAbility; i++) sim.tick();
+    const pet = sim.petOf(sim.playerId) as Entity;
+    expect(pet).toBeTruthy();
+    pet.maxHp = pet.hp = 1_000_000;
+
+    const warriorId = sim.addPlayer('warrior', 'BattleRedirect');
+    sim.setPlayerLevel(20, warriorId);
+    expect(sim.setSpec('arms', warriorId)).toBe(true);
+    expect(sim.selectTalentRow(14, 'war_row_blood_offering', warriorId)).toBe(true);
+    sim.castAbility('battle_stance', warriorId);
+    const warrior = sim.entities.get(warriorId) as Entity;
+
+    const wl0 = wl.hp;
+    const pet0 = pet.hp;
+    // 100 * 1.15 Combat Mastery = 115, then Demonology redirects 20% (23).
+    // The redirected share is already source-final and must not receive another 15%.
+    sim.dealDamage(warrior, wl, 100, true, 'physical', 'Maiming Strike', 'hit');
+    expect(wl0 - wl.hp).toBe(92);
+    expect(pet0 - pet.hp).toBe(23);
+    expect(wl0 - wl.hp + (pet0 - pet.hp)).toBe(115);
   });
 });

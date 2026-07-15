@@ -55,7 +55,7 @@ await page.evaluate(() => {
     mk('thorns', 'Thorns', 'thorns', 18, 300),
     mk('renew', 'Renew', 'hot', 40, 15),
     // debuffs (second row)
-    mk('rend', 'Rend', 'dot', 22, 9),
+    mk('deep_wounds', 'Gaping Wounds', 'dot', 22, 6),
     mk('hamstring', 'Hamstring', 'slow', 0.5, 12),
     mk('silence', 'Silenced', 'silence', 0, 4),
     mk('sapped_might', 'Sapped Might', 'buff_ap', -40, 8),

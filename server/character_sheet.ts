@@ -16,12 +16,12 @@
 import { DEEDS } from '../src/sim/content/deeds';
 import {
   computeTalentModifiers,
-  emptyAllocation,
+  repairAllocation,
   specLabel,
   type TalentAllocation,
   type TalentModifiers,
 } from '../src/sim/content/talents';
-import { zoneAt } from '../src/sim/data';
+import { CLASSES, zoneAt } from '../src/sim/data';
 import { characterDerivedStats } from '../src/sim/entity';
 import type { CharacterState } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
@@ -140,31 +140,17 @@ export interface CharacterSheet {
   pos?: { x: number; z: number };
 }
 
-const CLASS_LABELS: Record<PlayerClass, string> = {
-  warrior: 'Warrior',
-  paladin: 'Paladin',
-  hunter: 'Hunter',
-  rogue: 'Rogue',
-  priest: 'Priest',
-  shaman: 'Shaman',
-  mage: 'Mage',
-  warlock: 'Warlock',
-  druid: 'Druid',
-};
-
 export function splitCopper(copper: number): MoneySplit {
   const c = Math.max(0, Math.floor(copper));
   return { gold: Math.floor(c / 10000), silver: Math.floor(c / 100) % 100, copper: c % 100 };
 }
 
-function normalizeAllocation(state: CharacterState): TalentAllocation {
-  const a = state.talents;
-  if (!a || typeof a !== 'object') return emptyAllocation();
-  return {
-    spec: typeof a.spec === 'string' ? a.spec : null,
-    ranks: a.ranks && typeof a.ranks === 'object' ? a.ranks : {},
-    choices: a.choices && typeof a.choices === 'object' ? a.choices : {},
-  };
+function normalizeAllocation(
+  cls: PlayerClass,
+  state: CharacterState,
+  level: number,
+): TalentAllocation {
+  return repairAllocation(cls, state.talents, level);
 }
 
 function talentMods(
@@ -175,7 +161,7 @@ function talentMods(
   try {
     // Pass the character's level so mastery level-scaling matches the live sim
     // (a sub-20 character's sheet must not report full-strength mastery stats).
-    return computeTalentModifiers(cls, normalizeAllocation(state), level);
+    return computeTalentModifiers(cls, normalizeAllocation(cls, state, level), level);
   } catch {
     return undefined; // never let a malformed allocation break a public read
   }
@@ -222,8 +208,8 @@ export function characterSheet(input: CharacterSheetInput): CharacterSheet {
     name: row.name,
     realm,
     class: cls,
-    classLabel: CLASS_LABELS[cls] ?? cls,
-    spec: specLabel(cls, normalizeAllocation(state)),
+    classLabel: CLASSES[cls]?.name ?? cls,
+    spec: specLabel(cls, normalizeAllocation(cls, state, level)),
     level,
     virtualLevel: virtualLevel(lifetimeXp),
     prestigeRank: state.prestigeRank ?? 0,

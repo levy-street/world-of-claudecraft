@@ -19,7 +19,15 @@
 import { addStacked, bagCapacity, bagsFullError, equipBag as equipBagCmd } from './bags';
 import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
-import { canEquipItem, resolveEquipSlot, slotAcceptsItem } from './equipment_rules';
+import {
+  canDualWield,
+  canDualWieldTwoHand,
+  canEquipItem,
+  canEquipItemInSlot,
+  resolveEquipSlot,
+  slotAcceptsItem,
+  weaponHand,
+} from './equipment_rules';
 import { formatMoney } from './format_money';
 import { moveStackToCell } from './inventory_order';
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
@@ -40,6 +48,42 @@ import {
 import { vendorStackSize } from './vendor_stack';
 
 const VENDOR_BUYBACK_LIMIT = 12;
+
+function desiredEquipSlot(meta: PlayerMeta, itemId: string): EquipSlot | null {
+  const def = ITEMS[itemId];
+  if (!def?.slot) return null;
+  if (def.kind !== 'weapon') return resolveEquipSlot(def, meta.equipment);
+
+  const spec = meta.talents.spec;
+  const hand = weaponHand(def);
+  if (hand === 'mainhand') return 'mainhand';
+  if (hand === 'twohand') {
+    if (!canDualWieldTwoHand(meta.cls, spec)) return 'mainhand';
+    const mainhand = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand] : undefined;
+    if (
+      mainhand?.kind === 'weapon' &&
+      weaponHand(mainhand) === 'twohand' &&
+      !meta.equipment.offhand
+    ) {
+      return 'offhand';
+    }
+    return 'mainhand';
+  }
+
+  if (!meta.equipment.mainhand) return 'mainhand';
+  if (!canDualWield(meta.cls, spec)) return 'mainhand';
+  if (!canEquipItemInSlot(meta.cls, def, 'offhand', spec)) return 'mainhand';
+
+  const mainhand = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand] : undefined;
+  if (
+    !canDualWieldTwoHand(meta.cls, spec) &&
+    mainhand?.kind === 'weapon' &&
+    weaponHand(mainhand) === 'twohand'
+  ) {
+    return 'mainhand';
+  }
+  return 'offhand';
+}
 
 // Fungible-preferring removal: consumes plain (non-instanced) copies first and
 // only reaches for an instanced copy (an enchanted or otherwise signed/rolled
@@ -127,13 +171,43 @@ export function equipItem(
     ctx.error(meta.entityId, `You must be level ${requiredLevelFor(def)} to equip that.`);
     return;
   }
-  // Rings declare slot 'ring'; with no aimed slot the resolver picks ring1/ring2
-  // (empty-first). An aimed slot is honored verbatim once validated above, so
-  // dropping a ring on the ring2 socket fills ring2 even while ring1 is free.
-  const slot = targetSlot ?? resolveEquipSlot(def, meta.equipment);
-  if (!slot) return;
+  // An aimed paperdoll slot wins after both the generic slot check above and the
+  // class/spec hand policy below. Click equips keep rings empty-first and route
+  // eligible dual-wield weapons between hands.
+  const spec = meta.talents.spec;
+  const slot = targetSlot ?? desiredEquipSlot(meta, itemId);
+  if (!slot || !canEquipItemInSlot(meta.cls, def, slot, spec)) {
+    ctx.error(meta.entityId, 'You cannot equip that.');
+    return;
+  }
   const old = meta.equipment[slot];
   const oldInstance = meta.equipmentInstance?.[slot];
+  // A two-hander and a shield cannot coexist. Fury's Titan Grip exemption is
+  // weapon-only: a valid Fury weapon pair may contain one or two two-handers.
+  let displacedSlot: EquipSlot | null = null;
+  if (slot === 'offhand') {
+    const mainhand = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand] : undefined;
+    const titanPair = def.kind === 'weapon' && canDualWieldTwoHand(meta.cls, spec);
+    if (mainhand?.kind === 'weapon' && weaponHand(mainhand) === 'twohand' && !titanPair) {
+      displacedSlot = 'mainhand';
+    }
+  } else if (slot === 'mainhand' && def.kind === 'weapon' && weaponHand(def) === 'twohand') {
+    const offhand = meta.equipment.offhand ? ITEMS[meta.equipment.offhand] : undefined;
+    const titanPair = offhand?.kind === 'weapon' && canDualWieldTwoHand(meta.cls, spec);
+    if (meta.equipment.offhand && !titanPair) displacedSlot = 'offhand';
+  }
+  const displacedId = displacedSlot ? meta.equipment[displacedSlot] : undefined;
+  const displacedInstance = displacedSlot ? meta.equipmentInstance?.[displacedSlot] : undefined;
+  if (displacedSlot && displacedId) {
+    // Removing the incoming item frees one bag slot. If this equip also returns
+    // the replaced item, the displaced other hand needs one additional slot.
+    if (old && !ctx.canAddItem(displacedId, 1, meta.entityId)) {
+      bagsFullError(ctx, meta.entityId);
+      return;
+    }
+    delete meta.equipment[displacedSlot];
+    if (meta.equipmentInstance) delete meta.equipmentInstance[displacedSlot];
+  }
   // removeItem scans from the highest inventory index down (sim.ts), so a
   // freshly-enchanted copy (pushed onto the end by addItemInstance,
   // src/sim/professions/enchanting.ts applyEnchant) is what this picks up first
@@ -150,6 +224,13 @@ export function equipItem(
     if (oldInstance) meta.inventory.push({ itemId: old, count: 1, instance: oldInstance });
     else addItemSilent(old, 1, meta);
   }
+  if (displacedId) {
+    if (displacedInstance) {
+      meta.inventory.push({ itemId: displacedId, count: 1, instance: displacedInstance });
+    } else {
+      addItemSilent(displacedId, 1, meta);
+    }
+  }
   meta.equipment[slot] = itemId;
   if (consumed[0]) {
     meta.equipmentInstance ??= {};
@@ -161,6 +242,34 @@ export function equipItem(
   ctx.markDeedsDirty(meta.entityId);
   recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   ctx.emit({ type: 'log', text: `Equipped ${def.name}.`, color: '#8f8', pid: meta.entityId });
+}
+
+// A committed spec is the only state transition that can make an already worn
+// offhand illegal. Bench it into bags without a capacity gate so a respec can
+// never destroy gear, and keep any per-instance enchant payload attached.
+export function revalidateOffhandForSpec(ctx: SimContext, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  const { meta, e: p } = r;
+  const offhandId = meta.equipment.offhand;
+  if (!offhandId) return;
+  const def = ITEMS[offhandId];
+  if (!def) return;
+  if (canEquipItemInSlot(meta.cls, def, 'offhand', meta.talents.spec)) return;
+
+  const instance = meta.equipmentInstance?.offhand;
+  delete meta.equipment.offhand;
+  if (meta.equipmentInstance) delete meta.equipmentInstance.offhand;
+  if (instance) meta.inventory.push({ itemId: offhandId, count: 1, instance });
+  else addItemSilent(offhandId, 1, meta);
+  ctx.markDeedsDirty(meta.entityId);
+  recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
+  ctx.emit({
+    type: 'log',
+    text: `Unequipped ${def.name}.`,
+    color: '#8f8',
+    pid: meta.entityId,
+  });
 }
 
 // Remove the piece in `slot` back to the bags, leaving the slot empty. Unlike

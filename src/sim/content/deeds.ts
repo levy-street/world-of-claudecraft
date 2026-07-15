@@ -96,11 +96,11 @@ export const DEEDS: Record<string, DeedDef> = {
   },
   prog_full_build: {
     id: 'prog_full_build',
-    name: 'The Full Eleven',
-    desc: 'Spend all eleven talent points on a single build.',
+    name: 'The Full Six',
+    desc: 'Select one option in all six talent rows on a single build.',
     category: 'progression',
     renown: 25,
-    trigger: { kind: 'meter', meter: 'talentPoints', amount: 11 },
+    trigger: { kind: 'meter', meter: 'talentPoints', amount: 6 },
   },
   prog_veteran: {
     id: 'prog_veteran',

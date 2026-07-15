@@ -113,6 +113,7 @@ export function mergeAugmentMods(base: TalentModifiers, augIds: string[]): Talen
     global: { ...base.global },
     abilities: {},
     grants: [...base.grants],
+    procs: [...base.procs],
   };
   for (const k in base.abilities) m.abilities[k] = { ...base.abilities[k] };
   for (const id of augIds) {
@@ -152,12 +153,15 @@ export function mergeAugmentMods(base: TalentModifiers, augIds: string[]): Talen
       if (!m.abilities[am.ability]) {
         m.abilities[am.ability] = {
           dmgPct: 0,
+          dmgPctVsDotted: 0,
           flatDmg: 0,
           costPct: 0,
           cooldownPct: 0,
           castPct: 0,
           buffPct: 0,
           castWhileMoving: false,
+          damagePushbackImmune: false,
+          bonusCharges: 0,
           addEffects: [],
         };
       }
@@ -298,6 +302,7 @@ export function fiestaDownEntity(ctx: SimContext, e: Entity, killer: Entity | nu
   e.autoAttack = false;
   e.queuedOnSwing = null;
   delete e.queuedOnSwingFree;
+  delete e.queuedOnSwingCostMultiplier;
   e.queuedCastAbility = null;
   e.queuedCastAim = null;
   e.comboPoints = 0;
@@ -307,6 +312,7 @@ export function fiestaDownEntity(ctx: SimContext, e: Entity, killer: Entity | nu
   e.sitting = false;
   e.chargeTargetId = null;
   e.chargePath = [];
+  if (e.leap !== undefined) e.leap = null;
   e.followTargetId = null;
   e.targetId = null;
   const meta = ctx.players.get(e.id);

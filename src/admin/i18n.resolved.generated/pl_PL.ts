@@ -468,6 +468,7 @@ export const pl_PL: AdminTranslations = {
   "money.silver": "s",
   "money.copper": "m",
   "class.warrior": "Wojownik",
+  "class.swordmaster": "SwordMaster",
   "class.paladin": "Paladyn",
   "class.hunter": "Łowca",
   "class.rogue": "Łotrzyk",

@@ -32,6 +32,11 @@ const SPECS = {
     ['combat', 'blade_flurry'],
     ['subtlety', 'hemorrhage'],
   ],
+  swordmaster: [
+    ['tempest', 'blade_cyclone'],
+    ['duelist', 'duelist_flurry'],
+    ['azure_blade', 'azure_rush'],
+  ],
   priest: [
     ['discipline', 'power_infusion'],
     ['holy', 'holy_nova'],

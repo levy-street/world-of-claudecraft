@@ -269,6 +269,7 @@ export interface SimContextCallbacks {
     attackAnimationStarted?: boolean,
     // Amount is already fully source-modified (redirect shares); skip source-output mods.
     alreadyFinal?: boolean,
+    abilityId?: string | null,
   ): void;
   handleDeath(entity: Entity, killer: Entity | null): void;
   cancelCast(entity: Entity): void;
@@ -339,7 +340,13 @@ export interface SimContextCallbacks {
   rollWorldBossLoot(mob: Entity, contributors: PlayerMeta[]): void;
 
   // C2/C3/C4b heal, aura, knockback, and crowd-control surface.
-  applyHeal(source: Entity, target: Entity, amount: number, ability: string): void;
+  applyHeal(
+    source: Entity,
+    target: Entity,
+    amount: number,
+    ability: string,
+    abilityId?: string | null,
+  ): void;
   // Spell crit chance from intellect. STAYS on Sim (shared: the casting/ability
   // paths read it too); exposed here so the extracted heal core can draw its crit.
   spellCrit(p: Entity): number;
@@ -496,6 +503,9 @@ export interface SimContextCallbacks {
   // deleteLoadout/talentPoints) is NOT on this seam: Sim keeps thin wrapper methods that
   // delegate into the module (server/HUD/tests call the `Sim` facade directly).
   refreshKnownAbilities(meta: PlayerMeta, announce: boolean): void;
+  // A committed spec change can invalidate an equipped offhand. The inventory
+  // module benches it without destroying its instance payload.
+  revalidateOffhandForSpec(pid?: number): void;
   syncPetLevel(owner: Entity): void;
   // M2 mob locomotion: the updateMob dispatcher reaches every boss/pet/Nythraxis/
   // corpse branch and movement helper it dispatches to through these. All still live
@@ -625,9 +635,14 @@ export interface SimContextCallbacks {
     abilityName: string | null,
     opts: {
       cannotBeDodged?: boolean;
+      weapon?: Entity['weapon'];
       weaponMult?: number;
+      apSwingSpeed?: number;
       threatFlat?: number;
       threatMult?: number;
+      forceCrit?: boolean;
+      onDealt?: (amount: number) => void;
+      whiteDualWieldPenalty?: boolean;
     },
   ): boolean;
   effectiveAttackPower(e: Entity): number;
@@ -1054,6 +1069,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     frenzyPackmates: host.frenzyPackmates,
     armDeathThroes: host.armDeathThroes,
     refreshKnownAbilities: host.refreshKnownAbilities,
+    revalidateOffhandForSpec: host.revalidateOffhandForSpec,
     syncPetLevel: host.syncPetLevel,
     // M2 mob locomotion seam.
     moveToward: host.moveToward,

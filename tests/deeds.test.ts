@@ -1106,11 +1106,11 @@ describe('flag triggers (one negative and one positive per predicate)', () => {
     check('prog_specialized', false, 'no spec chosen yet');
     meta.talents.spec = 'arms';
     check('prog_specialized', true, 'spec chosen');
-    // talentCapstone: a non-capstone rank does nothing; a pointsGate-8 node grants
-    meta.talents.ranks = { war_toughness: 1 };
-    check('prog_deep_roots', false, 'non-capstone rank');
-    meta.talents.ranks = { war_berserker_rage: 1 };
-    check('prog_deep_roots', true, 'capstone rank');
+    // talentCapstone: a lower row does nothing; selecting the level-20 row grants.
+    meta.talents.rows = { 5: 'war_row_double_charge' };
+    check('prog_deep_roots', false, 'lower-row choice');
+    meta.talents.rows = { 20: 'war_row_colossal_might' };
+    check('prog_deep_roots', true, 'final-row choice');
     // guildMember (server-stamped entity field)
     check('soc_guild_joined', false, 'guildless');
     sim.setPlayerGuild(meta.entityId, 'The Levy');
@@ -1567,25 +1567,25 @@ describe('live sites grant in the same run (retro cannot mask a broken site)', (
     expect(meta.deedsEarned.has('cmb_heavy_hitter')).toBe(true);
   });
 
-  // A valid eleven-point warrior build: a spec, a pointsGate-8 capstone
-  // (war_berserker_rage, requires war_imp_heroic_strike and eight points spent
-  // above it), and eleven points spent in total, so it satisfies the spec, the
-  // capstone, the first-point, and the full-build deeds at once.
+  // A valid six-row warrior build: a spec and one choice in every canonical row,
+  // including the level-20 capstone, so it satisfies the spec, capstone,
+  // first-choice, and full-build deeds at once.
   const warriorSpecCapstoneBuild = (): TalentAllocation => ({
     ...emptyAllocation(),
     spec: 'arms',
-    ranks: {
-      war_toughness: 3,
-      war_cruelty: 3,
-      war_imp_heroic_strike: 2,
-      war_berserker_rage: 1,
-      arms_imp_overpower: 2,
+    rows: {
+      5: 'war_row_double_charge',
+      8: 'war_row_die_by_the_sword',
+      11: 'war_row_storm_bolt',
+      14: 'war_row_blood_offering',
+      17: 'war_row_avatar',
+      20: 'war_row_colossal_might',
     },
   });
 
   it('saveLoadout: applying a staged spec+capstone build makes the talent deeds land in-tick', () => {
     const sim = makeSim();
-    sim.setPlayerLevel(MAX_LEVEL); // the full eleven-point budget
+    sim.setPlayerLevel(MAX_LEVEL); // all six rows unlocked
     const { meta } = primary(sim);
     // Drain the setPlayerLevel dirty mark on its own tick so the final tick's
     // only mark can come from saveLoadout itself.
@@ -1612,7 +1612,7 @@ describe('live sites grant in the same run (retro cannot mask a broken site)', (
     const plainBuild: TalentAllocation = {
       ...emptyAllocation(),
       spec: null,
-      ranks: { war_toughness: 1 },
+      rows: { 5: 'war_row_pursuit' },
     };
     // Save the spec+capstone build first (slot 0), then a spec-less build (slot
     // 1) which becomes active and live. No tick runs between the two saves, so

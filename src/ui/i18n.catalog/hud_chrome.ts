@@ -835,6 +835,26 @@ export const hudChromeStrings = {
     // panel's leftHandedTouch row, surfaced again here alongside the joystick.
     mobileLeftHanded: 'Left-handed layout',
   },
+  // Choice-row talents and specialization details in the Talents V2 window.
+  talentRows: {
+    tab: 'Choices',
+    defaultLoadout: 'Default Loadout',
+    comingSoon: 'Coming soon',
+    readoutSummary: 'Talents: {head}, {spent}/{total} rows selected.',
+  },
+  abilityError: {
+    shieldRequired: 'You must have a shield equipped.',
+  },
+  specPanel: {
+    primaryAttr: 'Primary attribute',
+    complexity: 'Complexity',
+    complexityLow: 'Low',
+    complexityMedium: 'Medium',
+    complexityHigh: 'High',
+    exampleAbilities: 'Example abilities',
+    viewTalents: 'View talents',
+    selectSpec: 'Select specialization',
+  },
   // Controller / gamepad options panel (Options > Controller). Player-facing
   // chrome, so every label is a key here; the live numbers run through
   // formatNumber. The button names themselves (A / LB / D-pad, etc.) stay as
@@ -1458,6 +1478,7 @@ export const hudChromeStrings = {
       armor: 'Increases armor by {value}',
       int: 'Increases Intellect by {value}',
       agi: 'Increases Agility by {value}',
+      strAgi: 'Increases Strength and Agility by {value}',
       sta: 'Increases Stamina by {value}',
       spi: 'Increases Spirit by {value}',
       allStats: 'Increases all attributes by {value}',
@@ -1467,6 +1488,7 @@ export const hudChromeStrings = {
       armor: 'Reduces armor by {value}',
       int: 'Reduces Intellect by {value}',
       agi: 'Reduces Agility by {value}',
+      strAgi: 'Reduces Strength and Agility by {value}',
       sta: 'Reduces Stamina by {value}',
       spi: 'Reduces Spirit by {value}',
       allStats: 'Reduces all attributes by {value}',

@@ -7,7 +7,7 @@ import { Sim } from '../src/sim/sim';
 import type { AbilityEffect, Entity, PlayerClass } from '../src/sim/types';
 
 function alloc(spec: string): TalentAllocation {
-  return { spec, ranks: {}, choices: {} };
+  return { spec, rows: {} };
 }
 
 function mastery(cls: PlayerClass, spec: string) {
@@ -335,9 +335,14 @@ describe('spec masteries', () => {
       | { abilities: string[]; dmgPct?: number; costPct?: number };
     const AXES: Record<string, Record<string, Axis>> = {
       warrior: {
-        arms: { global: 'meleeDmgPct', value: 0.15 },
-        fury: { stat: 'crit', value: 0.1 },
-        prot: { global: 'threatPct', value: 0.5 },
+        arms: { global: 'masteryTwoHandDmgPct', value: 0.1 },
+        fury: { stat: 'crit', value: 0.05 },
+        prot: { global: 'threatPct', value: 0.3 },
+      },
+      swordmaster: {
+        tempest: { global: 'meleeDmgPct', value: 0.12 },
+        duelist: { global: 'meleeHastePct', value: 0.12 },
+        azure_blade: { stat: 'agiPct', value: 0.12 },
       },
       paladin: {
         holy: { global: 'critDmgHealPct', value: 0.5 },

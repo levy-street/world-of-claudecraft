@@ -15,6 +15,7 @@
 import puppeteer from 'puppeteer-core';
 import WebSocket from 'ws';
 import { BROWSER_PATH } from './browser_path.mjs';
+import { PLAYABLE_CLASSES } from './lib/playable_classes.mjs';
 
 const BASE = process.env.GAME_URL ?? 'http://localhost:8787';
 const WS_BASE = BASE.replace(/^http/, 'ws');
@@ -76,7 +77,7 @@ class Bot {
     if (!reg.body.token) throw new Error(`reg ${reg.status}`);
     const ch = await api(
       '/api/characters',
-      { name, class: ['warrior', 'mage', 'hunter', 'priest', 'rogue'][this.i % 5] },
+      { name, class: PLAYABLE_CLASSES[this.i % PLAYABLE_CLASSES.length] },
       reg.body.token,
       this.ip,
     );

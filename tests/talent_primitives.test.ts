@@ -466,12 +466,15 @@ describe('talent primitive P2: cast while moving', () => {
     const mods = emptyModifiers();
     mods.abilities.fireball = {
       dmgPct: 0,
+      dmgPctVsDotted: 0,
       flatDmg: 0,
       costPct: 0,
       cooldownPct: 0,
       castPct: 0,
       buffPct: 0,
       castWhileMoving: true,
+      damagePushbackImmune: false,
+      bonusCharges: 0,
       addEffects: [],
     };
     const fb = abilitiesKnownAt('mage', 20, mods).find((k) => k.def.id === 'fireball');
@@ -540,12 +543,15 @@ describe('talent primitives P4/P5', () => {
     const originalEffects = ABILITIES.fireball.effects;
     mods.abilities.fireball = {
       dmgPct: 0,
+      dmgPctVsDotted: 0,
       flatDmg: 0,
       costPct: 0,
       cooldownPct: 0,
       castPct: 0,
       buffPct: 0,
       castWhileMoving: false,
+      damagePushbackImmune: false,
+      bonusCharges: 0,
       addEffects: [added],
     };
 

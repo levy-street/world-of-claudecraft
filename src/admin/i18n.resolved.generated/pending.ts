@@ -10,25 +10,65 @@
 // and `pretest`). Reproducibility is checked by tests/i18n_admin_catalog.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "class.swordmaster"
+  ],
+  "es_ES": [
+    "class.swordmaster"
+  ],
+  "fr_FR": [
+    "class.swordmaster"
+  ],
+  "fr_CA": [
+    "class.swordmaster"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "class.swordmaster"
+  ],
+  "de_DE": [
+    "class.swordmaster"
+  ],
+  "zh_CN": [
+    "class.swordmaster"
+  ],
+  "zh_TW": [
+    "class.swordmaster"
+  ],
+  "ko_KR": [
+    "class.swordmaster"
+  ],
+  "ja_JP": [
+    "class.swordmaster"
+  ],
+  "pt_BR": [
+    "class.swordmaster"
+  ],
+  "ru_RU": [
+    "class.swordmaster"
+  ],
+  "cs_CZ": [
+    "class.swordmaster"
+  ],
+  "nl_NL": [
+    "class.swordmaster"
+  ],
+  "pl_PL": [
+    "class.swordmaster"
+  ],
+  "id_ID": [
+    "class.swordmaster"
+  ],
+  "tr_TR": [
+    "class.swordmaster"
+  ],
+  "sv_SE": [
+    "class.swordmaster"
+  ],
+  "vi_VN": [
+    "class.swordmaster"
+  ],
+  "da_DK": [
+    "class.swordmaster"
+  ]
 };

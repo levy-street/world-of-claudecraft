@@ -24,6 +24,7 @@ export const CLASS_CHIPS: ClassChip[] = [
   { id: 'mage', nameKey: 'classes.mage', color: '#69ccf0' },
   { id: 'warlock', nameKey: 'classes.warlock', color: '#9482c9' },
   { id: 'druid', nameKey: 'classes.druid', color: '#ff7d0a' },
+  { id: 'swordmaster', nameKey: 'classes.swordmaster', color: '#22d3ee' },
 ];
 
 export interface ZoneTeaser {
@@ -35,7 +36,25 @@ export interface ZoneTeaser {
 }
 
 export const ZONE_TEASERS: ZoneTeaser[] = [
-  { id: 'vale', nameKey: 'guide.home.world.valeName', blurbKey: 'guide.home.world.valeBlurb', min: 1, max: 7 },
-  { id: 'marsh', nameKey: 'guide.home.world.marshName', blurbKey: 'guide.home.world.marshBlurb', min: 6, max: 13 },
-  { id: 'peaks', nameKey: 'guide.home.world.peaksName', blurbKey: 'guide.home.world.peaksBlurb', min: 13, max: 20 },
+  {
+    id: 'vale',
+    nameKey: 'guide.home.world.valeName',
+    blurbKey: 'guide.home.world.valeBlurb',
+    min: 1,
+    max: 7,
+  },
+  {
+    id: 'marsh',
+    nameKey: 'guide.home.world.marshName',
+    blurbKey: 'guide.home.world.marshBlurb',
+    min: 6,
+    max: 13,
+  },
+  {
+    id: 'peaks',
+    nameKey: 'guide.home.world.peaksName',
+    blurbKey: 'guide.home.world.peaksBlurb',
+    min: 13,
+    max: 20,
+  },
 ];

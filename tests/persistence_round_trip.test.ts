@@ -14,6 +14,35 @@ function makeWorld() {
 }
 
 describe('serializeCharacter <-> addPlayer round-trip (G2 persistence)', () => {
+  it('round-trips a SwordMaster with two swords and its selected specialization intact', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('swordmaster', 'Aozora');
+    sim.setPlayerLevel(20, pid);
+    sim.setSpec('tempest', pid);
+    const before = sim.serializeCharacter(pid);
+    if (!before) throw new Error('SwordMaster state did not serialize');
+    expect(before.equipment).toMatchObject({
+      mainhand: 'worn_sword',
+      offhand: 'worn_sword',
+    });
+    expect(before.talents?.spec).toBe('tempest');
+
+    const restored = makeWorld();
+    const restoredPid = restored.addPlayer('swordmaster', 'Aozora', { state: before });
+    const after = restored.serializeCharacter(restoredPid);
+    const restoredEntity = restored.entities.get(restoredPid);
+    if (!after || !restoredEntity) throw new Error('SwordMaster state did not restore');
+
+    expect(after.equipment).toEqual(before.equipment);
+    expect(after.talents).toEqual(before.talents);
+    expect(after.resource).toBe(before.resource);
+    expect(restoredEntity.templateId).toBe('swordmaster');
+    expect(restoredEntity.mainhandItemId).toBe('worn_sword');
+    expect(restoredEntity.offhandItemId).toBe('worn_sword');
+    expect(restoredEntity.offhandWeapon).not.toBeNull();
+    expect(restoredEntity.dualWielding).toBe(true);
+  });
+
   it('a fully-populated character round-trips deep-equal through serialize -> load -> serialize', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Saver');

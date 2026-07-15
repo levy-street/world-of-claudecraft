@@ -19,6 +19,7 @@ import {
   primaryStatBudget,
   QUALITY_ILVL_BONUS,
   scaleWeaponDamage,
+  TWOHAND_STAT_MULT,
   weaponDpsBudget,
 } from '../item_budget';
 import type { ItemDef, MobTemplate } from '../types';
@@ -83,7 +84,8 @@ function applyRaidVariantRatings(variant: ItemDef, base: ItemDef): void {
 function makeHeroicVariant(base: ItemDef, sourceLevel = HEROIC_VARIANT_SOURCE_LEVEL): ItemDef {
   const quality = base.quality ?? 'common';
   const targetLevel = sourceLevel + (QUALITY_ILVL_BONUS[quality] ?? 0);
-  const targetBudget = primaryStatBudget(targetLevel, base.quality, base.slot);
+  const handMultiplier = base.kind === 'weapon' && base.hand === 'twohand' ? TWOHAND_STAT_MULT : 1;
+  const targetBudget = primaryStatBudget(targetLevel, base.quality, base.slot) * handMultiplier;
   const baseBudget = base.stats
     ? PRIMARY_STATS.reduce((sum, stat) => sum + (base.stats?.[stat] ?? 0), 0)
     : 0;

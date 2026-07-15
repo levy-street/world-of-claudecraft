@@ -6,12 +6,12 @@
 // HTML5 drag and the touch pointer drag share one rule set and the hover feedback
 // can never disagree with what the sim will actually do: the sim's own equip path
 // (src/sim/items.ts equipItem) re-validates every drop through the SAME leaves
-// (slotAcceptsItem / canEquipItem / meetsLevelRequirement), so this core is
+// (slotAcceptsItem / canEquipItemInSlot / meetsLevelRequirement), so this core is
 // feedback, never authority.
 //
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).
 
-import { canEquipItem, slotAcceptsItem } from '../sim/equipment_rules';
+import { canEquipItem, canEquipItemInSlot, slotAcceptsItem } from '../sim/equipment_rules';
 import { meetsLevelRequirement, requiredLevelFor } from '../sim/item_level_req';
 import type { EquipSlot, ItemDef, PlayerClass } from '../sim/types';
 
@@ -29,12 +29,14 @@ export function paperdollDropAction(
   slot: EquipSlot,
   cls: PlayerClass,
   level: number,
+  spec?: string | null,
 ): PaperdollDropAction {
   // Only real gear equips; a consumable or material declares no slot at all, and
   // a bag equips into its own bar socket, never the paperdoll.
   if (item.kind !== 'weapon' && item.kind !== 'armor') return 'blockedSlot';
   if (!slotAcceptsItem(item, slot)) return 'blockedSlot';
   if (!canEquipItem(cls, item)) return 'blockedClass';
+  if (!canEquipItemInSlot(cls, item, slot, spec)) return 'blockedClass';
   if (!meetsLevelRequirement(level, item)) return 'blockedLevel';
   return 'equip';
 }

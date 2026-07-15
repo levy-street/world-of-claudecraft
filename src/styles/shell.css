@@ -2576,6 +2576,9 @@
   .mini-class[data-class="rogue"] {
     --class-color: #fff569;
   }
+  .mini-class[data-class="swordmaster"] {
+    --class-color: #22d3ee;
+  }
   .mini-class[data-class="priest"] {
     --class-color: #ffffff;
   }
@@ -2798,11 +2801,11 @@
       transform: translateX(-50%);
       display: flex;
       flex-wrap: nowrap;
-      gap: 14px;
+      gap: clamp(6px, 1vw, 14px);
       z-index: 3;
       /* The base row is width:100%/grid; the rail must shrink-wrap so the
-         translateX centering actually centers the nine medallions. */
-      width: max-content;
+         translateX centering actually centers all ten medallions. */
+      width: min(966px, calc(100vw - 32px));
       justify-content: center;
     }
     #offline-select.cs-wow .mini-class,
@@ -2812,6 +2815,9 @@
       align-items: center;
       gap: 6px;
       width: 84px;
+      min-width: 0;
+      max-width: 84px;
+      flex: 1 1 84px;
       padding: 0;
       border: none;
       background: transparent;
@@ -2859,6 +2865,16 @@
       font-size: 12px;
       color: var(--class-color);
       text-shadow: 0 1px 3px #000;
+      max-width: 100%;
+      overflow-wrap: anywhere;
+    }
+    #offline-select.cs-wow .mini-class[data-class="swordmaster"] .mini-class-label,
+    body:not(.mobile-touch)
+      #charcreate-panel.cs-wow
+      .mini-class[data-class="swordmaster"]
+      .mini-class-label {
+      font-size: 11px;
+      white-space: nowrap;
     }
     #offline-select.cs-wow .mini-class.sel .mini-class-label,
     body:not(.mobile-touch) #charcreate-panel.cs-wow .mini-class.sel .mini-class-label {
@@ -3324,6 +3340,8 @@
       }
       #offline-select.cs-wow .mini-class {
         width: 70px;
+        max-width: 70px;
+        flex-basis: 70px;
         gap: 4px;
       }
       #offline-select.cs-wow .mini-class .mini-class-portrait {
@@ -5588,6 +5606,9 @@
   [data-class="rogue"] {
     --class-color: #fff569;
   }
+  [data-class="swordmaster"] {
+    --class-color: #22d3ee;
+  }
   [data-class="priest"] {
     --class-color: #ffffff;
   }
@@ -6091,7 +6112,7 @@
       overflow: hidden;
       padding: 10px;
     }
-    /* charcreate's columns hold a single tall flow (name input, 9-class grid,
+    /* charcreate's columns hold a single tall flow (name input, 10-class grid,
        appearance swatches, Back/Create actions) with no inner scroll container
        of its own, unlike charselect (whose #char-list and #charselect-class-details
        children scroll). Under the panel's min(560px, ...) height clamp that flow
@@ -6311,7 +6332,7 @@
       grid-template-columns: minmax(310px, 0.95fr) minmax(360px, 1.05fr);
     }
     body.mobile-touch #charcreate-panel .mini-class-row {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 6px;
     }
     body.mobile-touch #charcreate-panel .mini-class {
@@ -6350,7 +6371,7 @@
       overflow-y: auto;
     }
 
-    /* offline-select is #offline-select.cs-wow, a 9-class roster that overflowed
+    /* offline-select is #offline-select.cs-wow, a 10-class roster that overflowed
        even the internal-scroll fallback above (the scroll container clipped
        the last classes and the action buttons off entirely). Give it the same
        two-column charselect-panel/charcreate-panel treatment instead of just
@@ -6387,7 +6408,7 @@
     body.mobile-touch #offline-select .charselect-col-right {
       min-height: 0;
       height: 100%;
-      /* The left column's flow (name, 9-class grid, appearance swatches,
+      /* The left column's flow (name, 10-class grid, appearance swatches,
          Enter World/Back) does not always fit the panel's height clamp on the
          shortest landscape phones. .skin-row is the one child below with an
          explicit min-height:0 (it needs to collapse to 0 when empty), so
@@ -6424,7 +6445,7 @@
       font-size: 13px;
     }
     body.mobile-touch #offline-select .mini-class-row {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 4px;
     }
     body.mobile-touch #offline-select .mini-class {

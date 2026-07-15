@@ -153,6 +153,131 @@ describe('auto_attack meleeSwing: the white-hit table', () => {
   });
 });
 
+describe('auto_attack meleeSwing: landed talent procs resolve before retaliation', () => {
+  const addImbue = (player: AnyEntity): void => {
+    player.auras.push({
+      id: 'test_imbue',
+      name: 'Test Imbue',
+      kind: 'imbue',
+      remaining: 30,
+      duration: 30,
+      value: 0,
+      sourceId: player.id,
+      school: 'nature',
+    });
+  };
+
+  const addThorns = (target: AnyEntity, value: number): void => {
+    target.auras.push({
+      id: 'test_thorns',
+      name: 'Punishing Thorns',
+      kind: 'thorns',
+      remaining: 30,
+      duration: 30,
+      value,
+      sourceId: target.id,
+      school: 'nature',
+    });
+  };
+
+  it('lets Imbued Lifeblood save its owner from otherwise lethal thorns', () => {
+    const { sim, p } = makeSim('shaman', 20, 1756);
+    expect(sim.applyTalents({ spec: null, rows: { 5: 'sha_r5_imbue_mastery' } })).toBe(true);
+    const mob = spawnDummy(sim, p, 1);
+    addImbue(p);
+    addThorns(mob, 10);
+    p.mainhandItemId = null;
+    p.hp = 5;
+    const events = capture(sim);
+    const draws: number[] = [];
+    sim.rng.setObserver((value: number) => draws.push(value));
+
+    const connected = meleeSwing(sim.ctx, p, mob, 0, null, { cannotBeDodged: true });
+    sim.rng.setObserver(null);
+
+    const healIndex = events.findIndex(
+      (event) => event.type === 'heal2' && event.ability === 'Imbued Lifeblood',
+    );
+    const thornsIndex = events.findIndex(
+      (event) =>
+        event.type === 'damage' &&
+        event.sourceId === mob.id &&
+        event.targetId === p.id &&
+        event.ability === 'Punishing Thorns',
+    );
+    expect(connected).toBe(true);
+    expect(healIndex).toBeGreaterThan(-1);
+    expect(thornsIndex).toBeGreaterThan(healIndex);
+    expect(p.dead).toBe(false);
+    expect(p.hp).toBeGreaterThan(0);
+    // Hit table, weapon roll, swing crit, then Lifeblood's normal heal-crit roll.
+    expect(draws).toHaveLength(4);
+  });
+
+  it.each([
+    {
+      name: 'Oathwheel cooldown refund',
+      cls: 'paladin' as const,
+      row: { 14: 'pal_r14_righteous_cause' },
+      prepare: (player: AnyEntity) => player.cooldowns.set('judgement', 5),
+      read: (player: AnyEntity) => player.cooldowns.get('judgement'),
+      expected: 4.5,
+    },
+    {
+      name: 'Venom Dividend resource gain',
+      cls: 'rogue' as const,
+      row: { 14: 'rog_r14_deadly_brew' },
+      prepare: (player: AnyEntity) => {
+        player.resource = 0;
+      },
+      read: (player: AnyEntity) => player.resource,
+      expected: 5,
+    },
+    {
+      name: 'Imbued Tempo cooldown refund',
+      cls: 'shaman' as const,
+      row: { 14: 'sha_r14_weapon_fury' },
+      prepare: (player: AnyEntity) => player.cooldowns.set('earth_shock', 5),
+      read: (player: AnyEntity) => player.cooldowns.get('earth_shock'),
+      expected: 4.5,
+    },
+  ])('applies $name before thorns without changing the shared RNG trace', (testCase) => {
+    const run = (active: boolean) => {
+      const { sim, p } = makeSim(testCase.cls, 20, 26014);
+      if (active) {
+        expect(sim.applyTalents({ spec: null, rows: testCase.row })).toBe(true);
+      }
+      const mob = spawnDummy(sim, p, 1);
+      addImbue(p);
+      addThorns(mob, 1);
+      p.mainhandItemId = null;
+      testCase.prepare(p);
+      let valueAtRetaliation: unknown;
+      const dealDamage = sim.ctx.dealDamage;
+      sim.ctx.dealDamage = ((source: Entity | null, target: Entity, ...args: unknown[]) => {
+        if (source?.id === mob.id && target.id === p.id && args[3] === 'Punishing Thorns') {
+          valueAtRetaliation = testCase.read(p);
+        }
+        return (dealDamage as (...callArgs: unknown[]) => unknown)(source, target, ...args);
+      }) as typeof sim.ctx.dealDamage;
+      const draws: number[] = [];
+      sim.rng.setObserver((value: number) => draws.push(value));
+
+      const connected = meleeSwing(sim.ctx, p, mob, 0, null, { cannotBeDodged: true });
+      sim.rng.setObserver(null);
+
+      expect(connected).toBe(true);
+      return { draws, valueAtRetaliation };
+    };
+
+    const baseline = run(false);
+    const active = run(true);
+    expect(active.valueAtRetaliation).toBe(testCase.expected);
+    expect(active.draws).toEqual(baseline.draws);
+    expect(active.draws).toHaveLength(3);
+  });
+});
+
 describe('auto_attack rangedSwing: Auto Shot vs Wand', () => {
   it('Auto Shot is a physical projectile (armor-mitigated)', () => {
     const { sim, p } = makeSim('hunter', 12);

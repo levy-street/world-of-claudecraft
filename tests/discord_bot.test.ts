@@ -105,6 +105,7 @@ describe('level-on-name nickname', () => {
     expect(buildLevelNick('Aldric', 20, 'warrior')).toBe('Aldric ⚔20');
     expect(buildLevelNick('Mira', 7, 'mage')).toBe('Mira 🔮7');
     expect(levelNickSuffix(12, 'hunter')).toBe(' 🏹12');
+    expect(levelNickSuffix(20, 'SwordMaster')).toBe(' SM20');
   });
 
   it('handles an unknown class with no emoji', () => {

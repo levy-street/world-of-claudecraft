@@ -42,19 +42,22 @@ import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
 import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink';
 import { type BirdsView, buildBirds } from './birds';
 import { type CameraOcclusionState, stepCameraOcclusion } from './camera_collision';
-import { characterSoulRendActive } from './character_effects';
+import { characterRecklessnessActive, characterSoulRendActive } from './character_effects';
 import {
   type AnimState,
   type CharacterVisual,
   createCharacterVisual,
   setWeaponVfxViewportHeight,
 } from './characters';
+import { updateActiveAndBaseVisual } from './characters/active_visual_update';
 import { mechAssetsReady, preloadMechAssets } from './characters/assets';
 import { skinCount, visualKeyFor } from './characters/manifest';
 import {
   playerRangedAttackAlreadyStarted,
   playerRangedAttackStartsAtLaunch,
 } from './characters/skin_attack';
+import { attackAbilityId, isSpinAttackAbility } from './characters/weapon_attack_style_core';
+import { weaponAuraPlan } from './characters/weapon_aura_core';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { trackWebGLContext } from './context_release';
 import { buildCritters, type CritterField } from './critters';
@@ -117,6 +120,11 @@ import { buildClouds, buildSky, type SkyView } from './sky';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
 import { freezeStaticMatrices } from './static_matrix';
 import { shouldRenderStealthGhost } from './stealth';
+import {
+  swordmasterDamageEventVisualPlan,
+  swordmasterSpellVisualPlan,
+} from './swordmaster_fx_core';
+import { SwordmasterFxPainter } from './swordmaster_fx_painter';
 import { buildFlaredConeFan, buildRingXZ, drapeConeWorld } from './target_cone_debug';
 import { buildTerrain, type TerrainView } from './terrain';
 import { sparkleTexture } from './textures';
@@ -135,6 +143,8 @@ import { ValeCupPracticeSky } from './vale_cup_practice_sky';
 import { buildValeCupStadium, type ValeCupStadiumView } from './vale_cup_stadium';
 import { buildValeCupTeamRings, type ValeCupTeamRingsView } from './vale_cup_team_ring';
 import { SCHOOL_COLORS, Vfx } from './vfx';
+import { type WarriorCastVisualPlan, warriorCastVisualPlan } from './warrior_cast_fx_core';
+import { RecklessSkullPainter } from './warrior_cast_fx_painter';
 import { buildWater, type WaterView } from './water';
 import { Weather } from './weather';
 import { buildWorldAmbientSources, crowdAmbienceAt, footstepSurfaceAt } from './world_audio';
@@ -542,6 +552,7 @@ export interface EntityView {
   travelVisual: CharacterVisual | null; // druid travel form (chicken-cow), built lazily
   skin: number; // last-rendered appearance skin — diffed each frame for live swaps
   mainhandItemId: string | null; // last-rendered equipped weapon — diffed for live held-weapon swaps
+  offhandItemId: string | null; // last-rendered shield/second weapon, independent of mainhand skins
   weaponSkinId: string | null; // last-rendered weapon-skin cosmetic, diffed for live skin swaps
   weaponStowed: boolean; // last-rendered sheathe state (Z key), diffed for live stow toggles
   /** unscaled height — nameplate/vfx anchor reads height * e.scale */
@@ -594,6 +605,7 @@ export interface EntityView {
   // hidden until its shader programs finish linking off-thread (async-compile gate)
   compilePending: boolean;
   lastOverheadEmoteKey: string | null;
+  recklessOn?: boolean;
   // render-space position last frame, for true u/s locomotion speed
   lastX: number;
   lastZ: number;
@@ -804,6 +816,8 @@ export class Renderer {
   // ground-targeted AoE impact rings (see aoe_ring.ts), pooled like click markers
   private aoeRings: AoeRingSlot[] = [];
   private aoeRingNext = 0;
+  private recklessSkulls = new RecklessSkullPainter();
+  private swordmasterFx: SwordmasterFxPainter;
   private groundAimReticle: GroundAimReticle | null = null;
   raycaster = new THREE.Raycaster();
   clickTargets: THREE.Object3D[] = [];
@@ -874,6 +888,7 @@ export class Renderer {
     reverseBackpedal: false,
     dead: false,
     casting: false,
+    spinning: false,
     swimming: false,
     sitting: false,
   };
@@ -1520,13 +1535,26 @@ export class Renderer {
     }
 
     // particle system: projectiles, impacts, heal glows, ambience
-    this.vfx = new Vfx(this.scene, (id, frac) => {
+    const entityAnchor = (id: number, frac: number): THREE.Vector3 | null => {
       const v = this.views.get(id);
       if (!v) return null;
       const e = this.sim.entities.get(id);
       const h = v.height * (e?.scale ?? 1) * frac;
       return new THREE.Vector3(v.group.position.x, v.group.position.y + h, v.group.position.z);
-    });
+    };
+    const entityDestinationAnchor = (id: number, frac: number): THREE.Vector3 | null => {
+      const v = this.views.get(id);
+      const e = this.sim.entities.get(id);
+      if (!v || !e) return null;
+      const h = v.height * e.scale * frac;
+      return new THREE.Vector3(e.pos.x, e.pos.y + h, e.pos.z);
+    };
+    this.vfx = new Vfx(this.scene, entityAnchor);
+    this.swordmasterFx = new SwordmasterFxPainter(
+      this.scene,
+      entityAnchor,
+      entityDestinationAnchor,
+    );
     this.vfx.setViewportScale(this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(), 60);
 
     // ambient precipitation: biome-driven snow/rain that rides with the camera
@@ -2931,7 +2959,7 @@ export class Renderer {
   // including those between other players and mobs).
   handleEvent(ev: SimEvent): void {
     switch (ev.type) {
-      case 'spellfx':
+      case 'spellfx': {
         if (ev.fx === 'windup') {
           // A petSpell windup telegraph: start the throw animation now; the
           // projectile for this throw follows petSpell.windup later, timed to
@@ -2946,6 +2974,24 @@ export class Renderer {
           const source = this.sim.entities.get(ev.sourceId);
           if (playerRangedAttackStartsAtLaunch(source?.kind, ev.attackAnimation))
             this.triggerAttack(ev.sourceId);
+        }
+        const warriorCast = warriorCastVisualPlan(ev.fx, ev.ability);
+        if (warriorCast?.kind === 'shout') {
+          this.playShoutFx(ev.sourceId, warriorCast);
+          break;
+        }
+        if (warriorCast?.kind === 'gesture') {
+          this.triggerAttack(ev.sourceId, warriorCast.abilityId);
+          const swordmasterPlan = swordmasterSpellVisualPlan(ev.fx, warriorCast.abilityId);
+          if (swordmasterPlan)
+            this.swordmasterFx.paint(
+              swordmasterPlan,
+              ev.sourceId,
+              ev.targetId,
+              this.sim.entities.get(ev.sourceId)?.facing,
+              ev.motionPath,
+            );
+          break;
         }
         if (ev.fx === 'projectile') this.vfx.projectile(ev.sourceId, ev.targetId, ev.school);
         else if (ev.fx === 'beam') this.vfx.beam(ev.sourceId, ev.targetId, ev.school);
@@ -2970,6 +3016,7 @@ export class Renderer {
           }
         }
         break;
+      }
       case 'spellfxAt': {
         // Ground-targeted impact: burst draped onto the terrain where the spell
         // was aimed (not on the caster), so an aimed blast reads at its landing
@@ -2991,12 +3038,23 @@ export class Renderer {
           source?.kind,
           ev.attackAnimationStarted,
         );
+        const abilityId = ev.school === 'physical' ? attackAbilityId(ev.ability) : undefined;
         if (ev.school === 'physical' && ev.sourceId !== -1 && !rangedShotAlreadyStarted)
-          this.triggerAttack(ev.sourceId);
+          this.triggerAttack(ev.sourceId, abilityId);
         if (ev.kind === 'hit' && ev.amount > 0) {
           // landed blows flinch the victim (rate-limited inside the visual)
           this.triggerHit(ev.targetId);
-          if (ev.school === 'physical') this.vfx.meleeSpark(ev.targetId, ev.crit);
+          if (ev.school === 'physical') {
+            this.vfx.meleeSpark(ev.targetId, ev.crit);
+            const swordmasterPlan = swordmasterDamageEventVisualPlan(abilityId);
+            if (swordmasterPlan)
+              this.swordmasterFx.paint(
+                swordmasterPlan,
+                ev.sourceId,
+                ev.targetId,
+                this.sim.entities.get(ev.sourceId)?.facing,
+              );
+          }
         }
         break;
       }
@@ -3650,6 +3708,7 @@ export class Renderer {
       lastZ: e.pos.z,
       skin: e.skin,
       mainhandItemId: e.mainhandItemId,
+      offhandItemId: e.offhandItemId,
       // built skinless; the per-frame diff below applies e.weaponSkinId (and its VFX)
       weaponSkinId: null,
       // Born false so the per-frame diff below sheathes an already-stowed entity
@@ -3731,6 +3790,7 @@ export class Renderer {
     v.height = next.height;
     v.skin = e.skin;
     v.mainhandItemId = e.mainhandItemId; // next was built holding the current weapon
+    v.offhandItemId = e.offhandItemId; // next was built holding the current offhand
     v.weaponSkinId = null; // next was built skinless; the per-frame diff re-applies it
     v.weaponStowed = false; // next was built drawn (fresh stow transition); the diff re-sheathes
     v.group.add(next.root);
@@ -3746,9 +3806,25 @@ export class Renderer {
     else this.lightOwnerGroups.delete(v.group);
   }
 
-  triggerAttack(entityId: number): void {
+  triggerAttack(entityId: number, abilityId?: string): void {
     const v = this.views.get(entityId);
-    if (v) this.activeVisual(v)?.playAttack();
+    const visual = v ? this.activeVisual(v) : null;
+    if (!visual) return;
+    if (isSpinAttackAbility(abilityId)) visual.playWhirl();
+    else visual.playAttack(abilityId);
+  }
+
+  private playShoutFx(
+    entityId: number,
+    plan: Extract<WarriorCastVisualPlan, { kind: 'shout' }>,
+  ): void {
+    const e = this.sim.entities.get(entityId);
+    if (!e) return;
+    this.vfx.shoutwave(entityId, plan.color);
+    this.spawnAoeRing(e.pos.x, e.pos.z, plan.ringRadius, 'physical', plan.color);
+    const v = this.views.get(entityId);
+    const visual = v ? this.activeVisual(v) : null;
+    if (visual && !visual.isMidOneShot) visual.playEmote(plan.emote, plan.repeats);
   }
 
   triggerHit(entityId: number): void {
@@ -4528,6 +4604,12 @@ export class Renderer {
         this.reconcileViewLights(v);
       }
 
+      if (e.offhandItemId !== v.offhandItemId) {
+        v.offhandItemId = e.offhandItemId;
+        v.visual.setOffhand(e.offhandItemId);
+        this.reconcileViewLights(v);
+      }
+
       // live weapon-skin swap: a Season 1 Armory cosmetic applied/detached (self
       // or a peer, via the identity wire); replaces the held model + rarity VFX
       if (e.weaponSkinId !== v.weaponSkinId) {
@@ -4535,6 +4617,7 @@ export class Renderer {
         v.visual.setWeaponSkin(e.weaponSkinId);
         this.reconcileViewLights(v);
       }
+      v.visual.setWeaponAura(weaponAuraPlan(e.auras, e.castingAbility));
 
       // live sheathe toggle (Z key): the sim's weaponStowed bit moves held
       // props between the hands and the on-back pose (self or a peer)
@@ -4671,6 +4754,10 @@ export class Renderer {
       st.reverseBackpedal = ghostWolf;
       st.dead = visuallyDead;
       st.casting = e.castingAbility !== null && !visuallyDead;
+      st.spinning =
+        st.casting &&
+        e.castingAbility !== null &&
+        ABILITIES[e.castingAbility]?.selfCentered === true;
       st.swimming = swimming;
       st.sitting = e.kind === 'player' && (e.sitting || e.eating !== null || e.drinking !== null);
       // --- spatial movement audio (self + others) --------------------------
@@ -4728,7 +4815,7 @@ export class Renderer {
         if (v.isFar) animate = (this.frameIdx + e.id) % 6 === 0;
         else if (d2 > shadowRangeSq) animate = (this.frameIdx + e.id) % midAnimCadenceFrames === 0;
       }
-      active.update(dt, st, animate);
+      updateActiveAndBaseVisual(v.visual, active, dt, st, animate);
       // weapon-skin VFX ride the humanoid rig's held weapon; advancing them is a
       // few uniform writes per handle, so they stay smooth at every LOD tier
       v.visual.updateWeaponVfx(dt);
@@ -4761,6 +4848,15 @@ export class Renderer {
       }
       if (e.auras.some((a) => a.id === 'nythraxis_soul_rend')) {
         this.vfx.castSparkle(e.id, 'shadow', dt * 3.2);
+      }
+      if (characterRecklessnessActive(e)) {
+        this.vfx.recklessFlame(e.id, dt);
+        if (!v.recklessOn) {
+          v.recklessOn = true;
+          this.recklessSkulls.spawn(v.group, active.height * e.scale);
+        }
+      } else if (v.recklessOn) {
+        v.recklessOn = false;
       }
       // Shapeshift-form particle auras riding the tints above: metamorph fire,
       // moonkin star motes, shadowform gloom wisps. Suppressed for the dead
@@ -4843,6 +4939,7 @@ export class Renderer {
     }
     this.updateClickMarkers(dt);
     this.updateAoeRings(dt);
+    this.recklessSkulls.update(dt);
     this.updateGroundAimReticle(dt);
     // dev-only Tab-target cone overlay: re-drape the front cone on the terrain
     // under the local player, oriented to the model's rendered facing.
@@ -4953,6 +5050,7 @@ export class Renderer {
     this.waterView.update(this.time);
     worldStart = markWorldPhase('water', worldStart);
     this.vfx.update(dt);
+    this.swordmasterFx.update(dt);
     this.updateFiestaRing(dt);
     this.updateFiestaPowerups(dt);
     this.tickFiestaGlows(dt);
@@ -5809,7 +5907,7 @@ export class Renderer {
 
   // Flash a school-colored AoE ring on the terrain at a ground-targeted blast's
   // landing spot, sized to the blast radius (see aoe_ring.ts for the curves).
-  spawnAoeRing(x: number, z: number, radius: number, school: string): void {
+  spawnAoeRing(x: number, z: number, radius: number, school: string, colorHex?: number): void {
     if (this.aoeRings.length === 0) return;
     const slot = this.aoeRings[this.aoeRingNext];
     this.aoeRingNext = (this.aoeRingNext + 1) % this.aoeRings.length;
@@ -5817,7 +5915,7 @@ export class Renderer {
     slot.ring.position.set(x, y, z);
     slot.radius = radius;
     slot.elapsed = 0;
-    slot.mat.color.setHex(SCHOOL_COLORS[school] ?? 0xffffff);
+    slot.mat.color.setHex(colorHex ?? SCHOOL_COLORS[school] ?? 0xffffff);
     if (!this.lowGfx) slot.mat.color.multiplyScalar(SELECTION_RING_BOOST);
     slot.ring.visible = true;
   }

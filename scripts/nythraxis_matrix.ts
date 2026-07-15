@@ -298,7 +298,6 @@ const specs = {
       'berserker_rage',
       'execute',
       'mortal_strike',
-      'rend',
       'slam',
       'heroic_strike',
     ],
@@ -775,7 +774,6 @@ const DOT_ABILITIES = new Set([
   'insect_swarm',
   'flame_shock',
   'serpent_sting',
-  'rend',
   'rip',
   'rupture',
 ]);

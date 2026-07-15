@@ -468,6 +468,7 @@ export const cs_CZ: AdminTranslations = {
   "money.silver": "s",
   "money.copper": "m",
   "class.warrior": "Válečník",
+  "class.swordmaster": "SwordMaster",
   "class.paladin": "Paladin",
   "class.hunter": "Lovec",
   "class.rogue": "Tulák",

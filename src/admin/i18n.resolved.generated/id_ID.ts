@@ -468,6 +468,7 @@ export const id_ID: AdminTranslations = {
   "money.silver": "p",
   "money.copper": "t",
   "class.warrior": "Prajurit",
+  "class.swordmaster": "SwordMaster",
   "class.paladin": "Paladin",
   "class.hunter": "Pemburu",
   "class.rogue": "Penyamun",

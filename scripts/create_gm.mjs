@@ -14,6 +14,7 @@
 //     "INSERT INTO characters (account_id, name, class, level, is_gm)
 //      SELECT id, 'GM01', 'paladin', 20, TRUE FROM accounts WHERE username = 'name';"
 import pg from 'pg';
+import { PLAYABLE_CLASSES } from './lib/playable_classes.mjs';
 
 try {
   process.loadEnvFile?.();
@@ -24,9 +25,8 @@ try {
 const username = process.argv[2];
 const clsIdx = process.argv.indexOf('--class');
 const cls = clsIdx > 0 ? process.argv[clsIdx + 1] : 'paladin';
-const VALID = ['warrior', 'paladin', 'hunter', 'rogue', 'priest', 'shaman', 'mage', 'warlock', 'druid'];
 
-if (!username || username.startsWith('--') || !VALID.includes(cls)) {
+if (!username || username.startsWith('--') || !PLAYABLE_CLASSES.includes(cls)) {
   console.error('usage: node scripts/create_gm.mjs <username> [--class <class>]');
   process.exit(1);
 }
@@ -53,7 +53,9 @@ try {
     'INSERT INTO characters (account_id, name, class, level, is_gm) VALUES ($1, $2, $3, 20, TRUE) RETURNING id',
     [acct.rows[0].id, name, cls],
   );
-  console.log(`created ${name} (${cls}, level 20, invulnerable) — character id ${res.rows[0].id} on account '${username}'`);
+  console.log(
+    `created ${name} (${cls}, level 20, invulnerable) - character id ${res.rows[0].id} on account '${username}'`,
+  );
 } finally {
   await pool.end();
 }

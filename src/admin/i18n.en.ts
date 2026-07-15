@@ -475,6 +475,7 @@ export const en = {
   'money.silver': 's',
   'money.copper': 'c',
   'class.warrior': 'Warrior',
+  'class.swordmaster': 'SwordMaster',
   'class.paladin': 'Paladin',
   'class.hunter': 'Hunter',
   'class.rogue': 'Rogue',

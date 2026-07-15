@@ -282,7 +282,9 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
 
   it('a range-0 targeted ability falls back to MELEE_RANGE for the range check', () => {
     const view = createActionBarView(
-      descriptor(slot(1, { ability: ability('rend', { requiresTarget: true, range: 0 }) })),
+      descriptor(
+        slot(1, { ability: ability('mortal_strike', { requiresTarget: true, range: 0 }) }),
+      ),
       fakeDeps(),
     );
     // range 0 -> the out-of-range check uses MELEE_RANGE (dist2d is on the x/z plane).

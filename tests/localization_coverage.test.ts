@@ -67,9 +67,11 @@ import {
   zh_CN,
   zh_TW,
 } from '../src/ui/i18n';
+import { pending } from '../src/ui/i18n.resolved.generated/pending';
 import {
   hasTalentTitleOverride,
   renderTalentManifestEntry,
+  type TalentTranslationManifestEntry,
   talentTranslationManifest,
 } from '../src/ui/talent_i18n';
 
@@ -766,6 +768,27 @@ describe('i18n Localization Key Coverage', () => {
 
     expect(entityCount('class', 'name')).toBe(Object.keys(CLASSES).length);
     expect(entityCount('class', 'description')).toBe(Object.keys(CLASSES).length);
+    expect(
+      manifest.filter((entry) => entry.kind === 'class' && entry.id === 'swordmaster'),
+    ).toEqual([
+      {
+        kind: 'class',
+        id: 'swordmaster',
+        field: 'name',
+        source: 'SwordMaster',
+        group: 'classAbility',
+        key: 'classes.swordmaster',
+      },
+      {
+        kind: 'class',
+        id: 'swordmaster',
+        field: 'description',
+        source:
+          'SwordMasters build momentum with precise twin-blade strikes, then turn speed into sweeping attacks that cut through whole groups.',
+        group: 'classAbility',
+        key: 'classDetails.lore.swordmaster',
+      },
+    ]);
     expect(entityCount('ability', 'name')).toBe(Object.keys(ABILITIES).length);
     expect(entityCount('ability', 'description')).toBe(Object.keys(ABILITIES).length);
     // Heroic upgraded variants (heroicOf) have no name key: they share the base
@@ -843,6 +866,7 @@ describe('i18n Localization Key Coverage', () => {
     for (const lang of supportedLanguages) {
       setLanguage(lang);
       resetEntityTranslationFallbackLog();
+      const pendingForLocale = new Set(pending[lang] ?? []);
       for (const entry of classAbilityEntries) {
         const rendered = tEntity(classAbilityRequest(entry));
         expect(rendered.trim().length, `${lang}.${entry.key}`).toBeGreaterThan(0);
@@ -857,7 +881,8 @@ describe('i18n Localization Key Coverage', () => {
           lang !== 'en' &&
           lang !== 'en_CA' &&
           entry.kind === 'ability' &&
-          entry.field === 'description'
+          entry.field === 'description' &&
+          !pendingForLocale.has(entry.key)
         ) {
           expect(
             rendered,
@@ -886,26 +911,26 @@ describe('i18n Localization Key Coverage', () => {
 
     // Hard data-regression pin. The sentinel check above proves the {buff} token
     // survives interpolation everywhere but is value-agnostic, so it cannot catch
-    // a silent balance change. commanding_shout is the ability the old blanket $b
-    // pin actually meant: its $b resolves to its rank-1 Stamina buff via the same
-    // picker hud.ts feeds the token. Pinning the literal fails if the datum (or
-    // the picker) changes, and rendering with it confirms the EN description
+    // a silent balance change. Iron Bellow is the winning Warrior's baseline
+    // raid-buff ability: its $b resolves to its rank-1 attack-power percentage via
+    // the same picker hud.ts feeds the token. Pinning the literal fails if the datum
+    // (or the picker) changes, and rendering with it confirms the EN description
     // interpolates the real number instead of a stale hardcoded one.
-    const commandingShout = abilitiesKnownAt('warrior', ABILITIES.commanding_shout.learnLevel).find(
-      (known) => known.def.id === 'commanding_shout' && known.rank === 1,
+    const battleShout = abilitiesKnownAt('warrior', ABILITIES.battle_shout.learnLevel).find(
+      (known) => known.def.id === 'battle_shout' && known.rank === 1,
     );
-    expect(commandingShout, 'commanding_shout rank 1 resolves').toBeTruthy();
-    const commandingShoutBuff = abilityBuffValue(commandingShout!);
-    expect(commandingShoutBuff, 'commanding_shout rank-1 Stamina buff').toBe(6);
+    if (!battleShout) throw new Error('battle_shout rank 1 did not resolve');
+    const battleShoutBuff = abilityBuffValue(battleShout);
+    expect(battleShoutBuff, 'battle_shout rank-1 attack-power buff').toBe(10);
     setLanguage('en');
-    const commandingShoutDesc = tEntity({
+    const battleShoutDesc = tEntity({
       kind: 'ability',
-      id: 'commanding_shout',
+      id: 'battle_shout',
       field: 'description',
-      values: { buff: String(commandingShoutBuff) },
+      values: { buff: String(battleShoutBuff) },
     });
-    expect(commandingShoutDesc).toContain('6');
-    expect(commandingShoutDesc).not.toContain('{buff}');
+    expect(battleShoutDesc).toContain('10');
+    expect(battleShoutDesc).not.toContain('{buff}');
   });
 
   it('should provide every item translation in every locale without canonical fallbacks', () => {
@@ -1193,35 +1218,34 @@ describe('i18n Localization Key Coverage', () => {
     // RELEASE-TIER ONLY: specific real-translation spot-checks (would render the
     // English fill, not these strings, for an untranslated key on a PR).
     if (RELEASE_TIER) {
+      const rowEntry = (
+        optionId: string,
+        field: 'name' | 'description',
+      ): TalentTranslationManifestEntry => {
+        const entry = talentEntries.find(
+          (candidate) => candidate.id.endsWith(`.${optionId}`) && candidate.field === field,
+        );
+        if (!entry) throw new Error(`Missing talent manifest entry: ${optionId}.${field}`);
+        return entry;
+      };
+
       setLanguage('es');
+      expect(renderTalentManifestEntry(rowEntry('war_row_double_charge', 'name'))).toContain(
+        'Carga doble',
+      );
       expect(
-        renderTalentManifestEntry(
-          talentEntries.find((entry) => entry.id === 'war_toughness' && entry.field === 'name')!,
-        ),
-      ).toContain('Dureza');
-      expect(
-        renderTalentManifestEntry(
-          talentEntries.find(
-            (entry) => entry.id === 'arms.mastery' && entry.field === 'description',
-          )!,
-        ),
+        renderTalentManifestEntry(rowEntry('war_row_blood_offering', 'description')),
       ).toContain('daño');
 
       setLanguage('zh_CN');
-      expect(
-        renderTalentManifestEntry(
-          talentEntries.find((entry) => entry.id === 'war_cruelty' && entry.field === 'name')!,
-        ),
-      ).toContain('残忍');
+      expect(renderTalentManifestEntry(rowEntry('war_row_blood_offering', 'name'))).toContain(
+        '战斗精通',
+      );
 
       setLanguage('ko_KR');
-      expect(
-        renderTalentManifestEntry(
-          talentEntries.find(
-            (entry) => entry.id === 'prot_choice.pc_last_stand' && entry.field === 'description',
-          )!,
-        ),
-      ).toContain('생명력');
+      expect(renderTalentManifestEntry(rowEntry('war_row_second_wind', 'description'))).toContain(
+        '생명력',
+      );
     }
 
     setLanguage('en');
