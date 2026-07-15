@@ -170,11 +170,15 @@ export function composeWhisperReply(typed: string): string {
 // whisper / reply (`/w`, `/r`), emotes (`/me`, `/dance`), rolls (`/roll`),
 // channel membership (`/join`, `/leave`), the ambiguous bare `/g` (say offline,
 // guild online), and any unknown command return null and leave the sticky
-// channel unchanged. Host-independent by design: only prefixes that route
-// identically offline and online are mapped (hence `/gu`/`/general`, never `/g`).
+// channel unchanged. A `!` community command (`!lfg`, `!events`) is a transient
+// command like a roll, and it is host-dependent anyway (the server relay gate
+// consumes it online; offline it would land in say), so it also returns null.
+// Host-independent by design: only prefixes that route identically offline and
+// online are mapped (hence `/gu`/`/general`, never `/g`).
 export function sentLineChannel(line: string): ChatTabChannel | null {
   const text = line.trim();
   if (!text) return null;
+  if (text.startsWith('!')) return null;
   if (!text.startsWith('/')) return 'say';
   if (/^\/p(arty)?\s/i.test(text)) return 'party';
   if (/^\/y(ell)?\s/i.test(text)) return 'yell';

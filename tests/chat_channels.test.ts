@@ -285,6 +285,15 @@ describe('chat channel tabs — pure model', () => {
     expect(composeChatLine('party', '/w Bob hi')).toBe('/w Bob hi');
   });
 
+  it('a "!" community command is transient: it never resets the sticky channel to say', () => {
+    // noteSentChannel runs on every send; if a "!" line mapped like plain text
+    // it would return 'say' and firing "!lfg ..." mid-conversation would drop
+    // your NEXT plain line from party/general to say. It stays null, like the
+    // other transient commands (whispers, emotes, rolls).
+    expect(sentLineTarget('!lfg need a healer')).toBeNull();
+    expect(sentLineChannel('!events raid at the fountain')).toBeNull();
+  });
+
   it('sentLineChannel maps the /1 shortcut to General (but never /g, which is guild online)', () => {
     expect(sentLineChannel('/1 hey everyone')).toBe('general');
     expect(sentLineChannel('/general hey everyone')).toBe('general');
