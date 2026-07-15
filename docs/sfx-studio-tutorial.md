@@ -193,7 +193,7 @@ fails instead of silently dropping `_2`, `_3`, or any later orphan after a gap.
 
 The same discovery path supports constrained mob subfamily files such as
 `mob_beast_wolf_attack_1.mp3`. Their action must be `aggro`, `attack`, `death`,
-or `hurt`.
+`hurt`, or `idle`.
 
 ## 9. Export everything for production
 

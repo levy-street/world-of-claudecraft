@@ -684,6 +684,7 @@ export const zh_TW: EnTranslations = {
       "targetFriendlyNext": "切換友方目標",
       "discord": "Discord",
       "valecup": "溪谷盃",
+      "sheathe": "收起/拔出武器",
       "categoryPet": "寵物",
       "petAttack": "寵物：攻擊",
       "petStop": "寵物：停止",
@@ -856,6 +857,7 @@ export const zh_TW: EnTranslations = {
       "aurasOnPlayerFrame": "增益顯示在玩家框",
       "highContrastBackground": "高對比度背景",
       "startAttackOnAbility": "使用技能時自動攻擊",
+      "showAttackButton": "顯示攻擊按鈕",
       "walkByAutoloot": "路過自動拾取",
       "groundReticle": "地面瞄準指示圈",
       "showItemLevel": "顯示物品等級",
@@ -1068,6 +1070,12 @@ export const zh_TW: EnTranslations = {
         "many": "你是{rank}，{count}名成員",
         "other": "你是{rank}，{count}名成員"
       },
+      "finderPartySize": {
+        "one": "{count} 名玩家",
+        "few": "{count} 名玩家",
+        "many": "{count} 名玩家",
+        "other": "{count} 名玩家"
+      },
       "characterCount": {
         "one": "{count} 個角色",
         "few": "{count} 個角色",
@@ -1277,7 +1285,10 @@ export const zh_TW: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "此物品無法銷毀。",
-      "rightClickDestroy": "Shift+右鍵單擊以銷毀",
+      "rightClickDestroy": "右鍵單擊以銷毀",
+      "dragEquipHint": "拖曳到角色身上以裝備",
+      "dragDestroyHint": "拖曳到世界中以銷毀",
+      "reorderNeedsRecent": "清除篩選並按「最近」排序即可整理背包",
       "filterGroupAria": "依類別篩選背包",
       "filterAll": "全部",
       "filterWeapon": "武器",
@@ -1526,8 +1537,13 @@ export const zh_TW: EnTranslations = {
         "admin": "管理員",
         "coredevs": "核心開發者",
         "devs": "開發者",
+        "seniormods": "資深管理員",
         "mods": "管理員",
-        "artists": "美術"
+        "juniormods": "初級管理員",
+        "artists": "美術",
+        "contentcreator": "內容創作者",
+        "legend": "LEGEND",
+        "shill": "SHILL"
       },
       "guildMember": "已驗證成員",
       "notMember": "尚未加入伺服器",
@@ -1794,7 +1810,8 @@ export const zh_TW: EnTranslations = {
       "title": "採集",
       "mining": "採礦",
       "logging": "伐木",
-      "herbalism": "藥草學"
+      "herbalism": "藥草學",
+      "notReady": "這個資源節點尚未為你重新生成。"
     },
     "archetypeTitle": {
       "label": "稱號",
@@ -1826,6 +1843,107 @@ export const zh_TW: EnTranslations = {
       "notAtHub": "必須達到所需等級並位於製作站，才能製作該物品。",
       "throttled": "你製作得太快了，請稍等片刻後再試。",
       "recipeNotLearned": "你還沒有學會這個配方。"
+    },
+    "finder": {
+      "title": "地城搜尋器",
+      "close": "關閉",
+      "back": "返回",
+      "syncing": "正在等待伺服器...",
+      "tabCatalogue": "目錄",
+      "tabQueue": "快速配對",
+      "tabBoard": "預組隊伍",
+      "normal": "普通",
+      "heroic": "英雄",
+      "kindDungeon": "地城",
+      "kindRaid": "團隊副本",
+      "kindSolo": "單人冒險",
+      "levels": "等級 {min} 至 {max}",
+      "levelOne": "等級 {level}",
+      "clock": "{minutes}:{seconds}",
+      "roleCount": "{count} {role}",
+      "roleTank": "坦克",
+      "roleHealer": "補師",
+      "roleDps": "輸出",
+      "freeRoles": "不限職責",
+      "lockoutDaily": "最終首領每日鎖定",
+      "lockoutNone": "無鎖定",
+      "lockedFor": "鎖定約 {minutes} 分鐘",
+      "attunement": "需要完成前置任務：{quest}",
+      "heroicMarks": "英雄徽記：每人 {count} 枚",
+      "entrance": "入口：{zone}",
+      "showOnMap": "在地圖上顯示",
+      "encounters": "首領戰",
+      "finalBoss": "最終首領",
+      "summoned": "召喚的守衛",
+      "lootGuaranteed": "以下物品必掉其一：",
+      "lootMaybe": "以下物品至多掉落其一：",
+      "lootChance": "額外機率掉落：",
+      "lootHeroic": "英雄獎勵，以下物品必掉其一：",
+      "pct": "{pct}%",
+      "blockedLevel": "僅限等級 {min} 至 {max}",
+      "blockedSpec": "需要選擇專精",
+      "yourRoles": "你的職責",
+      "needsSpec": "選擇一個專精才能使用地城搜尋器。",
+      "leaderNote": "只有隊長才能為隊伍排隊。",
+      "chooseActivities": "選擇活動",
+      "joinQueue": "加入佇列",
+      "leaveQueue": "離開佇列",
+      "waited": "排隊時間：{time}",
+      "cooldownNote": "你可以在 {seconds} 秒後再次排隊。",
+      "travelNote": "隊伍在原地組成。請一起前往入口；不會傳送任何人。",
+      "proposalTitle": "找到隊伍：{name}",
+      "proposalRole": "你的職責：{role}",
+      "accepted": "{accepted}/{size} 已確認",
+      "remaining": "剩餘 {seconds} 秒確認",
+      "accept": "接受",
+      "decline": "拒絕",
+      "acceptedWait": "正在等待其他人...",
+      "slotState": "{role}：{accepted}/{total} 已就緒",
+      "openListings": "公開招募",
+      "boardEmpty": "目前沒有招募。發佈一個吧！",
+      "boardLeaderGate": "只有隊長才能發佈招募。",
+      "publishListing": "發佈招募",
+      "activity": "活動",
+      "publish": "發佈",
+      "yourListing": "你的招募",
+      "closeListing": "關閉招募",
+      "applicants": "申請者",
+      "noApplicants": "還沒有申請者。",
+      "acceptApplicantAria": "接受 {name}",
+      "declineApplicantAria": "拒絕 {name}",
+      "levelClass": "{level} 級 {className}",
+      "leader": "隊長：{name}",
+      "needs": "需要：{roles}",
+      "slots": "{size}/{capacity}",
+      "apply": "申請",
+      "withdraw": "撤回申請",
+      "tagFirstRun": "初次挑戰",
+      "tagQuestRun": "任務團",
+      "tagFullClear": "全通",
+      "tagLearning": "歡迎新手",
+      "tagFastRun": "速通",
+      "mech": {
+        "shadow_pulse": "暗影脈衝（週期性範圍傷害）",
+        "reaping_arc": "收割之弧（正面順劈）",
+        "mist_surge": "迷霧湧動（週期性範圍傷害）",
+        "summons_adds": "召喚增援",
+        "lunar_tide": "月潮（週期性範圍傷害）",
+        "enrage": "低血量時狂怒",
+        "shuddering_stomp": "震顫踐踏（範圍暈眩）",
+        "necrotic_shockwave": "死靈衝擊波（高額範圍傷害）",
+        "grave_cleaver": "掘墓劈砍（正面順劈）",
+        "shadow_nova": "暗影新星（範圍爆發）",
+        "profane_mending": "褻瀆治療（治療其盟友）",
+        "mana_burn": "枯萎祝福（燃燒法力）",
+        "deathstalker_cleave": "死亡潛行者劈砍（正面順劈）",
+        "mortal_wound": "遺忘之傷（降低受到的治療）",
+        "sealbreak_shockwave": "破印衝擊波（範圍爆發）",
+        "gravebreaker": "碎墓打擊（正面扇形，背對團隊）",
+        "raise_fallen": "亡者復生（週期性召喚小怪）",
+        "soul_rend": "靈魂撕裂（被標記者需分散並接受治療）",
+        "deathless_rage": "不死之怒（需在護符石處打斷）",
+        "wardstones": "護符石引導（階段轉換）"
+      }
     },
     "deeds": {
       "title": "功績之書",
@@ -5244,6 +5362,7 @@ export const zh_TW: EnTranslations = {
     "actionBar": {
       "attackName": "攻擊",
       "attackTooltip": "對目標開啟或關閉自動攻擊。右鍵點擊敵人也會發起攻擊。",
+      "attackRemoveHint": "右鍵點擊可將其從動作列移除並空出欄位。",
       "emptySlot": "空欄位",
       "slotAria": "動作欄位 {slot}：{ability}",
       "emptySlotAria": "動作欄位 {slot}：空",
@@ -7654,6 +7773,15 @@ export const zh_TW: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "不死王庭權杖"
       },
+      "deathless_warguard_legmail": {
+        "name": "不死戰衛腿甲"
+      },
+      "soulrend_diadem": {
+        "name": "裂魂冠冕"
+      },
+      "scourgehide_carapace": {
+        "name": "災禍之皮甲殼"
+      },
       "cryptplate_helm": {
         "name": "墓板頭盔"
       },
@@ -7692,6 +7820,9 @@ export const zh_TW: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "不死巨刃"
+      },
+      "soulforged_warplate": {
+        "name": "鑄魂戰甲"
       },
       "stormcallers_focus": {
         "name": "喚雷之核"

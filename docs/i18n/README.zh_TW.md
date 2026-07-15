@@ -16,11 +16,11 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
 [![Version](https://img.shields.io/badge/version-0.25.0-blue)](../../package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.zh_TW.md)
-[![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.gg/GjhnUsBtw)
+[![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
 [English](../../README.md) · [Español](README.es.md) · [Español (España)](README.es_ES.md) · [Français](README.fr_FR.md) · [Français (Canada)](README.fr_CA.md) · [Italiano](README.it_IT.md) · [Deutsch](README.de_DE.md) · [简体中文](README.zh_CN.md) · **繁體中文** · [한국어](README.ko_KR.md) · [日本語](README.ja_JP.md) · [Português (Brasil)](README.pt_BR.md) · [Русский](README.ru_RU.md) · [Nederlands](README.nl_NL.md) · [Polski](README.pl_PL.md) · [Bahasa Indonesia](README.id_ID.md) · [Türkçe](README.tr_TR.md) · [Svenska](README.sv_SE.md) · [Tiếng Việt](README.vi_VN.md) · [Dansk](README.da_DK.md)
 
-[立即遊玩](https://worldofclaudecraft.com/) · [架設你自己的世界](#host-your-own-world-one-command) · [訓練一個代理](#train-an-agent-headless-rl) · [Web3](#web3) · [參與貢獻](CONTRIBUTING.zh_TW.md) · [Discord](https://discord.gg/GjhnUsBtw)
+[立即遊玩](https://worldofclaudecraft.com/) · [架設你自己的世界](#host-your-own-world-one-command) · [訓練一個代理](#train-an-agent-headless-rl) · [Web3](#web3) · [參與貢獻](CONTRIBUTING.zh_TW.md) · [Discord](https://discord.com/invite/worldofclaudecraft)
 
 ![World of ClaudeCraft 標題畫面](../../docs/screenshots/title-screen.jpg)
 
@@ -303,7 +303,7 @@ node scripts/crypt_raid.mjs     # five bots clear the Hollow Crypt (ALLOW_DEV_CO
 
 ## 參與貢獻
 
-歡迎各式各樣的貢獻：程式碼、翻譯、錯誤回報與文件。先從 [CONTRIBUTING.zh_TW.md](CONTRIBUTING.zh_TW.md) 開始進行設定，閱讀[行為準則](../../CODE_OF_CONDUCT.md)，並在回報漏洞前查看 [SECURITY.md](../../SECURITY.md)。新來的嗎？找找標記為 [`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue) 的議題，開一個[議題](https://github.com/levy-street/world-of-claudecraft/issues/new/choose)，或在 [Discord](https://discord.gg/GjhnUsBtw) 上打聲招呼。
+歡迎各式各樣的貢獻：程式碼、翻譯、錯誤回報與文件。先從 [CONTRIBUTING.zh_TW.md](CONTRIBUTING.zh_TW.md) 開始進行設定，閱讀[行為準則](../../CODE_OF_CONDUCT.md)，並在回報漏洞前查看 [SECURITY.md](../../SECURITY.md)。新來的嗎？找找標記為 [`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue) 的議題，開一個[議題](https://github.com/levy-street/world-of-claudecraft/issues/new/choose)，或在 [Discord](https://discord.com/invite/worldofclaudecraft) 上打聲招呼。
 
 <div align="center">
 

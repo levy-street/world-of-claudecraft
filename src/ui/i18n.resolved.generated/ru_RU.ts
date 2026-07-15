@@ -684,6 +684,7 @@ export const ru_RU: EnTranslations = {
       "targetFriendlyNext": "Следующий союзник",
       "discord": "Discord",
       "valecup": "Кубок Долины",
+      "sheathe": "Убрать/обнажить оружие",
       "categoryPet": "Питомец",
       "petAttack": "Питомец: атака",
       "petStop": "Питомец: стоп",
@@ -856,6 +857,7 @@ export const ru_RU: EnTranslations = {
       "aurasOnPlayerFrame": "Баффы у рамки игрока",
       "highContrastBackground": "Фон высокой контрастности",
       "startAttackOnAbility": "Автоатака при использовании способности",
+      "showAttackButton": "Показывать кнопку атаки",
       "walkByAutoloot": "Автосбор добычи при проходе",
       "groundReticle": "Прицел наземного наведения",
       "showItemLevel": "Показывать уровень предмета",
@@ -1068,6 +1070,12 @@ export const ru_RU: EnTranslations = {
         "many": "вы {rank}, {count} участников",
         "other": "вы {rank}, {count} участника"
       },
+      "finderPartySize": {
+        "one": "{count} игрок",
+        "few": "{count} игрока",
+        "many": "{count} игроков",
+        "other": "{count} игрока"
+      },
       "characterCount": {
         "one": "{count} персонаж",
         "few": "{count} персонажа",
@@ -1277,7 +1285,10 @@ export const ru_RU: EnTranslations = {
     },
     "bags": {
       "cannotDestroy": "Этот предмет нельзя уничтожить.",
-      "rightClickDestroy": "Shift+правый клик, чтобы уничтожить",
+      "rightClickDestroy": "Правый клик, чтобы уничтожить",
+      "dragEquipHint": "Перетащите на персонажа, чтобы надеть",
+      "dragDestroyHint": "Перетащите в мир, чтобы уничтожить",
+      "reorderNeedsRecent": "Сбросьте фильтр и выберите сортировку «Недавние», чтобы менять порядок в сумках",
       "filterGroupAria": "Фильтровать сумки по категории",
       "filterAll": "Все",
       "filterWeapon": "Оружие",
@@ -1526,8 +1537,13 @@ export const ru_RU: EnTranslations = {
         "admin": "Администратор",
         "coredevs": "Ведущий разработчик",
         "devs": "Разработчик",
+        "seniormods": "Старший модератор",
         "mods": "Модератор",
-        "artists": "Художник"
+        "juniormods": "Младший модератор",
+        "artists": "Художник",
+        "contentcreator": "Контент-мейкер",
+        "legend": "LEGEND",
+        "shill": "SHILL"
       },
       "guildMember": "Подтвержденный участник",
       "notMember": "Еще не на сервере",
@@ -1794,7 +1810,8 @@ export const ru_RU: EnTranslations = {
       "title": "Собирательство",
       "mining": "Горное дело",
       "logging": "Лесозаготовка",
-      "herbalism": "Травничество"
+      "herbalism": "Травничество",
+      "notReady": "Этот ресурсный узел еще не восстановился для вас."
     },
     "archetypeTitle": {
       "label": "Титул",
@@ -1826,6 +1843,107 @@ export const ru_RU: EnTranslations = {
       "notAtHub": "Чтобы создать это, вы должны находиться у ремесленного центра и иметь требуемый уровень.",
       "throttled": "Вы создаете предметы слишком быстро. Подождите немного и попробуйте снова.",
       "recipeNotLearned": "Вы еще не изучили этот рецепт."
+    },
+    "finder": {
+      "title": "Поиск подземелий",
+      "close": "Закрыть",
+      "back": "Назад",
+      "syncing": "Ожидание игрового мира...",
+      "tabCatalogue": "Каталог",
+      "tabQueue": "Быстрый подбор",
+      "tabBoard": "Готовые группы",
+      "normal": "Обычный",
+      "heroic": "Героический",
+      "kindDungeon": "Подземелье",
+      "kindRaid": "Рейд",
+      "kindSolo": "Одиночное приключение",
+      "levels": "Уровни {min}-{max}",
+      "levelOne": "Уровень {level}",
+      "clock": "{minutes}:{seconds}",
+      "roleCount": "{role}: {count}",
+      "roleTank": "Танк",
+      "roleHealer": "Лекарь",
+      "roleDps": "Боец",
+      "freeRoles": "Любые роли",
+      "lockoutDaily": "Ежедневное закрепление за последним боссом",
+      "lockoutNone": "Без закрепления",
+      "lockedFor": "Закрыто еще примерно {minutes} мин",
+      "attunement": "Требуется допуск: {quest}",
+      "heroicMarks": "Героические знаки: {count} на игрока",
+      "entrance": "Вход: {zone}",
+      "showOnMap": "Показать на карте",
+      "encounters": "Босс-схватки",
+      "finalBoss": "Последний босс",
+      "summoned": "Призываемый страж",
+      "lootGuaranteed": "Всегда выпадает один из:",
+      "lootMaybe": "Выпадает не более одного из:",
+      "lootChance": "Дополнительно с шансом:",
+      "lootHeroic": "Героическая награда, всегда один из:",
+      "pct": "{pct}%",
+      "blockedLevel": "Только уровни {min}-{max}",
+      "blockedSpec": "Требуется специализация",
+      "yourRoles": "Ваши роли",
+      "needsSpec": "Выберите специализацию, чтобы пользоваться поиском подземелий.",
+      "leaderNote": "Ставить группу в очередь может только ее лидер.",
+      "chooseActivities": "Выберите приключения",
+      "joinQueue": "Встать в очередь",
+      "leaveQueue": "Покинуть очередь",
+      "waited": "В очереди: {time}",
+      "cooldownNote": "Снова встать в очередь можно через {seconds} с.",
+      "travelNote": "Группа собирается на месте. Идите ко входу вместе: телепортации нет.",
+      "proposalTitle": "Группа найдена: {name}",
+      "proposalRole": "Ваша роль: {role}",
+      "accepted": "Подтвердили: {accepted} из {size}",
+      "remaining": "На ответ: {seconds} с",
+      "accept": "Принять",
+      "decline": "Отклонить",
+      "acceptedWait": "Ожидание остальных...",
+      "slotState": "{role}: готовы {accepted} из {total}",
+      "openListings": "Открытые объявления",
+      "boardEmpty": "Объявлений пока нет. Создайте свое!",
+      "boardLeaderGate": "Публиковать объявление может только лидер группы.",
+      "publishListing": "Создать объявление",
+      "activity": "Приключение",
+      "publish": "Опубликовать",
+      "yourListing": "Ваше объявление",
+      "closeListing": "Закрыть объявление",
+      "applicants": "Заявки",
+      "noApplicants": "Заявок пока нет.",
+      "acceptApplicantAria": "Принять {name}",
+      "declineApplicantAria": "Отклонить {name}",
+      "levelClass": "{className}, {level}-й уровень",
+      "leader": "Лидер: {name}",
+      "needs": "Нужны: {roles}",
+      "slots": "{size}/{capacity}",
+      "apply": "Подать заявку",
+      "withdraw": "Отозвать заявку",
+      "tagFirstRun": "Первый заход",
+      "tagQuestRun": "Задания",
+      "tagFullClear": "Полная зачистка",
+      "tagLearning": "Новичкам рады",
+      "tagFastRun": "Быстрый заход",
+      "mech": {
+        "shadow_pulse": "Пульс тьмы (периодический урон по области)",
+        "reaping_arc": "Жатвенная дуга (рассекающий удар спереди)",
+        "mist_surge": "Волна тумана (периодический урон по области)",
+        "summons_adds": "Призывает подкрепления",
+        "lunar_tide": "Лунный прилив (периодический урон по области)",
+        "enrage": "Приходит в ярость при низком здоровье",
+        "shuddering_stomp": "Сотрясающий топот (оглушение по области)",
+        "necrotic_shockwave": "Некротическая ударная волна (высокий урон по области)",
+        "grave_cleaver": "Могильный секач (рассекающий удар спереди)",
+        "shadow_nova": "Кольцо тьмы (взрыв по области)",
+        "profane_mending": "Нечестивое исцеление (лечит союзников)",
+        "mana_burn": "Увядшее благословение (сжигает ману)",
+        "deathstalker_cleave": "Секач смертохода (рассекающий удар спереди)",
+        "mortal_wound": "Забытая рана (снижает получаемое лечение)",
+        "sealbreak_shockwave": "Волна сорванной печати (взрыв по области)",
+        "gravebreaker": "Гробокрушитель (конус спереди, разверните от рейда)",
+        "raise_fallen": "Поднятие павших (периодические волны прислужников)",
+        "soul_rend": "Разрыв души (отмеченным разойтись и получать лечение)",
+        "deathless_rage": "Бессмертная ярость (прерывается у охранных камней)",
+        "wardstones": "Охранные камни (смена фазы)"
+      }
     },
     "deeds": {
       "title": "Книга деяний",
@@ -5244,6 +5362,7 @@ export const ru_RU: EnTranslations = {
     "actionBar": {
       "attackName": "Атака",
       "attackTooltip": "Включает или выключает автоатаку по вашей цели. Щелчок правой кнопкой по врагу также начинает атаку.",
+      "attackRemoveHint": "Щёлкните правой кнопкой, чтобы убрать её с панели и освободить ячейку.",
       "emptySlot": "Пустая ячейка",
       "slotAria": "Ячейка действия {slot}: {ability}",
       "emptySlotAria": "Ячейка действия {slot}: пусто",
@@ -7654,6 +7773,15 @@ export const ru_RU: EnTranslations = {
       "scepter_of_the_deathless_court": {
         "name": "Скипетр бессмертного двора"
       },
+      "deathless_warguard_legmail": {
+        "name": "Ножные латы бессмертного стража"
+      },
+      "soulrend_diadem": {
+        "name": "Диадема разрыва души"
+      },
+      "scourgehide_carapace": {
+        "name": "Панцирь бичевой шкуры"
+      },
       "cryptplate_helm": {
         "name": "Гробничный латный шлем"
       },
@@ -7692,6 +7820,9 @@ export const ru_RU: EnTranslations = {
       },
       "deathless_greatblade": {
         "name": "Бессмертный великий клинок"
+      },
+      "soulforged_warplate": {
+        "name": "Душекованый боевой доспех"
       },
       "stormcallers_focus": {
         "name": "Средоточие буревестника"

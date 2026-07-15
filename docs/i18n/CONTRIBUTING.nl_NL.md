@@ -14,7 +14,7 @@ welkom.
 
 Deze gids helpt je op weg en zorgt ervoor dat je eerste bijdrage soepel verloopt.
 Je hoeft geen expert te zijn. Als iets onduidelijk is, vraag het dan op
-[Discord](https://discord.gg/GjhnUsBtw) en iemand helpt je graag verder.
+[Discord](https://discord.com/invite/worldofclaudecraft) en iemand helpt je graag verder.
 
 Door deel te nemen, ga je akkoord met onze [Gedragscode](../../CODE_OF_CONDUCT.md).
 
@@ -176,7 +176,7 @@ hoeft daarvoor geen gamecode te schrijven:
    dan een PR.
 
 Om een gloednieuwe locale voor te stellen, of om over toon en terminologie te
-overleggen, start een thread op [Discord](https://discord.gg/GjhnUsBtw) en we
+overleggen, start een thread op [Discord](https://discord.com/invite/worldofclaudecraft) en we
 helpen je hem aan te sluiten. Moedertaalsprekers en vloeiende sprekers zijn
 bijzonder welkom. Goede vertalingen laten het spel voor spelers overal als thuis
 voelen.
@@ -195,7 +195,7 @@ Gebruik alsjeblieft de [issue-sjablonen](https://github.com/levy-street/world-of
 ## Hulp krijgen
 
 Loop je vast, of wil je gewoon even hallo zeggen? Sluit je aan bij de
-[community-Discord](https://discord.gg/GjhnUsBtw). Geen vraag is te klein, en
+[community-Discord](https://discord.com/invite/worldofclaudecraft). Geen vraag is te klein, en
 nieuwe bijdragers zijn altijd welkom.
 
 ## Licentie

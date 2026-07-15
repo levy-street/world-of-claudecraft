@@ -660,6 +660,12 @@ export interface InvSlot {
   count: number;
   /** Additive, optional per-instance payload (#1165). Absent for ordinary fungible stacks. */
   instance?: ItemInstancePayload;
+  /** The bag CELL this stack was dragged into (the manual arrangement). Absent for a
+   *  stack that was never placed by hand, which the layout drops into the first free
+   *  cell (src/sim/inventory_order.ts). Additive and advisory: an unusable value (a
+   *  shrunken bag, two stacks claiming one cell) is simply ignored by the layout, so an
+   *  old save with no slots at all lays out exactly as it always did. */
+  slot?: number;
 }
 
 // A shallow `{ ...instance }` aliases the mutable `charges`/`rolled.stats` maps
@@ -1977,6 +1983,9 @@ export interface Entity {
   sitting: boolean;
   eating: Consuming | null;
   drinking: Consuming | null;
+  // Z-key cosmetic toggle: held weapons render sheathed on the back. Cleared by
+  // any deliberate combat action (auto-attack engage, ability cast), WoW-style.
+  weaponStowed: boolean;
   // mob AI
   aiState: AiState;
   tappedById: number | null; // first player to damage this mob owns loot/xp/quest credit
@@ -2381,6 +2390,9 @@ export type SimEvent = { pid?: number } & (
   | { type: 'duelCountdown'; seconds: number }
   | { type: 'duelStart' }
   | { type: 'duelEnd'; winnerName: string; loserName: string }
+  // Dungeon Finder: a 30s availability proposal opened for this player (the
+  // client pops the finder window; state rides the `df` self snapshot).
+  | { type: 'dfProposal' }
   // Ashen Coliseum arena: queue state, match lifecycle, and rating result
   | { type: 'arenaQueued'; position: number; format: ArenaFormat }
   | { type: 'arenaUnqueued' }
@@ -2536,7 +2548,11 @@ export type SimEvent = { pid?: number } & (
     }
   // entityId (when set) anchors the log to that entity so the server only
   // delivers it to nearby players; anchorless logs broadcast server-wide
-  | { type: 'log'; text: string; color?: string; entityId?: number }
+  // `telegraph` marks an entityId-anchored line as an actionable mechanic cue
+  // (a channel, a burst warning, a targeted debuff callout) rather than ambient
+  // flavor chatter: it must reach General/Chat even though it is anchored, since
+  // it may be a player's only cue. See src/ui/log_event_route.ts.
+  | { type: 'log'; text: string; color?: string; entityId?: number; telegraph?: boolean }
   | { type: 'delveEntered'; delveId: string; tierId: string }
   | { type: 'delveObjectiveComplete'; delveId: string; tierId: string }
   | { type: 'delveComplete'; delveId: string; tierId: string }

@@ -5,9 +5,8 @@
 // translate that key. The build (scripts/i18n_build.mjs) unflattens this map and
 // overlays it onto nested `en` to produce the dense resolved table; any key here
 // must be a real `en` leaf path: keys are typed `Partial<Record<TranslationKey,
-// string>>` so tsc rejects a structurally-wrong key, plus
-// tests/i18n_overlay_key_membership.test.ts catches a typo'd entity id the
-// template-literal key type cannot. Overlays are SPARSE: an
+// string>>` against the build-generated flat key union, so tsc rejects any key
+// that is not an exact `en` leaf path, typo'd entity ids included. Overlays are SPARSE: an
 // untranslated key is omitted and the build fills it from English, then the
 // registry (src/ui/i18n.status.json) marks it `pending`.
 
@@ -310,6 +309,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.choirmothers_casque.name': 'Elmetto della madre del coro',
   'entities.items.cryptplate_helm.name': 'Elmo della corazza della cripta',
   'entities.items.deathless_greatblade.name': 'Spadone senza morte',
+  'entities.items.deathless_warguard_legmail.name':
+    'Cosciali di maglia del guardiaguerra senza morte',
   'entities.items.gravescale_girdle.name': 'Cintura scagliatomba',
   'entities.items.gravewyrm_claws.name': 'Artigli del wyrm tombale',
   'entities.items.gravewyrm_cleaver.name': 'Mannaia del wyrm tombale',
@@ -325,10 +326,13 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.sanctum_prowlers_grips.name': 'Prese del predatore del santuario',
   'entities.items.sash_of_the_sunken_court.name': 'Fascia della corte sommersa',
   'entities.items.scepter_of_the_deathless_court.name': 'Scettro della corte senza morte',
+  'entities.items.scourgehide_carapace.name': 'Carapace di pelle del flagello',
   'entities.items.seal_of_the_nine_oaths.name': 'Sigillo dei nove giuramenti',
   'entities.items.shadowpulse_handwraps.name': 'Bende ombrapulsante',
   'entities.items.shadowpulse_slippers.name': 'Calzari ombrapulsante',
   'entities.items.shroud_of_the_gravewyrm.name': 'Sudario del wyrm tombale',
+  'entities.items.soulforged_warplate.name': 'Corazza da guerra forgianima',
+  'entities.items.soulrend_diadem.name': 'Diadema straccianima',
   'entities.items.stormcallers_focus.name': "Focus dell'evocatempesta",
   'entities.items.sunken_court_mantle.name': 'Mantello della corte sommersa',
   'entities.items.sutils_gambit.name': 'Gambetto di Sutil',

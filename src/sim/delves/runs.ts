@@ -1263,6 +1263,7 @@ export function startDelveRaiseDeadChannel(
     text: `${boss.name} begins Raise Dead.`,
     color: '#f96',
     entityId: boss.id,
+    telegraph: true,
   });
   return true;
 }

@@ -16,11 +16,11 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
 [![Version](https://img.shields.io/badge/version-0.25.0-blue)](../../package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.de_DE.md)
-[![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.gg/GjhnUsBtw)
+[![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
 [English](../../README.md) · [Español](README.es.md) · [Español (España)](README.es_ES.md) · [Français](README.fr_FR.md) · [Français (Canada)](README.fr_CA.md) · [Italiano](README.it_IT.md) · **Deutsch** · [简体中文](README.zh_CN.md) · [繁體中文](README.zh_TW.md) · [한국어](README.ko_KR.md) · [日本語](README.ja_JP.md) · [Português (Brasil)](README.pt_BR.md) · [Русский](README.ru_RU.md) · [Nederlands](README.nl_NL.md) · [Polski](README.pl_PL.md) · [Bahasa Indonesia](README.id_ID.md) · [Türkçe](README.tr_TR.md) · [Svenska](README.sv_SE.md) · [Tiếng Việt](README.vi_VN.md) · [Dansk](README.da_DK.md)
 
-[Jetzt spielen](https://worldofclaudecraft.com/) · [Hoste deine eigene Welt](#host-your-own-world-one-command) · [Trainiere einen Agenten](#train-an-agent-headless-rl) · [Web3](#web3) · [Mitwirken](CONTRIBUTING.de_DE.md) · [Discord](https://discord.gg/GjhnUsBtw)
+[Jetzt spielen](https://worldofclaudecraft.com/) · [Hoste deine eigene Welt](#host-your-own-world-one-command) · [Trainiere einen Agenten](#train-an-agent-headless-rl) · [Web3](#web3) · [Mitwirken](CONTRIBUTING.de_DE.md) · [Discord](https://discord.com/invite/worldofclaudecraft)
 
 ![Titelbildschirm von World of ClaudeCraft](../../docs/screenshots/title-screen.jpg)
 
@@ -303,7 +303,7 @@ Jede für Spieler sichtbare Zeichenkette wird über `t()` aufgelöst, und das Sp
 
 ## Mitwirken
 
-Beiträge jeder Art sind willkommen: Code, Übersetzungen, Fehlerberichte und Dokumentation. Beginne mit [CONTRIBUTING.de_DE.md](CONTRIBUTING.de_DE.md) für die Einrichtung, lies den [Verhaltenskodex](../../CODE_OF_CONDUCT.md) und prüfe [SECURITY.md](../../SECURITY.md), bevor du eine Schwachstelle meldest. Neu hier? Halte Ausschau nach Issues mit dem Label [`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue), öffne ein [Issue](https://github.com/levy-street/world-of-claudecraft/issues/new/choose) oder sag Hallo auf [Discord](https://discord.gg/GjhnUsBtw).
+Beiträge jeder Art sind willkommen: Code, Übersetzungen, Fehlerberichte und Dokumentation. Beginne mit [CONTRIBUTING.de_DE.md](CONTRIBUTING.de_DE.md) für die Einrichtung, lies den [Verhaltenskodex](../../CODE_OF_CONDUCT.md) und prüfe [SECURITY.md](../../SECURITY.md), bevor du eine Schwachstelle meldest. Neu hier? Halte Ausschau nach Issues mit dem Label [`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue), öffne ein [Issue](https://github.com/levy-street/world-of-claudecraft/issues/new/choose) oder sag Hallo auf [Discord](https://discord.com/invite/worldofclaudecraft).
 
 <div align="center">
 

@@ -16,11 +16,11 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
 [![Version](https://img.shields.io/badge/version-0.25.0-blue)](../../package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.tr_TR.md)
-[![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.gg/GjhnUsBtw)
+[![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
 [English](../../README.md) · [Español](README.es.md) · [Español (España)](README.es_ES.md) · [Français](README.fr_FR.md) · [Français (Canada)](README.fr_CA.md) · [Italiano](README.it_IT.md) · [Deutsch](README.de_DE.md) · [简体中文](README.zh_CN.md) · [繁體中文](README.zh_TW.md) · [한국어](README.ko_KR.md) · [日本語](README.ja_JP.md) · [Português (Brasil)](README.pt_BR.md) · [Русский](README.ru_RU.md) · [Nederlands](README.nl_NL.md) · [Polski](README.pl_PL.md) · [Bahasa Indonesia](README.id_ID.md) · **Türkçe** · [Svenska](README.sv_SE.md) · [Tiếng Việt](README.vi_VN.md) · [Dansk](README.da_DK.md)
 
-[Hemen oyna](https://worldofclaudecraft.com/) · [Kendi dünyanı barındır](#host-your-own-world-one-command) · [Bir ajan eğit](#train-an-agent-headless-rl) · [Web3](#web3) · [Katkıda bulun](CONTRIBUTING.tr_TR.md) · [Discord](https://discord.gg/GjhnUsBtw)
+[Hemen oyna](https://worldofclaudecraft.com/) · [Kendi dünyanı barındır](#host-your-own-world-one-command) · [Bir ajan eğit](#train-an-agent-headless-rl) · [Web3](#web3) · [Katkıda bulun](CONTRIBUTING.tr_TR.md) · [Discord](https://discord.com/invite/worldofclaudecraft)
 
 ![World of ClaudeCraft başlık ekranı](../../docs/screenshots/title-screen.jpg)
 
@@ -303,7 +303,7 @@ Her oyuncuya görünür dize `t()` üzerinden çözülür ve oyun **21 yerel aya
 
 ## Katkıda bulunma
 
-Her türlü katkı memnuniyetle karşılanır: kod, çeviriler, hata raporları ve belgeler. Kurulum için [CONTRIBUTING.tr_TR.md](CONTRIBUTING.tr_TR.md) ile başla, [Davranış Kuralları](../../CODE_OF_CONDUCT.md)'nı oku ve bir güvenlik açığı bildirmeden önce [SECURITY.md](../../SECURITY.md)'yi kontrol et. Burada yeni misin? [`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue) etiketli sorunlara bak, bir [sorun](https://github.com/levy-street/world-of-claudecraft/issues/new/choose) aç veya [Discord](https://discord.gg/GjhnUsBtw)'da merhaba de.
+Her türlü katkı memnuniyetle karşılanır: kod, çeviriler, hata raporları ve belgeler. Kurulum için [CONTRIBUTING.tr_TR.md](CONTRIBUTING.tr_TR.md) ile başla, [Davranış Kuralları](../../CODE_OF_CONDUCT.md)'nı oku ve bir güvenlik açığı bildirmeden önce [SECURITY.md](../../SECURITY.md)'yi kontrol et. Burada yeni misin? [`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue) etiketli sorunlara bak, bir [sorun](https://github.com/levy-street/world-of-claudecraft/issues/new/choose) aç veya [Discord](https://discord.com/invite/worldofclaudecraft)'da merhaba de.
 
 <div align="center">
 

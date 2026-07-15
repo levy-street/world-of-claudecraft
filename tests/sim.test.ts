@@ -779,6 +779,58 @@ describe('rogue', () => {
     expect(vanish / base).toBeCloseTo(0.5, 1);
   });
 
+  it('Sap does not break the caster stealth (issue #1890)', () => {
+    const sim = makeSim('rogue');
+    sim.setPlayerLevel(10); // Sap learns at level 10
+    const mob = nearestMob(sim, 'forest_wolf');
+    mob.level = 1;
+    mob.inCombat = false;
+    mob.aggroTargetId = null;
+    teleportTo(sim, mob.pos.x + 2, mob.pos.z);
+    sim.player.inCombat = false;
+    sim.castAbility('stealth');
+    expect(sim.player.auras.some((a) => a.kind === 'stealth')).toBe(true);
+    sim.targetEntity(mob.id);
+    facePlayerAt(sim, mob);
+    sim.castAbility('sap');
+    sim.tick();
+    expect(mob.auras.some((a: any) => a.kind === 'incapacitate')).toBe(true);
+    expect(sim.player.auras.some((a) => a.kind === 'stealth')).toBe(true);
+  });
+
+  it('Low Blow (kidney_shot) works while invisible from Vanish (issue #1890)', () => {
+    const sim = makeSim('rogue');
+    sim.setPlayerLevel(20); // Vanish (18) and Low Blow (14) both known
+    const wolf = nearestMob(sim, 'forest_wolf');
+    wolf.level = 1;
+    teleportTo(sim, wolf.pos.x + 2, wolf.pos.z);
+    sim.targetEntity(wolf.id);
+    facePlayerAt(sim, wolf);
+    let guard = 0;
+    while (sim.player.comboPoints < 2 && guard++ < 20 * 120 && !wolf.dead) {
+      if (sim.player.resource >= 45 && sim.player.gcdRemaining <= 0)
+        sim.castAbility('sinister_strike');
+      sim.tick();
+      facePlayerAt(sim, wolf);
+    }
+    expect(sim.player.comboPoints).toBeGreaterThanOrEqual(2);
+    // The build-up loop can finish off a starter-level wolf; revive it fully so
+    // the assertion below is about Low Blow, not an incidental kill.
+    sim.stopAutoAttack();
+    wolf.dead = false;
+    wolf.hp = wolf.maxHp;
+    sim.castAbility('vanish');
+    expect(sim.player.auras.some((a) => a.kind === 'stealth')).toBe(true);
+    facePlayerAt(sim, wolf);
+    for (let i = 0; i < 30 && sim.player.gcdRemaining > 0; i++) {
+      sim.tick();
+      facePlayerAt(sim, wolf);
+    }
+    sim.castAbility('kidney_shot');
+    sim.tick();
+    expect(wolf.auras.some((a: any) => a.kind === 'stun')).toBe(true);
+  });
+
   it('rogue GCD is 1.0s', () => {
     const sim = makeSim('rogue');
     expect(sim.playerGcd).toBe(1.0);

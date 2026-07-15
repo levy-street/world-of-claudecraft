@@ -14,7 +14,7 @@ berarti, dan kamu disambut di sini.
 
 Panduan ini akan membantumu menyiapkan lingkungan kerja dan membuat kontribusi
 pertamamu berjalan mulus. Kamu tidak perlu menjadi ahli. Jika ada yang kurang
-jelas, tanyakan di [Discord](https://discord.gg/GjhnUsBtw) dan seseorang akan
+jelas, tanyakan di [Discord](https://discord.com/invite/worldofclaudecraft) dan seseorang akan
 dengan senang hati membantu.
 
 Dengan ikut berpartisipasi, kamu setuju untuk mengikuti
@@ -186,7 +186,7 @@ baru? Kamu tidak perlu menulis kode game apa pun untuk melakukannya:
 
 Untuk mengusulkan sebuah locale yang benar-benar baru, atau untuk mendiskusikan
 nada dan terminologi, mulai sebuah thread di
-[Discord](https://discord.gg/GjhnUsBtw) dan kami akan membantumu menyambungkannya.
+[Discord](https://discord.com/invite/worldofclaudecraft) dan kami akan membantumu menyambungkannya.
 Penutur asli dan fasih sangat kami sambut. Terjemahan yang baik membuat game
 terasa seperti rumah bagi para pemain di mana pun.
 
@@ -204,7 +204,7 @@ Mohon gunakan [templat isu](https://github.com/levy-street/world-of-claudecraft/
 ## Mendapatkan bantuan
 
 Tersangkut, atau hanya ingin menyapa? Bergabunglah dengan
-[Discord komunitas](https://discord.gg/GjhnUsBtw). Tidak ada pertanyaan yang
+[Discord komunitas](https://discord.com/invite/worldofclaudecraft). Tidak ada pertanyaan yang
 terlalu kecil, dan kontributor baru selalu disambut.
 
 ## Lisensi

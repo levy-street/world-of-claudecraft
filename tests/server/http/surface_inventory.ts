@@ -2120,6 +2120,26 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: null,
     requireOwnedExpected: null,
   },
+  {
+    dispatcher: DISPATCH.internal,
+    method: 'POST',
+    path: '/internal/daily-rewards/void-payout',
+    handler: 'handleDailyRewardInternalApi arm: /internal/daily-rewards/void-payout',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.secretDailyReward,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.internal,
+    method: 'POST',
+    path: '/internal/daily-rewards/restore-payout',
+    handler: 'handleDailyRewardInternalApi arm: /internal/daily-rewards/restore-payout',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.secretDailyReward,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
 ];
 
 // The four API prefixes every dispatched route descriptor begins with. The

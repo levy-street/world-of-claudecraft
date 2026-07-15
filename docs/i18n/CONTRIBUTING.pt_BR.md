@@ -14,7 +14,7 @@ aqui.
 
 Este guia vai te ajudar a configurar o ambiente e tornar sua primeira contribuição
 algo tranquilo. Você não precisa ser especialista. Se algo não estiver claro,
-pergunte no [Discord](https://discord.gg/GjhnUsBtw) e alguém terá o maior prazer
+pergunte no [Discord](https://discord.com/invite/worldofclaudecraft) e alguém terá o maior prazer
 em ajudar.
 
 Ao participar, você concorda em seguir nosso [Código de Conduta](../../CODE_OF_CONDUCT.md).
@@ -180,7 +180,7 @@ escrever nenhum código de jogo para isso:
    PR.
 
 Para propor um locale totalmente novo, ou para conversar sobre tom e terminologia,
-inicie uma thread no [Discord](https://discord.gg/GjhnUsBtw) e nós te ajudamos a
+inicie uma thread no [Discord](https://discord.com/invite/worldofclaudecraft) e nós te ajudamos a
 deixar tudo conectado. Falantes nativos e fluentes são especialmente bem-vindos.
 Boas traduções fazem o jogo parecer um lar para jogadores de todos os lugares.
 
@@ -199,7 +199,7 @@ Por favor, use os [modelos de issue](https://github.com/levy-street/world-of-cla
 ## Conseguindo ajuda
 
 Travou ou só quer dar um oi? Entre no
-[Discord da comunidade](https://discord.gg/GjhnUsBtw). Nenhuma pergunta é pequena
+[Discord da comunidade](https://discord.com/invite/worldofclaudecraft). Nenhuma pergunta é pequena
 demais, e novos contribuidores são sempre bem-vindos.
 
 ## Licença

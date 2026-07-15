@@ -3041,8 +3041,8 @@
      el.style.color onto a class the pooled fct_painter toggles (no hex
      in TS). Each class carries the exact hex the live fct() passed, grouped by colour:
      miss/dodge keyed self (#bbb) vs other (#fff); damage done by ability (#ffe97a) vs
-     auto-attack (#fff); damage taken (#ff5544); heal (#3ce63c); xp (#b974ff); rested
-     xp (#4a9eff); Honor (#ffd100); the self note (#ff8c66). Crit stays the separate
+     auto-attack (#fff); damage taken (#ff5544); heal (#3ce63c); xp (#d9a3ff); rested
+     xp (#6db8ff); Honor (#ffd100); the self note (#ff8c66). Crit stays the separate
      .fct.crit class. */
   .fct-miss-self,
   .fct-dodge-self {
@@ -3063,10 +3063,39 @@
     color: #3ce63c;
   }
   .fct-xp {
-    color: #b974ff;
+    color: #d9a3ff;
+    font-size: calc(20px * var(--fct-scale, 1));
+    animation-name: fct-xp-pop;
+    animation-duration: 1.6s;
   }
   .fct-rested-xp {
-    color: #4a9eff;
+    color: #6db8ff;
+    font-size: calc(20px * var(--fct-scale, 1));
+    animation-name: fct-xp-pop;
+    animation-duration: 1.6s;
+  }
+  /* A slightly bigger scale-in pop than the plain rise (but lighter than the crit pop),
+     so the XP reward reads as pronounced without competing with a real critical hit. */
+  @keyframes fct-xp-pop {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+      scale: 1;
+    }
+    15% {
+      scale: 1.25;
+    }
+    100% {
+      opacity: 0;
+      translate: -50% calc(-50% - 76px);
+      scale: 1;
+    }
+  }
+  /* Same low-tier motion shedding precedent as .fct.crit: keep the bigger XP size and
+     color, drop only the scale/pop (the heaviest part of the effect). Never refused. */
+  :root[data-fx-level="low"] .fct-xp,
+  :root[data-fx-level="low"] .fct-rested-xp {
+    animation-name: fct-rise;
   }
   .fct-honor {
     color: #ffd100;

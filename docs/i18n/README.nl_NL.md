@@ -16,11 +16,11 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
 [![Version](https://img.shields.io/badge/version-0.25.0-blue)](../../package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.nl_NL.md)
-[![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.gg/GjhnUsBtw)
+[![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
 [English](../../README.md) · [Español](README.es.md) · [Español (España)](README.es_ES.md) · [Français](README.fr_FR.md) · [Français (Canada)](README.fr_CA.md) · [Italiano](README.it_IT.md) · [Deutsch](README.de_DE.md) · [简体中文](README.zh_CN.md) · [繁體中文](README.zh_TW.md) · [한국어](README.ko_KR.md) · [日本語](README.ja_JP.md) · [Português (Brasil)](README.pt_BR.md) · [Русский](README.ru_RU.md) · **Nederlands** · [Polski](README.pl_PL.md) · [Bahasa Indonesia](README.id_ID.md) · [Türkçe](README.tr_TR.md) · [Svenska](README.sv_SE.md) · [Tiếng Việt](README.vi_VN.md) · [Dansk](README.da_DK.md)
 
-[Speel nu](https://worldofclaudecraft.com/) · [Host je eigen wereld](#host-your-own-world-one-command) · [Train een agent](#train-an-agent-headless-rl) · [Web3](#web3) · [Bijdragen](CONTRIBUTING.nl_NL.md) · [Discord](https://discord.gg/GjhnUsBtw)
+[Speel nu](https://worldofclaudecraft.com/) · [Host je eigen wereld](#host-your-own-world-one-command) · [Train een agent](#train-an-agent-headless-rl) · [Web3](#web3) · [Bijdragen](CONTRIBUTING.nl_NL.md) · [Discord](https://discord.com/invite/worldofclaudecraft)
 
 ![World of ClaudeCraft titelscherm](../../docs/screenshots/title-screen.jpg)
 
@@ -303,7 +303,7 @@ Elke voor de speler zichtbare string wordt opgelost via `t()`, en de game wordt 
 
 ## Bijdragen
 
-Bijdragen van elke soort zijn welkom: code, vertalingen, bugrapporten en documentatie. Begin met [CONTRIBUTING.nl_NL.md](CONTRIBUTING.nl_NL.md) voor de setup, lees de [Code of Conduct](../../CODE_OF_CONDUCT.md), en bekijk [SECURITY.md](../../SECURITY.md) voordat je een kwetsbaarheid meldt. Nieuw hier? Zoek naar issues met het label [`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue), open een [issue](https://github.com/levy-street/world-of-claudecraft/issues/new/choose), of zeg hallo op [Discord](https://discord.gg/GjhnUsBtw).
+Bijdragen van elke soort zijn welkom: code, vertalingen, bugrapporten en documentatie. Begin met [CONTRIBUTING.nl_NL.md](CONTRIBUTING.nl_NL.md) voor de setup, lees de [Code of Conduct](../../CODE_OF_CONDUCT.md), en bekijk [SECURITY.md](../../SECURITY.md) voordat je een kwetsbaarheid meldt. Nieuw hier? Zoek naar issues met het label [`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue), open een [issue](https://github.com/levy-street/world-of-claudecraft/issues/new/choose), of zeg hallo op [Discord](https://discord.com/invite/worldofclaudecraft).
 
 <div align="center">
 

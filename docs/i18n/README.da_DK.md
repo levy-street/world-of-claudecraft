@@ -16,11 +16,11 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
 [![Version](https://img.shields.io/badge/version-0.25.0-blue)](../../package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.da_DK.md)
-[![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.gg/GjhnUsBtw)
+[![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
 [English](../../README.md) · [Español](README.es.md) · [Español (España)](README.es_ES.md) · [Français](README.fr_FR.md) · [Français (Canada)](README.fr_CA.md) · [Italiano](README.it_IT.md) · [Deutsch](README.de_DE.md) · [简体中文](README.zh_CN.md) · [繁體中文](README.zh_TW.md) · [한국어](README.ko_KR.md) · [日本語](README.ja_JP.md) · [Português (Brasil)](README.pt_BR.md) · [Русский](README.ru_RU.md) · [Nederlands](README.nl_NL.md) · [Polski](README.pl_PL.md) · [Bahasa Indonesia](README.id_ID.md) · [Türkçe](README.tr_TR.md) · [Svenska](README.sv_SE.md) · [Tiếng Việt](README.vi_VN.md) · **Dansk**
 
-[Spil nu](https://worldofclaudecraft.com/) · [Hav din egen verden](#host-your-own-world-one-command) · [Træn en agent](#train-an-agent-headless-rl) · [Web3](#web3) · [Bidrag](CONTRIBUTING.da_DK.md) · [Discord](https://discord.gg/GjhnUsBtw)
+[Spil nu](https://worldofclaudecraft.com/) · [Hav din egen verden](#host-your-own-world-one-command) · [Træn en agent](#train-an-agent-headless-rl) · [Web3](#web3) · [Bidrag](CONTRIBUTING.da_DK.md) · [Discord](https://discord.com/invite/worldofclaudecraft)
 
 ![World of ClaudeCraft titelskærm](../../docs/screenshots/title-screen.jpg)
 
@@ -303,7 +303,7 @@ Hver spiller-synlig streng resolver gennem `t()`, og spillet leveres på **21 sp
 
 ## Bidrag
 
-Bidrag af enhver art er velkomne: kode, oversættelser, fejlrapporter, og dokumentation. Start med [CONTRIBUTING.md](CONTRIBUTING.da_DK.md) for opsætning, læs [Code of Conduct](../../CODE_OF_CONDUCT.md), og tjek [SECURITY.md](../../SECURITY.md) før du rapporterer en sårbarhed. Ny her? Kig efter issues mærket [`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue), åbn et [issue](https://github.com/levy-street/world-of-claudecraft/issues/new/choose), eller sig hej på [Discord](https://discord.gg/GjhnUsBtw).
+Bidrag af enhver art er velkomne: kode, oversættelser, fejlrapporter, og dokumentation. Start med [CONTRIBUTING.md](CONTRIBUTING.da_DK.md) for opsætning, læs [Code of Conduct](../../CODE_OF_CONDUCT.md), og tjek [SECURITY.md](../../SECURITY.md) før du rapporterer en sårbarhed. Ny her? Kig efter issues mærket [`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue), åbn et [issue](https://github.com/levy-street/world-of-claudecraft/issues/new/choose), eller sig hej på [Discord](https://discord.com/invite/worldofclaudecraft).
 
 <div align="center">
 

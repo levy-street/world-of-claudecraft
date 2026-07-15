@@ -49,7 +49,8 @@ export class MobileActionRingPainter {
    *  rebuild + write entirely on an unchanged page). The toggle's aria-label is
    *  the static "Switch action page" action name (its purpose never changes);
    *  the indicator span shows the dynamic "Page X of Y" text. */
-  paint(state: ActionBarState, page: number, pageCount: number): void {
+  paint(state: ActionBarState, page: number, pageCount: number, showAttackButton = true): void {
+    this.writers.setDisplay(this.descriptor.bar.slots[0].btn, showAttackButton ? '' : 'none');
     this.barPainter.paint(state);
 
     if (this.lastPage !== page || this.lastPageCount !== pageCount) {

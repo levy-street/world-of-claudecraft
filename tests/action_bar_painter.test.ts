@@ -196,6 +196,7 @@ function idleWorld(): ActionBarWorldInput {
       gcdRemaining: 0,
       potionCdRemaining: 0,
       queuedOnSwing: null,
+      stealthed: false,
       pos: { x: 0, y: 0, z: 0 },
     },
     target: null,
@@ -232,7 +233,7 @@ describe('ActionBarPainter: aria-label + icon elision (Top risks 1 + 4)', () => 
         slots: [
           {
             slotIndex: 0,
-            isAttack: false,
+            isAttack: () => false,
             hasAction: () => true,
             ability: () => ability('fireball'),
             item: () => null,

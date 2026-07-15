@@ -1,14 +1,23 @@
 import { describe, expect, it } from 'vitest';
 import { CLASSES } from '../src/sim/content/classes';
 import {
+  actionForAttackSlot,
+  applyLoadoutBar,
+  assignAttackSlotAction,
+  attackSlotStorageKey,
   buildDefaultFormBar,
   classHasFormBars,
   clearHotbarSlot,
+  encodeStoredHotbarAction,
+  handleMobileAttackTap,
   hotbarActionsEqual,
+  loadAttackSlotAction,
   parseHotbarActions,
+  parseStoredHotbarAction,
   placeAbilityOnSlot,
   placeItemOnSlot,
   resolveMobileHotbarDrop,
+  saveAttackSlotAction,
   shouldSeedFormBar,
   syncHotbarActions,
 } from '../src/ui/hotbar';
@@ -57,6 +66,83 @@ describe('hotbar action parsing', () => {
       { type: 'ability', id: 'shared_id' },
       { type: 'item', id: 'shared_id' },
     ]);
+  });
+
+  it('parses only valid persisted abilities and items that still exist', () => {
+    expect(
+      parseStoredHotbarAction(
+        JSON.stringify({ type: 'ability', id: 'fireball' }),
+        abilityExists,
+        itemExists,
+      ),
+    ).toEqual({ type: 'ability', id: 'fireball' });
+    expect(
+      parseStoredHotbarAction(
+        JSON.stringify({ type: 'item', id: 'baked_bread' }),
+        abilityExists,
+        itemExists,
+      ),
+    ).toEqual({ type: 'item', id: 'baked_bread' });
+    expect(
+      parseStoredHotbarAction(
+        JSON.stringify({ type: 'ability', id: 'unknown' }),
+        abilityExists,
+        itemExists,
+      ),
+    ).toBeNull();
+    expect(
+      parseStoredHotbarAction(JSON.stringify({ type: 'item', id: 42 }), abilityExists, itemExists),
+    ).toBeNull();
+    expect(parseStoredHotbarAction('{broken', abilityExists, itemExists)).toBeNull();
+    expect(parseStoredHotbarAction(null, abilityExists, itemExists)).toBeNull();
+  });
+
+  it('encodes persisted actions and represents an empty slot without JSON null', () => {
+    expect(encodeStoredHotbarAction({ type: 'ability', id: 'fireball' })).toBe(
+      JSON.stringify({ type: 'ability', id: 'fireball' }),
+    );
+    expect(encodeStoredHotbarAction(null)).toBeNull();
+  });
+});
+
+describe('mobile attack tap', () => {
+  it.each([
+    { autoAttack: true, hasLiveHostileTarget: false },
+    { autoAttack: false, hasLiveHostileTarget: true },
+  ])('toggles auto-attack for an active combat state', (state) => {
+    const calls: string[] = [];
+
+    handleMobileAttackTap(state, {
+      activateAttack: () => calls.push('toggle'),
+      attackNearest: () => calls.push('nearest'),
+    });
+
+    expect(calls).toEqual(['toggle']);
+  });
+
+  it('acquires the nearest target when idle and a resolver is available', () => {
+    const calls: string[] = [];
+
+    handleMobileAttackTap(
+      { autoAttack: false, hasLiveHostileTarget: false },
+      {
+        activateAttack: () => calls.push('toggle'),
+        attackNearest: () => calls.push('nearest'),
+      },
+    );
+
+    expect(calls).toEqual(['nearest']);
+  });
+
+  it('falls back to the auto-attack toggle when no nearest resolver is wired', () => {
+    const calls: string[] = [];
+
+    handleMobileAttackTap(
+      { autoAttack: false, hasLiveHostileTarget: false },
+      { activateAttack: () => calls.push('toggle'), attackNearest: null },
+    );
+
+    expect(calls).toEqual(['toggle']);
   });
 });
 
@@ -378,6 +464,46 @@ describe('hotbar slot sync', () => {
   });
 });
 
+describe('applying a saved talent loadout bar', () => {
+  // A SavedLoadout.bar is ability ids only (saveTalentLoadout's currentBar mapping
+  // in hud.ts drops item shortcuts before persisting), so switching to a saved
+  // loadout must not silently clear a potion/food/drink slot the loadout never
+  // captured in the first place. Regression for #1889.
+  it('keeps an existing item shortcut in a slot the loadout leaves blank', () => {
+    const current = [
+      { type: 'item' as const, id: 'baked_bread' },
+      { type: 'ability' as const, id: 'frost_armor' },
+      { type: 'item' as const, id: 'spring_water' },
+      null,
+    ];
+
+    expect(applyLoadoutBar(current, ['fireball', null, null, null], 4, abilityExists)).toEqual([
+      { type: 'ability', id: 'fireball' },
+      null,
+      { type: 'item', id: 'spring_water' },
+      null,
+    ]);
+  });
+
+  it('lets a loadout ability slot replace whatever was there before', () => {
+    const current = [
+      { type: 'item' as const, id: 'baked_bread' },
+      { type: 'ability' as const, id: 'frost_armor' },
+    ];
+
+    expect(applyLoadoutBar(current, ['polymorph', 'fireball'], 2, abilityExists)).toEqual([
+      { type: 'ability', id: 'polymorph' },
+      { type: 'ability', id: 'fireball' },
+    ]);
+  });
+
+  it('drops an unknown/stale ability id from the loadout without reviving an item there', () => {
+    const current = [{ type: 'ability' as const, id: 'fireball' }];
+
+    expect(applyLoadoutBar(current, ['no_such_ability'], 1, abilityExists)).toEqual([null]);
+  });
+});
+
 describe('mobile touch drag drop resolution', () => {
   it('resolves the target slot when it differs from the source', () => {
     expect(resolveMobileHotbarDrop(2, 5)).toBe(5);
@@ -389,5 +515,52 @@ describe('mobile touch drag drop resolution', () => {
 
   it('cancels when the pointer released back on the source slot', () => {
     expect(resolveMobileHotbarDrop(2, 2)).toBeNull();
+  });
+});
+
+describe('desktop attack slot behavior', () => {
+  const storage = () => {
+    const values = new Map<string, string>();
+    return {
+      values,
+      getItem: (key: string) => values.get(key) ?? null,
+      setItem: (key: string, value: string) => values.set(key, value),
+      removeItem: (key: string) => values.delete(key),
+    };
+  };
+
+  it('uses a separate, stable storage key and round-trips valid actions', () => {
+    const store = storage();
+    const key = attackSlotStorageKey('woc_hotbar_warrior_Thorgar');
+    expect(key).toBe('woc_hotbar_warrior_Thorgar:s0');
+
+    saveAttackSlotAction(store, key, { type: 'ability', id: 'fireball' });
+    expect(loadAttackSlotAction(store, key, abilityExists, itemExists)).toEqual({
+      type: 'ability',
+      id: 'fireball',
+    });
+    saveAttackSlotAction(store, key, null);
+    expect(store.getItem(key)).toBeNull();
+  });
+
+  it('rejects malformed and stale persisted actions', () => {
+    const store = storage();
+    const key = attackSlotStorageKey('bar');
+    store.setItem(key, '{"type":"ability","id":"gone"}');
+    expect(loadAttackSlotAction(store, key, abilityExists, itemExists)).toBeNull();
+    store.setItem(key, '{bad');
+    expect(loadAttackSlotAction(store, key, abilityExists, itemExists)).toBeNull();
+  });
+
+  it('keeps slot 0 empty while Attack is shown and casts its assignment when removed', () => {
+    const action = { type: 'ability' as const, id: 'fireball' };
+    expect(actionForAttackSlot(true, action)).toBeNull();
+    expect(actionForAttackSlot(false, action)).toEqual(action);
+  });
+
+  it('assigns a dropped action and clears the source bar slot when applicable', () => {
+    const action = { type: 'ability' as const, id: 'fireball' };
+    expect(assignAttackSlotAction(action, 3)).toEqual({ action, clearSourceIndex: 3 });
+    expect(assignAttackSlotAction(action, null)).toEqual({ action, clearSourceIndex: null });
   });
 });

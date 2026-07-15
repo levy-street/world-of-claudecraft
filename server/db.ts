@@ -711,8 +711,50 @@ CREATE TABLE IF NOT EXISTS daily_reward_payouts (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   PRIMARY KEY (day, realm, rank)
 );
+ALTER TABLE daily_reward_payouts ADD COLUMN IF NOT EXISTS void_reason TEXT;
+ALTER TABLE daily_reward_payouts ADD COLUMN IF NOT EXISTS voided_by_id TEXT;
+ALTER TABLE daily_reward_payouts ADD COLUMN IF NOT EXISTS voided_by_username TEXT;
+ALTER TABLE daily_reward_payouts ADD COLUMN IF NOT EXISTS voided_at TIMESTAMPTZ;
+ALTER TABLE daily_reward_payouts ADD COLUMN IF NOT EXISTS signed_transaction TEXT;
 CREATE INDEX IF NOT EXISTS daily_reward_payouts_status
   ON daily_reward_payouts(status, day DESC, realm);
+CREATE TABLE IF NOT EXISTS daily_reward_payout_moderation_audit (
+  id BIGSERIAL PRIMARY KEY,
+  day TEXT NOT NULL,
+  realm TEXT NOT NULL,
+  rank INT NOT NULL,
+  account_id INT NOT NULL,
+  action TEXT NOT NULL CHECK (action IN ('void', 'restore')),
+  previous_status TEXT NOT NULL,
+  next_status TEXT NOT NULL,
+  reason TEXT NOT NULL,
+  actor_id TEXT NOT NULL,
+  actor_username TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS daily_reward_payout_moderation_target
+  ON daily_reward_payout_moderation_audit(day, realm, rank, created_at DESC);
+CREATE TABLE IF NOT EXISTS daily_reward_payout_attempts (
+  id BIGSERIAL PRIMARY KEY,
+  day TEXT NOT NULL,
+  realm TEXT NOT NULL,
+  rank INT NOT NULL,
+  kind TEXT NOT NULL CHECK (kind IN ('payout', 'resend')),
+  operation_id TEXT,
+  status TEXT NOT NULL CHECK (status IN ('prepared', 'paid', 'failed')),
+  tx_signature TEXT NOT NULL UNIQUE,
+  signed_transaction TEXT,
+  error TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  FOREIGN KEY (day, realm, rank) REFERENCES daily_reward_payouts(day, realm, rank)
+);
+CREATE INDEX IF NOT EXISTS daily_reward_payout_attempts_target
+  ON daily_reward_payout_attempts(day, realm, rank, created_at DESC);
+ALTER TABLE daily_reward_payout_attempts ADD COLUMN IF NOT EXISTS operation_id TEXT;
+CREATE UNIQUE INDEX IF NOT EXISTS daily_reward_payout_attempts_operation
+  ON daily_reward_payout_attempts(day, realm, rank, kind, operation_id)
+  WHERE operation_id IS NOT NULL;
 -- Shareable player cards (docs/prd/woc/player-card.md). One card per character;
 -- the PNG is composited client-side and stored here as bytes so any realm
 -- process (all share this database) can serve /p/<slug> and the OG image. slug

@@ -1088,6 +1088,9 @@ export const en = {
       shroud_of_the_gravewyrm: { name: 'Shroud of the Gravewyrm' },
       sanctum_prowlers_grips: { name: "Sanctum Prowler's Grips" },
       scepter_of_the_deathless_court: { name: 'Scepter of the Deathless Court' },
+      deathless_warguard_legmail: { name: 'Deathless Warguard Legmail' },
+      soulrend_diadem: { name: 'Soulrend Diadem' },
+      scourgehide_carapace: { name: 'Scourgehide Carapace' },
       cryptplate_helm: { name: 'Cryptplate Helm' },
       shadowpulse_slippers: { name: 'Shadowpulse Slippers' },
       bonechill_cord: { name: 'Bonechill Cord' },
@@ -1101,6 +1104,7 @@ export const en = {
       gravescale_girdle: { name: 'Gravescale Girdle' },
       wyrmchoir_handwraps: { name: 'Wyrmchoir Handwraps' },
       deathless_greatblade: { name: 'Deathless Greatblade' },
+      soulforged_warplate: { name: 'Soulforged Warplate' },
       stormcallers_focus: { name: "Stormcaller's Focus" },
       seal_of_the_nine_oaths: { name: 'Seal of the Nine Oaths' },
       nielas_coldlight_band: { name: "Niela's Coldlight Band" },
@@ -1168,11 +1172,21 @@ export const en = {
 // ": EnTranslations" so tsc still red-fails any missing or renamed key.
 export type EnTranslations = typeof en;
 
-// Depth 6 so the deepest real leaves (entities.quests.<id>.objectives.<n>.label,
-// entities.zones.<id>.pois.<n>.label) are members. The sparse overlays are typed
-// `Partial<Record<TranslationKey, string>>`, so TranslationKey must reach
-// every overlay key; depth 5 stopped one segment short. (Measured: no tsc cost.)
-export type TranslationKey = Leaves<typeof en, 6>;
+// TranslationKey is the build-generated flat literal union of every dotted leaf
+// path in `en` (./translation_keys.generated.ts, emitted by scripts/i18n_build.mjs;
+// regenerate with `npm run i18n:gen`). It replaced the recursive computation
+// `Leaves<typeof en, 6>`: the recursive union normalized to thousands of string
+// literals plus 85 template-literal patterns (from the four Record-over-id entity
+// subtrees: abilities, item sets, quest objectives, zone POIs), whose
+// literal-times-pattern subsumption checks exceed TypeScript 7's native-compiler
+// work budget (TS2590; issue #1868 is the durable evidence trail), and the
+// patterns accepted ANY entity id, so a typo'd id type-checked. The generated
+// union keeps every legal key, rejects typo'd entity ids (strictly stronger
+// checking), and roughly halves tsc wall time. The sparse overlays stay typed
+// `Partial<Record<TranslationKey, string>>`, so TranslationKey still reaches
+// every overlay key. Leaves above stays exported for compatibility; it has no
+// other instantiations repo-wide.
+export type TranslationKey = import('./translation_keys.generated').TranslationKeyFlat;
 export type InterpolationValue = string | number;
 export type InterpolationValues = Record<string, InterpolationValue>;
 

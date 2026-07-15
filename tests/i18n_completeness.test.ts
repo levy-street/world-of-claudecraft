@@ -206,6 +206,7 @@ describe('i18n CLDR pluralization', () => {
   it('declares the expected plural bases with all four CLDR categories in en', () => {
     expect(bases.sort()).toEqual([
       'characterCount',
+      'finderPartySize',
       'guildMembers',
       'playersMatching',
       'playersOnline',

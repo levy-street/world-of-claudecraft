@@ -182,6 +182,7 @@ function makeCtx() {
     partyOf: vi.fn(() => null),
     removeFromParty: vi.fn(),
     dropPartyMarkers: vi.fn(),
+    formDungeonFinderGroup: vi.fn(() => null),
     onMobKilledForQuests: vi.fn(),
     onInventoryChangedForQuests: vi.fn(),
     checkQuestReady: vi.fn(),
@@ -319,6 +320,7 @@ function makeCtx() {
     setPlayerLevel: vi.fn(),
     notice: vi.fn(),
     spawnDevBot: vi.fn(),
+    seedDungeonFinderDev: vi.fn(() => ({ spawned: 0, note: 'ok' as const })),
     // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved useItem dispatches to.
     startFishing: vi.fn(),
     unlockMechChromaFromItem: vi.fn(),

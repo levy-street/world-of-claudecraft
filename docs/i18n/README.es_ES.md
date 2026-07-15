@@ -16,11 +16,11 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
 [![Version](https://img.shields.io/badge/version-0.25.0-blue)](../../package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.es_ES.md)
-[![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.gg/GjhnUsBtw)
+[![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
 [English](../../README.md) · [Español](README.es.md) · **Español (España)** · [Français](README.fr_FR.md) · [Français (Canada)](README.fr_CA.md) · [Italiano](README.it_IT.md) · [Deutsch](README.de_DE.md) · [简体中文](README.zh_CN.md) · [繁體中文](README.zh_TW.md) · [한국어](README.ko_KR.md) · [日本語](README.ja_JP.md) · [Português (Brasil)](README.pt_BR.md) · [Русский](README.ru_RU.md) · [Nederlands](README.nl_NL.md) · [Polski](README.pl_PL.md) · [Bahasa Indonesia](README.id_ID.md) · [Türkçe](README.tr_TR.md) · [Svenska](README.sv_SE.md) · [Tiếng Việt](README.vi_VN.md) · [Dansk](README.da_DK.md)
 
-[Jugar ahora](https://worldofclaudecraft.com/) · [Aloja tu propio mundo](#host-your-own-world-one-command) · [Entrena un agente](#train-an-agent-headless-rl) · [Web3](#web3) · [Contribuir](CONTRIBUTING.es_ES.md) · [Discord](https://discord.gg/GjhnUsBtw)
+[Jugar ahora](https://worldofclaudecraft.com/) · [Aloja tu propio mundo](#host-your-own-world-one-command) · [Entrena un agente](#train-an-agent-headless-rl) · [Web3](#web3) · [Contribuir](CONTRIBUTING.es_ES.md) · [Discord](https://discord.com/invite/worldofclaudecraft)
 
 ![Pantalla de título de World of ClaudeCraft](../../docs/screenshots/title-screen.jpg)
 
@@ -303,7 +303,7 @@ Cada cadena visible para el jugador se resuelve a través de `t()`, y el juego s
 
 ## Contribuir
 
-Las contribuciones de todo tipo son bienvenidas: código, traducciones, informes de errores y documentación. Empieza con [CONTRIBUTING.md](CONTRIBUTING.es_ES.md) para la configuración, lee el [Código de conducta](../../CODE_OF_CONDUCT.md) y consulta [SECURITY.md](../../SECURITY.md) antes de informar de una vulnerabilidad. ¿Nuevo por aquí? Busca incidencias etiquetadas como [`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue), abre una [incidencia](https://github.com/levy-street/world-of-claudecraft/issues/new/choose) o saluda en [Discord](https://discord.gg/GjhnUsBtw).
+Las contribuciones de todo tipo son bienvenidas: código, traducciones, informes de errores y documentación. Empieza con [CONTRIBUTING.md](CONTRIBUTING.es_ES.md) para la configuración, lee el [Código de conducta](../../CODE_OF_CONDUCT.md) y consulta [SECURITY.md](../../SECURITY.md) antes de informar de una vulnerabilidad. ¿Nuevo por aquí? Busca incidencias etiquetadas como [`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue), abre una [incidencia](https://github.com/levy-street/world-of-claudecraft/issues/new/choose) o saluda en [Discord](https://discord.com/invite/worldofclaudecraft).
 
 <div align="center">
 

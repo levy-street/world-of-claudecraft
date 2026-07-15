@@ -159,6 +159,10 @@ export const BOOL_SETTINGS = {
   // startAutoAttack still no-ops unless a valid hostile target is in range, and
   // heals / buffs / damage-breakable CC (gouge, sap, sheep) never trigger it.
   startAttackOnAbilityUse: { def: true },
+  // on by default: slot 0 shows the classic fixed Attack (auto-attack) toggle.
+  // Turning it off (or right-clicking the Attack button) removes it from the bar,
+  // freeing slot 0 and its keybind to hold a normal assignable action.
+  showAttackButton: { def: true },
   // off by default: walk-by proximity autoloot (loot corpses just by walking
   // past them). Auto-grabbing loot can feel jarring, so it is opt-in and classic
   // deliberate looting stays the default. Gates the client AutoLoot pass in
@@ -207,11 +211,11 @@ export const BOOL_SETTINGS = {
   // Purely a local display preference: the badge is still earned and broadcast
   // either way, this only controls whether THIS client renders it.
   showDevBadges: { def: true },
-  // off by default (the classic self-view keeps no plate over your head): when
-  // on, render your OWN overhead nameplate (name, level, guild, hp, $WOC holder
-  // tier, dev badge, linked-Discord PFP) exactly as other players see it, so you
-  // can see how your character presents. Purely a local display preference.
-  showOwnNameplate: { def: false },
+  // on by default: render your OWN overhead nameplate (name, level, guild, hp,
+  // $WOC holder tier, dev badge, linked-Discord PFP) exactly as other players see
+  // it, so Discord linking and other flair changes have immediate visual feedback.
+  // Purely a local display preference; players can turn it off for the classic view.
+  showOwnNameplate: { def: true },
   // off by default: invert the vertical axis of mouselook (push mouse forward
   // to look down), the classic flight-sim preference.
   invertLookY: { def: false },

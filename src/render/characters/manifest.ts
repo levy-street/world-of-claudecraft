@@ -35,6 +35,9 @@ export interface ClipMap {
   walkBack?: string;
   /** one-shot played on respawn (skeleton awaken / boss taunt) */
   flourish?: string;
+  /** arm gesture for the Z-key sheathe toggle; the held-prop swap lands at its
+   *  midpoint (see visual.ts setWeaponStowed). Absent = snap with no gesture. */
+  stow?: string;
   /** player-facing overhead emote one-shots; clips are sourced from the GLB. */
   emote?: Partial<Record<OverheadEmoteId, EmoteClipSpec>>;
 }
@@ -131,6 +134,10 @@ const kaykit = (attack: string[], idle = 'Idle'): ClipMap => ({
   sitIdle: 'Sit_Floor_Idle',
   swim: 'Lie_Idle',
   jump: 'Jump_Idle',
+  // The trimmed player GLBs ship no dedicated sheathe clip; the 1H chop WINDUP
+  // (the clip's first ~40%, cut at the swap point by visual.ts) reaches over the
+  // shoulder toward the back, which reads as grabbing/planting the hilt.
+  stow: '1H_Melee_Attack_Chop',
   emote: KAYKIT_EMOTES,
 });
 
