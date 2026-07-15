@@ -1389,9 +1389,7 @@ const FACET_GAUNTLET = [
   'gauntletEcho',
   'gauntletCourt',
 ] as const satisfies readonly (keyof IWorldGauntlet)[];
-type _ExhaustGauntlet = AssertNever<
-  Exclude<keyof IWorldGauntlet, (typeof FACET_GAUNTLET)[number]>
->;
+type _ExhaustGauntlet = AssertNever<Exclude<keyof IWorldGauntlet, (typeof FACET_GAUNTLET)[number]>>;
 
 const FACET_HODRICS = [
   'hcInfo',

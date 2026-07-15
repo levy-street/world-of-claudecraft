@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { isBlocked } from '../src/sim/colliders';
 import { GAUNTLET, GAUNTLET_LAYOUT, GAUNTLET_VENUE } from '../src/sim/content/gauntlet';
 import { SKIN_COUNTS } from '../src/sim/content/skins';
-import { gauntletOrigin, isGauntletPos } from '../src/sim/data';
+import { GAUNTLET_X, gauntletOrigin, isGauntletPos } from '../src/sim/data';
 import { nextGreenWindowS } from '../src/sim/gauntlet/trial_sentinel';
 import {
   aliveContestants,
@@ -507,10 +507,10 @@ describe('venue layout envelope', () => {
   it('keeps every venue anchor inside the ground apron and the slot envelope', () => {
     const V = GAUNTLET_VENUE;
     // The apron must stay inside the gauntlet band (no bleed into the
-    // battleground reserve at x 9600) and inside one slot's z pitch (400,
+    // neighboring instance bands) and inside one slot's z pitch (400,
     // data.ts GAUNTLET_SLOT_SPACING) so neighboring runs never see it.
-    expect(isGauntletPos(9000 - V.groundHalfWidth)).toBe(true);
-    expect(isGauntletPos(9000 + V.groundHalfWidth)).toBe(true);
+    expect(isGauntletPos(GAUNTLET_X - V.groundHalfWidth)).toBe(true);
+    expect(isGauntletPos(GAUNTLET_X + V.groundHalfWidth)).toBe(true);
     expect(V.groundZMax - V.groundZMin).toBeLessThan(400);
     const inApron = (x: number, z: number, pad: number) => {
       expect(Math.abs(x) + pad).toBeLessThanOrEqual(V.groundHalfWidth);

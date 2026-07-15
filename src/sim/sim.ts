@@ -115,20 +115,19 @@ import {
   FISHING_RARE_ID,
   FISHING_TABLES,
   getActiveWorldContent,
+  hodricsOrigin,
   INSTANCE_SLOT_COUNT,
   ITEMS,
   isArenaPos,
   isDelvePos,
   isGauntletPos,
   isHodricsPos,
-  hodricsOrigin,
   MOBS,
   NPCS,
   QUESTS,
   SPIRIT_HEALER_NPC_ID,
   zoneAt,
 } from './data';
-import { HC_CHECKPOINTS, hcProgressFrac, hcSectionAt } from './hodrics_layout';
 import * as deedsMod from './deeds';
 import {
   createDeedRuntime,
@@ -142,8 +141,6 @@ import * as companionMod from './delves/companion';
 import * as lockpickMod from './delves/lockpick_controller';
 import * as runsMod from './delves/runs';
 import { projectOutsideDungeonDoors } from './dungeon_door_clearance';
-import * as gauntletMod from './gauntlet/runs';
-import type { GauntletRun } from './gauntlet/state';
 import * as nythraxis from './encounters/nythraxis';
 // A3: ARENA_SPAWNS_A_2v2/B_2v2 (read only by the moved fiestaRevive) now live with
 // social/fiesta.ts. The dungeon-wall consts (DUNGEON_WALL_HW/X) are now read only by
@@ -171,6 +168,9 @@ import {
 import { canEquipItem, resolveEquipSlot } from './equipment_rules';
 import { fleeSpeed } from './flee_speed';
 import { formatMoney } from './format_money';
+import * as gauntletMod from './gauntlet/runs';
+import type { GauntletRun } from './gauntlet/state';
+import { hcProgressFrac, hcSectionAt } from './hodrics_course';
 import * as interaction from './interaction';
 import { meetsLevelRequirement } from './item_level_req';
 import * as items from './items';
@@ -355,12 +355,12 @@ export { computeQuestState } from './quests/quest_commands';
 import { completeCurrentQuestsForDev, completeQuestForDev } from './quests/dev_quest_commands';
 import * as arenaMod from './social/arena';
 import * as duelMod from './social/duel';
-// A4: Protect Yumi (formats yumi3/yumi5); match logic in social/yumi.ts, reached
-// via ctx callbacks + the two hostility arms in isHostileTo/isFriendlyTo.
-import * as yumiMod from './social/yumi';
 import type { HcMatch, HcQueueUnit } from './social/hodrics';
 import * as hodricsMod from './social/hodrics';
 import * as hcBotsMod from './social/hodrics_bots';
+// A4: Protect Yumi (formats yumi3/yumi5); match logic in social/yumi.ts, reached
+// via ctx callbacks + the two hostility arms in isHostileTo/isFriendlyTo.
+import * as yumiMod from './social/yumi';
 
 // A2: eloDelta (with ARENA_K_FACTOR) moved to social/arena.ts. Re-exported so the
 // public path `import { Sim, eloDelta } from './sim'` (tests/arena.test.ts) holds.
@@ -1884,13 +1884,13 @@ export class Sim {
     if (savedPos && isDelvePos(savedPos.x)) {
       const delve = delveAt(savedPos.x) ?? DELVE_LIST[0];
       savedPos = { x: delve.doorPos.x, z: delve.doorPos.z - 4 };
-     } else if (savedPos && isHodricsPos(savedPos.x)) {
+    } else if (savedPos && isHodricsPos(savedPos.x)) {
       // Saved mid-race at Hodric's Castle: rejoin where they queued from (the
       // race instance is long gone); no return recorded falls back to the
       // world start below.
       const ret = savedState?.hcReturnPos;
       savedPos = ret ? { x: ret.x, z: ret.z } : null;
-     } else if (savedPos && isGauntletPos(savedPos.x)) {
+    } else if (savedPos && isGauntletPos(savedPos.x)) {
       // Saved mid-run in the Gauntlet band: their run is long gone, and
       // without this branch the generic dungeon fallback below would eject
       // them to an unrelated dungeon door. Rejoin at the world start (the
@@ -2537,6 +2537,10 @@ export class Sim {
             vcupBetNet: meta.vcupBetNet,
           }
         : {}),
+      ...(meta.hcRaces || meta.hcWins || meta.hcBest !== undefined
+        ? { hcRaces: meta.hcRaces, hcWins: meta.hcWins, hcBest: meta.hcBest }
+        : {}),
+      hcReturnPos: this.hcMatches.get(pid)?.returns.get(pid) ?? undefined,
       talents: cloneAllocation(restore ? restore.talents : meta.talents),
       loadouts: meta.loadouts.map((l) => ({
         name: l.name,
@@ -3204,12 +3208,24 @@ export class Sim {
       set nextArenaMatchId(v) {
         sim.nextArenaMatchId = v;
       },
-      get hcQueue() { return sim.hcQueue; },
-      set hcQueue(v) { sim.hcQueue = v; },
-      get hcMatches() { return sim.hcMatches; },
-      get hcBusySlots() { return sim.hcBusySlots; },
-      get nextHcMatchId() { return sim.nextHcMatchId; },
-      set nextHcMatchId(v) { sim.nextHcMatchId = v; },
+      get hcQueue() {
+        return sim.hcQueue;
+      },
+      set hcQueue(v) {
+        sim.hcQueue = v;
+      },
+      get hcMatches() {
+        return sim.hcMatches;
+      },
+      get hcBusySlots() {
+        return sim.hcBusySlots;
+      },
+      get nextHcMatchId() {
+        return sim.nextHcMatchId;
+      },
+      set nextHcMatchId(v) {
+        sim.nextHcMatchId = v;
+      },
       get delveRuns() {
         return sim.delveRuns;
       },
@@ -7051,8 +7067,12 @@ export class Sim {
     hcBotsMod.updateHcBots(this);
   }
 
-  hcQueueJoin(pid?: number): void { hodricsMod.hcQueueJoin(this.ctx, pid); }
-  hcQueueLeave(pid?: number): void { hodricsMod.hcQueueLeave(this.ctx, pid); }
+  hcQueueJoin(pid?: number): void {
+    hodricsMod.hcQueueJoin(this.ctx, pid);
+  }
+  hcQueueLeave(pid?: number): void {
+    hodricsMod.hcQueueLeave(this.ctx, pid);
+  }
   hcInfoFor(pid: number): import('../world_api').HcInfo | null {
     const meta = this.players.get(pid);
     if (!meta) return null;
@@ -7064,7 +7084,7 @@ export class Sim {
       const origin = hodricsOrigin(match.slot);
       const me = match.racers.get(pid) ?? null;
       const e = this.entities.get(pid);
-      const myZ = e ? e.pos.z - origin.z : HC_CHECKPOINTS[0].z;
+      const myZ = e ? e.pos.z - origin.z : (match.course.checkpoints[0]?.z ?? 0);
       const racers = [...match.racers.values()]
         .map((r) => {
           const re = this.entities.get(r.pid);
@@ -7074,9 +7094,10 @@ export class Sim {
             cls: r.cls,
             bot: r.bot,
             you: r.pid === pid,
-            progress: r.finished ? 1 : hcProgressFrac(liveZ),
+            progress: r.finished ? 1 : hcProgressFrac(match.course, liveZ),
             finished: r.finished,
             place: r.place > 0 ? r.place : null,
+            eliminated: r.eliminatedRound > 0,
             left: r.left,
           };
         })
@@ -7090,11 +7111,16 @@ export class Sim {
         state: match.state,
         countdown: match.state === 'countdown' ? Math.max(0, Math.ceil(match.timer)) : 0,
         clock: match.clock,
-        timeLeft: Math.max(0, hodricsMod.HC_MAX_DURATION - match.clock),
-        section: hcSectionAt(myZ),
+        round: match.round,
+        rounds: hodricsMod.HC_ROUNDS,
+        qualify: hodricsMod.HC_QUALIFY[match.round - 1] ?? 1,
+        courseSeed: match.courseSeed,
+        timeLeft: Math.max(0, (hodricsMod.HC_ROUND_TIME[match.round - 1] ?? 0) - match.clock),
+        section: hcSectionAt(match.course, myZ).id,
         checkpoint: me?.checkpoint ?? 0,
         finished: me?.finished ?? false,
         place: me && me.place > 0 ? me.place : null,
+        eliminated: (me?.eliminatedRound ?? 0) > 0,
         falls: me?.falls ?? 0,
         racers,
       };
@@ -7105,7 +7131,9 @@ export class Sim {
       match: matchInfo,
     };
   }
-  hcPracticeStart(): boolean { return hcBotsMod.hcPracticeStart(this); }
+  hcPracticeStart(): boolean {
+    return hcBotsMod.startHcPractice(this);
+  }
   get hcInfo(): import('../world_api').HcInfo | null {
     return this.primaryId === -1 ? null : this.hcInfoFor(this.primaryId);
   }

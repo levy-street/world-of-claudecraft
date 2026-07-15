@@ -10,6 +10,7 @@ vi.mock('../server/db', () => ({
   touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
   insertChatLogs: vi.fn(async () => {}),
+  loadAccountFlair: vi.fn(async () => ({ ai: false, streamer: false, links: {} })),
   walletForAccount: vi.fn(async () => null),
   markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
@@ -25,7 +26,8 @@ import { saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer, wireEntity } from '../server/game';
 import { ClientWorld } from '../src/net/online';
 import { mechHeldWeaponOverride, visualKeyFor } from '../src/render/characters/manifest';
-import { DELVES } from '../src/sim/data';
+import { DELVES, gauntletOrigin } from '../src/sim/data';
+import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
 import { type Aura, DT, type PlayerClass } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
@@ -2475,8 +2477,8 @@ const ALL_DELTA_KEYS = [
   'gopen',
   'gprof',
   'grun',
-  'honor',
   'hc',
+  'honor',
   'inv',
   'lhonor',
   'lockouts',

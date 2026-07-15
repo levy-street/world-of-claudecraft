@@ -27,8 +27,8 @@ import {
   isArenaPos,
   isDelvePos,
   isGauntletPos,
-  isYumiMazePos,
   isHodricsPos,
+  isYumiMazePos,
   MOBS,
   NPCS,
   WORLD_MAX_Z,
@@ -4161,10 +4161,10 @@ export class Renderer {
                 : isHodricsPos(px)
                   ? 'outdoor'
                   : inside && !inGauntlet
-                ? 'dungeon'
-                : camY < waterLevelAt(px, pz) - 0.05
-                  ? 'underwater'
-                  : 'outdoor';
+                    ? 'dungeon'
+                    : camY < waterLevelAt(px, pz) - 0.05
+                      ? 'underwater'
+                      : 'outdoor';
     const fog = this.scene.fog as THREE.Fog;
     if (desired !== this.fogState) {
       this.fogState = desired;

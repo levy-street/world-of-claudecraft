@@ -153,7 +153,7 @@ const NPC_IDS = [
   'gauntlet_contestant_warlock',
   'gauntlet_contestant_shaman',
   'gauntlet_contestant_druid',
-   'hodrics_herald', // Herald Osric, the Gauntlet race desk (Eastbrook edge)
+  'hodrics_herald', // Herald Osric, the Gauntlet race desk (Eastbrook edge)
 ] as const;
 
 const QUEST_IDS = [

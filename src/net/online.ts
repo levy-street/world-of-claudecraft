@@ -1156,7 +1156,7 @@ export class ClientWorld implements IWorld {
   // resolveSportKit instead of the class/level/talent derivation, so the
   // ONLINE action bar shows the sport kit (docs/prd/vale-cup.md wire trap).
   sportRole: SportRole | null = null;
-   // --- IWorldHodrics: the Gauntlet race view, mirrored from the snapshot self
+  // --- IWorldHodrics: the Gauntlet race view, mirrored from the snapshot self
   // (`s.hc`, delta-omitted, throttled server-side). ---
   hcInfo: import('../world_api').HcInfo | null = null;
   private lastHcCourseSeed = -1;
@@ -2707,7 +2707,7 @@ export class ClientWorld implements IWorld {
   vcupPracticeStart(bracket: VcBracket): void {
     this.cmd({ cmd: 'vcup_practice', bracket });
   }
-   // --- IWorldHodrics: the Gauntlet race queue. Practice is an offline harness;
+  // --- IWorldHodrics: the Gauntlet race queue. Practice is an offline harness;
   // online it is a no-op (the server fields full races with backfill bots). ---
   hcQueueJoin(): void {
     this.cmd({ cmd: 'hc_queue' });
@@ -2715,9 +2715,9 @@ export class ClientWorld implements IWorld {
   hcQueueLeave(): void {
     this.cmd({ cmd: 'hc_leave' });
   }
-   hcPracticeStart(): boolean {
-     return false;
-   }
+  hcPracticeStart(): boolean {
+    return false;
+  }
   // --- IWorldSocialGraph: persistent social command sends (resolved server-side by
   // character name) + the REST character typeahead. socialInfo arrives via the
   // social/socialpos frames; searchCharacters is a GET, not a cmd(). ---

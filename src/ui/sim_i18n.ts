@@ -97,6 +97,10 @@ const baseEnTable = {
   'error.gauntletArenaMatch': 'You cannot enter the Gauntlet during an arena match.',
   'error.gauntletHerald': 'You must speak to the Herald to enter the Gauntlet.',
   'error.gauntletFull': 'The Gauntlet is full. Try again soon.',
+  'error.hcLegsOnly': 'Legs only in the Gauntlet: abilities are barred.',
+  'error.hcAlreadyRacing': 'You are already racing the Gauntlet.',
+  'error.hcQueueDead': 'You cannot queue for the Gauntlet while dead.',
+  'error.hcArenaConflict': 'Leave the Coliseum before racing the Gauntlet.',
   // Custom per-item ground-pickup lines (src/sim/content/ground_pickup_lines.ts).
   // Emitted via def.pickupDeny/def.pickupEnough (variable-routed, so the S3 guard
   // cannot see them); values must stay byte-identical to that table for the EXACT

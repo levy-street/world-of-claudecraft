@@ -35,9 +35,9 @@ import type {
   ResolvedAbility,
   TradeSession,
 } from './sim';
+import type { HcMatch, HcQueueUnit } from './social/hodrics';
 import type { FinderFormationUnit } from './social/party';
 import type { VcState } from './social/vale_cup';
-import type { HcMatch, HcQueueUnit } from './social/hodrics';
 import type { SpatialGrid } from './spatial';
 import type {
   AbilityDef,

@@ -15,8 +15,8 @@ import {
   targetFrameNonSelfIntervalMs,
 } from '../game/ui_tier_knobs';
 import { voice, voiceDistanceGain } from '../game/voice';
-import type { ClaudiumStoreItem } from '../net/economy_sdk';
 import type { WorldAimSurface } from '../game/world_aim';
+import type { ClaudiumStoreItem } from '../net/economy_sdk';
 import { castBarState, consumeBarState } from '../render/cast_bar';
 import { CharacterPreview } from '../render/characters';
 import { preloadMechAssets } from '../render/characters/assets';
@@ -36,8 +36,8 @@ import {
 import { type AugmentCategory, augmentCategory } from '../sim/content/augments';
 import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
 import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
-import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
 import { GAUNTLET, GAUNTLET_CONTESTANT_NPC_ID, GAUNTLET_VENUE } from '../sim/content/gauntlet';
+import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
 import {
   EVENT_SKIN_TIERS,
   MECH_CHROMAS,
@@ -277,7 +277,6 @@ import {
   resetFramePositionsOnce,
   TARGET_FRAME_POS_KEY,
 } from './frame_pos_reset';
-import { gossipMenuIsEmpty } from './gossip_menu';
 import { GauntletCirclesPainter } from './gauntlet_circles_painter';
 import { gauntletCircleModel } from './gauntlet_circles_view';
 import { GauntletClock } from './gauntlet_clock';
@@ -286,6 +285,7 @@ import { gauntletHudModel } from './gauntlet_hud_view';
 import { GauntletOverlay } from './gauntlet_overlay';
 import { GauntletRecruitWindow } from './gauntlet_recruit_window';
 import { GauntletTraceBatcher, shapeLocalFromFraction } from './gauntlet_trace_core';
+import { gossipMenuIsEmpty } from './gossip_menu';
 import {
   type AimPoint,
   abilityAoeRadius,
@@ -7711,7 +7711,13 @@ export class Hud {
       const musicInDungeon = (inDungeon && !inHodrics) || inNythraxisArena;
       const zone = atSowfield
         ? 'vale_cup'
-        : musicZoneForLocation(currentZone.id, currentZone.biome, inHub, musicInDungeon, instanceId);
+        : musicZoneForLocation(
+            currentZone.id,
+            currentZone.biome,
+            inHub,
+            musicInDungeon,
+            instanceId,
+          );
       const musicDungeonId = (inDungeon && !inHodrics) || inNythraxisArena ? instanceId : null;
       if (shouldResetMusicForDungeonEntry(this.lastMusicDungeonId, musicDungeonId)) {
         music.resetForDungeonEntry(musicDungeonId);
@@ -10269,32 +10275,6 @@ export class Hud {
           this.showBanner(t('hudChrome.hc.banner.go'));
           audio.duelStart();
           triggerHaptic([15, 40, 25], loadHapticsEnabled());
-          break;
-        case 'hcRoundStart':
-          this.showBanner(
-            t('hudChrome.hc.banner.round', {
-              round: formatNumber(ev.round, { maximumFractionDigits: 0 }),
-            }),
-          );
-          break;
-        case 'hcQualified':
-          this.showBanner(t('hudChrome.hc.banner.qualified'));
-          this.log(t('hudChrome.hc.log.qualified'), '#7ee787');
-          audio.duelEnd();
-          this.renderer.fiestaAugmentBurst(this.sim.playerId);
-          triggerHaptic([20, 40, 45], loadHapticsEnabled());
-          break;
-        case 'hcEliminated':
-          this.showBanner(t('hudChrome.hc.banner.eliminated'));
-          this.log(
-            t('hudChrome.hc.log.eliminated', {
-              round: formatNumber(ev.round, { maximumFractionDigits: 0 }),
-            }),
-            '#ff9a6a',
-          );
-          this.renderer.addShake(0.45);
-          this.renderer.fiestaKillBurst(this.sim.playerId, 'fire');
-          triggerHaptic([40, 60, 80], loadHapticsEnabled());
           break;
         case 'hcRoundStart':
           this.showBanner(

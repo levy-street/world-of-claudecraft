@@ -45,12 +45,12 @@ import {
   SPIRIT_HEALER_NPC_ID,
 } from './content/graveyards';
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
+import { HC_HERALD, HC_HERALD_NPC_ID } from './content/hodrics';
 import {
   ALL_RECIPES as ALL_RECIPES_CONTENT,
   COMMON_RECIPES as COMMON_RECIPES_CONTENT,
   TOOL_RECIPES as TOOL_RECIPES_CONTENT,
 } from './content/recipes';
-import { HC_HERALD, HC_HERALD_NPC_ID } from './content/hodrics';
 import {
   TEMPLE_CAMPS,
   TEMPLE_DUNGEON_DEFS,
@@ -210,9 +210,9 @@ export const NPCS: Record<string, NpcDef> = {
   // The Gauntlet event NPCs (all dynamic: the recruiter spawns only while the
   // event window is open; the watcher/contestants spawn per run in the band).
   ...GAUNTLET_NPCS,
-   // The Gauntlet Herald (dynamic: true): spawned guarded at world init with a
+  // The Gauntlet Herald (dynamic: true): spawned guarded at world init with a
   // reserved out-of-band id (social/hodrics.ts spawnHcHerald), zero rng.
-   [HC_HERALD_NPC_ID]: HC_HERALD,
+  [HC_HERALD_NPC_ID]: HC_HERALD,
 };
 
 // Graveyards + the Spirit Healer: re-exported so the Sim and spirit.ts import the

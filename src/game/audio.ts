@@ -281,7 +281,9 @@ export class GameAudio {
   }
 
   gauntletFanfare(): void {
-    [523, 659, 784, 1046].forEach((f, i) => this.cueTone(f, 0.4, 0.18, 'triangle', i * 0.12));
+    [523, 659, 784, 1046].forEach((f, i) => {
+      this.cueTone(f, 0.4, 0.18, 'triangle', i * 0.12);
+    });
   }
 
   fiestaScorePing(mine: boolean): void {

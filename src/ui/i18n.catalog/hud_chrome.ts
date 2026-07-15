@@ -15,26 +15,14 @@ export const hudChromeStrings = {
   },
   // Raid/party ready-check prompt (the leader ran /ready). The buttons answer the
   // yes/no prompt; the outcome is announced in chat by the sim.
-    readyCheck: {
+  readyCheck: {
     prompt: '{name} has started a ready check. Are you ready?',
     ready: 'Ready',
     notReady: 'Not Ready',
     result: 'Ready check: {ready} ready, {notReady} not ready, {noResponse} no response.',
     notInPartyError: 'You must be in a party to start a ready check.',
-      inProgressError: 'A ready check is already in progress.',
-    },
-    gauntlet: {
-      title: 'The Gauntlet', pitch: 'Outlast every trial. The last one standing takes the purse.',
-      join: 'Join the Gauntlet', withdraw: 'Withdraw', lobbyJoined: '{count} in the lobby',
-      lobbyCountdown: 'The run begins in {seconds}s', vitality: 'Vitality',
-      survivorsAria: '{count} of {total} still standing', prizeAria: 'Prize pool: {amount}',
-      trialLabel: 'Trial {n} of {total}', go: 'Go', stop: 'Stop', phaseLobby: 'Gathering challengers',
-      phaseStaging: 'Take your marks', phaseTrial: 'The Crossing begins', phaseInterlude: 'Trial cleared',
-      phasePodium: 'The Gauntlet is decided', greenLight: 'Green light!', redLight: 'Red light!',
-      vitalityLost: 'You lost {amount} vitality.', contestantOut: '{name} is out!', eliminated: 'ELIMINATED',
-      survivorsLeft: '{count} still standing', spectating: 'Spectating', leave: 'Leave', victory: 'Victory',
-      podiumTitle: 'Final Standings', placeFirst: '1st', placeSecond: '2nd', placeThird: '3rd',
-    },
+    inProgressError: 'A ready check is already in progress.',
+  },
   // The Gauntlet survival event: the recruiter dialog, the live HUD cluster, the
   // green-light/red-light banners + logs, and the knockout / podium overlay.
   // {placeholder} tokens: {count}/{total}/{n} are formatNumber counts, {seconds} a
