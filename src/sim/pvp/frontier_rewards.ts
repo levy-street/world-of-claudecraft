@@ -11,15 +11,21 @@ import { FRONTIER_RARE_HERO_POINTS, FRONTIER_RARE_HONOR, isFrontierPos } from '.
 import { grantHeroPoints } from './hero_points';
 import { grantHonor } from './honor';
 
+// The Incursion's frost rares. The reward gates on template id, not just position, so
+// no future rare or owned mob dragged into the band can pay out (review note #10).
+const FROSTREACH_RARE_IDS = new Set(['rimefang_stalker', 'frostbound_revenant']);
+
 export function awardFrontierRareKill(
   ctx: SimContext,
   mob: Entity,
   contributors: PlayerMeta[] | null,
 ): void {
   if (!contributors || contributors.length === 0) return;
-  if (!isFrontierPos(mob.pos.x)) return;
+  if (!isFrontierPos(mob.pos.x) || !FROSTREACH_RARE_IDS.has(mob.templateId)) return;
   for (const meta of contributors) {
     grantHonor(ctx, meta, FRONTIER_RARE_HONOR, 'frontier_rare');
     grantHeroPoints(ctx, meta, FRONTIER_RARE_HERO_POINTS, 'frontier_rare');
+    // Book of Deeds: the frost-rare hunter/warden deeds read this lifetime counter.
+    ctx.bumpDeedStat(meta, 'frontierRareKills', 1);
   }
 }

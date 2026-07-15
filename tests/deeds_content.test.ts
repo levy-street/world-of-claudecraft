@@ -32,8 +32,8 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
   it('ships exactly 192 deeds worth 2365 total Renown', () => {
-    expect(DEED_ORDER.length).toBe(192);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2365);
+    expect(DEED_ORDER.length).toBe(194);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2400);
   });
 
   it('ships the audited per-category counts', () => {
@@ -46,7 +46,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       delve: 13,
       chronicle: 24,
       collection: 24,
-      pvp: 27,
+      pvp: 29,
       social: 16,
       exploration: 9,
       feat: 3,
@@ -64,6 +64,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'prog_callused_hands',
       'prog_tools_of_the_trade',
       'dgn_nythraxis_crypt',
+      'pvp_frostreach_slayer',
+      'pvp_frostreach_warden',
       'chr_marsh_first_cast',
     ]);
     expect(DEEDS.prog_crown_below.renown).toBe(25);
@@ -71,6 +73,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     expect(DEEDS.prog_callused_hands.renown).toBe(5);
     expect(DEEDS.prog_tools_of_the_trade.renown).toBe(10);
     expect(DEEDS.dgn_nythraxis_crypt.renown).toBe(10);
+    expect(DEEDS.pvp_frostreach_slayer.renown).toBe(10);
+    expect(DEEDS.pvp_frostreach_warden.renown).toBe(25);
     expect(DEEDS.chr_marsh_first_cast.renown).toBe(5);
     // Full trigger literals: the evaluator's .every() is proven elsewhere, but
     // only a literal pin catches a quest id quietly dropped from a chain list.
@@ -110,11 +114,11 @@ describe('audited launch totals (literals: update deliberately with the catalog)
   it('ships exactly 19 titles and 3 borders', () => {
     const titles = ALL.filter((d) => d.reward?.kind === 'title');
     const borders = ALL.filter((d) => d.reward?.kind === 'border');
-    expect(titles.length).toBe(19);
+    expect(titles.length).toBe(20);
     expect(borders.length).toBe(3);
     // Titles and border slugs are unique (one deed per cosmetic).
     const titleTexts = titles.map((d) => (d.reward as { text: string }).text);
-    expect(new Set(titleTexts).size).toBe(19);
+    expect(new Set(titleTexts).size).toBe(20);
     const borderSlugs = borders.map((d) => (d.reward as { slug: string }).slug);
     expect([...borderSlugs].sort()).toEqual(['curators_gilt', 'deepward', 'prestige_laurels']);
   });
@@ -140,7 +144,7 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // Regenerate after a DELIBERATE catalog change, then paste the printed hex
   // into FROZEN_CATALOG_SHA256 below (run from the repo root):
   //   npx tsx -e "import {DEED_ORDER,DEEDS} from './src/sim/content/deeds'; import {createHash} from 'node:crypto'; console.log(createHash('sha256').update(JSON.stringify(DEED_ORDER.map((id)=>[id,DEEDS[id].trigger,DEEDS[id].renown])),'utf8').digest('hex'))"
-  const FROZEN_CATALOG_SHA256 = 'e61f98af54cf091cd06f3e62f7852cc36b8b009665802584e3025427ea6495e3';
+  const FROZEN_CATALOG_SHA256 = 'c313a4e6de4bf1158a029aa19da93d3553a6d9a3edea4b2cd66f49a0915de471';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
