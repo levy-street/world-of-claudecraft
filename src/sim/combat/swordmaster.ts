@@ -64,6 +64,7 @@ export function strikeWithBothWeapons(
   ) {
     connected++;
   }
+  if (attacker.dead) return connected;
   const offhand = attacker.offhandWeapon;
   if (!offhand || target.dead) return connected;
   if (
@@ -99,6 +100,7 @@ export function resolveSwordmasterDualAoe(
   }
   let connected = 0;
   for (const target of targets) {
+    if (attacker.dead) break;
     connected += strikeWithBothWeapons(ctx, attacker, target, abilityName, effect, options);
   }
   return connected;

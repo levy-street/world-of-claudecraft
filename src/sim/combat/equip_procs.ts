@@ -7,8 +7,8 @@
 // Determinism / parity: the proc's rng roll only happens when the wielder actually
 // carries a proc weapon with a proc for THIS trigger. Ordinary gear (everything but
 // the two legendaries) draws no rng here, so the shared draw order, and every parity
-// golden that equips no legendary, is unchanged. The `proc.trigger !== trigger` skip
-// and the `target.dead` guard both short-circuit BEFORE the rng draw.
+// golden that equips no legendary, is unchanged. The dead-entity and
+// `proc.trigger !== trigger` guards all short-circuit BEFORE the rng draw.
 //
 // src/sim-pure: reaches Sim only through SimContext (rng/emit/applyAura/dealDamage/
 // hostilesInRadius); no DOM/Three/Math.random.
@@ -27,7 +27,10 @@ export function runWeaponProcs(
   target: Entity,
   trigger: WeaponProcTrigger,
 ): void {
-  if (target.dead) return;
+  // A landed melee hit can kill its wielder through a damage shield before
+  // control reaches this shared proc seam. Dead actors cannot start a proc
+  // chain, and the guard must precede item inspection and every rng draw.
+  if (wielder.dead || target.dead) return;
   // Entity.mainhandItemId stays populated for a worn OVER-LEVEL weapon (so the
   // model keeps rendering) while recalcPlayerStats treats that weapon as inert.
   // Mirror the level gate here so an inert weapon's procs are inert too (the

@@ -27,8 +27,14 @@ function harness(seed = 4242): { sim: TestSim; player: Entity; meta: PlayerMeta 
   return { sim, player, meta };
 }
 
-function spawnTarget(sim: TestSim, player: Entity, dx: number, dz: number): Entity {
-  const mob = createMob(sim.nextId++, MOBS.forest_wolf, 1, {
+function spawnTarget(
+  sim: TestSim,
+  player: Entity,
+  dx: number,
+  dz: number,
+  templateId = 'forest_wolf',
+): Entity {
+  const mob = createMob(sim.nextId++, MOBS[templateId], 1, {
     x: player.pos.x + dx,
     y: player.pos.y,
     z: player.pos.z + dz,
@@ -82,9 +88,70 @@ describe('SwordMaster paired strikes', () => {
       apSwingSpeed: player.offhandWeapon?.speed,
     });
   });
+
+  it('stops the paired and area sequence when lethal spiked hide kills the attacker', () => {
+    const run = (withLaterTarget: boolean) => {
+      const { sim, player, meta } = harness(4242);
+      const first = spawnTarget(sim, player, 0, 2, 'wild_boar');
+      const later = withLaterTarget ? spawnTarget(sim, player, 0, 3) : null;
+      player.hp = 1;
+      player.mainhandItemId = 'kingsbane_last_oath';
+      const resolved = resolve(sim, 'blade_dance', player.id);
+      const targetCalls: number[] = [];
+      const originalSwing = sim.ctx.meleeSwing;
+      sim.ctx.meleeSwing = (...args) => {
+        targetCalls.push(args[1].id);
+        return originalSwing(...args);
+      };
+      const draws: number[] = [];
+      sim.rng.setObserver((draw) => draws.push(draw));
+
+      runEffects(sim.ctx, player, meta, null, resolved);
+      sim.rng.setObserver(null);
+      const events = sim.drainEvents();
+
+      return {
+        dead: player.dead,
+        draws,
+        targetCalls,
+        firstId: first.id,
+        laterHp: later?.hp,
+        laterMaxHp: later?.maxHp,
+        procDamage: events.filter(
+          (event) => event.type === 'damage' && event.ability === 'Chain Arc',
+        ),
+      };
+    };
+
+    const isolated = run(false);
+    const area = run(true);
+    expect(area.dead).toBe(true);
+    expect(area.targetCalls).toEqual([area.firstId]);
+    expect(area.laterHp).toBe(area.laterMaxHp);
+    expect(area.procDamage).toEqual([]);
+    expect(area.draws).toEqual(isolated.draws);
+    expect(area.draws).toHaveLength(3);
+  });
 });
 
 describe('SwordMaster area ordering', () => {
+  it('emits the authored activation cue when an area attack has no targets', () => {
+    const { sim } = harness(1801);
+
+    sim.castAbility('crescent_sweep');
+
+    const events = sim.drainEvents();
+    expect(events).toContainEqual({
+      type: 'spellfx',
+      sourceId: sim.player.id,
+      targetId: sim.player.id,
+      school: 'physical',
+      fx: 'flourish',
+      ability: 'crescent_sweep',
+    });
+    expect(events.some((event) => event.type === 'damage')).toBe(false);
+  });
+
   it('selects front-facing targets by distance and then id before applying the cap', () => {
     const { sim, player } = harness();
     const far = spawnTarget(sim, player, 0, 4);

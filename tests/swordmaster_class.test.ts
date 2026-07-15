@@ -7,8 +7,8 @@ import {
   maxArmorTypeForClass,
 } from '../src/sim/equipment_rules';
 import { Sim } from '../src/sim/sim';
-import { SWORDMASTER_BASE_MOVE_MULT } from '../src/sim/swordmaster_rules';
 import { ALL_CLASSES, type Entity, type PlayerClass } from '../src/sim/types';
+import { terrainHeight } from '../src/sim/world';
 
 type RuleTestSim = Sim & {
   moveSpeedMult(entity: Entity): number;
@@ -67,7 +67,53 @@ describe('SwordMaster class contract', () => {
     const sim = new Sim({ seed: 72, playerClass: 'swordmaster' }) as unknown as RuleTestSim;
 
     expect(sim.player.attackPower).toBe(sim.player.stats.str + sim.player.stats.agi);
-    expect(sim.moveSpeedMult(sim.player)).toBeCloseTo(SWORDMASTER_BASE_MOVE_MULT, 8);
+    expect(sim.moveSpeedMult(sim.player)).toBeCloseTo(1.08, 8);
     expect(sim.playerGcdFor('swordmaster')).toBe(1);
+  });
+
+  it('casts Fleet Step through the live ability lifecycle and composes with the class baseline', () => {
+    const sim = new Sim({ seed: 73, playerClass: 'swordmaster' }) as unknown as RuleTestSim;
+    sim.setPlayerLevel(3);
+
+    sim.castAbility('fleet_step');
+
+    expect(sim.player.auras).toContainEqual(
+      expect.objectContaining({
+        id: 'fleet_step',
+        kind: 'buff_speed',
+        value: 1.3,
+        duration: 5,
+        remaining: 5,
+      }),
+    );
+    expect(sim.player.resource).toBe(90);
+    expect(sim.player.cooldowns.get('fleet_step')).toBe(20);
+    expect(sim.player.gcdRemaining).toBe(0);
+    expect(sim.moveSpeedMult(sim.player)).toBeCloseTo(1.08 * 1.3, 8);
+  });
+
+  it('moves exactly 8% farther than the shared run baseline over fixed sim ticks', () => {
+    const distanceFor = (playerClass: PlayerClass): number => {
+      const sim = new Sim({ seed: 42, playerClass });
+      sim.setPlayerLevel(20);
+      for (const entity of sim.entities.values()) {
+        if (entity.kind === 'mob') entity.dead = true;
+      }
+      const player = sim.player;
+      player.pos = { x: 0, y: terrainHeight(0, -40, sim.cfg.seed), z: -40 };
+      player.prevPos = { ...player.pos };
+      player.facing = 0;
+      player.prevFacing = 0;
+      player.onGround = true;
+      player.fallStartY = player.pos.y;
+      sim.moveInput.forward = true;
+      for (let tick = 0; tick < 20; tick++) sim.tick();
+      return Math.hypot(player.pos.x, player.pos.z + 40);
+    };
+
+    const warriorDistance = distanceFor('warrior');
+    const swordmasterDistance = distanceFor('swordmaster');
+    expect(warriorDistance).toBeGreaterThan(6);
+    expect(swordmasterDistance).toBeCloseTo(warriorDistance * 1.08, 6);
   });
 });
