@@ -40,7 +40,7 @@ Same seed, same world, everywhere. And almost nothing is a shipped asset: the to
 
 ## Highlights
 
-- **Nine classic classes**, each with a full classic-era-style kit that gains ranks as you level, plus a full **talent system** (three specs per class, 27 specs in all).
+- **Ten classic classes**, each with a full classic-era-style kit that gains ranks as you level, plus a full **talent system** (three specs per class, 30 specs in all).
 - **Three open-world zones** from level 1 to 20, nearly 80 quests, and a single connected storyline about the Gravecaller conspiracy.
 - **Five instanced dungeons**, four of them five-player elite raids and one solo crypt, with elite scaling, AoE boss mechanics, class-archetype loot, and a **Heroic difficulty tier** with richer rewards, plus open-world **world bosses**.
 - **Scalable delves**, a small-group mode for one or two players plus an AI companion, rebuilt from randomized chambers each run across Normal and Heroic tiers.
@@ -81,7 +81,7 @@ npm install
 npm run dev        # then open http://localhost:5173 and click Play Offline
 ```
 
-Name your character, pick any of the nine classes, and you start in **Eastbrook Vale** (levels 1-7), a market town ringed by six hubs: wolf runs to the north, boar meadows east, the Webwood west, Mirror Lake northwest, a burrower-ridden copper dig southwest, and a ruined chapel of restless dead northeast, with Gorrak's bandit camp to the southeast. The north road climbs a mountain pass into **Mirefen Marsh** (6-13, hub Fenbridge) and on up to **Thornpeak Heights** (13-20, hub Highwatch). The world seed is fixed in `src/main.ts`, so it is the same place every visit.
+Name your character, pick any of the ten classes, and you start in **Eastbrook Vale** (levels 1-7), a market town ringed by six hubs: wolf runs to the north, boar meadows east, the Webwood west, Mirror Lake northwest, a burrower-ridden copper dig southwest, and a ruined chapel of restless dead northeast, with Gorrak's bandit camp to the southeast. The north road climbs a mountain pass into **Mirefen Marsh** (6-13, hub Fenbridge) and on up to **Thornpeak Heights** (13-20, hub Highwatch). The world seed is fixed in `src/main.ts`, so it is the same place every visit.
 
 ### Online, with other players
 
@@ -153,7 +153,7 @@ python python/example_random_agent.py
 ```python
 from wow_env import WoWClassicEnv
 
-env = WoWClassicEnv(player_class="warrior")   # any of the nine classes
+env = WoWClassicEnv(player_class="warrior")   # any of the ten classes
 obs, info = env.reset(seed=42)
 obs, reward, terminated, truncated, info = env.step(env.action_space.sample())
 env.close()
@@ -181,7 +181,7 @@ More on the token at [worldofclaudecraft.com](https://worldofclaudecraft.com/).
 
 ## A tour of the world
 
-### The nine classes
+### The ten classes
 
 Every class runs on classic-era MMO mechanics implemented from first principles, and learns ranked spells across levels 1-20 (Arc Bolt R2 at 8, R3 at 14, R4 at 20, with high-band abilities like Early Grave, Low Blow, Urgent Prayer, Ancestral Strike, and Skyfall arriving near the top of the band).
 
@@ -194,6 +194,7 @@ Every class runs on classic-era MMO mechanics implemented from first principles,
 - **Mage**: Cinderbolt, Hoarfrost Mantle, Aether Insight, Rimelance, Waterbind, Cinderfall, Aether Darts (channeled), Bewitch, Icebind.
 - **Warlock**: Gloom Bolt, Fiendhide, Burning Pact, Blackrot, Hard Bargain, Hex of Anguish, Consume, and seven summonable demons from Emberkin to Wraithborn.
 - **Druid**: Wildbolt, Wildmend, Wildward, Lunar Tempest, Wildbloom, Briarguard, Gripping Roots, Bruin Form at 10.
+- **SwordMaster**: energy, leather armor, and twin one-handed blades; Twin Slash and Crescent Sweep establish a relentless rhythm of precise strikes and fast area attacks, while Fleet Step, Sword Aura, Wind Lunge, and Parrying Flow reward agile movement. Its Tempest, Duelist, and Azure Blade specs grant Blade Cyclone, Duelist Flurry, and Azure Rush.
 
 Heals and buffs land on party members, healing can crit, and absorb shields soak damage before health. Spend points across **three talent specs per class** (Battlecraft/Bloodrush/Ironguard, Moongrove/Wildfang/Groveheart, and so on); allocation is server-validated and exportable as a build string.
 
@@ -273,7 +274,7 @@ The sim is a fixed 20 Hz tick (`DT = 1/20`), all randomness flows through one se
 | Path | What it is |
 |---|---|
 | `src/sim/` | Deterministic game core, the source of truth. No DOM or Three dependencies. |
-| `src/sim/content/` | Data as code: the nine classes, abilities, zones, dungeons, items, talents, professions, deeds. |
+| `src/sim/content/` | Data as code: the ten classes, abilities, zones, dungeons, items, talents, professions, deeds. |
 | `src/` (rest) | Three.js renderer, HUD + styles, input/audio, online mirror, and the admin, guide, and editor SPAs. |
 | `server/` | Authoritative server: HTTP and WS, world loop, Postgres, auth, social, moderation. |
 | `headless/` + `python/` | RL env server (`env_server.ts`) and Python Gym bindings. |
@@ -308,7 +309,7 @@ checks for it up front: install FFmpeg with your platform package manager before
 gate or the Studio.
 
 ```bash
-npm test                        # vitest: formulas, combat, AI, quests, all 9 classes, parties, duels, trades, dungeons
+npm test                        # vitest: formulas, combat, AI, quests, all 10 classes, parties, duels, trades, dungeons
 npm run gate                    # complete CI-equivalent contribution gate
 npm run build                   # production web build
 npm run sfx:studio              # local SFX authoring, runtime mix, and production export

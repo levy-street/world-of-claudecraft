@@ -328,7 +328,7 @@ Solo-only check (excluding q_olen + q_mistcaller, 4,600 XP): 47,500 ≈ 1.02× �
 
 # 6. Item tables
 
-All ids verified non-colliding with existing ITEMS. `requiredClass` shown where class-locked; archetype fallback (`REWARD_ARCHETYPE`) means 3 reward entries cover all 9 classes.
+All ids verified non-colliding with existing ITEMS. `requiredClass` shown where class-locked; archetype fallback (`REWARD_ARCHETYPE`) means 3 reward entries cover all 10 classes.
 
 ## Quest items (kind 'quest', sellValue 0, drop-gated by questId)
 

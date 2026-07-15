@@ -1,4 +1,6 @@
-# World of Claudecraft — Ability Rank Progressions, Levels 1–20 (all nine classes)
+# World of Claudecraft: Ability Rank Progressions, Levels 1 to 20 (classic classes)
+
+SwordMaster is specified separately in [the SwordMaster class design](swordmaster.md); this historical rank table predates that class.
 
 **Tuning anchors used throughout** (from `src/sim/data.ts` / `types.ts`): typical mob hp = 40 + 18·L → L10 ≈ 220, **L14 ≈ 292**, **L20 ≈ 400** (elites ×2.3). A rank‑3 nuke at L14 should average ~40–50 dmg (6–8 casts); R4 at L20 ~70–80 (5–6 casts, fresh-rank spike). Mana costs follow the Lightning Bolt curve given in the brief (15/25/40/60). Rage/energy costs stay flat per rank (classic-era behavior). All DoT/HoT totals divide evenly by tick count. Rank rows reuse the existing `ranks: AbilityRank[]` schema — **ids unchanged**; new ability ids are snake_case and must be appended to each `CLASSES[*].abilities` array in learn order.
 
