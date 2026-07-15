@@ -22,7 +22,7 @@ import {
   zoneWelcomeText,
 } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
-import { ACTIONS, encodeObs } from '../src/sim/obs';
+import { ACTIONS, encodeObs, SELF_OBS_SIZE } from '../src/sim/obs';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import { Sim } from '../src/sim/sim';
 import { dist2d, type Entity, type SimEvent } from '../src/sim/types';
@@ -1760,9 +1760,9 @@ describe('RL observation encoding', () => {
   // encode entity distance as clamp(d / 40, ...). The target field used to clamp
   // to [0, 1] while the others use [0, 1.5] (the 60-unit observation radius), so
   // a target between 40 and 60 units saturated and lost distance granularity.
-  // Target distance index: 16 self + 2 fields per ability slot + presence/hp/level.
+  // Target distance index: self fields + 2 fields per ability slot + presence/hp/level.
   const ABILITY_SLOTS = ACTIONS.length - 13;
-  const TARGET_DIST_INDEX = 16 + ABILITY_SLOTS * 2 + 3;
+  const TARGET_DIST_INDEX = SELF_OBS_SIZE + ABILITY_SLOTS * 2 + 3;
 
   it('encodes target distance on the same 1.5 scale as nearby mobs', () => {
     const sim = makeSim();

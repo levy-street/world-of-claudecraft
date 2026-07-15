@@ -122,16 +122,17 @@ export function applyAction(sim: Sim, action: number): void {
 // ---------------------------------------------------------------------------
 
 const NEARBY_MOBS = 5;
+export const SELF_OBS_SIZE = 18;
 
 export function obsSize(): number {
-  return 18 + ABILITY_SLOTS * 2 + 9 + NEARBY_MOBS * 6 + 5 + QUEST_ORDER.length * 2;
+  return SELF_OBS_SIZE + ABILITY_SLOTS * 2 + 9 + NEARBY_MOBS * 6 + 5 + QUEST_ORDER.length * 2;
 }
 
 export function encodeObs(sim: Sim): number[] {
   const p = sim.player;
   const obs: number[] = [];
 
-  // --- self (18) ---
+  // --- self (SELF_OBS_SIZE) ---
   obs.push(p.hp / Math.max(1, p.maxHp));
   obs.push(p.resource / Math.max(1, p.maxResource));
   obs.push(p.level / MAX_LEVEL);
