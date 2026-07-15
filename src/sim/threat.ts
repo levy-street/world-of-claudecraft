@@ -41,11 +41,16 @@ export function threatModifier(source: Entity, school: string): number {
 }
 
 export function stealthDetectionMultiplier(observerLevel: number, stealthedLevel: number): number {
-  const raw = STEALTH_DETECTION_MULT + (observerLevel - stealthedLevel) * STEALTH_DETECTION_PER_LEVEL;
+  const raw =
+    STEALTH_DETECTION_MULT + (observerLevel - stealthedLevel) * STEALTH_DETECTION_PER_LEVEL;
   return Math.max(STEALTH_DETECTION_MIN_MULT, Math.min(STEALTH_DETECTION_MAX_MULT, raw));
 }
 
-export function stealthDetectionRadius(observer: Entity, stealthed: Entity, baseRadius: number): number {
+export function stealthDetectionRadius(
+  observer: Entity,
+  stealthed: Entity,
+  baseRadius: number,
+): number {
   return baseRadius * stealthDetectionMultiplier(observer.level, stealthed.level);
 }
 
@@ -58,6 +63,17 @@ export function clearThreat(mob: Entity): void {
   mob.threat.clear();
   mob.forcedTargetId = null;
   mob.forcedTargetTimer = 0;
+}
+
+/** Remove ONE attacker from the hate table (they left the instance or otherwise
+ *  stopped existing for this mob). A taunt lock (forcedTargetId) pointing at
+ *  that attacker is released with the entry. */
+export function dropThreat(mob: Entity, sourceId: number): void {
+  mob.threat.delete(sourceId);
+  if (mob.forcedTargetId === sourceId) {
+    mob.forcedTargetId = null;
+    mob.forcedTargetTimer = 0;
+  }
 }
 
 /** Highest threat value on the table (0 when empty) — taunt matches this. */
