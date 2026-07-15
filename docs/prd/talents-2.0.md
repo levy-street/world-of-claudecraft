@@ -253,6 +253,39 @@ and remain unchanged.
 | druid/feral | global: meleeDmgPct 0.15, dotDmgPct 0.15, threatPct 0.2 |
 | warlock/destruction | global: critDmgPct 0.5; stats: crit 0.02 |
 
+### Icicles (Frost) and Fulmination (Elemental)
+
+This pass adds two caster rotations built on the narrow proc vocabulary described in
+[Caster Proc Rotations](./caster-proc-rotations.md):
+
+- Frost mastery now grants Icefall and makes each landed Rimelance build one long-lived
+  Icicle, up to five. Icefall is an off-GCD, zero-cost release that consumes the full bank,
+  launches one fixed Frost hit per stack, and doubles its damage against rooted or chilled
+  targets. The bank is visible as an aura and a normalized reinforcement-learning
+  observation.
+- Elemental's level-11 Fulmination choice makes each completed Arc Bolt add one charge to
+  an active Thunder Ward, up to nine. Earthen Jolt consumes the ward and deals 8 bonus
+  Nature damage per charge. The existing visible Thunder Ward charge counter remains the
+  player-facing bank, and its normalized count is also exposed to reinforcement learning.
+
+Both mechanics preserve mobile play while adding anticipation. Building happens through
+ordinary rotational casts, so movement does not erase progress or force a stationary
+channel. The release decision creates the excitement: Frost chooses when control is ready
+for a doubled Icefall, while Elemental chooses between keeping Thunder Ward protection and
+converting the bank into Earthen Jolt burst. Neither mechanic adds random draws.
+
+### PBE-2 mage feedback pass
+
+- Flickerstep is baseline for every Mage at level 5. Frigid Reversal replaces its old
+  level-17 row slot with a large-hit Flickerstep reset and instant Rimelance counter.
+- Icy Veins now has a 120 second cooldown, matching Flashfire.
+- Third Current restores 8% of maximum mana while retaining its 50% next-spell discount.
+- Racing Mind now triggers from a spell critical strike, grants an 8 second instant-cast
+  window for cast-time combat spells, and has a 15 second internal cooldown.
+- Top-rank conjured food and water now match the best vendor consumables.
+- Cinderbolt burns for 8 damage per tick at top rank, Pyrelance burns for 12, and both
+  tooltips show the complete over-time total.
+
 ### Mastery rating readiness (owner directive 2026-07-07)
 
 Every spec's mastery must be improvable by a FUTURE mastery stat (an item
