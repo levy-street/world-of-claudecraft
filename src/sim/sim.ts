@@ -5702,13 +5702,16 @@ export class Sim {
         template,
         inst?.dungeonId ?? '',
         difficulty,
+        { summonedAdd: true },
       );
       const level = mobLevelForDungeonDifficulty(inst?.dungeonId ?? '', difficulty, rolledLevel);
       const add = createMob(this.nextId++, addTemplate, level, pos);
-      applyHeroicMobTuning(add, inst?.dungeonId ?? '', difficulty);
-      // Leash to the boss's ORIGINAL spawn (not his current, possibly-kited position):
-      // pulled too far from it, the add's chase-case leash check evades it home.
-      add.spawnPos = { ...boss.spawnPos };
+      applyHeroicMobTuning(add, inst?.dungeonId ?? '', difficulty, { summonedAdd: true });
+      // The add is anchored where it ERUPTED (createMob already set spawnPos to the
+      // spawn point beside the boss): a boss kited far from HIS original spawn must
+      // not hatch adds that are instantly past their own leash and evade home without
+      // ever swinging. Kited from here, the chase-case leash check walks it back to
+      // this eruption point, not the boss's distant home.
       add.tappedById = boss.tappedById;
       this.addEntity(add);
       boss.summonedIds.push(add.id);
@@ -5718,6 +5721,9 @@ export class Sim {
         add.aggroTargetId = victim.id;
         add.inCombat = true;
         add.aiState = dist2d(add.pos, victim.pos) > this.mobMeleeRange(add) ? 'chase' : 'attack';
+        // Same seeding aggroMob does on a normal pull: the leash measures from the
+        // eruption point until a hostile player action refreshes it.
+        add.leashAnchor = { ...add.pos };
         addThreat(add, victim.id, 1);
       }
       // Book of Deeds kill-order tasks track every add this attempt summoned.

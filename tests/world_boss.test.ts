@@ -852,7 +852,7 @@ describe('world boss pathing (phases through obstacles)', () => {
 });
 
 describe('world boss summons erupt centered on him and engage immediately', () => {
-  it('spawns adds on the boss, aggroed on his target, leashing to his spawn point', () => {
+  it('spawns adds on the boss, aggroed on his target, anchored where they erupted', () => {
     const sim = makeSim();
     const tank = sim.addPlayer('warrior', 'Tank');
     const { boss } = spawnBossNow(sim);
@@ -874,9 +874,47 @@ describe('world boss summons erupt centered on him and engage immediately', () =
       expect(add.aggroTargetId).toBe(tank);
       expect(add.inCombat).toBe(true);
       expect(add.aiState === 'chase' || add.aiState === 'attack').toBe(true);
-      // Kited too far, they run home to the boss's ORIGINAL spawn point.
-      expect(add.spawnPos.x).toBeCloseTo(boss.spawnPos.x, 5);
-      expect(add.spawnPos.z).toBeCloseTo(boss.spawnPos.z, 5);
+      // Anchored where they ERUPTED (the tight cluster on the boss, before the
+      // add's first chase step): kited from here, the leash walks them back to
+      // this point beside the fight.
+      expect(Math.hypot(add.spawnPos.x - boss.pos.x, add.spawnPos.z - boss.pos.z)).toBeLessThan(2);
+      expect(add.leashAnchor).not.toBeNull();
+    }
+  });
+
+  it('adds hatched from a KITED boss engage instead of leashing home instantly', () => {
+    const sim = makeSim();
+    const tank = sim.addPlayer('warrior', 'Tank');
+    const { boss } = spawnBossNow(sim);
+    const pt = (sim as any).entities.get(tank) as Entity;
+    pt.maxHp = pt.hp = 1_000_000;
+    // Drag the fight well past the open-world leash radius (45) from his spawn,
+    // as a kiter does; his own anchor refreshes from the player's hits.
+    boss.pos = {
+      x: boss.spawnPos.x + 80,
+      z: boss.spawnPos.z,
+      y: boss.pos.y,
+    };
+    boss.prevPos = { ...boss.pos };
+    (sim as any).rebucket(boss);
+    pt.pos = { x: boss.pos.x + 10, z: boss.pos.z, y: boss.pos.y };
+    pt.prevPos = { ...pt.pos };
+    (sim as any).rebucket(pt);
+    (sim as any).dealDamage(pt, boss, 50, false, 'physical', 'Chip', 'hit', true);
+    boss.hp = Math.floor(boss.maxHp * 0.6);
+    sim.tick();
+    const adds = [...(sim as any).entities.values()].filter(
+      (e: Entity) => e.templateId === 'thunzharr_stormling' && !e.dead,
+    );
+    expect(adds).toHaveLength(2);
+    // The old behavior anchored adds to the boss's ORIGINAL spawn, so hatching
+    // 80yd out put them instantly past their leash: first engaged tick flipped
+    // them to evade with a wiped hate table and they never swung at anyone.
+    for (let t = 0; t < 20; t++) sim.tick();
+    for (const add of adds) {
+      expect(add.aiState === 'chase' || add.aiState === 'attack').toBe(true);
+      expect(add.aggroTargetId).toBe(tank);
+      expect(add.threat.size).toBeGreaterThan(0);
     }
   });
 });
