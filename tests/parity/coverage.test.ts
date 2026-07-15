@@ -57,6 +57,35 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(sinister || playerDealt).toBe(true);
   });
 
+  it('solo_swordmaster: both blades, Sword Aura, and capped area attacks fire', () => {
+    const rec = run('solo_swordmaster');
+    const sim = rec.sim as any;
+    const pid = sim.playerId;
+    const player = sim.player;
+    const ev = rec.allEvents as Ev[];
+
+    expect(player.mainhandItemId).toBe('worn_sword');
+    expect(player.offhandItemId).toBe('worn_sword');
+    expect(player.dualWielding).toBe(true);
+    expect(ev.some((e) => e.type === 'castStart' && e.ability === 'sword_aura')).toBe(true);
+    expect(player.auras.some((a: Ev) => a.id === 'sword_aura' && a.kind === 'buff_str_agi')).toBe(
+      true,
+    );
+    expect(rec.notes.afterAura).toEqual({
+      str: (rec.notes.beforeAura as Ev).str + 12,
+      agi: (rec.notes.beforeAura as Ev).agi + 12,
+    });
+
+    const dealt = ev.filter((e) => e.type === 'damage' && e.sourceId === pid);
+    expect(dealt.filter((e) => e.ability === 'Twin Slash').length).toBe(2);
+    expect(new Set(dealt.filter((e) => e.ability === 'Crescent Sweep').map((e) => e.targetId)).size).toBe(
+      4,
+    );
+    expect(new Set(dealt.filter((e) => e.ability === 'Blade Cyclone').map((e) => e.targetId)).size).toBe(
+      4,
+    );
+  });
+
   it('affix_mob: frenzyOnHit buff on mob + bleed on player + player-cast taunt (4279)', () => {
     const rec = run('affix_mob');
     const pid = (rec.sim as any).playerId;

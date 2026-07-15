@@ -2,7 +2,7 @@
 // behavior so that any future extraction is checked against a committed golden.
 //
 // Coverage matrix (every item is mandatory per the S0a brief):
-//  - multiple classes:        warrior / mage / rogue / hunter / warlock / paladin
+//  - multiple classes:        warrior / swordmaster / mage / rogue / hunter / warlock / paladin
 //  - meleeSwing weaponStrike:  heroic_strike (warrior), sinister_strike (rogue)
 //  - auto-attack + mobSwing:   solo_warrior (mob swings back)
 //  - frenzy + on-hit affix:    affix_mob (old_greyjaw frenzyOnHit + ridge_stalker bleed)
@@ -207,6 +207,64 @@ function soloRogue(): Scenario {
         rec.tick(12);
         face(p, mob);
       }
+    },
+  };
+}
+
+// SwordMaster: a real 2 sec Sword Aura cast, paired main-hand then off-hand
+// strikes, and two capped area attacks against a stable target set.
+function soloSwordmaster(): Scenario {
+  return {
+    name: 'solo_swordmaster',
+    coverage: [
+      'class:swordmaster',
+      'Sword Aura casting lifecycle + buff_str_agi',
+      'dualWeaponStrike main-hand then off-hand resolution',
+      'dualWeaponAoe stable capped target selection',
+      'Tempest signature: blade_cyclone',
+    ],
+    build: () => new Sim({ seed: 1032, playerClass: 'swordmaster', autoEquip: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      sim.setPlayerLevel(20);
+      sim.setSpec('tempest');
+      const p = sim.player as AnyEntity;
+      beef(p);
+      const beforeAura = { str: p.stats.str, agi: p.stats.agi };
+
+      p.resource = p.maxResource;
+      sim.castAbility('sword_aura');
+      rec.snapshot('aura-cast-start');
+      rec.tick(41);
+      rec.notes.beforeAura = beforeAura;
+      rec.notes.afterAura = { str: p.stats.str, agi: p.stats.agi };
+      rec.snapshot('aura-active');
+
+      const mobs = [
+        spawnMob(sim, 'forest_wolf', 20, p.pos.x - 1.5, p.pos.y, p.pos.z + 2.5),
+        spawnMob(sim, 'forest_wolf', 20, p.pos.x + 1.5, p.pos.y, p.pos.z + 2.5),
+        spawnMob(sim, 'forest_wolf', 20, p.pos.x - 2.5, p.pos.y, p.pos.z + 4),
+        spawnMob(sim, 'forest_wolf', 20, p.pos.x + 2.5, p.pos.y, p.pos.z + 4),
+      ];
+      for (const mob of mobs) beef(mob, 50000);
+      rec.track(...mobs.map((mob) => mob.id));
+      p.facing = 0;
+      sim.targetEntity(mobs[0].id);
+
+      p.resource = p.maxResource;
+      sim.castAbility('twin_slash');
+      rec.snapshot('twin-slash');
+      rec.tick(21);
+
+      p.resource = p.maxResource;
+      sim.castAbility('crescent_sweep');
+      rec.snapshot('crescent-sweep');
+      rec.tick(81);
+
+      p.resource = p.maxResource;
+      sim.castAbility('blade_cyclone');
+      rec.snapshot('blade-cyclone');
+      rec.tick(8);
     },
   };
 }
@@ -4027,6 +4085,7 @@ function chatSocial(): Scenario {
 
 export const SCENARIOS: Scenario[] = [
   soloWarrior(),
+  soloSwordmaster(),
   soloMage(),
   soloRogue(),
   affixMob(),
