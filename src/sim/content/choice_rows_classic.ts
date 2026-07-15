@@ -139,7 +139,7 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
           id: 'mag_r5_mana_attunement',
           name: 'Third Current',
           description:
-            'Every 3rd mana-spending Mage spell restores 20 mana and makes your next mana-spending Mage spell within 8 sec cost 50% less.',
+            'Every 3rd mana-spending Mage spell restores 8% of your maximum mana and makes your next mana-spending Mage spell within 8 sec cost 50% less.',
           icon: 'arcane_intellect',
           effect: {
             proc: {
@@ -147,7 +147,7 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
               name: 'Third Current',
               trigger: { on: 'castNth', n: 3, abilities: mageManaSpendingSpellAbilityIds },
               responses: [
-                { kind: 'resource', amount: 20 },
+                { kind: 'resource', pctMax: 0.08, resourceType: 'mana' },
                 {
                   kind: 'empowerNext',
                   aura: 'next_cast_cheap',

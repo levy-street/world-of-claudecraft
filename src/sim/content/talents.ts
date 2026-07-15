@@ -127,7 +127,10 @@ export type ProcResponse =
       costPct?: number;
     }
   | { kind: 'cooldownRefund'; ability: string; seconds: number | 'reset' }
-  | { kind: 'resource'; amount: number; resourceType?: ResourceType }
+  | ({ kind: 'resource'; resourceType?: ResourceType } & (
+      | { amount: number; pctMax?: never }
+      | { amount?: never; pctMax: number }
+    ))
   | { kind: 'stackAura'; aura: 'icicles'; maxStacks: number; duration: number }
   | { kind: 'addAuraCharges'; ability: string; amount: number; maxCharges: number }
   | { kind: 'heal'; amount: number }

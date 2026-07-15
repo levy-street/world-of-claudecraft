@@ -7797,7 +7797,7 @@ function procResponseDescription(
     case 'cooldownRefund':
       return `${abilityName(response.ability)}: -${response.seconds === 'reset' ? formatPercent(1, lang) : seconds(response.seconds, lang)} ${text.statLabels.cooldown}`;
     case 'resource':
-      return `+${formatNumber(response.amount, lang)} ${t('classDetails.labels.resource')}`;
+      return `+${response.pctMax !== undefined ? formatPercent(response.pctMax, lang) : formatNumber(response.amount, lang)} ${t('classDetails.labels.resource')}`;
     case 'stackAura':
       return `+1 (<= ${formatNumber(response.maxStacks, lang)})`;
     case 'addAuraCharges':

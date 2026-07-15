@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { onDamageTaken } from '../src/sim/combat/talent_procs';
+import { onCastCompleted, onDamageTaken } from '../src/sim/combat/talent_procs';
 import { MAGE_CHOICE_ROWS } from '../src/sim/content/choice_rows_classic';
 import { ABILITIES } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
@@ -15,6 +15,25 @@ describe('PBE-2 Mage feedback', () => {
   it('aligns the Icy Veins cooldown with Flashfire at 120 seconds', () => {
     expect(ABILITIES.icy_veins.cooldown).toBe(120);
     expect(ABILITIES.icy_veins.cooldown).toBe(ABILITIES.combustion.cooldown);
+  });
+
+  it('scales Third Current to 8% maximum mana and keeps its cheap-spell half', () => {
+    const sim = mage({ 5: 'mag_r5_mana_attunement' });
+    sim.player.resource = 0;
+
+    for (let index = 0; index < 3; index++) {
+      onCastCompleted(sim.ctx, sim.player, 'fireball');
+    }
+
+    expect(sim.player.resource / sim.player.maxResource).toBeCloseTo(0.08, 2);
+    expect(sim.player.auras).toContainEqual(
+      expect.objectContaining({
+        id: 'mag_mana_attunement',
+        kind: 'next_cast_cheap',
+        value: 0.5,
+        remaining: 8,
+      }),
+    );
   });
 
   it('makes Flickerstep baseline and keeps three distinct level-17 choices', () => {

@@ -83,7 +83,10 @@ function fireOne(
       if (response.resourceType !== undefined && player.resourceType !== response.resourceType) {
         break;
       }
-      player.resource = Math.min(player.maxResource, player.resource + response.amount);
+      player.resource = Math.min(
+        player.maxResource,
+        player.resource + (response.amount ?? player.maxResource * response.pctMax),
+      );
       break;
     case 'stackAura': {
       const existing = player.auras.find(
