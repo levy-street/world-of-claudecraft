@@ -287,3 +287,30 @@ describe('Demonology damage redirect is not double-modified (F7)', () => {
     expect(wl0 - wl.hp).toBe(72); // 90 - 18
   });
 });
+
+describe('caster mastery outliers trimmed to sibling parity', () => {
+  it('Shadow Vespers is a single DoT lever (no spellDmgPct triple-stack with form)', () => {
+    // Gloamveil Form already amplifies ALL shadow damage +15% (school-scoped, damage.ts),
+    // so a mastery spellDmgPct compounded into form x spellDmg x dotDmg = ~1.45 on DoTs, an
+    // outlier matching the pre-fix balance druid. The mastery now carries only dotDmgPct, so
+    // the form is the general shadow multiplier and the mastery is the DoT specialization.
+    const mods = computeTalentModifiers('priest', { spec: 'shadow', ranks: {}, choices: {} }, 20);
+    expect(mods.global.dotDmgPct ?? 0).toBeCloseTo(0.15);
+    expect(mods.global.spellDmgPct ?? 0).toBe(0);
+  });
+
+  it('Frost Cryomancy mastery gives +15% on frostbolt (caster parity), not +25%', () => {
+    // Every other caster mastery is +15% on its primary; frost was +25% on frostbolt, the only
+    // permanent single-nuke outlier. Ability-scoping is kept (off-school mage spells untouched),
+    // only the magnitude drops to match arcane/elemental's 0.15.
+    const base = abilitiesKnownAt('mage', 20, undefined).find((a) => a.def.id === 'frostbolt');
+    const baseDd = base?.effects.find((e) => e.type === 'directDamage');
+    const mods = computeTalentModifiers('mage', { spec: 'frost', ranks: {}, choices: {} }, 20);
+    const frost = abilitiesKnownAt('mage', 20, mods).find((a) => a.def.id === 'frostbolt');
+    const frostDd = frost?.effects.find((e) => e.type === 'directDamage');
+    const baseMin = baseDd && 'min' in baseDd ? baseDd.min : 0;
+    const frostMin = frostDd && 'min' in frostDd ? frostDd.min : 0;
+    expect(baseMin).toBeGreaterThan(0);
+    expect(frostMin / baseMin).toBeCloseTo(1.15, 2); // not 1.25
+  });
+});
