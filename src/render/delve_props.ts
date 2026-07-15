@@ -9,6 +9,7 @@
 import * as THREE from 'three';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
+import { delveInteractableVisible } from './delve_interactable_visibility_core';
 import { buildDungeonPropMesh } from './dungeon';
 import { GFX, surfaceMat } from './gfx';
 
@@ -737,13 +738,6 @@ function buildProceduralFallbackCrate(entityId: number): { group: THREE.Group; h
 // perf-friendly, gameplay-neutral).
 // ---------------------------------------------------------------------------
 type RiteShrineKind = 'bell' | 'candle' | 'reed' | 'skull';
-
-/** Existing delve props remain visible independently of the generic loot flag.
- * The sim removes props that should disappear; stateful variants such as a
- * pulled bell rope stay in the entity set and must keep their rebuilt mesh. */
-export function delveInteractableVisible(templateId: string | null, lootable: boolean): boolean {
-  return lootable || templateId?.startsWith('delve_') === true;
-}
 
 /** Apply the object-view visibility policy after a delve prop mesh is rebuilt. */
 export function syncDelveInteractableVisibility(

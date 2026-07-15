@@ -146,14 +146,11 @@ describe('delve walkable width', () => {
   });
 });
 
+import { delveInteractableVisible } from '../src/render/delve_interactable_visibility_core';
 // ---------------------------------------------------------------------------
 // buildDelveInteractable -- procedural mesh shape tests
 // ---------------------------------------------------------------------------
-import {
-  buildDelveInteractable,
-  delveInteractableVisible,
-  syncDelveInteractableVisibility,
-} from '../src/render/delve_props';
+import { buildDelveInteractable, syncDelveInteractableVisibility } from '../src/render/delve_props';
 
 const ALL_DELVE_IDS = [
   'delve_locked_door',
@@ -187,6 +184,13 @@ describe('buildDelveInteractable', () => {
     }
     expect(delveInteractableVisible('ordinary_hidden_object', false)).toBe(false);
     expect(delveInteractableVisible('ordinary_loot', true)).toBe(true);
+    expect(delveInteractableVisible(null, false)).toBe(false);
+
+    const rangeCulled = buildDelveInteractable('delve_bell_rope_pulled', 43).group;
+    expect(
+      syncDelveInteractableVisibility(rangeCulled, 'delve_bell_rope_pulled', false, false),
+    ).toBe(false);
+    expect(rangeCulled.visible).toBe(false);
   });
 
   it('returns a non-empty group for every templateId', () => {
