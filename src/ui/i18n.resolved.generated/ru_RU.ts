@@ -2594,7 +2594,9 @@ export const ru_RU: EnTranslations = {
       "revenge": "Sweeps enemies in front of you, with a chance to become free after a dodge or parry.",
       "hamstring": "Cripples an enemy's movement to keep it from escaping.",
       "battle_shout": "Боевой клич, повышающий силу атаки всей группы.",
+      "commanding_shout": "Повышает выносливость, так что у всех становится больше запаса прочности в бою.",
       "charge": "Рывок к далекому врагу, открывающий бой коротким оглушением.",
+      "rend": "Открывает кровотечение, которое изматывает цель со временем.",
       "thunder_clap": "Бьет по всем вокруг вас и замедляет их атаки.",
       "twin_slash": "Cuts with both blades in one quick sequence to build momentum.",
       "crescent_sweep": "Carves a wide arc through nearby enemies.",
@@ -2652,9 +2654,7 @@ export const ru_RU: EnTranslations = {
       "mark_of_the_wild": "Длительное благословение, которое вы накладываете на себя или союзника перед боем.",
       "moonfire": "Бьет мгновенно и оставляет цель гореть, удобно использовать в движении.",
       "rejuvenation": "Накладывается мгновенно и лечит союзника со временем, так что вы можете продолжать действовать.",
-      "thorns": "Защищает союзника так, что атакующие в ближнем бою ранят себя при ударе.",
-      "commanding_shout": "Повышает выносливость, так что у всех становится больше запаса прочности в бою.",
-      "rend": "Открывает кровотечение, которое изматывает цель со временем."
+      "thorns": "Защищает союзника так, что атакующие в ближнем бою ранят себя при ударе."
     },
     "petHook": {
       "emberkin": "Дальнобойный демон с огненными стрелами, который понемногу бьет врагов с безопасного расстояния.",
@@ -5880,6 +5880,10 @@ export const ru_RU: EnTranslations = {
         "name": "Железный рёв",
         "description": "Повышает вашу силу атаки на {buff} на 2 мин."
       },
+      "commanding_shout": {
+        "name": "Ободряющий клич",
+        "description": "Повышает вашу выносливость на {buff} на 2 мин."
+      },
       "demoralizing_shout": {
         "name": "Зловещий вой",
         "description": "Издает устрашающий крик, снижая силу атаки всех противников поблизости на {buff} на 30 сек."
@@ -5887,6 +5891,10 @@ export const ru_RU: EnTranslations = {
       "charge": {
         "name": "Натиск",
         "description": "Вы бросаетесь к врагу, накапливаете 9 ярости и оглушаете его на 1 сек. Дальность 8-25 м."
+      },
+      "rend": {
+        "name": "Глубокий разрез",
+        "description": "Ранит цель, вызывая кровотечение на {damage} ед. урона за {duration} сек."
       },
       "thunder_clap": {
         "name": "Сотрясающий удар",
@@ -6907,14 +6915,6 @@ export const ru_RU: EnTranslations = {
       "revive_pet": {
         "name": "Оживление питомца",
         "description": "Оживляет вашего павшего питомца и возвращает его к вам."
-      },
-      "commanding_shout": {
-        "name": "Ободряющий клич",
-        "description": "Повышает вашу выносливость на {buff} на 2 мин."
-      },
-      "rend": {
-        "name": "Глубокий разрез",
-        "description": "Ранит цель, вызывая кровотечение на {damage} ед. урона за {duration} сек."
       }
     },
     "items": {

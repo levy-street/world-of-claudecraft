@@ -2594,7 +2594,9 @@ export const es_ES: EnTranslations = {
       "revenge": "Sweeps enemies in front of you, with a chance to become free after a dodge or parry.",
       "hamstring": "Cripples an enemy's movement to keep it from escaping.",
       "battle_shout": "Un grito de aliento que aumenta el poder de ataque del grupo.",
+      "commanding_shout": "Refuerza el aguante para que todos resistan más en combate.",
       "charge": "Embiste a un enemigo lejano para abrir el combate con un breve aturdimiento.",
+      "rend": "Abre una hemorragia que va desgastando al objetivo con el tiempo.",
       "thunder_clap": "Golpea a los enemigos a tu alrededor y ralentiza sus ataques.",
       "twin_slash": "Cuts with both blades in one quick sequence to build momentum.",
       "crescent_sweep": "Carves a wide arc through nearby enemies.",
@@ -2652,9 +2654,7 @@ export const es_ES: EnTranslations = {
       "mark_of_the_wild": "Una bendición duradera que pones sobre ti o un aliado antes de un combate.",
       "moonfire": "Golpea al instante y deja al objetivo ardiendo, ideal mientras te mueves.",
       "rejuvenation": "Se lanza al instante y sana a un aliado con el tiempo, para que puedas seguir actuando.",
-      "thorns": "Protege a un aliado para que los atacantes cuerpo a cuerpo se hieran al golpearlo.",
-      "commanding_shout": "Refuerza el aguante para que todos resistan más en combate.",
-      "rend": "Abre una hemorragia que va desgastando al objetivo con el tiempo."
+      "thorns": "Protege a un aliado para que los atacantes cuerpo a cuerpo se hieran al golpearlo."
     },
     "petHook": {
       "emberkin": "Un demonio de descargas de fuego a distancia que merma a los enemigos desde un lugar seguro.",
@@ -5880,6 +5880,10 @@ export const es_ES: EnTranslations = {
         "name": "Bramido de Hierro",
         "description": "Aumenta tu poder de ataque en {buff} durante 2 min."
       },
+      "commanding_shout": {
+        "name": "Grito Alentador",
+        "description": "Aumenta tu Aguante en {buff} durante 2 min."
+      },
       "demoralizing_shout": {
         "name": "Aullido Pavoroso",
         "description": "Lanza un grito aterrador que reduce el poder de ataque de todos los enemigos cercanos en {buff} durante 30 s."
@@ -5887,6 +5891,10 @@ export const es_ES: EnTranslations = {
       "charge": {
         "name": "Arremetida",
         "description": "Carga contra un enemigo, genera 9 de ira y lo aturde durante 1 s. Alcance de 8-25 m."
+      },
+      "rend": {
+        "name": "Tajo Profundo",
+        "description": "Hiere al objetivo y le hace sangrar por {damage} de daño durante {duration} s."
       },
       "thunder_clap": {
         "name": "Golpe Sísmico",
@@ -6907,14 +6915,6 @@ export const es_ES: EnTranslations = {
       "revive_pet": {
         "name": "Revivir mascota",
         "description": "Revive a tu mascota muerta y la devuelve a tu lado."
-      },
-      "commanding_shout": {
-        "name": "Grito Alentador",
-        "description": "Aumenta tu Aguante en {buff} durante 2 min."
-      },
-      "rend": {
-        "name": "Tajo Profundo",
-        "description": "Hiere al objetivo y le hace sangrar por {damage} de daño durante {duration} s."
       }
     },
     "items": {

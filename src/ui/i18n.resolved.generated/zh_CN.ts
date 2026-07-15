@@ -2594,7 +2594,9 @@ export const zh_CN: EnTranslations = {
       "revenge": "Sweeps enemies in front of you, with a chance to become free after a dodge or parry.",
       "hamstring": "Cripples an enemy's movement to keep it from escaping.",
       "battle_shout": "一声号召呐喊，提升全队的攻击强度。",
+      "commanding_shout": "提升耐力，让所有人在战斗中更耐打。",
       "charge": "冲向远处的敌人，以一次短暂的昏迷开场。",
+      "rend": "造成一道流血，让目标随时间逐渐被消耗。",
       "thunder_clap": "打击你周围的一切，并减缓它们的攻击速度。",
       "twin_slash": "Cuts with both blades in one quick sequence to build momentum.",
       "crescent_sweep": "Carves a wide arc through nearby enemies.",
@@ -2652,9 +2654,7 @@ export const zh_CN: EnTranslations = {
       "mark_of_the_wild": "开战前为自己或盟友施加的持续祝福。",
       "moonfire": "瞬间命中并让目标持续燃烧，移动时也很好用。",
       "rejuvenation": "瞬发施放，持续治疗盟友，让你可以继续行动。",
-      "thorns": "守护盟友，让近战攻击者在打击时反伤自己。",
-      "commanding_shout": "提升耐力，让所有人在战斗中更耐打。",
-      "rend": "造成一道流血，让目标随时间逐渐被消耗。"
+      "thorns": "守护盟友，让近战攻击者在打击时反伤自己。"
     },
     "petHook": {
       "emberkin": "一只远程火焰箭恶魔，从安全距离外消磨敌人。",
@@ -5880,6 +5880,10 @@ export const zh_CN: EnTranslations = {
         "name": "铁血怒吼",
         "description": "使你的攻击强度提高 {buff}，持续 2 分钟。"
       },
+      "commanding_shout": {
+        "name": "鼓舞呐喊",
+        "description": "使你的耐力提高 {buff}，持续 2 分钟。"
+      },
       "demoralizing_shout": {
         "name": "恐怖嚎叫",
         "description": "发出可怕的怒吼，使附近所有敌人的攻击强度降低 {buff}，持续 30 秒。"
@@ -5887,6 +5891,10 @@ export const zh_CN: EnTranslations = {
       "charge": {
         "name": "突进",
         "description": "向一名敌人冲锋，产生 9 点怒气并使其昏迷 1 秒。8-25 码距离。"
+      },
+      "rend": {
+        "name": "深创",
+        "description": "撕裂目标，使其流血，在 {duration} 秒内受到 {damage} 点伤害。"
       },
       "thunder_clap": {
         "name": "震地一击",
@@ -6907,14 +6915,6 @@ export const zh_CN: EnTranslations = {
       "revive_pet": {
         "name": "复活宠物",
         "description": "复活你死去的宠物，并将其召回身边。"
-      },
-      "commanding_shout": {
-        "name": "鼓舞呐喊",
-        "description": "使你的耐力提高 {buff}，持续 2 分钟。"
-      },
-      "rend": {
-        "name": "深创",
-        "description": "撕裂目标，使其流血，在 {duration} 秒内受到 {damage} 点伤害。"
       }
     },
     "items": {

@@ -2594,7 +2594,9 @@ export const pl_PL: EnTranslations = {
       "revenge": "Sweeps enemies in front of you, with a chance to become free after a dodge or parry.",
       "hamstring": "Cripples an enemy's movement to keep it from escaping.",
       "battle_shout": "Mobilizujący okrzyk, który zwiększa siłę ataku całej drużyny.",
+      "commanding_shout": "Wzmacnia wytrzymałość, by każdy dłużej wytrzymał w walce.",
       "charge": "Szarżujesz na odległego wroga, otwierając walkę krótkim ogłuszeniem.",
+      "rend": "Otwiera krwawienie, które z czasem wyczerpuje cel.",
       "thunder_clap": "Uderza we wszystko wokół ciebie i spowalnia ataki wrogów.",
       "twin_slash": "Cuts with both blades in one quick sequence to build momentum.",
       "crescent_sweep": "Carves a wide arc through nearby enemies.",
@@ -2652,9 +2654,7 @@ export const pl_PL: EnTranslations = {
       "mark_of_the_wild": "Trwałe błogosławieństwo, które nakładasz na siebie lub sojusznika przed walką.",
       "moonfire": "Trafia natychmiast i pozostawia płonący cel, dobre w ruchu.",
       "rejuvenation": "Rzucane natychmiast, leczy sojusznika z czasem, byś mógł działać dalej.",
-      "thorns": "Chroni sojusznika tak, że atakujący wręcz ranią się przy uderzeniu.",
-      "commanding_shout": "Wzmacnia wytrzymałość, by każdy dłużej wytrzymał w walce.",
-      "rend": "Otwiera krwawienie, które z czasem wyczerpuje cel."
+      "thorns": "Chroni sojusznika tak, że atakujący wręcz ranią się przy uderzeniu."
     },
     "petHook": {
       "emberkin": "Demon ciskający ognistymi pociskami z bezpiecznej odległości, podgryzający wrogów na dystans.",
@@ -5880,6 +5880,10 @@ export const pl_PL: EnTranslations = {
         "name": "Żelazny ryk",
         "description": "Zwiększa twoją moc ataku o {buff} na 2 min."
       },
+      "commanding_shout": {
+        "name": "Bolstering Cry",
+        "description": "Increases your Stamina by {buff} for 2 min."
+      },
       "demoralizing_shout": {
         "name": "Złowieszcze wycie",
         "description": "Wydaje przerażający okrzyk, zmniejszając moc ataku wszystkich pobliskich wrogów o {buff} na 30 sek."
@@ -5887,6 +5891,10 @@ export const pl_PL: EnTranslations = {
       "charge": {
         "name": "Natarcie",
         "description": "Szarżuj na wroga, generując 9 wściekłości i ogłuszając go na 1 sek. Zasięg 8-25 jardów."
+      },
+      "rend": {
+        "name": "Głęboka rana",
+        "description": "Rani cel, powodując krwawienie zadające {damage} obrażeń w ciągu {duration} sek."
       },
       "thunder_clap": {
         "name": "Trzęsący cios",
@@ -6907,10 +6915,6 @@ export const pl_PL: EnTranslations = {
       "revive_pet": {
         "name": "Wskrzeszenie zwierzęcia",
         "description": "Wskrzesza twoje martwe zwierzę i przywraca je u twego boku."
-      },
-      "rend": {
-        "description": "Rani cel, powodując krwawienie zadające {damage} obrażeń w ciągu {duration} sek.",
-        "name": "Głęboka rana"
       }
     },
     "items": {

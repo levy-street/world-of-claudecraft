@@ -2594,7 +2594,9 @@ export const id_ID: EnTranslations = {
       "revenge": "Sweeps enemies in front of you, with a chance to become free after a dodge or parry.",
       "hamstring": "Cripples an enemy's movement to keep it from escaping.",
       "battle_shout": "Pekik penggugah semangat yang menaikkan daya serang seluruh kelompok.",
+      "commanding_shout": "Memperkuat stamina agar semua orang lebih tahan lama dalam pertarungan.",
       "charge": "Menerjang musuh yang jauh untuk membuka pertarungan dengan pingsan singkat.",
+      "rend": "Membuka pendarahan yang menggerus sasaran seiring waktu.",
       "thunder_clap": "Menghantam segala sesuatu di sekitarmu dan melambatkan serangan mereka.",
       "twin_slash": "Cuts with both blades in one quick sequence to build momentum.",
       "crescent_sweep": "Carves a wide arc through nearby enemies.",
@@ -2652,9 +2654,7 @@ export const id_ID: EnTranslations = {
       "mark_of_the_wild": "Berkah tahan lama yang kamu pasang pada dirimu atau sekutu sebelum pertarungan.",
       "moonfire": "Menghantam seketika dan meninggalkan sasaran terbakar, bagus sambil bergerak.",
       "rejuvenation": "Dirapalkan seketika dan menyembuhkan sekutu seiring waktu, sehingga kamu bisa terus bertindak.",
-      "thorns": "Melindungi sekutu sehingga penyerang jarak dekat melukai diri sendiri saat memukul.",
-      "commanding_shout": "Memperkuat stamina agar semua orang lebih tahan lama dalam pertarungan.",
-      "rend": "Membuka pendarahan yang menggerus sasaran seiring waktu."
+      "thorns": "Melindungi sekutu sehingga penyerang jarak dekat melukai diri sendiri saat memukul."
     },
     "petHook": {
       "emberkin": "Iblis pelontar api jarak jauh yang menggerus musuh dari jarak aman.",
@@ -5880,6 +5880,10 @@ export const id_ID: EnTranslations = {
         "name": "Raungan Besi",
         "description": "Meningkatkan daya serangmu sebesar {buff} selama 2 menit."
       },
+      "commanding_shout": {
+        "name": "Seruan Penguat",
+        "description": "Meningkatkan Staminamu sebesar {buff} selama 2 menit."
+      },
       "demoralizing_shout": {
         "name": "Direhowl",
         "description": "Melepaskan pekikan menyeramkan, mengurangi kekuatan serang semua musuh di sekitar sebesar {buff} selama 30 detik."
@@ -5887,6 +5891,10 @@ export const id_ID: EnTranslations = {
       "charge": {
         "name": "Serbuan",
         "description": "Menerjang musuh, menghasilkan 9 amarah dan menyetrumnya selama 1 detik. Jangkauan 8-25 yard."
+      },
+      "rend": {
+        "name": "Sayatan Dalam",
+        "description": "Melukai target, membuatnya berdarah sebesar {damage} kerusakan selama {duration} detik."
       },
       "thunder_clap": {
         "name": "Pukulan Gempa",
@@ -6907,14 +6915,6 @@ export const id_ID: EnTranslations = {
       "revive_pet": {
         "name": "Hidupkan Peliharaan",
         "description": "Menghidupkan kembali peliharaanmu yang mati dan mengembalikannya ke sisimu."
-      },
-      "commanding_shout": {
-        "description": "Meningkatkan Staminamu sebesar {buff} selama 2 menit.",
-        "name": "Seruan Penguat"
-      },
-      "rend": {
-        "description": "Melukai target, membuatnya berdarah sebesar {damage} kerusakan selama {duration} detik.",
-        "name": "Sayatan Dalam"
       }
     },
     "items": {

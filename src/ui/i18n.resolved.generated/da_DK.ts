@@ -2594,7 +2594,9 @@ export const da_DK: EnTranslations = {
       "revenge": "Sweeps enemies in front of you, with a chance to become free after a dodge or parry.",
       "hamstring": "Cripples an enemy's movement to keep it from escaping.",
       "battle_shout": "Et samlende råb der hæver angrebsstyrken for gruppen.",
+      "commanding_shout": "Styrker udholdenheden så alle har mere modstandskraft i en kamp.",
       "charge": "Stormer mod en fjern fjende for at åbne kampen med en kort lammelse.",
+      "rend": "Åbner en blødning der nedslider målet over tid.",
       "thunder_clap": "Rammer alt omkring dig og sløver deres angreb.",
       "twin_slash": "Cuts with both blades in one quick sequence to build momentum.",
       "crescent_sweep": "Carves a wide arc through nearby enemies.",
@@ -2652,9 +2654,7 @@ export const da_DK: EnTranslations = {
       "mark_of_the_wild": "En vedvarende velsignelse du lægger på dig selv eller en allieret før en kamp.",
       "moonfire": "Rammer øjeblikkeligt og efterlader målet brændende, god mens du bevæger dig.",
       "rejuvenation": "Kastes øjeblikkeligt og helbreder en allieret over tid, så du kan blive ved med at handle.",
-      "thorns": "Beskytter en allieret så nærkampsangribere skader sig selv når de slår.",
-      "commanding_shout": "Styrker udholdenheden så alle har mere modstandskraft i en kamp.",
-      "rend": "Åbner en blødning der nedslider målet over tid."
+      "thorns": "Beskytter en allieret så nærkampsangribere skader sig selv når de slår."
     },
     "petHook": {
       "emberkin": "En fjernkamps-ildboltdæmon der pikker på fjender fra sikker afstand.",
@@ -5880,6 +5880,10 @@ export const da_DK: EnTranslations = {
         "name": "Jernbrøl",
         "description": "Øger din angrebskraft med {buff} i 2 min."
       },
+      "commanding_shout": {
+        "name": "Bolstering Cry",
+        "description": "Increases your Stamina by {buff} for 2 min."
+      },
       "demoralizing_shout": {
         "name": "Rædselshyl",
         "description": "Udstøder et frygtindgydende råb, der sænker angrebsstyrken hos alle nærliggende fjender med {buff} i 30 sek."
@@ -5887,6 +5891,10 @@ export const da_DK: EnTranslations = {
       "charge": {
         "name": "Fremstorm",
         "description": "Storm mod en fjende, generér 9 raseri og bedøv den i 1 sek. 8-25 m rækkevidde."
+      },
+      "rend": {
+        "name": "Dyb Flænge",
+        "description": "Sårer målet og får det til at bløde for {damage} skade over {duration} sek."
       },
       "thunder_clap": {
         "name": "Rystende Slag",
@@ -6907,10 +6915,6 @@ export const da_DK: EnTranslations = {
       "revive_pet": {
         "name": "Genoplive Kæledyr",
         "description": "Genopliver dit døde kæledyr og bringer det tilbage til din side."
-      },
-      "rend": {
-        "description": "Sårer målet og får det til at bløde for {damage} skade over {duration} sek.",
-        "name": "Dyb Flænge"
       }
     },
     "items": {
