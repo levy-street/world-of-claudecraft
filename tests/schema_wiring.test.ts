@@ -287,6 +287,16 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(sessionLock).toBeGreaterThan(commitIndex);
     expect(sessionLock).toBeLessThan(concurrentIndex);
     expect(sessionUnlock).toBeGreaterThan(concurrentIndex);
+
+    // The boot transaction's SET LOCAL statement_timeout = 0 reverts at COMMIT,
+    // so the post-commit migration must re-disable it session-wide before taking
+    // the session lock: the advisory-lock wait and the concurrent build can both
+    // outlast an operator-set database- or role-level statement_timeout.
+    const postCommitTimeoutOff = h.calls.findIndex(
+      (sql, i) => i > commitIndex && sql === 'SET statement_timeout = 0',
+    );
+    expect(postCommitTimeoutOff).toBeGreaterThan(commitIndex);
+    expect(postCommitTimeoutOff).toBeLessThan(sessionLock);
   });
 
   it('applies the rate-limit schema idempotently (a second boot re-issues the same DDL)', async () => {

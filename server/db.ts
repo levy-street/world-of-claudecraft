@@ -1069,6 +1069,12 @@ export async function ensureSchema(): Promise<void> {
     // the session-level form of the same advisory lock while running this
     // post-commit migration so simultaneous realm boots cannot race the index
     // name. The concurrent build permits normal play_sessions writes to continue.
+    // The boot transaction's SET LOCAL statement_timeout = 0 reverted at the
+    // COMMIT above, so re-disable it session-wide first: the advisory-lock wait
+    // and the concurrent build can both outlast an operator-set database- or
+    // role-level statement_timeout, and this dedicated client closes right
+    // after, so the session setting never leaks to pooled connections.
+    await client.query('SET statement_timeout = 0');
     let concurrentMigrationLocked = false;
     try {
       await client.query('SELECT pg_advisory_lock($1)', [SCHEMA_ADVISORY_LOCK_KEY]);
