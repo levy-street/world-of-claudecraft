@@ -4824,6 +4824,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.gathering.herbalism'
   | 'hudChrome.gathering.logging'
   | 'hudChrome.gathering.mining'
+  | 'hudChrome.gathering.notReady'
   | 'hudChrome.gathering.title'
   | 'hudChrome.itemArmorType.cloth'
   | 'hudChrome.itemArmorType.leather'
