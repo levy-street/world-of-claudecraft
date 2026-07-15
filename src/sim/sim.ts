@@ -907,6 +907,9 @@ export interface PlayerMeta {
   honorArenaDaily?: HonorArenaDailyState;
   // Persisted per-day daily-quest completion record (the utcDay + ids done that day).
   dailyQuests?: DailyQuestState;
+  // Where to teleport back to when leaving the Frostreach Frontier (the overworld
+  // spot the player entered from). Persisted so leave works across a relog.
+  frontierReturn?: { x: number; z: number; facing: number };
   prestigeRank: number;
   unlockedMilestones: Set<string>;
   // Classic Rested XP pool (copper-less XP units). Accrues while resting in an
@@ -1111,6 +1114,7 @@ export interface CharacterState {
   lifetimeHeroPoints?: number;
   honorArenaDaily?: HonorArenaDailyState;
   dailyQuests?: DailyQuestState;
+  frontierReturn?: { x: number; z: number; facing: number };
   prestigeRank?: number;
   unlockedMilestones?: string[];
   // Rested XP pool. Optional so pre-rested-XP saves load cleanly (defaults to 0).
@@ -2001,6 +2005,18 @@ export class Sim {
       );
       meta.honorArenaDaily = honorMod.normalizeHonorDailyState(s.honorArenaDaily);
       meta.dailyQuests = normalizeDailyQuestState(s.dailyQuests);
+      if (
+        s.frontierReturn &&
+        Number.isFinite(s.frontierReturn.x) &&
+        Number.isFinite(s.frontierReturn.z) &&
+        Number.isFinite(s.frontierReturn.facing)
+      ) {
+        meta.frontierReturn = {
+          x: s.frontierReturn.x,
+          z: s.frontierReturn.z,
+          facing: s.frontierReturn.facing,
+        };
+      }
       meta.heroPoints = honorMod.normalizeHeroPoints(s.heroPoints);
       meta.lifetimeHeroPoints = Math.max(
         meta.heroPoints,
@@ -2410,6 +2426,7 @@ export class Sim {
       ...(meta.dailyQuests && (meta.dailyQuests.date || meta.dailyQuests.done.length)
         ? { dailyQuests: { date: meta.dailyQuests.date, done: [...meta.dailyQuests.done] } }
         : {}),
+      ...(meta.frontierReturn ? { frontierReturn: { ...meta.frontierReturn } } : {}),
       prestigeRank: meta.prestigeRank,
       unlockedMilestones: [...meta.unlockedMilestones],
       restedXp: meta.restedXp,
@@ -6743,6 +6760,17 @@ export class Sim {
 
   arenaQueueLeave(pid?: number): void {
     arenaMod.arenaQueueLeave(this.ctx, pid);
+  }
+
+  // The Frostreach Frontier is a persistent zone, not a matchmade bracket: entering
+  // hard-teleports to the safe hub (remembering the return spot), leaving teleports
+  // back. Driven from the same PvP window as the arena/fiesta queue.
+  frontierEnter(pid?: number): void {
+    honorMod.frontierEnter(this.ctx, pid);
+  }
+
+  frontierLeave(pid?: number): void {
+    honorMod.frontierLeave(this.ctx, pid);
   }
 
   private isArenaQueued(pid: number): boolean {

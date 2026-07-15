@@ -912,6 +912,9 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // Bank system: the pooled bank deposit/withdraw/buy-slots command bodies
     // emit the quest-item/full/afford/max-slots refusals + the purchase notice.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/bank.ts'), 'utf8'),
+    // Frostreach Frontier enter/leave: only the shared "can't while dead" toast;
+    // every other rejection is a silent no-op the PvP window guards.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/pvp/frontier_entry.ts'), 'utf8'),
     socialSrc,
   ].join('\n');
   // Hardened S3: also scan the authoritative server's player-facing emits. The

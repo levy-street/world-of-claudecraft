@@ -12,8 +12,9 @@ export {
   inFrontierHub,
   isFrontierPos,
 } from './frontier';
-export { grantHeroPoints, normalizeHeroPoints, spendHeroPoints } from './hero_points';
+export { frontierEnter, frontierLeave } from './frontier_entry';
 export { awardFrontierRareKill } from './frontier_rewards';
+export { grantHeroPoints, normalizeHeroPoints, spendHeroPoints } from './hero_points';
 export {
   ARENA_DAILY_TAPER_FLOOR_START,
   ARENA_DAILY_TAPER_START,

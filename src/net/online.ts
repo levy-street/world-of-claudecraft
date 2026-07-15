@@ -2601,6 +2601,12 @@ export class ClientWorld implements IWorld {
   arenaAugmentPick(augmentId: string): void {
     this.cmd({ cmd: 'arena_augment', augment: augmentId });
   }
+  frontierEnter(): void {
+    this.cmd({ cmd: 'frontier_enter' });
+  }
+  frontierLeave(): void {
+    this.cmd({ cmd: 'frontier_leave' });
+  }
   // --- IWorldValeCup: boarball queue sends (cupInfo is a snapshot read; the
   // sport-kit swap rides the heavy `sport` self field decoded in applySnapshot). ---
   vcupQueueJoin(

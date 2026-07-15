@@ -14,6 +14,11 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.frontier.title': 'Морозный Фронтир',
+  'hudChrome.frontier.enter': 'Отправиться на Фронтир',
+  'hudChrome.frontier.leave': 'Вернуться с Фронтира',
+  'hudChrome.frontier.note':
+    'Постоянная зона открытого PvP. За пределами безопасного хаба все игроки враги.',
   'entities.npcs.frontier_marshal.name': 'Маршал Дрегг',
   'entities.npcs.frontier_marshal.title': 'Маршал Фронтира',
   'entities.npcs.frontier_marshal.greeting': 'Держи строй, солдат. Фронтир не спит, и мы тоже.',

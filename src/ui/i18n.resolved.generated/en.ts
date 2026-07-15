@@ -975,6 +975,12 @@ export const en: EnTranslations = {
         "frontierDaily": "Frontier daily"
       }
     },
+    "frontier": {
+      "title": "Frostreach Frontier",
+      "enter": "Travel to the Frontier",
+      "leave": "Return from the Frontier",
+      "note": "An always-on open-PvP zone. Beyond the safe hub, all players are enemies."
+    },
     "statInfo": {
       "fromYour": "From your {value} {stat}:",
       "names": {

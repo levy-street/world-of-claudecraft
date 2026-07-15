@@ -975,6 +975,12 @@ export const zh_CN: EnTranslations = {
         "frontierDaily": "边境每日任务"
       }
     },
+    "frontier": {
+      "title": "霜达边境",
+      "enter": "前往边境",
+      "leave": "离开边境",
+      "note": "常驻的开放PvP区域。走出安全枢纽后，所有玩家都是敌人。"
+    },
     "statInfo": {
       "fromYour": "来自你的 {value} 点{stat}：",
       "names": {

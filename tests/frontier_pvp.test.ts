@@ -268,6 +268,11 @@ describe('Frontier honor daily quest', () => {
     expect(sim.questState(QID, pid)).toBe('available');
   });
 
+  it('pays 100 honor', () => {
+    expect(FRONTIER_DAILY_HONOR).toBe(100);
+    expect(QUESTS.frontier_daily_muster.honorReward).toBe(100);
+  });
+
   it('grants a repeatable daily giver at the Frontier hub', () => {
     const sim = new Sim({ seed: 12, playerClass: 'warrior', autoEquip: true });
     const marshal = [...sim.entities.values()].find((e) => e.templateId === 'frontier_marshal');
@@ -280,5 +285,69 @@ describe('Frontier honor daily quest', () => {
       type: 'interact',
       targetNpcId: 'frostreach_quartermaster',
     });
+  });
+});
+
+describe('Frontier enter/leave (PvP-window travel surface)', () => {
+  it('teleports into the hub, remembers the return spot, and teleports back', () => {
+    const sim = new Sim({ seed: 21, playerClass: 'warrior', autoEquip: true });
+    const pid = sim.player.id;
+    const player = sim.entities.get(pid)!;
+    const meta = sim.meta(pid)!;
+    player.pos = { x: 12, y: 1, z: -7 };
+    player.prevPos = { ...player.pos };
+    player.facing = 1.2;
+
+    sim.frontierEnter(pid);
+    // Arrived inside the band, in the safe hub, with the return spot remembered.
+    expect(isFrontierPos(player.pos.x)).toBe(true);
+    expect(inFrontierHub(player.pos.x, player.pos.z)).toBe(true);
+    expect(meta.frontierReturn).toMatchObject({ x: 12, z: -7, facing: 1.2 });
+
+    sim.frontierLeave(pid);
+    // Back to the overworld spot; the return record is cleared.
+    expect(isFrontierPos(player.pos.x)).toBe(false);
+    expect(player.pos.x).toBeCloseTo(12, 5);
+    expect(player.pos.z).toBeCloseTo(-7, 5);
+    expect(player.facing).toBeCloseTo(1.2, 5);
+    expect(meta.frontierReturn).toBeUndefined();
+  });
+
+  it('is a no-op when already inside, dead, or in combat', () => {
+    const sim = new Sim({ seed: 22, playerClass: 'warrior', autoEquip: true });
+    const pid = sim.player.id;
+    const player = sim.entities.get(pid)!;
+    player.pos = { x: 5, y: 1, z: 5 };
+    player.prevPos = { ...player.pos };
+
+    // In combat: enter refused (no teleport, no return saved).
+    player.inCombat = true;
+    sim.frontierEnter(pid);
+    expect(isFrontierPos(player.pos.x)).toBe(false);
+    expect(sim.meta(pid)!.frontierReturn).toBeUndefined();
+
+    // Out of combat: enter works; a second enter while inside is a no-op that does
+    // not overwrite the saved return spot.
+    player.inCombat = false;
+    sim.frontierEnter(pid);
+    const savedReturn = { ...sim.meta(pid)!.frontierReturn! };
+    sim.frontierEnter(pid);
+    expect(sim.meta(pid)!.frontierReturn).toEqual(savedReturn);
+  });
+
+  it('persists the return spot across serialize / addPlayer', () => {
+    const sim = new Sim({ seed: 23, playerClass: 'warrior', autoEquip: true });
+    const pid = sim.player.id;
+    const player = sim.entities.get(pid)!;
+    player.pos = { x: 40, y: 1, z: 9 };
+    player.prevPos = { ...player.pos };
+    player.facing = 2.5;
+    sim.frontierEnter(pid);
+    const state = sim.serializeCharacter(pid)!;
+    expect(state.frontierReturn).toMatchObject({ x: 40, z: 9, facing: 2.5 });
+
+    const sim2 = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const pid2 = sim2.addPlayer('warrior', 'Alt', { state });
+    expect(sim2.meta(pid2)!.frontierReturn).toMatchObject({ x: 40, z: 9, facing: 2.5 });
   });
 });

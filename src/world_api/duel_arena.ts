@@ -152,4 +152,9 @@ export interface IWorldDuelArena {
   arenaQueueLeave(): void;
   // 2v2 Fiesta: lock in one of the augments currently on offer
   arenaAugmentPick(augmentId: string): void;
+  // The always-on Frostreach Frontier PvP zone: entered/left from the same PvP
+  // window as the arena/fiesta queue. Enter hard-teleports to the safe hub
+  // (remembering the return spot); leave teleports back.
+  frontierEnter(): void;
+  frontierLeave(): void;
 }

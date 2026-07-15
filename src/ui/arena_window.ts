@@ -17,6 +17,7 @@
 // skipping the DOM rebuild when the content signature is unchanged.
 
 import { audio } from '../game/audio';
+import { isFrontierPos } from '../sim/pvp';
 import type { PlayerClass } from '../sim/types';
 import type { ArenaFormat, IWorld } from '../world_api';
 import {
@@ -161,24 +162,67 @@ export class ArenaWindow {
       practiceAvailable: this.practiceHook !== null,
     });
 
+    // The Frostreach Frontier enter/leave control rides alongside the arena/fiesta
+    // brackets in BOTH the offline and live panels (the zone is always-on, not an
+    // online-only feature), so its inside/combat state joins the render signature.
+    const inFrontier = isFrontierPos(world.player.pos.x);
+    const frontierCombat = !!world.player.inCombat;
+    const frontierSig = `|f:${inFrontier ? 'in' : 'out'}${frontierCombat ? 'c' : ''}`;
+
     if (view.kind === 'offline') {
       // offline / not yet synced: arena is an online ranked feature. The static note is
       // built once per open (skip-guarded by the offline sentinel) instead of every
-      // ~250ms mediumHud tick.
-      if (this.lastSig === ARENA_OFFLINE_SIG) return;
-      this.lastSig = ARENA_OFFLINE_SIG;
-      el.innerHTML = this.offlineHtml();
+      // ~250ms mediumHud tick. The Frontier control still updates as the player travels.
+      const sig = ARENA_OFFLINE_SIG + frontierSig;
+      if (this.lastSig === sig) return;
+      this.lastSig = sig;
+      el.innerHTML = this.offlineHtml() + this.frontierHtml(inFrontier, frontierCombat);
       el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
+      this.wireFrontier(el);
       return;
     }
 
     // A queue/match pins its bracket as the selection for the next render.
     if (view.commitBracket) this.bracket = view.bracket;
     this.fetchLeaderboard(view.bracket);
-    if (view.sig === this.lastSig) return;
-    this.lastSig = view.sig;
-    el.innerHTML = this.liveHtml(view);
+    const sig = view.sig + frontierSig;
+    if (sig === this.lastSig) return;
+    this.lastSig = sig;
+    el.innerHTML = this.liveHtml(view) + this.frontierHtml(inFrontier, frontierCombat);
     this.wire(el, view);
+    this.wireFrontier(el);
+  }
+
+  /** The Frostreach Frontier travel control: Enter when outside, Leave when inside. */
+  private frontierHtml(inside: boolean, inCombat: boolean): string {
+    const act = inside ? 'frontier-leave' : 'frontier-enter';
+    const label = inside ? t('hudChrome.frontier.leave') : t('hudChrome.frontier.enter');
+    const disabled = inCombat ? ' disabled' : '';
+    return (
+      `<div class="arena-sub">${esc(t('hudChrome.frontier.title'))}</div>` +
+      `<button class="btn frontier-travel" data-act="${act}"${disabled}>${esc(label)}</button>` +
+      `<div class="arena-note">${esc(t('hudChrome.frontier.note'))}</div>`
+    );
+  }
+
+  /** Wire the Frontier enter/leave button; forces a re-render so it flips promptly. */
+  private wireFrontier(el: HTMLElement): void {
+    el.querySelector('[data-act="frontier-enter"]:not([disabled])')?.addEventListener(
+      'click',
+      () => {
+        this.deps.world().frontierEnter();
+        this.lastSig = '';
+        audio.click();
+      },
+    );
+    el.querySelector('[data-act="frontier-leave"]:not([disabled])')?.addEventListener(
+      'click',
+      () => {
+        this.deps.world().frontierLeave();
+        this.lastSig = '';
+        audio.click();
+      },
+    );
   }
 
   private wire(el: HTMLElement, view: Extract<ArenaView, { kind: 'live' }>): void {

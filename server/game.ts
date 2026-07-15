@@ -440,6 +440,7 @@ const HEAVY_SELF_REFRESH_TICKS = 40; // ~2 s backstop; staggered per session so 
 // commands stay allowed.
 const JAILED_BLOCKED_COMMANDS = new Set<string>([
   'arena_queue',
+  'frontier_enter',
   'vcup_queue',
   'vcup_ready',
   'vcup_practice',
@@ -4107,6 +4108,12 @@ export class GameServer {
           sim.arenaAugmentPick(msg.augment, pid);
         break;
       }
+      case 'frontier_enter':
+        sim.frontierEnter(pid);
+        break;
+      case 'frontier_leave':
+        sim.frontierLeave(pid);
+        break;
 
       // The Vale Cup (boarball queue at the Sowfield, docs/prd/vale-cup.md).
       // Deliberately NOT in HEAVY_SELF_CMDS: queueing mutates no heavy self

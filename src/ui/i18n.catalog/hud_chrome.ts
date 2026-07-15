@@ -957,6 +957,14 @@ export const hudChromeStrings = {
       frontierDaily: 'Frontier daily',
     },
   },
+  // The Frostreach Frontier enter/leave control in the PvP window (alongside the
+  // arena and fiesta queue). The always-on open-PvP zone you travel to and from.
+  frontier: {
+    title: 'Frostreach Frontier',
+    enter: 'Travel to the Frontier',
+    leave: 'Return from the Frontier',
+    note: 'An always-on open-PvP zone. Beyond the safe hub, all players are enemies.',
+  },
   // Character-screen stat tooltips (hover a stat on the C panel). The stat NAMES
   // reuse itemUi.stats.*; only these descriptions / effect lines / notes are new.
   // The breakdown numbers are recomputed live from the player's current stats

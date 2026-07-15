@@ -975,6 +975,12 @@ export const ko_KR: EnTranslations = {
         "frontierDaily": "변경 일일"
       }
     },
+    "frontier": {
+      "title": "서리절경 변경",
+      "enter": "변경으로 이동",
+      "leave": "변경에서 귀환",
+      "note": "상시 개방형 PvP 구역. 안전 허브를 벗어나면 모든 플레이어가 적이다."
+    },
     "statInfo": {
       "fromYour": "당신의 {value} {stat}에서:",
       "names": {

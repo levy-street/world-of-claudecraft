@@ -975,6 +975,12 @@ export const ja_JP: EnTranslations = {
         "frontierDaily": "辺境デイリー"
       }
     },
+    "frontier": {
+      "title": "フロストリーチ辺境",
+      "enter": "辺境へ向かう",
+      "leave": "辺境から戻る",
+      "note": "常時稼働のオープンPvPゾーン。安全なハブの外では、すべてのプレイヤーが敵となる。"
+    },
     "statInfo": {
       "fromYour": "あなたの{stat}{value}による効果:",
       "names": {

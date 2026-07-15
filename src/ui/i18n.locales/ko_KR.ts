@@ -14,6 +14,10 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.frontier.title': '서리절경 변경',
+  'hudChrome.frontier.enter': '변경으로 이동',
+  'hudChrome.frontier.leave': '변경에서 귀환',
+  'hudChrome.frontier.note': '상시 개방형 PvP 구역. 안전 허브를 벗어나면 모든 플레이어가 적이다.',
   'entities.npcs.frontier_marshal.name': '드레그 원수',
   'entities.npcs.frontier_marshal.title': '프론티어 원수',
   'entities.npcs.frontier_marshal.greeting':

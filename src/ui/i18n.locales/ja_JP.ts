@@ -14,6 +14,11 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.frontier.title': 'フロストリーチ辺境',
+  'hudChrome.frontier.enter': '辺境へ向かう',
+  'hudChrome.frontier.leave': '辺境から戻る',
+  'hudChrome.frontier.note':
+    '常時稼働のオープンPvPゾーン。安全なハブの外では、すべてのプレイヤーが敵となる。',
   'entities.npcs.frontier_marshal.name': 'マーシャル・ドレッグ',
   'entities.npcs.frontier_marshal.title': 'フロンティア元帥',
   'entities.npcs.frontier_marshal.greeting':

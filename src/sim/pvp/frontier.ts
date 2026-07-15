@@ -50,4 +50,4 @@ export const FRONTIER_RARE_HERO_POINTS = 3;
 /** The open-world player-kill honor premium (2x the Fiesta kill base). */
 export const FRONTIER_KILL_HONOR_MULT = 2;
 /** Honor for completing a Frontier daily quest. */
-export const FRONTIER_DAILY_HONOR = 40;
+export const FRONTIER_DAILY_HONOR = 100;

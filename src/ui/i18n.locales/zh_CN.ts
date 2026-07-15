@@ -14,6 +14,10 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.frontier.title': '霜达边境',
+  'hudChrome.frontier.enter': '前往边境',
+  'hudChrome.frontier.leave': '离开边境',
+  'hudChrome.frontier.note': '常驻的开放PvP区域。走出安全枢纽后，所有玩家都是敌人。',
   'entities.npcs.frontier_marshal.name': '德雷格元帅',
   'entities.npcs.frontier_marshal.title': '边境元帅',
   'entities.npcs.frontier_marshal.greeting': '守住阵线，士兵。边境从不眠，我们也一样。',
