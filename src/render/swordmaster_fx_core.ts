@@ -11,6 +11,18 @@ export interface SwordmasterDamageVisualPlan {
   spinRate: number;
 }
 
+export interface SwordmasterDashVisualPlan {
+  abilityId: 'wind_lunge' | 'azure_rush';
+  kind: 'dash';
+  color: number;
+  width: number;
+  duration: number;
+  particleCount: number;
+  afterimages: number;
+}
+
+export type SwordmasterVisualPlan = SwordmasterDamageVisualPlan | SwordmasterDashVisualPlan;
+
 const TWIN_CUT: Omit<SwordmasterDamageVisualPlan, 'abilityId'> = {
   kind: 'twin-cut',
   anchor: 'target',
@@ -51,6 +63,27 @@ const AOE_PLANS: Readonly<Record<string, Omit<SwordmasterDamageVisualPlan, 'abil
   },
 };
 
+const DASH_PLANS: Readonly<
+  Record<SwordmasterDashVisualPlan['abilityId'], Omit<SwordmasterDashVisualPlan, 'abilityId'>>
+> = {
+  wind_lunge: {
+    kind: 'dash',
+    color: SWORDMASTER_VFX_COLOR,
+    width: 1.25,
+    duration: 0.42,
+    particleCount: 18,
+    afterimages: 3,
+  },
+  azure_rush: {
+    kind: 'dash',
+    color: 0x67e8f9,
+    width: 1.65,
+    duration: 0.52,
+    particleCount: 26,
+    afterimages: 3,
+  },
+};
+
 /** Stable presentation routing for the SwordMaster's authored blade effects. */
 export function swordmasterDamageVisualPlan(
   abilityId: string | undefined,
@@ -72,8 +105,12 @@ export function swordmasterDamageVisualPlan(
 export function swordmasterSpellVisualPlan(
   fx: string,
   abilityId: string | undefined,
-): SwordmasterDamageVisualPlan | null {
-  return fx === 'flourish' ? swordmasterDamageVisualPlan(abilityId) : null;
+): SwordmasterVisualPlan | null {
+  if (fx !== 'flourish' || !abilityId) return null;
+  if (abilityId === 'wind_lunge' || abilityId === 'azure_rush') {
+    return { abilityId, ...DASH_PLANS[abilityId] };
+  }
+  return swordmasterDamageVisualPlan(abilityId);
 }
 
 /** Paired single-target cuts originate from damage events. Area plans are

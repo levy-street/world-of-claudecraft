@@ -1,7 +1,12 @@
 import * as THREE from 'three';
-import type { SwordmasterDamageVisualPlan } from './swordmaster_fx_core';
+import { SwordmasterDashPainter } from './swordmaster_dash_painter';
+import type { SwordmasterVisualPlan } from './swordmaster_fx_core';
 
 type EntityAnchor = (entityId: number, heightFraction: number) => THREE.Vector3 | null;
+type MotionPath = {
+  readonly from: { readonly x: number; readonly y: number; readonly z: number };
+  readonly to: { readonly x: number; readonly y: number; readonly z: number };
+};
 
 interface SwordArcSlot {
   mesh: THREE.Mesh<THREE.RingGeometry, THREE.MeshBasicMaterial>;
@@ -20,12 +25,15 @@ const ARC_POOL_SIZE = 24;
 export class SwordmasterFxPainter {
   private readonly geometry = new THREE.RingGeometry(0.68, 1, 40, 1, -0.72, 1.44);
   private readonly slots: SwordArcSlot[] = [];
+  private readonly dash: SwordmasterDashPainter;
   private nextSlot = 0;
 
   constructor(
     scene: THREE.Scene,
     private readonly anchor: EntityAnchor,
+    private readonly destinationAnchor: EntityAnchor = anchor,
   ) {
+    this.dash = new SwordmasterDashPainter(scene);
     for (let i = 0; i < ARC_POOL_SIZE; i++) {
       const material = new THREE.MeshBasicMaterial({
         transparent: true,
@@ -53,11 +61,25 @@ export class SwordmasterFxPainter {
   }
 
   paint(
-    plan: SwordmasterDamageVisualPlan,
+    plan: SwordmasterVisualPlan,
     sourceId: number,
     targetId: number,
     sourceFacing = 0,
+    motionPath?: MotionPath,
   ): void {
+    if (plan.kind === 'dash') {
+      const renderedStart = this.anchor(sourceId, 0.5);
+      const renderedEnd = this.destinationAnchor(sourceId, 0.5);
+      const height = motionPath && renderedStart ? renderedStart.y - motionPath.from.y : 0;
+      const start = motionPath
+        ? new THREE.Vector3(motionPath.from.x, motionPath.from.y + height, motionPath.from.z)
+        : renderedStart;
+      const end = motionPath
+        ? new THREE.Vector3(motionPath.to.x, motionPath.to.y + height, motionPath.to.z)
+        : renderedEnd;
+      if (start && end) this.dash.paint(plan, sourceId, start, end);
+      return;
+    }
     const source = this.anchor(sourceId, plan.anchor === 'source' ? 0.08 : 0.5);
     const target = this.anchor(targetId, 0.5);
     const at = plan.anchor === 'source' ? source : target;
@@ -98,6 +120,7 @@ export class SwordmasterFxPainter {
   }
 
   update(dt: number): void {
+    this.dash.update(dt);
     for (const slot of this.slots) {
       if (!slot.mesh.visible) continue;
       slot.elapsed += dt;
@@ -115,6 +138,7 @@ export class SwordmasterFxPainter {
   }
 
   dispose(): void {
+    this.dash.dispose();
     for (const slot of this.slots) {
       slot.mesh.removeFromParent();
       slot.mesh.material.dispose();

@@ -293,8 +293,103 @@ const auraActive = await page.evaluate(() => {
     agility: player.stats.agi,
   };
 });
+const auraFlowBefore = await page.evaluate(() => {
+  const times = [];
+  window.__game.renderer.scene.traverse((object) => {
+    if (object.userData.weaponAuraLayer !== 'flow') return;
+    times.push(object.material.uniforms.uTime.value);
+  });
+  return times;
+});
 await wait(300);
+const auraFlowAfter = await page.evaluate(() => {
+  const times = [];
+  window.__game.renderer.scene.traverse((object) => {
+    if (object.userData.weaponAuraLayer !== 'flow') return;
+    times.push(object.material.uniforms.uTime.value);
+  });
+  return times;
+});
 await capture(page, 'after-sword-aura-active');
+await page.setViewport({
+  width: 390,
+  height: 844,
+  deviceScaleFactor: 1,
+});
+await wait(250);
+await capture(page, 'after-sword-aura-active-mobile');
+await page.setViewport({ width: 1440, height: 960, deviceScaleFactor: 1 });
+await page.evaluate(() => {
+  window.__game.input.camYaw = 1.1;
+  window.__game.input.camPitch = 0.48;
+  window.__game.input.camDist = 13;
+});
+await wait(350);
+await capture(page, 'before-wind-lunge');
+
+const dash = await page.evaluate(() => {
+  const game = window.__game;
+  const sim = game.sim;
+  const player = sim.player;
+  const painter = game.renderer.swordmasterFx;
+  const update = painter.update.bind(painter);
+  let heldAt = 0;
+  painter.update = (dt) => {
+    if (heldAt >= 0.14) return;
+    const step = Math.min(dt, 0.14 - heldAt);
+    if (step <= 0) return;
+    update(step);
+    heldAt += step;
+  };
+  window.__restoreSwordmasterDashUpdate = () => {
+    painter.update = update;
+  };
+  const before = { ...player.pos };
+  player.resource = player.maxResource;
+  player.gcdRemaining = 0;
+  player.cooldowns.delete('wind_lunge');
+  sim.castAbility('wind_lunge', player.id);
+  const events = sim.drainEvents();
+  for (const event of events) game.renderer.handleEvent(event);
+  painter.update(0.14);
+  return {
+    ability: 'wind_lunge',
+    before,
+    after: { ...player.pos },
+    distance: Math.hypot(player.pos.x - before.x, player.pos.z - before.z),
+    visualEvent: events.find((event) => event.type === 'spellfx' && event.ability === 'wind_lunge'),
+  };
+});
+await page.waitForFunction(
+  () =>
+    window.__game.renderer.scene.children.some(
+      (object) => object.userData.swordmasterDash && object.visible,
+    ),
+  { timeout: 8_000, polling: 50 },
+);
+await wait(180);
+const dashVisual = await page.evaluate(() => {
+  const layers = [];
+  let progress = null;
+  window.__game.renderer.scene.traverse((object) => {
+    if (!object.visible || !object.userData.swordmasterDashLayer) return;
+    layers.push(object.userData.swordmasterDashLayer);
+    if (object.userData.swordmasterDashLayer === 'particles') {
+      progress = object.material.uniforms.uProgress.value;
+    }
+  });
+  return { layers, progress };
+});
+await capture(page, 'after-wind-lunge');
+await page.setViewport({
+  width: 390,
+  height: 844,
+  deviceScaleFactor: 1,
+});
+await wait(200);
+await capture(page, 'after-wind-lunge-mobile');
+await page.setViewport({ width: 1440, height: 960, deviceScaleFactor: 1 });
+await page.evaluate(() => window.__restoreSwordmasterDashUpdate?.());
 
 const cyclone = await page.evaluate(() => {
   const sim = window.__game.sim;
@@ -367,6 +462,9 @@ console.log(
       staged,
       auraCast,
       auraActive,
+      auraFlow: { before: auraFlowBefore, after: auraFlowAfter },
+      dash,
+      dashVisual,
       cyclone,
       browserErrors,
     },
@@ -408,6 +506,15 @@ const ok =
   auraCast.total === 2 &&
   auraActive.aura === 'sword_aura' &&
   auraActive.remaining > 295 &&
+  auraFlowBefore.length === 2 &&
+  auraFlowAfter.length === 2 &&
+  dash.distance > 7.5 &&
+  dash.visualEvent?.motionPath !== undefined &&
+  dashVisual.layers.includes('trail') &&
+  dashVisual.layers.includes('particles') &&
+  dashVisual.layers.filter((layer) => layer === 'afterimage').length === 3 &&
+  dashVisual.progress > 0 &&
+  dashVisual.progress < 1 &&
   cyclone.targetsBefore >= 5 &&
   cyclone.paintCalls.some((plan) => plan.abilityId === 'blade_cyclone') &&
   unexpectedBrowserErrors.length === 0;

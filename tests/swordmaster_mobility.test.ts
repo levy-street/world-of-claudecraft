@@ -60,11 +60,21 @@ describe('SwordMaster authored mobility', () => {
     const player = sim.player;
     player.auras.push(root());
     const before = { ...player.pos };
+    sim.drainEvents();
 
     sim.castAbility('wind_lunge');
+    const dashFx = sim
+      .drainEvents()
+      .find((event) => event.type === 'spellfx' && event.ability === 'wind_lunge');
 
     expect(player.auras.some((aura) => aura.kind === 'root')).toBe(false);
     expect(Math.hypot(player.pos.x - before.x, player.pos.z - before.z)).toBeCloseTo(8, 6);
+    expect(dashFx).toMatchObject({
+      type: 'spellfx',
+      fx: 'flourish',
+      ability: 'wind_lunge',
+      motionPath: { from: before, to: player.pos },
+    });
   });
 
   it('Azure Rush breaks roots, moves twelve yards, and slows only around its landing point', () => {
@@ -74,11 +84,21 @@ describe('SwordMaster authored mobility', () => {
     const outsideLanding = spawn(sim, 2, -40);
     const insideLanding = spawn(sim, 2, -28);
     const before = { ...player.pos };
+    sim.drainEvents();
 
     sim.castAbility('azure_rush');
+    const dashFx = sim
+      .drainEvents()
+      .find((event) => event.type === 'spellfx' && event.ability === 'azure_rush');
 
     expect(player.auras.some((aura) => aura.kind === 'root')).toBe(false);
     expect(Math.hypot(player.pos.x - before.x, player.pos.z - before.z)).toBeCloseTo(12, 6);
+    expect(dashFx).toMatchObject({
+      type: 'spellfx',
+      fx: 'flourish',
+      ability: 'azure_rush',
+      motionPath: { from: before, to: player.pos },
+    });
     expect(outsideLanding.auras.some((aura) => aura.id === 'azure_rush_slow')).toBe(false);
     expect(insideLanding.auras).toContainEqual(
       expect.objectContaining({

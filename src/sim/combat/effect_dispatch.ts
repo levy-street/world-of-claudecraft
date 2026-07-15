@@ -1569,6 +1569,7 @@ export function runEffects(
       }
       case 'blinkForward': {
         if (eff.breakRoots) removeRootAuras(ctx, p);
+        const from = { ...p.pos };
         let distance = eff.distance;
         let facing = p.facing;
         if (ability.id === 'shadowstep' && target && !target.dead) {
@@ -1585,6 +1586,17 @@ export function runEffects(
           y: p.pos.y,
           z: p.pos.z + Math.cos(facing) * distance,
         });
+        if (ability.id === 'wind_lunge' || ability.id === 'azure_rush') {
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: p.id,
+            targetId: p.id,
+            school: ability.school,
+            fx: 'flourish',
+            ability: ability.id,
+            motionPath: { from, to: { ...p.pos } },
+          });
+        }
         break;
       }
       case 'selfBuff': {

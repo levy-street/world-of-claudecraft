@@ -142,7 +142,10 @@ function clickMat(): THREE.Material {
 // rasterizes nothing while the shadow pass still renders the proxy
 let shadowOnlySingleton: THREE.Material | null = null;
 function shadowOnlyMat(): THREE.Material {
-  shadowOnlySingleton ??= new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false });
+  shadowOnlySingleton ??= new THREE.MeshBasicMaterial({
+    colorWrite: false,
+    depthWrite: false,
+  });
   return shadowOnlySingleton;
 }
 
@@ -839,12 +842,13 @@ export class CharacterVisual {
     return true;
   }
 
-  /** Advance the weapon-skin VFX (shader time, pulse, flicker). Cheap no-op
-   *  without an active skin; the renderer calls it once per entity per frame.
+  /** Advance held-weapon VFX (skin shaders and authored aura flow). Cheap no-op
+   *  without an active effect; the renderer calls it once per entity per frame.
    *  Also re-pins bow payload orientation (see reattachHeldWeapon). */
   updateWeaponVfx(dt: number): void {
     this.applySkinOrientation(dt);
     for (const handle of this.weaponVfx) handle.update(dt);
+    this.weaponAuraHandle?.update(dt);
   }
 
   /** Blend pinned skin payloads between the authored grip glue and their

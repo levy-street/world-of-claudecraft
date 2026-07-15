@@ -86,11 +86,17 @@ describe('SwordMaster character presentation', () => {
 });
 
 describe('SwordMaster procedural VFX plans', () => {
-  it('imbues both SwordMaster weapons blue while preserving Sanguine green mainhand', () => {
+  it('authors a broad, fast flow on both Sword Aura blades while preserving Sanguine', () => {
     expect(weaponAuraPlan([{ id: 'sword_aura' }])).toMatchObject({
       id: 'sword_aura',
       color: 0x22d3ee,
       slots: [0, 1],
+      flow: {
+        envelopeWidth: 0.46,
+        envelopeOpacity: 0.86,
+        speed: 0.82,
+        particleCount: 10,
+      },
     });
     expect(weaponAuraPlan([{ id: 'sanguine_aura' }])).toMatchObject({
       id: 'sanguine_aura',
@@ -103,12 +109,16 @@ describe('SwordMaster procedural VFX plans', () => {
       color: 0x67e8f9,
       slots: [0, 1],
       opacity: 0.24,
+      flow: {
+        envelopeWidth: 0.3,
+        particleCount: 6,
+      },
     });
     expect(weaponAuraPlan([{ id: 'sanguine_aura' }], 'sword_aura')?.id).toBe('sword_aura_cast');
     expect(weaponAuraPlan([])).toBeNull();
   });
 
-  it('paints and disposes both live Sword Aura hand shells', () => {
+  it('paints, animates, and disposes one shell and flowing blade rig per hand', () => {
     const model = new THREE.Group();
     const geometry = new THREE.BoxGeometry(0.1, 1, 0.1);
     for (const [slot, tag] of [
@@ -129,6 +139,7 @@ describe('SwordMaster procedural VFX plans', () => {
     if (!swordPlan) throw new Error('Sword Aura plan missing');
     const handle = paintWeaponAura(model, swordPlan);
     expect(handle.meshCount).toBe(2);
+    expect(handle.flowCount).toBe(2);
     expect(
       model.children.map((holder) =>
         holder.children.filter((child) => child.userData.weaponAuraId),
@@ -145,6 +156,16 @@ describe('SwordMaster procedural VFX plans', () => {
         }),
       ],
     ]);
+
+    const flowMaterials: THREE.ShaderMaterial[] = [];
+    model.traverse((object) => {
+      if (object.userData.weaponAuraLayer !== 'flow') return;
+      flowMaterials.push((object as THREE.Points).material as THREE.ShaderMaterial);
+    });
+    expect(flowMaterials).toHaveLength(2);
+    expect(flowMaterials.map((material) => material.uniforms.uTime.value)).toEqual([0, 0.37]);
+    handle.update(0.25);
+    expect(flowMaterials.map((material) => material.uniforms.uTime.value)).toEqual([0.25, 0.62]);
 
     handle.dispose();
     expect(model.children.flatMap((holder) => holder.children)).toHaveLength(2);
@@ -205,6 +226,25 @@ describe('SwordMaster procedural VFX plans', () => {
     });
   });
 
+  it('routes both authored dashes to a twin-blade afterimage and particle trail', () => {
+    expect(swordmasterSpellVisualPlan('flourish', 'wind_lunge')).toEqual({
+      abilityId: 'wind_lunge',
+      kind: 'dash',
+      color: 0x22d3ee,
+      width: 1.25,
+      duration: 0.42,
+      particleCount: 18,
+      afterimages: 3,
+    });
+    expect(swordmasterSpellVisualPlan('flourish', 'azure_rush')).toMatchObject({
+      abilityId: 'azure_rush',
+      kind: 'dash',
+      color: 0x67e8f9,
+      width: 1.65,
+      particleCount: 26,
+    });
+  });
+
   it('paints one two-arc pair for the paired mainhand and offhand damage events', () => {
     const scene = new THREE.Scene();
     const painter = new SwordmasterFxPainter(scene, (entityId, heightFraction) =>
@@ -241,6 +281,49 @@ describe('SwordMaster procedural VFX plans', () => {
     const arc = scene.children.find((child) => child.visible);
     expect(arc?.rotation.z).toBeCloseTo(facing, 8);
     painter.dispose();
+  });
+
+  it('spans the authoritative dash path, animates its particles, and retires the trail', () => {
+    const scene = new THREE.Scene();
+    const painter = new SwordmasterFxPainter(
+      scene,
+      (_entityId, heightFraction) => new THREE.Vector3(0, heightFraction * 2, 0),
+      (_entityId, heightFraction) => new THREE.Vector3(0, heightFraction * 2, 8),
+    );
+    const plan = swordmasterSpellVisualPlan('flourish', 'wind_lunge');
+    if (!plan || plan.kind !== 'dash') throw new Error('Wind Lunge VFX plan missing');
+
+    painter.paint(plan, 1, 1);
+
+    let trail: THREE.Mesh | null = null;
+    let particles: THREE.Points | null = null;
+    scene.traverse((object) => {
+      if (!object.visible) return;
+      if (object.userData.swordmasterDashLayer === 'trail') trail = object as THREE.Mesh;
+      if (object.userData.swordmasterDashLayer === 'particles') {
+        particles = object as THREE.Points;
+      }
+    });
+    expect(trail).not.toBeNull();
+    expect(particles).not.toBeNull();
+    const trailGeometry = (trail as unknown as THREE.Mesh).geometry;
+    trailGeometry.computeBoundingBox();
+    expect(trailGeometry.boundingBox?.min.z).toBeCloseTo(0, 6);
+    expect(trailGeometry.boundingBox?.max.z).toBeCloseTo(8, 6);
+    expect((particles as unknown as THREE.Points).geometry.drawRange.count).toBe(18);
+
+    painter.update(0.16);
+    const progress = ((particles as unknown as THREE.Points).material as THREE.ShaderMaterial)
+      .uniforms.uProgress.value;
+    expect(progress).toBeGreaterThan(0.3);
+    expect(progress).toBeLessThan(0.5);
+
+    painter.update(plan.duration);
+    expect(
+      scene.children.filter((child) => child.userData.swordmasterDash && child.visible),
+    ).toHaveLength(0);
+    painter.dispose();
+    expect(scene.children).toHaveLength(0);
   });
 });
 

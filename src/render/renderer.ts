@@ -1536,8 +1536,19 @@ export class Renderer {
       const h = v.height * (e?.scale ?? 1) * frac;
       return new THREE.Vector3(v.group.position.x, v.group.position.y + h, v.group.position.z);
     };
+    const entityDestinationAnchor = (id: number, frac: number): THREE.Vector3 | null => {
+      const v = this.views.get(id);
+      const e = this.sim.entities.get(id);
+      if (!v || !e) return null;
+      const h = v.height * e.scale * frac;
+      return new THREE.Vector3(e.pos.x, e.pos.y + h, e.pos.z);
+    };
     this.vfx = new Vfx(this.scene, entityAnchor);
-    this.swordmasterFx = new SwordmasterFxPainter(this.scene, entityAnchor);
+    this.swordmasterFx = new SwordmasterFxPainter(
+      this.scene,
+      entityAnchor,
+      entityDestinationAnchor,
+    );
     this.vfx.setViewportScale(this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(), 60);
 
     // ambient precipitation: biome-driven snow/rain that rides with the camera
@@ -2972,6 +2983,7 @@ export class Renderer {
               ev.sourceId,
               ev.targetId,
               this.sim.entities.get(ev.sourceId)?.facing,
+              ev.motionPath,
             );
           break;
         }

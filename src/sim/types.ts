@@ -2730,6 +2730,10 @@ export type SimEvent = { pid?: number } & (
         | 'flourish';
       // Stable presentation discriminator for authored cast cues.
       ability?: string;
+      // Optional resolved movement path for an instant authored dash. These
+      // endpoints are presentation-only evidence from the authoritative sweep;
+      // renderers never predict or write them back into simulation state.
+      motionPath?: { from: Vec3; to: Vec3 };
       // Stable presentation discriminator; renderers must not infer a player
       // attack animation from school or an English ability label.
       attackAnimation?: 'ranged-shot';
