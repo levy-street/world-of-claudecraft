@@ -2594,9 +2594,7 @@ export const cs_CZ: EnTranslations = {
       "revenge": "Sweeps enemies in front of you, with a chance to become free after a dodge or parry.",
       "hamstring": "Cripples an enemy's movement to keep it from escaping.",
       "battle_shout": "Povzbuzující pokřik, který zvedne sílu útoku party.",
-      "commanding_shout": "Posílí výdrž, aby všichni v boji vydrželi déle.",
       "charge": "Vyrazí k vzdálenému nepříteli a otevře boj krátkým omráčením.",
-      "rend": "Otevře krvácení, které cíl postupně opotřebuje.",
       "thunder_clap": "Zasáhne vše kolem tebe a zpomalí jejich útoky.",
       "twin_slash": "Cuts with both blades in one quick sequence to build momentum.",
       "crescent_sweep": "Carves a wide arc through nearby enemies.",
@@ -2654,7 +2652,9 @@ export const cs_CZ: EnTranslations = {
       "mark_of_the_wild": "Trvalé požehnání, které dáváš sobě nebo spojenci před bojem.",
       "moonfire": "Zasáhne okamžitě a nechá cíl hořet, dobré během pohybu.",
       "rejuvenation": "Sesílá se okamžitě a léčí spojence v čase, takže můžeš dál jednat.",
-      "thorns": "Ochrání spojence tak, že útočníci na blízko si sami ublíží za každý zásah."
+      "thorns": "Ochrání spojence tak, že útočníci na blízko si sami ublíží za každý zásah.",
+      "commanding_shout": "Posílí výdrž, aby všichni v boji vydrželi déle.",
+      "rend": "Otevře krvácení, které cíl postupně opotřebuje."
     },
     "petHook": {
       "emberkin": "Démon s ohnivou střelou na dálku, který ukrajuje nepřátele z bezpečné vzdálenosti.",
@@ -5880,10 +5880,6 @@ export const cs_CZ: EnTranslations = {
         "name": "Železný řev",
         "description": "Zvýší tvoji sílu útoku o {buff} na 2 min."
       },
-      "commanding_shout": {
-        "name": "Povzbuzující pokřik",
-        "description": "Zvýší tvoji výdrž o {buff} na 2 min."
-      },
       "demoralizing_shout": {
         "name": "Děsivé vytí",
         "description": "Vypustíš děsivý řev, který sníží sílu útoku všech blízkých nepřátel o {buff} na 30 s."
@@ -5891,10 +5887,6 @@ export const cs_CZ: EnTranslations = {
       "charge": {
         "name": "Nápor",
         "description": "Vyrazí k nepříteli, vygeneruje 9 vzteku a omráčí ho na 1 s. Dosah 8-25 yardů."
-      },
-      "rend": {
-        "name": "Hluboká rána",
-        "description": "Zraní cíl a způsobí mu krvácení za {damage} poškození během {duration} s."
       },
       "thunder_clap": {
         "name": "Chvějící úder",
@@ -6915,6 +6907,14 @@ export const cs_CZ: EnTranslations = {
       "revive_pet": {
         "name": "Oživit mazlíčka",
         "description": "Oživí tvého mrtvého mazlíčka a vrátí ho po tvém boku."
+      },
+      "commanding_shout": {
+        "description": "Zvýší tvoji výdrž o {buff} na 2 min.",
+        "name": "Povzbuzující pokřik"
+      },
+      "rend": {
+        "description": "Zraní cíl a způsobí mu krvácení za {damage} poškození během {duration} s.",
+        "name": "Hluboká rána"
       }
     },
     "items": {

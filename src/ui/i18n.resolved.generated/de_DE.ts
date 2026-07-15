@@ -2594,9 +2594,7 @@ export const de_DE: EnTranslations = {
       "revenge": "Sweeps enemies in front of you, with a chance to become free after a dodge or parry.",
       "hamstring": "Cripples an enemy's movement to keep it from escaping.",
       "battle_shout": "Ein aufrüttelnder Ruf, der die Angriffskraft der Gruppe erhöht.",
-      "commanding_shout": "Stärkt die Ausdauer, damit alle in einem Kampf länger durchhalten.",
       "charge": "Stürmt auf einen entfernten Gegner zu und eröffnet den Kampf mit einer kurzen Betäubung.",
-      "rend": "Eröffnet eine Blutung, die das Ziel über Zeit zermürbt.",
       "thunder_clap": "Trifft alles um dich herum und verlangsamt deren Angriffe.",
       "twin_slash": "Cuts with both blades in one quick sequence to build momentum.",
       "crescent_sweep": "Carves a wide arc through nearby enemies.",
@@ -2654,7 +2652,9 @@ export const de_DE: EnTranslations = {
       "mark_of_the_wild": "Ein anhaltender Segen, den du vor einem Kampf auf dich oder einen Verbündeten legst.",
       "moonfire": "Trifft sofort und lässt das Ziel brennen, gut in Bewegung.",
       "rejuvenation": "Wirkt sofort und heilt einen Verbündeten über Zeit, sodass du weiter handeln kannst.",
-      "thorns": "Schützt einen Verbündeten, sodass Nahkampfangreifer sich beim Zuschlagen selbst verletzen."
+      "thorns": "Schützt einen Verbündeten, sodass Nahkampfangreifer sich beim Zuschlagen selbst verletzen.",
+      "commanding_shout": "Stärkt die Ausdauer, damit alle in einem Kampf länger durchhalten.",
+      "rend": "Eröffnet eine Blutung, die das Ziel über Zeit zermürbt."
     },
     "petHook": {
       "emberkin": "Ein Feuerblitz-Dämon für die Distanz, der Gegner aus sicherer Entfernung abträgt.",
@@ -5880,10 +5880,6 @@ export const de_DE: EnTranslations = {
         "name": "Eisernes Gebrüll",
         "description": "Erhöht eure Angriffskraft 2 Min. lang um {buff}."
       },
-      "commanding_shout": {
-        "name": "Stärkender Ruf",
-        "description": "Erhöht eure Ausdauer 2 Min. lang um {buff}."
-      },
       "demoralizing_shout": {
         "name": "Direhowl",
         "description": "Stößt einen furchterregenden Ruf aus und verringert die Angriffskraft aller nahen Gegner 30 Sek. lang um {buff}."
@@ -5891,10 +5887,6 @@ export const de_DE: EnTranslations = {
       "charge": {
         "name": "Vorpreschen",
         "description": "Stürmt auf einen Gegner zu, erzeugt 9 Wut und betäubt ihn 1 Sek. lang. Reichweite 8-25 m."
-      },
-      "rend": {
-        "name": "Tiefe Wunde",
-        "description": "Verwundet das Ziel und lässt es über {duration} Sek. für {damage} Schaden bluten."
       },
       "thunder_clap": {
         "name": "Bebender Schlag",
@@ -6915,6 +6907,14 @@ export const de_DE: EnTranslations = {
       "revive_pet": {
         "name": "Begleiter wiederbeleben",
         "description": "Belebt deinen toten Begleiter wieder und ruft ihn an deine Seite zurück."
+      },
+      "commanding_shout": {
+        "name": "Stärkender Ruf",
+        "description": "Erhöht eure Ausdauer 2 Min. lang um {buff}."
+      },
+      "rend": {
+        "name": "Tiefe Wunde",
+        "description": "Verwundet das Ziel und lässt es über {duration} Sek. für {damage} Schaden bluten."
       }
     },
     "items": {

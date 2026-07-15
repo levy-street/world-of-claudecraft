@@ -685,7 +685,6 @@ const classAbilityNamesEn = {
         'Iron Bellow',
         'A shout that increases the attack power of all party members by {buff}% for 2 min.',
       ],
-      ['commanding_shout', 'Bolstering Cry', 'Increases your Stamina by {buff} for 2 min.'],
       [
         'demoralizing_shout',
         'Direhowl',
@@ -695,11 +694,6 @@ const classAbilityNamesEn = {
         'charge',
         'Onrush',
         'Charges an enemy, generating 9 rage and stunning it for 1 sec. 8-25 yd range.',
-      ],
-      [
-        'rend',
-        'Deep Gash',
-        'Wounds the target, causing them to bleed for {damage} damage over {duration} sec.',
       ],
       [
         'thunder_clap',

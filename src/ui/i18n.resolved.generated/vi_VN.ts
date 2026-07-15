@@ -2594,9 +2594,7 @@ export const vi_VN: EnTranslations = {
       "revenge": "Sweeps enemies in front of you, with a chance to become free after a dodge or parry.",
       "hamstring": "Cripples an enemy's movement to keep it from escaping.",
       "battle_shout": "Một tiếng hô cổ vũ giúp tăng sức tấn công cho cả tổ đội.",
-      "commanding_shout": "Tăng cường thể lực để mọi người trụ vững lâu hơn trong trận.",
       "charge": "Lao tới kẻ địch ở xa để mở màn trận đấu bằng một cú choáng ngắn.",
-      "rend": "Mở một vết chảy máu bào mòn mục tiêu dần theo thời gian.",
       "thunder_clap": "Đánh trúng mọi thứ quanh bạn và làm chậm đòn tấn công của chúng.",
       "twin_slash": "Cuts with both blades in one quick sequence to build momentum.",
       "crescent_sweep": "Carves a wide arc through nearby enemies.",
@@ -2654,7 +2652,9 @@ export const vi_VN: EnTranslations = {
       "mark_of_the_wild": "Một phúc lành lâu dài bạn ban cho bản thân hoặc đồng đội trước trận đấu.",
       "moonfire": "Giáng đòn tức thời và khiến mục tiêu cháy âm ỉ, hữu dụng khi đang di chuyển.",
       "rejuvenation": "Niệm tức thời và hồi máu cho đồng đội theo thời gian, để bạn cứ tiếp tục hành động.",
-      "thorns": "Bảo hộ đồng đội để kẻ tấn công cận chiến tự làm mình bị thương khi ra đòn."
+      "thorns": "Bảo hộ đồng đội để kẻ tấn công cận chiến tự làm mình bị thương khi ra đòn.",
+      "commanding_shout": "Tăng cường thể lực để mọi người trụ vững lâu hơn trong trận.",
+      "rend": "Mở một vết chảy máu bào mòn mục tiêu dần theo thời gian."
     },
     "petHook": {
       "emberkin": "Một con quỷ bắn cầu lửa từ xa, gặm dần kẻ địch từ khoảng cách an toàn.",
@@ -5880,10 +5880,6 @@ export const vi_VN: EnTranslations = {
         "name": "Tiếng Gầm Thép",
         "description": "Tăng sức mạnh tấn công của ngươi thêm {buff} trong 2 phút."
       },
-      "commanding_shout": {
-        "name": "Tiếng Hô Trợ Uy",
-        "description": "Tăng Thể Lực của ngươi thêm {buff} trong 2 phút."
-      },
       "demoralizing_shout": {
         "name": "Tiếng Hú Hung Hiểm",
         "description": "Bật ra tiếng hô đáng sợ, giảm sức tấn công của tất cả kẻ địch xung quanh đi {buff} trong 30 giây."
@@ -5891,10 +5887,6 @@ export const vi_VN: EnTranslations = {
       "charge": {
         "name": "Xông Tới",
         "description": "Lao vào kẻ địch, tạo 9 nộ khí và làm choáng nó trong 1 giây. Tầm 8-25 thước."
-      },
-      "rend": {
-        "name": "Vết Rạch Sâu",
-        "description": "Gây vết thương cho mục tiêu, khiến chúng chảy máu nhận {damage} sát thương trong {duration} giây."
       },
       "thunder_clap": {
         "name": "Đòn Chấn Rung",
@@ -6915,6 +6907,14 @@ export const vi_VN: EnTranslations = {
       "revive_pet": {
         "name": "Hồi Sinh Thú",
         "description": "Hồi sinh thú cưng đã chết và đưa nó trở lại bên bạn."
+      },
+      "commanding_shout": {
+        "description": "Tăng Thể Lực của ngươi thêm {buff} trong 2 phút.",
+        "name": "Tiếng Hô Trợ Uy"
+      },
+      "rend": {
+        "description": "Gây vết thương cho mục tiêu, khiến chúng chảy máu nhận {damage} sát thương trong {duration} giây.",
+        "name": "Vết Rạch Sâu"
       }
     },
     "items": {

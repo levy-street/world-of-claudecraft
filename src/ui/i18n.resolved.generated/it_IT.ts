@@ -2594,9 +2594,7 @@ export const it_IT: EnTranslations = {
       "revenge": "Sweeps enemies in front of you, with a chance to become free after a dodge or parry.",
       "hamstring": "Cripples an enemy's movement to keep it from escaping.",
       "battle_shout": "Un grido di incitamento che aumenta la potenza d'attacco del gruppo.",
-      "commanding_shout": "Rafforza la vigoria, così tutti hanno più resistenza in combattimento.",
       "charge": "Si scaglia su un nemico distante per aprire lo scontro con un breve stordimento.",
-      "rend": "Apre un'emorragia che logora il bersaglio nel tempo.",
       "thunder_clap": "Colpisce tutto ciò che ti circonda e rallenta i loro attacchi.",
       "twin_slash": "Cuts with both blades in one quick sequence to build momentum.",
       "crescent_sweep": "Carves a wide arc through nearby enemies.",
@@ -2654,7 +2652,9 @@ export const it_IT: EnTranslations = {
       "mark_of_the_wild": "Una benedizione duratura che metti su di te o un alleato prima di uno scontro.",
       "moonfire": "Colpisce all'istante e lascia il bersaglio in fiamme, ottimo mentre ti muovi.",
       "rejuvenation": "Si lancia all'istante e cura un alleato nel tempo, così puoi continuare ad agire.",
-      "thorns": "Protegge un alleato, così gli attaccanti in mischia si feriscono colpendolo."
+      "thorns": "Protegge un alleato, così gli attaccanti in mischia si feriscono colpendolo.",
+      "commanding_shout": "Rafforza la vigoria, così tutti hanno più resistenza in combattimento.",
+      "rend": "Apre un'emorragia che logora il bersaglio nel tempo."
     },
     "petHook": {
       "emberkin": "Un demone che scaglia dardi di fuoco a distanza e fiacca i nemici da una distanza di sicurezza.",
@@ -5880,10 +5880,6 @@ export const it_IT: EnTranslations = {
         "name": "Urlo di Ferro",
         "description": "Aumenta la tua potenza d'attacco di {buff} per 2 min."
       },
-      "commanding_shout": {
-        "name": "Grido Rincuorante",
-        "description": "Aumenta la tua Tempra di {buff} per 2 min."
-      },
       "demoralizing_shout": {
         "name": "Ululato Sinistro",
         "description": "Emette un urlo terrificante, riducendo la potenza d'attacco di tutti i nemici vicini di {buff} per 30 sec."
@@ -5891,10 +5887,6 @@ export const it_IT: EnTranslations = {
       "charge": {
         "name": "Irruzione",
         "description": "Carica un nemico, genera 9 rabbia e lo stordisce per 1 s. Portata 8-25 m."
-      },
-      "rend": {
-        "name": "Squarcio Profondo",
-        "description": "Ferisce il bersaglio e lo fa sanguinare per {damage} danni in {duration} sec."
       },
       "thunder_clap": {
         "name": "Colpo Sismico",
@@ -6915,6 +6907,14 @@ export const it_IT: EnTranslations = {
       "revive_pet": {
         "name": "Rianima Famiglio",
         "description": "Rianima il tuo famiglio morto e lo richiama al tuo fianco."
+      },
+      "commanding_shout": {
+        "name": "Grido Rincuorante",
+        "description": "Aumenta la tua Tempra di {buff} per 2 min."
+      },
+      "rend": {
+        "name": "Squarcio Profondo",
+        "description": "Ferisce il bersaglio e lo fa sanguinare per {damage} danni in {duration} sec."
       }
     },
     "items": {

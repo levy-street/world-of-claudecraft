@@ -2594,9 +2594,7 @@ export const ja_JP: EnTranslations = {
       "revenge": "Sweeps enemies in front of you, with a chance to become free after a dodge or parry.",
       "hamstring": "Cripples an enemy's movement to keep it from escaping.",
       "battle_shout": "パーティの攻撃力を高める鼓舞の雄叫びです。",
-      "commanding_shout": "持久力を底上げし、長い戦いでも全員が粘り強く戦えるようにします。",
       "charge": "離れた敵に突進し、短いスタンで戦闘の口火を切ります。",
-      "rend": "出血を与え、時間をかけて標的を削っていきます。",
       "thunder_clap": "周囲のすべてに当たり、相手の攻撃を遅くします。",
       "twin_slash": "Cuts with both blades in one quick sequence to build momentum.",
       "crescent_sweep": "Carves a wide arc through nearby enemies.",
@@ -2654,7 +2652,9 @@ export const ja_JP: EnTranslations = {
       "mark_of_the_wild": "戦闘の前に自分や味方に付与する、持続する祝福です。",
       "moonfire": "即座に当たり標的を燃焼させるため、移動中にも向いています。",
       "rejuvenation": "即座に唱えられ、味方を継続的に回復するので、行動を続けられます。",
-      "thorns": "味方を守り、近接で攻撃してきた相手に反射ダメージを与えます。"
+      "thorns": "味方を守り、近接で攻撃してきた相手に反射ダメージを与えます。",
+      "commanding_shout": "持久力を底上げし、長い戦いでも全員が粘り強く戦えるようにします。",
+      "rend": "出血を与え、時間をかけて標的を削っていきます。"
     },
     "petHook": {
       "emberkin": "安全な距離から敵を削る、ファイアボルトを放つ遠距離のデーモンです。",
@@ -5880,10 +5880,6 @@ export const ja_JP: EnTranslations = {
         "name": "鉄の咆哮",
         "description": "2分間、攻撃力が{buff}増加します。"
       },
-      "commanding_shout": {
-        "name": "鼓舞の号令",
-        "description": "2分間、スタミナが{buff}増加します。"
-      },
       "demoralizing_shout": {
         "name": "戦慄の遠吠え",
         "description": "恐ろしい雄叫びを上げ、30秒間、周囲の敵すべての攻撃力を{buff}低下させます。"
@@ -5891,10 +5887,6 @@ export const ja_JP: EnTranslations = {
       "charge": {
         "name": "突撃",
         "description": "敵に突撃し、怒りを9生成して1秒間スタンさせます。射程8-25yd。"
-      },
-      "rend": {
-        "name": "深き裂傷",
-        "description": "対象を負傷させ、{duration}秒かけて{damage}の出血ダメージを与えます。"
       },
       "thunder_clap": {
         "name": "震撼の一撃",
@@ -6915,6 +6907,14 @@ export const ja_JP: EnTranslations = {
       "revive_pet": {
         "name": "ペット蘇生",
         "description": "死んだペットを蘇生させ、自分のそばに呼び戻す。"
+      },
+      "commanding_shout": {
+        "name": "鼓舞の号令",
+        "description": "2分間、スタミナが{buff}増加します。"
+      },
+      "rend": {
+        "name": "深き裂傷",
+        "description": "対象を負傷させ、{duration}秒かけて{damage}の出血ダメージを与えます。"
       }
     },
     "items": {

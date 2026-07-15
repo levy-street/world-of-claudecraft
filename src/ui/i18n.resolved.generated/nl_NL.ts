@@ -2594,9 +2594,7 @@ export const nl_NL: EnTranslations = {
       "revenge": "Sweeps enemies in front of you, with a chance to become free after a dodge or parry.",
       "hamstring": "Cripples an enemy's movement to keep it from escaping.",
       "battle_shout": "Een strijdkreet die de aanvalskracht van de groep verhoogt.",
-      "commanding_shout": "Versterkt uithoudingsvermogen zodat iedereen meer staande blijft in een gevecht.",
       "charge": "Stormt op een verre vijand af om het gevecht te openen met een korte verdoving.",
-      "rend": "Opent een bloeding die het doelwit na verloop van tijd uitput.",
       "thunder_clap": "Raakt alles om je heen en vertraagt hun aanvallen.",
       "twin_slash": "Cuts with both blades in one quick sequence to build momentum.",
       "crescent_sweep": "Carves a wide arc through nearby enemies.",
@@ -2654,7 +2652,9 @@ export const nl_NL: EnTranslations = {
       "mark_of_the_wild": "Een blijvende zegening die je op jezelf of een bondgenoot legt voor een gevecht.",
       "moonfire": "Raakt direct en laat het doelwit branden, goed terwijl je beweegt.",
       "rejuvenation": "Wordt direct uitgesproken en geneest een bondgenoot na verloop van tijd, zodat je kunt blijven handelen.",
-      "thorns": "Beschermt een bondgenoot zodat melee-aanvallers zichzelf bezeren bij het toeslaan."
+      "thorns": "Beschermt een bondgenoot zodat melee-aanvallers zichzelf bezeren bij het toeslaan.",
+      "commanding_shout": "Versterkt uithoudingsvermogen zodat iedereen meer staande blijft in een gevecht.",
+      "rend": "Opent een bloeding die het doelwit na verloop van tijd uitput."
     },
     "petHook": {
       "emberkin": "Een demon op afstand die met vuurbouten vijanden bestookt vanaf een veilige afstand.",
@@ -5880,10 +5880,6 @@ export const nl_NL: EnTranslations = {
         "name": "IJzeren Gebrul",
         "description": "Verhoogt je aanvalskracht met {buff} gedurende 2 min."
       },
-      "commanding_shout": {
-        "name": "Bolstering Cry",
-        "description": "Increases your Stamina by {buff} for 2 min."
-      },
       "demoralizing_shout": {
         "name": "Grimmig Gehuil",
         "description": "Slaakt een angstaanjagende kreet die de aanvalskracht van alle nabije vijanden met {buff} verlaagt gedurende 30 sec."
@@ -5891,10 +5887,6 @@ export const nl_NL: EnTranslations = {
       "charge": {
         "name": "Bestorming",
         "description": "Stormt op een vijand af, genereert 9 woede en verdooft hem gedurende 1 sec. Bereik 8-25 m."
-      },
-      "rend": {
-        "name": "Diepe Snee",
-        "description": "Verwondt het doelwit, waardoor het {damage} schade bloedt gedurende {duration} sec."
       },
       "thunder_clap": {
         "name": "Schuddende Klap",
@@ -6915,6 +6907,10 @@ export const nl_NL: EnTranslations = {
       "revive_pet": {
         "name": "Huisdier Herleven",
         "description": "Doet je dode huisdier herleven en brengt het terug aan je zijde."
+      },
+      "rend": {
+        "description": "Verwondt het doelwit, waardoor het {damage} schade bloedt gedurende {duration} sec.",
+        "name": "Diepe Snee"
       }
     },
     "items": {

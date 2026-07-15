@@ -2594,9 +2594,7 @@ export const sv_SE: EnTranslations = {
       "revenge": "Sweeps enemies in front of you, with a chance to become free after a dodge or parry.",
       "hamstring": "Cripples an enemy's movement to keep it from escaping.",
       "battle_shout": "Ett samlande rop som höjer attackstyrkan för gruppen.",
-      "commanding_shout": "Stärker uthålligheten så alla har mer stryktålighet i en strid.",
       "charge": "Stormar mot en avlägsen fiende för att öppna striden med en kort bedövning.",
-      "rend": "Öppnar en blödning som sliter ner målet över tid.",
       "thunder_clap": "Slår allt runt omkring dig och saktar ner deras attacker.",
       "twin_slash": "Cuts with both blades in one quick sequence to build momentum.",
       "crescent_sweep": "Carves a wide arc through nearby enemies.",
@@ -2654,7 +2652,9 @@ export const sv_SE: EnTranslations = {
       "mark_of_the_wild": "En varaktig välsignelse du lägger på dig själv eller en allierad före en strid.",
       "moonfire": "Slår omedelbart och lämnar målet brinnande, bra medan du rör dig.",
       "rejuvenation": "Kastas omedelbart och läker en allierad över tid, så du kan fortsätta agera.",
-      "thorns": "Skyddar en allierad så att närstridsangripare skadar sig själva när de slår."
+      "thorns": "Skyddar en allierad så att närstridsangripare skadar sig själva när de slår.",
+      "commanding_shout": "Stärker uthålligheten så alla har mer stryktålighet i en strid.",
+      "rend": "Öppnar en blödning som sliter ner målet över tid."
     },
     "petHook": {
       "emberkin": "En eldpilskastande demon på avstånd som naggar fiender från säkert håll.",
@@ -5880,10 +5880,6 @@ export const sv_SE: EnTranslations = {
         "name": "Järnvrål",
         "description": "Ökar din attackkraft med {buff} i 2 min."
       },
-      "commanding_shout": {
-        "name": "Bolstering Cry",
-        "description": "Increases your Stamina by {buff} for 2 min."
-      },
       "demoralizing_shout": {
         "name": "Fasans tjut",
         "description": "Utstöter ett skräckinjagande rop som sänker anfallskraften hos alla närliggande fiender med {buff} i 30 sek."
@@ -5891,10 +5887,6 @@ export const sv_SE: EnTranslations = {
       "charge": {
         "name": "Anstormning",
         "description": "Stormar en fiende, genererar 9 raseri och bedövar den i 1 sek. 8-25 m räckvidd."
-      },
-      "rend": {
-        "name": "Djup skåra",
-        "description": "Sårar målet och får det att blöda för {damage} skada över {duration} sek."
       },
       "thunder_clap": {
         "name": "Skälvande slag",
@@ -6915,6 +6907,10 @@ export const sv_SE: EnTranslations = {
       "revive_pet": {
         "name": "Återuppliva djur",
         "description": "Återupplivar ditt döda djur och kallar det till din sida."
+      },
+      "rend": {
+        "description": "Sårar målet och får det att blöda för {damage} skada över {duration} sek.",
+        "name": "Djup skåra"
       }
     },
     "items": {

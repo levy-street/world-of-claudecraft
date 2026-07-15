@@ -2594,9 +2594,7 @@ export const zh_TW: EnTranslations = {
       "revenge": "Sweeps enemies in front of you, with a chance to become free after a dodge or parry.",
       "hamstring": "Cripples an enemy's movement to keep it from escaping.",
       "battle_shout": "鼓舞士氣的怒吼，提升隊伍的攻擊強度。",
-      "commanding_shout": "提升耐力，讓所有人在戰鬥中更有續航力。",
       "charge": "衝向遠處的敵人，以短暫昏迷揭開戰鬥序幕。",
-      "rend": "施加流血，隨時間慢慢磨耗目標。",
       "thunder_clap": "打擊你周遭的一切並降低它們的攻擊速度。",
       "twin_slash": "Cuts with both blades in one quick sequence to build momentum.",
       "crescent_sweep": "Carves a wide arc through nearby enemies.",
@@ -2654,7 +2652,9 @@ export const zh_TW: EnTranslations = {
       "mark_of_the_wild": "戰鬥前替自己或友方施加的持久祝福。",
       "moonfire": "瞬間命中並讓目標持續燃燒，移動時也很好用。",
       "rejuvenation": "瞬發施放，持續為友方回復生命，讓你能繼續行動。",
-      "thorns": "守護友方，讓近戰攻擊者每次出手都會傷到自己。"
+      "thorns": "守護友方，讓近戰攻擊者每次出手都會傷到自己。",
+      "commanding_shout": "提升耐力，讓所有人在戰鬥中更有續航力。",
+      "rend": "施加流血，隨時間慢慢磨耗目標。"
     },
     "petHook": {
       "emberkin": "一隻遠程的火焰箭惡魔，從安全距離外慢慢削弱敵人。",
@@ -5880,10 +5880,6 @@ export const zh_TW: EnTranslations = {
         "name": "鐵嗓怒吼",
         "description": "使你的攻擊強度提高 {buff}，持續 2 分鐘。"
       },
-      "commanding_shout": {
-        "name": "激勵吶喊",
-        "description": "使你的耐力提高 {buff}，持續 2 分鐘。"
-      },
       "demoralizing_shout": {
         "name": "厲嚎",
         "description": "發出可怕的怒吼，使附近所有敵人的攻擊強度降低 {buff}，持續 30 秒。"
@@ -5891,10 +5887,6 @@ export const zh_TW: EnTranslations = {
       "charge": {
         "name": "猛衝",
         "description": "向一名敵人衝鋒，產生 9 點怒氣並使其昏迷 1 秒。8-25 碼距離。"
-      },
-      "rend": {
-        "name": "深切裂傷",
-        "description": "撕裂目標，使其在 {duration} 秒內流血並受到 {damage} 點傷害。"
       },
       "thunder_clap": {
         "name": "撼地一擊",
@@ -6915,6 +6907,14 @@ export const zh_TW: EnTranslations = {
       "revive_pet": {
         "name": "復活寵物",
         "description": "復活你已死亡的寵物，並使其重回你身邊。"
+      },
+      "commanding_shout": {
+        "name": "激勵吶喊",
+        "description": "使你的耐力提高 {buff}，持續 2 分鐘。"
+      },
+      "rend": {
+        "name": "深切裂傷",
+        "description": "撕裂目標，使其在 {duration} 秒內流血並受到 {damage} 點傷害。"
       }
     },
     "items": {

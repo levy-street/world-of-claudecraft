@@ -2594,9 +2594,7 @@ export const ko_KR: EnTranslations = {
       "revenge": "Sweeps enemies in front of you, with a chance to become free after a dodge or parry.",
       "hamstring": "Cripples an enemy's movement to keep it from escaping.",
       "battle_shout": "파티 전체의 공격력을 높여 주는 사기를 북돋우는 외침입니다.",
-      "commanding_shout": "체력을 높여 모두가 전투에서 더 오래 버틸 수 있게 합니다.",
       "charge": "멀리 있는 적에게 돌진해 잠시 기절시키며 전투를 시작합니다.",
-      "rend": "시간이 지나며 대상을 약화시키는 출혈을 입힙니다.",
       "thunder_clap": "주위의 모든 적을 타격하고 그들의 공격 속도를 늦춥니다.",
       "twin_slash": "Cuts with both blades in one quick sequence to build momentum.",
       "crescent_sweep": "Carves a wide arc through nearby enemies.",
@@ -2654,7 +2652,9 @@ export const ko_KR: EnTranslations = {
       "mark_of_the_wild": "전투 전에 자신이나 아군에게 걸어 두는 지속형 축복입니다.",
       "moonfire": "즉시 타격하고 대상을 계속 불태우므로, 이동 중에 쓰기 좋습니다.",
       "rejuvenation": "즉시 시전되어 아군을 지속적으로 치유하므로, 계속 행동할 수 있습니다.",
-      "thorns": "아군을 보호해, 근접 공격자가 칠 때마다 스스로 피해를 입게 합니다."
+      "thorns": "아군을 보호해, 근접 공격자가 칠 때마다 스스로 피해를 입게 합니다.",
+      "commanding_shout": "체력을 높여 모두가 전투에서 더 오래 버틸 수 있게 합니다.",
+      "rend": "시간이 지나며 대상을 약화시키는 출혈을 입힙니다."
     },
     "petHook": {
       "emberkin": "안전한 거리에서 적을 조금씩 깎는 원거리 화염 화살 악마입니다.",
@@ -5880,10 +5880,6 @@ export const ko_KR: EnTranslations = {
         "name": "강철의 외침",
         "description": "2분 동안 전투력이 {buff}만큼 증가합니다."
       },
-      "commanding_shout": {
-        "name": "북돋는 외침",
-        "description": "2분 동안 체력이 {buff}만큼 증가합니다."
-      },
       "demoralizing_shout": {
         "name": "흉포한 울부짖음",
         "description": "무시무시한 외침을 내질러 30초 동안 주위 모든 적의 전투력을 {buff}만큼 감소시킵니다."
@@ -5891,10 +5887,6 @@ export const ko_KR: EnTranslations = {
       "charge": {
         "name": "쇄도",
         "description": "적에게 돌진하여 분노 9를 생성하고 1초 동안 기절시킵니다. 사거리 8-25yd."
-      },
-      "rend": {
-        "name": "깊은 상처",
-        "description": "대상을 상처 입혀 {duration}초에 걸쳐 {damage}의 출혈 피해를 입힙니다."
       },
       "thunder_clap": {
         "name": "진동의 일격",
@@ -6915,6 +6907,14 @@ export const ko_KR: EnTranslations = {
       "revive_pet": {
         "name": "소환수 소생",
         "description": "죽은 소환수를 되살려 당신의 곁으로 되돌립니다."
+      },
+      "commanding_shout": {
+        "name": "북돋는 외침",
+        "description": "2분 동안 체력이 {buff}만큼 증가합니다."
+      },
+      "rend": {
+        "name": "깊은 상처",
+        "description": "대상을 상처 입혀 {duration}초에 걸쳐 {damage}의 출혈 피해를 입힙니다."
       }
     },
     "items": {

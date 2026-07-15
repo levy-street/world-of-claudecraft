@@ -3771,7 +3771,7 @@ const mergeExtraEn = {
     [
       'revive_pet',
       'Patch Up',
-      'Patch up your companion, restoring {overTime} health over 12 sec in 3-sec ticks while it is alive. If it is dead, revive it at 35% health.',
+      'Patch up your companion over 12 sec in 3-sec ticks while it is alive. If it is dead, revive it at 35% health.',
     ],
   ]),
   items: {
