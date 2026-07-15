@@ -2021,6 +2021,7 @@ export const hudChromeStrings = {
     // #1866: click/tap/interact-key error when a targeted node's per-viewer
     // respawn timer has not elapsed yet (IWorldProfessions#nodeHarvestableByMe).
     notReady: 'This resource node has not respawned for you yet.',
+    qaFreshnessProbe: 'Phase 3 QA staled-slice probe (never merges).',
   },
   // Archetype title (#1130): the named title granted by a character's currently
   // active craft archetype (see src/sim/professions/archetype.ts). `none` is shown
