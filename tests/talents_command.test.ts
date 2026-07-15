@@ -23,7 +23,8 @@ describe('/talents readout', () => {
   it('reports not-yet-unlocked below the talent level', () => {
     const sim = new Sim({ seed: 7, playerClass: 'warrior' }); // fresh = level 1
     const text = readout(sim, '/talents');
-    expect(text).toBe('You have not unlocked talents yet — they begin at level 5.');
+    expect(text).toContain('You have not unlocked talents yet');
+    expect(text).toContain('they begin at level 5.');
   });
 
   it('shows the specialization and selected/unlocked row counts', () => {

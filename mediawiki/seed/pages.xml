@@ -550,7 +550,7 @@ The main story follows Brother Aldric from restless bones outside Eastbrook to K
 
 == Acts ==
 * [[Eastbrook Vale]] — Morthen the Gravecaller and [[The Hollow Crypt]].
-* [[Mirefen Marsh]] — Vael the Fogbinder and [[The Sunken Bastion]].
+* [[Mirefen Marsh]] , Vael the Fogbinder and [[The Sunken Bastion]].
 * [[Thornpeak Heights]] — Wyrmcult zealots, Highwatch, and [[Gravewyrm Sanctum]].
 [[Category:Lore]]
 [[Category:Quests]]
@@ -668,7 +668,7 @@ Recent Reddit threads framed World of Claudecraft as a viral open-source, Fable 
       <model>wikitext</model>
       <format>text/x-wiki</format>
       <text xml:space="preserve" bytes="1101">== Systems index ==
-* [[Combat]] — Classic-era combat math, resources, GCD, threat, leashing, death, food, drink, and recovery.
+* [[Combat]] , Classic-era combat math, resources, GCD, threat, leashing, death, food, drink, and recovery.
 * [[Parties]] — Five-player grouping, shared tap rights, shared kill credit, XP bonuses, party chat, and shared instances.
 * [[Guilds]] — Guild creation, ranks, roster management, invites, guild chat, and public-discovery roadmap requests.
 * [[Trading]] — Nearby players stage items and copper; both sides accept; walking apart cancels.
@@ -3535,7 +3535,7 @@ Mind the sparks, $C. Good steel is the difference between a scar and a grave.
       <model>wikitext</model>
       <format>text/x-wiki</format>
       <text xml:space="preserve" bytes="317">== Greeting ==
-Blrb-glub— sorry, been listening to those fish-men too long.
+Blrb-glub, sorry, been listening to those fish-men too long.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -4451,7 +4451,7 @@ The mountain forgets nothing, $N, and neither do I. Let us see what you have don
       <model>wikitext</model>
       <format>text/x-wiki</format>
       <text xml:space="preserve" bytes="473">== Greeting ==
-The mere drinks the moonlight, $C, and gives back the drowned. I have watched that gate for thirty nights — and tonight it is open.
+The mere drinks the moonlight, $C, and gives back the drowned. I have watched that gate for thirty nights , and tonight it is open.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -4852,7 +4852,7 @@ Ah, fine bristly hides! These will fetch a good price.
       <model>wikitext</model>
       <format>text/x-wiki</format>
       <text xml:space="preserve" bytes="572">== Quest text ==
-The lurkers in the eastern woods spin a silk I need for my poultices — and they have grown far too numerous besides. Cull 6 Sableweb Lurkers and cut 4 silk glands from their bellies.
+The lurkers in the eastern woods spin a silk I need for my poultices , and they have grown far too numerous besides. Cull 6 Sableweb Lurkers and cut 4 silk glands from their bellies.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -4897,7 +4897,7 @@ Ugh, still twitching. Perfect. Here, you&apos;ve earned this.
       <model>wikitext</model>
       <format>text/x-wiki</format>
       <text xml:space="preserve" bytes="583">== Quest text ==
-Twenty years I have fished Mirror Lake, and never lost a net until those gurgling fish-men crawled out of the shallows. Drive the Mudfin back — slay 8 of them. And watch yourself: where there is one mudfin, there are five.
+Twenty years I have fished Mirror Lake, and never lost a net until those gurgling fish-men crawled out of the shallows. Drive the Mudfin back , slay 8 of them. And watch yourself: where there is one mudfin, there are five.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -5205,7 +5205,7 @@ The yard grows quieter — but the calling has not stopped. It rises from below 
       <model>wikitext</model>
       <format>text/x-wiki</format>
       <text xml:space="preserve" bytes="778">== Quest text ==
-The crypt beneath the chapel must be unsealed if we are to stop the Gravecaller — but only a binding rite will let the living pass. I need 4 lumps of Blessed Tallow — the mine&apos;s burrowers hoard tallow by the crate — and 6 Ghostly Essences from the restless dead.
+The crypt beneath the chapel must be unsealed if we are to stop the Gravecaller , but only a binding rite will let the living pass. I need 4 lumps of Blessed Tallow , the mine&apos;s burrowers hoard tallow by the crate , and 6 Ghostly Essences from the restless dead.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -5373,7 +5373,7 @@ Morthen is dead, yet a question gnaws at me: a sect that hid for a century does 
 * Morthen&apos;s Grimoire: 1
 
 == Completion ==
-Morthen wrote to a &apos;Fogbinder&apos; in the northern fen. The sect is not dead, $N — it has merely been patient.
+Morthen wrote to a &apos;Fogbinder&apos; in the northern fen. The sect is not dead, $N , it has merely been patient.
 [[Category:Quests]]
 [[Category:Mirefen Marsh]]
 </text>
@@ -5627,7 +5627,7 @@ Amends made; a new path is open to you.
       <model>wikitext</model>
       <format>text/x-wiki</format>
       <text xml:space="preserve" bytes="696">== Quest text ==
-Morthen&apos;s writings named a master in the northern marsh — a &apos;Fogbinder.&apos; Now Warden Fenwick has sounded the muster horn at Fenbridge, and I do not believe in coincidence, $N. Take the causeway north, pull the muster order from the gatepost, and present it to the Warden.
+Morthen&apos;s writings named a master in the northern marsh , a &apos;Fogbinder.&apos; Now Warden Fenwick has sounded the muster horn at Fenbridge, and I do not believe in coincidence, $N. Take the causeway north, pull the muster order from the gatepost, and present it to the Warden.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -5847,7 +5847,7 @@ By the damp saints... The Codfather himself. Look at those whiskers. Fenbridge w
       <model>wikitext</model>
       <format>text/x-wiki</format>
       <text xml:space="preserve" bytes="674">== Quest text ==
-The Deepfen mudfins kept to their shallows for twenty years. Now they swarm the east bank like flies on a carcass — and my wardens say they are dragging things up from the lake bed. Whatever has them stirred, I want it stopped. Cull 12 of the snappers.
+The Deepfen mudfins kept to their shallows for twenty years. Now they swarm the east bank like flies on a carcass , and my wardens say they are dragging things up from the lake bed. Whatever has them stirred, I want it stopped. Cull 12 of the snappers.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -5984,7 +5984,7 @@ This is no weapon I know. Look at how the plates fold. It may be a rare piece of
       <model>wikitext</model>
       <format>text/x-wiki</format>
       <text xml:space="preserve" bytes="665">== Quest text ==
-Aldric says those idols are cult-make — which means the mudfins are hauling the marsh&apos;s old evil up one armful at a time. I will not have it washing onto my causeway. Go back to the shallows and break the dredging for good: 14 more snappers.
+Aldric says those idols are cult-make , which means the mudfins are hauling the marsh&apos;s old evil up one armful at a time. I will not have it washing onto my causeway. Go back to the shallows and break the dredging for good: 14 more snappers.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -6467,7 +6467,7 @@ Maren&apos;s reports name summoners among the cultists — voices that call the 
 * Gravecaller Cipher: 4
 
 == Completion ==
-Every cipher is countersigned &apos;Deacon Voss&apos; — and addressed onward to a &apos;Fogbinder&apos; in the Bastion. Morthen&apos;s master, $N. We have found him.
+Every cipher is countersigned &apos;Deacon Voss&apos; , and addressed onward to a &apos;Fogbinder&apos; in the Bastion. Morthen&apos;s master, $N. We have found him.
 [[Category:Quests]]
 [[Category:Thornpeak Heights]]
 </text>
@@ -6535,7 +6535,7 @@ Voss is dead and the mist over the camp is already thinning. You have broken the
       <model>wikitext</model>
       <format>text/x-wiki</format>
       <text xml:space="preserve" bytes="697">== Quest text ==
-The Sunken Bastion — a knight&apos;s hold that drowned in the fen a century ago — is where Voss&apos;s letters point, and where this Fogbinder sings his drowning hymns. The cult has warded its door with grave-stones. Bring me one of the ward stones, $N, and I will unweave the seal.
+The Sunken Bastion , a knight&apos;s hold that drowned in the fen a century ago , is where Voss&apos;s letters point, and where this Fogbinder sings his drowning hymns. The cult has warded its door with grave-stones. Bring me one of the ward stones, $N, and I will unweave the seal.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -6579,7 +6579,7 @@ The ward parts like rotten rope. The door stands open... and the dark below it i
       <model>wikitext</model>
       <format>text/x-wiki</format>
       <text xml:space="preserve" bytes="855">== Quest text ==
-Knight-Commander Olen held the Bastion when it sank — drowned at his post rather than abandon it. Every warden learns his name with pride. Now the Fogbinder has raised him as a puppet to guard the very door he died defending. That shame ends, $N. Take four companions below and grant Olen the rest he earned.
+Knight-Commander Olen held the Bastion when it sank , drowned at his post rather than abandon it. Every warden learns his name with pride. Now the Fogbinder has raised him as a puppet to guard the very door he died defending. That shame ends, $N. Take four companions below and grant Olen the rest he earned.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -6628,7 +6628,7 @@ Then his watch is finally over. I&apos;ll see his name cut into the gate myself.
       <model>wikitext</model>
       <format>text/x-wiki</format>
       <text xml:space="preserve" bytes="958">== Quest text ==
-At the bottom of the Bastion waits Vael the Fogbinder — Morthen&apos;s master, Voss&apos;s master, the voice that has drowned a hundred travelers to raise itself an army. He is far beyond any one hero: take four companions, no fewer. End him, $N, and the fen&apos;s dead may finally lie still.
+At the bottom of the Bastion waits Vael the Fogbinder , Morthen&apos;s master, Voss&apos;s master, the voice that has drowned a hundred travelers to raise itself an army. He is far beyond any one hero: take four companions, no fewer. End him, $N, and the fen&apos;s dead may finally lie still.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -6946,7 +6946,7 @@ Down at last. The mountain folk swore that cat would outlive the wall itself. Th
       <model>wikitext</model>
       <format>text/x-wiki</format>
       <text xml:space="preserve" bytes="661">== Quest text ==
-The tunnelers at Deeprock Burrows are digging deeper than any pit-rat has business digging — straight down, as if something were calling them. Their tunnels run beneath our wall, $N. Collapse the matter: kill twelve Deeprock Tunnelers.
+The tunnelers at Deeprock Burrows are digging deeper than any pit-rat has business digging , straight down, as if something were calling them. Their tunnels run beneath our wall, $N. Collapse the matter: kill twelve Deeprock Tunnelers.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -6971,7 +6971,7 @@ The tunnelers at Deeprock Burrows are digging deeper than any pit-rat has busine
 * Deeprock Tunneler slain: 12
 
 == Completion ==
-Straight down, every shaft of it — burrowers do not dig like that on their own. I must consult my books.
+Straight down, every shaft of it , burrowers do not dig like that on their own. I must consult my books.
 [[Category:Quests]]
 [[Category:Thornpeak Heights]]
 </text>
@@ -6990,7 +6990,7 @@ Straight down, every shaft of it — burrowers do not dig like that on their own
       <model>wikitext</model>
       <format>text/x-wiki</format>
       <text xml:space="preserve" bytes="657">== Quest text ==
-Caddis showed me a lump of wax taken off one of those tunnelers — it glows, $N, and it is warm as a heartbeat. He wants more for study, and I want it off my requisition list. Bring back six lumps of the glowing wax.
+Caddis showed me a lump of wax taken off one of those tunnelers , it glows, $N, and it is warm as a heartbeat. He wants more for study, and I want it off my requisition list. Bring back six lumps of the glowing wax.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -8188,7 +8188,7 @@ Then the crown is silent at last. Thornpeak will still carry its dead, but no ki
       <model>wikitext</model>
       <format>text/x-wiki</format>
       <text xml:space="preserve" bytes="774">== Quest text ==
-Look there, $N — under the surface, a stair of pale stone running down into the dark, and a gate of cold light at the head of it. The old wardens scratched warnings into the shore-rocks before the water took them. Take a rubbing of one for me; I would read what they feared before we go any closer.
+Look there, $N , under the surface, a stair of pale stone running down into the dark, and a gate of cold light at the head of it. The old wardens scratched warnings into the shore-rocks before the water took them. Take a rubbing of one for me; I would read what they feared before we go any closer.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -8232,7 +8232,7 @@ A waking-prayer... to something they called the Drowned Moon. And below it, in a
       <model>wikitext</model>
       <format>text/x-wiki</format>
       <text xml:space="preserve" bytes="714">== Quest text ==
-Since the gate opened, things climb out of the mere at dusk — bloated, pale, finned where hands ought to be. Glimmermere Waders, the old rubbings name them. They drag anything living back down with them. Cull ten before they thin my watch to nothing.
+Since the gate opened, things climb out of the mere at dusk , bloated, pale, finned where hands ought to be. Glimmermere Waders, the old rubbings name them. They drag anything living back down with them. Cull ten before they thin my watch to nothing.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -8257,7 +8257,7 @@ Since the gate opened, things climb out of the mere at dusk — bloated, pale, f
 * Glimmermere Wader slain: 10
 
 == Completion ==
-Ten back in the water. They feel no cold, $N, and no fear — only the pull of that gate. Whatever sings to them, it sings loud.
+Ten back in the water. They feel no cold, $N, and no fear , only the pull of that gate. Whatever sings to them, it sings loud.
 [[Category:Quests]]
 [[Category:Thornpeak Heights]]
 </text>
@@ -8276,7 +8276,7 @@ Ten back in the water. They feel no cold, $N, and no fear — only the pull of t
       <model>wikitext</model>
       <format>text/x-wiki</format>
       <text xml:space="preserve" bytes="957">== Quest text ==
-The waders do not act alone. Among them walk the Drowned Votaries — the cult that sank with the temple, still in their rotted vestments, still singing the prayer from the shore-rocks. Silence eight of them, and bring me six of the offerings they carry. I would know what they mean to give their goddess.
+The waders do not act alone. Among them walk the Drowned Votaries , the cult that sank with the temple, still in their rotted vestments, still singing the prayer from the shore-rocks. Silence eight of them, and bring me six of the offerings they carry. I would know what they mean to give their goddess.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -8326,7 +8326,7 @@ Pearls, knuckle-bones, a child&apos;s carved fish... grave-gifts, $N. They are n
       <model>wikitext</model>
       <format>text/x-wiki</format>
       <text xml:space="preserve" bytes="890">== Quest text ==
-One shape in the mere is no drowned man. A serpent the colour of bone glides the deep shelf where the stair begins — Sethrael, the rubbings call it, the Palecoil, the moon&apos;s own watch-beast. While it guards that water, no one reaches the gate alive. Go down to the shelf and kill it, $N. Take its heartscale so I know the deed is done.
+One shape in the mere is no drowned man. A serpent the colour of bone glides the deep shelf where the stair begins , Sethrael, the rubbings call it, the Palecoil, the moon&apos;s own watch-beast. While it guards that water, no one reaches the gate alive. Go down to the shelf and kill it, $N. Take its heartscale so I know the deed is done.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -8351,7 +8351,7 @@ One shape in the mere is no drowned man. A serpent the colour of bone glides the
 * Sethrael&apos;s Heartscale: 1
 
 == Completion ==
-Cold as the bottom of the world, and still it twitches. The shelf is clear, $N — the stair to the gate stands open. I almost wish it did not.
+Cold as the bottom of the world, and still it twitches. The shelf is clear, $N , the stair to the gate stands open. I almost wish it did not.
 
 == Rewards ==
 * [[Moonscale Saber]]
@@ -8375,7 +8375,7 @@ Cold as the bottom of the world, and still it twitches. The shelf is clear, $N �
       <model>wikitext</model>
       <format>text/x-wiki</format>
       <text xml:space="preserve" bytes="928">== Quest text ==
-The singing comes from below the gate now, and one voice leads it: Choirmother Selthe, who first taught the cult to drown without dying. While she keeps the prayer, the temple will never sleep — and the mere will never stop giving up its dead. Take companions through the gate and end her. This is no errand for a lone blade, $N.
+The singing comes from below the gate now, and one voice leads it: Choirmother Selthe, who first taught the cult to drown without dying. While she keeps the prayer, the temple will never sleep , and the mere will never stop giving up its dead. Take companions through the gate and end her. This is no errand for a lone blade, $N.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -8424,7 +8424,7 @@ The prayer falters... and for the first time in thirty nights, the mere is quiet
       <model>wikitext</model>
       <format>text/x-wiki</format>
       <text xml:space="preserve" bytes="1143">== Quest text ==
-I have read the last of the rubbings, $N, and I understand now what the cult drowned themselves to keep asleep. Ysolei — the Drowned Moon made flesh — coils on the altar at the temple&apos;s heart, and the stolen warmth of every life the mere took is pouring into her waking. When the moon stands full she rises, and the water rises with her — the tarn, the wall, the whole mountain under it. Gather the strongest you can find and put her back to sleep. For good, this time.
+I have read the last of the rubbings, $N, and I understand now what the cult drowned themselves to keep asleep. Ysolei , the Drowned Moon made flesh , coils on the altar at the temple&apos;s heart, and the stolen warmth of every life the mere took is pouring into her waking. When the moon stands full she rises, and the water rises with her , the tarn, the wall, the whole mountain under it. Gather the strongest you can find and put her back to sleep. For good, this time.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -8449,7 +8449,7 @@ I have read the last of the rubbings, $N, and I understand now what the cult dro
 * Ysolei, Avatar of the Drowned Moon, slain: 1
 
 == Completion ==
-The altar is dark, the water is still, and the moon over the tarn is only the moon. You drowned a goddess tonight, $N — and the mountain will never know how close it came. Let the wardens of the shore-rocks rest easy at last.
+The altar is dark, the water is still, and the moon over the tarn is only the moon. You drowned a goddess tonight, $N , and the mountain will never know how close it came. Let the wardens of the shore-rocks rest easy at last.
 
 == Rewards ==
 * [[Drowned Moon Maul]]
@@ -49915,7 +49915,7 @@ Summons a Warfiend under the command of the Warlock. The Warfiend is a durable m
       <model>wikitext</model>
       <format>text/x-wiki</format>
       <text xml:space="preserve" bytes="522">== Description ==
-Binds a Pyre Colossus to your will — a hulking juggernaut with crushing melee and the deepest health and armor of any demon. A long cooldown gates its raw power. Summoning a new demon dismisses your current one. You may have one demon at a time.
+Binds a Pyre Colossus to your will , a hulking juggernaut with crushing melee and the deepest health and armor of any demon. A long cooldown gates its raw power. Summoning a new demon dismisses your current one. You may have one demon at a time.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -49959,7 +49959,7 @@ Binds a Pyre Colossus to your will — a hulking juggernaut with crushing melee 
       <model>wikitext</model>
       <format>text/x-wiki</format>
       <text xml:space="preserve" bytes="498">== Description ==
-Binds a Wraithborn to your will — an elite demon that rains heavy Shadow damage from afar. A long cooldown gates its devastating power. Summoning a new demon dismisses your current one. You may have one demon at a time.
+Binds a Wraithborn to your will , an elite demon that rains heavy Shadow damage from afar. A long cooldown gates its devastating power. Summoning a new demon dismisses your current one. You may have one demon at a time.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -57525,4 +57525,3 @@ Find your legs: move 50% faster for 4 sec.
     </revision>
   </page>
 </mediawiki>
-
