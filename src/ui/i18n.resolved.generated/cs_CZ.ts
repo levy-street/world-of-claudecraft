@@ -7071,6 +7071,9 @@ export const cs_CZ: EnTranslations = {
       "mistcallers_duffel": {
         "name": "Vak poutače mlhy"
       },
+      "stormhide_haversack": {
+        "name": "Stormhide Haversack"
+      },
       "copper_mining_pick": {
         "name": "Měděný hornický krumpáč"
       },

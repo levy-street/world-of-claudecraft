@@ -7071,6 +7071,9 @@ export const da_DK: EnTranslations = {
       "mistcallers_duffel": {
         "name": "Fogbinderens køjesæk"
       },
+      "stormhide_haversack": {
+        "name": "Stormhide Haversack"
+      },
       "copper_mining_pick": {
         "name": "Kobberminehakke"
       },

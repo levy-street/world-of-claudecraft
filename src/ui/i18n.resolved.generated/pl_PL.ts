@@ -7071,6 +7071,9 @@ export const pl_PL: EnTranslations = {
       "mistcallers_duffel": {
         "name": "Worek Fogbindera"
       },
+      "stormhide_haversack": {
+        "name": "Stormhide Haversack"
+      },
       "copper_mining_pick": {
         "name": "Miedziany Kilof Górniczy"
       },

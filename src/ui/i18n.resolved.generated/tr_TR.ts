@@ -7071,6 +7071,9 @@ export const tr_TR: EnTranslations = {
       "mistcallers_duffel": {
         "name": "Fogbinder'ın Denizci Çantası"
       },
+      "stormhide_haversack": {
+        "name": "Stormhide Haversack"
+      },
       "copper_mining_pick": {
         "name": "Bakır Maden Kazması"
       },

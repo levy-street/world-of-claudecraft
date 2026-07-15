@@ -7071,6 +7071,9 @@ export const ko_KR: EnTranslations = {
       "mistcallers_duffel": {
         "name": "안개엮는자의 더플백"
       },
+      "stormhide_haversack": {
+        "name": "폭풍가죽 배낭"
+      },
       "copper_mining_pick": {
         "name": "구리 채광 곡괭이"
       },
