@@ -1133,7 +1133,7 @@ const classAbilityNamesEn = {
       [
         'sacred_bulwark',
         'Sacred Bulwark',
-        'Ward yourself in faith for 1 min. The next blow that would kill you is denied, restoring you to 35% health instead.',
+        'For {duration} sec, the next enemy hit that would kill you is denied, restoring you to 35% health instead.',
       ],
       [
         'primal_reflexes',

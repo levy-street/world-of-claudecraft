@@ -2375,7 +2375,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '以坚固的防御自守，使受到的所有伤害降低 40%，持续 8 秒。',
   'entities.abilities.sacred_bulwark.name': '神圣壁垒',
   'entities.abilities.sacred_bulwark.description':
-    '以信仰守护自身，持续 1 分钟。下一次致命打击将被抵消，转而将你恢复至 35% 生命值。',
+    '在 {duration} 秒内，下一次会杀死你的敌人攻击将被抵消，转而将你恢复至 35% 生命值。',
   'entities.abilities.primal_reflexes.name': '野性反射',
   'entities.abilities.primal_reflexes.description':
     '你的本能变得敏锐，使闪避几率提高 50%，持续 6 秒。',
@@ -5432,6 +5432,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.attackSpeedFast': '攻击速度提高 {pct}%',
   'hudChrome.auraEffect.haste': '攻击速度和施法速度提高 {pct}%',
   'hudChrome.auraEffect.tongues': '施法时间延长 {pct}%',
+  'hudChrome.auraEffect.damageReduction': '受到的所有伤害降低 {pct}%',
+  'hudChrome.auraEffect.guardianWard': '下一次敌人的致命攻击会改为将你的生命值恢复至 {pct}%',
   'hudChrome.auraEffect.increase.ap': '攻击强度提高 {value}',
   'hudChrome.auraEffect.increase.armor': '护甲提高 {value}',
   'hudChrome.auraEffect.increase.int': '智力提高 {value}',

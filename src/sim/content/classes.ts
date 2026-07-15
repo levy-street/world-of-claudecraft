@@ -702,7 +702,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 20,
     cost: 10,
     castTime: 0,
-    cooldown: 60,
+    cooldown: 180,
     range: 0,
     school: 'physical',
     requiresTarget: false,
@@ -1672,10 +1672,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ],
     description: 'A holy shield absorbs $d damage for 10 sec.',
   },
-  // Paladin tank cooldown: a divine cheat-death (the `guardian_ward` aura, consumed
-  // by a lethal blow in damage.ts). Kept up (its 1 min duration matches its cooldown),
-  // so when a killing blow lands the Light restores you instead. Complements Ward of
-  // Faith's small absorb.
+  // Paladin tank cooldown: a predictive divine cheat-death (the `guardian_ward`
+  // aura, consumed by an enemy lethal blow in damage.ts). Its short window and
+  // long cooldown make timing the defense the choice, rather than keeping it up.
   sacred_bulwark: {
     id: 'sacred_bulwark',
     name: 'Sacred Bulwark',
@@ -1683,14 +1682,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 20,
     cost: 15,
     castTime: 0,
-    cooldown: 60,
+    cooldown: 180,
     range: 0,
     school: 'holy',
     requiresTarget: false,
     offGcd: true,
-    effects: [{ type: 'selfBuff', kind: 'guardian_ward', value: 0, duration: 60 }],
+    effects: [{ type: 'selfBuff', kind: 'guardian_ward', value: 0.35, duration: 10 }],
     description:
-      'Ward yourself in faith for 1 min. The next blow that would kill you is denied, restoring you to 35% health instead.',
+      'For $t sec, the next enemy hit that would kill you is denied, restoring you to 35% health instead.',
   },
   hammer_of_justice: {
     id: 'hammer_of_justice',

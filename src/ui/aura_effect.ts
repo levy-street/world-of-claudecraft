@@ -131,6 +131,10 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
         key: `${KEY}.${a.value < 0 ? 'dodgeReduce' : 'dodge'}`,
         nums: { pct: pctFromFrac(a.value) },
       };
+    case 'shield_wall':
+      return { key: `${KEY}.damageReduction`, nums: { pct: pctFromFrac(a.value) } };
+    case 'guardian_ward':
+      return { key: `${KEY}.guardianWard`, nums: { pct: pctFromFrac(a.value) } };
 
     case 'sunder': {
       // Sunder Armor is a PERCENT reduction: SUNDER_ARMOR_PCT_PER_STACK per stack

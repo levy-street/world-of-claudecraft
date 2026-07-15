@@ -1361,6 +1361,8 @@ export const cs_CZ: EnTranslations = {
       },
       "dodge": "Zvyšuje šanci na vyhnutí o {pct} %",
       "dodgeReduce": "Snižuje šanci na vyhnutí o {pct} %",
+      "damageReduction": "Reduces all damage taken by {pct}%",
+      "guardianWard": "The next lethal enemy hit restores you to {pct}% health instead",
       "armorFlat": "Snižuje brnění o {value}",
       "armorFlatStacks": "Snižuje brnění o {value} ({stacks} stacků)",
       "armorPct": "Snižuje brnění o {pct} %",
@@ -6285,7 +6287,7 @@ export const cs_CZ: EnTranslations = {
       },
       "sacred_bulwark": {
         "name": "Sacred Bulwark",
-        "description": "Ward yourself in faith for 1 min. The next blow that would kill you is denied, restoring you to 35% health instead."
+        "description": "For {duration} sec, the next enemy hit that would kill you is denied, restoring you to 35% health instead."
       },
       "primal_reflexes": {
         "name": "Primal Reflexes",

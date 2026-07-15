@@ -1361,6 +1361,8 @@ export const da_DK: EnTranslations = {
       },
       "dodge": "Erhöht Ausweichchance um {pct}%",
       "dodgeReduce": "Verringert Ausweichchance um {pct}%",
+      "damageReduction": "Reduces all damage taken by {pct}%",
+      "guardianWard": "The next lethal enemy hit restores you to {pct}% health instead",
       "armorFlat": "Verringert Rüstung um {value}",
       "armorFlatStacks": "Verringert Rüstung um {value} ({stacks} Stapel)",
       "armorPct": "Reducerer rustning med {pct}%",
@@ -6285,7 +6287,7 @@ export const da_DK: EnTranslations = {
       },
       "sacred_bulwark": {
         "name": "Sacred Bulwark",
-        "description": "Ward yourself in faith for 1 min. The next blow that would kill you is denied, restoring you to 35% health instead."
+        "description": "For {duration} sec, the next enemy hit that would kill you is denied, restoring you to 35% health instead."
       },
       "primal_reflexes": {
         "name": "Primal Reflexes",

@@ -1361,6 +1361,8 @@ export const en_CA: EnTranslations = {
       },
       "dodge": "Increases dodge chance by {pct}%",
       "dodgeReduce": "Reduces dodge chance by {pct}%",
+      "damageReduction": "Reduces all damage taken by {pct}%",
+      "guardianWard": "The next lethal enemy hit restores you to {pct}% health instead",
       "armorFlat": "Reduces armor by {value}",
       "armorFlatStacks": "Reduces armor by {value} ({stacks} stacks)",
       "armorPct": "Reduces armor by {pct}%",
@@ -6285,7 +6287,7 @@ export const en_CA: EnTranslations = {
       },
       "sacred_bulwark": {
         "name": "Sacred Bulwark",
-        "description": "Ward yourself in faith for 1 min. The next blow that would kill you is denied, restoring you to 35% health instead."
+        "description": "For {duration} sec, the next enemy hit that would kill you is denied, restoring you to 35% health instead."
       },
       "primal_reflexes": {
         "name": "Primal Reflexes",

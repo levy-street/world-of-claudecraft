@@ -1361,6 +1361,8 @@ export const ko_KR: EnTranslations = {
       },
       "dodge": "회피 확률을 {pct}% 증가시킵니다",
       "dodgeReduce": "회피 확률을 {pct}% 감소시킵니다",
+      "damageReduction": "받는 모든 피해가 {pct}% 감소합니다",
+      "guardianWard": "다음 적의 치명적인 공격을 막고 대신 생명력을 {pct}%까지 회복합니다",
       "armorFlat": "방어도를 {value} 감소시킵니다",
       "armorFlatStacks": "방어도를 {value} 감소시킵니다 ({stacks}중첩)",
       "armorPct": "방어도를 {pct}% 감소시킵니다",
@@ -6285,7 +6287,7 @@ export const ko_KR: EnTranslations = {
       },
       "sacred_bulwark": {
         "name": "신성한 방벽",
-        "description": "1분 동안 신앙으로 자신을 보호합니다. 목숨을 앗아갈 일격을 무효화하고 생명력을 최대치의 35%까지 회복시킵니다."
+        "description": "{duration}초 동안 다음 적의 치명적인 공격을 무효화하고, 대신 생명력을 최대치의 35%까지 회복합니다."
       },
       "primal_reflexes": {
         "name": "원시의 반사",

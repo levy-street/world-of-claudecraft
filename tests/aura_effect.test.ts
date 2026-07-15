@@ -146,6 +146,17 @@ describe('auraEffectDescriptor', () => {
     });
   });
 
+  it('describes the tank defensive cooldown auras', () => {
+    expect(desc({ kind: 'shield_wall', value: 0.4 })).toEqual({
+      key: 'hudChrome.auraEffect.damageReduction',
+      nums: { pct: 40 },
+    });
+    expect(desc({ kind: 'guardian_ward', value: 0.35 })).toEqual({
+      key: 'hudChrome.auraEffect.guardianWard',
+      nums: { pct: 35 },
+    });
+  });
+
   it('summarizes crowd control by the restriction, not a number', () => {
     expect(desc({ kind: 'stun', value: 0 })).toEqual({ key: 'hudChrome.auraEffect.stun' });
     expect(desc({ kind: 'silence', value: 0 })).toEqual({ key: 'hudChrome.auraEffect.silence' });

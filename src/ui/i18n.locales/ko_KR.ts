@@ -2468,7 +2468,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '굳건한 방어 태세로 8초 동안 받는 모든 피해를 40% 감소시킵니다.',
   'entities.abilities.sacred_bulwark.name': '신성한 방벽',
   'entities.abilities.sacred_bulwark.description':
-    '1분 동안 신앙으로 자신을 보호합니다. 목숨을 앗아갈 일격을 무효화하고 생명력을 최대치의 35%까지 회복시킵니다.',
+    '{duration}초 동안 다음 적의 치명적인 공격을 무효화하고, 대신 생명력을 최대치의 35%까지 회복합니다.',
   'entities.abilities.primal_reflexes.name': '원시의 반사',
   'entities.abilities.primal_reflexes.description':
     '본능이 예리해져 6초 동안 회피율이 50% 증가합니다.',
@@ -5694,6 +5694,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.attackSpeedFast': '공격 속도를 {pct}% 증가시킵니다',
   'hudChrome.auraEffect.haste': '공격 속도와 시전 속도를 {pct}% 증가시킵니다',
   'hudChrome.auraEffect.tongues': '시전 시간을 {pct}% 증가시킵니다',
+  'hudChrome.auraEffect.damageReduction': '받는 모든 피해가 {pct}% 감소합니다',
+  'hudChrome.auraEffect.guardianWard':
+    '다음 적의 치명적인 공격을 막고 대신 생명력을 {pct}%까지 회복합니다',
   'hudChrome.auraEffect.increase.ap': '공격력을 {value} 증가시킵니다',
   'hudChrome.auraEffect.increase.armor': '방어도를 {value} 증가시킵니다',
   'hudChrome.auraEffect.increase.int': '지능을 {value} 증가시킵니다',
