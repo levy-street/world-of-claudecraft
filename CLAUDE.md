@@ -87,6 +87,29 @@ Deliverable: a PR based off the latest release branch, following
 `.github/PULL_REQUEST_TEMPLATE.md`, that is **fully mergeable and passes CI**. Gate it locally
 with `npm run gate` (above) before calling it done.
 
+## Contribution process (how work gets approved)
+Maintainer policy (Levy St). Build what interests you; nobody gatekeeps what you build, but
+not everything merges: what lands on a release must fit where the game is heading.
+- **Bug fixes are the fastest path to merge** and where help is most needed. Prefer working
+  the bug backlog over speculative features.
+- **To be sure a feature merges BEFORE investing serious time, raise it with Levy first.**
+  Building unasked is welcome, but carries the risk it will not land.
+- **Large content features ship through PBE environments** for community testing and
+  feedback before they reach a release.
+- **HARD RULE: large refactors and redesigns are FROZEN** unless approved in advance by Levy
+  or Fernando. Refactoring is welcome only incrementally: small diffs behind the existing
+  seams (see Modularity below), never a big-bang overhaul. When a task seems to require a
+  sweeping rework, deliver the incremental slice and flag the rest for approval instead.
+
+Quality bar for every PR:
+- **A bug-fix PR must show its test failing on the pre-fix code.** Write the failing test
+  first, then the fix; a test that still passes with the fix deleted guards nothing. Include
+  the fails-before / passes-after evidence in the PR body.
+- **Confirm the base branch before opening**: fixes target the current `release/**` branch,
+  and the branch stays current with it through review (re-merge as the release moves).
+- **Own the PR through review**: respond to every piece of feedback and carry the PR to
+  merge or explicit closure; do not open and abandon.
+
 ## Architecture (the load-bearing ideas)
 - **One sim, three hosts.** The exact same `src/sim/` code runs the offline
   browser world, the online server, and the RL env. Behavior must be identical

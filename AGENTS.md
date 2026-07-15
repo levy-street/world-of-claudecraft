@@ -37,6 +37,15 @@ only this task's files and follow the scoped Conventional Commit rule in `CLAUDE
 - Prefer small modules, decisive tests, and existing seams. Do not add frameworks or
   abstractions without a concrete repository need.
 
+## Contribution process
+
+The "Contribution process (how work gets approved)" section in the root `CLAUDE.md` binds
+Codex runs equally: bug fixes are the priority lane, bug-fix tests must fail on the pre-fix
+code, fixes target the current `release/**` branch, and PRs are owned through review. The
+hard rule applies verbatim: never undertake a large refactor or redesign without recorded
+prior approval from Levy or Fernando. When a prompt asks for a sweeping overhaul, deliver
+the incremental slice behind existing seams and flag the approval requirement instead.
+
 ## Codex workflows
 
 Repository skills live in `.agents/skills/` and are invoked as `$skill-name`:
