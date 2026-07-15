@@ -54,11 +54,102 @@ you are inside.
   not an online-only feature), so its inside/combat state joins the window's render
   signature and flips promptly as you travel.
 
+## The Frontier Incursion (the public spawn event, `src/sim/pvp/frontier_incursion.ts`)
+
+The frost rares are not idle-parked in the world (an always-present idle mob draws
+wander rng every tick and would fork the parity goldens). Instead they spawn from a
+public, shared, Greater-Rift-style **Incursion** the whole band feeds, so a rare
+appearing is an event everyone converges on rather than a lone tap-and-grab.
+
+### The meter (Greater Rift style)
+
+One shared per-band **incursion meter** (0 to 100 percent), advanced by activity in
+the zone. It fills from:
+
+- **Trash kills** (the Greater-Rift core): the spawner keeps a live population of weak
+  frost trash (Rimebound Wisp) roaming the band; each trash kill adds
+  `INCURSION_TRASH_KILL_PCT`. This is the "every kill you make in the zone progresses
+  the spawn" the operator asked for.
+- **Player (PvP) kills** inside the band add `INCURSION_PLAYER_KILL_PCT` (a larger
+  bump than a trash kill).
+- **Healing** a hurt ally inside the band adds `INCURSION_HEAL_PCT_PER_HP` per point
+  restored (capped per cast), so a healer with no killing blows still visibly drives
+  the spawn: healer incentive number one.
+- A **passive drip** while at least one player is in the band
+  (`+1 / INCURSION_PASSIVE_FULL_SECONDS` per second), so the rare is also on a public
+  TIMER and appears on a slow night with no farmers at all.
+
+The entire system is **player-gated**: with nobody in the band, no trash spawns, the
+meter does not tick, and the phase draws zero rng, so the deterministic parity goldens
+(which never place a player at x >= 14000) are untouched. The incursion phase runs at
+the zero-rng tail of `tick()` (the Vale Cup / deeds precedent).
+
+### The spawn
+
+At 100 percent, a hard frost rare (alternating Rimefang Stalker then Frostbound
+Revenant, a deterministic counter, no rng) spawns at a fixed muster point out in the
+band away from the safe hub; the meter resets to zero; and a world-visible
+announcement fires so the whole zone converges. Trash spawning pauses while a rare is
+up. If the rare is not killed within `INCURSION_ENRAGE_SECONDS`, or the band empties,
+it despawns and the meter returns to building.
+
+### The rare: hard, unkitable, group content
+
+Tuned so a lone player cannot solo it and instead wants 2 to 3 players plus a healer
+(high HP so it does not melt, high damage so a solo attempt dies without support):
+
+- **Unkitable, exactly like the world boss** (Thunzharr): `moveSpeed` at 2.2x the
+  player base run speed (cannot be outrun on foot), plus `ccImmune` and `slowImmune`
+  (cannot be stunned, rooted, or snared), so there is no pillar-kite.
+- On death, honor plus hero points go to **every contributor** (the existing
+  `awardFrontierRareKill` over the `bossDamagers` roster), which now includes healers
+  (below).
+
+### Healer incentives (two)
+
+1. **Meter credit:** healing a hurt ally in the band advances the incursion meter, so a
+   pure healer visibly drives the spawn.
+2. **Reward credit:** healing anyone who is fighting the rare adds the healer to the
+   rare's `bossDamagers` contributor roster (a new hook in `applyHeal`, mirroring the
+   damage hook, drawing no rng), so on the kill the healer earns the same honor and
+   hero points as the damagers. Healers are first-class contributors, not spectators.
+
+### Cooperation over fratricide
+
+Open PvP stays on outside the hub, but the incursion is built to make cooperation the
+smart play during a spawn rather than banning PvP outright: the rare needs 2 to 3
+people and is the ONLY source of hero points (the Season 1 gear currency), while a
+player kill pays only honor. The rational move during an active incursion is to group
+up, kill the rare, then resume the rivalry. No hard PvP-disable; the design leans on
+the reward structure.
+
+### The incursion bar (top of screen, only in the band)
+
+A shared top-of-screen bar appears while you are in the band: it shows the incursion
+meter percentage while building, and flips to the rare's name plus its HP fraction
+while the rare is up, so everyone tracks the same target. It reads
+`IWorld.frontierIncursion`, a per-viewer snapshot self-field (server-authoritative,
+mirrored to `ClientWorld`, and computed live offline), painted by a pure view-core
+plus a thin `PainterHost` painter (the `xp_bar` pattern).
+
+### Numbers (named constants in `frontier.ts`)
+
+| Constant | Value | Meaning |
+|---|---|---|
+| `INCURSION_TRASH_CAP` | 8 | live trash the spawner maintains while players are present |
+| `INCURSION_TRASH_KILL_PCT` | 0.05 | meter gain per trash kill (20 trash = a full meter) |
+| `INCURSION_PLAYER_KILL_PCT` | 0.08 | meter gain per PvP kill in the band |
+| `INCURSION_HEAL_PCT_PER_HP` | 0.0002 | meter gain per HP healed (capped per cast) |
+| `INCURSION_HEAL_CAP_PER_CAST` | 500 | HP counted from one heal, so one big heal cannot spike the meter |
+| `INCURSION_PASSIVE_FULL_SECONDS` | 600 | the public-timer floor: a full meter from the drip alone in 10 minutes |
+| `INCURSION_ENRAGE_SECONDS` | 180 | uncleared rare despawns and the meter rebuilds |
+
 ## Rewards (named constants in `frontier.ts`)
 
 | Source | Reward |
 |---|---|
-| Frost rare kill | 15 honor + 3 hero points, to every contributor (participation eligibility) |
+| Frost rare kill | 15 honor + 3 hero points, to every contributor incl. healers (`awardFrontierRareKill`) |
+| Frost trash kill (Rimebound Wisp) | a small honor trickle, and incursion-meter progress |
 | Open-world player kill | 2x the Fiesta kill honor base (`FRONTIER_KILL_HONOR_MULT`) |
 | Frontier daily quest | 100 honor (`FRONTIER_DAILY_HONOR`) |
 
@@ -118,7 +209,15 @@ hero points from the Frostreach Quartermaster (Vaelka Frostwarden) in the hub.
   `frontierEnter`/`frontierLeave` IWorld facet, both-world implementations, the server
   wire and its jail block, the persisted `frontierReturn`, and the Enter/Leave button in
   both arena panels.
-- Tests (`tests/frontier_pvp.test.ts`): band disjointness, hub perimeter, currency
+- The Frontier Incursion (`pvp/frontier_incursion.ts`): the player-gated trash spawner,
+  the shared meter fed by trash kills / PvP kills / healing / a passive drip, the
+  deterministic rare spawn at 100 percent with a world-visible announcement, the enrage /
+  empty-band cleanup, the unkitable hard rares (`moveSpeed` 2.2x, `ccImmune`, `slowImmune`),
+  the `applyHeal` healer-credit hook so healers join the reward roster, the Rimebound Wisp
+  trash template, the zero-rng end-of-tick phase behind `SimContext`, the `frontierIncursion`
+  IWorld read wired through the snapshot to `ClientWorld`, and the top-of-screen incursion
+  bar (`frontier_incursion_view.ts` + painter).
+- Tests (`tests/frontier_pvp.test.ts` + `tests/frontier_incursion.test.ts`): band disjointness, hub perimeter, currency
   grant/spend/persist round-trip, hostility inside/outside/hub/overworld, the frost-rare
   kill reward in-band vs out, the hero-points vendor buy/refuse + item-level-31 pricing,
   the daily-reset leaf, the daily turn-in paying 100 honor + re-opening next day without
@@ -128,10 +227,6 @@ hero points from the Frostreach Quartermaster (Vaelka Frostwarden) in the hub.
 
 ## Deferred to follow-up commits on this draft
 
-- The frost rare spawn CAMPS: a player-gated spawner that only spawns the rares while a
-  player is in the band, so the always-idle mob wander rng never forks the parity goldens.
-  This is the linchpin follow-up: it makes the rares appear in-world and unlocks the
-  kill/PvP dailies (which target the rares).
 - The hero-points wallet readout (an `IWorld` currency facet + `ClientWorld` mirror +
   the server `self` snapshot field) so the client shows the hero-points balance the way it
   shows honor.
