@@ -11,7 +11,7 @@
 // by enabling Enter/Leave only when the action is valid, so this module adds no new
 // localized strings.
 import type { SimContext } from '../sim_context';
-import { FRONTIER_HUB, isFrontierPos } from './frontier';
+import { FRONTIER_HUB, FRONTIER_MIN_LEVEL, isFrontierPos } from './frontier';
 
 // A deterministic per-player ring around the hub centre so simultaneous arrivals do
 // not stack on one point. No rng: purely a function of the entity id.
@@ -34,6 +34,7 @@ export function frontierEnter(ctx: SimContext, pid?: number): void {
     return;
   }
   if (isFrontierPos(e.pos.x)) return; // already inside: no-op
+  if (e.level < FRONTIER_MIN_LEVEL) return; // endgame gate: no-op (button disabled)
   if (e.inCombat) return; // cannot teleport away mid-fight: no-op (button disabled)
   // Remember the overworld spot to return to, then hard-teleport to the safe hub.
   meta.frontierReturn = { x: e.pos.x, z: e.pos.z, facing: e.facing };

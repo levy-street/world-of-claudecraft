@@ -12,8 +12,11 @@ import {
 import { createMob } from '../src/sim/entity';
 import { itemLevel } from '../src/sim/item_level';
 import {
+  FIESTA_KILL_HONOR,
   FRONTIER_DAILY_HONOR,
   FRONTIER_HUB,
+  FRONTIER_KILL_HONOR_MULT,
+  FRONTIER_MIN_LEVEL,
   FRONTIER_RARE_HERO_POINTS,
   FRONTIER_RARE_HONOR,
   FRONTIER_X_MAX,
@@ -144,6 +147,46 @@ describe('Open-world PvP flagging in the Frontier', () => {
     const hpInHub = b.hp;
     sim.dealDamage(a, b, 60, false, 'physical', null, 'hit');
     expect(b.hp).toBe(hpInHub);
+  });
+
+  it('exempts party members from hostility so a group can heal and AoE together', () => {
+    const a = placePlayer('Iii', FRONTIER_X_MIN + 200, 20);
+    const b = placePlayer('Jjj', FRONTIER_X_MIN + 205, 22);
+    // Ungrouped in the band: hostile.
+    expect(sim.isHostileTo(a, b)).toBe(true);
+    // Same party: no longer hostile (heals/shields/AoE work), the rares being group
+    // content. isFriendlyTo (derived from !isHostileTo) flips to true.
+    sim.partyInvite(b.id, a.id);
+    sim.partyAccept(b.id);
+    expect(sim.isHostileTo(a, b)).toBe(false);
+    expect(sim.isHostileTo(b, a)).toBe(false);
+  });
+
+  it('pays the killer the Frontier premium honor for a player kill out in the band', () => {
+    const a = placePlayer('Kkk', FRONTIER_X_MIN + 300, 30);
+    const b = placePlayer('Lll', FRONTIER_X_MIN + 305, 32);
+    const meta = sim.meta(a.id)!;
+    const honorBefore = meta.honor;
+    sim.dealDamage(a, b, b.hp, false, 'physical', null, 'hit'); // lethal
+    expect(b.dead).toBe(true);
+    expect(meta.honor).toBe(honorBefore + FIESTA_KILL_HONOR * FRONTIER_KILL_HONOR_MULT);
+  });
+});
+
+describe('Frontier entry level gate', () => {
+  it('refuses travel below the endgame level, allows it at the cap', () => {
+    const sim = new Sim({ seed: 44, playerClass: 'warrior', autoEquip: true });
+    const p = sim.player;
+    p.pos = { x: 12, y: 1, z: -7 };
+    p.prevPos = { ...p.pos };
+    // Below the gate: entering is a no-op.
+    sim.setPlayerLevel(FRONTIER_MIN_LEVEL - 1);
+    sim.frontierEnter(p.id);
+    expect(isFrontierPos(p.pos.x)).toBe(false);
+    // At the cap: travel works.
+    sim.setPlayerLevel(FRONTIER_MIN_LEVEL);
+    sim.frontierEnter(p.id);
+    expect(isFrontierPos(p.pos.x)).toBe(true);
   });
 });
 
@@ -308,6 +351,7 @@ describe('Frontier honor daily quest', () => {
 describe('Frontier enter/leave (PvP-window travel surface)', () => {
   it('teleports into the hub, remembers the return spot, and teleports back', () => {
     const sim = new Sim({ seed: 21, playerClass: 'warrior', autoEquip: true });
+    sim.setPlayerLevel(FRONTIER_MIN_LEVEL);
     const pid = sim.player.id;
     const player = sim.entities.get(pid)!;
     const meta = sim.meta(pid)!;
@@ -332,6 +376,7 @@ describe('Frontier enter/leave (PvP-window travel surface)', () => {
 
   it('is a no-op when already inside, dead, or in combat', () => {
     const sim = new Sim({ seed: 22, playerClass: 'warrior', autoEquip: true });
+    sim.setPlayerLevel(FRONTIER_MIN_LEVEL);
     const pid = sim.player.id;
     const player = sim.entities.get(pid)!;
     player.pos = { x: 5, y: 1, z: 5 };
@@ -354,6 +399,7 @@ describe('Frontier enter/leave (PvP-window travel surface)', () => {
 
   it('persists the return spot across serialize / addPlayer', () => {
     const sim = new Sim({ seed: 23, playerClass: 'warrior', autoEquip: true });
+    sim.setPlayerLevel(FRONTIER_MIN_LEVEL);
     const pid = sim.player.id;
     const player = sim.entities.get(pid)!;
     player.pos = { x: 40, y: 1, z: 9 };

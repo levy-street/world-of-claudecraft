@@ -6612,15 +6612,19 @@ export class Sim {
       }
       // The Frostreach Frontier: factionless open-world PvP. Both players inside
       // the band are hostile, no team, no color (the Wilderness "flagged the
-      // instant you are in here" rule). The one safe hub is exempted so nobody
-      // is attackable at the vendor/graveyard. isFriendlyTo mirrors this.
+      // instant you are in here" rule), EXCEPT party members: the rares are group
+      // content, so a party can heal/shield/AoE together (a party is not hostile to
+      // itself here). The one safe hub is exempted so nobody is attackable at the
+      // vendor/graveyard. isFriendlyTo mirrors this.
       if (
         honorMod.isFrontierPos(attackerPlayer.pos.x) &&
         honorMod.isFrontierPos(target.pos.x) &&
         !honorMod.inFrontierHub(attackerPlayer.pos.x, attackerPlayer.pos.z) &&
         !honorMod.inFrontierHub(target.pos.x, target.pos.z)
       ) {
-        return true;
+        const myParty = this.partyOf(attackerPlayer.id);
+        const sameParty = !!myParty && myParty.id === this.partyOf(target.id)?.id;
+        return !sameParty;
       }
       // The jail brawl: prisoners are hostile to each other, always (pets
       // resolve to their owner via pvpController above, so a prisoner's pet

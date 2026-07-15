@@ -29,6 +29,7 @@ import * as deedsMod from '../deeds';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import {
+  awardFrontierPlayerKill,
   awardFrontierRareKill,
   frontierIncursionOnKill,
   inFrontierHub,
@@ -733,6 +734,9 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
   // Frontier incursion: a trash or PvP kill inside the band feeds the public meter
   // (and a trash kill pays a small honor trickle). No-op outside the band. Draws no rng.
   frontierIncursionOnKill(ctx, e, killer);
+  // Frontier open-world PvP: killing a hostile player out in the band pays the killer
+  // honor at the Frontier premium. No-op outside the band / in the hub. Draws no rng.
+  awardFrontierPlayerKill(ctx, e, killer);
 
   // a dead mob keeps no raid marker — respawnMob reuses the same entity id,
   // so a stale mark would otherwise reappear on the respawn
@@ -842,9 +846,6 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     // clearThreat below, exactly like worldBossContribs.
     const rareContribs =
       !template?.worldBoss && template?.rare ? worldBossLootContributors(ctx, e) : null;
-    // A frost rare slain inside the Frostreach Frontier drops honor + hero points
-    // to every contributor (the Season 1 PvP-zone reward loop). Draws no rng.
-    awardFrontierRareKill(ctx, e, rareContribs);
     if (template?.worldBoss) {
       e.corpseTimer = WORLD_BOSS_CORPSE_SECONDS;
       e.respawnTimer = Infinity;
@@ -862,6 +863,10 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
       if (MOBS[e.templateId]?.family === 'demon') e.corpseTimer = 3;
       return; // owned pets drop no loot/credit; demons unravel, hunters revive or abandon
     }
+    // A frost rare slain inside the Frostreach Frontier drops honor + hero points to
+    // every contributor (the Season 1 PvP-zone reward loop). Below the owned-pet
+    // return + id-gated in awardFrontierRareKill, so no owned/future mob pays out.
+    awardFrontierRareKill(ctx, e, rareContribs);
     ctx.frenzyPackmates(e); // wild packmates fly into a frenzy when one falls
     ctx.armDeathThroes(e); // volatile corpses begin to destabilize, then burst
 

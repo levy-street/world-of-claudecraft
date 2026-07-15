@@ -4,6 +4,7 @@ export {
   FRONTIER_HUB,
   FRONTIER_HUB_RADIUS,
   FRONTIER_KILL_HONOR_MULT,
+  FRONTIER_MIN_LEVEL,
   FRONTIER_MUSTER,
   FRONTIER_RARE_HERO_POINTS,
   FRONTIER_RARE_HONOR,
@@ -30,7 +31,7 @@ export {
   frontierIncursionOnKill,
   updateFrontierIncursion,
 } from './frontier_incursion';
-export { awardFrontierRareKill } from './frontier_rewards';
+export { awardFrontierPlayerKill, awardFrontierRareKill } from './frontier_rewards';
 export { grantHeroPoints, normalizeHeroPoints, spendHeroPoints } from './hero_points';
 export {
   ARENA_DAILY_TAPER_FLOOR_START,

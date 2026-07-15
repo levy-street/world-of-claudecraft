@@ -17,7 +17,7 @@
 // skipping the DOM rebuild when the content signature is unchanged.
 
 import { audio } from '../game/audio';
-import { isFrontierPos } from '../sim/pvp';
+import { FRONTIER_MIN_LEVEL, isFrontierPos } from '../sim/pvp';
 import type { PlayerClass } from '../sim/types';
 import type { ArenaFormat, IWorld } from '../world_api';
 import {
@@ -167,7 +167,9 @@ export class ArenaWindow {
     // online-only feature), so its inside/combat state joins the render signature.
     const inFrontier = isFrontierPos(world.player.pos.x);
     const frontierCombat = !!world.player.inCombat;
-    const frontierSig = `|f:${inFrontier ? 'in' : 'out'}${frontierCombat ? 'c' : ''}`;
+    // Endgame gate: below the cap you cannot travel in (the sim refuses it too).
+    const frontierBelowLevel = (world.player.level ?? 0) < FRONTIER_MIN_LEVEL;
+    const frontierSig = `|f:${inFrontier ? 'in' : 'out'}${frontierCombat ? 'c' : ''}${frontierBelowLevel ? 'L' : ''}`;
 
     if (view.kind === 'offline') {
       // offline / not yet synced: arena is an online ranked feature. The static note is
@@ -176,7 +178,8 @@ export class ArenaWindow {
       const sig = ARENA_OFFLINE_SIG + frontierSig;
       if (this.lastSig === sig) return;
       this.lastSig = sig;
-      el.innerHTML = this.offlineHtml() + this.frontierHtml(inFrontier, frontierCombat);
+      el.innerHTML =
+        this.offlineHtml() + this.frontierHtml(inFrontier, frontierCombat, frontierBelowLevel);
       el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
       this.wireFrontier(el);
       return;
@@ -188,16 +191,18 @@ export class ArenaWindow {
     const sig = view.sig + frontierSig;
     if (sig === this.lastSig) return;
     this.lastSig = sig;
-    el.innerHTML = this.liveHtml(view) + this.frontierHtml(inFrontier, frontierCombat);
+    el.innerHTML =
+      this.liveHtml(view) + this.frontierHtml(inFrontier, frontierCombat, frontierBelowLevel);
     this.wire(el, view);
     this.wireFrontier(el);
   }
 
   /** The Frostreach Frontier travel control: Enter when outside, Leave when inside. */
-  private frontierHtml(inside: boolean, inCombat: boolean): string {
+  private frontierHtml(inside: boolean, inCombat: boolean, belowLevel: boolean): string {
     const act = inside ? 'frontier-leave' : 'frontier-enter';
     const label = inside ? t('hudChrome.frontier.leave') : t('hudChrome.frontier.enter');
-    const disabled = inCombat ? ' disabled' : '';
+    // Combat blocks either direction; the level gate blocks only entering.
+    const disabled = inCombat || (!inside && belowLevel) ? ' disabled' : '';
     return (
       `<div class="arena-sub">${esc(t('hudChrome.frontier.title'))}</div>` +
       `<button class="btn frontier-travel" data-act="${act}"${disabled}>${esc(label)}</button>` +

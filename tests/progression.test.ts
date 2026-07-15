@@ -23,7 +23,7 @@ import {
   ZONES,
 } from '../src/sim/data';
 import { canEquipItem } from '../src/sim/equipment_rules';
-import { isFrontierPos } from '../src/sim/pvp';
+import { inFrontierHub, isFrontierPos } from '../src/sim/pvp';
 import { ALL_CLASSES, MAX_LEVEL, XP_TABLE, type ZoneDef } from '../src/sim/types';
 import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
 
@@ -138,8 +138,14 @@ describe('content referential integrity', () => {
     for (const npc of Object.values(NPCS)) {
       // The Frostreach Frontier is a far-off always-on PvP band (like the arena,
       // delve, and yumi bands, which simply carry no static NPCs). Its dynamic
-      // Quartermaster legitimately stands in that band, past the overworld bounds.
-      if (isFrontierPos(npc.pos.x)) continue;
+      // Quartermaster/Marshal legitimately stand in that band, past the overworld
+      // bounds, but they MUST be inside the safe hub (never on PvP-enabled ground),
+      // so pin that instead of just skipping them.
+      if (isFrontierPos(npc.pos.x)) {
+        if (!inFrontierHub(npc.pos.x, npc.pos.z))
+          problems.push(`${npc.id} in the Frontier band but outside the safe hub`);
+        continue;
+      }
       if (!inWorld(npc.pos.x, npc.pos.z))
         problems.push(`${npc.id} outside world at (${npc.pos.x},${npc.pos.z})`);
     }

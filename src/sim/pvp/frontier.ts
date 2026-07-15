@@ -24,6 +24,10 @@ export const FRONTIER_HUB_RADIUS = 34;
 /** Where the enter teleport drops you: just inside the band, at the hub. */
 export const FRONTIER_ENTRY = { x: FRONTIER_HUB.x, z: FRONTIER_HUB.z } as const;
 
+/** The level gate: the Frontier is endgame content (level-20 rares + the ilvl-31
+ *  set), so a character must reach the cap before they can travel in. */
+export const FRONTIER_MIN_LEVEL = 20;
+
 /** True when x is inside the Frontier band. */
 export function isFrontierPos(x: number): boolean {
   return x >= FRONTIER_X_MIN && x < FRONTIER_X_MAX;
