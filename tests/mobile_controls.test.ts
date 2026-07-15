@@ -377,7 +377,27 @@ class FakeElement extends EventTarget {
   }
 
   releasePointerCapture(pointerId: number): void {
+    if (!this.captured.has(pointerId)) return;
     this.captured.delete(pointerId);
+    // Real browsers dispatch lostpointercapture for both an explicit
+    // releasePointerCapture() call and an implicit capture loss (spec
+    // behavior), and do so as a separate task rather than re-entrantly within
+    // the releasePointerCapture() call itself. The fake DOM previously stayed
+    // silent here, which is why the pinch-vs-swipe-look echo regression
+    // (releaseSwipeLook's own release tearing down a just-started pinch) went
+    // uncaught: queue it with queueMicrotask so callers observe the same
+    // non-reentrant timing as a real browser instead of synchronous recursion.
+    queueMicrotask(() => {
+      this.dispatchEvent(
+        Object.defineProperties(
+          new Event('lostpointercapture', { bubbles: true, cancelable: true }),
+          {
+            pointerId: { value: pointerId },
+            pointerType: { value: 'touch' },
+          },
+        ),
+      );
+    });
   }
 
   hasPointerCapture(pointerId: number): boolean {
@@ -527,10 +547,12 @@ function mobileCallbacks() {
     onDonate: noop,
     onEmotes: noop,
     onArena: noop,
+    onDungeonFinder: noop,
     onValeCup: noop,
     onQuestLog: noop,
     onCharacter: noop,
     onBags: noop,
+    onCrafting: noop,
     onSpellbook: noop,
     onTalents: noop,
     onMap: noop,
@@ -1243,6 +1265,81 @@ describe('MobileControls pointer lifecycle', () => {
     ]);
   });
 
+  it('resets swipe-look rotation when the browser silently drops pointer capture (iOS gesture interruption)', () => {
+    // Regression test for issue #1892: iOS Safari can invalidate an active
+    // touch's pointer capture (a system gesture, Control Center swipe, or an
+    // alert) WITHOUT firing pointerup or pointercancel. If only those two
+    // events reset swipe-look state, the camera is left permanently latched
+    // into "rotate" mode (setTouchLook(true) never flips back), which reads
+    // to the player as the camera getting stuck spinning or losing normal
+    // rotate/zoom control. `lostpointercapture` is the one event guaranteed
+    // to fire when capture is lost, so the canvas must reset on it exactly
+    // like `moveSurface`/`cameraJoystick` already do (mobile_controls.ts).
+    const { canvas } = installMobileControlDom();
+    const lookActive: boolean[] = [];
+    const lookVectors: Array<{ x: number; y: number }> = [];
+    const input = {
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: (active: boolean) => {
+        lookActive.push(active);
+      },
+      setTouchLookVector: (look: { x: number; y: number }) => {
+        lookVectors.push(look);
+      },
+      applyTouchLookDelta: () => {},
+      zoomBy: () => {},
+    } as unknown as Input;
+
+    new MobileControls(input, mobileCallbacks()).start();
+
+    canvas.dispatchEvent(
+      pointerEvent('pointerdown', {
+        pointerId: 33,
+        pointerType: 'touch',
+        clientX: 100,
+        clientY: 100,
+      }),
+    );
+    canvas.dispatchEvent(
+      pointerEvent('pointermove', {
+        pointerId: 33,
+        pointerType: 'touch',
+        clientX: 140,
+        clientY: 120,
+      }),
+    );
+    expect(lookActive).toEqual([true]);
+
+    // No pointerup/pointercancel: the browser just drops capture.
+    canvas.dispatchEvent(
+      pointerEvent('lostpointercapture', { pointerId: 33, pointerType: 'touch' }),
+    );
+
+    expect(lookActive).toEqual([true, false]);
+    expect(lookVectors.at(-1)).toEqual({ x: 0, y: 0 });
+
+    // A fresh single-finger swipe afterward must rotate normally again, not
+    // stay locked out.
+    canvas.dispatchEvent(
+      pointerEvent('pointerdown', {
+        pointerId: 34,
+        pointerType: 'touch',
+        clientX: 100,
+        clientY: 100,
+      }),
+    );
+    canvas.dispatchEvent(
+      pointerEvent('pointermove', {
+        pointerId: 34,
+        pointerType: 'touch',
+        clientX: 140,
+        clientY: 120,
+      }),
+    );
+    expect(lookActive).toEqual([true, false, true]);
+  });
+
   it('cancels canvas swipe rotation when a second finger starts guarded pinch zoom', () => {
     const { canvas } = installMobileControlDom();
     const deltas: Array<{ dx: number; dy: number }> = [];
@@ -1311,6 +1408,100 @@ describe('MobileControls pointer lifecycle', () => {
     expect(zooms).toHaveLength(2);
     expect(zooms[0]).toBeGreaterThan(0);
     expect(zooms[1]).toBeLessThan(0);
+  });
+
+  it('keeps a pinch alive when the takeover release echoes back as lostpointercapture', async () => {
+    // Regression test: releaseSwipeLook() calls releasePointerCapture() on the
+    // swipe-look pointer when a second finger lands (onPinchDown at size 2).
+    // That explicit release also fires lostpointercapture per spec, exactly
+    // like an implicit iOS capture loss. Without the releasingCaptureForPointer
+    // guard, the canvas lostpointercapture handler (mobile_controls.ts:429)
+    // treats that echo as a real capture loss and runs onPinchEnd for the
+    // pointer that just became part of the pinch, deleting it from
+    // pinchPointers and nulling pinchPrevDist: the pinch that just started is
+    // dead on arrival and stays dead (only pointerdown re-adds a pointer).
+    //
+    // The fake DOM's releasePointerCapture() queues its lostpointercapture echo
+    // with queueMicrotask to match real non-reentrant browser timing, so this
+    // test must await a microtask tick before asserting: a synchronous body
+    // returns before the echo (and thus the guard) ever runs, which is why an
+    // earlier version of this test still passed with the guard's early-return
+    // removed. Flushing the microtask queue here is what makes it decisive.
+    const { canvas } = installMobileControlDom();
+    const zooms: number[] = [];
+    const lookActive: boolean[] = [];
+    const input = {
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: (active: boolean) => {
+        lookActive.push(active);
+      },
+      setTouchLookVector: () => {},
+      applyTouchLookDelta: () => {},
+      zoomBy: (delta: number) => {
+        zooms.push(delta);
+      },
+    } as unknown as Input;
+
+    new MobileControls(input, mobileCallbacks()).start();
+
+    // First finger: starts swipe-look (moves past the deadzone so lookActive
+    // latches true and pointer capture is actually held, matching the fake
+    // DOM's captured-set guard on releasePointerCapture).
+    canvas.dispatchEvent(
+      pointerEvent('pointerdown', {
+        pointerId: 41,
+        pointerType: 'touch',
+        clientX: 100,
+        clientY: 100,
+      }),
+    );
+    canvas.dispatchEvent(
+      pointerEvent('pointermove', {
+        pointerId: 41,
+        pointerType: 'touch',
+        clientX: 130,
+        clientY: 100,
+      }),
+    );
+    expect(lookActive).toEqual([true]);
+
+    // Second finger lands: triggers the pinch takeover, which releases the
+    // first finger's swipe-look capture and echoes lostpointercapture for it.
+    canvas.dispatchEvent(
+      pointerEvent('pointerdown', {
+        pointerId: 42,
+        pointerType: 'touch',
+        clientX: 200,
+        clientY: 100,
+      }),
+    );
+    // Let the fake DOM's queued lostpointercapture echo actually fire before
+    // asserting, otherwise the guard it exercises never runs and this test
+    // would pass whether or not the production code has the fix.
+    await Promise.resolve();
+    expect(lookActive).toEqual([true, false]);
+
+    // The pinch must survive the echo: a move on both fingers should still
+    // register as a guarded pinch zoom, not be silently dropped.
+    canvas.dispatchEvent(
+      pointerEvent('pointermove', {
+        pointerId: 41,
+        pointerType: 'touch',
+        clientX: 90,
+        clientY: 100,
+      }),
+    );
+    canvas.dispatchEvent(
+      pointerEvent('pointermove', {
+        pointerId: 42,
+        pointerType: 'touch',
+        clientX: 210,
+        clientY: 100,
+      }),
+    );
+
+    expect(zooms.length).toBeGreaterThan(0);
   });
 
   it('does not zoom for small two-finger jitter', () => {

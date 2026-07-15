@@ -17,6 +17,7 @@ import {
   critFractionFromRating,
   EQUIP_SLOTS,
   hasteFractionFromRating,
+  hitFractionFromRating,
   SPELL_POWER_PER_INT,
 } from './types';
 
@@ -67,6 +68,8 @@ function baseEntity(id: number, pos: Vec3): Entity {
     critChance: 0.05,
     critRating: 0,
     hasteRating: 0,
+    hitRating: 0,
+    hitBonus: 0,
     critDmgSpellBonus: 0,
     critDmgPhysBonus: 0,
     critDmgHealBonus: 0,
@@ -110,6 +113,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     sitting: false,
     eating: null,
     drinking: null,
+    weaponStowed: false,
     aiState: 'idle',
     tappedById: null,
     pulseTimer: 0,
@@ -234,6 +238,7 @@ export function recalcPlayerStats(
   let bonusSp = 0; // flat Spell Power from gear affixes + buff_spellpower auras
   let bonusCritRating = 0;
   let bonusHasteRating = 0;
+  let bonusHitRating = 0;
   let bonusPvpOffenseRating = 0;
   let bonusPvpDefenseRating = 0;
   for (const slot of EQUIP_SLOTS) {
@@ -251,6 +256,7 @@ export function recalcPlayerStats(
     bonusSp += item.spellPower ?? 0;
     bonusCritRating += item.critRating ?? 0;
     bonusHasteRating += item.hasteRating ?? 0;
+    bonusHitRating += item.hitRating ?? 0;
     bonusPvpOffenseRating += item.pvpOffenseRating ?? 0;
     bonusPvpDefenseRating += item.pvpDefenseRating ?? 0;
     if (item.stats) {
@@ -470,6 +476,11 @@ export function recalcPlayerStats(
   e.spellPower = Math.max(0, Math.round(s.int * SPELL_POWER_PER_INT + bonusSp));
   e.critRating = bonusCritRating + setEff.critRating;
   e.hasteRating = bonusHasteRating + setEff.hasteRating;
+  // Hit rating (gear + set bonuses) folds into a hit fraction that combat subtracts
+  // from miss (swingMissChance) and spell resist (spell_resist.ts). It answers the
+  // Heroic +3 above-level penalty; unlike crit it has no higher-level suppression.
+  e.hitRating = bonusHitRating + setEff.hitRating;
+  e.hitBonus = hitFractionFromRating(e.hitRating);
   const hasteFrac = setEff.haste + hasteFractionFromRating(e.hasteRating);
   // Haste drives all three channels: faster melee and ranged auto-attack swings
   // AND shorter spell casts/channels.

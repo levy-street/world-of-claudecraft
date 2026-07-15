@@ -36,7 +36,7 @@ const env = releaseTier ? { ...process.env, I18N_RELEASE_TIER: '1' } : process.e
 const I18N_ARTIFACTS = [
   'src/ui/i18n.resolved.generated',
   'src/admin/i18n.resolved.generated',
-  'src/ui/i18n.status.summary.json',
+  'src/ui/i18n.catalog/translation_keys.generated.ts',
 ];
 
 const steps = [

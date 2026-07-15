@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { Pool } from 'pg';
+import { Pool, type QueryResult } from 'pg';
 import {
   type AccountFlair,
   EMPTY_ACCOUNT_FLAIR,
@@ -26,6 +26,16 @@ import {
   runMarketBackfill,
 } from './market_backfill';
 import { OAUTH_SCHEMA } from './oauth_db';
+import {
+  closeOrphanPlayerSessions,
+  closePlayerSession,
+  openPlayerSession,
+  PLAYER_METRICS_CONCURRENT_INDEX_SQL,
+  PLAYER_METRICS_INVALID_INDEX_CHECK_SQL,
+  PLAYER_METRICS_INVALID_INDEX_DROP_SQL,
+  PLAYER_METRICS_SCHEMA,
+  recordCharacterCreation,
+} from './player_metrics_db';
 import { RATELIMIT_PRUNE_SQL, RATELIMIT_SCHEMA } from './ratelimit_db';
 import { REALM } from './realm';
 import { chooseArchiveName } from './reclaim_name';
@@ -63,11 +73,109 @@ export const DATABASE_URL =
   })();
 
 // Max Postgres clients this realm process keeps in its pool (count). Shared
-// across the HTTP request path and the game loop; deliberately no idle/connection
-// timeout override, so those keep pg's own defaults.
+// across the HTTP request path and the game loop. The pool is timeout-bounded on
+// every axis below so a slow or unreachable database degrades into fast, isolated
+// query failures instead of a process-wide stall.
 export const DB_POOL_MAX_CLIENTS = 10;
 
-export const pool = new Pool({ connectionString: DATABASE_URL, max: DB_POOL_MAX_CLIENTS });
+// Pool checkout / connect wait: how long pool.connect() (and every pool.query,
+// which checks a client out first) may block waiting for a free client or a new
+// TCP connect before it rejects. A slow database must fail a request fast rather
+// than queue the whole handshake path behind an exhausted pool forever.
+export const DB_POOL_CONNECT_TIMEOUT_MS = 5000;
+
+// Server-side default statement timeout per session, applied as a connection
+// startup parameter so every query on every pooled client is bounded by the
+// database itself. The known heavy aggregates raise it per-transaction via
+// runWithStatementTimeout; any ordinary request query that runs past this is a
+// runaway and the database cancels it.
+export const DB_STATEMENT_TIMEOUT_MS = 15_000;
+
+// The raised per-transaction allowance for the known heavy reads (the cached
+// leaderboard / board / metrics aggregates and the final character save, plus the
+// on-demand admin reads: the sessions-by-day chart, the client perf summary, the
+// account-detail playtime aggregate, and the chat-log prune), applied via
+// runWithStatementTimeout. Bounded so even an exempted scan that goes runaway still
+// dies rather than pinning a pooled client indefinitely.
+export const DB_HEAVY_STATEMENT_TIMEOUT_MS = 60_000;
+
+// Client-side backstop timeout per connection. query_timeout is enforced in the
+// driver, NOT the database, so a SET LOCAL cannot lift it: it MUST sit strictly
+// above the heaviest server-side allowance or it would kill the very queries
+// runWithStatementTimeout raises DB_HEAVY_STATEMENT_TIMEOUT_MS for. The server-side
+// statement_timeout is the real working limit; this only catches a black-holed
+// server that accepted a query and then never answers (so no server-side timer
+// ever fires), one layer outside the heavy allowance.
+export const DB_QUERY_TIMEOUT_MS = DB_HEAVY_STATEMENT_TIMEOUT_MS + 5000;
+
+export const pool = new Pool({
+  connectionString: DATABASE_URL,
+  max: DB_POOL_MAX_CLIENTS,
+  connectionTimeoutMillis: DB_POOL_CONNECT_TIMEOUT_MS,
+  statement_timeout: DB_STATEMENT_TIMEOUT_MS,
+  query_timeout: DB_QUERY_TIMEOUT_MS,
+});
+
+// An idle pooled client can emit 'error' with no query in flight (a backend
+// termination, a dropped TCP connection). Unhandled, pg re-emits it on the Pool
+// where it becomes an uncaught exception that crashes the realm process. Swallow
+// it to a logged, counted event; pg discards the broken client and the next
+// checkout transparently opens a fresh one. Dev-channel English is fine here (a
+// log, never player text). The real pg Pool is an EventEmitter; a few db-layer
+// unit tests replace it with a minimal fake that omits .on, so guard the
+// registration by capability rather than force every such fake to grow the event
+// surface (the real registration is exercised in tests/server/tunables.test.ts).
+let poolClientErrorCount = 0;
+if (typeof pool.on === 'function') {
+  pool.on('error', (err) => {
+    poolClientErrorCount++;
+    console.error('pg pool: idle client error (client discarded)', err);
+  });
+}
+
+/** Count of idle pooled-client 'error' events seen since boot (tests + future metrics). */
+export function getPoolClientErrorCount(): number {
+  return poolClientErrorCount;
+}
+
+/**
+ * Run `fn` inside ONE transaction on a dedicated pooled client whose
+ * statement_timeout is raised to `timeoutMs` for the duration (SET LOCAL, so it
+ * reverts at COMMIT/ROLLBACK and never leaks to the next checkout). For the known
+ * heavy reads whose legitimate runtime can exceed the default DB_STATEMENT_TIMEOUT_MS.
+ * The wrapped `query` handed to `fn` runs on the same client inside the same
+ * transaction, so every statement it issues is covered by the raised timeout. The
+ * transaction runs at the default READ COMMITTED isolation, where each statement
+ * takes its own snapshot: this raises the allowance for every statement but does
+ * NOT give a multi-statement read one consistent snapshot.
+ *
+ * SET LOCAL cannot take a bind parameter, so `timeoutMs` is interpolated into the
+ * statement text as an integer; validating it as a non-negative safe integer here
+ * is therefore the injection guard, since no other value can reach the SQL text.
+ */
+export async function runWithStatementTimeout<T>(
+  timeoutMs: number,
+  fn: (query: (text: string, values?: unknown[]) => Promise<QueryResult>) => Promise<T>,
+): Promise<T> {
+  if (!Number.isSafeInteger(timeoutMs) || timeoutMs < 0) {
+    throw new Error(
+      `runWithStatementTimeout: timeoutMs must be a non-negative safe integer, got ${timeoutMs}`,
+    );
+  }
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    await client.query(`SET LOCAL statement_timeout = ${timeoutMs}`);
+    const result = await fn((text, values) => client.query(text, values));
+    await client.query('COMMIT');
+    return result;
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+}
 
 const REALM_SQL_DEFAULT = REALM.replace(/'/g, "''");
 const LIFETIME_XP_EXPR = "((state->>'lifetimeXp')::bigint)";
@@ -339,6 +447,14 @@ CREATE TABLE IF NOT EXISTS character_leases (
   expires_at TIMESTAMPTZ NOT NULL
 );
 CREATE INDEX IF NOT EXISTS character_leases_holder ON character_leases(holder);
+-- Stamped from the authenticated account at every acquire (the ownership gate
+-- getCharacter(accountId, characterId) precedes the acquire, so this is always the
+-- character's true owner). It lets the owner reclaim a lease stranded by a dead or
+-- wedged process before its TTL expires. NULL rows predate this column and can never
+-- be stolen by the account-match arm (plain SQL equality makes a NULL account_id fail
+-- every predicate arm except expiry: fail closed). No default, no index, no backfill;
+-- the auth_tokens.scope ALTER above is the ADD COLUMN IF NOT EXISTS precedent.
+ALTER TABLE character_leases ADD COLUMN IF NOT EXISTS account_id INT;
 CREATE TABLE IF NOT EXISTS admin_online_samples (
   id BIGSERIAL PRIMARY KEY,
   realm TEXT NOT NULL DEFAULT '${REALM_SQL_DEFAULT}',
@@ -711,8 +827,50 @@ CREATE TABLE IF NOT EXISTS daily_reward_payouts (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   PRIMARY KEY (day, realm, rank)
 );
+ALTER TABLE daily_reward_payouts ADD COLUMN IF NOT EXISTS void_reason TEXT;
+ALTER TABLE daily_reward_payouts ADD COLUMN IF NOT EXISTS voided_by_id TEXT;
+ALTER TABLE daily_reward_payouts ADD COLUMN IF NOT EXISTS voided_by_username TEXT;
+ALTER TABLE daily_reward_payouts ADD COLUMN IF NOT EXISTS voided_at TIMESTAMPTZ;
+ALTER TABLE daily_reward_payouts ADD COLUMN IF NOT EXISTS signed_transaction TEXT;
 CREATE INDEX IF NOT EXISTS daily_reward_payouts_status
   ON daily_reward_payouts(status, day DESC, realm);
+CREATE TABLE IF NOT EXISTS daily_reward_payout_moderation_audit (
+  id BIGSERIAL PRIMARY KEY,
+  day TEXT NOT NULL,
+  realm TEXT NOT NULL,
+  rank INT NOT NULL,
+  account_id INT NOT NULL,
+  action TEXT NOT NULL CHECK (action IN ('void', 'restore')),
+  previous_status TEXT NOT NULL,
+  next_status TEXT NOT NULL,
+  reason TEXT NOT NULL,
+  actor_id TEXT NOT NULL,
+  actor_username TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS daily_reward_payout_moderation_target
+  ON daily_reward_payout_moderation_audit(day, realm, rank, created_at DESC);
+CREATE TABLE IF NOT EXISTS daily_reward_payout_attempts (
+  id BIGSERIAL PRIMARY KEY,
+  day TEXT NOT NULL,
+  realm TEXT NOT NULL,
+  rank INT NOT NULL,
+  kind TEXT NOT NULL CHECK (kind IN ('payout', 'resend')),
+  operation_id TEXT,
+  status TEXT NOT NULL CHECK (status IN ('prepared', 'paid', 'failed')),
+  tx_signature TEXT NOT NULL UNIQUE,
+  signed_transaction TEXT,
+  error TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  FOREIGN KEY (day, realm, rank) REFERENCES daily_reward_payouts(day, realm, rank)
+);
+CREATE INDEX IF NOT EXISTS daily_reward_payout_attempts_target
+  ON daily_reward_payout_attempts(day, realm, rank, created_at DESC);
+ALTER TABLE daily_reward_payout_attempts ADD COLUMN IF NOT EXISTS operation_id TEXT;
+CREATE UNIQUE INDEX IF NOT EXISTS daily_reward_payout_attempts_operation
+  ON daily_reward_payout_attempts(day, realm, rank, kind, operation_id)
+  WHERE operation_id IS NOT NULL;
 -- Shareable player cards (docs/prd/woc/player-card.md). One card per character;
 -- the PNG is composited client-side and stored here as bytes so any realm
 -- process (all share this database) can serve /p/<slug> and the OG image. slug
@@ -803,17 +961,43 @@ CREATE INDEX IF NOT EXISTS character_deeds_character_earned
   ON character_deeds(character_id, earned_at DESC);
 `;
 
+const SCHEMA_ADVISORY_LOCK_KEY = 0x57_4f_43_01; // "WOC\x01"
+
 export async function ensureSchema(): Promise<void> {
   // In the process-per-realm model several server processes boot against the
   // same database at once. Their idempotent CREATE/ALTER statements would
   // otherwise deadlock when run concurrently, so serialize schema setup behind
   // a transaction-scoped advisory lock (auto-released on COMMIT). The lock key
   // is an arbitrary constant shared by every process.
-  const client = await pool.connect();
+  //
+  // Boot runs on a DEDICATED client, never the pool: the pool carries a
+  // driver-side query_timeout, a per-query timer that SET LOCAL cannot lift,
+  // and the advisory-lock wait plus the one-shot market backfill may
+  // legitimately outlast any per-request budget. This client is constructed
+  // with the connection string alone, so no statement_timeout or query_timeout
+  // config applies to boot at all. pg's Client is resolved at call time rather
+  // than imported at module scope because many test suites module-mock 'pg'
+  // with a Pool-only factory and never boot the schema; a top-level named
+  // import would invalidate every one of those mocks.
+  const { Client } = await import('pg');
+  const client = new Client({ connectionString: DATABASE_URL });
   try {
+    // Inside the try so the finally's end() always runs, even on a connect
+    // failure (end() on a never-connected client is a harmless no-op).
+    await client.connect();
     await client.query('BEGIN');
-    await client.query('SELECT pg_advisory_xact_lock($1)', [0x57_4f_43_01]); // "WOC\x01"
+    // Boot DDL serializes on the advisory lock across every realm process, so it
+    // can legitimately wait far longer than any per-request budget. The dedicated
+    // client above escapes the pool's timeouts; this SET LOCAL additionally
+    // overrides any database- or role-level statement_timeout an operator may
+    // have set server-side (SET LOCAL reverts at COMMIT).
+    await client.query('SET LOCAL statement_timeout = 0');
+    await client.query('SELECT pg_advisory_xact_lock($1)', [SCHEMA_ADVISORY_LOCK_KEY]);
     await client.query(SCHEMA);
+    // Compact player analytics facts depend on accounts, characters, and
+    // play_sessions from the core schema. The tables start empty and collect
+    // lifecycle facts prospectively, so boot never runs a production backfill.
+    await client.query(PLAYER_METRICS_SCHEMA);
     await client.query(SOCIAL_SCHEMA);
     await client.query(OAUTH_SCHEMA);
     // Discord integration tables (links, oauth states, pending logins, reward
@@ -883,6 +1067,33 @@ export async function ensureSchema(): Promise<void> {
       );
     }
     await client.query('COMMIT');
+    // CREATE INDEX CONCURRENTLY cannot run inside the schema transaction. Keep
+    // the session-level form of the same advisory lock while running this
+    // post-commit migration so simultaneous realm boots cannot race the index
+    // name. The concurrent build permits normal play_sessions writes to continue.
+    // The boot transaction's SET LOCAL statement_timeout = 0 reverted at the
+    // COMMIT above, so re-disable it session-wide first: the advisory-lock wait
+    // and the concurrent build can both outlast an operator-set database- or
+    // role-level statement_timeout, and this dedicated client closes right
+    // after, so the session setting never leaks to pooled connections.
+    await client.query('SET statement_timeout = 0');
+    let concurrentMigrationLocked = false;
+    try {
+      await client.query('SELECT pg_advisory_lock($1)', [SCHEMA_ADVISORY_LOCK_KEY]);
+      concurrentMigrationLocked = true;
+      // A prior boot's build may have died mid-CONCURRENTLY (a deploy-watchdog
+      // restart, a crash), stranding an INVALID index that IF NOT EXISTS would
+      // treat as existing forever. Drop the carcass so the build self-heals.
+      const invalidIndex = await client.query(PLAYER_METRICS_INVALID_INDEX_CHECK_SQL);
+      if ((invalidIndex.rowCount ?? 0) > 0) {
+        await client.query(PLAYER_METRICS_INVALID_INDEX_DROP_SQL);
+      }
+      await client.query(PLAYER_METRICS_CONCURRENT_INDEX_SQL);
+    } finally {
+      if (concurrentMigrationLocked) {
+        await client.query('SELECT pg_advisory_unlock($1)', [SCHEMA_ADVISORY_LOCK_KEY]);
+      }
+    }
     // Open the market write gate only AFTER a successful COMMIT, so no market
     // write can land before the marker is durable. Opens on the no-op path too
     // (backfill.ran === false, i.e. the marker already existed).
@@ -891,7 +1102,8 @@ export async function ensureSchema(): Promise<void> {
     await client.query('ROLLBACK').catch(() => {});
     throw err;
   } finally {
-    client.release();
+    // Dedicated client, not a pool checkout: close the connection outright.
+    await client.end().catch(() => {});
   }
 }
 
@@ -2302,19 +2514,6 @@ export async function guildNameForCharacter(characterId: number): Promise<string
   return res.rows[0]?.name ?? null;
 }
 
-export async function createCharacter(
-  accountId: number,
-  name: string,
-  cls: PlayerClass,
-  state: CharacterState | null = null,
-): Promise<CharacterRow> {
-  const res = await pool.query(
-    'INSERT INTO characters (account_id, name, class, realm, state) VALUES ($1, $2, $3, $4, $5) RETURNING id, account_id, name, class, level, state, is_gm, force_rename',
-    [accountId, name, cls, REALM, state ? JSON.stringify(state) : null],
-  );
-  return res.rows[0];
-}
-
 export async function createCharacterCapped(
   accountId: number,
   name: string,
@@ -2344,6 +2543,7 @@ export async function createCharacterCapped(
       'INSERT INTO characters (account_id, name, class, realm, state) VALUES ($1, $2, $3, $4, $5) RETURNING id, account_id, name, class, level, state, is_gm, force_rename',
       [accountId, name, cls, REALM, state ? JSON.stringify(state) : null],
     );
+    await recordCharacterCreation(client, accountId, REALM);
     await client.query('COMMIT');
     return res.rows[0];
   } catch (err) {
@@ -2470,16 +2670,43 @@ export async function renameCharacter(
   return res.rows[0] ?? null;
 }
 
+// Persist a character row. Returns true when the write landed. When a leaseNonce is
+// given the UPDATE is fenced to the current lease holder+nonce in the SAME statement:
+// a displaced session (its lease reclaimed by a same-account takeover, which rotated
+// the nonce) matches no lease row, the UPDATE touches nothing, and this returns false
+// so the caller can refuse to overwrite the live session's state. The fence rides the
+// write statement itself and never a separate pre-check, because a check-then-write
+// pair would race the takeover that steals the lease between the two. The no-nonce path
+// (tests, resumes, meta-less sessions) writes unconditionally and returns true, exactly
+// as before.
 export async function saveCharacterState(
   characterId: number,
   level: number,
   state: CharacterState,
-): Promise<void> {
+  leaseNonce?: string,
+): Promise<boolean> {
   const cleanState = sanitizeRemovedZone1Content(state).state;
-  await pool.query(
-    'UPDATE characters SET level = $2, state = $3, updated_at = now() WHERE id = $1',
-    [characterId, level, JSON.stringify(cleanState)],
+  // A character save should wait out a slow database rather than lose state, so
+  // run it on the raised heavy allowance; still bounded so a leave / shutdown
+  // flush cannot hang past the container stop grace.
+  const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
+    leaseNonce === undefined
+      ? query('UPDATE characters SET level = $2, state = $3, updated_at = now() WHERE id = $1', [
+          characterId,
+          level,
+          JSON.stringify(cleanState),
+        ])
+      : query(
+          `UPDATE characters SET level = $2, state = $3, updated_at = now()
+            WHERE id = $1
+              AND EXISTS (
+                SELECT 1 FROM character_leases
+                 WHERE character_id = $1 AND holder = $4 AND nonce = $5
+              )`,
+          [characterId, level, JSON.stringify(cleanState), PROCESS_LEASE_HOLDER, leaseNonce],
+        ),
   );
+  return leaseNonce === undefined ? true : (res.rowCount ?? 0) > 0;
 }
 
 // Persist a character row AND this realm's World Market + Ravenpost mail blobs
@@ -2496,7 +2723,8 @@ export async function saveCharacterAndMarketState(
   state: CharacterState,
   market: MarketSave,
   mail: MailSave,
-): Promise<void> {
+  leaseNonce?: string,
+): Promise<boolean> {
   // Gate the escrow flush on the boot backfill just like saveMarketState:
   // this writes the realm-market row, so it must not run before ensureSchema
   // has confirmed the marker and opened the gate. Checked before any pool work.
@@ -2505,10 +2733,36 @@ export async function saveCharacterAndMarketState(
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
-    await client.query(
-      'UPDATE characters SET level = $2, state = $3, updated_at = now() WHERE id = $1',
-      [characterId, level, JSON.stringify(cleanState)],
-    );
+    // Same rationale as saveCharacterState: a logout / shutdown escrow flush should
+    // wait out a slow database rather than lose the character + market blobs, so
+    // raise this transaction to the heavy allowance; still bounded so shutdown
+    // cannot hang past the container stop grace. SET LOCAL reverts at COMMIT.
+    await client.query(`SET LOCAL statement_timeout = ${DB_HEAVY_STATEMENT_TIMEOUT_MS}`);
+    // Fence the bag half on the current lease holder+nonce when one is given (same
+    // in-statement fence as saveCharacterState). If a same-account takeover rotated
+    // the nonce out from under this displaced session, the character UPDATE matches
+    // no row: ROLL BACK before touching the market/mail rows and report false. The
+    // escrow halves must never land without the bag half, and a displaced session
+    // must not overwrite the realm's shared Market/Ravenpost escrow either.
+    const charRes =
+      leaseNonce === undefined
+        ? await client.query(
+            'UPDATE characters SET level = $2, state = $3, updated_at = now() WHERE id = $1',
+            [characterId, level, JSON.stringify(cleanState)],
+          )
+        : await client.query(
+            `UPDATE characters SET level = $2, state = $3, updated_at = now()
+              WHERE id = $1
+                AND EXISTS (
+                  SELECT 1 FROM character_leases
+                   WHERE character_id = $1 AND holder = $4 AND nonce = $5
+                )`,
+            [characterId, level, JSON.stringify(cleanState), PROCESS_LEASE_HOLDER, leaseNonce],
+          );
+    if (leaseNonce !== undefined && (charRes.rowCount ?? 0) === 0) {
+      await client.query('ROLLBACK');
+      return false;
+    }
     await client.query(
       `INSERT INTO world_state (key, data, updated_at) VALUES ($1, $2, now())
        ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
@@ -2523,6 +2777,7 @@ export async function saveCharacterAndMarketState(
       [mailStateKey(REALM), JSON.stringify(mail)],
     );
     await client.query('COMMIT');
+    return true;
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
     throw err;
@@ -2568,8 +2823,9 @@ export async function topArenaRatings(
     fmt === '2v2'
       ? "COALESCE((state->>'arena2v2Losses')::int, 0)"
       : "COALESCE((state->>'arena1v1Losses')::int, (state->>'arenaLosses')::int, 0)";
-  const res = await pool.query(
-    `SELECT name, class, level,
+  const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
+    query(
+      `SELECT name, class, level,
             ${ratingExpr} AS rating,
             ${winsExpr} AS wins,
             ${lossesExpr} AS losses
@@ -2581,7 +2837,8 @@ export async function topArenaRatings(
                      WHERE a.id = characters.account_id AND ${ELIGIBLE_ACCOUNT_SQL})
       ORDER BY rating DESC, wins DESC, name ASC
       LIMIT $2`,
-    [REALM, Math.max(1, Math.min(100, limit))],
+      [REALM, Math.max(1, Math.min(100, limit))],
+    ),
   );
   return res.rows.map((r) => ({
     name: r.name,
@@ -2622,9 +2879,10 @@ export async function topLifetimeXp(
   // Capped at LEADERBOARD_MAX (1000): the in-game board pages through this whole
   // cached window, so a realm with hundreds of max-level players is fully ranked.
   const cap = Math.max(1, Math.min(LEADERBOARD_MAX, limit));
-  const res = opts.global
-    ? await pool.query(
-        `SELECT name, class, level, realm,
+  const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
+    opts.global
+      ? query(
+          `SELECT name, class, level, realm,
                 COALESCE((state->>'lifetimeXp')::bigint, 0) AS lifetime_xp,
                 COALESCE((state->>'prestigeRank')::int, 0)  AS prestige_rank,
                 state->>'activeTitle' AS active_title
@@ -2635,10 +2893,10 @@ export async function topLifetimeXp(
                          WHERE a.id = characters.account_id AND ${ELIGIBLE_ACCOUNT_SQL})
           ORDER BY lifetime_xp DESC, level DESC, name ASC
           LIMIT $1`,
-        [cap],
-      )
-    : await pool.query(
-        `SELECT name, class, level, realm,
+          [cap],
+        )
+      : query(
+          `SELECT name, class, level, realm,
                 COALESCE((state->>'lifetimeXp')::bigint, 0) AS lifetime_xp,
                 COALESCE((state->>'prestigeRank')::int, 0)  AS prestige_rank,
                 state->>'activeTitle' AS active_title
@@ -2649,8 +2907,9 @@ export async function topLifetimeXp(
                          WHERE a.id = characters.account_id AND ${ELIGIBLE_ACCOUNT_SQL})
           ORDER BY lifetime_xp DESC, level DESC, name ASC
           LIMIT $2`,
-        [REALM, cap],
-      );
+          [REALM, cap],
+        ),
+  );
   return res.rows.map((r) => ({
     name: r.name,
     class: r.class,
@@ -2702,23 +2961,25 @@ export async function topGuilds(
                          WHERE a.id = c.account_id AND ${ELIGIBLE_ACCOUNT_SQL})`;
   const groupOrder = `GROUP BY g.id, g.name, g.realm
           ORDER BY total_lifetime_xp DESC, member_count DESC, g.name ASC`;
-  const res = opts.global
-    ? await pool.query(
-        `SELECT ${selectAgg}
+  const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
+    opts.global
+      ? query(
+          `SELECT ${selectAgg}
            ${fromJoin}
           WHERE c.state IS NOT NULL
           ${groupOrder}
           LIMIT $1`,
-        [cap],
-      )
-    : await pool.query(
-        `SELECT ${selectAgg}
+          [cap],
+        )
+      : query(
+          `SELECT ${selectAgg}
            ${fromJoin}
           WHERE g.realm = $1 AND c.state IS NOT NULL
           ${groupOrder}
           LIMIT $2`,
-        [REALM, cap],
-      );
+          [REALM, cap],
+        ),
+  );
   return res.rows.map((r) => ({
     name: r.name,
     realm: r.realm,
@@ -2757,8 +3018,17 @@ export async function deedsBoardRanked(
   renowns: readonly number[],
   floor: number,
 ): Promise<{ ranked: RankedDeedsAccount[]; totalRanked: number; unknownDeedIds: string[] }> {
-  const res = await pool.query(
-    `WITH renown(deed_id, renown) AS (
+  // Both reads run in ONE raised-timeout transaction: the roll-up is a full-table
+  // hash aggregate and the unknown-id side read a DISTINCT scan, so a large
+  // character_deeds table can legitimately exceed the default statement timeout.
+  // The shared transaction raises the allowance once and reuses one client; it
+  // does NOT give the two reads a single snapshot (READ COMMITTED, see the
+  // runWithStatementTimeout header), so a commit landing between them can skew
+  // the pair by one refresh cycle. Acceptable here: the board is a TTL-cached
+  // cosmetic aggregate and the next refresh converges.
+  return runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, async (query) => {
+    const res = await query(
+      `WITH renown(deed_id, renown) AS (
        SELECT * FROM unnest($1::text[], $2::int[]) AS u(deed_id, renown) WHERE u.renown > 0
      ),
      per_deed AS (
@@ -2802,29 +3072,30 @@ export async function deedsBoardRanked(
        FROM account_agg aa
        JOIN display d ON d.account_id = aa.account_id
       ORDER BY aa.renown DESC, aa.completion_time ASC, aa.account_id ASC`,
-    [deedIds, renowns, floor],
-  );
-  const ranked: RankedDeedsAccount[] = res.rows.map((r) => ({
-    accountId: Number(r.account_id),
-    renown: Number(r.renown),
-    deedCount: Number(r.deed_count),
-    // TIMESTAMPTZ back to epoch ms (Date via pg; string tolerated for driver
-    // config drift), matching computeDeedsBoard's earnedMs.
-    completionTime: new Date(r.completion_time).getTime(),
-    displayCharacterId: Number(r.display_character_id),
-  }));
-  // Deed ids present in character_deeds but absent from the content table
-  // entirely (removed or renamed content), for the same warn computeDeedsBoard
-  // emitted. A cheap side read kept off the aggregation's hot path: scored rows
-  // already excluded these via the renown join, so this never shrinks a score,
-  // only surfaces the ids. A zero-renown KNOWN deed is not flagged (its id is in
-  // $1), matching computeDeedsBoard's def-present test.
-  const unknown = await pool.query(
-    `SELECT DISTINCT deed_id FROM character_deeds WHERE deed_id <> ALL($1::text[])`,
-    [deedIds],
-  );
-  const unknownDeedIds = unknown.rows.map((r) => String(r.deed_id)).sort();
-  return { ranked, totalRanked: ranked.length, unknownDeedIds };
+      [deedIds, renowns, floor],
+    );
+    const ranked: RankedDeedsAccount[] = res.rows.map((r) => ({
+      accountId: Number(r.account_id),
+      renown: Number(r.renown),
+      deedCount: Number(r.deed_count),
+      // TIMESTAMPTZ back to epoch ms (Date via pg; string tolerated for driver
+      // config drift), matching computeDeedsBoard's earnedMs.
+      completionTime: new Date(r.completion_time).getTime(),
+      displayCharacterId: Number(r.display_character_id),
+    }));
+    // Deed ids present in character_deeds but absent from the content table
+    // entirely (removed or renamed content), for the same warn computeDeedsBoard
+    // emitted. A cheap side read kept off the aggregation's hot path: scored rows
+    // already excluded these via the renown join, so this never shrinks a score,
+    // only surfaces the ids. A zero-renown KNOWN deed is not flagged (its id is in
+    // $1), matching computeDeedsBoard's def-present test.
+    const unknown = await query(
+      `SELECT DISTINCT deed_id FROM character_deeds WHERE deed_id <> ALL($1::text[])`,
+      [deedIds],
+    );
+    const unknownDeedIds = unknown.rows.map((r) => String(r.deed_id)).sort();
+    return { ranked, totalRanked: ranked.length, unknownDeedIds };
+  });
 }
 
 /** The display-character fill for ranked accounts: name, realm, class, level,
@@ -3103,26 +3374,21 @@ export async function openPlaySession(
   characterId: number,
   characterName: string,
   meta: RequestMetadata = {},
+  initialLevel = 1,
 ): Promise<number> {
-  const res = await pool.query(
-    `INSERT INTO play_sessions (account_id, character_id, character_name, ip_address, user_agent)
-     VALUES ($1, $2, $3, $4, $5)
-     RETURNING id`,
-    [
-      accountId,
-      characterId,
-      characterName,
-      cleanMetadataText(meta.ip, 128),
-      cleanMetadataText(meta.userAgent, 512),
-    ],
-  );
-  return res.rows[0].id;
+  return openPlayerSession(pool, {
+    accountId,
+    characterId,
+    characterName,
+    realm: REALM,
+    initialLevel,
+    ipAddress: cleanMetadataText(meta.ip, 128),
+    userAgent: cleanMetadataText(meta.userAgent, 512),
+  });
 }
 
-export async function closePlaySession(sessionId: number): Promise<void> {
-  await pool.query('UPDATE play_sessions SET ended_at = now() WHERE id = $1 AND ended_at IS NULL', [
-    sessionId,
-  ]);
+export async function closePlaySession(sessionId: number, maxLevel = 1): Promise<void> {
+  await closePlayerSession(pool, sessionId, REALM, maxLevel);
 }
 
 // Sessions left open by a crash have an unknown duration; close them at their
@@ -3130,16 +3396,7 @@ export async function closePlaySession(sessionId: number): Promise<void> {
 // current realm: in the process-per-realm model peers share one database, and
 // an unscoped UPDATE would force-close sessions still live on other realms.
 export async function closeOrphanSessions(): Promise<number> {
-  const res = await pool.query(
-    `UPDATE play_sessions ps
-        SET ended_at = ps.started_at
-       FROM characters c
-      WHERE ps.character_id = c.id
-        AND c.realm = $1
-        AND ps.ended_at IS NULL`,
-    [REALM],
-  );
-  return res.rowCount ?? 0;
+  return closeOrphanPlayerSessions(pool, REALM);
 }
 
 // ---------------------------------------------------------------------------
@@ -3164,31 +3421,42 @@ export const LEASE_TTL_SECONDS = 90;
 export const PROCESS_LEASE_HOLDER = `${REALM}#${randomUUID()}`;
 
 // Claim (or renew) the lease for one character. Returns true when this process
-// now holds it, false when a live lease belongs to another holder (fail closed:
-// the caller must refuse the join). The ON CONFLICT UPDATE fires only when the
-// existing lease has expired (crash reclaim) OR is already ours (a linkdead
-// resume on the same process re-extends its own lease instead of refusing
-// itself). A live foreign lease matches neither arm, so rowCount stays 0. Every
-// acquire stamps a fresh nonce (the caller passes a per-join value): a later
-// releaseCharacterLease matches on that nonce, so an older join's stale release
-// cannot delete the row this acquire re-stamped.
+// now holds it, false when a live lease belongs to a foreign holder AND a foreign
+// account (fail closed: the caller must refuse the join). The ON CONFLICT UPDATE
+// fires when the existing lease has expired (crash reclaim) OR is already ours (a
+// linkdead resume on the same process re-extends its own lease instead of refusing
+// itself) OR belongs to the same account (the owner reclaiming a lease stranded by
+// a dead or wedged process before its TTL expires). A live lease that is none of
+// those matches no arm, so rowCount stays 0. Every acquire stamps a fresh nonce
+// (the caller passes a per-join value): a later releaseCharacterLease matches on
+// that nonce, so an older join's stale release cannot delete the row this acquire
+// re-stamped, and a same-account reclaim rotates the nonce out from under any
+// displaced session, whose fenced writes then fail. accountId is the authenticated
+// owner (getCharacter gated the caller before this runs).
 export async function acquireCharacterLease(
   characterId: number,
+  accountId: number,
   nonce: string,
   holder = PROCESS_LEASE_HOLDER,
 ): Promise<boolean> {
   const res = await pool.query(
-    `INSERT INTO character_leases (character_id, realm, holder, nonce, acquired_at, heartbeat_at, expires_at)
-     VALUES ($1, $2, $3, $4, now(), now(), now() + make_interval(secs => $5))
+    // The nonce rotation needs no extra code: this ONE atomic statement already
+    // re-stamps nonce = EXCLUDED.nonce, which IS the fence rotation. The account arm
+    // uses PLAIN EQUALITY (never IS NOT DISTINCT FROM): SQL NULL semantics make a
+    // NULL account_id row (a lease that predates this column) fail the account arm
+    // and every arm except expiry, which is exactly the locked fail-closed behavior.
+    `INSERT INTO character_leases (character_id, realm, holder, nonce, account_id, acquired_at, heartbeat_at, expires_at)
+     VALUES ($1, $2, $3, $4, $5, now(), now(), now() + make_interval(secs => $6))
      ON CONFLICT (character_id) DO UPDATE
        SET realm = EXCLUDED.realm,
            holder = EXCLUDED.holder,
            nonce = EXCLUDED.nonce,
+           account_id = EXCLUDED.account_id,
            acquired_at = now(),
            heartbeat_at = now(),
            expires_at = EXCLUDED.expires_at
-       WHERE character_leases.expires_at < now() OR character_leases.holder = EXCLUDED.holder`,
-    [characterId, REALM, holder, nonce, LEASE_TTL_SECONDS],
+       WHERE character_leases.expires_at < now() OR character_leases.holder = EXCLUDED.holder OR character_leases.account_id = EXCLUDED.account_id`,
+    [characterId, REALM, holder, nonce, accountId, LEASE_TTL_SECONDS],
   );
   return (res.rowCount ?? 0) > 0;
 }
@@ -3262,9 +3530,10 @@ export async function insertChatLogs(rows: ChatLogRow[]): Promise<void> {
 // Keeps the table bounded; CHAT_LOG_RETENTION_DAYS=0 disables pruning.
 export async function pruneChatLogs(retentionDays: number): Promise<number> {
   if (!Number.isFinite(retentionDays) || retentionDays <= 0) return 0;
-  const res = await pool.query(
-    `DELETE FROM chat_logs WHERE created_at < now() - ($1 || ' days')::interval`,
-    [String(Math.floor(retentionDays))],
+  const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
+    query(`DELETE FROM chat_logs WHERE created_at < now() - ($1 || ' days')::interval`, [
+      String(Math.floor(retentionDays)),
+    ]),
   );
   return res.rowCount ?? 0;
 }

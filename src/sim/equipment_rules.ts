@@ -59,6 +59,18 @@ export function resolveEquipSlot(
   return 'ring1';
 }
 
+// Whether a concrete equipment key can hold `item`, i.e. whether an aimed slot
+// (a paperdoll drop target) is legal for the dragged piece. Rings declare the
+// slot KIND 'ring' and so accept either finger; every other item names its one
+// equipment key. Slotless items (consumables, materials) accept nothing. This is
+// the ONE rule the equip path and the HUD drop target share, so the client's
+// hover feedback and the server's re-validation can never disagree.
+export function slotAcceptsItem(item: ItemDef, slot: EquipSlot): boolean {
+  if (!item.slot) return false;
+  if (item.slot === 'ring') return slot === 'ring1' || slot === 'ring2';
+  return item.slot === slot;
+}
+
 export function maxArmorTypeForClass(cls: PlayerClass): ArmorType {
   if (MAIL_CLASSES.has(cls)) return 'mail';
   if (LEATHER_CLASSES.has(cls)) return 'leather';

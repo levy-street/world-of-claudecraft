@@ -12,9 +12,18 @@ const h = vi.hoisted(() => {
   // and throws when it is null. Answer that one query from a mutable flag so a test
   // can flip it to null to exercise the throw; every other query returns empty rows
   // (the existing assertions only inspect `calls`, so they are unaffected).
-  const state = { rateLimitsExists: true };
+  const state = { rateLimitsExists: true, invalidMetricsIndexExists: false };
   const query = vi.fn((sql: string) => {
     calls.push(String(sql));
+    // The invalid-carcass check for the post-commit metrics index build; a test
+    // flips the flag to exercise the repair arm. Checked before the to_regclass
+    // arm because the check SQL also resolves the index via to_regclass.
+    if (String(sql).includes('indisvalid')) {
+      return Promise.resolve({
+        rows: state.invalidMetricsIndexExists ? [{ found: 1 }] : [],
+        rowCount: state.invalidMetricsIndexExists ? 1 : 0,
+      });
+    }
     if (String(sql).includes('to_regclass')) {
       return Promise.resolve({
         rows: [{ reg: state.rateLimitsExists ? 'public.rate_limits' : null }],
@@ -28,11 +37,23 @@ const h = vi.hoisted(() => {
     state,
     query,
     connect: vi.fn(() => Promise.resolve({ query, release: vi.fn() })),
+    clientConfigs: [] as unknown[],
   };
 });
 vi.mock('pg', () => ({
   Pool: vi.fn(function Pool() {
     return { query: h.query, connect: h.connect };
+  }),
+  // ensureSchema boots on a dedicated Client (resolved at call time), never a
+  // pool checkout; record each construction config so a test can pin that the
+  // boot client escapes the pool's timeout configuration.
+  Client: vi.fn(function Client(config: unknown) {
+    h.clientConfigs.push(config);
+    return {
+      connect: vi.fn(() => Promise.resolve()),
+      query: h.query,
+      end: vi.fn(() => Promise.resolve()),
+    };
   }),
 }));
 
@@ -46,6 +67,23 @@ describe('ensureSchema wires every schema module at boot', () => {
   beforeEach(() => {
     h.calls.length = 0;
     h.state.rateLimitsExists = true;
+    h.state.invalidMetricsIndexExists = false;
+    h.clientConfigs.length = 0;
+  });
+
+  it('boots on a dedicated client with no pool timeout config (the driver query_timeout must never cap the advisory-lock wait or the backfill)', async () => {
+    h.connect.mockClear();
+    await ensureSchema();
+    expect(h.clientConfigs.length).toBeGreaterThan(0);
+    const cfg = h.clientConfigs.at(-1) as Record<string, unknown>;
+    expect(typeof cfg.connectionString).toBe('string');
+    // query_timeout is a driver-side per-query timer that SET LOCAL cannot
+    // lift; the boot client must not carry it (nor any other pool deadline).
+    expect('query_timeout' in cfg).toBe(false);
+    expect('statement_timeout' in cfg).toBe(false);
+    expect('connectionTimeoutMillis' in cfg).toBe(false);
+    // The pool was never dipped into for boot work.
+    expect(h.connect).not.toHaveBeenCalled();
   });
 
   it('applies the Discord schema so its tables exist before the feature is enabled', async () => {
@@ -111,6 +149,52 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain('password_set');
   });
 
+  it('disables the statement timeout for the boot transaction before the advisory lock', async () => {
+    // Boot DDL serializes on the advisory lock across concurrent realm processes and
+    // may legitimately wait far past any request budget, so the boot transaction runs
+    // with statement_timeout disabled (SET LOCAL, reverts at COMMIT). The pool's own
+    // default statement_timeout would otherwise cancel schema setup under a pile-up.
+    await ensureSchema();
+    const setLocalIdx = h.calls.findIndex((c) => c === 'SET LOCAL statement_timeout = 0');
+    const lockIdx = h.calls.findIndex((c) => c.includes('pg_advisory_xact_lock'));
+    expect(setLocalIdx).toBeGreaterThanOrEqual(0);
+    // It must run before the advisory-lock wait it exists to protect.
+    expect(setLocalIdx).toBeLessThan(lockIdx);
+  });
+
+  it('applies payout void metadata and append-only moderation audit storage', async () => {
+    await ensureSchema();
+    const applied = h.calls.join('\n');
+    expect(applied).toContain(
+      'ALTER TABLE daily_reward_payouts ADD COLUMN IF NOT EXISTS void_reason TEXT',
+    );
+    expect(applied).toContain(
+      'ALTER TABLE daily_reward_payouts ADD COLUMN IF NOT EXISTS voided_by_id TEXT',
+    );
+    expect(applied).toContain(
+      'ALTER TABLE daily_reward_payouts ADD COLUMN IF NOT EXISTS voided_by_username TEXT',
+    );
+    expect(applied).toContain(
+      'ALTER TABLE daily_reward_payouts ADD COLUMN IF NOT EXISTS voided_at TIMESTAMPTZ',
+    );
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS daily_reward_payout_moderation_audit');
+    expect(applied).toContain("action TEXT NOT NULL CHECK (action IN ('void', 'restore'))");
+    expect(applied).toContain('actor_id TEXT NOT NULL');
+    expect(applied).toContain('actor_username TEXT NOT NULL');
+    expect(applied).toContain(
+      'ALTER TABLE daily_reward_payouts ADD COLUMN IF NOT EXISTS signed_transaction TEXT',
+    );
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS daily_reward_payout_attempts');
+    expect(applied).toContain("kind TEXT NOT NULL CHECK (kind IN ('payout', 'resend'))");
+    expect(applied).toContain(
+      'ALTER TABLE daily_reward_payout_attempts ADD COLUMN IF NOT EXISTS operation_id TEXT',
+    );
+    expect(applied).toContain(
+      'CREATE UNIQUE INDEX IF NOT EXISTS daily_reward_payout_attempts_operation',
+    );
+    expect(applied).toContain('tx_signature TEXT NOT NULL UNIQUE');
+  });
+
   it('applies the bank-system tables (character_leases, bank_ledger) idempotently', async () => {
     // Bank system tables: the per-character load lease and the append-only
     // bank op ledger both live inline in the core SCHEMA string. Pin them by name so
@@ -121,6 +205,11 @@ describe('ensureSchema wires every schema module at boot', () => {
     const applied = h.calls.join('\n');
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS character_leases');
     expect(applied).toContain('CREATE INDEX IF NOT EXISTS character_leases_holder');
+    // The same-account takeover column is added at boot on existing databases (the
+    // owner reclaiming a lease stranded by a dead process); additive and idempotent.
+    expect(applied).toContain(
+      'ALTER TABLE character_leases ADD COLUMN IF NOT EXISTS account_id INT',
+    );
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS bank_ledger');
     expect(applied).toContain('CREATE INDEX IF NOT EXISTS bank_ledger_character');
     expect(applied).toContain('CREATE INDEX IF NOT EXISTS bank_ledger_created');
@@ -183,6 +272,67 @@ describe('ensureSchema wires every schema module at boot', () => {
     const applied = h.calls.join('\n');
     expect(applied).toContain('pg_advisory_xact_lock');
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS rate_limits');
+  });
+
+  it('applies the compact player-metrics schema without a boot backfill', async () => {
+    await ensureSchema();
+    const applied = h.calls.join('\n');
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS player_account_facts');
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS player_activity_daily');
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS player_business_daily');
+    const ddl = h.calls.find((sql) =>
+      sql.includes('CREATE TABLE IF NOT EXISTS player_account_facts'),
+    );
+    expect(ddl).toBeDefined();
+    expect(ddl).not.toMatch(/INSERT INTO|UPDATE |DELETE FROM/);
+
+    const commitIndex = h.calls.indexOf('COMMIT');
+    const concurrentIndex = h.calls.findIndex((sql) =>
+      sql.includes('CREATE INDEX CONCURRENTLY IF NOT EXISTS play_sessions_account_started_id'),
+    );
+    const sessionLock = h.calls.findIndex((sql) => sql.includes('pg_advisory_lock($1)'));
+    const sessionUnlock = h.calls.findIndex((sql) => sql.includes('pg_advisory_unlock($1)'));
+    expect(commitIndex).toBeGreaterThan(-1);
+    expect(concurrentIndex).toBeGreaterThan(commitIndex);
+    expect(sessionLock).toBeGreaterThan(commitIndex);
+    expect(sessionLock).toBeLessThan(concurrentIndex);
+    expect(sessionUnlock).toBeGreaterThan(concurrentIndex);
+
+    // The boot transaction's SET LOCAL statement_timeout = 0 reverts at COMMIT,
+    // so the post-commit migration must re-disable it session-wide before taking
+    // the session lock: the advisory-lock wait and the concurrent build can both
+    // outlast an operator-set database- or role-level statement_timeout.
+    const postCommitTimeoutOff = h.calls.findIndex(
+      (sql, i) => i > commitIndex && sql === 'SET statement_timeout = 0',
+    );
+    expect(postCommitTimeoutOff).toBeGreaterThan(commitIndex);
+    expect(postCommitTimeoutOff).toBeLessThan(sessionLock);
+
+    // The invalid-carcass check runs under the session lock, before the create
+    // it protects; on a healthy boot (no carcass) nothing is dropped.
+    const carcassCheck = h.calls.findIndex((sql) => sql.includes('indisvalid'));
+    expect(carcassCheck).toBeGreaterThan(sessionLock);
+    expect(carcassCheck).toBeLessThan(concurrentIndex);
+    expect(h.calls.some((sql) => sql.includes('DROP INDEX CONCURRENTLY'))).toBe(false);
+  });
+
+  it('drops an INVALID metrics-index carcass before rebuilding it (a killed CONCURRENTLY build self-heals)', async () => {
+    // A CREATE INDEX CONCURRENTLY killed mid-build (a deploy-watchdog restart,
+    // a crash) strands an INVALID index that IF NOT EXISTS treats as existing
+    // on every later boot: never rebuilt, unusable to the planner, yet
+    // maintained on every play_sessions write. Boot must drop the carcass and
+    // rebuild.
+    h.state.invalidMetricsIndexExists = true;
+    await ensureSchema();
+    const sessionLock = h.calls.findIndex((sql) => sql.includes('pg_advisory_lock($1)'));
+    const drop = h.calls.findIndex((sql) =>
+      sql.includes('DROP INDEX CONCURRENTLY IF EXISTS play_sessions_account_started_id'),
+    );
+    const create = h.calls.findIndex((sql) =>
+      sql.includes('CREATE INDEX CONCURRENTLY IF NOT EXISTS play_sessions_account_started_id'),
+    );
+    expect(drop).toBeGreaterThan(sessionLock);
+    expect(drop).toBeLessThan(create);
   });
 
   it('applies the rate-limit schema idempotently (a second boot re-issues the same DDL)', async () => {

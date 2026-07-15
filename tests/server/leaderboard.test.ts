@@ -127,6 +127,7 @@ const REALM_NAME = 'Claudemoon';
 function fakeRuntime(overrides: Partial<LeaderboardRuntime> = {}): LeaderboardRuntime {
   return {
     playersOnline: () => 0,
+    playersCap: () => 250,
     perfProfile: () => ({ ticks: 0 }),
     getLeaderboard: async () => [],
     getGuildLeaderboard: async () => [],
@@ -521,8 +522,8 @@ describe('readPublicSheet (FakeCharactersDb, resolved by name)', () => {
 // ---------------------------------------------------------------------------
 
 describe('status handler (name-list trim deviation)', () => {
-  it('returns counts only: { ok, realm, players_online, steam } with NO names list', async () => {
-    configureLeaderboardRuntime(fakeRuntime({ playersOnline: () => 4 }));
+  it('returns counts only: { ok, realm, players_online, players_cap, steam } with NO names list', async () => {
+    configureLeaderboardRuntime(fakeRuntime({ playersOnline: () => 4, playersCap: () => 250 }));
     const ctx = fakeCtx({ method: 'GET', url: '/api/status' });
     await handlerFor('/api/status')(ctx);
     const { status, body } = captured(ctx.res);
@@ -531,9 +532,22 @@ describe('status handler (name-list trim deviation)', () => {
       ok: true,
       realm: REALM_NAME,
       players_online: 4,
+      // The configured realm cap, advertised so the client realm list can show Full.
+      players_cap: 250,
       steam: { enabled: false },
     });
     expect('names' in (body as object)).toBe(false);
+  });
+
+  it('advertises players_cap 0 when the cap is disabled', async () => {
+    // A disabled cap (canonicalized to 0) still rides the field: the client reads
+    // 0 as "no refusal point" and never shows Full for this realm.
+    configureLeaderboardRuntime(fakeRuntime({ playersOnline: () => 4, playersCap: () => 0 }));
+    const ctx = fakeCtx({ method: 'GET', url: '/api/status' });
+    await handlerFor('/api/status')(ctx);
+    const { status, body } = captured(ctx.res);
+    expect(status).toBe(200);
+    expect((body as { players_cap: number }).players_cap).toBe(0);
   });
 
   it('adverts steam.enabled true when STEAM_ENABLED=1 (the capability advert)', async () => {

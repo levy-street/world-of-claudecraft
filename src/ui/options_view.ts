@@ -384,6 +384,7 @@ export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl
     boolToggle(s, 'landingHighContrast', 'hudChrome.options.highContrastBackground'),
     boolToggle(s, 'invertLookY', 'hud.options.invertLookY'),
     boolToggle(s, 'startAttackOnAbilityUse', 'hudChrome.options.startAttackOnAbility'),
+    boolToggle(s, 'showAttackButton', 'hudChrome.options.showAttackButton'),
     boolToggle(s, 'walkByAutoloot', 'hudChrome.options.walkByAutoloot'),
     boolToggle(s, 'groundReticle', 'hudChrome.options.groundReticle'),
     boolToggle(s, 'aurasOnPlayerFrame', 'hudChrome.options.aurasOnPlayerFrame'),

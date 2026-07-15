@@ -1496,11 +1496,13 @@ describe('client HTML shell', () => {
     );
     expect(html).toContain('id="mobile-more-close"');
     expect(html).toContain('<div id="mobile-extra-grid">');
-    // Daily Rewards and the Book of Deeds ride the More grid in BOTH entries
-    // (play.html historically lags index.html; these pins keep them in step).
+    // Daily Rewards, the Book of Deeds, and Crafting ride the More grid in BOTH
+    // entries (play.html historically lags index.html; these pins keep them in
+    // step).
     for (const entry of [html, playHtml]) {
       expect(entry).toContain('id="mobile-daily-rewards"');
       expect(entry).toContain('id="mobile-deeds"');
+      expect(entry).toContain('id="mobile-crafting"');
     }
     expect(hudMobileCss).toContain(
       'body.mobile-touch.mobile-more-open #mobile-controls {\n    z-index: 140;\n  }',
@@ -1805,12 +1807,11 @@ describe('client HTML shell', () => {
     expect(mobileControlsTs).toContain(
       "this.bindButton('mobile-target-cycle', () => this.callbacks.onCycleTarget());",
     );
-    // The attack toggle's fallback fires ONLY with no live hostile target (and
-    // never while auto-attacking), so a tap on a live target still toggles the
-    // classic castSlot(0) attack.
-    expect(hudTs).toContain(
-      'if (p.autoAttack || hasLiveHostileTarget || !this.onMobileAttackNearest) {',
-    );
+    // The attack toggle's fallback fires only with no live hostile target and
+    // never while auto-attacking. Its fixed mobile control must not route through
+    // the desktop slot 0, which can hold an assigned action.
+    expect(hudTs).toContain('handleMobileAttackTap(');
+    expect(hudTs).toContain('activateAttack: () => this.activateFixedAttackSlot(),');
   });
 
   it('keeps joystick autorun on the move pad and Jump on the ring bottom row', () => {

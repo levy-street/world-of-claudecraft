@@ -187,12 +187,14 @@ describe('Tolling Bells: wall pass-through despawn', () => {
     for (let i = 0; i < 20 * 14; i++) {
       sim.player.hp = sim.player.maxHp; // stay alive so the run keeps ticking
       sim.tick();
-      st.bellVolleyTimer = 9999;
+      if (run.nhaliaBoss) run.nhaliaBoss.bellVolleyTimer = 9999;
     }
     for (const id of ids) {
       expect((sim as any).entities.get(id)).toBeUndefined();
     }
-    expect(st.bells).toHaveLength(0);
+    // Bell contact can knock the player far enough to reset the encounter. The
+    // reset replaces the state object, so assert against the live run state.
+    expect(run.nhaliaBoss?.bells).toHaveLength(0);
   });
 });
 

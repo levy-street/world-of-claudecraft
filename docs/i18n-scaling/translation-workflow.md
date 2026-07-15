@@ -15,16 +15,16 @@ English-only PR correct and safe, so that is the contract.
 | Role | Does | Does NOT |
 |---|---|---|
 | **Contributor** (incl. small-plan Claude Code agents) | Add the key to `en` (a `src/ui/i18n.catalog/<domain>.ts` module, or `src/admin/i18n.en.ts` for the admin app); render it via `t()`. For text emitted from `src/sim/` or `server/`, register the matcher RULE in `src/ui/sim_i18n.ts` / `src/ui/server_i18n.ts` in the same change. Regenerate and commit the generated artifacts. | Touch the 21 `i18n.locales/<lang>.ts` overlays. Write any non-English translation. Put English copy, a placeholder, or `// TODO` into an overlay as a stand-in translation. Hand-edit `*.resolved.generated*` or `i18n.status.json`. |
-| **Maintainer** (Fernando) | Fill all non-English overlays before release via `npm run i18n:worklist`; regenerate; update the SHA baseline; ship from a `release/**` branch. | n/a |
+| **Maintainer** (Fernando) | Fill all non-English overlays before release via `npm run i18n:worklist`; regenerate; ship from a `release/**` branch. | n/a |
 
 Translating your own locale is **permitted but never required** of a contributor.
 
 ## Adding a player-visible string (by origin)
 
 Pick the recipe for where the string is emitted. In all four, add ENGLISH only,
-then `npm run i18n:gen` (= `i18n:build` + `i18n:admin` + `i18n:scan`) and commit;
-if the game resolved table changed, also `npm run i18n:hash -- --write`. Never
-edit the `i18n.locales/<lang>.ts` overlays and never fake a translation in one.
+then `npm run i18n:gen` (= `i18n:build` + `i18n:admin` + `i18n:scan`) and commit.
+Never edit the `i18n.locales/<lang>.ts` overlays and never fake a translation in
+one.
 
 1. **Client UI (`src/ui`, `src/render`, `src/game`, `index.html`).** Add the key
    to `en` and render via `t()` (numbers/dates via the formatters, below).
@@ -200,8 +200,7 @@ Dry-run the release gate locally with `I18N_RELEASE_TIER=1 npm test`.
    `src/admin/i18n.locales/` for the admin app).
 3. `npm run i18n:build && npm run i18n:admin && npm run i18n:scan` to regenerate
    the resolved tables and the status registry.
-4. `npm run i18n:hash -- --write` to update the resolved-table SHA baseline.
-5. Commit, then ship from a `release/**` branch where the release-tier gate
+4. Commit, then ship from a `release/**` branch where the release-tier gate
    enforces `pending = 0`.
 
 ## Admin parity
@@ -227,5 +226,4 @@ batch. Edit this file to change which terms are locked; do not change tool logic
    `src/admin/i18n.locales/<code>.ts`).
 2. Add the locale to the build's locale set and to the runtime `translations`
    map so it becomes selectable in `supportedLanguages`.
-3. Regenerate with `npm run i18n:build && npm run i18n:admin && npm run i18n:scan`
-   and update the SHA baseline.
+3. Regenerate with `npm run i18n:build && npm run i18n:admin && npm run i18n:scan`.

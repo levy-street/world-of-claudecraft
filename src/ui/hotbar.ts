@@ -1,9 +1,19 @@
 export type HotbarAction = { type: 'ability'; id: string } | { type: 'item'; id: string } | null;
 
+export interface HotbarStorage {
+  getItem(key: string): string | null;
+  setItem(key: string, value: string): void;
+  removeItem(key: string): void;
+}
+
 export const HOTBAR_ACTION_MIME = 'application/x-woc-hotbar-action';
 
 export function encodeHotbarAction(action: Exclude<HotbarAction, null>): string {
   return JSON.stringify(action);
+}
+
+export function encodeStoredHotbarAction(action: HotbarAction): string | null {
+  return action === null ? null : encodeHotbarAction(action);
 }
 
 export function parseHotbarAction(
@@ -18,6 +28,68 @@ export function parseHotbarAction(
     return { type: 'ability', id: action.id };
   if (action.type === 'item' && itemExists(action.id)) return { type: 'item', id: action.id };
   return null;
+}
+
+export function parseStoredHotbarAction(
+  raw: string | null,
+  abilityExists: (id: string) => boolean,
+  itemExists: (id: string) => boolean,
+): Exclude<HotbarAction, null> | null {
+  if (raw === null) return null;
+  try {
+    return parseHotbarAction(JSON.parse(raw), abilityExists, itemExists);
+  } catch {
+    return null;
+  }
+}
+
+export function attackSlotStorageKey(normalSlotMapKey: string): string {
+  return `${normalSlotMapKey}:s0`;
+}
+
+export function loadAttackSlotAction(
+  storage: Pick<HotbarStorage, 'getItem'>,
+  key: string,
+  abilityExists: (id: string) => boolean,
+  itemExists: (id: string) => boolean,
+): HotbarAction {
+  try {
+    return parseStoredHotbarAction(storage.getItem(key), abilityExists, itemExists);
+  } catch {
+    return null;
+  }
+}
+
+export function saveAttackSlotAction(
+  storage: Pick<HotbarStorage, 'setItem' | 'removeItem'>,
+  key: string,
+  action: HotbarAction,
+): void {
+  const encoded = encodeStoredHotbarAction(action);
+  if (encoded === null) storage.removeItem(key);
+  else storage.setItem(key, encoded);
+}
+
+export function actionForAttackSlot(showAttackButton: boolean, action: HotbarAction): HotbarAction {
+  return showAttackButton ? null : action;
+}
+
+export function assignAttackSlotAction(
+  action: Exclude<HotbarAction, null>,
+  sourceIndex: number | null | undefined,
+): { action: Exclude<HotbarAction, null>; clearSourceIndex: number | null } {
+  return { action, clearSourceIndex: sourceIndex ?? null };
+}
+
+export function handleMobileAttackTap(
+  state: { autoAttack: boolean; hasLiveHostileTarget: boolean },
+  actions: { activateAttack: () => void; attackNearest: (() => void) | null },
+): void {
+  if (!state.autoAttack && !state.hasLiveHostileTarget && actions.attackNearest) {
+    actions.attackNearest();
+    return;
+  }
+  actions.activateAttack();
 }
 
 export function parseHotbarActions(

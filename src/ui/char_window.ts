@@ -25,12 +25,15 @@ import type { IWorld } from '../world_api';
 import { buildPaperdollView, type PaperdollSlot } from './char_view';
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName, itemDisplayName } from './entity_i18n';
+import { dropRequiredLevel, paperdollDropAction } from './equip_drop_core';
 import { esc } from './esc';
 import { buildGatheringProficiencyRows } from './gathering_view';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { iconDataUrl, QUALITY_COLOR } from './icons';
+import type { ItemDragState } from './item_drag_state';
 import type { PainterHostPresentation } from './painter_host';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
+import { tSim } from './sim_i18n';
 import type { StatId } from './stat_tooltip';
 import { svgIcon } from './ui_icons';
 
@@ -94,6 +97,7 @@ const STAT_GRID: readonly StatId[] = [
   'spellPower',
   'critRating',
   'hasteRating',
+  'hitRating',
   'warfare',
 ];
 
@@ -131,6 +135,13 @@ export interface CharWindowDeps extends PainterHostPresentation {
   openPrestige(): void;
   /** Open the Book of Deeds (the active-title line's button). */
   openDeeds(): void;
+  /** The shared in-flight bag-item drag (published by the bags grid). The paperdoll
+   *  sockets read it during dragover, where the DataTransfer payload is unreadable. */
+  dragState: ItemDragState;
+  /** Repaint the bags grid after a drop equipped a piece out of it. */
+  renderBags(): void;
+  /** Refusal toast for a drop the socket will not take. */
+  showError(text: string): void;
 }
 
 // Maps each gathering profession id to its hud_chrome display-name key (issue 1124).
@@ -261,6 +272,10 @@ export class CharWindow {
     // back to this slot (the rebuilt row may be empty, with no x to focus).
     row.id = `equip-slot-${slot}`;
     row.tabIndex = -1;
+    // The socket's equipment key, read by BOTH drop arms: the HTML5 drop below and
+    // the touch hit test (item_drop_hit_test.ts), which has no drop event to read.
+    row.dataset.equipSlot = slot;
+    this.bindEquipDropTarget(row, slot);
     const qColor = !item
       ? SLOT_EMPTY_TEXT_COLOR
       : (QUALITY_COLOR[item.quality ?? 'common'] ?? QUALITY_DEFAULT_COLOR);
@@ -308,6 +323,81 @@ export class CharWindow {
       row.addEventListener('contextmenu', (ev) => ev.preventDefault());
     }
     return row;
+  }
+
+  /** Equip a bag stack into the exact socket it was dropped on (both drag arms land
+   *  here). The refusals are pre-empted client-side with the sim's OWN wording
+   *  (tSim), so no doomed command is sent and the toast reads identically to the
+   *  authoritative one the server would emit; the sim re-validates regardless. */
+  dropOnEquipSlot(itemId: string, slot: EquipSlot): void {
+    const item = ITEMS[itemId];
+    if (!item) return;
+    const world = this.deps.world();
+    switch (paperdollDropAction(item, slot, world.cfg.playerClass, world.player.level)) {
+      case 'blockedSlot':
+        this.deps.showError(tSim('error.wrongEquipSlot'));
+        return;
+      case 'blockedClass':
+        this.deps.showError(tSim('error.cannotEquip'));
+        return;
+      case 'blockedLevel':
+        this.deps.showError(
+          tSim('error.equipLevel', {
+            level: formatNumber(dropRequiredLevel(item), { maximumFractionDigits: 0 }),
+          }),
+        );
+        return;
+      case 'equip':
+        world.equipItemToSlot(itemId, slot);
+        audio.click();
+        this.deps.hideTooltip();
+        this.deps.renderBags();
+        this.renderIfOpen();
+    }
+  }
+
+  /** Light up every socket that would ACCEPT the stack in flight (null clears them).
+   *  Only the accepting sockets light: the feedback is the same pure decision the
+   *  drop itself runs, so a lit socket always takes the piece. */
+  markDropTargets(itemId: string | null): void {
+    const el = this.deps.root();
+    const world = this.deps.world();
+    const item = itemId ? ITEMS[itemId] : undefined;
+    for (const row of el.querySelectorAll<HTMLElement>('.equip-slot[data-equip-slot]')) {
+      const slot = row.dataset.equipSlot as EquipSlot | undefined;
+      const accepts =
+        !!item &&
+        !!slot &&
+        paperdollDropAction(item, slot, world.cfg.playerClass, world.player.level) === 'equip';
+      row.classList.toggle('drop-target', accepts);
+    }
+  }
+
+  // A paperdoll socket as a drop target for a bag stack: dragover accepts only what
+  // the socket would really take (so the cursor never promises an equip the drop
+  // then refuses), and the drop routes into the one shared dropOnEquipSlot.
+  private bindEquipDropTarget(row: HTMLElement, slot: EquipSlot): void {
+    row.addEventListener('dragover', (e) => {
+      const drag = this.deps.dragState.get();
+      if (!drag) return;
+      const item = ITEMS[drag.itemId];
+      const world = this.deps.world();
+      if (
+        !item ||
+        paperdollDropAction(item, slot, world.cfg.playerClass, world.player.level) !== 'equip'
+      )
+        return;
+      e.preventDefault();
+      if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+    });
+    row.addEventListener('drop', (e) => {
+      const drag = this.deps.dragState.get();
+      if (!drag) return;
+      e.preventDefault();
+      this.deps.dragState.end();
+      this.markDropTargets(null);
+      this.dropOnEquipSlot(drag.itemId, slot);
+    });
   }
 
   // `keepFocus` hands focus back to the now-empty slot row after the unequip

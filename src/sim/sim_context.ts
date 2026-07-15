@@ -17,6 +17,7 @@ import type { DeedRuntime } from './deeds';
 import type { DelayedEvent, GroundAoE } from './entity_roster';
 import type { PendingLootRoll } from './loot/loot_roll';
 import type { MarketListing } from './market';
+import type { MobScanCounters } from './mob/scan_counters';
 import type { PendingProjectile } from './projectile_travel';
 import type { FrontierIncursionState } from './pvp';
 import type { Rng } from './rng';
@@ -35,6 +36,7 @@ import type {
   ResolvedAbility,
   TradeSession,
 } from './sim';
+import type { FinderFormationUnit } from './social/party';
 import type { VcState } from './social/vale_cup';
 import type { SpatialGrid } from './spatial';
 import type {
@@ -211,6 +213,12 @@ export interface SimContextPrimitives {
   // seat means practice; the online server never seats fiesta bots). Sim-owned,
   // mutated in place, read-only view like bankerIds.
   readonly fiestaBotPids: number[];
+  // Mob-AI scan visit counters (observability): the aggro proximity scan and the
+  // threat-table walks bump these to attribute mob.update cost. Sim-owned holder
+  // reset at the top of each tick and mutated in place (field increments, never
+  // reassigned), so a read-only live view; the fields themselves stay writable so
+  // the hot paths can increment them. Feeds no gameplay branch and draws no rng.
+  readonly mobScanCounters: MobScanCounters;
 }
 
 // Cross-system callbacks. Each signature mirrors the still-on-`Sim` method it
@@ -401,6 +409,12 @@ export interface SimContextCallbacks {
   removeFromParty(pid: number, verb: string): void;
   // Drop a disbanded party's whole raid-marker set (points at T1's targeting store).
   dropPartyMarkers(partyId: number): void;
+  // Dungeon Finder formation seam (owned by social/party.ts): merge solo
+  // players and whole partial parties into ONE party/raid without synthesizing
+  // invite prompts or accept events. Returns the formed party, or null (and
+  // mutates nothing) when a source roster no longer matches live party state.
+  // Consumed by social/dungeon_finder.ts.
+  formDungeonFinderGroup(units: FinderFormationUnit[], opts: { raid: boolean }): Party | null;
   onMobKilledForQuests(mob: Entity, meta: PlayerMeta): void;
   onInventoryChangedForQuests(meta: PlayerMeta): void;
   checkQuestReady(qp: QuestProgress, meta: PlayerMeta): void;
@@ -658,6 +672,12 @@ export interface SimContextCallbacks {
   // devCommands). Adds a stationary whisperable player near the primary; returns the
   // new pid, or -1 if the name is blank or already taken. Stays on Sim.
   spawnDevBot(name: string): number;
+  // Dev-only Dungeon Finder scenario seeding backing "/dev lfg" (social/chat.ts,
+  // gated by devCommands). Spawns finder dev bots around the caller. Stays on Sim.
+  seedDungeonFinderDev(
+    mode: 'queue' | 'raid' | 'board',
+    pid?: number,
+  ): { spawned: number; note: 'ok' | 'needRoles' | 'noneEligible' };
 
   // L2 inventory/vendor (src/sim/items.ts): the four helpers the moved useItem
   // dispatches to that STAY on Sim (their owning facets are decided later). W2 owns
@@ -933,6 +953,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     get fiestaBotPids() {
       return host.fiestaBotPids;
     },
+    get mobScanCounters() {
+      return host.mobScanCounters;
+    },
     emit: host.emit,
     error: host.error,
     lockoutNowMs: host.lockoutNowMs,
@@ -1005,6 +1028,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     readyCheckStart: host.readyCheckStart,
     removeFromParty: host.removeFromParty,
     dropPartyMarkers: host.dropPartyMarkers,
+    formDungeonFinderGroup: host.formDungeonFinderGroup,
     onMobKilledForQuests: host.onMobKilledForQuests,
     onInventoryChangedForQuests: host.onInventoryChangedForQuests,
     checkQuestReady: host.checkQuestReady,
@@ -1114,6 +1138,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     setPlayerLevel: host.setPlayerLevel,
     notice: host.notice,
     spawnDevBot: host.spawnDevBot,
+    seedDungeonFinderDev: host.seedDungeonFinderDev,
     // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved useItem dispatches to.
     startFishing: host.startFishing,
     unlockMechChromaFromItem: host.unlockMechChromaFromItem,

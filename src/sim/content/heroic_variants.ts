@@ -29,6 +29,57 @@ export function heroicVariantId(baseId: string): string {
   return `heroic_${baseId}`;
 }
 
+// Combat ratings on the Heroic RAID variants (item level 33/37): the dual-rating
+// tier. Unlike the five-man heroic variants (which inherit their base's ratings
+// unchanged, so ilvl-26 dungeon bases with no rating stay rating-free at ilvl 28),
+// a raid variant SCALES its base's primary rating up to the raid allowance AND adds
+// a complementary secondary rating. Two ratings per piece is the raid tier's
+// identity, a step nothing below ilvl 33 has. See docs/prd/combat-ratings-and-jewelry.md.
+const RAID_RATING_KEYS = ['hitRating', 'critRating', 'hasteRating'] as const;
+type RatingKey = (typeof RAID_RATING_KEYS)[number];
+const RAID_PRIMARY_ARMOR = 55; // 5.5%
+const RAID_PRIMARY_WEAPON = 65; // 6.5%
+const RAID_PRIMARY_LEGENDARY = 70; // 7.0%
+const RAID_SECONDARY = 20; // 2.0%
+const RAID_SECONDARY_LEGENDARY = 30; // 3.0%
+
+// Apply the raid-tier dual rating to a variant, in place. The primary keeps the
+// base's rating TYPE (scaled to the tier allowance); the secondary is complementary.
+// Physical Hit pairs with crit and a physical non-Hit primary pairs with Hit. A
+// spell-facing Hit seed marks caster DPS and keeps Hit, paired with haste. A
+// spell-facing throughput seed (or no seed, like the Heartwood healer staff) stays
+// throughput-only and pairs crit + haste, so healer-facing gear never gains Hit.
+function applyRaidVariantRatings(variant: ItemDef, base: ItemDef): void {
+  const isLegendary = (base.quality ?? 'common') === 'legendary';
+  const s = base.stats;
+  // Spell-facing: carries caster stats (int/spirit/Spell Power) and no attack-power
+  // stats (strength/agility). It only carries Hit when the authored base explicitly
+  // seeds Hit, which distinguishes caster-DPS pieces from throughput/healer pieces.
+  const spellFacing =
+    ((s?.int ?? 0) > 0 || (s?.spi ?? 0) > 0 || (base.spellPower ?? 0) > 0) &&
+    (s?.str ?? 0) === 0 &&
+    (s?.agi ?? 0) === 0;
+  const baseRatingKey = RAID_RATING_KEYS.find((k) => (base[k] ?? 0) > 0);
+  const primaryKey: RatingKey = baseRatingKey ?? (spellFacing ? 'hasteRating' : 'hitRating');
+  // Spell-facing pieces use the other throughput rating as their secondary: an
+  // authored Hit seed becomes Hit + haste, while crit/haste/rating-less bases remain
+  // throughput-only. Physical pieces retain the Hit <-> crit complement rule.
+  const secondaryKey: RatingKey = spellFacing
+    ? primaryKey === 'hasteRating'
+      ? 'critRating'
+      : 'hasteRating'
+    : primaryKey === 'hitRating'
+      ? 'critRating'
+      : 'hitRating';
+  const primaryVal = isLegendary
+    ? RAID_PRIMARY_LEGENDARY
+    : base.weapon
+      ? RAID_PRIMARY_WEAPON
+      : RAID_PRIMARY_ARMOR;
+  variant[primaryKey] = primaryVal;
+  variant[secondaryKey] = isLegendary ? RAID_SECONDARY_LEGENDARY : RAID_SECONDARY;
+}
+
 function makeHeroicVariant(base: ItemDef, sourceLevel = HEROIC_VARIANT_SOURCE_LEVEL): ItemDef {
   const quality = base.quality ?? 'common';
   const targetLevel = sourceLevel + (QUALITY_ILVL_BONUS[quality] ?? 0);
@@ -61,6 +112,9 @@ function makeHeroicVariant(base: ItemDef, sourceLevel = HEROIC_VARIANT_SOURCE_LE
       ...scaleWeaponDamage(base.weapon, Math.max(weaponDpsBudget(targetLevel), baseDps)),
     };
   }
+  // Heroic RAID variants (source level 27 -> item level 33/37) get the dual rating;
+  // five-man heroic variants inherit their base's ratings unchanged via the spread.
+  if (sourceLevel === NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL) applyRaidVariantRatings(variant, base);
   // The spread widens ItemDef's discriminated union; the transform preserves the
   // base item's kind/slot shape, so this is a valid ItemDef of the same variant.
   return variant as ItemDef;
