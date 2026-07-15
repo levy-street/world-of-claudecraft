@@ -111,6 +111,39 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain('password_set');
   });
 
+  it('applies payout void metadata and append-only moderation audit storage', async () => {
+    await ensureSchema();
+    const applied = h.calls.join('\n');
+    expect(applied).toContain(
+      'ALTER TABLE daily_reward_payouts ADD COLUMN IF NOT EXISTS void_reason TEXT',
+    );
+    expect(applied).toContain(
+      'ALTER TABLE daily_reward_payouts ADD COLUMN IF NOT EXISTS voided_by_id TEXT',
+    );
+    expect(applied).toContain(
+      'ALTER TABLE daily_reward_payouts ADD COLUMN IF NOT EXISTS voided_by_username TEXT',
+    );
+    expect(applied).toContain(
+      'ALTER TABLE daily_reward_payouts ADD COLUMN IF NOT EXISTS voided_at TIMESTAMPTZ',
+    );
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS daily_reward_payout_moderation_audit');
+    expect(applied).toContain("action TEXT NOT NULL CHECK (action IN ('void', 'restore'))");
+    expect(applied).toContain('actor_id TEXT NOT NULL');
+    expect(applied).toContain('actor_username TEXT NOT NULL');
+    expect(applied).toContain(
+      'ALTER TABLE daily_reward_payouts ADD COLUMN IF NOT EXISTS signed_transaction TEXT',
+    );
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS daily_reward_payout_attempts');
+    expect(applied).toContain("kind TEXT NOT NULL CHECK (kind IN ('payout', 'resend'))");
+    expect(applied).toContain(
+      'ALTER TABLE daily_reward_payout_attempts ADD COLUMN IF NOT EXISTS operation_id TEXT',
+    );
+    expect(applied).toContain(
+      'CREATE UNIQUE INDEX IF NOT EXISTS daily_reward_payout_attempts_operation',
+    );
+    expect(applied).toContain('tx_signature TEXT NOT NULL UNIQUE');
+  });
+
   it('applies the bank-system tables (character_leases, bank_ledger) idempotently', async () => {
     // Bank system tables: the per-character load lease and the append-only
     // bank op ledger both live inline in the core SCHEMA string. Pin them by name so

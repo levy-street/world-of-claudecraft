@@ -47,6 +47,7 @@ import {
   swingMissChance,
   type WeaponInfo,
 } from '../types';
+import { drawWeapon } from '../weapon_stow';
 import { applyRageSpendCooldownRefund, spendResource } from './casting_lifecycle';
 import { blindMissBonus, isDisarmed, isStunned } from './cc';
 import { consumeNextAttackCrit } from './empower_next';
@@ -79,6 +80,7 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
     return;
   }
   if (p.sitting) ctx.standUp(p);
+  if (p.weaponStowed) drawWeapon(p);
   p.autoAttack = true;
   r.meta.lastActiveTick = ctx.tickCount; // starting auto-attack is a deliberate action
   // Engaging MELEE auto-attack seeds aggro at once, because the swing lands almost

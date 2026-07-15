@@ -1019,6 +1019,7 @@ function blankEntity(id: number): Entity {
     chargePath: [],
     followTargetId: null,
     sitting: false,
+    weaponStowed: false,
     eating: null,
     drinking: null,
     aiState: 'idle',
@@ -1145,6 +1146,11 @@ export class ClientWorld implements IWorld {
   // arenaInfo.match.fiesta and its dynamics flow over the events queue. ---
   duelInfo: DuelInfo | null = null;
   arenaInfo: ArenaInfo | null = null;
+  // --- IWorldDungeonFinder: group-finder state, mirrored from the snapshot
+  // self (`s.df` personal blob + `s.dfb` shared board, both delta-omitted: a
+  // missing key keeps the prior mirror, an explicit null clears it). ---
+  dungeonFinderInfo: import('../world_api').DungeonFinderInfo | null = null;
+  dungeonFinderBoard: import('../world_api').DungeonFinderBoard | null = null;
   honor = 0;
   lifetimeHonor = 0;
   // --- IWorldValeCup: Vale Cup queue/match state, mirrored from the snapshot
@@ -1893,6 +1899,7 @@ export class ClientWorld implements IWorld {
       e.castTotal = w.castTot ?? 0;
       e.channeling = !!w.chan;
       e.sitting = !!w.sit;
+      e.weaponStowed = !!w.ws;
       e.aggroTargetId = w.aggro ?? null;
       e.tappedById = w.tap ?? null;
       e.ownerId = w.own ?? null;
@@ -2133,6 +2140,8 @@ export class ClientWorld implements IWorld {
       if (s.trade !== undefined) this.tradeInfo = s.trade;
       if (s.duel !== undefined) this.duelInfo = s.duel;
       if (s.arena !== undefined) this.arenaInfo = s.arena;
+      if (s.df !== undefined) this.dungeonFinderInfo = s.df;
+      if (s.dfb !== undefined) this.dungeonFinderBoard = s.dfb;
       if (s.honor !== undefined) this.honor = s.honor ?? 0;
       if (s.lhonor !== undefined) this.lifetimeHonor = s.lhonor ?? 0;
       if (s.vcup !== undefined) this.cupInfo = s.vcup;
@@ -2381,6 +2390,14 @@ export class ClientWorld implements IWorld {
   equipItem(itemId: string): void {
     this.cmd({ cmd: 'equip', item: itemId });
   }
+  moveInventoryItem(from: number, to: number): void {
+    this.cmd({ cmd: 'inv_move', from, to });
+  }
+  // Same 'equip' wire token with the aimed slot attached: an older server that
+  // ignores the field simply resolves the slot itself, so the field is additive.
+  equipItemToSlot(itemId: string, slot: EquipSlot): void {
+    this.cmd({ cmd: 'equip', item: itemId, slot });
+  }
   unequipItem(slot: EquipSlot): void {
     this.cmd({ cmd: 'unequip_item', slot });
   }
@@ -2435,6 +2452,14 @@ export class ClientWorld implements IWorld {
   claimEventSkin(skin: number): void {
     const idx = Math.max(0, Math.floor(skin));
     this.cmd({ cmd: 'claim_event_skin', skin: idx });
+  }
+  toggleWeaponStow(): void {
+    // Optimistic local nudge (like changeSkin/playEmote) so the sheathe pose and
+    // its sound cue land instantly; the server re-validates (dead-gate) and the
+    // next snapshot's `ws` bit reconciles.
+    const p = this.entities.get(this.playerId);
+    if (p && !p.dead) p.weaponStowed = !p.weaponStowed;
+    this.cmd({ cmd: 'stow_weapon' });
   }
   unequipMechChroma(chromaId: string): void {
     const itemId = mechChromaItemId(chromaId);
@@ -2616,6 +2641,38 @@ export class ClientWorld implements IWorld {
   }
   arenaAugmentPick(augmentId: string): void {
     this.cmd({ cmd: 'arena_augment', augment: augmentId });
+  }
+  // --- IWorldDungeonFinder: group-finder sends (dungeonFinderInfo and
+  // dungeonFinderBoard are snapshot reads, decoded in applySnapshot). ---
+  dungeonFinderSetRoles(roles: import('../sim/content/talents').Role[]): void {
+    this.cmd({ cmd: 'df_roles', roles });
+  }
+  dungeonFinderQueueJoin(activityIds: string[]): void {
+    this.cmd({ cmd: 'df_queue', activities: activityIds });
+  }
+  dungeonFinderQueueLeave(): void {
+    this.cmd({ cmd: 'df_queue_leave' });
+  }
+  dungeonFinderRespond(accept: boolean): void {
+    this.cmd({ cmd: 'df_proposal', accept });
+  }
+  dungeonFinderListingCreate(
+    activityId: string,
+    tags: import('../sim/content/dungeon_finder').FinderListingTag[],
+  ): void {
+    this.cmd({ cmd: 'df_list_create', activity: activityId, tags });
+  }
+  dungeonFinderListingClose(): void {
+    this.cmd({ cmd: 'df_list_close' });
+  }
+  dungeonFinderApply(listingId: number): void {
+    this.cmd({ cmd: 'df_apply', listing: listingId });
+  }
+  dungeonFinderApplyCancel(): void {
+    this.cmd({ cmd: 'df_apply_cancel' });
+  }
+  dungeonFinderApplicationRespond(applicantPid: number, accept: boolean): void {
+    this.cmd({ cmd: 'df_app_respond', applicant: applicantPid, accept });
   }
   // --- IWorldValeCup: boarball queue sends (cupInfo is a snapshot read; the
   // sport-kit swap rides the heavy `sport` self field decoded in applySnapshot). ---

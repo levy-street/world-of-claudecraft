@@ -71,5 +71,32 @@ Any file dropped here is picked up automatically by
   add a small pulled-state overlay the way the locked chest overlays a ward
   seal on top of its GLB.
 
+- Dungeon/delve door arch (`src/render/door_portal.ts`): `dungeon_door_arch.glb`
+  is preloaded via `loadGltf()`/`registerPreload()`, yawed 90 degrees on load
+  so its authored opening (which faces local X) frames the procedural portal
+  swirl disc (which faces Z), and its cloned geometry/materials are marked
+  shared with `markSharedGeometry()`/`markSharedMaterial()` (the procedural
+  arch/keystone/plinth/portal already were, since door views never get a pool
+  key and the renderer's traverse-and-dispose churn path would otherwise free
+  GPU buffers still used by other door instances). `buildDoorBody()` falls back
+  to the procedural stone arch on load races; the Nythraxis crypt door stays a
+  bespoke invisible click-box either way.
+- Marsh-ruin dressing (`src/render/delve_marsh_dressing.ts`, The Drowned
+  Litany): `MARSH_ASSET_URL` lists the plank-bridge/shrine-fragment/
+  corpse-candle/bell-gallows/sluice-post/dead-tree/reed-cluster GLBs;
+  `placeLoadedMarshAsset()` clones the preloaded scene, uniform-rescales it to
+  the anchor's `MARSH_ASSET_SCALE` target (height or local-X span, matched to
+  the procedural fallback's footprint) via a `Box3` measure, and re-seats the
+  base on the floor, mirroring `buildStandaloneGlb()`. The corpse candle's
+  flame and the shrine fragment's additive glow stay procedural-only and are
+  drawn alongside either the GLB or the fallback body, the same way
+  `door_portal.ts` keeps its portal swirl outside the arch's GLB/procedural
+  branch.
+- Yumi maze braziers and torches (`src/render/yumi_maze.ts`): `brazier_stand`
+  and `torch_handle` GLBs are cloned per instance; the team-colored flame mesh
+  and its point light stay procedural-only and are re-seated against each
+  loaded asset's authored height (the torch handle's re-seat predates this
+  pass; the brazier flame was added in the same change).
+
 `tests/render_glb_replacement_assets.test.ts` asserts every preload URL above
 resolves to a real, manifested file.

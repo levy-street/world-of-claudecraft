@@ -16,7 +16,7 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts). This region draws NO rng.
 
-import { addStacked, bagsFullError, equipBag as equipBagCmd } from './bags';
+import { addStacked, bagCapacity, bagsFullError, equipBag as equipBagCmd } from './bags';
 import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
 import {
@@ -25,9 +25,11 @@ import {
   canEquipItem,
   canEquipItemInSlot,
   resolveEquipSlot,
+  slotAcceptsItem,
   weaponHand,
 } from './equipment_rules';
 import { formatMoney } from './format_money';
+import { moveStackToCell } from './inventory_order';
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
 import { battlefieldExperienceTrickle } from './professions/battlefield_xp';
 import type { ItemUseResult, PlayerMeta } from './sim';
@@ -128,13 +130,39 @@ export function discardItem(ctx: SimContext, itemId: string, count = 1, pid?: nu
   });
 }
 
-export function equipItem(ctx: SimContext, itemId: string, pid?: number): void {
+// Manual bag arrangement: the player dragged the stack at inventory index `from` onto
+// bag CELL `to`. An empty cell parks the stack there (leaving a hole behind it, which is
+// the point of fixed cells); an occupied one trades cells with its stack. The arrangement
+// rides on each stack (InvSlot.slot) and is serialized with the character, so it
+// persists. Authoritative like every other inventory command: moveStackToCell
+// re-validates both ends against the live bag and refuses anything illegal.
+export function moveInventoryItem(ctx: SimContext, from: number, to: number, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  const { meta } = r;
+  moveStackToCell(meta.inventory, from, to, bagCapacity(meta.bags));
+}
+
+// `targetSlot` names the exact equipment key the player aimed at (the paperdoll
+// drop target). It is a REQUEST, never a bypass: the sim re-validates it against
+// the item's declared slot (slotAcceptsItem), so a hand-crafted packet cannot put
+// a helm on a ring finger. Omitted (the click path), the slot resolves as before.
+export function equipItem(
+  ctx: SimContext,
+  itemId: string,
+  pid?: number,
+  targetSlot?: EquipSlot,
+): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
   const def = ITEMS[itemId];
   if (!def?.slot || (def.kind !== 'weapon' && def.kind !== 'armor')) return;
   if (ctx.countItem(itemId, meta.entityId) <= 0) return;
+  if (targetSlot && !slotAcceptsItem(def, targetSlot)) {
+    ctx.error(meta.entityId, 'That does not go in that slot.');
+    return;
+  }
   if (!canEquipItem(meta.cls, def)) {
     ctx.error(meta.entityId, 'You cannot equip that.');
     return;
@@ -143,10 +171,11 @@ export function equipItem(ctx: SimContext, itemId: string, pid?: number): void {
     ctx.error(meta.entityId, `You must be level ${requiredLevelFor(def)} to equip that.`);
     return;
   }
-  // Rings remain empty-first. Warrior weapons additionally route between hands
-  // from the committed v0.26 specialization.
+  // An aimed paperdoll slot wins after both the generic slot check above and the
+  // class/spec hand policy below. Click equips keep rings empty-first and route
+  // eligible dual-wield weapons between hands.
   const spec = meta.talents.spec;
-  const slot = desiredEquipSlot(meta, itemId);
+  const slot = targetSlot ?? desiredEquipSlot(meta, itemId);
   if (!slot || !canEquipItemInSlot(meta.cls, def, slot, spec)) {
     ctx.error(meta.entityId, 'You cannot equip that.');
     return;

@@ -10,6 +10,7 @@ import {
 } from '../src/sim/account_flair';
 import { verifyChallenge } from '../src/sim/client_challenge';
 import { DEEDS } from '../src/sim/content/deeds';
+import { isFinderListingTag, isFinderRole } from '../src/sim/content/dungeon_finder';
 import { MECH_CHROMAS, mechChromaItemId, mechChromaSkinIndex } from '../src/sim/content/skins';
 import { SPORT_ROLES, VALE_CUP_BALL_TEMPLATE_ID, VC_NATION_IDS } from '../src/sim/content/vale_cup';
 import { withWeaponSkinApplied } from '../src/sim/content/weapon_skin_rules';
@@ -49,11 +50,11 @@ import {
 } from '../src/sim/talent_allocation_input';
 import { stealthDetectionRadius, threatEntries } from '../src/sim/threat';
 import {
+  ALL_EQUIP_SLOTS,
   type Aura,
   DT,
   dist2d,
   type Entity,
-  EQUIP_SLOTS,
   type EquipSlot,
   emptyMoveInput,
   isDungeonDifficulty,
@@ -272,6 +273,7 @@ export const SIM_LAP_PHASES = [
   'instances',
   'delves',
   'valecup',
+  'dfinder',
   'market',
   'postOffice',
   'delayedEv',
@@ -313,12 +315,22 @@ const ARENA_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * ARENA_WIRE_HZ
 // the rosters at 20 Hz. Instant transitions ride the pid-scoped vcup* events.
 const VC_WIRE_HZ = 2;
 const VC_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * VC_WIRE_HZ)));
+// Dungeon Finder personal readout cadence: the `df` payload carries
+// whole-second clocks (queue wait, proposal countdown), so 2 Hz keeps the
+// window live without re-serializing it at 20 Hz. The shared `dfb` board rides
+// the same cadence and only re-sends when a listing actually changes.
+const DF_WIRE_HZ = 2;
+const DF_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * DF_WIRE_HZ)));
 
 type ClientMessage = Record<string, unknown> & {
   ability?: string;
+  accept?: boolean;
   action?: string;
+  activities?: unknown;
+  activity?: string;
   alloc?: unknown;
   ante?: number;
+  applicant?: number;
   augment?: string;
   bar?: unknown;
   bracket?: number;
@@ -343,6 +355,7 @@ type ClientMessage = Record<string, unknown> & {
   item?: string;
   itemId?: string;
   level?: number;
+  listing?: number;
   marker?: number;
   mi?: unknown;
   mode?: string;
@@ -358,6 +371,7 @@ type ClientMessage = Record<string, unknown> & {
   quest?: string;
   r?: string;
   role?: string;
+  roles?: unknown;
   rollId?: number;
   seq?: number;
   sid?: string;
@@ -366,6 +380,7 @@ type ClientMessage = Record<string, unknown> & {
   slot?: number | string;
   spec?: unknown;
   t?: string;
+  tags?: unknown;
   text?: string;
   tierId?: string;
   x?: number;
@@ -421,6 +436,7 @@ const JAILED_BLOCKED_COMMANDS = new Set<string>([
 ]);
 const HEAVY_SELF_CMDS = new Set<string>([
   'equip',
+  'inv_move', // rewrites the inventory array order: the self snapshot must resend it
   'unequip_item',
   'equip_bag',
   'unequip_bag',
@@ -574,6 +590,8 @@ export interface ClientSession {
   lastArenaWireTick: number;
   // Vale Cup readout, same idea at its own cadence (VC_WIRE_HZ)
   lastVcupWireTick: number;
+  // Dungeon Finder readout, same idea at its own cadence (DF_WIRE_HZ)
+  lastDfWireTick: number;
   // set when a command or sim event that can change a heavy self field (bags,
   // gear, quests, talents, stats, ...) lands for this session, so the next
   // snapshot re-diffs those fields. Otherwise they're skipped (see
@@ -883,6 +901,7 @@ function dynamicFields(e: Entity): Record<string, unknown> {
     if (e.channeling) out.chan = 1;
   }
   if (e.sitting || e.eating || e.drinking) out.sit = 1;
+  if (e.weaponStowed) out.ws = 1; // Z-key sheathe: weapons render on the back
   if (e.aggroTargetId !== null) out.aggro = e.aggroTargetId;
   if (e.tappedById !== null) out.tap = e.tappedById;
   if (e.ownerId !== null) out.own = e.ownerId;
@@ -1273,6 +1292,7 @@ export class GameServer {
     moderator.lastSent = {};
     moderator.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
     moderator.lastVcupWireTick = -VC_WIRE_INTERVAL_TICKS;
+    moderator.lastDfWireTick = -DF_WIRE_INTERVAL_TICKS;
     moderator.sentEnts.clear();
     this.send(moderator, { t: 'spectate', name: target.name });
     this.sendSystemNotice(moderator, `Now spectating ${target.name}.`);
@@ -1297,6 +1317,7 @@ export class GameServer {
     moderator.lastSent = {};
     moderator.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
     moderator.lastVcupWireTick = -VC_WIRE_INTERVAL_TICKS;
+    moderator.lastDfWireTick = -DF_WIRE_INTERVAL_TICKS;
     moderator.sentEnts.clear();
     this.send(moderator, { t: 'spectate', name: null });
     if (announce) this.sendSystemNotice(moderator, 'Stopped spectating.');
@@ -2406,6 +2427,7 @@ export class GameServer {
       lastSent: {},
       lastArenaWireTick: -ARENA_WIRE_INTERVAL_TICKS,
       lastVcupWireTick: -VC_WIRE_INTERVAL_TICKS,
+      lastDfWireTick: -DF_WIRE_INTERVAL_TICKS,
       selfHeavyDirty: true,
       lastWireRev: -1,
       sentEnts: new Map(),
@@ -3651,10 +3673,32 @@ export class GameServer {
         }
         break;
       case 'equip':
-        if (typeof msg.item === 'string') sim.equipItem(msg.item, pid);
+        if (typeof msg.item === 'string') {
+          // The optional aimed slot (the paperdoll drop target) is accepted only
+          // when it names a real equipment key; anything else falls back to the
+          // sim's own resolver rather than trusting the client. The sim then
+          // re-validates the slot against the item itself.
+          const aimed =
+            typeof msg.slot === 'string' &&
+            (ALL_EQUIP_SLOTS as readonly string[]).includes(msg.slot)
+              ? (msg.slot as EquipSlot)
+              : undefined;
+          if (aimed) sim.equipItemToSlot(msg.item, aimed, pid);
+          else sim.equipItem(msg.item, pid);
+        }
+        break;
+      case 'inv_move':
+        // Manual bag order (a drag between bag cells). Both indices are re-validated
+        // inside the sim against the live bag, so a bogus pair is simply refused.
+        if (typeof msg.from === 'number' && typeof msg.to === 'number') {
+          sim.moveInventoryItem(msg.from, msg.to, pid);
+        }
         break;
       case 'unequip_item':
-        if (typeof msg.slot === 'string' && (EQUIP_SLOTS as readonly string[]).includes(msg.slot)) {
+        if (
+          typeof msg.slot === 'string' &&
+          (ALL_EQUIP_SLOTS as readonly string[]).includes(msg.slot)
+        ) {
           sim.unequipItem(msg.slot as EquipSlot, pid);
         }
         break;
@@ -3727,6 +3771,11 @@ export class GameServer {
         if (skinId !== null || wtype) this.changeAccountWeaponSkin(session, skinId, wtype);
         break;
       }
+      // Z-key sheathe toggle: cosmetic, no payload; the Sim owns the dead-gate
+      // and the combat auto-unsheathe rule.
+      case 'stow_weapon':
+        sim.toggleWeaponStow(pid);
+        break;
       // Skin-select event lock-in. The Sim re-validates the skin against the
       // rank it rolled and consumes the event token; a forged claim no-ops.
       case 'claim_event_skin':
@@ -4113,6 +4162,62 @@ export class GameServer {
         ) {
           sim.vcupBet(msg.side, Math.floor(msg.amount), pid);
         }
+        break;
+
+      // Dungeon Finder (docs/prd/dungeon-finder.md). Deliberately NOT in
+      // HEAVY_SELF_CMDS: finder state rides its own `df`/`dfb` delta keys, and
+      // group formation bumps the party key through the normal snapshot path.
+      // Every field is validated here; the Sim re-validates eligibility, roles,
+      // capacity, and party state authoritatively.
+      case 'df_roles': {
+        if (Array.isArray(msg.roles) && msg.roles.length <= 3) {
+          const roles = msg.roles.filter(isFinderRole);
+          if (roles.length === msg.roles.length) sim.dungeonFinderSetRoles(roles, pid);
+        }
+        break;
+      }
+      case 'df_queue': {
+        if (Array.isArray(msg.activities) && msg.activities.length <= 16) {
+          const activities = msg.activities.filter(
+            (a): a is string => typeof a === 'string' && a.length <= 64,
+          );
+          if (activities.length === msg.activities.length)
+            sim.dungeonFinderQueueJoin(activities, pid);
+        }
+        break;
+      }
+      case 'df_queue_leave':
+        sim.dungeonFinderQueueLeave(pid);
+        break;
+      case 'df_proposal':
+        sim.dungeonFinderRespond(msg.accept === true, pid);
+        break;
+      case 'df_list_create': {
+        if (
+          typeof msg.activity === 'string' &&
+          msg.activity.length <= 64 &&
+          Array.isArray(msg.tags) &&
+          msg.tags.length <= 8
+        ) {
+          const tags = msg.tags.filter(isFinderListingTag);
+          if (tags.length === msg.tags.length)
+            sim.dungeonFinderListingCreate(msg.activity, tags, pid);
+        }
+        break;
+      }
+      case 'df_list_close':
+        sim.dungeonFinderListingClose(pid);
+        break;
+      case 'df_apply':
+        if (typeof msg.listing === 'number' && Number.isFinite(msg.listing))
+          sim.dungeonFinderApply(msg.listing, pid);
+        break;
+      case 'df_apply_cancel':
+        sim.dungeonFinderApplyCancel(pid);
+        break;
+      case 'df_app_respond':
+        if (typeof msg.applicant === 'number' && Number.isFinite(msg.applicant))
+          sim.dungeonFinderApplicationRespond(msg.applicant, msg.accept === true, pid);
         break;
 
       // post-cap cosmetic prestige (Max-Level XP Overflow)
@@ -4806,6 +4911,16 @@ export class GameServer {
     if (this.sim.tickCount - session.lastVcupWireTick >= VC_WIRE_INTERVAL_TICKS) {
       session.lastVcupWireTick = this.sim.tickCount;
       maybe('vcup', this.sim.cupInfoFor(anchorSession.pid));
+    }
+    // Dungeon Finder at its own UI cadence (DF_WIRE_HZ): the personal `df`
+    // blob carries whole-second clocks (queue wait, proposal countdown), so
+    // re-evaluating every tick would re-serialize it 20 times per visible
+    // change. The shared `dfb` board is a separate key so a live countdown
+    // never re-sends the listings.
+    if (this.sim.tickCount - session.lastDfWireTick >= DF_WIRE_INTERVAL_TICKS) {
+      session.lastDfWireTick = this.sim.tickCount;
+      maybe('df', this.sim.dungeonFinderInfoFor(anchorSession.pid));
+      maybe('dfb', this.sim.dungeonFinderBoardView());
     }
     // market info is null unless the player is standing at the Merchant, so it
     // only rides the wire for players actually browsing the World Market

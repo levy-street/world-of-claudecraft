@@ -65,6 +65,19 @@ export function resolveEquipSlot(
   return 'ring1';
 }
 
+// Whether a concrete equipment key can structurally hold `item`. Class and spec
+// policy is deliberately left to canEquipItemInSlot. Rings accept either finger;
+// weapons accept mainhand and, unless explicitly mainhand-only, offhand.
+export function slotAcceptsItem(item: ItemDef, slot: EquipSlot): boolean {
+  if (!item.slot) return false;
+  if (item.kind === 'weapon') {
+    if (slot === 'mainhand') return true;
+    return slot === 'offhand' && weaponHand(item) !== 'mainhand';
+  }
+  if (item.slot === 'ring') return slot === 'ring1' || slot === 'ring2';
+  return item.slot === slot;
+}
+
 export function maxArmorTypeForClass(cls: PlayerClass): ArmorType {
   if (MAIL_CLASSES.has(cls)) return 'mail';
   if (LEATHER_CLASSES.has(cls)) return 'leather';

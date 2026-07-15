@@ -1805,12 +1805,11 @@ describe('client HTML shell', () => {
     expect(mobileControlsTs).toContain(
       "this.bindButton('mobile-target-cycle', () => this.callbacks.onCycleTarget());",
     );
-    // The attack toggle's fallback fires ONLY with no live hostile target (and
-    // never while auto-attacking), so a tap on a live target still toggles the
-    // classic castSlot(0) attack.
-    expect(hudTs).toContain(
-      'if (p.autoAttack || hasLiveHostileTarget || !this.onMobileAttackNearest) {',
-    );
+    // The attack toggle's fallback fires only with no live hostile target and
+    // never while auto-attacking. Its fixed mobile control must not route through
+    // the desktop slot 0, which can hold an assigned action.
+    expect(hudTs).toContain('handleMobileAttackTap(');
+    expect(hudTs).toContain('activateAttack: () => this.activateFixedAttackSlot(),');
   });
 
   it('keeps joystick autorun on the move pad and Jump on the ring bottom row', () => {

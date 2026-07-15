@@ -33,11 +33,7 @@ const branch =
 const releaseTier = branch.startsWith('release/');
 const env = releaseTier ? { ...process.env, I18N_RELEASE_TIER: '1' } : process.env;
 
-const I18N_ARTIFACTS = [
-  'src/ui/i18n.resolved.generated',
-  'src/admin/i18n.resolved.generated',
-  'src/ui/i18n.status.summary.json',
-];
+const I18N_ARTIFACTS = ['src/ui/i18n.resolved.generated', 'src/admin/i18n.resolved.generated'];
 
 const steps = [
   ['i18n artifacts', 'npm', ['run', 'i18n:gen']],

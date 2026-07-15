@@ -586,7 +586,7 @@ describe('hud_perf_budget ARM 2: per-frame allocation budget (Node, npm test)', 
         slots: [
           {
             slotIndex: 0,
-            isAttack: false,
+            isAttack: () => false,
             hasAction: () => true,
             ability: () => ({
               def: {

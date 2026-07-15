@@ -179,6 +179,7 @@ export const ENTITY_EXCLUDE: ReadonlySet<string> = new Set([
   'holderTier', // cosmetic wallet flair; sim never reads it
   'holderBalance',
   'stealthed', // derived cache of auras.some(a => a.kind === 'stealth'); auras is sampled
+  'weaponStowed', // Z-key sheathe pose; render-only, no gameplay path reads it
 ]);
 
 // Session-only / presentation / derived PlayerMeta fields. Derived fields

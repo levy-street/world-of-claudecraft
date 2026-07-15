@@ -52,7 +52,7 @@ interface SlotOpts {
 function slot(slotIndex: number, opts: SlotOpts = {}): ActionBarSlotDescriptor {
   return {
     slotIndex,
-    isAttack: opts.attack ?? false,
+    isAttack: () => opts.attack ?? false,
     hasAction: () => opts.hasAction ?? (opts.ability != null || opts.item != null),
     ability: () => opts.ability ?? null,
     item: () => opts.item ?? null,
@@ -143,6 +143,42 @@ describe('actionBarView: the four slot kinds classify correctly', () => {
     expect(s[3].iconKey).toBe(EMPTY_ICON_KEY);
     expect(s[3].abilityId).toBeNull();
     expect(s[3].itemId).toBeNull();
+  });
+
+  it('slot 0 stops being Attack when isAttack() is false, rendering its assigned action', () => {
+    // The removable Attack button: with "Show Attack Button" off, the HUD makes
+    // slot 0's isAttack() return false and actionForSlot(0) resolve the assigned
+    // action, so the first slot renders as a normal ability slot, not Attack.
+    const view = createActionBarView(
+      descriptor(slot(0, { attack: false, ability: ability('frostbolt') })),
+      fakeDeps(),
+    );
+    const s = view.tick(world()).slots;
+    expect(s[0].kind).toBe('ability');
+    expect(s[0].iconKey).toBe(`${ABILITY_ICON_PREFIX}frostbolt`);
+    expect(s[0].abilityId).toBe('frostbolt');
+  });
+
+  it('slot 0 honors the live isAttack() accessor across ticks (toggle on/off)', () => {
+    // The Interface toggle flips slot 0 between Attack and a normal slot at runtime
+    // with no rebuild; the view must consult the accessor every tick, not cache it.
+    let showAttack = true;
+    const s0: ActionBarSlotDescriptor = {
+      slotIndex: 0,
+      isAttack: () => showAttack,
+      hasAction: () => !showAttack,
+      ability: () => (showAttack ? null : ability('fireball')),
+      item: () => null,
+      keybindLabel: () => 'K0',
+    };
+    const view = createActionBarView(descriptor(s0), fakeDeps());
+    expect(view.tick(world()).slots[0].kind).toBe('attack');
+    showAttack = false;
+    const off = view.tick(world()).slots[0];
+    expect(off.kind).toBe('ability');
+    expect(off.abilityId).toBe('fireball');
+    showAttack = true;
+    expect(view.tick(world()).slots[0].kind).toBe('attack');
   });
 
   it('an item slot wins over a stale ability binding (item-first precedence)', () => {

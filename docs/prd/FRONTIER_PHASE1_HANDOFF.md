@@ -219,8 +219,8 @@ S4, S5, S6 are independent of each other once S1-S3 are merged.
   and update the English value of `hud.keybinds.actions.arena`; window title key
   likewise. All new UI keys go in `src/ui/i18n.catalog/hud.ts` under a
   `hud.frontier.*` block. Then `npm run i18n:scan && npm run i18n:build`,
-  commit the regenerated `i18n.resolved.generated/` + status files, and run
-  the completeness test (gotcha G4).
+  commit the regenerated `i18n.resolved.generated/` slices (the status summary
+  is gitignored, never committed), and run the completeness test (gotcha G4).
 - FCT + events: handle `honorGain` (gold `+N Honor` float on self, XP-case
   template at `hud.ts:6165`), `frontierEntered`/`frontierLeft` as system lines.
 - Acceptance: `npx vitest run tests/frontier_panel_view.test.ts tests/i18n_completeness.test.ts tests/localization_fixes.test.ts`; manual: `npm run dev`, press G, enter, kill, see honor float (screenshot per the headless screenshot workflow).
@@ -283,9 +283,9 @@ locales plus exact level-20 stat budgets; that lands with Phase 2 economy).
   `UPDATE_PARITY=1` on an existing scenario.
 - **G4, i18n gates bite.** Known from prior work: new catalog keys have failed
   `tests/i18n_completeness` when the generated files were not rebuilt and
-  committed (`npm run i18n:scan && npm run i18n:build`, commit
-  `i18n.resolved.generated/` + `i18n.status.summary.json`). Run the test
-  locally before pushing. Do not hand-edit locale overlays except for the M16 five
+  committed (`npm run i18n:scan && npm run i18n:build`, commit the
+  `i18n.resolved.generated/` slices; `i18n.status.summary.json` is gitignored,
+  not committed). Run the test locally before pushing. Do not hand-edit locale overlays except for the M16 five
   non-Latin fills required alongside new wordy English values.
 - **G5, `hostile` flag vs `isHostileTo`.** Mob hostility is a template flag;
   player hostility is ONLY the `isHostileTo` clauses. Do not set any

@@ -159,6 +159,10 @@ export const BOOL_SETTINGS = {
   // startAutoAttack still no-ops unless a valid hostile target is in range, and
   // heals / buffs / damage-breakable CC (gouge, sap, sheep) never trigger it.
   startAttackOnAbilityUse: { def: true },
+  // on by default: slot 0 shows the classic fixed Attack (auto-attack) toggle.
+  // Turning it off (or right-clicking the Attack button) removes it from the bar,
+  // freeing slot 0 and its keybind to hold a normal assignable action.
+  showAttackButton: { def: true },
   // off by default: walk-by proximity autoloot (loot corpses just by walking
   // past them). Auto-grabbing loot can feel jarring, so it is opt-in and classic
   // deliberate looting stays the default. Gates the client AutoLoot pass in

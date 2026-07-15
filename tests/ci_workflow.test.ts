@@ -24,6 +24,23 @@ describe('CI workflow parity', () => {
     expect(gate).toContain("['browser regressions', 'npm', ['run', 'test:browser']]");
   });
 
+  it('posts the i18n coverage summary and diffs only the committed slices in both jobs', () => {
+    // The job-summary step is the out-of-band audit trail that replaced the
+    // committed src/ui/i18n.status.summary.json; deleting it would silently
+    // drop the trail, and re-adding the summary to a freshness diff or to
+    // gate.mjs would resurrect the aggregate merge conflicts the degit removed.
+    const prGate = jobSource('pr-gate');
+    const releaseGate = jobSource('release-gate');
+    for (const job of [prGate, releaseGate]) {
+      expect(job).toContain('run: node scripts/i18n_coverage_summary.mjs');
+      expect(job).toContain(
+        'run: git diff --exit-code -- src/ui/i18n.resolved.generated src/admin/i18n.resolved.generated',
+      );
+      expect(job).not.toContain('src/ui/i18n.status.summary.json');
+    }
+    expect(gate).not.toContain('src/ui/i18n.status.summary.json');
+  });
+
   it('runs the release tier against a release-to-main pull request merge result', () => {
     const prGate = jobSource('pr-gate');
     const releaseGate = jobSource('release-gate');

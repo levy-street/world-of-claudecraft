@@ -5,8 +5,9 @@
 // assembles the runtime `translations` map, a loaders.ts (per-locale dynamic-import
 // thunks + SUPPORTED_LANGUAGES, scaffolding for the later lazy flip), and pending.ts.
 // The single-file resolved table was split into this directory in the per-locale
-// emit split; the resolved-table SHA is invariant under the split (it hashes
-// src/ui/i18n.ts EXPORTS via scripts/i18n_resolved_hash.mjs, not file bytes).
+// emit split; the resolved-table hash printed by the scripts/i18n_resolved_hash.mjs
+// diagnostic is invariant under the split (it hashes src/ui/i18n.ts EXPORTS, not
+// file bytes).
 //
 // This is the load-bearing tsc safety net for the i18n scaling refactor. `en`
 // (src/ui/i18n.catalog) is the authoritative NESTED base; the 13 non-English
