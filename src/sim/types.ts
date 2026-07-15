@@ -230,6 +230,8 @@ export type AuraKind =
   | 'buff_spelldmg'
   | 'buff_spellhaste'
   | 'cast_shield'
+  | 'shield_wall'
+  | 'guardian_ward'
   | 'hot'
   | 'absorb'
   | 'imbue'

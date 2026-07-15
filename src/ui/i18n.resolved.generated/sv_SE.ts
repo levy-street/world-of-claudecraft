@@ -6908,10 +6908,6 @@ export const sv_SE: EnTranslations = {
         "name": "Återuppliva djur",
         "description": "Återupplivar ditt döda djur och kallar det till din sida."
       },
-      "commanding_shout": {
-        "description": "Ökar din uthållighet med {buff} i 2 min.",
-        "name": "Stärkande rop"
-      },
       "rend": {
         "description": "Sårar målet och får det att blöda för {damage} skada över {duration} sek.",
         "name": "Djup skåra"

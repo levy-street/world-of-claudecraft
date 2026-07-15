@@ -6908,10 +6908,6 @@ export const da_DK: EnTranslations = {
         "name": "Genoplive Kæledyr",
         "description": "Genopliver dit døde kæledyr og bringer det tilbage til din side."
       },
-      "commanding_shout": {
-        "description": "Øger din Udholdenhed med {buff} i 2 min.",
-        "name": "Styrkende Råb"
-      },
       "rend": {
         "description": "Sårer målet og får det til at bløde for {damage} skade over {duration} sek.",
         "name": "Dyb Flænge"

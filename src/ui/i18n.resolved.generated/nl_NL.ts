@@ -6908,10 +6908,6 @@ export const nl_NL: EnTranslations = {
         "name": "Huisdier Herleven",
         "description": "Doet je dode huisdier herleven en brengt het terug aan je zijde."
       },
-      "commanding_shout": {
-        "description": "Verhoogt je Uithoudingsvermogen met {buff} gedurende 2 min.",
-        "name": "Versterkende Kreet"
-      },
       "rend": {
         "description": "Verwondt het doelwit, waardoor het {damage} schade bloedt gedurende {duration} sec.",
         "name": "Diepe Snee"

@@ -6908,10 +6908,6 @@ export const pl_PL: EnTranslations = {
         "name": "Wskrzeszenie zwierzęcia",
         "description": "Wskrzesza twoje martwe zwierzę i przywraca je u twego boku."
       },
-      "commanding_shout": {
-        "description": "Zwiększa twoją kondycję o {buff} na 2 min.",
-        "name": "Krzepiący okrzyk"
-      },
       "rend": {
         "description": "Rani cel, powodując krwawienie zadające {damage} obrażeń w ciągu {duration} sek.",
         "name": "Głęboka rana"

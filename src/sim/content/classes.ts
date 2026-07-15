@@ -211,6 +211,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'righteous_fury',
       'retribution_aura',
       'rebuke',
+      'sacred_bulwark',
     ],
     color: 0xf58cba,
   },
@@ -388,6 +389,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'rip',
       'hurricane',
       'skull_bash',
+      'primal_reflexes',
     ],
     color: 0xff7d0a,
   },
@@ -2267,6 +2269,23 @@ export const ABILITIES: Record<string, AbilityDef> = {
       'Surrounds you with holy energy for 30 min, dealing 5 Holy damage to any enemy that strikes you in melee.',
   },
 
+  sacred_bulwark: {
+    id: 'sacred_bulwark',
+    name: 'Sacred Bulwark',
+    class: 'paladin',
+    learnLevel: 20,
+    cost: 15,
+    castTime: 0,
+    cooldown: 180,
+    range: 0,
+    school: 'holy',
+    requiresTarget: false,
+    offGcd: true,
+    effects: [{ type: 'selfBuff', kind: 'guardian_ward', value: 0.35, duration: 10 }],
+    description:
+      'For $t sec, the next enemy hit that would kill you is denied, restoring you to 35% health instead.',
+  },
+
   // ====================== HUNTER ======================
   tame_beast: {
     id: 'tame_beast',
@@ -3835,6 +3854,23 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 150, duration: 15 }],
     description: 'Your skin hardens like bark, increasing armor by 150 for 15 sec.',
   },
+  primal_reflexes: {
+    id: 'primal_reflexes',
+    name: 'Primal Reflexes',
+    class: 'druid',
+    learnLevel: 20,
+    cost: 0,
+    castTime: 0,
+    cooldown: 60,
+    range: 0,
+    school: 'nature',
+    requiresTarget: false,
+    offGcd: true,
+    usableInForm: true,
+    effects: [{ type: 'selfBuff', kind: 'buff_dodge', value: 0.5, duration: 6 }],
+    description: 'Your instincts sharpen, increasing your chance to dodge by 50% for 6 sec.',
+  },
+
   starfire: {
     id: 'starfire',
     name: 'Skyfall',

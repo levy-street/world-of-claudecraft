@@ -2386,9 +2386,11 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
           id: 'dru_r17_survival_of_the_fittest',
           name: 'Ironhide Reflex',
           description:
-            'Taking a hit for at least 20% of your maximum health shields you, absorbing 80 damage for 6 sec. While in Bruin Form, it also restores 20 rage. 20 sec internal cooldown.',
+            'Increases threat by 20% and armor by 15%. Taking a hit for at least 20% of your maximum health also shields you for 80 damage for 6 sec. While in Bruin Form, it restores 20 rage. 20 sec internal cooldown.',
           icon: 'bear_form',
           effect: {
+            global: { threatPct: 0.2 },
+            stats: { armorPct: 0.15 },
             proc: {
               id: 'dru_survival_of_the_fittest',
               name: 'Ironhide Reflex',
