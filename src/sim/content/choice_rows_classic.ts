@@ -304,14 +304,31 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 17,
       theme: 'survival',
-      decision: 'frequent escape vs emergency stasis vs reactive ward',
+      decision: 'reactive escape-and-counter vs emergency stasis vs reactive ward',
       options: [
         {
-          id: 'mag_r17_blink',
-          name: 'Flickerstep',
-          description: 'Grants Flickerstep.',
-          icon: 'blink',
-          effect: { grant: { ability: 'blink' } },
+          id: 'mag_r17_frigid_reversal',
+          name: 'Frigid Reversal',
+          description:
+            'Taking a hit for at least 15% of your maximum health resets Flickerstep and makes your next Rimelance within 8 sec instant. 20 sec internal cooldown.',
+          icon: 'frostbolt',
+          effect: {
+            proc: {
+              id: 'mag_frigid_reversal',
+              name: 'Frigid Reversal',
+              school: 'frost',
+              trigger: { on: 'bigHitTaken', hpFrac: 0.15, icd: 20 },
+              responses: [
+                { kind: 'cooldownRefund', ability: 'blink', seconds: 'reset' },
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_instant',
+                  abilities: ['frostbolt'],
+                  duration: 8,
+                },
+              ],
+            },
+          },
         },
         {
           id: 'mag_r17_ice_block',

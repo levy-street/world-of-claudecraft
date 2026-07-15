@@ -4808,6 +4808,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.flame_shock': '瞬发的灼烧，先打出一记，并持续灼烧目标。',
   'guide.abilityHook.frost_armor': '持续的自我增益，开战前先硬化你的护甲。',
   'guide.abilityHook.frostbolt': '从远处发动攻击并减速目标，让它无法贴近你。',
+  'guide.abilityHook.blink': '向前传送并解除定身，让每位法师都有可靠的脱身手段。',
   'guide.abilityHook.garrote': '从潜行中起手，用钢丝使目标持续流血。',
   'guide.abilityHook.gouge': '短暂使目标失去行动能力，方便你重新走位或解围。',
   'guide.abilityHook.healing_touch': '一记施法时间较长的单体大治疗，用于把人奶满。',

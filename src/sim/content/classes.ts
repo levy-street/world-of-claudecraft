@@ -131,6 +131,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'frost_armor',
       'arcane_intellect',
       'frostbolt',
+      'blink',
       'conjure_water',
       'conjure_food',
       'fire_blast',

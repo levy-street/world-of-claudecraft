@@ -1507,7 +1507,7 @@ const classAbilityNamesEn = {
         'Calls down avenging power, increasing attack power by 60 and spell power by 30 for 20 sec. (Paladin talent)',
       ],
       ['berserk', 'Red Haze', 'Increases attack power by 70 for 15 sec. (Druid talent)'],
-      ['blink', 'Flickerstep', 'Teleports you 15 yd forward and breaks roots. (Mage talent)'],
+        ['blink', 'Flickerstep', 'Teleports you 15 yd forward and breaks roots. (Mage)'],
       [
         'bloodlust',
         'Storm Chorus',

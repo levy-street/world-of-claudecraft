@@ -81,7 +81,7 @@ export const TALENT_ABILITIES_V2_B = {
     school: 'arcane',
     requiresTarget: false,
     effects: [{ type: 'blinkForward', distance: 15, breakRoots: true }],
-    description: 'Teleports you 15 yd forward and breaks roots. (Mage talent)',
+    description: 'Teleports you 15 yd forward and breaks roots. (Mage)',
   },
   ice_block: {
     id: 'ice_block',

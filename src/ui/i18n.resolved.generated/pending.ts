@@ -11,28 +11,34 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "entities.abilities.icefall.description",
-    "entities.abilities.icefall.name"
+    "entities.abilities.icefall.name",
+    "guide.abilityHook.blink"
   ],
   "es_ES": [
     "entities.abilities.icefall.description",
-    "entities.abilities.icefall.name"
+    "entities.abilities.icefall.name",
+    "guide.abilityHook.blink"
   ],
   "fr_FR": [
     "entities.abilities.icefall.description",
-    "entities.abilities.icefall.name"
+    "entities.abilities.icefall.name",
+    "guide.abilityHook.blink"
   ],
   "fr_CA": [
     "entities.abilities.icefall.description",
-    "entities.abilities.icefall.name"
+    "entities.abilities.icefall.name",
+    "guide.abilityHook.blink"
   ],
   "en_CA": [],
   "it_IT": [
     "entities.abilities.icefall.description",
-    "entities.abilities.icefall.name"
+    "entities.abilities.icefall.name",
+    "guide.abilityHook.blink"
   ],
   "de_DE": [
     "entities.abilities.icefall.description",
-    "entities.abilities.icefall.name"
+    "entities.abilities.icefall.name",
+    "guide.abilityHook.blink"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -40,39 +46,48 @@ export const pending: Record<string, readonly string[]> = {
   "ja_JP": [],
   "pt_BR": [
     "entities.abilities.icefall.description",
-    "entities.abilities.icefall.name"
+    "entities.abilities.icefall.name",
+    "guide.abilityHook.blink"
   ],
   "ru_RU": [],
   "cs_CZ": [
     "entities.abilities.icefall.description",
-    "entities.abilities.icefall.name"
+    "entities.abilities.icefall.name",
+    "guide.abilityHook.blink"
   ],
   "nl_NL": [
     "entities.abilities.icefall.description",
-    "entities.abilities.icefall.name"
+    "entities.abilities.icefall.name",
+    "guide.abilityHook.blink"
   ],
   "pl_PL": [
     "entities.abilities.icefall.description",
-    "entities.abilities.icefall.name"
+    "entities.abilities.icefall.name",
+    "guide.abilityHook.blink"
   ],
   "id_ID": [
     "entities.abilities.icefall.description",
-    "entities.abilities.icefall.name"
+    "entities.abilities.icefall.name",
+    "guide.abilityHook.blink"
   ],
   "tr_TR": [
     "entities.abilities.icefall.description",
-    "entities.abilities.icefall.name"
+    "entities.abilities.icefall.name",
+    "guide.abilityHook.blink"
   ],
   "sv_SE": [
     "entities.abilities.icefall.description",
-    "entities.abilities.icefall.name"
+    "entities.abilities.icefall.name",
+    "guide.abilityHook.blink"
   ],
   "vi_VN": [
     "entities.abilities.icefall.description",
-    "entities.abilities.icefall.name"
+    "entities.abilities.icefall.name",
+    "guide.abilityHook.blink"
   ],
   "da_DK": [
     "entities.abilities.icefall.description",
-    "entities.abilities.icefall.name"
+    "entities.abilities.icefall.name",
+    "guide.abilityHook.blink"
   ]
 };

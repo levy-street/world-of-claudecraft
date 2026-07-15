@@ -5043,6 +5043,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.frost_armor': '전투 전에 방어구를 단단하게 만드는 지속형 자기 강화입니다.',
   'guide.abilityHook.frostbolt':
     '원거리에서 타격하며 대상의 이동 속도를 늦춰 다가오지 못하게 합니다.',
+  'guide.abilityHook.blink':
+    '앞으로 순간이동하고 이동 불가 효과를 해제해 모든 마법사에게 확실한 탈출 수단을 줍니다.',
   'guide.abilityHook.garrote': '은신 상태에서 철사로 기습해 시간이 지나며 대상을 출혈시킵니다.',
   'guide.abilityHook.gouge': '대상을 잠시 무력화하여 위치를 바꾸거나 보호할 틈을 만듭니다.',
   'guide.abilityHook.healing_touch':
