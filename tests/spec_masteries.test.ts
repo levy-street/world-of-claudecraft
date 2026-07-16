@@ -65,8 +65,8 @@ describe('spec masteries', () => {
       // Frost-kit scoped so the mage's fire/arcane baseline spells stay untouched;
       // this per-ability damage is the spec's future mastery-rating scaling axis.
       ability: [
-        { ability: 'frostbolt', dmgPct: 0.25 },
-        { ability: 'frost_nova', dmgPct: 0.25 },
+        { ability: 'frostbolt', dmgPct: 0.15 },
+        { ability: 'frost_nova', dmgPct: 0.15 },
       ],
       stats: { armorPct: 0.1 },
     });
@@ -114,13 +114,17 @@ describe('spec masteries', () => {
       global: { healPct: 0.2 },
     });
     expect(TALENTS.priest?.specs.find((s) => s.id === 'shadow')?.mastery.effect).toEqual({
-      global: { dotDmgPct: 0.15, spellDmgPct: 0.1 },
+      // Vespers is the DoT specialization only; Gloamveil Form carries the
+      // general shadow multiplier (see fix/moonkin-damage-balance).
+      global: { dotDmgPct: 0.15 },
     });
     expect(TALENTS.shaman?.specs.find((s) => s.id === 'enhancement')?.mastery.effect).toEqual({
       global: { meleeHastePct: 0.1, meleeDmgPct: 0.1 },
     });
     expect(TALENTS.druid?.specs.find((s) => s.id === 'balance')?.mastery.effect).toEqual({
-      global: { spellDmgPct: 0.15, spellHastePct: 0.1 },
+      // Moonrage trimmed to 10%: it compounds with Moonwing Form's 15%,
+      // landing the same ~1.265 permanent stack the shadow priest has.
+      global: { spellDmgPct: 0.1, spellHastePct: 0.1 },
     });
     expect(TALENTS.druid?.specs.find((s) => s.id === 'feral')?.mastery.effect).toEqual({
       global: { meleeDmgPct: 0.15, dotDmgPct: 0.15, threatPct: 0.2 },
@@ -352,7 +356,7 @@ describe('spec masteries', () => {
       mage: {
         arcane: { global: 'spellDmgPct', value: 0.15 },
         fire: { global: 'critDmgSpellPct', value: 0.5 },
-        frost: { abilities: ['frostbolt', 'frost_nova'], dmgPct: 0.25 },
+        frost: { abilities: ['frostbolt', 'frost_nova'], dmgPct: 0.15 },
       },
       rogue: {
         assassination: { global: 'dotDmgPct', value: 0.2 },
@@ -375,7 +379,7 @@ describe('spec masteries', () => {
         destruction: { global: 'critDmgSpellPct', value: 0.5 },
       },
       druid: {
-        balance: { global: 'spellDmgPct', value: 0.15 },
+        balance: { global: 'spellDmgPct', value: 0.1 },
         feral: { global: 'meleeDmgPct', value: 0.15 },
         restoration: { global: 'hotHealPct', value: 0.25 },
       },
