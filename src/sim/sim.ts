@@ -2488,7 +2488,12 @@ export class Sim {
         ? { dailyQuests: { date: meta.dailyQuests.date, done: [...meta.dailyQuests.done] } }
         : {}),
       ...(meta.frontierReturn ? { frontierReturn: { ...meta.frontierReturn } } : {}),
-      ...(meta.arenaDaily ? { arenaDaily: { ...meta.arenaDaily } } : {}),
+      // An all-empty record (a bout entered with no host calendar, so both days are
+      // '') normalizes back to undefined on load; omit it here too so
+      // save/load/save stays byte-stable.
+      ...(meta.arenaDaily && (meta.arenaDaily.enteredDay || meta.arenaDaily.claimedDay)
+        ? { arenaDaily: { ...meta.arenaDaily } }
+        : {}),
       prestigeRank: meta.prestigeRank,
       unlockedMilestones: [...meta.unlockedMilestones],
       restedXp: meta.restedXp,

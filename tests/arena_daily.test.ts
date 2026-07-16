@@ -97,4 +97,21 @@ describe('Ashen Coliseum daily: the claim command', () => {
       claimedDay: '2026-07-15',
     });
   });
+
+  it('omits an all-empty record from serialization (byte-stable save/load/save)', () => {
+    const sim = new Sim({ seed: 63, playerClass: 'warrior', autoEquip: true });
+    const meta = sim.meta(sim.player.id)!;
+    // Offline/headless never set a host calendar, so entering a bout stamps ''.
+    markArenaEntered(meta, sim.utcDay);
+    expect(meta.arenaDaily).toEqual({ enteredDay: '', claimedDay: '' });
+    // normalizeArenaDaily coerces the all-empty record back to undefined on load, so
+    // emitting it would make save/load/save unstable; the serializer omits it.
+    const state = sim.serializeCharacter(sim.player.id)!;
+    expect(state.arenaDaily).toBeUndefined();
+
+    const sim2 = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const pid2 = sim2.addPlayer('warrior', 'Alt', { state });
+    expect(sim2.meta(pid2)!.arenaDaily).toBeUndefined();
+    expect(sim2.serializeCharacter(pid2)!.arenaDaily).toBeUndefined();
+  });
 });
