@@ -48,7 +48,7 @@ export function channelProblem(channels, expected) {
  *   - Sample rate and loudness checks still apply.
  *
  * @param {{ duration: number, bitrate: number, sampleRate: number, peakDb?: number|null, lufs?: number|null, isLossless?: boolean, isMp3?: boolean }} stats
- * @returns {{ reject: boolean, problems: string[], normBranch: 'peak'|'lufs'|null }}
+ * @returns {{ reject: boolean, problems: string[], advisories: string[], normBranch: 'peak'|'lufs'|null }}
  */
 export function classify({
   duration,
@@ -67,10 +67,11 @@ export function classify({
   preserveLoudness = false,
 }) {
   if (!isLossless && bitrate < MIN_SOURCE_BITRATE) {
-    return { reject: true, problems: [], normBranch: null };
+    return { reject: true, problems: [], advisories: [], normBranch: null };
   }
 
   const problems = [];
+  const advisories = [];
 
   if (isLossless) {
     problems.push('lossless source');
@@ -127,6 +128,26 @@ export function classify({
       problems.push(`${lufs.toFixed(1)} LUFS (want ${TARGET_LUFS} LUFS)`);
     }
   }
+  // A preserved-loudness master's measured LUFS should reflect the author's
+  // own mix, not this pipeline's generated-content target: it is never
+  // gain-staged toward TARGET_LUFS, only ever peak-limited. A custom key
+  // landing within tolerance of TARGET_LUFS anyway is CONSISTENT with the
+  // fingerprint of a real, previously-shipped bug (conform ran the
+  // LUFS-targeting branch on it before `custom: true` was set, and no
+  // reconform since has re-derived it from a pristine source, since conform
+  // reads its input from the same public/audio/sfx file it writes back to),
+  // but it is not proof: an author's own hot mix can coincidentally land
+  // there too (confirmed happening legitimately for several real keys), and
+  // this checker has no access to the external master-store source to tell
+  // the two apart. Advisory only, like the channel/naming checks below, so a
+  // human confirms it instead of the gate hard-failing a real, intentional mix.
+  if (normBranch === 'lufs' && lufs !== null && preserveLoudness) {
+    if (Math.abs(lufs - TARGET_LUFS) <= NORM_TOLERANCE) {
+      advisories.push(
+        `${lufs.toFixed(1)} LUFS looks loudness-targeted, not peak-safety-only (suspiciously close to the generated-content target ${TARGET_LUFS} LUFS; verify against the master-store source)`,
+      );
+    }
+  }
   // LUFS-target loudness alone cannot catch a clipping file: a wide-crest-factor
   // source hitting the loudness target can still overshoot the true-peak
   // ceiling (MP3 encoding's own inter-sample overshoot on top of that makes
@@ -136,5 +157,5 @@ export function classify({
     problems.push(`peak ${peakDb.toFixed(1)}dBFS (want at or under ${TARGET_PEAK_DBFS}dBFS)`);
   }
 
-  return { reject: false, problems, normBranch };
+  return { reject: false, problems, advisories, normBranch };
 }

@@ -140,7 +140,10 @@ describe('SFX runtime playback profile', () => {
       normalizeSfxGainMap({
         version: 1,
         categoryBaselineDb: {},
-        keyTrimDb: { foot_grass: 1 },
+        // foot_grass has its own computed ceiling above the flat 0dB default
+        // now (see sfx_gain_ceiling.mjs), so this must clear ANY plausible
+        // per-key ceiling, not just the old flat one, to still be unsafe.
+        keyTrimDb: { foot_grass: 20 },
       }),
     ).toThrow('resolved gain for foot_grass');
     expect(() => normalizeSfxSpeedMap({ version: 1, rateByKey: { foot_grass: '1.2' } })).toThrow(

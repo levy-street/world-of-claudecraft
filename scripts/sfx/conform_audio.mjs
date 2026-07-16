@@ -367,11 +367,12 @@ export function inspectSfxConformance(file, { ffmpegPath, ffprobePath, preserveL
   // Measured for BOTH branches: the lufs branch's own loudness figure cannot
   // reveal a true-peak overshoot (see classify's peak check above), so a
   // LUFS-target file needs its real peak measured too, not just its LUFS.
+  // LUFS is measured for a preserveLoudness file too (not to re-target it,
+  // classify() never does that for preserveLoudness): the wrong-branch
+  // fingerprint check below needs the real value to compare against
+  // TARGET_LUFS.
   const peakDb = measureSfxTruePeakDb(file, ffmpegPath);
-  const lufs =
-    preliminary.normBranch === 'lufs' && !preserveLoudness
-      ? measureSfxLufs(file, ffmpegPath)
-      : null;
+  const lufs = preliminary.normBranch === 'lufs' ? measureSfxLufs(file, ffmpegPath) : null;
   return {
     ...stats,
     isLossless,

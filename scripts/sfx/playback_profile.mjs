@@ -103,15 +103,24 @@ export function categoryForSfx(key) {
   return 'other';
 }
 
+// A custom key with a computed ceiling (see sfx_gain_ceiling.mjs) may resolve
+// above the flat 0dB default, up to its own measured-headroom ceiling; every
+// other key is unaffected (ceiling falls back to the original flat max).
+export function resolvedGainCeilingDb(key) {
+  return SFX_GAIN_CEILINGS[key] ?? RESOLVED_GAIN_MAX_DB;
+}
+
+// Linear form of resolvedGainCeilingDb, for callers (the generated manifest,
+// the runtime pack validator) that work in gain multipliers, not dB.
+export function resolvedGainCeiling(key) {
+  return Number((10 ** (resolvedGainCeilingDb(key) / 20)).toFixed(6));
+}
+
 function resolvedGainDb(key, gainMap) {
   const category = categoryForSfx(key);
   const baseline = gainMap.categoryBaselineDb[category];
   const trim = gainMap.keyTrimDb[key] ?? 0;
-  // A custom key with a computed ceiling (see sfx_gain_ceiling.mjs) may
-  // resolve above the flat 0dB default, up to its own measured-headroom
-  // ceiling; every other key is unaffected (ceiling falls back to the
-  // original flat max).
-  const maxDb = SFX_GAIN_CEILINGS[key] ?? RESOLVED_GAIN_MAX_DB;
+  const maxDb = resolvedGainCeilingDb(key);
   return boundedNumber(baseline + trim, RESOLVED_GAIN_MIN_DB, maxDb, `resolved gain for ${key}`);
 }
 
