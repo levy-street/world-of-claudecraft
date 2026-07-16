@@ -46,6 +46,11 @@ export interface HeroicDungeonTuning {
 // per-dungeon multiplier via mechanicDamageMult; support heals scale with
 // mechanicHealMult (= healthMultiplier); both wired in
 // ../instances/difficulty.ts.
+//
+// Rounding note: the 25% cut and the ~half add values are calibration-rounded
+// to tidy multipliers (drowned_temple 5.7 to 4.3 is a 24.6% cut, hollow_crypt
+// 5.1 to 2.55 is exactly half); the round numbers are intentional, do not
+// "fix" one back to the exact fraction.
 export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
   hollow_crypt: {
     id: 'hollow_crypt',
