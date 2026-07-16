@@ -3,27 +3,30 @@
 // resolution logic lives in ../professions/enchanting.ts behind the
 // SimContext seam.
 //
-// Scope: always-known enchants covering the weapon slot plus every armor slot
-// (helmet through ring). Each grants a flat primary-stat or armor bonus (the
-// only bonus categories recalcPlayerStats reads off an item instance's
-// rolled.stats, see src/sim/entity.ts); a weapon-damage enchant is deliberately
-// out of scope since damage rolls read the item DEFINITION's weapon.min/max, not
+// Scope: a two-tier enchant table, always known (no recipe learning; the
+// free-floor rule in ../professions/enchanting.ts applies to both tiers):
+//   1. Base enchants (arcane_dust, some arcane_essence): the per-slot basics.
+//      They cover the weapon slot plus every armor slot (helmet through ring),
+//      with several stat-axis options per slot so every build (str/agi/int
+//      melee/caster, sta/armor tank, spi healer) has a reachable, cheap
+//      enchant for each of its slots.
+//   2. Greater enchants (arcane_shard + arcane_essence): a stronger,
+//      shard-consuming top tier on the highest-impact slots (weapon, helmet,
+//      chest, legs, gloves). These are the ONLY consumer of arcane_shard, the
+//      material an epic/legendary disenchant yields
+//      (DISENCHANT_MATERIAL_BY_QUALITY in ../professions/enchanting.ts);
+//      without them a shard would be a dead-end currency with nothing to
+//      spend it on.
+// Magnitudes follow the existing base-tier convention (primary ~4-6, sta ~6-10);
+// Greater is a modest step up on the same axis, never a gear-doubling jump.
+//
+// Every enchant grants a flat primary-stat or armor bonus (the only bonus
+// categories recalcPlayerStats reads off an item instance's rolled.stats, see
+// src/sim/entity.ts); a weapon-damage enchant is deliberately out of scope
+// since damage rolls read the item DEFINITION's weapon.min/max, not
 // per-instance data, and wiring that is a larger, separate change. `itemSlot`
 // matches ItemDef['slot'] (see src/sim/types.ts): rings declare slot 'ring',
 // every other slot names its EquipSlot directly, exactly as items do.
-//
-// The table is intentionally in two layers:
-//   1. Base enchants (arcane_dust, some arcane_essence): several stat-axis
-//      options per slot so every build (str/agi/int melee/caster, sta/armor
-//      tank, spi healer) has a reachable, cheap enchant for each of its slots.
-//   2. Greater enchants (arcane_shard + arcane_essence): a stronger top tier on
-//      the highest-impact slots (weapon, helmet, chest, legs, gloves). These are
-//      the ONLY consumer of arcane_shard, the material an epic/legendary
-//      disenchant yields (DISENCHANT_MATERIAL_BY_QUALITY in
-//      ../professions/enchanting.ts); without them a shard would be a dead-end
-//      currency with nothing to spend it on.
-// Magnitudes follow the existing base-tier convention (primary ~4-6, sta ~6-10);
-// Greater is a modest step up on the same axis, never a gear-doubling jump.
 import type { ItemSlot } from '../types';
 
 export interface EnchantReagent {
