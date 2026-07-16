@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ChatAnnouncer } from '../src/ui/chat_announcer';
+import { ChatAnnouncer } from '../src/ui/hud/chat/chat_announcer';
 import { CHAT_ANNOUNCE_INTERVAL_MS } from '../src/ui/live_region_politeness';
 
 // The dedicated chat live-region announcer: one polite off-screen

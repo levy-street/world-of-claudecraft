@@ -784,6 +784,10 @@ export const hudChromeStrings = {
       'Auto picks desktop or touch controls from your device. Choose Desktop to force keyboard and mouse (useful on a tablet with a keyboard), or Touch for the on-screen controls.',
     // Audio panel toggle for the per-footfall step clips (off by default).
     footstepSounds: 'Footstep Sounds',
+    // Audio panel toggle for the discrete interface and feedback cues (loot, level,
+    // quest, whisper, and the combat miss/dodge/parry beeps; on by default). Off
+    // silences just those without touching the SFX volume or the world sounds.
+    interfaceSounds: 'Interface and Feedback Sounds',
     // Toggle for the OSRS-style click-feedback marker: entity targets and
     // click-to-move destinations (on by default).
     clickFeedback: 'Click Marker',

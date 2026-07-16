@@ -21,150 +21,150 @@ export const sv_SE: EnTranslations = {
     "rpPvp": "RP-PvP"
   },
   "devCommand": {
-    "dialogLabel": "Developer Command Center",
-    "kicker": "Development tools",
-    "title": "Command Center",
-    "subtitle": "Authoritative test controls for the active world.",
-    "closeAria": "Close developer commands",
-    "categoryNavAria": "Developer command categories",
+    "dialogLabel": "Central för utvecklarkommandon",
+    "kicker": "Utvecklingsverktyg",
+    "title": "Kommandocentral",
+    "subtitle": "Serverstyrda testkontroller för den aktiva världen.",
+    "closeAria": "Stäng utvecklarkommandon",
+    "categoryNavAria": "Kategorier för utvecklarkommandon",
     "categories": {
-      "player": "Player",
-      "spawns": "Spawns",
-      "inventory": "Inventory",
-      "progress": "Progress",
-      "travel": "Travel",
-      "scenarios": "Scenarios"
+      "player": "Spelare",
+      "spawns": "Skapade varelser",
+      "inventory": "Inventarium",
+      "progress": "Framsteg",
+      "travel": "Resor",
+      "scenarios": "Scenarier"
     },
-    "filterLabel": "Filter commands",
-    "filterPlaceholder": "Search this category",
-    "noMatches": "No matching commands.",
-    "serverRequirement": "Server cheats still require ALLOW_DEV_COMMANDS=1.",
-    "invalidValues": "Choose valid values before running this command.",
-    "sent": "Sent: {command}",
-    "run": "Run",
+    "filterLabel": "Filtrera kommandon",
+    "filterPlaceholder": "Sök i den här kategorin",
+    "noMatches": "Inga matchande kommandon.",
+    "serverRequirement": "Serverfusk kräver fortfarande ALLOW_DEV_COMMANDS=1.",
+    "invalidValues": "Välj giltiga värden innan du kör kommandot.",
+    "sent": "Skickat: {command}",
+    "run": "Kör",
     "fields": {
-      "level": "Level",
-      "mob": "Mob",
-      "count": "Count",
-      "item": "Item",
-      "gold": "Gold",
-      "quest": "Quest",
-      "profession": "Profession",
-      "amount": "Amount",
+      "level": "Nivå",
+      "mob": "Varelse",
+      "count": "Antal",
+      "item": "Föremål",
+      "gold": "Guld",
+      "quest": "Uppdrag",
+      "profession": "Yrke",
+      "amount": "Mängd",
       "x": "X",
       "z": "Z",
-      "dungeon": "Dungeon",
-      "difficulty": "Difficulty",
-      "name": "Name"
+      "dungeon": "Fängelsehåla",
+      "difficulty": "Svårighetsgrad",
+      "name": "Namn"
     },
     "difficulty": {
       "normal": "Normal",
-      "heroic": "Heroic"
+      "heroic": "Heroisk"
     },
     "actions": {
       "heal": {
-        "label": "Restore health",
-        "description": "Fill the health pool."
+        "label": "Återställ hälsa",
+        "description": "Fyll hela hälsomätaren."
       },
       "resource": {
-        "label": "Restore resource",
-        "description": "Fill mana, rage, or energy."
+        "label": "Återställ resurs",
+        "description": "Fyll på mana, raseri eller energi."
       },
       "cooldowns": {
-        "label": "Clear cooldowns",
-        "description": "Reset ability, GCD, and potion timers."
+        "label": "Rensa återhämtningstider",
+        "description": "Återställ förmåge-, GCD- och dryckestimers."
       },
       "god": {
-        "label": "Toggle god mode",
-        "description": "Toggle invulnerability and boosted damage."
+        "label": "Växla gudaläge",
+        "description": "Slå på eller av osårbarhet och förstärkt skada."
       },
       "revive": {
-        "label": "Revive",
-        "description": "Revive through the normal resurrection path."
+        "label": "Återuppliva",
+        "description": "Återuppliva genom den vanliga återuppståndelsevägen."
       },
       "kill": {
-        "label": "Kill player",
-        "description": "Test death, ghost, and corpse flows."
+        "label": "Döda spelaren",
+        "description": "Testa flöden för död, spöke och lik."
       },
       "combatreset": {
-        "label": "Reset combat",
-        "description": "Clear combat state and hostile threat."
+        "label": "Återställ strid",
+        "description": "Rensa stridstillstånd och fientligt hot."
       },
       "level": {
-        "label": "Set level",
-        "description": "Set the current character level."
+        "label": "Ange nivå",
+        "description": "Ange den aktuella karaktärsnivån."
       },
       "spawn": {
-        "label": "Spawn mob",
-        "description": "Create a concrete mob near the player."
+        "label": "Skapa varelse",
+        "description": "Skapa en bestämd varelse nära spelaren."
       },
       "killtarget": {
-        "label": "Kill target",
-        "description": "Kill the selected living mob."
+        "label": "Döda målet",
+        "description": "Döda den valda levande varelsen."
       },
       "despawntarget": {
-        "label": "Despawn target",
-        "description": "Remove a selected mob created by this tool."
+        "label": "Ta bort målet",
+        "description": "Ta bort en vald varelse som skapats med det här verktyget."
       },
       "despawnall": {
-        "label": "Clear my spawns",
-        "description": "Remove every mob spawned by this developer."
+        "label": "Rensa mina skapade varelser",
+        "description": "Ta bort alla varelser som den här utvecklaren har skapat."
       },
       "give": {
-        "label": "Give item",
-        "description": "Add an item to the player inventory."
+        "label": "Ge föremål",
+        "description": "Lägg till ett föremål i spelarens inventarium."
       },
       "gold": {
-        "label": "Add gold",
-        "description": "Add gold to the current purse."
+        "label": "Lägg till guld",
+        "description": "Lägg till guld i den aktuella börsen."
       },
       "quest": {
-        "label": "Complete quest",
-        "description": "Complete a specific quest by id."
+        "label": "Slutför uppdrag",
+        "description": "Slutför ett särskilt uppdrag via id."
       },
       "quests": {
-        "label": "Complete active quests",
-        "description": "Complete every quest in the current log."
+        "label": "Slutför aktiva uppdrag",
+        "description": "Slutför alla uppdrag i den aktuella loggen."
       },
       "attune": {
-        "label": "Unlock attunements",
-        "description": "Mark all attunement requirements complete."
+        "label": "Lås upp länkningar",
+        "description": "Markera alla länkningskrav som slutförda."
       },
       "gather": {
-        "label": "Grant gathering skill",
-        "description": "Increase a gathering profession."
+        "label": "Ge insamlingsfärdighet",
+        "description": "Höj färdigheten i ett insamlingsyrke."
       },
       "teleport": {
-        "label": "Teleport",
-        "description": "Move to exact world coordinates."
+        "label": "Teleportera",
+        "description": "Flytta till exakta världskoordinater."
       },
       "dungeon": {
-        "label": "Enter dungeon",
-        "description": "Enter a dungeon with dev gate bypass."
+        "label": "Gå in i fängelsehåla",
+        "description": "Gå in i en fängelsehåla utan utvecklarspärren."
       },
       "raid": {
-        "label": "Enter raid",
-        "description": "Enter the Nythraxis arena directly."
+        "label": "Gå in i raid",
+        "description": "Gå direkt in i Nythraxis arena."
       },
       "raidreset": {
-        "label": "Reset raid lockout",
-        "description": "Clear the current raid lockouts."
+        "label": "Återställ raidlåsning",
+        "description": "Rensa de aktuella raidlåsningarna."
       },
       "bot": {
-        "label": "Spawn social bot",
-        "description": "Create a whisperable stationary player."
+        "label": "Skapa social bot",
+        "description": "Skapa en stillastående spelare som kan ta emot viskningar."
       },
       "lfgqueue": {
-        "label": "Seed finder queue",
-        "description": "Create a Dungeon Finder queue scenario."
+        "label": "Förbered sökkön",
+        "description": "Skapa ett scenario för kön till instanssökaren."
       },
       "lfgraid": {
-        "label": "Seed raid finder",
-        "description": "Create a raid finder scenario."
+        "label": "Förbered raidsökaren",
+        "description": "Skapa ett scenario för raidsökaren."
       },
       "lfgboard": {
-        "label": "Seed listing board",
-        "description": "Create a premade listing scenario."
+        "label": "Förbered annonstavlan",
+        "description": "Skapa ett scenario med en färdig gruppannons."
       }
     }
   },
@@ -351,7 +351,7 @@ export const sv_SE: EnTranslations = {
       "remainingLessThanMinute": "<1 min",
       "remainingMinutes": "{minutes} min",
       "remainingHoursMinutes": "{hours} h {minutes} min",
-      "remainingDaysHours": "{days}d {hours}h",
+      "remainingDaysHours": "{days} dagar {hours} timmar",
       "score": "Poäng",
       "walletValue": "Plånbokens värde (WOC)",
       "usd": "{amount} USD",
@@ -391,7 +391,7 @@ export const sv_SE: EnTranslations = {
         "under_minimum": "Plånboken är under WOC-miniminivån på 20 USD.",
         "price_unavailable": "WOC-priset är otillgängligt, belöningar är tillfälligt låsta.",
         "banned": "Du är avstängd från dagliga belöningar. Orsak: {reason}",
-        "bannedUntil": "You are banned from Daily Rewards for another {remaining}. Access returns {until}. Reason: {reason}"
+        "bannedUntil": "Du är avstängd från dagliga belöningar i ytterligare {remaining}. Åtkomsten återkommer {until}. Orsak: {reason}"
       }
     },
     "wocStore": {
@@ -996,6 +996,7 @@ export const sv_SE: EnTranslations = {
       "interfaceModeTouch": "Pek",
       "interfaceModeNote": "Auto väljer skrivbords- eller pekkontroller utifrån din enhet. Välj Skrivbord för att tvinga fram tangentbord och mus (användbart på en surfplatta med tangentbord), eller Pek för skärmkontrollerna.",
       "footstepSounds": "Fotstegsljud",
+      "interfaceSounds": "Gränssnitts- och responsljud",
       "clickFeedback": "Klickmarkör",
       "lockCursorOnRotate": "Lås pekare under rotation",
       "keybindHelpLockCursorOnRotate": "Håller muspekaren inuti fönstret medan du drar för att rotera kameran, så att den inte kan nå skärmkanten eller flytta till en annan skärm. Stäng av om du föredrar en fri pekare.",
@@ -1619,31 +1620,31 @@ export const sv_SE: EnTranslations = {
       "lock": "Lås spelarramen"
     },
     "partyFrames": {
-      "section": "Party and Raid Frames",
-      "unlock": "Move party and raid frames",
-      "lock": "Lock party and raid frames",
-      "style": "Frame Style",
-      "styleAutomatic": "Automatic",
-      "styleClassic": "Classic Party Frames",
-      "styleRaid": "Raid Frames",
-      "scale": "Frame Scale",
-      "width": "Frame Width",
-      "height": "Frame Height",
-      "spacing": "Frame Spacing",
-      "columns": "Raid Columns",
-      "healthText": "Health Text",
-      "healthNone": "None",
-      "healthPercent": "Percent",
-      "healthCurrent": "Current",
-      "healthCurrentMax": "Current / Max",
-      "sort": "Sort Players",
-      "sortGroup": "Group",
-      "sortRole": "Role",
-      "sortName": "Name",
-      "showResource": "Show Mana, Rage, and Energy",
-      "showAbsorbs": "Show Absorb Shields",
-      "showAuras": "Show Buffs and Debuffs",
-      "showSelf": "Show Your Frame"
+      "section": "Grupp- och raidramar",
+      "unlock": "Flytta grupp- och raidramar",
+      "lock": "Lås grupp- och raidramar",
+      "style": "Ramstil",
+      "styleAutomatic": "Automatisk",
+      "styleClassic": "Klassiska gruppramar",
+      "styleRaid": "Raidramar",
+      "scale": "Ramskala",
+      "width": "Rambredd",
+      "height": "Ramhöjd",
+      "spacing": "Ramavstånd",
+      "columns": "Raidkolumner",
+      "healthText": "Hälsotext",
+      "healthNone": "Ingen",
+      "healthPercent": "Procent",
+      "healthCurrent": "Nuvarande",
+      "healthCurrentMax": "Nuvarande / max",
+      "sort": "Sortera spelare",
+      "sortGroup": "Grupp",
+      "sortRole": "Roll",
+      "sortName": "Namn",
+      "showResource": "Visa mana, raseri och energi",
+      "showAbsorbs": "Visa absorptionssköldar",
+      "showAuras": "Visa positiva och negativa effekter",
+      "showSelf": "Visa din ram"
     },
     "frameReset": {
       "label": "Återställ ramarnas positioner"
@@ -2304,6 +2305,9 @@ export const sv_SE: EnTranslations = {
       "already_linked": "Ditt konto har redan ett länkat Steam-konto.",
       "account_taken": "Det Steam-kontot är redan länkat till ett annat konto.",
       "upstream": "Steam svarade inte. Försök igen om en stund."
+    },
+    "welcome": {
+      "invalid_input": "Ogiltig indata."
     }
   },
   "guide": {
@@ -5002,6 +5006,29 @@ export const sv_SE: EnTranslations = {
     "body": "Vi startar om speltjänsten och förväntar oss att Claudemoon är tillbaka inom kort. Den här sidan fortsätter att kontrollera automatiskt.",
     "status": "Tillbaka snart"
   },
+  "welcome": {
+    "back": "Välkommen tillbaka, {name}",
+    "level": "Nivå {level}",
+    "lastPlayed": "Senast spelad: {when}",
+    "continue": "Träd in i världen",
+    "continueHint": "Enter för att fortsätta, Esc för att hoppa över",
+    "continueHintTouch": "Tryck för att fortsätta",
+    "discord": {
+      "title": "Gemenskapen lever på Discord",
+      "sub": "Förhandsvisningar av patchar, evenemang, utvecklarchatt och 2 bonusfack i banken när du länkar ditt Discord-konto.",
+      "join": "Gå med i vår Discord"
+    },
+    "chest": {
+      "ready": "Kistan för dagliga belöningar är klar"
+    },
+    "armory": {
+      "cta": "Träd in i världen och utforska Vapenhuset"
+    },
+    "news": {
+      "new": "Ny",
+      "viewAll": "Se alla uppdateringar på GitHub"
+    }
+  },
   "hud": {
     "core": {
       "elite": "ELIT",
@@ -6925,6 +6952,24 @@ export const sv_SE: EnTranslations = {
       },
       "eastbrook_wool_trousers": {
         "name": "Östbäcks ullbyxor"
+      },
+      "eastbrook_ritual_vestments": {
+        "name": "Östbäcks Rituella Skrud"
+      },
+      "eastbrook_druids_hide": {
+        "name": "Östbäcksdruidens Hud"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "Östbäcks Beskyddade Benkläder"
+      },
+      "wardweave_cowl": {
+        "name": "Skyddsvävd Huva"
+      },
+      "duskhide_wraps": {
+        "name": "Skymningshudslindor"
+      },
+      "sootscale_mantle": {
+        "name": "Sotfjällsmantel"
       },
       "gravecaller_blade": {
         "name": "Gravkallarens bredklinga"

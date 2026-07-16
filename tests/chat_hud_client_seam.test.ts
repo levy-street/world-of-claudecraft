@@ -1,6 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ClientWorld } from '../src/net/online';
 import { Hud } from '../src/ui/hud';
+import {
+  ChatWindowController,
+  type ChatWindowControllerDeps,
+} from '../src/ui/hud/chat/chat_window_controller';
 
 vi.mock('../src/render/characters', () => ({ CharacterPreview: class {} }));
 vi.mock('../src/render/characters/assets', () => ({ preloadMechAssets: vi.fn() }));
@@ -17,14 +21,11 @@ describe('Hud to ClientWorld chat seam', () => {
     vi.stubGlobal('WebSocket', { OPEN: 1 });
     const hud = Object.create(Hud.prototype) as InstanceType<typeof Hud>;
     const state = hud as unknown as {
-      activeChatTab: string;
-      stickyTarget: string;
-      pendingChatLinks: readonly unknown[];
-      chatInputTintTarget(): string;
+      chatWindow: { composeSend(typed: string): string };
     };
-    state.activeChatTab = 'all';
-    state.stickyTarget = 'say';
-    state.pendingChatLinks = [];
+    state.chatWindow = {
+      composeSend: (typed) => `/say ${typed}`,
+    };
 
     const sent: unknown[] = [];
     const client = Object.create(ClientWorld.prototype) as ClientWorld;
@@ -34,7 +35,6 @@ describe('Hud to ClientWorld chat seam', () => {
       ws: { readyState: 1, send: (raw: string) => sent.push(JSON.parse(raw)) },
     });
 
-    expect(state.chatInputTintTarget()).toBe('say');
     client.chat(hud.composeChatSend('hello nearby players'));
 
     expect(sent).toEqual([{ t: 'cmd', cmd: 'chat', text: '/say hello nearby players' }]);
@@ -43,26 +43,26 @@ describe('Hud to ClientWorld chat seam', () => {
   it('stays on the last channel sent, including a whisper reply (v0.26.0 regression)', () => {
     vi.stubGlobal('WebSocket', { OPEN: 1 });
     const hud = Object.create(Hud.prototype) as InstanceType<typeof Hud>;
-    const state = hud as unknown as {
-      activeChatTab: string;
+    // The Hud delegates chat compose/sticky state to its ChatWindowController; a
+    // bare instance never ran init, so its state is the field defaults (All tab,
+    // sticky say). No dep is exercised by compose/noteSent, so an empty deps
+    // object is enough here.
+    const controller = new ChatWindowController({} as ChatWindowControllerDeps);
+    (hud as unknown as { chatWindow: ChatWindowController }).chatWindow = controller;
+    const state = controller as unknown as {
       stickyTarget: string;
-      pendingChatLinks: readonly unknown[];
-      chatInputTintTarget(): string;
-      noteSentChannel(line: string): void;
+      inputTintTarget(): string;
     };
-    state.activeChatTab = 'all';
-    state.stickyTarget = 'say';
-    state.pendingChatLinks = [];
 
     // Send in party: the sticky target follows there.
-    state.noteSentChannel(hud.composeChatSend('/p on my way'));
+    hud.noteSentChannel(hud.composeChatSend('/p on my way'));
     expect(state.stickyTarget).toBe('party');
 
     // Reply to a whisper: the sticky target follows to whisper, and the NEXT plain
     // line keeps replying (/r) instead of snapping back to party (the regression).
-    state.noteSentChannel(hud.composeChatSend('/r sure thing'));
+    hud.noteSentChannel(hud.composeChatSend('/r sure thing'));
     expect(state.stickyTarget).toBe('whisper');
     expect(hud.composeChatSend('and thanks')).toBe('/r and thanks');
-    expect(state.chatInputTintTarget()).toBe('whisper');
+    expect(state.inputTintTarget()).toBe('whisper');
   });
 });

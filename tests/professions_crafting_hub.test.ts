@@ -214,15 +214,27 @@ describe('hub reagent sourcing (prog_tools_of_the_trade completability)', () => 
     // station circle, so the shopping trip and the craft share one location.
     const distToHub = Math.hypot(bree.pos.x - CRAFTING_HUB_POS.x, bree.pos.z - CRAFTING_HUB_POS.z);
     expect(distToHub).toBeLessThanOrEqual(CRAFTING_HUB_RADIUS);
-    // Price pins (literals, not derived): the trade-goods 4x staple markup,
-    // and buy stays above sell so there is no vendor arbitrage loop.
+    // Per-item price pins (literals, not derived): the trade-goods 4x staple
+    // markup, and buy stays above sell so there is no vendor arbitrage loop. A
+    // price-tier change on any single reagent must fail here, not slip past a
+    // shared range check.
+    const REAGENT_PRICES: Record<(typeof HUB_REAGENTS)[number], [number, number]> = {
+      thorium_ore: [60, 15],
+      arcanite_bar: [160, 40],
+      ashwood_log: [60, 15],
+      elderwood_log: [160, 40],
+      goldleaf_herb: [60, 15],
+      sunpetal_herb: [160, 40],
+    };
     for (const id of HUB_REAGENTS) {
       const def = ITEMS[id];
-      // The ternary treats "not epic" as rare, so pin the quality itself too:
-      // a retag to any other quality must fail here, not slip past the prices.
-      expect(['rare', 'epic'], `${id} quality`).toContain(def.quality);
-      expect(def.buyValue, `${id} buyValue`).toBe(def.quality === 'epic' ? 160 : 60);
-      expect(def.sellValue, `${id} sellValue`).toBe(def.quality === 'epic' ? 40 : 15);
+      // Reagents are common (white), NOT a rarity color: a material must never fall
+      // into the junk sweep (sellAllJunk vendors quality 'poor'). The tier lives in
+      // the price, not the color.
+      expect(def.quality, `${id} quality`).toBe('common');
+      const [buyValue, sellValue] = REAGENT_PRICES[id];
+      expect(def.buyValue, `${id} buyValue`).toBe(buyValue);
+      expect(def.sellValue, `${id} sellValue`).toBe(sellValue);
     }
   });
 

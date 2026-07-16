@@ -63,17 +63,6 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import type { CastBarState } from '../src/render/cast_bar';
 import type { AbilityDef, Aura } from '../src/sim/types';
-import {
-  type ActionBarPaintDescriptor,
-  ActionBarPainter,
-  type ActionBarSlotElements,
-} from '../src/ui/action_bar_painter';
-import {
-  type ActionBarDeps,
-  type ActionBarState,
-  type ActionBarWorldInput,
-  createActionBarView,
-} from '../src/ui/action_bar_view';
 import { type AuraInput, type AurasDeps, createAurasView } from '../src/ui/auras_view';
 import {
   type CastBarElements,
@@ -82,6 +71,17 @@ import {
   type CastBarPaintInput,
 } from '../src/ui/cast_bar_painter';
 import { FCT_POOL_CAP } from '../src/ui/fct_painter';
+import {
+  type ActionBarPaintDescriptor,
+  ActionBarPainter,
+  type ActionBarSlotElements,
+} from '../src/ui/hud/action_bar/action_bar_painter';
+import {
+  type ActionBarDeps,
+  type ActionBarState,
+  type ActionBarWorldInput,
+  createActionBarView,
+} from '../src/ui/hud/action_bar/action_bar_view';
 import { makeWriterFacet, type PainterHostWriters } from '../src/ui/painter_host';
 import type { SwingTimerState } from '../src/ui/swing_timer';
 import { SwingTimerPainter } from '../src/ui/swing_timer_painter';
@@ -213,8 +213,8 @@ const HOT_PAINTERS: ReadonlyArray<{
   { file: 'swing_timer_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'cast_bar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'unit_frame_painter.ts', allow: {}, reflowAllow: {} },
-  { file: 'action_bar_painter.ts', allow: {}, reflowAllow: {} },
-  { file: 'mobile_action_ring_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'hud/action_bar/action_bar_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'hud/action_bar/mobile_action_ring_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'party_frames_painter.ts', allow: {}, reflowAllow: {} },
   // yumi builds its whole strip + respawn overlay once in ensureEls (14 class
   // assignments + the two role attributes + the toggle's type); every
@@ -243,16 +243,16 @@ const HOT_PAINTERS: ReadonlyArray<{
   },
 ];
 
-// The OTHER src/ui/*_painter.ts modules, NOT facet-routed, so deliberately not in the
+// The OTHER src/ui/**/*_painter.ts modules, NOT facet-routed, so deliberately not in the
 // raw-write scan above: they draw to a 2D/Three canvas under the cadence +
 // cached-token regime (resolve --color-* tokens once per redraw, never per-marker), where
 // canvas drawing and one-time element sizing are not "raw per-frame DOM writes". The
-// completeness check below pairs with HOT_PAINTERS so a NEW src/ui/*_painter.ts must be
+// completeness check below pairs with HOT_PAINTERS so a NEW src/ui/**/*_painter.ts must be
 // consciously classified (facet-routed -> add to HOT_PAINTERS; canvas -> add here) instead
 // of silently escaping the scan. (Render-resident painters under src/render, e.g. the
 // cadence-throttled nameplate_painter, are intentionally outside this HUD-painter file.)
 const CANVAS_PAINTERS: ReadonlyArray<string> = [
-  'delve_map_painter.ts',
+  'hud/delve/delve_map_painter.ts',
   'map_window_painter.ts',
   'minimap_painter.ts',
   'perf_graph_painter.ts',
@@ -268,6 +268,19 @@ function countToken(code: string, token: string): number {
   // `.styleProp` member and `.setAttribute` is the method, not a substring.
   const re = new RegExp(`\\${token}\\b`, 'g');
   return (code.match(re) ?? []).length;
+}
+
+function findUiPainters(dir: string, prefix = ''): string[] {
+  const painters: string[] = [];
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const relative = prefix === '' ? entry.name : `${prefix}/${entry.name}`;
+    if (entry.isDirectory()) {
+      painters.push(...findUiPainters(`${dir}/${entry.name}`, relative));
+    } else if (entry.isFile() && entry.name.endsWith('_painter.ts')) {
+      painters.push(relative);
+    }
+  }
+  return painters.sort();
 }
 
 describe('hud_perf_budget ARM 1: hot painters make no raw DOM write (Node, npm test)', () => {
@@ -299,12 +312,12 @@ describe('hud_perf_budget ARM 1: hot painters make no raw DOM write (Node, npm t
     });
   }
 
-  // Completeness (mirrors the core sweep): every on-disk src/ui/*_painter.ts is
+  // Completeness (mirrors the core sweep): every on-disk src/ui/**/*_painter.ts is
   // either facet-routed (scanned above) or a documented canvas exclusion, so a NEW painter
   // cannot silently escape the raw-write scan by being forgotten from HOT_PAINTERS.
-  it('classifies every src/ui/*_painter.ts as facet-routed or a documented canvas exclusion', () => {
+  it('classifies every src/ui painter as facet-routed or a documented canvas exclusion', () => {
     const dir = fileURLToPath(new URL('../src/ui', import.meta.url));
-    const onDisk = readdirSync(dir).filter((name) => name.endsWith('_painter.ts'));
+    const onDisk = findUiPainters(dir);
     const classified = new Set<string>([...HOT_PAINTERS.map((p) => p.file), ...CANVAS_PAINTERS]);
     const unclassified = onDisk.filter((name) => !classified.has(name));
     expect(

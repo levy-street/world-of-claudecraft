@@ -16,7 +16,7 @@ import {
   serializeChatTabs,
   WHISPER_TAB,
   WHISPER_TAB_LABEL_KEY,
-} from '../src/ui/chat_channels';
+} from '../src/ui/hud/chat/chat_channels';
 
 describe('chat channel tabs — pure model', () => {
   it('exposes the bindable channels without whisper (which has no standing channel)', () => {

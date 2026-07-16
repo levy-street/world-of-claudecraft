@@ -2,26 +2,18 @@
 //
 // Behavioral pin for the per-corpse harvest picker painter (the pure row/button
 // decisions are unit-tested in corpse_harvest_view via the sim suite). Unlike the
-// other batch-5 windows, this is NOT a standalone framed window: hud.ts (read-only
-// here) composes renderCorpseHarvestPicker into its existing cursor-anchored
-// #loot-window popup (openLoot), which is neither draggable nor resizable, so it
+// other batch-5 windows, this is NOT a standalone framed window: the loot window
+// controller composes renderCorpseHarvestPicker into its cursor-anchored popup,
+// which is neither draggable nor resizable, so it
 // stays a picker section rather than adopting the .window-frame chrome. This test
 // locks the load-bearing contract the AAA pass must NOT disturb: the checkbox
 // selection maps straight through to onHarvest (the tags drive the concentrated
 // timed harvest in professions/gathering, so the mapping is the "timing" the brief
 // requires stay untouched), the harvest-disabled state, and the empty short-circuit.
 
-import { readFileSync } from 'node:fs';
-import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
-import type { CorpseHarvestViewModel } from '../src/ui/corpse_harvest_view';
-import { renderCorpseHarvestPicker } from '../src/ui/corpse_harvest_window';
-
-// hud.ts (read-only here, see module comment above) is not unit-testable in isolation:
-// openLoot builds the Take All button straight off a live Hud/Sim instance. Pin the
-// wiring at the source level instead, matching the button-title contract this test
-// already locks for the Harvest button above.
-const hud = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
+import type { CorpseHarvestViewModel } from '../src/ui/hud/loot/corpse_harvest_view';
+import { renderCorpseHarvestPicker } from '../src/ui/hud/loot/corpse_harvest_window';
 
 function view(overrides: Partial<CorpseHarvestViewModel> = {}): CorpseHarvestViewModel {
   return {
@@ -65,13 +57,6 @@ describe('renderCorpseHarvestPicker: picker section', () => {
     const btn = container.querySelector<HTMLButtonElement>('.corpse-harvest-btn');
     expect(btn?.title).toBeTruthy();
     expect(btn?.title.length).toBeGreaterThan(0);
-  });
-
-  it('wires the Take All button to its own tooltip, distinct from the Harvest tooltip (openLoot in hud.ts)', () => {
-    const takeAllBtn = hud.match(
-      /btn\.textContent = t\('itemUi\.loot\.takeAll'\);\s*\n\s*btn\.title = t\('([^']+)'\);/,
-    );
-    expect(takeAllBtn?.[1]).toBe('hudChrome.loot.takeAllTooltip');
   });
 
   it('reports exactly the currently-checked tags to onHarvest (the concentration/timing contract)', () => {

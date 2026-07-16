@@ -21,150 +21,150 @@ export const it_IT: EnTranslations = {
     "rpPvp": "GdR-PvP"
   },
   "devCommand": {
-    "dialogLabel": "Developer Command Center",
-    "kicker": "Development tools",
-    "title": "Command Center",
-    "subtitle": "Authoritative test controls for the active world.",
-    "closeAria": "Close developer commands",
-    "categoryNavAria": "Developer command categories",
+    "dialogLabel": "Centro comandi di sviluppo",
+    "kicker": "Strumenti di sviluppo",
+    "title": "Centro comandi",
+    "subtitle": "Controlli di test autoritativi per il mondo attivo.",
+    "closeAria": "Chiudi comandi di sviluppo",
+    "categoryNavAria": "Categorie dei comandi di sviluppo",
     "categories": {
-      "player": "Player",
-      "spawns": "Spawns",
-      "inventory": "Inventory",
-      "progress": "Progress",
-      "travel": "Travel",
-      "scenarios": "Scenarios"
+      "player": "Giocatore",
+      "spawns": "Entità generate",
+      "inventory": "Inventario",
+      "progress": "Progresso",
+      "travel": "Viaggio",
+      "scenarios": "Scenari"
     },
-    "filterLabel": "Filter commands",
-    "filterPlaceholder": "Search this category",
-    "noMatches": "No matching commands.",
-    "serverRequirement": "Server cheats still require ALLOW_DEV_COMMANDS=1.",
-    "invalidValues": "Choose valid values before running this command.",
-    "sent": "Sent: {command}",
-    "run": "Run",
+    "filterLabel": "Filtra comandi",
+    "filterPlaceholder": "Cerca in questa categoria",
+    "noMatches": "Nessun comando corrispondente.",
+    "serverRequirement": "I trucchi del server richiedono comunque ALLOW_DEV_COMMANDS=1.",
+    "invalidValues": "Scegli valori validi prima di eseguire questo comando.",
+    "sent": "Inviato: {command}",
+    "run": "Esegui",
     "fields": {
-      "level": "Level",
-      "mob": "Mob",
-      "count": "Count",
-      "item": "Item",
-      "gold": "Gold",
-      "quest": "Quest",
-      "profession": "Profession",
-      "amount": "Amount",
+      "level": "Livello",
+      "mob": "Creatura",
+      "count": "Conteggio",
+      "item": "Oggetto",
+      "gold": "Oro",
+      "quest": "Missione",
+      "profession": "Mestiere",
+      "amount": "Quantità",
       "x": "X",
       "z": "Z",
       "dungeon": "Dungeon",
-      "difficulty": "Difficulty",
-      "name": "Name"
+      "difficulty": "Difficoltà",
+      "name": "Nome"
     },
     "difficulty": {
-      "normal": "Normal",
-      "heroic": "Heroic"
+      "normal": "Normale",
+      "heroic": "Eroica"
     },
     "actions": {
       "heal": {
-        "label": "Restore health",
-        "description": "Fill the health pool."
+        "label": "Ripristina salute",
+        "description": "Ripristina tutta la salute."
       },
       "resource": {
-        "label": "Restore resource",
-        "description": "Fill mana, rage, or energy."
+        "label": "Ripristina risorsa",
+        "description": "Ripristina mana, rabbia o energia."
       },
       "cooldowns": {
-        "label": "Clear cooldowns",
-        "description": "Reset ability, GCD, and potion timers."
+        "label": "Azzera tempi di recupero",
+        "description": "Azzera i timer delle abilità, del GCD e delle pozioni."
       },
       "god": {
-        "label": "Toggle god mode",
-        "description": "Toggle invulnerability and boosted damage."
+        "label": "Attiva o disattiva modalità dio",
+        "description": "Attiva o disattiva l’invulnerabilità e i danni aumentati."
       },
       "revive": {
-        "label": "Revive",
-        "description": "Revive through the normal resurrection path."
+        "label": "Rianima",
+        "description": "Rianima seguendo il normale processo di resurrezione."
       },
       "kill": {
-        "label": "Kill player",
-        "description": "Test death, ghost, and corpse flows."
+        "label": "Uccidi giocatore",
+        "description": "Prova le sequenze di morte, fantasma e cadavere."
       },
       "combatreset": {
-        "label": "Reset combat",
-        "description": "Clear combat state and hostile threat."
+        "label": "Reimposta combattimento",
+        "description": "Azzera lo stato di combattimento e la minaccia ostile."
       },
       "level": {
-        "label": "Set level",
-        "description": "Set the current character level."
+        "label": "Imposta livello",
+        "description": "Imposta il livello del personaggio attuale."
       },
       "spawn": {
-        "label": "Spawn mob",
-        "description": "Create a concrete mob near the player."
+        "label": "Genera creatura",
+        "description": "Genera una creatura specifica vicino al giocatore."
       },
       "killtarget": {
-        "label": "Kill target",
-        "description": "Kill the selected living mob."
+        "label": "Uccidi bersaglio",
+        "description": "Uccide la creatura vivente selezionata."
       },
       "despawntarget": {
-        "label": "Despawn target",
-        "description": "Remove a selected mob created by this tool."
+        "label": "Rimuovi bersaglio",
+        "description": "Rimuove una creatura selezionata e creata con questo strumento."
       },
       "despawnall": {
-        "label": "Clear my spawns",
-        "description": "Remove every mob spawned by this developer."
+        "label": "Rimuovi le mie creature",
+        "description": "Rimuove tutte le creature generate da questo sviluppatore."
       },
       "give": {
-        "label": "Give item",
-        "description": "Add an item to the player inventory."
+        "label": "Dai oggetto",
+        "description": "Aggiunge un oggetto all’inventario del giocatore."
       },
       "gold": {
-        "label": "Add gold",
-        "description": "Add gold to the current purse."
+        "label": "Aggiungi oro",
+        "description": "Aggiunge oro alla borsa attuale."
       },
       "quest": {
-        "label": "Complete quest",
-        "description": "Complete a specific quest by id."
+        "label": "Completa missione",
+        "description": "Completa una missione specifica tramite ID."
       },
       "quests": {
-        "label": "Complete active quests",
-        "description": "Complete every quest in the current log."
+        "label": "Completa missioni attive",
+        "description": "Completa tutte le missioni nel registro attuale."
       },
       "attune": {
-        "label": "Unlock attunements",
-        "description": "Mark all attunement requirements complete."
+        "label": "Sblocca le sintonie",
+        "description": "Contrassegna come soddisfatti tutti i requisiti di sintonia."
       },
       "gather": {
-        "label": "Grant gathering skill",
-        "description": "Increase a gathering profession."
+        "label": "Aumenta abilità di raccolta",
+        "description": "Aumenta l’abilità in un mestiere di raccolta."
       },
       "teleport": {
-        "label": "Teleport",
-        "description": "Move to exact world coordinates."
+        "label": "Teletrasporta",
+        "description": "Sposta il giocatore a coordinate esatte del mondo."
       },
       "dungeon": {
-        "label": "Enter dungeon",
-        "description": "Enter a dungeon with dev gate bypass."
+        "label": "Entra nel dungeon",
+        "description": "Entra in un dungeon ignorando il vincolo di sviluppo."
       },
       "raid": {
-        "label": "Enter raid",
-        "description": "Enter the Nythraxis arena directly."
+        "label": "Entra nell’incursione",
+        "description": "Entra direttamente nell’arena di Nythraxis."
       },
       "raidreset": {
-        "label": "Reset raid lockout",
-        "description": "Clear the current raid lockouts."
+        "label": "Reimposta blocco incursione",
+        "description": "Azzera i blocchi incursione attuali."
       },
       "bot": {
-        "label": "Spawn social bot",
-        "description": "Create a whisperable stationary player."
+        "label": "Genera bot sociale",
+        "description": "Crea un giocatore immobile a cui è possibile inviare sussurri."
       },
       "lfgqueue": {
-        "label": "Seed finder queue",
-        "description": "Create a Dungeon Finder queue scenario."
+        "label": "Prepara coda del cercatore",
+        "description": "Crea uno scenario di coda del Cercatore di Dungeon."
       },
       "lfgraid": {
-        "label": "Seed raid finder",
-        "description": "Create a raid finder scenario."
+        "label": "Prepara cercatore di incursioni",
+        "description": "Crea uno scenario del cercatore di incursioni."
       },
       "lfgboard": {
-        "label": "Seed listing board",
-        "description": "Create a premade listing scenario."
+        "label": "Prepara bacheca dei gruppi",
+        "description": "Crea uno scenario di annuncio per un gruppo organizzato."
       }
     }
   },
@@ -351,7 +351,7 @@ export const it_IT: EnTranslations = {
       "remainingLessThanMinute": "<1m",
       "remainingMinutes": "{minutes}m",
       "remainingHoursMinutes": "{hours}h {minutes}m",
-      "remainingDaysHours": "{days}d {hours}h",
+      "remainingDaysHours": "{days} g {hours} h",
       "score": "Punteggio",
       "walletValue": "Valore del portafoglio (WOC)",
       "usd": "{amount} USD",
@@ -391,7 +391,7 @@ export const it_IT: EnTranslations = {
         "under_minimum": "Il portafoglio è sotto il minimo di 20 USD in WOC.",
         "price_unavailable": "Il prezzo di WOC non è disponibile, le ricompense sono temporaneamente bloccate.",
         "banned": "Sei escluso dalle Ricompense giornaliere. Motivo: {reason}",
-        "bannedUntil": "You are banned from Daily Rewards for another {remaining}. Access returns {until}. Reason: {reason}"
+        "bannedUntil": "Sei escluso dalle Ricompense giornaliere per altri {remaining}. L’accesso sarà ripristinato {until}. Motivo: {reason}"
       }
     },
     "wocStore": {
@@ -616,7 +616,7 @@ export const it_IT: EnTranslations = {
       "balanceLabel": "Saldo",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL: {amount}",
-      "usdcBalance": "USDC: {amount}",
+      "usdcBalance": "Saldo USDC: {amount}",
       "wocBalance": "WOC: {amount}",
       "unavailable": "Il negozio Claudium non è disponibile al momento. Il tuo saldo e i tuoi acquisti non subiranno modifiche. Riprova tra poco.",
       "disclosure": "Claudium è una valuta virtuale a senso unico: puoi acquistarlo con denaro reale e spenderlo in cosmetici. Non può essere riscattato, trasferito o convertito in denaro.",
@@ -996,6 +996,7 @@ export const it_IT: EnTranslations = {
       "interfaceModeTouch": "Touch",
       "interfaceModeNote": "Auto sceglie i controlli Desktop o Touch in base al tuo dispositivo. Scegli Desktop per forzare tastiera e mouse (utile su un tablet con tastiera), oppure Touch per i controlli a schermo.",
       "footstepSounds": "Suoni dei passi",
+      "interfaceSounds": "Suoni dell'interfaccia e di risposta",
       "clickFeedback": "Indicatore di clic",
       "lockCursorOnRotate": "Blocca cursore durante la rotazione",
       "keybindHelpLockCursorOnRotate": "Mantiene il cursore del mouse dentro la finestra mentre trascini per ruotare la telecamera, così non può raggiungere il bordo dello schermo o passare a un altro monitor. Disattiva l'opzione se preferisci un cursore libero.",
@@ -1619,31 +1620,31 @@ export const it_IT: EnTranslations = {
       "lock": "Blocca il riquadro del giocatore"
     },
     "partyFrames": {
-      "section": "Party and Raid Frames",
-      "unlock": "Move party and raid frames",
-      "lock": "Lock party and raid frames",
-      "style": "Frame Style",
-      "styleAutomatic": "Automatic",
-      "styleClassic": "Classic Party Frames",
-      "styleRaid": "Raid Frames",
-      "scale": "Frame Scale",
-      "width": "Frame Width",
-      "height": "Frame Height",
-      "spacing": "Frame Spacing",
-      "columns": "Raid Columns",
-      "healthText": "Health Text",
-      "healthNone": "None",
-      "healthPercent": "Percent",
-      "healthCurrent": "Current",
-      "healthCurrentMax": "Current / Max",
-      "sort": "Sort Players",
-      "sortGroup": "Group",
-      "sortRole": "Role",
-      "sortName": "Name",
-      "showResource": "Show Mana, Rage, and Energy",
-      "showAbsorbs": "Show Absorb Shields",
-      "showAuras": "Show Buffs and Debuffs",
-      "showSelf": "Show Your Frame"
+      "section": "Riquadri gruppo e incursione",
+      "unlock": "Sposta i riquadri di gruppo e incursione",
+      "lock": "Blocca i riquadri di gruppo e incursione",
+      "style": "Stile riquadri",
+      "styleAutomatic": "Automatico",
+      "styleClassic": "Riquadri gruppo classici",
+      "styleRaid": "Riquadri incursione",
+      "scale": "Scala riquadro",
+      "width": "Larghezza riquadro",
+      "height": "Altezza riquadro",
+      "spacing": "Spaziatura riquadri",
+      "columns": "Colonne incursione",
+      "healthText": "Testo salute",
+      "healthNone": "Nessuno",
+      "healthPercent": "Percentuale",
+      "healthCurrent": "Attuale",
+      "healthCurrentMax": "Attuale / max",
+      "sort": "Ordina giocatori",
+      "sortGroup": "Gruppo",
+      "sortRole": "Ruolo",
+      "sortName": "Nome",
+      "showResource": "Mostra mana, rabbia ed energia",
+      "showAbsorbs": "Mostra scudi di assorbimento",
+      "showAuras": "Mostra potenziamenti e penalità",
+      "showSelf": "Mostra il tuo riquadro"
     },
     "frameReset": {
       "label": "Ripristina le posizioni dei riquadri"
@@ -2304,6 +2305,9 @@ export const it_IT: EnTranslations = {
       "already_linked": "Il tuo account ha già un account Steam collegato.",
       "account_taken": "Quell'account Steam è già collegato a un altro account.",
       "upstream": "Steam non ha risposto. Riprova tra un istante."
+    },
+    "welcome": {
+      "invalid_input": "Dati non validi."
     }
   },
   "guide": {
@@ -5002,6 +5006,29 @@ export const it_IT: EnTranslations = {
     "body": "Stiamo riavviando il servizio di gioco e prevediamo che Claudemoon torni a breve. Questa pagina continuerà a controllare automaticamente.",
     "status": "Torna presto"
   },
+  "welcome": {
+    "back": "Bentornato, {name}",
+    "level": "Livello {level}",
+    "lastPlayed": "Ultima partita: {when}",
+    "continue": "Entra nel mondo",
+    "continueHint": "Invio per continuare, Esc per saltare",
+    "continueHintTouch": "Tocca per continuare",
+    "discord": {
+      "title": "La community vive su Discord",
+      "sub": "Anteprime delle patch, eventi, chat con gli sviluppatori e 2 spazi bonus in banca collegando il tuo account Discord.",
+      "join": "Unisciti al nostro Discord"
+    },
+    "chest": {
+      "ready": "Forziere delle ricompense giornaliere pronto"
+    },
+    "armory": {
+      "cta": "Entra nel mondo ed esplora l’Armeria"
+    },
+    "news": {
+      "new": "Novità",
+      "viewAll": "Vedi tutti gli aggiornamenti su GitHub"
+    }
+  },
   "hud": {
     "core": {
       "elite": "ÉLITE",
@@ -6925,6 +6952,24 @@ export const it_IT: EnTranslations = {
       },
       "eastbrook_wool_trousers": {
         "name": "Pantaloni di lana di Eastbrook"
+      },
+      "eastbrook_ritual_vestments": {
+        "name": "Vesti rituali di Eastbrook"
+      },
+      "eastbrook_druids_hide": {
+        "name": "Pelle del druido di Eastbrook"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "Gambali protetti di Eastbrook"
+      },
+      "wardweave_cowl": {
+        "name": "Cappuccio di tessuto protettivo"
+      },
+      "duskhide_wraps": {
+        "name": "Fasce di pelle del crepuscolo"
+      },
+      "sootscale_mantle": {
+        "name": "Mantello di scaglie fuligginose"
       },
       "gravecaller_blade": {
         "name": "Lama larga di Gravecaller"
