@@ -104,8 +104,10 @@ R2. Server dispatch. Add `case 'disenchant'` and `case 'apply_enchant'` to
 string, enchant id is a string) before calling the `sim.*` method. Surface the
 outcome to the acting player: emit a `type:'log'` (success, with the material
 name and count, or the applied enchant name) or `type:'error'` (the deny reasons:
-`not_disenchantable`, `not_held`, `wrong_slot`, `insufficient_materials`,
-`unknown_enchant`) English string, and register each new literal in
+`unknown_item`, `not_disenchantable`, `not_held`, `wrong_slot`,
+`insufficient_materials`, `unknown_enchant`; `resolveDisenchant` and
+`resolveApplyEnchant` both return `unknown_item` for an unrecognized item id)
+English string, and register each new literal in
 `src/ui/server_i18n.ts` in the same change (the S3 guard,
 `tests/localization_fixes.test.ts`, enforces this). Alternatively surface the
 `lastDisenchantResult` / `lastEnchantResult` self-snapshot fields and localize on
@@ -139,6 +141,11 @@ shards and granting a larger `statBonus`. Keep magnitudes in line with the
 existing flat-stat budget; do not invent new bonus categories (v1 enchants are
 flat str/agi/sta/int/spi/armor only, the categories `recalcPlayerStats` reads).
 
+Note (informational): PR #1950 already implements this requirement with its own
+Greater-tier, shard-consuming enchants. If #1950 lands first, R6 is delivered and
+this PRD's implementation should build on that list instead of adding a second
+one; check the sequencing between the two changes at merge time.
+
 R7. Persistence and parity. Enchants already ride the equipment item instance
 (JSONB, `equipmentInstance`), so a save round-trips an enchanted item unchanged;
 confirm the disenchant/apply paths draw rng only where they already do
@@ -155,7 +162,8 @@ Acceptance).
 
 Reagent tiers, for reference (already in the data): dust-only for the cheap
 slots, dust+essence for the big stamina pieces (chest, legs), and the new
-shard-tier for the strong variants.
+shard-tier for the strong variants (see the R6 note: PR #1950 ships a
+Greater-tier shard-consuming set; reconcile with it at merge time).
 
 ## 7. Acceptance criteria
 
@@ -207,6 +215,13 @@ shard-tier for the strong variants.
 - Salvage vs disenchant overlap: both break gear into materials. Keep both, or fold
   salvage into disenchant for gear (salvage staying for non-gear)? Out of v1 scope
   but worth deciding before shipping the context menu, so the two do not confuse.
+- Open design consideration (reviewer suggestion, FernandoX7): should disenchanting
+  be anchored to a dedicated alchemy/enchanting NPC building in the world (walk to
+  the enchanter's hut to break gear down) rather than being available anywhere at
+  the player's fingertips? Anchoring it to a place keeps the game open-world and
+  gives the profession a home; keeping it in the bag menu is lower friction. This
+  is an open question for the owner, not a decision; v1 as written assumes the
+  bag context menu.
 
 ## 10. Hook points (stable anchors, re-find exact lines)
 
