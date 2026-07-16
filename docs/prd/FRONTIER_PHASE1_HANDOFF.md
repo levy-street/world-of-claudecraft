@@ -81,10 +81,11 @@ factor, and DR schedule live in `pvp-honor-and-quartermaster.md` and its slice 2
 | Parity goldens | `tests/parity/scenarios.ts` + `UPDATE_PARITY=1 npx vitest run tests/parity`; never regenerate to hide a diff |
 | Snapshot tests | `tests/snapshots.test.ts` (`DELTA_KEYS` ~23-36, `bareClient` ~79) |
 | Arena window UI | `src/ui/hud.ts` `toggleArena` ~5268, `renderArenaWindow` ~5300-5486, wired from `src/main.ts:1037`; DOM shell `#arena-window` in `index.html` |
-| Modular window template | `src/ui/vendor_view.ts` + `src/ui/vendor_window.ts` + Hud orchestrates; recipe in `src/ui/CLAUDE.md` |
-| Keybind label | `src/game/keybinds.ts:160-166` (id `arena`) -> catalog key `hud.keybinds.actions.arena` in `src/ui/i18n.catalog/hud.ts` (mapping `hud.ts:563`) |
-| Nameplates | `src/render/renderer.ts:4520-4646` (`setNameplateStatic`; player color ~4531; CSS-class pattern `np-threat` ~4610 is the preferred hook) |
-| FCT | `src/ui/hud.ts` `handleEvents` ~6082 (XP case ~6165 is the template); the honor PRD already adds the honor float, reuse it |
+| Modular window template | `src/ui/hud/vendor/vendor_view.ts` (pure view, unit-tested) + `src/ui/hud/vendor/vendor_window.ts` (thin DOM consumer) + Hud orchestrates; recipe in `src/ui/CLAUDE.md` |
+| Keybind label | `src/game/keybinds.ts:160-166` (id `arena`, label string) -> catalog key `hud.keybinds.actions.arena` in `src/ui/i18n.catalog/hud.ts` (mapping in `hud.ts:563`) |
+| Character attachments | `src/render/characters/manifest.ts` `VisualDef.attach?: AttachDef[]` (`{url, bone, ...}`); runtime swap pattern `visual.ts:439` `setWeapon`. No cloak/tabard precedent exists; weapon attach is the template |
+| Nameplates | `src/render/renderer.ts:4520-4646` (`setNameplateStatic`; player color hardcoded `'#7fb8ff'` ~4531; CSS-class pattern `np-threat` ~4610 is the preferred hook) |
+| FCT | `src/ui/hud.ts` `handleEvents` ~6082 (XP case ~6165 is the template), `fct()` ~7258; the honor PRD already adds the honor float, reuse it |
 
 ## 3. Slices
 

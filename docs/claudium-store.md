@@ -38,9 +38,13 @@ STRIPE_PRICE_CLAUDIUM_13000
 These names match the economy service implementation. Do not place Stripe secret keys or Price
 IDs in the game-client repository.
 
-SOL and WOC amounts must continue to be quoted by the economy service from the USD value. The WOC
-rail should return the existing service-computed 20 percent discount. The game client displays
-the returned quote and does not calculate token prices or discounts.
+SOL, USDC, and WOC amounts must continue to be quoted by the economy service from the USD value.
+The WOC rail should return the existing service-computed 20 percent discount. The game client
+displays the returned quote and does not calculate token prices or discounts. All three native
+rails flow through the same native quote, confirm, and purchase endpoints proxied by the game
+server (`server/claudium_proxy.ts`); the economy service decides which rails are offered via its
+native rails response (`rails.sol`, `rails.usdc`, `rails.woc`), so enabling or disabling USDC is
+an economy-service deployment change, not a game-repository change.
 
 ## Weapon cosmetic identifiers
 

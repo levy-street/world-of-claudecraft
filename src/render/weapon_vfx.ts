@@ -2165,8 +2165,8 @@ function deriveEmissive(mat: THREE.MeshStandardMaterial, e: WeaponVfxEmissiveSpe
   mat.roughness = 1;
   mat.metalnessMap = null;
   mat.roughnessMap = null;
-  const img = mat.map?.image;
-  if (!img || !img.width) {
+  const img = mat.map?.image as HTMLImageElement | HTMLCanvasElement | ImageBitmap | undefined;
+  if (!img?.width) {
     mat.emissive = new THREE.Color(e.tint);
     mat.emissiveIntensity = 0.3;
     return { prev, tex: null, albedoTex: null };

@@ -244,6 +244,12 @@ export const BOOL_SETTINGS = {
   // players who want them back can re-enable. Independent of the SFX volume
   // slider — jump/land/splash/swim and combat one-shots are unaffected.
   footstepSfx: { def: false },
+  // on by default (no change out of the box): the discrete interface and feedback
+  // cues, the loot-roll/looted "ding", level-up, quest, whisper, polymorph, death,
+  // and denied-action beeps, plus the combat miss/dodge/parry avoid cues. Players
+  // who find these repetitive can silence just this family without touching the SFX
+  // volume slider or the spatial world sounds (impacts, casts, footsteps, ambience).
+  interfaceSfx: { def: true },
   // on by default: a brief OSRS-style ground marker (an expanding ring plus a
   // crossed "X") where you left-click in the world, gold for a normal click and
   // red when the click lands on a hostile. Purely a local presentation cue; it

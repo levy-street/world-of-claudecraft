@@ -109,6 +109,51 @@ export const COMMON_RECIPES: ProfessionRecipeRecord[] = [
     itemLevelBudget: 1,
     level: 1,
   },
+  // Caster-stat (int/spi) common-tier recipes: one per
+  // tailoring/leatherworking/armorcrafting, alongside the armor-only pieces
+  // above. Reuses the same harvested reagents as the rest of COMMON_RECIPES.
+  {
+    id: 'recipe_eastbrook_ritual_vestments',
+    professionId: 'tailoring',
+    resultItemId: 'eastbrook_ritual_vestments',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'linen_scrap', count: 3 },
+      { itemId: 'spider_leg', count: 1 },
+    ],
+    skillReq: 0,
+    trivialAt: 25,
+    itemLevelBudget: 9,
+    level: 9,
+  },
+  {
+    id: 'recipe_eastbrook_druids_hide',
+    professionId: 'leatherworking',
+    resultItemId: 'eastbrook_druids_hide',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'spider_leg', count: 2 },
+      { itemId: 'bone_fragments', count: 1 },
+    ],
+    skillReq: 0,
+    trivialAt: 25,
+    itemLevelBudget: 9,
+    level: 9,
+  },
+  {
+    id: 'recipe_eastbrook_warded_leggings',
+    professionId: 'armorcrafting',
+    resultItemId: 'eastbrook_warded_leggings',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'bone_fragments', count: 3 },
+      { itemId: 'linen_scrap', count: 1 },
+    ],
+    skillReq: 0,
+    trivialAt: 25,
+    itemLevelBudget: 10,
+    level: 10,
+  },
 ];
 
 // Tier 4/5 tool recipes (#1135's crafted base tools), de-stubbed from the
@@ -221,6 +266,57 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
   },
 ];
 
+// Hub-tier caster-stat (int/spi) recipes (crafting content follow-up to the
+// COMMON_RECIPES caster pieces above): one per tailoring/leatherworking/
+// armorcrafting, at the same thorium tier and hub-gating as TOOL_RECIPES.
+export const CASTER_HUB_RECIPES: ProfessionRecipeRecord[] = [
+  {
+    id: 'recipe_wardweave_cowl',
+    professionId: 'tailoring',
+    resultItemId: 'wardweave_cowl',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'thorium_ore', count: 3 },
+      { itemId: 'linen_scrap', count: 2 },
+    ],
+    skillReq: 75,
+    trivialAt: 125,
+    itemLevelBudget: 20,
+    level: 20,
+    requiresHubStation: true,
+  },
+  {
+    id: 'recipe_duskhide_wraps',
+    professionId: 'leatherworking',
+    resultItemId: 'duskhide_wraps',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'thorium_ore', count: 3 },
+      { itemId: 'spider_leg', count: 2 },
+    ],
+    skillReq: 75,
+    trivialAt: 125,
+    itemLevelBudget: 20,
+    level: 20,
+    requiresHubStation: true,
+  },
+  {
+    id: 'recipe_sootscale_mantle',
+    professionId: 'armorcrafting',
+    resultItemId: 'sootscale_mantle',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'thorium_ore', count: 4 },
+      { itemId: 'bone_fragments', count: 2 },
+    ],
+    skillReq: 75,
+    trivialAt: 125,
+    itemLevelBudget: 20,
+    level: 20,
+    requiresHubStation: true,
+  },
+];
+
 // Combo recipes (issue #1132): each requires BOTH crafts of one specific
 // adjacent pair at the recipe's tier (comboRequirement.minTier), on top of the
 // normal reagent/skillReq gating above. See the module comment for why these
@@ -281,6 +377,7 @@ export const COMBO_RECIPES: ProfessionRecipeRecord[] = [
 export const ALL_RECIPES: ProfessionRecipeRecord[] = [
   ...COMMON_RECIPES,
   ...TOOL_RECIPES,
+  ...CASTER_HUB_RECIPES,
   ...COMBO_RECIPES,
 ];
 

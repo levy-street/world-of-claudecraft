@@ -145,11 +145,20 @@ with `npm run gate` (above) before calling it done.
     in the SAME change. The S3 guard (`tests/localization_fixes.test.ts`) enforces it.
   - Full model (catalog layout, matcher rules, formatters, exceptions): `src/ui/CLAUDE.md` and
     `docs/i18n-scaling/translation-workflow.md`.
-- **Never set `ALLOW_DEV_COMMANDS=1` in production** (it enables level/teleport/item cheats).
+- **Never set `ALLOW_DEV_COMMANDS=1` in production** (it enables the full `/dev` cheat set:
+  level/teleport/item cheats, mob spawns, instance teleports, and the dev command GUI).
 - **Never commit `.env` or secrets.**
 
 ## Conventions
 - **ESM + TypeScript `strict`** everywhere. 2-space indent; match the surrounding file.
+- **TypeScript toolchain:** `tsc` is the TypeScript 7 native binary (installed as the
+  `@typescript/native` alias); a full-repo `npx tsc --noEmit` takes about 2 seconds, so run it
+  liberally as a check while working. `require('typescript')` deliberately resolves a
+  TypeScript 6 JS API wrapper because svelte-check needs that API; never collapse the dual
+  alias yourself (the collapse triggers live in CONTRIBUTING.md, "TypeScript toolchain", and
+  `tests/server/new_endpoint.test.ts` pins both arms). Regenerate `package-lock.json` ONLY
+  with `npx npm@10 install --package-lock-only`; plain `npm ci` is safe on any npm major
+  (rationale in CONTRIBUTING.md).
 - **Keep the dependency set tiny.** Don't add packages without a clear need. (Svelte
   and `@sveltejs/vite-plugin-svelte` are the one sanctioned exception, scoped to the
   `src/admin/` dashboard bundle; the game/guide/play entries stay framework-free.)
@@ -187,8 +196,10 @@ Use the seams this repo already has, do not invent new ones:
   (`src/world_api/<domain>.ts`), implement in BOTH `Sim` and `ClientWorld`, update the
   parity pin (`tests/world_api_parity.test.ts`), then consume via `IWorld` only.
 - New HUD component (a window OR a per-frame frame/bar): its own module the HUD composes,
-  never a new banner section in `hud.ts`: a pure view-core (`src/ui/<name>_view.ts`,
-  DOM-free, Node-tested, in the `UI_PURE_CORES` allowlist) plus a thin write-elided,
+  never a new banner section in `hud.ts`: a pure view-core (`<name>_view.ts`, DOM-free,
+  Node-tested, registered in the `UI_PURE_CORES` allowlist in `tests/architecture.test.ts`;
+  HUD-domain components land in the matching `src/ui/hud/<domain>/` directory behind its
+  `index.ts` barrel, see `src/ui/hud/CLAUDE.md`) plus a thin write-elided,
   instance-parameterized painter on the `PainterHost` seam. Reuse a FAMILY before bespoke.
   Full recipe + contracts: `src/ui/CLAUDE.md` and `src/styles/CLAUDE.md`.
 - New visual system: a new `src/render/<thing>.ts` the renderer calls, not a method bank on
@@ -234,9 +245,10 @@ Detailed heuristics and the bug-fix workflow live in the `extract-and-test` skil
   never skipped: a `Stop` hook (`.claude/hooks/qa-stop.sh`) blocks instantly on an em/en dash,
   emoji, stray `.only(`, or `debugger`; the `.githooks/pre-push` floor runs `tsc`, the guard
   tests, biome, and the copy scan at push time. See `docs/qa-gate.md` and `.claude/hooks/README.md`.
-- **Biome / formatting / CI.** Biome 2.5.0 (`biome.json`: 2-space, lineWidth 100, single quotes,
-  trailing commas). CI and the pre-push floor gate CHANGED FILES ONLY (`npm run ci:changed`)
-  and fail on errors and format diffs, NOT on lint warnings. Whole-repo `biome check .` is
+- **Biome / formatting / CI.** Biome (version pinned in `package.json`; `biome.json`: 2-space,
+  lineWidth 100, single quotes, trailing commas). CI and the pre-push floor gate CHANGED FILES
+  ONLY (`npm run ci:changed`) and fail on errors and format diffs, NOT on lint warnings.
+  Whole-repo `biome check .` is
   intentionally RED (pre-existing debt): a DEFERRED chore, not your regression, do not fix it.
   NEVER run a whole-repo `--write`; format only the files you changed:
   `npx @biomejs/biome check --write <changed-file.ts>`.
@@ -284,6 +296,7 @@ correct.
   `tests/localization_fixes.test.ts`), never on "looks done."
 
 ## Pointers
-`README.md` (host/develop/play + fidelity checklist) · `DEPLOY.md` (production) ·
-`CREDITS.md` (asset licenses) · `docs/design/` (design docs) · `docs/prd/` (feature specs) ·
-`docs/qa-gate.md` (the layered QA gate).
+`README.md` (host/develop/play + fidelity checklist) · `DESIGN.md` (the adopted interface
+design-language standard; interface changes land through its rollout phases) ·
+`DEPLOY.md` (production) · `CREDITS.md` (asset licenses) · `docs/design/` (design docs) ·
+`docs/prd/` (feature specs) · `docs/qa-gate.md` (the layered QA gate).

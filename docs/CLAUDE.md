@@ -39,7 +39,10 @@ ones worth knowing: `design/master-spec.md` is the big design doc (levels 6 to 2
 expansion: story arc, zones, dungeons, XP math, ids); `design/spell-ranks.md` is the
 classic-era ability-rank reference for sim ability content; `design/deeds.md` is the
 Book of Deeds achievements system plus the authoring contract every new deed (and
-every new piece of conquerable content) follows. **TRAP:**
+every new piece of conquerable content) follows. `design/design-language/` holds the
+approved desktop reference renders (images only, no local doc) that the repo-root
+`DESIGN.md` design-language spec names as its primary references and links by path,
+so keep the filenames stable. **TRAP:**
 `design/icon-system.md` proposes a multi-file `src/ui/icons/` module, but the shipped
 code is the flat `src/ui/icons.ts`, so re-verify against code.
 **Shipped history, same trap:** `design/ue5-overhaul-plan.md` is a completed program

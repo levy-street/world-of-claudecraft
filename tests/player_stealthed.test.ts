@@ -8,7 +8,7 @@
 // `stealthed` straight through and cannot catch this class of bug.
 
 import { describe, expect, it } from 'vitest';
-import { playerStealthed } from '../src/ui/player_stealthed';
+import { playerStealthed } from '../src/ui/hud/action_bar/player_stealthed';
 
 describe('playerStealthed', () => {
   it('is true for an online-shaped entity: a kind:"stealth" aura present despite a stale stealthed:false field', () => {

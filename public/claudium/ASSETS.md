@@ -21,6 +21,8 @@ master. `claudium_coin_master.png` is a PNG convenience copy of the coin.
 | `icon_buy` | "Buy Claudium" action (coin + plus badge). | WebP 1024/512/256/128/64 |
 | `icon_history` | Transaction history tab (coin in a circular arrow). | WebP 1024/512/256/128/64 |
 | `icon_store` | Cosmetic store / spend entry (market awning). | WebP 1024/512/256/128/64 |
+| `solana-icon` | SOL purchase rail brand mark in the buy flow. Third-party, see below. | WebP single size |
+| `usdc-icon` | USDC purchase rail brand mark in the buy flow. Third-party, see below. | WebP single size |
 | `stack_single` | Value tier: small amount. Composited from the real coin. | WebP 1024/512/256/128 |
 | `stack_small` | Value tier: medium amount (3 coins). | WebP 1024/512/256/128 |
 | `stack_large` | Value tier: large amount (coin pile). | WebP 1024/512/256/128 |
@@ -28,6 +30,11 @@ master. `claudium_coin_master.png` is a PNG convenience copy of the coin.
 
 Light + dark: the icons are transparent, so they sit on either theme. No baked
 background variant is needed; place them on the theme surface token directly.
+
+`solana-icon` and `usdc-icon` are the one exception to the provenance above:
+they are third-party brand marks for the crypto purchase rails
+(`src/ui/claudium_window.ts`), not Recraft output, and ship as single-size
+files with no ladder. Attribution lives in the repo-root `CREDITS.md`.
 
 ## Final vs. human-polish
 

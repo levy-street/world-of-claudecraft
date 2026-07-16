@@ -180,4 +180,7 @@ export const apiErrorStrings = {
     account_taken: 'That Steam account is already linked to another account.',
     upstream: 'Steam did not respond. Try again in a moment.',
   },
+  welcome: {
+    invalid_input: 'Invalid input.',
+  },
 };

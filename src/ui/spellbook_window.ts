@@ -24,7 +24,7 @@ import type { IWorld } from '../world_api';
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName, tEntity } from './entity_i18n';
 import { esc } from './esc';
-import { encodeHotbarAction, HOTBAR_ACTION_MIME } from './hotbar';
+import { encodeHotbarAction, HOTBAR_ACTION_MIME } from './hud/action_bar/hotbar';
 import { formatNumber, t } from './i18n';
 import { iconDataUrl } from './icons';
 import { buildSpellbookView, type SpellbookRow } from './spellbook_view';

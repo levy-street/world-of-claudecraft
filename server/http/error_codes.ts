@@ -190,6 +190,7 @@ export const ERROR_CODES = deepFreeze({
   'steam.account_taken': { params: [] },
   // The Steam Web API could not be reached or answered garbage (503).
   'steam.upstream': { params: [] },
+  'welcome.invalid_input': { params: [] },
 } as const);
 
 /** A stable error code: one of the keys of ERROR_CODES. */

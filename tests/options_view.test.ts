@@ -227,6 +227,7 @@ describe('options_view: audio dispatch matrix (cluster 4)', () => {
       'musicToggle',
       'voiceEnabled',
       'footstepSfx',
+      'interfaceSfx',
       'clickFeedback',
     ]);
     expect(find(controls, 'sfxVolume')).toMatchObject({ control: 'slider' });

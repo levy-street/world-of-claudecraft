@@ -8,20 +8,20 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import type { AbilityDef } from '../src/sim/types';
-import type { ActionBarSlotElements } from '../src/ui/action_bar_painter';
+import type { ActionBarSlotElements } from '../src/ui/hud/action_bar/action_bar_painter';
 import {
   type ActionBarAbility,
   type ActionBarDeps,
   type ActionBarSlotDescriptor,
   type ActionBarWorldInput,
   createActionBarView,
-} from '../src/ui/action_bar_view';
+} from '../src/ui/hud/action_bar/action_bar_view';
 import {
   clampMobilePage,
   nextMobilePage,
   sourceSlotForMobileButton,
-} from '../src/ui/mobile_action_page_view';
-import { MobileActionRingPainter } from '../src/ui/mobile_action_ring_painter';
+} from '../src/ui/hud/action_bar/mobile_action_page_view';
+import { MobileActionRingPainter } from '../src/ui/hud/action_bar/mobile_action_ring_painter';
 import { makeWriterFacet, type PainterHostWriters } from '../src/ui/painter_host';
 import { assertAllocationStable } from './util/alloc_probe';
 
@@ -358,7 +358,7 @@ describe('mobile action ring: alloc stability', () => {
 
 describe('MobileActionRingPainter: no raw DOM writes', () => {
   const src = readFileSync(
-    new URL('../src/ui/mobile_action_ring_painter.ts', import.meta.url),
+    new URL('../src/ui/hud/action_bar/mobile_action_ring_painter.ts', import.meta.url),
     'utf8',
   );
   const code = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
