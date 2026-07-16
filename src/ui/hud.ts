@@ -1264,6 +1264,7 @@ export class Hud {
   private readonly playerCard: PlayerCardController;
   // Shared by the confirm + input modals (one #confirm-dialog id; they never coexist).
   private confirmTrap: FocusTrapHandle | null = null;
+  private arenaEndTrap: FocusTrapHandle | null = null;
   private meters: Meters;
   private tutorial = new TutorialOverlay();
   private lastPetBarSig = '';
@@ -8482,6 +8483,9 @@ export class Hud {
           audio.duelCountdownTick();
           break;
         case 'arenaStart':
+          // A re-queued player may still have the last match's scoreboard open;
+          // never leave it covering a live bout.
+          this.closeArenaEndScreen();
           this.showBanner(t('hud.system.arenaStart'));
           audio.duelStart();
           break;
@@ -12181,12 +12185,19 @@ export class Hud {
       localPid: this.sim.playerId,
     });
     renderArenaEndWindow(root, view, { onClose: () => this.closeArenaEndScreen() });
+    const wasHidden = root.style.display !== 'block';
     root.style.display = 'block';
+    // Trap keyboard focus inside the modal (the shared FocusManager pattern every
+    // sibling modal uses); release-and-restore happens in closeArenaEndScreen.
+    if (wasHidden) this.arenaEndTrap = this.focusManager.open({ root: () => root });
+    this.arenaEndTrap?.focusFirst();
   }
 
   private closeArenaEndScreen(): void {
     const root = $('#arena-end-window');
     if (root) root.style.display = 'none';
+    this.arenaEndTrap?.release();
+    this.arenaEndTrap = null;
   }
 
   // Closes the topmost UI. Returns true if something was closed.

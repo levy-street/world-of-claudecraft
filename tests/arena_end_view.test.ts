@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import type { ArenaEndRow } from '../src/sim/types';
 import { buildArenaEndView } from '../src/ui/arena_end_view';
@@ -90,5 +92,39 @@ describe('buildArenaEndView', () => {
     expect(view.rows.map((r) => r.ally)).toEqual([true, true, false, false]);
     expect(view.rows.find((r) => r.pid === 1)?.me).toBe(true);
     expect(view.rows.find((r) => r.pid === 2)?.me).toBe(false);
+  });
+});
+
+// Source-scan pins on the Hud wiring (the focus suites pin pure trap math only,
+// so the per-modal contract is pinned here, next to the window's own tests):
+// the end-screen modal must trap keyboard focus like every sibling modal, and
+// release the trap on close. Same style as the fxTier() scan in
+// tests/ui_tier_knobs.test.ts.
+describe('arena end screen focus trap wiring (hud.ts source scan)', () => {
+  const hudSrc = readFileSync(fileURLToPath(new URL('../src/ui/hud.ts', import.meta.url)), 'utf8');
+  const methodBody = (name: string): string | null => {
+    const m = hudSrc.match(
+      new RegExp(`private\\s+${name}\\s*\\([^)]*\\)\\s*:\\s*void\\s*\\{([\\s\\S]*?)\\n\\s{2}\\}`),
+    );
+    return m ? m[1] : null;
+  };
+
+  it('openArenaEndScreen opens the shared focus trap on the modal root', () => {
+    const body = methodBody('openArenaEndScreen');
+    expect(body).not.toBeNull();
+    expect(body).toMatch(/this\.arenaEndTrap = this\.focusManager\.open\(/);
+  });
+
+  it('closeArenaEndScreen releases the trap (return-to-opener)', () => {
+    const body = methodBody('closeArenaEndScreen');
+    expect(body).not.toBeNull();
+    expect(body).toMatch(/this\.arenaEndTrap\?\.release\(\)/);
+    expect(body).toMatch(/this\.arenaEndTrap = null/);
+  });
+
+  it('the arenaStart event closes a scoreboard left open from the last match', () => {
+    const m = hudSrc.match(/case 'arenaStart':([\s\S]*?)break;/);
+    expect(m).not.toBeNull();
+    expect(m?.[1] ?? '').toMatch(/this\.closeArenaEndScreen\(\)/);
   });
 });
