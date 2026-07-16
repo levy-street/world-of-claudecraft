@@ -19,12 +19,17 @@ describe('Daily Rewards ban query enforcement', () => {
     mocks.connect.mockReset();
   });
 
-  it('resolves account and IP restrictions through the exclusion view', async () => {
-    mocks.query.mockResolvedValue({ rows: [{ reason: 'shared IP abuse' }] });
+  it('resolves active account and IP restrictions with account-ban expiry', async () => {
+    mocks.query.mockResolvedValue({
+      rows: [{ reason: 'shared IP abuse', expires_at: '2026-07-16T03:00:00.000Z' }],
+    });
     await expect(new PgDailyRewardDb().banForAccount(9)).resolves.toEqual({
       reason: 'shared IP abuse',
+      expiresAt: '2026-07-16T03:00:00.000Z',
     });
-    expect(mocks.query.mock.calls[0][0]).toContain('daily_reward_excluded_accounts');
+    expect(mocks.query.mock.calls[0][0]).toContain('daily_reward_bans');
+    expect(mocks.query.mock.calls[0][0]).toContain('expires_at > now()');
+    expect(mocks.query.mock.calls[0][0]).toContain('daily_reward_ip_bans');
   });
 
   it('filters banned accounts from current leaderboard reads and pending payouts', async () => {

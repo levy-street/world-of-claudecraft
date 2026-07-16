@@ -20,6 +20,154 @@ export const tr_TR: EnTranslations = {
     "rp": "RP",
     "rpPvp": "RP-PvP"
   },
+  "devCommand": {
+    "dialogLabel": "Geliştirici Komuta Merkezi",
+    "kicker": "Geliştirme araçları",
+    "title": "Komuta Merkezi",
+    "subtitle": "Etkin dünya için yetkili test denetimleri.",
+    "closeAria": "Geliştirici komutlarını kapat",
+    "categoryNavAria": "Geliştirici komutu kategorileri",
+    "categories": {
+      "player": "Oyuncu",
+      "spawns": "Oluşturulanlar",
+      "inventory": "Envanter",
+      "progress": "İlerleme",
+      "travel": "Seyahat",
+      "scenarios": "Senaryolar"
+    },
+    "filterLabel": "Komutları filtrele",
+    "filterPlaceholder": "Bu kategoride ara",
+    "noMatches": "Eşleşen komut yok.",
+    "serverRequirement": "Sunucu hileleri için yine de ALLOW_DEV_COMMANDS=1 gerekir.",
+    "invalidValues": "Bu komutu çalıştırmadan önce geçerli değerler seç.",
+    "sent": "Gönderildi: {command}",
+    "run": "Çalıştır",
+    "fields": {
+      "level": "Seviye",
+      "mob": "Yaratık",
+      "count": "Sayı",
+      "item": "Öğe",
+      "gold": "Altın",
+      "quest": "Görev",
+      "profession": "Meslek",
+      "amount": "Miktar",
+      "x": "X",
+      "z": "Z",
+      "dungeon": "Zindan",
+      "difficulty": "Zorluk",
+      "name": "Ad"
+    },
+    "difficulty": {
+      "normal": "Normal",
+      "heroic": "Kahramanca"
+    },
+    "actions": {
+      "heal": {
+        "label": "Canı yenile",
+        "description": "Can havuzunu tamamen doldur."
+      },
+      "resource": {
+        "label": "Kaynağı yenile",
+        "description": "Mana, öfke veya enerjiyi doldur."
+      },
+      "cooldowns": {
+        "label": "Bekleme sürelerini temizle",
+        "description": "Yetenek, GCD ve iksir sayaçlarını sıfırla."
+      },
+      "god": {
+        "label": "Tanrı modunu aç veya kapat",
+        "description": "Dokunulmazlığı ve artırılmış hasarı aç veya kapat."
+      },
+      "revive": {
+        "label": "Diril",
+        "description": "Normal dirilme sürecini kullanarak diril."
+      },
+      "kill": {
+        "label": "Oyuncuyu öldür",
+        "description": "Ölüm, hayalet ve ceset durumlarını sına."
+      },
+      "combatreset": {
+        "label": "Savaşı sıfırla",
+        "description": "Savaş durumunu ve düşman tehdit değerini temizle."
+      },
+      "level": {
+        "label": "Seviyeyi ayarla",
+        "description": "Mevcut karakter seviyesini ayarla."
+      },
+      "spawn": {
+        "label": "Yaratık oluştur",
+        "description": "Oyuncunun yakınında belirli bir yaratık oluştur."
+      },
+      "killtarget": {
+        "label": "Hedefi öldür",
+        "description": "Seçili canlı yaratığı öldür."
+      },
+      "despawntarget": {
+        "label": "Hedefi kaldır",
+        "description": "Bu araçla oluşturulan seçili yaratığı kaldır."
+      },
+      "despawnall": {
+        "label": "Oluşturduklarımı temizle",
+        "description": "Bu geliştiricinin oluşturduğu tüm yaratıkları kaldır."
+      },
+      "give": {
+        "label": "Öğe ver",
+        "description": "Oyuncu envanterine bir öğe ekle."
+      },
+      "gold": {
+        "label": "Altın ekle",
+        "description": "Mevcut keseye altın ekle."
+      },
+      "quest": {
+        "label": "Görevi tamamla",
+        "description": "Kimliğine göre belirli bir görevi tamamla."
+      },
+      "quests": {
+        "label": "Etkin görevleri tamamla",
+        "description": "Mevcut görev günlüğündeki tüm görevleri tamamla."
+      },
+      "attune": {
+        "label": "Uyumlanmaları aç",
+        "description": "Tüm uyumlanma gereksinimlerini tamamlanmış olarak işaretle."
+      },
+      "gather": {
+        "label": "Toplama becerisi ver",
+        "description": "Bir toplama mesleğini geliştir."
+      },
+      "teleport": {
+        "label": "Işınlan",
+        "description": "Kesin dünya koordinatlarına git."
+      },
+      "dungeon": {
+        "label": "Zindana gir",
+        "description": "Geliştirici erişim kontrolünü atlayarak bir zindana gir."
+      },
+      "raid": {
+        "label": "Akına gir",
+        "description": "Doğrudan Nythraxis arenasına gir."
+      },
+      "raidreset": {
+        "label": "Akın kilidini sıfırla",
+        "description": "Mevcut akın kilitlerini temizle."
+      },
+      "bot": {
+        "label": "Sosyal bot oluştur",
+        "description": "Fısıltı gönderilebilen sabit bir oyuncu oluştur."
+      },
+      "lfgqueue": {
+        "label": "Bulucu kuyruğunu doldur",
+        "description": "Bir Zindan Bulucu kuyruğu senaryosu oluştur."
+      },
+      "lfgraid": {
+        "label": "Akın bulucuyu doldur",
+        "description": "Bir akın bulucu senaryosu oluştur."
+      },
+      "lfgboard": {
+        "label": "İlan panosunu doldur",
+        "description": "Hazır bir grup ilanı senaryosu oluştur."
+      }
+    }
+  },
   "game": {
     "xp": {
       "suffix": "TP",
@@ -203,6 +351,7 @@ export const tr_TR: EnTranslations = {
       "remainingLessThanMinute": "<1dk",
       "remainingMinutes": "{minutes}dk",
       "remainingHoursMinutes": "{hours}sa {minutes}dk",
+      "remainingDaysHours": "{days} gün {hours} saat",
       "score": "Skor",
       "walletValue": "Cüzdan Değeri (WOC)",
       "usd": "{amount} USD",
@@ -241,7 +390,8 @@ export const tr_TR: EnTranslations = {
         "no_wallet": "En az 20 USD değerinde WOC bulunan bir cüzdan bağla.",
         "under_minimum": "Cüzdan, 20 USD değerindeki WOC alt sınırının altında.",
         "price_unavailable": "WOC fiyatı alınamıyor, ödüller geçici olarak kilitli.",
-        "banned": "Günlük Ödüllerden yasaklandın. Gerekçe: {reason}"
+        "banned": "Günlük Ödüllerden yasaklandın. Gerekçe: {reason}",
+        "bannedUntil": "Günlük Ödüller'e erişim yasağın {remaining} daha sürecek. Erişim {until} tarihinde geri açılır. Gerekçe: {reason}"
       }
     },
     "wocStore": {
@@ -466,6 +616,7 @@ export const tr_TR: EnTranslations = {
       "balanceLabel": "Bakiye",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL: {amount}",
+      "usdcBalance": "USDC: {amount}",
       "wocBalance": "WOC: {amount}",
       "unavailable": "Claudium mağazası şu anda kullanılamıyor. Bakiyeniz ve satın alımlarınız etkilenmez; lütfen kısa süre sonra tekrar kontrol edin.",
       "disclosure": "Claudium tek yönlü yumuşak bir para birimidir: Parayla satın alın ve kozmetik ürünlerine harcayın. Kullanılamaz, devredilemez veya nakde çevrilemez.",
@@ -473,6 +624,7 @@ export const tr_TR: EnTranslations = {
       "railLabel": "Ödeme yöntemi",
       "railStripe": "Kart",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "%20 indirim",
       "railWocUnavailable": "WOC fiyatlandırması şu anda mevcut değil.",
@@ -844,6 +996,7 @@ export const tr_TR: EnTranslations = {
       "interfaceModeTouch": "Dokunmatik",
       "interfaceModeNote": "Otomatik, cihazınıza göre masaüstü veya dokunmatik denetimleri seçer. Klavye ve fareyi zorlamak için Masaüstü'nü seçin (klavyeli bir tablette kullanışlıdır) ya da ekran üzeri denetimler için Dokunmatik'i seçin.",
       "footstepSounds": "Ayak Sesleri",
+      "interfaceSounds": "Arayüz ve Geri Bildirim Sesleri",
       "clickFeedback": "Tıklama İşareti",
       "lockCursorOnRotate": "Döndürürken İmleci Kilitle",
       "keybindHelpLockCursorOnRotate": "Kamerayı döndürmek için sürüklerken fare imlecini pencerenin içinde tutar, böylece ekran kenarına ulaşamaz veya başka bir monitöre geçemez. Serbest imleç tercih ediyorsanız kapatın.",
@@ -1465,6 +1618,33 @@ export const tr_TR: EnTranslations = {
     "playerFrame": {
       "unlock": "Oyuncu çerçevesini taşı",
       "lock": "Oyuncu çerçevesini kilitle"
+    },
+    "partyFrames": {
+      "section": "Grup ve Akın Çerçeveleri",
+      "unlock": "Grup ve akın çerçevelerini taşı",
+      "lock": "Grup ve akın çerçevelerini kilitle",
+      "style": "Çerçeve Stili",
+      "styleAutomatic": "Otomatik",
+      "styleClassic": "Klasik Grup Çerçeveleri",
+      "styleRaid": "Akın Çerçeveleri",
+      "scale": "Çerçeve Ölçeği",
+      "width": "Çerçeve Genişliği",
+      "height": "Çerçeve Yüksekliği",
+      "spacing": "Çerçeve Aralığı",
+      "columns": "Akın Sütunları",
+      "healthText": "Can Metni",
+      "healthNone": "Yok",
+      "healthPercent": "Yüzde",
+      "healthCurrent": "Mevcut",
+      "healthCurrentMax": "Mevcut / Azami",
+      "sort": "Oyuncuları Sırala",
+      "sortGroup": "Grup",
+      "sortRole": "Rol",
+      "sortName": "Ad",
+      "showResource": "Mana, Öfke ve Enerjiyi Göster",
+      "showAbsorbs": "Soğurma Kalkanlarını Göster",
+      "showAuras": "Güçlendirmeleri ve Zayıflatmaları Göster",
+      "showSelf": "Kendi Çerçeveni Göster"
     },
     "frameReset": {
       "label": "Çerçeve Konumlarını Sıfırla"
@@ -2125,6 +2305,9 @@ export const tr_TR: EnTranslations = {
       "already_linked": "Hesabına zaten bağlı bir Steam hesabı var.",
       "account_taken": "Bu Steam hesabı zaten başka bir hesaba bağlı.",
       "upstream": "Steam yanıt vermedi. Birazdan tekrar dene."
+    },
+    "welcome": {
+      "invalid_input": "Geçersiz girdi."
     }
   },
   "guide": {
@@ -4821,6 +5004,29 @@ export const tr_TR: EnTranslations = {
     "body": "Oyun hizmetini yeniden başlatıyoruz ve Claudemoon'un kısa süre içinde geri döneceğini umuyoruz. Bu sayfa otomatik olarak denetlemeye devam edecek.",
     "status": "Birazdan döneriz"
   },
+  "welcome": {
+    "back": "Tekrar hoş geldin, {name}",
+    "level": "Seviye {level}",
+    "lastPlayed": "Son oynama tarihi: {when}",
+    "continue": "Dünyaya Gir",
+    "continueHint": "Devam etmek için Enter'a, atlamak için Esc'ye bas",
+    "continueHintTouch": "Devam etmek için dokun",
+    "discord": {
+      "title": "Topluluk Discord'da yaşıyor",
+      "sub": "Yama ön izlemeleri, etkinlikler, geliştirici sohbeti ve Discord hesabını bağlayınca 2 bonus banka yuvası.",
+      "join": "Discord topluluğumuza katıl"
+    },
+    "chest": {
+      "ready": "Günlük sandık hazır"
+    },
+    "armory": {
+      "cta": "Dünyaya gir ve Cephaneliğe göz at"
+    },
+    "news": {
+      "new": "Yeni",
+      "viewAll": "GitHub'daki tüm güncellemeleri görüntüle"
+    }
+  },
   "hud": {
     "core": {
       "elite": "SEÇKİN",
@@ -6640,6 +6846,24 @@ export const tr_TR: EnTranslations = {
       },
       "eastbrook_wool_trousers": {
         "name": "Doğudere Yün Pantolonu"
+      },
+      "eastbrook_ritual_vestments": {
+        "name": "Doğudere Ayin Cübbesi"
+      },
+      "eastbrook_druids_hide": {
+        "name": "Doğudere Druidinin Postu"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "Doğudere Koruma Tozlukları"
+      },
+      "wardweave_cowl": {
+        "name": "Koruma Dokumalı Başlık"
+      },
+      "duskhide_wraps": {
+        "name": "Alacakaranlık Postu Sargıları"
+      },
+      "sootscale_mantle": {
+        "name": "İs Pulu Pelerini"
       },
       "gravecaller_blade": {
         "name": "Mezarçağıran'ın Geniş Kılıcı"

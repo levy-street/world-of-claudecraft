@@ -486,6 +486,62 @@ describe('moderation report helpers', () => {
     ]);
   });
 
+  it('persists a timed Daily Rewards ban and its audited expiry', async () => {
+    const client = clientStub();
+    client.query
+      .mockResolvedValueOnce(queryResult([]))
+      .mockResolvedValueOnce(queryResult([{ expires_at: '2026-07-16T06:00:00.000Z' }]))
+      .mockResolvedValue(queryResult([]));
+    connect.mockResolvedValue(client as unknown as PoolClient);
+
+    await setDailyRewardsBan({
+      accountId: 2,
+      adminAccountId: 1,
+      banned: true,
+      reason: 'automated play',
+      durationHours: 6,
+    });
+
+    expect(client.query.mock.calls[1][0]).toContain('expires_at');
+    expect(client.query.mock.calls[1][1]).toEqual([2, 'automated play', 1, 6]);
+    expect(client.query.mock.calls[2][1]).toEqual([
+      2,
+      1,
+      'daily_rewards_ban',
+      'automated play',
+      '2026-07-16T06:00:00.000Z',
+    ]);
+  });
+
+  it('rejects an invalid Daily Rewards ban duration before opening a transaction', async () => {
+    await expect(
+      setDailyRewardsBan({
+        accountId: 2,
+        adminAccountId: 1,
+        banned: true,
+        reason: 'automated play',
+        durationHours: 0,
+      }),
+    ).rejects.toThrow('daily rewards ban duration must be between 1 and 8760 hours');
+    expect(connect).not.toHaveBeenCalled();
+  });
+
+  it.each([true, '12', [12]])(
+    'rejects non-number Daily Rewards ban duration %j',
+    async (durationHours) => {
+      await expect(
+        setDailyRewardsBan({
+          accountId: 2,
+          adminAccountId: 1,
+          banned: true,
+          reason: 'automated play',
+          durationHours,
+        }),
+      ).rejects.toThrow('daily rewards ban duration must be between 1 and 8760 hours');
+      expect(connect).not.toHaveBeenCalled();
+    },
+  );
+
   it('removes and audits a Daily Rewards ban atomically', async () => {
     const client = clientStub();
     client.query

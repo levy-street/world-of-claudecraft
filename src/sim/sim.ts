@@ -137,6 +137,7 @@ import {
 import * as companionMod from './delves/companion';
 import * as lockpickMod from './delves/lockpick_controller';
 import * as runsMod from './delves/runs';
+import { despawnMobsForDev } from './dev_commands';
 import { projectOutsideDungeonDoors } from './dungeon_door_clearance';
 import * as nythraxis from './encounters/nythraxis';
 // A3: ARENA_SPAWNS_A_2v2/B_2v2 (read only by the moved fiestaRevive) now live with
@@ -365,6 +366,13 @@ import * as yumiMod from './social/yumi';
 export { eloDelta } from './social/arena';
 
 import { FINDER_ACTIVITIES, type FinderListingTag } from './content/dungeon_finder';
+import {
+  partyFrameAbsorb,
+  partyFrameAggroTargets,
+  partyFrameAuras,
+  partyFrameIncomingHeals,
+  partyFrameRole,
+} from './party_frame_info';
 import { DungeonFinderMachine } from './social/dungeon_finder';
 import * as fiestaMod from './social/fiesta';
 // A3: Fiesta tuning consts moved to social/fiesta.ts; these five are read back here
@@ -440,7 +448,6 @@ import {
   type MobFamily,
   type MoveInput,
   type OverheadEmoteId,
-  PARTY_MEMBER_AURA_CAP,
   PARTY_XP_RANGE,
   type PetMode,
   type PlayerClass,
@@ -2243,6 +2250,7 @@ export class Sim {
     if (leavingRun?.lockpick && leavingRun.lockpick.ownerId === pid)
       this.ctx.abandonLockpick(leavingRun);
     this.preparePlayerLeave(pid);
+    despawnMobsForDev(this.ctx, pid, 'spawned');
     // leave social systems cleanly. removeFromParty lives on the PartyMachine now
     // (A1); reach it through the seam, keeping this call in its load-bearing
     // teardown position (must run while the leaver is still in players/entities).
@@ -6474,8 +6482,8 @@ export class Sim {
     revivePlayerAt(this.ctx, pid, pos, hpFrac);
   }
 
-  // chatAllowed / handleDevChat / whisperMessageForName / resolveWhisperTarget
-  // moved to social/chat.ts (G2). The chat() router below dispatches to them via
+  // chatAllowed / whisperMessageForName / resolveWhisperTarget moved to social/chat.ts;
+  // handleDevChat moved to dev_commands.ts. The chat() router dispatches via
   // chatMod.*(this.ctx, ...); they had no callers outside chat().
 
   chat(text: string, pid?: number): SentChat | null {
@@ -7629,6 +7637,10 @@ export class Sim {
   get partyInfo(): import('../world_api').PartyInfo | null {
     const party = this.partyOf(this.primaryId);
     if (!party) return null;
+    const aggroTargets = partyFrameAggroTargets(this.entities.values());
+    const incomingHeals = partyFrameIncomingHeals(this.entities.values(), (abilityId, casterId) =>
+      this.resolvedAbility(abilityId, casterId),
+    );
     return {
       leader: party.leader,
       raid: party.raid,
@@ -7653,14 +7665,12 @@ export class Sim {
                 dead: e.dead ? 1 : 0,
                 inCombat: e.inCombat ? 1 : 0,
                 group: party.raidGroups.get(mPid) ?? 1,
-                // The mini aura strip under the member's party row: first N in
-                // aura order (buffs and debuffs alike), id + kind + sap flag
-                // only, no countdown (see PartyMemberAura in world_api/party.ts).
-                auras: e.auras.slice(0, PARTY_MEMBER_AURA_CAP).map((a) => ({
-                  id: a.id,
-                  kind: a.kind,
-                  ...(a.value < 0 ? { neg: 1 as const } : {}),
-                })),
+                absorb: partyFrameAbsorb(e.auras),
+                role: partyFrameRole(meta.talentMods.role),
+                connected: 1,
+                hasAggro: aggroTargets.has(mPid) ? 1 : 0,
+                incomingHeal: incomingHeals.get(mPid) ?? 0,
+                auras: partyFrameAuras(e.auras),
               },
             ]
           : [];

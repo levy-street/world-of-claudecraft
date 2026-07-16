@@ -20,6 +20,154 @@ export const nl_NL: EnTranslations = {
     "rp": "RP",
     "rpPvp": "RP-PvP"
   },
+  "devCommand": {
+    "dialogLabel": "Centrum voor ontwikkelaarsopdrachten",
+    "kicker": "Ontwikkelaarshulpmiddelen",
+    "title": "Opdrachtencentrum",
+    "subtitle": "Autoritatieve testbesturing voor de actieve wereld.",
+    "closeAria": "Ontwikkelaarsopdrachten sluiten",
+    "categoryNavAria": "Categorieën met ontwikkelaarsopdrachten",
+    "categories": {
+      "player": "Speler",
+      "spawns": "Spawns",
+      "inventory": "Inventaris",
+      "progress": "Voortgang",
+      "travel": "Reizen",
+      "scenarios": "Scenario's"
+    },
+    "filterLabel": "Opdrachten filteren",
+    "filterPlaceholder": "Deze categorie doorzoeken",
+    "noMatches": "Geen overeenkomende opdrachten.",
+    "serverRequirement": "Servercheats vereisen nog steeds ALLOW_DEV_COMMANDS=1.",
+    "invalidValues": "Kies geldige waarden voordat je deze opdracht uitvoert.",
+    "sent": "Verzonden: {command}",
+    "run": "Uitvoeren",
+    "fields": {
+      "level": "Niveau",
+      "mob": "Mob",
+      "count": "Aantal",
+      "item": "Voorwerp",
+      "gold": "Goud",
+      "quest": "Missie",
+      "profession": "Beroep",
+      "amount": "Hoeveelheid",
+      "x": "X",
+      "z": "Z",
+      "dungeon": "Kerker",
+      "difficulty": "Moeilijkheidsgraad",
+      "name": "Naam"
+    },
+    "difficulty": {
+      "normal": "Normaal",
+      "heroic": "Heroïsch"
+    },
+    "actions": {
+      "heal": {
+        "label": "Gezondheid herstellen",
+        "description": "Vul de gezondheid volledig aan."
+      },
+      "resource": {
+        "label": "Hulpbron herstellen",
+        "description": "Vul mana, woede of energie aan."
+      },
+      "cooldowns": {
+        "label": "Afkoeltijden wissen",
+        "description": "Reset timers voor vaardigheden, GCD en drankjes."
+      },
+      "god": {
+        "label": "Godmodus omschakelen",
+        "description": "Schakel onkwetsbaarheid en verhoogde schade in of uit."
+      },
+      "revive": {
+        "label": "Tot leven wekken",
+        "description": "Breng de speler tot leven via het normale herrijzenisproces."
+      },
+      "kill": {
+        "label": "Speler doden",
+        "description": "Test de processen voor dood, geest en lijk."
+      },
+      "combatreset": {
+        "label": "Gevecht resetten",
+        "description": "Wis de gevechtsstatus en vijandelijke dreiging."
+      },
+      "level": {
+        "label": "Niveau instellen",
+        "description": "Stel het huidige personageniveau in."
+      },
+      "spawn": {
+        "label": "Mob spawnen",
+        "description": "Maak een specifieke mob aan in de buurt van de speler."
+      },
+      "killtarget": {
+        "label": "Doel doden",
+        "description": "Dood de geselecteerde levende mob."
+      },
+      "despawntarget": {
+        "label": "Doel despawnen",
+        "description": "Verwijder een geselecteerde mob die met dit hulpmiddel is gemaakt."
+      },
+      "despawnall": {
+        "label": "Mijn spawns wissen",
+        "description": "Verwijder elke mob die door deze ontwikkelaar is gespawnd."
+      },
+      "give": {
+        "label": "Voorwerp geven",
+        "description": "Voeg een voorwerp toe aan de inventaris van de speler."
+      },
+      "gold": {
+        "label": "Goud toevoegen",
+        "description": "Voeg goud toe aan de huidige beurs."
+      },
+      "quest": {
+        "label": "Missie voltooien",
+        "description": "Voltooi een specifieke missie op ID."
+      },
+      "quests": {
+        "label": "Actieve missies voltooien",
+        "description": "Voltooi elke missie in het huidige logboek."
+      },
+      "attune": {
+        "label": "Afstemmingen ontgrendelen",
+        "description": "Markeer alle afstemmingsvereisten als voltooid."
+      },
+      "gather": {
+        "label": "Verzamelvaardigheid verhogen",
+        "description": "Verhoog de vaardigheid van een verzamelberoep."
+      },
+      "teleport": {
+        "label": "Teleporteren",
+        "description": "Ga naar exacte coördinaten in de wereld."
+      },
+      "dungeon": {
+        "label": "Kerker binnengaan",
+        "description": "Ga een kerker binnen zonder de ontwikkelaarsvergrendeling."
+      },
+      "raid": {
+        "label": "Raid binnengaan",
+        "description": "Ga rechtstreeks de Nythraxis-arena binnen."
+      },
+      "raidreset": {
+        "label": "Raidvergrendeling resetten",
+        "description": "Wis de huidige raidvergrendelingen."
+      },
+      "bot": {
+        "label": "Sociale bot spawnen",
+        "description": "Maak een stilstaande speler die fluisterberichten kan ontvangen."
+      },
+      "lfgqueue": {
+        "label": "Zoekerwachtrij vullen",
+        "description": "Maak een scenario voor de wachtrij van de kerkerzoeker."
+      },
+      "lfgraid": {
+        "label": "Raidzoeker vullen",
+        "description": "Maak een scenario voor de raidzoeker."
+      },
+      "lfgboard": {
+        "label": "Advertentiebord vullen",
+        "description": "Maak een scenario met een vooraf samengestelde groepsadvertentie."
+      }
+    }
+  },
   "game": {
     "xp": {
       "suffix": "XP",
@@ -203,6 +351,7 @@ export const nl_NL: EnTranslations = {
       "remainingLessThanMinute": "<1 min",
       "remainingMinutes": "{minutes} min",
       "remainingHoursMinutes": "{hours} u {minutes} min",
+      "remainingDaysHours": "{days} d {hours} u",
       "score": "Score",
       "walletValue": "Portemonneewaarde (WOC)",
       "usd": "{amount} USD",
@@ -241,7 +390,8 @@ export const nl_NL: EnTranslations = {
         "no_wallet": "Verbind een portemonnee met minstens $20 USD aan WOC.",
         "under_minimum": "Portemonnee ligt onder het WOC-minimum van $20 USD.",
         "price_unavailable": "WOC-prijs is niet beschikbaar, beloningen zijn tijdelijk vergrendeld.",
-        "banned": "Je bent uitgesloten van dagelijkse beloningen. Reden: {reason}"
+        "banned": "Je bent uitgesloten van dagelijkse beloningen. Reden: {reason}",
+        "bannedUntil": "Je bent nog {remaining} uitgesloten van dagelijkse beloningen. De toegang wordt hersteld op {until}. Reden: {reason}"
       }
     },
     "wocStore": {
@@ -466,6 +616,7 @@ export const nl_NL: EnTranslations = {
       "balanceLabel": "Saldo",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL: {amount}",
+      "usdcBalance": "USDC: {amount}",
       "wocBalance": "WOC: {amount}",
       "unavailable": "De Claudium-winkel is momenteel niet beschikbaar. Je saldo en aankopen zijn niet aangetast. Probeer het binnenkort opnieuw.",
       "disclosure": "Claudium is een virtuele valuta die maar één kant op gaat: koop het met geld en besteed het aan cosmetica. Het kan niet worden ingewisseld, overgedragen of uitbetaald.",
@@ -473,6 +624,7 @@ export const nl_NL: EnTranslations = {
       "railLabel": "Betaalmethode",
       "railStripe": "Kaart",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "20% korting",
       "railWocUnavailable": "WOC-prijzen zijn momenteel niet beschikbaar.",
@@ -844,6 +996,7 @@ export const nl_NL: EnTranslations = {
       "interfaceModeTouch": "Aanraking",
       "interfaceModeNote": "Automatisch kiest desktop- of aanraakbesturing op basis van je apparaat. Kies Desktop om toetsenbord en muis af te dwingen (handig op een tablet met toetsenbord), of Aanraking voor de besturing op het scherm.",
       "footstepSounds": "Voetstapgeluiden",
+      "interfaceSounds": "Interface- en feedbackgeluiden",
       "clickFeedback": "Klikmarkering",
       "lockCursorOnRotate": "Aanwijzer vergrendelen tijdens draaien",
       "keybindHelpLockCursorOnRotate": "Houdt de muisaanwijzer binnen het venster terwijl je sleept om de camera te draaien, zodat deze de schermrand niet kan bereiken of naar een ander beeldscherm kan gaan. Schakel uit als je liever een vrije aanwijzer hebt.",
@@ -1465,6 +1618,33 @@ export const nl_NL: EnTranslations = {
     "playerFrame": {
       "unlock": "Spelerframe verplaatsen",
       "lock": "Spelerframe vergrendelen"
+    },
+    "partyFrames": {
+      "section": "Groeps- en raidframes",
+      "unlock": "Groeps- en raidframes verplaatsen",
+      "lock": "Groeps- en raidframes vergrendelen",
+      "style": "Framestijl",
+      "styleAutomatic": "Automatisch",
+      "styleClassic": "Klassieke groepsframes",
+      "styleRaid": "Raidframes",
+      "scale": "Frameschaal",
+      "width": "Framebreedte",
+      "height": "Framehoogte",
+      "spacing": "Frameafstand",
+      "columns": "Raidkolommen",
+      "healthText": "Gezondheidstekst",
+      "healthNone": "Geen",
+      "healthPercent": "Percentage",
+      "healthCurrent": "Huidig",
+      "healthCurrentMax": "Huidig / Maximum",
+      "sort": "Spelers sorteren",
+      "sortGroup": "Groep",
+      "sortRole": "Rol",
+      "sortName": "Naam",
+      "showResource": "Mana, woede en energie tonen",
+      "showAbsorbs": "Absorptieschilden tonen",
+      "showAuras": "Versterkingen en verzwakkingen tonen",
+      "showSelf": "Je eigen frame tonen"
     },
     "frameReset": {
       "label": "Frameposities herstellen"
@@ -2125,6 +2305,9 @@ export const nl_NL: EnTranslations = {
       "already_linked": "Je account heeft al een gekoppeld Steam-account.",
       "account_taken": "Dat Steam-account is al aan een ander account gekoppeld.",
       "upstream": "Steam reageerde niet. Probeer het zo meteen opnieuw."
+    },
+    "welcome": {
+      "invalid_input": "Ongeldige invoer."
     }
   },
   "guide": {
@@ -4821,6 +5004,29 @@ export const nl_NL: EnTranslations = {
     "body": "We herstarten de gameservice en verwachten dat Claudemoon binnenkort weer terug is. Deze pagina blijft automatisch controleren.",
     "status": "Snel terug"
   },
+  "welcome": {
+    "back": "Welkom terug, {name}",
+    "level": "Niveau {level}",
+    "lastPlayed": "Laatst gespeeld: {when}",
+    "continue": "Wereld betreden",
+    "continueHint": "Enter om door te gaan, Esc om over te slaan",
+    "continueHintTouch": "Tik om door te gaan",
+    "discord": {
+      "title": "De community leeft op Discord",
+      "sub": "Voorproefjes van patches, evenementen, chat met de ontwikkelaars en 2 bonusvakken in de bank als je je Discord-account koppelt.",
+      "join": "Word lid van onze Discord"
+    },
+    "chest": {
+      "ready": "Kist met dagelijkse beloningen staat klaar"
+    },
+    "armory": {
+      "cta": "Wereld betreden en het Arsenaal bekijken"
+    },
+    "news": {
+      "new": "Nieuw",
+      "viewAll": "Bekijk alle updates op GitHub"
+    }
+  },
   "hud": {
     "core": {
       "elite": "ELITE",
@@ -6640,6 +6846,24 @@ export const nl_NL: EnTranslations = {
       },
       "eastbrook_wool_trousers": {
         "name": "Oostbeek-Wollen Broek"
+      },
+      "eastbrook_ritual_vestments": {
+        "name": "Rituele gewaden uit Oostbeek"
+      },
+      "eastbrook_druids_hide": {
+        "name": "Druïdenhuid uit Oostbeek"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "Beschermde beenstukken uit Oostbeek"
+      },
+      "wardweave_cowl": {
+        "name": "Kap van beschermweefsel"
+      },
+      "duskhide_wraps": {
+        "name": "Schemerhuid-wikkels"
+      },
+      "sootscale_mantle": {
+        "name": "Roetschubmantel"
       },
       "gravecaller_blade": {
         "name": "Grafroepers Breedkling"

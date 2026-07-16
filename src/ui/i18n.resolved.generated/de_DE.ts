@@ -20,6 +20,154 @@ export const de_DE: EnTranslations = {
     "rp": "RP",
     "rpPvp": "RP-PvP"
   },
+  "devCommand": {
+    "dialogLabel": "Entwicklerbefehlszentrale",
+    "kicker": "Entwicklungswerkzeuge",
+    "title": "Befehlszentrale",
+    "subtitle": "Autoritative Teststeuerung für die aktive Welt.",
+    "closeAria": "Entwicklerbefehle schließen",
+    "categoryNavAria": "Kategorien der Entwicklerbefehle",
+    "categories": {
+      "player": "Spieler",
+      "spawns": "Spawns",
+      "inventory": "Inventar",
+      "progress": "Fortschritt",
+      "travel": "Reisen",
+      "scenarios": "Szenarien"
+    },
+    "filterLabel": "Befehle filtern",
+    "filterPlaceholder": "Diese Kategorie durchsuchen",
+    "noMatches": "Keine passenden Befehle.",
+    "serverRequirement": "Server-Cheats erfordern weiterhin ALLOW_DEV_COMMANDS=1.",
+    "invalidValues": "Wähle gültige Werte, bevor du diesen Befehl ausführst.",
+    "sent": "Gesendet: {command}",
+    "run": "Ausführen",
+    "fields": {
+      "level": "Stufe",
+      "mob": "Mob",
+      "count": "Anzahl",
+      "item": "Gegenstand",
+      "gold": "Gold",
+      "quest": "Quest",
+      "profession": "Beruf",
+      "amount": "Menge",
+      "x": "X",
+      "z": "Z",
+      "dungeon": "Dungeon",
+      "difficulty": "Schwierigkeitsgrad",
+      "name": "Name"
+    },
+    "difficulty": {
+      "normal": "Normal",
+      "heroic": "Heroisch"
+    },
+    "actions": {
+      "heal": {
+        "label": "Gesundheit wiederherstellen",
+        "description": "Gesundheit vollständig auffüllen."
+      },
+      "resource": {
+        "label": "Ressource wiederherstellen",
+        "description": "Mana, Wut oder Energie auffüllen."
+      },
+      "cooldowns": {
+        "label": "Abklingzeiten zurücksetzen",
+        "description": "Fähigkeits-, GCD- und Tranktimer zurücksetzen."
+      },
+      "god": {
+        "label": "Gottmodus umschalten",
+        "description": "Unverwundbarkeit und erhöhten Schaden umschalten."
+      },
+      "revive": {
+        "label": "Wiederbeleben",
+        "description": "Über den normalen Wiederbelebungsablauf zurückkehren."
+      },
+      "kill": {
+        "label": "Spieler töten",
+        "description": "Abläufe für Tod, Geist und Leiche testen."
+      },
+      "combatreset": {
+        "label": "Kampf zurücksetzen",
+        "description": "Kampfstatus und feindliche Bedrohung zurücksetzen."
+      },
+      "level": {
+        "label": "Stufe festlegen",
+        "description": "Die aktuelle Charakterstufe festlegen."
+      },
+      "spawn": {
+        "label": "Mob spawnen",
+        "description": "Einen konkreten Mob in der Nähe des Spielers erstellen."
+      },
+      "killtarget": {
+        "label": "Ziel töten",
+        "description": "Den ausgewählten lebenden Mob töten."
+      },
+      "despawntarget": {
+        "label": "Ziel despawnen",
+        "description": "Einen mit diesem Werkzeug erstellten, ausgewählten Mob entfernen."
+      },
+      "despawnall": {
+        "label": "Eigene Spawns entfernen",
+        "description": "Alle von diesem Entwickler erzeugten Mobs entfernen."
+      },
+      "give": {
+        "label": "Gegenstand geben",
+        "description": "Einen Gegenstand zum Inventar des Spielers hinzufügen."
+      },
+      "gold": {
+        "label": "Gold hinzufügen",
+        "description": "Gold zum aktuellen Geldbeutel hinzufügen."
+      },
+      "quest": {
+        "label": "Quest abschließen",
+        "description": "Eine bestimmte Quest anhand ihrer ID abschließen."
+      },
+      "quests": {
+        "label": "Aktive Quests abschließen",
+        "description": "Jede Quest im aktuellen Logbuch abschließen."
+      },
+      "attune": {
+        "label": "Abstimmungen freischalten",
+        "description": "Alle Abstimmungsanforderungen als erfüllt markieren."
+      },
+      "gather": {
+        "label": "Sammelfertigkeit erhöhen",
+        "description": "Die Fertigkeit eines Sammelberufs erhöhen."
+      },
+      "teleport": {
+        "label": "Teleportieren",
+        "description": "Zu exakten Weltkoordinaten bewegen."
+      },
+      "dungeon": {
+        "label": "Dungeon betreten",
+        "description": "Einen Dungeon unter Umgehung der Entwicklersperre betreten."
+      },
+      "raid": {
+        "label": "Schlachtzug betreten",
+        "description": "Die Nythraxis-Arena direkt betreten."
+      },
+      "raidreset": {
+        "label": "Schlachtzugssperren zurücksetzen",
+        "description": "Aktuelle Schlachtzugssperren zurücksetzen."
+      },
+      "bot": {
+        "label": "Sozialen Bot spawnen",
+        "description": "Einen stationären Spieler erstellen, dem man zuflüstern kann."
+      },
+      "lfgqueue": {
+        "label": "Finder-Warteschlange befüllen",
+        "description": "Ein Szenario für die Dungeonfinder-Warteschlange erstellen."
+      },
+      "lfgraid": {
+        "label": "Schlachtzugssuche befüllen",
+        "description": "Ein Szenario für die Schlachtzugssuche erstellen."
+      },
+      "lfgboard": {
+        "label": "Angebotstafel befüllen",
+        "description": "Ein Szenario mit einer vorgefertigten Gruppensuche erstellen."
+      }
+    }
+  },
   "game": {
     "xp": {
       "suffix": "EP",
@@ -203,6 +351,7 @@ export const de_DE: EnTranslations = {
       "remainingLessThanMinute": "<1Min",
       "remainingMinutes": "{minutes}Min",
       "remainingHoursMinutes": "{hours}Std {minutes}Min",
+      "remainingDaysHours": "{days} T {hours} Std",
       "score": "Punktzahl",
       "walletValue": "Wallet-Wert (WOC)",
       "usd": "{amount} USD",
@@ -241,7 +390,8 @@ export const de_DE: EnTranslations = {
         "no_wallet": "Verbinde eine Wallet mit mindestens 20 USD in WOC.",
         "under_minimum": "Deine Wallet liegt unter dem Mindestwert von 20 USD in WOC.",
         "price_unavailable": "Der WOC-Preis ist nicht verfügbar, Belohnungen sind vorübergehend gesperrt.",
-        "banned": "Du bist von den täglichen Belohnungen ausgeschlossen. Grund: {reason}"
+        "banned": "Du bist von den täglichen Belohnungen ausgeschlossen. Grund: {reason}",
+        "bannedUntil": "Du bist noch für {remaining} von den täglichen Belohnungen ausgeschlossen. Der Zugang wird am {until} wiederhergestellt. Grund: {reason}"
       }
     },
     "wocStore": {
@@ -466,6 +616,7 @@ export const de_DE: EnTranslations = {
       "balanceLabel": "Guthaben",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL: {amount}",
+      "usdcBalance": "USDC: {amount}",
       "wocBalance": "WOC: {amount}",
       "unavailable": "Der Claudium-Shop ist derzeit nicht verfügbar. Dein Guthaben und deine Käufe bleiben davon unberührt. Bitte versuche es gleich noch einmal.",
       "disclosure": "Claudium ist eine nicht rücktauschbare Spielwährung: Du kaufst es mit echtem Geld und gibst es für kosmetische Inhalte aus. Es kann weder eingelöst noch übertragen oder ausgezahlt werden.",
@@ -473,6 +624,7 @@ export const de_DE: EnTranslations = {
       "railLabel": "Zahlungsart",
       "railStripe": "Karte",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "20% Rabatt",
       "railWocUnavailable": "WOC-Preise sind derzeit nicht verfügbar.",
@@ -844,6 +996,7 @@ export const de_DE: EnTranslations = {
       "interfaceModeTouch": "Touch",
       "interfaceModeNote": "Auto wählt je nach Gerät die Desktop- oder Touch-Steuerung. Wähle Desktop, um Tastatur und Maus zu erzwingen (praktisch bei einem Tablet mit Tastatur), oder Touch für die Bildschirmsteuerung.",
       "footstepSounds": "Schrittgeräusche",
+      "interfaceSounds": "Interface- und Feedback-Sounds",
       "clickFeedback": "Klickmarkierung",
       "lockCursorOnRotate": "Cursor beim Drehen sperren",
       "keybindHelpLockCursorOnRotate": "Hält den Mauszeiger im Fenster, während Ihr zum Drehen der Kamera zieht, damit er nicht den Bildschirmrand erreicht oder auf einen anderen Monitor wandert. Schaltet dies aus, wenn Ihr einen freien Cursor bevorzugt.",
@@ -1465,6 +1618,33 @@ export const de_DE: EnTranslations = {
     "playerFrame": {
       "unlock": "Spielerfenster verschieben",
       "lock": "Spielerfenster sperren"
+    },
+    "partyFrames": {
+      "section": "Gruppen- und Schlachtzugsrahmen",
+      "unlock": "Gruppen- und Schlachtzugsrahmen verschieben",
+      "lock": "Gruppen- und Schlachtzugsrahmen sperren",
+      "style": "Rahmenstil",
+      "styleAutomatic": "Automatisch",
+      "styleClassic": "Klassische Gruppenrahmen",
+      "styleRaid": "Schlachtzugsrahmen",
+      "scale": "Rahmenskalierung",
+      "width": "Rahmenbreite",
+      "height": "Rahmenhöhe",
+      "spacing": "Rahmenabstand",
+      "columns": "Schlachtzugsspalten",
+      "healthText": "Gesundheitstext",
+      "healthNone": "Kein Text",
+      "healthPercent": "Prozent",
+      "healthCurrent": "Aktuell",
+      "healthCurrentMax": "Aktuell / Maximum",
+      "sort": "Spieler sortieren",
+      "sortGroup": "Gruppe",
+      "sortRole": "Rolle",
+      "sortName": "Name",
+      "showResource": "Mana, Wut und Energie anzeigen",
+      "showAbsorbs": "Absorptionsschilde anzeigen",
+      "showAuras": "Stärkungs- und Schwächungseffekte anzeigen",
+      "showSelf": "Eigenen Rahmen anzeigen"
     },
     "frameReset": {
       "label": "Fensterpositionen zurücksetzen"
@@ -2125,6 +2305,9 @@ export const de_DE: EnTranslations = {
       "already_linked": "Dein Konto ist bereits mit einem Steam-Konto verknüpft.",
       "account_taken": "Dieses Steam-Konto ist bereits mit einem anderen Konto verknüpft.",
       "upstream": "Steam hat nicht geantwortet. Versuch es gleich noch einmal."
+    },
+    "welcome": {
+      "invalid_input": "Ungültige Eingabe."
     }
   },
   "guide": {
@@ -4821,6 +5004,29 @@ export const de_DE: EnTranslations = {
     "body": "Wir starten den Spieldienst neu und erwarten, dass Claudemoon bald zurückkehrt. Diese Seite prüft automatisch weiter.",
     "status": "Bald zurück"
   },
+  "welcome": {
+    "back": "Willkommen zurück, {name}",
+    "level": "Stufe {level}",
+    "lastPlayed": "Zuletzt gespielt: {when}",
+    "continue": "Welt betreten",
+    "continueHint": "Enter zum Fortfahren, Esc zum Überspringen",
+    "continueHintTouch": "Tippe, um fortzufahren",
+    "discord": {
+      "title": "Die Gemeinschaft lebt auf Discord",
+      "sub": "Patch-Vorschauen, Events, Entwicklerchat und 2 Bonusfächer in der Bank, wenn du dein Discord-Konto verknüpfst.",
+      "join": "Tritt unserem Discord bei"
+    },
+    "chest": {
+      "ready": "Truhe der täglichen Belohnungen ist bereit"
+    },
+    "armory": {
+      "cta": "Welt betreten und die Waffenkammer durchstöbern"
+    },
+    "news": {
+      "new": "Neu",
+      "viewAll": "Alle Updates auf GitHub ansehen"
+    }
+  },
   "hud": {
     "core": {
       "elite": "ELITE",
@@ -6640,6 +6846,24 @@ export const de_DE: EnTranslations = {
       },
       "eastbrook_wool_trousers": {
         "name": "Eastbrook-Wollhose"
+      },
+      "eastbrook_ritual_vestments": {
+        "name": "Eastbrook-Ritualgewänder"
+      },
+      "eastbrook_druids_hide": {
+        "name": "Eastbrook-Druidenhaut"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "Eastbrook-Schutzbeinlinge"
+      },
+      "wardweave_cowl": {
+        "name": "Banngewebe-Gugel"
+      },
+      "duskhide_wraps": {
+        "name": "Dämmerfell-Wickel"
+      },
+      "sootscale_mantle": {
+        "name": "Rußschuppenmantel"
       },
       "gravecaller_blade": {
         "name": "Gravecallers Breitschwert"

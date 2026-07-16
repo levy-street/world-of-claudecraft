@@ -20,6 +20,154 @@ export const vi_VN: EnTranslations = {
     "rp": "RP",
     "rpPvp": "RP-PvP"
   },
+  "devCommand": {
+    "dialogLabel": "Trung Tâm Lệnh Nhà Phát Triển",
+    "kicker": "Công cụ phát triển",
+    "title": "Trung Tâm Lệnh",
+    "subtitle": "Điều khiển kiểm thử phía máy chủ cho thế giới hiện tại.",
+    "closeAria": "Đóng lệnh nhà phát triển",
+    "categoryNavAria": "Danh mục lệnh nhà phát triển",
+    "categories": {
+      "player": "Người Chơi",
+      "spawns": "Quái Đã Tạo",
+      "inventory": "Túi Đồ",
+      "progress": "Tiến Trình",
+      "travel": "Di Chuyển",
+      "scenarios": "Kịch Bản"
+    },
+    "filterLabel": "Lọc lệnh",
+    "filterPlaceholder": "Tìm trong danh mục này",
+    "noMatches": "Không có lệnh phù hợp.",
+    "serverRequirement": "Lệnh gian lận phía máy chủ vẫn cần ALLOW_DEV_COMMANDS=1.",
+    "invalidValues": "Hãy chọn giá trị hợp lệ trước khi chạy lệnh này.",
+    "sent": "Đã gửi: {command}",
+    "run": "Chạy",
+    "fields": {
+      "level": "Cấp",
+      "mob": "Quái",
+      "count": "Số Lượng",
+      "item": "Vật Phẩm",
+      "gold": "Vàng",
+      "quest": "Nhiệm Vụ",
+      "profession": "Nghề",
+      "amount": "Số Lượng",
+      "x": "X",
+      "z": "Z",
+      "dungeon": "Hầm Ngục",
+      "difficulty": "Độ Khó",
+      "name": "Tên"
+    },
+    "difficulty": {
+      "normal": "Thường",
+      "heroic": "Anh Hùng"
+    },
+    "actions": {
+      "heal": {
+        "label": "Hồi phục máu",
+        "description": "Hồi đầy thanh máu."
+      },
+      "resource": {
+        "label": "Hồi phục tài nguyên",
+        "description": "Hồi đầy mana, nộ khí hoặc năng lượng."
+      },
+      "cooldowns": {
+        "label": "Xóa hồi chiêu",
+        "description": "Đặt lại bộ đếm kỹ năng, GCD và bình thuốc."
+      },
+      "god": {
+        "label": "Bật tắt chế độ bất tử",
+        "description": "Bật hoặc tắt bất tử và sát thương tăng cường."
+      },
+      "revive": {
+        "label": "Hồi sinh",
+        "description": "Hồi sinh qua quy trình hồi sinh thông thường."
+      },
+      "kill": {
+        "label": "Giết người chơi",
+        "description": "Kiểm thử quy trình chết, hồn ma và xác chết."
+      },
+      "combatreset": {
+        "label": "Đặt lại chiến đấu",
+        "description": "Xóa trạng thái chiến đấu và mức đe dọa của kẻ địch."
+      },
+      "level": {
+        "label": "Đặt cấp",
+        "description": "Đặt cấp hiện tại của nhân vật."
+      },
+      "spawn": {
+        "label": "Tạo quái",
+        "description": "Tạo một quái vật cụ thể gần người chơi."
+      },
+      "killtarget": {
+        "label": "Giết mục tiêu",
+        "description": "Giết quái vật còn sống được chọn."
+      },
+      "despawntarget": {
+        "label": "Xóa mục tiêu",
+        "description": "Xóa quái vật được chọn đã tạo bằng công cụ này."
+      },
+      "despawnall": {
+        "label": "Xóa quái đã tạo",
+        "description": "Xóa mọi quái vật do nhà phát triển này tạo ra."
+      },
+      "give": {
+        "label": "Trao vật phẩm",
+        "description": "Thêm một vật phẩm vào túi đồ của người chơi."
+      },
+      "gold": {
+        "label": "Thêm vàng",
+        "description": "Thêm vàng vào túi tiền hiện tại."
+      },
+      "quest": {
+        "label": "Hoàn thành nhiệm vụ",
+        "description": "Hoàn thành một nhiệm vụ cụ thể theo mã."
+      },
+      "quests": {
+        "label": "Hoàn thành nhiệm vụ đang làm",
+        "description": "Hoàn thành mọi nhiệm vụ trong nhật ký hiện tại."
+      },
+      "attune": {
+        "label": "Mở khóa đồng điệu",
+        "description": "Đánh dấu hoàn tất mọi yêu cầu đồng điệu."
+      },
+      "gather": {
+        "label": "Tăng kỹ năng thu thập",
+        "description": "Tăng cấp một nghề thu thập."
+      },
+      "teleport": {
+        "label": "Dịch chuyển",
+        "description": "Di chuyển đến tọa độ chính xác trong thế giới."
+      },
+      "dungeon": {
+        "label": "Vào hầm ngục",
+        "description": "Vào hầm ngục và bỏ qua điều kiện dành cho nhà phát triển."
+      },
+      "raid": {
+        "label": "Vào raid",
+        "description": "Vào thẳng đấu trường Nythraxis."
+      },
+      "raidreset": {
+        "label": "Đặt lại khóa raid",
+        "description": "Xóa các khóa raid hiện tại."
+      },
+      "bot": {
+        "label": "Tạo bot xã hội",
+        "description": "Tạo một người chơi đứng yên có thể nhận tin nhắn riêng."
+      },
+      "lfgqueue": {
+        "label": "Tạo dữ liệu hàng chờ",
+        "description": "Tạo kịch bản hàng chờ Tìm Hầm Ngục."
+      },
+      "lfgraid": {
+        "label": "Tạo dữ liệu tìm raid",
+        "description": "Tạo kịch bản tìm đội raid."
+      },
+      "lfgboard": {
+        "label": "Tạo dữ liệu bảng đăng nhóm",
+        "description": "Tạo kịch bản đăng nhóm lập sẵn."
+      }
+    }
+  },
   "game": {
     "xp": {
       "suffix": "XP",
@@ -203,6 +351,7 @@ export const vi_VN: EnTranslations = {
       "remainingLessThanMinute": "<1p",
       "remainingMinutes": "{minutes}p",
       "remainingHoursMinutes": "{hours}h {minutes}p",
+      "remainingDaysHours": "{days} ngày {hours} giờ",
       "score": "Điểm",
       "walletValue": "Giá Trị Ví (WOC)",
       "usd": "{amount} USD",
@@ -241,7 +390,8 @@ export const vi_VN: EnTranslations = {
         "no_wallet": "Kết nối một ví có ít nhất 20 USD WOC.",
         "under_minimum": "Ví thấp hơn mức tối thiểu 20 USD WOC.",
         "price_unavailable": "Giá WOC hiện không có sẵn, phần thưởng tạm thời bị khóa.",
-        "banned": "Bạn đã bị cấm tham gia Phần Thưởng Hằng Ngày. Lý do: {reason}"
+        "banned": "Bạn đã bị cấm tham gia Phần Thưởng Hằng Ngày. Lý do: {reason}",
+        "bannedUntil": "Bạn bị cấm nhận Phần Thưởng Hằng Ngày thêm {remaining}. Quyền truy cập trở lại vào {until}. Lý do: {reason}"
       }
     },
     "wocStore": {
@@ -466,6 +616,7 @@ export const vi_VN: EnTranslations = {
       "balanceLabel": "Số dư",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL: {amount}",
+      "usdcBalance": "USDC: {amount}",
       "wocBalance": "WOC: {amount}",
       "unavailable": "Cửa hàng Claudium hiện không có sẵn. Số dư và giao dịch mua hàng của bạn không bị ảnh hưởng; vui lòng kiểm tra lại trong thời gian ngắn.",
       "disclosure": "Claudium là loại tiền mềm một chiều: mua bằng tiền và tiêu vào mỹ phẩm. Nó không thể được đổi, chuyển nhượng hoặc rút tiền mặt.",
@@ -473,6 +624,7 @@ export const vi_VN: EnTranslations = {
       "railLabel": "Phương thức thanh toán",
       "railStripe": "Thẻ",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "Giảm 20%",
       "railWocUnavailable": "Giá WOC hiện không có sẵn.",
@@ -844,6 +996,7 @@ export const vi_VN: EnTranslations = {
       "interfaceModeTouch": "Cảm Ứng",
       "interfaceModeNote": "Tự Động chọn điều khiển máy tính hoặc cảm ứng theo thiết bị của bạn. Chọn Máy Tính để buộc dùng bàn phím và chuột (hữu ích trên máy tính bảng có bàn phím), hoặc Cảm Ứng để dùng các điều khiển trên màn hình.",
       "footstepSounds": "Âm Thanh Bước Chân",
+      "interfaceSounds": "Âm Thanh Giao Diện và Phản Hồi",
       "clickFeedback": "Dấu Nhấp Chuột",
       "lockCursorOnRotate": "Khóa Con Trỏ Khi Xoay",
       "keybindHelpLockCursorOnRotate": "Giữ con trỏ chuột bên trong cửa sổ khi bạn kéo để xoay camera, để nó không thể chạm tới mép màn hình hoặc di chuyển sang màn hình khác. Hãy tắt nếu bạn thích con trỏ tự do.",
@@ -1465,6 +1618,33 @@ export const vi_VN: EnTranslations = {
     "playerFrame": {
       "unlock": "Di chuyển khung người chơi",
       "lock": "Khóa khung người chơi"
+    },
+    "partyFrames": {
+      "section": "Khung Tổ Đội và Raid",
+      "unlock": "Di chuyển khung tổ đội và raid",
+      "lock": "Khóa khung tổ đội và raid",
+      "style": "Kiểu Khung",
+      "styleAutomatic": "Tự Động",
+      "styleClassic": "Khung Tổ Đội Cổ Điển",
+      "styleRaid": "Khung Raid",
+      "scale": "Tỷ Lệ Khung",
+      "width": "Chiều Rộng Khung",
+      "height": "Chiều Cao Khung",
+      "spacing": "Khoảng Cách Khung",
+      "columns": "Cột Raid",
+      "healthText": "Chữ Máu",
+      "healthNone": "Không Có",
+      "healthPercent": "Phần Trăm",
+      "healthCurrent": "Hiện Tại",
+      "healthCurrentMax": "Hiện Tại / Tối Đa",
+      "sort": "Sắp Xếp Người Chơi",
+      "sortGroup": "Nhóm",
+      "sortRole": "Vai Trò",
+      "sortName": "Tên",
+      "showResource": "Hiện Mana, Nộ Khí và Năng Lượng",
+      "showAbsorbs": "Hiện Khiên Hấp Thụ",
+      "showAuras": "Hiện Buff và Debuff",
+      "showSelf": "Hiện Khung Của Bạn"
     },
     "frameReset": {
       "label": "Đặt Lại Vị Trí Các Khung"
@@ -2125,6 +2305,9 @@ export const vi_VN: EnTranslations = {
       "already_linked": "Tài khoản của bạn đã liên kết với một tài khoản Steam.",
       "account_taken": "Tài khoản Steam đó đã được liên kết với một tài khoản khác.",
       "upstream": "Steam không phản hồi. Hãy thử lại sau giây lát."
+    },
+    "welcome": {
+      "invalid_input": "Dữ liệu nhập không hợp lệ."
     }
   },
   "guide": {
@@ -4821,6 +5004,29 @@ export const vi_VN: EnTranslations = {
     "body": "Chúng tôi đang khởi động lại dịch vụ trò chơi và dự kiến Claudemoon sẽ trở lại trong giây lát. Trang này sẽ tự động tiếp tục kiểm tra.",
     "status": "Sớm trở lại"
   },
+  "welcome": {
+    "back": "Mừng bạn trở lại, {name}",
+    "level": "Cấp {level}",
+    "lastPlayed": "Lần chơi gần nhất: {when}",
+    "continue": "Vào Thế Giới",
+    "continueHint": "Nhấn Enter để tiếp tục, Esc để bỏ qua",
+    "continueHintTouch": "Chạm để tiếp tục",
+    "discord": {
+      "title": "Cộng đồng tụ hội trên Discord",
+      "sub": "Xem trước các bản cập nhật, tham gia sự kiện, trò chuyện cùng nhà phát triển và nhận 2 ô ngân hàng thưởng khi liên kết Discord.",
+      "join": "Tham gia Discord của chúng tôi"
+    },
+    "chest": {
+      "ready": "Rương thưởng hằng ngày đã sẵn sàng"
+    },
+    "armory": {
+      "cta": "Vào thế giới và khám phá Kho Vũ Khí"
+    },
+    "news": {
+      "new": "Mới",
+      "viewAll": "Xem tất cả cập nhật trên GitHub"
+    }
+  },
   "hud": {
     "core": {
       "elite": "TINH ANH",
@@ -6640,6 +6846,24 @@ export const vi_VN: EnTranslations = {
       },
       "eastbrook_wool_trousers": {
         "name": "Quần Len Đông Khê"
+      },
+      "eastbrook_ritual_vestments": {
+        "name": "Lễ Phục Đông Khê"
+      },
+      "eastbrook_druids_hide": {
+        "name": "Da Druid Đông Khê"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "Quần Bảo Hộ Đông Khê"
+      },
+      "wardweave_cowl": {
+        "name": "Mũ Trùm Dệt Hộ Mệnh"
+      },
+      "duskhide_wraps": {
+        "name": "Băng Cuốn Da Hoàng Hôn"
+      },
+      "sootscale_mantle": {
+        "name": "Áo Choàng Vảy Muội"
       },
       "gravecaller_blade": {
         "name": "Đại Đao Của Triệu Mộ Giả"

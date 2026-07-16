@@ -304,10 +304,13 @@ describe('classify: loudness gate', () => {
     expect(problems.filter((p) => p.includes('LUFS'))).toHaveLength(0);
   });
 
-  it('ignores peakDb for long clips (uses lufs branch)', () => {
-    // A bad peak value on a long clip must not surface as a peak problem.
+  it('still flags an overshooting peakDb on a long clip even with in-spec LUFS', () => {
+    // LUFS alone cannot reveal a true-peak overshoot (see the dedicated
+    // "flags a long clip whose true peak overshoots" case above); a long
+    // clip's peak is checked unconditionally, not "ignored" just because the
+    // lufs branch is the one selecting its loudness TARGET.
     const { problems } = classify({ ...AT_SPEC, duration: 2.0, peakDb: 0, lufs: TARGET_LUFS });
-    expect(problems.filter((p) => p.includes('dBFS'))).toHaveLength(0);
+    expect(problems.filter((p) => p.includes('dBFS'))).toHaveLength(1);
   });
 
   it('ignores lufs for short clips (uses peak branch)', () => {
@@ -324,6 +327,42 @@ describe('classify: loudness gate', () => {
     // If caller passes neither peakDb nor lufs, no loudness problem is reported.
     const { problems } = classify({ ...AT_SPEC });
     expect(problems.filter((p) => p.includes('dBFS') || p.includes('LUFS'))).toHaveLength(0);
+  });
+
+  it('flags a long clip whose true peak overshoots even when LUFS is in spec', () => {
+    // A wide-crest-factor source can land exactly on the LUFS target while its
+    // true peak still clips: LUFS alone must not be treated as sufficient.
+    const { problems } = classify({
+      ...AT_SPEC,
+      duration: 2.0,
+      lufs: TARGET_LUFS,
+      peakDb: TARGET_PEAK_DBFS + 1,
+    });
+    expect(problems.some((p) => p.includes('dBFS'))).toBe(true);
+  });
+
+  it('does not flag a long clip whose true peak is within the safety ceiling', () => {
+    const { problems } = classify({
+      ...AT_SPEC,
+      duration: 2.0,
+      lufs: TARGET_LUFS,
+      peakDb: TARGET_PEAK_DBFS - 3,
+    });
+    expect(problems.filter((p) => p.includes('dBFS'))).toHaveLength(0);
+  });
+
+  it('does not flag a long clip peak sitting under the ceiling by less than the target', () => {
+    // Unlike the short-clip peak branch (symmetric tolerance around the
+    // target), the long-clip peak check is a one-sided ceiling: a peak well
+    // BELOW TARGET_PEAK_DBFS is never a problem for the lufs branch, only an
+    // overshoot above it is.
+    const { problems } = classify({
+      ...AT_SPEC,
+      duration: 2.0,
+      lufs: TARGET_LUFS,
+      peakDb: TARGET_PEAK_DBFS - 20,
+    });
+    expect(problems.filter((p) => p.includes('dBFS'))).toHaveLength(0);
   });
 });
 

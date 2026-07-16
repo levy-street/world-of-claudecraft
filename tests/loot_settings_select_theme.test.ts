@@ -9,7 +9,10 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 const css = readFileSync(new URL('../src/styles/components.css', import.meta.url), 'utf8');
-const win = readFileSync(new URL('../src/ui/loot_settings_window.ts', import.meta.url), 'utf8');
+const win = readFileSync(
+  new URL('../src/ui/hud/loot/loot_settings_window.ts', import.meta.url),
+  'utf8',
+);
 
 // Isolate the .hud-select base rule body.
 const base = css.match(/\.hud-select\s*\{([\s\S]*?)\}/);

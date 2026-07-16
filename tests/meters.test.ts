@@ -139,4 +139,57 @@ describe('combat meters', () => {
     expect(m.current!.tallies.get(3)!.name).toBe('Wolf Pet');
     expect(m.current!.tallies.get(3)!.dmg).toBe(18);
   });
+
+  it('merges a reconnecting party member into one row instead of duplicating them under their new pid', () => {
+    const w = fakeWorld();
+    const party = new Set([1, 2]);
+    const m = new MeterData(0);
+    // "Pal" deals damage under their original pid (2)...
+    m.onEvent(dmg(2, 50, 20), w, party, 1000);
+    // ...then relogs: the server issues a new entity id (3) for the same
+    // character, still named "Pal", and the HUD's party-pid set now includes it.
+    (w.entities as Map<number, any>).set(3, {
+      id: 3,
+      kind: 'player',
+      name: 'Pal',
+      templateId: 'priest',
+    });
+    (w.partyInfo as any).members = [{ pid: 3, name: 'Pal', cls: 'priest', group: 1 }];
+    const party2 = new Set([1, 3]);
+    m.onEvent(dmg(3, 50, 30), w, party2, 2000);
+    expect(m.current!.tallies.size).toBe(1); // one merged "Pal" row, not two
+    const palRows = [...m.current!.tallies.values()].filter((t) => t.name === 'Pal');
+    expect(palRows.length).toBe(1);
+    expect(palRows[0].dmg).toBe(50);
+  });
+
+  it('keeps two live same-named pets in separate rows instead of merging them by name', () => {
+    const w = fakeWorld();
+    // two warlocks running the same demon template both have a pet named
+    // "Imp" (createDemonPet sets pet.name = template.name), each with its
+    // own live pid. Both stay in the party set the whole time, so this must
+    // never look like a reconnect.
+    (w.entities as Map<number, any>).set(10, {
+      id: 10,
+      kind: 'mob',
+      name: 'Imp',
+      templateId: 'imp',
+      ownerId: 1,
+    });
+    (w.entities as Map<number, any>).set(11, {
+      id: 11,
+      kind: 'mob',
+      name: 'Imp',
+      templateId: 'imp',
+      ownerId: 2,
+    });
+    const party = new Set([1, 2, 10, 11]);
+    const m = new MeterData(0);
+    m.onEvent(dmg(10, 50, 20), w, party, 1000);
+    m.onEvent(dmg(11, 50, 30), w, party, 1500);
+    m.onEvent(dmg(10, 50, 5), w, party, 2000);
+    expect(m.current!.tallies.size).toBe(2);
+    expect(m.current!.tallies.get(10)!.dmg).toBe(25);
+    expect(m.current!.tallies.get(11)!.dmg).toBe(30);
+  });
 });

@@ -1158,12 +1158,19 @@ export function normalizeProductionMastering(raw, { allowHistoricalRevision = fa
   const attempts = raw.conform.attempts.map((attempt) => {
     assertOnlyFields(
       attempt,
-      new Set(['gainDb', 'measuredOutput', 'error']),
+      new Set(['gainDb', 'measuredOutput', 'measuredPeakDb', 'error']),
       'production conform attempt',
     );
     return {
       gainDb: masteringNumber(attempt.gainDb, 'conform attempt gain'),
       measuredOutput: masteringNumber(attempt.measuredOutput, 'conform attempt output'),
+      // Optional: added alongside conform_audio.mjs's independent post-encode
+      // true-peak verification. A project published before that change has
+      // persisted attempts without this field; keep loading it, don't force
+      // every historical record to carry a value that was never measured.
+      ...(attempt.measuredPeakDb === undefined
+        ? {}
+        : { measuredPeakDb: masteringNumber(attempt.measuredPeakDb, 'conform attempt peak') }),
       error: masteringNumber(attempt.error, 'conform attempt error'),
     };
   });

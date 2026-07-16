@@ -89,8 +89,10 @@ describe('World Market filters', () => {
   });
 
   it('matches rarities by the game quality names', () => {
-    expect(filterIds(items, { rarity: 'poor' })).toEqual(['wolf_fang', 'bone_fragments']);
+    // bone_fragments is a crafting reagent, so it is common (white), not poor.
+    expect(filterIds(items, { rarity: 'poor' })).toEqual(['wolf_fang']);
     expect(filterIds(items, { rarity: 'common' })).toEqual([
+      'bone_fragments',
       'roasted_boar',
       'minor_healing_potion',
     ]);

@@ -570,7 +570,8 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
         ? accountDetailBody.slice(wrapStart)
         : accountDetailBody.slice(wrapStart, nextPoolQuery);
     expect(wrappedRead).toContain('playtime_seconds');
-    expect(wrappedRead).toContain('FROM accounts WHERE id = $1');
+    expect(wrappedRead).toContain('FROM accounts');
+    expect(wrappedRead).toContain('WHERE id = $1');
     expect(bodyOf(dbSrc, 'export async function pruneChatLogs')).toContain(
       'runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS',
     );

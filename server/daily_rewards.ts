@@ -91,6 +91,7 @@ interface Eligibility {
   eligible: boolean;
   reason: 'eligible' | 'no_wallet' | 'under_minimum' | 'price_unavailable' | 'banned';
   banReason: string | null;
+  banExpiresAt: string | null;
   walletPubkey: string | null;
   wocBalance: number | null;
   wocUsdPrice: number | null;
@@ -232,6 +233,13 @@ function fallbackRuntimeConfig(): DailyRewardRuntimeConfig {
   };
 }
 
+function featuredDailyRewardTaskName(config: DailyRewardRuntimeConfig): string {
+  const [task] = config.tasks
+    .filter((candidate) => candidate.active !== false)
+    .sort((left, right) => left.sortOrder - right.sortOrder);
+  return task?.title ?? DEFAULT_TASKS[0].title;
+}
+
 function parseRuntimeConfigPayload(payload: unknown): DailyRewardRuntimeConfig {
   const record = payload && typeof payload === 'object' ? (payload as Record<string, unknown>) : {};
   const fallback = fallbackRuntimeConfig();
@@ -354,6 +362,10 @@ async function dailyRewardClock(now = new Date()): Promise<{
   return { day, config: await dailyRewardRuntimeConfig(day) };
 }
 
+export async function currentDailyRewardDay(now = new Date()): Promise<string> {
+  return (await dailyRewardClock(now)).day;
+}
+
 async function prizePoolSol(config: DailyRewardRuntimeConfig): Promise<number | null> {
   if (config.prizePoolSol !== null) return config.prizePoolSol;
   if (config.solUsdPrice === null) return null;
@@ -371,6 +383,7 @@ export async function dailyRewardEligibility(
       eligible: false,
       reason: 'no_wallet',
       banReason: null,
+      banExpiresAt: null,
       walletPubkey: null,
       wocBalance: null,
       wocUsdPrice: runtimeConfig.wocUsdPrice,
@@ -387,6 +400,7 @@ export async function dailyRewardEligibility(
       eligible: false,
       reason: 'price_unavailable',
       banReason: null,
+      banExpiresAt: null,
       walletPubkey: wallet.pubkey,
       wocBalance: balance,
       wocUsdPrice: price,
@@ -399,6 +413,7 @@ export async function dailyRewardEligibility(
     eligible: usdValue >= runtimeConfig.minUsd,
     reason: usdValue >= runtimeConfig.minUsd ? 'eligible' : 'under_minimum',
     banReason: null,
+    banExpiresAt: null,
     walletPubkey: wallet.pubkey,
     wocBalance: balance,
     wocUsdPrice: price,
@@ -585,6 +600,7 @@ export class DailyRewardService {
         eligible: false,
         reason: 'banned',
         banReason: ban.reason,
+        banExpiresAt: ban.expiresAt,
         walletPubkey: null,
         wocBalance: null,
         wocUsdPrice: config.wocUsdPrice,
@@ -997,7 +1013,23 @@ export class DailyRewardService {
 
   async discordWinnerAnnouncements(limit = 1): Promise<unknown> {
     await this.finalizePreviousDay();
-    return { days: await this.db.unannouncedWinnerDays(limit) };
+    const days = await this.db.unannouncedWinnerDays(limit);
+    const rewardDays = [...new Set(days.flatMap((day) => [day.day, addRewardDays(day.day, 1)]))];
+    const taskNames = new Map(
+      await Promise.all(
+        rewardDays.map(
+          async (day) =>
+            [day, featuredDailyRewardTaskName(await dailyRewardRuntimeConfig(day))] as const,
+        ),
+      ),
+    );
+    return {
+      days: days.map((day) => ({
+        ...day,
+        taskName: taskNames.get(day.day) ?? DEFAULT_TASKS[0].title,
+        nextTaskName: taskNames.get(addRewardDays(day.day, 1)) ?? DEFAULT_TASKS[0].title,
+      })),
+    };
   }
 
   async markDiscordWinnersAnnounced(

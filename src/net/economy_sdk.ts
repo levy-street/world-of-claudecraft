@@ -9,9 +9,9 @@
 
 import { apiUrl } from './online';
 
-export type ClaudiumRail = 'stripe' | 'sol' | 'woc';
+export type ClaudiumRail = 'stripe' | 'sol' | 'usdc' | 'woc';
 export type ClaudiumPriceRail = 'stripe' | 'woc';
-export type ClaudiumNativeRail = 'sol' | 'woc';
+export type ClaudiumNativeRail = 'sol' | 'usdc' | 'woc';
 
 export interface ClaudiumBalance {
   available?: boolean;
@@ -93,6 +93,11 @@ export interface ClaudiumSolBalance {
   lamports: string | null;
 }
 
+export interface ClaudiumUsdcBalance {
+  owner: string;
+  amountBase: string | null;
+}
+
 export interface ClaudiumNativeQuote {
   ok: boolean;
   reference: string | null;
@@ -136,7 +141,7 @@ const OFF_SKUS: ClaudiumSku[] = [];
 const OFF_STORE: ClaudiumStoreItem[] = [];
 const OFF_NATIVE_RAILS: ClaudiumNativeRails = {
   available: false,
-  rails: { sol: false, woc: false },
+  rails: { sol: false, usdc: false, woc: false },
 };
 const OFF_PURCHASE: ClaudiumPurchase = {
   ok: false,
@@ -305,6 +310,13 @@ export class EconomyClient {
     });
   }
 
+  usdcBalance(owner: string): Promise<ClaudiumUsdcBalance> {
+    return this.get(`/api/claudium/native/balance/usdc/${encodeURIComponent(owner)}`, {
+      owner,
+      amountBase: null,
+    });
+  }
+
   purchase(input: {
     rail: 'stripe';
     sku: string;
@@ -388,7 +400,7 @@ export async function confirmNativeSettlement(
  *
  * - stripe: hand the returned clientSecret + publishableKey to Stripe.js and
  *   confirm the PaymentIntent client-side. Needs a live publishable key + Stripe.js.
- * - nativeSignAndSend: sign and send the service-built SOL or WOC transaction,
+ * - nativeSignAndSend: sign and send the service-built SOL, USDC, or WOC transaction,
  *   returning its signature to post to nativeConfirm. Needs a live wallet.
  */
 export interface ClaudiumSigners {

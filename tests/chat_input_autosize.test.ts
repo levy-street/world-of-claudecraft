@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { chatInputSize } from '../src/ui/chat_input_autosize';
+import { chatInputSize } from '../src/ui/hud/chat/chat_input_autosize';
 
 const LIMITS = { minHeight: 36, maxHeight: 110 };
 // The desktop #chat-input has a 2px top + 2px bottom border under box-sizing: border-box.

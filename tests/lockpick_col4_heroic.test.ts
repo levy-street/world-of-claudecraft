@@ -12,7 +12,7 @@ import {
   stepLock,
   visibleCells,
 } from '../src/sim/lockpick';
-import { lockpickBoardModel } from '../src/ui/lockpick_panel';
+import { lockpickBoardModel } from '../src/ui/hud/delve/lockpick_panel';
 import type { LockpickView } from '../src/world_api';
 
 const heroic = LOCKPICK_TIER_PRESETS.heroic;

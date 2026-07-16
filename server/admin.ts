@@ -5,6 +5,7 @@ import {
   classDistribution,
   clientPerfRaw,
   clientPerfSummary,
+  dailyRewardPointEvents,
   levelDistribution,
   listAccounts,
   listCharacters,
@@ -47,6 +48,7 @@ import {
   updateFilterConfig,
   type WordTier,
 } from './chat_filter_db';
+import { currentDailyRewardDay } from './daily_rewards';
 import {
   accountById,
   accountForToken,
@@ -128,6 +130,16 @@ const AI_FLAG_REQUIRED = 'ai must be a boolean';
 const STREAMER_FLAG_REQUIRED = 'streamer must be a boolean';
 const STREAMER_LINKS_REQUIRED = 'a links object is required';
 const ACCOUNT_FLAIR_FAILED = 'failed to update account flair';
+const DAILY_REWARD_EVENT_DAY_REQUIRED = 'a valid daily rewards date is required';
+
+async function dailyRewardEventDay(value: string | null): Promise<string | null> {
+  if (value === null) return currentDailyRewardDay();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+  const parsed = new Date(`${value}T00:00:00.000Z`);
+  return Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value
+    ? value
+    : null;
+}
 
 /**
  * Decode the request's `links` bag, three-valued:
@@ -533,6 +545,7 @@ export async function handleAdminApi(
           adminAccountId: accountId,
           banned: dailyRewardsBanMatch[2] === 'ban',
           reason: body.reason,
+          durationHours: body.durationHours,
         });
         return ok(res, { ok: true });
       } catch (err) {
@@ -969,6 +982,15 @@ export async function handleAdminApi(
         blockedIps: getBlockedIpsForAccount(game, detail),
       });
     }
+    const dailyRewardEventsMatch = /^\/admin\/api\/accounts\/(\d+)\/daily-rewards-events$/.exec(
+      path,
+    );
+    if (dailyRewardEventsMatch) {
+      const day = await dailyRewardEventDay(url.searchParams.get('day'));
+      if (!day) return fail(res, 400, DAILY_REWARD_EVENT_DAY_REQUIRED);
+      const limit = Number(url.searchParams.get('limit') ?? '100');
+      return ok(res, await dailyRewardPointEvents(Number(dailyRewardEventsMatch[1]), day, limit));
+    }
     const detailMatch = /^\/admin\/api\/accounts\/(\d+)$/.exec(path);
     if (detailMatch) {
       const id = Number(detailMatch[1]);
@@ -1141,6 +1163,7 @@ function makeRealAdminDb() {
     classDistribution,
     clientPerfRaw,
     clientPerfSummary,
+    dailyRewardPointEvents,
     levelDistribution,
     listAccounts,
     listCharacters,
@@ -1672,6 +1695,7 @@ async function dailyRewardsBanHandler(ctx: Ctx): Promise<void> {
       adminAccountId: ctxAccountId(ctx),
       banned,
       reason: body.reason,
+      durationHours: body.durationHours,
     });
     return ok(ctx.res, { ok: true });
   } catch (err) {
@@ -1818,6 +1842,14 @@ async function accountDetailHandler(ctx: Ctx): Promise<void> {
   const detail = await adminDb().accountDetail(id);
   if (!detail) return fail(ctx.res, 404, 'account not found');
   ok(ctx.res, { ...detail, online: rt.liveAccountIds().has(id) });
+}
+
+/** GET /admin/api/accounts/:id/daily-rewards-events: bounded point-award ledger. */
+async function dailyRewardPointEventsHandler(ctx: Ctx): Promise<void> {
+  const day = await dailyRewardEventDay(ctx.url.searchParams.get('day'));
+  if (!day) return fail(ctx.res, 400, DAILY_REWARD_EVENT_DAY_REQUIRED);
+  const limit = Number(ctx.url.searchParams.get('limit') ?? '100');
+  ok(ctx.res, await adminDb().dailyRewardPointEvents(adminTargetId(ctx), day, limit));
 }
 
 /**
@@ -2166,6 +2198,14 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin, requireAdminTarget('account')],
     meta: adminTargetMeta('account'),
     handler: accountDetailHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/accounts/:id/daily-rewards-events',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: dailyRewardPointEventsHandler,
   },
   {
     method: 'POST',

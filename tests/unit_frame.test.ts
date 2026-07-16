@@ -79,6 +79,8 @@ describe('unitFrameView: the present / hidden gate', () => {
       titlePost: '',
       portraitKey: '',
       absorbFrac: 0,
+      absorbStartFrac: 0,
+      absorbSizeFrac: 0,
       absorbOvershield: false,
       dead: false,
       outOfRange: false,

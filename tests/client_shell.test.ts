@@ -87,10 +87,22 @@ const mainTs = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8').
   /\r\n/g,
   '\n',
 );
+const newsFeedTs = readFileSync(new URL('../src/ui/news_feed.ts', import.meta.url), 'utf8').replace(
+  /\r\n/g,
+  '\n',
+);
 const hudTs = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8').replace(
   /\r\n/g,
   '\n',
 );
+const playerCardControllerTs = readFileSync(
+  new URL('../src/ui/hud/player_card/player_card_controller.ts', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
+const actionBarControllerTs = readFileSync(
+  new URL('../src/ui/hud/action_bar/action_bar_controller.ts', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
 // The Esc options menu was extracted to options_view.ts (the declarative menu
 // model) + options_window.ts (the painter); the menu guard reads the
 // model rather than the old inline hud.ts main-menu builder.
@@ -307,7 +319,7 @@ describe('client HTML shell', () => {
     // tag also locks the attribute order + the exact i18n key across entries.
     for (const entry of [html, playHtml]) {
       expect(entry).toContain(
-        'id="player-frame" class="unitframe" role="group" data-i18n-aria="hudChrome.unitFrame.playerLabel"',
+        'id="player-frame" class="unitframe" role="group" tabindex="0" aria-haspopup="menu" data-i18n-aria="hudChrome.unitFrame.playerLabel"',
       );
     }
   });
@@ -507,14 +519,13 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain(
       'body.mobile-touch #party-frames.party-expanded #party-chip .ui-icon {\n    transform: rotate(90deg);',
     );
-    // Collapsed OR chat-yielded (no .party-expanded on mobile) hides the member rows +
-    // Leave button, so both states leave only the chip (if present) as the party UI.
+    // Collapsed OR chat-yielded (no .party-expanded on mobile) hides the member rows,
+    // leaving only the chip (if present) as the party UI. (Leaving the party moved to
+    // the self portrait context menu, so there is no longer a #party-leave button.)
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #party-frames:not(.party-expanded) .party-frame,',
+      'body.mobile-touch #party-frames:not(.party-expanded) .party-frame {\n    display: none;',
     );
-    expect(hudMobileCss).toContain(
-      'body.mobile-touch #party-frames:not(.party-expanded) #party-leave {\n    display: none;',
-    );
+    expect(hudMobileCss).not.toContain('#party-frames:not(.party-expanded) #party-leave');
   });
 
   it('drives the arena window relocalize from refreshLocalizedDynamicUi (live language switch)', () => {
@@ -907,14 +918,11 @@ describe('client HTML shell', () => {
     // .donate links in hud.css.
     expect(hudCss).toContain('body.native-app #mobile-donate,');
     // The tap targets: the account panel with the invite as the logged-out /
-    // offline fallback, and the Ko-fi page, pinned to the shells' URLs.
-    expect(mainTs).toContain(
-      "const DISCORD_INVITE_URL = 'https://discord.com/invite/worldofclaudecraft';",
-    );
+    // offline fallback (discordInviteUrl() itself falls back to
+    // DEFAULT_DISCORD_INVITE_URL in discord_status.ts), and the Ko-fi page,
+    // pinned to the shells' URLs.
     expect(mainTs).toContain("const DONATE_URL = 'https://ko-fi.com/worldofclaudecraft';");
-    expect(mainTs).toContain(
-      "window.open(discordInviteUrl() || DISCORD_INVITE_URL, '_blank', 'noopener,noreferrer');",
-    );
+    expect(mainTs).toContain("window.open(discordInviteUrl(), '_blank', 'noopener,noreferrer');");
     expect(mainTs).toContain(
       "onDonate: () => window.open(DONATE_URL, '_blank', 'noopener,noreferrer'),",
     );
@@ -1043,14 +1051,17 @@ describe('client HTML shell', () => {
   });
 
   it('wires player card pose clicks before loading card metadata', () => {
-    const methodStart = hudTs.indexOf('private async openPlayerCard');
-    const listener = hudTs.indexOf('poseButtons.forEach((b, i) =>', methodStart);
-    const metadataAwait = hudTs.indexOf(
+    const methodStart = playerCardControllerTs.indexOf('async open(): Promise<void>');
+    const listener = playerCardControllerTs.indexOf(
+      'poseButtons.forEach((button, index) =>',
+      methodStart,
+    );
+    const metadataAwait = playerCardControllerTs.indexOf(
       '[referral, standing] = await Promise.all([fetchReferralInfo(), fetchStanding()]);',
       methodStart,
     );
-    const actionWiring = hudTs.indexOf(
-      'this.wireCardActions(back, state, setStatus);',
+    const actionWiring = playerCardControllerTs.indexOf(
+      'this.wireActions(backdrop, state, setStatus);',
       methodStart,
     );
 
@@ -1059,11 +1070,11 @@ describe('client HTML shell', () => {
     expect(metadataAwait).toBeGreaterThan(listener);
     expect(actionWiring).toBeGreaterThan(metadataAwait);
 
-    const listenerBlock = hudTs.slice(listener, metadataAwait);
+    const listenerBlock = playerCardControllerTs.slice(listener, metadataAwait);
     expect(listenerBlock).toContain('if (!metadataReady) {');
-    expect(listenerBlock).toContain('selectPose(i);');
+    expect(listenerBlock).toContain('selectPose(index);');
     expect(listenerBlock).toContain('return;');
-    expect(hudTs.slice(metadataAwait, actionWiring)).toContain(
+    expect(playerCardControllerTs.slice(metadataAwait, actionWiring)).toContain(
       'await compose(requestedPoseIndex);',
     );
   });
@@ -1237,23 +1248,27 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain(
       'body.mobile-touch #party-frames .party-frame:not(:first-of-type) {\n    margin-top: -1px;',
     );
-    // F1: the container is a simple flex column now (chip, rows wrapper, master-loot,
-    // leave), so the leave button carries no grid placement and no member frame can
-    // auto-flow beside the chip.
+    // F1: the container is a simple flex column now (chip, rows wrapper, master-loot),
+    // so no member frame can auto-flow beside the chip. The leave button is gone (moved
+    // to the self portrait context menu), so no #party-leave rule remains on mobile.
     expect(hudMobileCss).toMatch(
       /body\.mobile-touch #party-frames \{[^}]*display: flex;[^}]*flex-direction: column;/,
     );
+    expect(hudMobileCss).not.toContain('body.mobile-touch #party-frames #party-leave');
+    // The mobile double-stack keeps its own two-row column grid. On desktop the
+    // .party-rows wrapper now drives the configurable party layout: a column grid
+    // sized by the --party-frame-columns / --party-frame-width / --party-frame-spacing
+    // custom properties (columns default to 1, i.e. the classic single stack).
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #party-frames #party-leave {\n    width: auto;\n    min-width: 0;\n    min-height: 40px;',
+      'body.mobile-touch #party-frames .party-rows {\n    display: grid;\n    zoom: 1;\n    grid-template-columns: none;\n    grid-auto-flow: column;\n    grid-template-rows: repeat(2, auto);',
     );
-    expect(hudMobileCss).not.toMatch(/#party-leave \{\n {4}grid-column/);
-    // The double-stack grid the container used to carry moved to the .party-rows WRAPPER;
-    // on desktop the wrapper is transparent (display: contents), so the desktop stack is
-    // unchanged. Both pins guard the two-arm structure.
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #party-frames .party-rows {\n    display: grid;\n    grid-auto-flow: column;\n    grid-template-rows: repeat(2, auto);',
+      'max-height: calc(100dvh - max(8px, env(safe-area-inset-top)) - 129px);',
     );
-    expect(hudCss).toContain('#party-frames .party-rows {\n    display: contents;\n  }');
+    expect(hudMobileCss).toContain('overflow: auto;');
+    expect(hudCss).toContain(
+      '#party-frames .party-rows {\n    display: grid;\n    grid-template-columns: repeat(var(--party-frame-columns, 1), var(--party-frame-width, 170px));',
+    );
     expect(hudMobileCss).toContain(
       'body.mobile-touch #party-frames .party-frame {\n      width: calc(100px * var(--mobile-chrome-scale, 1));\n      min-height: 40px;',
     );
@@ -1285,10 +1300,11 @@ describe('client HTML shell', () => {
     // If a future change moves the pool back inline or drops the keyed builder, this
     // fails instead of silently losing the guard.
 
-    // Party rows: the per-member row + the #party-leave button are built once by
-    // the pooled row builder, not re-created on every party rebuild in hud.ts.
+    // Party rows: the per-member row is built once by the pooled row builder, not
+    // re-created on every party rebuild in hud.ts. (Leaving the party moved from a
+    // per-row button to the self portrait context menu, so the row no longer builds
+    // a #party-leave button.)
     expect(partyFrameRowTs).toContain("row.className = 'party-frame panel';");
-    expect(partyFrameRowTs).toContain("btn.id = 'party-leave';");
 
     // Aura slots: one node per aura id, held in a keyed pool and built once in
     // createNode() as .buff > .dur + .stacks. The hud.ts-wiring assertion (mirroring the
@@ -1448,9 +1464,10 @@ describe('client HTML shell', () => {
   });
 
   it('places news release metadata below the heading on mobile', () => {
-    expect(mainTs).toContain(
+    // The renderer moved to src/ui/news_feed.ts (extracted out of main.ts).
+    expect(newsFeedTs).toContain(
       // biome-ignore lint/suspicious/noTemplateCurlyInString: asserting the source literally contains this template expression
-      '<h3 class="news-item-title">${title}</h3><div class="news-item-meta">${tag}${badge}${when}</div></div>',
+      '<h3 class="news-item-title">${title}</h3><div class="news-item-meta">${tag}${newBadge}${badge}${when}</div></div>',
     );
     expect(shellCss).toContain(
       'body.mobile-touch .news-item-head {\n    flex-direction: column;\n    align-items: flex-start;',
@@ -2076,48 +2093,56 @@ describe('client HTML shell', () => {
   });
 
   it('seeds druid form bars and initializes stealth pages blank', () => {
-    expect(hudTs).toContain('if (this.isFormKitBar()) {');
-    expect(hudTs).toContain('if (this.seedFormBarIfNeeded(parsed)) return;');
-    expect(hudTs).toMatch(
-      /buildDefaultFormBar\(\s*this\.formKitAbilityIds\(this\.activeHotbarForm\),\s*Hud\.BAR_ABILITY_SLOTS,\s*\)/,
+    expect(actionBarControllerTs).toContain('if (this.isFormKitBar()) {');
+    expect(actionBarControllerTs).toContain('if (this.seedFormBarIfNeeded(parsed)) return;');
+    expect(actionBarControllerTs).toMatch(
+      /buildDefaultFormBar\(\s*this\.formKitAbilityIds\(this\.activeFormState\),\s*ACTION_BAR_ABILITY_SLOTS,\s*\)/,
     );
-    expect(hudTs).toContain('if (this.isStealthHotbarForm()) {');
-    expect(hudTs).toContain('this.loadStealthSlotMap(parsed, stored, storedRaw);');
-    expect(hudTs).toMatch(/Array\.from\(\{ length: Hud\.BAR_ABILITY_SLOTS \}, \(\) => null\)/);
-    expect(hudTs).not.toContain('fallbackForm');
+    expect(actionBarControllerTs).toContain('if (this.isStealthForm()) {');
+    expect(actionBarControllerTs).toContain('this.loadStealthActions(parsed, stored, storedRaw);');
+    expect(actionBarControllerTs).toMatch(
+      /Array\.from\(\{ length: ACTION_BAR_ABILITY_SLOTS \}, \(\) => null\)/,
+    );
+    expect(actionBarControllerTs).not.toContain('fallbackForm');
   });
 
   it('migrates a pre-existing form bar at most once via a per-form seeded marker', () => {
-    expect(hudTs).toContain('_seeded');
-    expect(hudTs).toContain('shouldSeedFormBar(parsed, normalActions, false)');
+    expect(actionBarControllerTs).toContain('_seeded');
+    expect(actionBarControllerTs).toContain('shouldSeedFormBar(parsed, normalActions, false)');
   });
 
   it('only auto-places abilities that belong on the active form bar', () => {
-    expect(hudTs).toContain(
-      'if (this.shouldAutoPlaceOnForm(id, this.activeHotbarForm)) autoPlaceAbilityIds.add(id);',
+    expect(actionBarControllerTs).toContain(
+      'if (this.shouldAutoPlaceOnForm(id, this.activeFormState)) autoPlaceAbilityIds.add(id);',
     );
   });
 
   it('keeps the active druid form toggle on its form action bar', () => {
-    expect(hudTs).toContain("new Set(['bear_form', 'cat_form', 'travel_form'])");
-    expect(hudTs).toContain("if (this.activeHotbarForm === 'bear') return 'bear_form';");
-    expect(hudTs).toContain("if (this.activeHotbarForm === 'cat') return 'cat_form';");
-    expect(hudTs).not.toContain("this.activeHotbarForm === 'cat_stealth') return 'cat_form'");
-    expect(hudTs).toContain(
+    expect(actionBarControllerTs).toContain("new Set(['bear_form', 'cat_form', 'travel_form'])");
+    expect(actionBarControllerTs).toContain(
+      "if (this.activeFormState === 'bear') return 'bear_form';",
+    );
+    expect(actionBarControllerTs).toContain(
+      "if (this.activeFormState === 'cat') return 'cat_form';",
+    );
+    expect(actionBarControllerTs).not.toContain(
+      "this.activeFormState === 'cat_stealth') return 'cat_form'",
+    );
+    expect(actionBarControllerTs).toContain(
       'if (formToggle && knownAbilityIds.includes(formToggle)) autoPlaceAbilityIds.add(formToggle);',
     );
   });
 
   it('offers a reset-to-default action bar button in the spellbook, only for classes with form bars', () => {
     // The reset button + its label live in the spellbook painter;
-    // Hud still owns resetActiveFormBarToDefault + the form-bar predicate it wires.
+    // Hud keeps compatibility callbacks while the controller owns the form state.
     expect(spellbookWindowTs).toContain('data-reset-bar');
     expect(spellbookWindowTs).toContain("t('abilityUi.spellbook.resetBar')");
     expect(spellbookWindowTs).toContain('const resetBtnHtml = view.hasFormBars');
     expect(hudTs).toContain('resetFormBar: () => this.resetActiveFormBarToDefault()');
     expect(componentsCss).toContain('.spellbook-reset {');
     expect(hudMobileCss).toContain('body.mobile-touch #spellbook .spellbook-reset {');
-    expect(hudTs).toContain('return classHasFormBars(this.sim.cfg.playerClass);');
+    expect(hudTs).toContain('return this.actionBarController.classHasFormBars();');
   });
 
   it('shows mobile spellbook add and remove controls for the spell bar', () => {

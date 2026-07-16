@@ -27,7 +27,7 @@ import {
 } from './content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from './content/heroic_vendor';
 import { FURY_STOCK, WARFARE_SOURCE_LEVEL } from './content/pvp_honor';
-import { DUNGEONS, ITEMS, MOBS, QUESTS } from './data';
+import { ALL_RECIPES, DUNGEONS, ITEMS, MOBS, QUESTS } from './data';
 // The pure budget primitives live in the leaf module ./item_budget (no ./data
 // import, so content/heroic_variants.ts can share them at data-eval time without a
 // cycle). Imported for internal use and re-exported so every existing importer of
@@ -187,6 +187,12 @@ function buildSourceIndex(): Map<string, ItemSource> {
       : HEROIC_VARIANT_SOURCE_LEVEL;
     bump(item.id, src, false);
   }
+  // Crafted gear (content/recipes.ts): a recipe's output is current at the recipe's
+  // own level (the level a character can learn/use it, mirroring how a mob's level
+  // stands in for its loot). Without this, any crafted item with primary stats has
+  // no derivable item level: the budget gates below skip it and the tooltip's item
+  // level/score lines never show. Not a raid source.
+  for (const recipe of ALL_RECIPES) bump(recipe.resultItemId, recipe.level, false);
   return idx;
 }
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { encodeItemLink, encodeQuestLink, parseChatSegments } from '../src/ui/quest_link';
+import { encodeItemLink, encodeQuestLink, parseChatSegments } from '../src/ui/hud/quest/quest_link';
 
 describe('quest_link', () => {
   it('encodes a questId into a token', () => {
