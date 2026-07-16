@@ -616,6 +616,7 @@ export const en_XA: EnTranslations = {
       "balanceLabel": "[Ɓáļáñçé]",
       "balanceUnit": "[{amount} Çļáúðíúɱ]",
       "solBalance": "[ŠÓĻ: {amount}]",
+      "usdcBalance": "[ÚŠÐÇ: {amount}]",
       "wocBalance": "[ŴÓÇ: {amount}]",
       "unavailable": "[Ţĥé Çļáúðíúɱ šţóŕé íš úñáʋáíļáƀļé ŕíĝĥţ ñóŵ. Ýóúŕ ƀáļáñçé áñð þúŕçĥášéš áŕé úñáƒƒéçţéð; þļéášé çĥéçķ ƀáçķ šĥóŕţļý.]",
       "disclosure": "[Çļáúðíúɱ íš á óñé-ŵáý šóƒţ çúŕŕéñçý: ƀúý íţ ŵíţĥ ɱóñéý áñð šþéñð íţ óñ çóšɱéţíçš. Íţ çáññóţ ƀé ŕéðééɱéð, ţŕáñšƒéŕŕéð, óŕ çášĥéð óúţ.]",
@@ -623,10 +624,11 @@ export const en_XA: EnTranslations = {
       "railLabel": "[Þáýɱéñţ ɱéţĥóð]",
       "railStripe": "[Çáŕð]",
       "railSol": "[ŠÓĻ]",
+      "railUsdc": "[ÚŠÐÇ]",
       "railWoc": "[ŴÓÇ]",
       "railWocDiscount": "[20% óƒƒ]",
       "railWocUnavailable": "[ŴÓÇ þŕíçíñĝ íš úñáʋáíļáƀļé ŕíĝĥţ ñóŵ.]",
-      "railNativeUnavailable": "[ŠÓĻ/ŴÓÇ óƒƒ.]",
+      "railNativeUnavailable": "[Çŕýþţó óƒƒ.]",
       "amountLabel": "[Áɱóúñţ]",
       "showAmounts": "[Šĥóŵ áļļ Çļáúðíúɱ áɱóúñţš]",
       "hideAmounts": "[Ĥíðé éẋţŕá Çļáúðíúɱ áɱóúñţš]",
@@ -994,6 +996,7 @@ export const en_XA: EnTranslations = {
       "interfaceModeTouch": "[Ţóúçĥ]",
       "interfaceModeNote": "[Áúţó þíçķš ðéšķţóþ óŕ ţóúçĥ çóñţŕóļš ƒŕóɱ ýóúŕ ðéʋíçé. Çĥóóšé Ðéšķţóþ ţó ƒóŕçé ķéýƀóáŕð áñð ɱóúšé (úšéƒúļ óñ á ţáƀļéţ ŵíţĥ á ķéýƀóáŕð), óŕ Ţóúçĥ ƒóŕ ţĥé óñ-šçŕééñ çóñţŕóļš.]",
       "footstepSounds": "[Ƒóóţšţéþ Šóúñðš]",
+      "interfaceSounds": "[Íñţéŕƒáçé áñð Ƒééðƀáçķ Šóúñðš]",
       "clickFeedback": "[Çļíçķ Ɱáŕķéŕ]",
       "lockCursorOnRotate": "[Ļóçķ Çúŕšóŕ Ŵĥíļé Ŕóţáţíñĝ]",
       "keybindHelpLockCursorOnRotate": "[Ķééþš ţĥé ɱóúšé çúŕšóŕ íñšíðé ţĥé ŵíñðóŵ ŵĥíļé ýóú ðŕáĝ ţó ŕóţáţé ţĥé çáɱéŕá, šó íţ çáññóţ ŕéáçĥ ţĥé šçŕééñ éðĝé óŕ ɱóʋé ţó áñóţĥéŕ ɱóñíţóŕ. Ţúŕñ óƒƒ íƒ ýóú þŕéƒéŕ á ƒŕéé çúŕšóŕ.]",
@@ -2302,6 +2305,9 @@ export const en_XA: EnTranslations = {
       "already_linked": "[Ýóúŕ áççóúñţ áļŕéáðý ĥáš á ļíñķéð Šţéáɱ áççóúñţ.]",
       "account_taken": "[Ţĥáţ Šţéáɱ áççóúñţ íš áļŕéáðý ļíñķéð ţó áñóţĥéŕ áççóúñţ.]",
       "upstream": "[Šţéáɱ ðíð ñóţ ŕéšþóñð. Ţŕý áĝáíñ íñ á ɱóɱéñţ.]"
+    },
+    "welcome": {
+      "invalid_input": "[Íñʋáļíð íñþúţ.]"
     }
   },
   "guide": {
@@ -4998,6 +5004,29 @@ export const en_XA: EnTranslations = {
     "body": "[Ŵé áŕé ŕéšţáŕţíñĝ ţĥé ĝáɱé šéŕʋíçé áñð éẋþéçţ Çļáúðéɱóóñ ţó ŕéţúŕñ šĥóŕţļý. Ţĥíš þáĝé ŵíļļ ķééþ çĥéçķíñĝ áúţóɱáţíçáļļý.]",
     "status": "[Ɓáçķ šóóñ]"
   },
+  "welcome": {
+    "back": "[Ŵéļçóɱé ƀáçķ, {name}]",
+    "level": "[Ļéʋéļ {level}]",
+    "lastPlayed": "[Ļášţ þļáýéð {when}]",
+    "continue": "[Éñţéŕ Ŵóŕļð]",
+    "continueHint": "[Éñţéŕ ţó çóñţíñúé, Éšç ţó šķíþ]",
+    "continueHintTouch": "[Ţáþ ţó çóñţíñúé]",
+    "discord": {
+      "title": "[Ţĥé çóɱɱúñíţý ļíʋéš óñ Ðíšçóŕð]",
+      "sub": "[Þáţçĥ þŕéʋíéŵš, éʋéñţš, ðéʋ çĥáţ, áñð 2 ƀóñúš ƀáñķ šļóţš ƒóŕ ļíñķíñĝ.]",
+      "join": "[Ĵóíñ óúŕ Ðíšçóŕð]"
+    },
+    "chest": {
+      "ready": "[Ðáíļý çĥéšţ ŕéáðý]"
+    },
+    "armory": {
+      "cta": "[Éñţéŕ áñð ƀŕóŵšé ţĥé Áŕɱóŕý]"
+    },
+    "news": {
+      "new": "[Ñéŵ]",
+      "viewAll": "[Ʋíéŵ áļļ úþðáţéš óñ ĜíţĤúƀ]"
+    }
+  },
   "hud": {
     "core": {
       "elite": "[ÉĻÍŢÉ]",
@@ -6843,6 +6872,24 @@ export const en_XA: EnTranslations = {
       },
       "eastbrook_wool_trousers": {
         "name": "[Éášţƀŕóóķ Ŵóóļ Ţŕóúšéŕš]"
+      },
+      "eastbrook_ritual_vestments": {
+        "name": "[Éášţƀŕóóķ Ŕíţúáļ Ʋéšţɱéñţš]"
+      },
+      "eastbrook_druids_hide": {
+        "name": "[Éášţƀŕóóķ Ðŕúíð'š Ĥíðé]"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "[Éášţƀŕóóķ Ŵáŕðéð Ļéĝĝíñĝš]"
+      },
+      "wardweave_cowl": {
+        "name": "[Ŵáŕðŵéáʋé Çóŵļ]"
+      },
+      "duskhide_wraps": {
+        "name": "[Ðúšķĥíðé Ŵŕáþš]"
+      },
+      "sootscale_mantle": {
+        "name": "[Šóóţšçáļé Ɱáñţļé]"
       },
       "gravecaller_blade": {
         "name": "[Ĝŕáʋéçáļļéŕ'š Ɓŕóáðƀļáðé]"

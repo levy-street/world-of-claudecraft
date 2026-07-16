@@ -771,6 +771,18 @@ export class Api {
     return this.get('/api/discord');
   }
 
+  // Server-side Welcome Screen flags (today: the Season 1 Armory promo gate).
+  async welcomeFlags(): Promise<{ armoryPromoEnabled: boolean }> {
+    return this.get('/api/welcome/flags');
+  }
+
+  // Daily rewards status (bearer-only, no world/character needed): the Welcome
+  // Screen's chest-tile readiness read reuses the same endpoint the in-world
+  // daily rewards window polls via ClientWorld.dailyRewards().
+  async dailyRewards(): Promise<DailyRewardStatus> {
+    return this.get('/api/daily-rewards');
+  }
+
   // Unlink Discord. A Discord-provisioned account (no real password yet) must send a
   // `password` so it stays reachable after unlinking; the server 400s with
   // 'password_required' otherwise. A normal account passes nothing.

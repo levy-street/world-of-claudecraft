@@ -21,150 +21,150 @@ export const cs_CZ: EnTranslations = {
     "rpPvp": "RP-PvP"
   },
   "devCommand": {
-    "dialogLabel": "Developer Command Center",
-    "kicker": "Development tools",
-    "title": "Command Center",
-    "subtitle": "Authoritative test controls for the active world.",
-    "closeAria": "Close developer commands",
-    "categoryNavAria": "Developer command categories",
+    "dialogLabel": "Centrum vývojářských příkazů",
+    "kicker": "Vývojářské nástroje",
+    "title": "Centrum příkazů",
+    "subtitle": "Autoritativní testovací ovládání aktivního světa.",
+    "closeAria": "Zavřít vývojářské příkazy",
+    "categoryNavAria": "Kategorie vývojářských příkazů",
     "categories": {
-      "player": "Player",
-      "spawns": "Spawns",
-      "inventory": "Inventory",
-      "progress": "Progress",
-      "travel": "Travel",
-      "scenarios": "Scenarios"
+      "player": "Hráč",
+      "spawns": "Spawny",
+      "inventory": "Inventář",
+      "progress": "Postup",
+      "travel": "Cestování",
+      "scenarios": "Scénáře"
     },
-    "filterLabel": "Filter commands",
-    "filterPlaceholder": "Search this category",
-    "noMatches": "No matching commands.",
-    "serverRequirement": "Server cheats still require ALLOW_DEV_COMMANDS=1.",
-    "invalidValues": "Choose valid values before running this command.",
-    "sent": "Sent: {command}",
-    "run": "Run",
+    "filterLabel": "Filtrovat příkazy",
+    "filterPlaceholder": "Prohledat tuto kategorii",
+    "noMatches": "Žádné odpovídající příkazy.",
+    "serverRequirement": "Serverové cheaty stále vyžadují ALLOW_DEV_COMMANDS=1.",
+    "invalidValues": "Před spuštěním tohoto příkazu vyber platné hodnoty.",
+    "sent": "Odesláno: {command}",
+    "run": "Spustit",
     "fields": {
-      "level": "Level",
+      "level": "Úroveň",
       "mob": "Mob",
-      "count": "Count",
-      "item": "Item",
-      "gold": "Gold",
-      "quest": "Quest",
-      "profession": "Profession",
-      "amount": "Amount",
+      "count": "Počet",
+      "item": "Předmět",
+      "gold": "Zlato",
+      "quest": "Úkol",
+      "profession": "Povolání",
+      "amount": "Množství",
       "x": "X",
       "z": "Z",
       "dungeon": "Dungeon",
-      "difficulty": "Difficulty",
-      "name": "Name"
+      "difficulty": "Obtížnost",
+      "name": "Jméno"
     },
     "difficulty": {
-      "normal": "Normal",
-      "heroic": "Heroic"
+      "normal": "Normální",
+      "heroic": "Hrdinská"
     },
     "actions": {
       "heal": {
-        "label": "Restore health",
-        "description": "Fill the health pool."
+        "label": "Obnovit zdraví",
+        "description": "Doplň celé zdraví."
       },
       "resource": {
-        "label": "Restore resource",
-        "description": "Fill mana, rage, or energy."
+        "label": "Obnovit zdroj",
+        "description": "Doplň manu, vztek nebo energii."
       },
       "cooldowns": {
-        "label": "Clear cooldowns",
-        "description": "Reset ability, GCD, and potion timers."
+        "label": "Vynulovat doby obnovy",
+        "description": "Resetuj časovače schopností, GCD a lektvarů."
       },
       "god": {
-        "label": "Toggle god mode",
-        "description": "Toggle invulnerability and boosted damage."
+        "label": "Přepnout božský režim",
+        "description": "Přepni nezranitelnost a zvýšené poškození."
       },
       "revive": {
-        "label": "Revive",
-        "description": "Revive through the normal resurrection path."
+        "label": "Oživit",
+        "description": "Oživ postavu běžným způsobem vzkříšení."
       },
       "kill": {
-        "label": "Kill player",
-        "description": "Test death, ghost, and corpse flows."
+        "label": "Zabít hráče",
+        "description": "Otestuj průběh smrti, ducha a mrtvoly."
       },
       "combatreset": {
-        "label": "Reset combat",
-        "description": "Clear combat state and hostile threat."
+        "label": "Resetovat boj",
+        "description": "Vymaž stav boje a nepřátelskou hrozbu."
       },
       "level": {
-        "label": "Set level",
-        "description": "Set the current character level."
+        "label": "Nastavit úroveň",
+        "description": "Nastav aktuální úroveň postavy."
       },
       "spawn": {
-        "label": "Spawn mob",
-        "description": "Create a concrete mob near the player."
+        "label": "Vyvolat moba",
+        "description": "Vytvoř konkrétního moba poblíž hráče."
       },
       "killtarget": {
-        "label": "Kill target",
-        "description": "Kill the selected living mob."
+        "label": "Zabít cíl",
+        "description": "Zabij vybraného živého moba."
       },
       "despawntarget": {
-        "label": "Despawn target",
-        "description": "Remove a selected mob created by this tool."
+        "label": "Odstranit cíl",
+        "description": "Odstraň vybraného moba vytvořeného tímto nástrojem."
       },
       "despawnall": {
-        "label": "Clear my spawns",
-        "description": "Remove every mob spawned by this developer."
+        "label": "Odstranit mé spawny",
+        "description": "Odstraň všechny moby vyvolané tímto vývojářem."
       },
       "give": {
-        "label": "Give item",
-        "description": "Add an item to the player inventory."
+        "label": "Dát předmět",
+        "description": "Přidej předmět do hráčova inventáře."
       },
       "gold": {
-        "label": "Add gold",
-        "description": "Add gold to the current purse."
+        "label": "Přidat zlato",
+        "description": "Přidej zlato do aktuálního měšce."
       },
       "quest": {
-        "label": "Complete quest",
-        "description": "Complete a specific quest by id."
+        "label": "Dokončit úkol",
+        "description": "Dokonči konkrétní úkol podle ID."
       },
       "quests": {
-        "label": "Complete active quests",
-        "description": "Complete every quest in the current log."
+        "label": "Dokončit aktivní úkoly",
+        "description": "Dokonči všechny úkoly v aktuálním deníku."
       },
       "attune": {
-        "label": "Unlock attunements",
-        "description": "Mark all attunement requirements complete."
+        "label": "Odemknout naladění",
+        "description": "Označ všechny požadavky na naladění jako splněné."
       },
       "gather": {
-        "label": "Grant gathering skill",
-        "description": "Increase a gathering profession."
+        "label": "Přidat sběračskou dovednost",
+        "description": "Zvyš úroveň sběračského povolání."
       },
       "teleport": {
-        "label": "Teleport",
-        "description": "Move to exact world coordinates."
+        "label": "Teleportovat",
+        "description": "Přesuň se na přesné souřadnice světa."
       },
       "dungeon": {
-        "label": "Enter dungeon",
-        "description": "Enter a dungeon with dev gate bypass."
+        "label": "Vstoupit do dungeonu",
+        "description": "Vstup do dungeonu s obejitím vývojářského omezení."
       },
       "raid": {
-        "label": "Enter raid",
-        "description": "Enter the Nythraxis arena directly."
+        "label": "Vstoupit do raidu",
+        "description": "Vstup přímo do arény Nythraxis."
       },
       "raidreset": {
-        "label": "Reset raid lockout",
-        "description": "Clear the current raid lockouts."
+        "label": "Resetovat uzamčení raidu",
+        "description": "Vymaž aktuální uzamčení raidů."
       },
       "bot": {
-        "label": "Spawn social bot",
-        "description": "Create a whisperable stationary player."
+        "label": "Vyvolat sociálního bota",
+        "description": "Vytvoř nehybného hráče, kterému lze šeptat."
       },
       "lfgqueue": {
-        "label": "Seed finder queue",
-        "description": "Create a Dungeon Finder queue scenario."
+        "label": "Naplnit frontu hledače",
+        "description": "Vytvoř scénář fronty Hledače dungeonů."
       },
       "lfgraid": {
-        "label": "Seed raid finder",
-        "description": "Create a raid finder scenario."
+        "label": "Naplnit hledač raidů",
+        "description": "Vytvoř scénář hledače raidů."
       },
       "lfgboard": {
-        "label": "Seed listing board",
-        "description": "Create a premade listing scenario."
+        "label": "Naplnit tabuli nabídek",
+        "description": "Vytvoř scénář s předem sestavenou nabídkou skupiny."
       }
     }
   },
@@ -351,7 +351,7 @@ export const cs_CZ: EnTranslations = {
       "remainingLessThanMinute": "<1 min",
       "remainingMinutes": "{minutes} min",
       "remainingHoursMinutes": "{hours} h {minutes} min",
-      "remainingDaysHours": "{days}d {hours}h",
+      "remainingDaysHours": "{days} d {hours} h",
       "score": "Skóre",
       "walletValue": "Hodnota peněženky (WOC)",
       "usd": "{amount} USD",
@@ -391,7 +391,7 @@ export const cs_CZ: EnTranslations = {
         "under_minimum": "Peněženka je pod minimem 20 USD ve WOC.",
         "price_unavailable": "Cena WOC není dostupná, odměny jsou dočasně uzamčené.",
         "banned": "Máš zákaz účasti v denních odměnách. Důvod: {reason}",
-        "bannedUntil": "You are banned from Daily Rewards for another {remaining}. Access returns {until}. Reason: {reason}"
+        "bannedUntil": "Ještě {remaining} máš zákaz přístupu k denním odměnám. Přístup se vrátí {until}. Důvod: {reason}"
       }
     },
     "wocStore": {
@@ -616,6 +616,7 @@ export const cs_CZ: EnTranslations = {
       "balanceLabel": "Zůstatek",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL: {amount}",
+      "usdcBalance": "USDC: {amount}",
       "wocBalance": "WOC: {amount}",
       "unavailable": "Obchod Claudium nyní není dostupný. Tvůj zůstatek ani nákupy to neovlivní, zkus to za chvíli znovu.",
       "disclosure": "Claudium je jednosměrná herní měna: kupuje se za peníze a utrácí za kosmetické předměty. Nelze ji směnit zpět, převést ani vyplatit v hotovosti.",
@@ -623,6 +624,7 @@ export const cs_CZ: EnTranslations = {
       "railLabel": "Způsob platby",
       "railStripe": "Karta",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "Sleva 20 %",
       "railWocUnavailable": "Cena ve WOC nyní není dostupná.",
@@ -994,6 +996,7 @@ export const cs_CZ: EnTranslations = {
       "interfaceModeTouch": "Dotyk",
       "interfaceModeNote": "Automatika vybere desktopové nebo dotykové ovládání podle zařízení. Zvol Desktop pro vynucení klávesnice a myši (užitečné na tabletu s klávesnicí), nebo Dotyk pro ovládání na obrazovce.",
       "footstepSounds": "Zvuky kroků",
+      "interfaceSounds": "Zvuky rozhraní a odezvy",
       "clickFeedback": "Značka kliknutí",
       "lockCursorOnRotate": "Zamknout kurzor při otáčení",
       "keybindHelpLockCursorOnRotate": "Drží kurzor myši uvnitř okna při tažení pro otáčení kamery, takže nemůže dojet k okraji obrazovky ani na jiný monitor. Vypni, pokud chceš volný kurzor.",
@@ -1617,31 +1620,31 @@ export const cs_CZ: EnTranslations = {
       "lock": "Zamknout rám hráče"
     },
     "partyFrames": {
-      "section": "Party and Raid Frames",
-      "unlock": "Move party and raid frames",
-      "lock": "Lock party and raid frames",
-      "style": "Frame Style",
-      "styleAutomatic": "Automatic",
-      "styleClassic": "Classic Party Frames",
-      "styleRaid": "Raid Frames",
-      "scale": "Frame Scale",
-      "width": "Frame Width",
-      "height": "Frame Height",
-      "spacing": "Frame Spacing",
-      "columns": "Raid Columns",
-      "healthText": "Health Text",
-      "healthNone": "None",
-      "healthPercent": "Percent",
-      "healthCurrent": "Current",
-      "healthCurrentMax": "Current / Max",
-      "sort": "Sort Players",
-      "sortGroup": "Group",
+      "section": "Rámečky skupiny a raidu",
+      "unlock": "Přesunout rámečky skupiny a raidu",
+      "lock": "Zamknout rámečky skupiny a raidu",
+      "style": "Styl rámečku",
+      "styleAutomatic": "Automatický",
+      "styleClassic": "Klasické rámečky skupiny",
+      "styleRaid": "Rámečky raidu",
+      "scale": "Měřítko rámečku",
+      "width": "Šířka rámečku",
+      "height": "Výška rámečku",
+      "spacing": "Rozestupy rámečků",
+      "columns": "Sloupce raidu",
+      "healthText": "Text zdraví",
+      "healthNone": "Žádný",
+      "healthPercent": "Procenta",
+      "healthCurrent": "Aktuální",
+      "healthCurrentMax": "Aktuální / Maximum",
+      "sort": "Seřadit hráče",
+      "sortGroup": "Skupina",
       "sortRole": "Role",
-      "sortName": "Name",
-      "showResource": "Show Mana, Rage, and Energy",
-      "showAbsorbs": "Show Absorb Shields",
-      "showAuras": "Show Buffs and Debuffs",
-      "showSelf": "Show Your Frame"
+      "sortName": "Jméno",
+      "showResource": "Zobrazit manu, vztek a energii",
+      "showAbsorbs": "Zobrazit absorpční štíty",
+      "showAuras": "Zobrazit posílení a oslabení",
+      "showSelf": "Zobrazit vlastní rámeček"
     },
     "frameReset": {
       "label": "Resetovat pozice rámů"
@@ -2302,6 +2305,9 @@ export const cs_CZ: EnTranslations = {
       "already_linked": "Tvůj účet už má propojený účet Steam.",
       "account_taken": "Tento účet Steam už je propojený s jiným účtem.",
       "upstream": "Steam neodpověděl. Zkus to za chvíli znovu."
+    },
+    "welcome": {
+      "invalid_input": "Neplatný vstup."
     }
   },
   "guide": {
@@ -4998,6 +5004,29 @@ export const cs_CZ: EnTranslations = {
     "body": "Restartujeme herní službu a očekáváme, že se Claudemoon brzy vrátí. Tato stránka bude stav automaticky kontrolovat.",
     "status": "Brzy zpět"
   },
+  "welcome": {
+    "back": "Vítej zpět, {name}",
+    "level": "Úroveň {level}",
+    "lastPlayed": "Naposledy ve hře: {when}",
+    "continue": "Vstoupit do světa",
+    "continueHint": "Enter pro pokračování, Esc pro přeskočení",
+    "continueHintTouch": "Klepnutím pokračuj",
+    "discord": {
+      "title": "Komunita žije na Discordu",
+      "sub": "Ukázky aktualizací, události, chat s vývojáři a 2 bonusové sloty v bance za propojení účtu s Discordem.",
+      "join": "Připojit se na náš Discord"
+    },
+    "chest": {
+      "ready": "Denní truhla je připravená"
+    },
+    "armory": {
+      "cta": "Vstoupit a prohlédnout si Zbrojnici"
+    },
+    "news": {
+      "new": "Nové",
+      "viewAll": "Zobrazit všechny aktualizace na GitHubu"
+    }
+  },
   "hud": {
     "core": {
       "elite": "ELITA",
@@ -6843,6 +6872,24 @@ export const cs_CZ: EnTranslations = {
       },
       "eastbrook_wool_trousers": {
         "name": "Eastbrookské vlněné kalhoty"
+      },
+      "eastbrook_ritual_vestments": {
+        "name": "Eastbrookská rituální roucha"
+      },
+      "eastbrook_druids_hide": {
+        "name": "Kůže eastbrookského druida"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "Eastbrookské chráněné nohavice"
+      },
+      "wardweave_cowl": {
+        "name": "Kápě z ochranné tkaniny"
+      },
+      "duskhide_wraps": {
+        "name": "Omotávky ze soumračné kůže"
+      },
+      "sootscale_mantle": {
+        "name": "Plášť ze sazových šupin"
       },
       "gravecaller_blade": {
         "name": "Široká čepel Hrobovolajícího"

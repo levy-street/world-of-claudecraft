@@ -21,150 +21,150 @@ export const ru_RU: EnTranslations = {
     "rpPvp": "Ролевой-PvP"
   },
   "devCommand": {
-    "dialogLabel": "Developer Command Center",
-    "kicker": "Development tools",
-    "title": "Command Center",
-    "subtitle": "Authoritative test controls for the active world.",
-    "closeAria": "Close developer commands",
-    "categoryNavAria": "Developer command categories",
+    "dialogLabel": "Центр команд разработчика",
+    "kicker": "Инструменты разработчика",
+    "title": "Центр команд",
+    "subtitle": "Серверные средства управления для тестирования активного мира.",
+    "closeAria": "Закрыть команды разработчика",
+    "categoryNavAria": "Категории команд разработчика",
     "categories": {
-      "player": "Player",
-      "spawns": "Spawns",
-      "inventory": "Inventory",
-      "progress": "Progress",
-      "travel": "Travel",
-      "scenarios": "Scenarios"
+      "player": "Игрок",
+      "spawns": "Созданные существа",
+      "inventory": "Инвентарь",
+      "progress": "Прогресс",
+      "travel": "Перемещение",
+      "scenarios": "Сценарии"
     },
-    "filterLabel": "Filter commands",
-    "filterPlaceholder": "Search this category",
-    "noMatches": "No matching commands.",
-    "serverRequirement": "Server cheats still require ALLOW_DEV_COMMANDS=1.",
-    "invalidValues": "Choose valid values before running this command.",
-    "sent": "Sent: {command}",
-    "run": "Run",
+    "filterLabel": "Фильтр команд",
+    "filterPlaceholder": "Поиск в этой категории",
+    "noMatches": "Нет подходящих команд.",
+    "serverRequirement": "Для серверных читов всё ещё требуется ALLOW_DEV_COMMANDS=1.",
+    "invalidValues": "Выберите допустимые значения перед запуском этой команды.",
+    "sent": "Отправлено: {command}",
+    "run": "Выполнить",
     "fields": {
-      "level": "Level",
-      "mob": "Mob",
-      "count": "Count",
-      "item": "Item",
-      "gold": "Gold",
-      "quest": "Quest",
-      "profession": "Profession",
-      "amount": "Amount",
+      "level": "Уровень",
+      "mob": "Существо",
+      "count": "Число",
+      "item": "Предмет",
+      "gold": "Золото",
+      "quest": "Задание",
+      "profession": "Профессия",
+      "amount": "Количество",
       "x": "X",
       "z": "Z",
-      "dungeon": "Dungeon",
-      "difficulty": "Difficulty",
-      "name": "Name"
+      "dungeon": "Подземелье",
+      "difficulty": "Сложность",
+      "name": "Имя"
     },
     "difficulty": {
-      "normal": "Normal",
-      "heroic": "Heroic"
+      "normal": "Обычная",
+      "heroic": "Героическая"
     },
     "actions": {
       "heal": {
-        "label": "Restore health",
-        "description": "Fill the health pool."
+        "label": "Восполнить здоровье",
+        "description": "Полностью восполнить здоровье."
       },
       "resource": {
-        "label": "Restore resource",
-        "description": "Fill mana, rage, or energy."
+        "label": "Восполнить ресурс",
+        "description": "Полностью восполнить ману, ярость или энергию."
       },
       "cooldowns": {
-        "label": "Clear cooldowns",
-        "description": "Reset ability, GCD, and potion timers."
+        "label": "Сбросить время восстановления",
+        "description": "Сбросить таймеры способностей, ГКД и зелий."
       },
       "god": {
-        "label": "Toggle god mode",
-        "description": "Toggle invulnerability and boosted damage."
+        "label": "Переключить режим бога",
+        "description": "Переключить неуязвимость и повышенный урон."
       },
       "revive": {
-        "label": "Revive",
-        "description": "Revive through the normal resurrection path."
+        "label": "Воскреснуть",
+        "description": "Воскреснуть обычным способом."
       },
       "kill": {
-        "label": "Kill player",
-        "description": "Test death, ghost, and corpse flows."
+        "label": "Убить игрока",
+        "description": "Проверить переходы между состояниями смерти, призрака и трупа."
       },
       "combatreset": {
-        "label": "Reset combat",
-        "description": "Clear combat state and hostile threat."
+        "label": "Сбросить бой",
+        "description": "Очистить состояние боя и угрозу со стороны противников."
       },
       "level": {
-        "label": "Set level",
-        "description": "Set the current character level."
+        "label": "Установить уровень",
+        "description": "Установить текущий уровень персонажа."
       },
       "spawn": {
-        "label": "Spawn mob",
-        "description": "Create a concrete mob near the player."
+        "label": "Создать существо",
+        "description": "Создать определённое существо рядом с игроком."
       },
       "killtarget": {
-        "label": "Kill target",
-        "description": "Kill the selected living mob."
+        "label": "Убить цель",
+        "description": "Убить выбранное живое существо."
       },
       "despawntarget": {
-        "label": "Despawn target",
-        "description": "Remove a selected mob created by this tool."
+        "label": "Удалить цель",
+        "description": "Удалить выбранное существо, созданное этим инструментом."
       },
       "despawnall": {
-        "label": "Clear my spawns",
-        "description": "Remove every mob spawned by this developer."
+        "label": "Удалить моих существ",
+        "description": "Удалить всех существ, созданных этим разработчиком."
       },
       "give": {
-        "label": "Give item",
-        "description": "Add an item to the player inventory."
+        "label": "Дать предмет",
+        "description": "Добавить предмет в инвентарь игрока."
       },
       "gold": {
-        "label": "Add gold",
-        "description": "Add gold to the current purse."
+        "label": "Добавить золото",
+        "description": "Добавить золото в текущий кошелёк."
       },
       "quest": {
-        "label": "Complete quest",
-        "description": "Complete a specific quest by id."
+        "label": "Выполнить задание",
+        "description": "Выполнить определённое задание по идентификатору."
       },
       "quests": {
-        "label": "Complete active quests",
-        "description": "Complete every quest in the current log."
+        "label": "Выполнить активные задания",
+        "description": "Выполнить все задания в текущем журнале."
       },
       "attune": {
-        "label": "Unlock attunements",
-        "description": "Mark all attunement requirements complete."
+        "label": "Открыть все допуски",
+        "description": "Отметить все требования допуска выполненными."
       },
       "gather": {
-        "label": "Grant gathering skill",
-        "description": "Increase a gathering profession."
+        "label": "Дать навык сбора",
+        "description": "Повысить навык собирательной профессии."
       },
       "teleport": {
-        "label": "Teleport",
-        "description": "Move to exact world coordinates."
+        "label": "Телепортироваться",
+        "description": "Переместиться в точные координаты мира."
       },
       "dungeon": {
-        "label": "Enter dungeon",
-        "description": "Enter a dungeon with dev gate bypass."
+        "label": "Войти в подземелье",
+        "description": "Войти в подземелье в обход ограничений разработчика."
       },
       "raid": {
-        "label": "Enter raid",
-        "description": "Enter the Nythraxis arena directly."
+        "label": "Войти в рейд",
+        "description": "Войти прямо на арену Нитраксиса."
       },
       "raidreset": {
-        "label": "Reset raid lockout",
-        "description": "Clear the current raid lockouts."
+        "label": "Сбросить блокировку рейда",
+        "description": "Сбросить текущие рейдовые блокировки."
       },
       "bot": {
-        "label": "Spawn social bot",
-        "description": "Create a whisperable stationary player."
+        "label": "Создать социального бота",
+        "description": "Создать неподвижного игрока, которому можно шепнуть."
       },
       "lfgqueue": {
-        "label": "Seed finder queue",
-        "description": "Create a Dungeon Finder queue scenario."
+        "label": "Заполнить очередь поиска",
+        "description": "Создать сценарий очереди поиска подземелий."
       },
       "lfgraid": {
-        "label": "Seed raid finder",
-        "description": "Create a raid finder scenario."
+        "label": "Заполнить поиск рейда",
+        "description": "Создать сценарий поиска рейда."
       },
       "lfgboard": {
-        "label": "Seed listing board",
-        "description": "Create a premade listing scenario."
+        "label": "Заполнить доску объявлений",
+        "description": "Создать сценарий объявления готовой группы."
       }
     }
   },
@@ -616,6 +616,7 @@ export const ru_RU: EnTranslations = {
       "balanceLabel": "Баланс",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL: {amount}",
+      "usdcBalance": "USDC: {amount}",
       "wocBalance": "WOC: {amount}",
       "unavailable": "Магазин Claudium сейчас недоступен. Ваш баланс и покупки не затронуты; повторите попытку позже.",
       "disclosure": "Claudium — односторонняя игровая валюта: её можно купить за деньги и потратить на косметические предметы. Её нельзя вернуть, передать или обналичить.",
@@ -623,6 +624,7 @@ export const ru_RU: EnTranslations = {
       "railLabel": "Способ оплаты",
       "railStripe": "Карта",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "Скидка 20%",
       "railWocUnavailable": "Цена WOC сейчас недоступна.",
@@ -994,6 +996,7 @@ export const ru_RU: EnTranslations = {
       "interfaceModeTouch": "Сенсорный",
       "interfaceModeNote": "В режиме «Авто» управление для компьютера или сенсорное выбирается по вашему устройству. Выберите «Компьютер», чтобы включить клавиатуру и мышь (удобно на планшете с клавиатурой), или «Сенсорный» для экранного управления.",
       "footstepSounds": "Звуки шагов",
+      "interfaceSounds": "Звуки интерфейса и откликов",
       "clickFeedback": "Метка клика",
       "lockCursorOnRotate": "Блокировать курсор при вращении",
       "keybindHelpLockCursorOnRotate": "Удерживает курсор мыши внутри окна, пока вы вращаете камеру перетаскиванием, чтобы он не достигал края экрана и не переходил на другой монитор. Отключите, если предпочитаете свободный курсор.",
@@ -1630,14 +1633,14 @@ export const ru_RU: EnTranslations = {
       "spacing": "Интервал между рамками",
       "columns": "Столбцы рейда",
       "healthText": "Текст здоровья",
-      "healthNone": "None",
+      "healthNone": "Нет",
       "healthPercent": "Проценты",
       "healthCurrent": "Текущее",
       "healthCurrentMax": "Текущее / Максимум",
       "sort": "Сортировка игроков",
       "sortGroup": "Группа",
-      "sortRole": "Role",
-      "sortName": "Name",
+      "sortRole": "Роль",
+      "sortName": "Имя",
       "showResource": "Показывать ману, ярость и энергию",
       "showAbsorbs": "Показывать щиты поглощения",
       "showAuras": "Показывать усиления и ослабления",
@@ -2302,6 +2305,9 @@ export const ru_RU: EnTranslations = {
       "already_linked": "К вашему аккаунту уже привязан аккаунт Steam.",
       "account_taken": "Этот аккаунт Steam уже привязан к другому аккаунту.",
       "upstream": "Steam не отвечает. Повторите попытку чуть позже."
+    },
+    "welcome": {
+      "invalid_input": "Неверные входные данные."
     }
   },
   "guide": {
@@ -4998,6 +5004,29 @@ export const ru_RU: EnTranslations = {
     "body": "Мы перезапускаем игровой сервис и ожидаем, что Claudemoon скоро вернется. Эта страница продолжит проверку автоматически.",
     "status": "Скоро вернется"
   },
+  "welcome": {
+    "back": "С возвращением, {name}",
+    "level": "Уровень {level}",
+    "lastPlayed": "Последняя игра: {when}",
+    "continue": "Войти в мир",
+    "continueHint": "Enter, чтобы продолжить, Esc, чтобы пропустить",
+    "continueHintTouch": "Нажмите, чтобы продолжить",
+    "discord": {
+      "title": "Сообщество живёт в Discord",
+      "sub": "Превью патчей, события, чат разработчиков и 2 бонусных банковских слота за привязку.",
+      "join": "Присоединиться к Discord"
+    },
+    "chest": {
+      "ready": "Ежедневный сундук готов"
+    },
+    "armory": {
+      "cta": "Открыть и просмотреть Арсенал"
+    },
+    "news": {
+      "new": "Новое",
+      "viewAll": "Смотреть все обновления на GitHub"
+    }
+  },
   "hud": {
     "core": {
       "elite": "ЭЛИТА",
@@ -6843,6 +6872,24 @@ export const ru_RU: EnTranslations = {
       },
       "eastbrook_wool_trousers": {
         "name": "Истврукские шерстяные штаны"
+      },
+      "eastbrook_ritual_vestments": {
+        "name": "Ритуальные одеяния Иствбрука"
+      },
+      "eastbrook_druids_hide": {
+        "name": "Друидская шкура Иствбрука"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "Заговорённые поножи Иствбрука"
+      },
+      "wardweave_cowl": {
+        "name": "Капюшон Стражеткани"
+      },
+      "duskhide_wraps": {
+        "name": "Обмотки Сумеречной шкуры"
+      },
+      "sootscale_mantle": {
+        "name": "Мантия Пепельной чешуи"
       },
       "gravecaller_blade": {
         "name": "Широкий клинок Могильного Зова"

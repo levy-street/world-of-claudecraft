@@ -616,6 +616,7 @@ export const en: EnTranslations = {
       "balanceLabel": "Balance",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL: {amount}",
+      "usdcBalance": "USDC: {amount}",
       "wocBalance": "WOC: {amount}",
       "unavailable": "The Claudium store is unavailable right now. Your balance and purchases are unaffected; please check back shortly.",
       "disclosure": "Claudium is a one-way soft currency: buy it with money and spend it on cosmetics. It cannot be redeemed, transferred, or cashed out.",
@@ -623,10 +624,11 @@ export const en: EnTranslations = {
       "railLabel": "Payment method",
       "railStripe": "Card",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "20% off",
       "railWocUnavailable": "WOC pricing is unavailable right now.",
-      "railNativeUnavailable": "SOL/WOC off.",
+      "railNativeUnavailable": "Crypto off.",
       "amountLabel": "Amount",
       "showAmounts": "Show all Claudium amounts",
       "hideAmounts": "Hide extra Claudium amounts",
@@ -994,6 +996,7 @@ export const en: EnTranslations = {
       "interfaceModeTouch": "Touch",
       "interfaceModeNote": "Auto picks desktop or touch controls from your device. Choose Desktop to force keyboard and mouse (useful on a tablet with a keyboard), or Touch for the on-screen controls.",
       "footstepSounds": "Footstep Sounds",
+      "interfaceSounds": "Interface and Feedback Sounds",
       "clickFeedback": "Click Marker",
       "lockCursorOnRotate": "Lock Cursor While Rotating",
       "keybindHelpLockCursorOnRotate": "Keeps the mouse cursor inside the window while you drag to rotate the camera, so it cannot reach the screen edge or move to another monitor. Turn off if you prefer a free cursor.",
@@ -2302,6 +2305,9 @@ export const en: EnTranslations = {
       "already_linked": "Your account already has a linked Steam account.",
       "account_taken": "That Steam account is already linked to another account.",
       "upstream": "Steam did not respond. Try again in a moment."
+    },
+    "welcome": {
+      "invalid_input": "Invalid input."
     }
   },
   "guide": {
@@ -4998,6 +5004,29 @@ export const en: EnTranslations = {
     "body": "We are restarting the game service and expect Claudemoon to return shortly. This page will keep checking automatically.",
     "status": "Back soon"
   },
+  "welcome": {
+    "back": "Welcome back, {name}",
+    "level": "Level {level}",
+    "lastPlayed": "Last played {when}",
+    "continue": "Enter World",
+    "continueHint": "Enter to continue, Esc to skip",
+    "continueHintTouch": "Tap to continue",
+    "discord": {
+      "title": "The community lives on Discord",
+      "sub": "Patch previews, events, dev chat, and 2 bonus bank slots for linking.",
+      "join": "Join our Discord"
+    },
+    "chest": {
+      "ready": "Daily chest ready"
+    },
+    "armory": {
+      "cta": "Enter and browse the Armory"
+    },
+    "news": {
+      "new": "New",
+      "viewAll": "View all updates on GitHub"
+    }
+  },
   "hud": {
     "core": {
       "elite": "ELITE",
@@ -6843,6 +6872,24 @@ export const en: EnTranslations = {
       },
       "eastbrook_wool_trousers": {
         "name": "Eastbrook Wool Trousers"
+      },
+      "eastbrook_ritual_vestments": {
+        "name": "Eastbrook Ritual Vestments"
+      },
+      "eastbrook_druids_hide": {
+        "name": "Eastbrook Druid's Hide"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "Eastbrook Warded Leggings"
+      },
+      "wardweave_cowl": {
+        "name": "Wardweave Cowl"
+      },
+      "duskhide_wraps": {
+        "name": "Duskhide Wraps"
+      },
+      "sootscale_mantle": {
+        "name": "Sootscale Mantle"
       },
       "gravecaller_blade": {
         "name": "Gravecaller's Broadblade"

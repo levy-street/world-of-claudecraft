@@ -6,7 +6,7 @@ import {
   parseChatBox,
   placeChatBox,
   serializeChatBox,
-} from '../src/ui/chat_window';
+} from '../src/ui/hud/chat/chat_window';
 
 const VP = { w: 1280, h: 720 };
 const CHROME = 22; // tab strip height

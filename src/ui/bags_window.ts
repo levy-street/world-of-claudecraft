@@ -51,7 +51,7 @@ import { itemDisplayName } from './entity_i18n';
 import { dropRequiredLevel, isPaperdollDraggable, paperdollDropAction } from './equip_drop_core';
 import { esc } from './esc';
 import { FOCUSABLE_SELECTOR } from './focus_manager';
-import { encodeHotbarAction, HOTBAR_ACTION_MIME } from './hotbar';
+import { encodeHotbarAction, HOTBAR_ACTION_MIME } from './hud/action_bar/hotbar';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { iconDataUrl, QUALITY_COLOR } from './icons';
 import type { BagItemDrag, ItemDragState } from './item_drag_state';

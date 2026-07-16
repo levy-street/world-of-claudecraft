@@ -21,150 +21,150 @@ export const ko_KR: EnTranslations = {
     "rpPvp": "롤플레잉 PvP"
   },
   "devCommand": {
-    "dialogLabel": "Developer Command Center",
-    "kicker": "Development tools",
-    "title": "Command Center",
-    "subtitle": "Authoritative test controls for the active world.",
-    "closeAria": "Close developer commands",
-    "categoryNavAria": "Developer command categories",
+    "dialogLabel": "개발자 명령 센터",
+    "kicker": "개발 도구",
+    "title": "명령 센터",
+    "subtitle": "현재 세계를 서버 권한으로 시험하는 제어 기능입니다.",
+    "closeAria": "개발자 명령어 닫기",
+    "categoryNavAria": "개발자 명령어 범주",
     "categories": {
-      "player": "Player",
-      "spawns": "Spawns",
-      "inventory": "Inventory",
-      "progress": "Progress",
-      "travel": "Travel",
-      "scenarios": "Scenarios"
+      "player": "플레이어",
+      "spawns": "생성물",
+      "inventory": "소지품",
+      "progress": "진행",
+      "travel": "이동",
+      "scenarios": "시나리오"
     },
-    "filterLabel": "Filter commands",
-    "filterPlaceholder": "Search this category",
-    "noMatches": "No matching commands.",
-    "serverRequirement": "Server cheats still require ALLOW_DEV_COMMANDS=1.",
-    "invalidValues": "Choose valid values before running this command.",
-    "sent": "Sent: {command}",
-    "run": "Run",
+    "filterLabel": "명령어 필터",
+    "filterPlaceholder": "이 범주 검색",
+    "noMatches": "일치하는 명령어가 없습니다.",
+    "serverRequirement": "서버 치트 기능에는 여전히 ALLOW_DEV_COMMANDS=1이 필요합니다.",
+    "invalidValues": "명령을 실행하기 전에 올바른 값을 선택하세요.",
+    "sent": "전송됨: {command}",
+    "run": "실행",
     "fields": {
-      "level": "Level",
-      "mob": "Mob",
-      "count": "Count",
-      "item": "Item",
-      "gold": "Gold",
-      "quest": "Quest",
-      "profession": "Profession",
-      "amount": "Amount",
+      "level": "레벨",
+      "mob": "몹",
+      "count": "개수",
+      "item": "아이템",
+      "gold": "골드",
+      "quest": "퀘스트",
+      "profession": "전문 기술",
+      "amount": "수량",
       "x": "X",
       "z": "Z",
-      "dungeon": "Dungeon",
-      "difficulty": "Difficulty",
-      "name": "Name"
+      "dungeon": "던전",
+      "difficulty": "난이도",
+      "name": "이름"
     },
     "difficulty": {
-      "normal": "Normal",
-      "heroic": "Heroic"
+      "normal": "일반",
+      "heroic": "영웅"
     },
     "actions": {
       "heal": {
-        "label": "Restore health",
-        "description": "Fill the health pool."
+        "label": "생명력 회복",
+        "description": "생명력을 가득 채웁니다."
       },
       "resource": {
-        "label": "Restore resource",
-        "description": "Fill mana, rage, or energy."
+        "label": "자원 회복",
+        "description": "마나, 분노 또는 기력을 가득 채웁니다."
       },
       "cooldowns": {
-        "label": "Clear cooldowns",
-        "description": "Reset ability, GCD, and potion timers."
+        "label": "재사용 대기시간 초기화",
+        "description": "기술, 전역 재사용 대기시간, 물약 타이머를 초기화합니다."
       },
       "god": {
-        "label": "Toggle god mode",
-        "description": "Toggle invulnerability and boosted damage."
+        "label": "무적 모드 전환",
+        "description": "무적 상태와 강화된 피해를 전환합니다."
       },
       "revive": {
-        "label": "Revive",
-        "description": "Revive through the normal resurrection path."
+        "label": "부활",
+        "description": "정상적인 부활 경로로 되살아납니다."
       },
       "kill": {
-        "label": "Kill player",
-        "description": "Test death, ghost, and corpse flows."
+        "label": "플레이어 처치",
+        "description": "사망, 유령, 시체 흐름을 시험합니다."
       },
       "combatreset": {
-        "label": "Reset combat",
-        "description": "Clear combat state and hostile threat."
+        "label": "전투 초기화",
+        "description": "전투 상태와 적의 위협 수준을 초기화합니다."
       },
       "level": {
-        "label": "Set level",
-        "description": "Set the current character level."
+        "label": "레벨 설정",
+        "description": "현재 캐릭터 레벨을 설정합니다."
       },
       "spawn": {
-        "label": "Spawn mob",
-        "description": "Create a concrete mob near the player."
+        "label": "몹 생성",
+        "description": "플레이어 근처에 지정된 몹을 생성합니다."
       },
       "killtarget": {
-        "label": "Kill target",
-        "description": "Kill the selected living mob."
+        "label": "대상 처치",
+        "description": "선택한 살아 있는 몹을 처치합니다."
       },
       "despawntarget": {
-        "label": "Despawn target",
-        "description": "Remove a selected mob created by this tool."
+        "label": "대상 제거",
+        "description": "이 도구로 만든 선택된 몹을 제거합니다."
       },
       "despawnall": {
-        "label": "Clear my spawns",
-        "description": "Remove every mob spawned by this developer."
+        "label": "내 생성물 제거",
+        "description": "이 개발자가 생성한 모든 몹을 제거합니다."
       },
       "give": {
-        "label": "Give item",
-        "description": "Add an item to the player inventory."
+        "label": "아이템 지급",
+        "description": "플레이어 소지품에 아이템을 추가합니다."
       },
       "gold": {
-        "label": "Add gold",
-        "description": "Add gold to the current purse."
+        "label": "골드 추가",
+        "description": "현재 소지금에 골드를 추가합니다."
       },
       "quest": {
-        "label": "Complete quest",
-        "description": "Complete a specific quest by id."
+        "label": "퀘스트 완료",
+        "description": "ID로 특정 퀘스트를 완료합니다."
       },
       "quests": {
-        "label": "Complete active quests",
-        "description": "Complete every quest in the current log."
+        "label": "진행 중인 퀘스트 완료",
+        "description": "현재 퀘스트 목록의 모든 퀘스트를 완료합니다."
       },
       "attune": {
-        "label": "Unlock attunements",
-        "description": "Mark all attunement requirements complete."
+        "label": "선행 조건 해제",
+        "description": "모든 선행 조건을 완료 처리합니다."
       },
       "gather": {
-        "label": "Grant gathering skill",
-        "description": "Increase a gathering profession."
+        "label": "채집 기술 부여",
+        "description": "채집 전문 기술을 올립니다."
       },
       "teleport": {
-        "label": "Teleport",
-        "description": "Move to exact world coordinates."
+        "label": "순간이동",
+        "description": "정확한 세계 좌표로 이동합니다."
       },
       "dungeon": {
-        "label": "Enter dungeon",
-        "description": "Enter a dungeon with dev gate bypass."
+        "label": "던전 입장",
+        "description": "개발자 제한을 우회해 던전에 입장합니다."
       },
       "raid": {
-        "label": "Enter raid",
-        "description": "Enter the Nythraxis arena directly."
+        "label": "공격대 입장",
+        "description": "니트락시스 투기장에 바로 입장합니다."
       },
       "raidreset": {
-        "label": "Reset raid lockout",
-        "description": "Clear the current raid lockouts."
+        "label": "공격대 잠금 초기화",
+        "description": "현재 공격대 잠금을 초기화합니다."
       },
       "bot": {
-        "label": "Spawn social bot",
-        "description": "Create a whisperable stationary player."
+        "label": "소셜 봇 생성",
+        "description": "귓속말을 받을 수 있는 정지 플레이어를 생성합니다."
       },
       "lfgqueue": {
-        "label": "Seed finder queue",
-        "description": "Create a Dungeon Finder queue scenario."
+        "label": "찾기 대기열 채우기",
+        "description": "던전 찾기 대기열 시나리오를 만듭니다."
       },
       "lfgraid": {
-        "label": "Seed raid finder",
-        "description": "Create a raid finder scenario."
+        "label": "공격대 찾기 채우기",
+        "description": "공격대 찾기 시나리오를 만듭니다."
       },
       "lfgboard": {
-        "label": "Seed listing board",
-        "description": "Create a premade listing scenario."
+        "label": "모집 게시판 채우기",
+        "description": "사전 구성 파티 모집 시나리오를 만듭니다."
       }
     }
   },
@@ -616,6 +616,7 @@ export const ko_KR: EnTranslations = {
       "balanceLabel": "잔액",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL: {amount}",
+      "usdcBalance": "USDC: {amount}",
       "wocBalance": "WOC: {amount}",
       "unavailable": "현재 Claudium 상점을 이용할 수 없습니다. 잔액과 구매 내역에는 영향이 없으니 잠시 후 다시 확인해 주세요.",
       "disclosure": "Claudium은 단방향 게임 화폐입니다. 현금으로 구매해 꾸미기 상품에 사용할 수 있으며 환전, 양도 또는 현금화할 수 없습니다.",
@@ -623,6 +624,7 @@ export const ko_KR: EnTranslations = {
       "railLabel": "결제 수단",
       "railStripe": "카드",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "20% 할인",
       "railWocUnavailable": "현재 WOC 가격을 이용할 수 없습니다.",
@@ -994,6 +996,7 @@ export const ko_KR: EnTranslations = {
       "interfaceModeTouch": "터치",
       "interfaceModeNote": "자동은 기기에 따라 데스크톱 또는 터치 조작을 선택합니다. 데스크톱을 선택하면 키보드와 마우스로 고정되며(키보드가 있는 태블릿 등에 유용), 터치를 선택하면 화면 조작이 됩니다.",
       "footstepSounds": "발소리",
+      "interfaceSounds": "인터페이스 및 피드백 소리",
       "clickFeedback": "클릭 표시",
       "lockCursorOnRotate": "회전 중 커서 고정",
       "keybindHelpLockCursorOnRotate": "드래그하여 카메라를 회전하는 동안 마우스 커서를 창 안에 유지하여 화면 가장자리에 닿거나 다른 모니터로 이동하지 않도록 합니다. 자유로운 커서를 원하면 끄세요.",
@@ -1630,14 +1633,14 @@ export const ko_KR: EnTranslations = {
       "spacing": "프레임 간격",
       "columns": "공격대 열 수",
       "healthText": "생명력 텍스트",
-      "healthNone": "None",
+      "healthNone": "없음",
       "healthPercent": "백분율",
       "healthCurrent": "현재 값",
       "healthCurrentMax": "현재 / 최대",
       "sort": "플레이어 정렬",
       "sortGroup": "그룹",
-      "sortRole": "Role",
-      "sortName": "Name",
+      "sortRole": "역할",
+      "sortName": "이름",
       "showResource": "마나, 분노, 에너지 표시",
       "showAbsorbs": "흡수 보호막 표시",
       "showAuras": "버프 및 디버프 표시",
@@ -2302,6 +2305,9 @@ export const ko_KR: EnTranslations = {
       "already_linked": "계정에 이미 연동된 Steam 계정이 있습니다.",
       "account_taken": "해당 Steam 계정은 이미 다른 계정에 연결되어 있습니다.",
       "upstream": "Steam이 응답하지 않습니다. 잠시 후 다시 시도해 주세요."
+    },
+    "welcome": {
+      "invalid_input": "입력이 올바르지 않습니다."
     }
   },
   "guide": {
@@ -4998,6 +5004,29 @@ export const ko_KR: EnTranslations = {
     "body": "게임 서비스를 재시작하고 있으며 Claudemoon은 곧 돌아올 예정입니다. 이 페이지는 자동으로 계속 확인합니다.",
     "status": "곧 돌아옵니다"
   },
+  "welcome": {
+    "back": "다시 오신 것을 환영합니다, {name}",
+    "level": "레벨 {level}",
+    "lastPlayed": "마지막 플레이: {when}",
+    "continue": "월드 입장",
+    "continueHint": "Enter로 계속, Esc로 건너뛰기",
+    "continueHintTouch": "탭하여 계속",
+    "discord": {
+      "title": "커뮤니티는 Discord에서 활동합니다",
+      "sub": "패치 미리보기, 이벤트, 개발자 채팅, 연동 시 보너스 은행 슬롯 2개.",
+      "join": "Discord에 참여하기"
+    },
+    "chest": {
+      "ready": "일일 상자 준비 완료"
+    },
+    "armory": {
+      "cta": "무기고 둘러보기"
+    },
+    "news": {
+      "new": "신규",
+      "viewAll": "GitHub에서 모든 업데이트 보기"
+    }
+  },
   "hud": {
     "core": {
       "elite": "정예",
@@ -6843,6 +6872,24 @@ export const ko_KR: EnTranslations = {
       },
       "eastbrook_wool_trousers": {
         "name": "이스트브룩 양모 바지"
+      },
+      "eastbrook_ritual_vestments": {
+        "name": "이스트브룩 의식 예복"
+      },
+      "eastbrook_druids_hide": {
+        "name": "이스트브룩 드루이드 가죽"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "이스트브룩 방호 각반"
+      },
+      "wardweave_cowl": {
+        "name": "워드위브 두건"
+      },
+      "duskhide_wraps": {
+        "name": "더스크하이드 손목보호대"
+      },
+      "sootscale_mantle": {
+        "name": "수트스케일 망토"
       },
       "gravecaller_blade": {
         "name": "무덤부름 넓은날검"

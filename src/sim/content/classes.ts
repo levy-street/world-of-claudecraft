@@ -332,6 +332,11 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     startWeapon: 'gnarled_staff',
     startChest: 'footpad_jerkin',
     startItems: START_RATIONS_MANA,
+    // The same fixed class wand the other casters carry, in the druid's nature
+    // school. Form-aware: available only in caster form and Moonwing Form; the
+    // bear/cat/travel shapeshifts fight with claws (see combat/form_swing.ts
+    // rangedAutoProfile, which the auto-attack loop resolves through).
+    ranged: { min: 3, max: 6, speed: 1.8, maxRange: 30, minRange: 0, wand: true, school: 'nature' },
     abilities: [
       'wrath',
       'healing_touch',

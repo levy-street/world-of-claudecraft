@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { wireSkinPicker } from '../src/ui/skin_picker';
+import { wireSkinPicker } from '../src/ui/hud/cosmetics/skin_picker';
 
 // Hand-rolled fake DOM (jsdom is deliberately not a dependency; see
 // tests/CLAUDE.md). addEventListener models the real contract the module relies

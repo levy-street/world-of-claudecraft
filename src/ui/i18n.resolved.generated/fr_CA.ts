@@ -21,150 +21,150 @@ export const fr_CA: EnTranslations = {
     "rpPvp": "JdR-JcJ"
   },
   "devCommand": {
-    "dialogLabel": "Developer Command Center",
-    "kicker": "Development tools",
-    "title": "Command Center",
-    "subtitle": "Authoritative test controls for the active world.",
-    "closeAria": "Close developer commands",
-    "categoryNavAria": "Developer command categories",
+    "dialogLabel": "Centre de commandes de développement",
+    "kicker": "Outils de développement",
+    "title": "Centre de commandes",
+    "subtitle": "Commandes de test autoritatives pour le monde actif.",
+    "closeAria": "Fermer les commandes de développement",
+    "categoryNavAria": "Catégories de commandes de développement",
     "categories": {
-      "player": "Player",
-      "spawns": "Spawns",
-      "inventory": "Inventory",
-      "progress": "Progress",
-      "travel": "Travel",
-      "scenarios": "Scenarios"
+      "player": "Joueur",
+      "spawns": "Apparitions",
+      "inventory": "Inventaire",
+      "progress": "Progression",
+      "travel": "Déplacement",
+      "scenarios": "Scénarios"
     },
-    "filterLabel": "Filter commands",
-    "filterPlaceholder": "Search this category",
-    "noMatches": "No matching commands.",
-    "serverRequirement": "Server cheats still require ALLOW_DEV_COMMANDS=1.",
-    "invalidValues": "Choose valid values before running this command.",
-    "sent": "Sent: {command}",
-    "run": "Run",
+    "filterLabel": "Filtrer les commandes",
+    "filterPlaceholder": "Rechercher dans cette catégorie",
+    "noMatches": "Aucune commande correspondante.",
+    "serverRequirement": "Les commandes de triche du serveur exigent toujours ALLOW_DEV_COMMANDS=1.",
+    "invalidValues": "Choisissez des valeurs valides avant d’exécuter cette commande.",
+    "sent": "Envoyé : {command}",
+    "run": "Exécuter",
     "fields": {
-      "level": "Level",
-      "mob": "Mob",
-      "count": "Count",
-      "item": "Item",
-      "gold": "Gold",
-      "quest": "Quest",
-      "profession": "Profession",
-      "amount": "Amount",
+      "level": "Niveau",
+      "mob": "Créature",
+      "count": "Nombre",
+      "item": "Objet",
+      "gold": "Or",
+      "quest": "Quête",
+      "profession": "Métier",
+      "amount": "Quantité",
       "x": "X",
       "z": "Z",
-      "dungeon": "Dungeon",
-      "difficulty": "Difficulty",
-      "name": "Name"
+      "dungeon": "Donjon",
+      "difficulty": "Difficulté",
+      "name": "Nom"
     },
     "difficulty": {
       "normal": "Normal",
-      "heroic": "Heroic"
+      "heroic": "Héroïque"
     },
     "actions": {
       "heal": {
-        "label": "Restore health",
-        "description": "Fill the health pool."
+        "label": "Rétablir les points de vie",
+        "description": "Restaure tous les points de vie."
       },
       "resource": {
-        "label": "Restore resource",
-        "description": "Fill mana, rage, or energy."
+        "label": "Rétablir la ressource",
+        "description": "Restaure le mana, la rage ou l’énergie."
       },
       "cooldowns": {
-        "label": "Clear cooldowns",
-        "description": "Reset ability, GCD, and potion timers."
+        "label": "Réinitialiser les temps de recharge",
+        "description": "Réinitialise les temps de recharge des capacités, du GCD et des potions."
       },
       "god": {
-        "label": "Toggle god mode",
-        "description": "Toggle invulnerability and boosted damage."
+        "label": "Activer ou désactiver le mode divin",
+        "description": "Active ou désactive l’invulnérabilité et les dégâts augmentés."
       },
       "revive": {
-        "label": "Revive",
-        "description": "Revive through the normal resurrection path."
+        "label": "Réanimer",
+        "description": "Réanime en suivant le processus normal de résurrection."
       },
       "kill": {
-        "label": "Kill player",
-        "description": "Test death, ghost, and corpse flows."
+        "label": "Tuer le joueur",
+        "description": "Teste les séquences de mort, de fantôme et de cadavre."
       },
       "combatreset": {
-        "label": "Reset combat",
-        "description": "Clear combat state and hostile threat."
+        "label": "Réinitialiser le combat",
+        "description": "Efface l’état de combat et la menace hostile."
       },
       "level": {
-        "label": "Set level",
-        "description": "Set the current character level."
+        "label": "Définir le niveau",
+        "description": "Définit le niveau du personnage actuel."
       },
       "spawn": {
-        "label": "Spawn mob",
-        "description": "Create a concrete mob near the player."
+        "label": "Faire apparaître une créature",
+        "description": "Fait apparaître une créature précise près du joueur."
       },
       "killtarget": {
-        "label": "Kill target",
-        "description": "Kill the selected living mob."
+        "label": "Tuer la cible",
+        "description": "Tue la créature vivante sélectionnée."
       },
       "despawntarget": {
-        "label": "Despawn target",
-        "description": "Remove a selected mob created by this tool."
+        "label": "Faire disparaître la cible",
+        "description": "Supprime une créature sélectionnée créée avec cet outil."
       },
       "despawnall": {
-        "label": "Clear my spawns",
-        "description": "Remove every mob spawned by this developer."
+        "label": "Supprimer mes créatures",
+        "description": "Supprime toutes les créatures invoquées par ce développeur."
       },
       "give": {
-        "label": "Give item",
-        "description": "Add an item to the player inventory."
+        "label": "Donner un objet",
+        "description": "Ajoute un objet à l’inventaire du joueur."
       },
       "gold": {
-        "label": "Add gold",
-        "description": "Add gold to the current purse."
+        "label": "Ajouter de l’or",
+        "description": "Ajoute de l’or à la bourse actuelle."
       },
       "quest": {
-        "label": "Complete quest",
-        "description": "Complete a specific quest by id."
+        "label": "Accomplir la quête",
+        "description": "Accomplit une quête précise par son ID."
       },
       "quests": {
-        "label": "Complete active quests",
-        "description": "Complete every quest in the current log."
+        "label": "Accomplir les quêtes actives",
+        "description": "Accomplit toutes les quêtes du journal actuel."
       },
       "attune": {
-        "label": "Unlock attunements",
-        "description": "Mark all attunement requirements complete."
+        "label": "Déverrouiller les harmonisations",
+        "description": "Marque toutes les conditions d’harmonisation comme remplies."
       },
       "gather": {
-        "label": "Grant gathering skill",
-        "description": "Increase a gathering profession."
+        "label": "Augmenter la compétence de récolte",
+        "description": "Augmente la compétence d’un métier de récolte."
       },
       "teleport": {
-        "label": "Teleport",
-        "description": "Move to exact world coordinates."
+        "label": "Téléporter",
+        "description": "Déplace le joueur vers des coordonnées exactes du monde."
       },
       "dungeon": {
-        "label": "Enter dungeon",
-        "description": "Enter a dungeon with dev gate bypass."
+        "label": "Entrer dans un donjon",
+        "description": "Entre dans un donjon sans tenir compte de la restriction de développement."
       },
       "raid": {
-        "label": "Enter raid",
-        "description": "Enter the Nythraxis arena directly."
+        "label": "Entrer dans le raid",
+        "description": "Entre directement dans l’arène de Nythraxis."
       },
       "raidreset": {
-        "label": "Reset raid lockout",
-        "description": "Clear the current raid lockouts."
+        "label": "Réinitialiser le verrouillage de raid",
+        "description": "Efface les verrouillages de raid actuels."
       },
       "bot": {
-        "label": "Spawn social bot",
-        "description": "Create a whisperable stationary player."
+        "label": "Faire apparaître un bot social",
+        "description": "Crée un joueur immobile auquel il est possible de chuchoter."
       },
       "lfgqueue": {
-        "label": "Seed finder queue",
-        "description": "Create a Dungeon Finder queue scenario."
+        "label": "Préparer la file de recherche",
+        "description": "Crée un scénario de file de recherche de donjons."
       },
       "lfgraid": {
-        "label": "Seed raid finder",
-        "description": "Create a raid finder scenario."
+        "label": "Préparer la recherche de raids",
+        "description": "Crée un scénario de recherche de raids."
       },
       "lfgboard": {
-        "label": "Seed listing board",
-        "description": "Create a premade listing scenario."
+        "label": "Préparer le tableau des annonces",
+        "description": "Crée un scénario d’annonce de groupe prédéfini."
       }
     }
   },
@@ -351,7 +351,7 @@ export const fr_CA: EnTranslations = {
       "remainingLessThanMinute": "<1min",
       "remainingMinutes": "{minutes}min",
       "remainingHoursMinutes": "{hours}h {minutes}min",
-      "remainingDaysHours": "{days}d {hours}h",
+      "remainingDaysHours": "{days} j {hours} h",
       "score": "Score",
       "walletValue": "Valeur du portefeuille (WOC)",
       "usd": "{amount} USD",
@@ -391,7 +391,7 @@ export const fr_CA: EnTranslations = {
         "under_minimum": "Le portefeuille est en dessous du minimum de 20 USD en WOC.",
         "price_unavailable": "Le cours du WOC est indisponible, les récompenses sont temporairement verrouillées.",
         "banned": "Vous êtes exclu des Récompenses quotidiennes. Motif : {reason}",
-        "bannedUntil": "You are banned from Daily Rewards for another {remaining}. Access returns {until}. Reason: {reason}"
+        "bannedUntil": "Vous êtes exclu des Récompenses quotidiennes pour encore {remaining}. L’accès sera rétabli {until}. Motif : {reason}"
       }
     },
     "wocStore": {
@@ -616,6 +616,7 @@ export const fr_CA: EnTranslations = {
       "balanceLabel": "Solde",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL : {amount}",
+      "usdcBalance": "USDC : {amount}",
       "wocBalance": "WOC : {amount}",
       "unavailable": "La boutique de Claudium est indisponible pour le moment. Votre solde et vos achats ne sont pas affectés. Veuillez revenir dans quelques instants.",
       "disclosure": "Le Claudium est une monnaie virtuelle à sens unique : achetez-en avec de l’argent et dépensez-le en objets cosmétiques. Il ne peut être ni remboursé, ni transféré, ni converti en argent.",
@@ -623,6 +624,7 @@ export const fr_CA: EnTranslations = {
       "railLabel": "Mode de paiement",
       "railStripe": "Carte",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "20 % de réduction",
       "railWocUnavailable": "Les prix en WOC sont indisponibles pour le moment.",
@@ -994,6 +996,7 @@ export const fr_CA: EnTranslations = {
       "interfaceModeTouch": "Touch",
       "interfaceModeNote": "Auto choisit les commandes Desktop ou Touch selon votre appareil. Choisissez Desktop pour forcer le clavier et la souris (utile sur une tablette avec clavier), ou Touch pour les commandes à l'écran.",
       "footstepSounds": "Sons de pas",
+      "interfaceSounds": "Sons d’interface et retours sonores",
       "clickFeedback": "Repère de clic",
       "lockCursorOnRotate": "Verrouiller le curseur pendant la rotation",
       "keybindHelpLockCursorOnRotate": "Maintient le curseur de la souris dans la fenêtre pendant que vous faites glisser pour faire pivoter la caméra, afin qu'il n'atteigne pas le bord de l'écran et ne passe pas sur un autre moniteur. Désactivez cette option si vous préférez un curseur libre.",
@@ -1617,31 +1620,31 @@ export const fr_CA: EnTranslations = {
       "lock": "Verrouiller le cadre du joueur"
     },
     "partyFrames": {
-      "section": "Party and Raid Frames",
-      "unlock": "Move party and raid frames",
-      "lock": "Lock party and raid frames",
-      "style": "Frame Style",
-      "styleAutomatic": "Automatic",
-      "styleClassic": "Classic Party Frames",
-      "styleRaid": "Raid Frames",
-      "scale": "Frame Scale",
-      "width": "Frame Width",
-      "height": "Frame Height",
-      "spacing": "Frame Spacing",
-      "columns": "Raid Columns",
-      "healthText": "Health Text",
-      "healthNone": "None",
-      "healthPercent": "Percent",
-      "healthCurrent": "Current",
-      "healthCurrentMax": "Current / Max",
-      "sort": "Sort Players",
-      "sortGroup": "Group",
-      "sortRole": "Role",
-      "sortName": "Name",
-      "showResource": "Show Mana, Rage, and Energy",
-      "showAbsorbs": "Show Absorb Shields",
-      "showAuras": "Show Buffs and Debuffs",
-      "showSelf": "Show Your Frame"
+      "section": "Cadres de groupe et de raid",
+      "unlock": "Déplacer les cadres de groupe et de raid",
+      "lock": "Verrouiller les cadres de groupe et de raid",
+      "style": "Style des cadres",
+      "styleAutomatic": "Automatique",
+      "styleClassic": "Cadres de groupe classiques",
+      "styleRaid": "Cadres de raid",
+      "scale": "Échelle du cadre",
+      "width": "Largeur du cadre",
+      "height": "Hauteur du cadre",
+      "spacing": "Espacement des cadres",
+      "columns": "Colonnes de raid",
+      "healthText": "Texte des points de vie",
+      "healthNone": "Aucun",
+      "healthPercent": "Pourcentage",
+      "healthCurrent": "Actuels",
+      "healthCurrentMax": "Actuels / max.",
+      "sort": "Trier les joueurs",
+      "sortGroup": "Groupe",
+      "sortRole": "Rôle",
+      "sortName": "Nom",
+      "showResource": "Afficher le mana, la rage et l’énergie",
+      "showAbsorbs": "Afficher les boucliers d’absorption",
+      "showAuras": "Afficher les améliorations et affaiblissements",
+      "showSelf": "Afficher votre cadre"
     },
     "frameReset": {
       "label": "Réinitialiser la position des cadres"
@@ -2302,6 +2305,9 @@ export const fr_CA: EnTranslations = {
       "already_linked": "Votre compte est déjà lié à un compte Steam.",
       "account_taken": "Ce compte Steam est déjà lié à un autre compte.",
       "upstream": "Steam n'a pas répondu. Réessayez dans un instant."
+    },
+    "welcome": {
+      "invalid_input": "Saisie invalide."
     }
   },
   "guide": {
@@ -4998,6 +5004,29 @@ export const fr_CA: EnTranslations = {
     "body": "Nous redémarrons le service de jeu et Claudemoon devrait revenir sous peu. Cette page continuera de vérifier automatiquement.",
     "status": "De retour bientôt"
   },
+  "welcome": {
+    "back": "Bon retour parmi nous, {name}",
+    "level": "Niveau {level}",
+    "lastPlayed": "Dernière partie : {when}",
+    "continue": "Entrer dans le monde",
+    "continueHint": "Entrée pour continuer, Échap pour passer",
+    "continueHintTouch": "Touchez pour continuer",
+    "discord": {
+      "title": "La communauté vit sur Discord",
+      "sub": "Aperçus des patchs, événements, discussions avec les développeurs et 2 emplacements de banque bonus en liant votre compte Discord.",
+      "join": "Rejoindre notre Discord"
+    },
+    "chest": {
+      "ready": "Coffre des récompenses quotidiennes prêt"
+    },
+    "armory": {
+      "cta": "Entrer dans le monde et parcourir l’Armurerie"
+    },
+    "news": {
+      "new": "Nouveau",
+      "viewAll": "Voir toutes les mises à jour sur GitHub"
+    }
+  },
   "hud": {
     "core": {
       "elite": "ÉLITE",
@@ -6843,6 +6872,24 @@ export const fr_CA: EnTranslations = {
       },
       "eastbrook_wool_trousers": {
         "name": "Pantalon de laine d'Eastbrook"
+      },
+      "eastbrook_ritual_vestments": {
+        "name": "Habits rituels d’Eastbrook"
+      },
+      "eastbrook_druids_hide": {
+        "name": "Peau du druide d’Eastbrook"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "Jambières protégées d’Eastbrook"
+      },
+      "wardweave_cowl": {
+        "name": "Capuche de tissage protecteur"
+      },
+      "duskhide_wraps": {
+        "name": "Bandelettes en cuir crépusculaire"
+      },
+      "sootscale_mantle": {
+        "name": "Pèlerine en écailles de suie"
       },
       "gravecaller_blade": {
         "name": "Grande lame de Gravecaller"

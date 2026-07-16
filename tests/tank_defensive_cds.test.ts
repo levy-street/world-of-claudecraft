@@ -322,43 +322,41 @@ describe('Sacred Bulwark (paladin): divine cheat-death', () => {
     );
   });
 
-  it.each([
-    'duel',
-    '1v1',
-    'fiesta',
-    'yumi3',
-  ] as const)('saves the paladin from an enemy lethal hit in %s', (mode) => {
-    let sim: Sim;
-    let victimPid: number;
-    let sourcePid: number;
-    let match: ArenaMatch | null = null;
-    if (mode === 'duel') {
-      sim = new Sim({ seed: 9, playerClass: 'warrior', noPlayer: true });
-      victimPid = sim.addPlayer('paladin', 'Paladin');
-      sourcePid = sim.addPlayer('warrior', 'Warrior');
-      const duel = { a: victimPid, b: sourcePid, state: 'active' as const, timer: 0 };
-      sim.ctx.duels.set(victimPid, duel);
-      sim.ctx.duels.set(sourcePid, duel);
-    } else {
-      ({ sim, match, victimPid, sourcePid } = startArenaMode(mode));
-    }
-    const victim = sim.entities.get(victimPid)!;
-    const source = sim.entities.get(sourcePid)!;
-    victim.auras.push(guardianWard(victimPid));
-    victim.hp = victim.maxHp;
-    expect(victim.dead).toBe(false);
-    expect(victim.auras.some((a) => a.kind === 'guardian_ward')).toBe(true);
-    sim.drainEvents();
+  it.each(['duel', '1v1', 'fiesta', 'yumi3'] as const)(
+    'saves the paladin from an enemy lethal hit in %s',
+    (mode) => {
+      let sim: Sim;
+      let victimPid: number;
+      let sourcePid: number;
+      let match: ArenaMatch | null = null;
+      if (mode === 'duel') {
+        sim = new Sim({ seed: 9, playerClass: 'warrior', noPlayer: true });
+        victimPid = sim.addPlayer('paladin', 'Paladin');
+        sourcePid = sim.addPlayer('warrior', 'Warrior');
+        const duel = { a: victimPid, b: sourcePid, state: 'active' as const, timer: 0 };
+        sim.ctx.duels.set(victimPid, duel);
+        sim.ctx.duels.set(sourcePid, duel);
+      } else {
+        ({ sim, match, victimPid, sourcePid } = startArenaMode(mode));
+      }
+      const victim = sim.entities.get(victimPid)!;
+      const source = sim.entities.get(sourcePid)!;
+      victim.auras.push(guardianWard(victimPid));
+      victim.hp = victim.maxHp;
+      expect(victim.dead).toBe(false);
+      expect(victim.auras.some((a) => a.kind === 'guardian_ward')).toBe(true);
+      sim.drainEvents();
 
-    (sim as any).dealDamage(source, victim, victim.hp * 5, false, 'physical', null, 'hit');
+      (sim as any).dealDamage(source, victim, victim.hp * 5, false, 'physical', null, 'hit');
 
-    expect(victim.dead).toBe(false);
-    expect(victim.hp).toBe(Math.round(victim.maxHp * 0.35));
-    if (mode === 'duel') expect(sim.ctx.duels.has(victimPid)).toBe(true);
-    if (mode === '1v1') expect(match!.defeated.has(victimPid)).toBe(false);
-    if (mode === 'fiesta') expect(match!.fiesta!.respawn.has(victimPid)).toBe(false);
-    if (mode === 'yumi3') expect(match!.yumi!.respawn.has(victimPid)).toBe(false);
-  });
+      expect(victim.dead).toBe(false);
+      expect(victim.hp).toBe(Math.round(victim.maxHp * 0.35));
+      if (mode === 'duel') expect(sim.ctx.duels.has(victimPid)).toBe(true);
+      if (mode === '1v1') expect(match!.defeated.has(victimPid)).toBe(false);
+      if (mode === 'fiesta') expect(match!.fiesta!.respawn.has(victimPid)).toBe(false);
+      if (mode === 'yumi3') expect(match!.yumi!.respawn.has(victimPid)).toBe(false);
+    },
+  );
 });
 
 describe('Primal Reflexes (druid): dodge cooldown', () => {

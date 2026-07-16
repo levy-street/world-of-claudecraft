@@ -12,6 +12,7 @@
 
 import { isDebuffAura } from '../aura_classify';
 import { isRooted } from '../combat/cc';
+import { baseSwingSpeed, rangedAutoProfile } from '../combat/form_swing';
 import {
   FIRST_TALENT_LEVEL,
   pointsSpent,
@@ -263,8 +264,9 @@ export function attackReadout(ctx: SimContext, p: Entity, meta: PlayerMeta): str
   const t = p.targetId !== null ? ctx.entities.get(p.targetId) : null;
   if (!t || t.dead) return 'Auto-attack is on, but you have no valid target.';
   // ranged classes (hunter auto shot, caster wands) swing at their ranged
-  // speed; everyone else uses the equipped weapon's speed
-  const base = CLASSES[meta.cls].ranged?.speed ?? p.weapon.speed;
+  // speed; everyone else, including a druid shifted into a wandless form,
+  // uses the form-aware melee cadence (bear: weapon, cat: claw baseline)
+  const base = rangedAutoProfile(p, meta.cls)?.speed ?? baseSwingSpeed(p);
   const interval = base * ctx.swingIntervalMult(p);
   const next = p.swingTimer <= 0 ? 'now' : `in ${p.swingTimer.toFixed(1)}s`;
   return `Auto-attack is on against ${t.name} — next swing ${next} (${interval.toFixed(1)}s swing).`;

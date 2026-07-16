@@ -334,6 +334,7 @@ export function buildAudioControls(s: OptionsSettingsSource): OptionsControl[] {
     { control: 'musicToggle', labelKey: 'hud.options.music' },
     boolToggle(s, 'voiceEnabled', 'hud.options.npcVoices'),
     boolToggle(s, 'footstepSfx', 'hudChrome.options.footstepSounds'),
+    boolToggle(s, 'interfaceSfx', 'hudChrome.options.interfaceSounds'),
     boolToggle(s, 'clickFeedback', 'hudChrome.options.clickFeedback'),
   ];
 }

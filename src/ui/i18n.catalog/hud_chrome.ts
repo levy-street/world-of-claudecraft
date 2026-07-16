@@ -194,6 +194,7 @@ export const hudChromeStrings = {
     balanceLabel: 'Balance',
     balanceUnit: '{amount} Claudium',
     solBalance: 'SOL: {amount}',
+    usdcBalance: 'USDC: {amount}',
     wocBalance: 'WOC: {amount}',
     unavailable:
       'The Claudium store is unavailable right now. Your balance and purchases are unaffected; please check back shortly.',
@@ -203,10 +204,11 @@ export const hudChromeStrings = {
     railLabel: 'Payment method',
     railStripe: 'Card',
     railSol: 'SOL',
+    railUsdc: 'USDC',
     railWoc: 'WOC',
     railWocDiscount: '20% off',
     railWocUnavailable: 'WOC pricing is unavailable right now.',
-    railNativeUnavailable: 'SOL/WOC off.',
+    railNativeUnavailable: 'Crypto off.',
     amountLabel: 'Amount',
     showAmounts: 'Show all Claudium amounts',
     hideAmounts: 'Hide extra Claudium amounts',
@@ -782,6 +784,10 @@ export const hudChromeStrings = {
       'Auto picks desktop or touch controls from your device. Choose Desktop to force keyboard and mouse (useful on a tablet with a keyboard), or Touch for the on-screen controls.',
     // Audio panel toggle for the per-footfall step clips (off by default).
     footstepSounds: 'Footstep Sounds',
+    // Audio panel toggle for the discrete interface and feedback cues (loot, level,
+    // quest, whisper, and the combat miss/dodge/parry beeps; on by default). Off
+    // silences just those without touching the SFX volume or the world sounds.
+    interfaceSounds: 'Interface and Feedback Sounds',
     // Toggle for the OSRS-style click-feedback marker: entity targets and
     // click-to-move destinations (on by default).
     clickFeedback: 'Click Marker',

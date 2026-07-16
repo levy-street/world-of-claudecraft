@@ -21,150 +21,150 @@ export const zh_TW: EnTranslations = {
     "rpPvp": "RP-PvP"
   },
   "devCommand": {
-    "dialogLabel": "Developer Command Center",
-    "kicker": "Development tools",
-    "title": "Command Center",
-    "subtitle": "Authoritative test controls for the active world.",
-    "closeAria": "Close developer commands",
-    "categoryNavAria": "Developer command categories",
+    "dialogLabel": "開發者指令中心",
+    "kicker": "開發工具",
+    "title": "指令中心",
+    "subtitle": "目前世界的伺服器權威測試控制。",
+    "closeAria": "關閉開發者指令",
+    "categoryNavAria": "開發者指令類別",
     "categories": {
-      "player": "Player",
-      "spawns": "Spawns",
-      "inventory": "Inventory",
-      "progress": "Progress",
-      "travel": "Travel",
-      "scenarios": "Scenarios"
+      "player": "玩家",
+      "spawns": "生成物",
+      "inventory": "物品欄",
+      "progress": "進度",
+      "travel": "移動",
+      "scenarios": "情境"
     },
-    "filterLabel": "Filter commands",
-    "filterPlaceholder": "Search this category",
-    "noMatches": "No matching commands.",
-    "serverRequirement": "Server cheats still require ALLOW_DEV_COMMANDS=1.",
-    "invalidValues": "Choose valid values before running this command.",
-    "sent": "Sent: {command}",
-    "run": "Run",
+    "filterLabel": "篩選指令",
+    "filterPlaceholder": "搜尋此類別",
+    "noMatches": "沒有符合的指令。",
+    "serverRequirement": "伺服器作弊功能仍需 ALLOW_DEV_COMMANDS=1。",
+    "invalidValues": "執行此指令前請選擇有效值。",
+    "sent": "已傳送：{command}",
+    "run": "執行",
     "fields": {
-      "level": "Level",
-      "mob": "Mob",
-      "count": "Count",
-      "item": "Item",
-      "gold": "Gold",
-      "quest": "Quest",
-      "profession": "Profession",
-      "amount": "Amount",
+      "level": "等級",
+      "mob": "怪物",
+      "count": "數量",
+      "item": "物品",
+      "gold": "金幣",
+      "quest": "任務",
+      "profession": "專業技能",
+      "amount": "數量",
       "x": "X",
       "z": "Z",
-      "dungeon": "Dungeon",
-      "difficulty": "Difficulty",
-      "name": "Name"
+      "dungeon": "地城",
+      "difficulty": "難度",
+      "name": "名稱"
     },
     "difficulty": {
-      "normal": "Normal",
-      "heroic": "Heroic"
+      "normal": "普通",
+      "heroic": "英雄"
     },
     "actions": {
       "heal": {
-        "label": "Restore health",
-        "description": "Fill the health pool."
+        "label": "恢復生命值",
+        "description": "將生命值補滿。"
       },
       "resource": {
-        "label": "Restore resource",
-        "description": "Fill mana, rage, or energy."
+        "label": "恢復資源",
+        "description": "補滿法力、怒氣或能量。"
       },
       "cooldowns": {
-        "label": "Clear cooldowns",
-        "description": "Reset ability, GCD, and potion timers."
+        "label": "清除冷卻時間",
+        "description": "重設技能、全域冷卻與藥水計時器。"
       },
       "god": {
-        "label": "Toggle god mode",
-        "description": "Toggle invulnerability and boosted damage."
+        "label": "切換無敵模式",
+        "description": "切換無敵狀態與強化傷害。"
       },
       "revive": {
-        "label": "Revive",
-        "description": "Revive through the normal resurrection path."
+        "label": "復活",
+        "description": "透過正常復活流程復活。"
       },
       "kill": {
-        "label": "Kill player",
-        "description": "Test death, ghost, and corpse flows."
+        "label": "殺死玩家",
+        "description": "測試死亡、靈魂與屍體流程。"
       },
       "combatreset": {
-        "label": "Reset combat",
-        "description": "Clear combat state and hostile threat."
+        "label": "重設戰鬥",
+        "description": "清除戰鬥狀態與敵人的仇恨。"
       },
       "level": {
-        "label": "Set level",
-        "description": "Set the current character level."
+        "label": "設定等級",
+        "description": "設定目前角色等級。"
       },
       "spawn": {
-        "label": "Spawn mob",
-        "description": "Create a concrete mob near the player."
+        "label": "生成怪物",
+        "description": "在玩家附近建立一個指定怪物。"
       },
       "killtarget": {
-        "label": "Kill target",
-        "description": "Kill the selected living mob."
+        "label": "殺死目標",
+        "description": "殺死選取的存活怪物。"
       },
       "despawntarget": {
-        "label": "Despawn target",
-        "description": "Remove a selected mob created by this tool."
+        "label": "移除目標",
+        "description": "移除此工具建立的已選取怪物。"
       },
       "despawnall": {
-        "label": "Clear my spawns",
-        "description": "Remove every mob spawned by this developer."
+        "label": "清除我的生成物",
+        "description": "移除此開發者生成的所有怪物。"
       },
       "give": {
-        "label": "Give item",
-        "description": "Add an item to the player inventory."
+        "label": "給予物品",
+        "description": "將一件物品加入玩家物品欄。"
       },
       "gold": {
-        "label": "Add gold",
-        "description": "Add gold to the current purse."
+        "label": "新增金幣",
+        "description": "將金幣加入目前的錢袋。"
       },
       "quest": {
-        "label": "Complete quest",
-        "description": "Complete a specific quest by id."
+        "label": "完成任務",
+        "description": "依 ID 完成特定任務。"
       },
       "quests": {
-        "label": "Complete active quests",
-        "description": "Complete every quest in the current log."
+        "label": "完成進行中的任務",
+        "description": "完成目前任務日誌中的所有任務。"
       },
       "attune": {
-        "label": "Unlock attunements",
-        "description": "Mark all attunement requirements complete."
+        "label": "解鎖前置資格",
+        "description": "將所有前置資格要求標記為已完成。"
       },
       "gather": {
-        "label": "Grant gathering skill",
-        "description": "Increase a gathering profession."
+        "label": "授予採集技能",
+        "description": "提高一項採集專業技能。"
       },
       "teleport": {
-        "label": "Teleport",
-        "description": "Move to exact world coordinates."
+        "label": "傳送",
+        "description": "移動到精確的世界座標。"
       },
       "dungeon": {
-        "label": "Enter dungeon",
-        "description": "Enter a dungeon with dev gate bypass."
+        "label": "進入地城",
+        "description": "略過開發者模式的入場限制進入地城。"
       },
       "raid": {
-        "label": "Enter raid",
-        "description": "Enter the Nythraxis arena directly."
+        "label": "進入團隊副本",
+        "description": "直接進入尼思拉克西斯競技場。"
       },
       "raidreset": {
-        "label": "Reset raid lockout",
-        "description": "Clear the current raid lockouts."
+        "label": "重設團隊副本鎖定",
+        "description": "清除目前的團隊副本鎖定。"
       },
       "bot": {
-        "label": "Spawn social bot",
-        "description": "Create a whisperable stationary player."
+        "label": "生成社交機器人",
+        "description": "建立一名可接收密語的靜止玩家。"
       },
       "lfgqueue": {
-        "label": "Seed finder queue",
-        "description": "Create a Dungeon Finder queue scenario."
+        "label": "填入搜尋器佇列",
+        "description": "建立地城搜尋器佇列情境。"
       },
       "lfgraid": {
-        "label": "Seed raid finder",
-        "description": "Create a raid finder scenario."
+        "label": "填入團隊副本搜尋器",
+        "description": "建立團隊副本搜尋器情境。"
       },
       "lfgboard": {
-        "label": "Seed listing board",
-        "description": "Create a premade listing scenario."
+        "label": "填入組隊公告板",
+        "description": "建立預組隊公告情境。"
       }
     }
   },
@@ -616,6 +616,7 @@ export const zh_TW: EnTranslations = {
       "balanceLabel": "餘額",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL：{amount}",
+      "usdcBalance": "USDC：{amount}",
       "wocBalance": "WOC：{amount}",
       "unavailable": "Claudium 商店目前無法使用。您的餘額與購買不受影響，請稍後再試。",
       "disclosure": "Claudium 是單向軟貨幣：可用金錢購買並用於兌換外觀物品，不能贖回、轉讓或兌現。",
@@ -623,6 +624,7 @@ export const zh_TW: EnTranslations = {
       "railLabel": "付款方式",
       "railStripe": "信用卡",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "優惠 20%",
       "railWocUnavailable": "WOC 定價目前無法使用。",
@@ -994,6 +996,7 @@ export const zh_TW: EnTranslations = {
       "interfaceModeTouch": "觸控",
       "interfaceModeNote": "自動會根據你的裝置選擇桌面或觸控操作。選擇桌面可強制使用鍵盤與滑鼠（適合有鍵盤的平板），選擇觸控則使用螢幕上的操作控制項。",
       "footstepSounds": "腳步聲",
+      "interfaceSounds": "介面與回饋音效",
       "clickFeedback": "點擊標記",
       "lockCursorOnRotate": "旋轉時鎖定游標",
       "keybindHelpLockCursorOnRotate": "拖曳旋轉鏡頭時將滑鼠游標保持在視窗內，使其無法到達螢幕邊緣或移動到另一台顯示器。若你偏好自由游標，請關閉此選項。",
@@ -1630,14 +1633,14 @@ export const zh_TW: EnTranslations = {
       "spacing": "框體間距",
       "columns": "團隊欄數",
       "healthText": "生命值文字",
-      "healthNone": "None",
+      "healthNone": "無",
       "healthPercent": "百分比",
       "healthCurrent": "目前值",
       "healthCurrentMax": "目前 / 最大",
       "sort": "玩家排序",
       "sortGroup": "小隊",
-      "sortRole": "Role",
-      "sortName": "Name",
+      "sortRole": "職責",
+      "sortName": "名稱",
       "showResource": "顯示法力、怒氣和能量",
       "showAbsorbs": "顯示吸收護盾",
       "showAuras": "顯示增益和減益",
@@ -2302,6 +2305,9 @@ export const zh_TW: EnTranslations = {
       "already_linked": "你的帳號已連結一個 Steam 帳號。",
       "account_taken": "該 Steam 帳號已連結到另一個帳號。",
       "upstream": "Steam 未回應。請稍後重試。"
+    },
+    "welcome": {
+      "invalid_input": "輸入無效。"
     }
   },
   "guide": {
@@ -4998,6 +5004,29 @@ export const zh_TW: EnTranslations = {
     "body": "我們正在重新啟動遊戲服務，Claudemoon 應會很快恢復。此頁面會自動持續檢查。",
     "status": "即將恢復"
   },
+  "welcome": {
+    "back": "歡迎回來，{name}",
+    "level": "等級 {level}",
+    "lastPlayed": "上次遊玩：{when}",
+    "continue": "進入世界",
+    "continueHint": "按 Enter 繼續，按 Esc 跳過",
+    "continueHintTouch": "點擊繼續",
+    "discord": {
+      "title": "社群活躍在 Discord",
+      "sub": "版本預告、活動、開發者聊天，綁定還可獲得 2 個額外銀行格。",
+      "join": "加入我們的 Discord"
+    },
+    "chest": {
+      "ready": "每日寶箱已就緒"
+    },
+    "armory": {
+      "cta": "進入並瀏覽軍械庫"
+    },
+    "news": {
+      "new": "新",
+      "viewAll": "在 GitHub 上查看全部更新"
+    }
+  },
   "hud": {
     "core": {
       "elite": "精英",
@@ -6843,6 +6872,24 @@ export const zh_TW: EnTranslations = {
       },
       "eastbrook_wool_trousers": {
         "name": "東溪羊毛長褲"
+      },
+      "eastbrook_ritual_vestments": {
+        "name": "東溪儀典法衣"
+      },
+      "eastbrook_druids_hide": {
+        "name": "東溪德魯伊獸皮"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "東溪護法護腿"
+      },
+      "wardweave_cowl": {
+        "name": "織衛兜帽"
+      },
+      "duskhide_wraps": {
+        "name": "暮影裹手"
+      },
+      "sootscale_mantle": {
+        "name": "灰鱗披肩"
       },
       "gravecaller_blade": {
         "name": "喚墓者寬刃劍"
