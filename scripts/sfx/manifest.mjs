@@ -62,7 +62,14 @@ export function preloadForSfx(key) {
     category === 'ui' ||
     category === 'movement' ||
     category === 'combat' ||
-    key.startsWith('player_')
+    key.startsWith('player_') ||
+    // Quest accept/ready/complete are rare, narrative one-shots (category
+    // 'other', since they don't match any prefix rule): the very first one a
+    // brand-new player ever triggers is a cold network fetch, and playUi's
+    // buffer-not-ready fallback only replays if the fetch+decode finishes
+    // within 250ms of the request, so a lazily-loaded quest cue risks
+    // silently never playing on exactly the play's most important moments.
+    key.startsWith('quest_')
   ) {
     return 'startup';
   }
