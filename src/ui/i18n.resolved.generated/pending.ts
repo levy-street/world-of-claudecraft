@@ -11,6 +11,9 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "entities.items.stormhide_haversack.name",
+    "entities.letters.heroic_marks_reward.body",
+    "entities.letters.heroic_marks_reward.sender",
+    "entities.letters.heroic_marks_reward.subject",
     "guide.dungeonsPage.resetBody",
     "guide.dungeonsPage.resetTitle",
     "guide.gear.itemLevelBody",
@@ -18,6 +21,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "es_ES": [
     "entities.items.stormhide_haversack.name",
+    "entities.letters.heroic_marks_reward.body",
+    "entities.letters.heroic_marks_reward.sender",
+    "entities.letters.heroic_marks_reward.subject",
     "guide.dungeonsPage.resetBody",
     "guide.dungeonsPage.resetTitle",
     "guide.gear.itemLevelBody",
@@ -25,6 +31,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "fr_FR": [
     "entities.items.stormhide_haversack.name",
+    "entities.letters.heroic_marks_reward.body",
+    "entities.letters.heroic_marks_reward.sender",
+    "entities.letters.heroic_marks_reward.subject",
     "guide.dungeonsPage.resetBody",
     "guide.dungeonsPage.resetTitle",
     "guide.gear.itemLevelBody",
@@ -37,6 +46,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "fr_CA": [
     "entities.items.stormhide_haversack.name",
+    "entities.letters.heroic_marks_reward.body",
+    "entities.letters.heroic_marks_reward.sender",
+    "entities.letters.heroic_marks_reward.subject",
     "guide.dungeonsPage.resetBody",
     "guide.dungeonsPage.resetTitle",
     "guide.gear.itemLevelBody",
@@ -50,6 +62,9 @@ export const pending: Record<string, readonly string[]> = {
   "en_CA": [],
   "it_IT": [
     "entities.items.stormhide_haversack.name",
+    "entities.letters.heroic_marks_reward.body",
+    "entities.letters.heroic_marks_reward.sender",
+    "entities.letters.heroic_marks_reward.subject",
     "guide.dungeonsPage.resetBody",
     "guide.dungeonsPage.resetTitle",
     "guide.gear.itemLevelBody",
@@ -59,6 +74,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "de_DE": [
     "entities.items.stormhide_haversack.name",
+    "entities.letters.heroic_marks_reward.body",
+    "entities.letters.heroic_marks_reward.sender",
+    "entities.letters.heroic_marks_reward.subject",
     "guide.dungeonsPage.resetBody",
     "guide.dungeonsPage.resetTitle",
     "guide.gear.itemLevelBody",
@@ -70,6 +88,9 @@ export const pending: Record<string, readonly string[]> = {
   "ja_JP": [],
   "pt_BR": [
     "entities.items.stormhide_haversack.name",
+    "entities.letters.heroic_marks_reward.body",
+    "entities.letters.heroic_marks_reward.sender",
+    "entities.letters.heroic_marks_reward.subject",
     "guide.dungeonsPage.resetBody",
     "guide.dungeonsPage.resetTitle",
     "guide.gear.itemLevelBody",
@@ -78,6 +99,9 @@ export const pending: Record<string, readonly string[]> = {
   "ru_RU": [],
   "cs_CZ": [
     "entities.items.stormhide_haversack.name",
+    "entities.letters.heroic_marks_reward.body",
+    "entities.letters.heroic_marks_reward.sender",
+    "entities.letters.heroic_marks_reward.subject",
     "guide.dungeonsPage.resetBody",
     "guide.dungeonsPage.resetTitle",
     "guide.gear.itemLevelBody",
@@ -85,6 +109,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "nl_NL": [
     "entities.items.stormhide_haversack.name",
+    "entities.letters.heroic_marks_reward.body",
+    "entities.letters.heroic_marks_reward.sender",
+    "entities.letters.heroic_marks_reward.subject",
     "guide.dungeonsPage.resetBody",
     "guide.dungeonsPage.resetTitle",
     "guide.gear.itemLevelBody",
@@ -93,6 +120,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "pl_PL": [
     "entities.items.stormhide_haversack.name",
+    "entities.letters.heroic_marks_reward.body",
+    "entities.letters.heroic_marks_reward.sender",
+    "entities.letters.heroic_marks_reward.subject",
     "guide.dungeonsPage.resetBody",
     "guide.dungeonsPage.resetTitle",
     "guide.gear.itemLevelBody",
@@ -100,6 +130,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "id_ID": [
     "entities.items.stormhide_haversack.name",
+    "entities.letters.heroic_marks_reward.body",
+    "entities.letters.heroic_marks_reward.sender",
+    "entities.letters.heroic_marks_reward.subject",
     "guide.dungeonsPage.resetBody",
     "guide.dungeonsPage.resetTitle",
     "guide.gear.itemLevelBody",
@@ -107,6 +140,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "tr_TR": [
     "entities.items.stormhide_haversack.name",
+    "entities.letters.heroic_marks_reward.body",
+    "entities.letters.heroic_marks_reward.sender",
+    "entities.letters.heroic_marks_reward.subject",
     "guide.dungeonsPage.resetBody",
     "guide.dungeonsPage.resetTitle",
     "guide.gear.itemLevelBody",
@@ -115,6 +151,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "sv_SE": [
     "entities.items.stormhide_haversack.name",
+    "entities.letters.heroic_marks_reward.body",
+    "entities.letters.heroic_marks_reward.sender",
+    "entities.letters.heroic_marks_reward.subject",
     "guide.dungeonsPage.resetBody",
     "guide.dungeonsPage.resetTitle",
     "guide.gear.itemLevelBody",
@@ -122,6 +161,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "vi_VN": [
     "entities.items.stormhide_haversack.name",
+    "entities.letters.heroic_marks_reward.body",
+    "entities.letters.heroic_marks_reward.sender",
+    "entities.letters.heroic_marks_reward.subject",
     "guide.dungeonsPage.resetBody",
     "guide.dungeonsPage.resetTitle",
     "guide.gear.itemLevelBody",
@@ -129,6 +171,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "da_DK": [
     "entities.items.stormhide_haversack.name",
+    "entities.letters.heroic_marks_reward.body",
+    "entities.letters.heroic_marks_reward.sender",
+    "entities.letters.heroic_marks_reward.subject",
     "guide.dungeonsPage.resetBody",
     "guide.dungeonsPage.resetTitle",
     "guide.gear.itemLevelBody",
