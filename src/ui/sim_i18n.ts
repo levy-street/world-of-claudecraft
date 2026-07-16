@@ -313,6 +313,13 @@ const baseEnTable = {
   'dfinder.proposalReady': 'A dungeon group is ready. Confirm your slot now.',
   'dfinder.groupChanged': 'Your group changed and left the Dungeon Finder queue.',
   'dfinder.listingFull': 'Your group listing is now full.',
+  // Protect Yumi mystery power-up buffs (src/sim/social/yumi_powerups.ts): the
+  // buff-frame + aura gain/fade log localize by aura NAME (the banner/grabbed
+  // lines localize by defId instead), so the names need a key here too.
+  'aura.puInvuln': 'Invulnerable',
+  'aura.puStealth': 'Veilstep',
+  'aura.puEndlessMana': 'Endless Mana',
+  'aura.puBerserk': 'Warfever',
 } as const;
 
 const petEnTable = {
@@ -2486,6 +2493,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.bonesplinter': '骨刺',
     'aura.raggedGash': '撕裂伤口',
     'aura.soulblaze': '灼魂之焰',
+    'aura.puInvuln': '无敌',
+    'aura.puStealth': '帷影步',
+    'aura.puEndlessMana': '无尽法力',
+    'aura.puBerserk': '战争狂热',
     'groundPickup.supplyCrateDeny': '箱子被钉得严严实实。',
     'groundPickup.gravecallerSigilDeny': '徽记排斥着你的触碰。',
     'groundPickup.ledgerPageDeny': '账页装订得太紧，无法取下。',
@@ -2759,6 +2770,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.bonesplinter': '骨刺',
     'aura.raggedGash': '撕裂傷口',
     'aura.soulblaze': '灼魂之焰',
+    'aura.puInvuln': '無敵',
+    'aura.puStealth': '帷影步',
+    'aura.puEndlessMana': '無盡法力',
+    'aura.puBerserk': '戰爭狂熱',
     'groundPickup.supplyCrateDeny': '箱子被牢牢釘死了。',
     'groundPickup.gravecallerSigilDeny': '徽記排斥你的觸碰。',
     'groundPickup.ledgerPageDeny': '帳頁裝訂得太緊，無法取下。',
@@ -3032,6 +3047,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.bonesplinter': '뼈 파편',
     'aura.raggedGash': '찢어진 상처',
     'aura.soulblaze': '영혼의 불길',
+    'aura.puInvuln': '무적',
+    'aura.puStealth': '베일스텝',
+    'aura.puEndlessMana': '무한 마나',
+    'aura.puBerserk': '워피버',
     'groundPickup.supplyCrateDeny': '상자는 못질로 굳게 닫혀 있습니다.',
     'groundPickup.gravecallerSigilDeny': '인장이 당신의 손길을 밀어냅니다.',
     'groundPickup.ledgerPageDeny': '장부 페이지가 너무 단단히 묶여 있어 뜯어낼 수 없습니다.',
@@ -3316,6 +3335,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.bonesplinter': 'ボーンスプリンター',
     'aura.raggedGash': '裂けた傷',
     'aura.soulblaze': 'ソウルブレイズ',
+    'aura.puInvuln': '無敵',
+    'aura.puStealth': 'ヴェイルステップ',
+    'aura.puEndlessMana': '無限マナ',
+    'aura.puBerserk': 'ウォーフィーバー',
     'groundPickup.supplyCrateDeny': '木箱は釘で固く打ち付けられています。',
     'groundPickup.gravecallerSigilDeny': '印章はあなたの手を拒んでいます。',
     'groundPickup.ledgerPageDeny': '帳簿のページは固く綴じられていて、抜き取れません。',
@@ -3890,6 +3913,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.bonesplinter': 'Костяной осколок',
     'aura.raggedGash': 'Рваная рана',
     'aura.soulblaze': 'Пламя души',
+    'aura.puInvuln': 'Неуязвимость',
+    'aura.puStealth': 'Вуальный шаг',
+    'aura.puEndlessMana': 'Бесконечная мана',
+    'aura.puBerserk': 'Боевая лихорадка',
     'groundPickup.supplyCrateDeny': 'Ящик наглухо заколочен.',
     'groundPickup.gravecallerSigilDeny': 'Сигил отвергает ваше прикосновение.',
     'groundPickup.ledgerPageDeny':
@@ -4804,6 +4831,12 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Bonesplinter: 'aura.bonesplinter',
   'Ragged Gash': 'aura.raggedGash',
   Soulblaze: 'aura.soulblaze',
+  // Protect Yumi mystery power-up buffs (shown in the buff frame + aura log; the
+  // grant carries these English names, id 'mystery_powerup' is not an ability).
+  Invulnerable: 'aura.puInvuln',
+  Veilstep: 'aura.puStealth',
+  'Endless Mana': 'aura.puEndlessMana',
+  Warfever: 'aura.puBerserk',
 };
 export function localizeSimAuraName(name: string): string | null {
   const key = AURA_NAME_KEY[name];
@@ -6533,6 +6566,8 @@ const RULES: Rule[] = [
     re: /^Protect Yumi! Defend your familiar and hunt theirs\.$/,
     build: () => t('yumi.log.start'),
   },
+  { re: /^You are in the blue team!$/, build: () => t('yumi.log.teamBlue') },
+  { re: /^You are in the red team!$/, build: () => t('yumi.log.teamRed') },
   // Boss/mob mechanic broadcast. Broad (two open captures), so it MUST stay last -
   // after every more-specific "{X} {verb}!" rule above (awakens, enraged, calls for aid).
   {

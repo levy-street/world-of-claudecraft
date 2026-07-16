@@ -657,6 +657,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/props/weapon_stand.glb": "/media/models/props/weapon_stand.a781b465d38e.glb",
   "models/props/well.glb": "/media/models/props/well.9308ba09ea3b.glb",
   "models/props/yumi_brazier_stand.glb": "/media/models/props/yumi_brazier_stand.8a1f5e1ce91a.glb",
+  "models/props/yumi_powerup_box.glb": "/media/models/props/yumi_powerup_box.253e4d921e6f.glb",
   "models/props/yumi_torch_handle.glb": "/media/models/props/yumi_torch_handle.110183de1c8b.glb",
   "models/quest/bastion_ward_stone.glb": "/media/models/quest/bastion_ward_stone.6fb9a78a22bb.glb",
   "models/quest/gravecaller_sigil.glb": "/media/models/quest/gravecaller_sigil.38f76a48968a.glb",

@@ -310,6 +310,19 @@ export const ko_KR: EnTranslations = {
       "notInPartyError": "준비 확인을 시작하려면 파티에 속해 있어야 합니다.",
       "inProgressError": "준비 확인이 이미 진행 중입니다."
     },
+    "arena": {
+      "windowTitle": "전장",
+      "arenaIntro": "랭킹 콜로세움: 1대1이나 팀으로 겨루고, 승리해 순위를 오르며 레이팅을 올리세요.",
+      "yumiHeading": "Yumi 지키기",
+      "yumiIntro": "미로에서 벌어지는 팀 목표 모드로, 콜로세움 밖에 있습니다. 순위가 없으니 레이팅이 아닌 영광을 위해 즐기세요.",
+      "desc1v1": "1대1. 순수한 실력 승부, 의지할 동료가 없습니다.",
+      "desc2v2": "2대2. 파트너와 함께하거나 혼자 대기해 듀오로 매칭됩니다.",
+      "descFiesta": "증강과 파워업이 난무하는 시끌벅적한 2대2 난투.",
+      "descYumi3": "3대3. 아군 Yumi 고양이를 지키고 적팀의 고양이를 사냥하세요.",
+      "descYumi5": "5대5, 더 큰 미로에서 진행되며 고양이의 체력이 훨씬 많습니다.",
+      "yumiRules": "각 팀은 수동적인 Yumi 고양이를 지키고 적팀의 고양이를 사냥합니다. 두 고양이는 1분마다 미로의 새로운 구석으로 순간이동합니다. 쓰러진 전사는 {respawn}초 후 복귀합니다. 미스터리 파워업이 바닥에 나타나며, 상호작용을 잠시 누르고 있으면 획득합니다. 적 고양이를 먼저 파괴한 팀이 승리하고, {sudden}분에 서든데스로 교착을 끝냅니다.",
+      "queueCount": "대기열 {n}명"
+    },
     "death": {
       "resurrectAtCorpse": "시신에서 부활",
       "resurrectAtHealer": "영혼 치유사 (부활의 후유증)",
@@ -4573,7 +4586,10 @@ export const ko_KR: EnTranslations = {
       "partyTooBig5": "Protect Yumi 5대5는 최대 5인 파티까지 참가할 수 있습니다."
     },
     "log": {
-      "start": "Protect Yumi! 아군 소환수를 지키고 적의 소환수를 사냥하세요."
+      "start": "Protect Yumi! 아군 소환수를 지키고 적의 소환수를 사냥하세요.",
+      "teamBlue": "당신은 청팀입니다!",
+      "teamRed": "당신은 홍팀입니다!",
+      "powerupGrabbed": "{player}님이 {name} 파워업을 획득했습니다!"
     },
     "hud": {
       "title": "PROTECT YUMI",
@@ -4584,14 +4600,37 @@ export const ko_KR: EnTranslations = {
       "enemyYumi": "적군 Yumi",
       "aria": "아군 Yumi 생명력 {mine}/{max}, 적군 Yumi {theirs}.",
       "collapse": "Protect Yumi 게이지 접기",
-      "expand": "Protect Yumi 게이지 펼치기"
+      "expand": "Protect Yumi 게이지 펼치기",
+      "powerupIn": "파워업까지 {s}초",
+      "powerupReady": "파워업 준비 완료!",
+      "powerupActive": "{name}: {s}s remaining"
     },
     "respawn": {
       "title": "쓰러졌습니다!"
     },
     "banner": {
       "sudden": "서든 데스! Yumi가 더는 이동하지 않습니다!",
-      "teleport": "Yumi가 순간이동했습니다!"
+      "teleport": "Yumi가 순간이동했습니다!",
+      "powerupSpawn": "미스터리 파워업이 나타났습니다!",
+      "powerupMine": "{name}!"
+    },
+    "powerup": {
+      "invuln": {
+        "name": "무적"
+      },
+      "stealth": {
+        "name": "베일스텝"
+      },
+      "endless_mana": {
+        "name": "무한 마나"
+      },
+      "berserk": {
+        "name": "워피버"
+      }
+    },
+    "grab": {
+      "channeling": "획득 중… {s}초",
+      "aria": "미스터리 파워업 획득 중"
     },
     "end": {
       "win": "승리! Yumi를 지켜냈습니다!",

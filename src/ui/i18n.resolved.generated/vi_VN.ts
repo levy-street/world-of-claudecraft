@@ -310,6 +310,19 @@ export const vi_VN: EnTranslations = {
       "notInPartyError": "Bạn phải ở trong tổ đội để bắt đầu kiểm tra sẵn sàng.",
       "inProgressError": "Một lượt kiểm tra sẵn sàng đang diễn ra."
     },
+    "arena": {
+      "windowTitle": "Battlegrounds",
+      "arenaIntro": "The ranked coliseum: duel one-on-one or in a team, win to climb the ladder and raise your rating.",
+      "yumiHeading": "Protect Yumi",
+      "yumiIntro": "A team objective fought in the maze, outside the coliseum. Unranked, so play it for glory rather than rating.",
+      "desc1v1": "One versus one. Pure skill, no teammates to lean on.",
+      "desc2v2": "Two versus two. Bring a partner, or solo-queue and be paired into a duo.",
+      "descFiesta": "A rowdy two-versus-two free-for-all with augments and power-ups.",
+      "descYumi3": "Three versus three. Guard your Yumi cat and hunt the enemy team's.",
+      "descYumi5": "Five versus five in a larger maze, and your cat holds far more health.",
+      "yumiRules": "Each team guards a passive Yumi cat and hunts the enemy team's. Both cats blink to fresh corners of the maze every minute. A downed fighter returns after {respawn} seconds. Mystery power-ups appear on the floor: hold Interact for a moment to grab one. The first team to destroy the enemy cat wins, and at {sudden} minutes sudden death breaks any stalemate.",
+      "queueCount": "{n} in queue"
+    },
     "death": {
       "resurrectAtCorpse": "Hồi Sinh Tại Xác Chết",
       "resurrectAtHealer": "Người Canh Giữ Nhợt Nhạt (Cái Giá của Người Canh Giữ)",
@@ -4573,7 +4586,10 @@ export const vi_VN: EnTranslations = {
       "partyTooBig5": "Bảo Vệ Yumi 5 đấu 5 chỉ cho phép tổ đội tối đa năm người."
     },
     "log": {
-      "start": "Bảo Vệ Yumi! Bảo vệ linh thú của bạn và săn lùng linh thú của đối phương."
+      "start": "Bảo Vệ Yumi! Bảo vệ linh thú của bạn và săn lùng linh thú của đối phương.",
+      "teamBlue": "You are in the blue team!",
+      "teamRed": "You are in the red team!",
+      "powerupGrabbed": "{player} grabbed a {name} power-up!"
     },
     "hud": {
       "title": "BẢO VỆ YUMI",
@@ -4584,14 +4600,37 @@ export const vi_VN: EnTranslations = {
       "enemyYumi": "Yumi Địch",
       "aria": "Yumi của bạn còn {mine} trên {max} máu, Yumi địch còn {theirs}.",
       "collapse": "Thu gọn thanh Bảo Vệ Yumi",
-      "expand": "Mở rộng thanh Bảo Vệ Yumi"
+      "expand": "Mở rộng thanh Bảo Vệ Yumi",
+      "powerupIn": "Power-up in {s}s",
+      "powerupReady": "Power-up ready!",
+      "powerupActive": "{name}: {s}s remaining"
     },
     "respawn": {
       "title": "GỤC NGÃ!"
     },
     "banner": {
       "sudden": "ĐỘT TỬ! Các Yumi vẫn trụ vững!",
-      "teleport": "Các Yumi dịch chuyển tức thời!"
+      "teleport": "Các Yumi dịch chuyển tức thời!",
+      "powerupSpawn": "A mystery power-up appeared!",
+      "powerupMine": "{name}!"
+    },
+    "powerup": {
+      "invuln": {
+        "name": "Invulnerable"
+      },
+      "stealth": {
+        "name": "Veilstep"
+      },
+      "endless_mana": {
+        "name": "Endless Mana"
+      },
+      "berserk": {
+        "name": "Warfever"
+      }
+    },
+    "grab": {
+      "channeling": "Grabbing… {s}s",
+      "aria": "Grabbing the mystery power-up"
     },
     "end": {
       "win": "CHIẾN THẮNG! Yumi đã an toàn!",

@@ -139,6 +139,7 @@ import { buildWater, type WaterView } from './water';
 import { Weather } from './weather';
 import { buildWorldAmbientSources, crowdAmbienceAt, footstepSurfaceAt } from './world_audio';
 import { buildYumiMaze, type YumiMazeView } from './yumi_maze';
+import { YumiPowerupOrbs } from './yumi_powerup_orbs';
 import { YumiTeamMarkers } from './yumi_team_markers';
 
 // Festival gold/white celebration palette, shared by the Vale Cup full-time
@@ -972,8 +973,12 @@ export class Renderer {
   private shakeElapsed = 0;
   private fiestaRing: THREE.Mesh | null = null;
   private fiestaPowerupMeshes = new Map<number, THREE.Mesh>();
-  // Per-entity power-up glow: emits a coloured swirl around the carrier until it expires.
+  // Per-entity power-up glow: emits a coloured swirl around the carrier until it
+  // expires. Shared by the Fiesta ring power-ups and the Yumi mystery power-ups.
   private fiestaGlows = new Map<number, { color: number; until: number; nextSwirl: number }>();
+  // Protect Yumi mystery power-ups: the `(?)` orb pool + the shared glyph
+  // material live in their own visual module (yumi_powerup_orbs.ts).
+  private yumiOrbs = new YumiPowerupOrbs(this.scene);
 
   // Vale Cup: the Sowfield set piece, the staggered goal-firework volley queue,
   // and the boarball's dust pool (created lazily the first time the ball rolls).
@@ -3087,6 +3092,30 @@ export class Renderer {
         });
         if (ev.entityId === this.sim.playerId) this.addShake(0.5);
         break;
+      case 'yumiPowerup':
+        // Grabbed a mystery power-up: a big celebratory pop, then a lingering
+        // hue aura for the duration UNLESS it is Stealth (auraColor null: a glow
+        // would reveal the hidden player, so it shows none).
+        this.vfx.levelUpPillar(ev.entityId);
+        if (ev.auraColor !== null) {
+          this.vfx.nova(ev.entityId, 'arcane');
+          this.fiestaGlows.set(ev.entityId, {
+            color: ev.auraColor,
+            until: this.time + ev.duration,
+            nextSwirl: 0,
+          });
+        } else {
+          this.fiestaGlows.delete(ev.entityId); // stealth: drop any prior aura at once
+        }
+        if (ev.entityId === this.sim.playerId) this.addShake(0.5);
+        break;
+      case 'yumiPowerupSpawn': {
+        // A mystery power-up appeared: a sparkle burst where it dropped (the
+        // telegraphing `(?)` orb itself is the persistent cue; the HUD arms audio).
+        const sy = groundHeight(ev.x, ev.z, this.sim.cfg.seed);
+        this.vfx.burst(new THREE.Vector3(ev.x, sy + 1, ev.z), 'arcane', 22, 1.2);
+        break;
+      }
       case 'vcupGoal': {
         // Team-colored firework volley above the goal the ball went into (the
         // event's world anchor). Away palette when both sides fly one banner.
@@ -4955,6 +4984,17 @@ export class Renderer {
     this.vfx.update(dt);
     this.updateFiestaRing(dt);
     this.updateFiestaPowerups(dt);
+    {
+      // The mystery `(?)` orbs (yumi_powerup_orbs.ts): live views only during
+      // an active bout, an empty list otherwise so the pool drains + frees.
+      const ym = this.sim.arenaInfo?.match;
+      this.yumiOrbs.update(
+        ym?.yumi && ym.state === 'active' ? ym.yumi.groundPowerups : [],
+        this.time,
+        dt,
+        this.sim.cfg.seed,
+      );
+    }
     this.tickFiestaGlows(dt);
     for (const view of this.yumiMazeViews.values()) view.update(this.sim);
     this.yumiTeamMarkers.update(this.sim, this.views);

@@ -138,7 +138,7 @@ export function cleanseFriendlyNpcAuras(ctx: SimContext, e: Entity): void {
 
 export function updateAuras(ctx: SimContext, e: Entity): void {
   if (e.dead) {
-    e.stealthed = e.auras.some((a) => a.kind === 'stealth');
+    e.stealthed = e.auras.some((a) => a.kind === 'stealth' || a.kind === 'pu_stealth');
     return;
   }
   let statsDirty = false;
@@ -237,5 +237,5 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
     if (meta)
       recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   }
-  e.stealthed = e.auras.some((a) => a.kind === 'stealth');
+  e.stealthed = e.auras.some((a) => a.kind === 'stealth' || a.kind === 'pu_stealth');
 }

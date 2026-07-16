@@ -771,6 +771,7 @@ export interface FiestaPowerup {
 // per-match `rng` (fiesta's two-stream rule), never the shared sim stream.
 export interface YumiMatchState {
   teamSize: 3 | 5;
+  maxHp: number; // per-format objective pool (yumi3 7500, yumi5 12500); see yumiHpFor
   yumiA: number; // entity id of team A's cat
   yumiB: number;
   nextTeleportAt: number; // active-timer (s) of the next simultaneous teleport
@@ -781,7 +782,34 @@ export interface YumiMatchState {
   dmgToYumiA: number; // cumulative player damage dealt TO cat A (tiebreak)
   dmgToYumiB: number;
   lastStatusSecond: number; // last whole active-second a yumiStatus heartbeat went out
+  // Set by yumi_powerups.ts on any orb transition (spawn, ready, grab, timeout)
+  // to force an immediate out-of-band yumiStatus heartbeat: online the orbs ride
+  // the heartbeat (the arena wire is rate-limited far coarser than the 4s
+  // telegraph), so transitions must not wait for the next whole second.
+  statusDirty: boolean;
+  // Mystery power-ups (social/yumi_powerups.ts): the live orbs on the maze, a
+  // spawn-attempt countdown, and an id counter. Draws come from `rng` (the
+  // per-match stream), never the shared sim stream.
+  powerups: YumiGroundPowerup[];
+  nextPowerupId: number;
+  powerupTimer: number; // s until the next power-up spawn attempt
+  // In-progress hold-to-grab channels: pid -> the orb id being grabbed. The
+  // channel progress rides entity.yumiGrabRemaining (self-wire) for the bar.
+  grab: Map<number, number>;
   rng: Rng;
+}
+
+// A mystery power-up on the maze floor. `defId` is chosen at spawn but NEVER
+// leaves the sim (the client view omits it): every orb shows the same `(?)`
+// icon until it is grabbed. Telegraphs for YUMI_POWERUP_TELEGRAPH seconds
+// ('spawning'), then is grabbable ('ready') until it times out.
+export interface YumiGroundPowerup {
+  id: number;
+  defId: string;
+  x: number;
+  z: number;
+  state: 'spawning' | 'ready';
+  timer: number; // spawning: countdown to ready; ready: countdown to despawn
 }
 
 // A2: eloDelta (with ARENA_K_FACTOR) moved to social/arena.ts; re-exported from the
@@ -4666,7 +4694,9 @@ export class Sim {
     if (idx < 0) return;
     const name = e.auras[idx].name;
     e.auras.splice(idx, 1);
-    e.stealthed = false; // keep the cache live without waiting for updateAuras
+    // The Yumi Stealth mystery power-up (pu_stealth) keeps the carrier hidden
+    // through actions and hits, so only clear the cache if none remains.
+    e.stealthed = e.auras.some((a) => a.kind === 'pu_stealth');
     this.emit({ type: 'aura', targetId: e.id, name, gained: false });
   }
 
@@ -5282,7 +5312,7 @@ export class Sim {
   }
 
   // Step `e` one tick toward `dest`. With `ignoreObstacles`, the mover phases
-  // straight through props — used to free a stuck evader, and forced on for
+  // straight through props, used to free a stuck evader, and forced on for
   // templates flagged `phasesThroughObstacles` (mountain-sized world bosses
   // that must never wedge on a collider mid-chase). Returns true on arrival.
   private moveToward(e: Entity, dest: Vec3, speed: number, ignoreObstacles = false): boolean {
@@ -6340,6 +6370,16 @@ export class Sim {
     interaction.interact(this.ctx, pid);
   }
 
+  // Protect Yumi hold-to-grab intent (social/yumi_powerups.ts). Thin delegates so
+  // the IWorld surface + server dispatch resolve on the Sim facade unchanged.
+  yumiGrabStart(orbId: number, pid?: number): void {
+    interaction.yumiGrabStart(this.ctx, orbId, pid);
+  }
+
+  yumiGrabStop(pid?: number): void {
+    interaction.yumiGrabStop(this.ctx, pid);
+  }
+
   private isQuestInteractionEntity(e: Entity): boolean {
     if (e.kind === 'npc') return true;
     return e.kind === 'mob' && !e.hostile && !e.dead && e.questIds.length > 0;
@@ -7315,18 +7355,16 @@ export class Sim {
     const readoutFormat = format ?? '1v1';
     const standing = standings[readoutFormat];
     const playerCount = (q: ArenaQueueUnit[]) => q.reduce((n, u) => n + u.pids.length, 0);
-    const queueSize =
-      format === 'fiesta'
-        ? playerCount(this.arenaQueueFiesta)
-        : format === 'yumi3'
-          ? playerCount(this.arenaQueueYumi3)
-          : format === 'yumi5'
-            ? playerCount(this.arenaQueueYumi5)
-            : format === '2v2'
-              ? playerCount(this.arenaQueue2v2)
-              : format === '1v1'
-                ? this.arenaQueue1v1.length
-                : 0;
+    // Live player-count in every bracket's queue, so the window shows a per-bracket
+    // badge before you commit (1v1 is a flat pid list; the rest are premade units).
+    const queueCounts: Record<ArenaFormat, number> = {
+      '1v1': this.arenaQueue1v1.length,
+      '2v2': playerCount(this.arenaQueue2v2),
+      fiesta: playerCount(this.arenaQueueFiesta),
+      yumi3: playerCount(this.arenaQueueYumi3),
+      yumi5: playerCount(this.arenaQueueYumi5),
+    };
+    const queueSize = format ? queueCounts[format] : 0;
     return {
       rating: standing.rating,
       wins: standing.wins,
@@ -7335,6 +7373,7 @@ export class Sim {
       format,
       queued: queuedFmt !== null,
       queueSize,
+      queueCounts,
       match: matchInfo,
       ladder: ladders[readoutFormat],
       ladders,

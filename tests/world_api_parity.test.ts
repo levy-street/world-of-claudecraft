@@ -127,6 +127,8 @@ export const IWORLD_MEMBERS = [
   { name: 'pickUpObject', kind: 'method' },
   { name: 'townFocus', kind: 'data' },
   { name: 'setTownFocus', kind: 'method' },
+  { name: 'yumiGrabStart', kind: 'method' },
+  { name: 'yumiGrabStop', kind: 'method' },
   { name: 'acceptQuest', kind: 'method' },
   { name: 'turnInQuest', kind: 'method' },
   { name: 'reportTelemetry', kind: 'method' },
@@ -434,9 +436,9 @@ beforeAll(() => {
 
 describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => {
   it('pins total / data / method counts', () => {
-    expect(IWORLD_MEMBERS.length).toBe(233);
+    expect(IWORLD_MEMBERS.length).toBe(235);
     expect(DATA_MEMBERS.length).toBe(62);
-    expect(METHOD_MEMBERS.length).toBe(171);
+    expect(METHOD_MEMBERS.length).toBe(173);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -680,6 +682,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'vcupSetRole',
       'vendorBuyback',
       'xp',
+      'yumiGrabStart',
+      'yumiGrabStop',
     ]);
   });
 
@@ -923,6 +927,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'vcupQueueLeave',
       'vcupReady',
       'vcupSetRole',
+      'yumiGrabStart',
+      'yumiGrabStop',
     ]);
   });
 });
@@ -1025,6 +1031,8 @@ const FACET_INTERACTION = [
   'townFocus',
   'setTownFocus',
   'autoLoot',
+  'yumiGrabStart',
+  'yumiGrabStop',
 ] as const satisfies readonly (keyof IWorldInteraction)[];
 type _ExhaustInteraction = AssertNever<
   Exclude<keyof IWorldInteraction, (typeof FACET_INTERACTION)[number]>
@@ -1400,10 +1408,10 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the 27 fa
     expect(overlaps, `members filed in more than one facet:\n${overlaps.join('\n')}`).toEqual([]);
   });
 
-  it('the union of the 27 facets equals the pinned 233-member IWORLD_MEMBERS set', () => {
+  it('the union of the 27 facets equals the pinned 235-member IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(233);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(233);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(235);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(235);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

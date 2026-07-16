@@ -963,6 +963,9 @@ export const en = {
     },
     log: {
       start: 'Protect Yumi! Defend your familiar and hunt theirs.',
+      teamBlue: 'You are in the blue team!',
+      teamRed: 'You are in the red team!',
+      powerupGrabbed: '{player} grabbed a {name} power-up!',
     },
     hud: {
       title: 'PROTECT YUMI',
@@ -974,6 +977,9 @@ export const en = {
       aria: 'Your Yumi at {mine} of {max} health, enemy Yumi at {theirs}.',
       collapse: 'Collapse the Protect Yumi bars',
       expand: 'Expand the Protect Yumi bars',
+      powerupIn: 'Power-up in {s}s',
+      powerupReady: 'Power-up ready!',
+      powerupActive: '{name}: {s}s remaining',
     },
     respawn: {
       title: 'DOWNED!',
@@ -981,6 +987,22 @@ export const en = {
     banner: {
       sudden: 'SUDDEN DEATH! The Yumis hold their ground!',
       teleport: 'The Yumis teleport!',
+      powerupSpawn: 'A mystery power-up appeared!',
+      powerupMine: '{name}!',
+    },
+    // Mystery power-up names, revealed only on pickup (social/yumi_powerups.ts).
+    // Veilstep/Warfever are original coinages (the G0 de-IP gate denylists the
+    // verbatim classic names); keep them in sync with the sim auraName values.
+    powerup: {
+      invuln: { name: 'Invulnerable' },
+      stealth: { name: 'Veilstep' },
+      endless_mana: { name: 'Endless Mana' },
+      berserk: { name: 'Warfever' },
+    },
+    // The hold-to-grab channel bar (yumi_grab_bar_painter.ts).
+    grab: {
+      channeling: 'Grabbing… {s}s',
+      aria: 'Grabbing the mystery power-up',
     },
     end: {
       win: 'VICTORY! Yumi is safe!',

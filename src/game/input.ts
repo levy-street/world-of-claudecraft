@@ -188,6 +188,11 @@ export class Input {
   private controllerMoveInput: MoveInput | null = null;
   private controllerFacing: number | null = null;
   private emoteWheelHeldCodes = new Set<string>();
+  // Interact is an EDGE action (its code is never in `this.keys`), but Protect
+  // Yumi hold-to-grab needs to know if it is physically HELD. Track the held
+  // interact codes here (keyboard) plus a mobile-button flag (the Use button).
+  private interactHeldCodes = new Set<string>();
+  private mobileInteractHeld = false;
   // Physical key code -> action-bar slot currently held down, so key UP (or a
   // blur) releases the matching slot (drives the hold-to-charge shoot).
   private heldSlotCodes = new Map<string, number>();
@@ -435,6 +440,7 @@ export class Input {
     if (this.emoteWheelHeldCodes.size > 0) return;
     const hadHeldInput = this.keys.size > 0 || this.keyJumpUntil > 0;
     this.keys.clear();
+    this.interactHeldCodes.clear(); // drop any Yumi grab hold when input suspends
     this.keyJumpUntil = 0;
     // Suspending input drops any charging Vale Cup sport move (held Shoot etc.).
     this.releaseHeldSlots();
@@ -687,6 +693,10 @@ export class Input {
     // normally, so clearing keys here would cancel a walk the instant a camera
     // drag ends (every right/left-drag exits pointer lock on release).
     if (reason !== 'pointerlock') this.keys.clear();
+    if (reason !== 'pointerlock') {
+      this.interactHeldCodes.clear();
+      this.mobileInteractHeld = false;
+    }
     if (reason !== 'pointerlock' && this.emoteWheelHeldCodes.size > 0) {
       this.emoteWheelHeldCodes.clear();
       this.cb.onEmoteWheel(false);
@@ -800,6 +810,9 @@ export class Input {
         this.heldSlotCodes.set(e.code, slot);
         this.cb.onAbilityDown(slot);
       } else {
+        // Track the interact key as HELD for the Yumi grab channel; the edge
+        // dispatch (loot/interact-nearest) still fires on the press.
+        if (edge === 'interact') this.interactHeldCodes.add(e.code);
         this.dispatchEdge(edge);
       }
     }
@@ -807,6 +820,7 @@ export class Input {
 
   private onKeyUp(e: KeyboardEvent): void {
     if (this.keys.delete(e.code)) this.noteIntent('move');
+    this.interactHeldCodes.delete(e.code); // release the Yumi grab hold on key up
     if (this.emoteWheelHeldCodes.delete(e.code) && this.emoteWheelHeldCodes.size === 0) {
       this.cb.onEmoteWheel(false);
       e.preventDefault();
@@ -1069,6 +1083,18 @@ export class Input {
     return this.keybinds
       .codesForAction(id)
       .some((c) => this.keys.has(comboCode(c)) && !this.isAttackMoveReservedCode(c));
+  }
+
+  /** Whether Interact is currently HELD (keyboard or the mobile Use button); the
+   *  Protect Yumi hold-to-grab driver polls this each frame. */
+  isInteractHeld(): boolean {
+    return this.interactHeldCodes.size > 0 || this.mobileInteractHeld;
+  }
+
+  /** Mobile Use-button hold state (set from its pointerdown/up), OR-ed into the
+   *  interact-held read above so touch players can channel a grab. */
+  setMobileInteractHeld(held: boolean): void {
+    this.mobileInteractHeld = held;
   }
 
   readMoveInput(): MoveInput {

@@ -1004,6 +1004,8 @@ function blankEntity(id: number): Entity {
     targetId: null,
     autoAttack: false,
     swingTimer: 0,
+    yumiGrabRemaining: 0,
+    yumiGrabTotal: 0,
     inCombat: false,
     combatTimer: 99,
     auras: [],
@@ -1707,6 +1709,7 @@ export class ClientWorld implements IWorld {
         this.applyLockpickEvent(ev as SimEvent);
         this.applyCraftResultEvent(ev as SimEvent);
         this.applyChatFlairEvent(ev as SimEvent);
+        this.applyYumiStatusEvent(ev as SimEvent);
         this.eventQueue.push(ev as SimEvent);
       }
       return;
@@ -2091,6 +2094,8 @@ export class ClientWorld implements IWorld {
       e.targetId = s.target ?? null;
       e.autoAttack = !!s.auto;
       e.swingTimer = s.swing ?? e.swingTimer;
+      e.yumiGrabRemaining = s.ygr ?? 0;
+      e.yumiGrabTotal = s.ygt ?? 0;
       e.queuedOnSwing = s.queued ?? null;
       // A rolling deploy can pair this client with an older server whose stats
       // object predates WARFARE. Preserve numeric PvP fields instead of letting
@@ -2422,6 +2427,14 @@ export class ClientWorld implements IWorld {
   }
   pickUpObject(id: number): void {
     this.cmd({ cmd: 'pickup', id });
+  }
+  // Protect Yumi hold-to-grab intent (the server runs the 1.8s channel; progress
+  // rides player.yumiGrabRemaining on the self snapshot).
+  yumiGrabStart(orbId: number): void {
+    this.cmd({ cmd: 'yumi_grab_start', id: orbId });
+  }
+  yumiGrabStop(): void {
+    this.cmd({ cmd: 'yumi_grab_stop' });
   }
   acceptQuest(questId: string): void {
     if (!this.canSendCommand()) return;
@@ -3058,6 +3071,22 @@ export class ClientWorld implements IWorld {
   }
   collectDelveChestLoot(chestId: number): void {
     this.cmd({ cmd: 'collect_delve_chest_loot', objectId: chestId });
+  }
+  // Fold the yumiStatus heartbeat's mystery-orb fields into the mirrored
+  // arenaInfo. The `arena` snapshot field rides a rate-limited wire (~10s),
+  // far coarser than the 4s orb telegraph, so without this the renderer's
+  // `(?)` orbs and the hold-to-grab driver read positions up to 10s stale
+  // (phantom orbs after a grab, telegraphs that never show). The sim emits a
+  // beat every active second AND immediately on any orb transition, so this
+  // mirror stays fresh on both edges. Authoritative mirroring, not prediction
+  // (the same idea as the lockpick rebuild below); the scoreboard numbers are
+  // NOT folded because the HUD already caches those off the event itself.
+  private applyYumiStatusEvent(ev: SimEvent): void {
+    if (ev.type !== 'yumiStatus') return;
+    const yumi = this.arenaInfo?.match?.yumi;
+    if (!yumi) return;
+    yumi.groundPowerups = ev.groundPowerups;
+    yumi.nextPowerupIn = ev.nextPowerupIn;
   }
   // Mirror the authoritative craftResult event into lastCraftResult (#1127).
   // The event still flows to the HUD (drainEvents) for a toast/log line.

@@ -1,5 +1,7 @@
 // Protect Yumi! content: the team objective cat familiar. Data-as-code,
-// merged into MOBS by data.ts. The cat is a passive 5000 hp objective: it
+// merged into MOBS by data.ts. The cat is a passive objective (hpBase is the
+// template default; the live cat's hp is set per-format by yumiHpFor in
+// startYumiMatch: 7500 for 3v3, 12500 for 5v5). It
 // never attacks or moves on its own (social/yumi.ts teleports it around the
 // maze), its AI is inert (mob/locomotion.ts early-bails on the template id),
 // and only the opposing team may strike it while its own team may heal and
@@ -15,8 +17,8 @@ export const YUMI_MOBS: Record<string, MobTemplate> = {
     minLevel: 1,
     maxLevel: 60,
     family: 'beast',
-    hpPerLevel: 0, // 5000 flat regardless of level or format
-    hpBase: 5000,
+    hpPerLevel: 0, // flat pool; startYumiMatch overrides maxHp per-format (yumiHpFor)
+    hpBase: 7500,
     dmgBase: 0,
     dmgPerLevel: 0,
     attackSpeed: 2,

@@ -14,4 +14,10 @@ export interface IWorldInteraction {
   // malformed, over the point budget) server-side; the previous allocation is
   // kept and a toast is shown.
   setTownFocus(allocation: Record<string, number>): void;
+  // Protect Yumi hold-to-grab: start channeling the mystery orb `orbId` (Interact
+  // pressed/held next to a ready orb), or stop the channel (Interact released or
+  // no longer eligible). The 1.8s channel resolves server-authoritatively; the
+  // grab bar reads player.yumiGrabRemaining.
+  yumiGrabStart(orbId: number): void;
+  yumiGrabStop(): void;
 }

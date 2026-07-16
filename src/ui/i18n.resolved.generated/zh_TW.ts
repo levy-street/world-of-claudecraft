@@ -310,6 +310,19 @@ export const zh_TW: EnTranslations = {
       "notInPartyError": "你必須加入隊伍才能發起就緒確認。",
       "inProgressError": "就緒確認已在進行中。"
     },
+    "arena": {
+      "windowTitle": "戰場",
+      "arenaIntro": "排名競技場：單挑或組隊對決，獲勝可攀升排行榜並提升評分。",
+      "yumiHeading": "保護Yumi",
+      "yumiIntro": "在迷宮中進行的團隊目標模式，不屬於競技場。無排名，為榮耀而戰而非評分。",
+      "desc1v1": "一對一。純粹技巧，沒有隊友可依靠。",
+      "desc2v2": "二對二。帶上搭檔，或單人排隊被配成一對。",
+      "descFiesta": "喧鬧的二對二混戰，帶有強化和道具。",
+      "descYumi3": "三對三。守護你的Yumi貓，獵殺敵隊的。",
+      "descYumi5": "五對五，迷宮更大，你的貓擁有更多生命值。",
+      "yumiRules": "每隊守護一隻被動的Yumi貓，並獵殺敵隊的。兩隻貓每分鐘都會閃現到迷宮的新角落。陣亡的戰士{respawn}秒後重生。神祕強化會出現在地面上：按住互動鍵片刻即可拾取。率先摧毀敵方貓的隊伍獲勝；{sudden}分鐘時進入突然死亡，打破僵局。",
+      "queueCount": "排隊中 {n} 人"
+    },
     "death": {
       "resurrectAtCorpse": "在屍體旁復活",
       "resurrectAtHealer": "靈魂醫者（復活虛弱）",
@@ -4573,7 +4586,10 @@ export const zh_TW: EnTranslations = {
       "partyTooBig5": "Protect Yumi 5v5最多允許五人隊伍。"
     },
     "log": {
-      "start": "Protect Yumi！保衛你的使魔，獵殺敵方的使魔。"
+      "start": "Protect Yumi！保衛你的使魔，獵殺敵方的使魔。",
+      "teamBlue": "你在藍隊！",
+      "teamRed": "你在紅隊！",
+      "powerupGrabbed": "{player} 獲得了 {name} 強化！"
     },
     "hud": {
       "title": "守護YUMI",
@@ -4584,14 +4600,37 @@ export const zh_TW: EnTranslations = {
       "enemyYumi": "敵方Yumi",
       "aria": "我方Yumi生命值{mine}/{max}，敵方Yumi生命值{theirs}。",
       "collapse": "摺疊Protect Yumi血條",
-      "expand": "展開Protect Yumi血條"
+      "expand": "展開Protect Yumi血條",
+      "powerupIn": "強化 {s}秒後出現",
+      "powerupReady": "強化已就緒！",
+      "powerupActive": "{name}: {s}s remaining"
     },
     "respawn": {
       "title": "倒下了！"
     },
     "banner": {
       "sudden": "驟死戰！Yumi不再傳送！",
-      "teleport": "Yumi傳送了！"
+      "teleport": "Yumi傳送了！",
+      "powerupSpawn": "神祕強化出現了！",
+      "powerupMine": "{name}!"
+    },
+    "powerup": {
+      "invuln": {
+        "name": "無敵"
+      },
+      "stealth": {
+        "name": "帷影步"
+      },
+      "endless_mana": {
+        "name": "無盡法力"
+      },
+      "berserk": {
+        "name": "戰爭狂熱"
+      }
+    },
+    "grab": {
+      "channeling": "拾取中… {s}秒",
+      "aria": "正在拾取神祕強化"
     },
     "end": {
       "win": "勝利！Yumi安全了！",

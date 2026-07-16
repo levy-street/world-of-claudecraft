@@ -81,6 +81,8 @@ function baseEntity(id: number, pos: Vec3): Entity {
     targetId: null,
     autoAttack: false,
     swingTimer: 0,
+    yumiGrabRemaining: 0,
+    yumiGrabTotal: 0,
     inCombat: false,
     combatTimer: 99,
     auras: [],

@@ -250,6 +250,8 @@ export const COMMAND_NAMES = [
   'harvestCorpse',
   'lootRoll',
   'pickup',
+  'yumi_grab_start',
+  'yumi_grab_stop',
   'accept',
   'turnin',
   'abandon',

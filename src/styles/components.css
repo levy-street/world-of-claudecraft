@@ -6416,6 +6416,78 @@
     font-size: 11px;
     margin-left: 4px;
   }
+  /* Two titled sections: the ranked coliseum, then Protect Yumi (a separate mode,
+     tinted cool to read as NOT a coliseum bracket). */
+  .arena-group {
+    margin: 8px 0 4px;
+    padding: 8px 10px;
+    border: 1px solid #4a3c18;
+    border-radius: 7px;
+    background: linear-gradient(#1a140880, #0d0a0480);
+  }
+  .arena-group-yumi {
+    border-color: #3a4a66;
+    background: linear-gradient(#0f142280, #0a0d1480);
+  }
+  .arena-group-head {
+    font-family: var(--title-font);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--color-primary);
+  }
+  .arena-group-yumi .arena-group-head {
+    color: #7fb0ff;
+  }
+  .arena-group-intro {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    margin: 2px 0 4px;
+    line-height: 1.35;
+  }
+  .arena-group .arena-brackets {
+    margin: 4px 0 0;
+  }
+  /* Live "N in queue" pill on each bracket tab. */
+  .arena-qcount {
+    display: inline-block;
+    margin-left: 5px;
+    padding: 0 5px;
+    font-size: 10px;
+    font-weight: 700;
+    color: #0d0a04;
+    background: #ffb24a;
+    border-radius: 8px;
+    vertical-align: middle;
+  }
+  .arena-group-yumi .arena-qcount {
+    background: #7fb0ff;
+  }
+  .arena-rules {
+    margin: 8px 0 2px;
+    padding: 7px 9px;
+    font-size: 11px;
+    line-height: 1.45;
+    color: #cdd6e6;
+    background: rgba(20, 28, 48, 0.5);
+    border-left: 3px solid #3a4a66;
+    border-radius: 4px;
+  }
+  .arena-selected {
+    margin-top: 8px;
+  }
+  .arena-selected-name {
+    font-family: var(--title-font);
+    font-size: 13px;
+    font-weight: 700;
+    color: #ffb24a;
+  }
+  .arena-bracket-desc {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    margin: 2px 0 6px;
+    line-height: 1.35;
+  }
   .arena-party {
     margin: 6px 0 4px;
     padding: 8px 10px;
@@ -9688,6 +9760,63 @@
     font-size: 11px;
     color: #cfc9bb;
   }
+  /* Mystery power-up availability line: subtle by default, a brighter gold once
+     an orb is on the maze ('ready'). Readable but never shouty. */
+  .yh-powerup {
+    font-size: 11px;
+    font-weight: 700;
+    color: #d9c48a;
+    font-variant-numeric: tabular-nums;
+  }
+  .yh-powerup.ready {
+    color: #ffe27a;
+  }
+  .yh-powerup.active {
+    color: #ffb36b;
+  }
+  /* Hold-to-grab bar (yumi_grab_bar_painter.ts): a cast-style timer centred in
+     the mid-lower screen, clear of the bottom control cluster + action bar on
+     desktop and mobile. Painter toggles display:flex; hidden by default. */
+  .yumi-grab-bar {
+    position: fixed;
+    left: 50%;
+    bottom: 34%;
+    transform: translateX(-50%);
+    width: min(300px, 70vw);
+    max-width: 92vw;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 12px;
+    background: rgba(20, 16, 10, 0.74);
+    border: 1px solid #5a4a2a;
+    border-radius: 9px;
+    pointer-events: none;
+    z-index: 40;
+  }
+  .ygb-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #ffe27a;
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  }
+  .ygb-track {
+    width: 100%;
+    height: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  .ygb-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #ffcf4a, #ffe9a0);
+    border-radius: 5px;
+    transition: width 60ms linear;
+  }
   /* Collapse toggle: the one interactive element on the strip (the root is
      pointer-events none). CSS chevron, no glyph text; 40px touch floor on
      coarse pointers; steady token-colored focus ring. */
@@ -9728,7 +9857,8 @@
   }
   .yumi-hud.collapsed .yh-side,
   .yumi-hud.collapsed .yh-timer,
-  .yumi-hud.collapsed .yh-sub {
+  .yumi-hud.collapsed .yh-sub,
+  .yumi-hud.collapsed .yh-powerup {
     display: none;
   }
   .yumi-respawn {

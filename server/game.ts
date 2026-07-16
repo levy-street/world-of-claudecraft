@@ -3803,6 +3803,12 @@ export class GameServer {
       case 'interact':
         sim.interact(pid);
         break;
+      case 'yumi_grab_start':
+        if (typeof msg.id === 'number') sim.yumiGrabStart(msg.id, pid);
+        break;
+      case 'yumi_grab_stop':
+        sim.yumiGrabStop(pid);
+        break;
       case 'loot':
         if (typeof msg.id === 'number') sim.lootCorpse(msg.id, pid);
         break;
@@ -5021,6 +5027,10 @@ export class GameServer {
       gcd: round2(p.gcdRemaining),
       pcd: round2(p.potionCdRemaining),
       swing: round2(p.swingTimer),
+      // Protect Yumi hold-to-grab channel progress (0 unless mid-grab); drives
+      // the local grab bar, alongside the swing timer.
+      ygr: round2(p.yumiGrabRemaining),
+      ygt: round2(p.yumiGrabTotal),
       combo: p.comboPoints,
       target: p.targetId,
       auto: p.autoAttack,

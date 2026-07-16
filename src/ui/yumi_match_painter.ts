@@ -25,6 +25,7 @@ interface YumiHudEls {
   title: HTMLElement;
   timer: HTMLElement;
   sub: HTMLElement;
+  powerup: HTMLElement;
   toggle: HTMLElement;
   mineSide: HTMLElement;
   mineName: HTMLElement;
@@ -50,6 +51,7 @@ export class YumiMatchPainter {
     teleportIn: 0,
     suddenDeathIn: 0,
     suddenDeath: false,
+    nextPowerupIn: 0,
   };
   private respawnLeft = 0;
   private lastNow = -1;
@@ -72,6 +74,7 @@ export class YumiMatchPainter {
     teleportIn: number;
     suddenDeathIn: number;
     suddenDeath: boolean;
+    nextPowerupIn: number;
   }): void {
     this.live.seen = true;
     this.live.myHp = ev.myHp;
@@ -81,6 +84,7 @@ export class YumiMatchPainter {
     this.live.teleportIn = ev.teleportIn;
     this.live.suddenDeathIn = ev.suddenDeathIn;
     this.live.suddenDeath = ev.suddenDeath;
+    this.live.nextPowerupIn = ev.nextPowerupIn;
   }
 
   /** Seed my bench countdown from the yumiDown event. */
@@ -95,7 +99,7 @@ export class YumiMatchPainter {
     this.respawnLeft = 0;
   }
 
-  update(info: ArenaInfo | null): void {
+  update(info: ArenaInfo | null, activePowerupName = '', activePowerupRemaining = 0): void {
     // UI-clock countdown for the bench overlay (presentation only; the sim's
     // own timer revives the entity, this just animates toward it).
     const now = performance.now();
@@ -104,7 +108,13 @@ export class YumiMatchPainter {
     }
     this.lastNow = now;
 
-    const m = yumiMatchView(info, this.live, this.respawnLeft);
+    const m = yumiMatchView(
+      info,
+      this.live,
+      this.respawnLeft,
+      activePowerupName,
+      activePowerupRemaining,
+    );
     if (!m.active) {
       if (this.els) {
         this.w.setDisplay(this.els.root, 'none');
@@ -147,6 +157,27 @@ export class YumiMatchPainter {
     this.w.setText(els.sub, sub);
     // Teleports freeze in sudden death: the line would count nothing down.
     this.w.setDisplay(els.sub, m.suddenDeath ? 'none' : 'block');
+    // Mystery power-up availability: a subtle countdown to the next spawn, or a
+    // "ready" call once an orb is on the maze. Only in normal active play (spawns
+    // freeze in sudden death, and none exist during the countdown).
+    const hasActivePowerup = m.activePowerupRemaining > 0;
+    const showPowerup = hasActivePowerup || (m.phase === 'active' && !m.suddenDeath);
+    this.w.setDisplay(els.powerup, showPowerup ? 'block' : 'none');
+    if (showPowerup) {
+      this.w.setText(
+        els.powerup,
+        hasActivePowerup
+          ? t('yumi.hud.powerupActive', {
+              name: m.activePowerupName,
+              s: num(Math.ceil(m.activePowerupRemaining)),
+            })
+          : m.nextPowerupIn > 0
+            ? t('yumi.hud.powerupIn', { s: num(m.nextPowerupIn) })
+            : t('yumi.hud.powerupReady'),
+      );
+      this.w.toggleClass(els.powerup, 'ready', !hasActivePowerup && m.nextPowerupIn === 0);
+      this.w.toggleClass(els.powerup, 'active', hasActivePowerup);
+    }
     this.w.setText(els.mineName, t('yumi.hud.yourYumi'));
     this.w.setText(els.theirsName, t('yumi.hud.enemyYumi'));
     // Team identity: my bar wears MY team's color (matching the spawn-plaza
@@ -210,7 +241,9 @@ export class YumiMatchPainter {
     timer.className = 'yh-timer';
     const sub = document.createElement('div');
     sub.className = 'yh-sub';
-    mid.append(title, timer, sub);
+    const powerup = document.createElement('div');
+    powerup.className = 'yh-powerup';
+    mid.append(title, timer, sub, powerup);
     const theirs = side('theirs');
     // The collapse toggle folds the strip to the title chip (a user choice;
     // aria-label/expanded flow through the elided writers in paint()). The
@@ -240,6 +273,7 @@ export class YumiMatchPainter {
       title,
       timer,
       sub,
+      powerup,
       toggle,
       mineSide: mine.el,
       mineName: mine.name,

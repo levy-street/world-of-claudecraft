@@ -138,6 +138,7 @@ describe('activePvpOpponentIds', () => {
       arenaInfo: {
         queued: false,
         queueSize: 0,
+        queueCounts: { '1v1': 0, '2v2': 0, fiesta: 0, yumi3: 0, yumi5: 0 },
         rating: 1500,
         wins: 0,
         losses: 0,
@@ -183,6 +184,7 @@ describe('activePvpOpponentIds', () => {
     const base = {
       queued: false,
       queueSize: 0,
+      queueCounts: { '1v1': 0, '2v2': 0, fiesta: 0, yumi3: 0, yumi5: 0 },
       rating: 1500,
       wins: 0,
       losses: 0,
@@ -217,6 +219,8 @@ describe('activePvpOpponentIds', () => {
       damageTakenMult: 1,
       down: false,
       respawnIn: 0,
+      nextPowerupIn: 0,
+      groundPowerups: [],
       yumiA: yumiView(900),
       yumiB: yumiView(901),
       teamA: [],
@@ -247,6 +251,7 @@ describe('activePvpOpponentIds', () => {
       arenaInfo: {
         queued: false,
         queueSize: 0,
+        queueCounts: { '1v1': 0, '2v2': 0, fiesta: 0, yumi3: 0, yumi5: 0 },
         rating: 1500,
         wins: 0,
         losses: 0,

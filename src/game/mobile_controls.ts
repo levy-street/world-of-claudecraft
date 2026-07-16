@@ -116,7 +116,8 @@ export interface MobileControlCallbacks {
   onCycleTarget(): void;
   onJump(): void;
   onInteract(): void;
-  /** Open the composer focused (raise the keyboard): the keybind / whisper path. */
+  /** Use button HELD state (pointerdown/up), drives the Protect Yumi grab channel. */
+  onInteractHold(held: boolean): void;
   onChat(): void;
   /** Open the centered read view: composer bar visible but NOT focused (no keyboard). */
   onChatOpen(): void;
@@ -467,6 +468,7 @@ export class MobileControls {
     this.bindButton('mobile-target-cycle', () => this.callbacks.onCycleTarget());
     this.bindButton('mobile-jump', () => this.callbacks.onJump(), { pressFirst: true });
     this.bindButton('mobile-interact', () => this.callbacks.onInteract());
+    this.bindInteractHold('mobile-interact'); // hold to channel a Protect Yumi grab
     this.bindChatButton('mobile-chat');
     this.bindButton('mobile-menu', () => this.callbacks.onMenu());
     this.bindButton('mobile-social', () => this.callbacks.onSocial());
@@ -560,6 +562,21 @@ export class MobileControls {
       // Arm the idle-fade once for this activation (idempotent via ??=).
       this.chromeFade ??= startChromeFade(document.body);
     }
+  }
+
+  // Track the Use button as HELD (separate from its tap binding) so a touch
+  // player can channel a Protect Yumi grab by holding it. Tap still interacts.
+  private bindInteractHold(id: string): void {
+    const button = document.getElementById(id);
+    if (!button) return;
+    const up = () => this.callbacks.onInteractHold(false);
+    button.addEventListener('pointerdown', () => {
+      if (this.active) this.callbacks.onInteractHold(true);
+    });
+    button.addEventListener('pointerup', up);
+    button.addEventListener('pointercancel', up);
+    button.addEventListener('pointerleave', up);
+    button.addEventListener('lostpointercapture', up);
   }
 
   private bindButton(id: string, cb: () => void, opts: { pressFirst?: boolean } = {}): void {

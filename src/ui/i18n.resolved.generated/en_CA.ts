@@ -310,6 +310,19 @@ export const en_CA: EnTranslations = {
       "notInPartyError": "You must be in a party to start a ready check.",
       "inProgressError": "A ready check is already in progress."
     },
+    "arena": {
+      "windowTitle": "Battlegrounds",
+      "arenaIntro": "The ranked coliseum: duel one-on-one or in a team, win to climb the ladder and raise your rating.",
+      "yumiHeading": "Protect Yumi",
+      "yumiIntro": "A team objective fought in the maze, outside the coliseum. Unranked, so play it for glory rather than rating.",
+      "desc1v1": "One versus one. Pure skill, no teammates to lean on.",
+      "desc2v2": "Two versus two. Bring a partner, or solo-queue and be paired into a duo.",
+      "descFiesta": "A rowdy two-versus-two free-for-all with augments and power-ups.",
+      "descYumi3": "Three versus three. Guard your Yumi cat and hunt the enemy team's.",
+      "descYumi5": "Five versus five in a larger maze, and your cat holds far more health.",
+      "yumiRules": "Each team guards a passive Yumi cat and hunts the enemy team's. Both cats blink to fresh corners of the maze every minute. A downed fighter returns after {respawn} seconds. Mystery power-ups appear on the floor: hold Interact for a moment to grab one. The first team to destroy the enemy cat wins, and at {sudden} minutes sudden death breaks any stalemate.",
+      "queueCount": "{n} in queue"
+    },
     "death": {
       "resurrectAtCorpse": "Resurrect at Corpse",
       "resurrectAtHealer": "The Pale Keeper (Keeper's Toll)",
@@ -4573,7 +4586,10 @@ export const en_CA: EnTranslations = {
       "partyTooBig5": "Protect Yumi 5v5 allows a party of up to five."
     },
     "log": {
-      "start": "Protect Yumi! Defend your familiar and hunt theirs."
+      "start": "Protect Yumi! Defend your familiar and hunt theirs.",
+      "teamBlue": "You are in the blue team!",
+      "teamRed": "You are in the red team!",
+      "powerupGrabbed": "{player} grabbed a {name} power-up!"
     },
     "hud": {
       "title": "PROTECT YUMI",
@@ -4584,14 +4600,37 @@ export const en_CA: EnTranslations = {
       "enemyYumi": "Enemy Yumi",
       "aria": "Your Yumi at {mine} of {max} health, enemy Yumi at {theirs}.",
       "collapse": "Collapse the Protect Yumi bars",
-      "expand": "Expand the Protect Yumi bars"
+      "expand": "Expand the Protect Yumi bars",
+      "powerupIn": "Power-up in {s}s",
+      "powerupReady": "Power-up ready!",
+      "powerupActive": "{name}: {s}s remaining"
     },
     "respawn": {
       "title": "DOWNED!"
     },
     "banner": {
       "sudden": "SUDDEN DEATH! The Yumis hold their ground!",
-      "teleport": "The Yumis teleport!"
+      "teleport": "The Yumis teleport!",
+      "powerupSpawn": "A mystery power-up appeared!",
+      "powerupMine": "{name}!"
+    },
+    "powerup": {
+      "invuln": {
+        "name": "Invulnerable"
+      },
+      "stealth": {
+        "name": "Veilstep"
+      },
+      "endless_mana": {
+        "name": "Endless Mana"
+      },
+      "berserk": {
+        "name": "Warfever"
+      }
+    },
+    "grab": {
+      "channeling": "Grabbing… {s}s",
+      "aria": "Grabbing the mystery power-up"
     },
     "end": {
       "win": "VICTORY! Yumi is safe!",

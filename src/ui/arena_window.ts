@@ -17,6 +17,7 @@
 // skipping the DOM rebuild when the content signature is unchanged.
 
 import { audio } from '../game/audio';
+import { YUMI_RESPAWN_SECONDS, YUMI_SUDDEN_AT } from '../sim/social/yumi';
 import type { PlayerClass } from '../sim/types';
 import type { ArenaFormat, IWorld } from '../world_api';
 import {
@@ -210,23 +211,54 @@ export class ArenaWindow {
 
   private offlineHtml(): string {
     return (
-      `<div class="panel-title"><span id="arena-title">${esc(t('hud.arena.title'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.arena.close'))}">${svgIcon('close')}</button></div>` +
+      `<div class="panel-title"><span id="arena-title">${esc(t('hudChrome.arena.windowTitle'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.arena.close'))}">${svgIcon('close')}</button></div>` +
       `<div class="arena-note">${esc(t('hud.arena.offlineNote'))}</div>`
     );
   }
 
   private liveHtml(view: Extract<ArenaView, { kind: 'live' }>): string {
-    const bracketTag = `<span class="arena-bracket-tag${view.bracket === 'fiesta' ? ' fiesta' : ''}">${esc(this.bracketLabel(view.bracket))}</span>`;
-    const title = `<div class="panel-title"><span id="arena-title">${esc(t('hud.arena.title'))} ${bracketTag}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.arena.close'))}">${svgIcon('close')}</button></div>`;
-    const bracketTabs = `<div class="arena-brackets">${view.brackets.map((b) => this.bracketBtn(b)).join('')}</div>`;
-    const rank =
-      `<div class="arena-rank"><span class="rating">${esc(formatNumber(view.standing.rating, { maximumFractionDigits: 0 }))}</span>` +
-      `<span class="wl">${esc(
-        t('hud.arena.ratingSummary', {
-          wins: formatNumber(view.standing.wins, { maximumFractionDigits: 0 }),
-          losses: formatNumber(view.standing.losses, { maximumFractionDigits: 0 }),
-        }),
-      )}</span></div>`;
+    const title = `<div class="panel-title"><span id="arena-title">${esc(t('hudChrome.arena.windowTitle'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.arena.close'))}">${svgIcon('close')}</button></div>`;
+
+    // Two titled groups: the ranked coliseum, then Protect Yumi (NOT a coliseum
+    // bracket) with its own heading, intro, and rules.
+    const arenaTabs = view.brackets.filter((b) => b.group === 'arena');
+    const yumiTabs = view.brackets.filter((b) => b.group === 'yumi');
+    const arenaGroup = this.groupHtml(
+      'arena',
+      t('hud.arena.title'),
+      t('hudChrome.arena.arenaIntro'),
+      arenaTabs,
+      '',
+    );
+    // The rules prose interpolates the LIVE sim tuning constants so the copy
+    // can never drift from the numbers the mode actually runs.
+    const rules = `<div class="arena-rules">${esc(
+      t('hudChrome.arena.yumiRules', {
+        respawn: formatNumber(YUMI_RESPAWN_SECONDS, { maximumFractionDigits: 0 }),
+        sudden: formatNumber(YUMI_SUDDEN_AT / 60, { maximumFractionDigits: 0 }),
+      }),
+    )}</div>`;
+    const yumiGroup = this.groupHtml(
+      'yumi',
+      t('hudChrome.arena.yumiHeading'),
+      t('hudChrome.arena.yumiIntro'),
+      yumiTabs,
+      rules,
+    );
+
+    // The selected bracket drives one shared block below both groups: its name +
+    // description, then the queue action. Rating + ladders are ranked-coliseum
+    // only (Protect Yumi is unranked), so they show for the arena group only.
+    const isArena = view.bracketGroup === 'arena';
+    const rank = isArena
+      ? `<div class="arena-rank"><span class="rating">${esc(formatNumber(view.standing.rating, { maximumFractionDigits: 0 }))}</span>` +
+        `<span class="wl">${esc(
+          t('hud.arena.ratingSummary', {
+            wins: formatNumber(view.standing.wins, { maximumFractionDigits: 0 }),
+            losses: formatNumber(view.standing.losses, { maximumFractionDigits: 0 }),
+          }),
+        )}</span></div>`
+      : '';
     const practice = view.practice
       ? `<button class="btn fiesta-practice" data-act="practice">${esc(t('fiesta.practice'))}</button>` +
         `<div class="arena-note">${esc(t('fiesta.practiceNote'))}</div>`
@@ -235,22 +267,67 @@ export class ArenaWindow {
       view.allTime && view.allTime.length > 0
         ? `<div class="arena-sub">${esc(t('hud.arena.ladderAllTime'))}</div>${this.allTimeHtml(view.allTime)}`
         : '';
-    return (
-      title +
-      bracketTabs +
+    const ladders = isArena
+      ? `<div class="arena-sub">${esc(t('hud.arena.ladderOnline'))}</div>` +
+        this.ladderHtml(view.ladder) +
+        allTimeSection
+      : '';
+    const selected =
+      `<div class="arena-selected">` +
+      `<div class="arena-selected-name">${esc(this.bracketLabel(view.bracket))}</div>` +
+      this.bracketDesc(view.bracket) +
       rank +
       this.partyHtml(view.party) +
       this.actionHtml(view.action, view.bracket) +
       practice +
-      `<div class="arena-sub">${esc(t('hud.arena.ladderOnline'))}</div>` +
-      this.ladderHtml(view.ladder) +
-      allTimeSection
-    );
+      ladders +
+      `</div>`;
+    return title + arenaGroup + yumiGroup + selected;
   }
 
   private bracketBtn(b: ArenaBracketTab): string {
     const fiestaCls = b.fmt === 'fiesta' ? ' fiesta' : '';
-    return `<button class="arena-bracket${fiestaCls}${b.active ? ' active' : ''}${b.locked ? ' locked' : ''}" data-bracket="${b.fmt}" aria-pressed="${b.active ? 'true' : 'false'}"${b.locked ? ' disabled' : ''}>${esc(this.bracketLabel(b.fmt))}</button>`;
+    const count = formatNumber(b.queueCount, { maximumFractionDigits: 0 });
+    // Live "N in queue" badge (hidden at 0 so an empty bracket is not noisy).
+    const badge =
+      b.queueCount > 0
+        ? `<span class="arena-qcount" aria-label="${esc(t('hudChrome.arena.queueCount', { n: count }))}">${esc(count)}</span>`
+        : '';
+    return `<button class="arena-bracket${fiestaCls}${b.active ? ' active' : ''}${b.locked ? ' locked' : ''}" data-bracket="${b.fmt}" aria-pressed="${b.active ? 'true' : 'false'}"${b.locked ? ' disabled' : ''}>${esc(this.bracketLabel(b.fmt))}${badge}</button>`;
+  }
+
+  // A titled group of bracket tabs (Arena vs Protect Yumi), with its intro line
+  // and optional trailing content (the Yumi rules block).
+  private groupHtml(
+    group: 'arena' | 'yumi',
+    heading: string,
+    intro: string,
+    tabs: ArenaBracketTab[],
+    extra: string,
+  ): string {
+    return (
+      `<div class="arena-group arena-group-${group}">` +
+      `<div class="arena-group-head">${esc(heading)}</div>` +
+      `<div class="arena-group-intro">${esc(intro)}</div>` +
+      `<div class="arena-brackets">${tabs.map((b) => this.bracketBtn(b)).join('')}</div>` +
+      extra +
+      `</div>`
+    );
+  }
+
+  // The one-line description for the resolved bracket, shown above the queue action.
+  private bracketDesc(fmt: ArenaFormat): string {
+    const key =
+      fmt === '1v1'
+        ? 'hudChrome.arena.desc1v1'
+        : fmt === '2v2'
+          ? 'hudChrome.arena.desc2v2'
+          : fmt === 'fiesta'
+            ? 'hudChrome.arena.descFiesta'
+            : fmt === 'yumi3'
+              ? 'hudChrome.arena.descYumi3'
+              : 'hudChrome.arena.descYumi5';
+    return `<div class="arena-bracket-desc">${esc(t(key))}</div>`;
   }
 
   private partyHtml(section: ArenaPartySection): string {

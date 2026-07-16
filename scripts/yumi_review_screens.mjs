@@ -1,0 +1,201 @@
+// Screenshot pack for the Protect Yumi PR: the play window (Arena + Protect
+// Yumi sections) and, on the feature branch, the in-match extras (the `(?)`
+// mystery orb and the hold-to-grab bar). DEVICE=mobile applies the phone
+// viewport and mobile HUD class after the offline world has booted, so the
+// mobile Use control and layout are present in the evidence shot.
+// Offline world, no server needed beyond `npm run dev`.
+//
+//   GAME_URL=http://localhost:5173 SHOT_PREFIX=after SHOTS=all DEVICE=mobile \
+//     node scripts/yumi_review_screens.mjs
+//
+// SHOTS=window captures only the play window (for a base checkout that
+// predates the match extras). PNGs land in tmp/ (gitignored); the keepers are
+// copied into docs/screenshots by hand.
+
+import fs from 'node:fs';
+import puppeteer from 'puppeteer-core';
+import { BROWSER_PATH } from './browser_path.mjs';
+
+const URL = process.env.GAME_URL ?? 'http://localhost:5173';
+const PREFIX = process.env.SHOT_PREFIX ?? 'after';
+const SHOTS = process.env.SHOTS ?? 'all';
+const MOBILE = process.env.DEVICE === 'mobile';
+const DESKTOP_VIEWPORT = { width: 1280, height: 820, deviceScaleFactor: 1 };
+const MOBILE_VIEWPORT = { width: 844, height: 390, deviceScaleFactor: 1 };
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const waitForPage = async (page, fn, timeout, label) => {
+  const deadline = Date.now() + timeout;
+  while (Date.now() < deadline) {
+    // page.evaluate runs in the page's main world, where the dev-only __game
+    // hook lives. Puppeteer's waitForFunction uses an isolated world in newer
+    // releases and therefore cannot see that hook.
+    if (await page.evaluate(fn)) return;
+    await sleep(300);
+  }
+  throw new Error(`Timed out waiting for ${label}`);
+};
+fs.mkdirSync('tmp', { recursive: true });
+
+const shot = (name) => `tmp/${PREFIX}-${name}.png`;
+
+const browser = await puppeteer.launch({
+  executablePath: BROWSER_PATH,
+  headless: 'new',
+  protocolTimeout: 60000,
+  // Anti-throttle so the offline rAF loop keeps ticking headless.
+  args: [
+    `--window-size=${DESKTOP_VIEWPORT.width},${DESKTOP_VIEWPORT.height}`,
+    '--use-angle=swiftshader',
+    '--enable-unsafe-swiftshader',
+    '--disable-background-timer-throttling',
+    '--disable-renderer-backgrounding',
+    '--disable-backgrounding-occluded-windows',
+  ],
+  defaultViewport: DESKTOP_VIEWPORT,
+});
+const page = await browser.newPage();
+page.on('pageerror', (e) => console.error(`PAGEERROR: ${e.message}`));
+
+await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
+await page.waitForSelector('#server-select-trigger');
+await page.click('#server-select-trigger');
+await page.click('#server-opt-offline');
+await page.click('#btn-play');
+await page.waitForSelector('#offline-select:not([hidden])');
+await page.click('#offline-select .mini-class[data-class="warrior"]');
+await page.type('#char-name', 'Yumishots');
+await sleep(300);
+await page.evaluate(() => document.querySelector('#btn-start-offline')?.click());
+await waitForPage(page, () => !!window.__game?.sim?.player, 60000, 'offline game');
+// The world is up once the loading screen fades (a cold vite cache can hold it
+// for a while).
+await page.waitForFunction(
+  () => {
+    const ls = document.getElementById('loading-screen');
+    return ls && !ls.classList.contains('visible');
+  },
+  { timeout: 120000, polling: 500 },
+);
+// A fresh headless profile has never seen the spawn cinematic, which hides the
+// whole #ui layer while its village flyover runs: Escape is the skip gesture.
+await sleep(600);
+await page.keyboard.press('Escape');
+await page.waitForFunction(
+  () => {
+    const ui = document.getElementById('ui');
+    return ui && getComputedStyle(ui).display !== 'none';
+  },
+  { timeout: 15000, polling: 300 },
+);
+await sleep(2000); // let the HUD + first-frame renders settle
+// Dismiss the first-run onboarding coach so its card does not overlap the shot.
+await page.evaluate(() => {
+  document.querySelector('.tut-skip')?.click();
+});
+await sleep(500);
+// v0.27 adds a mouse-camera first-run prompt. The screenshot is about the play
+// window / Yumi HUD, so accept its default Classic choice before framing.
+await page.evaluate(() => document.querySelector('.camera-prompt-confirm')?.click());
+await sleep(300);
+if (MOBILE) {
+  await page.setViewport(MOBILE_VIEWPORT);
+  await page.evaluate(() => document.body.classList.add('mobile-touch'));
+  await sleep(900);
+}
+
+// ---- The play window (Arena + Protect Yumi sections) ----------------------
+await page.evaluate(() => {
+  window.__game.hud.toggleArena();
+});
+await sleep(900);
+const device = MOBILE ? 'mobile' : 'desktop';
+await page.screenshot({ path: shot(`play-window-${device}`) });
+console.log(`wrote ${shot(`play-window-${device}`)}`);
+await sleep(400);
+await page.evaluate(() => {
+  window.__game.hud.toggleArena(); // close it again
+});
+
+if (SHOTS === 'all') {
+  // ---- In-match: the `(?)` orb + the hold-to-grab bar ----------------------
+  await page.evaluate(() => {
+    const sim = window.__game.sim;
+    sim.setPlayerLevel(20);
+    const classes = ['warrior', 'mage', 'rogue', 'hunter', 'druid'];
+    const pids = [sim.playerId, ...classes.map((c, i) => sim.addPlayer(c, `Bot${i}`))];
+    for (const pid of pids) sim.arenaQueueJoin(pid, 'yumi3');
+  });
+  await waitForPage(
+    page,
+    () => {
+      const sim = window.__game.sim;
+      const m = sim.arenaMatchFor(sim.playerId);
+      return !!m && m.state === 'active';
+    },
+    30000,
+    'active Yumi match',
+  );
+  await sleep(2500); // maze interior + HUD strip
+
+  // Spawn an orb now, park it READY right in front of the player, and face it.
+  await page.evaluate(() => {
+    const sim = window.__game.sim;
+    const m = sim.arenaMatchFor(sim.playerId);
+    m.yumi.powerupTimer = 0.05;
+  });
+  await waitForPage(
+    page,
+    () => {
+      const sim = window.__game.sim;
+      const m = sim.arenaMatchFor(sim.playerId);
+      return m && m.yumi.powerups.length > 0;
+    },
+    10000,
+    'Yumi power-up spawn',
+  );
+  await page.evaluate(() => {
+    const g = window.__game;
+    const sim = g.sim;
+    const p = sim.player;
+    const m = sim.arenaMatchFor(sim.playerId);
+    const orb = m.yumi.powerups[0];
+    orb.state = 'ready';
+    orb.timer = 20;
+    // Clear the stage: shove the other fighters out of frame, and move the
+    // scene into the maze's open 3x3 CENTER PLAZA so the shot has air around
+    // it instead of a shell wall looming behind (real spawns always sit on
+    // corridor cell centers, ~3yd clear of every wall; the plaza just frames
+    // that honestly). Offline sim state is local and mutable, so this is a
+    // legitimate staging trick.
+    for (const pid of [...m.teamA, ...m.teamB]) {
+      if (pid === sim.playerId) continue;
+      const f = sim.entities.get(pid);
+      if (f) {
+        f.pos.x += 18;
+        f.prevPos = { ...f.pos };
+      }
+    }
+    const ox = 8400; // maze band x (mirror of yumiMazeOrigin)
+    const oz = -1250 + m.slot * 200;
+    p.pos.x = ox + 1.2;
+    p.pos.z = oz + 4;
+    p.prevPos = { ...p.pos };
+    sim.rebucket(p);
+    orb.x = ox - 0.4;
+    orb.z = oz;
+    // Aim NEAR the box, not AT it: a dead-on bearing centers the box exactly
+    // behind the player model, so offset the yaw to split the silhouettes.
+    p.facing = Math.atan2(orb.x - p.pos.x, orb.z - p.pos.z);
+    if (g.input) g.input.camYaw = p.facing - 0.55;
+    // A stable mid-channel grab bar: the bar paints off the entity fields, and
+    // nothing decrements them unless a real channel is in the grab map.
+    p.yumiGrabRemaining = 0.9;
+    p.yumiGrabTotal = 1.8;
+  });
+  await sleep(1200);
+  await page.screenshot({ path: shot(`yumi-orb-grab-${device}`) });
+  console.log(`wrote ${shot(`yumi-orb-grab-${device}`)}`);
+}
+
+await browser.close();
+console.log('done');

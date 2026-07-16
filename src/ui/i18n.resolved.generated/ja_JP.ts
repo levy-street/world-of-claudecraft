@@ -310,6 +310,19 @@ export const ja_JP: EnTranslations = {
       "notInPartyError": "準備確認を開始するにはパーティーに参加している必要があります。",
       "inProgressError": "準備確認はすでに進行中です。"
     },
+    "arena": {
+      "windowTitle": "バトルグラウンド",
+      "arenaIntro": "ランク制コロシアム。1対1やチームで対戦し、勝ってランキングを駆け上がりレートを上げよう。",
+      "yumiHeading": "Yumiを守れ",
+      "yumiIntro": "迷宮で戦うチーム目標モード。コロシアムの外にあり、レート無し。名誉のために戦おう。",
+      "desc1v1": "1対1。純粋な実力勝負、頼れる仲間はいない。",
+      "desc2v2": "2対2。相棒を連れてくるか、ソロで並んでペアを組もう。",
+      "descFiesta": "オーグメントとパワーアップが飛び交う賑やかな2対2の乱戦。",
+      "descYumi3": "3対3。自分のYumi猫を守り、敵チームの猫を狙え。",
+      "descYumi5": "5対5。より大きな迷宮で、猫の体力も大幅に増える。",
+      "yumiRules": "各チームは受け身のYumi猫を守り、敵チームの猫を狙う。両方の猫は1分ごとに迷宮の新しい隅へ瞬間移動する。倒れた戦士は{respawn}秒後に復帰する。ミステリーパワーアップが床に出現し、インタラクトを少し長押しで入手できる。先に敵の猫を倒したチームが勝利し、{sudden}分でサドンデスとなり膠着を打破する。",
+      "queueCount": "待機中 {n} 人"
+    },
     "death": {
       "resurrectAtCorpse": "亡骸で復活",
       "resurrectAtHealer": "霊魂の癒し手（復活の後遺症）",
@@ -4573,7 +4586,10 @@ export const ja_JP: EnTranslations = {
       "partyTooBig5": "Protect Yumi 5v5のパーティは最大5人までです。"
     },
     "log": {
-      "start": "Protect Yumi！自分の使い魔を守り、敵の使い魔を狙え。"
+      "start": "Protect Yumi！自分の使い魔を守り、敵の使い魔を狙え。",
+      "teamBlue": "あなたは青チームです！",
+      "teamRed": "あなたは赤チームです！",
+      "powerupGrabbed": "{player} が {name} パワーアップを獲得！"
     },
     "hud": {
       "title": "PROTECT YUMI",
@@ -4584,14 +4600,37 @@ export const ja_JP: EnTranslations = {
       "enemyYumi": "敵軍のYumi",
       "aria": "自軍のYumiは体力{mine}/{max}、敵軍のYumiは{theirs}。",
       "collapse": "Protect Yumiのバーを折りたたむ",
-      "expand": "Protect Yumiのバーを展開する"
+      "expand": "Protect Yumiのバーを展開する",
+      "powerupIn": "パワーアップまで {s}秒",
+      "powerupReady": "パワーアップ出現！",
+      "powerupActive": "{name}: {s}s remaining"
     },
     "respawn": {
       "title": "ダウン！"
     },
     "banner": {
       "sudden": "サドンデス！Yumiはもう転移しない！",
-      "teleport": "Yumiが転移した！"
+      "teleport": "Yumiが転移した！",
+      "powerupSpawn": "ミステリーパワーアップが出現！",
+      "powerupMine": "{name}!"
+    },
+    "powerup": {
+      "invuln": {
+        "name": "無敵"
+      },
+      "stealth": {
+        "name": "ヴェイルステップ"
+      },
+      "endless_mana": {
+        "name": "無限マナ"
+      },
+      "berserk": {
+        "name": "ウォーフィーバー"
+      }
+    },
+    "grab": {
+      "channeling": "取得中… {s}秒",
+      "aria": "ミステリーパワーアップを取得中"
     },
     "end": {
       "win": "勝利！Yumiは無事だ！",

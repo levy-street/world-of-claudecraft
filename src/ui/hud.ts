@@ -427,6 +427,7 @@ import { stackedWindowsVisible } from './window_stack_state_core';
 import { installWorldDropTarget } from './world_drop_target';
 import { formatXp, xpBarView } from './xp_bar';
 import { XpBarPainter } from './xp_bar_painter';
+import { YumiGrabBarPainter } from './yumi_grab_bar_painter';
 import { YumiMatchPainter } from './yumi_match_painter';
 
 let lpAdvancedLast = -1;
@@ -2949,6 +2950,11 @@ export class Hud {
   // yumiStatus/yumiDown events fed in handleEvents. Runs on the mediumHud
   // band next to the fiesta HUD (values change at 1Hz).
   private readonly yumiPainter = new YumiMatchPainter(this.writerFacet, () =>
+    document.getElementById('ui'),
+  );
+  // The Protect Yumi hold-to-grab bar (yumi_grab_bar_painter.ts): a cast-style
+  // timer shown while the local player channels a mystery-orb pickup.
+  private readonly yumiGrabBarPainter = new YumiGrabBarPainter(this.writerFacet, () =>
     document.getElementById('ui'),
   );
   // Per-frame XP + swing painters. Each caches its element refs once and
@@ -6747,7 +6753,13 @@ export class Hud {
       this.updateTradeWindow();
       this.updateArenaStatus();
       this.updateFiestaHud();
-      this.yumiPainter.update(this.sim.arenaInfo);
+      const yumiPowerup = p.auras.find((a) => a.kind.startsWith('pu_'));
+      this.yumiPainter.update(
+        this.sim.arenaInfo,
+        yumiPowerup ? auraDisplayNameFromSource(yumiPowerup.name) : '',
+        yumiPowerup?.remaining ?? 0,
+      );
+      this.yumiGrabBarPainter.update(this.sim);
       // Vale Cup surfaces (mediumHud like the arena/fiesta ones): the indicator
       // button, the in-match strip, and the open window redraw.
       this.vcupIndicator.update(buildVcupIndicatorView(this.sim.cupInfo, atSowfield));
@@ -8584,6 +8596,31 @@ export class Hud {
             audio.fiestaWave();
           }
           break;
+        case 'yumiPowerupSpawn':
+          // A mystery power-up appeared: banner + audio cue (the world burst +
+          // telegraphing `(?)` orb are the renderer's arm). Personal per fighter.
+          if (ev.pid === sim.playerId) {
+            this.showBanner(t('yumi.banner.powerupSpawn'));
+            this.combatLog(t('yumi.banner.powerupSpawn'), '#ffd24a');
+            audio.fiestaWave();
+          }
+          break;
+        case 'yumiPowerup': {
+          // A fighter grabbed a mystery power-up: log for all, big cue for me.
+          // The effect name is finally revealed here (localized by defId).
+          const puName = tOptional(`yumi.powerup.${ev.defId}.name`);
+          // The sim emits only catalogued ids. Ignore a malformed wire event instead
+          // of leaking an internal id into player-visible text.
+          if (!puName) break;
+          const puWho = sim.entities.get(ev.entityId)?.name ?? '?';
+          this.log(t('yumi.log.powerupGrabbed', { player: puWho, name: puName }), '#ffd24a');
+          if (ev.entityId === sim.playerId) {
+            audio.fiestaAugment();
+            this.showBanner(t('yumi.banner.powerupMine', { name: puName }));
+            this.fiestaWordPop(puName.toUpperCase(), '#ffd24a', 2);
+          }
+          break;
+        }
         case 'yumiTeleport': {
           if (ev.pid !== sim.playerId) break;
           // Two events per relocation (one per cat); cue once, on my team's cat.

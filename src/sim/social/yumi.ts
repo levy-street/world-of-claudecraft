@@ -1,8 +1,8 @@
 // Protect Yumi!: the 3v3/5v5 maze objective mode (formats 'yumi3'/'yumi5').
-// Each team guards a passive 5000 hp cat familiar in the fixed competitive
+// Each team guards a passive 7500 hp cat familiar in the fixed competitive
 // maze (src/sim/yumi_maze_layout.ts, its own far-east instance band); every 60
 // seconds BOTH cats teleport simultaneously to new maze cells; the first team
-// to destroy the enemy cat wins. Downed players bench for a flat 10 seconds
+// to destroy the enemy cat wins. Downed players bench for a flat 15 seconds
 // (fiesta's bench primitive, never the ranked permanent elimination). At 600
 // seconds sudden death latches: teleports freeze, cats take an escalating
 // damage-taken multiplier plus a growing neutral bleed, and a simultaneous
@@ -32,11 +32,35 @@ import { DT, type Entity, TICK_RATE } from '../types';
 import { teleportPoints, YUMI_TELEPORT_MIN_SEP, yumiMazeLayout } from '../yumi_maze_layout';
 import * as arenaMod from './arena';
 import { fiestaDownEntity } from './fiesta';
+import {
+  stopYumiGrab,
+  updateYumiPowerups,
+  YUMI_POWERUP_FIRST,
+  yumiNextPowerupIn,
+  yumiPowerupViews,
+} from './yumi_powerups';
 
-export const YUMI_HP = 5000;
+// Mode-based objective pool: 3v3 keeps 7500, 5v5 is 12500. Resolve it with
+// yumiHpFor(format) and store it on match.yumi.maxHp, never hardcode it inline.
+//
+// TUNING (a bespoke minigame, so these are pacing targets, not classic-era
+// formulas): the cat HP was raised from the original 5000 so a coordinated team
+// cannot burst the objective before the defenders can rotate back and heal it
+// (own-team healing of the cat is allowed), which keeps a bout in the 3-to-8
+// minute band we want before the 10:00 sudden-death floor. 5v5 scales the pool
+// up by the team-size ratio (7500 * 5/3 ~= 12500) so a larger team's extra DPS
+// does not shorten the fight. These are feel targets from playtesting the mode,
+// not derived numbers; adjust them here (they thread everywhere via yumiHpFor).
+export const YUMI_HP_3V3 = 7500;
+export const YUMI_HP_5V5 = 12500;
+// Back-compat alias (the 3v3 value); prefer yumiHpFor / match.yumi.maxHp.
+export const YUMI_HP = YUMI_HP_3V3;
 export const YUMI_COUNTDOWN = 5; // pre-fight gate, like the ranked arena
 export const YUMI_TELEPORT_EVERY = 60; // s between simultaneous relocations
-export const YUMI_RESPAWN_SECONDS = 10; // flat player bench timer
+// Bench timer raised from 10s to 15s so a takedown buys real objective pressure
+// (long enough for the attackers to commit to the enemy cat) without benching a
+// fighter so long the 3v3 side feels permanently a player down. A pacing target.
+export const YUMI_RESPAWN_SECONDS = 15; // flat player bench timer
 export const YUMI_SUDDEN_AT = 600; // s of active play before sudden death
 export const YUMI_SUDDEN_STEP = 15; // s per escalation step
 export const YUMI_SUDDEN_RAMP = 0.25; // +25% cat damage taken per step
@@ -47,6 +71,12 @@ export type YumiFormat = 'yumi3' | 'yumi5';
 
 export function yumiTeamSize(fmt: YumiFormat): 3 | 5 {
   return fmt === 'yumi3' ? 3 : 5;
+}
+
+// The objective HP pool for a format: 3v3 keeps 7500, 5v5 is 12500. The single
+// source of truth for cat max-hp everywhere (spawn, snapshot, sudden-death bleed).
+export function yumiHpFor(fmt: YumiFormat): number {
+  return fmt === 'yumi5' ? YUMI_HP_5V5 : YUMI_HP_3V3;
 }
 
 export function isYumiCat(e: Entity): boolean {
@@ -206,6 +236,7 @@ export function startYumiMatch(
     ),
   );
   const template = MOBS[YUMI_TEMPLATE_ID];
+  const maxHp = yumiHpFor(format); // mode-based pool: 3v3 7500, 5v5 12500
   const spawnCat = (start: { x: number; z: number }): Entity => {
     const cat = createMob(
       ctx.nextId++,
@@ -214,8 +245,8 @@ export function startYumiMatch(
       ctx.groundPos(origin.x + start.x, origin.z + start.z),
     );
     cat.hostile = false; // team hostility comes from yumiCatHostileTo, never the flag
-    cat.maxHp = YUMI_HP;
-    cat.hp = YUMI_HP;
+    cat.maxHp = maxHp;
+    cat.hp = maxHp;
     ctx.addEntity(cat);
     return cat;
   };
@@ -237,6 +268,7 @@ export function startYumiMatch(
     defeated: new Set(),
     yumi: {
       teamSize: yumiTeamSize(format),
+      maxHp,
       yumiA: catA.id,
       yumiB: catB.id,
       nextTeleportAt: YUMI_TELEPORT_EVERY,
@@ -247,9 +279,16 @@ export function startYumiMatch(
       dmgToYumiA: 0,
       dmgToYumiB: 0,
       lastStatusSecond: -1,
+      statusDirty: false,
+      // Mystery power-ups: first attempt YUMI_POWERUP_FIRST seconds into the
+      // bout, then on the interval (social/yumi_powerups.ts).
+      powerups: [],
+      nextPowerupId: 1,
+      powerupTimer: YUMI_POWERUP_FIRST,
+      grab: new Map(),
       // Per-match deterministic stream (the fiesta two-stream rule; seeded
-      // off the sim clock + this match's own id): teleport picks + the
-      // tiebreak coin never touch the shared draw order.
+      // off the sim clock + this match's own id): teleport picks, the tiebreak
+      // coin, and power-up spawns never touch the shared draw order.
       rng: new Rng((ctx.tickCount * 2654435761 + matchId * 40503) >>> 0),
     },
   };
@@ -266,6 +305,15 @@ export function startYumiMatch(
       type: 'log',
       text: 'Protect Yumi! Defend your familiar and hunt theirs.',
       color: '#7fd7ff',
+      pid: mPid,
+    });
+    // Team identity, rendered in that team's color (team A is blue, team B is
+    // red, matching the overhead arrows in render/yumi_team_markers.ts).
+    const onTeamA = teamA.includes(mPid);
+    ctx.emit({
+      type: 'log',
+      text: onTeamA ? 'You are in the blue team!' : 'You are in the red team!',
+      color: onTeamA ? '#2f6fe0' : '#d8342c',
       pid: mPid,
     });
   }
@@ -366,8 +414,11 @@ export function updateYumiActive(ctx: SimContext, match: ArenaMatch): void {
     pulseSuddenDeathBleed(ctx, match);
     if (match.state !== 'active') return;
   }
-  // Flat 10s respawn countdowns (fiesta's loop shape). A missing entity keeps
-  // its bench entry; a reconnected one restarts at the normal timer.
+  // Mystery power-ups: spawn/telegraph/pickup on the maze (social/yumi_powerups.ts).
+  updateYumiPowerups(ctx, match);
+  // Flat YUMI_RESPAWN_SECONDS respawn countdowns (fiesta's loop shape). A
+  // missing entity keeps its bench entry; a reconnected one restarts at the
+  // normal timer.
   for (const [pid, t] of [...y.respawn]) {
     const e = ctx.entities.get(pid);
     if (!e) continue;
@@ -379,10 +430,14 @@ export function updateYumiActive(ctx: SimContext, match: ArenaMatch): void {
     if (nt <= 0) yumiRevive(ctx, match, e);
     else y.respawn.set(pid, nt);
   }
-  // Once-per-second scoreboard heartbeat on whole-second edges (never per tick).
+  // Once-per-second scoreboard heartbeat on whole-second edges (never per
+  // tick), plus an immediate out-of-band beat whenever an orb transitioned
+  // this tick (statusDirty): the heartbeat is what carries the orbs online,
+  // and a 4s telegraph cannot wait for the next whole second.
   const sec = Math.floor(match.timer);
-  if (sec !== y.lastStatusSecond) {
+  if (sec !== y.lastStatusSecond || y.statusDirty) {
     y.lastStatusSecond = sec;
+    y.statusDirty = false;
     emitYumiStatus(ctx, match);
   }
 }
@@ -393,6 +448,23 @@ function killYumiCat(ctx: SimContext, match: ArenaMatch, cat: Entity, killer: En
   ctx.emit({ type: 'death', entityId: cat.id, killerId: killer?.id ?? -1 });
   const catTeam = match.yumi!.yumiA === cat.id ? 'A' : 'B';
   ctx.endArenaMatch(match, catTeam === 'A' ? 'B' : 'A', 'defeat');
+  // The bout is decided: retire any live orb and in-flight grab NOW and send
+  // one final heartbeat, so the ONLINE mirror drops the orb for the 5s
+  // aftermath too (offline arenaInfoFor reports [] the instant the match
+  // leaves 'active', but updateYumiActive no longer runs, so without this
+  // beat the last mirrored orb lingered, inert, until teardown). The beat
+  // doubles as the final scoreboard: the fallen cat reads 0. This is the one
+  // funnel for every aftermath-visible ending (defeat and the sudden-death
+  // bleed); a forfeit returns everyone immediately with no aftermath.
+  const y = match.yumi!;
+  for (const pid of [...y.grab.keys()]) {
+    const e = ctx.entities.get(pid);
+    if (e) stopYumiGrab(match, e);
+    else y.grab.delete(pid);
+  }
+  y.powerups = [];
+  y.statusDirty = false;
+  emitYumiStatus(ctx, match);
 }
 
 function bleedCat(ctx: SimContext, match: ArenaMatch, cat: Entity, dmg: number): void {
@@ -413,7 +485,7 @@ function bleedCat(ctx: SimContext, match: ArenaMatch, cat: Entity, dmg: number):
 
 function pulseSuddenDeathBleed(ctx: SimContext, match: ArenaMatch): void {
   const y = match.yumi!;
-  const dmg = Math.ceil(YUMI_HP * YUMI_SUDDEN_BLEED_PCT * suddenStep(match.timer));
+  const dmg = Math.ceil(y.maxHp * YUMI_SUDDEN_BLEED_PCT * suddenStep(match.timer));
   const catA = ctx.entities.get(y.yumiA);
   const catB = ctx.entities.get(y.yumiB);
   const hpA = catA && !catA.dead ? catA.hp : 0;
@@ -540,20 +612,27 @@ function emitYumiStatus(ctx: SimContext, match: ArenaMatch): void {
   const teleportIn = y.suddenDeath ? 0 : Math.max(0, Math.ceil(y.nextTeleportAt - match.timer));
   const suddenDeathIn = y.suddenDeath ? 0 : Math.max(0, Math.ceil(YUMI_SUDDEN_AT - match.timer));
   const mult = yumiTakenMult(match.timer);
+  const nextPowerupIn = yumiNextPowerupIn(match);
+  // One shared view array per beat (nobody mutates event payloads); this is
+  // what keeps the `(?)` orbs fresh online, where the arena wire that also
+  // carries them is rate-limited far coarser than the telegraph.
+  const groundPowerups = yumiPowerupViews(match);
   for (const mPid of ctx.arenaAllPids(match)) {
     const team = ctx.arenaTeamOf(match, mPid);
     if (!team) continue;
     ctx.emit({
       type: 'yumiStatus',
       myHp: team === 'A' ? hpA : hpB,
-      myMax: YUMI_HP,
+      myMax: y.maxHp,
       enemyHp: team === 'A' ? hpB : hpA,
-      enemyMax: YUMI_HP,
+      enemyMax: y.maxHp,
       teleportIn,
       suddenDeathIn,
       suddenDeath: y.suddenDeath,
       mult,
       team,
+      nextPowerupIn,
+      groundPowerups,
       pid: mPid,
     });
   }
@@ -573,7 +652,7 @@ export function yumiMatchInfo(ctx: SimContext, match: ArenaMatch, pid: number, m
     return {
       entityId: catId,
       hp: alive ? cat.hp : 0,
-      maxHp: YUMI_HP,
+      maxHp: y.maxHp,
       x: cat?.pos.x ?? 0,
       z: cat?.pos.z ?? 0,
       alive,
@@ -617,6 +696,10 @@ export function yumiMatchInfo(ctx: SimContext, match: ArenaMatch, pid: number, m
     // than a non-finite number that would not survive JSON.
     respawnIn:
       myRespawn === undefined || myRespawn === Infinity ? 0 : Math.max(0, Math.ceil(myRespawn)),
+    // Mystery power-ups: the countdown to the next spawn (0 while an orb is out)
+    // and the live orbs, TYPE-FREE so every one renders as a `(?)`.
+    nextPowerupIn: active ? yumiNextPowerupIn(match) : 0,
+    groundPowerups: active ? yumiPowerupViews(match) : [],
     yumiA: catView(y.yumiA),
     yumiB: catView(y.yumiB),
     teamA: scoreboard(match.teamA),
@@ -631,4 +714,14 @@ export function cleanupYumiMatch(ctx: SimContext, match: ArenaMatch): void {
   ctx.yumiCatMatches.delete(y.yumiB);
   if (ctx.entities.get(y.yumiA)) ctx.dropEntity(y.yumiA);
   if (ctx.entities.get(y.yumiB)) ctx.dropEntity(y.yumiB);
+  // Clear any grab channel left mid-flight when the bout ended (the match state
+  // is gone, but the progress rides the entity, so zero the bar on every fighter).
+  for (const pid of ctx.arenaAllPids(match)) {
+    const e = ctx.entities.get(pid);
+    if (e) {
+      e.yumiGrabRemaining = 0;
+      e.yumiGrabTotal = 0;
+    }
+  }
+  y.grab.clear();
 }

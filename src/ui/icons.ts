@@ -2750,6 +2750,13 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   aura_cost_tax: r('shadow', 'shadowPurple', ['gem', { p: 'droplet', ...BR }], ['drips']),
   aura_heal_absorb: r('shadow', 'shadowPurple', ['heart'], ['drips']),
   aura_form_bear: r('earth', 'earthBrown', ['paw']),
+  // Protect Yumi mystery power-ups. These are aura-kind identities rather
+  // than castable abilities, so they need explicit recipes instead of falling
+  // through to the generic hashed icon.
+  aura_pu_invuln: r('holy', 'holyGold', ['shield'], ['glow', 'sparkle']),
+  aura_pu_stealth: r('shadow', 'shadowPurple', ['eye'], ['motion']),
+  aura_pu_endless_mana: r('arcane', 'arcanePink', ['gem', { p: 'droplet', ...BR }], ['glow']),
+  aura_pu_berserk: r('fury', 'blood', ['fist', { p: 'claw_slash', ...BR }], ['glow']),
 };
 
 // Crests: class / mob-family / status glyphs, painted with the same primitive

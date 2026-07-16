@@ -295,7 +295,18 @@ export type AuraKind =
   | 'buff_int_pct'
   | 'buff_sta_pct'
   | 'buff_armor_pct'
-  | 'buff_ap_pct';
+  | 'buff_ap_pct'
+  // Protect Yumi mystery power-ups (social/yumi_powerups.ts), each a flat 15s
+  // temporary advantage. `pu_invuln`: dealDamage no-ops on the carrier.
+  // `pu_stealth`: drives the `stealthed` cache but survives breakStealth (stays
+  // hidden through actions, unlike rogue stealth). `pu_endless_mana`: free casts
+  // for the duration (reuses the next_cast_free plumbing, never consumed).
+  // `pu_berserk`: value = outgoing damage multiplier; dealDamage also amplifies
+  // incoming damage on the carrier (YUMI_BERSERK_TAKEN_MULT).
+  | 'pu_invuln'
+  | 'pu_stealth'
+  | 'pu_endless_mana'
+  | 'pu_berserk';
 
 export interface Aura {
   id: string; // ability id that applied it
@@ -861,7 +872,7 @@ export interface MobTemplate {
   // Fixed respawn delay in seconds, overriding respawnSeconds*respawnMult; also
   // caps corpse decay so the mob returns on schedule. (Training dummy: 10s.)
   respawnSeconds?: number;
-  // Training dummy: a stationary practice target — attackable (so it counts for
+  // Training dummy: a stationary practice target, attackable (so it counts for
   // damage and the combat meters) but never moves, aggros, or retaliates; drops
   // combat and heals to full a few seconds after the last hit. Guarded in
   // enterCombat (sim.ts) and updateMob (mob/locomotion.ts).
@@ -1943,6 +1954,12 @@ export interface Entity {
   targetId: number | null;
   autoAttack: boolean;
   swingTimer: number;
+  // Protect Yumi hold-to-grab channel (social/yumi_powerups.ts): seconds left in
+  // the 1.8s pickup channel (0 = not grabbing) and the full duration for the bar
+  // fraction. Transient combat state like swingTimer; wired on the self snapshot
+  // so the grab bar reads it, never persisted.
+  yumiGrabRemaining: number;
+  yumiGrabTotal: number;
   /** petSpell windup in flight: sim tick the committed release fires on
    *  (transient combat state like swingTimer; never persisted or wired). */
   rangedWindupReleaseTick?: number | null;
@@ -2270,6 +2287,18 @@ export interface ReadyCheck {
   responses: Map<number, 'ready' | 'notready' | 'pending'>; // pid -> answer
 }
 
+// A ground mystery power-up as presentation sees it, TYPE-FREE (every orb is a
+// `(?)`; the defId never leaves the sim). Built by yumiPowerupViews in
+// social/yumi_powerups.ts and carried on BOTH the yumiStatus heartbeat and
+// arenaInfo; src/world_api/duel_arena.ts mirrors this shape at the IWorld seam.
+export interface YumiGroundPowerupView {
+  id: number;
+  x: number;
+  z: number;
+  state: 'spawning' | 'ready';
+  frac: number; // spawning: telegraph progress 0..1; ready: lifetime remaining 0..1
+}
+
 // `pid` (when present) marks a personal event that should only be delivered to
 // that player entity's owner; events without pid are world-visible.
 export type SimEvent = { pid?: number } & (
@@ -2450,11 +2479,13 @@ export type SimEvent = { pid?: number } & (
   | { type: 'fiestaDown'; seconds: number }
   // Protect Yumi maze objective mode (social/yumi.ts). `yumiTeleport` is a
   // world-visible relocation cue (renderer snap + VFX at both ends);
-  // `yumiDown` is your personal 10s bench countdown; `yumiSuddenDeath` fires
-  // once when teleports freeze and the bleed ramp starts; `yumiStatus` is the
-  // once-per-second personal scoreboard heartbeat (the arena wire field is
-  // rate-limited and the enemy cat can sit outside interest range, so the
-  // live bars ride the event queue like fiesta's dynamics do).
+  // `yumiDown` is your personal bench countdown (YUMI_RESPAWN_SECONDS);
+  // `yumiSuddenDeath` fires once when teleports freeze and the bleed ramp
+  // starts; `yumiStatus` is the once-per-second personal scoreboard heartbeat
+  // (the arena wire field is rate-limited and the enemy cat can sit outside
+  // interest range, so the live bars ride the event queue like fiesta's
+  // dynamics do). The heartbeat's orb list is the named YumiGroundPowerupView
+  // (declared above the union) so the wire shape cannot silently narrow.
   | { type: 'yumiTeleport'; catId: number; fromX: number; fromZ: number; toX: number; toZ: number }
   | { type: 'yumiDown'; seconds: number }
   | { type: 'yumiSuddenDeath' }
@@ -2469,6 +2500,32 @@ export type SimEvent = { pid?: number } & (
       suddenDeath: boolean;
       mult: number;
       team: 'A' | 'B';
+      // Whole seconds until the next mystery power-up spawn attempt (0 once one
+      // is on the field). Rides the 1/s heartbeat so the online HUD timer stays
+      // fresh even though the arena wire (which carries the ground orbs) is
+      // rate-limited. See social/yumi_powerups.ts.
+      nextPowerupIn: number;
+      // The live `(?)` orbs (type-free), riding the same heartbeat for the same
+      // reason: the arena wire's ~10s cadence is far coarser than the 4s
+      // telegraph and the grab interaction, so online ClientWorld folds THESE
+      // into its mirrored arenaInfo. A heartbeat also fires IMMEDIATELY on any
+      // orb transition (spawn, ready, grab, timeout), on every host, so the
+      // orbs pop in and vanish without waiting for the next whole second.
+      groundPowerups: YumiGroundPowerupView[];
+    }
+  // A mystery power-up appeared on the maze (personal per fighter): drives the
+  // "available" banner + audio cue. The persistent (?) orb itself renders from
+  // arenaInfo.match.yumi.groundPowerups; this is the instant announcement.
+  | { type: 'yumiPowerupSpawn'; x: number; z: number }
+  // A fighter grabbed a mystery power-up (world event so everyone sees the pop +
+  // aura). `auraColor` is the hue of the carrier aura (null for Stealth, which
+  // must show none). "Mine" is decided client-side (entityId === local player).
+  | {
+      type: 'yumiPowerup';
+      entityId: number;
+      defId: string;
+      auraColor: number | null;
+      duration: number;
     }
   | { type: 'augmentOffer'; tier: 'silver' | 'gold' | 'prismatic'; wave: number; choices: string[] }
   | { type: 'augmentChosen'; augmentId: string; byPid: number; byName: string; mine: boolean }

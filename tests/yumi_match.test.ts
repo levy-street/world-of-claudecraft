@@ -1,5 +1,5 @@
 // Protect Yumi match system (src/sim/social/yumi.ts): queue + matchmaking,
-// the hostility matrix, teleport cadence, the 10s bench respawn, sudden
+// the hostility matrix, teleport cadence, the 15s bench respawn, sudden
 // death (guaranteed winner, unranked), win + cleanup, and determinism.
 
 import { describe, expect, it } from 'vitest';
@@ -12,6 +12,7 @@ import {
   packYumiTeams,
   pickYumiCells,
   resolveYumiTiebreak,
+  YUMI_HP,
   YUMI_RESPAWN_SECONDS,
   YUMI_SUDDEN_AT,
   YUMI_TELEPORT_EVERY,
@@ -63,7 +64,7 @@ function cats(sim: Sim, match: ReturnType<Sim['arenaMatchFor']> & object) {
 }
 
 describe('yumi: queue and matchmaking', () => {
-  it('seats six solo-queuers into one 3v3 match with two 5000 hp cats', () => {
+  it('seats six solo-queuers into one 3v3 match with two 7500 hp cats', () => {
     const { sim, match, pids } = startYumi3();
     expect(match.format).toBe('yumi3');
     expect((match as any).yumi).toBeTruthy();
@@ -72,8 +73,8 @@ describe('yumi: queue and matchmaking', () => {
     expect(new Set([...match.teamA, ...match.teamB])).toEqual(new Set(pids));
     expect(sim.arenaQueueYumi3.length).toBe(0);
     const { catA, catB } = cats(sim, match);
-    expect(catA.hp).toBe(5000);
-    expect(catB.hp).toBe(5000);
+    expect(catA.hp).toBe(7500);
+    expect(catB.hp).toBe(7500);
     expect(catA.templateId).toBe('yumi_cat');
     // teams placed at their maze spawn plazas (opposite corners)
     const origin = yumiMazeOrigin(match.slot);
@@ -172,6 +173,43 @@ describe('yumi: queue and matchmaking', () => {
   });
 });
 
+describe('yumi: team announcement', () => {
+  it('tells each fighter their team in that team color (A blue, B red)', () => {
+    const sim = makeWorld();
+    const classes = ['warrior', 'mage', 'rogue', 'priest', 'hunter', 'druid'] as const;
+    const pids = classes.map((c, i) => sim.addPlayer(c, `T${i}`));
+    pids.forEach((p, i) => {
+      teleport(sim, p, i * 4, -40);
+    });
+    pids.forEach((p) => {
+      sim.arenaQueueJoin(p, 'yumi3');
+    });
+    const evs = sim.tick(); // matchmake seats the teams and emits the intro logs
+    const match = sim.arenaMatchFor(pids[0])!;
+    const line = (pid: number, text: string) =>
+      evs.find((e) => e.type === 'log' && e.pid === pid && (e as any).text === text) as
+        | (SimEvent & { color?: string })
+        | undefined;
+    for (const pid of match.teamA) {
+      const ev = line(pid, 'You are in the blue team!');
+      expect(ev).toBeTruthy();
+      expect(ev!.color).toBe('#2f6fe0');
+    }
+    for (const pid of match.teamB) {
+      const ev = line(pid, 'You are in the red team!');
+      expect(ev).toBeTruthy();
+      expect(ev!.color).toBe('#d8342c');
+    }
+    // no fighter ever receives the other team's line (per-dimension negatives)
+    const wrong = (text: string, roster: number[]) =>
+      evs.some(
+        (e) => e.type === 'log' && (e as any).text === text && roster.includes(e.pid as number),
+      );
+    expect(wrong('You are in the red team!', match.teamA)).toBe(false);
+    expect(wrong('You are in the blue team!', match.teamB)).toBe(false);
+  });
+});
+
 describe('yumi: hostility matrix', () => {
   it('enemy players attackable, own cat healable, enemy cat attackable, outsiders inert', () => {
     const { sim, match, pids } = startYumi3();
@@ -250,11 +288,11 @@ describe('yumi: hostility matrix', () => {
     const b0 = sim.entities.get(match.teamB[0])!;
     // enemy hit damages the cat through the real damage hub
     (sim as any).dealDamage(a0, catB, 300, false, 'physical', null, 'hit');
-    expect(catB.hp).toBe(4700);
+    expect(catB.hp).toBe(7200);
     // own-team heal restores it (target validation asserted above)
     (sim as any).applyHeal(b0, catB, 200, 'Heal');
-    expect(catB.hp).toBeGreaterThan(4700);
-    expect(catB.hp).toBeLessThanOrEqual(4900 + 100); // crit heals at most 1.5x
+    expect(catB.hp).toBeGreaterThan(7200);
+    expect(catB.hp).toBeLessThanOrEqual(7500); // crit heals at most 1.5x, capped at maxHp
     // a shield on the cat soaks before hp
     const hpBefore = catB.hp;
     (sim as any).applyAura(catB, {
@@ -340,7 +378,7 @@ describe('yumi: teleports', () => {
 });
 
 describe('yumi: respawn', () => {
-  it('a downed player benches 10s, then revives beside the own cat, never eliminated', () => {
+  it('a downed player benches 15s, then revives beside the own cat, never eliminated', () => {
     const { sim, match } = startYumi3();
     const a0 = sim.entities.get(match.teamA[0])!;
     const b0 = sim.entities.get(match.teamB[0])!;
@@ -381,7 +419,8 @@ describe('yumi: respawn safety', () => {
 
 describe('yumi: competitive constants', () => {
   it('pins the timing magnitudes (a balance edit must consciously land here too)', () => {
-    expect(YUMI_RESPAWN_SECONDS).toBe(10);
+    expect(YUMI_HP).toBe(7500);
+    expect(YUMI_RESPAWN_SECONDS).toBe(15);
     expect(YUMI_TELEPORT_EVERY).toBe(60);
     expect(YUMI_SUDDEN_AT).toBe(600);
   });
@@ -564,8 +603,8 @@ describe('yumi: IWorld surface', () => {
     expect(ya!.size).toBe(3);
     expect(ya!.phase).toBe('active');
     // BOTH cats always present with live hp/coords (fairness invariant)
-    expect(ya!.yumiA.hp).toBe(5000);
-    expect(ya!.yumiB.hp).toBe(5000);
+    expect(ya!.yumiA.hp).toBe(7500);
+    expect(ya!.yumiB.hp).toBe(7500);
     expect(ya!.yumiA.alive).toBe(true);
     expect(ya!.teleportIn).toBeGreaterThan(0);
     expect(ya!.suddenDeathIn).toBeGreaterThan(0);

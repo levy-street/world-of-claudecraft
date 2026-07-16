@@ -52,6 +52,7 @@ import {
   rollCorpseMaterialRarity,
 } from './professions/gathering';
 import type { SimContext } from './sim_context';
+import { startYumiGrab, stopYumiGrab } from './social/yumi_powerups';
 import { dist2d, type Entity, INTERACT_RANGE, type InvSlot, OBJECT_RESPAWN } from './types';
 import { markWorldBossLooted } from './world_boss';
 
@@ -471,4 +472,24 @@ export function interact(ctx: SimContext, pid?: number): void {
     return;
   }
   if (questEntity) ctx.talkToNpc(questEntity.id, p.id);
+}
+
+// Protect Yumi hold-to-grab (social/yumi_powerups.ts): the client streams these
+// two intents as the Interact key is held/released next to a ready mystery orb.
+// The channel itself is advanced server-authoritatively each tick in
+// updateYumiGrabs; these just start/stop it for the resolved player's live match.
+export function yumiGrabStart(ctx: SimContext, orbId: number, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  const match = ctx.arenaMatches.get(r.e.id);
+  if (!match?.yumi || match.state !== 'active') return;
+  startYumiGrab(ctx, match, r.e, orbId);
+}
+
+export function yumiGrabStop(ctx: SimContext, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  const match = ctx.arenaMatches.get(r.e.id);
+  if (!match?.yumi) return;
+  stopYumiGrab(match, r.e);
 }
