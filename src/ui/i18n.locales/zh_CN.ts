@@ -2317,7 +2317,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '发射一支寒冰箭，造成 {damage} 点冰霜伤害，并使移动速度降低 40%。',
   'entities.abilities.icefall.name': '冰瀑',
   'entities.abilities.icefall.description':
-    '向目标发射所有储存的冰刺，每枚造成 {damage} 点冰霜伤害。如果目标因定身或昏迷而被冻结，则造成 2.5 倍伤害。此固定伤害无法造成暴击。（冰霜术）',
+    '向目标发射所有储存的冰刺，每枚造成 {damage} 点冰霜伤害。若目标被定身或昏迷，或你拥有冻伤效果，则造成 2.5 倍伤害并消耗冻伤。此固定伤害无法造成暴击。（冰霜术）',
   'entities.abilities.conjure_water.name': '束水术',
   'entities.abilities.conjure_water.description':
     '制造 2 瓶水，饮用后恢复法力。更高等级可制造更纯净的水。',

@@ -21,11 +21,12 @@ export const TALENT_ABILITIES_V2_B = {
         max: 8,
         fixedNoCrit: true,
         vsFrozenMult: 2.5,
+        consumeAuraAsFrozen: 'mag_frostbite',
         consumeAuraStacks: { auraId: 'mag_icicles', maxStacks: 5 },
       },
     ],
     description:
-      'Launches every stored Icicle at the target for $d Frost damage each. Deals 2.5 times damage if the target is frozen by a root or stun. This fixed damage cannot critically strike. (Cryomancy)',
+      'Launches every stored Icicle at the target for $d Frost damage each. Deals 2.5 times damage if the target is frozen by a root or stun, or while Frostbite is active. Consumes Frostbite. This fixed damage cannot critically strike. (Cryomancy)',
   },
   spellsteal: {
     id: 'spellsteal',

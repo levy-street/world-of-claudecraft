@@ -1,4 +1,4 @@
-import type { AbilityEffect, ResourceType } from '../types';
+import type { AbilityEffect, AuraKind, ResourceType } from '../types';
 import { ALL_CLASSES, MAX_LEVEL, type PlayerClass } from '../types';
 import {
   isTalentRowLevel,
@@ -132,6 +132,15 @@ export type ProcResponse =
       | { amount?: never; pctMax: number }
     ))
   | { kind: 'stackAura'; aura: 'icicles'; maxStacks: number; duration: number }
+  | {
+      kind: 'chanceAura';
+      id: string;
+      name: string;
+      aura: AuraKind;
+      chance: number;
+      duration: number;
+      charges?: number;
+    }
   | { kind: 'addAuraCharges'; ability: string; amount: number; maxCharges: number }
   | ({ kind: 'heal' } & ({ amount: number; pctMax?: never } | { amount?: never; pctMax: number }))
   | { kind: 'absorb'; amount: number; duration: number; name: string }

@@ -68,15 +68,88 @@ describe('Cryomancy Icicles', () => {
   it('explains the full Icicles loop in the authored mastery tooltip', () => {
     const frost = TALENTS.mage?.specs.find((spec) => spec.id === 'frost');
     expect(frost?.mastery.description).toContain('Rimelance hits store an Icicle, up to 5');
+    expect(frost?.mastery.description).toContain('15% chance to grant Frostbite for 15 sec');
     expect(frost?.mastery.description).toContain('8 Frost damage each');
-    expect(frost?.mastery.description).toContain('20 each against a rooted or stunned target');
+    expect(frost?.mastery.description).toContain(
+      '20 each against a rooted or stunned target or while Frostbite is active',
+    );
     expect(frost?.mastery.description).toContain('cannot critically strike');
   });
 
-  it('localizes the Icicles aura name in every non-Latin release locale', () => {
+  it('localizes the Cryomancy aura names in every non-Latin release locale', () => {
     for (const language of ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'] as const) {
       expect(localizeTalentTitle('Icicles', language)).not.toBe('Icicles');
+      expect(localizeTalentTitle('Frostbite', language)).not.toBe('Frostbite');
     }
+  });
+
+  it('draws once per Cryomancy Rimelance and deterministically procs on only some hits', () => {
+    const procSequence = (): { draws: number; procs: boolean[]; otherSpellDraws: number } => {
+      const sim = frostSim();
+      const target = targetFor(sim);
+      let draws = 0;
+      sim.ctx.rng.setObserver(() => draws++);
+
+      onSpellHit(sim.ctx, sim.player, 'fireball', target);
+      const otherSpellDraws = draws;
+      expect(sim.player.auras.some((aura) => aura.id === 'mag_frostbite')).toBe(false);
+      const procs: boolean[] = [];
+      for (let index = 0; index < 64; index++) {
+        onSpellHit(sim.ctx, sim.player, 'frostbolt', target);
+        const frostbiteIndex = sim.player.auras.findIndex((aura) => aura.id === 'mag_frostbite');
+        procs.push(frostbiteIndex >= 0);
+        if (frostbiteIndex >= 0) sim.player.auras.splice(frostbiteIndex, 1);
+      }
+      sim.ctx.rng.setObserver(null);
+      return { draws, procs, otherSpellDraws };
+    };
+
+    const first = procSequence();
+    const second = procSequence();
+    expect(second).toEqual(first);
+    expect(first.otherSpellDraws).toBe(0);
+    expect(first.draws).toBe(64);
+    expect(first.procs.some(Boolean)).toBe(true);
+    expect(first.procs.every(Boolean)).toBe(false);
+  });
+
+  it('rolls Frostbite only after Rimelance deals damage through the production hit gate', () => {
+    const sim = frostSim();
+    const target = targetFor(sim);
+    const rng = sim.ctx.rng as typeof sim.ctx.rng & {
+      range(min: number, max: number): number;
+      chance(probability: number): boolean;
+    };
+    let frostbiteRolls = 0;
+    rng.range = (min) => min;
+    rng.chance = (probability) => {
+      if (probability === 0.15) frostbiteRolls++;
+      return probability === 0.15;
+    };
+
+    run(sim, target, 'frostbolt');
+
+    expect(frostbiteRolls).toBe(1);
+    expect(sim.player.auras.some((aura) => aura.id === 'mag_frostbite')).toBe(true);
+    sim.player.auras = sim.player.auras.filter(
+      (aura) => aura.id !== 'mag_frostbite' && aura.kind !== 'icicles',
+    );
+    target.auras.push({
+      id: 'test_absorb',
+      name: 'Test Absorb',
+      kind: 'absorb',
+      value: 100_000,
+      remaining: 30,
+      duration: 30,
+      sourceId: target.id,
+      school: 'arcane',
+    });
+
+    run(sim, target, 'frostbolt');
+
+    expect(frostbiteRolls).toBe(1);
+    expect(sim.player.auras.some((aura) => aura.id === 'mag_frostbite')).toBe(false);
+    expect(sim.player.auras.some((aura) => aura.kind === 'icicles')).toBe(false);
   });
 
   it('grants Icefall and builds one visible, long-lived stack per landed Rimelance up to five', () => {
@@ -125,6 +198,53 @@ describe('Cryomancy Icicles', () => {
     expect(draws.chanceDraws()).toBe(0);
   });
 
+  it('uses and consumes Frostbite to execute a non-frozen, CC-immune target', () => {
+    const sim = frostSim();
+    const target = targetFor(sim);
+    target.ccImmune = true;
+    target.slowImmune = true;
+    const rng = sim.ctx.rng as typeof sim.ctx.rng & {
+      range(min: number, max: number): number;
+      chance(probability: number): boolean;
+    };
+    let rangeDraws = 0;
+    let chanceDraws = 0;
+    rng.range = (min) => {
+      rangeDraws++;
+      return min;
+    };
+    rng.chance = (probability) => {
+      chanceDraws++;
+      return probability === 0.15;
+    };
+
+    buildIcicles(sim, target, 3);
+    // Applying the proc auras recalculates derived stats, so zero Spell Power
+    // after setup to isolate the authored per-stack execute damage.
+    sim.player.spellPower = 0;
+
+    expect(target.auras.some((aura) => aura.kind === 'root' || aura.kind === 'stun')).toBe(false);
+    expect(sim.player.auras.find((aura) => aura.id === 'mag_frostbite')).toMatchObject({
+      name: 'Frostbite',
+      kind: 'frostbite',
+      remaining: 15,
+      duration: 15,
+      charges: 1,
+    });
+    expect(encodeObs(sim)[18]).toBe(1);
+    const before = target.hp;
+    const rangeDrawsBefore = rangeDraws;
+    const chanceDrawsBefore = chanceDraws;
+
+    run(sim, target, 'icefall');
+
+    expect(before - target.hp).toBe(3 * 20);
+    expect(sim.player.auras.some((aura) => aura.id === 'mag_frostbite')).toBe(false);
+    expect(encodeObs(sim)[18]).toBe(0);
+    expect(rangeDraws).toBe(rangeDrawsBefore);
+    expect(chanceDraws).toBe(chanceDrawsBefore);
+  });
+
   it('keeps chilled damage low but executes targets frozen by Icebind or a stun', () => {
     const damage = (state: 'normal' | 'chilled' | 'icebind' | 'stunned'): number => {
       const sim = frostSim();
@@ -134,6 +254,7 @@ describe('Cryomancy Icicles', () => {
       if (state === 'chilled') {
         for (let index = 0; index < 3; index++) run(sim, target, 'frostbolt');
         expect(target.auras.some((aura) => aura.kind === 'slow')).toBe(true);
+        expect(sim.player.auras.some((aura) => aura.id === 'mag_frostbite')).toBe(false);
       } else {
         buildIcicles(sim, target, 3);
       }
@@ -188,11 +309,13 @@ describe('Cryomancy Icicles', () => {
       school: 'frost',
     });
 
+    const rangeDrawsBefore = draws.rangeDraws();
+    const chanceDrawsBefore = draws.chanceDraws();
     run(sim, target, 'icefall');
 
     expect(sim.player.auras.find((aura) => aura.id === 'test_sure_crit')?.charges).toBe(3);
-    expect(draws.rangeDraws()).toBe(0);
-    expect(draws.chanceDraws()).toBe(0);
+    expect(draws.rangeDraws()).toBe(rangeDrawsBefore);
+    expect(draws.chanceDraws()).toBe(chanceDrawsBefore);
   });
 
   it('leaves non-Cryomancy mages draw-neutral and without Icicles', () => {
@@ -205,6 +328,7 @@ describe('Cryomancy Icicles', () => {
     onSpellHit(sim.ctx, sim.player, 'frostbolt', target);
 
     expect(sim.player.auras.some((entry) => entry.kind === 'icicles')).toBe(false);
+    expect(sim.player.auras.some((entry) => entry.id === 'mag_frostbite')).toBe(false);
     expect(draws.rangeDraws()).toBe(0);
     expect(draws.chanceDraws()).toBe(0);
   });

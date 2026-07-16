@@ -1532,6 +1532,51 @@ describe('client-side delta merge', () => {
     expect(aura?.charges, 'client should mirror the wire charge count').toBe(2);
   });
 
+  it('round-trips Frostbite through the aura wire as a HUD-visible buff', () => {
+    const sim = new Sim({ seed: 11, playerClass: 'mage', autoEquip: false });
+    const player = sim.player;
+    player.auras.push({
+      id: 'mag_frostbite',
+      name: 'Frostbite',
+      kind: 'frostbite',
+      remaining: 15,
+      duration: 15,
+      value: 0,
+      charges: 1,
+      sourceId: player.id,
+      school: 'frost',
+    });
+
+    const wire = wireEntity(player) as {
+      auras: Array<{ id: string; kind: string; rem: number; charges?: number }>;
+    };
+    expect(wire.auras).toContainEqual(
+      expect.objectContaining({
+        id: 'mag_frostbite',
+        kind: 'frostbite',
+        rem: 15,
+        charges: 1,
+      }),
+    );
+
+    const client = bareClient(player.id + 1000);
+    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(player)] });
+    const mirrored = client.entities
+      .get(player.id)
+      ?.auras.find((aura) => aura.id === 'mag_frostbite');
+    expect(mirrored).toMatchObject({
+      name: 'Frostbite',
+      kind: 'frostbite',
+      remaining: 15,
+      duration: 15,
+      charges: 1,
+      sourceId: player.id,
+      school: 'frost',
+    });
+    if (!mirrored) throw new Error('missing mirrored Frostbite aura');
+    expect(isAuraDebuff(mirrored)).toBe(false);
+  });
+
   it('round-trips the aura caster id (src) so own-aura prominence works online', () => {
     // Drives the REAL server emit (wireEntity) into the REAL client mirror: a
     // regression that drops either the `src` emission or the online.ts decode

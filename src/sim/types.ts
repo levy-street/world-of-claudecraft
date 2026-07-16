@@ -320,7 +320,8 @@ export type AuraKind =
   | 'sure_crit'
   | 'buff_dr'
   | 'buff_dr_phys'
-  | 'icicles';
+  | 'icicles'
+  | 'frostbite';
 
 export interface Aura {
   id: string; // ability id that applied it
@@ -1508,6 +1509,9 @@ export type AbilityEffect =
       fixedNoCrit?: boolean;
       vsRootedMult?: number;
       vsFrozenMult?: number;
+      // An owned caster aura that opens this effect's frozen multiplier and is
+      // consumed by the hit. Icefall uses Frostbite as its boss-safe execute path.
+      consumeAuraAsFrozen?: string;
       consumeAuraStacks?: { auraId: string; maxStacks: number };
     }
   | {

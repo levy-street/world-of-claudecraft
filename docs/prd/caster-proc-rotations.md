@@ -17,22 +17,24 @@ test must feel different.
 
 ## Frost: Icicles and Icefall
 
-Rimelance hits store an Icicle, up to five. Icefall is instant, off the global cooldown,
-costs no mana, consumes the full bank, and never draws random numbers.
+Rimelance hits store an Icicle, up to five, and have a 15% chance to grant one charge of
+Frostbite for 15 seconds. Icefall is instant, off the global cooldown, costs no mana,
+consumes the full bank, and never draws random numbers.
 
 The release is a single-target setup-and-execute:
 
 - A normal target takes 8 Frost damage per Icicle.
 - A target frozen by a root or stun takes 20 Frost damage per Icicle.
+- While Frostbite is active, Icefall treats any target as frozen and consumes the buff. This
+  proc path works on bosses and other targets that reject crowd control.
 - A slow or chill is not frozen. Rimelance therefore builds the bank without opening its own
-  execute window.
-- Icebind creates the intended window: build with Rimelance, freeze one priority target, then
-  release Icefall before the root ends.
+  execute window unless Frostbite actually procs.
+- Icebind remains the manual path: build with Rimelance, freeze one priority target, then
+  release Icefall before the root ends. Frostbite is the second path for any target.
 
 The frozen check belongs to Icefall and is separate from the global Shatter-style
-`critVsRooted` and `vsRootedMult` path. Bosses that reject roots remain baseline targets.
-A Frostbite-style boss enabler is deferred until it can justify its extra proc state, random
-draw, localization, and observation contract.
+`critVsRooted` and `vsRootedMult` path. Frostbite is a visible single-charge aura with a
+normalized remaining-window observation, so players and agents can time the same execute.
 
 ## Elemental: Fulmination
 
@@ -56,7 +58,8 @@ storm across a pack. It adds no action-bar button and no short reaction window.
 
 ## Determinism and rollout
 
-Icefall is draw-free. Fulmination draws only for a talented owner's landed Arc Bolt while the
-ward has charges, so unrelated builds preserve their random stream. Overload damage, chain
-selection, and the Earthen Jolt vent draw nothing. PBE validates damage, proc rate, window
-length, and mobile readability before release.
+Icefall is draw-free. Frostbite draws exactly once after a Cryomancy owner's landed Rimelance
+and nowhere else, so other spells and builds preserve their random stream. Fulmination draws
+only for a talented owner's landed Arc Bolt while the ward has charges. Overload damage,
+chain selection, and the Earthen Jolt vent draw nothing. PBE validates damage, proc rate,
+window length, and mobile readability before release.

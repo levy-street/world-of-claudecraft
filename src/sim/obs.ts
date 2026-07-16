@@ -122,7 +122,7 @@ export function applyAction(sim: Sim, action: number): void {
 // ---------------------------------------------------------------------------
 
 const NEARBY_MOBS = 5;
-export const SELF_OBS_SIZE = 18;
+export const SELF_OBS_SIZE = 19;
 
 export function obsSize(): number {
   return SELF_OBS_SIZE + ABILITY_SLOTS * 2 + 9 + NEARBY_MOBS * 6 + 5 + QUEST_ORDER.length * 2;
@@ -156,6 +156,8 @@ export function encodeObs(sim: Sim): number[] {
   const lightningShieldCharges =
     p.auras.find((aura) => aura.id === 'lightning_shield')?.charges ?? 0;
   obs.push(clamp(lightningShieldCharges / 9, 0, 1));
+  const frostbite = p.auras.find((aura) => aura.kind === 'frostbite');
+  obs.push(frostbite ? clamp(frostbite.remaining / Math.max(1, frostbite.duration), 0, 1) : 0);
 
   // --- abilities (10 x 2 = 20) ---
   for (let i = 0; i < ABILITY_SLOTS; i++) {

@@ -287,6 +287,11 @@ export function runEffects(
           ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
         }
         const rooted = isRootedOrChilled(target);
+        const frozenAuraIndex = eff.consumeAuraAsFrozen
+          ? p.auras.findIndex(
+              (aura) => aura.id === eff.consumeAuraAsFrozen && aura.sourceId === p.id,
+            )
+          : -1;
         const critChance =
           isSpell && rooted
             ? ctx.spellCrit(p) + ctx.playerMods(meta).global.critVsRooted
@@ -300,8 +305,15 @@ export function runEffects(
         // applies the AP scale-down. A non-scaling effect just contributes 0.
         dmg += directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
         if (eff.vsRootedMult !== undefined && rooted) dmg *= eff.vsRootedMult;
-        if (eff.vsFrozenMult !== undefined && isFrozenForIcefall(target)) {
+        if (
+          eff.vsFrozenMult !== undefined &&
+          (isFrozenForIcefall(target) || frozenAuraIndex >= 0)
+        ) {
           dmg *= eff.vsFrozenMult;
+        }
+        if (frozenAuraIndex >= 0) {
+          const [aura] = p.auras.splice(frozenAuraIndex, 1);
+          ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
         }
         const abilityMod = mods.abilities[ability.id];
         const vsDotted = abilityMod?.dmgPctVsDotted ?? 0;

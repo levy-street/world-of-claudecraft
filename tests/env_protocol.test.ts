@@ -7,7 +7,7 @@ import {
   validatePlayerLevel,
 } from '../headless/protocol';
 import { CLASSES } from '../src/sim/data';
-import { ACTIONS, encodeObs, NUM_ACTIONS, obsSize } from '../src/sim/obs';
+import { ACTIONS, encodeObs, NUM_ACTIONS, obsSize, SELF_OBS_SIZE } from '../src/sim/obs';
 import { Sim } from '../src/sim/sim';
 import { ALL_CLASSES } from '../src/sim/types';
 
@@ -96,6 +96,24 @@ describe('headless environment protocol validation', () => {
     // a single distinct length across all 9 classes, equal to the advertised
     // obsSize(): a trained config's obs vector shape is identical for every class.
     expect(sizes).toEqual(new Set([obsSize()]));
+  });
+
+  it('publishes the normalized Frostbite window in the final self observation slot', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'mage', autoEquip: false });
+    expect(SELF_OBS_SIZE).toBe(19);
+    expect(encodeObs(sim)[SELF_OBS_SIZE - 1]).toBe(0);
+    sim.player.auras.push({
+      id: 'mag_frostbite',
+      name: 'Frostbite',
+      kind: 'frostbite',
+      value: 0,
+      remaining: 7.5,
+      duration: 15,
+      charges: 1,
+      sourceId: sim.player.id,
+      school: 'frost',
+    });
+    expect(encodeObs(sim)[SELF_OBS_SIZE - 1]).toBe(0.5);
   });
 
   it('sizes the action space to the largest class kit so every class is castable', () => {

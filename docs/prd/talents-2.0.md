@@ -259,10 +259,12 @@ This pass adds two caster rotations built on the narrow proc vocabulary describe
 [Caster Proc Rotations](./caster-proc-rotations.md):
 
 - Frost mastery now grants Icefall and makes each landed Rimelance build one long-lived
-  Icicle, up to five. Icefall is an off-GCD, zero-cost release that consumes the full bank,
-  deals 8 Frost damage per stack normally, and deals 20 per stack only while the target is
-  rooted or stunned. Rimelance's chill does not open this execute window. The bank is visible
-  as an aura and a normalized reinforcement-learning observation.
+  Icicle, up to five, with a 15% chance to grant one charge of Frostbite for 15 seconds.
+  Icefall is an off-GCD, zero-cost release that consumes the full bank, deals 8 Frost damage
+  per stack normally, and deals 20 per stack while the target is rooted or stunned or while
+  Frostbite is active. Icefall consumes Frostbite. Rimelance's chill alone does not open this
+  execute window. Both the bank and proc window are visible as auras and normalized
+  reinforcement-learning observations.
 - Elemental's level-11 Fulmination choice makes each completed Arc Bolt add one charge to
   an active Thunder Ward, up to nine. Each charge present when the projectile lands raises
   Arc Bolt's Overload chance by 5%; the just-completed cast joins the bank before impact.
@@ -274,10 +276,11 @@ This pass adds two caster rotations built on the narrow proc vocabulary describe
 
 Both mechanics preserve mobile play while adding anticipation. Building happens through
 ordinary rotational casts, so movement does not erase progress or force a stationary
-channel. The release decision creates the excitement: Frost creates a hard-control window
-and times Icefall inside it, while Elemental rides a rising Overload chance before venting the
-bank across a pack. Icefall adds no random draws. Fulmination adds one draw only on a talented
-Shaman's landed Arc Bolt while Thunder Ward is active.
+channel. The release decision creates the excitement: Frost either creates a hard-control
+window or reacts to Frostbite before timing Icefall, while Elemental rides a rising Overload
+chance before venting the bank across a pack. Icefall adds no random draws. Frostbite adds one
+draw only on a Cryomancy Mage's landed Rimelance, and Fulmination adds one draw only on a
+talented Shaman's landed Arc Bolt while Thunder Ward is active.
 
 ### PBE-2 mage feedback pass
 

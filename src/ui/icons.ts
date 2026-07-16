@@ -2865,6 +2865,7 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
     ],
     ['glow'],
   ),
+  aura_frostbite: r('frost', 'ice', ['hand', { p: 'snowflake', ...TR }], ['glow']),
 };
 
 // Crests: class / mob-family / status glyphs, painted with the same primitive

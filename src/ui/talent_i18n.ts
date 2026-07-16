@@ -2776,6 +2776,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Cryomancy: '冰霜',
     Fulmination: '雷霆爆发',
     'Frigid Reversal': '寒冰逆转',
+    Frostbite: '冻伤',
     Icicles: '冰刺',
     'Dead Aim': '精准',
     'Deathless Ardor': '炽热防御者',
@@ -3121,6 +3122,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Cryomancy: '冰霜',
     Fulmination: '雷霆爆發',
     'Frigid Reversal': '寒冰逆轉',
+    Frostbite: '凍傷',
     Icicles: '冰刺',
     'Dead Aim': '精準',
     'Deathless Ardor': '熱忱防衛者',
@@ -3466,6 +3468,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Cryomancy: '냉기',
     Fulmination: '뇌전 폭발',
     'Frigid Reversal': '냉기 역전',
+    Frostbite: '동상',
     Icicles: '고드름',
     'Dead Aim': '정밀함',
     'Deathless Ardor': '헌신적인 수호자',
@@ -3811,6 +3814,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Cryomancy: 'フロスト',
     Fulmination: '雷撃爆発',
     'Frigid Reversal': '氷霜逆転',
+    Frostbite: '凍傷',
     Icicles: '氷柱',
     'Dead Aim': '精密',
     'Deathless Ardor': '熱烈なる守護者',
@@ -4501,6 +4505,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Cryomancy: 'Лед',
     Fulmination: 'Разряд',
     'Frigid Reversal': 'Ледяной разворот',
+    Frostbite: 'Обморожение',
     Icicles: 'Ледяные осколки',
     'Dead Aim': 'Меткость',
     'Deathless Ardor': 'Ярый защитник',
@@ -7800,6 +7805,8 @@ function procResponseDescription(
       return `+${response.pctMax !== undefined ? formatPercent(response.pctMax, lang) : formatNumber(response.amount, lang)} ${t('classDetails.labels.resource')}`;
     case 'stackAura':
       return `+1 (<= ${formatNumber(response.maxStacks, lang)})`;
+    case 'chanceAura':
+      return `${translateTitle(response.name, lang)}: ${formatPercent(response.chance, lang)} (${seconds(response.duration, lang)})`;
     case 'addAuraCharges':
       return `${abilityName(response.ability)}: +${formatNumber(response.amount, lang)} (<= ${formatNumber(response.maxCharges, lang)})`;
     case 'heal':

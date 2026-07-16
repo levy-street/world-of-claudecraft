@@ -28,8 +28,9 @@ describe('ability icons', () => {
     );
   });
 
-  it('has an explicit icon for the Icicles stack meter', () => {
+  it('has explicit icons for the Cryomancy aura meter and proc window', () => {
     expect(hasExplicitAuraIcon('aura_icicles')).toBe(true);
+    expect(hasExplicitAuraIcon('aura_frostbite')).toBe(true);
   });
 
   it('no two abilities resolve to an identical icon', () => {

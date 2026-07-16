@@ -75,7 +75,18 @@ describe('spec masteries', () => {
         name: 'Icicles',
         school: 'frost',
         trigger: { on: 'spellHit', abilities: ['frostbolt'] },
-        responses: [{ kind: 'stackAura', aura: 'icicles', maxStacks: 5, duration: 3600 }],
+        responses: [
+          { kind: 'stackAura', aura: 'icicles', maxStacks: 5, duration: 3600 },
+          {
+            kind: 'chanceAura',
+            id: 'mag_frostbite',
+            name: 'Frostbite',
+            aura: 'frostbite',
+            chance: 0.15,
+            duration: 15,
+            charges: 1,
+          },
+        ],
       },
     });
     expect(TALENTS.hunter?.specs.find((s) => s.id === 'beast_mastery')?.mastery.effect).toEqual({

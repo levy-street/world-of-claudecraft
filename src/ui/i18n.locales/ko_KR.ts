@@ -2397,7 +2397,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '냉기의 화살을 발사해 {damage}의 냉기 피해를 입히고 이동 속도를 40%만큼 늦춥니다.',
   'entities.abilities.icefall.name': '빙폭',
   'entities.abilities.icefall.description':
-    '저장한 고드름을 모두 대상에게 발사해 하나당 {damage}의 냉기 피해를 입힙니다. 대상이 이동 불가 또는 기절로 빙결된 경우 2.5배의 피해를 입힙니다. 이 고정 피해는 치명타로 적중하지 않습니다. (빙결술)',
+    '저장한 고드름을 모두 대상에게 발사해 하나당 {damage}의 냉기 피해를 입힙니다. 대상이 이동 불가 또는 기절 상태이거나 동상이 활성화되어 있으면 2.5배의 피해를 입히고 동상을 소모합니다. 이 고정 피해는 치명타로 적중하지 않습니다. (빙결술)',
   'entities.abilities.conjure_water.name': '물 창조',
   'entities.abilities.conjure_water.description':
     '마시면 마나를 회복하는 물병 2개를 창조합니다. 높은 등급은 더 순수한 물을 창조합니다.',

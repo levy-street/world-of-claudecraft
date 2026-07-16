@@ -118,6 +118,23 @@ function fireOne(
       });
       break;
     }
+    case 'chanceAura': {
+      // The response sits behind procsFor + the trigger's ability gate, so this is
+      // the only draw: Frostbite rolls only after a landed Cryomancy Rimelance hit.
+      if (!ctx.rng.chance(response.chance)) break;
+      ctx.applyAura(player, {
+        id: response.id,
+        name: response.name,
+        kind: response.aura,
+        remaining: response.duration,
+        duration: response.duration,
+        value: 0,
+        charges: response.charges,
+        sourceId: player.id,
+        school: def.school ?? 'frost',
+      });
+      break;
+    }
     case 'addAuraCharges': {
       const aura = player.auras.find(
         (entry) => entry.id === response.ability && entry.sourceId === player.id,
