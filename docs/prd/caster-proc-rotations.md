@@ -65,6 +65,12 @@ damage roll, so it consumes no additional random draws. The rising damage alread
 through the ordinary damage-event path, which keeps floating combat text and agent reward
 feedback aligned with the authoritative result.
 
+The supporting choice rows keep that identity on existing buttons. Ninefold Litany extends
+the commitment to nine seconds and nine ticks. Woe's Crescendo instead rewards reaching the
+baseline final tick with a fixed, draw-free area burst. Deathless Dirge makes Mindfracture
+refresh the priest's own Dirge of Decay without resnapshotting it or resetting its tick
+cadence.
+
 ## Determinism and rollout
 
 Icefall is draw-free. Frostbite draws exactly once after a Cryomancy owner's landed Rimelance

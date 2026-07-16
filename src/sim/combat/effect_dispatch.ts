@@ -53,7 +53,7 @@ import {
   sweepStrikeDamage,
 } from './area_echo';
 import { isFrozenForIcefall, isRootedOrChilled } from './cc';
-import { extendOwnedDot } from './dot_mutation';
+import { extendOwnedDot, refreshOwnedDot } from './dot_mutation';
 import { consumeAuraKind, consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
 import { exclusiveAuraConflicts } from './exclusive_aura';
@@ -964,6 +964,11 @@ export function runEffects(
       case 'extendDot': {
         if (!target) break;
         extendOwnedDot(target, p.id, eff.dot, eff.seconds, eff.maxBonus);
+        break;
+      }
+      case 'refreshDot': {
+        if (!target) break;
+        refreshOwnedDot(target, p.id, eff.dot);
         break;
       }
       case 'consumeDot': {

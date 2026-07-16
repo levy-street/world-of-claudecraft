@@ -1409,14 +1409,21 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 14,
       theme: 'investment',
-      decision: 'banked Mindfractures vs emergency heal echo vs extended decay',
+      decision: 'Dirge refresh vs emergency heal echo vs extended decay',
       options: [
         {
-          id: 'pri_r14_mind_melt',
-          name: 'Twin Fracture',
-          description: 'Mindfracture stores 2 uses.',
+          id: 'pri_r14_deathless_dirge',
+          name: 'Deathless Dirge',
+          description: 'Mindfracture refreshes your Dirge of Decay on its target.',
           icon: 'mind_blast',
-          effect: { ability: [{ ability: 'mind_blast', bonusCharges: 1 }] },
+          effect: {
+            ability: [
+              {
+                ability: 'mind_blast',
+                addEffects: [{ type: 'refreshDot', dot: 'shadow_word_pain' }],
+              },
+            ],
+          },
         },
         {
           id: 'pri_r14_greater_heal',

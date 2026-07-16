@@ -20,3 +20,13 @@ export function extendOwnedDot(
   dot.duration += extension;
   return extension;
 }
+
+/** Refresh one caster-owned DoT without changing its snapshot or tick cadence. */
+export function refreshOwnedDot(target: Entity, sourceId: number, dotId: string): number {
+  const dot = target.auras.find(
+    (aura) => aura.kind === 'dot' && aura.id === dotId && aura.sourceId === sourceId,
+  );
+  if (!dot) return 0;
+  dot.remaining = dot.duration;
+  return dot.remaining;
+}

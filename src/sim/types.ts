@@ -1587,6 +1587,7 @@ export type AbilityEffect =
       school?: Aura['school'];
     }
   | { type: 'extendDot'; dot: string; seconds: number; maxBonus: number }
+  | { type: 'refreshDot'; dot: string }
   | { type: 'consumeDot'; dot: string }
   | { type: 'slow'; mult: number; duration: number }
   | { type: 'root'; duration: number }

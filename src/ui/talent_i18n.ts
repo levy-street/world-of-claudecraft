@@ -709,6 +709,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Icicles: 'Carámbanos',
     'Dead Aim': 'Precisión',
     'Deathless Ardor': 'Defensor ferviente',
+    'Deathless Dirge': 'Endecha Inmortal',
     'Deathless Will': 'Instintos de supervivencia',
     'Deep Reserves': 'Segundo aliento',
     'Deep Rime': 'Escarcha permanente',
@@ -1056,6 +1057,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Icicles: 'Carámbanos',
     'Dead Aim': 'Precisión',
     'Deathless Ardor': 'Defensor ardiente',
+    'Deathless Dirge': 'Endecha Inmortal',
     'Deathless Will': 'Instintos de supervivencia',
     'Deep Reserves': 'Segundo aliento',
     'Deep Rime': 'Permaescarcha',
@@ -1403,6 +1405,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Icicles: 'Glaçons',
     'Dead Aim': 'Précision',
     'Deathless Ardor': 'Défenseur ardent',
+    'Deathless Dirge': 'Complainte Éternelle',
     'Deathless Will': 'Instincts de survie',
     'Deep Reserves': 'Second souffle',
     'Deep Rime': 'Permagel',
@@ -1750,6 +1753,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Icicles: 'Glaçons',
     'Dead Aim': 'Précision',
     'Deathless Ardor': 'Défenseur ardent',
+    'Deathless Dirge': 'Complainte Éternelle',
     'Deathless Will': 'Instincts de survie',
     'Deep Reserves': 'Second souffle',
     'Deep Rime': 'Pergélisol',
@@ -2097,6 +2101,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Icicles: 'Ghiaccioli',
     'Dead Aim': 'Precisione',
     'Deathless Ardor': 'Difensore ardente',
+    'Deathless Dirge': 'Lamento Imperituro',
     'Deathless Will': 'Istinti di sopravvivenza',
     'Deep Reserves': 'Secondo respiro',
     'Deep Rime': 'Permagelo',
@@ -2444,6 +2449,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Icicles: 'Eiszapfen',
     'Dead Aim': 'Präzision',
     'Deathless Ardor': 'Glühender Verteidiger',
+    'Deathless Dirge': 'Unsterbliche Totenklage',
     'Deathless Will': 'Überlebensinstinkte',
     'Deep Reserves': 'Zweiter Wind',
     'Deep Rime': 'Permafrost',
@@ -2792,6 +2798,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Icicles: '冰刺',
     'Dead Aim': '精准',
     'Deathless Ardor': '炽热防御者',
+    'Deathless Dirge': '不灭挽歌',
     'Deathless Will': '生存本能',
     'Deep Reserves': '二度呼吸',
     'Deep Rime': '永久冻结',
@@ -3140,6 +3147,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Icicles: '冰刺',
     'Dead Aim': '精準',
     'Deathless Ardor': '熱忱防衛者',
+    'Deathless Dirge': '不滅輓歌',
     'Deathless Will': '生存本能',
     'Deep Reserves': '復甦之風',
     'Deep Rime': '永凍',
@@ -3488,6 +3496,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Icicles: '고드름',
     'Dead Aim': '정밀함',
     'Deathless Ardor': '헌신적인 수호자',
+    'Deathless Dirge': '불멸의 장송곡',
     'Deathless Will': '생존 본능',
     'Deep Reserves': '재기',
     'Deep Rime': '영구 동결',
@@ -3836,6 +3845,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Icicles: '氷柱',
     'Dead Aim': '精密',
     'Deathless Ardor': '熱烈なる守護者',
+    'Deathless Dirge': '不滅の哀歌',
     'Deathless Will': '生存本能',
     'Deep Reserves': '再起の息吹',
     'Deep Rime': '永久凍土',
@@ -4183,6 +4193,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Icicles: 'Sincelos',
     'Dead Aim': 'Precisão',
     'Deathless Ardor': 'Defensor Fervoroso',
+    'Deathless Dirge': 'Lamento Imortal',
     'Deathless Will': 'Instintos de Sobrevivência',
     'Deep Reserves': 'Fôlego Renovado',
     'Deep Rime': 'Gelo Eterno',
@@ -4531,6 +4542,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Icicles: 'Ледяные осколки',
     'Dead Aim': 'Меткость',
     'Deathless Ardor': 'Ярый защитник',
+    'Deathless Dirge': 'Бессмертная панихида',
     'Deathless Will': 'Инстинкт выживания',
     'Deep Reserves': 'Второе дыхание',
     'Deep Rime': 'Вечная мерзлота',
@@ -4878,6 +4890,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Icicles: 'Rampouchy',
     'Dead Aim': 'Smrtící muška',
     'Deathless Ardor': 'Nesmrtelný zápal',
+    'Deathless Dirge': 'Nesmrtelný žalozpěv',
     'Deathless Will': 'Nesmrtelná vůle',
     'Deep Reserves': 'Hluboké rezervy',
     'Deep Rime': 'Hluboká jinovatka',
@@ -5225,6 +5238,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Icicles: 'IJspegels',
     'Dead Aim': 'Precisie',
     'Deathless Ardor': 'Vurige Verdediger',
+    'Deathless Dirge': 'Onsterfelijke Lijkzang',
     'Deathless Will': 'Overlevingsinstincten',
     'Deep Reserves': 'Tweede Adem',
     'Deep Rime': 'Permafrost',
@@ -5572,6 +5586,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Icicles: 'Sople',
     'Dead Aim': 'Precyzja',
     'Deathless Ardor': 'Żarliwy obrońca',
+    'Deathless Dirge': 'Nieśmiertelny Tren',
     'Deathless Will': 'Instynkty przetrwania',
     'Deep Reserves': 'Drugi oddech',
     'Deep Rime': 'Wieczna zmarzlina',
@@ -5919,6 +5934,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Icicles: 'Es Runcing',
     'Dead Aim': 'Presisi',
     'Deathless Ardor': 'Pembela Gigih',
+    'Deathless Dirge': 'Ratapan Abadi',
     'Deathless Will': 'Naluri Bertahan Hidup',
     'Deep Reserves': 'Napas Kedua',
     'Deep Rime': 'Beku Abadi',
@@ -6266,6 +6282,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Icicles: 'Buz Sarkıtları',
     'Dead Aim': 'İsabet',
     'Deathless Ardor': 'Ateşli Savunucu',
+    'Deathless Dirge': 'Ölümsüz Ağıt',
     'Deathless Will': 'Hayatta Kalma İçgüdüleri',
     'Deep Reserves': 'İkinci Nefes',
     'Deep Rime': 'Kalıcı Buz',
@@ -6613,6 +6630,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Icicles: 'Istappar',
     'Dead Aim': 'Precision',
     'Deathless Ardor': 'Brinnande försvarare',
+    'Deathless Dirge': 'Odödlig Klagosång',
     'Deathless Will': 'Överlevnadsinstinkter',
     'Deep Reserves': 'Andra andan',
     'Deep Rime': 'Permafrost',
@@ -6960,6 +6978,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Icicles: 'Băng Nhọn',
     'Dead Aim': 'Chính Xác',
     'Deathless Ardor': 'Vệ Binh Nhiệt Thành',
+    'Deathless Dirge': 'Ai Ca Bất Diệt',
     'Deathless Will': 'Bản Năng Sinh Tồn',
     'Deep Reserves': 'Hồi Sức',
     'Deep Rime': 'Băng Vĩnh Cửu',
@@ -7307,6 +7326,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Icicles: 'Istapper',
     'Dead Aim': 'Præcision',
     'Deathless Ardor': 'Ihærdig Forsvarer',
+    'Deathless Dirge': 'Udødelig Klagesang',
     'Deathless Will': 'Overlevelsesinstinkter',
     'Deep Reserves': 'Andet Pust',
     'Deep Rime': 'Permafrost',
@@ -7876,6 +7896,7 @@ type DescribedAddedEffect = Extract<
       | 'absorb'
       | 'dot'
       | 'extendDot'
+      | 'refreshDot'
       | 'channelFinisher'
       | 'interrupt'
       | 'consumeDot'
@@ -7891,6 +7912,7 @@ function assertDescribedAddedEffect(effect: AbilityEffect): asserts effect is De
     effect.type !== 'absorb' &&
     effect.type !== 'dot' &&
     effect.type !== 'extendDot' &&
+    effect.type !== 'refreshDot' &&
     effect.type !== 'channelFinisher' &&
     effect.type !== 'interrupt' &&
     effect.type !== 'consumeDot' &&
@@ -7925,6 +7947,10 @@ function addedEffectDescription(
     }
     case 'extendDot':
       return `${name} -> ${abilityName(effect.dot)}: +${seconds(effect.seconds, lang)} (<= +${seconds(effect.maxBonus, lang)}).`;
+    case 'refreshDot': {
+      const dot = ABILITIES[effect.dot]?.effects.find((candidate) => candidate.type === 'dot');
+      return `${name} -> ${abilityName(effect.dot)}: ${seconds(dot?.duration ?? 0, lang)}.`;
+    }
     case 'channelFinisher':
       return `${name}: ${formatNumber(effect.amount, lang)} ${text.statLabels.damage} (r=${formatNumber(effect.radius, lang)}).`;
     case 'interrupt':

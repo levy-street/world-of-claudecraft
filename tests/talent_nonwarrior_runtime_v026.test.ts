@@ -124,11 +124,9 @@ describe('retained v0.26 non-Warrior row runtime contracts', () => {
     expect(sim.player.resource).toBe(30);
   });
 
-  it('adds one talent charge for Twin Fracture and Twin Embers', () => {
-    const priest = simWithRows('priest', { 14: 'pri_r14_mind_melt' });
+  it('adds one talent charge for Twin Embers', () => {
     const mage = simWithRows('mage', { 5: 'mag_r5_impulse' });
 
-    expect(resolved(priest, 'mind_blast')).toMatchObject({ charges: 2, bonusCharges: 1 });
     expect(resolved(mage, 'fire_blast')).toMatchObject({ charges: 2, bonusCharges: 1 });
   });
 
