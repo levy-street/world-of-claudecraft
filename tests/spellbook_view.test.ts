@@ -35,6 +35,7 @@ function input(over: Partial<SpellbookInput> = {}): SpellbookInput {
     known: [],
     barAbilityIds: [],
     hasFreeSlot: true,
+    attackOnBar: true,
     hasFormBars: false,
     ...over,
   };
@@ -46,6 +47,13 @@ describe('buildSpellbookView: class kit + learned state', () => {
     expect(v.rows.map((r) => r.abilityId)).toEqual([...KIT]);
     expect(v.classId).toBe(CLASS_ID);
     expect(v.empty).toBe(false);
+  });
+
+  it('carries the pinned Attack toggle state beside the rows (never as a fake row)', () => {
+    expect(buildSpellbookView(input({ attackOnBar: true })).attackOnBar).toBe(true);
+    expect(buildSpellbookView(input({ attackOnBar: false })).attackOnBar).toBe(false);
+    // Attack is not an ability: it never leaks into the ability rows.
+    expect(buildSpellbookView(input()).rows.every((r) => r.abilityId !== 'attack')).toBe(true);
   });
 
   it('marks a learned ability known with its rank and a locked one null', () => {

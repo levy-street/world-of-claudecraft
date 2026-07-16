@@ -4280,6 +4280,10 @@ export class Hud {
     abilityIdByBarSlot: () =>
       this.hotbarActions.map((a) => (a && a.type === 'ability' ? a.id : null)),
     hasFreeSlot: () => this.firstEmptyHotbarIndex() !== -1,
+    attackOnBar: () => this.attackSlotIsAttack(),
+    // Routes through the Interface showAttackButton setting, the same state the
+    // options window and the slot-0 right-click drive, so all three stay one.
+    setAttackOnBar: (on) => this.optionsHooks?.settings.set('showAttackButton', on),
     addToBar: (id) => this.addAbilityToHotbar(id),
     removeFromBar: (id) => this.removeAbilityFromHotbar(id),
     hasFormBars: () => this.classHasFormBars(),
