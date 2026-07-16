@@ -1,6 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
+  ARENA_X,
   DELVE_BAND_X_MIN,
+  DUNGEON_X_THRESHOLD,
   ITEMS,
   isArenaPos,
   isDelvePos,
@@ -412,5 +414,67 @@ describe('Frontier enter/leave (PvP-window travel surface)', () => {
     const sim2 = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
     const pid2 = sim2.addPlayer('warrior', 'Alt', { state });
     expect(sim2.meta(pid2)!.frontierReturn).toMatchObject({ x: 40, z: 9, facing: 2.5 });
+  });
+
+  it('refuses entry for a player seated in a live arena match (the countdown escape)', () => {
+    // The reviewer's scenario: two seated fighters are NOT inCombat during the
+    // countdown, so without the arenaMatches guard frontier_enter deserts the match
+    // AND records the arena-slot coordinates as the return spot.
+    const sim = new Sim({ seed: 24, playerClass: 'warrior', noPlayer: true });
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('rogue', 'Bet');
+    for (const pid of [a, b]) {
+      const e = sim.entities.get(pid)!;
+      e.level = FRONTIER_MIN_LEVEL; // clear the level gate so only the match guard refuses
+      sim.arenaQueueJoin(pid);
+    }
+    sim.tick(); // matchmaking seats both in an arena slot (countdown, not inCombat)
+    expect(sim.arenaMatchFor(a)).toBeTruthy();
+    const ea = sim.entities.get(a)!;
+    expect(isArenaPos(ea.pos.x)).toBe(true);
+    expect(ea.inCombat).toBe(false);
+
+    sim.frontierEnter(a);
+    // Still seated in the match, and no arena-band return spot was recorded.
+    expect(isArenaPos(ea.pos.x)).toBe(true);
+    expect(isFrontierPos(ea.pos.x)).toBe(false);
+    expect(sim.meta(a)!.frontierReturn).toBeUndefined();
+  });
+
+  it('refuses entry from inside a dungeon instance', () => {
+    const sim = new Sim({ seed: 25, playerClass: 'warrior', autoEquip: true });
+    sim.setPlayerLevel(FRONTIER_MIN_LEVEL);
+    const pid = sim.player.id;
+    const player = sim.entities.get(pid)!;
+    player.pos = { x: 80, y: 1, z: 88 };
+    player.prevPos = { ...player.pos };
+    sim.enterCrypt(pid); // now standing in a far-off instance band
+    expect(player.pos.x).toBeGreaterThan(DUNGEON_X_THRESHOLD);
+
+    sim.frontierEnter(pid);
+    expect(isFrontierPos(player.pos.x)).toBe(false);
+    expect(player.pos.x).toBeGreaterThan(DUNGEON_X_THRESHOLD); // still inside the instance
+    expect(sim.meta(pid)!.frontierReturn).toBeUndefined();
+  });
+
+  it('never teleports a poisoned return spot into the arena band on leave', () => {
+    const sim = new Sim({ seed: 26, playerClass: 'warrior', autoEquip: true });
+    sim.setPlayerLevel(FRONTIER_MIN_LEVEL);
+    const pid = sim.player.id;
+    const player = sim.entities.get(pid)!;
+    // Inside the band, with a persisted return record poisoning an arena slot
+    // (the shape an old save could carry from before the entry guards existed).
+    player.pos = { x: FRONTIER_HUB.x, y: 1, z: FRONTIER_HUB.z };
+    player.prevPos = { ...player.pos };
+    sim.meta(pid)!.frontierReturn = { x: ARENA_X + 6, z: -1250, facing: 0 };
+
+    sim.frontierLeave(pid);
+    // Rejected: falls back to the sane overworld origin, never the arena band.
+    expect(isArenaPos(player.pos.x)).toBe(false);
+    expect(isFrontierPos(player.pos.x)).toBe(false);
+    expect(player.pos.x).toBeLessThanOrEqual(DUNGEON_X_THRESHOLD);
+    expect(player.pos.x).toBeCloseTo(0, 5);
+    expect(player.pos.z).toBeCloseTo(0, 5);
+    expect(sim.meta(pid)!.frontierReturn).toBeUndefined();
   });
 });
