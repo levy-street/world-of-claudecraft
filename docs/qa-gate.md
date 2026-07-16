@@ -39,7 +39,9 @@ fixing a red gate.
 changed-file formatting, the SFX conformance check, the full test suite, typecheck, and
 env, server, and client builds. Release branches use the release i18n tier. It stops at
 the first failure and bounds Vitest workers to avoid load flakes on shared machines. It
-requires FFmpeg (`ffmpeg` and `ffprobe`) on PATH and refuses to run without them.
+resolves FFmpeg (`ffmpeg` and `ffprobe`) from the bundled `ffmpeg-static`/`ffprobe-static`
+npm packages, falling back to PATH, and refuses to run when neither source yields a
+working binary.
 
 Use this command instead of an ad hoc shell pipeline. Piping a test run can hide its exit
 status, and unconstrained full-suite parallelism can make healthy heavy sim tests flake.
@@ -64,13 +66,18 @@ before reporting readiness.
 | Simulation architecture | `architecture-reviewer` | `woc_sim_architecture` |
 | Cross-host parity | `cross-platform-sync` | `woc_cross_platform` |
 | Persistence and migrations | `migration-safety` | `woc_persistence` |
+| Database performance | `database-performance-reviewer` | `woc_database_performance` |
 | Privacy and security | `privacy-security-review` | `woc_security` |
 | Decisive tests | `test-coverage-auditor` | `woc_test_coverage` |
 | Frontend and graphics | `frontend-seam-reviewer` | `woc_frontend` |
 | Release malware | `release-malware-audit` | `woc_release_malware` |
 
 These roles encode non-obvious review heuristics. Canonical architecture stays in root
-and local `CLAUDE.md` files.
+and local `CLAUDE.md` files. Persistence review owns compatibility, save/load shape, and
+rollback safety. Database-performance review owns query cadence, cardinality, plans,
+indexes, pool pressure, locks, timeout scope, write amplification, driver/dependency upgrades,
+PostgreSQL engine/resource/configuration/topology changes, and production-scale observability.
+Dispatch both when both sets of risk apply.
 
 ## Keep the gate current
 

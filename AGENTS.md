@@ -52,10 +52,16 @@ Repository skills live in `.agents/skills/` and are invoked as `$skill-name`:
   guidance.
 
 Read-only specialist agents live in `.codex/agents/`. Use only the roles matching the
-changed surface: sim architecture, cross-platform parity, persistence, security, test
-coverage, frontend, release malware, and official documentation research. The parent
-runs deterministic commands once; reviewers inspect evidence instead of duplicating the
-full gate.
+changed surface: sim architecture, cross-platform parity, persistence, database
+performance, security, test coverage, frontend, release malware, and official
+documentation research. The parent runs deterministic commands once; reviewers inspect
+evidence instead of duplicating the full gate.
+
+For SQL, database call sites, schema or indexes, query cadence/cardinality, pool or lock
+behavior, timeout policy, background work, database driver/dependency versions, PostgreSQL engine
+or resource/configuration/topology changes, or stored-data growth, invoke
+`woc_database_performance` before implementation decisions and again on the finished diff.
+Pair it with persistence or security review when those concerns also apply.
 
 ## Completion contract
 

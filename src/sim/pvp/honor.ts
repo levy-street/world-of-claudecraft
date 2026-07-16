@@ -1,4 +1,4 @@
-// Honor currency and deterministic Phase-1 reward rules. Every grant routes
+// Honor currency and deterministic initial reward rules. Every grant routes
 // through grantHonor so spendable and lifetime earnings update together.
 
 import type { PlayerMeta } from '../sim';

@@ -321,6 +321,7 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     { method: 'GET', path: '/api/claudium/native/rails' },
     { method: 'GET', path: '/api/claudium/native/price/:rail' },
     { method: 'GET', path: '/api/claudium/native/balance/sol/:owner' },
+    { method: 'GET', path: '/api/claudium/native/balance/usdc/:owner' },
     { method: 'GET', path: '/api/claudium/store' },
     { method: 'GET', path: '/api/claudium/history' },
     { method: 'POST', path: '/api/claudium/purchase' },

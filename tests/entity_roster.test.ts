@@ -17,6 +17,7 @@ import {
   runDespawnDecay,
   tickGroundAoEs,
 } from '../src/sim/entity_roster';
+import { createMobScanCounters } from '../src/sim/mob/scan_counters';
 import { Rng } from '../src/sim/rng';
 import { createSimContext, type SimContextHost } from '../src/sim/sim_context';
 import { createVcState } from '../src/sim/social/vale_cup';
@@ -95,6 +96,7 @@ function makeCtx() {
       return dungeonDoorIds;
     },
     instances: [],
+    dungeonResetLocks: new Map(),
     get arenaMatches() {
       return arenaMatches;
     },
@@ -199,6 +201,8 @@ function makeCtx() {
     instanceClaimIdAt: vi.fn(() => null),
     enterDungeon: vi.fn(),
     leaveDungeon: vi.fn(),
+    resetDungeonInstances: vi.fn(),
+    inheritDungeonResetLocks: vi.fn(),
     dungeonDifficulty: vi.fn(() => 'normal' as const),
     setDungeonDifficulty: vi.fn(),
     awardHeroicMarks: vi.fn(),
@@ -223,6 +227,7 @@ function makeCtx() {
     worldBossEntityIds: [],
     deedRuntime: createDeedRuntime(),
     fiestaBotPids: [],
+    mobScanCounters: createMobScanCounters(),
     bumpDeedStat: vi.fn(),
     markItemDiscovered: vi.fn(),
     markVisited: vi.fn(),

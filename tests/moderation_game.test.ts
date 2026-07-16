@@ -123,7 +123,7 @@ function command(server: GameServer, session: ClientSession, text: string): void
 
 beforeEach(() => {
   vi.clearAllMocks();
-  vi.mocked(saveCharacterState).mockResolvedValue(undefined);
+  vi.mocked(saveCharacterState).mockResolvedValue(true);
 });
 
 describe('in-game moderation actions', () => {

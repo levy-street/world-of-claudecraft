@@ -25,9 +25,11 @@ proofs.
   tests/server/new_endpoint.test.ts green (golden child tsc through the extends chain);
   .githooks/pre-push dry run green; a tsc --checkers 8 run is clean.
 - Local gate: npm run gate fully green on a non-release branch AND release-tier
-  (I18N_RELEASE_TIER=1) green on the release branch before the final merge (release
-  tier counts as green if the only reds are pre-existing pending-row locale failures
-  unrelated to this packet; record them).
+  (I18N_RELEASE_TIER=1) green on the release branch before the final merge.
+  (Clause updated 2026-07-15 by Phase 3 QA: the v0.26.0 fill emptied pending, so
+  pending-row locale reds are NO LONGER an expected mid-cycle state; a red
+  release tier is a real regression unless a new post-fill catalog key
+  legitimately reintroduced pending rows, in which case record exactly which.)
 - Verdict preservation: this filled matrix is pasted into the final PR body or the
   issue #1868 summary before any packet teardown.
 - Pinned tests all green and still meaningful: tests/ci_workflow.test.ts,

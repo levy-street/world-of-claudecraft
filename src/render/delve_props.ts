@@ -9,6 +9,7 @@
 import * as THREE from 'three';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
+import { delveInteractableVisible } from './delve_interactable_visibility_core';
 import { buildDungeonPropMesh } from './dungeon';
 import { GFX, surfaceMat } from './gfx';
 
@@ -737,6 +738,18 @@ function buildProceduralFallbackCrate(entityId: number): { group: THREE.Group; h
 // perf-friendly, gameplay-neutral).
 // ---------------------------------------------------------------------------
 type RiteShrineKind = 'bell' | 'candle' | 'reed' | 'skull';
+
+/** Apply the object-view visibility policy after a delve prop mesh is rebuilt. */
+export function syncDelveInteractableVisibility(
+  group: THREE.Object3D,
+  templateId: string | null,
+  lootable: boolean,
+  withinPortalRange = true,
+): boolean {
+  const visible = delveInteractableVisible(templateId, lootable) && withinPortalRange;
+  group.visible = visible;
+  return visible;
+}
 
 const RITE_SHRINE_ACCENT: Record<RiteShrineKind, number> = {
   bell: 0xc9a24b,

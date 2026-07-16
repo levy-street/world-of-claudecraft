@@ -845,8 +845,12 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
     // like a physical attack; a target can only fully RESIST them (classic-era
     // semantics), so a spell's on-impact roll uses isSpellResisted and emits a 'resist'.
     // A physical shot has no resist roll; its hit/crit resolve inside runEffects.
+    // Taunts (e.g. Sacred Goad) ALWAYS land: a resisted taunt would silently break
+    // tanking, so a taunt ability skips the resist roll entirely (physical taunts like
+    // Goad / Menace already never roll, since they resolve instantly below).
+    const isTaunt = res.effects.some((eff) => eff.type === 'taunt');
     scheduleProjectile(ctx, p, target, (src, tgt) => {
-      if (isSpell && isSpellResisted(ctx.rng, src.level, tgt.level)) {
+      if (isSpell && !isTaunt && isSpellResisted(ctx.rng, src.level, tgt.level, src.hitBonus)) {
         ctx.emit({
           type: 'damage',
           sourceId: src.id,

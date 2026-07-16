@@ -9,8 +9,8 @@
     "lockpick minigame (flawless solve)",
     "reward chest + delve marks"
   ],
-  "draws": 8,
-  "drawDigest": "20464699",
+  "draws": 13,
+  "drawDigest": "ded57bf5",
   "frames": [
     {
       "tick": 0,
@@ -134,44 +134,44 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 422,
-      "state": "a862caa8",
-      "events": "494596a3",
+      "state": "96ba5a50",
+      "events": "0743001f",
       "rng": {
-        "draws": 4,
-        "digest": "e1f30e03"
+        "draws": 7,
+        "digest": "30365ad3"
       }
     },
     {
       "tick": 20,
       "time": 1,
       "nextId": 422,
-      "state": "61ff76bd",
+      "state": "dec5d3ae",
       "events": "e8535d0d",
       "rng": {
-        "draws": 4,
-        "digest": "e1f30e03"
+        "draws": 7,
+        "digest": "30365ad3"
       }
     },
     {
       "tick": 30,
       "time": 1.5,
       "nextId": 422,
-      "state": "3e5b909e",
-      "events": "dea37e16",
+      "state": "a241fc2d",
+      "events": "adb5f051",
       "rng": {
-        "draws": 5,
-        "digest": "0d1e87b1"
+        "draws": 10,
+        "digest": "06665a19"
       }
     },
     {
       "tick": 38,
       "time": 1.9,
       "nextId": 424,
-      "state": "a86e6621",
-      "events": "0cb94d06",
+      "state": "88ffbe56",
+      "events": "4e2f9332",
       "rng": {
-        "draws": 8,
-        "digest": "20464699"
+        "draws": 13,
+        "digest": "ded57bf5"
       },
       "label": "delve-end",
       "players": [
@@ -190,7 +190,7 @@
           "bank": {},
           "cls": "rogue",
           "companionUpgrades": {},
-          "copper": 21,
+          "copper": 25,
           "counters": {
             "damageDealt": 1635,
             "kills": 1,
@@ -329,14 +329,14 @@
         },
         {
           "aiState": "idle",
-          "combatTimer": 100.9,
+          "combatTimer": 0.5,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -2.378458,
+          "facing": -1.570796,
           "fiveSecondRule": 99,
-          "hp": 103,
+          "hp": 56,
           "id": 417,
           "kind": "mob",
           "level": 4,
@@ -376,19 +376,19 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -2.583314,
+          "facing": 1.570796,
           "fiveSecondRule": 99,
           "hostile": true,
           "id": 418,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 4798.053255,
-            "z": -1173.117019
+            "x": 4800,
+            "z": -1170
           },
           "level": 9,
           "loot": {
-            "copper": 439
+            "copper": 434
           },
           "lootFfaTimer": 59.6,
           "lootRecipientIds": [
@@ -401,8 +401,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 4798.053255,
-            "z": -1173.117019
+            "x": 4800,
+            "z": -1170
           },
           "potionCooldownUntil": -1,
           "respawnTimer": 24.6,
@@ -413,14 +413,10 @@
           "stats": {
             "armor": 160
           },
-          "stompTimer": 12,
+          "stompTimer": 10.5,
+          "swingTimer": 0.75,
           "tappedById": 408,
           "templateId": "deacon_varric",
-          "wanderTarget": {
-            "x": 4795.28058,
-            "z": -1177.556469
-          },
-          "wanderTimer": 28.55,
           "weapon": {
             "max": 51,
             "min": 33,
@@ -471,22 +467,22 @@
       "tick": 40,
       "time": 2,
       "nextId": 424,
-      "state": "a98489a8",
+      "state": "d68a7282",
       "events": "741638a5",
       "rng": {
-        "draws": 8,
-        "digest": "20464699"
+        "draws": 13,
+        "digest": "ded57bf5"
       }
     },
     {
       "tick": 40,
       "time": 2,
       "nextId": 424,
-      "state": "a98489a8",
+      "state": "d68a7282",
       "events": "741638a5",
       "rng": {
-        "draws": 8,
-        "digest": "20464699"
+        "draws": 13,
+        "digest": "ded57bf5"
       },
       "label": "final",
       "players": [
@@ -505,7 +501,7 @@
           "bank": {},
           "cls": "rogue",
           "companionUpgrades": {},
-          "copper": 21,
+          "copper": 25,
           "counters": {
             "damageDealt": 1635,
             "kills": 1,
@@ -644,14 +640,14 @@
         },
         {
           "aiState": "idle",
-          "combatTimer": 101,
+          "combatTimer": 0.6,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -2.378458,
+          "facing": -1.570796,
           "fiveSecondRule": 99,
-          "hp": 103,
+          "hp": 56,
           "id": 417,
           "kind": "mob",
           "level": 4,
@@ -691,19 +687,19 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -2.583314,
+          "facing": 1.570796,
           "fiveSecondRule": 99,
           "hostile": true,
           "id": 418,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 4798.053255,
-            "z": -1173.117019
+            "x": 4800,
+            "z": -1170
           },
           "level": 9,
           "loot": {
-            "copper": 439
+            "copper": 434
           },
           "lootFfaTimer": 59.5,
           "lootRecipientIds": [
@@ -716,8 +712,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 4798.053255,
-            "z": -1173.117019
+            "x": 4800,
+            "z": -1170
           },
           "potionCooldownUntil": -1,
           "respawnTimer": 24.5,
@@ -728,14 +724,10 @@
           "stats": {
             "armor": 160
           },
-          "stompTimer": 12,
+          "stompTimer": 10.5,
+          "swingTimer": 0.75,
           "tappedById": 408,
           "templateId": "deacon_varric",
-          "wanderTarget": {
-            "x": 4795.28058,
-            "z": -1177.556469
-          },
-          "wanderTimer": 28.55,
           "weapon": {
             "max": 51,
             "min": 33,

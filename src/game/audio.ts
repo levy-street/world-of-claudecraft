@@ -16,6 +16,7 @@ const UI_CUES = {
   click: 'ui_click',
   coin: 'ui_coin',
   levelUp: 'ui_level_up',
+  achievement: 'ui_achievement',
   lootItem: 'ui_loot_item',
   questAccept: 'ui_quest_accept',
   questDone: 'ui_quest_done',
@@ -182,6 +183,10 @@ export class GameAudio {
 
   levelUp(): void {
     this.play(UI_CUES.levelUp);
+  }
+
+  achievement(): void {
+    this.play(UI_CUES.achievement);
   }
 
   lootItem(): void {

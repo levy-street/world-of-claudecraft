@@ -35,6 +35,8 @@ function stubSource(overrides: Partial<GameStateSource> = {}): GameStateSource {
     simEntities: () => 42,
     simTickHz: () => 20,
     tickPhaseMillis: () => ({}),
+    lastTickAt: () => 1_700_000_000_000,
+    loopStartedAt: () => 1_700_000_000_000,
     ...overrides,
   };
 }

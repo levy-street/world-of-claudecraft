@@ -130,6 +130,7 @@ describe('Codex custom agents', () => {
       .sort();
     expect(files).toEqual([
       'woc_cross_platform.toml',
+      'woc_database_performance.toml',
       'woc_docs_researcher.toml',
       'woc_frontend.toml',
       'woc_persistence.toml',
@@ -153,6 +154,70 @@ describe('Codex custom agents', () => {
       expect(text, file).not.toMatch(/^\s*model_reasoning_effort\s*=/m);
       expect(text, file).not.toMatch(/^\s*(approval_policy|network_access)\s*=/m);
     }
+  });
+
+  it('routes database scaling work to the dedicated reviewer', () => {
+    const agent = read('.codex/agents/woc_database_performance.toml');
+    expect(agent).toContain('name = "woc_database_performance"');
+    expect(agent).toContain('Never use database credentials, connect to or query a production');
+    expect(agent).toMatch(/or shared database, edit files, mutate any database/);
+    expect(agent).toContain('or run a load test against production.');
+    expect(agent).toMatch(
+      /The coordinator owns every database, test,\s+benchmark, and EXPLAIN command/,
+    );
+    expect(agent).toContain('Treat EXPLAIN ANALYZE as query execution');
+    expect(agent).toContain('Proposed-change review:');
+    expect(agent).toContain('Finished-diff review:');
+    expect(agent).toContain('An empty diff is not a reason to exit this mode.');
+    expect(agent).toMatch(/neither the assigned proposal nor the finished diff can affect/);
+    expect(agent).toContain('aggregate or redacted plans, metrics, and logs');
+    expect(agent).toContain('Never request or repeat');
+    expect(agent).toContain('Verdict: `PASS`, `BLOCK`, or `OUT_OF_SCOPE`');
+    expect(agent).toContain('Workload assumptions:');
+    expect(agent).toContain('Required runtime proof:');
+    expect(agent).toContain('woc_security');
+    expect(agent).toContain('unbounded waiters');
+    expect(agent).toContain('claimed connection reserves are enforced by code');
+    expect(agent).toMatch(/no direct query,\s+transaction, retry, or background path can bypass/);
+    expect(agent).toContain('disposable real-Postgres evidence');
+    expect(agent).toContain('schema or index design');
+    expect(agent).toMatch(/pool\s+configuration/);
+    expect(agent).toContain('lock scope');
+    expect(agent).toMatch(/timeout\s+policy/);
+    expect(agent).toContain('database driver/dependency version');
+    expect(agent).toContain('PostgreSQL engine version');
+    expect(agent).toContain('current official documentation/package source');
+    expect(read('.agents/skills/woc-qa/SKILL.md')).toMatch(
+      /`woc_database_performance` for SQL, indexes, query call sites, pool or lock behavior/,
+    );
+    expect(read('.agents/skills/woc-review-pr/SKILL.md')).toMatch(
+      /Invoke `woc_database_performance` when the diff changes SQL, a database call site/,
+    );
+    const planningSkill = read('.agents/skills/woc-feature-plan/SKILL.md');
+    expect(planningSkill).toMatch(
+      /When work adds or changes SQL, a database call site[\s\S]*use\s+`woc_database_performance` for a read-only scaling pass/,
+    );
+    expect(planningSkill).toContain(
+      'pool sizing or admission, transaction or lock scope, or timeout policy',
+    );
+    const implementationSkill = read('.agents/skills/woc-extract-and-test/SKILL.md');
+    expect(implementationSkill).toMatch(
+      /Before implementing database-backed behavior, invoke `woc_database_performance`/,
+    );
+    expect(implementationSkill).toMatch(
+      /Re-run `woc_database_performance` on the finished diff when its database triggers\s+match/,
+    );
+    expect(read('AGENTS.md')).toMatch(/database\s+performance/);
+    expect(read('AGENTS.md')).toContain(
+      '`woc_database_performance` before implementation decisions and again on the finished diff',
+    );
+    expect(read('AGENTS.md')).toContain('database driver/dependency versions');
+    expect(read('.agents/skills/woc-qa/SKILL.md')).toContain('driver/dependency upgrades');
+    expect(read('.agents/skills/woc-review-pr/SKILL.md')).toMatch(
+      /PostgreSQL\s+engine\/resource\/configuration\/topology/,
+    );
+    expect(read('docs/codex.md')).toContain('`woc_database_performance`');
+    expect(read('docs/qa-gate.md')).toContain('| Database performance |');
   });
 });
 
@@ -189,6 +254,16 @@ describe('Codex skills', () => {
       expect(metadata, skill).toContain(`$${skill}`);
       expect(metadata, skill).toMatch(/allow_implicit_invocation: (true|false)/);
     }
+
+    expect(read('.agents/skills/woc-extract-and-test/agents/openai.yaml')).toContain(
+      'allow_implicit_invocation: true',
+    );
+    expect(read('.agents/skills/woc-qa/agents/openai.yaml')).toContain(
+      'allow_implicit_invocation: true',
+    );
+    expect(read('.agents/skills/woc-feature-plan/agents/openai.yaml')).toContain(
+      'allow_implicit_invocation: false',
+    );
   });
 });
 

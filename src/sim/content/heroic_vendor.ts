@@ -13,8 +13,16 @@ import type { ItemDef } from '../types';
 // Jewelry carries no armorType, so every class can wear every piece; the stat
 // identity picks its audience. Prices are tunable placeholders sized against
 // the four heroic-final-boss rewards available during each realm reset cycle.
+//
+// Combat rating: every piece also carries ONE combat rating (hit / crit / haste)
+// at JEWELRY_RATING (25 -> 2.5%), chosen by its stat identity. Ratings are off the
+// primary-stat budget (like spellPower), so the sums above stay budget-enforced.
+// This is jewelry's endgame identity; see docs/prd/combat-ratings-and-jewelry.md.
 
 export const HEROIC_VENDOR_NPC_ID = 'heroic_quartermaster';
+
+// One rating per jewelry piece, 25 rating = 2.5% (10 rating = 1%).
+const JEWELRY_RATING = 25;
 
 export interface HeroicVendorOffer {
   itemId: string;
@@ -30,6 +38,7 @@ export const HEROIC_VENDOR_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { str: 7, sta: 4 },
+    hitRating: JEWELRY_RATING, // plate melee: Hit answers the Heroic +3 miss
     sellValue: 4500,
   },
   nielas_coldlight_band: {
@@ -40,6 +49,7 @@ export const HEROIC_VENDOR_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { int: 7, sta: 4 },
+    hitRating: JEWELRY_RATING, // dps caster: Hit answers the Heroic +3 resist
     sellValue: 4500,
   },
   sutils_gambit: {
@@ -50,6 +60,7 @@ export const HEROIC_VENDOR_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { agi: 7, sta: 4 },
+    critRating: JEWELRY_RATING, // agi dps: crit throughput
     sellValue: 4500,
   },
   oath_of_the_round_table: {
@@ -60,6 +71,7 @@ export const HEROIC_VENDOR_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { sta: 6, str: 5 },
+    hitRating: JEWELRY_RATING, // tank/melee: Hit
     sellValue: 4500,
   },
   zyzzs_deathless_signet: {
@@ -70,6 +82,7 @@ export const HEROIC_VENDOR_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { spi: 6, int: 5 },
+    hasteRating: JEWELRY_RATING, // healer-leaning: haste
     sellValue: 4500,
   },
   architects_cornerstone: {
@@ -80,6 +93,7 @@ export const HEROIC_VENDOR_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { int: 6, spi: 5 },
+    hasteRating: JEWELRY_RATING, // caster/healer: uptime
     sellValue: 4500,
   },
   yumis_keepsake_locket: {
@@ -90,6 +104,7 @@ export const HEROIC_VENDOR_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { agi: 7, sta: 5 },
+    hasteRating: JEWELRY_RATING, // agi dps: uptime
     sellValue: 6000,
   },
   zense_meridian: {
@@ -100,6 +115,7 @@ export const HEROIC_VENDOR_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { int: 7, spi: 5 },
+    critRating: JEWELRY_RATING, // caster throughput
     sellValue: 6000,
   },
   swiftfang_talisman: {
@@ -110,6 +126,7 @@ export const HEROIC_VENDOR_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { str: 6, agi: 6 },
+    hitRating: JEWELRY_RATING, // hybrid melee: Hit
     sellValue: 6000,
   },
   medallion_of_endless_profit: {
@@ -120,6 +137,7 @@ export const HEROIC_VENDOR_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { str: 7, sta: 5 },
+    critRating: JEWELRY_RATING, // melee throughput
     sellValue: 6000,
   },
 };

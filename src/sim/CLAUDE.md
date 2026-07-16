@@ -116,6 +116,7 @@ power coefficients), `stun_dr.ts` (CC diminishing-return categories), `item_leve
 `item_budget.ts`/`item_level_req.ts` (drop power math), `equipment_rules.ts` (equip
 legality), `cooldown_persist.ts` (cooldown save/load), `tab_target.ts`/`assist.ts`/
 `dead_target.ts` (target cycling, /assist, dead-target selectability), `flee_speed.ts`,
+`mob/scan_counters.ts` (the per-tick mob scan-visit tally the server reads post-tick),
 `lockpick.ts` (the minigame core behind `delves/lockpick_controller.ts`), `map_doc.ts`
 (the custom-map document/validator), `geometry2d.ts`, `market_query.ts`,
 `vendor_stack.ts`, `loot_master.ts`, `aura_classify.ts` (buff-vs-debuff, shared with the

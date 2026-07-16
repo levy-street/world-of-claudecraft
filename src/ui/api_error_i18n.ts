@@ -315,6 +315,13 @@ export function userFacingApiError(err: unknown): string {
   // WebSocket disconnect reasons surfaced through the fatal overlay (net/online.ts).
   if (normalized === 'connection to the server was lost.') return t('loading.connectionLost');
   if (normalized === 'rejected by server') return t('loading.connectionRejected');
+  // The realm admission cap refused a fresh join. 'realm is full' is a byte-exact
+  // wire contract with server/ws_auth.ts (WS_AUTH_ERROR).
+  if (normalized === 'realm is full') return t('loading.realmFull');
+  // The per-IP connection cap refused the handshake. 'too many connections from your
+  // network' is a byte-exact wire contract with server/ws_auth.ts (WS_AUTH_ERROR).
+  if (normalized === 'too many connections from your network')
+    return t('loading.tooManyConnections');
   // NOTE: protocol/transport diagnostics ('bad auth message', 'authentication timed out',
   // etc.) are intentionally NOT translated, they are developer/diagnostic errors and must
   // stay English so browser logs and support reports match the server source.

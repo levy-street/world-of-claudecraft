@@ -18,6 +18,17 @@ const SCHOOL_CUES = {
   nature: { cast: 'cast_nature', projectile: 'proj_nature', impact: 'impact_nature' },
 } as const satisfies Record<MagicSchool, { cast: SfxId; projectile: SfxId; impact: SfxId }>;
 
+// Wand auto-attack cues: distinct from a real spell cast's SCHOOL_CUES
+// projectile so a passive auto-attack doesn't sound identical to an actual
+// cast. Only the three wand-equipped classes (mage/arcane, priest/holy,
+// warlock/shadow, see classes.ts ranged.wand) have a dedicated cue; any other
+// school reaching here (should not happen) falls back to the real spell cue.
+const WAND_CUES: Partial<Record<MagicSchool, SfxId>> = {
+  arcane: 'wand_arcane',
+  holy: 'wand_holy',
+  shadow: 'wand_shadow',
+};
+
 // Exported (read-only, `as const`) purely so a test can pin its key set
 // against SFX_MOB_EXTENSION_FAMILIES: a family added to one and forgotten in
 // the other currently resolves at runtime to a key with no clip, which plays
@@ -149,7 +160,11 @@ export function spellFxCue(event: SpellFxEvent): { key: SfxId; anchorId: number 
   if (event.fx === 'projectile') {
     if (event.school === 'physical') return { key: 'melee_bow', anchorId: event.sourceId };
     const school = magicSchool(event.school);
-    return school ? { key: SCHOOL_CUES[school].projectile, anchorId: event.sourceId } : null;
+    if (!school) return null;
+    const key = event.wand
+      ? (WAND_CUES[school] ?? SCHOOL_CUES[school].projectile)
+      : SCHOOL_CUES[school].projectile;
+    return { key, anchorId: event.sourceId };
   }
   if (event.fx === 'nova') return { key: 'spell_nova', anchorId: event.targetId };
   return null;
