@@ -496,7 +496,10 @@ export const HEROIC_SUBBOSS_LOOT: Record<string, LootEntry[]> = {
   knight_commander_olen: [{ itemId: 'spiritbinder_pauldrons', chance: 0.2 }],
   // Drowned Temple sub-bosses
   choirmother_selthe: [{ itemId: 'spiritbinder_hauberk', chance: 0.2 }],
-  pearlguard_sentinel: [{ itemId: 'spiritbinder_legguards', chance: 0.2 }],
+  // 0.1, not 0.2: the sentinel spawns twice per Drowned Temple run, so the
+  // per-run acquisition chance (~19%) stays uniform with the single-spawn
+  // sub-bosses' 20% pieces. Do not "fix" this back to 0.2.
+  pearlguard_sentinel: [{ itemId: 'spiritbinder_legguards', chance: 0.1 }],
 };
 
 // RETIRED, save-compat only. v0.25.0 replaced the standalone heroic Nythraxis

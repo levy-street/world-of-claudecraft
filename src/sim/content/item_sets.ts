@@ -249,7 +249,7 @@ export const ITEM_SETS: Record<string, ItemSet> = {
   // mail-wearing hybrids (paladin, shaman). Shares CASTER_T1_BONUSES exactly the way
   // the two T2 caster sets (Soulflame, Stormcallers) share CASTER_T2_BONUSES. Its
   // heroic (item level 28) variants populate the sub-boss loot across the heroic
-  // five-mans (see the loot entries in content/dungeons.ts).
+  // five-mans (see HEROIC_SUBBOSS_LOOT in content/heroic_loot.ts).
   [SET_SPIRITBINDER]: {
     id: SET_SPIRITBINDER,
     name: 'Spiritbinder Regalia',
