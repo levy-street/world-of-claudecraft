@@ -5366,7 +5366,17 @@ export const ru_RU: EnTranslations = {
       "tradeInProgress": "Обмен уже идет.",
       "tradeTooFar": "Цель слишком далеко для обмена.",
       "tradeExpired": "Запрос обмена истек.",
-      "tradeFailed": "Обмен не удался: предметы или деньги больше недоступны."
+      "tradeFailed": "Обмен не удался: предметы или деньги больше недоступны.",
+      "tradeBusy": "Этот игрок уже участвует в обмене.",
+      "tradeUsage": "С кем обменяться? Использование: /trade <имя>.",
+      "claudiumTradeOff": "Обмен Claudium сейчас недоступен.",
+      "wocTradeOff": "Обмен WOC сейчас недоступен.",
+      "wocTradeLink": "Привяжите кошелек, чтобы обмениваться WOC.",
+      "wocTradePartnerLink": "У вашего партнера по обмену нет привязанного кошелька.",
+      "wocTradeOneSide": "Предлагать WOC в обмене может только одна сторона.",
+      "tradeSettleTimeout": "Обмен отменен: время ожидания платежа истекло. Ваши вещи возвращены.",
+      "tradeSettleCancelled": "Обмен отменен. Ваши вещи возвращены.",
+      "tradeSettleUnavailable": "Не удалось завершить обмен. Ваши вещи возвращены."
     },
     "logs": {
       "standUp": "Вы встаете.",
@@ -5386,6 +5396,7 @@ export const ru_RU: EnTranslations = {
       "tradeOpened": "Окно обмена открыто.",
       "tradeComplete": "Обмен завершен.",
       "tradeCancelled": "Обмен отменен.",
+      "tradeDeclined": "{name} отклонил ваш запрос на обмен.",
       "lootReceiveItem": "Получено: {item}.",
       "lootReceiveMoney": "Вы получаете {money}.",
       "lootMoney": "Вы добываете {money}.",
@@ -5394,6 +5405,34 @@ export const ru_RU: EnTranslations = {
       "soldJunkMany": "Вы продали серые предметы ({count}) за {money}.",
       "friendOnline": "{name} вошел в игру.",
       "friendOffline": "{name} вышел из игры."
+    },
+    "trade": {
+      "claudiumLabel": "Claudium",
+      "wocLabel": "WOC",
+      "settlingTitle": "Завершение сделки…",
+      "legYourClaudium": "Your Claudium",
+      "legTheirClaudium": "Their Claudium",
+      "legYourWoc": "Ваш платеж WOC",
+      "legTheirWoc": "Платеж WOC партнера",
+      "statusPending": "В ожидании",
+      "statusDone": "Done",
+      "wocPayPrompt": "Отправьте {amount} WOC с привязанного кошелька, чтобы завершить обмен.",
+      "openInWallet": "Открыть в кошельке",
+      "copyLink": "Скопировать ссылку на платеж",
+      "copiedLink": "Ссылка на платеж скопирована.",
+      "instanceSignedBy": "Подписано: {name}",
+      "instanceUnique": "Уникальная копия",
+      "title": "Обмен с {name}",
+      "yourOffer": "Ваше предложение",
+      "theirOffer": "Предложение {name}",
+      "emptyMine": "Нажимайте предметы в сумках, чтобы добавить их",
+      "emptyTheirs": "Пока ничего не предложено",
+      "money": "Деньги",
+      "copper": "медь",
+      "hint": "Нажмите предложенный предмет, чтобы убрать его. Оба игрока должны нажать Принять обмен.",
+      "accept": "Принять обмен",
+      "waiting": "Ожидание...",
+      "cancel": "Отмена"
     },
     "tutorial": {
       "title": "Новый искатель приключений",
@@ -5521,19 +5560,6 @@ export const ru_RU: EnTranslations = {
       },
       "guildHeadOne": "вы {rank}, {count} участник",
       "guildHeadMany": "вы {rank}, {count} участников"
-    },
-    "trade": {
-      "title": "Обмен с {name}",
-      "yourOffer": "Ваше предложение",
-      "theirOffer": "Предложение {name}",
-      "emptyMine": "Нажимайте предметы в сумках, чтобы добавить их",
-      "emptyTheirs": "Пока ничего не предложено",
-      "money": "Деньги",
-      "copper": "медь",
-      "hint": "Нажмите предложенный предмет, чтобы убрать его. Оба игрока должны нажать Принять обмен.",
-      "accept": "Принять обмен",
-      "waiting": "Ожидание...",
-      "cancel": "Отмена"
     },
     "arena": {
       "title": "Пепельный Колизей",
@@ -9805,6 +9831,16 @@ export const ru_RU: EnTranslations = {
         "sender": "Торговец",
         "subject": "Срок вашего лота истек",
         "body": "Покупатель не нашелся до истечения срока продажи. Товар ждет в ящике получения на Мировом Рынке; приходите забрать его.\n\n- Торговец"
+      },
+      "trade_delivery": {
+        "sender": "Вороновая почта",
+        "subject": "Товары по обмену доставлены",
+        "body": "Товары, полученные в результате обмена, прибыли. Ворон принес то, что не поместилось в ваши сумки."
+      },
+      "trade_refund": {
+        "sender": "Вороновая почта",
+        "subject": "Товары по обмену возвращены",
+        "body": "Обмен не состоялся. Все, что вы предложили, было возвращено вам."
       }
     },
     "itemSets": {

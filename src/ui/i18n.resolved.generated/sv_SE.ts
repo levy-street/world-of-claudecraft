@@ -5366,7 +5366,17 @@ export const sv_SE: EnTranslations = {
       "tradeInProgress": "En handel pågår redan.",
       "tradeTooFar": "Målet är för långt bort för att handla.",
       "tradeExpired": "Handelsförfrågan har gått ut.",
-      "tradeFailed": "Handeln misslyckades: föremål eller pengar är inte längre tillgängliga."
+      "tradeFailed": "Handeln misslyckades: föremål eller pengar är inte längre tillgängliga.",
+      "tradeBusy": "That player is already trading.",
+      "tradeUsage": "Trade whom? Usage: /trade <name>.",
+      "claudiumTradeOff": "Claudium trading is not available.",
+      "wocTradeOff": "WOC trading is not available.",
+      "wocTradeLink": "Link a wallet to trade WOC.",
+      "wocTradePartnerLink": "Your trade partner has no linked wallet.",
+      "wocTradeOneSide": "Only one side of a trade can offer WOC.",
+      "tradeSettleTimeout": "Trade cancelled: the payment window expired. Your goods were returned.",
+      "tradeSettleCancelled": "Trade cancelled. Your goods were returned.",
+      "tradeSettleUnavailable": "Trade could not settle. Your goods were returned."
     },
     "logs": {
       "standUp": "Du reser dig upp.",
@@ -5386,6 +5396,7 @@ export const sv_SE: EnTranslations = {
       "tradeOpened": "Handelsfönster öppnat.",
       "tradeComplete": "Handeln slutförd.",
       "tradeCancelled": "Handeln avbruten.",
+      "tradeDeclined": "{name} declined your trade request.",
       "lootReceiveItem": "Du mottar: {item}.",
       "lootReceiveMoney": "Du mottar {money}.",
       "lootMoney": "Du plundrar {money}.",
@@ -5394,6 +5405,34 @@ export const sv_SE: EnTranslations = {
       "soldJunkMany": "Sålde {count} skräpföremål för {money}.",
       "friendOnline": "{name} har kopplat upp.",
       "friendOffline": "{name} har kopplat från."
+    },
+    "trade": {
+      "claudiumLabel": "Claudium",
+      "wocLabel": "WOC",
+      "settlingTitle": "Settling trade...",
+      "legYourClaudium": "Your Claudium",
+      "legTheirClaudium": "Their Claudium",
+      "legYourWoc": "Your WOC payment",
+      "legTheirWoc": "Their WOC payment",
+      "statusPending": "Pending",
+      "statusDone": "Done",
+      "wocPayPrompt": "Send {amount} WOC from your linked wallet to complete the trade.",
+      "openInWallet": "Open in wallet",
+      "copyLink": "Copy payment link",
+      "copiedLink": "Payment link copied.",
+      "instanceSignedBy": "Signed by {name}",
+      "instanceUnique": "Unique copy",
+      "title": "Handla med {name}",
+      "yourOffer": "Ditt erbjudande",
+      "theirOffer": "{name}s erbjudande",
+      "emptyMine": "Klicka på föremål i dina väskor för att lägga till dem",
+      "emptyTheirs": "Inget erbjudet ännu",
+      "money": "Pengar",
+      "copper": "koppar",
+      "hint": "Klicka på ett erbjudet föremål för att ta bort det. Båda sidor måste trycka på Godkänn handel.",
+      "accept": "Godkänn handel",
+      "waiting": "Väntar...",
+      "cancel": "Avbryt"
     },
     "tutorial": {
       "title": "Ny äventyrare",
@@ -5521,19 +5560,6 @@ export const sv_SE: EnTranslations = {
       },
       "guildHeadOne": "du är {rank}, {count} medlem",
       "guildHeadMany": "du är {rank}, {count} medlemmar"
-    },
-    "trade": {
-      "title": "Handla med {name}",
-      "yourOffer": "Ditt erbjudande",
-      "theirOffer": "{name}s erbjudande",
-      "emptyMine": "Klicka på föremål i dina väskor för att lägga till dem",
-      "emptyTheirs": "Inget erbjudet ännu",
-      "money": "Pengar",
-      "copper": "koppar",
-      "hint": "Klicka på ett erbjudet föremål för att ta bort det. Båda sidor måste trycka på Godkänn handel.",
-      "accept": "Godkänn handel",
-      "waiting": "Väntar...",
-      "cancel": "Avbryt"
     },
     "arena": {
       "title": "Den Askgråa kolosseum",
@@ -9805,6 +9831,16 @@ export const sv_SE: EnTranslations = {
         "sender": "The Merchant",
         "subject": "Your listing expired",
         "body": "No buyer came for your goods before the listing ran out. They wait in your collection box at the World Market; come see me to take them back.\n\n- The Merchant"
+      },
+      "trade_delivery": {
+        "sender": "The Ravenpost",
+        "subject": "Trade delivery",
+        "body": "Goods from your trade have arrived. The raven carried what your bags could not."
+      },
+      "trade_refund": {
+        "sender": "The Ravenpost",
+        "subject": "Trade goods returned",
+        "body": "Your trade did not complete. Everything you offered has been returned."
       }
     },
     "itemSets": {

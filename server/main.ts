@@ -2612,6 +2612,12 @@ export async function startServer(): Promise<http.Server> {
   await pruneApplePendingLogins(pool);
   await game.loadMarket();
   await game.loadMail();
+  // Resolve any external-currency trade left mid-settlement by the previous boot.
+  // Runs after the mail store is loaded so escrow delivery/refund letters land in
+  // the live Ravenpost state; a failure here is logged, never fatal to boot.
+  await game
+    .recoverOpenTradeSettlements()
+    .catch((err) => console.error('trade settlement recovery failed:', err));
   await game.loadChatFilter();
   await game.loadBlockedIps();
   void game.recordOnlineSnapshot();

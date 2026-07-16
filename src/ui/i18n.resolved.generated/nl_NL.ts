@@ -5366,7 +5366,17 @@ export const nl_NL: EnTranslations = {
       "tradeInProgress": "Er is al een ruil aan de gang.",
       "tradeTooFar": "Het doelwit is te ver weg om mee te ruilen.",
       "tradeExpired": "Het ruilverzoek is verlopen.",
-      "tradeFailed": "Ruil mislukt: voorwerpen of geld niet langer beschikbaar."
+      "tradeFailed": "Ruil mislukt: voorwerpen of geld niet langer beschikbaar.",
+      "tradeBusy": "That player is already trading.",
+      "tradeUsage": "Trade whom? Usage: /trade <name>.",
+      "claudiumTradeOff": "Claudium trading is not available.",
+      "wocTradeOff": "WOC trading is not available.",
+      "wocTradeLink": "Link a wallet to trade WOC.",
+      "wocTradePartnerLink": "Your trade partner has no linked wallet.",
+      "wocTradeOneSide": "Only one side of a trade can offer WOC.",
+      "tradeSettleTimeout": "Trade cancelled: the payment window expired. Your goods were returned.",
+      "tradeSettleCancelled": "Trade cancelled. Your goods were returned.",
+      "tradeSettleUnavailable": "Trade could not settle. Your goods were returned."
     },
     "logs": {
       "standUp": "Je staat op.",
@@ -5386,6 +5396,7 @@ export const nl_NL: EnTranslations = {
       "tradeOpened": "Ruilvenster geopend.",
       "tradeComplete": "Ruil voltooid.",
       "tradeCancelled": "Ruil geannuleerd.",
+      "tradeDeclined": "{name} declined your trade request.",
       "lootReceiveItem": "Je ontvangt: {item}.",
       "lootReceiveMoney": "Je ontvangt {money}.",
       "lootMoney": "Je buit {money} buit.",
@@ -5394,6 +5405,34 @@ export const nl_NL: EnTranslations = {
       "soldJunkMany": "{count} rommelvoorwerpen verkocht voor {money}.",
       "friendOnline": "{name} is online gekomen.",
       "friendOffline": "{name} is offline gegaan."
+    },
+    "trade": {
+      "claudiumLabel": "Claudium",
+      "wocLabel": "WOC",
+      "settlingTitle": "Settling trade...",
+      "legYourClaudium": "Your Claudium",
+      "legTheirClaudium": "Their Claudium",
+      "legYourWoc": "Your WOC payment",
+      "legTheirWoc": "Their WOC payment",
+      "statusPending": "Pending",
+      "statusDone": "Done",
+      "wocPayPrompt": "Send {amount} WOC from your linked wallet to complete the trade.",
+      "openInWallet": "Open in wallet",
+      "copyLink": "Copy payment link",
+      "copiedLink": "Payment link copied.",
+      "instanceSignedBy": "Signed by {name}",
+      "instanceUnique": "Unique copy",
+      "title": "Ruilen met {name}",
+      "yourOffer": "Jouw aanbod",
+      "theirOffer": "Aanbod van {name}",
+      "emptyMine": "Klik op voorwerpen in je tassen om ze toe te voegen",
+      "emptyTheirs": "Nog niets aangeboden",
+      "money": "Geld",
+      "copper": "koper",
+      "hint": "Klik op een aangeboden voorwerp om het te verwijderen. Beide partijen moeten op Ruil accepteren drukken.",
+      "accept": "Ruil accepteren",
+      "waiting": "Wachten...",
+      "cancel": "Annuleren"
     },
     "tutorial": {
       "title": "Nieuwe avonturier",
@@ -5521,19 +5560,6 @@ export const nl_NL: EnTranslations = {
       },
       "guildHeadOne": "je bent {rank}, {count} lid",
       "guildHeadMany": "je bent {rank}, {count} leden"
-    },
-    "trade": {
-      "title": "Ruilen met {name}",
-      "yourOffer": "Jouw aanbod",
-      "theirOffer": "Aanbod van {name}",
-      "emptyMine": "Klik op voorwerpen in je tassen om ze toe te voegen",
-      "emptyTheirs": "Nog niets aangeboden",
-      "money": "Geld",
-      "copper": "koper",
-      "hint": "Klik op een aangeboden voorwerp om het te verwijderen. Beide partijen moeten op Ruil accepteren drukken.",
-      "accept": "Ruil accepteren",
-      "waiting": "Wachten...",
-      "cancel": "Annuleren"
     },
     "arena": {
       "title": "Het Asgrauwe Colosseum",
@@ -9805,6 +9831,16 @@ export const nl_NL: EnTranslations = {
         "sender": "The Merchant",
         "subject": "Your listing expired",
         "body": "No buyer came for your goods before the listing ran out. They wait in your collection box at the World Market; come see me to take them back.\n\n- The Merchant"
+      },
+      "trade_delivery": {
+        "sender": "The Ravenpost",
+        "subject": "Trade delivery",
+        "body": "Goods from your trade have arrived. The raven carried what your bags could not."
+      },
+      "trade_refund": {
+        "sender": "The Ravenpost",
+        "subject": "Trade goods returned",
+        "body": "Your trade did not complete. Everything you offered has been returned."
       }
     },
     "itemSets": {

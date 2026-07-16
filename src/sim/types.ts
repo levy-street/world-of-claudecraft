@@ -2412,6 +2412,35 @@ export type SimEvent = { pid?: number } & (
   | { type: 'guildInvite'; fromName: string; guildName: string }
   | { type: 'tradeRequest'; fromPid: number; fromName: string }
   | { type: 'tradeDone' }
+  // the invitee actively declined (distinct from letting the request lapse);
+  // structured data only, the client renders the string from t()
+  | { type: 'tradeDeclined'; byName: string }
+  // both sides confirmed a trade carrying an external-currency pledge: the sim
+  // escrowed both offers and parked the session in 'settling'. The server's
+  // settlement orchestrator reacts to this; clients learn the phase from the
+  // trade snapshot, so the event carries ids only.
+  | { type: 'tradeSettle'; a: number; b: number }
+  // an escrowed settlement was unwound; escrow has been returned (bags or mail)
+  | { type: 'tradeSettleFailed'; reason: 'timeout' | 'cancelled' | 'unavailable' }
+  // Server-swallowed accounting event: a trade changed goods hands, emitted for
+  // BOTH lanes so the server can write an append-only trade_ledger row (classic
+  // lane also uses it to trigger the durable two-row pair save). Never routed to
+  // a client; an offline HUD ignores the unknown type. Carries the full moved
+  // detail (items, copper, and the settled external pledges) since the session's
+  // offers are gone by the time the server reacts.
+  | {
+      type: 'tradeLedger';
+      a: number;
+      b: number;
+      itemsA: InvSlot[];
+      itemsB: InvSlot[];
+      copperA: number;
+      copperB: number;
+      claudiumA: number;
+      claudiumB: number;
+      wocA: string;
+      wocB: string;
+    }
   | { type: 'duelRequest'; fromPid: number; fromName: string }
   | { type: 'duelCountdown'; seconds: number }
   | { type: 'duelStart' }
@@ -2789,6 +2818,22 @@ export interface WorldContent {
   waterLevel?: number;
 }
 
+// Host view of the external-currency trade rails ($WOC / Claudium legs of a
+// player trade). `available` folds the host's feature flag AND its service
+// wiring; `balance` is the host's cached Claudium balance for offer clamping
+// (authoritative checks happen at settlement, never here); `linked` is whether
+// the player has a verified wallet link. The sim treats all of it as an opaque
+// host fact and never fetches anything itself.
+export interface TradeRailsView {
+  claudium: { available: boolean; balance: number };
+  woc: { available: boolean; linked: boolean };
+}
+
+export const OFFLINE_TRADE_RAILS: TradeRailsView = {
+  claudium: { available: false, balance: 0 },
+  woc: { available: false, linked: false },
+};
+
 export interface SimConfig {
   seed: number;
   playerClass: PlayerClass;
@@ -2828,6 +2873,12 @@ export interface SimConfig {
   // bet on). Server + offline game enable it; tests/goldens leave it off so the
   // idle timer never perturbs a deterministic scenario.
   valeCupShowcase?: boolean;
+  // Host-provided external-currency trade rails (the $WOC and Claudium legs of a
+  // player trade). The deterministic sim never reads a network balance itself:
+  // the authoritative server injects a view backed by its own caches; every
+  // other host omits this, so both rails read as unavailable and offline trades
+  // stay items + copper only (the dailyRewards stub doctrine).
+  tradeRails?: (pid: number) => TradeRailsView;
 }
 
 export function emptyMoveInput(): MoveInput {

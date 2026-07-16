@@ -31,6 +31,7 @@ import {
 import type { SimContext } from '../sim_context';
 import { dist2d, type Entity, type OverheadEmoteId, YELL_RANGE } from '../types';
 import * as readouts from './chat_readouts';
+import { tradeRequest } from './trade';
 
 const CHAT_BURST = 8; // messages a player may send back-to-back...
 const CHAT_REFILL = 2; // ...then this many more per second (caps spam amplifiers)
@@ -327,6 +328,46 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
       return null;
     }
     ctx.partyInvite(target.entityId, r.meta.entityId);
+    return null;
+  }
+
+  // "/trade name": open a trade request by name, mirroring /invite's exact-
+  // then-unambiguous-case-insensitive name resolution. Unlike /invite, trade
+  // DOES have a proximity check (TRADE_RANGE) and a busy/self-target guard,
+  // both already enforced by tradeRequest itself (src/sim/social/trade.ts),
+  // so this command only resolves the name and delegates.
+  const tradem = /^\/trade(?:\s+([\s\S]+))?$/i.exec(raw);
+  if (tradem) {
+    const targetName = (tradem[1] ?? '').trim();
+    if (!targetName) {
+      ctx.error(r.meta.entityId, 'Trade whom? Usage: /trade <name>.');
+      return null;
+    }
+    let target: PlayerMeta | null = null;
+    const ciMatches: PlayerMeta[] = [];
+    const wanted = targetName.toLowerCase();
+    for (const meta of ctx.players.values()) {
+      if (meta.name === targetName) {
+        target = meta;
+        break;
+      }
+      if (meta.name.toLowerCase() === wanted) ciMatches.push(meta);
+    }
+    if (!target) {
+      if (ciMatches.length === 1) target = ciMatches[0];
+      else if (ciMatches.length > 1) {
+        ctx.error(
+          r.meta.entityId,
+          `Several players match '${targetName}'. Use exact capitalization.`,
+        );
+        return null;
+      }
+    }
+    if (!target) {
+      ctx.error(r.meta.entityId, `There is no player named '${targetName}' online.`);
+      return null;
+    }
+    tradeRequest(ctx, target.entityId, r.meta.entityId);
     return null;
   }
 
@@ -1017,7 +1058,7 @@ export function helpLines(): string[] {
   return [
     'Chat channels: /s say, /y yell, /general, /p party, /world, /lfg.',
     'Whisper a player with /w <name> <message>, reply with /r.',
-    'Other commands: /join <world|lfg>, /roll, /invite <name>, /inspect <name>, /follow <name>, /unfollow, /assist <name>, /ready, /afk, /dnd, /who.',
+    'Other commands: /join <world|lfg>, /roll, /invite <name>, /trade <name>, /inspect <name>, /follow <name>, /unfollow, /assist <name>, /ready, /afk, /dnd, /who.',
     'Hide a player: /ignore <name> hides their public chat only. /block <name> also stops their whispers, invites and mail. Also /unignore, /unblock, /ignorelist, /blocklist.',
     'Character readouts: /played, /playtime, /xp, /gold, /stats, /bags, /gear, /abilities, /buffs, /cooldowns, /quest, /completed.',
     'World readouts: /where, /zones, /nearby, /pois, /graveyard, /dungeons, /arena, /session, /listings, /buyback.',

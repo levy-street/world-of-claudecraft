@@ -577,6 +577,37 @@ export async function claudiumHistory(accountId: number): Promise<ClaudiumHistor
   return { entries };
 }
 
+/** The result of a P2P Claudium transfer leg. Fails closed (ok:false) on any error. */
+export interface ClaudiumTransferResult {
+  ok: boolean;
+  reason?: string;
+}
+
+/**
+ * POST transfer. Move `amount` whole Claudium from one account to another, keyed
+ * by `dedupeKey` so a retry (or a boot-recovery refund replay) is exactly-once on
+ * the service side. Fails closed like every other call here: an unconfigured or
+ * unreachable service, a non-2xx, or a malformed body all read as ok:false, so a
+ * settlement leg never assumes a transfer landed that the service did not confirm.
+ */
+export async function transferClaudium(
+  fromAccountId: number,
+  toAccountId: number,
+  amount: number,
+  dedupeKey: string,
+): Promise<ClaudiumTransferResult> {
+  const data = await callService<{ ok?: unknown; reason?: unknown }>({
+    method: 'POST',
+    path: 'transfer',
+    body: { fromAccountId, toAccountId, amount, dedupeKey },
+  });
+  if (!data) return { ok: false, reason: 'unavailable' };
+  return {
+    ok: data.ok === true,
+    reason: typeof data.reason === 'string' ? data.reason : undefined,
+  };
+}
+
 /** GET store. The cosmetic catalog, priced in Claudium by the service. Empty when off. */
 export async function claudiumStore(accountId: number): Promise<ClaudiumStoreResult> {
   const data = await callService<ClaudiumStoreItem[]>({

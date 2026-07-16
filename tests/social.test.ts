@@ -970,8 +970,8 @@ describe('trading', () => {
     sim.tradeRequest(b, a);
     sim.tradeAccept(b);
     expect(sim.tradeFor(a)).toBeTruthy();
-    sim.tradeSetOffer([{ itemId: 'wolf_fang', count: 2 }], 30, a);
-    sim.tradeSetOffer([{ itemId: 'baked_bread', count: 1 }], 10, b);
+    sim.tradeSetOffer([{ itemId: 'wolf_fang', count: 2 }], 30, 0, '0', a);
+    sim.tradeSetOffer([{ itemId: 'baked_bread', count: 1 }], 10, 0, '0', b);
     sim.tradeConfirm(a);
     expect(sim.tradeFor(a)).toBeTruthy(); // not done until both confirm
     sim.tradeConfirm(b);
@@ -1026,7 +1026,7 @@ describe('trading', () => {
     sim.tradeAccept(b);
     // exploit attempt: 6 duplicate slots, each individually covered by the bags
     const dup = Array.from({ length: 6 }, () => ({ itemId: 'wolf_fang', count: 5 }));
-    sim.tradeSetOffer(dup, 0, a);
+    sim.tradeSetOffer(dup, 0, 0, '0', a);
     // the merged total (30) exceeds the bags (5), so the offer must be rejected
     expect(sim.tradeFor(a)?.offerA.items.length).toBe(0);
     sim.tradeConfirm(a);
@@ -1058,7 +1058,7 @@ describe('trading', () => {
       { itemId: 'wolf_fang', count: 2 },
     ] as any;
     // must not throw, and only the one valid slot survives
-    expect(() => sim.tradeSetOffer(junk, 0, a)).not.toThrow();
+    expect(() => sim.tradeSetOffer(junk, 0, 0, '0', a)).not.toThrow();
     expect(sim.tradeFor(a)?.offerA.items).toEqual([{ itemId: 'wolf_fang', count: 2 }]);
     sim.tradeConfirm(a);
     sim.tradeConfirm(b);
@@ -1084,6 +1084,8 @@ describe('trading', () => {
         { itemId: 'wolf_fang', count: 2 },
       ],
       0,
+      0,
+      '0',
       a,
     );
     expect(sim.tradeFor(a)?.offerA.items).toEqual([{ itemId: 'wolf_fang', count: 4 }]);
@@ -1103,11 +1105,14 @@ describe('trading', () => {
     sim.addItem('boar_hide', 2, a);
     sim.tradeRequest(b, a);
     sim.tradeAccept(b);
-    sim.tradeSetOffer([{ itemId: 'boar_hide', count: 2 }], 0, a);
+    sim.tradeSetOffer([{ itemId: 'boar_hide', count: 2 }], 0, 0, '0', a);
     expect(sim.tradeFor(a)?.offerA.items.length).toBe(0);
   });
 
-  it('mech chroma plates can be traded directly', () => {
+  // mech chroma tokens are noVendorSell + noDiscard + noMarketList (not soulbound):
+  // mail and the World Market already refused them on noMarketList; trade now does
+  // too (previously an oversight gap, #1165 binding-flag parity).
+  it('mech chroma plates cannot be traded (noMarketList)', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'Aleph');
     const b = sim.addPlayer('mage', 'Bet');
@@ -1117,13 +1122,14 @@ describe('trading', () => {
 
     sim.tradeRequest(b, a);
     sim.tradeAccept(b);
-    sim.tradeSetOffer([{ itemId: 'vanguard_chrome_armor_plate', count: 1 }], 0, a);
+    sim.tradeSetOffer([{ itemId: 'vanguard_chrome_armor_plate', count: 1 }], 0, 0, '0', a);
+    expect(sim.tradeFor(a)?.offerA.items.length).toBe(0);
     sim.tradeConfirm(a);
     sim.tradeConfirm(b);
 
     expect(sim.tradeFor(a)).toBe(null);
-    expect(sim.countItem('vanguard_chrome_armor_plate', a)).toBe(0);
-    expect(sim.countItem('vanguard_chrome_armor_plate', b)).toBe(1);
+    expect(sim.countItem('vanguard_chrome_armor_plate', a)).toBe(1);
+    expect(sim.countItem('vanguard_chrome_armor_plate', b)).toBe(0);
   });
 });
 

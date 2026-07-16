@@ -5366,7 +5366,17 @@ export const id_ID: EnTranslations = {
       "tradeInProgress": "Perdagangan sudah berlangsung.",
       "tradeTooFar": "Sasaran terlalu jauh untuk berdagang.",
       "tradeExpired": "Permintaan perdagangan telah kedaluwarsa.",
-      "tradeFailed": "Perdagangan gagal: barang atau uang sudah tidak tersedia."
+      "tradeFailed": "Perdagangan gagal: barang atau uang sudah tidak tersedia.",
+      "tradeBusy": "That player is already trading.",
+      "tradeUsage": "Trade whom? Usage: /trade <name>.",
+      "claudiumTradeOff": "Claudium trading is not available.",
+      "wocTradeOff": "WOC trading is not available.",
+      "wocTradeLink": "Link a wallet to trade WOC.",
+      "wocTradePartnerLink": "Your trade partner has no linked wallet.",
+      "wocTradeOneSide": "Only one side of a trade can offer WOC.",
+      "tradeSettleTimeout": "Trade cancelled: the payment window expired. Your goods were returned.",
+      "tradeSettleCancelled": "Trade cancelled. Your goods were returned.",
+      "tradeSettleUnavailable": "Trade could not settle. Your goods were returned."
     },
     "logs": {
       "standUp": "Kamu berdiri.",
@@ -5386,6 +5396,7 @@ export const id_ID: EnTranslations = {
       "tradeOpened": "Jendela perdagangan dibuka.",
       "tradeComplete": "Perdagangan selesai.",
       "tradeCancelled": "Perdagangan dibatalkan.",
+      "tradeDeclined": "{name} declined your trade request.",
       "lootReceiveItem": "Kamu menerima: {item}.",
       "lootReceiveMoney": "Kamu menerima {money}.",
       "lootMoney": "Kamu menjarah {money}.",
@@ -5394,6 +5405,34 @@ export const id_ID: EnTranslations = {
       "soldJunkMany": "Menjual {count} barang rongsok seharga {money}.",
       "friendOnline": "{name} telah daring.",
       "friendOffline": "{name} telah luring."
+    },
+    "trade": {
+      "claudiumLabel": "Claudium",
+      "wocLabel": "WOC",
+      "settlingTitle": "Settling trade...",
+      "legYourClaudium": "Your Claudium",
+      "legTheirClaudium": "Their Claudium",
+      "legYourWoc": "Your WOC payment",
+      "legTheirWoc": "Their WOC payment",
+      "statusPending": "Pending",
+      "statusDone": "Done",
+      "wocPayPrompt": "Send {amount} WOC from your linked wallet to complete the trade.",
+      "openInWallet": "Open in wallet",
+      "copyLink": "Copy payment link",
+      "copiedLink": "Payment link copied.",
+      "instanceSignedBy": "Signed by {name}",
+      "instanceUnique": "Unique copy",
+      "title": "Bertukar dengan {name}",
+      "yourOffer": "Tawaranmu",
+      "theirOffer": "Tawaran {name}",
+      "emptyMine": "Klik barang di tasmu untuk menambahkannya",
+      "emptyTheirs": "Belum ada yang ditawarkan",
+      "money": "Uang",
+      "copper": "tembaga",
+      "hint": "Klik barang yang ditawarkan untuk menghapusnya. Kedua pihak harus menekan Terima Tukar.",
+      "accept": "Terima Tukar",
+      "waiting": "Menunggu...",
+      "cancel": "Batal"
     },
     "tutorial": {
       "title": "Petualang Baru",
@@ -5521,19 +5560,6 @@ export const id_ID: EnTranslations = {
       },
       "guildHeadOne": "Anda adalah {rank}, {count} anggota",
       "guildHeadMany": "Anda adalah {rank}, {count} anggota"
-    },
-    "trade": {
-      "title": "Bertukar dengan {name}",
-      "yourOffer": "Tawaranmu",
-      "theirOffer": "Tawaran {name}",
-      "emptyMine": "Klik barang di tasmu untuk menambahkannya",
-      "emptyTheirs": "Belum ada yang ditawarkan",
-      "money": "Uang",
-      "copper": "tembaga",
-      "hint": "Klik barang yang ditawarkan untuk menghapusnya. Kedua pihak harus menekan Terima Tukar.",
-      "accept": "Terima Tukar",
-      "waiting": "Menunggu...",
-      "cancel": "Batal"
     },
     "arena": {
       "title": "Ashen Coliseum",
@@ -9805,6 +9831,16 @@ export const id_ID: EnTranslations = {
         "sender": "The Merchant",
         "subject": "Your listing expired",
         "body": "No buyer came for your goods before the listing ran out. They wait in your collection box at the World Market; come see me to take them back.\n\n- The Merchant"
+      },
+      "trade_delivery": {
+        "sender": "The Ravenpost",
+        "subject": "Trade delivery",
+        "body": "Goods from your trade have arrived. The raven carried what your bags could not."
+      },
+      "trade_refund": {
+        "sender": "The Ravenpost",
+        "subject": "Trade goods returned",
+        "body": "Your trade did not complete. Everything you offered has been returned."
       }
     },
     "itemSets": {

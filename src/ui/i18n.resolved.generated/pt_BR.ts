@@ -5366,7 +5366,17 @@ export const pt_BR: EnTranslations = {
       "tradeInProgress": "Já há uma troca em andamento.",
       "tradeTooFar": "O alvo está longe demais para trocar.",
       "tradeExpired": "A solicitação de troca expirou.",
-      "tradeFailed": "Troca falhou: itens ou dinheiro não estão mais disponíveis."
+      "tradeFailed": "Troca falhou: itens ou dinheiro não estão mais disponíveis.",
+      "tradeBusy": "That player is already trading.",
+      "tradeUsage": "Trade whom? Usage: /trade <name>.",
+      "claudiumTradeOff": "Claudium trading is not available.",
+      "wocTradeOff": "WOC trading is not available.",
+      "wocTradeLink": "Link a wallet to trade WOC.",
+      "wocTradePartnerLink": "Your trade partner has no linked wallet.",
+      "wocTradeOneSide": "Only one side of a trade can offer WOC.",
+      "tradeSettleTimeout": "Trade cancelled: the payment window expired. Your goods were returned.",
+      "tradeSettleCancelled": "Trade cancelled. Your goods were returned.",
+      "tradeSettleUnavailable": "Trade could not settle. Your goods were returned."
     },
     "logs": {
       "standUp": "Você se levanta.",
@@ -5386,6 +5396,7 @@ export const pt_BR: EnTranslations = {
       "tradeOpened": "Janela de troca aberta.",
       "tradeComplete": "Troca concluída.",
       "tradeCancelled": "Troca cancelada.",
+      "tradeDeclined": "{name} declined your trade request.",
       "lootReceiveItem": "Você recebe: {item}.",
       "lootReceiveMoney": "Você recebe {money}.",
       "lootMoney": "Você saqueia {money}.",
@@ -5394,6 +5405,34 @@ export const pt_BR: EnTranslations = {
       "soldJunkMany": "Você vendeu {count} itens cinza por {money}.",
       "friendOnline": "{name} ficou online.",
       "friendOffline": "{name} ficou offline."
+    },
+    "trade": {
+      "claudiumLabel": "Claudium",
+      "wocLabel": "WOC",
+      "settlingTitle": "Settling trade...",
+      "legYourClaudium": "Your Claudium",
+      "legTheirClaudium": "Their Claudium",
+      "legYourWoc": "Your WOC payment",
+      "legTheirWoc": "Their WOC payment",
+      "statusPending": "Pending",
+      "statusDone": "Done",
+      "wocPayPrompt": "Send {amount} WOC from your linked wallet to complete the trade.",
+      "openInWallet": "Open in wallet",
+      "copyLink": "Copy payment link",
+      "copiedLink": "Payment link copied.",
+      "instanceSignedBy": "Signed by {name}",
+      "instanceUnique": "Unique copy",
+      "title": "Negociar com {name}",
+      "yourOffer": "Sua oferta",
+      "theirOffer": "Oferta de {name}",
+      "emptyMine": "Clique nos itens das suas bolsas para adicioná-los",
+      "emptyTheirs": "Nada oferecido ainda",
+      "money": "Dinheiro",
+      "copper": "cobre",
+      "hint": "Clique em um item oferecido para removê-lo. Os dois lados precisam clicar em Aceitar troca.",
+      "accept": "Aceitar troca",
+      "waiting": "Aguardando...",
+      "cancel": "Cancelar"
     },
     "tutorial": {
       "title": "Novo Aventureiro",
@@ -5521,19 +5560,6 @@ export const pt_BR: EnTranslations = {
       },
       "guildHeadOne": "você é {rank}, {count} membro",
       "guildHeadMany": "você é {rank}, {count} membros"
-    },
-    "trade": {
-      "title": "Negociar com {name}",
-      "yourOffer": "Sua oferta",
-      "theirOffer": "Oferta de {name}",
-      "emptyMine": "Clique nos itens das suas bolsas para adicioná-los",
-      "emptyTheirs": "Nada oferecido ainda",
-      "money": "Dinheiro",
-      "copper": "cobre",
-      "hint": "Clique em um item oferecido para removê-lo. Os dois lados precisam clicar em Aceitar troca.",
-      "accept": "Aceitar troca",
-      "waiting": "Aguardando...",
-      "cancel": "Cancelar"
     },
     "arena": {
       "title": "Coliseu Cinzento",
@@ -9805,6 +9831,16 @@ export const pt_BR: EnTranslations = {
         "sender": "The Merchant",
         "subject": "Your listing expired",
         "body": "No buyer came for your goods before the listing ran out. They wait in your collection box at the World Market; come see me to take them back.\n\n- The Merchant"
+      },
+      "trade_delivery": {
+        "sender": "The Ravenpost",
+        "subject": "Trade delivery",
+        "body": "Goods from your trade have arrived. The raven carried what your bags could not."
+      },
+      "trade_refund": {
+        "sender": "The Ravenpost",
+        "subject": "Trade goods returned",
+        "body": "Your trade did not complete. Everything you offered has been returned."
       }
     },
     "itemSets": {

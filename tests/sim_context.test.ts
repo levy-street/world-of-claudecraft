@@ -223,6 +223,10 @@ const CALLBACK_KEYS = [
   'vcupShoot',
   'vcupSportDash',
   'vcupSportShove',
+  // G2b external-currency trade legs (social/trade.ts).
+  'tradeRails',
+  'tradeMailKey',
+  'sendTradeLetter',
 ] as const;
 
 // A fully-spied fake host. `clock` is mutable so a test can prove the context reads
@@ -502,6 +506,13 @@ function makeFakeHost() {
     vcupShoot: vi.fn(),
     vcupSportDash: vi.fn(),
     vcupSportShove: vi.fn(),
+    // G2b external-currency trade legs.
+    tradeRails: vi.fn(() => ({
+      claudium: { available: false, balance: 0 },
+      woc: { available: false, linked: false },
+    })),
+    tradeMailKey: vi.fn((pid: number) => String(pid)),
+    sendTradeLetter: vi.fn(),
   };
   return { host, rng, entities, clock };
 }

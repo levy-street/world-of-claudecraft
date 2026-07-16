@@ -63,7 +63,7 @@ import { isSpellResisted } from './combat/spell_resist';
 // moved to social/fiesta.ts with that logic; sim.ts keeps only the type used by
 // the PlayerMeta interface + the power-up catalog the fiestaMatchInfo accessor reads.
 import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content/augments';
-import { AUCTION_LETTERS } from './content/letters';
+import { AUCTION_LETTERS, TRADE_LETTERS } from './content/letters';
 import { MAILBOXES } from './content/mailboxes';
 import type { GatheringProfessionId } from './content/professions';
 import { FURY_ENTITY_ID, FURY_NPC_ID } from './content/pvp_honor';
@@ -448,6 +448,7 @@ import {
   MELEE_RANGE,
   type MobFamily,
   type MoveInput,
+  OFFLINE_TRADE_RAILS,
   type OverheadEmoteId,
   PARTY_XP_RANGE,
   type PetMode,
@@ -466,6 +467,7 @@ import {
   SUNDER_ARMOR_PCT_PER_STACK,
   steadyAngleTo,
   swingMissChance,
+  type TradeRailsView,
   type VcBracket,
   type VcNationId,
   type Vec3,
@@ -657,13 +659,38 @@ export interface Party {
   dungeonDifficulty?: DungeonDifficulty;
 }
 
+// A side's staged offer. Fungible rows are {itemId, count}; a non-fungible copy
+// (signed/rolled/enchanted) rides as its own count-1 row carrying the payload the
+// sim captured from the OWNER's inventory at offer time (never off the wire).
+// `claudium` is whole Claudium (0 = none); `woc` is a $WOC UI-units decimal
+// string ('0' = none) the sim treats as opaque: only the server converts it to
+// base units, so no float ever touches a real-token amount.
+export interface TradeOfferState {
+  items: InvSlot[];
+  copper: number;
+  claudium: number;
+  woc: string;
+}
+
 export interface TradeSession {
   a: number;
   b: number;
-  offerA: { items: InvSlot[]; copper: number };
-  offerB: { items: InvSlot[]; copper: number };
+  offerA: TradeOfferState;
+  offerB: TradeOfferState;
   acceptedA: boolean;
   acceptedB: boolean;
+  // 'open' trades still swap synchronously in-tick on double-confirm (the
+  // classic items + copper lane, unchanged). A trade carrying an external
+  // pledge parks in 'settling' instead: both offers move into escrow below and
+  // the server's settlement orchestrator finishes or unwinds the session.
+  phase: 'open' | 'settling';
+  // Captured at settle start (stable Ravenpost recipient identity + display
+  // name) so escrow can be delivered or refunded by mail even after a
+  // participant leaves the world and their pid is gone.
+  charA?: { key: string; name: string };
+  charB?: { key: string; name: string };
+  escrowA?: { items: InvSlot[]; copper: number };
+  escrowB?: { items: InvSlot[]; copper: number };
 }
 
 export interface DuelState {
@@ -1457,6 +1484,10 @@ export class Sim {
       lockoutNowMs: cfg.lockoutNowMs ?? (() => Math.floor(this.time * 1000)),
       raidResetMs: cfg.raidResetMs ?? ((nowMs: number) => nowMs + DEFAULT_RAID_LOCKOUT_MS),
       valeCupShowcase: cfg.valeCupShowcase ?? false,
+      // Offline/headless hosts omit tradeRails, so both external legs read as
+      // unavailable and a trade stays items + copper (the dailyRewards stub
+      // doctrine); the authoritative server injects its cache-backed view.
+      tradeRails: cfg.tradeRails ?? (() => OFFLINE_TRADE_RAILS),
       // Carried through so the renderer (which reaches the Sim as IWorld) can read
       // the same custom world via sim.cfg.world. Undefined for the built-in world.
       world: cfg.world,
@@ -2256,8 +2287,11 @@ export class Sim {
     // (A1); reach it through the seam, keeping this call in its load-bearing
     // teardown position (must run while the leaver is still in players/entities).
     this.ctx.removeFromParty(pid, 'has left the party');
+    // A 'settling' session survives the leaver: both offers already left the
+    // bags into escrow, so nothing here can dupe, and the server's settlement
+    // orchestrator delivers or refunds by mail via the captured charA/charB.
     const trade = this.trades.get(pid);
-    if (trade) this.tradeCancel(pid);
+    if (trade && trade.phase === 'open') this.tradeCancel(pid);
     const duel = this.duels.get(pid);
     if (duel) this.endDuel(duel, duel.a === pid ? duel.b : duel.a);
     // arena: leaving the queue is free; disconnecting mid-bout forfeits it
@@ -2321,10 +2355,15 @@ export class Sim {
     // after it: without this a disconnecting player could still be matched, or burn a
     // whole 30-second proposal for four other players. onPlayerRemoved is idempotent.
     this.dungeonFinder.onPlayerRemoved(pid);
-    // Trades are not escrowed. Cancel before the leave snapshot so the other
-    // party cannot confirm during the persistence await and receive an item
-    // that the departing character's already-captured save still contains.
-    if (this.trades.has(pid)) this.tradeCancel(pid);
+    // OPEN trades are not escrowed. Cancel before the leave snapshot so the
+    // other party cannot confirm during the persistence await and receive an
+    // item that the departing character's already-captured save still contains.
+    // A 'settling' session is the opposite case: both offers already moved into
+    // escrow (out of the captured save), so it must SURVIVE the leave and be
+    // finished or unwound by the server's settlement orchestrator (escrow
+    // reaches an offline owner by mail via the captured charA/charB identity).
+    const leavingTrade = this.trades.get(pid);
+    if (leavingTrade && leavingTrade.phase === 'open') this.tradeCancel(pid);
     // Forfeit unresolved rolls while the player, party, and source corpse are
     // still live, so every item goes to a remaining candidate or back to loot.
     removePlayerFromLootRolls(this.ctx, pid);
@@ -3608,6 +3647,12 @@ export class Sim {
         valeCupMod.vcupSportDash(sim.ctx, caster, distance, catchBall),
       vcupSportShove: (caster, target, distance) =>
         valeCupMod.vcupSportShove(sim.ctx, caster, target, distance),
+      // G2b external trade legs: the cfg-injected rails view, the Ravenpost
+      // recipient key, and the authored escrow letters (all stay on Sim).
+      tradeRails: (pid) => sim.tradeRails(pid),
+      tradeMailKey: (pid) => sim.tradeMailKey(pid),
+      sendTradeLetter: (recipientKey, recipientName, flavor, copper, items) =>
+        sim.sendTradeLetter(recipientKey, recipientName, flavor, copper, items),
     };
     return createSimContext(host);
   }
@@ -7363,8 +7408,12 @@ export class Sim {
     tradeMod.tradeAccept(this.ctx, pid);
   }
 
-  tradeSetOffer(items: InvSlot[], copper: number, pid?: number): void {
-    tradeMod.tradeSetOffer(this.ctx, items, copper, pid);
+  tradeDecline(pid?: number): void {
+    tradeMod.tradeDecline(this.ctx, pid);
+  }
+
+  tradeSetOffer(items: InvSlot[], copper: number, claudium = 0, woc = '0', pid?: number): void {
+    tradeMod.tradeSetOffer(this.ctx, items, copper, claudium, woc, pid);
   }
 
   tradeConfirm(pid?: number): void {
@@ -7374,6 +7423,51 @@ export class Sim {
   tradeCancel(pid?: number): void {
     tradeMod.tradeCancel(this.ctx, pid);
   }
+
+  // Settlement outcomes, called ONLY by the server's orchestrator once every
+  // external leg of a 'settling' session has finished (or failed/timed out).
+  // The offline Sim never reaches these: pledges are rejected when the rails
+  // view says unavailable, so no offline session can enter 'settling'.
+  tradeSettleComplete(pid: number): void {
+    tradeMod.tradeSettleComplete(this.ctx, pid);
+  }
+
+  tradeSettleFail(pid: number, reason: 'timeout' | 'cancelled' | 'unavailable'): void {
+    tradeMod.tradeSettleFail(this.ctx, pid, reason);
+  }
+
+  // Host bindings for the G2b SimContext callbacks (external trade legs). The
+  // rails view comes from cfg (server-injected; offline default all-off); the
+  // mail key + trade letters point at the PostOffice so escrow delivery and
+  // refunds reach offline recipients too.
+  tradeRails = (pid: number): TradeRailsView => this.cfg.tradeRails(pid);
+
+  tradeMailKey = (pid: number): string => {
+    const meta = this.players.get(pid);
+    return meta ? this.postOffice.mailKeyFor(meta) : String(pid);
+  };
+
+  sendTradeLetter = (
+    recipientKey: string,
+    recipientName: string,
+    flavor: 'delivery' | 'refund',
+    copper: number,
+    items: InvSlot[],
+  ): void => {
+    // Authored system letters from the single source of truth (TRADE_LETTERS in
+    // content/letters.ts): the client localizes subject/body/senderName via the
+    // letterId (the welcome-letter convention), so the canonical English here is
+    // never player-visible on localized clients. senderName is the Ravenpost
+    // courier, not the trading partner (fix F7c/r3#1: the letterId pipeline has no
+    // seam for a per-delivery dynamic sender). Prompt delivery: the raven takes a
+    // short hop, not the player-mail 45s flight.
+    this.postOffice.sendLetter(
+      recipientKey,
+      recipientName,
+      { ...TRADE_LETTERS[flavor], copper, items, delaySeconds: 5 },
+      'system',
+    );
+  };
 
   // offerCovered / closeTrade are module-internal in social/trade.ts now (no Sim
   // delegate; only the moved trade methods used them).
@@ -7702,6 +7796,12 @@ export class Sim {
 
   get tradeInfo(): import('../world_api').TradeInfo | null {
     return tradeMod.tradeInfoFor(this.ctx, this.primaryId);
+  }
+
+  // Per-pid variant for the server's snapshot builder (tradeWire), so both
+  // hosts serve the identical sim-owned base shape.
+  tradeInfoView(pid: number): import('../world_api').TradeInfo | null {
+    return tradeMod.tradeInfoFor(this.ctx, pid);
   }
 
   get duelInfo(): import('../world_api').DuelInfo | null {

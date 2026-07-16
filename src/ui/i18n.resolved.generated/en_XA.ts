@@ -5366,7 +5366,17 @@ export const en_XA: EnTranslations = {
       "tradeInProgress": "[Á ţŕáðé íš áļŕéáðý íñ þŕóĝŕéšš.]",
       "tradeTooFar": "[Ţáŕĝéţ íš ţóó ƒáŕ áŵáý ţó ţŕáðé.]",
       "tradeExpired": "[Ţĥé ţŕáðé ŕéɋúéšţ ĥáš éẋþíŕéð.]",
-      "tradeFailed": "[Ţŕáðé ƒáíļéð: íţéɱš óŕ ɱóñéý ñó ļóñĝéŕ áʋáíļáƀļé.]"
+      "tradeFailed": "[Ţŕáðé ƒáíļéð: íţéɱš óŕ ɱóñéý ñó ļóñĝéŕ áʋáíļáƀļé.]",
+      "tradeBusy": "[Ţĥáţ þļáýéŕ íš áļŕéáðý ţŕáðíñĝ.]",
+      "tradeUsage": "[Ţŕáðé ŵĥóɱ? Úšáĝé: /ţŕáðé <ñáɱé>.]",
+      "claudiumTradeOff": "[Çļáúðíúɱ ţŕáðíñĝ íš ñóţ áʋáíļáƀļé.]",
+      "wocTradeOff": "[ŴÓÇ ţŕáðíñĝ íš ñóţ áʋáíļáƀļé.]",
+      "wocTradeLink": "[Ļíñķ á ŵáļļéţ ţó ţŕáðé ŴÓÇ.]",
+      "wocTradePartnerLink": "[Ýóúŕ ţŕáðé þáŕţñéŕ ĥáš ñó ļíñķéð ŵáļļéţ.]",
+      "wocTradeOneSide": "[Óñļý óñé šíðé óƒ á ţŕáðé çáñ óƒƒéŕ ŴÓÇ.]",
+      "tradeSettleTimeout": "[Ţŕáðé çáñçéļļéð: ţĥé þáýɱéñţ ŵíñðóŵ éẋþíŕéð. Ýóúŕ ĝóóðš ŵéŕé ŕéţúŕñéð.]",
+      "tradeSettleCancelled": "[Ţŕáðé çáñçéļļéð. Ýóúŕ ĝóóðš ŵéŕé ŕéţúŕñéð.]",
+      "tradeSettleUnavailable": "[Ţŕáðé çóúļð ñóţ šéţţļé. Ýóúŕ ĝóóðš ŵéŕé ŕéţúŕñéð.]"
     },
     "logs": {
       "standUp": "[Ýóú šţáñð úþ.]",
@@ -5386,6 +5396,7 @@ export const en_XA: EnTranslations = {
       "tradeOpened": "[Ţŕáðé ŵíñðóŵ óþéñéð.]",
       "tradeComplete": "[Ţŕáðé çóɱþļéţé.]",
       "tradeCancelled": "[Ţŕáðé çáñçéļļéð.]",
+      "tradeDeclined": "[{name} ðéçļíñéð ýóúŕ ţŕáðé ŕéɋúéšţ.]",
       "lootReceiveItem": "[Ýóú ŕéçéíʋé: {item}.]",
       "lootReceiveMoney": "[Ýóú ŕéçéíʋé {money}.]",
       "lootMoney": "[Ýóú ļóóţ {money}.]",
@@ -5394,6 +5405,34 @@ export const en_XA: EnTranslations = {
       "soldJunkMany": "[Šóļð {count} ĵúñķ íţéɱš ƒóŕ {money}.]",
       "friendOnline": "[{name} ĥáš çóɱé óñļíñé.]",
       "friendOffline": "[{name} ĥáš ĝóñé óƒƒļíñé.]"
+    },
+    "trade": {
+      "claudiumLabel": "[Çļáúðíúɱ]",
+      "wocLabel": "[ŴÓÇ]",
+      "settlingTitle": "[Šéţţļíñĝ ţŕáðé...]",
+      "legYourClaudium": "[Ýóúŕ Çļáúðíúɱ]",
+      "legTheirClaudium": "[Ţĥéíŕ Çļáúðíúɱ]",
+      "legYourWoc": "[Ýóúŕ ŴÓÇ þáýɱéñţ]",
+      "legTheirWoc": "[Ţĥéíŕ ŴÓÇ þáýɱéñţ]",
+      "statusPending": "[Þéñðíñĝ]",
+      "statusDone": "[Ðóñé]",
+      "wocPayPrompt": "[Šéñð {amount} ŴÓÇ ƒŕóɱ ýóúŕ ļíñķéð ŵáļļéţ ţó çóɱþļéţé ţĥé ţŕáðé.]",
+      "openInWallet": "[Óþéñ íñ ŵáļļéţ]",
+      "copyLink": "[Çóþý þáýɱéñţ ļíñķ]",
+      "copiedLink": "[Þáýɱéñţ ļíñķ çóþíéð.]",
+      "instanceSignedBy": "[Šíĝñéð ƀý {name}]",
+      "instanceUnique": "[Úñíɋúé çóþý]",
+      "title": "[Ţŕáðé ŵíţĥ {name}]",
+      "yourOffer": "[Ýóúŕ óƒƒéŕ]",
+      "theirOffer": "[{name}'š óƒƒéŕ]",
+      "emptyMine": "[Çļíçķ íţéɱš íñ ýóúŕ ƀáĝš ţó áðð ţĥéɱ]",
+      "emptyTheirs": "[Ñóţĥíñĝ óƒƒéŕéð ýéţ]",
+      "money": "[Ɱóñéý]",
+      "copper": "[çóþþéŕ]",
+      "hint": "[Çļíçķ áñ óƒƒéŕéð íţéɱ ţó ŕéɱóʋé íţ. Ɓóţĥ šíðéš ɱúšţ þŕéšš Áççéþţ Ţŕáðé.]",
+      "accept": "[Áççéþţ Ţŕáðé]",
+      "waiting": "[Ŵáíţíñĝ...]",
+      "cancel": "[Çáñçéļ]"
     },
     "tutorial": {
       "title": "[Ñéŵ Áðʋéñţúŕéŕ]",
@@ -5521,19 +5560,6 @@ export const en_XA: EnTranslations = {
       },
       "guildHeadOne": "[ýóú áŕé {rank}, {count} ɱéɱƀéŕ]",
       "guildHeadMany": "[ýóú áŕé {rank}, {count} ɱéɱƀéŕš]"
-    },
-    "trade": {
-      "title": "[Ţŕáðé ŵíţĥ {name}]",
-      "yourOffer": "[Ýóúŕ óƒƒéŕ]",
-      "theirOffer": "[{name}'š óƒƒéŕ]",
-      "emptyMine": "[Çļíçķ íţéɱš íñ ýóúŕ ƀáĝš ţó áðð ţĥéɱ]",
-      "emptyTheirs": "[Ñóţĥíñĝ óƒƒéŕéð ýéţ]",
-      "money": "[Ɱóñéý]",
-      "copper": "[çóþþéŕ]",
-      "hint": "[Çļíçķ áñ óƒƒéŕéð íţéɱ ţó ŕéɱóʋé íţ. Ɓóţĥ šíðéš ɱúšţ þŕéšš Áççéþţ Ţŕáðé.]",
-      "accept": "[Áççéþţ Ţŕáðé]",
-      "waiting": "[Ŵáíţíñĝ...]",
-      "cancel": "[Çáñçéļ]"
     },
     "arena": {
       "title": "[Ţĥé Ášĥéñ Çóļíšéúɱ]",
@@ -9805,6 +9831,16 @@ export const en_XA: EnTranslations = {
         "sender": "[Ţĥé Ɱéŕçĥáñţ]",
         "subject": "[Ýóúŕ ļíšţíñĝ éẋþíŕéð]",
         "body": "[Ñó ƀúýéŕ çáɱé ƒóŕ ýóúŕ ĝóóðš ƀéƒóŕé ţĥé ļíšţíñĝ ŕáñ óúţ. Ţĥéý ŵáíţ íñ ýóúŕ çóļļéçţíóñ ƀóẋ áţ ţĥé Ŵóŕļð Ɱáŕķéţ; çóɱé šéé ɱé ţó ţáķé ţĥéɱ ƀáçķ.\n\n- Ţĥé Ɱéŕçĥáñţ]"
+      },
+      "trade_delivery": {
+        "sender": "[Ţĥé Ŕáʋéñþóšţ]",
+        "subject": "[Ţŕáðé ðéļíʋéŕý]",
+        "body": "[Ĝóóðš ƒŕóɱ ýóúŕ ţŕáðé ĥáʋé áŕŕíʋéð. Ţĥé ŕáʋéñ çáŕŕíéð ŵĥáţ ýóúŕ ƀáĝš çóúļð ñóţ.]"
+      },
+      "trade_refund": {
+        "sender": "[Ţĥé Ŕáʋéñþóšţ]",
+        "subject": "[Ţŕáðé ĝóóðš ŕéţúŕñéð]",
+        "body": "[Ýóúŕ ţŕáðé ðíð ñóţ çóɱþļéţé. Éʋéŕýţĥíñĝ ýóú óƒƒéŕéð ĥáš ƀééñ ŕéţúŕñéð.]"
       }
     },
     "itemSets": {

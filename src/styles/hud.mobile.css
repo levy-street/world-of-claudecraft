@@ -2758,7 +2758,8 @@
     display: none;
   }
   body.mobile-touch .soc-add input,
-  body.mobile-touch .trade-money input {
+  body.mobile-touch .trade-money input,
+  body.mobile-touch .trade-currency-input {
     min-height: 40px;
     font-size: 16px;
     box-sizing: border-box;
