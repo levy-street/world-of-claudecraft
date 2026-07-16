@@ -2181,6 +2181,31 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'あなたの {item} が {money} で売れました。商人のもとで受け取ってください。',
   'itemUi.market.expiredToast':
     '{item} の出品は買い手がつかず期限切れになりました。商人のもとで受け取ってください。',
+  'itemUi.market.denomLabel': '通貨',
+  'itemUi.market.denomGold': '金貨',
+  'itemUi.market.auctionGoldOnly': '入札は金貨のみ受け付けます。',
+  'itemUi.market.claudiumPriceEach': '単価（Claudium）',
+  'itemUi.market.wocPriceLot': 'ロット価格（WOC）',
+  'itemUi.market.claudiumEach': '各 {amount} Claudium',
+  'itemUi.market.claudiumMinError': '価格は1 Claudium以上にしてください。',
+  'itemUi.market.awaitingPayment': '支払い待ち',
+  'itemUi.market.buyExternalTitle': '購入の確認',
+  'itemUi.market.buyClaudiumConfirmBody':
+    '{item} を {amount} Claudium で購入しますか？支払いはあなたのClaudium残高から行われます。',
+  'itemUi.market.buyWocConfirmBody':
+    '{item} を {amount} WOC で購入しますか？連携ウォレットから支払い、着金が確認され次第、品物が引き渡されます。',
+  'itemUi.market.buyClaudiumAria': '{item} をClaudiumで購入',
+  'itemUi.market.buyWocAria': '{item} をWOCで購入',
+  'itemUi.market.pendingClaudium': '{item} の購入を処理しています。',
+  'itemUi.market.pendingPreparing': '{item} の支払いリクエストを準備しています。',
+  'itemUi.market.wocPayPrompt':
+    '連携ウォレットから {amount} WOC を送金すると {item} の購入が完了します。',
+  'itemUi.market.paymentExpiredToast':
+    '{item} の支払い期限が切れました。ロットは再び購入可能です。',
+  'itemUi.market.soldWalletToast':
+    'あなたの {item} が {amount} WOC で売れました。代金は連携ウォレットに支払われました。保証金は商人のもとで受け取ってください。',
+  'itemUi.market.soldAccountToast':
+    'あなたの {item} が {amount} Claudium で売れました。代金はClaudium残高に入金されました。保証金は商人のもとで受け取ってください。',
   'itemUi.market.sellNote':
     'バッグから品物を出品します。売れると商人が{cut}%を受け取ります。出品枠 {used}/{max} を使用中です。',
   'itemUi.market.sellPickEmpty': '売るものを選ぶにはバッグ内のアイテムをクリックしてください。',
@@ -2203,6 +2228,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.logs.expiredListing': '{item}の市場出品が期限切れになり、商人のもとで待機しています。',
   'itemUi.logs.postedAuction': '{item} をオークションに出品しました（開始価格 {money}）。',
   'itemUi.logs.bidPlaced': '{item} に {money} で入札しました。',
+  'itemUi.logs.listedClaudium': '{item} を {amount} Claudium でワールドマーケットに出品しました。',
+  'itemUi.logs.listedWoc': '{item} を {amount} WOC でワールドマーケットに出品しました。',
   'itemUi.logs.boughtBackItem': '{item}を{money}で買い戻しました。',
   'itemUi.errors.notSoldHere': 'そのアイテムはここでは販売されていません。',
   'itemUi.errors.notEnoughMoney': 'お金が足りません。',
@@ -2227,6 +2254,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.errors.cannotBidOwnLot': '自分の出品には入札できません。',
   'itemUi.errors.alreadyHighBidder': 'あなたはすでに最高入札者です。',
   'itemUi.errors.bidTooLow': '最低 {min} 以上で入札してください。',
+  'itemUi.errors.bidsGoldOnly': '入札は金貨のみ受け付けます。',
+  'itemUi.errors.claudiumUnavailable': 'Claudiumでの出品は利用できません。',
+  'itemUi.errors.wocUnavailable': 'WOCでの出品は利用できません。',
+  'itemUi.errors.wocLinkToList': 'WOCで出品するにはウォレットを連携してください。',
+  'itemUi.errors.wocLinkToPay': 'WOCで支払うにはウォレットを連携してください。',
+  'itemUi.errors.wocPriceInvalid': '有効なWOC価格を指定してください。',
+  'itemUi.errors.awaitingPayment': 'このロットは支払い待ちです。',
   'itemUi.loot.takeAll': 'すべて取る',
   'itemUi.loot.close': '戦利品を閉じる',
   'itemUi.lootRoll.title': '戦利品ロール',
@@ -5252,6 +5286,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '出品：バッグからスタックを選び、出品期間（12時間、24時間、48時間）を選んで単価を決めるか、オークションに切り替えて開始価格と任意の即決価格を設定します。出品には期間に応じた保証金がかかりますが、品物が売れるたびに返還され、売れ残った分だけが没収されます。品物は誰かが買うかオークションが終わるまで商人が預かり、気が変われば早めに引き取ることもできます。',
   'guide.economy.marketBidding':
     'オークション：一部の出品は固定価格ではなく入札制です。入札額は表示された最低額を満たす必要があり、あなたの入札が上回られると、それまでの入札額は全額返還されます。出品者が即決価格を設定している場合、その額に達する入札があれば即座に落札となります。',
+  'guide.economy.marketCurrencies':
+    '有効化されている場合、出品はClaudiumやWOC建てにもできます。買い手はアカウント間またはウォレット間で直接あなたに支払い、商人は支払いが確認されるまで品物を預かり、出品保証金は通常どおり金貨のままです。',
   'guide.economy.marketPricing':
     '値付けはあなた次第です。他より少し安く出品すると早く売れる傾向があり、高すぎる値はそのまま放置されがちです。出品する前にまず閲覧して、相場がどうなっているか確かめましょう。',
   'guide.economy.marketTitle': 'ワールドマーケット',
@@ -6838,6 +6874,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.letters.market_expired.subject': '出品期限切れ',
   'entities.letters.market_expired.body':
     '期限内に買い手が現れませんでした。品はワールドマーケットの回収箱で待っています。取り戻しに来てください。\n\n- 商人',
+  'entities.letters.market_sold_wallet.sender': '商人',
+  'entities.letters.market_sold_wallet.subject': '出品が売れました',
+  'entities.letters.market_sold_wallet.body':
+    '買い手があなたの品を買い取りました。代金はご希望どおり連携ウォレットへ直接支払われ、ワールドマーケットの回収箱で待っているのは出品保証金だけです。受け取りに来てください。\n\n- 商人',
+  'entities.letters.market_sold_account.sender': '商人',
+  'entities.letters.market_sold_account.subject': '出品が売れました',
+  'entities.letters.market_sold_account.body':
+    '買い手があなたの品を買い取りました。代金はあなたのClaudium残高へ直接支払われ、ワールドマーケットの回収箱で待っているのは出品保証金だけです。受け取りに来てください。\n\n- 商人',
   'entities.letters.trade_delivery.sender': 'レイヴンポスト',
   'entities.letters.trade_delivery.subject': '取引の品が届きました',
   'entities.letters.trade_delivery.body':

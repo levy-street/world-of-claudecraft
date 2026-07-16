@@ -3281,7 +3281,8 @@ export const ja_JP: EnTranslations = {
       "marketPost": "出品：バッグからスタックを選び、出品期間（12時間、24時間、48時間）を選んで単価を決めるか、オークションに切り替えて開始価格と任意の即決価格を設定します。出品には期間に応じた保証金がかかりますが、品物が売れるたびに返還され、売れ残った分だけが没収されます。品物は誰かが買うかオークションが終わるまで商人が預かり、気が変われば早めに引き取ることもできます。",
       "marketBidding": "オークション：一部の出品は固定価格ではなく入札制です。入札額は表示された最低額を満たす必要があり、あなたの入札が上回られると、それまでの入札額は全額返還されます。出品者が即決価格を設定している場合、その額に達する入札があれば即座に落札となります。",
       "marketCollect": "受け取り：品物が売れると、その代金は商人のもとで待っています。戻ってコインを受け取りましょう。売れ残って戻ってきたものも一緒です。商人は成立した売却ごとにわずかな手数料を取ります。",
-      "marketPricing": "値付けはあなた次第です。他より少し安く出品すると早く売れる傾向があり、高すぎる値はそのまま放置されがちです。出品する前にまず閲覧して、相場がどうなっているか確かめましょう。"
+      "marketPricing": "値付けはあなた次第です。他より少し安く出品すると早く売れる傾向があり、高すぎる値はそのまま放置されがちです。出品する前にまず閲覧して、相場がどうなっているか確かめましょう。",
+      "marketCurrencies": "有効化されている場合、出品はClaudiumやWOC建てにもできます。買い手はアカウント間またはウォレット間で直接あなたに支払い、商人は支払いが確認されるまで品物を預かり、出品保証金は通常どおり金貨のままです。"
     },
     "social": {
       "intro": "世界のほとんどはソロで進められますが、このゲームは他の人々と共に遊ぶように作られています。ここでは、話し、力を合わせ、仲間を見つける方法を紹介します。",
@@ -5935,7 +5936,29 @@ export const ja_JP: EnTranslations = {
       "outbidToast": "{item} への入札が他の人に上回られました。{money} が回収箱に返却されました。",
       "wonToast": "{item} のオークションを落札しました！商人のもとで受け取ってください。",
       "soldToast": "あなたの {item} が {money} で売れました。商人のもとで受け取ってください。",
-      "expiredToast": "{item} の出品は買い手がつかず期限切れになりました。商人のもとで受け取ってください。"
+      "expiredToast": "{item} の出品は買い手がつかず期限切れになりました。商人のもとで受け取ってください。",
+      "denomLabel": "通貨",
+      "denomGold": "金貨",
+      "denomClaudium": "Claudium",
+      "denomWoc": "WOC",
+      "auctionGoldOnly": "入札は金貨のみ受け付けます。",
+      "claudiumPriceEach": "単価（Claudium）",
+      "wocPriceLot": "ロット価格（WOC）",
+      "claudiumAmount": "{amount} Claudium",
+      "claudiumEach": "各 {amount} Claudium",
+      "claudiumMinError": "価格は1 Claudium以上にしてください。",
+      "awaitingPayment": "支払い待ち",
+      "buyExternalTitle": "購入の確認",
+      "buyClaudiumConfirmBody": "{item} を {amount} Claudium で購入しますか？支払いはあなたのClaudium残高から行われます。",
+      "buyWocConfirmBody": "{item} を {amount} WOC で購入しますか？連携ウォレットから支払い、着金が確認され次第、品物が引き渡されます。",
+      "buyClaudiumAria": "{item} をClaudiumで購入",
+      "buyWocAria": "{item} をWOCで購入",
+      "pendingClaudium": "{item} の購入を処理しています。",
+      "pendingPreparing": "{item} の支払いリクエストを準備しています。",
+      "wocPayPrompt": "連携ウォレットから {amount} WOC を送金すると {item} の購入が完了します。",
+      "paymentExpiredToast": "{item} の支払い期限が切れました。ロットは再び購入可能です。",
+      "soldWalletToast": "あなたの {item} が {amount} WOC で売れました。代金は連携ウォレットに支払われました。保証金は商人のもとで受け取ってください。",
+      "soldAccountToast": "あなたの {item} が {amount} Claudium で売れました。代金はClaudium残高に入金されました。保証金は商人のもとで受け取ってください。"
     },
     "logs": {
       "listedItem": "{item}を{money}でワールドマーケットに出品しました。",
@@ -5946,6 +5969,8 @@ export const ja_JP: EnTranslations = {
       "expiredListing": "{item}の市場出品が期限切れになり、商人のもとで待機しています。",
       "postedAuction": "{item} をオークションに出品しました（開始価格 {money}）。",
       "bidPlaced": "{item} に {money} で入札しました。",
+      "listedClaudium": "{item} を {amount} Claudium でワールドマーケットに出品しました。",
+      "listedWoc": "{item} を {amount} WOC でワールドマーケットに出品しました。",
       "boughtBackItem": "{item}を{money}で買い戻しました。"
     },
     "errors": {
@@ -5971,7 +5996,14 @@ export const ja_JP: EnTranslations = {
       "notAuction": "このロットはオークション出品ではありません。",
       "cannotBidOwnLot": "自分の出品には入札できません。",
       "alreadyHighBidder": "あなたはすでに最高入札者です。",
-      "bidTooLow": "最低 {min} 以上で入札してください。"
+      "bidTooLow": "最低 {min} 以上で入札してください。",
+      "bidsGoldOnly": "入札は金貨のみ受け付けます。",
+      "claudiumUnavailable": "Claudiumでの出品は利用できません。",
+      "wocUnavailable": "WOCでの出品は利用できません。",
+      "wocLinkToList": "WOCで出品するにはウォレットを連携してください。",
+      "wocLinkToPay": "WOCで支払うにはウォレットを連携してください。",
+      "wocPriceInvalid": "有効なWOC価格を指定してください。",
+      "awaitingPayment": "このロットは支払い待ちです。"
     },
     "loot": {
       "takeAll": "すべて取る",
@@ -9826,6 +9858,16 @@ export const ja_JP: EnTranslations = {
         "sender": "商人",
         "subject": "出品が売れました",
         "body": "買い手があなたの品を買い取りました。あなたの収益はワールドマーケットの回収箱で待っています。受け取りに来てください。\n\n- 商人"
+      },
+      "market_sold_wallet": {
+        "sender": "商人",
+        "subject": "出品が売れました",
+        "body": "買い手があなたの品を買い取りました。代金はご希望どおり連携ウォレットへ直接支払われ、ワールドマーケットの回収箱で待っているのは出品保証金だけです。受け取りに来てください。\n\n- 商人"
+      },
+      "market_sold_account": {
+        "sender": "商人",
+        "subject": "出品が売れました",
+        "body": "買い手があなたの品を買い取りました。代金はあなたのClaudium残高へ直接支払われ、ワールドマーケットの回収箱で待っているのは出品保証金だけです。受け取りに来てください。\n\n- 商人"
       },
       "market_expired": {
         "sender": "商人",

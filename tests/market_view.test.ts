@@ -25,6 +25,7 @@ function listing(itemId: string, over: Partial<MarketListingView> = {}): MarketL
     secondsLeft: 3600,
     kind: 'fixed',
     myBid: false,
+    denom: 'copper',
     ...over,
   };
 }
@@ -42,6 +43,7 @@ function info(over: Partial<MarketInfo> = {}): MarketInfo {
     maxListings: 10,
     myListingCount: 0,
     durationsHours: [12, 24, 48],
+    rails: { claudium: false, woc: false },
     ...over,
   };
 }
@@ -105,6 +107,7 @@ describe('market_view: top-level state union', () => {
         myListingCount: 0,
         maxListings: 10,
         durationsHours: [12, 24, 48],
+        rails: { claudium: false, woc: false },
       });
     expect(
       buildMarketView({
@@ -378,6 +381,74 @@ describe('market_view: determinism + ClientWorld-vs-Sim parity', () => {
         sellHave: 2,
       });
       expect(sim).toEqual(mirror);
+    }
+  });
+});
+
+describe('market_view: multi-currency denominations (AH-P4)', () => {
+  it('mirrors the viewer rails into the sell meta (the selector gating source)', () => {
+    const i = info({ rails: { claudium: true, woc: false } });
+    const sell = buildMarketView({
+      info: i,
+      tab: 'sell',
+      filters: ALL,
+      sellItemId: null,
+      sellHave: 0,
+    });
+    expect(sell.kind).toBe('sell');
+    if (sell.kind === 'sell') expect(sell.meta.rails).toEqual({ claudium: true, woc: false });
+  });
+
+  it('passes the pending purchase through to the browse view (null when none)', () => {
+    const itemId = Object.keys(ITEMS)[0];
+    const pending = {
+      listingId: 7,
+      itemId,
+      quantity: 2,
+      denom: 'woc' as const,
+      costWoc: '1.5',
+      wocPay: { uri: 'solana:x?amount=1.5&reference=r', reference: 'r', amountUi: '1.5' },
+    };
+    const withPending = buildMarketView({
+      info: info({ listings: [listing(itemId)], totalCount: 1, myPendingPurchase: pending }),
+      tab: 'browse',
+      filters: ALL,
+      sellItemId: null,
+      sellHave: 0,
+    });
+    expect(withPending.kind).toBe('browse');
+    if (withPending.kind === 'browse') expect(withPending.pending).toEqual(pending);
+
+    const withoutPending = buildMarketView({
+      info: info({ listings: [listing(itemId)], totalCount: 1 }),
+      tab: 'browse',
+      filters: ALL,
+      sellItemId: null,
+      sellHave: 0,
+    });
+    if (withoutPending.kind === 'browse') expect(withoutPending.pending).toBeNull();
+  });
+
+  it('keeps denom/priceWoc/pendingPayment on the resolved browse rows (the badge inputs)', () => {
+    const itemId = Object.keys(ITEMS)[0];
+    const rows = buildMarketBrowse(
+      info({
+        listings: [
+          listing(itemId, { id: 1, denom: 'claudium', pricePerUnit: 10, price: 20, count: 2 }),
+          listing(itemId, { id: 2, denom: 'woc', priceWoc: '1.5', price: 0, pendingPayment: true }),
+        ],
+        totalCount: 2,
+      }),
+      ALL,
+    );
+    expect(rows.state).toBe('list');
+    if (rows.state === 'list') {
+      expect(rows.page.items[0].listing).toMatchObject({ denom: 'claudium', pricePerUnit: 10 });
+      expect(rows.page.items[1].listing).toMatchObject({
+        denom: 'woc',
+        priceWoc: '1.5',
+        pendingPayment: true,
+      });
     }
   });
 });

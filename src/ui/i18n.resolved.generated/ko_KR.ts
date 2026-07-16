@@ -3281,7 +3281,8 @@ export const ko_KR: EnTranslations = {
       "marketPost": "등록하기: 가방에서 묶음을 고르고 등록 기간(12시간, 24시간, 48시간)을 선택해 개당 가격을 매기거나, 경매로 전환해 시작 입찰가와 선택적인 즉시구매가를 설정하세요. 등록에는 기간에 비례하는 보증금이 필요하지만 물품이 팔릴 때마다 돌려받으며, 팔리지 않은 만큼만 몰수됩니다. 누군가 살 때까지, 또는 경매가 끝날 때까지 물품은 상인이 보관하며, 마음이 바뀌면 일찍 되찾을 수도 있습니다.",
       "marketBidding": "경매: 일부 매물은 고정 가격 대신 입찰을 받습니다. 입찰가는 공시된 최소 금액 이상이어야 하며, 당신의 입찰이 밀리면 이전 입찰 금액은 전액 반환됩니다. 판매자가 즉시구매가를 설정한 경우, 그 금액에 도달하는 입찰이 있으면 그 자리에서 낙찰됩니다.",
       "marketCollect": "수령하기: 물품이 팔리면 그 수익이 상인에게서 당신을 기다립니다. 돌아가 동전을, 그리고 팔리지 않고 돌아온 물건이 있다면 함께 수령하세요. 상인은 성사된 거래마다 약간의 수수료를 가져갑니다.",
-      "marketPricing": "가격은 당신의 몫입니다. 남들이 부르는 값보다 조금 낮게 올리면 더 빨리 팔리는 경향이 있고, 지나치게 높은 값은 손도 닿지 않은 채 남을 수 있습니다. 등록하기 전에 먼저 둘러보며 시세가 어떤지 살펴보세요."
+      "marketPricing": "가격은 당신의 몫입니다. 남들이 부르는 값보다 조금 낮게 올리면 더 빨리 팔리는 경향이 있고, 지나치게 높은 값은 손도 닿지 않은 채 남을 수 있습니다. 등록하기 전에 먼저 둘러보며 시세가 어떤지 살펴보세요.",
+      "marketCurrencies": "활성화된 경우 등록 물품을 Claudium이나 WOC로도 가격을 매길 수 있습니다. 구매자는 계정 간 또는 지갑 간에 직접 지불하고, 상인은 결제가 확인될 때까지 물품을 보관하며, 등록 보증금은 그대로 골드입니다."
     },
     "social": {
       "intro": "세계 대부분은 혼자서도 누빌 수 있지만, 이 게임은 다른 사람들과 함께 플레이하도록 만들어졌습니다. 대화하고, 힘을 모으고, 어울릴 무리를 찾는 법을 정리했습니다.",
@@ -5935,7 +5936,29 @@ export const ko_KR: EnTranslations = {
       "outbidToast": "{item}에 대한 입찰이 다른 사람에게 밀렸습니다. {money}이(가) 수거함으로 반환되었습니다.",
       "wonToast": "{item} 경매에서 낙찰되었습니다! 상인에게서 수령하세요.",
       "soldToast": "{item}이(가) {money}에 판매되었습니다. 상인에게서 수령하세요.",
-      "expiredToast": "{item} 등록이 판매되지 않고 만료되었습니다. 상인에게서 수령하세요."
+      "expiredToast": "{item} 등록이 판매되지 않고 만료되었습니다. 상인에게서 수령하세요.",
+      "denomLabel": "통화",
+      "denomGold": "골드",
+      "denomClaudium": "Claudium",
+      "denomWoc": "WOC",
+      "auctionGoldOnly": "입찰은 골드로만 가능합니다.",
+      "claudiumPriceEach": "개당 가격(Claudium)",
+      "wocPriceLot": "전체 가격(WOC)",
+      "claudiumAmount": "{amount} Claudium",
+      "claudiumEach": "개당 {amount} Claudium",
+      "claudiumMinError": "가격은 최소 1 Claudium 이상이어야 합니다.",
+      "awaitingPayment": "결제 대기 중",
+      "buyExternalTitle": "구매 확인",
+      "buyClaudiumConfirmBody": "{item}을(를) {amount} Claudium에 구매하시겠습니까? 결제는 Claudium 잔액에서 이루어집니다.",
+      "buyWocConfirmBody": "{item}을(를) {amount} WOC에 구매하시겠습니까? 연결된 지갑에서 결제하며, 입금이 확인되면 물품이 전달됩니다.",
+      "buyClaudiumAria": "{item}을(를) Claudium으로 구매",
+      "buyWocAria": "{item}을(를) WOC로 구매",
+      "pendingClaudium": "{item} 구매를 처리하고 있습니다.",
+      "pendingPreparing": "{item}의 결제 요청을 준비하고 있습니다.",
+      "wocPayPrompt": "연결된 지갑에서 {amount} WOC를 보내면 {item} 구매가 완료됩니다.",
+      "paymentExpiredToast": "{item}의 결제 시간이 만료되었습니다. 해당 물품은 다시 구매할 수 있습니다.",
+      "soldWalletToast": "당신의 {item}이(가) {amount} WOC에 판매되었습니다. 대금은 연결된 지갑으로 지급되었으며, 보증금은 상인에게서 수령하세요.",
+      "soldAccountToast": "당신의 {item}이(가) {amount} Claudium에 판매되었습니다. 대금은 Claudium 잔액으로 지급되었으며, 보증금은 상인에게서 수령하세요."
     },
     "logs": {
       "listedItem": "{item}을(를) {money}에 세계 시장에 등록했습니다.",
@@ -5946,6 +5969,8 @@ export const ko_KR: EnTranslations = {
       "expiredListing": "{item} 시장 등록이 만료되어 상인에게 보관되었습니다.",
       "postedAuction": "{item}을(를) 경매에 등록했습니다 (시작가 {money}).",
       "bidPlaced": "입찰함: {item}에 {money}.",
+      "listedClaudium": "{item}을(를) {amount} Claudium에 세계 시장에 등록했습니다.",
+      "listedWoc": "{item}을(를) {amount} WOC에 세계 시장에 등록했습니다.",
       "boughtBackItem": "{item}을(를) {money}에 되샀습니다."
     },
     "errors": {
@@ -5971,7 +5996,14 @@ export const ko_KR: EnTranslations = {
       "notAuction": "이 물품은 경매 등록이 아닙니다.",
       "cannotBidOwnLot": "자신의 등록 물품에는 입찰할 수 없습니다.",
       "alreadyHighBidder": "이미 최고 입찰자입니다.",
-      "bidTooLow": "최소 {min} 이상 입찰하세요."
+      "bidTooLow": "최소 {min} 이상 입찰하세요.",
+      "bidsGoldOnly": "입찰은 골드로만 가능합니다.",
+      "claudiumUnavailable": "Claudium 등록은 이용할 수 없습니다.",
+      "wocUnavailable": "WOC 등록은 이용할 수 없습니다.",
+      "wocLinkToList": "WOC로 등록하려면 지갑을 연결하세요.",
+      "wocLinkToPay": "WOC로 결제하려면 지갑을 연결하세요.",
+      "wocPriceInvalid": "유효한 WOC 가격을 입력하세요.",
+      "awaitingPayment": "해당 물품은 결제 대기 중입니다."
     },
     "loot": {
       "takeAll": "모두 가져가기",
@@ -9826,6 +9858,16 @@ export const ko_KR: EnTranslations = {
         "sender": "상인",
         "subject": "물품이 판매되었습니다",
         "body": "구매자가 당신의 물건을 가져갔습니다. 판매 수익은 세계 시장의 수거함에서 기다리고 있습니다. 찾아와서 수령하세요.\n\n- 상인"
+      },
+      "market_sold_wallet": {
+        "sender": "상인",
+        "subject": "물품이 판매되었습니다",
+        "body": "구매자가 당신의 물건을 가져갔습니다. 대금은 요청하신 대로 연결된 지갑으로 바로 지급되었고, 세계 시장의 수거함에는 등록 보증금만 남아 있습니다. 찾아와서 수령하세요.\n\n- 상인"
+      },
+      "market_sold_account": {
+        "sender": "상인",
+        "subject": "물품이 판매되었습니다",
+        "body": "구매자가 당신의 물건을 가져갔습니다. 대금은 당신의 Claudium 잔액으로 바로 지급되었고, 세계 시장의 수거함에는 등록 보증금만 남아 있습니다. 찾아와서 수령하세요.\n\n- 상인"
       },
       "market_expired": {
         "sender": "상인",

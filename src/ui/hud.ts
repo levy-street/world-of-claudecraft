@@ -3921,6 +3921,7 @@ export class Hud {
     slotName: (slot) => itemSlotName(slot),
     confirmDialog: (title, body, okText, cancelText, onOk) =>
       this.confirmDialog(title, body, okText, cancelText, onOk),
+    copyToClipboard: (text) => this.copyTradePaymentLink(text),
     syncBags: (open) => {
       if (open) {
         this.renderBags();
@@ -10485,11 +10486,36 @@ export class Hud {
         }
         case 'marketSold': {
           const item = marketEventItemLabel(ev.itemId, ev.count);
-          this.log(
-            t('itemUi.market.soldToast', { item, money: formatLocalizedMoney(ev.proceeds) }),
-            '#7fdc4f',
-          );
+          // External-denomination sale: the payment went straight to the
+          // seller's wallet/Claudium balance (proceeds is 0 by construction),
+          // so the toast must not claim copper waits at the Merchant.
+          if (ev.denom === 'woc') {
+            this.log(
+              t('itemUi.market.soldWalletToast', { item, amount: ev.costWoc ?? '0' }),
+              '#7fdc4f',
+            );
+          } else if (ev.denom === 'claudium') {
+            this.log(
+              t('itemUi.market.soldAccountToast', {
+                item,
+                amount: formatNumber(ev.costClaudium ?? 0, { maximumFractionDigits: 0 }),
+              }),
+              '#7fdc4f',
+            );
+          } else {
+            this.log(
+              t('itemUi.market.soldToast', { item, money: formatLocalizedMoney(ev.proceeds) }),
+              '#7fdc4f',
+            );
+          }
           audio.coin();
+          break;
+        }
+        case 'marketPaymentExpired': {
+          // The buyer's external payment window closed unpaid: the lot is open
+          // again and nothing moved. Quiet treatment (no sound), like expiry.
+          const item = marketEventItemLabel(ev.itemId, 1);
+          this.log(t('itemUi.market.paymentExpiredToast', { item }), '#dcd29f');
           break;
         }
         case 'marketExpired': {
@@ -10827,6 +10853,14 @@ export class Hud {
       'That lot is not up for auction.': 'itemUi.errors.notAuction',
       'You cannot bid on your own lot.': 'itemUi.errors.cannotBidOwnLot',
       'You are already the high bidder.': 'itemUi.errors.alreadyHighBidder',
+      // AH-P4: multi-currency listing denominations (claudium / woc).
+      'Bids take gold only.': 'itemUi.errors.bidsGoldOnly',
+      'Claudium listings are not available.': 'itemUi.errors.claudiumUnavailable',
+      'WOC listings are not available.': 'itemUi.errors.wocUnavailable',
+      'Link a wallet to list for WOC.': 'itemUi.errors.wocLinkToList',
+      'Link a wallet to pay with WOC.': 'itemUi.errors.wocLinkToPay',
+      'Name a valid WOC price.': 'itemUi.errors.wocPriceInvalid',
+      'That lot is awaiting payment.': 'itemUi.errors.awaitingPayment',
       "You can't assist yourself.": 'hud.errors.assistSelf',
       'Assist whom? Target a player or use /assist <name>.': 'hud.errors.assistWhom',
       'Invite whom? Usage: /invite <name>.': 'hudChrome.party.inviteUsage',
@@ -11067,6 +11101,20 @@ export class Hud {
       return t('hud.logs.soldItem', {
         item: itemDisplayNameFromSource(match[1]),
         money: this.localizeSimMoney(match[2]),
+      });
+    // External-denomination Listed lines FIRST: the plain matcher below would
+    // otherwise swallow "... for 10 Claudium." with money = "10 Claudium".
+    match = /^Listed (.+?)( x\d+)? on the World Market for (.+) Claudium\.$/.exec(text);
+    if (match)
+      return t('itemUi.logs.listedClaudium', {
+        item: itemStackDisplayName(match[1], match[2]),
+        amount: match[3],
+      });
+    match = /^Listed (.+?)( x\d+)? on the World Market for (.+) WOC\.$/.exec(text);
+    if (match)
+      return t('itemUi.logs.listedWoc', {
+        item: itemStackDisplayName(match[1], match[2]),
+        amount: match[3],
       });
     match = /^Listed (.+?)( x\d+)? on the World Market for (.+)\.$/.exec(text);
     if (match)

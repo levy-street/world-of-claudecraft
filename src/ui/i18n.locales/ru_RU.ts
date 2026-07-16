@@ -2204,6 +2204,30 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.soldToast': 'Ваш лот {item} продан за {money}. Заберите средства у Торговца.',
   'itemUi.market.expiredToast':
     'Срок продажи {item} истек без покупателя. Заберите его у Торговца.',
+  'itemUi.market.denomLabel': 'Валюта',
+  'itemUi.market.denomGold': 'Золото',
+  'itemUi.market.auctionGoldOnly': 'Ставки принимаются только золотом.',
+  'itemUi.market.claudiumPriceEach': 'Цена за штуку (Claudium)',
+  'itemUi.market.wocPriceLot': 'Цена лота (WOC)',
+  'itemUi.market.claudiumEach': 'По {amount} Claudium за штуку',
+  'itemUi.market.claudiumMinError': 'Укажите цену не менее 1 Claudium.',
+  'itemUi.market.awaitingPayment': 'Ожидание оплаты',
+  'itemUi.market.buyExternalTitle': 'Подтверждение покупки',
+  'itemUi.market.buyClaudiumConfirmBody':
+    'Купить {item} за {amount} Claudium? Оплата спишется с вашего баланса Claudium.',
+  'itemUi.market.buyWocConfirmBody':
+    'Купить {item} за {amount} WOC? Вы платите из привязанного кошелька; товар будет выдан после подтверждения платежа.',
+  'itemUi.market.buyClaudiumAria': 'Купить {item} за Claudium',
+  'itemUi.market.buyWocAria': 'Купить {item} за WOC',
+  'itemUi.market.pendingClaudium': 'Завершаем покупку {item}.',
+  'itemUi.market.pendingPreparing': 'Готовим запрос на оплату {item}.',
+  'itemUi.market.wocPayPrompt':
+    'Отправьте {amount} WOC из привязанного кошелька, чтобы завершить покупку {item}.',
+  'itemUi.market.paymentExpiredToast': 'Время оплаты {item} истекло. Лот снова доступен.',
+  'itemUi.market.soldWalletToast':
+    'Ваш {item} продан за {amount} WOC. Оплата поступила в ваш привязанный кошелёк; залог заберите у Торговца.',
+  'itemUi.market.soldAccountToast':
+    'Ваш {item} продан за {amount} Claudium. Оплата зачислена на ваш баланс Claudium; залог заберите у Торговца.',
   'itemUi.market.sellNote':
     'Выставляйте товары из сумок. Торговец берет {cut}% при продаже. Использовано мест: {used}/{max}.',
   'itemUi.market.sellPickEmpty': 'Нажмите на предмет в сумках, чтобы выбрать товар для продажи.',
@@ -2224,6 +2248,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.logs.expiredListing': 'Ваш лот {item} истек и ждет у Торговца.',
   'itemUi.logs.postedAuction': 'Лот {item} выставлен на аукцион (начальная ставка {money}).',
   'itemUi.logs.bidPlaced': 'Сделана ставка: {money} за {item}.',
+  'itemUi.logs.listedClaudium': '{item} выставлен на Мировом Рынке за {amount} Claudium.',
+  'itemUi.logs.listedWoc': '{item} выставлен на Мировом Рынке за {amount} WOC.',
   'itemUi.logs.boughtBackItem': 'Вы выкупили {item} за {money}.',
   'itemUi.errors.notSoldHere': 'Этот предмет здесь не продается.',
   'itemUi.errors.notEnoughMoney': 'Недостаточно денег.',
@@ -2248,6 +2274,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.errors.cannotBidOwnLot': 'Нельзя делать ставку на собственный лот.',
   'itemUi.errors.alreadyHighBidder': 'Вы уже лидируете по ставке.',
   'itemUi.errors.bidTooLow': 'Ставка должна быть не менее {min}.',
+  'itemUi.errors.bidsGoldOnly': 'Ставки принимаются только золотом.',
+  'itemUi.errors.claudiumUnavailable': 'Лоты за Claudium недоступны.',
+  'itemUi.errors.wocUnavailable': 'Лоты за WOC недоступны.',
+  'itemUi.errors.wocLinkToList': 'Привяжите кошелёк, чтобы выставлять лоты за WOC.',
+  'itemUi.errors.wocLinkToPay': 'Привяжите кошелёк, чтобы платить WOC.',
+  'itemUi.errors.wocPriceInvalid': 'Укажите корректную цену в WOC.',
+  'itemUi.errors.awaitingPayment': 'Этот лот ожидает оплаты.',
   'itemUi.loot.takeAll': 'Взять все',
   'itemUi.loot.close': 'Закрыть добычу',
   'itemUi.lootRoll.title': 'Бросок за добычу',
@@ -5343,6 +5376,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Размещение: выберите стопку из своих сумок, укажите срок продажи (12, 24 или 48 часов) и назначьте цену за штуку, либо переключитесь на аукцион и укажите начальную ставку и необязательную цену выкупа. За размещение берется залог, зависящий от срока; он возвращается по мере продажи товара, а теряется только та часть, что осталась непроданной. Товары хранятся у Торговца, пока их не купят или пока не закончится аукцион, а забрать лот можно и раньше, если вы передумали.',
   'guide.economy.marketBidding':
     'Аукционы: некоторые лоты продаются через ставки, а не по фиксированной цене. Ставка должна быть не ниже указанного минимума, и если вашу ставку перебивают, она возвращается полностью. Если продавец назначил цену выкупа, ставка, достигшая этой суммы, сразу забирает лот.',
+  'guide.economy.marketCurrencies':
+    'Там, где это включено, лот можно оценить также в Claudium или WOC: покупатель платит вам напрямую, со счёта на счёт или из кошелька в кошелёк, Торговец держит товар до подтверждения оплаты, а залог за лот остаётся обычным золотом.',
   'guide.economy.marketPricing':
     'Цену назначаете вы сами. Объявление чуть ниже того, что просят другие, обычно продаётся быстрее, а заломленная цена может так и остаться нетронутой. Сначала осмотритесь, чтобы увидеть, какова ходовая ставка, прежде чем выставлять товар.',
   'guide.economy.marketTitle': 'Мировой рынок',
@@ -6951,6 +6986,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.letters.market_expired.subject': 'Срок вашего лота истек',
   'entities.letters.market_expired.body':
     'Покупатель не нашелся до истечения срока продажи. Товар ждет в ящике получения на Мировом Рынке; приходите забрать его.\n\n- Торговец',
+  'entities.letters.market_sold_wallet.sender': 'Торговец',
+  'entities.letters.market_sold_wallet.subject': 'Ваш лот продан',
+  'entities.letters.market_sold_wallet.body':
+    'Покупатель забрал ваш товар. Оплата ушла прямо в ваш привязанный кошелёк, как вы и просили; в ящике получения на Мировом Рынке ждёт только залог за лот. Приходите забрать его.\n\n- Торговец',
+  'entities.letters.market_sold_account.sender': 'Торговец',
+  'entities.letters.market_sold_account.subject': 'Ваш лот продан',
+  'entities.letters.market_sold_account.body':
+    'Покупатель забрал ваш товар. Оплата зачислена прямо на ваш баланс Claudium; в ящике получения на Мировом Рынке ждёт только залог за лот. Приходите забрать его.\n\n- Торговец',
   'entities.letters.trade_delivery.sender': 'Вороновая почта',
   'entities.letters.trade_delivery.subject': 'Товары по обмену доставлены',
   'entities.letters.trade_delivery.body':

@@ -96,10 +96,12 @@ import {
 } from './chat_filter_commands';
 import { applyChatStrike, loadChatFilterState, recordChatViolation } from './chat_filter_db';
 import { ChatLogger } from './chat_log';
+import { transferClaudium } from './claudium_proxy';
 import { createClaudiumTrade } from './claudium_trade';
 import { dailyRewardService } from './daily_rewards';
 import type { AccountChatMuteStatus, AccountCosmetics, RequestMetadata } from './db';
 import {
+  accountIdForCharacter,
   closePlaySession,
   grantAccountMechChroma,
   grantAccountWeaponSkins,
@@ -142,6 +144,7 @@ import { loadActiveBlockedIps } from './ip_block_db';
 import { keepaliveSweepDelayed } from './keepalive_sweep';
 import { LINKDEAD_GRACE_MS, planJoin } from './linkdead';
 import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips';
+import { MarketSettlements } from './market_settlement';
 import { trackReachedLevel5 } from './meta_capi';
 import {
   applyMobScanTick,
@@ -183,7 +186,7 @@ import {
   type TradeLedgerRow,
   type TradePairSaveSide,
 } from './trade_db';
-import { readTradeRailsConfig } from './trade_rails_boot';
+import { readTradeRailsConfig, type TradeRailsConfig } from './trade_rails_boot';
 import { type SettlementSession, TradeSettlements } from './trade_settlement';
 import { holderInfoForPubkey } from './woc_balance';
 import { makeReference, solanaPayUri, verifyWocPayment } from './woc_trade';
@@ -1272,6 +1275,10 @@ export class GameServer {
   // constructed; its rails read their own fail-closed config, so with both flags
   // unset every method returns inert values and no external leg ever runs.
   private tradeSettlements?: TradeSettlements;
+  // World Market external-denomination purchase orchestrator (AH-P4). Shares
+  // the SAME fail-closed rails config as tradeSettlements: the trade flags now
+  // also gate market listings, so with both unset it is equally inert.
+  private marketSettlements?: MarketSettlements;
 
   constructor() {
     this.sim = new Sim({
@@ -1314,7 +1321,11 @@ export class GameServer {
       tradeRails: (pid) => this.tradeSettlements?.tradeRailsView(pid) ?? OFFLINE_TRADE_RAILS,
     });
     this.social = new SocialService(this.socialDb, this.socialTransport());
-    this.tradeSettlements = this.buildTradeSettlements();
+    // ONE fail-closed rails read shared by both orchestrators (a half-configured
+    // or typo'd money-rail flag throws here, at boot, before anything runs).
+    const railsCfg = readTradeRailsConfig();
+    this.tradeSettlements = this.buildTradeSettlements(railsCfg);
+    this.marketSettlements = this.buildMarketSettlements(railsCfg);
     this.moderation = new ModerationService(this.moderationHost(), {
       recordAction: (input) => recordInGameAction(input),
       mute: (input) => muteAccountChat(input),
@@ -4543,7 +4554,19 @@ export class GameServer {
                       : undefined,
                 }
               : undefined;
-          sim.marketList(msg.item, msg.count, msg.price, pid, { durationHours, auction });
+          // Multi-currency fields: enum + string SHAPE checks only; the sim
+          // validates the values (rails availability, WOC normalization).
+          const denom =
+            msg.denom === 'copper' || msg.denom === 'claudium' || msg.denom === 'woc'
+              ? msg.denom
+              : undefined;
+          const priceWoc = typeof msg.priceWoc === 'string' ? msg.priceWoc : undefined;
+          sim.marketList(msg.item, msg.count, msg.price, pid, {
+            durationHours,
+            auction,
+            denom,
+            priceWoc,
+          });
         }
         break;
       case 'market_buy':
@@ -5208,7 +5231,7 @@ export class GameServer {
     }
     // market info is null unless the player is standing at the Merchant, so it
     // only rides the wire for players actually browsing the World Market
-    maybe('market', this.sim.marketInfoFor(anchorSession.pid));
+    maybe('market', this.marketWire(anchorSession.pid));
     maybe('mail', this.sim.mailInfoFor(anchorSession.pid));
     maybe('mailU', this.sim.mailUnreadFor(anchorSession.pid));
     // bank info is null unless the player is standing at a banker, so it only
@@ -5389,14 +5412,26 @@ export class GameServer {
     };
   }
 
-  // Build the external-trade settlement orchestrator. readTradeRailsConfig()
-  // throws at boot on a half-configured or typo'd money-rail flag (fail-closed
-  // doctrine); with both flags unset the orchestrator is inert.
-  private buildTradeSettlements(): TradeSettlements {
+  // Sim-owned market snapshot plus the server-only $WOC payment-request
+  // enrichment for a buyer with a pending external purchase (the tradeWire
+  // precedent: the sim serves the base shape, the server overlays wocPay).
+  private marketWire(pid: number): unknown {
+    const info = this.sim.marketInfoFor(pid);
+    if (!info?.myPendingPurchase || info.myPendingPurchase.denom !== 'woc') return info;
+    const pay = this.marketSettlements?.wocPayFor(pid, info.myPendingPurchase.listingId);
+    if (!pay) return info;
+    return { ...info, myPendingPurchase: { ...info.myPendingPurchase, wocPay: pay } };
+  }
+
+  // Build the external-trade settlement orchestrator. The caller reads the
+  // fail-closed rails config ONCE at boot (a half-configured or typo'd
+  // money-rail flag throws there); with both flags unset the orchestrator is
+  // inert. The same config also feeds buildMarketSettlements below.
+  private buildTradeSettlements(cfg: TradeRailsConfig): TradeSettlements {
     return new TradeSettlements({
       sim: this.sim,
       realm: REALM,
-      cfg: readTradeRailsConfig(),
+      cfg,
       db: {
         insertSettlementAndSaveBoth,
         markTradeSettlement,
@@ -5411,6 +5446,28 @@ export class GameServer {
       saveSideFor: (pid) => this.settlementSaveSide(pid),
       forceSave: (pid) => this.forceSaveForSettlement(pid),
       savePairAndLedger: (a, b, ledger) => this.saveTradePair(a, b, ledger),
+    });
+  }
+
+  // Build the World Market external-purchase orchestrator (AH-P4), on the SAME
+  // rails config. saveMarket deliberately bypasses this.saveMarket()'s
+  // catch-and-log wrapper: the orchestrator anchors settlement identity in the
+  // market blob BEFORE money moves, so a failed write must PROPAGATE and fail
+  // the purchase closed rather than read as success.
+  private buildMarketSettlements(cfg: TradeRailsConfig): MarketSettlements {
+    return new MarketSettlements({
+      sim: this.sim,
+      realm: REALM,
+      cfg,
+      db: { insertTradeLedger },
+      transferClaudium: (from, to, amount, dedupeKey) =>
+        transferClaudium(from, to, amount, dedupeKey),
+      wocTrade: { makeReference, solanaPayUri, verifyWocPayment },
+      walletPubkeyFor: async (accountId) => (await walletForAccount(accountId))?.pubkey ?? null,
+      accountIdForCharacter: (characterId) => accountIdForCharacter(characterId),
+      sessionFor: (pid) => this.settlementSessionFor(pid),
+      saveMarket: () => this.enqueueMarketWrite(() => saveMarketState(this.sim.serializeMarket())),
+      forceSave: (pid) => this.forceSaveForSettlement(pid),
     });
   }
 
@@ -5479,6 +5536,13 @@ export class GameServer {
   // main.ts after ensureSchema + market/mail load, before the loop starts.
   async recoverOpenTradeSettlements(): Promise<void> {
     if (this.tradeSettlements) await this.tradeSettlements.recoverOpenSettlements();
+  }
+
+  // Resolve any external market purchase left pending by a crash/restart. The
+  // persisted market blob is the anchor, so this runs after loadMarket (and
+  // after loadMail: a completion may letter an offline seller).
+  async recoverPendingMarketPurchases(): Promise<void> {
+    if (this.marketSettlements) await this.marketSettlements.recoverPendingPurchases();
   }
 
   private duelWire(pid: number): unknown {
@@ -5788,6 +5852,17 @@ export class GameServer {
         void this.tradeSettlements
           ?.onTradeLedger(ledger)
           .catch((err) => console.error('[trade-settle] onTradeLedger failed:', err));
+      } else if (ev.type === 'marketPurchaseStart') {
+        // External-denomination market purchase: server-only, swallowed like
+        // the trade accounting events. The buyer's self snapshot re-diffs so
+        // the pending panel (myPendingPurchase) appears promptly.
+        swallowedTradeEvents.add(ev);
+        const s = this.clients.get(ev.buyerPid);
+        if (s) s.selfHeavyDirty = true;
+        const purchase = ev;
+        void this.marketSettlements
+          ?.onMarketPurchaseStart(purchase)
+          .catch((err) => console.error('[market-settle] onMarketPurchaseStart failed:', err));
       }
     }
     // ignore list: social invites from blocked senders are resolved once per

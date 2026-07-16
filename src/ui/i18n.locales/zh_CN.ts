@@ -2084,6 +2084,29 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.wonToast': '你赢得了 {item} 的拍卖！请到商人处领取。',
   'itemUi.market.soldToast': '你的 {item} 以 {money} 售出。请到商人处领取。',
   'itemUi.market.expiredToast': '你的 {item} 上架已过期未售出。请到商人处领取。',
+  'itemUi.market.denomLabel': '货币',
+  'itemUi.market.denomGold': '金币',
+  'itemUi.market.auctionGoldOnly': '竞拍仅接受金币。',
+  'itemUi.market.claudiumPriceEach': '单价（Claudium）',
+  'itemUi.market.wocPriceLot': '整批价格（WOC）',
+  'itemUi.market.claudiumEach': '每件 {amount} Claudium',
+  'itemUi.market.claudiumMinError': '价格至少为 1 Claudium。',
+  'itemUi.market.awaitingPayment': '等待付款',
+  'itemUi.market.buyExternalTitle': '确认购买',
+  'itemUi.market.buyClaudiumConfirmBody':
+    '以 {amount} Claudium 购买 {item}？付款将从你的 Claudium 余额中扣除。',
+  'itemUi.market.buyWocConfirmBody':
+    '以 {amount} WOC 购买 {item}？你将从已绑定的钱包付款，款项到账后货物才会交付。',
+  'itemUi.market.buyClaudiumAria': '用 Claudium 购买 {item}',
+  'itemUi.market.buyWocAria': '用 WOC 购买 {item}',
+  'itemUi.market.pendingClaudium': '正在完成 {item} 的购买。',
+  'itemUi.market.pendingPreparing': '正在准备 {item} 的付款请求。',
+  'itemUi.market.wocPayPrompt': '从已绑定的钱包发送 {amount} WOC 以完成 {item} 的购买。',
+  'itemUi.market.paymentExpiredToast': '{item} 的付款时限已过。该拍品重新开放。',
+  'itemUi.market.soldWalletToast':
+    '你的 {item} 以 {amount} WOC 售出。货款已直接支付到你绑定的钱包；请到商人处领取保证金。',
+  'itemUi.market.soldAccountToast':
+    '你的 {item} 以 {amount} Claudium 售出。货款已计入你的 Claudium 余额；请到商人处领取保证金。',
   'itemUi.market.sellNote':
     '从背包上架货物。物品售出时商人抽取 {cut}%。你正在使用 {used}/{max} 个上架位。',
   'itemUi.market.sellPickEmpty': '点击背包中的物品来选择要出售的货物。',
@@ -2104,6 +2127,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.logs.expiredListing': '你的 {item} 市场上架已过期，正在商人处等待领取。',
   'itemUi.logs.postedAuction': '已将 {item} 上架拍卖（起拍价 {money}）。',
   'itemUi.logs.bidPlaced': '已出价：{money}，竞拍 {item}。',
+  'itemUi.logs.listedClaudium': '已将 {item} 以 {amount} Claudium 上架到世界市场。',
+  'itemUi.logs.listedWoc': '已将 {item} 以 {amount} WOC 上架到世界市场。',
   'itemUi.logs.boughtBackItem': '你以 {money} 回购了 {item}。',
   'itemUi.errors.notSoldHere': '这里不出售该物品。',
   'itemUi.errors.notEnoughMoney': '金钱不足。',
@@ -2128,6 +2153,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.errors.cannotBidOwnLot': '你不能对自己的拍品出价。',
   'itemUi.errors.alreadyHighBidder': '你已经是当前最高出价者。',
   'itemUi.errors.bidTooLow': '出价至少为 {min}。',
+  'itemUi.errors.bidsGoldOnly': '竞拍仅接受金币。',
+  'itemUi.errors.claudiumUnavailable': 'Claudium 挂单不可用。',
+  'itemUi.errors.wocUnavailable': 'WOC 挂单不可用。',
+  'itemUi.errors.wocLinkToList': '绑定钱包后才能以 WOC 上架。',
+  'itemUi.errors.wocLinkToPay': '绑定钱包后才能用 WOC 付款。',
+  'itemUi.errors.wocPriceInvalid': '请输入有效的 WOC 价格。',
+  'itemUi.errors.awaitingPayment': '该拍品正在等待付款。',
   'itemUi.loot.takeAll': '全部拾取',
   'itemUi.loot.close': '关闭战利品',
   'itemUi.lootRoll.title': '为战利品掷骰',
@@ -5002,6 +5034,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '挂单：从背包中选一组货物，选择上架时长（12、24 或 48 小时）并定下单价，或改为拍卖并设定起拍价及可选的一口价。上架需要缴纳一笔与时长相关的押金；货物售出时会随之退还，只有未售出的部分才会被没收。在有人买下或拍卖结束之前，货物会由商人代为保管，若你改变主意，也可以提前取回。',
   'guide.economy.marketBidding':
     '拍卖：部分挂单接受出价而非固定价格。出价必须不低于公示的最低出价，一旦你的出价被超过，先前的出价会全额退还。若卖家设置了一口价，出价达到该金额即可当场拍下整批货物。',
+  'guide.economy.marketCurrencies':
+    '在启用的情况下，挂单也可以用 Claudium 或 WOC 定价：买家直接向你付款（账户对账户或钱包对钱包），商人会保管货物直到付款确认，而上架保证金仍然是金币。',
   'guide.economy.marketPricing':
     '定价由你说了算。比别人略低一点往往卖得更快，而要价过高则可能无人问津。挂单前不妨先浏览一番，看看当下的行情如何。',
   'guide.economy.marketTitle': '世界市场',
@@ -6495,6 +6529,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.letters.market_expired.subject': '你的上架已过期',
   'entities.letters.market_expired.body':
     '在上架到期前没有买家出现。它正等在世界市场的领取箱中；来找我取回吧。\n\n- 商人',
+  'entities.letters.market_sold_wallet.sender': '商人',
+  'entities.letters.market_sold_wallet.subject': '你的拍品已售出',
+  'entities.letters.market_sold_wallet.body':
+    '买家买走了你的货物。货款已按你的要求直接支付到你绑定的钱包；世界市场的领取箱里只剩你的上架保证金。请来取回。\n\n- 商人',
+  'entities.letters.market_sold_account.sender': '商人',
+  'entities.letters.market_sold_account.subject': '你的拍品已售出',
+  'entities.letters.market_sold_account.body':
+    '买家买走了你的货物。货款已直接计入你的 Claudium 余额；世界市场的领取箱里只剩你的上架保证金。请来取回。\n\n- 商人',
   'entities.letters.trade_delivery.sender': '渡鸦邮驿',
   'entities.letters.trade_delivery.subject': '交易货品送达',
   'entities.letters.trade_delivery.body':

@@ -135,3 +135,66 @@ describe('market_window: behavior preserved through the core', () => {
     expect(painter).toContain('marketDepositPerUnit(item, this.sellDurationHours)');
   });
 });
+
+describe('market_window: multi-currency denominations (AH-P4)', () => {
+  it('renders the denomination selector ONLY for rails the viewer has (meta.rails gating)', () => {
+    // the selector options are built from meta.rails, never unconditionally
+    expect(painter).toContain('meta.rails.claudium');
+    expect(painter).toContain('meta.rails.woc');
+    expect(painter).toContain('data-sell-denom');
+    // with both rails off exactly one option exists, so no selector renders
+    expect(painter).toContain('denomOptions.length > 1');
+    // a rail turning off mid-session can never leave a phantom selection
+    expect(painter).toContain(
+      "if (!denomOptions.some((o) => o.denom === this.sellDenom)) this.sellDenom = 'copper';",
+    );
+  });
+
+  it('disables the auction toggle for an external denomination with the gold-only tooltip', () => {
+    expect(painter).toContain("kind === 'auction' && this.sellDenom !== 'copper'");
+    expect(painter).toContain('itemUi.market.auctionGoldOnly');
+    // switching to an external denom force-exits an in-progress auction choice
+    expect(painter).toContain(
+      "if (next !== 'copper' && this.sellKind === 'auction') this.sellKind = 'fixed';",
+    );
+  });
+
+  it('dispatches denom + priceWoc on list, with the WOC ask as an opaque string', () => {
+    expect(painter).toContain("opts.denom = 'woc'");
+    expect(painter).toContain('opts.priceWoc = raw');
+    expect(painter).toContain("opts.denom = 'claudium'");
+    expect(painter).toContain('.marketList(view.form.itemId, qty, unit, opts)');
+    // the WOC input is a TEXT decimal field whose raw string rides the wire
+    // untouched (no Number()/parse of the ask anywhere on the woc path)
+    expect(painter).toContain('id="mkt-woc" type="text" inputmode="decimal"');
+    expect(painter).toContain('?.value.trim()');
+    expect(painter, 'the woc ask is never coerced to a number').not.toContain('Number(raw)');
+  });
+
+  it('renders denomination badges in the price cell (coin icons per currency)', () => {
+    expect(painter).toContain("l.denom === 'claudium'");
+    expect(painter).toContain("l.denom === 'woc'");
+    expect(painter).toContain('claudium-coin');
+    expect(painter).toContain('woc-coin');
+    expect(painter).toContain('itemUi.market.claudiumEach');
+  });
+
+  it('locks a pending row for everyone and confirms external buys before dispatch', () => {
+    expect(painter).toContain('l.pendingPayment');
+    expect(painter).toContain('itemUi.market.awaitingPayment');
+    // both external flows route through the shared confirm dialog
+    expect(painter).toContain('itemUi.market.buyClaudiumConfirmBody');
+    expect(painter).toContain('itemUi.market.buyWocConfirmBody');
+  });
+
+  it('renders the pending panel reusing the trade payment-panel classes with wallet + copy actions', () => {
+    expect(painter).toContain('buildPendingPanel');
+    expect(painter).toContain('trade-woc-pay');
+    expect(painter).toContain('hud.trade.openInWallet');
+    expect(painter).toContain('hud.trade.copyLink');
+    expect(painter).toContain('itemUi.market.wocPayPrompt');
+    expect(painter).toContain('this.deps.copyToClipboard(uri)');
+    // the sig-driven refresh reacts to the pending purchase appearing/clearing
+    expect(painter).toContain('info?.myPendingPurchase');
+  });
+});

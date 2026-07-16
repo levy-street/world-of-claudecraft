@@ -3281,7 +3281,8 @@ export const vi_VN: EnTranslations = {
       "marketPost": "Đăng bán: chọn một chồng hàng từ túi của bạn, đặt giá, và rao lên. Hàng hóa được Thương Nhân giữ cho đến khi có người mua. Những mục chưa bán sẽ trở về với bạn sau một thời gian, và bạn có thể lấy lại sớm một mục nếu đổi ý.",
       "marketBidding": "Auctions: some listings take bids instead of a fixed price. A bid must clear the posted minimum, and outbidding someone always refunds them. When the seller sets a buyout, any bid that reaches it wins the lot on the spot.",
       "marketCollect": "Thu nhận: khi hàng của bạn bán được, tiền lời chờ bạn tại Thương Nhân. Hãy quay lại nhận bạc, cùng với bất cứ thứ gì trả về chưa bán được. Thương Nhân lấy một khoản nhỏ từ mỗi giao dịch hoàn tất.",
-      "marketPricing": "Định giá là tùy bạn. Rao thấp hơn một chút so với người khác thường bán nhanh hơn, trong khi giá cao ngất có thể nằm im không ai động đến. Hãy duyệt trước để xem mức giá hiện hành trông thế nào trước khi đăng."
+      "marketPricing": "Định giá là tùy bạn. Rao thấp hơn một chút so với người khác thường bán nhanh hơn, trong khi giá cao ngất có thể nằm im không ai động đến. Hãy duyệt trước để xem mức giá hiện hành trông thế nào trước khi đăng.",
+      "marketCurrencies": "Where enabled, a listing can also be priced in Claudium or WOC: the buyer pays you directly, account to account or wallet to wallet, the Merchant holds the goods until the payment clears, and the listing deposit stays plain gold."
     },
     "social": {
       "intro": "Phần lớn thế giới có thể chơi đơn, nhưng trò chơi được tạo ra để chơi cùng người khác. Đây là cách trò chuyện, hợp sức, và tìm thấy nhóm của bạn.",
@@ -5935,7 +5936,29 @@ export const vi_VN: EnTranslations = {
       "outbidToast": "You were outbid on {item}. {money} refunded to your collection box.",
       "wonToast": "You won the auction for {item}! Collect it at the Merchant.",
       "soldToast": "Your {item} sold for {money}. Collect it at the Merchant.",
-      "expiredToast": "Your listing of {item} expired unsold. Collect it at the Merchant."
+      "expiredToast": "Your listing of {item} expired unsold. Collect it at the Merchant.",
+      "denomLabel": "Currency",
+      "denomGold": "Gold",
+      "denomClaudium": "Claudium",
+      "denomWoc": "WOC",
+      "auctionGoldOnly": "Bids take gold only.",
+      "claudiumPriceEach": "Price each (Claudium)",
+      "wocPriceLot": "Lot price (WOC)",
+      "claudiumAmount": "{amount} Claudium",
+      "claudiumEach": "{amount} Claudium each",
+      "claudiumMinError": "Name a price of at least 1 Claudium.",
+      "awaitingPayment": "Awaiting payment",
+      "buyExternalTitle": "Confirm purchase",
+      "buyClaudiumConfirmBody": "Buy {item} for {amount} Claudium? The payment comes from your Claudium balance.",
+      "buyWocConfirmBody": "Buy {item} for {amount} WOC? You pay from your linked wallet, and the goods release once the payment lands.",
+      "buyClaudiumAria": "Buy {item} with Claudium",
+      "buyWocAria": "Buy {item} with WOC",
+      "pendingClaudium": "Completing your purchase of {item}.",
+      "pendingPreparing": "Preparing the payment request for {item}.",
+      "wocPayPrompt": "Send {amount} WOC from your linked wallet to finish buying {item}.",
+      "paymentExpiredToast": "The payment window for {item} closed. The lot is open again.",
+      "soldWalletToast": "Your {item} sold for {amount} WOC. The payment went to your linked wallet; collect your deposit at the Merchant.",
+      "soldAccountToast": "Your {item} sold for {amount} Claudium. The payment went to your Claudium balance; collect your deposit at the Merchant."
     },
     "logs": {
       "listedItem": "Đã rao bán {item} trên Chợ Thế Giới với giá {money}.",
@@ -5946,6 +5969,8 @@ export const vi_VN: EnTranslations = {
       "expiredListing": "Mặt hàng rao {item} của bạn đã hết hạn và đang chờ tại chỗ Thương Nhân.",
       "postedAuction": "Posted {item} for auction (starting bid {money}).",
       "bidPlaced": "Bid placed: {money} on {item}.",
+      "listedClaudium": "Listed {item} on the World Market for {amount} Claudium.",
+      "listedWoc": "Listed {item} on the World Market for {amount} WOC.",
       "boughtBackItem": "Đã mua lại {item} với giá {money}."
     },
     "errors": {
@@ -5971,7 +5996,14 @@ export const vi_VN: EnTranslations = {
       "notAuction": "That lot is not up for auction.",
       "cannotBidOwnLot": "You cannot bid on your own lot.",
       "alreadyHighBidder": "You are already the high bidder.",
-      "bidTooLow": "Bid at least {min}."
+      "bidTooLow": "Bid at least {min}.",
+      "bidsGoldOnly": "Bids take gold only.",
+      "claudiumUnavailable": "Claudium listings are not available.",
+      "wocUnavailable": "WOC listings are not available.",
+      "wocLinkToList": "Link a wallet to list for WOC.",
+      "wocLinkToPay": "Link a wallet to pay with WOC.",
+      "wocPriceInvalid": "Name a valid WOC price.",
+      "awaitingPayment": "That lot is awaiting payment."
     },
     "loot": {
       "takeAll": "Lấy Tất Cả",
@@ -9826,6 +9858,16 @@ export const vi_VN: EnTranslations = {
         "sender": "The Merchant",
         "subject": "Your lot has sold",
         "body": "A buyer has taken your goods off my hands. Your proceeds wait in your collection box at the World Market; come see me to collect them.\n\n- The Merchant"
+      },
+      "market_sold_wallet": {
+        "sender": "The Merchant",
+        "subject": "Your lot has sold",
+        "body": "A buyer has taken your goods off my hands. The payment went straight to your linked wallet, as you asked; only your listing deposit waits in your collection box at the World Market. Come see me to take it back.\n\n- The Merchant"
+      },
+      "market_sold_account": {
+        "sender": "The Merchant",
+        "subject": "Your lot has sold",
+        "body": "A buyer has taken your goods off my hands. The payment went straight to your Claudium balance; only your listing deposit waits in your collection box at the World Market. Come see me to take it back.\n\n- The Merchant"
       },
       "market_expired": {
         "sender": "The Merchant",

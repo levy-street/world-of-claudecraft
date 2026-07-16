@@ -129,6 +129,7 @@ describe('the World Market — the Merchant', () => {
         depositPerUnit: 0,
         expiresAt: Number.POSITIVE_INFINITY,
         house: false,
+        denom: 'copper',
       });
     }
     // One listing owned by the viewer (their stable seller key), which must ride on top
@@ -145,6 +146,7 @@ describe('the World Market — the Merchant', () => {
       depositPerUnit: 0,
       expiresAt: Number.POSITIVE_INFINITY,
       house: false,
+      denom: 'copper',
     });
 
     const p0 = sim.marketInfoFor(viewer)!;
@@ -851,6 +853,7 @@ describe('World Market: durations, deposits, and per-unit partial buys (auction 
       depositPerUnit: 0,
       expiresAt: sim.time + 3600,
       house: false,
+      denom: 'copper',
       ...over,
     });
     book.push(

@@ -247,6 +247,8 @@ const LETTER_IDS = [
   'market_outbid',
   'market_won',
   'market_sold',
+  'market_sold_wallet',
+  'market_sold_account',
   'market_expired',
   'trade_delivery',
   'trade_refund',

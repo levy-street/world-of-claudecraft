@@ -2087,6 +2087,29 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.wonToast': '你贏得了 {item} 的拍賣！請到商人處領取。',
   'itemUi.market.soldToast': '你的 {item} 以 {money} 售出。請到商人處領取。',
   'itemUi.market.expiredToast': '你的 {item} 上架已過期未售出。請到商人處領取。',
+  'itemUi.market.denomLabel': '貨幣',
+  'itemUi.market.denomGold': '金幣',
+  'itemUi.market.auctionGoldOnly': '競標僅接受金幣。',
+  'itemUi.market.claudiumPriceEach': '單價（Claudium）',
+  'itemUi.market.wocPriceLot': '整批價格（WOC）',
+  'itemUi.market.claudiumEach': '每件 {amount} Claudium',
+  'itemUi.market.claudiumMinError': '價格至少為 1 Claudium。',
+  'itemUi.market.awaitingPayment': '等待付款',
+  'itemUi.market.buyExternalTitle': '確認購買',
+  'itemUi.market.buyClaudiumConfirmBody':
+    '以 {amount} Claudium 購買 {item}？款項將從你的 Claudium 餘額中扣除。',
+  'itemUi.market.buyWocConfirmBody':
+    '以 {amount} WOC 購買 {item}？你將從已綁定的錢包付款，款項到帳後貨物才會交付。',
+  'itemUi.market.buyClaudiumAria': '用 Claudium 購買 {item}',
+  'itemUi.market.buyWocAria': '用 WOC 購買 {item}',
+  'itemUi.market.pendingClaudium': '正在完成 {item} 的購買。',
+  'itemUi.market.pendingPreparing': '正在準備 {item} 的付款請求。',
+  'itemUi.market.wocPayPrompt': '從已綁定的錢包發送 {amount} WOC 以完成 {item} 的購買。',
+  'itemUi.market.paymentExpiredToast': '{item} 的付款時限已過。該拍品重新開放。',
+  'itemUi.market.soldWalletToast':
+    '你的 {item} 以 {amount} WOC 售出。貨款已直接支付到你綁定的錢包；請到商人處領取保證金。',
+  'itemUi.market.soldAccountToast':
+    '你的 {item} 以 {amount} Claudium 售出。貨款已計入你的 Claudium 餘額；請到商人處領取保證金。',
   'itemUi.market.sellNote':
     '從背包上架貨物。物品售出時商人抽取 {cut}%。你正在使用 {used}/{max} 個上架位。',
   'itemUi.market.sellPickEmpty': '點擊背包中的物品來選擇要出售的貨物。',
@@ -2107,6 +2130,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.logs.expiredListing': '你的 {item} 市場上架已過期，正在商人處等待領取。',
   'itemUi.logs.postedAuction': '已將 {item} 上架拍賣（起標價 {money}）。',
   'itemUi.logs.bidPlaced': '已出價：{money}，競標 {item}。',
+  'itemUi.logs.listedClaudium': '已將 {item} 以 {amount} Claudium 上架到世界市場。',
+  'itemUi.logs.listedWoc': '已將 {item} 以 {amount} WOC 上架到世界市場。',
   'itemUi.logs.boughtBackItem': '你以 {money} 買回了 {item}。',
   'itemUi.errors.notSoldHere': '這裡不出售該物品。',
   'itemUi.errors.notEnoughMoney': '金錢不足。',
@@ -2131,6 +2156,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.errors.cannotBidOwnLot': '你不能對自己的拍品出價。',
   'itemUi.errors.alreadyHighBidder': '你已經是目前最高出價者。',
   'itemUi.errors.bidTooLow': '出價至少為 {min}。',
+  'itemUi.errors.bidsGoldOnly': '競標僅接受金幣。',
+  'itemUi.errors.claudiumUnavailable': 'Claudium 掛單不可用。',
+  'itemUi.errors.wocUnavailable': 'WOC 掛單不可用。',
+  'itemUi.errors.wocLinkToList': '綁定錢包後才能以 WOC 上架。',
+  'itemUi.errors.wocLinkToPay': '綁定錢包後才能用 WOC 付款。',
+  'itemUi.errors.wocPriceInvalid': '請輸入有效的 WOC 價格。',
+  'itemUi.errors.awaitingPayment': '該拍品正在等待付款。',
   'itemUi.loot.takeAll': '全部拾取',
   'itemUi.loot.close': '關閉戰利品',
   'itemUi.lootRoll.title': '為戰利品擲骰',
@@ -5003,6 +5035,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '刊登：從背包中選一堆物品，選擇上架時長（12、24 或 48 小時）並設定單價，或改為拍賣並設定起標價及可選的一口價。刊登需要繳一筆與時長相關的保證金；物品售出時會隨之退還，只有未售出的部分才會被沒收。在有人買下或拍賣結束之前，貨物會由商人代為保管，若你改變心意，也可以提早取回。',
   'guide.economy.marketBidding':
     '拍賣：部分刊登接受出價而非固定價格。出價必須不低於公告的最低出價，一旦你的出價被超過，先前的出價會全額退還。若賣家設定了一口價，出價達到該金額即可當場買下整批貨物。',
+  'guide.economy.marketCurrencies':
+    '在啟用的情況下，掛單也可以用 Claudium 或 WOC 定價：買家直接向你付款（帳戶對帳戶或錢包對錢包），商人會保管貨物直到付款確認，而上架保證金仍然是金幣。',
   'guide.economy.marketPricing':
     '定價由你決定。開價稍低於他人通常賣得更快，而開價過高則可能乏人問津。刊登之前先瀏覽一下，看看目前的行情如何。',
   'guide.economy.marketTitle': '世界市場',
@@ -6497,6 +6531,14 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.letters.market_expired.subject': '你的上架已過期',
   'entities.letters.market_expired.body':
     '上架到期前沒有買家出現。它正等在世界市場的領取箱中；來找我取回吧。\n\n- 商人',
+  'entities.letters.market_sold_wallet.sender': '商人',
+  'entities.letters.market_sold_wallet.subject': '你的拍品已售出',
+  'entities.letters.market_sold_wallet.body':
+    '買家買走了你的貨物。貨款已按你的要求直接支付到你綁定的錢包；世界市場的領取箱裡只剩你的上架保證金。請來取回。\n\n- 商人',
+  'entities.letters.market_sold_account.sender': '商人',
+  'entities.letters.market_sold_account.subject': '你的拍品已售出',
+  'entities.letters.market_sold_account.body':
+    '買家買走了你的貨物。貨款已直接計入你的 Claudium 餘額；世界市場的領取箱裡只剩你的上架保證金。請來取回。\n\n- 商人',
   'entities.letters.trade_delivery.sender': '渡鴉郵驛',
   'entities.letters.trade_delivery.subject': '交易貨品送達',
   'entities.letters.trade_delivery.body':

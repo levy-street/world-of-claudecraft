@@ -731,7 +731,7 @@ export interface SimContextCallbacks {
   sendMarketLetter(
     recipientKey: string,
     recipientName: string,
-    kind: 'outbid' | 'won' | 'sold' | 'expired',
+    kind: 'outbid' | 'won' | 'sold' | 'expired' | 'sold_wallet' | 'sold_account',
   ): void;
 
   // Set proc firing is owned by combat/set_procs.ts.

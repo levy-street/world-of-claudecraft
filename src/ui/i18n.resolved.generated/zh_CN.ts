@@ -3281,7 +3281,8 @@ export const zh_CN: EnTranslations = {
       "marketPost": "挂单：从背包中选一组货物，选择上架时长（12、24 或 48 小时）并定下单价，或改为拍卖并设定起拍价及可选的一口价。上架需要缴纳一笔与时长相关的押金；货物售出时会随之退还，只有未售出的部分才会被没收。在有人买下或拍卖结束之前，货物会由商人代为保管，若你改变主意，也可以提前取回。",
       "marketBidding": "拍卖：部分挂单接受出价而非固定价格。出价必须不低于公示的最低出价，一旦你的出价被超过，先前的出价会全额退还。若卖家设置了一口价，出价达到该金额即可当场拍下整批货物。",
       "marketCollect": "收取：当你的货物售出后，所得钱款会在商人处等你领取。回去收取钱币，连同任何未售出而退回的货物。商人会从每笔成交中抽取少许佣金。",
-      "marketPricing": "定价由你说了算。比别人略低一点往往卖得更快，而要价过高则可能无人问津。挂单前不妨先浏览一番，看看当下的行情如何。"
+      "marketPricing": "定价由你说了算。比别人略低一点往往卖得更快，而要价过高则可能无人问津。挂单前不妨先浏览一番，看看当下的行情如何。",
+      "marketCurrencies": "在启用的情况下，挂单也可以用 Claudium 或 WOC 定价：买家直接向你付款（账户对账户或钱包对钱包），商人会保管货物直到付款确认，而上架保证金仍然是金币。"
     },
     "social": {
       "intro": "世界的大部分内容都可单人完成，但这款游戏生来就是为了与他人同玩。这里讲的是如何交谈、组队，以及找到属于你的伙伴。",
@@ -5935,7 +5936,29 @@ export const zh_CN: EnTranslations = {
       "outbidToast": "你在 {item} 的出价被超过了。{money} 已退还至你的领取箱。",
       "wonToast": "你赢得了 {item} 的拍卖！请到商人处领取。",
       "soldToast": "你的 {item} 以 {money} 售出。请到商人处领取。",
-      "expiredToast": "你的 {item} 上架已过期未售出。请到商人处领取。"
+      "expiredToast": "你的 {item} 上架已过期未售出。请到商人处领取。",
+      "denomLabel": "货币",
+      "denomGold": "金币",
+      "denomClaudium": "Claudium",
+      "denomWoc": "WOC",
+      "auctionGoldOnly": "竞拍仅接受金币。",
+      "claudiumPriceEach": "单价（Claudium）",
+      "wocPriceLot": "整批价格（WOC）",
+      "claudiumAmount": "{amount} Claudium",
+      "claudiumEach": "每件 {amount} Claudium",
+      "claudiumMinError": "价格至少为 1 Claudium。",
+      "awaitingPayment": "等待付款",
+      "buyExternalTitle": "确认购买",
+      "buyClaudiumConfirmBody": "以 {amount} Claudium 购买 {item}？付款将从你的 Claudium 余额中扣除。",
+      "buyWocConfirmBody": "以 {amount} WOC 购买 {item}？你将从已绑定的钱包付款，款项到账后货物才会交付。",
+      "buyClaudiumAria": "用 Claudium 购买 {item}",
+      "buyWocAria": "用 WOC 购买 {item}",
+      "pendingClaudium": "正在完成 {item} 的购买。",
+      "pendingPreparing": "正在准备 {item} 的付款请求。",
+      "wocPayPrompt": "从已绑定的钱包发送 {amount} WOC 以完成 {item} 的购买。",
+      "paymentExpiredToast": "{item} 的付款时限已过。该拍品重新开放。",
+      "soldWalletToast": "你的 {item} 以 {amount} WOC 售出。货款已直接支付到你绑定的钱包；请到商人处领取保证金。",
+      "soldAccountToast": "你的 {item} 以 {amount} Claudium 售出。货款已计入你的 Claudium 余额；请到商人处领取保证金。"
     },
     "logs": {
       "listedItem": "已将 {item} 以 {money} 上架到世界市场。",
@@ -5946,6 +5969,8 @@ export const zh_CN: EnTranslations = {
       "expiredListing": "你的 {item} 市场上架已过期，正在商人处等待领取。",
       "postedAuction": "已将 {item} 上架拍卖（起拍价 {money}）。",
       "bidPlaced": "已出价：{money}，竞拍 {item}。",
+      "listedClaudium": "已将 {item} 以 {amount} Claudium 上架到世界市场。",
+      "listedWoc": "已将 {item} 以 {amount} WOC 上架到世界市场。",
       "boughtBackItem": "你以 {money} 回购了 {item}。"
     },
     "errors": {
@@ -5971,7 +5996,14 @@ export const zh_CN: EnTranslations = {
       "notAuction": "该拍品并非拍卖品。",
       "cannotBidOwnLot": "你不能对自己的拍品出价。",
       "alreadyHighBidder": "你已经是当前最高出价者。",
-      "bidTooLow": "出价至少为 {min}。"
+      "bidTooLow": "出价至少为 {min}。",
+      "bidsGoldOnly": "竞拍仅接受金币。",
+      "claudiumUnavailable": "Claudium 挂单不可用。",
+      "wocUnavailable": "WOC 挂单不可用。",
+      "wocLinkToList": "绑定钱包后才能以 WOC 上架。",
+      "wocLinkToPay": "绑定钱包后才能用 WOC 付款。",
+      "wocPriceInvalid": "请输入有效的 WOC 价格。",
+      "awaitingPayment": "该拍品正在等待付款。"
     },
     "loot": {
       "takeAll": "全部拾取",
@@ -9826,6 +9858,16 @@ export const zh_CN: EnTranslations = {
         "sender": "商人",
         "subject": "你的拍品已售出",
         "body": "有买家买走了你的货物。你的收益正等在世界市场的领取箱中；来找我领取吧。\n\n- 商人"
+      },
+      "market_sold_wallet": {
+        "sender": "商人",
+        "subject": "你的拍品已售出",
+        "body": "买家买走了你的货物。货款已按你的要求直接支付到你绑定的钱包；世界市场的领取箱里只剩你的上架保证金。请来取回。\n\n- 商人"
+      },
+      "market_sold_account": {
+        "sender": "商人",
+        "subject": "你的拍品已售出",
+        "body": "买家买走了你的货物。货款已直接计入你的 Claudium 余额；世界市场的领取箱里只剩你的上架保证金。请来取回。\n\n- 商人"
       },
       "market_expired": {
         "sender": "商人",

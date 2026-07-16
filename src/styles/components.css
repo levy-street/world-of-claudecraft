@@ -8139,14 +8139,31 @@
   .mkt-sell-pick .ps-name {
     font-size: 13px;
   }
-  /* Sell tab: listing-type (fixed/auction) and duration toggles. Small button
-     groups, not the filter-menu listbox (a 2-/3-way closed choice does not need
-     one) and never a slider (numeric-input precedent). */
+  /* Sell tab: denomination (gold/claudium/woc), listing-type (fixed/auction)
+     and duration toggles. Small button groups, not the filter-menu listbox
+     (a 2-/3-way closed choice does not need one) and never a slider
+     (numeric-input precedent). */
   .mkt-type-toggle,
+  .mkt-denom-toggle,
   .mkt-duration-toggle {
     display: flex;
     gap: 6px;
     margin-bottom: 10px;
+  }
+  /* AH-P4: the awaiting-payment lock badge on a browse row, and the buyer's own
+     pending-purchase panel (which reuses the trade payment-panel classes,
+     .trade-woc-pay*, for the prompt + wallet link + copy button). */
+  .mkt-awaiting {
+    font-family: var(--title-font);
+    font-size: 10.5px;
+    color: var(--gold);
+    white-space: nowrap;
+  }
+  .mkt-pending {
+    border: 1px solid #463a1c;
+    border-radius: 6px;
+    padding: 8px;
+    margin-bottom: 8px;
   }
   .mkt-type-btn,
   .mkt-duration-btn {
@@ -8176,6 +8193,11 @@
   .mkt-duration-btn:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
+  }
+  /* Bids take gold only: the auction toggle greys out for an external denom. */
+  .mkt-type-btn:disabled {
+    opacity: 0.45;
+    cursor: var(--cursor-arrow);
   }
   .mkt-price-form {
     display: flex;

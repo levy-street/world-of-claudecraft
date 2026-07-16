@@ -2618,6 +2618,13 @@ export async function startServer(): Promise<http.Server> {
   await game
     .recoverOpenTradeSettlements()
     .catch((err) => console.error('trade settlement recovery failed:', err));
+  // Resolve any external-denomination market purchase left pending by the
+  // previous boot (the persisted market blob is the anchor). After loadMarket
+  // (the pendings live there) and loadMail (a completion letters an offline
+  // seller); a failure is logged, never fatal to boot.
+  await game
+    .recoverPendingMarketPurchases()
+    .catch((err) => console.error('market purchase recovery failed:', err));
   await game.loadChatFilter();
   await game.loadBlockedIps();
   void game.recordOnlineSnapshot();

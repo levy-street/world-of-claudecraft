@@ -199,7 +199,14 @@ import {
   submitLootRoll as submitLootRollImpl,
 } from './loot/loot_roll';
 import { type MailSave, PostOffice } from './mail/post_office';
-import { Market, type MarketListing, type MarketListOptions, type MarketSave } from './market';
+import {
+  Market,
+  type MarketListing,
+  type MarketListOptions,
+  type MarketPendingAttachDetails,
+  type MarketPendingRecord,
+  type MarketSave,
+} from './market';
 import { defaultMarketQuery, type MarketQuery } from './market_query';
 import {
   mobCombatProfile as mobCombatProfileFn,
@@ -7566,6 +7573,30 @@ export class Sim {
 
   marketInfoFor(pid: number): import('../world_api').MarketInfo | null {
     return this.market.marketInfoFor(pid);
+  }
+
+  // External-purchase pending lifecycle, called ONLY by the server's market
+  // settlement orchestrator (the tradeSettleComplete/Fail precedent). The
+  // offline Sim never reaches these: external denominations are refused while
+  // the rails read unavailable, so no offline lot can be pending.
+  marketPendingAttach(listingId: number, details: MarketPendingAttachDetails): boolean {
+    return this.market.marketPendingAttach(listingId, details);
+  }
+
+  marketPendingComplete(listingId: number): boolean {
+    return this.market.marketPendingComplete(listingId);
+  }
+
+  marketPendingFail(listingId: number): boolean {
+    return this.market.marketPendingFail(listingId);
+  }
+
+  marketPendingRecord(listingId: number): MarketPendingRecord | null {
+    return this.market.marketPendingRecord(listingId);
+  }
+
+  marketPendingPurchases(): MarketPendingRecord[] {
+    return this.market.marketPendingPurchases();
   }
 
   serializeMarket(): MarketSave {

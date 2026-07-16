@@ -1472,6 +1472,8 @@ export const guideStrings = {
       'Collecting: when your goods sell, your proceeds wait for you at the Merchant. Return to collect the coin, along with anything that came back unsold. The Merchant takes a small cut of every completed sale.',
     marketPricing:
       'Pricing is up to you. Listing a little under what others are asking tends to sell faster, while a steep price may sit untouched. Browse first to see what the going rate looks like before you post.',
+    marketCurrencies:
+      'Where enabled, a listing can also be priced in Claudium or WOC: the buyer pays you directly, account to account or wallet to wallet, the Merchant holds the goods until the payment clears, and the listing deposit stays plain gold.',
   },
 
   // Social and Groups: chat channels, parties, party loot, friends, ignore, guilds.

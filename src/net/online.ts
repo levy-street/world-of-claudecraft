@@ -2912,7 +2912,8 @@ export class ClientWorld implements IWorld {
   }
   marketList(itemId: string, count: number, pricePerUnit: number, opts?: MarketListOptions): void {
     // `price` on the wire is the PER-UNIT ask of a fixed listing (ignored for an
-    // auction lot); duration/startingBid/buyout ride only when chosen.
+    // auction lot); duration/startingBid/buyout/denom/priceWoc ride only when
+    // chosen. priceWoc stays an opaque decimal string end to end.
     this.cmd({
       cmd: 'market_list',
       item: itemId,
@@ -2921,6 +2922,8 @@ export class ClientWorld implements IWorld {
       duration: opts?.durationHours,
       startingBid: opts?.auction?.startingBid,
       buyout: opts?.auction?.buyoutPrice,
+      denom: opts?.denom,
+      priceWoc: opts?.priceWoc,
     });
   }
   marketBuy(listingId: number, quantity?: number): void {

@@ -172,6 +172,8 @@ describe('i18n whole-catalog completeness', () => {
       'hud.trade.claudiumLabel', // "Claudium" - in-game currency brand (trade window)
       'hud.trade.legYourClaudium', // "Your Claudium" - currency brand
       'hud.trade.legTheirClaudium', // "Their Claudium" - currency brand
+      'itemUi.market.denomClaudium', // "Claudium" - currency brand (market denomination)
+      'itemUi.market.claudiumAmount', // "{amount} Claudium" - currency brand
       'guide.controls.discord', // "Discord" - brand (Guide controls-page action label)
       'desktop.crash.title', // "World of ClaudeCraft" - brand (desktop crash dialog title)
       'auth.emailPlaceholder', // "you@example.com" - RFC 2606 example address, kept verbatim

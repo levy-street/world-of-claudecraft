@@ -2355,8 +2355,42 @@ export type SimEvent = { pid?: number } & (
   // collection box, not the event).
   | { type: 'marketOutbid'; listingId: number; itemId: string; count: number; refund: number }
   | { type: 'marketWon'; listingId: number; itemId: string; count: number; paid: number }
-  | { type: 'marketSold'; listingId: number; itemId: string; count: number; proceeds: number }
+  // `marketSold` on an external-denomination sale (Claudium/$WOC) carries denom
+  // plus the amount paid; the payment went straight to the seller's account or
+  // wallet, so `proceeds` is 0 and only the deposit refund waits in collection.
+  // All three extra fields are absent on a plain copper sale.
+  | {
+      type: 'marketSold';
+      listingId: number;
+      itemId: string;
+      count: number;
+      proceeds: number;
+      denom?: 'claudium' | 'woc';
+      costClaudium?: number;
+      costWoc?: string;
+    }
   | { type: 'marketExpired'; listingId: number; itemId: string; count: number }
+  // A buyer started an external-denomination (Claudium/$WOC) market purchase:
+  // the sim locked the listing (pending) and the SERVER's market settlement
+  // orchestrator drives the payment. Server-swallowed like tradeSettle/
+  // tradeLedger: no client ever receives it, and the offline sim never emits it
+  // (external denominations are refused while the rails read unavailable).
+  // costWoc stays an opaque decimal string; the sim does no WOC arithmetic.
+  | {
+      type: 'marketPurchaseStart';
+      listingId: number;
+      denom: 'claudium' | 'woc';
+      buyerPid: number;
+      buyerKey: string;
+      sellerKey: string;
+      quantity: number;
+      costClaudium?: number;
+      costWoc?: string;
+    }
+  // An external-denomination purchase's payment window closed unpaid (or the
+  // settlement failed): the lot unlocked back to active and nothing moved.
+  // Personal (pid set when the buyer is still online).
+  | { type: 'marketPaymentExpired'; listingId: number; itemId: string }
   // Guild calendar outcome. Emitted only by the server's SocialService (the
   // sim never books guild events); declared here so the one client event
   // switch stays exhaustively typed.

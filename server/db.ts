@@ -2057,6 +2057,17 @@ export async function accountForWallet(pubkey: string): Promise<number | null> {
   return res.rows[0]?.account_id ?? null;
 }
 
+// The owning account of a character (one indexed SELECT). The market settlement
+// orchestrator uses this to resolve an OFFLINE seller (listings persist across
+// sessions, keyed by character id) to the account its Claudium proceeds credit
+// or its linked wallet hangs off.
+export async function accountIdForCharacter(characterId: number): Promise<number | null> {
+  const res = await pool.query('SELECT account_id FROM characters WHERE id = $1', [characterId]);
+  if (res.rows.length === 0) return null;
+  const id = Number(res.rows[0].account_id);
+  return Number.isSafeInteger(id) ? id : null;
+}
+
 // One wallet per account (account_id PK) and one account per wallet (pubkey
 // UNIQUE). Upserts the caller's link; returns false when the wallet is already
 // owned by a different account so the handler can surface a 409.

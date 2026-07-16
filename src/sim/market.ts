@@ -19,6 +19,7 @@ import {
 } from './market_query';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
+import { normalizeWocAmount } from './social/trade';
 import { dist2d, type Entity, INTERACT_RANGE, type InvSlot, type ItemDef } from './types';
 
 const MARKET_RANGE = INTERACT_RANGE + 2; // you must stand at the Merchant to deal
@@ -68,11 +69,81 @@ export function marketMinNextBid(l: Pick<MarketListing, 'startingBid' | 'bid'>):
   return Math.max(open, l.bid.amount + Math.max(1, Math.floor(l.bid.amount * 0.05)));
 }
 
-// Optional marketList parameters: the duration tier (default 48h) and, for an
-// auction lot, the opening ask + optional instant-buy price.
+// Listing denominations. Copper is the classic path (everything: fixed,
+// partial buys, auctions). Claudium is fixed-price per-unit, settled
+// buyer -> seller through the economy service by the SERVER's market
+// settlement orchestrator. WOC is fixed-price WHOLE-LOT, paid wallet to
+// wallet and verified on-chain by the server; the sim never does WOC
+// arithmetic (amounts stay opaque normalized decimal strings).
+export type MarketDenom = 'copper' | 'claudium' | 'woc';
+// Per-unit Claudium ask ceiling (whole Claudium). No in-repo bound exists to
+// reuse (the trade module clamps pledges to the cached balance instead), so
+// the market pins its own: 1e12 keeps even a full stack's total far inside
+// Number.MAX_SAFE_INTEGER.
+export const MARKET_MAX_CLAUDIUM_PRICE = 1e12;
+
+// Optional marketList parameters: the duration tier (default 48h), for an
+// auction lot the opening ask + optional instant-buy price, and the listing
+// denomination (default copper) with the WOC whole-lot ask when denom==='woc'.
 export interface MarketListOptions {
   durationHours?: number;
   auction?: { startingBid: number; buyoutPrice?: number };
+  denom?: MarketDenom;
+  priceWoc?: string;
+}
+
+// An external-denomination purchase awaiting payment. While set the listing is
+// LOCKED (no buy/bid/cancel; the expiry sweep skips it); only the server's
+// orchestrator resolves it via marketPendingComplete/marketPendingFail.
+// `startedAt` is sim.time at purchase start (persisted as sinceSeconds, the
+// secondsLeft idiom). The reference / wallet pubkeys / account ids are attached
+// by the SERVER (marketPendingAttach) before any money moves, so a restart can
+// re-verify the $WOC payment or replay the idempotent Claudium transfer without
+// any live session or surviving wallet_links row (the trade R1c lesson). The
+// sim stores them as opaque host facts and never interprets them.
+export interface MarketPendingState {
+  buyerKey: string;
+  buyerName: string;
+  quantity: number;
+  startedAt: number;
+  purchaseSeq: number;
+  reference?: string;
+  buyerWallet?: string;
+  sellerWallet?: string;
+  buyerAccountId?: number;
+  sellerAccountId?: number;
+}
+
+// Server-attached settlement identity for a pending purchase (see
+// MarketPendingState above).
+export interface MarketPendingAttachDetails {
+  reference?: string;
+  buyerWallet?: string;
+  sellerWallet?: string;
+  buyerAccountId?: number;
+  sellerAccountId?: number;
+}
+
+// The orchestrator-facing read of one pending external purchase: everything the
+// server needs to settle it live or recover it at boot, resolved off the
+// listing + its pending state. costWoc stays an opaque decimal string.
+export interface MarketPendingRecord {
+  listingId: number;
+  itemId: string;
+  denom: 'claudium' | 'woc';
+  quantity: number;
+  costClaudium?: number;
+  costWoc?: string;
+  buyerKey: string;
+  buyerName: string;
+  sellerKey: string;
+  sellerName: string;
+  purchaseSeq: number;
+  reference?: string;
+  buyerWallet?: string;
+  sellerWallet?: string;
+  buyerAccountId?: number;
+  sellerAccountId?: number;
 }
 
 export interface MarketListing {
@@ -98,6 +169,14 @@ export interface MarketListing {
   buyoutPrice?: number; // auction only: optional instant whole-lot price
   expiresAt: number; // sim.time seconds; Infinity for the Merchant's own stock
   house: boolean; // the Merchant's standing stock: never expires, never depletes, pays no one
+  // Listing denomination (default 'copper'; a pre-denomination blob loads as
+  // copper). Claudium rows keep pricePerUnit in whole Claudium (price = the
+  // running stack total); WOC rows carry priceWoc instead (whole-lot ask as an
+  // opaque normalized decimal string) with pricePerUnit undefined and price 0.
+  denom: MarketDenom;
+  priceWoc?: string;
+  // External purchase awaiting payment: the lock + settlement identity.
+  pending?: MarketPendingState;
 }
 
 // Gold + items awaiting pickup at the Merchant (sale proceeds, expired
@@ -128,9 +207,31 @@ export interface MarketSave {
     bid?: { amount: number; bidderKey: string; bidderName: string };
     startingBid?: number;
     buyoutPrice?: number;
+    // Multi-currency fields, optional so a pre-denomination blob loads as
+    // copper rows. `pending.sinceSeconds` is seconds ALREADY ELAPSED at save
+    // time (the inverse of secondsLeft: sim.time resets each boot, so on load
+    // startedAt becomes time - sinceSeconds).
+    denom?: MarketDenom;
+    priceWoc?: string;
+    pending?: {
+      buyerKey: string;
+      buyerName: string;
+      quantity: number;
+      sinceSeconds: number;
+      purchaseSeq: number;
+      reference?: string;
+      buyerWallet?: string;
+      sellerWallet?: string;
+      buyerAccountId?: number;
+      sellerAccountId?: number;
+    };
   }[];
   collections: { key: string; copper: number; items: InvSlot[] }[];
   nextListingId: number;
+  // Monotonic external-purchase counter (the Claudium dedupe key suffix); like
+  // nextListingId it must survive a restart so a replayed dedupe key can never
+  // collide with a fresh purchase.
+  nextPurchaseSeq?: number;
 }
 
 export class Market {
@@ -141,6 +242,9 @@ export class Market {
   marketListings: MarketListing[] = [];
   private marketCollections = new Map<string, MarketCollection>();
   private nextListingId = 1;
+  // External-purchase sequence (Claudium dedupe key suffix). Monotonic across
+  // save/load like nextListingId; never reused even after a failed purchase.
+  private nextPurchaseSeq = 1;
   // Entity ids of every NPC with `market: true`, assigned by the Sim ctor during NPC
   // placement (the NPC loop stays on Sim). The World Market is a single shared book;
   // any of these merchants is a valid place to stand and deal, so a player can use the
@@ -277,6 +381,7 @@ export class Market {
         depositPerUnit: 0,
         expiresAt: Infinity,
         house: true,
+        denom: 'copper',
       });
     }
   }
@@ -330,24 +435,69 @@ export class Market {
       return;
     }
     const auction = opts?.auction;
+    const denom: MarketDenom = opts?.denom ?? 'copper';
+    // Bids are copper-only, permanently: non-custodial outbid refunds are
+    // impossible without an on-chain escrow, so external-denomination lots are
+    // fixed-price (a WOC/Claudium buyout IS the crypto auction).
+    if (auction && denom !== 'copper') {
+      this.ctx.error(meta.entityId, 'Bids take gold only.');
+      return;
+    }
+    // External denominations exist only where the host's rails say so (the
+    // cfg.tradeRails view; offline hosts read all-unavailable, so an offline
+    // world can never mint an external listing).
+    if (denom === 'claudium' && !this.ctx.tradeRails(meta.entityId).claudium.available) {
+      this.ctx.error(meta.entityId, 'Claudium listings are not available.');
+      return;
+    }
+    if (denom === 'woc') {
+      const rails = this.ctx.tradeRails(meta.entityId);
+      if (!rails.woc.available || !rails.woc.linked) {
+        this.ctx.error(meta.entityId, 'Link a wallet to list for WOC.');
+        return;
+      }
+    }
     // Fixed listings: the wire price is the PER-UNIT ask; the pre-auction bounds
     // keep guarding the whole-stack TOTAL (unit * count), so MARKET_MIN_PRICE and
     // MARKET_MAX_PRICE keep their meaning. Auction lots validate the starting bid
-    // (and buyout) against the same bounds instead.
-    const unit = auction ? undefined : Math.floor(pricePerUnit);
-    const ask = auction ? Math.floor(auction.startingBid) : (unit as number) * want;
-    if (auction) {
-      if (!Number.isFinite(ask) || ask < MARKET_MIN_PRICE) {
-        this.ctx.error(meta.entityId, 'Name a starting bid of at least 1 copper.');
+    // (and buyout) against the same bounds instead. Claudium rows price per unit
+    // in whole Claudium (ceiling-clamped, safe-integer math); WOC rows are
+    // whole-lot with an opaque normalized decimal ask and price 0.
+    let unit: number | undefined;
+    let ask: number;
+    let priceWoc: string | undefined;
+    if (denom === 'woc') {
+      const normalized =
+        typeof opts?.priceWoc === 'string' ? normalizeWocAmount(opts.priceWoc) : null;
+      if (normalized === null) {
+        this.ctx.error(meta.entityId, 'Name a valid WOC price.');
         return;
       }
-    } else if (!Number.isFinite(ask) || ask < MARKET_MIN_PRICE || (unit as number) < 1) {
-      this.ctx.error(meta.entityId, 'Name a price of at least 1 copper.');
-      return;
-    }
-    if (ask > MARKET_MAX_PRICE) {
-      this.ctx.error(meta.entityId, 'That price is beyond what the Merchant will broker.');
-      return;
+      priceWoc = normalized;
+      ask = 0;
+    } else if (denom === 'claudium') {
+      if (!Number.isFinite(pricePerUnit) || Math.floor(pricePerUnit) < 1) {
+        this.ctx.error(meta.entityId, 'Name a price of at least 1 copper.');
+        return;
+      }
+      unit = Math.min(Math.floor(pricePerUnit), MARKET_MAX_CLAUDIUM_PRICE);
+      ask = unit * want;
+    } else {
+      unit = auction ? undefined : Math.floor(pricePerUnit);
+      ask = auction ? Math.floor(auction.startingBid) : (unit as number) * want;
+      if (auction) {
+        if (!Number.isFinite(ask) || ask < MARKET_MIN_PRICE) {
+          this.ctx.error(meta.entityId, 'Name a starting bid of at least 1 copper.');
+          return;
+        }
+      } else if (!Number.isFinite(ask) || ask < MARKET_MIN_PRICE || (unit as number) < 1) {
+        this.ctx.error(meta.entityId, 'Name a price of at least 1 copper.');
+        return;
+      }
+      if (ask > MARKET_MAX_PRICE) {
+        this.ctx.error(meta.entityId, 'That price is beyond what the Merchant will broker.');
+        return;
+      }
     }
     let buyout: number | undefined;
     if (auction && auction.buyoutPrice !== undefined) {
@@ -401,12 +551,28 @@ export class Market {
       buyoutPrice: buyout,
       expiresAt: this.ctx.time + durationHours * 3600,
       house: false,
+      denom,
+      priceWoc,
     });
     if (auction) {
       this.ctx.emit({
         type: 'loot',
         // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.
         text: `Posted ${def.name}${want > 1 ? ' x' + want : ''} for auction (starting bid ${formatMoney(ask)}).`,
+        pid: meta.entityId,
+      });
+    } else if (denom === 'claudium') {
+      this.ctx.emit({
+        type: 'loot',
+        // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.
+        text: `Listed ${def.name}${want > 1 ? ' x' + want : ''} on the World Market for ${ask} Claudium.`,
+        pid: meta.entityId,
+      });
+    } else if (denom === 'woc') {
+      this.ctx.emit({
+        type: 'loot',
+        // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.
+        text: `Listed ${def.name}${want > 1 ? ' x' + want : ''} on the World Market for ${priceWoc} WOC.`,
         pid: meta.entityId,
       });
     } else {
@@ -447,6 +613,12 @@ export class Market {
       this.ctx.error(meta.entityId, 'That listing is no longer available.');
       return;
     }
+    // An external purchase is mid-payment: the lot is locked for EVERYONE
+    // (buyer, rivals, and the seller) until the orchestrator resolves it.
+    if (listing.pending) {
+      this.ctx.error(meta.entityId, 'That lot is awaiting payment.');
+      return;
+    }
     if (this.marketListingBelongsTo(listing, meta)) {
       this.ctx.error(meta.entityId, 'That is your own listing — cancel it to reclaim it.');
       return;
@@ -458,6 +630,13 @@ export class Market {
         return;
       }
       this.settleAuctionBuyout(idx, meta);
+      return;
+    }
+    if (listing.denom === 'claudium' || listing.denom === 'woc') {
+      // External denomination: no copper moves here. The sim validates, locks
+      // the lot (pending), and emits the server-only marketPurchaseStart event
+      // that drives the settlement orchestrator (the tradeSettle precedent).
+      this.startExternalPurchase(listing, meta, quantity);
       return;
     }
     if (listing.pricePerUnit !== undefined) {
@@ -532,6 +711,225 @@ export class Market {
       text: `Bought ${def.name}${listing.count > 1 ? ' x' + listing.count : ''} for ${formatMoney(listing.price)}.`,
       pid: meta.entityId,
     });
+  }
+
+  // Start an external-denomination purchase (marketBuy routed here for a
+  // claudium/woc row). Payment is EXTERNAL, so afford is a UX pre-check at most
+  // (the cached Claudium balance; the service/chain is authoritative), no copper
+  // or goods move, and the sim only locks the lot behind `pending` and emits the
+  // server-only marketPurchaseStart event. Single-threaded and race-free: the
+  // lock is set in the same synchronous step that emits the event. Offline this
+  // is unreachable (the rails read unavailable, refused above/at list time).
+  private startExternalPurchase(
+    listing: MarketListing,
+    meta: PlayerMeta,
+    quantity: number | undefined,
+  ): void {
+    const rails = this.ctx.tradeRails(meta.entityId);
+    const buyerKey = this.marketSellerKey(meta);
+    if (listing.denom === 'claudium') {
+      if (!rails.claudium.available) {
+        this.ctx.error(meta.entityId, 'Claudium listings are not available.');
+        return;
+      }
+      if (listing.pricePerUnit === undefined) {
+        this.ctx.error(meta.entityId, 'That listing is no longer available.');
+        return;
+      }
+      // Per-unit partial buys, exactly like the copper fixed path.
+      const remaining = listing.count;
+      const requested =
+        quantity === undefined || !Number.isFinite(quantity) ? remaining : Math.floor(quantity);
+      const qty = Math.max(1, Math.min(remaining, requested));
+      const cost = qty * listing.pricePerUnit;
+      // UX pre-check only: the host's cached balance. The idempotent service
+      // transfer is the authoritative check at settlement.
+      if (rails.claudium.balance < cost) {
+        this.ctx.error(meta.entityId, 'You cannot afford that.');
+        return;
+      }
+      if (!this.ctx.canAddItem(listing.itemId, qty, meta.entityId)) {
+        this.ctx.error(meta.entityId, 'Your bags are full.');
+        return;
+      }
+      listing.pending = {
+        buyerKey,
+        buyerName: meta.name,
+        quantity: qty,
+        startedAt: this.ctx.time,
+        purchaseSeq: this.nextPurchaseSeq++,
+      };
+      this.ctx.emit({
+        type: 'marketPurchaseStart',
+        listingId: listing.id,
+        denom: 'claudium',
+        buyerPid: meta.entityId,
+        buyerKey,
+        sellerKey: listing.sellerKey,
+        quantity: qty,
+        costClaudium: cost,
+      });
+      return;
+    }
+    // WOC: whole-lot only (any quantity ask is ignored, the legacy-row rule).
+    if (!rails.woc.available) {
+      this.ctx.error(meta.entityId, 'WOC listings are not available.');
+      return;
+    }
+    if (!rails.woc.linked) {
+      this.ctx.error(meta.entityId, 'Link a wallet to pay with WOC.');
+      return;
+    }
+    if (listing.priceWoc === undefined) {
+      this.ctx.error(meta.entityId, 'That listing is no longer available.');
+      return;
+    }
+    if (!this.ctx.canAddItem(listing.itemId, listing.count, meta.entityId)) {
+      this.ctx.error(meta.entityId, 'Your bags are full.');
+      return;
+    }
+    listing.pending = {
+      buyerKey,
+      buyerName: meta.name,
+      quantity: listing.count,
+      startedAt: this.ctx.time,
+      purchaseSeq: this.nextPurchaseSeq++,
+    };
+    this.ctx.emit({
+      type: 'marketPurchaseStart',
+      listingId: listing.id,
+      denom: 'woc',
+      buyerPid: meta.entityId,
+      buyerKey,
+      sellerKey: listing.sellerKey,
+      quantity: listing.count,
+      costWoc: listing.priceWoc,
+    });
+  }
+
+  // ---- pending-purchase lifecycle: SERVER-called (the tradeSettleComplete/Fail
+  // precedent). The offline sim never reaches these: external denominations are
+  // refused while the rails read unavailable, so no offline lot can be pending.
+
+  // Attach the server's settlement identity (Solana Pay reference + wallet
+  // pubkeys for a $WOC purchase; buyer/seller account ids for a Claudium one)
+  // onto a pending lot, so the persisted market blob alone can drive crash
+  // recovery. Opaque host facts: the sim stores them and never interprets them.
+  marketPendingAttach(listingId: number, details: MarketPendingAttachDetails): boolean {
+    const pending = this.marketListings.find((l) => l.id === listingId)?.pending;
+    if (!pending) return false;
+    if (details.reference !== undefined) pending.reference = details.reference;
+    if (details.buyerWallet !== undefined) pending.buyerWallet = details.buyerWallet;
+    if (details.sellerWallet !== undefined) pending.sellerWallet = details.sellerWallet;
+    if (details.buyerAccountId !== undefined) pending.buyerAccountId = details.buyerAccountId;
+    if (details.sellerAccountId !== undefined) pending.sellerAccountId = details.sellerAccountId;
+    return true;
+  }
+
+  // One pending purchase as the orchestrator-facing record, or null.
+  marketPendingRecord(listingId: number): MarketPendingRecord | null {
+    const listing = this.marketListings.find((l) => l.id === listingId);
+    if (!listing?.pending || listing.denom === 'copper') return null;
+    return this.pendingRecordOf(listing);
+  }
+
+  // Every pending external purchase (boot recovery walks these after loadMarket).
+  marketPendingPurchases(): MarketPendingRecord[] {
+    return this.marketListings
+      .filter((l) => l.pending !== undefined && l.denom !== 'copper')
+      .map((l) => this.pendingRecordOf(l));
+  }
+
+  private pendingRecordOf(l: MarketListing): MarketPendingRecord {
+    const p = l.pending as MarketPendingState;
+    return {
+      listingId: l.id,
+      itemId: l.itemId,
+      denom: l.denom === 'woc' ? 'woc' : 'claudium',
+      quantity: p.quantity,
+      costClaudium:
+        l.denom === 'claudium' && l.pricePerUnit !== undefined
+          ? l.pricePerUnit * p.quantity
+          : undefined,
+      costWoc: l.denom === 'woc' ? l.priceWoc : undefined,
+      buyerKey: p.buyerKey,
+      buyerName: p.buyerName,
+      sellerKey: l.sellerKey,
+      sellerName: l.sellerName,
+      purchaseSeq: p.purchaseSeq,
+      reference: p.reference,
+      buyerWallet: p.buyerWallet,
+      sellerWallet: p.sellerWallet,
+      buyerAccountId: p.buyerAccountId,
+      sellerAccountId: p.sellerAccountId,
+    };
+  }
+
+  // The payment landed (verified on-chain / the idempotent Claudium transfer
+  // confirmed): release the goods. Delivery goes to the buyer's COLLECTION BOX,
+  // never straight to bags (the buyer may have moved or disconnected while
+  // paying). The seller was paid OUTSIDE the game, so no copper proceeds enter
+  // their collection; only the per-unit deposit stake refunds (always copper).
+  marketPendingComplete(listingId: number): boolean {
+    const idx = this.marketListings.findIndex((l) => l.id === listingId);
+    if (idx < 0) return false;
+    const listing = this.marketListings[idx];
+    const pending = listing.pending;
+    if (!pending || listing.denom === 'copper') return false;
+    const qty = Math.max(1, Math.min(listing.count, pending.quantity));
+    const denom: 'claudium' | 'woc' = listing.denom === 'woc' ? 'woc' : 'claudium';
+    const costClaudium =
+      denom === 'claudium' && listing.pricePerUnit !== undefined
+        ? listing.pricePerUnit * qty
+        : undefined;
+    const costWoc = denom === 'woc' ? listing.priceWoc : undefined;
+    listing.pending = undefined;
+    this.collectionFor(pending.buyerKey).items.push({ itemId: listing.itemId, count: qty });
+    // the per-unit deposit stake rides back with each tranche sold, as ever
+    this.collectionFor(listing.sellerKey).copper += listing.depositPerUnit * qty;
+    listing.count -= qty;
+    if (listing.pricePerUnit !== undefined) listing.price = listing.pricePerUnit * listing.count;
+    if (listing.count <= 0) this.marketListings.splice(idx, 1);
+    const sellerMeta = this.metaByMarketSellerKey(listing.sellerKey);
+    if (sellerMeta) {
+      this.ctx.emit({
+        type: 'marketSold',
+        listingId: listing.id,
+        itemId: listing.itemId,
+        count: qty,
+        proceeds: 0,
+        denom,
+        costClaudium,
+        costWoc,
+        pid: sellerMeta.entityId,
+      });
+    } else {
+      this.ctx.sendMarketLetter(
+        listing.sellerKey,
+        listing.sellerName,
+        denom === 'woc' ? 'sold_wallet' : 'sold_account',
+      );
+    }
+    return true;
+  }
+
+  // The payment never landed (timeout / service refusal / recovery unwind):
+  // clear the lock, the lot returns to active, nothing moved anywhere.
+  marketPendingFail(listingId: number): boolean {
+    const listing = this.marketListings.find((l) => l.id === listingId);
+    const pending = listing?.pending;
+    if (!listing || !pending) return false;
+    listing.pending = undefined;
+    const buyerMeta = this.metaByMarketSellerKey(pending.buyerKey);
+    if (buyerMeta) {
+      this.ctx.emit({
+        type: 'marketPaymentExpired',
+        listingId: listing.id,
+        itemId: listing.itemId,
+        pid: buyerMeta.entityId,
+      });
+    }
+    return true;
   }
 
   // Settle an auction lot at its buyout price for `meta`: refund the standing
@@ -634,6 +1032,10 @@ export class Market {
       this.ctx.error(meta.entityId, 'That listing is no longer available.');
       return;
     }
+    if (listing.pending) {
+      this.ctx.error(meta.entityId, 'That lot is awaiting payment.');
+      return;
+    }
     if (listing.kind !== 'auction') {
       this.ctx.error(meta.entityId, 'That lot is not up for auction.');
       return;
@@ -689,6 +1091,13 @@ export class Market {
     const listing = this.marketListings[idx];
     if (!this.marketListingBelongsTo(listing, meta)) {
       this.ctx.error(meta.entityId, 'That is not your listing.');
+      return;
+    }
+    // A pending external purchase locks the lot even against its own seller:
+    // the buyer may already be mid-payment, so the goods must stay committed
+    // until the orchestrator resolves the purchase either way.
+    if (listing.pending) {
+      this.ctx.error(meta.entityId, 'That lot is awaiting payment.');
       return;
     }
     if (!this.ctx.canAddItem(listing.itemId, listing.count, meta.entityId)) {
@@ -764,7 +1173,10 @@ export class Market {
     if (this.ctx.tickCount % 20 !== 0) return;
     for (let i = this.marketListings.length - 1; i >= 0; i--) {
       const l = this.marketListings[i];
-      if (l.house || this.ctx.time < l.expiresAt) continue;
+      // A pending external purchase never expires out from under its buyer: the
+      // sweep skips it, and a lot past its expiry settles/expires on the pass
+      // after the orchestrator clears the pending either way.
+      if (l.house || l.pending || this.ctx.time < l.expiresAt) continue;
       this.marketListings.splice(i, 1);
       const bid = l.bid;
       if (bid) {
@@ -882,12 +1294,51 @@ export class Market {
       buyoutPrice: l.buyoutPrice,
       myBid: l.bid?.bidderKey === this.marketSellerKey(meta),
       depositTotal: isMine(l) ? l.depositPerUnit * l.count : undefined,
+      denom: l.denom,
+      priceWoc: l.priceWoc,
+      pendingPayment: l.pending ? true : undefined,
     }));
     const col = this.collectionForSeller(meta);
     const myListingCount = this.marketListings.reduce(
       (n, l) => n + (this.marketListingBelongsTo(l, meta) ? 1 : 0),
       0,
     );
+    // The viewer's rails, folded like TradeInfo.rails (tradeInfoFor): pure UI
+    // affordance for the Sell tab's denomination selector; every list/buy is
+    // re-validated sim-side and settled authoritatively server-side. `woc`
+    // folds the wallet link since listing/paying both require it.
+    const viewerRails = this.ctx.tradeRails(pid);
+    const viewerKey = this.marketSellerKey(meta);
+    // The viewer's own in-flight external purchase (the FIRST, scanning the
+    // whole book, since a pending listing need not sit on the wired page). The
+    // server overlays wocPay onto this for a $WOC payer (the tradeWire
+    // precedent); the offline sim never sets it.
+    let myPendingPurchase:
+      | {
+          listingId: number;
+          itemId: string;
+          quantity: number;
+          denom: 'claudium' | 'woc';
+          costClaudium?: number;
+          costWoc?: string;
+        }
+      | undefined;
+    for (const l of this.marketListings) {
+      const p = l.pending;
+      if (!p || p.buyerKey !== viewerKey || l.denom === 'copper') continue;
+      myPendingPurchase = {
+        listingId: l.id,
+        itemId: l.itemId,
+        quantity: p.quantity,
+        denom: l.denom === 'woc' ? 'woc' : 'claudium',
+        costClaudium:
+          l.denom === 'claudium' && l.pricePerUnit !== undefined
+            ? l.pricePerUnit * p.quantity
+            : undefined,
+        costWoc: l.denom === 'woc' ? l.priceWoc : undefined,
+      };
+      break;
+    }
     return {
       listings,
       // Every listing matching the filter (the viewer's own plus all others), so the
@@ -902,6 +1353,11 @@ export class Market {
       maxListings: MARKET_MAX_LISTINGS,
       myListingCount,
       durationsHours: MARKET_DURATIONS_HOURS,
+      rails: {
+        claudium: viewerRails.claudium.available,
+        woc: viewerRails.woc.available && viewerRails.woc.linked,
+      },
+      myPendingPurchase,
     };
   }
 
@@ -928,6 +1384,26 @@ export class Market {
           bid: l.bid ? { ...l.bid } : undefined,
           startingBid: l.startingBid,
           buyoutPrice: l.buyoutPrice,
+          // denom is persisted only when non-default (JSON drops undefined);
+          // loadMarket coerces an absent value back to 'copper'.
+          denom: l.denom === 'copper' ? undefined : l.denom,
+          priceWoc: l.priceWoc,
+          pending: l.pending
+            ? {
+                buyerKey: l.pending.buyerKey,
+                buyerName: l.pending.buyerName,
+                quantity: l.pending.quantity,
+                // seconds ELAPSED (the inverse secondsLeft idiom): sim.time
+                // resets each boot, so on load startedAt = time - sinceSeconds.
+                sinceSeconds: Math.max(0, Math.round(this.ctx.time - l.pending.startedAt)),
+                purchaseSeq: l.pending.purchaseSeq,
+                reference: l.pending.reference,
+                buyerWallet: l.pending.buyerWallet,
+                sellerWallet: l.pending.sellerWallet,
+                buyerAccountId: l.pending.buyerAccountId,
+                sellerAccountId: l.pending.sellerAccountId,
+              }
+            : undefined,
         })),
       collections: [...this.marketCollections.entries()].map(([key, c]) => ({
         key,
@@ -935,6 +1411,7 @@ export class Market {
         items: c.items.map((s) => ({ ...s })),
       })),
       nextListingId: this.nextListingId,
+      nextPurchaseSeq: this.nextPurchaseSeq,
     };
   }
 
@@ -955,22 +1432,88 @@ export class Market {
       // entirely (never invent escrow); a buyout not beating the starting bid is
       // dropped (the list-time bound); pricePerUnit is only trusted on a fixed
       // row and only when it is a positive integer ask.
-      const kind: 'fixed' | 'auction' = l.kind === 'auction' ? 'auction' : 'fixed';
+      //
+      // Denomination: absent/unknown -> 'copper' (a pre-denomination blob).
+      // External rows are always 'fixed' (bids take gold only, the list-time
+      // rule), a claudium per-unit ask re-clamps to the same ceiling, and a woc
+      // ask must re-normalize; a woc row whose ask fails normalization keeps
+      // denom 'woc' with no ask (unbuyable, but the owner can still reclaim it;
+      // the sim never invents a price for someone else's goods).
+      const denom: MarketDenom = l.denom === 'claudium' || l.denom === 'woc' ? l.denom : 'copper';
+      const kind: 'fixed' | 'auction' =
+        l.kind === 'auction' && denom === 'copper' ? 'auction' : 'fixed';
       const clampPrice = (v: unknown): number | undefined =>
         typeof v === 'number' && Number.isFinite(v)
           ? Math.max(MARKET_MIN_PRICE, Math.min(MARKET_MAX_PRICE, Math.floor(v)))
           : undefined;
-      const price = Math.max(
-        MARKET_MIN_PRICE,
-        Math.min(MARKET_MAX_PRICE, Math.floor(l.price) || MARKET_MIN_PRICE),
-      );
+      const priceWoc =
+        denom === 'woc' && typeof l.priceWoc === 'string'
+          ? (normalizeWocAmount(l.priceWoc) ?? undefined)
+          : undefined;
       const pricePerUnit =
         kind === 'fixed' &&
+        denom !== 'woc' &&
         typeof l.pricePerUnit === 'number' &&
         Number.isFinite(l.pricePerUnit) &&
         Math.floor(l.pricePerUnit) >= 1
-          ? Math.floor(l.pricePerUnit)
+          ? denom === 'claudium'
+            ? Math.min(Math.floor(l.pricePerUnit), MARKET_MAX_CLAUDIUM_PRICE)
+            : Math.floor(l.pricePerUnit)
           : undefined;
+      const count = Math.max(1, l.count | 0);
+      const price =
+        denom === 'woc'
+          ? 0
+          : denom === 'claudium'
+            ? pricePerUnit !== undefined
+              ? pricePerUnit * count
+              : 0
+            : Math.max(
+                MARKET_MIN_PRICE,
+                Math.min(MARKET_MAX_PRICE, Math.floor(l.price) || MARKET_MIN_PRICE),
+              );
+      // Pending external purchase: validated defensively (never invent a lock,
+      // never trust a quantity past the stack). Malformed -> dropped, unlocked.
+      let pending: MarketPendingState | undefined;
+      const rawPending = l.pending;
+      if (
+        denom !== 'copper' &&
+        rawPending &&
+        typeof rawPending.buyerKey === 'string' &&
+        rawPending.buyerKey !== '' &&
+        typeof rawPending.quantity === 'number' &&
+        Number.isFinite(rawPending.quantity) &&
+        Math.floor(rawPending.quantity) >= 1 &&
+        typeof rawPending.purchaseSeq === 'number' &&
+        Number.isFinite(rawPending.purchaseSeq)
+      ) {
+        pending = {
+          buyerKey: rawPending.buyerKey,
+          buyerName: String(rawPending.buyerName ?? rawPending.buyerKey),
+          quantity: Math.min(Math.floor(rawPending.quantity), count),
+          startedAt:
+            this.ctx.time -
+            (typeof rawPending.sinceSeconds === 'number' && Number.isFinite(rawPending.sinceSeconds)
+              ? Math.max(0, rawPending.sinceSeconds)
+              : 0),
+          purchaseSeq: Math.floor(rawPending.purchaseSeq),
+          reference: typeof rawPending.reference === 'string' ? rawPending.reference : undefined,
+          buyerWallet:
+            typeof rawPending.buyerWallet === 'string' ? rawPending.buyerWallet : undefined,
+          sellerWallet:
+            typeof rawPending.sellerWallet === 'string' ? rawPending.sellerWallet : undefined,
+          buyerAccountId:
+            typeof rawPending.buyerAccountId === 'number' &&
+            Number.isFinite(rawPending.buyerAccountId)
+              ? Math.floor(rawPending.buyerAccountId)
+              : undefined,
+          sellerAccountId:
+            typeof rawPending.sellerAccountId === 'number' &&
+            Number.isFinite(rawPending.sellerAccountId)
+              ? Math.floor(rawPending.sellerAccountId)
+              : undefined,
+        };
+      }
       const startingBid = kind === 'auction' ? (clampPrice(l.startingBid) ?? price) : undefined;
       let buyoutPrice = kind === 'auction' ? clampPrice(l.buyoutPrice) : undefined;
       if (buyoutPrice !== undefined && startingBid !== undefined && buyoutPrice <= startingBid)
@@ -996,10 +1539,13 @@ export class Market {
         sellerKey: String(l.sellerKey ?? ''),
         sellerName: String(l.sellerName ?? l.sellerKey ?? '?'),
         itemId: l.itemId,
-        count: Math.max(1, l.count | 0),
+        count,
         price,
         kind,
         pricePerUnit,
+        denom,
+        priceWoc,
+        pending,
         durationSeconds:
           typeof l.durationSeconds === 'number' &&
           Number.isFinite(l.durationSeconds) &&
@@ -1033,6 +1579,14 @@ export class Market {
     }
     const maxId = this.marketListings.reduce((m, l) => Math.max(m, l.id + 1), 1);
     this.nextListingId = Math.max(this.nextListingId, save.nextListingId ?? 1, maxId);
+    // Monotonic like nextListingId: never below any loaded pending's seq + 1,
+    // so a Claudium dedupe key (market-<listing>-<seq>) can never be reissued
+    // for a DIFFERENT purchase after a restart.
+    const maxSeq = this.marketListings.reduce(
+      (m, l) => Math.max(m, (l.pending?.purchaseSeq ?? 0) + 1),
+      1,
+    );
+    this.nextPurchaseSeq = Math.max(this.nextPurchaseSeq, save.nextPurchaseSeq ?? 1, maxSeq);
     this.reclaimSoulboundListings();
   }
 
@@ -1047,7 +1601,10 @@ export class Market {
   private reclaimSoulboundListings(): void {
     for (let i = this.marketListings.length - 1; i >= 0; i--) {
       const l = this.marketListings[i];
-      if (l.house || !ITEMS[l.itemId]?.soulbound) continue;
+      // A pending external purchase is never yanked out from under recovery:
+      // the buyer may have already paid on-chain. The orchestrator resolves
+      // the pending first; the reclaim is idempotent and runs again next boot.
+      if (l.house || l.pending || !ITEMS[l.itemId]?.soulbound) continue;
       this.marketListings.splice(i, 1);
       // A live bid on a reclaimed auction must not strand the bidder's escrow:
       // it goes back to their collection box (silently; this runs at load time,

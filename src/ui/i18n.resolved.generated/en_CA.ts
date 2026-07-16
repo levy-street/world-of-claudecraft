@@ -3281,7 +3281,8 @@ export const en_CA: EnTranslations = {
       "marketPost": "Posting: choose a stack from your bags, pick how long to list it, 12, 24, or 48 hours, and set a per-item price, or open it to auction with a starting bid and an optional buyout. Listing takes a small deposit that scales with the duration; it comes back to you as your goods sell and is only lost on whatever goes unsold. The goods are held by the Merchant until someone buys them or the auction ends, and you can reclaim a listing early if you change your mind.",
       "marketBidding": "Auctions: some listings take bids instead of a fixed price. A bid must clear the posted minimum, and outbidding someone always refunds them. When the seller sets a buyout, any bid that reaches it wins the lot on the spot.",
       "marketCollect": "Collecting: when your goods sell, your proceeds wait for you at the Merchant. Return to collect the coin, along with anything that came back unsold. The Merchant takes a small cut of every completed sale.",
-      "marketPricing": "Pricing is up to you. Listing a little under what others are asking tends to sell faster, while a steep price may sit untouched. Browse first to see what the going rate looks like before you post."
+      "marketPricing": "Pricing is up to you. Listing a little under what others are asking tends to sell faster, while a steep price may sit untouched. Browse first to see what the going rate looks like before you post.",
+      "marketCurrencies": "Where enabled, a listing can also be priced in Claudium or WOC: the buyer pays you directly, account to account or wallet to wallet, the Merchant holds the goods until the payment clears, and the listing deposit stays plain gold."
     },
     "social": {
       "intro": "Most of the world is soloable, but the game is built to be played with other people. Here is how to talk, team up, and find your crowd.",
@@ -5935,7 +5936,29 @@ export const en_CA: EnTranslations = {
       "outbidToast": "You were outbid on {item}. {money} refunded to your collection box.",
       "wonToast": "You won the auction for {item}! Collect it at the Merchant.",
       "soldToast": "Your {item} sold for {money}. Collect it at the Merchant.",
-      "expiredToast": "Your listing of {item} expired unsold. Collect it at the Merchant."
+      "expiredToast": "Your listing of {item} expired unsold. Collect it at the Merchant.",
+      "denomLabel": "Currency",
+      "denomGold": "Gold",
+      "denomClaudium": "Claudium",
+      "denomWoc": "WOC",
+      "auctionGoldOnly": "Bids take gold only.",
+      "claudiumPriceEach": "Price each (Claudium)",
+      "wocPriceLot": "Lot price (WOC)",
+      "claudiumAmount": "{amount} Claudium",
+      "claudiumEach": "{amount} Claudium each",
+      "claudiumMinError": "Name a price of at least 1 Claudium.",
+      "awaitingPayment": "Awaiting payment",
+      "buyExternalTitle": "Confirm purchase",
+      "buyClaudiumConfirmBody": "Buy {item} for {amount} Claudium? The payment comes from your Claudium balance.",
+      "buyWocConfirmBody": "Buy {item} for {amount} WOC? You pay from your linked wallet, and the goods release once the payment lands.",
+      "buyClaudiumAria": "Buy {item} with Claudium",
+      "buyWocAria": "Buy {item} with WOC",
+      "pendingClaudium": "Completing your purchase of {item}.",
+      "pendingPreparing": "Preparing the payment request for {item}.",
+      "wocPayPrompt": "Send {amount} WOC from your linked wallet to finish buying {item}.",
+      "paymentExpiredToast": "The payment window for {item} closed. The lot is open again.",
+      "soldWalletToast": "Your {item} sold for {amount} WOC. The payment went to your linked wallet; collect your deposit at the Merchant.",
+      "soldAccountToast": "Your {item} sold for {amount} Claudium. The payment went to your Claudium balance; collect your deposit at the Merchant."
     },
     "logs": {
       "listedItem": "Listed {item} on the World Market for {money}.",
@@ -5946,6 +5969,8 @@ export const en_CA: EnTranslations = {
       "expiredListing": "Your market listing of {item} expired and waits at the Merchant.",
       "postedAuction": "Posted {item} for auction (starting bid {money}).",
       "bidPlaced": "Bid placed: {money} on {item}.",
+      "listedClaudium": "Listed {item} on the World Market for {amount} Claudium.",
+      "listedWoc": "Listed {item} on the World Market for {amount} WOC.",
       "boughtBackItem": "Bought back {item} for {money}."
     },
     "errors": {
@@ -5971,7 +5996,14 @@ export const en_CA: EnTranslations = {
       "notAuction": "That lot is not up for auction.",
       "cannotBidOwnLot": "You cannot bid on your own lot.",
       "alreadyHighBidder": "You are already the high bidder.",
-      "bidTooLow": "Bid at least {min}."
+      "bidTooLow": "Bid at least {min}.",
+      "bidsGoldOnly": "Bids take gold only.",
+      "claudiumUnavailable": "Claudium listings are not available.",
+      "wocUnavailable": "WOC listings are not available.",
+      "wocLinkToList": "Link a wallet to list for WOC.",
+      "wocLinkToPay": "Link a wallet to pay with WOC.",
+      "wocPriceInvalid": "Name a valid WOC price.",
+      "awaitingPayment": "That lot is awaiting payment."
     },
     "loot": {
       "takeAll": "Take All",
@@ -9826,6 +9858,16 @@ export const en_CA: EnTranslations = {
         "sender": "The Merchant",
         "subject": "Your lot has sold",
         "body": "A buyer has taken your goods off my hands. Your proceeds wait in your collection box at the World Market; come see me to collect them.\n\n- The Merchant"
+      },
+      "market_sold_wallet": {
+        "sender": "The Merchant",
+        "subject": "Your lot has sold",
+        "body": "A buyer has taken your goods off my hands. The payment went straight to your linked wallet, as you asked; only your listing deposit waits in your collection box at the World Market. Come see me to take it back.\n\n- The Merchant"
+      },
+      "market_sold_account": {
+        "sender": "The Merchant",
+        "subject": "Your lot has sold",
+        "body": "A buyer has taken your goods off my hands. The payment went straight to your Claudium balance; only your listing deposit waits in your collection box at the World Market. Come see me to take it back.\n\n- The Merchant"
       },
       "market_expired": {
         "sender": "The Merchant",

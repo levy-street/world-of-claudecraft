@@ -426,6 +426,7 @@ describe('World Market auctions: offline Merchant letters', () => {
       startingBid: 50,
       durationSeconds: 3600,
       depositPerUnit: 0,
+      denom: 'copper' as const,
       expiresAt: sim.time + 3600,
       house: false,
     });
@@ -465,6 +466,7 @@ describe('World Market auctions: offline Merchant letters', () => {
       pricePerUnit: 50,
       durationSeconds: 3600,
       depositPerUnit: 0,
+      denom: 'copper' as const,
       expiresAt: sim.time - 1,
       house: false,
     });

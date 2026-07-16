@@ -79,6 +79,7 @@ CREATE TABLE IF NOT EXISTS trade_ledger (
 );
 CREATE INDEX IF NOT EXISTS trade_ledger_char_a ON trade_ledger (char_a_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS trade_ledger_char_b ON trade_ledger (char_b_id, created_at DESC);
+ALTER TABLE trade_ledger ADD COLUMN IF NOT EXISTS context TEXT;
 `;
 
 // One side's escrowed goods (items, including instance payloads, plus copper).
@@ -182,6 +183,11 @@ export interface TradeLedgerRow {
   claudiumB: number;
   wocA: string;
   wocB: string;
+  // Non-settlement provenance marker (nullable TEXT, additive): completed
+  // external-denomination MARKET sales record 'market-<listingId>-<purchaseSeq>'
+  // here since settlement_id is a BIGINT FK-shaped column that cannot carry a
+  // marker string. Absent (null) on every player-trade row.
+  context?: string | null;
 }
 
 // Whole-unit money amounts (claudium, copper) cross the JS number boundary as
@@ -383,8 +389,8 @@ async function insertTradeLedgerWith(
     `INSERT INTO trade_ledger
        (realm, settlement_id, char_a_id, char_b_id, account_a_id, account_b_id,
         char_a_name, char_b_name, items_a, copper_a, items_b, copper_b,
-        claudium_a, claudium_b, woc_a, woc_b)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`,
+        claudium_a, claudium_b, woc_a, woc_b, context)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)`,
     [
       row.realm,
       row.settlementId,
@@ -402,6 +408,7 @@ async function insertTradeLedgerWith(
       assertSafeWhole(Math.trunc(row.claudiumB), 'claudiumB'),
       row.wocA,
       row.wocB,
+      row.context ?? null,
     ],
   );
 }

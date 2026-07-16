@@ -86,7 +86,10 @@ export const QUEST_LETTERS: Record<string, LetterDef> = {
 // letters carry NO coin or items: every refund, payout, and returned lot moves
 // through the Merchant's collection box, never the mail. Ids are append-only
 // like every letterId above.
-export const AUCTION_LETTERS: Record<'outbid' | 'won' | 'sold' | 'expired', LetterDef> = {
+export const AUCTION_LETTERS: Record<
+  'outbid' | 'won' | 'sold' | 'expired' | 'sold_wallet' | 'sold_account',
+  LetterDef
+> = {
   outbid: {
     letterId: 'market_outbid',
     senderName: 'The Merchant',
@@ -112,6 +115,29 @@ export const AUCTION_LETTERS: Record<'outbid' | 'won' | 'sold' | 'expired', Lett
     body:
       'A buyer has taken your goods off my hands. Your proceeds wait in your ' +
       'collection box at the World Market; come see me to collect them.\n\n' +
+      '- The Merchant',
+  },
+  // External-denomination sales: the buyer paid the seller directly (wallet to
+  // wallet, or Claudium account to account), so the body must NOT claim copper
+  // waits at the Merchant. Only the listing deposit refund sits in collection.
+  sold_wallet: {
+    letterId: 'market_sold_wallet',
+    senderName: 'The Merchant',
+    subject: 'Your lot has sold',
+    body:
+      'A buyer has taken your goods off my hands. The payment went straight to ' +
+      'your linked wallet, as you asked; only your listing deposit waits in ' +
+      'your collection box at the World Market. Come see me to take it back.\n\n' +
+      '- The Merchant',
+  },
+  sold_account: {
+    letterId: 'market_sold_account',
+    senderName: 'The Merchant',
+    subject: 'Your lot has sold',
+    body:
+      'A buyer has taken your goods off my hands. The payment went straight to ' +
+      'your Claudium balance; only your listing deposit waits in your ' +
+      'collection box at the World Market. Come see me to take it back.\n\n' +
       '- The Merchant',
   },
   expired: {

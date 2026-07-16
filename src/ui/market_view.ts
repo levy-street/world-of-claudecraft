@@ -20,7 +20,7 @@
 
 import { ITEMS } from '../sim/data';
 import type { ItemDef } from '../sim/types';
-import type { MarketInfo, MarketListingView } from '../world_api';
+import type { MarketInfo, MarketListingView, MarketPendingPurchaseView } from '../world_api';
 import { MARKET_PAGE_SIZE, type MarketFilters } from './market_filters';
 
 export type MarketTab = 'browse' | 'sell' | 'collect';
@@ -77,12 +77,15 @@ export type MarketSellBody =
 
 /** The Merchant-cut + listing-cap figures the Sell tab note shows, plus the
  *  duration tiers the sim will accept (mirrored from MarketInfo so the Sell tab
- *  never invents its own duration list). */
+ *  never invents its own duration list) and the viewer's external-denomination
+ *  rails (which currency options the selector may render; mirrored from
+ *  MarketInfo.rails so the UI can never offer a denomination the sim refuses). */
 export interface MarketSellMeta {
   cutPct: number;
   myListingCount: number;
   maxListings: number;
   durationsHours: readonly number[];
+  rails: { claudium: boolean; woc: boolean };
 }
 
 /** One Collect row: a returned/expired stack waiting to be reclaimed. */
@@ -102,7 +105,10 @@ export type MarketCollectBody =
  */
 export type MarketView =
   | { kind: 'no-data' }
-  | { kind: 'browse'; body: MarketBrowseBody }
+  // `pending` is the viewer's own in-flight external purchase (null when none):
+  // the Browse tab renders it as the awaiting-payment panel (with the
+  // server-enriched wocPay request for a $WOC payer).
+  | { kind: 'browse'; body: MarketBrowseBody; pending: MarketPendingPurchaseView | null }
   | { kind: 'sell'; body: MarketSellBody; meta: MarketSellMeta }
   | { kind: 'collect'; body: MarketCollectBody };
 
@@ -205,7 +211,13 @@ export function buildMarketCollect(info: MarketInfo): MarketCollectBody {
 export function buildMarketView(input: MarketViewInput): MarketView {
   const { info, tab } = input;
   if (!info) return { kind: 'no-data' };
-  if (tab === 'browse') return { kind: 'browse', body: buildMarketBrowse(info, input.filters) };
+  if (tab === 'browse') {
+    return {
+      kind: 'browse',
+      body: buildMarketBrowse(info, input.filters),
+      pending: info.myPendingPurchase ?? null,
+    };
+  }
   if (tab === 'sell') {
     return {
       kind: 'sell',
@@ -215,6 +227,7 @@ export function buildMarketView(input: MarketViewInput): MarketView {
         myListingCount: info.myListingCount,
         maxListings: info.maxListings,
         durationsHours: info.durationsHours,
+        rails: info.rails,
       },
     };
   }
