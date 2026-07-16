@@ -707,22 +707,46 @@ export async function setDailyRewardsBan(input: {
   adminAccountId: number;
   banned: boolean;
   reason: unknown;
+  durationHours?: unknown;
 }): Promise<void> {
   const reason = cleanText(input.reason, ACTION_REASON_MAX);
   if (!reason) throw new Error('moderation reason is required');
+  let durationHours: number | null = null;
+  if (input.banned && input.durationHours !== undefined && input.durationHours !== null) {
+    if (
+      typeof input.durationHours !== 'number' ||
+      !Number.isFinite(input.durationHours) ||
+      !Number.isInteger(input.durationHours) ||
+      input.durationHours < 1 ||
+      input.durationHours > 8760
+    ) {
+      throw new Error('daily rewards ban duration must be between 1 and 8760 hours');
+    }
+    durationHours = input.durationHours;
+  }
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
+    let expiresAt: string | Date | null = null;
     if (input.banned) {
-      await client.query(
-        `INSERT INTO daily_reward_bans (account_id, reason, admin_account_id)
-         VALUES ($1, $2, $3)
+      const saved = await client.query(
+        `INSERT INTO daily_reward_bans (account_id, reason, admin_account_id, expires_at)
+         VALUES (
+           $1,
+           $2,
+           $3,
+           CASE WHEN $4::int IS NULL THEN NULL ELSE now() + ($4 * interval '1 hour') END
+         )
          ON CONFLICT (account_id) DO UPDATE
            SET reason = EXCLUDED.reason,
                admin_account_id = EXCLUDED.admin_account_id,
-               updated_at = now()`,
-        [input.accountId, reason, input.adminAccountId],
+               expires_at = EXCLUDED.expires_at,
+               created_at = now(),
+               updated_at = now()
+         RETURNING expires_at`,
+        [input.accountId, reason, input.adminAccountId, durationHours],
       );
+      expiresAt = saved.rows[0]?.expires_at ?? null;
     } else {
       const removed = await client.query('DELETE FROM daily_reward_bans WHERE account_id = $1', [
         input.accountId,
@@ -737,6 +761,7 @@ export async function setDailyRewardsBan(input: {
         accountId: input.accountId,
         adminAccountId: input.adminAccountId,
         reason,
+        expiresAt,
       },
     );
     await client.query('COMMIT');

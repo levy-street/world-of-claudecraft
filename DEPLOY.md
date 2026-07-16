@@ -215,6 +215,13 @@ For off-box safety, sync the directory to S3 occasionally:
 
 - **Secrets**: the Postgres password is generated at first boot into
   `/opt/eastbrook/.env` (mode 600, gitignored). Nothing else to manage.
+- **Timed Daily Rewards ban rollback**: releases with timed bans retain expired rows in
+  `daily_reward_bans` and exclude them with an `expires_at` predicate. Before rolling
+  back to a release that predates timed bans, stop every game process and remove expired
+  rows with `DELETE FROM daily_reward_bans WHERE expires_at <= now();`. The older release
+  cannot honor future expiry times. Operators must either remove still-active timed bans
+  before rollback or explicitly accept that they will become permanent until manually
+  unbanned. Do not alter the nullable `expires_at` column during rollback.
 - **Bank ledger audit**: `node scripts/bank_audit.mjs` (reads `DATABASE_URL` from the
   environment) replays the append-only `bank_ledger` against live character bank state
   and exits non-zero on any discrepancy. Run it after an economy incident or a restore.

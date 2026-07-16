@@ -13,6 +13,11 @@ import { APPLE_AUTH_SCHEMA } from './apple_auth_db';
 import type { BankBonusFacts } from './bank_entitlements';
 import { seedChatFilterDefaults } from './chat_filter_db';
 import type { ChatLogRow } from './chat_log';
+import {
+  DAILY_REWARD_EVENTS_CONCURRENT_INDEX_SQL,
+  DAILY_REWARD_EVENTS_INVALID_INDEX_CHECK_SQL,
+  DAILY_REWARD_EVENTS_INVALID_INDEX_DROP_SQL,
+} from './daily_rewards_schema';
 import type { RankedDeedsAccount } from './deeds_board';
 import { DISCORD_SCHEMA } from './discord_db';
 import { GITHUB_SCHEMA } from './github_db';
@@ -743,6 +748,7 @@ CREATE TABLE IF NOT EXISTS daily_reward_bans (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+ALTER TABLE daily_reward_bans ADD COLUMN IF NOT EXISTS expires_at TIMESTAMPTZ;
 CREATE TABLE IF NOT EXISTS daily_reward_ip_bans (
   ip_address TEXT PRIMARY KEY,
   reason TEXT NOT NULL,
@@ -752,6 +758,7 @@ CREATE TABLE IF NOT EXISTS daily_reward_ip_bans (
 );
 CREATE OR REPLACE VIEW daily_reward_excluded_accounts AS
 SELECT account_id, reason FROM daily_reward_bans
+ WHERE expires_at IS NULL OR expires_at > now()
 UNION
 SELECT a.id AS account_id, ib.reason
   FROM accounts a
@@ -1089,6 +1096,13 @@ export async function ensureSchema(): Promise<void> {
         await client.query(PLAYER_METRICS_INVALID_INDEX_DROP_SQL);
       }
       await client.query(PLAYER_METRICS_CONCURRENT_INDEX_SQL);
+      const invalidDailyRewardIndex = await client.query(
+        DAILY_REWARD_EVENTS_INVALID_INDEX_CHECK_SQL,
+      );
+      if ((invalidDailyRewardIndex.rowCount ?? 0) > 0) {
+        await client.query(DAILY_REWARD_EVENTS_INVALID_INDEX_DROP_SQL);
+      }
+      await client.query(DAILY_REWARD_EVENTS_CONCURRENT_INDEX_SQL);
     } finally {
       if (concurrentMigrationLocked) {
         await client.query('SELECT pg_advisory_unlock($1)', [SCHEMA_ADVISORY_LOCK_KEY]);

@@ -169,6 +169,7 @@ import { ChatCommandMenu } from './ui/chat_command_menu';
 import { chatInputSize } from './ui/chat_input_autosize';
 import { CLASS_DETAILS, SIGNATURE_ABILITIES } from './ui/class_details_data';
 import { ensureDeedLocalesLoaded } from './ui/deed_i18n';
+import { isDevGuiCommand } from './ui/dev_command_view';
 import { devTierByIndex, devTierDisplayName } from './ui/dev_tier';
 import {
   type DiscordAccountStatus,
@@ -981,7 +982,10 @@ async function startGame(
       renderer.enableTargetConeDebug(tabConeHalfAt, TAB_NEAR_RADIUS, TAB_QUERY_RADIUS);
     }
     perf.setRenderer(renderer);
-    hud = new Hud(world, renderer, keybinds, { dailyRewardsEnabled: !NATIVE_APP });
+    hud = new Hud(world, renderer, keybinds, {
+      dailyRewardsEnabled: !NATIVE_APP,
+      devCommandsEnabled: import.meta.env.DEV,
+    });
     perf.setHud(hud);
     hydrateIcons(); // swap [data-icon] placeholders (micro-menu, mobile bar, meters) for inline SVG
   } catch (err) {
@@ -1144,7 +1148,9 @@ async function startGame(
       // that channel without the player retyping "/world" etc.
       const raw = chatInput.value;
       // "/share" links the selected quest into party chat; skip the normal send path.
-      if (!hud.maybeHandleQuestShareCommand(raw)) {
+      if (import.meta.env.DEV && isDevGuiCommand(raw)) {
+        hud.toggleDevCommandWindow();
+      } else if (!hud.maybeHandleQuestShareCommand(raw)) {
         const text = hud.composeChatSend(raw);
         if (text) {
           world.chat(text);
@@ -1551,6 +1557,17 @@ async function startGame(
       if (!v) hud.cancelGroundAim();
       return;
     }
+    if (
+      key === 'partyFrameShowResource' ||
+      key === 'partyFrameShowAbsorbs' ||
+      key === 'partyFrameShowAuras' ||
+      key === 'partyFrameShowSelf'
+    ) {
+      // Read live by Hud.updatePartyFrames (its config is rebuilt from settings each
+      // sync); persisting the choice is the only page-level work needed.
+      settings.set(key, !!value);
+      return;
+    }
     if (key === 'attackMove') {
       const v = settings.set('attackMove', !!value);
       if (!v) input.clearClickMove();
@@ -1743,6 +1760,27 @@ async function startGame(
       case 'targetFrameScale':
         document.documentElement.style.setProperty('--target-frame-scale', String(v));
         break;
+      case 'partyFrameScale':
+        document.documentElement.style.setProperty('--party-frame-scale', String(v));
+        break;
+      case 'partyFrameWidth':
+        document.documentElement.style.setProperty('--party-frame-width', `${v}px`);
+        break;
+      case 'partyFrameHeight':
+        document.documentElement.style.setProperty('--party-frame-height', `${v}px`);
+        break;
+      case 'partyFrameSpacing':
+        document.documentElement.style.setProperty('--party-frame-spacing', `${v}px`);
+        break;
+      case 'partyFrameColumns':
+        document.documentElement.style.setProperty('--party-frame-columns', String(Math.round(v)));
+        break;
+      case 'partyFrameHealthText':
+      case 'partyFrameSort':
+      case 'partyFrameStyle':
+        // Read live by Hud.updatePartyFrames; persistence above is the only
+        // page-level work needed.
+        break;
       case 'aurasOnPlayerFrame':
         hud.setAurasOnPlayerFrame(!!v);
         break;
@@ -1881,7 +1919,7 @@ async function startGame(
     const nativePriceCache = new Map<string, { amountBase: string; atMs: number }>();
     const nativePriceCacheTtlMs = 60_000;
     const nativeAmountBase = (
-      rail: 'sol' | 'woc',
+      rail: 'sol' | 'usdc' | 'woc',
       sku: string,
       amountBase: string | null | undefined,
     ): string | null => {
@@ -1917,21 +1955,24 @@ async function startGame(
         const { balance, skus, nativeRails } = pack;
         const wallet = await loadWallet();
         const walletAddress = wallet.currentWallet().address;
-        const [solBalance, wocBalance] = walletAddress
+        const [solBalance, usdcBalance, wocBalance] = walletAddress
           ? await Promise.all([
               economy.solBalance(walletAddress),
+              economy.usdcBalance(walletAddress),
               wallet.fetchWocBalance(walletAddress, true),
             ])
-          : [{ lamports: null }, null];
+          : [{ lamports: null }, { amountBase: null }, null];
         const nativePrices = await Promise.all(
           skus.map(async (row) => {
-            const [sol, woc] = await Promise.all([
+            const [sol, usdc, woc] = await Promise.all([
               nativeRails.sol ? economy.nativePrice('sol', row.sku) : null,
+              nativeRails.usdc ? economy.nativePrice('usdc', row.sku) : null,
               nativeRails.woc ? economy.nativePrice('woc', row.sku) : null,
             ]);
             return {
               sku: row.sku,
               solAmountBase: nativeAmountBase('sol', row.sku, sol?.amountBase),
+              usdcAmountBase: nativeAmountBase('usdc', row.sku, usdc?.amountBase),
               wocAmountBase: nativeAmountBase('woc', row.sku, woc?.amountBase),
             };
           }),
@@ -1943,6 +1984,7 @@ async function startGame(
           nativeRails,
           walletBalances: {
             solLamports: solBalance.lamports,
+            usdcBaseUnits: usdcBalance.amountBase,
             wocBaseUnits: wocBalanceBaseUnits(wocBalance),
           },
           nativePrices,

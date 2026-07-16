@@ -22,6 +22,9 @@ permissions:
 #                 registry-in-sync, s3_registered (every emit maps to a registered
 #                 key/RULE), and placeholder parity for the translations that
 #                 actually exist. An English-only PR (sparse overlay) passes here.
+#                 The test suite runs as a 4-shard matrix (each shard executes a
+#                 quarter of the test files), so the job's wall time is the
+#                 slowest quarter, not the whole suite.
 #
 #   pr-checks     the PR tier's serialized checks (i18n freshness + coverage
 #                 summary, malware gate, game/admin typecheck, env/server/client
@@ -31,7 +34,9 @@ permissions:
 #
 #   release-gate  full 21-locale tier. Runs on release/** pushes and on the
 #                 release-to-main PR merge result, with I18N_RELEASE_TIER=1. A merely
-#                 `pending` (untranslated) key cannot survive this gate.
+#                 `pending` (untranslated) key cannot survive this gate. Its test
+#                 step runs the same 4-shard matrix as pr-gate; the serialized
+#                 checks and builds run once, on shard 1 only.
 #
 # The release tier is a superset: its `npm test` runs every PR-tier check plus the
 # release-only ones, and the release-gate job also typechecks and builds
@@ -130,13 +135,24 @@ jobs:
 
   # The PR tier is two parallel jobs: pr-gate runs the test suite while pr-checks
   # runs the serialized checks, so the PR critical path is max(tests, checks)
-  # instead of their sum. Locally `npm run gate` (scripts/gate.mjs) runs the SAME
-  # combined step list serially by design; keep that script's step list in sync
-  # when adding or removing a step in either job.
+  # instead of their sum. pr-gate additionally fans the suite across a 4-shard
+  # matrix (vitest --shard: a sha1-hash partition of the test FILES), so its wall
+  # time is the slowest quarter. Locally `npm run gate` (scripts/gate.mjs) runs
+  # the SAME combined step list serially with ONE full unsharded vitest run by
+  # design (bounded workers); keep that script's step list in sync when adding
+  # or removing a step in either job.
   pr-gate:
     name: PR gate (English-only legal)
     if: (github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))) || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
+
+    # fail-fast stays off: shards pass or fail independently, so one red quarter
+    # never cancels the other three and a failure report always covers the whole
+    # suite.
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
 
     steps:
       - name: Check out repository
@@ -151,10 +167,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # `npm test` regenerates the i18n artifacts itself (pretest), so this job
-      # needs no explicit i18n:gen step; the freshness diff lives in pr-checks.
-      - name: Run tests (PR tier)
-        run: npm test
+      # `npm test` regenerates the i18n artifacts itself (pretest) in EVERY
+      # shard BY DESIGN (the S3 guard, guide freshness, and the git-subprocess
+      # suites need the generated artifacts no matter which shard they hash
+      # into), so this job needs no explicit i18n:gen step; the freshness diff
+      # lives in pr-checks.
+      - name: Run tests (PR tier, shard ${{ matrix.shard }} of 4)
+        run: npm test -- --shard=${{ matrix.shard }}/4
 
   # Runs in parallel with pr-gate: same if-condition, no needs edge in either
   # direction. The default pull_request merge-ref checkout MUST be preserved
@@ -225,6 +244,15 @@ jobs:
     env:
       I18N_RELEASE_TIER: '1'
 
+    # The same 4-shard matrix as pr-gate: the test step partitions across the
+    # four runners, while every serialized check and build below carries a
+    # single-shard condition so it runs exactly once (on shard 1) instead of
+    # four times. fail-fast stays off so shards report independently.
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
@@ -238,9 +266,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # This job's checks also run locally as `npm run gate` (scripts/gate.mjs);
-      # keep that script's step list in sync when adding or removing a step here.
+      # This job's checks also run locally as `npm run gate` (scripts/gate.mjs),
+      # which stays serial with ONE full unsharded test run by design; keep that
+      # script's step list in sync when adding or removing a step here.
       - name: Generate i18n artifacts
+        if: matrix.shard == 1
         run: npm run i18n:gen
 
       # Fast, legible fail BEFORE the long test/build run if a committed generated
@@ -250,29 +280,39 @@ jobs:
       # generated TranslationKey union. The test suite also enforces this, this just
       # surfaces it sooner.
       - name: Verify committed i18n artifacts are fresh
+        if: matrix.shard == 1
         run: git diff --exit-code -- src/ui/i18n.resolved.generated src/admin/i18n.resolved.generated src/ui/i18n.catalog/translation_keys.generated.ts
 
       # Post the coverage counts of the gitignored i18n.status.summary.json to the job summary as the out-of-band audit trail.
       - name: Post i18n coverage summary
+        if: matrix.shard == 1
         run: node scripts/i18n_coverage_summary.mjs
 
       # Release-gate malicious-code scan (see the PR-gate job for the rationale).
       # --gate fails only on a HIGH-severity signature surviving the path-aware
       # priors; the full agent-judged pass is the `release-malware-audit` skill.
       - name: Malicious-code gate
+        if: matrix.shard == 1
         run: npm run security:gate
 
-      - name: Run tests (release tier - 21-locale + empty-pending)
-        run: npm test
+      # Sharded like pr-gate; `npm test` (pretest) regenerates the i18n
+      # artifacts in EVERY shard so the artifact-dependent suites pass no
+      # matter which shard they hash into.
+      - name: Run tests (release tier - 21-locale + empty-pending, shard ${{ matrix.shard }} of 4)
+        run: npm test -- --shard=${{ matrix.shard }}/4
 
       - name: Typecheck
+        if: matrix.shard == 1
         run: npm run check:types
 
       - name: Build headless environment
+        if: matrix.shard == 1
         run: npm run build:env
 
       - name: Build server
+        if: matrix.shard == 1
         run: npm run build:server
 
       - name: Build client
+        if: matrix.shard == 1
         run: npm run build

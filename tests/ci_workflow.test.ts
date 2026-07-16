@@ -67,7 +67,9 @@ describe('CI workflow parity', () => {
       expect(job).toContain("github.event_name == 'workflow_dispatch'");
       expect(job).not.toContain('I18N_RELEASE_TIER');
     }
-    expect(releaseGate).toContain("I18N_RELEASE_TIER: '1'");
+    // Anchored to the JOB level (the 4-space env block): moving the flag onto
+    // a single step would silently run the four release test shards at PR tier.
+    expect(releaseGate).toContain("\n    env:\n      I18N_RELEASE_TIER: '1'");
     expect(releaseGate).toContain(
       "github.event_name == 'pull_request' && github.base_ref == 'main'",
     );
@@ -100,5 +102,61 @@ describe('CI workflow parity', () => {
       expect(prChecks).toContain(step);
       expect(prGate).not.toContain(step);
     }
+  });
+
+  it('shards the PR and release test steps four ways and keeps the checks single-shard', () => {
+    const prGate = jobSource('pr-gate');
+    const prChecks = jobSource('pr-checks');
+    const releaseGate = jobSource('release-gate');
+    // Both test jobs fan the ONE suite across the same 4-shard matrix. The run
+    // line stays `npm test` (whose pretest regenerates the i18n artifacts in
+    // every shard: the S3 guard, guide freshness, and the git-subprocess suites
+    // need them regardless of which shard they hash into), never a bare vitest
+    // invocation. fail-fast stays off so shards pass or fail independently and
+    // a red run always reports the whole suite.
+    for (const job of [prGate, releaseGate]) {
+      expect(job).toContain('strategy:');
+      expect(job).toContain('fail-fast: false');
+      expect(job).toContain('shard: [1, 2, 3, 4]');
+      expect(job).toContain('run: npm test -- --shard=${{ matrix.shard }}/4');
+    }
+    expect(workflow.match(/run: npm test -- --shard=\$\{\{ matrix\.shard \}\}\/4/g)).toHaveLength(
+      2,
+    );
+    expect(workflow).not.toContain('npx vitest');
+    // The local gate is the one place the whole suite still runs as a single
+    // unsharded pass (bounded workers); a --shard flag there would silently
+    // turn the pre-merge gate into a partial run, deleting the step would
+    // silently drop tests from the gate entirely, and dropping the worker
+    // bound would reintroduce the documented core-contention flake mode.
+    expect(gate).not.toContain('--shard');
+    expect(gate).toContain("'vitest (full suite)'");
+    expect(gate).toContain('--maxWorkers=');
+    // pr-checks stays a single unsharded job: its serialized checks run once.
+    expect(prChecks).not.toContain('strategy:');
+    expect(prChecks).not.toContain('matrix:');
+    // pr-gate is tests-only, so nothing in it is gated to a single shard...
+    expect(prGate).not.toContain('matrix.shard == 1');
+    // ...while release-gate keeps its serialized checks and builds on exactly
+    // one shard each (they are not partitionable and must not run four times):
+    // i18n:gen, the freshness diff, the coverage summary, the malware gate,
+    // typecheck, and the three builds. Every new non-test step added to
+    // release-gate needs the same single-shard condition, and this count.
+    expect(releaseGate.match(/if: matrix\.shard == 1/g)).toHaveLength(8);
+    // The release TEST step itself must stay un-gated (run on every shard):
+    // name-to-run adjacency proves no if: line sits between them, so a
+    // compensating double-edit (gate the test step, un-gate a build; count
+    // still 8) cannot silently shrink the release tier to a quarter of the
+    // suite.
+    expect(releaseGate).toMatch(
+      /- name: Run tests \(release tier[^\n]*\n {8}run: npm test -- --shard=\$\{\{ matrix\.shard \}\}\/4/,
+    );
+    // Structural step counts close the remaining direction: a NEW step added
+    // to either matrix job changes these totals and must consciously update
+    // this test (an unconditioned addition to release-gate would otherwise
+    // run four times per release push; pr-gate stays exactly checkout,
+    // setup-node, npm ci, and the sharded test run).
+    expect(prGate.match(/\n {6}- name: /g)).toHaveLength(4);
+    expect(releaseGate.match(/\n {6}- name: /g)).toHaveLength(12);
   });
 });

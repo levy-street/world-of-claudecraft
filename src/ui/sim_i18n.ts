@@ -6421,6 +6421,42 @@ const RULES: Rule[] = [
     build: (m) => tSim('error.heroicMarksNeeded', { marks: m[1], name: locItem(m[2]) }),
   },
   {
+    re: /^All instances have been reset\.$/,
+    build: () => t('hudChrome.dungeonDifficulty.resetDone'),
+  },
+  {
+    re: /^You have no instances to reset\.$/,
+    build: () => t('hudChrome.dungeonDifficulty.resetNone'),
+  },
+  {
+    re: /^You cannot reset instances while someone is still inside\.$/,
+    build: () => t('hudChrome.dungeonDifficulty.resetOccupied'),
+  },
+  {
+    re: /^Change dungeon difficulty before resetting these instances\. Empty instances reset on their own after 5 minutes\.$/,
+    build: () => t('hudChrome.dungeonDifficulty.resetSameDifficulty'),
+  },
+  {
+    re: /^Use \/dungeon reset to abandon your empty instances after changing difficulty\.$/,
+    build: () => t('hudChrome.dungeonDifficulty.resetUsage'),
+  },
+  {
+    re: /^You cannot reset instances while loot remains inside\.$/,
+    build: () => t('hudChrome.dungeonDifficulty.resetLoot'),
+  },
+  {
+    re: /^Instances can only be reset once every 5 minutes\.$/,
+    build: () => t('hudChrome.dungeonDifficulty.resetCooldown'),
+  },
+  {
+    re: /^This instance is set to Normal difficulty\. Use Reset All Instances to start a fresh Heroic run\.$/,
+    build: () => t('hudChrome.dungeonDifficulty.entryMismatchNormal'),
+  },
+  {
+    re: /^This instance is set to Heroic difficulty\. Use Reset All Instances to start a fresh Normal run\.$/,
+    build: () => t('hudChrome.dungeonDifficulty.entryMismatchHeroic'),
+  },
+  {
     re: /^You pass through the tombstone into (.+)\.$/,
     build: (m) => t('sim.delve.tombstoneInto', { name: locDelveModule(m[1]) }),
   },

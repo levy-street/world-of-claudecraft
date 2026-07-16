@@ -983,22 +983,30 @@
   body.auras-on-frame #debuff-bar {
     top: 14px;
   }
-  /* Party member mini aura strip: each row's own buffs/debuffs (the compact
-     wire summaries) as small icons under the bars. The .buff nodes reuse the
-     aura pool's styling; sized down here, with the (always empty) duration and
-     stacks labels hidden so the icons stay square. */
+  /* Party member mini aura strip: overlay the compact icons so gaining or losing
+     an aura never changes frame height or shifts the surrounding raid grid. */
   .party-frame .pfm-auras {
+    position: absolute;
+    right: 2px;
+    bottom: 2px;
+    z-index: 5;
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    max-width: calc(100% - 4px);
+    overflow: hidden;
     gap: 2px;
-    margin-top: 2px;
+    margin: 0;
     pointer-events: auto;
   }
   .pfm-auras .buff {
     width: 16px;
     height: 16px;
   }
-  .pfm-auras .buff .dur,
+  .pfm-auras .buff .dur {
+    display: block;
+    font-size: 8px;
+    line-height: 1;
+  }
   .pfm-auras .buff .stacks {
     display: none;
   }
@@ -4124,7 +4132,7 @@
     top: 12px;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: var(--party-frame-spacing, 4px);
     z-index: 5;
   }
   /* The painter nests the member rows one level down in a .party-rows wrapper (so the
@@ -4134,19 +4142,107 @@
      .party-frame rule apply unchanged. Mobile re-declares the wrapper as its own
      2-column grid (hud.mobile.css). */
   #party-frames .party-rows {
-    display: contents;
+    display: grid;
+    grid-template-columns: repeat(var(--party-frame-columns, 1), var(--party-frame-width, 170px));
+    gap: var(--party-frame-spacing, 4px);
+    zoom: var(--party-frame-scale, 1);
   }
   #party-frames.below-target {
     top: 96px;
   }
   .party-frame {
     --cls: #7fb8ff;
-    width: 170px;
+    position: relative;
+    width: var(--party-frame-width, 170px);
+    min-height: var(--party-frame-height, 42px);
+    box-sizing: border-box;
     padding: 4px 8px 5px;
     cursor: var(--cursor-point);
     transition:
       opacity 0.2s ease,
       box-shadow 0.2s ease;
+  }
+  /* Compact WoW-style raid presentation. The existing pooled row and painter remain
+     unchanged: this profile only rearranges their stable DOM, so mouseover casts,
+     absorbs, incoming healing, threat, Rewind, and auras share one implementation. */
+  #party-frames.party-style-raid .party-frame {
+    height: var(--party-frame-height, 42px);
+    min-height: var(--party-frame-height, 42px);
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid #050505;
+    border-radius: 2px;
+    background: #101010;
+    box-shadow: inset 0 0 0 1px #ffffff14;
+  }
+  #party-frames.party-style-raid .party-frame .pfm-name {
+    position: absolute;
+    inset: 2px 4px 5px;
+    z-index: 4;
+    min-width: 0;
+    pointer-events: none;
+  }
+  #party-frames.party-style-raid .party-frame .pfm-name-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+  }
+  /* Compact raid cells read HP from the bar fill (WoW-style), so the centered
+     percent text is dropped here: in a narrow cell (e.g. landscape phone) it
+     collided with the member name. The bar still conveys HP, so no actionable
+     information is lost. */
+  #party-frames.party-style-raid .party-frame .pfm-hp-text {
+    display: none;
+  }
+  #party-frames.party-style-raid .party-frame .pfm-id {
+    min-width: 0;
+    color: #fff;
+  }
+  #party-frames.party-style-raid .party-frame .pfm-crest {
+    display: none;
+  }
+  #party-frames.party-style-raid .party-frame .bar.hp {
+    position: absolute;
+    inset: 0 0 3px;
+    height: auto;
+    margin: 0;
+    border: 0;
+    border-radius: 1px 1px 0 0;
+    background: #171717;
+  }
+  #party-frames.party-style-raid .party-frame .bar.hp .bar-fill {
+    background-color: var(--cls);
+    filter: saturate(0.82) brightness(0.82);
+  }
+  #party-frames.party-style-raid .party-frame > .bar:not(.hp) {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 4;
+    width: auto;
+    height: 3px;
+    margin: 0;
+    border: 0;
+    border-radius: 0 0 1px 1px;
+  }
+  #party-frames.party-style-raid .party-frame.pf-hide-resource .bar.hp {
+    bottom: 0;
+    border-radius: 1px;
+  }
+  #party-frames.party-style-raid .party-frame .pfm-auras {
+    left: auto;
+    right: 2px;
+    top: auto;
+    bottom: 4px;
+    translate: none;
+  }
+  #party-frames.party-style-raid .party-frame .pfm-auras .buff {
+    flex: 0 0 12px;
+    width: 12px;
+    height: 12px;
+    box-shadow: 0 1px 2px #000;
   }
   .party-loot {
     width: 170px;
@@ -4261,9 +4357,91 @@
     height: 9px;
     margin-top: 2px;
   }
+  .party-frame .bar.hp {
+    position: relative;
+  }
+  .party-frame .pfm-hp-text {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-light);
+    font-family: var(--ui-font);
+    font-size: 9px;
+    line-height: 1;
+    text-shadow: 1px 1px 1px #000;
+    pointer-events: none;
+  }
+  .party-frame .pfm-incoming {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--incoming-start, 0%);
+    width: 0;
+    z-index: 1;
+    background: color-mix(in srgb, var(--color-friendly) 55%, transparent);
+    pointer-events: none;
+  }
+  .party-frame.pf-hide-resource > .bar:not(.hp),
+  .party-frame.pf-hide-auras .pfm-auras {
+    display: none;
+  }
+  #party-frames > .party-loot {
+    zoom: var(--party-frame-scale, 1);
+  }
+  #party-frames > .tf-move-btn {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid var(--gold-dim);
+    border-radius: 50%;
+    display: none;
+    background: var(--panel-bg);
+    color: var(--color-text-muted);
+    cursor: var(--cursor-point);
+    z-index: 8;
+  }
+  #party-frames.party-present > .tf-move-btn {
+    display: block;
+  }
+  #party-frames > .tf-move-btn::before {
+    content: "\2194";
+  }
+  #party-frames > .tf-move-btn.active {
+    color: var(--gold);
+    border-color: var(--gold);
+  }
+  #party-frames.tf-unlocked {
+    cursor: move;
+    outline: 1px dashed var(--gold);
+    outline-offset: 4px;
+    touch-action: none;
+  }
+  body.party-frame-dragging,
+  body.party-frame-dragging * {
+    user-select: none;
+  }
+  body.mobile-touch #party-frames > .tf-move-btn {
+    display: none;
+  }
   /* Glow: decorative combat outer glow scales with --fx-shadow (0 at low). */
   .party-frame.combat {
     box-shadow: 0 0 calc(7px * var(--fx-shadow, 1)) #e74c3c99;
+  }
+  .party-frame.threat {
+    border-color: var(--color-hostile);
+    box-shadow:
+      inset 0 0 0 1px var(--color-hostile),
+      0 0 calc(9px * var(--fx-shadow, 1)) var(--color-hostile);
+  }
+  .party-frame.disconnected {
+    filter: grayscale(1);
+    opacity: 0.5;
   }
   .party-frame.dead {
     opacity: 0.7;
@@ -4297,12 +4475,6 @@
       opacity: 0.4;
     }
   }
-  #party-leave {
-    font-size: 10px;
-    padding: 2px 8px;
-    margin: 0;
-  }
-
   /* ---------- context menu ---------- */
   #ctx-menu {
     position: absolute;
@@ -4592,6 +4764,54 @@
   }
   #target-frame.elite #tf-elite-tag {
     display: block;
+  }
+  /* Boss rank replaces both the creature portrait and the platform-dependent
+     Unicode glyph with one generic dragon emblem. The real numeric level stays
+     in the lower center chip, matching the classic fantasy target-frame read. */
+  #target-frame.boss .portrait-wrap::before {
+    content: "";
+    position: absolute;
+    inset: -15px;
+    z-index: 2;
+    background: url("/ui/ranks/elite-dragon-frame.webp") center / contain no-repeat;
+    pointer-events: none;
+  }
+  #target-frame.boss .tf-move-btn {
+    top: -18px;
+    right: -30px;
+  }
+  #target-frame.boss .portrait {
+    border-color: transparent;
+    outline: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  #target-frame.boss .level-chip {
+    left: 50%;
+    right: auto;
+    bottom: -7px;
+    width: 24px;
+    height: 24px;
+    border-color: var(--gold-dim);
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, #4a3a14, #241c08);
+    box-shadow:
+      0 0 0 1px var(--color-bg-deep),
+      0 0 7px color-mix(in srgb, var(--gold) 45%, transparent);
+    transform: translateX(-50%);
+    text-shadow: 1px 1px 1px #000;
+    z-index: 4;
+  }
+  #target-frame.boss #tf-elite-tag {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 
   #tf-debuffs {

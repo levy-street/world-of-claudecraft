@@ -27,6 +27,10 @@ src/admin/i18n.resolved.generated/*.tmp
 src/ui/i18n.status.json
 src/ui/i18n.status.summary.json
 
+# retired aggregate i18n sha256 baseline (superseded by the per-locale emit split);
+# must stay untracked, see tests/i18n_resolved_equivalence.test.ts
+src/ui/i18n.resolved.sha256
+
 # private extensions (e.g. bot-detector)
 private/*
 !private/.dockerkeep

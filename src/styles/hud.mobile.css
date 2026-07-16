@@ -1652,7 +1652,7 @@
      size, so a full party ate more vertical space than a landscape phone can
      spare. The adaptive double-stack now lives on the .party-rows WRAPPER (below),
      not on #party-frames itself: the container is a simple top-to-bottom column
-     (collapse chip, the rows wrapper, master-loot control, Leave button), so the
+     (collapse chip, the rows wrapper, master-loot control), so the
      chip always sits alone on its own line and no member frame can auto-flow beside
      it (the pre-wrapper grid put the chip in column 1 and flowed a member frame into
      column 1 row 2 / column 2 row 1, one of them beside the chip). */
@@ -1674,19 +1674,37 @@
      overrides the desktop display: contents (later @layer + higher specificity). */
   body.mobile-touch #party-frames .party-rows {
     display: grid;
+    zoom: 1;
+    grid-template-columns: none;
     grid-auto-flow: column;
     grid-template-rows: repeat(2, auto);
     column-gap: 4px;
     row-gap: 0;
+    max-width: calc(100dvw - max(20px, calc(env(safe-area-inset-left) + 10px)) - 10px);
+    max-height: calc(100dvh - max(8px, env(safe-area-inset-top)) - 129px);
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+  /* A real raid must not inherit the party-only two-row column flow: with nine
+     visible allies that would create five columns and run off a portrait phone.
+     Raid presentation fills two bounded columns top-to-bottom instead. */
+  body.mobile-touch #party-frames.party-style-raid .party-rows {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(2, minmax(0, calc(112px * var(--mobile-chrome-scale, 1))));
+    grid-template-rows: none;
   }
   body.mobile-touch #party-frames.below-target {
     /* +135px (was 130px): the collapse chip is the container's first child now, so keep
        it clear of the target frame's bottom edge (the same +5px nudge as landscape). */
     top: calc(max(8px, env(safe-area-inset-top)) + 135px);
   }
+  body.mobile-touch #party-frames.below-target .party-rows {
+    max-height: calc(100dvh - max(8px, env(safe-area-inset-top)) - 190px);
+  }
   /* party rows are role="button" tap targets (tap to target a member), so they
      must clear the 40x40 mobile touch floor, not the compact desktop
-     raid-frame height. Base and landscape both move 30/25px up to 40px; #party-leave too.
+     raid-frame height. Base and landscape both move 30/25px up to 40px.
      Width is trimmed from the old single-column 132px to compensate for the new
      double-stack layout (issue 1577 (2)) so two columns still fit a phone width. */
   body.mobile-touch #party-frames .party-frame {
@@ -1716,7 +1734,7 @@
      Keyed on :first-of-type (the first .party-frame div) rather than :first-child,
      because the collapse chip (a <button>) is now the container's first child, so the
      top member row is no longer :first-child; :first-of-type still selects it whether
-     or not the chip precedes it (the chip and Leave button are buttons, the rows divs). */
+     or not the chip precedes it (the chip is a button, the rows are divs). */
   body.mobile-touch #party-frames .party-frame:first-of-type {
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
@@ -1753,23 +1771,36 @@
     height: 5px;
     margin-top: 1px;
   }
-  /* Issue 1577 round 2 (2): keep the leave button a small, content-width button rather
-     than a full double-stack-width bar. It is a flex-column child of #party-frames now
-     (below the rows wrapper), left-aligned by the container's align-items: flex-start,
-     so it needs no grid placement; its own margin-top spaces it below the rows. */
-  body.mobile-touch #party-frames #party-leave {
-    width: auto;
-    min-width: 0;
+  /* The desktop .pfm-auras is an absolute bottom-right corner overlay (right:2px,
+     bottom:2px, overflow:hidden). On the compact ~40px mobile member row the 16px
+     desktop icons crowd the name/HP, so shrink them and cap the strip to a small
+     corner cluster that stays clear of the member name. Overflow:hidden and the
+     absolute positioning are inherited from the desktop rule. */
+  body.mobile-touch #party-frames .party-frame .pfm-auras {
+    max-width: 60%;
+    gap: 1px;
+  }
+  body.mobile-touch #party-frames .pfm-auras .buff {
+    width: 13px;
+    height: 13px;
+  }
+  body.mobile-touch #party-frames.party-style-raid .party-frame {
+    height: max(40px, var(--party-frame-height, 42px));
     min-height: 40px;
-    margin: 3px 0 0;
-    padding: 4px 12px;
-    border-radius: 5px;
-    font-size: 10px;
+    padding: 0;
+  }
+  body.mobile-touch #party-frames.party-style-raid .party-frame .bar.hp {
+    height: auto;
+    margin: 0;
+  }
+  body.mobile-touch #party-frames.party-style-raid .party-frame > .bar:not(.hp) {
+    height: 3px;
+    margin: 0;
   }
   /* The mobile-only collapse chip (a "Party" disclosure header) the party painter
      seats first in #party-frames while in a party on the touch HUD. Collapsed by
      default (a persisted USER choice, never a graphics-tier signal): only the chip
-     shows; the member frames + Leave button reveal when the container gains
+     shows; the member frames reveal when the container gains
      .party-expanded. The chip reuses the glass look + chevron rotate of the
      consumables toggle. Never rendered on desktop (the painter builds it only under
      body.mobile-touch), so the desktop stack is unchanged. */
@@ -1814,7 +1845,7 @@
     }
   }
   /* Expanded: the chevron points down and the frames show. On mobile the member rows
-     + Leave button show ONLY while the container carries .party-expanded, so BOTH the
+     show ONLY while the container carries .party-expanded, so BOTH the
      collapsed state (chip present, not expanded) AND the chat-yield state (chip removed
      while chat is open) hide the whole stack, leaving the chip (if present) as the only
      party UI. On desktop this rule never applies (no body.mobile-touch), so the desktop
@@ -1826,8 +1857,7 @@
   body.mobile-touch #party-frames.party-expanded #party-chip .ui-icon {
     transform: rotate(90deg);
   }
-  body.mobile-touch #party-frames:not(.party-expanded) .party-frame,
-  body.mobile-touch #party-frames:not(.party-expanded) #party-leave {
+  body.mobile-touch #party-frames:not(.party-expanded) .party-frame {
     display: none;
   }
   body.mobile-touch #buff-bar {
@@ -2409,6 +2439,7 @@
   body.mobile-touch #leaderboard-window,
   body.mobile-touch #loot-settings-window,
   body.mobile-touch #town-focus-window,
+  body.mobile-touch #dev-command-window,
   body.mobile-touch #claudium-window {
     left: 10px;
     right: 10px;
@@ -2417,6 +2448,49 @@
     transform: none;
     box-sizing: border-box;
     overflow-y: auto;
+  }
+  body.mobile-touch #dev-command-window {
+    height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
+    max-height: none;
+    overflow: hidden;
+  }
+  body.mobile-touch .dev-command-header {
+    padding: 10px 54px 9px 12px;
+  }
+  body.mobile-touch .dev-command-header h2 {
+    font-size: 20px;
+  }
+  body.mobile-touch .dev-command-header p {
+    display: none;
+  }
+  body.mobile-touch .dev-command-toolbar {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 8px 10px;
+  }
+  body.mobile-touch .dev-command-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+  body.mobile-touch .dev-command-tabs button,
+  body.mobile-touch .dev-command-run {
+    min-height: 40px;
+  }
+  body.mobile-touch .dev-command-grid {
+    grid-template-columns: 1fr;
+    padding: 9px 10px;
+  }
+  body.mobile-touch .dev-command-card {
+    min-height: 78px;
+    padding: 10px;
+  }
+  body.mobile-touch .dev-command-footer {
+    justify-content: flex-end;
+    min-height: 34px;
+    padding: 7px 10px;
+  }
+  body.mobile-touch .dev-command-footer > span {
+    display: none;
   }
   body.mobile-touch #claudium-window .cl-body {
     max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 78px);
@@ -4134,11 +4208,18 @@
       left: max(6px, env(safe-area-inset-left));
       top: calc(max(6px, env(safe-area-inset-top)) + 58px);
     }
+    body.mobile-touch #party-frames .party-rows {
+      max-width: calc(100dvw - max(6px, env(safe-area-inset-left)) - 10px);
+      max-height: calc(100dvh - max(6px, env(safe-area-inset-top)) - 113px);
+    }
     body.mobile-touch #party-frames.below-target {
       /* +105px (was 100px): the collapse chip is now the container's first child, and
          a chip crowding the scaled target frame reads as a mis-tap pair; the extra 5px
          keeps the chip clear of the target frame's bottom edge (>= 4px). */
       top: calc(max(6px, env(safe-area-inset-top)) + 105px);
+    }
+    body.mobile-touch #party-frames.below-target .party-rows {
+      max-height: calc(100dvh - max(6px, env(safe-area-inset-top)) - 160px);
     }
     /* keep the 40x40 touch floor in landscape too (was 25px); width matches the
        base double-stack tier (issue 1577 (2), a further trim from the old
@@ -4158,11 +4239,6 @@
     }
     body.mobile-touch #party-frames .party-frame .bar {
       height: 4px;
-    }
-    body.mobile-touch #party-frames #party-leave {
-      width: auto;
-      min-height: 40px;
-      font-size: 9px;
     }
     body.mobile-touch #buff-bar {
       right: calc(98px + env(safe-area-inset-right));
