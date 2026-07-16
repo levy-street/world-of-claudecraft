@@ -48,7 +48,8 @@ Most directories above have their own `CLAUDE.md` with local conventions; read i
 - `npm test`: Vitest. **Prefer a single file while iterating:** `npx vitest run tests/sim.test.ts`.
 - `npm run gate`: the full CI-equivalent pre-merge gate (i18n gen + freshness, malware scan,
   changed-files biome, SFX conformance, full tests with bounded workers, `tsc`, all builds;
-  release-tier automatically on a `release/**` branch; needs FFmpeg/ffprobe on PATH). Exit-code-safe;
+  release-tier automatically on a `release/**` branch; FFmpeg/ffprobe come from the bundled
+  ffmpeg-static/ffprobe-static packages, PATH is the fallback). Exit-code-safe;
   use it instead of an ad-hoc `&&` chain before calling a change done (piping `npm test` through
   `tail` masks its exit code, and an unbounded run flakes heavy suites under core contention).
 - `npm run build`: regen all generated artifacts (i18n, wiki content, sitemap, SFX + media

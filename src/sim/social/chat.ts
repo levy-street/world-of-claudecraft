@@ -14,14 +14,11 @@
 // at the emit site (the S3 i18n guard scans this file + chat_readouts.ts).
 
 import { type AssistCandidate, resolveAssist } from '../assist';
-import { GATHERING_PROFESSIONS } from '../content/professions';
 import { YUMI_TEMPLATE_ID } from '../content/yumi';
-import { CLASSES, ITEMS, zoneAt } from '../data';
+import { CLASSES, zoneAt } from '../data';
 import * as deedsMod from '../deeds';
+import { handleDevChat } from '../dev_commands';
 import { graveyardReadout } from '../entity_roster';
-import { enterDungeon } from '../instances/dungeons';
-import { isGatheringProfessionId, queueGatheringGrant } from '../professions/gathering';
-import { completeAllQuestsForDev } from '../quests/dev_quest_commands';
 import {
   type AwayStatus,
   JOINABLE_CHANNELS,
@@ -32,7 +29,7 @@ import {
   type SentChat,
 } from '../sim';
 import type { SimContext } from '../sim_context';
-import { dist2d, type Entity, MAX_LEVEL, type OverheadEmoteId, YELL_RANGE } from '../types';
+import { dist2d, type Entity, type OverheadEmoteId, YELL_RANGE } from '../types';
 import * as readouts from './chat_readouts';
 
 const CHAT_BURST = 8; // messages a player may send back-to-back...
@@ -572,6 +569,10 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     );
     return null;
   }
+  if (/^\/(?:dungeons|dungeon|instances)\s+reset\s*$/i.test(raw)) {
+    ctx.resetDungeonInstances(r.meta.entityId);
+    return null;
+  }
   if (/^\/(?:dungeons|dungeon|instances)(?:\s|$)/i.test(raw)) {
     ctx.error(r.meta.entityId, readouts.dungeonsReadout());
     ctx.error(
@@ -579,6 +580,10 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
       ctx.dungeonDifficulty(r.meta.entityId) === 'heroic'
         ? 'Dungeon difficulty: Heroic. Use /dungeon normal to change it.'
         : 'Dungeon difficulty: Normal. Use /dungeon heroic to change it.',
+    );
+    ctx.error(
+      r.meta.entityId,
+      'Use /dungeon reset to abandon your empty instances after changing difficulty.',
     );
     return null;
   }
@@ -761,9 +766,11 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     return { channel: 'party', message: clean };
   }
 
-  // "/g message": world-wide general channel (no pid = broadcast to all)
-  if (/^\/g(eneral)?\s/i.test(raw)) {
-    const clean = raw.replace(/^\/g(eneral)?\s+/i, '').trim();
+  // "/g message" / "/1 message": world-wide general channel (no pid = broadcast to
+  // all). "/1" is the classic numbered-channel shortcut for General; unlike "/g" it
+  // is never claimed by the online guild router, so it always reaches General.
+  if (/^\/(?:g(?:eneral)?|1)\s/i.test(raw)) {
+    const clean = raw.replace(/^\/(?:g(?:eneral)?|1)\s+/i, '').trim();
     if (!clean) return null;
     ctx.emit({
       type: 'chat',
@@ -912,178 +919,6 @@ export function chatAllowed(ctx: SimContext, pid: number): boolean {
   return true;
 }
 
-// Dev chat cheats: only when Sim.devCommands is enabled (offline local play
-// or online server with ALLOW_DEV_COMMANDS=1). Returns null when handled
-// (no channel message), or undefined when not a dev command.
-export function handleDevChat(
-  ctx: SimContext,
-  raw: string,
-  pid: number,
-): SentChat | null | undefined {
-  const levelM = /^\/(?:dev\s+level|devlevel)\s+(\d+)\s*$/i.exec(raw);
-  if (levelM) {
-    const level = Number(levelM[1]);
-    ctx.setPlayerLevel(level, pid);
-    ctx.emit({
-      type: 'log',
-      text: `[dev] Level set to ${Math.max(1, Math.min(MAX_LEVEL, level))}.`,
-      pid,
-    });
-    return null;
-  }
-  const tpM = /^\/(?:dev\s+tp|devtp)\s+(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)\s*$/i.exec(raw);
-  if (tpM) {
-    const e = ctx.entities.get(pid);
-    if (e) {
-      const p = ctx.groundPos(Number(tpM[1]), Number(tpM[2]));
-      e.pos = p;
-      e.prevPos = { ...p };
-      ctx.grid.update(e);
-      ctx.playerGrid.update(e);
-      ctx.emit({
-        type: 'log',
-        text: `[dev] Teleported to ${p.x.toFixed(1)}, ${p.z.toFixed(1)}.`,
-        pid,
-      });
-    }
-    return null;
-  }
-  const giveM = /^\/(?:dev\s+give|devgive)\s+(\S+)(?:\s+(\d+))?\s*$/i.exec(raw);
-  if (giveM) {
-    const itemId = giveM[1];
-    const count = Math.max(1, Math.min(20, Number(giveM[2] ?? 1)));
-    if (!ITEMS[itemId]) {
-      ctx.error(pid, `[dev] Unknown item '${itemId}'.`);
-      return null;
-    }
-    ctx.addItem(itemId, count, pid);
-    return null;
-  }
-  const goldM = /^\/(?:dev\s+gold|devgold)\s+(\d+)\s*$/i.exec(raw);
-  if (goldM) {
-    const gold = Math.max(1, Math.min(100000, Number(goldM[1])));
-    const meta = ctx.players.get(pid);
-    if (meta) {
-      meta.copper += gold * 10000;
-      ctx.emit({ type: 'log', text: `[dev] Added ${gold}g to your purse.`, pid });
-    }
-    return null;
-  }
-  const questM = /^\/(?:dev\s+quest|devquest)\s+(\S+)\s*$/i.exec(raw);
-  if (questM) {
-    ctx.completeQuestForDev(questM[1], pid);
-    return null;
-  }
-  const questAllM = /^\/(?:dev\s+(?:quests|questall)|devquestall)\s*$/i.exec(raw);
-  if (questAllM) {
-    ctx.completeCurrentQuestsForDev(pid);
-    return null;
-  }
-  const gatherM = /^\/(?:dev\s+gather|devgather)\s+(\S+)(?:\s+(\d+))?\s*$/i.exec(raw);
-  if (gatherM) {
-    const professionId = gatherM[1].toLowerCase();
-    const amount = Math.max(1, Math.min(100, Number(gatherM[2] ?? 1)));
-    if (!isGatheringProfessionId(professionId)) {
-      ctx.error(
-        pid,
-        `[dev] Unknown gathering profession '${professionId}'. Options: ${Object.keys(GATHERING_PROFESSIONS).join(', ')}.`,
-      );
-      return null;
-    }
-    const meta = ctx.players.get(pid);
-    if (meta) queueGatheringGrant(meta, professionId, amount);
-    return null;
-  }
-  const botM = /^\/(?:dev\s+bot|devbot)\s+(\S+)\s*$/i.exec(raw);
-  if (botM) {
-    const botName = botM[1];
-    const botPid = ctx.spawnDevBot(botName);
-    // Dev-only English diagnostics, routed through vars so they read as dev-channel
-    // text (like the other /dev feedback) rather than localizable UI copy.
-    const okText = `[dev] Spawned ${botName}. Whisper it: /w ${botName} hi (or right-click its name).`;
-    const failText = `[dev] Could not spawn '${botName}' (name blank or already in use).`;
-    if (botPid < 0) ctx.error(pid, failText);
-    else ctx.emit({ type: 'log', text: okText, pid });
-    return null;
-  }
-  const lfgM = /^\/(?:dev\s+lfg|devlfg)(?:\s+(\S+))?\s*$/i.exec(raw);
-  if (lfgM) {
-    const mode = (lfgM[1] ?? 'queue').toLowerCase();
-    // Dev-only English diagnostics, routed through vars so they read as
-    // dev-channel text (matching the /dev bot arm above).
-    if (mode !== 'queue' && mode !== 'raid' && mode !== 'board') {
-      const usageText = '[dev] Usage: /dev lfg [queue|raid|board].';
-      ctx.error(pid, usageText);
-      return null;
-    }
-    const res = ctx.seedDungeonFinderDev(mode, pid);
-    const okText = `[dev] Spawned ${res.spawned} finder bots (${mode}). Open the Dungeon Finder to play the flow.`;
-    const rolesText =
-      '[dev] Pick your Dungeon Finder role first (Quick Match tab), then rerun /dev lfg.';
-    const noneText = '[dev] No finder activity matches your current level band.';
-    const text =
-      res.note === 'needRoles' ? rolesText : res.note === 'noneEligible' ? noneText : okText;
-    if (res.note === 'ok') ctx.emit({ type: 'log', text, pid });
-    else ctx.error(pid, text);
-    return null;
-  }
-  if (/^\/(?:dev\s+attune|devattune)\s*$/i.test(raw)) {
-    // [dev] Mark every quest complete so all attunement / requiresQuest gates open.
-    completeAllQuestsForDev(ctx, pid);
-    return null;
-  }
-  // [dev] /dev raid [heroic|normal|reset] (also accepts "/dev tp raid <n> heroic").
-  // Zones a lone tester straight into the Nythraxis raid, bypassing the raid-group
-  // and attunement gates; "reset" clears the raid lockouts so it can be re-run.
-  const raidM = /^\/(?:dev\s+)(?:tp\s+)?raid\b\s*(.*)$/i.exec(raw);
-  if (raidM) {
-    const rest = raidM[1].toLowerCase();
-    const meta = ctx.players.get(pid);
-    if (/\breset\b/.test(rest)) {
-      if (meta) meta.raidLockouts.clear();
-      ctx.emit({ type: 'log', text: '[dev] Raid lockouts cleared.', pid });
-      return null;
-    }
-    const difficulty = /\bnormal\b/.test(rest) ? 'normal' : 'heroic';
-    ctx.setDungeonDifficulty(difficulty, pid);
-    enterDungeon(ctx, 'nythraxis_boss_arena', pid, true);
-    ctx.emit({ type: 'log', text: `[dev] Entering Nythraxis raid (${difficulty}).`, pid });
-    return null;
-  }
-  if (/^\/(?:dev\s+god|devgod)\s*$/i.test(raw)) {
-    // [dev] Toggle god mode: invulnerable (target.devGod in dealDamage) and 100x
-    // outgoing damage (dev-gated), so a solo tester can survive and down raid bosses
-    // to inspect their drops. Enabling also tops off health and resource. Uses its
-    // OWN devGod flag, never the production gm flag, so it can never touch a real GM.
-    const e = ctx.entities.get(pid);
-    if (e) {
-      e.devGod = !e.devGod;
-      if (e.devGod) {
-        e.hp = e.maxHp;
-        e.resource = e.maxResource;
-      }
-      ctx.emit({ type: 'log', text: `[dev] God mode ${e.devGod ? 'ON' : 'OFF'}.`, pid });
-    }
-    return null;
-  }
-  if (/^\/(?:dev\s+(?:kill|die|suicide)|devkill)\s*$/i.test(raw)) {
-    // [dev] Instant self-kill for testing the death/ghost loop: routes through the real
-    // death teardown (handleDeath), so the death overlay, corpse, and The Keeper's Toll
-    // persistence all behave exactly as a combat death.
-    const e = ctx.entities.get(pid);
-    if (e && !e.dead) ctx.handleDeath(e, null);
-    return null;
-  }
-  if (/^\/dev(?:\s|$)/i.test(raw)) {
-    ctx.error(
-      pid,
-      'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count], /dev gold N, /dev quest questId, /dev quests, /dev attune, /dev gather professionId [amount], /dev bot name, /dev vendor, /dev god, /dev raid [heroic|normal|reset], /dev kill',
-    );
-    return null;
-  }
-  return undefined;
-}
-
 export function whisperMessageForName(
   rest: string,
   name: string,
@@ -1097,6 +932,8 @@ export function whisperMessageForName(
   const message = rest.slice(name.length).trim();
   return message ? message : null;
 }
+
+export { handleDevChat } from '../dev_commands';
 
 export function resolveWhisperTarget(
   ctx: SimContext,

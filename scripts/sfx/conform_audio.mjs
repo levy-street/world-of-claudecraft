@@ -103,7 +103,18 @@ export function measureSfxLufs(file, ffmpegPath) {
   return Number.parseFloat(value);
 }
 
-const LONG_FORM_LIMIT_DB = -1;
+// MP3 encoding can push a clip's TRUE peak (the oversampled, post-decode
+// reconstruction peak measured below) above whatever peak the pre-encode PCM
+// signal fed to the encoder actually had; this is the standard lossy-codec
+// inter-sample-overshoot problem, not specific to this pipeline. The
+// pre-encode limiter ceiling therefore needs real headroom below the actual
+// enforced target (TARGET_PEAK_DBFS, verified post-encode below), not a
+// magic number decoupled from it: previously this was a hardcoded -1dBFS,
+// which was a safe distant ceiling only while TARGET_PEAK_DBFS sat far below
+// it (-6dBFS); raising the target closer to -1dBFS would silently let
+// LUFS-target (>=1s) clips clip on real playback, since this branch never
+// re-measured its own post-encode true peak (see the loop below, now fixed).
+const LONG_FORM_LIMIT_DB = TARGET_PEAK_DBFS - 1;
 const LONG_FORM_LIMIT = Number((10 ** (LONG_FORM_LIMIT_DB / 20)).toFixed(8));
 
 function filterNumber(value) {
@@ -187,8 +198,16 @@ export function conformSfxAudio({
     `.${basename(outputFile, extname(outputFile))}.${process.pid}.${randomBytes(6).toString('hex')}.tmp.mp3`,
   );
   const attempts = [];
+  let bestPeakSafeAttempt = null;
+  // A peak-overshoot correction (below) spends an attempt purely pulling
+  // gain down rather than converging LUFS, so the lufs branch gets a larger
+  // budget than the simpler peak branch: without it, a file whose peak only
+  // transiently overshoots mid-search (but has real headroom overall) could
+  // exhaust its attempts before fully reconverging and fall back to a
+  // needlessly-quiet peak-safe result instead of a real LUFS match.
+  const maxAttempts = normBranch === 'lufs' ? 40 : 16;
   try {
-    for (let attempt = 0; attempt < 16; attempt++) {
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
       const plan = buildSfxConformArgs({
         inputFile,
         outputFile: temporary,
@@ -201,9 +220,17 @@ export function conformSfxAudio({
         normBranch === 'peak'
           ? measureSfxTruePeakDb(temporary, ffmpegPath)
           : measureSfxLufs(temporary, ffmpegPath);
+      // The LUFS branch's pre-encode limiter cannot see MP3's own inter-sample
+      // overshoot, so the loudness convergence loop must independently verify
+      // the ACTUAL post-encode true peak on every attempt: peak safety is a
+      // hard ceiling that wins over hitting the loudness target exactly (a
+      // clip landing a little under TARGET_LUFS is fine; one that clips is not).
+      const measuredPeakDb =
+        normBranch === 'lufs' ? measureSfxTruePeakDb(temporary, ffmpegPath) : measuredOutput;
+      const peakOver = normBranch === 'lufs' ? measuredPeakDb - TARGET_PEAK_DBFS : 0;
       const error = target - measuredOutput;
-      attempts.push({ gainDb: filterNumber(gainDb), measuredOutput, error });
-      if (Math.abs(error) <= NORM_TOLERANCE) {
+      attempts.push({ gainDb: filterNumber(gainDb), measuredOutput, measuredPeakDb, error });
+      if (Math.abs(error) <= NORM_TOLERANCE && peakOver <= NORM_TOLERANCE) {
         renameSync(temporary, outputFile);
         return {
           outputFile,
@@ -214,10 +241,47 @@ export function conformSfxAudio({
           attempts,
         };
       }
+      // A wide-crest-factor source (a sharp transient over a quiet bed) can
+      // make TARGET_LUFS structurally unreachable without breaching the peak
+      // ceiling: keep the best peak-safe candidate seen so far so the loop can
+      // fall back to it (quieter than the nominal target, never clipped)
+      // instead of hard-failing content that is safe but merely under-loud.
+      if (peakOver <= NORM_TOLERANCE) {
+        if (!bestPeakSafeAttempt || measuredOutput > bestPeakSafeAttempt.measuredOutput) {
+          bestPeakSafeAttempt = { gainDb, measuredOutput, measuredPeakDb };
+        }
+      }
+      if (peakOver > NORM_TOLERANCE) {
+        // Peak is the binding constraint this attempt: pull gain down by the
+        // overshoot directly rather than the damped LUFS correction below,
+        // which would otherwise keep chasing loudness into more overshoot.
+        gainDb -= peakOver;
+        continue;
+      }
       // MP3 true-peak measurements are quantized and a limiter makes sustained
       // loudness response non-linear. A damped correction avoids oscillating
       // across the tolerance window while still converging quickly.
       gainDb += error * 0.5;
+    }
+    if (bestPeakSafeAttempt) {
+      const plan = buildSfxConformArgs({
+        inputFile,
+        outputFile: temporary,
+        duration,
+        gainDb: bestPeakSafeAttempt.gainDb,
+        channels,
+      });
+      run(ffmpegPath, plan.args);
+      renameSync(temporary, outputFile);
+      return {
+        outputFile,
+        normBranch,
+        inputLevel: measuredInput,
+        outputLevel: bestPeakSafeAttempt.measuredOutput,
+        gainDb: filterNumber(bestPeakSafeAttempt.gainDb),
+        peakLimited: true,
+        attempts,
+      };
     }
     throw new Error(
       `${normBranch} conformance did not reach ${target} within ${NORM_TOLERANCE}: ${JSON.stringify(attempts)}`,
@@ -236,7 +300,10 @@ export function inspectSfxConformance(file, { ffmpegPath, ffprobePath }) {
   if (preliminary.reject) {
     return { ...stats, isLossless, isMp3, ...preliminary, peakDb: null, lufs: null };
   }
-  const peakDb = preliminary.normBranch === 'peak' ? measureSfxTruePeakDb(file, ffmpegPath) : null;
+  // Measured for BOTH branches: the lufs branch's own loudness figure cannot
+  // reveal a true-peak overshoot (see classify's peak check below), so a
+  // LUFS-target file needs its real peak measured too, not just its LUFS.
+  const peakDb = measureSfxTruePeakDb(file, ffmpegPath);
   const lufs = preliminary.normBranch === 'lufs' ? measureSfxLufs(file, ffmpegPath) : null;
   return {
     ...stats,

@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.25.0-blue)](package.json)
+[![Version](https://img.shields.io/badge/version-0.27.0-blue)](package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -47,11 +47,13 @@ Same seed, same world, everywhere. And almost nothing is a shipped asset: the to
 - **The Ashen Coliseum**, a ranked PvP arena with 1v1 and 2v2 ladders plus a 2v2 Fiesta mode (augment pickups, a shrinking ring, first to fifteen takedowns), and the **Vale Cup**, a seasonal boarball tournament.
 - **A Book of Deeds**: an achievement journal of cosmetic titles, badge borders, and Renown, with per-zone Chronicles kept by in-world Chronicler NPCs and a lifetime leaderboard.
 - **Professions**: gathering nodes across every zone, crafting stations in town, and deeper trades to discover, feeding a player-driven **World Market** and the **Ravenpost** mail service.
-- **Real multiplayer**: parties, guilds, trading, duels, tap rights, party-split XP, whispers, away status, and a server that owns every combat roll.
+- **Real multiplayer**: parties, guilds, trading, duels, tap rights, party-split XP, whispers, away status, and a **Dungeon Finder** with role queues and premade listings.
 - **Procedural everything**: timber-framed towns, rigged creature families, painted spell icons drawn on canvas, WebAudio sound, biome weather, and real-time shadows. No 3D model files for the world.
 - **Localized into 22 locales** through a deterministic, sim-emits-keys pipeline.
+- **Full desktop apps for Windows, Linux, and macOS**, with native installers, automatic updates, and the same online world as the browser.
 - **Headless RL environment** with Gymnasium bindings, reward shaping, and a benchmark mode.
-- **Web3-native**: link a Solana wallet to show your $WOC balance and a cosmetic holder badge, fully optional and non-custodial.
+- **$WOC utility, fully optional**: link a Solana wallet for holder flair, Daily Rewards, and a discounted payment option in the cosmetic store. The game remains free to play and non-custodial.
+- **Season 1 Armory**: collect cosmetic weapon skins through the WOC Store, using Claudium purchased with fiat, SOL, or $WOC. Cosmetics never provide combat power.
 
 ## Screenshots
 
@@ -72,7 +74,7 @@ Weather is biome-driven and render-only, so it never touches the deterministic s
 
 ## Play it
 
-You have two ways in, and they run the same world.
+Play in your browser or install the full desktop app for Windows, Linux, or macOS. Every client connects to the same online world.
 
 ### Offline, in your browser
 
@@ -87,9 +89,11 @@ Name your character, pick any of the nine classes, and you start in **Eastbrook 
 
 See [Host your own world](#host-your-own-world-one-command) below to stand up the real client/server game with accounts and persistent characters.
 
-### Desktop app
+### Desktop apps for Windows, Linux, and macOS
 
-The Electron desktop shell wraps the same Vite client. Online sign-in is Discord and email only, exactly the web flow: email/password logs in inside the app, and "Continue with Discord" opens your default browser on the `/desktop-login` page, which hands a one-time code back to the app over a `worldofclaudecraft://` deep link that the app exchanges for a normal World of ClaudeCraft session token.
+World of ClaudeCraft ships as full desktop apps for all three major desktop platforms: signed Windows installers, Linux AppImage and deb packages, and signed and notarized universal macOS builds. They use the same game client and online world as the browser, with native packaging and automatic updates.
+
+Online sign-in is Discord and email only, exactly the web flow: email/password logs in inside the app, and "Continue with Discord" opens your default browser on the `/desktop-login` page, which hands a one-time code back to the app over a `worldofclaudecraft://` deep link that the app exchanges for a normal World of ClaudeCraft session token.
 
 ```bash
 npm run electron:dev          # Vite + Electron dev shell
@@ -169,7 +173,13 @@ The protocol and bindings are documented in `headless/CLAUDE.md` and `python/CLA
 
 World of ClaudeCraft is web3-native around **$WOC**, our community token on Solana. Connect a Solana wallet, link it to your account with one signature (non-custodial, no transaction to approve), and your read-only $WOC balance shows up in the HUD alongside a cosmetic holder-tier badge.
 
-It is cosmetic only and not needed to play. Nothing is spent or earned in-game, there is no pay-to-win, and the whole game plays fine without ever connecting a wallet.
+$WOC also has optional utility in the live game:
+
+- **WOC Store**: buy Claudium, the one-way cosmetic currency, with fiat, SOL, or $WOC. The $WOC payment rail receives a service-quoted discount.
+- **Season 1 Armory**: spend Claudium on cosmetic weapon-skin collections. Store purchases do not add stats or combat power.
+- **Daily Rewards**: eligible verified holders can earn points through a daily spin and rotating tasks, then compete for a share of the daily prize pool.
+
+None of this is needed to play. Wallet linking is optional and non-custodial, there is no pay-to-win, and the whole game plays fine without ever connecting a wallet.
 
 **$WOC contract address (Solana):**
 
@@ -222,6 +232,7 @@ Press `G` or the arena button to queue. Matchmaking teleports fighters into a pr
 
 ### Playing together
 
+- **Dungeon Finder**: open it with `Shift+I` to browse dungeons and raids, inspect bosses and loot, join an automatic tank/healer/DPS role queue, or create a premade listing. Finder-made groups still travel to the entrance together.
 - **Parties** up to 5: right-click a player and Invite to Party. Members share tap rights and quest credit, split XP with the classic-era group bonuses (1.166 / 1.3 / 1.43 for 3/4/5), and show up as blips on the minimap. `/p` for party chat, `/roll` to settle loot.
 - **Trading**: right-click and Trade. Both sides stage items and money, both must accept, and the swap is atomic and server-validated. Quest items cannot be traded, and walking apart cancels.
 - **Duels**: right-click and Challenge to a Duel. A 3-second countdown, then fight until one side hits 1 hp; the winner is announced zone-wide and running 60 yards away forfeits.
@@ -233,7 +244,8 @@ Press `G` or the arena button to queue. Matchmaking teleports fighters into a pr
 - **The World Market**: a player-driven auction house for gear, materials, and consumables, browsable from the hub towns.
 - **Ravenpost mail**: send items and coin to other characters, with attachments held safely until claimed.
 - **Guilds**: charters, rosters, ranks, and guild chat.
-- **Daily rewards**: a login streak with escalating chests.
+- **Daily Rewards**: verified $WOC holders can earn leaderboard points from a daily spin and rotating tasks, with automatic payouts from the daily prize pool.
+- **WOC Store and Season 1 Armory**: buy Claudium with fiat, SOL, or $WOC, then spend it on purely cosmetic weapon skins.
 - **Eating and drinking**: sit to restore over 18 seconds, broken by damage or standing, and yes, you can eat and drink at once.
 - **Vendors** that buy food and water and sell honest white gear, with coin shown in gold, silver, and copper.
 - **A personal bank** (the Gilded Strongbox): bursars in each hub town keep a vault per character, from 24 slots up to 96 with coin-bought expansions, plus bonus slots earned online for a verified email, linked accounts, and referrals.
@@ -253,7 +265,8 @@ Press `G` or the arena button to queue. Matchmaking teleports fighters into a pr
 | `Tab` | cycle nearest enemies. left-click to target, right-click to attack, loot, or talk |
 | `1`-`9`, `0`, `-`, `=` | action bar |
 | `F` | interact (loot a corpse, pick up an object, talk) |
-| `C` `P` `L` `M` `B` `G` `Shift+Z` | character, spellbook, quest log, world map, bags, arena, deeds |
+| `C` `P` `L` `M` `B` `G` `Shift+I` `Shift+Z` | character, spellbook, quest log, world map, bags, arena, Dungeon Finder, deeds |
+| `Z` | sheath or draw your weapons |
 | `V` / `R` / `Esc` | nameplates, autorun, close windows or clear target |
 
 Touch controls (a movement stick, camera drag, and on-screen action buttons) come up automatically on mobile.
@@ -301,11 +314,13 @@ And almost none of it is a shipped asset. The world is drawn from code:
 
 ## Development
 
-The SFX conformance checks (`npm run sfx:check`) and the audio tests use the bundled
-`ffmpeg-static`/`ffprobe-static` npm packages, so `npm test` needs no system install. The SFX
-Studio and the audio generator scripts shell out to `ffmpeg` on `PATH`, and `npm run gate`
-checks for it up front: install FFmpeg with your platform package manager before running the
-gate or the Studio.
+All FFmpeg consumers use the bundled `ffmpeg-static`/`ffprobe-static` npm packages, so no
+system FFmpeg install is needed. The conformance-measuring paths (`npm run sfx:check`, the
+audio tests, the Studio's export validation) bind to the static binaries directly, with no
+`PATH` fallback: rerun `npm ci` if a scripts-skipped install left them missing. The Studio's
+playback/encode spawns and the `npm run gate` preflight resolve via
+`scripts/sfx/ffmpeg_paths.mjs`, which does fall back to `PATH`. Some standalone audio
+generator scripts (for example `scripts/gen_ui_sfx.mjs`) still default to `PATH` `ffmpeg`.
 
 ```bash
 npm test                        # vitest: formulas, combat, AI, quests, all 9 classes, parties, duels, trades, dungeons

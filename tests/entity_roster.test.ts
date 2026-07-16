@@ -97,6 +97,7 @@ function makeCtx() {
       return dungeonDoorIds;
     },
     instances: [],
+    dungeonResetLocks: new Map(),
     get arenaMatches() {
       return arenaMatches;
     },
@@ -201,6 +202,8 @@ function makeCtx() {
     instanceClaimIdAt: vi.fn(() => null),
     enterDungeon: vi.fn(),
     leaveDungeon: vi.fn(),
+    resetDungeonInstances: vi.fn(),
+    inheritDungeonResetLocks: vi.fn(),
     dungeonDifficulty: vi.fn(() => 'normal' as const),
     setDungeonDifficulty: vi.fn(),
     awardHeroicMarks: vi.fn(),

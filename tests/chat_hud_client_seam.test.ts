@@ -18,12 +18,12 @@ describe('Hud to ClientWorld chat seam', () => {
     const hud = Object.create(Hud.prototype) as InstanceType<typeof Hud>;
     const state = hud as unknown as {
       activeChatTab: string;
-      stickyChannel: string;
+      stickyTarget: string;
       pendingChatLinks: readonly unknown[];
       chatInputTintTarget(): string;
     };
     state.activeChatTab = 'all';
-    state.stickyChannel = 'say';
+    state.stickyTarget = 'say';
     state.pendingChatLinks = [];
 
     const sent: unknown[] = [];
@@ -38,5 +38,31 @@ describe('Hud to ClientWorld chat seam', () => {
     client.chat(hud.composeChatSend('hello nearby players'));
 
     expect(sent).toEqual([{ t: 'cmd', cmd: 'chat', text: '/say hello nearby players' }]);
+  });
+
+  it('stays on the last channel sent, including a whisper reply (v0.26.0 regression)', () => {
+    vi.stubGlobal('WebSocket', { OPEN: 1 });
+    const hud = Object.create(Hud.prototype) as InstanceType<typeof Hud>;
+    const state = hud as unknown as {
+      activeChatTab: string;
+      stickyTarget: string;
+      pendingChatLinks: readonly unknown[];
+      chatInputTintTarget(): string;
+      noteSentChannel(line: string): void;
+    };
+    state.activeChatTab = 'all';
+    state.stickyTarget = 'say';
+    state.pendingChatLinks = [];
+
+    // Send in party: the sticky target follows there.
+    state.noteSentChannel(hud.composeChatSend('/p on my way'));
+    expect(state.stickyTarget).toBe('party');
+
+    // Reply to a whisper: the sticky target follows to whisper, and the NEXT plain
+    // line keeps replying (/r) instead of snapping back to party (the regression).
+    state.noteSentChannel(hud.composeChatSend('/r sure thing'));
+    expect(state.stickyTarget).toBe('whisper');
+    expect(hud.composeChatSend('and thanks')).toBe('/r and thanks');
+    expect(state.chatInputTintTarget()).toBe('whisper');
   });
 });

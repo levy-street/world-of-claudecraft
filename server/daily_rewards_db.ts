@@ -104,7 +104,7 @@ export interface DailyRewardWinnerAnnouncement {
 }
 
 export interface DailyRewardDb {
-  banForAccount(accountId: number): Promise<{ reason: string } | null>;
+  banForAccount(accountId: number): Promise<{ reason: string; expiresAt: string | null } | null>;
   ensureDay(day: string, prizePoolUsd: number, wocUsdPrice: number | null): Promise<void>;
   seedTasks(day: string, tasks: DailyRewardTaskSeed[]): Promise<void>;
   tasksForAccount(day: string, accountId: number): Promise<DailyRewardTaskRow[]>;
@@ -248,12 +248,38 @@ function scoreRow(row: Record<string, unknown>): DailyRewardScoreRow {
 }
 
 export class PgDailyRewardDb implements DailyRewardDb {
-  async banForAccount(accountId: number): Promise<{ reason: string } | null> {
+  async banForAccount(
+    accountId: number,
+  ): Promise<{ reason: string; expiresAt: string | null } | null> {
     const res = await pool.query(
-      'SELECT reason FROM daily_reward_excluded_accounts WHERE account_id = $1 LIMIT 1',
+      `SELECT reason, expires_at
+         FROM (
+           SELECT reason, expires_at, 0 AS priority
+             FROM daily_reward_bans
+            WHERE account_id = $1
+              AND (expires_at IS NULL OR expires_at > now())
+           UNION ALL
+           SELECT ib.reason, NULL::timestamptz AS expires_at, 1 AS priority
+             FROM accounts a
+             JOIN daily_reward_ip_bans ib
+               ON ib.ip_address = a.last_login_ip
+               OR EXISTS (
+                 SELECT 1
+                   FROM play_sessions ps
+                  WHERE ps.account_id = a.id AND ps.ip_address = ib.ip_address
+               )
+            WHERE a.id = $1
+         ) restrictions
+        ORDER BY priority
+        LIMIT 1`,
       [accountId],
     );
-    return res.rows[0] ? { reason: String(res.rows[0].reason) } : null;
+    return res.rows[0]
+      ? {
+          reason: String(res.rows[0].reason),
+          expiresAt: dateString(res.rows[0].expires_at),
+        }
+      : null;
   }
 
   async ensureDay(day: string, prizePoolUsd: number, wocUsdPrice: number | null): Promise<void> {
