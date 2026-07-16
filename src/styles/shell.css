@@ -2456,6 +2456,52 @@
     gap: 8px;
     flex: 0 0 auto;
   }
+  /* Delete character: a QUIET icon affordance, deliberately not a .btn and not the
+     red .btn-danger it used to be. It sits after the primary action (Enter World /
+     Take Over / Rename), so neither the eye nor the tab order reaches it first, and
+     it only takes on its danger tint once hovered or focused. The type-the-name
+     confirm modal is still the safety net; this just stops the control from baiting
+     the reflex click. */
+  .char-delete-btn {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    color: var(--color-text-muted);
+    opacity: 0.5;
+    cursor: pointer;
+    transition:
+      color 0.12s,
+      background 0.12s,
+      border-color 0.12s,
+      opacity 0.12s;
+  }
+  .char-delete-btn .ui-icon {
+    width: 16px;
+    height: 16px;
+  }
+  .char-delete-btn:hover:not(:disabled),
+  .char-delete-btn:focus-visible {
+    opacity: 1;
+    color: #e0705f;
+    border-color: rgba(214, 74, 61, 0.55);
+    background: rgba(90, 23, 20, 0.35);
+  }
+  .char-delete-btn:disabled {
+    opacity: 0.22;
+    cursor: not-allowed;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .char-delete-btn {
+      transition: none;
+    }
+  }
   .char-row .char-inworld-hint {
     display: block;
     color: #ffbf66;
@@ -3117,6 +3163,9 @@
     body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-actions .btn {
       width: 100%;
       white-space: nowrap;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-delete-btn {
+      justify-self: end;
     }
     body:not(.mobile-touch) #charselect-panel.cs-wow .class-details-grid {
       grid-template-columns: minmax(0, 1fr);
@@ -4996,7 +5045,7 @@
   }
   body.mobile-touch .char-row .char-actions {
     display: grid;
-    grid-template-columns: 0.85fr 1.15fr;
+    grid-template-columns: 1fr auto;
     gap: 7px;
     width: 100%;
   }
@@ -5005,6 +5054,13 @@
     padding: 7px 8px;
     font-size: 11px;
     white-space: nowrap;
+  }
+  /* Touch has no hover to reveal the control, so it stays legible; it keeps the
+     40x40 tap floor while staying visually quieter than the primary action. */
+  body.mobile-touch .char-delete-btn {
+    width: 40px;
+    height: 40px;
+    opacity: 0.7;
   }
   body.mobile-touch #charcreate-panel .mini-class-row,
   body.mobile-touch #offline-select .mini-class-row {
@@ -5746,7 +5802,7 @@
       flex: 1 1 auto;
       min-height: 0;
       display: grid;
-      grid-template-columns: 0.85fr 1.15fr;
+      grid-template-columns: 1fr auto;
       gap: 28px;
       align-items: stretch;
     }
@@ -5828,7 +5884,7 @@
        landscape (900-940px) and stack the grandchildren as flex items. */
     body:not(.mobile-touch) #charselect-panel {
       display: grid;
-      grid-template-columns: 0.85fr 1.15fr;
+      grid-template-columns: 1fr auto;
       grid-template-rows: auto auto minmax(0, 1fr);
       column-gap: 28px;
       row-gap: 0;
@@ -5942,7 +5998,7 @@
   body.mobile-touch #char-list .char-row .char-actions {
     grid-area: actions;
     display: grid;
-    grid-template-columns: 0.85fr 1.15fr;
+    grid-template-columns: 1fr auto;
     gap: 7px;
     width: 100%;
   }
@@ -6107,7 +6163,7 @@
     }
     body.mobile-touch #char-list .char-row .char-actions {
       display: grid;
-      grid-template-columns: 0.9fr 1.1fr;
+      grid-template-columns: 1fr auto;
       gap: 6px;
       width: 100%;
     }

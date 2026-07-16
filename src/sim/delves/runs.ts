@@ -182,6 +182,10 @@ export function clampDelveModuleBounds(
   const moduleId = run.modules[run.moduleIndex] as DelveModuleId;
   const layout = DELVE_MODULE_LAYOUTS[moduleId];
   if (!layout) return { x, z };
+  // Irregular Litany rooms are already enclosed by their exact polygon-shell
+  // OBBs. Applying the legacy rectangular clamp as well creates invisible
+  // walls across every lobe that extends beyond layout.wallX/zMin/zMax.
+  if (layout.shellPolygon?.length) return { x, z };
   const wallX = layout.wallX ?? DUNGEON_WALL_X;
   const halfX = wallX - DUNGEON_WALL_HW - r; // inner wall face minus body radius
   const zBase = delveModuleZOffset(run);
@@ -1263,6 +1267,7 @@ export function startDelveRaiseDeadChannel(
     text: `${boss.name} begins Raise Dead.`,
     color: '#f96',
     entityId: boss.id,
+    telegraph: true,
   });
   return true;
 }

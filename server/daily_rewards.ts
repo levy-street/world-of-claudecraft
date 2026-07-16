@@ -9,7 +9,14 @@ import type {
   DailyRewardSpinResult,
   DailyRewardStatus,
 } from '../src/world_api';
-import { type DailyRewardDb, type DailyRewardTaskSeed, PgDailyRewardDb } from './daily_rewards_db';
+import {
+  type DailyRewardDb,
+  type DailyRewardInternalPayoutRow,
+  type DailyRewardPayoutActor,
+  type DailyRewardPayoutAttemptRow,
+  type DailyRewardTaskSeed,
+  PgDailyRewardDb,
+} from './daily_rewards_db';
 import { accountAndScopeForToken, moderationStatusForAccount, walletForAccount } from './db';
 import { ctxAccountId } from './http/context';
 import { type BearerActiveGuardDb, createActiveGuard } from './http/middleware/bearer_active_guard';
@@ -84,6 +91,7 @@ interface Eligibility {
   eligible: boolean;
   reason: 'eligible' | 'no_wallet' | 'under_minimum' | 'price_unavailable' | 'banned';
   banReason: string | null;
+  banExpiresAt: string | null;
   walletPubkey: string | null;
   wocBalance: number | null;
   wocUsdPrice: number | null;
@@ -225,6 +233,13 @@ function fallbackRuntimeConfig(): DailyRewardRuntimeConfig {
   };
 }
 
+function featuredDailyRewardTaskName(config: DailyRewardRuntimeConfig): string {
+  const [task] = config.tasks
+    .filter((candidate) => candidate.active !== false)
+    .sort((left, right) => left.sortOrder - right.sortOrder);
+  return task?.title ?? DEFAULT_TASKS[0].title;
+}
+
 function parseRuntimeConfigPayload(payload: unknown): DailyRewardRuntimeConfig {
   const record = payload && typeof payload === 'object' ? (payload as Record<string, unknown>) : {};
   const fallback = fallbackRuntimeConfig();
@@ -347,6 +362,10 @@ async function dailyRewardClock(now = new Date()): Promise<{
   return { day, config: await dailyRewardRuntimeConfig(day) };
 }
 
+export async function currentDailyRewardDay(now = new Date()): Promise<string> {
+  return (await dailyRewardClock(now)).day;
+}
+
 async function prizePoolSol(config: DailyRewardRuntimeConfig): Promise<number | null> {
   if (config.prizePoolSol !== null) return config.prizePoolSol;
   if (config.solUsdPrice === null) return null;
@@ -364,6 +383,7 @@ export async function dailyRewardEligibility(
       eligible: false,
       reason: 'no_wallet',
       banReason: null,
+      banExpiresAt: null,
       walletPubkey: null,
       wocBalance: null,
       wocUsdPrice: runtimeConfig.wocUsdPrice,
@@ -380,6 +400,7 @@ export async function dailyRewardEligibility(
       eligible: false,
       reason: 'price_unavailable',
       banReason: null,
+      banExpiresAt: null,
       walletPubkey: wallet.pubkey,
       wocBalance: balance,
       wocUsdPrice: price,
@@ -392,6 +413,7 @@ export async function dailyRewardEligibility(
     eligible: usdValue >= runtimeConfig.minUsd,
     reason: usdValue >= runtimeConfig.minUsd ? 'eligible' : 'under_minimum',
     banReason: null,
+    banExpiresAt: null,
     walletPubkey: wallet.pubkey,
     wocBalance: balance,
     wocUsdPrice: price,
@@ -578,6 +600,7 @@ export class DailyRewardService {
         eligible: false,
         reason: 'banned',
         banReason: ban.reason,
+        banExpiresAt: ban.expiresAt,
         walletPubkey: null,
         wocBalance: null,
         wocUsdPrice: config.wocUsdPrice,
@@ -990,7 +1013,23 @@ export class DailyRewardService {
 
   async discordWinnerAnnouncements(limit = 1): Promise<unknown> {
     await this.finalizePreviousDay();
-    return { days: await this.db.unannouncedWinnerDays(limit) };
+    const days = await this.db.unannouncedWinnerDays(limit);
+    const rewardDays = [...new Set(days.flatMap((day) => [day.day, addRewardDays(day.day, 1)]))];
+    const taskNames = new Map(
+      await Promise.all(
+        rewardDays.map(
+          async (day) =>
+            [day, featuredDailyRewardTaskName(await dailyRewardRuntimeConfig(day))] as const,
+        ),
+      ),
+    );
+    return {
+      days: days.map((day) => ({
+        ...day,
+        taskName: taskNames.get(day.day) ?? DEFAULT_TASKS[0].title,
+        nextTaskName: taskNames.get(addRewardDays(day.day, 1)) ?? DEFAULT_TASKS[0].title,
+      })),
+    };
   }
 
   async markDiscordWinnersAnnounced(
@@ -1012,12 +1051,19 @@ export class DailyRewardService {
     await this.db.finalizeDay(previous, config.prizePoolUsd, DAILY_REWARD_SPLITS);
   }
 
-  async pendingPayouts(limit = 20): Promise<unknown> {
+  async pendingPayouts(limit = 20, day?: string): Promise<unknown> {
     await this.finalizePreviousDay();
-    return { payouts: await this.db.pendingPayouts(limit) };
+    return { payouts: await this.db.pendingPayouts(limit, day) };
   }
 
-  async markPayout(body: unknown): Promise<{ ok: true } | { error: string; status: number }> {
+  async markPayout(body: unknown): Promise<
+    | {
+        ok: true;
+        payout?: DailyRewardInternalPayoutRow;
+        attempt?: DailyRewardPayoutAttemptRow;
+      }
+    | { error: string; status: number }
+  > {
     const record = body && typeof body === 'object' ? (body as Record<string, unknown>) : {};
     const day = typeof record.day === 'string' ? record.day : '';
     const rank = Number(record.rank);
@@ -1027,11 +1073,123 @@ export class DailyRewardService {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || !Number.isInteger(rank) || rank < 1 || rank > 10) {
       return { error: 'invalid payout target', status: 400 };
     }
-    if (status !== 'paid' && status !== 'failed')
+    if (
+      !['processing', 'paid', 'failed', 'resend_processing', 'resent', 'resend_failed'].includes(
+        status,
+      )
+    )
       return { error: 'invalid payout status', status: 400 };
+    if (
+      ['processing', 'paid', 'resend_processing', 'resent', 'resend_failed'].includes(status) &&
+      !txSignature
+    ) {
+      return { error: 'transaction signature is required', status: 400 };
+    }
+    const signedTransaction =
+      typeof record.signedTransaction === 'string' ? record.signedTransaction : null;
+    if (signedTransaction && signedTransaction.length > 5000) {
+      return { error: 'signed transaction is too large', status: 400 };
+    }
+    const operationId = typeof record.operationId === 'string' ? record.operationId.trim() : '';
+    if (status.startsWith('resend') || status === 'resent') {
+      if (!/^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$/.test(operationId)) {
+        return { error: 'valid resend operation id is required', status: 400 };
+      }
+    }
+    if (status === 'processing') {
+      const result = await this.db.claimPayout(day, rank, txSignature as string, signedTransaction);
+      if (result.outcome === 'not_found') return { error: 'payout not found', status: 404 };
+      if (result.outcome === 'invalid_status') {
+        return { error: 'payout cannot be claimed', status: 409 };
+      }
+      return { ok: true, payout: result.payout };
+    }
+    if (status === 'resend_processing') {
+      const result = await this.db.claimPayoutResend(
+        day,
+        rank,
+        operationId,
+        txSignature as string,
+        signedTransaction,
+      );
+      if (result.outcome === 'not_found') return { error: 'paid payout not found', status: 404 };
+      if (result.outcome === 'invalid_status') {
+        return { error: 'only paid payouts can be resent', status: 409 };
+      }
+      return { ok: true, attempt: result.attempt };
+    }
+    if (status === 'resent' || status === 'resend_failed') {
+      const ok = await this.db.markPayoutResend(
+        day,
+        rank,
+        operationId,
+        status === 'resent' ? 'paid' : 'failed',
+        txSignature as string,
+        error,
+      );
+      return ok ? { ok: true } : { error: 'resend attempt not found', status: 404 };
+    }
     const ok = await this.db.markPayout(day, rank, status, txSignature, error);
     return ok ? { ok: true } : { error: 'payout not found', status: 404 };
   }
+
+  async voidPayout(
+    body: unknown,
+  ): Promise<
+    { ok: true; payout: DailyRewardInternalPayoutRow } | { error: string; status: number }
+  > {
+    const record = body && typeof body === 'object' ? (body as Record<string, unknown>) : {};
+    const target = payoutModerationTarget(record);
+    if ('error' in target) return target;
+    const reason = typeof record.reason === 'string' ? record.reason.trim() : '';
+    if (reason.length < 3 || reason.length > 500) {
+      return { error: 'invalid void reason', status: 400 };
+    }
+    const actor = payoutModerationActor(record);
+    if (!actor) return { error: 'invalid payout actor', status: 400 };
+    const result = await this.db.voidPayout(target.day, target.rank, reason, actor);
+    if (result.outcome === 'not_found') return { error: 'payout not found', status: 404 };
+    if (result.outcome === 'invalid_status') {
+      return { error: 'payout cannot be voided', status: 409 };
+    }
+    return { ok: true, payout: result.payout };
+  }
+
+  async restorePayout(
+    body: unknown,
+  ): Promise<
+    { ok: true; payout: DailyRewardInternalPayoutRow } | { error: string; status: number }
+  > {
+    const record = body && typeof body === 'object' ? (body as Record<string, unknown>) : {};
+    const target = payoutModerationTarget(record);
+    if ('error' in target) return target;
+    const actor = payoutModerationActor(record);
+    if (!actor) return { error: 'invalid payout actor', status: 400 };
+    const result = await this.db.restorePayout(target.day, target.rank, actor);
+    if (result.outcome === 'not_found') return { error: 'payout not found', status: 404 };
+    if (result.outcome === 'invalid_status') {
+      return { error: 'payout cannot be restored', status: 409 };
+    }
+    return { ok: true, payout: result.payout };
+  }
+}
+
+function payoutModerationTarget(
+  record: Record<string, unknown>,
+): { day: string; rank: number } | { error: string; status: 400 } {
+  const day = typeof record.day === 'string' ? record.day : '';
+  const rank = Number(record.rank);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || !Number.isInteger(rank) || rank < 1 || rank > 10) {
+    return { error: 'invalid payout target', status: 400 };
+  }
+  return { day, rank };
+}
+
+function payoutModerationActor(record: Record<string, unknown>): DailyRewardPayoutActor | null {
+  const id = typeof record.actorId === 'string' ? record.actorId.trim() : '';
+  const username = typeof record.actorUsername === 'string' ? record.actorUsername.trim() : '';
+  if (!id || id.length > 200 || !username || username.length > 100) return null;
+  return { id, username };
 }
 
 function secretsMatch(actual: string, expected: string): boolean {
@@ -1100,8 +1258,14 @@ export async function handleDailyRewardInternalApi(
     return true;
   }
   if (req.method === 'POST' && url.pathname === '/internal/daily-rewards/pending-payouts') {
+    const requestedDay = url.searchParams.get('day');
+    if (requestedDay !== null && !/^\d{4}-\d{2}-\d{2}$/.test(requestedDay)) {
+      json(res, 400, { success: false, data: null, error: 'invalid reward day' });
+      return true;
+    }
     const data = await dailyRewardService.pendingPayouts(
       Number(url.searchParams.get('limit')) || DAILY_OPS_PENDING_PAYOUTS_LIMIT,
+      requestedDay ?? undefined,
     );
     json(res, 200, { success: true, data, error: null });
     return true;
@@ -1131,6 +1295,24 @@ export async function handleDailyRewardInternalApi(
     else json(res, 200, { success: true, data: result, error: null });
     return true;
   }
+  if (req.method === 'POST' && url.pathname === '/internal/daily-rewards/void-payout') {
+    const result = await dailyRewardService.voidPayout(await readBody(req));
+    if ('error' in result) {
+      json(res, result.status, { success: false, data: null, error: result.error });
+    } else {
+      json(res, 200, { success: true, data: result, error: null });
+    }
+    return true;
+  }
+  if (req.method === 'POST' && url.pathname === '/internal/daily-rewards/restore-payout') {
+    const result = await dailyRewardService.restorePayout(await readBody(req));
+    if ('error' in result) {
+      json(res, result.status, { success: false, data: null, error: result.error });
+    } else {
+      json(res, 200, { success: true, data: result, error: null });
+    }
+    return true;
+  }
   json(res, 404, { success: false, data: null, error: 'unknown endpoint' });
   return true;
 }
@@ -1145,6 +1327,8 @@ export async function handleDailyRewardInternalApi(
 //   POST /internal/daily-rewards/payout-history    payout service ops
 //   POST /internal/daily-rewards/leaderboard       payout service ops
 //   POST /internal/daily-rewards/mark-payout       payout service ops
+//   POST /internal/daily-rewards/void-payout       payout moderation ops
+//   POST /internal/daily-rewards/restore-payout    payout moderation ops
 // The legacy dispatch stays as the flag-off rollback path until the ladder-deletion PR: the
 // main.ts prefix arm (startsWith('/api/daily-rewards'), bearerActiveAccount
 // BEFORE delegating) for the player family, and the /internal composite
@@ -1161,7 +1345,7 @@ export async function handleDailyRewardInternalApi(
 // dailyRewardsOpsBodyValidationRemap deviation). Off-table shapes (wrong
 // method, unknown subpath, the no-slash '/api/daily-rewardsX' sibling, HEAD)
 // resolve unmatched and delegate to the ladder unchanged. v0.20.0 grew each
-// family by its paginated leaderboard read (four player + four ops routes).
+// family by its paginated leaderboard read (four player + six ops routes).
 //
 // The player guard is the shared legacy-body createActiveGuard (mirrors the
 // prefix arm's bearerActiveAccount byte-for-byte). The ops gate is the
@@ -1208,7 +1392,7 @@ export function resetDailyRewardDbForTests(): void {
 /** Full active session gate (mirrors the prefix arm's bearerActiveAccount). */
 const activeGuard = createActiveGuard(() => dailyRewardGuardDb());
 
-/** The fail-closed payout-service gate, one instance shared by the four ops routes. */
+/** The fail-closed payout-service gate, one instance shared by the six ops routes. */
 const dailyRewardOpsGate = requireInternalSecretFailClosed({
   header: DAILY_REWARD_SECRET_HEADER,
   envVar: DAILY_REWARD_SECRET_ENV,
@@ -1288,6 +1472,22 @@ export const routes: RouteDef[] = [
   {
     method: 'POST',
     path: '/internal/daily-rewards/mark-payout',
+    surface: 'internal',
+    meta: { envelope: 'admin' },
+    middleware: [dailyRewardOpsGate],
+    handler: dailyRewardOpsHandler,
+  },
+  {
+    method: 'POST',
+    path: '/internal/daily-rewards/void-payout',
+    surface: 'internal',
+    meta: { envelope: 'admin' },
+    middleware: [dailyRewardOpsGate],
+    handler: dailyRewardOpsHandler,
+  },
+  {
+    method: 'POST',
+    path: '/internal/daily-rewards/restore-payout',
     surface: 'internal',
     meta: { envelope: 'admin' },
     middleware: [dailyRewardOpsGate],

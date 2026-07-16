@@ -100,6 +100,7 @@ function idleWorld(): ActionBarWorldInput {
       gcdRemaining: 0,
       potionCdRemaining: 0,
       queuedOnSwing: null,
+      stealthed: false,
       pos: { x: 0, y: 0, z: 0 },
     },
     target: null,
@@ -119,7 +120,7 @@ function ringDescriptor(
   const slots: ActionBarSlotDescriptor[] = [];
   slots.push({
     slotIndex: 0,
-    isAttack: true,
+    isAttack: () => true,
     hasAction: () => false,
     ability: () => null,
     item: () => null,
@@ -128,7 +129,7 @@ function ringDescriptor(
   for (let i = 0; i < 5; i++) {
     slots.push({
       slotIndex: i + 1,
-      isAttack: false,
+      isAttack: () => false,
       hasAction: () => abilitiesBySourceSlot.has(sourceSlotForMobileButton(pageBox.page, i)),
       ability: () => abilitiesBySourceSlot.get(sourceSlotForMobileButton(pageBox.page, i)) ?? null,
       item: () => null,
@@ -266,24 +267,24 @@ describe('MobileActionRingPainter: page indicator + toggle aria', () => {
     } as unknown as HTMLElement;
     // Give the bar's own elements a real-ish shape too so ActionBarPainter's
     // writes succeed against the shared facet.
-    const realEls = els.map(() => ({
+    const realNode = () => ({
       textContent: '',
       style: { setProperty(): void {} },
       classList: { toggle(): void {} },
       setAttribute(): void {},
-    }));
-    const bar = els.map((_e, i) => ({
-      btn: realEls[i] as unknown as HTMLElement,
-      label: realEls[i] as unknown as HTMLElement,
-      countEl: realEls[i] as unknown as HTMLElement,
-      keybindEl: realEls[i] as unknown as HTMLElement,
-      cdOverlay: realEls[i] as unknown as HTMLElement,
-      cdText: realEls[i] as unknown as HTMLElement,
+    });
+    const bar = els.map(() => ({
+      btn: realNode() as unknown as HTMLElement,
+      label: realNode() as unknown as HTMLElement,
+      countEl: realNode() as unknown as HTMLElement,
+      keybindEl: realNode() as unknown as HTMLElement,
+      cdOverlay: realNode() as unknown as HTMLElement,
+      cdText: realNode() as unknown as HTMLElement,
     }));
     const painter = new MobileActionRingPainter(
       facet,
       {
-        bar: { container: realEls[0] as unknown as HTMLElement, slots: bar },
+        bar: { container: realNode() as unknown as HTMLElement, slots: bar },
         pageToggle: toggle,
         pageIndicator: indicator,
       },
@@ -303,6 +304,34 @@ describe('MobileActionRingPainter: page indicator + toggle aria', () => {
 
     painter.paint(view.tick(idleWorld()), 1, 2);
     expect(counts.writes).toBeGreaterThan(writesAfterFirst);
+  });
+});
+
+describe('MobileActionRingPainter: removable attack control', () => {
+  it('hides and restores the fixed attack button from the Interface setting', () => {
+    const { calls, writers } = recordingFacet();
+    const els = [0, 1, 2, 3, 4, 5].map((i) => slotElements(`ring${i}`));
+    const painter = new MobileActionRingPainter(
+      writers,
+      {
+        bar: {
+          container: { tag: 'ring-container' } as unknown as HTMLElement,
+          slots: els,
+        },
+        pageToggle: { tag: 'toggle' } as unknown as HTMLElement,
+        pageIndicator: { tag: 'indicator' } as unknown as HTMLElement,
+      },
+      (key) => `URL(${key})`,
+      (key, values) => (values ? `${key}|${JSON.stringify(values)}` : key),
+    );
+    const view = createActionBarView({ slots: ringDescriptor({ page: 0 }, new Map()) }, fakeDeps());
+
+    painter.paint(view.tick(idleWorld()), 0, 2, false);
+    expect(calls).toContainEqual({ m: 'setDisplay', args: [els[0].btn, 'none'] });
+
+    calls.length = 0;
+    painter.paint(view.tick(idleWorld()), 0, 2, true);
+    expect(calls).toContainEqual({ m: 'setDisplay', args: [els[0].btn, ''] });
   });
 });
 
@@ -363,8 +392,9 @@ describe('Hud.buildMobileActionRing wiring (source scan)', () => {
     expect(hud).toContain('this.buildMobileActionRing();');
   });
 
-  it('wires the attack button to castSlot(0)', () => {
-    expect(hud).toContain('this.castSlot(0);');
+  it('keeps the mobile attack button independent from the assignable desktop slot 0', () => {
+    expect(hud).toContain('handleMobileAttackTap(');
+    expect(hud).not.toMatch(/bindTouchTap\(attackBtn,[\s\S]*?this\.castSlot\(0\);/);
   });
 
   it('resolves the source slot for a mobile button INSIDE the click handler, not captured at bind time', () => {
@@ -381,6 +411,12 @@ describe('Hud.buildMobileActionRing wiring (source scan)', () => {
   it('gates the per-frame ring paint on isMobileLayout()', () => {
     expect(hud).toContain(
       'if (this.isMobileLayout() && this.mobileActionRingView && this.mobileActionRingPainter) {',
+    );
+  });
+
+  it('passes the live Show Attack Button setting into the mobile ring painter', () => {
+    expect(hud).toMatch(
+      /this\.mobileActionRingPainter\.paint\([\s\S]*?this\.attackSlotIsAttack\(\),[\s\S]*?\);/,
     );
   });
 

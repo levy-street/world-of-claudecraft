@@ -128,6 +128,9 @@ export interface ReleaseEntry {
 export interface LeaderboardRuntime {
   /** game.clients.size, for project-stats and status. */
   playersOnline(): number;
+  /** The configured realm player cap for /api/status, canonicalized to a
+   *  non-negative count (0 when the cap is disabled). */
+  playersCap(): number;
   /** game.perfProfile(), for the dev-gated /api/perf route. */
   perfProfile(): unknown;
   /** Cache-fronted player leaderboard read (main.ts getLeaderboard). */
@@ -552,6 +555,8 @@ async function projectStatsHandler(ctx: Ctx): Promise<void> {
  * dropped here, so the public endpoint exposes counts only, not who is online.
  * steam.enabled is the capability advert clients read before rendering any
  * Steam link UI (dual-arm edit: the legacy main.ts twin carries the same field).
+ * players_cap is the configured realm player cap (0 when disabled), also a dual-arm
+ * edit: the legacy main.ts twin carries the same field with the same semantics.
  */
 async function statusHandler(ctx: Ctx): Promise<void> {
   const rt = useRuntime();
@@ -559,6 +564,7 @@ async function statusHandler(ctx: Ctx): Promise<void> {
     ok: true,
     realm: REALM,
     players_online: rt.playersOnline(),
+    players_cap: rt.playersCap(),
     steam: { enabled: steamEnabled() },
   });
 }

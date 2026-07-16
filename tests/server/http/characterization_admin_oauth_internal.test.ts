@@ -390,6 +390,8 @@ describe('characterization: internal handleDailyRewardInternalApi (late-arrival 
     { path: '/internal/daily-rewards/pending-payouts', name: 'daily_rewards_pending_payouts' },
     { path: '/internal/daily-rewards/payout-history', name: 'daily_rewards_payout_history' },
     { path: '/internal/daily-rewards/mark-payout', name: 'daily_rewards_mark_payout' },
+    { path: '/internal/daily-rewards/void-payout', name: 'daily_rewards_void_payout' },
+    { path: '/internal/daily-rewards/restore-payout', name: 'daily_rewards_restore_payout' },
   ] as const;
 
   // Fail-closed gate, captured PER ROUTE: with the env secret UNSET the family

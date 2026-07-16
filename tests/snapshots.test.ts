@@ -25,7 +25,7 @@ import { saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer, wireEntity } from '../server/game';
 import { ClientWorld } from '../src/net/online';
 import { mechHeldWeaponOverride, visualKeyFor } from '../src/render/characters/manifest';
-import { DELVES } from '../src/sim/data';
+import { DELVES, GATHER_NODES } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import { type Aura, DT, type PlayerClass } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
@@ -136,6 +136,7 @@ function bareClient(pid: number): ClientWorld {
   c.inputEchoSamples = [];
   c.spectateFacingPending = false;
   c.pendingSpectateFacing = null;
+  c.nodeCooldowns = new Map();
   return c;
 }
 
@@ -163,11 +164,13 @@ describe('self stat wire round-trip', () => {
         rtype: 'mana',
         crat: 20,
         hrat: 150,
+        hirat: 30,
       },
     });
     // Without the wire fields these read the blankEntity default 0 (the bug this guards).
     expect(client.player.critRating).toBe(20);
     expect(client.player.hasteRating).toBe(150);
+    expect(client.player.hitRating).toBe(30);
   });
 
   it('backfills WARFARE fractions when an older server sends the legacy six-field stats shape', () => {
@@ -490,7 +493,7 @@ describe('delta snapshots', () => {
     const snap = lastSnap(fc.sent);
     expect(snap).not.toBeNull();
     // a fresh session has an empty lastSent, so EVERY maybe() delta key rides the
-    // first snapshot (even the null-valued ones like party/trade/bank); all 42 of them
+    // first snapshot (even the null-valued ones like party/trade/bank); all 44 of them
     for (const key of ALL_DELTA_KEYS) {
       expect(snap.self, `self.${key} missing from first snapshot`).toHaveProperty(key);
     }
@@ -972,6 +975,37 @@ describe('raid party wire', () => {
     expect(client.partyInfo?.raid).toBe(true);
     expect(client.partyInfo?.members.find((m) => m.pid === member.pid)?.group).toBe(2);
   });
+
+  it('ships tactical frame fields and the authoritative connection state', () => {
+    const entity = server.sim.entities.get(member.pid)!;
+    const meta = server.sim.meta(member.pid)!;
+    meta.talentMods.role = 'healer';
+    entity.auras.push({
+      id: 'power_word_shield',
+      name: 'Psalm of Warding',
+      kind: 'absorb',
+      remaining: 6,
+      duration: 12,
+      value: 90,
+      sourceId: member.pid,
+      school: 'holy',
+    });
+    member.linkdead = true;
+
+    broadcast(server);
+    const snap = lastSnap(fcLeader.sent);
+    const wired = snap.self.party.members.find((m: any) => m.pid === member.pid);
+    expect(wired).toMatchObject({ absorb: 90, role: 'healer', connected: 0 });
+    expect(wired.auras).toEqual([{ id: 'power_word_shield', kind: 'absorb', remaining: 6 }]);
+
+    const client = bareClient(leader.pid);
+    (client as any).applySnapshot(snap);
+    expect(client.partyInfo?.members.find((m) => m.pid === member.pid)).toMatchObject({
+      absorb: 90,
+      role: 'healer',
+      connected: 0,
+    });
+  });
 });
 
 describe('dungeon difficulty wire', () => {
@@ -1258,7 +1292,7 @@ describe('chat moderation', () => {
 describe('autosaves', () => {
   beforeEach(() => {
     vi.mocked(saveCharacterState).mockReset();
-    vi.mocked(saveCharacterState).mockResolvedValue(undefined);
+    vi.mocked(saveCharacterState).mockResolvedValue(true);
   });
 
   it('skips overlapping saveAll runs while saving each current session once', async () => {
@@ -1271,7 +1305,7 @@ describe('autosaves', () => {
     const firstSave = new Promise<void>((resolve) => {
       resolveFirstSave = resolve;
     });
-    vi.mocked(saveCharacterState).mockImplementationOnce(() => firstSave);
+    vi.mocked(saveCharacterState).mockImplementationOnce(() => firstSave.then(() => true));
 
     const firstRun = server.saveAll('test');
     await vi.waitFor(() => {
@@ -1297,7 +1331,7 @@ describe('autosaves', () => {
     const firstSave = new Promise<void>((resolve) => {
       resolveFirstSave = resolve;
     });
-    vi.mocked(saveCharacterState).mockImplementationOnce(() => firstSave);
+    vi.mocked(saveCharacterState).mockImplementationOnce(() => firstSave.then(() => true));
 
     const autosave = server.saveAll('autosave');
     await vi.waitFor(() => {
@@ -2448,9 +2482,9 @@ describe('lockpick view rebuilds from events on the online client', () => {
 // while the prior decoded value is preserved.
 // ---------------------------------------------------------------------------
 
-// The pinned set of the 42 `maybe(...)` delta keys, sorted. Cross-checked below
+// The pinned set of the 44 `maybe(...)` delta keys, sorted. Cross-checked below
 // against the live `maybe(...)` calls scraped from server/game.ts source, so a
-// 41st unregistered delta key reddens this gate.
+// 45th unregistered delta key reddens this gate.
 const ALL_DELTA_KEYS = [
   'arena',
   'atitle',
@@ -2465,6 +2499,8 @@ const ALL_DELTA_KEYS = [
   'dcompanion',
   'deeds',
   'delveDaily',
+  'df',
+  'dfb',
   'dmarks',
   'drun',
   'dstats',
@@ -2482,6 +2518,7 @@ const ALL_DELTA_KEYS = [
   'market',
   'marks',
   'milestones',
+  'ncd',
   'party',
   'prof',
   'qdone',
@@ -2515,6 +2552,8 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   dcomp: 'companionUpgrades',
   dcompanion: 'companionState',
   deeds: 'deedsEarned',
+  df: 'dungeonFinderInfo',
+  dfb: 'dungeonFinderBoard',
   dmarks: 'delveMarks',
   drun: 'delveRun',
   dstats: 'deedStats',
@@ -2627,6 +2666,10 @@ function dirtyEveryDeltaField(): {
   meta.delveClears = { 'collapsed_reliquary:heroic': 1 };
   meta.companionUpgrades = { companion_tessa: 2 };
   meta.gatheringProficiency = { mining: 6, logging: 0, herbalism: 0 };
+  // Per-player gather-node respawn cooldown (#1866): one node still cooling
+  // down (readyAt 30s in the sim future), so `ncd` mirrors it as ~30 remaining
+  // seconds and nodeHarvestableByMe reports it not ready.
+  meta.nodeHarvestReadyAt[GATHER_NODES[0].id] = sim.time + 30;
   meta.delveDaily = { date: '2099-01-01', firstClearXp: new Set(['x']), markClears: 4 };
   meta.talents = { spec: 'arms', ranks: {}, choices: {} };
   // Book of Deeds: two earned deeds with DISTINCT utcDay stamps (an empty map
@@ -2772,6 +2815,10 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.delveMarks).toBe(7); // dmarks -> delveMarks
     expect(client.companionUpgrades).toEqual({ companion_tessa: 2 }); // dcomp -> companionUpgrades
     expect(client.gatheringProficiency).toEqual({ mining: 6, logging: 0, herbalism: 0 }); // gprof -> gatheringProficiency
+    // ncd -> nodeHarvestableByMe: the cooling-down node reads not-ready, an
+    // untouched node (never in the map) still reads ready.
+    expect(client.nodeHarvestableByMe(GATHER_NODES[0].id)).toBe(false);
+    expect(client.nodeHarvestableByMe('not_a_real_node')).toBe(true);
     expect(client.professionsState).toEqual({
       skills: [
         { professionId: 'mining', skill: 6, maxSkill: 300 },
@@ -2843,10 +2890,43 @@ describe('full self-state snapshot delta fixture', () => {
   });
 });
 
+describe('gather node cooldown wire round trip (ncd)', () => {
+  it('flips a node from not-ready back to ready once the server-side cooldown clears', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Gatherer');
+    const sim = (server as any).sim;
+    const meta = sim.players.get(session.pid);
+    const nodeId = GATHER_NODES[0].id;
+    meta.nodeHarvestReadyAt[nodeId] = sim.time + 30;
+
+    broadcast(server);
+    const notReadySnap = lastSnap(fc.sent);
+    expect(notReadySnap.self.ncd).toMatchObject({ [nodeId]: expect.any(Number) });
+
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(notReadySnap);
+    expect(client.nodeHarvestableByMe(nodeId)).toBe(false);
+
+    // Server-side cooldown clears (readyAt passes): the next broadcast omits the
+    // node from `ncd` entirely (server/game.ts's until > sim.time filter), and
+    // applying THAT snapshot, not a hand-reassigned map, must flip the client
+    // back to ready -- the exact transition a permanent-lockout regression would
+    // fail to make.
+    meta.nodeHarvestReadyAt[nodeId] = sim.time - 1;
+    broadcast(server);
+    const readySnap = lastSnap(fc.sent);
+    expect(readySnap.self.ncd).toEqual({});
+
+    (client as any).applySnapshot(readySnap);
+    expect(client.nodeHarvestableByMe(nodeId)).toBe(true);
+  });
+});
+
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 42 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(42);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(42);
+  it('ALL_DELTA_KEYS contains exactly 45 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(45);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(45);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2858,7 +2938,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.size).toBe(42);
+    expect(scraped.size).toBe(45);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

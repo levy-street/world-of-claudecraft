@@ -1,5 +1,4 @@
 import { readFileSync } from 'node:fs';
-import type { PoolClient } from 'pg';
 import {
   type ChatFilterState,
   cleanEscalationConfig,
@@ -53,7 +52,18 @@ function envSeedHardWords(): string[] {
   return envSeedWords('CHAT_FILTER_HARD_LIST', 'CHAT_FILTER_HARD_FILE');
 }
 
-async function insertSeedWords(client: PoolClient, words: string[], tier: WordTier): Promise<void> {
+// Minimal query surface for the boot-time seeding path: ensureSchema passes its
+// dedicated boot client (a plain pg Client, no release()), tests pass a
+// recording client. Only query() is used. Mirrors MarketBackfillClient.
+export interface ChatFilterSeedClient {
+  query(text: string, values?: unknown[]): Promise<{ rows: any[] }>;
+}
+
+async function insertSeedWords(
+  client: ChatFilterSeedClient,
+  words: string[],
+  tier: WordTier,
+): Promise<void> {
   const unique = Array.from(
     new Set(words.map((w) => normalizeWord(w)).filter((w) => w.length > 0)),
   );
@@ -70,7 +80,7 @@ async function insertSeedWords(client: PoolClient, words: string[], tier: WordTi
  * boot transaction (pinned client, under the advisory lock), so it's safe under
  * concurrent realm boots and only fills a tier when that tier is empty.
  */
-export async function seedChatFilterDefaults(client: PoolClient): Promise<void> {
+export async function seedChatFilterDefaults(client: ChatFilterSeedClient): Promise<void> {
   await client.query(`INSERT INTO chat_filter_config (id) VALUES (1) ON CONFLICT (id) DO NOTHING`);
   const counts = await client.query(
     `SELECT tier, count(*)::int AS n FROM chat_filter_words GROUP BY tier`,

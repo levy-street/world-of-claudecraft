@@ -76,10 +76,12 @@ export interface ActionBarAbility {
  *  painter descriptor); NO per-frame allocation (the accessors return existing refs
  *  or null, never a fresh wrapper object). */
 export interface ActionBarSlotDescriptor {
-  /** 0-based slot index; slot 0 is the fixed Attack toggle. */
+  /** 0-based slot index; slot 0 is the Attack toggle by default. */
   slotIndex: number;
-  /** Whether this is the fixed attack slot (slot 0). */
-  isAttack: boolean;
+  /** Whether the slot currently renders the fixed Attack toggle. An accessor (like
+   *  ability()/item()) because the desktop bar's slot 0 can be switched to a normal
+   *  assignable slot live via the "Show Attack Button" Interface option. */
+  isAttack(): boolean;
   /** Whether the slot has ANY raw binding assigned (even one whose ability is
    *  unlearned or item id is unknown). The many-spells count source: kept distinct
    *  from ability()/item() so the count stays byte-identical to the former
@@ -125,6 +127,12 @@ export interface ActionBarPlayerInput {
   potionCdRemaining: number;
   queuedOnSwing: string | null;
   pos: Vec3;
+  /** Whether the player currently carries a `kind:'stealth'` aura (Stealth or
+   *  Vanish). Gates a `requiresStealth` ability's usable state (issue #1890):
+   *  without this the bar never dimmed Cheap Shot/Ambush/Garrote out of
+   *  stealth, so they looked equally "ready" whether or not the cast would
+   *  actually succeed. */
+  stealthed: boolean;
 }
 
 /** The target fields the bar reads; null when there is no current target. */
@@ -237,7 +245,7 @@ export function createActionBarView(
           boundCount++;
         }
 
-        if (sd.isAttack) {
+        if (sd.isAttack()) {
           slot.kind = 'attack';
           slot.abilityId = null;
           slot.itemId = null;
@@ -335,7 +343,8 @@ export function createActionBarView(
             : 0;
         slot.cdText = cd > COOLDOWN_TEXT_THRESHOLD ? deps.formatCount(Math.ceil(cd)) : '';
         slot.count = '';
-        slot.usable = !(player.resource < ability.cost);
+        slot.usable =
+          !(player.resource < ability.cost) && (!def.requiresStealth || player.stealthed);
         slot.outOfRange =
           def.requiresTarget &&
           tgtDist !== null &&

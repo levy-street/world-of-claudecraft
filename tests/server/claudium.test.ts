@@ -427,7 +427,11 @@ describe('Claudium economy-service transport contract', () => {
       },
       {
         url: '/api/claudium/native/rails',
-        expected: { available: false, rails: { sol: false, woc: false } },
+        expected: { available: false, rails: { sol: false, usdc: false, woc: false } },
+      },
+      {
+        url: '/api/claudium/native/balance/usdc/walletowner',
+        expected: { owner: 'walletowner', amountBase: null },
       },
     ];
 
@@ -454,7 +458,12 @@ describe('Claudium economy-service transport contract', () => {
           });
         }
         if (url.endsWith('/native/rails')) {
-          return new Response(JSON.stringify({ rails: { sol: true, woc: true } }), {
+          return new Response(JSON.stringify({ rails: { sol: true, usdc: true, woc: true } }), {
+            status: 200,
+          });
+        }
+        if (url.endsWith('/native/balance/usdc/walletowner')) {
+          return new Response(JSON.stringify({ owner: 'walletowner', amountBase: '12345678' }), {
             status: 200,
           });
         }
@@ -475,7 +484,11 @@ describe('Claudium economy-service transport contract', () => {
       },
       {
         url: '/api/claudium/native/rails',
-        expected: { available: true, rails: { sol: true, woc: true } },
+        expected: { available: true, rails: { sol: true, usdc: true, woc: true } },
+      },
+      {
+        url: '/api/claudium/native/balance/usdc/walletowner',
+        expected: { owner: 'walletowner', amountBase: '12345678' },
       },
     ];
 
@@ -727,6 +740,54 @@ describe('Claudium economy-service transport contract', () => {
     const request = fetchMock.mock.calls[0]?.[1] as RequestInit;
     expect(JSON.parse(String(request.body))).toEqual({
       rail: 'sol',
+      sku: 'claudium_500',
+      payer: 'payer-address',
+      fulfillment: { kind: 'credit', accountId: 7 },
+    });
+  });
+
+  it('accepts USDC as a native quote rail', async () => {
+    vi.stubEnv('WOC_ECONOMY_SERVICE_URL', 'https://economy.example/v1/claudium/');
+    vi.stubEnv('WOC_ECONOMY_INTERNAL_SECRET', 'test-secret');
+    const fetchMock = vi.fn(
+      async (_input: string | URL | Request, _init?: RequestInit) =>
+        new Response(
+          JSON.stringify({
+            reference: 'CLM_usdc',
+            rail: 'usdc',
+            claudium: 500,
+            amountBase: '4990000',
+            destination: 'treasury-owner',
+            mint: 'usdc-mint',
+            memo: 'CLM_usdc',
+            quoteExpiryMs: 123456,
+            transactionBase64: 'transaction',
+          }),
+          { status: 200 },
+        ),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+    const res = new FakeRes();
+
+    await handleClaudiumApi(
+      makeReq({
+        method: 'POST',
+        url: '/api/claudium/native/quote',
+        body: { rail: 'usdc', sku: 'claudium_500', payer: 'payer-address' },
+      }),
+      res as never,
+      7,
+      { rateLimitApplied: true },
+    );
+
+    expect(responseJson(res)).toMatchObject({
+      ok: true,
+      reference: 'CLM_usdc',
+      rail: 'usdc',
+      amountBase: '4990000',
+    });
+    expect(JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body))).toEqual({
+      rail: 'usdc',
       sku: 'claudium_500',
       payer: 'payer-address',
       fulfillment: { kind: 'credit', accountId: 7 },

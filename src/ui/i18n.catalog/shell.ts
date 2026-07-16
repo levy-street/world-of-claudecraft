@@ -41,6 +41,9 @@ export const shellStrings = {
       connectionLost: 'Connection to the server was lost.',
       reconnecting: 'Connection lost. Reconnecting...',
       connectionRejected: 'The server closed the connection.',
+      realmFull: 'This world is full right now. Please try again in a few minutes.',
+      tooManyConnections:
+        'Too many connections to this world are coming from your network. Please close extra game windows or try again in a few minutes.',
       tips: {
         classes:
           'Tip: each of the 9 classes plays differently. Try a few before committing to one.',
@@ -131,11 +134,11 @@ export const shellStrings = {
       popTipLow:
         'Low population: fewer than 15 players online right now. Plenty of room; great for a fresh start.',
       popTipMedium:
-        'Medium population: 15 to 39 players online right now. A healthy, active world.',
+        'Medium population: 15 to 79 players online right now. A healthy, active world.',
       popTipHigh:
-        'High population: 40 to 79 players online right now. Busy, with lots of players around.',
+        'High population: 80 or more players online right now. Busy, with lots of players around.',
       popTipFull:
-        'Full population: 80 or more players online right now. Very busy; you may wait in a login queue.',
+        'Full population: this world is at capacity right now. New logins are declined until a player logs out.',
       popTipOffline: 'Offline: this world is unreachable right now and cannot be joined.',
       characterCountOne: '{count} character',
       characterCountOther: '{count} characters',

@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { readFileSync } from 'node:fs';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { desktopDownloadUrl, initDesktopDownload } from '../src/game/desktop_download';
 
@@ -31,9 +32,9 @@ describe('initDesktopDownload', () => {
     expect(linux.getAttribute('aria-disabled')).toBe('false');
     expect(linux.classList.contains('is-unavailable')).toBe(false);
     const win = document.querySelector('[data-platform="win"]') as HTMLAnchorElement;
-    expect(win.hasAttribute('href')).toBe(false);
-    expect(win.getAttribute('aria-disabled')).toBe('true');
-    expect(win.classList.contains('is-unavailable')).toBe(true);
+    expect(win.href).toBe(desktopDownloadUrl('win'));
+    expect(win.getAttribute('aria-disabled')).toBe('false');
+    expect(win.classList.contains('is-unavailable')).toBe(false);
   });
 
   it('highlights and floats the visitor OS button first, and reveals its hint', () => {
@@ -56,8 +57,33 @@ describe('initDesktopDownload', () => {
     expect(mac.classList.contains('is-detected')).toBe(true);
   });
 
+  it('highlights and floats the Windows button for Windows visitors', () => {
+    setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/125');
+    initDesktopDownload(document);
+    const actions = document.querySelector('.desktop-download-actions') as HTMLElement;
+    const first = actions.firstElementChild as HTMLElement;
+    expect(first.dataset.platform).toBe('win');
+    expect(first.classList.contains('is-detected')).toBe(true);
+  });
+
   it('no-ops when the download view is absent', () => {
     document.body.innerHTML = '<main></main>';
     expect(() => initDesktopDownload(document)).not.toThrow();
+  });
+});
+
+describe('desktop download entry markup', () => {
+  it.each(['index.html', 'play.html'])('%s ships an enabled Windows fallback link', (path) => {
+    const html = readFileSync(path, 'utf8');
+    const entry = new DOMParser().parseFromString(html, 'text/html');
+    const links = entry.querySelectorAll<HTMLAnchorElement>(
+      '.desktop-download-link[data-platform="win"]',
+    );
+
+    expect(links).toHaveLength(1);
+    expect(links[0]?.getAttribute('href')).toBe(desktopDownloadUrl('win'));
+    expect(links[0]?.dataset.i18n).toBe('download.windowsCta');
+    expect(links[0]?.classList.contains('is-unavailable')).toBe(false);
+    expect(entry.querySelector('[data-i18n="download.windowsPending"]')).toBeNull();
   });
 });

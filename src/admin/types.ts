@@ -285,7 +285,7 @@ export interface AccountDetail {
   chatMutedUntil: string | null;
   chatMuteReason: string;
   chatStrikes: number;
-  dailyRewardsBan?: { reason: string; createdAt: string } | null;
+  dailyRewardsBan?: { reason: string; createdAt: string; expiresAt: string | null } | null;
   dailyRewardsIpBans?: { ip: string; reason: string; createdAt: string }[];
   lastLoginIp: string | null;
   playtimeSeconds: number;
@@ -309,6 +309,22 @@ export interface AccountDetail {
     ip: string | null;
   }[];
   moderationHistory: ModerationHistoryEntry[];
+}
+
+export interface DailyRewardPointEventRow {
+  id: number;
+  createdAt: string;
+  kind: string;
+  points: number;
+  totalPoints: number;
+  meta: Record<string, unknown>;
+}
+
+export interface DailyRewardPointEventLog {
+  day: string;
+  rows: DailyRewardPointEventRow[];
+  total: number;
+  truncated: boolean;
 }
 
 export interface ModerationHistoryEntry {
@@ -550,6 +566,10 @@ export interface PerfCaptureResult {
   maxTicksPerCallback: number;
   online: number;
   simEntities: number;
+  aggroVisitsTotal: number;
+  aggroVisitsMaxPerTick: number;
+  threatVisitsTotal: number;
+  threatVisitsMaxPerTick: number;
   profile: {
     samples: number;
     windowTicks: number;

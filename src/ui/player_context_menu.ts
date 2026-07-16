@@ -23,8 +23,8 @@ export type PlayerContextActionId =
   | 'stream-youtube'
   | 'close';
 
-export interface PlayerContextAction {
-  id: PlayerContextActionId;
+export interface PlayerContextAction<TId extends string = PlayerContextActionId> {
+  id: TId;
   label: string;
   /** brand mark drawn inside the row (stream links only) */
   icon?: UiIconName;
@@ -46,6 +46,54 @@ export interface ChatPlayerContextState {
   canReport: boolean;
   /** an official streamer's platform links, when the server sent any for this player */
   streamerLinks?: StreamerLinks;
+}
+
+export type SelfPlayerContextActionId =
+  | 'convert-raid'
+  | 'convert-party'
+  | 'loot-settings'
+  | 'leave-party'
+  | 'dungeon-difficulty'
+  | 'reset-dungeons'
+  | 'close';
+
+export interface SelfPlayerContextState {
+  inParty: boolean;
+  isLeader: boolean;
+  isRaid: boolean;
+  partySize: number;
+  isHeroic: boolean;
+}
+
+/** Build the classic player-portrait menu. Party membership owns the Leave Party
+ * action here, rather than a permanent button beneath the compact unit frames. */
+export function selfPlayerContextActions(
+  state: SelfPlayerContextState,
+): PlayerContextAction<SelfPlayerContextActionId>[] {
+  const actions: PlayerContextAction<SelfPlayerContextActionId>[] = [];
+  if (state.inParty && state.isLeader && !state.isRaid && state.partySize >= 5) {
+    actions.push({ id: 'convert-raid', label: t('hud.chat.context.convertToRaid') });
+  }
+  if (state.inParty && state.isLeader && state.isRaid && state.partySize <= 5) {
+    actions.push({ id: 'convert-party', label: t('hud.chat.context.convertToParty') });
+  }
+  if (state.inParty) {
+    actions.push({ id: 'loot-settings', label: t('hudChrome.lootSettings.menuItem') });
+    actions.push({ id: 'leave-party', label: t('hud.social.leaveParty') });
+  }
+  if (!state.inParty || state.isLeader) {
+    actions.push({
+      id: 'dungeon-difficulty',
+      label: t(
+        state.isHeroic
+          ? 'hudChrome.dungeonDifficulty.setNormal'
+          : 'hudChrome.dungeonDifficulty.setHeroic',
+      ),
+    });
+    actions.push({ id: 'reset-dungeons', label: t('hudChrome.dungeonDifficulty.resetAll') });
+  }
+  actions.push({ id: 'close', label: t('hud.chat.context.cancel') });
+  return actions;
 }
 
 const STREAM_ACTION: Record<

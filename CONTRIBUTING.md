@@ -13,7 +13,7 @@ dungeon: it all counts, and you're welcome here.
 
 This guide will help you get set up and make your first contribution a smooth one.
 You don't need to be an expert. If anything is unclear, ask on
-[Discord](https://discord.gg/GjhnUsBtw) and someone will be happy to help.
+[Discord](https://discord.com/invite/worldofclaudecraft) and someone will be happy to help.
 
 By participating, you agree to follow our [Code of Conduct](CODE_OF_CONDUCT.md).
 
@@ -170,7 +170,7 @@ write any game code to do it:
 3. Run `npx tsc --noEmit` to confirm nothing is missing, then open a PR.
 
 To propose a brand-new locale, or to discuss tone and terminology, start a thread
-on [Discord](https://discord.gg/GjhnUsBtw) and we'll help you wire it up. Native
+on [Discord](https://discord.com/invite/worldofclaudecraft) and we'll help you wire it up. Native
 and fluent speakers are especially welcome. Good translations make the game feel
 like home for players everywhere.
 
@@ -188,7 +188,7 @@ Please use the [issue templates](https://github.com/levy-street/world-of-claudec
 ## Getting help
 
 Stuck, or just want to say hi? Join the
-[community Discord](https://discord.gg/GjhnUsBtw). No question is too small, and
+[community Discord](https://discord.com/invite/worldofclaudecraft). No question is too small, and
 new contributors are always welcome.
 
 ## License

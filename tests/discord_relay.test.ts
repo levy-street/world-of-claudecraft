@@ -68,4 +68,19 @@ describe('dropdown helpers', () => {
     expect(isRelayInput('hello')).toBe(false);
     expect(isRelayInput('/who')).toBe(false);
   });
+
+  it('accepts a natural plural so "!events" posts as the event command', () => {
+    // The command word is "event"; a player typing the plural "!events" still posts.
+    expect(relayCommandById('events')?.id).toBe('event');
+    expect(parseRelayCommand('!events raid at the fountain')).toEqual({
+      command: RELAY_COMMANDS.find((c) => c.id === 'event'),
+      message: 'raid at the fountain',
+    });
+    // The exact word wins; a real "!lfg" is unaffected and still parses.
+    expect(relayCommandById('event')?.id).toBe('event');
+    expect(parseRelayCommand('!lfg need a healer')?.command.id).toBe('lfg');
+    // A genuinely unknown word is still rejected (not force-singularized to a match).
+    expect(relayCommandById('zzz')).toBeUndefined();
+    expect(parseRelayCommand('!zzz hi')).toBeNull();
+  });
 });

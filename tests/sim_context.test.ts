@@ -8,6 +8,7 @@
 
 import { describe, expect, it, vi } from 'vitest';
 import { createDeedRuntime } from '../src/sim/deeds';
+import { createMobScanCounters } from '../src/sim/mob/scan_counters';
 import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
 import { createSimContext, type SimContextHost } from '../src/sim/sim_context';
@@ -72,6 +73,7 @@ const CALLBACK_KEYS = [
   'partyOf',
   'removeFromParty',
   'dropPartyMarkers',
+  'formDungeonFinderGroup',
   // Q1 quest-credit trio + the countItem it consumes.
   'onMobKilledForQuests',
   'onInventoryChangedForQuests',
@@ -143,6 +145,8 @@ const CALLBACK_KEYS = [
   'instanceClaimIdAt',
   'enterDungeon',
   'leaveDungeon',
+  'resetDungeonInstances',
+  'inheritDungeonResetLocks',
   'dungeonDifficulty',
   'setDungeonDifficulty',
   'awardHeroicMarks',
@@ -196,6 +200,7 @@ const CALLBACK_KEYS = [
   'setPlayerLevel',
   'notice',
   'spawnDevBot',
+  'seedDungeonFinderDev',
   // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved useItem dispatches to.
   'startFishing',
   'unlockMechChromaFromItem',
@@ -251,6 +256,7 @@ function makeFakeHost() {
     groundAoEs: [],
     dungeonDoorIds: null,
     instances: [],
+    dungeonResetLocks: new Map(),
     arenaMatches: new Map(),
     duels: new Map(),
     cfg: { seed: 1 } as unknown as SimContextHost['cfg'],
@@ -288,6 +294,7 @@ function makeFakeHost() {
     worldBossEntityIds: [],
     deedRuntime: createDeedRuntime(),
     fiestaBotPids: [],
+    mobScanCounters: createMobScanCounters(),
     bumpDeedStat: vi.fn(),
     markItemDiscovered: vi.fn(),
     markVisited: vi.fn(),
@@ -347,6 +354,7 @@ function makeFakeHost() {
     partyOf: vi.fn(() => null),
     removeFromParty: vi.fn(),
     dropPartyMarkers: vi.fn(),
+    formDungeonFinderGroup: vi.fn(() => null),
     onMobKilledForQuests: vi.fn(),
     onInventoryChangedForQuests: vi.fn(),
     checkQuestReady: vi.fn(),
@@ -363,6 +371,8 @@ function makeFakeHost() {
     instanceClaimIdAt: vi.fn(() => null),
     enterDungeon: vi.fn(),
     leaveDungeon: vi.fn(),
+    resetDungeonInstances: vi.fn(),
+    inheritDungeonResetLocks: vi.fn(),
     dungeonDifficulty: vi.fn(() => 'normal' as const),
     setDungeonDifficulty: vi.fn(),
     awardHeroicMarks: vi.fn(),
@@ -468,6 +478,7 @@ function makeFakeHost() {
     setPlayerLevel: vi.fn(),
     notice: vi.fn(),
     spawnDevBot: vi.fn(),
+    seedDungeonFinderDev: vi.fn(() => ({ spawned: 0, note: 'ok' as const })),
     // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved useItem dispatches to.
     startFishing: vi.fn(),
     unlockMechChromaFromItem: vi.fn(),

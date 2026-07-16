@@ -13,7 +13,7 @@ zbudowanie zupełnie nowego lochu: wszystko się liczy, a Ty jesteś tu mile wid
 
 Ten przewodnik pomoże Ci się przygotować i sprawić, by Twój pierwszy wkład przebiegł
 gładko. Nie musisz być ekspertem. Jeśli coś jest niejasne, zapytaj na
-[Discordzie](https://discord.gg/GjhnUsBtw), a ktoś chętnie pomoże.
+[Discordzie](https://discord.com/invite/worldofclaudecraft), a ktoś chętnie pomoże.
 
 Biorąc udział, zgadzasz się przestrzegać naszego [Kodeksu postępowania](../../CODE_OF_CONDUCT.md).
 
@@ -177,7 +177,7 @@ kodu gry, by to zrobić:
    otwórz PR.
 
 Aby zaproponować zupełnie nową wersję językową lub przedyskutować ton i
-terminologię, rozpocznij wątek na [Discordzie](https://discord.gg/GjhnUsBtw), a
+terminologię, rozpocznij wątek na [Discordzie](https://discord.com/invite/worldofclaudecraft), a
 pomożemy Ci wszystko poskładać. Szczególnie mile widziani są rodzimi i biegli
 użytkownicy języka. Dobre tłumaczenia sprawiają, że gra staje się dla graczy
 wszędzie jak dom.
@@ -196,7 +196,7 @@ Prosimy korzystać z [szablonów zgłoszeń](https://github.com/levy-street/worl
 ## Uzyskiwanie pomocy
 
 Utknąłeś albo chcesz się po prostu przywitać? Dołącz do
-[społecznościowego Discorda](https://discord.gg/GjhnUsBtw). Żadne pytanie nie jest
+[społecznościowego Discorda](https://discord.com/invite/worldofclaudecraft). Żadne pytanie nie jest
 zbyt małe, a nowi współtwórcy są zawsze mile widziani.
 
 ## Licencja

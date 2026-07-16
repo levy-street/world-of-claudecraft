@@ -150,6 +150,7 @@ const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   meters: 'hud.keybinds.actions.meters',
   social: 'hud.keybinds.actions.social',
   arena: 'hud.keybinds.actions.arena',
+  dungeonFinder: 'hudChrome.finder.title',
   chat: 'hud.keybinds.actions.chat',
   // Combat/social target + emote-wheel actions. English-only chrome keys (the
   // `hud` catalog domain is tsc-locked to inline per-locale blocks).
@@ -158,6 +159,7 @@ const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   targetFriendlyNext: 'hudChrome.keybinds.targetFriendlyNext',
   discord: 'hudChrome.keybinds.discord',
   valecup: 'hudChrome.keybinds.valecup',
+  sheathe: 'hudChrome.keybinds.sheathe',
   petAttack: 'hudChrome.keybinds.petAttack',
   petStop: 'hudChrome.keybinds.petStop',
   petTaunt: 'hudChrome.keybinds.petTaunt',

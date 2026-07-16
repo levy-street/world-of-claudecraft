@@ -90,13 +90,19 @@ describe('registry', () => {
     expect(valecup?.category).toBe('Interface');
     expect(valecup?.kind).toBe('edge');
     expect(valecup?.defaults).toEqual(['KeyY']);
-    // The Book of Deeds is a rebindable Interface toggle. Every bare letter is
-    // claimed by another default, so deeds parks on the shifted layer of KeyZ,
-    // like Damage Meters does on H and the Shift+digit secondary bar.
+    // The Book of Deeds is a rebindable Interface toggle on the shifted layer of
+    // KeyZ, like Damage Meters does on H and the Shift+digit secondary bar.
     const deeds = BIND_ACTIONS.find((a) => a.id === 'deeds');
     expect(deeds?.category).toBe('Interface');
     expect(deeds?.kind).toBe('edge');
     expect(deeds?.defaults).toEqual(['Shift+KeyZ']);
+    // Sheathe/unsheathe weapon is a rebindable Interface toggle (default Z, the
+    // classic sheathe key and the last free bare letter). It shares the physical
+    // key with deeds, which sits on the SHIFTED layer: the two never collide.
+    const sheathe = BIND_ACTIONS.find((a) => a.id === 'sheathe');
+    expect(sheathe?.category).toBe('Interface');
+    expect(sheathe?.kind).toBe('edge');
+    expect(sheathe?.defaults).toEqual(['KeyZ']);
   });
 });
 
@@ -126,9 +132,8 @@ describe('Keybinds defaults', () => {
     expect(kb.actionForCode('KeyU')).toBe('discord');
     expect(kb.actionForCode('KeyT')).toBe('crafting');
     expect(kb.actionForCode('KeyY')).toBe('valecup');
-    // The bare letter stays free (the scope fixtures below bind it); the
-    // Book of Deeds ships on the shifted layer.
-    expect(kb.actionForCode('KeyZ')).toBe(null);
+    // Bare Z sheathes; the Book of Deeds ships on the shifted layer of the same key.
+    expect(kb.actionForCode('KeyZ')).toBe('sheathe');
     expect(kb.actionForCode('Shift+KeyZ')).toBe('deeds');
   });
 
@@ -167,10 +172,10 @@ describe('binding', () => {
 
   it('binds a secondary key without disturbing the primary', () => {
     const kb = new Keybinds();
-    expect(kb.bind('slot1', 1, 'KeyZ')).toBe(true);
+    expect(kb.bind('slot1', 1, 'Semicolon')).toBe(true);
     expect(kb.codeAt('slot1', 0)).toBe('Digit2');
-    expect(kb.codeAt('slot1', 1)).toBe('KeyZ');
-    expect(kb.actionForCode('KeyZ')).toBe('slot1');
+    expect(kb.codeAt('slot1', 1)).toBe('Semicolon');
+    expect(kb.actionForCode('Semicolon')).toBe('slot1');
   });
 
   it('rejects the reserved Escape key', () => {
@@ -268,7 +273,8 @@ describe('persistence', () => {
     expect(kb.actionForCode('KeyH')).toBe('targetFriendly');
     expect(kb.actionForCode('Enter')).toBe('chat');
     expect(kb.actionForCode('Equal')).toBe('slot11');
-    expect(kb.actionForCode('KeyZ')).toBe(null);
+    // sheathe postdates this save: it keeps its default Z, not unbound.
+    expect(kb.actionForCode('KeyZ')).toBe('sheathe');
   });
 
   it('drops a retained default that a stored binding already claimed', () => {
@@ -316,16 +322,16 @@ describe('persistence', () => {
 describe('per-character scope', () => {
   it('keeps two character scopes independent', () => {
     const alice = new Keybinds('char:alice');
-    alice.bind('jump', 0, 'KeyZ'); // KeyZ is unbound by default
+    alice.bind('jump', 0, 'Semicolon'); // Semicolon is unbound by default
     const bob = new Keybinds('char:bob');
     // Bob never inherits Alice's change; he starts from defaults.
-    expect(bob.actionForCode('KeyZ')).toBe(null);
+    expect(bob.actionForCode('Semicolon')).toBe(null);
     expect(bob.codeAt('jump', 0)).toBe('Space');
-    bob.bind('jump', 0, 'KeyY'); // also unbound by default
+    bob.bind('jump', 0, 'KeyY');
     // Reloading each scope reads back only its own profile.
-    expect(new Keybinds('char:alice').actionForCode('KeyZ')).toBe('jump');
+    expect(new Keybinds('char:alice').actionForCode('Semicolon')).toBe('jump');
     expect(new Keybinds('char:bob').actionForCode('KeyY')).toBe('jump');
-    expect(new Keybinds('char:bob').actionForCode('KeyZ')).toBe(null);
+    expect(new Keybinds('char:bob').actionForCode('Semicolon')).toBe(null);
   });
 
   it('writes to a namespaced key, not the legacy global key', () => {
@@ -389,8 +395,9 @@ describe('per-character scope', () => {
     aldric.bind('jump', 0, 'KeyZ');
     expect(localStorage.getItem('woc_keybinds:offline:warrior:Aldric')).not.toBeNull();
     expect(localStorage.getItem('woc_keybinds')).toBeNull();
-    // A different offline character starts from defaults, not Aldric's binding.
-    expect(new Keybinds('offline:mage:Brenna').actionForCode('KeyZ')).toBe(null);
+    // A different offline character starts from defaults, not Aldric's binding
+    // (KeyZ is sheathe's default, so Brenna resolves it to sheathe, not jump).
+    expect(new Keybinds('offline:mage:Brenna').actionForCode('KeyZ')).toBe('sheathe');
     expect(new Keybinds('offline:mage:Brenna').codeAt('jump', 0)).toBe('Space');
     // The same scope reads back its own profile.
     expect(new Keybinds('offline:warrior:Aldric').actionForCode('KeyZ')).toBe('jump');
@@ -402,7 +409,7 @@ describe('per-character scope', () => {
     // profile. A different name does not.
     new Keybinds('offline:warrior:Aldric').bind('jump', 0, 'KeyZ');
     expect(new Keybinds('offline:warrior:Aldric').actionForCode('KeyZ')).toBe('jump');
-    expect(new Keybinds('offline:warrior:Borin').actionForCode('KeyZ')).toBe(null);
+    expect(new Keybinds('offline:warrior:Borin').actionForCode('KeyZ')).toBe('sheathe');
   });
 
   it('seeds from the legacy blob when the scoped value is corrupt JSON', () => {
@@ -480,6 +487,16 @@ describe('per-character scope', () => {
     expect(kb.edgeActionForCombo('Shift+KeyH')).toBe('meters');
   });
 
+  it('gives sheathe and deeds the two layers of KeyZ instead of colliding', () => {
+    const kb = new Keybinds();
+    expect(kb.codeAt('sheathe', 0)).toBe('KeyZ');
+    expect(kb.codeAt('deeds', 0)).toBe('Shift+KeyZ');
+    // Production edge dispatch matches the FULL chord, so the shifted layer never
+    // sheathes and the bare key never opens the Book of Deeds.
+    expect(kb.edgeActionForCombo('KeyZ')).toBe('sheathe');
+    expect(kb.edgeActionForCombo('Shift+KeyZ')).toBe('deeds');
+  });
+
   it('seeds from the legacy blob when the scoped value is not a plain object', () => {
     localStorage.setItem('woc_keybinds', JSON.stringify({ jump: ['KeyZ', null] }));
     // A JSON array is typeof 'object' but is not a valid profile; it must seed.
@@ -493,11 +510,11 @@ describe('per-character scope', () => {
   it('reset() persists to the scoped key and leaves the legacy blob untouched', () => {
     localStorage.setItem('woc_keybinds', JSON.stringify({ jump: ['KeyJ', null] }));
     const alice = new Keybinds('char:alice');
-    alice.bind('jump', 0, 'KeyZ'); // KeyZ is unbound by default
+    alice.bind('jump', 0, 'KeyZ'); // steals Z from sheathe in this scope
     alice.reset();
     // Alice's scoped profile is back to defaults...
     expect(new Keybinds('char:alice').codeAt('jump', 0)).toBe('Space');
-    expect(new Keybinds('char:alice').actionForCode('KeyZ')).toBe(null);
+    expect(new Keybinds('char:alice').actionForCode('KeyZ')).toBe('sheathe');
     // ...and reset never wrote the legacy key.
     expect(JSON.parse(localStorage.getItem('woc_keybinds')!).jump).toEqual(['KeyJ', null]);
   });

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import type { AccountDetail as AccountDetailData } from '../types';
   import { apiGet } from '../api';
   import { recentAccountIps } from '../account_ips';
@@ -9,6 +9,7 @@
   import { t } from '../i18n';
   import AccountDetail from '../pages/AccountDetail.svelte';
   import AccountIndicators from './AccountIndicators.svelte';
+  import DailyRewardPointEvents from './DailyRewardPointEvents.svelte';
   import IpLink from './IpLink.svelte';
   import ModalDialog from './ModalDialog.svelte';
 
@@ -24,6 +25,11 @@
 
   let detail = $state<AccountDetailData | null>(null);
   let failed = $state(false);
+  type AccountTab = 'overview' | 'rewardPoints';
+  const ACCOUNT_TABS: AccountTab[] = ['overview', 'rewardPoints'];
+  let activeTab = $state<AccountTab>('overview');
+  let overviewTabButton = $state<HTMLButtonElement>();
+  let rewardPointsTabButton = $state<HTMLButtonElement>();
   let requestId = 0;
 
   let recentIps = $derived(detail ? recentAccountIps(detail) : []);
@@ -42,11 +48,37 @@
     }
   }
 
+  function tabButton(tab: AccountTab): HTMLButtonElement | undefined {
+    return tab === 'overview' ? overviewTabButton : rewardPointsTabButton;
+  }
+
+  function selectTab(tab: AccountTab, focus = false): void {
+    activeTab = tab;
+    if (focus) void tick().then(() => tabButton(tab)?.focus());
+  }
+
+  function onTabKeydown(event: KeyboardEvent): void {
+    const current = ACCOUNT_TABS.indexOf(activeTab);
+    let next = current;
+    if (event.key === 'ArrowRight') next = (current + 1) % ACCOUNT_TABS.length;
+    else if (event.key === 'ArrowLeft') next = (current - 1 + ACCOUNT_TABS.length) % ACCOUNT_TABS.length;
+    else if (event.key === 'Home') next = 0;
+    else if (event.key === 'End') next = ACCOUNT_TABS.length - 1;
+    else return;
+    event.preventDefault();
+    selectTab(ACCOUNT_TABS[next], true);
+  }
+
   onMount(() => {
-    void refresh();
     return () => {
       requestId += 1;
     };
+  });
+
+  $effect(() => {
+    accountId;
+    activeTab = 'overview';
+    void refresh();
   });
 </script>
 
@@ -113,33 +145,80 @@
       {:else if detail === null}
         <div class="empty">{t('accountModal.loading')}</div>
       {:else}
-        <AccountDetail
-          {detail}
-          includeAdminControls={auth.can('moderation.act')}
-          onChanged={() => {
-            void refresh(false);
-            onChanged?.();
-          }}
-        />
-        <section class="recent-ips">
-          <h3>{t('accountModal.recentIps')}</h3>
-          {#if recentIps.length === 0}
-            <div class="empty">{t('blockedIps.noKnownIps')}</div>
-          {:else}
-            <div class="recent-ip-list">
-              {#each recentIps as entry (entry.ip)}
-                <div class="recent-ip">
-                  <IpLink ip={entry.ip} />
-                  <span>
-                    {entry.lastSeenAt
-                      ? fmtDate(entry.lastSeenAt)
-                      : t('common.unknown')}
-                  </span>
+        <div class="account-tabs" role="tablist" aria-label={t('accountModal.tabsLabel')}>
+          <button
+            bind:this={overviewTabButton}
+            id="account-tab-overview"
+            type="button"
+            role="tab"
+            aria-selected={activeTab === 'overview'}
+            aria-controls="account-panel-overview"
+            tabindex={activeTab === 'overview' ? 0 : -1}
+            class:active={activeTab === 'overview'}
+            onclick={() => selectTab('overview')}
+            onkeydown={onTabKeydown}
+          >
+            {t('accountModal.tabOverview')}
+          </button>
+          <button
+            bind:this={rewardPointsTabButton}
+            id="account-tab-reward-points"
+            type="button"
+            role="tab"
+            aria-selected={activeTab === 'rewardPoints'}
+            aria-controls="account-panel-reward-points"
+            tabindex={activeTab === 'rewardPoints' ? 0 : -1}
+            class:active={activeTab === 'rewardPoints'}
+            onclick={() => selectTab('rewardPoints')}
+            onkeydown={onTabKeydown}
+          >
+            {t('accountModal.tabRewardPoints')}
+          </button>
+        </div>
+
+        {#if activeTab === 'overview'}
+          <div
+            id="account-panel-overview"
+            role="tabpanel"
+            aria-labelledby="account-tab-overview"
+          >
+            <AccountDetail
+              {detail}
+              includeAdminControls={auth.can('moderation.act')}
+              onChanged={() => {
+                void refresh(false);
+                onChanged?.();
+              }}
+            />
+            <section class="recent-ips">
+              <h3>{t('accountModal.recentIps')}</h3>
+              {#if recentIps.length === 0}
+                <div class="empty">{t('blockedIps.noKnownIps')}</div>
+              {:else}
+                <div class="recent-ip-list">
+                  {#each recentIps as entry (entry.ip)}
+                    <div class="recent-ip">
+                      <IpLink ip={entry.ip} />
+                      <span>
+                        {entry.lastSeenAt
+                          ? fmtDate(entry.lastSeenAt)
+                          : t('common.unknown')}
+                      </span>
+                    </div>
+                  {/each}
                 </div>
-              {/each}
-            </div>
-          {/if}
-        </section>
+              {/if}
+            </section>
+          </div>
+        {:else}
+          <div
+            id="account-panel-reward-points"
+            role="tabpanel"
+            aria-labelledby="account-tab-reward-points"
+          >
+            <DailyRewardPointEvents accountId={detail.id} />
+          </div>
+        {/if}
       {/if}
     </div>
   </div>
@@ -225,6 +304,27 @@
     overflow: auto;
     padding: 18px;
     container-type: inline-size;
+  }
+
+  .account-tabs {
+    display: flex;
+    gap: 4px;
+    margin: -4px 0 16px;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .account-tabs button {
+    padding: 8px 14px;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    color: var(--text-dim);
+  }
+
+  .account-tabs button:hover,
+  .account-tabs button.active {
+    border-bottom-color: var(--gold-dim);
+    color: var(--gold);
   }
 
   .recent-ips {
