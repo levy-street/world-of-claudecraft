@@ -138,6 +138,10 @@ const itemStringsEn = {
       filterWeaponAll: 'All weapons',
       filterRarity: 'Rarity',
       filterRarityAll: 'All rarities',
+      sortLabel: 'Sort',
+      sortNewest: 'Newest',
+      sortPrice: 'Price',
+      sortTimeLeft: 'Time left',
       weaponSword: 'Swords',
       weaponDagger: 'Daggers',
       weaponStaff: 'Staves',
@@ -156,18 +160,75 @@ const itemStringsEn = {
       reclaim: 'Reclaim',
       buyAria: 'Buy {item} for {price}',
       reclaimAria: 'Reclaim {item}',
+      timeLeft: '{time} left',
+      yourBidBadge: 'Your bid',
+      currentBidLabel: 'Bid:',
+      noBidsYet: 'No bids yet',
+      minNextBid: 'Min bid {money}',
+      buyoutLabel: 'Buyout {money}',
+      auctionBadge: 'Auction',
+      leadingBid: "You're leading",
+      bidInputAria: 'Bid amount for {item}',
+      bidButton: 'Bid',
+      bidAria: 'Bid on {item}',
+      buyoutButton: 'Buyout',
+      buyoutAria: 'Buy out {item} for {price}',
+      buyQuantityAria: 'Quantity of {item} to buy',
       sellNote:
         'List goods from your bags. The Merchant takes a {cut}% cut when an item sells. You are using {used}/{max} listing slots.',
       sellPickEmpty: 'Click an item in your bags to choose what to sell.',
       quantity: 'Quantity',
       quantityOf: 'of {count}',
       priceEach: 'Price each',
+      listingTypeLabel: 'Listing type',
+      listingTypeFixed: 'Fixed price',
+      listingTypeAuction: 'Auction',
+      durationLabel: 'Duration',
+      durationOption: '{hours}h',
+      startingBidLabel: 'Starting bid',
+      buyoutOptionalLabel: 'Buyout (optional)',
+      totalLabel: 'Total',
+      depositPreviewLabel: 'Listing deposit',
       listButton: 'List on the World Market',
       minPriceError: 'Name a price of at least 1 copper.',
+      cancelConfirmTitle: 'Reclaim listing',
+      cancelConfirmBody: 'Reclaim {item} from the market? The {money} deposit will be forfeited.',
+      cancelConfirmBodyNoDeposit: 'Reclaim {item} from the market?',
+      cancelConfirmDismiss: 'Cancel',
       collectEmpty: 'Nothing waiting. Sale proceeds and expired listings collect here.',
       collectNote: 'Earnings and returned goods the Merchant is holding for you.',
       saleProceeds: 'Sale proceeds',
       collectAll: 'Collect All',
+      outbidToast: 'You were outbid on {item}. {money} refunded to your collection box.',
+      wonToast: 'You won the auction for {item}! Collect it at the Merchant.',
+      soldToast: 'Your {item} sold for {money}. Collect it at the Merchant.',
+      expiredToast: 'Your listing of {item} expired unsold. Collect it at the Merchant.',
+      denomLabel: 'Currency',
+      denomGold: 'Gold',
+      denomClaudium: 'Claudium',
+      denomWoc: 'WOC',
+      auctionGoldOnly: 'Bids take gold only.',
+      claudiumPriceEach: 'Price each (Claudium)',
+      wocPriceLot: 'Lot price (WOC)',
+      claudiumAmount: '{amount} Claudium',
+      claudiumEach: '{amount} Claudium each',
+      claudiumMinError: 'Name a price of at least 1 Claudium.',
+      awaitingPayment: 'Awaiting payment',
+      buyExternalTitle: 'Confirm purchase',
+      buyClaudiumConfirmBody:
+        'Buy {item} for {amount} Claudium? The payment comes from your Claudium balance.',
+      buyWocConfirmBody:
+        'Buy {item} for {amount} WOC? You pay from your linked wallet, and the goods release once the payment lands.',
+      buyClaudiumAria: 'Buy {item} with Claudium',
+      buyWocAria: 'Buy {item} with WOC',
+      pendingClaudium: 'Completing your purchase of {item}.',
+      pendingPreparing: 'Preparing the payment request for {item}.',
+      wocPayPrompt: 'Send {amount} WOC from your linked wallet to finish buying {item}.',
+      paymentExpiredToast: 'The payment window for {item} closed. The lot is open again.',
+      soldWalletToast:
+        'Your {item} sold for {amount} WOC. The payment went to your linked wallet; collect your deposit at the Merchant.',
+      soldAccountToast:
+        'Your {item} sold for {amount} Claudium. The payment went to your Claudium balance; collect your deposit at the Merchant.',
     },
     logs: {
       listedItem: 'Listed {item} on the World Market for {money}.',
@@ -176,6 +237,10 @@ const itemStringsEn = {
       collectedMoney: 'You collect {money} from the Merchant.',
       reclaimedItem: 'Reclaimed {item} from the market.',
       expiredListing: 'Your market listing of {item} expired and waits at the Merchant.',
+      postedAuction: 'Posted {item} for auction (starting bid {money}).',
+      bidPlaced: 'Bid placed: {money} on {item}.',
+      listedClaudium: 'Listed {item} on the World Market for {amount} Claudium.',
+      listedWoc: 'Listed {item} on the World Market for {amount} WOC.',
     },
     errors: {
       notSoldHere: 'That item is not sold here.',
@@ -192,6 +257,23 @@ const itemStringsEn = {
       cannotAfford: 'You cannot afford that.',
       notYourListing: 'That is not your listing.',
       nothingToCollect: 'You have nothing to collect.',
+      minStartingBid: 'Name a starting bid of at least 1 copper.',
+      buyoutTooLow: 'The buyout must beat the starting bid.',
+      chooseDuration: 'Choose a listing duration of 12, 24, or 48 hours.',
+      cannotAffordDeposit: 'You cannot afford the listing deposit.',
+      bidsOnly: 'That lot takes bids only.',
+      notAuction: 'That lot is not up for auction.',
+      cannotBidOwnLot: 'You cannot bid on your own lot.',
+      alreadyHighBidder: 'You are already the high bidder.',
+      bidTooLow: 'Bid at least {min}.',
+      bidsGoldOnly: 'Bids take gold only.',
+      claudiumUnavailable: 'Claudium listings are not available.',
+      wocUnavailable: 'WOC listings are not available.',
+      wocLinkToList: 'Link a wallet to list for WOC.',
+      wocLinkToPay: 'Link a wallet to pay with WOC.',
+      wocPriceInvalid: 'Name a valid WOC price.',
+      awaitingPayment: 'That lot is awaiting payment.',
+      pendingPurchaseFirst: 'Finish your pending purchase first.',
     },
   },
 };
@@ -332,6 +414,7 @@ export const itemStrings = {
         collectAll: 'Recoger lote completo',
       },
       logs: {
+        ...itemStringsEn.itemUi.logs,
         listedItem: '{item} publicado en el Mercado Mundial por {money}.',
         sellerSold: '{buyer} compró tu {item} por {money}. Recoge {proceeds} del Mercader.',
         boughtItem: 'Compraste {item} por {money}.',
@@ -340,6 +423,7 @@ export const itemStrings = {
         expiredListing: 'Tu publicación de {item} venció y espera en el Mercader.',
       },
       errors: {
+        ...itemStringsEn.itemUi.errors,
         notSoldHere: 'Ese objeto no se vende aquí.',
         notEnoughMoney: 'No tienes suficiente dinero.',
         bringGoods: 'Debes llevar tus bienes al Mercader.',
@@ -491,6 +575,7 @@ export const itemStrings = {
         collectAll: 'Tout récupérer',
       },
       logs: {
+        ...itemStringsEn.itemUi.logs,
         listedItem: '{item} listé au Marché mondial pour {money}.',
         sellerSold:
           '{buyer} a acheté votre {item} pour {money}. Récupérez {proceeds} auprès du Marchand.',
@@ -500,6 +585,7 @@ export const itemStrings = {
         expiredListing: 'Votre annonce de {item} a expiré et attend chez le Marchand.',
       },
       errors: {
+        ...itemStringsEn.itemUi.errors,
         notSoldHere: "Cet objet n'est pas vendu ici.",
         notEnoughMoney: "Pas assez d'argent.",
         bringGoods: 'Vous devez apporter vos biens au Marchand.',
@@ -650,6 +736,7 @@ export const itemStrings = {
         collectAll: 'Ritira tutto',
       },
       logs: {
+        ...itemStringsEn.itemUi.logs,
         listedItem: '{item} messo sul Mercato Mondiale per {money}.',
         sellerSold:
           '{buyer} ha comprato il tuo {item} per {money}. Ritira {proceeds} dal Mercante.',
@@ -659,6 +746,7 @@ export const itemStrings = {
         expiredListing: 'La tua inserzione di {item} è scaduta e attende dal Mercante.',
       },
       errors: {
+        ...itemStringsEn.itemUi.errors,
         notSoldHere: 'Questo oggetto non è venduto qui.',
         notEnoughMoney: 'Denaro insufficiente.',
         bringGoods: 'Devi portare le merci al Mercante.',
@@ -809,6 +897,7 @@ export const itemStrings = {
         collectAll: 'Alles abholen',
       },
       logs: {
+        ...itemStringsEn.itemUi.logs,
         listedItem: '{item} für {money} auf dem Weltmarkt eingestellt.',
         sellerSold:
           '{buyer} hat Euren Gegenstand {item} für {money} gekauft. Holt {proceeds} beim Händler ab.',
@@ -818,6 +907,7 @@ export const itemStrings = {
         expiredListing: 'Euer Marktangebot von {item} ist abgelaufen und wartet beim Händler.',
       },
       errors: {
+        ...itemStringsEn.itemUi.errors,
         notSoldHere: 'Dieser Gegenstand wird hier nicht verkauft.',
         notEnoughMoney: 'Nicht genug Geld.',
         bringGoods: 'Ihr müsst Eure Waren zum Händler bringen.',
@@ -962,6 +1052,7 @@ export const itemStrings = {
         collectAll: '全部领取',
       },
       logs: {
+        ...itemStringsEn.itemUi.logs,
         listedItem: '已将 {item} 以 {money} 上架到世界市场。',
         sellerSold: '{buyer} 以 {money} 买走了你的 {item}。向商人领取 {proceeds}。',
         boughtItem: '已以 {money} 购买 {item}。',
@@ -970,6 +1061,7 @@ export const itemStrings = {
         expiredListing: '你的 {item} 市场上架已过期，正在商人处等待领取。',
       },
       errors: {
+        ...itemStringsEn.itemUi.errors,
         notSoldHere: '这里不出售该物品。',
         notEnoughMoney: '金钱不足。',
         bringGoods: '你必须把货物带到商人处。',
@@ -1114,6 +1206,7 @@ export const itemStrings = {
         collectAll: '全部領取',
       },
       logs: {
+        ...itemStringsEn.itemUi.logs,
         listedItem: '已將 {item} 以 {money} 上架到世界市場。',
         sellerSold: '{buyer} 以 {money} 買走了你的 {item}。向商人領取 {proceeds}。',
         boughtItem: '已以 {money} 購買 {item}。',
@@ -1122,6 +1215,7 @@ export const itemStrings = {
         expiredListing: '你的 {item} 市場上架已過期，正在商人處等待領取。',
       },
       errors: {
+        ...itemStringsEn.itemUi.errors,
         notSoldHere: '這裡不出售該物品。',
         notEnoughMoney: '金錢不足。',
         bringGoods: '你必須把貨物帶到商人處。',
@@ -1269,6 +1363,7 @@ export const itemStrings = {
         collectAll: '모두 수령',
       },
       logs: {
+        ...itemStringsEn.itemUi.logs,
         listedItem: '{item}을(를) {money}에 세계 시장에 등록했습니다.',
         sellerSold:
           '{buyer}님이 당신의 {item}을(를) {money}에 샀습니다. 상인에게서 {proceeds}을(를) 수령하세요.',
@@ -1278,6 +1373,7 @@ export const itemStrings = {
         expiredListing: '{item} 시장 등록이 만료되어 상인에게 보관되었습니다.',
       },
       errors: {
+        ...itemStringsEn.itemUi.errors,
         notSoldHere: '이 아이템은 여기서 판매하지 않습니다.',
         notEnoughMoney: '돈이 부족합니다.',
         bringGoods: '상품을 상인에게 가져가야 합니다.',
@@ -1425,6 +1521,7 @@ export const itemStrings = {
         collectAll: 'すべて受け取る',
       },
       logs: {
+        ...itemStringsEn.itemUi.logs,
         listedItem: '{item}を{money}でワールドマーケットに出品しました。',
         sellerSold:
           '{buyer}があなたの{item}を{money}で購入しました。商人から{proceeds}を受け取ってください。',
@@ -1434,6 +1531,7 @@ export const itemStrings = {
         expiredListing: '{item}の市場出品が期限切れになり、商人のもとで待機しています。',
       },
       errors: {
+        ...itemStringsEn.itemUi.errors,
         notSoldHere: 'そのアイテムはここでは販売されていません。',
         notEnoughMoney: 'お金が足りません。',
         bringGoods: '品物を商人のところへ持っていく必要があります。',
@@ -1582,6 +1680,7 @@ export const itemStrings = {
         collectAll: 'Coletar tudo',
       },
       logs: {
+        ...itemStringsEn.itemUi.logs,
         listedItem: '{item} listado no Mercado Mundial por {money}.',
         sellerSold: '{buyer} comprou seu {item} por {money}. Colete {proceeds} com o Mercador.',
         boughtItem: '{item} comprado por {money}.',
@@ -1590,6 +1689,7 @@ export const itemStrings = {
         expiredListing: 'Sua listagem de {item} expirou e espera com o Mercador.',
       },
       errors: {
+        ...itemStringsEn.itemUi.errors,
         notSoldHere: 'Esse item não é vendido aqui.',
         notEnoughMoney: 'Dinheiro insuficiente.',
         bringGoods: 'Você precisa levar seus bens ao Mercador.',
@@ -1739,6 +1839,7 @@ export const itemStrings = {
         collectAll: 'Забрать все',
       },
       logs: {
+        ...itemStringsEn.itemUi.logs,
         listedItem: '{item} выставлен на мировой рынок за {money}.',
         sellerSold: '{buyer} купил ваш {item} за {money}. Заберите {proceeds} у Торговца.',
         boughtItem: '{item} куплен за {money}.',
@@ -1747,6 +1848,7 @@ export const itemStrings = {
         expiredListing: 'Ваш лот {item} истек и ждет у Торговца.',
       },
       errors: {
+        ...itemStringsEn.itemUi.errors,
         notSoldHere: 'Этот предмет здесь не продается.',
         notEnoughMoney: 'Недостаточно денег.',
         bringGoods: 'Нужно принести товары к Торговцу.',

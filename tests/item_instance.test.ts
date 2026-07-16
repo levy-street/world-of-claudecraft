@@ -150,6 +150,7 @@ describe('item-instance payload (#1165)', () => {
     standAtMerchant(sim, seller);
     sim.addItem('apprentice_staff', 1, seller);
     sim.addItemInstance('apprentice_staff', { signer: 'Aldric' }, seller);
+    sim.meta(seller)!.copper = 72; // the 48h listing deposit: floor(120 * 0.15) * 4
 
     sim.marketList('apprentice_staff', 1, 100, seller);
 

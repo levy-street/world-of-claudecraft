@@ -9,7 +9,15 @@ import {
 
 // A full browse query with sensible defaults; a case varies only what it cares about.
 function q(over: Partial<MarketQuery> = {}): MarketQuery {
-  return { search: '', itemType: 'all', subtype: 'all', rarity: 'all', page: 0, ...over };
+  return {
+    search: '',
+    itemType: 'all',
+    subtype: 'all',
+    rarity: 'all',
+    sort: 'newest',
+    page: 0,
+    ...over,
+  };
 }
 
 // Filter a list of item ids through the shared predicate the SERVER filters with

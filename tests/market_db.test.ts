@@ -141,4 +141,49 @@ describe('market write gate', () => {
     );
     expect(dbMock.query).not.toHaveBeenCalled();
   });
+
+  // The auction-house extension (kind/pricePerUnit/durationSeconds/depositPerUnit/
+  // bid/startingBid/buyoutPrice) added fields to MarketSave['listings'][number] in
+  // src/sim/market.ts, but this layer stores world_state as opaque JSONB keyed by
+  // realm: it never inspects a listing's shape, so the new fields ride through
+  // unchanged. This test proves that verbatim rather than merely asserting it in
+  // prose: a save carrying every widened field round-trips byte-identical through
+  // both the write and read paths, confirming db.ts needs no change for them.
+  it('round-trips an auction-house-shaped listing (kind/bid/deposit/duration) as opaque JSONB', async () => {
+    openMarketWriteGate();
+    dbMock.query.mockResolvedValueOnce({ rowCount: 1, rows: [] });
+    const save = {
+      listings: [
+        {
+          id: 1,
+          sellerKey: '7',
+          sellerName: 'Auctioneer',
+          itemId: 'wolf_fang',
+          count: 1,
+          price: 50,
+          secondsLeft: 3600,
+          kind: 'auction',
+          pricePerUnit: undefined,
+          durationSeconds: 43200,
+          depositPerUnit: 0,
+          bid: { amount: 75, bidderKey: '8', bidderName: 'Bidder' },
+          startingBid: 50,
+          buyoutPrice: 200,
+        },
+      ],
+      collections: [{ key: '9', copper: 30, items: [] }],
+      nextListingId: 2,
+    } as never;
+
+    await saveMarketState(save);
+    const [, writeParams] = dbMock.query.mock.calls[0];
+    // saveWorldState serializes with JSON.stringify before the SQL param; parse
+    // it back to prove nothing was stripped or coerced on the way out.
+    expect(JSON.parse(writeParams[1])).toEqual(save);
+
+    dbMock.query.mockReset();
+    dbMock.query.mockResolvedValueOnce({ rows: [{ data: save }] });
+    const loaded = await loadMarketState();
+    expect(loaded).toEqual(save); // read back byte-identical: JSONB is shape-agnostic
+  });
 });

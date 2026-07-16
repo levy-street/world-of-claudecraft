@@ -370,6 +370,19 @@ const hudStringsEn = {
       tradeTooFar: 'Target is too far away to trade.',
       tradeExpired: 'The trade request has expired.',
       tradeFailed: 'Trade failed: items or money no longer available.',
+      // G2b: external-currency trade legs (Claudium/WOC pledges) + the /trade
+      // slash command usage line + the pre-existing tradeAccept busy-check gap
+      // fix (trade.ts's own "already trading" refusal never had a matcher).
+      tradeBusy: 'That player is already trading.',
+      tradeUsage: 'Trade whom? Usage: /trade <name>.',
+      claudiumTradeOff: 'Claudium trading is not available.',
+      wocTradeOff: 'WOC trading is not available.',
+      wocTradeLink: 'Link a wallet to trade WOC.',
+      wocTradePartnerLink: 'Your trade partner has no linked wallet.',
+      wocTradeOneSide: 'Only one side of a trade can offer WOC.',
+      tradeSettleTimeout: 'Trade cancelled: the payment window expired. Your goods were returned.',
+      tradeSettleCancelled: 'Trade cancelled. Your goods were returned.',
+      tradeSettleUnavailable: 'Trade could not settle. Your goods were returned.',
     },
     logs: {
       standUp: 'You stand up.',
@@ -389,6 +402,7 @@ const hudStringsEn = {
       tradeOpened: 'Trade window opened.',
       tradeComplete: 'Trade complete.',
       tradeCancelled: 'Trade cancelled.',
+      tradeDeclined: '{name} declined your trade request.',
       lootReceiveItem: 'You receive: {item}.',
       lootReceiveMoney: 'You receive {money}.',
       lootMoney: 'You loot {money}.',
@@ -397,6 +411,30 @@ const hudStringsEn = {
       soldJunkMany: 'Sold {count} junk items for {money}.',
       friendOnline: '{name} has come online.',
       friendOffline: '{name} has gone offline.',
+    },
+    // G2b window-body additions (Claudium/WOC pledge rows + the settling
+    // status panel): the base 'hud.trade.*' window strings (title/yourOffer/
+    // theirOffer/emptyMine/emptyTheirs/money/hint/accept/waiting/cancel) live
+    // in i18n.catalog/merge.ts's overlay block, the historical home for this
+    // namespace; merge.ts's own `trade` object spreads this one first
+    // (mirroring its `options` sub-block) so both sources compose into one
+    // `en.hud.trade`.
+    trade: {
+      claudiumLabel: 'Claudium',
+      wocLabel: 'WOC',
+      settlingTitle: 'Settling trade...',
+      legYourClaudium: 'Your Claudium',
+      legTheirClaudium: 'Their Claudium',
+      legYourWoc: 'Your WOC payment',
+      legTheirWoc: 'Their WOC payment',
+      statusPending: 'Pending',
+      statusDone: 'Done',
+      wocPayPrompt: 'Send {amount} WOC from your linked wallet to complete the trade.',
+      openInWallet: 'Open in wallet',
+      copyLink: 'Copy payment link',
+      copiedLink: 'Payment link copied.',
+      instanceSignedBy: 'Signed by {name}',
+      instanceUnique: 'Unique copy',
     },
     tutorial: {
       title: 'New Adventurer',

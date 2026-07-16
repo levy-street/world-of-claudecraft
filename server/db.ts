@@ -45,6 +45,7 @@ import { RATELIMIT_PRUNE_SQL, RATELIMIT_SCHEMA } from './ratelimit_db';
 import { REALM } from './realm';
 import { chooseArchiveName } from './reclaim_name';
 import { SOCIAL_SCHEMA } from './social_db';
+import { TRADE_SCHEMA } from './trade_db';
 import { USER_ASSETS_SCHEMA } from './user_assets_db';
 
 // The realm-market key helpers and the backfill marker key live in
@@ -1043,6 +1044,11 @@ export async function ensureSchema(): Promise<void> {
     // unconditionally (idempotent), like the other schema modules.
     await client.query(MAPS_SCHEMA);
     await client.query(USER_ASSETS_SCHEMA);
+    // Player-trade settlement + ledger tables (external-currency trade lane).
+    // FK-references characters(id)/accounts(id), so it runs after SCHEMA. Applied
+    // unconditionally (idempotent), like the other schema modules; the settlement
+    // orchestrator reads/writes these only when a rail is enabled.
+    await client.query(TRADE_SCHEMA);
     // Seed the chat-filter word lists + config on first boot only (idempotent).
     // Runs under the same advisory lock so concurrent realm boots don't race.
     await seedChatFilterDefaults(client);
@@ -2049,6 +2055,17 @@ export async function walletForAccount(accountId: number): Promise<WalletLinkRow
 export async function accountForWallet(pubkey: string): Promise<number | null> {
   const res = await pool.query('SELECT account_id FROM wallet_links WHERE pubkey = $1', [pubkey]);
   return res.rows[0]?.account_id ?? null;
+}
+
+// The owning account of a character (one indexed SELECT). The market settlement
+// orchestrator uses this to resolve an OFFLINE seller (listings persist across
+// sessions, keyed by character id) to the account its Claudium proceeds credit
+// or its linked wallet hangs off.
+export async function accountIdForCharacter(characterId: number): Promise<number | null> {
+  const res = await pool.query('SELECT account_id FROM characters WHERE id = $1', [characterId]);
+  if (res.rows.length === 0) return null;
+  const id = Number(res.rows[0].account_id);
+  return Number.isSafeInteger(id) ? id : null;
 }
 
 // One wallet per account (account_id PK) and one account per wallet (pubkey

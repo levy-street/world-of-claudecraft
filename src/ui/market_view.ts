@@ -20,8 +20,15 @@
 
 import { ITEMS } from '../sim/data';
 import type { ItemDef } from '../sim/types';
-import type { MarketInfo, MarketListingView } from '../world_api';
-import { MARKET_PAGE_SIZE, type MarketFilters } from './market_filters';
+import type { MarketInfo, MarketListingView, MarketPendingPurchaseView } from '../world_api';
+import {
+  MARKET_PAGE_SIZE,
+  type MarketFilters,
+  type MarketItemTypeFilter,
+  type MarketRarityFilter,
+  type MarketSortOrder,
+  type MarketSubtypeFilter,
+} from './market_filters';
 
 export type MarketTab = 'browse' | 'sell' | 'collect';
 
@@ -75,11 +82,17 @@ export type MarketSellBody =
   | { state: 'cannot-market' }
   | { state: 'form'; form: MarketSellForm };
 
-/** The Merchant-cut + listing-cap figures the Sell tab note shows. */
+/** The Merchant-cut + listing-cap figures the Sell tab note shows, plus the
+ *  duration tiers the sim will accept (mirrored from MarketInfo so the Sell tab
+ *  never invents its own duration list) and the viewer's external-denomination
+ *  rails (which currency options the selector may render; mirrored from
+ *  MarketInfo.rails so the UI can never offer a denomination the sim refuses). */
 export interface MarketSellMeta {
   cutPct: number;
   myListingCount: number;
   maxListings: number;
+  durationsHours: readonly number[];
+  rails: { claudium: boolean; woc: boolean };
 }
 
 /** One Collect row: a returned/expired stack waiting to be reclaimed. */
@@ -99,7 +112,10 @@ export type MarketCollectBody =
  */
 export type MarketView =
   | { kind: 'no-data' }
-  | { kind: 'browse'; body: MarketBrowseBody }
+  // `pending` is the viewer's own in-flight external purchase (null when none):
+  // the Browse tab renders it as the awaiting-payment panel (with the
+  // server-enriched wocPay request for a $WOC payer).
+  | { kind: 'browse'; body: MarketBrowseBody; pending: MarketPendingPurchaseView | null }
   | { kind: 'sell'; body: MarketSellBody; meta: MarketSellMeta }
   | { kind: 'collect'; body: MarketCollectBody };
 
@@ -202,7 +218,13 @@ export function buildMarketCollect(info: MarketInfo): MarketCollectBody {
 export function buildMarketView(input: MarketViewInput): MarketView {
   const { info, tab } = input;
   if (!info) return { kind: 'no-data' };
-  if (tab === 'browse') return { kind: 'browse', body: buildMarketBrowse(info, input.filters) };
+  if (tab === 'browse') {
+    return {
+      kind: 'browse',
+      body: buildMarketBrowse(info, input.filters),
+      pending: info.myPendingPurchase ?? null,
+    };
+  }
   if (tab === 'sell') {
     return {
       kind: 'sell',
@@ -211,6 +233,8 @@ export function buildMarketView(input: MarketViewInput): MarketView {
         cutPct: info.cutPct,
         myListingCount: info.myListingCount,
         maxListings: info.maxListings,
+        durationsHours: info.durationsHours,
+        rails: info.rails,
       },
     };
   }
@@ -224,4 +248,47 @@ export function buildMarketView(input: MarketViewInput): MarketView {
 export function marketCollectBadgeCount(info: MarketInfo | null): number {
   if (!info) return 0;
   return (info.collectionCopper > 0 ? 1 : 0) + info.collectionItems.length;
+}
+
+// The view-state the painter's per-frame refresh diffs to decide whether to repaint
+// the live Browse/Collect list.
+export interface MarketRefreshState {
+  tab: MarketTab;
+  itemType: MarketItemTypeFilter;
+  subtype: MarketSubtypeFilter;
+  rarity: MarketRarityFilter;
+  sort: MarketSortOrder;
+  page: number;
+}
+
+// The Browse/Collect refresh dirty-check signature. It deliberately OMITS every
+// listing's live secondsLeft (dropped by the JSON replacer): secondsLeft ticks at
+// whole-second granularity, so leaving it in flips the signature once a second and
+// the painter rebuilds the whole list, which wipes a mid-typed bid or buy-quantity
+// input. Every other rendered field still rides the signature, so a new or removed
+// listing, a bid, a price/count/denom change, or a pending-payment lock still forces
+// a rebuild; the painter refreshes the stale countdown text in place instead.
+export function marketRefreshSignature(
+  state: MarketRefreshState,
+  info: MarketInfo | null | undefined,
+): string {
+  return JSON.stringify(
+    [
+      state.tab,
+      state.itemType,
+      state.subtype,
+      state.rarity,
+      state.sort,
+      state.page,
+      info?.listings,
+      info?.totalCount,
+      info?.filter,
+      info?.page,
+      info?.pageCount,
+      info?.collectionCopper,
+      info?.collectionItems,
+      info?.myPendingPurchase,
+    ],
+    (key, value) => (key === 'secondsLeft' ? undefined : value),
+  );
 }

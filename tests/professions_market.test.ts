@@ -57,12 +57,15 @@ describe('World Market integration: profession items (#1146)', () => {
     standAtMerchant(sim, buyer);
     sim.addItem('bone_fragments', 5, seller);
     sim.players.get(buyer)!.copper = 1000;
+    sim.players.get(seller)!.copper = 20; // the 48h listing deposit: 5 units * 4
     sim.events.length = 0;
 
     // list the WHOLE stack (the fully-listed case the acceptance criteria calls out)
-    sim.marketList('bone_fragments', 5, 200, seller);
+    // at 40 copper per unit (a 200 total, matching the pre-auction fixture)
+    sim.marketList('bone_fragments', 5, 40, seller);
     expect(errorsSince(sim)).toEqual([]);
     expect(sim.countItem('bone_fragments', seller)).toBe(0); // fully escrowed, none left behind
+    expect(copperOf(sim, seller)).toBe(0); // the deposit was staked
 
     const listing = sim.marketListings.find(
       (l) => l.sellerKey === marketSellerKey(seller) && l.itemId === 'bone_fragments',
@@ -70,16 +73,16 @@ describe('World Market integration: profession items (#1146)', () => {
     expect(listing.count).toBe(5);
     sim.events.length = 0;
 
-    sim.marketBuy(listing.id, buyer);
+    sim.marketBuy(listing.id, undefined, buyer);
 
     expect(errorsSince(sim)).toEqual([]);
     expect(copperOf(sim, buyer)).toBe(800);
     expect(sim.countItem('bone_fragments', buyer)).toBe(5); // exact quantity, no dupe/loss
     expect(sim.countItem('bone_fragments', seller)).toBe(0); // seller keeps none
     expect(sim.marketListings.some((l) => l.id === listing.id)).toBe(false);
-    // 5% cut: seller is owed 190, waiting to be collected (no coin created or destroyed)
+    // 5% cut: seller is owed 190, plus their full 20 deposit back (all units sold)
     const info = sim.marketInfoFor(seller)!;
-    expect(info.collectionCopper).toBe(190);
+    expect(info.collectionCopper).toBe(210);
   });
 
   it('lists a crafted/vendor gathering tool and buys it: no dupe, no loss', () => {
@@ -101,7 +104,7 @@ describe('World Market integration: profession items (#1146)', () => {
     )!;
     sim.events.length = 0;
 
-    sim.marketBuy(listing.id, buyer);
+    sim.marketBuy(listing.id, undefined, buyer);
 
     expect(errorsSince(sim)).toEqual([]);
     expect(copperOf(sim, buyer)).toBe(410);
@@ -115,6 +118,7 @@ describe('World Market integration: profession items (#1146)', () => {
     const crafter = sim.addPlayer('warrior', 'Crafter');
     standAtMerchant(sim, crafter);
     sim.addItem('eastbrook_arming_sword', 1, crafter);
+    sim.players.get(crafter)!.copper = 84; // 48h deposit: floor(140 * 0.15) * 4
     sim.events.length = 0;
 
     sim.marketList('eastbrook_arming_sword', 1, 500, crafter);
@@ -141,14 +145,17 @@ describe('World Market integration: profession items (#1146)', () => {
     sim.addItem('copper_mining_pick', 1, seller);
     sim.addItem('eastbrook_wool_trousers', 1, seller);
     sim.players.get(buyer)!.copper = 2000;
+    // 48h deposits: bone_fragments 4/unit * 2, pick 0, trousers floor(110*0.15)*4 = 64
+    sim.players.get(seller)!.copper = 72;
 
-    sim.marketList('bone_fragments', 2, 100, seller); // sells -> collection gold
+    sim.marketList('bone_fragments', 2, 50, seller); // sells (100 total) -> collection gold
     sim.marketList('copper_mining_pick', 1, 90, seller); // stays listed
     sim.marketList('eastbrook_wool_trousers', 1, 400, seller); // stays listed
     sim.marketBuy(
       sim.marketListings.find(
         (l) => l.sellerKey === marketSellerKey(seller) && l.itemId === 'bone_fragments',
       )!.id,
+      undefined,
       buyer,
     );
 
@@ -166,13 +173,14 @@ describe('World Market integration: profession items (#1146)', () => {
     expect(loadedGear).toMatchObject({ sellerKey: marketSellerKey(seller), count: 1, price: 400 });
     // house stock reseeded exactly once, never duplicated from the save
     expect(sim2.marketListings.filter((l) => l.house).length).toBe(houseBefore);
-    // the material sale proceeds carried across (100 - 5% = 95)
+    // the material sale proceeds carried across (100 - 5% = 95, plus the 8
+    // deposit refunded when both listed units sold)
     // reach into the private collection map: sim2 has no live player for the seller pid,
     // so the public marketInfoFor cannot resolve the key here.
     const col = (
       sim2.market as unknown as { marketCollections: Map<string, { copper: number }> }
     ).marketCollections.get(marketSellerKey(seller));
-    expect(col?.copper).toBe(95);
+    expect(col?.copper).toBe(103);
 
     // buyer can still collect their bought material, and quantities stay exact
     expect(sim.countItem('bone_fragments', buyer)).toBe(2);
@@ -216,6 +224,7 @@ describe('save-on-leave atomicity for a profession-item listing (#1146)', () => 
       const seller = sim.addPlayer('warrior', 'Gatherer');
       standAtMerchant(sim, seller);
       sim.addItem('bone_fragments', 3, seller);
+      sim.players.get(seller)!.copper = 12; // the 48h listing deposit: 3 units * 4
       sim.marketList('bone_fragments', 3, 150, seller); // escrows the whole stack right before "disconnect"
 
       const state = sim.serializeCharacter(seller);

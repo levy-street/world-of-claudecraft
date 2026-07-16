@@ -3682,12 +3682,12 @@ function marketRoundTrip(): Scenario {
 
       // 2) browse filter narrows to the wolf_fang listing, then clears.
       sim.marketSearch(
-        { search: 'wolf', itemType: 'all', subtype: 'all', rarity: 'all', page: 0 },
+        { search: 'wolf', itemType: 'all', subtype: 'all', rarity: 'all', sort: 'newest', page: 0 },
         seller,
       );
       rec.snapshot('searched');
       sim.marketSearch(
-        { search: '', itemType: 'all', subtype: 'all', rarity: 'all', page: 0 },
+        { search: '', itemType: 'all', subtype: 'all', rarity: 'all', sort: 'newest', page: 0 },
         seller,
       );
       rec.snapshot('search-cleared');
@@ -3695,7 +3695,7 @@ function marketRoundTrip(): Scenario {
       // 3) the buyer buys it: coin leaves the buyer, goods enter their bags, the
       // seller's proceeds (less the 5% cut) wait in their collection.
       const sale = sim.marketListings.find((l) => !l.house && l.sellerName === 'Seller')!;
-      sim.marketBuy(sale.id, buyer);
+      sim.marketBuy(sale.id, undefined, buyer);
       rec.snapshot('bought');
 
       // 4) list a second stack then reclaim it -> the escrow returns to the bags.
@@ -3713,6 +3713,160 @@ function marketRoundTrip(): Scenario {
       rec.snapshot('expired');
 
       // 6) collect everything waiting: the sale gold + the expired item -> bags.
+      sim.marketCollect(seller);
+      rec.snapshot('collected');
+    },
+  };
+}
+
+// World Market auction extension (L2): a seller and TWO bidders (outbid needs a
+// third distinct identity, since marketBid refuses a bid on your own lot, so
+// market_round_trip's two-player shape cannot exercise it) drive the bid/outbid/
+// buyout/expiry-win path the fixed-price scenario above does not touch. Lot A (no
+// buyout) is bid, outbid (the loser's escrow refunds to their collection +
+// marketOutbid), then forced past expiry so the once-a-second sweep settles it to
+// the high bidder (marketWon to the winner, marketSold to the seller, item into the
+// winner's collection). Lot B (with a buyout) takes one bid, then is bought out
+// outright, which refunds the standing bidder's escrow as part of the buyout
+// settlement. Both listed items round their deposit to 0 (wolf_fang/spring_water
+// sellValue), so every copper movement traces to the bid/proceeds math, not the
+// deposit -- market_partial below covers deposit conservation. No rng.
+function marketAuction(): Scenario {
+  return {
+    name: 'market_auction',
+    coverage: [
+      'World Market auction: marketList with auction opts (startingBid, no buyout)',
+      'marketBid escrows the full bid; a higher second bid refunds the first bidder (marketOutbid) to their collection',
+      'marketList with a buyout price, a bid placed against it, then marketBuy settles the buyout and refunds the standing bid',
+      'updateMarket expiry sweep on an auction WITH a bid: item -> winner collection, proceeds -> seller collection (marketWon/marketSold)',
+      "marketCollect drains every party's collection (winner goods, seller proceeds, outbid refund)",
+    ],
+    build: () => new Sim({ seed: 1023, playerClass: 'warrior', noPlayer: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const seller = sim.addPlayer('warrior', 'Auctioneer');
+      const bidderA = sim.addPlayer('mage', 'Alder');
+      const bidderB = sim.addPlayer('rogue', 'Birch');
+      const merchant = [...sim.entities.values()].find(
+        (e: AnyEntity) => e.templateId === 'the_merchant',
+      ) as AnyEntity;
+      for (const pid of [seller, bidderA, bidderB]) {
+        teleport(sim, sim.entities.get(pid) as AnyEntity, merchant.pos.x, merchant.pos.z);
+      }
+      sim.addItem('wolf_fang', 1, seller);
+      sim.addItem('spring_water', 1, seller);
+      sim.players.get(bidderA)!.copper = 500;
+      sim.players.get(bidderB)!.copper = 1000;
+      rec.notes.seller = seller;
+      rec.notes.bidderA = bidderA;
+      rec.notes.bidderB = bidderB;
+      rec.snapshot('auction-setup');
+
+      // 1) Lot A: an auction with no buyout.
+      sim.marketList('wolf_fang', 1, 0, seller, { auction: { startingBid: 50 } });
+      const lotA = sim.marketListings.find((l) => !l.house && l.itemId === 'wolf_fang')!;
+      rec.notes.lotAId = lotA.id;
+      rec.snapshot('lotA-listed');
+
+      // 2) bidder A opens at the starting bid; bidder B outbids -> A's escrow
+      // refunds to their collection (marketOutbid, both parties online).
+      sim.marketBid(lotA.id, 50, bidderA);
+      rec.snapshot('lotA-bid');
+      sim.marketBid(lotA.id, 100, bidderB);
+      rec.snapshot('lotA-outbid');
+
+      // 3) Lot B: an auction WITH a buyout.
+      sim.marketList('spring_water', 1, 0, seller, {
+        auction: { startingBid: 20, buyoutPrice: 200 },
+      });
+      const lotB = sim.marketListings.find((l) => !l.house && l.itemId === 'spring_water')!;
+      sim.marketBid(lotB.id, 30, bidderA);
+      rec.snapshot('lotB-bid');
+
+      // 4) bidder B buys Lot B out outright: A's standing bid refunds as part of
+      // the buyout settlement; the item lands straight in B's bags.
+      sim.marketBuy(lotB.id, undefined, bidderB);
+      rec.snapshot('lotB-boughtout');
+
+      // 5) force Lot A past its expiry and run the once-a-second sweep: the
+      // standing high bid (B, 100) settles the sale (marketWon/marketSold).
+      lotA.expiresAt = sim.time - 1;
+      rec.tick(20);
+      rec.snapshot('lotA-expired');
+
+      // 6) everyone collects what is waiting for them.
+      sim.marketCollect(seller);
+      sim.marketCollect(bidderA);
+      sim.marketCollect(bidderB);
+      rec.snapshot('collected');
+    },
+  };
+}
+
+// World Market partial-buy extension (L2): per-unit stacks split across TWO
+// different buyers (the fixed-price sibling of market_round_trip, which only ever
+// buys a lot whole). Exercises listing deposit accrual, the per-unit deposit
+// refund riding back with each partial sale, and deposit forfeiture on the unsold
+// remainder's expiry -- the conservation invariant (deposit charged == deposit
+// refunded + deposit forfeited) holds exactly. arcanite_bar (sellValue 40) keeps
+// the per-unit deposit meaningfully non-zero, unlike wolf_fang/spring_water above.
+// No rng.
+function marketPartial(): Scenario {
+  return {
+    name: 'market_partial',
+    coverage: [
+      'marketList per-unit stack with a non-zero listing deposit (depositPerUnit * count escrowed up front)',
+      'marketBuy partial quantity by one buyer: cost = qty * pricePerUnit, remainder stays listed',
+      'marketBuy partial quantity by a SECOND, different buyer against the same listing',
+      'the per-unit deposit stake rides back to the seller collection with each partial sale',
+      'updateMarket expiry sweep on the unsold remainder: item returns, its deposit share is forfeited',
+    ],
+    build: () => new Sim({ seed: 1031, playerClass: 'warrior', noPlayer: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const seller = sim.addPlayer('warrior', 'Stocker');
+      const buyerA = sim.addPlayer('mage', 'Cato');
+      const buyerB = sim.addPlayer('rogue', 'Dell');
+      const merchant = [...sim.entities.values()].find(
+        (e: AnyEntity) => e.templateId === 'the_merchant',
+      ) as AnyEntity;
+      for (const pid of [seller, buyerA, buyerB]) {
+        teleport(sim, sim.entities.get(pid) as AnyEntity, merchant.pos.x, merchant.pos.z);
+      }
+      sim.addItem('arcanite_bar', 6, seller);
+      sim.players.get(seller)!.copper = 1000; // covers the listing deposit
+      sim.players.get(buyerA)!.copper = 1000;
+      sim.players.get(buyerB)!.copper = 1000;
+      rec.notes.seller = seller;
+      rec.notes.buyerA = buyerA;
+      rec.notes.buyerB = buyerB;
+      rec.snapshot('partial-setup');
+
+      // 1) list the full stack at 100/unit, the 24h tier (deposit = floor(40*0.15)*2
+      // = 12/unit, 72 total) -> escrow pulls all 6 from the seller's bags.
+      sim.marketList('arcanite_bar', 6, 100, seller, { durationHours: 24 });
+      const lot = sim.marketListings.find((l) => !l.house && l.itemId === 'arcanite_bar')!;
+      rec.notes.lotId = lot.id;
+      rec.snapshot('listed');
+
+      // 2) buyer A takes 2 of 6: cost 200, proceeds floor(200*0.95)=190 + the
+      // 2-unit deposit share (24) both land in the seller's collection.
+      sim.marketBuy(lot.id, 2, buyerA);
+      rec.snapshot('bought-partial-a');
+
+      // 3) buyer B takes 3 of the remaining 4: cost 300, proceeds 285 + the
+      // 3-unit deposit share (36).
+      sim.marketBuy(lot.id, 3, buyerB);
+      rec.snapshot('bought-partial-b');
+
+      // 4) force the unsold 1-unit remainder past expiry: the sweep returns the
+      // item to the seller's collection and forfeits its 12-copper deposit share
+      // (never refunded to anyone -- the gold-sink half of the invariant).
+      lot.expiresAt = sim.time - 1;
+      rec.tick(20);
+      rec.snapshot('remainder-expired');
+
+      // 5) the seller collects every proceeds/refund tranche plus the returned item.
       sim.marketCollect(seller);
       rec.snapshot('collected');
     },
@@ -3961,8 +4115,8 @@ function playerTrade(): Scenario {
       // 1) atomic swap: A gives 2 wolf_fang + 30 copper, B gives 1 baked_bread + 10 copper.
       sim.tradeRequest(b, a);
       sim.tradeAccept(b);
-      sim.tradeSetOffer([{ itemId: 'wolf_fang', count: 2 }], 30, a);
-      sim.tradeSetOffer([{ itemId: 'baked_bread', count: 1 }], 10, b);
+      sim.tradeSetOffer([{ itemId: 'wolf_fang', count: 2 }], 30, 0, '0', a);
+      sim.tradeSetOffer([{ itemId: 'baked_bread', count: 1 }], 10, 0, '0', b);
       sim.tradeConfirm(a);
       sim.tradeConfirm(b);
       rec.snapshot('swapped');
@@ -3970,7 +4124,7 @@ function playerTrade(): Scenario {
       // 2) cancel path: open another session, A confirms, B cancels it (no swap).
       sim.tradeRequest(b, a);
       sim.tradeAccept(b);
-      sim.tradeSetOffer([{ itemId: 'wolf_fang', count: 1 }], 0, a);
+      sim.tradeSetOffer([{ itemId: 'wolf_fang', count: 1 }], 0, 0, '0', a);
       sim.tradeConfirm(a);
       sim.tradeCancel(b);
       rec.snapshot('cancelled');
@@ -3983,6 +4137,84 @@ function playerTrade(): Scenario {
       teleport(sim, sim.entities.get(b) as AnyEntity, 40, -40);
       rec.tick(1);
       rec.snapshot('drift-cancelled');
+    },
+  };
+}
+
+// Player-to-player trade, instance-aware (G2b): an offer row may carry a specific
+// instanced copy (signed/rolled/enchanted, #1165) instead of a plain fungible
+// stack; the sim captures the payload from the OWNER's real inventory (never off
+// the wire) and it survives the swap intact. Both sides offer an instance row plus
+// copper (a hand-placed copy via addItemInstance stands in for a crafted/enchanted
+// grant; no dev command mints one directly). Only the classic items+copper lane is
+// reachable here: external (Claudium/$WOC) pledges need a live server settlement
+// orchestrator the offline sim cannot drive, so this scenario never touches them.
+function playerTradeInstances(): Scenario {
+  return {
+    name: 'player_trade_instances',
+    coverage: [
+      'tradeSetOffer captures an instance payload from the OWNER real inventory (never off the wire)',
+      'tradeConfirm swaps an instance row + a plain fungible row atomically, both directions',
+      'the instance payload (signer/rolled.stats) survives the swap intact (#1165 data-loss regression)',
+    ],
+    build: () => new Sim({ seed: 1023, playerClass: 'warrior', noPlayer: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const a = sim.addPlayer('warrior', 'Ayla');
+      const b = sim.addPlayer('mage', 'Borin');
+      teleport(sim, sim.entities.get(a) as AnyEntity, 0, -40);
+      teleport(sim, sim.entities.get(b) as AnyEntity, 3, -40);
+
+      // dev-grant a plain stack, then hand-place an instanced copy alongside it
+      // (the sim internals other scenarios use to stage state directly).
+      sim.addItem('wolf_fang', 2, a);
+      sim.addItemInstance('wolf_fang', { signer: 'Ayla', rolled: { stats: { str: 5 } } }, a);
+      sim.addItem('apprentice_staff', 1, b);
+      sim.addItemInstance(
+        'apprentice_staff',
+        { signer: 'Borin', rolled: { stats: { int: 2 } } },
+        b,
+      );
+      sim.players.get(a)!.copper = 100;
+      sim.players.get(b)!.copper = 50;
+      rec.notes.a = a;
+      rec.notes.b = b;
+      rec.snapshot('trade-instances-setup');
+
+      // Both sides offer their instanced copy plus copper; the offline sim reads
+      // the selector as a match against the owner's real inventory, so the
+      // captured payload rides on the WIRE selector rather than the input count.
+      sim.tradeRequest(b, a);
+      sim.tradeAccept(b);
+      sim.tradeSetOffer(
+        [
+          {
+            itemId: 'wolf_fang',
+            count: 1,
+            instance: { signer: 'Ayla', rolled: { stats: { str: 5 } } },
+          },
+        ],
+        30,
+        0,
+        '0',
+        a,
+      );
+      sim.tradeSetOffer(
+        [
+          {
+            itemId: 'apprentice_staff',
+            count: 1,
+            instance: { signer: 'Borin', rolled: { stats: { int: 2 } } },
+          },
+        ],
+        10,
+        0,
+        '0',
+        b,
+      );
+      sim.tradeConfirm(a);
+      sim.tradeConfirm(b);
+      rec.snapshot('trade-instances-swapped');
     },
   };
 }
@@ -4098,9 +4330,12 @@ export const SCENARIOS: Scenario[] = [
   hitRatingHeroic(true),
   c5AutoAttack(),
   marketRoundTrip(),
+  marketAuction(),
+  marketPartial(),
   inventoryVendor(),
   bankRoundTrip(),
   g1bXpPrestige(),
   playerTrade(),
+  playerTradeInstances(),
   chatSocial(),
 ];

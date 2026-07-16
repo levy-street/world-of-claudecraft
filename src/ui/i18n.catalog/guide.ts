@@ -1469,13 +1469,17 @@ export const guideStrings = {
     marketBody:
       'The Merchant runs the World Market, a player-driven exchange where you can buy and sell with people you may never meet. Speak to the Merchant in Eastbrook, or to Auctioneer Voss up in Highwatch, to open it: both keepers serve the one shared market. The Merchant also keeps a standing stock of their own goods listed there, so there is always something to buy even when no other players have posted.',
     marketBrowse:
-      'Browsing: scroll the listings or search by name to find what is for sale. Each listing shows the goods, the seller, and the asking price for the whole stack.',
+      'Browsing: scroll the listings or search by name to find what is for sale. Each listing shows the goods, the seller, how much time is left, and either a per-item price for a bulk stack you can buy in part, or the standing bid on an auction lot.',
     marketPost:
-      'Posting: choose a stack from your bags, set your price, and list it. The goods are held by the Merchant until someone buys them. Unsold listings come back to you after a while, and you can reclaim one early if you change your mind.',
+      'Posting: choose a stack from your bags, pick how long to list it, 12, 24, or 48 hours, and set a per-item price, or open it to auction with a starting bid and an optional buyout. Listing takes a small deposit that scales with the duration; it comes back to you as your goods sell and is only lost on whatever goes unsold. The goods are held by the Merchant until someone buys them or the auction ends, and you can reclaim a listing early if you change your mind.',
+    marketBidding:
+      'Auctions: some listings take bids instead of a fixed price. A bid must clear the posted minimum, and outbidding someone always refunds them. When the seller sets a buyout, any bid that reaches it wins the lot on the spot.',
     marketCollect:
       'Collecting: when your goods sell, your proceeds wait for you at the Merchant. Return to collect the coin, along with anything that came back unsold. The Merchant takes a small cut of every completed sale.',
     marketPricing:
       'Pricing is up to you. Listing a little under what others are asking tends to sell faster, while a steep price may sit untouched. Browse first to see what the going rate looks like before you post.',
+    marketCurrencies:
+      'Where enabled, a listing can also be priced in Claudium or WOC: the buyer pays you directly, account to account or wallet to wallet, the Merchant holds the goods until the payment clears, and the listing deposit stays plain gold.',
   },
 
   // Social and Groups: chat channels, parties, party loot, friends, ignore, guilds.

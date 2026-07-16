@@ -538,6 +538,10 @@ function marketInfo(shape: WorldShape): MarketInfo {
     price: 1234,
     mine: false,
     house: false,
+    secondsLeft: 3600,
+    kind: 'fixed',
+    myBid: false,
+    denom: 'copper',
   };
   const base: MarketInfo = {
     listings: [listing],
@@ -550,6 +554,8 @@ function marketInfo(shape: WorldShape): MarketInfo {
     cutPct: 5,
     maxListings: 10,
     myListingCount: 0,
+    durationsHours: [12, 24, 48],
+    rails: { claudium: false, woc: false },
   };
   // The sim shape may carry extra server-only fields the view ignores; the client mirror
   // carries only the decoded fields (the offline-only-shape trap catches).

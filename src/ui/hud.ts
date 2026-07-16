@@ -78,6 +78,7 @@ import {
   type AbilityEffect,
   CONSUME_DURATION,
   canPrestige,
+  cloneItemInstancePayload,
   dist2d,
   type Entity,
   FAERIE_FIRE_ARMOR_PCT,
@@ -391,6 +392,8 @@ import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap, CLICK_SUPPRESS_MS, TAP_SLOP_PX } from './touch_tap';
 import { buildTownFocusView, stepTownFocus } from './town_focus_view';
 import { renderTownFocusWindow } from './town_focus_window';
+import { buildTradeView } from './trade_view';
+import { renderTradeWindow, type TradeWindowDeps } from './trade_window';
 import { TutorialOverlay } from './tutorial';
 import { svgIcon } from './ui_icons';
 import { getUiScale } from './ui_scale';
@@ -1160,7 +1163,12 @@ export class Hud {
   private lastSwingTimer = 0;
   private lastLowResourceSig = '';
   // trading: locally staged offer, pushed to the server on change
-  private stagedTrade: { items: InvSlot[]; copper: number } = { items: [], copper: 0 };
+  private stagedTrade: { items: InvSlot[]; copper: number; claudium: number; woc: string } = {
+    items: [],
+    copper: 0,
+    claudium: 0,
+    woc: '0',
+  };
   private tradeWasOpen = false;
   private lastTradeSig = '';
   private lastPartySig = '';
@@ -3317,7 +3325,7 @@ export class Hud {
     closeVendor: () => this.closeVendor(),
     closeBank: () => this.closeBank(),
     onClosed: () => this.onBagsClosed(),
-    addItemToTrade: (itemId) => this.addItemToTrade(itemId),
+    addItemToTrade: (slot) => this.addItemToTrade(slot),
     stageMarketSell: (itemId) => this.marketWindow.stageSell(itemId),
     stageMailParcel: (itemId) => this.mailboxWindow.stageParcel(itemId),
     insertItemChatLink: (itemId) => this.insertItemChatLink(itemId),
@@ -3352,6 +3360,9 @@ export class Hud {
     ...this.windowFocus('#market-window'),
     showError: (text) => this.showError(text),
     slotName: (slot) => itemSlotName(slot),
+    confirmDialog: (title, body, okText, cancelText, onOk) =>
+      this.confirmDialog(title, body, okText, cancelText, onOk),
+    copyToClipboard: (text) => this.copyTradePaymentLink(text),
     syncBags: (open) => {
       if (open) {
         this.renderBags();
@@ -8420,11 +8431,33 @@ export class Hud {
             t('hud.prompts.tradeRequest', { name: `<b>${esc(ev.fromName)}</b>` }),
             t('hud.prompts.openTrade'),
             () => this.sim.tradeAccept(),
-            () => {
-              /* let it expire */
-            },
+            () => this.sim.tradeDecline(),
           );
           break;
+        case 'tradeDeclined':
+          audio.click();
+          this.log(t('hud.logs.tradeDeclined', { name: esc(ev.byName) }), '#8df');
+          break;
+        case 'tradeSettleFailed':
+          this.showError(
+            t(
+              ev.reason === 'timeout'
+                ? 'hud.errors.tradeSettleTimeout'
+                : ev.reason === 'cancelled'
+                  ? 'hud.errors.tradeSettleCancelled'
+                  : 'hud.errors.tradeSettleUnavailable',
+            ),
+          );
+          break;
+        // 'tradeSettle' and 'tradeLedger' are server-swallowed accounting
+        // events (see src/sim/types.ts): an online client never receives
+        // them (game.ts intercepts and reacts server-side), and the offline
+        // Sim never emits them either, because OFFLINE_TRADE_RAILS reports
+        // every external rail unavailable, so the external-pledge lane that
+        // would emit these can never trigger with no server present. No case
+        // is needed (the switch has no default arm; an unmatched type is a
+        // silent no-op), but the two are named here so a reader does not go
+        // looking for a missing handler.
         case 'duelRequest':
           audio.duelChallenge();
           this.showPrompt(
@@ -8957,6 +8990,70 @@ export class Hud {
           }
           break;
         }
+        // World Market auction outcomes. Structured data only (the mail letter
+        // precedent): every visible string is built here from t() keys, never
+        // spliced from sim text, so no localizeLootText/localizeErrorText matcher
+        // is needed for these (S3 stays clean). Offline recipients get the
+        // AUCTION_LETTERS letter instead (sim/market.ts sendMarketLetter); this
+        // switch only ever sees the online-recipient shape.
+        case 'marketOutbid': {
+          const item = marketEventItemLabel(ev.itemId, ev.count);
+          this.log(
+            t('itemUi.market.outbidToast', { item, money: formatLocalizedMoney(ev.refund) }),
+            '#dcd29f',
+          );
+          audio.click();
+          break;
+        }
+        case 'marketWon': {
+          const item = marketEventItemLabel(ev.itemId, ev.count);
+          this.log(t('itemUi.market.wonToast', { item }), '#7fdc4f');
+          audio.coin();
+          break;
+        }
+        case 'marketSold': {
+          const item = marketEventItemLabel(ev.itemId, ev.count);
+          // External-denomination sale: the payment went straight to the
+          // seller's wallet/Claudium balance (proceeds is 0 by construction),
+          // so the toast must not claim copper waits at the Merchant.
+          if (ev.denom === 'woc') {
+            this.log(
+              t('itemUi.market.soldWalletToast', { item, amount: ev.costWoc ?? '0' }),
+              '#7fdc4f',
+            );
+          } else if (ev.denom === 'claudium') {
+            this.log(
+              t('itemUi.market.soldAccountToast', {
+                item,
+                amount: formatNumber(ev.costClaudium ?? 0, { maximumFractionDigits: 0 }),
+              }),
+              '#7fdc4f',
+            );
+          } else {
+            this.log(
+              t('itemUi.market.soldToast', { item, money: formatLocalizedMoney(ev.proceeds) }),
+              '#7fdc4f',
+            );
+          }
+          audio.coin();
+          break;
+        }
+        case 'marketPaymentExpired': {
+          // The buyer's external payment window closed unpaid: the lot is open
+          // again and nothing moved. Quiet treatment (no sound), like expiry.
+          const item = marketEventItemLabel(ev.itemId, 1);
+          this.log(t('itemUi.market.paymentExpiredToast', { item }), '#dcd29f');
+          break;
+        }
+        case 'marketExpired': {
+          // The sim also emits a legacy 'log' event for this (parity-pinned text,
+          // itemUi.logs.expiredListing) that already lands in General/Chat; this
+          // structured companion carries no additional sound, matching expiry's
+          // existing quiet treatment (a deliberate choice, not an oversight).
+          const item = marketEventItemLabel(ev.itemId, ev.count);
+          this.log(t('itemUi.market.expiredToast', { item }), '#caa472');
+          break;
+        }
       }
     }
     if (deedUnlocks.length > 0) this.handleDeedUnlocks(deedUnlocks);
@@ -9244,6 +9341,17 @@ export class Hud {
       'Target is too far away to trade.': 'hud.errors.tradeTooFar',
       'The trade request has expired.': 'hud.errors.tradeExpired',
       'Trade failed: items or money no longer available.': 'hud.errors.tradeFailed',
+      // G2b: external-currency trade legs (Claudium/WOC pledges) and the
+      // pre-existing gap fix: 'That player is already trading.' had no
+      // matcher anywhere (tradeAccept's own busy check, distinct from
+      // tradeRequest's 'A trade is already in progress.' above).
+      'That player is already trading.': 'hud.errors.tradeBusy',
+      'Claudium trading is not available.': 'hud.errors.claudiumTradeOff',
+      'WOC trading is not available.': 'hud.errors.wocTradeOff',
+      'Link a wallet to trade WOC.': 'hud.errors.wocTradeLink',
+      'Your trade partner has no linked wallet.': 'hud.errors.wocTradePartnerLink',
+      'Only one side of a trade can offer WOC.': 'hud.errors.wocTradeOneSide',
+      'Trade whom? Usage: /trade <name>.': 'hud.errors.tradeUsage',
       'That quest is not available.': 'questUi.errors.unavailable',
       'That quest is not in your log.': 'questUi.errors.notInLog',
       'That quest is not complete.': 'questUi.errors.incomplete',
@@ -9264,6 +9372,23 @@ export class Hud {
       'You cannot afford that.': 'itemUi.errors.cannotAfford',
       'That is not your listing.': 'itemUi.errors.notYourListing',
       'You have nothing to collect.': 'itemUi.errors.nothingToCollect',
+      'Name a starting bid of at least 1 copper.': 'itemUi.errors.minStartingBid',
+      'The buyout must beat the starting bid.': 'itemUi.errors.buyoutTooLow',
+      'Choose a listing duration of 12, 24, or 48 hours.': 'itemUi.errors.chooseDuration',
+      'You cannot afford the listing deposit.': 'itemUi.errors.cannotAffordDeposit',
+      'That lot takes bids only.': 'itemUi.errors.bidsOnly',
+      'That lot is not up for auction.': 'itemUi.errors.notAuction',
+      'You cannot bid on your own lot.': 'itemUi.errors.cannotBidOwnLot',
+      'You are already the high bidder.': 'itemUi.errors.alreadyHighBidder',
+      // AH-P4: multi-currency listing denominations (claudium / woc).
+      'Bids take gold only.': 'itemUi.errors.bidsGoldOnly',
+      'Claudium listings are not available.': 'itemUi.errors.claudiumUnavailable',
+      'WOC listings are not available.': 'itemUi.errors.wocUnavailable',
+      'Link a wallet to list for WOC.': 'itemUi.errors.wocLinkToList',
+      'Link a wallet to pay with WOC.': 'itemUi.errors.wocLinkToPay',
+      'Name a valid WOC price.': 'itemUi.errors.wocPriceInvalid',
+      'That lot is awaiting payment.': 'itemUi.errors.awaitingPayment',
+      'Finish your pending purchase first.': 'itemUi.errors.pendingPurchaseFirst',
       "You can't assist yourself.": 'hud.errors.assistSelf',
       'Assist whom? Target a player or use /assist <name>.': 'hud.errors.assistWhom',
       'Invite whom? Usage: /invite <name>.': 'hudChrome.party.inviteUsage',
@@ -9324,6 +9449,8 @@ export class Hud {
       });
     match = /^That is your own listing (?:\u2014|-) cancel it to reclaim it\.$/.exec(text);
     if (match) return t('itemUi.errors.ownListing');
+    match = /^Bid at least (.+)\.$/.exec(text);
+    if (match) return t('itemUi.errors.bidTooLow', { min: this.localizeSimMoney(match[1]) });
     match = /^All instances of (.+) are busy\. Try again soon\.$/.exec(text);
     if (match) {
       const busyName = match[1];
@@ -9503,11 +9630,37 @@ export class Hud {
         item: itemDisplayNameFromSource(match[1]),
         money: this.localizeSimMoney(match[2]),
       });
+    // External-denomination Listed lines FIRST: the plain matcher below would
+    // otherwise swallow "... for 10 Claudium." with money = "10 Claudium".
+    match = /^Listed (.+?)( x\d+)? on the World Market for (.+) Claudium\.$/.exec(text);
+    if (match)
+      return t('itemUi.logs.listedClaudium', {
+        item: itemStackDisplayName(match[1], match[2]),
+        amount: match[3],
+      });
+    match = /^Listed (.+?)( x\d+)? on the World Market for (.+) WOC\.$/.exec(text);
+    if (match)
+      return t('itemUi.logs.listedWoc', {
+        item: itemStackDisplayName(match[1], match[2]),
+        amount: match[3],
+      });
     match = /^Listed (.+?)( x\d+)? on the World Market for (.+)\.$/.exec(text);
     if (match)
       return t('itemUi.logs.listedItem', {
         item: itemStackDisplayName(match[1], match[2]),
         money: this.localizeSimMoney(match[3]),
+      });
+    match = /^Posted (.+?)( x\d+)? for auction \(starting bid (.+)\)\.$/.exec(text);
+    if (match)
+      return t('itemUi.logs.postedAuction', {
+        item: itemStackDisplayName(match[1], match[2]),
+        money: this.localizeSimMoney(match[3]),
+      });
+    match = /^Bid placed: (.+) on (.+)\.$/.exec(text);
+    if (match)
+      return t('itemUi.logs.bidPlaced', {
+        money: this.localizeSimMoney(match[1]),
+        item: itemDisplayNameFromSource(match[2]),
       });
     match = /^(.+) bought your (.+) for (.+?) (?:\u2014|-) collect (.+) from the Merchant\.$/.exec(
       text,
@@ -11971,20 +12124,92 @@ export class Hud {
     return this.sim.tradeInfo !== null;
   }
 
-  addItemToTrade(itemId: string): void {
+  addItemToTrade(slot: InvSlot): void {
     if (!this.tradeOpen || this.stagedTrade.items.length >= 6) return;
-    const existing = this.stagedTrade.items.find((s) => s.itemId === itemId);
-    const have = this.sim.inventory.find((s) => s.itemId === itemId)?.count ?? 0;
+    if (slot.instance) {
+      // A signed/enchanted/rolled copy trades ONLY as an explicit count-1 instance
+      // row carrying its payload; never merge it into a fungible stack of the same
+      // item id (fix F5/r8#1: the old itemId-only path dropped these entirely).
+      this.stagedTrade.items.push({
+        itemId: slot.itemId,
+        count: 1,
+        instance: cloneItemInstancePayload(slot.instance),
+      });
+      this.pushTradeOffer();
+      return;
+    }
+    const existing = this.stagedTrade.items.find((s) => s.itemId === slot.itemId && !s.instance);
+    // Cap increments at the FUNGIBLE stock (plain slots only), not the total count:
+    // an instanced copy of the same item id must not be counted as stageable
+    // fungible stock, matching the sim's countFungibleItem gate.
+    const fungibleHave = this.sim.inventory.reduce(
+      (sum, s) => (s.itemId === slot.itemId && !s.instance ? sum + s.count : sum),
+      0,
+    );
     if (existing) {
-      if (existing.count < have) existing.count++;
+      if (existing.count < fungibleHave) existing.count++;
     } else {
-      this.stagedTrade.items.push({ itemId, count: 1 });
+      this.stagedTrade.items.push({ itemId: slot.itemId, count: 1 });
     }
     this.pushTradeOffer();
   }
 
   private pushTradeOffer(): void {
-    this.sim.tradeSetOffer(this.stagedTrade.items, this.stagedTrade.copper);
+    this.sim.tradeSetOffer(
+      this.stagedTrade.items,
+      this.stagedTrade.copper,
+      this.stagedTrade.claudium,
+      this.stagedTrade.woc,
+    );
+  }
+
+  // Removes one unit of the offered row at `index` in the sim-confirmed
+  // myOffer.items (the same array trade_window.ts paints), by finding the
+  // matching entry in the local staged buffer. Matched by itemId + instance
+  // presence rather than array index into stagedTrade.items: the two arrays
+  // are index-aligned today (addItemToTrade only ever stages plain fungible
+  // rows, one per itemId), but matching this way stays correct if a future
+  // change stages rows in a different order.
+  private onRemoveOfferedTradeRow(index: number): void {
+    const row = this.sim.tradeInfo?.myOffer.items[index];
+    if (!row) return;
+    const stagedIdx = this.stagedTrade.items.findIndex(
+      (s) => s.itemId === row.itemId && !!s.instance === !!row.instance,
+    );
+    if (stagedIdx < 0) return;
+    const staged = this.stagedTrade.items[stagedIdx];
+    staged.count--;
+    if (staged.count <= 0) this.stagedTrade.items.splice(stagedIdx, 1);
+    this.pushTradeOffer();
+  }
+
+  private onTradeMoneyChange(copper: number): void {
+    this.stagedTrade.copper = Math.max(0, Math.floor(copper) || 0);
+    this.pushTradeOffer();
+  }
+
+  private onTradeClaudiumChange(amount: number): void {
+    this.stagedTrade.claudium = Math.max(0, Math.floor(amount) || 0);
+    this.pushTradeOffer();
+  }
+
+  private onTradeWocChange(raw: string): void {
+    const trimmed = raw.trim();
+    this.stagedTrade.woc = trimmed === '' ? '0' : trimmed;
+    this.pushTradeOffer();
+  }
+
+  // Best-effort clipboard write for the settling panel's payment-link copy
+  // button. navigator.clipboard is unavailable over plain HTTP / in some
+  // embedded contexts; a failed write just skips the confirmation toast
+  // rather than throwing (the link text is always visible as a fallback).
+  private copyTradePaymentLink(text: string): void {
+    navigator.clipboard
+      ?.writeText(text)
+      .then(() => this.log(t('hud.trade.copiedLink'), '#8df'))
+      .catch(() => {
+        /* clipboard unavailable; the link is still visible in the window */
+      });
   }
 
   private updateTradeWindow(): void {
@@ -11992,17 +12217,23 @@ export class Hud {
     const info = this.sim.tradeInfo;
     if (!info) {
       if (this.tradeWasOpen) {
-        el.style.display = 'none';
         this.tradeWasOpen = false;
-        this.stagedTrade = { items: [], copper: 0 };
+        this.stagedTrade = { items: [], copper: 0, claudium: 0, woc: '0' };
         this.lastTradeSig = '';
+        renderTradeWindow(el, { kind: 'closed' }, this.tradeWindowDeps);
+        // Release the Tab-trap and return focus to the opener (fix F7e).
+        this.tradeWindowDeps.restoreFocus(this.tradeOpenerFocus);
+        this.tradeOpenerFocus = null;
         if ($('#bags').style.display !== 'none') this.renderBags();
       }
       return;
     }
     if (!this.tradeWasOpen) {
       this.tradeWasOpen = true;
-      this.stagedTrade = { items: [], copper: 0 };
+      this.stagedTrade = { items: [], copper: 0, claudium: 0, woc: '0' };
+      // Install the shared FocusManager Tab-trap for the trade window on open,
+      // mirroring #market-window (fix F7e/r8#3).
+      this.tradeOpenerFocus = this.tradeWindowDeps.captureFocus();
       this.renderBags();
       $('#bags').style.display = 'flex';
     }
@@ -12011,77 +12242,39 @@ export class Hud {
       info.theirOffer,
       info.myAccepted,
       info.theirAccepted,
+      info.phase,
+      info.rails,
+      info.settle,
+      info.wocPay,
       this.stagedTrade,
     ]);
     if (sig === this.lastTradeSig) return;
     this.lastTradeSig = sig;
-
-    const itemRow = (s: InvSlot, mine: boolean) => {
-      const item = ITEMS[s.itemId];
-      const label = `${item ? itemDisplayName(item) : s.itemId}${s.count > 1 ? ` x${formatNumber(s.count, { maximumFractionDigits: 0 })}` : ''}`;
-      const inner = `${this.itemIcon(item)}<span>${esc(label)}</span>`;
-      return mine
-        ? `<button type="button" class="trade-item mine" data-item="${esc(s.itemId)}">${inner}</button>`
-        : `<div class="trade-item">${inner}</div>`;
-    };
-    el.innerHTML = `
-      <div class="panel-title"><span>${esc(t('hud.trade.title', { name: info.otherName }))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.trade.cancel'))}">${svgIcon('close')}</button></div>
-      <div class="trade-cols">
-        <div class="trade-col ${info.myAccepted ? 'accepted' : ''}">
-          <h4>${esc(t('hud.trade.yourOffer'))}</h4>
-          <div class="trade-items">${info.myOffer.items.map((s) => itemRow(s, true)).join('') || `<div class="trade-empty">${esc(t('hud.trade.emptyMine'))}</div>`}</div>
-          <div class="trade-money"><span class="trade-money-label">${esc(t('hud.trade.money'))}:</span>
-            <span class="trade-coins">
-              <input class="coininput" id="trade-g" type="number" min="0" value="${Math.floor(this.stagedTrade.copper / 10000)}" aria-label="${esc(t('itemUi.money.gold'))}"><span class="coin g" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.goldShort'))}</span>
-              <input class="coininput" id="trade-s" type="number" min="0" max="99" value="${Math.floor((this.stagedTrade.copper % 10000) / 100)}" aria-label="${esc(t('itemUi.money.silver'))}"><span class="coin s" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.silverShort'))}</span>
-              <input class="coininput" id="trade-c" type="number" min="0" max="99" value="${this.stagedTrade.copper % 100}" aria-label="${esc(t('itemUi.money.copper'))}"><span class="coin c" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.copperShort'))}</span>
-            </span>
-          </div>
-        </div>
-        <div class="trade-col ${info.theirAccepted ? 'accepted' : ''}">
-          <h4>${esc(t('hud.trade.theirOffer', { name: info.otherName }))}</h4>
-          <div class="trade-items">${info.theirOffer.items.map((s) => itemRow(s, false)).join('') || `<div class="trade-empty">${esc(t('hud.trade.emptyTheirs'))}</div>`}</div>
-          <div class="trade-money">${esc(t('hud.trade.money'))}: <span class="gold">${formatLocalizedMoney(info.theirOffer.copper)}</span></div>
-        </div>
-      </div>
-      <div class="trade-hint">${esc(t('hud.trade.hint'))}</div>`;
-    const acceptBtn = document.createElement('button');
-    acceptBtn.className = 'btn';
-    acceptBtn.textContent = info.myAccepted ? t('hud.trade.waiting') : t('hud.trade.accept');
-    acceptBtn.disabled = info.myAccepted;
-    acceptBtn.addEventListener('click', () => this.sim.tradeConfirm());
-    const cancelBtn = document.createElement('button');
-    cancelBtn.className = 'btn';
-    cancelBtn.textContent = t('hud.trade.cancel');
-    cancelBtn.addEventListener('click', () => this.sim.tradeCancel());
-    el.append(acceptBtn, cancelBtn);
-    el.querySelector('[data-close]')?.addEventListener('click', () => this.sim.tradeCancel());
-    el.querySelectorAll('.trade-item.mine').forEach((row) => {
-      row.addEventListener('click', () => {
-        const itemId = (row as HTMLElement).dataset.item ?? '';
-        const idx = this.stagedTrade.items.findIndex((s) => s.itemId === itemId);
-        if (idx >= 0) {
-          this.stagedTrade.items[idx].count--;
-          if (this.stagedTrade.items[idx].count <= 0) this.stagedTrade.items.splice(idx, 1);
-          this.pushTradeOffer();
-        }
-      });
-    });
-    const goldInput = el.querySelector('#trade-g') as HTMLInputElement;
-    const silverInput = el.querySelector('#trade-s') as HTMLInputElement;
-    const copperInput = el.querySelector('#trade-c') as HTMLInputElement;
-    const syncTradeMoney = () => {
-      const gg = Math.max(0, Math.floor(Number(goldInput?.value) || 0));
-      const ss = Math.max(0, Math.floor(Number(silverInput?.value) || 0));
-      const cc = Math.max(0, Math.floor(Number(copperInput?.value) || 0));
-      this.stagedTrade.copper = gg * 10000 + ss * 100 + cc;
-      this.pushTradeOffer();
-    };
-    [goldInput, silverInput, copperInput].forEach((input) => {
-      input?.addEventListener('change', syncTradeMoney);
-    });
-    el.style.display = 'block';
+    renderTradeWindow(
+      el,
+      buildTradeView(info, this.stagedTrade, (id) => ITEMS[id]),
+      this.tradeWindowDeps,
+    );
   }
+
+  // Built once (lazy field, composes the shared presentationBag), not per
+  // render: the callbacks close over `this` and read live state on each call,
+  // so there is nothing render-specific to rebuild.
+  private readonly tradeWindowDeps: TradeWindowDeps = {
+    ...this.presentationBag,
+    ...this.windowFocus('#trade-window'),
+    onRemoveOffered: (index) => this.onRemoveOfferedTradeRow(index),
+    onMoneyChange: (copper) => this.onTradeMoneyChange(copper),
+    onClaudiumChange: (amount) => this.onTradeClaudiumChange(amount),
+    onWocChange: (raw) => this.onTradeWocChange(raw),
+    onConfirm: () => this.sim.tradeConfirm(),
+    onCancel: () => this.sim.tradeCancel(),
+    copyToClipboard: (text) => this.copyTradePaymentLink(text),
+  };
+
+  // The element focused when the trade window opened, restored (with the Tab-trap
+  // released) when it closes (fix F7e/r8#3).
+  private tradeOpenerFocus: HTMLElement | null = null;
 
   // -------------------------------------------------------------------------
   // Options menu (Esc) + hotkey rebinding
@@ -12261,6 +12454,17 @@ function itemStackDisplayName(item: string, stackSuffix?: string): string {
   if (!stackSuffix) return itemName;
   const count = Number(stackSuffix.trim().slice(1));
   return `${itemName} ${t('itemUi.bags.stackCount', { count: formatNumber(count, { maximumFractionDigits: 0 }) })}`;
+}
+
+// The market's structured SimEvents (marketOutbid/Won/Sold/Expired) carry an
+// itemId + count directly, unlike the loot-channel text scrapes above: no
+// English source string to parse, so the display name + stack suffix build
+// straight from the ids.
+function marketEventItemLabel(itemId: string, count: number): string {
+  const item = ITEMS[itemId];
+  const name = item ? itemDisplayName(item) : itemId;
+  if (count <= 1) return name;
+  return `${name} ${t('itemUi.market.stackCount', { count: formatNumber(count, { maximumFractionDigits: 0 }) })}`;
 }
 
 function mobDisplayName(mobId: string): string {

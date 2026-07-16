@@ -259,7 +259,7 @@
       "time": 0,
       "nextId": 410,
       "state": "01ee998f",
-      "events": "f8791bac",
+      "events": "a2f0b1a5",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -936,8 +936,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 410,
-      "state": "c18f263c",
-      "events": "40e24e67",
+      "state": "dfecd4db",
+      "events": "9631fece",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1013,7 +1013,7 @@
           "bank": {},
           "cls": "mage",
           "companionUpgrades": {},
-          "copper": 4700,
+          "copper": 4400,
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
@@ -1167,7 +1167,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 410,
-      "state": "c18f263c",
+      "state": "dfecd4db",
       "events": "3c05f6df",
       "rng": {
         "draws": 0,
@@ -1244,7 +1244,7 @@
           "bank": {},
           "cls": "mage",
           "companionUpgrades": {},
-          "copper": 4700,
+          "copper": 4400,
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
@@ -1398,8 +1398,8 @@
       "tick": 20,
       "time": 1,
       "nextId": 410,
-      "state": "caa20159",
-      "events": "40dfbbdd",
+      "state": "cff22280",
+      "events": "b531a963",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1409,7 +1409,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 410,
-      "state": "caa20159",
+      "state": "cff22280",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1489,7 +1489,7 @@
           "bank": {},
           "cls": "mage",
           "companionUpgrades": {},
-          "copper": 4700,
+          "copper": 4400,
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
@@ -1646,8 +1646,8 @@
       "tick": 20,
       "time": 1,
       "nextId": 410,
-      "state": "e715a78b",
-      "events": "627b358b",
+      "state": "c7676c3e",
+      "events": "8cac0036",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1668,13 +1668,13 @@
           "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 285,
+          "copper": 570,
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "marketSaleCopper": 285
+              "marketSaleCopper": 570
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -1729,7 +1729,7 @@
           "bank": {},
           "cls": "mage",
           "companionUpgrades": {},
-          "copper": 4700,
+          "copper": 4400,
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
@@ -1886,7 +1886,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 410,
-      "state": "e715a78b",
+      "state": "c7676c3e",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1908,13 +1908,13 @@
           "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 285,
+          "copper": 570,
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "marketSaleCopper": 285
+              "marketSaleCopper": 570
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -1969,7 +1969,7 @@
           "bank": {},
           "cls": "mage",
           "companionUpgrades": {},
-          "copper": 4700,
+          "copper": 4400,
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},

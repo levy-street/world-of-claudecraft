@@ -7,8 +7,9 @@
 //
 // Run with max graphics: GFX=ultra. Toggle which build you screenshot with
 // LABEL=before|after (purely cosmetic — affects only the output filenames).
-import puppeteer from 'puppeteer-core';
+
 import fs from 'node:fs';
+import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH as EDGE } from './browser_path.mjs';
 
 const GFX = process.env.GFX ?? 'ultra';
@@ -41,21 +42,35 @@ await wait(1500);
 // Stand the player on the Merchant, list all 12 of their slots, then flood the
 // market with 200 cheaper other-seller listings that sort first.
 const setup = await page.evaluate(() => {
-  const { sim, hud } = window.__game;
+  const { sim } = window.__game;
   const me = [...sim.players.keys()][0];
   let merch = null;
   for (const e of sim.entities.values()) if (e.templateId === 'the_merchant') merch = e;
   const pe = sim.entities.get(me);
-  pe.pos.x = merch.pos.x; pe.pos.z = merch.pos.z; pe.prevPos = { ...pe.pos };
+  pe.pos.x = merch.pos.x;
+  pe.pos.z = merch.pos.z;
+  pe.prevPos = { ...pe.pos };
 
   sim.addItem('wolf_fang', 12, me);
   for (let i = 0; i < 12; i++) sim.marketList('wolf_fang', 1, 200 + i, me);
 
   let id = sim.nextListingId;
   for (let i = 0; i < 200; i++) {
+    // hand-pushed flood rows must carry the full auction-era listing shape
     sim.marketListings.push({
-      id: id++, sellerKey: `Trader${i}`, sellerName: `Trader${i}`,
-      itemId: 'bone_fragments', count: 1, price: 40 + (i % 30), expiresAt: sim.time + 1000, house: false,
+      id: id++,
+      sellerKey: `Trader${i}`,
+      sellerName: `Trader${i}`,
+      itemId: 'bone_fragments',
+      count: 1,
+      price: 40 + (i % 30),
+      expiresAt: sim.time + 1000,
+      house: false,
+      kind: 'fixed',
+      denom: 'copper',
+      pricePerUnit: 40 + (i % 30),
+      durationSeconds: 1000,
+      depositPerUnit: 0,
     });
   }
   sim.nextListingId = id;
@@ -75,12 +90,21 @@ await wait(600);
 const clip = await page.evaluate(() => {
   const el = document.querySelector('#market-window');
   const r = el.getBoundingClientRect();
-  return { x: Math.round(r.x), y: Math.round(r.y), width: Math.round(r.width), height: Math.round(r.height) };
+  return {
+    x: Math.round(r.x),
+    y: Math.round(r.y),
+    width: Math.round(r.width),
+    height: Math.round(r.height),
+  };
 });
 await page.screenshot({ path: `${OUT}/${LABEL}_browse.png`, clip });
 
 // Switch to the Sell tab where the "X / 12 listing slots" note lives.
-await page.evaluate(() => { const h = window.__game.hud; h.marketTab = 'sell'; h.renderMarket(); });
+await page.evaluate(() => {
+  const h = window.__game.hud;
+  h.marketTab = 'sell';
+  h.renderMarket();
+});
 await wait(400);
 await page.screenshot({ path: `${OUT}/${LABEL}_sell.png`, clip });
 

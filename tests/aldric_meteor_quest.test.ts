@@ -145,7 +145,7 @@ describe('Brother Aldric fallen star quest', () => {
     expect(sim.countItem(REWARD_ITEM_ID)).toBe(1);
   });
 
-  it('keeps the cosmetic item out of vendor sell, destroy, and market flows while allowing trade', () => {
+  it('keeps the cosmetic item out of vendor sell, destroy, market, and trade flows (noMarketList)', () => {
     const sim = new Sim({ seed: 20061, playerClass: 'warrior', playerName: 'Seller' });
     sim.addItem(REWARD_ITEM_ID, 1);
 
@@ -169,8 +169,9 @@ describe('Brother Aldric fallen star quest', () => {
     sim.tradeRequest(buyer);
     sim.tradeAccept(buyer);
     sim.tradeSetOffer([{ itemId: REWARD_ITEM_ID, count: 1 }], 0);
-    expect(sim.tradeFor(sim.playerId)?.offerA.items).toEqual([
-      { itemId: REWARD_ITEM_ID, count: 1 },
-    ]);
+    // noVendorSell + noDiscard + noMarketList, same as mail/market: trade refuses
+    // it too (#1165 binding-flag parity; previously an oversight gap).
+    expect(sim.tradeFor(sim.playerId)?.offerA.items).toEqual([]);
+    expect(sim.countItem(REWARD_ITEM_ID)).toBe(1);
   });
 });

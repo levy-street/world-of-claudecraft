@@ -3,7 +3,7 @@ import path from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
 import { DEEDS } from '../src/sim/content/deeds';
-import { QUEST_LETTERS } from '../src/sim/content/letters';
+import { AUCTION_LETTERS, QUEST_LETTERS, TRADE_LETTERS } from '../src/sim/content/letters';
 import {
   ABILITIES,
   CLASSES,
@@ -382,6 +382,7 @@ describe('i18n Localization Key Coverage', () => {
     losses: 4,
     loser: 'Mira',
     marker: 'Skull',
+    hours: 24,
     max: 25,
     message: 'Meet at the inn',
     min: 16,
@@ -392,6 +393,7 @@ describe('i18n Localization Key Coverage', () => {
     percent: 30,
     position: 3,
     price: '1g 20s',
+    time: '2h 15m',
     proceeds: '95s',
     quality: 'Rare',
     rating: 1513,
@@ -1021,8 +1023,13 @@ describe('i18n Localization Key Coverage', () => {
       Object.keys(DUNGEONS).length * 3 +
       Object.keys(DELVES).length * 3 +
       // Ravenpost authored letters: welcome + Heroic Marks reward + quest
-      // letters, 3 fields each.
-      (2 + Object.keys(QUEST_LETTERS).length) * 3;
+      // letters + auction-outcome letters + G2b trade settlement letters
+      // (delivery/refund), 3 fields each.
+      (2 +
+        Object.keys(QUEST_LETTERS).length +
+        Object.keys(AUCTION_LETTERS).length +
+        Object.keys(TRADE_LETTERS).length) *
+        3;
     expect(worldEntries).toHaveLength(expectedWorldCount);
 
     for (const lang of supportedLanguages) {

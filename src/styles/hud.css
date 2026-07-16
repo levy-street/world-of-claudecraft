@@ -4701,6 +4701,11 @@
   .trade-item.mine:hover {
     background: #ffffff14;
   }
+  /* A signed/enchanted/rolled instance copy: a subtle gold inset border so it
+     reads apart from a plain copy of the same item (no layout shift). */
+  .trade-item.instance {
+    box-shadow: inset 0 0 0 1px var(--gold-dim);
+  }
   .trade-empty {
     color: var(--color-text-muted);
     font-size: 11px;
@@ -4745,6 +4750,68 @@
     font-size: 10.5px;
     color: #887c5c;
     margin-top: 8px;
+  }
+  /* G2b: Claudium/WOC pledge rows (my side, editable) and read-only currency
+     readouts (their side / settling), reusing the bags wallet-balance icon
+     conventions (.claudium-coin / .woc-coin, components.css). */
+  .trade-currency {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    font-size: 12px;
+  }
+  .trade-currency-readonly {
+    color: var(--color-text-muted);
+  }
+  .trade-currency-input {
+    width: 80px;
+    background: #0d0d14;
+    color: #ffd100;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 3px 6px;
+    user-select: text;
+  }
+  /* G2b settling panel: replaces the offer inputs once both sides confirm a
+     trade carrying an external pledge (escrowed, server-driven legs). */
+  .trade-settle {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .trade-settle-leg {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 12px;
+    padding: 3px 6px;
+    border: 1px solid #463a1c;
+    border-radius: 3px;
+    background: #0c0c12;
+  }
+  .trade-settle-leg.is-done .trade-settle-status {
+    color: #1eff00;
+  }
+  .trade-settle-leg.is-pending .trade-settle-status {
+    color: var(--gold);
+  }
+  .trade-woc-pay {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid #463a1c;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .trade-woc-pay-prompt {
+    font-size: 11.5px;
+    color: var(--color-text-muted);
+  }
+  .trade-woc-pay-link {
+    text-align: center;
+    text-decoration: none;
   }
 
   /* ---------- elite target frame ---------- */

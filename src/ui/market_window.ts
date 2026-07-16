@@ -14,8 +14,15 @@
 // raw hex sits in this painter.
 
 import { audio } from '../game/audio';
+import { ITEMS } from '../sim/data';
+import {
+  type MarketDenom,
+  type MarketDurationHours,
+  type MarketListOptions,
+  marketDepositPerUnit,
+} from '../sim/market';
 import type { EquipSlot } from '../sim/types';
-import type { IWorld } from '../world_api';
+import type { IWorld, MarketListingView, MarketPendingPurchaseView } from '../world_api';
 import { markDialogRoot } from './dialog_root';
 import { dropdownKeyNav } from './dropdown_nav';
 import { computeDropdownPlacement } from './dropdown_position';
@@ -27,10 +34,12 @@ import {
   MARKET_ARMOR_TYPE_FILTERS,
   MARKET_ITEM_TYPE_FILTERS,
   MARKET_RARITY_FILTERS,
+  MARKET_SORT_ORDERS,
   MARKET_WEAPON_TYPE_FILTERS,
   type MarketItemTypeFilter,
   type MarketQuery,
   type MarketRarityFilter,
+  type MarketSortOrder,
   type MarketSubtypeFilter,
 } from './market_filters';
 import {
@@ -43,8 +52,11 @@ import {
   type MarketSellMeta,
   type MarketTab,
   marketCollectBadgeCount,
+  marketRefreshSignature,
 } from './market_view';
 import type { PainterHostPresentation } from './painter_host';
+import { buildWocPayPanel } from './payment_panel';
+import { lockoutParts, lockoutShape } from './raid_lockout';
 import { svgIcon } from './ui_icons';
 
 // The unranked quality fallback as a CSS custom property. The
@@ -76,8 +88,20 @@ export interface MarketWindowDeps extends PainterHostPresentation {
   restoreFocus(target: HTMLElement | null): void;
   showError(text: string): void;
   slotName(slot: EquipSlot): string;
+  /** The shared modal confirm prompt (reused verbatim from talents/questlog). */
+  confirmDialog(
+    title: string,
+    body: string,
+    okText: string,
+    cancelText: string,
+    onOk: () => void,
+  ): void;
   /** Render the bags window and, when `open`, reveal it alongside the market. */
   syncBags(open: boolean): void;
+  /** Best-effort clipboard write for the pending panel's payment-link copy
+   *  button (the trade window's copyToClipboard dep, reused: the confirmation
+   *  toast is owned by Hud, so the button keeps a static label). */
+  copyToClipboard(text: string): void;
 }
 
 export class MarketWindow {
@@ -86,8 +110,12 @@ export class MarketWindow {
   private itemTypeFilter: MarketItemTypeFilter = 'all';
   private subtypeFilter: MarketSubtypeFilter = 'all';
   private rarityFilter: MarketRarityFilter = 'all';
+  private sortOrder: MarketSortOrder = 'newest';
   private browsePage = 0;
   private sellItemId: string | null = null;
+  private sellKind: 'fixed' | 'auction' = 'fixed';
+  private sellDenom: MarketDenom = 'copper';
+  private sellDurationHours: MarketDurationHours = 48;
   private searchQuery = '';
   private lastSig = '';
   private openerFocus: HTMLElement | null = null;
@@ -111,8 +139,12 @@ export class MarketWindow {
     this.itemTypeFilter = 'all';
     this.subtypeFilter = 'all';
     this.rarityFilter = 'all';
+    this.sortOrder = 'newest';
     this.browsePage = 0;
     this.sellItemId = null;
+    this.sellKind = 'fixed';
+    this.sellDenom = 'copper';
+    this.sellDurationHours = 48;
     this.searchQuery = '';
     this.pushQuery();
     this.lastSig = '';
@@ -147,6 +179,7 @@ export class MarketWindow {
       itemType: this.itemTypeFilter,
       subtype: this.subtypeFilter,
       rarity: this.rarityFilter,
+      sort: this.sortOrder,
       page: this.browsePage,
     };
   }
@@ -164,20 +197,22 @@ export class MarketWindow {
   refreshIfChanged(): void {
     if (!this.opened || this.tab === 'sell') return;
     const info = this.deps.world().marketInfo;
-    const sig = JSON.stringify([
-      this.tab,
-      this.itemTypeFilter,
-      this.subtypeFilter,
-      this.rarityFilter,
-      this.browsePage,
-      info?.listings,
-      info?.totalCount,
-      info?.filter,
-      info?.page,
-      info?.pageCount,
-      info?.collectionCopper,
-      info?.collectionItems,
-    ]);
+    const sig = marketRefreshSignature(
+      {
+        tab: this.tab,
+        itemType: this.itemTypeFilter,
+        subtype: this.subtypeFilter,
+        rarity: this.rarityFilter,
+        sort: this.sortOrder,
+        page: this.browsePage,
+      },
+      info,
+    );
+    // The signature omits each listing's live secondsLeft so a bare per-second tick
+    // never rebuilds the Browse list and wipes a mid-typed bid or buy-quantity. Keep
+    // the countdown honest by refreshing just the time-left cells in place every pass,
+    // before the change check below can early-return.
+    if (this.tab === 'browse' && info) this.tickBrowseTimeLeft(info.listings);
     if (sig === this.lastSig) return;
     this.lastSig = sig;
     const collectTab = this.deps.root().querySelector('[data-tab="collect"]');
@@ -307,6 +342,9 @@ export class MarketWindow {
         } else if (key === 'rarity') {
           this.rarityFilter = value as MarketRarityFilter;
           this.browsePage = 0;
+        } else if (key === 'sort') {
+          this.sortOrder = value as MarketSortOrder;
+          this.browsePage = 0;
         } else {
           return;
         }
@@ -401,7 +439,7 @@ export class MarketWindow {
       return;
     }
     if (view.kind === 'browse') {
-      this.renderBrowse(body, view.body);
+      this.renderBrowse(body, view.body, view.pending);
       return;
     }
     if (view.kind === 'sell') {
@@ -411,7 +449,11 @@ export class MarketWindow {
     this.renderCollect(body, view.body);
   }
 
-  private renderBrowse(body: HTMLElement, view: MarketBrowseBody): void {
+  private renderBrowse(
+    body: HTMLElement,
+    view: MarketBrowseBody,
+    pending: MarketPendingPurchaseView | null,
+  ): void {
     // Reuse the search field and list container across refreshes so typing in
     // the box never loses focus when the server streams back filtered results.
     let search = body.querySelector('.mkt-search') as HTMLInputElement | null;
@@ -454,6 +496,7 @@ export class MarketWindow {
       search.value = this.searchQuery;
     }
     list.innerHTML = '';
+    if (pending) list.appendChild(this.buildPendingPanel(pending));
     if (view.state === 'empty') {
       if (view.reason === 'filtered') this.browsePage = 0;
       const empty = document.createElement('div');
@@ -491,35 +534,23 @@ export class MarketWindow {
       const row = document.createElement('div');
       row.className = 'mkt-row';
       const itemName = itemDisplayName(item);
-      const each =
-        l.count > 1
-          ? `<br><span class="seller">${esc(t('itemUi.market.each', { money: formatLocalizedMoney(Math.ceil(l.price / l.count)) }))}</span>`
-          : '';
       const stack =
         l.count > 1
           ? ` <span class="stack">${esc(t('itemUi.market.stackCount', { count: formatNumber(l.count, { maximumFractionDigits: 0 }) }))}</span>`
           : '';
+      const myBidBadge = l.myBid
+        ? ` <span class="mkt-mybid">${esc(t('itemUi.market.yourBidBadge'))}</span>`
+        : '';
+      const timeLeft =
+        l.secondsLeft >= 0
+          ? `<br><span class="time-left" data-listing-id="${l.id}">${esc(t('itemUi.market.timeLeft', { time: this.formatTimeLeft(l.secondsLeft) }))}</span>`
+          : '';
       row.innerHTML =
         `${this.deps.itemIcon(item)}` +
-        `<span class="mkt-name"><span class="nm" style="color:${qColor}">${esc(itemName)}${stack}</span>` +
-        `<span class="seller${l.house ? ' house' : ''}">${esc(l.house ? t('itemUi.market.merchantStock') : l.sellerName)}</span></span>` +
-        `<span class="mkt-price">${this.deps.moneyHtml(l.price)}${each}</span>`;
-      const btn = document.createElement('button');
-      btn.className = `mkt-btn${l.mine ? ' cancel' : ''}`;
-      btn.textContent = l.mine ? t('itemUi.market.reclaim') : t('itemUi.market.buy');
-      btn.setAttribute(
-        'aria-label',
-        t(l.mine ? 'itemUi.market.reclaimAria' : 'itemUi.market.buyAria', {
-          item: itemName,
-          price: formatLocalizedMoney(l.price),
-        }),
-      );
-      btn.addEventListener('click', () => {
-        if (l.mine) this.deps.world().marketCancel(l.id);
-        else this.deps.world().marketBuy(l.id);
-        audio.click();
-      });
-      row.appendChild(btn);
+        `<span class="mkt-name"><span class="nm" style="color:${qColor}">${esc(itemName)}${stack}${myBidBadge}</span>` +
+        `<span class="seller${l.house ? ' house' : ''}">${esc(l.house ? t('itemUi.market.merchantStock') : l.sellerName)}</span>${timeLeft}</span>` +
+        this.marketPriceCellHtml(l);
+      this.appendMarketRowAction(row, l, itemName);
       this.deps.attachTooltip(row, () => this.deps.itemTooltip(item));
       list.appendChild(row);
     }
@@ -584,54 +615,224 @@ export class MarketWindow {
     pick.innerHTML = `${this.deps.itemIcon(item)}<span class="ps-name" style="color:${qColor}">${esc(itemDisplayName(item))}</span>`;
     body.appendChild(pick);
 
+    // Denomination selector (Gold / Claudium / WOC): the same small-button
+    // pattern as the type toggle below, rendered ONLY for rails the viewer has
+    // available (meta.rails, mirrored from the sim's authoritative view). With
+    // both rails off exactly one option would render, so the whole selector is
+    // skipped and the form stays byte-identical to the copper-only market.
+    const denomOptions: { denom: MarketDenom; label: string }[] = [
+      { denom: 'copper', label: t('itemUi.market.denomGold') },
+    ];
+    if (meta.rails.claudium) {
+      denomOptions.push({ denom: 'claudium', label: t('itemUi.market.denomClaudium') });
+    }
+    if (meta.rails.woc) denomOptions.push({ denom: 'woc', label: t('itemUi.market.denomWoc') });
+    if (!denomOptions.some((o) => o.denom === this.sellDenom)) this.sellDenom = 'copper';
+    if (denomOptions.length > 1) {
+      const denomToggle = document.createElement('div');
+      denomToggle.className = 'mkt-denom-toggle';
+      denomToggle.setAttribute('role', 'group');
+      denomToggle.setAttribute('aria-label', t('itemUi.market.denomLabel'));
+      denomToggle.innerHTML = denomOptions
+        .map(
+          (o) =>
+            `<button type="button" class="mkt-type-btn${this.sellDenom === o.denom ? ' sel' : ''}" data-sell-denom="${o.denom}" aria-pressed="${this.sellDenom === o.denom ? 'true' : 'false'}">${esc(o.label)}</button>`,
+        )
+        .join('');
+      denomToggle.querySelectorAll<HTMLButtonElement>('[data-sell-denom]').forEach((button) => {
+        button.addEventListener('click', () => {
+          const next = button.dataset.sellDenom as MarketDenom;
+          if (next === this.sellDenom) return;
+          this.sellDenom = next;
+          // Bids take gold only: an external denomination forces a fixed sale.
+          if (next !== 'copper' && this.sellKind === 'auction') this.sellKind = 'fixed';
+          audio.click();
+          this.renderContent();
+        });
+      });
+      body.appendChild(denomToggle);
+    }
+
+    // Listing-type toggle (fixed price / auction): two small buttons, not the
+    // filter-menu listbox (a 2-way choice does not need one) and not a slider
+    // (numeric-input precedent, docs/hud-program-validation-report.md M7).
+    // The auction option is DISABLED for an external denomination (the sim's
+    // "Bids take gold only." rule), with the reason as its tooltip.
+    const kindToggle = document.createElement('div');
+    kindToggle.className = 'mkt-type-toggle';
+    kindToggle.setAttribute('role', 'group');
+    kindToggle.setAttribute('aria-label', t('itemUi.market.listingTypeLabel'));
+    kindToggle.innerHTML = (['fixed', 'auction'] as const)
+      .map((kind) => {
+        const auctionLocked = kind === 'auction' && this.sellDenom !== 'copper';
+        const lockedAttrs = auctionLocked
+          ? ` disabled title="${esc(t('itemUi.market.auctionGoldOnly'))}"`
+          : '';
+        return `<button type="button" class="mkt-type-btn${this.sellKind === kind ? ' sel' : ''}" data-sell-kind="${kind}" aria-pressed="${this.sellKind === kind ? 'true' : 'false'}"${lockedAttrs}>${esc(t(kind === 'fixed' ? 'itemUi.market.listingTypeFixed' : 'itemUi.market.listingTypeAuction'))}</button>`;
+      })
+      .join('');
+    kindToggle.querySelectorAll<HTMLButtonElement>('[data-sell-kind]').forEach((button) => {
+      button.addEventListener('click', () => {
+        if (button.disabled) return;
+        const next = button.dataset.sellKind as 'fixed' | 'auction';
+        if (next === this.sellKind) return;
+        this.sellKind = next;
+        audio.click();
+        this.renderContent();
+      });
+    });
+    body.appendChild(kindToggle);
+
+    // Duration toggle (12h / 24h / 48h): same small-button pattern as the type
+    // toggle above, driven by the sim's own duration list (meta.durationsHours)
+    // so the UI can never drift from what marketList will accept.
+    const durationToggle = document.createElement('div');
+    durationToggle.className = 'mkt-duration-toggle';
+    durationToggle.setAttribute('role', 'group');
+    durationToggle.setAttribute('aria-label', t('itemUi.market.durationLabel'));
+    durationToggle.innerHTML = meta.durationsHours
+      .map((hours) => {
+        const sel = this.sellDurationHours === hours;
+        return `<button type="button" class="mkt-duration-btn${sel ? ' sel' : ''}" data-sell-duration="${hours}" aria-pressed="${sel ? 'true' : 'false'}">${esc(t('itemUi.market.durationOption', { hours: formatNumber(hours, { maximumFractionDigits: 0 }) }))}</button>`;
+      })
+      .join('');
+    durationToggle.querySelectorAll<HTMLButtonElement>('[data-sell-duration]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const next = Number(button.dataset.sellDuration) as MarketDurationHours;
+        if (next === this.sellDurationHours) return;
+        this.sellDurationHours = next;
+        audio.click();
+        this.renderContent();
+      });
+    });
+    body.appendChild(durationToggle);
+
     const form = document.createElement('div');
     form.className = 'mkt-price-form';
     const qtyRow =
       have > 1
-        ? `<div class="mkt-price-row"><label for="mkt-qty">${esc(t('itemUi.market.quantity'))}</label><input class="coininput" id="mkt-qty" type="number" min="1" max="${have}" value="1"> <span class="mkt-coin-tag">${esc(t('itemUi.market.quantityOf', { count: formatNumber(have, { maximumFractionDigits: 0 }) }))}</span></div>`
+        ? `<div class="mkt-price-row"><label for="mkt-qty">${esc(t('itemUi.market.quantity'))}</label><input class="coininput" id="mkt-qty" type="number" min="1" max="${have}" value="${have}"> <span class="mkt-coin-tag">${esc(t('itemUi.market.quantityOf', { count: formatNumber(have, { maximumFractionDigits: 0 }) }))}</span></div>`
         : '';
-    form.innerHTML =
-      qtyRow +
-      `<div class="mkt-price-row"><label>${esc(t('itemUi.market.priceEach'))}</label>` +
-      `<input class="coininput" id="mkt-g" type="number" min="0" value="${suggested.gold}" aria-label="${esc(t('itemUi.money.gold'))}"><span class="coin g" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.goldShort'))}</span>` +
-      `<input class="coininput" id="mkt-s" type="number" min="0" max="99" value="${suggested.silver}" aria-label="${esc(t('itemUi.money.silver'))}"><span class="coin s" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.silverShort'))}</span>` +
-      `<input class="coininput" id="mkt-c" type="number" min="0" max="99" value="${suggested.copper}" aria-label="${esc(t('itemUi.money.copper'))}"><span class="coin c" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.copperShort'))}</span></div>`;
+    const priceLabel =
+      this.sellKind === 'auction'
+        ? t('itemUi.market.startingBidLabel')
+        : t('itemUi.market.priceEach');
+    // The ask input, per denomination: the copper coin trio (fixed or auction),
+    // a whole-Claudium integer per-unit input, or the whole-lot WOC decimal
+    // string (the sim treats it as an opaque normalized amount; whole-lot only).
+    const priceRow =
+      this.sellDenom === 'claudium'
+        ? `<div class="mkt-price-row"><label for="mkt-cl">${esc(t('itemUi.market.claudiumPriceEach'))}</label><img class="claudium-coin" src="/claudium/icons/claudium_coin_64.webp" alt=""><input class="coininput mkt-currency-input" id="mkt-cl" type="number" min="1" step="1" inputmode="numeric" value="1"></div>`
+        : this.sellDenom === 'woc'
+          ? `<div class="mkt-price-row"><label for="mkt-woc">${esc(t('itemUi.market.wocPriceLot'))}</label><span class="woc-coin" aria-hidden="true"></span><input class="coininput mkt-currency-input" id="mkt-woc" type="text" inputmode="decimal" pattern="[0-9]*\\.?[0-9]*" value=""></div>`
+          : `<div class="mkt-price-row"><label>${esc(priceLabel)}</label>` +
+            `<input class="coininput" id="mkt-g" type="number" min="0" value="${suggested.gold}" aria-label="${esc(t('itemUi.money.gold'))}"><span class="coin g" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.goldShort'))}</span>` +
+            `<input class="coininput" id="mkt-s" type="number" min="0" max="99" value="${suggested.silver}" aria-label="${esc(t('itemUi.money.silver'))}"><span class="coin s" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.silverShort'))}</span>` +
+            `<input class="coininput" id="mkt-c" type="number" min="0" max="99" value="${suggested.copper}" aria-label="${esc(t('itemUi.money.copper'))}"><span class="coin c" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.copperShort'))}</span></div>`;
+    const totalRow =
+      this.sellKind === 'fixed' && this.sellDenom !== 'woc'
+        ? `<div class="mkt-price-row"><label>${esc(t('itemUi.market.totalLabel'))}</label><span id="mkt-total" class="mkt-coin-tag"></span></div>`
+        : '';
+    const buyoutRow =
+      this.sellKind === 'auction'
+        ? `<div class="mkt-price-row"><label>${esc(t('itemUi.market.buyoutOptionalLabel'))}</label>` +
+          `<input class="coininput" id="mkt-bo-g" type="number" min="0" value="0" aria-label="${esc(t('itemUi.money.gold'))}"><span class="coin g" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.goldShort'))}</span>` +
+          `<input class="coininput" id="mkt-bo-s" type="number" min="0" max="99" value="0" aria-label="${esc(t('itemUi.money.silver'))}"><span class="coin s" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.silverShort'))}</span>` +
+          `<input class="coininput" id="mkt-bo-c" type="number" min="0" max="99" value="0" aria-label="${esc(t('itemUi.money.copper'))}"><span class="coin c" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.copperShort'))}</span></div>`
+        : '';
+    const depositRow = `<div class="mkt-price-row"><label>${esc(t('itemUi.market.depositPreviewLabel'))}</label><span id="mkt-deposit" class="mkt-coin-tag"></span></div>`;
+    form.innerHTML = qtyRow + priceRow + totalRow + buyoutRow + depositRow;
     body.appendChild(form);
+
+    const inputVal = (id: string): number => {
+      const el = this.deps.root().querySelector(`#${id}`) as HTMLInputElement | null;
+      return Math.max(0, parseInt(el?.value || '0', 10) || 0);
+    };
+    const readQty = (): number => (have > 1 ? Math.max(1, Math.min(have, inputVal('mkt-qty'))) : 1);
+    const readEach = (): number =>
+      inputVal('mkt-g') * COPPER_PER_GOLD +
+      inputVal('mkt-s') * COPPER_PER_SILVER +
+      inputVal('mkt-c');
+    const readBuyout = (): number =>
+      this.sellKind === 'auction'
+        ? inputVal('mkt-bo-g') * COPPER_PER_GOLD +
+          inputVal('mkt-bo-s') * COPPER_PER_SILVER +
+          inputVal('mkt-bo-c')
+        : 0;
+    const totalEl = body.querySelector('#mkt-total') as HTMLElement | null;
+    const depositEl = body.querySelector('#mkt-deposit') as HTMLElement;
+    const refreshLivePreview = () => {
+      const qty = readQty();
+      if (totalEl) {
+        totalEl.textContent =
+          this.sellDenom === 'claudium'
+            ? t('itemUi.market.claudiumAmount', {
+                amount: formatNumber(inputVal('mkt-cl') * qty, { maximumFractionDigits: 0 }),
+              })
+            : formatLocalizedMoney(readEach() * qty);
+      }
+      // The deposit is ALWAYS copper, whatever the ask's denomination.
+      depositEl.textContent = formatLocalizedMoney(
+        marketDepositPerUnit(item, this.sellDurationHours) * qty,
+      );
+    };
+    body
+      .querySelectorAll<HTMLInputElement>(
+        '#mkt-qty, #mkt-g, #mkt-s, #mkt-c, #mkt-bo-g, #mkt-bo-s, #mkt-bo-c, #mkt-cl, #mkt-woc',
+      )
+      .forEach((input) => {
+        input.addEventListener('input', refreshLivePreview);
+      });
+    refreshLivePreview();
 
     const listBtn = document.createElement('button');
     listBtn.className = 'mkt-list-btn';
     listBtn.textContent = t('itemUi.market.listButton');
     listBtn.addEventListener('click', () => {
-      const root = this.deps.root();
-      const qty =
-        have > 1
-          ? Math.max(
-              1,
-              Math.min(
-                have,
-                parseInt((root.querySelector('#mkt-qty') as HTMLInputElement)?.value || '1', 10) ||
-                  1,
-              ),
-            )
-          : 1;
-      const gg = Math.max(
-        0,
-        parseInt((root.querySelector('#mkt-g') as HTMLInputElement)?.value || '0', 10) || 0,
-      );
-      const ss = Math.max(
-        0,
-        parseInt((root.querySelector('#mkt-s') as HTMLInputElement)?.value || '0', 10) || 0,
-      );
-      const cc = Math.max(
-        0,
-        parseInt((root.querySelector('#mkt-c') as HTMLInputElement)?.value || '0', 10) || 0,
-      );
-      const each = gg * COPPER_PER_GOLD + ss * COPPER_PER_SILVER + cc;
-      if (each < 1) {
-        this.deps.showError(t('itemUi.market.minPriceError'));
-        return;
+      const qty = readQty();
+      const each = readEach();
+      const opts: MarketListOptions = { durationHours: this.sellDurationHours };
+      if (this.sellDenom === 'woc') {
+        // Client-side pre-check only; the sim re-normalizes authoritatively.
+        const raw = (
+          this.deps.root().querySelector('#mkt-woc') as HTMLInputElement | null
+        )?.value.trim();
+        if (!raw) {
+          this.deps.showError(t('itemUi.errors.wocPriceInvalid'));
+          return;
+        }
+        opts.denom = 'woc';
+        opts.priceWoc = raw;
+        // pricePerUnit is ignored by the sim for a woc lot; 0 documents that.
+        this.deps.world().marketList(view.form.itemId, qty, 0, opts);
+      } else if (this.sellDenom === 'claudium') {
+        const unit = inputVal('mkt-cl');
+        if (unit < 1) {
+          this.deps.showError(t('itemUi.market.claudiumMinError'));
+          return;
+        }
+        opts.denom = 'claudium';
+        this.deps.world().marketList(view.form.itemId, qty, unit, opts);
+      } else if (this.sellKind === 'auction') {
+        if (each < 1) {
+          this.deps.showError(t('itemUi.errors.minStartingBid'));
+          return;
+        }
+        const buyout = readBuyout();
+        if (buyout > 0 && buyout <= each) {
+          this.deps.showError(t('itemUi.errors.buyoutTooLow'));
+          return;
+        }
+        opts.auction = { startingBid: each, buyoutPrice: buyout > 0 ? buyout : undefined };
+        // pricePerUnit is ignored by the sim for an auction lot; 0 documents that.
+        this.deps.world().marketList(view.form.itemId, qty, 0, opts);
+      } else {
+        if (each < 1) {
+          this.deps.showError(t('itemUi.market.minPriceError'));
+          return;
+        }
+        this.deps.world().marketList(view.form.itemId, qty, each, opts);
       }
-      this.deps.world().marketList(view.form.itemId, qty, each * qty);
       this.sellItemId = null;
       audio.coin();
       this.render(); // the next snapshot echoes the new bags + listings
@@ -680,7 +881,331 @@ export class MarketWindow {
       .reduce((n, s) => n + s.count, 0);
   }
 
-  // ---- Filter chrome (the browse-tab type/subtype/rarity dropdowns) ----
+  // ---- Browse row: time-left, price cell, and the buy/bid/reclaim action area ----
+
+  // Whole days/hours/minutes from a listing's secondsLeft, via the same pure
+  // lockoutParts/lockoutShape split + hudChrome.raidLockout.* templates the raid
+  // lockout badge already uses (hud.ts formatLockoutDuration precedent): no new
+  // duration-formatting i18n keys needed for the market's own time-left column.
+  private formatTimeLeft(secondsLeft: number): string {
+    const ms = secondsLeft * 1000;
+    const { days, hours, minutes } = lockoutParts(ms);
+    const n = (v: number) => formatNumber(v, { maximumFractionDigits: 0, useGrouping: false });
+    switch (lockoutShape(ms)) {
+      case 'daysHours':
+        return t('hudChrome.raidLockout.daysHours', { d: n(days), h: n(hours) });
+      case 'hoursMinutes':
+        return t('hudChrome.raidLockout.hoursMinutes', { h: n(hours), m: n(minutes) });
+      case 'minutes':
+        return t('hudChrome.raidLockout.minutes', { m: n(minutes) });
+      default:
+        return t('hudChrome.raidLockout.lessThanMinute');
+    }
+  }
+
+  // Refresh the Browse time-left cells in place, keyed by listing id, without a full
+  // rebuild. The refresh signature deliberately excludes secondsLeft so a bare
+  // per-second tick never rebuilds the list and wipes a mid-typed bid or quantity;
+  // this keeps the visible countdown ticking anyway by rewriting only the affected
+  // spans. A house-stock row (secondsLeft < 0) renders no time-left cell, so a missing
+  // or negative entry is simply skipped.
+  private tickBrowseTimeLeft(listings: readonly MarketListingView[]): void {
+    const spans = this.deps
+      .root()
+      .querySelectorAll<HTMLElement>('.mkt-list .time-left[data-listing-id]');
+    if (spans.length === 0) return;
+    const secondsById = new Map(listings.map((l) => [l.id, l.secondsLeft] as const));
+    spans.forEach((span) => {
+      const secondsLeft = secondsById.get(Number(span.dataset.listingId));
+      if (secondsLeft === undefined || secondsLeft < 0) return;
+      span.textContent = t('itemUi.market.timeLeft', { time: this.formatTimeLeft(secondsLeft) });
+    });
+  }
+
+  // The awaiting-payment panel for the viewer's OWN pending external purchase:
+  // a Claudium purchase settles in one service round-trip (a short notice); a
+  // $WOC purchase renders the server-enriched Solana Pay request through the
+  // SHARED payment-panel builder (payment_panel.ts, the same panel the trade
+  // window paints) so the two windows can never drift (r7#2), keeping the
+  // trade-woc-pay* CSS classes.
+  private buildPendingPanel(pending: MarketPendingPurchaseView): HTMLElement {
+    const item = ITEMS[pending.itemId];
+    const itemName = item ? itemDisplayName(item) : pending.itemId;
+    if (pending.denom === 'woc' && pending.wocPay) {
+      const panel = buildWocPayPanel(
+        t('itemUi.market.wocPayPrompt', { amount: pending.wocPay.amountUi, item: itemName }),
+        pending.wocPay.uri,
+        this.deps,
+      );
+      panel.classList.add('mkt-pending');
+      return panel;
+    }
+    // Claudium (one service round-trip) and the pre-enrichment $WOC moment
+    // ("preparing payment") are prompt-only: no wallet link or copy button yet.
+    const panel = document.createElement('div');
+    panel.className = 'mkt-pending trade-woc-pay';
+    const prompt = document.createElement('div');
+    prompt.className = 'trade-woc-pay-prompt';
+    prompt.textContent =
+      pending.denom === 'claudium'
+        ? t('itemUi.market.pendingClaudium', { item: itemName })
+        : t('itemUi.market.pendingPreparing', { item: itemName });
+    panel.appendChild(prompt);
+    return panel;
+  }
+
+  // The price cell: fixed rows keep the existing total (+ per-unit "each" sub-line
+  // for a stack); auction rows show the auction badge, the standing bid (or "no
+  // bids yet"), the minimum next bid, and an optional buyout price. External
+  // rows render in their own currency: N + the Claudium coin icon (per-unit sub-
+  // line for a stack), or the opaque WOC ask + the WOC coin icon (whole lot).
+  private marketPriceCellHtml(l: MarketListingView): string {
+    if (l.denom === 'claudium') {
+      const each =
+        l.count > 1 && l.pricePerUnit !== undefined
+          ? `<br><span class="seller">${esc(
+              t('itemUi.market.claudiumEach', {
+                amount: formatNumber(l.pricePerUnit, { maximumFractionDigits: 0 }),
+              }),
+            )}</span>`
+          : '';
+      return `<span class="mkt-price"><img class="claudium-coin" src="/claudium/icons/claudium_coin_64.webp" alt=""> ${esc(
+        formatNumber(l.price, { maximumFractionDigits: 0 }),
+      )}${each}</span>`;
+    }
+    if (l.denom === 'woc') {
+      return `<span class="mkt-price"><span class="woc-coin" aria-hidden="true"></span> ${esc(l.priceWoc ?? '')} ${esc(t('itemUi.market.denomWoc'))}</span>`;
+    }
+    if (l.kind === 'auction') {
+      const bidLine =
+        l.currentBid !== undefined
+          ? `${esc(t('itemUi.market.currentBidLabel'))} ${this.deps.moneyHtml(l.currentBid)}`
+          : esc(t('itemUi.market.noBidsYet'));
+      const minLine =
+        l.minNextBid !== undefined
+          ? `<br><span class="seller">${esc(t('itemUi.market.minNextBid', { money: formatLocalizedMoney(l.minNextBid) }))}</span>`
+          : '';
+      const buyoutLine =
+        l.buyoutPrice !== undefined
+          ? `<br><span class="seller">${esc(t('itemUi.market.buyoutLabel', { money: formatLocalizedMoney(l.buyoutPrice) }))}</span>`
+          : '';
+      return `<span class="mkt-price"><span class="mkt-auction-badge">${esc(t('itemUi.market.auctionBadge'))}</span><br>${bidLine}${minLine}${buyoutLine}</span>`;
+    }
+    const each =
+      l.count > 1
+        ? `<br><span class="seller">${esc(t('itemUi.market.each', { money: formatLocalizedMoney(Math.ceil(l.price / l.count)) }))}</span>`
+        : '';
+    return `<span class="mkt-price">${this.deps.moneyHtml(l.price)}${each}</span>`;
+  }
+
+  // The action area: Reclaim (with a deposit-aware confirm) for the viewer's own
+  // listing; Bid input + optional Buyout for an auction lot; a quantity spinner +
+  // live total for a per-unit fixed row; the plain Buy button for a legacy
+  // whole-lot row (or a single-count fixed row, where a spinner buys nothing).
+  // External rows get a confirm dialog before marketBuy (a real-money decision);
+  // a lot with a payment in flight is locked for everyone (no controls at all).
+  private appendMarketRowAction(row: HTMLElement, l: MarketListingView, itemName: string): void {
+    if (l.pendingPayment) {
+      const badge = document.createElement('span');
+      badge.className = 'mkt-awaiting';
+      badge.textContent = t('itemUi.market.awaitingPayment');
+      row.appendChild(badge);
+      return;
+    }
+    if (!l.mine && l.denom === 'claudium') {
+      this.appendClaudiumBuyAction(row, l, itemName);
+      return;
+    }
+    if (!l.mine && l.denom === 'woc') {
+      this.appendWocBuyAction(row, l, itemName);
+      return;
+    }
+    if (l.mine) {
+      const btn = document.createElement('button');
+      btn.className = 'mkt-btn cancel';
+      btn.textContent = t('itemUi.market.reclaim');
+      btn.setAttribute('aria-label', t('itemUi.market.reclaimAria', { item: itemName }));
+      btn.addEventListener('click', () => {
+        const deposit = l.depositTotal ?? 0;
+        const body =
+          deposit > 0
+            ? t('itemUi.market.cancelConfirmBody', {
+                item: itemName,
+                money: formatLocalizedMoney(deposit),
+              })
+            : t('itemUi.market.cancelConfirmBodyNoDeposit', { item: itemName });
+        this.deps.confirmDialog(
+          t('itemUi.market.cancelConfirmTitle'),
+          body,
+          t('itemUi.market.reclaim'),
+          t('itemUi.market.cancelConfirmDismiss'),
+          () => {
+            this.deps.world().marketCancel(l.id);
+            audio.click();
+          },
+        );
+      });
+      row.appendChild(btn);
+      return;
+    }
+    if (l.kind === 'auction') {
+      const actions = document.createElement('div');
+      actions.className = 'mkt-auction-actions';
+      if (l.buyoutPrice !== undefined) {
+        const buyoutBtn = document.createElement('button');
+        buyoutBtn.className = 'mkt-btn';
+        buyoutBtn.textContent = t('itemUi.market.buyoutButton');
+        buyoutBtn.setAttribute(
+          'aria-label',
+          t('itemUi.market.buyoutAria', {
+            item: itemName,
+            price: formatLocalizedMoney(l.buyoutPrice),
+          }),
+        );
+        buyoutBtn.addEventListener('click', () => {
+          this.deps.world().marketBuy(l.id);
+          audio.click();
+        });
+        actions.appendChild(buyoutBtn);
+      }
+      if (l.myBid) {
+        const badge = document.createElement('span');
+        badge.className = 'mkt-mybid-lead';
+        badge.textContent = t('itemUi.market.leadingBid');
+        actions.appendChild(badge);
+      } else {
+        const min = l.minNextBid ?? 1;
+        const form = document.createElement('div');
+        form.className = 'mkt-bid-form';
+        form.innerHTML =
+          `<input class="coininput mkt-bid-input" type="number" min="${min}" step="1" value="${min}" aria-label="${esc(t('itemUi.market.bidInputAria', { item: itemName }))}">` +
+          `<button type="button" class="mkt-btn">${esc(t('itemUi.market.bidButton'))}</button>`;
+        const input = form.querySelector('input') as HTMLInputElement;
+        const bidBtn = form.querySelector('button') as HTMLButtonElement;
+        bidBtn.setAttribute('aria-label', t('itemUi.market.bidAria', { item: itemName }));
+        bidBtn.addEventListener('click', () => {
+          const amount = Math.max(min, parseInt(input.value, 10) || min);
+          this.deps.world().marketBid(l.id, amount);
+          audio.click();
+        });
+        actions.appendChild(form);
+      }
+      row.appendChild(actions);
+      return;
+    }
+    if (l.pricePerUnit !== undefined && l.count > 1) {
+      const perUnit = l.pricePerUnit;
+      const form = document.createElement('div');
+      form.className = 'mkt-buy-form';
+      form.innerHTML =
+        `<input class="coininput mkt-qty-input" type="number" min="1" max="${l.count}" value="${l.count}" aria-label="${esc(t('itemUi.market.buyQuantityAria', { item: itemName }))}">` +
+        `<span class="mkt-buy-total"></span>` +
+        `<button type="button" class="mkt-btn">${esc(t('itemUi.market.buy'))}</button>`;
+      const input = form.querySelector('input') as HTMLInputElement;
+      const totalEl = form.querySelector('.mkt-buy-total') as HTMLElement;
+      const buyBtn = form.querySelector('button') as HTMLButtonElement;
+      const clampedQty = () => Math.max(1, Math.min(l.count, parseInt(input.value, 10) || 1));
+      const updateTotal = () => {
+        totalEl.textContent = formatLocalizedMoney(clampedQty() * perUnit);
+      };
+      input.addEventListener('input', updateTotal);
+      updateTotal();
+      buyBtn.setAttribute(
+        'aria-label',
+        t('itemUi.market.buyAria', { item: itemName, price: formatLocalizedMoney(perUnit) }),
+      );
+      buyBtn.addEventListener('click', () => {
+        this.deps.world().marketBuy(l.id, clampedQty());
+        audio.click();
+      });
+      row.appendChild(form);
+      return;
+    }
+    const btn = document.createElement('button');
+    btn.className = 'mkt-btn';
+    btn.textContent = t('itemUi.market.buy');
+    btn.setAttribute(
+      'aria-label',
+      t('itemUi.market.buyAria', { item: itemName, price: formatLocalizedMoney(l.price) }),
+    );
+    btn.addEventListener('click', () => {
+      this.deps.world().marketBuy(l.id);
+      audio.click();
+    });
+    row.appendChild(btn);
+  }
+
+  // Claudium row: the same quantity spinner as a copper per-unit row (partial
+  // buys), a live Claudium total, and a confirm dialog before the buy fires.
+  private appendClaudiumBuyAction(row: HTMLElement, l: MarketListingView, itemName: string): void {
+    const perUnit = l.pricePerUnit ?? 0;
+    const confirmBuy = (qty: number) => {
+      const amount = formatNumber(perUnit * qty, { maximumFractionDigits: 0 });
+      this.deps.confirmDialog(
+        t('itemUi.market.buyExternalTitle'),
+        t('itemUi.market.buyClaudiumConfirmBody', { item: itemName, amount }),
+        t('itemUi.market.buy'),
+        t('itemUi.market.cancelConfirmDismiss'),
+        () => {
+          this.deps.world().marketBuy(l.id, qty);
+          audio.click();
+        },
+      );
+    };
+    if (l.count > 1) {
+      const form = document.createElement('div');
+      form.className = 'mkt-buy-form';
+      form.innerHTML =
+        `<input class="coininput mkt-qty-input" type="number" min="1" max="${l.count}" value="${l.count}" aria-label="${esc(t('itemUi.market.buyQuantityAria', { item: itemName }))}">` +
+        `<span class="mkt-buy-total"></span>` +
+        `<button type="button" class="mkt-btn">${esc(t('itemUi.market.buy'))}</button>`;
+      const input = form.querySelector('input') as HTMLInputElement;
+      const totalEl = form.querySelector('.mkt-buy-total') as HTMLElement;
+      const buyBtn = form.querySelector('button') as HTMLButtonElement;
+      const clampedQty = () => Math.max(1, Math.min(l.count, parseInt(input.value, 10) || 1));
+      const updateTotal = () => {
+        totalEl.textContent = t('itemUi.market.claudiumAmount', {
+          amount: formatNumber(clampedQty() * perUnit, { maximumFractionDigits: 0 }),
+        });
+      };
+      input.addEventListener('input', updateTotal);
+      updateTotal();
+      buyBtn.setAttribute('aria-label', t('itemUi.market.buyClaudiumAria', { item: itemName }));
+      buyBtn.addEventListener('click', () => confirmBuy(clampedQty()));
+      row.appendChild(form);
+      return;
+    }
+    const btn = document.createElement('button');
+    btn.className = 'mkt-btn';
+    btn.textContent = t('itemUi.market.buy');
+    btn.setAttribute('aria-label', t('itemUi.market.buyClaudiumAria', { item: itemName }));
+    btn.addEventListener('click', () => confirmBuy(1));
+    row.appendChild(btn);
+  }
+
+  // WOC row: whole-lot only, one Buy button behind a confirm dialog; the
+  // pending panel (buildPendingPanel) takes over once the purchase starts.
+  private appendWocBuyAction(row: HTMLElement, l: MarketListingView, itemName: string): void {
+    const btn = document.createElement('button');
+    btn.className = 'mkt-btn';
+    btn.textContent = t('itemUi.market.buy');
+    btn.setAttribute('aria-label', t('itemUi.market.buyWocAria', { item: itemName }));
+    btn.addEventListener('click', () => {
+      this.deps.confirmDialog(
+        t('itemUi.market.buyExternalTitle'),
+        t('itemUi.market.buyWocConfirmBody', { item: itemName, amount: l.priceWoc ?? '0' }),
+        t('itemUi.market.buy'),
+        t('itemUi.market.cancelConfirmDismiss'),
+        () => {
+          this.deps.world().marketBuy(l.id);
+          audio.click();
+        },
+      );
+    });
+    row.appendChild(btn);
+  }
+
+  // ---- Filter chrome (the browse-tab type/subtype/rarity/sort dropdowns) ----
 
   private marketItemTypeLabel(filter: MarketItemTypeFilter): string {
     if (filter === 'weapon') return t('itemUi.market.filterTypeWeapon');
@@ -731,8 +1256,14 @@ export class MarketWindow {
     return t('itemUi.market.weaponOther');
   }
 
+  private marketSortLabel(sort: MarketSortOrder): string {
+    if (sort === 'priceAsc') return t('itemUi.market.sortPrice');
+    if (sort === 'timeLeft') return t('itemUi.market.sortTimeLeft');
+    return t('itemUi.market.sortNewest');
+  }
+
   private renderMarketFilterMenu(
-    menu: 'itemType' | 'subtype' | 'rarity',
+    menu: 'itemType' | 'subtype' | 'rarity' | 'sort',
     label: string,
     value: string,
     options: readonly string[],
@@ -780,6 +1311,13 @@ export class MarketWindow {
         this.rarityFilter,
         MARKET_RARITY_FILTERS,
         (filter) => this.marketRarityLabel(filter as MarketRarityFilter),
+      ) +
+      this.renderMarketFilterMenu(
+        'sort',
+        t('itemUi.market.sortLabel'),
+        this.sortOrder,
+        MARKET_SORT_ORDERS,
+        (sort) => this.marketSortLabel(sort as MarketSortOrder),
       ) +
       `</div>`
     );

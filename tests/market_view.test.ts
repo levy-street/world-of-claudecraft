@@ -22,6 +22,10 @@ function listing(itemId: string, over: Partial<MarketListingView> = {}): MarketL
     price: 100,
     mine: false,
     house: false,
+    secondsLeft: 3600,
+    kind: 'fixed',
+    myBid: false,
+    denom: 'copper',
     ...over,
   };
 }
@@ -38,6 +42,8 @@ function info(over: Partial<MarketInfo> = {}): MarketInfo {
     cutPct: 5,
     maxListings: 10,
     myListingCount: 0,
+    durationsHours: [12, 24, 48],
+    rails: { claudium: false, woc: false },
     ...over,
   };
 }
@@ -96,7 +102,13 @@ describe('market_view: top-level state union', () => {
     });
     expect(sell.kind).toBe('sell');
     if (sell.kind === 'sell')
-      expect(sell.meta).toEqual({ cutPct: 5, myListingCount: 0, maxListings: 10 });
+      expect(sell.meta).toEqual({
+        cutPct: 5,
+        myListingCount: 0,
+        maxListings: 10,
+        durationsHours: [12, 24, 48],
+        rails: { claudium: false, woc: false },
+      });
     expect(
       buildMarketView({
         info: i,
@@ -186,6 +198,27 @@ describe('market_view: browse states', () => {
     expect(body.page.total).toBe(1); // only the OTHER listing counts toward the range
     expect(body.page.start).toBe(0);
     expect(body.page.end).toBe(1); // one OTHER listing on the page; the mine row is extra
+  });
+
+  it('passes every auction-house field through unchanged (the core adds nothing, drops nothing)', () => {
+    // buildMarketBrowse only resolves the item and drops unknown ids; every other
+    // field on MarketListingView (auction shape, time-left, deposit) rides straight
+    // through to the row untouched. This is the painter's read surface for the
+    // time-left column, the auction badge/bid/buyout display, and the deposit-aware
+    // cancel confirmation.
+    const auctionLot = listing('keen_dirk', {
+      mine: true,
+      kind: 'auction',
+      secondsLeft: 5400, // 1h 30m
+      currentBid: 250,
+      minNextBid: 262,
+      buyoutPrice: 900,
+      myBid: false,
+      depositTotal: 40,
+    });
+    const body = buildMarketBrowse(info({ listings: [auctionLot], totalCount: 1 }), ALL);
+    if (body.state !== 'list') throw new Error('expected list');
+    expect(body.page.items[0].listing).toEqual(auctionLot);
   });
 });
 
@@ -308,7 +341,23 @@ describe('market_view: determinism + ClientWorld-vs-Sim parity', () => {
     const simInfo = Object.assign(
       Object.create({ wireVersion: 7 }),
       info({
-        listings: [listing('keen_dirk'), listing('greyjaw_pelt_cloak'), listing('roasted_boar')],
+        listings: [
+          listing('keen_dirk'),
+          listing('greyjaw_pelt_cloak'),
+          listing('roasted_boar'),
+          // An auction lot with every optional field set: the JSON round-trip
+          // must carry currentBid/minNextBid/buyoutPrice/depositTotal exactly
+          // (no server-only prototype leakage, no dropped fields).
+          listing('healing_potion', {
+            mine: true,
+            kind: 'auction',
+            secondsLeft: 1800,
+            currentBid: 80,
+            minNextBid: 84,
+            buyoutPrice: 500,
+            depositTotal: 12,
+          }),
+        ],
         filter: '',
         collectionCopper: 250,
         collectionItems: [{ itemId: 'bone_fragments', count: 4 }],
@@ -332,6 +381,74 @@ describe('market_view: determinism + ClientWorld-vs-Sim parity', () => {
         sellHave: 2,
       });
       expect(sim).toEqual(mirror);
+    }
+  });
+});
+
+describe('market_view: multi-currency denominations (AH-P4)', () => {
+  it('mirrors the viewer rails into the sell meta (the selector gating source)', () => {
+    const i = info({ rails: { claudium: true, woc: false } });
+    const sell = buildMarketView({
+      info: i,
+      tab: 'sell',
+      filters: ALL,
+      sellItemId: null,
+      sellHave: 0,
+    });
+    expect(sell.kind).toBe('sell');
+    if (sell.kind === 'sell') expect(sell.meta.rails).toEqual({ claudium: true, woc: false });
+  });
+
+  it('passes the pending purchase through to the browse view (null when none)', () => {
+    const itemId = Object.keys(ITEMS)[0];
+    const pending = {
+      listingId: 7,
+      itemId,
+      quantity: 2,
+      denom: 'woc' as const,
+      costWoc: '1.5',
+      wocPay: { uri: 'solana:x?amount=1.5&reference=r', reference: 'r', amountUi: '1.5' },
+    };
+    const withPending = buildMarketView({
+      info: info({ listings: [listing(itemId)], totalCount: 1, myPendingPurchase: pending }),
+      tab: 'browse',
+      filters: ALL,
+      sellItemId: null,
+      sellHave: 0,
+    });
+    expect(withPending.kind).toBe('browse');
+    if (withPending.kind === 'browse') expect(withPending.pending).toEqual(pending);
+
+    const withoutPending = buildMarketView({
+      info: info({ listings: [listing(itemId)], totalCount: 1 }),
+      tab: 'browse',
+      filters: ALL,
+      sellItemId: null,
+      sellHave: 0,
+    });
+    if (withoutPending.kind === 'browse') expect(withoutPending.pending).toBeNull();
+  });
+
+  it('keeps denom/priceWoc/pendingPayment on the resolved browse rows (the badge inputs)', () => {
+    const itemId = Object.keys(ITEMS)[0];
+    const rows = buildMarketBrowse(
+      info({
+        listings: [
+          listing(itemId, { id: 1, denom: 'claudium', pricePerUnit: 10, price: 20, count: 2 }),
+          listing(itemId, { id: 2, denom: 'woc', priceWoc: '1.5', price: 0, pendingPayment: true }),
+        ],
+        totalCount: 2,
+      }),
+      ALL,
+    );
+    expect(rows.state).toBe('list');
+    if (rows.state === 'list') {
+      expect(rows.page.items[0].listing).toMatchObject({ denom: 'claudium', pricePerUnit: 10 });
+      expect(rows.page.items[1].listing).toMatchObject({
+        denom: 'woc',
+        priceWoc: '1.5',
+        pendingPayment: true,
+      });
     }
   });
 });

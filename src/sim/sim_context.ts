@@ -47,6 +47,7 @@ import type {
   DungeonDifficulty,
   Entity,
   ErrorReason,
+  InvSlot,
   ItemInstancePayload,
   PlayerClass,
   QuestProgress,
@@ -55,6 +56,7 @@ import type {
   SimConfig,
   SimEvent,
   SkinCatalog,
+  TradeRailsView,
   Vec3,
 } from './types';
 
@@ -721,6 +723,16 @@ export interface SimContextCallbacks {
   // (quests/quest_commands.ts) queues the giver's authored thank-you letter
   // through this; the binding points at the PostOffice instance on Sim.
   queueQuestLetter(questId: string, pid: number): void;
+  // World Market auction letters (mail/post_office.ts): market.ts notifies an
+  // OFFLINE seller/bidder of an auction outcome through this (online players
+  // get the structured market* events instead). The binding points at the
+  // PostOffice instance on Sim with the AUCTION_LETTERS entry for `kind`,
+  // mailed as a 'system' letter (the queueQuestLetter precedent).
+  sendMarketLetter(
+    recipientKey: string,
+    recipientName: string,
+    kind: 'outbid' | 'won' | 'sold' | 'expired' | 'sold_wallet' | 'sold_account',
+  ): void;
 
   // Ravenpost mail: posts Heroic Marks to a heroic final-boss participant who took
   // the daily lockout but was not at the corpse to loot them (awardHeroicMarks in
@@ -760,6 +772,25 @@ export interface SimContextCallbacks {
   vcupShoot(caster: Entity, power: number, loft: number, range: number): void;
   vcupSportDash(caster: Entity, distance: number, catchBall: boolean): void;
   vcupSportShove(caster: Entity, target: Entity, distance: number): void;
+
+  // G2b external-currency trade legs (social/trade.ts). `tradeRails` is the
+  // host's view of the $WOC/Claudium rails (cfg.tradeRails; offline defaults to
+  // all-unavailable, so pledges are rejected and offline trades stay
+  // items + copper). `tradeMailKey` is the Ravenpost stable-recipient key
+  // (character id string, the market sellerKey convention) captured at settle
+  // start so escrow can be delivered or refunded after a participant leaves.
+  // `sendTradeLetter` books an authored system letter carrying escrowed goods
+  // (delivery to the counterparty, or refund to the owner); it never refuses,
+  // matching the post office's authored-letter contract. All stay on Sim.
+  tradeRails(pid: number): TradeRailsView;
+  tradeMailKey(pid: number): string;
+  sendTradeLetter(
+    recipientKey: string,
+    recipientName: string,
+    flavor: 'delivery' | 'refund',
+    copper: number,
+    items: InvSlot[],
+  ): void;
 }
 
 // The seam consumed by extracted modules.
@@ -1162,6 +1193,8 @@ export function createSimContext(host: SimContextHost): SimContext {
     canAddItem: host.canAddItem,
     // Ravenpost mail: the quest turn-in letter hook (points at the PostOffice on Sim).
     queueQuestLetter: host.queueQuestLetter,
+    // World Market auction letters: the offline-notification hook (PostOffice on Sim).
+    sendMarketLetter: host.sendMarketLetter,
     mailHeroicMarks: host.mailHeroicMarks,
     applySetProcs: host.applySetProcs,
     // Book of Deeds seam (points at deeds.ts via the Sim-bound arrows).
@@ -1176,5 +1209,10 @@ export function createSimContext(host: SimContextHost): SimContext {
     vcupShoot: host.vcupShoot,
     vcupSportDash: host.vcupSportDash,
     vcupSportShove: host.vcupSportShove,
+    // G2b external-currency trade legs (points at Sim: the cfg.tradeRails view,
+    // the PostOffice recipient key, and the authored trade letters).
+    tradeRails: host.tradeRails,
+    tradeMailKey: host.tradeMailKey,
+    sendTradeLetter: host.sendTradeLetter,
   };
 }

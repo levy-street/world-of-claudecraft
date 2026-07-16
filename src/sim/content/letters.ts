@@ -97,3 +97,102 @@ export const QUEST_LETTERS: Record<string, LetterDef> = {
     delaySeconds: 150,
   },
 };
+
+// World Market auction outcomes: the Merchant writes when the affected player
+// is OFFLINE (online players get the structured market events instead). The
+// letters carry NO coin or items: every refund, payout, and returned lot moves
+// through the Merchant's collection box, never the mail. Ids are append-only
+// like every letterId above.
+export const AUCTION_LETTERS: Record<
+  'outbid' | 'won' | 'sold' | 'expired' | 'sold_wallet' | 'sold_account',
+  LetterDef
+> = {
+  outbid: {
+    letterId: 'market_outbid',
+    senderName: 'The Merchant',
+    subject: 'You have been outbid',
+    body:
+      'Another buyer has raised the bidding on a lot you wanted. Your copper ' +
+      'waits in your collection box at the World Market; come see me to take ' +
+      'it back or bid again.\n\n- The Merchant',
+  },
+  won: {
+    letterId: 'market_won',
+    senderName: 'The Merchant',
+    subject: 'Your winning bid',
+    body:
+      'The hammer has fallen and the lot is yours. Your goods wait in your ' +
+      'collection box at the World Market; come see me to claim them.\n\n' +
+      '- The Merchant',
+  },
+  sold: {
+    letterId: 'market_sold',
+    senderName: 'The Merchant',
+    subject: 'Your lot has sold',
+    body:
+      'A buyer has taken your goods off my hands. Your proceeds wait in your ' +
+      'collection box at the World Market; come see me to collect them.\n\n' +
+      '- The Merchant',
+  },
+  // External-denomination sales: the buyer paid the seller directly (wallet to
+  // wallet, or Claudium account to account), so the body must NOT claim copper
+  // waits at the Merchant. Only the listing deposit refund sits in collection.
+  sold_wallet: {
+    letterId: 'market_sold_wallet',
+    senderName: 'The Merchant',
+    subject: 'Your lot has sold',
+    body:
+      'A buyer has taken your goods off my hands. The payment went straight to ' +
+      'your linked wallet, as you asked; only your listing deposit waits in ' +
+      'your collection box at the World Market. Come see me to take it back.\n\n' +
+      '- The Merchant',
+  },
+  sold_account: {
+    letterId: 'market_sold_account',
+    senderName: 'The Merchant',
+    subject: 'Your lot has sold',
+    body:
+      'A buyer has taken your goods off my hands. The payment went straight to ' +
+      'your Claudium balance; only your listing deposit waits in your ' +
+      'collection box at the World Market. Come see me to take it back.\n\n' +
+      '- The Merchant',
+  },
+  expired: {
+    letterId: 'market_expired',
+    senderName: 'The Merchant',
+    subject: 'Your listing expired',
+    body:
+      'No buyer came for your goods before the listing ran out. They wait in ' +
+      'your collection box at the World Market; come see me to take them ' +
+      'back.\n\n- The Merchant',
+  },
+};
+
+// G2b trade settlement (server-driven, src/sim/sim.ts sendTradeLetter): the
+// two escrow-release letters, keyed by letterId (not by quest id, hence a
+// separate table from QUEST_LETTERS). senderName is the courier, not the
+// trading partner, matching the welcome letter's convention (a stable,
+// canonical sender the client localizes via letterId) rather than a
+// per-delivery dynamic name, which the letterId-driven client pipeline has
+// no seam for (mailbox_window.ts resolves sender/subject/body from this
+// table whenever row.letterId is set, ignoring the DB-stored literal). The
+// canonical English here must stay byte-identical to sim.ts's inline
+// sendTradeLetter payload: that literal is what a non-localized (or
+// pre-i18n-pipeline) consumer of the raw mail row would see, and the two
+// must never drift.
+export const TRADE_LETTERS: Record<string, LetterDef> = {
+  delivery: {
+    letterId: 'trade_delivery',
+    senderName: 'The Ravenpost',
+    subject: 'Trade delivery',
+    body: 'Goods from your trade have arrived. The raven carried what your bags could not.',
+    delaySeconds: 5,
+  },
+  refund: {
+    letterId: 'trade_refund',
+    senderName: 'The Ravenpost',
+    subject: 'Trade goods returned',
+    body: 'Your trade did not complete. Everything you offered has been returned.',
+    delaySeconds: 5,
+  },
+};

@@ -43,6 +43,10 @@ describe('/listings command', () => {
         itemId: 'worn_sword',
         count: 1,
         price: 150,
+        kind: 'fixed',
+        durationSeconds: 3600,
+        depositPerUnit: 0,
+        denom: 'copper' as const,
         expiresAt: sim.time + 3600 + 5,
         house: false,
       },
@@ -53,6 +57,10 @@ describe('/listings command', () => {
         itemId: 'rusty_dagger',
         count: 3,
         price: 20,
+        kind: 'fixed',
+        durationSeconds: 3600,
+        depositPerUnit: 0,
+        denom: 'copper' as const,
         expiresAt: sim.time + 120,
         house: false,
       },
@@ -63,6 +71,10 @@ describe('/listings command', () => {
         itemId: 'worn_sword',
         count: 1,
         price: 999,
+        kind: 'fixed',
+        durationSeconds: 3600,
+        depositPerUnit: 0,
+        denom: 'copper' as const,
         expiresAt: sim.time + 3600,
         house: false,
       },
@@ -73,6 +85,11 @@ describe('/listings command', () => {
         itemId: 'worn_sword',
         count: 1,
         price: 1,
+        kind: 'fixed',
+        pricePerUnit: 1,
+        durationSeconds: 0,
+        depositPerUnit: 0,
+        denom: 'copper' as const,
         expiresAt: Infinity,
         house: true,
       },
@@ -81,6 +98,53 @@ describe('/listings command', () => {
     sim.chat('/listings', a);
     expect(lastError(sim.tick())).toBe(
       'Your market listings (2/12): Pitted Shortsword — 1s 50c (1h 0m left), Rusty Dagger x3 — 20c (2m left).',
+    );
+  });
+
+  it('renders an auction lot with its current bid and time left', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    sim.tick();
+    const aName = metaOf(sim, a).name;
+
+    sim.marketListings.push(
+      {
+        id: 1,
+        sellerKey: aName,
+        sellerName: aName,
+        itemId: 'rusty_dagger',
+        count: 2,
+        price: 40,
+        kind: 'auction',
+        startingBid: 40,
+        durationSeconds: 3600,
+        depositPerUnit: 0,
+        denom: 'copper' as const,
+        expiresAt: sim.time + 120,
+        house: false,
+      },
+      {
+        id: 2,
+        sellerKey: aName,
+        sellerName: aName,
+        itemId: 'worn_sword',
+        count: 1,
+        price: 100,
+        kind: 'auction',
+        startingBid: 100,
+        bid: { amount: 150, bidderKey: 'b1', bidderName: 'Bet' },
+        durationSeconds: 3600,
+        depositPerUnit: 0,
+        denom: 'copper' as const,
+        expiresAt: sim.time + 3600 + 5,
+        house: false,
+      },
+    );
+
+    sim.chat('/listings', a);
+    // no bid yet -> the starting bid shows; with a bid -> the standing bid shows
+    expect(lastError(sim.tick())).toBe(
+      'Your market listings (2/12): Rusty Dagger x2 - bid 40c (2m left), Pitted Shortsword - bid 1s 50c (1h 0m left).',
     );
   });
 

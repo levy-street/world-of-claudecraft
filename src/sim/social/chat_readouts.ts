@@ -225,6 +225,10 @@ export function listingsReadout(ctx: SimContext, meta: PlayerMeta): string {
     const h = Math.floor(secs / 3600),
       m = Math.floor((secs % 3600) / 60);
     const left = h > 0 ? `${h}h ${m}m` : m > 0 ? `${m}m` : `${secs}s`;
+    if (l.kind === 'auction') {
+      const cur = l.bid?.amount ?? l.startingBid ?? l.price;
+      return `${name}${qty} - bid ${formatMoney(cur)} (${left} left)`;
+    }
     return `${name}${qty} — ${formatMoney(l.price)} (${left} left)`;
   });
   return `Your market listings (${parts.length}/${MARKET_MAX_LISTINGS}): ${parts.join(', ')}.`;

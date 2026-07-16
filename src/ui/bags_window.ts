@@ -151,7 +151,10 @@ export interface BagsWindowDeps extends PainterHostPresentation {
    *  closing the bank; dropping the docking class lets the mobile standalone
    *  full-screen rule take over instead of leaving a half-width orphan). */
   onClosed(): void;
-  addItemToTrade(itemId: string): void;
+  /** Stage a bag stack into the open trade offer. The full slot is passed (not
+   *  just the itemId) so a signed/enchanted/rolled copy stages as a distinct
+   *  count-1 instance row instead of being dropped by the fungible-only path. */
+  addItemToTrade(slot: InvSlot): void;
   /** Stage a bag item for a Market listing (selects it + repaints the market). */
   stageMarketSell(itemId: string): void;
   /** Stage a bag stack as a mail parcel (repaints the mailbox Send tab). */
@@ -740,7 +743,7 @@ export class BagsWindow {
         this.deps.showError(t('hudChrome.itemSoulbound'));
         return;
       case 'trade':
-        this.deps.addItemToTrade(s.itemId);
+        this.deps.addItemToTrade(s);
         break;
       case 'mailAttachBlocked':
         this.deps.showError(t('hudChrome.mailbox.cannotMail'));

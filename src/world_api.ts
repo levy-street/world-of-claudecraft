@@ -151,7 +151,11 @@ export type {
 } from './world_api/dungeon_finder';
 export type { RaidLockout } from './world_api/dungeons';
 export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
-export type { MarketInfo, MarketListingView } from './world_api/market';
+export type {
+  MarketInfo,
+  MarketListingView,
+  MarketPendingPurchaseView,
+} from './world_api/market';
 export type { PartyInfo, PartyMemberAura, PartyMemberInfo } from './world_api/party';
 export type { CraftResultView, PlayerProfessionsView, RecipeDef } from './world_api/professions';
 export type {
@@ -392,6 +396,10 @@ export const COMMAND_NAMES = [
   'ignore_add',
   'ignore_remove',
   'stow_weapon',
+  // World Market auction bids (the auction-house extension of IWorldMarket).
+  'market_bid',
+  // trade family addition (G2b): an active invite decline (duel/party parity)
+  'trade_decline',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -535,6 +543,7 @@ export const COMMAND_FACETS = {
   trade_offer: 'IWorldTrade',
   trade_confirm: 'IWorldTrade',
   trade_cancel: 'IWorldTrade',
+  trade_decline: 'IWorldTrade',
   // IWorldDuelArena: duels + rated-arena queue + the 2v2 Fiesta augment pick. Fiesta
   // has no top-level member (it lives in arenaInfo.match.fiesta and flows over the
   // events queue); arena_augment is its only command. duelInfo/arenaInfo are snapshot
@@ -576,6 +585,7 @@ export const COMMAND_FACETS = {
   market_buy: 'IWorldMarket',
   market_cancel: 'IWorldMarket',
   market_collect: 'IWorldMarket',
+  market_bid: 'IWorldMarket',
   // IWorldMail: Ravenpost letters (snake_case wire strings, by design). mailInfo /
   // mailUnread are snapshot reads (no send, untagged).
   mail_send: 'IWorldMail',
