@@ -401,6 +401,33 @@ describe('yumi power-up effects', () => {
     expect(5000 - w2.mob.hp).toBe(100);
   });
 
+  it('Berserker does not reapply its outgoing multiplier to a redirected pet share', () => {
+    const sim = new Sim({ seed: 10, playerClass: 'warlock', autoEquip: true });
+    sim.setPlayerLevel(20);
+    sim.setSpec('demonology'); // 20% of incoming damage redirects to the active pet
+    const target = sim.player;
+    target.maxHp = target.hp = 1000;
+
+    const pet = createMob(sim.nextId++, MOBS.forest_wolf, 20, target.pos);
+    pet.ownerId = target.id;
+    pet.maxHp = pet.hp = 1000;
+    sim.addEntity(pet);
+
+    const attacker = createMob(sim.nextId++, MOBS.forest_wolf, 20, {
+      x: target.pos.x + 2,
+      y: target.pos.y,
+      z: target.pos.z,
+    });
+    attacker.hostile = true;
+    sim.addEntity(attacker);
+    applyMysteryPowerup((sim as any).ctx, attacker, 'berserk');
+
+    hit(sim, attacker, target, 100); // 100 x 1.4 = 140, then split 112 / 28
+    expect(1000 - target.hp).toBe(112);
+    expect(1000 - pet.hp).toBe(28);
+    expect(2000 - target.hp - pet.hp).toBe(140);
+  });
+
   it('Endless Mana: reads as a free cast that is never consumed', () => {
     const { ctx, a } = duelWorld();
     expect(hasNextCastFree(a)).toBe(false);

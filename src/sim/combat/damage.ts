@@ -167,6 +167,7 @@ export function dealDamage(
   // ENEMY source: self-damage and source-less damage (falls, neutral bleeds)
   // are never amplified, matching the Weakening Hex arm below.
   if (
+    !alreadyFinal &&
     amount > 0 &&
     source &&
     source.id !== target.id &&
