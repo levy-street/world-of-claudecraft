@@ -31,7 +31,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 411,
-      "state": "f117d397",
+      "state": "9e6f2841",
       "events": "fafd769d",
       "rng": {
         "draws": 0,
@@ -65,9 +65,6 @@
               "baked_bread",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "quality:epic"
             ]
           },
           "delveClears": {},
@@ -363,7 +360,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 411,
-      "state": "b1403a3b",
+      "state": "22c544fd",
       "events": "84b694f4",
       "rng": {
         "draws": 0,
@@ -397,9 +394,6 @@
               "baked_bread",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "quality:epic"
             ]
           },
           "delveClears": {},
@@ -691,7 +685,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 411,
-      "state": "4f88bfe5",
+      "state": "801fd6a3",
       "events": "01350309",
       "rng": {
         "draws": 0,
@@ -725,9 +719,6 @@
               "baked_bread",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "quality:epic"
             ]
           },
           "delveClears": {},
@@ -781,9 +772,6 @@
               "baked_bread",
               "gnarled_staff",
               "spring_water"
-            ],
-            "visited": [
-              "quality:epic"
             ]
           },
           "delveClears": {},
@@ -1027,7 +1015,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 411,
-      "state": "4b81839d",
+      "state": "43ba38ef",
       "events": "fd8936ae",
       "rng": {
         "draws": 0,
@@ -1061,9 +1049,6 @@
               "baked_bread",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "quality:epic"
             ]
           },
           "delveClears": {},
@@ -1117,9 +1102,6 @@
               "baked_bread",
               "gnarled_staff",
               "spring_water"
-            ],
-            "visited": [
-              "quality:epic"
             ]
           },
           "delveClears": {},
@@ -1180,9 +1162,6 @@
               "baked_bread",
               "footpad_jerkin",
               "rusty_dagger"
-            ],
-            "visited": [
-              "quality:epic"
             ]
           },
           "delveClears": {},
@@ -1371,8 +1350,8 @@
       "tick": 20,
       "time": 1,
       "nextId": 411,
-      "state": "9fd89d69",
-      "events": "fe0ce561",
+      "state": "758203ee",
+      "events": "77eddc05",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1382,7 +1361,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 411,
-      "state": "9fd89d69",
+      "state": "758203ee",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1418,16 +1397,9 @@
               "worn_sword"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook",
-              "quality:epic"
+              "poi:eastbrook_vale:eastbrook"
             ]
           },
-          "deedsEarned": [
-            [
-              "col_first_epic",
-              ""
-            ]
-          ],
           "delveClears": {},
           "delveDaily": {},
           "entityId": 408,
@@ -1481,16 +1453,9 @@
               "spring_water"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook",
-              "quality:epic"
+              "poi:eastbrook_vale:eastbrook"
             ]
           },
-          "deedsEarned": [
-            [
-              "col_first_epic",
-              ""
-            ]
-          ],
           "delveClears": {},
           "delveDaily": {},
           "entityId": 409,
@@ -1551,16 +1516,9 @@
               "rusty_dagger"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook",
-              "quality:epic"
+              "poi:eastbrook_vale:eastbrook"
             ]
           },
-          "deedsEarned": [
-            [
-              "col_first_epic",
-              ""
-            ]
-          ],
           "delveClears": {},
           "delveDaily": {},
           "entityId": 410,
@@ -1747,7 +1705,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 411,
-      "state": "899892b8",
+      "state": "a4a46727",
       "events": "70526a30",
       "rng": {
         "draws": 0,
@@ -1785,16 +1743,9 @@
               "worn_sword"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook",
-              "quality:epic"
+              "poi:eastbrook_vale:eastbrook"
             ]
           },
-          "deedsEarned": [
-            [
-              "col_first_epic",
-              ""
-            ]
-          ],
           "delveClears": {},
           "delveDaily": {},
           "entityId": 408,
@@ -1852,16 +1803,9 @@
               "spring_water"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook",
-              "quality:epic"
+              "poi:eastbrook_vale:eastbrook"
             ]
           },
-          "deedsEarned": [
-            [
-              "col_first_epic",
-              ""
-            ]
-          ],
           "delveClears": {},
           "delveDaily": {},
           "entityId": 409,
@@ -1922,16 +1866,9 @@
               "rusty_dagger"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook",
-              "quality:epic"
+              "poi:eastbrook_vale:eastbrook"
             ]
           },
-          "deedsEarned": [
-            [
-              "col_first_epic",
-              ""
-            ]
-          ],
           "delveClears": {},
           "delveDaily": {},
           "entityId": 410,
@@ -2118,7 +2055,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 411,
-      "state": "899892b8",
+      "state": "a4a46727",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -2156,16 +2093,9 @@
               "worn_sword"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook",
-              "quality:epic"
+              "poi:eastbrook_vale:eastbrook"
             ]
           },
-          "deedsEarned": [
-            [
-              "col_first_epic",
-              ""
-            ]
-          ],
           "delveClears": {},
           "delveDaily": {},
           "entityId": 408,
@@ -2223,16 +2153,9 @@
               "spring_water"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook",
-              "quality:epic"
+              "poi:eastbrook_vale:eastbrook"
             ]
           },
-          "deedsEarned": [
-            [
-              "col_first_epic",
-              ""
-            ]
-          ],
           "delveClears": {},
           "delveDaily": {},
           "entityId": 409,
@@ -2293,16 +2216,9 @@
               "rusty_dagger"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook",
-              "quality:epic"
+              "poi:eastbrook_vale:eastbrook"
             ]
           },
-          "deedsEarned": [
-            [
-              "col_first_epic",
-              ""
-            ]
-          ],
           "delveClears": {},
           "delveDaily": {},
           "entityId": 410,
