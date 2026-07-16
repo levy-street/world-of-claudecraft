@@ -2717,7 +2717,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [{ type: 'drainTick', min: 12, max: 12, healFrac: 0, rampPct: 0.3 }],
     description:
-      "Assaults the target's mind with Shadow energy for 3 sec. Each successive tick deals 30% more Shadow damage than the first.",
+      "Assaults the target's mind with Shadow energy for 3 sec. Its damage increases each tick by 30% of the first tick's damage.",
   },
   flash_heal: {
     id: 'flash_heal',
