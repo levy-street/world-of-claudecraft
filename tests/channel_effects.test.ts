@@ -17,6 +17,9 @@ function runLitany(
   healthLost: number;
   duration: number;
   ticks: number;
+  castTotal: number;
+  channelTickEvery: number;
+  updates: number;
 } {
   const sim = new Sim({ seed, playerClass: 'priest', autoEquip: false });
   sim.setPlayerLevel(20);
@@ -48,9 +51,13 @@ function runLitany(
 
   sim.castAbility('mind_flay');
   expect(sim.player.castingAbility).toBe('mind_flay');
+  const castTotal = sim.player.castTotal;
+  const channelTickEvery = sim.player.channelTickEvery;
+  let updates = 0;
   for (let tick = 0; tick < 200 && sim.player.castingAbility; tick++) {
     updateCasting(sim.ctx, sim.player, meta);
     advancePendingProjectiles(sim.ctx);
+    updates++;
   }
   for (let tick = 0; tick < 200 && sim.ctx.pendingProjectiles.length > 0; tick++) {
     advancePendingProjectiles(sim.ctx);
@@ -62,7 +69,16 @@ function runLitany(
     .flatMap((event) =>
       event.type === 'damage' && event.ability === 'Litany of Woe' ? [event.amount] : [],
     );
-  return { amounts, draws, healthLost: target.maxHp - target.hp, duration, ticks };
+  return {
+    amounts,
+    draws,
+    healthLost: target.maxHp - target.hp,
+    duration,
+    ticks,
+    castTotal,
+    channelTickEvery,
+    updates,
+  };
 }
 
 function runFinisher(
@@ -90,8 +106,8 @@ function runFinisher(
     return target;
   };
   const primary = addTarget(91_001, 0, 25);
-  const nearby = addTarget(91_002, 4, 25);
-  addTarget(91_003, 10, 25);
+  const nearby = addTarget(91_002, 8, 25);
+  addTarget(91_003, 8.01, 25);
   sim.targetEntity(primary.id);
   sim.player.facing = Math.atan2(
     primary.pos.x - sim.player.pos.x,
@@ -126,9 +142,12 @@ function runFinisher(
   return { burstTargets, draws, primaryId: primary.id, nearbyId: nearby.id };
 }
 
-function runMindfractureRefresh(talented: boolean): {
-  own: Aura;
-  foreign: Aura;
+function runMindfractureRefresh(
+  talented: boolean,
+  includeOwnedDirge = true,
+): {
+  own: Aura | undefined;
+  foreign: Aura | undefined;
   draws: number[];
 } {
   const sim = new Sim({ seed: 61_403, playerClass: 'priest', autoEquip: false });
@@ -164,7 +183,8 @@ function runMindfractureRefresh(talented: boolean): {
     school: 'shadow',
   };
   const foreign: Aura = { ...own, sourceId: 999_999 };
-  target.auras.push(foreign, own);
+  target.auras.push(foreign);
+  if (includeOwnedDirge) target.auras.push(own);
 
   const meta = sim.meta(sim.playerId);
   if (!meta) throw new Error('missing priest metadata');
@@ -178,7 +198,16 @@ function runMindfractureRefresh(talented: boolean): {
     advancePendingProjectiles(sim.ctx);
   }
   sim.rng.setObserver(null);
-  return { own, foreign, draws };
+  return {
+    own: target.auras.find(
+      (aura) =>
+        aura.kind === 'dot' && aura.id === 'shadow_word_pain' && aura.sourceId === sim.playerId,
+    ),
+    foreign: target.auras.find(
+      (aura) => aura.kind === 'dot' && aura.id === 'shadow_word_pain' && aura.sourceId === 999_999,
+    ),
+    draws,
+  };
 }
 
 function runMindfractureSpread(
@@ -187,7 +216,7 @@ function runMindfractureSpread(
 ): {
   primaryOwn: Aura | undefined;
   nearbyOwn: Aura | undefined;
-  nearbyForeign: Aura;
+  nearbyForeign: Aura | undefined;
   farOwn: Aura | undefined;
   draws: number[];
 } {
@@ -212,8 +241,8 @@ function runMindfractureSpread(
     return target;
   };
   const primary = addTarget(93_001, 0);
-  const nearby = addTarget(93_002, 4);
-  const far = addTarget(93_003, 10);
+  const nearby = addTarget(93_002, 8);
+  const far = addTarget(93_003, 8.01);
   sim.targetEntity(primary.id);
   sim.player.facing = Math.atan2(
     primary.pos.x - sim.player.pos.x,
@@ -258,7 +287,9 @@ function runMindfractureSpread(
   return {
     primaryOwn: owned(primary),
     nearbyOwn: owned(nearby),
-    nearbyForeign,
+    nearbyForeign: nearby.auras.find(
+      (aura) => aura.kind === 'dot' && aura.id === 'shadow_word_pain' && aura.sourceId === 999_999,
+    ),
     farOwn: owned(far),
     draws,
   };
@@ -274,6 +305,7 @@ describe('Litany of Woe channel effects', () => {
   it('casts at 25 yards and emits three rising authoritative damage events', () => {
     const result = runLitany(17_216);
 
+    expect(ABILITIES.mind_flay.range).toBe(30);
     expect(result.amounts).toEqual([12, 16, 19]);
     expect(result.healthLost).toBe(47);
     expect(result.draws).toHaveLength(3);
@@ -292,6 +324,9 @@ describe('Litany of Woe channel effects', () => {
 
     expect(result.duration).toBe(9);
     expect(result.ticks).toBe(9);
+    expect(result.castTotal).toBe(9);
+    expect(result.channelTickEvery).toBe(1);
+    expect(result.updates).toBe(180);
     expect(result.amounts).toEqual([12, 16, 19, 23, 26, 30, 34, 37, 41]);
     expect(result.amounts.at(-1)).toBeGreaterThan(19);
     expect(result.draws).toHaveLength(9);
@@ -307,6 +342,10 @@ describe('Litany of Woe channel effects', () => {
     expect(choice?.effect.ability?.[0]?.ability).toBe('mind_flay');
     expect(finisher).toBeDefined();
     expect(finisher?.effect.ability?.[0]?.ability).toBe('mind_flay');
+    expect(finisher?.effect.ability?.[0]?.addEffects?.[0]).toMatchObject({
+      type: 'channelFinisher',
+      radius: 8,
+    });
     expect(ABILITIES.mind_flay.learnLevel).toBeLessThanOrEqual(17);
     expect(validateTalentTree(TALENTS.priest)).toEqual([]);
   });
@@ -328,15 +367,19 @@ describe('Litany of Woe channel effects', () => {
   it('refreshes only the caster-owned Dirge with talented Mindfracture', () => {
     const baseline = runMindfractureRefresh(false);
     const talented = runMindfractureRefresh(true);
+    const foreignOnly = runMindfractureRefresh(true, false);
 
-    expect(baseline.own.remaining).toBe(3);
+    expect(baseline.own?.remaining).toBe(3);
     expect(talented.own).toMatchObject({
       remaining: 18,
       duration: 18,
       value: 9,
+      tickInterval: 3,
       tickTimer: 1.25,
     });
-    expect(talented.foreign.remaining).toBe(3);
+    expect(talented.foreign?.remaining).toBe(3);
+    expect(foreignOnly.own).toBeUndefined();
+    expect(foreignOnly.foreign?.remaining).toBe(3);
     expect(talented.draws).toEqual(baseline.draws);
   });
 
@@ -347,6 +390,10 @@ describe('Litany of Woe channel effects', () => {
 
     expect(choice?.effect.ability?.[0]?.ability).toBe('mind_blast');
     expect(spread?.effect.ability?.[0]?.ability).toBe('mind_blast');
+    expect(spread?.effect.ability?.[0]?.addEffects?.[0]).toMatchObject({
+      type: 'spreadDot',
+      radius: 8,
+    });
     expect(ABILITIES.mind_blast.learnLevel).toBeLessThanOrEqual(14);
     expect(ABILITIES.shadow_word_pain.learnLevel).toBeLessThanOrEqual(14);
   });
