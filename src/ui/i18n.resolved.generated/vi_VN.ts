@@ -351,6 +351,7 @@ export const vi_VN: EnTranslations = {
       "remainingLessThanMinute": "<1p",
       "remainingMinutes": "{minutes}p",
       "remainingHoursMinutes": "{hours}h {minutes}p",
+      "remainingDaysHours": "{days}d {hours}h",
       "score": "Điểm",
       "walletValue": "Giá Trị Ví (WOC)",
       "usd": "{amount} USD",
@@ -389,7 +390,8 @@ export const vi_VN: EnTranslations = {
         "no_wallet": "Kết nối một ví có ít nhất 20 USD WOC.",
         "under_minimum": "Ví thấp hơn mức tối thiểu 20 USD WOC.",
         "price_unavailable": "Giá WOC hiện không có sẵn, phần thưởng tạm thời bị khóa.",
-        "banned": "Bạn đã bị cấm tham gia Phần Thưởng Hằng Ngày. Lý do: {reason}"
+        "banned": "Bạn đã bị cấm tham gia Phần Thưởng Hằng Ngày. Lý do: {reason}",
+        "bannedUntil": "You are banned from Daily Rewards for another {remaining}. Access returns {until}. Reason: {reason}"
       }
     },
     "wocStore": {

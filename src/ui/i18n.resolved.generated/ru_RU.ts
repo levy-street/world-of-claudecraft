@@ -351,6 +351,7 @@ export const ru_RU: EnTranslations = {
       "remainingLessThanMinute": "<1м",
       "remainingMinutes": "{minutes}м",
       "remainingHoursMinutes": "{hours}ч {minutes}м",
+      "remainingDaysHours": "{days}д {hours}ч",
       "score": "Счёт",
       "walletValue": "Стоимость кошелька (WOC)",
       "usd": "{amount} USD",
@@ -389,7 +390,8 @@ export const ru_RU: EnTranslations = {
         "no_wallet": "Подключите кошелек с не менее чем $20 USD в WOC.",
         "under_minimum": "Кошелек ниже минимума в $20 USD WOC.",
         "price_unavailable": "Цена WOC недоступна, награды временно заблокированы.",
-        "banned": "Вам запрещено участвовать в ежедневных наградах. Причина: {reason}"
+        "banned": "Вам запрещено участвовать в ежедневных наградах. Причина: {reason}",
+        "bannedUntil": "Запрет на участие в ежедневных наградах действует еще {remaining}. Доступ вернется {until}. Причина: {reason}"
       }
     },
     "wocStore": {

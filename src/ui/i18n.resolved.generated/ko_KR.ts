@@ -351,6 +351,7 @@ export const ko_KR: EnTranslations = {
       "remainingLessThanMinute": "1분 미만",
       "remainingMinutes": "{minutes}분",
       "remainingHoursMinutes": "{hours}시간 {minutes}분",
+      "remainingDaysHours": "{days}일 {hours}시간",
       "score": "점수",
       "walletValue": "지갑 가치 (WOC)",
       "usd": "{amount} USD",
@@ -389,7 +390,8 @@ export const ko_KR: EnTranslations = {
         "no_wallet": "$20 USD 상당 이상의 WOC를 보유한 지갑을 연결하세요.",
         "under_minimum": "지갑이 최소 $20 USD WOC 기준에 미치지 못합니다.",
         "price_unavailable": "WOC 가격을 확인할 수 없어 보상이 일시적으로 잠겨 있습니다.",
-        "banned": "일일 보상 참여가 금지되었습니다. 사유: {reason}"
+        "banned": "일일 보상 참여가 금지되었습니다. 사유: {reason}",
+        "bannedUntil": "일일 보상 참여가 앞으로 {remaining} 동안 금지됩니다. 해제 시각: {until}. 사유: {reason}"
       }
     },
     "wocStore": {

@@ -365,6 +365,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.reason.price_unavailable':
     'WOCの価格を取得できないため、報酬は一時的にロックされています。',
   'hudChrome.dailyRewards.reason.banned': 'デイリー報酬への参加が禁止されています。理由: {reason}',
+  'hudChrome.dailyRewards.reason.bannedUntil':
+    'デイリー報酬への参加はあと{remaining}禁止されています。解除日時: {until}。理由: {reason}',
   'hudChrome.keybinds.discord': 'Discord',
   'hudChrome.spectate.banner': '{name}を観戦中',
   'hudChrome.readyCheck.prompt': '{name} が準備確認を開始しました。準備はいいですか？',
@@ -6580,6 +6582,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'あなたは沼地の果てへ登り、ハルヴェン修道士のもとへ戻る。',
   'hudChrome.dailyRewards.endsIn': '終了まで{time}',
   'hudChrome.dailyRewards.remainingHoursMinutes': '{hours}時間{minutes}分',
+  'hudChrome.dailyRewards.remainingDaysHours': '{days}日{hours}時間',
   'hudChrome.dailyRewards.remainingLessThanMinute': '1分未満',
   'hudChrome.dailyRewards.remainingMinutes': '{minutes}分',
   'hudChrome.dailyRewards.sol': '{amount} SOL',

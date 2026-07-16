@@ -351,6 +351,7 @@ export const da_DK: EnTranslations = {
       "remainingLessThanMinute": "<1m",
       "remainingMinutes": "{minutes}m",
       "remainingHoursMinutes": "{hours}t {minutes}m",
+      "remainingDaysHours": "{days}d {hours}h",
       "score": "Score",
       "walletValue": "Wallet-værdi (WOC)",
       "usd": "{amount} USD",
@@ -389,7 +390,8 @@ export const da_DK: EnTranslations = {
         "no_wallet": "Forbind en wallet med mindst 20 USD i WOC.",
         "under_minimum": "Wallet er under WOC-minimummet på 20 USD.",
         "price_unavailable": "WOC-prisen er utilgængelig, belønninger er midlertidigt låst.",
-        "banned": "Du er udelukket fra daglige belønninger. Årsag: {reason}"
+        "banned": "Du er udelukket fra daglige belønninger. Årsag: {reason}",
+        "bannedUntil": "You are banned from Daily Rewards for another {remaining}. Access returns {until}. Reason: {reason}"
       }
     },
     "wocStore": {

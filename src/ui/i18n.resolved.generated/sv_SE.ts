@@ -351,6 +351,7 @@ export const sv_SE: EnTranslations = {
       "remainingLessThanMinute": "<1 min",
       "remainingMinutes": "{minutes} min",
       "remainingHoursMinutes": "{hours} h {minutes} min",
+      "remainingDaysHours": "{days}d {hours}h",
       "score": "Poäng",
       "walletValue": "Plånbokens värde (WOC)",
       "usd": "{amount} USD",
@@ -389,7 +390,8 @@ export const sv_SE: EnTranslations = {
         "no_wallet": "Anslut en plånbok med minst 20 USD i WOC.",
         "under_minimum": "Plånboken är under WOC-miniminivån på 20 USD.",
         "price_unavailable": "WOC-priset är otillgängligt, belöningar är tillfälligt låsta.",
-        "banned": "Du är avstängd från dagliga belöningar. Orsak: {reason}"
+        "banned": "Du är avstängd från dagliga belöningar. Orsak: {reason}",
+        "bannedUntil": "You are banned from Daily Rewards for another {remaining}. Access returns {until}. Reason: {reason}"
       }
     },
     "wocStore": {

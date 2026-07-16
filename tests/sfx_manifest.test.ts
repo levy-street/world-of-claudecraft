@@ -162,9 +162,9 @@ describe('buildManifest', () => {
     expect(manifest).toContain('cast_lightning_bolt');
   });
 
-  it('keeps the release catalog and all 27 UI cues in one 156-key inventory', () => {
+  it('keeps the release catalog and all 27 UI cues in one 159-key inventory', () => {
     const keys = new Set(SFX.map((entry) => entry.key));
-    expect(keys.size).toBe(156);
+    expect(keys.size).toBe(159);
     expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(27);
     for (const key of [
       'cast_lightning_bolt',
@@ -177,6 +177,9 @@ describe('buildManifest', () => {
       'quest_ready',
       'lockpick_success',
       'ui_achievement',
+      'wand_arcane',
+      'wand_holy',
+      'wand_shadow',
     ]) {
       expect(keys.has(key), key).toBe(true);
     }
@@ -191,7 +194,7 @@ describe('buildManifest', () => {
     // appear in the static catalog, they are purely filesystem-discovered.
     const mobFamilyKeys = [...keys].filter((key) => key.startsWith('mob_'));
     expect(mobFamilyKeys).toHaveLength(53); // 13 families x 4 actions, + 1 reptile idle
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(156);
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(159);
   });
 });
 

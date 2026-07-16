@@ -362,6 +362,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Цена WOC недоступна, награды временно заблокированы.',
   'hudChrome.dailyRewards.reason.banned':
     'Вам запрещено участвовать в ежедневных наградах. Причина: {reason}',
+  'hudChrome.dailyRewards.reason.bannedUntil':
+    'Запрет на участие в ежедневных наградах действует еще {remaining}. Доступ вернется {until}. Причина: {reason}',
   'hudChrome.keybinds.discord': 'Discord',
   'hudChrome.spectate.banner': 'Наблюдение за {name}',
   'hudChrome.readyCheck.prompt': '{name} начал проверку готовности. Вы готовы?',
@@ -6699,6 +6701,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Вы поднимаетесь обратно к брату Хальвену на краю топи.',
   'hudChrome.dailyRewards.endsIn': 'Осталось {time}',
   'hudChrome.dailyRewards.remainingHoursMinutes': '{hours}ч {minutes}м',
+  'hudChrome.dailyRewards.remainingDaysHours': '{days}д {hours}ч',
   'hudChrome.dailyRewards.remainingLessThanMinute': '<1м',
   'hudChrome.dailyRewards.remainingMinutes': '{minutes}м',
   'hudChrome.dailyRewards.sol': '{amount} SOL',

@@ -360,6 +360,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.reason.price_unavailable':
     'WOC 가격을 확인할 수 없어 보상이 일시적으로 잠겨 있습니다.',
   'hudChrome.dailyRewards.reason.banned': '일일 보상 참여가 금지되었습니다. 사유: {reason}',
+  'hudChrome.dailyRewards.reason.bannedUntil':
+    '일일 보상 참여가 앞으로 {remaining} 동안 금지됩니다. 해제 시각: {until}. 사유: {reason}',
   'hudChrome.keybinds.discord': 'Discord',
   'hudChrome.spectate.banner': '{name} 관전 중',
   'hudChrome.readyCheck.prompt': '{name} 님이 준비 확인을 시작했습니다. 준비되셨습니까?',
@@ -6563,6 +6565,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '그대는 늪지의 끝자락으로 올라가 할벤 수사에게 돌아간다.',
   'hudChrome.dailyRewards.endsIn': '{time} 후 종료',
   'hudChrome.dailyRewards.remainingHoursMinutes': '{hours}시간 {minutes}분',
+  'hudChrome.dailyRewards.remainingDaysHours': '{days}일 {hours}시간',
   'hudChrome.dailyRewards.remainingLessThanMinute': '1분 미만',
   'hudChrome.dailyRewards.remainingMinutes': '{minutes}분',
   'hudChrome.dailyRewards.sol': '{amount} SOL',

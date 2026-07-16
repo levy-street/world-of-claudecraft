@@ -351,6 +351,7 @@ export const es_ES: EnTranslations = {
       "remainingLessThanMinute": "<1min",
       "remainingMinutes": "{minutes}min",
       "remainingHoursMinutes": "{hours}h {minutes}min",
+      "remainingDaysHours": "{days}d {hours}h",
       "score": "Puntuación",
       "walletValue": "Valor de cartera (WOC)",
       "usd": "{amount} USD",
@@ -389,7 +390,8 @@ export const es_ES: EnTranslations = {
         "no_wallet": "Conecta una cartera con al menos $20 USD en WOC.",
         "under_minimum": "La cartera está por debajo del mínimo de $20 USD en WOC.",
         "price_unavailable": "El precio de WOC no está disponible; las recompensas están bloqueadas temporalmente.",
-        "banned": "Tienes prohibido participar en las Recompensas diarias. Motivo: {reason}"
+        "banned": "Tienes prohibido participar en las Recompensas diarias. Motivo: {reason}",
+        "bannedUntil": "You are banned from Daily Rewards for another {remaining}. Access returns {until}. Reason: {reason}"
       }
     },
     "wocStore": {

@@ -351,6 +351,7 @@ export const pl_PL: EnTranslations = {
       "remainingLessThanMinute": "<1 min",
       "remainingMinutes": "{minutes} min",
       "remainingHoursMinutes": "{hours} godz. {minutes} min",
+      "remainingDaysHours": "{days}d {hours}h",
       "score": "Wynik",
       "walletValue": "Wartość portfela (WOC)",
       "usd": "{amount} USD",
@@ -389,7 +390,8 @@ export const pl_PL: EnTranslations = {
         "no_wallet": "Podłącz portfel z co najmniej 20 USD w WOC.",
         "under_minimum": "Portfel jest poniżej minimum 20 USD w WOC.",
         "price_unavailable": "Cena WOC jest niedostępna, nagrody są tymczasowo zablokowane.",
-        "banned": "Masz zakaz udziału w codziennych nagrodach. Powód: {reason}"
+        "banned": "Masz zakaz udziału w codziennych nagrodach. Powód: {reason}",
+        "bannedUntil": "You are banned from Daily Rewards for another {remaining}. Access returns {until}. Reason: {reason}"
       }
     },
     "wocStore": {

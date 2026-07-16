@@ -351,6 +351,7 @@ export const id_ID: EnTranslations = {
       "remainingLessThanMinute": "<1m",
       "remainingMinutes": "{minutes}m",
       "remainingHoursMinutes": "{hours}j {minutes}m",
+      "remainingDaysHours": "{days}d {hours}h",
       "score": "Skor",
       "walletValue": "Nilai Dompet (WOC)",
       "usd": "{amount} USD",
@@ -389,7 +390,8 @@ export const id_ID: EnTranslations = {
         "no_wallet": "Hubungkan dompet dengan setidaknya $20 USD dalam WOC.",
         "under_minimum": "Dompet di bawah batas minimum $20 USD WOC.",
         "price_unavailable": "Harga WOC tidak tersedia, hadiah terkunci sementara.",
-        "banned": "Kamu dilarang mengikuti Hadiah Harian. Alasan: {reason}"
+        "banned": "Kamu dilarang mengikuti Hadiah Harian. Alasan: {reason}",
+        "bannedUntil": "You are banned from Daily Rewards for another {remaining}. Access returns {until}. Reason: {reason}"
       }
     },
     "wocStore": {

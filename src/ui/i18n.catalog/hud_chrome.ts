@@ -71,6 +71,7 @@ export const hudChromeStrings = {
     remainingLessThanMinute: '<1m',
     remainingMinutes: '{minutes}m',
     remainingHoursMinutes: '{hours}h {minutes}m',
+    remainingDaysHours: '{days}d {hours}h',
     score: 'Score',
     walletValue: 'Wallet Value (WOC)',
     usd: '{amount} USD',
@@ -111,6 +112,8 @@ export const hudChromeStrings = {
       under_minimum: 'Wallet is below the $20 USD WOC minimum.',
       price_unavailable: 'WOC price is unavailable, rewards are temporarily locked.',
       banned: 'You are banned from Daily Rewards. Reason: {reason}',
+      bannedUntil:
+        'You are banned from Daily Rewards for another {remaining}. Access returns {until}. Reason: {reason}',
     },
   },
   wocStore: {

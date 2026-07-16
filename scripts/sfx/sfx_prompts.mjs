@@ -278,6 +278,18 @@ export const SFX = [
       'A glob of nature energy flying through the air, an organic whoosh. Single shot, no music.',
   },
 
+  // --- Wand auto-attacks (custom recordings, not ElevenLabs) ----------------
+  // Distinct from the matching proj_<school> real-spell-cast sound, see
+  // WAND_CUES in src/ui/combat_sfx.ts: mage/priest/warlock wand auto-attacks
+  // (classes.ts ranged.wand) previously reused the school's actual spell
+  // projectile sound, so a passive auto-attack was indistinguishable from a
+  // real cast by ear. Placeholder audio (copied from the matching proj_
+  // clip) ships until real melee-ish takes replace it via the normal
+  // drop-in-swap mechanism.
+  { key: 'wand_arcane', custom: true },
+  { key: 'wand_holy', custom: true },
+  { key: 'wand_shadow', custom: true },
+
   // --- Spell impacts --------------------------------------------------------
   {
     key: 'impact_fire',

@@ -351,6 +351,7 @@ export const zh_TW: EnTranslations = {
       "remainingLessThanMinute": "<1分",
       "remainingMinutes": "{minutes}分",
       "remainingHoursMinutes": "{hours}小時{minutes}分",
+      "remainingDaysHours": "{days}天{hours}小時",
       "score": "分數",
       "walletValue": "錢包價值 (WOC)",
       "usd": "{amount} USD",
@@ -389,7 +390,8 @@ export const zh_TW: EnTranslations = {
         "no_wallet": "請連接持有至少 $20 USD WOC 的錢包。",
         "under_minimum": "錢包低於 $20 USD 的 WOC 最低要求。",
         "price_unavailable": "無法取得 WOC 價格，獎勵暫時鎖定。",
-        "banned": "您已被禁止參加每日獎勵。原因：{reason}"
+        "banned": "您已被禁止參加每日獎勵。原因：{reason}",
+        "bannedUntil": "您還將被禁止參加每日獎勵 {remaining}。恢復時間：{until}。原因：{reason}"
       }
     },
     "wocStore": {

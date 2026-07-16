@@ -1872,6 +1872,17 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
   {
     dispatcher: DISPATCH.admin,
     method: 'GET',
+    path: '/admin/api/accounts/:id/daily-rewards-events',
+    handler: 'dailyRewardEventsMatch',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: REQUIRE_OWNED.operator404,
+    match: /^\/admin\/api\/accounts\/(\d+)\/daily-rewards-events$/,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'GET',
     path: '/admin/api/characters',
     handler: 'handleAdminApi arm: /admin/api/characters',
     contentType: PROBLEM_JSON,

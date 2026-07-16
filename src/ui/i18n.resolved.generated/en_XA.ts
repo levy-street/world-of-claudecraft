@@ -351,6 +351,7 @@ export const en_XA: EnTranslations = {
       "remainingLessThanMinute": "[<1ɱ]",
       "remainingMinutes": "[{minutes}ɱ]",
       "remainingHoursMinutes": "[{hours}ĥ {minutes}ɱ]",
+      "remainingDaysHours": "[{days}ð {hours}ĥ]",
       "score": "[Šçóŕé]",
       "walletValue": "[Ŵáļļéţ Ʋáļúé (ŴÓÇ)]",
       "usd": "[{amount} ÚŠÐ]",
@@ -389,7 +390,8 @@ export const en_XA: EnTranslations = {
         "no_wallet": "[Çóññéçţ á ŵáļļéţ ŵíţĥ áţ ļéášţ $20 ÚŠÐ íñ ŴÓÇ.]",
         "under_minimum": "[Ŵáļļéţ íš ƀéļóŵ ţĥé $20 ÚŠÐ ŴÓÇ ɱíñíɱúɱ.]",
         "price_unavailable": "[ŴÓÇ þŕíçé íš úñáʋáíļáƀļé, ŕéŵáŕðš áŕé ţéɱþóŕáŕíļý ļóçķéð.]",
-        "banned": "[Ýóú áŕé ƀáññéð ƒŕóɱ Ðáíļý Ŕéŵáŕðš. Ŕéášóñ: {reason}]"
+        "banned": "[Ýóú áŕé ƀáññéð ƒŕóɱ Ðáíļý Ŕéŵáŕðš. Ŕéášóñ: {reason}]",
+        "bannedUntil": "[Ýóú áŕé ƀáññéð ƒŕóɱ Ðáíļý Ŕéŵáŕðš ƒóŕ áñóţĥéŕ {remaining}. Áççéšš ŕéţúŕñš {until}. Ŕéášóñ: {reason}]"
       }
     },
     "wocStore": {

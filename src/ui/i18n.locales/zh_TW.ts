@@ -350,6 +350,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.reason.under_minimum': '錢包低於 $20 USD 的 WOC 最低要求。',
   'hudChrome.dailyRewards.reason.price_unavailable': '無法取得 WOC 價格，獎勵暫時鎖定。',
   'hudChrome.dailyRewards.reason.banned': '您已被禁止參加每日獎勵。原因：{reason}',
+  'hudChrome.dailyRewards.reason.bannedUntil':
+    '您還將被禁止參加每日獎勵 {remaining}。恢復時間：{until}。原因：{reason}',
   'hudChrome.keybinds.discord': 'Discord',
   'hudChrome.spectate.banner': '正在觀察 {name}',
   'hudChrome.readyCheck.prompt': '{name} 發起了準備確認。你準備好了嗎？',
@@ -6253,6 +6255,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.delves.drowned_litany.leaveText': '你爬回沼澤邊緣，回到哈爾文修士身邊。',
   'hudChrome.dailyRewards.endsIn': '{time}後結束',
   'hudChrome.dailyRewards.remainingHoursMinutes': '{hours}小時{minutes}分',
+  'hudChrome.dailyRewards.remainingDaysHours': '{days}天{hours}小時',
   'hudChrome.dailyRewards.remainingLessThanMinute': '<1分',
   'hudChrome.dailyRewards.remainingMinutes': '{minutes}分',
   'hudChrome.dailyRewards.sol': '{amount} SOL',

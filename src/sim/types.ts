@@ -2577,6 +2577,10 @@ export type SimEvent = { pid?: number } & (
       // Stable presentation discriminator; renderers must not infer a player
       // attack animation from school or an English ability label.
       attackAnimation?: 'ranged-shot';
+      // True for a wand auto-attack projectile, so combat_sfx.ts can pick the
+      // dedicated wand_<school> cue instead of the real-spell proj_<school>
+      // one: a passive auto-attack must not sound identical to an actual cast.
+      wand?: true;
     }
   // visual-only cue anchored to a WORLD POINT rather than an entity: a
   // ground-targeted spell's impact (the burst/nova lands where it was aimed, not

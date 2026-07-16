@@ -351,6 +351,7 @@ export const cs_CZ: EnTranslations = {
       "remainingLessThanMinute": "<1 min",
       "remainingMinutes": "{minutes} min",
       "remainingHoursMinutes": "{hours} h {minutes} min",
+      "remainingDaysHours": "{days}d {hours}h",
       "score": "Skóre",
       "walletValue": "Hodnota peněženky (WOC)",
       "usd": "{amount} USD",
@@ -389,7 +390,8 @@ export const cs_CZ: EnTranslations = {
         "no_wallet": "Připoj peněženku s alespoň 20 USD ve WOC.",
         "under_minimum": "Peněženka je pod minimem 20 USD ve WOC.",
         "price_unavailable": "Cena WOC není dostupná, odměny jsou dočasně uzamčené.",
-        "banned": "Máš zákaz účasti v denních odměnách. Důvod: {reason}"
+        "banned": "Máš zákaz účasti v denních odměnách. Důvod: {reason}",
+        "bannedUntil": "You are banned from Daily Rewards for another {remaining}. Access returns {until}. Reason: {reason}"
       }
     },
     "wocStore": {
