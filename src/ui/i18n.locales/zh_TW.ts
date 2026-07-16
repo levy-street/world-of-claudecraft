@@ -5518,7 +5518,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.greyjaw_stalker.name': '灰顎追獵者裝備',
   'entities.itemSets.greyjaw_stalker.bonus3': '攻擊速度和施法速度提高 15%。',
   'entities.itemSets.necromancers.name': '哀織法衣',
-  'entities.itemSets.necromancers.bonus2': '你不會被擊退（擊退抗性 100%）。',
+  'entities.itemSets.necromancers.bonus2':
+    '法術強度提高 20 點。受到傷害不再延遲你的施法（施法延遲抗性 100%）。',
   'entities.itemSets.necromancers.bonus3': '智力提高 10 點，耐力提高 10 點。',
   'entities.itemSets.necromancers.bonus4':
     '你的法術有 10% 的機率觸發「清晰施法」，使你的下一個法術免費施放。',
@@ -5529,13 +5530,15 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.nighttalon.bonus4':
     '你的武器致命一擊會撕開「撕裂傷口」，使目標每 2 秒流血 6 點傷害，持續 12 秒。最多疊加 3 層。',
   'entities.itemSets.soulflame.name': '怨焰法衣',
-  'entities.itemSets.soulflame.bonus2': '你不會被擊退（擊退抗性 100%）。',
+  'entities.itemSets.soulflame.bonus2':
+    '法術強度提高 20 點。受到傷害不再延遲你的施法（施法延遲抗性 100%）。',
   'entities.itemSets.soulflame.bonus3':
     '智力提高 15 點，精神提高 15 點，攻擊速度和施法速度提高 15%。',
   'entities.itemSets.soulflame.bonus4':
     '你的法術有 10% 的機率觸發「灼魂之焰」，使法術強度提高 40 點，持續 10 秒。',
   'entities.itemSets.stormcallers.name': '喚風法衣',
-  'entities.itemSets.stormcallers.bonus2': '你不會被擊退（擊退抗性 100%）。',
+  'entities.itemSets.stormcallers.bonus2':
+    '法術強度提高 20 點。受到傷害不再延遲你的施法（施法延遲抗性 100%）。',
   'entities.itemSets.stormcallers.bonus3':
     '智力提高 15 點，精神提高 15 點，攻擊速度和施法速度提高 15%。',
   'entities.itemSets.stormcallers.bonus4':

@@ -9571,7 +9571,7 @@ export const tr_TR: EnTranslations = {
       },
       "necromancers": {
         "name": "Mournweave Giysileri",
-        "bonus2": "Geri itilemezsin (%100 geri itilme direnci).",
+        "bonus2": "Büyü gücünü 20 artırır. Alınan hasar artık büyü yapmanı geciktirmez (%100 büyü gecikme direnci).",
         "bonus3": "Zekayı 10 ve dayanıklılığı 10 artırır.",
         "bonus4": "Büyülerinin %10 ihtimalle Berrak Büyü kazandırır, bir sonraki büyünü bedava yapar."
       },
@@ -9583,13 +9583,13 @@ export const tr_TR: EnTranslations = {
       },
       "soulflame": {
         "name": "Wraithfire Kıyafetleri",
-        "bonus2": "Geri itilemezsin (%100 geri itilme direnci).",
+        "bonus2": "Büyü gücünü 20 artırır. Alınan hasar artık büyü yapmanı geciktirmez (%100 büyü gecikme direnci).",
         "bonus3": "Zekayı 15, ruhu 15, saldırı ve büyü hızını %15 artırır.",
         "bonus4": "Büyülerinin %10 ihtimalle Ruhalazı kazandırır, 10 sn boyunca büyü gücünü 40 artırır."
       },
       "stormcallers": {
         "name": "Galecall Cübbeleri",
-        "bonus2": "Geri itilemezsin (%100 geri itilme direnci).",
+        "bonus2": "Büyü gücünü 20 artırır. Alınan hasar artık büyü yapmanı geciktirmez (%100 büyü gecikme direnci).",
         "bonus3": "Zekayı 15, ruhu 15, saldırı ve büyü hızını %15 artırır.",
         "bonus4": "Büyülerinin %10 ihtimalle Ruhalazı kazandırır, 10 sn boyunca büyü gücünü 40 artırır."
       },

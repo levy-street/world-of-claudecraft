@@ -6766,7 +6766,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Augmente la vitesse d'attaque et d'incantation de 15%.",
   'entities.itemSets.necromancers.name': 'Parure de Mournweave',
   'entities.itemSets.necromancers.bonus2':
-    'Vous ne pouvez pas être projeté en arrière (100% de résistance à la projection).',
+    'Augmente la puissance des sorts de 20. Les dégâts subis ne retardent plus vos incantations (100% de résistance au retard des sorts).',
   'entities.itemSets.necromancers.bonus3': "Augmente l'intelligence de 10 et l'endurance de 10.",
   'entities.itemSets.nighttalon.name': 'Peau de Direfang',
   'entities.itemSets.nighttalon.bonus2': "Augmente la puissance d'attaque de 40.",
@@ -6774,12 +6774,12 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Augmente l'agilité de 15, les chances de critique de 2% et la vitesse d'attaque et d'incantation de 15%.",
   'entities.itemSets.soulflame.name': "Tenue d'apparat Wraithfire",
   'entities.itemSets.soulflame.bonus2':
-    'Vous ne pouvez pas être projeté en arrière (100% de résistance à la projection).',
+    'Augmente la puissance des sorts de 20. Les dégâts subis ne retardent plus vos incantations (100% de résistance au retard des sorts).',
   'entities.itemSets.soulflame.bonus3':
     "Augmente l'intelligence de 15, l'esprit de 15 et la vitesse d'attaque et d'incantation de 15%.",
   'entities.itemSets.stormcallers.name': 'Vêtements de Galecall',
   'entities.itemSets.stormcallers.bonus2':
-    'Vous ne pouvez pas être projeté en arrière (100% de résistance à la projection).',
+    'Augmente la puissance des sorts de 20. Les dégâts subis ne retardent plus vos incantations (100% de résistance au retard des sorts).',
   'entities.itemSets.stormcallers.bonus3':
     "Augmente l'intelligence de 15, l'esprit de 15 et la vitesse d'attaque et d'incantation de 15%.",
   'entities.itemSets.vale_arcanist.name': "Tenue de l'arcaniste du Val",

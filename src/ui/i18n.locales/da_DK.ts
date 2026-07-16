@@ -6234,7 +6234,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.greyjaw_stalker.bonus3': 'Øger angrebs- og magihastighed med 15%.',
   'entities.itemSets.necromancers.name': 'Mournweave klæder',
   'entities.itemSets.necromancers.bonus2':
-    'Du kan ikke stødes tilbage (100% modstand mod tilbagestød).',
+    'Øger magikraft med 20. Skade, du tager, forsinker ikke længere dine besværgelser (100% modstand mod fordrøjelse af besværgelser).',
   'entities.itemSets.necromancers.bonus3': 'Øger intellekt med 10 og udholdenhed med 10.',
   'entities.itemSets.nighttalon.name': 'Direfang pels',
   'entities.itemSets.nighttalon.bonus2': 'Øger angrebskraft med 40.',
@@ -6242,12 +6242,12 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Øger smidighed med 15, kritisk chance med 2% og angrebs- og magihastighed med 15%.',
   'entities.itemSets.soulflame.name': 'Wraithfire regalier',
   'entities.itemSets.soulflame.bonus2':
-    'Du kan ikke stødes tilbage (100% modstand mod tilbagestød).',
+    'Øger magikraft med 20. Skade, du tager, forsinker ikke længere dine besværgelser (100% modstand mod fordrøjelse af besværgelser).',
   'entities.itemSets.soulflame.bonus3':
     'Øger intellekt med 15, ånd med 15 og angrebs- og magihastighed med 15%.',
   'entities.itemSets.stormcallers.name': 'Galecall klæder',
   'entities.itemSets.stormcallers.bonus2':
-    'Du kan ikke stødes tilbage (100% modstand mod tilbagestød).',
+    'Øger magikraft med 20. Skade, du tager, forsinker ikke længere dine besværgelser (100% modstand mod fordrøjelse af besværgelser).',
   'entities.itemSets.stormcallers.bonus3':
     'Øger intellekt med 15, ånd med 15 og angrebs- og magihastighed med 15%.',
   'entities.itemSets.vale_arcanist.name': 'Dalarkanistens klæder',

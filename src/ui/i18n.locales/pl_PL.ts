@@ -6289,19 +6289,20 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.greyjaw_stalker.bonus3': 'Zwiększa szybkość ataku i rzucania zaklęć o 15%.',
   'entities.itemSets.necromancers.name': 'Szaty Mournweave',
   'entities.itemSets.necromancers.bonus2':
-    'Nie można cię odrzucić (100% odporności na odrzucenie).',
+    'Zwiększa moc zaklęć o 20. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć (100% odporności na opóźnienie rzucania).',
   'entities.itemSets.necromancers.bonus3': 'Zwiększa intelekt o 10 i wytrzymałość o 10.',
   'entities.itemSets.nighttalon.name': 'Skóra Direfang',
   'entities.itemSets.nighttalon.bonus2': 'Zwiększa siłę ataku o 40.',
   'entities.itemSets.nighttalon.bonus3':
     'Zwiększa zręczność o 15, szansę na trafienie krytyczne o 2% oraz szybkość ataku i rzucania zaklęć o 15%.',
   'entities.itemSets.soulflame.name': 'Regalia Wraithfire',
-  'entities.itemSets.soulflame.bonus2': 'Nie można cię odrzucić (100% odporności na odrzucenie).',
+  'entities.itemSets.soulflame.bonus2':
+    'Zwiększa moc zaklęć o 20. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć (100% odporności na opóźnienie rzucania).',
   'entities.itemSets.soulflame.bonus3':
     'Zwiększa intelekt o 15, ducha o 15 oraz szybkość ataku i rzucania zaklęć o 15%.',
   'entities.itemSets.stormcallers.name': 'Szaty Galecall',
   'entities.itemSets.stormcallers.bonus2':
-    'Nie można cię odrzucić (100% odporności na odrzucenie).',
+    'Zwiększa moc zaklęć o 20. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć (100% odporności na opóźnienie rzucania).',
   'entities.itemSets.stormcallers.bonus3':
     'Zwiększa intelekt o 15, ducha o 15 oraz szybkość ataku i rzucania zaklęć o 15%.',
   'entities.itemSets.vale_arcanist.name': 'Szaty Arkanisty z Doliny',

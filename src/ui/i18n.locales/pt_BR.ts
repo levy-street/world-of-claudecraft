@@ -6329,7 +6329,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Aumenta a velocidade de ataque e de lançamento em 15%.',
   'entities.itemSets.necromancers.name': 'Vestes Mournweave',
   'entities.itemSets.necromancers.bonus2':
-    'Você não pode ser repelido (100% de resistência a repulsão).',
+    'Aumenta o poder mágico em 20. Dano recebido não atrasa mais suas conjurações (100% de resistência a atraso de conjuração).',
   'entities.itemSets.necromancers.bonus3': 'Aumenta o intelecto em 10 e o vigor em 10.',
   'entities.itemSets.nighttalon.name': 'Traje de Couro Direfang',
   'entities.itemSets.nighttalon.bonus2': 'Aumenta o poder de ataque em 40.',
@@ -6337,12 +6337,12 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Aumenta a agilidade em 15, a chance de crítico em 2% e a velocidade de ataque e de lançamento em 15%.',
   'entities.itemSets.soulflame.name': 'Vestes Wraithfire',
   'entities.itemSets.soulflame.bonus2':
-    'Você não pode ser repelido (100% de resistência a repulsão).',
+    'Aumenta o poder mágico em 20. Dano recebido não atrasa mais suas conjurações (100% de resistência a atraso de conjuração).',
   'entities.itemSets.soulflame.bonus3':
     'Aumenta o intelecto em 15, o espírito em 15 e a velocidade de ataque e de lançamento em 15%.',
   'entities.itemSets.stormcallers.name': 'Vestes Galecall',
   'entities.itemSets.stormcallers.bonus2':
-    'Você não pode ser repelido (100% de resistência a repulsão).',
+    'Aumenta o poder mágico em 20. Dano recebido não atrasa mais suas conjurações (100% de resistência a atraso de conjuração).',
   'entities.itemSets.stormcallers.bonus3':
     'Aumenta o intelecto em 15, o espírito em 15 e a velocidade de ataque e de lançamento em 15%.',
   'entities.itemSets.vale_arcanist.name': 'Vestes do Arcanista do Vale',

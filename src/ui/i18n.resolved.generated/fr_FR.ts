@@ -9571,7 +9571,7 @@ export const fr_FR: EnTranslations = {
       },
       "necromancers": {
         "name": "Parure de Mournweave",
-        "bonus2": "Vous ne pouvez pas être projeté en arrière (100% de résistance à la projection).",
+        "bonus2": "Augmente la puissance des sorts de 20. Les dégâts subis ne retardent plus vos incantations (100% de résistance au retard des sorts).",
         "bonus3": "Augmente l'intelligence de 10 et l'endurance de 10.",
         "bonus4": "Vos sorts ont 10% de chances de conférer Incantation limpide, rendant votre prochain sort gratuit."
       },
@@ -9583,13 +9583,13 @@ export const fr_FR: EnTranslations = {
       },
       "soulflame": {
         "name": "Tenue d'apparat Wraithfire",
-        "bonus2": "Vous ne pouvez pas être projeté en arrière (100% de résistance à la projection).",
+        "bonus2": "Augmente la puissance des sorts de 20. Les dégâts subis ne retardent plus vos incantations (100% de résistance au retard des sorts).",
         "bonus3": "Augmente l'intelligence de 15, l'esprit de 15 et la vitesse d'attaque et d'incantation de 15%.",
         "bonus4": "Vos sorts ont 10% de chances de conférer Embrasement d'âme, augmentant la puissance des sorts de 40 pendant 10 s."
       },
       "stormcallers": {
         "name": "Vêtements de Galecall",
-        "bonus2": "Vous ne pouvez pas être projeté en arrière (100% de résistance à la projection).",
+        "bonus2": "Augmente la puissance des sorts de 20. Les dégâts subis ne retardent plus vos incantations (100% de résistance au retard des sorts).",
         "bonus3": "Augmente l'intelligence de 15, l'esprit de 15 et la vitesse d'attaque et d'incantation de 15%.",
         "bonus4": "Vos sorts ont 10% de chances de conférer Embrasement d'âme, augmentant la puissance des sorts de 40 pendant 10 s."
       },

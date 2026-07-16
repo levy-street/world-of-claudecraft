@@ -9571,7 +9571,7 @@ export const pt_BR: EnTranslations = {
       },
       "necromancers": {
         "name": "Vestes Mournweave",
-        "bonus2": "Você não pode ser repelido (100% de resistência a repulsão).",
+        "bonus2": "Aumenta o poder mágico em 20. Dano recebido não atrasa mais suas conjurações (100% de resistência a atraso de conjuração).",
         "bonus3": "Aumenta o intelecto em 10 e o vigor em 10.",
         "bonus4": "Suas magias têm 10% de chance de conceder Conjuração Clara, tornando sua próxima magia gratuita."
       },
@@ -9583,13 +9583,13 @@ export const pt_BR: EnTranslations = {
       },
       "soulflame": {
         "name": "Vestes Wraithfire",
-        "bonus2": "Você não pode ser repelido (100% de resistência a repulsão).",
+        "bonus2": "Aumenta o poder mágico em 20. Dano recebido não atrasa mais suas conjurações (100% de resistência a atraso de conjuração).",
         "bonus3": "Aumenta o intelecto em 15, o espírito em 15 e a velocidade de ataque e de lançamento em 15%.",
         "bonus4": "Suas magias têm 10% de chance de conceder Chama da Alma, aumentando o poder mágico em 40 por 10 s."
       },
       "stormcallers": {
         "name": "Vestes Galecall",
-        "bonus2": "Você não pode ser repelido (100% de resistência a repulsão).",
+        "bonus2": "Aumenta o poder mágico em 20. Dano recebido não atrasa mais suas conjurações (100% de resistência a atraso de conjuração).",
         "bonus3": "Aumenta o intelecto em 15, o espírito em 15 e a velocidade de ataque e de lançamento em 15%.",
         "bonus4": "Suas magias têm 10% de chance de conceder Chama da Alma, aumentando o poder mágico em 40 por 10 s."
       },

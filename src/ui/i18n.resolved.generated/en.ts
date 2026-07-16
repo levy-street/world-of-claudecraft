@@ -9571,7 +9571,7 @@ export const en: EnTranslations = {
       },
       "necromancers": {
         "name": "Mournweave Raiment",
-        "bonus2": "Increases spell power by 20. You cannot be knocked back (100% knockback resistance).",
+        "bonus2": "Increases spell power by 20. Damage taken no longer delays your spellcasting (100% pushback resistance).",
         "bonus3": "Increases Intellect by 10 and Stamina by 10.",
         "bonus4": "Your spells have a 10% chance to grant Clearcasting, making your next spell free."
       },
@@ -9583,13 +9583,13 @@ export const en: EnTranslations = {
       },
       "soulflame": {
         "name": "Wraithfire Regalia",
-        "bonus2": "Increases spell power by 20. You cannot be knocked back (100% knockback resistance).",
+        "bonus2": "Increases spell power by 20. Damage taken no longer delays your spellcasting (100% pushback resistance).",
         "bonus3": "Increases Intellect by 15, Spirit by 15, and attack and casting speed by 15%.",
         "bonus4": "Your spells have a 10% chance to grant Soulblaze, increasing spell power by 40 for 10 sec."
       },
       "stormcallers": {
         "name": "Galecall Vestments",
-        "bonus2": "Increases spell power by 20. You cannot be knocked back (100% knockback resistance).",
+        "bonus2": "Increases spell power by 20. Damage taken no longer delays your spellcasting (100% pushback resistance).",
         "bonus3": "Increases Intellect by 15, Spirit by 15, and attack and casting speed by 15%.",
         "bonus4": "Your spells have a 10% chance to grant Soulblaze, increasing spell power by 40 for 10 sec."
       },

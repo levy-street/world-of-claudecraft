@@ -9571,7 +9571,7 @@ export const it_IT: EnTranslations = {
       },
       "necromancers": {
         "name": "Vesti Mournweave",
-        "bonus2": "Non puoi essere respinto (100% di resistenza alla respinta).",
+        "bonus2": "Aumenta il potere degli incantesimi di 20. I danni subiti non ritardano più i tuoi incantesimi (100% di resistenza al ritardo di lancio).",
         "bonus3": "Aumenta l'intelletto di 10 e la tempra di 10.",
         "bonus4": "I tuoi incantesimi hanno una probabilità del 10% di conferire Lancio Limpido, rendendo gratuito il tuo prossimo incantesimo."
       },
@@ -9583,13 +9583,13 @@ export const it_IT: EnTranslations = {
       },
       "soulflame": {
         "name": "Paramenti Wraithfire",
-        "bonus2": "Non puoi essere respinto (100% di resistenza alla respinta).",
+        "bonus2": "Aumenta il potere degli incantesimi di 20. I danni subiti non ritardano più i tuoi incantesimi (100% di resistenza al ritardo di lancio).",
         "bonus3": "Aumenta l'intelletto di 15, lo spirito di 15 e la velocità d'attacco e di lancio del 15%.",
         "bonus4": "I tuoi incantesimi hanno una probabilità del 10% di conferire Vampanima, aumentando la potenza magica di 40 per 10 sec."
       },
       "stormcallers": {
         "name": "Vesti Galecall",
-        "bonus2": "Non puoi essere respinto (100% di resistenza alla respinta).",
+        "bonus2": "Aumenta il potere degli incantesimi di 20. I danni subiti non ritardano più i tuoi incantesimi (100% di resistenza al ritardo di lancio).",
         "bonus3": "Aumenta l'intelletto di 15, lo spirito di 15 e la velocità d'attacco e di lancio del 15%.",
         "bonus4": "I tuoi incantesimi hanno una probabilità del 10% di conferire Vampanima, aumentando la potenza magica di 40 per 10 sec."
       },

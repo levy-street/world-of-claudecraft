@@ -6318,7 +6318,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.greyjaw_stalker.bonus3': 'Verhoogt aanvals- en spreuksnelheid met 15%.',
   'entities.itemSets.necromancers.name': 'Mournweave-Gewaden',
   'entities.itemSets.necromancers.bonus2':
-    'Je kunt niet worden teruggeslagen (100% terugslagweerstand).',
+    'Verhoogt spreukkracht met 20. Opgelopen schade vertraagt je spreuken niet meer (100% weerstand tegen spreukvertraging).',
   'entities.itemSets.necromancers.bonus3':
     'Verhoogt intellect met 10 en uithoudingsvermogen met 10.',
   'entities.itemSets.nighttalon.name': 'Direfang-Pels',
@@ -6327,12 +6327,12 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Verhoogt behendigheid met 15, kritieke kans met 2% en aanvals- en spreuksnelheid met 15%.',
   'entities.itemSets.soulflame.name': 'Wraithfire-Regalia',
   'entities.itemSets.soulflame.bonus2':
-    'Je kunt niet worden teruggeslagen (100% terugslagweerstand).',
+    'Verhoogt spreukkracht met 20. Opgelopen schade vertraagt je spreuken niet meer (100% weerstand tegen spreukvertraging).',
   'entities.itemSets.soulflame.bonus3':
     'Verhoogt intellect met 15, geest met 15 en aanvals- en spreuksnelheid met 15%.',
   'entities.itemSets.stormcallers.name': 'Galecall-Gewaden',
   'entities.itemSets.stormcallers.bonus2':
-    'Je kunt niet worden teruggeslagen (100% terugslagweerstand).',
+    'Verhoogt spreukkracht met 20. Opgelopen schade vertraagt je spreuken niet meer (100% weerstand tegen spreukvertraging).',
   'entities.itemSets.stormcallers.bonus3':
     'Verhoogt intellect met 15, geest met 15 en aanvals- en spreuksnelheid met 15%.',
   'entities.itemSets.vale_arcanist.name': 'Gewaden van de Dal-arcanist',

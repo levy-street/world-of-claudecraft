@@ -9571,7 +9571,7 @@ export const nl_NL: EnTranslations = {
       },
       "necromancers": {
         "name": "Mournweave-Gewaden",
-        "bonus2": "Je kunt niet worden teruggeslagen (100% terugslagweerstand).",
+        "bonus2": "Verhoogt spreukkracht met 20. Opgelopen schade vertraagt je spreuken niet meer (100% weerstand tegen spreukvertraging).",
         "bonus3": "Verhoogt intellect met 10 en uithoudingsvermogen met 10.",
         "bonus4": "Je spreuken hebben 10% kans om Helder Bezweren te verlenen, waardoor je volgende spreuk gratis is."
       },
@@ -9583,13 +9583,13 @@ export const nl_NL: EnTranslations = {
       },
       "soulflame": {
         "name": "Wraithfire-Regalia",
-        "bonus2": "Je kunt niet worden teruggeslagen (100% terugslagweerstand).",
+        "bonus2": "Verhoogt spreukkracht met 20. Opgelopen schade vertraagt je spreuken niet meer (100% weerstand tegen spreukvertraging).",
         "bonus3": "Verhoogt intellect met 15, geest met 15 en aanvals- en spreuksnelheid met 15%.",
         "bonus4": "Je spreuken hebben 10% kans om Zielevlam te verlenen, waardoor je spreukkracht met 40 toeneemt gedurende 10 sec."
       },
       "stormcallers": {
         "name": "Galecall-Gewaden",
-        "bonus2": "Je kunt niet worden teruggeslagen (100% terugslagweerstand).",
+        "bonus2": "Verhoogt spreukkracht met 20. Opgelopen schade vertraagt je spreuken niet meer (100% weerstand tegen spreukvertraging).",
         "bonus3": "Verhoogt intellect met 15, geest met 15 en aanvals- en spreuksnelheid met 15%.",
         "bonus4": "Je spreuken hebben 10% kans om Zielevlam te verlenen, waardoor je spreukkracht met 40 toeneemt gedurende 10 sec."
       },

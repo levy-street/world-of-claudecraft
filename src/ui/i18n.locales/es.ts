@@ -6349,7 +6349,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Aumenta la velocidad de ataque y de lanzamiento en 15%.',
   'entities.itemSets.necromancers.name': 'Vestiduras de Mournweave',
   'entities.itemSets.necromancers.bonus2':
-    'No puedes ser empujado hacia atrás (100% de resistencia al empuje).',
+    'Aumenta el poder de los hechizos en 20. El daño recibido ya no retrasa tus hechizos (100% de resistencia al retraso de lanzamiento).',
   'entities.itemSets.necromancers.bonus3': 'Aumenta el intelecto en 10 y el aguante en 10.',
   'entities.itemSets.nighttalon.name': 'Atuendo de cuero Direfang',
   'entities.itemSets.nighttalon.bonus2': 'Aumenta el poder de ataque en 40.',
@@ -6357,12 +6357,12 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Aumenta la agilidad en 15, la probabilidad de crítico en 2% y la velocidad de ataque y de lanzamiento en 15%.',
   'entities.itemSets.soulflame.name': 'Vestiduras de Wraithfire',
   'entities.itemSets.soulflame.bonus2':
-    'No puedes ser empujado hacia atrás (100% de resistencia al empuje).',
+    'Aumenta el poder de los hechizos en 20. El daño recibido ya no retrasa tus hechizos (100% de resistencia al retraso de lanzamiento).',
   'entities.itemSets.soulflame.bonus3':
     'Aumenta el intelecto en 15, el espíritu en 15 y la velocidad de ataque y de lanzamiento en 15%.',
   'entities.itemSets.stormcallers.name': 'Vestiduras de Galecall',
   'entities.itemSets.stormcallers.bonus2':
-    'No puedes ser empujado hacia atrás (100% de resistencia al empuje).',
+    'Aumenta el poder de los hechizos en 20. El daño recibido ya no retrasa tus hechizos (100% de resistencia al retraso de lanzamiento).',
   'entities.itemSets.stormcallers.bonus3':
     'Aumenta el intelecto en 15, el espíritu en 15 y la velocidad de ataque y de lanzamiento en 15%.',
   'entities.itemSets.vale_arcanist.name': 'Vestiduras del Arcanista del Valle',

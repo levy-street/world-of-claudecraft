@@ -6323,18 +6323,21 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.greyjaw_stalker.name': 'Bộ Kẻ Rình Rập Greyjaw',
   'entities.itemSets.greyjaw_stalker.bonus3': 'Tăng tốc độ tấn công cùng thi triển thêm 15%.',
   'entities.itemSets.necromancers.name': 'Y Phục Mournweave',
-  'entities.itemSets.necromancers.bonus2': 'Bạn không thể bị đẩy lùi (kháng đẩy lùi 100%).',
+  'entities.itemSets.necromancers.bonus2':
+    'Tăng sức mạnh phép thuật thêm 20. Sát thương phải chịu không còn làm chậm việc thi triển phép của bạn (kháng trì hoãn thi triển 100%).',
   'entities.itemSets.necromancers.bonus3': 'Tăng trí tuệ thêm 10 và thể lực thêm 10.',
   'entities.itemSets.nighttalon.name': 'Bộ Da Direfang',
   'entities.itemSets.nighttalon.bonus2': 'Tăng sức mạnh tấn công thêm 40.',
   'entities.itemSets.nighttalon.bonus3':
     'Tăng nhanh nhẹn thêm 15, tỉ lệ chí mạng thêm 2% và tốc độ tấn công cùng thi triển thêm 15%.',
   'entities.itemSets.soulflame.name': 'Lễ Phục Wraithfire',
-  'entities.itemSets.soulflame.bonus2': 'Bạn không thể bị đẩy lùi (kháng đẩy lùi 100%).',
+  'entities.itemSets.soulflame.bonus2':
+    'Tăng sức mạnh phép thuật thêm 20. Sát thương phải chịu không còn làm chậm việc thi triển phép của bạn (kháng trì hoãn thi triển 100%).',
   'entities.itemSets.soulflame.bonus3':
     'Tăng trí tuệ thêm 15, tinh thần thêm 15 và tốc độ tấn công cùng thi triển thêm 15%.',
   'entities.itemSets.stormcallers.name': 'Áo Lễ Galecall',
-  'entities.itemSets.stormcallers.bonus2': 'Bạn không thể bị đẩy lùi (kháng đẩy lùi 100%).',
+  'entities.itemSets.stormcallers.bonus2':
+    'Tăng sức mạnh phép thuật thêm 20. Sát thương phải chịu không còn làm chậm việc thi triển phép của bạn (kháng trì hoãn thi triển 100%).',
   'entities.itemSets.stormcallers.bonus3':
     'Tăng trí tuệ thêm 15, tinh thần thêm 15 và tốc độ tấn công cùng thi triển thêm 15%.',
   'entities.itemSets.vale_arcanist.name': 'Bộ Arcanist Thung Khê',

@@ -9571,7 +9571,7 @@ export const sv_SE: EnTranslations = {
       },
       "necromancers": {
         "name": "Mournweave-skrud",
-        "bonus2": "Du kan inte knuffas bakåt (100% motstånd mot tillbakastöt).",
+        "bonus2": "Ökar trollformelskraft med 20. Skada du tar fördröjer inte längre dina besvärjelser (100% motstånd mot fördröjning av besvärjelser).",
         "bonus3": "Ökar intellekt med 10 och uthållighet med 10.",
         "bonus4": "Dina besvärjelser har 10% chans att ge Klarsyn, vilket gör din nästa besvärjelse gratis."
       },
@@ -9583,13 +9583,13 @@ export const sv_SE: EnTranslations = {
       },
       "soulflame": {
         "name": "Wraithfire-regalier",
-        "bonus2": "Du kan inte knuffas bakåt (100% motstånd mot tillbakastöt).",
+        "bonus2": "Ökar trollformelskraft med 20. Skada du tar fördröjer inte längre dina besvärjelser (100% motstånd mot fördröjning av besvärjelser).",
         "bonus3": "Ökar intellekt med 15, ande med 15 samt attack- och magihastighet med 15%.",
         "bonus4": "Dina besvärjelser har 10% chans att ge Själslåga och öka besvärjelseskraften med 40 i 10 sek."
       },
       "stormcallers": {
         "name": "Galecall-skrud",
-        "bonus2": "Du kan inte knuffas bakåt (100% motstånd mot tillbakastöt).",
+        "bonus2": "Ökar trollformelskraft med 20. Skada du tar fördröjer inte längre dina besvärjelser (100% motstånd mot fördröjning av besvärjelser).",
         "bonus3": "Ökar intellekt med 15, ande med 15 samt attack- och magihastighet med 15%.",
         "bonus4": "Dina besvärjelser har 10% chans att ge Själslåga och öka besvärjelseskraften med 40 i 10 sek."
       },

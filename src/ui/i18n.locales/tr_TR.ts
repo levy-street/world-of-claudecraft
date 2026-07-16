@@ -6296,17 +6296,20 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.greyjaw_stalker.name': 'Greyjaw İzsürücü takımı',
   'entities.itemSets.greyjaw_stalker.bonus3': 'Saldırı ve büyü hızını %15 artırır.',
   'entities.itemSets.necromancers.name': 'Mournweave Giysileri',
-  'entities.itemSets.necromancers.bonus2': 'Geri itilemezsin (%100 geri itilme direnci).',
+  'entities.itemSets.necromancers.bonus2':
+    'Büyü gücünü 20 artırır. Alınan hasar artık büyü yapmanı geciktirmez (%100 büyü gecikme direnci).',
   'entities.itemSets.necromancers.bonus3': 'Zekayı 10 ve dayanıklılığı 10 artırır.',
   'entities.itemSets.nighttalon.name': 'Direfang Postu',
   'entities.itemSets.nighttalon.bonus2': 'Saldırı gücünü 40 artırır.',
   'entities.itemSets.nighttalon.bonus3':
     'Çevikliği 15, kritik şansını %2, saldırı ve büyü hızını %15 artırır.',
   'entities.itemSets.soulflame.name': 'Wraithfire Kıyafetleri',
-  'entities.itemSets.soulflame.bonus2': 'Geri itilemezsin (%100 geri itilme direnci).',
+  'entities.itemSets.soulflame.bonus2':
+    'Büyü gücünü 20 artırır. Alınan hasar artık büyü yapmanı geciktirmez (%100 büyü gecikme direnci).',
   'entities.itemSets.soulflame.bonus3': 'Zekayı 15, ruhu 15, saldırı ve büyü hızını %15 artırır.',
   'entities.itemSets.stormcallers.name': 'Galecall Cübbeleri',
-  'entities.itemSets.stormcallers.bonus2': 'Geri itilemezsin (%100 geri itilme direnci).',
+  'entities.itemSets.stormcallers.bonus2':
+    'Büyü gücünü 20 artırır. Alınan hasar artık büyü yapmanı geciktirmez (%100 büyü gecikme direnci).',
   'entities.itemSets.stormcallers.bonus3':
     'Zekayı 15, ruhu 15, saldırı ve büyü hızını %15 artırır.',
   'entities.itemSets.vale_arcanist.name': 'Vadi Arkanisti giysileri',

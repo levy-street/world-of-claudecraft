@@ -5780,7 +5780,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.greyjaw_stalker.name': '그레이죠 추적자의 장비',
   'entities.itemSets.greyjaw_stalker.bonus3': '공격 속도와 시전 속도가 15% 증가합니다.',
   'entities.itemSets.necromancers.name': '비탄직물 의복',
-  'entities.itemSets.necromancers.bonus2': '넉백되지 않습니다 (넉백 저항 100%).',
+  'entities.itemSets.necromancers.bonus2':
+    '주문력이 20 증가합니다. 피해를 입어도 주문 시전이 지연되지 않습니다 (시전 지연 저항 100%).',
   'entities.itemSets.necromancers.bonus3': '지능이 10, 체력이 10만큼 증가합니다.',
   'entities.itemSets.necromancers.bonus4':
     '주문 사용 시 10% 확률로 "선명한 시전"이 발동하여 다음 주문을 무료로 시전합니다.',
@@ -5791,13 +5792,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.nighttalon.bonus4':
     '무기 치명타 적중 시 "찢어진 상처"를 내어 대상이 12초 동안 2초마다 6의 출혈 피해를 입습니다. 최대 3번 중첩됩니다.',
   'entities.itemSets.soulflame.name': '망령불꽃 의복',
-  'entities.itemSets.soulflame.bonus2': '넉백되지 않습니다 (넉백 저항 100%).',
+  'entities.itemSets.soulflame.bonus2':
+    '주문력이 20 증가합니다. 피해를 입어도 주문 시전이 지연되지 않습니다 (시전 지연 저항 100%).',
   'entities.itemSets.soulflame.bonus3':
     '지능이 15, 정신력이 15만큼 증가하고 공격 속도와 시전 속도가 15% 증가합니다.',
   'entities.itemSets.soulflame.bonus4':
     '주문 사용 시 10% 확률로 "영혼의 불길"이 발동하여 주문력이 40만큼 증가합니다. 10초 동안 지속됩니다.',
   'entities.itemSets.stormcallers.name': '강풍부름 의복',
-  'entities.itemSets.stormcallers.bonus2': '넉백되지 않습니다 (넉백 저항 100%).',
+  'entities.itemSets.stormcallers.bonus2':
+    '주문력이 20 증가합니다. 피해를 입어도 주문 시전이 지연되지 않습니다 (시전 지연 저항 100%).',
   'entities.itemSets.stormcallers.bonus3':
     '지능이 15, 정신력이 15만큼 증가하고 공격 속도와 시전 속도가 15% 증가합니다.',
   'entities.itemSets.stormcallers.bonus4':

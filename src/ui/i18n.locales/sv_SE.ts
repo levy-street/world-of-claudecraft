@@ -6236,7 +6236,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.greyjaw_stalker.bonus3': 'Ökar attack- och magihastighet med 15%.',
   'entities.itemSets.necromancers.name': 'Mournweave-skrud',
   'entities.itemSets.necromancers.bonus2':
-    'Du kan inte knuffas bakåt (100% motstånd mot tillbakastöt).',
+    'Ökar trollformelskraft med 20. Skada du tar fördröjer inte längre dina besvärjelser (100% motstånd mot fördröjning av besvärjelser).',
   'entities.itemSets.necromancers.bonus3': 'Ökar intellekt med 10 och uthållighet med 10.',
   'entities.itemSets.nighttalon.name': 'Direfang-päls',
   'entities.itemSets.nighttalon.bonus2': 'Ökar attackkraft med 40.',
@@ -6244,12 +6244,12 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Ökar smidighet med 15, kritisk chans med 2% samt attack- och magihastighet med 15%.',
   'entities.itemSets.soulflame.name': 'Wraithfire-regalier',
   'entities.itemSets.soulflame.bonus2':
-    'Du kan inte knuffas bakåt (100% motstånd mot tillbakastöt).',
+    'Ökar trollformelskraft med 20. Skada du tar fördröjer inte längre dina besvärjelser (100% motstånd mot fördröjning av besvärjelser).',
   'entities.itemSets.soulflame.bonus3':
     'Ökar intellekt med 15, ande med 15 samt attack- och magihastighet med 15%.',
   'entities.itemSets.stormcallers.name': 'Galecall-skrud',
   'entities.itemSets.stormcallers.bonus2':
-    'Du kan inte knuffas bakåt (100% motstånd mot tillbakastöt).',
+    'Ökar trollformelskraft med 20. Skada du tar fördröjer inte längre dina besvärjelser (100% motstånd mot fördröjning av besvärjelser).',
   'entities.itemSets.stormcallers.bonus3':
     'Ökar intellekt med 15, ande med 15 samt attack- och magihastighet med 15%.',
   'entities.itemSets.vale_arcanist.name': 'Dalarkanistens skrud',

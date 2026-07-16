@@ -9571,7 +9571,7 @@ export const pl_PL: EnTranslations = {
       },
       "necromancers": {
         "name": "Szaty Mournweave",
-        "bonus2": "Nie można cię odrzucić (100% odporności na odrzucenie).",
+        "bonus2": "Zwiększa moc zaklęć o 20. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć (100% odporności na opóźnienie rzucania).",
         "bonus3": "Zwiększa intelekt o 10 i wytrzymałość o 10.",
         "bonus4": "Twoje zaklęcia mają 10% szansy na udzielenie Jasności Umysłu, dzięki czemu następne zaklęcie jest darmowe."
       },
@@ -9583,13 +9583,13 @@ export const pl_PL: EnTranslations = {
       },
       "soulflame": {
         "name": "Regalia Wraithfire",
-        "bonus2": "Nie można cię odrzucić (100% odporności na odrzucenie).",
+        "bonus2": "Zwiększa moc zaklęć o 20. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć (100% odporności na opóźnienie rzucania).",
         "bonus3": "Zwiększa intelekt o 15, ducha o 15 oraz szybkość ataku i rzucania zaklęć o 15%.",
         "bonus4": "Twoje zaklęcia mają 10% szansy na udzielenie Płomienia Duszy, zwiększającego moc zaklęć o 40 na 10 s."
       },
       "stormcallers": {
         "name": "Szaty Galecall",
-        "bonus2": "Nie można cię odrzucić (100% odporności na odrzucenie).",
+        "bonus2": "Zwiększa moc zaklęć o 20. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć (100% odporności na opóźnienie rzucania).",
         "bonus3": "Zwiększa intelekt o 15, ducha o 15 oraz szybkość ataku i rzucania zaklęć o 15%.",
         "bonus4": "Twoje zaklęcia mają 10% szansy na udzielenie Płomienia Duszy, zwiększającego moc zaklęć o 40 na 10 s."
       },

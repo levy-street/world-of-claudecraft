@@ -6378,7 +6378,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.greyjaw_stalker.bonus3':
     'Meningkatkan kecepatan serangan dan rapal sebesar 15%.',
   'entities.itemSets.necromancers.name': 'Jubah Mournweave',
-  'entities.itemSets.necromancers.bonus2': 'Kamu tidak dapat terpental (ketahanan pentalan 100%).',
+  'entities.itemSets.necromancers.bonus2':
+    'Meningkatkan kekuatan sihir sebesar 20. Kerusakan yang diterima tidak lagi menunda perapalan sihirmu (ketahanan penundaan rapalan 100%).',
   'entities.itemSets.necromancers.bonus3':
     'Meningkatkan kecerdasan sebesar 10 dan stamina sebesar 10.',
   'entities.itemSets.nighttalon.name': 'Perlengkapan Kulit Direfang',
@@ -6386,11 +6387,13 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.nighttalon.bonus3':
     'Meningkatkan kelincahan sebesar 15, peluang kritis sebesar 2%, serta kecepatan serangan dan rapal sebesar 15%.',
   'entities.itemSets.soulflame.name': 'Regalia Wraithfire',
-  'entities.itemSets.soulflame.bonus2': 'Kamu tidak dapat terpental (ketahanan pentalan 100%).',
+  'entities.itemSets.soulflame.bonus2':
+    'Meningkatkan kekuatan sihir sebesar 20. Kerusakan yang diterima tidak lagi menunda perapalan sihirmu (ketahanan penundaan rapalan 100%).',
   'entities.itemSets.soulflame.bonus3':
     'Meningkatkan kecerdasan sebesar 15, roh sebesar 15, serta kecepatan serangan dan rapal sebesar 15%.',
   'entities.itemSets.stormcallers.name': 'Jubah Galecall',
-  'entities.itemSets.stormcallers.bonus2': 'Kamu tidak dapat terpental (ketahanan pentalan 100%).',
+  'entities.itemSets.stormcallers.bonus2':
+    'Meningkatkan kekuatan sihir sebesar 20. Kerusakan yang diterima tidak lagi menunda perapalan sihirmu (ketahanan penundaan rapalan 100%).',
   'entities.itemSets.stormcallers.bonus3':
     'Meningkatkan kecerdasan sebesar 15, roh sebesar 15, serta kecepatan serangan dan rapal sebesar 15%.',
   'entities.itemSets.vale_arcanist.name': 'Perlengkapan Arkanis Lembah',

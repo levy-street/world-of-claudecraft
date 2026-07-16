@@ -9571,7 +9571,7 @@ export const es: EnTranslations = {
       },
       "necromancers": {
         "name": "Vestiduras de Mournweave",
-        "bonus2": "No puedes ser empujado hacia atrás (100% de resistencia al empuje).",
+        "bonus2": "Aumenta el poder de los hechizos en 20. El daño recibido ya no retrasa tus hechizos (100% de resistencia al retraso de lanzamiento).",
         "bonus3": "Aumenta el intelecto en 10 y el aguante en 10.",
         "bonus4": "Tus hechizos tienen un 10% de probabilidad de otorgar Mente Clara, haciendo que tu próximo hechizo sea gratuito."
       },
@@ -9583,13 +9583,13 @@ export const es: EnTranslations = {
       },
       "soulflame": {
         "name": "Vestiduras de Wraithfire",
-        "bonus2": "No puedes ser empujado hacia atrás (100% de resistencia al empuje).",
+        "bonus2": "Aumenta el poder de los hechizos en 20. El daño recibido ya no retrasa tus hechizos (100% de resistencia al retraso de lanzamiento).",
         "bonus3": "Aumenta el intelecto en 15, el espíritu en 15 y la velocidad de ataque y de lanzamiento en 15%.",
         "bonus4": "Tus hechizos tienen un 10% de probabilidad de otorgar Fulgor del Alma, aumentando el poder con hechizos en 40 durante 10 s."
       },
       "stormcallers": {
         "name": "Vestiduras de Galecall",
-        "bonus2": "No puedes ser empujado hacia atrás (100% de resistencia al empuje).",
+        "bonus2": "Aumenta el poder de los hechizos en 20. El daño recibido ya no retrasa tus hechizos (100% de resistencia al retraso de lanzamiento).",
         "bonus3": "Aumenta el intelecto en 15, el espíritu en 15 y la velocidad de ataque y de lanzamiento en 15%.",
         "bonus4": "Tus hechizos tienen un 10% de probabilidad de otorgar Fulgor del Alma, aumentando el poder con hechizos en 40 durante 10 s."
       },

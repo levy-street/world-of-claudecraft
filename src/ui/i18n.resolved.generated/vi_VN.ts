@@ -9571,7 +9571,7 @@ export const vi_VN: EnTranslations = {
       },
       "necromancers": {
         "name": "Y Phục Mournweave",
-        "bonus2": "Bạn không thể bị đẩy lùi (kháng đẩy lùi 100%).",
+        "bonus2": "Tăng sức mạnh phép thuật thêm 20. Sát thương phải chịu không còn làm chậm việc thi triển phép của bạn (kháng trì hoãn thi triển 100%).",
         "bonus3": "Tăng trí tuệ thêm 10 và thể lực thêm 10.",
         "bonus4": "Các phép của bạn có 10% cơ hội ban Tâm Trí Thông Suốt, khiến phép kế tiếp của bạn được thi triển miễn phí."
       },
@@ -9583,13 +9583,13 @@ export const vi_VN: EnTranslations = {
       },
       "soulflame": {
         "name": "Lễ Phục Wraithfire",
-        "bonus2": "Bạn không thể bị đẩy lùi (kháng đẩy lùi 100%).",
+        "bonus2": "Tăng sức mạnh phép thuật thêm 20. Sát thương phải chịu không còn làm chậm việc thi triển phép của bạn (kháng trì hoãn thi triển 100%).",
         "bonus3": "Tăng trí tuệ thêm 15, tinh thần thêm 15 và tốc độ tấn công cùng thi triển thêm 15%.",
         "bonus4": "Các phép của bạn có 10% cơ hội ban Hồn Hỏa, tăng sức mạnh phép thuật thêm 40 trong 10 giây."
       },
       "stormcallers": {
         "name": "Áo Lễ Galecall",
-        "bonus2": "Bạn không thể bị đẩy lùi (kháng đẩy lùi 100%).",
+        "bonus2": "Tăng sức mạnh phép thuật thêm 20. Sát thương phải chịu không còn làm chậm việc thi triển phép của bạn (kháng trì hoãn thi triển 100%).",
         "bonus3": "Tăng trí tuệ thêm 15, tinh thần thêm 15 và tốc độ tấn công cùng thi triển thêm 15%.",
         "bonus4": "Các phép của bạn có 10% cơ hội ban Hồn Hỏa, tăng sức mạnh phép thuật thêm 40 trong 10 giây."
       },

@@ -4665,18 +4665,21 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.deathlord.name': 'Bojová výbava mohylového pána',
   'entities.itemSets.greyjaw_stalker.bonus3': 'Zvyšuje rychlost útoku a sesílání o 15 %.',
   'entities.itemSets.greyjaw_stalker.name': 'Výbava stopaře Šedočelista',
-  'entities.itemSets.necromancers.bonus2': 'Nelze tě odhodit (100% odolnost proti odhození).',
+  'entities.itemSets.necromancers.bonus2':
+    'Zvyšuje sílu kouzel o 20. Utrpěné poškození již nezdržuje tvé sesílání kouzel (100% odolnost proti zdržení sesílání).',
   'entities.itemSets.necromancers.bonus3': 'Zvyšuje intelekt o 10 a výdrž o 10.',
   'entities.itemSets.necromancers.name': 'Oděv smutkotkaní',
   'entities.itemSets.nighttalon.bonus2': 'Zvyšuje sílu útoku o 40.',
   'entities.itemSets.nighttalon.bonus3':
     'Zvyšuje obratnost o 15, šanci na kritický zásah o 2 % a rychlost útoku i sesílání o 15 %.',
   'entities.itemSets.nighttalon.name': 'Kožešina děsivého tesáku',
-  'entities.itemSets.soulflame.bonus2': 'Nelze tě odhodit (100% odolnost proti odhození).',
+  'entities.itemSets.soulflame.bonus2':
+    'Zvyšuje sílu kouzel o 20. Utrpěné poškození již nezdržuje tvé sesílání kouzel (100% odolnost proti zdržení sesílání).',
   'entities.itemSets.soulflame.bonus3':
     'Zvyšuje intelekt o 15, ducha o 15 a rychlost útoku i sesílání o 15 %.',
   'entities.itemSets.soulflame.name': 'Regálie přízračného ohně',
-  'entities.itemSets.stormcallers.bonus2': 'Nelze tě odhodit (100% odolnost proti odhození).',
+  'entities.itemSets.stormcallers.bonus2':
+    'Zvyšuje sílu kouzel o 20. Utrpěné poškození již nezdržuje tvé sesílání kouzel (100% odolnost proti zdržení sesílání).',
   'entities.itemSets.stormcallers.bonus3':
     'Zvyšuje intelekt o 15, ducha o 15 a rychlost útoku i sesílání o 15 %.',
   'entities.itemSets.stormcallers.name': 'Roucha volání vichru',

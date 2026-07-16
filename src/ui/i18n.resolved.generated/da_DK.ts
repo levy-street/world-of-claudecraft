@@ -9571,7 +9571,7 @@ export const da_DK: EnTranslations = {
       },
       "necromancers": {
         "name": "Mournweave klæder",
-        "bonus2": "Du kan ikke stødes tilbage (100% modstand mod tilbagestød).",
+        "bonus2": "Øger magikraft med 20. Skade, du tager, forsinker ikke længere dine besværgelser (100% modstand mod fordrøjelse af besværgelser).",
         "bonus3": "Øger intellekt med 10 og udholdenhed med 10.",
         "bonus4": "Dine besværgelser har 10% chance for at give Klartrylleri, som gør din næste besværgelse gratis."
       },
@@ -9583,13 +9583,13 @@ export const da_DK: EnTranslations = {
       },
       "soulflame": {
         "name": "Wraithfire regalier",
-        "bonus2": "Du kan ikke stødes tilbage (100% modstand mod tilbagestød).",
+        "bonus2": "Øger magikraft med 20. Skade, du tager, forsinker ikke længere dine besværgelser (100% modstand mod fordrøjelse af besværgelser).",
         "bonus3": "Øger intellekt med 15, ånd med 15 og angrebs- og magihastighed med 15%.",
         "bonus4": "Dine besværgelser har 10% chance for at give Sjælebrand og øge besværgelseskraft med 40 i 10 sek."
       },
       "stormcallers": {
         "name": "Galecall klæder",
-        "bonus2": "Du kan ikke stødes tilbage (100% modstand mod tilbagestød).",
+        "bonus2": "Øger magikraft med 20. Skade, du tager, forsinker ikke længere dine besværgelser (100% modstand mod fordrøjelse af besværgelser).",
         "bonus3": "Øger intellekt med 15, ånd med 15 og angrebs- og magihastighed med 15%.",
         "bonus4": "Dine besværgelser har 10% chance for at give Sjælebrand og øge besværgelseskraft med 40 i 10 sek."
       },

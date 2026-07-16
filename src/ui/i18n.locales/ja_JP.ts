@@ -5784,7 +5784,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.greyjaw_stalker.name': 'グレイジョーの追跡者の装備',
   'entities.itemSets.greyjaw_stalker.bonus3': '攻撃速度と詠唱速度が15%上昇します。',
   'entities.itemSets.necromancers.name': 'モーンウィーヴの法衣',
-  'entities.itemSets.necromancers.bonus2': 'ノックバックされなくなります（ノックバック耐性100%）。',
+  'entities.itemSets.necromancers.bonus2':
+    '呪文の威力が20増加します。被ダメージによって詠唱が遅れなくなります（詠唱妨害耐性100%）。',
   'entities.itemSets.necromancers.bonus3': '知力が10、スタミナが10上昇します。',
   'entities.itemSets.necromancers.bonus4':
     '呪文に10%の確率で「クリアキャスティング」が発動し、次の呪文が無償になります。',
@@ -5795,13 +5796,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.nighttalon.bonus4':
     '武器のクリティカルヒットで「裂けた傷」を与え、対象に2秒ごとに6ダメージの出血を12秒間与えます。最大3回まで累積します。',
   'entities.itemSets.soulflame.name': 'レイスファイアの法衣',
-  'entities.itemSets.soulflame.bonus2': 'ノックバックされなくなります（ノックバック耐性100%）。',
+  'entities.itemSets.soulflame.bonus2':
+    '呪文の威力が20増加します。被ダメージによって詠唱が遅れなくなります（詠唱妨害耐性100%）。',
   'entities.itemSets.soulflame.bonus3':
     '知力が15、精神力が15上昇し、攻撃速度と詠唱速度が15%上昇します。',
   'entities.itemSets.soulflame.bonus4':
     '呪文に10%の確率で「ソウルブレイズ」が発動し、呪文の威力が10秒間40上昇します。',
   'entities.itemSets.stormcallers.name': 'ゲイルコールの法衣',
-  'entities.itemSets.stormcallers.bonus2': 'ノックバックされなくなります（ノックバック耐性100%）。',
+  'entities.itemSets.stormcallers.bonus2':
+    '呪文の威力が20増加します。被ダメージによって詠唱が遅れなくなります（詠唱妨害耐性100%）。',
   'entities.itemSets.stormcallers.bonus3':
     '知力が15、精神力が15上昇し、攻撃速度と詠唱速度が15%上昇します。',
   'entities.itemSets.stormcallers.bonus4':

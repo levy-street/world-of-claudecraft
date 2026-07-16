@@ -9571,7 +9571,7 @@ export const id_ID: EnTranslations = {
       },
       "necromancers": {
         "name": "Jubah Mournweave",
-        "bonus2": "Kamu tidak dapat terpental (ketahanan pentalan 100%).",
+        "bonus2": "Meningkatkan kekuatan sihir sebesar 20. Kerusakan yang diterima tidak lagi menunda perapalan sihirmu (ketahanan penundaan rapalan 100%).",
         "bonus3": "Meningkatkan kecerdasan sebesar 10 dan stamina sebesar 10.",
         "bonus4": "Mantramu memiliki peluang 10% memberikan Rapal Jernih, menjadikan mantra berikutmu tanpa biaya."
       },
@@ -9583,13 +9583,13 @@ export const id_ID: EnTranslations = {
       },
       "soulflame": {
         "name": "Regalia Wraithfire",
-        "bonus2": "Kamu tidak dapat terpental (ketahanan pentalan 100%).",
+        "bonus2": "Meningkatkan kekuatan sihir sebesar 20. Kerusakan yang diterima tidak lagi menunda perapalan sihirmu (ketahanan penundaan rapalan 100%).",
         "bonus3": "Meningkatkan kecerdasan sebesar 15, roh sebesar 15, serta kecepatan serangan dan rapal sebesar 15%.",
         "bonus4": "Mantramu memiliki peluang 10% memberikan Nyala Jiwa, meningkatkan kekuatan mantra sebesar 40 selama 10 detik."
       },
       "stormcallers": {
         "name": "Jubah Galecall",
-        "bonus2": "Kamu tidak dapat terpental (ketahanan pentalan 100%).",
+        "bonus2": "Meningkatkan kekuatan sihir sebesar 20. Kerusakan yang diterima tidak lagi menunda perapalan sihirmu (ketahanan penundaan rapalan 100%).",
         "bonus3": "Meningkatkan kecerdasan sebesar 15, roh sebesar 15, serta kecepatan serangan dan rapal sebesar 15%.",
         "bonus4": "Mantramu memiliki peluang 10% memberikan Nyala Jiwa, meningkatkan kekuatan mantra sebesar 40 selama 10 detik."
       },

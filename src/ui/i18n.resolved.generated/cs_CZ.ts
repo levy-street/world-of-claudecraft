@@ -9571,7 +9571,7 @@ export const cs_CZ: EnTranslations = {
       },
       "necromancers": {
         "name": "Oděv smutkotkaní",
-        "bonus2": "Nelze tě odhodit (100% odolnost proti odhození).",
+        "bonus2": "Zvyšuje sílu kouzel o 20. Utrpěné poškození již nezdržuje tvé sesílání kouzel (100% odolnost proti zdržení sesílání).",
         "bonus3": "Zvyšuje intelekt o 10 a výdrž o 10.",
         "bonus4": "Tvá kouzla mají 10% šanci udělit Jasné sesílání, díky němuž je tvé příští kouzlo zdarma."
       },
@@ -9583,13 +9583,13 @@ export const cs_CZ: EnTranslations = {
       },
       "soulflame": {
         "name": "Regálie přízračného ohně",
-        "bonus2": "Nelze tě odhodit (100% odolnost proti odhození).",
+        "bonus2": "Zvyšuje sílu kouzel o 20. Utrpěné poškození již nezdržuje tvé sesílání kouzel (100% odolnost proti zdržení sesílání).",
         "bonus3": "Zvyšuje intelekt o 15, ducha o 15 a rychlost útoku i sesílání o 15 %.",
         "bonus4": "Tvá kouzla mají 10% šanci udělit Dušový žár, který zvýší sílu kouzel o 40 na 10 s."
       },
       "stormcallers": {
         "name": "Roucha volání vichru",
-        "bonus2": "Nelze tě odhodit (100% odolnost proti odhození).",
+        "bonus2": "Zvyšuje sílu kouzel o 20. Utrpěné poškození již nezdržuje tvé sesílání kouzel (100% odolnost proti zdržení sesílání).",
         "bonus3": "Zvyšuje intelekt o 15, ducha o 15 a rychlost útoku i sesílání o 15 %.",
         "bonus4": "Tvá kouzla mají 10% šanci udělit Dušový žár, který zvýší sílu kouzel o 40 na 10 s."
       },
