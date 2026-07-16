@@ -235,11 +235,26 @@ describe('bags_window: touch peek + bank-cluster close', () => {
     // right-click without a live DOM harness.
     const start = painter.indexOf('private runBagAction(');
     const body = painter.slice(start, painter.indexOf('\n  }\n', start));
-    expect(body).toMatch(/case 'trade':\s*this\.deps\.addItemToTrade\(s\.itemId\);/);
+    // The clicked slot (not just its itemId) is threaded to the trade staging call
+    // so an instanced copy reaches the instance-aware path (F5/r8#1).
+    expect(body).toMatch(/case 'trade':\s*this\.deps\.addItemToTrade\(s\);/);
     expect(body).toMatch(/case 'mailAttach':\s*this\.deps\.stageMailParcel\(s\.itemId\);/);
     expect(body).toMatch(/case 'marketSell':\s*this\.deps\.stageMarketSell\(s\.itemId\);/);
     expect(body).toMatch(/case 'bankDeposit': \{/);
     expect(body).toMatch(/case 'petFeed':\s*this\.deps\.world\(\)\.feedPet\(s\.itemId\);/);
+  });
+
+  it('addItemToTrade stages a distinct count-1 instance row for an instanced slot (F5)', () => {
+    // Hud.addItemToTrade takes the full slot and, when it carries an instance,
+    // stages a count-1 row with a cloned payload rather than merging into a
+    // fungible stack (which the old itemId-only path silently dropped).
+    const start = hud.indexOf('addItemToTrade(slot: InvSlot): void {');
+    expect(start).toBeGreaterThan(-1);
+    const body = hud.slice(start, hud.indexOf('\n  }\n', start));
+    expect(body).toContain('instance: cloneItemInstancePayload(slot.instance)');
+    expect(body).toContain('count: 1');
+    // fungible increments cap on the FUNGIBLE stock only, never the total count
+    expect(body).toContain('!s.instance');
   });
 });
 

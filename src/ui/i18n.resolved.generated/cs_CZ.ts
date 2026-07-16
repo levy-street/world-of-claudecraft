@@ -5361,7 +5361,17 @@ export const cs_CZ: EnTranslations = {
       "tradeInProgress": "Obchod už probíhá.",
       "tradeTooFar": "Cíl je příliš daleko pro obchod.",
       "tradeExpired": "Žádost o obchod vypršela.",
-      "tradeFailed": "Obchod selhal: předměty nebo peníze už nejsou dostupné."
+      "tradeFailed": "Obchod selhal: předměty nebo peníze už nejsou dostupné.",
+      "tradeBusy": "That player is already trading.",
+      "tradeUsage": "Trade whom? Usage: /trade <name>.",
+      "claudiumTradeOff": "Claudium trading is not available.",
+      "wocTradeOff": "WOC trading is not available.",
+      "wocTradeLink": "Link a wallet to trade WOC.",
+      "wocTradePartnerLink": "Your trade partner has no linked wallet.",
+      "wocTradeOneSide": "Only one side of a trade can offer WOC.",
+      "tradeSettleTimeout": "Trade cancelled: the payment window expired. Your goods were returned.",
+      "tradeSettleCancelled": "Trade cancelled. Your goods were returned.",
+      "tradeSettleUnavailable": "Trade could not settle. Your goods were returned."
     },
     "logs": {
       "standUp": "Vstáváš.",
@@ -5381,6 +5391,7 @@ export const cs_CZ: EnTranslations = {
       "tradeOpened": "Obchodní okno otevřeno.",
       "tradeComplete": "Obchod dokončen.",
       "tradeCancelled": "Obchod zrušen.",
+      "tradeDeclined": "{name} declined your trade request.",
       "lootReceiveItem": "Získáváš: {item}.",
       "lootReceiveMoney": "Získáváš {money}.",
       "lootMoney": "Bereš kořist {money}.",
@@ -5389,6 +5400,34 @@ export const cs_CZ: EnTranslations = {
       "soldJunkMany": "Prodáno {count} odpadních předmětů za {money}.",
       "friendOnline": "{name} je online.",
       "friendOffline": "{name} se odpojil(a)."
+    },
+    "trade": {
+      "claudiumLabel": "Claudium",
+      "wocLabel": "WOC",
+      "settlingTitle": "Settling trade...",
+      "legYourClaudium": "Your Claudium",
+      "legTheirClaudium": "Their Claudium",
+      "legYourWoc": "Your WOC payment",
+      "legTheirWoc": "Their WOC payment",
+      "statusPending": "Pending",
+      "statusDone": "Done",
+      "wocPayPrompt": "Send {amount} WOC from your linked wallet to complete the trade.",
+      "openInWallet": "Open in wallet",
+      "copyLink": "Copy payment link",
+      "copiedLink": "Payment link copied.",
+      "instanceSignedBy": "Signed by {name}",
+      "instanceUnique": "Unique copy",
+      "title": "Obchod s {name}",
+      "yourOffer": "Tvoje nabídka",
+      "theirOffer": "Nabídka hráče {name}",
+      "emptyMine": "Klikni na předměty v batozích a přidej je",
+      "emptyTheirs": "Zatím nic nenabídnuto",
+      "money": "Peníze",
+      "copper": "měď",
+      "hint": "Klikni na nabízený předmět a odeber ho. Obě strany musí stisknout Přijmout obchod.",
+      "accept": "Přijmout obchod",
+      "waiting": "Čeká se...",
+      "cancel": "Zrušit"
     },
     "tutorial": {
       "title": "Nový dobrodruh",
@@ -5516,19 +5555,6 @@ export const cs_CZ: EnTranslations = {
       },
       "guildHeadOne": "jsi {rank}, {count} člen",
       "guildHeadMany": "jsi {rank}, {count} členů"
-    },
-    "trade": {
-      "title": "Obchod s {name}",
-      "yourOffer": "Tvoje nabídka",
-      "theirOffer": "Nabídka hráče {name}",
-      "emptyMine": "Klikni na předměty v batozích a přidej je",
-      "emptyTheirs": "Zatím nic nenabídnuto",
-      "money": "Peníze",
-      "copper": "měď",
-      "hint": "Klikni na nabízený předmět a odeber ho. Obě strany musí stisknout Přijmout obchod.",
-      "accept": "Přijmout obchod",
-      "waiting": "Čeká se...",
-      "cancel": "Zrušit"
     },
     "arena": {
       "title": "Popelavé koloseum",
@@ -9734,6 +9760,16 @@ export const cs_CZ: EnTranslations = {
         "sender": "Bratr Aldric",
         "subject": "Tvůj čin v temnotě",
         "body": "Jen málokdo se kdy dozví, co bylo pohřbeno v té dutině, a ještě méně by tomu věřilo. Já to vím a nezapomenu.\n\nAť je tvá cesta osvětlena.\n- Bratr Aldric"
+      },
+      "trade_delivery": {
+        "sender": "The Ravenpost",
+        "subject": "Trade delivery",
+        "body": "Goods from your trade have arrived. The raven carried what your bags could not."
+      },
+      "trade_refund": {
+        "sender": "The Ravenpost",
+        "subject": "Trade goods returned",
+        "body": "Your trade did not complete. Everything you offered has been returned."
       }
     },
     "itemSets": {

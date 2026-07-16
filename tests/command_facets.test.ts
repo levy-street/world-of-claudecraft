@@ -350,3 +350,26 @@ describe('command facet tags (deeds)', () => {
     }
   });
 });
+
+// G2b: append the trade_decline tag (an active decline for a pending trade invite,
+// alongside the existing W9 trade_req/trade_accept/trade_offer/trade_confirm/
+// trade_cancel block above). The table-consistency invariants in the W6 block
+// already cover this new entry. Append-only: never edit a tag.
+const TRADE_DECLINE_TAGS: Readonly<Record<string, string>> = {
+  trade_decline: 'IWorldTrade',
+};
+
+describe('command facet tags (trade decline)', () => {
+  const tags = COMMAND_FACETS as Readonly<Record<string, string>>;
+
+  it('tags trade_decline with the IWorldTrade facet', () => {
+    for (const [cmd, facet] of Object.entries(TRADE_DECLINE_TAGS)) {
+      expect(tags[cmd], `facet tag for '${cmd}'`).toBe(facet);
+    }
+  });
+
+  it('preserves the snake_case wire string (never normalized to camelCase)', () => {
+    expect('trade_decline' in tags).toBe(true);
+    expect('tradeDecline' in tags).toBe(false);
+  });
+});

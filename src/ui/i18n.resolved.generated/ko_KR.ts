@@ -5361,7 +5361,17 @@ export const ko_KR: EnTranslations = {
       "tradeInProgress": "이미 거래가 진행 중입니다.",
       "tradeTooFar": "대상이 너무 멀어 거래할 수 없습니다.",
       "tradeExpired": "거래 요청이 만료되었습니다.",
-      "tradeFailed": "거래 실패: 아이템이나 돈을 더 이상 사용할 수 없습니다."
+      "tradeFailed": "거래 실패: 아이템이나 돈을 더 이상 사용할 수 없습니다.",
+      "tradeBusy": "그 플레이어는 이미 거래 중입니다.",
+      "tradeUsage": "누구와 거래하시겠습니까? 사용법: /trade <이름>",
+      "claudiumTradeOff": "Claudium 거래를 현재 이용할 수 없습니다.",
+      "wocTradeOff": "WOC 거래를 현재 이용할 수 없습니다.",
+      "wocTradeLink": "WOC를 거래하려면 지갑을 연결하세요.",
+      "wocTradePartnerLink": "거래 상대방이 지갑을 연결하지 않았습니다.",
+      "wocTradeOneSide": "거래에서 WOC는 한쪽만 제안할 수 있습니다.",
+      "tradeSettleTimeout": "거래가 취소되었습니다: 결제 대기 시간이 만료되어 물품이 반환되었습니다.",
+      "tradeSettleCancelled": "거래가 취소되었습니다. 물품이 반환되었습니다.",
+      "tradeSettleUnavailable": "거래를 정산할 수 없습니다. 물품이 반환되었습니다."
     },
     "logs": {
       "standUp": "일어섰습니다.",
@@ -5381,6 +5391,7 @@ export const ko_KR: EnTranslations = {
       "tradeOpened": "거래 창이 열렸습니다.",
       "tradeComplete": "거래 완료.",
       "tradeCancelled": "거래 취소됨.",
+      "tradeDeclined": "{name}님이 거래 요청을 거절했습니다.",
       "lootReceiveItem": "{item}을(를) 획득했습니다.",
       "lootReceiveMoney": "{money}을(를) 받았습니다.",
       "lootMoney": "{money}을(를) 전리품으로 획득했습니다.",
@@ -5389,6 +5400,34 @@ export const ko_KR: EnTranslations = {
       "soldJunkMany": "잡동사니 아이템 {count}개를 {money}에 팔았습니다.",
       "friendOnline": "{name}님이 접속했습니다.",
       "friendOffline": "{name}님이 접속을 종료했습니다."
+    },
+    "trade": {
+      "claudiumLabel": "Claudium",
+      "wocLabel": "WOC",
+      "settlingTitle": "거래 정산 중...",
+      "legYourClaudium": "Your Claudium",
+      "legTheirClaudium": "Their Claudium",
+      "legYourWoc": "내 WOC 결제",
+      "legTheirWoc": "상대방의 WOC 결제",
+      "statusPending": "대기 중",
+      "statusDone": "Done",
+      "wocPayPrompt": "연결된 지갑에서 {amount} WOC를 보내 거래를 완료하세요.",
+      "openInWallet": "지갑에서 열기",
+      "copyLink": "결제 링크 복사",
+      "copiedLink": "결제 링크가 복사되었습니다.",
+      "instanceSignedBy": "서명자: {name}",
+      "instanceUnique": "고유한 사본",
+      "title": "{name}님과 거래",
+      "yourOffer": "내 제안",
+      "theirOffer": "{name}의 제안",
+      "emptyMine": "가방의 아이템을 클릭해 추가하세요",
+      "emptyTheirs": "아직 제안한 것이 없습니다",
+      "money": "돈",
+      "copper": "동화",
+      "hint": "제안한 아이템을 클릭하면 제거됩니다. 양쪽 모두 거래 수락을 눌러야 합니다.",
+      "accept": "거래 수락",
+      "waiting": "대기 중...",
+      "cancel": "취소"
     },
     "tutorial": {
       "title": "새내기 모험가",
@@ -5516,19 +5555,6 @@ export const ko_KR: EnTranslations = {
       },
       "guildHeadOne": "당신은 {rank}, {count}명 회원",
       "guildHeadMany": "당신은 {rank}, {count}명 회원"
-    },
-    "trade": {
-      "title": "{name}님과 거래",
-      "yourOffer": "내 제안",
-      "theirOffer": "{name}의 제안",
-      "emptyMine": "가방의 아이템을 클릭해 추가하세요",
-      "emptyTheirs": "아직 제안한 것이 없습니다",
-      "money": "돈",
-      "copper": "동화",
-      "hint": "제안한 아이템을 클릭하면 제거됩니다. 양쪽 모두 거래 수락을 눌러야 합니다.",
-      "accept": "거래 수락",
-      "waiting": "대기 중...",
-      "cancel": "취소"
     },
     "arena": {
       "title": "잿빛 원형경기장",
@@ -9734,6 +9760,16 @@ export const ko_KR: EnTranslations = {
         "sender": "알드릭 수사",
         "subject": "그대가 어둠 속에서 해낸 일",
         "body": "그 구렁에 무엇이 묻혀 있었는지 아는 이는 거의 없고, 믿을 이는 더 적을 것입니다. 저는 알고 있고, 잊지 않겠습니다.\n\n그대의 길에 늘 빛이 함께하기를.\n- 알드릭 수사"
+      },
+      "trade_delivery": {
+        "sender": "레이븐포스트",
+        "subject": "거래 물품 도착",
+        "body": "거래로 받은 물품이 도착했습니다. 가방에 들어가지 않은 것은 까마귀가 대신 날라 왔습니다."
+      },
+      "trade_refund": {
+        "sender": "레이븐포스트",
+        "subject": "거래 물품 반환",
+        "body": "거래가 성사되지 않았습니다. 제시했던 모든 것을 돌려받았습니다."
       }
     },
     "itemSets": {

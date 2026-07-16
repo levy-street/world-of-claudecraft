@@ -40,6 +40,7 @@ import { RATELIMIT_PRUNE_SQL, RATELIMIT_SCHEMA } from './ratelimit_db';
 import { REALM } from './realm';
 import { chooseArchiveName } from './reclaim_name';
 import { SOCIAL_SCHEMA } from './social_db';
+import { TRADE_SCHEMA } from './trade_db';
 import { USER_ASSETS_SCHEMA } from './user_assets_db';
 
 // The realm-market key helpers and the backfill marker key live in
@@ -1036,6 +1037,11 @@ export async function ensureSchema(): Promise<void> {
     // unconditionally (idempotent), like the other schema modules.
     await client.query(MAPS_SCHEMA);
     await client.query(USER_ASSETS_SCHEMA);
+    // Player-trade settlement + ledger tables (external-currency trade lane).
+    // FK-references characters(id)/accounts(id), so it runs after SCHEMA. Applied
+    // unconditionally (idempotent), like the other schema modules; the settlement
+    // orchestrator reads/writes these only when a rail is enabled.
+    await client.query(TRADE_SCHEMA);
     // Seed the chat-filter word lists + config on first boot only (idempotent).
     // Runs under the same advisory lock so concurrent realm boots don't race.
     await seedChatFilterDefaults(client);

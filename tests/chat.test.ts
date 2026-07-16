@@ -822,12 +822,107 @@ describe('trade completion event', () => {
 
     sim.tradeRequest(b, a);
     sim.tradeAccept(b);
-    sim.tradeSetOffer([{ itemId: 'wolf_fang', count: 1 }], 0, a);
+    sim.tradeSetOffer([{ itemId: 'wolf_fang', count: 1 }], 0, 0, '0', a);
     sim.tradeConfirm(a);
     sim.tradeConfirm(b);
     const events = sim.tick();
     const done = events.filter((e) => e.type === 'tradeDone');
     expect(done.map((e) => e.pid).sort()).toEqual([a, b].sort());
+  });
+});
+
+describe('/trade slash command', () => {
+  it('opens a trade request by name (proximity still enforced by tradeRequest itself)', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('mage', 'Bet');
+    teleport(sim, a, 0, -40);
+    teleport(sim, b, 3, -40);
+    sim.tick();
+
+    const sent = sim.chat('/trade Bet', a);
+    expect(sent).toBeNull(); // a command, never a broadcast chat line
+    const ev = sim.tick();
+    expect(ev.some((e) => e.type === 'tradeRequest' && e.pid === b && e.fromPid === a)).toBe(true);
+  });
+
+  it('resolves the name case-insensitively when unambiguous', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('mage', 'Bet');
+    teleport(sim, a, 0, -40);
+    teleport(sim, b, 3, -40);
+    sim.tick();
+    sim.chat('/trade bet', a); // lowercase
+    expect(sim.tick().some((e) => e.type === 'tradeRequest' && e.pid === b)).toBe(true);
+  });
+
+  it('errors on an ambiguous case-insensitive match', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    sim.addPlayer('mage', 'bet');
+    sim.addPlayer('rogue', 'BET');
+    sim.tick();
+    sim.chat('/trade Bet', a);
+    expect(
+      sim
+        .tick()
+        .some(
+          (e) =>
+            e.type === 'error' &&
+            e.pid === a &&
+            e.text === "Several players match 'Bet'. Use exact capitalization.",
+        ),
+    ).toBe(true);
+  });
+
+  it('errors on an unknown name (recognized "no player named" toast)', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    sim.tick();
+    sim.chat('/trade Nobody', a);
+    expect(
+      sim
+        .tick()
+        .some(
+          (e) =>
+            e.type === 'error' &&
+            e.pid === a &&
+            e.text === "There is no player named 'Nobody' online.",
+        ),
+    ).toBe(true);
+  });
+
+  it('errors with a usage hint when no name is given', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    sim.tick();
+    sim.chat('/trade', a);
+    expect(
+      sim
+        .tick()
+        .some(
+          (e) =>
+            e.type === 'error' && e.pid === a && e.text === 'Trade whom? Usage: /trade <name>.',
+        ),
+    ).toBe(true);
+  });
+
+  it('delegates range validation: too far away is refused like the context-menu path', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('mage', 'Bet');
+    teleport(sim, a, 0, 0);
+    teleport(sim, b, 1000, 1000);
+    sim.tick();
+    sim.chat('/trade Bet', a);
+    expect(
+      sim
+        .tick()
+        .some(
+          (e) => e.type === 'error' && e.pid === a && e.text === 'Target is too far away to trade.',
+        ),
+    ).toBe(true);
   });
 });
 

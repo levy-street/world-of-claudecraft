@@ -47,6 +47,7 @@ import type {
   DungeonDifficulty,
   Entity,
   ErrorReason,
+  InvSlot,
   ItemInstancePayload,
   PlayerClass,
   QuestProgress,
@@ -55,6 +56,7 @@ import type {
   SimConfig,
   SimEvent,
   SkinCatalog,
+  TradeRailsView,
   Vec3,
 } from './types';
 
@@ -755,6 +757,25 @@ export interface SimContextCallbacks {
   vcupShoot(caster: Entity, power: number, loft: number, range: number): void;
   vcupSportDash(caster: Entity, distance: number, catchBall: boolean): void;
   vcupSportShove(caster: Entity, target: Entity, distance: number): void;
+
+  // G2b external-currency trade legs (social/trade.ts). `tradeRails` is the
+  // host's view of the $WOC/Claudium rails (cfg.tradeRails; offline defaults to
+  // all-unavailable, so pledges are rejected and offline trades stay
+  // items + copper). `tradeMailKey` is the Ravenpost stable-recipient key
+  // (character id string, the market sellerKey convention) captured at settle
+  // start so escrow can be delivered or refunded after a participant leaves.
+  // `sendTradeLetter` books an authored system letter carrying escrowed goods
+  // (delivery to the counterparty, or refund to the owner); it never refuses,
+  // matching the post office's authored-letter contract. All stay on Sim.
+  tradeRails(pid: number): TradeRailsView;
+  tradeMailKey(pid: number): string;
+  sendTradeLetter(
+    recipientKey: string,
+    recipientName: string,
+    flavor: 'delivery' | 'refund',
+    copper: number,
+    items: InvSlot[],
+  ): void;
 }
 
 // The seam consumed by extracted modules.
@@ -1170,5 +1191,10 @@ export function createSimContext(host: SimContextHost): SimContext {
     vcupShoot: host.vcupShoot,
     vcupSportDash: host.vcupSportDash,
     vcupSportShove: host.vcupSportShove,
+    // G2b external-currency trade legs (points at Sim: the cfg.tradeRails view,
+    // the PostOffice recipient key, and the authored trade letters).
+    tradeRails: host.tradeRails,
+    tradeMailKey: host.tradeMailKey,
+    sendTradeLetter: host.sendTradeLetter,
   };
 }

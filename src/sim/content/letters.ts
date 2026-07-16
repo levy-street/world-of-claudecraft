@@ -80,3 +80,32 @@ export const QUEST_LETTERS: Record<string, LetterDef> = {
     delaySeconds: 150,
   },
 };
+
+// G2b trade settlement (server-driven, src/sim/sim.ts sendTradeLetter): the
+// two escrow-release letters, keyed by letterId (not by quest id, hence a
+// separate table from QUEST_LETTERS). senderName is the courier, not the
+// trading partner, matching the welcome letter's convention (a stable,
+// canonical sender the client localizes via letterId) rather than a
+// per-delivery dynamic name, which the letterId-driven client pipeline has
+// no seam for (mailbox_window.ts resolves sender/subject/body from this
+// table whenever row.letterId is set, ignoring the DB-stored literal). The
+// canonical English here must stay byte-identical to sim.ts's inline
+// sendTradeLetter payload: that literal is what a non-localized (or
+// pre-i18n-pipeline) consumer of the raw mail row would see, and the two
+// must never drift.
+export const TRADE_LETTERS: Record<string, LetterDef> = {
+  delivery: {
+    letterId: 'trade_delivery',
+    senderName: 'The Ravenpost',
+    subject: 'Trade delivery',
+    body: 'Goods from your trade have arrived. The raven carried what your bags could not.',
+    delaySeconds: 5,
+  },
+  refund: {
+    letterId: 'trade_refund',
+    senderName: 'The Ravenpost',
+    subject: 'Trade goods returned',
+    body: 'Your trade did not complete. Everything you offered has been returned.',
+    delaySeconds: 5,
+  },
+};

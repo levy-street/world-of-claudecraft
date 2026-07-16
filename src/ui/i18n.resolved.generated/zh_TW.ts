@@ -5361,7 +5361,17 @@ export const zh_TW: EnTranslations = {
       "tradeInProgress": "已有交易正在進行。",
       "tradeTooFar": "目標太遠，無法交易。",
       "tradeExpired": "交易請求已過期。",
-      "tradeFailed": "交易失敗：物品或金錢已不可用。"
+      "tradeFailed": "交易失敗：物品或金錢已不可用。",
+      "tradeBusy": "該玩家已在進行其他交易。",
+      "tradeUsage": "與誰交易？用法：/trade <名字>。",
+      "claudiumTradeOff": "Claudium 交易目前無法使用。",
+      "wocTradeOff": "WOC 交易目前無法使用。",
+      "wocTradeLink": "請先綁定錢包才能交易 WOC。",
+      "wocTradePartnerLink": "你的交易對象尚未綁定錢包。",
+      "wocTradeOneSide": "一次交易只能由一方提供 WOC。",
+      "tradeSettleTimeout": "交易已取消：付款等待逾時，你的物品已退還。",
+      "tradeSettleCancelled": "交易已取消，你的物品已退還。",
+      "tradeSettleUnavailable": "交易無法結算，你的物品已退還。"
     },
     "logs": {
       "standUp": "你站了起來。",
@@ -5381,6 +5391,7 @@ export const zh_TW: EnTranslations = {
       "tradeOpened": "交易視窗已開啟。",
       "tradeComplete": "交易完成。",
       "tradeCancelled": "交易已取消。",
+      "tradeDeclined": "{name} 拒絕了你的交易請求。",
       "lootReceiveItem": "你獲得：{item}。",
       "lootReceiveMoney": "你獲得 {money}。",
       "lootMoney": "你拾取 {money}。",
@@ -5389,6 +5400,34 @@ export const zh_TW: EnTranslations = {
       "soldJunkMany": "你以 {money} 賣出 {count} 件雜物。",
       "friendOnline": "{name} 上線了。",
       "friendOffline": "{name} 下線了。"
+    },
+    "trade": {
+      "claudiumLabel": "Claudium",
+      "wocLabel": "WOC",
+      "settlingTitle": "交易結算中…",
+      "legYourClaudium": "Your Claudium",
+      "legTheirClaudium": "Their Claudium",
+      "legYourWoc": "你的 WOC 付款",
+      "legTheirWoc": "對方的 WOC 付款",
+      "statusPending": "進行中",
+      "statusDone": "Done",
+      "wocPayPrompt": "請從你已綁定的錢包發送 {amount} WOC 以完成交易。",
+      "openInWallet": "在錢包中開啟",
+      "copyLink": "複製付款連結",
+      "copiedLink": "付款連結已複製。",
+      "instanceSignedBy": "簽名者：{name}",
+      "instanceUnique": "獨特的副本",
+      "title": "與 {name} 交易",
+      "yourOffer": "你的出價",
+      "theirOffer": "{name} 的出價",
+      "emptyMine": "點擊背包中的物品來加入交易",
+      "emptyTheirs": "對方尚未提供物品",
+      "money": "金錢",
+      "copper": "銅幣",
+      "hint": "點擊已提供的物品可將其移除。雙方都必須點擊接受交易。",
+      "accept": "接受交易",
+      "waiting": "等待中...",
+      "cancel": "取消"
     },
     "tutorial": {
       "title": "新冒險者",
@@ -5516,19 +5555,6 @@ export const zh_TW: EnTranslations = {
       },
       "guildHeadOne": "你是{rank}，{count}名成員",
       "guildHeadMany": "你是{rank}，{count}名成員"
-    },
-    "trade": {
-      "title": "與 {name} 交易",
-      "yourOffer": "你的出價",
-      "theirOffer": "{name} 的出價",
-      "emptyMine": "點擊背包中的物品來加入交易",
-      "emptyTheirs": "對方尚未提供物品",
-      "money": "金錢",
-      "copper": "銅幣",
-      "hint": "點擊已提供的物品可將其移除。雙方都必須點擊接受交易。",
-      "accept": "接受交易",
-      "waiting": "等待中...",
-      "cancel": "取消"
     },
     "arena": {
       "title": "灰燼競技場",
@@ -9734,6 +9760,16 @@ export const zh_TW: EnTranslations = {
         "sender": "奧德里克修士",
         "subject": "你在黑暗中所做的一切",
         "body": "很少有人會知道那處窪地裡埋葬著什麼，願意相信的人更少。但我知道，而且我不會忘記。\n\n願你的道路常明。\n- 奧德里克修士"
+      },
+      "trade_delivery": {
+        "sender": "渡鴉郵驛",
+        "subject": "交易貨品送達",
+        "body": "你交易所得的貨品已經送達。渡鴉幫你捎來了背包裝不下的東西。"
+      },
+      "trade_refund": {
+        "sender": "渡鴉郵驛",
+        "subject": "交易物品已退還",
+        "body": "交易未能完成。你提供的一切已經退還給你。"
       }
     },
     "itemSets": {

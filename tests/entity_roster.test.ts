@@ -347,6 +347,13 @@ function makeCtx() {
     vcupShoot: vi.fn(),
     vcupSportDash: vi.fn(),
     vcupSportShove: vi.fn(),
+    // G2b external-currency trade legs.
+    tradeRails: vi.fn(() => ({
+      claudium: { available: false, balance: 0 },
+      woc: { available: false, linked: false },
+    })),
+    tradeMailKey: vi.fn((pid: number) => String(pid)),
+    sendTradeLetter: vi.fn(),
   };
   const ctx = createSimContext(host);
   return {

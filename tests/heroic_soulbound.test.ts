@@ -46,11 +46,17 @@ describe('soulbound: heroic_mark is bound', () => {
       offerB: null,
       acceptedA: true,
       acceptedB: true,
+      phase: 'open',
     };
     const ctx = {
       resolve: (pid?: number) => (pid === 1 ? { meta: { entityId: 1, copper: 0 }, e: {} } : null),
       trades: new Map<number, any>([[1, session]]),
       countItem: (itemId: string, pid?: number) => bags.get(pid ?? 1)?.get(itemId) ?? 0,
+      countFungibleItem: (itemId: string, pid?: number) => bags.get(pid ?? 1)?.get(itemId) ?? 0,
+      tradeRails: () => ({
+        claudium: { available: false, balance: 0 },
+        woc: { available: false, linked: false },
+      }),
     } as unknown as SimContext;
 
     tradeSetOffer(
@@ -60,6 +66,8 @@ describe('soulbound: heroic_mark is bound', () => {
         { itemId: 'minor_healing_potion', count: 2 },
       ],
       0,
+      0,
+      '0',
       1,
     );
 

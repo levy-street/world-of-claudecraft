@@ -2659,8 +2659,11 @@ export class ClientWorld implements IWorld {
   tradeAccept(): void {
     this.cmd({ cmd: 'trade_accept' });
   }
-  tradeSetOffer(items: InvSlot[], copper: number): void {
-    this.cmd({ cmd: 'trade_offer', items, copper });
+  tradeDecline(): void {
+    this.cmd({ cmd: 'trade_decline' });
+  }
+  tradeSetOffer(items: InvSlot[], copper: number, claudium: number, woc: string): void {
+    this.cmd({ cmd: 'trade_offer', items, copper, claudium, woc });
   }
   tradeConfirm(): void {
     this.cmd({ cmd: 'trade_confirm' });

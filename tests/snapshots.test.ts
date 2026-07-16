@@ -2712,10 +2712,11 @@ function dirtyEveryDeltaField(): {
   sim.trades.set(lp, {
     a: lp,
     b: mp,
-    offerA: { items: [], copper: 10 },
-    offerB: { items: [], copper: 0 },
+    offerA: { items: [], copper: 10, claudium: 0, woc: '0' },
+    offerB: { items: [], copper: 0, claudium: 0, woc: '0' },
     acceptedA: true,
     acceptedB: false,
+    phase: 'open',
   });
   sim.duels.set(lp, { a: lp, b: mp, state: 'countdown', timer: 3 });
   (sim as any).pendingLootRolls.set(1, {
@@ -2793,6 +2794,10 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.partyInfo?.members.some((m) => m.pid === memberPid)).toBe(true);
     expect(client.markerFor(memberPid)).toBe(3); // marks -> markers, via markerFor()
     expect((client.tradeInfo as any)?.otherPid).toBe(memberPid); // trade -> tradeInfo
+    // phase/rails ride the same 'trade' delta key (asserted directly, the
+    // trade/duel precedent): confirm they survive the wire unmangled.
+    expect((client.tradeInfo as any)?.phase).toBe('open');
+    expect((client.tradeInfo as any)?.rails).toEqual({ claudium: false, woc: false });
     expect((client.duelInfo as any)?.state).toBe('countdown'); // duel -> duelInfo
     expect(client.arenaInfo).not.toBeNull(); // arena -> arenaInfo
     expect(client.marketInfo).not.toBeNull(); // market -> marketInfo
