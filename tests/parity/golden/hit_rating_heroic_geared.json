@@ -223,7 +223,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 410,
-      "state": "e6e9bfdd",
+      "state": "58d4ee74",
       "events": "a3f7da5c",
       "rng": {
         "draws": 242,
@@ -234,7 +234,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 410,
-      "state": "4d5e87dc",
+      "state": "5e0854e9",
       "events": "741638a5",
       "rng": {
         "draws": 308,
@@ -245,7 +245,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 410,
-      "state": "029ae415",
+      "state": "90e3a0c6",
       "events": "741638a5",
       "rng": {
         "draws": 356,
@@ -256,7 +256,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 410,
-      "state": "0cfc2132",
+      "state": "ab059cd1",
       "events": "741638a5",
       "rng": {
         "draws": 406,
@@ -267,7 +267,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 410,
-      "state": "0cfc2132",
+      "state": "ab059cd1",
       "events": "741638a5",
       "rng": {
         "draws": 406,
@@ -451,7 +451,9 @@
               "remaining": 6.05,
               "school": "fire",
               "sourceId": 408,
+              "tickBase": 3,
               "tickInterval": 2,
+              "tickPowerStat": "spell",
               "tickTimer": 0.05,
               "value": 3
             }
@@ -513,7 +515,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 410,
-      "state": "0cfc2132",
+      "state": "ab059cd1",
       "events": "741638a5",
       "rng": {
         "draws": 406,
@@ -697,7 +699,9 @@
               "remaining": 6.05,
               "school": "fire",
               "sourceId": 408,
+              "tickBase": 3,
               "tickInterval": 2,
+              "tickPowerStat": "spell",
               "tickTimer": 0.05,
               "value": 3
             }
