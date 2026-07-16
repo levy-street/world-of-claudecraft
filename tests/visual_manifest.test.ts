@@ -87,6 +87,51 @@ describe('character visual manifest', () => {
     ).toEqual([]);
   });
 
+  // The custom v02 class bodies bake fewer clips than the 22-clip KayKit set,
+  // so their defs are pinned tighter: every non-emote clip the ClipMap can
+  // resolve (including the per-hand and per-ability overrides) must be baked
+  // in, and every emote spec needs at least one of its alternatives (the
+  // runtime plays the first LOADED clip per spec, so alternatives may be
+  // absent but a fully-unloadable emote is a silent no-op).
+  for (const [label, key, url] of [
+    ['warrior', 'player_warrior', 'models/chars/players/warrior_v02.glb'],
+    ['paladin', 'player_paladin', 'models/chars/players/paladin_v02.glb'],
+  ] as const) {
+    it(`points the ${label} manifest at clips baked into ${url.split('/').pop()}`, async () => {
+      const visual = VISUALS[key];
+      expect(visual.url).toBe(url);
+      const animationNames = await glbAnimationNames(`public/${visual.url}`);
+      expect(animationNames.size).toBeGreaterThan(0);
+
+      const c = visual.clips;
+      const required = [
+        c.idle,
+        c.walk,
+        c.run,
+        c.death,
+        c.cast,
+        c.sitDown,
+        c.sitIdle,
+        c.swim,
+        c.jump,
+        c.walkBack,
+        c.flourish,
+        ...c.attack,
+        ...(c.hit ?? []),
+        ...Object.values(c.attackByHand ?? {}),
+        ...Object.values(c.attackByAbility ?? {}),
+      ].filter((name): name is string => !!name);
+      expect([...new Set(required)].filter((name) => !animationNames.has(name))).toEqual([]);
+
+      for (const [emote, spec] of Object.entries(c.emote ?? {})) {
+        expect(
+          spec.clips.some((name) => animationNames.has(name)),
+          `emote ${emote} has no loadable clip`,
+        ).toBe(true);
+      }
+    });
+  }
+
   it('points the baked wolf visuals (form_cat, mob_wolf, greyjaw) at clips in their GLBs', async () => {
     const byUrl = new Map<string, Set<string>>();
     for (const key of ['form_cat', 'mob_wolf', 'greyjaw'] as const) {

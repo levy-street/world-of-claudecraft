@@ -332,13 +332,12 @@ function mechEmissiveUrl(c: MechChroma): string | null {
 // to the body material's .map (same UVs). Classes sharing a model share its skin
 // set. Players only — mobs/npcs keep their default look. See public/textures/skins/.
 export const SKINS: Record<string, (string | null)[]> = {
-  player_warrior: [
-    null,
-    `${SKINS_DIR}/knight/alt_a.png`,
-    `${SKINS_DIR}/knight/alt_b.png`,
-    `${SKINS_DIR}/knight/alt_c.png`,
-  ],
-  player_paladin: [null, `${SKINS_DIR}/paladin/alt_a.png`],
+  // The v02 warrior/paladin bodies have their own clean UVs; the knight and
+  // paladin alt atlases were authored for the retired KayKit UVs and would
+  // scramble on them. Slots stay null so saved skin indices remain valid
+  // (SKIN_COUNTS lockstep: warrior 4, paladin 2).
+  player_warrior: [null, null, null, null],
+  player_paladin: [null, null],
   player_hunter: [
     null,
     `${SKINS_DIR}/ranger/alt_a.png`,
@@ -439,7 +438,10 @@ const VELOCIRAPTOR: ClipMap = {
 export const VISUALS: Record<string, VisualDef> = {
   // -- player classes ------------------------------------------------------
   player_warrior: {
-    url: `${PLAYERS}/knight.glb`,
+    // dedicated warrior body (artist-rigged v02 pack + bald chibi head), ships
+    // its own embedded textures - no show-list. Revert by pointing back at
+    // knight.glb (+ its Knight_Helmet/Knight_Cape show list and knight skins).
+    url: `${PLAYERS}/warrior_v02.glb`,
     height: HUMANOID_H,
     // Auto-attacks rotate the two 1H swings; specific abilities override to a
     // clip that fits their weight. knight.glb only ships 4 melee clips, so the
@@ -479,7 +481,6 @@ export const VISUALS: Record<string, VisualDef> = {
         raised_guard: 'Block',
       },
     },
-    show: ['Knight_Helmet', 'Knight_Cape'], // v2 knight dropped the built-in Badge_Shield mesh
     attach: [
       { url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' },
       { url: `${WEAPONS}/shield_round.glb`, bone: 'handslot.l' },
@@ -487,16 +488,37 @@ export const VISUALS: Record<string, VisualDef> = {
     weaponSlots: [0, 1],
   },
   player_paladin: {
-    url: `${PLAYERS}/paladin.glb`,
+    // dedicated paladin body (artist-rigged v02 pack + bald chibi head), ships
+    // its own embedded textures - no show-list/tint. Revert by pointing back
+    // at paladin.glb (+ its paladin/alt_a skin).
+    url: `${PLAYERS}/paladin_v02.glb`,
     height: HUMANOID_H,
     clips: {
       ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
       // Paladins can wield the vendor greatswords; no dual wield.
       attackByHand: { twohand: '2H_Melee_Attack_Chop' },
+      attackByAbility: {
+        // Blessings / auras / the seal: the artist's Cast_Buff track (a
+        // skyward raise) is baked as Spellcast_Raise.
+        seal_of_righteousness: 'Spellcast_Raise',
+        devotion_aura: 'Spellcast_Raise',
+        retribution_aura: 'Spellcast_Raise',
+        righteous_fury: 'Spellcast_Raise',
+        blessing_of_might: 'Spellcast_Raise',
+        lay_on_hands: 'Spellcast_Raise',
+        // Hammer strikes: the pack's Stun track is an overhead hammer blow;
+        // it reads right for the stun and for slamming the ground consecrated.
+        hammer_of_justice: 'Stun',
+        consecration: 'Stun',
+        // Holy bolts: the cast push-out.
+        judgement: 'Spellcast_Shoot',
+        exorcism: 'Spellcast_Shoot',
+        // Defensive plant, like the warrior's Raised Guard.
+        divine_protection: 'Block',
+        // holy_light / flash_of_light have cast times: they ride the
+        // Spellcasting cast channel, no per-ability override.
+      },
     },
-    // dedicated paladin model (helmeted variant) — ships its own Cape + Helmet
-    // meshes and texture, so no show-list/tint. Shield + paladin hammer arrive
-    // in the weapons pass; the gripped axe holds the slot until then.
     attach: [
       { url: `${WEAPONS}/axe_1handed.glb`, bone: 'handslot.r' },
       { url: `${WEAPONS}/shield_square.glb`, bone: 'handslot.l' },

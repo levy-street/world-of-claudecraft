@@ -2004,13 +2004,9 @@ export const GUIDE_DELVES: GuideDelve[] = [
 
 export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
   "player_warrior": {
-    "url": "models/chars/players/knight.glb",
+    "url": "models/chars/players/warrior_v02.glb",
     "idle": "Idle",
     "height": 2.6,
-    "show": [
-      "Knight_Helmet",
-      "Knight_Cape"
-    ],
     "attach": [
       {
         "url": "models/weapons/sword_1handed.glb",
@@ -2023,13 +2019,9 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     ]
   },
   "player_warrior_classic": {
-    "url": "models/chars/players/knight.glb",
+    "url": "models/chars/players/warrior_v02.glb",
     "idle": "Idle",
     "height": 2.6,
-    "show": [
-      "Knight_Helmet",
-      "Knight_Cape"
-    ],
     "attach": [
       {
         "url": "models/weapons/sword_1handed.glb",
@@ -2042,7 +2034,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     ]
   },
   "player_paladin": {
-    "url": "models/chars/players/paladin.glb",
+    "url": "models/chars/players/paladin_v02.glb",
     "idle": "Idle",
     "height": 2.6,
     "attach": [

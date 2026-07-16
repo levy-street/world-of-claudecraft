@@ -9,6 +9,7 @@ provided as a courtesy.
 | Assets | Author | Source | License |
 |---|---|---|---|
 | Character models + animations (knight, mage, rogue, barbarian, hooded rogue), weapons/shields | Kay Lousberg (KayKit) | https://github.com/KayKit-Game-Assets/KayKit-Character-Pack-Adventures-1.0 | CC0 1.0 |
+| Warrior + paladin player bodies and animation tracks (warrior_v02.glb, paladin_v02.glb; heads derived from the KayKit Adventurers ranger head) | Commissioned for this project (Levy Street) | in-house | Project asset |
 | Skeleton character models + animations, bone weapons | Kay Lousberg (KayKit) | https://github.com/KayKit-Game-Assets/KayKit-Character-Pack-Skeletons-1.0 | CC0 1.0 |
 | Dungeon modular kit (walls, floors, pillars, torches, banners, chests, furniture) | Kay Lousberg (KayKit) | https://github.com/KayKit-Game-Assets/KayKit-Dungeon-Remastered-1.0 | CC0 1.0 |
 | Graveyard/crypt props, dead trees, lanterns | Kay Lousberg (KayKit) | https://github.com/KayKit-Game-Assets/KayKit-Halloween-Bits-1.0 | CC0 1.0 |
