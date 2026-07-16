@@ -1615,8 +1615,6 @@ export const zh_TW: EnTranslations = {
       "removeFromBarAria": "將 {name} 從動作列移除"
     },
     "nameplate": {
-      "mob": "[{level}] {name}",
-      "mobElite": "[{level}+] {name}",
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+"
     },

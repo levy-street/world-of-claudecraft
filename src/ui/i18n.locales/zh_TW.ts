@@ -383,8 +383,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemTooltip.requiresLevel': '需要等級 {level}',
   'hudChrome.spellbook.addToBarAria': '將 {name} 加入動作列',
   'hudChrome.spellbook.removeFromBarAria': '將 {name} 從動作列移除',
-  'hudChrome.nameplate.mob': '[{level}] {name}',
-  'hudChrome.nameplate.mobElite': '[{level}+] {name}',
   'hudChrome.mobTooltip.familyDemon': '惡魔',
   'hudChrome.mobTooltip.levelFamily': '等級 {level} {family}',
   'hudChrome.mobTooltip.hostile': '敵對',

@@ -1615,8 +1615,6 @@ export const en: EnTranslations = {
       "removeFromBarAria": "Remove {name} from action bar"
     },
     "nameplate": {
-      "mob": "[{level}] {name}",
-      "mobElite": "[{level}+] {name}",
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+"
     },

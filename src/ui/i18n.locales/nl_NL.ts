@@ -5324,8 +5324,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.leaderboard': 'Ranglijst',
   'hudChrome.mobile.nameplates': 'Namen',
   'hudChrome.mobile.toggleHaptics': 'Haptiek aan/uit',
-  'hudChrome.nameplate.mob': '[{level}] {name}',
-  'hudChrome.nameplate.mobElite': '[{level}+] {name}',
   'hudChrome.options.browserEffects': 'Browsereffecten',
   'hudChrome.options.browserEffectsAuto': 'Automatisch',
   'hudChrome.options.browserEffectsFull': 'Volledig',

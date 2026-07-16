@@ -5380,8 +5380,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.leaderboard': 'Peringkat',
   'hudChrome.mobile.nameplates': 'Nama',
   'hudChrome.mobile.toggleHaptics': 'Alihkan haptik',
-  'hudChrome.nameplate.mob': '[{level}] {name}',
-  'hudChrome.nameplate.mobElite': '[{level}+] {name}',
   'hudChrome.options.browserEffects': 'Efek Peramban',
   'hudChrome.options.browserEffectsAuto': 'Otomatis',
   'hudChrome.options.browserEffectsFull': 'Penuh',

@@ -31,7 +31,6 @@
     will-change: transform;
     --nameplate-width: 80px;
     --nameplate-text-shadow: 1px 1px 3px #000, -1px -1px 3px #000;
-    --nameplate-text-shadow-active: 2px 2px 8px #000, -2px -2px 8px #000;
   }
   .nameplate.has-emote {
     z-index: 30;

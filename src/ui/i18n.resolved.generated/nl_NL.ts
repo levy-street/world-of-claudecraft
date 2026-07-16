@@ -1615,8 +1615,6 @@ export const nl_NL: EnTranslations = {
       "removeFromBarAria": "{name} verwijderen van actiebalk"
     },
     "nameplate": {
-      "mob": "[{level}] {name}",
-      "mobElite": "[{level}+] {name}",
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+"
     },

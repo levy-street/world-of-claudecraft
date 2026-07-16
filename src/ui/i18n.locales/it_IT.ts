@@ -1364,8 +1364,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.loot.chestTitle': 'Scrigno',
   'hudChrome.spellbook.addToBarAria': 'Aggiungi {name} alla barra azioni',
   'hudChrome.spellbook.removeFromBarAria': 'Rimuovi {name} dalla barra azioni',
-  'hudChrome.nameplate.mob': '[{level}] {name}',
-  'hudChrome.nameplate.mobElite': '[{level}+] {name}',
   'hud.core.mapCanvasLabel': 'Mappa',
   'hud.core.mapSummary': 'Mappa di {zone}.',
   'hudChrome.castBar.playerAria': 'La tua barra di lancio',

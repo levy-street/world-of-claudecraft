@@ -1615,8 +1615,6 @@ export const ko_KR: EnTranslations = {
       "removeFromBarAria": "{name}을(를) 행동 단축바에서 제거"
     },
     "nameplate": {
-      "mob": "[{level}] {name}",
-      "mobElite": "[{level}+] {name}",
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+"
     },

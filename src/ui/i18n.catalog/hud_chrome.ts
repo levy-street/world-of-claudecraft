@@ -1616,13 +1616,10 @@ export const hudChromeStrings = {
     addToBarAria: 'Add {name} to action bar',
     removeFromBarAria: 'Remove {name} from action bar',
   },
-  // Live overworld mob nameplate label: a bracketed level then the localized mob
-  // name (mirrors the corpse branch's worldContent.corpseName template). {level}
-  // runs through formatNumber; {name} is already localized. Format-only (brackets /
-  // order may reorder per locale), kept here so an English-only add compiles.
+  // Live overworld mob nameplate level badge text. Level renders in its own
+  // element so con-color styling applies to the badge without recoloring the
+  // mob name line.
   nameplate: {
-    mob: '[{level}] {name}',
-    mobElite: '[{level}+] {name}',
     // Level-only badge rendered in a separate element so the con color applies
     // to the bracket only, not the mob name text.
     mobLevel: '{level}',

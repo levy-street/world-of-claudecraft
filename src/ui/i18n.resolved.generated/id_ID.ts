@@ -1615,8 +1615,6 @@ export const id_ID: EnTranslations = {
       "removeFromBarAria": "Hapus {name} dari bilah aksi"
     },
     "nameplate": {
-      "mob": "[{level}] {name}",
-      "mobElite": "[{level}+] {name}",
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+"
     },

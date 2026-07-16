@@ -1733,8 +1733,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.loot.chestTitle': 'Coffre',
   'hudChrome.spellbook.addToBarAria': "Ajouter {name} à la barre d'action",
   'hudChrome.spellbook.removeFromBarAria': "Retirer {name} de la barre d'action",
-  'hudChrome.nameplate.mob': '[{level}] {name}',
-  'hudChrome.nameplate.mobElite': '[{level}+] {name}',
   'hud.core.mapCanvasLabel': 'Carte',
   'hud.core.mapSummary': 'Carte de {zone}.',
   'hudChrome.castBar.playerAria': "Votre barre d'incantation",

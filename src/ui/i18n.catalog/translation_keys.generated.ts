@@ -5174,8 +5174,6 @@ export type TranslationKeyFlat =
   | 'hudChrome.mobile.targetCycle'
   | 'hudChrome.mobile.targetCycleShort'
   | 'hudChrome.mobile.toggleHaptics'
-  | 'hudChrome.nameplate.mob'
-  | 'hudChrome.nameplate.mobElite'
   | 'hudChrome.nameplate.mobEliteLevel'
   | 'hudChrome.nameplate.mobLevel'
   | 'hudChrome.nativeUpdate.body'

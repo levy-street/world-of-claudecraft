@@ -1349,8 +1349,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.loot.chestTitle': 'Cofre',
   'hudChrome.spellbook.addToBarAria': 'Añadir {name} a la barra de acción',
   'hudChrome.spellbook.removeFromBarAria': 'Quitar {name} de la barra de acción',
-  'hudChrome.nameplate.mob': '[{level}] {name}',
-  'hudChrome.nameplate.mobElite': '[{level}+] {name}',
   'hudChrome.mobTooltip.levelFamily': 'Nivel {level} {family}',
   'hudChrome.mobTooltip.familyDemon': 'Demonio',
   'hudChrome.mobTooltip.hostile': 'Hostil',

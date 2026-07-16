@@ -5340,8 +5340,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.leaderboard': 'Xếp Hạng',
   'hudChrome.mobile.nameplates': 'Tên',
   'hudChrome.mobile.toggleHaptics': 'Bật/tắt phản hồi rung',
-  'hudChrome.nameplate.mob': '[{level}] {name}',
-  'hudChrome.nameplate.mobElite': '[{level}+] {name}',
   'hudChrome.options.browserEffects': 'Hiệu Ứng Trình Duyệt',
   'hudChrome.options.browserEffectsAuto': 'Tự Động',
   'hudChrome.options.browserEffectsFull': 'Đầy Đủ',

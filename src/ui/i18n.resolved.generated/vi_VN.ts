@@ -1615,8 +1615,6 @@ export const vi_VN: EnTranslations = {
       "removeFromBarAria": "Gỡ {name} khỏi thanh kỹ năng"
     },
     "nameplate": {
-      "mob": "[{level}] {name}",
-      "mobElite": "[{level}+] {name}",
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+"
     },

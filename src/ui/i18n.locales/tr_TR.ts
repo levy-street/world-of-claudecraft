@@ -5308,8 +5308,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.leaderboard': 'Sıralama',
   'hudChrome.mobile.nameplates': 'İsimler',
   'hudChrome.mobile.toggleHaptics': 'Dokunsal geri bildirimi aç/kapat',
-  'hudChrome.nameplate.mob': '[{level}] {name}',
-  'hudChrome.nameplate.mobElite': '[{level}+] {name}',
   'hudChrome.options.browserEffects': 'Tarayıcı Efektleri',
   'hudChrome.options.browserEffectsAuto': 'Otomatik',
   'hudChrome.options.browserEffectsFull': 'Tam',

@@ -1615,8 +1615,6 @@ export const en_XA: EnTranslations = {
       "removeFromBarAria": "[Ŕéɱóʋé {name} ƒŕóɱ áçţíóñ ƀáŕ]"
     },
     "nameplate": {
-      "mob": "[[{level}] {name}]",
-      "mobElite": "[[{level}+] {name}]",
       "mobLevel": "[{level}]",
       "mobEliteLevel": "[{level}+]"
     },

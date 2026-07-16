@@ -5255,8 +5255,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.leaderboard': 'Ranking',
   'hudChrome.mobile.nameplates': 'Namn',
   'hudChrome.mobile.toggleHaptics': 'Växla haptik',
-  'hudChrome.nameplate.mob': '[{level}] {name}',
-  'hudChrome.nameplate.mobElite': '[{level}+] {name}',
   'hudChrome.options.browserEffects': 'Webbläsareffekter',
   'hudChrome.options.browserEffectsAuto': 'Auto',
   'hudChrome.options.browserEffectsFull': 'Fullständig',

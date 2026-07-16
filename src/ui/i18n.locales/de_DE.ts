@@ -1372,8 +1372,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.loot.chestTitle': 'Truhe',
   'hudChrome.spellbook.addToBarAria': '{name} zur Aktionsleiste hinzufügen',
   'hudChrome.spellbook.removeFromBarAria': '{name} von der Aktionsleiste entfernen',
-  'hudChrome.nameplate.mob': '[{level}] {name}',
-  'hudChrome.nameplate.mobElite': '[{level}+] {name}',
   'hud.core.mapCanvasLabel': 'Karte',
   'hud.core.mapSummary': 'Karte von {zone}.',
   'hudChrome.castBar.playerAria': 'Eure Zauberleiste',
