@@ -122,7 +122,8 @@ for (const filename of files) {
   const sourceExtension = path.extname(filename);
   const stem = path.basename(filename, sourceExtension);
   const outputFile = path.join(sfxDirectory, `${stem}.mp3`);
-  const report = inspectSfxConformance(file, { ffmpegPath, ffprobePath });
+  const preserveLoudness = conformPolicy.isCustomMaster(filename);
+  const report = inspectSfxConformance(file, { ffmpegPath, ffprobePath, preserveLoudness });
 
   if (report.reject) {
     console.log(
@@ -145,8 +146,11 @@ for (const filename of files) {
   toConform++;
 
   const displayProblems = [...loudnessProblems, ...(chProblem ? [chProblem] : [])];
-  const normLabel =
-    report.normBranch === 'peak' ? `true peak ${TARGET_PEAK_DBFS}dBFS` : `${TARGET_LUFS} LUFS`;
+  const normLabel = preserveLoudness
+    ? `true peak <= ${TARGET_PEAK_DBFS}dBFS (loudness preserved as-authored)`
+    : report.normBranch === 'peak'
+      ? `true peak ${TARGET_PEAK_DBFS}dBFS`
+      : `${TARGET_LUFS} LUFS`;
 
   if (!fix) {
     // Loudness problems fail the check inline; a channel-only mismatch is
@@ -168,6 +172,7 @@ for (const filename of files) {
       peakDb: report.peakDb,
       ffmpegPath,
       channels: expectedChannels ?? null,
+      preserveLoudness,
     });
     if (file !== outputFile) unlinkSync(file);
     console.log('done');

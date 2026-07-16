@@ -58,6 +58,13 @@ export function classify({
   lufs = null,
   isLossless = false,
   isMp3 = true,
+  // A custom (hand-recorded, already-mastered) key is pre-mastered content:
+  // conform never re-targets its loudness (the author's own mix, likely
+  // measured against a different metric than integrated LUFS, e.g. momentary
+  // LUFS in their own DAW, is authoritative), only guards the true-peak
+  // ceiling so it can never actually clip. See sfx_conform_inventory.mjs's
+  // isCustomMaster.
+  preserveLoudness = false,
 }) {
   if (!isLossless && bitrate < MIN_SOURCE_BITRATE) {
     return { reject: true, problems: [], normBranch: null };
@@ -83,11 +90,17 @@ export function classify({
   const normBranch = duration < DURATION_THRESHOLD ? 'peak' : 'lufs';
 
   if (normBranch === 'peak' && peakDb !== null) {
-    if (Math.abs(peakDb - TARGET_PEAK_DBFS) > NORM_TOLERANCE) {
+    // A preserved-loudness master only ever needs to come DOWN if it exceeds
+    // the safety ceiling; it is never flagged for sitting under the nominal
+    // target (that undershoot is the author's own mix decision, not a defect).
+    const peakProblem = preserveLoudness
+      ? peakDb - TARGET_PEAK_DBFS > NORM_TOLERANCE
+      : Math.abs(peakDb - TARGET_PEAK_DBFS) > NORM_TOLERANCE;
+    if (peakProblem) {
       problems.push(`peak ${peakDb.toFixed(1)}dBFS (want ${TARGET_PEAK_DBFS}dBFS)`);
     }
   }
-  if (normBranch === 'lufs' && lufs !== null) {
+  if (normBranch === 'lufs' && lufs !== null && !preserveLoudness) {
     // A wide-crest-factor source can be structurally unable to reach
     // TARGET_LUFS without breaching the peak safety ceiling (see
     // conformSfxAudio's bestPeakSafeAttempt fallback), landing under target

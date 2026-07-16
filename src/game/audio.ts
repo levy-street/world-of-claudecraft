@@ -23,6 +23,7 @@ const UI_CUES = {
   whisper: 'ui_whisper',
   sheep: 'ui_sheep',
   death: 'ui_death',
+  playerDeath: 'player_death',
   error: 'ui_error',
   duelChallenge: 'ui_duel_challenge',
   duelCountdown: 'ui_duel_countdown',
@@ -212,6 +213,14 @@ export class GameAudio {
 
   achievement(): void {
     this.play(UI_CUES.achievement);
+  }
+
+  // Your OWN character actually dying (the 'playerDeath' sim event), not a
+  // minigame/PvP loss chime (fiesta, Yumi, arena rating, Vale Cup all still
+  // use death() below): plays the real custom death vocalization instead of
+  // the generic UI stinger.
+  playerDeath(): void {
+    this.play(UI_CUES.playerDeath);
   }
 
   lootItem(): void {
