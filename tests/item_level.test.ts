@@ -1,7 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { ABYSS_JEWELRY_IDS, HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
-import { ITEMS } from '../src/sim/data';
-import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { ITEMS, MOBS } from '../src/sim/data';
 import {
   expectedStatBudget,
@@ -223,15 +221,6 @@ describe('item level: raid tier', () => {
   });
 });
 
-describe('item level: heroic boss drops read item level 31 and are budget-exact', () => {
-  it('every heroic gear drop is an epic at item level 31 with its exact stat budget', () => {
-    const ids = Object.values(HEROIC_BOSS_LOOT)
-      .flat()
-      .flatMap((e) => (e.itemId ? [e.itemId] : []))
-      // The Molten Abyss neck/rings are the intentional exception (item level 25); they
-      // are covered by the jewelry test below.
-      .filter((id) => !ABYSS_JEWELRY_IDS.has(id));
-    expect(ids.length).toBeGreaterThanOrEqual(16); // the authored heroic set
 describe('item level: heroic boss drops are budget-exact (five-mans 31, raid 33/37)', () => {
   it('every explicit heroic-table drop is at its tier item level with its exact stat budget', () => {
     // The five-man final bosses register at source level 25 (item level 31). The
@@ -246,7 +235,10 @@ describe('item level: heroic boss drops are budget-exact (five-mans 31, raid 33/
     expect(raidIds.size).toBe(3); // the three heroic-only raid weapons
     const ids = Object.values(HEROIC_BOSS_LOOT)
       .flat()
-      .flatMap((e) => (e.itemId ? [e.itemId] : []));
+      .flatMap((e) => (e.itemId ? [e.itemId] : []))
+      // The Molten Abyss neck/rings are the intentional exception (item level 25);
+      // they are covered by the jewelry test below.
+      .filter((id) => !ABYSS_JEWELRY_IDS.has(id));
     expect(ids.length).toBeGreaterThanOrEqual(12); // the full five-man heroic set + raid weapons
     for (const id of ids) {
       const item = ITEMS[id];
@@ -273,6 +265,8 @@ describe('item level: heroic boss drops are budget-exact (five-mans 31, raid 33/
       expect(itemLevel(item), `${id} ilvl`).toBe(25);
       expect(primaryStatSum(item), `${id} stat sum == budget`).toBe(expectedStatBudget(item));
     }
+  });
+
   it('the raid boss set pieces and legendaries upgrade to raid-tier heroic variants (33/37)', () => {
     // These are not listed in the explicit table: they come from the normal-loot
     // heroic swap (heroic_<base>), rescaled to the raid tier (source 27).

@@ -35,6 +35,7 @@ export const ABYSS_JEWELRY_IDS: ReadonlySet<string> = new Set([
   'bloodember_band',
   'ashcoil_signet',
 ]);
+
 // The 10-player heroic raid (Heroic Nythraxis) is one tier ABOVE the five-man
 // heroics: its drop table registers at source level 27 so its epics land at item
 // level 33 and its legendaries at 37 (27 + the quality bump). Its heroic set
@@ -482,19 +483,8 @@ export const RETIRED_HEROIC_ITEMS: Record<string, ItemDef> = {
     sellValue: 14000,
     requiredClass: HEAL_MAIL,
   },
-  stormcallers_focus: {
-    id: 'stormcallers_focus',
-    name: "Stormcaller's Focus",
-    kind: 'weapon',
-    slot: 'mainhand',
-    quality: 'epic',
-    requiredLevel: 20,
-    weapon: { min: 29, max: 51, speed: 2.5 },
-    stats: { int: 13, spi: 9 },
-    sellValue: 16000,
-    requiredClass: HEAL_MAIL,
-  },
-  // ================= Heroic Molten Abyss: Azazel the Abyssal Lord ==========  // The forge boss arms the most underserved archetype: healer mail (int/spi paladin
+  // ================= Heroic Molten Abyss: Azazel the Abyssal Lord =================
+  // The forge boss arms the most underserved archetype: healer mail (int/spi paladin
   // and shaman), which the four earlier heroics leave without a chest, legs, or waist.
   // It also introduces two new weapon shapes (a one-hand strength maul and a one-hand
   // caster scepter) and a leather chest that closes the agility gap.
@@ -604,7 +594,6 @@ export const RETIRED_HEROIC_ITEMS: Record<string, ItemDef> = {
     stats: { agi: 6, sta: 5 },
     sellValue: 4500,
   },
-=======
 };
 
 // Heroic-only drop tables per final boss, TWO rollGroups each (chances inside a

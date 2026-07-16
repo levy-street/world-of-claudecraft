@@ -24,8 +24,6 @@ import {
   HEROIC_ABYSS_JEWELRY_SOURCE_LEVEL,
   HEROIC_BOSS_LOOT,
   HEROIC_LOOT_SOURCE_LEVEL,
-  HEROIC_BOSS_LOOT,
-  HEROIC_LOOT_SOURCE_LEVEL,
   NYTHRAXIS_RAID_BOSS_ID,
   NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL,
 } from './content/heroic_loot';
@@ -172,13 +170,13 @@ function buildSourceIndex(): Map<string, ItemSource> {
         : HEROIC_LOOT_SOURCE_LEVEL;
     for (const entry of entries) {
       if (!entry.itemId) continue;
-      // The Molten Abyss neck/rings register a tier below the standard heroic gear so
-      // they land at item level 25 (under the item-level-26 marks-vendor jewelry).
-      const src = ABYSS_JEWELRY_IDS.has(entry.itemId)
+      // The Molten Abyss neck/rings register a tier below the standard heroic gear
+      // so they land at item level 25 (under the item-level-26 marks-vendor
+      // jewelry); everything else keeps the per-boss tier (raid 27, five-man 25).
+      const entrySrc = ABYSS_JEWELRY_IDS.has(entry.itemId)
         ? HEROIC_ABYSS_JEWELRY_SOURCE_LEVEL
-        : HEROIC_LOOT_SOURCE_LEVEL;
-      bump(entry.itemId, src, false);
-      if (entry.itemId) bump(entry.itemId, src, false);
+        : src;
+      bump(entry.itemId, entrySrc, false);
     }
   }
   // Heroic upgraded drop variants (content/heroic_variants.ts): the "Heroic X"
