@@ -1719,50 +1719,6 @@
   .chat-pane .chat-hidden {
     display: none;
   }
-  /* All-view category filter strip (issue #1670): hidden except on the All
-     tab, where it thins the combined view without touching channel tabs.
-     A single nowrap row that scrolls horizontally on overflow, mirroring
-     #chatlog-tabs above, so ten category pills never eat a second row of
-     the (already short) chat log. */
-  .chat-category-strip {
-    display: none;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scrollbar-width: none;
-    gap: 4px;
-    padding: 3px 6px;
-    background: #100e18;
-    border-left: 1px solid #3a321d;
-    border-right: 1px solid #3a321d;
-  }
-  .chat-category-strip::-webkit-scrollbar {
-    display: none;
-  }
-  .chat-category-strip.active {
-    display: flex;
-  }
-  .chat-category-toggle {
-    flex: 0 0 auto;
-    min-height: 20px;
-    padding: 1px 8px;
-    border: 1px solid #3a321d;
-    border-radius: 10px;
-    background: linear-gradient(#231f2c, #14111c);
-    color: var(--gold);
-    cursor: var(--cursor-point);
-    font-family: var(--title-font);
-    font-size: 11px;
-  }
-  .chat-category-toggle.off {
-    color: #6b6252;
-    background: #0d0b13;
-    border-color: #2a2418;
-  }
-  .chat-category-toggle:focus-visible {
-    outline: 2px solid var(--gold);
-    outline-offset: 1px;
-  }
   #chatlog-frame {
     height: 184px;
     padding: 0;

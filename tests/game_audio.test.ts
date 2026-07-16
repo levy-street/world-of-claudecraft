@@ -80,6 +80,47 @@ describe('sampled GameAudio facade', () => {
     expect(sfxMock.playUi).toHaveBeenCalledTimes(routes.length);
   });
 
+  it('gates the feedback cues on setFeedbackEnabled but leaves timing/affordance cues alone', () => {
+    const audio = new GameAudio();
+    expect(audio.feedbackEnabled).toBe(true); // on by default (no change out of the box)
+
+    audio.setFeedbackEnabled(false);
+    expect(audio.feedbackEnabled).toBe(false);
+
+    // The interface/feedback cues fall silent (loot, level, quest, whisper, etc.).
+    const feedback = [
+      'coin',
+      'levelUp',
+      'lootItem',
+      'questAccept',
+      'questDone',
+      'whisper',
+      'sheep',
+      'death',
+      'error',
+    ] as const;
+    for (const m of feedback) audio[m]();
+    expect(sfxMock.playUi).not.toHaveBeenCalled();
+
+    // Direct-affordance cues (you clicked/opened) and gameplay-timing cues (duel
+    // countdown, fiesta) are NOT gated, so they still play.
+    audio.click();
+    audio.bagOpen();
+    audio.duelCountdownTick();
+    audio.fiestaWave();
+    expect(sfxMock.playUi.mock.calls.map(([k]) => k)).toEqual([
+      'ui_click',
+      'ui_bag_open',
+      'ui_duel_countdown',
+      'ui_fiesta_wave',
+    ]);
+
+    // Re-enabling restores the feedback cues.
+    audio.setFeedbackEnabled(true);
+    audio.lootItem();
+    expect(sfxMock.playUi).toHaveBeenLastCalledWith('ui_loot_item', { jitter: false });
+  });
+
   it('preserves the distinct procedural three-note ready-check chime', () => {
     const frequencyParams: Array<{ setValueAtTime: ReturnType<typeof vi.fn> }> = [];
     const oscillators: Array<{

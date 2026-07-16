@@ -15,7 +15,7 @@ import {
   CHAT_MESSAGE_TOKEN,
   CHAT_NAME_TOKEN,
   chatAiTagEl,
-} from '../src/ui/chat_line';
+} from '../src/ui/hud/chat/chat_line';
 
 /** The rendered form of a channel template, with its two slots tokenized. */
 const template = (prefix: string) => `${prefix}${CHAT_NAME_TOKEN}: ${CHAT_MESSAGE_TOKEN}`;

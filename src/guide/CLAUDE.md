@@ -20,7 +20,8 @@ sim/render *data*, never the live world or `IWorld`.
   generated content; `pages/index.ts` holds the `PAGES` record mapping route id to page
   module. `app.ts` is the shell, `router.ts` the SPA router, `head.ts` the per-route
   `<title>`/meta, `search.ts` the client search, `chrome.ts` the nav frame,
-  `class_view.ts` the per-class detail page.
+  `class_view.ts` the shared class-presentation helpers (crest, spec cards, role
+  badges, feel tags) used by the classes and talents pages.
 - `class_meta.ts`: curated (NOT generated) class-chooser feel tags; authored presentation
   judgments, so a new class needs a hand-written entry here that no generator produces.
 - `nav_aids.ts`: breadcrumbs, prev/next, and the scrollspy TOC, derived from

@@ -1,4 +1,4 @@
-// Unit tests for src/ui/lockpick_panel.ts: pure view helpers, no DOM.
+// Unit tests for src/ui/hud/delve/lockpick_panel.ts: pure view helpers, no DOM.
 import { describe, expect, it } from 'vitest';
 import { generateLock, type LockTierSpec, visibleCells } from '../src/sim/lockpick';
 import {
@@ -9,7 +9,7 @@ import {
   pageDots,
   stepFeedback,
   TIER_LABEL,
-} from '../src/ui/lockpick_panel';
+} from '../src/ui/hud/delve/lockpick_panel';
 import type { LockpickView } from '../src/world_api';
 
 const TIER: LockTierSpec = {

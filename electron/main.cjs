@@ -38,6 +38,7 @@ const { initLogging } = require('./logging.cjs');
 const { DEFAULT_SHELL_STRINGS, sanitizeShellStrings } = require('./shell_strings.cjs');
 const { attachRendererCrashRecovery, installProcessCrashGuards } = require('./crash_guard.cjs');
 const { initUpdater } = require('./updater.cjs');
+const { forceHighPerformanceGpu } = require('./gpu_preference.cjs');
 
 const APP_ORIGIN = 'app://worldofclaudecraft';
 // The Vite dev server URL is a DEV-ONLY seam (electron-dev.mjs sets it): its
@@ -105,6 +106,13 @@ crashReporter.start({
 // diagnosable; the renderer's warnings/errors and uncaught exceptions are
 // mirrored into the same file below.
 const { log, filePath: logFilePath } = initLogging({ isPackaged: app.isPackaged });
+
+// Force the discrete high-performance GPU on hybrid (Optimus) systems, with zero user
+// action. Runs before app 'ready' (so the Chromium switches are read) and before any
+// window (so the Windows per-app preference beats the GPU process this launch). See
+// electron/gpu_preference.cjs for the two levers and why the client-side
+// powerPreference:'high-performance' hint is not enough on Windows.
+forceHighPerformanceGpu({ app, log });
 
 // Player-visible strings for main-process dialogs (crash recovery): the
 // renderer pushes t()-localized values via 'desktop-set-strings'

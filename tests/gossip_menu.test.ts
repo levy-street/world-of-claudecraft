@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { gossipMenuIsEmpty } from '../src/ui/gossip_menu';
+import { gossipMenuIsEmpty } from '../src/ui/hud/quest/gossip_menu';
 
 // Reproduces the tutorial bug report: after accepting/turning in the starter
 // quest with the Marshal (the only content a fresh character's gossip menu

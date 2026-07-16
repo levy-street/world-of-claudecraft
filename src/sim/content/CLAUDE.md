@@ -49,8 +49,9 @@ there first if you need one.
   base items + mob loot tables at `data.ts` assembly.
 - **Professions data:** `professions.ts` (`CRAFT_RING`, `GATHERING_PROFESSIONS`,
   `TOOL_EFFECTS`, `PERK_THRESHOLDS`), `recipes.ts` (`COMMON_RECIPES`/`TOOL_RECIPES`/
-  `COMBO_RECIPES`/`ALL_RECIPES`), `gather_nodes.ts`, `enchants.ts`. Mechanics live
-  in `src/sim/professions/`, never here.
+  `CASTER_HUB_RECIPES`/`COMBO_RECIPES`, merged into `ALL_RECIPES`),
+  `gather_nodes.ts`, `enchants.ts`. Mechanics live in `src/sim/professions/`,
+  never here.
 - **Events + world systems:** `augments.ts` (2v2 Fiesta) and `skins.ts` (cosmetic
   skin events), `vale_cup.ts`, `yumi.ts`, `item_sets.ts` (set bonuses),
   `graveyards.ts` (death loop), `letters.ts` + `mailboxes.ts` (mail), `tunnels.ts`

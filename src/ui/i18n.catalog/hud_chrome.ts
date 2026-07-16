@@ -279,24 +279,6 @@ export const hudChromeStrings = {
     resetAction: 'Reset',
     note: 'Drag the chat tab strip to move the window, or the corner grip to resize it. Reset returns it to the default position and size.',
   },
-  // The All-view category filter strip (issue #1670): one toggle per category,
-  // shaping the combined view without giving up channel tabs.
-  chat: {
-    categories: {
-      hide: 'Hide {category} lines in the All view',
-      show: 'Show {category} lines in the All view',
-      game: 'Game',
-      loot: 'Loot',
-      xp: 'XP',
-      quest: 'Quests',
-      event: 'Events',
-      public: 'Public',
-      party: 'Party',
-      guild: 'Guild',
-      channels: 'Channels',
-      whispers: 'Whispers',
-    },
-  },
   swing: {
     ready: 'Swing',
     seconds: '{seconds}s',
@@ -802,6 +784,10 @@ export const hudChromeStrings = {
       'Auto picks desktop or touch controls from your device. Choose Desktop to force keyboard and mouse (useful on a tablet with a keyboard), or Touch for the on-screen controls.',
     // Audio panel toggle for the per-footfall step clips (off by default).
     footstepSounds: 'Footstep Sounds',
+    // Audio panel toggle for the discrete interface and feedback cues (loot, level,
+    // quest, whisper, and the combat miss/dodge/parry beeps; on by default). Off
+    // silences just those without touching the SFX volume or the world sounds.
+    interfaceSounds: 'Interface and Feedback Sounds',
     // Toggle for the OSRS-style click-feedback marker: entity targets and
     // click-to-move destinations (on by default).
     clickFeedback: 'Click Marker',
@@ -1549,7 +1535,7 @@ export const hudChromeStrings = {
     imbueRange: 'Weapon imbued: {min} to {max} bonus damage on Verdict',
     stealth: 'Concealed; movement speed reduced by {pct}%',
     formBear: 'Bruin Form: increased health and armor',
-    formCat: 'Cat Form: melee damage and energy',
+    formCat: 'Wolf Form: melee damage and energy',
     formTravel: 'Fleet Form: movement speed increased by {pct}%',
     defensiveStance: 'Guarded Stance: reduced damage taken, more threat',
     righteousFury: 'Burning Oath: greatly increased threat from Holy damage',

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { CRAFTING_HUB_MIN_LEVEL, CRAFTING_HUB_POS } from '../src/sim/content/professions';
 import {
+  CASTER_HUB_RECIPES,
   COMBO_RECIPES,
   COMMON_RECIPES,
   recipeById,
@@ -78,6 +79,78 @@ describe('TOOL_RECIPES (#1135 de-stub): tier 4/5 tool recipes', () => {
     expect(sim.countItem('thorium_ore', pid)).toBe(0);
     expect(sim.countItem('mithril_mining_pick', pid)).toBe(0);
     expect(sim.countItem('thorium_mining_pick', pid)).toBe(1);
+  });
+});
+
+describe('caster-stat (int/spi) crafting recipes', () => {
+  const CASTER_COMMON_IDS = [
+    'recipe_eastbrook_ritual_vestments',
+    'recipe_eastbrook_druids_hide',
+    'recipe_eastbrook_warded_leggings',
+  ];
+
+  it('COMMON_RECIPES has one free-floor caster piece per tailoring/leatherworking/armorcrafting', () => {
+    const casterCommon = COMMON_RECIPES.filter((r) => CASTER_COMMON_IDS.includes(r.id));
+    expect(casterCommon.length).toBe(3);
+    const professionIds = casterCommon.map((r) => r.professionId).sort();
+    expect(professionIds).toEqual(['armorcrafting', 'leatherworking', 'tailoring']);
+    for (const recipe of casterCommon) {
+      expect(recipe.skillReq).toBe(0);
+      expect(recipe.requiresHubStation).toBeUndefined();
+    }
+  });
+
+  it('CASTER_HUB_RECIPES defines one hub-gated int/spi piece per tailoring/leatherworking/armorcrafting', () => {
+    expect(CASTER_HUB_RECIPES.length).toBe(3);
+    const professionIds = CASTER_HUB_RECIPES.map((r) => r.professionId).sort();
+    expect(professionIds).toEqual(['armorcrafting', 'leatherworking', 'tailoring']);
+    for (const recipe of CASTER_HUB_RECIPES) {
+      expect(recipe.requiresHubStation).toBe(true);
+      expect(recipe.skillReq).toBeGreaterThan(0);
+      expect(recipe.reagents.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('recipeById resolves every caster-tier recipe', () => {
+    for (const recipe of [
+      ...COMMON_RECIPES.filter((r) => CASTER_COMMON_IDS.includes(r.id)),
+      ...CASTER_HUB_RECIPES,
+    ]) {
+      expect(recipeById(recipe.id)?.id).toBe(recipe.id);
+    }
+  });
+
+  it('crafts the common-tier tailoring caster piece from its reagents', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const recipe = recipeById('recipe_eastbrook_ritual_vestments')!;
+    grantItem(sim, 'linen_scrap', 3, pid);
+    grantItem(sim, 'spider_leg', 1, pid);
+
+    const result = resolveCraft((sim as any).ctx, pid, recipe.id);
+
+    expect(result.ok).toBe(true);
+    expect(sim.countItem('linen_scrap', pid)).toBe(0);
+    expect(sim.countItem('spider_leg', pid)).toBe(0);
+    expect(sim.countItem('eastbrook_ritual_vestments', pid)).toBe(1);
+  });
+
+  it('crafts the hub-tier armorcrafting caster piece once station-gated and reagents held', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const recipe = recipeById('recipe_sootscale_mantle')!;
+    sim.setPlayerLevel(CRAFTING_HUB_MIN_LEVEL);
+    const entity = (sim as any).entities.get(pid);
+    entity.pos.x = CRAFTING_HUB_POS.x;
+    entity.pos.z = CRAFTING_HUB_POS.z;
+    entity.prevPos = { ...entity.pos };
+    grantItem(sim, 'thorium_ore', 4, pid);
+    grantItem(sim, 'bone_fragments', 2, pid);
+
+    const result = resolveCraft((sim as any).ctx, pid, recipe.id);
+
+    expect(result.ok).toBe(true);
+    expect(sim.countItem('sootscale_mantle', pid)).toBe(1);
   });
 });
 
@@ -291,9 +364,14 @@ describe('craftItem command (#1127)', () => {
 
   it('the IWorld recipeList read surface exposes every recipe, common, tool, and combo alike (#1132 review)', () => {
     const sim = makeSim();
-    const allIds = [...COMMON_RECIPES, ...TOOL_RECIPES, ...COMBO_RECIPES].map((r) => r.id).sort();
+    const allIds = [...COMMON_RECIPES, ...TOOL_RECIPES, ...CASTER_HUB_RECIPES, ...COMBO_RECIPES]
+      .map((r) => r.id)
+      .sort();
     expect(sim.recipeList.length).toBe(
-      COMMON_RECIPES.length + TOOL_RECIPES.length + COMBO_RECIPES.length,
+      COMMON_RECIPES.length +
+        TOOL_RECIPES.length +
+        CASTER_HUB_RECIPES.length +
+        COMBO_RECIPES.length,
     );
     expect(sim.recipeList.map((r) => r.id).sort()).toEqual(allIds);
   });

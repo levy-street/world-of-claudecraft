@@ -6,10 +6,10 @@
 # src/ - client & shared simulation source
 
 Everything the browser client needs plus the shared game core. Directories with
-their own CLAUDE.md: `sim/` (+ `sim/content/`, `sim/professions/`), `render/`
-(+ `render/characters/`), `game/`, `ui/`, `styles/`, `net/`, `admin/`, `guide/`
-(+ `guide/viewer/`), plus `world_api/` and `editor/` (below). Read the local one
-before working in an area.
+their own CLAUDE.md: `sim/` (+ `sim/content/`, `sim/professions/`, `sim/pvp/`),
+`render/` (+ `render/characters/`), `game/`, `ui/` (+ `ui/hud/`), `styles/`,
+`net/`, `admin/`, `guide/` (+ `guide/viewer/`), plus `world_api/` and `editor/`
+(below). Read the local one before working in an area.
 
 ## Entries (what loads what)
 - `index.html` AND `play.html` both load `src/main.ts`. Guard index-only DOM
