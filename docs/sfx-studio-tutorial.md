@@ -12,12 +12,11 @@ Studio export.
 
 ## 1. Start the Studio
 
-Install dependencies and confirm that FFmpeg and FFprobe are available:
+Install dependencies (this also downloads the bundled FFmpeg and FFprobe static
+binaries the Studio spawns; no system install is needed) and start the Studio:
 
 ```bash
 npm ci
-ffmpeg -version
-ffprobe -version
 npm run sfx:studio
 ```
 
@@ -193,7 +192,7 @@ fails instead of silently dropping `_2`, `_3`, or any later orphan after a gap.
 
 The same discovery path supports constrained mob subfamily files such as
 `mob_beast_wolf_attack_1.mp3`. Their action must be `aggro`, `attack`, `death`,
-or `hurt`.
+`hurt`, or `idle`.
 
 ## 9. Export everything for production
 
@@ -284,7 +283,11 @@ npm run gate
 ## Troubleshooting
 
 `FFmpeg is unavailable`
-: Install FFmpeg and FFprobe and ensure both commands are on `PATH`.
+: The bundled `ffmpeg-static`/`ffprobe-static` binaries are missing (an install
+  that skipped package scripts leaves them undownloaded). Rerun `npm ci`. A `PATH`
+  FFmpeg install only restores playback and encoding (which fall back via
+  `scripts/sfx/ffmpeg_paths.mjs`); the production bundle export validates with the
+  static binaries directly and stays broken until they are reinstalled.
 
 `another SFX Studio server is already using this repository`
 : Stop the earlier process. If it crashed, rerun after confirming no Studio

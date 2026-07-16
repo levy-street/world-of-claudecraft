@@ -22,6 +22,13 @@ describe('classifyDiff', () => {
     expect(plan.generic).toHaveLength(0);
   });
 
+  it('maps the tank cooldown regression suite to its focused visual target', () => {
+    const plan = classifyDiff(['tests/tank_defensive_cds.test.ts']);
+    expect(plan.isVisual).toBe(true);
+    expect(plan.specific.map((t: { key: string }) => t.key)).toEqual(['tank-defensive-cds']);
+    expect(plan.specific[0].variants).toHaveLength(4);
+  });
+
   it('maps a zone/terrain change to the world-map target', () => {
     const plan = classifyDiff(['src/render/terrain.ts']);
     expect(plan.specific.map((t: { key: string }) => t.key)).toContain('world-map');

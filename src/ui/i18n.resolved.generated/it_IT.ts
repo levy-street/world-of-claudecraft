@@ -20,6 +20,154 @@ export const it_IT: EnTranslations = {
     "rp": "GdR",
     "rpPvp": "GdR-PvP"
   },
+  "devCommand": {
+    "dialogLabel": "Developer Command Center",
+    "kicker": "Development tools",
+    "title": "Command Center",
+    "subtitle": "Authoritative test controls for the active world.",
+    "closeAria": "Close developer commands",
+    "categoryNavAria": "Developer command categories",
+    "categories": {
+      "player": "Player",
+      "spawns": "Spawns",
+      "inventory": "Inventory",
+      "progress": "Progress",
+      "travel": "Travel",
+      "scenarios": "Scenarios"
+    },
+    "filterLabel": "Filter commands",
+    "filterPlaceholder": "Search this category",
+    "noMatches": "No matching commands.",
+    "serverRequirement": "Server cheats still require ALLOW_DEV_COMMANDS=1.",
+    "invalidValues": "Choose valid values before running this command.",
+    "sent": "Sent: {command}",
+    "run": "Run",
+    "fields": {
+      "level": "Level",
+      "mob": "Mob",
+      "count": "Count",
+      "item": "Item",
+      "gold": "Gold",
+      "quest": "Quest",
+      "profession": "Profession",
+      "amount": "Amount",
+      "x": "X",
+      "z": "Z",
+      "dungeon": "Dungeon",
+      "difficulty": "Difficulty",
+      "name": "Name"
+    },
+    "difficulty": {
+      "normal": "Normal",
+      "heroic": "Heroic"
+    },
+    "actions": {
+      "heal": {
+        "label": "Restore health",
+        "description": "Fill the health pool."
+      },
+      "resource": {
+        "label": "Restore resource",
+        "description": "Fill mana, rage, or energy."
+      },
+      "cooldowns": {
+        "label": "Clear cooldowns",
+        "description": "Reset ability, GCD, and potion timers."
+      },
+      "god": {
+        "label": "Toggle god mode",
+        "description": "Toggle invulnerability and boosted damage."
+      },
+      "revive": {
+        "label": "Revive",
+        "description": "Revive through the normal resurrection path."
+      },
+      "kill": {
+        "label": "Kill player",
+        "description": "Test death, ghost, and corpse flows."
+      },
+      "combatreset": {
+        "label": "Reset combat",
+        "description": "Clear combat state and hostile threat."
+      },
+      "level": {
+        "label": "Set level",
+        "description": "Set the current character level."
+      },
+      "spawn": {
+        "label": "Spawn mob",
+        "description": "Create a concrete mob near the player."
+      },
+      "killtarget": {
+        "label": "Kill target",
+        "description": "Kill the selected living mob."
+      },
+      "despawntarget": {
+        "label": "Despawn target",
+        "description": "Remove a selected mob created by this tool."
+      },
+      "despawnall": {
+        "label": "Clear my spawns",
+        "description": "Remove every mob spawned by this developer."
+      },
+      "give": {
+        "label": "Give item",
+        "description": "Add an item to the player inventory."
+      },
+      "gold": {
+        "label": "Add gold",
+        "description": "Add gold to the current purse."
+      },
+      "quest": {
+        "label": "Complete quest",
+        "description": "Complete a specific quest by id."
+      },
+      "quests": {
+        "label": "Complete active quests",
+        "description": "Complete every quest in the current log."
+      },
+      "attune": {
+        "label": "Unlock attunements",
+        "description": "Mark all attunement requirements complete."
+      },
+      "gather": {
+        "label": "Grant gathering skill",
+        "description": "Increase a gathering profession."
+      },
+      "teleport": {
+        "label": "Teleport",
+        "description": "Move to exact world coordinates."
+      },
+      "dungeon": {
+        "label": "Enter dungeon",
+        "description": "Enter a dungeon with dev gate bypass."
+      },
+      "raid": {
+        "label": "Enter raid",
+        "description": "Enter the Nythraxis arena directly."
+      },
+      "raidreset": {
+        "label": "Reset raid lockout",
+        "description": "Clear the current raid lockouts."
+      },
+      "bot": {
+        "label": "Spawn social bot",
+        "description": "Create a whisperable stationary player."
+      },
+      "lfgqueue": {
+        "label": "Seed finder queue",
+        "description": "Create a Dungeon Finder queue scenario."
+      },
+      "lfgraid": {
+        "label": "Seed raid finder",
+        "description": "Create a raid finder scenario."
+      },
+      "lfgboard": {
+        "label": "Seed listing board",
+        "description": "Create a premade listing scenario."
+      }
+    }
+  },
   "game": {
     "xp": {
       "suffix": "PE",
@@ -203,6 +351,7 @@ export const it_IT: EnTranslations = {
       "remainingLessThanMinute": "<1m",
       "remainingMinutes": "{minutes}m",
       "remainingHoursMinutes": "{hours}h {minutes}m",
+      "remainingDaysHours": "{days}d {hours}h",
       "score": "Punteggio",
       "walletValue": "Valore del portafoglio (WOC)",
       "usd": "{amount} USD",
@@ -241,7 +390,8 @@ export const it_IT: EnTranslations = {
         "no_wallet": "Collega un portafoglio con almeno 20 USD in WOC.",
         "under_minimum": "Il portafoglio è sotto il minimo di 20 USD in WOC.",
         "price_unavailable": "Il prezzo di WOC non è disponibile, le ricompense sono temporaneamente bloccate.",
-        "banned": "Sei escluso dalle Ricompense giornaliere. Motivo: {reason}"
+        "banned": "Sei escluso dalle Ricompense giornaliere. Motivo: {reason}",
+        "bannedUntil": "You are banned from Daily Rewards for another {remaining}. Access returns {until}. Reason: {reason}"
       }
     },
     "wocStore": {
@@ -466,6 +616,7 @@ export const it_IT: EnTranslations = {
       "balanceLabel": "Saldo",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL: {amount}",
+      "usdcBalance": "USDC: {amount}",
       "wocBalance": "WOC: {amount}",
       "unavailable": "Il negozio Claudium non è disponibile al momento. Il tuo saldo e i tuoi acquisti non subiranno modifiche. Riprova tra poco.",
       "disclosure": "Claudium è una valuta virtuale a senso unico: puoi acquistarlo con denaro reale e spenderlo in cosmetici. Non può essere riscattato, trasferito o convertito in denaro.",
@@ -473,6 +624,7 @@ export const it_IT: EnTranslations = {
       "railLabel": "Metodo di pagamento",
       "railStripe": "Carta",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "20% di sconto",
       "railWocUnavailable": "I prezzi WOC non sono disponibili al momento.",
@@ -618,13 +770,13 @@ export const it_IT: EnTranslations = {
       "update": "Aggiorna"
     },
     "cameraPrompt": {
-      "title": "Choose Your Camera",
-      "intro": "Pick how the camera follows your character.",
-      "mouseDesc": "Move the mouse to turn the camera without holding a button.",
-      "classicTitle": "Classic Camera",
-      "classicDesc": "Hold right-click and move the mouse to turn the camera.",
-      "changeLater": "You can change this later under Esc, Key Bindings.",
-      "confirm": "Confirm"
+      "title": "Scegli la Telecamera",
+      "intro": "Scegli come la telecamera segue il tuo personaggio.",
+      "mouseDesc": "Muovi il mouse per ruotare la telecamera senza tenere premuto alcun pulsante.",
+      "classicTitle": "Telecamera Classica",
+      "classicDesc": "Tieni premuto il clic destro e muovi il mouse per ruotare la telecamera.",
+      "changeLater": "Puoi modificarlo in seguito tramite Esc, Tasti di scelta rapida.",
+      "confirm": "Conferma"
     },
     "castBar": {
       "playerAria": "La tua barra di lancio",
@@ -672,11 +824,11 @@ export const it_IT: EnTranslations = {
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m}m {s}s",
       "seconds": "{s}s",
-      "autoShowHint": "Rows appear automatically once your party deals damage or healing, and this segment closes a few seconds after combat ends."
+      "autoShowHint": "Le righe appaiono automaticamente non appena il tuo gruppo infligge danni o cura, e questo pannello si chiude qualche secondo dopo la fine del combattimento."
     },
     "petFeed": {
-      "disabledFullHp": "Pet is at full health",
-      "disabledNoFood": "No food in your bags will heal your pet"
+      "disabledFullHp": "Il famiglio e a salute piena",
+      "disabledNoFood": "Nessun cibo nelle borse curera il tuo famiglio"
     },
     "keybinds": {
       "emoteWheel": "Ruota emote",
@@ -684,6 +836,7 @@ export const it_IT: EnTranslations = {
       "targetFriendlyNext": "Scorri i bersagli amici",
       "discord": "Discord",
       "valecup": "Coppa della Valle",
+      "sheathe": "Fodera/Sfodera Arma",
       "categoryPet": "Famiglio",
       "petAttack": "Famiglio: attacca",
       "petStop": "Famiglio: fermo",
@@ -856,6 +1009,7 @@ export const it_IT: EnTranslations = {
       "aurasOnPlayerFrame": "Buff sul riquadro del giocatore",
       "highContrastBackground": "Sfondo a contrasto elevato",
       "startAttackOnAbility": "Attacco automatico all'uso dell'abilita",
+      "showAttackButton": "Mostra Pulsante Attacco",
       "walkByAutoloot": "Raccolta automatica al passaggio",
       "groundReticle": "Reticolo di puntamento a terra",
       "showItemLevel": "Mostra livello oggetto",
@@ -977,6 +1131,7 @@ export const it_IT: EnTranslations = {
         "spellPower": "Potere Magico",
         "critRating": "Indice di critico",
         "hasteRating": "Indice di celerità",
+        "hitRating": "Valutazione Colpo",
         "warfare": "Guerra"
       },
       "warfareValue": "+{increase}% inflitti / -{reduction}% subiti",
@@ -994,6 +1149,7 @@ export const it_IT: EnTranslations = {
         "dodge": "La tua probabilità di evitare completamente un attacco in mischia in arrivo, senza subire danni.",
         "critRating": "Indice di critico dal tuo equipaggiamento e dai bonus di set, che aumenta la tua probabilità di colpo critico. Circa 10 punti conferiscono l'1% di critico.",
         "hasteRating": "Indice di celerità dal tuo equipaggiamento e dai bonus di set, che accelera i tuoi attacchi e i tuoi lanci. Circa 10 punti conferiscono l'1% di celerità.",
+        "hitRating": "Valutazione colpo dall'equipaggiamento e dai bonus di set, che riduce la frequenza con cui i tuoi attacchi mancano e i tuoi incantesimi vengono resistiti, specialmente contro nemici di livello superiore. Circa 10 punti di valutazione concedono l'1% di colpo.",
         "warfare": "Aumenta il danno inflitto ai giocatori del {increase}% e riduce il danno subito dai giocatori del {reduction}%."
       },
       "effects": {
@@ -1067,6 +1223,12 @@ export const it_IT: EnTranslations = {
         "few": "sei {rank}, {count} membri",
         "many": "sei {rank}, {count} membri",
         "other": "sei {rank}, {count} membri"
+      },
+      "finderPartySize": {
+        "one": "{count} giocatore",
+        "few": "{count} giocatori",
+        "many": "{count} giocatori",
+        "other": "{count} giocatori"
       },
       "characterCount": {
         "one": "{count} personaggio",
@@ -1273,11 +1435,27 @@ export const it_IT: EnTranslations = {
     },
     "dungeonDifficulty": {
       "setHeroic": "Imposta difficoltà del dungeon: Eroica",
-      "setNormal": "Imposta difficoltà del dungeon: Normale"
+      "setNormal": "Imposta difficoltà del dungeon: Normale",
+      "resetAll": "Reimposta tutte le istanze",
+      "resetDone": "Tutte le istanze sono state reimpostate.",
+      "resetNone": "Non hai istanze da reimpostare.",
+      "resetOccupied": "Non puoi reimpostare le istanze mentre c'è ancora qualcuno all'interno.",
+      "resetSameDifficulty": "Cambia la difficoltà del dungeon prima di reimpostare queste istanze. Le istanze vuote si reimpostano automaticamente dopo 5 minuti.",
+      "resetLoot": "Non puoi reimpostare le istanze mentre c'è ancora del bottino all'interno.",
+      "resetConfirmTitle": "Reimpostare tutte le istanze?",
+      "resetConfirmBody": "Questo abbandona le istanze vuote della difficoltà selezionata in precedenza. Il bottino non raccolto impedirà la reimpostazione.",
+      "resetConfirm": "Reimposta istanze",
+      "resetCooldown": "Le istanze possono essere reimpostate solo una volta ogni 5 minuti.",
+      "resetUsage": "Usa /dungeon reset per abbandonare le istanze vuote dopo aver cambiato difficoltà.",
+      "entryMismatchNormal": "Questa istanza è impostata sulla difficoltà Normale. Usa Reimposta tutte le istanze per iniziare una nuova sessione Eroica.",
+      "entryMismatchHeroic": "Questa istanza è impostata sulla difficoltà Eroica. Usa Reimposta tutte le istanze per iniziare una nuova sessione Normale."
     },
     "bags": {
       "cannotDestroy": "Questo oggetto non può essere distrutto.",
-      "rightClickDestroy": "Shift+right-click to destroy",
+      "rightClickDestroy": "Clic destro per distruggere",
+      "dragEquipHint": "Trascina sul personaggio per equipaggiare",
+      "dragDestroyHint": "Trascina nel mondo per distruggere",
+      "reorderNeedsRecent": "Rimuovi il filtro e ordina per Recenti per riorganizzare le borse",
       "filterGroupAria": "Filtra le borse per categoria",
       "filterAll": "Tutti",
       "filterWeapon": "Armi",
@@ -1350,6 +1528,8 @@ export const it_IT: EnTranslations = {
       },
       "dodge": "Aumenta la probabilità di schivata del {pct}%",
       "dodgeReduce": "Riduce la probabilità di schivata del {pct}%",
+      "damageReduction": "Riduce tutti i danni subiti del {pct}%",
+      "guardianWard": "Il prossimo colpo nemico letale ti ripristina al {pct}% della salute",
       "armorFlat": "Riduce l'armatura di {value}",
       "armorFlatStacks": "Riduce l'armatura di {value} ({stacks} accumuli)",
       "armorPct": "Riduce l'armatura del {pct}%",
@@ -1438,6 +1618,33 @@ export const it_IT: EnTranslations = {
       "unlock": "Sposta il riquadro del giocatore",
       "lock": "Blocca il riquadro del giocatore"
     },
+    "partyFrames": {
+      "section": "Party and Raid Frames",
+      "unlock": "Move party and raid frames",
+      "lock": "Lock party and raid frames",
+      "style": "Frame Style",
+      "styleAutomatic": "Automatic",
+      "styleClassic": "Classic Party Frames",
+      "styleRaid": "Raid Frames",
+      "scale": "Frame Scale",
+      "width": "Frame Width",
+      "height": "Frame Height",
+      "spacing": "Frame Spacing",
+      "columns": "Raid Columns",
+      "healthText": "Health Text",
+      "healthNone": "None",
+      "healthPercent": "Percent",
+      "healthCurrent": "Current",
+      "healthCurrentMax": "Current / Max",
+      "sort": "Sort Players",
+      "sortGroup": "Group",
+      "sortRole": "Role",
+      "sortName": "Name",
+      "showResource": "Show Mana, Rage, and Energy",
+      "showAbsorbs": "Show Absorb Shields",
+      "showAuras": "Show Buffs and Debuffs",
+      "showSelf": "Show Your Frame"
+    },
     "frameReset": {
       "label": "Ripristina le posizioni dei riquadri"
     },
@@ -1478,7 +1685,7 @@ export const it_IT: EnTranslations = {
         "benefits": "Collega il tuo Discord per ottenere punti dal gioco e dall'attivita nella comunita, e scalare i gradi di stato.",
         "error": "Impossibile collegare Discord. Riprova.",
         "success": "Discord collegato.",
-        "joinServer": "Just join the Discord server"
+        "joinServer": "Unisciti al server Discord"
       },
       "choice": {
         "title": "Continua con Discord",
@@ -1526,13 +1733,13 @@ export const it_IT: EnTranslations = {
         "admin": "Admin",
         "coredevs": "Sviluppatore Principale",
         "devs": "Dev",
-        "seniormods": "Senior Mod",
+        "seniormods": "Moderatore Senior",
         "mods": "Mod",
-        "juniormods": "Junior Mod",
+        "juniormods": "Moderatore Junior",
         "artists": "Artista",
-        "contentcreator": "Content Creator",
-        "legend": "LEGEND",
-        "shill": "SHILL"
+        "contentcreator": "Creatore di Contenuti",
+        "legend": "LEGGENDA",
+        "shill": "SOSTENITORE"
       },
       "guildMember": "Membro verificato",
       "notMember": "Non ancora nel server",
@@ -1799,7 +2006,8 @@ export const it_IT: EnTranslations = {
       "title": "Raccolta",
       "mining": "Estrazione mineraria",
       "logging": "Taglio del legname",
-      "herbalism": "Erbalismo"
+      "herbalism": "Erbalismo",
+      "notReady": "Questo nodo di risorse non e ancora rispawnato per te."
     },
     "archetypeTitle": {
       "label": "Titolo",
@@ -1831,6 +2039,107 @@ export const it_IT: EnTranslations = {
       "notAtHub": "Devi trovarti alla postazione artigiana, al livello richiesto, per fabbricarlo.",
       "throttled": "Stai fabbricando troppo in fretta. Aspetta un momento e riprova.",
       "recipeNotLearned": "Non hai ancora imparato quella ricetta."
+    },
+    "finder": {
+      "title": "Cercatore di Dungeon",
+      "close": "Chiudi",
+      "back": "Indietro",
+      "syncing": "In attesa del reame...",
+      "tabCatalogue": "Catalogo",
+      "tabQueue": "Partita Rapida",
+      "tabBoard": "Gruppi Prefissati",
+      "normal": "Normale",
+      "heroic": "Eroico",
+      "kindDungeon": "Dungeon",
+      "kindRaid": "Incursione",
+      "kindSolo": "Avventura in solitario",
+      "levels": "Livelli da {min} a {max}",
+      "levelOne": "Livello {level}",
+      "clock": "{minutes}:{seconds}",
+      "roleCount": "{count} {role}",
+      "roleTank": "Tank",
+      "roleHealer": "Guaritore",
+      "roleDps": "Danno",
+      "freeRoles": "Qualsiasi ruolo benvenuto",
+      "lockoutDaily": "Blocco giornaliero sul boss finale",
+      "lockoutNone": "Nessun blocco",
+      "lockedFor": "Bloccato per circa {minutes} min",
+      "attunement": "Richiede sintonia: {quest}",
+      "heroicMarks": "Marchi Eroici: {count} per giocatore",
+      "entrance": "Ingresso: {zone}",
+      "showOnMap": "Mostra sulla Mappa",
+      "encounters": "Scontri",
+      "finalBoss": "Boss finale",
+      "summoned": "Guardiano evocato",
+      "lootGuaranteed": "Uno di questi cade sempre:",
+      "lootMaybe": "Al massimo uno di questi puo cadere:",
+      "lootChance": "Possibilita di bottino aggiuntivo:",
+      "lootHeroic": "Bonus eroico, uno di questi cade sempre:",
+      "pct": "{pct}%",
+      "blockedLevel": "Solo livelli da {min} a {max}",
+      "blockedSpec": "Richiede una specializzazione",
+      "yourRoles": "I tuoi ruoli",
+      "needsSpec": "Scegli una specializzazione per usare il Cercatore di Dungeon.",
+      "leaderNote": "Solo il capo gruppo puo mettere il gruppo in coda.",
+      "chooseActivities": "Scegli le attivita",
+      "joinQueue": "Unisciti alla coda",
+      "leaveQueue": "Lascia la coda",
+      "waited": "Tempo in coda: {time}",
+      "cooldownNote": "Potrai accodarti di nuovo tra {seconds}s.",
+      "travelNote": "Il gruppo si forma dove si trovano tutti. Raggiungi l'ingresso insieme agli altri; nessuno viene teletrasportato.",
+      "proposalTitle": "Gruppo trovato: {name}",
+      "proposalRole": "Il tuo ruolo: {role}",
+      "accepted": "{accepted} di {size} confermati",
+      "remaining": "{seconds}s per rispondere",
+      "accept": "Accetta",
+      "decline": "Rifiuta",
+      "acceptedWait": "In attesa degli altri...",
+      "slotState": "{role}: {accepted} di {total} pronti",
+      "openListings": "Annunci aperti",
+      "boardEmpty": "Nessun annuncio al momento. Pubblica il tuo!",
+      "boardLeaderGate": "Solo il capo gruppo puo pubblicare un annuncio.",
+      "publishListing": "Pubblica un annuncio",
+      "activity": "Attivita",
+      "publish": "Pubblica",
+      "yourListing": "Il tuo annuncio",
+      "closeListing": "Chiudi annuncio",
+      "applicants": "Candidati",
+      "noApplicants": "Ancora nessun candidato.",
+      "acceptApplicantAria": "Accetta {name}",
+      "declineApplicantAria": "Rifiuta {name}",
+      "levelClass": "Lv {level} {className}",
+      "leader": "Capo: {name}",
+      "needs": "Cerca {roles}",
+      "slots": "{size}/{capacity}",
+      "apply": "Candidati",
+      "withdraw": "Ritira candidatura",
+      "tagFirstRun": "Prima corsa",
+      "tagQuestRun": "Corsa missioni",
+      "tagFullClear": "Pulizia completa",
+      "tagLearning": "Principianti benvenuti",
+      "tagFastRun": "Corsa veloce",
+      "mech": {
+        "shadow_pulse": "Impulso d'Ombra (danno ad area pulsante)",
+        "reaping_arc": "Arco Mietitore (fendente frontale)",
+        "mist_surge": "Ondata di Nebbia (danno ad area pulsante)",
+        "summons_adds": "Evoca rinforzi",
+        "lunar_tide": "Marea Lunare (danno ad area pulsante)",
+        "enrage": "Va in furia con poca salute",
+        "shuddering_stomp": "Pestata Tremenda (stordimento ad area)",
+        "necrotic_shockwave": "Onda d'Urto Necrotica (danno ad area pesante)",
+        "grave_cleaver": "Tranciatumba (fendente frontale)",
+        "shadow_nova": "Nova d'Ombra (esplosione ad area)",
+        "profane_mending": "Cura Profana (cura i propri alleati)",
+        "mana_burn": "Benedizione Avvizzita (brucia mana)",
+        "deathstalker_cleave": "Fendente del Cacciatore di Morti (fendente frontale)",
+        "mortal_wound": "Ferita Dimenticata (riduce le cure ricevute)",
+        "sealbreak_shockwave": "Onda d'Urto Spezzasigillo (esplosione ad area)",
+        "gravebreaker": "Frantumatore di Tombe (cono frontale, voltalo lontano dall'incursione)",
+        "raise_fallen": "Richiama i Caduti (ondate periodiche di rinforzi)",
+        "soul_rend": "Squarcio dell'Anima (i giocatori segnati devono disperdersi ed essere curati)",
+        "deathless_rage": "Furia Immortale (interrotta alle pietre di guardia)",
+        "wardstones": "Canalizzazione delle pietre di guardia (transizione di fase)"
+      }
     },
     "deeds": {
       "title": "Libro delle Imprese",
@@ -2573,8 +2882,8 @@ export const it_IT: EnTranslations = {
         "desc": "Creature squamose e serpentine delle antiche profondità. Rare, fiere e ben più forti di quanto sembrino."
       },
       "reptile": {
-        "name": "Reptiles",
-        "desc": "Cold-blooded hunters with a hiss and a snap all their own, distinct from the warm-blooded beasts."
+        "name": "Rettili",
+        "desc": "Cacciatori a sangue freddo con un sibilo e uno scatto tutti loro, ben distinti dalle bestie a sangue caldo."
       }
     },
     "worldPage": {
@@ -3596,6 +3905,7 @@ export const it_IT: EnTranslations = {
     "title": "Scarica il launcher per desktop",
     "desc": "Ottieni il launcher autonomo per prestazioni ottimizzate e gioco a schermo intero.",
     "macCta": "Scarica per macOS",
+    "windowsCta": "Scarica per Windows",
     "linuxCta": "Scarica per Linux",
     "linuxHint": "AppImage: rendilo eseguibile, quindi eseguilo. Nessuna installazione necessaria.",
     "windowsPending": "Build Windows in arrivo."
@@ -4483,6 +4793,8 @@ export const it_IT: EnTranslations = {
     "connectionLost": "Connessione al server persa.",
     "reconnecting": "Connessione persa. Riconnessione...",
     "connectionRejected": "Il server ha chiuso la connessione.",
+    "realmFull": "Questo mondo e al completo in questo momento. Riprova tra qualche minuto.",
+    "tooManyConnections": "Troppe connessioni a questo mondo provengono dalla tua rete. Chiudi le finestre di gioco extra o riprova tra qualche minuto.",
     "tips": {
       "classes": "Suggerimento: ciascuna delle 9 classi si gioca in modo diverso. Provane alcune prima di sceglierne una.",
       "talents": "Suggerimento: puoi azzerare i talenti ogni volta che sei fuori combattimento, quindi una scelta iniziale non è mai definitiva.",
@@ -5249,6 +5561,7 @@ export const it_IT: EnTranslations = {
     "actionBar": {
       "attackName": "Attacca",
       "attackTooltip": "Attiva o disattiva l'autoattacco sul bersaglio. Anche il clic destro su un nemico attacca.",
+      "attackRemoveHint": "Clic destro per rimuoverlo dalla barra e liberare lo slot.",
       "emptySlot": "Slot vuoto",
       "slotAria": "Slot azione {slot}: {ability}",
       "emptySlotAria": "Slot azione {slot}: vuoto",
@@ -6164,6 +6477,18 @@ export const it_IT: EnTranslations = {
       "barkskin": {
         "name": "Scorza di Quercia",
         "description": "La tua pelle si indurisce come corteccia, aumentando l'armatura di 150 per 15 s."
+      },
+      "ironhold": {
+        "name": "Fortezza di Ferro",
+        "description": "Ti ripari dietro la guardia, riducendo tutti i danni subiti del 40% per 8 sec."
+      },
+      "sacred_bulwark": {
+        "name": "Bastione Sacro",
+        "description": "Per {duration} sec, il prossimo colpo nemico che ti ucciderebbe viene negato, ripristinandoti invece al 35% della salute."
+      },
+      "primal_reflexes": {
+        "name": "Riflessi Primordiali",
+        "description": "I tuoi istinti si affilano, aumentando la possibilita di schivata del 50% per 6 sec."
       },
       "starfire": {
         "name": "Caduta Celeste",

@@ -82,11 +82,13 @@ export interface InputCallbacks {
       | 'social'
       | 'arena'
       | 'valecup'
+      | 'dungeonFinder'
       | 'leaderboard'
       | 'calendar'
       | 'discord'
       | 'deeds'
-      | 'crafting',
+      | 'crafting'
+      | 'sheathe',
   ): void;
   onEmoteWheel(open: boolean): void;
   onClickPick(x: number, y: number, button: number): void;
@@ -895,6 +897,9 @@ export class Input {
       case 'arena':
         this.cb.onUiKey('arena');
         return;
+      case 'dungeonFinder':
+        this.cb.onUiKey('dungeonFinder');
+        return;
       case 'valecup':
         this.cb.onUiKey('valecup');
         return;
@@ -912,6 +917,9 @@ export class Input {
         return;
       case 'chat':
         this.cb.onUiKey('chat');
+        return;
+      case 'sheathe':
+        this.cb.onUiKey('sheathe');
         return;
     }
   }

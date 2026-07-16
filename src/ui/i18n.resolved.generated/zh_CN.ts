@@ -20,6 +20,154 @@ export const zh_CN: EnTranslations = {
     "rp": "RP",
     "rpPvp": "RP-PvP"
   },
+  "devCommand": {
+    "dialogLabel": "Developer Command Center",
+    "kicker": "Development tools",
+    "title": "Command Center",
+    "subtitle": "Authoritative test controls for the active world.",
+    "closeAria": "Close developer commands",
+    "categoryNavAria": "Developer command categories",
+    "categories": {
+      "player": "Player",
+      "spawns": "Spawns",
+      "inventory": "Inventory",
+      "progress": "Progress",
+      "travel": "Travel",
+      "scenarios": "Scenarios"
+    },
+    "filterLabel": "Filter commands",
+    "filterPlaceholder": "Search this category",
+    "noMatches": "No matching commands.",
+    "serverRequirement": "Server cheats still require ALLOW_DEV_COMMANDS=1.",
+    "invalidValues": "Choose valid values before running this command.",
+    "sent": "Sent: {command}",
+    "run": "Run",
+    "fields": {
+      "level": "Level",
+      "mob": "Mob",
+      "count": "Count",
+      "item": "Item",
+      "gold": "Gold",
+      "quest": "Quest",
+      "profession": "Profession",
+      "amount": "Amount",
+      "x": "X",
+      "z": "Z",
+      "dungeon": "Dungeon",
+      "difficulty": "Difficulty",
+      "name": "Name"
+    },
+    "difficulty": {
+      "normal": "Normal",
+      "heroic": "Heroic"
+    },
+    "actions": {
+      "heal": {
+        "label": "Restore health",
+        "description": "Fill the health pool."
+      },
+      "resource": {
+        "label": "Restore resource",
+        "description": "Fill mana, rage, or energy."
+      },
+      "cooldowns": {
+        "label": "Clear cooldowns",
+        "description": "Reset ability, GCD, and potion timers."
+      },
+      "god": {
+        "label": "Toggle god mode",
+        "description": "Toggle invulnerability and boosted damage."
+      },
+      "revive": {
+        "label": "Revive",
+        "description": "Revive through the normal resurrection path."
+      },
+      "kill": {
+        "label": "Kill player",
+        "description": "Test death, ghost, and corpse flows."
+      },
+      "combatreset": {
+        "label": "Reset combat",
+        "description": "Clear combat state and hostile threat."
+      },
+      "level": {
+        "label": "Set level",
+        "description": "Set the current character level."
+      },
+      "spawn": {
+        "label": "Spawn mob",
+        "description": "Create a concrete mob near the player."
+      },
+      "killtarget": {
+        "label": "Kill target",
+        "description": "Kill the selected living mob."
+      },
+      "despawntarget": {
+        "label": "Despawn target",
+        "description": "Remove a selected mob created by this tool."
+      },
+      "despawnall": {
+        "label": "Clear my spawns",
+        "description": "Remove every mob spawned by this developer."
+      },
+      "give": {
+        "label": "Give item",
+        "description": "Add an item to the player inventory."
+      },
+      "gold": {
+        "label": "Add gold",
+        "description": "Add gold to the current purse."
+      },
+      "quest": {
+        "label": "Complete quest",
+        "description": "Complete a specific quest by id."
+      },
+      "quests": {
+        "label": "Complete active quests",
+        "description": "Complete every quest in the current log."
+      },
+      "attune": {
+        "label": "Unlock attunements",
+        "description": "Mark all attunement requirements complete."
+      },
+      "gather": {
+        "label": "Grant gathering skill",
+        "description": "Increase a gathering profession."
+      },
+      "teleport": {
+        "label": "Teleport",
+        "description": "Move to exact world coordinates."
+      },
+      "dungeon": {
+        "label": "Enter dungeon",
+        "description": "Enter a dungeon with dev gate bypass."
+      },
+      "raid": {
+        "label": "Enter raid",
+        "description": "Enter the Nythraxis arena directly."
+      },
+      "raidreset": {
+        "label": "Reset raid lockout",
+        "description": "Clear the current raid lockouts."
+      },
+      "bot": {
+        "label": "Spawn social bot",
+        "description": "Create a whisperable stationary player."
+      },
+      "lfgqueue": {
+        "label": "Seed finder queue",
+        "description": "Create a Dungeon Finder queue scenario."
+      },
+      "lfgraid": {
+        "label": "Seed raid finder",
+        "description": "Create a raid finder scenario."
+      },
+      "lfgboard": {
+        "label": "Seed listing board",
+        "description": "Create a premade listing scenario."
+      }
+    }
+  },
   "game": {
     "xp": {
       "suffix": "经验",
@@ -203,6 +351,7 @@ export const zh_CN: EnTranslations = {
       "remainingLessThanMinute": "<1分",
       "remainingMinutes": "{minutes}分",
       "remainingHoursMinutes": "{hours}小时{minutes}分",
+      "remainingDaysHours": "{days}天{hours}小时",
       "score": "得分",
       "walletValue": "钱包价值 (WOC)",
       "usd": "{amount} USD",
@@ -241,7 +390,8 @@ export const zh_CN: EnTranslations = {
         "no_wallet": "请连接一个持有至少价值 $20 USD 的 WOC 的钱包。",
         "under_minimum": "钱包低于 $20 USD WOC 的最低要求。",
         "price_unavailable": "WOC 价格不可用，奖励暂时锁定。",
-        "banned": "您已被禁止参加每日奖励。原因：{reason}"
+        "banned": "您已被禁止参加每日奖励。原因：{reason}",
+        "bannedUntil": "您还将被禁止参加每日奖励 {remaining}。恢复时间：{until}。原因：{reason}"
       }
     },
     "wocStore": {
@@ -466,6 +616,7 @@ export const zh_CN: EnTranslations = {
       "balanceLabel": "余额",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL：{amount}",
+      "usdcBalance": "USDC: {amount}",
       "wocBalance": "WOC：{amount}",
       "unavailable": "Claudium 商店暂时不可用。您的余额和购买不会受到影响，请稍后再试。",
       "disclosure": "Claudium 是单向软货币：可用真钱购买并用于兑换外观物品，不能赎回、转让或兑现。",
@@ -473,6 +624,7 @@ export const zh_CN: EnTranslations = {
       "railLabel": "付款方式",
       "railStripe": "银行卡",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "优惠 20%",
       "railWocUnavailable": "WOC 定价暂时不可用。",
@@ -684,6 +836,7 @@ export const zh_CN: EnTranslations = {
       "targetFriendlyNext": "切换友方目标",
       "discord": "Discord",
       "valecup": "溪谷杯",
+      "sheathe": "收起/拔出武器",
       "categoryPet": "宠物",
       "petAttack": "宠物：攻击",
       "petStop": "宠物：停止",
@@ -856,6 +1009,7 @@ export const zh_CN: EnTranslations = {
       "aurasOnPlayerFrame": "增益显示在玩家框",
       "highContrastBackground": "高对比度背景",
       "startAttackOnAbility": "使用技能时自动攻击",
+      "showAttackButton": "显示攻击按钮",
       "walkByAutoloot": "路过自动拾取",
       "groundReticle": "地面瞄准指示圈",
       "showItemLevel": "显示物品等级",
@@ -977,6 +1131,7 @@ export const zh_CN: EnTranslations = {
         "spellPower": "法术强度",
         "critRating": "暴击等级",
         "hasteRating": "急速等级",
+        "hitRating": "命中等级",
         "warfare": "战争"
       },
       "warfareValue": "造成伤害 +{increase}% / 承受伤害 -{reduction}%",
@@ -994,6 +1149,7 @@ export const zh_CN: EnTranslations = {
         "dodge": "你完全躲开来袭近战攻击、不受任何伤害的几率。",
         "critRating": "来自装备和套装奖励的暴击等级，提升你的暴击几率。约每10点等级提供1%暴击。",
         "hasteRating": "来自装备和套装奖励的急速等级，加快你的攻击和施法速度。约每10点等级提供1%急速。",
+        "hitRating": "来自装备和套装奖励的命中等级，降低你的攻击被闪避和法术被抵抗的几率，对更高等级的敌人尤其有效。约每10点等级提供1%命中。",
         "warfare": "对玩家造成的伤害提高 {increase}%，受到玩家造成的伤害降低 {reduction}%。"
       },
       "effects": {
@@ -1067,6 +1223,12 @@ export const zh_CN: EnTranslations = {
         "few": "你是{rank}，{count}名成员",
         "many": "你是{rank}，{count}名成员",
         "other": "你是{rank}，{count}名成员"
+      },
+      "finderPartySize": {
+        "one": "{count} 名玩家",
+        "few": "{count} 名玩家",
+        "many": "{count} 名玩家",
+        "other": "{count} 名玩家"
       },
       "characterCount": {
         "one": "{count} 个角色",
@@ -1273,11 +1435,27 @@ export const zh_CN: EnTranslations = {
     },
     "dungeonDifficulty": {
       "setHeroic": "设置地下城难度：英雄",
-      "setNormal": "设置地下城难度：普通"
+      "setNormal": "设置地下城难度：普通",
+      "resetAll": "重置所有副本",
+      "resetDone": "所有副本已重置。",
+      "resetNone": "你没有可重置的副本。",
+      "resetOccupied": "仍有人在副本内时无法重置副本。",
+      "resetSameDifficulty": "切换地下城难度后才能重置这些副本。空置副本会在5分钟后自动重置。",
+      "resetLoot": "副本内仍有战利品时无法重置。",
+      "resetConfirmTitle": "重置所有副本？",
+      "resetConfirmBody": "此操作会放弃先前所选难度下的空置副本。若有未拾取的战利品，则无法重置。",
+      "resetConfirm": "重置副本",
+      "resetCooldown": "每5分钟只能重置一次副本。",
+      "resetUsage": "切换难度后，使用 /dungeon reset 放弃你的空置副本。",
+      "entryMismatchNormal": "此副本的难度为普通。使用“重置所有副本”以开始全新的英雄难度副本。",
+      "entryMismatchHeroic": "此副本的难度为英雄。使用“重置所有副本”以开始全新的普通难度副本。"
     },
     "bags": {
       "cannotDestroy": "该物品无法销毁。",
-      "rightClickDestroy": "Shift+右键单击以销毁",
+      "rightClickDestroy": "右键单击以销毁",
+      "dragEquipHint": "拖到角色身上以装备",
+      "dragDestroyHint": "拖出到世界中以销毁",
+      "reorderNeedsRecent": "清除筛选并按“最近”排序即可整理背包",
       "filterGroupAria": "按类别筛选背包",
       "filterAll": "全部",
       "filterWeapon": "武器",
@@ -1350,6 +1528,8 @@ export const zh_CN: EnTranslations = {
       },
       "dodge": "躲闪几率提高 {pct}%",
       "dodgeReduce": "躲闪几率降低 {pct}%",
+      "damageReduction": "受到的所有伤害降低 {pct}%",
+      "guardianWard": "下一次敌人的致命攻击会改为将你的生命值恢复至 {pct}%",
       "armorFlat": "护甲降低 {value}",
       "armorFlatStacks": "护甲降低 {value}（{stacks} 层）",
       "armorPct": "护甲降低 {pct}%",
@@ -1437,6 +1617,33 @@ export const zh_CN: EnTranslations = {
     "playerFrame": {
       "unlock": "移动玩家框",
       "lock": "锁定玩家框"
+    },
+    "partyFrames": {
+      "section": "队伍和团队框体",
+      "unlock": "移动队伍和团队框体",
+      "lock": "锁定队伍和团队框体",
+      "style": "框体样式",
+      "styleAutomatic": "自动",
+      "styleClassic": "经典队伍框体",
+      "styleRaid": "团队框体",
+      "scale": "框体缩放",
+      "width": "框体宽度",
+      "height": "框体高度",
+      "spacing": "框体间距",
+      "columns": "团队列数",
+      "healthText": "生命值文字",
+      "healthNone": "None",
+      "healthPercent": "百分比",
+      "healthCurrent": "当前值",
+      "healthCurrentMax": "当前 / 最大",
+      "sort": "玩家排序",
+      "sortGroup": "小队",
+      "sortRole": "Role",
+      "sortName": "Name",
+      "showResource": "显示法力、怒气和能量",
+      "showAbsorbs": "显示吸收护盾",
+      "showAuras": "显示增益和减益",
+      "showSelf": "显示你的框体"
     },
     "frameReset": {
       "label": "重置框体位置"
@@ -1531,8 +1738,8 @@ export const zh_CN: EnTranslations = {
         "juniormods": "初级管理员",
         "artists": "画师",
         "contentcreator": "内容创作者",
-        "legend": "LEGEND",
-        "shill": "SHILL"
+        "legend": "传奇",
+        "shill": "布道者"
       },
       "guildMember": "已验证成员",
       "notMember": "尚未加入服务器",
@@ -1799,7 +2006,8 @@ export const zh_CN: EnTranslations = {
       "title": "采集",
       "mining": "采矿",
       "logging": "伐木",
-      "herbalism": "草药学"
+      "herbalism": "草药学",
+      "notReady": "这个资源节点尚未为你重新生成。"
     },
     "archetypeTitle": {
       "label": "称号",
@@ -1831,6 +2039,107 @@ export const zh_CN: EnTranslations = {
       "notAtHub": "必须达到所需等级并位于制作站，才能制作该物品。",
       "throttled": "你制作得太快了，请稍等片刻后再试。",
       "recipeNotLearned": "你还没有学会这个配方。"
+    },
+    "finder": {
+      "title": "地下城查找器",
+      "close": "关闭",
+      "back": "返回",
+      "syncing": "正在等待服务器...",
+      "tabCatalogue": "目录",
+      "tabQueue": "快速匹配",
+      "tabBoard": "预组队伍",
+      "normal": "普通",
+      "heroic": "英雄",
+      "kindDungeon": "地下城",
+      "kindRaid": "团队副本",
+      "kindSolo": "单人冒险",
+      "levels": "等级 {min} 至 {max}",
+      "levelOne": "等级 {level}",
+      "clock": "{minutes}:{seconds}",
+      "roleCount": "{count} {role}",
+      "roleTank": "坦克",
+      "roleHealer": "治疗",
+      "roleDps": "输出",
+      "freeRoles": "不限职责",
+      "lockoutDaily": "最终首领每日锁定",
+      "lockoutNone": "无锁定",
+      "lockedFor": "锁定约 {minutes} 分钟",
+      "attunement": "需要完成前置任务：{quest}",
+      "heroicMarks": "英雄徽记：每人 {count} 枚",
+      "entrance": "入口：{zone}",
+      "showOnMap": "在地图上显示",
+      "encounters": "首领战",
+      "finalBoss": "最终首领",
+      "summoned": "召唤的守卫",
+      "lootGuaranteed": "以下物品必掉其一：",
+      "lootMaybe": "以下物品至多掉落其一：",
+      "lootChance": "额外概率掉落：",
+      "lootHeroic": "英雄奖励，以下物品必掉其一：",
+      "pct": "{pct}%",
+      "blockedLevel": "仅限等级 {min} 至 {max}",
+      "blockedSpec": "需要选择专精",
+      "yourRoles": "你的职责",
+      "needsSpec": "选择一个专精才能使用地下城查找器。",
+      "leaderNote": "只有队长才能为队伍排队。",
+      "chooseActivities": "选择活动",
+      "joinQueue": "加入队列",
+      "leaveQueue": "离开队列",
+      "waited": "排队时间：{time}",
+      "cooldownNote": "你可以在 {seconds} 秒后再次排队。",
+      "travelNote": "队伍在原地组成。请一起前往入口；不会传送任何人。",
+      "proposalTitle": "找到队伍：{name}",
+      "proposalRole": "你的职责：{role}",
+      "accepted": "{accepted}/{size} 已确认",
+      "remaining": "剩余 {seconds} 秒确认",
+      "accept": "接受",
+      "decline": "拒绝",
+      "acceptedWait": "正在等待其他人...",
+      "slotState": "{role}：{accepted}/{total} 已就绪",
+      "openListings": "公开招募",
+      "boardEmpty": "目前没有招募。发布一个吧！",
+      "boardLeaderGate": "只有队长才能发布招募。",
+      "publishListing": "发布招募",
+      "activity": "活动",
+      "publish": "发布",
+      "yourListing": "你的招募",
+      "closeListing": "关闭招募",
+      "applicants": "申请者",
+      "noApplicants": "还没有申请者。",
+      "acceptApplicantAria": "接受 {name}",
+      "declineApplicantAria": "拒绝 {name}",
+      "levelClass": "{level} 级 {className}",
+      "leader": "队长：{name}",
+      "needs": "需要：{roles}",
+      "slots": "{size}/{capacity}",
+      "apply": "申请",
+      "withdraw": "撤回申请",
+      "tagFirstRun": "初次挑战",
+      "tagQuestRun": "任务车",
+      "tagFullClear": "全通",
+      "tagLearning": "欢迎新手",
+      "tagFastRun": "速通",
+      "mech": {
+        "shadow_pulse": "暗影脉冲（周期性范围伤害）",
+        "reaping_arc": "收割之弧（正面顺劈）",
+        "mist_surge": "迷雾涌动（周期性范围伤害）",
+        "summons_adds": "召唤增援",
+        "lunar_tide": "月潮（周期性范围伤害）",
+        "enrage": "低血量时狂怒",
+        "shuddering_stomp": "震颤践踏（范围眩晕）",
+        "necrotic_shockwave": "死灵冲击波（高额范围伤害）",
+        "grave_cleaver": "掘墓劈砍（正面顺劈）",
+        "shadow_nova": "暗影新星（范围爆发）",
+        "profane_mending": "亵渎治疗（治疗其盟友）",
+        "mana_burn": "枯萎祝福（燃烧法力）",
+        "deathstalker_cleave": "死亡潜行者劈砍（正面顺劈）",
+        "mortal_wound": "遗忘之伤（降低受到的治疗）",
+        "sealbreak_shockwave": "破印冲击波（范围爆发）",
+        "gravebreaker": "碎墓打击（正面扇形，背对团队）",
+        "raise_fallen": "亡者复生（周期性召唤小怪）",
+        "soul_rend": "灵魂撕裂（被标记者需分散并接受治疗）",
+        "deathless_rage": "不死之怒（需在护符石处打断）",
+        "wardstones": "护符石引导（阶段转换）"
+      }
     },
     "deeds": {
       "title": "功绩之书",
@@ -3596,6 +3905,7 @@ export const zh_CN: EnTranslations = {
     "title": "下载电脑版启动器",
     "desc": "获取独立启动器，以获得更优化的性能和全屏游戏体验。",
     "macCta": "下载 macOS 版",
+    "windowsCta": "下载 Windows 版",
     "linuxCta": "下载 Linux 版",
     "linuxHint": "AppImage 格式：赋予可执行权限后直接运行，无需安装。",
     "windowsPending": "Windows 版本即将推出。"
@@ -4483,6 +4793,8 @@ export const zh_CN: EnTranslations = {
     "connectionLost": "与服务器的连接已断开。",
     "reconnecting": "连接已断开。正在重新连接...",
     "connectionRejected": "服务器关闭了连接。",
+    "realmFull": "当前服务器已满，请稍后几分钟再试。",
+    "tooManyConnections": "您的网络向该服务器发起的连接过多。请关闭多余的游戏窗口，或稍后几分钟再试。",
     "tips": {
       "classes": "提示：9 个职业玩法各不相同，投入之前不妨都试一试。",
       "talents": "提示：你可以在任意脱离战斗的时候重置天赋，因此早期的选择永远不会成为陷阱。",
@@ -4560,9 +4872,9 @@ export const zh_CN: EnTranslations = {
     "medium": "中",
     "low": "低",
     "popTipLow": "人数较少：当前在线玩家不足 15 人。空间充足，适合全新开始。",
-    "popTipMedium": "人数适中：当前在线玩家 15 至 39 人。健康活跃的服务器。",
-    "popTipHigh": "人数较多：当前在线玩家 40 至 79 人。繁忙，玩家众多。",
-    "popTipFull": "人数已满：当前在线玩家 80 人或以上。非常繁忙；登录时可能需要排队。",
+    "popTipMedium": "人数适中：当前在线玩家 15 至 79 人。健康活跃的服务器。",
+    "popTipHigh": "人数较多：当前在线玩家 80 人以上。繁忙，玩家众多。",
+    "popTipFull": "人数已满：当前服务器已达到玩家上限。在有玩家退出之前，新的登录会被拒绝。",
     "popTipOffline": "离线：此服务器当前无法连接，无法加入。",
     "characterCountOne": "{count} 个角色",
     "characterCountOther": "{count} 个角色",
@@ -5249,6 +5561,7 @@ export const zh_CN: EnTranslations = {
     "actionBar": {
       "attackName": "攻击",
       "attackTooltip": "对目标开启或关闭自动攻击。右键点击敌人也会发起攻击。",
+      "attackRemoveHint": "右键点击可将其从动作栏移除并空出栏位。",
       "emptySlot": "空栏位",
       "slotAria": "动作栏位 {slot}：{ability}",
       "emptySlotAria": "动作栏位 {slot}：空",
@@ -6164,6 +6477,18 @@ export const zh_CN: EnTranslations = {
       "barkskin": {
         "name": "橡树皮",
         "description": "你的皮肤硬化如树皮，使护甲提高 150，持续 15 秒。"
+      },
+      "ironhold": {
+        "name": "铁壁",
+        "description": "以坚固的防御自守，使受到的所有伤害降低 40%，持续 8 秒。"
+      },
+      "sacred_bulwark": {
+        "name": "神圣壁垒",
+        "description": "在 {duration} 秒内，下一次会杀死你的敌人攻击将被抵消，转而将你恢复至 35% 生命值。"
+      },
+      "primal_reflexes": {
+        "name": "野性反射",
+        "description": "你的本能变得敏锐，使闪避几率提高 50%，持续 6 秒。"
       },
       "starfire": {
         "name": "天陨",

@@ -11,8 +11,50 @@ import * as THREE from 'three';
 import { groundHeight } from '../sim/world';
 import { YUMI_MAZE_WALL_HEIGHT, yumiMazeLayout } from '../sim/yumi_maze_layout';
 import type { IWorld } from '../world_api';
+import { loadGltf } from './assets/loader';
+import { registerPreload } from './assets/preload';
 import { surfaceMat } from './gfx';
 import { stoneTexture } from './textures';
+
+// GLB-backed static bodies (Tripo-generated, see public/models/props), with a
+// procedural fallback for pre-load races / headless test hosts (mirrors the
+// gather_nodes.ts pattern). Flames/lights stay procedural VFX either way.
+type YumiMazeAssetKind = 'brazier_stand' | 'torch_handle';
+
+const YUMI_MAZE_ASSET_URL: Record<YumiMazeAssetKind, string> = {
+  brazier_stand: '/models/props/yumi_brazier_stand.glb',
+  torch_handle: '/models/props/yumi_torch_handle.glb',
+};
+
+const loadedYumiMazeGltf = new Map<YumiMazeAssetKind, THREE.Group>();
+
+if (typeof window !== 'undefined') {
+  for (const [kind, url] of Object.entries(YUMI_MAZE_ASSET_URL) as [YumiMazeAssetKind, string][]) {
+    registerPreload(
+      loadGltf(url).then((gltf) => {
+        loadedYumiMazeGltf.set(kind, gltf.scene);
+      }),
+    );
+  }
+}
+
+function cloneYumiMazeAsset(kind: YumiMazeAssetKind): THREE.Object3D | null {
+  const loaded = loadedYumiMazeGltf.get(kind);
+  if (!loaded) return null;
+  const inst = loaded.clone(true);
+  inst.traverse((child) => {
+    if (child instanceof THREE.Mesh) {
+      child.castShadow = true;
+      child.receiveShadow = true;
+    }
+  });
+  return inst;
+}
+
+/** Test-only window into the preload asset set (mirrors gather_nodes.ts). */
+export const yumiMazePreloadInternalsForTest = {
+  yumiMazeAssetUrl: YUMI_MAZE_ASSET_URL,
+};
 
 const TEAM_BLUE = 0x2f6fe0;
 const TEAM_RED = 0xd8342c;
@@ -151,14 +193,24 @@ export function buildYumiMaze(
     lights.fireLights.push(light);
   };
   const brazier = (bx: number, bz: number, flameColor: number) => {
-    const pedestal = new THREE.Mesh(pedestalGeo, pedestalMat);
-    pedestal.position.set(bx, 0.58, bz);
-    group.add(pedestal);
-    const bowl = new THREE.Mesh(bowlGeo, pedestalMat);
-    bowl.position.set(bx, 1.3, bz);
-    group.add(bowl);
+    const stand = cloneYumiMazeAsset('brazier_stand');
+    if (stand) {
+      stand.position.set(bx, 0, bz);
+      group.add(stand);
+    } else {
+      const pedestal = new THREE.Mesh(pedestalGeo, pedestalMat);
+      pedestal.position.set(bx, 0.58, bz);
+      group.add(pedestal);
+      const bowl = new THREE.Mesh(bowlGeo, pedestalMat);
+      bowl.position.set(bx, 1.3, bz);
+      group.add(bowl);
+    }
     const flame = new THREE.Mesh(brazierFlameGeo, flameMat(flameColor));
-    flame.position.set(bx, BRAZIER_FLAME_Y, bz);
+    // The procedural bowl's rim sits at 1.51 (bowl y 1.3 + half its 0.42
+    // height), which tucks the flame cone's 1.4 base inside it. The GLB
+    // stand is only 1.30 tall, so re-seat the flame down to match its rim
+    // instead of floating above it.
+    flame.position.set(bx, stand ? BRAZIER_FLAME_Y - 0.1 : BRAZIER_FLAME_Y, bz);
     group.add(flame);
     lights.flames.push(flame);
     fireLight(bx, BRAZIER_LIGHT_Y, bz, flameColor);
@@ -188,11 +240,24 @@ export function buildYumiMaze(
     const side = i % 2 === 0 ? 1 : -1;
     const tx = w.x + (vertical ? side * (w.hw + 0.34) : 0);
     const tz = w.z + (vertical ? 0 : side * (w.hd + 0.34));
-    const handle = new THREE.Mesh(handleGeo, handleMat);
-    handle.position.set(tx, torchY - 0.28, tz);
-    handle.rotation.z = vertical ? side * 0.35 : 0;
-    handle.rotation.x = vertical ? 0 : -side * 0.35;
-    group.add(handle);
+    const handleAsset = cloneYumiMazeAsset('torch_handle');
+    if (handleAsset) {
+      handleAsset.position.set(tx, torchY - 0.72, tz);
+      handleAsset.rotation.y = vertical
+        ? side > 0
+          ? Math.PI / 2
+          : -Math.PI / 2
+        : side > 0
+          ? 0
+          : Math.PI;
+      group.add(handleAsset);
+    } else {
+      const handle = new THREE.Mesh(handleGeo, handleMat);
+      handle.position.set(tx, torchY - 0.28, tz);
+      handle.rotation.z = vertical ? side * 0.35 : 0;
+      handle.rotation.x = vertical ? 0 : -side * 0.35;
+      group.add(handle);
+    }
     const flame = new THREE.Mesh(flameGeo, flameMat(WARM_FLAME));
     flame.position.set(
       tx + (vertical ? side * 0.18 : 0),

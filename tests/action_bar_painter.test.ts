@@ -233,7 +233,7 @@ describe('ActionBarPainter: aria-label + icon elision (Top risks 1 + 4)', () => 
         slots: [
           {
             slotIndex: 0,
-            isAttack: false,
+            isAttack: () => false,
             hasAction: () => true,
             ability: () => ability('fireball'),
             item: () => null,

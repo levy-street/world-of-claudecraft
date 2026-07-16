@@ -20,6 +20,154 @@ export const vi_VN: EnTranslations = {
     "rp": "RP",
     "rpPvp": "RP-PvP"
   },
+  "devCommand": {
+    "dialogLabel": "Developer Command Center",
+    "kicker": "Development tools",
+    "title": "Command Center",
+    "subtitle": "Authoritative test controls for the active world.",
+    "closeAria": "Close developer commands",
+    "categoryNavAria": "Developer command categories",
+    "categories": {
+      "player": "Player",
+      "spawns": "Spawns",
+      "inventory": "Inventory",
+      "progress": "Progress",
+      "travel": "Travel",
+      "scenarios": "Scenarios"
+    },
+    "filterLabel": "Filter commands",
+    "filterPlaceholder": "Search this category",
+    "noMatches": "No matching commands.",
+    "serverRequirement": "Server cheats still require ALLOW_DEV_COMMANDS=1.",
+    "invalidValues": "Choose valid values before running this command.",
+    "sent": "Sent: {command}",
+    "run": "Run",
+    "fields": {
+      "level": "Level",
+      "mob": "Mob",
+      "count": "Count",
+      "item": "Item",
+      "gold": "Gold",
+      "quest": "Quest",
+      "profession": "Profession",
+      "amount": "Amount",
+      "x": "X",
+      "z": "Z",
+      "dungeon": "Dungeon",
+      "difficulty": "Difficulty",
+      "name": "Name"
+    },
+    "difficulty": {
+      "normal": "Normal",
+      "heroic": "Heroic"
+    },
+    "actions": {
+      "heal": {
+        "label": "Restore health",
+        "description": "Fill the health pool."
+      },
+      "resource": {
+        "label": "Restore resource",
+        "description": "Fill mana, rage, or energy."
+      },
+      "cooldowns": {
+        "label": "Clear cooldowns",
+        "description": "Reset ability, GCD, and potion timers."
+      },
+      "god": {
+        "label": "Toggle god mode",
+        "description": "Toggle invulnerability and boosted damage."
+      },
+      "revive": {
+        "label": "Revive",
+        "description": "Revive through the normal resurrection path."
+      },
+      "kill": {
+        "label": "Kill player",
+        "description": "Test death, ghost, and corpse flows."
+      },
+      "combatreset": {
+        "label": "Reset combat",
+        "description": "Clear combat state and hostile threat."
+      },
+      "level": {
+        "label": "Set level",
+        "description": "Set the current character level."
+      },
+      "spawn": {
+        "label": "Spawn mob",
+        "description": "Create a concrete mob near the player."
+      },
+      "killtarget": {
+        "label": "Kill target",
+        "description": "Kill the selected living mob."
+      },
+      "despawntarget": {
+        "label": "Despawn target",
+        "description": "Remove a selected mob created by this tool."
+      },
+      "despawnall": {
+        "label": "Clear my spawns",
+        "description": "Remove every mob spawned by this developer."
+      },
+      "give": {
+        "label": "Give item",
+        "description": "Add an item to the player inventory."
+      },
+      "gold": {
+        "label": "Add gold",
+        "description": "Add gold to the current purse."
+      },
+      "quest": {
+        "label": "Complete quest",
+        "description": "Complete a specific quest by id."
+      },
+      "quests": {
+        "label": "Complete active quests",
+        "description": "Complete every quest in the current log."
+      },
+      "attune": {
+        "label": "Unlock attunements",
+        "description": "Mark all attunement requirements complete."
+      },
+      "gather": {
+        "label": "Grant gathering skill",
+        "description": "Increase a gathering profession."
+      },
+      "teleport": {
+        "label": "Teleport",
+        "description": "Move to exact world coordinates."
+      },
+      "dungeon": {
+        "label": "Enter dungeon",
+        "description": "Enter a dungeon with dev gate bypass."
+      },
+      "raid": {
+        "label": "Enter raid",
+        "description": "Enter the Nythraxis arena directly."
+      },
+      "raidreset": {
+        "label": "Reset raid lockout",
+        "description": "Clear the current raid lockouts."
+      },
+      "bot": {
+        "label": "Spawn social bot",
+        "description": "Create a whisperable stationary player."
+      },
+      "lfgqueue": {
+        "label": "Seed finder queue",
+        "description": "Create a Dungeon Finder queue scenario."
+      },
+      "lfgraid": {
+        "label": "Seed raid finder",
+        "description": "Create a raid finder scenario."
+      },
+      "lfgboard": {
+        "label": "Seed listing board",
+        "description": "Create a premade listing scenario."
+      }
+    }
+  },
   "game": {
     "xp": {
       "suffix": "XP",
@@ -203,6 +351,7 @@ export const vi_VN: EnTranslations = {
       "remainingLessThanMinute": "<1p",
       "remainingMinutes": "{minutes}p",
       "remainingHoursMinutes": "{hours}h {minutes}p",
+      "remainingDaysHours": "{days}d {hours}h",
       "score": "Điểm",
       "walletValue": "Giá Trị Ví (WOC)",
       "usd": "{amount} USD",
@@ -241,7 +390,8 @@ export const vi_VN: EnTranslations = {
         "no_wallet": "Kết nối một ví có ít nhất 20 USD WOC.",
         "under_minimum": "Ví thấp hơn mức tối thiểu 20 USD WOC.",
         "price_unavailable": "Giá WOC hiện không có sẵn, phần thưởng tạm thời bị khóa.",
-        "banned": "Bạn đã bị cấm tham gia Phần Thưởng Hằng Ngày. Lý do: {reason}"
+        "banned": "Bạn đã bị cấm tham gia Phần Thưởng Hằng Ngày. Lý do: {reason}",
+        "bannedUntil": "You are banned from Daily Rewards for another {remaining}. Access returns {until}. Reason: {reason}"
       }
     },
     "wocStore": {
@@ -466,6 +616,7 @@ export const vi_VN: EnTranslations = {
       "balanceLabel": "Số dư",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL: {amount}",
+      "usdcBalance": "USDC: {amount}",
       "wocBalance": "WOC: {amount}",
       "unavailable": "Cửa hàng Claudium hiện không có sẵn. Số dư và giao dịch mua hàng của bạn không bị ảnh hưởng; vui lòng kiểm tra lại trong thời gian ngắn.",
       "disclosure": "Claudium là loại tiền mềm một chiều: mua bằng tiền và tiêu vào mỹ phẩm. Nó không thể được đổi, chuyển nhượng hoặc rút tiền mặt.",
@@ -473,6 +624,7 @@ export const vi_VN: EnTranslations = {
       "railLabel": "Phương thức thanh toán",
       "railStripe": "Thẻ",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "Giảm 20%",
       "railWocUnavailable": "Giá WOC hiện không có sẵn.",
@@ -618,13 +770,13 @@ export const vi_VN: EnTranslations = {
       "update": "Cập Nhật"
     },
     "cameraPrompt": {
-      "title": "Choose Your Camera",
-      "intro": "Pick how the camera follows your character.",
-      "mouseDesc": "Move the mouse to turn the camera without holding a button.",
-      "classicTitle": "Classic Camera",
-      "classicDesc": "Hold right-click and move the mouse to turn the camera.",
-      "changeLater": "You can change this later under Esc, Key Bindings.",
-      "confirm": "Confirm"
+      "title": "Chọn Máy Ảnh Của Bạn",
+      "intro": "Chọn cách máy ảnh theo dõi nhân vật của bạn.",
+      "mouseDesc": "Di chuyển chuột để xoay máy ảnh mà không cần giữ nút.",
+      "classicTitle": "Máy Ảnh Cổ Điển",
+      "classicDesc": "Giữ chuột phải và di chuyển chuột để xoay máy ảnh.",
+      "changeLater": "Bạn có thể thay đổi sau trong Esc, Phím Tắt.",
+      "confirm": "Xác Nhận"
     },
     "castBar": {
       "playerAria": "Thanh Niệm Chú Của Bạn",
@@ -672,11 +824,11 @@ export const vi_VN: EnTranslations = {
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m}p {s}g",
       "seconds": "{s}g",
-      "autoShowHint": "Rows appear automatically once your party deals damage or healing, and this segment closes a few seconds after combat ends."
+      "autoShowHint": "Các hàng xuất hiện tự động sau khi nhóm của bạn gây sát thương hoặc hồi máu, và phần này đóng lại vài giây sau khi chiến đấu kết thúc."
     },
     "petFeed": {
-      "disabledFullHp": "Pet is at full health",
-      "disabledNoFood": "No food in your bags will heal your pet"
+      "disabledFullHp": "Thú cưng đang đầy máu",
+      "disabledNoFood": "Không có thức ăn nào trong túi đồ của bạn có thể chữa lành thú cưng"
     },
     "keybinds": {
       "emoteWheel": "Vòng Biểu Cảm",
@@ -684,6 +836,7 @@ export const vi_VN: EnTranslations = {
       "targetFriendlyNext": "Luân Phiên Mục Tiêu Đồng Minh",
       "discord": "Discord",
       "valecup": "Cúp Thung Lũng",
+      "sheathe": "Tra/Rút Vũ Khí",
       "categoryPet": "Thú Cưng",
       "petAttack": "Thú Cưng: Tấn Công",
       "petStop": "Thú Cưng: Dừng",
@@ -856,6 +1009,7 @@ export const vi_VN: EnTranslations = {
       "aurasOnPlayerFrame": "Hiệu Ứng Có Lợi Trên Khung Người Chơi",
       "highContrastBackground": "Nền Tương Phản Cao",
       "startAttackOnAbility": "Tự Đánh Khi Dùng Kỹ Năng",
+      "showAttackButton": "Hiển Thị Nút Tấn Công",
       "walkByAutoloot": "Tự Nhặt Đồ Khi Đi Ngang",
       "groundReticle": "Vòng ngắm mục tiêu mặt đất",
       "showItemLevel": "Hiển Thị Cấp Vật Phẩm",
@@ -977,6 +1131,7 @@ export const vi_VN: EnTranslations = {
         "spellPower": "Sức Mạnh Phép Thuật",
         "critRating": "Chỉ Số Chí Mạng",
         "hasteRating": "Chỉ Số Thần Tốc",
+        "hitRating": "Chỉ Số Trúng Đòn",
         "warfare": "Chiến Tranh"
       },
       "warfareValue": "+{increase}% gây ra / -{reduction}% nhận vào",
@@ -994,6 +1149,7 @@ export const vi_VN: EnTranslations = {
         "dodge": "Tỉ lệ bạn né hoàn toàn một đòn cận chiến, không nhận sát thương.",
         "critRating": "Chỉ số chí mạng từ trang bị và phần thưởng bộ trang bị của bạn, nâng tỉ lệ chí mạng của bạn. Khoảng 10 điểm chỉ số ban 1% chí mạng.",
         "hasteRating": "Chỉ số thần tốc từ trang bị và phần thưởng bộ trang bị của bạn, đẩy nhanh các đòn tấn công và việc thi triển phép của bạn. Khoảng 10 điểm chỉ số ban 1% thần tốc.",
+        "hitRating": "Chỉ số trúng đòn từ trang bị và các chỉ số bộ của bạn, giảm tần suất tấn công bị hụt và phép thuật bị kháng, đặc biệt khi đối mặt với kẻ địch cấp cao hơn. Khoảng 10 chỉ số cho 1% trúng đòn.",
         "warfare": "Tăng sát thương gây ra cho người chơi thêm {increase}% và giảm sát thương nhận từ người chơi thêm {reduction}%."
       },
       "effects": {
@@ -1067,6 +1223,12 @@ export const vi_VN: EnTranslations = {
         "few": "bạn là {rank}, {count} thành viên",
         "many": "bạn là {rank}, {count} thành viên",
         "other": "bạn là {rank}, {count} thành viên"
+      },
+      "finderPartySize": {
+        "one": "{count} người chơi",
+        "few": "{count} người chơi",
+        "many": "{count} người chơi",
+        "other": "{count} người chơi"
       },
       "characterCount": {
         "one": "{count} nhân vật",
@@ -1273,11 +1435,27 @@ export const vi_VN: EnTranslations = {
     },
     "dungeonDifficulty": {
       "setHeroic": "Đặt Độ Khó Hầm Ngục: Anh Hùng",
-      "setNormal": "Đặt Độ Khó Hầm Ngục: Thường"
+      "setNormal": "Đặt Độ Khó Hầm Ngục: Thường",
+      "resetAll": "Đặt Lại Tất Cả Phụ Bản",
+      "resetDone": "Tất cả phụ bản đã được đặt lại.",
+      "resetNone": "Bạn không có phụ bản nào để đặt lại.",
+      "resetOccupied": "Bạn không thể đặt lại phụ bản khi vẫn còn người ở bên trong.",
+      "resetSameDifficulty": "Hãy đổi độ khó hầm ngục trước khi đặt lại các phụ bản này. Phụ bản trống sẽ tự đặt lại sau 5 phút.",
+      "resetLoot": "Bạn không thể đặt lại phụ bản khi vẫn còn chiến lợi phẩm bên trong.",
+      "resetConfirmTitle": "Đặt Lại Tất Cả Phụ Bản?",
+      "resetConfirmBody": "Thao tác này sẽ từ bỏ các phụ bản trống thuộc độ khó bạn đã chọn trước đó. Chiến lợi phẩm chưa nhận sẽ ngăn việc đặt lại.",
+      "resetConfirm": "Đặt Lại Phụ Bản",
+      "resetCooldown": "Chỉ có thể đặt lại phụ bản một lần mỗi 5 phút.",
+      "resetUsage": "Dùng /dungeon reset để từ bỏ các phụ bản trống sau khi đổi độ khó.",
+      "entryMismatchNormal": "Phụ bản này được đặt ở độ khó Thường. Dùng Đặt Lại Tất Cả Phụ Bản để bắt đầu một lượt Anh Hùng mới.",
+      "entryMismatchHeroic": "Phụ bản này được đặt ở độ khó Anh Hùng. Dùng Đặt Lại Tất Cả Phụ Bản để bắt đầu một lượt Thường mới."
     },
     "bags": {
       "cannotDestroy": "Không thể phá hủy vật phẩm này.",
-      "rightClickDestroy": "Shift+right-click to destroy",
+      "rightClickDestroy": "Nhấp chuột phải để hủy bỏ",
+      "dragEquipHint": "Kéo lên nhân vật để trang bị",
+      "dragDestroyHint": "Kéo ra ngoài thế giới để hủy bỏ",
+      "reorderNeedsRecent": "Xóa bộ lọc và sắp xếp theo Gần Đây để sắp xếp lại túi đồ",
       "filterGroupAria": "Lọc túi đồ theo danh mục",
       "filterAll": "Tất cả",
       "filterWeapon": "Vũ khí",
@@ -1350,6 +1528,8 @@ export const vi_VN: EnTranslations = {
       },
       "dodge": "Aumenta la probabilidad de esquivar un {pct}%",
       "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
+      "damageReduction": "Giảm {pct}% toàn bộ sát thương nhận vào",
+      "guardianWard": "Đòn chí mạng tiếp theo của kẻ địch thay vào đó hồi bạn lên {pct}% máu",
       "armorFlat": "Reduce la armadura en {value}",
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
       "armorPct": "Giảm giáp đi {pct}%",
@@ -1438,6 +1618,33 @@ export const vi_VN: EnTranslations = {
       "unlock": "Di chuyển khung người chơi",
       "lock": "Khóa khung người chơi"
     },
+    "partyFrames": {
+      "section": "Party and Raid Frames",
+      "unlock": "Move party and raid frames",
+      "lock": "Lock party and raid frames",
+      "style": "Frame Style",
+      "styleAutomatic": "Automatic",
+      "styleClassic": "Classic Party Frames",
+      "styleRaid": "Raid Frames",
+      "scale": "Frame Scale",
+      "width": "Frame Width",
+      "height": "Frame Height",
+      "spacing": "Frame Spacing",
+      "columns": "Raid Columns",
+      "healthText": "Health Text",
+      "healthNone": "None",
+      "healthPercent": "Percent",
+      "healthCurrent": "Current",
+      "healthCurrentMax": "Current / Max",
+      "sort": "Sort Players",
+      "sortGroup": "Group",
+      "sortRole": "Role",
+      "sortName": "Name",
+      "showResource": "Show Mana, Rage, and Energy",
+      "showAbsorbs": "Show Absorb Shields",
+      "showAuras": "Show Buffs and Debuffs",
+      "showSelf": "Show Your Frame"
+    },
     "frameReset": {
       "label": "Đặt Lại Vị Trí Các Khung"
     },
@@ -1478,7 +1685,7 @@ export const vi_VN: EnTranslations = {
         "benefits": "Liên kết Discord để nhận điểm từ việc chơi và hoạt động cộng đồng, và leo lên các bậc trạng thái.",
         "error": "Không thể liên kết Discord. Vui lòng thử lại.",
         "success": "Đã liên kết Discord.",
-        "joinServer": "Just join the Discord server"
+        "joinServer": "Chỉ cần tham gia máy chủ Discord"
       },
       "choice": {
         "title": "Tiếp tục với Discord",
@@ -1526,13 +1733,13 @@ export const vi_VN: EnTranslations = {
         "admin": "Quản Trị Viên",
         "coredevs": "Nhà Phát Triển Chính",
         "devs": "Lập Trình Viên",
-        "seniormods": "Senior Mod",
+        "seniormods": "Điều Hành Viên Cấp Cao",
         "mods": "Điều Hành Viên",
-        "juniormods": "Junior Mod",
+        "juniormods": "Điều Hành Viên Mới",
         "artists": "Họa Sĩ",
-        "contentcreator": "Content Creator",
-        "legend": "LEGEND",
-        "shill": "SHILL"
+        "contentcreator": "Nhà Sáng Tạo Nội Dung",
+        "legend": "HUYỀN THOẠI",
+        "shill": "QUẢNG BÁ VIÊN"
       },
       "guildMember": "Thành viên đã xác minh",
       "notMember": "Chưa tham gia máy chủ",
@@ -1799,7 +2006,8 @@ export const vi_VN: EnTranslations = {
       "title": "Thu thập",
       "mining": "Khai mỏ",
       "logging": "Đốn gỗ",
-      "herbalism": "Thảo dược học"
+      "herbalism": "Thảo dược học",
+      "notReady": "Điểm tài nguyên này chưa hồi sinh lại dành cho bạn."
     },
     "archetypeTitle": {
       "label": "Danh hiệu",
@@ -1831,6 +2039,107 @@ export const vi_VN: EnTranslations = {
       "notAtHub": "Bạn phải ở trung tâm chế tác, đạt cấp yêu cầu, mới chế tạo được thứ đó.",
       "throttled": "Bạn đang chế tạo quá nhanh. Hãy chờ một lát rồi thử lại.",
       "recipeNotLearned": "Bạn chưa học công thức đó."
+    },
+    "finder": {
+      "title": "Tìm Hầm Ngục",
+      "close": "Đóng",
+      "back": "Quay Lại",
+      "syncing": "Đang chờ vương quốc...",
+      "tabCatalogue": "Danh Mục",
+      "tabQueue": "Ghép Nhanh",
+      "tabBoard": "Nhóm Thành Lập Sẵn",
+      "normal": "Thường",
+      "heroic": "Anh Hùng",
+      "kindDungeon": "Hầm Ngục",
+      "kindRaid": "Đột Kích",
+      "kindSolo": "Phiêu lưu đơn độc",
+      "levels": "Cấp độ {min} đến {max}",
+      "levelOne": "Cấp độ {level}",
+      "clock": "{minutes}:{seconds}",
+      "roleCount": "{count} {role}",
+      "roleTank": "Đỡ Đòn",
+      "roleHealer": "Chữa Lành",
+      "roleDps": "Gây Sát Thương",
+      "freeRoles": "Chào đón mọi vai trò",
+      "lockoutDaily": "Khóa hàng ngày trên trùm cuối",
+      "lockoutNone": "Không có khóa",
+      "lockedFor": "Bị khóa khoảng {minutes} phút",
+      "attunement": "Yêu cầu điều chỉnh: {quest}",
+      "heroicMarks": "Dấu Anh Hùng: {count} mỗi người chơi",
+      "entrance": "Lối vào: {zone}",
+      "showOnMap": "Hiển Thị Trên Bản Đồ",
+      "encounters": "Cuộc Đối Đầu",
+      "finalBoss": "Trùm cuối",
+      "summoned": "Hộ vệ được triệu hồi",
+      "lootGuaranteed": "Luôn rơi một trong số này:",
+      "lootMaybe": "Tối đa một trong số này có thể rơi:",
+      "lootChance": "Cơ hội rơi thêm:",
+      "lootHeroic": "Thưởng anh hùng, luôn rơi một trong số này:",
+      "pct": "{pct}%",
+      "blockedLevel": "Chỉ dành cho cấp độ {min} đến {max}",
+      "blockedSpec": "Yêu cầu chuyên môn hóa",
+      "yourRoles": "Vai trò của bạn",
+      "needsSpec": "Hãy chọn chuyên môn hóa để sử dụng Tìm Hầm Ngục.",
+      "leaderNote": "Chỉ trưởng nhóm mới có thể đưa cả nhóm vào hàng chờ.",
+      "chooseActivities": "Chọn hoạt động",
+      "joinQueue": "Vào hàng chờ",
+      "leaveQueue": "Rời hàng chờ",
+      "waited": "Thời gian trong hàng chờ: {time}",
+      "cooldownNote": "Bạn có thể vào hàng chờ lại sau {seconds} giây.",
+      "travelNote": "Nhóm được thành lập tại vị trí của mọi người. Hãy cùng nhau di chuyển đến lối vào; không ai được dịch chuyển.",
+      "proposalTitle": "Đã tìm được nhóm: {name}",
+      "proposalRole": "Vai trò của bạn: {role}",
+      "accepted": "{accepted} trên {size} đã xác nhận",
+      "remaining": "Còn {seconds} giây để trả lời",
+      "accept": "Chấp Nhận",
+      "decline": "Từ Chối",
+      "acceptedWait": "Đang chờ những người khác...",
+      "slotState": "{role}: {accepted} trên {total} sẵn sàng",
+      "openListings": "Thông báo đang mở",
+      "boardEmpty": "Chưa có thông báo nào. Hãy đăng một cái!",
+      "boardLeaderGate": "Chỉ trưởng nhóm của bạn mới có thể đăng thông báo.",
+      "publishListing": "Đăng thông báo",
+      "activity": "Hoạt Động",
+      "publish": "Đăng",
+      "yourListing": "Thông báo của bạn",
+      "closeListing": "Đóng thông báo",
+      "applicants": "Người Đăng Ký",
+      "noApplicants": "Chưa có người đăng ký.",
+      "acceptApplicantAria": "Chấp nhận {name}",
+      "declineApplicantAria": "Từ chối {name}",
+      "levelClass": "Cấp {level} {className}",
+      "leader": "Trưởng nhóm: {name}",
+      "needs": "Cần {roles}",
+      "slots": "{size}/{capacity}",
+      "apply": "Đăng Ký",
+      "withdraw": "Rút đơn đăng ký",
+      "tagFirstRun": "Lần đầu chạy",
+      "tagQuestRun": "Chạy nhiệm vụ",
+      "tagFullClear": "Dọn sạch",
+      "tagLearning": "Chào đón người học việc",
+      "tagFastRun": "Chạy nhanh",
+      "mech": {
+        "shadow_pulse": "Xung Bóng Tối (sát thương vùng theo nhịp)",
+        "reaping_arc": "Vòng Chém Gặt (chém ngang phía trước)",
+        "mist_surge": "Sóng Sương Mù (sát thương vùng theo nhịp)",
+        "summons_adds": "Triệu hồi quân tiếp viện",
+        "lunar_tide": "Triều Nguyệt (sát thương vùng theo nhịp)",
+        "enrage": "Nổi giận khi máu thấp",
+        "shuddering_stomp": "Giậm Chân Rùng Rợn (làm choáng vùng)",
+        "necrotic_shockwave": "Sóng Xung Hoại Tử (sát thương vùng nặng)",
+        "grave_cleaver": "Chém Mộ Phần (chém ngang phía trước)",
+        "shadow_nova": "Nova Bóng Tối (bùng nổ vùng)",
+        "profane_mending": "Chữa Lành Bất Thánh (hồi máu cho đồng minh)",
+        "mana_burn": "Chúc Phúc Khô Héo (đốt cháy mana)",
+        "deathstalker_cleave": "Chém Ngang Thần Chết (chém ngang phía trước)",
+        "mortal_wound": "Vết Thương Bị Lãng Quên (giảm lượng máu hồi nhận vào)",
+        "sealbreak_shockwave": "Sóng Xung Phá Ấn (bùng nổ vùng)",
+        "gravebreaker": "Phá Mộ (hình nón phía trước, quay lưng về phía đoàn đột kích)",
+        "raise_fallen": "Triệu Hồi Tử Giả (các đợt quân tiếp viện theo chu kỳ)",
+        "soul_rend": "Xé Hồn (người chơi bị đánh dấu phải tản ra và được hồi máu)",
+        "deathless_rage": "Thịnh Nộ Bất Tử (bị gián đoạn tại các đá hộ mệnh)",
+        "wardstones": "Kênh đá hộ mệnh (chuyển giai đoạn)"
+      }
     },
     "deeds": {
       "title": "Sách Kỳ Công",
@@ -2573,8 +2882,8 @@ export const vi_VN: EnTranslations = {
         "desc": "Những sinh vật có vảy, thân rắn từ vực sâu cổ xưa. Hiếm gặp, kiêu hãnh, và mạnh hơn vẻ ngoài của chúng rất nhiều."
       },
       "reptile": {
-        "name": "Reptiles",
-        "desc": "Cold-blooded hunters with a hiss and a snap all their own, distinct from the warm-blooded beasts."
+        "name": "Bò Sát",
+        "desc": "Những thợ săn máu lạnh với tiếng rít và cú đớp rất riêng của chúng, khác biệt hoàn toàn so với các dã thú máu nóng."
       }
     },
     "worldPage": {
@@ -3596,6 +3905,7 @@ export const vi_VN: EnTranslations = {
     "title": "Tải Trình Khởi Chạy Trên Máy Tính",
     "desc": "Tải trình khởi chạy độc lập để có hiệu năng tối ưu và chơi toàn màn hình.",
     "macCta": "Tải xuống cho macOS",
+    "windowsCta": "Tải xuống cho Windows",
     "linuxCta": "Tải xuống cho Linux",
     "linuxHint": "AppImage: làm cho nó có thể thực thi được rồi chạy nó. Không cần cài đặt.",
     "windowsPending": "Bản dựng Windows đang chờ."
@@ -4483,6 +4793,8 @@ export const vi_VN: EnTranslations = {
     "connectionLost": "Đã mất kết nối tới máy chủ.",
     "reconnecting": "Mất kết nối. Đang kết nối lại...",
     "connectionRejected": "Máy chủ đã đóng kết nối.",
+    "realmFull": "Thế giới này đang đầy người chơi. Vui lòng thử lại sau vài phút.",
+    "tooManyConnections": "Có quá nhiều kết nối đến thế giới này từ mạng của bạn. Vui lòng đóng bớt cửa sổ trò chơi hoặc thử lại sau vài phút.",
     "tips": {
       "classes": "Mẹo: mỗi lớp trong 9 lớp nhân vật có lối chơi khác nhau. Hãy thử vài lớp trước khi quyết định gắn bó.",
       "talents": "Mẹo: bạn có thể đặt lại tài năng bất cứ lúc nào ngoài chiến đấu, nên lựa chọn ban đầu không bao giờ là cái bẫy.",
@@ -5249,6 +5561,7 @@ export const vi_VN: EnTranslations = {
     "actionBar": {
       "attackName": "Tấn Công",
       "attackTooltip": "Bật/tắt tự động tấn công mục tiêu. Nhấp chuột phải vào kẻ địch cũng sẽ tấn công.",
+      "attackRemoveHint": "Nhấp chuột phải để gỡ khỏi thanh và giải phóng ô trống.",
       "emptySlot": "Ô trống",
       "slotAria": "Ô hành động {slot}: {ability}",
       "emptySlotAria": "Ô hành động {slot}: trống",
@@ -6164,6 +6477,18 @@ export const vi_VN: EnTranslations = {
       "barkskin": {
         "name": "Da Sồi",
         "description": "Da ngươi rắn lại như vỏ cây, tăng 150 giáp trong 15 giây."
+      },
+      "ironhold": {
+        "name": "Thiết Lũy",
+        "description": "Ẩn sau lá chắn bảo vệ, giảm 40% sát thương nhận vào trong 8 giây."
+      },
+      "sacred_bulwark": {
+        "name": "Phòng Bị Thánh Thần",
+        "description": "Trong {duration} giây, đòn tấn công tiếp theo của kẻ địch vốn sẽ giết chết bạn sẽ bị vô hiệu hóa, thay vào đó hồi phục bạn lên 35% máu."
+      },
+      "primal_reflexes": {
+        "name": "Phản Xạ Nguyên Thủy",
+        "description": "Bản năng của bạn trở nên sắc bén, tăng 50% cơ hội né đòn trong 6 giây."
       },
       "starfire": {
         "name": "Thiên Giáng",

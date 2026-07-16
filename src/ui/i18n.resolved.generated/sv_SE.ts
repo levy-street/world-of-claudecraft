@@ -20,6 +20,154 @@ export const sv_SE: EnTranslations = {
     "rp": "RP",
     "rpPvp": "RP-PvP"
   },
+  "devCommand": {
+    "dialogLabel": "Developer Command Center",
+    "kicker": "Development tools",
+    "title": "Command Center",
+    "subtitle": "Authoritative test controls for the active world.",
+    "closeAria": "Close developer commands",
+    "categoryNavAria": "Developer command categories",
+    "categories": {
+      "player": "Player",
+      "spawns": "Spawns",
+      "inventory": "Inventory",
+      "progress": "Progress",
+      "travel": "Travel",
+      "scenarios": "Scenarios"
+    },
+    "filterLabel": "Filter commands",
+    "filterPlaceholder": "Search this category",
+    "noMatches": "No matching commands.",
+    "serverRequirement": "Server cheats still require ALLOW_DEV_COMMANDS=1.",
+    "invalidValues": "Choose valid values before running this command.",
+    "sent": "Sent: {command}",
+    "run": "Run",
+    "fields": {
+      "level": "Level",
+      "mob": "Mob",
+      "count": "Count",
+      "item": "Item",
+      "gold": "Gold",
+      "quest": "Quest",
+      "profession": "Profession",
+      "amount": "Amount",
+      "x": "X",
+      "z": "Z",
+      "dungeon": "Dungeon",
+      "difficulty": "Difficulty",
+      "name": "Name"
+    },
+    "difficulty": {
+      "normal": "Normal",
+      "heroic": "Heroic"
+    },
+    "actions": {
+      "heal": {
+        "label": "Restore health",
+        "description": "Fill the health pool."
+      },
+      "resource": {
+        "label": "Restore resource",
+        "description": "Fill mana, rage, or energy."
+      },
+      "cooldowns": {
+        "label": "Clear cooldowns",
+        "description": "Reset ability, GCD, and potion timers."
+      },
+      "god": {
+        "label": "Toggle god mode",
+        "description": "Toggle invulnerability and boosted damage."
+      },
+      "revive": {
+        "label": "Revive",
+        "description": "Revive through the normal resurrection path."
+      },
+      "kill": {
+        "label": "Kill player",
+        "description": "Test death, ghost, and corpse flows."
+      },
+      "combatreset": {
+        "label": "Reset combat",
+        "description": "Clear combat state and hostile threat."
+      },
+      "level": {
+        "label": "Set level",
+        "description": "Set the current character level."
+      },
+      "spawn": {
+        "label": "Spawn mob",
+        "description": "Create a concrete mob near the player."
+      },
+      "killtarget": {
+        "label": "Kill target",
+        "description": "Kill the selected living mob."
+      },
+      "despawntarget": {
+        "label": "Despawn target",
+        "description": "Remove a selected mob created by this tool."
+      },
+      "despawnall": {
+        "label": "Clear my spawns",
+        "description": "Remove every mob spawned by this developer."
+      },
+      "give": {
+        "label": "Give item",
+        "description": "Add an item to the player inventory."
+      },
+      "gold": {
+        "label": "Add gold",
+        "description": "Add gold to the current purse."
+      },
+      "quest": {
+        "label": "Complete quest",
+        "description": "Complete a specific quest by id."
+      },
+      "quests": {
+        "label": "Complete active quests",
+        "description": "Complete every quest in the current log."
+      },
+      "attune": {
+        "label": "Unlock attunements",
+        "description": "Mark all attunement requirements complete."
+      },
+      "gather": {
+        "label": "Grant gathering skill",
+        "description": "Increase a gathering profession."
+      },
+      "teleport": {
+        "label": "Teleport",
+        "description": "Move to exact world coordinates."
+      },
+      "dungeon": {
+        "label": "Enter dungeon",
+        "description": "Enter a dungeon with dev gate bypass."
+      },
+      "raid": {
+        "label": "Enter raid",
+        "description": "Enter the Nythraxis arena directly."
+      },
+      "raidreset": {
+        "label": "Reset raid lockout",
+        "description": "Clear the current raid lockouts."
+      },
+      "bot": {
+        "label": "Spawn social bot",
+        "description": "Create a whisperable stationary player."
+      },
+      "lfgqueue": {
+        "label": "Seed finder queue",
+        "description": "Create a Dungeon Finder queue scenario."
+      },
+      "lfgraid": {
+        "label": "Seed raid finder",
+        "description": "Create a raid finder scenario."
+      },
+      "lfgboard": {
+        "label": "Seed listing board",
+        "description": "Create a premade listing scenario."
+      }
+    }
+  },
   "game": {
     "xp": {
       "suffix": "XP",
@@ -203,6 +351,7 @@ export const sv_SE: EnTranslations = {
       "remainingLessThanMinute": "<1 min",
       "remainingMinutes": "{minutes} min",
       "remainingHoursMinutes": "{hours} h {minutes} min",
+      "remainingDaysHours": "{days}d {hours}h",
       "score": "Poäng",
       "walletValue": "Plånbokens värde (WOC)",
       "usd": "{amount} USD",
@@ -241,7 +390,8 @@ export const sv_SE: EnTranslations = {
         "no_wallet": "Anslut en plånbok med minst 20 USD i WOC.",
         "under_minimum": "Plånboken är under WOC-miniminivån på 20 USD.",
         "price_unavailable": "WOC-priset är otillgängligt, belöningar är tillfälligt låsta.",
-        "banned": "Du är avstängd från dagliga belöningar. Orsak: {reason}"
+        "banned": "Du är avstängd från dagliga belöningar. Orsak: {reason}",
+        "bannedUntil": "You are banned from Daily Rewards for another {remaining}. Access returns {until}. Reason: {reason}"
       }
     },
     "wocStore": {
@@ -466,6 +616,7 @@ export const sv_SE: EnTranslations = {
       "balanceLabel": "Saldo",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL: {amount}",
+      "usdcBalance": "USDC: {amount}",
       "wocBalance": "WOC: {amount}",
       "unavailable": "Claudium-butiken är inte tillgänglig just nu. Ditt saldo och dina köp påverkas inte. Försök igen om en stund.",
       "disclosure": "Claudium är en virtuell valuta som bara går åt ett håll: köp den för pengar och använd den till kosmetika. Den kan inte växlas in, överföras eller betalas ut.",
@@ -473,6 +624,7 @@ export const sv_SE: EnTranslations = {
       "railLabel": "Betalningsmetod",
       "railStripe": "Kort",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "20% rabatt",
       "railWocUnavailable": "WOC-priser är inte tillgängliga just nu.",
@@ -618,13 +770,13 @@ export const sv_SE: EnTranslations = {
       "update": "Uppdatera"
     },
     "cameraPrompt": {
-      "title": "Choose Your Camera",
-      "intro": "Pick how the camera follows your character.",
-      "mouseDesc": "Move the mouse to turn the camera without holding a button.",
-      "classicTitle": "Classic Camera",
-      "classicDesc": "Hold right-click and move the mouse to turn the camera.",
-      "changeLater": "You can change this later under Esc, Key Bindings.",
-      "confirm": "Confirm"
+      "title": "Välj din kamera",
+      "intro": "Välj hur kameran följer din karaktär.",
+      "mouseDesc": "Rör musen för att vrida kameran utan att hålla in någon knapp.",
+      "classicTitle": "Klassisk kamera",
+      "classicDesc": "Håll in höger musknapp och rör musen för att vrida kameran.",
+      "changeLater": "Du kan ändra detta senare under Esc, Tangentbindningar.",
+      "confirm": "Bekräfta"
     },
     "castBar": {
       "playerAria": "Din besvärjelsemätare",
@@ -672,11 +824,11 @@ export const sv_SE: EnTranslations = {
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m} m {s} s",
       "seconds": "{s} s",
-      "autoShowHint": "Rows appear automatically once your party deals damage or healing, and this segment closes a few seconds after combat ends."
+      "autoShowHint": "Rader visas automatiskt när din grupp gör skada eller helar, och detta segment stängs några sekunder efter att striden avslutas."
     },
     "petFeed": {
-      "disabledFullHp": "Pet is at full health",
-      "disabledNoFood": "No food in your bags will heal your pet"
+      "disabledFullHp": "Husdjuret har fulla livspunkter",
+      "disabledNoFood": "Ingen mat i dina väskor kan hela ditt husdjur"
     },
     "keybinds": {
       "emoteWheel": "Gesthjul",
@@ -684,6 +836,7 @@ export const sv_SE: EnTranslations = {
       "targetFriendlyNext": "Växla vänligt mål",
       "discord": "Discord",
       "valecup": "Dalcupen",
+      "sheathe": "Slida/Ta fram vapen",
       "categoryPet": "Djur",
       "petAttack": "Djur: Anfall",
       "petStop": "Djur: Stanna",
@@ -856,6 +1009,7 @@ export const sv_SE: EnTranslations = {
       "aurasOnPlayerFrame": "Förstärkningar på spelarramen",
       "highContrastBackground": "Bakgrund med hög kontrast",
       "startAttackOnAbility": "Automatisk attack vid förmågeanvändning",
+      "showAttackButton": "Visa attackknapp",
       "walkByAutoloot": "Automatisk plundring i förbifarten",
       "groundReticle": "Markriktmedel",
       "showItemLevel": "Visa föremålsnivå",
@@ -977,6 +1131,7 @@ export const sv_SE: EnTranslations = {
         "spellPower": "Besvärjelsekraft",
         "critRating": "Kritvärde",
         "hasteRating": "Snabbhetsvärde",
+        "hitRating": "Träffvärde",
         "warfare": "Krigföring"
       },
       "warfareValue": "+{increase}% tillfogad / -{reduction}% mottagen",
@@ -994,6 +1149,7 @@ export const sv_SE: EnTranslations = {
         "dodge": "Din chans att helt undvika en inkommande närstridsattack utan att ta skada.",
         "critRating": "Kritvärde från din utrustning och setbonusar, som höjer din chans till kritisk träff. Ungefär 10 i värde ger 1% krit.",
         "hasteRating": "Snabbhetsvärde från din utrustning och setbonusar, som snabbar upp dina attacker och besvärjelser. Ungefär 10 i värde ger 1% snabbhet.",
+        "hitRating": "Träffvärde från din utrustning och setbonusar, som minskar hur ofta dina attacker missar och dina besvärjelser motarbetas, framfor allt mot fiender av högre nivå. Ungefär 10 i värde ger 1% träff.",
         "warfare": "Ökar skadan mot spelare med {increase}% och minskar skadan från spelare med {reduction}%."
       },
       "effects": {
@@ -1067,6 +1223,12 @@ export const sv_SE: EnTranslations = {
         "few": "du är {rank}, {count} medlemmar",
         "many": "du är {rank}, {count} medlemmar",
         "other": "du är {rank}, {count} medlemmar"
+      },
+      "finderPartySize": {
+        "one": "{count} spelare",
+        "few": "{count} spelare",
+        "many": "{count} spelare",
+        "other": "{count} spelare"
       },
       "characterCount": {
         "one": "{count} rollfigur",
@@ -1273,11 +1435,27 @@ export const sv_SE: EnTranslations = {
     },
     "dungeonDifficulty": {
       "setHeroic": "Ställ in fängelsehålans svårighetsgrad: Heroisk",
-      "setNormal": "Ställ in fängelsehålans svårighetsgrad: Normal"
+      "setNormal": "Ställ in fängelsehålans svårighetsgrad: Normal",
+      "resetAll": "Återställ alla instanser",
+      "resetDone": "Alla instanser har återställts.",
+      "resetNone": "Du har inga instanser att återställa.",
+      "resetOccupied": "Du kan inte återställa instanser medan någon fortfarande är kvar inuti.",
+      "resetSameDifficulty": "Ändra fängelsehålans svårighetsgrad innan du återställer dessa instanser. Tomma instanser återställs automatiskt efter 5 minuter.",
+      "resetLoot": "Du kan inte återställa instanser medan byte finns kvar inuti.",
+      "resetConfirmTitle": "Återställ alla instanser?",
+      "resetConfirmBody": "Detta överger tomma instanser från din tidigare valda svårighetsgrad. Outhämtat byte förhindrar återställningen.",
+      "resetConfirm": "Återställ instanser",
+      "resetCooldown": "Instanser kan bara återställas en gång var 5:e minut.",
+      "resetUsage": "Använd /dungeon reset för att överge dina tomma instanser efter att du har ändrat svårighetsgraden.",
+      "entryMismatchNormal": "Den här instansen är inställd på Normal svårighetsgrad. Använd Återställ alla instanser för att starta en ny Heroisk omgång.",
+      "entryMismatchHeroic": "Den här instansen är inställd på Heroisk svårighetsgrad. Använd Återställ alla instanser för att starta en ny Normal omgång."
     },
     "bags": {
       "cannotDestroy": "Det här föremålet kan inte förstöras.",
-      "rightClickDestroy": "Shift+right-click to destroy",
+      "rightClickDestroy": "Högerklicka för att förstöra",
+      "dragEquipHint": "Dra till din karaktär för att utrusta",
+      "dragDestroyHint": "Dra ut i världen för att förstöra",
+      "reorderNeedsRecent": "Rensa filtret och sortera efter Nyliga för att ordna om dina väskor",
       "filterGroupAria": "Filtrera väskor efter kategori",
       "filterAll": "Alla",
       "filterWeapon": "Vapen",
@@ -1350,6 +1528,8 @@ export const sv_SE: EnTranslations = {
       },
       "dodge": "Erhöht Ausweichchance um {pct}%",
       "dodgeReduce": "Verringert Ausweichchance um {pct}%",
+      "damageReduction": "Minskar all inkommande skada med {pct}%",
+      "guardianWard": "Nästa dödliga fiendeträff återger dig {pct}% av dina livspunkter i stället",
       "armorFlat": "Verringert Rüstung um {value}",
       "armorFlatStacks": "Verringert Rüstung um {value} ({stacks} Stapel)",
       "armorPct": "Minskar rustningen med {pct}%",
@@ -1438,6 +1618,33 @@ export const sv_SE: EnTranslations = {
       "unlock": "Flytta spelarramen",
       "lock": "Lås spelarramen"
     },
+    "partyFrames": {
+      "section": "Party and Raid Frames",
+      "unlock": "Move party and raid frames",
+      "lock": "Lock party and raid frames",
+      "style": "Frame Style",
+      "styleAutomatic": "Automatic",
+      "styleClassic": "Classic Party Frames",
+      "styleRaid": "Raid Frames",
+      "scale": "Frame Scale",
+      "width": "Frame Width",
+      "height": "Frame Height",
+      "spacing": "Frame Spacing",
+      "columns": "Raid Columns",
+      "healthText": "Health Text",
+      "healthNone": "None",
+      "healthPercent": "Percent",
+      "healthCurrent": "Current",
+      "healthCurrentMax": "Current / Max",
+      "sort": "Sort Players",
+      "sortGroup": "Group",
+      "sortRole": "Role",
+      "sortName": "Name",
+      "showResource": "Show Mana, Rage, and Energy",
+      "showAbsorbs": "Show Absorb Shields",
+      "showAuras": "Show Buffs and Debuffs",
+      "showSelf": "Show Your Frame"
+    },
     "frameReset": {
       "label": "Återställ ramarnas positioner"
     },
@@ -1478,7 +1685,7 @@ export const sv_SE: EnTranslations = {
         "benefits": "Länka ditt Discord för att tjäna poäng från spel och gemenskapsaktivitet, och klättra på statusnivåerna.",
         "error": "Det gick inte att länka Discord. Försök igen.",
         "success": "Discord länkat.",
-        "joinServer": "Just join the Discord server"
+        "joinServer": "Gå med i Discord-servern"
       },
       "choice": {
         "title": "Fortsätt med Discord",
@@ -1526,13 +1733,13 @@ export const sv_SE: EnTranslations = {
         "admin": "Admin",
         "coredevs": "Kärnutvecklare",
         "devs": "Utvecklare",
-        "seniormods": "Senior Mod",
+        "seniormods": "Senior-mod",
         "mods": "Moderator",
-        "juniormods": "Junior Mod",
+        "juniormods": "Junior-mod",
         "artists": "Konstnär",
-        "contentcreator": "Content Creator",
+        "contentcreator": "Innehållsskapare",
         "legend": "LEGEND",
-        "shill": "SHILL"
+        "shill": "MARKNADSFÖRARE"
       },
       "guildMember": "Verifierad medlem",
       "notMember": "Inte med på servern ännu",
@@ -1799,7 +2006,8 @@ export const sv_SE: EnTranslations = {
       "title": "Insamling",
       "mining": "Gruvdrift",
       "logging": "Skogsavverkning",
-      "herbalism": "Örtkunskap"
+      "herbalism": "Örtkunskap",
+      "notReady": "Den här resursnoden har inte återspawnats för dig ännu."
     },
     "archetypeTitle": {
       "label": "Titel",
@@ -1831,6 +2039,107 @@ export const sv_SE: EnTranslations = {
       "notAtHub": "Du måste vara vid hantverksplatsen, på rätt nivå, för att tillverka det.",
       "throttled": "Du tillverkar för snabbt. Vänta ett ögonblick och försök igen.",
       "recipeNotLearned": "Du har inte lärt dig det receptet än."
+    },
+    "finder": {
+      "title": "Fängelsehålsletaren",
+      "close": "Stäng",
+      "back": "Tillbaka",
+      "syncing": "Väntar på riket...",
+      "tabCatalogue": "Katalog",
+      "tabQueue": "Snabbmatch",
+      "tabBoard": "Förberedda grupper",
+      "normal": "Normal",
+      "heroic": "Heroisk",
+      "kindDungeon": "Fängelsehål",
+      "kindRaid": "Raid",
+      "kindSolo": "Soloäventyr",
+      "levels": "Nivåerna {min} till {max}",
+      "levelOne": "Nivå {level}",
+      "clock": "{minutes}:{seconds}",
+      "roleCount": "{count} {role}",
+      "roleTank": "Tank",
+      "roleHealer": "Helaren",
+      "roleDps": "Skada",
+      "freeRoles": "Alla roller välkomna",
+      "lockoutDaily": "Daglig spärr på slutbossen",
+      "lockoutNone": "Ingen spärr",
+      "lockedFor": "Låst i ungefär {minutes} min",
+      "attunement": "Kräver länkning: {quest}",
+      "heroicMarks": "Heroiska märken: {count} per spelare",
+      "entrance": "Ingång: {zone}",
+      "showOnMap": "Visa på kartan",
+      "encounters": "Möten",
+      "finalBoss": "Slutboss",
+      "summoned": "Kallad väktare",
+      "lootGuaranteed": "Ett av dessa faller alltid:",
+      "lootMaybe": "Högst ett av dessa kan falla:",
+      "lootChance": "Extra chans till föremål:",
+      "lootHeroic": "Heroisk bonus, ett av dessa faller alltid:",
+      "pct": "{pct}%",
+      "blockedLevel": "Endast nivåerna {min} till {max}",
+      "blockedSpec": "Kräver en specialisering",
+      "yourRoles": "Dina roller",
+      "needsSpec": "Välj en specialisering för att använda Fängelsehålsletaren.",
+      "leaderNote": "Endast din grupplanledare kan ställa gruppen i kö.",
+      "chooseActivities": "Välj aktiviteter",
+      "joinQueue": "Ställ dig i kö",
+      "leaveQueue": "Lämna kön",
+      "waited": "Tid i kö: {time}",
+      "cooldownNote": "Du kan ställa dig i kö igen om {seconds}s.",
+      "travelNote": "Gruppen samlas där alla befinner sig. Res till ingången tillsammans, ingen teleporteras.",
+      "proposalTitle": "Grupp hittad: {name}",
+      "proposalRole": "Din roll: {role}",
+      "accepted": "{accepted} av {size} bekräftade",
+      "remaining": "{seconds}s att svara",
+      "accept": "Acceptera",
+      "decline": "Avvisa",
+      "acceptedWait": "Väntar på de övriga...",
+      "slotState": "{role}: {accepted} av {total} redo",
+      "openListings": "Öppna annonser",
+      "boardEmpty": "Inga annonser just nu. Publicera en!",
+      "boardLeaderGate": "Endast din grupplanledare kan publicera en annons.",
+      "publishListing": "Publicera en annons",
+      "activity": "Aktivitet",
+      "publish": "Publicera",
+      "yourListing": "Din annons",
+      "closeListing": "Stäng annons",
+      "applicants": "Sökande",
+      "noApplicants": "Inga sökande ännu.",
+      "acceptApplicantAria": "Acceptera {name}",
+      "declineApplicantAria": "Avvisa {name}",
+      "levelClass": "Nv {level} {className}",
+      "leader": "Ledare: {name}",
+      "needs": "Behöver {roles}",
+      "slots": "{size}/{capacity}",
+      "apply": "Ansök",
+      "withdraw": "Dra tillbaka ansökan",
+      "tagFirstRun": "Första genomgången",
+      "tagQuestRun": "Uppdragsgenomgång",
+      "tagFullClear": "Full rensning",
+      "tagLearning": "Nybörjare välkomna",
+      "tagFastRun": "Snabb genomgång",
+      "mech": {
+        "shadow_pulse": "Skuggpuls (pulserande områdesskada)",
+        "reaping_arc": "Skördebåge (frontalt huggsving)",
+        "mist_surge": "Dimstorm (pulserande områdesskada)",
+        "summons_adds": "Kallar förstärkningar",
+        "lunar_tide": "Månflod (pulserande områdesskada)",
+        "enrage": "Rasar vid låga livspunkter",
+        "shuddering_stomp": "Darrande trampling (områdeschock)",
+        "necrotic_shockwave": "Nekrotisk chockvåg (kraftig områdesskada)",
+        "grave_cleaver": "Grav-klyvare (frontalt huggsving)",
+        "shadow_nova": "Skuggnova (områdesburst)",
+        "profane_mending": "Vanhelgad läkning (helar sina allierade)",
+        "mana_burn": "Förvissnad välsignelse (bränner mana)",
+        "deathstalker_cleave": "Dödsstalkarens huggsving (frontalt huggsving)",
+        "mortal_wound": "Glömt sår (minskar mottagen läkning)",
+        "sealbreak_shockwave": "Sigelsbrytande chockvåg (områdesburst)",
+        "gravebreaker": "Gravkrossare (frontal kon, rikta den bort från raiden)",
+        "raise_fallen": "Res de fallna (periodiska vågor av tillskott)",
+        "soul_rend": "Själsrift (märkta spelare måste sprida sig och bli helade)",
+        "deathless_rage": "Dödsfri vrede (avbryts vid väktarstenarna)",
+        "wardstones": "Väktarstenarnas kanaler (fasövergång)"
+      }
     },
     "deeds": {
       "title": "Bedrifternas bok",
@@ -2573,8 +2882,8 @@ export const sv_SE: EnTranslations = {
         "desc": "Fjälliga, ormlika ting från de gamla djupen. Sällsynta, stolta och långt starkare än de ser ut."
       },
       "reptile": {
-        "name": "Reptiles",
-        "desc": "Cold-blooded hunters with a hiss and a snap all their own, distinct from the warm-blooded beasts."
+        "name": "Reptiler",
+        "desc": "Kallblodiga jägare med ett eget väsande och ett snäppande bett, skilda från de varmblodiga djuren."
       }
     },
     "worldPage": {
@@ -3596,6 +3905,7 @@ export const sv_SE: EnTranslations = {
     "title": "Ladda ner skrivbordsstartaren",
     "desc": "Hämta den fristående startaren för optimerad prestanda och spel i helskärm.",
     "macCta": "Ladda ner för macOS",
+    "windowsCta": "Ladda ner för Windows",
     "linuxCta": "Ladda ner för Linux",
     "linuxHint": "AppImage: gör den körbar och kör den sedan. Ingen installation behövs.",
     "windowsPending": "Windows-bygge väntar."
@@ -4483,6 +4793,8 @@ export const sv_SE: EnTranslations = {
     "connectionLost": "Anslutningen till servern bröts.",
     "reconnecting": "Anslutning förlorad. Återansluter...",
     "connectionRejected": "Servern stängde anslutningen.",
+    "realmFull": "Denna värld är full just nu. Försök igen om några minuter.",
+    "tooManyConnections": "För många anslutningar till denna värld kommer från ditt nätverk. Stäng extra spelfönster eller försök igen om några minuter.",
     "tips": {
       "classes": "Tips: var och en av de 9 klasserna spelas på sitt eget sätt. Prova några innan du bestämmer dig för en.",
       "talents": "Tips: du kan återställa dina talanger när du inte strider, så ett tidigt val blir aldrig en fälla.",
@@ -5249,6 +5561,7 @@ export const sv_SE: EnTranslations = {
     "actionBar": {
       "attackName": "Anfall",
       "attackTooltip": "Växla automatiskt anfall mot ditt mål. Att högerklicka på en fiende anfaller också.",
+      "attackRemoveHint": "Högerklicka för att ta bort det från fältet och frigöra platsen.",
       "emptySlot": "Tom plats",
       "slotAria": "Handlingsplats {slot}: {ability}",
       "emptySlotAria": "Handlingsplats {slot}: tom",
@@ -6164,6 +6477,18 @@ export const sv_SE: EnTranslations = {
       "barkskin": {
         "name": "Ekhud",
         "description": "Din hud hårdnar som bark och ökar rustning med 150 i 15 sek."
+      },
+      "ironhold": {
+        "name": "Järngrepp",
+        "description": "Forsar dig bakom ditt skydd och minskar all inkommande skada med 40% i 8 sek."
+      },
+      "sacred_bulwark": {
+        "name": "Helig Bålverk",
+        "description": "I {duration} sek nekas nästa fiendeträff som annars skulle döda dig, och du återfår 35% av dina livspunkter i stället."
+      },
+      "primal_reflexes": {
+        "name": "Ursinnesreflexer",
+        "description": "Dina instinkter skärps och ökar din chans att undvika anfall med 50% i 6 sek."
       },
       "starfire": {
         "name": "Himlafall",

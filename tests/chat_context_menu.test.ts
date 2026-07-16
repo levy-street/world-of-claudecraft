@@ -5,6 +5,8 @@ import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
 import {
   type ChatPlayerContextState,
   chatPlayerContextActions,
+  type SelfPlayerContextState,
+  selfPlayerContextActions,
   streamerActionPlatform,
   streamerMenuActions,
 } from '../src/ui/player_context_menu';
@@ -224,6 +226,58 @@ describe('chat player context menu', () => {
 
     expect(actions.find((a) => a.id === 'whisper')?.label).toBe('Flüstern');
     expect(actions.find((a) => a.id === 'report')?.label).toBe('Spieler melden');
+  });
+});
+
+const SELF_BASE: SelfPlayerContextState = {
+  inParty: false,
+  isLeader: false,
+  isRaid: false,
+  partySize: 1,
+  isHeroic: false,
+};
+
+describe('self player context menu', () => {
+  it('offers Leave Party to every party member', () => {
+    const member = selfPlayerContextActions({
+      ...SELF_BASE,
+      inParty: true,
+      partySize: 3,
+    });
+    const leader = selfPlayerContextActions({
+      ...SELF_BASE,
+      inParty: true,
+      isLeader: true,
+      partySize: 3,
+    });
+
+    expect(member.map((action) => action.id)).toContain('leave-party');
+    expect(leader.map((action) => action.id)).toContain('leave-party');
+  });
+
+  it('does not offer Leave Party while solo', () => {
+    expect(selfPlayerContextActions(SELF_BASE).map((action) => action.id)).not.toContain(
+      'leave-party',
+    );
+  });
+
+  it('keeps leader-only conversion and dungeon actions gated', () => {
+    const member = selfPlayerContextActions({
+      ...SELF_BASE,
+      inParty: true,
+      partySize: 5,
+    });
+    const leader = selfPlayerContextActions({
+      ...SELF_BASE,
+      inParty: true,
+      isLeader: true,
+      partySize: 5,
+    });
+
+    expect(member.map((action) => action.id)).not.toContain('convert-raid');
+    expect(member.map((action) => action.id)).not.toContain('dungeon-difficulty');
+    expect(leader.map((action) => action.id)).toContain('convert-raid');
+    expect(leader.map((action) => action.id)).toContain('dungeon-difficulty');
   });
 });
 

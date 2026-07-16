@@ -8,19 +8,28 @@
 
 import { spellHitChance } from '../types';
 
+// Effective spell-hit chance including the caster's gear Hit rating (hitBonus, a
+// fraction that reduces resist). Capped at 1. hitBonus defaults to 0, so a caster
+// with no hit gear is byte-identical to the level-only chance.
+export function effectiveSpellHit(casterLevel: number, targetLevel: number, hitBonus = 0): number {
+  return Math.min(1, spellHitChance(casterLevel, targetLevel) + hitBonus);
+}
+
 // Probability in [0,1] that a target fully resists a spell from this caster.
-export function spellResistChance(casterLevel: number, targetLevel: number): number {
-  return 1 - spellHitChance(casterLevel, targetLevel);
+export function spellResistChance(casterLevel: number, targetLevel: number, hitBonus = 0): number {
+  return 1 - effectiveSpellHit(casterLevel, targetLevel, hitBonus);
 }
 
 // Whether a cast is resisted (does no damage and applies no effect). Draws
-// exactly one value from the shared rng via `chance(spellHitChance(...))`, so
+// exactly one value from the shared rng via `chance(effectiveSpellHit(...))`, so
 // the global draw order is identical to the previous spell-hit roll: only the
-// emitted event label changes from 'miss' to 'resist'.
+// emitted event label changes from 'miss' to 'resist'. With hitBonus 0 the
+// argument equals spellHitChance(...) exactly, keeping the ungeared draw identical.
 export function isSpellResisted(
   rng: { chance(p: number): boolean },
   casterLevel: number,
   targetLevel: number,
+  hitBonus = 0,
 ): boolean {
-  return !rng.chance(spellHitChance(casterLevel, targetLevel));
+  return !rng.chance(effectiveSpellHit(casterLevel, targetLevel, hitBonus));
 }

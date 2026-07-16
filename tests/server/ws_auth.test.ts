@@ -102,6 +102,10 @@ function setup() {
     bufferHandshakeMessages,
     requestMetadata: vi.fn(() => ({ ip: '1.2.3.4', userAgent: 'ua' })),
     maxWsPerIpHard: 20,
+    // The realm admission cap is DISABLED by default (0), so every existing case
+    // reaches game.join unchanged; the cap arm is exercised by the dedicated block
+    // below, which raises it per case.
+    maxPlayersPerRealm: 0,
   };
   const req = {} as http.IncomingMessage;
   return { ws, game, session, deps, req };
@@ -189,7 +193,7 @@ describe('createWsAuth: authenticateWebSocket reject paths', () => {
     );
   });
 
-  it('8. closes 1008 on the IP gate, wiring the gate inputs, and sends NO error frame', async () => {
+  it('8. sends the tooManyConnections error frame on the IP gate, wiring the gate inputs', async () => {
     const { ws, game, deps, req } = setup();
     deps.isConnectionRefused = vi.fn(() => true);
     const { authenticateWebSocket } = createWsAuth(deps);
@@ -207,10 +211,9 @@ describe('createWsAuth: authenticateWebSocket reject paths', () => {
     });
     expect(game.isIpBlocked).toHaveBeenCalledWith('1.2.3.4');
     expect(game.countIpSessions).toHaveBeenCalledWith('1.2.3.4');
-    // This asymmetry is load-bearing: the hard per-IP limit closes with a code
-    // and reason but never writes a {t:'error'} frame first.
-    expect(ws.close).toHaveBeenCalledWith(1008, 'Too many connections from your network');
-    expect(ws.send).not.toHaveBeenCalled();
+    // The refusal now rides the same localizable {t:'error'} frame every other
+    // reject path uses, so the client surfaces it instead of silently reconnecting.
+    expectSendThenClose(ws, errorFrame('too many connections from your network'));
   });
 
   it('8b. refuses via the REAL gate predicate when live IP sessions reach the hard limit', async () => {
@@ -221,7 +224,19 @@ describe('createWsAuth: authenticateWebSocket reject paths', () => {
     game.countIpSessions = vi.fn((_ip: string) => 20); // exactly at maxWsPerIpHard (20)
     const { authenticateWebSocket } = createWsAuth(deps);
     await authenticateWebSocket(asWs(ws), authRaw(), req);
-    expect(ws.close).toHaveBeenCalledWith(1008, 'Too many connections from your network');
+    expectSendThenClose(ws, errorFrame('too many connections from your network'));
+    expect(game.join).not.toHaveBeenCalled();
+  });
+
+  it('8b2. refuses via the REAL gate predicate when the IP is blocked', async () => {
+    const { ws, game, deps, req } = setup();
+    // The blocked arm of the real predicate, with the session count at zero, so the
+    // refusal can only come from the block flag itself.
+    deps.isConnectionRefused = realIsConnectionRefused;
+    game.isIpBlocked = vi.fn((_ip: string) => true);
+    const { authenticateWebSocket } = createWsAuth(deps);
+    await authenticateWebSocket(asWs(ws), authRaw(), req);
+    expectSendThenClose(ws, errorFrame('too many connections from your network'));
     expect(game.join).not.toHaveBeenCalled();
   });
 
@@ -232,9 +247,9 @@ describe('createWsAuth: authenticateWebSocket reject paths', () => {
     game.countIpSessions = vi.fn((_ip: string) => 999); // far past the limit
     const { authenticateWebSocket } = createWsAuth(deps);
     await authenticateWebSocket(asWs(ws), authRaw(), req);
-    // isAdmin short-circuits the gate, so the join proceeds and no 1008 fires.
+    // isAdmin short-circuits the gate, so the join proceeds and no refusal frame is sent.
     expect(game.join).toHaveBeenCalledTimes(1);
-    expect(ws.close).not.toHaveBeenCalledWith(1008, 'Too many connections from your network');
+    expect(ws.send).not.toHaveBeenCalledWith(errorFrame('too many connections from your network'));
   });
 
   it('9. forwards a game.join error frame', async () => {
@@ -260,6 +275,296 @@ describe('createWsAuth: authenticateWebSocket reject paths', () => {
     await authenticateWebSocket(asWs(ws), authRaw(), req);
     expectSendThenClose(ws, errorFrame('You are banned.'));
     expect(deps.getCharacter).not.toHaveBeenCalled();
+  });
+});
+
+describe('createWsAuth: realm admission cap', () => {
+  it('a. refuses an at-cap fresh join with "realm is full", before the lease and the join', async () => {
+    const { ws, game, deps, req } = setup();
+    deps.maxPlayersPerRealm = 5;
+    game.clients = { size: 5 };
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const { authenticateWebSocket } = createWsAuth(deps);
+    await authenticateWebSocket(asWs(ws), authRaw(), req);
+    // The literal 'realm is full' rides the {t:'error'} frame verbatim (WS_AUTH_ERROR
+    // is not exported; the wire literal is the contract the client matches).
+    expectSendThenClose(ws, errorFrame('realm is full'));
+    expect(game.join).not.toHaveBeenCalled();
+    // The refusal is checked BEFORE the lease acquire, so a refused join never
+    // stamps (and could never leak) a character lease.
+    expect(deps.acquireCharacterLease).not.toHaveBeenCalled();
+    logSpy.mockRestore();
+  });
+
+  it('b. lets an at-cap RESUME through: an existing session reuses its world slot', async () => {
+    const { ws, game, deps, req } = setup();
+    deps.maxPlayersPerRealm = 5;
+    game.clients = { size: 5 };
+    // A live or linkdead session already owns this character: the handshake takes
+    // the resume arm, which is exempt from the cap (it adds no new world slot).
+    game.hasSessionForCharacter = vi.fn(() => true);
+    const { authenticateWebSocket } = createWsAuth(deps);
+    await authenticateWebSocket(asWs(ws), authRaw(), req);
+    expect(game.join).toHaveBeenCalledTimes(1);
+    expect(ws.send).not.toHaveBeenCalledWith(errorFrame('realm is full'));
+  });
+
+  it('c. a cap of 0 disables the gate even far past any count', async () => {
+    const { ws, game, deps, req } = setup();
+    deps.maxPlayersPerRealm = 0;
+    game.clients = { size: 999 };
+    const { authenticateWebSocket } = createWsAuth(deps);
+    await authenticateWebSocket(asWs(ws), authRaw(), req);
+    expect(game.join).toHaveBeenCalledTimes(1);
+    expect(ws.send).not.toHaveBeenCalledWith(errorFrame('realm is full'));
+  });
+
+  it('d. staff bypass the cap, mirroring the per-IP exemption', async () => {
+    const { ws, game, deps, req } = setup();
+    deps.maxPlayersPerRealm = 5;
+    game.clients = { size: 5 };
+    deps.adminRolesForAccount = vi.fn(async () => ({ username: 'Op', roles: ['admin'] }));
+    const { authenticateWebSocket } = createWsAuth(deps);
+    await authenticateWebSocket(asWs(ws), authRaw(), req);
+    expect(game.join).toHaveBeenCalledTimes(1);
+    expect(ws.send).not.toHaveBeenCalledWith(errorFrame('realm is full'));
+  });
+
+  it('e. admits a fresh join one below the cap (the boundary just under refusal)', async () => {
+    const { ws, game, deps, req } = setup();
+    deps.maxPlayersPerRealm = 5;
+    game.clients = { size: 4 };
+    const { authenticateWebSocket } = createWsAuth(deps);
+    await authenticateWebSocket(asWs(ws), authRaw(), req);
+    expect(game.join).toHaveBeenCalledTimes(1);
+    expect(ws.send).not.toHaveBeenCalledWith(errorFrame('realm is full'));
+  });
+
+  it('f. admits exactly one of two concurrent fresh joins racing for the last slot', async () => {
+    const { ws, game, deps, req } = setup();
+    const ws2 = new FakeWs();
+    deps.maxPlayersPerRealm = 5;
+    // One free slot (4 of 5): two fresh joins for DIFFERENT characters race for it.
+    game.clients = { size: 4 };
+    // Echo the requested character id so the two handshakes hold DISTINCT ids (no
+    // pendingLeaseJoins collision), isolating the cap-race path.
+    deps.getCharacter = vi.fn(async (_accountId: number, id: number) => baseChar({ id }));
+    // A slow lease acquire holds the first fresh join open across the awaits, so the
+    // second reaches the cap check while the first is still in flight. The in-flight
+    // counter (not a bare game.clients.size read) is what must refuse the second.
+    deps.acquireCharacterLease = vi.fn(async () => {
+      await new Promise((r) => setTimeout(r, 10));
+      return true;
+    });
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const { authenticateWebSocket } = createWsAuth(deps);
+    // Launch BOTH without awaiting the first, so they interleave across the awaits.
+    const first = authenticateWebSocket(asWs(ws), authRaw({ character: 7 }), req);
+    const second = authenticateWebSocket(asWs(ws2), authRaw({ character: 8 }), req);
+    await Promise.all([first, second]);
+    // Exactly one join, and the loser got the realm-full frame: the in-flight
+    // admission the winner holds fills the last slot before the loser's cap check.
+    expect(game.join).toHaveBeenCalledTimes(1);
+    expectSendThenClose(ws2, errorFrame('realm is full'));
+    expect(ws.send).not.toHaveBeenCalledWith(errorFrame('realm is full'));
+    logSpy.mockRestore();
+  });
+
+  it('g. aggregates refusal logging to one line per window carrying the count since the last', async () => {
+    const { game, deps, req } = setup();
+    deps.maxPlayersPerRealm = 5;
+    game.clients = { size: 5 };
+    // Echo the requested id so each refusal is a distinct character.
+    deps.getCharacter = vi.fn(async (_accountId: number, id: number) => baseChar({ id }));
+    let nowMs = 100_000;
+    const nowSpy = vi.spyOn(Date, 'now').mockImplementation(() => nowMs);
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const { authenticateWebSocket } = createWsAuth(deps);
+    const refusalLines = () =>
+      logSpy.mock.calls.map((c) => String(c[0])).filter((line) => line.includes('realm full'));
+    const refuse = (character: number) =>
+      authenticateWebSocket(asWs(new FakeWs()), authRaw({ character }), req);
+    // The first refusal after an idle window logs immediately, carrying its own count.
+    await refuse(11);
+    expect(refusalLines()).toEqual(['ws auth: realm full, refused 1 fresh join(s) at cap 5']);
+    // Further refusals inside the window stay silent (aggregated, never per-attempt spam).
+    nowMs += 1_000;
+    await refuse(12);
+    nowMs += 1_000;
+    await refuse(13);
+    expect(refusalLines()).toHaveLength(1);
+    // One millisecond under the 30s window edge is still silent (pins the window
+    // value, not just "some delay")...
+    nowMs = 129_999;
+    await refuse(14);
+    expect(refusalLines()).toHaveLength(1);
+    // ...and the edge itself flushes the aggregate: the three silent refusals
+    // plus itself.
+    nowMs = 130_000;
+    await refuse(15);
+    expect(refusalLines()).toEqual([
+      'ws auth: realm full, refused 1 fresh join(s) at cap 5',
+      'ws auth: realm full, refused 4 fresh join(s) at cap 5',
+    ]);
+    nowSpy.mockRestore();
+    logSpy.mockRestore();
+  });
+
+  it('g2. flushes a burst tail at the window edge instead of waiting for the next refusal', async () => {
+    // Refusals inside the window aggregate silently; if the burst then STOPS, the
+    // tail must still be logged at the window edge. Without the trailing flush the
+    // count sits invisible until the next refusal after the window, which may be
+    // hours later, so incident-time counts read shifted into the wrong burst.
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    let nowMs = 100_000;
+    const nowSpy = vi.spyOn(Date, 'now').mockImplementation(() => nowMs);
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    try {
+      const { game, deps, req } = setup();
+      deps.maxPlayersPerRealm = 5;
+      game.clients = { size: 5 };
+      deps.getCharacter = vi.fn(async (_accountId: number, id: number) => baseChar({ id }));
+      const { authenticateWebSocket } = createWsAuth(deps);
+      const refusalLines = () =>
+        logSpy.mock.calls.map((c) => String(c[0])).filter((line) => line.includes('realm full'));
+      const refuse = (character: number) =>
+        authenticateWebSocket(asWs(new FakeWs()), authRaw({ character }), req);
+      // First refusal after idle logs immediately; the two inside the window stay
+      // silent and arm exactly one trailing flush.
+      await refuse(21);
+      nowMs += 1_000;
+      await refuse(22);
+      nowMs += 1_000;
+      await refuse(23);
+      expect(refusalLines()).toEqual(['ws auth: realm full, refused 1 fresh join(s) at cap 5']);
+      // The burst stops. At the window edge the tail flushes on its own.
+      nowMs = 130_000;
+      await vi.advanceTimersByTimeAsync(30_000);
+      expect(refusalLines()).toEqual([
+        'ws auth: realm full, refused 1 fresh join(s) at cap 5',
+        'ws auth: realm full, refused 2 fresh join(s) at cap 5',
+      ]);
+      // The flush cleared the aggregate and disarmed itself: nothing further fires.
+      nowMs = 200_000;
+      await vi.advanceTimersByTimeAsync(60_000);
+      expect(refusalLines()).toHaveLength(2);
+    } finally {
+      // Restore in the finally: a failing assertion above must not leak a frozen
+      // Date.now or a silenced console.log into every later test in this file.
+      nowSpy.mockRestore();
+      logSpy.mockRestore();
+      vi.useRealTimers();
+    }
+  });
+
+  it('g3. an inline window-edge flush disarms the pending trailing timer (no early flush of the next window)', async () => {
+    // The race this pins: a refusal at the window edge flushes inline while an
+    // older trailing timer is still pending. If that timer survived, it would
+    // fire moments into the NEW window and flush a fresh burst's first refusals
+    // early, splitting one burst into two misdated lines.
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    let nowMs = 100_000;
+    const nowSpy = vi.spyOn(Date, 'now').mockImplementation(() => nowMs);
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    try {
+      const { game, deps, req } = setup();
+      deps.maxPlayersPerRealm = 5;
+      game.clients = { size: 5 };
+      deps.getCharacter = vi.fn(async (_accountId: number, id: number) => baseChar({ id }));
+      const { authenticateWebSocket } = createWsAuth(deps);
+      const refusalLines = () =>
+        logSpy.mock.calls.map((c) => String(c[0])).filter((line) => line.includes('realm full'));
+      const refuse = (character: number) =>
+        authenticateWebSocket(asWs(new FakeWs()), authRaw({ character }), req);
+      await refuse(31); // logs immediately (line 1)
+      nowMs = 101_000;
+      await refuse(32); // silent, arms the trailing timer (due at the 130_000 edge)
+      await vi.advanceTimersByTimeAsync(28_000); // sit just short of that edge
+      nowMs = 130_000;
+      await refuse(33); // window edge: inline flush (line 2, count 2) must DISARM the timer
+      nowMs = 130_500;
+      await refuse(34); // first refusal of the NEW window: silent, arms a fresh timer
+      nowMs = 131_000;
+      // Cross the old timer's due time: a surviving stale timer would flush the
+      // new window's single refusal here, 29 seconds early.
+      await vi.advanceTimersByTimeAsync(1_000);
+      expect(refusalLines()).toEqual([
+        'ws auth: realm full, refused 1 fresh join(s) at cap 5',
+        'ws auth: realm full, refused 2 fresh join(s) at cap 5',
+      ]);
+      // The fresh timer still flushes the new window's tail at its OWN edge.
+      nowMs = 160_500;
+      await vi.advanceTimersByTimeAsync(29_500);
+      expect(refusalLines()).toEqual([
+        'ws auth: realm full, refused 1 fresh join(s) at cap 5',
+        'ws auth: realm full, refused 2 fresh join(s) at cap 5',
+        'ws auth: realm full, refused 1 fresh join(s) at cap 5',
+      ]);
+    } finally {
+      // Restore in the finally: a failing assertion above must not leak a frozen
+      // Date.now or a silenced console.log into every later test in this file.
+      nowSpy.mockRestore();
+      logSpy.mockRestore();
+      vi.useRealTimers();
+    }
+  });
+
+  it('h. a failed fresh join releases its in-flight admission (no capacity leak)', async () => {
+    const { game, deps, req } = setup();
+    deps.maxPlayersPerRealm = 5;
+    // One free slot (4 of 5) for the whole case: only released admissions keep it open.
+    game.clients = { size: 4 };
+    deps.getCharacter = vi.fn(async (_accountId: number, id: number) => baseChar({ id }));
+    // createWsAuth destructures the deps at construction, so the three joins'
+    // behaviors are queued up front: join 1 has its lease refused (a live foreign
+    // lease), join 2 throws on the bank-bonus DB read, join 3 is clean.
+    const bankOk = { bonusSlots: 0, sources: [] };
+    deps.bankBonusForAccount = vi
+      .fn(async () => bankOk)
+      .mockResolvedValueOnce(bankOk)
+      .mockRejectedValueOnce(new Error('db down'));
+    deps.acquireCharacterLease = vi.fn(async () => true).mockResolvedValueOnce(false);
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const { authenticateWebSocket } = createWsAuth(deps);
+    // Failure arm 1: the lease refusal. The join was counted in flight past the
+    // cap check, so the refusal must release it.
+    const ws1 = new FakeWs();
+    await authenticateWebSocket(asWs(ws1), authRaw({ character: 21 }), req);
+    expectSendThenClose(ws1, errorFrame('character already in world'));
+    // Failure arm 2: a thrown fresh-arm DB error propagates to the caller and
+    // must release the admission on the way out.
+    const ws2 = new FakeWs();
+    await expect(authenticateWebSocket(asWs(ws2), authRaw({ character: 22 }), req)).rejects.toThrow(
+      'db down',
+    );
+    // With both failed admissions released, the single free slot is still
+    // admittable: a leaked counter would refuse this join as realm-full instead.
+    const ws3 = new FakeWs();
+    await authenticateWebSocket(asWs(ws3), authRaw({ character: 23 }), req);
+    expect(game.join).toHaveBeenCalledTimes(1);
+    expect(ws3.send).not.toHaveBeenCalledWith(errorFrame('realm is full'));
+    logSpy.mockRestore();
+  });
+
+  it('i. a successful fresh join releases its in-flight admission (no capacity leak)', async () => {
+    const { game, deps, req } = setup();
+    deps.maxPlayersPerRealm = 5;
+    // One free slot (4 of 5), and the fake clients.size never grows, so ONLY a
+    // leaked in-flight admission could push the second join over the cap: a
+    // decrement moved off the success path (out of the unconditional release)
+    // refuses join 2 as realm-full while every failure-arm case stays green.
+    game.clients = { size: 4 };
+    deps.getCharacter = vi.fn(async (_accountId: number, id: number) => baseChar({ id }));
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const { authenticateWebSocket } = createWsAuth(deps);
+    const ws1 = new FakeWs();
+    await authenticateWebSocket(asWs(ws1), authRaw({ character: 31 }), req);
+    expect(ws1.send).not.toHaveBeenCalledWith(errorFrame('realm is full'));
+    const ws2 = new FakeWs();
+    await authenticateWebSocket(asWs(ws2), authRaw({ character: 32 }), req);
+    expect(ws2.send).not.toHaveBeenCalledWith(errorFrame('realm is full'));
+    expect(game.join).toHaveBeenCalledTimes(2);
+    logSpy.mockRestore();
   });
 });
 
@@ -458,8 +763,10 @@ describe('createWsAuth: bank bonus stamp', () => {
 
   it('never recomputes the bank bonus on the resume arm (no mid-session recompute)', async () => {
     const { ws, game, deps, req } = setup();
-    // A live/linkdead session already owns the lease row: the handshake takes the resume
-    // arm, which must not recompute or stamp a fresh bonus (locked policy).
+    // A live/linkdead session in this process holds the character (it usually still
+    // owns the lease row too, unless a cross-process takeover already rotated the
+    // nonce): the handshake takes the resume arm, which must not recompute or stamp
+    // a fresh bonus (locked policy).
     game.hasSessionForCharacter = vi.fn(() => true);
     const { authenticateWebSocket } = createWsAuth(deps);
     await authenticateWebSocket(asWs(ws), authRaw(), req);
@@ -500,6 +807,53 @@ describe('createWsAuth: onConnection', () => {
     // The timer was cleared, so advancing past it produces no timeout frame.
     vi.advanceTimersByTime(10_000);
     expect(ws.send).not.toHaveBeenCalledWith(errorFrame('authentication timed out'));
+  });
+
+  it('converts a rejected handshake into the retryable authTimedOut frame while the socket is open, then flushes', async () => {
+    const { ws, deps, req } = setup();
+    // A DB dependency rejects, so authenticateWebSocket rejects (it is designed to
+    // reject, never swallow: the character_lease_ws pin requires that). The caller
+    // must convert the escaped rejection into the client's classified retry path
+    // instead of leaving an unhandled rejection that hangs the client.
+    deps.accountForToken = vi.fn(async () => {
+      throw new Error('db down');
+    });
+    // Model an OPEN socket so the caller sends the classified error frame.
+    (ws as unknown as { readyState: number; OPEN: number }).readyState = 1;
+    (ws as unknown as { OPEN: number }).OPEN = 1;
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { onConnection } = createWsAuth(deps);
+    await onConnection(asWs(ws), req);
+
+    ws.emit('message', authRaw());
+    await flushMicrotasks();
+
+    // The client receives the EXISTING retryable rejection literal, not a hang.
+    expectSendThenClose(ws, errorFrame('authentication timed out'));
+    // The escaped rejection is logged server-side, never silently swallowed.
+    expect(errSpy).toHaveBeenCalled();
+    errSpy.mockRestore();
+  });
+
+  it('logs but sends no frame when the socket already closed during a rejected handshake', async () => {
+    const { ws, deps, req } = setup();
+    deps.accountForToken = vi.fn(async () => {
+      throw new Error('db down');
+    });
+    // Socket already closed (readyState CLOSED, not OPEN): the caller must not
+    // double-send onto a socket a reject path already tore down.
+    (ws as unknown as { readyState: number; OPEN: number }).readyState = 3;
+    (ws as unknown as { OPEN: number }).OPEN = 1;
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { onConnection } = createWsAuth(deps);
+    await onConnection(asWs(ws), req);
+
+    ws.emit('message', authRaw());
+    await flushMicrotasks();
+
+    expect(ws.send).not.toHaveBeenCalled();
+    expect(errSpy).toHaveBeenCalled();
+    errSpy.mockRestore();
   });
 
   it('tears down quietly on a pre-auth socket error without throwing', async () => {

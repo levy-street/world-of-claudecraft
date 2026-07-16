@@ -43,6 +43,7 @@ import {
   normAngle,
   swingMissChance,
 } from '../types';
+import { drawWeapon } from '../weapon_stow';
 import { spendResource } from './casting_lifecycle';
 import { blindMissBonus, isDisarmed, isStunned } from './cc';
 import { consumeNextAttackCrit } from './empower_next';
@@ -70,6 +71,7 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
     return;
   }
   if (p.sitting) ctx.standUp(p);
+  if (p.weaponStowed) drawWeapon(p);
   p.autoAttack = true;
   r.meta.lastActiveTick = ctx.tickCount; // starting auto-attack is a deliberate action
   // Engaging MELEE auto-attack seeds aggro at once, because the swing lands almost
@@ -189,7 +191,7 @@ export function rangedSwing(
     targetId: target.id,
     school,
     fx: 'projectile',
-    ...(ranged.wand ? {} : { attackAnimation: 'ranged-shot' as const }),
+    ...(ranged.wand ? { wand: true as const } : { attackAnimation: 'ranged-shot' as const }),
   });
   // The shot/bolt is in flight: its miss roll and damage land when it reaches the
   // target (projectile_travel), and fizzle if the target dies before impact.

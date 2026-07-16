@@ -192,6 +192,14 @@ export const BIND_ACTIONS: BindAction[] = [
     defaults: ['KeyG'],
   },
   {
+    // Shift+KeyI: bare KeyI belongs to Calendar (unchanged).
+    id: 'dungeonFinder',
+    label: 'Dungeon Finder',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['Shift+KeyI'],
+  },
+  {
     id: 'valecup',
     label: 'Vale Cup',
     category: 'Interface',
@@ -244,6 +252,13 @@ export const BIND_ACTIONS: BindAction[] = [
     category: 'Interface',
     kind: 'held',
     defaults: ['KeyX'],
+  },
+  {
+    id: 'sheathe',
+    label: 'Sheathe/Unsheathe Weapon',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['KeyZ'],
   },
   // Pet bar (hunter/warlock pet commands). Bound to Ctrl + 1..5 by default, so the
   // action-bar 1..5 stay free; every one is rebindable like any other action. The

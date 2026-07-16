@@ -10,6 +10,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { MOBS } from '../src/sim/data';
+import { createMobScanCounters } from '../src/sim/mob/scan_counters';
 import {
   highestThreatTarget,
   isTrivialTo,
@@ -41,13 +42,15 @@ function ent(id: number, over: Partial<Entity> = {}): Entity {
   } as unknown as Entity;
 }
 
-// Fake seam: the module only reads `entities` and calls the two Nythraxis helpers.
+// Fake seam: the module reads `entities` and the mob-scan counters, and calls the
+// two Nythraxis helpers.
 function fakeCtx(
   entities: Map<number, Entity>,
   opts: { fallback?: Entity | null; despawn?: boolean } = {},
 ): SimContext {
   return {
     entities,
+    mobScanCounters: createMobScanCounters(),
     nythraxisAddFallbackTarget: () => opts.fallback ?? null,
     scheduleNythraxisAddDespawnIfBossReset: () => opts.despawn ?? false,
   } as unknown as SimContext;

@@ -20,6 +20,154 @@ export const cs_CZ: EnTranslations = {
     "rp": "RP",
     "rpPvp": "RP-PvP"
   },
+  "devCommand": {
+    "dialogLabel": "Developer Command Center",
+    "kicker": "Development tools",
+    "title": "Command Center",
+    "subtitle": "Authoritative test controls for the active world.",
+    "closeAria": "Close developer commands",
+    "categoryNavAria": "Developer command categories",
+    "categories": {
+      "player": "Player",
+      "spawns": "Spawns",
+      "inventory": "Inventory",
+      "progress": "Progress",
+      "travel": "Travel",
+      "scenarios": "Scenarios"
+    },
+    "filterLabel": "Filter commands",
+    "filterPlaceholder": "Search this category",
+    "noMatches": "No matching commands.",
+    "serverRequirement": "Server cheats still require ALLOW_DEV_COMMANDS=1.",
+    "invalidValues": "Choose valid values before running this command.",
+    "sent": "Sent: {command}",
+    "run": "Run",
+    "fields": {
+      "level": "Level",
+      "mob": "Mob",
+      "count": "Count",
+      "item": "Item",
+      "gold": "Gold",
+      "quest": "Quest",
+      "profession": "Profession",
+      "amount": "Amount",
+      "x": "X",
+      "z": "Z",
+      "dungeon": "Dungeon",
+      "difficulty": "Difficulty",
+      "name": "Name"
+    },
+    "difficulty": {
+      "normal": "Normal",
+      "heroic": "Heroic"
+    },
+    "actions": {
+      "heal": {
+        "label": "Restore health",
+        "description": "Fill the health pool."
+      },
+      "resource": {
+        "label": "Restore resource",
+        "description": "Fill mana, rage, or energy."
+      },
+      "cooldowns": {
+        "label": "Clear cooldowns",
+        "description": "Reset ability, GCD, and potion timers."
+      },
+      "god": {
+        "label": "Toggle god mode",
+        "description": "Toggle invulnerability and boosted damage."
+      },
+      "revive": {
+        "label": "Revive",
+        "description": "Revive through the normal resurrection path."
+      },
+      "kill": {
+        "label": "Kill player",
+        "description": "Test death, ghost, and corpse flows."
+      },
+      "combatreset": {
+        "label": "Reset combat",
+        "description": "Clear combat state and hostile threat."
+      },
+      "level": {
+        "label": "Set level",
+        "description": "Set the current character level."
+      },
+      "spawn": {
+        "label": "Spawn mob",
+        "description": "Create a concrete mob near the player."
+      },
+      "killtarget": {
+        "label": "Kill target",
+        "description": "Kill the selected living mob."
+      },
+      "despawntarget": {
+        "label": "Despawn target",
+        "description": "Remove a selected mob created by this tool."
+      },
+      "despawnall": {
+        "label": "Clear my spawns",
+        "description": "Remove every mob spawned by this developer."
+      },
+      "give": {
+        "label": "Give item",
+        "description": "Add an item to the player inventory."
+      },
+      "gold": {
+        "label": "Add gold",
+        "description": "Add gold to the current purse."
+      },
+      "quest": {
+        "label": "Complete quest",
+        "description": "Complete a specific quest by id."
+      },
+      "quests": {
+        "label": "Complete active quests",
+        "description": "Complete every quest in the current log."
+      },
+      "attune": {
+        "label": "Unlock attunements",
+        "description": "Mark all attunement requirements complete."
+      },
+      "gather": {
+        "label": "Grant gathering skill",
+        "description": "Increase a gathering profession."
+      },
+      "teleport": {
+        "label": "Teleport",
+        "description": "Move to exact world coordinates."
+      },
+      "dungeon": {
+        "label": "Enter dungeon",
+        "description": "Enter a dungeon with dev gate bypass."
+      },
+      "raid": {
+        "label": "Enter raid",
+        "description": "Enter the Nythraxis arena directly."
+      },
+      "raidreset": {
+        "label": "Reset raid lockout",
+        "description": "Clear the current raid lockouts."
+      },
+      "bot": {
+        "label": "Spawn social bot",
+        "description": "Create a whisperable stationary player."
+      },
+      "lfgqueue": {
+        "label": "Seed finder queue",
+        "description": "Create a Dungeon Finder queue scenario."
+      },
+      "lfgraid": {
+        "label": "Seed raid finder",
+        "description": "Create a raid finder scenario."
+      },
+      "lfgboard": {
+        "label": "Seed listing board",
+        "description": "Create a premade listing scenario."
+      }
+    }
+  },
   "game": {
     "xp": {
       "suffix": "XP",
@@ -203,6 +351,7 @@ export const cs_CZ: EnTranslations = {
       "remainingLessThanMinute": "<1 min",
       "remainingMinutes": "{minutes} min",
       "remainingHoursMinutes": "{hours} h {minutes} min",
+      "remainingDaysHours": "{days}d {hours}h",
       "score": "Skóre",
       "walletValue": "Hodnota peněženky (WOC)",
       "usd": "{amount} USD",
@@ -241,7 +390,8 @@ export const cs_CZ: EnTranslations = {
         "no_wallet": "Připoj peněženku s alespoň 20 USD ve WOC.",
         "under_minimum": "Peněženka je pod minimem 20 USD ve WOC.",
         "price_unavailable": "Cena WOC není dostupná, odměny jsou dočasně uzamčené.",
-        "banned": "Máš zákaz účasti v denních odměnách. Důvod: {reason}"
+        "banned": "Máš zákaz účasti v denních odměnách. Důvod: {reason}",
+        "bannedUntil": "You are banned from Daily Rewards for another {remaining}. Access returns {until}. Reason: {reason}"
       }
     },
     "wocStore": {
@@ -466,6 +616,7 @@ export const cs_CZ: EnTranslations = {
       "balanceLabel": "Zůstatek",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL: {amount}",
+      "usdcBalance": "USDC: {amount}",
       "wocBalance": "WOC: {amount}",
       "unavailable": "Obchod Claudium nyní není dostupný. Tvůj zůstatek ani nákupy to neovlivní, zkus to za chvíli znovu.",
       "disclosure": "Claudium je jednosměrná herní měna: kupuje se za peníze a utrácí za kosmetické předměty. Nelze ji směnit zpět, převést ani vyplatit v hotovosti.",
@@ -473,6 +624,7 @@ export const cs_CZ: EnTranslations = {
       "railLabel": "Způsob platby",
       "railStripe": "Karta",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "Sleva 20 %",
       "railWocUnavailable": "Cena ve WOC nyní není dostupná.",
@@ -618,13 +770,13 @@ export const cs_CZ: EnTranslations = {
       "update": "Aktualizovat"
     },
     "cameraPrompt": {
-      "title": "Choose Your Camera",
-      "intro": "Pick how the camera follows your character.",
-      "mouseDesc": "Move the mouse to turn the camera without holding a button.",
-      "classicTitle": "Classic Camera",
-      "classicDesc": "Hold right-click and move the mouse to turn the camera.",
-      "changeLater": "You can change this later under Esc, Key Bindings.",
-      "confirm": "Confirm"
+      "title": "Zvolte si kameru",
+      "intro": "Zvol, jak kamera sleduje tvou postavu.",
+      "mouseDesc": "Pohybuj myší pro otáčení kamery bez nutnosti přidržovat tlačítko.",
+      "classicTitle": "Klasická kamera",
+      "classicDesc": "Přidržte pravé tlačítko myši a pohybujte myší pro otáčení kamery.",
+      "changeLater": "Toto nastavení můžeš změnit později v nabídce Esc, Klávesové zkratky.",
+      "confirm": "Potvrdit"
     },
     "castBar": {
       "playerAria": "Tvoje lišta sesílání",
@@ -672,11 +824,11 @@ export const cs_CZ: EnTranslations = {
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m} min {s} s",
       "seconds": "{s} s",
-      "autoShowHint": "Rows appear automatically once your party deals damage or healing, and this segment closes a few seconds after combat ends."
+      "autoShowHint": "Řádky se zobrazí automaticky, jakmile tvoje skupina způsobí poškození nebo léčení, a tento segment se zavře několik sekund po skončení boje."
     },
     "petFeed": {
-      "disabledFullHp": "Pet is at full health",
-      "disabledNoFood": "No food in your bags will heal your pet"
+      "disabledFullHp": "Mazlíček má plné zdraví",
+      "disabledNoFood": "V batohách nemáš žádné jídlo, které by vyléčilo tvého mazlíčka"
     },
     "keybinds": {
       "emoteWheel": "Kruh emotů",
@@ -684,6 +836,7 @@ export const cs_CZ: EnTranslations = {
       "targetFriendlyNext": "Procházet spojenecké cíle",
       "discord": "Discord",
       "valecup": "Pohár údolí",
+      "sheathe": "Zasunout/Vytasit zbraň",
       "categoryPet": "Mazlíček",
       "petAttack": "Mazlíček: Útok",
       "petStop": "Mazlíček: Zastavit",
@@ -856,6 +1009,7 @@ export const cs_CZ: EnTranslations = {
       "aurasOnPlayerFrame": "Buffy na rámu hráče",
       "highContrastBackground": "Vysoce kontrastní pozadí",
       "startAttackOnAbility": "Automatický útok při použití schopnosti",
+      "showAttackButton": "Zobrazit tlačítko útoku",
       "walkByAutoloot": "Automatická kořist při průchodu",
       "groundReticle": "Zaměřovací kruh na zemi",
       "showItemLevel": "Zobrazit úroveň předmětu",
@@ -977,6 +1131,7 @@ export const cs_CZ: EnTranslations = {
         "spellPower": "Síla kouzel",
         "critRating": "Hodnocení kritického zásahu",
         "hasteRating": "Hodnocení rychlosti",
+        "hitRating": "Hodnocení zásahu",
         "warfare": "Válečnictví"
       },
       "warfareValue": "+{increase} % způsobeno / -{reduction} % utrpěno",
@@ -994,6 +1149,7 @@ export const cs_CZ: EnTranslations = {
         "dodge": "Tvoje šance úplně se vyhnout příchozímu útoku na blízko a neutrpět poškození.",
         "critRating": "Hodnocení kritického zásahu z tvé výbavy a bonusů sad, které zvyšuje tvoji šanci na kritický zásah. Přibližně 10 hodnocení dá 1 % kritického zásahu.",
         "hasteRating": "Hodnocení rychlosti z tvé výbavy a bonusů sad, které zrychluje tvé útoky a sesílání kouzel. Přibližně 10 hodnocení dá 1 % rychlosti.",
+        "hitRating": "Hodnocení zásahu z vybavení a bonusů sady, snižující četnost mašení tvých útoků a odolávání tvým kouzlům, zejména proti nepřátelům vyšší úrovně. Přibližně 10 bodů hodnocení přidá 1 % zásahu.",
         "warfare": "Zvýší poškození způsobené hráčům o {increase} % a sníží poškození utrpěné od hráčů o {reduction} %."
       },
       "effects": {
@@ -1067,6 +1223,12 @@ export const cs_CZ: EnTranslations = {
         "few": "jste {rank}, {count} členové",
         "many": "jste {rank}, {count} člena",
         "other": "jste {rank}, {count} členů"
+      },
+      "finderPartySize": {
+        "one": "{count} hráč",
+        "few": "{count} hráči",
+        "many": "{count} hráčů",
+        "other": "{count} hráčů"
       },
       "characterCount": {
         "one": "{count} postava",
@@ -1273,11 +1435,27 @@ export const cs_CZ: EnTranslations = {
     },
     "dungeonDifficulty": {
       "setHeroic": "Nastavit obtížnost dungeonu: Hrdinská",
-      "setNormal": "Nastavit obtížnost dungeonu: Normální"
+      "setNormal": "Nastavit obtížnost dungeonu: Normální",
+      "resetAll": "Resetovat všechny instance",
+      "resetDone": "Všechny instance byly resetovány.",
+      "resetNone": "Nemáš žádné instance k resetování.",
+      "resetOccupied": "Instance nelze resetovat, dokud je někdo stále uvnitř.",
+      "resetSameDifficulty": "Před resetováním těchto instancí změň obtížnost dungeonu. Prázdné instance se po 5 minutách resetují samy.",
+      "resetLoot": "Instance nelze resetovat, dokud uvnitř zůstává kořist.",
+      "resetConfirmTitle": "Resetovat všechny instance?",
+      "resetConfirmBody": "Tím opustíš prázdné instance z dříve vybrané obtížnosti. Nevyzvednutá kořist zabrání resetování.",
+      "resetConfirm": "Resetovat instance",
+      "resetCooldown": "Instance lze resetovat pouze jednou za 5 minut.",
+      "resetUsage": "Po změně obtížnosti použij /dungeon reset k opuštění prázdných instancí.",
+      "entryMismatchNormal": "Tato instance je nastavena na normální obtížnost. Použij Resetovat všechny instance a začni nový hrdinský průchod.",
+      "entryMismatchHeroic": "Tato instance je nastavena na hrdinskou obtížnost. Použij Resetovat všechny instance a začni nový normální průchod."
     },
     "bags": {
       "cannotDestroy": "Tento předmět nelze zničit.",
-      "rightClickDestroy": "Shift+right-click to destroy",
+      "rightClickDestroy": "Kliknutím pravým tlačítkem zničíš",
+      "dragEquipHint": "Přetáhni na svou postavu a předmět bude vybaven",
+      "dragDestroyHint": "Přetáhni do světa a předmět bude zničen",
+      "reorderNeedsRecent": "Zruš filtr a seřaď podle Nedávných, chceš-li přeuspořádat batohy",
       "filterGroupAria": "Filtrovat batohy podle kategorie",
       "filterAll": "Vše",
       "filterWeapon": "Zbraně",
@@ -1350,6 +1528,8 @@ export const cs_CZ: EnTranslations = {
       },
       "dodge": "Zvyšuje šanci na vyhnutí o {pct} %",
       "dodgeReduce": "Snižuje šanci na vyhnutí o {pct} %",
+      "damageReduction": "Snižuje veškeré utrpěné poškození o {pct} %",
+      "guardianWard": "Příští smrtící nepřátelský útok místo toho obnoví tvoje zdraví na {pct} %",
       "armorFlat": "Snižuje brnění o {value}",
       "armorFlatStacks": "Snižuje brnění o {value} ({stacks} stacků)",
       "armorPct": "Snižuje brnění o {pct} %",
@@ -1438,6 +1618,33 @@ export const cs_CZ: EnTranslations = {
       "unlock": "Přesunout rám hráče",
       "lock": "Zamknout rám hráče"
     },
+    "partyFrames": {
+      "section": "Party and Raid Frames",
+      "unlock": "Move party and raid frames",
+      "lock": "Lock party and raid frames",
+      "style": "Frame Style",
+      "styleAutomatic": "Automatic",
+      "styleClassic": "Classic Party Frames",
+      "styleRaid": "Raid Frames",
+      "scale": "Frame Scale",
+      "width": "Frame Width",
+      "height": "Frame Height",
+      "spacing": "Frame Spacing",
+      "columns": "Raid Columns",
+      "healthText": "Health Text",
+      "healthNone": "None",
+      "healthPercent": "Percent",
+      "healthCurrent": "Current",
+      "healthCurrentMax": "Current / Max",
+      "sort": "Sort Players",
+      "sortGroup": "Group",
+      "sortRole": "Role",
+      "sortName": "Name",
+      "showResource": "Show Mana, Rage, and Energy",
+      "showAbsorbs": "Show Absorb Shields",
+      "showAuras": "Show Buffs and Debuffs",
+      "showSelf": "Show Your Frame"
+    },
     "frameReset": {
       "label": "Resetovat pozice rámů"
     },
@@ -1478,7 +1685,7 @@ export const cs_CZ: EnTranslations = {
         "benefits": "Propoj Discord, získávej body za hraní a komunitní aktivitu a stoupej ve statusových stupních.",
         "error": "Discord se nepodařilo propojit. Zkus to prosím znovu.",
         "success": "Discord propojen.",
-        "joinServer": "Just join the Discord server"
+        "joinServer": "Připojit se na Discord server"
       },
       "choice": {
         "title": "Pokračovat přes Discord",
@@ -1526,13 +1733,13 @@ export const cs_CZ: EnTranslations = {
         "admin": "Admin",
         "coredevs": "Hlavní dev",
         "devs": "Dev",
-        "seniormods": "Senior Mod",
+        "seniormods": "Senior moderátor",
         "mods": "Mod",
-        "juniormods": "Junior Mod",
+        "juniormods": "Junior moderátor",
         "artists": "Umělec",
-        "contentcreator": "Content Creator",
-        "legend": "LEGEND",
-        "shill": "SHILL"
+        "contentcreator": "Tvůrce obsahu",
+        "legend": "LEGENDA",
+        "shill": "HLASATEL"
       },
       "guildMember": "Ověřený člen",
       "notMember": "Zatím nejsi na serveru",
@@ -1799,7 +2006,8 @@ export const cs_CZ: EnTranslations = {
       "title": "Sběr",
       "mining": "Těžba",
       "logging": "Dřevorubectví",
-      "herbalism": "Bylinkářství"
+      "herbalism": "Bylinkářství",
+      "notReady": "Tento zdroj pro tebe ještě neobnovil zásoby."
     },
     "archetypeTitle": {
       "label": "Titul",
@@ -1831,6 +2039,107 @@ export const cs_CZ: EnTranslations = {
       "notAtHub": "Abys to mohl vyrobit, musíš být v řemeslném centru a mít potřebnou úroveň.",
       "throttled": "Vyrábíš příliš rychle. Chvíli počkej a zkus to znovu.",
       "recipeNotLearned": "Tento recept ses ještě nenaučil."
+    },
+    "finder": {
+      "title": "Hledač dungeonů",
+      "close": "Zavřít",
+      "back": "Zpět",
+      "syncing": "Čeká se na realm...",
+      "tabCatalogue": "Katalog",
+      "tabQueue": "Rychlé přiřazení",
+      "tabBoard": "Předem sestavené skupiny",
+      "normal": "Normální",
+      "heroic": "Hrdinský",
+      "kindDungeon": "Dungeon",
+      "kindRaid": "Raid",
+      "kindSolo": "Sólové dobrodružství",
+      "levels": "Úrovně {min} až {max}",
+      "levelOne": "Úroveň {level}",
+      "clock": "{minutes}:{seconds}",
+      "roleCount": "{count} {role}",
+      "roleTank": "Tank",
+      "roleHealer": "Léčitel",
+      "roleDps": "Útočník",
+      "freeRoles": "Vítány jsou libovolné role",
+      "lockoutDaily": "Denní uzamčení na závěrečného bosse",
+      "lockoutNone": "Žádné uzamčení",
+      "lockedFor": "Uzamčeno přibližně na {minutes} min",
+      "attunement": "Vyžaduje naladění: {quest}",
+      "heroicMarks": "Hrdinská znamení: {count} za hráče",
+      "entrance": "Vstup: {zone}",
+      "showOnMap": "Zobrazit na mapě",
+      "encounters": "Střety",
+      "finalBoss": "Závěrečný boss",
+      "summoned": "Přivolaný strážce",
+      "lootGuaranteed": "Vždy vypadne jedno z těchto:",
+      "lootMaybe": "Může vypadnout nejvýše jeden z těchto předmětů:",
+      "lootChance": "Dodatečné šance na kořist:",
+      "lootHeroic": "Hrdinský bonus, vždy vypadne jedno z těchto:",
+      "pct": "{pct} %",
+      "blockedLevel": "Pouze úrovně {min} až {max}",
+      "blockedSpec": "Vyžaduje specializaci",
+      "yourRoles": "Tvoje role",
+      "needsSpec": "Zvol specializaci, abys mohl/a využívat Hledač dungeonů.",
+      "leaderNote": "Do fronty může skupinu zařadit pouze vůdce skupiny.",
+      "chooseActivities": "Zvolte aktivity",
+      "joinQueue": "Vstoupit do fronty",
+      "leaveQueue": "Opustit frontu",
+      "waited": "Čas ve frontě: {time}",
+      "cooldownNote": "Do fronty se můžeš znovu přidat za {seconds} s.",
+      "travelNote": "Skupina se sestaví tam, kde každý stojí. Cestujte ke vchodu společně; nikdo není přenesen teleportem.",
+      "proposalTitle": "Skupina nalezena: {name}",
+      "proposalRole": "Tvoje role: {role}",
+      "accepted": "{accepted} z {size} potvrzeno",
+      "remaining": "{seconds} s na odpověď",
+      "accept": "Přijmout",
+      "decline": "Odmítnout",
+      "acceptedWait": "Čeká se na ostatní...",
+      "slotState": "{role}: {accepted} z {total} připraveno",
+      "openListings": "Otevřené nabídky",
+      "boardEmpty": "Momentálně žádné nabídky. Přidej svou!",
+      "boardLeaderGate": "Nabídku může zveřejnit pouze vůdce skupiny.",
+      "publishListing": "Zveřejnit nabídku",
+      "activity": "Aktivita",
+      "publish": "Zveřejnit",
+      "yourListing": "Tvoje nabídka",
+      "closeListing": "Uzavřít nabídku",
+      "applicants": "Uchazeči",
+      "noApplicants": "Zatím žádní uchazeči.",
+      "acceptApplicantAria": "Přijmout {name}",
+      "declineApplicantAria": "Odmítnout {name}",
+      "levelClass": "Úr. {level} {className}",
+      "leader": "Vůdce: {name}",
+      "needs": "Potřebuje {roles}",
+      "slots": "{size}/{capacity}",
+      "apply": "Přihlásit se",
+      "withdraw": "Odvolat přihlášku",
+      "tagFirstRun": "První průběh",
+      "tagQuestRun": "Průběh za questem",
+      "tagFullClear": "Úplné vyčištění",
+      "tagLearning": "Vítáni začátečníci",
+      "tagFastRun": "Rychlý průběh",
+      "mech": {
+        "shadow_pulse": "Stínový puls (pulzující plošné poškození)",
+        "reaping_arc": "Žací oblouk (čelní sek)",
+        "mist_surge": "Mlžný příval (pulzující plošné poškození)",
+        "summons_adds": "Přivolává posily",
+        "lunar_tide": "Měsíční příboj (pulzující plošné poškození)",
+        "enrage": "Zuří při nízkém zdraví",
+        "shuddering_stomp": "Třesoucí dupnutí (plošné ochromení)",
+        "necrotic_shockwave": "Nekrotická rázová vlna (silné plošné poškození)",
+        "grave_cleaver": "Hrobní sekáč (čelní sek)",
+        "shadow_nova": "Stínová nova (plošný výbuch)",
+        "profane_mending": "Znesvěcené léčení (léčí spojence)",
+        "mana_burn": "Vyschlé požehnání (spaluje manu)",
+        "deathstalker_cleave": "Sek smrtilovcovy zbraně (čelní sek)",
+        "mortal_wound": "Zapomenutá rána (snižuje přijímané léčení)",
+        "sealbreak_shockwave": "Rázová vlna zlomení pečeti (plošný výbuch)",
+        "gravebreaker": "Rozbíječ hrobů (čelní kužel, otočte jej od raidu)",
+        "raise_fallen": "Povstání padlých (periodické vlny přivolávek)",
+        "soul_rend": "Trhání duše (označení hráči se musí rozejít a být vyléčeni)",
+        "deathless_rage": "Nesmrtelný hněv (přerušen u ochranných kamenů)",
+        "wardstones": "Kanály ochranných kamenů (přechod fáze)"
+      }
     },
     "deeds": {
       "title": "Kniha skutků",
@@ -2573,8 +2882,8 @@ export const cs_CZ: EnTranslations = {
         "desc": "Šupinaté, hadovité věci ze starých hlubin. Vzácné, hrdé a mnohem silnější, než vypadají."
       },
       "reptile": {
-        "name": "Reptiles",
-        "desc": "Cold-blooded hunters with a hiss and a snap all their own, distinct from the warm-blooded beasts."
+        "name": "Plazi",
+        "desc": "Studenokrevní lovci s vlastním syčením a lupem čelistí, odlišní od teplokrevných bestií."
       }
     },
     "worldPage": {
@@ -3596,6 +3905,7 @@ export const cs_CZ: EnTranslations = {
     "title": "Stáhnout desktopový launcher",
     "desc": "Získej samostatný launcher pro optimalizovaný výkon a hraní na celé obrazovce.",
     "macCta": "Stáhnout pro macOS",
+    "windowsCta": "Stáhnout pro Windows",
     "linuxCta": "Stáhnout pro Linux",
     "linuxHint": "AppImage: nastav soubor jako spustitelný a spusť ho. Instalace není potřeba.",
     "windowsPending": "Sestavení pro Windows se připravuje."
@@ -4483,6 +4793,8 @@ export const cs_CZ: EnTranslations = {
     "connectionLost": "Připojení k serveru bylo ztraceno.",
     "reconnecting": "Připojení ztraceno. Znovu se připojuje...",
     "connectionRejected": "Server ukončil připojení.",
+    "realmFull": "Tento svět je momentálně plný. Zkus to prosím znovu za několik minut.",
+    "tooManyConnections": "Z tvé sítě se k tomuto světu připojuje příliš mnoho spojení. Zavři nadbytečná herní okna nebo to zkus znovu za několik minut.",
     "tips": {
       "classes": "Tip: každá z 9 tříd se hraje jinak. Než se pro jednu rozhodneš, několik jich vyzkoušej.",
       "talents": "Tip: kdykoli nejsi v boji, můžeš resetovat své talenty, takže časná volba nikdy není past.",
@@ -5249,6 +5561,7 @@ export const cs_CZ: EnTranslations = {
     "actionBar": {
       "attackName": "Útok",
       "attackTooltip": "Přepne automatický útok na cíl. Kliknutí pravým tlačítkem na nepřítele také zaútočí.",
+      "attackRemoveHint": "Klikni pravým tlačítkem pro odebrání z lišty a uvolnění slotu.",
       "emptySlot": "Prázdný slot",
       "slotAria": "Akční slot {slot}: {ability}",
       "emptySlotAria": "Akční slot {slot}: prázdný",
@@ -6164,6 +6477,18 @@ export const cs_CZ: EnTranslations = {
       "barkskin": {
         "name": "Dubová kůže",
         "description": "Tvoje kůže ztvrdne jako kůra a zvýší zbroj o 150 na 15 s."
+      },
+      "ironhold": {
+        "name": "Železný hmat",
+        "description": "Zapři se za svůj štít a sniž veškeré utrpěné poškození o 40 % po dobu 8 sekund."
+      },
+      "sacred_bulwark": {
+        "name": "Posvátná hradba",
+        "description": "Po dobu {duration} sekund je odvrácen příští nepřátelský úder, který by tě zabil, a místo toho ti obnoví 35 % zdraví."
+      },
+      "primal_reflexes": {
+        "name": "Prvotní reflexy",
+        "description": "Tvoje instinkty se zostří a tvá šance na vyhnutí se útoku vzroste o 50 % po dobu 6 sekund."
       },
       "starfire": {
         "name": "Pád nebes",

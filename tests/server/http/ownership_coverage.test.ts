@@ -649,10 +649,9 @@ describe('internal secret-gate mounting sweep: every /internal route is gated', 
     vi.restoreAllMocks();
   });
 
-  it('selects the full 15-route internal surface (the handleInternalApi 11 + the 4 ops routes)', () => {
-    // The ops family is 4 since v0.20.0 added its paginated leaderboard read to
-    // the 3 late-arrival rows.
-    expect(internalSurfaceRoutes.length).toBe(15);
+  it('selects the full 17-route internal surface (the handleInternalApi 11 + the 6 ops routes)', () => {
+    // The ops family includes four payout-service routes and two moderation mutations.
+    expect(internalSurfaceRoutes.length).toBe(17);
   });
 
   for (const route of internalSurfaceRoutes) {

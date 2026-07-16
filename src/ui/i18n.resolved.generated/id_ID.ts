@@ -20,6 +20,154 @@ export const id_ID: EnTranslations = {
     "rp": "RP",
     "rpPvp": "RP-PvP"
   },
+  "devCommand": {
+    "dialogLabel": "Developer Command Center",
+    "kicker": "Development tools",
+    "title": "Command Center",
+    "subtitle": "Authoritative test controls for the active world.",
+    "closeAria": "Close developer commands",
+    "categoryNavAria": "Developer command categories",
+    "categories": {
+      "player": "Player",
+      "spawns": "Spawns",
+      "inventory": "Inventory",
+      "progress": "Progress",
+      "travel": "Travel",
+      "scenarios": "Scenarios"
+    },
+    "filterLabel": "Filter commands",
+    "filterPlaceholder": "Search this category",
+    "noMatches": "No matching commands.",
+    "serverRequirement": "Server cheats still require ALLOW_DEV_COMMANDS=1.",
+    "invalidValues": "Choose valid values before running this command.",
+    "sent": "Sent: {command}",
+    "run": "Run",
+    "fields": {
+      "level": "Level",
+      "mob": "Mob",
+      "count": "Count",
+      "item": "Item",
+      "gold": "Gold",
+      "quest": "Quest",
+      "profession": "Profession",
+      "amount": "Amount",
+      "x": "X",
+      "z": "Z",
+      "dungeon": "Dungeon",
+      "difficulty": "Difficulty",
+      "name": "Name"
+    },
+    "difficulty": {
+      "normal": "Normal",
+      "heroic": "Heroic"
+    },
+    "actions": {
+      "heal": {
+        "label": "Restore health",
+        "description": "Fill the health pool."
+      },
+      "resource": {
+        "label": "Restore resource",
+        "description": "Fill mana, rage, or energy."
+      },
+      "cooldowns": {
+        "label": "Clear cooldowns",
+        "description": "Reset ability, GCD, and potion timers."
+      },
+      "god": {
+        "label": "Toggle god mode",
+        "description": "Toggle invulnerability and boosted damage."
+      },
+      "revive": {
+        "label": "Revive",
+        "description": "Revive through the normal resurrection path."
+      },
+      "kill": {
+        "label": "Kill player",
+        "description": "Test death, ghost, and corpse flows."
+      },
+      "combatreset": {
+        "label": "Reset combat",
+        "description": "Clear combat state and hostile threat."
+      },
+      "level": {
+        "label": "Set level",
+        "description": "Set the current character level."
+      },
+      "spawn": {
+        "label": "Spawn mob",
+        "description": "Create a concrete mob near the player."
+      },
+      "killtarget": {
+        "label": "Kill target",
+        "description": "Kill the selected living mob."
+      },
+      "despawntarget": {
+        "label": "Despawn target",
+        "description": "Remove a selected mob created by this tool."
+      },
+      "despawnall": {
+        "label": "Clear my spawns",
+        "description": "Remove every mob spawned by this developer."
+      },
+      "give": {
+        "label": "Give item",
+        "description": "Add an item to the player inventory."
+      },
+      "gold": {
+        "label": "Add gold",
+        "description": "Add gold to the current purse."
+      },
+      "quest": {
+        "label": "Complete quest",
+        "description": "Complete a specific quest by id."
+      },
+      "quests": {
+        "label": "Complete active quests",
+        "description": "Complete every quest in the current log."
+      },
+      "attune": {
+        "label": "Unlock attunements",
+        "description": "Mark all attunement requirements complete."
+      },
+      "gather": {
+        "label": "Grant gathering skill",
+        "description": "Increase a gathering profession."
+      },
+      "teleport": {
+        "label": "Teleport",
+        "description": "Move to exact world coordinates."
+      },
+      "dungeon": {
+        "label": "Enter dungeon",
+        "description": "Enter a dungeon with dev gate bypass."
+      },
+      "raid": {
+        "label": "Enter raid",
+        "description": "Enter the Nythraxis arena directly."
+      },
+      "raidreset": {
+        "label": "Reset raid lockout",
+        "description": "Clear the current raid lockouts."
+      },
+      "bot": {
+        "label": "Spawn social bot",
+        "description": "Create a whisperable stationary player."
+      },
+      "lfgqueue": {
+        "label": "Seed finder queue",
+        "description": "Create a Dungeon Finder queue scenario."
+      },
+      "lfgraid": {
+        "label": "Seed raid finder",
+        "description": "Create a raid finder scenario."
+      },
+      "lfgboard": {
+        "label": "Seed listing board",
+        "description": "Create a premade listing scenario."
+      }
+    }
+  },
   "game": {
     "xp": {
       "suffix": "XP",
@@ -203,6 +351,7 @@ export const id_ID: EnTranslations = {
       "remainingLessThanMinute": "<1m",
       "remainingMinutes": "{minutes}m",
       "remainingHoursMinutes": "{hours}j {minutes}m",
+      "remainingDaysHours": "{days}d {hours}h",
       "score": "Skor",
       "walletValue": "Nilai Dompet (WOC)",
       "usd": "{amount} USD",
@@ -241,7 +390,8 @@ export const id_ID: EnTranslations = {
         "no_wallet": "Hubungkan dompet dengan setidaknya $20 USD dalam WOC.",
         "under_minimum": "Dompet di bawah batas minimum $20 USD WOC.",
         "price_unavailable": "Harga WOC tidak tersedia, hadiah terkunci sementara.",
-        "banned": "Kamu dilarang mengikuti Hadiah Harian. Alasan: {reason}"
+        "banned": "Kamu dilarang mengikuti Hadiah Harian. Alasan: {reason}",
+        "bannedUntil": "You are banned from Daily Rewards for another {remaining}. Access returns {until}. Reason: {reason}"
       }
     },
     "wocStore": {
@@ -466,6 +616,7 @@ export const id_ID: EnTranslations = {
       "balanceLabel": "Saldo",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL: {amount}",
+      "usdcBalance": "USDC: {amount}",
       "wocBalance": "WOC: {amount}",
       "unavailable": "Toko Claudium tidak tersedia saat ini. Saldo dan pembelian Anda tidak terpengaruh; harap segera periksa kembali.",
       "disclosure": "Claudium adalah mata uang lunak satu arah: beli dengan uang dan belanjakan untuk kosmetik. Itu tidak dapat ditebus, ditransfer, atau diuangkan.",
@@ -473,6 +624,7 @@ export const id_ID: EnTranslations = {
       "railLabel": "Metode pembayaran",
       "railStripe": "Kartu",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "Diskon 20%.",
       "railWocUnavailable": "Harga WOC tidak tersedia saat ini.",
@@ -618,13 +770,13 @@ export const id_ID: EnTranslations = {
       "update": "Perbarui"
     },
     "cameraPrompt": {
-      "title": "Choose Your Camera",
-      "intro": "Pick how the camera follows your character.",
-      "mouseDesc": "Move the mouse to turn the camera without holding a button.",
-      "classicTitle": "Classic Camera",
-      "classicDesc": "Hold right-click and move the mouse to turn the camera.",
-      "changeLater": "You can change this later under Esc, Key Bindings.",
-      "confirm": "Confirm"
+      "title": "Pilih Kameramu",
+      "intro": "Pilih cara kamera mengikuti karaktermu.",
+      "mouseDesc": "Gerakkan tetikus untuk memutar kamera tanpa menahan tombol apa pun.",
+      "classicTitle": "Kamera Klasik",
+      "classicDesc": "Tahan klik kanan dan gerakkan tetikus untuk memutar kamera.",
+      "changeLater": "Kamu dapat mengubah ini nanti di Esc, Ikatan Tombol.",
+      "confirm": "Konfirmasi"
     },
     "castBar": {
       "playerAria": "Bilah Rapal Anda",
@@ -672,11 +824,11 @@ export const id_ID: EnTranslations = {
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m}m {s}d",
       "seconds": "{s}d",
-      "autoShowHint": "Rows appear automatically once your party deals damage or healing, and this segment closes a few seconds after combat ends."
+      "autoShowHint": "Baris muncul secara otomatis setelah partaimu memberikan kerusakan atau penyembuhan, dan segmen ini tertutup beberapa detik setelah pertarungan berakhir."
     },
     "petFeed": {
-      "disabledFullHp": "Pet is at full health",
-      "disabledNoFood": "No food in your bags will heal your pet"
+      "disabledFullHp": "Peliharaan sudah dalam kondisi darah penuh",
+      "disabledNoFood": "Tidak ada makanan di tasmu yang dapat menyembuhkan peliharaanmu"
     },
     "keybinds": {
       "emoteWheel": "Roda Emote",
@@ -684,6 +836,7 @@ export const id_ID: EnTranslations = {
       "targetFriendlyNext": "Putar Bidikan Sekutu",
       "discord": "Discord",
       "valecup": "Piala Lembah",
+      "sheathe": "Sarungkan/Cabut Senjata",
       "categoryPet": "Peliharaan",
       "petAttack": "Peliharaan: Serang",
       "petStop": "Peliharaan: Berhenti",
@@ -856,6 +1009,7 @@ export const id_ID: EnTranslations = {
       "aurasOnPlayerFrame": "Buff pada Bingkai Pemain",
       "highContrastBackground": "Latar Kontras Tinggi",
       "startAttackOnAbility": "Serangan Otomatis Saat Memakai Kemampuan",
+      "showAttackButton": "Tampilkan Tombol Serang",
       "walkByAutoloot": "Jarah Otomatis Sambil Lewat",
       "groundReticle": "Retikel bidik darat",
       "showItemLevel": "Tampilkan Level Item",
@@ -977,6 +1131,7 @@ export const id_ID: EnTranslations = {
         "spellPower": "Kekuatan Mantra",
         "critRating": "Rating Kritis",
         "hasteRating": "Rating Kecepatan",
+        "hitRating": "Rating Pukulan",
         "warfare": "Perang"
       },
       "warfareValue": "+{increase}% dibagikan / -{reduction}% diambil",
@@ -994,6 +1149,7 @@ export const id_ID: EnTranslations = {
         "dodge": "Peluang Anda untuk sepenuhnya menghindari serangan jarak dekat, tanpa menerima kerusakan.",
         "critRating": "Rating kritis dari perlengkapan dan bonus set Anda, menaikkan peluang serangan kritis Anda. Sekitar 10 rating memberi 1% kritis.",
         "hasteRating": "Rating kecepatan dari perlengkapan dan bonus set Anda, mempercepat serangan dan rapalan mantra Anda. Sekitar 10 rating memberi 1% kecepatan.",
+        "hitRating": "Rating pukulan dari perlengkapan dan bonus setelanmu, mengurangi seberapa sering seranganmu meleset dan mantramu ditangkal, terutama melawan musuh level lebih tinggi. Sekitar 10 rating memberikan 1% hit.",
         "warfare": "Meningkatkan kerusakan yang diberikan kepada pemain sebesar {increase}% dan mengurangi kerusakan yang diterima dari pemain sebesar {reduction}%."
       },
       "effects": {
@@ -1067,6 +1223,12 @@ export const id_ID: EnTranslations = {
         "few": "Anda adalah {rank}, {count} anggota",
         "many": "Anda adalah {rank}, {count} anggota",
         "other": "Anda adalah {rank}, {count} anggota"
+      },
+      "finderPartySize": {
+        "one": "{count} pemain",
+        "few": "{count} pemain",
+        "many": "{count} pemain",
+        "other": "{count} pemain"
       },
       "characterCount": {
         "one": "{count} karakter",
@@ -1273,11 +1435,27 @@ export const id_ID: EnTranslations = {
     },
     "dungeonDifficulty": {
       "setHeroic": "Atur Kesulitan Dungeon: Heroik",
-      "setNormal": "Atur Kesulitan Dungeon: Normal"
+      "setNormal": "Atur Kesulitan Dungeon: Normal",
+      "resetAll": "Reset Semua Instans",
+      "resetDone": "Semua instans telah direset.",
+      "resetNone": "Tidak ada instans yang dapat kamu reset.",
+      "resetOccupied": "Kamu tidak dapat mereset instans selama masih ada seseorang di dalamnya.",
+      "resetSameDifficulty": "Ubah kesulitan dungeon sebelum mereset instans ini. Instans kosong akan direset otomatis setelah 5 menit.",
+      "resetLoot": "Kamu tidak dapat mereset instans selama masih ada jarahan di dalamnya.",
+      "resetConfirmTitle": "Reset Semua Instans?",
+      "resetConfirmBody": "Tindakan ini meninggalkan instans kosong dari kesulitan yang sebelumnya dipilih. Jarahan yang belum diambil akan mencegah reset.",
+      "resetConfirm": "Reset Instans",
+      "resetCooldown": "Instans hanya dapat direset sekali setiap 5 menit.",
+      "resetUsage": "Gunakan /dungeon reset untuk meninggalkan instans kosong setelah mengubah kesulitan.",
+      "entryMismatchNormal": "Instans ini diatur ke kesulitan Normal. Gunakan Reset Semua Instans untuk memulai perjalanan Heroik baru.",
+      "entryMismatchHeroic": "Instans ini diatur ke kesulitan Heroik. Gunakan Reset Semua Instans untuk memulai perjalanan Normal baru."
     },
     "bags": {
       "cannotDestroy": "Item ini tidak dapat dihancurkan.",
-      "rightClickDestroy": "Shift+right-click to destroy",
+      "rightClickDestroy": "Klik kanan untuk menghancurkan",
+      "dragEquipHint": "Seret ke karaktermu untuk memakai",
+      "dragDestroyHint": "Seret ke dunia untuk menghancurkan",
+      "reorderNeedsRecent": "Hapus filter dan urutkan berdasarkan Terbaru untuk mengatur ulang tasmu",
       "filterGroupAria": "Saring tas menurut kategori",
       "filterAll": "Semua",
       "filterWeapon": "Senjata",
@@ -1350,6 +1528,8 @@ export const id_ID: EnTranslations = {
       },
       "dodge": "Aumenta la probabilidad de esquivar un {pct}%",
       "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
+      "damageReduction": "Mengurangi semua kerusakan yang diterima sebesar {pct}%",
+      "guardianWard": "Serangan musuh mematikan berikutnya memulihkanmu menjadi {pct}% kesehatan",
       "armorFlat": "Reduce la armadura en {value}",
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
       "armorPct": "Mengurangi zirah sebesar {pct}%",
@@ -1438,6 +1618,33 @@ export const id_ID: EnTranslations = {
       "unlock": "Pindahkan bingkai pemain",
       "lock": "Kunci bingkai pemain"
     },
+    "partyFrames": {
+      "section": "Party and Raid Frames",
+      "unlock": "Move party and raid frames",
+      "lock": "Lock party and raid frames",
+      "style": "Frame Style",
+      "styleAutomatic": "Automatic",
+      "styleClassic": "Classic Party Frames",
+      "styleRaid": "Raid Frames",
+      "scale": "Frame Scale",
+      "width": "Frame Width",
+      "height": "Frame Height",
+      "spacing": "Frame Spacing",
+      "columns": "Raid Columns",
+      "healthText": "Health Text",
+      "healthNone": "None",
+      "healthPercent": "Percent",
+      "healthCurrent": "Current",
+      "healthCurrentMax": "Current / Max",
+      "sort": "Sort Players",
+      "sortGroup": "Group",
+      "sortRole": "Role",
+      "sortName": "Name",
+      "showResource": "Show Mana, Rage, and Energy",
+      "showAbsorbs": "Show Absorb Shields",
+      "showAuras": "Show Buffs and Debuffs",
+      "showSelf": "Show Your Frame"
+    },
     "frameReset": {
       "label": "Atur Ulang Posisi Bingkai"
     },
@@ -1478,7 +1685,7 @@ export const id_ID: EnTranslations = {
         "benefits": "Tautkan Discord-mu untuk meraih poin dari bermain dan aktivitas komunitas, serta naik tingkat status.",
         "error": "Tidak dapat menautkan Discord. Silakan coba lagi.",
         "success": "Discord tertaut.",
-        "joinServer": "Just join the Discord server"
+        "joinServer": "Langsung bergabung ke server Discord"
       },
       "choice": {
         "title": "Lanjutkan dengan Discord",
@@ -1526,13 +1733,13 @@ export const id_ID: EnTranslations = {
         "admin": "Admin",
         "coredevs": "Dev Inti",
         "devs": "Pengembang",
-        "seniormods": "Senior Mod",
+        "seniormods": "Moderator Senior",
         "mods": "Moderator",
-        "juniormods": "Junior Mod",
+        "juniormods": "Moderator Muda",
         "artists": "Seniman",
-        "contentcreator": "Content Creator",
-        "legend": "LEGEND",
-        "shill": "SHILL"
+        "contentcreator": "Kreator Konten",
+        "legend": "LEGENDA",
+        "shill": "PENDUKUNG"
       },
       "guildMember": "Anggota terverifikasi",
       "notMember": "Belum berada di server",
@@ -1799,7 +2006,8 @@ export const id_ID: EnTranslations = {
       "title": "Pengumpulan",
       "mining": "Penambangan",
       "logging": "Penebangan",
-      "herbalism": "Herbalisme"
+      "herbalism": "Herbalisme",
+      "notReady": "Simpul sumber daya ini belum muncul kembali untukmu."
     },
     "archetypeTitle": {
       "label": "Gelar",
@@ -1831,6 +2039,107 @@ export const id_ID: EnTranslations = {
       "notAtHub": "Kamu harus berada di pusat kerajinan, pada level yang disyaratkan, untuk membuat itu.",
       "throttled": "Kamu membuat terlalu cepat. Tunggu sejenak dan coba lagi.",
       "recipeNotLearned": "Kamu belum mempelajari resep itu."
+    },
+    "finder": {
+      "title": "Pencari Dungeon",
+      "close": "Tutup",
+      "back": "Kembali",
+      "syncing": "Menunggu realm...",
+      "tabCatalogue": "Katalog",
+      "tabQueue": "Pencocokan Cepat",
+      "tabBoard": "Grup Premade",
+      "normal": "Biasa",
+      "heroic": "Heroik",
+      "kindDungeon": "Penjara Bawah Tanah",
+      "kindRaid": "Serangan Massal",
+      "kindSolo": "Petualangan solo",
+      "levels": "Level {min} hingga {max}",
+      "levelOne": "Tingkat {level}",
+      "clock": "{minutes} menit {seconds} detik",
+      "roleCount": "{count} orang {role}",
+      "roleTank": "Pelindung",
+      "roleHealer": "Penyembuh",
+      "roleDps": "Penyerang",
+      "freeRoles": "Semua peran diterima",
+      "lockoutDaily": "Penguncian harian pada bos terakhir",
+      "lockoutNone": "Tanpa penguncian",
+      "lockedFor": "Terkunci sekitar {minutes} menit",
+      "attunement": "Memerlukan penyelarasan: {quest}",
+      "heroicMarks": "Tanda Heroik: {count} per pemain",
+      "entrance": "Pintu masuk: {zone}",
+      "showOnMap": "Tampilkan di Peta",
+      "encounters": "Pertemuan",
+      "finalBoss": "Bos terakhir",
+      "summoned": "Wali yang dipanggil",
+      "lootGuaranteed": "Salah satu dari ini selalu jatuh:",
+      "lootMaybe": "Paling banyak salah satu dari ini mungkin jatuh:",
+      "lootChance": "Peluang jatuhan tambahan:",
+      "lootHeroic": "Bonus heroik, salah satu dari ini selalu jatuh:",
+      "pct": "{pct} persen",
+      "blockedLevel": "Khusus level {min} hingga {max}",
+      "blockedSpec": "Memerlukan spesialisasi",
+      "yourRoles": "Peranmu",
+      "needsSpec": "Pilih spesialisasi untuk menggunakan Pencari Dungeon.",
+      "leaderNote": "Hanya pemimpin partaimu yang dapat mengantrekan grup.",
+      "chooseActivities": "Pilih aktivitas",
+      "joinQueue": "Masuk antrean",
+      "leaveQueue": "Tinggalkan antrean",
+      "waited": "Waktu dalam antrean: {time}",
+      "cooldownNote": "Kamu dapat mengantri lagi dalam {seconds} detik.",
+      "travelNote": "Grup terbentuk di tempat semua orang berdiri. Berjalanlah bersama menuju pintu masuk; tidak ada yang diteleportasi.",
+      "proposalTitle": "Grup ditemukan: {name}",
+      "proposalRole": "Peranmu: {role}",
+      "accepted": "{accepted} dari {size} dikonfirmasi",
+      "remaining": "{seconds} detik untuk menjawab",
+      "accept": "Terima",
+      "decline": "Tolak",
+      "acceptedWait": "Menunggu yang lainnya...",
+      "slotState": "{role}: {accepted} dari {total} siap",
+      "openListings": "Daftar terbuka",
+      "boardEmpty": "Tidak ada daftar saat ini. Buat satu!",
+      "boardLeaderGate": "Hanya pemimpin partaimu yang dapat menerbitkan daftar.",
+      "publishListing": "Terbitkan daftar",
+      "activity": "Aktivitas",
+      "publish": "Terbitkan",
+      "yourListing": "Daftarmu",
+      "closeListing": "Tutup daftar",
+      "applicants": "Pelamar",
+      "noApplicants": "Belum ada pelamar.",
+      "acceptApplicantAria": "Terima {name}",
+      "declineApplicantAria": "Tolak {name}",
+      "levelClass": "Lvl {level} {className}",
+      "leader": "Pemimpin: {name}",
+      "needs": "Membutuhkan {roles}",
+      "slots": "{size} dari {capacity}",
+      "apply": "Lamar",
+      "withdraw": "Cabut lamaran",
+      "tagFirstRun": "Kali pertama",
+      "tagQuestRun": "Misi pencarian",
+      "tagFullClear": "Bersih tuntas",
+      "tagLearning": "Pemula diterima",
+      "tagFastRun": "Berlari cepat",
+      "mech": {
+        "shadow_pulse": "Denyut Bayangan (kerusakan area berdenyut)",
+        "reaping_arc": "Busur Penuai (tebasan ke depan)",
+        "mist_surge": "Lonjakan Kabut (kerusakan area berdenyut)",
+        "summons_adds": "Memanggil bala bantuan",
+        "lunar_tide": "Arus Bulan (kerusakan area berdenyut)",
+        "enrage": "Mengamuk saat darah menipis",
+        "shuddering_stomp": "Hentakan Gemetar (stun area)",
+        "necrotic_shockwave": "Gelombang Kejut Nekrotik (kerusakan area berat)",
+        "grave_cleaver": "Penebas Kubur (tebasan ke depan)",
+        "shadow_nova": "Nova Bayangan (ledakan area)",
+        "profane_mending": "Pemulihan Najis (menyembuhkan sekutunya)",
+        "mana_burn": "Berkah Layu (membakar mana)",
+        "deathstalker_cleave": "Tebasan Deathstalker (tebasan ke depan)",
+        "mortal_wound": "Luka Terlupakan (mengurangi penyembuhan yang diterima)",
+        "sealbreak_shockwave": "Gelombang Kejut Pemecah Segel (ledakan area)",
+        "gravebreaker": "Pemecah Kubur (kerucut ke depan, arahkan menjauhi raid)",
+        "raise_fallen": "Bangkitkan Yang Gugur (gelombang bala bantuan berkala)",
+        "soul_rend": "Robek Jiwa (pemain yang ditandai harus menyebar dan disembuhkan)",
+        "deathless_rage": "Murka Abadi (diputus di wardstone)",
+        "wardstones": "Saluran Wardstone (transisi fase)"
+      }
     },
     "deeds": {
       "title": "Kitab Jasa",
@@ -2573,8 +2882,8 @@ export const id_ID: EnTranslations = {
         "desc": "Makhluk bersisik dan berlekuk ular dari kedalaman purba. Langka, angkuh, dan jauh lebih kuat dari penampakannya."
       },
       "reptile": {
-        "name": "Reptiles",
-        "desc": "Cold-blooded hunters with a hiss and a snap all their own, distinct from the warm-blooded beasts."
+        "name": "Reptil",
+        "desc": "Pemburu berdarah dingin dengan desis dan cakitan khas mereka sendiri, berbeda dari hewan berdarah panas."
       }
     },
     "worldPage": {
@@ -3596,6 +3905,7 @@ export const id_ID: EnTranslations = {
     "title": "Unduh Peluncur Desktop",
     "desc": "Dapatkan peluncur mandiri untuk performa optimal dan permainan layar penuh.",
     "macCta": "Unduh untuk macOS",
+    "windowsCta": "Unduh untuk Windows",
     "linuxCta": "Unduh untuk Linux",
     "linuxHint": "AppImage: membuatnya dapat dieksekusi, lalu jalankan. Tidak perlu instalasi.",
     "windowsPending": "Build Windows tertunda."
@@ -4483,6 +4793,8 @@ export const id_ID: EnTranslations = {
     "connectionLost": "Koneksi ke server terputus.",
     "reconnecting": "Koneksi terputus. Menyambungkan kembali...",
     "connectionRejected": "Server menutup koneksi.",
+    "realmFull": "Dunia ini sedang penuh. Coba lagi dalam beberapa menit.",
+    "tooManyConnections": "Terlalu banyak koneksi ke dunia ini dari jaringanmu. Tutup jendela permainan ekstra atau coba lagi dalam beberapa menit.",
     "tips": {
       "classes": "Kiat: masing-masing dari 9 kelas memiliki gaya bermain berbeda. Cobalah beberapa sebelum menetapkan pilihan.",
       "talents": "Kiat: kamu dapat mengatur ulang talenta kapan saja saat tidak bertarung, jadi pilihan awal tidak akan menjadi jebakan.",
@@ -5249,6 +5561,7 @@ export const id_ID: EnTranslations = {
     "actionBar": {
       "attackName": "Serang",
       "attackTooltip": "Alihkan serangan otomatis pada targetmu. Klik kanan pada musuh juga menyerang.",
+      "attackRemoveHint": "Klik kanan untuk menghapusnya dari bilah dan mengosongkan slot.",
       "emptySlot": "Slot kosong",
       "slotAria": "Slot aksi {slot}: {ability}",
       "emptySlotAria": "Slot aksi {slot}: kosong",
@@ -6164,6 +6477,18 @@ export const id_ID: EnTranslations = {
       "barkskin": {
         "name": "Kulit Ek",
         "description": "Kulitmu mengeras bagai kulit kayu, meningkatkan zirah sebesar 150 selama 15 detik."
+      },
+      "ironhold": {
+        "name": "Cengkeraman Besi",
+        "description": "Bertahan di balik perlindunganmu, mengurangi semua kerusakan yang diterima sebesar 40% selama 8 detik."
+      },
+      "sacred_bulwark": {
+        "name": "Benteng Suci",
+        "description": "Selama {duration} detik, serangan musuh berikutnya yang seharusnya membunuhmu ditolak, dan kamu dipulihkan menjadi 35% kesehatan."
+      },
+      "primal_reflexes": {
+        "name": "Refleks Purba",
+        "description": "Nalurimu menajam, meningkatkan peluang menghindar sebesar 50% selama 6 detik."
       },
       "starfire": {
         "name": "Skyfall",

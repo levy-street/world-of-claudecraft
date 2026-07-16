@@ -87,6 +87,118 @@ export type Leaves<T, D extends number = 5> = [D] extends [never]
 export const en = {
   meta: { builtOn: 'Built {date}' },
   realmTypes: { normal: 'Normal', pvp: 'PvP', rp: 'RP', rpPvp: 'RP-PvP' },
+  devCommand: {
+    dialogLabel: 'Developer Command Center',
+    kicker: 'Development tools',
+    title: 'Command Center',
+    subtitle: 'Authoritative test controls for the active world.',
+    closeAria: 'Close developer commands',
+    categoryNavAria: 'Developer command categories',
+    categories: {
+      player: 'Player',
+      spawns: 'Spawns',
+      inventory: 'Inventory',
+      progress: 'Progress',
+      travel: 'Travel',
+      scenarios: 'Scenarios',
+    },
+    filterLabel: 'Filter commands',
+    filterPlaceholder: 'Search this category',
+    noMatches: 'No matching commands.',
+    serverRequirement: 'Server cheats still require ALLOW_DEV_COMMANDS=1.',
+    invalidValues: 'Choose valid values before running this command.',
+    sent: 'Sent: {command}',
+    run: 'Run',
+    fields: {
+      level: 'Level',
+      mob: 'Mob',
+      count: 'Count',
+      item: 'Item',
+      gold: 'Gold',
+      quest: 'Quest',
+      profession: 'Profession',
+      amount: 'Amount',
+      x: 'X',
+      z: 'Z',
+      dungeon: 'Dungeon',
+      difficulty: 'Difficulty',
+      name: 'Name',
+    },
+    difficulty: { normal: 'Normal', heroic: 'Heroic' },
+    actions: {
+      heal: { label: 'Restore health', description: 'Fill the health pool.' },
+      resource: {
+        label: 'Restore resource',
+        description: 'Fill mana, rage, or energy.',
+      },
+      cooldowns: {
+        label: 'Clear cooldowns',
+        description: 'Reset ability, GCD, and potion timers.',
+      },
+      god: {
+        label: 'Toggle god mode',
+        description: 'Toggle invulnerability and boosted damage.',
+      },
+      revive: {
+        label: 'Revive',
+        description: 'Revive through the normal resurrection path.',
+      },
+      kill: { label: 'Kill player', description: 'Test death, ghost, and corpse flows.' },
+      combatreset: {
+        label: 'Reset combat',
+        description: 'Clear combat state and hostile threat.',
+      },
+      level: { label: 'Set level', description: 'Set the current character level.' },
+      spawn: { label: 'Spawn mob', description: 'Create a concrete mob near the player.' },
+      killtarget: { label: 'Kill target', description: 'Kill the selected living mob.' },
+      despawntarget: {
+        label: 'Despawn target',
+        description: 'Remove a selected mob created by this tool.',
+      },
+      despawnall: {
+        label: 'Clear my spawns',
+        description: 'Remove every mob spawned by this developer.',
+      },
+      give: { label: 'Give item', description: 'Add an item to the player inventory.' },
+      gold: { label: 'Add gold', description: 'Add gold to the current purse.' },
+      quest: { label: 'Complete quest', description: 'Complete a specific quest by id.' },
+      quests: {
+        label: 'Complete active quests',
+        description: 'Complete every quest in the current log.',
+      },
+      attune: {
+        label: 'Unlock attunements',
+        description: 'Mark all attunement requirements complete.',
+      },
+      gather: {
+        label: 'Grant gathering skill',
+        description: 'Increase a gathering profession.',
+      },
+      teleport: { label: 'Teleport', description: 'Move to exact world coordinates.' },
+      dungeon: {
+        label: 'Enter dungeon',
+        description: 'Enter a dungeon with dev gate bypass.',
+      },
+      raid: { label: 'Enter raid', description: 'Enter the Nythraxis arena directly.' },
+      raidreset: {
+        label: 'Reset raid lockout',
+        description: 'Clear the current raid lockouts.',
+      },
+      bot: {
+        label: 'Spawn social bot',
+        description: 'Create a whisperable stationary player.',
+      },
+      lfgqueue: {
+        label: 'Seed finder queue',
+        description: 'Create a Dungeon Finder queue scenario.',
+      },
+      lfgraid: { label: 'Seed raid finder', description: 'Create a raid finder scenario.' },
+      lfgboard: {
+        label: 'Seed listing board',
+        description: 'Create a premade listing scenario.',
+      },
+    },
+  },
   game: gameStrings,
   hudChrome: hudChromeStrings,
   apiError: apiErrorStrings,
@@ -182,6 +294,7 @@ export const en = {
     title: 'Download Desktop Launcher',
     desc: 'Get the standalone launcher for optimized performance and full-screen play.',
     macCta: 'Download for macOS',
+    windowsCta: 'Download for Windows',
     linuxCta: 'Download for Linux',
     linuxHint: 'AppImage: make it executable, then run it. No install needed.',
     windowsPending: 'Windows build pending.',
@@ -1172,11 +1285,21 @@ export const en = {
 // ": EnTranslations" so tsc still red-fails any missing or renamed key.
 export type EnTranslations = typeof en;
 
-// Depth 6 so the deepest real leaves (entities.quests.<id>.objectives.<n>.label,
-// entities.zones.<id>.pois.<n>.label) are members. The sparse overlays are typed
-// `Partial<Record<TranslationKey, string>>`, so TranslationKey must reach
-// every overlay key; depth 5 stopped one segment short. (Measured: no tsc cost.)
-export type TranslationKey = Leaves<typeof en, 6>;
+// TranslationKey is the build-generated flat literal union of every dotted leaf
+// path in `en` (./translation_keys.generated.ts, emitted by scripts/i18n_build.mjs;
+// regenerate with `npm run i18n:gen`). It replaced the recursive computation
+// `Leaves<typeof en, 6>`: the recursive union normalized to thousands of string
+// literals plus 85 template-literal patterns (from the four Record-over-id entity
+// subtrees: abilities, item sets, quest objectives, zone POIs), whose
+// literal-times-pattern subsumption checks exceed TypeScript 7's native-compiler
+// work budget (TS2590; issue #1868 is the durable evidence trail), and the
+// patterns accepted ANY entity id, so a typo'd id type-checked. The generated
+// union keeps every legal key, rejects typo'd entity ids (strictly stronger
+// checking), and roughly halves tsc wall time. The sparse overlays stay typed
+// `Partial<Record<TranslationKey, string>>`, so TranslationKey still reaches
+// every overlay key. Leaves above stays exported for compatibility; it has no
+// other instantiations repo-wide.
+export type TranslationKey = import('./translation_keys.generated').TranslationKeyFlat;
 export type InterpolationValue = string | number;
 export type InterpolationValues = Record<string, InterpolationValue>;
 

@@ -20,6 +20,154 @@ export const ru_RU: EnTranslations = {
     "rp": "Ролевой",
     "rpPvp": "Ролевой-PvP"
   },
+  "devCommand": {
+    "dialogLabel": "Developer Command Center",
+    "kicker": "Development tools",
+    "title": "Command Center",
+    "subtitle": "Authoritative test controls for the active world.",
+    "closeAria": "Close developer commands",
+    "categoryNavAria": "Developer command categories",
+    "categories": {
+      "player": "Player",
+      "spawns": "Spawns",
+      "inventory": "Inventory",
+      "progress": "Progress",
+      "travel": "Travel",
+      "scenarios": "Scenarios"
+    },
+    "filterLabel": "Filter commands",
+    "filterPlaceholder": "Search this category",
+    "noMatches": "No matching commands.",
+    "serverRequirement": "Server cheats still require ALLOW_DEV_COMMANDS=1.",
+    "invalidValues": "Choose valid values before running this command.",
+    "sent": "Sent: {command}",
+    "run": "Run",
+    "fields": {
+      "level": "Level",
+      "mob": "Mob",
+      "count": "Count",
+      "item": "Item",
+      "gold": "Gold",
+      "quest": "Quest",
+      "profession": "Profession",
+      "amount": "Amount",
+      "x": "X",
+      "z": "Z",
+      "dungeon": "Dungeon",
+      "difficulty": "Difficulty",
+      "name": "Name"
+    },
+    "difficulty": {
+      "normal": "Normal",
+      "heroic": "Heroic"
+    },
+    "actions": {
+      "heal": {
+        "label": "Restore health",
+        "description": "Fill the health pool."
+      },
+      "resource": {
+        "label": "Restore resource",
+        "description": "Fill mana, rage, or energy."
+      },
+      "cooldowns": {
+        "label": "Clear cooldowns",
+        "description": "Reset ability, GCD, and potion timers."
+      },
+      "god": {
+        "label": "Toggle god mode",
+        "description": "Toggle invulnerability and boosted damage."
+      },
+      "revive": {
+        "label": "Revive",
+        "description": "Revive through the normal resurrection path."
+      },
+      "kill": {
+        "label": "Kill player",
+        "description": "Test death, ghost, and corpse flows."
+      },
+      "combatreset": {
+        "label": "Reset combat",
+        "description": "Clear combat state and hostile threat."
+      },
+      "level": {
+        "label": "Set level",
+        "description": "Set the current character level."
+      },
+      "spawn": {
+        "label": "Spawn mob",
+        "description": "Create a concrete mob near the player."
+      },
+      "killtarget": {
+        "label": "Kill target",
+        "description": "Kill the selected living mob."
+      },
+      "despawntarget": {
+        "label": "Despawn target",
+        "description": "Remove a selected mob created by this tool."
+      },
+      "despawnall": {
+        "label": "Clear my spawns",
+        "description": "Remove every mob spawned by this developer."
+      },
+      "give": {
+        "label": "Give item",
+        "description": "Add an item to the player inventory."
+      },
+      "gold": {
+        "label": "Add gold",
+        "description": "Add gold to the current purse."
+      },
+      "quest": {
+        "label": "Complete quest",
+        "description": "Complete a specific quest by id."
+      },
+      "quests": {
+        "label": "Complete active quests",
+        "description": "Complete every quest in the current log."
+      },
+      "attune": {
+        "label": "Unlock attunements",
+        "description": "Mark all attunement requirements complete."
+      },
+      "gather": {
+        "label": "Grant gathering skill",
+        "description": "Increase a gathering profession."
+      },
+      "teleport": {
+        "label": "Teleport",
+        "description": "Move to exact world coordinates."
+      },
+      "dungeon": {
+        "label": "Enter dungeon",
+        "description": "Enter a dungeon with dev gate bypass."
+      },
+      "raid": {
+        "label": "Enter raid",
+        "description": "Enter the Nythraxis arena directly."
+      },
+      "raidreset": {
+        "label": "Reset raid lockout",
+        "description": "Clear the current raid lockouts."
+      },
+      "bot": {
+        "label": "Spawn social bot",
+        "description": "Create a whisperable stationary player."
+      },
+      "lfgqueue": {
+        "label": "Seed finder queue",
+        "description": "Create a Dungeon Finder queue scenario."
+      },
+      "lfgraid": {
+        "label": "Seed raid finder",
+        "description": "Create a raid finder scenario."
+      },
+      "lfgboard": {
+        "label": "Seed listing board",
+        "description": "Create a premade listing scenario."
+      }
+    }
+  },
   "game": {
     "xp": {
       "suffix": "опыт",
@@ -203,6 +351,7 @@ export const ru_RU: EnTranslations = {
       "remainingLessThanMinute": "<1м",
       "remainingMinutes": "{minutes}м",
       "remainingHoursMinutes": "{hours}ч {minutes}м",
+      "remainingDaysHours": "{days}д {hours}ч",
       "score": "Счёт",
       "walletValue": "Стоимость кошелька (WOC)",
       "usd": "{amount} USD",
@@ -241,7 +390,8 @@ export const ru_RU: EnTranslations = {
         "no_wallet": "Подключите кошелек с не менее чем $20 USD в WOC.",
         "under_minimum": "Кошелек ниже минимума в $20 USD WOC.",
         "price_unavailable": "Цена WOC недоступна, награды временно заблокированы.",
-        "banned": "Вам запрещено участвовать в ежедневных наградах. Причина: {reason}"
+        "banned": "Вам запрещено участвовать в ежедневных наградах. Причина: {reason}",
+        "bannedUntil": "Запрет на участие в ежедневных наградах действует еще {remaining}. Доступ вернется {until}. Причина: {reason}"
       }
     },
     "wocStore": {
@@ -466,6 +616,7 @@ export const ru_RU: EnTranslations = {
       "balanceLabel": "Баланс",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL: {amount}",
+      "usdcBalance": "USDC: {amount}",
       "wocBalance": "WOC: {amount}",
       "unavailable": "Магазин Claudium сейчас недоступен. Ваш баланс и покупки не затронуты; повторите попытку позже.",
       "disclosure": "Claudium — односторонняя игровая валюта: её можно купить за деньги и потратить на косметические предметы. Её нельзя вернуть, передать или обналичить.",
@@ -473,6 +624,7 @@ export const ru_RU: EnTranslations = {
       "railLabel": "Способ оплаты",
       "railStripe": "Карта",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "Скидка 20%",
       "railWocUnavailable": "Цена WOC сейчас недоступна.",
@@ -684,6 +836,7 @@ export const ru_RU: EnTranslations = {
       "targetFriendlyNext": "Следующий союзник",
       "discord": "Discord",
       "valecup": "Кубок Долины",
+      "sheathe": "Убрать/обнажить оружие",
       "categoryPet": "Питомец",
       "petAttack": "Питомец: атака",
       "petStop": "Питомец: стоп",
@@ -856,6 +1009,7 @@ export const ru_RU: EnTranslations = {
       "aurasOnPlayerFrame": "Баффы у рамки игрока",
       "highContrastBackground": "Фон высокой контрастности",
       "startAttackOnAbility": "Автоатака при использовании способности",
+      "showAttackButton": "Показывать кнопку атаки",
       "walkByAutoloot": "Автосбор добычи при проходе",
       "groundReticle": "Прицел наземного наведения",
       "showItemLevel": "Показывать уровень предмета",
@@ -977,6 +1131,7 @@ export const ru_RU: EnTranslations = {
         "spellPower": "Сила заклинаний",
         "critRating": "Рейтинг крит. удара",
         "hasteRating": "Рейтинг ускорения",
+        "hitRating": "Рейтинг меткости",
         "warfare": "Боевая мощь"
       },
       "warfareValue": "+{increase}% к урону / -{reduction}% получаемого",
@@ -994,6 +1149,7 @@ export const ru_RU: EnTranslations = {
         "dodge": "Ваш шанс полностью уклониться от входящей атаки в ближнем бою, не получив урона.",
         "critRating": "Рейтинг критического удара от снаряжения и бонусов комплекта повышает шанс критического удара. Примерно 10 рейтинга дают 1% крит. удара.",
         "hasteRating": "Рейтинг ускорения от снаряжения и бонусов комплекта ускоряет ваши атаки и заклинания. Примерно 10 рейтинга дают 1% ускорения.",
+        "hitRating": "Рейтинг меткости от снаряжения и бонусов комплекта снижает частоту промахов ваших атак и сопротивления вашим заклинаниям, особенно против противников более высокого уровня. Примерно 10 рейтинга дают 1% меткости.",
         "warfare": "Увеличивает урон по игрокам на {increase}% и снижает получаемый от игроков урон на {reduction}%."
       },
       "effects": {
@@ -1067,6 +1223,12 @@ export const ru_RU: EnTranslations = {
         "few": "вы {rank}, {count} участника",
         "many": "вы {rank}, {count} участников",
         "other": "вы {rank}, {count} участника"
+      },
+      "finderPartySize": {
+        "one": "{count} игрок",
+        "few": "{count} игрока",
+        "many": "{count} игроков",
+        "other": "{count} игрока"
       },
       "characterCount": {
         "one": "{count} персонаж",
@@ -1273,11 +1435,27 @@ export const ru_RU: EnTranslations = {
     },
     "dungeonDifficulty": {
       "setHeroic": "Установить сложность подземелий: героическая",
-      "setNormal": "Установить сложность подземелий: обычная"
+      "setNormal": "Установить сложность подземелий: обычная",
+      "resetAll": "Сбросить все подземелья",
+      "resetDone": "Все подземелья сброшены.",
+      "resetNone": "Нет подземелий для сброса.",
+      "resetOccupied": "Нельзя сбросить подземелья, пока внутри кто-то находится.",
+      "resetSameDifficulty": "Смените сложность подземелья перед сбросом этих подземелий. Пустые подземелья сбрасываются сами через 5 минут.",
+      "resetLoot": "Нельзя сбросить подземелья, пока внутри остаётся добыча.",
+      "resetConfirmTitle": "Сбросить все подземелья?",
+      "resetConfirmBody": "Это отменит пустые подземелья прежней выбранной сложности. Неполученная добыча не позволит выполнить сброс.",
+      "resetConfirm": "Сбросить подземелья",
+      "resetCooldown": "Подземелья можно сбрасывать только один раз в 5 минут.",
+      "resetUsage": "После смены сложности используйте /dungeon reset, чтобы отказаться от пустых подземелий.",
+      "entryMismatchNormal": "Это подземелье настроено на обычную сложность. Используйте «Сбросить все подземелья», чтобы начать новое героическое прохождение.",
+      "entryMismatchHeroic": "Это подземелье настроено на героическую сложность. Используйте «Сбросить все подземелья», чтобы начать новое обычное прохождение."
     },
     "bags": {
       "cannotDestroy": "Этот предмет нельзя уничтожить.",
-      "rightClickDestroy": "Shift+правый клик, чтобы уничтожить",
+      "rightClickDestroy": "Правый клик, чтобы уничтожить",
+      "dragEquipHint": "Перетащите на персонажа, чтобы надеть",
+      "dragDestroyHint": "Перетащите в мир, чтобы уничтожить",
+      "reorderNeedsRecent": "Сбросьте фильтр и выберите сортировку «Недавние», чтобы менять порядок в сумках",
       "filterGroupAria": "Фильтровать сумки по категории",
       "filterAll": "Все",
       "filterWeapon": "Оружие",
@@ -1350,6 +1528,8 @@ export const ru_RU: EnTranslations = {
       },
       "dodge": "Повышает шанс уклонения на {pct}%",
       "dodgeReduce": "Снижает шанс уклонения на {pct}%",
+      "damageReduction": "Уменьшает весь получаемый урон на {pct}%",
+      "guardianWard": "Следующий смертельный удар противника вместо этого восстанавливает здоровье до {pct}%",
       "armorFlat": "Снижает броню на {value}",
       "armorFlatStacks": "Снижает броню на {value} ({stacks} зарядов)",
       "armorPct": "Снижает броню на {pct}%",
@@ -1437,6 +1617,33 @@ export const ru_RU: EnTranslations = {
     "playerFrame": {
       "unlock": "Переместить рамку игрока",
       "lock": "Закрепить рамку игрока"
+    },
+    "partyFrames": {
+      "section": "Рамки группы и рейда",
+      "unlock": "Переместить рамки группы и рейда",
+      "lock": "Закрепить рамки группы и рейда",
+      "style": "Стиль рамок",
+      "styleAutomatic": "Автоматически",
+      "styleClassic": "Классические рамки группы",
+      "styleRaid": "Рамки рейда",
+      "scale": "Масштаб рамок",
+      "width": "Ширина рамок",
+      "height": "Высота рамок",
+      "spacing": "Интервал между рамками",
+      "columns": "Столбцы рейда",
+      "healthText": "Текст здоровья",
+      "healthNone": "None",
+      "healthPercent": "Проценты",
+      "healthCurrent": "Текущее",
+      "healthCurrentMax": "Текущее / Максимум",
+      "sort": "Сортировка игроков",
+      "sortGroup": "Группа",
+      "sortRole": "Role",
+      "sortName": "Name",
+      "showResource": "Показывать ману, ярость и энергию",
+      "showAbsorbs": "Показывать щиты поглощения",
+      "showAuras": "Показывать усиления и ослабления",
+      "showSelf": "Показывать вашу рамку"
     },
     "frameReset": {
       "label": "Сбросить положение рамок"
@@ -1531,8 +1738,8 @@ export const ru_RU: EnTranslations = {
         "juniormods": "Младший модератор",
         "artists": "Художник",
         "contentcreator": "Контент-мейкер",
-        "legend": "LEGEND",
-        "shill": "SHILL"
+        "legend": "ЛЕГЕНДА",
+        "shill": "ГЛАШАТАЙ"
       },
       "guildMember": "Подтвержденный участник",
       "notMember": "Еще не на сервере",
@@ -1799,7 +2006,8 @@ export const ru_RU: EnTranslations = {
       "title": "Собирательство",
       "mining": "Горное дело",
       "logging": "Лесозаготовка",
-      "herbalism": "Травничество"
+      "herbalism": "Травничество",
+      "notReady": "Этот ресурсный узел еще не восстановился для вас."
     },
     "archetypeTitle": {
       "label": "Титул",
@@ -1831,6 +2039,107 @@ export const ru_RU: EnTranslations = {
       "notAtHub": "Чтобы создать это, вы должны находиться у ремесленного центра и иметь требуемый уровень.",
       "throttled": "Вы создаете предметы слишком быстро. Подождите немного и попробуйте снова.",
       "recipeNotLearned": "Вы еще не изучили этот рецепт."
+    },
+    "finder": {
+      "title": "Поиск подземелий",
+      "close": "Закрыть",
+      "back": "Назад",
+      "syncing": "Ожидание игрового мира...",
+      "tabCatalogue": "Каталог",
+      "tabQueue": "Быстрый подбор",
+      "tabBoard": "Готовые группы",
+      "normal": "Обычный",
+      "heroic": "Героический",
+      "kindDungeon": "Подземелье",
+      "kindRaid": "Рейд",
+      "kindSolo": "Одиночное приключение",
+      "levels": "Уровни {min}-{max}",
+      "levelOne": "Уровень {level}",
+      "clock": "{minutes}:{seconds}",
+      "roleCount": "{role}: {count}",
+      "roleTank": "Танк",
+      "roleHealer": "Лекарь",
+      "roleDps": "Боец",
+      "freeRoles": "Любые роли",
+      "lockoutDaily": "Ежедневное закрепление за последним боссом",
+      "lockoutNone": "Без закрепления",
+      "lockedFor": "Закрыто еще примерно {minutes} мин",
+      "attunement": "Требуется допуск: {quest}",
+      "heroicMarks": "Героические знаки: {count} на игрока",
+      "entrance": "Вход: {zone}",
+      "showOnMap": "Показать на карте",
+      "encounters": "Босс-схватки",
+      "finalBoss": "Последний босс",
+      "summoned": "Призываемый страж",
+      "lootGuaranteed": "Всегда выпадает один из:",
+      "lootMaybe": "Выпадает не более одного из:",
+      "lootChance": "Дополнительно с шансом:",
+      "lootHeroic": "Героическая награда, всегда один из:",
+      "pct": "{pct}%",
+      "blockedLevel": "Только уровни {min}-{max}",
+      "blockedSpec": "Требуется специализация",
+      "yourRoles": "Ваши роли",
+      "needsSpec": "Выберите специализацию, чтобы пользоваться поиском подземелий.",
+      "leaderNote": "Ставить группу в очередь может только ее лидер.",
+      "chooseActivities": "Выберите приключения",
+      "joinQueue": "Встать в очередь",
+      "leaveQueue": "Покинуть очередь",
+      "waited": "В очереди: {time}",
+      "cooldownNote": "Снова встать в очередь можно через {seconds} с.",
+      "travelNote": "Группа собирается на месте. Идите ко входу вместе: телепортации нет.",
+      "proposalTitle": "Группа найдена: {name}",
+      "proposalRole": "Ваша роль: {role}",
+      "accepted": "Подтвердили: {accepted} из {size}",
+      "remaining": "На ответ: {seconds} с",
+      "accept": "Принять",
+      "decline": "Отклонить",
+      "acceptedWait": "Ожидание остальных...",
+      "slotState": "{role}: готовы {accepted} из {total}",
+      "openListings": "Открытые объявления",
+      "boardEmpty": "Объявлений пока нет. Создайте свое!",
+      "boardLeaderGate": "Публиковать объявление может только лидер группы.",
+      "publishListing": "Создать объявление",
+      "activity": "Приключение",
+      "publish": "Опубликовать",
+      "yourListing": "Ваше объявление",
+      "closeListing": "Закрыть объявление",
+      "applicants": "Заявки",
+      "noApplicants": "Заявок пока нет.",
+      "acceptApplicantAria": "Принять {name}",
+      "declineApplicantAria": "Отклонить {name}",
+      "levelClass": "{className}, {level}-й уровень",
+      "leader": "Лидер: {name}",
+      "needs": "Нужны: {roles}",
+      "slots": "{size}/{capacity}",
+      "apply": "Подать заявку",
+      "withdraw": "Отозвать заявку",
+      "tagFirstRun": "Первый заход",
+      "tagQuestRun": "Задания",
+      "tagFullClear": "Полная зачистка",
+      "tagLearning": "Новичкам рады",
+      "tagFastRun": "Быстрый заход",
+      "mech": {
+        "shadow_pulse": "Пульс тьмы (периодический урон по области)",
+        "reaping_arc": "Жатвенная дуга (рассекающий удар спереди)",
+        "mist_surge": "Волна тумана (периодический урон по области)",
+        "summons_adds": "Призывает подкрепления",
+        "lunar_tide": "Лунный прилив (периодический урон по области)",
+        "enrage": "Приходит в ярость при низком здоровье",
+        "shuddering_stomp": "Сотрясающий топот (оглушение по области)",
+        "necrotic_shockwave": "Некротическая ударная волна (высокий урон по области)",
+        "grave_cleaver": "Могильный секач (рассекающий удар спереди)",
+        "shadow_nova": "Кольцо тьмы (взрыв по области)",
+        "profane_mending": "Нечестивое исцеление (лечит союзников)",
+        "mana_burn": "Увядшее благословение (сжигает ману)",
+        "deathstalker_cleave": "Секач смертохода (рассекающий удар спереди)",
+        "mortal_wound": "Забытая рана (снижает получаемое лечение)",
+        "sealbreak_shockwave": "Волна сорванной печати (взрыв по области)",
+        "gravebreaker": "Гробокрушитель (конус спереди, разверните от рейда)",
+        "raise_fallen": "Поднятие павших (периодические волны прислужников)",
+        "soul_rend": "Разрыв души (отмеченным разойтись и получать лечение)",
+        "deathless_rage": "Бессмертная ярость (прерывается у охранных камней)",
+        "wardstones": "Охранные камни (смена фазы)"
+      }
     },
     "deeds": {
       "title": "Книга деяний",
@@ -3596,6 +3905,7 @@ export const ru_RU: EnTranslations = {
     "title": "Скачать загрузчик для ПК",
     "desc": "Загрузите отдельный клиент для оптимальной производительности и игры на весь экран.",
     "macCta": "Скачать для macOS",
+    "windowsCta": "Скачать для Windows",
     "linuxCta": "Скачать для Linux",
     "linuxHint": "Формат AppImage: сделайте файл исполняемым и запустите его, установка не требуется.",
     "windowsPending": "Сборка для Windows готовится."
@@ -4483,6 +4793,8 @@ export const ru_RU: EnTranslations = {
     "connectionLost": "Соединение с сервером потеряно.",
     "reconnecting": "Соединение потеряно. Повторное подключение...",
     "connectionRejected": "Сервер закрыл соединение.",
+    "realmFull": "Этот мир сейчас переполнен. Пожалуйста, попробуйте снова через несколько минут.",
+    "tooManyConnections": "Из вашей сети открыто слишком много подключений к этому миру. Пожалуйста, закройте лишние игровые окна или попробуйте снова через несколько минут.",
     "tips": {
       "classes": "Совет: все 9 классов играются по-разному. Попробуйте несколько, прежде чем выбрать один.",
       "talents": "Совет: вы можете сбросить таланты в любое время вне боя, так что ранний выбор никогда не станет ловушкой.",
@@ -4560,9 +4872,9 @@ export const ru_RU: EnTranslations = {
     "medium": "Средняя",
     "low": "Низкая",
     "popTipLow": "Низкая населённость: сейчас в сети менее 15 игроков. Много места; отлично для нового старта.",
-    "popTipMedium": "Средняя населённость: сейчас в сети от 15 до 39 игроков. Активный и живой мир.",
-    "popTipHigh": "Высокая населённость: сейчас в сети от 40 до 79 игроков. Оживлённо, много игроков.",
-    "popTipFull": "Полная населённость: сейчас в сети 80 и более игроков. Очень оживлённо; возможна очередь на вход.",
+    "popTipMedium": "Средняя населённость: сейчас в сети от 15 до 79 игроков. Активный и живой мир.",
+    "popTipHigh": "Высокая населённость: сейчас в сети 80 и более игроков. Оживлённо, много игроков.",
+    "popTipFull": "Полная населённость: этот мир достиг лимита игроков. Новые подключения отклоняются, пока кто-то из игроков не выйдет.",
     "popTipOffline": "Не в сети: этот мир сейчас недоступен и к нему нельзя подключиться.",
     "characterCountOne": "{count} персонаж",
     "characterCountOther": "{count} персонажа",
@@ -5249,6 +5561,7 @@ export const ru_RU: EnTranslations = {
     "actionBar": {
       "attackName": "Атака",
       "attackTooltip": "Включает или выключает автоатаку по вашей цели. Щелчок правой кнопкой по врагу также начинает атаку.",
+      "attackRemoveHint": "Щёлкните правой кнопкой, чтобы убрать её с панели и освободить ячейку.",
       "emptySlot": "Пустая ячейка",
       "slotAria": "Ячейка действия {slot}: {ability}",
       "emptySlotAria": "Ячейка действия {slot}: пусто",
@@ -6164,6 +6477,18 @@ export const ru_RU: EnTranslations = {
       "barkskin": {
         "name": "Дубовая шкура",
         "description": "Ваша кожа твердеет, как кора, повышая броню на 150 на 15 сек."
+      },
+      "ironhold": {
+        "name": "Железная стена",
+        "description": "Укрывшись за щитом, вы снижаете весь получаемый урон на 40% на 8 сек."
+      },
+      "sacred_bulwark": {
+        "name": "Священный оплот",
+        "description": "В течение {duration} сек. следующий смертельный удар противника не убьет вас, а восстановит здоровье до 35% от максимума."
+      },
+      "primal_reflexes": {
+        "name": "Первобытные рефлексы",
+        "description": "Ваши инстинкты обостряются, повышая шанс уклонения на 50% на 6 сек."
       },
       "starfire": {
         "name": "Падение небес",

@@ -20,6 +20,154 @@ export const en_CA: EnTranslations = {
     "rp": "RP",
     "rpPvp": "RP-PvP"
   },
+  "devCommand": {
+    "dialogLabel": "Developer Command Center",
+    "kicker": "Development tools",
+    "title": "Command Center",
+    "subtitle": "Authoritative test controls for the active world.",
+    "closeAria": "Close developer commands",
+    "categoryNavAria": "Developer command categories",
+    "categories": {
+      "player": "Player",
+      "spawns": "Spawns",
+      "inventory": "Inventory",
+      "progress": "Progress",
+      "travel": "Travel",
+      "scenarios": "Scenarios"
+    },
+    "filterLabel": "Filter commands",
+    "filterPlaceholder": "Search this category",
+    "noMatches": "No matching commands.",
+    "serverRequirement": "Server cheats still require ALLOW_DEV_COMMANDS=1.",
+    "invalidValues": "Choose valid values before running this command.",
+    "sent": "Sent: {command}",
+    "run": "Run",
+    "fields": {
+      "level": "Level",
+      "mob": "Mob",
+      "count": "Count",
+      "item": "Item",
+      "gold": "Gold",
+      "quest": "Quest",
+      "profession": "Profession",
+      "amount": "Amount",
+      "x": "X",
+      "z": "Z",
+      "dungeon": "Dungeon",
+      "difficulty": "Difficulty",
+      "name": "Name"
+    },
+    "difficulty": {
+      "normal": "Normal",
+      "heroic": "Heroic"
+    },
+    "actions": {
+      "heal": {
+        "label": "Restore health",
+        "description": "Fill the health pool."
+      },
+      "resource": {
+        "label": "Restore resource",
+        "description": "Fill mana, rage, or energy."
+      },
+      "cooldowns": {
+        "label": "Clear cooldowns",
+        "description": "Reset ability, GCD, and potion timers."
+      },
+      "god": {
+        "label": "Toggle god mode",
+        "description": "Toggle invulnerability and boosted damage."
+      },
+      "revive": {
+        "label": "Revive",
+        "description": "Revive through the normal resurrection path."
+      },
+      "kill": {
+        "label": "Kill player",
+        "description": "Test death, ghost, and corpse flows."
+      },
+      "combatreset": {
+        "label": "Reset combat",
+        "description": "Clear combat state and hostile threat."
+      },
+      "level": {
+        "label": "Set level",
+        "description": "Set the current character level."
+      },
+      "spawn": {
+        "label": "Spawn mob",
+        "description": "Create a concrete mob near the player."
+      },
+      "killtarget": {
+        "label": "Kill target",
+        "description": "Kill the selected living mob."
+      },
+      "despawntarget": {
+        "label": "Despawn target",
+        "description": "Remove a selected mob created by this tool."
+      },
+      "despawnall": {
+        "label": "Clear my spawns",
+        "description": "Remove every mob spawned by this developer."
+      },
+      "give": {
+        "label": "Give item",
+        "description": "Add an item to the player inventory."
+      },
+      "gold": {
+        "label": "Add gold",
+        "description": "Add gold to the current purse."
+      },
+      "quest": {
+        "label": "Complete quest",
+        "description": "Complete a specific quest by id."
+      },
+      "quests": {
+        "label": "Complete active quests",
+        "description": "Complete every quest in the current log."
+      },
+      "attune": {
+        "label": "Unlock attunements",
+        "description": "Mark all attunement requirements complete."
+      },
+      "gather": {
+        "label": "Grant gathering skill",
+        "description": "Increase a gathering profession."
+      },
+      "teleport": {
+        "label": "Teleport",
+        "description": "Move to exact world coordinates."
+      },
+      "dungeon": {
+        "label": "Enter dungeon",
+        "description": "Enter a dungeon with dev gate bypass."
+      },
+      "raid": {
+        "label": "Enter raid",
+        "description": "Enter the Nythraxis arena directly."
+      },
+      "raidreset": {
+        "label": "Reset raid lockout",
+        "description": "Clear the current raid lockouts."
+      },
+      "bot": {
+        "label": "Spawn social bot",
+        "description": "Create a whisperable stationary player."
+      },
+      "lfgqueue": {
+        "label": "Seed finder queue",
+        "description": "Create a Dungeon Finder queue scenario."
+      },
+      "lfgraid": {
+        "label": "Seed raid finder",
+        "description": "Create a raid finder scenario."
+      },
+      "lfgboard": {
+        "label": "Seed listing board",
+        "description": "Create a premade listing scenario."
+      }
+    }
+  },
   "game": {
     "xp": {
       "suffix": "XP",
@@ -203,6 +351,7 @@ export const en_CA: EnTranslations = {
       "remainingLessThanMinute": "<1m",
       "remainingMinutes": "{minutes}m",
       "remainingHoursMinutes": "{hours}h {minutes}m",
+      "remainingDaysHours": "{days}d {hours}h",
       "score": "Score",
       "walletValue": "Wallet Value (WOC)",
       "usd": "{amount} USD",
@@ -241,7 +390,8 @@ export const en_CA: EnTranslations = {
         "no_wallet": "Connect a wallet with at least $20 USD in WOC.",
         "under_minimum": "Wallet is below the $20 USD WOC minimum.",
         "price_unavailable": "WOC price is unavailable, rewards are temporarily locked.",
-        "banned": "You are banned from Daily Rewards. Reason: {reason}"
+        "banned": "You are banned from Daily Rewards. Reason: {reason}",
+        "bannedUntil": "You are banned from Daily Rewards for another {remaining}. Access returns {until}. Reason: {reason}"
       }
     },
     "wocStore": {
@@ -466,6 +616,7 @@ export const en_CA: EnTranslations = {
       "balanceLabel": "Balance",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL: {amount}",
+      "usdcBalance": "USDC: {amount}",
       "wocBalance": "WOC: {amount}",
       "unavailable": "The Claudium store is unavailable right now. Your balance and purchases are unaffected; please check back shortly.",
       "disclosure": "Claudium is a one-way soft currency: buy it with money and spend it on cosmetics. It cannot be redeemed, transferred, or cashed out.",
@@ -473,10 +624,11 @@ export const en_CA: EnTranslations = {
       "railLabel": "Payment method",
       "railStripe": "Card",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "20% off",
       "railWocUnavailable": "WOC pricing is unavailable right now.",
-      "railNativeUnavailable": "SOL/WOC off.",
+      "railNativeUnavailable": "Crypto off.",
       "amountLabel": "Amount",
       "showAmounts": "Show all Claudium amounts",
       "hideAmounts": "Hide extra Claudium amounts",
@@ -684,6 +836,7 @@ export const en_CA: EnTranslations = {
       "targetFriendlyNext": "Cycle Friendly Target",
       "discord": "Discord",
       "valecup": "Vale Cup",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "categoryPet": "Pet",
       "petAttack": "Pet: Attack",
       "petStop": "Pet: Stop",
@@ -856,6 +1009,7 @@ export const en_CA: EnTranslations = {
       "aurasOnPlayerFrame": "Buffs on the Player Frame",
       "highContrastBackground": "High-Contrast Background",
       "startAttackOnAbility": "Auto-Attack on Ability Use",
+      "showAttackButton": "Show Attack Button",
       "walkByAutoloot": "Walk-by Autoloot",
       "groundReticle": "Ground-Targeting Reticle",
       "showItemLevel": "Show Item Level",
@@ -977,6 +1131,7 @@ export const en_CA: EnTranslations = {
         "spellPower": "Spell Power",
         "critRating": "Crit Rating",
         "hasteRating": "Haste Rating",
+        "hitRating": "Hit Rating",
         "warfare": "Warfare"
       },
       "warfareValue": "+{increase}% dealt / -{reduction}% taken",
@@ -994,6 +1149,7 @@ export const en_CA: EnTranslations = {
         "dodge": "Your chance to completely avoid an incoming melee attack, taking no damage.",
         "critRating": "Crit rating from your gear and set bonuses, raising your critical strike chance. About 10 rating grants 1% crit.",
         "hasteRating": "Haste rating from your gear and set bonuses, speeding up your attacks and spellcasting. About 10 rating grants 1% haste.",
+        "hitRating": "Hit rating from your gear and set bonuses, reducing how often your attacks miss and your spells are resisted, especially against higher-level enemies. About 10 rating grants 1% hit.",
         "warfare": "Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%."
       },
       "effects": {
@@ -1067,6 +1223,12 @@ export const en_CA: EnTranslations = {
         "few": "you are {rank}, {count} members",
         "many": "you are {rank}, {count} members",
         "other": "you are {rank}, {count} members"
+      },
+      "finderPartySize": {
+        "one": "{count} player",
+        "few": "{count} players",
+        "many": "{count} players",
+        "other": "{count} players"
       },
       "characterCount": {
         "one": "{count} character",
@@ -1273,11 +1435,27 @@ export const en_CA: EnTranslations = {
     },
     "dungeonDifficulty": {
       "setHeroic": "Set Dungeon Difficulty: Heroic",
-      "setNormal": "Set Dungeon Difficulty: Normal"
+      "setNormal": "Set Dungeon Difficulty: Normal",
+      "resetAll": "Reset All Instances",
+      "resetDone": "All instances have been reset.",
+      "resetNone": "You have no instances to reset.",
+      "resetOccupied": "You cannot reset instances while someone is still inside.",
+      "resetSameDifficulty": "Change dungeon difficulty before resetting these instances. Empty instances reset on their own after 5 minutes.",
+      "resetLoot": "You cannot reset instances while loot remains inside.",
+      "resetConfirmTitle": "Reset All Instances?",
+      "resetConfirmBody": "This abandons empty instances from your previously selected difficulty. Unclaimed loot will prevent the reset.",
+      "resetConfirm": "Reset Instances",
+      "resetCooldown": "Instances can only be reset once every 5 minutes.",
+      "resetUsage": "Use /dungeon reset to abandon your empty instances after changing difficulty.",
+      "entryMismatchNormal": "This instance is set to Normal difficulty. Use Reset All Instances to start a fresh Heroic run.",
+      "entryMismatchHeroic": "This instance is set to Heroic difficulty. Use Reset All Instances to start a fresh Normal run."
     },
     "bags": {
       "cannotDestroy": "This item cannot be destroyed.",
-      "rightClickDestroy": "Shift+right-click to destroy",
+      "rightClickDestroy": "Right-click to destroy",
+      "dragEquipHint": "Drag onto your character to equip",
+      "dragDestroyHint": "Drag out into the world to destroy",
+      "reorderNeedsRecent": "Clear the filter and sort by Recent to rearrange your bags",
       "filterGroupAria": "Filter bags by category",
       "filterAll": "All",
       "filterWeapon": "Weapons",
@@ -1350,6 +1528,8 @@ export const en_CA: EnTranslations = {
       },
       "dodge": "Increases dodge chance by {pct}%",
       "dodgeReduce": "Reduces dodge chance by {pct}%",
+      "damageReduction": "Reduces all damage taken by {pct}%",
+      "guardianWard": "The next lethal enemy hit restores you to {pct}% health instead",
       "armorFlat": "Reduces armor by {value}",
       "armorFlatStacks": "Reduces armor by {value} ({stacks} stacks)",
       "armorPct": "Reduces armor by {pct}%",
@@ -1437,6 +1617,33 @@ export const en_CA: EnTranslations = {
     "playerFrame": {
       "unlock": "Move player frame",
       "lock": "Lock player frame"
+    },
+    "partyFrames": {
+      "section": "Party and Raid Frames",
+      "unlock": "Move party and raid frames",
+      "lock": "Lock party and raid frames",
+      "style": "Frame Style",
+      "styleAutomatic": "Automatic",
+      "styleClassic": "Classic Party Frames",
+      "styleRaid": "Raid Frames",
+      "scale": "Frame Scale",
+      "width": "Frame Width",
+      "height": "Frame Height",
+      "spacing": "Frame Spacing",
+      "columns": "Raid Columns",
+      "healthText": "Health Text",
+      "healthNone": "None",
+      "healthPercent": "Percent",
+      "healthCurrent": "Current",
+      "healthCurrentMax": "Current / Max",
+      "sort": "Sort Players",
+      "sortGroup": "Group",
+      "sortRole": "Role",
+      "sortName": "Name",
+      "showResource": "Show Mana, Rage, and Energy",
+      "showAbsorbs": "Show Absorb Shields",
+      "showAuras": "Show Buffs and Debuffs",
+      "showSelf": "Show Your Frame"
     },
     "frameReset": {
       "label": "Reset Frame Positions"
@@ -1799,7 +2006,8 @@ export const en_CA: EnTranslations = {
       "title": "Gathering",
       "mining": "Mining",
       "logging": "Logging",
-      "herbalism": "Herbalism"
+      "herbalism": "Herbalism",
+      "notReady": "This resource node has not respawned for you yet."
     },
     "archetypeTitle": {
       "label": "Title",
@@ -1831,6 +2039,107 @@ export const en_CA: EnTranslations = {
       "notAtHub": "You must be at the crafting hub, at the required level, to craft that.",
       "throttled": "You are crafting too quickly. Wait a moment and try again.",
       "recipeNotLearned": "You have not learned that recipe yet."
+    },
+    "finder": {
+      "title": "Dungeon Finder",
+      "close": "Close",
+      "back": "Back",
+      "syncing": "Waiting for the realm...",
+      "tabCatalogue": "Catalogue",
+      "tabQueue": "Quick Match",
+      "tabBoard": "Premade Groups",
+      "normal": "Normal",
+      "heroic": "Heroic",
+      "kindDungeon": "Dungeon",
+      "kindRaid": "Raid",
+      "kindSolo": "Solo adventure",
+      "levels": "Levels {min} to {max}",
+      "levelOne": "Level {level}",
+      "clock": "{minutes}:{seconds}",
+      "roleCount": "{count} {role}",
+      "roleTank": "Tank",
+      "roleHealer": "Healer",
+      "roleDps": "Damage",
+      "freeRoles": "Any roles welcome",
+      "lockoutDaily": "Daily lockout on the final boss",
+      "lockoutNone": "No lockout",
+      "lockedFor": "Locked for about {minutes} min",
+      "attunement": "Requires attunement: {quest}",
+      "heroicMarks": "Heroic Marks: {count} per player",
+      "entrance": "Entrance: {zone}",
+      "showOnMap": "Show on Map",
+      "encounters": "Encounters",
+      "finalBoss": "Final boss",
+      "summoned": "Summoned guardian",
+      "lootGuaranteed": "One of these always drops:",
+      "lootMaybe": "At most one of these may drop:",
+      "lootChance": "Additional chance drops:",
+      "lootHeroic": "Heroic bonus, one of these always drops:",
+      "pct": "{pct}%",
+      "blockedLevel": "Levels {min} to {max} only",
+      "blockedSpec": "Requires a specialization",
+      "yourRoles": "Your roles",
+      "needsSpec": "Choose a specialization to use the Dungeon Finder.",
+      "leaderNote": "Only your party leader can queue the group.",
+      "chooseActivities": "Choose activities",
+      "joinQueue": "Join queue",
+      "leaveQueue": "Leave queue",
+      "waited": "Time in queue: {time}",
+      "cooldownNote": "You may queue again in {seconds}s.",
+      "travelNote": "The group forms where everyone stands. Travel to the entrance together; nobody is teleported.",
+      "proposalTitle": "Group found: {name}",
+      "proposalRole": "Your role: {role}",
+      "accepted": "{accepted} of {size} confirmed",
+      "remaining": "{seconds}s to answer",
+      "accept": "Accept",
+      "decline": "Decline",
+      "acceptedWait": "Waiting for the others...",
+      "slotState": "{role}: {accepted} of {total} ready",
+      "openListings": "Open listings",
+      "boardEmpty": "No listings right now. Publish one!",
+      "boardLeaderGate": "Only your party leader can publish a listing.",
+      "publishListing": "Publish a listing",
+      "activity": "Activity",
+      "publish": "Publish",
+      "yourListing": "Your listing",
+      "closeListing": "Close listing",
+      "applicants": "Applicants",
+      "noApplicants": "No applicants yet.",
+      "acceptApplicantAria": "Accept {name}",
+      "declineApplicantAria": "Decline {name}",
+      "levelClass": "Lv {level} {className}",
+      "leader": "Leader: {name}",
+      "needs": "Needs {roles}",
+      "slots": "{size}/{capacity}",
+      "apply": "Apply",
+      "withdraw": "Withdraw application",
+      "tagFirstRun": "First run",
+      "tagQuestRun": "Quest run",
+      "tagFullClear": "Full clear",
+      "tagLearning": "Learning welcome",
+      "tagFastRun": "Fast run",
+      "mech": {
+        "shadow_pulse": "Shadow Pulse (pulsing area damage)",
+        "reaping_arc": "Reaping Arc (frontal cleave)",
+        "mist_surge": "Mist Surge (pulsing area damage)",
+        "summons_adds": "Summons reinforcements",
+        "lunar_tide": "Lunar Tide (pulsing area damage)",
+        "enrage": "Enrages at low health",
+        "shuddering_stomp": "Shuddering Stomp (area stun)",
+        "necrotic_shockwave": "Necrotic Shockwave (heavy area damage)",
+        "grave_cleaver": "Grave-Cleaver (frontal cleave)",
+        "shadow_nova": "Shadow Nova (area burst)",
+        "profane_mending": "Profane Mending (heals its allies)",
+        "mana_burn": "Withered Benediction (burns mana)",
+        "deathstalker_cleave": "Deathstalker Cleave (frontal cleave)",
+        "mortal_wound": "Forgotten Wound (reduces healing taken)",
+        "sealbreak_shockwave": "Sealbreak Shockwave (area burst)",
+        "gravebreaker": "Gravebreaker (frontal cone, face it away from the raid)",
+        "raise_fallen": "Raise Fallen (periodic waves of adds)",
+        "soul_rend": "Soul Rend (marked players must spread and be healed)",
+        "deathless_rage": "Deathless Rage (interrupted at the wardstones)",
+        "wardstones": "Wardstone channels (phase transition)"
+      }
     },
     "deeds": {
       "title": "Book of Deeds",
@@ -3596,6 +3905,7 @@ export const en_CA: EnTranslations = {
     "title": "Download Desktop Launcher",
     "desc": "Get the standalone launcher for optimized performance and full-screen play.",
     "macCta": "Download for macOS",
+    "windowsCta": "Download for Windows",
     "linuxCta": "Download for Linux",
     "linuxHint": "AppImage: make it executable, then run it. No install needed.",
     "windowsPending": "Windows build pending."
@@ -4483,6 +4793,8 @@ export const en_CA: EnTranslations = {
     "connectionLost": "Connection to the server was lost.",
     "reconnecting": "Connection lost. Reconnecting...",
     "connectionRejected": "The server closed the connection.",
+    "realmFull": "This world is full right now. Please try again in a few minutes.",
+    "tooManyConnections": "Too many connections to this world are coming from your network. Please close extra game windows or try again in a few minutes.",
     "tips": {
       "classes": "Tip: each of the 9 classes plays differently. Try a few before committing to one.",
       "talents": "Tip: you can reset your talents any time you are out of combat, so an early pick is never a trap.",
@@ -4560,9 +4872,9 @@ export const en_CA: EnTranslations = {
     "medium": "Medium",
     "low": "Low",
     "popTipLow": "Low population: fewer than 15 players online right now. Plenty of room; great for a fresh start.",
-    "popTipMedium": "Medium population: 15 to 39 players online right now. A healthy, active world.",
-    "popTipHigh": "High population: 40 to 79 players online right now. Busy, with lots of players around.",
-    "popTipFull": "Full population: 80 or more players online right now. Very busy; you may wait in a login queue.",
+    "popTipMedium": "Medium population: 15 to 79 players online right now. A healthy, active world.",
+    "popTipHigh": "High population: 80 or more players online right now. Busy, with lots of players around.",
+    "popTipFull": "Full population: this world is at capacity right now. New logins are declined until a player logs out.",
     "popTipOffline": "Offline: this world is unreachable right now and cannot be joined.",
     "characterCountOne": "{count} character",
     "characterCountOther": "{count} characters",
@@ -5249,6 +5561,7 @@ export const en_CA: EnTranslations = {
     "actionBar": {
       "attackName": "Attack",
       "attackTooltip": "Toggle auto-attack on your target. Right-clicking an enemy also attacks.",
+      "attackRemoveHint": "Right-click to remove it from the bar and free the slot.",
       "emptySlot": "Empty slot",
       "slotAria": "Action slot {slot}: {ability}",
       "emptySlotAria": "Action slot {slot}: empty",
@@ -6164,6 +6477,18 @@ export const en_CA: EnTranslations = {
       "barkskin": {
         "name": "Oakhide",
         "description": "Your skin hardens like bark, increasing armor by 150 for 15 sec."
+      },
+      "ironhold": {
+        "name": "Ironhold",
+        "description": "Brace behind your guard, reducing all damage taken by 40% for 8 sec."
+      },
+      "sacred_bulwark": {
+        "name": "Sacred Bulwark",
+        "description": "For {duration} sec, the next enemy hit that would kill you is denied, restoring you to 35% health instead."
+      },
+      "primal_reflexes": {
+        "name": "Primal Reflexes",
+        "description": "Your instincts sharpen, increasing your chance to dodge by 50% for 6 sec."
       },
       "starfire": {
         "name": "Skyfall",
@@ -9424,7 +9749,7 @@ export const en_CA: EnTranslations = {
         "name": "Bonewrought Regalia",
         "bonus2": "Increases attack power by 40.",
         "bonus3": "Increases Strength by 15, Stamina by 15, and attack and casting speed by 15%.",
-        "bonus4": "Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 8 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus4": "Increases Hit by 6%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 8 damage every 2 sec for 12 sec. Stacks up to 3 times."
       },
       "deathlord": {
         "name": "Barrowlord Battlegear",
@@ -9446,7 +9771,7 @@ export const en_CA: EnTranslations = {
         "name": "Direfang Pelt",
         "bonus2": "Increases attack power by 40.",
         "bonus3": "Increases Agility by 15, critical strike chance by 2%, and attack and casting speed by 15%.",
-        "bonus4": "Your weapon critical strikes tear a Ragged Gash, bleeding the target for 6 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus4": "Increases Hit by 6%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 6 damage every 2 sec for 12 sec. Stacks up to 3 times."
       },
       "soulflame": {
         "name": "Wraithfire Regalia",

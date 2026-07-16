@@ -117,6 +117,17 @@ export const SETTING_RANGES = {
   // The target frame's twin of playerFrameScale, via --target-frame-scale.
   // Same children-zoom trick (the frame itself is drag-positioned). 1.0 = stock.
   targetFrameScale: { min: 0.7, max: 1.15, def: 1 },
+  // Party/raid frame layout. partyFrameStyle: 0 automatic, 1 classic, 2 raid.
+  // partyFrameHealthText: 0 none, 1 percent, 2 current, 3 current/max.
+  // partyFrameSort: 0 group, 1 role, 2 name.
+  partyFrameStyle: { min: 0, max: 2, def: 0 },
+  partyFrameScale: { min: 0.7, max: 1.4, def: 1 },
+  partyFrameWidth: { min: 120, max: 260, def: 170 },
+  partyFrameHeight: { min: 30, max: 72, def: 42 },
+  partyFrameSpacing: { min: 0, max: 12, def: 4 },
+  partyFrameColumns: { min: 1, max: 5, def: 1 },
+  partyFrameHealthText: { min: 0, max: 3, def: 1 },
+  partyFrameSort: { min: 0, max: 2, def: 0 },
 } as const;
 
 export const BOOL_SETTINGS = {
@@ -159,6 +170,10 @@ export const BOOL_SETTINGS = {
   // startAutoAttack still no-ops unless a valid hostile target is in range, and
   // heals / buffs / damage-breakable CC (gouge, sap, sheep) never trigger it.
   startAttackOnAbilityUse: { def: true },
+  // on by default: slot 0 shows the classic fixed Attack (auto-attack) toggle.
+  // Turning it off (or right-clicking the Attack button) removes it from the bar,
+  // freeing slot 0 and its keybind to hold a normal assignable action.
+  showAttackButton: { def: true },
   // off by default: walk-by proximity autoloot (loot corpses just by walking
   // past them). Auto-grabbing loot can feel jarring, so it is opt-in and classic
   // deliberate looting stays the default. Gates the client AutoLoot pass in
@@ -176,6 +191,12 @@ export const BOOL_SETTINGS = {
   // vacated top spot) so incoming debuffs keep one glanceable classic corner.
   // Desktop only; the mobile layout keeps its own aura placement.
   aurasOnPlayerFrame: { def: false },
+  // Party/raid frame display profile. Health is always visible; these switches
+  // choose the supporting information layered around it.
+  partyFrameShowResource: { def: true },
+  partyFrameShowAbsorbs: { def: true },
+  partyFrameShowAuras: { def: true },
+  partyFrameShowSelf: { def: false },
 
   // --- Interface & Comfort pack (booleans). ---
   // off by default: drop every HUD cross-fade / panel animation, for players

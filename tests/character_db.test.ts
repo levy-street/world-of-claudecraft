@@ -249,7 +249,9 @@ describe('account and session request metadata', () => {
     const [sql, params] = dbMock.query.mock.calls[0];
     expect(sql).toMatch(/ip_address/);
     expect(sql).toMatch(/user_agent/);
-    expect(params).toEqual([7, 42, 'Alice', '203.0.113.6', 'Mozilla/5.0']);
+    expect(sql).toContain('player_account_facts');
+    expect(sql).toContain('player_activity_daily');
+    expect(params).toEqual([7, 42, 'Alice', REALM, 1, '203.0.113.6', 'Mozilla/5.0']);
   });
 });
 
@@ -572,6 +574,7 @@ describe('createCharacterCapped', () => {
         ],
         rowCount: 1,
       } as any)
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // player metric facts
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any); // COMMIT
 
     const row = await createCharacterCapped(7, 'Captest', 'mage', 10);
@@ -583,7 +586,8 @@ describe('createCharacterCapped', () => {
     expect(client.query.mock.calls[2][0]).toContain('count(*)::int');
     expect(client.query.mock.calls[2][1]).toEqual([7, REALM]);
     expect(client.query.mock.calls[3][0]).toMatch(/INSERT INTO characters/);
-    expect(client.query.mock.calls[4][0]).toBe('COMMIT');
+    expect(client.query.mock.calls[4][0]).toContain('INSERT INTO player_account_facts');
+    expect(client.query.mock.calls[5][0]).toBe('COMMIT');
     expect(client.release).toHaveBeenCalledTimes(1);
   });
 

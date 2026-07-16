@@ -20,6 +20,154 @@ export const tr_TR: EnTranslations = {
     "rp": "RP",
     "rpPvp": "RP-PvP"
   },
+  "devCommand": {
+    "dialogLabel": "Developer Command Center",
+    "kicker": "Development tools",
+    "title": "Command Center",
+    "subtitle": "Authoritative test controls for the active world.",
+    "closeAria": "Close developer commands",
+    "categoryNavAria": "Developer command categories",
+    "categories": {
+      "player": "Player",
+      "spawns": "Spawns",
+      "inventory": "Inventory",
+      "progress": "Progress",
+      "travel": "Travel",
+      "scenarios": "Scenarios"
+    },
+    "filterLabel": "Filter commands",
+    "filterPlaceholder": "Search this category",
+    "noMatches": "No matching commands.",
+    "serverRequirement": "Server cheats still require ALLOW_DEV_COMMANDS=1.",
+    "invalidValues": "Choose valid values before running this command.",
+    "sent": "Sent: {command}",
+    "run": "Run",
+    "fields": {
+      "level": "Level",
+      "mob": "Mob",
+      "count": "Count",
+      "item": "Item",
+      "gold": "Gold",
+      "quest": "Quest",
+      "profession": "Profession",
+      "amount": "Amount",
+      "x": "X",
+      "z": "Z",
+      "dungeon": "Dungeon",
+      "difficulty": "Difficulty",
+      "name": "Name"
+    },
+    "difficulty": {
+      "normal": "Normal",
+      "heroic": "Heroic"
+    },
+    "actions": {
+      "heal": {
+        "label": "Restore health",
+        "description": "Fill the health pool."
+      },
+      "resource": {
+        "label": "Restore resource",
+        "description": "Fill mana, rage, or energy."
+      },
+      "cooldowns": {
+        "label": "Clear cooldowns",
+        "description": "Reset ability, GCD, and potion timers."
+      },
+      "god": {
+        "label": "Toggle god mode",
+        "description": "Toggle invulnerability and boosted damage."
+      },
+      "revive": {
+        "label": "Revive",
+        "description": "Revive through the normal resurrection path."
+      },
+      "kill": {
+        "label": "Kill player",
+        "description": "Test death, ghost, and corpse flows."
+      },
+      "combatreset": {
+        "label": "Reset combat",
+        "description": "Clear combat state and hostile threat."
+      },
+      "level": {
+        "label": "Set level",
+        "description": "Set the current character level."
+      },
+      "spawn": {
+        "label": "Spawn mob",
+        "description": "Create a concrete mob near the player."
+      },
+      "killtarget": {
+        "label": "Kill target",
+        "description": "Kill the selected living mob."
+      },
+      "despawntarget": {
+        "label": "Despawn target",
+        "description": "Remove a selected mob created by this tool."
+      },
+      "despawnall": {
+        "label": "Clear my spawns",
+        "description": "Remove every mob spawned by this developer."
+      },
+      "give": {
+        "label": "Give item",
+        "description": "Add an item to the player inventory."
+      },
+      "gold": {
+        "label": "Add gold",
+        "description": "Add gold to the current purse."
+      },
+      "quest": {
+        "label": "Complete quest",
+        "description": "Complete a specific quest by id."
+      },
+      "quests": {
+        "label": "Complete active quests",
+        "description": "Complete every quest in the current log."
+      },
+      "attune": {
+        "label": "Unlock attunements",
+        "description": "Mark all attunement requirements complete."
+      },
+      "gather": {
+        "label": "Grant gathering skill",
+        "description": "Increase a gathering profession."
+      },
+      "teleport": {
+        "label": "Teleport",
+        "description": "Move to exact world coordinates."
+      },
+      "dungeon": {
+        "label": "Enter dungeon",
+        "description": "Enter a dungeon with dev gate bypass."
+      },
+      "raid": {
+        "label": "Enter raid",
+        "description": "Enter the Nythraxis arena directly."
+      },
+      "raidreset": {
+        "label": "Reset raid lockout",
+        "description": "Clear the current raid lockouts."
+      },
+      "bot": {
+        "label": "Spawn social bot",
+        "description": "Create a whisperable stationary player."
+      },
+      "lfgqueue": {
+        "label": "Seed finder queue",
+        "description": "Create a Dungeon Finder queue scenario."
+      },
+      "lfgraid": {
+        "label": "Seed raid finder",
+        "description": "Create a raid finder scenario."
+      },
+      "lfgboard": {
+        "label": "Seed listing board",
+        "description": "Create a premade listing scenario."
+      }
+    }
+  },
   "game": {
     "xp": {
       "suffix": "TP",
@@ -203,6 +351,7 @@ export const tr_TR: EnTranslations = {
       "remainingLessThanMinute": "<1dk",
       "remainingMinutes": "{minutes}dk",
       "remainingHoursMinutes": "{hours}sa {minutes}dk",
+      "remainingDaysHours": "{days}d {hours}h",
       "score": "Skor",
       "walletValue": "Cüzdan Değeri (WOC)",
       "usd": "{amount} USD",
@@ -241,7 +390,8 @@ export const tr_TR: EnTranslations = {
         "no_wallet": "En az 20 USD değerinde WOC bulunan bir cüzdan bağla.",
         "under_minimum": "Cüzdan, 20 USD değerindeki WOC alt sınırının altında.",
         "price_unavailable": "WOC fiyatı alınamıyor, ödüller geçici olarak kilitli.",
-        "banned": "Günlük Ödüllerden yasaklandın. Gerekçe: {reason}"
+        "banned": "Günlük Ödüllerden yasaklandın. Gerekçe: {reason}",
+        "bannedUntil": "You are banned from Daily Rewards for another {remaining}. Access returns {until}. Reason: {reason}"
       }
     },
     "wocStore": {
@@ -466,6 +616,7 @@ export const tr_TR: EnTranslations = {
       "balanceLabel": "Bakiye",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL: {amount}",
+      "usdcBalance": "USDC: {amount}",
       "wocBalance": "WOC: {amount}",
       "unavailable": "Claudium mağazası şu anda kullanılamıyor. Bakiyeniz ve satın alımlarınız etkilenmez; lütfen kısa süre sonra tekrar kontrol edin.",
       "disclosure": "Claudium tek yönlü yumuşak bir para birimidir: Parayla satın alın ve kozmetik ürünlerine harcayın. Kullanılamaz, devredilemez veya nakde çevrilemez.",
@@ -473,6 +624,7 @@ export const tr_TR: EnTranslations = {
       "railLabel": "Ödeme yöntemi",
       "railStripe": "Kart",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "%20 indirim",
       "railWocUnavailable": "WOC fiyatlandırması şu anda mevcut değil.",
@@ -618,13 +770,13 @@ export const tr_TR: EnTranslations = {
       "update": "Güncelle"
     },
     "cameraPrompt": {
-      "title": "Choose Your Camera",
-      "intro": "Pick how the camera follows your character.",
-      "mouseDesc": "Move the mouse to turn the camera without holding a button.",
-      "classicTitle": "Classic Camera",
-      "classicDesc": "Hold right-click and move the mouse to turn the camera.",
-      "changeLater": "You can change this later under Esc, Key Bindings.",
-      "confirm": "Confirm"
+      "title": "Kamera Modunu Seç",
+      "intro": "Kameranın karakterini nasıl takip edeceğini seç.",
+      "mouseDesc": "Bir tuşa basmadan fareyi hareket ettirerek kamerayı döndür.",
+      "classicTitle": "Klasik Kamera",
+      "classicDesc": "Kamerayı döndürmek için sağ tıklayı basılı tut ve fareyi hareket ettir.",
+      "changeLater": "Bunu daha sonra Esc, Tuş Atamaları menüsünden değiştirebilirsin.",
+      "confirm": "Onayla"
     },
     "castBar": {
       "playerAria": "Senin Büyü Çubuğun",
@@ -672,11 +824,11 @@ export const tr_TR: EnTranslations = {
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m}dk {s}sn",
       "seconds": "{s}sn",
-      "autoShowHint": "Rows appear automatically once your party deals damage or healing, and this segment closes a few seconds after combat ends."
+      "autoShowHint": "Satırlar, partindeki oyuncular hasar vermeye veya iyileştirmeye başladığında otomatik görünür; bu bölüm ise savaş bittikten birkaç saniye sonra kapanır."
     },
     "petFeed": {
-      "disabledFullHp": "Pet is at full health",
-      "disabledNoFood": "No food in your bags will heal your pet"
+      "disabledFullHp": "Evcil hayvanın canı dolu",
+      "disabledNoFood": "Çantalarında evcil hayvanını iyileştirecek yiyecek yok"
     },
     "keybinds": {
       "emoteWheel": "İfade Çarkı",
@@ -684,6 +836,7 @@ export const tr_TR: EnTranslations = {
       "targetFriendlyNext": "Dost Hedefler Arasında Geç",
       "discord": "Discord",
       "valecup": "Vadi Kupası",
+      "sheathe": "Silahı Kın'a Tak / Çıkar",
       "categoryPet": "Yoldaş",
       "petAttack": "Yoldaş: Saldır",
       "petStop": "Yoldaş: Dur",
@@ -856,6 +1009,7 @@ export const tr_TR: EnTranslations = {
       "aurasOnPlayerFrame": "Oyuncu Çerçevesinde Güçlendirmeler",
       "highContrastBackground": "Yüksek Kontrastlı Arka Plan",
       "startAttackOnAbility": "Yetenek Kullanımında Otomatik Saldırı",
+      "showAttackButton": "Saldırı Düğmesini Göster",
       "walkByAutoloot": "Yanından Geçerken Otomatik Yağma",
       "groundReticle": "Yer hedefleme halkası",
       "showItemLevel": "Eşya Seviyesini Göster",
@@ -977,6 +1131,7 @@ export const tr_TR: EnTranslations = {
         "spellPower": "Büyü Gücü",
         "critRating": "Kritik Puanı",
         "hasteRating": "Hız Puanı",
+        "hitRating": "İsabetlilik Puanı",
         "warfare": "Harp"
       },
       "warfareValue": "+{increase}% verilen / -{reduction}% alınan",
@@ -994,6 +1149,7 @@ export const tr_TR: EnTranslations = {
         "dodge": "Gelen bir yakın dövüş saldırısından hiç hasar almadan tamamen kaçınma şansın.",
         "critRating": "Teçhizatından ve set bonuslarından gelen kritik puanı, kritik vuruş şansını artırır. Yaklaşık 10 puan %1 kritik sağlar.",
         "hasteRating": "Teçhizatından ve set bonuslarından gelen hız puanı, saldırılarını ve büyü yapmanı hızlandırır. Yaklaşık 10 puan %1 hız sağlar.",
+        "hitRating": "Ekipmanından ve set bonuslarından gelen isabetlilik puanı; özellikle daha yüksek seviyeli düşmanlara karşı saldırılarının ıskalanma ve büyülerinin dirençle engelleme olasılığını azaltır. Her yaklaşık 10 puan, isabetliliği %1 artırır.",
         "warfare": "Oyunculara verilen hasarı {increase}% artırır ve oyunculardan alınan hasarı {reduction}% azaltır."
       },
       "effects": {
@@ -1067,6 +1223,12 @@ export const tr_TR: EnTranslations = {
         "few": "rütben {rank}, {count} üye",
         "many": "rütben {rank}, {count} üye",
         "other": "rütben {rank}, {count} üye"
+      },
+      "finderPartySize": {
+        "one": "{count} oyuncu",
+        "few": "{count} oyuncu",
+        "many": "{count} oyuncu",
+        "other": "{count} oyuncu"
       },
       "characterCount": {
         "one": "{count} karakter",
@@ -1273,11 +1435,27 @@ export const tr_TR: EnTranslations = {
     },
     "dungeonDifficulty": {
       "setHeroic": "Zindan Zorluğunu Ayarla: Kahramanca",
-      "setNormal": "Zindan Zorluğunu Ayarla: Normal"
+      "setNormal": "Zindan Zorluğunu Ayarla: Normal",
+      "resetAll": "Tüm Örnekleri Sıfırla",
+      "resetDone": "Tüm örnekler sıfırlandı.",
+      "resetNone": "Sıfırlanacak örneğin yok.",
+      "resetOccupied": "İçeride hâlâ biri varken örnekleri sıfırlayamazsın.",
+      "resetSameDifficulty": "Bu örnekleri sıfırlamadan önce zindan zorluğunu değiştir. Boş örnekler 5 dakika sonra kendiliğinden sıfırlanır.",
+      "resetLoot": "İçeride ganimet kaldığı sürece örnekleri sıfırlayamazsın.",
+      "resetConfirmTitle": "Tüm Örnekler Sıfırlansın mı?",
+      "resetConfirmBody": "Bu işlem, daha önce seçtiğin zorluktaki boş örneklerden vazgeçer. Alınmamış ganimet sıfırlamayı engeller.",
+      "resetConfirm": "Örnekleri Sıfırla",
+      "resetCooldown": "Örnekler yalnızca 5 dakikada bir sıfırlanabilir.",
+      "resetUsage": "Zorluğu değiştirdikten sonra boş örneklerinden vazgeçmek için /dungeon reset kullan.",
+      "entryMismatchNormal": "Bu örnek Normal zorluğa ayarlı. Yeni bir Kahramanca koşu başlatmak için Tüm Örnekleri Sıfırla seçeneğini kullan.",
+      "entryMismatchHeroic": "Bu örnek Kahramanca zorluğa ayarlı. Yeni bir Normal koşu başlatmak için Tüm Örnekleri Sıfırla seçeneğini kullan."
     },
     "bags": {
       "cannotDestroy": "Bu eşya yok edilemez.",
-      "rightClickDestroy": "Shift+right-click to destroy",
+      "rightClickDestroy": "Yok etmek için sağ tıkla",
+      "dragEquipHint": "Kuşanmak için karakterinin üzerine sürükle",
+      "dragDestroyHint": "Yok etmek için dünyaya sürükle",
+      "reorderNeedsRecent": "Çantalarını yeniden düzenlemek için filtreyi temizle ve Son Eklenen sıralama seçeneğini kullan",
       "filterGroupAria": "Çantaları kategoriye göre filtrele",
       "filterAll": "Tümü",
       "filterWeapon": "Silahlar",
@@ -1350,6 +1528,8 @@ export const tr_TR: EnTranslations = {
       },
       "dodge": "Aumenta la probabilidad de esquivar un {pct}%",
       "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
+      "damageReduction": "Alınan tüm hasarı %{pct} azaltır",
+      "guardianWard": "Seni öldürecek bir sonraki düşman darbesi engellenir ve yerine canın %{pct}'e geri döner",
       "armorFlat": "Reduce la armadura en {value}",
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
       "armorPct": "Zırhı %{pct} azaltır",
@@ -1438,6 +1618,33 @@ export const tr_TR: EnTranslations = {
       "unlock": "Oyuncu çerçevesini taşı",
       "lock": "Oyuncu çerçevesini kilitle"
     },
+    "partyFrames": {
+      "section": "Party and Raid Frames",
+      "unlock": "Move party and raid frames",
+      "lock": "Lock party and raid frames",
+      "style": "Frame Style",
+      "styleAutomatic": "Automatic",
+      "styleClassic": "Classic Party Frames",
+      "styleRaid": "Raid Frames",
+      "scale": "Frame Scale",
+      "width": "Frame Width",
+      "height": "Frame Height",
+      "spacing": "Frame Spacing",
+      "columns": "Raid Columns",
+      "healthText": "Health Text",
+      "healthNone": "None",
+      "healthPercent": "Percent",
+      "healthCurrent": "Current",
+      "healthCurrentMax": "Current / Max",
+      "sort": "Sort Players",
+      "sortGroup": "Group",
+      "sortRole": "Role",
+      "sortName": "Name",
+      "showResource": "Show Mana, Rage, and Energy",
+      "showAbsorbs": "Show Absorb Shields",
+      "showAuras": "Show Buffs and Debuffs",
+      "showSelf": "Show Your Frame"
+    },
     "frameReset": {
       "label": "Çerçeve Konumlarını Sıfırla"
     },
@@ -1478,7 +1685,7 @@ export const tr_TR: EnTranslations = {
         "benefits": "Oyun ve topluluk etkinliğinden puan kazanmak ve statü kademelerini tırmanmak için Discord hesabını bağla.",
         "error": "Discord bağlanamadı. Lütfen tekrar dene.",
         "success": "Discord bağlandı.",
-        "joinServer": "Just join the Discord server"
+        "joinServer": "Discord sunucusuna katıl"
       },
       "choice": {
         "title": "Discord ile devam et",
@@ -1526,13 +1733,13 @@ export const tr_TR: EnTranslations = {
         "admin": "Yönetici",
         "coredevs": "Çekirdek Geliştirici",
         "devs": "Geliştirici",
-        "seniormods": "Senior Mod",
+        "seniormods": "Kıdemli Moderatör",
         "mods": "Moderatör",
-        "juniormods": "Junior Mod",
+        "juniormods": "Yardımcı Moderatör",
         "artists": "Sanatçı",
-        "contentcreator": "Content Creator",
-        "legend": "LEGEND",
-        "shill": "SHILL"
+        "contentcreator": "İçerik Üreticisi",
+        "legend": "EFSANE",
+        "shill": "SAVUNUCU"
       },
       "guildMember": "Onaylı üye",
       "notMember": "Henüz sunucuda değil",
@@ -1799,7 +2006,8 @@ export const tr_TR: EnTranslations = {
       "title": "Toplama",
       "mining": "Madencilik",
       "logging": "Ağaç kesme",
-      "herbalism": "Bitkicilik"
+      "herbalism": "Bitkicilik",
+      "notReady": "Bu kaynak noktası senin için henüz yeniden oluşmadı."
     },
     "archetypeTitle": {
       "label": "Unvan",
@@ -1831,6 +2039,107 @@ export const tr_TR: EnTranslations = {
       "notAtHub": "Bunu üretmek için zanaat merkezinde ve gereken kademede olmalısın.",
       "throttled": "Çok hızlı üretiyorsun. Bir an bekle ve tekrar dene.",
       "recipeNotLearned": "Bu tarifi henüz öğrenmedin."
+    },
+    "finder": {
+      "title": "Zindan Bulucu",
+      "close": "Kapat",
+      "back": "Geri",
+      "syncing": "Diyar bekleniyor...",
+      "tabCatalogue": "Katalog",
+      "tabQueue": "Hızlı Eşleşme",
+      "tabBoard": "Hazır Gruplar",
+      "normal": "Normal",
+      "heroic": "Heroik",
+      "kindDungeon": "Zindan",
+      "kindRaid": "Akın",
+      "kindSolo": "Yalnız macera",
+      "levels": "{min} ile {max} arasındaki seviyeler",
+      "levelOne": "Seviye {level}",
+      "clock": "{minutes}:{seconds}",
+      "roleCount": "{count} {role}",
+      "roleTank": "Tank",
+      "roleHealer": "İyileştirici",
+      "roleDps": "Hasar",
+      "freeRoles": "Her rol kabul edilir",
+      "lockoutDaily": "Son canavarla günlük kilitlenme",
+      "lockoutNone": "Kilitlenme yok",
+      "lockedFor": "Yaklaşık {minutes} dakika kilitli",
+      "attunement": "Uyum gerektirir: {quest}",
+      "heroicMarks": "Heroik İşaretler: oyuncu başına {count}",
+      "entrance": "Giriş: {zone}",
+      "showOnMap": "Haritada Göster",
+      "encounters": "Karşılaşmalar",
+      "finalBoss": "Son canavar",
+      "summoned": "Çağrılmış koruyucu",
+      "lootGuaranteed": "Bunlardan biri her zaman düşer:",
+      "lootMaybe": "En fazla bunlardan biri düşebilir:",
+      "lootChance": "Ek düşme şansı:",
+      "lootHeroic": "Heroik bonusu, bunlardan biri her zaman düşer:",
+      "pct": "%{pct}",
+      "blockedLevel": "Yalnızca {min} ile {max} arasındaki seviyeler",
+      "blockedSpec": "Uzmanlaşma gerektirir",
+      "yourRoles": "Rollerin",
+      "needsSpec": "Zindan Bulucu'yu kullanmak için bir uzmanlaşma seç.",
+      "leaderNote": "Grubu yalnızca parti liderinin sıraya sokabilir.",
+      "chooseActivities": "Aktiviteleri seç",
+      "joinQueue": "Sıraya gir",
+      "leaveQueue": "Sıradan çık",
+      "waited": "Sırada geçen süre: {time}",
+      "cooldownNote": "{seconds} sn sonra tekrar sıraya girebilirsin.",
+      "travelNote": "Grup, herkesin bulunduğu yerde oluşur. Girişe birlikte seyahat edin; kimse ışınlanmaz.",
+      "proposalTitle": "Grup bulundu: {name}",
+      "proposalRole": "Rolün: {role}",
+      "accepted": "{size} kişiden {accepted} tanesi onaylandı",
+      "remaining": "Yanıt için {seconds}sn",
+      "accept": "Kabul Et",
+      "decline": "Reddet",
+      "acceptedWait": "Diğerleri bekleniyor...",
+      "slotState": "{role}: {total} kişiden {accepted} tanesi hazır",
+      "openListings": "Açık ilanlar",
+      "boardEmpty": "Şu an ilan yok. Bir tane yayımla!",
+      "boardLeaderGate": "İlan yalnızca grubunun lideri tarafından yayımlanabilir.",
+      "publishListing": "İlan yayımla",
+      "activity": "Aktivite",
+      "publish": "Yayımla",
+      "yourListing": "İlanın",
+      "closeListing": "İlanı kapat",
+      "applicants": "Başvurular",
+      "noApplicants": "Henüz başvuru yok.",
+      "acceptApplicantAria": "{name} adlı başvuruyu kabul et",
+      "declineApplicantAria": "{name} adlı başvuruyu reddet",
+      "levelClass": "Sv. {level} {className}",
+      "leader": "Lider: {name}",
+      "needs": "{roles} aranıyor",
+      "slots": "{size}/{capacity}",
+      "apply": "Başvur",
+      "withdraw": "Başvuruyu geri çek",
+      "tagFirstRun": "İlk koşu",
+      "tagQuestRun": "Görev koşusu",
+      "tagFullClear": "Tam temizlik",
+      "tagLearning": "Yeni başlayanlar hoş geldin",
+      "tagFastRun": "Hızlı koşu",
+      "mech": {
+        "shadow_pulse": "Gölge Darbesi (darbeli alan hasarı)",
+        "reaping_arc": "Biçen Yay (öne doğru yay saldırısı)",
+        "mist_surge": "Sis Dalgası (darbeli alan hasarı)",
+        "summons_adds": "Takviye çağırır",
+        "lunar_tide": "Ay Dalgası (darbeli alan hasarı)",
+        "enrage": "Düşük canda çılgına döner",
+        "shuddering_stomp": "Titreyen Çiğneme (alan sersemletmesi)",
+        "necrotic_shockwave": "Nekrotik Şok Dalgası (ağır alan hasarı)",
+        "grave_cleaver": "Mezar Biçici (öne doğru yay saldırısı)",
+        "shadow_nova": "Gölge Novası (alan patlaması)",
+        "profane_mending": "Murdar Şifa (müttefiklerini iyileştirir)",
+        "mana_burn": "Solmuş Kutsama (manayı yakar)",
+        "deathstalker_cleave": "Ölüm Avcısının Biçişi (öne doğru yay saldırısı)",
+        "mortal_wound": "Unutulmuş Yara (alınan iyileştirmeyi azaltır)",
+        "sealbreak_shockwave": "Mühür Kıran Şok Dalgası (alan patlaması)",
+        "gravebreaker": "Mezar Kırıcı (öne doğru koni, akından uzağa yönelt)",
+        "raise_fallen": "Düşenleri Kaldır (periyodik yardımcı dalgaları)",
+        "soul_rend": "Ruh Yırtılması (işaretlenen oyuncular yayılmalı ve iyileştirilmeli)",
+        "deathless_rage": "Ölümsüz Öfke (koruma taşlarında kesilir)",
+        "wardstones": "Koruma taşı kanalları (faz geçişi)"
+      }
     },
     "deeds": {
       "title": "Yiğitlikler Kitabı",
@@ -2573,8 +2882,8 @@ export const tr_TR: EnTranslations = {
         "desc": "Eski derinliklerin pullu, yılansı yaratıkları. Nadir, mağrur ve göründüklerinden çok daha güçlü."
       },
       "reptile": {
-        "name": "Reptiles",
-        "desc": "Cold-blooded hunters with a hiss and a snap all their own, distinct from the warm-blooded beasts."
+        "name": "Sürüngenler",
+        "desc": "Kendi özgün tıslaması ve ısırışıyla soğukkanlı avcılar; sıcakkanlı yaratıklardan tamamen farklı bir türdür."
       }
     },
     "worldPage": {
@@ -3596,6 +3905,7 @@ export const tr_TR: EnTranslations = {
     "title": "Masaüstü Başlatıcısını İndir",
     "desc": "Optimize edilmiş performans ve tam ekran oyun için bağımsız başlatıcıyı edinin.",
     "macCta": "macOS için indir",
+    "windowsCta": "Windows için indirin",
     "linuxCta": "Linux için indirin",
     "linuxHint": "AppImage: yürütülebilir hale getirin ve ardından çalıştırın. Kurulum gerekmez.",
     "windowsPending": "Windows derlemesi beklemede."
@@ -4483,6 +4793,8 @@ export const tr_TR: EnTranslations = {
     "connectionLost": "Sunucuyla bağlantı koptu.",
     "reconnecting": "Bağlantı kesildi. Yeniden bağlanılıyor...",
     "connectionRejected": "Sunucu bağlantıyı kapattı.",
+    "realmFull": "Bu dünya şu an dolu. Lütfen birkaç dakika sonra tekrar dene.",
+    "tooManyConnections": "Ağından bu dünyaya çok fazla bağlantı geliyor. Lütfen fazladan oyun pencerelerini kapat ya da birkaç dakika sonra tekrar dene.",
     "tips": {
       "classes": "İpucu: 9 sınıfın her biri farklı oynanır. Birine bağlanmadan önce birkaçını dene.",
       "talents": "İpucu: savaş dışında olduğun sürece yeteneklerini istediğin zaman sıfırlayabilirsin, bu yüzden erken bir seçim asla tuzak değildir.",
@@ -5249,6 +5561,7 @@ export const tr_TR: EnTranslations = {
     "actionBar": {
       "attackName": "Saldırı",
       "attackTooltip": "Hedefine otomatik saldırıyı aç/kapat. Bir düşmana sağ tıklamak da saldırır.",
+      "attackRemoveHint": "Çubuktan kaldırıp yuvayı serbest bırakmak için sağ tıkla.",
       "emptySlot": "Boş yuva",
       "slotAria": "Eylem yuvası {slot}: {ability}",
       "emptySlotAria": "Eylem yuvası {slot}: boş",
@@ -6164,6 +6477,18 @@ export const tr_TR: EnTranslations = {
       "barkskin": {
         "name": "Meşe Derisi",
         "description": "Derin ağaç kabuğu gibi sertleşir, zırhı 15 saniye boyunca 150 artırır."
+      },
+      "ironhold": {
+        "name": "Demir Tutuş",
+        "description": "Kalkanının arkasına sığınarak 8 sn boyunca aldığın tüm hasarı %40 azaltırsın."
+      },
+      "sacred_bulwark": {
+        "name": "Kutsal Siper",
+        "description": "{duration} sn boyunca, seni öldürebilecek bir sonraki düşman darbesi engellenir ve bunun yerine canın %35'e geri döner."
+      },
+      "primal_reflexes": {
+        "name": "Yaban Refleksleri",
+        "description": "İçgüdülerin keskinleşerek 6 sn boyunca savurma şansını %50 artırır."
       },
       "starfire": {
         "name": "Gök Düşüşü",

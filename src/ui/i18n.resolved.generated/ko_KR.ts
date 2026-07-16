@@ -20,6 +20,154 @@ export const ko_KR: EnTranslations = {
     "rp": "롤플레잉",
     "rpPvp": "롤플레잉 PvP"
   },
+  "devCommand": {
+    "dialogLabel": "Developer Command Center",
+    "kicker": "Development tools",
+    "title": "Command Center",
+    "subtitle": "Authoritative test controls for the active world.",
+    "closeAria": "Close developer commands",
+    "categoryNavAria": "Developer command categories",
+    "categories": {
+      "player": "Player",
+      "spawns": "Spawns",
+      "inventory": "Inventory",
+      "progress": "Progress",
+      "travel": "Travel",
+      "scenarios": "Scenarios"
+    },
+    "filterLabel": "Filter commands",
+    "filterPlaceholder": "Search this category",
+    "noMatches": "No matching commands.",
+    "serverRequirement": "Server cheats still require ALLOW_DEV_COMMANDS=1.",
+    "invalidValues": "Choose valid values before running this command.",
+    "sent": "Sent: {command}",
+    "run": "Run",
+    "fields": {
+      "level": "Level",
+      "mob": "Mob",
+      "count": "Count",
+      "item": "Item",
+      "gold": "Gold",
+      "quest": "Quest",
+      "profession": "Profession",
+      "amount": "Amount",
+      "x": "X",
+      "z": "Z",
+      "dungeon": "Dungeon",
+      "difficulty": "Difficulty",
+      "name": "Name"
+    },
+    "difficulty": {
+      "normal": "Normal",
+      "heroic": "Heroic"
+    },
+    "actions": {
+      "heal": {
+        "label": "Restore health",
+        "description": "Fill the health pool."
+      },
+      "resource": {
+        "label": "Restore resource",
+        "description": "Fill mana, rage, or energy."
+      },
+      "cooldowns": {
+        "label": "Clear cooldowns",
+        "description": "Reset ability, GCD, and potion timers."
+      },
+      "god": {
+        "label": "Toggle god mode",
+        "description": "Toggle invulnerability and boosted damage."
+      },
+      "revive": {
+        "label": "Revive",
+        "description": "Revive through the normal resurrection path."
+      },
+      "kill": {
+        "label": "Kill player",
+        "description": "Test death, ghost, and corpse flows."
+      },
+      "combatreset": {
+        "label": "Reset combat",
+        "description": "Clear combat state and hostile threat."
+      },
+      "level": {
+        "label": "Set level",
+        "description": "Set the current character level."
+      },
+      "spawn": {
+        "label": "Spawn mob",
+        "description": "Create a concrete mob near the player."
+      },
+      "killtarget": {
+        "label": "Kill target",
+        "description": "Kill the selected living mob."
+      },
+      "despawntarget": {
+        "label": "Despawn target",
+        "description": "Remove a selected mob created by this tool."
+      },
+      "despawnall": {
+        "label": "Clear my spawns",
+        "description": "Remove every mob spawned by this developer."
+      },
+      "give": {
+        "label": "Give item",
+        "description": "Add an item to the player inventory."
+      },
+      "gold": {
+        "label": "Add gold",
+        "description": "Add gold to the current purse."
+      },
+      "quest": {
+        "label": "Complete quest",
+        "description": "Complete a specific quest by id."
+      },
+      "quests": {
+        "label": "Complete active quests",
+        "description": "Complete every quest in the current log."
+      },
+      "attune": {
+        "label": "Unlock attunements",
+        "description": "Mark all attunement requirements complete."
+      },
+      "gather": {
+        "label": "Grant gathering skill",
+        "description": "Increase a gathering profession."
+      },
+      "teleport": {
+        "label": "Teleport",
+        "description": "Move to exact world coordinates."
+      },
+      "dungeon": {
+        "label": "Enter dungeon",
+        "description": "Enter a dungeon with dev gate bypass."
+      },
+      "raid": {
+        "label": "Enter raid",
+        "description": "Enter the Nythraxis arena directly."
+      },
+      "raidreset": {
+        "label": "Reset raid lockout",
+        "description": "Clear the current raid lockouts."
+      },
+      "bot": {
+        "label": "Spawn social bot",
+        "description": "Create a whisperable stationary player."
+      },
+      "lfgqueue": {
+        "label": "Seed finder queue",
+        "description": "Create a Dungeon Finder queue scenario."
+      },
+      "lfgraid": {
+        "label": "Seed raid finder",
+        "description": "Create a raid finder scenario."
+      },
+      "lfgboard": {
+        "label": "Seed listing board",
+        "description": "Create a premade listing scenario."
+      }
+    }
+  },
   "game": {
     "xp": {
       "suffix": "경험치",
@@ -203,6 +351,7 @@ export const ko_KR: EnTranslations = {
       "remainingLessThanMinute": "1분 미만",
       "remainingMinutes": "{minutes}분",
       "remainingHoursMinutes": "{hours}시간 {minutes}분",
+      "remainingDaysHours": "{days}일 {hours}시간",
       "score": "점수",
       "walletValue": "지갑 가치 (WOC)",
       "usd": "{amount} USD",
@@ -241,7 +390,8 @@ export const ko_KR: EnTranslations = {
         "no_wallet": "$20 USD 상당 이상의 WOC를 보유한 지갑을 연결하세요.",
         "under_minimum": "지갑이 최소 $20 USD WOC 기준에 미치지 못합니다.",
         "price_unavailable": "WOC 가격을 확인할 수 없어 보상이 일시적으로 잠겨 있습니다.",
-        "banned": "일일 보상 참여가 금지되었습니다. 사유: {reason}"
+        "banned": "일일 보상 참여가 금지되었습니다. 사유: {reason}",
+        "bannedUntil": "일일 보상 참여가 앞으로 {remaining} 동안 금지됩니다. 해제 시각: {until}. 사유: {reason}"
       }
     },
     "wocStore": {
@@ -466,6 +616,7 @@ export const ko_KR: EnTranslations = {
       "balanceLabel": "잔액",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL: {amount}",
+      "usdcBalance": "USDC: {amount}",
       "wocBalance": "WOC: {amount}",
       "unavailable": "현재 Claudium 상점을 이용할 수 없습니다. 잔액과 구매 내역에는 영향이 없으니 잠시 후 다시 확인해 주세요.",
       "disclosure": "Claudium은 단방향 게임 화폐입니다. 현금으로 구매해 꾸미기 상품에 사용할 수 있으며 환전, 양도 또는 현금화할 수 없습니다.",
@@ -473,6 +624,7 @@ export const ko_KR: EnTranslations = {
       "railLabel": "결제 수단",
       "railStripe": "카드",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "20% 할인",
       "railWocUnavailable": "현재 WOC 가격을 이용할 수 없습니다.",
@@ -684,6 +836,7 @@ export const ko_KR: EnTranslations = {
       "targetFriendlyNext": "아군 대상 순환",
       "discord": "Discord",
       "valecup": "베일 컵",
+      "sheathe": "무기 넣기/빼기",
       "categoryPet": "펫",
       "petAttack": "펫: 공격",
       "petStop": "펫: 정지",
@@ -856,6 +1009,7 @@ export const ko_KR: EnTranslations = {
       "aurasOnPlayerFrame": "버프를 플레이어 프레임에 표시",
       "highContrastBackground": "고대비 배경",
       "startAttackOnAbility": "스킬 사용 시 자동 공격",
+      "showAttackButton": "공격 버튼 표시",
       "walkByAutoloot": "지나가며 자동 획득",
       "groundReticle": "지면 조준 표시기",
       "showItemLevel": "아이템 레벨 표시",
@@ -977,6 +1131,7 @@ export const ko_KR: EnTranslations = {
         "spellPower": "주문력",
         "critRating": "치명타 등급",
         "hasteRating": "가속 등급",
+        "hitRating": "명중 등급",
         "warfare": "워페어"
       },
       "warfareValue": "주는 피해 +{increase}% / 받는 피해 -{reduction}%",
@@ -994,6 +1149,7 @@ export const ko_KR: EnTranslations = {
         "dodge": "들어오는 근접 공격을 완전히 피해 피해를 전혀 입지 않을 확률입니다.",
         "critRating": "장비와 세트 보너스에서 얻는 치명타 등급으로 치명타 확률이 증가합니다. 약 10등급당 1% 치명타.",
         "hasteRating": "장비와 세트 보너스에서 얻는 가속 등급으로 공격과 시전 속도가 빨라집니다. 약 10등급당 1% 가속.",
+        "hitRating": "장비와 세트 보너스에서 얻는 명중 등급으로 공격이 빗나가거나 주문이 저항되는 빈도를 줄이며, 특히 더 높은 레벨의 적에게 효과적입니다. 약 10등급당 1% 명중.",
         "warfare": "플레이어에게 주는 피해가 {increase}% 증가하고 플레이어에게 받는 피해가 {reduction}% 감소합니다."
       },
       "effects": {
@@ -1067,6 +1223,12 @@ export const ko_KR: EnTranslations = {
         "few": "당신은 {rank}, {count}명 회원",
         "many": "당신은 {rank}, {count}명 회원",
         "other": "당신은 {rank}, {count}명 회원"
+      },
+      "finderPartySize": {
+        "one": "{count}인",
+        "few": "{count}인",
+        "many": "{count}인",
+        "other": "{count}인"
       },
       "characterCount": {
         "one": "캐릭터 {count}개",
@@ -1273,11 +1435,27 @@ export const ko_KR: EnTranslations = {
     },
     "dungeonDifficulty": {
       "setHeroic": "던전 난이도 설정: 영웅",
-      "setNormal": "던전 난이도 설정: 일반"
+      "setNormal": "던전 난이도 설정: 일반",
+      "resetAll": "모든 인스턴스 초기화",
+      "resetDone": "모든 인스턴스가 초기화되었습니다.",
+      "resetNone": "초기화할 인스턴스가 없습니다.",
+      "resetOccupied": "아직 안에 플레이어가 있으면 인스턴스를 초기화할 수 없습니다.",
+      "resetSameDifficulty": "인스턴스를 초기화하기 전에 던전 난이도를 변경하세요. 비어 있는 인스턴스는 5분 후 자동으로 초기화됩니다.",
+      "resetLoot": "안에 전리품이 남아 있으면 인스턴스를 초기화할 수 없습니다.",
+      "resetConfirmTitle": "모든 인스턴스를 초기화할까요?",
+      "resetConfirmBody": "이전에 선택한 난이도의 빈 인스턴스를 포기합니다. 획득하지 않은 전리품이 있으면 초기화할 수 없습니다.",
+      "resetConfirm": "인스턴스 초기화",
+      "resetCooldown": "인스턴스는 5분마다 한 번만 초기화할 수 있습니다.",
+      "resetUsage": "난이도를 변경한 후 /dungeon reset 으로 빈 인스턴스를 포기할 수 있습니다.",
+      "entryMismatchNormal": "이 인스턴스는 일반 난이도로 설정되어 있습니다. 영웅 난이도로 새로 시작하려면 모든 인스턴스 초기화를 사용하세요.",
+      "entryMismatchHeroic": "이 인스턴스는 영웅 난이도로 설정되어 있습니다. 일반 난이도로 새로 시작하려면 모든 인스턴스 초기화를 사용하세요."
     },
     "bags": {
       "cannotDestroy": "이 아이템은 파괴할 수 없습니다.",
-      "rightClickDestroy": "Shift + 마우스 오른쪽 버튼으로 파괴",
+      "rightClickDestroy": "마우스 오른쪽 버튼으로 파괴",
+      "dragEquipHint": "캐릭터로 끌어다 놓아 장착",
+      "dragDestroyHint": "세계로 끌어내어 파괴",
+      "reorderNeedsRecent": "가방을 정리하려면 필터를 해제하고 최근 순으로 정렬하세요",
       "filterGroupAria": "가방을 분류별로 필터링",
       "filterAll": "전체",
       "filterWeapon": "무기",
@@ -1350,6 +1528,8 @@ export const ko_KR: EnTranslations = {
       },
       "dodge": "회피 확률을 {pct}% 증가시킵니다",
       "dodgeReduce": "회피 확률을 {pct}% 감소시킵니다",
+      "damageReduction": "받는 모든 피해가 {pct}% 감소합니다",
+      "guardianWard": "다음 적의 치명적인 공격을 막고 대신 생명력을 {pct}%까지 회복합니다",
       "armorFlat": "방어도를 {value} 감소시킵니다",
       "armorFlatStacks": "방어도를 {value} 감소시킵니다 ({stacks}중첩)",
       "armorPct": "방어도를 {pct}% 감소시킵니다",
@@ -1437,6 +1617,33 @@ export const ko_KR: EnTranslations = {
     "playerFrame": {
       "unlock": "플레이어 프레임 이동",
       "lock": "플레이어 프레임 고정"
+    },
+    "partyFrames": {
+      "section": "파티 및 공격대 프레임",
+      "unlock": "파티 및 공격대 프레임 이동",
+      "lock": "파티 및 공격대 프레임 고정",
+      "style": "프레임 스타일",
+      "styleAutomatic": "자동",
+      "styleClassic": "클래식 파티 프레임",
+      "styleRaid": "공격대 프레임",
+      "scale": "프레임 배율",
+      "width": "프레임 너비",
+      "height": "프레임 높이",
+      "spacing": "프레임 간격",
+      "columns": "공격대 열 수",
+      "healthText": "생명력 텍스트",
+      "healthNone": "None",
+      "healthPercent": "백분율",
+      "healthCurrent": "현재 값",
+      "healthCurrentMax": "현재 / 최대",
+      "sort": "플레이어 정렬",
+      "sortGroup": "그룹",
+      "sortRole": "Role",
+      "sortName": "Name",
+      "showResource": "마나, 분노, 에너지 표시",
+      "showAbsorbs": "흡수 보호막 표시",
+      "showAuras": "버프 및 디버프 표시",
+      "showSelf": "내 프레임 표시"
     },
     "frameReset": {
       "label": "프레임 위치 초기화"
@@ -1531,8 +1738,8 @@ export const ko_KR: EnTranslations = {
         "juniormods": "수습 운영자",
         "artists": "아티스트",
         "contentcreator": "콘텐츠 크리에이터",
-        "legend": "LEGEND",
-        "shill": "SHILL"
+        "legend": "전설",
+        "shill": "홍보대사"
       },
       "guildMember": "인증된 멤버",
       "notMember": "아직 서버에 없음",
@@ -1799,7 +2006,8 @@ export const ko_KR: EnTranslations = {
       "title": "채집",
       "mining": "채광",
       "logging": "벌목",
-      "herbalism": "약초학"
+      "herbalism": "약초학",
+      "notReady": "이 자원 채집지는 아직 당신을 위해 재생성되지 않았습니다."
     },
     "archetypeTitle": {
       "label": "칭호",
@@ -1831,6 +2039,107 @@ export const ko_KR: EnTranslations = {
       "notAtHub": "그것을 제작하려면 필요한 레벨로 제작 거점에 있어야 합니다.",
       "throttled": "너무 빨리 제작하고 있습니다. 잠시 후 다시 시도하세요.",
       "recipeNotLearned": "아직 그 제작법을 배우지 않았습니다."
+    },
+    "finder": {
+      "title": "던전 찾기",
+      "close": "닫기",
+      "back": "뒤로",
+      "syncing": "서버 응답을 기다리는 중...",
+      "tabCatalogue": "목록",
+      "tabQueue": "빠른 매칭",
+      "tabBoard": "사전 모집",
+      "normal": "일반",
+      "heroic": "영웅",
+      "kindDungeon": "던전",
+      "kindRaid": "공격대",
+      "kindSolo": "솔로 모험",
+      "levels": "레벨 {min} ~ {max}",
+      "levelOne": "레벨 {level}",
+      "clock": "{minutes}:{seconds}",
+      "roleCount": "{role} {count}",
+      "roleTank": "방어 전담",
+      "roleHealer": "치유 전담",
+      "roleDps": "공격 전담",
+      "freeRoles": "역할 제한 없음",
+      "lockoutDaily": "최종 우두머리 일일 귀속",
+      "lockoutNone": "귀속 없음",
+      "lockedFor": "약 {minutes}분 동안 귀속됨",
+      "attunement": "선행 퀘스트 필요: {quest}",
+      "heroicMarks": "영웅의 징표: 1인당 {count}개",
+      "entrance": "입구: {zone}",
+      "showOnMap": "지도에 표시",
+      "encounters": "우두머리 전투",
+      "finalBoss": "최종 우두머리",
+      "summoned": "소환되는 수호자",
+      "lootGuaranteed": "다음 중 하나가 반드시 드롭:",
+      "lootMaybe": "다음 중 최대 하나가 드롭:",
+      "lootChance": "추가 확률 드롭:",
+      "lootHeroic": "영웅 보상, 다음 중 하나가 반드시 드롭:",
+      "pct": "{pct}%",
+      "blockedLevel": "레벨 {min} ~ {max} 전용",
+      "blockedSpec": "전문화 선택 필요",
+      "yourRoles": "내 역할",
+      "needsSpec": "던전 찾기를 사용하려면 전문화를 선택하세요.",
+      "leaderNote": "파티장만 파티를 대기열에 등록할 수 있습니다.",
+      "chooseActivities": "콘텐츠 선택",
+      "joinQueue": "대기열 참가",
+      "leaveQueue": "대기열 나가기",
+      "waited": "대기 시간: {time}",
+      "cooldownNote": "{seconds}초 후에 다시 대기열에 참가할 수 있습니다.",
+      "travelNote": "파티는 그 자리에서 결성됩니다. 함께 입구까지 이동하세요. 순간이동은 없습니다.",
+      "proposalTitle": "파티 결성: {name}",
+      "proposalRole": "내 역할: {role}",
+      "accepted": "{size}명 중 {accepted}명 수락",
+      "remaining": "응답까지 {seconds}초",
+      "accept": "수락",
+      "decline": "거절",
+      "acceptedWait": "다른 플레이어를 기다리는 중...",
+      "slotState": "{role}: {total}명 중 {accepted}명 준비 완료",
+      "openListings": "공개 모집",
+      "boardEmpty": "지금은 모집이 없습니다. 직접 올려 보세요!",
+      "boardLeaderGate": "파티장만 모집 글을 올릴 수 있습니다.",
+      "publishListing": "모집 등록",
+      "activity": "콘텐츠",
+      "publish": "등록",
+      "yourListing": "내 모집",
+      "closeListing": "모집 마감",
+      "applicants": "신청자",
+      "noApplicants": "아직 신청자가 없습니다.",
+      "acceptApplicantAria": "{name} 수락",
+      "declineApplicantAria": "{name} 거절",
+      "levelClass": "Lv {level} {className}",
+      "leader": "파티장: {name}",
+      "needs": "필요: {roles}",
+      "slots": "{size}/{capacity}",
+      "apply": "신청",
+      "withdraw": "신청 취소",
+      "tagFirstRun": "첫 공략",
+      "tagQuestRun": "퀘스트 진행",
+      "tagFullClear": "완전 공략",
+      "tagLearning": "초보 환영",
+      "tagFastRun": "빠른 공략",
+      "mech": {
+        "shadow_pulse": "어둠의 파동(주기적 광역 피해)",
+        "reaping_arc": "수확의 호(전방 휩쓸기)",
+        "mist_surge": "안개 쇄도(주기적 광역 피해)",
+        "summons_adds": "증원 소환",
+        "lunar_tide": "달의 파도(주기적 광역 피해)",
+        "enrage": "체력이 낮으면 격노",
+        "shuddering_stomp": "전율의 발구르기(광역 기절)",
+        "necrotic_shockwave": "괴사의 충격파(높은 광역 피해)",
+        "grave_cleaver": "무덤 절단(전방 휩쓸기)",
+        "shadow_nova": "어둠의 회오리(광역 폭발)",
+        "profane_mending": "모독의 치유(아군 치유)",
+        "mana_burn": "시든 축복(마나 연소)",
+        "deathstalker_cleave": "죽음추적자의 절단(전방 휩쓸기)",
+        "mortal_wound": "잊힌 상처(받는 치유 감소)",
+        "sealbreak_shockwave": "봉인 파괴 충격파(광역 폭발)",
+        "gravebreaker": "무덤파괴자(전방 부채꼴, 공격대 반대편으로)",
+        "raise_fallen": "망자 소생(주기적 증원)",
+        "soul_rend": "영혼 가르기(표식 대상은 산개 후 치유 필요)",
+        "deathless_rage": "불사의 격노(수호석에서 저지)",
+        "wardstones": "수호석 정신집중(단계 전환)"
+      }
     },
     "deeds": {
       "title": "업적의 서",
@@ -3596,6 +3905,7 @@ export const ko_KR: EnTranslations = {
     "title": "데스크톱 런처 다운로드",
     "desc": "최적화된 성능과 전체 화면 플레이를 위해 독립형 런처를 다운로드하세요.",
     "macCta": "macOS용 다운로드",
+    "windowsCta": "Windows용 다운로드",
     "linuxCta": "Linux용 다운로드",
     "linuxHint": "AppImage 형식입니다. 실행 권한만 부여하면 바로 실행되며, 설치는 필요 없습니다.",
     "windowsPending": "Windows 빌드는 준비 중입니다."
@@ -4483,6 +4793,8 @@ export const ko_KR: EnTranslations = {
     "connectionLost": "서버와의 연결이 끊어졌습니다.",
     "reconnecting": "연결이 끊어졌습니다. 다시 연결하는 중...",
     "connectionRejected": "서버가 연결을 종료했습니다.",
+    "realmFull": "이 월드는 현재 포화 상태입니다. 몇 분 후에 다시 시도해 주세요.",
+    "tooManyConnections": "사용 중인 네트워크에서 이 월드로 연결이 너무 많습니다. 추가 게임 창을 닫거나 몇 분 후에 다시 시도해 주세요.",
     "tips": {
       "classes": "팁: 9개 클래스는 저마다 플레이 방식이 다릅니다. 정하기 전에 몇 가지를 직접 해보세요.",
       "talents": "팁: 비전투 상태라면 언제든 특성을 초기화할 수 있어, 처음 선택도 절대 돌이킬 수 없는 것이 아닙니다.",
@@ -4560,9 +4872,9 @@ export const ko_KR: EnTranslations = {
     "medium": "보통",
     "low": "낮음",
     "popTipLow": "낮은 인구: 현재 접속자 15명 미만. 여유롭고 새로 시작하기에 좋습니다.",
-    "popTipMedium": "보통 인구: 현재 접속자 15~39명. 건강하고 활발한 월드입니다.",
-    "popTipHigh": "높은 인구: 현재 접속자 40~79명. 붐비고 플레이어가 많습니다.",
-    "popTipFull": "포화 인구: 현재 접속자 80명 이상. 매우 붐비며 로그인 대기열이 있을 수 있습니다.",
+    "popTipMedium": "보통 인구: 현재 접속자 15~79명. 건강하고 활발한 월드입니다.",
+    "popTipHigh": "높은 인구: 현재 접속자 80명 이상. 붐비고 플레이어가 많습니다.",
+    "popTipFull": "포화 인구: 이 월드는 현재 플레이어 정원에 도달했습니다. 다른 플레이어가 로그아웃할 때까지 새 로그인이 거부됩니다.",
     "popTipOffline": "오프라인: 이 월드는 현재 연결할 수 없어 입장할 수 없습니다.",
     "characterCountOne": "캐릭터 {count}개",
     "characterCountOther": "캐릭터 {count}개",
@@ -5249,6 +5561,7 @@ export const ko_KR: EnTranslations = {
     "actionBar": {
       "attackName": "공격",
       "attackTooltip": "대상에게 자동 공격을 켜거나 끕니다. 적을 우클릭해도 공격합니다.",
+      "attackRemoveHint": "우클릭하면 바에서 제거하고 칸을 비웁니다.",
       "emptySlot": "빈 칸",
       "slotAria": "행동 칸 {slot}: {ability}",
       "emptySlotAria": "행동 칸 {slot}: 비어 있음",
@@ -6164,6 +6477,18 @@ export const ko_KR: EnTranslations = {
       "barkskin": {
         "name": "참나무 가죽",
         "description": "피부가 나무껍질처럼 단단해져 15초 동안 방어도가 150만큼 증가합니다."
+      },
+      "ironhold": {
+        "name": "철벽",
+        "description": "굳건한 방어 태세로 8초 동안 받는 모든 피해를 40% 감소시킵니다."
+      },
+      "sacred_bulwark": {
+        "name": "신성한 방벽",
+        "description": "{duration}초 동안 다음 적의 치명적인 공격을 무효화하고, 대신 생명력을 최대치의 35%까지 회복합니다."
+      },
+      "primal_reflexes": {
+        "name": "원시의 반사",
+        "description": "본능이 예리해져 6초 동안 회피율이 50% 증가합니다."
       },
       "starfire": {
         "name": "창공 낙하",

@@ -55,6 +55,7 @@ describe('sampled GameAudio facade', () => {
       ['click', 'ui_click'],
       ['coin', 'ui_coin'],
       ['levelUp', 'ui_level_up'],
+      ['achievement', 'ui_achievement'],
       ['lootItem', 'ui_loot_item'],
       ['questAccept', 'ui_quest_accept'],
       ['questDone', 'ui_quest_done'],

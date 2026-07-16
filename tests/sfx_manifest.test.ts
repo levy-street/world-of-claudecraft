@@ -162,10 +162,10 @@ describe('buildManifest', () => {
     expect(manifest).toContain('cast_lightning_bolt');
   });
 
-  it('keeps the release catalog and all 26 UI cues in one 155-key inventory', () => {
+  it('keeps the release catalog and all 27 UI cues in one 159-key inventory', () => {
     const keys = new Set(SFX.map((entry) => entry.key));
-    expect(keys.size).toBe(155);
-    expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(26);
+    expect(keys.size).toBe(159);
+    expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(27);
     for (const key of [
       'cast_lightning_bolt',
       'mob_mudfin_attack',
@@ -176,6 +176,10 @@ describe('buildManifest', () => {
       'mob_reptile_hurt',
       'quest_ready',
       'lockpick_success',
+      'ui_achievement',
+      'wand_arcane',
+      'wand_holy',
+      'wand_shadow',
     ]) {
       expect(keys.has(key), key).toBe(true);
     }
@@ -190,7 +194,7 @@ describe('buildManifest', () => {
     // appear in the static catalog, they are purely filesystem-discovered.
     const mobFamilyKeys = [...keys].filter((key) => key.startsWith('mob_'));
     expect(mobFamilyKeys).toHaveLength(53); // 13 families x 4 actions, + 1 reptile idle
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(155);
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(159);
   });
 });
 
@@ -209,6 +213,25 @@ describe('mob subfamily scanning', () => {
     );
     expect(data.mob_beast_wolf_attack).toBeDefined();
     expect(data.mob_beast_wolf_attack.urls).toEqual(['/audio/sfx/mob_beast_wolf_attack_1.mp3']);
+  });
+
+  // Regression: MOB_ACTIONS gained 'idle' (#1887) but SFX_MOB_EXTENSION_KEY_PATTERN
+  // was never updated to match, so a subfamily-level idle recording (e.g. a
+  // dedicated wolf idle take distinct from the beast family default) could never
+  // be added: the action-token scan finds 'idle' fine, but the stricter grammar
+  // check right after it rejects the resulting key, forever.
+  it('adds a subfamily key from mob_<family>_<sub>_idle_N.mp3', () => {
+    writeFileSync(path.join(sfxDir, 'mob_beast_wolf_idle_1.mp3'), '');
+    const { count, errors } = buildManifest([], sfxDir, manifestPath);
+    expect(errors).toEqual([]);
+    expect(count).toBe(1);
+    const data = JSON.parse(
+      readFileSync(manifestPath, 'utf8')
+        .split('=\n')[1]
+        .replace(/ as const;/, ''),
+    );
+    expect(data.mob_beast_wolf_idle).toBeDefined();
+    expect(data.mob_beast_wolf_idle.urls).toEqual(['/audio/sfx/mob_beast_wolf_idle_1.mp3']);
   });
 
   it('groups multiple numbered variants under the same subfamily key (sorted)', () => {
@@ -333,9 +356,10 @@ describe('mob subfamily scanning', () => {
   it('exports one constrained grammar for runtime mob extension keys', () => {
     expect(SFX_MOB_EXTENSION_FAMILIES).toContain('beast');
     expect(SFX_MOB_EXTENSION_KEY_PATTERN.source).toBe(
-      '^mob_([a-z0-9]+)_([a-z0-9]+(?:_[a-z0-9]+)*)_(aggro|attack|death|hurt)$',
+      '^mob_([a-z0-9]+)_([a-z0-9]+(?:_[a-z0-9]+)*)_(aggro|attack|death|hurt|idle)$',
     );
     expect(isSfxMobExtensionKey('mob_beast_dire_wolf_hurt')).toBe(true);
+    expect(isSfxMobExtensionKey('mob_beast_dire_wolf_idle')).toBe(true);
     expect(isSfxMobExtensionKey('mob_unknown_dire_wolf_hurt')).toBe(false);
     expect(isSfxMobExtensionKey('mob_beast_attack')).toBe(false);
     expect(isSfxMobExtensionKey('mob_beast_dire_wolf_bogus')).toBe(false);

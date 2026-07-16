@@ -171,6 +171,46 @@ describe('combat SFX policy', () => {
     ).toBeNull();
   });
 
+  it('gives a wand auto-attack projectile its own cue, distinct from the real spell cast', () => {
+    for (const school of ['arcane', 'holy', 'shadow']) {
+      const wandCue = spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 20,
+        school,
+        fx: 'projectile',
+        wand: true,
+      });
+      expect(wandCue?.key, school).toBe(`wand_${school}`);
+      expect(wandCue !== null && wandCue.key in SFX_CLIPS, school).toBe(true);
+      const castCue = spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 20,
+        school,
+        fx: 'projectile',
+      });
+      expect(castCue?.key, school).toBe(`proj_${school}`);
+      expect(wandCue?.key, school).not.toBe(castCue?.key);
+    }
+  });
+
+  it('falls back to the real spell cue for a wand projectile of a school with no dedicated cue', () => {
+    // No wand-equipped class currently casts fire/frost/nature, but the fallback
+    // must still hold if that ever changes: a wand flag alone should never
+    // resolve to null.
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 20,
+        school: 'fire',
+        fx: 'projectile',
+        wand: true,
+      }),
+    ).toEqual({ key: 'proj_fire', anchorId: 10 });
+  });
+
   it('anchors projectiles to the source and novas to the visual target', () => {
     expect(
       spellFxCue({

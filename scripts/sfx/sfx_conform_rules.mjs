@@ -88,9 +88,39 @@ export function classify({
     }
   }
   if (normBranch === 'lufs' && lufs !== null) {
-    if (Math.abs(lufs - TARGET_LUFS) > NORM_TOLERANCE) {
+    // A wide-crest-factor source can be structurally unable to reach
+    // TARGET_LUFS without breaching the peak safety ceiling (see
+    // conformSfxAudio's bestPeakSafeAttempt fallback), landing under target
+    // as the correct, safest achievable result, not a defect. Gain is linear,
+    // so boosting this file by the shortfall would raise its peak by the
+    // exact same amount: if that hypothetical peak would clip, the shortfall
+    // is peak-constrained, not a missed conform pass, and is not a problem.
+    // An OVER-target LUFS is always a problem regardless (never a peak-safety
+    // side effect, since more gain only ever makes a peak overshoot worse).
+    const lufsOver = lufs - TARGET_LUFS > NORM_TOLERANCE;
+    const lufsUnder = TARGET_LUFS - lufs > NORM_TOLERANCE;
+    // A hard limiter's real relationship between gain and measured loudness
+    // is nonlinear near its ceiling (severe gain reduction can leave measured
+    // LUFS essentially flat even under a large additional gain push), so the
+    // linear hypothetical below is an ESTIMATE, not exact: use the same
+    // NORM_TOLERANCE slop already accepted everywhere else in this file
+    // (a hypothetical landing within it of the ceiling counts as
+    // constrained too) rather than requiring a clean, certain overshoot.
+    const hypotheticalPeakAtTarget = peakDb !== null ? peakDb + (TARGET_LUFS - lufs) : null;
+    const peakConstrained =
+      hypotheticalPeakAtTarget !== null &&
+      hypotheticalPeakAtTarget - TARGET_PEAK_DBFS > -NORM_TOLERANCE;
+    if (lufsOver || (lufsUnder && !peakConstrained)) {
       problems.push(`${lufs.toFixed(1)} LUFS (want ${TARGET_LUFS} LUFS)`);
     }
+  }
+  // LUFS-target loudness alone cannot catch a clipping file: a wide-crest-factor
+  // source hitting the loudness target can still overshoot the true-peak
+  // ceiling (MP3 encoding's own inter-sample overshoot on top of that makes
+  // this worse, not something a pre-encode-only check would ever see). Peak
+  // safety is checked here unconditionally for both branches.
+  if (normBranch === 'lufs' && peakDb !== null && peakDb - TARGET_PEAK_DBFS > NORM_TOLERANCE) {
+    problems.push(`peak ${peakDb.toFixed(1)}dBFS (want at or under ${TARGET_PEAK_DBFS}dBFS)`);
   }
 
   return { reject: false, problems, normBranch };
