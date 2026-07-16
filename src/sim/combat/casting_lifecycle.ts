@@ -178,8 +178,9 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
       } else {
         const res = ctx.resolvedAbility(p.castingAbility, p.id);
         if (res) {
-          p.channelTicksFired = (p.channelTicksFired ?? 0) + 1;
-          applyChannelTick(ctx, p, res, p.channelTicksFired);
+          const channelTickNumber = (p.channelTicksFired ?? 0) + 1;
+          if (p.channelTicksFired !== undefined) p.channelTicksFired = channelTickNumber;
+          applyChannelTick(ctx, p, res, channelTickNumber);
         }
       }
     }
@@ -605,7 +606,17 @@ export function castAbility(
     p.channeling = true;
     p.channelTickEvery = channelDuration / ability.channel.ticks;
     p.channelTickTimer = p.channelTickEvery;
-    p.channelTicksFired = 0;
+    if (
+      res.effects.some(
+        (effect) =>
+          (effect.type === 'drainTick' && effect.rampPct !== undefined) ||
+          effect.type === 'channelFinisher',
+      )
+    ) {
+      p.channelTicksFired = 0;
+    } else {
+      delete p.channelTicksFired;
+    }
     p.gcdRemaining = Math.max(p.gcdRemaining, gcd);
     ctx.emit({
       type: 'castStart',

@@ -2131,8 +2131,8 @@ export interface Entity {
   channeling: boolean;
   channelTickTimer: number;
   channelTickEvery: number;
-  // Server-authoritative one-based channel ordinal. Optional so non-channel
-  // entities and wire mirrors do not carry redundant transient state.
+  // Server-authoritative one-based channel ordinal. Only channels whose effects
+  // depend on their ordinal carry it; the online wire serializer omits it.
   channelTicksFired?: number;
   gcdRemaining: number;
   cooldowns: Map<string, number>;
