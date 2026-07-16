@@ -2165,7 +2165,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Yakındaki düşmanları {damage} hasar için patlatır ve saldırılarını 10 saniye boyunca %10 yavaşlatır.',
   'entities.abilities.thunder_clap.name': 'Sarsan Darbe',
   'entities.abilities.tigers_fury.description':
-    'Saldırı gücünü 6 saniye boyunca 40 artırır. Yalnızca Kurt Formu.',
+    'Saldırı gücünü {duration} saniye boyunca {buff} artırır. Yalnızca Kurt Formu.',
   'entities.abilities.tigers_fury.name': 'Kurt Kanı',
   'entities.abilities.travel_form.description':
     "Anında hızlı bir Fleet Formu'na bürünerek hareket hızını %40 artırır. Bürünmüşken diğer yetenekleri kullanamazsın, ancak dövüşte ya da dövüş dışında bürünebilirsin; kaçmak için idealdir.",
@@ -4027,8 +4027,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.gear.fishingTitle': 'Balık Tutma',
   'guide.gear.intro':
     'Teçhizat, karakterinizin giydiği donanım ve taşıdığınız eşyalardır. Daha iyi teçhizat, güçlenmenin en istikrarlı yoludur ve çoğunu sadece oynayarak edinirsiniz.',
-  'guide.gear.itemLevelBody':
-    'İki parçayı karşılaştırmanın hızlı bir yolunu istiyorsanız, seçeneklerden Eşya Seviyesini Göster ayarını açın. Dünyada, düşmanlardan ve görevlerden kazanılan teçhizat o zaman bir eşya seviyesi gösterir; nereden geldiğine bağlı olarak kabaca ne kadar güçlü olduğunu belirten tek bir rakam. Böylece farklı yuvalar arasında bile hangi yükseltmenin daha ağır bastığını bir bakışta anlayabilirsiniz. Sıradan satıcı mallarıyla başlangıç teçhizatı gibi böyle bir kaynağı olmayan parçalar eşya seviyesi göstermez; yani eksik bir rakam kusur değil, normaldir.',
   'guide.gear.qualityBody':
     'Her eşyanın bir kalitesi vardır ve değerini bir bakışta okuyabilmeniz için ismi buna uygun renklendirilir. En yaygından en değerliye:',
   'guide.gear.qualityCommon': 'Yaygın',
@@ -7009,7 +7007,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.bestiary.flavor.sethrael_palecoil':
     "Işıltıgöl'ün derin sahanlığında süzülen, kemik solgunluğunda bir yılan; sahiplendiği suyun sessiz muhafızı. Gölü onunla paylaşan yüzücüler ender su yüzüne çıkar.",
   'guide.combat.metersBody':
-    "Bir dövüşün nasıl geçtiğini merak mı ediyorsun? Z'ye basıp grup sayaçlarını aç; bunlar grubunun hasarını, iyileştirmesini ve tehdidini karşılaşma karşılaşma toplar.",
+    "Bir dövüşün nasıl geçtiğini merak mı ediyorsun? Shift+H'ye basıp grup sayaçlarını aç; bunlar grubunun hasarını, iyileştirmesini ve tehdidini karşılaşma karşılaşma toplar.",
   'guide.combat.queueBody':
     'Basışlarını kareye göre zamanlamak zorunda değilsin. Bir sonraki yeteneğine mevcut büyünün son anlarında bas; sıraya alınır ve büyü biter bitmez tetiklenir, böylece pratikli oyun boşluksuz akar. Çok erken bir basış ise basitçe reddedilir, dolayısıyla hiçbir şey boşa gitmez. Bazı yakın dövüş darbeleri de aynı şekilde çalışır, bir sonraki silah savuruşunla birlikte çıkar.',
   'guide.combat.queueTitle': 'Bir sonraki hamlen çoktan hazır',
@@ -7065,7 +7063,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'En büyük tekrarlanabilir ödüllere konan günlük bir sınır. Her kahramanca zindan günde bir temizleme öder, akın normali ve kahramancayı ayrı ayrı izler ve bir dünya şefini yağmalamak seninkini başlatır. Temizlenmiş beş oyunculu bir sefer kendi grubuna açık kalır; kilitli akın kapısı sıfırlanmaya dek yeniden açılmaz.',
   'guide.glossary.lockoutTerm': 'Kilitlenme',
   'guide.glossary.metersDef':
-    'Mevcut dövüş için grup skor tablosu penceresi: verilen hasar, yapılan iyileştirme ve en çok tehdidi kimin tuttuğu, karşılaşma başına tutulur. Tuş atamasıyla aç (varsayılan olarak Z).',
+    'Mevcut dövüş için grup skor tablosu penceresi: verilen hasar, yapılan iyileştirme ve en çok tehdidi kimin tuttuğu, karşılaşma başına tutulur. Tuş atamasıyla aç (varsayılan olarak Shift+H).',
   'guide.glossary.metersTerm': 'Hasar sayaçları',
   'guide.glossary.petBarDef':
     "Bir Avcı ya da Karabüyücü evcilinin eklediği komut sırası: Saldır, Dur, Tahrik, Savunmacı ve Saldırgan; varsayılan olarak Ctrl artı 1'den 5'e atanmıştır.",
@@ -7096,9 +7094,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.models.formTravel': 'Fleet Formu',
   'guide.models.groupForms': 'Druid Formları',
   'guide.nav.sidebarLabel': 'Rehber konuları',
-  'guide.professions.craftHowBody':
-    "Bildiğin her tarifi, her birinin neye ihtiyaç duyduğunu ve elinde ne olduğunu görmek için Üretim penceresini aç (varsayılan tuş T); malzemeler oradaysa, bir tıklama işi görür. Sıradan tarifler dünyanın her yerinde üretilebilir. Bir avuç ileri düzey alet tarifi ise Highwatch'taki üretim merkezinde durmanı ister.",
-  'guide.professions.craftHowTitle': 'Üretim penceresi',
   'guide.professions.focusBody':
     'Her merkez kasaba, uğrayan toplayıcılar için bir Kasaba Odağı paneli tutar: kasabada dur, onu mini haritanın yanından aç ve küçük bir odak puanı bütçesini önemsediğin bileşen türlerine yönelt. Bir bileşene ne kadar çok odak verirsen, sonraki her cesetten o kadar ince ve zengin çıkar; dağılımın karakterini nereye giderse takip eder ve kasabaya sonraki her uğrayışında onu ücretsiz yeniden düzenleyebilirsin.',
   'guide.professions.focusTitle': 'Kasaba Odağı',
@@ -7639,4 +7634,16 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'welcome.armory.cta': 'Dünyaya gir ve Cephaneliğe göz at',
   'welcome.news.new': 'Yeni',
   'welcome.news.viewAll': "GitHub'daki tüm güncellemeleri görüntüle",
+  'entities.letters.heroic_marks_reward.sender': 'Kahraman levazım subayı',
+  'entities.letters.heroic_marks_reward.subject': 'Kahramanlık Nişanların',
+  'entities.letters.heroic_marks_reward.body':
+    'Birliğin kahramanlık sınavını temizlerken sen arka saflarda savaşıyor ya da yerde yatıyordun. Kilidin yine de kaydedildi, bu yüzden Kahramanlık Nişanlarından payın kaybolmak yerine buraya gönderildi. Onları iyi kullan.\n\n- Kahraman levazım subayı',
+  'guide.dungeonsPage.resetTitle': 'Örneklerini sıfırlama',
+  'guide.dungeonsPage.resetBody':
+    'Grubun sahiplenilmiş koşuları tutarken zorluğu değiştirirsen eski haklar kendiliğinden silinmeden önce bir süre kalır. Grup lideri kendi portre menüsünden Tüm Örnekleri Sıfırla seçeneğini seçerek veya /dungeon reset yazarak bunları hemen bırakabilir. Zorluk gerçekten değiştirilmiş olmalı, içeride canlı ya da düşmüş hiç kimse kalmamalı ve sıfırlamalar arasında kısa bir bekleme süresi vardır. Kapıya yanlış zorlukta gelirsen oyun başlamadan önce uyarır. Baskın bu şekilde asla sıfırlanmaz; kendi kilit kuralları geçerlidir.',
+  'guide.gear.itemLevelBody':
+    'İki parçayı hızlıca karşılaştırmak için seçeneklerden Eşya Seviyesini Göster’i aç. Düşmanlardan, görevlerden ve üretim mesleklerinden gelen, kaynağı bilinen teçhizat bir eşya seviyesi gösterir: kaynağına göre gücünü yaklaşık belirten tek bir sayı, farklı yuvalar arasında bile hangi yükseltmenin daha etkili olduğunu gösterir. Basit satıcı eşyaları ve başlangıç teçhizatı gibi böyle bir kaynağı olmayan parçalarda seviye görünmez; sayının olmaması normaldir.',
+  'guide.professions.craftHowBody':
+    'Bildiğin tüm tarifleri, gerekenleri ve elindeki malzemeleri görmek için Üretim penceresini (varsayılan T tuşu) aç; malzemeler hazırsa tek tıklama yeter. Yaygın tarifler dünyanın her yerinde üretilebilir. Yüksek seviye aletler ve nadir büyücü zırhları gibi bazı gelişmiş tarifler ise Highwatch üretim merkezinde bulunmanı ister.',
+  'guide.professions.craftHowTitle': 'Üretim penceresi',
 };

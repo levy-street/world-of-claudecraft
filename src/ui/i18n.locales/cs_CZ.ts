@@ -4264,7 +4264,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Zasáhne blízké nepřátele za {damage} poškození a zpomalí jejich útoky o 10 % na 10 s.',
   'entities.abilities.thunder_clap.name': 'Chvějící úder',
   'entities.abilities.tigers_fury.description':
-    'Zvýší sílu útoku o 40 na 6 s. Pouze ve vlčí podobě.',
+    'Zvýší sílu útoku o {buff} na {duration} s. Pouze ve vlčí podobě.',
   'entities.abilities.tigers_fury.name': 'Vlčí krev',
   'entities.abilities.travel_form.description':
     'Okamžitě se proměníš ve svižnou běhavou podobu a zvýšíš rychlost pohybu o 40 %. V proměně nemůžeš používat jiné schopnosti, ale můžeš se proměnit v boji i mimo něj, ideální pro únik.',
@@ -6361,8 +6361,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.gear.upgradeTitle': 'Udržuj výbavu aktuální',
   'guide.gear.upgradeBody':
     'Výměna starého kusu za čerstvé vylepšení udělá víc než dokonalá hra ve výbavě, ze které jsi vyrostl. Když padne něco lepšího nebo to nabídne úkol, vezmi to. Neschovávej dobré předměty na později.',
-  'guide.gear.itemLevelBody':
-    'Chceš-li rychle porovnat dva kusy, zapni v nastavení Zobrazit úroveň předmětu. Výbava vydobytá ve světě, od nepřátel a z úkolů, pak ukazuje item level, jedno číslo pro přibližnou sílu podle toho, odkud pochází, takže na první pohled poznáš, které vylepšení má větší váhu, i napříč různými sloty. Kusy bez takového původu, jako prosté základy od obchodníků a startovní výbava, žádný item level neukazují, takže chybějící číslo je normální, ne chyba.',
   'guide.gear.sourcesTitle': 'Odkud výbava pochází',
   'guide.gear.sourcesBody':
     'Většina raných vylepšení jsou odměny z úkolů, takže se vyplatí úkoly dokončovat, ne grindit. Nepřátelé pouštějí výbavu po porážce, prodejci ve městě prodávají solidní základy, řemeslníci mění nasbírané suroviny v nositelné kusy a hráčský trh ti dovolí nakupovat od ostatních dobrodruhů. Na vrcholu kopce kupují výbavu, kterou nikde jinde nenajdeš, dvě známkové měny: Známky výprav u správce výprav a Hrdinské značky u hrdinského zásobovače.',
@@ -6867,7 +6865,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.bestiary.flavor.sethrael_palecoil':
     'Kostně bledý had, který klouže po hlubokém dně Třpytivého plesa, tichý strážce vody, již si přivlastnil. Plavci, kteří s ním sdílejí pleso, se málokdy vynoří.',
   'guide.combat.metersBody':
-    'Zajímá tě, jak boj dopadl? Stiskni Z a otevři měřiče party, které pro tvou skupinu sčítají poškození, léčení a hrozbu, souboj po souboji.',
+    'Zajímá tě, jak boj dopadl? Stiskni Shift+H a otevři měřiče party, které pro tvou skupinu sčítají poškození, léčení a hrozbu, souboj po souboji.',
   'guide.combat.queueBody':
     'Nemusíš mačkat tlačítka přesně na snímek. Stiskni další schopnost v posledních okamžicích probíhajícího sesílání a zařadí se do fronty, spustí se v okamžiku, kdy sesílání skončí, takže sehraná hra plyne bez mezer. Stisk příliš brzy se prostě odmítne, takže nic nepřijde nazmar. Některé údery na blízko fungují stejně, vyjedou s tvým dalším švihem zbraně.',
   'guide.combat.queueTitle': 'Tvůj další tah je už nabitý',
@@ -6923,7 +6921,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Denní strop na největší opakovatelné odměny. Každý hrdinský dungeon vyplatí jedno vyčištění za den, raid sleduje normální a hrdinský zvlášť a vylootování světového bosse ten tvůj spustí. Vyčištěný pětičlenný běh zůstává otevřený vlastní partě; uzamčené dveře raidu se znovu neotevřou až do resetu.',
   'guide.glossary.lockoutTerm': 'Zámek',
   'guide.glossary.metersDef':
-    'Okno se skóre party pro aktuální boj: způsobené poškození, odvedené léčení a kdo drží nejvíc hrozby, vedené pro každý souboj. Otevřeš ho jeho klávesou (ve výchozím stavu Z).',
+    'Okno se skóre party pro aktuální boj: způsobené poškození, odvedené léčení a kdo drží nejvíc hrozby, vedené pro každý souboj. Otevřeš ho jeho klávesou (ve výchozím stavu Shift+H).',
   'guide.glossary.metersTerm': 'Měřiče poškození',
   'guide.glossary.petBarDef':
     'Řada příkazů, kterou přidá mazlíček lovce nebo černokněžníka: Útok, Stát, Provokace, Obranný a Útočný, ve výchozím stavu vázané na Ctrl plus 1 až 5.',
@@ -6954,8 +6952,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.models.formTravel': 'Svižná podoba',
   'guide.models.groupForms': 'Podoby druida',
   'guide.nav.sidebarLabel': 'Témata průvodce',
-  'guide.professions.craftHowBody':
-    'Otevři okno Výroby (výchozí klávesa T) a uvidíš každý recept, který znáš, co který potřebuje a co máš po ruce; když jsou materiály připravené, práci obstará jediné kliknutí. Běžné recepty lze vyrábět kdekoli ve světě. Hrstka pokročilých receptů na nástroje tě naopak žádá, aby ses postavil k výrobnímu centru v Highwatchi.',
   'guide.professions.craftHowTitle': 'Okno výroby',
   'guide.professions.focusBody':
     'Každé větší město drží panel Zaměření města pro přicházející sběrače: postav se ve městě, otevři ho vedle minimapy a namiř malý rozpočet bodů zaměření na typy komponent, na kterých ti záleží. Čím víc zaměření dáš dané komponentě, tím jemnější a bohatší padá z každého dalšího těla; tvé rozdělení následuje postavu, ať se toulá kamkoli, a můžeš ho zdarma přepracovat při každé pozdější návštěvě města.',
@@ -7558,4 +7554,15 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'welcome.armory.cta': 'Vstoupit a prohlédnout si Zbrojnici',
   'welcome.news.new': 'Nové',
   'welcome.news.viewAll': 'Zobrazit všechny aktualizace na GitHubu',
+  'entities.letters.heroic_marks_reward.sender': 'Hrdinský zásobovač',
+  'entities.letters.heroic_marks_reward.subject': 'Vaše hrdinské marky',
+  'entities.letters.heroic_marks_reward.body':
+    'Vaše skupina zdolala hrdinskou zkoušku, zatímco jste bojovali v týlu nebo leželi poraženi. Také vaše uzamčení bylo zaznamenáno, takže váš podíl hrdinských marek dorazil sem, místo aby se ztratil. Využijte je dobře.\n\n- Hrdinský zásobovač',
+  'guide.dungeonsPage.resetTitle': 'Resetování instancí',
+  'guide.dungeonsPage.resetBody':
+    'Když změníte obtížnost, zatímco skupina stále drží přidělené průchody, staré nároky chvíli zůstanou a pak samy zmizí. Vůdce skupiny je může opustit okamžitě volbou Resetovat všechny instance v nabídce vlastního portrétu nebo příkazem /dungeon reset. Obtížnost musí být skutečně změněna, uvnitř nesmí zůstat nikdo živý ani padlý a mezi resety je krátká prodleva. U dveří na špatné obtížnosti vás hra varuje před začátkem. Raid se takto nikdy neresetuje; platí pro něj vlastní pravidla uzamčení.',
+  'guide.gear.itemLevelBody':
+    'Pro rychlé porovnání dvou kusů zapněte v možnostech Zobrazit úroveň předmětu. Výbava se známým původem, od nepřátel, z úkolů a řemesel, pak ukazuje úroveň předmětu: jediné číslo, které přibližně vyjadřuje sílu podle zdroje a umožňuje poznat lepší vylepšení i mezi různými sloty. Kusy bez takového původu, například základní zboží obchodníků a počáteční výbava, úroveň neukazují; chybějící číslo je normální.',
+  'guide.professions.craftHowBody':
+    'Otevřete okno Výroba (výchozí klávesa T) a uvidíte všechny známé recepty, jejich požadavky i své zásoby; máte-li materiály, stačí jedno kliknutí. Běžné recepty lze vyrábět kdekoli. Některé pokročilé recepty, včetně nástrojů vyšší úrovně a vzácné zbroje pro sesilatele, vyžadují výrobní centrum v Highwatchi.',
 };

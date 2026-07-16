@@ -1,4 +1,5 @@
 import {
+  HEROIC_MARK_LETTER,
   type LetterDef,
   QUEST_LETTERS,
   TRADE_LETTERS,
@@ -245,6 +246,7 @@ const LETTER_IDS = [
   'letter_q_hollow',
   'trade_delivery',
   'trade_refund',
+  'heroic_marks_reward',
 ] as const;
 
 type MobId = (typeof MOB_IDS)[number];
@@ -377,7 +379,10 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
     };
   });
 
-  const lettersById: Record<string, LetterDef> = { [WELCOME_LETTER.letterId]: WELCOME_LETTER };
+  const lettersById: Record<string, LetterDef> = {
+    [WELCOME_LETTER.letterId]: WELCOME_LETTER,
+    [HEROIC_MARK_LETTER.letterId]: HEROIC_MARK_LETTER,
+  };
   for (const letter of Object.values(QUEST_LETTERS)) lettersById[letter.letterId] = letter;
   for (const letter of Object.values(TRADE_LETTERS)) lettersById[letter.letterId] = letter;
   const letters = {} as LetterTranslations;

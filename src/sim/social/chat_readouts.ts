@@ -43,6 +43,7 @@ import {
   type Entity,
   type EquipSlot,
   FISHING_CAST_ID,
+  isFormAuraKind,
   MAX_LEVEL,
   MELEE_RANGE,
   xpForLevel,
@@ -288,14 +289,7 @@ export function overpowerReadout(ctx: SimContext, e: Entity, meta: PlayerMeta): 
 // only one is ever active, so the first match is the answer.
 export function formReadout(e: Entity): string {
   const form = e.auras.find(
-    (a) =>
-      a.kind === 'form_bear' ||
-      a.kind === 'form_cat' ||
-      a.kind === 'form_travel' ||
-      a.kind === 'form_moonkin' ||
-      a.kind === 'form_shadow' ||
-      a.kind === 'defensive_stance' ||
-      a.kind === 'stealth',
+    (a) => isFormAuraKind(a.kind) || a.kind === 'defensive_stance' || a.kind === 'stealth',
   );
   if (!form) return 'You are not in any form or stance.';
   if (form.kind === 'stealth') return 'You are stealthed.';

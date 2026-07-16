@@ -1,4 +1,5 @@
 import {
+  HEROIC_MARK_LETTER,
   type LetterDef,
   QUEST_LETTERS,
   TRADE_LETTERS,
@@ -157,10 +158,12 @@ const CLASS_DESCRIPTION_KEYS: Record<PlayerClass, string> = {
 
 const fallbackLog = new Map<string, EntityTranslationFallback>();
 
-// Ravenpost authored letters by letterId (the welcome letter + the quest
-// thank-you letters), the canonical English source the 'letter' kind reads.
+// Ravenpost authored letters by letterId (the welcome letter, the Heroic Marks
+// reward letter, and the quest thank-you letters), the canonical English source
+// the 'letter' kind reads.
 const LETTERS_BY_ID: Record<string, LetterDef> = {
   [WELCOME_LETTER.letterId]: WELCOME_LETTER,
+  [HEROIC_MARK_LETTER.letterId]: HEROIC_MARK_LETTER,
 };
 for (const letter of Object.values(QUEST_LETTERS)) LETTERS_BY_ID[letter.letterId] = letter;
 for (const letter of Object.values(TRADE_LETTERS)) LETTERS_BY_ID[letter.letterId] = letter;

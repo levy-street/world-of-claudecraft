@@ -314,10 +314,11 @@ import { lowHealthVignette } from './low_health';
 import { lowResourceView } from './low_resource';
 import { mailIndicatorView } from './mailbox_view';
 import { MailboxWindow } from './mailbox_window';
+import { bindMapPinchZoom, finishMapTap, mapTapReleaseFromPointer } from './map_pinch_zoom';
+import { MAP_TAP_MOVE_TOLERANCE_PX, nextMapZoom } from './map_pinch_zoom_core';
 import { type MapRegion, mapCanvasHeight, paintTerrainRows } from './map_terrain';
 import { MapWindowPainter } from './map_window_painter';
 import {
-  MAP_MAX_ZOOM,
   type MapNpcMarker,
   type MapQuestAreaMarker,
   mapWindowMode,
@@ -1845,9 +1846,16 @@ export class Hud {
     );
     $('#map-zoom-in')?.addEventListener('click', () => this.zoomMap(1.4));
     $('#map-zoom-out')?.addEventListener('click', () => this.zoomMap(1 / 1.4));
+    const mapPinch = bindMapPinchZoom(mapCanvas, {
+      onPinchStart: () => {
+        this.mapDrag = null;
+        mapCanvas.style.cursor = '';
+      },
+      onZoom: (factor) => this.zoomMap(factor),
+    });
     // drag to pan (only meaningful while zoomed in; at zoom 1 the whole zone fits)
     mapCanvas.addEventListener('pointerdown', (ev) => {
-      if (!this.mapView || this.mapZoom <= 1) return;
+      if (mapPinch.isPinching() || !this.mapView || this.mapZoom <= 1) return;
       const base = this.mapCenter ?? { x: this.sim.player.pos.x, z: this.sim.player.pos.z };
       this.mapCenter = { ...base };
       this.mapDrag = { px: ev.clientX, py: ev.clientY, cx: base.x, cz: base.z };
@@ -1855,7 +1863,7 @@ export class Hud {
       mapCanvas.style.cursor = 'grabbing';
     });
     mapCanvas.addEventListener('pointermove', (ev) => {
-      if (!this.mapDrag || !this.mapView) return;
+      if (mapPinch.isPinching() || !this.mapDrag || !this.mapView) return;
       const rect = mapCanvas.getBoundingClientRect();
       // "grab the paper" pan: the world point under the cursor stays under it.
       // toMap draws +X to the left and +Z up (mx = (maxX-x)/span, my = (maxZ-z)/
@@ -1883,7 +1891,6 @@ export class Hud {
     // with live tracker progress. Both hit-tests run against the markers of the
     // last paint, scaled from CSS px to the canvas backing space the model projects
     // into.
-    const TAP_MOVE_TOLERANCE_PX = 10;
     let mapAreaTipShown = false;
     let mapTapStart: { x: number; y: number } | null = null;
     const hideMapAreaTip = (): void => {
@@ -1927,16 +1934,21 @@ export class Hud {
     // release can tell a stationary marker tap from a pan.
     mapCanvas.addEventListener('pointerdown', (ev) => {
       hideMapAreaTip();
-      mapTapStart = ev.pointerType === 'mouse' ? null : { x: ev.clientX, y: ev.clientY };
+      mapTapStart =
+        ev.pointerType === 'mouse' || mapPinch.isPinching()
+          ? null
+          : { x: ev.clientX, y: ev.clientY };
     });
     // A stationary touch release reveals the marker under the finger. iOS can raise
     // pointercancel (not pointerup) for a tap it briefly mistook for a gesture, so
     // both end the tap; a release that moved past the tolerance was a pan.
     const endMapTap = (ev: PointerEvent): void => {
-      if (ev.pointerType === 'mouse' || !mapTapStart) return;
-      const moved = Math.hypot(ev.clientX - mapTapStart.x, ev.clientY - mapTapStart.y);
+      finishMapTap(
+        mapPinch,
+        mapTapReleaseFromPointer(ev, mapTapStart, MAP_TAP_MOVE_TOLERANCE_PX),
+        showMapTipAt,
+      );
       mapTapStart = null;
-      if (moved <= TAP_MOVE_TOLERANCE_PX) showMapTipAt(ev.clientX, ev.clientY);
     };
     mapCanvas.addEventListener('pointerup', endMapTap);
     mapCanvas.addEventListener('pointercancel', endMapTap);
@@ -2658,8 +2670,8 @@ export class Hud {
     this.chatWindow.applyInputPresentation();
   }
 
-  noteSentChannel(sentLine: string): void {
-    this.chatWindow.noteSentChannel(sentLine);
+  noteSentChannel(sentLine: string, online: boolean): void {
+    this.chatWindow.noteSentChannel(sentLine, online);
   }
 
   composeChatSend(typed: string): string {
@@ -7430,7 +7442,7 @@ export class Hud {
   // scroll-wheel / button zoom for the world map (clamped to [1, MAP_MAX_ZOOM])
   private zoomMap(factor: number): void {
     const prev = this.mapZoom;
-    this.mapZoom = Math.max(1, Math.min(MAP_MAX_ZOOM, this.mapZoom * factor));
+    this.mapZoom = nextMapZoom(this.mapZoom, factor);
     // zooming back to 1 resumes following the player; a fresh zoom-in from the
     // follow view anchors the pan at the player so dragging starts from there
     if (this.mapZoom === 1) this.mapCenter = null;

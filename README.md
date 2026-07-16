@@ -7,8 +7,8 @@
 **Official website: https://worldofclaudecraft.com/**
 
 [![CI](https://github.com/levy-street/world-of-claudecraft/actions/workflows/ci.yml/badge.svg)](https://github.com/levy-street/world-of-claudecraft/actions/workflows/ci.yml)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Three.js](https://img.shields.io/badge/Three.js-r165-000000?logo=threedotjs&logoColor=white)](https://threejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-7.0-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Three.js](https://img.shields.io/badge/Three.js-r185-000000?logo=threedotjs&logoColor=white)](https://threejs.org/)
 [![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)](https://vite.dev/)
 [![Vitest](https://img.shields.io/badge/Vitest-4.1-6E9F18?logo=vitest&logoColor=white)](https://vitest.dev/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
@@ -53,7 +53,7 @@ Same seed, same world, everywhere. And almost nothing is a shipped asset: the to
 - **Full desktop apps for Windows, Linux, and macOS**, with native installers, automatic updates, and the same online world as the browser.
 - **Headless RL environment** with Gymnasium bindings, reward shaping, and a benchmark mode.
 - **$WOC utility, fully optional**: link a Solana wallet for holder flair, Daily Rewards, and a discounted payment option in the cosmetic store. The game remains free to play and non-custodial.
-- **Season 1 Armory**: collect cosmetic weapon skins through the WOC Store, using Claudium purchased with fiat, SOL, or $WOC. Cosmetics never provide combat power.
+- **Season 1 Armory**: collect cosmetic weapon skins through the WOC Store, using Claudium purchased with fiat, SOL, USDC, or $WOC. Cosmetics never provide combat power.
 
 ## Screenshots
 
@@ -119,7 +119,7 @@ docker compose up -d --build     # postgres + game server, fully built
 # open http://localhost:8787 for accounts, characters, and the whole world
 ```
 
-For **remote hosting**, put the compose stack on any VPS, set a real `POSTGRES_PASSWORD` in the environment, and front port 8787 with a TLS reverse proxy. Caddy makes this two lines (`your.domain { reverse_proxy localhost:8787 }`); WebSockets are proxied automatically and the client auto-selects `wss://` on https pages. Auth endpoints are rate-limited per IP, passwords are scrypt-hashed, and tokens expire after 7 days. Never set `ALLOW_DEV_COMMANDS=1` in production, since it enables the level and teleport cheats the test bots use. See [DEPLOY.md](DEPLOY.md) for the full production guide.
+For **remote hosting**, put the compose stack on any VPS, set a real `POSTGRES_PASSWORD` in the environment, and front port 8787 with a TLS reverse proxy. Caddy makes this two lines (`your.domain { reverse_proxy localhost:8787 }`); WebSockets are proxied automatically and the client auto-selects `wss://` on https pages. Auth endpoints are rate-limited per IP, passwords are scrypt-hashed, and tokens expire after 7 days. Never set `ALLOW_DEV_COMMANDS=1` in production, since it enables the full `/dev` cheat set: the level and teleport cheats the test bots use, plus item grants, mob spawns, instance teleports, and the in-game dev command GUI. See [DEPLOY.md](DEPLOY.md) for the full production guide.
 
 ### Develop online with hot reload
 
@@ -132,7 +132,7 @@ npm run server       # authoritative game server on :8787 (REST + WebSocket)
 npm run dev          # client dev server on :5173 (proxies /api and /ws)
 ```
 
-Open http://localhost:5173, choose **Play Online**, create an account, create a character, and Enter World. Open a second tab and log in again to see each other in town. `Enter` opens chat. A real MediaWiki player wiki comes up alongside the Docker Compose stack at http://localhost:8080/wiki/; its seed pages are generated from current game content with `npm run wiki:seed`.
+Open http://localhost:5173, choose **Play Online**, create an account, create a character, and Enter World. A Welcome Screen greets you while the realm connection establishes behind it: the latest release news with NEW badges for anything you have not seen, a Join our Discord strip, and, on the desktop web client, Daily Rewards and Season 1 Armory tiles; Continue enables once the connection is ready, and offline play opens through the same screen. Open a second tab and log in again to see each other in town. `Enter` opens chat. A real MediaWiki player wiki comes up alongside the Docker Compose stack at http://localhost:8080/wiki/; its seed pages are generated from current game content with `npm run wiki:seed`.
 
 What persists and how the server stays in charge:
 
@@ -175,7 +175,7 @@ World of ClaudeCraft is web3-native around **$WOC**, our community token on Sola
 
 $WOC also has optional utility in the live game:
 
-- **WOC Store**: buy Claudium, the one-way cosmetic currency, with fiat, SOL, or $WOC. The $WOC payment rail receives a service-quoted discount.
+- **WOC Store**: buy Claudium, the one-way cosmetic currency, with fiat, SOL, USDC, or $WOC. The $WOC payment rail receives a service-quoted discount.
 - **Season 1 Armory**: spend Claudium on cosmetic weapon-skin collections. Store purchases do not add stats or combat power.
 - **Daily Rewards**: eligible verified holders can earn points through a daily spin and rotating tasks, then compete for a share of the daily prize pool.
 
@@ -245,7 +245,7 @@ Press `G` or the arena button to queue. Matchmaking teleports fighters into a pr
 - **Ravenpost mail**: send items and coin to other characters, with attachments held safely until claimed.
 - **Guilds**: charters, rosters, ranks, and guild chat.
 - **Daily Rewards**: verified $WOC holders can earn leaderboard points from a daily spin and rotating tasks, with automatic payouts from the daily prize pool.
-- **WOC Store and Season 1 Armory**: buy Claudium with fiat, SOL, or $WOC, then spend it on purely cosmetic weapon skins.
+- **WOC Store and Season 1 Armory**: buy Claudium with fiat, SOL, USDC, or $WOC, then spend it on purely cosmetic weapon skins.
 - **Eating and drinking**: sit to restore over 18 seconds, broken by damage or standing, and yes, you can eat and drink at once.
 - **Vendors** that buy food and water and sell honest white gear, with coin shown in gold, silver, and copper.
 - **A personal bank** (the Gilded Strongbox): bursars in each hub town keep a vault per character, from 24 slots up to 96 with coin-bought expansions, plus bonus slots earned online for a verified email, linked accounts, and referrals.

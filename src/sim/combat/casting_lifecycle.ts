@@ -45,6 +45,7 @@ import {
   dist2d,
   FACING_HOLD_DIST,
   FISHING_CAST_ID,
+  isFormAuraKind,
   MELEE_ARC,
   MELEE_RANGE,
   normAngle,
@@ -70,15 +71,7 @@ import { isSpellResisted } from './spell_resist';
 const SHAMAN_SHOCK_COOLDOWN_IDS = ['earth_shock', 'flame_shock', 'frost_shock'] as const;
 
 function isFormToggle(ability: AbilityDef): boolean {
-  return ability.effects.some(
-    (e) =>
-      e.type === 'selfBuff' &&
-      (e.kind === 'form_bear' ||
-        e.kind === 'form_cat' ||
-        e.kind === 'form_travel' ||
-        e.kind === 'form_moonkin' ||
-        e.kind === 'form_shadow'),
-  );
+  return ability.effects.some((e) => e.type === 'selfBuff' && isFormAuraKind(e.kind));
 }
 
 // Forms, stances and stealth are toggles: re-casting cancels the aura, and
@@ -88,13 +81,7 @@ function isToggleBuff(ability: AbilityDef): boolean {
   return ability.effects.some(
     (e) =>
       e.type === 'selfBuff' &&
-      (e.kind === 'form_bear' ||
-        e.kind === 'form_cat' ||
-        e.kind === 'form_travel' ||
-        e.kind === 'form_moonkin' ||
-        e.kind === 'form_shadow' ||
-        e.kind === 'defensive_stance' ||
-        e.kind === 'stealth'),
+      (isFormAuraKind(e.kind) || e.kind === 'defensive_stance' || e.kind === 'stealth'),
   );
 }
 

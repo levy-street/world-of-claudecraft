@@ -2138,7 +2138,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Treft nabije vijanden voor {damage} schade en vertraagt hun aanvallen met 10% gedurende 10 sec.',
   'entities.abilities.thunder_clap.name': 'Schuddende Klap',
   'entities.abilities.tigers_fury.description':
-    'Verhoogt de aanvalskracht met 40 gedurende 6 sec. Alleen in Wolfsgedaante.',
+    'Verhoogt de aanvalskracht met {buff} gedurende {duration} sec. Alleen in Wolfsgedaante.',
   'entities.abilities.tigers_fury.name': 'Wolvenbloed',
   'entities.abilities.travel_form.description':
     'Verander ogenblikkelijk in een snelle Fleetgedaante en verhoog je bewegingssnelheid met 40%. Je kunt geen andere vaardigheden gebruiken terwijl je veranderd bent, maar je kunt in of buiten gevecht van gedaante wisselen, ideaal om te ontsnappen.',
@@ -4036,10 +4036,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.gear.fishingTitle': 'Vissen',
   'guide.gear.intro':
     'Uitrusting is de wapenrusting die je personage draagt en de voorwerpen die je meedraagt. Betere uitrusting is de gestaagste manier om sterker te worden, en het meeste pik je vanzelf op door te spelen.',
-  'guide.gear.itemLevelBody':
-    "Wil je een snelle manier om twee stukken te vergelijken, zet dan Itemniveau Tonen aan in de opties. Uitrusting die je in de wereld bemachtigt, van vijanden en quests, toont dan een itemniveau, een enkel getal voor hoe krachtig het ongeveer is op basis van waar het vandaan komt, zodat je in één oogopslag ziet welke upgrade meer gewicht in de schaal legt, zelfs tussen verschillende slots. Stukken zonder zo'n bron, zoals eenvoudige verkoperswaar en beginuitrusting, tonen geen itemniveau, dus een ontbrekend getal is normaal, geen fout.",
-  'guide.gear.qualityBody':
-    'Elk voorwerp heeft een kwaliteit, en zijn naam is gekleurd om die te tonen, zodat je zijn waarde in één oogopslag kunt aflezen. Van meest gewoon tot meest gewild:',
   'guide.gear.qualityCommon': 'Gewoon',
   'guide.gear.qualityEpic': 'Episch',
   'guide.gear.qualityLegendary': 'Legendarisch',
@@ -7098,7 +7094,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.bestiary.flavor.sethrael_palecoil':
     'Een bleke slang, wit als bot, die over de diepe rand van De Glinstermeer glijdt, stille wachter van het water dat zij heeft opgeëist. Zwemmers die het meer met haar delen, komen zelden weer boven.',
   'guide.combat.metersBody':
-    'Benieuwd hoe een gevecht verliep? Druk op Z om de groepsmeters te openen, die schade, genezing en dreiging voor je groep bijhouden, gevecht na gevecht.',
+    'Benieuwd hoe een gevecht verliep? Druk op Shift+H om de groepsmeters te openen, die schade, genezing en dreiging voor je groep bijhouden, gevecht na gevecht.',
   'guide.combat.queueBody':
     'Je hoeft je toetsdrukken niet exact op het frame te timen. Druk je volgende vaardigheid in de laatste ogenblikken van de lopende cast en hij wordt in de wachtrij gezet, om af te vuren zodra de cast klaar is, zodat geoefend spel zonder gaten verloopt. Een druk die te vroeg komt, wordt simpelweg geweigerd, zodat er niets verloren gaat. Sommige melee-aanvallen werken op dezelfde manier en rijden mee op je volgende wapenzwaai.',
   'guide.combat.queueTitle': 'Je volgende zet staat al geladen',
@@ -7154,7 +7150,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Een dagelijkse limiet op de grootste herhaalbare beloningen. Elke heroïsche kerker keert één clear per dag uit, de raid houdt gewoon en heroïsch apart bij, en het plunderen van een wereldbaas start de jouwe. Een uitgespeelde run voor vijf spelers blijft open voor de eigen groep; de vergrendelde raiddeur gaat pas open bij de reset.',
   'guide.glossary.lockoutTerm': 'Daglockout',
   'guide.glossary.metersDef':
-    'Het scorebordvenster van de groep voor het huidige gevecht: aangerichte schade, verrichte genezing en wie de meeste dreiging vasthoudt, per gevecht bijgehouden. Open het met de toetsbinding (standaard Z).',
+    'Het scorebordvenster van de groep voor het huidige gevecht: aangerichte schade, verrichte genezing en wie de meeste dreiging vasthoudt, per gevecht bijgehouden. Open het met de toetsbinding (standaard Shift+H).',
   'guide.glossary.metersTerm': 'Schademeters',
   'guide.glossary.petBarDef':
     'De commandorij die een huisdier van een jager of heksenmeester toevoegt: Aanvallen, Stoppen, Provoceren, Defensief en Agressief, standaard gebonden aan Ctrl plus 1 tot en met 5.',
@@ -7185,8 +7181,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.models.formTravel': 'Fleetgedaante',
   'guide.models.groupForms': 'Druïdengedaanten',
   'guide.nav.sidebarLabel': 'Gidsonderwerpen',
-  'guide.professions.craftHowBody':
-    'Open het vervaardigingsvenster (standaardtoets T) om elk recept te zien dat je kent, wat elk nodig heeft en wat je bij de hand hebt; als de materialen er zijn, doet één klik het werk. Gewone recepten kun je overal in de wereld vervaardigen. Een handjevol geavanceerde gereedschapsrecepten vraagt je in plaats daarvan om bij de ambachtshub in Highwatch te staan.',
   'guide.professions.craftHowTitle': 'Het vervaardigingsvenster',
   'guide.professions.focusBody':
     'Elke hoofdplaats heeft een Stadsfocus-paneel voor oogsters op bezoek: sta in de stad, open het naast de minimap, en richt een klein budget aan focuspunten op de componenttypen die je belangrijk vindt. Hoe meer focus je aan een component geeft, hoe fijner en rijker het van elk later lijk komt; je toewijzing volgt je personage waar het ook zwerft, en je kunt haar gratis herzien bij elk later bezoek aan de stad.',
@@ -7733,4 +7727,17 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'welcome.armory.cta': 'Wereld betreden en het Arsenaal bekijken',
   'welcome.news.new': 'Nieuw',
   'welcome.news.viewAll': 'Bekijk alle updates op GitHub',
+  'entities.letters.heroic_marks_reward.sender': 'Heroïsche kwartiermeester',
+  'entities.letters.heroic_marks_reward.subject': 'Je heroïsche marken',
+  'entities.letters.heroic_marks_reward.body':
+    'Je groep heeft de heroïsche beproeving doorstaan terwijl jij in de achterhoede vocht of verslagen op de grond lag. Ook jouw binding is vastgelegd, dus je aandeel heroïsche marken is hierheen gestuurd in plaats van verloren te gaan. Gebruik ze goed.\n\n- Heroïsche kwartiermeester',
+  'guide.dungeonsPage.resetTitle': 'Je instanties resetten',
+  'guide.dungeonsPage.resetBody':
+    'Als je van moeilijkheid wisselt terwijl je groep nog geclaimde runs heeft, blijven de oude claims even staan voordat ze vanzelf verdwijnen. De groepsleider kan ze direct loslaten via Alle instanties resetten in het menu van het eigen portret, of met /dungeon reset. De moeilijkheid moet echt gewijzigd zijn, er mag niemand, levend of gevallen, binnen zijn en tussen resets geldt een korte afkoeltijd. Bij de deur op de verkeerde moeilijkheid waarschuwt het spel voor de start. De raid wordt nooit zo gereset; daarvoor blijven de eigen lockoutregels gelden.',
+  'guide.gear.itemLevelBody':
+    'Schakel Itemniveau tonen in de opties in om twee stukken snel te vergelijken. Uitrusting met een bekende bron, van vijanden, quests en ambachten, toont dan een itemniveau: één getal dat de kracht op basis van de herkomst benadert en upgrades zelfs tussen verschillende vakken vergelijkbaar maakt. Stukken zonder zo’n bron, zoals eenvoudige handelswaar en startuitrusting, tonen geen itemniveau; een ontbrekend getal is normaal.',
+  'guide.professions.craftHowBody':
+    'Open het Vervaardigingsvenster (standaardtoets T) om al je bekende recepten, hun benodigdheden en je voorraad te zien; als de materialen er zijn, volstaat één klik. Gewone recepten kunnen overal worden gemaakt. Enkele geavanceerde recepten, waaronder hoogwaardig gereedschap en zeldzaam pantser voor magiërs, vereisen het vervaardigingscentrum in Highwatch.',
+  'guide.gear.qualityBody':
+    'Elk voorwerp heeft een kwaliteit en de naam krijgt de bijbehorende kleur, zodat je de waarde in één oogopslag ziet. Van gewoon tot kostbaar:',
 };

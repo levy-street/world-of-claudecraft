@@ -1020,9 +1020,10 @@ describe('i18n Localization Key Coverage', () => {
       ZONES.reduce((sum, zone) => sum + zone.pois.length, 0) +
       Object.keys(DUNGEONS).length * 3 +
       Object.keys(DELVES).length * 3 +
-      // Ravenpost authored letters: welcome + quest letters + G2b trade
-      // settlement letters (delivery/refund), 3 fields each.
-      (1 + Object.keys(QUEST_LETTERS).length + Object.keys(TRADE_LETTERS).length) * 3;
+      // Ravenpost authored letters: welcome + Heroic Marks reward (the 2) +
+      // quest letters + G2b trade settlement letters (delivery/refund), 3
+      // fields each.
+      (2 + Object.keys(QUEST_LETTERS).length + Object.keys(TRADE_LETTERS).length) * 3;
     expect(worldEntries).toHaveLength(expectedWorldCount);
 
     for (const lang of supportedLanguages) {

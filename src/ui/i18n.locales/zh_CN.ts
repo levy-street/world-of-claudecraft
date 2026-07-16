@@ -2475,7 +2475,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.insect_swarm.description':
     '敌人被虫群侵袭，在 12 秒内受到 {damage} 点自然伤害。',
   'entities.abilities.tigers_fury.name': '狼血',
-  'entities.abilities.tigers_fury.description': '使攻击强度提高 40，持续 6 秒。仅限狼形态。',
+  'entities.abilities.tigers_fury.description':
+    '使攻击强度提高 {buff}，持续 {duration} 秒。仅限狼形态。',
   'entities.abilities.rip.name': '割裂',
   'entities.abilities.rip.description':
     '终结技，在 12 秒内造成 {damage} 点流血伤害。消耗连击点。仅限狼形态。',
@@ -4648,6 +4649,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.templeName': '沉没神殿',
   'guide.dungeonsPage.templeBody': '沼泽小路旁一座沉没的圣殿，是为好奇者与有备而来者准备的岔路。',
   'guide.dungeonsPage.sanctumName': '墓龙圣所',
+  'guide.dungeonsPage.resetBody':
+    '在队伍仍持有已认领副本时切换难度，旧的认领会保留一段时间后自行清除。队长也可以立即放弃它们：在自己的头像菜单中选择“重置所有副本”，或输入 /dungeon reset。重置只有在难度确实更改之后才能进行，且副本内不能有任何人（无论生死）留守，两次重置之间还隔着一段短暂的冷却。带着错误的难度来到门口，游戏会在开打之前直接提醒你。团队副本永远不会以这种方式重置；它遵循自己的锁定规则。',
+  'guide.dungeonsPage.resetTitle': '重置你的副本',
   'guide.dungeonsPage.sanctumBody': '棘峰的黑暗核心，邪教漫长的图谋在此达到可怖的顶点。',
   'guide.dungeonsPage.raidName': '终局团队副本',
   'guide.dungeonsPage.raidBody':
@@ -5003,7 +5007,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.gear.intro':
     '装备是你角色身上穿戴的行头，以及你随身携带的物品。更好的装备是变强最稳妥的途径，而其中大部分只需游玩便能到手。',
   'guide.gear.itemLevelBody':
-    '如果你想快速比较两件装备，可以在选项中开启“显示物品等级”。在世界中赢得的装备，无论来自敌人还是任务，都会显示一个物品等级，一个根据其来源大致衡量强度的单一数值，让你一眼就能看出哪件升级更有分量，即便是不同部位之间也能比较。没有这类来源的物品，比如普通的商人基础货和新手装备，则不显示物品等级，因此没有数值是正常现象，并非缺陷。',
+    '如果你想快速比较两件装备，可以在选项中开启“显示物品等级”。有明确来源的装备，无论来自敌人、任务还是制作专业，都会显示一个物品等级，一个根据其来源大致衡量强度的单一数值，让你一眼就能看出哪件升级更有分量，即便是不同部位之间也能比较。没有这类来源的物品，比如普通的商人基础货和新手装备，则不显示物品等级，因此没有数值是正常现象，并非缺陷。',
   'guide.gear.qualityBody':
     '每件物品都有其品质，名称也以相应的颜色标示，让你一眼便能看出它的价值。从最常见到最珍贵：',
   'guide.gear.qualityCommon': '普通',
@@ -6445,6 +6449,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.letters.trade_refund.sender': '渡鸦邮驿',
   'entities.letters.trade_refund.subject': '交易物品已退还',
   'entities.letters.trade_refund.body': '交易未能完成。你提供的一切已经退还给你。',
+  'entities.letters.heroic_marks_reward.sender': '英勇军需官',
+  'entities.letters.heroic_marks_reward.subject': '你的英勇印记',
+  'entities.letters.heroic_marks_reward.body':
+    '你的部队清剿了英勇试炼，而你在后排作战，或已倒在尘土之中。你的锁定同样已经生效，因此你那一份英勇印记飞到了这里，而非就此遗失。好好使用它们。\n\n- 英勇军需官',
   'hudChrome.calendar.title': '活动日历',
   'hudChrome.calendar.close': '关闭日历',
   'hudChrome.calendar.keybindLabel': '活动日历',
@@ -7041,7 +7049,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.bestiary.flavor.sethrael_palecoil':
     '一条骨色苍白的巨蛇，游弋于微光湖的深处暗礁，是它所占据水域的沉默守卫。与它共享此湖的泅水者，鲜有能再浮出水面的。',
   'guide.combat.metersBody':
-    '想知道一场战斗打得如何？按 Z 打开小队仪表盘，它会逐场统计你队伍的伤害、治疗与威胁。',
+    '想知道一场战斗打得如何？按 Shift+H 打开小队仪表盘，它会逐场统计你队伍的伤害、治疗与威胁。',
   'guide.controls.arrowKeys': '方向键',
   'guide.controls.bothMouse': '鼠标左右键',
   'guide.controls.runForward': '向前奔跑',
@@ -7056,7 +7064,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '对最丰厚的可重复奖励设下的每日上限。每个英雄地下城每天只结算一次通关，团队副本的普通与英雄难度分别计算，而拾取世界首领便会开始你自己的锁定。已通关的五人副本对其原队伍仍保持开放；被锁上的团队副本之门要等到重置才会重新打开。',
   'guide.glossary.lockoutTerm': '副本锁定',
   'guide.glossary.metersDef':
-    '当前战斗的小队记分板窗口：造成的伤害、完成的治疗，以及谁承受着最高威胁，均按遭遇战分别记录。用其快捷键打开（默认为 Z）。',
+    '当前战斗的小队记分板窗口：造成的伤害、完成的治疗，以及谁承受着最高威胁，均按遭遇战分别记录。用其快捷键打开（默认为 Shift+H）。',
   'guide.glossary.metersTerm': '伤害统计',
   'guide.glossary.petBarDef':
     '猎人或术士的宠物会额外添加的指令栏：攻击、停止、嘲讽、防御和主动，默认绑定为 Ctrl 加 1 到 5。',
@@ -7073,7 +7081,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.models.groupForms': '德鲁伊形态',
   'guide.nav.sidebarLabel': '指南主题',
   'guide.professions.craftHowBody':
-    '打开制作窗口（默认按键 T），即可查看你已知的每个配方、各自所需的材料，以及你手头现有的材料；材料齐备时，点击一下即可完成制作。普通配方可以在世界的任何地方制作。少数进阶工具配方则要求你站在高守哨站的制作枢纽处。',
+    '打开制作窗口（默认按键 T），即可查看你已知的每个配方、各自所需的材料，以及你手头现有的材料；材料齐备时，点击一下即可完成制作。普通配方可以在世界的任何地方制作。少数进阶配方，包括高阶工具和稀有的施法者护甲，则要求你站在高守哨站的制作枢纽处。',
   'guide.professions.craftHowTitle': '制作窗口',
   'guide.search.typeAbility': '技能',
   'guide.search.typeDeed': '功绩',

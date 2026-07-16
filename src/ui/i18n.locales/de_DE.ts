@@ -3353,7 +3353,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Der Gegner wird von Insekten umschwärmt und erleidet {damage} Naturschaden über 12 Sek.',
   'entities.abilities.tigers_fury.name': 'Wolfsblood',
   'entities.abilities.tigers_fury.description':
-    'Erhöht die Angriffskraft 6 Sek. lang um 40. Nur in Wolfsgestalt.',
+    'Erhöht die Angriffskraft {duration} Sek. lang um {buff}. Nur in Wolfsgestalt.',
   'entities.abilities.rip.name': 'Zerfetzen',
   'entities.abilities.rip.description':
     'Finishing-Move, der über 12 Sek. {damage} Blutungsschaden verursacht. Verbraucht Combopunkte. Nur in Wolfsgestalt.',
@@ -5750,8 +5750,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.gear.fishingTitle': 'Angeln',
   'guide.gear.intro':
     'Ausrüstung ist das, was dein Charakter trägt, und die Gegenstände, die du bei dir führst. Bessere Ausrüstung ist der verlässlichste Weg, stärker zu werden, und das meiste davon sammelst du ganz nebenbei beim Spielen ein.',
-  'guide.gear.itemLevelBody':
-    'Wenn du zwei Teile schnell vergleichen willst, aktiviere in den Optionen Gegenstandsstufe anzeigen. Ausrüstung, die du in der Welt erringst, von Feinden und aus Quests, zeigt dann eine Gegenstandsstufe, eine einzelne Zahl dafür, wie mächtig sie ungefähr ist, je nachdem, woher sie stammt, sodass du auf einen Blick erkennst, welche Verbesserung mehr Gewicht hat, sogar über verschiedene Ausrüstungsplätze hinweg. Teile ohne eine solche Herkunft, etwa schlichte Händlerware und Startausrüstung, zeigen keine Gegenstandsstufe, eine fehlende Zahl ist also normal und kein Fehler.',
   'guide.gear.qualityBody':
     'Jeder Gegenstand hat eine Qualität, und sein Name ist passend gefärbt, sodass du seinen Wert auf einen Blick ablesen kannst. Vom Gewöhnlichsten zum Begehrtesten:',
   'guide.gear.qualityCommon': 'Gewöhnlich',
@@ -7163,7 +7161,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.bestiary.flavor.sethrael_palecoil':
     'Eine knochenbleiche Schlange, die über den tiefen Grund des Glimmermere gleitet, stiller Wächter des Wassers, das sie für sich beansprucht hat. Schwimmer, die den See mit ihr teilen, tauchen selten wieder auf.',
   'guide.combat.metersBody':
-    'Neugierig, wie ein Kampf gelaufen ist? Drücke Z, um die Gruppenmesswerte zu öffnen, die Schaden, Heilung und Bedrohung deiner Gruppe zählen, Begegnung für Begegnung.',
+    'Neugierig, wie ein Kampf gelaufen ist? Drücke Shift+H, um die Gruppenmesswerte zu öffnen, die Schaden, Heilung und Bedrohung deiner Gruppe zählen, Begegnung für Begegnung.',
   'guide.combat.queueBody':
     'Du musst deine Tastendrücke nicht auf den Frame genau abpassen. Drücke deine nächste Fähigkeit in den letzten Momenten des laufenden Zaubers, und sie wird in die Warteschlange gestellt und löst im selben Augenblick aus, in dem der Zauber endet, sodass geübtes Spiel ohne Lücken fließt. Ein zu früher Druck wird einfach abgewiesen, es geht also nichts verloren. Manche Nahkampfschläge funktionieren genauso und reiten auf deinem nächsten Waffenschwung aus.',
   'guide.combat.queueTitle': 'Dein nächster Zug ist schon geladen',
@@ -7219,7 +7217,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Eine Tagesgrenze für die größten wiederholbaren Belohnungen. Jeder heroische Dungeon zahlt einen Abschluss pro Tag aus, der Schlachtzug führt Normal und Heroisch getrennt, und das Plündern eines Weltbosses startet deine. Ein abgeschlossener Fünf-Spieler-Durchgang bleibt seiner eigenen Gruppe offen; die gesperrte Schlachtzugstür öffnet sich erst zur Zurücksetzung wieder.',
   'guide.glossary.lockoutTerm': 'Sperre',
   'guide.glossary.metersDef':
-    'Das Anzeigefenster der Gruppe für den aktuellen Kampf: verursachter Schaden, gewirkte Heilung und wer die meiste Bedrohung hält, je Begegnung geführt. Öffne es mit seiner Tastenbelegung (standardmäßig Z).',
+    'Das Anzeigefenster der Gruppe für den aktuellen Kampf: verursachter Schaden, gewirkte Heilung und wer die meiste Bedrohung hält, je Begegnung geführt. Öffne es mit seiner Tastenbelegung (standardmäßig Shift+H).',
   'guide.glossary.metersTerm': 'Schadensmesser',
   'guide.glossary.petBarDef':
     'Die Befehlsreihe, die ein Jäger- oder Hexenmeister-Begleiter hinzufügt: Angriff, Stopp, Spott, Defensiv und Aggressiv, standardmäßig auf Strg plus 1 bis 5 belegt.',
@@ -7250,8 +7248,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.models.formTravel': 'Fleet Form',
   'guide.models.groupForms': 'Druidengestalten',
   'guide.nav.sidebarLabel': 'Handbuchthemen',
-  'guide.professions.craftHowBody':
-    'Öffne das Handwerksfenster (Standardtaste T), um jedes Rezept zu sehen, das du kennst, was jedes braucht und was du zur Hand hast; sind die Materialien da, erledigt ein Klick die Arbeit. Gewöhnliche Rezepte lassen sich überall in der Welt herstellen. Eine Handvoll fortgeschrittener Werkzeugrezepte verlangt stattdessen, dass du am Handwerksplatz in Highwatch stehst.',
   'guide.professions.craftHowTitle': 'Das Handwerksfenster',
   'guide.professions.focusBody':
     'Jede größere Stadt hält ein Stadtfokus-Panel für vorbeikommende Sammler bereit: Stell dich in die Stadt, öffne es neben der Minikarte und richte ein kleines Budget an Fokuspunkten auf die Komponententypen, die dir wichtig sind. Je mehr Fokus du einer Komponente gibst, desto feiner und reicher fällt sie von jeder späteren Leiche ab; deine Verteilung folgt deinem Charakter, wohin er auch zieht, und du kannst sie bei jedem späteren Besuch in der Stadt kostenlos umarbeiten.',
@@ -7800,4 +7796,15 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'welcome.armory.cta': 'Welt betreten und die Waffenkammer durchstöbern',
   'welcome.news.new': 'Neu',
   'welcome.news.viewAll': 'Alle Updates auf GitHub ansehen',
+  'entities.letters.heroic_marks_reward.sender': 'Heroischer Quartiermeister',
+  'entities.letters.heroic_marks_reward.subject': 'Deine heroischen Marken',
+  'entities.letters.heroic_marks_reward.body':
+    'Deine Gruppe hat die heroische Prüfung gemeistert, während du in der Nachhut gekämpft hast oder bereits am Boden lagst. Auch deine Instanzbindung wurde aktiviert, daher ist dein Anteil an heroischen Marken hier angekommen, statt verloren zu gehen. Setze sie klug ein.\n\n- Heroischer Quartiermeister',
+  'guide.dungeonsPage.resetTitle': 'Instanzen zurücksetzen',
+  'guide.dungeonsPage.resetBody':
+    'Wenn ihr die Schwierigkeit wechselt, während eure Gruppe noch beanspruchte Läufe hält, bleiben die alten Ansprüche eine Weile bestehen. Der Gruppenleiter kann sie sofort aufgeben: Wählt im Menü des eigenen Porträts Alle Instanzen zurücksetzen oder gebt /dungeon reset ein. Das funktioniert erst nach einem tatsächlichen Schwierigkeitswechsel, nur wenn niemand, ob lebend oder gefallen, drinnen ist, und zwischen Rücksetzungen gilt eine kurze Abklingzeit. Bei falscher Schwierigkeit warnt euch das Spiel vor dem Start. Der Schlachtzug wird so niemals zurückgesetzt; seine eigenen Bindungsregeln bleiben bestehen.',
+  'guide.gear.itemLevelBody':
+    'Aktiviere Gegenstandsstufe anzeigen in den Optionen, um zwei Ausrüstungsteile schnell zu vergleichen. Ausrüstung bekannter Herkunft, von Gegnern, Quests und Handwerksberufen, zeigt dann eine Gegenstandsstufe: eine einzelne Zahl, die ihre Stärke anhand der Quelle grob angibt und Verbesserungen auch über verschiedene Plätze hinweg vergleichbar macht. Teile ohne solche Herkunft, etwa einfache Händlerware und Startausrüstung, zeigen keine Gegenstandsstufe; eine fehlende Zahl ist normal.',
+  'guide.professions.craftHowBody':
+    'Öffne das Handwerksfenster (Standardtaste T), um alle bekannten Rezepte, ihre Zutaten und deinen Vorrat zu sehen; sind die Materialien vorhanden, genügt ein Klick. Gewöhnliche Rezepte lassen sich überall herstellen. Einige fortgeschrittene Rezepte, darunter höherstufige Werkzeuge und seltene Zaubererrüstung, erfordern dagegen das Handwerkszentrum in Highwatch.',
 };

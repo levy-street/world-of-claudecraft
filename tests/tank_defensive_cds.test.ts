@@ -378,6 +378,26 @@ describe('Primal Reflexes (druid): dodge cooldown', () => {
   });
 });
 
+describe('Oakhide (druid): armor cooldown usable while shapeshifted', () => {
+  it('applies its armor buff in Bruin Form and Wolf Form, not just caster form', () => {
+    const { sim, p, pid } = make('druid');
+    cast(sim, 'barkskin', pid);
+    expect(p.auras.some((a) => a.kind === 'buff_armor' && a.value === 150)).toBe(true);
+
+    const { sim: sim2, p: p2, pid: pid2 } = make('druid');
+    cast(sim2, 'bear_form', pid2);
+    expect(p2.auras.some((a) => a.kind === 'form_bear')).toBe(true);
+    cast(sim2, 'barkskin', pid2);
+    expect(p2.auras.some((a) => a.kind === 'buff_armor' && a.value === 150)).toBe(true);
+
+    const { sim: sim3, p: p3, pid: pid3 } = make('druid');
+    cast(sim3, 'cat_form', pid3);
+    expect(p3.auras.some((a) => a.kind === 'form_cat')).toBe(true);
+    cast(sim3, 'barkskin', pid3);
+    expect(p3.auras.some((a) => a.kind === 'buff_armor' && a.value === 150)).toBe(true);
+  });
+});
+
 describe('Druid parity: Dire Bruin threat/armor buff', () => {
   it('grants +20% threat and +15% armor', () => {
     const druid = TALENTS.druid!;
