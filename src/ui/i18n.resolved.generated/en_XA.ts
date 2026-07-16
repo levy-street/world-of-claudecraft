@@ -6003,7 +6003,8 @@ export const en_XA: EnTranslations = {
       "wocLinkToList": "[Ļíñķ á ŵáļļéţ ţó ļíšţ ƒóŕ ŴÓÇ.]",
       "wocLinkToPay": "[Ļíñķ á ŵáļļéţ ţó þáý ŵíţĥ ŴÓÇ.]",
       "wocPriceInvalid": "[Ñáɱé á ʋáļíð ŴÓÇ þŕíçé.]",
-      "awaitingPayment": "[Ţĥáţ ļóţ íš áŵáíţíñĝ þáýɱéñţ.]"
+      "awaitingPayment": "[Ţĥáţ ļóţ íš áŵáíţíñĝ þáýɱéñţ.]",
+      "pendingPurchaseFirst": "[Ƒíñíšĥ ýóúŕ þéñðíñĝ þúŕçĥášé ƒíŕšţ.]"
     },
     "loot": {
       "takeAll": "[Ţáķé Áļļ]",

@@ -52,6 +52,22 @@ export function normalizeWocAmount(raw: string): string | null {
   return frac ? `${whole}.${frac}` : whole;
 }
 
+// Order two NORMALIZED amounts (normalizeWocAmount output: no leading/trailing
+// zeros) without ever converting to a number: the integer part compares by
+// length then lexicographically, then the fraction digits compare padded to a
+// common length. Returns negative / 0 / positive like a sort comparator.
+export function compareWocAmounts(a: string, b: string): number {
+  const [wholeA, fracA = ''] = a.split('.');
+  const [wholeB, fracB = ''] = b.split('.');
+  if (wholeA.length !== wholeB.length) return wholeA.length - wholeB.length;
+  if (wholeA !== wholeB) return wholeA < wholeB ? -1 : 1;
+  const len = Math.max(fracA.length, fracB.length);
+  const paddedA = fracA.padEnd(len, '0');
+  const paddedB = fracB.padEnd(len, '0');
+  if (paddedA === paddedB) return 0;
+  return paddedA < paddedB ? -1 : 1;
+}
+
 function emptyOffer(): TradeOfferState {
   return { items: [], copper: 0, claudium: 0, woc: '0' };
 }

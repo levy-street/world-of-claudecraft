@@ -6003,7 +6003,8 @@ export const ko_KR: EnTranslations = {
       "wocLinkToList": "WOC로 등록하려면 지갑을 연결하세요.",
       "wocLinkToPay": "WOC로 결제하려면 지갑을 연결하세요.",
       "wocPriceInvalid": "유효한 WOC 가격을 입력하세요.",
-      "awaitingPayment": "해당 물품은 결제 대기 중입니다."
+      "awaitingPayment": "해당 물품은 결제 대기 중입니다.",
+      "pendingPurchaseFirst": "진행 중인 구매를 먼저 완료하세요."
     },
     "loot": {
       "takeAll": "모두 가져가기",

@@ -1185,6 +1185,10 @@ export class GameServer {
   // older snapshot over a newer one. Snapshots are captured inside the queued
   // thunk, so commit order equals capture order equals freshness order.
   private readonly enqueueMarketWrite = createSerialWriter();
+  // Throttle for the market-blob size warning in saveMarket (r4#2): the blob
+  // is rewritten wholesale on every save, so growth past 1 MiB is worth one
+  // log line per minute, not one per save.
+  private lastMarketBlobWarnAtMs = 0;
   private restartCountdownStartedAt: number | null = null;
   private readonly restartCountdownTimers: NodeJS.Timeout[] = [];
   private readonly startedAt = Date.now();
@@ -3122,7 +3126,20 @@ export class GameServer {
 
   async saveMarket(): Promise<void> {
     try {
-      await this.enqueueMarketWrite(() => saveMarketState(this.sim.serializeMarket()));
+      await this.enqueueMarketWrite(() => {
+        const save = this.sim.serializeMarket();
+        // Observability for the wholesale-rewrite blob (r4#2): every external
+        // purchase forces two full-blob writes through this shared FIFO
+        // writer, so crossing 1 MiB deserves a (once-a-minute) warning.
+        const bytes = JSON.stringify(save).length;
+        if (bytes > 1024 * 1024 && Date.now() - this.lastMarketBlobWarnAtMs > 60_000) {
+          this.lastMarketBlobWarnAtMs = Date.now();
+          console.warn(
+            `market blob is ${bytes} bytes (over 1 MiB); every save rewrites it wholesale through the shared market/mail writer`,
+          );
+        }
+        return saveMarketState(save);
+      });
     } catch (err) {
       console.error('failed to save world market:', err);
     }

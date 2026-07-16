@@ -10861,6 +10861,7 @@ export class Hud {
       'Link a wallet to pay with WOC.': 'itemUi.errors.wocLinkToPay',
       'Name a valid WOC price.': 'itemUi.errors.wocPriceInvalid',
       'That lot is awaiting payment.': 'itemUi.errors.awaitingPayment',
+      'Finish your pending purchase first.': 'itemUi.errors.pendingPurchaseFirst',
       "You can't assist yourself.": 'hud.errors.assistSelf',
       'Assist whom? Target a player or use /assist <name>.': 'hud.errors.assistWhom',
       'Invite whom? Usage: /invite <name>.': 'hudChrome.party.inviteUsage',

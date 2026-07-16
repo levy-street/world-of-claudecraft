@@ -8,6 +8,9 @@ import { describe, expect, it } from 'vitest';
 // the pure core (no duplicated market_filters logic).
 const painter = readFileSync(new URL('../src/ui/market_window.ts', import.meta.url), 'utf8');
 const core = readFileSync(new URL('../src/ui/market_view.ts', import.meta.url), 'utf8');
+// The $WOC payment panel is SHARED with the trade window (r7#2): the wallet
+// link + copy controls live in payment_panel.ts, called by both painters.
+const paymentPanel = readFileSync(new URL('../src/ui/payment_panel.ts', import.meta.url), 'utf8');
 
 describe('market_window: no magic values', () => {
   it('carries no literal color in TS (colors live in the extracted stylesheet/tokens)', () => {
@@ -187,13 +190,18 @@ describe('market_window: multi-currency denominations (AH-P4)', () => {
     expect(painter).toContain('itemUi.market.buyWocConfirmBody');
   });
 
-  it('renders the pending panel reusing the trade payment-panel classes with wallet + copy actions', () => {
+  it('renders the pending panel through the SHARED payment panel (trade classes, wallet + copy actions)', () => {
     expect(painter).toContain('buildPendingPanel');
     expect(painter).toContain('trade-woc-pay');
-    expect(painter).toContain('hud.trade.openInWallet');
-    expect(painter).toContain('hud.trade.copyLink');
     expect(painter).toContain('itemUi.market.wocPayPrompt');
-    expect(painter).toContain('this.deps.copyToClipboard(uri)');
+    // the wallet link + copy controls come from the one shared builder both
+    // the market and trade windows call (payment_panel.ts, r7#2)
+    expect(painter).toContain('buildWocPayPanel');
+    expect(paymentPanel).toContain('trade-woc-pay-link');
+    expect(paymentPanel).toContain('trade-woc-pay-copy');
+    expect(paymentPanel).toContain('hud.trade.openInWallet');
+    expect(paymentPanel).toContain('hud.trade.copyLink');
+    expect(paymentPanel).toContain('deps.copyToClipboard(uri)');
     // the sig-driven refresh reacts to the pending purchase appearing/clearing
     expect(painter).toContain('info?.myPendingPurchase');
   });

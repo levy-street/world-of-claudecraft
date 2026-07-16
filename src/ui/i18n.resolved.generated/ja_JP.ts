@@ -6003,7 +6003,8 @@ export const ja_JP: EnTranslations = {
       "wocLinkToList": "WOCで出品するにはウォレットを連携してください。",
       "wocLinkToPay": "WOCで支払うにはウォレットを連携してください。",
       "wocPriceInvalid": "有効なWOC価格を指定してください。",
-      "awaitingPayment": "このロットは支払い待ちです。"
+      "awaitingPayment": "このロットは支払い待ちです。",
+      "pendingPurchaseFirst": "保留中の購入を先に完了してください。"
     },
     "loot": {
       "takeAll": "すべて取る",

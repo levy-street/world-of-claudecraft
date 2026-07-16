@@ -2163,6 +2163,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.errors.wocLinkToPay': '綁定錢包後才能用 WOC 付款。',
   'itemUi.errors.wocPriceInvalid': '請輸入有效的 WOC 價格。',
   'itemUi.errors.awaitingPayment': '該拍品正在等待付款。',
+  'itemUi.errors.pendingPurchaseFirst': '請先完成待處理的購買。',
   'itemUi.loot.takeAll': '全部拾取',
   'itemUi.loot.close': '關閉戰利品',
   'itemUi.lootRoll.title': '為戰利品擲骰',

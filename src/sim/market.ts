@@ -19,7 +19,7 @@ import {
 } from './market_query';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
-import { normalizeWocAmount } from './social/trade';
+import { compareWocAmounts, normalizeWocAmount } from './social/trade';
 import { dist2d, type Entity, INTERACT_RANGE, type InvSlot, type ItemDef } from './types';
 
 const MARKET_RANGE = INTERACT_RANGE + 2; // you must stand at the Merchant to deal
@@ -599,6 +599,13 @@ export class Market {
       this.ctx.error(meta.entityId, 'You are too far from the Merchant.');
       return;
     }
+    // An explicit quantity below 1 is a malformed/hostile client, refused
+    // outright rather than coerced to 1 (r3 nit#6). An absent or non-finite
+    // quantity keeps its established whole-remainder meaning.
+    if (quantity !== undefined && Number.isFinite(quantity) && Math.floor(quantity) < 1) {
+      this.ctx.error(meta.entityId, 'Name how many you wish to sell.');
+      return;
+    }
     const idx = this.marketListings.findIndex((l) => l.id === listingId);
     if (idx < 0) {
       this.ctx.error(meta.entityId, 'That listing is no longer available.');
@@ -727,6 +734,16 @@ export class Market {
   ): void {
     const rails = this.ctx.tradeRails(meta.entityId);
     const buyerKey = this.marketSellerKey(meta);
+    // One external purchase at a time per buyer (r3#3, r6#1): the payment
+    // panel only ever surfaces the FIRST pending (myPendingPurchase), so a
+    // second would be blind and unpayable, and a pending is otherwise a free,
+    // renewable lock on another seller's lot.
+    for (const l of this.marketListings) {
+      if (l.pending !== undefined && l.denom !== 'copper' && l.pending.buyerKey === buyerKey) {
+        this.ctx.error(meta.entityId, 'Finish your pending purchase first.');
+        return;
+      }
+    }
     if (listing.denom === 'claudium') {
       if (!rails.claudium.available) {
         this.ctx.error(meta.entityId, 'Claudium listings are not available.');
@@ -838,6 +855,15 @@ export class Market {
     return this.marketListings
       .filter((l) => l.pending !== undefined && l.denom !== 'copper')
       .map((l) => this.pendingRecordOf(l));
+  }
+
+  // The buyer's CURRENT live pid for a stable buyerKey, or null when offline
+  // (the myPendingPurchase key resolution, exposed for the server orchestrator:
+  // a relog mints a new pid but keeps the character-id-shaped key, and the
+  // payment request / completion force-save must follow the live session).
+  marketBuyerPid(buyerKey: string): number | null {
+    const meta = this.metaByMarketSellerKey(buyerKey);
+    return meta ? meta.entityId : null;
   }
 
   private pendingRecordOf(l: MarketListing): MarketPendingRecord {
@@ -1032,6 +1058,9 @@ export class Market {
       this.ctx.error(meta.entityId, 'That listing is no longer available.');
       return;
     }
+    // Unreachable by construction (only fixed claudium/woc rows can carry a
+    // pending, and bids are refused on non-auction rows below); kept as
+    // defense-in-depth for a future external-denomination auction shape.
     if (listing.pending) {
       this.ctx.error(meta.entityId, 'That lot is awaiting payment.');
       return;
@@ -1247,12 +1276,29 @@ export class Market {
         : (l.pricePerUnit ?? l.price);
     const unitDen = (l: MarketListing): number =>
       l.kind === 'auction' || l.pricePerUnit !== undefined ? 1 : Math.max(1, l.count);
+    // priceAsc groups by denomination first (copper, then claudium, then woc):
+    // copper/claudium/WOC asks are incommensurable (no exchange rate exists
+    // sim-side), and a WOC row's `price` is 0 by construction, so a raw
+    // cross-denomination compare would pin every WOC lot to the front (r5#1).
+    const denomRank = (l: MarketListing): number =>
+      l.denom === 'copper' ? 0 : l.denom === 'claudium' ? 1 : 2;
     const secondsLeftOf = (l: MarketListing): number =>
       l.house || !Number.isFinite(l.expiresAt)
         ? -1
         : Math.max(0, Math.round(l.expiresAt - this.ctx.time));
     const sorted = [...matched].sort((a, b) => {
       if (query.sort === 'priceAsc') {
+        const byDenom = denomRank(a) - denomRank(b);
+        if (byDenom !== 0) return byDenom;
+        if (a.denom === 'woc') {
+          // Opaque normalized decimal strings, compared without arithmetic;
+          // an unbuyable row (ask failed re-normalization on load) sorts last.
+          if (a.priceWoc === undefined || b.priceWoc === undefined) {
+            if (a.priceWoc !== b.priceWoc) return a.priceWoc === undefined ? 1 : -1;
+            return b.id - a.id;
+          }
+          return compareWocAmounts(a.priceWoc, b.priceWoc) || b.id - a.id;
+        }
         return unitNum(a) * unitDen(b) - unitNum(b) * unitDen(a) || b.id - a.id;
       }
       if (query.sort === 'timeLeft') {

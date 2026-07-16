@@ -16,12 +16,8 @@ import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { formatMoney as formatLocalizedMoney, formatNumber, t } from './i18n';
 import type { PainterHostPresentation } from './painter_host';
-import type {
-  TradeItemRowModel,
-  TradeSettleModel,
-  TradeViewModel,
-  TradeWocPayModel,
-} from './trade_view';
+import { buildWocPayPanel } from './payment_panel';
+import type { TradeItemRowModel, TradeSettleModel, TradeViewModel } from './trade_view';
 import { svgIcon } from './ui_icons';
 
 /**
@@ -151,30 +147,6 @@ function buildSettlePanel(settle: TradeSettleModel | null): HTMLElement {
   ];
   for (const row of rows) if (row) panel.appendChild(row);
   return panel;
-}
-
-function buildWocPayPanel(wocPay: TradeWocPayModel, deps: TradeWindowDeps): HTMLElement {
-  const box = document.createElement('div');
-  box.className = 'trade-woc-pay';
-  const prompt = document.createElement('div');
-  prompt.className = 'trade-woc-pay-prompt';
-  prompt.textContent = t('hud.trade.wocPayPrompt', { amount: wocPay.amountUi });
-  box.appendChild(prompt);
-  const link = document.createElement('a');
-  link.className = 'trade-woc-pay-link btn';
-  link.href = wocPay.uri;
-  link.textContent = t('hud.trade.openInWallet');
-  box.appendChild(link);
-  const copy = document.createElement('button');
-  copy.type = 'button';
-  copy.className = 'btn trade-woc-pay-copy';
-  copy.textContent = t('hud.trade.copyLink');
-  // The confirmation ("Payment link copied.") is a toast, owned by Hud
-  // (deps.copyToClipboard), so this button stays a static label rather than
-  // holding its own transient-text timer.
-  copy.addEventListener('click', () => deps.copyToClipboard(wocPay.uri));
-  box.appendChild(copy);
-  return box;
 }
 
 /** Paint #trade-window from a prepared view. Hides the window on 'closed'; the
@@ -338,7 +310,15 @@ export function renderTradeWindow(
     });
   } else {
     el.appendChild(buildSettlePanel(view.settle));
-    if (view.wocPay) el.appendChild(buildWocPayPanel(view.wocPay, deps));
+    if (view.wocPay) {
+      el.appendChild(
+        buildWocPayPanel(
+          t('hud.trade.wocPayPrompt', { amount: view.wocPay.amountUi }),
+          view.wocPay.uri,
+          deps,
+        ),
+      );
+    }
     // Settling is not necessarily un-cancellable: the server orchestrator (not
     // the sim) decides whether trade_cancel still unwinds the escrow at this
     // phase (refused only once a $WOC leg has verified on-chain). The button

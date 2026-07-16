@@ -6003,7 +6003,8 @@ export const zh_TW: EnTranslations = {
       "wocLinkToList": "綁定錢包後才能以 WOC 上架。",
       "wocLinkToPay": "綁定錢包後才能用 WOC 付款。",
       "wocPriceInvalid": "請輸入有效的 WOC 價格。",
-      "awaitingPayment": "該拍品正在等待付款。"
+      "awaitingPayment": "該拍品正在等待付款。",
+      "pendingPurchaseFirst": "請先完成待處理的購買。"
     },
     "loot": {
       "takeAll": "全部拾取",

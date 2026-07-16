@@ -2261,6 +2261,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.errors.wocLinkToPay': 'WOCで支払うにはウォレットを連携してください。',
   'itemUi.errors.wocPriceInvalid': '有効なWOC価格を指定してください。',
   'itemUi.errors.awaitingPayment': 'このロットは支払い待ちです。',
+  'itemUi.errors.pendingPurchaseFirst': '保留中の購入を先に完了してください。',
   'itemUi.loot.takeAll': 'すべて取る',
   'itemUi.loot.close': '戦利品を閉じる',
   'itemUi.lootRoll.title': '戦利品ロール',

@@ -5771,6 +5771,7 @@ export type TranslationKeyFlat =
   | 'itemUi.errors.notYourListing'
   | 'itemUi.errors.nothingToCollect'
   | 'itemUi.errors.ownListing'
+  | 'itemUi.errors.pendingPurchaseFirst'
   | 'itemUi.errors.priceTooHigh'
   | 'itemUi.errors.tooFar'
   | 'itemUi.errors.tooManyListings'

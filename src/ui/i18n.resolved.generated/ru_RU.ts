@@ -6003,7 +6003,8 @@ export const ru_RU: EnTranslations = {
       "wocLinkToList": "Привяжите кошелёк, чтобы выставлять лоты за WOC.",
       "wocLinkToPay": "Привяжите кошелёк, чтобы платить WOC.",
       "wocPriceInvalid": "Укажите корректную цену в WOC.",
-      "awaitingPayment": "Этот лот ожидает оплаты."
+      "awaitingPayment": "Этот лот ожидает оплаты.",
+      "pendingPurchaseFirst": "Сначала завершите незавершённую покупку."
     },
     "loot": {
       "takeAll": "Взять все",

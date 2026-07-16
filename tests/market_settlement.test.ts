@@ -79,6 +79,10 @@ interface StubState {
   // (the economy service's exactly-once contract).
   transferOutcomes: Map<string, ClaudiumTransferResult>;
   transferFail: boolean;
+  // The economy service is unreachable: every transfer reads ok:false with
+  // reason 'unavailable' and nothing is recorded on the service ledger.
+  // Mutable so a test can bring the service back mid-flight.
+  transferUnavailable: boolean;
   wocResults: Map<string, VerifyWocResult>;
   clock: { value: number };
   refs: string[];
@@ -97,6 +101,10 @@ function buildOrchestrator(
   opts: {
     cfg?: TradeRailsConfig;
     transferFail?: boolean;
+    transferUnavailable?: boolean;
+    // The FIRST saveMarket call rejects (the anchor write): the header
+    // invariant says an unanchored transfer never executes.
+    saveMarketFailFirst?: boolean;
     walletFor?: (accountId: number) => string | null;
     missingSession?: (pid: number) => boolean;
   } = {},
@@ -106,6 +114,7 @@ function buildOrchestrator(
     transferCalls: [],
     transferOutcomes: new Map(),
     transferFail: opts.transferFail ?? false,
+    transferUnavailable: opts.transferUnavailable ?? false,
     wocResults: new Map(),
     clock: { value: 1_000_000 },
     refs: [],
@@ -127,6 +136,7 @@ function buildOrchestrator(
   };
 
   const saveMarket = vi.fn(async () => {});
+  if (opts.saveMarketFailFirst) saveMarket.mockRejectedValueOnce(new Error('anchor write failed'));
   const forceSave = vi.fn(async () => {});
   const walletFor = opts.walletFor ?? ((accountId: number) => `wallet-${accountId}`);
 
@@ -151,6 +161,9 @@ function buildOrchestrator(
     },
     async transferClaudium(from, to, amount, dedupeKey) {
       state.transferCalls.push({ from, to, amount, dedupeKey });
+      // Unreachable service: nothing answers and nothing lands on the service
+      // ledger, not even a remembered outcome (proxy maps this to 'unavailable').
+      if (state.transferUnavailable) return { ok: false, reason: 'unavailable' };
       const prior = state.transferOutcomes.get(dedupeKey);
       if (prior) return prior; // idempotent replay: the original outcome
       const outcome: ClaudiumTransferResult = state.transferFail
@@ -235,7 +248,12 @@ describe('MarketSettlements: claudium purchases', () => {
 
     // one idempotent service transfer, buyer account -> seller account
     expect(state.transferCalls).toEqual([
-      { from: buyer + 1000, to: seller + 1000, amount: 20, dedupeKey: `market-${listingId}-1` },
+      {
+        from: buyer + 1000,
+        to: seller + 1000,
+        amount: 20,
+        dedupeKey: `market-test-realm-${listingId}-1`,
+      },
     ]);
     // goods in the BUYER'S collection box; deposit refund (2 x 4c) to the seller
     expect(collections(sim).get(String(buyer))?.items).toEqual([
@@ -249,7 +267,7 @@ describe('MarketSettlements: claudium purchases', () => {
     expect(state.ledger).toHaveLength(1);
     expect(state.ledger[0]).toMatchObject({
       settlementId: null,
-      context: `market-${listingId}-1`,
+      context: `market-test-realm-${listingId}-1`,
       charAName: 'Buyer',
       charBName: 'Seller',
       itemsB: [{ itemId: 'bone_fragments', count: 2 }],
@@ -288,6 +306,79 @@ describe('MarketSettlements: claudium purchases', () => {
 
     expect(state.transferCalls).toEqual([]);
     expect(sim.marketListings.find((l) => l.id === listingId)?.pending).toBeUndefined();
+  });
+
+  it('an UNAVAILABLE transfer keeps the pending locked and retries the SAME dedupe key until the service answers', async () => {
+    const sim = makeSim();
+    const { seller, buyer, listingId } = listAndBuyer(sim, 'claudium', {
+      count: 2,
+      pricePerUnit: 10,
+    });
+    const h = buildOrchestrator(sim, { transferUnavailable: true });
+
+    await startPurchase(sim, h.orch, listingId, buyer, 2);
+
+    // ambiguous failure: the transfer MAY have committed, so the lot stays
+    // locked (never marketPendingFail) and nothing is delivered yet
+    const key = `market-test-realm-${listingId}-1`;
+    expect(sim.marketListings.find((l) => l.id === listingId)?.pending).toBeTruthy();
+    expect(h.state.transferCalls).toEqual([
+      { from: buyer + 1000, to: seller + 1000, amount: 20, dedupeKey: key },
+    ]);
+    expect(h.state.ledger).toEqual([]);
+    expect(sim.events.some((e) => e.type === 'marketPaymentExpired')).toBe(false);
+
+    // the ticker retries the SAME key while the service stays down
+    await h.orch.pollOnce();
+    expect(h.state.transferCalls).toHaveLength(2);
+    expect(h.state.transferCalls[1].dedupeKey).toBe(key);
+    expect(sim.marketListings.find((l) => l.id === listingId)?.pending).toBeTruthy();
+
+    // even past the timeout window the pending is NEVER auto-failed
+    h.state.clock.value += WOC_CFG.timeoutMs + 1;
+    await h.orch.pollOnce();
+    expect(sim.marketListings.find((l) => l.id === listingId)?.pending).toBeTruthy();
+
+    // the service comes back: the next retry completes with the same key
+    h.state.transferUnavailable = false;
+    await h.orch.pollOnce();
+    expect(sim.marketListings.some((l) => l.id === listingId)).toBe(false); // whole stack sold
+    expect(collections(sim).get(String(buyer))?.items).toEqual([
+      { itemId: 'bone_fragments', count: 2 },
+    ]);
+    expect(h.state.ledger).toHaveLength(1);
+    expect(h.state.ledger[0]).toMatchObject({ context: key, claudiumA: 20 });
+    expect(h.state.transferCalls.every((c) => c.dedupeKey === key)).toBe(true);
+  });
+
+  it('the claudium concurrency cap insta-fails the 33rd concurrent purchase (reservation counter)', async () => {
+    const sim = makeSim();
+    const { buyer, listingId } = listAndBuyer(sim, 'claudium', { count: 2, pricePerUnit: 10 });
+    const { orch, state } = buildOrchestrator(sim);
+    // model 32 already-open purchases holding every slot
+    (orch as unknown as { claudiumReservations: number }).claudiumReservations = 32;
+
+    await startPurchase(sim, orch, listingId, buyer, 1);
+
+    const listing = sim.marketListings.find((l) => l.id === listingId)!;
+    expect(listing.pending).toBeUndefined(); // unlocked, buyer can retry later
+    expect(state.transferCalls).toEqual([]); // the service was never touched
+    expect(sim.events.some((e) => e.type === 'marketPaymentExpired')).toBe(true);
+  });
+
+  it('a failed anchor save fails the purchase closed: an unanchored transfer never executes', async () => {
+    const sim = makeSim();
+    const { buyer, listingId } = listAndBuyer(sim, 'claudium', { count: 2, pricePerUnit: 10 });
+    const { orch, state } = buildOrchestrator(sim, { saveMarketFailFirst: true });
+
+    await startPurchase(sim, orch, listingId, buyer, 2);
+
+    expect(state.transferCalls).toEqual([]); // no money ever moved
+    const listing = sim.marketListings.find((l) => l.id === listingId)!;
+    expect(listing.pending).toBeUndefined(); // failed closed via marketPendingFail
+    expect(listing.count).toBe(2);
+    expect(state.ledger).toEqual([]);
+    expect(sim.events.some((e) => e.type === 'marketPaymentExpired')).toBe(true);
   });
 });
 
@@ -330,7 +421,7 @@ describe('MarketSettlements: woc purchases', () => {
     expect(collections(sim).get(String(seller))?.copper).toBe(8); // deposit only
     expect(state.ledger).toHaveLength(1);
     expect(state.ledger[0]).toMatchObject({
-      context: `market-${listingId}-1`,
+      context: `market-test-realm-${listingId}-1`,
       wocA: '1.5',
       claudiumA: 0,
     });
@@ -397,6 +488,86 @@ describe('MarketSettlements: woc purchases', () => {
     expect(sim.marketListings.find((l) => l.id === listingId)?.pending).toBeUndefined();
     expect(state.refs).toEqual([]);
   });
+
+  it('a missing BUYER wallet link fails the pending before any request renders', async () => {
+    const sim = makeSim();
+    const { buyer, listingId } = listAndBuyer(sim, 'woc', { count: 1, priceWoc: '2' });
+    const { orch, state } = buildOrchestrator(sim, {
+      walletFor: (accountId) => (accountId === buyer + 1000 ? null : `wallet-${accountId}`),
+    });
+
+    await startPurchase(sim, orch, listingId, buyer);
+
+    expect(sim.marketListings.find((l) => l.id === listingId)?.pending).toBeUndefined();
+    expect(state.refs).toEqual([]);
+  });
+
+  it('a failed anchor save fails the woc purchase closed: no payment request survives', async () => {
+    const sim = makeSim();
+    const { buyer, listingId } = listAndBuyer(sim, 'woc', { count: 2, priceWoc: '1.5' });
+    const { orch, state } = buildOrchestrator(sim, { saveMarketFailFirst: true });
+
+    await startPurchase(sim, orch, listingId, buyer);
+
+    const listing = sim.marketListings.find((l) => l.id === listingId)!;
+    expect(listing.pending).toBeUndefined(); // failed closed + unlocked
+    expect(orch.wocPayFor(buyer, listingId)).toBeNull(); // never tracked or enriched
+    expect(state.ledger).toEqual([]);
+    expect(sim.events.some((e) => e.type === 'marketPaymentExpired')).toBe(true);
+  });
+
+  it('an unpaid timeout starts a per-buyer cooldown: an immediate retry is refused, an expired cooldown allows again', async () => {
+    const sim = makeSim();
+    const { buyer, listingId } = listAndBuyer(sim, 'woc', { count: 2, priceWoc: '1.5' });
+    const { orch, state } = buildOrchestrator(sim);
+    await startPurchase(sim, orch, listingId, buyer);
+    expect(state.refs).toEqual(['ref0']);
+
+    // the buyer never pays: the timeout fails the pending and starts the cooldown
+    state.clock.value += WOC_CFG.timeoutMs + 1;
+    await orch.pollOnce();
+    expect(sim.marketListings.find((l) => l.id === listingId)?.pending).toBeUndefined();
+
+    // a fresh purchase during the cooldown is refused via the busy path
+    await startPurchase(sim, orch, listingId, buyer);
+    expect(sim.marketListings.find((l) => l.id === listingId)?.pending).toBeUndefined();
+    expect(state.refs).toEqual(['ref0']); // no new payment request was minted
+    expect(sim.events.some((e) => e.type === 'marketPaymentExpired')).toBe(true);
+
+    // once the cooldown lapses the same buyer may start again
+    state.clock.value += 120_000 + 1;
+    await startPurchase(sim, orch, listingId, buyer);
+    expect(sim.marketListings.find((l) => l.id === listingId)?.pending).toBeTruthy();
+    expect(state.refs).toEqual(['ref0', 'ref1']);
+  });
+
+  it('a relog (new pid, same character) still receives the payment request; completion force-saves the live session', async () => {
+    const sim = makeSim();
+    const { buyer, listingId } = listAndBuyer(sim, 'woc', { count: 2, priceWoc: '1.5' });
+    const { orch, state, forceSave } = buildOrchestrator(sim);
+    await startPurchase(sim, orch, listingId, buyer);
+    expect(orch.wocPayFor(buyer, listingId)).toBeTruthy();
+
+    // relog: the session drops and a NEW pid resumes the same character
+    sim.removePlayer(buyer);
+    const relogged = sim.addPlayer('mage', 'Buyer', { characterId: buyer });
+    expect(relogged).not.toBe(buyer);
+
+    // the payment request follows the LIVE session, not the stale pid
+    expect(orch.wocPayFor(buyer, listingId)).toBeNull();
+    expect(orch.wocPayFor(relogged, listingId)).toMatchObject({
+      reference: 'ref0',
+      amountUi: '1.5',
+    });
+
+    // the payment lands: completion force-saves the live session's pid
+    state.wocResults.set('1.5', { signature: 'sigRelog' });
+    await orch.pollOnce();
+    expect(collections(sim).get(String(buyer))?.items).toEqual([
+      { itemId: 'bone_fragments', count: 2 },
+    ]);
+    expect(forceSave).toHaveBeenCalledWith(relogged);
+  });
 });
 
 describe('MarketSettlements: boot recovery from the persisted market blob', () => {
@@ -427,7 +598,7 @@ describe('MarketSettlements: boot recovery from the persisted market blob', () =
     expect(bootA.state.ledger).toHaveLength(1);
     expect(bootA.state.ledger[0]).toMatchObject({
       wocA: '1.5',
-      context: `market-${a.listingId}-1`,
+      context: `market-test-realm-${a.listingId}-1`,
     });
 
     // unpaid: never resumes a wait across a restart; the lot unlocks
@@ -474,12 +645,17 @@ describe('MarketSettlements: boot recovery from the persisted market blob', () =
       sellerAccountId: seller + 1000,
     });
     const boot = reboot(sim.serializeMarket());
-    boot.state.transferOutcomes.set(`market-${listingId}-1`, { ok: true });
+    boot.state.transferOutcomes.set(`market-test-realm-${listingId}-1`, { ok: true });
 
     await boot.orch.recoverPendingPurchases();
 
     expect(boot.state.transferCalls).toEqual([
-      { from: buyer + 1000, to: seller + 1000, amount: 20, dedupeKey: `market-${listingId}-1` },
+      {
+        from: buyer + 1000,
+        to: seller + 1000,
+        amount: 20,
+        dedupeKey: `market-test-realm-${listingId}-1`,
+      },
     ]);
     expect(boot.sim.marketListings.some((l) => l.id === listingId)).toBe(false); // whole stack sold
     expect(collections(boot.sim).get(String(buyer))?.items).toEqual([
@@ -488,7 +664,7 @@ describe('MarketSettlements: boot recovery from the persisted market blob', () =
     expect(boot.state.ledger).toHaveLength(1);
     expect(boot.state.ledger[0]).toMatchObject({
       claudiumA: 20,
-      context: `market-${listingId}-1`,
+      context: `market-test-realm-${listingId}-1`,
     });
   });
 
@@ -504,5 +680,42 @@ describe('MarketSettlements: boot recovery from the persisted market blob', () =
     const listing = boot.sim.marketListings.find((l) => l.id === listingId)!;
     expect(listing.pending).toBeUndefined();
     expect(listing.count).toBe(2);
+  });
+
+  it('boot recovery with the service DOWN keeps the claudium pending locked, then completes when it answers', async () => {
+    const sim = makeSim();
+    const { seller, buyer, listingId } = listAndBuyer(sim, 'claudium', {
+      count: 2,
+      pricePerUnit: 10,
+    });
+    // Crash model: anchored, transfer EXECUTED on the service ledger, process
+    // died before completion; at the next boot the service is unreachable.
+    sim.marketBuy(listingId, 2, buyer);
+    sim.marketPendingAttach(listingId, {
+      buyerAccountId: buyer + 1000,
+      sellerAccountId: seller + 1000,
+    });
+    const key = `market-test-realm-${listingId}-1`;
+    const boot = reboot(sim.serializeMarket(), { transferUnavailable: true });
+    boot.state.transferOutcomes.set(key, { ok: true });
+
+    await boot.orch.recoverPendingPurchases();
+
+    // KEPT, not failed: the money already moved and only the service knows
+    const listing = boot.sim.marketListings.find((l) => l.id === listingId)!;
+    expect(listing.pending).toBeTruthy();
+    expect(boot.state.ledger).toEqual([]);
+    expect(collections(boot.sim).get(String(buyer))).toBeUndefined();
+
+    // the service returns: the ticker replays the SAME key and completes
+    boot.state.transferUnavailable = false;
+    await boot.orch.pollOnce();
+    expect(boot.sim.marketListings.some((l) => l.id === listingId)).toBe(false);
+    expect(collections(boot.sim).get(String(buyer))?.items).toEqual([
+      { itemId: 'bone_fragments', count: 2 },
+    ]);
+    expect(boot.state.ledger).toHaveLength(1);
+    expect(boot.state.ledger[0]).toMatchObject({ context: key, claudiumA: 20 });
+    expect(boot.state.transferCalls.map((c) => c.dedupeKey)).toEqual([key, key]);
   });
 });

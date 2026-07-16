@@ -653,3 +653,19 @@ describe('normalizeWocAmount', () => {
     expect(tradeMod.normalizeWocAmount('1.123456789')).toBe('1.123456789');
   });
 });
+
+describe('compareWocAmounts', () => {
+  it('orders normalized amounts numerically without ever converting to a number', () => {
+    // integer part: length first (a longer integer is always bigger), then digits
+    expect(tradeMod.compareWocAmounts('2', '10')).toBeLessThan(0);
+    expect(tradeMod.compareWocAmounts('10', '2')).toBeGreaterThan(0);
+    expect(tradeMod.compareWocAmounts('9.9', '10')).toBeLessThan(0);
+    expect(tradeMod.compareWocAmounts('123', '124')).toBeLessThan(0);
+    // fractions compare padded to a common length, so '1.5' > '1.05'
+    expect(tradeMod.compareWocAmounts('1.5', '1.05')).toBeGreaterThan(0);
+    expect(tradeMod.compareWocAmounts('1', '1.000000001')).toBeLessThan(0);
+    // equality, including a fractionless amount against itself
+    expect(tradeMod.compareWocAmounts('1.5', '1.5')).toBe(0);
+    expect(tradeMod.compareWocAmounts('7', '7')).toBe(0);
+  });
+});

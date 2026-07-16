@@ -6003,7 +6003,8 @@ export const pt_BR: EnTranslations = {
       "wocLinkToList": "Link a wallet to list for WOC.",
       "wocLinkToPay": "Link a wallet to pay with WOC.",
       "wocPriceInvalid": "Name a valid WOC price.",
-      "awaitingPayment": "That lot is awaiting payment."
+      "awaitingPayment": "That lot is awaiting payment.",
+      "pendingPurchaseFirst": "Finish your pending purchase first."
     },
     "loot": {
       "takeAll": "Pegar tudo",

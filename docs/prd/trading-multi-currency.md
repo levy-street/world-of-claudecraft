@@ -144,6 +144,19 @@ operator reconciles a late payment manually via the on-chain reference recorded 
 row. This is a deliberately narrow, manually-recoverable edge, not an automatic
 fund-loss path.
 
+The World Market's Claudium purchases (server/market_settlement.ts, the same rails)
+are stricter still about ambiguity: the idempotent transfer's dedupe key is
+realm-scoped (market-realm-listing-seq; the listing and purchase counters are
+per-realm while the economy service ledger is account-global), and an AMBIGUOUS
+transfer failure (service unreachable or a lost response, reason 'unavailable')
+never fails the pending purchase, because the transfer may have committed. The lot
+stays locked and anchored while the same dedupe key retries on the poll ticker,
+live and across restarts, until the service answers either way; past the timeout
+window it keeps retrying and logs loudly every poll. Only a definitive service
+refusal (a concrete reason such as insufficient balance) fails the pending closed
+and unlocks the lot. The lock persisting until the service answers is the intended
+conservative behavior: an ambiguous external failure never unlocks goods.
+
 ## Determinism and host parity
 
 The sim never fetches a balance or talks to a service: the server injects a rails

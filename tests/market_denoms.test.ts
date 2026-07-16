@@ -251,6 +251,31 @@ describe('World Market denominations: external purchase start (marketBuy)', () =
     expect(starts).toHaveLength(1);
     expect(starts[0]).toMatchObject({ denom: 'woc', quantity: 3, costWoc: '2' });
   });
+
+  it('refuses a second external purchase while the buyer already has one pending', () => {
+    const sim = makeWorld({ claudium: true, balance: 1000, woc: true, linked: true });
+    const a = listExternal(sim, 'claudium', { count: 2, pricePerUnit: 10 });
+    const b = listExternal(sim, 'woc', { count: 1, priceWoc: '2' });
+    const buyer = addBuyer(sim, 'Buyer');
+    sim.marketBuy(a.listingId, 1, buyer);
+    expect(sim.marketListings.find((l) => l.id === a.listingId)?.pending).toBeTruthy();
+    sim.events.length = 0;
+
+    // a second pending would be blind (only the FIRST surfaces on the wire)
+    // and a free renewable lock on another seller's lot: refused outright
+    sim.marketBuy(b.listingId, undefined, buyer);
+
+    expect(errorsSince(sim)).toEqual(['Finish your pending purchase first.']);
+    expect(sim.marketListings.find((l) => l.id === b.listingId)?.pending).toBeUndefined();
+    expect(eventsOf(sim, 'marketPurchaseStart')).toHaveLength(0);
+
+    // once the first pending resolves, the buyer may start the next purchase
+    sim.marketPendingFail(a.listingId);
+    sim.events.length = 0;
+    sim.marketBuy(b.listingId, undefined, buyer);
+    expect(errorsSince(sim)).toEqual([]);
+    expect(sim.marketListings.find((l) => l.id === b.listingId)?.pending).toBeTruthy();
+  });
 });
 
 describe('World Market denominations: the pending lock', () => {
@@ -367,6 +392,47 @@ describe('World Market denominations: pending lifecycle (server-called)', () => 
     expect(collections(sim).get('ghost-9')?.items).toEqual([{ itemId: 'wolf_fang', count: 2 }]);
     expect(collections(sim).get('ghost-7')?.copper).toBe(6);
     expect(sim.marketListings.some((l) => l.id === 9001)).toBe(false); // spliced at 0
+  });
+
+  it('marketPendingComplete letters an OFFLINE claudium seller with the account letter, not the wallet one', () => {
+    const sim = makeWorld({ claudium: true, balance: 1000 });
+    sim.addPlayer('warrior', 'Somebody'); // keep the world alive
+    sim.marketListings.push({
+      id: 9002,
+      sellerKey: 'ghost-7',
+      sellerName: 'Ghostseller',
+      itemId: 'wolf_fang',
+      count: 2,
+      price: 20,
+      kind: 'fixed',
+      pricePerUnit: 10,
+      durationSeconds: 3600,
+      depositPerUnit: 3,
+      expiresAt: sim.time + 3600,
+      house: false,
+      denom: 'claudium',
+      pending: {
+        buyerKey: 'ghost-9',
+        buyerName: 'Ghostbuyer',
+        quantity: 2,
+        startedAt: sim.time,
+        purchaseSeq: 1,
+      },
+    });
+    const sendLetter = vi.spyOn(sim.postOffice, 'sendLetter');
+
+    expect(sim.marketPendingComplete(9002)).toBe(true);
+
+    // the Claudium body says "your Claudium balance", never "linked wallet"
+    expect(sendLetter).toHaveBeenCalledTimes(1);
+    expect(sendLetter).toHaveBeenCalledWith(
+      'ghost-7',
+      'Ghostseller',
+      AUCTION_LETTERS.sold_account,
+      'system',
+    );
+    expect(collections(sim).get('ghost-9')?.items).toEqual([{ itemId: 'wolf_fang', count: 2 }]);
+    expect(collections(sim).get('ghost-7')?.copper).toBe(6);
   });
 
   it('marketPendingFail unlocks the lot and tells the online buyer via marketPaymentExpired', () => {

@@ -2281,6 +2281,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.errors.wocLinkToPay': 'Привяжите кошелёк, чтобы платить WOC.',
   'itemUi.errors.wocPriceInvalid': 'Укажите корректную цену в WOC.',
   'itemUi.errors.awaitingPayment': 'Этот лот ожидает оплаты.',
+  'itemUi.errors.pendingPurchaseFirst': 'Сначала завершите незавершённую покупку.',
   'itemUi.loot.takeAll': 'Взять все',
   'itemUi.loot.close': 'Закрыть добычу',
   'itemUi.lootRoll.title': 'Бросок за добычу',

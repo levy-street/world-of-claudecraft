@@ -2239,6 +2239,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.errors.wocLinkToPay': 'WOC로 결제하려면 지갑을 연결하세요.',
   'itemUi.errors.wocPriceInvalid': '유효한 WOC 가격을 입력하세요.',
   'itemUi.errors.awaitingPayment': '해당 물품은 결제 대기 중입니다.',
+  'itemUi.errors.pendingPurchaseFirst': '진행 중인 구매를 먼저 완료하세요.',
   'itemUi.loot.takeAll': '모두 가져가기',
   'itemUi.loot.close': '전리품 닫기',
   'itemUi.lootRoll.title': '전리품 주사위',

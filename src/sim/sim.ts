@@ -7599,6 +7599,10 @@ export class Sim {
     return this.market.marketPendingPurchases();
   }
 
+  marketBuyerPid(buyerKey: string): number | null {
+    return this.market.marketBuyerPid(buyerKey);
+  }
+
   serializeMarket(): MarketSave {
     return this.market.serializeMarket();
   }

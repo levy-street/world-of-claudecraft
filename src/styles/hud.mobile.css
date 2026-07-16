@@ -2746,7 +2746,8 @@
   body.mobile-touch .soc-sugg-item,
   body.mobile-touch .trade-item.mine,
   body.mobile-touch #social-window .btn,
-  body.mobile-touch #trade-window .btn {
+  body.mobile-touch #trade-window .btn,
+  body.mobile-touch #market-window .btn {
     min-height: 40px;
     font-size: 16px;
   }

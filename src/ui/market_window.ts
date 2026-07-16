@@ -54,6 +54,7 @@ import {
   marketCollectBadgeCount,
 } from './market_view';
 import type { PainterHostPresentation } from './painter_host';
+import { buildWocPayPanel } from './payment_panel';
 import { lockoutParts, lockoutShape } from './raid_lockout';
 import { svgIcon } from './ui_icons';
 
@@ -903,42 +904,33 @@ export class MarketWindow {
 
   // The awaiting-payment panel for the viewer's OWN pending external purchase:
   // a Claudium purchase settles in one service round-trip (a short notice); a
-  // $WOC purchase renders the server-enriched Solana Pay request, reusing the
-  // trade window's payment-panel pattern + CSS classes (trade-woc-pay*).
+  // $WOC purchase renders the server-enriched Solana Pay request through the
+  // SHARED payment-panel builder (payment_panel.ts, the same panel the trade
+  // window paints) so the two windows can never drift (r7#2), keeping the
+  // trade-woc-pay* CSS classes.
   private buildPendingPanel(pending: MarketPendingPurchaseView): HTMLElement {
     const item = ITEMS[pending.itemId];
     const itemName = item ? itemDisplayName(item) : pending.itemId;
+    if (pending.denom === 'woc' && pending.wocPay) {
+      const panel = buildWocPayPanel(
+        t('itemUi.market.wocPayPrompt', { amount: pending.wocPay.amountUi, item: itemName }),
+        pending.wocPay.uri,
+        this.deps,
+      );
+      panel.classList.add('mkt-pending');
+      return panel;
+    }
+    // Claudium (one service round-trip) and the pre-enrichment $WOC moment
+    // ("preparing payment") are prompt-only: no wallet link or copy button yet.
     const panel = document.createElement('div');
     panel.className = 'mkt-pending trade-woc-pay';
     const prompt = document.createElement('div');
     prompt.className = 'trade-woc-pay-prompt';
-    if (pending.denom === 'claudium') {
-      prompt.textContent = t('itemUi.market.pendingClaudium', { item: itemName });
-      panel.appendChild(prompt);
-      return panel;
-    }
-    if (!pending.wocPay) {
-      prompt.textContent = t('itemUi.market.pendingPreparing', { item: itemName });
-      panel.appendChild(prompt);
-      return panel;
-    }
-    prompt.textContent = t('itemUi.market.wocPayPrompt', {
-      amount: pending.wocPay.amountUi,
-      item: itemName,
-    });
+    prompt.textContent =
+      pending.denom === 'claudium'
+        ? t('itemUi.market.pendingClaudium', { item: itemName })
+        : t('itemUi.market.pendingPreparing', { item: itemName });
     panel.appendChild(prompt);
-    const link = document.createElement('a');
-    link.className = 'trade-woc-pay-link btn';
-    link.href = pending.wocPay.uri;
-    link.textContent = t('hud.trade.openInWallet');
-    panel.appendChild(link);
-    const copy = document.createElement('button');
-    copy.type = 'button';
-    copy.className = 'btn trade-woc-pay-copy';
-    copy.textContent = t('hud.trade.copyLink');
-    const uri = pending.wocPay.uri;
-    copy.addEventListener('click', () => this.deps.copyToClipboard(uri));
-    panel.appendChild(copy);
     return panel;
   }
 

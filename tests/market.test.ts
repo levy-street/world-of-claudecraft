@@ -744,7 +744,7 @@ describe('World Market: durations, deposits, and per-unit partial buys (auction 
     expect(sim.marketInfoFor(seller)!.collectionCopper).toBe(190 + 285); // + floor(300 * 0.95)
   });
 
-  it('clamps a partial-buy quantity into 1..remaining', () => {
+  it('refuses a partial-buy quantity below 1 and clamps an oversized one to the remainder', () => {
     const sim = makeWorld();
     const seller = sim.addPlayer('warrior', 'Seller');
     const buyer = sim.addPlayer('mage', 'Buyer');
@@ -754,12 +754,20 @@ describe('World Market: durations, deposits, and per-unit partial buys (auction 
     sim.players.get(buyer)!.copper = 1000;
     sim.marketList('wolf_fang', 3, 10, seller);
     const listing = sim.marketListings.find((l) => l.sellerKey === marketSellerKey(seller))!;
+    sim.events.length = 0;
 
-    sim.marketBuy(listing.id, 0, buyer); // floors to 1
-    expect(listing.count).toBe(2);
-    expect(copperOf(sim, buyer)).toBe(990);
+    // an explicit ask below 1 is a malformed/hostile client: refused outright,
+    // never coerced to a 1-unit purchase (r3 nit#6)
+    sim.marketBuy(listing.id, 0, buyer);
+    sim.marketBuy(listing.id, -5, buyer);
+    expect(errorsSince(sim)).toEqual([
+      'Name how many you wish to sell.',
+      'Name how many you wish to sell.',
+    ]);
+    expect(listing.count).toBe(3);
+    expect(copperOf(sim, buyer)).toBe(1000);
 
-    sim.marketBuy(listing.id, 99, buyer); // clamps to the remaining 2
+    sim.marketBuy(listing.id, 99, buyer); // clamps to the remaining 3
     expect(copperOf(sim, buyer)).toBe(970);
     expect(sim.marketListings.some((l) => l.id === listing.id)).toBe(false);
   });
@@ -885,6 +893,46 @@ describe('World Market: durations, deposits, and per-unit partial buys (auction 
     expect(ids()).toEqual([12, 10, 11, 13]); // 100s < 500s < 2000s < house (never)
   });
 
+  it('priceAsc groups a mixed-denomination book: copper, then claudium, then woc (decimal-string order)', () => {
+    const sim = makeWorld();
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, viewer);
+    const book = sim.market.marketListings;
+    book.length = 0;
+    const row = (id: number, over: Partial<(typeof book)[number]> = {}): (typeof book)[number] => ({
+      id,
+      sellerKey: 'rival',
+      sellerName: 'Rival',
+      itemId: 'bone_fragments',
+      count: 1,
+      price: 100,
+      kind: 'fixed',
+      durationSeconds: 3600,
+      depositPerUnit: 0,
+      expiresAt: sim.time + 3600,
+      house: false,
+      denom: 'copper',
+      ...over,
+    });
+    book.push(
+      // woc lots carry price 0 by construction: without denomination grouping
+      // they would pin to the very front of "cheapest first"
+      row(20, { denom: 'woc', priceWoc: '10', price: 0 }),
+      row(21, { denom: 'woc', priceWoc: '9.5', price: 0 }),
+      // a 5-claudium ask must never sort "cheaper" than a 50-copper one
+      row(22, { denom: 'claudium', pricePerUnit: 5, price: 5 }),
+      row(23, { denom: 'claudium', pricePerUnit: 50, price: 50 }),
+      row(24, { pricePerUnit: 50, price: 50 }),
+      row(25, { pricePerUnit: 90, price: 90 }),
+    );
+
+    sim.marketSearch(q('', { sort: 'priceAsc' }), viewer);
+    const ids = sim.marketInfoFor(viewer)!.listings.map((l) => l.id);
+    // copper ascending, then claudium ascending, then woc by decimal-string
+    // compare ('9.5' < '10': integer length beats lexicographic '1' < '9')
+    expect(ids).toEqual([24, 25, 22, 23, 21, 20]);
+  });
+
   it('wires secondsLeft on every listing view (-1 for house stock)', () => {
     const sim = makeWorld();
     const seller = sim.addPlayer('warrior', 'Seller');
@@ -947,5 +995,40 @@ describe('World Market: a now-soulbound listing is returned to the seller', () =
     ).marketCollections;
     const coll = collections.get(sellerKey);
     expect(coll?.items.some((s) => s.itemId === 'heroic_mark' && s.count === 3)).toBe(true);
+  });
+
+  it('credits the bidder collection when a soulbound AUCTION row with a live bid is reclaimed on load', () => {
+    const sim = makeWorld();
+    const sellerKey = 'char:99';
+    // an auction of a now-soulbound item, saved with a standing escrowed bid:
+    // the reclaim must return the escrow to the bidder, never destroy it
+    const save = {
+      listings: [
+        {
+          id: 1,
+          sellerKey,
+          sellerName: 'Ada',
+          itemId: 'heroic_mark',
+          count: 1,
+          price: 100,
+          secondsLeft: 1000,
+          kind: 'auction' as const,
+          startingBid: 100,
+          bid: { amount: 250, bidderKey: 'bidder-9', bidderName: 'Bea' },
+        },
+      ],
+      collections: [],
+      nextListingId: 2,
+    };
+    sim.market.loadMarket(save as never);
+
+    expect(sim.market.marketListings.some((l) => l.itemId === 'heroic_mark')).toBe(false);
+    const collections = (
+      sim.market as unknown as {
+        marketCollections: Map<string, { copper: number; items: { itemId: string }[] }>;
+      }
+    ).marketCollections;
+    expect(collections.get('bidder-9')?.copper).toBe(250); // escrow refunded
+    expect(collections.get(sellerKey)?.items.some((s) => s.itemId === 'heroic_mark')).toBe(true);
   });
 });

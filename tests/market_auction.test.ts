@@ -3,11 +3,30 @@
 // the winner, and Merchant letters for offline parties. Real Sim instances (the
 // market.test.ts fixture pattern); zero rng, integer copper throughout.
 import { describe, expect, it, vi } from 'vitest';
-import { AUCTION_LETTERS } from '../src/sim/content/letters';
+import { AUCTION_LETTERS, TRADE_LETTERS } from '../src/sim/content/letters';
 import { marketMinNextBid } from '../src/sim/market';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+
+// Every letterId is PERSISTED in delivered mail rows, so each is pinned here to
+// its literal string (the tests/mailbox_view.test.ts 'ravenpost_welcome'
+// precedent): the delivery assertions below compare against AUCTION_LETTERS
+// itself, so without these pins a letterId rename would move both sides of
+// every assertion together while orphaning the localized copy of each letter
+// already sitting in a mailbox.
+describe('World Market and trade letters: persisted letterId pins', () => {
+  it('pins every letterId to its persisted literal', () => {
+    expect(AUCTION_LETTERS.outbid.letterId).toBe('market_outbid');
+    expect(AUCTION_LETTERS.won.letterId).toBe('market_won');
+    expect(AUCTION_LETTERS.sold.letterId).toBe('market_sold');
+    expect(AUCTION_LETTERS.expired.letterId).toBe('market_expired');
+    expect(AUCTION_LETTERS.sold_wallet.letterId).toBe('market_sold_wallet');
+    expect(AUCTION_LETTERS.sold_account.letterId).toBe('market_sold_account');
+    expect(TRADE_LETTERS.delivery.letterId).toBe('trade_delivery');
+    expect(TRADE_LETTERS.refund.letterId).toBe('trade_refund');
+  });
+});
 
 function makeWorld() {
   return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
