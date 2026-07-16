@@ -43,16 +43,14 @@ function walk(dir: string): string[] {
   return out;
 }
 
-// On-disk pure-core candidates in a single layer dir (non-recursive): the modules
+// On-disk pure-core candidates in the full UI tree: the modules
 // named with the pure-core convention <thing>_view.ts / <thing>_core.ts. The
 // COMPLETENESS sweep below asserts every one of these IS registered, so a new
 // extraction that forgets to add its core to the allowlist fails the guard instead
 // of silently escaping it. Bare-named cores (xp_bar.ts, swing_timer.ts, ...) are
 // not caught by this convention; new extractions follow the *_view/*_core naming.
 function onDiskCores(dir: string): string[] {
-  return readdirSync(dir)
-    .filter((name) => /_(?:view|core)\.ts$/.test(name) && !name.endsWith('.d.ts'))
-    .map((name) => join(dir, name));
+  return walk(dir).filter((file) => /_(?:view|core)\.ts$/.test(file) && !file.endsWith('.d.ts'));
 }
 
 // Blank out comments while preserving line count and column positions, so prose
@@ -136,8 +134,8 @@ const UI_PURE_CORES = [
   'src/ui/clock.ts',
   'src/ui/compass.ts',
   'src/ui/coords.ts',
-  'src/ui/quest_tracker.ts',
-  'src/ui/delve_map.ts',
+  'src/ui/hud/quest/quest_tracker.ts',
+  'src/ui/hud/delve/delve_map.ts',
   'src/ui/raid_lockout_view.ts',
   'src/ui/stat_tooltip_view.ts',
   'src/ui/target_portrait_view.ts',
@@ -150,12 +148,12 @@ const UI_PURE_CORES = [
   'src/ui/item_set_tooltip_view.ts',
   'src/ui/weapon_proc_view.ts',
   'src/ui/options_view.ts',
-  'src/ui/vendor_view.ts',
-  'src/ui/heroic_vendor_view.ts',
+  'src/ui/hud/vendor/vendor_view.ts',
+  'src/ui/hud/vendor/heroic_vendor_view.ts',
   'src/ui/claudium_view.ts',
   'src/ui/woc_store_view.ts',
-  'src/ui/loot_roll_status_view.ts',
-  'src/ui/loot_settings_view.ts',
+  'src/ui/hud/loot/loot_roll_status_view.ts',
+  'src/ui/hud/loot/loot_settings_view.ts',
   'src/ui/crafting_view.ts',
   'src/ui/market_view.ts',
   'src/ui/mailbox_view.ts',
@@ -180,12 +178,12 @@ const UI_PURE_CORES = [
   'src/ui/daily_rewards_view.ts',
   'src/ui/deeds_view.ts',
   'src/ui/spellbook_view.ts',
-  'src/ui/questlog_view.ts',
+  'src/ui/hud/quest/questlog_view.ts',
   'src/ui/swing_timer.ts',
   'src/ui/unit_frame.ts',
-  'src/ui/action_bar_view.ts',
-  'src/ui/mobile_action_page_view.ts',
-  'src/ui/consumable_bar_view.ts',
+  'src/ui/hud/action_bar/action_bar_view.ts',
+  'src/ui/hud/action_bar/mobile_action_page_view.ts',
+  'src/ui/hud/action_bar/consumable_bar_view.ts',
   'src/ui/mobile_hud_layout.ts',
   'src/ui/auras_view.ts',
   'src/ui/minimap_markers.ts',
@@ -200,9 +198,10 @@ const UI_PURE_CORES = [
   'src/ui/live_region_politeness.ts',
   'src/ui/discord_widget_view.ts',
   'src/ui/desktop_update_view.ts',
-  'src/ui/corpse_harvest_view.ts',
+  'src/ui/hud/loot/corpse_harvest_view.ts',
   'src/ui/town_focus_view.ts',
   'src/ui/pet_action_icons.ts',
+  'src/ui/welcome_screen_view.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
 ].map((rel) => join(repoRoot, rel));
@@ -244,8 +243,8 @@ const BARE_NAMED = [
   'src/ui/clock.ts',
   'src/ui/compass.ts',
   'src/ui/coords.ts',
-  'src/ui/quest_tracker.ts',
-  'src/ui/delve_map.ts',
+  'src/ui/hud/quest/quest_tracker.ts',
+  'src/ui/hud/delve/delve_map.ts',
   'src/ui/swing_timer.ts',
   'src/ui/unit_frame.ts',
   'src/ui/minimap_markers.ts',

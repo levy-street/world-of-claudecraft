@@ -1173,7 +1173,11 @@ const classAbilityNamesEn = {
         'Stinging Swarm',
         'The enemy is swarmed by insects, taking {damage} Nature damage over 12 sec.',
       ],
-      ['tigers_fury', 'Wolfsblood', 'Increases attack power by 40 for 6 sec. Wolf Form only.'],
+      [
+        'tigers_fury',
+        'Wolfsblood',
+        'Increases attack power by {buff} for {duration} sec. Wolf Form only.',
+      ],
       [
         'rip',
         'Rip',

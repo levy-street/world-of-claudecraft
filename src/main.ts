@@ -105,9 +105,17 @@ import {
   DESKTOP_APP,
   isAuthError,
   NATIVE_APP,
-  type ReleaseEntry,
 } from './net/online';
 import { realmPopulation } from './net/realm_population';
+import { RECONNECT_CONFLICT_ERROR } from './net/reconnect_policy';
+import {
+  clearPlayMarker,
+  freshMarker,
+  markResumeAttempt,
+  readPlayMarker,
+  refreshPlayMarker,
+  savePlayMarker,
+} from './net/resume_play';
 import { openStripeCheckout } from './net/stripe_checkout';
 // The wallet module is loaded lazily via dynamic import() in the wallet
 // controller below, so it stays out of the main entry chunk and only loads when
@@ -166,7 +174,6 @@ import {
 } from './ui/camera_prompt';
 import { deleteCharButtonHtml } from './ui/char_delete_button';
 import { ChatCommandMenu } from './ui/chat_command_menu';
-import { chatInputSize } from './ui/chat_input_autosize';
 import { CLASS_DETAILS, SIGNATURE_ABILITIES } from './ui/class_details_data';
 import { ensureDeedLocalesLoaded } from './ui/deed_i18n';
 import { isDevGuiCommand } from './ui/dev_command_view';
@@ -189,6 +196,14 @@ import { renderDiscordWidget } from './ui/discord_widget';
 import { classDisplayName, tEntity } from './ui/entity_i18n';
 import { FocusManager, type FocusTrapHandle } from './ui/focus_manager';
 import { type ClaudiumHooks, Hud } from './ui/hud';
+import { chatInputSize } from './ui/hud/chat/chat_input_autosize';
+import { wireSkinPicker } from './ui/hud/cosmetics/skin_picker';
+import {
+  absolutePublishedCardUrl,
+  setCardUploader,
+  setReferralProvider,
+  setStandingProvider,
+} from './ui/hud/player_card/player_card_share';
 import {
   ensureLocaleLoaded,
   formatDateTime,
@@ -208,19 +223,13 @@ import { iconDataUrl } from './ui/icons';
 import { createLoadingTipRotation, type LoadingTipRotation } from './ui/loading_tips';
 import { applyNativeDeviceLanguage } from './ui/native_language';
 import { scheduleNativeUpdateCheck } from './ui/native_update_prompt';
+import { loadNewsInto } from './ui/news_feed';
 import { createMetricsSampler } from './ui/perf_metrics_sampler';
 import { PerfOverlay } from './ui/perf_overlay';
 import { type PerfOverlayConfig, PerfOverlayConfigStore } from './ui/perf_overlay_config';
 import { buildPerfOverlayView, FrameMeter } from './ui/perf_overlay_model';
-import {
-  absolutePublishedCardUrl,
-  setCardUploader,
-  setReferralProvider,
-  setStandingProvider,
-} from './ui/player_card_share';
 import { hydratePortraits, portraitChipHtml } from './ui/portrait_chip';
 import { hideReconnectOverlay, showReconnectOverlay } from './ui/reconnect_overlay';
-import { wireSkinPicker } from './ui/skin_picker';
 import { createSpectateBadge } from './ui/spectate_badge';
 import { refreshSteamLinkStatus, wireSteamLink } from './ui/steam_link';
 import { shouldShowStorePromo } from './ui/store_promo_card';
@@ -240,6 +249,11 @@ import {
   setWocBalance,
   shouldDisconnectUnverifiedWallet,
 } from './ui/wallet_balance';
+import {
+  mountWelcomeScreen,
+  takeArmoryOpenIntent,
+  type WelcomeScreenController,
+} from './ui/welcome_screen_window';
 import { formatXp } from './ui/xp_bar';
 import type { IWorld, LeaderboardEntry } from './world_api';
 
@@ -285,6 +299,10 @@ let pendingDeleteCharacter: CharacterSummary | null = null;
 // instead of a per-row one; it acts on whichever character is selected. Mobile
 // and narrow layouts keep the per-row buttons and never read this.
 let charselectSelected: CharacterSummary | null = null;
+// One-shot: set by the boot resume path to the character (and the realm it was
+// playing on) to auto-enter, then consumed by refreshCharacters once its list
+// has loaded (mobile WebView-reload resume; see src/net/resume_play.ts).
+let pendingResume: { characterId: number; realm: string } | null = null;
 let homepageMusic: HTMLAudioElement | null = null;
 let homepageMusicStarted = false;
 let homepageMusicMuted = readHomepageMusicMuted();
@@ -815,6 +833,11 @@ function nextPaint(): Promise<void> {
 // every failure path recovers via fatalOverlay's reload.
 let hasBegunWorldEntry = false;
 
+// The one live Welcome Screen instance, if the DOM has it (absent on /play).
+// module-scoped so enterWorld/startOffline and the intro-finish hook below can
+// share the single mounted controller.
+let welcomeScreen: WelcomeScreenController | null = null;
+
 function beginWorldEntry(): boolean {
   if (hasBegunWorldEntry) return false;
   hasBegunWorldEntry = true;
@@ -1155,8 +1178,9 @@ async function startGame(
         if (text) {
           world.chat(text);
           // Remember the channel this line reached so the next open (on the All
-          // tab) defaults there and tints the input to its color.
-          hud.noteSentChannel(text);
+          // tab) defaults there and tints the input to its color. Pass the host so a
+          // bare "/g" sticks to guild online but general offline.
+          hud.noteSentChannel(text, online != null);
         }
       }
       // a typed "/join world"/"/leave lfg" opens or closes its channel tab too,
@@ -1656,6 +1680,10 @@ async function startGame(
       sfx.setFootstepsEnabled(settings.set('footstepSfx', !!value));
       return;
     }
+    if (key === 'interfaceSfx') {
+      audio.setFeedbackEnabled(settings.set('interfaceSfx', !!value));
+      return;
+    }
     if (key === 'landingHighContrast') {
       // Mirror of the start-screen toggle; keeps the persisted preference in sync
       // and re-applies the backdrop (the landing page is hidden in-game, but the
@@ -1808,6 +1836,8 @@ async function startGame(
       // Signal the server to leave immediately, skipping the linkdead grace, so
       // the character is not held in-world after a deliberate logout.
       online?.sendLogout();
+      // A deliberate logout is not a resumable drop: forget the active session.
+      clearPlayMarker();
       location.reload();
     },
     captureKey: (cb) => input.captureNextKey(cb),
@@ -3068,6 +3098,10 @@ async function startGame(
     } catch {
       // storage unavailable: worst case the intro replays next session
     }
+    // The Armory card's one-shot open intent (if the player clicked it on the
+    // Welcome Screen) fires here, never during the pan and never while #ui is
+    // hidden: the pan just finished and setIntroUiHidden(false) ran above.
+    if (takeArmoryOpenIntent()) hud.openWocStore();
   };
   const introTaps: number[] = [];
   const skipIntro = (e: Event): void => {
@@ -3119,6 +3153,10 @@ async function startGame(
     setIntroUiHidden(true);
     window.addEventListener('keydown', skipIntro, true);
     window.addEventListener('pointerdown', skipIntro, true);
+  } else if (takeArmoryOpenIntent()) {
+    // No intro pan this login (returning character, or reduced motion): the
+    // loading fade already happened by this point, so open right away.
+    hud.openWocStore();
   }
   input.setSuspendMovement(true);
   await nextPaint();
@@ -3205,6 +3243,46 @@ async function startOffline(
   seedOverride?: number,
 ): Promise<void> {
   if (!(await prepareWorldEntry())) return;
+  // Offline path: same Welcome Screen before startGame, but Continue enables
+  // immediately (no connection to wait on) and every store/chest/discord tile
+  // stays hidden per the gating matrix; the news fetch still hits the site
+  // origin and fails soft if offline.
+  const welcomeRoot = $('#welcome-screen');
+  if (welcomeRoot) {
+    await new Promise<void>((resolve) => {
+      welcomeScreen = mountWelcomeScreen(welcomeRoot, {
+        // offline: true already forces every store/chest/discord-desktop tile off in the
+        // gating matrix regardless of platform, but mobileTouch/nativeApp still drive the
+        // touch-vs-keyboard Continue hint ("Tap to continue"), so derive them for real
+        // instead of hardcoding false (the online mount below does the same).
+        platform: {
+          nativeApp: NATIVE_APP,
+          desktopApp: DESKTOP_APP,
+          mobileTouch: document.body.classList.contains('mobile-touch'),
+          offline: true,
+        },
+        fetchReleases: () => api.releases(20),
+        fetchArmoryPromoEnabled: () => Promise.resolve(false),
+        fetchDiscord: () =>
+          Promise.resolve({ enabled: null, linked: null, guildMember: null, fetchFailed: false }),
+        fetchChest: () => Promise.resolve({ ready: false, unknown: true }),
+        header: () => ({
+          characterName: name,
+          level: 1,
+          className: classDisplayName(playerClass),
+          realmName: '',
+          lastPlayed: null,
+        }),
+        onContinue: () => {
+          welcomeScreen?.hide();
+          welcomeScreen?.destroy();
+          welcomeScreen = null;
+          resolve();
+        },
+      });
+      void welcomeScreen.show();
+    });
+  }
   enterLoadingState(t('loading.world'));
   // Editor play-test: route terrain + props at the custom world too (the renderer
   // reaches it by module global), in addition to the Sim reading cfg.world.
@@ -3752,6 +3830,7 @@ function enterLoggedOutChrome(): void {
 function logoutAccount(): void {
   const finish = () => {
     api.clearSession();
+    clearPlayMarker();
     location.reload();
   };
   if (!api.token) {
@@ -3836,6 +3915,7 @@ const loggedOutModel = () =>
 
 function handleAccountSessionExpired(): void {
   api.clearSession();
+  clearPlayMarker();
   enterLoggedOutChrome();
   paintAccountPortal(loggedOutModel());
 }
@@ -4002,6 +4082,7 @@ function setupAccountPortal(): void {
     try {
       await api.deactivateAccount(deUser.value, dePass.value);
       api.clearSession();
+      clearPlayMarker();
       setAccountFieldMsg('#account-deactivate-msg', t('hudChrome.account.deactivated'), true);
       window.setTimeout(() => location.reload(), 1200);
     } catch (e2) {
@@ -4152,6 +4233,11 @@ function setupSecuritySection(): void {
 }
 
 function showRealmList(dir?: import('./net/online').RealmDirectory): void {
+  // Reaching the realm list means the boot resume could not auto-select a realm
+  // (no remembered realm). Drop any pending resume intent here so a later manual
+  // realm pick does not surprise-enter the world on a decision made at boot; the
+  // player continues through normal realm + character select.
+  pendingResume = null;
   show('#realm-panel');
   const listEl = $('#realm-list');
   const render = (d: import('./net/online').RealmDirectory) => {
@@ -4439,6 +4525,26 @@ async function refreshCharacters(): Promise<void> {
     if (chars.some((c) => c.skinCatalog === 'mech')) void preloadMechAssets();
     if (api.realm) $('#charselect-realm').textContent = api.realm;
     listEl.innerHTML = '';
+    // Boot resume: a WebView reload during play sent us here with a persisted
+    // active-play marker. If that character still exists on the marker's realm,
+    // re-enter the world directly instead of showing char-select (a linkdead
+    // session resumes seamlessly; a genuinely live duplicate falls back to the
+    // fatal overlay, same as a manual enter). One-shot: consume the pending
+    // intent either way (including the empty-roster case below), and clear the
+    // persisted marker if the character or realm is gone so we stop retrying.
+    // The realm check closes the cross-realm id-collision hole: character ids
+    // are only unique per realm database.
+    if (pendingResume !== null) {
+      const resume = pendingResume;
+      pendingResume = null;
+      const target =
+        resume.realm === api.realm ? chars.find((c) => c.id === resume.characterId) : undefined;
+      if (target) {
+        void enterWorld(target);
+        return;
+      }
+      clearPlayMarker();
+    }
     if (chars.length === 0) {
       // No characters on this realm, drop straight into the create screen.
       listEl.innerHTML = `<li class="char-list-message">${escapeHtml(t('character.noneYet'))}</li>`;
@@ -4557,11 +4663,22 @@ async function refreshCharacters(): Promise<void> {
       renderClassDetails('charselect-class-details', 'warrior');
     }
   } catch (err) {
+    // A failed roster load must also drop any boot resume intent: leaving it
+    // armed would auto-enter the world on whatever unrelated refresh (sort,
+    // realm switch, rename) happens to succeed next.
+    pendingResume = null;
     listEl.innerHTML = `<li class="char-list-message char-list-error">${escapeHtml(userFacingApiError(err))}</li>`;
   }
 }
 
-function fatalOverlay(message: string): void {
+function fatalOverlay(message: string, opts?: { keepResumeMarker?: boolean }): void {
+  // A fatal overlay is a terminal client state whose only exit is a reload, so
+  // clearing the resume marker HERE covers every present and future caller: the
+  // reload lands on the normal boot path instead of auto-resuming into the same
+  // failure. The one exception is a duplicate-session conflict ("character
+  // already in world"): the session is alive in another tab or device, and
+  // clearing would erase THAT session's marker, so the caller opts out.
+  if (!opts?.keepResumeMarker) clearPlayMarker();
   hideLoadingScreen(); // its art would bleed through the translucent backdrop
   if (document.getElementById('disconnect-overlay')) return; // first reason wins
   const el = document.createElement('div');
@@ -4644,7 +4761,6 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
     audio.init();
     music.init();
     sfx.init();
-    enterLoadingState(t('loading.connectingRealm'));
   } finally {
     if (!hasBegunWorldEntry && button) {
       button.disabled = false;
@@ -4669,17 +4785,90 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
     setReferralProvider(null);
     setStandingProvider(null);
   };
+
+  // Post-login Welcome Screen: news + patch notes + Join our Discord strip, plus
+  // (desktop web only) the Season 1 Armory promo. Shown instead of the bare
+  // loading screen while the realm connection establishes behind it; Continue
+  // is the only way forward, gated on the same readiness condition the old
+  // auto-poll used to gate startGame on. Falls back to the old bare loading
+  // screen if the welcome-screen DOM is absent (the /play entry lacks it).
+  const welcomeRoot = $('#welcome-screen');
+  let started = false;
+  const proceedToGame = () => {
+    if (started) return;
+    started = true;
+    clearInterval(poll);
+    welcomeScreen?.hide();
+    welcomeScreen?.destroy();
+    welcomeScreen = null;
+    void startGame(world, null, world, `char:${c.id}`, true);
+  };
+  if (welcomeRoot) {
+    welcomeScreen = mountWelcomeScreen(welcomeRoot, {
+      platform: {
+        nativeApp: NATIVE_APP,
+        desktopApp: DESKTOP_APP,
+        mobileTouch: document.body.classList.contains('mobile-touch'),
+        offline: false,
+      },
+      fetchReleases: () => api.releases(20),
+      fetchArmoryPromoEnabled: () => api.welcomeFlags().then((f) => f.armoryPromoEnabled),
+      fetchDiscord: () =>
+        api.discordStatus().then((d) => ({
+          enabled: typeof d.enabled === 'boolean' ? d.enabled : null,
+          linked: typeof d.linked === 'boolean' ? d.linked : null,
+          guildMember: typeof d.guildMember === 'boolean' ? d.guildMember : null,
+          fetchFailed: false,
+        })),
+      fetchChest: () =>
+        api.dailyRewards().then((s) => ({
+          ready: s.eligibility.eligible === true && s.spin.claimed === false,
+          unknown: false,
+        })),
+      header: () => ({
+        characterName: c.name,
+        level: c.level,
+        className: classDisplayName(c.class),
+        realmName: (() => {
+          try {
+            return new URL(api.base).host;
+          } catch {
+            return '';
+          }
+        })(),
+        lastPlayed: c.lastPlayed ?? null,
+      }),
+      onContinue: proceedToGame,
+    });
+    void welcomeScreen.show();
+  } else {
+    enterLoadingState(t('loading.connectingRealm'));
+  }
+
   // wait for hello + first snapshot so the world starts populated
   const waitStart = Date.now();
   const poll = setInterval(() => {
     if (world.connected && world.entities.has(world.playerId)) {
       clearInterval(poll);
-      void startGame(world, null, world, `char:${c.id}`, true);
+      // Remember the active session (character + realm) so a WebView reload
+      // during play resumes straight back into the world instead of the
+      // home/login screen. Also resets the resume-attempt budget: entry
+      // completed, the session is known-good.
+      if (api.realm) savePlayMarker(c.id, api.realm, Date.now());
+      if (welcomeRoot) {
+        welcomeScreen?.setConnectionReady(true);
+      } else {
+        proceedToGame();
+      }
     } else if (Date.now() - waitStart > 10000) {
       clearInterval(poll);
       world.close();
       clearCardProviders();
+      welcomeScreen?.destroy();
+      welcomeScreen = null;
       hideReconnectOverlay();
+      // Entry never completed: fatalOverlay drops the resume marker so the next
+      // boot does not loop straight back into a session that will not start.
       fatalOverlay(t('loading.enterTimeout'));
     }
   }, 50);
@@ -4688,8 +4877,18 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
   world.onDisconnect = (reason) => {
     clearInterval(poll);
     clearCardProviders();
+    welcomeScreen?.destroy();
+    welcomeScreen = null;
     hideReconnectOverlay();
-    fatalOverlay(userFacingApiError(reason));
+    // The session ended for good (retries exhausted, kick, takeover, auth fail):
+    // fatalOverlay clears the resume marker so a reload does not loop back into
+    // a dead session. Exception: a duplicate-session conflict means the
+    // character is ALIVE in another tab or device, so the marker (theirs, via
+    // the shared localStorage) must survive; the bounded resume-attempt budget
+    // in resume_play.ts keeps this tab from looping on the overlay forever.
+    fatalOverlay(userFacingApiError(reason), {
+      keepResumeMarker: reason === RECONNECT_CONFLICT_ERROR,
+    });
   };
   // an unexpected drop is not fatal: the server holds the character in-world
   // (linkdead) while ClientWorld auto-reconnects, so just veil the game until
@@ -5293,97 +5492,12 @@ async function loadHighscores(): Promise<void> {
   host.innerHTML = head + body;
 }
 
-// Minimal, safe Markdown → HTML for GitHub release notes. The input is escaped
-// FIRST, so every regex below operates on inert text; the only markup we emit is
-// our own whitelisted tags. Deliberately tiny (no tables/images/blockquotes),
-// enough to make patch notes readable without pulling in a markdown dependency.
-function renderReleaseBody(md: string): string {
-  const esc = (s: string): string =>
-    s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
-  const inline = (s: string): string =>
-    esc(s)
-      // [text](url), only http(s) links survive; anything else renders as text.
-      .replace(
-        /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
-        (_m, text, url) => `<a href="${url}" target="_blank" rel="noopener noreferrer">${text}</a>`,
-      )
-      .replace(/`([^`]+)`/g, '<code>$1</code>')
-      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-      .replace(/(^|[^*])\*([^*]+)\*/g, '$1<em>$2</em>');
-  const out: string[] = [];
-  let inList = false;
-  const closeList = () => {
-    if (inList) {
-      out.push('</ul>');
-      inList = false;
-    }
-  };
-  for (const line of md.replace(/\r\n/g, '\n').split('\n')) {
-    const heading = /^(#{1,6})\s+(.*)$/.exec(line);
-    const bullet = /^\s*[-*]\s+(.*)$/.exec(line);
-    if (heading) {
-      closeList();
-      const level = Math.min(3, heading[1].length); // collapse h1-h6 → h1-h3
-      out.push(`<h${level}>${inline(heading[2])}</h${level}>`);
-    } else if (bullet) {
-      if (!inList) {
-        out.push('<ul>');
-        inList = true;
-      }
-      out.push(`<li>${inline(bullet[1])}</li>`);
-    } else if (line.trim() === '') {
-      closeList();
-    } else {
-      closeList();
-      out.push(`<p>${inline(line)}</p>`);
-    }
-  }
-  closeList();
-  return out.join('');
-}
-
 // News & Updates: published GitHub releases, proxied + cached by the server.
 // Re-fetched each time the view is opened (the server caches, so it is cheap).
-let newsLoading = false;
+// The sanitizing renderer + fetch/paint loop live in ./ui/news_feed (extracted
+// out of this firewall file); this call site just supplies the host + fetcher.
 async function loadNews(): Promise<void> {
-  const host = $('#news-feed');
-  if (!host || newsLoading) return;
-  newsLoading = true;
-  host.innerHTML = `<div class="news-loading">${t('news.loading')}</div>`;
-  let releases: ReleaseEntry[] = [];
-  try {
-    releases = await api.releases(20);
-  } catch {
-    host.innerHTML = `<div class="news-error">${t('news.error')}</div>`;
-    newsLoading = false;
-    return;
-  }
-  newsLoading = false;
-  if (releases.length === 0) {
-    host.innerHTML = `<div class="news-empty">${t('news.empty')}</div>`;
-    return;
-  }
-  const esc = (s: string): string =>
-    s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
-  host.innerHTML = releases
-    .map((r) => {
-      const when = r.publishedAt
-        ? `<span class="news-date">${formatDateTime(new Date(r.publishedAt), { dateStyle: 'medium' })}</span>`
-        : '';
-      const tag = r.tag ? `<span class="news-tag">${esc(r.tag)}</span>` : '';
-      const badge = r.prerelease ? `<span class="news-badge">${t('news.prerelease')}</span>` : '';
-      const title = esc(r.name || r.tag || '');
-      const link = r.url
-        ? `<div class="news-item-foot"><a class="news-link" href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">${t('news.viewOnGithub')}</a></div>`
-        : '';
-      return (
-        `<article class="news-item">` +
-        `<div class="news-item-head">` +
-        `<h3 class="news-item-title">${title}</h3><div class="news-item-meta">${tag}${badge}${when}</div></div>` +
-        `<div class="news-body">${renderReleaseBody(r.body)}</div>${link}</article>`
-      );
-    })
-    .join('');
+  await loadNewsInto($('#news-feed'), () => api.releases(20));
 }
 
 let caCopyResetTimer: number | null = null;
@@ -6029,10 +6143,10 @@ function flashWalletError(message: string): void {
 // ── Discord login/onboarding ─────────────────────────────────────────────────
 // Discord UI is available on web and native unless explicitly disabled at build time.
 const DISCORD_BUILD_ENABLED = String(import.meta.env.VITE_DISCORD_DISABLED ?? '').trim() !== '1';
-// Community links for the mobile More tray. The invite mirrors the hardcoded
-// invite on the shells' community links and is the fallback when the server-fed
-// discordInviteUrl() is not known yet (logged out, offline).
-const DISCORD_INVITE_URL = 'https://discord.com/invite/worldofclaudecraft';
+// Community links for the mobile More tray. discordInviteUrl() itself now
+// falls back to DEFAULT_DISCORD_INVITE_URL (discord_status.ts) when the
+// server-fed value is not known yet (logged out, offline), so every caller
+// gets the fail-open behavior for free.
 const DONATE_URL = 'https://ko-fi.com/worldofclaudecraft';
 const DISCORD_ONBOARD_KEY = 'woc_discord_onboard';
 let discordPopup: Window | null = null;
@@ -6398,7 +6512,7 @@ function openDiscordEntry(): void {
     toggleDiscordPanel(true);
     return;
   }
-  window.open(discordInviteUrl() || DISCORD_INVITE_URL, '_blank', 'noopener,noreferrer');
+  window.open(discordInviteUrl(), '_blank', 'noopener,noreferrer');
 }
 
 function wireDiscordCtaBanner(): void {
@@ -6626,6 +6740,7 @@ function wireRecoveryEmailModal(): void {
     // return to the login screen. They are prompted again on the next sign-in.
     void api.logout().catch(() => {});
     api.clearSession();
+    clearPlayMarker();
     closeRecoveryEmailModal();
     enterLoggedOutChrome();
     switchMainView('#hero-view');
@@ -7039,8 +7154,13 @@ function wireStartScreens(): void {
 
   const goToLoggedInPlay = () => {
     void enterRealmFlow().catch((err) => {
+      // Entering play failed before character select: drop any boot resume
+      // intent (it must not fire on a later unrelated roster refresh), and on
+      // an auth failure clear the marker with the session it belonged to.
+      pendingResume = null;
       if (isAuthError(err)) {
         api.clearSession();
+        clearPlayMarker();
         enterLoggedOutChrome();
       } else {
         loginError(userFacingApiError(err));
@@ -8313,7 +8433,39 @@ function wireStartScreens(): void {
     showDiscordChoice(parkedDiscordChoice);
   } else if (api.restoreSession()) {
     enterLoggedInChrome();
-    void revalidateAccountSession();
+    void revalidateAccountSession().then(() => {
+      // WebView-reload resume: if the session survived revalidation and a fresh
+      // active-play marker is present, re-enter the world directly instead of
+      // leaving the player parked on the home/character-select chrome. The
+      // Discord-onboarding arm below already enters play, so skip it there, and
+      // the desktop-login handoff page must mint its code, never load the game.
+      if (discordOnboarding) return;
+      if (isDesktopLoginPage()) return;
+      if (!api.token) return; // revalidation cleared a stale session
+      const marker = readPlayMarker();
+      const resume = freshMarker(marker, Date.now());
+      if (resume === null) {
+        // A marker that exists but no longer resumes (stale, or its attempt
+        // budget is spent) is dead weight: clear it so the restamp handlers
+        // below cannot keep it around indefinitely.
+        if (marker) clearPlayMarker();
+        return;
+      }
+      // Count this consumption against the marker's bounded attempt budget (a
+      // completed entry resets it), then route through the normal realm flow:
+      // restoring the marker's realm as the remembered one makes enterRealmFlow
+      // auto-select it even if the player browsed other realms before the
+      // reload, and refreshCharacters consumes the pending intent.
+      markResumeAttempt();
+      pendingResume = { characterId: resume.characterId, realm: resume.realm };
+      try {
+        localStorage.setItem(LAST_REALM_KEY, resume.realm);
+      } catch {
+        // fail-soft like the resume_play wrappers: a blocked write only loses
+        // the realm auto-pick, the resume then falls to the realm list.
+      }
+      goToLoggedInPlay();
+    });
     // Re-bind the account's linked wallet on a restored session (not just on fresh
     // login), so an auto-reconnected wallet shows verified and is NOT treated as
     // unverified and disconnected (the bug that forced a re-sign on every reload).
@@ -8329,6 +8481,16 @@ function wireStartScreens(): void {
     enterLoggedOutChrome();
     if (isDesktopLoginPage()) show('#login-panel');
   }
+
+  // Keep the active-play resume marker fresh right up to the moment the app is
+  // backgrounded (the pre-eviction instant on iOS), so even a long play session
+  // resumes into the world on the reload that follows an OS WebView eviction. A
+  // no-op when no session is in play, so it is safe to register unconditionally.
+  const restampResumeMarker = () => {
+    if (document.visibilityState === 'hidden') refreshPlayMarker(Date.now());
+  };
+  document.addEventListener('visibilitychange', restampResumeMarker);
+  window.addEventListener('pagehide', () => refreshPlayMarker(Date.now()));
 
   // Header Logo click listener to return to homepage
   const headerLogoBtn = $('#header-logo-btn');

@@ -49,9 +49,17 @@ through it before writing, so a regenerated clip already meets the standard.
   rejected (re-encoding cannot restore it); a hand-authored MP3 above the
   192 kbps ceiling is re-encoded down to it.
 - **Loudness:** clips under 1 s normalize to a -6 dBFS true peak; clips at or
-  above 1 s normalize to -14 LUFS integrated. Normalization is a consistency
-  measure, not a clipping fix: the engine caps per-play gain at 1.0 under a 0.85
-  master, so clipping is not otherwise possible.
+  above 1 s normalize to -14 LUFS integrated, and the LUFS branch verifies the
+  real post-encode true peak against the same -6 dBFS ceiling on every attempt
+  (MP3 encoding can push a clip's true peak above whatever the pre-encode
+  limiter saw). Peak safety is the binding constraint: a wide-crest-factor clip
+  that cannot reach -14 LUFS without breaching the ceiling ships as the best
+  peak-safe result, under the nominal target and marked `peakLimited`
+  (`conformSfxAudio` in `scripts/sfx/conform_audio.mjs`). `npm run sfx:check`
+  accepts that peak-constrained shortfall and hard-fails an over-target LUFS
+  or a true-peak overshoot (`classify` in `scripts/sfx/sfx_conform_rules.mjs`).
+  On top of the asset ceiling, the engine caps per-play gain at 1.0 under a
+  0.85 master, so runtime gain staging cannot clip a conformed clip.
 - **Channels (mono/stereo policy per playback path):** mono, except global
   ambience beds. `playAt` positions a clip through an equalpower `PannerNode` that
   downmixes to mono before panning, and `playUi` sums to the mono master, so for
@@ -68,8 +76,8 @@ through it before writing, so a regenerated clip already meets the standard.
   (contiguous from `_1`); dynamic creature variants use
   `mob_<family>_<subfamily>_<action>_<n>.mp3`. The category prefixes in use are
   `foot_`, `move_`, `melee_`, `impact_`, `combat_`, `player_`, `cast_`, `proj_`,
-  `spell_`, `heal_`, `buff_`/`debuff_`, `mob_`, `amb_`, `lockpick_`, `quest_`, and
-  `ui_`.
+  `wand_`, `spell_`, `heal_`, `buff_`/`debuff_`, `mob_`, `amb_`, `lockpick_`,
+  `quest_`, and `ui_`.
 
 `npm run sfx:check` reports the loudness, format, and bitrate rules as hard
 failures. The channel and naming rules are advisory by default (they print but do
@@ -277,12 +285,21 @@ These cues are non-positional, preload at startup, and keep the existing
 `GameAudio` method surface. They are sampled assets, so they use the same Studio
 editing, mastering, caching, and playback limits as the world catalog.
 
+The Interface and Feedback Sounds toggle (the `interfaceSfx` setting, wired to
+`audio.setFeedbackEnabled` in `src/game/audio.ts`) silences the notification
+cues (coin, loot, level-up, quest, whisper, transformation, death, error) and
+the spatial avoid cues (miss/dodge/resist/parry), which the HUD gates via
+`audio.feedbackEnabled`: they report an outcome, not a world impact. Affordance
+and gameplay-timing cues (click, bag transitions, ready check, duel lifecycle,
+Fiesta) and every world/spatial sound ignore the toggle.
+
 | keys | purpose |
 |---|---|
 | `ui_click`, `ui_error` | basic interaction and invalid-action feedback |
 | `ui_bag_open`, `ui_bag_close` | inventory transitions |
 | `ui_coin`, `ui_loot_item` | currency and item rewards |
 | `ui_quest_accept`, `ui_quest_done`, `ui_level_up` | progression feedback |
+| `ui_achievement` | Book of Deeds unlock chime |
 | `ui_whisper`, `ui_sheep`, `ui_death` | message, transformation, and defeat events |
 | `ui_duel_challenge`, `ui_duel_countdown`, `ui_duel_start`, `ui_duel_end` | duel lifecycle |
 | `ui_fiesta_word_0` through `ui_fiesta_word_3` | escalating Fiesta takedown tiers |

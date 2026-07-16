@@ -175,47 +175,47 @@ describe('daily reward payout moderation persistence', () => {
     h.poolQuery.mockClear();
   });
 
-  it.each([
-    'pending',
-    'failed',
-  ])('atomically voids a %s payout and appends an audit row', async (status) => {
-    h.state.row = payout(status);
+  it.each(['pending', 'failed'])(
+    'atomically voids a %s payout and appends an audit row',
+    async (status) => {
+      h.state.row = payout(status);
 
-    const result = await new PgDailyRewardDb().voidPayout(
-      '2026-07-14',
-      1,
-      'Payment requires manual review',
-      { id: 'operator-7', username: 'moderator' },
-    );
+      const result = await new PgDailyRewardDb().voidPayout(
+        '2026-07-14',
+        1,
+        'Payment requires manual review',
+        { id: 'operator-7', username: 'moderator' },
+      );
 
-    expect(result.outcome).toBe('updated');
-    if (result.outcome === 'updated') {
-      expect(result.payout).toMatchObject({
-        status: 'voided',
-        voidReason: 'Payment requires manual review',
-        voidedById: 'operator-7',
-        voidedByUsername: 'moderator',
-        voidedAt: '2026-07-15T01:02:03.000Z',
-      });
-    }
-    expect(h.state.audit).toHaveLength(1);
-    expect(h.state.audit[0].params).toEqual([
-      '2026-07-14',
-      'test-realm',
-      1,
-      42,
-      'void',
-      status,
-      'voided',
-      'Payment requires manual review',
-      'operator-7',
-      'moderator',
-    ]);
-    expect(h.query.mock.calls.map(([sql]) => String(sql))).toEqual(
-      expect.arrayContaining(['BEGIN', 'COMMIT']),
-    );
-    expect(h.release).toHaveBeenCalledOnce();
-  });
+      expect(result.outcome).toBe('updated');
+      if (result.outcome === 'updated') {
+        expect(result.payout).toMatchObject({
+          status: 'voided',
+          voidReason: 'Payment requires manual review',
+          voidedById: 'operator-7',
+          voidedByUsername: 'moderator',
+          voidedAt: '2026-07-15T01:02:03.000Z',
+        });
+      }
+      expect(h.state.audit).toHaveLength(1);
+      expect(h.state.audit[0].params).toEqual([
+        '2026-07-14',
+        'test-realm',
+        1,
+        42,
+        'void',
+        status,
+        'voided',
+        'Payment requires manual review',
+        'operator-7',
+        'moderator',
+      ]);
+      expect(h.query.mock.calls.map(([sql]) => String(sql))).toEqual(
+        expect.arrayContaining(['BEGIN', 'COMMIT']),
+      );
+      expect(h.release).toHaveBeenCalledOnce();
+    },
+  );
 
   it('protects paid payouts from voiding without writing audit history', async () => {
     h.state.row = payout('paid');

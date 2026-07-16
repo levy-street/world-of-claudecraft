@@ -21,150 +21,150 @@ export const nl_NL: EnTranslations = {
     "rpPvp": "RP-PvP"
   },
   "devCommand": {
-    "dialogLabel": "Developer Command Center",
-    "kicker": "Development tools",
-    "title": "Command Center",
-    "subtitle": "Authoritative test controls for the active world.",
-    "closeAria": "Close developer commands",
-    "categoryNavAria": "Developer command categories",
+    "dialogLabel": "Centrum voor ontwikkelaarsopdrachten",
+    "kicker": "Ontwikkelaarshulpmiddelen",
+    "title": "Opdrachtencentrum",
+    "subtitle": "Autoritatieve testbesturing voor de actieve wereld.",
+    "closeAria": "Ontwikkelaarsopdrachten sluiten",
+    "categoryNavAria": "Categorieën met ontwikkelaarsopdrachten",
     "categories": {
-      "player": "Player",
+      "player": "Speler",
       "spawns": "Spawns",
-      "inventory": "Inventory",
-      "progress": "Progress",
-      "travel": "Travel",
-      "scenarios": "Scenarios"
+      "inventory": "Inventaris",
+      "progress": "Voortgang",
+      "travel": "Reizen",
+      "scenarios": "Scenario's"
     },
-    "filterLabel": "Filter commands",
-    "filterPlaceholder": "Search this category",
-    "noMatches": "No matching commands.",
-    "serverRequirement": "Server cheats still require ALLOW_DEV_COMMANDS=1.",
-    "invalidValues": "Choose valid values before running this command.",
-    "sent": "Sent: {command}",
-    "run": "Run",
+    "filterLabel": "Opdrachten filteren",
+    "filterPlaceholder": "Deze categorie doorzoeken",
+    "noMatches": "Geen overeenkomende opdrachten.",
+    "serverRequirement": "Servercheats vereisen nog steeds ALLOW_DEV_COMMANDS=1.",
+    "invalidValues": "Kies geldige waarden voordat je deze opdracht uitvoert.",
+    "sent": "Verzonden: {command}",
+    "run": "Uitvoeren",
     "fields": {
-      "level": "Level",
+      "level": "Niveau",
       "mob": "Mob",
-      "count": "Count",
-      "item": "Item",
-      "gold": "Gold",
-      "quest": "Quest",
-      "profession": "Profession",
-      "amount": "Amount",
+      "count": "Aantal",
+      "item": "Voorwerp",
+      "gold": "Goud",
+      "quest": "Missie",
+      "profession": "Beroep",
+      "amount": "Hoeveelheid",
       "x": "X",
       "z": "Z",
-      "dungeon": "Dungeon",
-      "difficulty": "Difficulty",
-      "name": "Name"
+      "dungeon": "Kerker",
+      "difficulty": "Moeilijkheidsgraad",
+      "name": "Naam"
     },
     "difficulty": {
-      "normal": "Normal",
-      "heroic": "Heroic"
+      "normal": "Normaal",
+      "heroic": "Heroïsch"
     },
     "actions": {
       "heal": {
-        "label": "Restore health",
-        "description": "Fill the health pool."
+        "label": "Gezondheid herstellen",
+        "description": "Vul de gezondheid volledig aan."
       },
       "resource": {
-        "label": "Restore resource",
-        "description": "Fill mana, rage, or energy."
+        "label": "Hulpbron herstellen",
+        "description": "Vul mana, woede of energie aan."
       },
       "cooldowns": {
-        "label": "Clear cooldowns",
-        "description": "Reset ability, GCD, and potion timers."
+        "label": "Afkoeltijden wissen",
+        "description": "Reset timers voor vaardigheden, GCD en drankjes."
       },
       "god": {
-        "label": "Toggle god mode",
-        "description": "Toggle invulnerability and boosted damage."
+        "label": "Godmodus omschakelen",
+        "description": "Schakel onkwetsbaarheid en verhoogde schade in of uit."
       },
       "revive": {
-        "label": "Revive",
-        "description": "Revive through the normal resurrection path."
+        "label": "Tot leven wekken",
+        "description": "Breng de speler tot leven via het normale herrijzenisproces."
       },
       "kill": {
-        "label": "Kill player",
-        "description": "Test death, ghost, and corpse flows."
+        "label": "Speler doden",
+        "description": "Test de processen voor dood, geest en lijk."
       },
       "combatreset": {
-        "label": "Reset combat",
-        "description": "Clear combat state and hostile threat."
+        "label": "Gevecht resetten",
+        "description": "Wis de gevechtsstatus en vijandelijke dreiging."
       },
       "level": {
-        "label": "Set level",
-        "description": "Set the current character level."
+        "label": "Niveau instellen",
+        "description": "Stel het huidige personageniveau in."
       },
       "spawn": {
-        "label": "Spawn mob",
-        "description": "Create a concrete mob near the player."
+        "label": "Mob spawnen",
+        "description": "Maak een specifieke mob aan in de buurt van de speler."
       },
       "killtarget": {
-        "label": "Kill target",
-        "description": "Kill the selected living mob."
+        "label": "Doel doden",
+        "description": "Dood de geselecteerde levende mob."
       },
       "despawntarget": {
-        "label": "Despawn target",
-        "description": "Remove a selected mob created by this tool."
+        "label": "Doel despawnen",
+        "description": "Verwijder een geselecteerde mob die met dit hulpmiddel is gemaakt."
       },
       "despawnall": {
-        "label": "Clear my spawns",
-        "description": "Remove every mob spawned by this developer."
+        "label": "Mijn spawns wissen",
+        "description": "Verwijder elke mob die door deze ontwikkelaar is gespawnd."
       },
       "give": {
-        "label": "Give item",
-        "description": "Add an item to the player inventory."
+        "label": "Voorwerp geven",
+        "description": "Voeg een voorwerp toe aan de inventaris van de speler."
       },
       "gold": {
-        "label": "Add gold",
-        "description": "Add gold to the current purse."
+        "label": "Goud toevoegen",
+        "description": "Voeg goud toe aan de huidige beurs."
       },
       "quest": {
-        "label": "Complete quest",
-        "description": "Complete a specific quest by id."
+        "label": "Missie voltooien",
+        "description": "Voltooi een specifieke missie op ID."
       },
       "quests": {
-        "label": "Complete active quests",
-        "description": "Complete every quest in the current log."
+        "label": "Actieve missies voltooien",
+        "description": "Voltooi elke missie in het huidige logboek."
       },
       "attune": {
-        "label": "Unlock attunements",
-        "description": "Mark all attunement requirements complete."
+        "label": "Afstemmingen ontgrendelen",
+        "description": "Markeer alle afstemmingsvereisten als voltooid."
       },
       "gather": {
-        "label": "Grant gathering skill",
-        "description": "Increase a gathering profession."
+        "label": "Verzamelvaardigheid verhogen",
+        "description": "Verhoog de vaardigheid van een verzamelberoep."
       },
       "teleport": {
-        "label": "Teleport",
-        "description": "Move to exact world coordinates."
+        "label": "Teleporteren",
+        "description": "Ga naar exacte coördinaten in de wereld."
       },
       "dungeon": {
-        "label": "Enter dungeon",
-        "description": "Enter a dungeon with dev gate bypass."
+        "label": "Kerker binnengaan",
+        "description": "Ga een kerker binnen zonder de ontwikkelaarsvergrendeling."
       },
       "raid": {
-        "label": "Enter raid",
-        "description": "Enter the Nythraxis arena directly."
+        "label": "Raid binnengaan",
+        "description": "Ga rechtstreeks de Nythraxis-arena binnen."
       },
       "raidreset": {
-        "label": "Reset raid lockout",
-        "description": "Clear the current raid lockouts."
+        "label": "Raidvergrendeling resetten",
+        "description": "Wis de huidige raidvergrendelingen."
       },
       "bot": {
-        "label": "Spawn social bot",
-        "description": "Create a whisperable stationary player."
+        "label": "Sociale bot spawnen",
+        "description": "Maak een stilstaande speler die fluisterberichten kan ontvangen."
       },
       "lfgqueue": {
-        "label": "Seed finder queue",
-        "description": "Create a Dungeon Finder queue scenario."
+        "label": "Zoekerwachtrij vullen",
+        "description": "Maak een scenario voor de wachtrij van de kerkerzoeker."
       },
       "lfgraid": {
-        "label": "Seed raid finder",
-        "description": "Create a raid finder scenario."
+        "label": "Raidzoeker vullen",
+        "description": "Maak een scenario voor de raidzoeker."
       },
       "lfgboard": {
-        "label": "Seed listing board",
-        "description": "Create a premade listing scenario."
+        "label": "Advertentiebord vullen",
+        "description": "Maak een scenario met een vooraf samengestelde groepsadvertentie."
       }
     }
   },
@@ -351,7 +351,7 @@ export const nl_NL: EnTranslations = {
       "remainingLessThanMinute": "<1 min",
       "remainingMinutes": "{minutes} min",
       "remainingHoursMinutes": "{hours} u {minutes} min",
-      "remainingDaysHours": "{days}d {hours}h",
+      "remainingDaysHours": "{days} d {hours} u",
       "score": "Score",
       "walletValue": "Portemonneewaarde (WOC)",
       "usd": "{amount} USD",
@@ -391,7 +391,7 @@ export const nl_NL: EnTranslations = {
         "under_minimum": "Portemonnee ligt onder het WOC-minimum van $20 USD.",
         "price_unavailable": "WOC-prijs is niet beschikbaar, beloningen zijn tijdelijk vergrendeld.",
         "banned": "Je bent uitgesloten van dagelijkse beloningen. Reden: {reason}",
-        "bannedUntil": "You are banned from Daily Rewards for another {remaining}. Access returns {until}. Reason: {reason}"
+        "bannedUntil": "Je bent nog {remaining} uitgesloten van dagelijkse beloningen. De toegang wordt hersteld op {until}. Reden: {reason}"
       }
     },
     "wocStore": {
@@ -996,6 +996,7 @@ export const nl_NL: EnTranslations = {
       "interfaceModeTouch": "Aanraking",
       "interfaceModeNote": "Automatisch kiest desktop- of aanraakbesturing op basis van je apparaat. Kies Desktop om toetsenbord en muis af te dwingen (handig op een tablet met toetsenbord), of Aanraking voor de besturing op het scherm.",
       "footstepSounds": "Voetstapgeluiden",
+      "interfaceSounds": "Interface- en feedbackgeluiden",
       "clickFeedback": "Klikmarkering",
       "lockCursorOnRotate": "Aanwijzer vergrendelen tijdens draaien",
       "keybindHelpLockCursorOnRotate": "Houdt de muisaanwijzer binnen het venster terwijl je sleept om de camera te draaien, zodat deze de schermrand niet kan bereiken of naar een ander beeldscherm kan gaan. Schakel uit als je liever een vrije aanwijzer hebt.",
@@ -1619,31 +1620,31 @@ export const nl_NL: EnTranslations = {
       "lock": "Spelerframe vergrendelen"
     },
     "partyFrames": {
-      "section": "Party and Raid Frames",
-      "unlock": "Move party and raid frames",
-      "lock": "Lock party and raid frames",
-      "style": "Frame Style",
-      "styleAutomatic": "Automatic",
-      "styleClassic": "Classic Party Frames",
-      "styleRaid": "Raid Frames",
-      "scale": "Frame Scale",
-      "width": "Frame Width",
-      "height": "Frame Height",
-      "spacing": "Frame Spacing",
-      "columns": "Raid Columns",
-      "healthText": "Health Text",
-      "healthNone": "None",
-      "healthPercent": "Percent",
-      "healthCurrent": "Current",
-      "healthCurrentMax": "Current / Max",
-      "sort": "Sort Players",
-      "sortGroup": "Group",
-      "sortRole": "Role",
-      "sortName": "Name",
-      "showResource": "Show Mana, Rage, and Energy",
-      "showAbsorbs": "Show Absorb Shields",
-      "showAuras": "Show Buffs and Debuffs",
-      "showSelf": "Show Your Frame"
+      "section": "Groeps- en raidframes",
+      "unlock": "Groeps- en raidframes verplaatsen",
+      "lock": "Groeps- en raidframes vergrendelen",
+      "style": "Framestijl",
+      "styleAutomatic": "Automatisch",
+      "styleClassic": "Klassieke groepsframes",
+      "styleRaid": "Raidframes",
+      "scale": "Frameschaal",
+      "width": "Framebreedte",
+      "height": "Framehoogte",
+      "spacing": "Frameafstand",
+      "columns": "Raidkolommen",
+      "healthText": "Gezondheidstekst",
+      "healthNone": "Geen",
+      "healthPercent": "Percentage",
+      "healthCurrent": "Huidig",
+      "healthCurrentMax": "Huidig / Maximum",
+      "sort": "Spelers sorteren",
+      "sortGroup": "Groep",
+      "sortRole": "Rol",
+      "sortName": "Naam",
+      "showResource": "Mana, woede en energie tonen",
+      "showAbsorbs": "Absorptieschilden tonen",
+      "showAuras": "Versterkingen en verzwakkingen tonen",
+      "showSelf": "Je eigen frame tonen"
     },
     "frameReset": {
       "label": "Frameposities herstellen"
@@ -2304,6 +2305,9 @@ export const nl_NL: EnTranslations = {
       "already_linked": "Je account heeft al een gekoppeld Steam-account.",
       "account_taken": "Dat Steam-account is al aan een ander account gekoppeld.",
       "upstream": "Steam reageerde niet. Probeer het zo meteen opnieuw."
+    },
+    "welcome": {
+      "invalid_input": "Ongeldige invoer."
     }
   },
   "guide": {
@@ -2597,7 +2601,7 @@ export const nl_NL: EnTranslations = {
       "effectsTitle": "Buffs, debuffs en crowd control",
       "effectsBody": "Veel vaardigheden brengen een effect aan dat blijft hangen. Behulpzame (buffs) verhogen je statistieken, beschermen je, of helen je beetje bij beetje; schadelijke (debuffs) tappen je gezondheid af met schade na verloop van tijd of verzwakken je. Let op de kleine icoontjes in de bovenhoek van het scherm, naast de minimap, om te zien wat er op je ligt en hoe lang het duurt.",
       "ccBody": "Crowd control is een speciaal soort debuff die beperkt wat een doelwit kan doen: verdovingen, wortels en vertragingen, stiltes die het spreuken stilleggen, ontwapeningen, angsten, en transformaties die een vijand even ongevaarlijk maken. Tegen andere spelers slijt controle door herhaling: dezelfde soort te snel opnieuw toegepast verzwakt en faalt dan volledig, en een verdoving die vanuit sluipmodus opent wordt apart geteld van de verdovingen die erop volgen, zodat niemand voor eeuwig weerloos aaneengeregen kan worden. De wezens van de wereld koesteren zulke wrok niet: bij hen verzwakt controle nooit door herhaling, al kunnen veel van de machtigste vijanden, benoemde elites en de sterkste bazen onder hen, helemaal niet worden gecontroleerd.",
-      "metersBody": "Benieuwd hoe een gevecht verliep? Druk op Z om de groepsmeters te openen, die schade, genezing en dreiging voor je groep bijhouden, gevecht na gevecht.",
+      "metersBody": "Benieuwd hoe een gevecht verliep? Druk op Shift+H om de groepsmeters te openen, die schade, genezing en dreiging voor je groep bijhouden, gevecht na gevecht.",
       "queueTitle": "Je volgende zet staat al geladen",
       "queueBody": "Je hoeft je toetsdrukken niet exact op het frame te timen. Druk je volgende vaardigheid in de laatste ogenblikken van de lopende cast en hij wordt in de wachtrij gezet, om af te vuren zodra de cast klaar is, zodat geoefend spel zonder gaten verloopt. Een druk die te vroeg komt, wordt simpelweg geweigerd, zodat er niets verloren gaat. Sommige melee-aanvallen werken op dezelfde manier en rijden mee op je volgende wapenzwaai.",
       "deathTitle": "Wanneer je valt",
@@ -2658,7 +2662,7 @@ export const nl_NL: EnTranslations = {
       "petBarTerm": "Huisdierbalk",
       "petBarDef": "De commandorij die een huisdier van een jager of heksenmeester toevoegt: Aanvallen, Stoppen, Provoceren, Defensief en Agressief, standaard gebonden aan Ctrl plus 1 tot en met 5.",
       "metersTerm": "Schademeters",
-      "metersDef": "Het scorebordvenster van de groep voor het huidige gevecht: aangerichte schade, verrichte genezing en wie de meeste dreiging vasthoudt, per gevecht bijgehouden. Open het met de toetsbinding (standaard Z).",
+      "metersDef": "Het scorebordvenster van de groep voor het huidige gevecht: aangerichte schade, verrichte genezing en wie de meeste dreiging vasthoudt, per gevecht bijgehouden. Open het met de toetsbinding (standaard Shift+H).",
       "targetMarkerTerm": "Doelwitmarkering",
       "targetMarkerDef": "Een symbool dat elk groeps- of raidlid boven een doelwit kan spelden zodat iedereen zich op hetzelfde richt, of het juist mijdt. Acht symbolen, één doelwit per symbool.",
       "loadoutTerm": "Loadout",
@@ -2987,6 +2991,8 @@ export const nl_NL: EnTranslations = {
       "heroicRewardsTitle": "Heroïsche Merken en verbeterde buit",
       "heroicRewardsBody": "Heroïsche bazen laten de buit vallen die je kent, verbeterd en op de tooltip gemarkeerd als Heroïsch, en de eindbaas van elke run voegt epics toe die je nergens anders vindt. Die laatste kill laat ook Heroïsche Merken achter voor elke deelnemer: een munt die je uitgeeft bij Kwartiermeester Vex in Highwatch, wiens voorraad ringen en halskettingen de enige sieraden in het rijk zijn.",
       "heroicLockoutBody": "Gewone kerkers kun je de hele dag door lopen. Heroïsch vraagt geduld: de kill van de eindbaas zet iedereen in de run vast op één heroïsche clear van die kerker per dag, en de raid houdt voor elke moeilijkheidsgraad een eigen daglockout bij. Een uitgespeelde run voor vijf spelers blijft open voor de eigen groep, voor lijkenlopen en buit, zodat niemand wordt buitengesloten van wat ze daar hebben verdiend. De raid is strenger: zodra de kill je vastzet, blijft de deur dicht tot de dagelijkse reset, dus verzamel je buit voordat je de arena verlaat.",
+      "resetTitle": "Resetting your instances",
+      "resetBody": "Switch difficulty while your group still holds claimed runs and the old claims linger for a while before clearing on their own. The party leader can let them go at once instead: choose Reset All Instances on their own portrait menu, or type /dungeon reset. A reset works only after the difficulty has actually been changed, only while nobody, living or fallen, remains inside, and a short cooldown separates one reset from the next. Arrive at the door on the wrong difficulty and the game says so before the run starts. The raid is never reset this way; its own lockout rules stand.",
       "templeLoreTitle": "De Verdronken Tempel, een beetje dieper",
       "templeLoreBody": "De tempel heeft zijn eigen legende, ouder dan de sekte die je elders najaagt. Aan de oever van de Glansmere, een bergmeer dat het maanlicht drinkt en de verdronkenen teruggeeft, bewaakt een eenzame wachter een poort van bleek licht. Onder het oppervlak loopt een trap van koude steen erheen naar beneden. Het volk dat daar zonk verdronk niet door een ongeluk: het was het Bleke Koor, dat in aanbidding onderging en nooit ophield met zingen. De oude wachters krasten een enkele waarschuwing in de rotsen voordat het water hen nam, een gebed tot iets dat zij de Verdronken Maan noemden, met een vastere hand die twee woorden eronder toevoegde: het slaapt slechts.",
       "cryptLeadTitle": "Een deur die de doden gesloten moesten houden",
@@ -3184,7 +3190,7 @@ export const nl_NL: EnTranslations = {
       "bagsTitle": "Tassen en draagruimte",
       "bagsBody": "Alles wat je oppakt, reist mee in één gedeelde rugzak, en die vergroot je door tassen uit te rusten. Je tassenvenster heeft vier tassloten: klik op een tas in je rugzak om hem in een vrij slot te steken, en elke tas die je draagt, voegt zijn eigen ruimte toe. Eenvoudige tassen zijn goedkope handelswaar, ruimere vallen van beesten, en de fraaiste komen van kerkerbazen, zodat je draagruimte netjes meegroeit met je uitrusting.",
       "qualityTitle": "Kwaliteit, in één oogopslag",
-      "qualityBody": "Elk voorwerp heeft een kwaliteit, en zijn naam is gekleurd om die te tonen, zodat je zijn waarde in één oogopslag kunt aflezen. Van meest gewoon tot meest gewild:",
+      "qualityBody": "Every item has a quality, and its name is colored to match so you can read its worth at a glance. From most common to most prized:",
       "qualityPoor": "Pover",
       "qualityCommon": "Gewoon",
       "qualityUncommon": "Ongewoon",
@@ -3194,7 +3200,7 @@ export const nl_NL: EnTranslations = {
       "qualityNote": "Hogere kwaliteit betekent meestal betere statistieken, maar kwaliteit is een hint, geen regel. Een goed passend stuk voor jouw klasse en niveau kan een flitsender exemplaar verslaan.",
       "upgradeTitle": "Houd je uitrusting actueel",
       "upgradeBody": "Een oud stuk vervangen door een verse verbetering doet meer voor je dan perfect spelen in uitrusting die je ontgroeid bent. Wanneer er iets beters valt of een quest het aanbiedt, neem het. Bewaar je goede voorwerpen niet voor later.",
-      "itemLevelBody": "Wil je een snelle manier om twee stukken te vergelijken, zet dan Itemniveau Tonen aan in de opties. Uitrusting die je in de wereld bemachtigt, van vijanden en quests, toont dan een itemniveau, een enkel getal voor hoe krachtig het ongeveer is op basis van waar het vandaan komt, zodat je in één oogopslag ziet welke upgrade meer gewicht in de schaal legt, zelfs tussen verschillende slots. Stukken zonder zo'n bron, zoals eenvoudige verkoperswaar en beginuitrusting, tonen geen itemniveau, dus een ontbrekend getal is normaal, geen fout.",
+      "itemLevelBody": "If you want a quick way to compare two pieces, turn on Show Item Level in the options. Gear with a known source, from enemies, quests, and the crafting trades, then shows an item level, a single figure for roughly how powerful it is based on where it came from, so you can tell at a glance which upgrade pulls more weight, even across different slots. Pieces with no such source, like plain vendor basics and starter gear, show no item level, so a missing figure is normal, not a fault.",
       "sourcesTitle": "Waar uitrusting vandaan komt",
       "sourcesBody": "De meeste van je vroege verbeteringen zijn questbeloningen, dus het loont om quests af te ronden in plaats van te grinden. Vijanden laten uitrusting vallen wanneer je ze verslaat, verkopers in de stad verkopen degelijke basisspullen, ambachtslieden maken van verzamelde materialen draagbare stukken, en op de spelersmarkt kun je van andere avonturiers kopen. Bovenaan de heuvel kopen twee merkvaluta uitrusting die nergens anders te vinden is: Delve-Merken bij de delvebewaarder, en Heroïsche Merken bij de heroïsche kwartiermeester.",
       "soulboundTitle": "Zielgebonden: van jou en jou alleen",
@@ -3238,7 +3244,7 @@ export const nl_NL: EnTranslations = {
       "craftRecipesTitle": "Recepten en reagentia",
       "craftRecipesBody": "Elk recept vraagt om specifieke reagentia die je verzamelt of koopt. De meest eenvoudige recepten vragen niets anders dan gewone materialen en zijn vanaf het allereerste begin te maken, zodat je een vak meteen kunt gaan uitoefenen zodra je het oppakt. De receptenlijsten worden nog aangevuld: een paar vakken wachten nog op hun eerste recepten, en er komen er meer bij naarmate de ambachten groeien.",
       "craftHowTitle": "Het vervaardigingsvenster",
-      "craftHowBody": "Open het vervaardigingsvenster (standaardtoets T) om elk recept te zien dat je kent, wat elk nodig heeft en wat je bij de hand hebt; als de materialen er zijn, doet één klik het werk. Gewone recepten kun je overal in de wereld vervaardigen. Een handjevol geavanceerde gereedschapsrecepten vraagt je in plaats daarvan om bij de ambachtshub in Highwatch te staan.",
+      "craftHowBody": "Open the Crafting window (default key T) to see every recipe you know, what each one needs, and what you have on hand; when the materials are there, one click does the work. Common recipes can be crafted anywhere in the world. A handful of advanced recipes, higher-tier tools and rare caster armor among them, instead ask you to stand at the crafting hub in Highwatch.",
       "craftMasteryTitle": "Vaardigheid en meesterschap",
       "craftMasteryBody": "Succesvol iets maken bouwt vaardigheid op in dat vak, en vaardigheid houdt de recepten van een ambacht nooit achter slot: als je een recept kent en de materialen ervan bezit, kun je het proberen. Wat vaardigheid je in plaats daarvan oplevert, is kwaliteit: een geoefende hand levert fijner werk af. De enige uitzondering zijn combinatierecepten, die vragen dat je jezelf in beide ambachten hebt bewezen voordat ze opengaan.",
       "craftComboTitle": "Combinatierecepten",
@@ -5000,6 +5006,29 @@ export const nl_NL: EnTranslations = {
     "body": "We herstarten de gameservice en verwachten dat Claudemoon binnenkort weer terug is. Deze pagina blijft automatisch controleren.",
     "status": "Snel terug"
   },
+  "welcome": {
+    "back": "Welkom terug, {name}",
+    "level": "Niveau {level}",
+    "lastPlayed": "Laatst gespeeld: {when}",
+    "continue": "Wereld betreden",
+    "continueHint": "Enter om door te gaan, Esc om over te slaan",
+    "continueHintTouch": "Tik om door te gaan",
+    "discord": {
+      "title": "De community leeft op Discord",
+      "sub": "Voorproefjes van patches, evenementen, chat met de ontwikkelaars en 2 bonusvakken in de bank als je je Discord-account koppelt.",
+      "join": "Word lid van onze Discord"
+    },
+    "chest": {
+      "ready": "Kist met dagelijkse beloningen staat klaar"
+    },
+    "armory": {
+      "cta": "Wereld betreden en het Arsenaal bekijken"
+    },
+    "news": {
+      "new": "Nieuw",
+      "viewAll": "Bekijk alle updates op GitHub"
+    }
+  },
   "hud": {
     "core": {
       "elite": "ELITE",
@@ -6528,7 +6557,7 @@ export const nl_NL: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Wolvenbloed",
-        "description": "Verhoogt de aanvalskracht met 40 gedurende 6 sec. Alleen in Wolfsgedaante."
+        "description": "Verhoogt de aanvalskracht met {buff} gedurende {duration} sec. Alleen in Wolfsgedaante."
       },
       "rip": {
         "name": "Verscheuren",
@@ -6819,6 +6848,24 @@ export const nl_NL: EnTranslations = {
       },
       "eastbrook_wool_trousers": {
         "name": "Oostbeek-Wollen Broek"
+      },
+      "eastbrook_ritual_vestments": {
+        "name": "Rituele gewaden uit Oostbeek"
+      },
+      "eastbrook_druids_hide": {
+        "name": "Druïdenhuid uit Oostbeek"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "Beschermde beenstukken uit Oostbeek"
+      },
+      "wardweave_cowl": {
+        "name": "Kap van beschermweefsel"
+      },
+      "duskhide_wraps": {
+        "name": "Schemerhuid-wikkels"
+      },
+      "sootscale_mantle": {
+        "name": "Roetschubmantel"
       },
       "gravecaller_blade": {
         "name": "Grafroepers Breedkling"

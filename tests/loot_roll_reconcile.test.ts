@@ -3,7 +3,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import { terrainHeight } from '../src/sim/world';
-import { LOOT_ROLL_REGRACE_MS, reconcileLootRolls } from '../src/ui/loot_roll_reconcile';
+import { LOOT_ROLL_REGRACE_MS, reconcileLootRolls } from '../src/ui/hud/loot/loot_roll_reconcile';
 
 // Loot-roll prompts were delivered only as a single best-effort `lootRoll`
 // event. A client that missed that one frame (reconnect, interest churn, a

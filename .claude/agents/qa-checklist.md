@@ -56,6 +56,7 @@ Read all in-scope files. Also read the CLAUDE.md files that govern each domain i
 - `src/net/CLAUDE.md` (net / wire protocol in scope)
 - `src/render/CLAUDE.md` (and its `characters/` sub-file; the `assets/` notes are a section inside it) (renderer in scope)
 - `src/ui/CLAUDE.md` and `src/styles/CLAUDE.md` (HUD / i18n / CSS in scope)
+- `src/ui/hud/CLAUDE.md` (an extracted HUD domain under `src/ui/hud/` in scope)
 - `src/game/CLAUDE.md` (input / camera / mobile in scope)
 - `src/admin/CLAUDE.md` (admin dashboard SPA in scope)
 - `headless/CLAUDE.md` and `python/CLAUDE.md` (RL env in scope)
@@ -238,7 +239,9 @@ Skip if no `src/sim/content/` files are in scope.
 
 - `npx tsc --noEmit` is clean.
 - The relevant Vitest files pass; for a full check the CI-equivalent gate is green, in the order
-  the CI workflow runs it: `npm run i18n:gen` then the i18n freshness check
+  `npm run gate` (`scripts/gate.mjs`) runs it serially (CI splits the same step list across a
+  sharded test matrix plus a parallel checks job, pinned by `tests/ci_workflow.test.ts`):
+  `npm run i18n:gen` then the i18n freshness check
   (`git diff --exit-code` over the generated i18n artifacts), `npm run security:gate`,
   `npm run ci:changed` (biome, changed files), `npm run sfx:check`,
   `npm test`, `npx tsc --noEmit`, `npm run build:env`, `npm run build:server`, `npm run build`.

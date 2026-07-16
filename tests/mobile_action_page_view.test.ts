@@ -8,7 +8,7 @@ import {
   nextMobilePage,
   sourceSlotForMobileButton,
   sourceSlotsForMobilePage,
-} from '../src/ui/mobile_action_page_view';
+} from '../src/ui/hud/action_bar/mobile_action_page_view';
 
 describe('mobilePageCount', () => {
   it('defaults to 2 pages for the default 10-slot span', () => {

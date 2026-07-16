@@ -332,6 +332,11 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     startWeapon: 'gnarled_staff',
     startChest: 'footpad_jerkin',
     startItems: START_RATIONS_MANA,
+    // The same fixed class wand the other casters carry, in the druid's nature
+    // school. Form-aware: available only in caster form and Moonwing Form; the
+    // bear/cat/travel shapeshifts fight with claws (see combat/form_swing.ts
+    // rangedAutoProfile, which the auto-attack loop resolves through).
+    ranged: { min: 3, max: 6, speed: 1.8, maxRange: 30, minRange: 0, wand: true, school: 'nature' },
     abilities: [
       'wrath',
       'healing_touch',
@@ -3377,6 +3382,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'nature',
     requiresTarget: false,
     offGcd: true,
+    // A tank cooldown, so it must fire mid-fight in Bruin Form (or Wolf Form)
+    // like Primal Reflexes/Primal Surge below, not just pre-cast in caster form.
+    usableInForm: true,
     effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 150, duration: 15 }],
     description: 'Your skin hardens like bark, increasing armor by 150 for 15 sec.',
   },
@@ -3548,7 +3556,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     requiresForm: 'cat',
     effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 40, duration: 6 }],
-    description: 'Increases attack power by 40 for 6 sec. Wolf Form only.',
+    description: 'Increases attack power by $b for $t sec. Wolf Form only.',
   },
   rip: {
     id: 'rip',
