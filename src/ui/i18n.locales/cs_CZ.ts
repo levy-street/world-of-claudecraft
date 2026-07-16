@@ -2,6 +2,160 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const cs_CZ: Partial<Record<TranslationKey, string>> = {
+  'entities.abilities.ironhold.description':
+    'Zapři se za svůj štít a sniž veškeré utrpěné poškození o 40 % po dobu 8 sekund.',
+  'entities.abilities.ironhold.name': 'Železný hmat',
+  'entities.abilities.primal_reflexes.description':
+    'Tvoje instinkty se zostří a tvá šance na vyhnutí se útoku vzroste o 50 % po dobu 6 sekund.',
+  'entities.abilities.primal_reflexes.name': 'Prvotní reflexy',
+  'entities.abilities.sacred_bulwark.description':
+    'Po dobu {duration} sekund je odvrácen příští nepřátelský úder, který by tě zabil, a místo toho ti obnoví 35 % zdraví.',
+  'entities.abilities.sacred_bulwark.name': 'Posvátná hradba',
+  'guide.family.reptile.desc':
+    'Studenokrevní lovci s vlastním syčením a lupem čelistí, odlišní od teplokrevných bestií.',
+  'guide.family.reptile.name': 'Plazi',
+  'hudChrome.auraEffect.damageReduction': 'Snižuje veškeré utrpěné poškození o {pct} %',
+  'hudChrome.auraEffect.guardianWard':
+    'Příští smrtící nepřátelský útok místo toho obnoví tvoje zdraví na {pct} %',
+  'hudChrome.bags.dragDestroyHint': 'Přetáhni do světa a předmět bude zničen',
+  'hudChrome.bags.dragEquipHint': 'Přetáhni na svou postavu a předmět bude vybaven',
+  'hudChrome.bags.reorderNeedsRecent':
+    'Zruš filtr a seřaď podle Nedávných, chceš-li přeuspořádat batohy',
+  'hudChrome.bags.rightClickDestroy': 'Kliknutím pravým tlačítkem zničíš',
+  'hudChrome.cameraPrompt.changeLater':
+    'Toto nastavení můžeš změnit později v nabídce Esc, Klávesové zkratky.',
+  'hudChrome.cameraPrompt.classicDesc':
+    'Přidržte pravé tlačítko myši a pohybujte myší pro otáčení kamery.',
+  'hudChrome.cameraPrompt.classicTitle': 'Klasická kamera',
+  'hudChrome.cameraPrompt.confirm': 'Potvrdit',
+  'hudChrome.cameraPrompt.intro': 'Zvol, jak kamera sleduje tvou postavu.',
+  'hudChrome.cameraPrompt.mouseDesc':
+    'Pohybuj myší pro otáčení kamery bez nutnosti přidržovat tlačítko.',
+  'hudChrome.cameraPrompt.title': 'Zvolte si kameru',
+  'hudChrome.discord.link.joinServer': 'Připojit se na Discord server',
+  'hudChrome.discord.roleTag.contentcreator': 'Tvůrce obsahu',
+  'hudChrome.discord.roleTag.juniormods': 'Junior moderátor',
+  'hudChrome.discord.roleTag.legend': 'LEGENDA',
+  'hudChrome.discord.roleTag.seniormods': 'Senior moderátor',
+  'hudChrome.discord.roleTag.shill': 'HLASATEL',
+  'hudChrome.finder.accept': 'Přijmout',
+  'hudChrome.finder.acceptApplicantAria': 'Přijmout {name}',
+  'hudChrome.finder.accepted': '{accepted} z {size} potvrzeno',
+  'hudChrome.finder.acceptedWait': 'Čeká se na ostatní...',
+  'hudChrome.finder.activity': 'Aktivita',
+  'hudChrome.finder.applicants': 'Uchazeči',
+  'hudChrome.finder.apply': 'Přihlásit se',
+  'hudChrome.finder.attunement': 'Vyžaduje naladění: {quest}',
+  'hudChrome.finder.back': 'Zpět',
+  'hudChrome.finder.blockedLevel': 'Pouze úrovně {min} až {max}',
+  'hudChrome.finder.blockedSpec': 'Vyžaduje specializaci',
+  'hudChrome.finder.boardEmpty': 'Momentálně žádné nabídky. Přidej svou!',
+  'hudChrome.finder.boardLeaderGate': 'Nabídku může zveřejnit pouze vůdce skupiny.',
+  'hudChrome.finder.chooseActivities': 'Zvolte aktivity',
+  'hudChrome.finder.clock': '{minutes}:{seconds}',
+  'hudChrome.finder.close': 'Zavřít',
+  'hudChrome.finder.closeListing': 'Uzavřít nabídku',
+  'hudChrome.finder.cooldownNote': 'Do fronty se můžeš znovu přidat za {seconds} s.',
+  'hudChrome.finder.decline': 'Odmítnout',
+  'hudChrome.finder.declineApplicantAria': 'Odmítnout {name}',
+  'hudChrome.finder.encounters': 'Střety',
+  'hudChrome.finder.entrance': 'Vstup: {zone}',
+  'hudChrome.finder.finalBoss': 'Závěrečný boss',
+  'hudChrome.finder.freeRoles': 'Vítány jsou libovolné role',
+  'hudChrome.finder.heroic': 'Hrdinský',
+  'hudChrome.finder.heroicMarks': 'Hrdinská znamení: {count} za hráče',
+  'hudChrome.finder.joinQueue': 'Vstoupit do fronty',
+  'hudChrome.finder.kindDungeon': 'Dungeon',
+  'hudChrome.finder.kindRaid': 'Raid',
+  'hudChrome.finder.kindSolo': 'Sólové dobrodružství',
+  'hudChrome.finder.leader': 'Vůdce: {name}',
+  'hudChrome.finder.leaderNote': 'Do fronty může skupinu zařadit pouze vůdce skupiny.',
+  'hudChrome.finder.leaveQueue': 'Opustit frontu',
+  'hudChrome.finder.levelClass': 'Úr. {level} {className}',
+  'hudChrome.finder.levelOne': 'Úroveň {level}',
+  'hudChrome.finder.levels': 'Úrovně {min} až {max}',
+  'hudChrome.finder.lockedFor': 'Uzamčeno přibližně na {minutes} min',
+  'hudChrome.finder.lockoutDaily': 'Denní uzamčení na závěrečného bosse',
+  'hudChrome.finder.lockoutNone': 'Žádné uzamčení',
+  'hudChrome.finder.lootChance': 'Dodatečné šance na kořist:',
+  'hudChrome.finder.lootGuaranteed': 'Vždy vypadne jedno z těchto:',
+  'hudChrome.finder.lootHeroic': 'Hrdinský bonus, vždy vypadne jedno z těchto:',
+  'hudChrome.finder.lootMaybe': 'Může vypadnout nejvýše jeden z těchto předmětů:',
+  'hudChrome.finder.mech.deathless_rage': 'Nesmrtelný hněv (přerušen u ochranných kamenů)',
+  'hudChrome.finder.mech.deathstalker_cleave': 'Sek smrtilovcovy zbraně (čelní sek)',
+  'hudChrome.finder.mech.enrage': 'Zuří při nízkém zdraví',
+  'hudChrome.finder.mech.grave_cleaver': 'Hrobní sekáč (čelní sek)',
+  'hudChrome.finder.mech.gravebreaker': 'Rozbíječ hrobů (čelní kužel, otočte jej od raidu)',
+  'hudChrome.finder.mech.lunar_tide': 'Měsíční příboj (pulzující plošné poškození)',
+  'hudChrome.finder.mech.mana_burn': 'Vyschlé požehnání (spaluje manu)',
+  'hudChrome.finder.mech.mist_surge': 'Mlžný příval (pulzující plošné poškození)',
+  'hudChrome.finder.mech.mortal_wound': 'Zapomenutá rána (snižuje přijímané léčení)',
+  'hudChrome.finder.mech.necrotic_shockwave': 'Nekrotická rázová vlna (silné plošné poškození)',
+  'hudChrome.finder.mech.profane_mending': 'Znesvěcené léčení (léčí spojence)',
+  'hudChrome.finder.mech.raise_fallen': 'Povstání padlých (periodické vlny přivolávek)',
+  'hudChrome.finder.mech.reaping_arc': 'Žací oblouk (čelní sek)',
+  'hudChrome.finder.mech.sealbreak_shockwave': 'Rázová vlna zlomení pečeti (plošný výbuch)',
+  'hudChrome.finder.mech.shadow_nova': 'Stínová nova (plošný výbuch)',
+  'hudChrome.finder.mech.shadow_pulse': 'Stínový puls (pulzující plošné poškození)',
+  'hudChrome.finder.mech.shuddering_stomp': 'Třesoucí dupnutí (plošné ochromení)',
+  'hudChrome.finder.mech.soul_rend': 'Trhání duše (označení hráči se musí rozejít a být vyléčeni)',
+  'hudChrome.finder.mech.summons_adds': 'Přivolává posily',
+  'hudChrome.finder.mech.wardstones': 'Kanály ochranných kamenů (přechod fáze)',
+  'hudChrome.finder.needs': 'Potřebuje {roles}',
+  'hudChrome.finder.needsSpec': 'Zvol specializaci, abys mohl/a využívat Hledač dungeonů.',
+  'hudChrome.finder.noApplicants': 'Zatím žádní uchazeči.',
+  'hudChrome.finder.normal': 'Normální',
+  'hudChrome.finder.openListings': 'Otevřené nabídky',
+  'hudChrome.finder.pct': '{pct} %',
+  'hudChrome.finder.proposalRole': 'Tvoje role: {role}',
+  'hudChrome.finder.proposalTitle': 'Skupina nalezena: {name}',
+  'hudChrome.finder.publish': 'Zveřejnit',
+  'hudChrome.finder.publishListing': 'Zveřejnit nabídku',
+  'hudChrome.finder.remaining': '{seconds} s na odpověď',
+  'hudChrome.finder.roleCount': '{count} {role}',
+  'hudChrome.finder.roleDps': 'Útočník',
+  'hudChrome.finder.roleHealer': 'Léčitel',
+  'hudChrome.finder.roleTank': 'Tank',
+  'hudChrome.finder.showOnMap': 'Zobrazit na mapě',
+  'hudChrome.finder.slotState': '{role}: {accepted} z {total} připraveno',
+  'hudChrome.finder.slots': '{size}/{capacity}',
+  'hudChrome.finder.summoned': 'Přivolaný strážce',
+  'hudChrome.finder.syncing': 'Čeká se na realm...',
+  'hudChrome.finder.tabBoard': 'Předem sestavené skupiny',
+  'hudChrome.finder.tabCatalogue': 'Katalog',
+  'hudChrome.finder.tabQueue': 'Rychlé přiřazení',
+  'hudChrome.finder.tagFastRun': 'Rychlý průběh',
+  'hudChrome.finder.tagFirstRun': 'První průběh',
+  'hudChrome.finder.tagFullClear': 'Úplné vyčištění',
+  'hudChrome.finder.tagLearning': 'Vítáni začátečníci',
+  'hudChrome.finder.tagQuestRun': 'Průběh za questem',
+  'hudChrome.finder.title': 'Hledač dungeonů',
+  'hudChrome.finder.travelNote':
+    'Skupina se sestaví tam, kde každý stojí. Cestujte ke vchodu společně; nikdo není přenesen teleportem.',
+  'hudChrome.finder.waited': 'Čas ve frontě: {time}',
+  'hudChrome.finder.withdraw': 'Odvolat přihlášku',
+  'hudChrome.finder.yourListing': 'Tvoje nabídka',
+  'hudChrome.finder.yourRoles': 'Tvoje role',
+  'hudChrome.gathering.notReady': 'Tento zdroj pro tebe ještě neobnovil zásoby.',
+  'hudChrome.keybinds.sheathe': 'Zasunout/Vytasit zbraň',
+  'hudChrome.meters.autoShowHint':
+    'Řádky se zobrazí automaticky, jakmile tvoje skupina způsobí poškození nebo léčení, a tento segment se zavře několik sekund po skončení boje.',
+  'hudChrome.options.showAttackButton': 'Zobrazit tlačítko útoku',
+  'hudChrome.petFeed.disabledFullHp': 'Mazlíček má plné zdraví',
+  'hudChrome.petFeed.disabledNoFood':
+    'V batohách nemáš žádné jídlo, které by vyléčilo tvého mazlíčka',
+  'hudChrome.plurals.finderPartySize.few': '{count} hráči',
+  'hudChrome.plurals.finderPartySize.many': '{count} hráčů',
+  'hudChrome.plurals.finderPartySize.one': '{count} hráč',
+  'hudChrome.plurals.finderPartySize.other': '{count} hráčů',
+  'hudChrome.statInfo.desc.hitRating':
+    'Hodnocení zásahu z vybavení a bonusů sady, snižující četnost mašení tvých útoků a odolávání tvým kouzlům, zejména proti nepřátelům vyšší úrovně. Přibližně 10 bodů hodnocení přidá 1 % zásahu.',
+  'hudChrome.statInfo.names.hitRating': 'Hodnocení zásahu',
+  'abilityUi.actionBar.attackRemoveHint':
+    'Klikni pravým tlačítkem pro odebrání z lišty a uvolnění slotu.',
+  'loading.realmFull': 'Tento svět je momentálně plný. Zkus to prosím znovu za několik minut.',
+  'loading.tooManyConnections':
+    'Z tvé sítě se k tomuto světu připojuje příliš mnoho spojení. Zavři nadbytečná herní okna nebo to zkus znovu za několik minut.',
   'entities.abilities.sport_boot.description':
     'Dlouhý vysoký odkop směrem k zaměřovanému bodu. Dav to miluje.',
   'entities.abilities.sport_boot.name': 'Velký odkop',
@@ -37,7 +191,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.nav.professions': 'Profese',
   'guide.nav.valeCup': 'Pohár údolí',
   'guide.professions.archetypeChooseBody':
-    'Svůj první archetyp vyhlašuješ skrze raný příběhový úkol v první zóně, který tě do dané identity formálně přijme. Dokud tento úkol nedokončíš, žádný archetyp sis ještě nezvolil.',
+    'Vyhlášení archetypu bude příběhový okamžik: úkol, který tě do dané identity formálně přijme. Tato cesta se teprve buduje, takže prozatím každá postava chodí světem s volbou před sebou a každé řemeslo mezitím postupuje až po vzácnou úroveň kvality.',
   'guide.professions.archetypeChooseTitle': 'Volba archetypu',
   'guide.professions.archetypeIdentityBody':
     'Tvůj aktivní archetyp je prohlášením o tom, kým tvá postava ve světě je, a projevuje se v tom, jak tě ostatní i svět oslovují. Přesné odměny a uznání, které s ním přicházejí, se ještě dolaďují; vracej se sem, jak se systém bude doplňovat.',
@@ -45,38 +199,38 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.professions.archetypeIntro':
     'Každé z deseti řemesel zároveň představuje archetyp, širší identitu, kterou můžeš přijmout nad rámec samotné práce v daném oboru. Aktivní archetyp je vždy jen jedna volba, ne seznam k odškrtání: neseš jeden a později ho můžeš změnit, pokud se tak rozhodneš.',
   'guide.professions.archetypeSwitchBody':
-    'Jednou vyhlášený archetyp tě nesvazuje navždy. Přechod k jinému archetypu znamená nejprve dokončit opakovatelný úkol "odčinění" u toho starého, a s každou další změnou je od tebe očekávané odčinění o něco náročnější, takže změna zůstává smysluplná, ne bezplatná.',
+    'Ani vyhlášení nebude doživotní ortel. V plánu je opakovatelné odčinění vůči tvému starému oboru, než se chopíš nového, přičemž s každou další změnou je odčinění strmější, takže volba zůstává smysluplná, ne bezplatná. Stejně jako samotné vyhlášení je i tohle teprve na cestě.',
   'guide.professions.archetypeSwitchTitle': 'Změna názoru',
   'guide.professions.archetypeTitle': 'Deset archetypů',
   'guide.professions.craftComboBody':
-    'Kromě vlastního seznamu receptů jednotlivých řemesel podporuje kolo i kombinované recepty, které čerpají ze dvou sousedních řemesel najednou a odměňují postavu (nebo dvojici obchodních partnerů), která investovala do sousedících oborů na kruhu, ne do jednoho v izolaci.',
+    'Kromě vlastního seznamu receptů jednotlivého řemesla podporuje kolo i kombinované recepty, které čerpají ze dvou sousedních řemesel najednou a odměňují postavu, jež investovala do sousedících oborů na kruhu, ne do jednoho v izolaci. Výrobce musí ovládat obě řemesla sám; dovednost partnera nemůže zastoupit ani jednu z polovin.',
   'guide.professions.craftComboTitle': 'Kombinované recepty',
   'guide.professions.craftIntro':
     'Deset výrobních řemesel proměňuje nasbírané suroviny v hotovou výbavu a zboží: zbrojířství, kovářství zbraní a klenotnictví tvarují surovou hmotu v nositelnou výbavu; alchymie a inženýrství stojí na pokusech a omylech; vaření, písařství a očarovávání se dotýkají výstupů ostatních řemesel; krejčovství a koželužství pracují podle přesných střihů. Dohromady tvoří kolo, kde každé řemeslo sousedí se dvěma dalšími a stojí naproti jednomu.',
   'guide.professions.craftMasteryBody':
-    'Úspěšná výroba zvyšuje dovednost v daném řemesle a bohatší recepty jsou zamčené za vyšší dovedností: základní recepty jsou otevřené všem, zatímco postupně pokročilejší vyžadují stále větší mistrovství. Růst dovednosti v řemesle je cesta od jednoduchého začátečnického zboží k jeho ambicióznějším receptům.',
+    'Úspěšná výroba zvyšuje dovednost v daném řemesle a dovednost nikdy nezamyká recepty řemesla: pokud recept znáš a máš jeho materiály, můžeš se o něj pokusit. Co ti dovednost místo toho kupuje, je kvalita, zkušená ruka odvede jemnější práci. Jedinou výjimkou jsou kombinované recepty, které tě žádají, aby ses osvědčil v obou jejich řemeslech, než se otevřou.',
   'guide.professions.craftMasteryTitle': 'Dovednost a mistrovství',
   'guide.professions.craftRecipesBody':
-    'Každé řemeslo má vlastní recepty a každý vyžaduje konkrétní přísady, které nasbíráš nebo koupíš. Nejzákladnější recepty každého řemesla žádají jen běžné materiály a lze je vyrábět od samého začátku, takže se do oboru můžeš pustit hned, jak si ho osvojíš, místo čekání na odemčení.',
+    'Každý recept vyžaduje konkrétní přísady, které nasbíráš nebo koupíš. Nejjednodušší recepty žádají jen běžné materiály a lze je vyrábět od samého začátku, takže se do oboru můžeš pustit hned, jak si ho osvojíš. Seznamy receptů se stále doplňují: pár řemesel čeká na své první recepty a další přibývají, jak řemesla rostou.',
   'guide.professions.craftRecipesTitle': 'Recepty a přísady',
   'guide.professions.craftRingBody':
     'Deset řemesel je uspořádáno do pevného kruhu a na tom, kde řemeslo na kruhu sedí, záleží: řemesla vedle sebe toho mají společného víc než řemesla na protilehlých stranách. Oddat se jednomu řemeslu má působit jako vstup do rodiny příbuzných oborů, ne jako výběr izolované dovednosti.',
   'guide.professions.craftRingTitle': 'Kolo specializací',
   'guide.professions.craftTitle': 'Deset řemesel',
   'guide.professions.gatherIntro':
-    'Tři sběračské obory ti umožňují získávat suroviny přímo ze světa: Těžba dobývá rudu a kámen ze žil, Dřevorubectví kácí dřevo v porostech stromů a Bylinkářství sbírá divoce rostoucí byliny a rostliny. Každý se počítá zvlášť, takže práce v jednom nikdy nezpomalí tvůj postup v jiném.',
+    'Tři sběračské obory ti umožňují získávat suroviny přímo ze světa: Těžba dobývá rudu a kámen ze žil, Dřevorubectví kácí dřevo v porostech stromů a Bylinkářství sbírá divoce rostoucí byliny a rostliny. Každý se počítá zvlášť, takže práce v jednom nikdy nezpomalí tvůj postup v jiném. Jsi v tom nový? Předák Odell v Eastbrooku má krátkou pochůzku, Řemeslo pro každou ruku, která tě provede tvou první sklizní.',
   'guide.professions.gatherProficiencyBody':
-    'Každá úspěšná sklizeň zvyšuje tvou zběhlost v daném sběračském oboru. Vyšší zběhlost posouvá to, co z naleziště získáš, ke vzácnějším stupňům materiálu, od běžného výše, i když ty nejvzácnější stupně zůstávají vzácné i při vysoké zběhlosti. Více praxe tvým šancím nikdy neškodí, vždy je jen zlepšuje.',
-  'guide.professions.gatherProficiencyTitle': 'Zběhlost a kvalita materiálu',
+    'Každá úspěšná sklizeň zvyšuje tvou zběhlost v daném sběračském oboru a karta postavy sleduje každý obor zvlášť. Více praxe tvému postupu nikdy neškodí, vždy k němu jen přidává.',
+  'guide.professions.gatherProficiencyTitle': 'Zběhlost',
   'guide.professions.gatherTitle': 'Sběr: Těžba, Dřevorubectví a Bylinkářství',
   'guide.professions.gatherToolsBody':
-    'Obchodníci prodávají základní nástroje pro každý sběračský obor a lepší lze vyrobit, takže práce na nalezišti má s lepší výbavou působit stále schopněji, ne zůstávat pořád stejná. Nástroje vyšší úrovně jsou zamýšlená cesta k bohatším nalezištím a k jejich efektivnějšímu zpracování během dlouhé výpravy.',
+    'Obchodníci prodávají základní nástroje pro každý sběračský obor a lepší lze vyrobit. K práci na nalezišti dnes není žádný nástroj potřeba: nástroje jsou základ pro bohatší naleziště, která teprve přijdou, kde budou cestou dovnitř krumpáče, sekery a srpy vyšších stupňů.',
   'guide.professions.gatherToolsTitle': 'Nástroje řemesla',
   'guide.professions.gatherWhatBody':
-    'Rudné žíly, porosty dřeva a záhony bylin jsou rozmístěny po zónách jako viditelné objekty, které nikomu nepatří. Přijď k jednomu a interakcí sklidíš, co ukrývá. Jakmile naleziště sklidíš, potřebuje čas na zotavení, než ho ty osobně sklidíš znovu, nikomu jinému ale nebrání: jiný hráč může totéž naleziště mezitím sklidit.',
+    'Rudné žíly, porosty dřeva a záhony bylin jsou rozmístěny po Údolí a močálu jako viditelné objekty, které nikomu nepatří. Přijď k jednomu a interakcí sklidíš, co ukrývá. Jakmile naleziště sklidíš, potřebuje čas na zotavení, než ho ty osobně sklidíš znovu, nikomu jinému ale nebrání: jiný hráč může totéž naleziště mezitím sklidit.',
   'guide.professions.gatherWhatTitle': 'Naleziště surovin',
   'guide.professions.intro':
-    'Kromě boje a úkolů tě svět odměňuje i za práci na poli a u výhně: za sběr surovin, jejich proměnu ve výbavu u výrobních stanic deseti různých řemesel a za přijetí identity jednoho z deseti archetypů, které tato řemesla představují.',
+    'Kromě boje a úkolů tě svět odměňuje i za práci na poli a u výhně: za sběr surovin, jejich proměnu ve výbavu a zboží napříč deseti výrobními řemesly a za přijetí identity jednoho z deseti archetypů, které tato řemesla představují.',
   'guide.valeCupPage.heading': 'Pohár údolí',
   'guide.valeCupPage.howHeading': 'Jak hrát',
   'guide.valeCupPage.howMatch':
@@ -111,15 +265,15 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Každý tým hraje pod zástavou. Národ vybírá kapitán, a pokud obě strany hrají pod stejnou, hostující strana nastoupí v obrácených barvách.',
   'guide.valeCupPage.nationsHeading': 'Osm národních zástav',
   'guide.valeCupPage.rewardsBody':
-    'Pravidla příměří znamenají žádné zkušenosti a žádnou kořist: rozhodnutý zápas se počítá do tvé bilance a na tabuli vítězů a přináší i body denních odměn. Dezerce ze zápasu ti zablokuje místo a správce hřiště si to pamatuje.',
+    'Pravidla příměří znamenají žádné zkušenosti a žádnou kořist: rozhodnutý zápas se počítá do tvé bilance a na tabuli vítězů a výhra se počítá i do denních úkolů o odměny. Dezerce ze zápasu ti zablokuje místo a správce hřiště si to pamatuje.',
   'guide.valeCupPage.rewardsHeading': 'Pravidla příměří',
   'guide.valeCupPage.rolesBody':
-    'Tvá role určuje výbavu, kterou si neseš na hřiště. Kopou všichni; zbytek je povaha.',
+    'Tvá role určuje výbavu, kterou si neseš na hřiště. Kopou všichni; zbytek je povaha. V bracketech jeden na jednoho a dva na dva hrají všichni všestrannou výbavu, takže volba role přijde ke slovu až od tří na tři výš.',
   'guide.valeCupPage.rolesHeading': 'Sportovní role',
   'guide.valeCupPage.spectateBody':
     'Na stadionu se hraje vždy jen jeden zápas a kdokoli může přijít a sledovat ho z tribun.',
   'hudChrome.keybinds.valecup': 'Pohár údolí',
-  'hudChrome.mobile.dailyRewards': 'Odměny',
+  'hudChrome.mobile.dailyRewards': 'Obchod',
   'hudChrome.perf.labels.predLead': 'Náskok predikce',
   'hudChrome.perf.labels.serverTick': 'Frekvence tiků serveru',
   'hudChrome.townFocus.budgetLabel': 'Zbývající body: {remaining} / {budget}',
@@ -331,12 +485,30 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'heroicShop.balance': 'Hrdinské značky: {count}',
   'heroicShop.buyAria': 'Koupit {item} za {marks} hrdinských značek',
   'hudChrome.bags.cannotDestroy': 'Tento předmět nelze zničit.',
-  'hudChrome.bags.rightClickDestroy': 'Zničíš pravým kliknutím',
   'hudChrome.crafting.comboRequirementUnmet':
     'Nemáš obě požadovaná řemesla na potřebné úrovni pro tento recept.',
   'hudChrome.discord.roleTag.coredevs': 'Hlavní dev',
   'hudChrome.dungeonDifficulty.setHeroic': 'Nastavit obtížnost dungeonu: Hrdinská',
   'hudChrome.dungeonDifficulty.setNormal': 'Nastavit obtížnost dungeonu: Normální',
+  'hudChrome.dungeonDifficulty.resetAll': 'Resetovat všechny instance',
+  'hudChrome.dungeonDifficulty.resetDone': 'Všechny instance byly resetovány.',
+  'hudChrome.dungeonDifficulty.resetNone': 'Nemáš žádné instance k resetování.',
+  'hudChrome.dungeonDifficulty.resetOccupied':
+    'Instance nelze resetovat, dokud je někdo stále uvnitř.',
+  'hudChrome.dungeonDifficulty.resetSameDifficulty':
+    'Před resetováním těchto instancí změň obtížnost dungeonu. Prázdné instance se po 5 minutách resetují samy.',
+  'hudChrome.dungeonDifficulty.resetUsage':
+    'Po změně obtížnosti použij /dungeon reset k opuštění prázdných instancí.',
+  'hudChrome.dungeonDifficulty.resetLoot': 'Instance nelze resetovat, dokud uvnitř zůstává kořist.',
+  'hudChrome.dungeonDifficulty.resetConfirmTitle': 'Resetovat všechny instance?',
+  'hudChrome.dungeonDifficulty.resetConfirmBody':
+    'Tím opustíš prázdné instance z dříve vybrané obtížnosti. Nevyzvednutá kořist zabrání resetování.',
+  'hudChrome.dungeonDifficulty.resetConfirm': 'Resetovat instance',
+  'hudChrome.dungeonDifficulty.resetCooldown': 'Instance lze resetovat pouze jednou za 5 minut.',
+  'hudChrome.dungeonDifficulty.entryMismatchNormal':
+    'Tato instance je nastavena na normální obtížnost. Použij Resetovat všechny instance a začni nový hrdinský průchod.',
+  'hudChrome.dungeonDifficulty.entryMismatchHeroic':
+    'Tato instance je nastavena na hrdinskou obtížnost. Použij Resetovat všechny instance a začni nový normální průchod.',
   'hudChrome.itemProc.attackSlow': 'a zpomalí rychlost útoku cíle o {pct} % na {duration} s',
   'hudChrome.itemProc.chainArc':
     'zasáhne cíl {school} kouzlem {name} ({damage}), které přeskočí na {jumps} nedalekých nepřátel se slábnoucím poškozením',
@@ -417,6 +589,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'a11y.toggleMenu': 'Přepnout menu',
   'download.desc': 'Získej samostatný launcher pro optimalizovaný výkon a hraní na celé obrazovce.',
   'download.linuxCta': 'Stáhnout pro Linux',
+  'download.windowsCta': 'Stáhnout pro Windows',
   'download.linuxHint':
     'AppImage: nastav soubor jako spustitelný a spusť ho. Instalace není potřeba.',
   'download.macCta': 'Stáhnout pro macOS',
@@ -3239,6 +3412,25 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.paperdoll.unequipHint':
     'Klikni na x, pravé kliknutí, nebo přetáhni do batohů pro sundání',
   'hudChrome.party.inviteUsage': 'Koho pozvat? Použití: /invite <jméno>.',
+  'hudChrome.playerMenu.info': 'Informace o hráči',
+  'hudChrome.playerMenu.block': 'Zablokovat',
+  'hudChrome.playerMenu.unblock': 'Odblokovat',
+  'hudChrome.playerMenu.openFor': 'Otevřít nabídku hráče {name}',
+  'hudChrome.playerMenu.profileUnavailable': 'Profil hráče {name} nebyl nalezen.',
+  'hudChrome.playerMenu.aiTag': '[AI]',
+  'hudChrome.playerMenu.aiTagTitle': 'Účet ovládaný AI',
+  'hudChrome.playerMenu.watchTwitch': 'Sledovat na Twitchi',
+  'hudChrome.playerMenu.watchX': 'Zobrazit na X',
+  'hudChrome.playerMenu.watchKick': 'Sledovat na Kicku',
+  'hudChrome.playerMenu.watchYouTube': 'Sledovat na YouTube',
+  'hudChrome.social.ignoredTab': 'Ignorovaní',
+  'hudChrome.social.ignoredEmpty': 'Nikoho neignoruješ.',
+  'hudChrome.social.blockedEmpty': 'Nikoho jsi nezablokoval.',
+  'hudChrome.social.blockSearchPlaceholder': 'Jméno hráče',
+  'hudChrome.social.blockAction': 'Zablokovat',
+  'hudChrome.social.nowBlocking': '{name} zablokován.',
+  'hudChrome.social.blockedTab': 'Zablokovaní',
+  'hudChrome.social.stopBlockingTitle': 'Odblokovat hráče {name}',
   'hudChrome.party.promoteLeader': 'Povýšit na vůdce',
   'hudChrome.playerFrame.lock': 'Zamknout rám hráče',
   'hudChrome.playerFrame.unlock': 'Přesunout rám hráče',
@@ -4745,6 +4937,9 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.morthen.name': 'Morthen Hrobovolající',
   'entities.mobs.mudfin_murloc.name': 'Bahennoploutvý plíživec',
   'entities.mobs.nhalia_mourner.name': 'Nhaliin truchlící',
+  'entities.mobs.nythraxis_heroic_priest_add.name': 'Malric, nesmrtelný hierofant',
+  'entities.mobs.nythraxis_heroic_rogue_add.name': 'Voss, nesmrtelný nůž',
+  'entities.mobs.nythraxis_heroic_warrior_add.name': 'Aldren, nesmrtelná válečná stráž',
   'entities.mobs.nythraxis_scourge_of_thornpeak.name': 'Nythraxis, metla Thornpeaku',
   'entities.mobs.nythraxis_skeleton_warrior.name': 'Povstalá královská stráž',
   'entities.mobs.ogre_crusher.name': 'Thornpeakský drtič',
@@ -5411,7 +5606,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Ano. Celá hra je zdarma až po maximální úroveň a je open source na GitHubu.',
   'guide.home.faq.q2': 'Potřebuji crypto peněženku?',
   'guide.home.faq.a2':
-    'Ne. Hra je plně hratelná i bez ní. Volitelný komunitní token odemyká jen kosmetické doplňky a nikdy neovlivňuje sílu.',
+    'Ne. Hra je plně hratelná i bez něj. Volitelný komunitní token přidává jen kosmetický styl a podíl na balíku denních odměn a nikdy neovlivňuje sílu.',
   'guide.home.faq.q3': 'Můžu hrát offline?',
   'guide.home.faq.a3':
     'Ano. V prohlížeči je okamžitý režim pro jednoho hráče, vedle sdíleného online světa.',
@@ -5432,7 +5627,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Vyber třídu a vzhled, dej hrdinovi jméno a vstup do světa. Další postavy si můžeš vytvořit později.',
   'guide.howToPlay.step2Title': 'Najdi první úkol',
   'guide.howToPlay.step2Body':
-    'Maršál Redbrook čeká v počátečním městě. Promluv s ním a přijmi Vlci u dveří.',
+    'Maršál Redbrook čeká v počátečním městě s úkolem Vlci u dveří a předák Odell opodál má taky práci. Promluv s kterýmkoli z nich a vezmi si svůj první úkol.',
   'guide.howToPlay.step3Title': 'Pohyb a rozhlížení',
   'guide.howToPlay.step3Body':
     'Pohybuj se klávesami W, A, S, D. Podrž pravé tlačítko myši a táhni pro rozhlížení. To je skoro všechno.',
@@ -5457,7 +5652,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Přijímej úkoly od lidí se značkou nad hlavou, splň cíl a odevzdej je za zkušenosti, mince a výbavu. Tracker na obrazovce drží cíle na očích.',
   'guide.howToPlay.deathTitle': 'Smrt není konec',
   'guide.howToPlay.deathBody':
-    'Když padneš, propustíš ducha a oživíš se na nejbližším hřbitově s plným zdravím, potom se vrátíš, kde jsi byl. Neztrácíš zkušenosti.',
+    'Když padneš, tvé tělo zůstane tam, kde kleslo, a ty povstaneš jako duch na nejbližším hřbitově. Doběhni duchem zpět ke svému tělu a oživíš se na místě bez postihu, nebo přijmi u hřbitova Bledého strážce a nech se okamžitě vzkřísit za cenu pomíjivé slabosti. Úplně noví hrdinové jsou slabosti zcela ušetřeni a nikdy nepřijdeš o nic, co vlastníš nebo sis vydobyl.',
   'guide.howToPlay.groupingTitle': 'Hraní spolu',
   'guide.howToPlay.groupingBody':
     'Pozvi ostatní do party, sdílejte postup v úkolech a pouštějte se do dungeonů. Většinu světa zvládneš sólo, takže skupina je volba, ne povinnost.',
@@ -5465,9 +5660,10 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.howToPlay.onlineBody':
     'Hraj sdílený online svět s ostatními, nebo spusť okamžitý offline svět v prohlížeči a nauč se základy.',
   'guide.howToPlay.reassure':
-    'Talenty se odemykají na úrovni 10 a dají se kdykoli resetovat, takže rané volby nejsou nikdy trvalé. Volně experimentuj.',
+    'Talenty se odemykají na úrovni 10 a můžeš je kdykoli mimo boj resetovat, takže rané volby nejsou nikdy trvalé. Volně experimentuj.',
   'guide.howToPlay.controlsLink': 'Zobrazit úplnou referenci ovládání',
-  'guide.controls.intro': 'Výchozí klávesy pro desktop. Každou vazbu lze změnit v nastavení hry.',
+  'guide.controls.intro':
+    'Výchozí klávesy pro desktop. Každou vazbu lze změnit v nastavení hry, kromě Esc, které vždy otevírá herní menu, a vazba může být i kombinace s modifikátorem jako Shift+Z.',
   'guide.controls.keyHeader': 'Klávesa',
   'guide.controls.actionHeader': 'Akce',
   'guide.controls.groupMovement': 'Pohyb',
@@ -5484,15 +5680,15 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.controls.gameMenu': 'Otevřít herní menu a nastavení',
   'guide.controls.mobileHeading': 'Na mobilu',
   'guide.controls.mobileBody':
-    'Dotykové ovládání se na telefonech a tabletech objeví automaticky: vlevo pohybová páčka, vpravo táhni k rozhlížení a na obrazovce jsou tlačítka schopností a menu.',
+    'Dotykové ovládání se na telefonech a tabletech objeví automaticky: vlevo pohybová páčka, jinde táhni k rozhlížení, dvěma prsty přibliž kameru sevřením a na obrazovce jsou tlačítka schopností a menu. Malá šipka v levém horním rohu zobrazí nebo skryje tlačítka menu a tlačítko Více tam ukrývá zbytek tvých oken.',
   'guide.controls.controllerHeading': 'Na ovladači',
   'guide.controls.controllerBody':
-    'Gamepady také fungují a podpora ovladače je zapnutá ve výchozím stavu. Levá páčka hýbe postavou, pravá míří kameru a přední i ramenní tlačítka pokrývají schopnosti, skok a interakci. Otevři jakékoli okno a zobrazí se kurzor pro menu. Tlačítka, mrtvou zónu páček, rychlost kamery, vibrace i obrácené rozhlížení nastavíš v nastavení ovladače.',
+    'Gamepady také fungují a podpora ovladače je zapnutá ve výchozím stavu. Levá páčka hýbe postavou, pravá míří kameru a přední i ramenní tlačítka pokrývají schopnosti, skok a interakci. Otevři okno, třeba batohy, a zobrazí se kurzor na obrazovce, a herním menu se pohybuješ přímo křížovým ovladačem a předními tlačítky. Tlačítka, mrtvou zónu páček, rychlost kamery, vibrace i obrácené rozhlížení nastavíš v nastavení ovladače.',
   'guide.settingsPage.heading': 'Nastavení a výkon',
   'guide.settingsPage.intro':
     'Nech hru vypadat co nejlépe, nebo běžet co nejrychleji. Tři hotové profily a vysvětlení, co každá grafická volba opravdu dělá.',
   'guide.settingsPage.wherePath':
-    'Všechno z této stránky najdeš ve hře: stiskni Esc a podívej se do Grafika, Rozhraní a Překryv výkonu.',
+    'Všechno z této stránky žije ve hře: stiskni Esc a otevři nastavení. Menu se otevře na Přehledu připnutých nezbytností, s kategoriemi na liště vedle: nastavení níže bydlí pod Grafikou, Rozhraním a Přístupností ve skupině Zobrazení a Překryv výkonu pod Systémem. Ještě rychleji napiš název do vyhledávacího pole nahoře a skoč přímo na něj.',
   'guide.settingsPage.fairnessTitle': 'Férové už v návrhu',
   'guide.settingsPage.fairnessBody':
     'Žádná volba tu nemění krásu za sílu. Nižší nastavení ubírají jen kosmetické leštění, nikdy informace, se kterými bojuješ: debuffy, cast bary, zdraví party i čísla poškození jsou stejné od Low po Ultra. Skromnější stroj nikdy není handicap.',
@@ -5535,7 +5731,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Pokročilé vychází z vysokého stupně a odemkne čtyři další volby, takže můžeš utratit snímky tam, kde si jich všimneš: detail terénu, hustota vegetace, efekty a osvětlení a kvalita stínů. Stejně jako kvalita grafiky platí po znovunačtení.',
   'guide.settingsPage.advancedMixes':
     'Dvě oblíbené kombinace: nech kvalitu stínů na vysoké a nastav efekty a osvětlení na nízké pro ostrý vzhled bez záře, který běží lehce, nebo to obrať a nech bloom se zjemněnými stíny.',
-  'guide.settingsPage.tableHeading': 'Každá volba, vysvětlená',
+  'guide.settingsPage.tableHeading': 'Každá grafická volba, vysvětlená',
   'guide.settingsPage.colSetting': 'Nastavení',
   'guide.settingsPage.colDoes': 'Co dělá',
   'guide.settingsPage.colImpact': 'Dopad na FPS',
@@ -5585,15 +5781,15 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Válečníci budují vztek uprostřed boje, tuláci utrácejí energii, která se plynule vrací, a sesilatelé spravují zásobu many. Naučit se svůj zdroj je polovina dobrého hraní třídy.',
   'guide.combat.growTitle': 'S každou úrovní sílíš',
   'guide.combat.growBody':
-    'Každá úroveň tě posílí a odemkne nové schopnosti až po maximum na úrovni {cap}. Úkoly jsou nejrychlejší cesta nahoru; dungeony a průzkum ji doplňují.',
+    'Každá úroveň tě posílí a odemkne nové schopnosti až po maximum na úrovni {cap}. Úkoly jsou nejrychlejší cesta nahoru; lov, běhání dungeonů a výpravy ji doplňují.',
   'guide.combat.effectsTitle': 'Buffy, debuffy a crowd control',
   'guide.combat.effectsBody':
-    'Mnoho schopností zanechá přetrvávající efekt. Užitečné efekty, buffy, zvedají statistiky, štítí tě nebo tě postupně léčí; škodlivé efekty, debuffy, vysávají zdraví poškozením v čase nebo tě oslabují. Sleduj malé ikony u akční lišty, ať víš, co na tobě je a jak dlouho to trvá.',
+    'Mnoho schopností zanechá přetrvávající efekt. Užitečné efekty, buffy, zvedají statistiky, štítí tě nebo tě postupně léčí; škodlivé efekty, debuffy, vysávají zdraví poškozením v čase nebo tě oslabují. Sleduj malé ikony v horním rohu obrazovky vedle minimapy, ať víš, co na tobě je a jak dlouho to trvá.',
   'guide.combat.ccBody':
-    'Crowd control je zvláštní druh debuffu, který omezuje, co cíl dokáže: omráčení, zakořenění a zpomalení, umlčení kouzel, odzbrojení, strach a proměny, které na chvíli udělají z protivníka neškodný cíl. Některé z nich, jako kořeny, strachy a proměny, ztrácejí účinek, když se opakují příliš rychle, takže nejdou řetězit navždy.',
+    'Crowd control je zvláštní druh debuffu, který omezuje, co cíl dokáže: omráčení, zakořenění a zpomalení, umlčení zastavující sesílání, odzbrojení, strach a proměny, které z protivníka na chvíli udělají neškodný cíl. Proti ostatním hráčům se ovládání opakováním ztenčuje: stejný druh nasazený příliš rychle po sobě slábne a nakonec selže úplně, a omráčení otevřené ze stealthu se počítá zvlášť od těch, která následují, takže nikoho nelze držet bezmocného navěky. Bytosti světa žádnou takovou zášť nechovají: na ně se ovládání opakováním nikdy neztenčuje, ačkoli mnohé z nejmocnějších protivníků, jmenované elity a nejsilnější bossové mezi nimi, nelze ovládat vůbec.',
   'guide.combat.deathTitle': 'Když padneš',
   'guide.combat.deathBody':
-    'Když zdraví klesne na nulu, padneš. Propusť ducha, oživ se na nejbližším hřbitově s plným zdravím a vrať se zpět, takže smrt stojí trochu času, ne postup. Mezi boji si sedni k jídlu a pití, ať začneš další souboj v plné síle.',
+    'Když ti zdraví klesne na nulu, padneš tam, kde stojíš, a tvé tělo tam zůstane. Propusť ducha a povstaneš jako duch na nejbližším hřbitově: rychlejší na nohou než živí, mimo dosah svých nepřátel, ale neschopný bojovat, lootovat nebo s kýmkoli mluvit, kromě Bledého strážce vznášejícího se nad kameny. Odtud se rozhoduješ. Doběhni duchem zpět ke svému tělu a oživíš se na místě s obnovenou částí zdraví a many a zcela bez postihu. Nebo přijmi od Bledého strážce okamžité vzkříšení tam, kde jsi, za cenu Strážcova mýta: dočasného oslabení všeho, čím jsi, které trvá tím déle, čím jsi zkušenější, a úplně nové postavy zcela míjí. Padneš-li uvnitř dungeonu, tvůj duch čeká na hřbitově venku; projdi duchem zpět dveřmi a oživíš se u vchodu. Výpravy jsou výjimkou: padneš-li tam, prostě tě to postaví zpět na nohy u vchodu do výpravy, druhý pád ale běh ukončí. Ať tak či onak, nepřijdeš o žádné zkušenosti, výbavu ani mince. Mezi boji si sedni k jídlu a pití, ať další začneš v plné síle.',
   'guide.glossary.intro': 'Rychlá reference termínů používaných v průvodci a chatu.',
   'guide.glossary.aggroTerm': 'Aggro',
   'guide.glossary.aggroDef':
@@ -5658,13 +5854,13 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Ano. Celá hra je zdarma až po maximální úroveň a zdrojový kód je otevřený na GitHubu.',
   'guide.faqPage.q2': 'Potřebuji crypto peněženku nebo tokeny?',
   'guide.faqPage.a2':
-    'Ne. Hra je plně hratelná i bez nich. Volitelný komunitní token odemyká jen kosmetický styl a nikdy neovlivňuje sílu ani postup.',
+    'Ne. Hra je plně hratelná i bez něj. Volitelný komunitní token přidává jen kosmetický styl a podíl na balíku denních odměn a nikdy neovlivňuje sílu ani postup.',
   'guide.faqPage.q3': 'Můžu hrát na telefonu?',
   'guide.faqPage.a3':
     'Ano. Hra běží v mobilním prohlížeči s dotykovým ovládáním a existuje i desktopový launcher.',
   'guide.faqPage.q4': 'Můžu hrát offline nebo sólo?',
   'guide.faqPage.a4':
-    'Ano. Existuje okamžitý offline režim pro jednoho hráče a online svět je plně sólovatelný kromě dungeonů a raidu.',
+    'Ano. Existuje okamžitý offline režim pro jednoho hráče a online svět je plně sólovatelný kromě dungeonů, raidu a světového bosse.',
   'guide.faqPage.q5': 'Kolik tříd je ve hře?',
   'guide.faqPage.a5':
     'Devět, pokrývajících klasické role tanka, léčitele a poškození, každá se systémem zdroje, vztekem, manou nebo energií, a vlastními typickými schopnostmi.',
@@ -5682,7 +5878,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Ano. Vyvolej kohokoli na duel pro zábavu, nebo vstup do Popelavého kolosea bojovat s ostatními hráči. PvP je dobrovolné, nikdy tě k němu hra nenutí.',
   'guide.faqPage.q10': 'Co dělat na maximální úrovni?',
   'guide.faqPage.a10':
-    'Maximum je úroveň {cap}. Odtud běháš pětičlenné dungeony a desetičlenný raid, lovíš lepší výbavu a zkoušíš se v aréně.',
+    'Maximum je úroveň {cap}. Odtud běháš pětičlenné dungeony a desetičlenný raid, pouštíš se do nich znovu v hrdinském režimu za vylepšenou kořist, čelíš světovému bossovi, když povstane, zkoušíš se v aréně, vyrážíš na výpravy se společníkem po boku a honíš skutky v Knize skutků, abys stoupal v pořadí světa.',
   'guide.faqPage.q11': 'Jak najdu skupinu?',
   'guide.faqPage.a11':
     'Pozvi kohokoli, koho potkáš, do party, zeptej se v chatu nebo se spojte u dungeonu. Většina světa jde sólo, takže skupina je volba, ne požadavek.',
@@ -5705,7 +5901,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.masteryLabel': 'Mistrovství',
   'guide.classPage.fullKitHeading': 'Celý kit',
   'guide.classPage.fullKitNote':
-    'Každá schopnost, kterou se tato třída může naučit, v pořadí odemčení. Talenty rozhodnou, které ponesou tvůj build.',
+    'Výbava, kterou tato třída získává s postupem úrovní, v pořadí, v jakém přichází. Talenty přidají několik dalších schopností a rozhodnou, které ponesou tvůj build.',
   'guide.classPage.petsHeading': 'Démoni',
   'guide.classPage.petsNote':
     'Černokněžníci vyvolávají démony, aby bojovali po jejich boku, každý se hodí na jinou práci.',
@@ -5831,7 +6027,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.petHook.wraithborn': 'Elitní sesilatel, který z dálky sesílá těžký stín.',
   'guide.bestiary.heading': 'Bestiář',
   'guide.bestiary.intro':
-    'Bytosti světa seřazené podle rodin. To jsou protivníci, které potkáš venku. Nejsmrtelnější věci čekají, neuvedené, za dveřmi dungeonů.',
+    'Bytosti světa seřazené podle rodin. To jsou každodenní protivníci, které potkáš venku pod širým nebem. Elitní nepřátelé a jejich vojevůdci se těmto stránkám vyhýbají a ty nejsmrtelnější věci ze všech čekají za dveřmi dungeonů.',
   'guide.bestiary.rare': 'Vzácný',
   'guide.bestiary.levels': 'Úrovně {min} až {max}',
   'guide.bestiary.levelsSame': 'Úroveň {min}',
@@ -5897,11 +6093,11 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Dvě stě let tahle zeď drží. Na mé hlídce se nezlomí, ale sténá.',
   'guide.worldPage.peaksGreeter': 'Kapitánka Thessaly, Highwatch',
   'guide.worldPage.valePlaceNotes':
-    'Eastbrook je tvoje první domovská základna. Vlčí stezka a Kančí louka jsou mírná loviště; Zrcadlové jezero je klidná voda pro rybaření; Černopavučina a Měděná štola skrývají pavouky a rudychtivé kopáče; Tábor banditů a Padlá kaple drží drsnější práci; Vrch relikviáře klesá do Zhrouceného relikviáře, první výpravy světa; a Mýtina Brightwoodu je tichý, sluncem zalitý háj na severu.',
+    'Eastbrook je tvoje první domovská základna. Vlčí stezka a Kančí louka jsou mírná loviště; Zrcadlové jezero je pěkná voda pro rybaření, ač se v jeho mělčinách hemží bahnoploutví; Černopavučina a Měděná štola skrývají pavouky a rudychtivé kopáče; Tábor banditů a Padlá kaple drží drsnější práci; Vrch relikviáře klesá do Zhrouceného relikviáře, první výpravy světa; Mýtina Brightwoodu je tichý, sluncem zalitý háj na severu; a Prasečí pole je hrazené kančbalové hřiště Eastbrooku, kde se pod žňovým příměřím hraje o Pohár údolí.',
   'guide.worldPage.marshPlaceNotes':
-    'Fenbridge hlídá jedinou suchou cestu. Rákosiny slídilů a Mělčiny Deepfenu se hemží močálovými šelmami a bahenními ploutvemi; Vdoví houština je hustě opředená pavučinami; Utopená kaple a Trollí mohyly drží starší nebezpečí; Tábor Hrobovolajících je zakopaný kult a Potopená bašta je instancované srdce močálu.',
+    'Fenbridge hlídá jedinou suchou cestu. Rákosiny slídilů a Mělčiny Deepfenu se hemží močálovými šelmami a bahenními ploutvemi; Vdoví houština je hustě opředená pavučinami; Utopená kaple a Trollí mohyly drží starší nebezpečí a hned severně od mohyl se otevírá Utopená litanie, vlastní výprava močálu; Tábor Hrobovolajících je zakopaný kult a Potopená bašta je instancované srdce močálu.',
   'guide.worldPage.peaksPlaceNotes':
-    'Highwatch drží zeď. Hřeben slídilů a Hlubokamenné nory patří hřebenovým kočkám a norníkům; Zlobří podhůří a Drogmarův válečný tábor surovcům za žold; Bouřný skalní štít praská elementály a Třpytivé pleso září pod ním; Stany kultu draka a Pole revenantů obkružují vyvýšeninu kultu, se Svatyní Hrobodraka na vrcholu.',
+    'Highwatch drží zeď. Hřeben slídilů a Hlubokamenné nory patří hřebenovým kočkám a norníkům; Zlobří podhůří a Drogmarův válečný tábor surovcům za žold; Bouřný skalní štít praská elementály a pod ním září Třpytivé pleso, tůň, jejíž břeh střeží bránu bledého světla dolů do Utopeného chrámu; Stany kultu draka a Pole revenantů obkružují vyvýšeninu kultu, se Svatyní Hrobodraka na vrcholu.',
   'guide.worldPage.gladeTitle': 'Tichý kout: Mýtina Brightwoodu',
   'guide.worldPage.gladeBody':
     'Ne každý příběh v údolí je o mrtvých. Na severu si sluncem zalitý háj zvaný Mýtina Brightwoodu drží vlastní jemnější rytmus, samé tiché stezky a skvrnité světlo pod větvemi. Je to měkký protipól cesty, po které jdeš, a stojí za vidění, když ti cesta dá prostor se toulat.',
@@ -5910,7 +6106,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Úkoly jsou srdcem světa a nejrychlejší cestou k levelování. Takhle fungují.',
   'guide.questsPage.acceptTitle': 'Hledání a přijímání',
   'guide.questsPage.acceptBody':
-    'Lidé se značkou nad hlavou pro tebe mají práci. Promluv s nimi a přijmi úkol. Tvůj úplně první je Vlci u dveří od maršála Redbrooka v Eastbrooku.',
+    'Lidé se značkou nad hlavou pro tebe mají práci. Promluv s nimi a přijmi úkol. V Eastbrooku čeká maršál Redbrook s úkolem Vlci u dveří, jedním z prvních, které si můžeš vzít.',
   'guide.questsPage.objectivesTitle': 'Cíle',
   'guide.questsPage.objectivesBody':
     'Zabij určité nepřátele, sbírej předměty nebo interaguj s něčím ve světě. Tracker na obrazovce počítá postup za pochodu. Když si to rozmyslíš, můžeš úkol zahodit z deníku a později ho znovu vzít u zadavatele.',
@@ -5919,7 +6115,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Hotový úkol odnes na značku odevzdání, mapa ti ukáže kde, za zkušenosti, mince a často kus výbavy vhodný pro tvoji třídu. Obvykle je to člověk, který ti úkol dal, i když některé úkoly tě pošlou dál.',
   'guide.questsPage.partyTitle': 'Úkoly ve skupině',
   'guide.questsPage.partyBody':
-    'Členové party poblíž sdílejí kredit za zabití a cíle, takže společné plnění je rychlejší, nikdy pomalejší. Úkol můžeš také sdílet se skupinou: pošli ho do chatu jako klikací odkaz příkazem /share a každý blízký člen, který splňuje podmínky, ho vezme jedním kliknutím.',
+    'Členové party poblíž sdílejí kredit za zabití a cíle, takže společné plnění je rychlejší, nikdy pomalejší. Úkol můžeš také sdílet se skupinou: pošli ho do chatu jako klikací odkaz příkazem /share a každý člen, který splňuje podmínky, vezme tentýž úkol jedním kliknutím.',
   'guide.questsPage.storyTitle': 'Vším vede jedna nit',
   'guide.questsPage.storyBody':
     'Už od prvních pochůzek v Eastbrooku je s mrtvými něco špatně. Pracuje tu kult a stopa vede na sever každou zónou. Sleduj ji a zjistíš, kdo za tím stojí.',
@@ -5930,10 +6126,10 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Většina úkolů má několik známých tvarů. Tracker na obrazovce přesně říká, co každý chce, takže nemusíš hádat.',
   'guide.questsPage.typeSlayTitle': 'Zabití',
   'guide.questsPage.typeSlayBody':
-    'Prořeď smečku šelem nebo zlom vliv kultu poražením určitého počtu označených nepřátel. První úkol ve hře, čištění vlků z eastbrookské cesty, je jedním z nich.',
+    'Prořeď smečku šelem nebo zlom vliv kultu poražením určitého počtu označeného nepřítele. Jedním z tvých prvních úkolů, čištění vlků z eastbrookské cesty, je právě takový.',
   'guide.questsPage.typeGatherTitle': 'Sbírání',
   'guide.questsPage.typeGatherBody':
-    'Sbírej předměty ze světa nebo z toho, co pouštějí nepřátelé: byliny, rudu, ztracené dopisy, pochmurná činidla kultu. Některé kusy padají jen z konkrétního protivníka, takže lov a sběr patří k sobě.',
+    'Sbírej předměty ze světa nebo z toho, co pouštějí nepřátelé: byliny, rudu, pochmurná činidla kultu. Některé kusy padají jen z konkrétního protivníka, takže lov a sběr patří k sobě.',
   'guide.questsPage.typeInteractTitle': 'Interakce',
   'guide.questsPage.typeInteractBody':
     'Použij, očisti nebo přečti něco pevně umístěného ve světě: poskvrněný hrob, varování vyryté do břehové skály, zapečetěné dveře krypty. Dojdi ke značce a jednej.',
@@ -6000,7 +6196,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Temné srdce Thornpeaku, kde dlouhá práce kultu dosáhne strašného vrcholu.',
   'guide.dungeonsPage.raidName': 'Endgame raid',
   'guide.dungeonsPage.raidBody':
-    'Za zapečetěnými královskými dveřmi čeká desetičlenná zkouška: vícefázový boj a nesmrtelná síla, kterou musí celý raid společně umlčet. Získej si vstup a přiveď devět přátel.',
+    'Za zapečetěnými královskými dveřmi čeká desetičlenná zkouška: vícefázový boj a nesmrtelná síla, kterou musí celý raid společně vyřadit. Získej si vstup a přiveď devět přátel.',
   'guide.dungeonsPage.templeLoreTitle': 'Utopený chrám, o trochu hlouběji',
   'guide.dungeonsPage.templeLoreBody':
     'Chrám má vlastní legendu, starší než kult, který pronásleduješ jinde. Na břehu Třpytivého plesa, horského jezera, které pije měsíční světlo a vrací utopené, drží osamělý hlídač bránu bledého světla. Pod hladinou k ní vede schodiště studeného kamene. Lidé, kteří tam klesli, se neutopili nešťastnou náhodou: byli Bledý sbor, který sestoupil pod vodu v uctívání a nikdy nepřestal zpívat. Staří strážci vyryli do skal jediné varování, než je voda vzala, modlitbu k něčemu, čemu říkali Utopený měsíc, a pevnější ruka pod ni přidala dvě slova: jen spí.',
@@ -6035,13 +6231,13 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Výprava nabízí víc než jednu obtížnost. Vyšší zesílí nepřátele, přidá modifikátor běhu a zaplatí víc. Také chce, abys měl pár úrovní za sebou, než tě pustí dovnitř.',
   'guide.delvesPage.affixesHeading': 'Modifikátory běhu',
   'guide.delvesPage.affixesBody':
-    'Těžší běhy losují modifikátor, který mění sestup, od neklidných mrtvých přes zkažený vzduch po selhávající střechu. Zvedají nebezpečí i odměnu. Kryptová výprava může dostat kterýkoli z nich:',
+    'Těžší běhy losují modifikátor, který mění, jak sestup probíhá, od neklidných mrtvých přes zkažený vzduch po selhávající strop. Zvedají nebezpečí i odměnu společně. Každá výprava čerpá z modifikátorů, které sedí jejímu tématu; napříč říší vypadá jejich zásoba takto:',
   'guide.delvesPage.marksHeading': 'Známky výprav',
   'guide.delvesPage.marksBody':
     'Čištění výprav vydělává Známky výprav, měnu oddělenou od mincí. Utrať je u správce za posílení společníka a výbavu, kterou nikde jinde nenajdeš.',
   'guide.delvesPage.whereHeading': 'Kde nějakou najít',
   'guide.delvesPage.whereBody':
-    'První výprava, Zhroucený relikviář, se otevírá na Vrchu relikviáře v počátečním Eastbrookském údolí. Bratr Halven tam drží tabuli a pošle tě dolů, až budeš připraven.',
+    'První výprava, Zhroucený relikviář, se otevírá na Vrchu relikviáře v počátečním Eastbrookském údolí. Bratr Halven tam drží tabuli a pošle tě dolů, až budeš připraven. Jeho pochůzky tam ale nekončí: za Trollími mohylami na severním okraji Mirefenského močálu tentýž správce otevírá Utopenou litanii výpravníkům, kteří už mají něco za sebou.',
   'guide.talentsPage.heading': 'Talenty a specializace',
   'guide.talentsPage.intro':
     'Talenty jsou způsob, jak udělat třídu vlastní. Jsou volitelné, odpouštějí chyby a snadno se mění, takže můžeš experimentovat bez strachu.',
@@ -6050,15 +6246,15 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Při levelování získáváš talentové body, které utrácíš za malé, trvalé vylepšení schopností a statistik. Tvarují pocit ze třídy a posouvají ji k většímu poškození, pevnější obraně nebo silnějšímu léčení.',
   'guide.talentsPage.howHeading': 'Jak fungují',
   'guide.talentsPage.howBody':
-    'Talenty se otevírají na úrovni 10 a body získáváš dál až po maximum. Utrácíš je v talentovém panelu své třídy a můžeš si uložit víc než jedno rozložení pro přepínání buildů.',
+    'Talenty se otevírají na úrovni 10 a body získáváš dál až po maximum. Utrácíš je v talentovém panelu své třídy, kde se hlubší řady otevírají, jak investuješ a stoupáš v úrovních, a můžeš si uložit víc než jedno rozložení pro přepínání buildů.',
   'guide.talentsPage.shareNote':
     'Hotový build lze zkopírovat jako krátký sdílitelný kód a dát příteli, který ho vloží přímo do vlastního talentového panelu.',
   'guide.talentsPage.resetTitle': 'Nic není trvalé',
   'guide.talentsPage.resetNote':
-    'Talenty můžeš resetovat kdykoli mimo boj, takže raná volba není nikdy past. Zkoušej věci, najdi, co ti sedí, a klidně změň názor.',
+    'Talenty můžeš resetovat kdykoli mimo boj a mimo zápas v aréně, takže raná volba není nikdy past. Zkoušej věci, najdi, co ti sedí, a klidně změň názor.',
   'guide.talentsPage.specsHeading': 'Specializace podle tříd',
   'guide.talentsPage.specsBody':
-    'Každá třída má několik specializací, každou s vlastní rolí a typickým zaměřením. Tady je jejich tvar. Otevři třídu pro celý kit.',
+    'Každá třída má několik specializací, každou s vlastní rolí a typickým zaměřením. Výběr jedné v talentovém panelu uděluje typickou schopnost a vlastní trvalé mistrovství. Tady je tvar jich všech. Otevři třídu pro její celou výbavu.',
   'guide.arenaPage.heading': 'Aréna a PvP',
   'guide.arenaPage.intro':
     'Chceš se otestovat proti ostatním hráčům? Souboje hráč proti hráči jsou zabudované a vždy jsou volbou, nikdy nucením.',
@@ -6067,15 +6263,15 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Vyzvi libovolného hráče, kterého potkáš, na přátelský duel. V sázce je jen hrdost, takže je to nejsnazší cesta, jak se naučit matchup nebo vyřešit přátelskou hádku.',
   'guide.arenaPage.coliseumHeading': 'Popelavé koloseum',
   'guide.arenaPage.coliseumBody':
-    'Koloseum je aréna světa, kde čelíš ostatním hráčům v hodnocených zápasech jeden na jednoho nebo dva na dva. Každý bracket má vlastní pořadí, takže výhra tě v jeho žebříku posune pro celý svět.',
+    'Koloseum je aréna světa, kde čelíš ostatním hráčům v hodnocených zápasech jeden na jednoho nebo dva na dva. Každý bracket má vlastní pořadí, takže výhra tě v jeho žebříku posune pro celý svět. Otevři okno Arény a přihlas se do bracketu, sám nebo se svým partnerem.',
   'guide.arenaPage.fiestaHeading': 'Fiesta dva na dva',
   'guide.arenaPage.fiestaBody':
-    'Fiesta je rychlý režim dva na dva hraný v krátkých kolech. Mezi koly draftuješ augmenty, rychlá posílení, která za běhu přetvarují tvůj kit, takže žádné dva zápasy nehrají stejně.',
+    'Fiesta je rychlá řež dva na dva hraná jako jeden souvislý souboj, kde jsou všichni bojovníci postaveni na stejnou startovní čáru. Jak boj běží, draftuješ augmenty, rychlá posílení, která za běhu přetvarují tvůj kit, takže žádné dva zápasy nehrají stejně.',
   'guide.arenaPage.augmentsNote':
     'Augmenty a power-upy trvají jen pro zápas. Jsou o hravých, okamžitých buildech, ne o trvalé síle, takže si nikdo nekoupí cestu k výhře.',
   'guide.arenaPage.wavesTitle': 'Augmenty přicházejí ve vlnách',
   'guide.arenaPage.wavesBody':
-    'Každé kolo Fiesty ti dá čerstvou volbu a volby jsou s postupem zápasu odvážnější. Stavíš od jedné vlny k další, pokaždé vybíráš jednu z několika možností a necháváš si ji do konce souboje.',
+    'Souboj Fiesty ti podává čerstvé volby, jak běží, a volby jsou s délkou boje odvážnější. Stavíš od jedné vlny k další, pokaždé vybíráš jednu z několika možností a necháváš si ji do konce souboje.',
   'guide.arenaPage.waveSilverTitle': 'Stříbrná',
   'guide.arenaPage.waveSilverBody':
     'Úvodní vlna: čistá posílení jedné statistiky, která zostří základy třídy.',
@@ -6099,10 +6295,10 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Každá třída obstojí a dosáhne maxima. Vyber fantazii, která se ti líbí, ne tu, kterou někdo jiný nazývá nejlepší.',
   'guide.wishPage.i2Title': 'Smrt tě skoro nic nestojí',
   'guide.wishPage.i2Body':
-    'Když padneš, propustíš ducha, oživíš se na nejbližším hřbitově a vrátíš se zpět. Neztrácíš zkušenosti, takže je bezpečné riskovat a učit se.',
+    'Když padneš, povstaneš jako duch na nejbližším hřbitově. Doběhni zpět ke svému tělu a oživíš se zdarma, nebo přijmi okamžité vzkříšení od Bledého strážce a za to pohodlí si odnes krátce trvající slabost. Nikdy nepřijdeš o žádné zkušenosti, výbavu ani mince, takže je bezpečné riskovat a učit se.',
   'guide.wishPage.i3Title': 'Talenty nejsou past',
   'guide.wishPage.i3Body':
-    'Odemykají se na úrovni 10 a resetuješ je, kdykoli chceš, takže rané volby nejsou nikdy trvalé.',
+    'Odemykají se na úrovni 10 a resetuješ je, kdykoli chceš, mimo boj, takže rané volby nejsou nikdy trvalé.',
   'guide.wishPage.i4Title': 'Sleduj stopu úkolů',
   'guide.wishPage.i4Body':
     'Úkoly jsou nejrychlejší cesta k levelování a vedou tě světem. Když nevíš, kam jít, najdi další značku.',
@@ -6141,7 +6337,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Výbava je vybavení, které postava nosí, a předměty, které nese. Lepší výbava je nejstabilnější cesta k síle a většinu získáš prostě hraním.',
   'guide.gear.slotsTitle': 'Co můžeš vybavit',
   'guide.gear.slotsBody':
-    'Máš slot na zbraň a sedm slotů zbroje. Každá třída umí používat jen určité zbraně a nosí zbroj jen do své váhy, látku, kůži nebo kroužkovou zbroj, takže vhodná vylepšení jsou ta dělaná pro tvoji třídu. V rámci toho zaplň každý slot nejlepším kusem, který najdeš.',
+    'Máš slot na zbraň, sedm slotů zbroje a tři sloty na klenoty: jeden na krk a dva na prsty. Každá třída umí používat jen určité zbraně a nosí zbroj jen do své váhy, látku, kůži nebo kroužkovou zbroj, takže vhodná vylepšení jsou ta dělaná pro tvoji třídu. Klenoty nemají žádnou váhu: každá třída nosí, co si vyslouží. V rámci toho zaplň každý slot nejlepším kusem, který najdeš.',
   'guide.gear.slotMainhand': 'Zbraň',
   'guide.gear.slotHelmet': 'Hlava',
   'guide.gear.slotShoulder': 'Ramena',
@@ -6165,13 +6361,13 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.gear.upgradeBody':
     'Výměna starého kusu za čerstvé vylepšení udělá víc než dokonalá hra ve výbavě, ze které jsi vyrostl. Když padne něco lepšího nebo to nabídne úkol, vezmi to. Neschovávej dobré předměty na později.',
   'guide.gear.itemLevelBody':
-    'Chceš-li rychle porovnat dva kusy, zapni v nastavení Zobrazit úroveň předmětu. Každá zbraň a kus zbroje pak ukazuje item level, jedno číslo pro přibližnou sílu podle původu, takže na první pohled poznáš, které vylepšení má větší váhu, i napříč sloty.',
+    'Chceš-li rychle porovnat dva kusy, zapni v nastavení Zobrazit úroveň předmětu. Výbava vydobytá ve světě, od nepřátel a z úkolů, pak ukazuje item level, jedno číslo pro přibližnou sílu podle toho, odkud pochází, takže na první pohled poznáš, které vylepšení má větší váhu, i napříč různými sloty. Kusy bez takového původu, jako prosté základy od obchodníků a startovní výbava, žádný item level neukazují, takže chybějící číslo je normální, ne chyba.',
   'guide.gear.sourcesTitle': 'Odkud výbava pochází',
   'guide.gear.sourcesBody':
-    'Většina raných vylepšení jsou odměny z úkolů, takže se vyplatí úkoly dokončovat, ne grindit. Nepřátelé pouštějí výbavu po porážce, prodejci ve městě prodávají solidní základy a hráčský trh ti dovolí nakupovat od ostatních dobrodruhů.',
+    'Většina raných vylepšení jsou odměny z úkolů, takže se vyplatí úkoly dokončovat, ne grindit. Nepřátelé pouštějí výbavu po porážce, prodejci ve městě prodávají solidní základy, řemeslníci mění nasbírané suroviny v nositelné kusy a hráčský trh ti dovolí nakupovat od ostatních dobrodruhů. Na vrcholu kopce kupují výbavu, kterou nikde jinde nenajdeš, dvě známkové měny: Známky výprav u správce výprav a Hrdinské značky u hrdinského zásobovače.',
   'guide.gear.setsTitle': 'Sady a bonusy sad',
   'guide.gear.setsBody':
-    'Nejvzácnější zbroj přichází v sladěných rodinách, několika kusech střižených tak, aby vypadaly a bojovaly jako jeden celek. Oblékni dost kusů jedné rodiny najednou a sada se probudí, přidá bonusy nad vlastní statistiky každého kusu, a čím víc kusů nosíš, tím silnější je. Padají z nejtěžšího skupinového obsahu blízko maxima, takže honba za celou sadou je klasický endgame cíl.',
+    'Některá zbroj přichází ve sladěných rodinách, několika kusech střižených tak, aby vypadaly a bojovaly jako jeden celek. Oblékni dost kusů jedné rodiny najednou a sada se probudí, přidá bonusy nad vlastní statistiky každého kusu, a čím víc kusů nosíš, tím silnější je. Pár takových rodin se objevuje jako ceněné dropy během levelování; ty největší pocházejí z nejtěžšího skupinového obsahu blízko maximální úrovně, takže honba za celou sadou je klasický endgame cíl.',
   'guide.gear.consumablesTitle': 'Spotřební předměty',
   'guide.gear.consumablesIntro':
     'Některé předměty použiješ jednou pro rychlou výhodu. Jsou levné pojištění, takže pár měj po ruce.',
@@ -6183,7 +6379,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Elixíry dávají dočasný buff při dobrodružství, malou výhodu, když chceš zatlačit o kousek dál.',
   'guide.gear.fishingTitle': 'Rybaření',
   'guide.gear.fishingBody':
-    'Rybaření je klidná změna tempa. Vybav rybářský prut, nahod do otevřené vody a vytáhni, co zabere. Většinou chytíš ryby jako jídlo, které můžeš sníst, občas kus harampádí na prodej za pár mincí a tu a tam ceněný vzácný úlovek. Co najdeš, záleží na vodě, ve které lovíš.',
+    'Rybaření je klidná změna tempa. Nos u sebe rybářský prut, použij ho u otevřené vody a vytáhni, co zabere. Většinou chytíš ryby jako jídlo, které můžeš sníst, občas kus harampádí na prodej za pár mincí a tu a tam ceněný vzácný úlovek. Co najdeš, záleží na vodě, ve které lovíš.',
   'guide.gear.fishingFood':
     'Ryby, které vytáhneš, jsou jídlo: sněz jednu při sezení a odpočinku a obnoví zdraví, vydatnější ryby pocházejí z chladnějších hlubších vod na severu. Prut v jezeře je tichý způsob, jak mezi boji udržet batoh zásobený.',
   'guide.gear.fishingRare':
@@ -6207,21 +6403,21 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.economy.vendorsTitle': 'Prodejci a co drží skladem',
   'guide.economy.vendorsBody':
     'Města a výspy jsou poseté obchodníky, každý má vlastní řemeslo. Zásobovači drží jídlo a pití, zbrojíři a zbraňoví kováři výbavu a intendant praktický cestovní kit. Přistup k některému a uvidíš, co prodává.',
-  'guide.economy.marksTitle': 'Druhá měna: Známky výprav',
+  'guide.economy.marksTitle': 'Známky: měny nad rámec mincí',
   'guide.economy.marksBody':
-    'Mince nejsou jediné, co ukládáš. Výpravy vyplácejí Známky výprav, samostatnou měnu, kterou utrácíš jen u správce výprav za vylepšení společníka a výbavu, kterou jinde nenajdeš. Nikdy se nemíchají s mincemi.',
+    'Mince nejsou jediné, co ukládáš. Výpravy vyplácejí Známky výprav, které utrácíš jen u správce výprav za vylepšení společníka a výbavu, kterou jinde nenajdeš. Hrdinské běhy dungeonů nechávají na posledním bossovi Hrdinské značky, které utratíš u hrdinského zásobovače v Highwatchi za klenoty, jaké neprodává žádný jiný kout říše. Ani jedny se nikdy nemíchají s mincemi.',
   'guide.economy.buyingTitle': 'Nákup a prodej',
   'guide.economy.buyingBody':
-    'Postav se blízko obchodníka a otevři jeho okno. Můžeš koupit cokoli má skladem, pokud na to máš, a prodat většinu věcí z batohů za mince. Když něco prodáš omylem, prodejce podrží nedávné prodeje, abys je mohl koupit zpět.',
+    'Promluv s obchodníkem a zvol si prohlížení jeho zboží, a jeho obchod se otevře se třemi záložkami: Prohlížet, Prodat a Zpětný odkup. Prohlížet drží vše, co má skladem, tvé, pokud na to máš. Prodat vypisuje, co z tvých batohů vykoupí, a prodej kusu, který nese vlastní vylosovanou kvalitu, tě nejdřív požádá o potvrzení, aby ceněný exemplář nikdy neproklouzl omylem. Když se rozloučíš s něčím, čeho lituješ, záložka Zpětný odkup podrží tvé nedávné prodeje, takže je můžeš koupit zpět za mince, které ti byly vyplaceny.',
   'guide.economy.junkTitle': 'Vyklízení harampádí',
   'guide.economy.junkBody':
-    'Předměty, pro které nemáš využití, se pořád prodají kterémukoli prodejci, takže batohy vyprazdňuj pokaždé, když projdeš městem, místo aby se zaplnily. Opravdu bezcenné drobnosti můžeš také zahodit a udělat místo.',
+    'Předměty, pro které nemáš využití, se pořád prodají kterémukoli prodejci, takže batohy vyprazdňuj pokaždé, když projdeš městem, místo aby se zaplnily. Prodejní záložka u obchodníka dokonce drží tlačítko na jedno kliknutí, které naráz prodá každou drobnost chabé kvality. Opravdu bezcenné drobnosti můžeš také rovnou zahodit a udělat místo.',
   'guide.economy.tradeTitle': 'Obchod s ostatními hráči',
   'guide.economy.tradeBody':
     'Můžeš obchodovat tváří v tvář s kýmkoli poblíž. Oba vložíte předměty a mince do společného okna a výměna proběhne teprve, když ji oba potvrdíte, takže se nikdo nenechá nachytat. Je to jednoduchý způsob, jak předat kamarádovi drop nebo uzavřít dohodu.',
   'guide.economy.marketTitle': 'Světový trh',
   'guide.economy.marketBody':
-    'Kupec provozuje Světový trh, hráči řízenou burzu, kde můžeš nakupovat a prodávat s lidmi, které možná nikdy nepotkáš. Promluv s kupcem a otevři ho. Kupec tam také drží stálou zásobu vlastního zboží, takže je vždy co koupit, i když ostatní hráči nic nevystavili.',
+    'Kupec provozuje Světový trh, hráči řízenou burzu, kde můžeš nakupovat a prodávat s lidmi, které možná nikdy nepotkáš. Promluv s Kupcem v Eastbrooku, nebo s dražitelem Vossem nahoře v Highwatchi, a otevřeš ho: oba správci slouží jednomu společnému trhu. Kupec tam také drží stálou zásobu vlastního zboží, takže je vždy co koupit, i když ostatní hráči nic nevystavili.',
   'guide.economy.marketBrowse':
     'Prohlížení: posouvej nabídky nebo hledej podle jména, co je na prodej. Každá nabídka ukazuje zboží, prodejce a požadovanou cenu za celý stack.',
   'guide.economy.marketPost':
@@ -6257,7 +6453,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Volitelný kanál pro celý svět na hledání lidí do dungeonu. Otevři záložku a připoj se.',
   'guide.social.chanGuild': 'Cech a důstojníci.',
   'guide.social.chanGuildBody':
-    'Kanály pro tvůj cech. Cechovní chat dosáhne na každého člena; důstojnický kanál je jen pro důstojníky.',
+    'Kanály pro tvůj cech. Cechovní chat dosáhne na každého člena; důstojnický kanál je pro důstojníky a vedoucího cechu.',
   'guide.social.partyHeading': 'Vytvoření party',
   'guide.social.partyBody':
     'Pozvi jiného hráče kliknutím pravým tlačítkem na jeho jméno a volbou pozvat. Party pojme až pět hráčů a jeden z vás je vůdce.',
@@ -6273,7 +6469,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Peníze ze zabití mohou jít tomu, kdo lootuje, nebo se rovnoměrně rozdělit po partě.',
   'guide.social.lootCommonTitle': 'Předměty.',
   'guide.social.lootCommonBody':
-    'Běžné dropy mohou jít lootujícímu, zatímco lepší dropy jdou do hodu, aby měl každý férovou šanci.',
+    'Běžné dropy mohou kolovat po partě nebo připadnout tomu, kdo lootuje, zatímco lepší dropy jdou do hodu, aby měl každý férovou šanci.',
   'guide.social.lootRollTitle': 'Need, Greed nebo Pass.',
   'guide.social.lootRollBody':
     'Když předmět jde do hodu, každý způsobilý člen zvolí Need, pokud ho chce používat, Greed, pokud by ho vzal jen navíc, nebo Pass, pokud ustupuje. Nejvyšší hod vyhrává.',
@@ -6292,7 +6488,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Členství v cechu ti dá soukromý cechovní chat a ukáže cechovníky ve sdíleném seznamu, takže jsou online vždy známé tváře.',
   'guide.social.etiquetteHeading': 'Etiketa ve skupině',
   'guide.social.etiquetteBody':
-    'Skupina je volba, ne povinnost. Pozdrav při příchodu, házej Need jen na výbavu, kterou skutečně použiješ, a dej skupině vědět, než odejdeš. Trocha slušnosti dojde daleko a většina hráčů je za společnost ráda.',
+    'Skupina je volba, ne povinnost. Pozdrav při příchodu, házej Need jen na výbavu, kterou skutečně použiješ, a dej skupině vědět, než odejdeš. Trocha slušnosti dojde daleko a většina hráčů je za společnost ráda. Moderátoři udržují klid a hráče, který ostatním nedá hru užít, lze přesunout do vězeňské cely, dokud ho moderátor nepustí ven.',
   'guide.stats.intro':
     'Tvoji postavu popisuje několik atributů. Nemusíš si je pamatovat nazpaměť, abys hrál dobře, ale přibližná znalost pomáhá číst panel postavy a vybírat správná vylepšení.',
   'guide.stats.primaryHeading': 'Primární atributy',
@@ -6312,19 +6508,19 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Intelekt zvětšuje sesilatelům zásobu many, zvedá sílu kouzel, takže kouzla zasahují tvrději, a zlepšuje šanci na krit kouzel. Záleží třídám sesílajícím z many; pro třídy se vztekem nebo energií dělá málo.',
   'guide.stats.spiTitle': 'Duch',
   'guide.stats.spiBody':
-    'Duch určuje, jak rychle se sesilateli vrací mana mimo boj. Stejně jako intelekt slouží manovým třídám a pro ostatní znamená málo.',
+    'Duch určuje, jak rychle se sesilateli vrací mana, kdykoli přeruší sesílání, což je většinu času mezi boji. Stejně jako intelekt slouží manovým třídám a pro ostatní znamená málo.',
   'guide.stats.armorTitle': 'Zbroj',
   'guide.stats.armorBody':
     'Zbroj snižuje fyzické poškození, které dostáváš. Vychází hlavně z toho, co nosíš, a těžší zbrojové třídy jí nesou mnohem víc. Více zbroje proti protivníkovi blízko tvé úrovně znamená měkčí zásahy.',
   'guide.stats.apTitle': 'Síla útoku',
   'guide.stats.apBody':
-    'Síla útoku měří, jak tvrdě zasahuje zbraň. Primární atributy ji krmí a silnější zbraně a výbava ji dál zvedají, proto může vylepšení skutečně poskočit v poškození.',
+    'Síla útoku měří, jak tvrdě zasahuje tvá zbraň. Krmí ji primární atributy a výbava, která tyto atributy nese, ji dál zvedá, zatímco silnější zbraň zvyšuje tvé poškození přímo, a proto může být vylepšení skutečným skokem v poškození.',
   'guide.stats.spTitle': 'Síla kouzel',
   'guide.stats.spBody':
     'Síla kouzel je sesilatelský protějšek síly útoku: zvedá poškození kouzel. Krmí ji intelekt a výbava i buffy sesilatelů přidávají další, takže sesilatel sleduje sílu kouzel jako bojovník na blízko sílu útoku.',
   'guide.stats.critTitle': 'Kritický zásah',
   'guide.stats.critBody':
-    'Šance na kritický zásah říká, jak často útok dopadne s extra poškozením. Každý začíná s malou základní šancí a obratnost, plus některé talenty a výbava, ji zvyšuje.',
+    'Šance na kritický zásah říká, jak často útok dopadne s extra poškozením. Každý začíná s malou základní šancí a obratnost (plus některé talenty a výbava) ji zvyšuje. Tvůj panel ukazuje jak samotnou šanci, tak hodnocení kritického zásahu, kterým k ní tvá výbava přispívá.',
   'guide.stats.dodgeTitle': 'Uhýbání',
   'guide.stats.dodgeBody':
     'Uhýbání je šance se zcela vyhnout příchozímu útoku na blízko. Začínáš s malou základní šancí a obratnost ji zvedá, takže mrštné třídy unikají více ranám.',
@@ -6341,7 +6537,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Každý boj, úkol a krok na sever posiluje hrdinu. Takhle funguje levelování a co tě drží v růstu, když dosáhneš vrcholu.',
   'guide.progression.xpTitle': 'Jak získáváš zkušenosti',
   'guide.progression.xpBody':
-    'Zkušenosti získáváš dokončováním úkolů a porážením nepřátel. Úkoly dávají zdaleka nejvíc, takže sledování stopy úkolů je nejrychlejší cesta vzhůru. Zabíjení po cestě doplní zbytek.',
+    'Zkušenosti získáváš dokončováním úkolů, porážením nepřátel a čištěním výprav. Úkoly dávají zdaleka nejvíc, takže sledování stopy úkolů je nejrychlejší cesta vzhůru. Zabíjení a běhy výprav po cestě doplní zbytek.',
   'guide.progression.capBody':
     'Každá úroveň tě posílí a přinese nové schopnosti až po maximum na úrovni {cap}.',
   'guide.progression.journeyTitle': 'Cesta na sever',
@@ -6350,12 +6546,12 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.progression.bandLabel': 'Úrovně {min} až {max}',
   'guide.progression.restedTitle': 'Odpočaté zkušenosti',
   'guide.progression.restedBody':
-    'Odpočívej na bezpečném místě, třeba v hostinci, mimo boj, a postava během sezení nasbírá odpočaté zkušenosti. Až půjdeš příště bojovat, tato zásoba dá zabitím extra bonus, dokud nedojde. Pauza v hostinci není ztracený čas; urychlí další kus levelování.',
+    'Vejdi do hostince a zůstaň mimo boj a postava během čekání nasbírá odpočaté zkušenosti. Hostinec má každé město. Až příště vyrazíš bojovat, tato zásoba dá tvým zabitím bonus navíc, dokud nedojde. Pauza v hostinci není nikdy ztracený čas; urychlí tvůj další úsek levelování.',
   'guide.progression.capTitle': 'Dosažení úrovně {cap}',
   'guide.progression.capJourneyBody':
-    'Úroveň {cap} je maximum, konec levelování, ale ne růstu. Odtud běháš dungeony a raid, lovíš lepší výbavu a testuješ se v aréně.',
+    'Úroveň {cap} je maximum, konec levelování, ale ne růstu. Odtud běháš dungeony a raid v normálním i hrdinském režimu, čelíš světovému bossovi, když povstane, honíš lepší výbavu a zkoušíš se v aréně.',
   'guide.progression.prestigeBody':
-    'Zkušenosti se počítají i po maximu. Krmí kosmetickou virtuální úroveň, takže lišta zkušeností dál stoupá, a dlouhodobou prestižní hodnost pro uznání. Velké milníky celoživotních zkušeností také odemykají kosmetické tituly a rámečky jmenovek viditelné na panelu postavy. Všechno je čistě volitelné a nikdy nedává sílu, jen značku cesty, kterou jsi prošel.',
+    'Zkušenosti se počítají i po maximu. Krmí kosmetickou virtuální úroveň, takže lišta zkušeností dál stoupá, a dlouhodobou prestižní hodnost, kterou si po dosažení maxima můžeš nárokovat z karty postavy. Překonání velkých milníků celoživotních zkušeností také vynáší skutky v Knize skutků, s kosmetickými tituly a rámečky jmenovek, které se ukazují na kartě postavy. Všechno je čistě volitelné a nikdy nedává sílu, jen značku cesty, kterou jsi prošel.',
   'guide.progression.noRush':
     'Není kam spěchat. Svět je tu pro hraní vlastním tempem, takže se toulaj, ber úkoly, které tě zaujmou, a nech hrdinu růst po cestě.',
   'guide.placeholder.note': 'Tato část průvodce se připravuje.',
@@ -6492,6 +6688,135 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetMismatch': 'Hesla se neshodují.',
   'hudChrome.auth.resetErrInvalid':
     'Tento odkaz pro obnovení je neplatný nebo vypršel. Požádejte o nový.',
+  'apiError.deeds.invalid_input': 'Neplatný vstup.',
+  'apiError.steam.account_taken': 'Tento účet Steam už je propojený s jiným účtem.',
+  'apiError.steam.already_linked': 'Tvůj účet už má propojený účet Steam.',
+  'apiError.steam.banned': 'Tento účet Steam nelze propojit.',
+  'apiError.steam.disabled': 'Propojení účtu Steam není momentálně k dispozici.',
+  'apiError.steam.invalid_ticket':
+    'Steam nedokázal tuto žádost o propojení ověřit. Zkus to znovu z desktopové aplikace.',
+  'apiError.steam.upstream': 'Steam neodpověděl. Zkus to za chvíli znovu.',
+  'entities.npcs.chronicler_edda_hartwell.greeting':
+    'Hora nezapomíná na nic, {playerName}, a já také ne. Podívejme se, co máš za sebou.',
+  'entities.npcs.chronicler_edda_hartwell.name': 'Kronikářka Zenzie',
+  'entities.npcs.chronicler_edda_hartwell.title': 'Kronika výšin',
+  'entities.npcs.chronicler_osric_fenn.greeting':
+    'Chraň stránky před vlhkem, {playerName}. Močál pohltí víc knih, než kolik jich kdy pohltí čtenáři.',
+  'entities.npcs.chronicler_osric_fenn.name': 'Kronikář Osric Fenn',
+  'entities.npcs.chronicler_osric_fenn.title': 'Kronika močálu',
+  'entities.npcs.chronicler_saul.greeting':
+    'Každý skutek, který stojí za to vykonat, stojí i za to zapsat dvakrát, {playerName}: jednou do knihy a jednou pro vyprávění u ohně.',
+  'entities.npcs.chronicler_saul.name': 'Kronikář Saul',
+  'entities.npcs.chronicler_saul.title': 'Kronika údolí',
+  'guide.controls.deeds': 'Kniha skutků',
+  'guide.deedsPage.cat.chronicle': 'Kroniky',
+  'guide.deedsPage.cat.collection': 'Sbírky',
+  'guide.deedsPage.cat.combat': 'Boj',
+  'guide.deedsPage.cat.delve': 'Výpravy',
+  'guide.deedsPage.cat.dungeon': 'Dungeony',
+  'guide.deedsPage.cat.exploration': 'Průzkum',
+  'guide.deedsPage.cat.feat': 'Počiny',
+  'guide.deedsPage.cat.progression': 'Postup',
+  'guide.deedsPage.cat.pvp': 'PvP a sport',
+  'guide.deedsPage.cat.social': 'Společnost',
+  'guide.deedsPage.catHeading': '{label} ({count})',
+  'guide.deedsPage.catalogBody':
+    'Zde je každý skutek, který Kniha pojme, seřazený podle kategorií. Ty tajné tu záměrně chybí a čekají, až je objevíš. Otevři si Knihu skutků ve hře a uvidíš přesně, co který z nich žádá.',
+  'guide.deedsPage.catalogHeading': 'Úplný soupis skutků',
+  'guide.deedsPage.chroniclesBody':
+    'Každá zóna má svou vlastní kroniku, sadu skutků, kterou shromáždil místní kronikář, jenž si vzal za své zaznamenat každého pocestného, který tudy projde. Saul z Eastbrookského údolí je první z nich. Kronika se dělí na kapitoly a je jen na tobě, v jakém pořadí se do nich pustíš.',
+  'guide.deedsPage.chroniclesHeading': 'Kroniky',
+  'guide.deedsPage.colName': 'Skutek',
+  'guide.deedsPage.colRenown': 'Věhlas',
+  'guide.deedsPage.colReward': 'Odměna',
+  'guide.deedsPage.featTag': 'Počin',
+  'guide.deedsPage.featsBody':
+    'Počiny stojí na zvláštní polici: záznamy odkazu a světových prvenství, skutky spjaté s minulou érou nebo s okamžikem, který se stane jen jednou. Nenesou žádný věhlas a nepočítají se do celkového dokončení; zůstávají navěky uchované jako památka na to, co bylo vykonáno.',
+  'guide.deedsPage.featsHeading': 'Počiny',
+  'guide.deedsPage.howBody':
+    'Skutky se vykonávají a uchovávají vždy za jednu postavu, takže každý hrdina, za kterého hraješ, si buduje vlastní Knihu; teprve žebříček říše shromáždí tvůj věhlas napříč všemi tvými postavami a započítá každý skutek jen jednou. Každý skutek přímo v Knize skutků ve hře jasně říká, co od tebe žádá, takže vždy víš, za čím se hnát, a ty, o které usiluješ, si můžeš označit ke sledování, aby ti při hře zůstaly na očích. Malá hrstka jich zůstává tajných a odhalí se teprve tehdy, když je vykonáš. Kniha se také drží poctivě: cokoli tvůj dosavadní záznam dokáže doložit, připíše ti okamžitě, takže veterán ji nikdy neotevře na prázdné stránce; jen počítací skutky začínají svůj součet od nuly.',
+  'guide.deedsPage.howHeading': 'Jak skutky fungují',
+  'guide.deedsPage.intro':
+    'Kniha skutků je místo, kde si svět počítá vše, co máš za sebou: od prvních kroků z počátečního údolí až po nejtěžší boje, jaké říše nabízí. Vykonávej skutky při hraní, nos tituly, které ti udělí, a sleduj, jak tvůj věhlas roste.',
+  'guide.deedsPage.renownBody':
+    'Věhlas je skóre, které stojí za Knihou. Každý vykonaný skutek má pevně danou hodnotu a tvůj součet jen roste, takže klidný týden tě nikdy nepřipraví o pozici. Hrstka skutků závisí spíš na štěstí než na umu a počiny jsou poctou samy o sobě, proto ani jedny nenesou žádný věhlas.',
+  'guide.deedsPage.renownHeading': 'Věhlas',
+  'guide.deedsPage.rewardBorder': 'Rámeček',
+  'guide.deedsPage.rewardsBody':
+    'Odměny jsou čistě na parádu, a přesně o to jde. Některé skutky udělují titul, který můžeš nosit, nebo rámeček, jenž orámuje tvé jméno, nikdy však nic, co by tvého hrdinu posílilo. Vyber si v Knize skutků titul, o který stojíš, a ponese se s tebou na jmenovce, v chatu i na žebříčcích, všem na očích.',
+  'guide.deedsPage.rewardsHeading': 'Tituly a rámečky',
+  'guide.deedsPage.standingsNote':
+    'Světy si vedou průběžný součet věhlasu napříč všemi účty. Chceš-li vidět, kdo si jak stojí, otevři ve hře žebříček a přejdi na jeho záložku Věhlas; pořadí žije tam, ne na wiki.',
+  'guide.nav.deeds': 'Kniha skutků',
+  'hudChrome.deeds.broadcastLine': '{name} završuje skutek: {deed}',
+  'hudChrome.deeds.broadcastsLabel': 'Sdílet vykonané skutky s cechem a přáteli',
+  'hudChrome.deeds.catChronicle': 'Kroniky',
+  'hudChrome.deeds.catCollection': 'Sbírky',
+  'hudChrome.deeds.catCombat': 'Boj',
+  'hudChrome.deeds.catDelve': 'Výpravy',
+  'hudChrome.deeds.catDungeon': 'Dungeony',
+  'hudChrome.deeds.catExploration': 'Průzkum',
+  'hudChrome.deeds.catFeat': 'Počiny',
+  'hudChrome.deeds.catProgression': 'Postup',
+  'hudChrome.deeds.catPvp': 'PvP a sport',
+  'hudChrome.deeds.catSocial': 'Společnost',
+  'hudChrome.deeds.categoriesAria': 'Kategorie skutků',
+  'hudChrome.deeds.categoryCountAria': '{category}: vykonáno {earned} z {visible} skutků',
+  'hudChrome.deeds.charOpenBook': 'Kniha skutků',
+  'hudChrome.deeds.charTitleLabel': 'Titul',
+  'hudChrome.deeds.charTitleNone': 'Žádný titul nezvolen',
+  'hudChrome.deeds.close': 'Zavřít Knihu skutků',
+  'hudChrome.deeds.collapseHint': 'Sbalit panel skutků',
+  'hudChrome.deeds.completionAria': 'Vykonáno {earned} z {total} skutků',
+  'hudChrome.deeds.countLabel': '{earned}/{total} skutků',
+  'hudChrome.deeds.earnedDate': 'Vykonáno {date}',
+  'hudChrome.deeds.emptyCategory': 'Žádné skutky tu neodpovídají.',
+  'hudChrome.deeds.expandHint': 'Rozbalit panel skutků',
+  'hudChrome.deeds.featRibbon': 'Počin',
+  'hudChrome.deeds.filterAll': 'Vše',
+  'hudChrome.deeds.filterEarned': 'Vykonané',
+  'hudChrome.deeds.filterGroupAria': 'Filtrovat skutky',
+  'hudChrome.deeds.filterNearly': 'Skoro hotové',
+  'hudChrome.deeds.filterUnearned': 'Nevykonané',
+  'hudChrome.deeds.hiddenBadge': 'Skrytý',
+  'hudChrome.deeds.lbDeedsCol': 'Skutky',
+  'hudChrome.deeds.lbEmpty': 'V žebříčku zatím nejsou žádní kronikáři.',
+  'hudChrome.deeds.lbSelf': 'Tvoje umístění: pořadí {rank}, horních {percent} procent',
+  'hudChrome.deeds.lbTab': 'Věhlas',
+  'hudChrome.deeds.lbTitleCol': 'Titul',
+  'hudChrome.deeds.nearestLabel': 'Skoro tam:',
+  'hudChrome.deeds.progressAria': 'Postup: {current} z {target}',
+  'hudChrome.deeds.progressText': '{current}/{target}',
+  'hudChrome.deeds.rarityLine': 'Vykonalo jej {percent} dobrodruhů',
+  'hudChrome.deeds.recentLabel': 'Nedávné:',
+  'hudChrome.deeds.renownChip': 'Věhlas: {renown}',
+  'hudChrome.deeds.renownLabel': 'Věhlas',
+  'hudChrome.deeds.retroSummary': 'Tvoje kronika se dopisuje: zaznamenáno {count} skutků.',
+  'hudChrome.deeds.searchAria': 'Hledat skutky podle názvu',
+  'hudChrome.deeds.searchPlaceholder': 'Hledat skutky',
+  'hudChrome.deeds.title': 'Kniha skutků',
+  'hudChrome.deeds.titleChip': 'Odměna: titul',
+  'hudChrome.deeds.titledName': '{name} [{title}]',
+  'hudChrome.deeds.titlesAria': 'Zvol si zobrazovaný titul',
+  'hudChrome.deeds.titlesEmpty': 'Vykonej skutek nesoucí titul a tato police se odemkne.',
+  'hudChrome.deeds.titlesNone': 'Bez titulu',
+  'hudChrome.deeds.titlesSection': 'Tituly',
+  'hudChrome.deeds.trackerLabel': 'Skutky',
+  'hudChrome.deeds.unlockedBanner': 'Skutek vykonán: {name}',
+  'hudChrome.deeds.unlockedTitleHint': 'Získán nový titul: {title}. Zvol si ho v Knize skutků.',
+  'hudChrome.deeds.unwatch': 'Přestat sledovat',
+  'hudChrome.deeds.unwatchAria': 'Přestat sledovat skutek {name}',
+  'hudChrome.deeds.watch': 'Sledovat',
+  'hudChrome.deeds.watchAria': 'Sledovat skutek {name} na panelu skutků',
+  'hudChrome.deeds.watchFull': 'Seznam sledovaných je plný (max {cap})',
+  'hudChrome.mobile.deeds': 'Skutky',
+  'hudChrome.steam.benefits':
+    'Propoj svůj účet Steam z desktopové aplikace a skutky, které vykonáš, se budou zrcadlit do achievementů ve službě Steam.',
+  'hudChrome.steam.link': 'Propojit Steam',
+  'hudChrome.steam.linked': 'Propojeno s účtem Steam {id}',
+  'hudChrome.steam.noTicket': 'Steam nevydal propojovací tiket. Spusť Steam a zkus to znovu.',
+  'hudChrome.steam.title': 'Steam',
+  'hudChrome.steam.unlink': 'Odpojit Steam',
   'entities.items.chunk_of_ore.name': 'Kus rudy',
   'entities.quests.q_prof_intro.completion':
     'Vidíš? Rudu v batohu a mozoly na rukou. Pokračuj v těžbě, kácení dřeva a sběru bylin, když cestuješ po cestách, a až se vrátíš do města, nezapomeň na tabuli Zaměření města u tržiště a řemeslnický ponk poblíž. V tom všem čeká poctivé živobytí, pokud o něj stojíš.',
@@ -6504,7 +6829,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleChoiceIntro': 'Vytvoř nový účet, nebo propoj Apple s účtem, který už máš.',
   'hudChrome.auth.appleError': 'Přihlášení přes Apple se nezdařilo. Zkus to znovu.',
   'hudChrome.auth.appleLoginCta': 'Pokračovat přes Apple',
-  'hudChrome.controller.duplicate': 'Také přiřazeno k {buttons}',
   'hudChrome.dailyRewards.reason.banned': 'Máš zákaz účasti v denních odměnách. Důvod: {reason}',
   'hudChrome.itemHeroicTag': '[HRDINSKÉ]',
   'hudChrome.itemSoulbound': 'Vázáno na duši',
@@ -6516,84 +6840,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petTaunt': 'Mazlíček: Provokace',
   'hudChrome.mailbox.parcelQtyDecreaseAria': 'Odeslat o jeden kus {item} méně',
   'hudChrome.mailbox.parcelQtyIncreaseAria': 'Odeslat o jeden kus {item} více',
-  'hudChrome.mobile.hideMenuButtons': 'Skrýt tlačítka nabídky',
-  'hudChrome.mobile.showMenuButtons': 'Zobrazit tlačítka nabídky',
-  'hudChrome.options.changed': 'Změněno: {count}',
-  'hudChrome.options.changedSummary': 'Změněno oproti výchozím hodnotám: {count}',
-  'hudChrome.options.conflictDot': 'Konflikt přiřazení',
-  'hudChrome.options.done': 'Hotovo',
-  'hudChrome.options.ia.catAccessibilityName': 'Přístupnost',
-  'hudChrome.options.ia.catAccessibilitySub': 'Pohyb, kontrast a pohodlné zobrazení obsahu.',
-  'hudChrome.options.ia.catAudioSub': 'Hlasitost a přepínače zvuku.',
-  'hudChrome.options.ia.catControllerSub': 'Pocit z gamepadu a rozložení tlačítek.',
-  'hudChrome.options.ia.catControlsName': 'Ovládání',
-  'hudChrome.options.ia.catControlsSub': 'Kamera, pohyb, boj a odezva.',
-  'hudChrome.options.ia.catGraphicsSub': 'Kvalita, dohled a vzhled světa.',
-  'hudChrome.options.ia.catInterfaceSub': 'Měřítko HUD, panely, chat a rámečky jednotek.',
-  'hudChrome.options.ia.catKeybindsSub': 'Nastav klávesy pro každou akci.',
-  'hudChrome.options.ia.catOverviewName': 'Přehled',
-  'hudChrome.options.ia.catOverviewSub': 'Připnuté základní volby, rychlé akce a změny.',
-  'hudChrome.options.ia.catSystemName': 'Systémová nastavení',
-  'hudChrome.options.ia.catSystemSub': 'Výkon, podpora a informace.',
-  'hudChrome.options.ia.catTouchName': 'Dotykové ovládání',
-  'hudChrome.options.ia.catTouchSub': 'Ovládací páčky na obrazovce, rozhlížení a tlačítka.',
-  'hudChrome.options.ia.railDisplay': 'Zobrazení',
-  'hudChrome.options.ia.railInput': 'Vstup',
-  'hudChrome.options.ia.railSystem': 'Systémová nastavení',
-  'hudChrome.options.keybindCleared': 'Vymazána klávesa pro {action}',
-  'hudChrome.options.keybindEvicted':
-    'Přiřazena klávesa {key} k akci {action}; odebrána z {evicted}',
-  'hudChrome.options.keybindModifierHint':
-    'Tip: můžeš přiřadit kombinace modifikačních kláves. Podrž Shift, Ctrl nebo Alt a stiskni klávesu, aby se kombinace zachytila, například Shift+1.',
-  'hudChrome.options.keybindRebinding':
-    'Přemapování akce {action}. Stiskni klávesu, nebo zruš akci klávesou Escape.',
-  'hudChrome.options.keybindTaken': 'Klávesa odebrána',
-  'hudChrome.options.keybindUnbound': '{action} nemá přiřazenou klávesu',
-  'hudChrome.options.legend.back': 'Zpět',
-  'hudChrome.options.legend.category': 'Kategorie',
-  'hudChrome.options.legend.clear': 'Vymazat',
-  'hudChrome.options.legend.navigate': 'Navigace',
-  'hudChrome.options.legend.page': 'Stránka',
-  'hudChrome.options.legend.reset': 'Resetovat',
-  'hudChrome.options.legend.select': 'Vybrat',
-  'hudChrome.options.modeOffline': 'Režim bez připojení',
-  'hudChrome.options.modeOnline': 'Síťový režim',
-  'hudChrome.options.overviewConflictAlert':
-    'Některá přiřazení kláves jsou v konfliktu nebo chybí.',
-  'hudChrome.options.resetAllBody':
-    'Tím se všechna nastavení vrátí na výchozí hodnoty. Tuto akci nelze vrátit zpět.',
-  'hudChrome.options.resetAllTitle': 'Resetovat všechna nastavení?',
-  'hudChrome.options.searchEmpty': 'Tvému hledání neodpovídá žádné nastavení.',
-  'hudChrome.options.searchGoTo': 'Přejít na {category}',
-  'hudChrome.options.searchPlaceholder': 'Hledat v nastavení',
-  'hudChrome.options.searchScopeAll': 'Všechna nastavení',
-  'hudChrome.options.searchScopeThis': 'Tato sekce',
-  'hudChrome.options.sec.about': 'Informace',
-  'hudChrome.options.sec.actionBars': 'Lišty akcí',
-  'hudChrome.options.sec.buttons': 'Tlačítka',
-  'hudChrome.options.sec.camera': 'Ovládání kamery',
-  'hudChrome.options.sec.chat': 'Konverzace',
-  'hudChrome.options.sec.combat': 'Boj',
-  'hudChrome.options.sec.combatTooltips': 'Boj a popisky',
-  'hudChrome.options.sec.content': 'Obsah',
-  'hudChrome.options.sec.feedback': 'Odezva',
-  'hudChrome.options.sec.feel': 'Pocit ze hry',
-  'hudChrome.options.sec.general': 'Obecné',
-  'hudChrome.options.sec.hudExtras': 'Doplňky HUD',
-  'hudChrome.options.sec.inputMode': 'Režim vstupu',
-  'hudChrome.options.sec.look': 'Rozhlížení',
-  'hudChrome.options.sec.motionContrast': 'Pohyb a kontrast',
-  'hudChrome.options.sec.movement': 'Pohyb',
-  'hudChrome.options.sec.panels': 'Panely',
-  'hudChrome.options.sec.performance': 'Výkon',
-  'hudChrome.options.sec.quality': 'Kvalita',
-  'hudChrome.options.sec.scaleText': 'Měřítko a text',
-  'hudChrome.options.sec.sticks': 'Ovládací páčky',
-  'hudChrome.options.sec.support': 'Podpora',
-  'hudChrome.options.sec.toggles': 'Přepínače',
-  'hudChrome.options.sec.unitFrames': 'Rámečky jednotek',
-  'hudChrome.options.sec.view': 'Výhled',
-  'hudChrome.options.sec.volume': 'Hlasitost',
   'hudChrome.readyCheck.notReady': 'Nepřipraven(a)',
   'hudChrome.readyCheck.prompt': 'Hráč {name} zahájil kontrolu připravenosti. Jsi připraven(a)?',
   'hudChrome.readyCheck.ready': 'Připraven(a)',
@@ -6602,12 +6848,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.notInPartyError':
     'Abys mohl(a) zahájit kontrolu připravenosti, musíš být ve skupině.',
   'hudChrome.readyCheck.inProgressError': 'Kontrola připravenosti už probíhá.',
-  'hudChrome.talents.choicesTab': 'Volby',
-  'hudChrome.talents.resetChoices': 'Resetovat volby',
-  'hudChrome.talents.tierLevel': 'Úroveň {n}',
-  'hudChrome.talents.tierLevelLabel': 'Úroveň',
-  'itemUi.vendor.sellItemAria': 'Prodat {item} za {price}',
-  'itemUi.vendor.sellRolledWarning': 'Náhodně vytvořené vlastnosti nelze získat zpět odkoupením.',
   'loading.tips.classes':
     'Tip: každá z 9 tříd se hraje jinak. Než se pro jednu rozhodneš, několik jich vyzkoušej.',
   'loading.tips.dungeons':
@@ -6623,4 +6863,560 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Tip: vyzvi jiného hráče na přátelský souboj, nebo se zařaď do fronty arény Popelavého kolosea a vyzkoušej svou sestavu.',
   'loading.tips.talents':
     'Tip: kdykoli nejsi v boji, můžeš resetovat své talenty, takže časná volba nikdy není past.',
+  'guide.bestiary.flavor.sethrael_palecoil':
+    'Kostně bledý had, který klouže po hlubokém dně Třpytivého plesa, tichý strážce vody, již si přivlastnil. Plavci, kteří s ním sdílejí pleso, se málokdy vynoří.',
+  'guide.combat.metersBody':
+    'Zajímá tě, jak boj dopadl? Stiskni Z a otevři měřiče party, které pro tvou skupinu sčítají poškození, léčení a hrozbu, souboj po souboji.',
+  'guide.combat.queueBody':
+    'Nemusíš mačkat tlačítka přesně na snímek. Stiskni další schopnost v posledních okamžicích probíhajícího sesílání a zařadí se do fronty, spustí se v okamžiku, kdy sesílání skončí, takže sehraná hra plyne bez mezer. Stisk příliš brzy se prostě odmítne, takže nic nepřijde nazmar. Některé údery na blízko fungují stejně, vyjedou s tvým dalším švihem zbraně.',
+  'guide.combat.queueTitle': 'Tvůj další tah je už nabitý',
+  'guide.controls.arrowKeys': 'Šipky',
+  'guide.controls.attackMoveNote':
+    'Ještě jedna, ve výchozím stavu vypnutá: zapni v nastavení Útočný pohyb a vyhradíš si klávesu (A, dokud je volba zapnutá), která tě rozejde ke kurzoru a spustí útok na nepřítele pod ním, nebo na prvního, kterého cestou potkáš.',
+  'guide.controls.bothMouse': 'Obě tlačítka myši',
+  'guide.controls.calendar': 'Kalendář událostí',
+  'guide.controls.crafting': 'Výroba',
+  'guide.controls.discord': 'Discord',
+  'guide.controls.groupPet': 'Příkazy mazlíčka',
+  'guide.controls.petBar':
+    'Lišta mazlíčka: Útok, Stát, Provokace, Obranný, Útočný (když máš venku mazlíčka lovce nebo černokněžníka)',
+  'guide.controls.runForward': 'Běh vpřed',
+  'guide.controls.valeCup': 'Pohár údolí',
+  'guide.dungeonsPage.heroicBody':
+    'Každý pětičlenný dungeon, a stejně tak samotný raid, má za hranicí maxima úrovní připravenou hrdinskou verzi. Tytéž síně, přetvořené pro vybavenou endgame partu: všechno bije tvrději, ničemu neutečeš po svých a bossové zcela setřesou omráčení i zpomalení. Nejdřív přeroste normální verze; hrdinský režim počítá s tím, že už jsi.',
+  'guide.dungeonsPage.heroicHowBody':
+    'Obtížnost zvol dřív, než si skupina nárokuje instanci: napiš /dungeon heroic, nebo přepni přepínač Obtížnost dungeonu v menu party. Volba je společná pro celou partu a uzamkne se u dveří, takže běh zůstane tím, čím byl nárokován.',
+  'guide.dungeonsPage.heroicLockoutBody':
+    'Normální dungeony můžeš běhat celý den. Hrdinský žádá trpělivost: zabití posledního bosse uzamkne všechny v běhu na jedno hrdinské vyčištění toho dungeonu za den a raid si drží denní zámek pro každou obtížnost zvlášť. Vyčištěný pětičlenný běh zůstává otevřený vlastní partě pro doběhy k tělu a kořist, takže nikdo nezůstane odříznut od toho, co si tam vydobyl. Raid je přísnější: jakmile tě jeho zabití uzamkne, dveře zůstanou zavřené až do denního resetu, takže si posbírej kořist, než opustíš arénu.',
+  'guide.dungeonsPage.heroicRewardsBody':
+    'Hrdinští bossové upouštějí kořist, kterou znáš, vylepšenou a v popisku označenou jako Heroic, a poslední boss každého běhu přidává epické předměty, které jinde nenajdeš. To poslední zabití zanechá všem účastníkům i Hrdinské známky: měnu, kterou utratíš u zásobovače Vexe v Highwatchi, jehož zásoba prstenů a náhrdelníků je jediným šperkem v celé říši.',
+  'guide.dungeonsPage.heroicRewardsTitle': 'Hrdinské známky a vylepšená kořist',
+  'guide.dungeonsPage.heroicTitle': 'Hrdinský režim',
+  'guide.economy.dailyBody':
+    'Tlačítko s truhlou pokladu na obrazovce otevře okno denních odměn. Každý den nabídne hrstku úkolů, dokonči úkoly, bojuj v Popelavém koloseu, vyhraj zápas Poháru údolí, a nabízí i roztočení kola cen zdarma, vše za body do denního pořadí, a nejúspěšnější hráči dne si dělí balík cen pro držitele volitelného komunitního tokenu. Nic z toho nedává ve hře sílu. Samo okno vypisuje pravidla dne a kdo je způsobilý, ukazuje žebříček a uchovává tvou historii.',
+  'guide.economy.dailyTitle': 'Denní odměny',
+  'guide.economy.mailBody':
+    'Každé větší město drží vyřezávaný havraní sloup: schránku Havraní pošty, dopisní služby celé říše. Postav se k němu a napiš jakékoli postavě podle jména, příteli online i dávno offline, a k dopisu přilož mince nebo zboží za drobné poštovné. Havranovi chvíli trvá, než doletí; když přistane, ikona obálky příjemci prozradí, že na něj něco čeká.',
+  'guide.economy.mailHow':
+    'Vyzvedávání funguje stejně obráceně: postav se ke kterémukoli sloupu, přečti si dopisy a vezmi, co nesou, do měšce a batohů. Prostý dopis po čase vybledne, ale ten, který stále nese mince nebo zboží, na tebe počká, ať ti to trvá jakkoli dlouho. Některé věci pošta odmítá rovnou: předměty vázané k duši, úkolové zboží a jedinečné kosmetické tokeny cestují s tebou, nebo vůbec. A po vydařeném odevzdání úkolu měj sloup na očku; někteří zadavatelé úkolů píší.',
+  'guide.economy.mailTitle': 'Havraní pošta',
+  'guide.footer.linksLabel': 'Odkazy na hru a komunitu',
+  'guide.gear.bagsBody':
+    'Všechno, co sebereš, jede v jednom společném vaku a rozšíříš ho tím, že si nasadíš batohy. Okno batohů drží čtyři sloty na batohy: klikni na batoh ve vaku, a zasuneš ho do volného slotu, a každý nošený batoh přidá vlastní místo. Prosté batohy jsou levné zboží od obchodníků, prostornější padají ze šelem a ty nejlepší pocházejí od dungeonových bossů, takže tvůj úložný prostor roste ruku v ruce s výbavou.',
+  'guide.gear.bagsTitle': 'Batohy a úložný prostor',
+  'guide.gear.slotFinger': 'Prst',
+  'guide.gear.slotNeck': 'Krk',
+  'guide.gear.soulboundBody':
+    'Několik zvláštních odměn je vázaných k duši, spjatých s tvou postavou od chvíle, kdy si je vysloužíš. Předmět vázaný k duši nelze směnit, poslat poštou, prodat obchodníkovi ani vystavit na trhu; je tvůj a jen tvůj. Dnes tato ochrana střeží cenné tokeny jako Hrdinské známky, zatímco výbavu, kterou získáš, můžeš volně směňovat, prodávat i sdílet.',
+  'guide.gear.soulboundTitle': 'Vázané k duši: tvé a jen tvé',
+  'guide.glossary.deedDef':
+    'Úspěch zaznamenaný v Knize skutků. Jeho vykonání uděluje Věhlas a některé dávají kosmetický titul nebo rámeček jmenovky.',
+  'guide.glossary.deedTerm': 'Skutek',
+  'guide.glossary.heroicDef':
+    'Těžší verze dungeonu nebo raidu, vyladěná pro vybavené endgame party. Hrdinští bossové upouštějí vylepšenou kořist a poslední boss platí Hrdinskými známkami.',
+  'guide.glossary.heroicTerm': 'Hrdinský',
+  'guide.glossary.loadoutDef':
+    'Uložené rozložení talentů. Drž si jich několik a přepínej mezi buildy, aniž bys znovu utrácel body jeden po druhém.',
+  'guide.glossary.loadoutTerm': 'Rozložení',
+  'guide.glossary.lockoutDef':
+    'Denní strop na největší opakovatelné odměny. Každý hrdinský dungeon vyplatí jedno vyčištění za den, raid sleduje normální a hrdinský zvlášť a vylootování světového bosse ten tvůj spustí. Vyčištěný pětičlenný běh zůstává otevřený vlastní partě; uzamčené dveře raidu se znovu neotevřou až do resetu.',
+  'guide.glossary.lockoutTerm': 'Zámek',
+  'guide.glossary.metersDef':
+    'Okno se skóre party pro aktuální boj: způsobené poškození, odvedené léčení a kdo drží nejvíc hrozby, vedené pro každý souboj. Otevřeš ho jeho klávesou (ve výchozím stavu Z).',
+  'guide.glossary.metersTerm': 'Měřiče poškození',
+  'guide.glossary.petBarDef':
+    'Řada příkazů, kterou přidá mazlíček lovce nebo černokněžníka: Útok, Stát, Provokace, Obranný a Útočný, ve výchozím stavu vázané na Ctrl plus 1 až 5.',
+  'guide.glossary.petBarTerm': 'Lišta mazlíčka',
+  'guide.glossary.readyCheckDef':
+    'Vedoucí skupiny napíše /ready a udělá anketu v partě nebo raidu: každý potvrdí Připraven, nebo Nepřipraven, a skupina vidí počty.',
+  'guide.glossary.readyCheckTerm': 'Kontrola připravenosti',
+  'guide.glossary.renownDef':
+    'Celoživotní skóre, které tvé skutky dohromady tvoří. Jen stoupá a říše z něj vede pořadí na žebříčku.',
+  'guide.glossary.renownTerm': 'Věhlas',
+  'guide.glossary.restedDef':
+    'Bonusové zkušenosti, které si postava ukládá při odpočinku v hostinci, mimo boj. Tvá další zabití vydělají zkušenosti navíc, dokud se zásoba nevyčerpá.',
+  'guide.glossary.restedTerm': 'Odpočatý',
+  'guide.glossary.soulboundDef':
+    'Předmět spjatý s tvou postavou od chvíle, kdy ho získáš. Nelze ho směnit, poslat poštou, prodat obchodníkovi ani vystavit na trhu.',
+  'guide.glossary.soulboundTerm': 'Vázané k duši',
+  'guide.glossary.spiritHealerDef':
+    'Duchovní léčitel říše, vznášející se nad každým hřbitovem: dokáže vzkřísit tvého ducha na místě za cenu pomíjivé slabosti.',
+  'guide.glossary.spiritHealerTerm': 'Bledý strážce',
+  'guide.glossary.targetMarkerDef':
+    'Symbol, který kterýkoli člen party nebo raidu může připnout nad cíl, aby se všichni soustředili na tentýž, nebo se mu vyhnuli. Osm symbolů, jeden cíl na symbol.',
+  'guide.glossary.targetMarkerTerm': 'Značka cíle',
+  'guide.glossary.worldBossDef':
+    'Boss o síle raidu, který v otevřeném světě povstává v pravidelném rytmu a bojuje s ním kdokoli se sejde, aby odpověděl, ne pevně daná parta.',
+  'guide.glossary.worldBossTerm': 'Světový boss',
+  'guide.models.formBear': 'Medvědí podoba',
+  'guide.models.formCat': 'Vlčí podoba',
+  'guide.models.formTravel': 'Svižná podoba',
+  'guide.models.groupForms': 'Podoby druida',
+  'guide.nav.sidebarLabel': 'Témata průvodce',
+  'guide.professions.craftHowBody':
+    'Otevři okno Výroby (výchozí klávesa T) a uvidíš každý recept, který znáš, co který potřebuje a co máš po ruce; když jsou materiály připravené, práci obstará jediné kliknutí. Běžné recepty lze vyrábět kdekoli ve světě. Hrstka pokročilých receptů na nástroje tě naopak žádá, aby ses postavil k výrobnímu centru v Highwatchi.',
+  'guide.professions.craftHowTitle': 'Okno výroby',
+  'guide.professions.focusBody':
+    'Každé větší město drží panel Zaměření města pro přicházející sběrače: postav se ve městě, otevři ho vedle minimapy a namiř malý rozpočet bodů zaměření na typy komponent, na kterých ti záleží. Čím víc zaměření dáš dané komponentě, tím jemnější a bohatší padá z každého dalšího těla; tvé rozdělení následuje postavu, ať se toulá kamkoli, a můžeš ho zdarma přepracovat při každé pozdější návštěvě města.',
+  'guide.professions.focusTitle': 'Zaměření města',
+  'guide.professions.harvestBody':
+    'Sběr nekončí u nalezišť. Některé skolené šelmy lze sklidit pro komponenty, kůže, tesáky, hedvábí i podivnější věci, přímo z těla vedle jeho běžné kořisti. Jeden sběrač na zabití: kdo sklidí první, bere vše. Volba je pokaždé na tobě: strhni z těla všechno, co nabízí, nebo se soustřeď na jedinou komponentu a vezmi si její jemnější stupeň. Sklízet umí každá postava, žádné řemeslo ani výcvik není třeba, a obzvlášť jemná komponenta dokonce nese jméno toho, kdo ji sklidil.',
+  'guide.professions.harvestTitle': 'Sklizeň ze samotného lovu',
+  'guide.search.typeAbility': 'Schopnost',
+  'guide.search.typeDeed': 'Skutek',
+  'guide.settingsPage.audioBody':
+    'Okno nastavení není jen o obrazu. Kategorie Zvuk drží samostatné ovladače hlasitosti pro efekty, hudbu a hlasy a kategorie Rozhraní nese výběr jazyka, který přeloží celé rozhraní na místě, bez načítání, a k tomu výběr motivu pro vzhled oken. Jazyk je také připnutý jako první v Přehledu, takže je vždy jeden krok od otevření menu.',
+  'guide.settingsPage.audioTitle': 'Zvuk a jazyk',
+  'guide.settingsPage.autolootBody':
+    'Nechce se ti klikat na každé tělo? Volba v rozhraní, ve výchozím stavu vypnutá, sebere kořist z tvých vlastních zabití, když kolem nich projdeš.',
+  'guide.settingsPage.factSearchBody':
+    'Nejsi si jistý, kde nějaká volba bydlí? Napiš do vyhledávacího pole nahoře v menu. Rozumí i běžným formulacím, takže fps najde ukazatel FPS, a výběr výsledku tě přenese přímo k nastavení a nechá ho zvýrazněné.',
+  'guide.settingsPage.factSearchTitle': 'Hledání to najde první',
+  'guide.settingsPage.touchBody':
+    'Na dotykové obrazovce nastavení navíc vypěstuje vlastní skupinu pro pohodlí: velikost a citlivost páčky, velikost a průhlednost tlačítek na obrazovce, zrcadlené rozvržení pro leváky, volitelnou páčku kamery a obrácené dotykové rozhlížení, takže se obrazovka přizpůsobí tvým rukám, ne naopak.',
+  'guide.social.calendarBody':
+    'Stiskni I a otevři kalendář událostí. Vyznačuje dny říše, kolem nichž stojí za to plánovat, od týdenního svolání raidu po noc Fiesty, a právě v něm si cechy drží rozvrh: vedoucí cechu a důstojníci na něj mohou zapisovat události a každý člen je vidí na téže stránce.',
+  'guide.social.calendarHeading': 'Kalendář událostí',
+  'guide.social.communityBody':
+    'Začni řádek chatu vykřičníkem a vyšleš komunitní výzvu: !lfg pro hledání skupiny, !wts a !wtb pro obchod, !recruit pro nábor do cechu, !event pro oznámení raidu nebo srazu a !help, když potřebuješ pomoct. Menu výzev vyskočí v okamžiku, kdy napíšeš vykřičník. Každá výzva se rozešle po světě a zopakuje na komunitním Discordu, takže dosáhne i na hráče, kteří nejsou ani přihlášení. Komunitní výzvy jsou součástí online hry.',
+  'guide.social.communityHeading': 'Výzva celé komunitě',
+  'guide.social.emotesBody':
+    'Tvá postava umí promluvit i beze slov: napiš emote jako /wave, /dance, /cheer nebo /bow, nejdřív si zaměř přítele, ať ho namíříš na něj, nebo podrž X a otevři kolo emotů pro rychlý výraz nad hlavou.',
+  'guide.social.markersBody':
+    'V partě si zaměř nepřátelskou bytost a klikni pravým na její portrét v rámečku cíle (na dotyku dlouhý stisk), abys ji korunoval jedním z osmi raidových symbolů. Značit může kterýkoli člen, každý symbol žije vždy na jednom cíli a opětovné nasazení symbolu na jeho vlastní cíl ho zruší. Pořadí zabíjení, rozdělení crowd controlu nebo prosté „tenhle první“ doletí jako symbol rychleji než věta.',
+  'guide.social.markersHeading': 'Značky cíle',
+  'guide.social.readyBody':
+    'Před velkým pullem může vedoucí skupiny napsat /ready a udělat anketu v místnosti: všichni ostatní dostanou výzvu Připraven, nebo Nepřipraven, a jakmile všichni odpoví, nebo vyprší 30 sekund, celá skupina uvidí jediné shrnutí počtů. Nikdo není vyzdvižen; jde o počet, ne o viníka.',
+  'guide.social.readyHeading': 'Kontroly připravenosti',
+  'guide.social.slashBody':
+    'Pár každodenních příkazů stojí za zapamatování: /w Jméno pošle šeptem zprávu a /r odpoví na tu poslední, kterou jsi dostal, /invite pozve někoho do party, /follow tě zařadí do kroku za přítelem, /roll hodí kostkou před zraky skupiny, /who ukáže, kdo je online, a /afk tě označí jako nepřítomného. Pro celý seznam napiš ve hře /help.',
+  'guide.social.slashHeading': 'Šikovné lomítkové příkazy',
+  'guide.stats.hasteBody':
+    'Rychlost je statistika, která zrychlí vše, co děláš: švihy na blízko, střelbu na dálku i sesílání kouzel, všechno zrychlí naráz. Pochází z výbavy, hlavně z bonusů sad zbroje, a několik schopností udělí krátký nával rychlejších švihů. Na kartě postavy ji uvidíš jako Haste Rating.',
+  'guide.stats.hasteTitle': 'Rychlost',
+  'guide.talentsPage.choiceNote':
+    'Pár bodů na každém stromě je spíš rozcestí než nákup: uzel nabízí dvě nebo tři možnosti a ty se upíšeš jedné z nich. Tvůj další reset volbu znovu otevře, stejně jako vše ostatní na stromě.',
+  'guide.valeCupPage.bettingBody':
+    'Diváci na Prasečím poli mohou vsadit na jednu stranu, dokud se zápas teprve utváří: sázky se slévají dohromady a při závěrečném hvizdu si vítězové rozdělí balík poražených v poměru k tomu, co vsadili. Remíza, nebo překvapení, na které nikdo nevsadil, vrátí každou minci. Hráči nasazení v zápase na něj sázet nemohou a zábradlí uchovává tvou celoživotní bilanci výher, proher a čistého zisku.',
+  'guide.valeCupPage.bettingHeading': 'Sázka u zábradlí',
+  'guide.valeCupPage.practiceBody':
+    'Okno Poháru údolí nabízí i trénink: soukromou kopii hřiště, kde obě strany zaplní boti a nic se nepočítá do tvé bilance. Chybí ti hráč nebo dva na skutečný zápas? Po krátkém čekání týmy doplní boti a jakýkoli zápas s boty na hřišti je přátelák, nikdy hodnocený. A když Prasečí pole zahálí, boti předvedou exhibici, na kterou se můžeš z tribuny dívat, i sázet; v okamžiku, kdy se skuteční hráči připraví, exhibice hřiště uvolní a každá sázka se vrátí.',
+  'guide.valeCupPage.practiceHeading': 'Tréninkové zápasy a zahálející hřiště',
+  'guide.worldPage.worldBossBody':
+    'Vysoko na Thornpeaku bouře nad Bouřným skalním štítem občas nabere tvar. Thunzharr, Probouzející se štít tam povstává v pravidelném rytmu, elementál o síle raidu, s nímž v otevřeném světě bojuje kdokoli odpoví na volání, a čím víc vyzyvatelů se proti němu postaví, tím je mocnější. Každý, kdo se do boje zapojí, získá vlastní hod o jeho kořist, ctěný za podmínek raidového zámku, a jeho pád doznívá dost dlouho, aby padlí stihli doběhnout zpět a nárokovat, co jim náleží. Sesbírej víc mečů, než si myslíš, že potřebuješ.',
+  'guide.worldPage.worldBossTitle': 'Když se štít probudí: světový boss',
+  'entities.abilities.arcane_power.description':
+    'Zvýší tvoje poškození kouzly o 20 % a rychlost sesílání o 10 % na 10 s. (klíčová schopnost Tajemné magie)',
+  'entities.abilities.arcane_power.name': 'Příval éteru',
+  'entities.abilities.bestial_wrath.description':
+    'Uvrhne tě do zvířecího běsnění, zvýší tvoji sílu útoku o 20 % a poškození způsobené tvým společníkem o 100 % na 15 s. (klíčová schopnost Mistrovství šelem)',
+  'entities.abilities.bestial_wrath.name': 'Vyjící běs',
+  'entities.abilities.blade_flurry.description':
+    'Rozpoutá smršť čepelí a zvýší tvoji rychlost útoku o 20 % na 12 s. (klíčová schopnost Boje)',
+  'entities.abilities.blade_flurry.name': 'Zrcadlové čepele',
+  'entities.abilities.chain_heal.description':
+    'Vyléčí spojenecký cíl za velké množství zdraví, poté přeskočí až na 2 další blízké spojence. Každý další skok léčí o 50 % méně. (klíčová schopnost Obnovy)',
+  'entities.abilities.chain_heal.name': 'Řetězové léčení',
+  'entities.abilities.cold_blood.description':
+    'Soustředí tvůj vražedný záměr, takže tvůj příští útok bude kritickým zásahem. (klíčová schopnost Vraždění)',
+  'entities.abilities.cold_blood.name': 'Klid zabijáka',
+  'entities.abilities.combustion.description':
+    'Zvýší šanci na kritický zásah kouzlem o 50 % na 15 s. (klíčová schopnost Ohně)',
+  'entities.abilities.combustion.name': 'Bleskový žár',
+  'entities.abilities.conflagrate.description':
+    'Spotřebuje Hořící pakt na nepříteli a zapálí ho za {damage} ohnivého poškození. (klíčová schopnost Ničení)',
+  'entities.abilities.conflagrate.name': 'Vzplanutí',
+  'entities.abilities.counter_shot.description':
+    'Rychlý výstřel, který přeruší sesílání kouzla cíle a na 4 s mu znemožní kouzla stejné školy.',
+  'entities.abilities.counter_shot.name': 'Umlčující výstřel',
+  'entities.abilities.counterspell.description':
+    'Přeruší sesílání kouzla cíle a na 6 s mu znemožní kouzla stejné školy.',
+  'entities.abilities.counterspell.name': 'Zlomení kouzla',
+  'entities.abilities.crusader_strike.description':
+    'Zasáhne cíl za poškození zbraně plus {damage} svatého poškození. (talent paladina)',
+  'entities.abilities.crusader_strike.name': 'Křižácký úder',
+  'entities.abilities.elemental_mastery.description':
+    'Povolá bouři a tvé příští kouzlo sešle okamžitě. (klíčová schopnost Živlů)',
+  'entities.abilities.elemental_mastery.name': 'Prvotní mistrovství',
+  'entities.abilities.feral_charge.description':
+    'Uvolní prvotní nápor. Ve vlčí podobě zvýší obnovu energie o 100 % na 10 s. V medvědí podobě okamžitě vygeneruje 50 vzteku. (klíčová schopnost Divokosti)',
+  'entities.abilities.feral_charge.name': 'Prvotní nápor',
+  'entities.abilities.hemorrhage.description':
+    'Zasáhne nepřítele za poškození zbraně plus {damage}, způsobí mu krvácení na 12 s a zvýší utrpěné poškození krvácením o 40 %. Udělí 1 combo bod. (klíčová schopnost Lstivosti)',
+  'entities.abilities.hemorrhage.name': 'Rudá stuha',
+  'entities.abilities.holy_nova.description':
+    'Vyvolá výbuch svaté záře, který vyléčí blízké spojence za {damage} a poškodí blízké nepřátele. (klíčová schopnost Svaté magie)',
+  'entities.abilities.holy_nova.name': 'Svatá nova',
+  'entities.abilities.holy_shield.description':
+    'Vrhne na nepřítele zářivou záštitu, způsobí mu svaté poškození a odrazí se ke 2 blízkým nepřátelům. (klíčová schopnost Ochrany)',
+  'entities.abilities.holy_shield.name': 'Posvěcená hradba',
+  'entities.abilities.holy_shock.description':
+    'Zasáhne spojenecký cíl svatou energií a vyléčí ho, nebo způsobí nepříteli {damage} svatého poškození. (klíčová schopnost Svaté magie)',
+  'entities.abilities.holy_shock.name': 'Svatý otřes',
+  'entities.abilities.holy_taunt.description':
+    'Vyzve cíl: tvoje hrozba se zvýší na úroveň jeho nejnenáviděnějšího nepřítele a cíl je donucen tě 3 s útočit.',
+  'entities.abilities.holy_taunt.name': 'Posvátná výzva',
+  'entities.abilities.icy_veins.description':
+    'Zvýší rychlost sesílání o 30 % a na 10 s zabrání přerušení i zpomalení sesílání. (klíčová schopnost Mrazu)',
+  'entities.abilities.icy_veins.name': 'Ledové žíly',
+  'entities.abilities.kick.description':
+    'Přeruší sesílání kouzla cíle a na 4 s mu znemožní kouzla stejné školy.',
+  'entities.abilities.kick.name': 'Kopanec',
+  'entities.abilities.metamorphosis.description':
+    'Na 20 s se proměníš v děsivého démona, zvýšíš svoje poškození kouzly o 20 % a rychlost sesílání o 20 %. Tvůj démon způsobuje o 50 % více poškození a sesílá o 20 % rychleji. (klíčová schopnost Démonologie)',
+  'entities.abilities.metamorphosis.name': 'Děsivý zjev',
+  'entities.abilities.moonkin_form.description':
+    'Promění tě v děsivého měsíčníka, zvýší tvoje poškození kouzly o 20 % a zbroj o 50 %. Trvá, dokud podobu neopustíš. Dalším sesláním se vrátíš do normální podoby. (klíčová schopnost Rovnováhy)',
+  'entities.abilities.moonkin_form.name': 'Podoba měsíčního křídla',
+  'entities.abilities.power_infusion.description':
+    'Naplní spojenecký cíl mocí a zvýší jeho rychlost sesílání o 20 % na 15 s. (klíčová schopnost Kázně)',
+  'entities.abilities.power_infusion.name': 'Pomazání',
+  'entities.abilities.pummel.description':
+    'Přeruší sesílání kouzla cíle a na 4 s mu znemožní kouzla stejné školy.',
+  'entities.abilities.pummel.name': 'Drtič čelistí',
+  'entities.abilities.rebuke.description':
+    'Přeruší sesílání kouzla cíle a na 4 s mu znemožní kouzla stejné školy.',
+  'entities.abilities.rebuke.name': 'Pokárání',
+  'entities.abilities.shadowform.description':
+    'Přijmeš podobu stínu, zvýšíš svoje stínové poškození o 15 a posílíš stínovou magii, dokud podobu neopustíš. Dalším sesláním se vrátíš do normální podoby. (klíčová schopnost Stínu)',
+  'entities.abilities.shadowform.name': 'Podoba šerého závoje',
+  'entities.abilities.siphon_life.description':
+    'Vysává život nepřítele, způsobí mu {damage} stínového poškození během 30 s a vyléčí tě za způsobené poškození. (klíčová schopnost Utrpení)',
+  'entities.abilities.siphon_life.name': 'Žilopijec',
+  'entities.abilities.skull_bash.description':
+    'Výpad hlavou, který přeruší sesílání kouzla cíle a na 4 s mu znemožní kouzla stejné školy.',
+  'entities.abilities.skull_bash.name': 'Úder hlavou',
+  'entities.abilities.spell_lock.description':
+    'Umlčí cíl během sesílání a na 5 s mu znemožní kouzla stejné školy.',
+  'entities.abilities.spell_lock.name': 'Příkaz mlčet',
+  'entities.abilities.swiftmend.description':
+    'Spotřebuje průběžné léčení na spojeneckém cíli a vyléčí ho za {damage}. (klíčová schopnost Obnovy)',
+  'entities.abilities.swiftmend.name': 'Rychlé zhojení',
+  'entities.abilities.trueshot_aura.description':
+    'Povzbudí blízké spojence a zvýší jejich sílu útoku o 10 % na 30 min. (klíčová schopnost Střelby)',
+  'entities.abilities.trueshot_aura.name': 'Aura jistého letu',
+  'entities.abilities.wyvern_sting.description':
+    'Bodne nepřítele na dálku a vyřadí ho až na 4 s. Jakékoli poškození efekt přeruší. (klíčová schopnost Přežití)',
+  'entities.abilities.wyvern_sting.name': 'Žihadlo wyverny',
+  'entities.items.ashen_focus_ring.name': 'Prsten popelavého soustředění',
+  'entities.items.ashstalker_cowl.name': 'Kápě Popelavého stopaře',
+  'entities.items.ashstalker_grips.name': 'Rukavice Popelavého stopaře',
+  'entities.items.ashstalker_harness.name': 'Kyrys Popelavého stopaře',
+  'entities.items.ashstalker_legguards.name': 'Chrániče nohou Popelavého stopaře',
+  'entities.items.ashstalker_shoulderguards.name': 'Nárameníky Popelavého stopaře',
+  'entities.items.ashstalker_treads.name': 'Střevíce Popelavého stopaře',
+  'entities.items.ashstalker_waistband.name': 'Pás Popelavého stopaře',
+  'entities.items.cinder_sigil_pendant.name': 'Přívěsek žhavého znamení',
+  'entities.items.cinderweave_cord.name': 'Šňůra žárové tkaniny',
+  'entities.items.cinderweave_cowl.name': 'Kápě žárové tkaniny',
+  'entities.items.cinderweave_handwraps.name': 'Omotávky žárové tkaniny',
+  'entities.items.cinderweave_legwraps.name': 'Nohavice žárové tkaniny',
+  'entities.items.cinderweave_mantle.name': 'Plášť žárové tkaniny',
+  'entities.items.cinderweave_raiment.name': 'Roucho žárové tkaniny',
+  'entities.items.cinderweave_slippers.name': 'Střevíce žárové tkaniny',
+  'entities.items.emberglass_warstaff.name': 'Bojová hůl z uhlíkového skla',
+  'entities.items.final_argument_greatblade.name': 'Velká čepel posledního argumentu',
+  'entities.items.final_oath_medallion.name': 'Medailon poslední přísahy',
+  'entities.items.first_blood_razor.name': 'Břitva první krve',
+  'entities.items.fleetblood_band.name': 'Prsten hbité krve',
+  'entities.items.furyforged_gauntlets.name': 'Vztekem kované rukavice',
+  'entities.items.furyforged_girdle.name': 'Vztekem kovaný pás',
+  'entities.items.furyforged_legguards.name': 'Vztekem kované chrániče nohou',
+  'entities.items.furyforged_sabatons.name': 'Vztekem kované sabatony',
+  'entities.items.furyforged_warhelm.name': 'Vztekem kovaná válečná helma',
+  'entities.items.furyforged_warplate.name': 'Vztekem kovaný kyrys',
+  'entities.items.furyforged_warspaulders.name': 'Vztekem kované nárameníky',
+  'entities.items.iron_vow_band.name': 'Prsten železné přísahy',
+  'entities.items.last_step_signet.name': 'Pečetní prsten posledního kroku',
+  'entities.items.razorwind_torque.name': 'Nákrčník břitkého větru',
+  'entities.items.spellbreakers_seal.name': 'Pečeť lámače kouzel',
+  'entities.items.stormbound_crown.name': 'Bouří spoutaná koruna',
+  'entities.items.stormbound_greaves.name': 'Bouří spoutané holenice',
+  'entities.items.stormbound_handguards.name': 'Bouří spoutané rukavice',
+  'entities.items.stormbound_hauberk.name': 'Bouří spoutaný hauberk',
+  'entities.items.stormbound_legmail.name': 'Bouří spoutané kroužkové nohavice',
+  'entities.items.stormbound_spaulders.name': 'Bouří spoutané nárameníky',
+  'entities.items.stormbound_waistguard.name': 'Bouří spoutaný pás',
+  'entities.items.unbroken_circle.name': 'Neporušený kruh',
+  'entities.npcs.fury.greeting': 'Písky si pamatují každé vítězství. Utrácej svou čest moudře.',
+  'entities.npcs.fury.name': 'FÚRIE',
+  'entities.npcs.fury.title': 'Intendant cti',
+  'hudChrome.claudium.amountLabel': 'Množství',
+  'hudChrome.claudium.balanceLabel': 'Zůstatek',
+  'hudChrome.claudium.balanceUnit': '{amount} Claudium',
+  'hudChrome.claudium.buyButton': 'Koupit',
+  'hudChrome.claudium.buyTitle': 'Koupit Claudium',
+  'hudChrome.claudium.buyUnavailable': 'Nákup nyní není dostupný.',
+  'hudChrome.claudium.checkoutClose': 'Zavřít platbu',
+  'hudChrome.claudium.checkoutFailed': 'Platbu se nepodařilo načíst. Zkus to znovu.',
+  'hudChrome.claudium.checkoutLoading': 'Načítání platby…',
+  'hudChrome.claudium.checkoutNotSettled':
+    'Transakce byla odeslána, ale Claudium zatím nebylo připsáno. Zkus to za chvíli znovu.',
+  'hudChrome.claudium.checkoutPending':
+    'Transakce probíhá. Potvrď ji v peněžence a nech tento panel otevřený.',
+  'hudChrome.claudium.checkoutPendingButton': 'Zpracovává se',
+  'hudChrome.claudium.checkoutTitle': 'Dokončit nákup',
+  'hudChrome.claudium.checkoutUnavailable': 'Tento nákup Claudium nyní není dostupný.',
+  'hudChrome.claudium.checkoutWalletRequired':
+    'Před nákupem Claudium za kryptoměnu připoj peněženku Solana.',
+  'hudChrome.claudium.checkoutWalletUnsupported':
+    'Tato peněženka neumí podepisovat a odesílat transakce Solana.',
+  'hudChrome.claudium.close': 'Zavřít Claudium',
+  'hudChrome.claudium.disclosure':
+    'Claudium je jednosměrná herní měna: kupuje se za peníze a utrácí za kosmetické předměty. Nelze ji směnit zpět, převést ani vyplatit v hotovosti.',
+  'hudChrome.claudium.hideAmounts': 'Skrýt další nabídky Claudium',
+  'hudChrome.claudium.kindCosmetic': 'Kosmetika',
+  'hudChrome.claudium.kindItem': 'Předmět',
+  'hudChrome.claudium.kindSkin': 'Vzhled',
+  'hudChrome.claudium.loading': 'Načítání Claudium…',
+  'hudChrome.claudium.open': 'Otevřít Claudium',
+  'hudChrome.claudium.railLabel': 'Způsob platby',
+  'hudChrome.claudium.railNativeUnavailable': 'SOL/WOC nedostupné',
+  'hudChrome.claudium.railSol': 'SOL',
+  'hudChrome.claudium.railStripe': 'Karta',
+  'hudChrome.claudium.railWoc': 'WOC',
+  'hudChrome.claudium.railWocDiscount': 'Sleva 20 %',
+  'hudChrome.claudium.railWocUnavailable': 'Cena ve WOC nyní není dostupná.',
+  'hudChrome.claudium.showAmounts': 'Zobrazit všechny nabídky Claudium',
+  'hudChrome.claudium.skuRow': '{claudium} Claudium za {usd}',
+  'hudChrome.claudium.solBalance': 'SOL: {amount}',
+  'hudChrome.claudium.spendButton': 'Uplatnit',
+  'hudChrome.claudium.storeCost': '{amount} Claudium',
+  'hudChrome.claudium.storeEmpty': 'Žádná kosmetika nyní není dostupná.',
+  'hudChrome.claudium.storeTitle': 'Obchod s kosmetikou',
+  'hudChrome.claudium.title': 'Claudium',
+  'hudChrome.claudium.unavailable':
+    'Obchod Claudium nyní není dostupný. Tvůj zůstatek ani nákupy to neovlivní, zkus to za chvíli znovu.',
+  'hudChrome.claudium.wocBalance': 'WOC: {amount}',
+  'hudChrome.corpseHarvest.harvestButtonTooltip':
+    'Sklidit: získá z tohoto těla výrobní materiály (kůži, tesák, hedvábí a podobné součásti), odděleně od kořisti. Sklízet může každý, ale dané tělo smí sklidit jen jeden hráč.',
+  'hudChrome.deeds.openBookHint': 'Otevřít Knihu skutků',
+  'hudChrome.loot.takeAllTooltip':
+    'Vzít vše: sebere všechny mince a předměty v tomto okně kořisti.',
+  'hudChrome.statInfo.desc.warfare':
+    'Zvýší poškození způsobené hráčům o {increase} % a sníží poškození utrpěné od hráčů o {reduction} %.',
+  'hudChrome.statInfo.names.warfare': 'Válečnictví',
+  'hudChrome.statInfo.warfareValue': '+{increase} % způsobeno / -{reduction} % utrpěno',
+  'hudChrome.tutorial.nextTipMap': 'Podívej se na mapu světa ({key}) a zjisti, kde čekají úkoly.',
+  'hudChrome.tutorial.nextTipQuestLog': 'Otevři deník úkolů ({key}) a najdi další úkol v okolí.',
+  'hudChrome.tutorial.nextTipSocial':
+    'Otevři okno Společnost ({key}) a najdi skupinu pro těžší boje.',
+  'hudChrome.tutorial.nextTipsTitle': 'Kam dál',
+  'hudChrome.tutorial.slayTargetHint':
+    'Bojuješ poprvé? Stiskni {targetKey} nebo klikni na vlka, abys ho zaměřil, a pak na něj zaútoč schopností z lišty akcí.',
+  'hudChrome.tutorial.slayTargetHintTouch':
+    'Bojuješ poprvé? Klepnutím zaměř vlka a pak na něj zaútoč schopností z lišty akcí.',
+  'hudChrome.warfare.balance': 'Čest: {amount}',
+  'hudChrome.warfare.dualPrice': '{money} + {honor}',
+  'hudChrome.warfare.honorAmount': '{amount} cti',
+  'hudChrome.warfare.honorFloat': '+{amount} cti',
+  'hudChrome.warfare.honorGain': 'Získáváš {amount} cti ({reason}).',
+  'hudChrome.warfare.notEnoughHonor': 'Nemáš dost cti.',
+  'hudChrome.warfare.reasons.arenaWin': 'Vítězství v aréně',
+  'hudChrome.warfare.reasons.fiestaComplete': 'Dokončení Fiesty',
+  'hudChrome.warfare.reasons.fiestaKill': 'Vyřazení ve Fiestě',
+  'hudChrome.warfare.reasons.fiestaWin': 'Vítězství ve Fiestě',
+  'hudChrome.wocStore.applied': 'Použito',
+  'hudChrome.wocStore.apply': 'Použít vzhled',
+  'hudChrome.wocStore.armoryBody':
+    'Omezené vzhledy zbraní ze Zbrojnice 1. sezóny. Platí pro celý účet, jsou čistě kosmetické a uvidí je všichni kolem tebe.',
+  'hudChrome.wocStore.armoryEyebrow': '1. sezóna',
+  'hudChrome.wocStore.armoryTitle': 'Zbrojnice',
+  'hudChrome.wocStore.badge.flagship': 'Vlajkový',
+  'hudChrome.wocStore.badge.hero': 'Hrdinský',
+  'hudChrome.wocStore.balance': 'Zůstatek Claudium',
+  'hudChrome.wocStore.buyClaudium': 'Koupit Claudium',
+  'hudChrome.wocStore.buySkin': 'Koupit vzhled',
+  'hudChrome.wocStore.cancel': 'Zrušit',
+  'hudChrome.wocStore.close': 'Zavřít obchod WOC',
+  'hudChrome.wocStore.collectionLine': 'Kolekce {collection}',
+  'hudChrome.wocStore.collections.emberwrought': 'Žárem kované',
+  'hudChrome.wocStore.collections.fallen_star': 'Padlá hvězda',
+  'hudChrome.wocStore.collections.guildmark': 'Cechovní značka',
+  'hudChrome.wocStore.collections.hoarfrost': 'Jinovatka',
+  'hudChrome.wocStore.confirmBody': 'Koupit {item} za {cost} Claudium?',
+  'hudChrome.wocStore.confirmPurchase': 'Koupit',
+  'hudChrome.wocStore.confirmTitle': 'Potvrdit nákup kosmetiky',
+  'hudChrome.wocStore.detach': 'Odebrat vzhled',
+  'hudChrome.wocStore.equipHint': 'Tento vzhled lze použít po nasazení předmětu typu {type}.',
+  'hudChrome.wocStore.error': 'Obchod WOC nyní není dostupný. Zkus to za chvíli znovu.',
+  'hudChrome.wocStore.inspectAria': 'Prohlédnout {item}',
+  'hudChrome.wocStore.loading': 'Načítání obchodu WOC…',
+  'hudChrome.wocStore.lore': 'Příběh',
+  'hudChrome.wocStore.needMoreBody':
+    'K nákupu předmětu {item} potřebuješ ještě {shortfall} Claudium.',
+  'hudChrome.wocStore.needMoreTitle': 'Je potřeba více Claudium',
+  'hudChrome.wocStore.owned': 'Vlastníš',
+  'hudChrome.wocStore.priceChanged':
+    'Cena se před dokončením nákupu změnila. Zkontroluj novou cenu a nákup znovu potvrď.',
+  'hudChrome.wocStore.rarity.epic': 'Epický',
+  'hudChrome.wocStore.rarity.legendary': 'Legendární',
+  'hudChrome.wocStore.rarity.rare': 'Vzácný',
+  'hudChrome.wocStore.rarity.uncommon': 'Neobvyklý',
+  'hudChrome.wocStore.rewardsTab': 'Denní odměny',
+  'hudChrome.wocStore.scene.day': 'Den',
+  'hudChrome.wocStore.scene.dusk': 'Soumrak',
+  'hudChrome.wocStore.scene.night': 'Noc',
+  'hudChrome.wocStore.sceneLabel': 'Osvětlení scény',
+  'hudChrome.wocStore.seasonOne': '1. sezóna',
+  'hudChrome.wocStore.skins.ashspark_dagger.look':
+    'Krátká černěná čepel protkaná žhavě oranžovými žilkami, v hlavici drobný doutnající drahokam, popel a jiskry.',
+  'hudChrome.wocStore.skins.ashspark_dagger.lore':
+    'Čepel ze zadní uličky, v jejímž kameni hlavice je propašovaný horský oheň. Tichý žert zbrojíře: i kapsář může nosit uhlík prvního kování. Je černěná, protkaná oranžovými žilkami a v pochvě vždy o něco teplejší, než by měla být. Tas ji za tmy pod Highwatchem a záře ti osvítí ruku právě natolik, abys našel mezeru v soupeřově krytu.',
+  'hudChrome.wocStore.skins.ashspark_dagger.name': 'Popelojiskrná kudla',
+  'hudChrome.wocStore.skins.astravyr_dagger.look':
+    'Úlomek padlé hvězdy s roztaveně zlatým ostřím na kosmicky černém kovu, kolem hlavice obíhá jasná hvězdná jiskra a za čepelí zůstává tenká stopa polární záře.',
+  'hudChrome.wocStore.skins.astravyr_dagger.lore':
+    'Nejmenší kus hvězdy, který Aldric vytáhl z kráteru, a podle některých také nejnebezpečnější. Jediný střípek onoho nadpozemského srdce, roztaveně zlaté ostří na kosmicky černém kovu a osamělá hvězdná jiskra kroužící kolem hlavice jako měsíc, který ztratil svůj svět. Téměř nic neváží a téměř vše rozřízne. Je dost malý, aby se ukryl, a dost jasný, aby se ve tmě našel podle vlastního světla.',
+  'hudChrome.wocStore.skins.astravyr_dagger.name': 'Astravyr, tesák padlé hvězdy',
+  'hudChrome.wocStore.skins.brasscap_axe.look':
+    'Leštěné ocelové ostří, mosazná hlavice a výztuhy na lakovaném jasanovém topůrku, úhledné ovinutí a značka výrobce.',
+  'hudChrome.wocStore.skins.brasscap_axe.lore':
+    'Sekera se značkou je chlouba, kterou můžeš držet v ruce. Mosazná hlavice a výztuhy jsou napůl zbrojí a napůl podpisem: chrání topůrko před rozštípnutím a zachytávají světlo hospody, aby každý viděl, že sis koupil práci zbrojíře Hodea, ne odloženou výzbroj milice. „Když to seká, prodávám to,“ říká kovář z Highwatche. Tahle seká.',
+  'hudChrome.wocStore.skins.brasscap_axe.name': 'Sekyrka s mosaznou hlavicí',
+  'hudChrome.wocStore.skins.brasscrown_staff.look':
+    'Hůl z tvrdého dřeva zakončená soustruženou mosaznou korunou, mosaznou botkou a páskem barvené kůže.',
+  'hudChrome.wocStore.skins.brasscrown_staff.lore':
+    'Je vysoustružená z vyzrálého tvrdého dřeva a korunovaná mosaznou hlavicí, jakých eastbrookští kováři odlévají stovky, ale každou dovedou k dokonalosti. Patří cestovateli, který chce budit respekt u brány Fenbridge stejně jako u zdi Highwatche. Vycházková hůl, která nikdy doopravdy chodit nemusela. Barvený kožený pásek ladí s kabátem, jehož cenu si snadno domyslíš.',
+  'hudChrome.wocStore.skins.brasscrown_staff.name': 'Vycházková hůl s mosaznou korunou',
+  'hudChrome.wocStore.skins.cinderbrand_sword.look':
+    'Tmavá čepel z kované oceli, žlábek vyplněný žhavě oranžovými runami, praskliny od žáru a v záštitě doutnající drahokam.',
+  'hudChrome.wocStore.skins.cinderbrand_sword.lore':
+    'První čepel zakalená nikoli ve vodě, ale v Požehnaných uhlících vyhrabaných na Bouřném štítu. Kováři z Highwatche přísahají, že ty uhlíky „hoří modře a čistě, protože hora pamatuje svou dávnou přísahu“. Oheň uložený do žlábku doutná oranžově a neumírá. Runy hřejí do holé dlaně i za nejchladnější noci na zdi. Žhavou značku není třeba zapalovat. Ona zkrátka odmítá zhasnout.',
+  'hudChrome.wocStore.skins.cinderbrand_sword.name': 'Žhavá značka',
+  'hudChrome.wocStore.skins.cinderlatch_crossbow.look':
+    'Kuše z černěné oceli, z prasklin lučiště prosakuje žhavě oranžové světlo a v pažbě doutná uhlík.',
+  'hudChrome.wocStore.skins.cinderlatch_crossbow.lore':
+    'Nejpodivnější ze žárem kovaných zbraní: horský oheň nalitý do stroje. Z prasklin lučiště prosakuje oranžová záře a doutnající uhlík v pažbě brání tětivě ztuhnout v chladu Thornpeaku i vlhku Mirefenu. Šipky opouštějí drážku už teplé a dopadají ještě teplejší. Odpověď lovce na zeď, u níž ani nepřítel necítí chlad.',
+  'hudChrome.wocStore.skins.cinderlatch_crossbow.name': 'Žhavý zámek',
+  'hudChrome.wocStore.skins.cosmarch_staff.look':
+    'Kolem roztaveně zlatého jádra obíhá shluk zlatých hvězdných střepů, kosmicky černý dřík je leptaný souhvězdími a vzhůru se vinou stuhy polární záře.',
+  'hudChrome.wocStore.skins.cosmarch_staff.lore':
+    'Dřík z hvězdného kovu korunovaný roztaveně zlatým jádrem a prstencem zlatých střepů, které kolem něj kráčejí po pomalé, nekonečné oběžné dráze. Malý vesmír, vyrytý souhvězdími, jež neodpovídají žádné obloze nad Thornpeakem. Polární záře stoupá po celé délce jako kouř, který zapomněl stoupat. Ti, kdo hůl nesli, tvrdili, že v ní cítili otáčení prázdnoty, stejně jako Ysoleino pleso „pije měsíční světlo“: trpělivě, chladně a s pohledem upřeným zpět.',
+  'hudChrome.wocStore.skins.cosmarch_staff.name': 'Kosmopochod, věž nekonečné prázdnoty',
+  'hudChrome.wocStore.skins.emberbite_axe.look':
+    'Sekera z černěného železa s žhavě oranžovými prasklinami v ostří, drahokamem připomínajícím doutnající uhlík a chvějícím se horkým vzduchem.',
+  'hudChrome.wocStore.skins.emberbite_axe.lore':
+    'Zbrojíř Hode zasadil do srdce ostří živý uhlík horského ohně, takže čepel mezi údery nikdy zcela nevychladne. Praskliny při švihu vydechnou oranžovou záři, jako by rána budila něco, co první kování zanechalo spát v železe. Říká se, že uhlík odevzdal elementál z Bouřného štítu. Když se na Highwatchi zvedne vítr, říká se mnoho věcí.',
+  'hudChrome.wocStore.skins.emberbite_axe.name': 'Uhlíkový skus',
+  'hudChrome.wocStore.skins.emberwish_wand.look':
+    'Zajatá roztaveně zlatá jiskra umírající hvězdy zahalená obíhajícími jiskrami, kosmicky černý dřík je leptaný zářícími souhvězdími.',
+  'hudChrome.wocStore.skins.emberwish_wand.lore':
+    'Ne samotná padlá hvězda, ale poslední jiskra umírající: jediný roztaveně zlatý uhlík slunce, které už vyhaslo, obklopený jiskrami jeho posledního světla. Kosmicky černý dřík nese souhvězdí, která sledovala jeho smrt. Sedláci z Mirefenu tvrdí, že za pravého soumraku splní svému držiteli jedno přání. Také tvrdí, že každá duše, která jej držela, si přála více času a Utopený měsíc žádné z nich nevyhověl.',
+  'hudChrome.wocStore.skins.emberwish_wand.name': 'Žhavé přání, jiskra umírajícího slunce',
+  'hudChrome.wocStore.skins.emberwrought_wand.look':
+    'Hůlka z černěného kovu zakončená žhavým uhlíkem sevřeným železnými drápy, jemné praskliny od žáru a teplé vnitřní světlo.',
+  'hudChrome.wocStore.skins.emberwrought_wand.lore':
+    'Hůlka, která dala jméno celé třídě. Když zbrojíř z Highwatche poprvé sevřel uhlík horského ohně do železných drápů a přiměl jej poslouchat smrtelnou ruku, dokonce i kněží Světla tomu přestali říkat kacířství a začali tomu říkat užitečný nástroj. Je teplá, trpělivá a tiše nebezpečná. Uhlík na jejím konci hoří bez přestání od doby před prvním nádechem jejího majitele.',
+  'hudChrome.wocStore.skins.emberwrought_wand.name': 'Žárem kovaná hůlka',
+  'hudChrome.wocStore.skins.encore_bow.look':
+    'Komicky přerostlé hvězdné dělo: kosmicky černá hlaveň leptaná zlatými souhvězdími, rozšířené ústí se vsazeným roztaveně zlatým kometovým nábojem, mosazné kování a dřevěná ramenní pažba.',
+  'hudChrome.wocStore.skins.encore_bow.lore':
+    'Kováři, kteří opracovali padlou hvězdu, z ní vytvořili šest relikvií a stále jim zbývalo hvězdného kovu na celou hlaveň. Učni už tou dobou měli vlastní nápady. Z kovadliny vzešla buď první palná zbraň říše, nebo její nejmenší obléhací stroj: ramenní dělo, které ani tak nevystřeluje, jako spíš žádá o druhou hvězdu, tentokrát zamířenou. Bratr Aldric je odmítl požehnat s tím, že něčeho tak hlasitého si nebesa jistě všimla sama. Lovci je zbožňují. Nikdo, kdo mu stál v cestě, ještě ne.',
+  'hudChrome.wocStore.skins.encore_bow.name': 'Přídavek, druhá padající hvězda',
+  'hudChrome.wocStore.skins.everwinter_wand.look':
+    'Jediný hrot zářícího azurového ledovcového ledu, ze stříbrné objímky kvete jinovatka a kolem se drží slabá chladná mlha.',
+  'hudChrome.wocStore.skins.everwinter_wand.lore':
+    'Hrot zářícího ledovcového ledu, údajně odlomený z hlubokého plesa pod Svatyní, kde má horský chlad zuby. Ze stříbrné objímky bez ustání kvete jinovatka a nikdy netaje, ani v ohni, ani v létě. Mágové jej drží blízko kvůli chladu, který propůjčuje jejich kouzlům. Za nocí, kdy se zdá, že se naklání k Nythraxisově kryptě a naslouchá, jej raději drží dál od sebe.',
+  'hudChrome.wocStore.skins.everwinter_wand.name': 'Střep věčné zimy',
+  'hudChrome.wocStore.skins.fletcher_s_guild_bow.look':
+    'Lakovaný ořechový reflexní luk, mosazné konce ramen, tětiva z voskovaného lnu a cechovní značka na středu.',
+  'hudChrome.wocStore.skins.fletcher_s_guild_bow.lore':
+    'Nejblíž skutečnému cechu má v říši značka šípaře na středu luku. Je to slib o tom, co se skrývá uvnitř, podobně jako vinařova pečeť na sudu. Lakovaný ořech, mosaz na koncích ramen a tětiva z voskovaného lnu, která se neroztřepí ani v mirefenském dešti. Každý spoj obhajuje svou cenu. Jednou jej napni za Vdoviným houštím a spor je rozhodnut.',
+  'hudChrome.wocStore.skins.fletcher_s_guild_bow.name': 'Luk cechu šípařů',
+  'hudChrome.wocStore.skins.forgeheart_staff.look':
+    'Železem okovaná hůl korunovaná klecí se zářícím žhavým jádrem, po dříku stoupají ohnivé runy a nad ním se chvěje horký vzduch.',
+  'hudChrome.wocStore.skins.forgeheart_staff.lore':
+    'Živý uhlík horského ohně uvězněný v železe na vrcholu hole. Kronikář Caddis jej považuje za důkaz, že oheň prvního kování lze spoutat ke službě, nejen k pečetění. V tenké, nekonečné stuze z něj stoupá chvění horkého vzduchu. Mág, který jej nese, nepotřebuje výheň ani strážní oheň. Šeptá se, že uhlík pochází z vlastního dechu Voskara Žhavokřídlého a od té doby nevychladl.',
+  'hudChrome.wocStore.skins.forgeheart_staff.name': 'Hůl srdce výhně',
+  'hudChrome.wocStore.skins.frostbite_dagger.look':
+    'Zlověstně tenká dýka z čirého modrého ledu, středem vede zářící azurová žíla, ostří lemují jehličky mrazu a jílec pokrývá jinovatka.',
+  'hudChrome.wocStore.skins.frostbite_dagger.lore':
+    'Tenká jako zadržený dech a dvakrát chladnější. Střep thornpeakského ledovce vybroušený do jediné zářící žíly, tak ostrý, že rána zamrzne dřív, než si krev vzpomene téct. Jméno si vypůjčila od hrobového chladu, který mrtví snášejí z vrcholků. Nikdy nepotřebuje brousit. Led se netupí, podotýká suše kronikář Caddis, jen čeká.',
+  'hudChrome.wocStore.skins.frostbite_dagger.name': 'Jehla jinovatky',
+  'hudChrome.wocStore.skins.glaciersplit_axe.look':
+    'Hlava z průsvitného modrého ledovcového ledu, popraskané nitro září azurově, kolem trčí krystaly mrazu a za topůrkem se táhne studená pára.',
+  'hudChrome.wocStore.skins.glaciersplit_axe.lore':
+    'Vytesaná z modrého srdce thornpeakského ledovce, kde dvě století ledu stlačovala chlad, až začal sám zářit. I v klidu za ní táhne pára a praskot jejího dopadu zní jako rozsedlina otevírající se pod Stopařovým hřebenem. Highwatch své padlé odevzdává ledu tam nahoře. Tato zbraň má udržet oblevu a vše, co by obleva mohla probudit, v bezpečné vzdálenosti.',
+  'hudChrome.wocStore.skins.glaciersplit_axe.name': 'Štěpič ledovců',
+  'hudChrome.wocStore.skins.guildmark_arming_sword.look':
+    'Modřená ocelová čepel, bronzová záštita ve tvaru rybího ocasu, rukojeť z modrozelené kůže a drobná vyražená cechovní značka.',
+  'hudChrome.wocStore.skins.guildmark_arming_sword.lore':
+    'Zatímco běžná kovaná čepel zůstává bezejmenná, tato je podepsaná. Zbrojíř získá právo vyrazit svou značku k záštitě teprve tehdy, když se za jeho ocel zaručí obchodník Světového trhu, a za značku kováře Haldrena se zaručil. Modřená proti vlhku údolí a vyvážená na vlásek. Za značku platíš stejně jako za meč a stojí to za to.',
+  'hudChrome.wocStore.skins.guildmark_arming_sword.name': 'Poboční meč s cechovní značkou',
+  'hudChrome.wocStore.skins.guildmark_dirk.look':
+    'Štíhlá dýka z kalené oceli, bronzová záštita a matice hlavice, rukojeť ovinutá tmavozelenou šňůrou a vyražená značka.',
+  'hudChrome.wocStore.skins.guildmark_dirk.lore':
+    'Tohle nosí vážený muž, když meč zůstane doma. Štíhlá kalená čepel se stejnou značkou, která potvrzuje kvalitu celého meče, zavěšená u pasu jako pečetní prsten s ostřím. Nenápadná pro každého kromě těch, kdo umějí číst zbrojířův důkaz. Intendantka Bree jich na Highwatchi schovává zásuvku pro důstojníky, kteří si vysloužili úctu zdi.',
+  'hudChrome.wocStore.skins.guildmark_dirk.name': 'Dýka s cechovní značkou',
+  'hudChrome.wocStore.skins.hoarfrost_vigil_staff.look':
+    'Postříbřená hůl korunovaná volně plovoucím, pomalu se otáčejícím střepem zářícího azurového ledu, z něhož vyrůstají krystaly a proudí chladná pára.',
+  'hudChrome.wocStore.skins.hoarfrost_vigil_staff.lore':
+    'Hůl hlídky, která na zdi Highwatche nikdy nespí. Její korunou je střep azurového ledu z plesa, který se vznáší bez dotyku se stříbrem a pomalu se otáčí vlastní silou. Stráž přísahá, že vždy míří k chladu shromažďujícímu se pod vrcholky. Nést Stráž znamená odsloužit dvě stě let hlídky za jedinou noc a slíbit, že neodvrátíš zrak.',
+  'hudChrome.wocStore.skins.hoarfrost_vigil_staff.name': 'Jinovatková stráž',
+  'hudChrome.wocStore.skins.ice_fang_sword.look':
+    'Zakřivená čepel z bledého ledovcového ledu, podél hřbetu zubaté krystaly jinovatky, ve žlábku zářící azurové zmrzlé jádro a záštita z rampouchů.',
+  'hudChrome.wocStore.skins.ice_fang_sword.lore':
+    'Vlajková zbraň zmrzlé kolekce a kus, po kterém každý sběratel sáhne jako první. Ledový tesák nebyl vykován, ale vyřezán z výběžku ledovce, který korunuje Thornpeak nad Highwatchem. Jeho azurové jádro plane chladem jako světlo Třpytivého plesa. Jinovatkou pokrývá i vzduch, který rozsekne. Strážci zdi přísahají, že jej jeden voják nesl v noci, kdy vysoký sníh zadržel kult draka, a „koupil zdi jednu zimu“.',
+  'hudChrome.wocStore.skins.ice_fang_sword.name': 'Ledový tesák',
+  'hudChrome.wocStore.skins.lacquered_wand.look':
+    'Štíhlá hůlka s hluboce červeným lakem, dvěma pásky leštěné mosazi a drobnou zaoblenou mosaznou špičkou.',
+  'hudChrome.wocStore.skins.lacquered_wand.lore':
+    'Sedm trpělivých vrstev hluboce červeného laku, dvakrát obepnutých leštěnou mosazí. Takovou hůlku si potulný mág koupí na Světovém trhu, jakmile začne za kouzla účtovat skutečné mince a chce podle toho vypadat. Světlo vede stejně dobře jako březový proutek. Na obchodníkově pultu se však nádherně leskne a polovina drobné magie vždy spočívala v tom, že jí ostatní uvěří.',
+  'hudChrome.wocStore.skins.lacquered_wand.name': 'Lakovaná hůlka',
+  'hudChrome.wocStore.skins.meteorlatch_crossbow.look':
+    'Meteorický hvězdný kov, roztaveně zlaté jádro podél pažby, kosmicky černá ramena leptaná souhvězdími a natažená šipka čistého hvězdného ohně.',
+  'hudChrome.wocStore.skins.meteorlatch_crossbow.lore':
+    'Byla vykována ze surového meteorického kovu, dokud mirefenský kráter ještě zářil. Trosky „příliš žhavé na dotek“ byly roztepány do kosmicky černých ramen leptaných souhvězdími a podél pažby spočinulo roztaveně zlaté jádro. Nevkládá se do ní šipka, sama ji vyvolá: dřík hvězdného ohně vypuštěný jako rozsudek a dopadající jako jeho vykonání. Když se Highwatch obával, že ani nesmrtelná koruna Nythraxise nemusí být tím nejhorším pod vrcholky, chtěl mít na zdi právě tuto zbraň. Miř dobře.',
+  'hudChrome.wocStore.skins.meteorlatch_crossbow.name': 'Hvězdný zámek, poslední soud oblohy',
+  'hudChrome.wocStore.skins.rimecrusher_mace.look':
+    'Shluk zubatých ledových krystalů kolem zářícího azurového jádra, jinovatka se plíží po postříbřeném toporu.',
+  'hudChrome.wocStore.skins.rimecrusher_mace.lore':
+    'Nebyl vytesán, ale vypěstován. Thornpeakský led rostl kolem studeného azurového jádra, dokud neztvrdl jako nejlepší Hodeova ocel. Jinovatka se plíží po postříbřeném toporu k ruce a nikdy k ní docela nedorazí. Kam udeří, tam voda zamrzne. Kde spočine, tam zem zbělá. Hrobový chlad vrcholků, zmenšený natolik, aby se jím dalo udeřit vše, co šplhá na zeď.',
+  'hudChrome.wocStore.skins.rimecrusher_mace.name': 'Drtič jinovatky',
+  'hudChrome.wocStore.skins.skyrender_axe.look':
+    'Hlava jako utržený kus noční oblohy, roztaveně zlaté praskliny a rytiny souhvězdí, vznášející se střepy hvězdného světla a stopa polární záře za ostřím.',
+  'hudChrome.wocStore.skins.skyrender_axe.lore':
+    'Vykovaná z okraje kráteru, kde padlá hvězda vyrvala z Mirefenu odraz samotné oblohy a zanechala ránu, která se dodnes kouří. Hlava připomíná kus utržené noci: roztaveně zlaté praskliny, souhvězdí, jež žádný učenec z Highwatche neumí pojmenovat, a polární záře krvácející z ostří při každém švihu. Bratr Aldric jí požehnal, ale odmítl se jí dotknout. Zvednout ji znamená držet otvor, který po sobě zanechala nebesa.',
+  'hudChrome.wocStore.skins.skyrender_axe.name': 'Trhač nebes, rána oblohy',
+  'hudChrome.wocStore.skins.smoulderfall_mace.look':
+    'Tmavé železné lamely žhnou uvnitř prasklin oranžově a v hlavě spočívá drahokam s roztaveným jádrem.',
+  'hudChrome.wocStore.skins.smoulderfall_mace.lore':
+    'Palcát s vlastním ohništěm. Kámen s roztaveným jádrem, odštípnutý z pečeti Svatyně, která byla „ukována horským ohněm“, září zasazený v hlavě. Lamely jsou teplé na dotek a ještě teplejší v místě dopadu. Seržant z Highwatche přísahá, že rána zanechá modřinu, která slabě svítí až do rána. Horský oheň byl konečně určen k rozbíjení místo pečetění.',
+  'hudChrome.wocStore.skins.smoulderfall_mace.name': 'Doutnající pád',
+  'hudChrome.wocStore.skins.solheim_sword.look':
+    'Velký meč vykovaný z padlé hvězdy, roztaveně zlaté jádro dělí čepel, kosmicky černou ocel lemuje světlo hvězd, kolem záštity obíhají zlaté střepy a za zbraní vlaje stuha polární záře.',
+  'hudChrome.wocStore.skins.solheim_sword.lore':
+    'Když hvězda spadla ze západní oblohy a za Vdoviným houštím „praskla jako výheň“, bratr Aldric vytáhl její stále doutnající srdce z mirefenského kráteru a prosil kováře říše, aby zpracovali „věc, která nepatří do tohoto světa“. Vytvořili z ní jediný velký meč: Solheim. Roztaveně zlaté jádro půlí kosmicky černou čepel jako úsvit praskající noční oblohou a střepy hvězdného kovu obíhají záštitu po drahách, které neurčila žádná ruka. Byl vykován jediný. Další nebude.',
+  'hudChrome.wocStore.skins.solheim_sword.name': 'Solheim, poslední světlo úsvitu',
+  'hudChrome.wocStore.skins.starfall_mace.look':
+    'Zajaté roztaveně zlaté hvězdné jádro obklopené obíhajícími úlomky, kosmicky černé lamely protkané světlem hvězd a polární záře vytékající ze spojů.',
+  'hudChrome.wocStore.skins.starfall_mace.lore':
+    'Hvězdné jádro zachycené v okamžiku před smrtí, obklopené troskami, které s ním padaly, a zmrazené na dosah od zapomnění. Kosmicky černými lamelami proudí uvězněné světlo hvězd a při pozvednutí ze spojů vytéká polární záře. Staří kněží Světla nazývali padající hvězdu soudem, rozsudkem seslaným shůry, který neměl zastavit žádný štít. Tento palcát pojmenovali po hvězdě, která dopadla na Mirefen.',
+  'hudChrome.wocStore.skins.starfall_mace.name': 'Pád hvězdy, soud nebes',
+  'hudChrome.wocStore.skins.tempered_flanged_mace.look':
+    'Hlava z kalené modřené oceli se šesti lamelami, mosazná objímka a hlavice, rukojeť z vínově rudé kůže.',
+  'hudChrome.wocStore.skins.tempered_flanged_mace.lore':
+    'Šest lamel z modřené kalené oceli, každá nabroušená k otevření helmy, zakončená mosazí a ovinutá vínově rudou kůží. Zbrojíři říše nevyrábějí ošklivé zbraně, ani když je jejich práce brutální. Tento kus byl objednán přes Světový trh, ne sejmut z police. Někde leží účetní kniha se jménem hrdého kupce a částkou, kterou zaplatil Hodeovi.',
+  'hudChrome.wocStore.skins.tempered_flanged_mace.name': 'Kalený křidélkový palcát',
+  'hudChrome.wocStore.skins.winterbite.look':
+    'Luk z postříbřené oceli a modrého ledu, ve středu září azurové zmrzlé jádro, na tětivě čeká šíp z pevného ledu a kolem proudí studená pára.',
+  'hudChrome.wocStore.skins.winterbite.lore':
+    'Luk z postříbřené oceli a thornpeakského ledu, jehož střed osvětluje studené azurové jádro, které přimrazí šíp k tětivě. S každým natažením se znovu vytvoří šíp z pevného ledovcového ledu. Lučištník na zdi nenosí toulec, jen chlad. Highwatch s podobným lukem udržel Stopařův hřeben během obléhání. Jediný lučištník, říká se, a zásoba šípů na celou zimu, které byly vždy připravené.',
+  'hudChrome.wocStore.skins.winterbite.name': 'Zimní skus',
+  'hudChrome.wocStore.storeTab': 'Obchod',
+  'hudChrome.wocStore.tabsLabel': 'Sekce obchodu WOC',
+  'hudChrome.wocStore.title': 'Obchod WOC',
+  'hudChrome.wocStore.tryOn': 'Vyzkoušet',
+  'hudChrome.wocStore.unavailable': 'Nedostupné',
+  'hudChrome.wocStore.viewModeLabel': 'Režim náhledu',
+  'hudChrome.wocStore.weaponOnly': 'Jen zbraň',
+  'hudChrome.wocStore.wtype.axe': 'Sekera',
+  'hudChrome.wocStore.wtype.bow': 'Luk',
+  'hudChrome.wocStore.wtype.crossbow': 'Kuše',
+  'hudChrome.wocStore.wtype.dagger': 'Dýka',
+  'hudChrome.wocStore.wtype.mace': 'Palcát',
+  'hudChrome.wocStore.wtype.staff': 'Hůl',
+  'hudChrome.wocStore.wtype.sword': 'Meč',
+  'hudChrome.wocStore.wtype.wand': 'Hůlka',
 };

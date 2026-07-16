@@ -25,18 +25,18 @@ export const ZONE3_ZONE: ZoneDef = {
   graveyard: { x: 15, z: 645 },
   lakes: [{ x: -70, z: 760, radius: 18 }],
   pois: [
-    { x: 0, z: 660, label: 'Highwatch' },
-    { x: -50, z: 590, label: 'Stalker Ridge' },
-    { x: 85, z: 615, label: 'Deeprock Burrows' },
-    { x: -90, z: 700, label: 'Ogre Foothills' },
-    { x: -130, z: 740, label: "Drogmar's War-Camp" },
-    { x: 110, z: 760, label: 'Stormcrag' },
-    { x: -70, z: 770, label: 'The Glimmermere' },
-    { x: 55, z: 820, label: 'Wyrmcult Tents' },
-    { x: -40, z: 830, label: 'Revenant Fields' },
-    { x: 0, z: 880, label: 'Gravewyrm Sanctum' },
+    { x: 0, z: 660, label: 'Highwatch', id: 'highwatch' },
+    { x: -50, z: 590, label: 'Stalker Ridge', id: 'stalker_ridge' },
+    { x: 85, z: 615, label: 'Deeprock Burrows', id: 'deeprock_burrows' },
+    { x: -90, z: 700, label: 'Ogre Foothills', id: 'ogre_foothills' },
+    { x: -130, z: 740, label: "Drogmar's War-Camp", id: 'drogmars_war_camp' },
+    { x: 110, z: 760, label: 'Stormcrag', id: 'stormcrag' },
+    { x: -70, z: 770, label: 'The Glimmermere', id: 'the_glimmermere' },
+    { x: 55, z: 820, label: 'Wyrmcult Tents', id: 'wyrmcult_tents' },
+    { x: -40, z: 830, label: 'Revenant Fields', id: 'revenant_fields' },
+    { x: 0, z: 880, label: 'Gravewyrm Sanctum', id: 'gravewyrm_sanctum' },
   ],
-  welcome: 'Captain Thessaly holds the wall at Highwatch — barely.',
+  welcome: 'Captain Thessaly holds the wall at Highwatch - barely.',
 };
 
 // Mountain road from Fenbridge up to Highwatch, then spokes.
@@ -1091,6 +1091,16 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
       'cragwalker_boots',
       'windguard_leggings',
       'simple_fishing_pole',
+      // Tier 4/5 hub-recipe reagents (items.ts): Bree is the trade-goods
+      // vendor inside the crafting hub radius, so every requiresHubStation
+      // recipe has a live reagent source (prog_tools_of_the_trade needs at
+      // least one hub craft to be possible).
+      'thorium_ore',
+      'arcanite_bar',
+      'ashwood_log',
+      'elderwood_log',
+      'goldleaf_herb',
+      'sunpetal_herb',
     ],
     greeting:
       'Wool, hardtack, and steel-shod boots — Highwatch runs on all three, and I am short of everything.',
@@ -1154,6 +1164,22 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     questIds: [],
     banker: true,
     greeting: 'Every crate, coffer, and trinket is safe with the Gilded Strongbox.',
+  },
+  chronicler_edda_hartwell: {
+    // Display name renamed to Zenzie (maintainer call). The template id is
+    // retained for save compatibility: player saves persist it as the
+    // npc:chronicler_edda_hartwell visited mark, and it is the locale key stem.
+    id: 'chronicler_edda_hartwell',
+    name: 'Chronicler Zenzie',
+    title: 'The Peaks Chronicle',
+    // On the south road shoulder below the square, facing south over the road
+    // up from Fenbridge (clear of the house footprint at {8,650}; nearest
+    // authored neighbor ~15 units, she had been wedged into the gate cluster).
+    pos: { x: 2, z: 643 },
+    facing: 3.1,
+    color: 0x5a6fd6, // cool indigo: the chronicler tint is her identity (shared mage visual)
+    questIds: [],
+    greeting: 'The mountain forgets nothing, $N, and neither do I. Let us see what you have done.',
   },
 };
 
@@ -1760,7 +1786,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'The Bound Guardian',
     giverNpcId: 'brother_aldric_highwatch',
     turnInNpcId: 'brother_aldric_highwatch',
-    text: "Voss wrote that the survivors sealed the King's Signet behind an ancient guardian, so no one could reach the tomb of Nythraxis by accident or ambition. Take the Crypt Keystone to the ritual circle on the flat ground east of the abandoned crypt and south-east of the western grave. Use it there, break the guardian, and bring back the signet.",
+    text: "Voss wrote that the survivors sealed the King's Signet behind an ancient guardian, so no one could reach the tomb of Nythraxis by accident or ambition. Take the Crypt Keystone to the ritual circle on the flat ground north-west of the abandoned crypt and north-east of High Priest Malric's grave. Use it there, break the guardian, and bring back the signet.",
     completionText:
       "The three relics tell the same story: Aldren fought to defend his king, Malric broke the boundary of death, and Voss tried to stop what followed. The seal is weakening, and this signet is the key to Nythraxis's tomb. You are now attuned to enter The Crypt of Nythraxis. Return to the abandoned crypt, unlock the royal door, and face Nythraxis before the old king's rage spills beyond Thornpeak.",
     objectives: [
@@ -2876,6 +2902,9 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'helmet',
     quality: 'epic',
     stats: { armor: 310, str: 8, sta: 9 },
+    // ilvl-29 raid seed rating (20 -> 2.0%); the Heroic raid variant scales this up
+    // and adds a complementary secondary (heroic_variants.ts). Off the stat budget.
+    hitRating: 20,
     sellValue: 12000,
     requiredClass: ['warrior', 'paladin'],
   },
@@ -2888,6 +2917,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'shoulder',
     quality: 'epic',
     stats: { armor: 260, str: 7, sta: 8 },
+    hitRating: 20,
     sellValue: 12000,
     requiredClass: ['warrior', 'paladin'],
   },
@@ -2900,6 +2930,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'helmet',
     quality: 'epic',
     stats: { armor: 190, agi: 10, sta: 7 },
+    hitRating: 20,
     sellValue: 12000,
     requiredClass: ['rogue', 'hunter', 'druid'],
   },
@@ -2912,6 +2943,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'shoulder',
     quality: 'epic',
     stats: { armor: 165, agi: 9, sta: 6 },
+    hitRating: 20,
     sellValue: 12000,
     requiredClass: ['rogue', 'hunter', 'druid'],
   },
@@ -2924,6 +2956,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'helmet',
     quality: 'epic',
     stats: { armor: 105, int: 11, sta: 6 },
+    hitRating: 20,
     sellValue: 12000,
     requiredClass: ['mage', 'priest', 'warlock', 'druid'],
   },
@@ -2936,6 +2969,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'shoulder',
     quality: 'epic',
     stats: { armor: 92, int: 9, sta: 6 },
+    hitRating: 20,
     sellValue: 12000,
     requiredClass: ['mage', 'priest', 'warlock', 'druid'],
   },
@@ -2948,6 +2982,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'helmet',
     quality: 'epic',
     stats: { armor: 225, int: 10, sta: 7 },
+    critRating: 20,
     sellValue: 12000,
     requiredClass: ['shaman'],
   },
@@ -2960,6 +2995,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'shoulder',
     quality: 'epic',
     stats: { armor: 190, int: 8, sta: 7 },
+    critRating: 20,
     sellValue: 12000,
     requiredClass: ['shaman'],
   },
@@ -3141,7 +3177,7 @@ export const ZONE3_PROPS: ZonePropsDef = {
   wells: [{ x: 0, z: 662, r: 1.5 }],
   stalls: [
     { x: -7.5, z: 667, rot: Math.PI / 2, r: 1.7 }, // Quartermaster Bree
-    { x: -4.5, z: 673.5, rot: -0.6, r: 1.7 }, // Armorer Hode
+    { x: -4.5, z: 673.5, rot: -0.6, r: 1.7, smithy: true }, // Armorer Hode
   ],
   mines: [
     { x: 88, z: 612, rot: -2.0 }, // Deeprock Burrows

@@ -42,7 +42,7 @@ The rest of this Policy gives the detail.
 
 **Advertising and analytics.** We use third-party advertising and analytics providers on the Site and in the App. These providers may set cookies or use device identifiers to measure usage and to serve and measure advertising. They collect information such as device identifiers, IP address, approximate location derived from IP, and interaction data, subject to their own privacy policies. Where required, we ask for your consent before using non-essential cookies or trackers, and we provide a way to manage your choices.
 
-**Donations.** If you donate through GitHub Sponsors, the payment is processed by GitHub and its payment providers. We do not receive or store your card or bank details. GitHub's privacy policy governs that processing.
+**Donations.** If you donate through Ko-fi, Ko-fi facilitates the payment directly through a third-party payment provider such as PayPal or Stripe. We do not process your card details on the Service. Ko-fi and the selected payment provider process donation-related information under their own privacy policies and may share supporter and transaction information with us.
 
 **Community channels.** Our Discord server and our GitHub repository are operated on third-party platforms. Information you share there is governed by those platforms' privacy policies, not this one.
 
@@ -146,7 +146,7 @@ We use technical and organisational measures to protect personal information, in
 
 ## 12. Third-party services and links
 
-The Service links to and integrates third-party services, including GitHub, GitHub Sponsors, Discord, and the Solana network. These services are controlled by others and have their own privacy policies. We are not responsible for their practices. Review their policies before using them.
+The Service links to and integrates third-party services, including GitHub, Ko-fi, PayPal, Stripe, Discord, and the Solana network. These services are controlled by others and have their own privacy policies. We are not responsible for their practices. Review their policies before using them.
 
 ---
 

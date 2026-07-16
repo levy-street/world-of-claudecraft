@@ -34,44 +34,9 @@ import { classDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { formatNumber, t } from './i18n';
 import { svgIcon } from './ui_icons';
-import { renderWindowFrame, type WindowFrameParts } from './window_frame';
-import type { WindowFrameDescriptor } from './window_frame_view';
 
 // Best-effort all-time ladder pull is throttled per bracket to this interval.
 const LEADERBOARD_REFETCH_MS = 15000;
-
-// Descriptor id 'arena' derives the title id 'arena-title', which is exactly the
-// id the root's markDialogRoot aria-labelledby points at; the frame's own role/aria
-// are stripped in ensureFrame so the stable root keeps the single dialog identity
-// (set once on open, never per mediumHud tick). This is the documented styling
-// exception: the window is DOM-rendered from the extracted stylesheet with
-// team-color tokens (no canvas / getComputedStyle token resolution), which the
-// frame chrome wraps without changing.
-const ARENA_FRAME: WindowFrameDescriptor = {
-  id: 'arena',
-  titleKey: 'hud.arena.title',
-  closeLabelKey: 'hud.arena.close',
-};
-
-/**
- * Stamp the shared window frame cold on an inner mount, then reuse it. The frame
- * is visual chrome only: its role/aria are stripped so the #arena-window root
- * (marked once in toggle) keeps the dialog identity and the focus-return contract.
- */
-function ensureFrame(el: HTMLElement, onClose: () => void): WindowFrameParts {
-  const mounted = el.querySelector<HTMLElement>(':scope > .window-frame');
-  const body = mounted?.querySelector<HTMLElement>('.window-body');
-  if (mounted && body) {
-    return { root: mounted, body, footer: null, tabButtons: [] };
-  }
-  const mount = document.createElement('div');
-  const parts = renderWindowFrame(mount, ARENA_FRAME, { onClose });
-  mount.removeAttribute('role');
-  mount.removeAttribute('aria-labelledby');
-  mount.removeAttribute('aria-modal');
-  el.replaceChildren(mount);
-  return parts;
-}
 
 // Render-skip sentinel for the offline panel: once-per-open guard so the static offline
 // note is not rebuilt every ~250ms mediumHud tick. The live signature is always
@@ -137,7 +102,7 @@ export class ArenaWindow {
     // Move keyboard focus into the freshly opened window (onto the close button),
     // matching the sibling cold windows, so a keyboard user is not left on the opener
     // while the focus trap is active.
-    (root.querySelector('[data-window-close]') as HTMLElement | null)?.focus();
+    (root.querySelector('[data-close]') as HTMLElement | null)?.focus();
   }
 
   close(): void {
@@ -183,11 +148,9 @@ export class ArenaWindow {
   render(): void {
     const world = this.deps.world();
     const el = this.deps.root();
-    // The chrome is stamped once (cold) on an inner mount and reused; the 250ms
-    // mediumHud re-render only refills the body + retitles. The dialog role /
-    // aria-labelledby / tabindex live on the stable root (set ONCE in toggle()),
-    // not here, so the re-render does not re-write them every tick.
-    const { body } = ensureFrame(el, () => this.close());
+    // The dialog role / aria-modal / aria-labelledby / tabindex are set ONCE in toggle()
+    // on open (the root is stable across renders), not here, so the 250ms mediumHud
+    // re-render does not re-write them every tick.
     const view = buildArenaView({
       info: world.arenaInfo,
       selectedBracket: this.bracket,
@@ -204,8 +167,8 @@ export class ArenaWindow {
       // ~250ms mediumHud tick.
       if (this.lastSig === ARENA_OFFLINE_SIG) return;
       this.lastSig = ARENA_OFFLINE_SIG;
-      this.setTitle(null);
-      body.innerHTML = `<div class="arena-note">${esc(t('hud.arena.offlineNote'))}</div>`;
+      el.innerHTML = this.offlineHtml();
+      el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
       return;
     }
 
@@ -214,24 +177,12 @@ export class ArenaWindow {
     this.fetchLeaderboard(view.bracket);
     if (view.sig === this.lastSig) return;
     this.lastSig = view.sig;
-    this.setTitle(view.bracket);
-    body.innerHTML = this.liveHtml(view);
-    this.wire(body, view);
-  }
-
-  // Set the frame title: plain for the offline note, or with the bracket tag riding
-  // beside it for the live panel (the bracket label passes through esc()).
-  private setTitle(bracket: ArenaFormat | null): void {
-    const titleEl = this.deps.root().querySelector<HTMLElement>('.window-title');
-    if (!titleEl) return;
-    const base = esc(t('hud.arena.title'));
-    titleEl.innerHTML =
-      bracket === null
-        ? base
-        : `${base} <span class="arena-bracket-tag${bracket === 'fiesta' ? ' fiesta' : ''}">${esc(this.bracketLabel(bracket))}</span>`;
+    el.innerHTML = this.liveHtml(view);
+    this.wire(el, view);
   }
 
   private wire(el: HTMLElement, view: Extract<ArenaView, { kind: 'live' }>): void {
+    el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
     el.querySelectorAll('[data-bracket]:not([disabled])').forEach((btn) => {
       btn.addEventListener('click', () => {
         this.bracket = (btn as HTMLElement).dataset.bracket as ArenaFormat;
@@ -255,10 +206,18 @@ export class ArenaWindow {
     });
   }
 
-  // ---- HTML builders (the localized DOM the pure view-model drives). The title
-  // and close now live in the shared frame chrome; these build the body content. --
+  // ---- HTML builders (the localized DOM the pure view-model drives) ----------
+
+  private offlineHtml(): string {
+    return (
+      `<div class="panel-title"><span id="arena-title">${esc(t('hud.arena.title'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.arena.close'))}">${svgIcon('close')}</button></div>` +
+      `<div class="arena-note">${esc(t('hud.arena.offlineNote'))}</div>`
+    );
+  }
 
   private liveHtml(view: Extract<ArenaView, { kind: 'live' }>): string {
+    const bracketTag = `<span class="arena-bracket-tag${view.bracket === 'fiesta' ? ' fiesta' : ''}">${esc(this.bracketLabel(view.bracket))}</span>`;
+    const title = `<div class="panel-title"><span id="arena-title">${esc(t('hud.arena.title'))} ${bracketTag}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.arena.close'))}">${svgIcon('close')}</button></div>`;
     const bracketTabs = `<div class="arena-brackets">${view.brackets.map((b) => this.bracketBtn(b)).join('')}</div>`;
     const rank =
       `<div class="arena-rank"><span class="rating">${esc(formatNumber(view.standing.rating, { maximumFractionDigits: 0 }))}</span>` +
@@ -277,6 +236,7 @@ export class ArenaWindow {
         ? `<div class="arena-sub">${esc(t('hud.arena.ladderAllTime'))}</div>${this.allTimeHtml(view.allTime)}`
         : '';
     return (
+      title +
       bracketTabs +
       rank +
       this.partyHtml(view.party) +

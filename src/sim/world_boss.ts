@@ -121,7 +121,7 @@ export function worldBossContributors(ctx: SimContext, mob: Entity): PlayerMeta[
     if (seen.has(pid)) continue;
     seen.add(pid);
     const meta = ctx.players.get(pid);
-    if (meta) out.push(meta);
+    if (meta && !meta.leaving) out.push(meta);
   }
   return out.sort((a, b) => a.entityId - b.entityId);
 }
@@ -142,7 +142,7 @@ export function worldBossLootContributors(ctx: SimContext, mob: Entity): PlayerM
     if (seen.has(pid)) return;
     seen.add(pid);
     const meta = ctx.players.get(pid);
-    if (meta) out.push(meta);
+    if (meta && !meta.leaving) out.push(meta);
   };
   // Permanent damagers (already owner-resolved player ids), then anyone still on the
   // hate table (pets credit their owner, exactly as worldBossContributors resolves).

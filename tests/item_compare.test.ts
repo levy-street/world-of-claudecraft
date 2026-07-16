@@ -1,8 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import type { ItemDef, Stats } from '../src/sim/types';
+import type { CoreStats, ItemDef } from '../src/sim/types';
 import { itemStatDeltas } from '../src/ui/item_compare';
 
-function armor(id: string, stats: Partial<Stats>): ItemDef {
+function armor(
+  id: string,
+  stats: Partial<CoreStats>,
+  ratings: Partial<{ pvpOffenseRating: number; pvpDefenseRating: number }> = {},
+): ItemDef {
   return {
     id,
     name: id,
@@ -11,6 +15,7 @@ function armor(id: string, stats: Partial<Stats>): ItemDef {
     slot: 'chest',
     sellValue: 1,
     stats,
+    ...ratings,
   };
 }
 function weapon(id: string, min: number, max: number, speed: number): ItemDef {
@@ -60,5 +65,27 @@ describe('itemStatDeltas', () => {
     );
     expect(byStat.int).toBe(12);
     expect(byStat.armor).toBeUndefined();
+  });
+
+  it('compares one Warfare rating as a whole-point item stat', () => {
+    const candidate = armor('candidate', {}, { pvpOffenseRating: 40, pvpDefenseRating: 40 });
+    const equipped = armor('equipped', {}, { pvpOffenseRating: 15, pvpDefenseRating: 15 });
+    expect(itemStatDeltas(candidate, equipped)).toEqual([
+      { stat: 'warfare', delta: 25, decimals: 0 },
+    ]);
+  });
+
+  it('treats missing Warfare as zero and never overstates a mismatched internal pair', () => {
+    const candidate = armor('warfare', {}, { pvpOffenseRating: 30, pvpDefenseRating: 30 });
+    const equipped = armor('plain', {});
+    expect(itemStatDeltas(candidate, equipped)).toEqual([
+      { stat: 'warfare', delta: 30, decimals: 0 },
+    ]);
+    expect(
+      itemStatDeltas(
+        armor('mismatch', {}, { pvpOffenseRating: 30, pvpDefenseRating: 10 }),
+        equipped,
+      ),
+    ).toEqual([{ stat: 'warfare', delta: 10, decimals: 0 }]);
   });
 });

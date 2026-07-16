@@ -5,7 +5,7 @@
 // therefore carries ONLY the keys whose value differs from es; every other key is
 // intentionally omitted. A key must NOT be re-added with a value equal to es
 // (redundant duplication). Every key here must be a real `en` leaf
-// path (tests/i18n_overlay_key_membership.test.ts + the byte gate). Keys are in `en`'s
+// path (the flat TranslationKey union type + the byte gate). Keys are in `en`'s
 // leaf order.
 
 import type { TranslationKey } from '../i18n.catalog';
@@ -292,4 +292,9 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   // Corpse-harvest window + mobile hotbar page toggle.
   'hudChrome.corpseHarvest.title': 'Recolección',
   'hudChrome.corpseHarvest.components.gills': 'Branquias',
+  'hudChrome.deeds.collapseHint': 'Contraer el seguimiento de gestas',
+  'hudChrome.deeds.expandHint': 'Expandir el seguimiento de gestas',
+  'hudChrome.deeds.watchAria': 'Seguir {name} en el seguimiento en pantalla',
+  'guide.deedsPage.cat.delve': 'Profundidades',
+  'hudChrome.deeds.catDelve': 'Profundidades',
 };

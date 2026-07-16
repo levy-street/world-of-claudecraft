@@ -1,7 +1,8 @@
 // Shared, host-agnostic catalog of the staff/special Discord roles that get a
-// colored name + a tag in game. Only these six are surfaced (everyone else has
-// the default name color and no tag). Pure data so the server, the renderer, and
-// the bot all agree on the key set without crossing host boundaries.
+// colored name + a tag in game. Only the roles in this catalog are surfaced
+// (everyone else has the default name color and no tag). Pure data so the
+// server, the renderer, and the bot all agree on the key set without crossing
+// host boundaries.
 //
 // `name` is the exact Discord role name the bot matches; `key` is the stable
 // wire/storage token; `color` tints the in-world nameplate; the player-facing tag
@@ -26,36 +27,59 @@ export interface DiscordSpecialRole {
 // stays on the staff green because the guild's Admin role is the renamed Mods
 // role and a Discord rename keeps the role's color.
 export const DISCORD_SPECIAL_ROLES: readonly DiscordSpecialRole[] = [
-  { key: 'levyst', name: 'Levy St', aliases: ['Levy Street'], color: '#ff6b6b', priority: 6 },
+  { key: 'levyst', name: 'Levy St', aliases: ['Levy Street'], color: '#ff6b6b', priority: 11 },
   {
     key: 'admin',
     name: 'Admin',
     aliases: ['Admins', 'Administrator', 'Administrators'],
     color: '#57d98a',
-    priority: 5,
+    priority: 10,
   },
   {
     key: 'coredevs',
     name: 'Core Dev',
     aliases: ['Core Devs', 'Core Developer', 'Core Developers', 'CoreDev'],
     color: '#bc00ff',
-    priority: 4,
+    priority: 9,
   },
   {
     key: 'devs',
     name: 'Devs',
     aliases: ['Dev', 'Developer', 'Developers'],
     color: '#7c8cff',
-    priority: 3,
+    priority: 8,
+  },
+  {
+    key: 'seniormods',
+    name: 'Senior Mods',
+    aliases: ['Senior Mod', 'Senior Moderator', 'Senior Moderators', 'Sr Mod', 'Sr Mods'],
+    color: '#2eb872',
+    priority: 7,
   },
   {
     key: 'mods',
     name: 'Mods',
     aliases: ['Mod', 'Moderator', 'Moderators'],
     color: '#57d98a',
-    priority: 2,
+    priority: 6,
   },
-  { key: 'artists', name: 'Artists', aliases: ['Artist'], color: '#ff85d8', priority: 1 },
+  {
+    key: 'juniormods',
+    name: 'Junior Mods',
+    aliases: ['Junior Mod', 'Junior Moderator', 'Junior Moderators', 'Jr Mod', 'Jr Mods'],
+    color: '#9ce8b6',
+    priority: 5,
+  },
+  { key: 'artists', name: 'Artists', aliases: ['Artist'], color: '#ff85d8', priority: 4 },
+  {
+    key: 'contentcreator',
+    name: 'Content Creator',
+    aliases: ['Content Creators', 'Creator', 'Creators'],
+    color: '#4fc3f7',
+    priority: 3,
+  },
+  { key: 'legend', name: 'LEGEND', aliases: ['Legends'], color: '#ff8000', priority: 2 },
+  { key: 'shill', name: 'SHILL', aliases: ['Shills'], color: '#ffd166', priority: 1 },
 ] as const;
 
 const BY_KEY = new Map(DISCORD_SPECIAL_ROLES.map((r) => [r.key, r]));

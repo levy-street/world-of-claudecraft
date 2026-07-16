@@ -12,22 +12,22 @@ import { describe, expect, it } from 'vitest';
 const src = readFileSync(new URL('../src/ui/questlog_window.ts', import.meta.url), 'utf8');
 const code = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
 
-describe('questlog_window: WCAG chrome (frame + rows + focus-return)', () => {
+describe('questlog_window: WCAG chrome (dialog + rows + focus-return)', () => {
   it('drives the panel from the pure view core', () => {
     expect(code).toContain('buildQuestLogView(');
   });
 
-  it('adopts the shared window frame (its builder sets role=dialog + aria-labelledby)', () => {
-    // The dialog identity + close control now come from the shared window-frame
-    // builder (window_frame.ts, unit-tested in window_frame_view.test.ts); the
-    // painter mounts it on an inner container and reuses the derived title id.
-    expect(code).toContain('renderWindowFrame(mount, QUESTLOG_FRAME');
-    expect(code).toContain("titleKey: 'questUi.log.title'");
-    expect(code).toContain("closeLabelKey: 'questUi.log.close'");
+  it('renders the dialog role + labelledby for the window', () => {
+    // The dialog identity is set via the shared markDialogRoot helper (role=dialog +
+    // aria-labelledby + aria-modal + tabindex); the helper's own writes are unit-tested in
+    // dialog_root.test.ts.
+    expect(code).toContain("markDialogRoot(el, { labelledBy: 'quest-log-title' })");
+    expect(code).toContain('id="quest-log-title"');
   });
 
-  it('routes the frame close control back through the painter close()', () => {
-    expect(code).toContain('onClose: () => this.close()');
+  it('gives the close control a real button with an aria-label', () => {
+    expect(code).toContain('class="x-btn" data-close aria-label=');
+    expect(code).toContain("t('questUi.log.close')");
   });
 
   it('renders quest rows as real buttons with aria-pressed selection state', () => {

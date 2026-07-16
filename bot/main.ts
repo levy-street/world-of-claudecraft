@@ -1,9 +1,9 @@
 // World of ClaudeCraft Discord bot.
 //
 // Two-way bridge between the game and the official Discord server:
-//  - IN DISCORD: /flex shows your top character + rank, /whoami your link status,
-//    /link the connect instructions; status-tier roles are synced from in-game
-//    reward points; new members get a welcome.
+//  - IN DISCORD: /whoami shows your link status, /link the connect instructions;
+//    status-tier roles are synced from in-game reward points (missing roles are
+//    auto-provisioned); member joins are recorded without a welcome message.
 //  - INTO THE GAME: who is online + in the featured voice room is pushed to the
 //    server, which surfaces it in the HUD Discord widget.
 //
@@ -90,10 +90,10 @@ async function main(): Promise<void> {
   await ensureTierRoles();
   await refreshTierRoles();
 
-  // Resolve the staff/special role ids by name (Levy St / Admin / Core Dev /
-  // Devs / Mods / Artists, including catalog aliases so guild-side renames keep
-  // matching), so each member's top special role can be pushed to the game
-  // (name color + tag).
+  // Resolve the staff/special role ids by name (every DISCORD_SPECIAL_ROLES
+  // entry, staff and community alike, including catalog aliases so guild-side
+  // renames keep matching), so each member's top special role can be pushed to
+  // the game (name color + tag).
   const specialRoleIds = new Map<string, string>(); // role key -> guild role id
   const refreshSpecialRoles = async (): Promise<void> => {
     const roles = await discord.guildRoles(cfg.guildId);

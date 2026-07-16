@@ -11,9 +11,17 @@
 // timed harvest in professions/gathering, so the mapping is the "timing" the brief
 // requires stay untouched), the harvest-disabled state, and the empty short-circuit.
 
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import type { CorpseHarvestViewModel } from '../src/ui/corpse_harvest_view';
 import { renderCorpseHarvestPicker } from '../src/ui/corpse_harvest_window';
+
+// hud.ts (read-only here, see module comment above) is not unit-testable in isolation:
+// openLoot builds the Take All button straight off a live Hud/Sim instance. Pin the
+// wiring at the source level instead, matching the button-title contract this test
+// already locks for the Harvest button above.
+const hud = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
 
 function view(overrides: Partial<CorpseHarvestViewModel> = {}): CorpseHarvestViewModel {
   return {
@@ -49,6 +57,21 @@ describe('renderCorpseHarvestPicker: picker section', () => {
     const container = document.createElement('div');
     renderCorpseHarvestPicker(container, view({ harvestDisabled: true }), { onHarvest: () => {} });
     expect(container.querySelector<HTMLButtonElement>('.corpse-harvest-btn')?.disabled).toBe(true);
+  });
+
+  it('exposes what Harvest does via a tooltip, distinct from Take All (playtester clarity)', () => {
+    const container = document.createElement('div');
+    renderCorpseHarvestPicker(container, view(), { onHarvest: () => {} });
+    const btn = container.querySelector<HTMLButtonElement>('.corpse-harvest-btn');
+    expect(btn?.title).toBeTruthy();
+    expect(btn?.title.length).toBeGreaterThan(0);
+  });
+
+  it('wires the Take All button to its own tooltip, distinct from the Harvest tooltip (openLoot in hud.ts)', () => {
+    const takeAllBtn = hud.match(
+      /btn\.textContent = t\('itemUi\.loot\.takeAll'\);\s*\n\s*btn\.title = t\('([^']+)'\);/,
+    );
+    expect(takeAllBtn?.[1]).toBe('hudChrome.loot.takeAllTooltip');
   });
 
   it('reports exactly the currently-checked tags to onHarvest (the concentration/timing contract)', () => {

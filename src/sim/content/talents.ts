@@ -74,7 +74,25 @@ export interface GlobalModEffect {
   meleeDmgPct?: number; // physical ability damage
   spellDmgPct?: number; // magic ability damage
   healPct?: number; // healing done
+  dotDmgPct?: number; // damage-over-time effects
+  hotHealPct?: number; // heal-over-time effects
+  absorbPct?: number; // absorb shield strength
+  meleeHastePct?: number; // passive melee attack haste
+  petDmgPct?: number; // owner's passive pet damage
+  petDmgSharePct?: number; // incoming damage redirected to a living pet
   threatPct?: number; // bonus threat (tank role)
+  // Extra critical-strike damage (0.5 = +50%), split by OUTPUT CHANNEL so a spec mastery
+  // only strengthens the crits it is meant to: a Fire/Destruction mastery boosts SPELL
+  // crits, an Arms/Subtlety mastery boosts PHYSICAL crits, and a Holy paladin mastery
+  // boosts HEAL crits, never the others. Added to the matching base crit multiplier
+  // (spell 1.5, physical 2.0, heal 1.5). Baked onto the paired Entity.critDmg*Bonus in
+  // recalcPlayerStats.
+  critDmgSpellPct?: number;
+  critDmgPhysPct?: number;
+  critDmgHealPct?: number;
+  // Passive spell haste from a spec mastery (0.1 = +10%). Folds into Entity.spellHaste, so
+  // it shortens every cast and the cast-time tooltips reflect it live.
+  spellHastePct?: number;
   critVsRooted?: number; // additive spell crit chance against rooted targets
 }
 
@@ -524,7 +542,23 @@ function zeroStats(): Required<StatModEffect> {
   };
 }
 function zeroGlobal(): Required<GlobalModEffect> {
-  return { meleeDmgPct: 0, spellDmgPct: 0, healPct: 0, threatPct: 0, critVsRooted: 0 };
+  return {
+    meleeDmgPct: 0,
+    spellDmgPct: 0,
+    healPct: 0,
+    dotDmgPct: 0,
+    hotHealPct: 0,
+    absorbPct: 0,
+    meleeHastePct: 0,
+    petDmgPct: 0,
+    petDmgSharePct: 0,
+    threatPct: 0,
+    critDmgSpellPct: 0,
+    critDmgPhysPct: 0,
+    critDmgHealPct: 0,
+    spellHastePct: 0,
+    critVsRooted: 0,
+  };
 }
 function zeroAbilityMod(): ResolvedAbilityMod {
   return {
@@ -579,7 +613,17 @@ function accumulate(mods: TalentModifiers, eff: TalentEffect | undefined, mult: 
     g.meleeDmgPct += (e.meleeDmgPct ?? 0) * mult;
     g.spellDmgPct += (e.spellDmgPct ?? 0) * mult;
     g.healPct += (e.healPct ?? 0) * mult;
+    g.dotDmgPct += (e.dotDmgPct ?? 0) * mult;
+    g.hotHealPct += (e.hotHealPct ?? 0) * mult;
+    g.absorbPct += (e.absorbPct ?? 0) * mult;
+    g.meleeHastePct += (e.meleeHastePct ?? 0) * mult;
+    g.petDmgPct += (e.petDmgPct ?? 0) * mult;
+    g.petDmgSharePct += (e.petDmgSharePct ?? 0) * mult;
     g.threatPct += (e.threatPct ?? 0) * mult;
+    g.critDmgSpellPct += (e.critDmgSpellPct ?? 0) * mult;
+    g.critDmgPhysPct += (e.critDmgPhysPct ?? 0) * mult;
+    g.critDmgHealPct += (e.critDmgHealPct ?? 0) * mult;
+    g.spellHastePct += (e.spellHastePct ?? 0) * mult;
     g.critVsRooted += (e.critVsRooted ?? 0) * mult;
   }
   for (const am of eff.ability ?? []) {
@@ -649,7 +693,11 @@ export function defaultBuild(cls: PlayerClass, points: number): TalentAllocation
   return alloc;
 }
 
-export function computeTalentModifiers(cls: PlayerClass, alloc: TalentAllocation): TalentModifiers {
+export function computeTalentModifiers(
+  cls: PlayerClass,
+  alloc: TalentAllocation,
+  level = MAX_LEVEL,
+): TalentModifiers {
   const mods = emptyModifiers();
   const ct = talentsFor(cls);
   if (!ct) return mods;
@@ -660,7 +708,7 @@ export function computeTalentModifiers(cls: PlayerClass, alloc: TalentAllocation
     mods.spec = spec.id;
     mods.role = spec.role;
     mods.grants.push({ ability: spec.signature, rank: 1 }); // signature ability
-    accumulate(mods, spec.mastery.effect, 1); // Mastery passive
+    accumulate(mods, spec.mastery.effect, Math.min(1, level / 20)); // Mastery passive
   }
 
   for (const id in alloc.ranks) {

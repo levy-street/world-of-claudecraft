@@ -46,6 +46,7 @@ export const COMMON_RECIPES: ProfessionRecipeRecord[] = [
     skillReq: 0,
     trivialAt: 25,
     itemLevelBudget: 10,
+    level: 10,
   },
   {
     id: 'recipe_eastbrook_chain_vest',
@@ -56,6 +57,7 @@ export const COMMON_RECIPES: ProfessionRecipeRecord[] = [
     skillReq: 0,
     trivialAt: 25,
     itemLevelBudget: 10,
+    level: 10,
   },
   {
     id: 'recipe_eastbrook_wool_trousers',
@@ -66,6 +68,7 @@ export const COMMON_RECIPES: ProfessionRecipeRecord[] = [
     skillReq: 0,
     trivialAt: 25,
     itemLevelBudget: 8,
+    level: 8,
   },
   {
     id: 'recipe_tanned_leather_jerkin',
@@ -79,6 +82,7 @@ export const COMMON_RECIPES: ProfessionRecipeRecord[] = [
     skillReq: 0,
     trivialAt: 25,
     itemLevelBudget: 9,
+    level: 9,
   },
   {
     id: 'recipe_tough_jerky',
@@ -89,6 +93,7 @@ export const COMMON_RECIPES: ProfessionRecipeRecord[] = [
     skillReq: 0,
     trivialAt: 25,
     itemLevelBudget: 1,
+    level: 1,
   },
   {
     id: 'recipe_minor_healing_potion',
@@ -102,6 +107,7 @@ export const COMMON_RECIPES: ProfessionRecipeRecord[] = [
     skillReq: 0,
     trivialAt: 25,
     itemLevelBudget: 1,
+    level: 1,
   },
 ];
 
@@ -135,6 +141,7 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
     skillReq: 75,
     trivialAt: 125,
     itemLevelBudget: 20,
+    level: 20,
     requiresHubStation: true,
   },
   {
@@ -149,6 +156,7 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
     skillReq: 150,
     trivialAt: 200,
     itemLevelBudget: 30,
+    level: 20,
     requiresHubStation: true,
   },
   {
@@ -163,6 +171,7 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
     skillReq: 75,
     trivialAt: 125,
     itemLevelBudget: 20,
+    level: 20,
     requiresHubStation: true,
   },
   {
@@ -177,6 +186,7 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
     skillReq: 150,
     trivialAt: 200,
     itemLevelBudget: 30,
+    level: 20,
     requiresHubStation: true,
   },
   {
@@ -191,6 +201,7 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
     skillReq: 75,
     trivialAt: 125,
     itemLevelBudget: 20,
+    level: 20,
     requiresHubStation: true,
   },
   {
@@ -205,6 +216,7 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
     skillReq: 150,
     trivialAt: 200,
     itemLevelBudget: 30,
+    level: 20,
     requiresHubStation: true,
   },
 ];
@@ -226,6 +238,7 @@ export const COMBO_RECIPES: ProfessionRecipeRecord[] = [
     skillReq: 25,
     trivialAt: 50,
     itemLevelBudget: 20,
+    level: 15,
     comboRequirement: { craftA: 'armorcrafting', craftB: 'weaponcrafting', minTier: 1 },
   },
   {
@@ -240,6 +253,7 @@ export const COMBO_RECIPES: ProfessionRecipeRecord[] = [
     skillReq: 25,
     trivialAt: 50,
     itemLevelBudget: 18,
+    level: 15,
     comboRequirement: { craftA: 'armorcrafting', craftB: 'weaponcrafting', minTier: 1 },
   },
   {
@@ -254,6 +268,7 @@ export const COMBO_RECIPES: ProfessionRecipeRecord[] = [
     skillReq: 25,
     trivialAt: 50,
     itemLevelBudget: 16,
+    level: 15,
     comboRequirement: { craftA: 'alchemy', craftB: 'engineering', minTier: 1 },
   },
 ];

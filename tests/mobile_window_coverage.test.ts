@@ -44,12 +44,7 @@ function windowIdsFromHtml(html: string): string[] {
     const attrs = tag[1];
     const idMatch = attrs.match(/\bid="([a-z0-9-]+)"/);
     const classMatch = attrs.match(/\bclass="([^"]*)"/);
-    // Exact class-TOKEN match, not \bwindow\b: the regex word boundary treats the
-    // hyphen in the frame-grammar chrome classes (window-title, window-close,
-    // window-frame) as a boundary, so a titlebar span or close button inside a
-    // statically-authored frame (the More drawer) would be mis-scraped as a
-    // window of its own and demanded a sheet rule it must never have.
-    if (idMatch && classMatch && classMatch[1].split(/\s+/).includes('window')) {
+    if (idMatch && classMatch && /\bwindow\b/.test(classMatch[1])) {
       ids.push(idMatch[1]);
     }
   }

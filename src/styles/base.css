@@ -517,6 +517,8 @@
   }
   .window.window-dragging {
     cursor: move;
+    user-select: none;
+    will-change: transform;
   }
   .x-btn {
     color: #c9b27a;
@@ -537,6 +539,8 @@
   .chat-tab:focus-visible,
   .micro-btn:focus-visible,
   .mobile-btn:focus-visible,
+  .vendor-item:focus-visible,
+  .vendor-sell-junk:focus-visible,
   .bag-item:focus-visible,
   .bank-item:focus-visible,
   .bank-buy-btn:focus-visible,

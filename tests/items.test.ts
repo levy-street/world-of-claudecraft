@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { ITEMS } from '../src/sim/data';
 import * as items from '../src/sim/items';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
@@ -238,6 +239,101 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
 
     items.buyItem(ctx, wilkes.id, 'minor_healing_potion', pid);
     expect(sim.countItem('minor_healing_potion', pid)).toBe(1); // non-staples stay single
+  });
+
+  it('buys FURY gear with honor without changing lifetime honor', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Veteran');
+    const meta = sim.meta(pid)!;
+    const fury = [...sim.entities.values()].find((entity) => entity.templateId === 'fury')!;
+    const player = sim.entities.get(pid)!;
+    player.pos.x = fury.pos.x;
+    player.pos.z = fury.pos.z;
+    meta.inventory.length = 0;
+    meta.honor = 1_000;
+    meta.lifetimeHonor = 2_000;
+
+    items.buyItem(ctxOf(sim), fury.id, 'final_argument_greatblade', pid);
+
+    expect(sim.countItem('final_argument_greatblade', pid)).toBe(1);
+    expect(meta.honor).toBe(200);
+    expect(meta.lifetimeHonor).toBe(2_000);
+    expect(meta.copper).toBe(0);
+  });
+
+  it('can destroy duplicate soulbound FURY purchases without making them transferable', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Collector');
+    const meta = sim.meta(pid)!;
+    const fury = [...sim.entities.values()].find((entity) => entity.templateId === 'fury')!;
+    const player = sim.entities.get(pid)!;
+    player.pos.x = fury.pos.x;
+    player.pos.z = fury.pos.z;
+    meta.inventory.length = 0;
+    meta.honor = 1_600;
+
+    items.buyItem(ctxOf(sim), fury.id, 'final_argument_greatblade', pid);
+    items.buyItem(ctxOf(sim), fury.id, 'final_argument_greatblade', pid);
+    expect(sim.countItem('final_argument_greatblade', pid)).toBe(2);
+    expect(ITEMS.final_argument_greatblade.soulbound).toBe(true);
+
+    items.discardItem(ctxOf(sim), 'final_argument_greatblade', 2, pid);
+    expect(sim.countItem('final_argument_greatblade', pid)).toBe(0);
+  });
+
+  it('checks dual copper/honor prices and bag space before either debit', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'DualBuyer');
+    const meta = sim.meta(pid)!;
+    const fury = [...sim.entities.values()].find((entity) => entity.templateId === 'fury')!;
+    const player = sim.entities.get(pid)!;
+    player.pos.x = fury.pos.x;
+    player.pos.z = fury.pos.z;
+    meta.inventory.length = 0;
+    const testId = 'test_warfare_rations';
+    ITEMS[testId] = {
+      id: testId,
+      name: 'Test Warfare Rations',
+      kind: 'food',
+      foodHp: 100,
+      buyValue: 10,
+      priceHonor: 7,
+      sellValue: 1,
+    };
+    fury.vendorItems.push(testId);
+
+    try {
+      meta.copper = 49;
+      meta.honor = 7;
+      items.buyItem(ctxOf(sim), fury.id, testId, pid);
+      expect(meta.copper).toBe(49);
+      expect(meta.honor).toBe(7);
+      expect(sim.countItem(testId, pid)).toBe(0);
+
+      meta.copper = 50;
+      meta.honor = 6;
+      items.buyItem(ctxOf(sim), fury.id, testId, pid);
+      expect(meta.copper).toBe(50);
+      expect(meta.honor).toBe(6);
+      expect(sim.countItem(testId, pid)).toBe(0);
+
+      meta.honor = 7;
+      items.buyItem(ctxOf(sim), fury.id, testId, pid);
+      expect(meta.copper).toBe(0);
+      expect(meta.honor).toBe(0);
+      expect(sim.countItem(testId, pid)).toBe(5);
+
+      meta.inventory = Array.from({ length: 16 }, () => ({ itemId: 'worn_sword', count: 1 }));
+      meta.copper = 0;
+      meta.honor = 800;
+      items.buyItem(ctxOf(sim), fury.id, 'final_argument_greatblade', pid);
+      expect(meta.copper).toBe(0);
+      expect(meta.honor).toBe(800);
+      expect(sim.countItem('final_argument_greatblade', pid)).toBe(0);
+    } finally {
+      fury.vendorItems.splice(fury.vendorItems.indexOf(testId), 1);
+      delete ITEMS[testId];
+    }
   });
 
   it('buying a food stack then selling it back is a net loss (no vendor arbitrage)', () => {

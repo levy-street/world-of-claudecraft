@@ -102,6 +102,7 @@ export function releasePlayerSpirit(ctx: SimContext, pid?: number): void {
   }
   // Mark where the body lies, then send the spirit to the graveyard.
   p.corpsePos = { x: p.pos.x, y: p.pos.y, z: p.pos.z };
+  p.corpseInstanceId = ctx.instanceClaimIdAt(p.pos);
   p.ghost = true; // p.dead stays true
   const gy = ghostGraveyard(p);
   p.pos = ctx.groundPos(gy.x, gy.z);
@@ -203,6 +204,7 @@ function reviveAt(
   p.dead = false;
   p.ghost = false;
   p.corpsePos = null;
+  p.corpseInstanceId = null;
   p.pos = ctx.groundPos(pos.x, pos.z);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);

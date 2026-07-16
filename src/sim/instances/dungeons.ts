@@ -17,16 +17,17 @@
 
 import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../content/dungeon_difficulty';
 import { DUNGEON_X_THRESHOLD, DUNGEONS, dungeonAt, instanceOrigin, MOBS } from '../data';
-import { NYTHRAXIS_LAYOUT } from '../dungeon_layout';
 import { createGroundObject, createMob } from '../entity';
 import type { InstanceSlot, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
+import { arenaQueueLeave } from '../social/arena';
 import { resurrectOnInstanceReentry } from '../spirit';
 import {
   dist2d,
   type Entity,
   INSTANCE_EMPTY_TIMEOUT,
   NYTHRAXIS_BOSS_ID,
+  NYTHRAXIS_ROOM_RADIUS,
   type Vec3,
 } from '../types';
 import {
@@ -37,22 +38,112 @@ import {
 } from './difficulty';
 
 const DOOR_TRIGGER_RADIUS = 2.0; // walking this close to a dungeon door teleports you
+const HEROIC_REWARD_WINDOW_MS = 24 * 60 * 60 * 1000;
 const RAID_ALLOWED_DUNGEON_IDS = new Set(['nythraxis_crypt', 'nythraxis_boss_arena']);
 const RAID_REQUIRED_DUNGEON_IDS = new Set(['nythraxis_boss_arena']);
 
 export function instanceKeyFor(ctx: SimContext, pid: number): string {
   const party = ctx.partyOf(pid);
-  return party ? `party:${party.id}` : `solo:${pid}`;
+  if (party) return `party:${party.id}`;
+  // Solo instances key on the DURABLE character id when the server supplies one,
+  // so a logout, relog, or character-select "Take Over" (each of which mints a
+  // new entity id) rejoins the SAME live instance instead of claiming a fresh one
+  // with the boss respawned (issue #1600). This is the shared foundation that
+  // also lets a disconnected solo runner resume their cleared instance (#1351).
+  // Offline / sim-only callers have no characterId and fall back to the entity id,
+  // preserving the exact pre-existing key (and the parity golden trace).
+  const durable = ctx.players.get(pid)?.characterId;
+  return durable !== undefined ? `solo:char:${durable}` : `solo:${pid}`;
+}
+
+function resetOwnerPids(ctx: SimContext, pid: number): number[] {
+  return ctx.partyOf(pid)?.members ?? [pid];
+}
+
+function resetCooldownKey(ctx: SimContext, pid: number, dungeonId: string): string {
+  const durable = ctx.players.get(pid)?.characterId;
+  return `${durable !== undefined ? `char:${durable}` : `entity:${pid}`}:${dungeonId}`;
+}
+
+function activeResetLock(
+  ctx: SimContext,
+  pid: number,
+  dungeonId: string,
+): { availableAt: number; claimId: number } | null {
+  const key = resetCooldownKey(ctx, pid, dungeonId);
+  const lock = ctx.dungeonResetLocks.get(key);
+  if (!lock || lock.availableAt <= ctx.time) {
+    ctx.dungeonResetLocks.delete(key);
+    return null;
+  }
+  return lock;
+}
+
+// Joining a party during a reset cooldown inherits that party's active dungeon
+// locks. Otherwise fresh characters could take over the replacement claim, rotate
+// the ephemeral party id, and open another run before the five-minute boundary.
+export function inheritDungeonResetLocks(ctx: SimContext, pid: number): void {
+  const party = ctx.partyOf(pid);
+  if (!party) return;
+  const partyKey = `party:${party.id}`;
+  for (const inst of ctx.instances) {
+    if (RAID_ALLOWED_DUNGEON_IDS.has(inst.dungeonId)) continue;
+    const claimLock =
+      inst.partyKey === partyKey && inst.resetAvailableAt > ctx.time && inst.exitId !== null
+        ? { availableAt: inst.resetAvailableAt, claimId: inst.exitId }
+        : null;
+    const ownerLock = party.members
+      .filter((ownerPid) => ownerPid !== pid)
+      .map((ownerPid) => activeResetLock(ctx, ownerPid, inst.dungeonId))
+      .find((lock) => lock !== null);
+    const inherited = claimLock ?? ownerLock;
+    // Inheritance may only ever EXTEND the joiner's lock. Replacing an existing
+    // lock with a nearer-expiry one would let a mid-cooldown farmer launder the
+    // remainder away through a brief join, and rebinding its claimId would lock
+    // the joiner out of their own replacement claim.
+    const existing = activeResetLock(ctx, pid, inst.dungeonId);
+    if (inherited && (existing === null || inherited.availableAt > existing.availableAt)) {
+      ctx.dungeonResetLocks.set(resetCooldownKey(ctx, pid, inst.dungeonId), inherited);
+    }
+  }
 }
 
 export function instanceOriginOf(inst: InstanceSlot): { x: number; z: number } {
   return instanceOrigin(DUNGEONS[inst.dungeonId].index, inst.slot);
 }
 
+// Unique live-claim identity at a position. The exit entity is recreated on
+// every claim, unlike the reusable dungeon/slot coordinates, so released
+// corpses can be bound without trusting a stale body in a recycled slot.
+export function instanceClaimIdAt(ctx: SimContext, pos: Vec3): number | null {
+  for (const inst of ctx.instances) {
+    if (inst.partyKey === null || inst.exitId === null) continue;
+    if (instanceClaimContains(ctx, inst, pos)) return inst.exitId;
+  }
+  return null;
+}
+
 // The one instance-footprint envelope (shared by occupancy, position lookup,
 // and the kill-lockout sweep): is `pos` inside the slot anchored at `origin`?
 function instanceContains(origin: { x: number; z: number }, pos: Vec3): boolean {
   return Math.abs(pos.x - origin.x) < 120 && Math.abs(pos.z - origin.z) < 250;
+}
+
+function instanceClaimContains(ctx: SimContext, inst: InstanceSlot, pos: Vec3): boolean {
+  const origin = instanceOriginOf(inst);
+  if (instanceContains(origin, pos)) return true;
+  if (inst.dungeonId !== 'nythraxis_boss_arena') return false;
+  const boss = inst.mobIds
+    .map((id) => ctx.entities.get(id))
+    .find((entity) => entity?.templateId === NYTHRAXIS_BOSS_ID);
+  // The raid room is wider than the generic instance footprint, so its claim
+  // includes the side wings. Keep that wider circle clipped to this slot's z
+  // band or it reaches into the adjacent arena slot 500 yards away.
+  return (
+    !!boss &&
+    Math.abs(pos.z - origin.z) < 250 &&
+    dist2d(pos, boss.spawnPos) <= NYTHRAXIS_ROOM_RADIUS
+  );
 }
 
 // Difficulty-scoped lockout key: heroic clears lock beside the normal key, so
@@ -91,10 +182,19 @@ export function updateDoorTriggers(ctx: SimContext, p: Entity): void {
   }
 }
 
-export function enterDungeon(ctx: SimContext, dungeonId: string, pid?: number): void {
+export function enterDungeon(
+  ctx: SimContext,
+  dungeonId: string,
+  pid?: number,
+  // [dev] /dev raid: skip the raid-group requirement and the Nythraxis attunement
+  // so a lone tester can zone into the raid. Dev-gated (never in production). The
+  // raid LOCKOUT is deliberately NOT bypassed (use /dev raid reset for that).
+  devBypass = false,
+): void {
   const r = ctx.resolve(pid);
   const dungeon = DUNGEONS[dungeonId];
   if (!r || !dungeon) return;
+  const bypass = devBypass && ctx.devCommands;
   // A living player enters normally; a ghost that has run its spirit back re-enters to
   // resurrect at the entrance (below). A fresh corpse (dead, spirit not yet released)
   // cannot move, so it never reaches the door.
@@ -106,11 +206,11 @@ export function enterDungeon(ctx: SimContext, dungeonId: string, pid?: number): 
     ctx.error(r.meta.entityId, 'Raid groups cannot enter standard dungeons.');
     return;
   }
-  if (!party?.raid && raidRequired) {
+  if (!party?.raid && raidRequired && !bypass) {
     ctx.error(r.meta.entityId, 'You must convert your party to a raid group first.');
     return;
   }
-  if (dungeonId === 'nythraxis_boss_arena' && !canEnterNythraxisRaid(r.meta)) {
+  if (dungeonId === 'nythraxis_boss_arena' && !canEnterNythraxisRaid(r.meta) && !bypass) {
     ctx.error(r.meta.entityId, 'The royal door is sealed to you.');
     return;
   }
@@ -169,6 +269,35 @@ export function enterDungeon(ctx: SimContext, dungeonId: string, pid?: number): 
     ctx.error(r.meta.entityId, `You are locked to Heroic ${dungeon.name}.`);
     return;
   }
+  // Party ids are intentionally ephemeral. During a reset cooldown, every durable
+  // owner may re-enter only the exact replacement claim created by that reset.
+  // Reforming the group or joining a friend's pre-created claim cannot rotate the
+  // ownership key into an immediate fresh run.
+  // A ghost whose corpse is bound to this exact live claim is recovering its
+  // body, never minting a fresh run, so a partymate's unrelated reset lock must
+  // not strand the spirit at the door.
+  const corpseBoundToClaim =
+    r.e.ghost && inst !== undefined && r.e.corpseInstanceId === inst.exitId;
+  const conflictingResetLock =
+    !raidAllowed && !corpseBoundToClaim
+      ? resetOwnerPids(ctx, r.meta.entityId)
+          .map((ownerPid) => activeResetLock(ctx, ownerPid, dungeonId))
+          .find((lock) => lock !== null && lock.claimId !== inst?.exitId)
+      : undefined;
+  if (conflictingResetLock) {
+    ctx.error(r.meta.entityId, 'Instances can only be reset once every 5 minutes.');
+    return;
+  }
+  // The claim-wins rule above is silent, and silence is exactly the reported
+  // confusion: a player who toggled the selection and walked back in landed in
+  // the old-difficulty run with no explanation. A living player rejoining a
+  // standard claim whose difficulty differs from their selection is told, and
+  // pointed at the reset path. Ghosts are corpse-running back to the run they
+  // already know; raid claims are excluded from Reset All, so no advice there.
+  const mismatchedClaimDifficulty =
+    !raidAllowed && !r.e.ghost && inst !== undefined && inst.difficulty !== difficulty
+      ? inst.difficulty
+      : null;
   if (!inst) {
     // Heroic five-mans lock on the KILL: a locked player can still corpse-run
     // back into a cleared live claim (gated on the boss being down, above), but
@@ -184,6 +313,17 @@ export function enterDungeon(ctx: SimContext, dungeonId: string, pid?: number): 
       return;
     }
     claimInstance(ctx, inst, key, difficulty);
+  }
+  if (mismatchedClaimDifficulty !== null) {
+    ctx.emit({
+      type: 'log',
+      text:
+        mismatchedClaimDifficulty === 'heroic'
+          ? 'This instance is set to Heroic difficulty. Use Reset All Instances to start a fresh Normal run.'
+          : 'This instance is set to Normal difficulty. Use Reset All Instances to start a fresh Heroic run.',
+      color: '#f96',
+      pid: r.meta.entityId,
+    });
   }
   if (!party || party.members.length < dungeon.suggestedPlayers) {
     ctx.emit({
@@ -202,6 +342,10 @@ export function enterDungeon(ctx: SimContext, dungeonId: string, pid?: number): 
   p.targetId = null;
   p.autoAttack = false;
   inst.emptyFor = 0;
+  // Stepping inside removes you from any arena queue: a match must never form for
+  // a player standing in an instance and teleport them back inside fully restored
+  // (issue #1600). No-op if they were not queued; notifies any 2v2 teammate.
+  arenaQueueLeave(ctx, r.meta.entityId);
   // A ghost that ran its spirit back and re-entered resurrects at the entrance,
   // penalty-free: the re-entry IS the corpse run under the instance death model (no
   // Spirit Healer inside an instance).
@@ -212,6 +356,8 @@ export function enterDungeon(ctx: SimContext, dungeonId: string, pid?: number): 
     dungeonId === 'nythraxis_crypt' && corpseRunClaim !== undefined;
   if (p.ghost && !passingThroughNythraxisCrypt) resurrectOnInstanceReentry(ctx, r.meta, p, p.pos);
   ctx.emit({ type: 'log', text: dungeon.enterText, color: '#b9f', pid: r.meta.entityId });
+  // Stepping through the moongate is a Chronicle task.
+  if (dungeonId === 'drowned_temple') ctx.markVisited(r.meta, 'dungeon:drowned_temple');
 }
 
 function canEnterNythraxisRaid(meta: PlayerMeta): boolean {
@@ -268,31 +414,19 @@ function isDefeatedNythraxisParticipant(ctx: SimContext, inst: InstanceSlot, pid
   return false;
 }
 
-function nythraxisArenaContains(inst: InstanceSlot, pos: Vec3): boolean {
-  const floorHalfX = NYTHRAXIS_LAYOUT.floorHalfX;
-  if (floorHalfX === undefined) return false;
-  const origin = instanceOriginOf(inst);
-  const localX = pos.x - origin.x;
-  const localZ = pos.z - origin.z;
-  return (
-    Math.abs(localX) <= floorHalfX &&
-    localZ >= NYTHRAXIS_LAYOUT.zMin &&
-    localZ <= NYTHRAXIS_LAYOUT.zMax
-  );
-}
-
 function defeatedNythraxisCorpseRunClaim(
   ctx: SimContext,
   partyKey: string,
   p: Entity,
 ): InstanceSlot | undefined {
   const corpsePos = p.corpsePos;
-  if (!p.ghost || !corpsePos) return undefined;
+  if (!p.ghost || !corpsePos || p.corpseInstanceId === null) return undefined;
   const inst = ctx.instances.find(
     (candidate) =>
       candidate.dungeonId === 'nythraxis_boss_arena' &&
       candidate.partyKey === partyKey &&
-      nythraxisArenaContains(candidate, corpsePos),
+      candidate.exitId === p.corpseInstanceId &&
+      instanceClaimContains(ctx, candidate, corpsePos),
   );
   if (!inst || !isDefeatedNythraxisParticipant(ctx, inst, p.id)) return undefined;
   return inst;
@@ -344,6 +478,8 @@ function claimInstance(
   inst.partyKey = key;
   inst.difficulty = difficulty;
   inst.emptyFor = 0;
+  // The Sanctum speed deed measures from the claim.
+  inst.claimedAt = ctx.time;
   inst.clearedBy = new Set();
   const origin = instanceOriginOf(inst);
   for (const spawn of dungeon.spawns) {
@@ -416,7 +552,114 @@ function freeInstance(ctx: SimContext, inst: InstanceSlot): void {
   inst.objectIds = [];
   inst.exitId = null;
   inst.emptyFor = 0;
+  inst.resetAvailableAt = 0;
+  inst.claimedAt = undefined;
   inst.clearedBy = new Set();
+}
+
+// Explicit classic-style reset for the caller's standard dungeon claims. Durable
+// character keys keep relogs attached to the same run; this is the deliberate,
+// server-authoritative way to abandon that run before selecting another difficulty.
+// Raid approach/arena claims are excluded because their lockout and corpse-return
+// rules are stricter and are reset only by their existing lifecycle.
+export function resetDungeonInstances(ctx: SimContext, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  const party = ctx.partyOf(r.meta.entityId);
+  if (party && party.leader !== r.meta.entityId) {
+    ctx.error(r.meta.entityId, 'You are not the party leader.');
+    return;
+  }
+
+  const key = instanceKeyFor(ctx, r.meta.entityId);
+  const owned = ctx.instances.filter(
+    (inst) => inst.partyKey === key && !RAID_ALLOWED_DUNGEON_IDS.has(inst.dungeonId),
+  );
+  if (owned.length === 0) {
+    ctx.error(r.meta.entityId, 'You have no instances to reset.');
+    return;
+  }
+  // Reset is a difficulty-transition escape hatch, not a same-difficulty farming
+  // loop. The v0.26 durable key intentionally stopped relog from respawning Normal
+  // bosses; require the player to select the other difficulty before abandoning the
+  // old claims so Reset All cannot recreate that exploit with one extra click.
+  const selected = ctx.dungeonDifficulty(r.meta.entityId);
+  // Compare against the per-dungeon CLAMPED difficulty (what the replacement
+  // claim below would actually use), so a dungeon without a heroic mode can
+  // never pass the transition guard and loop same-difficulty resets.
+  const resettable = owned.filter(
+    (inst) => inst.difficulty !== claimDifficultyForDungeon(inst.dungeonId, selected),
+  );
+  if (resettable.length === 0) {
+    ctx.error(
+      r.meta.entityId,
+      'Change dungeon difficulty before resetting these instances. Empty instances reset on their own after 5 minutes.',
+    );
+    return;
+  }
+  const ownerPids = resetOwnerPids(ctx, r.meta.entityId);
+  if (
+    resettable.some(
+      (inst) =>
+        inst.resetAvailableAt > ctx.time ||
+        ownerPids.some((ownerPid) => activeResetLock(ctx, ownerPid, inst.dungeonId) !== null),
+    )
+  ) {
+    ctx.error(r.meta.entityId, 'Instances can only be reset once every 5 minutes.');
+    return;
+  }
+  if (selected === 'heroic') {
+    const locked = resettable.find((inst) =>
+      isRaidLocked(ctx, r.meta, heroicLockoutId(inst.dungeonId)),
+    );
+    if (locked) {
+      ctx.error(r.meta.entityId, `You are locked to Heroic ${DUNGEONS[locked.dungeonId].name}.`);
+      return;
+    }
+  }
+
+  // Validate every claim before freeing any so Reset All is atomic. A living player,
+  // an unreleased corpse, or a released spirit still bound to a corpse in the claim
+  // keeps it alive for recovery and loot instead of being stranded by the reset.
+  for (const inst of resettable) {
+    const origin = instanceOriginOf(inst);
+    for (const meta of ctx.players.values()) {
+      const player = ctx.entities.get(meta.entityId);
+      if (!player) continue;
+      const bodyInside = instanceContains(origin, player.pos);
+      const corpseInside =
+        player.ghost &&
+        player.corpsePos !== null &&
+        player.corpseInstanceId === inst.exitId &&
+        instanceContains(origin, player.corpsePos);
+      if (bodyInside || corpseInside) {
+        ctx.error(r.meta.entityId, 'You cannot reset instances while someone is still inside.');
+        return;
+      }
+    }
+    if (inst.mobIds.some((id) => ctx.entities.get(id)?.lootable)) {
+      ctx.error(r.meta.entityId, 'You cannot reset instances while loot remains inside.');
+      return;
+    }
+  }
+
+  // Reclaim each slot immediately at the selected difficulty. This commits the
+  // transition atomically: toggling the preference back afterward still rejoins this
+  // live claim, so Reset All cannot be turned into a Normal -> Heroic -> Normal
+  // zero-downtime boss-respawn loop.
+  for (const inst of resettable) {
+    freeInstance(ctx, inst);
+    claimInstance(ctx, inst, key, claimDifficultyForDungeon(inst.dungeonId, selected));
+    if (inst.exitId === null) throw new Error('Dungeon reset replacement claim has no identity.');
+    inst.resetAvailableAt = ctx.time + INSTANCE_EMPTY_TIMEOUT;
+    for (const ownerPid of ownerPids) {
+      ctx.dungeonResetLocks.set(resetCooldownKey(ctx, ownerPid, inst.dungeonId), {
+        availableAt: inst.resetAvailableAt,
+        claimId: inst.exitId,
+      });
+    }
+  }
+  ctx.error(r.meta.entityId, 'All instances have been reset.');
 }
 
 // Kill-time lockout recipients for a claimed instance: every CURRENT member of
@@ -426,15 +669,18 @@ function freeInstance(ctx: SimContext, inst: InstanceSlot): void {
 // was the old rule, and it let a door-camper or an early-released ghost escape
 // the daily lockout and later claim a fresh run for the whole locked party.
 export function instanceLockoutMetas(ctx: SimContext, inst: InstanceSlot): PlayerMeta[] {
-  const origin = instanceOriginOf(inst);
   const out: PlayerMeta[] = [];
   for (const meta of ctx.players.values()) {
+    if (meta.leaving) continue;
     if (instanceKeyFor(ctx, meta.entityId) === inst.partyKey) {
       out.push(meta);
       continue;
     }
     const e = ctx.entities.get(meta.entityId);
-    if (e && instanceContains(origin, e.pos)) out.push(meta);
+    const matchingInstanceCorpse =
+      e?.ghost && e.corpsePos && e.corpseInstanceId === inst.exitId ? e.corpsePos : null;
+    const lockoutPos = matchingInstanceCorpse ?? e?.pos;
+    if (lockoutPos && instanceClaimContains(ctx, inst, lockoutPos)) out.push(meta);
   }
   return out;
 }
@@ -456,82 +702,45 @@ function lockToHeroicClaim(
   meta.raidLockouts.set(lockId, lockedUntil);
 }
 
-// Heroic KILL lockout, the sibling of awardHeroicMarks on the death path.
-// combat/damage.ts calls it for EVERY mob death (credit or no credit): when the
-// dead mob is the final boss of a heroic claim, the whole owning group (plus
-// anyone inside) is locked to that heroic dungeon until the daily reset (the
-// same realm-local boundary the Nythraxis raid uses), scoped to the :heroic
-// key so the normal difficulty is never consumed. Marks stay participation-
-// gated below; the lockout deliberately is not. Death-time reward recipients
-// (a departed tap holder) are the third arm of the union, stamped in
-// awardHeroicMarks where that snapshot exists.
-export function grantHeroicKillLockout(ctx: SimContext, mob: Entity): void {
-  const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(mob.id));
-  if (!inst || inst.difficulty !== 'heroic') return;
-  const tuning = HEROIC_DUNGEON_TUNING[inst.dungeonId];
-  if (!tuning || mob.templateId !== tuning.finalBossId) return;
-  const lockedUntil = ctx.raidResetMs(ctx.lockoutNowMs());
-  for (const meta of instanceLockoutMetas(ctx, inst)) {
-    lockToHeroicClaim(ctx, inst, meta, lockedUntil);
-  }
+function heroicRewardWindowToken(lockedUntil: number): string {
+  return `reset:${Math.floor(lockedUntil / HEROIC_REWARD_WINDOW_MS)}`;
 }
 
-// Heroic participation reward: the final boss of a heroic instance drops
-// Heroic Marks for every eligible participant (marksPerParticipant on the
-// tuning record: 1 for the five-mans, 3 for the Nythraxis raid). `recipients`
-// is the same downed-members-included snapshot handleDeath uses for XP and
-// loot rights. Each mark is its own personalFor slot (the loot pickup arm
-// grants one item per personal slot, so a single loot click takes them all)
-// and nobody can take another player's. Draws no rng, so the corpse loot
-// draw order is untouched. The daily LOCKOUT is not granted here: it covers
-// the whole owning group, credit or no credit (grantHeroicKillLockout above).
-//
-// Daily income gate: each dungeon pays a given character at most once per host
-// UTC day (delveDaily pattern), so the instance-reset farm cannot print marks.
-// The stamp lands when the personal slots are CREATED (not when looted): an
-// unlooted corpse still consumed that day's slot, like the delve first-clear
-// XP set.
+// Settle a heroic final-boss kill in one synchronous mutation. The whole group
+// owning the claim (plus anyone still inside) receives the realm-reset lockout,
+// while the death-time participation snapshot receives the configured marks.
+// A recipient already locked for this reset is not paid again. This makes the
+// authoritative lockout boundary the only income gate and removes the former
+// UTC-day mismatch. Marks go straight into inventory, so corpse cleanup, a UI
+// failure, or logout cannot persist an entitlement without its reward.
 export function awardHeroicMarks(ctx: SimContext, mob: Entity, recipients: PlayerMeta[]): void {
-  if (recipients.length === 0) return;
   const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(mob.id));
   if (!inst || inst.difficulty !== 'heroic') return;
   const tuning = HEROIC_DUNGEON_TUNING[inst.dungeonId];
   if (!tuning || mob.templateId !== tuning.finalBossId) return;
-  const loot = mob.loot ?? { copper: 0, items: [] };
-  // Death-time reward recipients are the third arm of the kill-lockout union
-  // (grantHeroicKillLockout covers the owning group and the occupants): a tap
-  // holder who left the party and the instance before the kill still walks
-  // away with the mark slot and the corpse loot rights, so they must carry the
-  // daily lockout too. Stamped before the marks daily gate below, like the
-  // pre-split code, so an already-marked recipient is still locked.
   const lockedUntil = ctx.raidResetMs(ctx.lockoutNowMs());
-  const earners: number[] = [];
-  for (const meta of recipients) {
-    lockToHeroicClaim(ctx, inst, meta, lockedUntil);
-    // `utcDay` comes from the host, never the wall clock (determinism). Both
-    // hosts stamp it (server/game.ts, main.ts); with an empty day the set
-    // simply never resets, the same semantics as delveDaily.
-    const today = ctx.utcDay;
-    if (today && meta.heroicDaily.date !== today) {
-      meta.heroicDaily = { date: today, marked: new Set() };
+  const rewardWindow = heroicRewardWindowToken(lockedUntil);
+  const rewardIds = new Set(recipients.map((meta) => meta.entityId));
+  const lockoutRecipients = new Map<number, PlayerMeta>();
+  for (const meta of instanceLockoutMetas(ctx, inst)) lockoutRecipients.set(meta.entityId, meta);
+  // A tap holder who left both party and instance before the kill remains in
+  // the death snapshot and must receive the same lockout as their reward.
+  for (const meta of recipients) lockoutRecipients.set(meta.entityId, meta);
+
+  for (const meta of lockoutRecipients.values()) {
+    const alreadyLocked = isRaidLocked(ctx, meta, heroicLockoutId(inst.dungeonId));
+    if (!alreadyLocked && rewardIds.has(meta.entityId)) {
+      ctx.addItem(HEROIC_MARK_ITEM_ID, tuning.marksPerParticipant, meta.entityId);
+      // The Book of Deeds daily circuit observes successful rewards, but it is
+      // telemetry only: the realm-reset lockout above remains the income gate.
+      if (meta.heroicDaily.date !== rewardWindow) {
+        meta.heroicDaily = { date: rewardWindow, marked: new Set() };
+      }
+      meta.heroicDaily.marked.add(inst.dungeonId);
+      ctx.markDeedsDirty(meta.entityId);
     }
-    if (meta.heroicDaily.marked.has(inst.dungeonId)) continue;
-    meta.heroicDaily.marked.add(inst.dungeonId);
-    earners.push(meta.entityId);
+    lockToHeroicClaim(ctx, inst, meta, lockedUntil);
   }
-  if (earners.length === 0) return;
-  // One shared-personal slot for the whole party: whoever loots the corpse hands
-  // every earner their marks at once, so no one has to reach the body and click
-  // their own copy. `count` is the per-participant payout (1 for a five-man, 3
-  // for the raid); the loot handler grants that many to each id in `personalFor`.
-  loot.items.push({
-    itemId: HEROIC_MARK_ITEM_ID,
-    count: tuning.marksPerParticipant,
-    personalFor: earners,
-    sharedPersonal: true,
-  });
-  mob.loot = loot;
-  mob.lootable = true;
 }
 
 export function updateInstances(ctx: SimContext): void {

@@ -41,24 +41,25 @@ them, there is nothing to audit and a full parity walk wastes a large token budg
 yourself before reading any file:
 
 1. Get the changed files only (cheap):
-   `git diff --name-only "$(git merge-base HEAD main)"..HEAD` (or `git diff --cached
+   `git diff --name-only "$(git merge-base HEAD "$(git rev-parse --abbrev-ref '@{upstream}' 2>/dev/null || echo origin/main)")"..HEAD` (or `git diff --cached
    --name-only` for staged work / `HEAD~N` skipping merge commits).
-2. You are IN SCOPE if any changed path is one of: `src/world_api.ts` (IWorld), anything
+2. You are IN SCOPE if any changed path is one of: `src/world_api.ts` or `src/world_api/**`
+   (the IWorld facets), anything
    under `src/sim/` (sim behavior / obs / `SimEvent` / types), `src/net/online.ts`
    (ClientWorld / `applyWire`), `server/game.ts` (`wireEntity` / dispatch), the i18n
    matchers `src/ui/sim_i18n.ts` or `src/ui/server_i18n.ts`, `src/ui/hud.ts` (SimEvent
-   handlers), or the RL surface (`headless/**`, `python/**`).
+   handlers), or the RL surface (`headless/**`, `python/**`). An i18n CATALOG refactor that
+   only moves `t()` keys (files under `src/ui/i18n.catalog/` / `src/ui/i18n.locales/` /
+   `src/ui/i18n.resolved.generated/`, keys unchanged) is NOT a parity surface: it is guarded
+   by the generated-bundle reproducibility tests (`tests/i18n_emit_shape.test.ts`,
+   `tests/i18n_completeness.test.ts`) and the resolved-hash harness, so do not enter scope
+   for it.
 3. EARLY EXIT: if no changed path matched, output exactly this and STOP (do not read files,
    do not build comparison tables):
 
    > **Parity / Sync Report - out of scope.** This change touches no parity surface (no
    > IWorld / `src/sim` / `ClientWorld` / `wireEntity` / `SimEvent` / sim-server i18n
-   > matcher / RL-env file). Nothing to audit. Note: an i18n *catalog* refactor that only
-   > moves `t()` keys (catalog modules under `src/ui/i18n.catalog/` plus the overlays under
-   > `src/ui/i18n.locales/`, keys unchanged; the runtime reads the generated bundles under
-   > `src/ui/i18n.resolved.generated/`) is guarded by the generated-bundle reproducibility
-   > tests (`tests/i18n_emit_shape.test.ts`, `tests/i18n_completeness.test.ts`) and the
-   > resolved-hash harness, not by parity review.
+   > matcher / RL-env file). Nothing to audit.
 
 4. Otherwise proceed, focusing only on the matched surfaces.
 
@@ -67,7 +68,7 @@ yourself before reading any file:
 - **Specific domain** ("audit the new pet feature"): focus on that domain across IWorld,
   Sim, ClientWorld, the wire fields, SimEvents, and i18n.
 - **Recent changes** ("check recent drift"): diff against an appropriate base, e.g.
-  `git diff --name-only "$(git merge-base HEAD main)"..HEAD` (or `HEAD~N` skipping merge
+  `git diff --name-only "$(git merge-base HEAD "$(git rev-parse --abbrev-ref '@{upstream}' 2>/dev/null || echo origin/main)")"..HEAD` (or `HEAD~N` skipping merge
   commits). Do not blindly use a fixed `HEAD~5`; merge commits inflate the range. Then audit
   the corresponding parity points.
 - **Full scan**: walk every row of the parity map below.
@@ -76,7 +77,7 @@ yourself before reading any file:
 
 | Concern | Source of truth | Mirror that can drift | Seam / guard |
 |--------|-----------------|-----------------------|--------------|
-| IWorld surface | `src/sim/sim.ts` (implements directly) | `src/net/online.ts` `ClientWorld` | `src/world_api.ts` (`tsc`) |
+| IWorld surface | `src/sim/sim.ts` (implements directly) | `src/net/online.ts` `ClientWorld` | `src/world_api.ts` (`tsc`) + `tests/world_api_parity.test.ts` (the `IWORLD_MEMBERS` pin: presence + same-kind on both worlds; new members land in the matching `src/world_api/<facet>.ts` and update the pin in the same change) |
 | Entity / self snapshot | `server/game.ts` `wireEntity` / `selfWireJson` | `src/net/online.ts` `applyWire` / `applySnapshot` | wire JSON shape |
 | Per-player events | `SimEvent` union in `src/sim/types.ts`, emitted in sim/server | `src/ui/hud.ts` event handlers (FCT/log/toasts) | `pid` = personal |
 | Client commands | `src/net/online.ts` `cmd({...})` senders | `server/game.ts` command dispatch | command name string |
@@ -137,16 +138,11 @@ For every new or changed member of the `SimEvent` union (`src/sim/types.ts`):
 - Run `npx vitest run tests/localization_fixes.test.ts` and read the result. If S3 (or any
   guard) fails, surface the exact failing emit string and which matcher table needs the
   key/RULE. Do not just say "tests fail".
-- Locale completeness is no longer an eager `translations` map: only `en` is static-imported
-  and the dense locales load lazily from the generated bundles, with overlays as partial maps.
-  A missing non-English fill is English-filled at build and marked `pending`; the PR tier
-  allows English-only and the release tier (`I18N_RELEASE_TIER=1`) hard-fails on a `pending`
-  row. One always-on exception (M16): a new *wordy* English value (a run of 4+ consecutive
-  lowercase letters) also needs its five non-Latin fills (`zh_CN`/`zh_TW`/`ja_JP`/`ko_KR`/
-  `ru_RU`) in the same change, or `tests/i18n_completeness.test.ts` reds even at PR tier (the
-  maintainer normally adds them at merge). For key/placeholder parity run
-  `npx vitest run tests/i18n_completeness.test.ts tests/i18n_emit_shape.test.ts`;
-  `npx tsc --noEmit` still type-checks the emit/catalog shape against the English catalog.
+- Locale completeness: run
+  `npx vitest run tests/i18n_completeness.test.ts tests/i18n_emit_shape.test.ts` and report
+  the real result; `npx tsc --noEmit` type-checks the emit/catalog shape against the English
+  catalog. The pending-row model and the M16 wordy-English rule live in `src/ui/CLAUDE.md`;
+  do not flag a missing non-English fill beyond what those tests red on.
 - Numbers, money, and dates must go through `formatNumber` / `formatMoney` / `formatDateTime`
   rather than raw string building.
 
@@ -159,7 +155,8 @@ For every new or changed member of the `SimEvent` union (`src/sim/types.ts`):
   DOM/Three.js import - that breaks the "runs unchanged in Node" invariant and the env host.
 - Run the sim-purity guard and report its real status: `npx vitest run tests/architecture.test.ts`
   (it scans every `src/sim/` file for the forbidden imports and for
-  `Math.random`/`Date.now`/`performance.now`).
+  `Math.random`/`Date.now`/`performance.now`). For any IWorld surface change, also run
+  `npx vitest run tests/world_api_parity.test.ts` (the `IWORLD_MEMBERS` pin) and report it.
 - Note: game-system logic may now live in `src/sim/<system>/` modules behind the `SimContext`
   seam (`src/sim/sim_context.ts`), but `Sim` still satisfies `IWorld` from `src/sim/sim.ts`, so
   the parity surface is unchanged. The move-not-rewrite / draw-order audit of those modules is

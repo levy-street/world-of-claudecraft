@@ -16,8 +16,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 406,
-      "state": "6e73f95b",
+      "nextId": 409,
+      "state": "6bd4c62d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -43,9 +43,18 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 408,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -80,7 +89,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 405,
+          "id": 408,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -123,9 +132,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 406,
-      "state": "08ea24c7",
-      "events": "9cfda0e2",
+      "nextId": 409,
+      "state": "da75b1ab",
+      "events": "977a17cf",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -134,8 +143,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 406,
-      "state": "07cb4b9f",
+      "nextId": 409,
+      "state": "dc359b6b",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -145,8 +154,8 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 406,
-      "state": "734759e1",
+      "nextId": 409,
+      "state": "c3decc9d",
       "events": "741638a5",
       "rng": {
         "draws": 75,
@@ -156,8 +165,8 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 406,
-      "state": "734759e1",
+      "nextId": 409,
+      "state": "c3decc9d",
       "events": "741638a5",
       "rng": {
         "draws": 75,
@@ -183,9 +192,27 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "worn_sword"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_well_rested",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 408,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -201,6 +228,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "renown": 5,
           "restedXp": 0.125,
           "talents": {
             "choices": {},
@@ -221,7 +249,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102,
           "hp": 90,
-          "id": 405,
+          "id": 408,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -264,9 +292,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 406,
-      "state": "401be428",
-      "events": "57500f83",
+      "nextId": 409,
+      "state": "d02ae080",
+      "events": "7fd0fd5c",
       "rng": {
         "draws": 75,
         "digest": "cc652885"
@@ -293,9 +321,27 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "worn_sword"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_well_rested",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 408,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -312,6 +358,7 @@
           "lifetimeXp": 160,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "renown": 5,
           "restedXp": 920,
           "talents": {
             "choices": {},
@@ -333,7 +380,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102,
           "hp": 90,
-          "id": 405,
+          "id": 408,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -376,9 +423,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 406,
-      "state": "ee9838cd",
-      "events": "3f3f4747",
+      "nextId": 409,
+      "state": "bdfe51ed",
+      "events": "9e92923f",
       "rng": {
         "draws": 75,
         "digest": "cc652885"
@@ -406,9 +453,27 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "worn_sword"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_well_rested",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 408,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -425,6 +490,7 @@
           "lifetimeXp": 610,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "renown": 5,
           "restedXp": 920,
           "talents": {
             "choices": {},
@@ -446,7 +512,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102,
           "hp": 128,
-          "id": 405,
+          "id": 408,
           "kind": "player",
           "level": 2,
           "lootFfaTimer": "Infinity",
@@ -489,9 +555,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 406,
-      "state": "16417699",
-      "events": "1721c475",
+      "nextId": 409,
+      "state": "f6b05a65",
+      "events": "2896a35f",
       "rng": {
         "draws": 75,
         "digest": "cc652885"
@@ -519,9 +585,27 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "worn_sword"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_well_rested",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 408,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -538,6 +622,7 @@
           "lifetimeXp": 190400,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "renown": 5,
           "restedXp": 920,
           "talents": {
             "choices": {},
@@ -559,7 +644,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102,
           "hp": 812,
-          "id": 405,
+          "id": 408,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -602,9 +687,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 406,
-      "state": "27d914e2",
-      "events": "553bfaee",
+      "nextId": 409,
+      "state": "43216972",
+      "events": "41ed0fe7",
       "rng": {
         "draws": 75,
         "digest": "cc652885"
@@ -632,9 +717,27 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "worn_sword"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_well_rested",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 408,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -652,6 +755,7 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "prestigeRank": 1,
+          "renown": 5,
           "restedXp": 920,
           "talents": {
             "choices": {},
@@ -672,7 +776,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102,
           "hp": 812,
-          "id": 405,
+          "id": 408,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -715,8 +819,8 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 406,
-      "state": "27d914e2",
+      "nextId": 409,
+      "state": "43216972",
       "events": "741638a5",
       "rng": {
         "draws": 75,
@@ -745,9 +849,27 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "worn_sword"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_well_rested",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 408,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -765,6 +887,7 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "prestigeRank": 1,
+          "renown": 5,
           "restedXp": 920,
           "talents": {
             "choices": {},
@@ -785,7 +908,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102,
           "hp": 812,
-          "id": 405,
+          "id": 408,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -828,8 +951,8 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 406,
-      "state": "27d914e2",
+      "nextId": 409,
+      "state": "43216972",
       "events": "741638a5",
       "rng": {
         "draws": 75,
@@ -858,9 +981,27 @@
           },
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "worn_sword"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_well_rested",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 405,
+          "entityId": 408,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -878,6 +1019,7 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "prestigeRank": 1,
+          "renown": 5,
           "restedXp": 920,
           "talents": {
             "choices": {},
@@ -898,7 +1040,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102,
           "hp": 812,
-          "id": 405,
+          "id": 408,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",

@@ -39,6 +39,7 @@ import {
   MOBS,
   resolveDelveShopOffers,
 } from '../data';
+import * as deedsMod from '../deeds';
 import {
   DELVE_MODULE_LAYOUTS,
   type DelveModuleId,
@@ -181,6 +182,10 @@ export function clampDelveModuleBounds(
   const moduleId = run.modules[run.moduleIndex] as DelveModuleId;
   const layout = DELVE_MODULE_LAYOUTS[moduleId];
   if (!layout) return { x, z };
+  // Irregular Litany rooms are already enclosed by their exact polygon-shell
+  // OBBs. Applying the legacy rectangular clamp as well creates invisible
+  // walls across every lobe that extends beyond layout.wallX/zMin/zMax.
+  if (layout.shellPolygon?.length) return { x, z };
   const wallX = layout.wallX ?? DUNGEON_WALL_X;
   const halfX = wallX - DUNGEON_WALL_HW - r; // inner wall face minus body radius
   const zBase = delveModuleZOffset(run);
@@ -395,6 +400,9 @@ export function enterDelve(ctx: SimContext, delveId: string, tierId: string, pid
   p.targetId = null;
   p.autoAttack = false;
   run.emptyFor = 0;
+  // Whole-run roster watermark, taken after the teleport so the count includes
+  // this player; it only ever grows for the life of the run.
+  run.deedMaxParty = Math.max(run.deedMaxParty ?? 0, ctx.partyMembersForKey(key).length);
   if (key.startsWith('solo:') && delve.autoCompanionId && !run.companion) {
     ctx.spawnDelveCompanion(run, r.meta.entityId, delve.autoCompanionId);
   }
@@ -448,6 +456,7 @@ export function claimDelveRun(
   run.completed = false;
   run.emptyFor = 0;
   run.deathsThisRun = {};
+  run.deedMaxParty = 0;
   run.objectState = {};
   run.raiseDeadChannel = null;
   run.restlessPending = [];
@@ -564,6 +573,7 @@ export function freeDelveRun(ctx: SimContext, run: DelveRun): void {
   run.completed = false;
   run.emptyFor = 0;
   run.deathsThisRun = {};
+  run.deedMaxParty = 0;
   run.objectState = {};
   run.raiseDeadChannel = null;
   run.restlessPending = [];
@@ -761,6 +771,9 @@ export function grantDelveClearTo(
   );
   meta.copper += copper;
   unlockNextDelveLore(ctx, meta, pid);
+  // Clear predicates re-check; a heroic run whose watermark never saw a second
+  // player is the solo task.
+  deedsMod.onDelveClearForDeeds(ctx, meta, run);
   ctx.maybeCompanionBark(run, pid, 'completion');
   restorePetFromDelveStash(ctx, pid);
   ctx.emit({ type: 'delveComplete', delveId: run.delveId, tierId: run.tierId, pid });
@@ -1254,6 +1267,7 @@ export function startDelveRaiseDeadChannel(
     text: `${boss.name} begins Raise Dead.`,
     color: '#f96',
     entityId: boss.id,
+    telegraph: true,
   });
   return true;
 }
@@ -1519,6 +1533,8 @@ export function companionUpgrade(ctx: SimContext, companionId: string, pid?: num
   r.meta.delveMarks -= cost.marks;
   r.meta.copper -= cost.copper;
   r.meta.companionUpgrades[companionId] = next;
+  // Companion-rank predicates read this map; re-evaluate on the next pass.
+  ctx.markDeedsDirty(r.meta.entityId);
   ctx.emit({
     type: 'log',
     text: `${def.name} reaches rank ${next}.`,

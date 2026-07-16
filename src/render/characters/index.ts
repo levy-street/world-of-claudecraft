@@ -9,7 +9,7 @@ import { CharacterVisual } from './visual';
 export { CharacterPreview } from './preview';
 export type { PreviewAppearance } from './preview_appearance';
 export type { AnimState } from './visual';
-export { CharacterVisual } from './visual';
+export { CharacterVisual, setWeaponVfxViewportHeight } from './visual';
 
 /** Build the visual for an entity (or an explicit shapeshift/polymorph form key). */
 export function createCharacterVisual(

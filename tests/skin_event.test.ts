@@ -1,9 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { Sim } from '../src/sim/sim';
-import {
-  EVENT_SKIN_TIERS, EVENT_SKIN_TOKEN_ID, MECH_CHROMAS, SKIN_COUNTS, SKIN_RANK_ROLL_WEIGHTS, SKIN_RANKS, mechChromaItemId, rankAllowsSkin, rollSkinRank,
-} from '../src/sim/content/skins';
 import { SKINS } from '../src/render/characters/manifest';
+import {
+  EVENT_SKIN_TIERS,
+  EVENT_SKIN_TOKEN_ID,
+  MECH_CHROMAS,
+  mechChromaItemId,
+  rankAllowsSkin,
+  rollSkinRank,
+  SKIN_COUNTS,
+  SKIN_RANK_ROLL_WEIGHTS,
+  SKIN_RANKS,
+} from '../src/sim/content/skins';
+import { Sim } from '../src/sim/sim';
 import type { PlayerClass, SimEvent, SkinRank } from '../src/sim/types';
 
 type SkinEvent = Extract<SimEvent, { type: 'skinEvent' }>;
@@ -130,7 +138,9 @@ describe('cosmetic skin-select event', () => {
 
   it('returns a non-vendorable, non-discardable, non-marketable mech cosmetic item when unequipped', () => {
     const sim = new Sim({ seed: 1, playerClass: 'shaman', playerName: 'Seller' });
-    const merchant = [...sim.entities.values()].find((e) => e.kind === 'npc' && e.templateId === 'the_merchant');
+    const merchant = [...sim.entities.values()].find(
+      (e) => e.kind === 'npc' && e.templateId === 'the_merchant',
+    );
     if (!merchant) throw new Error('merchant not found');
     const pos = sim.groundPos(merchant.pos.x, merchant.pos.z);
     sim.player.pos = { ...pos };
@@ -147,7 +157,9 @@ describe('cosmetic skin-select event', () => {
     sim.marketList('amber_crimson_armor_plate', 1, 100);
 
     expect(sim.countItem('amber_crimson_armor_plate')).toBe(1);
-    expect(sim.marketListings.some((listing) => listing.itemId === 'amber_crimson_armor_plate')).toBe(false);
+    expect(
+      sim.marketListings.some((listing) => listing.itemId === 'amber_crimson_armor_plate'),
+    ).toBe(false);
   });
 
   it('returns and reuses a specific item for every mech chroma', () => {
@@ -156,7 +168,12 @@ describe('cosmetic skin-select event', () => {
       expect(itemId, chroma.id).toBeTruthy();
 
       const sim = new Sim({ seed: 1, playerClass: 'shaman', playerName: `Mech-${chroma.id}` });
-      sim.accountCosmetics = { completedQuestIds: [], mechChromaIds: [chroma.id] };
+      sim.accountCosmetics = {
+        completedQuestIds: [],
+        mechChromaIds: [chroma.id],
+        weaponSkinIds: [],
+        weaponSkinLoadout: {},
+      };
       expect((sim as any).unequipMechChroma(chroma.id)).toBe(true);
       expect(sim.accountCosmetics.mechChromaIds).not.toContain(chroma.id);
       expect(sim.countItem(itemId!)).toBe(1);

@@ -23,16 +23,19 @@ import { ITEMS } from '../sim/data';
 import type { EquipSlot } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { buildPaperdollView, type PaperdollSlot } from './char_view';
+import { markDialogRoot } from './dialog_root';
 import { classDisplayName, itemDisplayName } from './entity_i18n';
+import { dropRequiredLevel, paperdollDropAction } from './equip_drop_core';
 import { esc } from './esc';
 import { buildGatheringProficiencyRows } from './gathering_view';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { iconDataUrl, QUALITY_COLOR } from './icons';
+import type { ItemDragState } from './item_drag_state';
 import type { PainterHostPresentation } from './painter_host';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
+import { tSim } from './sim_i18n';
 import type { StatId } from './stat_tooltip';
-import { renderWindowFrame, type WindowFrameParts } from './window_frame';
-import type { WindowFrameDescriptor } from './window_frame_view';
+import { svgIcon } from './ui_icons';
 
 // Quality / empty-slot colors as CSS custom properties: the shared
 // QUALITY_COLOR map carries the per-quality hex, and these tokens cover the
@@ -76,7 +79,7 @@ export function hobbyCraftText(craftId: string | null): string {
   return t(key ?? 'hudChrome.archetypeTitle.none');
 }
 
-// The ten character-sheet stat cells, primaries down the left column and derived
+// The character-sheet stat cells, primaries down the left column and derived
 // stats down the right (the CSS grid wraps two per row). The HUD builds each cell
 // from the unit-tested stat_tooltip_view model, so the order is the only stat
 // concern this painter owns.
@@ -94,6 +97,8 @@ const STAT_GRID: readonly StatId[] = [
   'spellPower',
   'critRating',
   'hasteRating',
+  'hitRating',
+  'warfare',
 ];
 
 /**
@@ -128,6 +133,15 @@ export interface CharWindowDeps extends PainterHostPresentation {
   renderSkinPicker(): void;
   openPlayerCard(): void;
   openPrestige(): void;
+  /** Open the Book of Deeds (the active-title line's button). */
+  openDeeds(): void;
+  /** The shared in-flight bag-item drag (published by the bags grid). The paperdoll
+   *  sockets read it during dragover, where the DataTransfer payload is unreadable. */
+  dragState: ItemDragState;
+  /** Repaint the bags grid after a drop equipped a piece out of it. */
+  renderBags(): void;
+  /** Refusal toast for a drop the socket will not take. */
+  showError(text: string): void;
 }
 
 // Maps each gathering profession id to its hud_chrome display-name key (issue 1124).
@@ -143,40 +157,10 @@ const GATHERING_PROFESSION_LABEL_KEY: Record<
 const SHARE_GLYPH =
   '<svg class="pc-share-ico" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M18 16.1a3 3 0 0 0-2.3 1.1l-6.7-3.9a3 3 0 0 0 0-2.6l6.7-3.9A3 3 0 1 0 15 4l-6.7 3.9a3 3 0 1 0 0 8.2L15 20a3 3 0 1 0 3-3.9z"/></svg>';
 
-// The character sheet is a closable, footer-less frame: the paperdoll + stats
-// two-pane, the class identity strip, and the share row all render as sections of
-// one scrollable body. The title reuses the existing "Character" action label and
-// the close reuses the returnToGame key (no new i18n keys). The frame IS the dialog
-// (role + aria-labelledby on the inner mount), so the module no longer marks the
-// shared #char-window root as a dialog.
-const CHAR_FRAME: WindowFrameDescriptor = {
-  id: 'char-window',
-  titleKey: 'hud.keybinds.actions.char',
-  closeLabelKey: 'hud.options.returnToGame',
-};
-
 export class CharWindow {
   private openerFocus: HTMLElement | null = null;
 
   constructor(private readonly deps: CharWindowDeps) {}
-
-  /**
-   * Stamp the shared window frame cold at first open, then reuse it. The frame
-   * mounts on an INNER container (never on the shared #char-window root), so the
-   * root stays a pristine `.window.panel`: the id-scoped viewport clamp, the
-   * resize grip (window_resize.ts targets the root), and the mobile inset rules
-   * keep matching it. An intact mounted frame (its body present) is the reuse
-   * marker; only the body repaints per render.
-   */
-  private ensureFrame(el: HTMLElement): WindowFrameParts {
-    const mounted = el.querySelector<HTMLElement>(':scope > .window-frame');
-    const body = mounted?.querySelector<HTMLElement>('.window-body');
-    if (mounted && body) return { root: mounted, body, footer: null, tabButtons: [] };
-    const mount = document.createElement('div');
-    const parts = renderWindowFrame(mount, CHAR_FRAME, { onClose: () => this.close() });
-    el.replaceChildren(mount);
-    return parts;
-  }
 
   get isOpen(): boolean {
     return this.deps.root().style.display === 'block';
@@ -212,20 +196,15 @@ export class CharWindow {
     const p = world.player;
     const className = classDisplayName(world.cfg.playerClass);
     const level = formatNumber(p.level, { maximumFractionDigits: 0 });
-    // The shared frame carries the dialog role + aria-labelledby (its "Character"
-    // title); the body repaints below. The close routes to this.close() via the
-    // frame's onClose, wired once when the frame is stamped cold.
-    const { body } = this.ensureFrame(el);
+    // WCAG 2.2 AA: name the focus-trapped root via the character title span.
+    markDialogRoot(el, { labelledBy: 'char-title' });
     const archetypeTitle = archetypeTitleText(world.archetypeTitle);
     const hobbyCraft = hobbyCraftText(world.hobbyCraft);
     const hobbyRow =
       world.hobbyCraft !== null
         ? `<span class="panel-subtitle char-hobby-craft">${esc(t('hudChrome.archetypeTitle.hobbyLabel'))}: ${esc(hobbyCraft)}</span>`
         : '';
-    // The class identity strip (portrait + name + level/class/archetype/hobby): the
-    // former sticky .panel-title header content, now the first body row under the
-    // frame titlebar (the close moved to the frame).
-    let html = `<div class="char-identity">${portraitChipHtml({ cls: world.cfg.playerClass, skin: p.skin ?? 0, name: p.name, variant: 'md' })}<span class="char-title-text" id="char-title">${esc(p.name)} <span class="panel-subtitle">${esc(t('itemUi.equipment.levelClass', { level, className }))}</span><span class="panel-subtitle char-archetype-title">${esc(t('hudChrome.archetypeTitle.label'))}: ${esc(archetypeTitle)}</span>${hobbyRow}</span></div>`;
+    let html = `<div class="panel-title char-title-portrait">${portraitChipHtml({ cls: world.cfg.playerClass, skin: p.skin ?? 0, name: p.name, variant: 'md' })}<span class="char-title-text" id="char-title">${esc(p.name)} <span class="panel-subtitle">${esc(t('itemUi.equipment.levelClass', { level, className }))}</span><span class="panel-subtitle char-archetype-title">${esc(t('hudChrome.archetypeTitle.label'))}: ${esc(archetypeTitle)}</span>${hobbyRow}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
     html += `<div class="paperdoll">
       <div class="equip-col" id="equip-col-left"></div>
       <div class="char-model-panel">
@@ -239,23 +218,27 @@ export class CharWindow {
     html += this.deps.progressionHtml(p.level);
     html += this.gatheringHtml(world);
     html += `<div class="pc-share-row"><button type="button" class="btn pc-share-btn" data-act="share-card">${SHARE_GLYPH}<span>${esc(t('playerCard.shareButton'))}</span></button></div>`;
-    body.innerHTML = html;
-    hydratePortraits(body);
-    body
-      .querySelector('[data-act="prestige"]')
-      ?.addEventListener('click', () => this.deps.openPrestige());
-    body.querySelector('[data-act="share-card"]')?.addEventListener('click', () => {
+    el.innerHTML = html;
+    hydratePortraits(el);
+    el.querySelector('[data-act="prestige"]')?.addEventListener('click', () =>
+      this.deps.openPrestige(),
+    );
+    el.querySelector('[data-act="open-deeds"]')?.addEventListener('click', () => {
+      audio.click();
+      this.deps.openDeeds();
+    });
+    el.querySelector('[data-act="share-card"]')?.addEventListener('click', () => {
       audio.click();
       this.deps.openPlayerCard();
     });
 
     const view = buildPaperdollView(world.equipment, ITEMS);
-    const leftCol = body.querySelector('#equip-col-left');
-    const rightCol = body.querySelector('#equip-col-right');
+    const leftCol = el.querySelector('#equip-col-left');
+    const rightCol = el.querySelector('#equip-col-right');
     for (const cell of view.left) leftCol?.appendChild(this.buildSlotRow(cell));
     for (const cell of view.right) rightCol?.appendChild(this.buildSlotRow(cell));
 
-    for (const cell of body.querySelectorAll<HTMLElement>('.char-stats [data-stat]')) {
+    for (const cell of el.querySelectorAll<HTMLElement>('.char-stats [data-stat]')) {
       const stat = cell.dataset.stat as StatId;
       // Resolve the tooltip lazily, on show, so the breakdown reflects the
       // player's current stats at the moment they hover, not at render time.
@@ -264,6 +247,7 @@ export class CharWindow {
 
     this.deps.renderPreview();
     this.deps.renderSkinPicker();
+    el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
   }
 
   // The "Gathering" section (issue 1124): one row per gathering profession, showing
@@ -288,6 +272,10 @@ export class CharWindow {
     // back to this slot (the rebuilt row may be empty, with no x to focus).
     row.id = `equip-slot-${slot}`;
     row.tabIndex = -1;
+    // The socket's equipment key, read by BOTH drop arms: the HTML5 drop below and
+    // the touch hit test (item_drop_hit_test.ts), which has no drop event to read.
+    row.dataset.equipSlot = slot;
+    this.bindEquipDropTarget(row, slot);
     const qColor = !item
       ? SLOT_EMPTY_TEXT_COLOR
       : (QUALITY_COLOR[item.quality ?? 'common'] ?? QUALITY_DEFAULT_COLOR);
@@ -335,6 +323,81 @@ export class CharWindow {
       row.addEventListener('contextmenu', (ev) => ev.preventDefault());
     }
     return row;
+  }
+
+  /** Equip a bag stack into the exact socket it was dropped on (both drag arms land
+   *  here). The refusals are pre-empted client-side with the sim's OWN wording
+   *  (tSim), so no doomed command is sent and the toast reads identically to the
+   *  authoritative one the server would emit; the sim re-validates regardless. */
+  dropOnEquipSlot(itemId: string, slot: EquipSlot): void {
+    const item = ITEMS[itemId];
+    if (!item) return;
+    const world = this.deps.world();
+    switch (paperdollDropAction(item, slot, world.cfg.playerClass, world.player.level)) {
+      case 'blockedSlot':
+        this.deps.showError(tSim('error.wrongEquipSlot'));
+        return;
+      case 'blockedClass':
+        this.deps.showError(tSim('error.cannotEquip'));
+        return;
+      case 'blockedLevel':
+        this.deps.showError(
+          tSim('error.equipLevel', {
+            level: formatNumber(dropRequiredLevel(item), { maximumFractionDigits: 0 }),
+          }),
+        );
+        return;
+      case 'equip':
+        world.equipItemToSlot(itemId, slot);
+        audio.click();
+        this.deps.hideTooltip();
+        this.deps.renderBags();
+        this.renderIfOpen();
+    }
+  }
+
+  /** Light up every socket that would ACCEPT the stack in flight (null clears them).
+   *  Only the accepting sockets light: the feedback is the same pure decision the
+   *  drop itself runs, so a lit socket always takes the piece. */
+  markDropTargets(itemId: string | null): void {
+    const el = this.deps.root();
+    const world = this.deps.world();
+    const item = itemId ? ITEMS[itemId] : undefined;
+    for (const row of el.querySelectorAll<HTMLElement>('.equip-slot[data-equip-slot]')) {
+      const slot = row.dataset.equipSlot as EquipSlot | undefined;
+      const accepts =
+        !!item &&
+        !!slot &&
+        paperdollDropAction(item, slot, world.cfg.playerClass, world.player.level) === 'equip';
+      row.classList.toggle('drop-target', accepts);
+    }
+  }
+
+  // A paperdoll socket as a drop target for a bag stack: dragover accepts only what
+  // the socket would really take (so the cursor never promises an equip the drop
+  // then refuses), and the drop routes into the one shared dropOnEquipSlot.
+  private bindEquipDropTarget(row: HTMLElement, slot: EquipSlot): void {
+    row.addEventListener('dragover', (e) => {
+      const drag = this.deps.dragState.get();
+      if (!drag) return;
+      const item = ITEMS[drag.itemId];
+      const world = this.deps.world();
+      if (
+        !item ||
+        paperdollDropAction(item, slot, world.cfg.playerClass, world.player.level) !== 'equip'
+      )
+        return;
+      e.preventDefault();
+      if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+    });
+    row.addEventListener('drop', (e) => {
+      const drag = this.deps.dragState.get();
+      if (!drag) return;
+      e.preventDefault();
+      this.deps.dragState.end();
+      this.markDropTargets(null);
+      this.dropOnEquipSlot(drag.itemId, slot);
+    });
   }
 
   // `keepFocus` hands focus back to the now-empty slot row after the unequip

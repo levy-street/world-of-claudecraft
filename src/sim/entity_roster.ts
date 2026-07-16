@@ -82,6 +82,16 @@ export function dropEntityFromRoster(ctx: SimContext, id: number): void {
   ctx.clearEntityMarker(id); // a despawned entity keeps no raid marker
   const e = ctx.entities.get(id);
   if (!e) return;
+  // A despawned mob keeps no per-attempt Book of Deeds state: freeInstance,
+  // freeDelveRun, and spawnDelveModule drop boss mobs without a kill, so a leaked
+  // encounter/taint entry (entity ids are monotonic and never reused) would linger
+  // and be re-scanned by the 1 Hz sweep forever. bloatPending is deliberately NOT
+  // cleared here: its delayed death-throes blast may still resolve against the
+  // already-dropped corpse.
+  if (e.kind === 'mob') {
+    ctx.deedRuntime.encounters.delete(id);
+    ctx.deedRuntime.menderTainted.delete(id);
+  }
   ctx.grid.remove(e);
   if (e.kind === 'player') ctx.playerGrid.remove(e);
   ctx.entities.delete(id);

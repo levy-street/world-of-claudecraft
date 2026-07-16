@@ -33,6 +33,7 @@ import {
   vcNation,
 } from '../content/vale_cup';
 import { abilitiesKnownAt, DUNGEON_X_THRESHOLD, MOBS, NPCS } from '../data';
+import * as deedsMod from '../deeds';
 import { createMob, createNpc, recalcPlayerStats } from '../entity';
 import { restorePetFromDelveStash, stowPetForDelve } from '../pet/pet_commands';
 import type { PlayerMeta } from '../sim';
@@ -1045,6 +1046,19 @@ function onGoal(ctx: SimContext, match: VcMatch, scoringTeam: 'A' | 'B'): void {
     x: c.x,
     z: c.z,
   });
+  // Deed credit mirrors the scorer banner: the scoring team's last kicker
+  // within the kick window, else its last toucher; an own goal credits nobody.
+  // Must resolve here, before resetBallToCenter wipes the attribution.
+  const ball = match.ball;
+  let scorerPid: number | null = null;
+  if (ball) {
+    if (ball.lastKickTeam === scoringTeam && ctx.time - ball.lastKickAt <= VC_SCORER_KICK_WINDOW) {
+      scorerPid = ball.lastKickPid ?? null;
+    } else if (ball.lastTouchTeam === scoringTeam) {
+      scorerPid = ball.lastTouchPid ?? null;
+    }
+  }
+  deedsMod.onCupGoalForDeeds(ctx, match, scoringTeam, scorerPid);
   // 'A' scores into the EAST goal; the ball settles in that pocket.
   match.pocket = scoringTeam === 'A' ? 'east' : 'west';
   match.kickoffTeam = scoringTeam === 'A' ? 'B' : 'A';
@@ -1103,6 +1117,8 @@ function applyStanding(ctx: SimContext, match: VcMatch, winner: 'A' | 'B' | null
         creditGuildResult(ctx, match, pid, 'loss');
       }
       match.resolved.add(pid);
+      // The standing just moved and roles/scores are final: deed credit now.
+      deedsMod.onCupStandingForDeeds(ctx, match, pid, team, winner);
     }
   }
 }
@@ -1206,6 +1222,9 @@ export function endCupMatch(ctx: SimContext, match: VcMatch, winner: 'A' | 'B' |
       pid,
     });
   }
+  // Seated fighters with a recorded personal touch see the match out; also
+  // drops the per-match deed memory.
+  deedsMod.onCupMatchEndForDeeds(ctx, match);
   match.phase = 'over';
   match.timer = VC_OVER_DELAY;
 }
@@ -1363,6 +1382,7 @@ export function vcupBallKick(
   ball.lastKickAt = ctx.time;
   ball.lastTouchPid = caster.id;
   ball.lastTouchTeam = team;
+  deedsMod.onCupTouchForDeeds(ctx, match, caster.id);
   writeBallEntity(ctx, ball);
 }
 
@@ -1374,6 +1394,7 @@ function gripBall(ctx: SimContext, match: VcMatch, keeper: Entity, team: 'A' | '
   if (towardOwnGoal > VC_SAVE_SHOT_SPEED) {
     const name = ctx.players.get(keeper.id)?.name ?? '';
     ctx.emit({ type: 'vcupSave', keeperName: name, x: keeper.pos.x, z: keeper.pos.z });
+    deedsMod.onCupSaveForDeeds(ctx, match, keeper.id);
   }
   ball.holderPid = keeper.id;
   ball.holdUntil = ctx.time + VC_GRIP_HOLD;
@@ -1382,6 +1403,7 @@ function gripBall(ctx: SimContext, match: VcMatch, keeper: Entity, team: 'A' | '
   ball.vz = 0;
   ball.lastTouchPid = keeper.id;
   ball.lastTouchTeam = team;
+  deedsMod.onCupTouchForDeeds(ctx, match, keeper.id);
 }
 
 export function vcupSportDash(
@@ -1549,6 +1571,7 @@ export function vcupBallPass(
   ball.lastKickAt = ctx.time;
   ball.lastTouchPid = caster.id;
   ball.lastTouchTeam = team;
+  deedsMod.onCupTouchForDeeds(ctx, match, caster.id);
   writeBallEntity(ctx, ball);
 }
 
@@ -1617,6 +1640,7 @@ export function vcupShoot(
   ball.lastKickAt = ctx.time;
   ball.lastTouchPid = caster.id;
   ball.lastTouchTeam = team;
+  deedsMod.onCupTouchForDeeds(ctx, match, caster.id);
   writeBallEntity(ctx, ball);
 }
 
@@ -1717,6 +1741,7 @@ function updateBallContacts(ctx: SimContext, match: VcMatch): void {
       ) {
         ball.lastTouchPid = pid;
         ball.lastTouchTeam = team;
+        deedsMod.onCupTouchForDeeds(ctx, match, pid);
         continue;
       }
       // Dribbling: running into the ball carries it along.
@@ -1724,6 +1749,7 @@ function updateBallContacts(ctx: SimContext, match: VcMatch): void {
         if (applyDribbleNudge(ball, e.pos.x - e.prevPos.x, e.pos.z - e.prevPos.z)) {
           ball.lastTouchPid = pid;
           ball.lastTouchTeam = team;
+          deedsMod.onCupTouchForDeeds(ctx, match, pid);
         }
       }
     }

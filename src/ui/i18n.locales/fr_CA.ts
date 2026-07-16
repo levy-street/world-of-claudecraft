@@ -5,7 +5,7 @@
 // therefore carries ONLY the keys whose value differs from fr_FR; every other key is
 // intentionally omitted. A key must NOT be re-added with a value equal to fr_FR
 // (redundant duplication). Every key here must be a real `en` leaf
-// path (tests/i18n_overlay_key_membership.test.ts + the byte gate). Keys are in `en`'s
+// path (the flat TranslationKey union type + the byte gate). Keys are in `en`'s
 // leaf order.
 
 import type { TranslationKey } from '../i18n.catalog';
@@ -236,4 +236,6 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.school.shadow': 'ombre',
   'hudChrome.auraEffect.school.holy': 'sacré',
   'hudChrome.auraEffect.school.nature': 'nature',
+  'guide.deedsPage.cat.delve': 'Excavations',
+  'hudChrome.deeds.catDelve': 'Excavations',
 };

@@ -57,6 +57,7 @@ const FRIENDLY_NPC_REJECTED_AURA_KINDS: ReadonlySet<AuraKind> = new Set([
   'polymorph',
   'attackspeed',
   'sunder',
+  'bleed_vuln',
   'corrode',
   'faerie_fire',
   'spellvuln',
@@ -70,6 +71,10 @@ export function isRejectedFriendlyNpcAura(aura: Aura): boolean {
   return FRIENDLY_NPC_REJECTED_AURA_KINDS.has(aura.kind);
 }
 
+function pctValue(value: number): number {
+  return value > 1 ? value / 100 : value;
+}
+
 export function updateRegen(ctx: SimContext, p: Entity, _meta: PlayerMeta): void {
   if (ctx.tickCount % 40 !== 0) return; // every 2 seconds (the classic tick)
   if (p.resourceType === 'mana') {
@@ -81,7 +86,10 @@ export function updateRegen(ctx: SimContext, p: Entity, _meta: PlayerMeta): void
       p.resource = Math.min(p.maxResource, p.resource + Math.round(regen));
     }
   } else if (p.resourceType === 'energy') {
-    p.resource = Math.min(p.maxResource, p.resource + 20);
+    // Feral Instinct (cat form) grants a buff_energyregen aura (value = fraction, 1 = +100%).
+    let regen = 20;
+    for (const a of p.auras) if (a.kind === 'buff_energyregen') regen *= 1 + a.value;
+    p.resource = Math.min(p.maxResource, p.resource + Math.round(regen));
   } else if (p.resourceType === 'rage' && !p.inCombat) {
     p.resource = Math.max(0, p.resource - 2);
   }
@@ -171,14 +179,22 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
           // remains a talent-balance change, not a PvE difficulty bump. The roll is still
           // drawn unconditionally (chance(0) consumes one rng value), so the draw order is
           // identical whatever the source; a mob roll simply never lands.
-          const amount = periodicTickAmount(a, src);
+          let tickDamage = periodicTickAmount(a, src);
+          if (a.school === 'physical') {
+            let bleedAmp = 0;
+            for (const targetAura of e.auras) {
+              if (targetAura.kind === 'bleed_vuln') bleedAmp += pctValue(targetAura.value);
+            }
+            if (bleedAmp > 0) tickDamage = Math.round(tickDamage * (1 + bleedAmp));
+          }
           const crit = ctx.rng.chance(
             src?.kind === 'player' ? periodicCritChance(a, src, ctx.spellCrit) : 0,
           );
+          const dealt = crit ? Math.round(tickDamage * periodicCritMult(a)) : tickDamage;
           ctx.dealDamage(
             src,
             e,
-            crit ? Math.round(amount * periodicCritMult(a)) : amount,
+            dealt,
             crit,
             a.school,
             a.name,
@@ -189,6 +205,21 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             // mob's leash anchor, so a DoT-kited mob still leashes home.
             false,
           );
+          if (a.leechPct !== undefined && src && !src.dead) {
+            const healed = Math.min(Math.round(dealt * a.leechPct), src.maxHp - src.hp);
+            if (healed > 0) {
+              src.hp += healed;
+              ctx.emit({
+                type: 'heal2',
+                sourceId: src.id,
+                targetId: src.id,
+                amount: healed,
+                crit: false,
+                ability: a.name,
+              });
+              ctx.healingThreat(src, src, healed);
+            }
+          }
           if (e.dead) return;
         } else if (a.kind === 'hot') {
           // Dynamic HoT: live per-tick amount + a crit roll (heals crit at 1.5x). The

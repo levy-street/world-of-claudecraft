@@ -32,7 +32,7 @@ export const talents: GuidePage = {
       <article class="guide-article guide-talents">
         ${pageHeader('guide.talentsPage.heading', 'guide.talentsPage.intro')}
         ${section('guide.talentsPage.whatHeading', `<p>${esc(t('guide.talentsPage.whatBody'))}</p>`)}
-        ${section('guide.talentsPage.howHeading', `<p>${esc(t('guide.talentsPage.howBody'))}</p><p>${esc(t('guide.talentsPage.shareNote'))}</p>`)}
+        ${section('guide.talentsPage.howHeading', `<p>${esc(t('guide.talentsPage.howBody'))}</p><p>${esc(t('guide.talentsPage.choiceNote'))}</p><p>${esc(t('guide.talentsPage.shareNote'))}</p>`)}
         ${callout(esc(t('guide.talentsPage.resetNote')), { variant: 'note', titleKey: 'guide.talentsPage.resetTitle' })}
         ${section('guide.talentsPage.specsHeading', specOverview)}
         ${related([

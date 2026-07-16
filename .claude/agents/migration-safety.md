@@ -2,11 +2,11 @@
 name: migration-safety
 description: >
   Schema and persisted-state safety analyzer for World of ClaudeCraft (Postgres via `pg`).
-  There are no migration files: the schema is inline DDL in server/db.ts (SCHEMA),
-  server/social_db.ts (SOCIAL_SCHEMA), and server/oauth_db.ts (OAUTH_SCHEMA), each re-applied
-  at every boot under an advisory lock, and persisted state lives in JSONB. Reviews changes for
-  additive/idempotent DDL, JSONB save/load back-compat, index coverage, parameterized SQL, and
-  boot safety. Read-only.
+  There are no migration files: the schema is inline DDL (SCHEMA in server/db.ts plus the
+  domain *_SCHEMA modules ensureSchema() applies in order), re-applied at every boot under an
+  advisory lock, and persisted state lives in JSONB. Reviews changes for additive/idempotent
+  DDL, JSONB save/load back-compat, index coverage, parameterized SQL, and boot safety.
+  Read-only.
 tools: Read, Grep, Glob, Bash
 model: opus
 maxTurns: 15
@@ -20,12 +20,13 @@ analyze code but never modify files.
 ## How this project's schema works (read this first)
 
 - **There is no migrations directory.** The schema is inline SQL applied in order by
-  `ensureSchema()` as separate `client.query(...)` calls, NOT one concatenated batch: `SCHEMA`
-  (`server/db.ts`), then `SOCIAL_SCHEMA` (`server/social_db.ts`), then `OAUTH_SCHEMA`
-  (`server/oauth_db.ts`). Order is load-bearing both within and across them: a new
-  `ALTER`/`CREATE` must come after the table it depends on, and because `SOCIAL_SCHEMA` /
-  `OAUTH_SCHEMA` run after `SCHEMA`, they may `ALTER` a table that `SCHEMA` creates (for example
-  `social_db.ts` alters `characters`).
+  `ensureSchema()` (`server/db.ts`) as separate `client.query(...)` calls, NOT one concatenated
+  batch: `SCHEMA` (`server/db.ts`) first, then the domain schemas it imports (social, oauth,
+  discord, apple_auth, github, ratelimit, maps, user_assets, each an exported `*_SCHEMA` in its
+  `server/<domain>_db.ts`). Read the `ensureSchema()` body for the authoritative order; it is
+  load-bearing both within and across the schemas: a new `ALTER`/`CREATE` must come after the
+  table it depends on, and the domain schemas run after `SCHEMA` so they may `ALTER` or
+  FK-reference a table that `SCHEMA` creates (for example `social_db.ts` alters `characters`).
 - The DDL is **re-applied on every boot** by `ensureSchema()`, inside a transaction held
   under a Postgres advisory lock (`pg_advisory_xact_lock(...)`) so concurrent realm boots
   serialize. It therefore MUST be safe to run repeatedly.
@@ -33,11 +34,12 @@ analyze code but never modify files.
   and so on) is stored as **JSONB** in `characters.state`. Most "schema" changes are really
   changes to the shape of that JSONB blob, handled by the serialize/deserialize code in
   `server/db.ts` / `server/game.ts`, not by DDL.
-- `characters.state` is not the only persisted JSONB shape. The World Market is a JSONB row in
-  `world_state.data` (key/value store; the market row, via `saveMarketState` / `loadMarketState`
-  / `MarketSave` in `server/db.ts`), and `accounts.cosmetics` is JSONB too. The same back-compat
-  rules (default new fields on load, keep reading old keys, write on every save) apply to all of
-  them.
+- `characters.state` is not the only persisted JSONB shape. `world_state.data` is a key/value
+  store of JSONB rows: the World Market (via `saveMarketState` / `loadMarketState` /
+  `MarketSave` in `server/db.ts`) and the mail system (via `saveMailState` / `loadMailState` /
+  `MailSave`, saved in one transaction with the market); `accounts.cosmetics` is JSONB too. The
+  same back-compat rules (default new fields on load, keep reading old keys, write on every
+  save) apply to all of them.
 - Saves happen on a ~30s cadence (accumulated inside the sim loop via `AUTOSAVE_SECONDS`, not
   a standalone interval), and also on player leave and on SIGINT/SIGTERM shutdown.
 
@@ -48,11 +50,11 @@ there is no schema or persistence change to review, and reading the full `SCHEMA
 that out wastes budget. Gate yourself before reading any file:
 
 1. Get the changed files only (cheap): `git diff --cached --name-only`, or if nothing is
-   staged, `git diff --name-only "$(git merge-base HEAD main)"..HEAD`.
-2. You are IN SCOPE if any changed path is `server/db.ts`, `server/social_db.ts`,
-   `server/oauth_db.ts`, any other `server/*_db.ts` (for example `chat_filter_db.ts`), or a
-   file that serializes/deserializes a persisted JSONB blob (`characters.state` in
-   `server/db.ts` / `server/game.ts`; `world_state` / `MarketSave` in `server/db.ts`). A grep
+   staged, `git diff --name-only "$(git merge-base HEAD "$(git rev-parse --abbrev-ref '@{upstream}' 2>/dev/null || echo origin/main)")"..HEAD`.
+2. You are IN SCOPE if any changed path is `server/db.ts`, any other `server/*_db.ts` (for
+   example `social_db.ts`, `oauth_db.ts`, `chat_filter_db.ts`), or a file that
+   serializes/deserializes a persisted JSONB blob (`characters.state` in `server/db.ts` /
+   `server/game.ts`; `world_state` / `MarketSave` / `MailSave` in `server/db.ts`). A grep
    of the changed set for `SCHEMA`, `CREATE TABLE`, `ALTER TABLE`, `characters.state`,
    `world_state`, or a save/load function confirms it.
 3. EARLY EXIT: if nothing matched, output exactly this and STOP (do not read the `SCHEMA`):
@@ -72,7 +74,7 @@ Determine what to review using the following precedence:
 4. If nothing schema- or persistence-related is found, report that no schema/persistence
    changes were detected.
 
-Once in scope, read the full `SCHEMA` / `SOCIAL_SCHEMA` definition and the save/load
+Once in scope, read the full definition of each affected `*_SCHEMA` and the save/load
 functions before reviewing.
 
 ## Review Checklist
@@ -126,10 +128,10 @@ If a new column is added to an EXISTING table:
 
 ### Check 6 - Boot / Advisory-Lock Safety (CRITICAL)
 
-- New schema and any first-boot seeding (e.g. `seedChatFilterDefaults`, defined in
-  `server/chat_filter_db.ts`) must run inside the `ensureSchema()` advisory-lock transaction
-  and must be idempotent (safe across multiple realm processes booting at once; see
-  `npm run realms`).
+- New schema and any first-boot seeding or backfill (e.g. `seedChatFilterDefaults` from
+  `server/chat_filter_db.ts`, the market backfill from `server/market_backfill.ts`) must run
+  inside the `ensureSchema()` advisory-lock transaction and must be idempotent (safe across
+  multiple realm processes booting at once; see `npm run realms`).
 - Read the `ensureSchema()` body in `server/db.ts` and confirm the advisory-lock call and the
   transaction boundary yourself before asserting this check; if the lock or a seed call is not
   where this prompt claims, report the discrepancy rather than assuming.

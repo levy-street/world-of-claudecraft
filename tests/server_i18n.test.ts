@@ -6,6 +6,34 @@ import { localizeServerText, tServer } from '../src/ui/server_i18n';
 // re-render them in the active locale (friends/guild/world/who/moderation).
 describe('server-sent message localization', () => {
   const samples: string[] = [
+    // The two chat-suppression tiers. These are emitted from server/social.ts and
+    // server/game.ts, which the S3 drift guard only partially scans, so pin every
+    // one of them here: a drift between the emit literal and the server_i18n regex
+    // ships English to all 22 locales with an otherwise green gate.
+    // IGNORE tier (chat-only)
+    'Mira is now ignored.',
+    'Mira is no longer ignored.',
+    'Mira is already ignored.',
+    'Your ignore list is full.',
+    'You cannot ignore yourself.',
+    "No character named 'Zzz' on your ignore list.",
+    'Mira is not on your ignore list.',
+    'Your ignore list is empty.',
+    'Ignored (2): Mira, Bob',
+    'Usage: /ignore <name>, /unignore <name>, /ignorelist.',
+    // BLOCK tier (the heavy tool)
+    'Mira is now blocked.',
+    'Mira is no longer blocked.',
+    'Mira is already blocked.',
+    'Your block list is full.',
+    'You cannot block yourself.',
+    "No character named 'Zzz' on your block list.",
+    'Mira is not on your block list.',
+    'Your block list is empty.',
+    'Blocked (1): Mira',
+    'Usage: /block <name>, /unblock <name>, /blocklist.',
+    'You are blocking Mira. Remove them from your block list first.',
+    'Your block list is still loading. Try /who again in a moment.',
     'Mira added to friends.',
     'Your friends list is full.',
     "No character named 'Zzz' exists.",

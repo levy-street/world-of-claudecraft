@@ -57,7 +57,8 @@ a real determinism regression is far worse than a low-confidence false alarm.
    change is BLOCKING.
 
 3. **Tick-phase order.** `tick()` is load-bearing. The ground-AoE pass (`tickGroundAoEs`, in
-   `entity_roster.ts`) runs early in the tick prologue, just after the pending-mob-respawn pass,
+   `entity_roster.ts`) runs early in the tick prologue, just after the pending-mob-respawn and
+   world-boss passes (the `lap?.(...)` markers in `tick()` are the authoritative phase order),
    and it draws rng; dead players still tick timers/auras; the end-of-tick system block runs in a
    FIXED order (duels -> arena -> trades -> loot -> instances -> delves -> market ->
    delayedEvents), then the grid refresh last. The `engagedPids` combat-flag pass stays INLINE in
@@ -68,8 +69,9 @@ a real determinism regression is far worse than a low-confidence false alarm.
    hot paths (for example `mobSwing`, `updateRangedPetAttack`, `pulseGroundAoE` whose second
    caller passes `threatOpts`, `applyTaunt`, and `meleeSwing`, which is also a `castAbility`
    weaponStrike entry) must stay reachable via `SimContext` with a thin same-named `Sim`
-   delegate. Some already live in a system module (for example `meleeSwing` is now
-   `meleeSwingImpl` in `src/sim/combat/auto_attack.ts` with a thin `Sim.meleeSwing` delegate), so
+   delegate. Some already live in a system module (for example `meleeSwing`'s implementation
+   lives in `src/sim/combat/auto_attack.ts`, imported into `sim.ts` as `meleeSwingImpl`, with a
+   thin `Sim.meleeSwing` delegate), so
    their relocation is expected, not a finding; what you verify is that every listed call site
    still resolves and each delegate forwards the correct `this`/ctx and exact arg order. Do NOT
    apply "none were relocated" literally.

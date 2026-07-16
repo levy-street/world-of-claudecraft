@@ -195,6 +195,7 @@ describe('resolveCraftForRecipe reads the archetype-gated ceiling for skill-gain
       skillReq: 50, // recipeTier = 2
       trivialAt: 100,
       itemLevelBudget: 10,
+      level: 10,
     };
     const result = resolveCraftForRecipe(ctxOf(sim), pid, recipe);
 
@@ -223,6 +224,7 @@ describe('resolveCraftForRecipe reads the archetype-gated ceiling for skill-gain
       skillReq: 25, // recipeTier = 1, above the common (0) dormancy ceiling
       trivialAt: 50,
       itemLevelBudget: 10,
+      level: 10,
     };
     const result = resolveCraftForRecipe(ctxOf(sim), pid, recipe);
 
@@ -246,6 +248,7 @@ describe('resolveCraftForRecipe reads the archetype-gated ceiling for skill-gain
       skillReq: 0, // recipeTier = 0 (common, the free floor)
       trivialAt: 25,
       itemLevelBudget: 1,
+      level: 1,
     };
     const result = resolveCraftForRecipe(ctxOf(sim), pid, recipe);
 
@@ -269,6 +272,7 @@ describe('resolveCraftForRecipe reads the archetype-gated ceiling for skill-gain
       skillReq: 100, // recipeTier = 4, exactly at capability -> full progress
       trivialAt: 200,
       itemLevelBudget: 10,
+      level: 10,
     };
     const result = resolveCraftForRecipe(ctxOf(sim), pid, recipe);
 
@@ -292,6 +296,7 @@ describe('resolveCraftForRecipe reads the archetype-gated ceiling for skill-gain
       skillReq: 100,
       trivialAt: 200,
       itemLevelBudget: 10,
+      level: 10,
     };
     const result = resolveCraftForRecipe(ctxOf(sim), pid, recipe);
 
@@ -315,6 +320,7 @@ describe('resolveCraftForRecipe reads the archetype-gated ceiling for skill-gain
       skillReq: 75, // recipeTier = 3, above the rare ceiling
       trivialAt: 100,
       itemLevelBudget: 10,
+      level: 10,
     };
     const result = resolveCraftForRecipe(ctxOf(sim), pid, recipe);
 
@@ -346,6 +352,7 @@ describe('resolveCraftForRecipe reads the archetype-gated ceiling for skill-gain
       skillReq: 75, // recipeTier = 3, far above raw capability, within the unlimited ceiling
       trivialAt: 200,
       itemLevelBudget: 10,
+      level: 10,
     };
     const result = resolveCraftForRecipe(ctxOf(sim), pid, recipe);
 
@@ -369,6 +376,7 @@ describe('resolveCraftForRecipe reads the archetype-gated ceiling for skill-gain
       skillReq: 50, // recipeTier = 2: above raw capability, exactly at the ceiling
       trivialAt: 100,
       itemLevelBudget: 10,
+      level: 10,
     };
     const result = resolveCraftForRecipe(ctxOf(sim), pid, recipe);
 
@@ -391,6 +399,7 @@ describe('resolveCraftForRecipe reads the archetype-gated ceiling for skill-gain
       skillReq: 75, // recipeTier = 3, above the pre-archetype rare ceiling
       trivialAt: 100,
       itemLevelBudget: 10,
+      level: 10,
     };
     const result = resolveCraftForRecipe(ctxOf(sim), pid, recipe);
 
@@ -433,6 +442,7 @@ describe('resolveCraftForRecipe clamps output quality to the empowerment ceiling
       skillReq: 0,
       trivialAt: 25,
       itemLevelBudget: 1,
+      level: 1,
     };
     const result = resolveCraftForRecipe(ctxOf(sim), pid, recipe);
 
@@ -456,6 +466,7 @@ describe('resolveCraftForRecipe clamps output quality to the empowerment ceiling
       skillReq: 0,
       trivialAt: 25,
       itemLevelBudget: 1,
+      level: 1,
     };
     const result = resolveCraftForRecipe(ctxOf(sim), pid, recipe);
 

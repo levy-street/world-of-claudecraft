@@ -42,6 +42,9 @@
 //   bank.ts             IWorldBank           per-character deposit box (proximity-gated info +
 //                                            deposit/withdraw/buy-slots)
 //   vale_cup.ts         IWorldValeCup        Vale Cup boarball queue/roles/betting/practice
+//   dungeon_finder.ts   IWorldDungeonFinder  Dungeon Finder queue/proposals/premade board
+//   deeds.ts            IWorldDeeds          earned deeds, lifetime stats, renown, active title,
+//                                            rarity + the account-Renown leaderboard reads
 //
 // THREE GATES pin this seam (run before any facet edit; the literal counts are
 // pinned THERE and re-stale here, so this prose stays count-free):
@@ -59,8 +62,10 @@ import type { IWorldChat } from './world_api/chat';
 import type { IWorldCombat } from './world_api/combat';
 import type { IWorldCosmetics } from './world_api/cosmetics';
 import type { IWorldDailyRewards } from './world_api/daily_rewards';
+import type { IWorldDeeds } from './world_api/deeds';
 import type { IWorldDelves } from './world_api/delves';
 import type { IWorldDuelArena } from './world_api/duel_arena';
+import type { IWorldDungeonFinder } from './world_api/dungeon_finder';
 import type { IWorldDungeons } from './world_api/dungeons';
 import type { IWorldEntityRoster } from './world_api/entity_roster';
 import type { IWorldInteraction } from './world_api/interaction';
@@ -81,12 +86,23 @@ import type { IWorldTrade } from './world_api/trade';
 import type { IWorldValeCup } from './world_api/vale_cup';
 
 // --- pass-through sim re-exports: downstream imports these FROM world_api ---
+// Account flair is defined in the host-agnostic sim core (src/sim/account_flair.ts)
+// because the server, the client mirror, and the HUD must all agree on its shape;
+// it rides through this seam so render/ui never import a concrete world.
+export type { PlayerFlair, StreamerLinks, StreamerPlatform } from './sim/account_flair';
 export type {
+  DeedsLeaderboardPage,
   DevLeaderboardPage,
   GuildLeaderboardPage,
   LeaderboardPage,
 } from './sim/leaderboard_page';
-export type { ArenaCombatant, ArenaFormat, ArenaStanding, OverheadEmoteId } from './sim/types';
+export type {
+  ArenaCombatant,
+  ArenaFormat,
+  ArenaStanding,
+  DeedStats,
+  OverheadEmoteId,
+} from './sim/types';
 
 // --- facet aux-type + value re-exports (each travels with its facet file) ---
 export type { BankBonusSource, BankInfo } from './world_api/bank';
@@ -104,6 +120,11 @@ export type {
   DailyRewardTaskView,
 } from './world_api/daily_rewards';
 export type {
+  DeedsLeaderboardEntry,
+  DeedsLeaderboardSelf,
+  DeedsRarity,
+} from './world_api/deeds';
+export type {
   DelveCompanionInfo,
   DelveDailyInfo,
   DelveRunInfo,
@@ -119,6 +140,15 @@ export type {
   FiestaPowerupView,
   FiestaScoreboardPlayer,
 } from './world_api/duel_arena';
+export type {
+  DungeonFinderApplicantView,
+  DungeonFinderBoard,
+  DungeonFinderInfo,
+  DungeonFinderListingView,
+  DungeonFinderMyListingView,
+  DungeonFinderProposalView,
+  DungeonFinderQueueView,
+} from './world_api/dungeon_finder';
 export type { RaidLockout } from './world_api/dungeons';
 export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
 export type { MarketInfo, MarketListingView } from './world_api/market';
@@ -130,6 +160,7 @@ export type {
   LeaderboardEntry,
 } from './world_api/progression_xp';
 export type {
+  CharacterProfile,
   CharacterSearchResult,
   FriendInfo,
   GuildEventInfo,
@@ -180,7 +211,9 @@ export interface IWorld
     IWorldTelemetry,
     IWorldProfessions,
     IWorldBank,
-    IWorldValeCup {}
+    IWorldValeCup,
+    IWorldDungeonFinder,
+    IWorldDeeds {}
 
 // ---------------------------------------------------------------------------
 // Command schema (W0b): the shared wire-token vocabulary.
@@ -222,6 +255,7 @@ export const COMMAND_NAMES = [
   'abandon',
   'qlinkaccept',
   'equip',
+  'inv_move',
   'unequip_item',
   'use',
   'discard',
@@ -234,6 +268,7 @@ export const COMMAND_NAMES = [
   'change_skin',
   'unequip_mech_chroma',
   'claim_event_skin',
+  'change_weapon_skin',
   'release',
   'challengeResponse',
   'chat',
@@ -342,6 +377,21 @@ export const COMMAND_NAMES = [
   'vcup_ready',
   'vcup_bet',
   'vcup_practice',
+  'df_roles',
+  'df_queue',
+  'df_queue_leave',
+  'df_proposal',
+  'df_list_create',
+  'df_list_close',
+  'df_apply',
+  'df_apply_cancel',
+  'df_app_respond',
+  'deed_set_title',
+  // personal chat ignores: the chat-only sibling of block_add/block_remove.
+  // (An admin "mute" is a moderation action, not a wire command.)
+  'ignore_add',
+  'ignore_remove',
+  'stow_weapon',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -407,7 +457,9 @@ export type WorldFacet =
   | 'IWorldDailyRewards'
   | 'IWorldTelemetry'
   | 'IWorldBank'
-  | 'IWorldValeCup';
+  | 'IWorldValeCup'
+  | 'IWorldDungeonFinder'
+  | 'IWorldDeeds';
 
 export const COMMAND_FACETS = {
   // IWorldCombat: ability casts, auto-attack, spirit release.
@@ -446,6 +498,8 @@ export const COMMAND_FACETS = {
   change_skin: 'IWorldCosmetics',
   claim_event_skin: 'IWorldCosmetics',
   unequip_mech_chroma: 'IWorldCosmetics',
+  change_weapon_skin: 'IWorldCosmetics',
+  stow_weapon: 'IWorldCosmetics',
   // IWorldPet: hunter-pet commands (snake_case wire strings, by design; pet state
   // mirrors on the owned-mob entity wire, not a self-snapshot field).
   pet_abandon: 'IWorldPet',
@@ -494,11 +548,15 @@ export const COMMAND_FACETS = {
   // IWorldSocialGraph: friends/blocks/guild commands (online only; resolved
   // server-side by character name, handled by the #4 SocialService). socialInfo
   // arrives via the social/socialpos frames (no command); searchCharacters is a REST
-  // GET (no wire command); social_refresh is a dispatch-only server push (untagged).
+  // GET (no wire command); accountFlair is a pure local read of the flair the entity
+  // wire and the chat event already carry (no command); social_refresh is a
+  // dispatch-only server push (untagged).
   friend_add: 'IWorldSocialGraph',
   friend_remove: 'IWorldSocialGraph',
   block_add: 'IWorldSocialGraph',
   block_remove: 'IWorldSocialGraph',
+  ignore_add: 'IWorldSocialGraph',
+  ignore_remove: 'IWorldSocialGraph',
   guild_create: 'IWorldSocialGraph',
   guild_invite: 'IWorldSocialGraph',
   guild_accept: 'IWorldSocialGraph',
@@ -560,4 +618,19 @@ export const COMMAND_FACETS = {
   vcup_ready: 'IWorldValeCup',
   vcup_bet: 'IWorldValeCup',
   vcup_practice: 'IWorldValeCup',
+  // IWorldDungeonFinder: the group finder (snake_case wire strings, by design).
+  // dungeonFinderInfo / dungeonFinderBoard are snapshot reads (no send, untagged).
+  df_roles: 'IWorldDungeonFinder',
+  df_queue: 'IWorldDungeonFinder',
+  df_queue_leave: 'IWorldDungeonFinder',
+  df_proposal: 'IWorldDungeonFinder',
+  df_list_create: 'IWorldDungeonFinder',
+  df_list_close: 'IWorldDungeonFinder',
+  df_apply: 'IWorldDungeonFinder',
+  df_apply_cancel: 'IWorldDungeonFinder',
+  df_app_respond: 'IWorldDungeonFinder',
+  // IWorldDeeds: the Book of Deeds title selection (snake_case wire string, by
+  // design). deedsEarned/deedStats/renown/activeTitle are snapshot reads (no
+  // send, untagged).
+  deed_set_title: 'IWorldDeeds',
 } as const satisfies Partial<Record<ClientCommand, WorldFacet>>;

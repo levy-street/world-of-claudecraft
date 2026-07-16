@@ -41,6 +41,24 @@
         "guide.economy.bankTitle",
         "guide.economy.bankBody"
       ]
+    },
+    "deedsSystem": {
+      "note": "Book of Deeds (achievements) vocabulary, locked by the non-Latin fills shipped with the window chrome. Deed: zh_CN 功绩, zh_TW 功績, ja 功績, ko 업적, ru деяние. Book of Deeds: zh_CN 功绩之书, zh_TW 功績之書, ja 功績の書, ko 업적의 서, ru Книга деяний. Renown (the deed score; distinct from any reputation concept): zh_CN 名望, zh_TW 名望, ja 名声, ko 명성, ru Известность. Title (cosmetic name suffix): zh_CN 头衔, zh_TW 頭銜, ja 称号, ko 칭호, ru звание. Feat (zero-Renown trophy): zh_CN 壮举, zh_TW 壯舉, ja 偉業, ko 위업, ru подвиг. Chronicle (per-zone task set): zh_CN 编年史, zh_TW 編年史, ja 年代記, ko 연대기, ru летопись. Chronicler (the in-world NPC face of a Chronicle, locked by the entities.npcs.chronicler_* fills): zh_CN 编年史者, zh_TW 編年史者, ja 年代記官, ko 연대기 기록관, ru Летописец. Border (the cosmetic nameplate/panel frame reward, locked by guide.deedsPage.rewardBorder): zh_CN 边框, zh_TW 邊框, ja 枠飾り, ko 테두리, ru Рамка. Keep each identical wherever the system is referenced. Reward titles (19 shipped): Veteran, Champion, Paragon, Mythic, Eternal reuse the game.milestone.* established forms verbatim (see milestoneTitles); the other 14 (Wyrmfeller, the Deathless, Peakbreaker, Bellstiller, of the Vale, of the Mirefen, of Thornpeak, the Curator, the Resplendent, Gladiator, Boarball Legend, Magnate, the Wayfarer, the Footnote) are coined once per locale in the deed locale chunks (src/ui/deed_i18n.locales/<locale>.ts) and kept identical wherever referenced.",
+      "keyPatterns": ["hudChrome.deeds.*"]
+    },
+    "milestoneTitles": {
+      "note": "The five lifetime-XP milestone titles, unified into deeds as their reward titles. The deed locale table's title fields for prog_veteran, prog_champion, prog_paragon, prog_mythic, and prog_eternal MUST reuse these established localized forms verbatim; never re-coin them.",
+      "keyPatterns": [
+        "game.milestone.veteran",
+        "game.milestone.champion",
+        "game.milestone.paragon",
+        "game.milestone.mythic",
+        "game.milestone.eternal"
+      ]
+    },
+    "steamLink": {
+      "note": "Steam account-link vocabulary (the character-select card + apiError.steam.*), locked by the non-Latin fills shipped with the link surface. Steam stays Latin everywhere (brand). Link (the account-link verb): zh_CN 关联, zh_TW 連結, ja 連携, ko 연동, ru привязать (linked state: привязан). Steam achievements (the platform term the deeds mirror writes to): zh_CN Steam 成就, zh_TW Steam 成就, ja Steam実績, ko Steam 도전 과제, ru достижения Steam. Keep each identical wherever the link surface is referenced.",
+      "keyPatterns": ["hudChrome.steam.*", "apiError.steam.*"]
     }
   }
 }

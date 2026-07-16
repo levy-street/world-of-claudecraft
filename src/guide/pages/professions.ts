@@ -14,11 +14,14 @@ const GATHERING_BLOCKS = [
   ['guide.professions.gatherWhatTitle', 'guide.professions.gatherWhatBody'],
   ['guide.professions.gatherProficiencyTitle', 'guide.professions.gatherProficiencyBody'],
   ['guide.professions.gatherToolsTitle', 'guide.professions.gatherToolsBody'],
+  ['guide.professions.harvestTitle', 'guide.professions.harvestBody'],
+  ['guide.professions.focusTitle', 'guide.professions.focusBody'],
 ] as const;
 
 const CRAFT_BLOCKS = [
   ['guide.professions.craftRingTitle', 'guide.professions.craftRingBody'],
   ['guide.professions.craftRecipesTitle', 'guide.professions.craftRecipesBody'],
+  ['guide.professions.craftHowTitle', 'guide.professions.craftHowBody'],
   ['guide.professions.craftMasteryTitle', 'guide.professions.craftMasteryBody'],
   ['guide.professions.craftComboTitle', 'guide.professions.craftComboBody'],
 ] as const;

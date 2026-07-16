@@ -1065,11 +1065,11 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     expect(leaks, 'unregistered sim emit strings (add a key/RULE to sim_i18n.ts)').toEqual([]);
   });
 
-  // RELEASE TIER: the same coverage across all 14 locales, and where a real matcher
+  // RELEASE TIER: the same coverage across all 21 locales, and where a real matcher
   // resolves the string, its localized form is not raw English in any translated
   // locale (no silently-shipped English).
   it.runIf(RELEASE_TIER)(
-    's3_localized: every emit is recognized in all 14 locales and not left English where a matcher resolves it',
+    's3_localized: every emit is recognized in all 21 locales and not left English where a matcher resolves it',
     () => {
       const cands = candidateStrings();
       expect(cands.length, 'sanity: should enumerate many emit sites').toBeGreaterThan(80);

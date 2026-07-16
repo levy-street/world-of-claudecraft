@@ -2,12 +2,12 @@
 # QA stop-gate for World of ClaudeCraft.
 #
 # Runs at the end of EVERY Claude Code turn (the Stop hook). It deliberately does only
-# instant, near-zero-cost checks on the lines this turn ADDED, so it never slows the edit
-# loop. It NEVER runs tsc, vitest, biome, or the LLM review:
+# instant, near-zero-cost checks on the working tree's added lines (the unstaged tracked
+# diff plus untracked text files), so it never slows the edit loop. It NEVER runs tsc, vitest, biome, or the LLM review:
 #   - a Stop hook fires on every turn, so heavy checks here would tax every iteration;
 #   - a hook is a shell command and cannot spawn the QA agent anyway.
 # The heavier deterministic floor (tsc, guard tests, biome) runs once per push in
-# .githooks/pre-push; the full multi-agent review is the /qa command and the qa-checklist
+# .githooks/pre-push; the full multi-agent review is the /qa skill and the qa-checklist
 # agent.
 #
 # What it blocks on (all hard project invariants from CLAUDE.md, all detectable instantly):

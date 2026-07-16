@@ -93,4 +93,4 @@ A complete checklist and a green CI run (tests, typecheck, and builds) are what
 we look for before merging. Smaller, focused PRs land faster than large ones, and
 reviewers may suggest changes, which is a normal and friendly part of the
 process. Thank you for helping build World of ClaudeCraft. Questions? Join us on
-[Discord](https://discord.gg/GjhnUsBtw).
+[Discord](https://discord.com/invite/worldofclaudecraft).

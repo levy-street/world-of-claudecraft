@@ -18,14 +18,13 @@
 // It takes primitives, not an IWorld, so the ClientWorld-vs-Sim parity row
 // is N/A for it, exactly like dropdown_nav.ts; same-input-same-output is the contract.
 
-export type RovingOrientation = 'horizontal' | 'vertical' | 'both';
+export type RovingOrientation = 'horizontal' | 'both';
 
 // The next roving index for `key`, or null when the key is not a roving move. `count` is
 // the number of siblings; `current` is the focused sibling's index. Home -> 0,
 // End -> count - 1, next/prev wrap around the ends. 'horizontal' owns ArrowRight (next) /
-// ArrowLeft (prev) only; 'vertical' owns ArrowDown (next) / ArrowUp (prev) only (the Esc
-// menu rail, spec section 5: it leaves Left/Right free so in-row value adjust never
-// competes); 'both' owns all four for a 2D grid. Home/End are owned by every orientation.
+// ArrowLeft (prev) only; 'both' additionally owns ArrowDown (next) / ArrowUp (prev) for a
+// 2D grid or vertical stack.
 export function rovingTarget(
   key: string,
   current: number,
@@ -35,10 +34,8 @@ export function rovingTarget(
   if (count <= 0) return null;
   if (key === 'Home') return 0;
   if (key === 'End') return count - 1;
-  const horizontal = orientation === 'horizontal' || orientation === 'both';
-  const vertical = orientation === 'vertical' || orientation === 'both';
-  const next = (horizontal && key === 'ArrowRight') || (vertical && key === 'ArrowDown');
-  const prev = (horizontal && key === 'ArrowLeft') || (vertical && key === 'ArrowUp');
+  const next = key === 'ArrowRight' || (orientation === 'both' && key === 'ArrowDown');
+  const prev = key === 'ArrowLeft' || (orientation === 'both' && key === 'ArrowUp');
   if (next) return (((current + 1) % count) + count) % count;
   if (prev) return (((current - 1) % count) + count) % count;
   return null;

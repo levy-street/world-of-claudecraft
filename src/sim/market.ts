@@ -403,6 +403,8 @@ export class Market {
         text: `You collect ${formatMoney(col.copper)} from the Merchant.`,
         pid: meta.entityId,
       });
+      // Collection copper is exclusively sale proceeds, so all of it counts.
+      this.ctx.bumpDeedStat(meta, 'marketSaleCopper', col.copper);
       col.copper = 0;
     }
     // Capacity gate: items that don't fit stay in the collection box (never

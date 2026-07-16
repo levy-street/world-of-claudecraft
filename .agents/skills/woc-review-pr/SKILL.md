@@ -32,6 +32,12 @@ operator documentation wherever those domains apply.
 The coordinating agent runs targeted commands once. Specialist reviewers inspect the
 diff and shared results without duplicating the full test or build run.
 
+Invoke `woc_database_performance` when the diff changes SQL, a database call site,
+schema or indexes, query frequency/cardinality, pool or lock behavior, timeout policy,
+background database work, database driver/dependency versions, PostgreSQL
+engine/resource/configuration/topology, or stored-data growth. Pair it with persistence or security
+review when those concerns also apply.
+
 For every candidate finding:
 
 1. Trace the execution path.

@@ -68,6 +68,7 @@ export function renderCorpseHarvestPicker(
   btn.type = 'button';
   btn.className = 'btn corpse-harvest-btn';
   btn.textContent = t('hudChrome.corpseHarvest.harvestButton');
+  btn.title = t('hudChrome.corpseHarvest.harvestButtonTooltip');
   btn.disabled = view.harvestDisabled;
   btn.addEventListener('click', () => {
     const chosen = [...list.querySelectorAll<HTMLInputElement>('.corpse-harvest-check')]

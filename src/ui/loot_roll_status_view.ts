@@ -36,9 +36,13 @@ export function computeLootRollStatusRows(
   statuses: readonly LootRollGroupStatus[],
   shownPromptIds: readonly number[],
   selfPid: number,
+  includeWatchRows = true,
 ): LootRollStatusRow[] {
   const shown = new Set(shownPromptIds);
-  return statuses.map((status) => ({
+  const visibleStatuses = includeWatchRows
+    ? statuses
+    : statuses.filter((status) => shown.has(status.rollId));
+  return visibleStatuses.map((status) => ({
     rollId: status.rollId,
     itemId: status.itemId,
     itemName: status.itemName,

@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
+import { DEEDS } from '../src/sim/content/deeds';
 import { QUEST_LETTERS } from '../src/sim/content/letters';
 import {
   ABILITIES,
@@ -16,6 +17,13 @@ import {
 } from '../src/sim/data';
 import type { PlayerClass } from '../src/sim/types';
 import { abilityBuffValue } from '../src/ui/ability_damage';
+import {
+  deedDesc,
+  deedName,
+  deedTitleText,
+  deedTranslationManifest,
+  ensureDeedLocalesLoaded,
+} from '../src/ui/deed_i18n';
 import {
   assertEntityTranslationsReady,
   entityTranslationFallbackLog,
@@ -48,6 +56,7 @@ import {
   pl_PL,
   pt_BR,
   ru_RU,
+  type SupportedLanguage,
   setLanguage,
   supportedLanguages,
   sv_SE,
@@ -98,13 +107,19 @@ const locales: Record<string, typeof en> = {
 const RELEASE_TIER = process.env.I18N_RELEASE_TIER === '1';
 
 describe('i18n Localization Key Coverage', () => {
-  // Lazy locale flip: non-en locales are no longer statically resident. This suite
-  // setLanguage(non-en)s and reads synchronously via t()/tEntity/formatMoney/talent helpers,
-  // so make every supported locale resident up front - the test-harness mirror of the
-  // bootstrap's await-before-paint. Each setLanguage(lang) read then resolves the localized
-  // table instead of the English fallback.
+  // Lazy locale flip: non-en locales (and the deed locale tables, which ride their own
+  // dynamically imported chunk) are no longer statically resident. This suite
+  // setLanguage(non-en)s and reads synchronously via t()/tEntity/formatMoney/talent/deed
+  // helpers, so make every supported locale resident up front - the test-harness mirror of
+  // the bootstrap's await-before-paint. Each setLanguage(lang) read then resolves the
+  // localized table instead of the English fallback.
   beforeAll(async () => {
-    await Promise.all(supportedLanguages.map((lang) => ensureLocaleLoaded(lang)));
+    await Promise.all(
+      supportedLanguages.flatMap((lang) => [
+        ensureLocaleLoaded(lang),
+        ensureDeedLocalesLoaded(lang),
+      ]),
+    );
   });
 
   const placeholderPattern = /\b(TODO|TBD|FIXME|PLACEHOLDER|TRANSLATE|LOREM)\b/i;
@@ -1071,6 +1086,64 @@ describe('i18n Localization Key Coverage', () => {
     setLanguage('en');
   });
 
+  it('keeps generated talent effect labels out of English fallback in translated locales', () => {
+    const englishEffectFragments = [
+      'damage-over-time damage',
+      'heal-over-time healing',
+      'melee haste',
+      'pet damage',
+      'damage redirected to pet',
+    ];
+    const descriptions = talentTranslationManifest().filter(
+      (entry) => entry.field === 'description',
+    );
+
+    for (const lang of supportedLanguages) {
+      if (lang === 'en' || lang === 'en_CA') continue;
+      setLanguage(lang);
+      const rendered = descriptions.map(renderTalentManifestEntry).join('\n').toLowerCase();
+      for (const fragment of englishEffectFragments) {
+        expect(rendered, `${lang}: copied English talent effect label ${fragment}`).not.toContain(
+          fragment,
+        );
+      }
+    }
+
+    setLanguage('en');
+  });
+
+  it('renders the mobile Store label in every locale', () => {
+    const expected: Record<SupportedLanguage, string> = {
+      en: 'Store',
+      en_CA: 'Store',
+      es: 'Tienda',
+      es_ES: 'Tienda',
+      fr_FR: 'Boutique',
+      fr_CA: 'Boutique',
+      it_IT: 'Negozio',
+      de_DE: 'Shop',
+      zh_CN: '商店',
+      zh_TW: '商店',
+      ko_KR: '상점',
+      ja_JP: 'ストア',
+      pt_BR: 'Loja',
+      ru_RU: 'Магазин',
+      cs_CZ: 'Obchod',
+      nl_NL: 'Winkel',
+      pl_PL: 'Sklep',
+      id_ID: 'Toko',
+      tr_TR: 'Mağaza',
+      sv_SE: 'Butik',
+      vi_VN: 'Cửa hàng',
+      da_DK: 'Butik',
+    };
+    for (const lang of supportedLanguages) {
+      setLanguage(lang);
+      expect(t('hudChrome.mobile.dailyRewards'), lang).toBe(expected[lang]);
+    }
+    setLanguage('en');
+  });
+
   it('should provide talent content translations for every supported locale', () => {
     const talentEntries = talentTranslationManifest();
     expect(talentEntries.length).toBeGreaterThan(250);
@@ -1150,6 +1223,125 @@ describe('i18n Localization Key Coverage', () => {
         ),
       ).toContain('생명력');
     }
+
+    setLanguage('en');
+  });
+
+  // Deed names and reward titles that legitimately equal English in a locale,
+  // recorded as deliberate cross-language cognates (Veteran, Champion, Paragon,
+  // and Gladiator are those languages' own words; Marginalia is Latin; nl keeps
+  // the poker term Full House). This list IS the recording mechanism: a deed
+  // name or title that matches English WITHOUT a row here is an accidental
+  // leak at the release gate. Dialect locales list their rendered result
+  // (es_ES and fr_CA resolve through their base tables plus overrides).
+  const deedCognateAllowlist: Record<string, readonly string[]> = {
+    es: ['soc_market_magnate.title'],
+    es_ES: ['soc_market_magnate.title'],
+    fr_FR: ['prog_champion.name', 'prog_champion.title', 'dlv_lore_journal.name'],
+    fr_CA: ['prog_champion.name', 'prog_champion.title', 'dlv_lore_journal.name'],
+    it_IT: ['soc_market_magnate.title'],
+    de_DE: [
+      'prog_veteran.name',
+      'prog_veteran.title',
+      'prog_champion.name',
+      'prog_champion.title',
+      'prog_paragon.name',
+      'prog_paragon.title',
+      'pvp_arena_1v1_1900.name',
+      'pvp_arena_1v1_1900.title',
+    ],
+    pt_BR: ['prog_paragon.name', 'prog_paragon.title'],
+    nl_NL: [
+      'dlv_lore_journal.name',
+      'pvp_arena_1v1_1900.name',
+      'pvp_arena_1v1_1900.title',
+      'soc_full_house.name',
+    ],
+    pl_PL: ['dlv_lore_journal.name', 'pvp_arena_1v1_1900.name', 'pvp_arena_1v1_1900.title'],
+    id_ID: [
+      'prog_veteran.name',
+      'prog_veteran.title',
+      'pvp_arena_1v1_1900.name',
+      'pvp_arena_1v1_1900.title',
+    ],
+    sv_SE: [
+      'prog_veteran.name',
+      'prog_veteran.title',
+      'pvp_arena_1v1_1900.name',
+      'pvp_arena_1v1_1900.title',
+    ],
+    da_DK: [
+      'prog_veteran.name',
+      'prog_veteran.title',
+      'pvp_arena_1v1_1900.name',
+      'pvp_arena_1v1_1900.title',
+    ],
+  };
+
+  it('should provide deed content translations for every supported locale', () => {
+    const deedEntries = deedTranslationManifest();
+    expect(deedEntries.length).toBe(Object.keys(DEEDS).length * 2 + 19);
+
+    for (const lang of supportedLanguages) {
+      setLanguage(lang);
+      for (const entry of deedEntries) {
+        const rendered =
+          entry.field === 'name'
+            ? deedName(entry.id)
+            : entry.field === 'desc'
+              ? deedDesc(entry.id)
+              : deedTitleText(entry.id);
+        expect(rendered.trim().length, `${lang}.${entry.id}.${entry.field}`).toBeGreaterThan(0);
+        // RELEASE-TIER ONLY (copied-English deed prose): an unfilled deed desc
+        // renders the authored English fallback, which is legal on a PR (the
+        // English-only contributor rule) and blocked only at the release gate.
+        if (RELEASE_TIER && lang !== 'en' && lang !== 'en_CA' && entry.field === 'desc') {
+          expect(
+            copiedEnglishComparable(rendered),
+            `${lang}.${entry.id}.desc should not copy canonical English deed prose`,
+          ).not.toBe(copiedEnglishComparable(entry.source));
+        }
+        // Deed NAMES and reward TITLES must not leak English either. A value may
+        // legitimately equal English only as a deliberate cross-language cognate
+        // recorded in deedCognateAllowlist above; a match WITHOUT such a row is
+        // an accidental leak (e.g. a new deed the locale tables do not yet cover).
+        if (
+          RELEASE_TIER &&
+          lang !== 'en' &&
+          lang !== 'en_CA' &&
+          entry.field !== 'desc' &&
+          !(deedCognateAllowlist[lang] ?? []).includes(`${entry.id}.${entry.field}`)
+        ) {
+          expect(
+            copiedEnglishComparable(rendered),
+            `${lang}.${entry.id}.${entry.field} leaks English with no deedCognateAllowlist row`,
+          ).not.toBe(copiedEnglishComparable(entry.source));
+        }
+      }
+      // The five milestone titles are locked to the established game.milestone.*
+      // renderings in every locale (milestones unified into deeds: one prestige
+      // system, one vocabulary).
+      for (const [deedId, milestoneKey] of [
+        ['prog_veteran', 'game.milestone.veteran'],
+        ['prog_champion', 'game.milestone.champion'],
+        ['prog_paragon', 'game.milestone.paragon'],
+        ['prog_mythic', 'game.milestone.mythic'],
+        ['prog_eternal', 'game.milestone.eternal'],
+      ] as [string, TranslationKey][]) {
+        expect(deedTitleText(deedId), `${lang} ${deedId} title`).toBe(t(milestoneKey));
+      }
+    }
+
+    // Real-translation spot pins (these would render the English fill if the
+    // locale tables were dropped or the language wiring broke).
+    setLanguage('de_DE');
+    expect(deedName('prog_first_steps')).toBe('Erste Schritte');
+    setLanguage('ja_JP');
+    expect(deedName('prog_first_steps')).toBe('はじめの一歩');
+    setLanguage('zh_CN');
+    expect(deedName('prog_first_steps')).toBe('千里之行');
+    setLanguage('ru_RU');
+    expect(deedTitleText('prog_veteran')).toBe('Ветеран');
 
     setLanguage('en');
   });

@@ -1,5 +1,13 @@
 import { createHash } from 'node:crypto';
-import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import path from 'node:path';
 
 const root = process.cwd();
@@ -9,13 +17,17 @@ const generatedPath = path.join(root, 'src/render/assets/manifest.generated.ts')
 
 const MEDIA_ROOTS = ['models', 'textures', 'env', 'vfx'];
 const HASH_LEN = 12;
+// Per-directory CLAUDE.md docs live alongside the assets under public/models/<category>/;
+// exclude them (and anything else non-media) so the manifest never ships internal docs.
+const MEDIA_EXTENSIONS = new Set(['.glb', '.fbx', '.hdr', '.jpg', '.jpeg', '.png', '.webp']);
 
 function walk(dir) {
   const out = [];
   for (const ent of readdirSync(dir, { withFileTypes: true })) {
     const p = path.join(dir, ent.name);
     if (ent.isDirectory()) out.push(...walk(p));
-    else if (ent.isFile()) out.push(p);
+    else if (ent.isFile() && MEDIA_EXTENSIONS.has(path.extname(ent.name).toLowerCase()))
+      out.push(p);
   }
   return out;
 }
@@ -53,7 +65,9 @@ function generate() {
       '',
     ].join('\n'),
   );
-  console.log(`generated ${path.relative(root, generatedPath)} (${Object.keys(entries).length} media assets)`);
+  console.log(
+    `generated ${path.relative(root, generatedPath)} (${Object.keys(entries).length} media assets)`,
+  );
 }
 
 function emit() {
@@ -66,7 +80,9 @@ function emit() {
     mkdirSync(path.dirname(dest), { recursive: true });
     copyFileSync(src, dest);
   }
-  console.log(`emitted ${Object.keys(entries).length} hashed media assets to ${path.relative(root, mediaDir)}`);
+  console.log(
+    `emitted ${Object.keys(entries).length} hashed media assets to ${path.relative(root, mediaDir)}`,
+  );
 }
 
 const cmd = process.argv[2] ?? 'generate';

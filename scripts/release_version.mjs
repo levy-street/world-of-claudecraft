@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { planVersionSync } from './version_sync.mjs';
@@ -10,8 +10,10 @@ const VERSION_RE = /^\d+\.\d+\.\d+$/;
 const RELEASE_REF_RE = /(?:^|refs\/heads\/)release\/v?(\d+\.\d+\.\d+)(?:-[a-z0-9][a-z0-9-]*)?$/;
 const MAC_DMG_RE = /world-of-claudecraft-\d+\.\d+\.\d+-mac-universal\.dmg/g;
 const LINUX_APPIMAGE_RE = /world-of-claudecraft-\d+\.\d+\.\d+-linux-x86_64\.AppImage/g;
+const WINDOWS_INSTALLER_RE = /world-of-claudecraft-\d+\.\d+\.\d+-win\.exe/g;
 const DESKTOP_VERSION_RE = /export const DESKTOP_VERSION = '(\d+\.\d+\.\d+)';/;
 const GAME_VERSION_RE = /(<div\b[^>]*\bid=["']game-version["'][^>]*>)v[^<]*(<\/div>)/;
+const README_VERSION_BADGE_SOURCE = String.raw`img\.shields\.io/badge/version-(\d+\.\d+\.\d+)-blue`;
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const PATHS = {
@@ -21,6 +23,8 @@ const PATHS = {
   pbxproj: 'ios/App/App.xcodeproj/project.pbxproj',
   desktopModule: 'src/game/desktop_download.ts',
   htmlFiles: ['index.html', 'play.html'],
+  readmeRoot: 'README.md',
+  readmeDir: 'docs/i18n',
 };
 
 function parseJson(text, path) {
@@ -89,11 +93,12 @@ export function setDesktopDownloadVersion(html, version, path) {
   }
   MAC_DMG_RE.lastIndex = 0;
   const normalized = normalizeVersion(version);
-  // The Linux AppImage link is index.html-only (play.html links only the dmg),
-  // so it rewrites where present and is never required.
+  // Optional platform links are rewritten wherever present. The macOS link is
+  // the only download URL every entry page is required to carry.
   return html
     .replace(MAC_DMG_RE, `world-of-claudecraft-${normalized}-mac-universal.dmg`)
-    .replace(LINUX_APPIMAGE_RE, `world-of-claudecraft-${normalized}-linux-x86_64.AppImage`);
+    .replace(LINUX_APPIMAGE_RE, `world-of-claudecraft-${normalized}-linux-x86_64.AppImage`)
+    .replace(WINDOWS_INSTALLER_RE, `world-of-claudecraft-${normalized}-win.exe`);
 }
 
 export function setDesktopModuleVersion(source, version, path) {
@@ -113,6 +118,22 @@ export function setGameVersionText(html, version, path) {
   return html.replace(GAME_VERSION_RE, `$1v${normalizeVersion(version)}$2`);
 }
 
+function readReadmeBadgeVersions(markdown) {
+  return [...markdown.matchAll(new RegExp(README_VERSION_BADGE_SOURCE, 'g'))].map(
+    (match) => match[1],
+  );
+}
+
+export function setReadmeVersionBadge(markdown, version, path) {
+  if (readReadmeBadgeVersions(markdown).length === 0) {
+    throw new Error(`${path} is missing a release version badge`);
+  }
+  return markdown.replace(
+    new RegExp(README_VERSION_BADGE_SOURCE, 'g'),
+    `img.shields.io/badge/version-${normalizeVersion(version)}-blue`,
+  );
+}
+
 export function planReleaseVersion({
   version,
   packageJson,
@@ -121,6 +142,7 @@ export function planReleaseVersion({
   pbxproj,
   desktopModule,
   htmlFiles,
+  readmeFiles,
 }) {
   const normalized = normalizeVersion(version);
   const nativePlan = planVersionSync({ version: normalized, gradle, pbxproj });
@@ -128,6 +150,12 @@ export function planReleaseVersion({
     Object.entries(htmlFiles).map(([path, html]) => [
       path,
       setGameVersionText(setDesktopDownloadVersion(html, normalized, path), normalized, path),
+    ]),
+  );
+  const nextReadmeFiles = Object.fromEntries(
+    Object.entries(readmeFiles).map(([path, markdown]) => [
+      path,
+      setReadmeVersionBadge(markdown, normalized, path),
     ]),
   );
 
@@ -138,6 +166,7 @@ export function planReleaseVersion({
     pbxproj: nativePlan.pbxproj,
     desktopModule: setDesktopModuleVersion(desktopModule, normalized, PATHS.desktopModule),
     htmlFiles: nextHtmlFiles,
+    readmeFiles: nextReadmeFiles,
   };
 }
 
@@ -175,6 +204,7 @@ export function collectReleaseVersionFailures({
   pbxproj,
   desktopModule,
   htmlFiles,
+  readmeFiles,
 }) {
   const expected = normalizeVersion(version);
   const failures = [];
@@ -222,6 +252,7 @@ export function collectReleaseVersionFailures({
 
   const expectedArtifact = `world-of-claudecraft-${expected}-mac-universal.dmg`;
   const expectedLinuxArtifact = `world-of-claudecraft-${expected}-linux-x86_64.AppImage`;
+  const expectedWindowsArtifact = `world-of-claudecraft-${expected}-win.exe`;
   for (const [path, html] of Object.entries(htmlFiles)) {
     const gameVersion = readGameVersion(html);
     if (gameVersion !== expected) {
@@ -236,15 +267,40 @@ export function collectReleaseVersionFailures({
     if (LINUX_APPIMAGE_RE.test(html) && !html.includes(expectedLinuxArtifact)) {
       failures.push(`${path} has a stale Linux desktop download URL, expected ${expected}`);
     }
+    WINDOWS_INSTALLER_RE.lastIndex = 0;
+    if (WINDOWS_INSTALLER_RE.test(html) && !html.includes(expectedWindowsArtifact)) {
+      failures.push(`${path} has a stale Windows desktop download URL, expected ${expected}`);
+    }
     if (/coming soon/i.test(html)) {
       failures.push(`${path} still contains Coming Soon in the download panel`);
+    }
+  }
+
+  for (const [path, markdown] of Object.entries(readmeFiles)) {
+    const badgeVersions = readReadmeBadgeVersions(markdown);
+    if (badgeVersions.length === 0) {
+      failures.push(`${path} is missing a release version badge`);
+      continue;
+    }
+    const staleBadge = badgeVersions.find((badgeVersion) => badgeVersion !== expected);
+    if (staleBadge) {
+      failures.push(`${path} version badge includes ${staleBadge}, expected all ${expected}`);
     }
   }
 
   return failures;
 }
 
+function readReadmePaths() {
+  const localized = readdirSync(resolve(ROOT, PATHS.readmeDir), { withFileTypes: true })
+    .filter((entry) => entry.isFile() && /^README\.[^.]+\.md$/.test(entry.name))
+    .map((entry) => `${PATHS.readmeDir}/${entry.name}`)
+    .sort();
+  return [PATHS.readmeRoot, ...localized];
+}
+
 function readReleaseFiles() {
+  const readmePaths = readReadmePaths();
   return {
     packageJson: readFileSync(resolve(ROOT, PATHS.packageJson), 'utf8'),
     packageLock: readFileSync(resolve(ROOT, PATHS.packageLock), 'utf8'),
@@ -253,6 +309,9 @@ function readReleaseFiles() {
     desktopModule: readFileSync(resolve(ROOT, PATHS.desktopModule), 'utf8'),
     htmlFiles: Object.fromEntries(
       PATHS.htmlFiles.map((path) => [path, readFileSync(resolve(ROOT, path), 'utf8')]),
+    ),
+    readmeFiles: Object.fromEntries(
+      readmePaths.map((path) => [path, readFileSync(resolve(ROOT, path), 'utf8')]),
     ),
   };
 }
@@ -265,6 +324,9 @@ function writeReleaseFiles(plan) {
   writeFileSync(resolve(ROOT, PATHS.desktopModule), plan.desktopModule);
   for (const [path, html] of Object.entries(plan.htmlFiles)) {
     writeFileSync(resolve(ROOT, path), html);
+  }
+  for (const [path, markdown] of Object.entries(plan.readmeFiles)) {
+    writeFileSync(resolve(ROOT, path), markdown);
   }
 }
 

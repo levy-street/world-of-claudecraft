@@ -94,7 +94,10 @@ export function applyHeal(
   if (target.dead) return;
   const crit = ctx.rng.chance(ctx.spellCrit(source));
   let healed = Math.round(
-    amount * (crit ? 1.5 : 1) * hexOutputMult(ctx, source) * healingTakenMult(ctx, target),
+    amount *
+      (crit ? 1.5 + source.critDmgHealBonus : 1) *
+      hexOutputMult(ctx, source) *
+      healingTakenMult(ctx, target),
   );
   healed = consumeHealAbsorb(ctx, target, healed);
   healed = Math.min(healed, target.maxHp - target.hp);
