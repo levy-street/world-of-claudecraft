@@ -1154,13 +1154,15 @@ export const KNOWN_DEVIATIONS: readonly KnownDeviation[] = [
       '/internal/daily-rewards/pending-payouts',
       '/internal/daily-rewards/payout-history',
       '/internal/daily-rewards/mark-payout',
+      '/internal/daily-rewards/void-payout',
+      '/internal/daily-rewards/restore-payout',
     ],
     currentBehavior:
       'The legacy ops family is the FIRST arm of the /internal composite delegate ' +
       '(handleDailyRewardInternalApi, tried before handleInternalApi), fired ' +
       'fire-and-forget with NO outer catch: mark-payout self-reads its body via an ' +
       'UN-caught readBody (unlike internal.ts, which .catch(() => ({}))s every read), ' +
-      'so a malformed/over-cap body AND any DB throw in the three handlers become an ' +
+      'so a malformed/over-cap body AND any DB throw in the five handlers become an ' +
       'unhandled rejection: NO response is written and the payout service request ' +
       'HANGS. The gate itself is FAIL-CLOSED: an unset ' +
       'WOC_DAILY_REWARD_SERVICE_SECRET and a wrong x-woc-daily-reward-secret header ' +
@@ -1168,7 +1170,7 @@ export const KNOWN_DEVIATIONS: readonly KnownDeviation[] = [
       "(never the other internal gates' feature-off 404, never a " +
       'RESTART_COUNTDOWN_SECRET fallback).',
     intendedBehavior:
-      'The migration registers the three ops routes behind the new ' +
+      'The migration registers the five ops routes behind the new ' +
       'requireInternalSecretFailClosed gate (same fail-closed 401 semantics, ' +
       'per-request env read, length-guarded timingSafeEqual) with handlers calling ' +
       'the SAME handleDailyRewardInternalApi core, and routes the rejection to the ' +

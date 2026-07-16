@@ -50,6 +50,7 @@ export type StatId =
   | 'dodge'
   | 'critRating'
   | 'hasteRating'
+  | 'hitRating'
   | 'warfare';
 
 /** A single contribution line. `value` is already in the unit the line displays
@@ -151,6 +152,8 @@ export interface StatTooltipInput {
   critRating: number;
   /** entity.hasteRating, the accumulated haste rating from gear + set bonuses. */
   hasteRating: number;
+  /** entity.hitRating, the accumulated hit rating from gear + set bonuses. */
+  hitRating: number;
   /** Weapon damage-per-second exactly as the panel computes it. */
   dps: number;
   /** Equipped items contributing stats, for the gear source line (HUD maps from
@@ -343,6 +346,11 @@ export function buildStatTooltip(stat: StatId, input: StatTooltipInput): StatToo
       statValue = input.hasteRating;
       break;
     }
+    case 'hitRating': {
+      isPrimary = false;
+      statValue = input.hitRating;
+      break;
+    }
     case 'warfare': {
       isPrimary = false;
       statValue = stats.pvpOffense * 100;
@@ -499,6 +507,7 @@ export function buildStatSources(stat: StatId, input: StatTooltipInput): StatSou
     // description carries the meaning, so no per-source breakdown line.
     case 'critRating':
     case 'hasteRating':
+    case 'hitRating':
     case 'warfare':
       return sources;
   }

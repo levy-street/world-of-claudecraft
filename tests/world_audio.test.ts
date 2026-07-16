@@ -1,15 +1,19 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import {
   buildWorldAmbientSources,
   crowdAmbienceAt,
   footstepSurfaceAt,
   isOnDockDeck,
 } from '../src/render/world_audio';
-import { DUNGEON_X_THRESHOLD, PROPS } from '../src/sim/data';
+import { BUILTIN_WORLD, DUNGEON_X_THRESHOLD, PROPS, setActiveWorldContent } from '../src/sim/data';
 import { SOWFIELD_CENTER } from '../src/sim/vale_cup_layout';
 import { groundHeight } from '../src/sim/world';
 
 const SEED = 20061;
+
+afterEach(() => {
+  setActiveWorldContent(null);
+});
 
 function dockWorld(
   dock: (typeof PROPS.docks)[number],
@@ -38,6 +42,27 @@ describe('world audio routing', () => {
         footstepSurfaceAt(SEED, beside.x, groundHeight(beside.x, beside.z, SEED), beside.z, true),
       ).not.toBe('wood');
     }
+  });
+
+  it('routes dock footsteps from the active world after content swaps', () => {
+    const builtinDock = PROPS.docks[0];
+    const builtinDeck = dockWorld(builtinDock, 0, -3.18);
+    const customDock = { ...builtinDock, x: 120, z: 140 };
+    const customDeck = dockWorld(customDock, 0, -3.18);
+
+    setActiveWorldContent({
+      ...BUILTIN_WORLD,
+      props: { ...BUILTIN_WORLD.props, docks: [customDock] },
+    });
+
+    expect(isOnDockDeck(builtinDeck.x, builtinDeck.z)).toBe(false);
+    expect(isOnDockDeck(customDeck.x, customDeck.z)).toBe(true);
+
+    setActiveWorldContent({
+      ...BUILTIN_WORLD,
+      props: { ...BUILTIN_WORLD.props, docks: [] },
+    });
+    expect(isOnDockDeck(customDeck.x, customDeck.z)).toBe(false);
   });
 
   it('keeps dungeon floors stone', () => {

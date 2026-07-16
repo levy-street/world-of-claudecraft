@@ -6,10 +6,25 @@
 
 import { sanitizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import type { MoveInput } from '../sim/types';
+import { detectBrowserEngine } from './browser_env';
 import { cursorForHover, type HoverCursorKind } from './cursors';
 import { comboCode, isModifierCode, type Keybinds, makeCombo } from './keybinds';
-import { shouldEngagePointerLock, shouldReleasePointerLock } from './pointer_lock';
+import {
+  pointerLockNeedsSyncGesture,
+  shouldEngagePointerLock,
+  shouldEngagePointerLockOnMouseDown,
+  shouldReleasePointerLock,
+} from './pointer_lock';
+import { normalizePointerLookDelta } from './pointer_look_delta';
 import { clickPickFromMouseGesture, DEFAULT_CLICK_PICK_MAX_MS } from './pointer_pick';
+
+function detectPointerLockNeedsSyncGesture(): boolean {
+  try {
+    return pointerLockNeedsSyncGesture(navigator.userAgent);
+  } catch {
+    return false;
+  }
+}
 
 const BASE_LOOK_SENS = 0.0045;
 const TOUCH_LOOK_YAW_RATE = 3.2;
@@ -67,11 +82,13 @@ export interface InputCallbacks {
       | 'social'
       | 'arena'
       | 'valecup'
+      | 'dungeonFinder'
       | 'leaderboard'
       | 'calendar'
       | 'discord'
       | 'deeds'
-      | 'crafting',
+      | 'crafting'
+      | 'sheathe',
   ): void;
   onEmoteWheel(open: boolean): void;
   onClickPick(x: number, y: number, button: number): void;
@@ -159,6 +176,9 @@ export class Input {
   private lookPitchSign = 1;
   private downButton = -1;
   private pointerLockRequestedForDrag = false;
+  // Firefox rejects requestPointerLock() when it is deferred to a later
+  // mousemove; computed once since the browser cannot change mid-session.
+  private readonly needsSyncPointerLockGesture = detectPointerLockNeedsSyncGesture();
   private downX = 0;
   private downY = 0;
   private downAt = 0;
@@ -174,6 +194,14 @@ export class Input {
   // mouse-look sensitivity, in radians per pixel of drag; the old fixed value
   // was BASE_LOOK_SENS — setCameraSpeed scales it from the settings menu
   private lookSensitivity = BASE_LOOK_SENS;
+  // Gecko (Firefox) reports movementX/movementY in CSS pixels, not the physical
+  // pixels Chromium reports and the sensitivity is tuned against, so on a HiDPI
+  // display or under page zoom its mouselook runs at the wrong speed (#1834).
+  // Detected once (the engine never changes mid-session) and used to normalize
+  // each delta in onMouseMove; every other engine stays a pass-through.
+  private readonly isGeckoEngine =
+    typeof navigator !== 'undefined' &&
+    detectBrowserEngine(navigator.userAgent || '').engine === 'gecko';
   private touchMove: TouchMoveInput = {
     forward: false,
     back: false,
@@ -209,7 +237,24 @@ export class Input {
     window.addEventListener('pointerup', (e) => this.onMouseUp(e));
     window.addEventListener('pointercancel', (e) => this.onMouseUp(e));
     document.addEventListener('pointerlockchange', () => {
-      if (!document.pointerLockElement) this.releaseCapture('pointerlock');
+      if (!document.pointerLockElement) {
+        this.releaseCapture('pointerlock');
+        return;
+      }
+      // A fast click can beat the async requestPointerLock() grant: the
+      // mousedown-synchronous request above (Firefox) or the drag-threshold
+      // request (Chromium) can resolve AFTER mouseup already ran, so nothing
+      // released it there. If the grant lands with no drag button currently
+      // held, drop it immediately rather than leaving the cursor stuck
+      // captured until the next press/release cycle.
+      if (
+        shouldReleasePointerLock({
+          anyButtonDown: this.leftDown || this.rightDown,
+          hasLock: document.pointerLockElement === this.canvas,
+        })
+      ) {
+        document.exitPointerLock();
+      }
     });
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) this.releaseCapture('hidden');
@@ -852,6 +897,9 @@ export class Input {
       case 'arena':
         this.cb.onUiKey('arena');
         return;
+      case 'dungeonFinder':
+        this.cb.onUiKey('dungeonFinder');
+        return;
       case 'valecup':
         this.cb.onUiKey('valecup');
         return;
@@ -870,6 +918,9 @@ export class Input {
       case 'chat':
         this.cb.onUiKey('chat');
         return;
+      case 'sheathe':
+        this.cb.onUiKey('sheathe');
+        return;
     }
   }
 
@@ -886,8 +937,32 @@ export class Input {
     this.cameraDragActive = false;
     // Pointer lock is requested lazily once a drag actually begins (see
     // onMouseMove) — NOT on every press, which spammed the browser "mouse
-    // capture" banner on every right-click used to attack/look (#116).
+    // capture" banner on every right-click used to attack/look (#116). That
+    // deferred mousemove call is denied by Firefox outside fullscreen (see
+    // needsSyncPointerLockGesture), so on Firefox it is instead requested
+    // synchronously right here, for either drag-capable button (left or
+    // right), excluding the click-to-move button. That preserves #116 fully
+    // only on Chromium: on Firefox, an ordinary click on a non-click-to-move
+    // button (e.g. right-click to loot/target/interact) still takes and
+    // releases the lock on every press, a visible flicker, because we cannot
+    // tell a click from the start of a drag until it has already moved. A
+    // genuine drag started on the click-to-move button also stays unfixed on
+    // Firefox (its lock request only ever comes from the denied mousemove
+    // path). Both are accepted trade-offs of restoring working camera drag on
+    // Firefox; see shouldEngagePointerLockOnMouseDown for the full reasoning.
     this.pointerLockRequestedForDrag = false;
+    if (
+      shouldEngagePointerLockOnMouseDown({
+        button: e.button,
+        clickMoveButton: this.clickMoveMouseButton,
+        needsSyncGesture: this.needsSyncPointerLockGesture,
+        lockOnRotate: this.lockCursorOnRotate,
+        alreadyLocked: document.pointerLockElement === this.canvas,
+      })
+    ) {
+      this.pointerLockRequestedForDrag = true;
+      void this.canvas.requestPointerLock?.()?.catch?.(() => {});
+    }
     this.updateCursor();
   }
 
@@ -933,8 +1008,15 @@ export class Input {
       this.hoverY = e.clientY;
     }
     if (!this.leftDown && !this.rightDown) return;
-    const mx = e.movementX ?? 0,
-      my = e.movementY ?? 0;
+    // Normalize the raw movement delta to Chromium's physical-pixel unit so
+    // mouselook keeps the same speed and drag-start feel on Firefox, where the
+    // deltas arrive in CSS pixels (#1834). A no-op on Chromium/WebKit.
+    const { dx: mx, dy: my } = normalizePointerLookDelta({
+      movementX: e.movementX ?? 0,
+      movementY: e.movementY ?? 0,
+      isGecko: this.isGeckoEngine,
+      devicePixelRatio: typeof window !== 'undefined' ? window.devicePixelRatio : 1,
+    });
     if (mx === 0 && my === 0) return;
     const heldMs = this.pressDurationMs();
     if (this.downButton === this.clickMoveMouseButton && heldMs <= DEFAULT_CLICK_PICK_MAX_MS)

@@ -12,6 +12,7 @@ import path from 'node:path';
 import { conformSfxAudio } from './sfx/conform_audio.mjs';
 import { buildSfxGenerationPlan } from './sfx/generation_plan.mjs';
 import { writeSfxManifest } from './sfx/manifest.mjs';
+import { expectedChannelsForEntry } from './sfx/sfx_conform_rules.mjs';
 import { SFX } from './sfx/sfx_prompts.mjs';
 
 const API = 'https://api.elevenlabs.io';
@@ -113,6 +114,9 @@ for (const { entry, tracks } of generationPlan) {
         outputFile: destination,
         duration: track.duration,
         ffmpegPath,
+        // Ambience loops (stereo: true) keep both channels; every other cue is
+        // downmixed to mono to match its positional/one-shot playback path.
+        channels: expectedChannelsForEntry(entry),
       });
       seconds += track.duration;
       made++;

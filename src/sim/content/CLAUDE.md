@@ -187,3 +187,18 @@ content you add here should reach it in the same change:
   CI on any dangling id ("all loot tables, vendor stock, camps and dungeon spawns
   resolve"; a collect objective also needs an acquisition source). Run
   `npx vitest run tests/progression.test.ts` after wiring new content.
+- **Never delete or rename a SHIPPED item id.** Once an id exists on main or any
+  `release/**` branch it may have reached a deployed realm, and player saves keep
+  raw item ids in equipment, bags, bank, mail attachments, and market listings,
+  loaded verbatim with no validation: an id that stops resolving in `ITEMS` renders
+  as an Empty slot with zero stats while sitting dormant in the save (v0.25.0
+  deleted four heroic defs this way and 18 prod characters lost visible gear). To
+  remove an item from the game, RETIRE it: keep the def and remove every
+  acquisition path (exemplar: `RETIRED_HEROIC_ITEMS` in `heroic_loot.ts`). Renames
+  are display-only through the i18n catalog; the id stays frozen. Watch the
+  generated tier too: dropping a base item from a mob's `loot[]` also deletes its
+  generated `heroic_<id>` variant def, which players may hold. Only an item that
+  never left your unmerged feature branch may be deleted outright.
+  `tests/shipped_item_ids.test.ts` pins every shipped id against `ITEMS`
+  (append-only golden; after a release re-mint with `UPDATE_SHIPPED_ITEMS=1` and
+  review the diff as additions-only).

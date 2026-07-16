@@ -13,7 +13,7 @@ construir una mazmorra completamente nueva: todo cuenta, y aquí eres bienvenido
 
 Esta guía te ayudará a configurar tu entorno y a que tu primera contribución
 salga sin contratiempos. No necesitas ser una persona experta. Si algo no queda
-claro, pregunta en [Discord](https://discord.gg/GjhnUsBtw) y alguien estará feliz
+claro, pregunta en [Discord](https://discord.com/invite/worldofclaudecraft) y alguien estará feliz
 de ayudarte.
 
 Al participar, aceptas seguir nuestro [Código de Conducta](../../CODE_OF_CONDUCT.md).
@@ -177,7 +177,7 @@ escribir nada de código de juego para hacerlo:
 3. Ejecuta `npx tsc --noEmit` para confirmar que no falte nada, y luego abre un PR.
 
 Para proponer un idioma totalmente nuevo, o para conversar sobre tono y
-terminología, inicia un hilo en [Discord](https://discord.gg/GjhnUsBtw) y te
+terminología, inicia un hilo en [Discord](https://discord.com/invite/worldofclaudecraft) y te
 ayudaremos a conectarlo. Las personas hablantes nativas y fluidas son
 especialmente bienvenidas. Las buenas traducciones hacen que el juego se sienta
 como en casa para jugadores de todas partes.
@@ -197,7 +197,7 @@ Por favor, usa las [plantillas de issue](https://github.com/levy-street/world-of
 ## Cómo conseguir ayuda
 
 ¿Atascado, o solo quieres saludar? Únete al
-[Discord de la comunidad](https://discord.gg/GjhnUsBtw). Ninguna pregunta es
+[Discord de la comunidad](https://discord.com/invite/worldofclaudecraft). Ninguna pregunta es
 demasiado pequeña, y las personas que contribuyen por primera vez siempre son
 bienvenidas.
 

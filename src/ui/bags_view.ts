@@ -9,13 +9,17 @@
 //
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).
 
+import { type BagCells, layoutBagCells } from '../sim/inventory_order';
 import type { InvSlot } from '../sim/types';
 import {
   applyBagFilter,
   type BagFilterState,
   bagFilterIsDefault,
+  bagOrderIsManual,
   type ItemLookup,
 } from './bag_filter';
+
+export type { BagCells };
 
 /** The item facts the bag click/tooltip logic needs (a subset of ItemDef). */
 export interface BagItemInfo {
@@ -167,12 +171,14 @@ export function bagsWindowShown(display: string): boolean {
   return display !== 'none' && display !== '';
 }
 
-/** What a right-click (destroy affordance) on a bag item does. 'discard' opens the
- *  destroy prompt, 'discardBlocked' rejects a protected item with feedback, 'none'
- *  means the destroy affordance is inert. */
+/** What the shift+right-click destroy affordance on a bag item does. 'discard' opens
+ *  the destroy prompt, 'discardBlocked' rejects a protected item with feedback, 'none'
+ *  means the destroy affordance is inert. A plain right-click (no shift) now runs the
+ *  same primary action as a left-click (equip/use/etc, via bagItemAction), matching
+ *  classic-MMO expectations instead of destroying the item by surprise (issue 1852). */
 export type BagDestroyAction = 'discard' | 'discardBlocked' | 'none';
 
-/** Decide the right-click destroy affordance for a bag item. Inert in the
+/** Decide the shift+right-click destroy affordance for a bag item. Inert in the
  *  transactional modes (trade / mail / market / vendor / pet-feed / bank-deposit),
  *  whose own click/contextmenu owns the slot; a noDiscard item is protected with
  *  feedback, every other item can be destroyed (mirrors the sim's discardItem rule,
@@ -233,6 +239,12 @@ export type BagGridState = 'empty' | 'noMatch' | 'items';
 
 export interface BagGridModel {
   state: BagGridState;
+  /** The bag's REAL cells: one entry per square, null where the square is empty, with
+   *  every stack sitting in the cell the player parked it in (src/sim/inventory_order.ts
+   *  layoutBagCells). Only the pristine view (no filter, no search, sort by recent) shows
+   *  the true cells; a filtered or sorted view is a derived LIST, so this is empty there
+   *  and the painter falls back to `visible` + `emptyCells`. */
+  cells: BagCells;
   /** The filtered, ordered slots to paint (empty unless state === 'items'). */
   visible: InvSlot[];
   /** Free slot squares to paint after the items (0 while a filter/search is
@@ -258,14 +270,18 @@ export function buildBagGrid(
   const showEmpties = bagFilterIsDefault(filter);
   const emptyCells = showEmpties ? Math.max(0, capacity - inventory.length) : 0;
   const overflow = Math.max(0, inventory.length - capacity);
+  // The pristine view paints the bag's real cells (holes and all); every other view is a
+  // derived list, where a square is just a row and holds no position.
+  const cells = bagOrderIsManual(filter) ? layoutBagCells(inventory, capacity) : [];
   if (inventory.length === 0) {
     return emptyCells > 0
-      ? { state: 'items', visible: [], emptyCells, overflow }
-      : { state: 'empty', visible: [], emptyCells: 0, overflow };
+      ? { state: 'items', cells, visible: [], emptyCells, overflow }
+      : { state: 'empty', cells: [], visible: [], emptyCells: 0, overflow };
   }
   const visible = applyBagFilter(inventory, lookup, filter);
-  if (visible.length === 0) return { state: 'noMatch', visible: [], emptyCells: 0, overflow };
-  return { state: 'items', visible, emptyCells, overflow };
+  if (visible.length === 0)
+    return { state: 'noMatch', cells: [], visible: [], emptyCells: 0, overflow };
+  return { state: 'items', cells, visible, emptyCells, overflow };
 }
 
 /** One socket of the bag bar: the equipped bag (with its slot count) or an

@@ -10,7 +10,7 @@
 // hooks, and the shared `pulseGroundAoE`/`applyTaunt`/`meleeSwing` entry points all
 // STAY on Sim and are consumed via the seam. The pure module fns/consts the switch
 // uses (preservesStealth, armorReduction, recalcPlayerStats, addThreat,
-// meleeMissChance, CHARGE_MAX_DURATION) are imported/inlined directly.
+// swingMissChance, CHARGE_MAX_DURATION) are imported/inlined directly.
 //
 // `src/sim`-pure: no DOM/Three, no Math.random/Date.now; all randomness is the
 // shared `ctx.rng` stream, drawn in the exact pre-move order.
@@ -31,7 +31,7 @@ import {
 import { stunDrCategory } from '../stun_dr';
 import { addThreat } from '../threat';
 import type { AbilityDef, Entity } from '../types';
-import { armorReduction, FISHING_CAST_ID, meleeMissChance } from '../types';
+import { armorReduction, FISHING_CAST_ID, swingMissChance } from '../types';
 import { isRootedOrChilled } from './cc';
 import { consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
@@ -45,7 +45,10 @@ function isStealthToggle(ability: AbilityDef): boolean {
 }
 
 function preservesStealth(ability: AbilityDef): boolean {
-  return isStealthToggle(ability) || ability.id === 'sprint';
+  // Sap is the classic no-reveal opener: it incapacitates from range without a
+  // melee swing, so unlike Cheap Shot/Ambush/Garrote it must not blow the
+  // caster's own stealth (issue #1890).
+  return isStealthToggle(ability) || ability.id === 'sprint' || ability.id === 'sap';
 }
 
 function consumeMatchingAura(
@@ -1178,8 +1181,9 @@ export function runEffects(
       }
       case 'sunder': {
         if (!target || target.dead) break;
-        // a sunder can miss like any melee attack — a miss causes no threat
-        if (ctx.rng.chance(meleeMissChance(p.level, target.level))) {
+        // a sunder can miss like any melee attack (and Hit rating reduces it, via
+        // swingMissChance); a miss causes no threat
+        if (ctx.rng.chance(swingMissChance(p, target))) {
           ctx.emit({
             type: 'damage',
             sourceId: p.id,

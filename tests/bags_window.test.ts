@@ -124,7 +124,7 @@ describe('bags_window: bank-deposit mode wiring', () => {
     // catalog key would be dead and the affordance undiscoverable.
     expect(painter).toContain("key === 'hudChrome.bank.depositHint' && bankDepositOpensPrompt(s)");
     expect(painter).toContain("t('hudChrome.bank.depositPartialHint')");
-    expect(painter).toContain('+ extra + partial + destroy + link');
+    expect(painter).toContain('+ extra + partial + equipDrag + destroy + link');
   });
 });
 
@@ -135,8 +135,15 @@ describe('bags_window: touch peek + bank-cluster close', () => {
     // feed). The guard check sits at the TOP of the handler, before the shift-link and
     // the bagItemAction switch, so a peek release can never fall through to an action.
     expect(painter).toContain('consumePeek(): boolean;');
+    // The peek check stays FIRST; the only thing that may sit between it and the
+    // shift-link arm is the touch-drag click suppression (the synthetic click that
+    // trails a completed drag), which is likewise a "swallow this click" gate.
     expect(painter).toMatch(
-      /row\.addEventListener\('click', \(ev\) => \{[\s\S]{0,320}?if \(this\.deps\.consumePeek\(\)\) \{\s*this\.deps\.hideTooltip\(\);\s*return;\s*\}\s*if \(ev\.shiftKey && bagShiftLinks/,
+      /row\.addEventListener\('click', \(ev\) => \{[\s\S]{0,320}?if \(this\.deps\.consumePeek\(\)\) \{\s*this\.deps\.hideTooltip\(\);\s*return;\s*\}[\s\S]{0,400}?if \(ev\.shiftKey && bagShiftLinks/,
+    );
+    // The drag's trailing click must never ALSO run the stack's action.
+    expect(painter).toMatch(
+      /if \(this\.suppressNextClick\) \{\s*this\.suppressNextClick = false;\s*return;\s*\}/,
     );
     // Slice to the BAGS construction block (its own `});` terminator) so this pins
     // the bags-side guard wiring specifically; an unsliced scan would stay green off
@@ -216,5 +223,79 @@ describe('bags_window: touch peek + bank-cluster close', () => {
     expect(painter).toMatch(
       /if \(ke\.key === 'Enter' \|\| ke\.key === ' ' \|\| ke\.code === 'Space'\) \{\s*ke\.stopPropagation\(\);\s*if \(!prompt\.isConnected\) ke\.preventDefault\(\);\s*return;\s*\}/,
     );
+  });
+
+  it('the shared dispatch reaches the transactional modes too, not just equip/use (issue 1852 review)', () => {
+    // runBagAction runs the FULL mode switch for both left-click and right-click, so
+    // trade / mail / market-sell / bank-deposit / pet-feed also fire on right-click
+    // (previously inert there, since bagDestroyAction returned 'none' for them).
+    // bagItemAction's per-mode dispatch is exhaustively pinned in bags_view.test.ts;
+    // this pins that runBagAction's switch actually wires each of those actions
+    // to its staging call, so the two pins together prove reachability from
+    // right-click without a live DOM harness.
+    const start = painter.indexOf('private runBagAction(');
+    const body = painter.slice(start, painter.indexOf('\n  }\n', start));
+    expect(body).toMatch(/case 'trade':\s*this\.deps\.addItemToTrade\(s\.itemId\);/);
+    expect(body).toMatch(/case 'mailAttach':\s*this\.deps\.stageMailParcel\(s\.itemId\);/);
+    expect(body).toMatch(/case 'marketSell':\s*this\.deps\.stageMarketSell\(s\.itemId\);/);
+    expect(body).toMatch(/case 'bankDeposit': \{/);
+    expect(body).toMatch(/case 'petFeed':\s*this\.deps\.world\(\)\.feedPet\(s\.itemId\);/);
+  });
+});
+
+describe('bags_window: right-click uses, dragging destroys/equips', () => {
+  it('right-click runs the SAME action as left-click and never opens the destroy prompt', () => {
+    // The classic binding: right-click uses/equips. Destroying moved to the drag-out
+    // gesture, so the contextmenu handler must reach runBagAction and must NOT call
+    // the discard prompt (the release/v0.25.0 behavior this replaces).
+    const ctx = painter.slice(
+      painter.indexOf("row.addEventListener('contextmenu'"),
+      painter.indexOf('row.draggable ='),
+    );
+    expect(ctx).toContain('this.runBagAction(item, s, ev)');
+    expect(ctx).not.toContain('showDiscardItemPrompt');
+    expect(ctx).not.toContain('bagDestroyAction');
+    // The vendor's Ctrl/Meta split-stack sell survives untouched.
+    expect(ctx).toContain('this.sellBagItem(s, ev)');
+  });
+
+  it('every stack is draggable outside the transactional modes (not just hotbar items)', () => {
+    // Previously only food/drink/potion/fishing items were draggable (to the action
+    // bar). Now any stack can be dragged to a paperdoll socket or out to destroy, and
+    // only the hotbar-eligible ones additionally write the hotbar DataTransfer payload.
+    expect(painter).toContain('row.draggable = !this.deps.tradeOpen() && !this.deps.vendorOpen();');
+    expect(painter).toMatch(
+      /dragstart[\s\S]{0,400}?this\.deps\.dragState\.begin\(drag\);[\s\S]{0,200}?if \(this\.deps\.isHotbarItemId\(s\.itemId\)\) \{/,
+    );
+  });
+
+  it('the world drop opens the destroy prompt and honors the noDiscard refusal', () => {
+    expect(painter).toContain('promptDestroy(itemId: string, count: number): void');
+    expect(painter).toContain('destroyAction(itemId: string): BagDestroyAction');
+    expect(painter).toContain("t('hudChrome.bags.cannotDestroy')");
+    // The HUD installs the canvas as the world drop target with exactly those seams.
+    expect(hud).toContain('installWorldDropTarget({');
+    expect(hud).toContain("root: () => $('#game-canvas'),");
+    expect(hud).toContain('destroyAction: (itemId) => this.bagsWindow.destroyAction(itemId),');
+  });
+
+  it('the tooltip advertises the two drag gestures, not the dead right-click destroy', () => {
+    expect(painter).toContain("t('hudChrome.bags.dragEquipHint')");
+    expect(painter).toContain("t('hudChrome.bags.dragDestroyHint')");
+    expect(painter).not.toContain('rightClickDestroy');
+  });
+});
+
+describe('bags_window: styles for the drag affordances', () => {
+  it('the touch ghost never eats the hit test that resolves the drop target under it', () => {
+    const ghost = components.slice(
+      components.indexOf('.touch-drag-ghost {'),
+      components.indexOf('.touch-drag-ghost .item-icon'),
+    );
+    expect(ghost).toContain('pointer-events: none;');
+  });
+
+  it('an accepting paperdoll socket lights up as a drop target', () => {
+    expect(components).toContain('.equip-slot.drop-target {');
   });
 });

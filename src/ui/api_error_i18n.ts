@@ -175,12 +175,53 @@ function resolveByCode(code: string, params: Record<string, unknown> | undefined
   return t(key);
 }
 
+// A failed fetch (connection refused, DNS failure, or an offline device) rejects
+// with a TypeError and no stable error code. Engines word that TypeError differently,
+// so recognize their known messages without treating arbitrary application Errors
+// containing words such as "load failed" as transport failures.
+const TRANSPORT_FAILURE_MESSAGES = new Set([
+  'failed to fetch',
+  'load failed', // Safari
+  'fetch failed', // Node / undici (the underlying cause is e.g. ECONNREFUSED)
+  'network request failed',
+  'the network connection was lost',
+]);
+
+// True for a fetch transport failure, or for the empty gateway response produced
+// when a reverse/dev proxy cannot reach its backend. An explicit server error body
+// remains a diagnostic even when it uses the same gateway status.
+function isTransportFailure(err: unknown): boolean {
+  // A problem body with a stable code came from the application server. RFC
+  // problem bodies omit the legacy `error` field, so ApiError's message is the
+  // same generic status text as an empty proxy response; the code is what
+  // distinguishes those cases.
+  if (errorCode(err) !== undefined) return false;
+  const status =
+    err && typeof err === 'object' && typeof (err as { status?: unknown }).status === 'number'
+      ? (err as { status: number }).status
+      : undefined;
+  const message = technicalErrorMessage(err).trim().toLowerCase();
+  if (status !== undefined) {
+    return (
+      (status === 502 || status === 503 || status === 504) &&
+      message === `request failed (${status})`
+    );
+  }
+  if (!(err instanceof TypeError)) return false;
+  const normalized = message.replace(/[.!]+$/, '');
+  return normalized.includes('networkerror') || TRANSPORT_FAILURE_MESSAGES.has(normalized);
+}
+
 export function userFacingApiError(err: unknown): string {
   const code = errorCode(err);
   if (code) {
     const byCode = resolveByCode(code, errorParams(err));
     if (byCode !== null) return byCode;
   }
+
+  // The server was unreachable (fetch rejected). Surface the same localized connection
+  // message the WebSocket-drop path already uses, not the raw browser diagnostic.
+  if (isTransportFailure(err)) return t('loading.connectionLost');
 
   // --- Prose fallback (old-ladder routes, until the ladder is removed). Moved verbatim from
   // src/main.ts; each arm re-localizes a stable English source string. ---
@@ -274,6 +315,13 @@ export function userFacingApiError(err: unknown): string {
   // WebSocket disconnect reasons surfaced through the fatal overlay (net/online.ts).
   if (normalized === 'connection to the server was lost.') return t('loading.connectionLost');
   if (normalized === 'rejected by server') return t('loading.connectionRejected');
+  // The realm admission cap refused a fresh join. 'realm is full' is a byte-exact
+  // wire contract with server/ws_auth.ts (WS_AUTH_ERROR).
+  if (normalized === 'realm is full') return t('loading.realmFull');
+  // The per-IP connection cap refused the handshake. 'too many connections from your
+  // network' is a byte-exact wire contract with server/ws_auth.ts (WS_AUTH_ERROR).
+  if (normalized === 'too many connections from your network')
+    return t('loading.tooManyConnections');
   // NOTE: protocol/transport diagnostics ('bad auth message', 'authentication timed out',
   // etc.) are intentionally NOT translated, they are developer/diagnostic errors and must
   // stay English so browser logs and support reports match the server source.

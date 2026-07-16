@@ -20,7 +20,7 @@
 import { audio } from '../game/audio';
 import { BACKPACK_SLOTS, bagSlotsOf } from '../sim/bags';
 import { ITEMS } from '../sim/data';
-import type { InvSlot } from '../sim/types';
+import type { EquipSlot, InvSlot } from '../sim/types';
 import type { IWorld } from '../world_api';
 import {
   BAG_CATEGORIES,
@@ -28,11 +28,13 @@ import {
   type BagCategory,
   type BagFilterState,
   type BagSort,
+  bagOrderIsManual,
   DEFAULT_BAG_FILTER,
   parseBagFilter,
   serializeBagFilter,
 } from './bag_filter';
 import {
+  type BagDestroyAction,
   type BagMode,
   bagDestroyAction,
   bagItemAction,
@@ -46,14 +48,19 @@ import {
   resolveDepositSubmit,
 } from './bags_view';
 import { itemDisplayName } from './entity_i18n';
+import { dropRequiredLevel, isPaperdollDraggable, paperdollDropAction } from './equip_drop_core';
 import { esc } from './esc';
 import { FOCUSABLE_SELECTOR } from './focus_manager';
 import { encodeHotbarAction, HOTBAR_ACTION_MIME } from './hotbar';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { iconDataUrl, QUALITY_COLOR } from './icons';
+import type { BagItemDrag, ItemDragState } from './item_drag_state';
+import { resolveDropTargetAt } from './item_drop_hit_test';
 import type { PainterHostPresentation } from './painter_host';
 import { tSim } from './sim_i18n';
+import { bindTouchItemDrag } from './touch_item_drag';
 import { svgIcon } from './ui_icons';
+import { dropOnWorld } from './world_drop_target';
 
 const BAG_FILTER_KEY = 'woc_bag_filter';
 
@@ -158,6 +165,18 @@ export interface BagsWindowDeps extends PainterHostPresentation {
   isHotbarItemId(itemId: string): boolean;
   setDragAction(action: { type: 'item'; id: string } | null): void;
   clearActionDropTargets(): void;
+  /** The shared in-flight bag-item drag every drop target reads (paperdoll socket,
+   *  world canvas). Hud owns the single instance. */
+  dragState: ItemDragState;
+  /** True on the touch HUD: the pointer drag replaces HTML5 drag-and-drop there. */
+  isTouchHud(): boolean;
+  /** Light up (or clear) the paperdoll sockets that accept the stack in flight, so
+   *  the drag advertises where it can land. Cleared on every drag teardown. */
+  markEquipDropTargets(itemId: string | null): void;
+  /** Equip a touch-dragged stack into the socket it was released on. The character
+   *  window owns the paperdoll drop (and its refusals); this is the touch arm's way
+   *  in, since a finger release has no drop event to land on that window. */
+  dropOnEquipSlot(itemId: string, slot: EquipSlot): void;
 }
 
 export class BagsWindow {
@@ -170,6 +189,11 @@ export class BagsWindow {
       return { ...DEFAULT_BAG_FILTER };
     }
   })();
+
+  // Set when a touch drag completed on a bag row: the synthetic click the release
+  // fires must not ALSO run the row's action (drag a potion to the paperdoll and it
+  // would otherwise be drunk on release). One flag: only one drag can be live.
+  private suppressNextClick = false;
 
   // The element that opened the bags window, captured on open and refocused on close
   // (WCAG 2.4.3). Null when bags was opened by a pointer-driven cross-window path
@@ -433,12 +457,46 @@ export class BagsWindow {
       grid.innerHTML = `<div class="bag-empty">${esc(t('hudChrome.bags.noMatch'))}</div>`;
       return;
     }
+    // The pristine view paints the bag's REAL cells (model.cells): every stack sits in
+    // the square the player parked it in, and the squares between them stay empty. Any
+    // other view (a filter, a search, a sort) is a derived LIST, whose squares hold no
+    // position: those are still drop targets, but the drop is REFUSED with a toast
+    // rather than silently doing nothing, which is what a broken drag looks like.
+    if (model.cells.length > 0) {
+      for (let cell = 0; cell < model.cells.length; cell++) {
+        const stack = model.cells[cell];
+        const item = stack ? ITEMS[stack.itemId] : undefined;
+        grid.appendChild(
+          stack && item ? this.buildStackCell(stack, item, cell) : this.buildEmptyCell(cell),
+        );
+      }
+      return;
+    }
     for (const s of model.visible) {
       const item = ITEMS[s.itemId];
       if (!item) continue;
+      grid.appendChild(this.buildStackCell(s, item, null));
+    }
+    for (let i = 0; i < model.emptyCells; i++) grid.appendChild(this.buildEmptyCell(null));
+  }
+
+  // One occupied square. `cell` is the bag CELL it sits in (the drop-target position), or
+  // null in a derived list view where a square names no position.
+  private buildStackCell(
+    s: InvSlot,
+    item: (typeof ITEMS)[string],
+    cell: number | null,
+  ): HTMLElement {
+    const world = this.deps.world();
+    {
       const row = document.createElement('button');
       row.type = 'button';
       row.className = `bag-item q-${bagQualityKey(item)}`;
+      // The stack's live inventory INDEX, resolved by REFERENCE (duplicate stacks and
+      // instanced copies share an itemId): that is what the move command sends as `from`.
+      const index = bagStackIndex(world.inventory, s);
+      if (cell !== null) row.dataset.bagIndex = String(cell);
+      this.bindBagCellDrop(row, cell);
       const qColor = QUALITY_COLOR[bagQualityKey(item)] ?? QUALITY_DEFAULT_COLOR;
       const itemName = itemDisplayName(item);
       row.style.setProperty('--bag-slot-quality', qColor);
@@ -459,92 +517,26 @@ export class BagsWindow {
           this.deps.hideTooltip();
           return;
         }
+        // The synthetic click that trails a completed touch drag must not ALSO run
+        // the stack's action: dragging a potion onto the paperdoll would otherwise
+        // drink it on release.
+        if (this.suppressNextClick) {
+          this.suppressNextClick = false;
+          return;
+        }
         if (ev.shiftKey && bagShiftLinks(this.bagMode())) {
           this.deps.insertItemChatLink(s.itemId);
           return;
         }
-        const action = bagItemAction(item, this.bagMode());
-        switch (action) {
-          case 'transferBlockedSoulbound':
-            this.deps.showError(t('hudChrome.itemSoulbound'));
-            return;
-          case 'trade':
-            this.deps.addItemToTrade(s.itemId);
-            break;
-          case 'mailAttachBlocked':
-            this.deps.showError(t('hudChrome.mailbox.cannotMail'));
-            return;
-          case 'mailAttach':
-            this.deps.stageMailParcel(s.itemId);
-            break;
-          case 'marketSellBlockedQuest':
-            this.deps.showError(t('itemUi.errors.noQuestItems'));
-            return;
-          case 'marketSellBlockedNoMarket':
-            this.deps.showError(t('itemUi.tooltip.cannotMarket'));
-            return;
-          case 'marketSell':
-            this.deps.stageMarketSell(s.itemId);
-            break;
-          case 'vendorSell':
-            this.sellBagItem(s, ev);
-            break;
-          case 'bankDeposit': {
-            // The command is inventory-index-based, so resolve the exact clicked stack
-            // by reference (duplicate stacks / distinct instanced copies share an
-            // itemId); a stale click whose stack already left the bags is a no-op.
-            const index = bagStackIndex(this.deps.world().inventory, s);
-            if (index < 0) break;
-            if (ev.shiftKey && bankDepositOpensPrompt(s)) {
-              this.showDepositQuantityPrompt(index, s, Math.max(1, Math.floor(s.count)));
-            } else {
-              // Whole-stack deposit (omitted count); an instanced slot always moves whole.
-              this.deps.world().bankDeposit(index);
-              this.deps.hideTooltip();
-              // Bank ops emit no client repaint event and the bags grid has no per-frame
-              // refresh (only the bank grid does), so repaint here like the use / equip
-              // local-action cases, not a bespoke path.
-              this.render();
-            }
-            break;
-          }
-          case 'bankDepositBlockedQuest':
-            // The sim would refuse this ('You cannot store quest items in the bank.');
-            // pre-empt with the same deny wording via its established sim key (rendered
-            // through the shared showError pipe), and send nothing.
-            this.deps.showError(tSim('error.bankQuestItem'));
-            return;
-          case 'petFeedBlocked':
-            this.deps.showError(t('hud.pet.petEatsFoodOnly'));
-            return;
-          case 'petFeed':
-            this.deps.world().feedPet(s.itemId);
-            this.deps.setPendingPetFeed(false);
-            this.deps.resetPetBarSig();
-            this.render();
-            break;
-          case 'discardQuest':
-            this.showDiscardItemPrompt(s.itemId, Math.max(1, Math.floor(s.count)));
-            break;
-          case 'equipBag':
-            this.deps.world().equipBag(s.itemId);
-            this.deps.hideTooltip();
-            this.render();
-            break;
-          case 'use':
-            this.deps.world().useItem(s.itemId);
-            this.render();
-            this.deps.renderCharIfOpen();
-            break;
-        }
+        this.runBagAction(item, s, ev);
       });
       row.addEventListener('contextmenu', (ev) => {
         // A touch long-press belongs to the tooltip peek (the TouchPeekGuard
         // family): Chromium synthesizes contextmenu at ~500ms on a touch hold,
         // beating the 950ms peek timer, so a touch-sourced right-click inspects
-        // and never sells or destroys. Desktop mouse right-click keeps both
-        // affordances; an undefined pointerType on a mobile-touch device fails
-        // safe to inspect (Firefox Android fires contextmenu as a MouseEvent).
+        // and never acts. Desktop mouse right-click keeps its affordance; an
+        // undefined pointerType on a mobile-touch device fails safe to inspect
+        // (Firefox Android fires contextmenu as a MouseEvent).
         const pointerType = (ev as PointerEvent).pointerType;
         if (
           pointerType === 'touch' ||
@@ -561,63 +553,292 @@ export class BagsWindow {
           this.sellBagItem(s, ev);
           return;
         }
-        // Otherwise right-click destroys the item, reusing the quest-item destroy
-        // prompt (confirm + quantity). noDiscard items stay protected (issue 1501).
-        const destroy = bagDestroyAction(item, this.bagMode());
-        if (destroy === 'none') return;
+        // Otherwise right-click runs the SAME action as left-click (use / equip),
+        // the classic binding. It no longer destroys: destroying is the drag-out
+        // gesture (drop the stack on the world), which opens the confirm prompt.
         ev.preventDefault();
-        if (destroy === 'discardBlocked') {
-          this.deps.showError(t('hudChrome.bags.cannotDestroy'));
-          return;
-        }
-        this.showDiscardItemPrompt(s.itemId, Math.max(1, Math.floor(s.count)));
+        this.runBagAction(item, s, ev);
       });
-      if (!this.deps.tradeOpen() && !this.deps.vendorOpen() && this.deps.isHotbarItemId(s.itemId)) {
-        row.draggable = true;
-        row.addEventListener('dragstart', (e) => {
+      // Every bag stack is draggable now, not just the hotbar-eligible ones: the
+      // drag feeds three targets (an action-bar slot for a usable item, a paperdoll
+      // socket for a gear piece, the world to destroy), and each target decides for
+      // itself whether to accept. The hotbar payload still rides the DataTransfer
+      // (the action bar reads it there), while dragState carries the stack for the
+      // targets that must decide during dragover, where the DataTransfer is unreadable.
+      row.draggable = !this.deps.tradeOpen() && !this.deps.vendorOpen();
+      row.addEventListener('dragstart', (e) => {
+        const drag: BagItemDrag = {
+          itemId: s.itemId,
+          count: Math.max(1, Math.floor(s.count)),
+          index: index >= 0 ? index : null,
+        };
+        this.deps.dragState.begin(drag);
+        if (this.deps.isHotbarItemId(s.itemId)) {
           const action = { type: 'item' as const, id: s.itemId };
           this.deps.setDragAction(action);
           this.writeDraggedAction(e.dataTransfer, action);
-          if (e.dataTransfer) e.dataTransfer.effectAllowed = 'copy';
-          this.deps.hideTooltip();
-        });
-        row.addEventListener('dragend', () => {
-          this.deps.setDragAction(null);
-          this.deps.clearActionDropTargets();
-        });
-      }
-      this.deps.attachTooltip(row, () => {
-        const mode = this.bagMode();
-        const key = bagTooltipHintKey(item, mode);
-        const extra = key ? `<div class="tt-sub">${esc(t(key))}</div>` : '';
-        // Advertise the shift-click partial deposit on a splittable stack, the bank
-        // window's withdrawPartialHint twin (tied to the deposit hint arm so a
-        // blocked quest item never shows it).
-        const partial =
-          key === 'hudChrome.bank.depositHint' && bankDepositOpensPrompt(s)
-            ? `<div class="tt-sub">${esc(t('hudChrome.bank.depositPartialHint'))}</div>`
-            : '';
-        // Advertise the right-click destroy affordance (issue 1501) only when the item is
-        // actually destroyable here, so junk items are discoverable without a menu.
-        const destroy =
-          bagDestroyAction(item, mode) === 'discard'
-            ? `<div class="tt-sub">${esc(t('hudChrome.bags.rightClickDestroy'))}</div>`
-            : '';
-        const link = bagShiftLinks(mode)
-          ? `<div class="tt-sub">${esc(t('hudChrome.itemShare.linkHint'))}</div>`
-          : '';
-        return this.deps.itemTooltip(item) + extra + partial + destroy + link;
+        }
+        if (e.dataTransfer) {
+          e.dataTransfer.setData('text/plain', s.itemId);
+          e.dataTransfer.effectAllowed = 'copyMove';
+        }
+        this.deps.markEquipDropTargets(s.itemId);
+        this.deps.hideTooltip();
       });
-      grid.appendChild(row);
+      row.addEventListener('dragend', () => {
+        this.deps.dragState.end();
+        this.deps.setDragAction(null);
+        this.deps.clearActionDropTargets();
+        this.deps.markEquipDropTargets(null);
+      });
+      // A fresh press clears any stale suppression: the flag is only ever meant to
+      // swallow the ONE synthetic click that trails the drag it was set by, so a drag
+      // that somehow ends without that click can never eat a later, real tap.
+      row.addEventListener('pointerdown', () => {
+        this.suppressNextClick = false;
+      });
+      // The touch arm of the same drag (HTML5 drag-and-drop does not exist there).
+      bindTouchItemDrag(row, {
+        state: this.deps.dragState,
+        isTouchHud: () => this.deps.isTouchHud(),
+        payload: () =>
+          this.deps.tradeOpen() || this.deps.vendorOpen()
+            ? null
+            : {
+                itemId: s.itemId,
+                count: Math.max(1, Math.floor(s.count)),
+                index: index >= 0 ? index : null,
+              },
+        ghostHtml: () => this.deps.itemIcon(item),
+        onStart: () => {
+          this.deps.hideTooltip();
+          this.deps.markEquipDropTargets(s.itemId);
+        },
+        onMove: () => {
+          /* the paperdoll sockets are already lit; the ghost tracks the finger */
+        },
+        onDrop: (x, y) => {
+          // Suppress the synthetic click the release fires on the source row.
+          this.suppressNextClick = true;
+          const target = resolveDropTargetAt(x, y);
+          const count = Math.max(1, Math.floor(s.count));
+          // The paperdoll drop belongs to the character window (it owns the sockets
+          // and the equip refusals); the world drop belongs here, where the destroy
+          // prompt lives. Releasing anywhere else is a plain cancel.
+          if (target.kind === 'equip') this.deps.dropOnEquipSlot(s.itemId, target.slot);
+          else if (target.kind === 'bagCell')
+            this.dropOnBagCell(index >= 0 ? index : null, target.index);
+          else if (target.kind === 'world') this.dropOnWorldToDestroy(s.itemId, count);
+        },
+        onEnd: () => {
+          this.deps.markEquipDropTargets(null);
+        },
+      });
+      this.attachRowTooltip(row, item, s);
+      return row;
     }
-    // Free-slot squares (unfiltered view only): the classic empty sockets that
-    // make the remaining capacity visible at a glance. Decorative, not focusable.
-    for (let i = 0; i < model.emptyCells; i++) {
-      const cell = document.createElement('div');
-      cell.className = 'bag-item empty';
-      cell.setAttribute('aria-hidden', 'true');
-      grid.appendChild(cell);
+  }
+
+  // One empty square: free space in the bag. In the pristine view it is a real CELL a
+  // stack can be parked in (a hole, deliberately), so it accepts a drop; in a derived
+  // list view it is decorative padding. Never focusable either way.
+  private buildEmptyCell(cell: number | null): HTMLElement {
+    const el = document.createElement('div');
+    el.className = 'bag-item empty';
+    el.setAttribute('aria-hidden', 'true');
+    if (cell !== null) {
+      el.dataset.bagIndex = String(cell);
+      this.bindBagCellDrop(el, cell);
     }
+    return el;
+  }
+
+  // A bag square as a drop target for a stack dragged out of the SAME bag. `cell` is the
+  // square's bag position, or null in a derived list view (where the drop is refused with
+  // a toast: the square holds no position there, so honoring it would move a stack the
+  // player never aimed at).
+  private bindBagCellDrop(el: HTMLElement, cell: number | null): void {
+    el.addEventListener('dragover', (e) => {
+      const drag = this.deps.dragState.get();
+      if (!drag || drag.index === null) return;
+      e.preventDefault();
+      if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+      // Only a real cell can accept, so only a real cell lights up; the list-view square
+      // still takes the drop, purely to explain why it cannot.
+      if (cell !== null) el.classList.add('drop-target');
+    });
+    el.addEventListener('dragleave', () => el.classList.remove('drop-target'));
+    el.addEventListener('drop', (e) => {
+      const drag = this.deps.dragState.get();
+      el.classList.remove('drop-target');
+      if (!drag || drag.index === null) return;
+      e.preventDefault();
+      // Stop the drop bubbling to the #bags unequip drop target behind the grid.
+      e.stopPropagation();
+      const from = drag.index;
+      this.deps.dragState.end();
+      this.dropOnBagCell(from, cell);
+    });
+  }
+
+  // Run the reorder. Both ends are re-validated by the sim (a stale index after a
+  // repaint, or a hand-crafted pair, is simply refused there), so this only dispatches.
+  private dropOnBagCell(from: number | null, to: number | null): void {
+    if (from === null) return;
+    if (to === null || !bagOrderIsManual(this.filter)) {
+      // A filtered / searched / sorted grid is a derived LIST: its squares hold no bag
+      // position, so a drop there would move a stack the player never aimed at. Say so
+      // instead of doing nothing, which is indistinguishable from a broken drag.
+      this.deps.showError(t('hudChrome.bags.reorderNeedsRecent'));
+      return;
+    }
+    this.deps.world().moveInventoryItem(from, to);
+    audio.click();
+    this.deps.hideTooltip();
+    this.render();
+  }
+
+  /** Open the destroy prompt for a stack dropped on the world. Public so the HUD's
+   *  world-canvas drop target (the desktop arm of the same gesture) shares this one
+   *  entry point with the touch arm above. */
+  promptDestroy(itemId: string, count: number): void {
+    this.showDiscardItemPrompt(itemId, Math.max(1, Math.floor(count)));
+  }
+
+  /** What dropping `itemId` on the world does right now (pure decision, shared with
+   *  the tooltip hint). Public for the HUD-installed canvas drop target. */
+  destroyAction(itemId: string): BagDestroyAction {
+    const item = ITEMS[itemId];
+    if (!item) return 'none';
+    return bagDestroyAction(item, this.bagMode());
+  }
+
+  /** The blocked-destroy toast (a noDiscard item). Public for the same reason. */
+  showDestroyBlocked(): void {
+    this.deps.showError(t('hudChrome.bags.cannotDestroy'));
+  }
+
+  private dropOnWorldToDestroy(itemId: string, count: number): void {
+    dropOnWorld(
+      {
+        destroyAction: (id) => this.destroyAction(id),
+        promptDestroy: (id, n) => this.promptDestroy(id, n),
+        showBlocked: () => this.showDestroyBlocked(),
+      },
+      itemId,
+      count,
+    );
+  }
+
+  // The click / right-click dispatch for a bag stack: the mode-dependent action the
+  // pure bagItemAction decided. Both buttons run it (right-click is the classic
+  // use/equip binding), so the two can never drift apart.
+  private runBagAction(item: (typeof ITEMS)[string], s: InvSlot, ev: MouseEvent): void {
+    const action = bagItemAction(item, this.bagMode());
+    switch (action) {
+      case 'transferBlockedSoulbound':
+        this.deps.showError(t('hudChrome.itemSoulbound'));
+        return;
+      case 'trade':
+        this.deps.addItemToTrade(s.itemId);
+        break;
+      case 'mailAttachBlocked':
+        this.deps.showError(t('hudChrome.mailbox.cannotMail'));
+        return;
+      case 'mailAttach':
+        this.deps.stageMailParcel(s.itemId);
+        break;
+      case 'marketSellBlockedQuest':
+        this.deps.showError(t('itemUi.errors.noQuestItems'));
+        return;
+      case 'marketSellBlockedNoMarket':
+        this.deps.showError(t('itemUi.tooltip.cannotMarket'));
+        return;
+      case 'marketSell':
+        this.deps.stageMarketSell(s.itemId);
+        break;
+      case 'vendorSell':
+        this.sellBagItem(s, ev);
+        break;
+      case 'bankDeposit': {
+        // The command is inventory-index-based, so resolve the exact clicked stack
+        // by reference (duplicate stacks / distinct instanced copies share an
+        // itemId); a stale click whose stack already left the bags is a no-op.
+        const index = bagStackIndex(this.deps.world().inventory, s);
+        if (index < 0) break;
+        if (ev.shiftKey && bankDepositOpensPrompt(s)) {
+          this.showDepositQuantityPrompt(index, s, Math.max(1, Math.floor(s.count)));
+        } else {
+          // Whole-stack deposit (omitted count); an instanced slot always moves whole.
+          this.deps.world().bankDeposit(index);
+          this.deps.hideTooltip();
+          // Bank ops emit no client repaint event and the bags grid has no per-frame
+          // refresh (only the bank grid does), so repaint here like the use / equip
+          // local-action cases, not a bespoke path.
+          this.render();
+        }
+        break;
+      }
+      case 'bankDepositBlockedQuest':
+        // The sim would refuse this ('You cannot store quest items in the bank.');
+        // pre-empt with the same deny wording via its established sim key (rendered
+        // through the shared showError pipe), and send nothing.
+        this.deps.showError(tSim('error.bankQuestItem'));
+        return;
+      case 'petFeedBlocked':
+        this.deps.showError(t('hud.pet.petEatsFoodOnly'));
+        return;
+      case 'petFeed':
+        this.deps.world().feedPet(s.itemId);
+        this.deps.setPendingPetFeed(false);
+        this.deps.resetPetBarSig();
+        this.render();
+        break;
+      case 'discardQuest':
+        this.showDiscardItemPrompt(s.itemId, Math.max(1, Math.floor(s.count)));
+        break;
+      case 'equipBag':
+        this.deps.world().equipBag(s.itemId);
+        this.deps.hideTooltip();
+        this.render();
+        break;
+      case 'use':
+        this.deps.world().useItem(s.itemId);
+        this.render();
+        this.deps.renderCharIfOpen();
+        break;
+    }
+  }
+
+  // The stack's tooltip: the item card, the mode hint, and the affordance hints
+  // (partial deposit, drag-to-equip, drag-out-to-destroy, chat link).
+  private attachRowTooltip(row: HTMLElement, item: (typeof ITEMS)[string], s: InvSlot): void {
+    this.deps.attachTooltip(row, () => {
+      const mode = this.bagMode();
+      const key = bagTooltipHintKey(item, mode);
+      const extra = key ? `<div class="tt-sub">${esc(t(key))}</div>` : '';
+      // Advertise the shift-click partial deposit on a splittable stack, the bank
+      // window's withdrawPartialHint twin (tied to the deposit hint arm so a
+      // blocked quest item never shows it).
+      const partial =
+        key === 'hudChrome.bank.depositHint' && bankDepositOpensPrompt(s)
+          ? `<div class="tt-sub">${esc(t('hudChrome.bank.depositPartialHint'))}</div>`
+          : '';
+      // Advertise the two drag gestures that replaced right-click-destroy: a gear
+      // piece drags onto the character sheet to equip, and anything destroyable here
+      // drags out onto the world to throw away (which opens the prompt, issue 1501).
+      const equipDrag = isPaperdollDraggable(item)
+        ? `<div class="tt-sub">${esc(t('hudChrome.bags.dragEquipHint'))}</div>`
+        : '';
+      const destroy =
+        bagDestroyAction(item, mode) === 'discard'
+          ? `<div class="tt-sub">${esc(t('hudChrome.bags.dragDestroyHint'))}</div>`
+          : '';
+      const link = bagShiftLinks(mode)
+        ? `<div class="tt-sub">${esc(t('hudChrome.itemShare.linkHint'))}</div>`
+        : '';
+      return this.deps.itemTooltip(item) + extra + partial + equipDrag + destroy + link;
+    });
   }
 
   // Refresh only the grid contents (used by live search) so the search input keeps

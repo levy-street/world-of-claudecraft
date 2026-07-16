@@ -35,6 +35,9 @@ export interface ClipMap {
   walkBack?: string;
   /** one-shot played on respawn (skeleton awaken / boss taunt) */
   flourish?: string;
+  /** arm gesture for the Z-key sheathe toggle; the held-prop swap lands at its
+   *  midpoint (see visual.ts setWeaponStowed). Absent = snap with no gesture. */
+  stow?: string;
   /** player-facing overhead emote one-shots; clips are sourced from the GLB. */
   emote?: Partial<Record<OverheadEmoteId, EmoteClipSpec>>;
 }
@@ -131,6 +134,10 @@ const kaykit = (attack: string[], idle = 'Idle'): ClipMap => ({
   sitIdle: 'Sit_Floor_Idle',
   swim: 'Lie_Idle',
   jump: 'Jump_Idle',
+  // The trimmed player GLBs ship no dedicated sheathe clip; the 1H chop WINDUP
+  // (the clip's first ~40%, cut at the swap point by visual.ts) reaches over the
+  // shoulder toward the back, which reads as grabbing/planting the hilt.
+  stow: '1H_Melee_Attack_Chop',
   emote: KAYKIT_EMOTES,
 });
 
@@ -1109,6 +1116,13 @@ const MOB_KEYS: Record<string, string> = {
   fallen_captain_aldren: 'skel_warrior',
   corrupted_priest_malric: 'skel_necromancer',
   deathstalker_voss: 'skel_rogue',
+  // The Nythraxis phase-2 heroic court is Aldren / Malric / Voss risen again, so
+  // the "Spirit of X" adds reuse each character's crypt visual above. Without these
+  // the ids fall through to FAMILY_KEYS.undead (skel_minion) and the whole court
+  // renders as identical generic skeletons. See spawnNythraxisHeroicAdds.
+  nythraxis_heroic_warrior_add: 'skel_warrior', // Spirit of Aldren
+  nythraxis_heroic_priest_add: 'skel_necromancer', // Spirit of Malric
+  nythraxis_heroic_rogue_add: 'skel_rogue', // Spirit of Voss
   vision_aldren_warrior: 'player_warrior',
   vision_malric_mage: 'player_mage',
   vision_deathstalker_voss: 'player_rogue',
@@ -1126,6 +1140,12 @@ const FAMILY_KEYS: Record<string, string> = {
   elemental: 'mob_elemental',
   dragonkin: 'mob_dragonkin',
   demon: 'mob_demonalt',
+  // deepfen_spearjaw already has an explicit MOB_KEYS override to mob_spearjaw
+  // (visualKeyFor checks MOB_KEYS first), so this default stays unreachable
+  // for it even after its family retag. It only matters for a future reptile
+  // mob with no override of its own; reuse the same model so that fallback
+  // is sane too.
+  reptile: 'mob_spearjaw',
 };
 
 const NPC_KEYS: Record<string, string> = {

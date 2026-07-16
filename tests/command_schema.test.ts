@@ -23,8 +23,8 @@ import { COMMAND_NAMES, type CommandName, DISPATCH_ONLY_COMMANDS } from '../src/
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 
 // Verified counts on the current tree (re-derived below; never trust stale prose).
-const EXPECTED_SEND_COUNT = 136; // +Season 1 Armory skin and ignore_add/ignore_remove
-const EXPECTED_DISPATCH_COUNT = 145; // +Season 1 Armory skin and ignore_add/ignore_remove
+const EXPECTED_SEND_COUNT = 147; // +Season 1 Armory skin, ignore_add/ignore_remove, stow_weapon, Dungeon Finder, inv_move
+const EXPECTED_DISPATCH_COUNT = 156; // +Season 1 Armory skin, ignore_add/ignore_remove, stow_weapon, Dungeon Finder, inv_move
 const EXPECTED_DISPATCH_ONLY_COUNT = 9;
 
 // The chat sub-channel routing switch (server/game.ts `switch

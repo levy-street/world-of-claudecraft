@@ -203,7 +203,8 @@ Dependency order: S1 -> S2 -> S3 -> (S4, S5, S6 in any order) -> S7 -> S8.
 - Keybind label: change the `arena` keybind label to `'PvP (Arena & Frontier)'` and the
   English value of `hud.keybinds.actions.arena`; window title likewise. New UI keys go in
   `hud.frontier.*` in `src/ui/i18n.catalog/hud.ts`. Then `npm run i18n:scan && npm run
-  i18n:build`, commit the regenerated files, run the completeness test (gotcha G4).
+  i18n:build`, commit the regenerated `i18n.resolved.generated/` slices (the status
+  summary is gitignored, never committed), run the completeness test (gotcha G4).
 - FCT + events: the honor float is the honor PRD's; handle `frontierEntered` /
   `frontierLeft` as system lines.
 - Acceptance: `npx vitest run tests/frontier_panel_view.test.ts tests/i18n_completeness.test.ts tests/localization_fixes.test.ts`; manual: `npm run dev`, press G, enter, kill, see honor float (screenshot per the headless screenshot workflow).
@@ -248,13 +249,15 @@ with its full item i18n and exact level-20 stat budgets).
   golden reds, fix the code, never `UPDATE_PARITY=1` on an existing scenario.
 - **G4, i18n gates bite.** New catalog keys have failed `tests/i18n_completeness` when the
   generated files were not rebuilt and committed (`npm run i18n:scan && npm run
-  i18n:build`, commit `i18n.resolved.generated/` + `i18n.status.summary.json`). Run it
+  i18n:build`, commit the `i18n.resolved.generated/` slices;
+  `i18n.status.summary.json` is gitignored, not committed). Run it
   locally before pushing. Do not hand-edit locale overlays except the M16 five non-Latin
   fills for new wordy English values.
 - **G5, `hostile` flag vs `isHostileTo`.** Mob hostility is a template flag; player
   hostility is ONLY the `isHostileTo` clauses. Do not set any `hostile`-like flag on
   players; the frontier clause is positional.
-- **G6, worktree discipline.** Build each slice in a fresh worktree off the active release
+- **G6, worktree discipline.** Other sessions may carry uncommitted work. Build each
+  slice in a fresh worktree outside the shared checkout, based on the active release
   branch, branch `feature/frontier-f1-s<N>`.
 - **G7, honor lives in the honor PRD.** Do not add the `honor` currency, `grantHonor`, or
   the DR machinery here. If they are not yet merged, F1 is blocked on

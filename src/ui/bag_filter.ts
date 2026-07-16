@@ -35,6 +35,15 @@ export function bagFilterIsDefault(filter: BagFilterState): boolean {
   return filter.category === 'all' && filter.search.trim() === '';
 }
 
+// Whether the grid is showing the bag's REAL cells (the fixed squares a stack can be
+// parked in), which is the only view where dragging a stack onto a square can mean "put
+// it there". A category chip, a search, or a quality/name sort all turn the grid into a
+// derived LIST: the squares there are just rows, they hold no position, so a drop is
+// refused with a toast rather than moving something the player did not aim at.
+export function bagOrderIsManual(filter: BagFilterState): boolean {
+  return filter.sort === 'recent' && bagFilterIsDefault(filter);
+}
+
 // Look up an item definition by id. Injected so the pure core never imports the
 // live ITEMS table (and tests can supply a synthetic one).
 export type ItemLookup = (itemId: string) => ItemDef | undefined;

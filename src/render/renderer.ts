@@ -61,11 +61,11 @@ import { buildCritters, type CritterField } from './critters';
 import { animatesEveryFrame, crowdLodScaleSq, midAnimCadence } from './crowd_lod';
 import { shouldPlayDeedFirework } from './deed_fx_gate';
 import { buildDelveModule } from './delve_interiors';
-import { buildDelveInteractable } from './delve_props';
+import { buildDelveInteractable, syncDelveInteractableVisibility } from './delve_props';
 import { buildDoorBody } from './door_portal';
 import { DungeonInteriors, ensureDungeonAssets } from './dungeon';
 import { objectDisplayName } from './entity_labels';
-import { releaseSelfFacing, stepSelfFacing } from './facing_smooth';
+import { advanceSelfFacing, releaseSelfFacing } from './facing_smooth';
 import { buildFish, type FishView } from './fish';
 import {
   buildFoliage,
@@ -543,6 +543,7 @@ export interface EntityView {
   skin: number; // last-rendered appearance skin — diffed each frame for live swaps
   mainhandItemId: string | null; // last-rendered equipped weapon — diffed for live held-weapon swaps
   weaponSkinId: string | null; // last-rendered weapon-skin cosmetic, diffed for live skin swaps
+  weaponStowed: boolean; // last-rendered sheathe state (Z key), diffed for live stow toggles
   /** unscaled height — nameplate/vfx anchor reads height * e.scale */
   height: number;
   /** last-applied entity scale (group.scale); diffed each frame for live size buffs */
@@ -806,6 +807,11 @@ export class Renderer {
   private groundAimReticle: GroundAimReticle | null = null;
   raycaster = new THREE.Raycaster();
   clickTargets: THREE.Object3D[] = [];
+  // Gather-node meshes (#1866), raycast separately from `clickTargets`/`pick()`:
+  // nodes are static content keyed by string id, not entities keyed by numeric
+  // id, so they get their own list and `pickGatherNode` instead of widening
+  // `pick()`'s numeric-id contract.
+  gatherNodeMeshes: THREE.Object3D[] = [];
   camYaw = Math.PI;
   camPitch = 0.32;
   camDist = 12;
@@ -893,6 +899,11 @@ export class Renderer {
   // engage re-seeds from the live interpolated facing instead of snapping. See
   // facing_smooth.ts for why the camera-driven yaw must be rate-limited.
   private selfFacingOverride: number | null = null;
+  // Camera yaw applied on the previous camera-driven frame. advanceSelfFacing
+  // subtracts it to tell the camera's ongoing rotation (applied 1:1) apart from
+  // the residual engage gap (rate-limited), so a fast flick never lags. Null
+  // while disengaged so the next engage re-seeds cleanly.
+  private selfFacingLastTarget: number | null = null;
   private cameraLookAt = new THREE.Vector3();
   // floating /say-/yell bubbles, keyed by speaker entity id
   private chatBubbles = new Map<number, { el: HTMLDivElement; until: number }>();
@@ -1369,6 +1380,7 @@ export class Renderer {
     this.scene.add(gatherNodes.group);
     // Baked into world space at build with no per-frame update(), same as props.
     freezeStaticMatrices(gatherNodes.group);
+    this.gatherNodeMeshes = gatherNodes.group.children;
 
     // selection ring — a classic target reticle: a base ring plus four
     // inward-pointing ticks. The base ring is draped over the terrain each
@@ -3640,6 +3652,9 @@ export class Renderer {
       mainhandItemId: e.mainhandItemId,
       // built skinless; the per-frame diff below applies e.weaponSkinId (and its VFX)
       weaponSkinId: null,
+      // Born false so the per-frame diff below sheathes an already-stowed entity
+      // (a peer entering interest) on its first sync.
+      weaponStowed: false,
       liveScale: e.scale,
       loco: newLocoTrack(),
       stepAccum: 0,
@@ -3717,6 +3732,7 @@ export class Renderer {
     v.skin = e.skin;
     v.mainhandItemId = e.mainhandItemId; // next was built holding the current weapon
     v.weaponSkinId = null; // next was built skinless; the per-frame diff re-applies it
+    v.weaponStowed = false; // next was built drawn (fresh stow transition); the diff re-sheathes
     v.group.add(next.root);
     this.reconcileViewLights(v);
   }
@@ -4236,6 +4252,7 @@ export class Renderer {
       this.lastSelfId = p.id;
       this.selfRenderPositionReady = false;
       this.selfFacingOverride = null;
+      this.selfFacingLastTarget = null;
       // A still-decaying predictor-handoff offset belongs to the previous
       // character; leaking it would displace the new one for a few frames.
       this.selfMotionOffset.set(0, 0, 0);
@@ -4404,12 +4421,16 @@ export class Renderer {
       v.group.position.set(x, y, z);
       let facing = e.prevFacing + shortestAngle(e.prevFacing, e.facing) * facingAlpha(ea);
       if (id === p.id && renderFacingOverride !== null) {
-        // Rate-limit the camera-driven heading so engaging mouselook (or starting
-        // to move in Mouse Camera mode) rotates the model smoothly toward the
-        // camera instead of teleporting it up to 180deg in a single frame. Seed
-        // from the current interpolated facing on first engage.
-        facing = stepSelfFacing(this.selfFacingOverride ?? facing, renderFacingOverride, dt);
+        // Follow the camera-driven heading, easing in the one-time engage gap
+        // (up to 180deg when engaging after an orbit) under the rate limiter
+        // while applying the camera's ongoing rotation 1:1. Seed the model and
+        // the last-target from the current values on first engage so the whole
+        // seed gap is treated as residual and a fast flick never trails behind.
+        const prevModel = this.selfFacingOverride ?? facing;
+        const lastTarget = this.selfFacingLastTarget ?? renderFacingOverride;
+        facing = advanceSelfFacing(prevModel, renderFacingOverride, lastTarget, dt);
         this.selfFacingOverride = facing;
+        this.selfFacingLastTarget = renderFacingOverride;
       } else if (id === p.id && this.selfFacingOverride !== null) {
         // Disengage frame: route the return to the interpolated sim facing
         // through the SAME rate limiter so releasing mouselook mid-flick (before
@@ -4418,6 +4439,7 @@ export class Renderer {
         const r = releaseSelfFacing(this.selfFacingOverride, facing, dt);
         facing = r.facing;
         this.selfFacingOverride = r.done ? null : r.facing;
+        this.selfFacingLastTarget = r.lastTarget;
       }
       v.group.rotation.y = facing;
 
@@ -4434,8 +4456,12 @@ export class Renderer {
           continue;
         }
         const isPortalObject = isPersistentPortalObject(e);
-        const vis = e.lootable && (!isPortalObject || d2 <= ENTITY_VIEW_CREATE_RANGE_SQ);
-        v.group.visible = vis;
+        const vis = syncDelveInteractableVisibility(
+          v.group,
+          e.templateId,
+          e.lootable,
+          !isPortalObject || d2 <= ENTITY_VIEW_CREATE_RANGE_SQ,
+        );
         if (v.sparkle && vis) {
           // sub-pixel beyond ~45u but still a full transparent draw each
           // (d2 is this entity's player distance, computed once above)
@@ -4508,6 +4534,13 @@ export class Renderer {
         v.weaponSkinId = e.weaponSkinId;
         v.visual.setWeaponSkin(e.weaponSkinId);
         this.reconcileViewLights(v);
+      }
+
+      // live sheathe toggle (Z key): the sim's weaponStowed bit moves held
+      // props between the hands and the on-back pose (self or a peer)
+      if (e.weaponStowed !== v.weaponStowed) {
+        v.weaponStowed = e.weaponStowed;
+        v.visual.setWeaponStowed(e.weaponStowed);
       }
 
       // live body-size buffs (Fiesta power-ups): scale the whole group so the
@@ -4699,6 +4732,9 @@ export class Renderer {
       // weapon-skin VFX ride the humanoid rig's held weapon; advancing them is a
       // few uniform writes per handle, so they stay smooth at every LOD tier
       v.visual.updateWeaponVfx(dt);
+      // The sheathe swap is deferred to the gesture midpoint, so the rig (and any
+      // skin VFX point light on it) is rebuilt inside update(), not at the diff.
+      if (v.visual.consumeWeaponGraphDirty()) this.reconcileViewLights(v);
 
       const emoteId =
         e.kind === 'player' && e.overheadEmoteId && !e.dead ? e.overheadEmoteId : null;
@@ -5607,7 +5643,40 @@ export class Renderer {
     return this.raycaster.ray.intersectPlane(plane, hit) ? { x: hit.x, z: hit.z } : null;
   }
 
+  // Click/tap-to-harvest (#1866): raycasts the static gather-node meshes
+  // (`gatherNodeMeshes`, tagged with `userData.gatherNodeId` in
+  // src/render/gather_nodes.ts) and returns the hit node's content id, or null.
+  // A separate method from `pick()` on purpose: nodes are static content keyed
+  // by string id, not entities keyed by numeric id, so widening `pick()`'s
+  // return contract would force every existing caller to re-discriminate.
+  pickGatherNode(clientX: number, clientY: number): string | null {
+    const ndc = new THREE.Vector2(
+      (clientX / this.viewport.width) * 2 - 1,
+      -(clientY / this.viewport.height) * 2 + 1,
+    );
+    this.raycaster.setFromCamera(ndc, this.camera);
+    const hits = this.raycaster.intersectObjects(this.gatherNodeMeshes, true);
+    for (const hit of hits) {
+      let o: THREE.Object3D | null = hit.object;
+      while (o) {
+        if (typeof o.userData.gatherNodeId === 'string') return o.userData.gatherNodeId as string;
+        o = o.parent;
+      }
+    }
+    return null;
+  }
+
   pick(clientX: number, clientY: number): number | null {
+    const direct = this.pickDirect(clientX, clientY);
+    if (direct !== null) return direct;
+    return this.pickSloppy(clientX, clientY);
+  }
+
+  // The direct-raycast half of pick(): only a hit that actually lands on an
+  // entity's mesh. Split out so callers that also raycast gather nodes (a
+  // click that lands on a node must not be stolen by the sloppy assist below)
+  // can slot the node raycast in between this and pickSloppy.
+  pickDirect(clientX: number, clientY: number): number | null {
     const ndc = new THREE.Vector2(
       (clientX / this.viewport.width) * 2 - 1,
       -(clientY / this.viewport.height) * 2 + 1,
@@ -5636,12 +5705,13 @@ export class Renderer {
         o = o.parent;
       }
     }
-    const directPick = resolveDirectPickEntityId(
-      directHitIds,
-      this.sim.entities,
-      this.sim.player.targetId,
-    );
-    if (directHitIds.length > 0) return directPick;
+    if (directHitIds.length === 0) return null;
+    return resolveDirectPickEntityId(directHitIds, this.sim.entities, this.sim.player.targetId);
+  }
+
+  // The forgiving-assist half of pick(): snap to the nearest targetable
+  // character within a small screen radius when nothing was hit directly.
+  pickSloppy(clientX: number, clientY: number): number | null {
     // Forgiving assist: nothing under the ray, so snap to the nearest
     // targetable character within a small screen radius — chibi proportions
     // and melee scrums (often hidden behind the player's own model) make

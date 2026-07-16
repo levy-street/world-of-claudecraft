@@ -100,13 +100,12 @@ added (Step 4), bindings re-checked (Step 5), premises corrected (Step 6), each 
 Apply the fixes in the same change with a parity/regression test per divergence, then run the
 targeted suites plus `npx tsc --noEmit` (or `npm run gate` if the merge was large).
 
-One recurring merge-mechanics trap to check every time (it has reddened the gate twice on the
-bank-system branch, once on a v0.22.0 merge and once on a v0.23.0 merge): when a merge
-conflicts on the generated i18n artifacts and BOTH sides changed catalog keys, taking either
-side of `src/ui/i18n.resolved.sha256` leaves a stale baseline, and `npm run i18n:gen` does NOT
-rewrite it (the merged union table hashes to a value neither parent had). After regenerating,
-run `node scripts/i18n_resolved_hash.mjs --write` and confirm
-`npx vitest run tests/i18n_resolved_equivalence.test.ts` is green, in the SAME merge commit.
+One i18n merge-mechanics note: the aggregate baseline (`src/ui/i18n.resolved.sha256`) and the
+status summary (`src/ui/i18n.status.summary.json`) are no longer committed (removed by the
+2026-07-14 degit change), so a merge where both sides changed catalog keys only needs
+`npm run i18n:gen` to reconcile the committed line-item slices. The historical stale-baseline
+trap (taking either side of the aggregate left a hash neither parent had, needing a manual
+re-baseline) applies only when auditing merges on branches that predate that change.
 
 A second recurring trap (reddened the gate on a later v0.23.0 merge into the bank-system
 branch): a release-authored test that drives GameServer mocks `../server/db` with the export

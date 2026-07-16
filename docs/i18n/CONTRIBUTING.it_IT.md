@@ -13,7 +13,7 @@ bug, creare un dungeon completamente nuovo: tutto conta, e qui sei il benvenuto.
 
 Questa guida ti aiuterà a configurare l'ambiente e a rendere semplice il tuo primo
 contributo. Non devi essere un esperto. Se qualcosa non è chiaro, chiedi su
-[Discord](https://discord.gg/GjhnUsBtw) e qualcuno sarà felice di darti una mano.
+[Discord](https://discord.com/invite/worldofclaudecraft) e qualcuno sarà felice di darti una mano.
 
 Partecipando, accetti di seguire il nostro [Codice di Condotta](../../CODE_OF_CONDUCT.md).
 
@@ -177,7 +177,7 @@ scrivere alcun codice di gioco per farlo:
 3. Esegui `npx tsc --noEmit` per confermare che non manchi nulla, poi apri una PR.
 
 Per proporre una lingua completamente nuova, o per discutere di tono e
-terminologia, avvia una discussione su [Discord](https://discord.gg/GjhnUsBtw) e ti
+terminologia, avvia una discussione su [Discord](https://discord.com/invite/worldofclaudecraft) e ti
 aiuteremo a impostarla. I madrelingua e chi parla fluentemente sono particolarmente
 benvenuti. Buone traduzioni fanno sentire il gioco come a casa per i giocatori di
 ogni parte del mondo.
@@ -198,7 +198,7 @@ Per favore usa i [modelli di issue](https://github.com/levy-street/world-of-clau
 ## Ottenere aiuto
 
 Bloccato, o hai solo voglia di salutare? Unisciti al
-[Discord della comunità](https://discord.gg/GjhnUsBtw). Nessuna domanda è troppo
+[Discord della comunità](https://discord.com/invite/worldofclaudecraft). Nessuna domanda è troppo
 piccola, e i nuovi contributori sono sempre benvenuti.
 
 ## Licenza

@@ -150,12 +150,12 @@ describe('hud wiring', () => {
     // Banner and audio are gated on the PLAN's fresh-unlock fields; the retro
     // count only ever feeds the one localized summary log line.
     expect(body).toContain('if (plan.bannerId !== null)');
-    expect(body).toContain('if (plan.playSound) audio.levelUp();');
+    expect(body).toContain('if (plan.playSound) audio.achievement();');
     expect(body).toMatch(
       /if \(plan\.retroCount > 0\) \{\s*const retroText = t\('hudChrome\.deeds\.retroSummary'/,
     );
     expect(body.match(/showBanner/g)?.length).toBe(1);
-    expect(body.match(/audio\.levelUp/g)?.length).toBe(1);
+    expect(body.match(/audio\.achievement/g)?.length).toBe(1);
   });
 
   it('announces the unlock and the retro summary through the polite #combat-live region', () => {

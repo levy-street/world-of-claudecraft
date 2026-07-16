@@ -1,4 +1,4 @@
-import { pool } from './db';
+import { DB_HEAVY_STATEMENT_TIMEOUT_MS, runWithStatementTimeout } from './db';
 
 // Read-side aggregate for the client-perf /metrics gauges (Phase 4). This is NEW
 // SQL (it does not exist in admin_db.ts, whose clientPerfSummary aggregates a
@@ -170,5 +170,11 @@ export async function runClientPerfMetricRows(
 export async function clientPerfMetricRows(
   options: ClientPerfMetricsOptions = {},
 ): Promise<ClientPerfRow[]> {
-  return runClientPerfMetricRows(pool, options);
+  // The capped aggregate uses two window functions and a percentile_cont over the
+  // recent client_perf_reports; on the shared pool it runs on the raised heavy
+  // allowance (driven by the client-perf metrics collector on an interval). The
+  // integration test's own pool path (runClientPerfMetricRows) is left untouched.
+  return runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
+    runClientPerfMetricRows({ query }, options),
+  );
 }

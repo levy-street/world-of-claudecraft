@@ -16,13 +16,16 @@
 // leaf sheet is autumn-red, which we shift to green (bushes) / olive (swamp).
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { dedup, meshopt, prune, simplify, textureCompress, weld } from '@gltf-transform/functions';
 import { MeshoptDecoder, MeshoptEncoder, MeshoptSimplifier } from 'meshoptimizer';
 import sharp from 'sharp';
 
-const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..');
+// URL.pathname keeps a leading slash before a Windows drive letter, which
+// path.resolve mangles into "D:\D:\..."; fileURLToPath is correct on every OS.
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const PUBLIC_DIR = path.join(ROOT, 'public');
 const SIMPLIFY_ERROR = 0.05;
 
@@ -75,15 +78,24 @@ async function processItem(io, item) {
 
   const transforms = [];
   if (item.simplify) {
-    transforms.push(weld(), simplify({
-      simplifier: MeshoptSimplifier, ratio: item.simplify, error: SIMPLIFY_ERROR,
-    }));
+    transforms.push(
+      weld(),
+      simplify({
+        simplifier: MeshoptSimplifier,
+        ratio: item.simplify,
+        error: SIMPLIFY_ERROR,
+      }),
+    );
   }
   transforms.push(prune(), dedup());
   if (item.maxTex) {
-    transforms.push(textureCompress({
-      encoder: sharp, targetFormat: 'webp', resize: [item.maxTex, item.maxTex],
-    }));
+    transforms.push(
+      textureCompress({
+        encoder: sharp,
+        targetFormat: 'webp',
+        resize: [item.maxTex, item.maxTex],
+      }),
+    );
   }
   transforms.push(meshopt({ encoder: MeshoptEncoder, level: 'high' }));
   await doc.transform(...transforms);

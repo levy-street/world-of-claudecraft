@@ -41,6 +41,39 @@ function rootStub(body: Record<string, unknown> | null = null): HTMLElement {
 }
 
 describe('DailyRewardsWindow store refresh behavior', () => {
+  it('selects and opens the Store without toggling an open window closed', () => {
+    const root = rootStub();
+    root.style.display = 'none';
+    const window = new DailyRewardsWindow({
+      root: () => root,
+      world: worldStub,
+      closeOthers: () => undefined,
+      captureFocus: () => null,
+      restoreFocus: () => undefined,
+      storeEnabled: () => true,
+    });
+    Object.assign(window as unknown as Record<string, unknown>, { tab: 'rewards' });
+    const toggle = vi.spyOn(window, 'toggle').mockImplementation(() => undefined);
+
+    window.openStore();
+
+    expect(toggle).toHaveBeenCalledOnce();
+    expect((window as unknown as { tab: string }).tab).toBe('store');
+
+    root.style.display = 'block';
+    toggle.mockClear();
+    const renderCurrent = vi
+      .spyOn(
+        window as unknown as { renderCurrent(focus: 'open' | null): Promise<void> },
+        'renderCurrent',
+      )
+      .mockResolvedValue();
+    window.openStore();
+
+    expect(toggle).not.toHaveBeenCalled();
+    expect(renderCurrent).toHaveBeenCalledWith('open');
+  });
+
   it('does not rebuild an unchanged store body during a background refresh', () => {
     let html = '';
     let writes = 0;

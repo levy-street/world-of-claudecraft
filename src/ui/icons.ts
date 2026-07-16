@@ -2347,6 +2347,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   judgement: r('holy', 'gold', [{ p: 'sunburst', ...BIG }, 'mace'], ['glow']),
   blessing_of_might: r('holy', 'gold', ['fist', { p: 'sunburst', ...TL }]),
   divine_protection: r('holy', 'silverWhite', ['shield'], ['glow']),
+  sacred_bulwark: r('holy', 'holyGold', ['shield', { p: 'cross', ...BR }], ['arcs', 'glow']),
   hammer_of_justice: r('holy', 'gold', ['mace'], ['arcs']),
   lay_on_hands: r('holy', 'holyGold', [{ p: 'sunburst', ...BIG }, 'hand'], ['sparkle', 'glow']),
   holy_taunt: r('holy', 'holyGold', ['roar'], ['arcs']),
@@ -2424,6 +2425,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   slam: r('fury', 'steel', ['mace'], ['motion']),
   cleave: r('fury', 'steel', ['axe'], ['arcs']),
   defensive_stance: r('steel', 'steel', ['shield'], ['arcs']),
+  ironhold: r('steel', 'steel', ['shield', { p: 'chestplate', ...BR }], ['glow']),
   sunder_armor: r('steel', 'steel', ['chestplate', { p: 'mace', ...BR }]),
   taunt: r('fury', 'blood', ['fist'], ['arcs']),
   mortal_strike: r('blood', 'blood', ['sword', { p: 'claw_slash', ...BR }]),
@@ -2488,6 +2490,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   swipe: r('earth', 'earthBrown', ['claw_slash'], ['arcs']),
   regrowth: r('nature', 'leafGreen', ['heart', { p: 'leaf', ...BR }], ['sparkle']),
   barkskin: r('earth', 'earthBrown', ['shield', { p: 'leaf', ...BR }]),
+  primal_reflexes: r('nature', 'leafGreen', ['paw', { p: 'eye', ...TR }], ['motion', 'glow']),
   starfire: r('arcane', 'silverWhite', ['moon', { p: 'sunburst', ...BR }], ['sparkle', 'glow']),
   holy_shock: r('holy', 'holyGold', ['bolt', { p: 'cross', ...BR }], ['glow']),
   holy_shield: r('holy', 'gold', ['shield', { p: 'sunburst', ...BR }]),
@@ -2782,6 +2785,7 @@ const CREST_RECIPES: Record<string, IconRecipe> = {
   family_ogre: r('fury', 'earthBrown', ['fist']),
   family_elemental: r('storm', 'sky', ['lightning'], ['glow']),
   family_dragonkin: r('fire', 'ember', ['claw_slash'], ['glow']),
+  family_reptile: r('earth', 'leafGreen', ['fang']),
   family_sheep: r('nature', 'silverWhite', ['sheep_head']),
   // status / interaction markers
   status_npc: r('parchment', 'gold', ['sigil_rune']),
@@ -3696,6 +3700,13 @@ export function deedImageUrl(crestId: string): string | null {
   if (!crestId.startsWith(DEED_CREST_PREFIX)) return null;
   const deedId = crestId.slice(DEED_CREST_PREFIX.length);
   return DEED_IMAGE_IDS.has(deedId) ? `${DEED_ICON_DIR}/${deedId}.webp` : null;
+}
+
+/** True when `id` has a real crest recipe, as opposed to falling through to the
+ *  generic fallback + dev-only console.warn. Lets a test walk every family a
+ *  MobFamily-shaped id can produce and assert none of them silently fall back. */
+export function hasCrestRecipe(id: string): boolean {
+  return id in CREST_RECIPES;
 }
 
 const urlCache = new Map<string, string>();

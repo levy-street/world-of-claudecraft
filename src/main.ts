@@ -30,6 +30,7 @@ import { initDesktopShellIntegration } from './game/desktop_shell_integration';
 import { takeEditorPlaytestRequest } from './game/editor_playtest';
 import { GamepadManager } from './game/gamepad';
 import { GamepadBindings } from './game/gamepad_bindings';
+import { handleGatherNodeInteract } from './game/gather_node_interact';
 import { Input } from './game/input';
 import { InputActivityMeter, installInputActivityTracking } from './game/input_activity';
 import {
@@ -106,6 +107,7 @@ import {
   NATIVE_APP,
   type ReleaseEntry,
 } from './net/online';
+import { realmPopulation } from './net/realm_population';
 import { openStripeCheckout } from './net/stripe_checkout';
 // The wallet module is loaded lazily via dynamic import() in the wallet
 // controller below, so it stays out of the main entry chunk and only loads when
@@ -125,7 +127,7 @@ import { desktopBridge } from './runtime';
 import { pathCrossesFence } from './sim/colliders';
 import { isStunned } from './sim/combat/cc';
 import { ABILITIES, CLASSES } from './sim/content/classes';
-import { ITEMS, isDelvePos, setActiveWorldContent } from './sim/data';
+import { GATHER_NODES, ITEMS, isDelvePos, setActiveWorldContent } from './sim/data';
 import { canEquipItem } from './sim/equipment_rules';
 import { findPlayerPath, resolvePlayerDestination } from './sim/pathfind';
 import { Sim } from './sim/sim';
@@ -157,10 +159,17 @@ import {
   validateForm,
 } from './ui/auth_utils';
 import { assembleBugReportMeta } from './ui/bug_report';
+import {
+  cameraPromptOpen,
+  dismissCameraPrompt,
+  maybeShowFirstRunCameraPrompt,
+} from './ui/camera_prompt';
+import { deleteCharButtonHtml } from './ui/char_delete_button';
 import { ChatCommandMenu } from './ui/chat_command_menu';
 import { chatInputSize } from './ui/chat_input_autosize';
 import { CLASS_DETAILS, SIGNATURE_ABILITIES } from './ui/class_details_data';
 import { ensureDeedLocalesLoaded } from './ui/deed_i18n';
+import { isDevGuiCommand } from './ui/dev_command_view';
 import { devTierByIndex, devTierDisplayName } from './ui/dev_tier';
 import {
   type DiscordAccountStatus,
@@ -211,8 +220,10 @@ import {
 } from './ui/player_card_share';
 import { hydratePortraits, portraitChipHtml } from './ui/portrait_chip';
 import { hideReconnectOverlay, showReconnectOverlay } from './ui/reconnect_overlay';
+import { wireSkinPicker } from './ui/skin_picker';
 import { createSpectateBadge } from './ui/spectate_badge';
 import { refreshSteamLinkStatus, wireSteamLink } from './ui/steam_link';
+import { shouldShowStorePromo } from './ui/store_promo_card';
 import { type PresetId, type ThemeKnob, ThemeStore } from './ui/theme';
 import {
   classifyAuthCode,
@@ -971,7 +982,10 @@ async function startGame(
       renderer.enableTargetConeDebug(tabConeHalfAt, TAB_NEAR_RADIUS, TAB_QUERY_RADIUS);
     }
     perf.setRenderer(renderer);
-    hud = new Hud(world, renderer, keybinds, { dailyRewardsEnabled: !NATIVE_APP });
+    hud = new Hud(world, renderer, keybinds, {
+      dailyRewardsEnabled: !NATIVE_APP,
+      devCommandsEnabled: import.meta.env.DEV,
+    });
     perf.setHud(hud);
     hydrateIcons(); // swap [data-icon] placeholders (micro-menu, mobile bar, meters) for inline SVG
   } catch (err) {
@@ -995,20 +1009,31 @@ async function startGame(
   // edge, the extra height extends upward, away from the chat log beneath it.
   const CHAT_INPUT_MIN_H = 36;
   const CHAT_INPUT_MAX_H = 110;
-  const autosizeChatInput = (): void => {
-    // Empty: pin to one line. (A long placeholder otherwise inflates a textarea's
-    // scrollHeight in Chromium, making the bar tall when empty and snapping to one
-    // line on the first keystroke.)
-    if (chatInput.value === '') {
-      chatInput.style.height = `${CHAT_INPUT_MIN_H}px`;
-      chatInput.style.overflowY = 'hidden';
-      return;
-    }
+  // Collapse to 'auto' and read the textarea's natural content height.
+  const measureChatInputScrollH = (): number => {
     chatInput.style.height = 'auto';
-    const size = chatInputSize(chatInput.scrollHeight, {
-      minHeight: CHAT_INPUT_MIN_H,
-      maxHeight: CHAT_INPUT_MAX_H,
-    });
+    return chatInput.scrollHeight;
+  };
+  const autosizeChatInput = (): void => {
+    const cs = getComputedStyle(chatInput);
+    const borderY =
+      (Number.parseFloat(cs.borderTopWidth) || 0) + (Number.parseFloat(cs.borderBottomWidth) || 0);
+    // A textarea's scrollHeight ignores the placeholder, so an empty box would measure
+    // as zero content and clip a placeholder that wraps to more than one line. When the
+    // field is empty, momentarily mirror the placeholder into the value to measure the
+    // height it needs. This is synchronous (no paint or input event in between), so the
+    // caret and text never flicker and no listener re-fires.
+    let placeholderHeight = 0;
+    if (chatInput.value === '' && chatInput.placeholder) {
+      chatInput.value = chatInput.placeholder;
+      placeholderHeight = measureChatInputScrollH();
+      chatInput.value = '';
+    }
+    const contentHeight = measureChatInputScrollH();
+    const size = chatInputSize(
+      { contentHeight, placeholderHeight, borderY },
+      { minHeight: CHAT_INPUT_MIN_H, maxHeight: CHAT_INPUT_MAX_H },
+    );
     chatInput.style.height = `${size.height}px`;
     chatInput.style.overflowY = size.overflowY;
   };
@@ -1060,9 +1085,10 @@ async function startGame(
     wrap.insertBefore(chatInput, wrap.firstChild);
   };
   function openChat(): void {
-    // reflect the active chat-channel tab in the placeholder (e.g. "Message World")
+    // reflect the active/sticky send channel in the placeholder (e.g. "Message World")
+    // and tint the input text to that channel's color
     ensureMobileComposerInPanel();
-    chatInput.placeholder = hud.activeChatPlaceholder();
+    hud.applyChatInputPresentation();
     chatInput.style.display = 'block';
     anchorChatInput();
     autosizeChatInput();
@@ -1073,7 +1099,7 @@ async function startGame(
   // the keyboard (native + the focus handler). Same as openChat minus the focus.
   function openChatRead(): void {
     ensureMobileComposerInPanel();
-    chatInput.placeholder = hud.activeChatPlaceholder();
+    hud.applyChatInputPresentation();
     chatInput.style.display = 'block';
     document.body.classList.remove('mobile-chat-reply');
     autosizeChatInput();
@@ -1122,9 +1148,16 @@ async function startGame(
       // that channel without the player retyping "/world" etc.
       const raw = chatInput.value;
       // "/share" links the selected quest into party chat; skip the normal send path.
-      if (!hud.maybeHandleQuestShareCommand(raw)) {
+      if (import.meta.env.DEV && isDevGuiCommand(raw)) {
+        hud.toggleDevCommandWindow();
+      } else if (!hud.maybeHandleQuestShareCommand(raw)) {
         const text = hud.composeChatSend(raw);
-        if (text) world.chat(text);
+        if (text) {
+          world.chat(text);
+          // Remember the channel this line reached so the next open (on the All
+          // tab) defaults there and tints the input to its color.
+          hud.noteSentChannel(text);
+        }
       }
       // a typed "/join world"/"/leave lfg" opens or closes its channel tab too,
       // mirroring the "+" menu (without hijacking the active send channel)
@@ -1147,6 +1180,14 @@ async function startGame(
   // WITHOUT closing chat.
   const chatDismiss = document.getElementById('chat-dismiss');
   chatDismiss?.addEventListener('click', () => chatInput.blur());
+
+  // One keyboard/gamepad action gate for every blocking client surface. The
+  // camera prompt lives outside Hud, so it reports its open state explicitly.
+  const gameplayInputBlocked = () =>
+    hud.isModalOpen() ||
+    hud.promptModalOpen() ||
+    cameraPromptOpen() ||
+    chatInput.style.display === 'block';
 
   const input = new Input(
     canvas,
@@ -1206,6 +1247,9 @@ async function startGame(
           case 'arena':
             hud.toggleArena();
             break;
+          case 'dungeonFinder':
+            hud.toggleDungeonFinder();
+            break;
           case 'valecup':
             hud.toggleValeCup();
             break;
@@ -1221,6 +1265,17 @@ async function startGame(
           case 'deeds':
             hud.toggleDeeds();
             break;
+          case 'sheathe': {
+            // Cosmetic sheathe toggle (Z). The world owns the rule (dead-gate,
+            // combat auto-unsheathe); play the cue only when the state moved.
+            const wasStowed = world.player.weaponStowed;
+            world.toggleWeaponStow();
+            if (world.player.weaponStowed !== wasStowed) {
+              if (world.player.weaponStowed) audio.weaponSheathe();
+              else audio.weaponUnsheathe();
+            }
+            break;
+          }
           case 'chat':
             openChat();
             break;
@@ -1234,17 +1289,15 @@ async function startGame(
       onEmoteWheel: (open) => hud.setEmoteWheelOpen(open),
       onClickPick: (x, y, button) => handlePick(x, y, button),
       onAttackMove: (x, y) => handleAttackMove(x, y),
-      canUseGameKeys: () =>
-        !hud.isModalOpen() && !hud.promptModalOpen() && chatInput.style.display !== 'block',
+      canUseGameKeys: () => !gameplayInputBlocked(),
     },
     keybinds,
   );
   input.camYaw = world.player.facing;
   perf.setInputDebugProvider(() => ({
     ...input.debugState(),
-    canUseGameKeys:
-      !hud.isModalOpen() && !hud.promptModalOpen() && chatInput.style.display !== 'block',
-    modalOpen: hud.isModalOpen(),
+    canUseGameKeys: !gameplayInputBlocked(),
+    modalOpen: hud.isModalOpen() || cameraPromptOpen(),
     chatOpen: chatInput.style.display === 'block',
     gameInputReady,
   }));
@@ -1267,10 +1320,12 @@ async function startGame(
     onDonate: () => window.open(DONATE_URL, '_blank', 'noopener,noreferrer'),
     onEmotes: () => hud.toggleEmoteWheel(),
     onArena: () => hud.toggleArena(),
+    onDungeonFinder: () => hud.toggleDungeonFinder(),
     onValeCup: () => hud.toggleValeCup(),
     onQuestLog: () => hud.toggleQuestLog(),
     onCharacter: () => hud.toggleChar(),
     onBags: () => hud.toggleBags(),
+    onCrafting: () => hud.toggleCrafting(),
     onSpellbook: () => hud.toggleSpellbook(),
     onTalents: () => hud.toggleTalents(),
     onMap: () => hud.toggleMap(),
@@ -1305,10 +1360,10 @@ async function startGame(
     });
   }, APM_BEAT_MS);
   const gamepadBindings = new GamepadBindings();
-  const canUseGameKeysNow = () =>
-    !hud.isModalOpen() && !hud.promptModalOpen() && chatInput.style.display !== 'block';
+  const canUseGameKeysNow = () => !gameplayInputBlocked();
   function dispatchGamepadAction(id: string): void {
     if (id === 'escape') {
+      if (dismissCameraPrompt()) return;
       if (hud.cancelGroundAim()) return;
       if (!hud.closeAll()) hud.toggleOptionsMenu();
       return;
@@ -1385,7 +1440,7 @@ async function startGame(
   const gamepad = new GamepadManager(input, gamepadBindings, {
     onAction: (id) => dispatchGamepadAction(id),
     onInputEdge: () => inputMeter.record(performance.now()),
-    isPointerMode: () => hud.isWindowOpen(),
+    isPointerMode: () => hud.isWindowOpen() || cameraPromptOpen(),
     getPlayerHealth: () => (world.player.dead ? 0 : world.player.hp),
     onConnectionChange: () => hud.refreshControllerLabels(),
   });
@@ -1490,9 +1545,27 @@ async function startGame(
       settings.set('startAttackOnAbilityUse', !!value);
       return;
     }
+    if (key === 'showAttackButton') {
+      // Slot-0 mode switch, read LIVE by the HUD (attackSlotIsAttack): ON keeps the
+      // classic Attack toggle; OFF turns the first slot into a normal assignable one
+      // (its key then casts the assigned action). Persistence is the only page work.
+      settings.set('showAttackButton', !!value);
+      return;
+    }
     if (key === 'groundReticle') {
       const v = settings.set('groundReticle', !!value);
       if (!v) hud.cancelGroundAim();
+      return;
+    }
+    if (
+      key === 'partyFrameShowResource' ||
+      key === 'partyFrameShowAbsorbs' ||
+      key === 'partyFrameShowAuras' ||
+      key === 'partyFrameShowSelf'
+    ) {
+      // Read live by Hud.updatePartyFrames (its config is rebuilt from settings each
+      // sync); persisting the choice is the only page-level work needed.
+      settings.set(key, !!value);
       return;
     }
     if (key === 'attackMove') {
@@ -1679,12 +1752,34 @@ async function startGame(
         break;
       case 'uiScale':
         document.documentElement.style.setProperty('--ui-scale', String(v));
+        hud.reapplySavedGeometry();
         break;
       case 'playerFrameScale':
         document.documentElement.style.setProperty('--player-frame-scale', String(v));
         break;
       case 'targetFrameScale':
         document.documentElement.style.setProperty('--target-frame-scale', String(v));
+        break;
+      case 'partyFrameScale':
+        document.documentElement.style.setProperty('--party-frame-scale', String(v));
+        break;
+      case 'partyFrameWidth':
+        document.documentElement.style.setProperty('--party-frame-width', `${v}px`);
+        break;
+      case 'partyFrameHeight':
+        document.documentElement.style.setProperty('--party-frame-height', `${v}px`);
+        break;
+      case 'partyFrameSpacing':
+        document.documentElement.style.setProperty('--party-frame-spacing', `${v}px`);
+        break;
+      case 'partyFrameColumns':
+        document.documentElement.style.setProperty('--party-frame-columns', String(Math.round(v)));
+        break;
+      case 'partyFrameHealthText':
+      case 'partyFrameSort':
+      case 'partyFrameStyle':
+        // Read live by Hud.updatePartyFrames; persistence above is the only
+        // page-level work needed.
         break;
       case 'aurasOnPlayerFrame':
         hud.setAurasOnPlayerFrame(!!v);
@@ -1824,7 +1919,7 @@ async function startGame(
     const nativePriceCache = new Map<string, { amountBase: string; atMs: number }>();
     const nativePriceCacheTtlMs = 60_000;
     const nativeAmountBase = (
-      rail: 'sol' | 'woc',
+      rail: 'sol' | 'usdc' | 'woc',
       sku: string,
       amountBase: string | null | undefined,
     ): string | null => {
@@ -1860,21 +1955,24 @@ async function startGame(
         const { balance, skus, nativeRails } = pack;
         const wallet = await loadWallet();
         const walletAddress = wallet.currentWallet().address;
-        const [solBalance, wocBalance] = walletAddress
+        const [solBalance, usdcBalance, wocBalance] = walletAddress
           ? await Promise.all([
               economy.solBalance(walletAddress),
+              economy.usdcBalance(walletAddress),
               wallet.fetchWocBalance(walletAddress, true),
             ])
-          : [{ lamports: null }, null];
+          : [{ lamports: null }, { amountBase: null }, null];
         const nativePrices = await Promise.all(
           skus.map(async (row) => {
-            const [sol, woc] = await Promise.all([
+            const [sol, usdc, woc] = await Promise.all([
               nativeRails.sol ? economy.nativePrice('sol', row.sku) : null,
+              nativeRails.usdc ? economy.nativePrice('usdc', row.sku) : null,
               nativeRails.woc ? economy.nativePrice('woc', row.sku) : null,
             ]);
             return {
               sku: row.sku,
               solAmountBase: nativeAmountBase('sol', row.sku, sol?.amountBase),
+              usdcAmountBase: nativeAmountBase('usdc', row.sku, usdc?.amountBase),
               wocAmountBase: nativeAmountBase('woc', row.sku, woc?.amountBase),
             };
           }),
@@ -1886,6 +1984,7 @@ async function startGame(
           nativeRails,
           walletBalances: {
             solLamports: solBalance.lamports,
+            usdcBaseUnits: usdcBalance.amountBase,
             wocBaseUnits: wocBalanceBaseUnits(wocBalance),
           },
           nativePrices,
@@ -1957,7 +2056,18 @@ async function startGame(
         };
       },
     };
-    if (!NATIVE_APP) hud.attachClaudium(claudiumHooks);
+    if (!NATIVE_APP) {
+      hud.attachClaudium(claudiumHooks);
+      if (
+        shouldShowStorePromo({
+          nativeApp: NATIVE_APP,
+          desktopApp: DESKTOP_APP,
+          mobileTouch: document.body.classList.contains('mobile-touch'),
+        })
+      ) {
+        hud.attachStorePromoCard();
+      }
+    }
   }
   function interactKey(): void {
     const p = world.player;
@@ -1974,6 +2084,18 @@ async function startGame(
     // emit its precise "move closer to the chest/passage" hint.
     let bestDelve: number | null = null,
       bestDelveD = INTERACT_RANGE + 1;
+    // Gather nodes (#1866) are static content (src/sim/data GATHER_NODES), not
+    // entities, so they get their own nearest-in-range scan alongside the
+    // entity loop below rather than living inside it.
+    let bestNode: (typeof GATHER_NODES)[number] | null = null,
+      bestNodeD = INTERACT_RANGE;
+    for (const node of GATHER_NODES) {
+      const d = dist2d(p.pos, { x: node.pos.x, y: p.pos.y, z: node.pos.z });
+      if (d < bestNodeD) {
+        bestNode = node;
+        bestNodeD = d;
+      }
+    }
     for (const e of world.entities.values()) {
       const d = dist2d(p.pos, e.pos);
       if (e.kind === 'mob' && e.lootable && d < bestCorpseD) {
@@ -1989,7 +2111,11 @@ async function startGame(
         bestObj = e.id;
         bestObjD = d;
       }
-      if (e.kind === 'npc' && d < bestNpcD) {
+      // The graveyard angel is hidden from (and not interactable by) the living,
+      // same filter renderer.pick() applies to the click path: skip it here too
+      // unless the local player is a released spirit, so it cannot starve a
+      // node sharing its graveyard's interact range for keyboard/gamepad/mobile.
+      if (e.kind === 'npc' && d < bestNpcD && (e.templateId !== 'spirit_healer' || p.ghost)) {
         bestNpc = e.id;
         bestNpcD = d;
       }
@@ -2023,6 +2149,18 @@ async function startGame(
       const npc = world.entities.get(bestNpc);
       if (npc?.kind === 'npc' && npc.templateId === 'brother_halven') hud.openDelveBoard(bestNpc);
       else hud.openQuestDialog(bestNpc);
+      return;
+    }
+    if (bestNode !== null) {
+      handleGatherNodeInteract(
+        world,
+        hud,
+        p.pos,
+        bestNode.id,
+        bestNode.pos,
+        t('questUi.errors.tooFar'),
+        t('hudChrome.gathering.notReady'),
+      );
       return;
     }
     hud.showError(t('errors.nothingInteract'));
@@ -2094,7 +2232,31 @@ async function startGame(
         return;
       }
     }
-    const id = renderer.pick(x, y);
+    // Gather nodes (#1866) are static content, not entities, so they get their
+    // own raycast rather than living in `renderer.pick()`. Ordered: a direct
+    // entity hit always wins (it must not be overridden by a nearby node), then
+    // a direct node hit (it must not be stolen by the sloppy assist below when
+    // a mob/player camps the node), then the sloppy character assist, then the
+    // ground-click/click-to-move fallback. A click that lands on a node
+    // harvests it; it does not also walk you there or deselect your target.
+    let id = renderer.pickDirect(x, y);
+    if (id === null) {
+      const nodeId = renderer.pickGatherNode(x, y);
+      const node = nodeId !== null ? GATHER_NODES.find((n) => n.id === nodeId) : undefined;
+      if (node) {
+        handleGatherNodeInteract(
+          world,
+          hud,
+          world.player.pos,
+          node.id,
+          node.pos,
+          t('questUi.errors.tooFar'),
+          t('hudChrome.gathering.notReady'),
+        );
+        return;
+      }
+      id = renderer.pickSloppy(x, y);
+    }
     // OSRS-style click feedback (its own toggle): a brief ground marker, gold for a
     // neutral click and red on a hostile. Both reference games only mark a real action,
     // so the marker stamps where a click actually does something: the click-to-move
@@ -2579,7 +2741,9 @@ async function startGame(
     // freeze movement while the game menu is up so WASD doesn't walk the
     // character behind it (other windows stay non-modal, as before); the
     // first-spawn intro cinematic holds movement the same way until it lands
-    input.setSuspendMovement(!gameInputReady || hud.isModalOpen() || intro !== null);
+    input.setSuspendMovement(
+      !gameInputReady || hud.isModalOpen() || cameraPromptOpen() || intro !== null,
+    );
     const playerDead = world.player.dead;
     if (shouldClearAutorunOnDeath(playerWasDead, playerDead)) {
       input.setAutorun(false);
@@ -2986,6 +3150,13 @@ async function startGame(
         // bags/vendor/loot open never pays the compose burst synchronously
         // (icon_prewarm.ts). Re-entry is a fast no-op: the cache is module-global.
         prewarmIconCache(defaultIconPrewarmEntries());
+        // First-run camera-mode prompt (issue #1727): show once per browser on a
+        // mouse-driven interface, after any spawn cinematic has finished. Applies
+        // the choice through the same applySetting path as the Key Bindings toggle.
+        maybeShowFirstRunCameraPrompt({
+          applyMouseCamera: (enabled) => applySetting('mouseCamera', enabled),
+          isBlocked: () => intro !== null,
+        });
         (window as any).__game = {
           sim: world,
           world,
@@ -3145,6 +3316,7 @@ function renderSkinPicker(
   }
   if (picker) picker.style.display = '';
   row.style.setProperty('--class-color', `#${CLASSES[cls].color.toString(16).padStart(6, '0')}`);
+  const swatches: HTMLElement[] = [];
   for (let i = 0; i < count; i++) {
     const b = document.createElement('button');
     b.type = 'button';
@@ -3162,21 +3334,19 @@ function renderSkinPicker(
     } else {
       b.textContent = String(i + 1);
     }
-    b.addEventListener('click', () => {
-      row.querySelectorAll('.skin-swatch').forEach((x) => {
-        x.classList.remove('sel');
-      });
-      b.classList.add('sel');
-      onPick(i);
-    });
-    // Live-preview the chroma on the right avatar while hovering; revert on leave.
-    b.addEventListener('mouseenter', () => characterPreview?.setSkin(i));
-    b.addEventListener('mouseleave', () => {
-      const sel = row.querySelector('.skin-swatch.sel') as HTMLElement | null;
-      characterPreview?.setSkin(sel ? Number(sel.dataset.skin ?? 0) || 0 : current);
-    });
+    swatches.push(b);
     row.appendChild(b);
   }
+  // Live-preview the chroma on the avatar while hovering, commit on click, and
+  // revert to the committed selection when the pointer leaves the whole row.
+  // The revert is row-level, not per swatch, so hovering the swatch next to the
+  // selected one previews instead of being clobbered (issue 1464); see
+  // wireSkinPicker.
+  wireSkinPicker(row, swatches, current, {
+    onPreview: (i) => characterPreview?.setSkin(i),
+    onRevert: (i) => characterPreview?.setSkin(i),
+    onPick,
+  });
 }
 
 /** Give each class button a small portrait preview of that class (run once
@@ -3526,20 +3696,6 @@ function loginError(text: string): void {
 }
 
 const LAST_REALM_KEY = 'woc_last_realm';
-
-// Classic-MMO population bands, derived from the realm's current online count
-// (the classic MMO's own labels are relative to peak; current count is a fair
-// local stand-in).
-function realmPopulation(
-  online: boolean,
-  players: number,
-): { labelKey: TranslationKey; tipKey: TranslationKey; cls: string } {
-  if (!online) return { labelKey: 'realm.offline', tipKey: 'realm.popTipOffline', cls: 'offline' };
-  if (players >= 80) return { labelKey: 'realm.full', tipKey: 'realm.popTipFull', cls: 'full' };
-  if (players >= 40) return { labelKey: 'realm.high', tipKey: 'realm.popTipHigh', cls: 'high' };
-  if (players >= 15) return { labelKey: 'realm.medium', tipKey: 'realm.popTipMedium', cls: 'med' };
-  return { labelKey: 'realm.low', tipKey: 'realm.popTipLow', cls: 'low' };
-}
 
 // After login the classic MMO drops you onto a Realm List screen (then character select for
 // the chosen realm). We remember the last realm and jump straight to its
@@ -4046,7 +4202,7 @@ function showRealmList(dir?: import('./net/online').RealmDirectory): void {
           `.realm-row[data-name="${CSS.escape(r.name)}"]`,
         ) as HTMLElement | null;
         if (!row) return;
-        const pop = realmPopulation(st.online, st.players);
+        const pop = realmPopulation(st.online, st.players, st.cap);
         const popEl = row.querySelector('[data-pop]') as HTMLElement;
         popEl.textContent = t(pop.labelKey);
         popEl.className = `realm-pop ${pop.cls}`;
@@ -4148,7 +4304,7 @@ function renderRealmDropdown(): void {
           `.realm-row[data-name="${CSS.escape(r.name)}"]`,
         ) as HTMLElement | null;
         if (!row) return;
-        const pop = realmPopulation(st.online, st.players);
+        const pop = realmPopulation(st.online, st.players, st.cap);
         const popEl = row.querySelector('[data-pop]') as HTMLElement;
         popEl.textContent = t(pop.labelKey);
         popEl.className = `realm-pop ${pop.cls}`;
@@ -4313,10 +4469,10 @@ async function refreshCharacters(): Promise<void> {
         </div>
         ${
           c.forceRename
-            ? `<input class="rename-input" placeholder="${escapeHtml(t('character.newNamePlaceholder'))}" maxlength="16" /><span class="char-actions"><button class="btn btn-danger delete-char-btn" ${c.online ? 'disabled' : ''}>${escapeHtml(t('character.delete'))}</button><button class="btn rename-btn">${escapeHtml(t('character.rename'))}</button></span>`
+            ? `<input class="rename-input" placeholder="${escapeHtml(t('character.newNamePlaceholder'))}" maxlength="16" /><span class="char-actions"><button class="btn rename-btn">${escapeHtml(t('character.rename'))}</button>${deleteCharButtonHtml(c.online)}</span>`
             : c.online
-              ? `<span class="char-actions"><button class="btn btn-danger delete-char-btn" disabled title="${escapeHtml(t('character.inWorldHint'))}">${escapeHtml(t('character.delete'))}</button><button class="btn take-over-btn" title="${escapeHtml(t('character.takeOverConfirm'))}" aria-label="${escapeHtml(t('character.takeOverConfirm'))}">${escapeHtml(t('character.takeOver'))}</button></span>`
-              : `<span class="char-actions"><button class="btn btn-danger delete-char-btn">${escapeHtml(t('character.delete'))}</button><button class="btn enter-world-btn">${escapeHtml(t('auth.enterWorld'))}</button></span>`
+              ? `<span class="char-actions"><button class="btn take-over-btn" title="${escapeHtml(t('character.takeOverConfirm'))}" aria-label="${escapeHtml(t('character.takeOverConfirm'))}">${escapeHtml(t('character.takeOver'))}</button>${deleteCharButtonHtml(true)}</span>`
+              : `<span class="char-actions"><button class="btn enter-world-btn">${escapeHtml(t('auth.enterWorld'))}</button>${deleteCharButtonHtml(false)}</span>`
         }`;
 
       row.querySelector('.delete-char-btn')?.addEventListener('click', (e) => {
@@ -4848,7 +5004,7 @@ function updateSeoMetadata(lang: SupportedLanguage): void {
   if (jsonLd) {
     const sameAs = [
       'https://github.com/levy-street/world-of-claudecraft',
-      'https://discord.gg/GjhnUsBtw',
+      'https://discord.com/invite/worldofclaudecraft',
       'https://www.youtube.com/@WoClaudeCraft',
       'https://x.com/WoClaudecraft',
       'https://www.instagram.com/worldofclaudecraft/',
@@ -5876,7 +6032,7 @@ const DISCORD_BUILD_ENABLED = String(import.meta.env.VITE_DISCORD_DISABLED ?? ''
 // Community links for the mobile More tray. The invite mirrors the hardcoded
 // invite on the shells' community links and is the fallback when the server-fed
 // discordInviteUrl() is not known yet (logged out, offline).
-const DISCORD_INVITE_URL = 'https://discord.gg/GjhnUsBtw';
+const DISCORD_INVITE_URL = 'https://discord.com/invite/worldofclaudecraft';
 const DONATE_URL = 'https://ko-fi.com/worldofclaudecraft';
 const DISCORD_ONBOARD_KEY = 'woc_discord_onboard';
 let discordPopup: Window | null = null;

@@ -186,7 +186,10 @@ function tickCantorPhases(
     if (run.affixes.includes('lively_choir')) {
       ctx.spawnBossAdds(boss, 'choir_thrall', 2);
     }
-    st.cantorShieldAdds = boss.summonedIds.slice(before);
+    // A burst can cross both HP thresholds in one update. Keep every phase's
+    // shield adds tracked until all of them die instead of replacing the first
+    // pair with the second pair.
+    st.cantorShieldAdds.push(...boss.summonedIds.slice(before));
     applyCantorShield(ctx, boss);
     ctx.emit({
       type: 'log',
@@ -234,6 +237,7 @@ function tickBlackwaterMarkCast(
     text: `${boss.name} marks ${target.name} with Blackwater!`,
     color: '#6af',
     entityId: boss.id,
+    telegraph: true,
   });
   ctx.emit({
     type: 'spellfx',
@@ -292,6 +296,7 @@ function tickFinalBell(
     type: 'log',
     text: `${boss.name} unleashes Final Bell!`,
     color: '#ff9933',
+    telegraph: true,
     entityId: boss.id,
   });
   ctx.spawnBossAdds(

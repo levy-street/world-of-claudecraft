@@ -71,6 +71,7 @@ export const hudChromeStrings = {
     remainingLessThanMinute: '<1m',
     remainingMinutes: '{minutes}m',
     remainingHoursMinutes: '{hours}h {minutes}m',
+    remainingDaysHours: '{days}d {hours}h',
     score: 'Score',
     walletValue: 'Wallet Value (WOC)',
     usd: '{amount} USD',
@@ -111,6 +112,8 @@ export const hudChromeStrings = {
       under_minimum: 'Wallet is below the $20 USD WOC minimum.',
       price_unavailable: 'WOC price is unavailable, rewards are temporarily locked.',
       banned: 'You are banned from Daily Rewards. Reason: {reason}',
+      bannedUntil:
+        'You are banned from Daily Rewards for another {remaining}. Access returns {until}. Reason: {reason}',
     },
   },
   wocStore: {
@@ -191,6 +194,7 @@ export const hudChromeStrings = {
     balanceLabel: 'Balance',
     balanceUnit: '{amount} Claudium',
     solBalance: 'SOL: {amount}',
+    usdcBalance: 'USDC: {amount}',
     wocBalance: 'WOC: {amount}',
     unavailable:
       'The Claudium store is unavailable right now. Your balance and purchases are unaffected; please check back shortly.',
@@ -200,10 +204,11 @@ export const hudChromeStrings = {
     railLabel: 'Payment method',
     railStripe: 'Card',
     railSol: 'SOL',
+    railUsdc: 'USDC',
     railWoc: 'WOC',
     railWocDiscount: '20% off',
     railWocUnavailable: 'WOC pricing is unavailable right now.',
-    railNativeUnavailable: 'SOL/WOC off.',
+    railNativeUnavailable: 'Crypto off.',
     amountLabel: 'Amount',
     showAmounts: 'Show all Claudium amounts',
     hideAmounts: 'Hide extra Claudium amounts',
@@ -470,6 +475,19 @@ export const hudChromeStrings = {
     notNow: 'Not now',
     update: 'Update',
   },
+  // First-run camera-mode prompt (issue #1727): a one-shot modal on the first world
+  // entry in a browser, offering Classic vs Mouse Camera. The mouse option title
+  // reuses hud.options.mouseCamera; these are the surrounding strings. The setting
+  // stays changeable later under Esc, Key Bindings.
+  cameraPrompt: {
+    title: 'Choose Your Camera',
+    intro: 'Pick how the camera follows your character.',
+    mouseDesc: 'Move the mouse to turn the camera without holding a button.',
+    classicTitle: 'Classic Camera',
+    classicDesc: 'Hold right-click and move the mouse to turn the camera.',
+    changeLater: 'You can change this later under Esc, Key Bindings.',
+    confirm: 'Confirm',
+  },
   // Cast-bar progressbar accessible names (the visible spell name + seconds-left
   // text are the live status; these name which bar is which). One for the player's
   // own cast (#castbar) and one for the target/boss cast (#tf-castbar).
@@ -541,6 +559,18 @@ export const hudChromeStrings = {
     perSecondRow: '{total} ({rate})',
     minutesSeconds: '{m}m {s}s',
     seconds: '{s}s',
+    // Shown alongside the empty state so a first-time viewer understands the
+    // panel is not broken: rows populate once party combat starts, and the
+    // segment closes itself a few seconds after the fight ends.
+    autoShowHint:
+      'Rows appear automatically once your party deals damage or healing, and this segment closes a few seconds after combat ends.',
+  },
+  // Pet action bar disabled-state tooltips: the feed/heal-pet button stays
+  // visible (never hidden) while it cannot currently be used, so a hunter
+  // sees WHY instead of a button that looks broken.
+  petFeed: {
+    disabledFullHp: 'Pet is at full health',
+    disabledNoFood: 'No food in your bags will heal your pet',
   },
   // Key Bindings panel action labels that the in-file BIND_ACTION_LABEL_KEYS map
   // (hud.ts) routes through t(). Kept here (not the constrained `hud` catalog
@@ -552,6 +582,7 @@ export const hudChromeStrings = {
     // Discord is a brand name; it stays identical across locales.
     discord: 'Discord',
     valecup: 'Vale Cup',
+    sheathe: 'Sheathe/Unsheathe Weapon',
     // Pet bar (Ctrl+1..5 by default) key-binding rows + category header.
     categoryPet: 'Pet',
     petAttack: 'Pet: Attack',
@@ -786,6 +817,9 @@ export const hudChromeStrings = {
     // Interface panel toggle: also engage auto-attack when using an offensive
     // ability, so white swings start without a separate Attack press (on by default).
     startAttackOnAbility: 'Auto-Attack on Ability Use',
+    // Interface panel toggle: show the fixed Attack (auto-attack) button in slot 0
+    // of the action bar (on by default). Off frees slot 0 for a normal action.
+    showAttackButton: 'Show Attack Button',
     // Interface panel toggle: loot corpses by walking past them (off by default).
     walkByAutoloot: 'Walk-by Autoloot',
     groundReticle: 'Ground-Targeting Reticle',
@@ -944,6 +978,7 @@ export const hudChromeStrings = {
       spellPower: 'Spell Power',
       critRating: 'Crit Rating',
       hasteRating: 'Haste Rating',
+      hitRating: 'Hit Rating',
       warfare: 'Warfare',
     },
     warfareValue: '+{increase}% dealt / -{reduction}% taken',
@@ -965,6 +1000,8 @@ export const hudChromeStrings = {
         'Crit rating from your gear and set bonuses, raising your critical strike chance. About 10 rating grants 1% crit.',
       hasteRating:
         'Haste rating from your gear and set bonuses, speeding up your attacks and spellcasting. About 10 rating grants 1% haste.',
+      hitRating:
+        'Hit rating from your gear and set bonuses, reducing how often your attacks miss and your spells are resisted, especially against higher-level enemies. About 10 rating grants 1% hit.',
       warfare:
         'Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%.',
     },
@@ -1069,6 +1106,12 @@ export const hudChromeStrings = {
       few: 'you are {rank}, {count} members',
       many: 'you are {rank}, {count} members',
       other: 'you are {rank}, {count} members',
+    },
+    finderPartySize: {
+      one: '{count} player',
+      few: '{count} players',
+      many: '{count} players',
+      other: '{count} players',
     },
     characterCount: {
       one: '{count} character',
@@ -1334,6 +1377,23 @@ export const hudChromeStrings = {
   dungeonDifficulty: {
     setHeroic: 'Set Dungeon Difficulty: Heroic',
     setNormal: 'Set Dungeon Difficulty: Normal',
+    resetAll: 'Reset All Instances',
+    resetDone: 'All instances have been reset.',
+    resetNone: 'You have no instances to reset.',
+    resetOccupied: 'You cannot reset instances while someone is still inside.',
+    resetSameDifficulty:
+      'Change dungeon difficulty before resetting these instances. Empty instances reset on their own after 5 minutes.',
+    resetLoot: 'You cannot reset instances while loot remains inside.',
+    resetConfirmTitle: 'Reset All Instances?',
+    resetConfirmBody:
+      'This abandons empty instances from your previously selected difficulty. Unclaimed loot will prevent the reset.',
+    resetConfirm: 'Reset Instances',
+    resetCooldown: 'Instances can only be reset once every 5 minutes.',
+    resetUsage: 'Use /dungeon reset to abandon your empty instances after changing difficulty.',
+    entryMismatchNormal:
+      'This instance is set to Normal difficulty. Use Reset All Instances to start a fresh Heroic run.',
+    entryMismatchHeroic:
+      'This instance is set to Heroic difficulty. Use Reset All Instances to start a fresh Normal run.',
   },
   // Modular bag filtering controls: the category chips, sort dropdown, and live
   // search above the bag grid, plus the "no items match" empty state.
@@ -1343,7 +1403,19 @@ export const hudChromeStrings = {
     cannotDestroy: 'This item cannot be destroyed.',
     // Tooltip sub-line advertising the right-click destroy affordance, shown only
     // for a destroyable item so junk is removable without hunting for a menu.
+    // DEAD: right-click now uses/equips (the classic binding) and destroying is the
+    // drag-out gesture below. Kept so the locale overlays keep resolving; drop it
+    // (and its overlay rows) at the next locale fill.
     rightClickDestroy: 'Right-click to destroy',
+    // Tooltip sub-lines for the two drag gestures that replaced right-click-destroy:
+    // drag a gear piece onto the character sheet to equip it, drag any destroyable
+    // stack out onto the world to throw it away (which opens the destroy prompt).
+    dragEquipHint: 'Drag onto your character to equip',
+    dragDestroyHint: 'Drag out into the world to destroy',
+    // Refusal when a stack is dropped on a square of a FILTERED / SEARCHED / SORTED grid:
+    // that grid is a derived list, its squares hold no bag position, so honoring the drop
+    // would move a stack the player never aimed at. Say so instead of doing nothing.
+    reorderNeedsRecent: 'Clear the filter and sort by Recent to rearrange your bags',
     filterGroupAria: 'Filter bags by category',
     filterAll: 'All',
     filterWeapon: 'Weapons',
@@ -1433,6 +1505,8 @@ export const hudChromeStrings = {
     },
     dodge: 'Increases dodge chance by {pct}%',
     dodgeReduce: 'Reduces dodge chance by {pct}%',
+    damageReduction: 'Reduces all damage taken by {pct}%',
+    guardianWard: 'The next lethal enemy hit restores you to {pct}% health instead',
     armorFlat: 'Reduces armor by {value}',
     armorFlatStacks: 'Reduces armor by {value} ({stacks} stacks)',
     // Sunder Armor / Faerie Fire: percent armor reductions (Sunder stacks).
@@ -1561,6 +1635,33 @@ export const hudChromeStrings = {
     unlock: 'Move player frame',
     lock: 'Lock player frame',
   },
+  partyFrames: {
+    section: 'Party and Raid Frames',
+    unlock: 'Move party and raid frames',
+    lock: 'Lock party and raid frames',
+    style: 'Frame Style',
+    styleAutomatic: 'Automatic',
+    styleClassic: 'Classic Party Frames',
+    styleRaid: 'Raid Frames',
+    scale: 'Frame Scale',
+    width: 'Frame Width',
+    height: 'Frame Height',
+    spacing: 'Frame Spacing',
+    columns: 'Raid Columns',
+    healthText: 'Health Text',
+    healthNone: 'None',
+    healthPercent: 'Percent',
+    healthCurrent: 'Current',
+    healthCurrentMax: 'Current / Max',
+    sort: 'Sort Players',
+    sortGroup: 'Group',
+    sortRole: 'Role',
+    sortName: 'Name',
+    showResource: 'Show Mana, Rage, and Energy',
+    showAbsorbs: 'Show Absorb Shields',
+    showAuras: 'Show Buffs and Debuffs',
+    showSelf: 'Show Your Frame',
+  },
   // Interface panel row: snap both movable unit frames back to their stock
   // spots (the button reuses chatWindow.resetAction). Wordy (M16): the five
   // non-Latin fills land in this same change.
@@ -1609,6 +1710,12 @@ export const hudChromeStrings = {
         'Link your Discord to earn points from play and community activity, and climb the status tiers.',
       error: 'Could not link Discord. Please try again.',
       success: 'Discord linked.',
+      // Secondary action next to the link CTA: open the plain community invite
+      // without linking an account. This is the single Discord entry point in
+      // the game HUD (the corner community tray's separate invite link was
+      // removed as a duplicate), so an unlinked player still needs one click
+      // to just join the server.
+      joinServer: 'Just join the Discord server',
     },
     // First-time Discord login chooser (create a new account vs link an existing one).
     choice: {
@@ -1660,8 +1767,13 @@ export const hudChromeStrings = {
       admin: 'Admin',
       coredevs: 'Core Dev',
       devs: 'Dev',
+      seniormods: 'Senior Mod',
       mods: 'Mod',
+      juniormods: 'Junior Mod',
       artists: 'Artist',
+      contentcreator: 'Content Creator',
+      legend: 'LEGEND',
+      shill: 'SHILL',
     },
     guildMember: 'Verified member',
     notMember: 'Not in the server yet',
@@ -1955,6 +2067,9 @@ export const hudChromeStrings = {
     mining: 'Mining',
     logging: 'Logging',
     herbalism: 'Herbalism',
+    // #1866: click/tap/interact-key error when a targeted node's per-viewer
+    // respawn timer has not elapsed yet (IWorldProfessions#nodeHarvestableByMe).
+    notReady: 'This resource node has not respawned for you yet.',
   },
   // Archetype title (#1130): the named title granted by a character's currently
   // active craft archetype (see src/sim/professions/archetype.ts). `none` is shown
@@ -2002,6 +2117,117 @@ export const hudChromeStrings = {
     throttled: 'You are crafting too quickly. Wait a moment and try again.',
     // #1299: the recipe exists but this player has not learned it yet.
     recipeNotLearned: 'You have not learned that recipe yet.',
+  },
+  // Dungeon Finder window (docs/prd/dungeon-finder.md). Dungeon, creature,
+  // item, quest, and zone NAMES resolve through tEntity/world_entity_i18n,
+  // never through these keys.
+  finder: {
+    title: 'Dungeon Finder',
+    close: 'Close',
+    back: 'Back',
+    syncing: 'Waiting for the realm...',
+    tabCatalogue: 'Catalogue',
+    tabQueue: 'Quick Match',
+    tabBoard: 'Premade Groups',
+    normal: 'Normal',
+    heroic: 'Heroic',
+    kindDungeon: 'Dungeon',
+    kindRaid: 'Raid',
+    kindSolo: 'Solo adventure',
+    levels: 'Levels {min} to {max}',
+    levelOne: 'Level {level}',
+    // Group size renders through tPlural(hudChrome.plurals.finderPartySize).
+    // The mm:ss clock separator is a token pattern, like every other HUD clock.
+    clock: '{minutes}:{seconds}',
+    // Count-plus-role composition ({count} tanks): a token pattern so a locale
+    // owns the ORDER, never a `${n} ${label}` concat at the call site.
+    roleCount: '{count} {role}',
+    roleTank: 'Tank',
+    roleHealer: 'Healer',
+    roleDps: 'Damage',
+    freeRoles: 'Any roles welcome',
+    lockoutDaily: 'Daily lockout on the final boss',
+    lockoutNone: 'No lockout',
+    lockedFor: 'Locked for about {minutes} min',
+    attunement: 'Requires attunement: {quest}',
+    heroicMarks: 'Heroic Marks: {count} per player',
+    entrance: 'Entrance: {zone}',
+    showOnMap: 'Show on Map',
+    encounters: 'Encounters',
+    finalBoss: 'Final boss',
+    summoned: 'Summoned guardian',
+    lootGuaranteed: 'One of these always drops:',
+    lootMaybe: 'At most one of these may drop:',
+    lootChance: 'Additional chance drops:',
+    lootHeroic: 'Heroic bonus, one of these always drops:',
+    pct: '{pct}%',
+    blockedLevel: 'Levels {min} to {max} only',
+    blockedSpec: 'Requires a specialization',
+    yourRoles: 'Your roles',
+    needsSpec: 'Choose a specialization to use the Dungeon Finder.',
+    leaderNote: 'Only your party leader can queue the group.',
+    chooseActivities: 'Choose activities',
+    joinQueue: 'Join queue',
+    leaveQueue: 'Leave queue',
+    waited: 'Time in queue: {time}',
+    cooldownNote: 'You may queue again in {seconds}s.',
+    travelNote:
+      'The group forms where everyone stands. Travel to the entrance together; nobody is teleported.',
+    proposalTitle: 'Group found: {name}',
+    proposalRole: 'Your role: {role}',
+    accepted: '{accepted} of {size} confirmed',
+    remaining: '{seconds}s to answer',
+    accept: 'Accept',
+    decline: 'Decline',
+    acceptedWait: 'Waiting for the others...',
+    slotState: '{role}: {accepted} of {total} ready',
+    openListings: 'Open listings',
+    boardEmpty: 'No listings right now. Publish one!',
+    boardLeaderGate: 'Only your party leader can publish a listing.',
+    publishListing: 'Publish a listing',
+    activity: 'Activity',
+    publish: 'Publish',
+    yourListing: 'Your listing',
+    closeListing: 'Close listing',
+    applicants: 'Applicants',
+    noApplicants: 'No applicants yet.',
+    acceptApplicantAria: 'Accept {name}',
+    declineApplicantAria: 'Decline {name}',
+    levelClass: 'Lv {level} {className}',
+    leader: 'Leader: {name}',
+    needs: 'Needs {roles}',
+    slots: '{size}/{capacity}',
+    apply: 'Apply',
+    withdraw: 'Withdraw application',
+    tagFirstRun: 'First run',
+    tagQuestRun: 'Quest run',
+    tagFullClear: 'Full clear',
+    tagLearning: 'Learning welcome',
+    tagFastRun: 'Fast run',
+    // Notable encounter mechanics (stable keys authored in
+    // src/sim/content/dungeon_finder.ts encounter records).
+    mech: {
+      shadow_pulse: 'Shadow Pulse (pulsing area damage)',
+      reaping_arc: 'Reaping Arc (frontal cleave)',
+      mist_surge: 'Mist Surge (pulsing area damage)',
+      summons_adds: 'Summons reinforcements',
+      lunar_tide: 'Lunar Tide (pulsing area damage)',
+      enrage: 'Enrages at low health',
+      shuddering_stomp: 'Shuddering Stomp (area stun)',
+      necrotic_shockwave: 'Necrotic Shockwave (heavy area damage)',
+      grave_cleaver: 'Grave-Cleaver (frontal cleave)',
+      shadow_nova: 'Shadow Nova (area burst)',
+      profane_mending: 'Profane Mending (heals its allies)',
+      mana_burn: 'Withered Benediction (burns mana)',
+      deathstalker_cleave: 'Deathstalker Cleave (frontal cleave)',
+      mortal_wound: 'Forgotten Wound (reduces healing taken)',
+      sealbreak_shockwave: 'Sealbreak Shockwave (area burst)',
+      gravebreaker: 'Gravebreaker (frontal cone, face it away from the raid)',
+      raise_fallen: 'Raise Fallen (periodic waves of adds)',
+      soul_rend: 'Soul Rend (marked players must spread and be healed)',
+      deathless_rage: 'Deathless Rage (interrupted at the wardstones)',
+      wardstones: 'Wardstone channels (phase transition)',
+    },
   },
   // The Book of Deeds window: the deed catalog browser (summary strip,
   // category rail, entry cards, title picker), the watchlist HUD tracker, and

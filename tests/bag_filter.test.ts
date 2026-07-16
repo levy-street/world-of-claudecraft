@@ -5,6 +5,7 @@ import {
   BAG_CATEGORIES,
   type BagFilterState,
   bagFilterIsDefault,
+  bagOrderIsManual,
   DEFAULT_BAG_FILTER,
   parseBagFilter,
   serializeBagFilter,
@@ -191,5 +192,23 @@ describe('bagFilterIsDefault (shared by the bags grid and the bank window)', () 
     expect(bagFilterIsDefault(state({ category: 'weapon' }))).toBe(false);
     expect(bagFilterIsDefault(state({ search: 'x' }))).toBe(false);
     expect(bagFilterIsDefault(state({ search: '   ' }))).toBe(true);
+  });
+});
+
+describe('bagOrderIsManual (the reorder gate)', () => {
+  // Dragging a stack onto a cell only means "put it there" while the view PRESERVES the
+  // inventory array order. A quality/name sort REORDERS the view, so a cell names no
+  // array position and the sort would put both stacks straight back: that view refuses
+  // the drop (with a toast). A category chip or a search only HIDES stacks, leaving the
+  // survivors in array order, so a swap between two visible stacks stays coherent there.
+  it('is true only for the pristine view, the one that shows the bag REAL cells', () => {
+    expect(bagOrderIsManual({ category: 'all', sort: 'recent', search: '' })).toBe(true);
+  });
+
+  it('is false for any derived view: its squares are rows, not bag positions', () => {
+    expect(bagOrderIsManual({ category: 'all', sort: 'quality', search: '' })).toBe(false);
+    expect(bagOrderIsManual({ category: 'all', sort: 'name', search: '' })).toBe(false);
+    expect(bagOrderIsManual({ category: 'weapon', sort: 'recent', search: '' })).toBe(false);
+    expect(bagOrderIsManual({ category: 'all', sort: 'recent', search: 'clo' })).toBe(false);
   });
 });
