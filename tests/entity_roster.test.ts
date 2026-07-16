@@ -17,8 +17,8 @@ import {
   runDespawnDecay,
   tickGroundAoEs,
 } from '../src/sim/entity_roster';
-import { createFrontierIncursionState } from '../src/sim/pvp';
 import { createMobScanCounters } from '../src/sim/mob/scan_counters';
+import { createFrontierIncursionState } from '../src/sim/pvp';
 import { Rng } from '../src/sim/rng';
 import { createSimContext, type SimContextHost } from '../src/sim/sim_context';
 import { createVcState } from '../src/sim/social/vale_cup';

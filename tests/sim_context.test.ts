@@ -8,8 +8,8 @@
 
 import { describe, expect, it, vi } from 'vitest';
 import { createDeedRuntime } from '../src/sim/deeds';
-import { createFrontierIncursionState } from '../src/sim/pvp';
 import { createMobScanCounters } from '../src/sim/mob/scan_counters';
+import { createFrontierIncursionState } from '../src/sim/pvp';
 import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
 import { createSimContext, type SimContextHost } from '../src/sim/sim_context';
