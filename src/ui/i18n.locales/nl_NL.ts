@@ -493,6 +493,27 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.roleTag.coredevs': 'Kernontwikkelaar',
   'hudChrome.dungeonDifficulty.setHeroic': 'Kerkermoeilijkheid instellen: Heroïsch',
   'hudChrome.dungeonDifficulty.setNormal': 'Kerkermoeilijkheid instellen: Normaal',
+  'hudChrome.dungeonDifficulty.resetAll': 'Alle instanties resetten',
+  'hudChrome.dungeonDifficulty.resetDone': 'Alle instanties zijn gereset.',
+  'hudChrome.dungeonDifficulty.resetNone': 'Je hebt geen instanties om te resetten.',
+  'hudChrome.dungeonDifficulty.resetOccupied':
+    'Je kunt instanties niet resetten zolang er nog iemand binnen is.',
+  'hudChrome.dungeonDifficulty.resetSameDifficulty':
+    'Wijzig de kerkermoeilijkheid voordat je deze instanties reset. Lege instanties resetten zichzelf na 5 minuten.',
+  'hudChrome.dungeonDifficulty.resetUsage':
+    'Gebruik /dungeon reset om je lege instanties te verlaten nadat je de moeilijkheid hebt gewijzigd.',
+  'hudChrome.dungeonDifficulty.resetLoot':
+    'Je kunt instanties niet resetten zolang er nog buit binnen ligt.',
+  'hudChrome.dungeonDifficulty.resetConfirmTitle': 'Alle instanties resetten?',
+  'hudChrome.dungeonDifficulty.resetConfirmBody':
+    'Hiermee verlaat je lege instanties van je eerder geselecteerde moeilijkheid. Niet-opgeëiste buit voorkomt de reset.',
+  'hudChrome.dungeonDifficulty.resetConfirm': 'Instanties resetten',
+  'hudChrome.dungeonDifficulty.resetCooldown':
+    'Instanties kunnen slechts eenmaal per 5 minuten worden gereset.',
+  'hudChrome.dungeonDifficulty.entryMismatchNormal':
+    'Deze instantie is ingesteld op de moeilijkheid Normaal. Gebruik Alle instanties resetten om een nieuwe Heroïsche run te starten.',
+  'hudChrome.dungeonDifficulty.entryMismatchHeroic':
+    'Deze instantie is ingesteld op de moeilijkheid Heroïsch. Gebruik Alle instanties resetten om een nieuwe Normale run te starten.',
   'hudChrome.itemProc.attackSlow':
     'en verlaagt de aanvalssnelheid van het doelwit met {pct}% gedurende {duration} sec',
   'hudChrome.itemProc.chainArc':
@@ -6647,6 +6668,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'apiError.validation.failed':
     'Sommige velden zijn ongeldig. Controleer het formulier en probeer het opnieuw.',
   'download.linuxCta': 'Downloaden voor Linux',
+  'download.windowsCta': 'Downloaden voor Windows',
   'download.linuxHint':
     'AppImage: maak het uitvoerbaar en voer het vervolgens uit. Geen installatie nodig.',
   'loading.reconnecting': 'Verbinding verbroken. Opnieuw verbinding maken...',

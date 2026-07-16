@@ -482,6 +482,27 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.roleTag.coredevs': 'Kärnutvecklare',
   'hudChrome.dungeonDifficulty.setHeroic': 'Ställ in fängelsehålans svårighetsgrad: Heroisk',
   'hudChrome.dungeonDifficulty.setNormal': 'Ställ in fängelsehålans svårighetsgrad: Normal',
+  'hudChrome.dungeonDifficulty.resetAll': 'Återställ alla instanser',
+  'hudChrome.dungeonDifficulty.resetDone': 'Alla instanser har återställts.',
+  'hudChrome.dungeonDifficulty.resetNone': 'Du har inga instanser att återställa.',
+  'hudChrome.dungeonDifficulty.resetOccupied':
+    'Du kan inte återställa instanser medan någon fortfarande är kvar inuti.',
+  'hudChrome.dungeonDifficulty.resetSameDifficulty':
+    'Ändra fängelsehålans svårighetsgrad innan du återställer dessa instanser. Tomma instanser återställs automatiskt efter 5 minuter.',
+  'hudChrome.dungeonDifficulty.resetUsage':
+    'Använd /dungeon reset för att överge dina tomma instanser efter att du har ändrat svårighetsgraden.',
+  'hudChrome.dungeonDifficulty.resetLoot':
+    'Du kan inte återställa instanser medan byte finns kvar inuti.',
+  'hudChrome.dungeonDifficulty.resetConfirmTitle': 'Återställ alla instanser?',
+  'hudChrome.dungeonDifficulty.resetConfirmBody':
+    'Detta överger tomma instanser från din tidigare valda svårighetsgrad. Outhämtat byte förhindrar återställningen.',
+  'hudChrome.dungeonDifficulty.resetConfirm': 'Återställ instanser',
+  'hudChrome.dungeonDifficulty.resetCooldown':
+    'Instanser kan bara återställas en gång var 5:e minut.',
+  'hudChrome.dungeonDifficulty.entryMismatchNormal':
+    'Den här instansen är inställd på Normal svårighetsgrad. Använd Återställ alla instanser för att starta en ny Heroisk omgång.',
+  'hudChrome.dungeonDifficulty.entryMismatchHeroic':
+    'Den här instansen är inställd på Heroisk svårighetsgrad. Använd Återställ alla instanser för att starta en ny Normal omgång.',
   'hudChrome.itemProc.attackSlow': 'och saktar målets attackhastighet med {pct}% i {duration} sek',
   'hudChrome.itemProc.chainArc':
     'träffar målet med en {school} {name} ({damage}) som hoppar till {jumps} närliggande fiender med avtagande skada',
@@ -6561,6 +6582,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'apiError.two_factor.setup_required': 'Starta konfigurationen av tvåfaktorsautentisering först.',
   'apiError.validation.failed': 'Vissa fält är ogiltiga. Kontrollera formuläret och försök igen.',
   'download.linuxCta': 'Ladda ner för Linux',
+  'download.windowsCta': 'Ladda ner för Windows',
   'download.linuxHint': 'AppImage: gör den körbar och kör den sedan. Ingen installation behövs.',
   'loading.reconnecting': 'Anslutning förlorad. Återansluter...',
   'guide.nav.settings': 'Inställningar och prestanda',

@@ -195,6 +195,17 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain('tx_signature TEXT NOT NULL UNIQUE');
   });
 
+  it('applies timed Daily Rewards bans without changing the exclusion-view shape', async () => {
+    await ensureSchema();
+    const applied = h.calls.join('\n');
+    expect(applied).toContain(
+      'ALTER TABLE daily_reward_bans ADD COLUMN IF NOT EXISTS expires_at TIMESTAMPTZ',
+    );
+    expect(applied).toContain('CREATE OR REPLACE VIEW daily_reward_excluded_accounts AS');
+    expect(applied).toContain('expires_at IS NULL OR expires_at > now()');
+    expect(applied).toContain('SELECT account_id, reason');
+  });
+
   it('applies the bank-system tables (character_leases, bank_ledger) idempotently', async () => {
     // Bank system tables: the per-character load lease and the append-only
     // bank op ledger both live inline in the core SCHEMA string. Pin them by name so
@@ -314,6 +325,14 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(carcassCheck).toBeGreaterThan(sessionLock);
     expect(carcassCheck).toBeLessThan(concurrentIndex);
     expect(h.calls.some((sql) => sql.includes('DROP INDEX CONCURRENTLY'))).toBe(false);
+    const rewardEventsIndex = h.calls.findIndex((sql) =>
+      sql.includes(
+        'CREATE INDEX CONCURRENTLY IF NOT EXISTS daily_reward_events_account_day_created_id',
+      ),
+    );
+    expect(rewardEventsIndex).toBeGreaterThan(concurrentIndex);
+    expect(rewardEventsIndex).toBeLessThan(sessionUnlock);
+    expect(h.calls[rewardEventsIndex]).toContain('WHERE points > 0');
   });
 
   it('drops an INVALID metrics-index carcass before rebuilding it (a killed CONCURRENTLY build self-heals)', async () => {

@@ -510,6 +510,27 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.roleTag.coredevs': 'Kernentwickler',
   'hudChrome.dungeonDifficulty.setHeroic': 'Dungeon-Schwierigkeit festlegen: Heroisch',
   'hudChrome.dungeonDifficulty.setNormal': 'Dungeon-Schwierigkeit festlegen: Normal',
+  'hudChrome.dungeonDifficulty.resetAll': 'Alle Instanzen zurücksetzen',
+  'hudChrome.dungeonDifficulty.resetDone': 'Alle Instanzen wurden zurückgesetzt.',
+  'hudChrome.dungeonDifficulty.resetNone': 'Du hast keine Instanzen zum Zurücksetzen.',
+  'hudChrome.dungeonDifficulty.resetOccupied':
+    'Du kannst Instanzen nicht zurücksetzen, solange sich noch jemand darin befindet.',
+  'hudChrome.dungeonDifficulty.resetSameDifficulty':
+    'Ändere die Dungeon-Schwierigkeit, bevor du diese Instanzen zurücksetzt. Leere Instanzen werden nach 5 Minuten automatisch zurückgesetzt.',
+  'hudChrome.dungeonDifficulty.resetUsage':
+    'Verwende /dungeon reset, um deine leeren Instanzen nach einer Schwierigkeitsänderung aufzugeben.',
+  'hudChrome.dungeonDifficulty.resetLoot':
+    'Du kannst Instanzen nicht zurücksetzen, solange sich noch Beute darin befindet.',
+  'hudChrome.dungeonDifficulty.resetConfirmTitle': 'Alle Instanzen zurücksetzen?',
+  'hudChrome.dungeonDifficulty.resetConfirmBody':
+    'Dadurch werden leere Instanzen deiner zuvor gewählten Schwierigkeit aufgegeben. Nicht beanspruchte Beute verhindert das Zurücksetzen.',
+  'hudChrome.dungeonDifficulty.resetConfirm': 'Instanzen zurücksetzen',
+  'hudChrome.dungeonDifficulty.resetCooldown':
+    'Instanzen können nur einmal alle 5 Minuten zurückgesetzt werden.',
+  'hudChrome.dungeonDifficulty.entryMismatchNormal':
+    'Diese Instanz ist auf die Schwierigkeit Normal eingestellt. Verwende Alle Instanzen zurücksetzen, um einen neuen heroischen Durchlauf zu starten.',
+  'hudChrome.dungeonDifficulty.entryMismatchHeroic':
+    'Diese Instanz ist auf die Schwierigkeit Heroisch eingestellt. Verwende Alle Instanzen zurücksetzen, um einen neuen normalen Durchlauf zu starten.',
   'hudChrome.itemProc.attackSlow':
     'und verlangsamt das Angriffstempo des Ziels {duration} Sek. lang um {pct}%',
   'hudChrome.itemProc.chainArc':
@@ -6703,6 +6724,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'apiError.validation.failed':
     'Einige Felder sind ungültig. Prüfe das Formular und versuche es erneut.',
   'download.linuxCta': 'Für Linux herunterladen',
+  'download.windowsCta': 'Für Windows herunterladen',
   'download.linuxHint':
     'AppImage: Machen Sie es ausführbar und führen Sie es dann aus. Keine Installation erforderlich.',
   'loading.reconnecting': 'Verbindung verloren. Verbindung wird wieder hergestellt...',

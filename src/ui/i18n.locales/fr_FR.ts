@@ -872,6 +872,27 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.roleTag.coredevs': 'Développeur principal',
   'hudChrome.dungeonDifficulty.setHeroic': 'Définir la difficulté du donjon : Héroïque',
   'hudChrome.dungeonDifficulty.setNormal': 'Définir la difficulté du donjon : Normal',
+  'hudChrome.dungeonDifficulty.resetAll': 'Réinitialiser toutes les instances',
+  'hudChrome.dungeonDifficulty.resetDone': 'Toutes les instances ont été réinitialisées.',
+  'hudChrome.dungeonDifficulty.resetNone': "Vous n'avez aucune instance à réinitialiser.",
+  'hudChrome.dungeonDifficulty.resetOccupied':
+    "Vous ne pouvez pas réinitialiser les instances tant qu'une personne s'y trouve.",
+  'hudChrome.dungeonDifficulty.resetSameDifficulty':
+    "Changez la difficulté du donjon avant de réinitialiser ces instances. Les instances vides se réinitialisent d'elles-mêmes après 5 minutes.",
+  'hudChrome.dungeonDifficulty.resetUsage':
+    'Utilisez /dungeon reset pour abandonner vos instances vides après avoir changé la difficulté.',
+  'hudChrome.dungeonDifficulty.resetLoot':
+    "Vous ne pouvez pas réinitialiser les instances tant qu'il reste du butin à l'intérieur.",
+  'hudChrome.dungeonDifficulty.resetConfirmTitle': 'Réinitialiser toutes les instances ?',
+  'hudChrome.dungeonDifficulty.resetConfirmBody':
+    'Cette action abandonne les instances vides de la difficulté précédemment sélectionnée. Tout butin non récupéré empêchera la réinitialisation.',
+  'hudChrome.dungeonDifficulty.resetConfirm': 'Réinitialiser les instances',
+  'hudChrome.dungeonDifficulty.resetCooldown':
+    'Les instances ne peuvent être réinitialisées qu’une fois toutes les 5 minutes.',
+  'hudChrome.dungeonDifficulty.entryMismatchNormal':
+    'Cette instance est réglée sur la difficulté Normal. Utilisez Réinitialiser toutes les instances pour commencer une nouvelle partie Héroïque.',
+  'hudChrome.dungeonDifficulty.entryMismatchHeroic':
+    'Cette instance est réglée sur la difficulté Héroïque. Utilisez Réinitialiser toutes les instances pour commencer une nouvelle partie Normal.',
   'hudChrome.itemProc.attackSlow':
     "et ralentit la vitesse d'attaque de la cible de {pct}% pendant {duration} s",
   'hudChrome.itemProc.chainArc':
@@ -7088,6 +7109,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'apiError.validation.failed':
     'Certains champs sont invalides. Vérifiez le formulaire puis réessayez.',
   'download.linuxCta': 'Télécharger pour Linux',
+  'download.windowsCta': 'Télécharger pour Windows',
   'download.linuxHint':
     'AppImage$1 rendez-le exécutable, puis exécutez-le. Aucune installation nécessaire.',
   'loading.reconnecting': 'Connexion perdue. Reconnexion...',

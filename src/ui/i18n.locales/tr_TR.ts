@@ -536,6 +536,26 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.roleTag.coredevs': 'Çekirdek Geliştirici',
   'hudChrome.dungeonDifficulty.setHeroic': 'Zindan Zorluğunu Ayarla: Kahramanca',
   'hudChrome.dungeonDifficulty.setNormal': 'Zindan Zorluğunu Ayarla: Normal',
+  'hudChrome.dungeonDifficulty.resetAll': 'Tüm Örnekleri Sıfırla',
+  'hudChrome.dungeonDifficulty.resetDone': 'Tüm örnekler sıfırlandı.',
+  'hudChrome.dungeonDifficulty.resetNone': 'Sıfırlanacak örneğin yok.',
+  'hudChrome.dungeonDifficulty.resetOccupied':
+    'İçeride hâlâ biri varken örnekleri sıfırlayamazsın.',
+  'hudChrome.dungeonDifficulty.resetSameDifficulty':
+    'Bu örnekleri sıfırlamadan önce zindan zorluğunu değiştir. Boş örnekler 5 dakika sonra kendiliğinden sıfırlanır.',
+  'hudChrome.dungeonDifficulty.resetUsage':
+    'Zorluğu değiştirdikten sonra boş örneklerinden vazgeçmek için /dungeon reset kullan.',
+  'hudChrome.dungeonDifficulty.resetLoot':
+    'İçeride ganimet kaldığı sürece örnekleri sıfırlayamazsın.',
+  'hudChrome.dungeonDifficulty.resetConfirmTitle': 'Tüm Örnekler Sıfırlansın mı?',
+  'hudChrome.dungeonDifficulty.resetConfirmBody':
+    'Bu işlem, daha önce seçtiğin zorluktaki boş örneklerden vazgeçer. Alınmamış ganimet sıfırlamayı engeller.',
+  'hudChrome.dungeonDifficulty.resetConfirm': 'Örnekleri Sıfırla',
+  'hudChrome.dungeonDifficulty.resetCooldown': 'Örnekler yalnızca 5 dakikada bir sıfırlanabilir.',
+  'hudChrome.dungeonDifficulty.entryMismatchNormal':
+    'Bu örnek Normal zorluğa ayarlı. Yeni bir Kahramanca koşu başlatmak için Tüm Örnekleri Sıfırla seçeneğini kullan.',
+  'hudChrome.dungeonDifficulty.entryMismatchHeroic':
+    'Bu örnek Kahramanca zorluğa ayarlı. Yeni bir Normal koşu başlatmak için Tüm Örnekleri Sıfırla seçeneğini kullan.',
   'hudChrome.itemProc.attackSlow':
     've hedefin saldırı hızını {duration} sn boyunca %{pct} yavaşlatır',
   'hudChrome.itemProc.chainArc':
@@ -6607,6 +6627,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'apiError.two_factor.setup_required': 'Önce iki adımlı doğrulama kurulumunu başlatın.',
   'apiError.validation.failed': 'Bazı alanlar geçersiz. Formu kontrol edip tekrar deneyin.',
   'download.linuxCta': 'Linux için indirin',
+  'download.windowsCta': 'Windows için indirin',
   'download.linuxHint':
     'AppImage: yürütülebilir hale getirin ve ardından çalıştırın. Kurulum gerekmez.',
   'loading.reconnecting': 'Bağlantı kesildi. Yeniden bağlanılıyor...',

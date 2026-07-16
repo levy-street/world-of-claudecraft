@@ -490,6 +490,25 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.roleTag.coredevs': 'Hlavní dev',
   'hudChrome.dungeonDifficulty.setHeroic': 'Nastavit obtížnost dungeonu: Hrdinská',
   'hudChrome.dungeonDifficulty.setNormal': 'Nastavit obtížnost dungeonu: Normální',
+  'hudChrome.dungeonDifficulty.resetAll': 'Resetovat všechny instance',
+  'hudChrome.dungeonDifficulty.resetDone': 'Všechny instance byly resetovány.',
+  'hudChrome.dungeonDifficulty.resetNone': 'Nemáš žádné instance k resetování.',
+  'hudChrome.dungeonDifficulty.resetOccupied':
+    'Instance nelze resetovat, dokud je někdo stále uvnitř.',
+  'hudChrome.dungeonDifficulty.resetSameDifficulty':
+    'Před resetováním těchto instancí změň obtížnost dungeonu. Prázdné instance se po 5 minutách resetují samy.',
+  'hudChrome.dungeonDifficulty.resetUsage':
+    'Po změně obtížnosti použij /dungeon reset k opuštění prázdných instancí.',
+  'hudChrome.dungeonDifficulty.resetLoot': 'Instance nelze resetovat, dokud uvnitř zůstává kořist.',
+  'hudChrome.dungeonDifficulty.resetConfirmTitle': 'Resetovat všechny instance?',
+  'hudChrome.dungeonDifficulty.resetConfirmBody':
+    'Tím opustíš prázdné instance z dříve vybrané obtížnosti. Nevyzvednutá kořist zabrání resetování.',
+  'hudChrome.dungeonDifficulty.resetConfirm': 'Resetovat instance',
+  'hudChrome.dungeonDifficulty.resetCooldown': 'Instance lze resetovat pouze jednou za 5 minut.',
+  'hudChrome.dungeonDifficulty.entryMismatchNormal':
+    'Tato instance je nastavena na normální obtížnost. Použij Resetovat všechny instance a začni nový hrdinský průchod.',
+  'hudChrome.dungeonDifficulty.entryMismatchHeroic':
+    'Tato instance je nastavena na hrdinskou obtížnost. Použij Resetovat všechny instance a začni nový normální průchod.',
   'hudChrome.itemProc.attackSlow': 'a zpomalí rychlost útoku cíle o {pct} % na {duration} s',
   'hudChrome.itemProc.chainArc':
     'zasáhne cíl {school} kouzlem {name} ({damage}), které přeskočí na {jumps} nedalekých nepřátel se slábnoucím poškozením',
@@ -570,6 +589,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'a11y.toggleMenu': 'Přepnout menu',
   'download.desc': 'Získej samostatný launcher pro optimalizovaný výkon a hraní na celé obrazovce.',
   'download.linuxCta': 'Stáhnout pro Linux',
+  'download.windowsCta': 'Stáhnout pro Windows',
   'download.linuxHint':
     'AppImage: nastav soubor jako spustitelný a spusť ho. Instalace není potřeba.',
   'download.macCta': 'Stáhnout pro macOS',

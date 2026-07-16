@@ -513,6 +513,27 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.roleTag.coredevs': 'Desarrollador principal',
   'hudChrome.dungeonDifficulty.setHeroic': 'Fijar dificultad de mazmorra: Heroica',
   'hudChrome.dungeonDifficulty.setNormal': 'Fijar dificultad de mazmorra: Normal',
+  'hudChrome.dungeonDifficulty.resetAll': 'Restablecer todas las instancias',
+  'hudChrome.dungeonDifficulty.resetDone': 'Se han restablecido todas las instancias.',
+  'hudChrome.dungeonDifficulty.resetNone': 'No tienes instancias que restablecer.',
+  'hudChrome.dungeonDifficulty.resetOccupied':
+    'No puedes restablecer instancias mientras alguien siga dentro.',
+  'hudChrome.dungeonDifficulty.resetSameDifficulty':
+    'Cambia la dificultad de la mazmorra antes de restablecer estas instancias. Las instancias vacías se restablecen solas después de 5 minutos.',
+  'hudChrome.dungeonDifficulty.resetUsage':
+    'Usa /dungeon reset para abandonar tus instancias vacías después de cambiar la dificultad.',
+  'hudChrome.dungeonDifficulty.resetLoot':
+    'No puedes restablecer instancias mientras quede botín dentro.',
+  'hudChrome.dungeonDifficulty.resetConfirmTitle': '¿Restablecer todas las instancias?',
+  'hudChrome.dungeonDifficulty.resetConfirmBody':
+    'Esto abandona las instancias vacías de la dificultad seleccionada anteriormente. El botín sin reclamar impedirá el restablecimiento.',
+  'hudChrome.dungeonDifficulty.resetConfirm': 'Restablecer instancias',
+  'hudChrome.dungeonDifficulty.resetCooldown':
+    'Las instancias solo se pueden restablecer una vez cada 5 minutos.',
+  'hudChrome.dungeonDifficulty.entryMismatchNormal':
+    'Esta instancia está configurada en dificultad Normal. Usa Restablecer todas las instancias para iniciar una nueva partida Heroica.',
+  'hudChrome.dungeonDifficulty.entryMismatchHeroic':
+    'Esta instancia está configurada en dificultad Heroica. Usa Restablecer todas las instancias para iniciar una nueva partida Normal.',
   'hudChrome.itemProc.attackSlow':
     'y ralentiza la velocidad de ataque del objetivo un {pct}% durante {duration} s',
   'hudChrome.itemProc.chainArc':
@@ -6684,6 +6705,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'apiError.validation.failed':
     'Algunos campos no son válidos. Revisa el formulario e inténtalo de nuevo.',
   'download.linuxCta': 'Descargar para Linux',
+  'download.windowsCta': 'Descargar para Windows',
   'download.linuxHint': 'AppImage: hazlo ejecutable y luego ejecútalo. No se necesita instalación.',
   'loading.reconnecting': 'Conexión perdida. Reconectando...',
   'guide.nav.settings': 'Configuración y rendimiento',

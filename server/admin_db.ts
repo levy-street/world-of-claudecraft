@@ -879,7 +879,7 @@ export interface AccountDetail {
   isAi: boolean;
   isStreamer: boolean;
   streamerLinks: StreamerLinks;
-  dailyRewardsBan?: { reason: string; createdAt: string } | null;
+  dailyRewardsBan?: { reason: string; createdAt: string; expiresAt: string | null } | null;
   dailyRewardsIpBans?: { ip: string; reason: string; createdAt: string }[];
   lastLoginIp: string | null;
   playtimeSeconds: number;
@@ -911,6 +911,102 @@ export interface AccountDetail {
     adminAccountId: number | null;
     adminUsername: string | null;
   }[];
+}
+
+export interface DailyRewardPointEventRow {
+  id: number;
+  createdAt: string;
+  kind: string;
+  points: number;
+  totalPoints: number;
+  meta: Record<string, unknown>;
+}
+
+export interface DailyRewardPointEventLog {
+  day: string;
+  rows: DailyRewardPointEventRow[];
+  total: number;
+  truncated: boolean;
+}
+
+const DAILY_REWARD_POINT_EVENT_LIMIT_MAX = 250;
+
+const DAILY_REWARD_EVENT_META_KEYS = [
+  'baseClearPoints',
+  'basePoints',
+  'bonusType',
+  'bountifulMultiplier',
+  'bracket',
+  'chestBasePoints',
+  'chestTier',
+  'delveId',
+  'format',
+  'matchType',
+  'multiplier',
+  'onlineMinutes',
+  'outcome',
+  'questId',
+  'repeatIndex',
+  'taskId',
+  'taskType',
+  'tierId',
+  'tierMultiplier',
+  'won',
+] as const;
+
+function eventMeta(value: unknown): Record<string, unknown> {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
+  const source = value as Record<string, unknown>;
+  const safe: Record<string, unknown> = {};
+  for (const key of DAILY_REWARD_EVENT_META_KEYS) {
+    const entry = source[key];
+    if (typeof entry === 'string' || typeof entry === 'number' || typeof entry === 'boolean') {
+      safe[key] = entry;
+    }
+  }
+  return safe;
+}
+
+export async function dailyRewardPointEvents(
+  accountId: number,
+  day: string,
+  limit = 100,
+): Promise<DailyRewardPointEventLog> {
+  const requestedLimit = Number.isFinite(limit) ? Math.floor(limit) : 100;
+  const safeLimit = Math.max(1, Math.min(DAILY_REWARD_POINT_EVENT_LIMIT_MAX, requestedLimit));
+  const result = await pool.query(
+    `SELECT id, created_at, kind, points, meta, total_points, total_events
+       FROM (
+         SELECT id, created_at, kind, points, meta,
+                SUM(points) OVER (
+                  ORDER BY created_at DESC, id DESC
+                  ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING
+                ) AS total_points,
+                COUNT(*) OVER () AS total_events
+           FROM daily_reward_events
+          WHERE account_id = $1
+            AND day = $2
+            AND realm = $3
+            AND points > 0
+       ) events
+      ORDER BY created_at DESC, id DESC
+      LIMIT $4`,
+    [accountId, day, REALM, safeLimit],
+  );
+  const total = Number(result.rows[0]?.total_events ?? 0);
+  return {
+    day,
+    rows: result.rows.map((row) => ({
+      id: Number(row.id),
+      createdAt: row.created_at,
+      kind: String(row.kind),
+      points: Number(row.points),
+      totalPoints: Number(row.total_points),
+      meta: eventMeta(row.meta),
+    })),
+    total,
+    truncated: total > result.rows.length,
+  };
 }
 
 export type ModerationHistoryTab = 'all' | 'mine' | 'notes';
@@ -1038,14 +1134,22 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
                 COALESCE(chat_mute_reason, '') AS chat_mute_reason,
                 COALESCE(chat_strikes, 0) AS chat_strikes,
                 is_ai, is_streamer, streamer_links,
-                (SELECT reason FROM daily_reward_bans WHERE account_id = accounts.id)
-                  AS daily_rewards_ban_reason,
-                (SELECT created_at FROM daily_reward_bans WHERE account_id = accounts.id)
-                  AS daily_rewards_banned_at,
+                active_daily_rewards_ban.daily_rewards_ban_reason,
+                active_daily_rewards_ban.daily_rewards_banned_at,
+                active_daily_rewards_ban.daily_rewards_ban_expires_at,
                 last_login_ip,
                 COALESCE((SELECT sum(EXTRACT(EPOCH FROM (COALESCE(s.ended_at, now()) - s.started_at)))
                           FROM play_sessions s WHERE s.account_id = accounts.id), 0)::bigint AS playtime_seconds
-         FROM accounts WHERE id = $1`,
+         FROM accounts
+         LEFT JOIN LATERAL (
+           SELECT reason AS daily_rewards_ban_reason,
+                  created_at AS daily_rewards_banned_at,
+                  expires_at AS daily_rewards_ban_expires_at
+             FROM daily_reward_bans
+            WHERE account_id = accounts.id
+              AND (expires_at IS NULL OR expires_at > now())
+         ) active_daily_rewards_ban ON true
+         WHERE id = $1`,
         [accountId],
       ),
     ),
@@ -1114,6 +1218,7 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
         : {
             reason: String(a.daily_rewards_ban_reason),
             createdAt: a.daily_rewards_banned_at,
+            expiresAt: a.daily_rewards_ban_expires_at ?? null,
           },
     dailyRewardsIpBans: (dailyRewardsIpBans?.rows ?? []).map((row) => ({
       ip: String(row.ip_address),

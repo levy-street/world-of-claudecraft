@@ -287,7 +287,8 @@ SHA256SUMS-mac --ignore-missing` on macOS) from their download directory.
 1. Bump `version` in `package.json` (the feed is version-ordered; see rollback),
    and match `DESKTOP_VERSION` in `src/game/desktop_download.ts` so the download
    page links point at the new build (the static hrefs in `index.html` are the
-   no-JS fallback; keep them on the same version).
+   no-JS fallback; keep them on the same version). The page offers macOS (dmg),
+   Windows (the combined x64/arm64 NSIS installer), and Linux (AppImage).
 2. Build on each OS runner with signing env present: `npm run electron:build`,
    with `VITE_DESKTOP_API_ORIGIN` unset or set to the production origin. All
    three platforms are built and published by CI on the release tag (see

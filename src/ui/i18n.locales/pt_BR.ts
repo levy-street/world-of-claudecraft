@@ -511,6 +511,27 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.roleTag.coredevs': 'Dev Principal',
   'hudChrome.dungeonDifficulty.setHeroic': 'Definir Dificuldade da Masmorra: Heroico',
   'hudChrome.dungeonDifficulty.setNormal': 'Definir Dificuldade da Masmorra: Normal',
+  'hudChrome.dungeonDifficulty.resetAll': 'Redefinir todas as instâncias',
+  'hudChrome.dungeonDifficulty.resetDone': 'Todas as instâncias foram redefinidas.',
+  'hudChrome.dungeonDifficulty.resetNone': 'Você não tem instâncias para redefinir.',
+  'hudChrome.dungeonDifficulty.resetOccupied':
+    'Você não pode redefinir instâncias enquanto alguém ainda estiver dentro.',
+  'hudChrome.dungeonDifficulty.resetSameDifficulty':
+    'Altere a dificuldade da masmorra antes de redefinir estas instâncias. Instâncias vazias são redefinidas automaticamente após 5 minutos.',
+  'hudChrome.dungeonDifficulty.resetUsage':
+    'Use /dungeon reset para abandonar suas instâncias vazias após alterar a dificuldade.',
+  'hudChrome.dungeonDifficulty.resetLoot':
+    'Você não pode redefinir instâncias enquanto houver saque dentro delas.',
+  'hudChrome.dungeonDifficulty.resetConfirmTitle': 'Redefinir todas as instâncias?',
+  'hudChrome.dungeonDifficulty.resetConfirmBody':
+    'Isso abandona as instâncias vazias da dificuldade selecionada anteriormente. Saques não coletados impedirão a redefinição.',
+  'hudChrome.dungeonDifficulty.resetConfirm': 'Redefinir instâncias',
+  'hudChrome.dungeonDifficulty.resetCooldown':
+    'As instâncias só podem ser redefinidas uma vez a cada 5 minutos.',
+  'hudChrome.dungeonDifficulty.entryMismatchNormal':
+    'Esta instância está definida na dificuldade Normal. Use Redefinir todas as instâncias para iniciar uma nova sessão Heroica.',
+  'hudChrome.dungeonDifficulty.entryMismatchHeroic':
+    'Esta instância está definida na dificuldade Heroica. Use Redefinir todas as instâncias para iniciar uma nova sessão Normal.',
   'hudChrome.itemProc.attackSlow':
     'e reduz a velocidade de ataque do alvo em {pct}% por {duration} s',
   'hudChrome.itemProc.chainArc':
@@ -6644,6 +6665,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'apiError.validation.failed':
     'Alguns campos são inválidos. Verifique o formulário e tente novamente.',
   'download.linuxCta': 'Baixar para Linux',
+  'download.windowsCta': 'Baixar para Windows',
   'download.linuxHint': 'AppImage: torne-o executável e execute-o. Não é necessária instalação.',
   'loading.reconnecting': 'Conexão perdida. Reconectando...',
   'guide.nav.settings': 'Configurações e desempenho',

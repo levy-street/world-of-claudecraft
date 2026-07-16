@@ -543,6 +543,26 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.roleTag.coredevs': 'Dev Inti',
   'hudChrome.dungeonDifficulty.setHeroic': 'Atur Kesulitan Dungeon: Heroik',
   'hudChrome.dungeonDifficulty.setNormal': 'Atur Kesulitan Dungeon: Normal',
+  'hudChrome.dungeonDifficulty.resetAll': 'Reset Semua Instans',
+  'hudChrome.dungeonDifficulty.resetDone': 'Semua instans telah direset.',
+  'hudChrome.dungeonDifficulty.resetNone': 'Tidak ada instans yang dapat kamu reset.',
+  'hudChrome.dungeonDifficulty.resetOccupied':
+    'Kamu tidak dapat mereset instans selama masih ada seseorang di dalamnya.',
+  'hudChrome.dungeonDifficulty.resetSameDifficulty':
+    'Ubah kesulitan dungeon sebelum mereset instans ini. Instans kosong akan direset otomatis setelah 5 menit.',
+  'hudChrome.dungeonDifficulty.resetUsage':
+    'Gunakan /dungeon reset untuk meninggalkan instans kosong setelah mengubah kesulitan.',
+  'hudChrome.dungeonDifficulty.resetLoot':
+    'Kamu tidak dapat mereset instans selama masih ada jarahan di dalamnya.',
+  'hudChrome.dungeonDifficulty.resetConfirmTitle': 'Reset Semua Instans?',
+  'hudChrome.dungeonDifficulty.resetConfirmBody':
+    'Tindakan ini meninggalkan instans kosong dari kesulitan yang sebelumnya dipilih. Jarahan yang belum diambil akan mencegah reset.',
+  'hudChrome.dungeonDifficulty.resetConfirm': 'Reset Instans',
+  'hudChrome.dungeonDifficulty.resetCooldown': 'Instans hanya dapat direset sekali setiap 5 menit.',
+  'hudChrome.dungeonDifficulty.entryMismatchNormal':
+    'Instans ini diatur ke kesulitan Normal. Gunakan Reset Semua Instans untuk memulai perjalanan Heroik baru.',
+  'hudChrome.dungeonDifficulty.entryMismatchHeroic':
+    'Instans ini diatur ke kesulitan Heroik. Gunakan Reset Semua Instans untuk memulai perjalanan Normal baru.',
   'hudChrome.itemProc.attackSlow':
     'dan memperlambat kecepatan serangan target sebesar {pct}% selama {duration} dtk',
   'hudChrome.itemProc.chainArc':
@@ -6691,6 +6711,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'apiError.two_factor.setup_required': 'Mulai penyiapan autentikasi dua-faktor terlebih dahulu.',
   'apiError.validation.failed': 'Beberapa kolom tidak valid. Periksa formulir lalu coba lagi.',
   'download.linuxCta': 'Unduh untuk Linux',
+  'download.windowsCta': 'Unduh untuk Windows',
   'download.linuxHint':
     'AppImage: membuatnya dapat dieksekusi, lalu jalankan. Tidak perlu instalasi.',
   'loading.reconnecting': 'Koneksi terputus. Menyambungkan kembali...',

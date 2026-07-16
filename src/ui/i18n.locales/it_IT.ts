@@ -514,6 +514,27 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.roleTag.coredevs': 'Sviluppatore Principale',
   'hudChrome.dungeonDifficulty.setHeroic': 'Imposta difficoltà del dungeon: Eroica',
   'hudChrome.dungeonDifficulty.setNormal': 'Imposta difficoltà del dungeon: Normale',
+  'hudChrome.dungeonDifficulty.resetAll': 'Reimposta tutte le istanze',
+  'hudChrome.dungeonDifficulty.resetDone': 'Tutte le istanze sono state reimpostate.',
+  'hudChrome.dungeonDifficulty.resetNone': 'Non hai istanze da reimpostare.',
+  'hudChrome.dungeonDifficulty.resetOccupied':
+    "Non puoi reimpostare le istanze mentre c'è ancora qualcuno all'interno.",
+  'hudChrome.dungeonDifficulty.resetSameDifficulty':
+    'Cambia la difficoltà del dungeon prima di reimpostare queste istanze. Le istanze vuote si reimpostano automaticamente dopo 5 minuti.',
+  'hudChrome.dungeonDifficulty.resetUsage':
+    'Usa /dungeon reset per abbandonare le istanze vuote dopo aver cambiato difficoltà.',
+  'hudChrome.dungeonDifficulty.resetLoot':
+    "Non puoi reimpostare le istanze mentre c'è ancora del bottino all'interno.",
+  'hudChrome.dungeonDifficulty.resetConfirmTitle': 'Reimpostare tutte le istanze?',
+  'hudChrome.dungeonDifficulty.resetConfirmBody':
+    'Questo abbandona le istanze vuote della difficoltà selezionata in precedenza. Il bottino non raccolto impedirà la reimpostazione.',
+  'hudChrome.dungeonDifficulty.resetConfirm': 'Reimposta istanze',
+  'hudChrome.dungeonDifficulty.resetCooldown':
+    'Le istanze possono essere reimpostate solo una volta ogni 5 minuti.',
+  'hudChrome.dungeonDifficulty.entryMismatchNormal':
+    'Questa istanza è impostata sulla difficoltà Normale. Usa Reimposta tutte le istanze per iniziare una nuova sessione Eroica.',
+  'hudChrome.dungeonDifficulty.entryMismatchHeroic':
+    'Questa istanza è impostata sulla difficoltà Eroica. Usa Reimposta tutte le istanze per iniziare una nuova sessione Normale.',
   'hudChrome.itemProc.attackSlow':
     "e rallenta la velocità d'attacco del bersaglio del {pct}% per {duration} sec",
   'hudChrome.itemProc.chainArc':
@@ -6671,6 +6692,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Avvia prima la configurazione dell'autenticazione a due fattori.",
   'apiError.validation.failed': 'Alcuni campi non sono validi. Controlla il modulo e riprova.',
   'download.linuxCta': 'Scarica per Linux',
+  'download.windowsCta': 'Scarica per Windows',
   'download.linuxHint':
     'AppImage: rendilo eseguibile, quindi eseguilo. Nessuna installazione necessaria.',
   'loading.reconnecting': 'Connessione persa. Riconnessione...',

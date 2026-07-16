@@ -482,6 +482,27 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.roleTag.coredevs': 'Kerneudvikler',
   'hudChrome.dungeonDifficulty.setHeroic': 'Indstil fangekældersværhedsgrad: Heroisk',
   'hudChrome.dungeonDifficulty.setNormal': 'Indstil fangekældersværhedsgrad: Normal',
+  'hudChrome.dungeonDifficulty.resetAll': 'Nulstil alle instanser',
+  'hudChrome.dungeonDifficulty.resetDone': 'Alle instanser er blevet nulstillet.',
+  'hudChrome.dungeonDifficulty.resetNone': 'Du har ingen instanser at nulstille.',
+  'hudChrome.dungeonDifficulty.resetOccupied':
+    'Du kan ikke nulstille instanser, mens nogen stadig er derinde.',
+  'hudChrome.dungeonDifficulty.resetSameDifficulty':
+    'Skift fangekældersværhedsgrad, før du nulstiller disse instanser. Tomme instanser nulstilles automatisk efter 5 minutter.',
+  'hudChrome.dungeonDifficulty.resetUsage':
+    'Brug /dungeon reset til at forlade dine tomme instanser efter at have ændret sværhedsgrad.',
+  'hudChrome.dungeonDifficulty.resetLoot':
+    'Du kan ikke nulstille instanser, mens der stadig er bytte derinde.',
+  'hudChrome.dungeonDifficulty.resetConfirmTitle': 'Nulstil alle instanser?',
+  'hudChrome.dungeonDifficulty.resetConfirmBody':
+    'Dette forlader tomme instanser fra din tidligere valgte sværhedsgrad. Uhentet bytte forhindrer nulstillingen.',
+  'hudChrome.dungeonDifficulty.resetConfirm': 'Nulstil instanser',
+  'hudChrome.dungeonDifficulty.resetCooldown':
+    'Instanser kan kun nulstilles én gang hvert 5. minut.',
+  'hudChrome.dungeonDifficulty.entryMismatchNormal':
+    'Denne instans er indstillet til Normal sværhedsgrad. Brug Nulstil alle instanser for at starte en ny Heroisk gennemspilning.',
+  'hudChrome.dungeonDifficulty.entryMismatchHeroic':
+    'Denne instans er indstillet til Heroisk sværhedsgrad. Brug Nulstil alle instanser for at starte en ny Normal gennemspilning.',
   'hudChrome.itemProc.attackSlow': 'og sænker målets angrebshastighed med {pct}% i {duration} sek.',
   'hudChrome.itemProc.chainArc':
     'rammer målet med en {school} {name} ({damage}), der springer til {jumps} nærliggende fjender for aftagende skade',
@@ -6541,6 +6562,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'apiError.two_factor.setup_required': 'Start opsætning af to-faktor først.',
   'apiError.validation.failed': 'Nogle felter er ugyldige. Tjek formularen og prøv igen.',
   'download.linuxCta': 'Download til Linux',
+  'download.windowsCta': 'Download til Windows',
   'download.linuxHint':
     'AppImage: gør det eksekverbart, og kør det derefter. Ingen installation nødvendig.',
   'loading.reconnecting': 'Forbindelse mistet. Genopretter forbindelse...',

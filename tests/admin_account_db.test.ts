@@ -18,7 +18,7 @@ vi.mock('../server/realm', () => ({
   REALM: 'test-realm',
 }));
 
-import { accountDetail, listModerationActions } from '../server/admin_db';
+import { accountDetail, dailyRewardPointEvents, listModerationActions } from '../server/admin_db';
 
 describe('admin account detail query', () => {
   beforeEach(() => {
@@ -43,6 +43,7 @@ describe('admin account detail query', () => {
             chat_strikes: 0,
             daily_rewards_ban_reason: 'leaderboard manipulation',
             daily_rewards_banned_at: '2026-06-01T01:00:00Z',
+            daily_rewards_ban_expires_at: '2026-06-01T07:00:00Z',
             last_login_ip: '203.0.113.7',
             playtime_seconds: 3600,
           },
@@ -80,6 +81,7 @@ describe('admin account detail query', () => {
     expect(detail?.dailyRewardsBan).toEqual({
       reason: 'leaderboard manipulation',
       createdAt: '2026-06-01T01:00:00Z',
+      expiresAt: '2026-06-01T07:00:00Z',
     });
     expect(mocks.query).toHaveBeenNthCalledWith(
       4,
@@ -90,6 +92,75 @@ describe('admin account detail query', () => {
       'ORDER BY action_log.created_at DESC, action_log.id DESC',
     );
     expect(mocks.query.mock.calls[3][0]).toContain('LIMIT 50');
+    expect(mocks.query.mock.calls[0][0]).toContain('LEFT JOIN LATERAL');
+    expect(mocks.query.mock.calls[0][0]).toContain('expires_at > now()');
+  });
+
+  it('returns positive point events for one account, reward day, and realm', async () => {
+    mocks.query.mockResolvedValueOnce({
+      rows: [
+        {
+          id: '12',
+          created_at: '2026-07-16T03:00:00Z',
+          kind: 'task',
+          points: 20,
+          total_points: '35',
+          total_events: '2',
+          meta: { taskType: 'quest_completion', multiplier: 2, characterId: 99 },
+        },
+        {
+          id: '10',
+          created_at: '2026-07-16T01:00:00Z',
+          kind: 'spin',
+          points: 15,
+          total_points: '15',
+          total_events: '2',
+          meta: { outcome: 's15', completionId: 'private-id' },
+        },
+      ],
+    });
+
+    const events = await dailyRewardPointEvents(7, '2026-07-16', 100);
+
+    expect(events).toEqual({
+      day: '2026-07-16',
+      rows: [
+        {
+          id: 12,
+          createdAt: '2026-07-16T03:00:00Z',
+          kind: 'task',
+          points: 20,
+          totalPoints: 35,
+          meta: { taskType: 'quest_completion', multiplier: 2 },
+        },
+        {
+          id: 10,
+          createdAt: '2026-07-16T01:00:00Z',
+          kind: 'spin',
+          points: 15,
+          totalPoints: 15,
+          meta: { outcome: 's15' },
+        },
+      ],
+      total: 2,
+      truncated: false,
+    });
+    const [sql, params] = mocks.query.mock.calls[0];
+    expect(sql).toContain('account_id = $1');
+    expect(sql).toContain('day = $2');
+    expect(sql).toContain('realm = $3');
+    expect(sql).toContain('points > 0');
+    expect(sql).toContain('ORDER BY created_at DESC, id DESC');
+    expect(sql).toContain('ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING');
+    expect(params).toEqual([7, '2026-07-16', 'test-realm', 100]);
+  });
+
+  it('caps the point event log at 250 rows', async () => {
+    mocks.query.mockResolvedValueOnce({ rows: [] });
+
+    await dailyRewardPointEvents(7, '2026-07-16', 5000);
+
+    expect(mocks.query.mock.calls[0][1]).toEqual([7, '2026-07-16', 'test-realm', 250]);
   });
 
   it('lists moderation actions newest first, mapping both account and ip sources', async () => {

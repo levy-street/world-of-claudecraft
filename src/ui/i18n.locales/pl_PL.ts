@@ -495,6 +495,26 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.roleTag.coredevs': 'Główny deweloper',
   'hudChrome.dungeonDifficulty.setHeroic': 'Ustaw trudność podziemia: Heroiczna',
   'hudChrome.dungeonDifficulty.setNormal': 'Ustaw trudność podziemia: Normalna',
+  'hudChrome.dungeonDifficulty.resetAll': 'Zresetuj wszystkie instancje',
+  'hudChrome.dungeonDifficulty.resetDone': 'Wszystkie instancje zostały zresetowane.',
+  'hudChrome.dungeonDifficulty.resetNone': 'Nie masz żadnych instancji do zresetowania.',
+  'hudChrome.dungeonDifficulty.resetOccupied':
+    'Nie możesz zresetować instancji, dopóki ktoś nadal znajduje się w środku.',
+  'hudChrome.dungeonDifficulty.resetSameDifficulty':
+    'Zmień trudność podziemia przed zresetowaniem tych instancji. Puste instancje resetują się automatycznie po 5 minutach.',
+  'hudChrome.dungeonDifficulty.resetUsage':
+    'Po zmianie trudności użyj /dungeon reset, aby porzucić puste instancje.',
+  'hudChrome.dungeonDifficulty.resetLoot':
+    'Nie możesz zresetować instancji, dopóki w środku pozostaje łup.',
+  'hudChrome.dungeonDifficulty.resetConfirmTitle': 'Zresetować wszystkie instancje?',
+  'hudChrome.dungeonDifficulty.resetConfirmBody':
+    'Spowoduje to porzucenie pustych instancji z poprzednio wybranego poziomu trudności. Nieodebrany łup uniemożliwi reset.',
+  'hudChrome.dungeonDifficulty.resetConfirm': 'Zresetuj instancje',
+  'hudChrome.dungeonDifficulty.resetCooldown': 'Instancje można resetować tylko raz na 5 minut.',
+  'hudChrome.dungeonDifficulty.entryMismatchNormal':
+    'Ta instancja ma ustawioną normalną trudność. Użyj opcji Zresetuj wszystkie instancje, aby rozpocząć nowy heroiczny przebieg.',
+  'hudChrome.dungeonDifficulty.entryMismatchHeroic':
+    'Ta instancja ma ustawioną heroiczną trudność. Użyj opcji Zresetuj wszystkie instancje, aby rozpocząć nowy normalny przebieg.',
   'hudChrome.itemProc.attackSlow': 'i spowalnia szybkość ataku celu o {pct}% na {duration} s',
   'hudChrome.itemProc.chainArc':
     'razi cel czarem {school} {name} ({damage}), który przeskakuje na {jumps} pobliskich wrogów, zadając malejące obrażenia',
@@ -6598,6 +6618,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'apiError.validation.failed':
     'Niektóre pola są nieprawidłowe. Sprawdź formularz i spróbuj ponownie.',
   'download.linuxCta': 'Pobierz dla Linuksa',
+  'download.windowsCta': 'Pobierz dla Windows',
   'download.linuxHint':
     'AppImage: uczyń go wykonywalnym, a następnie uruchom. Nie wymaga instalacji.',
   'loading.reconnecting': 'Połączenie utracone. Ponowne łączenie...',

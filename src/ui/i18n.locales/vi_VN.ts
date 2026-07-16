@@ -533,6 +533,26 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.roleTag.coredevs': 'Nhà Phát Triển Chính',
   'hudChrome.dungeonDifficulty.setHeroic': 'Đặt Độ Khó Hầm Ngục: Anh Hùng',
   'hudChrome.dungeonDifficulty.setNormal': 'Đặt Độ Khó Hầm Ngục: Thường',
+  'hudChrome.dungeonDifficulty.resetAll': 'Đặt Lại Tất Cả Phụ Bản',
+  'hudChrome.dungeonDifficulty.resetDone': 'Tất cả phụ bản đã được đặt lại.',
+  'hudChrome.dungeonDifficulty.resetNone': 'Bạn không có phụ bản nào để đặt lại.',
+  'hudChrome.dungeonDifficulty.resetOccupied':
+    'Bạn không thể đặt lại phụ bản khi vẫn còn người ở bên trong.',
+  'hudChrome.dungeonDifficulty.resetSameDifficulty':
+    'Hãy đổi độ khó hầm ngục trước khi đặt lại các phụ bản này. Phụ bản trống sẽ tự đặt lại sau 5 phút.',
+  'hudChrome.dungeonDifficulty.resetUsage':
+    'Dùng /dungeon reset để từ bỏ các phụ bản trống sau khi đổi độ khó.',
+  'hudChrome.dungeonDifficulty.resetLoot':
+    'Bạn không thể đặt lại phụ bản khi vẫn còn chiến lợi phẩm bên trong.',
+  'hudChrome.dungeonDifficulty.resetConfirmTitle': 'Đặt Lại Tất Cả Phụ Bản?',
+  'hudChrome.dungeonDifficulty.resetConfirmBody':
+    'Thao tác này sẽ từ bỏ các phụ bản trống thuộc độ khó bạn đã chọn trước đó. Chiến lợi phẩm chưa nhận sẽ ngăn việc đặt lại.',
+  'hudChrome.dungeonDifficulty.resetConfirm': 'Đặt Lại Phụ Bản',
+  'hudChrome.dungeonDifficulty.resetCooldown': 'Chỉ có thể đặt lại phụ bản một lần mỗi 5 phút.',
+  'hudChrome.dungeonDifficulty.entryMismatchNormal':
+    'Phụ bản này được đặt ở độ khó Thường. Dùng Đặt Lại Tất Cả Phụ Bản để bắt đầu một lượt Anh Hùng mới.',
+  'hudChrome.dungeonDifficulty.entryMismatchHeroic':
+    'Phụ bản này được đặt ở độ khó Anh Hùng. Dùng Đặt Lại Tất Cả Phụ Bản để bắt đầu một lượt Thường mới.',
   'hudChrome.itemProc.attackSlow':
     'và làm chậm tốc độ tấn công của mục tiêu thêm {pct}% trong {duration} giây',
   'hudChrome.itemProc.chainArc':
@@ -6629,6 +6649,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'apiError.two_factor.setup_required': 'Hãy bắt đầu thiết lập xác thực hai yếu tố trước.',
   'apiError.validation.failed': 'Một số trường không hợp lệ. Hãy kiểm tra biểu mẫu và thử lại.',
   'download.linuxCta': 'Tải xuống cho Linux',
+  'download.windowsCta': 'Tải xuống cho Windows',
   'download.linuxHint': 'AppImage: làm cho nó có thể thực thi được rồi chạy nó. Không cần cài đặt.',
   'loading.reconnecting': 'Mất kết nối. Đang kết nối lại...',
   'guide.nav.settings': 'Cài đặt & Hiệu suất',
