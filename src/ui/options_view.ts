@@ -474,6 +474,10 @@ export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl
       boolToggle(s, 'groundReticle', 'hudChrome.options.groundReticle'),
       boolToggle(s, 'mouseoverCast', 'hudChrome.options.mouseoverCast'),
       boolToggle(s, 'stickyTarget', 'hudChrome.options.stickyTarget'),
+      choice(s, 'combatTextStyle', 'hudChrome.options.combatTextStyle', [
+        { value: 0, labelKey: 'hudChrome.options.combatTextClassic' },
+        { value: 1, labelKey: 'hudChrome.options.combatTextEnhanced' },
+      ]),
       slider(s, 'fctScale', 'hud.options.fctScale'),
       boolToggle(s, 'showSecondaryActionBar', 'hudChrome.options.showSecondaryActionBar', {
         rerender: true,

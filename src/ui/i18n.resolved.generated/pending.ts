@@ -9,25 +9,85 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.options.combatTextClassic",
+    "hudChrome.options.combatTextEnhanced",
+    "hudChrome.options.combatTextStyle"
+  ],
+  "es_ES": [
+    "hudChrome.options.combatTextClassic",
+    "hudChrome.options.combatTextEnhanced",
+    "hudChrome.options.combatTextStyle"
+  ],
+  "fr_FR": [
+    "hudChrome.options.combatTextClassic",
+    "hudChrome.options.combatTextEnhanced",
+    "hudChrome.options.combatTextStyle"
+  ],
+  "fr_CA": [
+    "hudChrome.options.combatTextClassic",
+    "hudChrome.options.combatTextEnhanced",
+    "hudChrome.options.combatTextStyle"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.options.combatTextClassic",
+    "hudChrome.options.combatTextEnhanced",
+    "hudChrome.options.combatTextStyle"
+  ],
+  "de_DE": [
+    "hudChrome.options.combatTextClassic",
+    "hudChrome.options.combatTextEnhanced",
+    "hudChrome.options.combatTextStyle"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.options.combatTextClassic",
+    "hudChrome.options.combatTextEnhanced",
+    "hudChrome.options.combatTextStyle"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.options.combatTextClassic",
+    "hudChrome.options.combatTextEnhanced",
+    "hudChrome.options.combatTextStyle"
+  ],
+  "nl_NL": [
+    "hudChrome.options.combatTextClassic",
+    "hudChrome.options.combatTextEnhanced",
+    "hudChrome.options.combatTextStyle"
+  ],
+  "pl_PL": [
+    "hudChrome.options.combatTextClassic",
+    "hudChrome.options.combatTextEnhanced",
+    "hudChrome.options.combatTextStyle"
+  ],
+  "id_ID": [
+    "hudChrome.options.combatTextClassic",
+    "hudChrome.options.combatTextEnhanced",
+    "hudChrome.options.combatTextStyle"
+  ],
+  "tr_TR": [
+    "hudChrome.options.combatTextClassic",
+    "hudChrome.options.combatTextEnhanced",
+    "hudChrome.options.combatTextStyle"
+  ],
+  "sv_SE": [
+    "hudChrome.options.combatTextClassic",
+    "hudChrome.options.combatTextEnhanced",
+    "hudChrome.options.combatTextStyle"
+  ],
+  "vi_VN": [
+    "hudChrome.options.combatTextClassic",
+    "hudChrome.options.combatTextEnhanced",
+    "hudChrome.options.combatTextStyle"
+  ],
+  "da_DK": [
+    "hudChrome.options.combatTextClassic",
+    "hudChrome.options.combatTextEnhanced",
+    "hudChrome.options.combatTextStyle"
+  ]
 };
