@@ -4795,6 +4795,7 @@ export const ja_JP: EnTranslations = {
     "connectionRejected": "サーバーが接続を閉じました。",
     "realmFull": "このワールドは現在満員です。数分後にもう一度お試しください。",
     "tooManyConnections": "お使いのネットワークからこのワールドへの接続が多すぎます。余分なゲームウィンドウを閉じるか、数分後にもう一度お試しください。",
+    "webOnlyRealm": "このワールドにはウェブブラウザからのみ入れます。",
     "tips": {
       "classes": "ヒント：9つのクラスはそれぞれ遊び方が異なります。決める前にいくつか試してみましょう。",
       "talents": "ヒント：非戦闘中ならいつでも特性をリセットできるので、最初の選択が失敗になることはありません。",
@@ -4863,6 +4864,8 @@ export const ja_JP: EnTranslations = {
     "noRealms": "利用可能なワールドがありません。",
     "loading": "ワールドを読み込み中...",
     "recommended": "おすすめ",
+    "p2wBadge": "ペイトゥウィン",
+    "p2wTip": "このワールドでは現実のお金と暗号資産の仕組みが有効です。入場は任意で、成人のみ対象です。",
     "checkingStatus": "状態を確認中...",
     "onlineNow": "現在{count}人がオンライン",
     "down": "ワールドは停止中です",

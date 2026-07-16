@@ -4795,6 +4795,7 @@ export const da_DK: EnTranslations = {
     "connectionRejected": "Serveren lukkede forbindelsen.",
     "realmFull": "Denne verden er fuld i øjeblikket. Prøv igen om et par minutter.",
     "tooManyConnections": "Der kommer for mange forbindelser til denne verden fra dit netværk. Luk ekstra spilvinduer, eller prøv igen om et par minutter.",
+    "webOnlyRealm": "This world can only be entered from a web browser.",
     "tips": {
       "classes": "Tip: Hver af de 9 klasser spilles forskelligt. Prøv nogle stykker, før du vælger én.",
       "talents": "Tip: Du kan nulstille dine talenter, når du er ude af kamp, så et tidligt valg er aldrig en fælde.",
@@ -4863,6 +4864,8 @@ export const da_DK: EnTranslations = {
     "noRealms": "Ingen verdener tilgængelige.",
     "loading": "Indlæser verdener...",
     "recommended": "Anbefalet",
+    "p2wBadge": "Pay-to-Win",
+    "p2wTip": "Real-money and crypto mechanics are enabled on this world. Entering is optional and for adults only.",
     "checkingStatus": "Tjekker status...",
     "onlineNow": "{count} online nu",
     "down": "Verdenen er nede",

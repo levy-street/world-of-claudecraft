@@ -4795,6 +4795,7 @@ export const id_ID: EnTranslations = {
     "connectionRejected": "Server menutup koneksi.",
     "realmFull": "Dunia ini sedang penuh. Coba lagi dalam beberapa menit.",
     "tooManyConnections": "Terlalu banyak koneksi ke dunia ini dari jaringanmu. Tutup jendela permainan ekstra atau coba lagi dalam beberapa menit.",
+    "webOnlyRealm": "This world can only be entered from a web browser.",
     "tips": {
       "classes": "Kiat: masing-masing dari 9 kelas memiliki gaya bermain berbeda. Cobalah beberapa sebelum menetapkan pilihan.",
       "talents": "Kiat: kamu dapat mengatur ulang talenta kapan saja saat tidak bertarung, jadi pilihan awal tidak akan menjadi jebakan.",
@@ -4863,6 +4864,8 @@ export const id_ID: EnTranslations = {
     "noRealms": "Tidak ada dunia tersedia.",
     "loading": "Memuat dunia...",
     "recommended": "Direkomendasikan",
+    "p2wBadge": "Pay-to-Win",
+    "p2wTip": "Real-money and crypto mechanics are enabled on this world. Entering is optional and for adults only.",
     "checkingStatus": "Memeriksa status...",
     "onlineNow": "{count} online sekarang",
     "down": "Dunia sedang mati",

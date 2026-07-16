@@ -7,8 +7,16 @@ export const NATIVE_APP_ORIGINS = new Set([
   'https://localhost',
 ]);
 
+// The shipped Electron shell's packaged origin, as distinct from the two
+// localhost Vite origins below that a genuine web browser ALSO presents during
+// `npm run dev` (the page origin is the same localhost:5173). Checks that must
+// refuse the desktop APP but never a real browser (a web-only realm's entry
+// gates) key off this alone; the broad class below stays for CORS and UX-path
+// selection where conflating the two is harmless.
+export const PACKAGED_DESKTOP_APP_ORIGIN = 'app://worldofclaudecraft';
+
 export const DESKTOP_APP_ORIGINS = new Set([
-  'app://worldofclaudecraft',
+  PACKAGED_DESKTOP_APP_ORIGIN,
   'http://127.0.0.1:5173',
   'http://localhost:5173',
 ]);
@@ -24,6 +32,13 @@ export function isNativeAppRequest(req: Pick<IncomingMessage, 'headers'>): boole
 export function isDesktopAppRequest(req: Pick<IncomingMessage, 'headers'>): boolean {
   const origin = req.headers.origin;
   return typeof origin === 'string' && DESKTOP_APP_ORIGINS.has(origin);
+}
+
+// The packaged Electron shell ONLY, excluding the Vite dev origins (see the
+// PACKAGED_DESKTOP_APP_ORIGIN header for why the two must not be conflated on
+// refusal paths).
+export function isPackagedDesktopRequest(req: Pick<IncomingMessage, 'headers'>): boolean {
+  return req.headers.origin === PACKAGED_DESKTOP_APP_ORIGIN;
 }
 
 // The CORS reflection allow-list for /api/*: realm vhosts plus the native and

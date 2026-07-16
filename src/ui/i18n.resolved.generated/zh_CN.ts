@@ -4795,6 +4795,7 @@ export const zh_CN: EnTranslations = {
     "connectionRejected": "服务器关闭了连接。",
     "realmFull": "当前服务器已满，请稍后几分钟再试。",
     "tooManyConnections": "您的网络向该服务器发起的连接过多。请关闭多余的游戏窗口，或稍后几分钟再试。",
+    "webOnlyRealm": "该世界只能通过网页浏览器进入。",
     "tips": {
       "classes": "提示：9 个职业玩法各不相同，投入之前不妨都试一试。",
       "talents": "提示：你可以在任意脱离战斗的时候重置天赋，因此早期的选择永远不会成为陷阱。",
@@ -4863,6 +4864,8 @@ export const zh_CN: EnTranslations = {
     "noRealms": "没有可用服务器。",
     "loading": "正在加载服务器...",
     "recommended": "推荐",
+    "p2wBadge": "付费变强",
+    "p2wTip": "该世界启用了真实货币与加密货币机制。进入完全自愿，仅限成年人。",
     "checkingStatus": "正在检查状态...",
     "onlineNow": "当前 {count} 人在线",
     "down": "服务器不可用",

@@ -108,6 +108,7 @@ import {
   type ReleaseEntry,
 } from './net/online';
 import { realmPopulation } from './net/realm_population';
+import { realmIsP2w, visibleRealms } from './net/realm_visibility';
 import { openStripeCheckout } from './net/stripe_checkout';
 // The wallet module is loaded lazily via dynamic import() in the wallet
 // controller below, so it stays out of the main entry chunk and only loads when
@@ -3701,7 +3702,10 @@ const LAST_REALM_KEY = 'woc_last_realm';
 // the chosen realm). We remember the last realm and jump straight to its
 // characters, with a "Change Realm" button back to this list.
 async function enterRealmFlow(): Promise<void> {
-  const dir = await api.realms();
+  const raw = await api.realms();
+  // App shells never show web-only realms (the server already filters; this
+  // covers a stale or misconfigured server; src/net/realm_visibility.ts).
+  const dir = { ...raw, realms: visibleRealms(raw.realms, NATIVE_APP || DESKTOP_APP) };
   $('#realm-list-user').textContent = api.username ? `${api.username}` : '';
   const remembered = localStorage.getItem(LAST_REALM_KEY);
   const auto = dir.realms.find((r) => r.name === remembered);
@@ -4173,10 +4177,13 @@ function showRealmList(dir?: import('./net/online').RealmDirectory): void {
           chars > 0
             ? `<span class="rn-chars">${escapeHtml(tPlural('hudChrome.plurals.characterCount', chars))}</span>`
             : '';
+        const p2wTag = realmIsP2w(r)
+          ? `<span class="rn-p2w" title="${escapeHtml(t('realm.p2wTip'))}" aria-label="${escapeHtml(t('realm.p2wTip'))}">${escapeHtml(t('realm.p2wBadge'))}</span>`
+          : '';
         const typeKey = realmTypeKeys[r.type as keyof typeof realmTypeKeys];
         const typeLabel = typeKey ? t(typeKey) : r.type;
         return `<div class="realm-row" data-name="${escapeHtml(r.name)}" data-url="${escapeHtml(r.url)}">
-        <div><div class="realm-name">${escapeHtml(r.name)}${charTag}<span class="rn-rec" data-rec hidden>${escapeHtml(t('realm.recommended'))}</span></div>
+        <div><div class="realm-name">${escapeHtml(r.name)}${charTag}${p2wTag}<span class="rn-rec" data-rec hidden>${escapeHtml(t('realm.recommended'))}</span></div>
           <div class="realm-sub" data-sub>${escapeHtml(t('realm.checkingStatus'))}</div></div>
         <div class="realm-meta">
           <div class="realm-type">${escapeHtml(typeLabel)}</div>
@@ -4230,7 +4237,11 @@ function showRealmList(dir?: import('./net/online').RealmDirectory): void {
   if (dir) render(dir);
   else {
     listEl.innerHTML = `<div class="realm-loading">${escapeHtml(t('realm.loading'))}</div>`;
-    void api.realms().then(render);
+    void api
+      .realms()
+      .then((raw) =>
+        render({ ...raw, realms: visibleRealms(raw.realms, NATIVE_APP || DESKTOP_APP) }),
+      );
   }
 }
 
@@ -4275,8 +4286,9 @@ function toggleRealmDropdown(): void {
 function renderRealmDropdown(): void {
   const menu = $('#cs-realm-menu');
   menu.innerHTML = `<div class="realm-loading">${escapeHtml(t('realm.loading'))}</div>`;
-  void api.realms().then((d) => {
+  void api.realms().then((raw) => {
     if (!realmDropdownOpen) return;
+    const d = { ...raw, realms: visibleRealms(raw.realms, NATIVE_APP || DESKTOP_APP) };
     if (d.realms.length === 0) {
       menu.innerHTML = `<div class="realm-loading">${escapeHtml(t('realm.noRealms'))}</div>`;
       return;
@@ -4284,8 +4296,11 @@ function renderRealmDropdown(): void {
     menu.innerHTML = d.realms
       .map((r) => {
         const sel = r.name === api.realm ? ' sel' : '';
+        const p2wTag = realmIsP2w(r)
+          ? `<span class="rn-p2w" title="${escapeHtml(t('realm.p2wTip'))}" aria-label="${escapeHtml(t('realm.p2wTip'))}">${escapeHtml(t('realm.p2wBadge'))}</span>`
+          : '';
         return `<div class="realm-row cs-realm-row${sel}" role="option" aria-selected="${r.name === api.realm}" data-name="${escapeHtml(r.name)}" data-url="${escapeHtml(r.url)}">
-        <div class="realm-name">${escapeHtml(r.name)}</div>
+        <div class="realm-name">${escapeHtml(r.name)}${p2wTag}</div>
         <div class="realm-pop offline" data-pop>-</div>
       </div>`;
       })

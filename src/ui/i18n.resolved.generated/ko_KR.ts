@@ -4795,6 +4795,7 @@ export const ko_KR: EnTranslations = {
     "connectionRejected": "서버가 연결을 종료했습니다.",
     "realmFull": "이 월드는 현재 포화 상태입니다. 몇 분 후에 다시 시도해 주세요.",
     "tooManyConnections": "사용 중인 네트워크에서 이 월드로 연결이 너무 많습니다. 추가 게임 창을 닫거나 몇 분 후에 다시 시도해 주세요.",
+    "webOnlyRealm": "이 월드는 웹 브라우저에서만 입장할 수 있습니다.",
     "tips": {
       "classes": "팁: 9개 클래스는 저마다 플레이 방식이 다릅니다. 정하기 전에 몇 가지를 직접 해보세요.",
       "talents": "팁: 비전투 상태라면 언제든 특성을 초기화할 수 있어, 처음 선택도 절대 돌이킬 수 없는 것이 아닙니다.",
@@ -4863,6 +4864,8 @@ export const ko_KR: EnTranslations = {
     "noRealms": "사용 가능한 월드가 없습니다.",
     "loading": "월드 불러오는 중...",
     "recommended": "추천",
+    "p2wBadge": "페이 투 윈",
+    "p2wTip": "이 월드에서는 실제 화폐 및 암호화폐 시스템이 활성화되어 있습니다. 입장은 선택 사항이며 성인 전용입니다.",
     "checkingStatus": "상태 확인 중...",
     "onlineNow": "현재 {count}명 접속 중",
     "down": "월드가 중단되었습니다",

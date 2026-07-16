@@ -50,6 +50,19 @@ services:
       # advertises the value so the client realm list can show Full honestly. Empty
       # (unset) yields the built-in default of 5000; an explicit 0 disables the cap.
       MAX_PLAYERS_PER_REALM: ${MAX_PLAYERS_PER_REALM:-}
+      # Runtime: realm identity + directory (server/realm.ts). One process = one
+      # realm; a second realm is another service like this one with its own
+      # REALM_NAME/PORT and the same DATABASE_URL. All empty defaults keep the
+      # single-realm behavior. REALM_NAME must be real process env (an .env-only
+      # value is ignored, see #1612); REALMS is the shared directory every realm
+      # process advertises (also the CORS allowlist); REALM_FLAGS carries this
+      # realm's own flags (web = browser-only, p2w = pay-to-win label) for the
+      # single-realm default; REALM_RESET_TZ is the raid-reset time zone.
+      REALM_NAME: ${REALM_NAME:-}
+      REALM_TYPE: ${REALM_TYPE:-}
+      REALMS: ${REALMS:-}
+      REALM_FLAGS: ${REALM_FLAGS:-}
+      REALM_RESET_TZ: ${REALM_RESET_TZ:-}
       # Target the game server 302-redirects /wiki to when hit directly (not via the
       # reverse proxy). Public origin in prod; localhost fallback for local dev.
       WIKI_URL: ${WIKI_URL:-http://localhost:8080/wiki/index.php/Main_Page}

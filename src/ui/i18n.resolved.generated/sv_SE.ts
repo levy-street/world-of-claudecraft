@@ -4795,6 +4795,7 @@ export const sv_SE: EnTranslations = {
     "connectionRejected": "Servern stängde anslutningen.",
     "realmFull": "Denna värld är full just nu. Försök igen om några minuter.",
     "tooManyConnections": "För många anslutningar till denna värld kommer från ditt nätverk. Stäng extra spelfönster eller försök igen om några minuter.",
+    "webOnlyRealm": "This world can only be entered from a web browser.",
     "tips": {
       "classes": "Tips: var och en av de 9 klasserna spelas på sitt eget sätt. Prova några innan du bestämmer dig för en.",
       "talents": "Tips: du kan återställa dina talanger när du inte strider, så ett tidigt val blir aldrig en fälla.",
@@ -4863,6 +4864,8 @@ export const sv_SE: EnTranslations = {
     "noRealms": "Inga världar tillgängliga.",
     "loading": "Laddar världar...",
     "recommended": "Rekommenderas",
+    "p2wBadge": "Pay-to-Win",
+    "p2wTip": "Real-money and crypto mechanics are enabled on this world. Entering is optional and for adults only.",
     "checkingStatus": "Kontrollerar status...",
     "onlineNow": "{count} online nu",
     "down": "Världen är nere",

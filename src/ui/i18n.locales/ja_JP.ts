@@ -1225,6 +1225,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'loading.realmFull': 'このワールドは現在満員です。数分後にもう一度お試しください。',
   'loading.tooManyConnections':
     'お使いのネットワークからこのワールドへの接続が多すぎます。余分なゲームウィンドウを閉じるか、数分後にもう一度お試しください。',
+  'loading.webOnlyRealm': 'このワールドにはウェブブラウザからのみ入れます。',
   'errors.nothingInteract': '操作できるものがありません。',
   'errors.noEnemyNearby': '近くに敵がいません。',
   'errors.characterNameRequired': 'キャラクター名を入力してください。',
@@ -1264,6 +1265,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'realm.noRealms': '利用可能なワールドがありません。',
   'realm.loading': 'ワールドを読み込み中...',
   'realm.recommended': 'おすすめ',
+  'realm.p2wBadge': 'ペイトゥウィン',
+  'realm.p2wTip':
+    'このワールドでは現実のお金と暗号資産の仕組みが有効です。入場は任意で、成人のみ対象です。',
   'realm.checkingStatus': '状態を確認中...',
   'realm.onlineNow': '現在{count}人がオンライン',
   'realm.down': 'ワールドは停止中です',

@@ -124,7 +124,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.partyFrames.styleClassic",
     "hudChrome.partyFrames.styleRaid",
     "hudChrome.partyFrames.unlock",
-    "hudChrome.partyFrames.width"
+    "hudChrome.partyFrames.width",
+    "loading.webOnlyRealm",
+    "realm.p2wBadge",
+    "realm.p2wTip"
   ],
   "es_ES": [
     "devCommand.actions.attune.description",
@@ -241,7 +244,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.partyFrames.styleClassic",
     "hudChrome.partyFrames.styleRaid",
     "hudChrome.partyFrames.unlock",
-    "hudChrome.partyFrames.width"
+    "hudChrome.partyFrames.width",
+    "loading.webOnlyRealm",
+    "realm.p2wBadge",
+    "realm.p2wTip"
   ],
   "fr_FR": [
     "devCommand.actions.attune.description",
@@ -358,7 +364,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.partyFrames.styleClassic",
     "hudChrome.partyFrames.styleRaid",
     "hudChrome.partyFrames.unlock",
-    "hudChrome.partyFrames.width"
+    "hudChrome.partyFrames.width",
+    "loading.webOnlyRealm",
+    "realm.p2wBadge",
+    "realm.p2wTip"
   ],
   "fr_CA": [
     "devCommand.actions.attune.description",
@@ -475,7 +484,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.partyFrames.styleClassic",
     "hudChrome.partyFrames.styleRaid",
     "hudChrome.partyFrames.unlock",
-    "hudChrome.partyFrames.width"
+    "hudChrome.partyFrames.width",
+    "loading.webOnlyRealm",
+    "realm.p2wBadge",
+    "realm.p2wTip"
   ],
   "en_CA": [],
   "it_IT": [
@@ -593,7 +605,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.partyFrames.styleClassic",
     "hudChrome.partyFrames.styleRaid",
     "hudChrome.partyFrames.unlock",
-    "hudChrome.partyFrames.width"
+    "hudChrome.partyFrames.width",
+    "loading.webOnlyRealm",
+    "realm.p2wBadge",
+    "realm.p2wTip"
   ],
   "de_DE": [
     "devCommand.actions.attune.description",
@@ -710,7 +725,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.partyFrames.styleClassic",
     "hudChrome.partyFrames.styleRaid",
     "hudChrome.partyFrames.unlock",
-    "hudChrome.partyFrames.width"
+    "hudChrome.partyFrames.width",
+    "loading.webOnlyRealm",
+    "realm.p2wBadge",
+    "realm.p2wTip"
   ],
   "zh_CN": [
     "devCommand.actions.attune.description",
@@ -1199,7 +1217,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.partyFrames.styleClassic",
     "hudChrome.partyFrames.styleRaid",
     "hudChrome.partyFrames.unlock",
-    "hudChrome.partyFrames.width"
+    "hudChrome.partyFrames.width",
+    "loading.webOnlyRealm",
+    "realm.p2wBadge",
+    "realm.p2wTip"
   ],
   "ru_RU": [
     "devCommand.actions.attune.description",
@@ -1409,7 +1430,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.partyFrames.styleClassic",
     "hudChrome.partyFrames.styleRaid",
     "hudChrome.partyFrames.unlock",
-    "hudChrome.partyFrames.width"
+    "hudChrome.partyFrames.width",
+    "loading.webOnlyRealm",
+    "realm.p2wBadge",
+    "realm.p2wTip"
   ],
   "nl_NL": [
     "devCommand.actions.attune.description",
@@ -1526,7 +1550,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.partyFrames.styleClassic",
     "hudChrome.partyFrames.styleRaid",
     "hudChrome.partyFrames.unlock",
-    "hudChrome.partyFrames.width"
+    "hudChrome.partyFrames.width",
+    "loading.webOnlyRealm",
+    "realm.p2wBadge",
+    "realm.p2wTip"
   ],
   "pl_PL": [
     "devCommand.actions.attune.description",
@@ -1643,7 +1670,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.partyFrames.styleClassic",
     "hudChrome.partyFrames.styleRaid",
     "hudChrome.partyFrames.unlock",
-    "hudChrome.partyFrames.width"
+    "hudChrome.partyFrames.width",
+    "loading.webOnlyRealm",
+    "realm.p2wBadge",
+    "realm.p2wTip"
   ],
   "id_ID": [
     "devCommand.actions.attune.description",
@@ -1760,7 +1790,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.partyFrames.styleClassic",
     "hudChrome.partyFrames.styleRaid",
     "hudChrome.partyFrames.unlock",
-    "hudChrome.partyFrames.width"
+    "hudChrome.partyFrames.width",
+    "loading.webOnlyRealm",
+    "realm.p2wBadge",
+    "realm.p2wTip"
   ],
   "tr_TR": [
     "devCommand.actions.attune.description",
@@ -1877,7 +1910,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.partyFrames.styleClassic",
     "hudChrome.partyFrames.styleRaid",
     "hudChrome.partyFrames.unlock",
-    "hudChrome.partyFrames.width"
+    "hudChrome.partyFrames.width",
+    "loading.webOnlyRealm",
+    "realm.p2wBadge",
+    "realm.p2wTip"
   ],
   "sv_SE": [
     "devCommand.actions.attune.description",
@@ -1994,7 +2030,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.partyFrames.styleClassic",
     "hudChrome.partyFrames.styleRaid",
     "hudChrome.partyFrames.unlock",
-    "hudChrome.partyFrames.width"
+    "hudChrome.partyFrames.width",
+    "loading.webOnlyRealm",
+    "realm.p2wBadge",
+    "realm.p2wTip"
   ],
   "vi_VN": [
     "devCommand.actions.attune.description",
@@ -2111,7 +2150,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.partyFrames.styleClassic",
     "hudChrome.partyFrames.styleRaid",
     "hudChrome.partyFrames.unlock",
-    "hudChrome.partyFrames.width"
+    "hudChrome.partyFrames.width",
+    "loading.webOnlyRealm",
+    "realm.p2wBadge",
+    "realm.p2wTip"
   ],
   "da_DK": [
     "devCommand.actions.attune.description",
@@ -2228,6 +2270,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.partyFrames.styleClassic",
     "hudChrome.partyFrames.styleRaid",
     "hudChrome.partyFrames.unlock",
-    "hudChrome.partyFrames.width"
+    "hudChrome.partyFrames.width",
+    "loading.webOnlyRealm",
+    "realm.p2wBadge",
+    "realm.p2wTip"
   ]
 };

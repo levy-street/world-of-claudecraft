@@ -51,6 +51,12 @@ const WS_AUTH_ERROR = {
   tooManyConnections: 'too many connections from your network',
   forceRename: 'This character must be renamed before entering the world.',
   authTimedOut: 'authentication timed out',
+  // A web-only realm process refused a native/desktop app-shell client (see
+  // realm_platform_guard.ts). This EXACT lowercase literal is part of the wire
+  // contract the client matcher reads verbatim (src/ui/api_error_i18n.ts maps it
+  // to loading.webOnlyRealm), so changing it is a wire change that must land in
+  // the client matcher in the same commit.
+  webOnlyRealm: 'this realm can only be entered from a web browser',
 } as const;
 
 // The first auth frame must arrive within this window or the socket is closed.
@@ -123,6 +129,12 @@ export interface WsAuthDeps {
   bankBonusForAccount: (
     accountId: number,
   ) => Promise<{ bonusSlots: number; sources: BankBonusSource[] }>;
+  // True when this realm process refuses the request's client class outright
+  // (a web-only realm rejecting the native/desktop app shells, keyed off the
+  // upgrade request's Origin). Optional so existing hosts and tests are
+  // unchanged; absent means no class is refused. Checked FIRST in the
+  // handshake, before any DB work.
+  refusesAppShellClient?: (req: http.IncomingMessage) => boolean;
 }
 
 export interface WsAuthHandlers {
@@ -235,6 +247,13 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
     }
     if (msg?.t !== 'auth') {
       rejectHandshake(ws, WS_AUTH_ERROR.authRequired);
+      return;
+    }
+    // A web-only realm refuses app-shell client classes before any DB work: a
+    // token minted on another realm is valid account-wide, so the class check
+    // cannot rely on login/register alone.
+    if (deps.refusesAppShellClient?.(req)) {
+      rejectHandshake(ws, WS_AUTH_ERROR.webOnlyRealm);
       return;
     }
 

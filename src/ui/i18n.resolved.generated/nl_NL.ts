@@ -4795,6 +4795,7 @@ export const nl_NL: EnTranslations = {
     "connectionRejected": "De server heeft de verbinding gesloten.",
     "realmFull": "Deze wereld is op dit moment vol. Probeer het over een paar minuten opnieuw.",
     "tooManyConnections": "Er komen te veel verbindingen naar deze wereld vanuit jouw netwerk. Sluit extra spelvensters of probeer het over een paar minuten opnieuw.",
+    "webOnlyRealm": "This world can only be entered from a web browser.",
     "tips": {
       "classes": "Tip: elk van de 9 klassen speelt anders. Probeer er een paar voordat je er een kiest.",
       "talents": "Tip: je kunt je talenten buiten gevechten altijd herstellen, dus een vroege keuze is nooit een valstrik.",
@@ -4863,6 +4864,8 @@ export const nl_NL: EnTranslations = {
     "noRealms": "Geen werelden beschikbaar.",
     "loading": "Werelden laden...",
     "recommended": "Aanbevolen",
+    "p2wBadge": "Pay-to-Win",
+    "p2wTip": "Real-money and crypto mechanics are enabled on this world. Entering is optional and for adults only.",
     "checkingStatus": "Status controleren...",
     "onlineNow": "{count} nu online",
     "down": "Wereld is offline",

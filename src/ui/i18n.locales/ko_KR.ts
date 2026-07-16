@@ -1215,6 +1215,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'loading.realmFull': '이 월드는 현재 포화 상태입니다. 몇 분 후에 다시 시도해 주세요.',
   'loading.tooManyConnections':
     '사용 중인 네트워크에서 이 월드로 연결이 너무 많습니다. 추가 게임 창을 닫거나 몇 분 후에 다시 시도해 주세요.',
+  'loading.webOnlyRealm': '이 월드는 웹 브라우저에서만 입장할 수 있습니다.',
   'errors.nothingInteract': '상호작용할 대상이 없습니다.',
   'errors.noEnemyNearby': '근처에 적이 없습니다.',
   'errors.characterNameRequired': '캐릭터 이름을 입력하세요.',
@@ -1253,6 +1254,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'realm.noRealms': '사용 가능한 월드가 없습니다.',
   'realm.loading': '월드 불러오는 중...',
   'realm.recommended': '추천',
+  'realm.p2wBadge': '페이 투 윈',
+  'realm.p2wTip':
+    '이 월드에서는 실제 화폐 및 암호화폐 시스템이 활성화되어 있습니다. 입장은 선택 사항이며 성인 전용입니다.',
   'realm.checkingStatus': '상태 확인 중...',
   'realm.onlineNow': '현재 {count}명 접속 중',
   'realm.down': '월드가 중단되었습니다',

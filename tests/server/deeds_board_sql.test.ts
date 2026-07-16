@@ -139,9 +139,14 @@ describe('deedsBoardRanked SQL shape (mocked pool)', () => {
     expect(agg).toContain('JOIN accounts a ON a.id = cd.account_id');
     // Belt over the ON DELETE CASCADE: only rows whose character still exists.
     expect(agg.split('JOIN characters c ON c.id = cd.character_id').length - 1).toBe(2);
+    // The realm exclusion (pay-to-win realms never rank on the shared board) is
+    // likewise applied at BOTH roll-up sites, so an excluded realm's characters
+    // leave the score, the count, AND the display pick together.
+    expect(agg.split('AND c.realm != ALL($4::text[])').length - 1).toBe(2);
 
-    // The aggregation params: the content table (parallel arrays) plus the floor.
-    expect(spy.mock.calls[0][1]).toEqual([DEED_IDS, RENOWNS, DEEDS_BOARD_ENTRY_FLOOR]);
+    // The aggregation params: the content table (parallel arrays), the floor,
+    // and the realm exclusion list (empty by default).
+    expect(spy.mock.calls[0][1]).toEqual([DEED_IDS, RENOWNS, DEEDS_BOARD_ENTRY_FLOOR, []]);
 
     // The unknown-deed warn is a cheap side read over the whole content id set,
     // no eligibility join (it hunts removed/renamed content).

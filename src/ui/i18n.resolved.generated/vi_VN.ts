@@ -4795,6 +4795,7 @@ export const vi_VN: EnTranslations = {
     "connectionRejected": "Máy chủ đã đóng kết nối.",
     "realmFull": "Thế giới này đang đầy người chơi. Vui lòng thử lại sau vài phút.",
     "tooManyConnections": "Có quá nhiều kết nối đến thế giới này từ mạng của bạn. Vui lòng đóng bớt cửa sổ trò chơi hoặc thử lại sau vài phút.",
+    "webOnlyRealm": "This world can only be entered from a web browser.",
     "tips": {
       "classes": "Mẹo: mỗi lớp trong 9 lớp nhân vật có lối chơi khác nhau. Hãy thử vài lớp trước khi quyết định gắn bó.",
       "talents": "Mẹo: bạn có thể đặt lại tài năng bất cứ lúc nào ngoài chiến đấu, nên lựa chọn ban đầu không bao giờ là cái bẫy.",
@@ -4863,6 +4864,8 @@ export const vi_VN: EnTranslations = {
     "noRealms": "Không có thế giới nào khả dụng.",
     "loading": "Đang tải các thế giới...",
     "recommended": "Được Đề Xuất",
+    "p2wBadge": "Pay-to-Win",
+    "p2wTip": "Real-money and crypto mechanics are enabled on this world. Entering is optional and for adults only.",
     "checkingStatus": "Đang kiểm tra trạng thái...",
     "onlineNow": "{count} đang trực tuyến",
     "down": "Thế giới đang ngừng hoạt động",

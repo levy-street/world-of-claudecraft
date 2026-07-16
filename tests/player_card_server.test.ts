@@ -259,13 +259,13 @@ describe('public card origin config', () => {
   it('selects the matching trusted realm origin', () => {
     expect(
       publicOriginForRealm('Ironforge', [
-        { name: 'Claudemoon', url: 'https://claudemoon.example.com', type: 'Normal' },
-        { name: 'Ironforge', url: 'https://ironforge.example.com', type: 'PvP' },
+        { name: 'Claudemoon', url: 'https://claudemoon.example.com', type: 'Normal', flags: [] },
+        { name: 'Ironforge', url: 'https://ironforge.example.com', type: 'PvP', flags: [] },
       ]),
     ).toBe('https://ironforge.example.com');
     expect(
       publicOriginForRealm('Missing', [
-        { name: 'Claudemoon', url: 'https://claudemoon.example.com', type: 'Normal' },
+        { name: 'Claudemoon', url: 'https://claudemoon.example.com', type: 'Normal', flags: [] },
       ]),
     ).toBe('');
   });

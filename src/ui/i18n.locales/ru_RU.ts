@@ -1242,6 +1242,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Этот мир сейчас переполнен. Пожалуйста, попробуйте снова через несколько минут.',
   'loading.tooManyConnections':
     'Из вашей сети открыто слишком много подключений к этому миру. Пожалуйста, закройте лишние игровые окна или попробуйте снова через несколько минут.',
+  'loading.webOnlyRealm': 'В этот мир можно войти только через веб-браузер.',
   'errors.nothingInteract': 'Нет объекта для взаимодействия.',
   'errors.noEnemyNearby': 'Рядом нет врагов.',
   'errors.characterNameRequired': 'Введите имя персонажа.',
@@ -1282,6 +1283,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'realm.noRealms': 'Нет доступных миров.',
   'realm.loading': 'Загрузка миров...',
   'realm.recommended': 'Рекомендуется',
+  'realm.p2wBadge': 'Пэй-ту-вин',
+  'realm.p2wTip':
+    'В этом мире включены механики реальных денег и криптовалюты. Вход добровольный и только для совершеннолетних.',
   'realm.checkingStatus': 'Проверка состояния...',
   'realm.onlineNow': 'сейчас в сети: {count}',
   'realm.down': 'Мир недоступен',
