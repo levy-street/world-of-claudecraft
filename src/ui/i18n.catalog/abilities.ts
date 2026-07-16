@@ -974,7 +974,7 @@ const classAbilityNamesEn = {
       [
         'mind_flay',
         'Litany of Woe',
-        "Assaults the target's mind with Shadow energy, causing {damage} damage each second for 3 sec.",
+        "Assaults the target's mind with Shadow energy for 3 sec. Each successive tick deals 30% more Shadow damage than the first.",
       ],
       ['flash_heal', 'Urgent Prayer', 'A fast prayer that heals a friendly target for {damage}.'],
       ['lightning_bolt', 'Arc Bolt', 'Hurls a bolt of lightning for {damage} Nature damage.'],

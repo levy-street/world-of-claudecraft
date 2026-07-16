@@ -2712,12 +2712,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     channel: { duration: 3, ticks: 3 },
     cooldown: 0,
-    range: 20,
+    range: 30,
     school: 'shadow',
     requiresTarget: true,
-    effects: [{ type: 'drainTick', min: 12, max: 12, healFrac: 0 }],
+    effects: [{ type: 'drainTick', min: 12, max: 12, healFrac: 0, rampPct: 0.3 }],
     description:
-      "Assaults the target's mind with Shadow energy, causing $d Shadow damage each second for 3 sec.",
+      "Assaults the target's mind with Shadow energy for 3 sec. Each successive tick deals 30% more Shadow damage than the first.",
   },
   flash_heal: {
     id: 'flash_heal',

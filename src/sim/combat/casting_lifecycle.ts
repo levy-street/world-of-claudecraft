@@ -51,6 +51,7 @@ import {
   normAngle,
 } from '../types';
 import { isInStasis, isLockedOut, isSilenced, isStunned, tonguesMult } from './cc';
+import { rampedDrainTickDamage } from './channel_effects';
 import { extendOwnedDot } from './dot_mutation';
 import {
   consumeFreeCostFor,
@@ -176,12 +177,16 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
         ctx.applyDemonHealTick(p);
       } else {
         const res = ctx.resolvedAbility(p.castingAbility, p.id);
-        if (res) applyChannelTick(ctx, p, res);
+        if (res) {
+          p.channelTicksFired = (p.channelTicksFired ?? 0) + 1;
+          applyChannelTick(ctx, p, res, p.channelTicksFired);
+        }
       }
     }
     if (p.castRemaining <= CAST_COMPLETE_EPS) {
       p.castingAbility = null;
       p.channeling = false;
+      delete p.channelTicksFired;
       // completed ground-targeted channels drop their aim like every other
       // resolve path: castAim is always cleared on resolve
       p.castAim = null;
@@ -231,6 +236,7 @@ export function cancelCast(ctx: SimContext, p: Entity): void {
   p.castingAbility = null;
   p.castRemaining = 0;
   p.channeling = false;
+  delete p.channelTicksFired;
   p.castAim = null;
   p.castTargetId = null;
   // an interrupted cast never completed, so its queued follow-up is dropped too
@@ -599,6 +605,7 @@ export function castAbility(
     p.channeling = true;
     p.channelTickEvery = channelDuration / ability.channel.ticks;
     p.channelTickTimer = p.channelTickEvery;
+    p.channelTicksFired = 0;
     p.gcdRemaining = Math.max(p.gcdRemaining, gcd);
     ctx.emit({
       type: 'castStart',
@@ -713,7 +720,12 @@ function armAbilityCooldown(
   p.cooldowns.set(abilityId, cooldown);
 }
 
-function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): void {
+function applyChannelTick(
+  ctx: SimContext,
+  p: Entity,
+  res: ResolvedAbility,
+  channelTickNumber: number,
+): void {
   // Ground-targeted channels (Rain of Fire / Volley / Hurricane): each tick pulses
   // the ability's aoeDamage at the aimed point (clamped at cast start, held in
   // castAim for the channel's life), independent of any entity target.
@@ -809,7 +821,11 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
         ctx.dealDamage(src, tgt, Math.round(dmg), crit, res.def.school, res.def.name, 'hit');
         noteSpellHit(ctx, src, crit);
       } else if (eff.type === 'drainTick') {
-        const dmg = Math.round(ctx.rng.range(eff.min, eff.max) + channelSp);
+        const dmg = rampedDrainTickDamage(
+          ctx.rng.range(eff.min, eff.max) + channelSp,
+          eff.rampPct,
+          channelTickNumber,
+        );
         ctx.dealDamage(src, tgt, dmg, false, res.def.school, res.def.name, 'hit');
         if (!src.dead) {
           const healed = Math.min(Math.round(dmg * eff.healFrac), src.maxHp - src.hp);

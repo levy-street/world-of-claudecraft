@@ -56,10 +56,20 @@ observation. Fulmination turns that bank into an escalating area storm:
 The decision is how long to ride the rising Overload chance before venting the accumulated
 storm across a pack. It adds no action-bar button and no short reaction window.
 
+## Shadow: Litany of Woe
+
+Litany of Woe is a three-second, three-tick Shadow channel with a 30-yard range. The first
+tick establishes the channel's damage, then the second and third ticks deal 30% and 60% more
+than that first tick. The ramp is calculated from the tick ordinal after the normal per-tick
+damage roll, so it consumes no additional random draws. The rising damage already travels
+through the ordinary damage-event path, which keeps floating combat text and agent reward
+feedback aligned with the authoritative result.
+
 ## Determinism and rollout
 
 Icefall is draw-free. Frostbite draws exactly once after a Cryomancy owner's landed Rimelance
 and nowhere else, so other spells and builds preserve their random stream. Fulmination draws
 only for a talented owner's landed Arc Bolt while the ward has charges. Overload damage,
 chain selection, and the Earthen Jolt vent draw nothing. PBE validates damage, proc rate,
-window length, and mobile readability before release.
+window length, and mobile readability before release. Litany's ordinal ramp is draw-free;
+each tick retains exactly the one damage roll the baseline channel already consumed.

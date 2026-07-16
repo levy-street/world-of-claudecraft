@@ -1554,7 +1554,7 @@ export type AbilityEffect =
   | { type: 'imbue'; bonus: number; duration: number; judgeMin?: number; judgeMax?: number } // seals / rockbiter: extra damage per swing
   | { type: 'judgement'; dmgMult?: number; flat?: number } // consume your imbue, deal its judgement damage to the target
   | { type: 'lifeTap'; hp: number; mana: number }
-  | { type: 'drainTick'; min: number; max: number; healFrac: number } // channel tick that heals the caster
+  | { type: 'drainTick'; min: number; max: number; healFrac: number; rampPct?: number } // channel tick that may heal the caster or ramp by ordinal
   | {
       type: 'buffTarget';
       kind: AuraKind;
@@ -2128,6 +2128,9 @@ export interface Entity {
   channeling: boolean;
   channelTickTimer: number;
   channelTickEvery: number;
+  // Server-authoritative one-based channel ordinal. Optional so non-channel
+  // entities and wire mirrors do not carry redundant transient state.
+  channelTicksFired?: number;
   gcdRemaining: number;
   cooldowns: Map<string, number>;
   // Native multi-charge abilities recharge sequentially through cooldowns.
