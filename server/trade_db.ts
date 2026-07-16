@@ -80,6 +80,10 @@ CREATE TABLE IF NOT EXISTS trade_ledger (
 CREATE INDEX IF NOT EXISTS trade_ledger_char_a ON trade_ledger (char_a_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS trade_ledger_char_b ON trade_ledger (char_b_id, created_at DESC);
 ALTER TABLE trade_ledger ADD COLUMN IF NOT EXISTS context TEXT;
+-- writeLedger's retry and the boot-replay window can re-emit the same audit row; this
+-- partial unique index makes a duplicate non-null context a no-op. Classic-lane trades
+-- write context NULL and NULLs are never unique-constrained, so they are unaffected.
+CREATE UNIQUE INDEX IF NOT EXISTS trade_ledger_context_uniq ON trade_ledger (context) WHERE context IS NOT NULL;
 `;
 
 // One side's escrowed goods (items, including instance payloads, plus copper).
@@ -390,7 +394,8 @@ async function insertTradeLedgerWith(
        (realm, settlement_id, char_a_id, char_b_id, account_a_id, account_b_id,
         char_a_name, char_b_name, items_a, copper_a, items_b, copper_b,
         claudium_a, claudium_b, woc_a, woc_b, context)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)`,
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+     ON CONFLICT (context) WHERE context IS NOT NULL DO NOTHING`,
     [
       row.realm,
       row.settlementId,

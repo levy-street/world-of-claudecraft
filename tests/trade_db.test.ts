@@ -18,9 +18,11 @@ import {
   claimTradeSettlementForRecovery,
   type InsertTradeSettlementInput,
   insertSettlementAndSaveBoth,
+  insertTradeLedger,
   loadOpenTradeSettlements,
   markTradeSettlement,
   saveTradePairAndLedger,
+  TRADE_SCHEMA,
   type TradeLedgerRow,
   type TradePairSaveSide,
 } from '../server/trade_db';
@@ -146,6 +148,47 @@ describe('saveTradePairAndLedger', () => {
     const sqls = client.query.mock.calls.map((c) => String(c[0]));
     expect(sqls.some((s) => /ROLLBACK/.test(s))).toBe(true);
     expect(sqls.some((s) => /INSERT INTO trade_ledger/i.test(s))).toBe(false);
+  });
+});
+
+describe('insertTradeLedger: duplicate-context dedup (r2)', () => {
+  const MARKET_ROW: TradeLedgerRow = { ...LEDGER, context: 'market-r1-42-1' };
+
+  function ledgerInserts(): Array<[string, unknown[]]> {
+    return dbMock.query.mock.calls
+      .filter((c) => /INSERT INTO trade_ledger/i.test(String(c[0])))
+      .map((c) => [String(c[0]), c[1] as unknown[]]);
+  }
+
+  it('pins the partial UNIQUE index on non-null context in the schema DDL', () => {
+    expect(TRADE_SCHEMA).toContain('CREATE UNIQUE INDEX IF NOT EXISTS trade_ledger_context_uniq');
+    expect(TRADE_SCHEMA).toContain('ON trade_ledger (context) WHERE context IS NOT NULL');
+  });
+
+  it('a repeated non-null context is a Postgres no-op (ON CONFLICT DO NOTHING, context rides $17)', async () => {
+    // The pool is a query spy, so the dedup itself is the partial unique index + the
+    // ON CONFLICT clause the INSERT carries; a duplicate context never writes a second
+    // row in real Postgres. Assert the clause and that the same context is the last param.
+    await insertTradeLedger(MARKET_ROW);
+    await insertTradeLedger(MARKET_ROW);
+    const inserts = ledgerInserts();
+    expect(inserts).toHaveLength(2);
+    for (const [sql, params] of inserts) {
+      expect(sql).toContain('ON CONFLICT (context) WHERE context IS NOT NULL DO NOTHING');
+      expect(params[params.length - 1]).toBe('market-r1-42-1');
+    }
+  });
+
+  it('classic-lane null-context rows are unconstrained: two both insert', async () => {
+    await insertTradeLedger(LEDGER); // no context field -> null
+    await insertTradeLedger(LEDGER);
+    const inserts = ledgerInserts();
+    expect(inserts).toHaveLength(2);
+    for (const [sql, params] of inserts) {
+      // the partial index skips NULLs, so ON CONFLICT never fires and both rows land
+      expect(sql).toContain('ON CONFLICT (context) WHERE context IS NOT NULL DO NOTHING');
+      expect(params[params.length - 1]).toBeNull();
+    }
   });
 });
 

@@ -21,7 +21,14 @@
 import { ITEMS } from '../sim/data';
 import type { ItemDef } from '../sim/types';
 import type { MarketInfo, MarketListingView, MarketPendingPurchaseView } from '../world_api';
-import { MARKET_PAGE_SIZE, type MarketFilters } from './market_filters';
+import {
+  MARKET_PAGE_SIZE,
+  type MarketFilters,
+  type MarketItemTypeFilter,
+  type MarketRarityFilter,
+  type MarketSortOrder,
+  type MarketSubtypeFilter,
+} from './market_filters';
 
 export type MarketTab = 'browse' | 'sell' | 'collect';
 
@@ -241,4 +248,47 @@ export function buildMarketView(input: MarketViewInput): MarketView {
 export function marketCollectBadgeCount(info: MarketInfo | null): number {
   if (!info) return 0;
   return (info.collectionCopper > 0 ? 1 : 0) + info.collectionItems.length;
+}
+
+// The view-state the painter's per-frame refresh diffs to decide whether to repaint
+// the live Browse/Collect list.
+export interface MarketRefreshState {
+  tab: MarketTab;
+  itemType: MarketItemTypeFilter;
+  subtype: MarketSubtypeFilter;
+  rarity: MarketRarityFilter;
+  sort: MarketSortOrder;
+  page: number;
+}
+
+// The Browse/Collect refresh dirty-check signature. It deliberately OMITS every
+// listing's live secondsLeft (dropped by the JSON replacer): secondsLeft ticks at
+// whole-second granularity, so leaving it in flips the signature once a second and
+// the painter rebuilds the whole list, which wipes a mid-typed bid or buy-quantity
+// input. Every other rendered field still rides the signature, so a new or removed
+// listing, a bid, a price/count/denom change, or a pending-payment lock still forces
+// a rebuild; the painter refreshes the stale countdown text in place instead.
+export function marketRefreshSignature(
+  state: MarketRefreshState,
+  info: MarketInfo | null | undefined,
+): string {
+  return JSON.stringify(
+    [
+      state.tab,
+      state.itemType,
+      state.subtype,
+      state.rarity,
+      state.sort,
+      state.page,
+      info?.listings,
+      info?.totalCount,
+      info?.filter,
+      info?.page,
+      info?.pageCount,
+      info?.collectionCopper,
+      info?.collectionItems,
+      info?.myPendingPurchase,
+    ],
+    (key, value) => (key === 'secondsLeft' ? undefined : value),
+  );
 }

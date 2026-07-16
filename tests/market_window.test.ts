@@ -1,5 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { type MarketRefreshState, marketRefreshSignature } from '../src/ui/market_view';
+import type { MarketInfo, MarketListingView } from '../src/world_api';
 
 // The market window painter is a DOM module; driving the live DOM + events is the
 // opt-in browser suite. This is the no-DOM-suite equivalent: it
@@ -35,6 +37,89 @@ describe('market_window: no magic values', () => {
   it('uses no em or en dashes (ASCII separators only)', () => {
     expect(painter.includes('—'), 'em dash found').toBe(false);
     expect(painter.includes('–'), 'en dash found').toBe(false);
+  });
+});
+
+// The one bug this PR must fix: a per-second countdown tick rebuilt the whole Browse
+// list, wiping a mid-typed bid or buy-quantity. The dirty-check signature must ignore
+// each listing's live secondsLeft (which flips every second) while still reacting to a
+// real change. The signature is the pure marketRefreshSignature the painter calls.
+describe('market_window: browse refresh signature (typing-guard regression)', () => {
+  function browseListing(over: Partial<MarketListingView> = {}): MarketListingView {
+    return {
+      id: 1,
+      sellerName: 'Seller',
+      itemId: 'wolf_fang',
+      count: 3,
+      price: 100,
+      mine: false,
+      house: false,
+      secondsLeft: 3600,
+      kind: 'fixed',
+      myBid: false,
+      denom: 'copper',
+      ...over,
+    };
+  }
+
+  function snapshot(listings: MarketListingView[]): MarketInfo {
+    return {
+      listings,
+      totalCount: listings.length,
+      filter: '',
+      page: 0,
+      pageCount: 1,
+      collectionCopper: 0,
+      collectionItems: [],
+      cutPct: 5,
+      maxListings: 10,
+      myListingCount: 0,
+      durationsHours: [12, 24, 48],
+      rails: { claudium: false, woc: false },
+    };
+  }
+
+  const BROWSE_STATE: MarketRefreshState = {
+    tab: 'browse',
+    itemType: 'all',
+    subtype: 'all',
+    rarity: 'all',
+    sort: 'newest',
+    page: 0,
+  };
+
+  it('is stable across two snapshots that differ ONLY in secondsLeft', () => {
+    const a = marketRefreshSignature(
+      BROWSE_STATE,
+      snapshot([browseListing({ secondsLeft: 3600 })]),
+    );
+    const b = marketRefreshSignature(BROWSE_STATE, snapshot([browseListing({ secondsLeft: 1 })]));
+    expect(a).toBe(b);
+  });
+
+  it('still flips when a listing price / count / bid changes (real rebuild preserved)', () => {
+    const base = marketRefreshSignature(BROWSE_STATE, snapshot([browseListing()]));
+    expect(
+      marketRefreshSignature(BROWSE_STATE, snapshot([browseListing({ price: 250 })])),
+    ).not.toBe(base);
+    expect(marketRefreshSignature(BROWSE_STATE, snapshot([browseListing({ count: 4 })]))).not.toBe(
+      base,
+    );
+    expect(
+      marketRefreshSignature(
+        BROWSE_STATE,
+        snapshot([browseListing({ kind: 'auction', currentBid: 120 })]),
+      ),
+    ).not.toBe(base);
+  });
+
+  it('still flips when a listing is added or removed', () => {
+    const one = marketRefreshSignature(BROWSE_STATE, snapshot([browseListing({ id: 1 })]));
+    const two = marketRefreshSignature(
+      BROWSE_STATE,
+      snapshot([browseListing({ id: 1 }), browseListing({ id: 2 })]),
+    );
+    expect(one).not.toBe(two);
   });
 });
 
@@ -202,7 +287,10 @@ describe('market_window: multi-currency denominations (AH-P4)', () => {
     expect(paymentPanel).toContain('hud.trade.openInWallet');
     expect(paymentPanel).toContain('hud.trade.copyLink');
     expect(paymentPanel).toContain('deps.copyToClipboard(uri)');
-    // the sig-driven refresh reacts to the pending purchase appearing/clearing
-    expect(painter).toContain('info?.myPendingPurchase');
+    // the sig-driven refresh reacts to the pending purchase appearing/clearing: the
+    // painter diffs the pure marketRefreshSignature, which folds info?.myPendingPurchase
+    // into the signature (the builder moved to the DOM-free core, market_view.ts).
+    expect(painter).toContain('marketRefreshSignature(');
+    expect(core).toContain('info?.myPendingPurchase');
   });
 });

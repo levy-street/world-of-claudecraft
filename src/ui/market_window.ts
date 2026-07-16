@@ -52,6 +52,7 @@ import {
   type MarketSellMeta,
   type MarketTab,
   marketCollectBadgeCount,
+  marketRefreshSignature,
 } from './market_view';
 import type { PainterHostPresentation } from './painter_host';
 import { buildWocPayPanel } from './payment_panel';
@@ -196,22 +197,22 @@ export class MarketWindow {
   refreshIfChanged(): void {
     if (!this.opened || this.tab === 'sell') return;
     const info = this.deps.world().marketInfo;
-    const sig = JSON.stringify([
-      this.tab,
-      this.itemTypeFilter,
-      this.subtypeFilter,
-      this.rarityFilter,
-      this.sortOrder,
-      this.browsePage,
-      info?.listings,
-      info?.totalCount,
-      info?.filter,
-      info?.page,
-      info?.pageCount,
-      info?.collectionCopper,
-      info?.collectionItems,
-      info?.myPendingPurchase,
-    ]);
+    const sig = marketRefreshSignature(
+      {
+        tab: this.tab,
+        itemType: this.itemTypeFilter,
+        subtype: this.subtypeFilter,
+        rarity: this.rarityFilter,
+        sort: this.sortOrder,
+        page: this.browsePage,
+      },
+      info,
+    );
+    // The signature omits each listing's live secondsLeft so a bare per-second tick
+    // never rebuilds the Browse list and wipes a mid-typed bid or buy-quantity. Keep
+    // the countdown honest by refreshing just the time-left cells in place every pass,
+    // before the change check below can early-return.
+    if (this.tab === 'browse' && info) this.tickBrowseTimeLeft(info.listings);
     if (sig === this.lastSig) return;
     this.lastSig = sig;
     const collectTab = this.deps.root().querySelector('[data-tab="collect"]');
@@ -542,7 +543,7 @@ export class MarketWindow {
         : '';
       const timeLeft =
         l.secondsLeft >= 0
-          ? `<br><span class="time-left">${esc(t('itemUi.market.timeLeft', { time: this.formatTimeLeft(l.secondsLeft) }))}</span>`
+          ? `<br><span class="time-left" data-listing-id="${l.id}">${esc(t('itemUi.market.timeLeft', { time: this.formatTimeLeft(l.secondsLeft) }))}</span>`
           : '';
       row.innerHTML =
         `${this.deps.itemIcon(item)}` +
@@ -900,6 +901,25 @@ export class MarketWindow {
       default:
         return t('hudChrome.raidLockout.lessThanMinute');
     }
+  }
+
+  // Refresh the Browse time-left cells in place, keyed by listing id, without a full
+  // rebuild. The refresh signature deliberately excludes secondsLeft so a bare
+  // per-second tick never rebuilds the list and wipes a mid-typed bid or quantity;
+  // this keeps the visible countdown ticking anyway by rewriting only the affected
+  // spans. A house-stock row (secondsLeft < 0) renders no time-left cell, so a missing
+  // or negative entry is simply skipped.
+  private tickBrowseTimeLeft(listings: readonly MarketListingView[]): void {
+    const spans = this.deps
+      .root()
+      .querySelectorAll<HTMLElement>('.mkt-list .time-left[data-listing-id]');
+    if (spans.length === 0) return;
+    const secondsById = new Map(listings.map((l) => [l.id, l.secondsLeft] as const));
+    spans.forEach((span) => {
+      const secondsLeft = secondsById.get(Number(span.dataset.listingId));
+      if (secondsLeft === undefined || secondsLeft < 0) return;
+      span.textContent = t('itemUi.market.timeLeft', { time: this.formatTimeLeft(secondsLeft) });
+    });
   }
 
   // The awaiting-payment panel for the viewer's OWN pending external purchase:

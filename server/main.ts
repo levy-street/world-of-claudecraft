@@ -2621,8 +2621,11 @@ export async function startServer(): Promise<http.Server> {
   // Resolve any external-denomination market purchase left pending by the
   // previous boot (the persisted market blob is the anchor). After loadMarket
   // (the pendings live there) and loadMail (a completion letters an offline
-  // seller); a failure is logged, never fatal to boot.
-  await game
+  // seller); a failure is logged, never fatal to boot. Fire-and-forget: recovery
+  // has no correctness reason to gate the listen (the loaded blob already keeps the
+  // lots locked), and its per-pending RPC timeouts could otherwise stall boot for
+  // minutes on a crash-restart during a service outage.
+  void game
     .recoverPendingMarketPurchases()
     .catch((err) => console.error('market purchase recovery failed:', err));
   await game.loadChatFilter();
