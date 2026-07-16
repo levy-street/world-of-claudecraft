@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
+  characterFrostbiteArmed,
+  characterIciclesCount,
   characterRecklessnessActive,
   characterSanguineAuraActive,
   characterSoulRendActive,
+  characterThunderWardCharges,
 } from '../src/render/character_effects';
 import type { Entity } from '../src/sim/types';
 
@@ -76,6 +79,65 @@ function entity(partial: Partial<Entity>): Entity {
 }
 
 describe('character visual effects', () => {
+  it('derives the visible Icicle count from the exact Mage aura and clamps corrupt mirrors', () => {
+    const icicles = (stacks: number | undefined, id = 'mag_icicles') => ({
+      id,
+      name: 'Icicles',
+      kind: 'icicles' as const,
+      remaining: 30,
+      duration: 30,
+      value: 0,
+      sourceId: 1,
+      school: 'frost' as const,
+      stacks,
+    });
+
+    expect(characterIciclesCount(entity({ auras: [] }))).toBe(0);
+    expect(characterIciclesCount(entity({ auras: [icicles(3)] }))).toBe(3);
+    // AuraWire omits an exact stack count of one; aura presence must reconstruct it.
+    expect(characterIciclesCount(entity({ auras: [icicles(undefined)] }))).toBe(1);
+    expect(characterIciclesCount(entity({ auras: [icicles(-2)] }))).toBe(0);
+    expect(characterIciclesCount(entity({ auras: [icicles(12)] }))).toBe(5);
+    expect(characterIciclesCount(entity({ auras: [icicles(4, 'mob_icicles')] }))).toBe(0);
+  });
+
+  it('arms the Icicle flare only for the exact Mage Frostbite aura', () => {
+    const frostbite = (id = 'mag_frostbite') => ({
+      id,
+      name: 'Frostbite',
+      kind: 'frostbite' as const,
+      remaining: 5,
+      duration: 5,
+      value: 0,
+      sourceId: 1,
+      school: 'frost' as const,
+    });
+
+    expect(characterFrostbiteArmed(entity({ auras: [] }))).toBe(false);
+    expect(characterFrostbiteArmed(entity({ auras: [frostbite()] }))).toBe(true);
+    expect(characterFrostbiteArmed(entity({ auras: [frostbite('mob_frostbite')] }))).toBe(false);
+  });
+
+  it('derives Thunder Ward intensity from exact charges and clamps corrupt mirrors', () => {
+    const thunderWard = (charges: number, id = 'lightning_shield') => ({
+      id,
+      name: 'Thunder Ward',
+      kind: 'thorns' as const,
+      remaining: 600,
+      duration: 600,
+      value: 0,
+      sourceId: 1,
+      school: 'nature' as const,
+      charges,
+    });
+
+    expect(characterThunderWardCharges(entity({ auras: [] }))).toBe(0);
+    expect(characterThunderWardCharges(entity({ auras: [thunderWard(4)] }))).toBe(4);
+    expect(characterThunderWardCharges(entity({ auras: [thunderWard(-1)] }))).toBe(0);
+    expect(characterThunderWardCharges(entity({ auras: [thunderWard(14)] }))).toBe(9);
+    expect(characterThunderWardCharges(entity({ auras: [thunderWard(6, 'mob_ward')] }))).toBe(0);
+  });
+
   it('detects Soul Rend as a model-level effect instead of a nameplate marker', () => {
     expect(characterSoulRendActive(entity({ auras: [] }))).toBe(false);
     expect(

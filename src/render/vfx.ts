@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import type { UiEffectsTier } from '../game/ui_effects_profile';
+import { characterAuraParticleScale } from '../game/ui_tier_knobs';
 import { loadTexture } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { GFX } from './gfx';
@@ -206,6 +208,9 @@ export class Vfx {
   private fwCols: THREE.Color[] = [];
   private fwFlash = new THREE.Color();
   private quality = 1;
+  // Static-preset-only richness for character aura particles. Deliberately
+  // separate from `quality`, which is owned by the adaptive FPS governor.
+  private characterAuraParticleScale = 1;
 
   constructor(
     scene: THREE.Scene,
@@ -300,6 +305,10 @@ export class Vfx {
     this.quality = Math.min(1, Math.max(0, Number.isFinite(level) ? level : 1));
   }
 
+  setStaticEffectsTier(tier: UiEffectsTier): void {
+    this.characterAuraParticleScale = characterAuraParticleScale(tier);
+  }
+
   prewarm(at: THREE.Vector3): void {
     const sprites = Object.values(SPR);
     for (let i = 0; i < sprites.length; i++) {
@@ -350,6 +359,19 @@ export class Vfx {
     const expected = dt * ratePerSecond * (0.35 + 0.65 * this.quality);
     const n = Math.floor(expected);
     return n + (Math.random() <= expected - n ? 1 : 0);
+  }
+
+  // Cosmetic character auras shed only from the player's static effects tier.
+  // These helpers must stay independent of the adaptive `quality` field above.
+  private characterAuraEmitCount(ratePerSecond: number, dt: number): number {
+    const expected = dt * ratePerSecond * this.characterAuraParticleScale;
+    const n = Math.floor(expected);
+    return n + (Math.random() <= expected - n ? 1 : 0);
+  }
+
+  private characterAuraVisibleCount(count: number): number {
+    if (count <= 1 || this.characterAuraParticleScale === 1) return count;
+    return Math.max(1, Math.ceil(count * this.characterAuraParticleScale));
   }
 
   private spawn(
@@ -780,6 +802,112 @@ export class Vfx {
   }
 
   // continuous emitters (called per frame)
+  icicleOrbit(
+    entityId: number,
+    count: number,
+    frostbiteArmed: boolean,
+    time: number,
+    dt: number,
+  ): void {
+    const clampedCount = Math.min(5, Math.max(0, Math.trunc(count)));
+    const visibleCount = this.characterAuraVisibleCount(clampedCount);
+    if (visibleCount === 0) return;
+    const emissions = this.characterAuraEmitCount(30, dt);
+    if (emissions === 0) return;
+    const at = this.anchor(entityId, 0.58);
+    if (!at) return;
+
+    for (let emission = 0; emission < emissions; emission++) {
+      const phase = time * 1.65 + entityId * 0.37 + emission * 0.11;
+      const flareIndex = (Math.floor(time * 8) + entityId + emission) % visibleCount;
+      for (let i = 0; i < visibleCount; i++) {
+        const angle = phase + (i / visibleCount) * Math.PI * 2;
+        const sin = Math.sin(angle);
+        const cos = Math.cos(angle);
+        const radius = 0.62;
+        const y = at.y + Math.sin(angle * 2 + entityId) * 0.11;
+        this.spawn(
+          at.x + sin * radius,
+          y,
+          at.z + cos * radius,
+          cos * 0.12,
+          frostbiteArmed ? 0.16 : 0.05,
+          -sin * 0.12,
+          frostbiteArmed ? 0xeafcff : 0x78cfff,
+          frostbiteArmed ? 0.46 : 0.36,
+          frostbiteArmed ? 0.2 : 0.16,
+          0,
+          SPR.trace,
+          angle + Math.PI / 2,
+        );
+        if (frostbiteArmed && i === flareIndex) {
+          this.spawn(
+            at.x + sin * radius,
+            y,
+            at.z + cos * radius,
+            0,
+            0.18,
+            0,
+            0xf4fdff,
+            0.68,
+            0.13,
+            0,
+            SPR.flash,
+            0,
+          );
+        }
+      }
+    }
+  }
+
+  thunderWard(entityId: number, charges: number, time: number, dt: number): void {
+    const clampedCharges = Math.min(9, Math.max(0, Math.trunc(charges)));
+    if (clampedCharges === 0) return;
+    const intensity = clampedCharges / 9;
+    const emissions = this.characterAuraEmitCount(12 + intensity * 24, dt);
+    if (emissions === 0) return;
+    const at = this.anchor(entityId, 0.48);
+    if (!at) return;
+
+    for (let i = 0; i < emissions; i++) {
+      const angle = time * 4.2 + entityId * 0.71 + i * 2.4 + Math.random() * 0.8;
+      const sin = Math.sin(angle);
+      const cos = Math.cos(angle);
+      const radius = 0.42 + Math.random() * (0.2 + intensity * 0.18);
+      const y = at.y + (Math.random() - 0.5) * (0.65 + intensity * 0.35);
+      this.spawn(
+        at.x + sin * radius,
+        y,
+        at.z + cos * radius,
+        cos * (0.8 + intensity * 0.9),
+        0.15 + Math.random() * 0.35,
+        -sin * (0.8 + intensity * 0.9),
+        Math.random() < intensity ? 0xc6f7ff : 0x69cfff,
+        0.24 + intensity * 0.22,
+        0.16 + Math.random() * 0.13,
+        0,
+        Math.random() < 0.35 ? SPR.sparkBurst : SPR.trace,
+        angle,
+      );
+      if (clampedCharges === 9 && Math.random() < 0.45) {
+        this.spawn(
+          at.x + sin * radius,
+          y,
+          at.z + cos * radius,
+          0,
+          0.2,
+          0,
+          0xecffff,
+          0.62,
+          0.11,
+          0,
+          SPR.flash,
+          0,
+        );
+      }
+    }
+  }
+
   castSparkle(entityId: number, school: string, dt: number): void {
     if (!this.emitChance(30, dt)) return;
     const at = this.anchor(entityId, 0.66);

@@ -43,9 +43,12 @@ import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink
 import { type BirdsView, buildBirds } from './birds';
 import { type CameraOcclusionState, stepCameraOcclusion } from './camera_collision';
 import {
+  characterFrostbiteArmed,
+  characterIciclesCount,
   characterRecklessnessActive,
   characterSanguineAuraActive,
   characterSoulRendActive,
+  characterThunderWardCharges,
 } from './character_effects';
 import {
   type AnimState,
@@ -4276,6 +4279,8 @@ export class Renderer {
     sharedUniforms.uTime.value = this.time;
     const sim = this.sim;
     const p = sim.player;
+    const staticEffectsTier = coerceFxTier(document.documentElement.dataset.fxLevel);
+    this.vfx.setStaticEffectsTier(staticEffectsTier);
     if (this.lastSelfId !== p.id) {
       this.lastSelfId = p.id;
       this.selfRenderPositionReady = false;
@@ -4784,6 +4789,19 @@ export class Renderer {
           dt,
         );
       }
+      // Icicles/Frostbite and Thunder Ward ride the character mirror only.
+      // The action-bar proc glow is the untiered actionable cue; these are
+      // cosmetic and their density follows the static preset inside Vfx.
+      if (!e.dead && charOnScreen) {
+        const icicles = characterIciclesCount(e);
+        if (icicles > 0) {
+          this.vfx.icicleOrbit(e.id, icicles, characterFrostbiteArmed(e), this.time, dt);
+        }
+        const thunderWardCharges = characterThunderWardCharges(e);
+        if (thunderWardCharges > 0) {
+          this.vfx.thunderWard(e.id, thunderWardCharges, this.time, dt);
+        }
+      }
       if (e.auras.some((a) => a.id === 'nythraxis_soul_rend')) {
         this.vfx.castSparkle(e.id, 'shadow', dt * 3.2);
       }
@@ -5095,9 +5113,7 @@ export class Renderer {
     // first-run default (resolveDefaultGraphicsPreset in gfx.ts), which lands a
     // recognized-weak or software GPU on the LOW preset (its 1/15s ceiling) while a
     // mid/unknown device defaults to medium (1/24s). An explicit player preset wins.
-    const nameplateInterval = nameplateIntervalSec(
-      coerceFxTier(document.documentElement.dataset.fxLevel),
-    );
+    const nameplateInterval = nameplateIntervalSec(staticEffectsTier);
     const fullNameplatePass = this.nameplateTimer >= nameplateInterval;
     if (fullNameplatePass) this.nameplateTimer = 0;
     this.nameplatePainter.update(fullNameplatePass);

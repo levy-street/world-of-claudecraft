@@ -184,6 +184,22 @@ export function nameplateIntervalSec(tier: UiEffectsTier): number {
 }
 
 // ---------------------------------------------------------------------------
+// Character aura particles: Icicles/Frostbite and Thunder Ward remain present
+// on every tier, but low sheds cosmetic particle density. Their actionable
+// action-bar proc glow is a separate, untiered UI layer.
+// ---------------------------------------------------------------------------
+
+/** Particle-density multiplier for character aura emitters on low. */
+export const CHARACTER_AURA_PARTICLE_SCALE_LOW = 0.45;
+/** Full particle density retained by medium, high, and ultra. */
+export const CHARACTER_AURA_PARTICLE_SCALE_FULL = 1;
+
+/** Static-preset density for cosmetic character aura particles. */
+export function characterAuraParticleScale(tier: UiEffectsTier): number {
+  return tier === 'low' ? CHARACTER_AURA_PARTICLE_SCALE_LOW : CHARACTER_AURA_PARTICLE_SCALE_FULL;
+}
+
+// ---------------------------------------------------------------------------
 // Shared cadence predicate + tier coercion.
 // ---------------------------------------------------------------------------
 
