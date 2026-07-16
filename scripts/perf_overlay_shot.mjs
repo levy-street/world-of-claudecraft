@@ -94,11 +94,14 @@ if (box.width > 0) {
   });
 }
 
-// Open Options > System (the perf overlay settings live in the System category).
+// Open Options > Performance.
 await page.evaluate(() => window.__game.hud.toggleOptionsMenu());
 await new Promise((r) => setTimeout(r, 150));
 await page.evaluate(() => {
-  document.querySelector('#options-menu .opt-tab[data-category="system"]')?.click();
+  const btn = [...document.querySelectorAll('#options-menu .opt-btn')].find((b) =>
+    /Performance/i.test(b.textContent),
+  );
+  btn?.click();
 });
 await new Promise((r) => setTimeout(r, 250));
 
@@ -118,25 +121,19 @@ async function shotPanel(name, { width, height, touch }) {
       const el = document.getElementById(id);
       if (el) el.style.display = 'none';
     }
-    // Re-open Options > System if the resize dropped the menu or the pane. The
-    // wide layouts use the rail (data-category); the narrow back-stack shell has
-    // no rail, so fall back to the stacked category row (English-only run, so
-    // matching the aria-label is safe here).
-    let menu = document.querySelector('#options-menu');
+    // Re-open Options > Performance if the resize dropped the menu.
+    const menu = document.querySelector('#options-menu');
     if (
       !menu ||
       getComputedStyle(menu).display === 'none' ||
-      !menu.querySelector('.opt-perf-host')
+      !menu.classList.contains('perf-wide')
     ) {
       const hud = window.__game.hud;
       if (!menu || getComputedStyle(menu).display === 'none') hud.toggleOptionsMenu();
-      const tab = document.querySelector('#options-menu .opt-tab[data-category="system"]');
-      if (tab) tab.click();
-      else
-        [...document.querySelectorAll('#options-menu .opt-mshell-cat')]
-          .find((b) => /system/i.test(b.getAttribute('aria-label') || ''))
-          ?.click();
-      menu = document.querySelector('#options-menu');
+      const btn = [...document.querySelectorAll('#options-menu .opt-btn')].find((b) =>
+        /Performance/i.test(b.textContent),
+      );
+      btn?.click();
     }
     const el = document.querySelector('#options-menu');
     const r = el.getBoundingClientRect();

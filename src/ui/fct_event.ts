@@ -1,5 +1,5 @@
 // Pure discrimination for floating-combat-text spawns: the SimEvent -> FctEvent SHAPING
-// half of the FCT split. The 8 hud.ts spawn sites assembled the { kind, isSelf, crit }
+// half of the FCT split. The hud.ts spawn sites assemble the { kind, isSelf, crit }
 // triple inline; this lifts that decision (which is the only non-trivial part: the damage
 // source/target priority, the ability vs auto split, the miss/dodge self-vs-other colour
 // flag) into one deterministic, testable function. Host-agnostic and DOM/clock/i18n-free
@@ -29,6 +29,7 @@ export type FctSpawnSource =
   | { readonly type: 'heal'; readonly crit: boolean; readonly isPlayerTarget: boolean }
   | { readonly type: 'xp' }
   | { readonly type: 'rested-xp' }
+  | { readonly type: 'honor' }
   | { readonly type: 'self-note' };
 
 /** The discriminator the painter spawns with (the text + target are spread on at the call site). */
@@ -70,6 +71,8 @@ export function fctSpawnShape(src: FctSpawnSource): FctSpawnShape | null {
       return { kind: 'xp', isSelf: true, crit: false };
     case 'rested-xp':
       return { kind: 'rested-xp', isSelf: true, crit: false };
+    case 'honor':
+      return { kind: 'honor', isSelf: true, crit: false };
     case 'self-note':
       return { kind: 'self-note', isSelf: true, crit: false };
   }

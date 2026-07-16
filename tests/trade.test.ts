@@ -42,6 +42,7 @@ function makeTradeCtx() {
       return meta && e ? { meta, e } : null;
     },
     error: (pid: number, text: string) => events.push({ type: 'error', pid, text }),
+    bumpDeedStat: () => {},
     emit: (ev: any) => events.push(ev),
     hasPendingSocialInvite: (tp: number) =>
       partyInvites.has(tp) || tradeInvites.has(tp) || duelInvites.has(tp),

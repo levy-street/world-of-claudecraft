@@ -19,7 +19,13 @@ import { dist2d, INTERACT_RANGE } from '../sim/types';
 import type { IWorld } from '../world_api';
 import type { TranslationKey } from './i18n';
 import { formatNumber, t } from './i18n';
-import { type TutorialParam, tutorialBodyPlan, tutorialNeedsRerender } from './tutorial_copy';
+import {
+  TUTORIAL_NEXT_TIPS,
+  type TutorialParam,
+  tutorialBodyPlan,
+  tutorialNeedsRerender,
+  tutorialSlayHintPlan,
+} from './tutorial_copy';
 
 // Starter content the onboarding guides the player toward — all derived from the
 // shipped sim sources so a content rename or a moved spawn can't silently desync
@@ -33,7 +39,10 @@ const SPAWN = { x: PLAYER_START.x, y: 0, z: PLAYER_START.z }; // dist2d ignores 
 const MOVE_THRESHOLD = 3; // yards from spawn before "find your footing" is satisfied
 const GIVER_RANGE = INTERACT_RANGE + 2; // matches the sim's accept-quest reach
 const STORAGE_KEY = 'woc.tutorial.v1';
-const DONE_LINGER_MS = 9000; // auto-dismiss the closing card after this long
+// Auto-dismiss the closing card after this long. Longer than the mid-tutorial
+// steps (which advance on player action, not a timer) so there is time to read
+// the "where to next" tips below the quest-complete line before it fades.
+const DONE_LINGER_MS = 14000;
 
 export type TutorialStep = 'move' | 'seek' | 'talk' | 'slay' | 'return' | 'done';
 
@@ -86,6 +95,9 @@ export class TutorialOverlay {
   private stepEl!: HTMLElement;
   private bodyEl!: HTMLElement;
   private progressEl!: HTMLElement;
+  private tipsWrapEl!: HTMLElement;
+  private tipsTitleEl!: HTMLElement;
+  private tipsEl!: HTMLElement;
   private skipBtn!: HTMLButtonElement;
   private arrow: HTMLElement | null = null;
 
@@ -173,6 +185,19 @@ export class TutorialOverlay {
     });
   }
 
+  // Rebuilds the "where to next" tip list under the closing 'done' card. Rebuilt
+  // (not cached) because the shown key labels depend on the player's live
+  // keybinds, which can change mid-session via the rebinding UI.
+  private renderNextTips(keybinds: Keybinds): void {
+    this.tipsEl.replaceChildren();
+    for (const tip of TUTORIAL_NEXT_TIPS) {
+      const key = keybinds.primaryLabel(tip.keybindId) || t('hud.options.unbound');
+      const li = document.createElement('li');
+      li.textContent = t(tip.bodyKey, { key });
+      this.tipsEl.appendChild(li);
+    }
+  }
+
   private ensureDom(): void {
     if (this.root) return;
     const ui = document.getElementById('ui');
@@ -201,12 +226,21 @@ export class TutorialOverlay {
     this.progressEl = document.createElement('div');
     this.progressEl.className = 'tut-progress';
 
+    this.tipsWrapEl = document.createElement('div');
+    this.tipsWrapEl.style.display = 'none';
+    this.tipsTitleEl = document.createElement('div');
+    this.tipsTitleEl.className = 'tut-next-tips-title';
+    this.tipsTitleEl.textContent = t('hudChrome.tutorial.nextTipsTitle');
+    this.tipsEl = document.createElement('ul');
+    this.tipsEl.className = 'tut-next-tips';
+    this.tipsWrapEl.append(this.tipsTitleEl, this.tipsEl);
+
     this.skipBtn = document.createElement('button');
     this.skipBtn.className = 'tut-skip';
     this.skipBtn.type = 'button';
     this.skipBtn.addEventListener('click', () => this.finish());
 
-    root.append(header, this.bodyEl, this.progressEl, this.skipBtn);
+    root.append(header, this.bodyEl, this.progressEl, this.tipsWrapEl, this.skipBtn);
     ui.appendChild(root);
     this.root = root;
 
@@ -230,6 +264,7 @@ export class TutorialOverlay {
     // a literal blank gap in "press  to speak" (mirrors the HUD keybind list).
     const interactKey = keybinds.primaryLabel('interact') || t('hud.options.unbound');
     const questKey = keybinds.primaryLabel('questlog') || t('hud.options.unbound');
+    const targetKey = keybinds.primaryLabel('target') || t('hud.options.unbound');
     const name = world.player.name || t('hud.core.you');
 
     // On the touch interface the controls are on-screen sticks + Use/More
@@ -238,7 +273,13 @@ export class TutorialOverlay {
     // the same body class the HUD uses so it tracks the Interface Mode override.
     const touch = document.body.classList.contains('mobile-touch');
     this.lastTouch = touch;
-    const allParams: Record<TutorialParam, string> = { moveKeys, interactKey, questKey, name };
+    const allParams: Record<TutorialParam, string> = {
+      moveKeys,
+      interactKey,
+      questKey,
+      targetKey,
+      name,
+    };
     const plan = tutorialBodyPlan(this.step!, touch);
     const params: Partial<Record<TutorialParam, string>> = {};
     for (const key of plan.params) params[key] = allParams[key];
@@ -253,7 +294,16 @@ export class TutorialOverlay {
     };
 
     this.titleEl.textContent = t(titleKey[this.step!]);
-    this.bodyEl.textContent = t(plan.bodyKey, params);
+    let body = t(plan.bodyKey, params);
+    if (this.step === 'slay') {
+      // First-time targeting/attack hint (see tutorialSlayHintPlan): the objective
+      // body above never explains how to engage a wolf.
+      const hintPlan = tutorialSlayHintPlan(touch);
+      const hintParams: Partial<Record<TutorialParam, string>> = {};
+      for (const key of hintPlan.params) hintParams[key] = allParams[key];
+      body = `${body} ${t(hintPlan.bodyKey, hintParams)}`;
+    }
+    this.bodyEl.textContent = body;
 
     const idx = STEP_ORDER.indexOf(this.step!);
     this.stepEl.textContent =
@@ -269,6 +319,13 @@ export class TutorialOverlay {
       this.progressEl.style.display = '';
     } else {
       this.progressEl.style.display = 'none';
+    }
+
+    if (this.step === 'done') {
+      this.renderNextTips(keybinds);
+      this.tipsWrapEl.style.display = '';
+    } else {
+      this.tipsWrapEl.style.display = 'none';
     }
 
     this.skipBtn.textContent =

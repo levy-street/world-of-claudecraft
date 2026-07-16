@@ -3,6 +3,7 @@
 // Pure data + dispatch — no three.js imports, no loading.
 
 import { MECH_CHROMAS, type MechChroma } from '../../sim/content/skins';
+import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import { MOBS } from '../../sim/data';
 import type { Entity, PlayerClass } from '../../sim/types';
 import { ITEM_WEAPON_VARIANTS } from '../../ui/weapon_variants';
@@ -34,6 +35,9 @@ export interface ClipMap {
   walkBack?: string;
   /** one-shot played on respawn (skeleton awaken / boss taunt) */
   flourish?: string;
+  /** arm gesture for the Z-key sheathe toggle; the held-prop swap lands at its
+   *  midpoint (see visual.ts setWeaponStowed). Absent = snap with no gesture. */
+  stow?: string;
   /** player-facing overhead emote one-shots; clips are sourced from the GLB. */
   emote?: Partial<Record<OverheadEmoteId, EmoteClipSpec>>;
 }
@@ -130,6 +134,10 @@ const kaykit = (attack: string[], idle = 'Idle'): ClipMap => ({
   sitIdle: 'Sit_Floor_Idle',
   swim: 'Lie_Idle',
   jump: 'Jump_Idle',
+  // The trimmed player GLBs ship no dedicated sheathe clip; the 1H chop WINDUP
+  // (the clip's first ~40%, cut at the swap point by visual.ts) reaches over the
+  // shoulder toward the back, which reads as grabbing/planting the hilt.
+  stow: '1H_Melee_Attack_Chop',
   emote: KAYKIT_EMOTES,
 });
 
@@ -291,6 +299,21 @@ export function itemWeaponModelUrls(): string[] {
   return [...new Set(Object.values(ITEM_WEAPON_VARIANTS).map((key) => `${WEAPONS}/${key}.glb`))];
 }
 
+/** GLB url for a Season 1 Armory weapon-skin cosmetic, or null for no/unknown
+ *  skin. The skin model replaces the equipped item's held model (same bone, its
+ *  own KAYKIT_WEAPON_ACCESSORY grip family + WEAPON_GRIP_OVERRIDES fine-tune). */
+export function weaponSkinModelUrl(skinId: string | null | undefined): string | null {
+  if (!skinId) return null;
+  const def = WEAPON_SKINS[skinId];
+  return def ? `${WEAPONS}/${def.model}.glb` : null;
+}
+
+/** Distinct weapon-skin GLB urls, preloaded like item weapon models: any nearby
+ *  player can have a skin applied, and the attach path is synchronous. */
+export function weaponSkinModelUrls(): string[] {
+  return [...new Set(Object.values(WEAPON_SKINS).map((def) => `${WEAPONS}/${def.model}.glb`))];
+}
+
 const LOW_URL_ALIAS: Record<string, string> = {
   'models/chars/players/rogue_hooded.glb': 'models/chars/players/rogue.glb',
 };
@@ -441,6 +464,10 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${PLAYERS}/ranger.glb`,
     height: HUMANOID_H,
     clips: kaykit(['2H_Ranged_Shoot']),
+    // Bow-draw clips for the Season 1 bow skins (scripts/build_bow_anims.mjs):
+    // with a bow displayed the shot plays a draw instead of the crossbow
+    // shoulder-aim (visual.ts weaponSkinAttackClips).
+    animUrls: [`${PLAYERS}/bow_anims.glb`],
     // dedicated ranger model — the quiver is a built-in mesh, so it's no longer
     // a separate chest attachment
     attach: [{ url: `${WEAPONS}/crossbow_1handed.glb`, bone: 'handslot.r' }],
@@ -994,6 +1021,23 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: kaykit(['2H_Melee_Attack_Chop']),
     attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
   },
+  // The three zone Chroniclers (Saul, Osric Fenn, Zenzie): one shared
+  // scholarly-mage silhouette (hat, staff, open ledger in the off hand,
+  // the warlock spellbook grip) with the per-NPC entity tint carrying each
+  // identity. When the bespoke chronicler .glb files arrive, split this into
+  // one def per chronicler with its own url.
+  npc_chronicler: {
+    url: `${PLAYERS}/mage.glb`,
+    height: HUMANOID_H,
+    clips: kaykit(['2H_Melee_Attack_Chop']),
+    show: ['Mage_Hat'],
+    attach: [
+      { url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' },
+      { url: `${WEAPONS}/spellbook_open.glb`, bone: 'handslot.l', gripRef: 'Spellbook_open' },
+    ],
+    tint: 'entity',
+    tintStrength: 0.55,
+  },
   // Reedbound Acolyte (The Drowned Litany trash mob): Stone Cantor model from
   // the Raid 02 asset batch. The earlier Meshy mesh (reedbound_acolyte.glb) was
   // realistically proportioned and clashed with the chunky KayKit-style rigs;
@@ -1100,6 +1144,13 @@ const MOB_KEYS: Record<string, string> = {
   fallen_captain_aldren: 'skel_warrior',
   corrupted_priest_malric: 'skel_necromancer',
   deathstalker_voss: 'skel_rogue',
+  // The Nythraxis phase-2 heroic court is Aldren / Malric / Voss risen again, so
+  // the "Spirit of X" adds reuse each character's crypt visual above. Without these
+  // the ids fall through to FAMILY_KEYS.undead (skel_minion) and the whole court
+  // renders as identical generic skeletons. See spawnNythraxisHeroicAdds.
+  nythraxis_heroic_warrior_add: 'skel_warrior', // Spirit of Aldren
+  nythraxis_heroic_priest_add: 'skel_necromancer', // Spirit of Malric
+  nythraxis_heroic_rogue_add: 'skel_rogue', // Spirit of Voss
   vision_aldren_warrior: 'player_warrior',
   vision_malric_mage: 'player_mage',
   vision_deathstalker_voss: 'player_rogue',
@@ -1117,6 +1168,12 @@ const FAMILY_KEYS: Record<string, string> = {
   elemental: 'mob_elemental',
   dragonkin: 'mob_dragonkin',
   demon: 'mob_demonalt',
+  // deepfen_spearjaw already has an explicit MOB_KEYS override to mob_spearjaw
+  // (visualKeyFor checks MOB_KEYS first), so this default stays unreachable
+  // for it even after its family retag. It only matters for a future reptile
+  // mob with no override of its own; reuse the same model so that fallback
+  // is sane too.
+  reptile: 'mob_spearjaw',
 };
 
 const NPC_KEYS: Record<string, string> = {
@@ -1138,6 +1195,9 @@ const NPC_KEYS: Record<string, string> = {
   quartermaster_bree: 'npc_villager',
   brother_halven: 'npc_reliquary_keeper',
   brother_halven_marsh: 'npc_reliquary_keeper',
+  chronicler_saul: 'npc_chronicler',
+  chronicler_osric_fenn: 'npc_chronicler',
+  chronicler_edda_hartwell: 'npc_chronicler',
   // The graveyard angel: a robed figure, rendered translucent (ethereal) with a
   // holy shimmer by the renderer (see the spirit_healer branches there).
   spirit_healer: 'npc_villager_robed',
@@ -1183,6 +1243,9 @@ export function manifestUrls(): string[] {
   // Equipped-weapon models a player may swap to at runtime (any nearby player's
   // gear), so they are resolved-and-ready when setWeapon attaches them.
   for (const url of itemWeaponModelUrls()) urls.add(url);
+  // Season 1 Armory weapon-skin models: also attachable on any nearby player at
+  // any moment (account-wide cosmetics), so they preload with the same sweep.
+  for (const url of weaponSkinModelUrls()) urls.add(url);
   return [...urls];
 }
 

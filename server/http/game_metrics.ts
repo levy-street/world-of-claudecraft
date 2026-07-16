@@ -99,6 +99,20 @@ export interface GameStateSource {
   simTickHz(): number | null;
   /** Per-phase p95/max in MILLISECONDS, keyed by phase name; missing phases are skipped. */
   tickPhaseMillis(): Record<string, TickPhaseMillis>;
+  /**
+   * Wall clock (epoch millis) of the last COMPLETED tick pass, null during warmup.
+   * This one is NOT a Prometheus gauge (loop rate is already covered by
+   * woc_sim_tick_hz): it exists so main.ts can hand this same source object to the
+   * /livez staleness read in server/http/health.ts.
+   */
+  lastTickAt(): number | null;
+  /**
+   * Wall clock (epoch millis) when the game loop was last started, null before it.
+   * Also NOT a Prometheus gauge: it is the /livez staleness backstop for a loop that
+   * has started but not yet completed a pass, so a boot-time wedge (every tick throws)
+   * still reads as stale rather than as warmup forever.
+   */
+  loopStartedAt(): number | null;
 }
 
 /**

@@ -2,7 +2,7 @@
 // grip every movable .window.panel gets from src/ui/window_resize.ts). DOM-free
 // so Vitest drives it directly: the controller feeds it plain numbers.
 //
-// Space conventions mirror the drag logic in hud.ts (setWindowPixelPosition):
+// Space conventions mirror window_drag.ts and Hud.setWindowPixelPosition:
 // pointer clientX/clientY and getBoundingClientRect() arrive in *visual* (zoomed)
 // space, while style.width/height are author lengths the browser multiplies by
 // the #ui `zoom`. Corner hit-testing happens in visual space (rect + pointer +
@@ -13,18 +13,9 @@
 export const RESIZE_CORNER_BAND = 18;
 /** SE-corner hit band, author px (coarse/touch pointer; WCAG 2.5.8 >=24px). */
 export const RESIZE_CORNER_BAND_TOUCH = 28;
-/** Smallest size a window can be dragged down to, author px. The floor leaves
- *  every resizable window's whole chrome reachable at the minimum: titlebar +
- *  any tab rail + at least one content row + its primary action (live PR #1736
- *  feedback: a framed window could be dragged so small its actions vanished).
- *  The delve board carries the tallest fixed chrome (name, marks, two
- *  requirement lines, and the DELVE/SHOP tab rail, ~200px) before its scrolling
- *  body, so 300px clears that plus a shop row + Buy; 260px keeps an item row
- *  (icon + truncated name + Buy) legible. Both stay below the narrowest default
- *  window width (the social panel, 348px), so the floor only bounds shrinking
- *  and never makes a window open or first-resize oddly. */
-export const WINDOW_MIN_WIDTH = 260;
-export const WINDOW_MIN_HEIGHT = 300;
+/** Smallest size a window can be dragged down to, author px. */
+export const WINDOW_MIN_WIDTH = 220;
+export const WINDOW_MIN_HEIGHT = 140;
 /** Viewport edge margin a resize keeps clear, author px (matches the drag clamp). */
 export const WINDOW_RESIZE_MARGIN = 8;
 /** Pointer travel (visual px) before a corner press becomes a resize: a bare

@@ -688,7 +688,14 @@ describe('persistence and back-compat', () => {
     const sim2 = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
     const pid2 = sim2.addPlayer('warrior', 'Saver', { state: s1 });
     const s2 = sim2.serializeCharacter(pid2)!;
-    expect(s2).toEqual(s1);
+    // The Book of Deeds legitimately enriches a save across a load: joining
+    // seeds the discovery ledger from held items (the hand-stuffed bank rows
+    // above bypassed the addItem hub) and back-credits state predicates (12
+    // purchased slots earns the first-expansion deed). Everything else must
+    // round-trip byte-equal.
+    const { deeds: _d1, deedStats: _ds1, renown: _r1, ...bankRest1 } = s1;
+    const { deeds: _d2, deedStats: _ds2, renown: _r2, ...bankRest2 } = s2;
+    expect(bankRest2).toEqual(bankRest1);
     expect(s2.bank).toEqual({
       inventory: m.bank.inventory,
       purchasedSlots: 12,

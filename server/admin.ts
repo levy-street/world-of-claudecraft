@@ -5,6 +5,7 @@ import {
   classDistribution,
   clientPerfRaw,
   clientPerfSummary,
+  dailyRewardPointEvents,
   levelDistribution,
   listAccounts,
   listCharacters,
@@ -47,12 +48,14 @@ import {
   updateFilterConfig,
   type WordTier,
 } from './chat_filter_db';
+import { currentDailyRewardDay } from './daily_rewards';
 import {
   accountById,
   accountForToken,
   accountMailTarget,
   findAccount,
   isAdminAccount,
+  loadAccountFlair,
   pool,
   revokeTokensExcept,
   saveToken,
@@ -88,6 +91,8 @@ import {
   moderationReportsForAccount,
   muteAccountChat,
   recordPasswordReset,
+  setAccountAiFlag,
+  setAccountStreamerFlair,
   setDailyRewardsBan,
   setDailyRewardsIpBan,
 } from './moderation_db';
@@ -115,6 +120,42 @@ const ACTIVITY_WINDOW_DAYS = 30;
 const ANTIBOT_CONFIG_NOTE_MAX = 500;
 
 const IP_BLOCK_KICK_MESSAGE = 'Connection to the server was lost.';
+
+// Account-flair validation messages. Named constants so the two dispatch twins (the
+// legacy handleAdminApi arm and the RouteDef handler) can never drift, and so the
+// dashboard has a stable string to map onto its own i18n key. `invalid streamer
+// link` is raised by moderation_db.setAccountStreamerFlair and surfaces through the
+// same err.message path every other admin write uses.
+const AI_FLAG_REQUIRED = 'ai must be a boolean';
+const STREAMER_FLAG_REQUIRED = 'streamer must be a boolean';
+const STREAMER_LINKS_REQUIRED = 'a links object is required';
+const ACCOUNT_FLAIR_FAILED = 'failed to update account flair';
+const DAILY_REWARD_EVENT_DAY_REQUIRED = 'a valid daily rewards date is required';
+
+async function dailyRewardEventDay(value: string | null): Promise<string | null> {
+  if (value === null) return currentDailyRewardDay();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+  const parsed = new Date(`${value}T00:00:00.000Z`);
+  return Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value
+    ? value
+    : null;
+}
+
+/**
+ * Decode the request's `links` bag, three-valued:
+ *  - an object: the bag REPLACES the stored links (an explicit `{}` clears them);
+ *  - `undefined` (key absent): LEAVE the stored links alone. The dashboard's three
+ *    streamer actions (mark / unmark / save links) all send the full bag, but a caller
+ *    that sends only the flag must never wipe an account's links by omission, and
+ *    unmarking a streamer deliberately keeps them (wireStreamerLinks is what stops
+ *    them shipping, so stored-but-not-shipped is the correct state);
+ *  - `null`: malformed (an array or a scalar), which the handler turns into a 400.
+ */
+function streamerLinksBody(value: unknown): Record<string, unknown> | null | undefined {
+  if (value === undefined || value === null) return undefined;
+  if (typeof value !== 'object' || Array.isArray(value)) return null;
+  return value as Record<string, unknown>;
+}
 
 // Map editor moderation reads/writes go straight to the db layer (like the
 // other *_db imports here); the player-facing rules stay in maps.ts. LAZY
@@ -504,6 +545,7 @@ export async function handleAdminApi(
           adminAccountId: accountId,
           banned: dailyRewardsBanMatch[2] === 'ban',
           reason: body.reason,
+          durationHours: body.durationHours,
         });
         return ok(res, { ok: true });
       } catch (err) {
@@ -635,6 +677,52 @@ export async function handleAdminApi(
         return ok(res, { ok: true });
       } catch (err) {
         return fail(res, 400, err instanceof Error ? err.message : 'password reset failed');
+      }
+    }
+
+    // Account flair: the AI-operated mark and an official streamer's links. Both
+    // are cosmetic and non-punitive, so (unlike suspend/ban/chat-mute) there is
+    // deliberately NO isAdminAccount guard: marking a staff account as a streamer
+    // is a legitimate edit (a developer who streams), and no reason is required.
+    // The write is still audited, and the live push lands the change on a connected
+    // player with no reconnect (the identity diff re-broadcasts it).
+    const aiFlagMatch = /^\/admin\/api\/accounts\/(\d+)\/ai$/.exec(path);
+    if (req.method === 'POST' && aiFlagMatch) {
+      const targetAccountId = Number(aiFlagMatch[1]);
+      const body = await readBody(req);
+      if (typeof body.ai !== 'boolean') return fail(res, 400, AI_FLAG_REQUIRED);
+      try {
+        await setAccountAiFlag({
+          accountId: targetAccountId,
+          adminAccountId: accountId,
+          ai: body.ai,
+          reason: body.reason,
+        });
+        game.applyAccountFlairLive(targetAccountId, await loadAccountFlair(targetAccountId));
+        return ok(res, { ok: true });
+      } catch (err) {
+        return fail(res, 400, err instanceof Error ? err.message : ACCOUNT_FLAIR_FAILED);
+      }
+    }
+    const streamerFlairMatch = /^\/admin\/api\/accounts\/(\d+)\/streamer$/.exec(path);
+    if (req.method === 'POST' && streamerFlairMatch) {
+      const targetAccountId = Number(streamerFlairMatch[1]);
+      const body = await readBody(req);
+      if (typeof body.streamer !== 'boolean') return fail(res, 400, STREAMER_FLAG_REQUIRED);
+      const links = streamerLinksBody(body.links);
+      if (links === null) return fail(res, 400, STREAMER_LINKS_REQUIRED);
+      try {
+        await setAccountStreamerFlair({
+          accountId: targetAccountId,
+          adminAccountId: accountId,
+          streamer: body.streamer,
+          links,
+          reason: body.reason,
+        });
+        game.applyAccountFlairLive(targetAccountId, await loadAccountFlair(targetAccountId));
+        return ok(res, { ok: true });
+      } catch (err) {
+        return fail(res, 400, err instanceof Error ? err.message : ACCOUNT_FLAIR_FAILED);
       }
     }
 
@@ -894,6 +982,15 @@ export async function handleAdminApi(
         blockedIps: getBlockedIpsForAccount(game, detail),
       });
     }
+    const dailyRewardEventsMatch = /^\/admin\/api\/accounts\/(\d+)\/daily-rewards-events$/.exec(
+      path,
+    );
+    if (dailyRewardEventsMatch) {
+      const day = await dailyRewardEventDay(url.searchParams.get('day'));
+      if (!day) return fail(res, 400, DAILY_REWARD_EVENT_DAY_REQUIRED);
+      const limit = Number(url.searchParams.get('limit') ?? '100');
+      return ok(res, await dailyRewardPointEvents(Number(dailyRewardEventsMatch[1]), day, limit));
+    }
     const detailMatch = /^\/admin\/api\/accounts\/(\d+)$/.exec(path);
     if (detailMatch) {
       const id = Number(detailMatch[1]);
@@ -1017,6 +1114,9 @@ export type AdminRuntime = Pick<
   | 'muteAccountChat'
   | 'liftChatMuteLive'
   | 'resetChatStrikesLive'
+  // Push an operator's account-flair edit onto the account's live session, so the
+  // AI mark / streamer links change without a reconnect.
+  | 'applyAccountFlairLive'
   | 'reloadChatFilter'
   | 'reloadBlockedIps'
   | 'disconnectByIp'
@@ -1063,6 +1163,7 @@ function makeRealAdminDb() {
     classDistribution,
     clientPerfRaw,
     clientPerfSummary,
+    dailyRewardPointEvents,
     levelDistribution,
     listAccounts,
     listCharacters,
@@ -1114,6 +1215,11 @@ function makeRealAdminDb() {
     recordPasswordReset,
     setDailyRewardsBan,
     setDailyRewardsIpBan,
+    // Account flair: the two audited writes plus the read-back the live push sends
+    // (the DB row, never the request body, is the source of truth for what ships).
+    setAccountAiFlag,
+    setAccountStreamerFlair,
+    loadAccountFlair,
     emailSecurityIncident,
     providerUsageSnapshot,
     rateLimited,
@@ -1589,6 +1695,7 @@ async function dailyRewardsBanHandler(ctx: Ctx): Promise<void> {
       adminAccountId: ctxAccountId(ctx),
       banned,
       reason: body.reason,
+      durationHours: body.durationHours,
     });
     return ok(ctx.res, { ok: true });
   } catch (err) {
@@ -1737,6 +1844,14 @@ async function accountDetailHandler(ctx: Ctx): Promise<void> {
   ok(ctx.res, { ...detail, online: rt.liveAccountIds().has(id) });
 }
 
+/** GET /admin/api/accounts/:id/daily-rewards-events: bounded point-award ledger. */
+async function dailyRewardPointEventsHandler(ctx: Ctx): Promise<void> {
+  const day = await dailyRewardEventDay(ctx.url.searchParams.get('day'));
+  if (!day) return fail(ctx.res, 400, DAILY_REWARD_EVENT_DAY_REQUIRED);
+  const limit = Number(ctx.url.searchParams.get('limit') ?? '100');
+  ok(ctx.res, await adminDb().dailyRewardPointEvents(adminTargetId(ctx), day, limit));
+}
+
 /**
  * POST /admin/api/accounts/:id/reset-password: set a new password on any account.
  * Audit row first (no live effect without its record), then the credential write,
@@ -1777,6 +1892,60 @@ async function resetPasswordHandler(ctx: Ctx): Promise<void> {
     return ok(ctx.res, { ok: true });
   } catch (err) {
     return fail(ctx.res, 400, err instanceof Error ? err.message : 'password reset failed');
+  }
+}
+
+/**
+ * POST /admin/api/accounts/:id/ai: mark the account as AI-operated (or clear it).
+ * Cosmetic and non-punitive: no reason is required and, unlike suspend/ban/chat-mute,
+ * there is NO isAdminAccount guard (a staff account can legitimately carry flair).
+ * The audited write lands first, then the freshly-read flair is pushed to any live
+ * session so a connected player sees it without reconnecting.
+ */
+async function accountAiFlagHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const targetAccountId = adminTargetId(ctx);
+  const body = await readBody(ctx.req);
+  if (typeof body.ai !== 'boolean') return fail(ctx.res, 400, AI_FLAG_REQUIRED);
+  try {
+    await adminDb().setAccountAiFlag({
+      accountId: targetAccountId,
+      adminAccountId: ctxAccountId(ctx),
+      ai: body.ai,
+      reason: body.reason,
+    });
+    rt.applyAccountFlairLive(targetAccountId, await adminDb().loadAccountFlair(targetAccountId));
+    return ok(ctx.res, { ok: true });
+  } catch (err) {
+    return fail(ctx.res, 400, err instanceof Error ? err.message : ACCOUNT_FLAIR_FAILED);
+  }
+}
+
+/**
+ * POST /admin/api/accounts/:id/streamer: set the streamer flag + platform links.
+ * Every link is validated by normalizeStreamerLink inside the db write (https only,
+ * that platform's own hosts, no credentials): a hostile value throws before any row
+ * changes, so a rejected link never reaches the database, let alone a client.
+ */
+async function accountStreamerFlairHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const targetAccountId = adminTargetId(ctx);
+  const body = await readBody(ctx.req);
+  if (typeof body.streamer !== 'boolean') return fail(ctx.res, 400, STREAMER_FLAG_REQUIRED);
+  const links = streamerLinksBody(body.links);
+  if (links === null) return fail(ctx.res, 400, STREAMER_LINKS_REQUIRED);
+  try {
+    await adminDb().setAccountStreamerFlair({
+      accountId: targetAccountId,
+      adminAccountId: ctxAccountId(ctx),
+      streamer: body.streamer,
+      links,
+      reason: body.reason,
+    });
+    rt.applyAccountFlairLive(targetAccountId, await adminDb().loadAccountFlair(targetAccountId));
+    return ok(ctx.res, { ok: true });
+  } catch (err) {
+    return fail(ctx.res, 400, err instanceof Error ? err.message : ACCOUNT_FLAIR_FAILED);
   }
 }
 
@@ -2031,12 +2200,38 @@ export const routes: RouteDef[] = [
     handler: accountDetailHandler,
   },
   {
+    method: 'GET',
+    path: '/admin/api/accounts/:id/daily-rewards-events',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: dailyRewardPointEventsHandler,
+  },
+  {
     method: 'POST',
     path: '/admin/api/accounts/:id/reset-password',
     surface: 'admin',
     middleware: [requireAdmin, requireAdminTarget('account')],
     meta: adminTargetMeta('account'),
     handler: resetPasswordHandler,
+  },
+
+  // Account flair: the AI-operated mark and an official streamer's platform links.
+  {
+    method: 'POST',
+    path: '/admin/api/accounts/:id/ai',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: accountAiFlagHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/accounts/:id/streamer',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: accountStreamerFlairHandler,
   },
 
   // Staff-role management (release v0.22.0 fine-grained permissions).

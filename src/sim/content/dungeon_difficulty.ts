@@ -1,8 +1,8 @@
 import type { DungeonDifficulty } from '../types';
 
-// The participation token every eligible player can loot once from a heroic
-// final-boss corpse (a personalFor slot per participant; see awardHeroicMarks
-// in ../instances/dungeons.ts). The item record lives in ./items.ts.
+// The participation token awarded directly to every eligible player when a
+// heroic final boss dies (see awardHeroicMarks in ../instances/dungeons.ts).
+// The item record lives in ./items.ts.
 export const HEROIC_MARK_ITEM_ID = 'heroic_mark';
 
 export interface HeroicDungeonTuning {
@@ -12,11 +12,10 @@ export interface HeroicDungeonTuning {
   healthMultiplier: number;
   damageMultiplier: number;
   armorMultiplier: number;
-  // The dungeon's last boss: killing it in a heroic instance drops Heroic
+  // The dungeon's last boss: killing it in a heroic instance awards Heroic
   // Marks for every eligible participant.
   finalBossId: string;
-  // Marks each participant can loot from the final-boss corpse (one
-  // personalFor slot per mark, so a single loot click takes them all).
+  // Marks awarded directly to each eligible participant at kill time.
   marksPerParticipant: number;
 }
 

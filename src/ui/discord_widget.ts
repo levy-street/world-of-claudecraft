@@ -1,6 +1,6 @@
 // Thin DOM consumer for the Discord HUD window (#discord-window).
 //
-// Mirrors src/ui/vendor_window.ts: it imports t/esc/svgIcon + the formatters and
+// Mirrors src/ui/hud/vendor/vendor_window.ts: it imports t/esc/svgIcon + the formatters and
 // the pure tier presentation directly, but takes Hud's shared painters
 // (attachTooltip/hideTooltip) and the action callbacks via an injected `deps`
 // object. It owns no state and never imports Hud. The branching logic lives in
@@ -92,10 +92,15 @@ export function renderDiscordWidget(
 
   let account = '';
   if (view.mode === 'unlinked') {
+    // The Discord (U) panel is the game HUD's single Discord entry point (the
+    // corner community tray's separate invite link was removed as a
+    // duplicate), so an unlinked player still gets a one-click plain "join
+    // the server" path alongside the account-linking CTA.
     account =
       `<div class="dc-link-cta">` +
       `<p class="dc-benefits">${esc(t('hudChrome.discord.link.benefits'))}</p>` +
       `<button type="button" class="dc-btn dc-btn-primary" data-action="link">${esc(t('hudChrome.discord.link.cta'))}</button>` +
+      `<button type="button" class="dc-btn dc-btn-ghost" data-action="join-server">${esc(t('hudChrome.discord.link.joinServer'))}</button>` +
       `</div>`;
   } else if (view.mode === 'linked') {
     const tierName = discordStatusDisplayName(view.tierIndex);
@@ -184,6 +189,9 @@ export function renderDiscordWidget(
     deps.onOpenUrl(input.inviteUrl),
   );
   el.querySelector<HTMLElement>('[data-action="join"]')?.addEventListener('click', () =>
+    deps.onOpenUrl(input.inviteUrl),
+  );
+  el.querySelector<HTMLElement>('[data-action="join-server"]')?.addEventListener('click', () =>
     deps.onOpenUrl(input.inviteUrl),
   );
 }

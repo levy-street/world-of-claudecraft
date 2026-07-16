@@ -6,12 +6,16 @@
 
   let {
     isAdmin = false,
+    isAi = false,
+    isStreamer = false,
     online = false,
     status,
     suspendedUntil = null,
     size = 'compact',
   }: {
     isAdmin?: boolean;
+    isAi?: boolean;
+    isStreamer?: boolean;
     online?: boolean;
     status?: AccountStatus;
     suspendedUntil?: string | null;
@@ -21,6 +25,8 @@
 
 <span class="account-indicators">
   {#if isAdmin}<Badge variant="admin" {size}>{t('accounts.badgeAdmin')}</Badge>{/if}
+  {#if isAi}<Badge variant="neutral" {size}>{t('accounts.badgeAi')}</Badge>{/if}
+  {#if isStreamer}<Badge variant="success" {size}>{t('accounts.badgeStreamer')}</Badge>{/if}
   {#if online}<Badge variant="success" {size}>{t('moderation.badgeOnline')}</Badge>{/if}
   {#if status === 'banned'}
     <Badge variant="bad" {size}>{t('accounts.badgeBanned')}</Badge>

@@ -172,11 +172,14 @@ export const ENTITY_EXCLUDE: ReadonlySet<string> = new Set([
   'skinCatalog',
   'potionCdRemaining', // derived display copy of potionCooldownUntil (the pinned authority)
   'mainhandItemId', // render-only; "the sim never reads it for gameplay"
+  'weaponSkinLoadout', // cosmetic weapon-skin selection; never read for gameplay
+  'weaponSkinId', // render-only resolved weapon-skin mirror
   'equippedItems', // render-only mirror for inspect; sim never reads it for gameplay
   'equippedInstances', // render-only mirror (Enchanting); the sim reads the SOURCE (meta.equipmentInstance), never this
   'holderTier', // cosmetic wallet flair; sim never reads it
   'holderBalance',
   'stealthed', // derived cache of auras.some(a => a.kind === 'stealth'); auras is sampled
+  'weaponStowed', // Z-key sheathe pose; render-only, no gameplay path reads it
 ]);
 
 // Session-only / presentation / derived PlayerMeta fields. Derived fields

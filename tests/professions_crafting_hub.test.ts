@@ -7,8 +7,14 @@ import {
   CRAFTING_HUB_STATIONS,
   CRAFTING_HUB_ZONE_ID,
 } from '../src/sim/content/professions';
-import { COMBO_RECIPES, COMMON_RECIPES, TOOL_RECIPES } from '../src/sim/content/recipes';
-import { resolveCraft } from '../src/sim/professions/crafting';
+import {
+  ALL_RECIPES,
+  COMBO_RECIPES,
+  COMMON_RECIPES,
+  TOOL_RECIPES,
+} from '../src/sim/content/recipes';
+import { ITEMS, NPCS } from '../src/sim/data';
+import { craftItem, resolveCraft } from '../src/sim/professions/crafting';
 import {
   canUseCraftingHubStation,
   isAtCraftingHub,
@@ -152,5 +158,111 @@ describe('resolveCraft gates station-bound recipes on hub presence + level (#129
     const result = resolveCraft((sim as any).ctx, pid, 'recipe_eastbrook_arming_sword');
 
     expect(result.ok).toBe(true);
+  });
+});
+
+describe('hub reagent sourcing (prog_tools_of_the_trade completability)', () => {
+  const HUB_REAGENTS = [
+    'thorium_ore',
+    'arcanite_bar',
+    'ashwood_log',
+    'elderwood_log',
+    'goldleaf_herb',
+    'sunpetal_herb',
+  ] as const;
+
+  // Every id a player can actually buy: on some NPC's vendor list AND carrying
+  // the buyValue the live buy path requires (items.ts buyItem checks both).
+  const vendorSold = new Set<string>();
+  for (const npc of Object.values(NPCS)) {
+    for (const id of npc.vendorItems ?? []) if (ITEMS[id]?.buyValue) vendorSold.add(id);
+  }
+
+  function acquirable(itemId: string, seen: Set<string> = new Set()): boolean {
+    if (vendorSold.has(itemId)) return true;
+    if (seen.has(itemId)) return false;
+    seen.add(itemId);
+    // Each sibling reagent branch gets its own copy of the path: `seen` is a
+    // cycle guard, not a global visited set, so a craftable intermediate
+    // shared by two siblings is not wrongly reported unreachable.
+    return ALL_RECIPES.some(
+      (r) =>
+        r.resultItemId === itemId && r.reagents.every((g) => acquirable(g.itemId, new Set(seen))),
+    );
+  }
+
+  it('every station-bound recipe reagent chain bottoms out at a live vendor', () => {
+    // The deed needs one hub craft, so at least one recipe must be completable;
+    // this pins ALL six, reagents and base tools alike, so no future recipe or
+    // stock edit can silently strand the deed again.
+    for (const recipe of TOOL_RECIPES) {
+      for (const reagent of recipe.reagents) {
+        expect(
+          acquirable(reagent.itemId),
+          `${recipe.id} reagent ${reagent.itemId} has no live source`,
+        ).toBe(true);
+      }
+    }
+  });
+
+  it('Quartermaster Bree sells all six reagents from inside the hub circle', () => {
+    const bree = NPCS.quartermaster_bree;
+    for (const id of HUB_REAGENTS) {
+      expect(bree.vendorItems, `${id} missing from Bree's stock`).toContain(id);
+    }
+    // Buying and crafting happen at the same hub: Bree's counter is inside the
+    // station circle, so the shopping trip and the craft share one location.
+    const distToHub = Math.hypot(bree.pos.x - CRAFTING_HUB_POS.x, bree.pos.z - CRAFTING_HUB_POS.z);
+    expect(distToHub).toBeLessThanOrEqual(CRAFTING_HUB_RADIUS);
+    // Price pins (literals, not derived): the trade-goods 4x staple markup,
+    // and buy stays above sell so there is no vendor arbitrage loop.
+    for (const id of HUB_REAGENTS) {
+      const def = ITEMS[id];
+      // The ternary treats "not epic" as rare, so pin the quality itself too:
+      // a retag to any other quality must fail here, not slip past the prices.
+      expect(['rare', 'epic'], `${id} quality`).toContain(def.quality);
+      expect(def.buyValue, `${id} buyValue`).toBe(def.quality === 'epic' ? 160 : 60);
+      expect(def.sellValue, `${id} sellValue`).toBe(def.quality === 'epic' ? 40 : 15);
+    }
+  });
+
+  it('vendor purchases alone complete the deed: shop at Wilkes and Bree, craft, grant', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    sim.setPlayerLevel(CRAFTING_HUB_MIN_LEVEL);
+    const anySim = sim as any;
+    const meta = anySim.players.get(pid);
+    meta.copper = 390; // mithril_mining_pick 150 + four thorium_ore at 60, exact
+
+    const npcEntity = (templateId: string) =>
+      [...anySim.entities.values()].find((e: any) => e.templateId === templateId);
+    const placeAt = (pos: { x: number; z: number }) => {
+      const e = anySim.entities.get(pid);
+      e.pos.x = pos.x;
+      e.pos.z = pos.z;
+      e.prevPos = { ...e.pos };
+    };
+
+    // Every recipe input comes from a real vendor purchase, nothing granted:
+    // the base tool from Trader Wilkes in Eastbrook, the ore from Bree.
+    const wilkes = npcEntity('trader_wilkes');
+    placeAt(wilkes.pos);
+    sim.buyItem(wilkes.id, 'mithril_mining_pick');
+    expect(sim.countItem('mithril_mining_pick', pid)).toBe(1);
+
+    const bree = npcEntity('quartermaster_bree');
+    placeAt(bree.pos);
+    for (let i = 0; i < 4; i++) sim.buyItem(bree.id, 'thorium_ore');
+    expect(sim.countItem('thorium_ore', pid)).toBe(4);
+    expect(meta.copper).toBe(0); // both price literals held
+
+    // Bree stands inside the hub circle, so the craft resolves right there.
+    const result = craftItem(anySim.ctx, 'recipe_thorium_mining_pick', pid);
+    expect(result.ok).toBe(true);
+    expect(sim.countItem('thorium_mining_pick', pid)).toBe(1);
+    expect(sim.countItem('thorium_ore', pid)).toBe(0);
+    expect(meta.deedStats.counters.hubCraftsPerformed).toBe(1);
+    sim.tick();
+    expect(meta.deedsEarned.has('prog_tools_of_the_trade')).toBe(true);
   });
 });

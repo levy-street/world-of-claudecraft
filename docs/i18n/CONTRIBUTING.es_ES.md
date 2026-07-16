@@ -13,7 +13,7 @@ fallo, crear una mazmorra entera: todo cuenta, y aquí eres bienvenido.
 
 Esta guía te ayudará a ponerte en marcha y a que tu primera contribución salga
 rodada. No hace falta que seas un experto. Si algo no queda claro, pregunta en
-[Discord](https://discord.gg/GjhnUsBtw) y alguien estará encantado de echarte una
+[Discord](https://discord.com/invite/worldofclaudecraft) y alguien estará encantado de echarte una
 mano.
 
 Al participar, aceptas seguir nuestro [Código de conducta](../../CODE_OF_CONDUCT.md).
@@ -180,7 +180,7 @@ escribir nada de código de juego para hacerlo:
 3. Ejecuta `npx tsc --noEmit` para confirmar que no falta nada y luego abre un PR.
 
 Para proponer un idioma totalmente nuevo, o para hablar del tono y la terminología,
-abre un hilo en [Discord](https://discord.gg/GjhnUsBtw) y te ayudaremos a montarlo.
+abre un hilo en [Discord](https://discord.com/invite/worldofclaudecraft) y te ayudaremos a montarlo.
 Los hablantes nativos y los que dominan el idioma son especialmente bienvenidos.
 Una buena traducción hace que el juego se sienta como en casa para los jugadores de
 todas partes.
@@ -201,7 +201,7 @@ Por favor, usa las
 ## Cómo conseguir ayuda
 
 ¿Te has atascado o solo quieres saludar? Únete al
-[Discord de la comunidad](https://discord.gg/GjhnUsBtw). Ninguna pregunta es
+[Discord de la comunidad](https://discord.com/invite/worldofclaudecraft). Ninguna pregunta es
 demasiado pequeña, y quien contribuye por primera vez siempre es bienvenido.
 
 ## Licencia

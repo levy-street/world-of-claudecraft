@@ -359,6 +359,8 @@ export class PostOffice {
       delaySeconds: MAIL_DELIVERY_SECONDS,
     });
     this.result(meta.entityId, 'sent', { name: recipient.name, value: MAIL_POSTAGE });
+    // Only a letter carrying coin or parcels counts; a bare note does not.
+    if (coin > 0 || items.length > 0) this.ctx.bumpDeedStat(meta, 'mailAttachmentsSent', 1);
   }
 
   // Take everything attached to one letter: coin into the purse, parcels into

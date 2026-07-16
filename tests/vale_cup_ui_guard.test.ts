@@ -11,7 +11,7 @@
 // nation flag colors are DERIVED from the VC_NATIONS data record), the
 // write-elision routing of the two per-frame painters, and the hud.ts call
 // sites (mediumHud cadence, Esc routing, kickoff auto-close, relocalize
-// fan-out, the offline pid filter, and the Sowfield music arm).
+// fan-out, the offline pid filter, and the action-bar world seam).
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
@@ -44,11 +44,9 @@ describe('vale_cup_window: WCAG chrome (focusable controls + focus-return)', () 
     expect(windowSrc).toContain('buildVcupView(');
   });
 
-  it('gives the close control a real button via the shared frame builder', () => {
-    // The chrome (titlebar + close button) is stamped by the shared window-frame
-    // builder; the window names its own close aria key on the descriptor.
-    expect(windowSrc).toContain('renderWindowFrame(');
-    expect(windowSrc).toContain("closeLabelKey: 'hudChrome.vcup.close'");
+  it('gives the close control a real button with an aria-label', () => {
+    expect(windowSrc).toContain('class="x-btn" data-close aria-label=');
+    expect(windowSrc).toContain("t('hudChrome.vcup.close')");
   });
 
   it('renders bracket tabs, the nation flag grid, and roles as real buttons with aria-pressed', () => {
@@ -61,9 +59,7 @@ describe('vale_cup_window: WCAG chrome (focusable controls + focus-return)', () 
   });
 
   it('routes every close path through close() so focus returns to the opener', () => {
-    // The frame builder wires its close control to the injected onClose, which the
-    // window points at close() (WCAG 2.4.3 focus-return).
-    expect(windowSrc).toContain('() => this.close()');
+    expect(windowSrc).toContain("data-close]')?.addEventListener('click', () => this.close())");
     expect(windowSrc).toContain('this.deps.restoreFocus(this.openerFocus)');
     expect(windowSrc).toContain('this.openerFocus = this.deps.captureFocus()');
   });
@@ -336,18 +332,17 @@ describe('vale_cup hud.ts call sites', () => {
     }
   });
 
-  it('plays the Sowfield match theme inside the stadium footprint', () => {
-    expect(hud).toContain('isAtSowfield(p.pos.x, p.pos.z)');
-    expect(hud).toContain("? 'vale_cup'");
-  });
-
   it('seeds the sport hotbar form off the IWorld snapshot (cupInfo.match + my roster)', () => {
     // No phase check on purpose: the sim restores the class kit in the SAME
     // tick it nulls the match, so the form must hold through 'over' or
     // syncSlotMap would wipe the saved class bar against the sport known list.
-    expect(hud).toContain("if (cupMatch && cupMatch.team !== null) return 'sport';");
-    expect(hud).not.toContain("cupMatch.phase !== 'over'");
-    // the sport bar never inherits the class bar, and sport ids never pollute it
-    expect(hud).toContain("if (form === 'sport') return !!SPORT_ABILITIES[id];");
+    const start = hud.indexOf('isInSportMatch: () => {');
+    const end = hud.indexOf('showAttackButton:', start);
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    const wiring = hud.slice(start, end);
+    expect(wiring).toContain('const match = this.sim.cupInfo?.match;');
+    expect(wiring).toContain('return !!match && match.team !== null;');
+    expect(wiring).not.toContain('.phase');
   });
 });

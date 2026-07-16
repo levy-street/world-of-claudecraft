@@ -26,6 +26,9 @@ describe('electron IPC channel contract (preload <-> main)', () => {
         'desktop-login-open-browser',
         'desktop-login-take-code',
         'desktop-set-strings',
+        'desktop-steam-capability',
+        'desktop-steam-link-settled',
+        'desktop-steam-link-ticket',
         'desktop-update-install',
       ]),
     );
@@ -52,6 +55,34 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     }
   });
 
+  it('every ipcMain.handle body checks the trusted-sender gate FIRST', () => {
+    // A handler without the sender gate would answer IPC from any frame that
+    // somehow runs in the window (the deny-by-default posture's last line).
+    // Scan both registration sites: main.cjs handlers call trustedSender(...),
+    // the updater's injected gate is named isTrusted(...). The check must
+    // appear within the first statement's reach of the callback body.
+    const registrations = mainSide.split(/ipcMain\.handle\(/).slice(1);
+    expect(registrations.length).toBeGreaterThanOrEqual(5);
+    for (const body of registrations) {
+      const head = body.slice(0, 200);
+      expect(
+        /trustedSender\(|isTrusted\(/.test(head),
+        `an ipcMain.handle body does not gate on the trusted sender: ${head.split('\n')[0]}`,
+      ).toBe(true);
+    }
+  });
+
+  it('the steam-link-settled handler body cancels the live auth ticket', () => {
+    // The channel existing is not enough: the settle signal exists ONLY so the
+    // shell CancelAuthTickets the live handle promptly (Valve's contract), so
+    // the handler body must actually reach steamShell.cancelLinkTicket.
+    const main = read('electron/main.cjs');
+    const start = main.indexOf("ipcMain.handle('desktop-steam-link-settled'");
+    expect(start).toBeGreaterThan(-1);
+    const body = main.slice(start, main.indexOf('});', start));
+    expect(body).toContain('steamShell.cancelLinkTicket()');
+  });
+
   it('the bridge methods the client feature-checks exist in the preload', () => {
     for (const method of [
       'openBrowserLogin',
@@ -61,6 +92,9 @@ describe('electron IPC channel contract (preload <-> main)', () => {
       'reportRendererError',
       'onUpdateEvent',
       'installUpdate',
+      'steamLinkTicket',
+      'steamLinkSupported',
+      'steamLinkSettled',
     ]) {
       expect(preload, `preload is missing bridge method ${method}`).toContain(`${method}:`);
     }

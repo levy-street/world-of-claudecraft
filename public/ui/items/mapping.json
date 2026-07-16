@@ -1,7 +1,7 @@
 {
   "license": "CraftPix premium (royalty-free commercial). Icons purchased by Levy Street account - callum@levystreet.com",
   "iconSize": 128,
-  "note": "Item icons (resources, consumables, quest items, and armor equipment), curated + verified from CraftPix packs. WebP only.",
+  "note": "Item icons (resources, consumables, quest items, armor equipment, and bags), curated + verified from CraftPix packs unless the entry carries its own \"license\" field, which overrides the pack license above. WebP only; add art with `npm run assets:items`.",
   "entries": [
     {
       "itemId": "acolytes_circlet",
@@ -44,6 +44,14 @@
       "sourcePack": "armor",
       "sourceFile": "1.png",
       "confidence": "high"
+    },
+    {
+      "itemId": "backpack",
+      "name": "Backpack (implicit bag-bar slot; UI id, not an item)",
+      "sourcePack": "woc_bags",
+      "sourceFile": "WoC_Bag_10.png",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
       "itemId": "baked_bread",
@@ -641,6 +649,14 @@
       "confidence": "medium"
     },
     {
+      "itemId": "gravewoven_bag",
+      "name": "Gravewoven Bag",
+      "sourcePack": "woc_bags",
+      "sourceFile": "WoC_Bag_04.png",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "gravewoven_raiment",
       "name": "Gravewoven Raiment",
       "sourcePack": "armor",
@@ -846,9 +862,10 @@
     {
       "itemId": "linen_pouch",
       "name": "Linen Pouch",
-      "sourcePack": "generic100b",
-      "sourceFile": "34.png",
-      "confidence": "high"
+      "sourcePack": "woc_bags",
+      "sourceFile": "WoC_Bag_03.png",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
       "itemId": "linen_scrap",
@@ -947,6 +964,14 @@
       "sourcePack": "armor",
       "sourceFile": "10.png",
       "confidence": "medium"
+    },
+    {
+      "itemId": "mistcallers_duffel",
+      "name": "Fogbinder's Duffel",
+      "sourcePack": "woc_bags",
+      "sourceFile": "WoC_Bag_07.png",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
       "itemId": "mistveil_cord",
@@ -1628,6 +1653,14 @@
       "confidence": "medium"
     },
     {
+      "itemId": "travelers_knapsack",
+      "name": "Traveler's Knapsack",
+      "sourcePack": "woc_bags",
+      "sourceFile": "WoC_Bag_08.png",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "troll_fetish",
       "name": "Mirefen Troll Fetish",
       "sourcePack": "generic100b",
@@ -1728,9 +1761,10 @@
     {
       "itemId": "wolfhide_satchel",
       "name": "Wolfhide Satchel",
-      "sourcePack": "generic100b",
-      "sourceFile": "28.png",
-      "confidence": "high"
+      "sourcePack": "woc_bags",
+      "sourceFile": "WoC_Bag_06.png",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
       "itemId": "woven_robe",

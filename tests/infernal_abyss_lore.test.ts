@@ -54,13 +54,19 @@ describe('Infernal Abyss lore visions', () => {
 
     expect(sim.questLog.get('q_infernal_abyss_echoes')?.counts[0]).toBe(1);
     expect(sim.meta(allyPid)?.questLog.get('q_infernal_abyss_echoes')?.counts[0]).toBe(1);
-    const firstLine = infernalAbyssLoreLines('charred_legion_tablet')?.[0];
-    expect(sim.events).toContainEqual(
-      expect.objectContaining({ type: 'log', pid: sim.playerId, text: firstLine }),
-    );
-    expect(sim.events).toContainEqual(
-      expect.objectContaining({ type: 'log', pid: allyPid, text: firstLine }),
-    );
+    // BOTH vision lines reach BOTH party members (dropping the second line of
+    // the two-line revelation must red this test). The second line rides the
+    // delayed-event queue five seconds behind the first, so collect across it.
+    const collected = [...sim.events];
+    for (let i = 0; i < 20 * 6; i++) collected.push(...sim.tick());
+    for (const line of infernalAbyssLoreLines('charred_legion_tablet') ?? []) {
+      expect(collected).toContainEqual(
+        expect.objectContaining({ type: 'log', pid: sim.playerId, text: line }),
+      );
+      expect(collected).toContainEqual(
+        expect.objectContaining({ type: 'log', pid: allyPid, text: line }),
+      );
+    }
   });
 
   it('localizes every lore line in the five non-Latin M16 locales', () => {

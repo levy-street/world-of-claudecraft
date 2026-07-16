@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { placeInfernalAbyssAtmosphere } from '../src/render/infernal_abyss_atmosphere';
+import { placeInfernalAbyssDressing } from '../src/render/infernal_abyss_dressing';
 import { placeInfernalAbyssFloorAccents } from '../src/render/infernal_abyss_floor_accents';
 import { INFERNAL_ABYSS_LAYOUT } from '../src/sim/dungeon_layout';
 
@@ -30,6 +31,37 @@ describe('Infernal Abyss render accents', () => {
     expect(low.veinSegments).toBeLessThan(high.veinSegments);
     expect(low.crustPlates).toBeLessThan(high.crustPlates);
     expect(low.triangles).toBeLessThan(high.triangles);
+  });
+
+  it('renders the identical lava footprint on both graphics tiers (fairness)', () => {
+    // Lava is the one ACTIONABLE hazard in the dungeon: per
+    // docs/design/graphics-settings-fairness.md a tier may shed lights and
+    // cosmetics but never the hazard geometry a player reacts to. Pin the
+    // lava mesh set (count, position, scale) byte-equal across tiers.
+    const lavaOnly = {
+      ...INFERNAL_ABYSS_LAYOUT,
+      decor: (INFERNAL_ABYSS_LAYOUT.decor ?? []).filter((decor) =>
+        ['lava_pool', 'lava_fissure', 'lava_moat'].includes(decor.key),
+      ),
+      barriers: [],
+    };
+    const snapshot = (lowGfx: boolean) => {
+      const group = new THREE.Group();
+      placeInfernalAbyssDressing(group, lavaOnly, lowGfx, []);
+      return group.children
+        .filter((child): child is THREE.Mesh => child instanceof THREE.Mesh)
+        .map((mesh) => ({
+          x: mesh.position.x,
+          z: mesh.position.z,
+          yaw: mesh.rotation.y,
+          scale: mesh.scale.toArray(),
+        }));
+    };
+    const high = snapshot(false);
+    const low = snapshot(true);
+    expect(lavaOnly.decor.length).toBe(10);
+    expect(high).toHaveLength(lavaOnly.decor.length);
+    expect(low).toEqual(high);
   });
 
   it('keeps the cavern atmosphere at a fixed draw-call budget on both tiers', () => {

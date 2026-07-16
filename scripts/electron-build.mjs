@@ -7,6 +7,7 @@ import {
   azureSignOptionsFromEnv,
   desktopBuilderConfig,
   isChannelFeedFile,
+  keyVaultSignConfigFromEnv,
   stampChannelFeedFiles,
 } from './electron-builder-config.mjs';
 import { buildElectronVendor } from './electron-vendor.mjs';
@@ -101,6 +102,9 @@ const config = desktopBuilderConfig({
   loginOrigin,
   crashSubmitUrl: process.env.WOC_CRASH_SUBMIT_URL ?? '',
   azureSign: process.platform === 'win32' ? azureSignOptionsFromEnv(process.env) : null,
+  // The Azure Key Vault certificate route (the AzureSignTool hook); the config
+  // derivation prefers azureSign when both credential sets are present.
+  keyVaultSign: process.platform === 'win32' ? keyVaultSignConfigFromEnv(process.env) : null,
   // The update track defaults from apiOrigin (production origin publishes the
   // 'latest' feed, anything else 'dev'); WOC_UPDATE_CHANNEL=dev stages a
   // production-origin artifact on the dev track for update-pipeline testing.
@@ -108,6 +112,18 @@ const config = desktopBuilderConfig({
   // makes desktopBuilderConfig throw before anything is built. Set-but-empty
   // means "unset" (derive from the origin), hence || rather than ??.
   updateChannel: process.env.WOC_UPDATE_CHANNEL || null,
+  // The real Steamworks app id for a depot build (stamped into wocDesktop for
+  // electron/steam.cjs). desktopBuilderConfig refuses a steam channel build
+  // without a numeric id, so a depot can never silently ship on the Spacewar
+  // dev id (480); website builds ignore it.
+  steamAppId: process.env.WOC_STEAM_APP_ID || '',
+  // steamworks.js is an optionalDependency, so guard the steam channel against a
+  // tree where its native install silently failed: the depot would otherwise
+  // ship without Steam. desktopBuilderConfig invokes this only for the steam
+  // channel, so website builds never touch node_modules here.
+  steamworksInstalled: () =>
+    existsSync(path.join(root, 'node_modules/steamworks.js/package.json')) &&
+    existsSync(path.join(root, 'node_modules/steamworks.js/dist')),
 });
 const configDir = mkdtempSync(path.join(tmpdir(), 'woc-eb-'));
 const configPath = path.join(configDir, 'electron-builder.json');

@@ -93,7 +93,22 @@ describe('Infernal Abyss authored layout', () => {
         walls.some((wall) => blocks({ type: 'obb', ...wall, rot: 0 }, door.x, door.z, 0)),
       ).toBe(false);
     }
-    expect(authoredWallSegments(rooms, doors, DUNGEON_WALL_HW)).toEqual(walls);
+    // Literal segment-count pin: a door that stops cutting its opening (or a
+    // room edge that stops emitting walls) changes this count.
+    expect(walls).toHaveLength(63);
+  });
+
+  it('stays inside the shared instance-footprint envelope with margin', () => {
+    // updateInstances' instanceContains window is |x| < 120, |z| < 250 around
+    // the instance origin. Every room (and so every spawn, hazard, and lore
+    // object) must sit inside it or players at the far end read as "outside
+    // the instance" (occupancy, corpse-run, and the lava containment gate).
+    for (const room of rooms) {
+      expect(Math.abs(room.x0), room.id).toBeLessThan(120);
+      expect(Math.abs(room.x1), room.id).toBeLessThan(120);
+      expect(Math.abs(room.z0), room.id).toBeLessThan(250);
+      expect(Math.abs(room.z1), room.id).toBeLessThan(250);
+    }
   });
 
   it('keeps the main route, armory branch, and gladiator branch traversable', () => {

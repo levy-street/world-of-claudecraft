@@ -9,6 +9,7 @@
     forceRename,
     type PendingAction,
   } from '../moderation_actions';
+  import AccountFlairControls from '../components/AccountFlairControls.svelte';
   import AccountModerationActions from '../components/AccountModerationActions.svelte';
   import AccountNote from '../components/AccountNote.svelte';
   import ChatModerationControls from '../components/ChatModerationControls.svelte';
@@ -86,6 +87,7 @@
       onReset={() => direct(`/admin/api/moderation/accounts/${detail.id}/reset-strikes`)}
     />
     <DailyRewardsModerationControls target={detail} onSubmit={submitPending} />
+    <AccountFlairControls target={detail} onSubmit={submitPending} />
   {/if}
 
   <div class="detail-grid">

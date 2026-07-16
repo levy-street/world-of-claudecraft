@@ -21,6 +21,7 @@ import type { IWorld } from '../world_api';
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
 import { formatNumber, type TranslationKey, t } from './i18n';
+import { svgIcon } from './ui_icons';
 import { VCUP_NATION_NAME_KEYS, vcupFlagHtml } from './vale_cup_flag';
 import {
   buildVcupView,
@@ -31,38 +32,6 @@ import {
   type VcupRoleRow,
   type VcupView,
 } from './vale_cup_window_view';
-import { renderWindowFrame, type WindowFrameParts } from './window_frame';
-import type { WindowFrameDescriptor } from './window_frame_view';
-
-// Descriptor id 'valecup' derives the title id 'valecup-title', which is exactly
-// the id the root's markDialogRoot aria-labelledby points at; the frame's own
-// role/aria are stripped in ensureFrame so the stable root stays the sole dialog
-// (its identity set once on open, never per mediumHud tick).
-const VCUP_FRAME: WindowFrameDescriptor = {
-  id: 'valecup',
-  titleKey: 'hudChrome.vcup.title',
-  closeLabelKey: 'hudChrome.vcup.close',
-};
-
-/**
- * Stamp the shared window frame cold on an inner mount, then reuse it. The frame
- * is visual chrome only: its role/aria are stripped, so the #valecup-window root
- * (marked once in toggle) keeps the dialog identity and the focus-return contract.
- */
-function ensureFrame(el: HTMLElement, onClose: () => void): WindowFrameParts {
-  const mounted = el.querySelector<HTMLElement>(':scope > .window-frame');
-  const body = mounted?.querySelector<HTMLElement>('.window-body');
-  if (mounted && body) {
-    return { root: mounted, body, footer: null, tabButtons: [] };
-  }
-  const mount = document.createElement('div');
-  const parts = renderWindowFrame(mount, VCUP_FRAME, { onClose });
-  mount.removeAttribute('role');
-  mount.removeAttribute('aria-labelledby');
-  mount.removeAttribute('aria-modal');
-  el.replaceChildren(mount);
-  return parts;
-}
 
 // Render-skip sentinel for the offline panel (ArenaWindow's ARENA_OFFLINE_SIG
 // pattern): the live sig is always JSON.stringify([...]) and starts with '[',
@@ -146,7 +115,7 @@ export class ValeCupWindow {
     root.style.display = 'block';
     this.lastSig = '';
     this.render();
-    (root.querySelector('[data-window-close]') as HTMLElement | null)?.focus();
+    (root.querySelector('[data-close]') as HTMLElement | null)?.focus();
   }
 
   close(): void {
@@ -172,9 +141,6 @@ export class ValeCupWindow {
   render(): void {
     const world = this.deps.world();
     const el = this.deps.root();
-    // The chrome is stamped once (cold) on an inner mount and reused; the 250ms
-    // mediumHud re-render only refills the body.
-    const { body } = ensureFrame(el, () => this.close());
     const view = buildVcupView({
       info: world.cupInfo,
       selectedBracket: this.bracket,
@@ -189,7 +155,8 @@ export class ValeCupWindow {
     if (view.kind === 'offline') {
       if (this.lastSig === VCUP_OFFLINE_SIG) return;
       this.lastSig = VCUP_OFFLINE_SIG;
-      body.innerHTML = `<div class="vcup-note">${esc(t('hudChrome.vcup.offlineNote'))}</div>`;
+      el.innerHTML = this.offlineHtml();
+      el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
       return;
     }
 
@@ -201,11 +168,12 @@ export class ValeCupWindow {
     }
     if (view.sig === this.lastSig) return;
     this.lastSig = view.sig;
-    body.innerHTML = this.liveHtml(view);
-    this.wire(body, view);
+    el.innerHTML = this.liveHtml(view);
+    this.wire(el, view);
   }
 
   private wire(el: HTMLElement, view: Extract<VcupView, { kind: 'live' }>): void {
+    el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
     el.querySelectorAll('[data-bracket]:not([disabled])').forEach((btn) => {
       btn.addEventListener('click', () => {
         this.bracket = Number((btn as HTMLElement).dataset.bracket) as VcBracket;
@@ -257,11 +225,19 @@ export class ValeCupWindow {
     });
   }
 
-  // ---- HTML builders (the localized DOM the pure view-model drives). The title
-  // and close now live in the shared frame chrome; these build the body content. --
+  // ---- HTML builders (the localized DOM the pure view-model drives) ----------
+
+  private titleHtml(): string {
+    return `<div class="panel-title"><span id="valecup-title">${esc(t('hudChrome.vcup.title'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.vcup.close'))}">${svgIcon('close')}</button></div>`;
+  }
+
+  private offlineHtml(): string {
+    return `${this.titleHtml()}<div class="vcup-note">${esc(t('hudChrome.vcup.offlineNote'))}</div>`;
+  }
 
   private liveHtml(view: Extract<VcupView, { kind: 'live' }>): string {
     return (
+      this.titleHtml() +
       this.recordHtml(view.standing) +
       this.bracketsHtml(view.brackets) +
       `<div class="vcup-sub">${esc(t('hudChrome.vcup.nationsHeading'))}</div>` +

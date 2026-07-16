@@ -1,6 +1,8 @@
 import type { TalentModifiers } from './content/talents';
+import { resolveActiveWeaponSkin } from './content/weapon_skin_rules';
 import { aggregateSetBonuses, CLASSES, ITEMS, MOBS, type NpcDef } from './data';
 import { meetsLevelRequirement } from './item_level_req';
+import { pvpFractionsFromRatings } from './pvp';
 import type {
   Entity,
   EquipSlot,
@@ -15,6 +17,7 @@ import {
   critFractionFromRating,
   EQUIP_SLOTS,
   hasteFractionFromRating,
+  hitFractionFromRating,
   SPELL_POWER_PER_INT,
 } from './types';
 
@@ -43,7 +46,16 @@ function baseEntity(id: number, pos: Vec3): Entity {
     overheadEmoteId: null,
     overheadEmoteUntil: 0,
     overheadEmoteSeq: 0,
-    stats: { str: 0, agi: 0, sta: 0, int: 0, spi: 0, armor: 0 },
+    stats: {
+      str: 0,
+      agi: 0,
+      sta: 0,
+      int: 0,
+      spi: 0,
+      armor: 0,
+      pvpOffense: 0,
+      pvpDefense: 0,
+    },
     weapon: { min: 1, max: 2, speed: 2 },
     attackPower: 0,
     rangedPower: 0,
@@ -56,6 +68,11 @@ function baseEntity(id: number, pos: Vec3): Entity {
     critChance: 0.05,
     critRating: 0,
     hasteRating: 0,
+    hitRating: 0,
+    hitBonus: 0,
+    critDmgSpellBonus: 0,
+    critDmgPhysBonus: 0,
+    critDmgHealBonus: 0,
     dodgeChance: 0.05,
     castPushbackReduction: 0,
     knockbackResistance: 0,
@@ -96,6 +113,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     sitting: false,
     eating: null,
     drinking: null,
+    weaponStowed: false,
     aiState: 'idle',
     tappedById: null,
     pulseTimer: 0,
@@ -110,6 +128,8 @@ function baseEntity(id: number, pos: Vec3): Entity {
     detonateTimer: Infinity,
     mendTimer: 0,
     wardTimer: 0,
+    channelTimer: 0,
+    channelRamp: 0,
     rallyTimer: 0,
     warcryTimer: 0,
     firedSummons: 0,
@@ -148,14 +168,18 @@ function baseEntity(id: number, pos: Vec3): Entity {
     dead: false,
     ghost: false,
     corpsePos: null,
+    corpseInstanceId: null,
     scale: 1,
     color: 0xffffff,
     skinCatalog: 'class',
     skin: 0,
     mainhandItemId: null,
+    weaponSkinLoadout: {},
+    weaponSkinId: null,
     equippedItems: {},
     equippedInstances: {},
     guild: '',
+    title: null,
   };
 }
 
@@ -207,11 +231,16 @@ export function recalcPlayerStats(
     int: def.baseStats.int + def.statsPerLevel.int * (lvl - 1),
     spi: def.baseStats.spi + def.statsPerLevel.spi * (lvl - 1),
     armor: def.baseStats.armor + def.statsPerLevel.armor * (lvl - 1),
+    pvpOffense: 0,
+    pvpDefense: 0,
   };
   const setCounts = new Map<string, number>();
   let bonusSp = 0; // flat Spell Power from gear affixes + buff_spellpower auras
   let bonusCritRating = 0;
   let bonusHasteRating = 0;
+  let bonusHitRating = 0;
+  let bonusPvpOffenseRating = 0;
+  let bonusPvpDefenseRating = 0;
   for (const slot of EQUIP_SLOTS) {
     const itemId = equipment[slot];
     if (!itemId) continue;
@@ -227,6 +256,9 @@ export function recalcPlayerStats(
     bonusSp += item.spellPower ?? 0;
     bonusCritRating += item.critRating ?? 0;
     bonusHasteRating += item.hasteRating ?? 0;
+    bonusHitRating += item.hitRating ?? 0;
+    bonusPvpOffenseRating += item.pvpOffenseRating ?? 0;
+    bonusPvpDefenseRating += item.pvpDefenseRating ?? 0;
     if (item.stats) {
       s.str += item.stats.str ?? 0;
       s.agi += item.stats.agi ?? 0;
@@ -264,6 +296,7 @@ export function recalcPlayerStats(
   let bonusDodge = 0;
   let bearForm = false;
   let catForm = false;
+  let moonkinForm = false;
   let scaleMul = 1; // Fiesta buff_scale: body-size multiplier (>1 also adds hp)
   // Percent raid buffs (Mark of the Wild / Arcane Intellect / Power Word: Fortitude /
   // Devotion Aura / Battle Shout / Blessing of Might). Accumulated as fractions here,
@@ -304,6 +337,8 @@ export function recalcPlayerStats(
       s.spi = Math.round(s.spi * m);
     } else if (a.kind === 'buff_dodge') bonusDodge += a.value;
     else if (a.kind === 'buff_scale') scaleMul *= a.value;
+    // Metamorphosis: a temporary demon transform that also makes the caster larger.
+    else if (a.kind === 'form_metamorph') scaleMul *= 1.35;
     // Percent raid buffs store integer percent POINTS (5 = +5%) so they survive the
     // integer-rounding talent value multiplier; converted to a fraction here.
     else if (a.kind === 'buff_stats_pct') allStatsPct += a.value / 100;
@@ -313,6 +348,15 @@ export function recalcPlayerStats(
     else if (a.kind === 'buff_ap_pct') buffApPct += a.value / 100;
     else if (a.kind === 'form_bear') bearForm = true;
     else if (a.kind === 'form_cat') catForm = true;
+    // Moonkin Form carries its Spell Power bonus in the form aura's value, so it lives and
+    // dies with the one toggle (a Balance druid's whole kit is arcane/nature, so a generic
+    // Spell Power bonus is correct). Gloamveil Form (form_shadow) is NOT a Spell Power
+    // buff: it amplifies the priest's Shadow-school DAMAGE by a percent, applied in
+    // combat/damage.ts, so it contributes nothing to the stat pass here.
+    else if (a.kind === 'form_moonkin') {
+      bonusSp += a.value;
+      moonkinForm = true;
+    }
   }
   // Talent passive stat modifiers (flat additions + a stamina percent before the
   // HP derivation below). AP/armor/maxHp percents are applied at their own steps.
@@ -356,6 +400,9 @@ export function recalcPlayerStats(
     bonusAp += 8 + lvl * 2;
     s.agi += Math.max(2, Math.floor(lvl / 2));
   }
+  // Moonkin Form: a hardy caster form that adds 50% armor (its +20% spell damage rides a
+  // separate buff_spelldmg aura the form applies).
+  if (moonkinForm) s.armor = Math.round(s.armor * 1.5);
   if (mods?.stats.armorPct) s.armor = Math.round(s.armor * (1 + mods.stats.armorPct));
   if (buffArmorPct) s.armor = Math.round(s.armor * (1 + buffArmorPct)); // Devotion Aura
   // Floor Spirit at 0 so a Spirit-siphoning debuff (negative buff_spi) can never
@@ -363,6 +410,9 @@ export function recalcPlayerStats(
   s.spi = Math.max(0, s.spi);
 
   e.stats = s;
+  const warfare = pvpFractionsFromRatings(bonusPvpOffenseRating, bonusPvpDefenseRating);
+  e.stats.pvpOffense = warfare.offense;
+  e.stats.pvpDefense = warfare.defense;
   // An over-level mainhand is inert like any other gear: fall back to unarmed
   // damage (and drop the weapon-type flags, e.g. dagger, that gate abilities)
   // until the wearer is high enough level. The mainhand still stays worn (see
@@ -381,6 +431,10 @@ export function recalcPlayerStats(
   // were one ever stored, never resolves to a held model).
   e.mainhandItemId =
     equipment.mainhand && ITEMS[equipment.mainhand]?.weapon ? equipment.mainhand : null;
+  // Resolve the active weapon-skin cosmetic against the (possibly changed)
+  // mainhand: swapping to a different weapon type drops a non-matching skin and
+  // re-shows the matching one automatically. Cosmetic only; never feeds stats.
+  e.weaponSkinId = resolveActiveWeaponSkin(cls, e.mainhandItemId, e.weaponSkinLoadout);
   // Render-only mirror of the full worn set, copied so a later mutation of the
   // owning PlayerMeta.equipment never aliases into the entity. Synced in the
   // identity wire (terse `eq`) for the inspect-another-player window.
@@ -422,12 +476,21 @@ export function recalcPlayerStats(
   e.spellPower = Math.max(0, Math.round(s.int * SPELL_POWER_PER_INT + bonusSp));
   e.critRating = bonusCritRating + setEff.critRating;
   e.hasteRating = bonusHasteRating + setEff.hasteRating;
+  // Hit rating (gear + set bonuses) folds into a hit fraction that combat subtracts
+  // from miss (swingMissChance) and spell resist (spell_resist.ts). It answers the
+  // Heroic +3 above-level penalty; unlike crit it has no higher-level suppression.
+  e.hitRating = bonusHitRating + setEff.hitRating;
+  e.hitBonus = hitFractionFromRating(e.hitRating);
   const hasteFrac = setEff.haste + hasteFractionFromRating(e.hasteRating);
   // Haste drives all three channels: faster melee and ranged auto-attack swings
   // AND shorter spell casts/channels.
-  e.meleeHaste = hasteFrac;
+  // Union of the rating system (#1471) and the spec masteries (#1543): ratings and
+  // set haste feed hasteFrac; a spec mastery's passive haste adds on its channel.
+  e.meleeHaste = hasteFrac + (mods?.global.meleeHastePct ?? 0);
   e.rangedHaste = hasteFrac;
-  e.spellHaste = hasteFrac;
+  // Spell haste also folds in a spec mastery's passive haste (spellHastePct), so a
+  // caster spec can shorten every cast; the cast-time tooltips read the same total.
+  e.spellHaste = hasteFrac + (mods?.global.spellHastePct ?? 0);
   e.setProcs = setEff.procs;
   if (e.setProcs.length > 0 && !e.procReadyAt) e.procReadyAt = {};
   // Crit: ~1% per 20 agi at low level
@@ -437,6 +500,11 @@ export function recalcPlayerStats(
     (mods?.stats.crit ?? 0) +
     setEff.crit +
     critFractionFromRating(e.critRating);
+  // Extra crit damage from a spec mastery, per output channel (e.g. Fire mage: SPELL
+  // crits deal more; Holy paladin: HEAL crits; Subtlety/Arms: PHYSICAL crits).
+  e.critDmgSpellBonus = mods?.global.critDmgSpellPct ?? 0;
+  e.critDmgPhysBonus = mods?.global.critDmgPhysPct ?? 0;
+  e.critDmgHealBonus = mods?.global.critDmgHealPct ?? 0;
   e.castPushbackReduction = setEff.castPushbackReduction;
   e.knockbackResistance = setEff.knockbackResistance;
   // Floored at 0: an off-balance debuff (negative buff_dodge) can drive dodge to nothing.
@@ -546,6 +614,8 @@ export function createMob(id: number, template: MobTemplate, level: number, pos:
   if (template.mendAlly) e.mendTimer = template.mendAlly.every;
   // Telegraph the first Ward the same way: one full interval after engage.
   if (template.wardAllies) e.wardTimer = template.wardAllies.every;
+  // Telegraph the first channeled heal tick: one full interval after engage.
+  if (template.channelHeal) e.channelTimer = template.channelHeal.every;
   // Telegraph the first Stoneskin: one full interval after engage.
   if (template.stoneskin) e.stoneskinTimer = template.stoneskin.every;
   // Telegraph the first hardcast (bigCast) the same way: one full interval after engage.

@@ -141,7 +141,7 @@ if (setup.vendorId !== null) {
   // 4) TOOLTIP — synthesize a hover on the first vendor weapon row (attachTooltip
   // listens for mouseenter/mousemove and positions #tooltip at the cursor).
   await page.evaluate(() => {
-    const row = document.querySelector('#vendor-window .vendor-row');
+    const row = document.querySelector('#vendor-window .vendor-item');
     const r = row.getBoundingClientRect();
     const cx = r.x + r.width / 2,
       cy = r.y + r.height / 2;

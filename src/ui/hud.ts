@@ -1,8 +1,8 @@
 import { audio } from '../game/audio';
 import type { GamepadKind } from '../game/gamepad_map';
-import type { Keybinds } from '../game/keybinds';
-import type { MenuIntentKind } from '../game/menu_gamepad_nav';
-import { music, musicZoneForLocation, shouldResetMusicForDungeonEntry } from '../game/music';
+import { InstanceMusicController } from '../game/instance_music';
+import { type Keybinds, keyCapLabel } from '../game/keybinds';
+import { music } from '../game/music';
 import type { GameSettings, Settings } from '../game/settings';
 import { sfx } from '../game/sfx';
 import type { UiEffectsTier } from '../game/ui_effects_profile';
@@ -15,47 +15,37 @@ import {
   targetFrameNonSelfIntervalMs,
 } from '../game/ui_tier_knobs';
 import { voice, voiceDistanceGain } from '../game/voice';
+import type { ClaudiumStoreItem } from '../net/economy_sdk';
 import { castBarState, consumeBarState } from '../render/cast_bar';
 import { CharacterPreview } from '../render/characters';
 import { preloadMechAssets } from '../render/characters/assets';
-import { mechHeldWeaponOverride, skinCount } from '../render/characters/manifest';
-import {
-  onPortraitsReady,
-  playerPortraitDataUrl,
-  visualPortraitDataUrl,
-} from '../render/characters/portrait';
+import { mechHeldWeaponOverride } from '../render/characters/manifest';
+import { onPortraitsReady } from '../render/characters/portrait';
 import { isFriendlyPet, mobTooltipConColor } from '../render/reaction';
 import type { Renderer } from '../render/renderer';
-import { type AugmentCategory, augmentCategory } from '../sim/content/augments';
+import {
+  type ChatSenderFlair,
+  normalizeStreamerLink,
+  type StreamerLinks,
+} from '../sim/account_flair';
+import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
 import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
 import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
-import {
-  EVENT_SKIN_TIERS,
-  MECH_CHROMAS,
-  SKIN_RANKS,
-  type SkinTier,
-  skinRankOrder,
-} from '../sim/content/skins';
+import { MECH_CHROMAS } from '../sim/content/skins';
 import { FIRST_TALENT_LEVEL, type TalentAllocation, talentsFor } from '../sim/content/talents';
-import { SPORT_ABILITIES } from '../sim/content/vale_cup';
 import type { ZoneDef } from '../sim/data';
 import {
   ABILITIES,
   CLASSES,
-  COMPANION_UPGRADE_COSTS,
-  DELVE_AFFIXES,
   DELVE_LIST,
   DELVES,
   DUNGEON_LIST,
   DUNGEON_X_THRESHOLD,
-  delveAt,
   dungeonAt,
   ITEMS,
-  isDelvePos,
   MOBS,
   NPCS,
   QUESTS,
-  questRewardItem,
   WORLD_MAX_X,
   WORLD_MAX_Z,
   WORLD_MIN_X,
@@ -64,11 +54,10 @@ import {
   zoneAt,
 } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
-import { armorTypeForItem, canEquipItem, weaponArchetypeForItem } from '../sim/equipment_rules';
+import { canEquipItem } from '../sim/equipment_rules';
 import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
 import { requiredLevelFor } from '../sim/item_level_req';
 import type { Ante, PickAction } from '../sim/lockpick';
-import { PICK_ACTIONS } from '../sim/lockpick';
 import { FOCUS_POINT_BUDGET, isInTownZone } from '../sim/professions/focus';
 import { type QuestObjectiveRef, questObjectivesForMob } from '../sim/quest_targets';
 import type { ResolvedAbility } from '../sim/sim';
@@ -76,14 +65,13 @@ import type {
   AbilityDef,
   CalendarResultCode,
   EquipSlot,
+  HonorReason,
   InvSlot,
   ItemSlot,
-  LootRollChoice,
   MailResultCode,
   PetMode,
   PlayerClass,
   ResourceType,
-  SkinRank,
   Stats,
 } from '../sim/types';
 import {
@@ -95,11 +83,9 @@ import {
   FAERIE_FIRE_ARMOR_PCT,
   FISHING_CAST_ID,
   type ItemDef,
-  isQuestTurnInNpc,
   MAX_LEVEL,
   MELEE_RANGE,
   MILESTONES,
-  type RiteIntensity,
   type SimEvent,
   SUNDER_ARMOR_PCT_PER_STACK,
   virtualLevel,
@@ -108,8 +94,8 @@ import {
 import { isAtSowfield } from '../sim/vale_cup_layout';
 import { worldBossIdFromLockout } from '../sim/world_boss';
 import {
+  type CharacterProfile,
   type DailyRewardStatus,
-  type DelveRunInfo,
   type IWorld,
   isOverheadEmoteId,
   OVERHEAD_EMOTES,
@@ -125,22 +111,7 @@ import {
   abilityPrimaryEffect,
   abilitySecondaryEffect,
 } from './ability_damage';
-import { isSelfOnlyAbility } from './ability_self_only';
-import { ActionBarPainter, type ActionBarSlotElements } from './action_bar_painter';
-import {
-  ABILITY_ICON_PREFIX,
-  type ActionBarView,
-  ATTACK_ICON_KEY,
-  createActionBarView,
-  EMPTY_ICON_KEY,
-  ITEM_ICON_PREFIX,
-} from './action_bar_view';
 import { ArenaWindow } from './arena_window';
-import {
-  abilityStartsAutoAttack,
-  deferAutoAttackUntilCastEnd,
-  hasAutoAttackTarget,
-} from './attack_on_ability';
 import { type AuraEffectInput, auraEffectDescriptor } from './aura_effect';
 import { AurasPainter, type AurasPainterDeps } from './auras_painter';
 import { type AurasDeps, createAurasView } from './auras_view';
@@ -150,54 +121,66 @@ import { BagsWindow, dismissBagPrompts } from './bags_window';
 import { BankWindow } from './bank_window';
 import { CalendarWindow } from './calendar_window';
 import { CastBarPainter } from './cast_bar_painter';
+import { charBagsPaired } from './char_bags_pairing_core';
 import { buildPaperdollView, type PaperdollSlot } from './char_view';
 import { CharWindow } from './char_window';
 import {
   activeCharacterAppearancePreview,
   characterAppearanceOptions,
 } from './character_appearance';
-import { ChatAnnouncer } from './chat_announcer';
 import {
-  CHANNEL_LABEL_KEYS,
-  CHAT_TAB_CHANNELS,
-  type ChatOpenTab,
-  type ChatTabChannel,
-  type ChatTabId,
-  channelNeedsJoin,
-  chatOpenTabLabelKey,
-  composeChatLine,
-  composeWhisperReply,
-  isChatOpenTab,
-  isChatTabChannel,
-  parseChatTabs,
-  serializeChatTabs,
-  WHISPER_TAB,
-  WHISPER_TAB_LABEL_KEY,
-} from './chat_channels';
-import { ChatMobileOverlay } from './chat_mobile_overlay';
-import { type ChatClock, clampChatClock, formatChatTimestamp } from './chat_timestamp';
-import { type ChatBoxGeometry, clampChatBox, parseChatBox, serializeChatBox } from './chat_window';
+  ignoreKey,
+  type PlayerSocialFlags,
+  parseIgnoreList,
+  resolvePlayerSocialFlags,
+  serializeIgnoreList,
+} from './chat_ignore_core';
+import type { ClaudiumRail, ClaudiumSnapshot } from './claudium_window';
+import { ClaudiumWindow } from './claudium_window';
 import { formatClockTime } from './clock';
 import { CombatAnnouncer } from './combat_announcer';
 import {
+  auraApplyCue,
+  castCueForAbility,
+  impactCueForDamage,
+  type MobVoiceAction,
+  mobVoiceActionForDamage,
+  mobVoiceCue,
+  mobVoiceCueWithFallback,
+  playerSwingCueForDamage,
   shouldPlayCombatImpactForTarget,
   shouldPlayCritSfxForTarget,
   shouldPlayMobVoiceSfxForEntity,
+  spellFxCue,
 } from './combat_sfx';
 import { type CardinalId, compassView } from './compass';
-import { CONSUMABLE_BAR_SLOTS, consumableBarItems } from './consumable_bar_view';
 import { formatMinimapCoords } from './coords';
-import { corpseHarvestView } from './corpse_harvest_view';
-import { renderCorpseHarvestPicker } from './corpse_harvest_window';
 import { buildCraftingView } from './crafting_view';
 import { renderCraftingWindow } from './crafting_window';
 import { DailyRewardsWindow } from './daily_rewards_window';
-import { DelveMapPainter } from './delve_map_painter';
+import {
+  deedBroadcastLine,
+  deedName,
+  deedTitleText,
+  type TitledNameDecoration,
+  titledDisplayName,
+  titledNameDecoration,
+} from './deed_i18n';
+import { DeedTrackerPainter } from './deed_tracker_painter';
+import {
+  buildDeedTrackerViewInto,
+  buildDeedUnlockPlan,
+  type DeedDisplayCategory,
+  makeDeedTrackerView,
+} from './deeds_view';
+import { DeedsWindow } from './deeds_window';
+import { DevCommandWindow } from './dev_command_window';
 import { devTierBadgeDataUrl, devTierByIndex, devTierDisplayName } from './dev_tier';
-import { markDialogRoot } from './dialog_root';
 import { discordRoleTagLabel } from './discord_role_tag';
 import { discordStatusBadgeDataUrl, discordStatusDisplayName } from './discord_tier';
-import { dropdownKeyNav, TYPEAHEAD_MIN_OPTIONS, typeaheadTarget } from './dropdown_nav';
+import { dropdownKeyNav } from './dropdown_nav';
+import { DungeonFinderProposalPopup } from './dungeon_finder_proposal_popup';
+import { DungeonFinderWindow } from './dungeon_finder_window';
 import { emoteIconUrl } from './emote_icons';
 import {
   classDisplayName,
@@ -207,10 +190,38 @@ import {
   zoneDisplayName,
   zonePoiLabel,
 } from './entity_i18n';
+import { ERROR_LOG_COLOR, shouldMirrorErrorToast } from './error_toast_log';
 import { esc } from './esc';
 import { fctSpawnShape } from './fct_event';
 import { FctPainter } from './fct_painter';
 import { FocusManager, type FocusTrapHandle } from './focus_manager';
+import {
+  PARTY_FRAME_POS_KEY,
+  PLAYER_FRAME_POS_KEY,
+  resetFramePositionsOnce,
+  TARGET_FRAME_POS_KEY,
+} from './frame_pos_reset';
+import { holderTierBadgeDataUrl, holderTierByIndex, holderTierDisplayName } from './holder_tier';
+import { isSelfOnlyAbility } from './hud/action_bar/ability_self_only';
+import {
+  ACTION_BAR_ABILITY_SLOTS,
+  ActionBarController,
+} from './hud/action_bar/action_bar_controller';
+import { ActionBarPainter, type ActionBarSlotElements } from './hud/action_bar/action_bar_painter';
+import {
+  ABILITY_ICON_PREFIX,
+  type ActionBarView,
+  ATTACK_ICON_KEY,
+  createActionBarView,
+  EMPTY_ICON_KEY,
+  ITEM_ICON_PREFIX,
+} from './hud/action_bar/action_bar_view';
+import {
+  abilityStartsAutoAttack,
+  deferAutoAttackUntilCastEnd,
+  hasAutoAttackTarget,
+} from './hud/action_bar/attack_on_ability';
+import { CONSUMABLE_BAR_SLOTS, consumableBarItems } from './hud/action_bar/consumable_bar_view';
 import {
   type AimPoint,
   abilityAoeRadius,
@@ -220,31 +231,62 @@ import {
   createGroundAimState,
   enterGroundAim,
   type GroundAimState,
-} from './ground_aim';
-import { buildHeroicVendorView } from './heroic_vendor_view';
-import { renderHeroicVendorWindow } from './heroic_vendor_window';
+} from './hud/action_bar/ground_aim';
 import {
-  holderTierBadgeDataUrl,
-  holderTierByIndex,
-  holderTierDisplayName,
-  holderTierForBalance,
-} from './holder_tier';
-import {
-  buildDefaultFormBar,
-  classHasFormBars,
+  applyLoadoutBar as applyLoadoutBarActions,
+  assignAttackSlotAction,
   clearHotbarSlot,
   encodeHotbarAction,
   HOTBAR_ACTION_MIME,
   type HotbarAction,
+  handleMobileAttackTap,
   parseHotbarAction,
-  parseHotbarActions,
   placeAbilityOnSlot,
   placeItemOnSlot,
   resolveMobileHotbarDrop,
-  shouldSeedFormBar,
   swapHotbarSlots,
-  syncHotbarActions,
-} from './hotbar';
+} from './hud/action_bar/hotbar';
+import {
+  clampMobilePage,
+  mobilePageCount,
+  nextMobilePage,
+  sourceSlotForMobileButton,
+} from './hud/action_bar/mobile_action_page_view';
+import { MobileActionRingPainter } from './hud/action_bar/mobile_action_ring_painter';
+import { playerStealthed } from './hud/action_bar/player_stealthed';
+import { ChatAnnouncer } from './hud/chat/chat_announcer';
+import { chatChannelColor } from './hud/chat/chat_channels';
+import { ChatGeometryController } from './hud/chat/chat_geometry_controller';
+import {
+  appendChatLineParts,
+  CHAT_MESSAGE_TOKEN,
+  CHAT_NAME_TOKEN,
+  chatAiTagEl,
+} from './hud/chat/chat_line';
+import { type ChatClock, clampChatClock, formatChatTimestamp } from './hud/chat/chat_timestamp';
+import { ChatWindowController } from './hud/chat/chat_window_controller';
+import { SkinEventController } from './hud/cosmetics/skin_event_controller';
+import { mechChromaName } from './hud/cosmetics/skin_event_i18n';
+import { DelveBoardController } from './hud/delve/delve_board_controller';
+import { DelveMapPainter } from './hud/delve/delve_map_painter';
+import { DelveTrackerController } from './hud/delve/delve_tracker_controller';
+import { LockpickController } from './hud/delve/lockpick_controller';
+import { RiteController } from './hud/delve/rite_controller';
+import { FiestaController } from './hud/fiesta/fiesta_controller';
+import { LootRollController } from './hud/loot/loot_roll_controller';
+import { lootSettingsView } from './hud/loot/loot_settings_view';
+import { renderLootSettingsWindow } from './hud/loot/loot_settings_window';
+import { LootWindowController } from './hud/loot/loot_window_controller';
+import { PlayerCardController } from './hud/player_card/player_card_controller';
+import { QuestDialogController } from './hud/quest/quest_dialog_controller';
+import { parseChatSegments } from './hud/quest/quest_link';
+import { QuestProgressBanner } from './hud/quest/quest_progress_banner';
+import { QuestTrackerController } from './hud/quest/quest_tracker_controller';
+import { QuestLogWindow } from './hud/quest/questlog_window';
+import { buildHeroicVendorView } from './hud/vendor/heroic_vendor_view';
+import { renderHeroicVendorWindow } from './hud/vendor/heroic_vendor_window';
+import { buildVendorView } from './hud/vendor/vendor_view';
+import { renderVendorWindow } from './hud/vendor/vendor_window';
 import {
   formatMoney as formatLocalizedMoney,
   formatNumber,
@@ -259,20 +301,13 @@ import {
 import { iconDataUrl, QUALITY_COLOR, raidMarkerDataUrl } from './icons';
 import { InfernalAbyssWorldMapPainter } from './infernal_abyss_world_map_painter';
 import { itemArmorTypeLabelKey } from './item_armor_type';
+import { requiredClassesForTooltip } from './item_class_restriction';
 import { itemStatDeltas } from './item_compare';
+import { ItemDragState } from './item_drag_state';
 import { itemSetMemberCounts, itemSetTooltipModel } from './item_set_tooltip_view';
 import { LeaderboardWindow } from './leaderboard_window';
 import { ReannounceMarker } from './live_region_reannounce';
-import { PICK_ACTION_HOTKEYS } from './lockpick_panel';
-import { LockpickWindow } from './lockpick_window';
-import { reconcileLootRolls as computeLootRollReconcile } from './loot_roll_reconcile';
-import {
-  computeLootRollStatusRows,
-  type LootRollStatusRow,
-  lootRollStatusFingerprint,
-} from './loot_roll_status_view';
-import { lootSettingsView } from './loot_settings_view';
-import { renderLootSettingsWindow } from './loot_settings_window';
+import { isCombatFlavorLog } from './log_event_route';
 import { lowHealthVignette } from './low_health';
 import { lowResourceView } from './low_resource';
 import { mailIndicatorView } from './mailbox_view';
@@ -300,13 +335,6 @@ import {
   nextMinimapZoom,
 } from './minimap_zoom';
 import { type MobTooltipI18n, type MobTooltipModel, mobTooltipHtml } from './mob_tooltip_view';
-import {
-  clampMobilePage,
-  mobilePageCount,
-  nextMobilePage,
-  sourceSlotForMobileButton,
-} from './mobile_action_page_view';
-import { MobileActionRingPainter } from './mobile_action_ring_painter';
 import { MovableFrame } from './movable_frame';
 import { OptionsWindow } from './options_window';
 import { makeWriterFacet, type PainterHostPresentation } from './painter_host';
@@ -315,34 +343,20 @@ import type { PartyRowAuraDeps } from './party_frame_row';
 import { partyFrameSignature, selectPartyFrameMembers } from './party_frames';
 import { PartyFramesPainter } from './party_frames_painter';
 import type { PerfOverlayHooks } from './perf_overlay_settings';
-import { PET_ACTION_ICONS } from './pet_action_icons';
+import { PET_ACTION_ICONS, petFeedButtonState } from './pet_action_icons';
 import {
-  CARD_POSES,
-  cardCanvasToBlob,
-  cardCanvasToUploadBlob,
-  type PlayerCardData,
-  type PlayerCardStat,
-  renderPlayerCardCanvas,
-} from './player_card';
-import {
-  type CharacterStanding,
-  cardHostingAvailable,
-  fetchReferralInfo,
-  fetchStanding,
-  type PublishedCard,
-  publishCard,
-} from './player_card_share';
-import { chatPlayerContextActions } from './player_context_menu';
+  chatPlayerContextActions,
+  type PlayerContextAction,
+  type PlayerContextActionId,
+  selfPlayerContextActions,
+  streamerActionPlatform,
+  streamerMenuActions,
+} from './player_context_menu';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
 import { maskProfanity } from './profanity';
-import { encodeItemLink, encodeQuestLink, parseChatSegments } from './quest_link';
-import { QuestProgressBanner } from './quest_progress_banner';
-import { type QuestTrackerView, questTrackerView, type TrackedQuest } from './quest_tracker';
-import { QuestLogWindow } from './questlog_window';
 import { lockoutParts, lockoutShape } from './raid_lockout';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
 import { restView } from './rest_indicator';
-import { RiteWindow } from './rite_window';
 import { localizeServerText } from './server_i18n';
 import { localizeSimAuraName, localizeSimText } from './sim_i18n';
 import { SocialWindow } from './social_window';
@@ -355,13 +369,22 @@ import {
   type StatTooltipModel,
   weaponDps,
 } from './stat_tooltip';
-import { type StatTooltipI18n, statCellHtml, statTooltipHtml } from './stat_tooltip_view';
+import {
+  type StatTooltipI18n,
+  statCellHtml,
+  statNameKey,
+  statTooltipHtml,
+} from './stat_tooltip_view';
+import { mountStorePromoCard, type StorePromoCardController } from './store_promo_card';
 import { nearestSubzone } from './subzone';
 import { swingTimerState } from './swing_timer';
 import { SwingTimerPainter } from './swing_timer_painter';
 import { localizeTalentTitle, roleLabel, tTalent } from './talent_i18n';
 import { TalentsWindow } from './talents_window';
+import { targetPortraitUrl } from './target_portrait_view';
+import { targetRankView, targetUsesEliteFrame } from './target_rank_view';
 import type { PresetId, ThemeKnob, ThemeState } from './theme';
+import { SharedTooltipOwner } from './tooltip_owner';
 import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap, CLICK_SUPPRESS_MS, TAP_SLOP_PX } from './touch_tap';
 import { buildTownFocusView, stepTownFocus } from './town_focus_view';
@@ -384,22 +407,23 @@ import { buildVcupHudView } from './vale_cup_hud_view';
 import { ValeCupIndicator } from './vale_cup_indicator';
 import { buildVcupIndicatorView } from './vale_cup_indicator_view';
 import { ValeCupWindow, vcupNationName } from './vale_cup_window';
-import { buildVendorSellRows, buildVendorView } from './vendor_view';
-import { renderVendorWindow, type VendorTab } from './vendor_window';
 import { nextVoicedYell, type VoicedYellState, voicedYellGain } from './voice_events';
 import {
   onWalletUiChange,
-  verifiedWocBalance,
-  walletDisplayAvailable,
   walletUiEnabled,
   wocBalance,
   wocBalanceVerified,
 } from './wallet_balance';
 import { type WeaponProcEffectDesc, weaponProcLines } from './weapon_proc_view';
-import { isWindowDragHandle, STATIC_DIALOG_WINDOW_IDS } from './window_drag_handle';
+import {
+  installWindowDrag,
+  isWindowDragPreviewMutation,
+  type WindowDragController,
+} from './window_drag';
 import { makeWindowFocus } from './window_focus';
-import { relocalizeWindowFrame } from './window_frame';
 import { installWindowResize, markResizableWindow } from './window_resize';
+import { stackedWindowsVisible } from './window_stack_state_core';
+import { installWorldDropTarget } from './world_drop_target';
 import { formatXp, xpBarView } from './xp_bar';
 import { XpBarPainter } from './xp_bar_painter';
 import { YumiMatchPainter } from './yumi_match_painter';
@@ -412,9 +436,7 @@ let lpAdvancedLast = -1;
 // perf_overlay_settings.ts alongside the panel that consumes it.
 export interface OptionsHooks {
   logout(): void;
-  // Arm a one-shot rebind capture; returns a canceller the rebind UI calls for its
-  // on-screen Cancel affordance and its focus-loss/blur exit (fires cb(null) once).
-  captureKey(cb: (code: string | null) => void): () => void;
+  captureKey(cb: (code: string | null) => void): void;
   settings: Settings;
   onSettingChange(key: keyof GameSettings, value: GameSettings[keyof GameSettings]): void;
   // Switch the active locale at runtime (loads the locale chunk, relocalizes the page,
@@ -425,6 +447,14 @@ export interface OptionsHooks {
   // bag footer and player card reflect on-chain token changes. No-op when the wallet
   // feature is off or no wallet is connected/linked.
   refreshWocBalance(): void;
+  // Account deed-broadcast opt-out seam (accounts.deed_broadcasts): whether a
+  // marquee deed unlock fans out to guildmates and followers. main.ts wires the
+  // REST read/write pair ONLINE ONLY; the options row renders only when the
+  // seam is present (offline characters have no account, so no row).
+  deedBroadcasts?: {
+    get(): Promise<boolean>;
+    set(enabled: boolean): Promise<boolean>;
+  };
   perfOverlay: PerfOverlayHooks;
   // UI theming seam — main.ts owns the ThemeStore + live CSS-variable apply.
   theme: ThemeHooks;
@@ -449,14 +479,43 @@ export interface GamepadBindingsHooks {
   // Detected brand of the connected pad, so the panel labels each button with the
   // glyph printed on that controller ('generic' combined labels when none/unknown).
   kind(): GamepadKind;
-  // Whether a pad is connected right now, so the options footer renders the
-  // controller button-legend strip only while one is present (spec section 5).
-  connected(): boolean;
 }
 
 export interface ReportHooks {
   submit(targetPid: number, reason: string, details: string): Promise<void>;
   submitByName?(targetName: string, reason: string, details: string): Promise<void>;
+}
+
+/**
+ * Online-only glue that backs the Claudium store window. main.ts wires this from
+ * the client economy SDK (which hits the game server's /api/claudium/* routes).
+ * snapshot() reads the current service state; buy()/spend() begin the client-signed
+ * purchase / cosmetic-redeem flows. All values originate in the economy service.
+ */
+export interface ClaudiumHooks {
+  balance(): Promise<number | null>;
+  storeSnapshot(): Promise<{
+    available: boolean;
+    balance: number | null;
+    storeItems: readonly ClaudiumStoreItem[];
+  }>;
+  snapshot(): Promise<ClaudiumSnapshot>;
+  buy(rail: ClaudiumRail, sku: string): Promise<void>;
+  spend(
+    itemId: string,
+    kind: 'cosmetic' | 'skin' | 'item',
+    expectedCostClaudium: number,
+  ): Promise<{
+    granted: boolean;
+    balance: number | null;
+    costClaudium: number | null;
+    reason: string | null;
+  }>;
+}
+
+export interface HudFeatures {
+  dailyRewardsEnabled: boolean;
+  devCommandsEnabled?: boolean;
 }
 
 export interface BugReportPayload {
@@ -505,10 +564,8 @@ const VCUP_WALKUP_EVENTS = new Set([
 // Stadium-scale: covers the pitch + stands + approach, but nowhere near another
 // match's pitch (the real Sowfield and practice instances are >600yd apart).
 const VCUP_THEATRE_RADIUS = 200;
-// The target frame's boss glyph (a skull replaces the numeric level chip for a
-// boss-rank target) and the number of combo pips, named so the per-frame target
-// paint carries no bare literal at the call site.
-const BOSS_SKULL_GLYPH = '☠';
+// The number of combo pips, named so the per-frame player paint carries no bare
+// literal at the call site.
 const COMBO_PIP_COUNT = 5;
 // The mob-hover tooltip's fixed desktop bottom-right slot (the WoW default
 // GameTooltip corner), in author-space px: the right margin clears the sidebar
@@ -519,10 +576,6 @@ const MOB_TOOLTIP_MARGIN_RIGHT = 56;
 const MOB_TOOLTIP_MARGIN_BOTTOM = 60;
 const MOB_TOOLTIP_MOBILE_MINIMAP_GAP = 8;
 const MOB_TOOLTIP_MOBILE_EDGE_GAP = 8;
-// LT/RT page-scroll step for the generic gamepad menu fallback, as a fraction of
-// the trapped dialog's visible body height (mirrors the options window's
-// PAGE_SCROLL_FRACTION so paging feels identical across trapped dialogs).
-const TRAP_PAGE_SCROLL_FRACTION = 0.9;
 // The descriptor for a hidden target frame (no target, or a targeted world object).
 // unitFrameView reads only `present` when hiding, so the rest are no-op defaults; a
 // shared const avoids allocating a fresh descriptor for every hidden frame.
@@ -609,6 +662,12 @@ const CALENDAR_RESULT_KEYS: Record<CalendarResultCode, TranslationKey> = {
   badInput: 'hudChrome.calendar.result.badInput',
   calendarFull: 'hudChrome.calendar.result.calendarFull',
   eventGone: 'hudChrome.calendar.result.eventGone',
+};
+const HONOR_REASON_KEYS: Record<HonorReason, TranslationKey> = {
+  arena_win: 'hudChrome.warfare.reasons.arenaWin',
+  fiesta_kill: 'hudChrome.warfare.reasons.fiestaKill',
+  fiesta_complete: 'hudChrome.warfare.reasons.fiestaComplete',
+  fiesta_win: 'hudChrome.warfare.reasons.fiestaWin',
 };
 const RAID_MARKER_LABEL_KEYS = [
   'hud.markers.names.star',
@@ -699,20 +758,14 @@ const DEFAULT_EMOTE_WHEEL: OverheadEmoteId[] = [
 
 // yards past a zone boundary before the crossing banner/welcome commits
 const ZONE_BANNER_DEADBAND = 5;
-const IGNORED_CHAT_NAMES_KEY = 'woc_ignored_chat_names';
-// Classic-style chat tabs: the ordered channel tabs the player has opened, and the
-// tab that was active last session. The built-in `all`/`combat` views are
-// implicit and never stored.
-const CHAT_TABS_KEY = 'woc_chat_tabs';
-const CHAT_ACTIVE_TAB_KEY = 'woc_chat_active_tab';
-// Persisted chat-window geometry (drag position + resize size). Desktop only —
-// the mobile layout owns its own placement and ignores this.
-const CHAT_GEOMETRY_KEY = 'woc_chat_geometry';
-// (The MOBILE chat panel geometry key lives with its controller in
-// chat_mobile_overlay.ts: one JSON blob for the movable/resizable open panel.)
-// Persisted top-left for each movable unit frame (MovableFrame in movable_frame.ts).
-const TARGET_FRAME_POS_KEY = 'woc_target_frame_pos';
-const PLAYER_FRAME_POS_KEY = 'woc_player_frame_pos';
+// The OFFLINE ignore store. Online, the ignore list is server-persisted and
+// arrives on the `social` frame, so this set is not consulted at all (see the
+// chat event filter): keeping a second, name-keyed local list live online is
+// exactly how you get "I unignored them and still cannot see them".
+const LOCAL_IGNORES_KEY = 'woc_ignored_chat_names';
+// The persisted top-left keys for the movable unit frames live in
+// frame_pos_reset.ts (imported above) so the one-time reset clears the same
+// keys the MovableFrames read.
 const CHAT_TEMPLATE_KEYS = {
   party: 'hud.chat.templates.party',
   yell: 'hud.chat.templates.yell',
@@ -727,19 +780,6 @@ const CHAT_TEMPLATE_KEYS = {
   roll: 'hud.chat.templates.roll',
   say: 'hud.chat.templates.say',
 } satisfies Record<string, TranslationKey>;
-type HotbarForm = 'normal' | 'bear' | 'cat' | 'stealth' | 'sport';
-
-const DELVE_AFFIX_COLORS: Record<string, string> = {
-  restless_graves: '#8b7355',
-  bad_air: '#6a8a6a',
-  candleblind: '#c9a227',
-  old_mechanisms: '#7a8a9a',
-  flooded_paths: '#4a7a9a',
-  grave_tax: '#9a6a4a',
-  unstable_roof: '#8a6a5a',
-  cult_remnants: '#7a4a8a',
-  chapel_candle: '#ffd100',
-};
 type MobileHotbarDrag = {
   pointerId: number;
   sourceIndex: number;
@@ -758,68 +798,22 @@ const MAP_BG_RES = 480;
 
 // --- spatial sound-effect mapping (clips generated by scripts/gen_sfx.mjs;
 // engine in src/game/sfx.ts) ------------------------------------------------
-const SFX_MOB_FAMILIES = new Set([
-  'beast',
-  'spider',
-  'mudfin',
-  'burrower',
-  'humanoid',
-  'undead',
-  'troll',
-  'ogre',
-  'elemental',
-  'dragonkin',
-  'demon',
-]);
-const SFX_CAST_SCHOOLS = new Set(['fire', 'frost', 'arcane', 'shadow', 'holy', 'nature']);
 // Combat/spell/creature SFX are trimmed this much under movement/ambience so the
 // soundscape doesn't get fatiguing in a long fight. One knob for the whole layer.
 const COMBAT_GAIN = 0.7;
 
-/** Creature-voice family for a mob templateId (boar split from beast), or null. */
-function mobVoiceFamily(templateId: string): string | null {
-  if (templateId === 'wild_boar' || templateId === 'elder_bristleback') return 'boar';
-  const fam = MOBS[templateId]?.family;
-  return fam && SFX_MOB_FAMILIES.has(fam) ? fam : null;
+/** Append an inline span child (className '' for a plain text slot) and return
+ *  it; used to split a pre-existing single-text element into separately
+ *  writable children (the target name line's title decoration). */
+function appendChildSpan(parent: HTMLElement, className: string): HTMLElement {
+  const span = document.createElement('span');
+  if (className) span.className = className;
+  parent.appendChild(span);
+  return span;
 }
 
-/** Sustained cast-loop clip for an ability's school, or null (physical/unknown). */
-function castKeyForAbility(ability: string): string | null {
-  // Per-ability custom cast loop overrides (a player-provided clip that fits the
-  // spell better than its school default). Loops for the whole cast, any rank.
-  if (ability === 'lightning_bolt') return 'cast_lightning_bolt';
-  const school = ABILITIES[ability]?.school;
-  return school && SFX_CAST_SCHOOLS.has(school) ? `cast_${school}` : null;
-}
-
-/** Physical-impact timbre by what's hit: bone (undead), metal (plate), leather
- *  (other players), flesh (creatures). */
-function materialImpactKey(tgt: Entity): string {
-  if (tgt.kind === 'player')
-    return tgt.templateId === 'warrior' || tgt.templateId === 'paladin'
-      ? 'impact_metal'
-      : 'impact_leather';
-  if (tgt.kind === 'mob')
-    return MOBS[tgt.templateId]?.family === 'undead' ? 'impact_bone' : 'impact_flesh';
-  return 'impact_flesh';
-}
-
-/** Melee/ranged swing clip by player class. */
-function weaponSwingKey(cls: string): string {
-  switch (cls) {
-    case 'rogue':
-    case 'warlock':
-      return 'melee_swing_light';
-    case 'hunter':
-      return 'melee_bow';
-    case 'paladin':
-    case 'mage':
-    case 'priest':
-    case 'druid':
-      return 'melee_swing_heavy';
-    default:
-      return 'melee_swing_blade'; // warrior, shaman
-  }
+function availableMobVoiceCue(templateId: string, action: MobVoiceAction): string | null {
+  return mobVoiceCue(templateId, action, (key) => sfx.hasVariants(key));
 }
 
 // Stable voice-clip key for a spoken yell line. MUST match the generator slug in
@@ -839,10 +833,9 @@ export class Hud {
   // two rows share one hotbarActions array, so drag/drop, persistence, and the
   // keybind dispatch all work across both with no per-bar bookkeeping.
   private static readonly PRIMARY_BAR_ABILITY_SLOTS = 11;
-  private static readonly BAR_ABILITY_SLOTS = 22;
+  private static readonly BAR_ABILITY_SLOTS = ACTION_BAR_ABILITY_SLOTS;
   private static readonly PET_AUTOCAST_TOUCH_HOLD_MS = 2000;
   private static ddSeq = 0; // monotonic id source for buildDropdown listbox/option ARIA wiring
-  private static readonly FORM_TOGGLE_IDS = new Set(['bear_form', 'cat_form', 'travel_form']); // shift toggles, castable in any form
   private abilityButtons: {
     btn: HTMLButtonElement;
     label: HTMLSpanElement;
@@ -886,12 +879,21 @@ export class Hud {
   // no live hostile target: wired by main.ts to the same nearest-attackable
   // pick the touch layer uses (the HUD cannot resolve attackability itself,
   // that helper lives behind the game-layer seam). Null until wired; the
-  // attack handler then falls back to the plain castSlot(0) toggle.
+  // attack handler then falls back to the fixed attack control.
   onMobileAttackNearest: (() => void) | null = null;
-  private hotbarActions: HotbarAction[] = []; // index = barSlot-1
-  private loadedSlotMapFromStorage = false;
-  private knownAbilityIdsAtLastSlotSync: Set<string> | null = null;
-  private activeHotbarForm: HotbarForm = 'normal';
+  private readonly actionBarController: ActionBarController;
+  private get hotbarActions(): HotbarAction[] {
+    return this.actionBarController.actions;
+  }
+  private set hotbarActions(actions: HotbarAction[]) {
+    this.actionBarController.replaceActions(actions);
+  }
+  private get attackSlotAction(): HotbarAction {
+    return this.actionBarController.attackAction;
+  }
+  private set attackSlotAction(action: HotbarAction) {
+    this.actionBarController.replaceAttackAction(action);
+  }
   private groundAim: GroundAimState = createGroundAimState();
   private groundAimPoint: AimPoint | null = null;
   private groundAimClamped = false;
@@ -902,15 +904,26 @@ export class Hud {
   // the pure vale_cup_charge_view core; only the input timing state lives here.
   private shootChargeSlot: number | null = null;
   private shootChargeStartMs = 0;
-  private dragAction: { action: Exclude<HotbarAction, null>; sourceIndex: number | null } | null =
-    null;
+  private dragAction: {
+    action: Exclude<HotbarAction, null>;
+    sourceIndex: number | null;
+    sourceAttackSlot?: boolean;
+  } | null = null;
   // Set while dragging an equipped piece out of the paperdoll onto the bags window.
   private dragUnequipSlot: EquipSlot | null = null;
+  // The mirror gesture: the bag stack currently being dragged OUT of the bags, read
+  // by its two drop targets (a paperdoll socket equips it, the world destroys it).
+  // The windows publish and read it through their deps; the state itself is a shared
+  // module, not another cross-window field cluster on this coordinator.
+  private readonly itemDragState = new ItemDragState();
   private mobileHotbarDrag: MobileHotbarDrag | null = null;
   private suppressNextActionClick = false;
   private optionsHooks: OptionsHooks | null = null;
   private reportHooks: ReportHooks | null = null;
   private bugReportHooks: BugReportHooks | null = null;
+  // Only wired online (main.ts owns the Discord account/panel state); its presence
+  // gates whether #mm-discord does anything on a build with Discord disabled.
+  private discordHook: (() => void) | null = null;
   // Soft swear terms from the server (online only), masked in chat when the
   // player's "Filter Profanity" setting is on. Fed by main.ts from ClientWorld.
   private profanityWords: string[] = [];
@@ -963,15 +976,6 @@ export class Hud {
   // ./focus_manager. Escape is NOT handled here: it stays with the existing unified
   // dispatcher (main.ts game input -> hud.closeAll()), so there is one Escape path.
   private readonly focusManager = new FocusManager();
-  // Classic-style chat tabs. `chatTabs` are the player-added tabs (send-capable
-  // channels plus the optional filter-only whisper collector; the built-in
-  // `all`/`combat` views are implicit); `activeChatTab` is the one currently
-  // shown, and drives both the log filter and the send channel.
-  private chatTabs: ChatOpenTab[] = [];
-  private activeChatTab: ChatTabId = 'all';
-  // Bind the tab-strip wheel-to-horizontal-scroll listener exactly once (renderChatTabs
-  // rebuilds the strip's children but the bar element itself persists).
-  private chatTabsWheelBound = false;
   // The control that opened the shared #ctx-menu (the chat "+" button), so the
   // outside-click closer can defer to that opener's own toggle click. Cleared on
   // every close path (closeContextMenu + item activation).
@@ -984,6 +988,11 @@ export class Hud {
   private readonly questBanner = new QuestProgressBanner($('#quest-banner'));
   private subzoneEl = $('#subzone-banner');
   private tooltipEl = $('#tooltip');
+  // Which element last painted the shared #tooltip box, so a hovered slot can
+  // detect that the visible content belongs to a different element (after a
+  // drag-drop, or Firefox's spurious post-drag re-enter on the drag source) and
+  // re-resolve its own tooltip instead of trailing the stale one (#1626).
+  private readonly tooltipOwner = new SharedTooltipOwner<HTMLElement>();
   // Distinguishes a touch long-press "peek" (inspect, no action) from a tap.
   private peekGuard = new TouchPeekGuard();
   // The mob whose world-hover tooltip is currently shown (showMobHoverTooltip),
@@ -994,6 +1003,7 @@ export class Hud {
   // showMobHoverTooltip.
   private lastMobTooltipId: string | null = null;
   private errorTimer: number | undefined;
+  private lastMirroredErrorText: string | undefined;
   private bannerTimer: number | undefined;
   private pfLevelEl = $('#pf-level');
   private pfHpEl = $('#pf-hp');
@@ -1007,6 +1017,15 @@ export class Hud {
   private targetFrameEl = $('#target-frame');
   private targetEliteTagEl = $('#tf-elite-tag');
   private targetNameEl = $('#tf-name');
+  // The target name line splits into three inline children (pre-decoration,
+  // name text, post-decoration) so the painter can write the Book of Deeds
+  // title in its own muted-gold spans without setText clobbering them, while
+  // the OUTER #tf-name keeps the nowrap ellipsis, the hostile/friendly color
+  // write, and the frame's single-line height. Built here (not in the HTML)
+  // so both game entries pick it up.
+  private targetTitlePreEl = appendChildSpan(this.targetNameEl, 'uf-title');
+  private targetNameTextEl = appendChildSpan(this.targetNameEl, '');
+  private targetTitlePostEl = appendChildSpan(this.targetNameEl, 'uf-title');
   private targetLevelEl = $('#tf-level');
   private targetDiscordEl = $('#tf-discord');
   // Diff key for the target-frame Discord line, so its per-frame update only rebuilds
@@ -1078,7 +1097,7 @@ export class Hud {
   private hotDomSkippedWrites = 0;
   private subzoneTimer: number | undefined;
   private lastSubzone: string | null = null;
-  private lastMusicDungeonId: string | null = null;
+  private readonly instanceMusic = new InstanceMusicController(music);
   private minimapCtx: CanvasRenderingContext2D;
   private minimapBg: HTMLCanvasElement;
   private clockEl: HTMLElement | null = null;
@@ -1125,76 +1144,16 @@ export class Hud {
   private mapPrewarmVia: 'idle' | 'timeout' | null = null;
   // Delve schematic caches: static background (floor/pillars/tombs/dais/exit)
   // keyed by module id, redrawn only when the module changes.
-  private openLootMobId: number | null = null;
-  private openLootChestId: number | null = null;
-  private activeLootRolls = new Map<
-    number,
-    { event: Extract<SimEvent, { type: 'lootRoll' }>; receivedAt: number; durationMs: number }
-  >();
-  // rolls the player has answered or let expire locally; suppresses the
-  // snapshot reconcile from re-showing them until the server drops the roll
-  private dismissedLootRolls = new Set<number>();
-  // shown rolls already observed in the open-roll mirror at least once, so their
-  // later absence from the mirror means the server resolved them (retire), not
-  // that the mirror simply has not caught up to a just-shown event yet.
-  private confirmedLootRolls = new Set<number>();
-  // Group vote strip (the XLoot-style monitor): the authoritative per-candidate
-  // choices on every open roll, polled from IWorld.lootRollGroupStatus and
-  // re-rendered only when the fingerprint changes. A status row with no local
-  // prompt renders as a watch-only row, which is what keeps the roll frame up
-  // after the player answers until the server resolves the roll.
-  private lootRollStatusRows: LootRollStatusRow[] = [];
-  private lootRollStatusFp = '';
-  // rollId -> receivedAt for the watch-only rows' countdown bar (a prompt row
-  // keeps its own receivedAt; a watch row starts timing at first sight).
-  private lootRollWatchTimers = new Map<number, number>();
-  // Master-loot assignment prompts, shown only to the master looter alongside
-  // the loot-roll rail. Same lifetime/expiry as a need/greed roll.
-  private activeMasterRolls = new Map<
-    number,
-    { event: Extract<SimEvent, { type: 'masterLoot' }>; receivedAt: number; durationMs: number }
-  >();
+  private readonly lootWindow: LootWindowController;
+  private readonly lootRolls: LootRollController;
   private openVendorNpcId: number | null = null;
-  // The copper vendor's active tab (Browse / Sell / Buyback). Hud-held so a
-  // snapshot repaint keeps it and each fresh open resets it to Browse.
-  private vendorTab: VendorTab = 'browse';
   private openHeroicVendorNpcId: number | null = null;
-  private openDelveBoardNpcId: number | null = null;
-  private lastDelveTrackerSig = '';
-  private selectedDelveTier: 'normal' | 'heroic' = 'normal';
-  private delveBoardTab: 'delve' | 'shop' = 'delve';
-  private delveTrap: FocusTrapHandle | null = null;
-  private lockpickTrap: FocusTrapHandle | null = null;
-  private lockpickKeyHandler: ((e: KeyboardEvent) => void) | null = null;
-  // The board paints from the authoritative world.lockpickState (never a cached
-  // copy), and owns the per-page countdown with a generation guard. hud.ts keeps
-  // only offer routing, focus restore, and keybinds.
-  private readonly lockpickWindow = new LockpickWindow({
-    getState: () => this.sim.lockpickState,
-    tierName: (tier) => this.lockpickTierName(tier),
-    onEngage: (objectId, ante) => this.submitLockpickEngage(objectId, ante),
-    onAction: (action) => this.submitLockpickAction(action),
-    onAbort: () => this.submitLockpickAbort(),
-    onClose: () => this.closeLockpick(),
-  });
-  // Drowned Reliquary Rite difficulty popup. Opened on the delveRiteChoosePrompt
-  // cue (approaching the risen reliquary), closed once playback starts.
-  private riteTrap: FocusTrapHandle | null = null;
-  private readonly riteWindow = new RiteWindow({
-    onChoose: (intensity) => this.submitRiteChoose(intensity),
-    onClose: () => this.closeRitePanel(),
-  });
-  private openGossipNpcId: number | null = null;
-  private openQuestDetailId: string | null = null;
-  // Ordered so two base/heroic items with the same display name retain their
-  // distinct tokens when the readable draft is converted for sending.
-  private pendingChatLinks: readonly { display: string; token: string }[] = [];
-  private questDialogTrap: FocusTrapHandle | null = null;
-  private questDialogOpenedAtMs = 0;
-  // The NPC whose voice line is currently sounding, so update() can fade it by
-  // distance as the player walks away. Outlives the dialog window (which closes at
-  // 8) and is cleared once the clip ends. null when no dialogue voice is playing.
-  private voiceNpcId: number | null = null;
+  private readonly delveBoard: DelveBoardController;
+  private readonly delveTracker: DelveTrackerController;
+  private readonly lockpickController: LockpickController;
+  private readonly riteController: RiteController;
+  private readonly questTracker: QuestTrackerController;
+  private readonly questDialog: QuestDialogController;
   // swing timer: the period is captured from the reset edge (swingTimer jumping
   // up), so the bar tracks real swing speed including haste / ranged weapons.
   private swingPeriod = 0;
@@ -1224,11 +1183,7 @@ export class Hud {
   private wasLeaderOfParty = false;
   private lastArenaStatusSig = '';
   private arenaMatchSeen = false; // closes the queue panel once a bout starts
-  // 2v2 Fiesta UI state (all transient)
-  private fiestaScoreSeen = { a: -1, b: -1 }; // last rendered tally (for score-ping)
-  private fiestaOfferKey = ''; // identity of the currently-shown augment offer
-  private fiestaActiveSeen = false; // were we in a fiesta bout last frame
-  private fiestaWasDown = false; // were we benched last frame (for the revive cue)
+  private readonly fiesta: FiestaController;
   private lastCombatEventAt = 0;
   // mob ids that have already vocalized their aggro alert (so the first strike
   // roars and subsequent strikes use the attack vocalization). Cleared on death
@@ -1242,6 +1197,10 @@ export class Hud {
   private lastZoneId = '';
   private mapZoom = 1; // world-map zoom: 1 = whole zone, up to MAP_MAX_ZOOM
   private mapCenter: { x: number; z: number } | null = null; // pan target; null = follow player
+  // Dungeon Finder "Show on Map": a highlighted entrance + the zone band to
+  // display instead of the player's committed zone. Cleared on map open/close.
+  private mapPing: { x: number; z: number } | null = null;
+  private mapZoneOverride: string | null = null;
   private mapDrag: { px: number; py: number; cx: number; cz: number } | null = null;
   private mapView: {
     spanX: number;
@@ -1257,41 +1216,23 @@ export class Hud {
   // The quest-giver glyphs of the last overworld map paint, for the hover
   // tooltip's hit-test (quest names + level requirements). Empty in delve mode.
   private mapNpcMarkers: MapNpcMarker[] = [];
-  private windowDrag: {
-    el: HTMLElement;
-    pointerId: number;
-    offsetX: number;
-    offsetY: number;
-  } | null = null;
-  // Movable/resizable chat box: current geometry (null = stock CSS default) plus
-  // the in-progress pointer gesture, if any. See chat_window.ts for the math.
-  private chatBox: ChatBoxGeometry | null = null;
-  private chatBoxGesture:
-    | { kind: 'move'; pointerId: number; grabX: number; grabY: number }
-    | {
-        kind: 'resize';
-        pointerId: number;
-        startX: number;
-        startY: number;
-        startW: number;
-        startH: number;
-      }
-    | null = null;
-  // Mobile chat overlay controller (chat_mobile_overlay.ts): the move chip +
-  // bottom resize bar on the open touch panel, with persisted geometry.
-  private chatMobileOverlay: ChatMobileOverlay | null = null;
+  private windowDragController: WindowDragController | null = null;
+  private readonly chatGeometry: ChatGeometryController;
+  private readonly chatWindow: ChatWindowController;
   // Movable unit frames (the shared MovableFrame controller, movable_frame.ts):
   // the target frame and the player frame each get a corner move/lock button, a
   // pointer drag, and a persisted top-left. Constructed once in initFrameMovers.
   private targetFrameMover: MovableFrame | null = null;
   private playerFrameMover: MovableFrame | null = null;
+  private partyFrameMover: MovableFrame | null = null;
   private windowObserver: MutationObserver | null = null;
   private windowZ = 50;
-  private ignoredChatNames = new Set<string>();
+  private localIgnoredNames = new Set<string>();
   private lastHudFastAt = 0;
   private lastHudMediumAt = 0;
   private lastHudSlowAt = 0;
   private dailyRewardsButtonEl: HTMLButtonElement | null = null;
+  private storePromoCard: StorePromoCardController | null = null;
   // Mobile More-tray entry mirroring the desktop chest button's hidden/spin-ready
   // state (folded off the top-right rail so it never overlaps the buff/debuff bars).
   private mobileDailyRewardsButtonEl: HTMLButtonElement | null = null;
@@ -1308,30 +1249,20 @@ export class Hud {
   private lastTargetDebuffsPaintAt = 0;
   private lastTargetFramePaintAt = 0;
   private lastTargetFrameId: number | null = null;
+  // Title resolve elision for the target frame (the lastIcon pattern): the
+  // pattern-key composition re-runs only when the (language, title id)
+  // signature changes; every steady frame reuses the cached decoration and
+  // the elided setText writes nothing.
+  private lastTargetTitleSig: string | null = null;
+  private targetTitleDecoration: TitledNameDecoration = { pre: '', post: '' };
   private charPreview: CharacterPreview | null = null;
   private charPreviewCanvas: HTMLCanvasElement | null = null;
-  // Cosmetic skin-select event overlay (opened by the skinEvent cue). The shared
-  // CharacterPreview above is borrowed for the rotatable 3D preview.
-  private skinEventEl: HTMLElement | null = null;
-  private skinEventTrap: FocusTrapHandle | null = null;
-  private skinEventRank: SkinRank | null = null;
-  private skinEventTiers: readonly SkinTier[] = EVENT_SKIN_TIERS;
-  private skinEventSelected = -1;
-  private skinEventSelectedKey = '';
-  private skinEventRevealTimer: number | null = null;
-  private skinEventWheelAngle = 0;
-  // 'class' = per-class event skins; 'mech' = the Combat Mech chroma catalog.
-  private skinEventMode: 'class' | 'mech' = 'class';
+  private readonly skinEvent: SkinEventController;
   // Pending lazy-load of the mech GLB + chromas; the reveal waits on it.
   private mechAssetsPromise: Promise<void> | null = null;
-  private cardModalEl: HTMLElement | null = null;
-  private cardModalTrap: FocusTrapHandle | null = null;
+  private readonly playerCard: PlayerCardController;
   // Shared by the confirm + input modals (one #confirm-dialog id; they never coexist).
   private confirmTrap: FocusTrapHandle | null = null;
-  // Set while the player-card modal is open: re-composites the card with the
-  // current pose so a $WOC balance change (the bag-footer path can't reach the
-  // card's canvas) is reflected. Cleared when the modal closes.
-  private recomposeOpenCard: (() => void) | null = null;
   private meters: Meters;
   private tutorial = new TutorialOverlay();
   private lastPetBarSig = '';
@@ -1352,15 +1283,248 @@ export class Hud {
     private sim: IWorld,
     private renderer: Renderer,
     private keybinds: Keybinds,
+    private readonly features: HudFeatures = { dailyRewardsEnabled: true },
   ) {
-    this.ignoredChatNames = this.loadIgnoredChatNames();
+    this.localIgnoredNames = this.loadLocalIgnoredNames();
     this.meters = new Meters(sim);
-    this.initChatTabs();
-    this.initChatBoxGeometry();
+    this.actionBarController = new ActionBarController({
+      storage: localStorage,
+      playerClass: this.sim.cfg.playerClass,
+      playerName: this.sim.player.name,
+      knownAbilityIds: () => this.sim.known.map((known) => known.def.id),
+      hasAura: (kind) => this.sim.player.auras.some((aura) => aura.kind === kind),
+      isInSportMatch: () => {
+        const match = this.sim.cupInfo?.match;
+        return !!match && match.team !== null;
+      },
+      showAttackButton: () => this.optionsHooks?.settings.get('showAttackButton') ?? true,
+    });
+    this.delveTracker = new DelveTrackerController({
+      element: $('#delve-tracker'),
+      world: () => this.sim,
+      delveName: delveDisplayName,
+      mobName: mobDisplayName,
+      attachTooltip: (element, html) => this.attachTooltip(element, html),
+      closeRitePanel: (restoreFocus) => this.closeRitePanel(restoreFocus),
+    });
+    this.delveBoard = new DelveBoardController({
+      element: $('#delve-board'),
+      world: () => this.sim,
+      openFocusTrap: () => this.focusManager.open({ root: () => $('#delve-board') }),
+      closeOtherWindows: (selector) => this.closeOtherWindows(selector),
+      hideTooltip: () => this.hideTooltip(),
+      attachTooltip: (element, html) => this.attachTooltip(element, html),
+      itemIcon: (item) => this.itemIcon(item),
+      itemTooltip: (item) => this.itemTooltip(item),
+      delveName: delveDisplayName,
+      preloadInterior: (event) => this.renderer.handleEvent(event),
+    });
+    this.riteController = new RiteController({
+      panel: $('#delve-rite-panel'),
+      openFocusTrap: () => this.focusManager.open({ root: () => $('#delve-rite-panel') }),
+      choose: (intensity) => this.sim.delveRiteChoose(intensity),
+    });
+    this.lockpickController = new LockpickController({
+      panel: $('#lockpick-panel'),
+      keyboardTarget: window,
+      openFocusTrap: () => this.focusManager.open({ root: () => $('#lockpick-panel') }),
+      getState: () => this.sim.lockpickState,
+      engage: (objectId, ante) => this.sim.lockpickEngage(objectId, ante),
+      act: (action) => this.sim.lockpickAction(action),
+      abort: () => this.sim.lockpickAbort(),
+      drainEvents: () => {
+        const drain = (this.sim as { drainEvents?: () => SimEvent[] }).drainEvents;
+        return drain ? drain.call(this.sim) : null;
+      },
+      handleEvents: (events) => this.handleEvents(events),
+      showBanner: (text) => this.showBanner(text),
+      log: (text, color) => this.log(text, color),
+      hideTooltip: () => this.hideTooltip(),
+    });
+    this.fiesta = new FiestaController({
+      document,
+      world: () => this.sim,
+      audio: {
+        click: () => audio.click(),
+        scorePing: (mineScored) => audio.fiestaScorePing(mineScored),
+        revive: () => audio.fiestaRevive(),
+      },
+      crestIconUrl: (playerClass) => iconDataUrl('crest', playerClass),
+      random: Math.random,
+      schedule: (callback, delayMs) => {
+        window.setTimeout(callback, delayMs);
+      },
+    });
+    this.questTracker = new QuestTrackerController({
+      element: $('#quest-tracker'),
+      document,
+      world: () => this.sim,
+      settings: {
+        available: () => this.optionsHooks !== null,
+        collapsed: () =>
+          (this.optionsHooks?.settings.get('questTrackerCollapsed') ?? false) === true,
+        setCollapsed: (collapsed) => {
+          this.optionsHooks?.settings.set('questTrackerCollapsed', collapsed);
+        },
+      },
+      questTitle,
+      objectiveLabel: questObjectiveLabel,
+      click: () => audio.click(),
+    });
+    this.questDialog = new QuestDialogController({
+      element: $('#quest-dialog'),
+      document,
+      world: () => this.sim,
+      now: () => performance.now(),
+      text: {
+        npcName: npcDisplayName,
+        mobName: mobDisplayName,
+        npcTitle: npcDisplayTitle,
+        npcGreeting,
+        delveName: delveDisplayName,
+        questTitle,
+        questNarrative,
+        objectiveLabel: questObjectiveLabel,
+        number: (value) => this.questNumber(value),
+        progress: (label, current, total) => this.questProgressText(label, current, total),
+        suggestedPlayers: (count) => this.questSuggestedPlayersHtml(count),
+        money: (copper) => this.moneyHtml(copper),
+      },
+      openFocusTrap: (root) => this.focusManager.open({ root }),
+      closeTransient: () => this.closeOtherWindows('#quest-dialog'),
+      hideTooltip: () => this.hideTooltip(),
+      itemIcon: (item) => this.itemIcon(item),
+      itemTooltip: (item) => this.itemTooltip(item),
+      attachTooltip: (element, html) => this.attachTooltip(element, html),
+      openChronicles: () => this.openDeeds('chronicle'),
+      openVendor: (npcId) => this.openVendor(npcId),
+      openHeroicVendor: (npcId) => this.openHeroicVendor(npcId),
+      openMarket: () => this.openMarket(),
+      openDelveBoard: (npcId) => this.openDelveBoard(npcId),
+      openValeCup: () => this.toggleValeCup(),
+      voice: {
+        play: (key) => voice.play(key),
+        isPlaying: () => voice.isPlaying(),
+        setDistance: (distance) =>
+          voice.setDistanceGain(distance === null ? 0 : voiceDistanceGain(distance)),
+      },
+    });
+    this.lootWindow = new LootWindowController({
+      element: $('#loot-window'),
+      document,
+      world: () => this.sim,
+      closeTransient: () => this.closeOtherWindows('#loot-window'),
+      hideTooltip: () => this.hideTooltip(),
+      entityName: entityDisplayName,
+      money: (copper) => this.moneyHtml(copper),
+      coinIconUrl: () => iconDataUrl('item', 'coin_gold'),
+      itemIcon: (item) => this.itemIcon(item),
+      itemTooltip: (item) => this.itemTooltip(item),
+      attachTooltip: (element, html) => this.attachTooltip(element, html),
+      centerPopup: (element) => this.centerPopupInViewport(element),
+      placePopup: (element, x, y, reserveRight, reserveBottom, minLeft, minTop) =>
+        this.placePopupAt(element, x, y, reserveRight, reserveBottom, minLeft, minTop),
+    });
+    this.lootRolls = new LootRollController({
+      document,
+      world: () => this.sim,
+      now: () => performance.now(),
+      isMobileLayout: () => this.isMobileLayout(),
+      itemIcon: (item) => this.itemIcon(item),
+      itemTooltip: (item) => this.itemTooltip(item),
+      attachTooltip: (element, html) => this.attachTooltip(element, html),
+      writers: this.writerFacet,
+    });
+    this.playerCard = new PlayerCardController({
+      document,
+      world: () => this.sim,
+      ensurePreview: () => {
+        if (!this.charPreview) this.renderCharPreview();
+      },
+      preview: () => this.charPreview,
+      openFocusTrap: (root) => this.focusManager.open({ root }),
+      options: {
+        refreshBalance: () => this.optionsHooks?.refreshWocBalance(),
+        showWallet: () => this.optionsHooks?.settings.get('showWalletOnPlayerCard') ?? true,
+        setShowWallet: (show) => {
+          this.optionsHooks?.onSettingChange('showWalletOnPlayerCard', show);
+        },
+        showDevBadges: () => this.optionsHooks?.settings.get('showDevBadges') ?? true,
+      },
+      slotName: itemSlotName,
+      click: () => audio.click(),
+    });
+    this.skinEvent = new SkinEventController({
+      document,
+      window,
+      world: () => this.sim,
+      closeTop: () => this.closeAll(),
+      hideTooltip: () => this.hideTooltip(),
+      onPortraitsReady,
+      preloadMechAssets: () => {
+        if (!this.mechAssetsPromise) this.mechAssetsPromise = preloadMechAssets();
+        return this.mechAssetsPromise;
+      },
+      preview: {
+        mount: (container, playerClass, skin, previewKey) =>
+          this.mountCharPreview(container, playerClass, skin, previewKey),
+        setSkin: (skin) => this.charPreview?.setSkin(skin),
+      },
+      openFocusTrap: (root) => this.focusManager.open({ root }),
+      attachTooltip: (element, html) => this.attachTooltip(element, html),
+      showBanner: (text) => this.showBanner(text),
+      renderBagsIfOpen: () => {
+        if ($('#bags').style.display !== 'none') this.renderBags();
+      },
+      random: Math.random,
+      audio: {
+        bagOpen: () => audio.bagOpen(),
+        bagClose: () => audio.bagClose(),
+        click: () => audio.click(),
+        levelUp: () => audio.levelUp(),
+      },
+    });
+    this.chatGeometry = new ChatGeometryController({
+      document,
+      window,
+      storage: localStorage,
+      isMobileLayout: () => this.isMobileLayout(),
+      hasStorePromoCard: () => this.storePromoCard !== null,
+      uiScale: getUiScale,
+    });
+    this.chatWindow = new ChatWindowController({
+      document,
+      storage: localStorage,
+      chatLog: this.chatLogEl,
+      combatLog: this.combatLogEl,
+      contextMenu: {
+        element: $('#ctx-menu'),
+        opener: () => this.ctxMenuOpener,
+        setOpener: (opener) => {
+          this.ctxMenuOpener = opener;
+        },
+        close: () => this.closeContextMenu(),
+        place: (element, x, y, reserveRight, reserveBottom, minLeft, minTop) =>
+          this.placePopupAt(element, x, y, reserveRight, reserveBottom, minLeft, minTop),
+        bind: (onActivate) => this.bindContextMenuActions(onActivate),
+      },
+      sendChat: (line) => this.sim.chat(line),
+      isMobileLayout: () => this.isMobileLayout(),
+      itemDisplayName: (itemId) => {
+        const item = ITEMS[itemId];
+        return item ? itemDisplayName(item) : null;
+      },
+      questTitle,
+      selectedQuestId: () => this.questlogWindow.selectedQuestId,
+      hasQuest: (questId) => this.sim.questLog.has(questId),
+      showError: (text) => this.showError(text),
+    });
+    this.chatWindow.init();
+    this.chatGeometry.init();
     this.initFrameMovers();
     this.initWindowManagement();
     this.emoteWheelSlots = this.loadEmoteWheelSlots();
-    this.loadSlotMap();
+    this.actionBarController.init();
     this.buildActionBar();
     this.initMailIndicator();
     this.refreshKeybindLabels();
@@ -1370,7 +1534,7 @@ export class Hud {
     // connected wallet's $WOC balance changes
     onWalletUiChange(() => {
       if ($('#bags').style.display !== 'none') this.renderBags();
-      this.recomposeOpenCard?.();
+      this.playerCard.refresh();
     });
     $('#pf-name').textContent = sim.player.name;
     this.drawPlayerFramePortrait();
@@ -1411,12 +1575,17 @@ export class Hud {
     });
     this.initCompass();
     this.initMinimapZoom(mm);
-    this.releaseSpiritBtnEl.addEventListener('click', () => {
+    // bindTouchTap, not 'click': the browser only synthesizes click for the
+    // PRIMARY pointer, so on a phone these death-screen buttons went dead the
+    // moment another finger was down (a held movement joystick when the player
+    // died mid-run), stranding them on the death overlay (issue 1484). Matches
+    // every other touch-facing HUD button; desktop mouse/keyboard is preserved.
+    bindTouchTap(this.releaseSpiritBtnEl, () => {
       if (this.sim.arenaInfo?.match) return;
       this.sim.releaseSpirit();
     });
-    this.resurrectCorpseBtnEl.addEventListener('click', () => this.sim.resurrectAtCorpse());
-    this.resurrectHealerBtnEl.addEventListener('click', () => this.sim.resurrectAtSpiritHealer());
+    bindTouchTap(this.resurrectCorpseBtnEl, () => this.sim.resurrectAtCorpse());
+    bindTouchTap(this.resurrectHealerBtnEl, () => this.sim.resurrectAtSpiritHealer());
     document.addEventListener('pointerdown', (ev) => {
       const target = ev.target as Node | null;
       if (!target) return;
@@ -1499,6 +1668,7 @@ export class Hud {
       this.mobileDailyRewardsButtonEl = mobileDailyRewardsButton;
       dailyRewardsButton.innerHTML =
         '<img class="daily-rewards-icon" src="/ui/daily-rewards/treasure_chest.webp" alt="" draggable="false" decoding="async">';
+      this.syncDailyRewardsSurfaceLabels();
       dailyRewardsButton.classList.remove('spin-ready');
       this.applyDailyRewardsChestButtonVisibility();
       dailyRewardsButton.addEventListener('pointerdown', (event) => {
@@ -1547,11 +1717,20 @@ export class Hud {
       this.openTargetFrameMenuAt(pe.clientX, pe.clientY);
     });
     this.bindMobileFrameLongPress($('#target-frame'), (x, y) => this.openTargetFrameMenuAt(x, y));
-    $('#player-frame').addEventListener('contextmenu', (ev) => {
+    const playerFrame = $('#player-frame');
+    playerFrame.addEventListener('contextmenu', (ev) => {
       ev.preventDefault();
       this.openSelfContextMenu((ev as MouseEvent).clientX, (ev as MouseEvent).clientY);
     });
-    this.bindMobileFrameLongPress($('#player-frame'), (x, y) => this.openSelfContextMenu(x, y), {
+    playerFrame.addEventListener('keydown', (ev) => {
+      if (ev.key !== 'ContextMenu' && !(ev.shiftKey && ev.key === 'F10')) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      const rect = playerFrame.getBoundingClientRect();
+      this.openSelfContextMenu(rect.left, rect.bottom, playerFrame);
+      $('#ctx-menu').querySelector<HTMLElement>('.ctx-item')?.focus();
+    });
+    this.bindMobileFrameLongPress(playerFrame, (x, y) => this.openSelfContextMenu(x, y), {
       ignoreSelector: 'button, #buff-bar, #debuff-bar',
     });
     $('#mm-char').addEventListener('click', () => this.toggleChar());
@@ -1559,6 +1738,7 @@ export class Hud {
     $('#mm-talents')?.addEventListener('click', () => this.toggleTalents());
     $('#mm-town-focus')?.addEventListener('click', () => this.toggleTownFocus());
     $('#mm-quest').addEventListener('click', () => this.toggleQuestLog());
+    $('#mm-deeds').addEventListener('click', () => this.toggleDeeds());
     // Collapse/expand the on-screen quest tracker by clicking its header. The
     // overlay is click-through (pointer-events:none) except the header button, so
     // delegate on the stable container (the header is rebuilt on each render).
@@ -1592,6 +1772,34 @@ export class Hud {
         this.questlogWindow.openWithQuest(row.dataset.quest);
       }
     });
+    // Collapse/expand the deed tracker from its header (the quest tracker
+    // delegation pattern: click plus the Enter/Space keydown arm below,
+    // stopped before the window-level chat-open/jump binds hijack the
+    // focused header button; see the quest-tracker guard above). On the
+    // compact touch tier the rows are folded away (hud.mobile.css) and the
+    // header is a count chip: activation opens the Book of Deeds instead of
+    // toggling a collapse the player cannot see.
+    $('#deed-tracker').addEventListener('click', (e) => {
+      if (!(e.target as HTMLElement).closest('.dt-header')) return;
+      const body = document.body.classList;
+      if (body.contains('mobile-touch') && body.contains('hud-mobile-compact')) {
+        this.openDeeds();
+        return;
+      }
+      this.toggleDeedTrackerCollapsed();
+    });
+    $('#deed-tracker').addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ' && e.code !== 'Space') return;
+      if (!(e.target as HTMLElement).closest('.dt-header')) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const body = document.body.classList;
+      if (body.contains('mobile-touch') && body.contains('hud-mobile-compact')) {
+        this.openDeeds();
+        return;
+      }
+      this.toggleDeedTrackerCollapsed();
+    });
     // The delve board, lockpick panel, map window, and the bank + bags cluster are
     // non-modal overlays, so canUseGameKeys() stays true and the global jump (Space)
     // / chat (Enter) binds would otherwise hijack those keys on a focused panel
@@ -1606,6 +1814,7 @@ export class Hud {
       '#map-window',
       '#bank-window',
       '#bags',
+      '#deeds-window',
     ]) {
       $(panelId).addEventListener('keydown', (e) => {
         if ((e.target as HTMLElement).tagName !== 'BUTTON') return;
@@ -1725,6 +1934,7 @@ export class Hud {
     mapCanvas.addEventListener('pointerup', endMapTap);
     mapCanvas.addEventListener('pointercancel', endMapTap);
     $('#mm-bag').addEventListener('click', () => this.toggleBags());
+    $('#mm-crafting').addEventListener('click', () => this.toggleCrafting());
     // Drop an equipped piece dragged out of the paperdoll onto the bags window.
     const bagsEl = $('#bags');
     bagsEl.addEventListener('dragover', (e) => {
@@ -1748,11 +1958,23 @@ export class Hud {
       this.renderBags();
       this.renderCharIfOpen();
     });
+    // The mirror gesture: drop a bag stack on the WORLD to throw it away (the classic
+    // binding that replaced right-click-destroys). It only opens the destroy prompt;
+    // nothing is ever destroyed by the drop itself.
+    installWorldDropTarget({
+      root: () => $('#game-canvas'),
+      state: this.itemDragState,
+      destroyAction: (itemId) => this.bagsWindow.destroyAction(itemId),
+      promptDestroy: (itemId, count) => this.bagsWindow.promptDestroy(itemId, count),
+      showBlocked: () => this.bagsWindow.showDestroyBlocked(),
+    });
     $('#mm-social').addEventListener('click', () => this.toggleSocial());
     $('#mm-options')?.addEventListener('click', () => this.toggleOptionsMenu());
     $('#mm-arena').addEventListener('click', () => this.toggleArena());
+    $('#mm-dfinder').addEventListener('click', () => this.toggleDungeonFinder());
     $('#mm-valecup').addEventListener('click', () => this.toggleValeCup());
     $('#mm-leaderboard').addEventListener('click', () => this.toggleLeaderboard());
+    $('#mm-discord')?.addEventListener('click', () => this.discordHook?.());
     const emoteBtn = $('#mm-emote');
     emoteBtn.addEventListener('click', (ev) => {
       ev.preventDefault();
@@ -1866,6 +2088,7 @@ export class Hud {
       markResizableWindow(el);
     };
     this.windowObserver = new MutationObserver((mutations) => {
+      const windowsToSync = new Set<HTMLElement>();
       for (const m of mutations) {
         if (m.type === 'childList') {
           m.addedNodes.forEach((node) => {
@@ -1876,58 +2099,24 @@ export class Hud {
           continue;
         }
         if (m.target instanceof HTMLElement && m.target.matches('.window.panel')) {
-          this.syncWindowOpenState(m.target);
+          if (isWindowDragPreviewMutation(m.attributeName, m.target)) continue;
+          windowsToSync.add(m.target);
         }
       }
+      for (const win of windowsToSync) this.syncWindowOpenState(win);
     });
     document.querySelectorAll<HTMLElement>('.window.panel').forEach(observeWindow);
     this.windowObserver.observe(document.body, { childList: true, subtree: true });
     this.syncAnyWindowOpenState();
 
-    document.addEventListener('pointerdown', (ev) => {
-      const target = ev.target as HTMLElement | null;
-      const el = target?.closest?.('.window.panel') as HTMLElement | null;
-      if (!el) return;
-      this.bringWindowToFront(el);
-      if (ev.button !== 0 || !target || !isWindowDragHandle(target, el)) return;
-      ev.preventDefault();
-      this.hideTooltip();
-      const rect = el.getBoundingClientRect();
-      this.setWindowPixelPosition(el, rect.left, rect.top, rect);
-      this.windowDrag = {
-        el,
-        pointerId: ev.pointerId,
-        offsetX: ev.clientX - rect.left,
-        offsetY: ev.clientY - rect.top,
-      };
-      el.classList.add('window-dragging');
-      el.dataset.windowMoved = '1';
-      try {
-        target.setPointerCapture?.(ev.pointerId);
-      } catch {
-        /* synthetic/legacy pointer without active capture */
-      }
+    this.windowDragController = installWindowDrag({
+      getScale: () => getUiScale(),
+      isDragHandle: (target, el) => this.isWindowDragHandle(target, el),
+      bringToFront: (el) => this.bringWindowToFront(el),
+      hideTooltip: () => this.hideTooltip(),
+      pinWindow: (el, rect) => this.setWindowPixelPosition(el, rect.left, rect.top, rect),
+      commitWindow: (el, left, top, rect) => this.setWindowPixelPosition(el, left, top, rect),
     });
-    document.addEventListener('pointermove', (ev) => {
-      const drag = this.windowDrag;
-      if (!drag || drag.pointerId !== ev.pointerId) return;
-      ev.preventDefault();
-      const rect = drag.el.getBoundingClientRect();
-      this.setWindowPixelPosition(
-        drag.el,
-        ev.clientX - drag.offsetX,
-        ev.clientY - drag.offsetY,
-        rect,
-      );
-    });
-    const endDrag = (ev: PointerEvent) => {
-      const drag = this.windowDrag;
-      if (!drag || drag.pointerId !== ev.pointerId) return;
-      drag.el.classList.remove('window-dragging');
-      this.windowDrag = null;
-    };
-    document.addEventListener('pointerup', endDrag);
-    document.addEventListener('pointercancel', endDrag);
     installWindowResize({
       getScale: () => getUiScale(),
       pinWindow: (el, rect) => this.setWindowPixelPosition(el, rect.left, rect.top, rect),
@@ -1980,6 +2169,15 @@ export class Hud {
       .filter((win) => win.id !== 'mobile-extra-controls')
       .some((win) => this.isWindowVisible(win));
     document.body.classList.toggle('mobile-window-open', anyOpen);
+    const storeWindow = document.getElementById('daily-rewards-window') as HTMLElement | null;
+    const claudiumWindow = document.getElementById('claudium-window') as HTMLElement | null;
+    document.body.classList.toggle(
+      'store-stack-open',
+      stackedWindowsVisible(
+        !!storeWindow && this.isWindowVisible(storeWindow),
+        !!claudiumWindow && this.isWindowVisible(claudiumWindow),
+      ),
+    );
     const mapWindow = document.getElementById('map-window');
     const questLogWindow = document.getElementById('quest-log-window');
     document.body.classList.toggle(
@@ -1997,62 +2195,25 @@ export class Hud {
     // their inset:0 CSS with an inline top/left/right:auto/bottom:auto that
     // never gets reset, breaking the full-screen layout for the rest of the
     // session (issue 1577 char/talents redo).
-    if (document.body.classList.contains('mobile-touch')) {
-      // A desktop session bakes inline cascade/drag geometry (left/top plus
-      // windowMoved); after an Interface Mode or rotation flip to touch that
-      // inline inset would beat the dock CSS for the rest of the session
-      // (inline wins over any layered rule), so clear it at show time. The
-      // cursor-anchored popups own their inline position in both modes and are
-      // left alone; inline width/height (the touch corner-band resize) stay.
-      if (el.id !== 'loot-window' && el.id !== 'confirm-dialog' && el.style.left !== '') {
-        el.style.removeProperty('left');
-        el.style.removeProperty('top');
-        el.style.removeProperty('right');
-        el.style.removeProperty('bottom');
-        el.style.removeProperty('transform');
-        delete el.dataset.windowMoved;
-      }
+    if (
+      document.body.classList.contains('mobile-touch') ||
+      el.dataset.windowMoved === '1' ||
+      el.id === 'loot-window' ||
+      el.id === 'confirm-dialog'
+    )
       return;
-    }
-    // The static-dialog family (quest/gossip, confirm, delve board/rite,
-    // lockpick, loot, report) is never cascade-offset: these are centered
-    // transient dialogs whose drag is disabled (STATIC_DIALOG_WINDOW_IDS), so
-    // a baked cascade position would stick for the session with no way to
-    // pull the window back. loot-window/confirm-dialog were already skipped
-    // (cursor-anchored / modal); the set subsumes both.
-    if (el.dataset.windowMoved === '1' || STATIC_DIALOG_WINDOW_IDS.has(el.id)) return;
-    // A window that already carries a baked inline position was cascaded (or
-    // otherwise pinned) before: re-cascading from that persisted rect would
-    // compound another 28px of drift on every reopen while any other window is
-    // open, so only a window still at its stylesheet position cascades. The
-    // reopen still re-clamps in place (the old compounding cascade incidentally
-    // did this), so a position persisted at a larger viewport cannot reopen
-    // off-screen.
-    if (el.style.left !== '') {
-      const rect = el.getBoundingClientRect();
-      this.setWindowPixelPosition(el, rect.left, rect.top, rect);
+    if (
+      document.body.classList.contains('vendor-open') &&
+      (el.id === 'vendor-window' || el.id === 'bags')
+    )
       return;
-    }
-    // The vendor floats and cascades like the World Market, but its auto-opened
-    // bags companion must NOT be pinned: the cascade would bake an inline left/top
-    // onto #bags that outlives the pairing and beats the bank's later
-    // body.bank-open dock (inline wins over any layered rule), breaking the common
-    // vendor-then-bank hub flow.
-    if (document.body.classList.contains('vendor-open') && el.id === 'bags') return;
-    // The bank docks its bags companion side by side (a fixed cluster driven by
-    // body.bank-open, mobile-paired 50/50); baking a cascade-offset inline position
-    // onto either half would defeat that layout (the inline inset beats the docking
-    // CSS), so skip the cascade for the bank cluster.
+    // The bank docks its bags companion the same way the vendor does (a fixed
+    // side-by-side cluster driven by body.bank-open, mobile-paired 50/50); baking a
+    // cascade-offset inline position onto either half would defeat that layout (the
+    // inline inset beats the docking CSS), so skip the cascade for the bank cluster.
     if (
       document.body.classList.contains('bank-open') &&
       (el.id === 'bank-window' || el.id === 'bags')
-    )
-      return;
-    // The market pairs its bags companion the same way on touch (body.market-open,
-    // 50/50 dock): a baked cascade inset on either half would beat the dock CSS.
-    if (
-      document.body.classList.contains('market-open') &&
-      (el.id === 'market-window' || el.id === 'bags')
     )
       return;
     const openCount = [...document.querySelectorAll<HTMLElement>('.window.panel')].filter(
@@ -2065,13 +2226,22 @@ export class Hud {
   }
 
   private bringWindowToFront(el: HTMLElement): void {
+    // The confirm/input prompt is the topmost modal by definition and never
+    // joins the 50-89 window band: banding it (a pointerdown raise, or the
+    // normalize sweep) drops it BEHIND the armory inspect overlay (z 90), so a
+    // real mouse press on the dialog demotes it mid-click and its own OK
+    // button becomes unclickable (the "phantom dead confirm" bug).
+    if (el.id === 'confirm-dialog') {
+      el.style.zIndex = String(Math.max(this.windowZValue(el), 95));
+      return;
+    }
     if (this.windowZ >= 89) this.normalizeWindowZ();
     el.style.zIndex = String(++this.windowZ);
   }
 
   private normalizeWindowZ(): void {
     const open = [...document.querySelectorAll<HTMLElement>('.window.panel')]
-      .filter((el) => this.isWindowVisible(el))
+      .filter((el) => el.id !== 'confirm-dialog' && this.isWindowVisible(el))
       .sort((a, b) => this.windowZValue(a) - this.windowZValue(b));
     this.windowZ = 50;
     for (const el of open) el.style.zIndex = String(++this.windowZ);
@@ -2080,6 +2250,18 @@ export class Hud {
   private windowZValue(el: HTMLElement): number {
     const z = Number.parseInt(el.style.zIndex || getComputedStyle(el).zIndex || '', 10);
     return Number.isFinite(z) ? z : 0;
+  }
+
+  private isWindowDragHandle(target: HTMLElement, win: HTMLElement): boolean {
+    if (
+      target.closest(
+        'button, input, textarea, select, a, .x-btn, .ui-dd, [draggable="true"], #map-canvas, #map-zoom',
+      )
+    )
+      return false;
+    const title = target.closest('.panel-title');
+    if (title && win.contains(title)) return true;
+    return win.id === 'map-window' && target === win;
   }
 
   private setWindowPixelPosition(
@@ -2185,7 +2367,7 @@ export class Hud {
   }
 
   private closeManagedWindow(el: HTMLElement): void {
-    if (this.windowDrag?.el === el) this.windowDrag = null;
+    this.windowDragController?.cancel(el);
     delete el.dataset.windowOpen;
     switch (el.id) {
       case 'confirm-dialog':
@@ -2201,9 +2383,13 @@ export class Hud {
         // consistent with the toggle/X close path.
         this.socialWindow.close();
         break;
+      case 'dev-command-window':
+        this.devCommandWindow.close();
+        break;
       case 'char-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.charWindow.close();
+        this.syncCharBagsPairing();
         break;
       case 'trade-window':
         this.sim.tradeCancel();
@@ -2224,10 +2410,18 @@ export class Hud {
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.calendarWindow.close();
         break;
+      case 'deeds-window':
+        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
+        this.deedsWindow.close();
+        break;
       case 'arena-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA),
         // consistent with the toggle / X close path.
         this.arenaWindow.close();
+        break;
+      case 'dungeon-finder-window':
+        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
+        this.dungeonFinderWindow.close();
         break;
       case 'valecup-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
@@ -2306,242 +2500,12 @@ export class Hud {
     this.syncAnyWindowOpenState();
   }
 
-  // -------------------------------------------------------------------------
-  // Chat tabs (classic-style): the built-in "Chat" (all) and "Combat Log" views,
-  // plus player-added per-channel tabs. The active tab drives BOTH the log
-  // filter (which messages show) and the send channel (what plain text targets),
-  // so a player can chat in World/LFG/Party/etc. without retyping the command.
-  // -------------------------------------------------------------------------
-
-  private initChatTabs(): void {
-    let savedTabs: string | null = null;
-    let savedActive: string | null = null;
-    try {
-      savedTabs = localStorage.getItem(CHAT_TABS_KEY);
-      savedActive = localStorage.getItem(CHAT_ACTIVE_TAB_KEY);
-    } catch {
-      /* storage unavailable */
-    }
-    this.chatTabs = parseChatTabs(savedTabs);
-    this.activeChatTab =
-      savedActive === 'all' ||
-      savedActive === 'combat' ||
-      (isChatOpenTab(savedActive) && this.chatTabs.includes(savedActive))
-        ? (savedActive as ChatTabId)
-        : 'all';
-    // re-join any opt-in global channels whose tabs were restored, so messages
-    // typed there are delivered this session too (the whisper tab never joins)
-    for (const ch of this.chatTabs)
-      if (isChatTabChannel(ch) && channelNeedsJoin(ch)) this.sim.chat(`/join ${ch}`);
-    this.renderChatTabs();
-    this.selectChatTab(this.activeChatTab, false);
-  }
-
-  private persistChatTabs(): void {
-    try {
-      localStorage.setItem(CHAT_TABS_KEY, serializeChatTabs(this.chatTabs));
-      localStorage.setItem(CHAT_ACTIVE_TAB_KEY, this.activeChatTab);
-    } catch {
-      /* storage unavailable */
-    }
-  }
-
-  // -------------------------------------------------------------------------
-  // Movable / resizable chat window (desktop only). The pure geometry math
-  // (clamping, (de)serialization) lives in chat_window.ts; this section is just
-  // the DOM wiring: a drag handle on the tab strip, a corner resize grip, and
-  // localStorage persistence with a reset path back to the CSS default.
-  // -------------------------------------------------------------------------
-
   private isMobileLayout(): boolean {
     return document.body.classList.contains('mobile-touch');
   }
 
-  private initChatBoxGeometry(): void {
-    const wrap = document.getElementById('chatlog-wrap');
-    const tabs = document.getElementById('chatlog-tabs');
-    const frame = document.getElementById('chatlog-frame');
-    if (!wrap || !tabs || !frame) return;
-
-    // Resize grip pinned to the frame's bottom-right corner.
-    const grip = document.createElement('div');
-    grip.className = 'chat-resize-grip';
-    grip.title = t('hudChrome.chatWindow.resize');
-    grip.setAttribute('aria-hidden', 'true');
-    frame.appendChild(grip);
-
-    // Mobile-only overlay controller: builds the bottom resize bar and the
-    // top-corner move chip, restores the persisted panel geometry, and drives
-    // the --mobile-chat-left/top/h vars the open-state CSS consumes. Both
-    // affordances are display:none on desktop.
-    this.chatMobileOverlay = new ChatMobileOverlay(wrap);
-
-    // touch-action lives in CSS now: `none` on desktop so a touch-drag on the empty
-    // strip moves the chat box (the move gesture is desktop-only, see
-    // onChatBoxMoveStart), and `pan-x` on mobile so overflowed tabs can be swiped
-    // (hud.mobile.css). An inline style here would override those rules.
-    tabs.setAttribute('aria-label', t('hudChrome.chatWindow.move'));
-    tabs.addEventListener('pointerdown', (ev) => this.onChatBoxMoveStart(ev, wrap, tabs));
-    grip.addEventListener('pointerdown', (ev) => this.onChatBoxResizeStart(ev, wrap, frame));
-    document.addEventListener('pointermove', (ev) => this.onChatBoxPointerMove(ev));
-    const end = (ev: PointerEvent) => this.onChatBoxPointerEnd(ev);
-    document.addEventListener('pointerup', end);
-    document.addEventListener('pointercancel', end);
-    // Re-clamp into view when the viewport changes (mirrors the .window.panel logic).
-    window.addEventListener('resize', () => {
-      if (this.chatBox) this.applyChatBoxGeometry();
-    });
-
-    let saved: string | null = null;
-    try {
-      saved = localStorage.getItem(CHAT_GEOMETRY_KEY);
-    } catch {
-      /* storage unavailable */
-    }
-    this.chatBox = parseChatBox(saved);
-    if (this.chatBox) this.applyChatBoxGeometry();
-  }
-
-  // Seed this.chatBox from the live layout the first time a gesture starts, so a
-  // box still on its CSS default converts cleanly to explicit px coordinates.
-  private ensureChatBoxGeometry(wrap: HTMLElement, tabs: HTMLElement): void {
-    if (this.chatBox) return;
-    const wrapRect = wrap.getBoundingClientRect();
-    const frameRect = document.getElementById('chatlog-frame')?.getBoundingClientRect();
-    const chromeH = tabs.getBoundingClientRect().height;
-    this.chatBox = {
-      left: wrapRect.left,
-      top: wrapRect.top,
-      width: wrapRect.width,
-      height: frameRect ? frameRect.height : Math.max(0, wrapRect.height - chromeH),
-    };
-  }
-
-  private onChatBoxMoveStart(ev: PointerEvent, wrap: HTMLElement, tabs: HTMLElement): void {
-    if (ev.button !== 0 || this.isMobileLayout()) return;
-    const target = ev.target as HTMLElement | null;
-    // Tab buttons (select / add / close) keep their own click behaviour; only the
-    // empty strip area initiates a move.
-    if (!target || target.closest('button')) return;
-    ev.preventDefault();
-    this.ensureChatBoxGeometry(wrap, tabs);
-    const rect = wrap.getBoundingClientRect();
-    this.chatBoxGesture = {
-      kind: 'move',
-      pointerId: ev.pointerId,
-      grabX: ev.clientX - rect.left,
-      grabY: ev.clientY - rect.top,
-    };
-    document.body.classList.add('chat-box-dragging');
-    try {
-      tabs.setPointerCapture?.(ev.pointerId);
-    } catch {
-      /* synthetic pointer */
-    }
-  }
-
-  private onChatBoxResizeStart(ev: PointerEvent, wrap: HTMLElement, frame: HTMLElement): void {
-    if (ev.button !== 0 || this.isMobileLayout()) return;
-    ev.preventDefault();
-    ev.stopPropagation();
-    const tabs = document.getElementById('chatlog-tabs');
-    if (tabs) this.ensureChatBoxGeometry(wrap, tabs);
-    if (!this.chatBox) return;
-    this.chatBoxGesture = {
-      kind: 'resize',
-      pointerId: ev.pointerId,
-      startX: ev.clientX,
-      startY: ev.clientY,
-      startW: this.chatBox.width,
-      startH: this.chatBox.height,
-    };
-    document.body.classList.add('chat-box-dragging');
-    try {
-      frame.setPointerCapture?.(ev.pointerId);
-    } catch {
-      /* synthetic pointer */
-    }
-  }
-
-  private onChatBoxPointerMove(ev: PointerEvent): void {
-    const g = this.chatBoxGesture;
-    if (!g || g.pointerId !== ev.pointerId || !this.chatBox) return;
-    ev.preventDefault();
-    if (g.kind === 'move') {
-      this.chatBox = { ...this.chatBox, left: ev.clientX - g.grabX, top: ev.clientY - g.grabY };
-    } else {
-      this.chatBox = {
-        ...this.chatBox,
-        width: g.startW + (ev.clientX - g.startX),
-        height: g.startH + (ev.clientY - g.startY),
-      };
-    }
-    this.applyChatBoxGeometry();
-  }
-
-  private onChatBoxPointerEnd(ev: PointerEvent): void {
-    const g = this.chatBoxGesture;
-    if (!g || g.pointerId !== ev.pointerId) return;
-    this.chatBoxGesture = null;
-    document.body.classList.remove('chat-box-dragging');
-    this.persistChatBoxGeometry();
-  }
-
-  private applyChatBoxGeometry(): void {
-    if (!this.chatBox || this.isMobileLayout()) return;
-    const wrap = document.getElementById('chatlog-wrap');
-    const tabs = document.getElementById('chatlog-tabs');
-    const frame = document.getElementById('chatlog-frame');
-    if (!wrap || !tabs || !frame) return;
-    const chromeH = tabs.getBoundingClientRect().height || 22;
-    const clamped = clampChatBox(
-      this.chatBox,
-      { w: window.innerWidth, h: window.innerHeight },
-      chromeH,
-    );
-    this.chatBox = clamped;
-    wrap.style.left = `${clamped.left}px`;
-    wrap.style.top = `${clamped.top}px`;
-    wrap.style.right = 'auto';
-    wrap.style.bottom = 'auto';
-    wrap.style.width = `${clamped.width}px`;
-    frame.style.height = `${clamped.height}px`;
-    // Keep the (separately positioned) chat input bar aligned above the box.
-    const input = document.getElementById('chat-input');
-    if (input) {
-      input.style.left = `${clamped.left}px`;
-      input.style.width = `${clamped.width}px`;
-      input.style.bottom = `${Math.max(0, window.innerHeight - clamped.top + 4)}px`;
-    }
-  }
-
-  private persistChatBoxGeometry(): void {
-    if (!this.chatBox) return;
-    try {
-      localStorage.setItem(CHAT_GEOMETRY_KEY, serializeChatBox(this.chatBox));
-    } catch {
-      /* storage unavailable */
-    }
-  }
-
-  // Public: snap the chat window back to its stock CSS position/size and forget
-  // the saved geometry (both the desktop box and the mobile overlay panel).
-  // Wired to the "Reset Chat Window" interface option.
   resetChatWindow(): void {
-    this.chatBox = null;
-    this.chatMobileOverlay?.reset();
-    try {
-      localStorage.removeItem(CHAT_GEOMETRY_KEY);
-    } catch {
-      /* storage unavailable */
-    }
-    const ids = ['chatlog-wrap', 'chatlog-frame', 'chat-input'];
-    for (const id of ids) {
-      const el = document.getElementById(id);
-      if (!el) continue;
-      for (const prop of ['left', 'top', 'right', 'bottom', 'width', 'height'])
-        el.style.removeProperty(prop);
-    }
+    this.chatGeometry.reset();
   }
 
   // -------------------------------------------------------------------------
@@ -2555,6 +2519,10 @@ export class Hud {
   // -------------------------------------------------------------------------
 
   private initFrameMovers(): void {
+    // One-time v0.24.1 cleanup: drop frame drags saved against the reverted
+    // PR #1736 overhaul layout BEFORE the movers read them back (a saved
+    // position applies, and detaches the player frame, at construction).
+    resetFramePositionsOnce(localStorage);
     const isMobileLayout = () => this.isMobileLayout();
     // A live desktop-to-mobile viewport flip must re-home the anchored aura
     // bars (mobile owns its own aura placement), and the flip back re-anchors.
@@ -2591,13 +2559,31 @@ export class Hud {
         onPositioned: (active) => this.setPlayerFrameDetached(active),
       });
     }
+    this.partyFrameMover = new MovableFrame({
+      frame: this.partyFramesEl,
+      storageKey: PARTY_FRAME_POS_KEY,
+      unlockLabelKey: 'hudChrome.partyFrames.unlock',
+      lockLabelKey: 'hudChrome.partyFrames.lock',
+      draggingBodyClass: 'party-frame-dragging',
+      fallbackSize: { w: 360, h: 240 },
+      isMobileLayout,
+    });
   }
 
-  // Public: snap both movable unit frames back to their stock CSS spots and
+  // Public: snap all movable unit frames back to their stock CSS spots and
   // forget the saved drags. Wired to the "Reset Frame Positions" interface option.
   resetUnitFrames(): void {
     this.targetFrameMover?.reset();
     this.playerFrameMover?.reset();
+    this.partyFrameMover?.reset();
+  }
+
+  /** Repaint persisted visual-space geometry after a live UI Scale change. */
+  reapplySavedGeometry(): void {
+    this.chatGeometry.reapply();
+    this.targetFrameMover?.reapplyPosition();
+    this.playerFrameMover?.reapplyPosition();
+    this.partyFrameMover?.reapplyPosition();
   }
 
   // The player frame docks inside #actionbar-stack, whose #bottom-bar ancestor
@@ -2653,284 +2639,44 @@ export class Hud {
     }
   }
 
-  private renderChatTabs(): void {
-    const bar = $('#chatlog-tabs');
-    // Overflowed tabs scroll horizontally (see #chatlog-tabs in hud.css); translate
-    // a vertical wheel into that scroll (bound once, the bar element persists across
-    // these innerHTML rebuilds) so a mouse without a horizontal wheel can still reach
-    // them. A no-op until the strip actually overflows.
-    if (!this.chatTabsWheelBound) {
-      this.chatTabsWheelBound = true;
-      bar.addEventListener(
-        'wheel',
-        (ev) => {
-          if (ev.deltaY === 0 || bar.scrollWidth <= bar.clientWidth) return;
-          ev.preventDefault();
-          bar.scrollLeft += ev.deltaY;
-        },
-        { passive: false },
-      );
-    }
-    bar.innerHTML = '';
-    bar.setAttribute('role', 'tablist');
-    const makeTab = (id: ChatTabId, label: string): HTMLButtonElement => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'chat-tab';
-      btn.dataset.tab = id;
-      btn.setAttribute('role', 'tab');
-      btn.textContent = label;
-      btn.addEventListener('click', () => this.selectChatTab(id, true));
-      return btn;
-    };
-    bar.append(
-      makeTab('all', t('hud.core.chatTab')),
-      makeTab('combat', t('hud.core.combatLogTab')),
-    );
-    for (const ch of this.chatTabs) {
-      const label = t(chatOpenTabLabelKey(ch));
-      const btn = makeTab(ch, label);
-      btn.title = t('hud.core.chatChannels.close', { channel: label });
-      // right-click / long-press a channel tab to close it (the + menu also toggles)
-      btn.addEventListener('contextmenu', (ev) => {
-        ev.preventDefault();
-        this.removeChatTab(ch);
-      });
-      bar.append(btn);
-    }
-    const add = document.createElement('button');
-    add.type = 'button';
-    add.className = 'chat-tab chat-tab-add';
-    add.textContent = '+';
-    add.setAttribute('aria-label', t('hud.core.chatChannels.add'));
-    add.title = t('hud.core.chatChannels.add');
-    add.addEventListener('click', () => {
-      // Toggle: a second click on + closes the picker it opened.
-      const menu = $('#ctx-menu');
-      if (menu.style.display === 'block' && this.ctxMenuOpener === add) {
-        this.closeContextMenu();
-        return;
-      }
-      const r = add.getBoundingClientRect();
-      this.openChatChannelMenu(r.left, r.bottom, add);
-    });
-    bar.append(add);
-    this.updateActiveTabStyles();
-  }
-
-  private updateActiveTabStyles(): void {
-    $('#chatlog-tabs')
-      .querySelectorAll<HTMLButtonElement>('.chat-tab')
-      .forEach((btn) => {
-        if (btn.classList.contains('chat-tab-add')) return;
-        const active = btn.dataset.tab === this.activeChatTab;
-        btn.classList.toggle('active', active);
-        btn.setAttribute('aria-selected', active ? 'true' : 'false');
-        btn.tabIndex = active ? 0 : -1;
-      });
-  }
-
-  private selectChatTab(tab: ChatTabId, persist = true): void {
-    this.activeChatTab = tab;
-    const showCombat = tab === 'combat';
-    this.chatLogEl.classList.toggle('active', !showCombat);
-    this.combatLogEl.classList.toggle('active', showCombat);
-    if (!showCombat) this.applyChatFilter();
-    this.updateActiveTabStyles();
-    if (persist) this.persistChatTabs();
-    this.syncChatPlaceholder();
-  }
-
-  // Add a channel tab if not already present. Does NOT switch the active send
-  // channel — the player stays on their current tab (All/Say is the catch-all
-  // home that shows every channel and sends Say), so opening a channel never
-  // hijacks where typed text goes. `join` auto-joins opt-in global channels;
-  // skip it when the caller already sent the /join (e.g. a typed command).
-  // `select` focuses the new tab — reserved for a deliberate tab click.
-  private addChatTab(channel: ChatOpenTab, opts: { join?: boolean; select?: boolean } = {}): void {
-    const { join = true, select = false } = opts;
-    if (!this.chatTabs.includes(channel)) {
-      this.chatTabs.push(channel);
-      // The whisper tab is filter-only (no channel to /join); only real channels join.
-      if (join && isChatTabChannel(channel) && channelNeedsJoin(channel))
-        this.sim.chat(`/join ${channel}`);
-      this.renderChatTabs();
-      this.persistChatTabs();
-    }
-    if (select) this.selectChatTab(channel, true);
-  }
-
-  // Mirror a typed "/join|/leave <world|lfg>" into the tab bar so the command
-  // line and the "+" menu stay in sync: /join opens the channel's tab and
-  // /leave closes it. We never re-issue the command — main.ts already sent it,
-  // and creating the tab leaves the active send channel untouched.
   syncChatTabsForInput(typed: string): void {
-    const m = /^\/(join|leave)\b\s*(\S*)/i.exec(typed.trim());
-    if (!m) return;
-    const channel = m[2].toLowerCase();
-    if (!isChatTabChannel(channel) || !channelNeedsJoin(channel)) return;
-    if (m[1].toLowerCase() === 'join') this.addChatTab(channel, { join: false });
-    else if (this.chatTabs.includes(channel)) this.removeChatTab(channel);
+    this.chatWindow.syncTabsForInput(typed);
   }
 
-  private removeChatTab(channel: ChatOpenTab): void {
-    const i = this.chatTabs.indexOf(channel);
-    if (i < 0) return;
-    this.chatTabs.splice(i, 1);
-    // closing a tab does not /leave the channel (you stay subscribed, classic behavior)
-    if (this.activeChatTab === channel) this.activeChatTab = 'all';
-    this.renderChatTabs();
-    this.selectChatTab(this.activeChatTab, true);
+  private hideIfFiltered(element: HTMLElement, channel: string): void {
+    this.chatWindow.hideIfFiltered(element, channel);
   }
 
-  // The "+" menu: a toggle list of every openable tab. Open tabs show a check and
-  // toggle off; the rest add a tab. Whisper is offered alongside the channels as
-  // a filter-only tab that gathers every whisper in one place. Reuses the shared
-  // #ctx-menu, so it inherits its outside-click / Escape close behaviour.
-  private openChatChannelMenu(x: number, y: number, opener: HTMLElement | null = null): void {
-    const el = $('#ctx-menu');
-    this.ctxMenuOpener = opener;
-    let html = `<div class="ctx-title">${esc(t('hud.core.chatChannels.addTitle'))}</div>`;
-    // A trailing check mark flags already-open tabs, exactly as the channel list
-    // did before this whisper tab was added. Built from its char code so no literal
-    // glyph sits in source, keeping the no-emoji source guard green.
-    const checkMark = ` ${String.fromCharCode(0x2713)}`;
-    const item = (id: ChatOpenTab, labelKey: TranslationKey): string => {
-      const open = this.chatTabs.includes(id);
-      return `<div class="ctx-item" data-act="${id}">${esc(t(labelKey))}${open ? checkMark : ''}</div>`;
-    };
-    for (const ch of CHAT_TAB_CHANNELS) html += item(ch, CHANNEL_LABEL_KEYS[ch]);
-    html += item(WHISPER_TAB, WHISPER_TAB_LABEL_KEY);
-    html += `<div class="ctx-item" data-act="close">${esc(t('hud.chat.context.cancel'))}</div>`;
-    el.innerHTML = html;
-    this.placePopupAt(el, x, y, 170, 320, 0, 8);
-    el.style.display = 'block';
-    this.bindContextMenuActions((act) => {
-      if (!isChatOpenTab(act)) return;
-      if (this.chatTabs.includes(act)) this.removeChatTab(act);
-      // Focus the whisper tab on open so the effect is visible (channels stay put,
-      // as opening one must not hijack where the player's typed text goes).
-      else this.addChatTab(act, { select: act === WHISPER_TAB });
-    });
+  applyChatInputPresentation(): void {
+    this.chatWindow.applyInputPresentation();
   }
 
-  // The tab that FILTERS the log (which messages show): null on all/combat, else
-  // the active tab, including the whisper collector (its messages carry chan
-  // 'whisper', so the same dataset.chan filter gathers them).
-  private chatFilterTab(): ChatOpenTab | null {
-    return this.activeChatTab === 'all' || this.activeChatTab === 'combat'
-      ? null
-      : this.activeChatTab;
+  noteSentChannel(sentLine: string): void {
+    this.chatWindow.noteSentChannel(sentLine);
   }
 
-  // The SEND channel a plain typed line targets: null on all/combat AND on the
-  // whisper tab (whisper has no generic send channel; the whisper tab replies via
-  // /r instead, handled in composeChatSend).
-  private chatSendChannel(): ChatTabChannel | null {
-    const tab = this.chatFilterTab();
-    return tab !== null && isChatTabChannel(tab) ? tab : null;
-  }
-
-  private applyChatFilter(): void {
-    const filter = this.chatFilterTab();
-    for (const child of Array.from(this.chatLogEl.children)) {
-      const chan = (child as HTMLElement).dataset.chan;
-      (child as HTMLElement).classList.toggle('chat-hidden', filter !== null && chan !== filter);
-    }
-    this.chatLogEl.scrollTop = this.chatLogEl.scrollHeight;
-  }
-
-  private hideIfFiltered(div: HTMLElement, chan: string): void {
-    const filter = this.chatFilterTab();
-    if (filter !== null && chan !== filter) div.classList.add('chat-hidden');
-  }
-
-  private syncChatPlaceholder(): void {
-    const input = document.getElementById('chat-input') as HTMLTextAreaElement | null;
-    if (input) input.placeholder = this.activeChatPlaceholder();
-  }
-
-  // The line actually sent for what the player typed, honoring the active tab.
-  // main.ts calls this on Enter so a channel tab works without retyping the slash
-  // command; an explicit "/..." the player typed still wins. On the whisper tab,
-  // plain text replies to the last whisperer (/r) instead of binding a channel.
   composeChatSend(typed: string): string {
-    const withLinks = this.applyPendingChatLinks(typed);
-    if (this.activeChatTab === WHISPER_TAB) return composeWhisperReply(withLinks);
-    const ch = this.chatSendChannel();
-    return ch ? composeChatLine(ch, withLinks) : withLinks.trim();
+    return this.chatWindow.composeSend(typed);
   }
 
-  // Shift-click a quest-log entry: open the chat input and insert a readable
-  // [Name] link. composeChatSend swaps it for the canonical [[q:id]] token on send.
   insertQuestChatLink(questId: string): void {
-    this.insertChatLink(`[${questTitle(questId)}]`, encodeQuestLink(questId));
+    this.chatWindow.insertQuestLink(questId);
   }
 
-  // Shift-click a bag item: insert a readable [Item Name] link into chat. On send,
-  // composeChatSend swaps it for the canonical [[i:id]] token (name resolved at render).
   insertItemChatLink(itemId: string): void {
-    const item = ITEMS[itemId];
-    if (!item) return;
-    this.insertChatLink(`[${itemDisplayName(item)}]`, encodeItemLink(itemId));
+    this.chatWindow.insertItemLink(itemId);
   }
 
-  // Shared affordance: append a readable [Name] to the chat input and remember the
-  // token it stands for, so applyPendingChatLinks can swap it back in on send.
-  private insertChatLink(display: string, token: string): void {
-    const input = $('#chat-input') as unknown as HTMLInputElement;
-    this.pendingChatLinks = [...this.pendingChatLinks, { display, token }];
-    input.placeholder = this.activeChatPlaceholder();
-    input.style.display = 'block';
-    input.value =
-      input.value && !input.value.endsWith(' ')
-        ? `${input.value} ${display}`
-        : `${input.value}${display}`;
-    input.focus();
-  }
-
-  // Drop any shift-click-inserted links that were never sent (chat closed/cleared),
-  // so a stale [Name] entry can't silently rewrite a later message.
   clearPendingChatLinks(): void {
-    this.pendingChatLinks = [];
+    this.chatWindow.clearPendingLinks();
   }
 
-  // Replace any inserted readable [Name] with its [[q:id]]/[[i:id]] token, then forget them.
-  private applyPendingChatLinks(typed: string): string {
-    if (this.pendingChatLinks.length === 0) return typed;
-    const pending = this.pendingChatLinks;
-    this.pendingChatLinks = [];
-    let out = typed;
-    for (const { display, token } of pending) out = out.replace(display, token);
-    return out;
-  }
-
-  // Intercept "/share": link the selected quest into party chat. Returns true when
-  // handled (the caller then skips normal send). Not-in-a-party is left to the sim's
-  // existing "You are not in a party." error from the /p path.
   maybeHandleQuestShareCommand(raw: string): boolean {
-    if (!/^\/share(?:\s|$)/i.test(raw.trim())) return false;
-    const id = this.questlogWindow.selectedQuestId;
-    if (!id || !this.sim.questLog.has(id)) {
-      this.showError(t('hudChrome.questShare.noQuestSelected'));
-      return true;
-    }
-    this.sim.chat(`/p ${encodeQuestLink(id)}`);
-    return true;
+    return this.chatWindow.maybeHandleQuestShareCommand(raw);
   }
 
-  // Placeholder for the chat input reflecting the active tab.
   activeChatPlaceholder(): string {
-    if (this.activeChatTab === WHISPER_TAB)
-      return t('hud.core.chatChannels.sendingTo', { channel: t(WHISPER_TAB_LABEL_KEY) });
-    const ch = this.chatSendChannel();
-    if (ch) return t('hud.core.chatChannels.sendingTo', { channel: t(CHANNEL_LABEL_KEYS[ch]) });
-    // The compact touch composer has no room for the desktop slash-command legend
-    // (/s, /w, /r, ...), so use a short prompt on the mobile HUD. The channel-aware
-    // "Message {channel}" variants above are already short and stay as-is.
-    return this.isMobileLayout()
-      ? t('hudChrome.mobile.chatPlaceholder')
-      : t('hud.core.chatPlaceholder');
+    return this.chatWindow.activePlaceholder();
   }
 
   // -------------------------------------------------------------------------
@@ -3299,7 +3045,12 @@ export class Hud {
     this.writerFacet,
     {
       frame: this.targetFrameEl,
-      name: this.targetNameEl,
+      // The name writes into the TEXT-ONLY middle child; the title decoration
+      // writes into the muted-gold siblings (setText would clobber children of
+      // the outer #tf-name, which keeps the color/class writes below).
+      name: this.targetNameTextEl,
+      titlePre: this.targetTitlePreEl,
+      titlePost: this.targetTitlePostEl,
       level: this.targetLevelEl,
       hpFill: this.targetHpEl,
       hpText: this.targetHpTextEl,
@@ -3361,8 +3112,11 @@ export class Hud {
       classCss,
       onTarget: (pid) => this.sim.targetEntity(pid),
       onContextMenu: (pid, name, x, y) => this.openContextMenu(pid, name, x, y),
-      onLeave: () => this.sim.partyLeave(),
-      leaveLabel: () => t('hud.social.leaveParty'),
+      // Row hover hook. Clique-style mouseover casting (acting on the hovered member)
+      // is deferred until the authoritative cast-on-target sim path exists, so this is
+      // a no-op for now. Leaving the party moved from a per-frame button to the self
+      // portrait context menu.
+      onHover: () => {},
       chipLabel: () => t('hudChrome.unitFrame.partyChip'),
       onToggleCollapse: () => this.togglePartyCollapsed(),
       partyAuras: this.partyAurasDeps,
@@ -3518,6 +3272,12 @@ export class Hud {
       this.showPrompt(text, acceptLabel, onAccept, onDecline),
     startWhisper: (name) => this.startWhisper(name),
   });
+  private readonly devCommandWindow = new DevCommandWindow({
+    available: () => this.features.devCommandsEnabled === true,
+    world: () => this.sim,
+    closeOthers: () => this.closeOtherWindows('#dev-command-window'),
+    ...this.windowFocus('#dev-command-window'),
+  });
   // Bags window painter (bags_view.ts core + bags_window.ts painter). It composes
   // the shared presentation bag (icon/money/tooltip) and adds the inventory-cluster
   // surface: world reads, cross-window mode flags + commands, pet-feed / drag /
@@ -3527,6 +3287,8 @@ export class Hud {
     root: () => $('#bags'),
     world: () => this.sim,
     wocBalanceHtml: () => this.wocBalanceHtml(),
+    claudiumLauncherHtml: () => this.claudiumLauncherHtml(),
+    openClaudium: () => this.toggleClaudium(),
     hideTooltip: () => this.hideTooltip(),
     consumePeek: () => this.peekGuard.consume(),
     cancelPetFeed: () => this.cancelPetFeed(),
@@ -3561,6 +3323,10 @@ export class Hud {
       this.dragAction = action ? { action, sourceIndex: null } : null;
     },
     clearActionDropTargets: () => this.clearActionDropTargets(),
+    dragState: this.itemDragState,
+    isTouchHud: () => document.body.classList.contains('mobile-touch'),
+    markEquipDropTargets: (itemId) => this.charWindow.markDropTargets(itemId),
+    dropOnEquipSlot: (itemId, slot) => this.charWindow.dropOnEquipSlot(itemId, slot),
   });
   // World Market window painter (market_view.ts core + market_window.ts painter).
   // It composes the shared presentation bag (icon/money/tooltip) and owns the
@@ -3577,11 +3343,6 @@ export class Hud {
     showError: (text) => this.showError(text),
     slotName: (slot) => itemSlotName(slot),
     syncBags: (open) => {
-      // The market-open body class drives the touch 50/50 dock (market left,
-      // bags right, the vendor-open/bank-open pairing pattern): without it both
-      // sheets edge-pin to the SAME full-screen rect on mobile and the bags
-      // window stacks directly on top of the market (live bug, PR #1736).
-      document.body.classList.toggle('market-open', open);
       if (open) {
         this.renderBags();
         $('#bags').style.display = 'flex';
@@ -3635,6 +3396,28 @@ export class Hud {
     // snapshot echo repaints again authoritatively.
     onInventoryChanged: () => this.onInventoryChanged(),
   });
+  // Book of Deeds window painter (deeds_view.ts core + deeds_window.ts
+  // painter): the deed catalog browser and title picker over the IWorldDeeds
+  // facet. A standalone trapping window (windowFocus), not a docked
+  // companion; onWatchChanged repaints the HUD tracker immediately so a
+  // watch toggle never waits for the slow band.
+  private readonly deedsWindow = new DeedsWindow({
+    ...this.presentationBag,
+    root: () => $('#deeds-window'),
+    world: () => this.sim,
+    closeOthers: () => this.closeOtherWindows('#deeds-window'),
+    hideTooltip: () => this.hideTooltip(),
+    consumePeek: () => this.peekGuard.consume(),
+    ...this.windowFocus('#deeds-window'),
+    onWatchChanged: () => this.updateDeedTracker(),
+  });
+  // Watchlist HUD tracker (#deed-tracker): slow-band painter over the one
+  // reused tracker-view container (allocation-light by contract).
+  private readonly deedTrackerView = makeDeedTrackerView();
+  private readonly deedTrackerPainter = new DeedTrackerPainter({
+    root: () => $('#deed-tracker'),
+    writers: this.writerFacet,
+  });
   // Event calendar window painter (calendar_view.ts month-grid core +
   // calendar_window.ts painter). System events expand from data rules; guild
   // events read the socialInfo mirror and book/remove through IWorld.
@@ -3654,6 +3437,27 @@ export class Hud {
     world: () => this.sim,
     closeOthers: () => this.closeOtherWindows('#arena-window'),
     ...this.windowFocus('#arena-window'),
+  });
+
+  // Dungeon Finder (cold window; docs/prd/dungeon-finder.md). Composes the
+  // shared presentation bag for loot icons/tooltips and a narrow map hook for
+  // the non-teleporting "Show on Map" action.
+  private readonly dungeonFinderWindow = new DungeonFinderWindow({
+    ...this.presentationBag,
+    root: () => $('#dungeon-finder-window'),
+    world: () => this.sim,
+    closeOthers: () => this.closeOtherWindows('#dungeon-finder-window'),
+    hideTooltip: () => this.hideTooltip(),
+    showOnMap: (x, z) => this.showFinderOnMap(x, z),
+    ...this.windowFocus('#dungeon-finder-window'),
+  });
+
+  // The WoW-style "group found" prompt: opened by the dfProposal SimEvent,
+  // self-closing when the proposal resolves. Lives OUTSIDE the finder window
+  // so an answer never requires opening it.
+  private readonly dungeonFinderProposalPopup = new DungeonFinderProposalPopup({
+    root: () => $('#dfinder-proposal-popup'),
+    world: () => this.sim,
   });
   // Vale Cup window painter (vale_cup_window_view.ts model + vale_cup_window.ts
   // painter, the ArenaWindow shape). It owns the bracket / nation / role
@@ -3751,9 +3555,13 @@ export class Hud {
     renderPreview: () => this.renderCharPreview(),
     renderSkinPicker: () => this.renderCharSkinPicker(),
     openPlayerCard: () => {
-      void this.openPlayerCard();
+      void this.playerCard.open();
     },
     openPrestige: () => this.openPrestigeDialog(),
+    openDeeds: () => this.openDeeds(),
+    dragState: this.itemDragState,
+    renderBags: () => this.renderBags(),
+    showError: (text) => this.showError(text),
   });
   // Options window painter (options_view.ts core + options_window.ts painter). The
   // window renders no item rows, so it composes no PainterHostPresentation bag; it
@@ -3795,11 +3603,6 @@ export class Hud {
       this.chatClock = clock;
       localStorage.setItem('chatClock', clock);
     },
-    // Authoritative online play (drives the Overview status readout + gates the
-    // online-only quick actions), and the shared confirm dialog for Reset all.
-    isOnline: () => this.sim.socialInfo !== null,
-    confirmDialog: (title, body, okText, cancelText, onOk) =>
-      this.confirmDialog(title, body, okText, cancelText, onOk),
   });
   // Leaderboard window painter (leaderboard_view.ts async-free core + leaderboard_
   // window.ts painter). It owns the page index + focus opener and the one
@@ -3823,11 +3626,62 @@ export class Hud {
     onWalletConnect: () => {
       window.dispatchEvent(new CustomEvent('woc:wallet-verify'));
     },
-    showChestButton: () => this.showDailyRewardsChestButton(),
-    setShowChestButton: (show) => this.setDailyRewardsChestButtonPreference(show),
+    storeEnabled: () => this.claudiumHooks !== null,
+    storeSnapshot: async () => {
+      const snapshot = await this.claudiumHooks?.storeSnapshot();
+      if (!snapshot) return { available: false, balance: null, items: [] };
+      this.setClaudiumLauncherBalance(snapshot.balance);
+      return {
+        available: snapshot.available,
+        balance: snapshot.balance,
+        items: [...snapshot.storeItems],
+      };
+    },
+    spendStoreItem: async (itemId, kind, expectedCostClaudium) => {
+      const result = await this.claudiumHooks?.spend(itemId, kind, expectedCostClaudium);
+      if (result?.balance !== null && result?.balance !== undefined) {
+        this.setClaudiumLauncherBalance(result.balance);
+      }
+      return (
+        result ?? {
+          granted: false,
+          balance: null,
+          costClaudium: null,
+          reason: 'unavailable',
+        }
+      );
+    },
+    openClaudium: () => this.toggleClaudium(),
     confirmDialog: (title, body, okText, cancelText, onOk) =>
       this.confirmDialog(title, body, okText, cancelText, onOk),
     ...this.windowFocus('#daily-rewards-window'),
+    onVisibilityChange: () => this.syncAnyWindowOpenState(),
+  });
+  // Claudium (server-authoritative soft currency) window. main.ts injects the
+  // economy hooks when online via attachClaudium; until then (and offline) the
+  // hooks are null and the window renders its clean disabled/empty state. The
+  // window computes NOTHING; every number rides in through these hooks.
+  private claudiumHooks: ClaudiumHooks | null = null;
+  private claudiumLauncherBalance: number | null = null;
+  private claudiumLauncherBalancePending = false;
+  private claudiumLauncherBalanceLastMs = 0;
+  private claudiumLauncherBalanceSeq = 0;
+  private readonly claudiumWindow = new ClaudiumWindow({
+    root: () => $('#claudium-window'),
+    closeOthers: () => this.closeOtherWindows('#claudium-window'),
+    snapshot: async () => {
+      const snapshot =
+        (await this.claudiumHooks?.snapshot()) ??
+        ({
+          balance: null,
+          skus: [],
+          nativeRails: { sol: false, usdc: false, woc: false },
+        } satisfies ClaudiumSnapshot);
+      this.setClaudiumLauncherBalance(snapshot.balance);
+      return snapshot;
+    },
+    buy: (rail, sku) => this.claudiumHooks?.buy(rail, sku) ?? Promise.resolve(),
+    ...this.windowFocus('#claudium-window'),
     onVisibilityChange: () => this.syncAnyWindowOpenState(),
   });
   // Spellbook window painter (spellbook_view.ts core + spellbook_window.ts painter).
@@ -3843,7 +3697,11 @@ export class Hud {
     hideTooltip: () => this.hideTooltip(),
     attachTooltip: (el, html) => this.attachTooltip(el, html),
     abilitySummary: (known) =>
-      describeAbilitySummary(known, this.sim.player.resourceType, this.sim.player.spellHaste),
+      describeAbilitySummary(
+        known,
+        this.sim.player.resourceType,
+        playerSpellHasteFrac(this.sim.player),
+      ),
     abilityTooltip: (known) => this.abilityTooltip(known),
     barAbilityIds: () =>
       this.hotbarActions.flatMap((a) => (a && a.type === 'ability' ? [a.id] : [])),
@@ -3852,7 +3710,7 @@ export class Hud {
     // (empty or an item) map to null, never mistaken for an ability id.
     abilityIdByBarSlot: () =>
       this.hotbarActions.map((a) => (a && a.type === 'ability' ? a.id : null)),
-    hasFreeSlot: () => this.firstEmptyHotbarIndex() !== -1,
+    hasFreeSlot: () => this.actionBarController.hasFreeSlot(),
     addToBar: (id) => this.addAbilityToHotbar(id),
     removeFromBar: (id) => this.removeAbilityFromHotbar(id),
     hasFormBars: () => this.classHasFormBars(),
@@ -3893,7 +3751,7 @@ export class Hud {
   // gate ONLY when the target identity changes (or after invalidatePortrait), never
   // per frame, and reads the subject set just before that frame's paint() call. A
   // player target shows its real 3D class headshot (rendered locally from the synced
-  // class + skin); any other entity shows its faction/family crest.
+  // class + skin); mobs use committed model portraits and NPCs use their crest.
   private drawTargetPortrait(): void {
     const target = this.targetPortraitSubject;
     if (!target) return;
@@ -3904,10 +3762,21 @@ export class Hud {
         target.skin ?? 0,
       );
     } else {
-      this.portraits.drawCrest(
-        this.targetPortraitEl,
-        crestIdForEntity(target.kind, MOBS[target.templateId]?.family),
-      );
+      const template = MOBS[target.templateId];
+      const faceUrl = targetPortraitUrl(target.templateId, Boolean(template));
+      if (faceUrl) {
+        this.portraits.drawHeadshot(this.targetPortraitEl, faceUrl, () => {
+          this.portraits.drawCrest(
+            this.targetPortraitEl,
+            crestIdForEntity(target.kind, template?.family),
+          );
+        });
+      } else {
+        this.portraits.drawCrest(
+          this.targetPortraitEl,
+          crestIdForEntity(target.kind, template?.family),
+        );
+      }
     }
   }
 
@@ -3942,6 +3811,46 @@ export class Hud {
       ? t('wallet.balanceAria', { balance })
       : t('wallet.balancePreviewAria', { balance });
     return `<span class="woc-balance ${verified ? 'is-verified' : 'is-preview'}" title="${esc(title)}" aria-label="${esc(aria)}"><span class="woc-coin" aria-hidden="true"></span>${esc(balance)}</span>`;
+  }
+
+  private claudiumLauncherHtml(): string {
+    if (!this.claudiumHooks) return '';
+    this.refreshClaudiumLauncherBalance();
+    const label =
+      this.claudiumLauncherBalance === null
+        ? '--'
+        : formatNumber(this.claudiumLauncherBalance, { maximumFractionDigits: 0 });
+    const aria = t('hudChrome.claudium.open');
+    return `<button type="button" class="claudium-launcher" data-claudium-launcher title="${esc(aria)}" aria-label="${esc(aria)}"><img class="claudium-coin" src="/claudium/icons/claudium_coin_64.webp" alt=""><span class="claudium-launcher-balance">${esc(label)}</span></button>`;
+  }
+
+  private setClaudiumLauncherBalance(balance: number | null): void {
+    this.claudiumLauncherBalance = balance;
+    this.claudiumLauncherBalanceLastMs = Date.now();
+  }
+
+  private refreshClaudiumLauncherBalance(force = false): void {
+    if (!this.claudiumHooks || this.claudiumLauncherBalancePending) return;
+    const now = Date.now();
+    if (!force && now - this.claudiumLauncherBalanceLastMs < 30_000) return;
+    this.claudiumLauncherBalancePending = true;
+    const seq = ++this.claudiumLauncherBalanceSeq;
+    void this.claudiumHooks
+      .balance()
+      .then((balance) => {
+        if (seq !== this.claudiumLauncherBalanceSeq) return;
+        this.setClaudiumLauncherBalance(balance);
+        if ($('#bags').style.display !== 'none') this.renderBags();
+      })
+      .catch(() => {
+        if (seq !== this.claudiumLauncherBalanceSeq) return;
+        this.setClaudiumLauncherBalance(null);
+      })
+      .finally(() => {
+        if (seq === this.claudiumLauncherBalanceSeq) {
+          this.claudiumLauncherBalancePending = false;
+        }
+      });
   }
 
   // One-line aura effect summary HTML for the buff/debuff tooltip: the pure descriptor
@@ -3990,6 +3899,9 @@ export class Hud {
       // cache the measured box for the mousemove clamp below (no forced reflow)
       ttW = size.w;
       ttH = size.h;
+      // This element now owns the shared box, so its own mousemove keeps the
+      // cheap reposition-only path and a hover onto any other element re-resolves.
+      this.tooltipOwner.claim(el);
     };
     const showNearElement = () => {
       const rect = el.getBoundingClientRect();
@@ -4018,6 +3930,16 @@ export class Hud {
     });
     el.addEventListener('mousemove', (e) => {
       if (mobile()) return;
+      // The shared box may be showing another element's content: a drag-drop
+      // that ended inside a slot fires no mouseenter, and Firefox re-enters the
+      // drag SOURCE after a native drag, so the visible tooltip can belong to a
+      // different (or no) element while the cursor sits over this one (#1626).
+      // Repaint this element's own tooltip in that case; the common in-slot move
+      // stays on the cheap reposition-only path below.
+      if (this.tooltipOwner.needsReshow(el)) {
+        showAt(e.clientX, e.clientY, 'mouse');
+        return;
+      }
       const z = getUiScale();
       // reuse the box size measured in showAt: same content, no forced reflow
       const tw = ttW,
@@ -4028,10 +3950,13 @@ export class Hud {
     el.addEventListener('mouseleave', () => {
       clearTouchTimer();
       this.tooltipEl.style.display = 'none';
+      // Box hidden: no element owns it, so the next move over any slot re-resolves.
+      this.tooltipOwner.release();
     });
     el.addEventListener('focusout', () => {
       clearTouchTimer();
       this.tooltipEl.style.display = 'none';
+      this.tooltipOwner.release();
     });
     el.addEventListener('pointerdown', (e) => {
       if (!mobile() || e.pointerType === 'mouse') return;
@@ -4118,6 +4043,10 @@ export class Hud {
   hideTooltip(): void {
     this.tooltipEl.style.display = 'none';
     this.tooltipEl.classList.remove('mob-tooltip');
+    // Box hidden (drag start, window close, slot mutate): drop ownership so a
+    // later move over any slot re-resolves its live tooltip instead of keeping
+    // the now-stale content (#1626).
+    this.tooltipOwner.release();
   }
 
   private showRaidLockoutTooltip(): void {
@@ -4312,6 +4241,28 @@ export class Hud {
         }
       }
     }
+    const warfareRating = Math.min(item.pvpOffenseRating ?? 0, item.pvpDefenseRating ?? 0);
+    if (warfareRating > 0) {
+      html += `<div class="tt-green">${esc(
+        t('itemUi.tooltip.stat', {
+          value: itemNumber(warfareRating),
+          stat: t(statNameKey('warfare') as TranslationKey),
+        }),
+      )}</div>`;
+    }
+    // Combat ratings (hit / crit / haste): shown as classic "+N Rating" affix lines,
+    // sharing the character-sheet HUD-chrome labels. Hit answers the higher-level
+    // miss/resist penalty; crit and haste add throughput.
+    for (const ratingStat of ['hitRating', 'critRating', 'hasteRating'] as const) {
+      const value = item[ratingStat] ?? 0;
+      if (value <= 0) continue;
+      html += `<div class="tt-green">${esc(
+        t('itemUi.tooltip.stat', {
+          value: itemNumber(value),
+          stat: t(statNameKey(ratingStat) as TranslationKey),
+        }),
+      )}</div>`;
+    }
     if (item.foodHp)
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useFood', { amount: itemNumber(item.foodHp), seconds: itemNumber(CONSUME_DURATION) }))}</div>`;
     if (item.drinkMana)
@@ -4326,8 +4277,9 @@ export class Hud {
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.questItem'))}</div>`;
     if (item.kind === 'bag' && item.bagSlots)
       html += `<div class="tt-stat">${esc(t('itemUi.tooltip.bagSlots', { slots: itemNumber(item.bagSlots) }))}</div>`;
-    if (item.requiredClass && !armorTypeForItem(item) && !weaponArchetypeForItem(item)) {
-      html += `<div class="tt-sub">${esc(t('itemUi.tooltip.classes', { classes: item.requiredClass.map(classDisplayName).join(', ') }))}</div>`;
+    const requiredClasses = requiredClassesForTooltip(item);
+    if (requiredClasses) {
+      html += `<div class="tt-sub">${esc(t('itemUi.tooltip.classes', { classes: requiredClasses.map(classDisplayName).join(', ') }))}</div>`;
     }
     // Classic "Requires Level N" line for equippable gear gated above level 1.
     // Red when the viewer is below the requirement (cannot equip yet), otherwise
@@ -4458,7 +4410,9 @@ export class Hud {
           minimumFractionDigits: d.decimals,
           maximumFractionDigits: d.decimals,
         });
-        return `<div class="${cls}">${sign}${magnitude} ${esc(t(`itemUi.stats.${d.stat}` as TranslationKey))}</div>`;
+        return `<div class="${cls}">${sign}${magnitude} ${esc(
+          t(statNameKey(d.stat) as TranslationKey),
+        )}</div>`;
       })
       .join('');
     let html = `<div class="tt-cmp"><div class="tt-cmp-head">${esc(t('itemUi.tooltip.currentlyEquipped'))}</div>`;
@@ -4503,6 +4457,7 @@ export class Hud {
       dodgeChance: p.dodgeChance,
       critRating: p.critRating,
       hasteRating: p.hasteRating,
+      hitRating: p.hitRating,
       dps: weaponDps(wpn?.weapon, p.attackPower),
       gear,
       buffs,
@@ -4540,15 +4495,14 @@ export class Hud {
   }
 
   private refreshLocalizedDynamicUi(): void {
-    // Frame chrome first: every MOUNTED window frame (open or closed; the
-    // ensureFrame reuse paths keep a closed frame's chrome alive) re-resolves
-    // its stamped t() text (title, tab labels, close aria-label) from the key
-    // data attributes, so no frame keeps the pre-switch language for the
-    // session. Runs before the per-window renders below so a window that
-    // interpolates its title (vendor, quest log, ...) re-stamps it after.
-    for (const frame of document.querySelectorAll<HTMLElement>('.window-frame')) {
-      relocalizeWindowFrame(frame);
-    }
+    this.syncDailyRewardsSurfaceLabels();
+    this.storePromoCard?.relocalize({
+      open: t('hudChrome.wocStore.title'),
+      close: t('hudChrome.wocStore.close'),
+      season: t('hudChrome.wocStore.seasonOne'),
+      title: t('hudChrome.wocStore.armoryTitle'),
+      cta: t('hudChrome.wocStore.title'),
+    });
     this.refreshKeybindLabels();
     this.updateQuestTracker();
     this.updateDelveTracker();
@@ -4560,23 +4514,26 @@ export class Hud {
     // the party rows above).
     this.targetFrameMover?.relocalize();
     this.playerFrameMover?.relocalize();
+    this.partyFrameMover?.relocalize();
     if (this.questlogWindow.isOpen) this.questlogWindow.render();
     if ($('#bags').style.display !== 'none') this.renderBags();
-    // Gate on visibility, not a literal display value: the vendor root opens
-    // display:flex on desktop (bounded frame) and display:block on the touch dock,
-    // so a hard-coded === 'block' would leave the open vendor's text stale after a
-    // live language switch until reopen.
-    if (this.openVendorNpcId !== null && $('#vendor-window').style.display !== 'none')
+    if (this.openVendorNpcId !== null && $('#vendor-window').style.display === 'block')
       this.renderVendor();
-    if (this.openHeroicVendorNpcId !== null && $('#vendor-window').style.display !== 'none')
+    if (this.openHeroicVendorNpcId !== null && $('#vendor-window').style.display === 'block')
       this.renderHeroicVendor();
     if (this.marketWindow.isOpen) this.marketWindow.render();
     if (this.bankWindow.isOpen) this.bankWindow.render();
+    if (this.deedsWindow.isOpen) this.deedsWindow.render();
+    // The deed tracker's texts re-localize on its next elided paint; run one
+    // now so the strip never shows a stale language for up to a slow tick.
+    this.updateDeedTracker();
     this.charWindow.renderIfOpen();
     // The arena window's render-skip signature is text-independent (offline sentinel or a
     // JSON of ids/numbers), so a language switch alone never moves it; relocalize() forces
     // one rebuild with fresh t() (self-gated on isOpen).
     this.arenaWindow.relocalize();
+    this.dungeonFinderWindow.relocalize();
+    this.dungeonFinderProposalPopup.relocalize();
     // Same text-independent-sig contract for the Vale Cup surfaces: clear the
     // sigs so the next render/update rebuilds with fresh t().
     this.valeCupWindow.relocalize();
@@ -4585,18 +4542,7 @@ export class Hud {
     this.vcupMatchHud.relocalize();
     this.vcupBriefing.relocalize();
     this.vcupCharge.relocalize();
-    const dialog = $('#quest-dialog');
-    if (dialog.style.display !== 'block' || this.openGossipNpcId === null) return;
-    const npc = this.sim.entities.get(this.openGossipNpcId);
-    if (!npc) {
-      this.closeQuestDialog();
-      return;
-    }
-    if (this.openQuestDetailId && QUESTS[this.openQuestDetailId]) {
-      this.renderQuestDetail(npc, this.openQuestDetailId);
-    } else {
-      this.renderGossip(npc);
-    }
+    this.questDialog.relocalize();
   }
 
   private abilityTooltip(res: ResolvedAbility): string {
@@ -4622,7 +4568,7 @@ export class Hud {
     const rangeLine = abilityRangeLine(a);
     if (rangeLine) costLine.push(rangeLine);
     if (costLine.length) html += `<div class="tt-stat">${costLine.map(esc).join(' &nbsp; ')}</div>`;
-    const castLine = [abilityCastLine(res, this.sim.player.spellHaste)];
+    const castLine = [abilityCastLine(res, playerSpellHasteFrac(this.sim.player))];
     // Use the RESOLVED cooldown (res.cooldown), not res.def.cooldown, so talents that
     // reduce cooldown (Improved Mortal Strike, Barrage, Improved Fire Blast, ...) show
     // their effect in the tooltip.
@@ -4657,308 +4603,53 @@ export class Hud {
   // shortcuts. Abilities are keyed by id (known is class-ordered and shifts on
   // level-up, so indices would not survive). Persisted per class+character,
   // with separate form/stealth layouts because each state has a different kit.
-  private slotMapKey(form: HotbarForm = this.activeHotbarForm): string {
-    const base = `woc_hotbar_${this.sim.cfg.playerClass}_${this.sim.player.name}`;
-    return form === 'normal' ? base : `${base}_${form}`;
-  }
-
-  private playerHotbarForm(): HotbarForm {
-    // Vale Cup sport kit: keyed off the IWorld snapshot (cupInfo.match with me
-    // on a roster), NOT off meta.known contents, because the snapshot and the
-    // wireRev-gated known swap ride the same server flush, so the bar and the
-    // kit flip together offline AND online. The form deliberately holds through
-    // phase 'over': the sim restores the class kit in the SAME tick it nulls
-    // the match (teardownCupMatch), so flipping to 'normal' any earlier would
-    // load the saved class bar while known is still the sport kit, and
-    // syncSlotMap would drop every "unlearned" class ability from it and SAVE
-    // the wipe. Checked before the druid/rogue arms: the sport standardize
-    // strips forms/stealth on kickoff anyway.
-    const cupMatch = this.sim.cupInfo?.match;
-    if (cupMatch && cupMatch.team !== null) return 'sport';
-    if (this.sim.cfg.playerClass === 'druid') {
-      if (this.sim.player.auras.some((a) => a.kind === 'form_bear')) return 'bear';
-      if (this.sim.player.auras.some((a) => a.kind === 'form_cat')) return 'cat';
-    }
-    if (
-      this.sim.cfg.playerClass === 'rogue' &&
-      this.sim.player.auras.some((a) => a.kind === 'stealth')
-    )
-      return 'stealth';
-    return 'normal';
-  }
-
   private isHotbarItemId(itemId: string): boolean {
-    const item = ITEMS[itemId];
-    return (
-      item?.kind === 'food' ||
-      item?.kind === 'drink' ||
-      item?.kind === 'potion' ||
-      item?.use?.type === 'fishing'
-    );
+    return this.actionBarController.isHotbarItemId(itemId);
   }
 
-  // Whether an ability belongs on a given form's default bar. Bear/cat bars hold
-  // only that form's kit (its `requiresForm` abilities) plus the shift toggles;
-  // the caster ('normal') bar excludes form-only abilities so they no longer
-  // auto-dump onto it. Rogue stealth has no `requiresForm` kit, so it keeps the
-  // full caster set.
-  private shouldAutoPlaceOnForm(id: string, form: HotbarForm): boolean {
-    // The sport bar holds ONLY the sport kit; conversely no sport id may ever
-    // auto-place onto (and pollute) a persisted class bar.
-    if (form === 'sport') return !!SPORT_ABILITIES[id];
-    if (SPORT_ABILITIES[id]) return false;
-    if (form === 'bear' || form === 'cat') {
-      return ABILITIES[id]?.requiresForm === form || Hud.FORM_TOGGLE_IDS.has(id);
-    }
-    return !ABILITIES[id]?.requiresForm;
-  }
-
-  // The known abilities that make up a form's default bar, in class/learn order.
-  private formKitAbilityIds(form: HotbarForm): string[] {
-    return this.sim.known.map((k) => k.def.id).filter((id) => this.shouldAutoPlaceOnForm(id, form));
-  }
-
-  // True for the druid form bars that own a dedicated kit (bear/cat). Rogue
-  // stealth is excluded: the sim does not lock the caster kit in stealth, so its
-  // bar legitimately mirrors the normal layout.
-  private isFormKitBar(form: HotbarForm = this.activeHotbarForm): boolean {
-    return this.sim.cfg.playerClass === 'druid' && (form === 'bear' || form === 'cat');
-  }
-
-  // Gates form-bar-only UI (e.g. the spellbook "Reset bar" button) so it never
-  // shows for single-bar classes. Delegates to the pure, unit-tested helper.
   private classHasFormBars(): boolean {
-    return classHasFormBars(this.sim.cfg.playerClass);
-  }
-
-  // Per-form one-time marker so the migration of pre-existing form bars (empty or
-  // a clone of the caster bar) runs at most once and never clobbers a layout the
-  // player deliberately customized. Mirrors the emote-wheel version marker.
-  private formBarSeededKey(form: HotbarForm = this.activeHotbarForm): string {
-    return `${this.slotMapKey(form)}_seeded`;
-  }
-
-  private markFormBarSeeded(form: HotbarForm = this.activeHotbarForm): void {
-    try {
-      localStorage.setItem(this.formBarSeededKey(form), '1');
-    } catch {
-      /* storage unavailable */
-    }
-  }
-
-  // Seed/migrate a druid bear/cat bar to its form kit. Returns true if it took
-  // ownership of `hotbarActions`. Runs at most once per form (guarded by the
-  // marker): on first encounter it seeds an empty bar or migrates a bar that is a
-  // byte-identical clone of the caster bar, but leaves a customized bar untouched.
-  private seedFormBarIfNeeded(parsed: HotbarAction[]): boolean {
-    let alreadySeeded = false;
-    try {
-      alreadySeeded = localStorage.getItem(this.formBarSeededKey()) === '1';
-    } catch {
-      /* storage unavailable */
-    }
-    if (alreadySeeded) return false;
-
-    let normalRaw: unknown = null;
-    try {
-      normalRaw = JSON.parse(localStorage.getItem(this.slotMapKey('normal')) ?? 'null');
-    } catch {
-      /* corrupt */
-    }
-    const normalActions = parseHotbarActions(
-      normalRaw,
-      Hud.BAR_ABILITY_SLOTS,
-      (id) => !!ABILITIES[id] || !!SPORT_ABILITIES[id],
-      (id) => this.isHotbarItemId(id),
-    );
-
-    // Mark before deciding so a deliberately customized bar is left untouched and
-    // this migration is never re-evaluated for the form.
-    this.markFormBarSeeded();
-    if (!shouldSeedFormBar(parsed, normalActions, false)) return false;
-
-    this.hotbarActions = buildDefaultFormBar(
-      this.formKitAbilityIds(this.activeHotbarForm),
-      Hud.BAR_ABILITY_SLOTS,
-    );
-    this.loadedSlotMapFromStorage = true;
-    this.knownAbilityIdsAtLastSlotSync = null;
-    this.saveSlotMap();
-    return true;
-  }
-
-  private loadSlotMap(): void {
-    let arr: unknown = null;
-    let stored = false;
-    try {
-      const raw = localStorage.getItem(this.slotMapKey());
-      stored = raw !== null;
-      arr = JSON.parse(raw ?? 'null');
-    } catch {
-      /* corrupt */
-    }
-    const parsed = parseHotbarActions(
-      arr,
-      Hud.BAR_ABILITY_SLOTS,
-      (id) => !!ABILITIES[id] || !!SPORT_ABILITIES[id],
-      (id) => this.isHotbarItemId(id),
-    );
-    // The Vale Cup sport bar seeds from the sport kit (buildDefaultFormBar over
-    // the current known list, which IS the role kit during a match, so Kick /
-    // the role moves / Second Wind land in slots 1-4). It must NEVER inherit
-    // the class bar via the empty-form fallback below: class abilities are not
-    // castable on the pitch. A player's mid-match rearrangement still persists
-    // under the dedicated `_sport` storage key.
-    if (this.activeHotbarForm === 'sport') {
-      if (parsed.every((action) => action === null)) {
-        this.hotbarActions = buildDefaultFormBar(
-          this.formKitAbilityIds('sport'),
-          Hud.BAR_ABILITY_SLOTS,
-        );
-        this.loadedSlotMapFromStorage = true;
-        this.knownAbilityIdsAtLastSlotSync = null;
-        return;
-      }
-      this.loadedSlotMapFromStorage = stored;
-      this.hotbarActions = parsed;
-      this.knownAbilityIdsAtLastSlotSync = null;
-      return;
-    }
-    // Druid bear/cat bars auto-populate with that form's kit instead of cloning
-    // the caster bar; existing characters are migrated once (see seedFormBarIfNeeded).
-    if (this.isFormKitBar()) {
-      if (this.seedFormBarIfNeeded(parsed)) return;
-      this.loadedSlotMapFromStorage = stored;
-      this.hotbarActions = parsed;
-      this.knownAbilityIdsAtLastSlotSync = null;
-      return;
-    }
-    const emptyFormMap =
-      this.activeHotbarForm !== 'normal' && parsed.every((action) => action === null);
-    if (emptyFormMap) {
-      let fallback: unknown = null;
-      try {
-        fallback = JSON.parse(localStorage.getItem(this.slotMapKey('normal')) ?? 'null');
-      } catch {
-        /* corrupt */
-      }
-      const normalActions = parseHotbarActions(
-        fallback,
-        Hud.BAR_ABILITY_SLOTS,
-        (id) => !!ABILITIES[id] || !!SPORT_ABILITIES[id],
-        (id) => this.isHotbarItemId(id),
-      );
-      if (normalActions.some((action) => action !== null)) {
-        this.loadedSlotMapFromStorage = true;
-        this.hotbarActions = normalActions;
-        this.knownAbilityIdsAtLastSlotSync = null;
-        return;
-      }
-    }
-    this.loadedSlotMapFromStorage = stored;
-    this.hotbarActions = parsed;
-    this.knownAbilityIdsAtLastSlotSync = null;
+    return this.actionBarController.classHasFormBars();
   }
 
   private saveSlotMap(): void {
-    try {
-      localStorage.setItem(this.slotMapKey(), JSON.stringify(this.hotbarActions));
-    } catch {
-      /* storage unavailable */
-    }
-  }
-
-  private firstEmptyHotbarIndex(): number {
-    return this.hotbarActions.indexOf(null);
-  }
-
-  private hotbarIndexForAbility(abilityId: string): number {
-    return this.hotbarActions.findIndex(
-      (action) => action?.type === 'ability' && action.id === abilityId,
-    );
+    this.actionBarController.saveActions();
   }
 
   private addAbilityToHotbar(abilityId: string): boolean {
-    if (this.hotbarIndexForAbility(abilityId) !== -1) return false;
-    const target = this.firstEmptyHotbarIndex();
-    if (target === -1) return false;
-    this.hotbarActions = placeAbilityOnSlot(this.hotbarActions, abilityId, target);
-    this.saveSlotMap();
-    return true;
+    return this.actionBarController.addAbility(abilityId);
   }
 
   private removeAbilityFromHotbar(abilityId: string): boolean {
-    const target = this.hotbarIndexForAbility(abilityId);
-    if (target === -1) return false;
-    this.hotbarActions = clearHotbarSlot(this.hotbarActions, target);
-    this.saveSlotMap();
-    return true;
+    return this.actionBarController.removeAbility(abilityId);
   }
 
-  // Rebuild the active bar from its default kit (form bars get their form kit;
-  // the caster/stealth bar gets the form-filtered known abilities). Item
-  // shortcuts and manual arrangement are intentionally discarded — it's a reset.
-  // The per-frame update() repaints the slot icons from hotbarActions, so we only
-  // mutate state here (same as addAbilityToHotbar / drag-drop).
   private resetActiveFormBarToDefault(): void {
-    this.hotbarActions = buildDefaultFormBar(
-      this.formKitAbilityIds(this.activeHotbarForm),
-      Hud.BAR_ABILITY_SLOTS,
-    );
-    this.knownAbilityIdsAtLastSlotSync = new Set(this.sim.known.map((k) => k.def.id));
-    this.markFormBarSeeded();
-    this.saveSlotMap();
+    this.actionBarController.resetActiveBar();
     this.spellbookWindow.refreshHotbarControls();
   }
 
-  private formToggleAbilityId(): string | null {
-    if (this.activeHotbarForm === 'bear') return 'bear_form';
-    if (this.activeHotbarForm === 'cat') return 'cat_form';
-    return null;
-  }
-
   private syncActiveHotbarForm(): void {
-    const next = this.playerHotbarForm();
-    if (next === this.activeHotbarForm) return;
-    this.saveSlotMap();
-    this.activeHotbarForm = next;
+    if (!this.actionBarController.syncActiveForm()) return;
     this.dragAction = null;
-    this.clearActionDropTargets();
-    this.loadSlotMap();
+    this.clearMobileHotbarDrag();
     this.mobileActionPage = clampMobilePage(this.mobileActionPage);
   }
 
-  // Drop unlearned ability ids; place newly learned abilities in the first
-  // empty slot. Item shortcuts stay assigned even when their count reaches 0.
   private syncSlotMap(): void {
-    const knownAbilityIds = this.sim.known.map((k) => k.def.id);
-    const autoPlaceAbilityIds = new Set<string>();
-    // Only auto-place abilities that belong on the active form's bar, so newly
-    // learned form abilities land on their form bar and not the caster bar.
-    const consider = (id: string) => {
-      if (this.shouldAutoPlaceOnForm(id, this.activeHotbarForm)) autoPlaceAbilityIds.add(id);
-    };
-    if (this.knownAbilityIdsAtLastSlotSync === null) {
-      if (!this.loadedSlotMapFromStorage) {
-        for (const id of knownAbilityIds) consider(id);
-      }
-    } else {
-      for (const id of knownAbilityIds) {
-        if (!this.knownAbilityIdsAtLastSlotSync.has(id)) consider(id);
-      }
-    }
-    const formToggle = this.formToggleAbilityId();
-    if (formToggle && knownAbilityIds.includes(formToggle)) autoPlaceAbilityIds.add(formToggle);
-    const synced = syncHotbarActions(this.hotbarActions, knownAbilityIds, autoPlaceAbilityIds);
-    this.hotbarActions = synced.actions;
-    if (synced.changed) this.saveSlotMap();
-    this.knownAbilityIdsAtLastSlotSync = new Set(knownAbilityIds);
+    this.actionBarController.syncKnownAbilities();
     this.mobileActionPage = clampMobilePage(this.mobileActionPage);
+  }
+
+  private attackSlotIsAttack(): boolean {
+    return this.actionBarController.isAttackSlotFixed();
+  }
+
+  private saveAttackSlotAction(): void {
+    this.actionBarController.saveAttackAction();
   }
 
   private actionForSlot(barSlot: number): HotbarAction {
-    // barSlot 1..22 (1..11 primary bar, 12..22 secondary bar)
-    return this.hotbarActions[barSlot - 1] ?? null;
+    return this.actionBarController.actionForSlot(barSlot);
   }
 
   abilityForSlot(barSlot: number): ResolvedAbility | null {
@@ -5173,6 +4864,21 @@ export class Hud {
     return true;
   }
 
+  private activateFixedAttackSlot(): void {
+    // On the pitch, key 1 casts your first sport move (Kick) instead of the
+    // harvest-truce-inert auto-attack, which would be a dead key with no useful
+    // effect. Off the pitch it is the normal auto-attack toggle.
+    const sportFirst = this.firstSportAbilityId();
+    if (sportFirst) {
+      this.castSportTap(sportFirst, this.sim.known[0]?.def.range ?? MELEE_RANGE);
+      this.flashActionSlot(0);
+      return;
+    }
+    if (this.sim.player.autoAttack) this.sim.stopAutoAttack();
+    else this.sim.startAutoAttack();
+    this.flashActionSlot(0);
+  }
+
   // Shared entry point for hotbar clicks and the 1..0-= keybinds.
   castSlot(barSlot: number): void {
     if (this.isGroundAimActive()) {
@@ -5183,19 +4889,8 @@ export class Hud {
       }
       this.cancelGroundAim();
     }
-    if (barSlot === 0) {
-      // On the pitch, key 1 casts your first sport move (Kick) instead of the
-      // harvest-truce-inert auto-attack, which would be a dead key with no useful
-      // effect. Off the pitch it is the normal auto-attack toggle.
-      const sportFirst = this.firstSportAbilityId();
-      if (sportFirst) {
-        this.castSportTap(sportFirst, this.sim.known[0]?.def.range ?? MELEE_RANGE);
-        this.flashActionSlot(barSlot);
-        return;
-      }
-      if (this.sim.player.autoAttack) this.sim.stopAutoAttack();
-      else this.sim.startAutoAttack();
-      this.flashActionSlot(barSlot);
+    if (barSlot === 0 && this.attackSlotIsAttack()) {
+      this.activateFixedAttackSlot();
       return;
     }
     const action = this.actionForSlot(barSlot);
@@ -5363,8 +5058,8 @@ export class Hud {
         e.stopPropagation();
       });
       this.attachTooltip(btn, () => {
-        if (slot === 0) {
-          return `<div class="tt-title">${esc(t('abilityUi.actionBar.attackName'))}</div><div class="tt-sub">${esc(t('abilityUi.actionBar.attackTooltip'))}</div>`;
+        if (slot === 0 && this.attackSlotIsAttack()) {
+          return `<div class="tt-title">${esc(t('abilityUi.actionBar.attackName'))}</div><div class="tt-sub">${esc(t('abilityUi.actionBar.attackTooltip'))}</div><div class="tt-sub">${esc(t('abilityUi.actionBar.attackRemoveHint'))}</div>`;
         }
         const known = this.abilityForSlot(slot);
         const clearHint = `<div class="tt-sub">${esc(t('abilityUi.actionBar.clearHint'))}</div>`;
@@ -5426,7 +5121,11 @@ export class Hud {
           e.preventDefault(); // required to permit the drop
           if (e.dataTransfer)
             e.dataTransfer.dropEffect =
-              this.dragAction?.sourceIndex === null && dragged.type === 'item' ? 'copy' : 'move';
+              this.dragAction?.sourceIndex === null &&
+              !this.dragAction?.sourceAttackSlot &&
+              dragged.type === 'item'
+                ? 'copy'
+                : 'move';
           btn.classList.add('drop-target');
         });
         btn.addEventListener('dragleave', () => btn.classList.remove('drop-target'));
@@ -5436,6 +5135,7 @@ export class Hud {
           const dragged = this.dragAction ?? {
             action: this.readDraggedAction(e.dataTransfer),
             sourceIndex: null,
+            sourceAttackSlot: false,
           };
           this.dragAction = null;
           const action = dragged.action;
@@ -5449,6 +5149,10 @@ export class Hud {
             this.hotbarActions = placeAbilityOnSlot(this.hotbarActions, action.id, slot - 1);
           } else if (action.type === 'item' && this.isHotbarItemId(action.id)) {
             this.hotbarActions = placeItemOnSlot(this.hotbarActions, action.id, slot - 1);
+          }
+          if (dragged.sourceAttackSlot) {
+            this.attackSlotAction = null;
+            this.saveAttackSlotAction();
           }
           this.saveSlotMap();
           // The drop rearranged this slot's contents, but a drop that ends with the
@@ -5469,6 +5173,69 @@ export class Hud {
           this.hotbarActions = clearHotbarSlot(this.hotbarActions, slot - 1);
           this.saveSlotMap();
           this.hideTooltip();
+        });
+      } else {
+        // Slot 0 (Attack). Right-click removes the Attack toggle from the bar
+        // (Interface option showAttackButton -> off), freeing the slot and its key
+        // for a normal action; right-click again clears whatever was dropped in.
+        // The Options toggle restores Attack at any time.
+        btn.draggable = true;
+        btn.addEventListener('contextmenu', (e) => {
+          e.preventDefault();
+          if (this.attackSlotIsAttack()) {
+            this.optionsHooks?.settings.set('showAttackButton', false);
+          } else if (this.attackSlotAction !== null) {
+            this.attackSlotAction = null;
+            this.saveAttackSlotAction();
+          }
+          this.hideTooltip();
+        });
+        btn.addEventListener('dragstart', (e) => {
+          const action = this.actionForSlot(0);
+          if (!action) {
+            e.preventDefault();
+            return;
+          }
+          this.dragAction = { action, sourceIndex: null, sourceAttackSlot: true };
+          this.writeDraggedAction(e.dataTransfer, action);
+          if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move';
+          this.hideTooltip();
+        });
+        // With Attack removed, the freed slot accepts a drag like any other slot.
+        btn.addEventListener('dragover', (e) => {
+          if (this.attackSlotIsAttack()) return;
+          if (this.dragAction?.sourceAttackSlot) return;
+          const dragged = this.dragAction?.action ?? this.readDraggedAction(e.dataTransfer);
+          if (!dragged) return;
+          e.preventDefault();
+          btn.classList.add('drop-target');
+        });
+        btn.addEventListener('dragleave', () => btn.classList.remove('drop-target'));
+        btn.addEventListener('drop', (e) => {
+          e.preventDefault();
+          btn.classList.remove('drop-target');
+          if (this.attackSlotIsAttack()) return;
+          const dragged = this.dragAction ?? {
+            action: this.readDraggedAction(e.dataTransfer),
+            sourceIndex: null,
+            sourceAttackSlot: false,
+          };
+          if (!dragged.action) return;
+          const assigned = assignAttackSlotAction(dragged.action, dragged.sourceIndex);
+          this.attackSlotAction = assigned.action;
+          this.saveAttackSlotAction();
+          // A drag from another bar slot MOVES the action there (the attack slot
+          // holds nothing to swap back); spellbook/bag drags simply assign.
+          if (assigned.clearSourceIndex !== null) {
+            this.hotbarActions = clearHotbarSlot(this.hotbarActions, assigned.clearSourceIndex);
+            this.saveSlotMap();
+          }
+          this.dragAction = null;
+          this.hideTooltip();
+        });
+        btn.addEventListener('dragend', () => {
+          this.dragAction = null;
+          this.clearActionDropTargets();
         });
       }
       container?.appendChild(btn);
@@ -5494,7 +5261,9 @@ export class Hud {
           const slotKey = `slot${i}`;
           return {
             slotIndex: i,
-            isAttack: i === 0,
+            // Live accessor: slot 0 stops being the Attack toggle when the player
+            // removes it (Interface option showAttackButton off / right-click).
+            isAttack: () => i === 0 && this.attackSlotIsAttack(),
             // Raw binding presence (any assigned slot, even one whose ability is
             // unlearned or item id is unknown): the many-spells count source, kept
             // byte-identical to the former hotbarActions.filter(a => a !== null).
@@ -5567,7 +5336,7 @@ export class Hud {
       return { btn, label, countEl, keybindEl, cdOverlay, cdText };
     });
 
-    // Wire clicks: attack -> the classic toggle via castSlot(0) while the
+    // Wire clicks: attack -> the classic fixed control while the
     // player is auto-attacking or holds a live hostile target, and the
     // acquire-nearest fallback (the old Closest behavior, injected by main.ts
     // as onMobileAttackNearest) otherwise, so a bare tap with nothing targeted
@@ -5589,11 +5358,13 @@ export class Hud {
       const p = this.sim.player;
       const target = p.targetId !== null ? this.sim.entities.get(p.targetId) : null;
       const hasLiveHostileTarget = !!target && !target.dead && target.hostile;
-      if (p.autoAttack || hasLiveHostileTarget || !this.onMobileAttackNearest) {
-        this.castSlot(0);
-      } else {
-        this.onMobileAttackNearest();
-      }
+      handleMobileAttackTap(
+        { autoAttack: p.autoAttack, hasLiveHostileTarget },
+        {
+          activateAttack: () => this.activateFixedAttackSlot(),
+          attackNearest: this.onMobileAttackNearest,
+        },
+      );
       attackBtn.blur();
     });
     slotBtns.forEach((btn, i) => {
@@ -5635,7 +5406,7 @@ export class Hud {
         slots: [
           {
             slotIndex: 0,
-            isAttack: true,
+            isAttack: () => true,
             hasAction: () => false,
             ability: () => null,
             item: () => null,
@@ -5643,7 +5414,7 @@ export class Hud {
           },
           ...Array.from({ length: 5 }, (_, i) => ({
             slotIndex: i + 1,
-            isAttack: false,
+            isAttack: () => false,
             hasAction: () =>
               this.actionForSlot(sourceSlotForMobileButton(this.mobileActionPage, i)) !== null,
             ability: () => this.abilityForSlot(sourceSlotForMobileButton(this.mobileActionPage, i)),
@@ -5766,7 +5537,7 @@ export class Hud {
       {
         slots: Array.from({ length: CONSUMABLE_BAR_SLOTS }, (_, i) => ({
           slotIndex: i,
-          isAttack: false,
+          isAttack: () => false,
           hasAction: () => this.consumableBarIds[i] !== undefined,
           ability: () => null,
           item: () => {
@@ -6046,13 +5817,17 @@ export class Hud {
       ['#mm-spell', 'spellbook', 'abilityUi.spellbook.title'],
       ['#mm-talents', 'talents', 'game.talents.title'],
       ['#mm-quest', 'questlog', 'questUi.log.title'],
+      ['#mm-deeds', 'deeds', 'hudChrome.deeds.title'],
       ['#mm-map', 'map', 'hud.core.mobileMap'],
       ['#mm-bag', 'bags', 'itemUi.bags.title'],
+      ['#mm-crafting', 'crafting', 'hudChrome.crafting.title'],
       ['#mm-arena', 'arena', 'hud.core.mobileArena'],
+      ['#mm-dfinder', 'dungeonFinder', 'hudChrome.finder.title'],
       ['#mm-valecup', 'valecup', 'hudChrome.keybinds.valecup'],
       ['#mm-leaderboard', 'leaderboard', 'game.leaderboard.title'],
       ['#mm-emote', 'emoteWheel', 'hudChrome.emoteWheel.label'],
       ['#mm-social', 'social', 'hud.social.friendsTab'],
+      ['#mm-discord', 'discord', 'hudChrome.discord.title'],
     ];
     for (const [selector, action, labelKey] of sideButtons) {
       const btn = document.querySelector<HTMLElement>(selector);
@@ -6060,7 +5835,7 @@ export class Hud {
       const key = this.keybinds.primaryLabel(action);
       const label = t(labelKey);
       const keyEl = btn.querySelector<HTMLElement>('.keybind');
-      if (keyEl) keyEl.textContent = key.toLowerCase();
+      if (keyEl) keyEl.textContent = keyCapLabel(key);
       btn.setAttribute('aria-label', key ? `${label} (${key})` : label);
     }
   }
@@ -6103,7 +5878,13 @@ export class Hud {
     const cd = Math.ceil(Math.max(0, pet.petTauntTimer));
     const autoTaunt = pet.petAutoTaunt === true;
     const ownerClass = this.sim.cfg.playerClass;
-    const sig = `${pet.id}:${ownerClass}:${mode}:${cd}:${autoTaunt ? 'auto' : 'manual'}:${this.pendingPetFeed ? 'feed' : ''}:${this.petModeMenuOpen ? 'modes' : ''}`;
+    // Feed-button reason (full HP / no food) folds in so the pet bar redraws
+    // when either flips, even while the pet stays otherwise unchanged.
+    const feedSig =
+      ownerClass === 'warlock'
+        ? ''
+        : (petFeedButtonState(pet.hp, pet.maxHp, this.hasPetFood()).reasonKey ?? 'ok');
+    const sig = `${pet.id}:${ownerClass}:${mode}:${cd}:${autoTaunt ? 'auto' : 'manual'}:${this.pendingPetFeed ? 'feed' : ''}:${this.petModeMenuOpen ? 'modes' : ''}:${feedSig}`;
     bar.style.display = 'flex';
     if (sig === this.lastPetBarSig) return;
     this.lastPetBarSig = sig;
@@ -6128,6 +5909,12 @@ export class Hud {
         cooldownText?: string;
         onContextMenu?: () => void;
         onTouchHold?: () => void;
+        // Kept visible (never hidden) but greyed and inert while set. The
+        // accessible name (`title`, which also feeds aria-label) STAYS the
+        // action name; the WHY is carried by the rich hover tooltip
+        // (`tooltip`), so a screen reader still announces the action, not the
+        // disabled reason.
+        disabled?: boolean;
       } = {},
     ) => {
       const btn = document.createElement('button');
@@ -6135,8 +5922,10 @@ export class Hud {
       if (opts.active) btn.classList.add('active');
       if (opts.autocast) btn.classList.add('autocast');
       if (opts.cooldownText) btn.classList.add('cooldown');
+      if (opts.disabled) btn.classList.add('disabled');
       btn.title = title;
       btn.setAttribute('aria-label', title);
+      if (opts.disabled) btn.setAttribute('aria-disabled', 'true');
       if (opts.active || opts.autocast) btn.setAttribute('aria-pressed', 'true');
       const icon = document.createElement('span');
       icon.className = 'icon-label';
@@ -6160,7 +5949,7 @@ export class Hud {
         touchHoldTimer = undefined;
       };
       const runClickAction = () => {
-        if (opts.cooldownText) return;
+        if (opts.cooldownText || opts.disabled) return;
         audio.click();
         onClick();
       };
@@ -6183,6 +5972,7 @@ export class Hud {
         btn.addEventListener('contextmenu', (event) => {
           event.preventDefault();
           if (document.body.classList.contains('mobile-touch')) return;
+          if (opts.disabled) return; // an inert button fires no secondary action
           audio.click();
           opts.onContextMenu?.();
         });
@@ -6192,6 +5982,7 @@ export class Hud {
           if (!document.body.classList.contains('mobile-touch') || event.pointerType !== 'touch') {
             return;
           }
+          if (opts.disabled) return; // an inert button fires no long-press action
           event.preventDefault();
           clearTouchHoldTimer();
           suppressNextClick = false;
@@ -6292,20 +6083,25 @@ export class Hud {
         },
       );
     } else {
+      const feedState = petFeedButtonState(pet.hp, pet.maxHp, this.hasPetFood());
       addButton(
         commands,
         PET_ACTION_ICONS.feed,
+        // Accessible name stays "Heal Pet" even when disabled; the disabled
+        // reason lives in the rich tooltip below, never in the aria-label.
         t('hud.pet.healPet'),
-        petTooltip(t('hud.pet.healPet'), t('hud.pet.healPetDesc')),
+        feedState.reasonKey
+          ? petTooltip(t('hud.pet.healPet'), t(feedState.reasonKey))
+          : petTooltip(t('hud.pet.healPet'), t('hud.pet.healPetDesc')),
         () => {
           // Toggle: a second click cancels the pending feed instead of trapping
-          // the player in food-selection mode.
+          // the player in food-selection mode. Reaching this handler at all
+          // means feedState.disabled was false (the button no-ops while
+          // disabled), so the food check below is now just a defensive guard.
           if (this.pendingPetFeed) {
             this.cancelPetFeed();
             return;
           }
-          // With no edible food there is nothing to select, so entering feed mode
-          // would strand the player on the bag screen — surface an error instead.
           if (!this.hasPetFood()) {
             this.showError(t('hud.pet.noPetFood'));
             return;
@@ -6315,7 +6111,10 @@ export class Hud {
           $('#bags').style.display = 'flex';
           this.renderBags();
         },
-        { active: this.pendingPetFeed },
+        // A pending feed stays clickable so the toggle can CANCEL it, even once
+        // the pet has regenerated back to full HP (which would otherwise flip
+        // feedState.disabled true and trap the player in food-selection mode).
+        { active: this.pendingPetFeed, disabled: feedState.disabled && !this.pendingPetFeed },
       );
     }
     const modes: { mode: PetMode; labelKey: TranslationKey; descKey: TranslationKey }[] = [
@@ -6398,10 +6197,26 @@ export class Hud {
   }
 
   private dailyRewardsEnabled(): boolean {
-    return !(
-      document.body.classList.contains('native-app') &&
-      document.body.classList.contains('mobile-touch')
-    );
+    return this.features.dailyRewardsEnabled;
+  }
+
+  private syncDailyRewardsSurfaceLabels(): void {
+    const storeEnabled = this.claudiumHooks !== null;
+    const titleKey = storeEnabled ? 'hudChrome.wocStore.title' : 'hudChrome.dailyRewards.title';
+    const labelKey = storeEnabled ? 'hudChrome.wocStore.storeTab' : 'hudChrome.dailyRewards.title';
+    const title = t(titleKey);
+    for (const button of [this.dailyRewardsButtonEl, this.mobileDailyRewardsButtonEl]) {
+      if (!button) continue;
+      button.setAttribute('data-i18n-title', titleKey);
+      button.setAttribute('data-i18n-aria', titleKey);
+      button.title = title;
+      button.setAttribute('aria-label', title);
+    }
+    const label = this.mobileDailyRewardsButtonEl?.querySelector<HTMLElement>('.mobile-label');
+    if (label) {
+      label.setAttribute('data-i18n', labelKey);
+      label.textContent = t(labelKey);
+    }
   }
 
   private showDailyRewardsChestButton(): boolean {
@@ -6493,24 +6308,11 @@ export class Hud {
     // chat burst on the fast tier once chat goes quiet.
     if (fastHud) this.chatAnnouncer.flush(now);
 
-    // Fade a talking NPC's voice line by distance as the player walks away, so a
-    // dialogue trails off naturally instead of holding full volume. Per-frame for a
-    // smooth ramp; independent of the dialog window (which closes at 8), so the
-    // voice keeps fading until the clip ends or the player is out of earshot.
-    if (this.voiceNpcId !== null) {
-      if (!voice.isPlaying()) {
-        this.voiceNpcId = null;
-      } else {
-        const vnpc = sim.entities.get(this.voiceNpcId);
-        voice.setDistanceGain(vnpc ? voiceDistanceGain(dist2d(p.pos, vnpc.pos)) : 0);
-      }
-    }
+    this.questDialog.updateVoice();
     this.meters.update();
-    this.lockpickWindow.repaintIfChanged();
+    this.lockpickController.repaintIfChanged();
     this.tutorial.update(sim, this.renderer, this.keybinds);
-    this.reconcileLootRolls();
-    this.reconcileLootRollStatus(now);
-    this.updateLootRollTimers(now);
+    this.lootRolls.update(now);
     if (slowHud) this.updateRaidLockoutBadge();
     if (slowHud) this.refreshDailyRewardsLauncher();
     this.syncActiveHotbarForm();
@@ -6601,7 +6403,8 @@ export class Hud {
     // target instance. (Targeting a world object hides the frame, like no target.)
     const target = p.targetId !== null ? sim.entities.get(p.targetId) : null;
     if (target && target.kind !== 'object') {
-      const isBoss = !!MOBS[target.templateId]?.boss;
+      const targetTemplate = MOBS[target.templateId];
+      const targetRank = targetRankView(targetTemplate);
       // The portrait gate fires inside paint(); hand it the subject to redraw.
       this.targetPortraitSubject = target;
       // The target is a NON-SELF frame; on low throttle its HP/level/
@@ -6635,6 +6438,13 @@ export class Hud {
       ) {
         this.lastTargetFramePaintAt = now;
         this.lastTargetFrameId = target.id;
+        // entity.title is the Book of Deeds deed id on the identity wire
+        // (players only; always null/absent for mobs and NPCs).
+        const titleSig = `${getLanguage()}|${target.title ?? ''}`;
+        if (titleSig !== this.lastTargetTitleSig) {
+          this.lastTargetTitleSig = titleSig;
+          this.targetTitleDecoration = titledNameDecoration(target.title ?? null);
+        }
         this.targetFramePainter.paint(
           unitFrameView({
             present: true,
@@ -6655,8 +6465,10 @@ export class Hud {
               target.dead || !target.resourceType
                 ? ''
                 : `${Math.round(target.resource)} / ${target.maxResource}`,
-            levelText: isBoss ? BOSS_SKULL_GLYPH : String(target.level),
+            levelText: String(target.level),
             name: entityDisplayName(target),
+            titlePre: this.targetTitleDecoration.pre,
+            titlePost: this.targetTitleDecoration.post,
             // id-keyed gate, byte-faithful to the old lastPortraitTarget !== target.id;
             // the painter resets it on hide so an id reused by a new mob still redraws.
             portraitKey: String(target.id),
@@ -6669,8 +6481,12 @@ export class Hud {
       // Target-only sub-parts the family frame does not express, each routed through
       // the elided writers (the elite class + name color are the two writes the four
       // original writers cannot express, hence the toggleClass / setStyleProp).
-      this.toggleClass(this.targetFrameEl, 'elite', !!MOBS[target.templateId]?.elite);
-      this.setText(this.targetEliteTagEl, isBoss ? t('hud.core.boss') : t('hud.core.elite'));
+      this.toggleClass(this.targetFrameEl, 'elite', targetUsesEliteFrame(targetRank));
+      this.toggleClass(this.targetFrameEl, 'boss', targetRank === 'boss');
+      this.setText(
+        this.targetEliteTagEl,
+        targetRank === 'boss' ? t('hud.core.boss') : t('hud.core.elite'),
+      );
       // Linked-Discord players get their staff-role name color (else friendly/hostile),
       // plus a Discord info line (nickname + rank + role chips) under the healthbar.
       const tfRoleColor = target.kind === 'player' ? specialRoleColor(target.discordRole) : null;
@@ -6750,10 +6566,22 @@ export class Hud {
     // ActionBarPainter. Every per-slot icon / cooldown / dimming / count write
     // routes through the elided writer facet; the aria-label keeps its per-frame t()
     // call IN the core while the painter elides the DOM setAttribute (Top risk 4).
+    // Derive `stealthed` from the mirrored auras rather than trust the raw entity
+    // field: offline it is the live sim Entity's cache (kept current by
+    // Sim.updateAuras), but online it is the ClientWorld mirror's server-local
+    // interest-filtering cache, never encoded on the wire and never updated on the
+    // client (see src/net/online.ts, server/game.ts). The auras ARE mirrored, so
+    // this stays correct on both hosts. Shared by every action-bar-family view
+    // below (desktop bar, mobile ring, consumables quick bar).
+    const abPlayer = { ...p, stealthed: playerStealthed(p.auras) };
     this.renderPetBar();
     if (this.spellbookWindow.isOpen) this.spellbookWindow.tickOpen();
     this.actionBarPainter.paint(
-      this.actionBarView.tick({ player: p, target: target ?? null, inventory: sim.inventory }),
+      this.actionBarView.tick({
+        player: abPlayer,
+        target: target ?? null,
+        inventory: sim.inventory,
+      }),
     );
 
     // mobile action ring: the paged touch combat cluster, gated on the touch-mode
@@ -6763,12 +6591,13 @@ export class Hud {
     if (this.isMobileLayout() && this.mobileActionRingView && this.mobileActionRingPainter) {
       this.mobileActionRingPainter.paint(
         this.mobileActionRingView.tick({
-          player: p,
+          player: abPlayer,
           target: target ?? null,
           inventory: sim.inventory,
         }),
         this.mobileActionPage,
         mobilePageCount(),
+        this.attackSlotIsAttack(),
       );
     }
 
@@ -6787,7 +6616,7 @@ export class Hud {
     ) {
       this.consumableBarPainter.paint(
         this.consumableBarView.tick({
-          player: p,
+          player: abPlayer,
           target: target ?? null,
           inventory: sim.inventory,
         }),
@@ -6881,75 +6710,19 @@ export class Hud {
         }
       }
 
-      // soundtrack: pick the zone theme and layer in combat percussion.
-      // Combat = a mob is on us, or we traded blows in the last few seconds
-      // (the wire protocol doesn't ship the inCombat flag).
-      let aggroed = false;
-      let bossEngaged = false; // the Nythraxis raid boss is pulled -> its own track
-      const dungeon = dungeonAt(p.pos.x);
-      const inNythraxisArena = dungeon?.id === 'nythraxis_boss_arena';
-      for (const e of sim.entities.values()) {
-        if (e.kind !== 'mob' || e.dead) continue;
-        if (e.aggroTargetId === sim.playerId) aggroed = true;
-        if (e.templateId === 'nythraxis_scourge_of_thornpeak') {
-          if (e.aggroTargetId !== null) bossEngaged = true;
-        }
-      }
-      const inCombat = aggroed || now - this.lastCombatEventAt < 5000;
-      const musicCombat = inCombat || inNythraxisArena;
-      bossEngaged =
-        bossEngaged || inNythraxisArena || now - this.lastNythraxisCombatEventAt < 10000;
-      const hub = currentZone.hub;
-      const inHub = !inDungeon && Math.hypot(p.pos.x - hub.x, p.pos.z - hub.z) < hub.radius + 10;
-      // Delves sit past the dungeon x-threshold (so inDungeon is already true) but
-      // dungeonAt() returns null for them, so feed the delve id as the instance id:
-      // delves use the dungeon theme (dungeonMusicZoneForDungeon falls back to
-      // dungeon_hollow_crypt) and get the same fresh-phrasing reset on entry that
-      // real dungeons do, instead of relying on the accidental null fallback.
-      const inDelveBand = isDelvePos(p.pos.x);
-      const instanceId = inDelveBand
-        ? (delveAt(p.pos.x)?.id ?? 'collapsed_reliquary')
-        : (dungeon?.id ?? null);
-      // The Sowfield stadium plays its own jaunty match theme (a positional
-      // override inside Eastbrook Vale; the zone LABEL stays Eastbrook Vale,
-      // the Sowfield is a poi, not a zone).
-      const atSowfield = !inDungeon && isAtSowfield(p.pos.x, p.pos.z);
-      const zone = atSowfield
-        ? 'vale_cup'
-        : musicZoneForLocation(
-            currentZone.id,
-            currentZone.biome,
-            inHub,
-            inDungeon || inNythraxisArena,
-            instanceId,
-          );
-      const musicDungeonId = inDungeon || inNythraxisArena ? instanceId : null;
-      if (shouldResetMusicForDungeonEntry(this.lastMusicDungeonId, musicDungeonId)) {
-        music.resetForDungeonEntry(musicDungeonId);
-      }
-      this.lastMusicDungeonId = musicDungeonId;
-      music.update(zone, musicCombat);
-      music.setBossCombat(bossEngaged);
-      // Sowfield area music: the 'match' track once a game has kicked off (ball in
-      // play or a goal being celebrated), the 'waiting' track any other time you
-      // are at the stadium, and silence (procedural score returns) once you leave.
-      // Reads whichever match view we hold: our own if playing, else the walk-up
-      // spectate view the sim fills only at the Sowfield.
-      const cupMatchView = sim.cupInfo?.match ?? sim.cupInfo?.spectate ?? null;
-      const cupKickedOff =
-        cupMatchView?.phase === 'active' ||
-        cupMatchView?.phase === 'goal' ||
-        cupMatchView?.phase === 'golden';
-      // A private practice bout plays the SAME boarball soundtrack as the real
-      // Sowfield (the match beat once it kicks off, the waiting bed before), not
-      // the instance/combat theme its far-out pitch would otherwise pick. The
-      // practice pitch is an offset instance (match.origin is non-zero); a real
-      // match is {0,0} and already covered by atSowfield.
-      const myMatch = sim.cupInfo?.match;
-      const inPracticeMatch = !!myMatch && (myMatch.origin.x !== 0 || myMatch.origin.z !== 0);
-      music.setSowfieldTrack(
-        atSowfield || inPracticeMatch ? (cupKickedOff ? 'match' : 'waiting') : null,
-      );
+      const musicState = this.instanceMusic.update({
+        now,
+        lastCombatEventAt: this.lastCombatEventAt,
+        lastBossCombatEventAt: this.lastNythraxisCombatEventAt,
+        playerId: sim.playerId,
+        playerPos: p.pos,
+        zone: currentZone,
+        inDungeon,
+        entities: sim.entities.values(),
+        cupInfo: sim.cupInfo,
+      });
+      const inCombat = musicState.inCombat;
+      const { atSowfield } = musicState;
 
       // classic combat indicator: crossed swords + red ring on the player portrait.
       // Routed through the cached ref + the elided toggleClass writer: a counted,
@@ -6986,15 +6759,10 @@ export class Hud {
       this.updateShootCharge();
       if ($('#map-window').style.display === 'block') this.updateMapWindow();
       if ($('#arena-window').style.display === 'block') this.arenaWindow.render();
+      if ($('#dungeon-finder-window').style.display === 'flex') this.dungeonFinderWindow.render();
+      if (this.dungeonFinderProposalPopup.isOpen) this.dungeonFinderProposalPopup.render();
       if ($('#valecup-window').style.display === 'block') this.valeCupWindow.render();
-      if (this.openLootMobId !== null) {
-        const mob = sim.entities.get(this.openLootMobId);
-        if (!mob?.lootable || dist2d(p.pos, mob.pos) > 7) this.closeLoot();
-      }
-      if (this.openLootChestId !== null) {
-        const chest = sim.entities.get(this.openLootChestId);
-        if (!chest || dist2d(p.pos, chest.pos) > 7) this.closeLoot();
-      }
+      this.lootWindow.updateProximity();
       if (this.openVendorNpcId !== null) {
         const npc = sim.entities.get(this.openVendorNpcId);
         if (!npc || dist2d(p.pos, npc.pos) > 8) this.closeVendor();
@@ -7003,13 +6771,7 @@ export class Hud {
         const npc = sim.entities.get(this.openHeroicVendorNpcId);
         if (!npc || dist2d(p.pos, npc.pos) > 8) this.closeHeroicVendor();
       }
-      // Close the quest/gossip dialog once the player walks out of talking range
-      // (or the NPC is gone), the same way the vendor window auto-closes above. You
-      // open within INTERACT_RANGE (5), so the wider 8 threshold never fires on open.
-      if (this.openGossipNpcId !== null) {
-        const npc = sim.entities.get(this.openGossipNpcId);
-        if (!npc || dist2d(p.pos, npc.pos) > 8) this.closeQuestDialog();
-      }
+      this.questDialog.updateProximity();
     }
 
     // when a bout begins, get the queue panel out of the way for the fight. Route through
@@ -7050,6 +6812,10 @@ export class Hud {
     if (slowHud && this.mailboxWindow.isOpen) this.mailboxWindow.refreshIfChanged();
     // The bank closes itself when the bank mirror goes null (left the banker).
     if (slowHud && this.bankWindow.isOpen) this.bankWindow.refreshIfChanged();
+    if (slowHud && this.deedsWindow.isOpen) this.deedsWindow.refreshIfChanged();
+    // The deed tracker is always-on chrome (not gated on a window): watched
+    // progress climbs from normal play, and earned deeds drop off.
+    if (slowHud) this.updateDeedTracker();
     if (slowHud && this.calendarWindow.isOpen) this.calendarWindow.refreshIfChanged();
     if (slowHud) this.updateMailIndicator();
   }
@@ -7172,87 +6938,13 @@ export class Hud {
   }
 
   private updateQuestTracker(): void {
-    const el = $('#quest-tracker');
-    const settings = this.optionsHooks?.settings;
-    let collapsed = (settings?.get('questTrackerCollapsed') ?? false) === true;
-    const quests: TrackedQuest[] = [];
-    for (const qp of this.sim.questLog.values()) {
-      const quest = QUESTS[qp.questId];
-      quests.push({
-        id: qp.questId,
-        // acceptance-order number, the same one the map badges + side list show
-        number: quests.length + 1,
-        title: questTitle(qp.questId),
-        complete: qp.state === 'ready',
-        objectives: quest.objectives.map((obj, i) => ({
-          label: questObjectiveLabel(qp.questId, i),
-          current: qp.counts[i],
-          total: obj.count,
-        })),
-      });
-    }
-    // Only persist the collapse choice while at least one quest is tracked: when
-    // the tracker empties (all quests turned in or abandoned) drop the flag, so a
-    // freshly accepted quest reappears expanded with its objectives visible
-    // rather than hidden behind a collapsed header. Self-limiting to a single
-    // write: once cleared, later empty frames read false and skip.
-    if (collapsed && quests.length === 0 && settings) {
-      settings.set('questTrackerCollapsed', false);
-      collapsed = false;
-    }
-    const html = this.questTrackerHtml(questTrackerView(quests, collapsed));
-    if (el.innerHTML !== html) el.innerHTML = html;
-  }
-
-  // Render the pure tracker view to the floating overlay's HTML. The header is a
-  // <button> (pointer-events re-enabled in CSS over the otherwise click-through
-  // overlay) that toggles the collapse; a delegated listener on #quest-tracker
-  // (see the event-binding constructor) handles activation so it survives these
-  // innerHTML rebuilds.
-  private questTrackerHtml(view: QuestTrackerView): string {
-    if (!view.visible) return '';
-    const chevron = view.collapsed ? '▸' : '▾'; // U+25B8 right / U+25BE down triangle
-    // The leading space keeps a separator in the button's accessible name
-    // ("Quests (5)", not "Quests(5)"); the visual gap is the flex `gap`.
-    const count = view.collapsed
-      ? ` <span class="qt-count">${esc(t('hudChrome.questTracker.count', { count: this.questNumber(view.count) }))}</span>`
-      : '';
-    // State-aware hover hint: clicking collapses while expanded, expands while collapsed.
-    const hint = esc(
-      t(
-        view.collapsed
-          ? 'hudChrome.questTracker.expandHint'
-          : 'hudChrome.questTracker.collapseHint',
-      ),
-    );
-    // aria-controls points at the row list (kept in the DOM, empty when collapsed)
-    // so assistive tech ties the toggle to the region it shows/hides.
-    const html =
-      `<button type="button" class="qt-header" aria-expanded="${!view.collapsed}" aria-controls="qt-list" title="${hint}">` +
-      `<span class="qt-chevron" aria-hidden="true">${chevron}</span>` +
-      `<span class="qt-h-label">${esc(t('questUi.tracker.title'))}</span>${count}</button>`;
-    let rows = '';
-    for (const q of view.quests) {
-      rows += `<div class="qt-title" role="button" tabindex="0" data-quest="${esc(q.id)}"><span class="qt-num">${esc(this.questNumber(q.number))}</span>${esc(q.title)}${q.complete ? ` <span class="quest-complete">(${esc(t('questUi.tracker.complete'))})</span>` : ''}</div>`;
-      for (const o of q.objectives) {
-        rows += `<div class="qt-obj${o.done ? ' done' : ''}">- ${esc(this.questProgressText(o.label, o.current, o.total))}</div>`;
-      }
-    }
-    return `${html}<div id="qt-list">${rows}</div>`;
+    this.questTracker.update();
   }
 
   /** Flip the persisted tracker-collapsed preference (the header click/keyboard
    *  activation), preserving keyboard focus across the innerHTML rebuild. */
   private toggleQuestTrackerCollapsed(): void {
-    const settings = this.optionsHooks?.settings;
-    if (!settings) return;
-    const refocus =
-      document.activeElement instanceof HTMLElement &&
-      document.activeElement.classList.contains('qt-header');
-    settings.set('questTrackerCollapsed', !settings.get('questTrackerCollapsed'));
-    audio.click();
-    this.updateQuestTracker();
-    if (refocus) ($('#quest-tracker').querySelector('.qt-header') as HTMLElement | null)?.focus();
+    this.questTracker.toggleCollapsed();
   }
 
   // -------------------------------------------------------------------------
@@ -7260,196 +6952,15 @@ export class Hud {
   // -------------------------------------------------------------------------
 
   openDelveBoard(npcId: number): void {
-    const npc = this.sim.entities.get(npcId);
-    if (npc?.kind !== 'npc') return;
-    const delve = Object.values(DELVES).find((d) => d.boardNpcId === npc.templateId);
-    if (!delve) return;
-    // display:flex (not block): the delve board is a bounded flex column so its
-    // body flex-fills and scrolls on a corner resize (see the #delve-board CSS).
-    if ($('#delve-board').style.display !== 'flex')
-      this.delveTrap = this.focusManager.open({ root: () => $('#delve-board') });
-    this.openDelveBoardNpcId = npcId;
-    this.selectedDelveTier = 'normal';
-    this.delveBoardTab = 'delve';
-    this.closeOtherWindows('#delve-board');
-    $('#delve-board').style.display = 'flex';
-    this.renderDelveBoard(true);
+    this.delveBoard.open(npcId);
   }
 
   private renderDelveBoard(focus = false): void {
-    const el = $('#delve-board');
-    const npcId = this.openDelveBoardNpcId;
-    if (npcId === null) {
-      el.style.display = 'none';
-      return;
-    }
-    const npc = this.sim.entities.get(npcId);
-    if (npc?.kind !== 'npc') {
-      this.closeDelveBoard();
-      return;
-    }
-    const delve = Object.values(DELVES).find((d) => d.boardNpcId === npc.templateId);
-    if (!delve) {
-      this.closeDelveBoard();
-      return;
-    }
-    const delveName = delveDisplayName(delve.id);
-    const partySize = this.sim.partyInfo?.members.length ?? 1;
-    const partyTooLarge = partySize > delve.maxPlayers;
-    const canEnter = this.sim.player.level >= delve.minLevel && !partyTooLarge;
-    const tierNormal = t('delveUi.board.tier.normal');
-    const tierHeroic = t('delveUi.board.tier.heroic');
-    const marks = formatNumber(this.sim.delveMarks, { maximumFractionDigits: 0 });
-    const tab = this.delveBoardTab;
-    const tabBtn = (id: 'delve' | 'shop', label: string): string =>
-      `<button type="button" class="delve-tab${tab === id ? ' active' : ''}" role="tab" aria-selected="${tab === id}" data-board-tab="${id}">${esc(label)}</button>`;
-    let body: string;
-    if (tab === 'shop') {
-      body = this.delveShopBodyHtml(delve.id);
-    } else {
-      const companionId = delve.autoCompanionId ?? 'companion_tessa';
-      const companionRank = this.sim.companionUpgrades[companionId] ?? 1;
-      const companionRankLabel = t('delveUi.board.companion.rank', {
-        rank: formatNumber(companionRank, { maximumFractionDigits: 0 }),
-      });
-      const companionMaxRank = Math.max(...Object.keys(COMPANION_UPGRADE_COSTS).map(Number));
-      const nextRank = companionRank + 1;
-      const nextCost = COMPANION_UPGRADE_COSTS[nextRank];
-      const companionNameKey = companionId === 'companion_edda' ? 'edda' : 'tessa';
-      const companionName = t(`delveUi.board.companion.${companionNameKey}` as TranslationKey);
-      let companionAction: string;
-      if (companionRank >= companionMaxRank || !nextCost) {
-        companionAction = `<div class="delve-companion-max quest-muted">${esc(t('delveUi.board.companion.maxRank'))}</div>`;
-      } else {
-        const costMarks = formatNumber(nextCost.marks, { maximumFractionDigits: 0 });
-        const nextRankLabel = formatNumber(nextRank, { maximumFractionDigits: 0 });
-        const affordable = this.sim.delveMarks >= nextCost.marks;
-        companionAction =
-          `<button type="button" class="btn delve-companion-upgrade" data-companion-upgrade="${esc(companionId)}"` +
-          ` aria-label="${esc(t('delveUi.board.companion.upgradeAria', { name: companionName, rank: nextRankLabel, marks: costMarks }))}"` +
-          `${affordable ? '' : ' disabled'}>${esc(t('delveUi.board.companion.upgrade', { rank: nextRankLabel, marks: costMarks }))}</button>`;
-      }
-      const tierRow = ['normal', 'heroic']
-        .map((tierId) => {
-          const label = tierId === 'heroic' ? tierHeroic : tierNormal;
-          const selected = this.selectedDelveTier === tierId ? ' selected' : '';
-          return `<button type="button" class="delve-tier-btn${selected}" data-tier-pick="${esc(tierId)}" aria-pressed="${this.selectedDelveTier === tierId}">${esc(label)}</button>`;
-        })
-        .join('');
-      body =
-        `<div class="delve-board-greeting">${esc(t(delve.id === 'drowned_litany' ? 'delveUi.npc.halvenMarsh.greeting' : 'delveUi.npc.halven.greeting', { playerName: this.sim.player.name }))}</div>` +
-        `<div class="delve-tier-row">${tierRow}</div>` +
-        `<div class="delve-companion-row"><div class="delve-companion-label">${esc(t('delveUi.board.companion.pick'))}</div>` +
-        `<div class="delve-companion-name">${esc(companionName)} <span class="quest-muted">(${esc(companionRankLabel)})</span></div>` +
-        `<div class="delve-companion-boon quest-muted">${esc(t('delveUi.board.companion.boon'))}</div>` +
-        `${companionAction}</div>` +
-        `<button type="button" class="btn delve-enter-btn" data-delve-enter aria-label="${esc(t('delveUi.board.enterAria', { delve: delveName, tier: this.selectedDelveTier === 'heroic' ? tierHeroic : tierNormal }))}"${canEnter ? '' : ' disabled'}>${esc(t('delveUi.board.enter'))}</button>`;
-    }
-    el.innerHTML =
-      `<div class="panel-title"><span>${esc(t('delveUi.board.title'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>` +
-      `<div class="delve-board-name">${esc(delveName)}</div>` +
-      `<div class="delve-board-meta">${esc(t('delveUi.board.marks', { count: marks }))}</div>` +
-      `<div class="delve-board-req${this.sim.player.level >= delve.minLevel ? '' : ' req-unmet'}">${esc(t('delveUi.board.minLevel', { level: formatNumber(delve.minLevel, { maximumFractionDigits: 0 }) }))}</div>` +
-      `<div class="delve-board-req${partyTooLarge ? ' req-unmet' : ''}">${esc(t('delveUi.board.partyTooLarge', { max: formatNumber(delve.maxPlayers, { maximumFractionDigits: 0 }) }))}</div>` +
-      `<div class="delve-tabs" role="tablist" aria-label="${esc(t('delveUi.board.title'))}">${tabBtn('delve', t('delveUi.board.tabDelve'))}${tabBtn('shop', t('delveUi.board.tabShop'))}</div>` +
-      `<div class="delve-board-body" role="tabpanel">${body}</div>`;
-    el.querySelectorAll('[data-board-tab]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const next = (btn as HTMLElement).dataset.boardTab as 'delve' | 'shop';
-        if (next === this.delveBoardTab) return;
-        this.delveBoardTab = next;
-        this.renderDelveBoard(true);
-      });
-    });
-    if (tab === 'shop') {
-      this.bindDelveShopHandlers(el, delve.id);
-    } else {
-      el.querySelectorAll('[data-tier-pick]').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          this.selectedDelveTier = (btn as HTMLElement).dataset.tierPick as 'normal' | 'heroic';
-          this.renderDelveBoard(true);
-        });
-      });
-      el.querySelector('[data-companion-upgrade]')?.addEventListener('click', (ev) => {
-        const btn = ev.currentTarget as HTMLElement;
-        const id = btn.dataset.companionUpgrade;
-        if (!id) return;
-        this.sim.companionUpgrade(id);
-        this.renderDelveBoard(true);
-      });
-      el.querySelector('[data-delve-enter]')?.addEventListener('click', () => {
-        const tierId = this.selectedDelveTier;
-        this.sim.enterDelve(delve.id, tierId);
-        // enterDelve queues delveEntered for the next sim tick; kick interior
-        // prebuild now so the first rendered frame is not a fog void.
-        this.renderer.handleEvent({ type: 'delveEntered', delveId: delve.id, tierId });
-        this.closeDelveBoard();
-      });
-    }
-    el.querySelector('[data-close]')?.addEventListener('click', () => this.closeDelveBoard());
-    if (focus) this.delveTrap?.focusFirst(tab === 'shop' ? '.delve-shop-buy' : '.delve-enter-btn');
-  }
-
-  // Brother Halven's Marks-vendor stock for the open delve. Offers + lock state
-  // come resolved through IWorld (delveShopOffers); item display (name/quality/
-  // icon/tooltip) is rendered locally like the silver vendor. The buy itself is
-  // server-authoritative -- a locked or unaffordable offer is also re-checked sim-side.
-  private delveShopBodyHtml(delveId: string): string {
-    const rows = this.sim
-      .delveShopOffers(delveId)
-      .map((offer) => {
-        const item = ITEMS[offer.itemId];
-        if (!item) return '';
-        const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff';
-        const name = itemDisplayName(item);
-        const marksLabel = formatNumber(offer.marks, { maximumFractionDigits: 0 });
-        const priceLabel = t('delveUi.shop.price', { marks: marksLabel });
-        const affordable = this.sim.delveMarks >= offer.marks;
-        let action: string;
-        if (!offer.unlocked) {
-          const req = offer.requiresHeroicClear
-            ? t('delveUi.shop.reqHeroic')
-            : t('delveUi.shop.reqClears', {
-                count: formatNumber(offer.requiresClears, { maximumFractionDigits: 0 }),
-              });
-          action = `<span class="delve-shop-req">${esc(req)}</span>`;
-        } else {
-          const buyAria = t('delveUi.shop.buyAria', { item: name, marks: marksLabel });
-          action = `<button type="button" class="delve-shop-buy" data-buy="${esc(offer.itemId)}" aria-label="${esc(buyAria)}"${affordable ? '' : ' disabled'}>${esc(t('delveUi.shop.buy'))}</button>`;
-        }
-        const priceCls = offer.unlocked && !affordable ? ' unaffordable' : '';
-        return (
-          `<div class="delve-shop-row${offer.unlocked ? '' : ' locked'}" role="listitem" data-shop-item="${esc(offer.itemId)}">` +
-          `${this.itemIcon(item)}` +
-          `<div class="delve-shop-info"><span class="delve-shop-name" style="color:${qColor}">${esc(name)}</span>` +
-          `<span class="delve-shop-price${priceCls}">${esc(priceLabel)}</span></div>` +
-          `${action}</div>`
-        );
-      })
-      .join('');
-    if (!rows) return `<div class="delve-shop-empty">${esc(t('delveUi.shop.empty'))}</div>`;
-    return `<div class="delve-shop-list" role="list">${rows}</div>`;
-  }
-
-  private bindDelveShopHandlers(el: HTMLElement, delveId: string): void {
-    el.querySelectorAll('[data-shop-item]').forEach((row) => {
-      const item = ITEMS[(row as HTMLElement).dataset.shopItem ?? ''];
-      if (item) this.attachTooltip(row as HTMLElement, () => this.itemTooltip(item));
-    });
-    el.querySelectorAll('[data-buy]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        if ((btn as HTMLButtonElement).disabled) return;
-        this.sim.delveBuyShopItem(delveId, (btn as HTMLElement).dataset.buy ?? '');
-      });
-    });
+    this.delveBoard.render(focus);
   }
 
   private closeDelveBoard(restoreFocus = true): void {
-    $('#delve-board').style.display = 'none';
-    this.openDelveBoardNpcId = null;
-    this.hideTooltip();
-    this.delveTrap?.release(restoreFocus);
-    this.delveTrap = null;
+    this.delveBoard.close(restoreFocus);
   }
 
   // ---------------------------------------------------------------------------
@@ -7461,300 +6972,60 @@ export class Hud {
   // ---------------------------------------------------------------------------
 
   private openLockpickAnte(objectId: number, bountiful = false): void {
-    const el = $('#lockpick-panel');
-    if (el.style.display !== 'block')
-      this.lockpickTrap = this.focusManager.open({ root: () => $('#lockpick-panel') });
-    el.style.display = 'block';
-    this.bindLockpickKeys();
-    this.lockpickWindow.renderAnte(objectId, bountiful);
-    this.lockpickTrap?.focusFirst('.lp-ante-btn');
-  }
-
-  // The lockpick loot tier names are shared with the combat-log lines, so reuse
-  // the sim.lockpick.tier* keys rather than minting parallel lockpickUi ones.
-  private lockpickTierName(tier: 'premium' | 'medium' | 'low'): string {
-    return t(
-      tier === 'premium'
-        ? 'sim.lockpick.tierPremium'
-        : tier === 'medium'
-          ? 'sim.lockpick.tierMedium'
-          : 'sim.lockpick.tierLow',
-    );
+    this.lockpickController.openAnte(objectId, bountiful);
   }
 
   // A lockpickSession event means the authoritative board is live in
   // world.lockpickState; show the panel and let the window paint from it.
   private openLockpickBoard(): void {
-    const el = $('#lockpick-panel');
-    if (el.style.display !== 'block')
-      this.lockpickTrap = this.focusManager.open({ root: () => $('#lockpick-panel') });
-    el.style.display = 'block';
-    this.bindLockpickKeys();
-    this.lockpickWindow.openBoard();
+    this.lockpickController.openBoard();
   }
 
   private endLockpick(
     outcome: 'success' | 'fail' | 'abandoned',
     tier?: 'premium' | 'medium' | 'low',
   ): void {
-    const summary =
-      outcome === 'success'
-        ? tier
-          ? t('lockpickUi.summary.success', { tier: this.lockpickTierName(tier) })
-          : t('lockpickUi.summary.successGeneric')
-        : outcome === 'fail'
-          ? t('lockpickUi.summary.fail')
-          : t('lockpickUi.summary.abandoned');
-    if (outcome === 'success') this.showBanner(summary);
-    this.log(summary, outcome === 'success' ? '#7fdc4f' : outcome === 'fail' ? '#ff7a6a' : '#ccc');
-    this.closeLockpick();
+    this.lockpickController.end(outcome, tier);
   }
 
   private openDelveLoot(chestId: number, items: { itemId: string; count: number }[]): void {
     this.closeLockpick();
-    if (items.length === 0) return;
-    this.closeOtherWindows('#loot-window');
-    this.openLootMobId = null;
-    this.openLootChestId = chestId;
-    const chest = this.sim.entities.get(chestId);
-    const el = $('#loot-window');
-    let html = `<div class="panel-title"><span>${esc(chest ? entityDisplayName(chest) : t('hudChrome.loot.chestTitle'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('itemUi.loot.close'))}">${svgIcon('close')}</button></div>`;
-    for (const s of items) {
-      const item = ITEMS[s.itemId];
-      html += `<div class="loot-item" data-item="${s.itemId}">${this.itemIcon(item)}<span style="font-size:12px">${esc(itemDisplayName(item))}${s.count > 1 ? ` ${esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) }))}` : ''}</span></div>`;
-    }
-    el.innerHTML = html;
-    el.querySelectorAll('[data-item]').forEach((row) => {
-      const itemId = (row as HTMLElement).dataset.item ?? '';
-      this.attachTooltip(row as HTMLElement, () => this.itemTooltip(ITEMS[itemId]));
-    });
-    const btn = document.createElement('button');
-    btn.className = 'btn';
-    btn.textContent = t('itemUi.loot.takeAll');
-    btn.addEventListener('click', () => {
-      this.sim.collectDelveChestLoot(chestId);
-      this.closeLoot();
-    });
-    el.appendChild(btn);
-    el.querySelector('[data-close]')?.addEventListener('click', () => this.closeLoot());
-    el.style.display = 'block';
-    this.centerPopupInViewport(el);
+    this.lootWindow.openChest(chestId, items);
   }
 
-  private bindLockpickKeys(): void {
-    if (this.lockpickKeyHandler) return;
-    const handler = (e: KeyboardEvent): void => {
-      if ($('#lockpick-panel').style.display !== 'block') return;
-      // A live board exists iff the authoritative session is non-null; otherwise
-      // the panel is the ante selector and only Escape (close) applies.
-      const live = this.sim.lockpickState;
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        if (live) this.submitLockpickAbort();
-        else this.closeLockpick();
-        return;
-      }
-      if (!live) return;
-      if (e.repeat) return;
-      const key = e.key.toLowerCase();
-      const idx = (PICK_ACTION_HOTKEYS as readonly string[]).indexOf(key);
-      if (idx < 0) return;
-      const action = PICK_ACTIONS[idx];
-      if (!live.allowed.includes(action)) return;
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      this.submitLockpickAction(action);
-    };
-    this.lockpickKeyHandler = handler;
-    window.addEventListener('keydown', handler, true); // capture: beats game input
-  }
-
-  /** Offline sim queues lockpick events until the 20 Hz tick; flush them now so
-   * the step feedback toast, timer, and audio react immediately. The board
-   * POSITION never depends on this (it always paints from world.lockpickState);
-   * online has no drainEvents and reacts to the normal event stream instead. */
   flushLockpickEvents(): void {
-    const drain = (this.sim as { drainEvents?: () => SimEvent[] }).drainEvents;
-    if (!drain) return;
-    const events = drain.call(this.sim);
-    if (events.length > 0) this.handleEvents(events);
+    this.lockpickController.flushEvents();
   }
 
-  /** Engage through the HUD path (always flushes queued sim events). Dev consoles
-   * should call this instead of sim.lockpickEngage directly. */
   submitLockpickEngage(objectId: number, ante: Ante): void {
-    this.sim.lockpickEngage(objectId, ante);
-    this.flushLockpickEvents();
+    this.lockpickController.submitEngage(objectId, ante);
   }
 
   submitLockpickAction(action: PickAction): void {
-    this.sim.lockpickAction(action);
-    this.flushLockpickEvents();
-    // Safety net for any path that didn't emit a step event (e.g. a rejected
-    // action): realign the board to the authoritative state.
-    this.lockpickWindow.repaintIfChanged();
+    this.lockpickController.submitAction(action);
   }
 
   submitLockpickAbort(): void {
-    this.lockpickWindow.stopTimer();
-    this.sim.lockpickAbort();
-    this.flushLockpickEvents();
+    this.lockpickController.submitAbort();
   }
 
   private closeLockpick(restoreFocus = true): void {
-    $('#lockpick-panel').style.display = 'none';
-    this.lockpickWindow.close();
-    this.hideTooltip();
-    if (this.lockpickKeyHandler) {
-      window.removeEventListener('keydown', this.lockpickKeyHandler, true);
-      this.lockpickKeyHandler = null;
-    }
-    this.lockpickTrap?.release(restoreFocus);
-    this.lockpickTrap = null;
+    this.lockpickController.close(restoreFocus);
   }
 
   // Drowned Reliquary Rite: the difficulty popup opens when a player interacts
   // with the risen reliquary (delveRiteChoosePrompt) and closes once the chosen
   // sequence starts playing (the first delveRitePulse) or on dismiss.
   private openRitePanel(): void {
-    const el = $('#delve-rite-panel');
-    if (el.style.display !== 'block')
-      this.riteTrap = this.focusManager.open({ root: () => $('#delve-rite-panel') });
-    el.style.display = 'block';
-    this.riteWindow.render();
-    this.riteTrap?.focusFirst('.lp-ante-btn');
-  }
-
-  private submitRiteChoose(intensity: RiteIntensity): void {
-    this.sim.delveRiteChoose(intensity);
-    this.closeRitePanel();
+    this.riteController.open();
   }
 
   private closeRitePanel(restoreFocus = true): void {
-    const el = $('#delve-rite-panel');
-    if (el.style.display === 'none') return;
-    el.style.display = 'none';
-    this.riteTrap?.release(restoreFocus);
-    this.riteTrap = null;
-  }
-
-  private delveObjectiveLine(run: DelveRunInfo): string {
-    const isFinale = run.moduleIndex >= run.moduleCount - 1;
-    if (!isFinale) return t('delveUi.objective.clear_room');
-    if (run.objective.kind === 'kill_boss') {
-      const bossId = DELVES[run.delveId]?.bosses[0] ?? 'deacon_varric';
-      return t('delveUi.objective.kill_boss', { boss: mobDisplayName(bossId) });
-    }
-    return t(`delveUi.objective.${run.objective.kind}` as TranslationKey);
-  }
-
-  private delveAffixLabel(affixId: string): string {
-    const affix = DELVE_AFFIXES[affixId];
-    if (!affix) return affixId;
-    if (affix.blessing) return t(`delveUi.blessing.${affixId}` as TranslationKey);
-    return t(`delveUi.affix.${affixId}` as TranslationKey);
+    this.riteController.close(restoreFocus);
   }
 
   private updateDelveTracker(): void {
-    const el = $('#delve-tracker');
-    const run = this.sim.delveRun;
-    if (!run) {
-      this.lastDelveTrackerSig = '';
-      if (el.innerHTML !== '') el.innerHTML = '';
-      el.style.display = 'none';
-      // The run ended (walk-out, death release, completion teardown) while the
-      // difficulty popup could still be up; do not leave it floating over the
-      // outdoor world.
-      this.closeRitePanel(false);
-      return;
-    }
-    // State-driven close: the popup is only valid while the rite awaits a
-    // choice. The first pulse event also closes it, but that event is
-    // interest-scoped to the apse, so a party member elsewhere in the delve
-    // relies on this wire-state check instead.
-    if (run.rite && run.rite.phase !== 'choose') this.closeRitePanel(false);
-    const sig = JSON.stringify([
-      run.delveId,
-      run.tierId,
-      run.moduleIndex,
-      run.moduleCount,
-      run.modules,
-      run.objective,
-      run.affixes,
-      run.completed,
-      run.exitPortalOpen,
-      run.rite,
-      this.sim.delveMarks,
-    ]);
-    if (sig === this.lastDelveTrackerSig) return;
-    this.lastDelveTrackerSig = sig;
-    el.style.display = 'block';
-    const delveName = delveDisplayName(run.delveId);
-    const tierLabel =
-      run.tierId === 'heroic' ? t('delveUi.board.tier.heroic') : t('delveUi.board.tier.normal');
-    const modId = run.modules[run.moduleIndex];
-    const modName = modId ? t(`delveUi.moduleName.${modId}` as TranslationKey) : '';
-    const moduleLine = t('delveUi.tracker.module', {
-      current: formatNumber(run.moduleIndex + 1, { maximumFractionDigits: 0 }),
-      total: formatNumber(run.moduleCount, { maximumFractionDigits: 0 }),
-    });
-    const objectiveLine = this.delveObjectiveLine(run);
-    const complete =
-      run.objective.complete || run.completed
-        ? ` <span class="quest-complete">(${esc(t('delveUi.tracker.complete'))})</span>`
-        : '';
-    let affixHtml = '';
-    if (run.affixes.length > 0) {
-      affixHtml = `<div class="dt-affix-row"><span class="dt-affix-label">${esc(t('delveUi.tracker.affix'))}</span>`;
-      for (const affixId of run.affixes) {
-        const color = DELVE_AFFIX_COLORS[affixId] ?? '#888';
-        affixHtml += `<span class="dt-affix-icon" data-affix="${esc(affixId)}" style="background:${color}" role="img" tabindex="0" aria-label="${esc(this.delveAffixLabel(affixId))}"></span>`;
-      }
-      affixHtml += '</div>';
-    }
-    const marks = formatNumber(this.sim.delveMarks, { maximumFractionDigits: 0 });
-    // Drowned Reliquary Rite: a phase-by-phase guidance line so the player
-    // always knows the next step (approach, watch, repeat with F, claim).
-    let riteHint = '';
-    if (run.rite) {
-      const riteText =
-        run.rite.phase === 'choose'
-          ? t('delveUi.tracker.riteChoose')
-          : run.rite.phase === 'playback'
-            ? t('delveUi.tracker.ritePlayback')
-            : run.rite.phase === 'input'
-              ? t('delveUi.tracker.riteInput', {
-                  current: formatNumber(run.rite.current, { maximumFractionDigits: 0 }),
-                  total: formatNumber(run.rite.total, { maximumFractionDigits: 0 }),
-                })
-              : t('delveUi.tracker.riteOpen');
-      riteHint = `<div class="dt-obj dt-hint">-> ${esc(riteText)}</div>`;
-    }
-    let exitHint = '';
-    if (run.moduleIndex < run.moduleCount - 1) {
-      if (run.exitPortalOpen) {
-        exitHint = `<div class="dt-obj dt-hint">-> ${esc(t('delveUi.tracker.exitHintOpen'))}</div>`;
-      } else {
-        exitHint = `<div class="dt-obj dt-hint">${esc(t('delveUi.tracker.exitHintLocked'))}</div>`;
-      }
-    }
-    el.innerHTML =
-      `<div class="dt-header">${esc(t('delveUi.tracker.title'))}</div>` +
-      `<div class="dt-title">${esc(delveName)} <span class="dt-tier">${esc(tierLabel)}</span>${complete}</div>` +
-      `<div class="dt-obj">- ${esc(moduleLine)}${modName ? `: ${esc(modName)}` : ''}</div>` +
-      `<div class="dt-obj${run.objective.complete ? ' done' : ''}">- ${esc(t('delveUi.tracker.objective'))}: ${esc(objectiveLine)}</div>` +
-      riteHint +
-      exitHint +
-      `<div class="dt-obj">- ${esc(t('delveUi.tracker.marks', { count: marks }))}</div>` +
-      affixHtml;
-    el.querySelectorAll('.dt-affix-icon').forEach((icon) => {
-      const affixId = (icon as HTMLElement).dataset.affix ?? '';
-      this.attachTooltip(
-        icon as HTMLElement,
-        () => `<div class="tt-title">${esc(this.delveAffixLabel(affixId))}</div>`,
-      );
-    });
+    this.delveTracker.update();
   }
 
   // -------------------------------------------------------------------------
@@ -8064,6 +7335,10 @@ export class Hud {
     this.arenaWindow.toggle();
   }
 
+  toggleDungeonFinder(): void {
+    this.dungeonFinderWindow.toggle();
+  }
+
   toggleValeCup(): void {
     this.valeCupWindow.toggle();
   }
@@ -8127,15 +7402,32 @@ export class Hud {
     if (el.style.display === 'block') {
       el.style.display = 'none';
       this.hideTooltip(); // a touch marker tip can outlive the window otherwise
+      this.mapPing = null;
+      this.mapZoneOverride = null;
       this.syncAnyWindowOpenState();
       return;
     }
     this.closeOtherWindows('#map-window');
     this.mapZoom = 1; // always open at the full-zone view, following the player
     this.mapCenter = null;
+    this.mapPing = null;
+    this.mapZoneOverride = null;
     el.style.display = 'block';
     this.updateMapWindow();
     this.syncAnyWindowOpenState();
+  }
+
+  // Dungeon Finder "Show on Map": open the world map on the entrance's zone
+  // band, pan to the authored door position, and ring it. Never teleports; the
+  // highlight clears when the map closes or is reopened normally.
+  showFinderOnMap(x: number, z: number): void {
+    const el = $('#map-window');
+    if (el.style.display !== 'block') this.toggleMap();
+    this.mapZoneOverride = zoneAt(z).id;
+    this.mapPing = { x, z };
+    this.mapZoom = Math.max(this.mapZoom, 2);
+    this.mapCenter = { x, z };
+    this.updateMapWindow();
   }
 
   // scroll-wheel / button zoom for the world map (clamped to [1, MAP_MAX_ZOOM])
@@ -8198,15 +7490,18 @@ export class Hud {
     // the instance x-band layout); outdoors, follow the committed zone so
     // border-straddling can't thrash the cached terrain regen.
     const dungeon = dungeonAt(p.pos.x);
-    const zone: ZoneDef = dungeon
-      ? zoneAt(dungeon.doorPos.z)
-      : (ZONES.find((z) => z.id === this.lastZoneId) ?? zoneAt(p.pos.z));
+    const zone: ZoneDef = this.mapZoneOverride
+      ? (ZONES.find((z) => z.id === this.mapZoneOverride) ?? zoneAt(p.pos.z))
+      : dungeon
+        ? zoneAt(dungeon.doorPos.z)
+        : (ZONES.find((z) => z.id === this.lastZoneId) ?? zoneAt(p.pos.z));
     const result = this.mapPainter.paintOverworld(ctx, this.sim, {
       zone,
       bg: this.mapZoneBg(zone), // cached per zone; prewarmed during idle
       canvasSize: S,
       zoom: this.mapZoom,
       center: this.mapCenter,
+      ping: this.mapPing,
     });
     this.mapView = result.view;
     this.mapQuestAreas = result.questAreas;
@@ -8290,7 +7585,7 @@ export class Hud {
 
   // Spatial sound for a sim event — positioned at the relevant entity so nearby
   // players' and creatures' combat attenuates with distance and pans correctly.
-  // Personal/UI sounds stay on the procedural audio.* path in handleEvents.
+  // Personal/UI sounds stay on the sampled audio.* facade in handleEvents.
   // All combat/spell/creature SFX route through here so the whole layer can be
   // balanced with the single COMBAT_GAIN knob (kept under movement/ambience).
   private combat(
@@ -8315,6 +7610,11 @@ export class Hud {
         const tgt = sim.entities.get(ev.targetId);
         if (!tgt) return;
         const tp = tgt.pos;
+        const src = sim.entities.get(ev.sourceId) ?? null;
+        const swing = playerSwingCueForDamage(ev, src);
+        if (swing && src) {
+          this.combat(swing, src.pos.x, src.pos.y, src.pos.z, 0.5, { cooldown: 0.08 });
+        }
         if (ev.kind === 'miss' || ev.kind === 'dodge' || ev.kind === 'resist') {
           this.combat('combat_dodge', tp.x, tp.y, tp.z, 0.5);
           return;
@@ -8323,37 +7623,42 @@ export class Hud {
           this.combat('combat_parry', tp.x, tp.y, tp.z, 0.6);
           return;
         }
-        const src = sim.entities.get(ev.sourceId);
-        if (src) this.playAttackerSfx(src);
+        if (src?.kind === 'mob') this.playAttackerSfx(src);
         // a struck mob vocalizes its aggro alert the first time it's engaged
         // (camp engage), whether you hit it or it hits you.
         if (tgt.kind === 'mob') this.ensureMobEngaged(tgt);
-        const physical = !ev.school || ev.school === 'physical';
+        const impact = impactCueForDamage(ev, tgt);
         if (shouldPlayCombatImpactForTarget(tgt)) {
-          this.combat(
-            physical ? materialImpactKey(tgt) : `impact_${ev.school}`,
-            tp.x,
-            tp.y,
-            tp.z,
-            0.75,
-            { cooldown: 0.05 },
-          );
+          if (impact) this.combat(impact, tp.x, tp.y, tp.z, 0.75, { cooldown: 0.05 });
         }
         if (ev.crit && shouldPlayCritSfxForTarget(tgt))
           this.combat('combat_crit', tp.x, tp.y, tp.z, 0.7);
         // pain vocalization only on a crit — never on ordinary hits.
         if (ev.crit && ev.targetId === sim.playerId) {
           this.combat('player_hurt', tp.x, tp.y, tp.z, 0.55, { cooldown: 0.3 });
-        } else if (ev.crit && tgt.kind === 'mob' && shouldPlayCritSfxForTarget(tgt)) {
-          const fam = mobVoiceFamily(tgt.templateId);
-          if (fam && shouldPlayMobVoiceSfxForEntity(tgt))
-            this.combat(`mob_${fam}_attack`, tp.x, tp.y, tp.z, 0.6, { rate: 1.25, cooldown: 0.1 });
+        } else {
+          const mobAction = mobVoiceActionForDamage(ev, tgt);
+          if (mobAction && shouldPlayMobVoiceSfxForEntity(tgt)) {
+            const voice = mobVoiceCueWithFallback(
+              tgt.templateId,
+              mobAction,
+              (key) => sfx.hasVariants(key),
+              (key) => sfx.isBuffered(key),
+            );
+            if (voice) this.combat(voice, tp.x, tp.y, tp.z, 0.6, { cooldown: 0.1 });
+          }
         }
         return;
       }
       case 'castStart': {
         const ent = sim.entities.get(ev.entityId);
-        const key = castKeyForAbility(ev.ability);
+        // Chain Heal uses a custom one-shot healing cast clip (cast_chain_heal)
+        // instead of the earthy nature cast loop its school would otherwise pick.
+        if (ent && ev.ability === 'chain_heal') {
+          this.combat('cast_chain_heal', ent.pos.x, ent.pos.y, ent.pos.z, 0.45);
+          return;
+        }
+        const key = castCueForAbility(ev.ability);
         if (ent && key) {
           sfx.loop(`cast:${ev.entityId}`, key, 0.45 * COMBAT_GAIN, ent.pos.x, ent.pos.y, ent.pos.z);
           this.castLoopIds.add(ev.entityId);
@@ -8365,13 +7670,9 @@ export class Hud {
         this.castLoopIds.delete(ev.entityId);
         return;
       case 'spellfx': {
-        if (ev.fx === 'projectile') {
-          const s = sim.entities.get(ev.sourceId);
-          if (s) this.combat(`proj_${ev.school}`, s.pos.x, s.pos.y, s.pos.z, 0.55);
-        } else if (ev.fx === 'nova') {
-          const e = sim.entities.get(ev.sourceId) ?? sim.entities.get(ev.targetId);
-          if (e) this.combat('spell_nova', e.pos.x, e.pos.y, e.pos.z, 0.6);
-        }
+        const cue = spellFxCue(ev);
+        const anchor = cue ? sim.entities.get(cue.anchorId) : null;
+        if (cue && anchor) this.combat(cue.key, anchor.pos.x, anchor.pos.y, anchor.pos.z, 0.6);
         return;
       }
       case 'heal':
@@ -8383,8 +7684,14 @@ export class Hud {
       }
       case 'aura': {
         if (ev.targetId !== sim.playerId) return; // only your own buffs/debuffs, else it's spammy
+        const target = sim.entities.get(ev.targetId);
+        const aura = ev.gained
+          ? (target?.auras.find((entry) => entry.name === ev.name) ?? null)
+          : null;
+        const cue = auraApplyCue(ev, aura);
+        if (!cue) return;
         const p = sim.player.pos;
-        this.combat(ev.gained ? 'buff_apply' : 'debuff_apply', p.x, p.y, p.z, 0.4, {
+        this.combat(cue, p.x, p.y, p.z, 0.4, {
           cooldown: 0.1,
         });
         return;
@@ -8397,9 +7704,8 @@ export class Hud {
         const p = ent.pos;
         if (ent.kind === 'mob') {
           this.mobAggroed.delete(ev.entityId);
-          const fam = mobVoiceFamily(ent.templateId);
-          if (fam && shouldPlayMobVoiceSfxForEntity(ent))
-            this.combat(`mob_${fam}_death`, p.x, p.y, p.z, 0.8);
+          const voice = availableMobVoiceCue(ent.templateId, 'death');
+          if (voice && shouldPlayMobVoiceSfxForEntity(ent)) this.combat(voice, p.x, p.y, p.z, 0.8);
         } else if (ent.kind === 'player' && ev.entityId !== sim.playerId) {
           this.combat('player_death', p.x, p.y, p.z, 0.7);
         }
@@ -8414,24 +7720,27 @@ export class Hud {
   private ensureMobEngaged(mob: Entity): boolean {
     if (this.mobAggroed.has(mob.id)) return false;
     this.mobAggroed.add(mob.id);
-    const fam = mobVoiceFamily(mob.templateId);
-    if (fam && shouldPlayMobVoiceSfxForEntity(mob))
-      this.combat(`mob_${fam}_aggro`, mob.pos.x, mob.pos.y, mob.pos.z, 0.7);
+    const voice = availableMobVoiceCue(mob.templateId, 'aggro');
+    if (voice && shouldPlayMobVoiceSfxForEntity(mob))
+      this.combat(voice, mob.pos.x, mob.pos.y, mob.pos.z, 0.7);
     return true;
   }
 
-  // Attacker side of a damage event: a creature roars on engage then grunts on
-  // subsequent strikes; a player swings their weapon.
+  // Attacker side of a mob damage event: it roars on engage, then grunts on
+  // subsequent strikes. Player swings are resolved earlier from the damage event.
   private playAttackerSfx(src: Entity): void {
     if (src.kind === 'mob') {
       if (this.ensureMobEngaged(src)) return; // just fired the aggro alert
-      const fam = mobVoiceFamily(src.templateId);
-      if (fam && shouldPlayMobVoiceSfxForEntity(src))
-        this.combat(`mob_${fam}_attack`, src.pos.x, src.pos.y, src.pos.z, 0.55, { cooldown: 0.25 });
-    } else if (src.kind === 'player') {
-      this.combat(weaponSwingKey(src.templateId), src.pos.x, src.pos.y, src.pos.z, 0.5, {
-        cooldown: 0.08,
-      });
+      const voice = availableMobVoiceCue(src.templateId, 'attack');
+      if (voice && shouldPlayMobVoiceSfxForEntity(src)) {
+        this.combat(voice, src.pos.x, src.pos.y, src.pos.z, 0.55, { cooldown: 0.25 });
+        // Warm the crit-only hurt cue alongside the frequently-played attack
+        // bark, so it is resident well before a crit could ever need it. Gated
+        // the same as the play above (a muted Nythraxis mob never plays it)
+        // and short-circuited once warm so this doesn't re-scan every hit.
+        const hurtVoice = availableMobVoiceCue(src.templateId, 'hurt');
+        if (hurtVoice && !sfx.isBuffered(hurtVoice)) sfx.preload(hurtVoice);
+      }
     }
   }
 
@@ -8453,6 +7762,10 @@ export class Hud {
 
   handleEvents(events: SimEvent[]): void {
     const sim = this.sim;
+    // Book of Deeds unlocks batch across the whole drain (handleDeedUnlocks):
+    // banners coalesce to the last unlock, retro back-credits collapse into
+    // one summary line, and the celebration sound plays once.
+    const deedUnlocks: { deedId: string; retro?: boolean }[] = [];
     // One spawn clock for the whole batch: FCT floaters spawned from this event burst
     // share a bornAt, and the pooled painter's step() evicts each once now - bornAt >= ttl.
     const now = performance.now();
@@ -8652,6 +7965,28 @@ export class Hud {
           }
           break;
         }
+        case 'honor': {
+          const amount = formatNumber(ev.amount, { maximumFractionDigits: 0 });
+          const honorShape = fctSpawnShape({ type: 'honor' });
+          if (honorShape) {
+            this.fctPainter.spawn(
+              {
+                ...honorShape,
+                text: t('hudChrome.warfare.honorFloat', { amount }),
+                target: sim.player,
+              },
+              now,
+            );
+          }
+          this.combatLog(
+            t('hudChrome.warfare.honorGain', {
+              amount,
+              reason: t(HONOR_REASON_KEYS[ev.reason]),
+            }),
+            '#ffd100',
+          );
+          break;
+        }
         case 'levelup': {
           this.showBanner(t('hud.core.levelBanner', { level: ev.level }));
           this.log(t('hud.core.levelLog', { level: ev.level }), '#ffd100');
@@ -8683,14 +8018,14 @@ export class Hud {
           audio.levelUp();
           break;
         }
-        case 'milestoneUnlocked': {
-          const name = this.milestoneName(ev.milestoneId);
-          this.showBanner(`${t('game.milestone.unlocked')}: ${name}`);
-          this.log(`${t('game.milestone.unlocked')}: ${name}`, '#ffd100');
-          audio.levelUp();
+        case 'deedUnlocked': {
+          deedUnlocks.push(ev);
           break;
         }
         case 'learnAbility':
+          // A newly granted ability (level-up or spec signature) must appear in
+          // an open spellbook right away, not on the next manual reopen.
+          if (this.spellbookWindow.isOpen) this.spellbookWindow.render();
           break; // logged by sim
         case 'comboPoint':
           break;
@@ -8702,7 +8037,7 @@ export class Hud {
             / assigned .+ to .+\.$/.test(ev.text) ||
             /^.+ was not assigned and is free for all\.$/.test(ev.text)
           )
-            this.closeLootRollsForItem(ev.text);
+            this.lootRolls.closeForItem(ev.text);
           if (
             ev.text.includes('loot') ||
             ev.text.includes('Sold') ||
@@ -8741,11 +8076,11 @@ export class Hud {
           break;
         }
         case 'lootRoll': {
-          this.showLootRoll(ev);
+          this.lootRolls.showRoll(ev);
           break;
         }
         case 'masterLoot': {
-          this.showMasterLoot(ev);
+          this.lootRolls.showMasterRoll(ev);
           break;
         }
         case 'vendor': {
@@ -8756,11 +8091,11 @@ export class Hud {
           if (this.openHeroicVendorNpcId !== null) this.renderHeroicVendor();
           // A delve Marks purchase rides the same 'vendor' event; refresh the shop
           // tab so the balance and per-offer affordability update after a buy.
-          if (this.openDelveBoardNpcId !== null) this.renderDelveBoard();
+          if (this.delveBoard.isOpen) this.renderDelveBoard();
           break;
         }
         case 'skinEvent':
-          this.openSkinEvent(ev.rank, ev.catalog === 'mech' ? { mech: true } : undefined);
+          this.skinEvent.open(ev.rank, ev.catalog === 'mech' ? { mech: true } : undefined);
           break;
         case 'mailbox':
           // Keyboard/sim interact at a mailbox object: open the mail window.
@@ -8811,12 +8146,20 @@ export class Hud {
           this.calendarWindow.onCalendarResult(ev.code);
           break;
         }
+        case 'deedBroadcast': {
+          // A guildmate's or followed friend's marquee unlock. Id-based on
+          // the wire (server sends the deed id, never English); the visible
+          // line composes in deed_i18n (Node-pinned there), in the guild-chat
+          // green so it reads as social news.
+          this.log(deedBroadcastLine(ev.characterName, ev.deedId), '#40d264');
+          break;
+        }
         case 'error':
           this.showError(this.localizeErrorText(ev.text));
           break;
         case 'questAccepted':
           sfx.playUi('quest_accept', { gain: 1.8 });
-          this.refreshGossip();
+          this.questDialog.refresh();
           break;
         case 'questProgress': {
           const progressText = this.localizeQuestProgressText(ev.questId, ev.text);
@@ -8824,7 +8167,7 @@ export class Hud {
           // The classic yellow top-center flash ("Forest Wolf slain: 3/8"); the
           // log line above stays the durable, announced copy.
           this.questBanner.show(progressText);
-          this.refreshGossip();
+          this.questDialog.refresh();
           break;
         }
         case 'questReady': {
@@ -8835,54 +8178,63 @@ export class Hud {
             }),
           );
           sfx.playUi('quest_ready', { gain: 4.5 });
-          this.refreshGossip();
+          this.questDialog.refresh();
           break;
         }
         case 'questDone':
           sfx.playUi('quest_complete', { gain: 1.8 });
-          this.refreshGossip();
+          this.questDialog.refresh();
           break;
         case 'chat': {
-          if (this.isChatIgnored(ev.from)) break;
+          // OFFLINE ONLY. Online, the server drops an ignored player's public chat
+          // before it reaches us (and honours the whisper/roll carve-outs), so
+          // consulting the local list here as well would resurrect stale ignores
+          // the player has since cleared from their account.
+          if (this.sim.socialInfo === null && this.localIgnoredNames.has(ignoreKey(ev.from))) break;
           switch (ev.channel) {
             case 'party':
               this.chatLogFrom(
                 ev.from,
                 ev.text,
-                '#7fd4ff',
                 CHAT_TEMPLATE_KEYS.party,
                 'party',
                 ev.fromPid,
+                ev.flair,
+                ev.fromTitle,
               );
               break;
             case 'yell':
               this.chatLogFrom(
                 ev.from,
                 ev.text,
-                '#ff5040',
                 CHAT_TEMPLATE_KEYS.yell,
                 'yell',
                 ev.fromPid,
+                ev.flair,
+                ev.fromTitle,
               );
               break;
             case 'whisper':
+              // The "To {name}" echo DISPLAYS the recipient, so the sender's
+              // fromTitle must never decorate it (untitled beats mislabeled).
               if (ev.to)
                 this.chatLogFrom(
                   ev.to,
                   ev.text,
-                  '#ff80ff',
                   CHAT_TEMPLATE_KEYS.toWhisper,
                   'whisper',
                   ev.fromPid,
+                  ev.flair,
                 );
               else {
                 this.chatLogFrom(
                   ev.from,
                   ev.text,
-                  '#ff80ff',
                   CHAT_TEMPLATE_KEYS.whisper,
                   'whisper',
                   ev.fromPid,
+                  ev.flair,
+                  ev.fromTitle,
                 );
                 audio.whisper();
               }
@@ -8891,80 +8243,88 @@ export class Hud {
               this.chatLogFrom(
                 ev.from,
                 ev.text,
-                '#ffc864',
                 CHAT_TEMPLATE_KEYS.general,
                 'general',
                 ev.fromPid,
+                ev.flair,
+                ev.fromTitle,
               );
               break;
             case 'world':
               this.chatLogFrom(
                 ev.from,
                 ev.text,
-                '#ff9d5c',
                 CHAT_TEMPLATE_KEYS.world,
                 'world',
                 ev.fromPid,
+                ev.flair,
+                ev.fromTitle,
               );
               break;
             case 'lfg':
               this.chatLogFrom(
                 ev.from,
                 ev.text,
-                '#5cd6a0',
                 CHAT_TEMPLATE_KEYS.lfg,
                 'lfg',
                 ev.fromPid,
+                ev.flair,
+                ev.fromTitle,
               );
               break;
             case 'guild':
               this.chatLogFrom(
                 ev.from,
                 ev.text,
-                '#40d264',
                 CHAT_TEMPLATE_KEYS.guild,
                 'guild',
                 ev.fromPid,
+                ev.flair,
+                ev.fromTitle,
               );
               break;
             case 'officer':
               this.chatLogFrom(
                 ev.from,
                 ev.text,
-                '#4ce0c0',
                 CHAT_TEMPLATE_KEYS.officer,
                 'officer',
                 ev.fromPid,
+                ev.flair,
+                ev.fromTitle,
               );
               break;
             case 'emote':
               this.chatLogFrom(
                 ev.from,
                 ev.text,
-                '#ff8040',
                 CHAT_TEMPLATE_KEYS.emote,
                 'emote',
                 ev.fromPid,
+                ev.flair,
+                ev.fromTitle,
               );
               break;
             case 'roll':
               this.chatLogFrom(
                 ev.from,
                 ev.text,
-                '#ffd100',
                 CHAT_TEMPLATE_KEYS.roll,
                 'roll',
                 ev.fromPid,
+                ev.flair,
+                ev.fromTitle,
               );
               break;
             default:
               this.chatLogFrom(
                 ev.from,
                 ev.text,
-                '#f0ead8',
                 CHAT_TEMPLATE_KEYS.say,
                 'say',
                 ev.fromPid,
+                ev.flair,
+                ev.fromTitle,
               );
               break;
           }
@@ -8989,7 +8349,7 @@ export class Hud {
               voice.play(voiced.state.key, { gain: voicedYellGain(ev.from) });
               // A distinct overheard yell, not a dialogue: do not let the per-frame
               // distance fade attenuate it by a talked-to NPC's position.
-              this.voiceNpcId = null;
+              this.questDialog.clearVoiceSource();
             }
           }
           break;
@@ -9115,6 +8475,11 @@ export class Hud {
           break;
         case 'arenaUnqueued':
           this.log(t('hud.system.arenaUnqueued'), '#ffa040');
+          break;
+        case 'dfProposal':
+          // A 30s availability window: the WoW-style prompt pops at the top of
+          // the screen (with its cue) without opening the finder window.
+          this.dungeonFinderProposalPopup.show();
           break;
         case 'arenaFound': {
           const name =
@@ -9433,7 +8798,7 @@ export class Hud {
           sfx.playUi('lockpick_begin');
           break;
         case 'lockpickStep': {
-          this.lockpickWindow.onStep(ev.result);
+          this.lockpickController.onStep(ev.result);
           switch (ev.result) {
             case 'advanced': {
               let pick = Math.floor(Math.random() * 4);
@@ -9535,7 +8900,15 @@ export class Hud {
         }
         case 'log': {
           const text = this.localizeSystemText(ev.text);
-          this.log(text, ev.color ?? '#ccc');
+          // Route mob/boss combat-flavor chatter to the Combat Log tab instead of
+          // General/Chat (see log_event_route.ts): pid-scoped personal narrative and
+          // entityId-anchored actionable mechanic telegraphs both stay in General/Chat,
+          // so new players standing near a busy fight aren't drowned out by ambient
+          // mob barks while a mechanic's only cue is never buried. A narrative line
+          // still gets its floating world chat bubble below.
+          if (isCombatFlavorLog(ev.entityId, ev.pid, ev.telegraph))
+            this.combatLog(text, ev.color ?? '#ccc');
+          else this.log(text, ev.color ?? '#ccc');
           const isNythraxisVisionLine = [
             'My king was a good man.',
             'I swore my blade to him.',
@@ -9600,6 +8973,39 @@ export class Hud {
         }
       }
     }
+    if (deedUnlocks.length > 0) this.handleDeedUnlocks(deedUnlocks);
+  }
+
+  // The earned moment, planned purely (deeds_view buildDeedUnlockPlan) so the
+  // batching rules stay unit-pinned: each fresh unlock gets a gold log line
+  // (the durable copy) and title rewards a second hint line; the single
+  // banner slot shows the drain's last unlock; one celebration sound per
+  // drain. The on-join retro catch-up draws NO banner and NO audio, just one
+  // localized summary count.
+  private handleDeedUnlocks(events: { deedId: string; retro?: boolean }[]): void {
+    const plan = buildDeedUnlockPlan(events, DEEDS);
+    for (const id of plan.logIds) {
+      this.log(t('hudChrome.deeds.unlockedBanner', { name: deedName(id) }), '#ffd100');
+    }
+    for (const id of plan.titleHintIds) {
+      this.log(t('hudChrome.deeds.unlockedTitleHint', { title: deedTitleText(id) }), '#ffd100');
+    }
+    if (plan.bannerId !== null) {
+      const bannerText = t('hudChrome.deeds.unlockedBanner', { name: deedName(plan.bannerId) });
+      this.showBanner(bannerText);
+      // The banner div carries no live semantics and the chat log is
+      // deliberately aria-live off, so the polite #combat-live region is what
+      // a screen reader hears (the throttled self-note precedent above).
+      this.combatAnnouncer.push(bannerText, performance.now());
+    }
+    if (plan.playSound) audio.achievement();
+    if (plan.retroCount > 0) {
+      const retroText = t('hudChrome.deeds.retroSummary', {
+        count: formatNumber(plan.retroCount, { maximumFractionDigits: 0 }),
+      });
+      this.log(retroText, '#ffd100');
+      this.combatAnnouncer.push(retroText, performance.now());
+    }
   }
 
   log(text: string, color = '#ccc'): void {
@@ -9625,56 +9031,62 @@ export class Hud {
   private chatLogFrom(
     name: string,
     text: string,
-    color: string,
     templateKey: TranslationKey,
     chan: string,
     fromPid?: number,
+    flair?: ChatSenderFlair,
+    fromTitle?: string,
   ): void {
     const wasNearBottom =
       this.chatLogEl.scrollHeight - this.chatLogEl.scrollTop - this.chatLogEl.clientHeight < 24;
     const div = document.createElement('div');
-    div.style.color = color;
+    // The line color is a pure function of its channel (the single source of truth
+    // shared with the chat input tint), so it is derived here rather than passed in.
+    div.style.color = chatChannelColor(chan);
     div.dataset.chan = chan;
     this.hideIfFiltered(div, chan);
     this.prependTimestamp(div);
     const sender = document.createElement('span');
     sender.className = 'chat-player-name';
-    sender.textContent = name;
-    sender.title = t('hud.chat.rightClickName', { name });
+    // The DISPLAYED sender may carry the speaker's Book of Deeds title (a
+    // deed id on the event, localized here); the context-menu handlers below
+    // close over the RAW `name`, so whisper/social lookups stay unaffected.
+    sender.textContent = titledDisplayName(name, fromTitle);
+    sender.title = t('hudChrome.playerMenu.openFor', { name });
     sender.setAttribute('role', 'button');
-    sender.setAttribute('aria-label', t('hud.chat.rightClickName', { name }));
+    sender.setAttribute('aria-label', t('hudChrome.playerMenu.openFor', { name }));
     sender.tabIndex = 0;
+    // Anchor the menu under the name itself for a click/tap/keyboard open, and at
+    // the cursor for a right-click.
+    const openUnderName = () => {
+      const rect = sender.getBoundingClientRect();
+      this.openChatPlayerContextMenu(name, rect.left, rect.bottom, sender);
+    };
+    // bindTouchTap covers BOTH paths: any touch pointer (the browser only
+    // synthesizes `click` for the PRIMARY one, so a bare click binding goes dead
+    // while the other thumb is steering) AND the ordinary mouse/keyboard click.
+    // Do NOT also addEventListener('click', ...) here: bindTouchTap binds click
+    // itself, so the handler would fire twice per click and the second call would
+    // hit the toggle branch below and slam the menu shut the instant it opened.
+    bindTouchTap(sender, openUnderName);
     sender.addEventListener('contextmenu', (ev) => {
       ev.preventDefault();
-      this.openChatPlayerContextMenu(name, ev.clientX, ev.clientY);
+      this.openChatPlayerContextMenu(name, ev.clientX, ev.clientY, sender);
     });
     sender.addEventListener('keydown', (ev) => {
       if (ev.key !== 'Enter' && ev.key !== ' ') return;
       ev.preventDefault();
-      const rect = sender.getBoundingClientRect();
-      this.openChatPlayerContextMenu(name, rect.left, rect.bottom);
+      openUnderName();
     });
-    const nameToken = '__WOC_CHAT_NAME__';
-    const messageToken = '__WOC_CHAT_MESSAGE__';
-    const rendered = t(templateKey, { name: nameToken, message: messageToken });
-    let senderAppended = false;
-    let messageAppended = false;
-    for (const part of rendered.split(/(__WOC_CHAT_NAME__|__WOC_CHAT_MESSAGE__)/)) {
-      if (part === nameToken) {
-        div.append(sender);
-        senderAppended = true;
-      } else if (part === messageToken) {
-        this.appendChatMessageBody(div, text, fromPid);
-        messageAppended = true;
-      } else if (part) {
-        div.append(document.createTextNode(part));
-      }
-    }
-    if (!senderAppended || !messageAppended) {
-      div.textContent = '';
-      div.append(sender, document.createTextNode(': '));
-      this.appendChatMessageBody(div, text, fromPid);
-    }
+    // The [AI] tag rides the {name} slot, not the head of the line: the localized
+    // templates read '[General] {name}: {message}', so it must sit beside the name
+    // and not look like part of the channel prefix (see ./chat_line).
+    const rendered = t(templateKey, { name: CHAT_NAME_TOKEN, message: CHAT_MESSAGE_TOKEN });
+    appendChatLineParts(div, rendered, {
+      aiTag: flair?.ai ? chatAiTagEl(document) : null,
+      sender,
+      appendBody: (parent) => this.appendChatMessageBody(parent, text, fromPid),
+    });
     this.chatLogEl.appendChild(div);
     // Announce the player-chat line through the tab-independent #chat-live region.
     this.announceChatLine(div);
@@ -9855,6 +9267,7 @@ export class Hud {
       "This quest can't be shared.": 'hudChrome.questShare.notShareable',
       'That item is not sold here.': 'itemUi.errors.notSoldHere',
       'Not enough money.': 'itemUi.errors.notEnoughMoney',
+      'Not enough honor.': 'hudChrome.warfare.notEnoughHonor',
       'You must bring your goods to the Merchant.': 'itemUi.errors.bringGoods',
       'The Merchant will not broker quest items.': 'itemUi.errors.noQuestItems',
       'You do not have that many to sell.': 'itemUi.errors.notEnoughToSell',
@@ -10233,13 +9646,23 @@ export class Hud {
   }
 
   showError(text: string): void {
-    this.errorEl.textContent = this.localizeErrorText(text);
+    const localized = this.localizeErrorText(text);
+    this.errorEl.textContent = localized;
     this.errorEl.style.opacity = '1';
     clearTimeout(this.errorTimer);
     this.errorTimer = window.setTimeout(() => {
       this.errorEl.style.opacity = '0';
     }, 1600);
     audio.error();
+    // Mirror into the chat log's system channel (the same one loot/level-up/death
+    // lines use) so the toast is not lost once it fades: WoW-style error/system
+    // logging. The on-screen toast's own timing above is unchanged. Consecutive
+    // repeats (mashing a key while an error condition persists) are suppressed
+    // so the channel does not flood; a different error still logs normally.
+    if (shouldMirrorErrorToast(localized, this.lastMirroredErrorText)) {
+      this.log(localized, ERROR_LOG_COLOR);
+      this.lastMirroredErrorText = localized;
+    }
   }
 
   showBanner(text: string): void {
@@ -10272,280 +9695,23 @@ export class Hud {
   }
 
   private inFiesta(): boolean {
-    const match = this.sim.arenaInfo?.match;
-    return !!match?.fiesta && match.state === 'active';
+    return this.fiesta.isActive();
   }
 
   private updateFiestaHud(): void {
-    const match = this.sim.arenaInfo?.match;
-    const f = match?.fiesta;
-    const active = !!f && match?.state === 'active';
-    if (!f || !active) {
-      if (this.fiestaActiveSeen) this.teardownFiestaHud();
-      this.fiestaActiveSeen = false;
-      return;
-    }
-    this.fiestaActiveSeen = true;
-    this.renderFiestaScore(f);
-    this.renderFiestaRespawn(f);
-    this.renderFiestaOffer(f);
-    this.renderFiestaPending(f);
-  }
-
-  // "Augment pending" indicator: a banked offer waiting for the player's next
-  // death (so it never interrupts a live fight). Hidden once it's on offer.
-  private renderFiestaPending(f: import('../world_api').FiestaMatchInfo): void {
-    const el = this.getFiestaEl('fiesta-pending', 'fiesta-pending');
-    const show = f.augmentPending > 0 && !f.offer && !f.down;
-    if (!show) {
-      el.style.display = 'none';
-      el.dataset.sig = '';
-      return;
-    }
-    el.style.display = 'flex';
-    const sig = `${f.augmentPending}`;
-    if (el.dataset.sig !== sig) {
-      el.dataset.sig = sig;
-      el.innerHTML =
-        `<span class="fpend-gem">${this.augmentCategorySvg('utility')}</span>` +
-        `<span class="fpend-text">${esc(t('fiesta.pending.label'))}</span>`;
-    }
-  }
-
-  private getFiestaEl(id: string, cls: string): HTMLElement {
-    let el = document.getElementById(id);
-    if (!el) {
-      el = document.createElement('div');
-      el.id = id;
-      el.className = cls;
-      document.getElementById('ui')?.appendChild(el);
-    }
-    return el;
-  }
-
-  private renderFiestaScore(f: import('../world_api').FiestaMatchInfo): void {
-    const el = this.getFiestaEl('fiesta-score', 'fiesta-score');
-    const num = (n: number) => formatNumber(n, { maximumFractionDigits: 0 });
-    const dots = Array.from(
-      { length: f.totalWaves },
-      (_, i) => `<span class="fw-dot${i < f.wave ? ' on' : ''}"></span>`,
-    ).join('');
-    const myTeam = f.team === 'A' ? f.teamA : f.teamB;
-    const enemyTeam = f.team === 'A' ? f.teamB : f.teamA;
-    const faces = (players: import('../world_api').FiestaScoreboardPlayer[]) =>
-      players
-        .map(
-          (p) =>
-            `<div class="fp${p.me ? ' me' : ''}${p.down ? ' down' : ''}" title="${esc(p.name)}">` +
-            `<img class="fp-face" src="${iconDataUrl('crest', p.cls)}" alt="" draggable="false">` +
-            `<span class="fp-kills">${num(p.kills)}</span></div>`,
-        )
-        .join('');
-    const teamSig = (ps: import('../world_api').FiestaScoreboardPlayer[]) =>
-      ps.map((p) => `${p.kills}${p.down ? 'd' : ''}`).join(',');
-    const sig = `${f.myScore}|${f.theirScore}|${f.scoreLimit}|${f.wave}|${teamSig(myTeam)}|${teamSig(enemyTeam)}`;
-    if (el.dataset.sig === sig) return;
-    const scored =
-      this.fiestaScoreSeen.a >= 0 &&
-      (this.fiestaScoreSeen.a !== f.scoreA || this.fiestaScoreSeen.b !== f.scoreB);
-    const myPrev = f.team === 'A' ? this.fiestaScoreSeen.a : this.fiestaScoreSeen.b;
-    const theirPrev = f.team === 'A' ? this.fiestaScoreSeen.b : this.fiestaScoreSeen.a;
-    el.dataset.sig = sig;
-    el.innerHTML = `
-      <div class="fs-team mine" aria-hidden="true">${faces(myTeam)}</div>
-      <div class="fs-core">
-        <span class="fs-num mine">${num(f.myScore)}</span>
-        <div class="fs-mid">
-          <div class="fs-title">${esc(t('fiesta.score.title'))}</div>
-          <div class="fs-waves">${dots}</div>
-          <div class="fs-limit">${esc(t('fiesta.score.toWin', { n: num(f.scoreLimit) }))}</div>
-        </div>
-        <span class="fs-num theirs">${num(f.theirScore)}</span>
-      </div>
-      <div class="fs-team theirs" aria-hidden="true">${faces(enemyTeam)}</div>`;
-    el.setAttribute(
-      'aria-label',
-      t('fiesta.score.aria', {
-        mine: num(f.myScore),
-        theirs: num(f.theirScore),
-        limit: num(f.scoreLimit),
-      }),
-    );
-    if (scored) {
-      const mineScored = f.myScore > myPrev;
-      audio.fiestaScorePing(mineScored);
-      el.classList.remove('flash-mine', 'flash-theirs');
-      void el.offsetWidth; // restart the CSS flash
-      el.classList.add(mineScored ? 'flash-mine' : 'flash-theirs');
-      // Confetti rains in the killing team's colour (from this viewer's POV).
-      if (f.myScore > myPrev) this.fiestaConfetti('#1b9fff');
-      if (f.theirScore > theirPrev) this.fiestaConfetti('#ff2d66');
-    }
-    this.fiestaScoreSeen = { a: f.scoreA, b: f.scoreB };
-  }
-
-  // A burst of CSS confetti raining down the screen in a team colour.
-  private fiestaConfetti(color: string): void {
-    const ui = document.getElementById('ui');
-    if (!ui) return;
-    const layer = document.createElement('div');
-    layer.className = 'fiesta-confetti';
-    const tints = [color, '#ffffff', '#ffd24a'];
-    for (let i = 0; i < 36; i++) {
-      const bit = document.createElement('i');
-      bit.style.left = `${Math.random() * 100}%`;
-      bit.style.background = tints[i % tints.length];
-      bit.style.animationDelay = `${Math.random() * 0.5}s`;
-      bit.style.animationDuration = `${1.4 + Math.random() * 1.1}s`;
-      bit.style.transform = `rotate(${Math.random() * 360}deg)`;
-      layer.appendChild(bit);
-    }
-    ui.appendChild(layer);
-    setTimeout(() => layer.remove(), 2800);
-  }
-
-  private renderFiestaRespawn(f: import('../world_api').FiestaMatchInfo): void {
-    const el = this.getFiestaEl('fiesta-respawn', 'fiesta-respawn');
-    if (f.down && f.respawnIn > 0) {
-      el.style.display = 'flex';
-      const sig = `${f.respawnIn}`;
-      if (el.dataset.sig !== sig) {
-        el.dataset.sig = sig;
-        el.innerHTML = `
-          <div class="fr-title">${esc(t('fiesta.respawn.title'))}</div>
-          <div class="fr-count">${esc(formatNumber(f.respawnIn, { maximumFractionDigits: 0 }))}</div>
-          <div class="fr-sub">${esc(t('fiesta.respawn.sub'))}</div>`;
-      }
-      this.fiestaWasDown = true;
-    } else {
-      if (this.fiestaWasDown) audio.fiestaRevive();
-      this.fiestaWasDown = false;
-      el.style.display = 'none';
-      el.dataset.sig = '';
-    }
-  }
-
-  private renderFiestaOffer(f: import('../world_api').FiestaMatchInfo): void {
-    const offer = f.offer;
-    const key = offer ? `${offer.wave}:${offer.choices.join(',')}` : '';
-    if (key === this.fiestaOfferKey) return;
-    this.fiestaOfferKey = key;
-    if (offer) this.renderFiestaAugments(offer);
-    else this.closeFiestaAugments();
-  }
-
-  private renderFiestaAugments(offer: import('../world_api').FiestaAugmentOffer): void {
-    const el = this.getFiestaEl('fiesta-augments', 'fiesta-augments');
-    el.style.display = 'flex';
-    const tierLabel = esc(t(`fiesta.tier.${offer.tier}` as TranslationKey));
-    el.innerHTML = `<div class="fa-head">${esc(t('fiesta.augment.choose'))} <span class="fa-tier ${offer.tier}">${tierLabel}</span></div>
-      <div class="fa-cards"></div>`;
-    const cards = el.querySelector('.fa-cards');
-    if (!cards) return;
-    for (const id of offer.choices) {
-      const cat = augmentCategory(id);
-      const card = document.createElement('button');
-      card.type = 'button';
-      card.className = `fa-card ${offer.tier}`;
-      card.innerHTML =
-        `<span class="fa-icon cat-${cat}">${this.augmentCategorySvg(cat)}</span>` +
-        `<span class="fa-name">${esc(this.augmentName(id))}</span>` +
-        `<span class="fa-desc">${esc(this.augmentDesc(id))}</span>` +
-        `<span class="fa-cat cat-${cat}">${esc(t(`fiesta.category.${cat}` as TranslationKey))}</span>`;
-      card.setAttribute(
-        'aria-label',
-        `${this.augmentName(id)} (${t(`fiesta.category.${cat}` as TranslationKey)}) — ${this.augmentDesc(id)}`,
-      );
-      card.addEventListener('click', () => {
-        audio.click();
-        this.sim.arenaAugmentPick(id);
-        this.closeFiestaAugments();
-      });
-      cards.appendChild(card);
-    }
-  }
-
-  private closeFiestaAugments(): void {
-    const el = document.getElementById('fiesta-augments');
-    if (el) {
-      el.style.display = 'none';
-      el.innerHTML = '';
-    }
-  }
-
-  // A small inline-SVG glyph per augment category (offense/defense/sustain/
-  // mobility/utility). currentColor is set by the .cat-* CSS class.
-  private augmentCategorySvg(cat: AugmentCategory): string {
-    const p: Record<AugmentCategory, string> = {
-      offense: '<path d="M3 21l6-6m0 0l9-9 2 2-9 9m-2-2l-2 2 2 2 2-2m-2-2l2 2"/>', // sword
-      defense: '<path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z"/>', // shield
-      sustain:
-        '<path d="M12 21s-7-4.6-9.2-9C1.3 8.7 3 5 6.5 5c2 0 3.5 1.5 5.5 4 2-2.5 3.5-4 5.5-4C21 5 22.7 8.7 21.2 12 19 16.4 12 21 12 21z"/>', // heart
-      mobility: '<path d="M5 18l6-6-6-6m7 12l6-6-6-6"/>', // chevrons
-      utility:
-        '<path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.8 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/>', // star
-    };
-    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">${p[cat]}</svg>`;
-  }
-
-  private teardownFiestaHud(): void {
-    for (const id of ['fiesta-score', 'fiesta-respawn', 'fiesta-augments', 'fiesta-pending']) {
-      const el = document.getElementById(id);
-      if (el) {
-        el.style.display = 'none';
-        el.innerHTML = '';
-        el.dataset.sig = '';
-      }
-    }
-    this.fiestaScoreSeen = { a: -1, b: -1 };
-    this.fiestaOfferKey = '';
-    this.fiestaWasDown = false;
+    this.fiesta.update();
   }
 
   private augmentName(id: string): string {
-    return tOptional(`fiesta.augment.${id}.name`) ?? id;
+    return this.fiesta.augmentName(id);
   }
 
-  private augmentDesc(id: string): string {
-    return tOptional(`fiesta.augment.${id}.desc`) ?? '';
+  private fiestaWordParts(flavor: string, n?: number) {
+    return this.fiesta.wordParts(flavor, n);
   }
 
-  // Map a sim word-pop flavor to its localized text, dopamine tier (0..3), and
-  // accent colour.
-  private fiestaWordParts(
-    flavor: string,
-    n?: number,
-  ): { text: string; tier: number; color: string } {
-    switch (flavor) {
-      case 'firstblood':
-        return { text: t('fiesta.word.firstblood'), tier: 3, color: '#ff3df0' };
-      case 'doublekill':
-        return { text: t('fiesta.word.doublekill'), tier: 3, color: '#ffae00' };
-      case 'shutdown':
-        return { text: t('fiesta.word.shutdown'), tier: 3, color: '#00e5ff' };
-      case 'spree':
-        return {
-          text: t('fiesta.word.spree', { n: formatNumber(n ?? 3, { maximumFractionDigits: 0 }) }),
-          tier: 2,
-          color: '#ff7a1a',
-        };
-      case 'revived':
-        return { text: t('fiesta.word.revived'), tier: 0, color: '#7fdc4f' };
-      case 'ringclose':
-        return { text: t('fiesta.word.ringclose'), tier: 1, color: '#ff3df0' };
-      default:
-        return { text: t('fiesta.word.kill'), tier: 1, color: '#ffd24a' };
-    }
-  }
-
-  // A big exaggerated word that punches in at screen-centre and fades out.
   private fiestaWordPop(text: string, color: string, tier: number): void {
-    const el = document.createElement('div');
-    el.className = `fiesta-word tier${tier}`;
-    el.textContent = text;
-    el.style.setProperty('--fw-color', color);
-    document.getElementById('ui')?.appendChild(el);
-    setTimeout(() => el.remove(), 1400);
+    this.fiesta.wordPop(text, color, tier);
   }
 
   // -------------------------------------------------------------------------
@@ -10553,759 +9719,27 @@ export class Hud {
   // -------------------------------------------------------------------------
 
   openQuestDialog(npcId: number): void {
-    const npc = this.sim.entities.get(npcId);
-    if (npc?.kind !== 'npc') return;
-    // A banker never gossips: divert to the sim interact, whose banker intercept
-    // emits the bank event this HUD opens on (case 'bank'), identically in both
-    // worlds. Routing through the sim keeps proximity server-authoritative; the
-    // authored greeting stays un-rendered by design (a deliberate QA adjudication).
-    if (NPCS[npc.templateId]?.banker) {
-      this.sim.targetEntity(npc.id);
-      this.sim.interact();
-      return;
-    }
-    this.questDialogOpenedAtMs = performance.now();
-    if ($('#quest-dialog').style.display !== 'block')
-      this.questDialogTrap = this.focusManager.open({ root: () => $('#quest-dialog') });
-    this.closeOtherWindows('#quest-dialog');
-    // Voice the greeting only on the initial open — renderGossip also runs when
-    // navigating back from a quest detail or after accept/turn-in, where a
-    // re-greeting would be noise.
-    voice.play(`greeting__${npc.templateId}`);
-    this.voiceNpcId = npc.id;
-    this.renderGossip(npc);
+    this.questDialog.open(npcId);
   }
 
-  private renderGossip(npc: Entity): void {
-    this.openGossipNpcId = npc.id;
-    this.openQuestDetailId = null;
-    const el = $('#quest-dialog');
-    const def = NPCS[npc.templateId];
-    // accepted-but-unfinished quests are tracked in the quest log; the NPC
-    // only offers new quests (at the giver) and turn-ins (at the turn-in NPC)
-    const interesting = npc.questIds.filter((q) => {
-      const st = this.sim.questState(q);
-      return (
-        (st === 'available' && QUESTS[q].giverNpcId === npc.templateId) ||
-        (st === 'ready' && isQuestTurnInNpc(QUESTS[q], npc.templateId))
-      );
-    });
-    const discussionQuests = [...this.sim.questLog.values()]
-      .filter((qp) => qp.state === 'active' && npc.questIds.includes(qp.questId))
-      .filter((qp) =>
-        QUESTS[qp.questId].objectives.some(
-          (objective, objectiveIndex) =>
-            objective.type === 'interact' &&
-            objective.targetNpcId === npc.templateId &&
-            qp.counts[objectiveIndex] < objective.count,
-        ),
-      )
-      .map((qp) => qp.questId);
-    markDialogRoot(el, { labelledBy: 'quest-dialog-title' });
-    const npcName = def ? npcDisplayName(npc.templateId) : mobDisplayName(npc.templateId);
-    const npcTitle = def ? npcDisplayTitle(def.id) : '';
-    let html = `<div class="panel-title"><span id="quest-dialog-title">${esc(npcName)}<span class="quest-muted"> &lt;${esc(npcTitle)}&gt;</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>`;
-    html += `<div class="qd-text">"${esc(def ? npcGreeting(def.id, this.sim.cfg.playerClass, this.sim.player.name) : t('questUi.dialog.greetingFallback'))}"</div>`;
-    if (interesting.length > 0) {
-      for (const qid of interesting) {
-        const st = this.sim.questState(qid);
-        const icon =
-          st === 'ready' ? '<span class="gold">?</span> ' : '<span class="gold">!</span> ';
-        const title = questTitle(qid);
-        const aria =
-          st === 'ready'
-            ? t('questUi.dialog.readyQuestAria', { name: title })
-            : t('questUi.dialog.availableQuestAria', { name: title });
-        html += `<button type="button" class="qd-list-item" data-quest="${esc(qid)}" aria-label="${esc(aria)}">${icon}${esc(title)}</button>`;
-      }
-    }
-    if (discussionQuests.length > 0) {
-      for (const qid of discussionQuests) {
-        const title = questTitle(qid);
-        html += `<button type="button" class="qd-list-item" data-discuss="${esc(qid)}" aria-label="${esc(t('questUi.dialog.discussQuestAria', { name: title }))}"><span class="gold">?</span> ${esc(t('questUi.dialog.discussQuest', { name: title }))}</button>`;
-      }
-    }
-    if (npc.vendorItems.length > 0) {
-      html += `<button type="button" class="qd-list-item" data-vendor="1" aria-label="${esc(t('questUi.dialog.browseGoodsAria', { name: npcName }))}"><span class="quest-complete">$</span> ${esc(t('questUi.dialog.browseGoods'))}</button>`;
-    }
-    if (def?.market) {
-      html += `<button type="button" class="qd-list-item" data-market="1" aria-label="${esc(t('questUi.dialog.worldMarketAria'))}"><span class="gold">${svgIcon('market')}</span> ${esc(t('questUi.dialog.worldMarket'))}</button>`;
-    }
-    if (def?.heroicVendor) {
-      html += `<button type="button" class="qd-list-item" data-heroic-shop="1" aria-label="${esc(t('questUi.dialog.browseGoodsAria', { name: npcName }))}"><span class="quest-complete">$</span> ${esc(t('questUi.dialog.browseGoods'))}</button>`;
-    }
-    if (Object.values(DELVES).some((d) => d.boardNpcId === npc.templateId)) {
-      const delveForNpc = Object.values(DELVES).find((d) => d.boardNpcId === npc.templateId);
-      const openLabel = delveForNpc
-        ? delveDisplayName(delveForNpc.id)
-        : t('delveUi.board.openDelve');
-      html += `<button type="button" class="qd-list-item" data-delve-board="1" aria-label="${esc(t('delveUi.board.openDelveAria', { name: npcName }))}"><span class="gold">${svgIcon('skull')}</span> ${esc(openLabel)}</button>`;
-    }
-    // Groundskeeper Bram keeps the book of fixtures at the Sowfield gate: his
-    // gossip menu opens the Vale Cup window (the delve-board button precedent).
-    if (npc.templateId === 'groundskeeper_bram') {
-      html += `<button type="button" class="qd-list-item" data-vcup="1" aria-label="${esc(t('hudChrome.vcup.gossipOpenAria'))}"><span class="gold">${svgIcon('ball')}</span> ${esc(t('hudChrome.vcup.gossipOpen'))}</button>`;
-    }
-    el.innerHTML = html;
-    el.querySelectorAll('[data-quest]').forEach((item) => {
-      item.addEventListener('click', () =>
-        this.renderQuestDetail(npc, (item as HTMLElement).dataset.quest ?? ''),
-      );
-    });
-    el.querySelectorAll('[data-discuss]').forEach((item) => {
-      item.addEventListener('click', () => {
-        this.sim.targetEntity(npc.id);
-        this.sim.interact();
-        (item as HTMLButtonElement).disabled = true;
-      });
-    });
-    el.querySelector('[data-vendor]')?.addEventListener('click', () => {
-      this.closeQuestDialog(false);
-      this.openVendor(npc.id);
-    });
-    el.querySelector('[data-heroic-shop]')?.addEventListener('click', () => {
-      this.closeQuestDialog(false);
-      this.openHeroicVendor(npc.id);
-    });
-    el.querySelector('[data-market]')?.addEventListener('click', () => {
-      this.closeQuestDialog(false);
-      this.openMarket();
-    });
-    el.querySelector('[data-delve-board]')?.addEventListener('click', () => {
-      this.closeQuestDialog(false);
-      this.openDelveBoard(npc.id);
-    });
-    el.querySelector('[data-vcup]')?.addEventListener('click', () => {
-      this.closeQuestDialog(false);
-      this.toggleValeCup();
-    });
-    el.querySelector('[data-close]')?.addEventListener('click', () => this.closeQuestDialog());
-    el.style.display = 'block';
-    this.questDialogTrap?.focusFirst();
-  }
-
-  private renderQuestDetail(npc: Entity, questId: string): void {
-    const el = $('#quest-dialog');
-    const quest = QUESTS[questId];
-    this.openQuestDetailId = questId;
-    const state = this.sim.questState(questId);
-    const text = questNarrative(
-      questId,
-      state === 'ready' ? 'completion' : 'text',
-      this.sim.player.name,
-    );
-    voice.play(state === 'ready' ? `quest__${questId}__complete` : `quest__${questId}__offer`);
-    this.voiceNpcId = npc.id;
-    markDialogRoot(el, { labelledBy: 'quest-dialog-title' });
-    let html = `<div class="panel-title"><span id="quest-dialog-title">${esc(questTitle(questId))}${this.questSuggestedPlayersHtml(quest.suggestedPlayers)}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>`;
-    if (state === 'available' && quest.minLevel) {
-      html += `<div class="qd-req">${esc(t('questUi.detail.requiresLevel', { level: this.questNumber(quest.minLevel) }))}</div>`;
-    }
-    html += `<div class="qd-text">${esc(text)}</div>`;
-    if (state !== 'ready') {
-      const qp = this.sim.questLog.get(questId);
-      html += `<div class="qd-sub">${esc(t('questUi.detail.objectives'))}</div>`;
-      html += quest.objectives
-        .map(
-          (o, i) =>
-            `<div class="qd-obj">${esc(this.questProgressText(questObjectiveLabel(questId, i), qp ? Math.min(qp.counts[i], o.count) : 0, o.count))}</div>`,
-        )
-        .join('');
-    }
-    html += `<div class="qd-sub">${esc(t('questUi.detail.rewards'))}</div>`;
-    html += `<div class="qd-obj">${esc(t('questUi.detail.xpReward', { xp: this.questNumber(quest.xpReward) }))} &nbsp; ${this.moneyHtml(quest.copperReward)}</div>`;
-    const rewardItem = questRewardItem(quest, this.sim.cfg.playerClass);
-    if (rewardItem) {
-      const item = ITEMS[rewardItem];
-      html += `<div class="qd-reward-row" data-reward><span class="qd-reward-label">${esc(t('questUi.detail.itemReward'))}</span>${this.itemIcon(item)}<span class="qd-reward-name" style="color:${QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff'}">${esc(itemDisplayName(item))}</span></div>`;
-    }
-    el.innerHTML = html;
-    const rewardRow = el.querySelector('[data-reward]') as HTMLElement | null;
-    if (rewardRow && rewardItem)
-      this.attachTooltip(rewardRow, () => this.itemTooltip(ITEMS[rewardItem]));
-
-    if (state === 'available') {
-      const btn = document.createElement('button');
-      btn.className = 'btn';
-      btn.type = 'button';
-      btn.textContent = t('questUi.dialog.accept');
-      btn.addEventListener('click', () => {
-        this.sim.acceptQuest(questId);
-        this.sim.reportTelemetry('quest_accept', {
-          timeMs: performance.now() - this.questDialogOpenedAtMs,
-        });
-        this.renderGossip(npc);
-      });
-      el.appendChild(btn);
-    } else if (state === 'ready') {
-      const btn = document.createElement('button');
-      btn.className = 'btn';
-      btn.type = 'button';
-      btn.textContent = t('questUi.dialog.completeQuest');
-      btn.addEventListener('click', () => {
-        this.sim.turnInQuest(questId);
-        this.sim.reportTelemetry('quest_turnin', {
-          timeMs: performance.now() - this.questDialogOpenedAtMs,
-        });
-        this.renderGossip(npc);
-      });
-      el.appendChild(btn);
-    }
-    const back = document.createElement('button');
-    back.className = 'btn';
-    back.type = 'button';
-    back.textContent = t('questUi.dialog.back');
-    back.addEventListener('click', () => this.renderGossip(npc));
-    el.appendChild(back);
-    el.querySelector('[data-close]')?.addEventListener('click', () => this.closeQuestDialog());
-    el.style.display = 'block';
-    this.questDialogTrap?.focusFirst();
-  }
-
-  // Open the read-only quest detail for a chat-link click. Shows Accept only when the
-  // viewer is in the link author's party AND the quest is available; the server
-  // re-validates on accept. Non-party / ineligible viewers see view-only info.
   openLinkedQuestDialog(questId: string, fromPid?: number): void {
-    const quest = QUESTS[questId];
-    if (!quest) return;
-    this.openGossipNpcId = null;
-    if ($('#quest-dialog').style.display !== 'block')
-      this.questDialogTrap = this.focusManager.open({ root: () => $('#quest-dialog') });
-    this.closeOtherWindows('#quest-dialog');
-    const el = $('#quest-dialog');
-    const state = this.sim.questState(questId);
-    const inSharerParty =
-      fromPid !== undefined &&
-      (this.sim.partyInfo?.members.some((m) => m.pid === fromPid) ?? false);
-    markDialogRoot(el, { labelledBy: 'quest-dialog-title' });
-    let html = `<div class="panel-title"><span id="quest-dialog-title">${esc(questTitle(questId))}${this.questSuggestedPlayersHtml(quest.suggestedPlayers)} <span class="quest-muted">&lt;${esc(t('hudChrome.questShare.dialogTitle'))}&gt;</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>`;
-    if (quest.minLevel)
-      html += `<div class="qd-req">${esc(t('questUi.detail.requiresLevel', { level: this.questNumber(quest.minLevel) }))}</div>`;
-    html += `<div class="qd-text">${esc(questNarrative(questId, 'text', this.sim.player.name))}</div>`;
-    html += `<div class="qd-sub">${esc(t('questUi.detail.objectives'))}</div>`;
-    html += quest.objectives
-      .map(
-        (o, i) =>
-          `<div class="qd-obj">${esc(this.questProgressText(questObjectiveLabel(questId, i), 0, o.count))}</div>`,
-      )
-      .join('');
-    html += `<div class="qd-sub">${esc(t('questUi.detail.rewards'))}</div>`;
-    html += `<div class="qd-obj">${esc(t('questUi.detail.xpReward', { xp: this.questNumber(quest.xpReward) }))} &nbsp; ${this.moneyHtml(quest.copperReward)}</div>`;
-    const rewardItem = questRewardItem(quest, this.sim.cfg.playerClass);
-    if (rewardItem) {
-      const item = ITEMS[rewardItem];
-      html += `<div class="qd-reward-row" data-reward><span class="qd-reward-label">${esc(t('questUi.detail.itemReward'))}</span>${this.itemIcon(item)}<span class="qd-reward-name" style="color:${QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff'}">${esc(itemDisplayName(item))}</span></div>`;
-    }
-    el.innerHTML = html;
-    const rewardRow = el.querySelector('[data-reward]') as HTMLElement | null;
-    if (rewardRow && rewardItem)
-      this.attachTooltip(rewardRow, () => this.itemTooltip(ITEMS[rewardItem]));
-    if (inSharerParty && state === 'available') {
-      const btn = document.createElement('button');
-      btn.className = 'btn';
-      btn.type = 'button';
-      btn.textContent = t('questUi.dialog.accept');
-      btn.addEventListener('click', () => {
-        if (fromPid === undefined) return;
-        this.sim.acceptLinkedQuest(questId, fromPid);
-        this.closeQuestDialog();
-      });
-      el.appendChild(btn);
-    } else {
-      // View-only: explain why no Accept. Non-party -> join hint; in-party but
-      // ineligible -> the reason (already on it / done / requirements unmet).
-      const hint = document.createElement('div');
-      hint.className = 'qd-req';
-      hint.textContent = !inSharerParty
-        ? t('hudChrome.questShare.viewOnlyHint')
-        : state === 'done'
-          ? t('hudChrome.questShare.alreadyDone')
-          : state === 'active' || state === 'ready'
-            ? t('hudChrome.questShare.alreadyOn')
-            : t('hudChrome.questShare.ineligible');
-      el.appendChild(hint);
-    }
-    el.querySelector('[data-close]')?.addEventListener('click', () => this.closeQuestDialog());
-    el.style.display = 'block';
-    this.questDialogTrap?.focusFirst();
-  }
-
-  private renderQuestDiscussion(npc: Entity, questId: string, page: number): void {
-    const el = $('#quest-dialog');
-    const pages = [
-      questNarrative(questId, 'text', this.sim.player.name),
-      questNarrative(questId, 'completion', this.sim.player.name),
-    ];
-    const clampedPage = Math.max(0, Math.min(page, pages.length - 1));
-    markDialogRoot(el, { labelledBy: 'quest-dialog-title' });
-    el.innerHTML =
-      `<div class="panel-title"><span id="quest-dialog-title">${esc(questTitle(questId))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>` +
-      `<div class="qd-text">${esc(pages[clampedPage])}</div>`;
-    const action = document.createElement('button');
-    action.className = 'btn';
-    action.type = 'button';
-    if (clampedPage < pages.length - 1) {
-      action.textContent = t('questUi.dialog.continue');
-      action.addEventListener('click', () =>
-        this.renderQuestDiscussion(npc, questId, clampedPage + 1),
-      );
-    } else {
-      action.textContent = t('questUi.dialog.done');
-      action.addEventListener('click', () => {
-        this.sim.targetEntity(npc.id);
-        this.sim.interact();
-        this.renderGossip(npc);
-      });
-    }
-    el.appendChild(action);
-    const back = document.createElement('button');
-    back.className = 'btn';
-    back.type = 'button';
-    back.textContent = t('questUi.dialog.back');
-    back.addEventListener('click', () => this.renderGossip(npc));
-    el.appendChild(back);
-    el.querySelector('[data-close]')?.addEventListener('click', () => this.closeQuestDialog());
-    el.style.display = 'block';
-    this.questDialogTrap?.focusFirst();
+    this.questDialog.openLinked(questId, fromPid);
   }
 
   closeQuestDialog(restoreFocus = true): void {
-    $('#quest-dialog').style.display = 'none';
-    this.openGossipNpcId = null;
-    this.openQuestDetailId = null;
-    this.hideTooltip();
-    this.questDialogTrap?.release(restoreFocus);
-    this.questDialogTrap = null;
-  }
-
-  // Re-render the open gossip dialog after quest state changes so completed
-  // quests can never be accepted again from a stale dialog.
-  private refreshGossip(): void {
-    if (this.openGossipNpcId === null || $('#quest-dialog').style.display !== 'block') return;
-    const npc = this.sim.entities.get(this.openGossipNpcId);
-    if (npc) this.renderGossip(npc);
-    else this.closeQuestDialog();
+    this.questDialog.close(restoreFocus);
   }
 
   // -------------------------------------------------------------------------
   // Loot window
   // -------------------------------------------------------------------------
 
-  private lootRollRoot(): HTMLElement {
-    let root = document.getElementById('loot-rolls');
-    const uiRoot = document.getElementById('ui');
-    if (!root) {
-      root = document.createElement('div');
-      root.id = 'loot-rolls';
-      root.setAttribute('aria-live', 'polite');
-    }
-    if (uiRoot && root.parentElement !== uiRoot) uiRoot.appendChild(root);
-    else if (!root.parentElement) document.body.appendChild(root);
-    return root;
-  }
-
-  private showLootRoll(ev: Extract<SimEvent, { type: 'lootRoll' }>): void {
-    // A master-loot prompt that converts to a need/greed roll reuses the same rollId;
-    // drop the superseded master panel so the looter sees only the need/greed panel.
-    this.activeMasterRolls.delete(ev.rollId);
-    this.activeLootRolls.set(ev.rollId, {
-      event: ev,
-      receivedAt: performance.now(),
-      durationMs: 60_000,
-    });
-    this.renderLootRolls();
-  }
-
-  private submitLootRoll(rollId: number, choice: LootRollChoice): void {
-    this.sim.submitLootRoll(rollId, choice);
-    this.activeLootRolls.delete(rollId);
-    this.dismissedLootRolls.add(rollId);
-    this.renderLootRolls();
-  }
-
-  // Reconcile the shown loot-roll prompts against the server's authoritative
-  // open-roll mirror. Loot-roll events are best-effort (a single frame), so this
-  // both RE-SHOWS an open roll whose event was missed (reconnect, interest
-  // churn, a dropped snapshot) and RETIRES a shown roll the server has since
-  // resolved (the mirror drops it to []), so a stale dead-button prompt no
-  // longer lingers until the local timer. The three-way decision lives in
-  // the pure computeLootRollReconcile; here we apply it to the live DOM state.
-  private reconcileLootRolls(): void {
-    const open = this.sim.activeLootRolls();
-    // Steady state (no open rolls and nothing shown/tracked): nothing to do, and
-    // skip allocating the decision arrays every frame.
-    if (
-      open.length === 0 &&
-      this.activeLootRolls.size === 0 &&
-      this.dismissedLootRolls.size === 0 &&
-      this.confirmedLootRolls.size === 0
-    ) {
-      return;
-    }
-    const promptById = new Map(open.map((p) => [p.rollId, p] as const));
-    const decision = computeLootRollReconcile({
-      open: open.map((p) => p.rollId),
-      shown: [...this.activeLootRolls.keys()],
-      dismissed: [...this.dismissedLootRolls],
-      confirmed: [...this.confirmedLootRolls],
-    });
-    this.confirmedLootRolls = new Set(decision.confirmed);
-    for (const id of decision.toPrune) this.dismissedLootRolls.delete(id); // server confirmed it is gone
-    let changed = false;
-    for (const id of decision.toRetire) {
-      this.activeLootRolls.delete(id);
-      changed = true;
-    }
-    for (const id of decision.toShow) {
-      const p = promptById.get(id);
-      if (!p) continue;
-      this.activeLootRolls.set(id, {
-        event: { type: 'lootRoll', ...p },
-        receivedAt: performance.now(),
-        durationMs: 60_000,
-      });
-      changed = true;
-    }
-    if (changed) this.renderLootRolls();
-  }
-
-  private showMasterLoot(ev: Extract<SimEvent, { type: 'masterLoot' }>): void {
-    this.activeMasterRolls.set(ev.rollId, {
-      event: ev,
-      receivedAt: performance.now(),
-      // The master looter's curate window is 5 minutes (sim MASTER_LOOT_TIMEOUT),
-      // longer than a need/greed roll, so the countdown bar must span the full window.
-      durationMs: 300_000,
-    });
-    this.renderLootRolls();
-  }
-
-  private assignMasterLoot(rollId: number, targetPids: number[]): void {
-    this.sim.assignMasterLoot(rollId, targetPids);
-    this.activeMasterRolls.delete(rollId);
-    this.renderLootRolls();
-  }
-
-  // Poll the authoritative group vote state and re-render the roll rail only
-  // when it actually changes (the view core's fingerprint). Also owns the watch
-  // timers: a watch-only row starts its countdown at first sight and is dropped
-  // the moment the server stops listing the roll (resolution/expiry).
-  private reconcileLootRollStatus(now: number): void {
-    const statuses = this.sim.lootRollGroupStatus();
-    if (statuses.length === 0 && this.lootRollStatusRows.length === 0) return;
-    const rows = computeLootRollStatusRows(
-      statuses,
-      [...this.activeLootRolls.keys()],
-      this.sim.playerId,
-    );
-    const fp = lootRollStatusFingerprint(rows);
-    if (fp === this.lootRollStatusFp) return;
-    this.lootRollStatusFp = fp;
-    this.lootRollStatusRows = rows;
-    const live = new Set(rows.map((row) => row.rollId));
-    for (const rollId of this.lootRollWatchTimers.keys())
-      if (!live.has(rollId)) this.lootRollWatchTimers.delete(rollId);
-    for (const row of rows)
-      if (!this.lootRollWatchTimers.has(row.rollId)) this.lootRollWatchTimers.set(row.rollId, now);
-    this.renderLootRolls();
-  }
-
-  private updateLootRollTimers(now: number): void {
-    if (
-      this.activeLootRolls.size === 0 &&
-      this.activeMasterRolls.size === 0 &&
-      this.lootRollStatusRows.length === 0
-    )
-      return;
-    let changed = false;
-    for (const [rollId, roll] of this.activeLootRolls) {
-      if (now - roll.receivedAt >= roll.durationMs) {
-        this.activeLootRolls.delete(rollId);
-        this.dismissedLootRolls.add(rollId); // expired locally; don't let reconcile re-show it
-        changed = true;
-      }
-    }
-    for (const [rollId, roll] of this.activeMasterRolls) {
-      if (now - roll.receivedAt >= roll.durationMs) {
-        this.activeMasterRolls.delete(rollId);
-        changed = true;
-      }
-    }
-    if (changed) this.renderLootRolls();
-    const root = document.getElementById('loot-rolls');
-    if (!root) return;
-    for (const row of root.querySelectorAll<HTMLElement>('.loot-roll')) {
-      const rollId = Number(row.dataset.rollId);
-      if (row.dataset.watch) {
-        // Watch-only rows time against first sight; the row itself lives and
-        // dies with the server's group status, the bar is purely cosmetic.
-        const receivedAt = this.lootRollWatchTimers.get(rollId);
-        if (receivedAt === undefined) continue;
-        const remaining = Math.max(0, 1 - (now - receivedAt) / 60_000);
-        row.style.setProperty('--loot-roll-frac', remaining.toFixed(3));
-        continue;
-      }
-      const roll = row.dataset.master
-        ? this.activeMasterRolls.get(rollId)
-        : this.activeLootRolls.get(rollId);
-      if (!roll) continue;
-      const remaining = Math.max(0, 1 - (now - roll.receivedAt) / roll.durationMs);
-      row.style.setProperty('--loot-roll-frac', remaining.toFixed(3));
-    }
-  }
-
-  private closeLootRollsForItem(text: string): void {
-    const match =
-      /^.+ wins \[\[i:([A-Za-z0-9_]+)\]\] \(\d+\)$/.exec(text) ??
-      /^Everyone passed on \[\[i:([A-Za-z0-9_]+)\]\]\.$/.exec(text) ??
-      /^.+ assigned \[\[i:([A-Za-z0-9_]+)\]\] to .+\.$/.exec(text) ??
-      /^(.+) was not assigned and is free for all\.$/.exec(text);
-    if (!match) return;
-    const id = match[1];
-    for (const [rollId, roll] of this.activeLootRolls) {
-      if (roll.event.itemId === id || roll.event.itemName === id)
-        this.activeLootRolls.delete(rollId);
-    }
-    for (const [rollId, roll] of this.activeMasterRolls) {
-      if (roll.event.itemId === id || roll.event.itemName === id)
-        this.activeMasterRolls.delete(rollId);
-    }
-    this.renderLootRolls();
-  }
-
-  // The per-candidate vote strip (the XLoot-style monitor): one chip per
-  // candidate showing their live need/greed/pass choice, or an empty chip while
-  // they are still deciding, headed by an "N/M rolled" count so a full raid
-  // (RAID_MAX = 10) reads at a glance without scanning every chip. Roll numbers
-  // are never shown here; the sim broadcasts them as loot chat lines at
-  // resolution. The strip is aria-hidden: it re-renders on every vote, so
-  // leaving it in the #loot-rolls live region would spam a screen reader up to
-  // ten times per roll. The accessible surface is the prompt (announced once on
-  // show) plus the full per-roller reveal in the chat log at resolution.
-  private lootRollVotesHtml(status: LootRollStatusRow): string {
-    const votes = status.entries
-      .map(
-        (entry) => `
-        <span class="loot-roll-vote${entry.self ? ' self' : ''}">
-          <span class="loot-roll-vote-name">${esc(entry.name)}</span>
-          <span class="loot-roll-vote-chip ${entry.choice ?? 'undecided'}">${entry.choice ? esc(t(`itemUi.lootRoll.${entry.choice}`)) : ''}</span>
-        </span>`,
-      )
-      .join('');
-    const count = t('itemUi.lootRoll.rolled', {
-      answered: formatNumber(status.answered, { maximumFractionDigits: 0 }),
-      total: formatNumber(status.total, { maximumFractionDigits: 0 }),
-    });
-    return `<div class="loot-roll-votes" aria-hidden="true">
-      <div class="loot-roll-votes-count">${esc(count)}</div>
-      <div class="loot-roll-votes-list">${votes}</div>
-    </div>`;
-  }
-
-  private renderLootRolls(): void {
-    const root = this.lootRollRoot();
-    if (
-      this.activeLootRolls.size === 0 &&
-      this.activeMasterRolls.size === 0 &&
-      this.lootRollStatusRows.length === 0
-    ) {
-      root.style.display = 'none';
-      root.innerHTML = '';
-      return;
-    }
-    root.style.display = 'flex';
-    root.innerHTML = '';
-    const statusByRoll = new Map(this.lootRollStatusRows.map((row) => [row.rollId, row]));
-    for (const [rollId, roll] of this.activeMasterRolls)
-      this.renderMasterLootRow(root, rollId, roll.event);
-    for (const [rollId, roll] of this.activeLootRolls) {
-      const ev = roll.event;
-      const item = ITEMS[ev.itemId];
-      const itemName = item ? itemDisplayName(item) : ev.itemName;
-      const quality = item?.quality ?? ev.quality ?? 'common';
-      const status = statusByRoll.get(rollId);
-      const row = document.createElement('div');
-      row.className = 'loot-roll panel';
-      row.dataset.rollId = String(rollId);
-      row.style.setProperty('--loot-roll-frac', '1');
-      row.innerHTML = `
-        <div class="loot-roll-item">
-          ${item ? this.itemIcon(item) : `<img class="item-icon q-${quality}" src="${iconDataUrl('item', ev.itemId)}" alt="" draggable="false">`}
-          <div class="loot-roll-copy">
-            <div class="loot-roll-title">${esc(t('itemUi.lootRoll.title'))}</div>
-            <div class="loot-roll-name" style="color:${QUALITY_COLOR[quality] ?? '#fff'}">${esc(itemName)}</div>
-          </div>
-        </div>
-        <div class="loot-roll-timer" aria-hidden="true"><span></span></div>
-        ${status ? this.lootRollVotesHtml(status) : ''}
-        <div class="loot-roll-actions">
-          <button type="button" class="loot-roll-btn need" data-choice="need">${esc(t('itemUi.lootRoll.need'))}</button>
-          <button type="button" class="loot-roll-btn greed" data-choice="greed">${esc(t('itemUi.lootRoll.greed'))}</button>
-          <button type="button" class="loot-roll-btn pass" data-choice="pass">${esc(t('itemUi.lootRoll.pass'))}</button>
-        </div>`;
-      if (item)
-        this.attachTooltip(row.querySelector('.loot-roll-item') as HTMLElement, () =>
-          this.itemTooltip(item),
-        );
-      row.querySelectorAll<HTMLButtonElement>('[data-choice]').forEach((btn) => {
-        const choice = btn.dataset.choice as LootRollChoice;
-        btn.setAttribute('aria-label', t(`itemUi.lootRoll.${choice}Aria`, { item: itemName }));
-        btn.addEventListener('click', () => this.submitLootRoll(rollId, choice));
-      });
-      root.appendChild(row);
-    }
-    // Watch-only rows: open rolls this player is not (or no longer) answering,
-    // kept up so the whole group can follow the votes until the server resolves
-    // the roll and drops it from the group status.
-    for (const status of this.lootRollStatusRows) {
-      if (this.activeLootRolls.has(status.rollId) || this.activeMasterRolls.has(status.rollId))
-        continue;
-      const item = ITEMS[status.itemId];
-      const itemName = item ? itemDisplayName(item) : status.itemName;
-      const quality = item?.quality ?? status.quality ?? 'common';
-      const row = document.createElement('div');
-      row.className = 'loot-roll panel watch';
-      row.dataset.rollId = String(status.rollId);
-      row.dataset.watch = '1';
-      row.style.setProperty('--loot-roll-frac', '1');
-      row.innerHTML = `
-        <div class="loot-roll-item">
-          ${item ? this.itemIcon(item) : `<img class="item-icon q-${quality}" src="${iconDataUrl('item', status.itemId)}" alt="" draggable="false">`}
-          <div class="loot-roll-copy">
-            <div class="loot-roll-title">${esc(t('itemUi.lootRoll.title'))}</div>
-            <div class="loot-roll-name" style="color:${QUALITY_COLOR[quality] ?? '#fff'}">${esc(itemName)}</div>
-          </div>
-        </div>
-        <div class="loot-roll-timer" aria-hidden="true"><span></span></div>
-        ${this.lootRollVotesHtml(status)}`;
-      if (item)
-        this.attachTooltip(row.querySelector('.loot-roll-item') as HTMLElement, () =>
-          this.itemTooltip(item),
-        );
-      root.appendChild(row);
-    }
-  }
-
-  private renderMasterLootRow(
-    root: HTMLElement,
-    rollId: number,
-    ev: Extract<SimEvent, { type: 'masterLoot' }>,
-  ): void {
-    const item = ITEMS[ev.itemId];
-    const itemName = item ? itemDisplayName(item) : ev.itemName;
-    const quality = item?.quality ?? ev.quality ?? 'common';
-    const row = document.createElement('div');
-    row.className = 'loot-roll panel master';
-    row.dataset.rollId = String(rollId);
-    row.dataset.master = '1';
-    row.style.setProperty('--loot-roll-frac', '1');
-    const picks = ev.candidates
-      .map(
-        (c) =>
-          `<label><input type="checkbox" class="ml-pick" value="${c.pid}"><span>${esc(c.name)}</span></label>`,
-      )
-      .join('');
-    row.innerHTML = `
-      <div class="loot-roll-item">
-        ${item ? this.itemIcon(item) : `<img class="item-icon q-${quality}" src="${iconDataUrl('item', ev.itemId)}" alt="" draggable="false">`}
-        <div class="loot-roll-copy">
-          <div class="loot-roll-title">${esc(t('hudChrome.masterLoot.assignPrompt', { item: itemName }))}</div>
-          <div class="loot-roll-name" style="color:${QUALITY_COLOR[quality] ?? '#fff'}">${esc(itemName)}</div>
-        </div>
-      </div>
-      <div class="loot-roll-timer" aria-hidden="true"><span></span></div>
-      <div class="master-loot-picks">
-        <label class="ml-all-row"><input type="checkbox" class="ml-all"><span>${esc(t('hudChrome.masterLoot.selectAll'))}</span></label>
-        ${picks}
-      </div>
-      <div class="loot-roll-actions"><button type="button" class="loot-roll-btn assign ml-roll" disabled>${esc(t('hudChrome.masterLoot.rollButton'))}</button></div>`;
-    if (item)
-      this.attachTooltip(row.querySelector('.loot-roll-item') as HTMLElement, () =>
-        this.itemTooltip(item),
-      );
-    // Curate-then-roll: the looter checks a subset and presses Roll. One checked
-    // member is granted directly server-side; two or more open a need/greed roll for
-    // just that subset. The select-all header mirrors / drives the per-member boxes.
-    const all = row.querySelector<HTMLInputElement>('.ml-all')!;
-    const pickEls = [...row.querySelectorAll<HTMLInputElement>('.ml-pick')];
-    const rollBtn = row.querySelector<HTMLButtonElement>('.ml-roll')!;
-    const syncRoll = (): void => {
-      const checked = pickEls.filter((p) => p.checked).length;
-      rollBtn.disabled = checked === 0;
-      all.checked = pickEls.length > 0 && checked === pickEls.length;
-    };
-    all.addEventListener('change', () => {
-      for (const p of pickEls) p.checked = all.checked;
-      syncRoll();
-    });
-    for (const p of pickEls) p.addEventListener('change', syncRoll);
-    rollBtn.addEventListener('click', () => {
-      const pids = pickEls.filter((p) => p.checked).map((p) => Number(p.value));
-      if (pids.length > 0) this.assignMasterLoot(rollId, pids);
-    });
-    root.appendChild(row);
-  }
-
   openLoot(mobId: number, screenX: number, screenY: number): void {
-    const mob = this.sim.entities.get(mobId);
-    if (!mob) return;
-    const componentTags = MOBS[mob.templateId]?.componentTags;
-    const harvestable = !!componentTags?.length && mob.harvestClaimedBy === null;
-    const visibleItems = mob.loot
-      ? mob.loot.items.filter((s) => !s.personalFor || s.personalFor.includes(this.sim.playerId))
-      : [];
-    const hasLoot = !!mob.loot && (mob.loot.copper > 0 || visibleItems.length > 0);
-    if (!hasLoot && !harvestable) return;
-    this.closeOtherWindows('#loot-window');
-    this.openLootMobId = mobId;
-    this.openLootChestId = null;
-    const el = $('#loot-window');
-    let html = `<div class="panel-title"><span>${esc(entityDisplayName(mob))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('itemUi.loot.close'))}">${svgIcon('close')}</button></div>`;
-    if (mob.loot && mob.loot.copper > 0) {
-      html += `<div class="loot-item"><img class="item-icon q-common" src="${iconDataUrl('item', 'coin_gold')}" alt="" draggable="false"><span>${this.moneyHtml(mob.loot.copper)}</span></div>`;
-    }
-    for (const s of visibleItems) {
-      const item = ITEMS[s.itemId];
-      html += `<div class="loot-item" data-item="${s.itemId}">${this.itemIcon(item)}<span style="font-size:12px">${esc(itemDisplayName(item))}${s.count > 1 ? ` ${esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) }))}` : ''}</span></div>`;
-    }
-    el.innerHTML = html;
-    el.querySelectorAll('[data-item]').forEach((row) => {
-      const itemId = (row as HTMLElement).dataset.item ?? '';
-      this.attachTooltip(row as HTMLElement, () => this.itemTooltip(ITEMS[itemId]));
-    });
-    if (hasLoot) {
-      const btn = document.createElement('button');
-      btn.className = 'btn';
-      btn.textContent = t('itemUi.loot.takeAll');
-      btn.addEventListener('click', () => {
-        this.sim.lootCorpse(mobId);
-        this.closeLoot();
-      });
-      el.appendChild(btn);
-    }
-    if (harvestable && componentTags) {
-      renderCorpseHarvestPicker(el, corpseHarvestView(componentTags, new Set()), {
-        onHarvest: (chosen) => {
-          this.sim.harvestCorpse(mobId, chosen);
-          this.closeLoot();
-        },
-      });
-    }
-    el.querySelector('[data-close]')?.addEventListener('click', () => this.closeLoot());
-    el.style.display = 'block';
-    if (document.body.classList.contains('mobile-touch')) {
-      this.centerPopupInViewport(el);
-    } else {
-      this.placePopupAt(el, screenX - 115, screenY - 30, 260, 280, 10, 10);
-      el.style.transform = 'none'; // loot pops at the cursor, not the centred slot
-    }
+    this.lootWindow.openCorpse(mobId, screenX, screenY);
   }
 
   closeLoot(): void {
-    $('#loot-window').style.display = 'none';
-    this.openLootMobId = null;
-    this.openLootChestId = null;
-    this.hideTooltip();
+    this.lootWindow.close();
   }
 
   // -------------------------------------------------------------------------
@@ -11314,23 +9748,16 @@ export class Hud {
 
   openVendor(npcId: number): void {
     this.closeOtherWindows(['#vendor-window', '#bags']);
-    // The bank cluster is exclusive: close it through the painter so onBankClosed
-    // clears body.bank-open before the standalone vendor takes the container.
+    // The bags companion is exclusive (see openBank): close the bank cluster
+    // through the painter so onBankClosed clears body.bank-open before the
+    // vendor pairing takes over.
     if (this.bankWindowOpen) this.closeBank();
     this.openHeroicVendorNpcId = null; // the marks shop shares the container
     this.openVendorNpcId = npcId;
-    this.vendorTab = 'browse'; // every fresh open starts on Browse
-    // Market parity: the vendor is a standalone tabbed window, so it no longer
-    // force-docks Bags (Sell moved from the docked-bags flow into its own tab).
-    // Bags stays reachable on its own keybind.
+    document.body.classList.add('vendor-open');
     this.renderVendor();
-    // The painter never writes an inline display on open (the stylesheet owns it,
-    // #vendor-window:has(> .window-frame) shows the flex column). A FIRST open
-    // therefore produces no style mutation for the window observer to see (a
-    // REopen still does: the painter clears close's inline 'none'), so run the
-    // open-state sync (cascade, z-order, mobile-window-open) directly; it is
-    // idempotent when the observer also fires.
-    this.syncWindowOpenState($('#vendor-window'));
+    this.renderBags();
+    $('#bags').style.display = 'flex';
   }
 
   private renderVendor(): void {
@@ -11359,24 +9786,16 @@ export class Hud {
     renderVendorWindow(
       $('#vendor-window'),
       entityDisplayName(npc),
-      buildVendorView(npc.vendorItems, this.sim.vendorBuyback, ITEMS),
-      buildVendorSellRows(this.sim.inventory, ITEMS),
-      this.vendorTab,
+      buildVendorView(npc.vendorItems, this.sim.vendorBuyback, ITEMS, {
+        copper: this.sim.copper,
+        honor: this.sim.honor,
+      }),
       {
         ...this.presentationBag,
         hideTooltip: () => this.hideTooltip(),
         onBuy: (itemId) => buyAndRefresh(() => this.sim.buyItem(npc.id, itemId)),
         onBuyBack: (itemId) => buyAndRefresh(() => this.sim.buyBackItem(itemId)),
-        // The Sell tab dispatches the whole stack through the SAME sim sellItem
-        // command the bags Ctrl-click flow uses (byte-identical: itemId + count).
-        onSellItem: (itemId, count) => buyAndRefresh(() => this.sim.sellItem(itemId, count)),
-        confirmDialog: (title, body, okText, cancelText, onOk) =>
-          this.confirmDialog(title, body, okText, cancelText, onOk),
         onSellJunk: () => buyAndRefresh(() => this.sim.sellAllJunk()),
-        onTabChange: (tab) => {
-          this.vendorTab = tab;
-          this.renderVendor();
-        },
         onClose: () => this.closeVendor(),
         sellJunk: {
           enabled: junk.length > 0,
@@ -11462,12 +9881,6 @@ export class Hud {
   // -------------------------------------------------------------------------
 
   private townFocusDraft: Record<string, number> | null = null;
-  // WCAG 2.2 AA focus traps for the two standalone framed windows that lacked
-  // them: opening TRAPS Tab inside the dialog + lands focus on the first control,
-  // closing RETURNS focus to the opener (the shared FocusManager, like every other
-  // framed window). Held here so the close path can release the trap.
-  private townFocusTrap: FocusTrapHandle | null = null;
-  private craftingTrap: FocusTrapHandle | null = null;
 
   private isInTown(): boolean {
     const pos = this.sim.player.pos;
@@ -11482,11 +9895,7 @@ export class Hud {
     }
     this.closeOtherWindows('#town-focus-window');
     this.townFocusDraft = { ...this.sim.townFocus };
-    // Trap Tab inside the dialog and return focus to the opener on close (WCAG
-    // 2.4.3 / 2.1.2), like every other standalone framed window.
-    this.townFocusTrap = this.focusManager.open({ root: () => $('#town-focus-window') });
     this.renderTownFocus();
-    this.townFocusTrap.focusFirst();
   }
 
   private renderTownFocus(): void {
@@ -11518,8 +9927,6 @@ export class Hud {
   closeTownFocus(): void {
     $('#town-focus-window').style.display = 'none';
     this.townFocusDraft = null;
-    this.townFocusTrap?.release();
-    this.townFocusTrap = null;
     this.hideTooltip();
   }
 
@@ -11542,15 +9949,8 @@ export class Hud {
   }
 
   openCrafting(): void {
-    const wasHidden = $('#crafting-window').style.display !== 'block';
     this.closeOtherWindows('#crafting-window');
-    // Trap Tab inside the dialog and return focus to the opener on close (WCAG
-    // 2.4.3 / 2.1.2), like every other standalone framed window. Only install on a
-    // fresh open so a re-open while shown never stacks a second trap.
-    if (wasHidden)
-      this.craftingTrap = this.focusManager.open({ root: () => $('#crafting-window') });
     this.renderCrafting();
-    this.craftingTrap?.focusFirst();
   }
 
   private renderCrafting(): void {
@@ -11572,8 +9972,6 @@ export class Hud {
 
   closeCrafting(): void {
     $('#crafting-window').style.display = 'none';
-    this.craftingTrap?.release();
-    this.craftingTrap = null;
     this.hideTooltip();
   }
   // -------------------------------------------------------------------------
@@ -11662,6 +10060,61 @@ export class Hud {
     if (document.body.classList.contains('mobile-touch') && this.bankWindow.isOpen) {
       document.body.classList.remove('bank-open');
     }
+    // The char-sheet companion undocks too: with the bags gone the sheet takes the
+    // full screen back rather than staying a half-width orphan.
+    this.syncCharBagsPairing();
+  }
+
+  // The Book of Deeds trio (keybind toggle, chronicler/char-panel opens, Esc
+  // close). open() takes an optional section so a chronicler lands on the
+  // Chronicles category.
+  openDeeds(category?: DeedDisplayCategory | 'titles'): void {
+    this.deedsWindow.open(category);
+  }
+
+  closeDeeds(): void {
+    this.deedsWindow.close();
+  }
+
+  toggleDeeds(): void {
+    this.deedsWindow.toggle();
+  }
+
+  get deedsWindowOpen(): boolean {
+    return this.deedsWindow.isOpen;
+  }
+
+  // Repaint the deed tracker from the live facet: the slow band, a watch
+  // toggle, the collapse toggle, and language switches all funnel here; the
+  // elided writers make an unchanged repaint free.
+  private updateDeedTracker(): void {
+    const collapsed = (this.optionsHooks?.settings.get('deedTrackerCollapsed') ?? false) === true;
+    const view = buildDeedTrackerViewInto(
+      this.deedTrackerView,
+      this.deedsWindow.watched,
+      this.sim.deedsEarned,
+      this.sim.deedStats,
+      DEEDS,
+      collapsed,
+    );
+    // Compact touch tier: the rows are folded away (hud.mobile.css) and the header
+    // is a count chip that opens the Book (see the #deed-tracker click/keydown
+    // delegation, which reroutes to openDeeds here). Tell the painter so it swaps
+    // the header from a disclosure toggle to a dialog opener. Reuse the exact class
+    // test the delegation uses so the announced role matches the behavior.
+    view.chip =
+      document.body.classList.contains('mobile-touch') &&
+      document.body.classList.contains('hud-mobile-compact');
+    this.deedTrackerPainter.update(view);
+  }
+
+  /** Flip the persisted deed-tracker collapse (header click/keyboard delegation). */
+  private toggleDeedTrackerCollapsed(): void {
+    const settings = this.optionsHooks?.settings;
+    if (!settings) return;
+    settings.set('deedTrackerCollapsed', !settings.get('deedTrackerCollapsed'));
+    audio.click();
+    this.updateDeedTracker();
   }
 
   toggleCalendar(): void {
@@ -11716,6 +10169,7 @@ export class Hud {
       // not take this close branch and play the close sound (issue #1538).
       audio.bagClose();
       this.bagsWindow.close();
+      this.syncCharBagsPairing();
       return;
     }
     this.closeOtherWindows('#bags');
@@ -11727,6 +10181,8 @@ export class Hud {
     // onBagsClosed drops the class while the bank stays up; idempotent on desktop,
     // which never undocks).
     if (this.bankWindow.isOpen) document.body.classList.add('bank-open');
+    // Dock the char-sheet pairing when its companion opens (the touch cluster).
+    this.syncCharBagsPairing();
     audio.bagOpen();
     // Pull a fresh on-chain $WOC balance for the footer; the async result
     // re-renders the bag via the onWalletUiChange listener wired in the ctor.
@@ -11743,6 +10199,9 @@ export class Hud {
 
   onCosmeticsChanged(): void {
     this.renderCharIfOpen();
+    // A grant or apply from another session on the account (or a server
+    // correction of an optimistic apply) must refresh an open armory too.
+    this.dailyRewardsWindow.onCosmeticsChanged();
   }
 
   private renderCharIfOpen(): void {
@@ -11759,6 +10218,22 @@ export class Hud {
 
   toggleChar(): void {
     this.charWindow.toggle();
+    this.syncCharBagsPairing();
+  }
+
+  // Dock the character sheet and the bags as one 50/50 cluster on touch (the pure
+  // charBagsPaired decides), so the bags do not sit ON TOP of the paperdoll and the
+  // drag-to-equip gesture has a visible socket to land on. Called from every path
+  // that opens or closes either window; idempotent, and a no-op on desktop.
+  private syncCharBagsPairing(): void {
+    const paired = charBagsPaired({
+      touch: document.body.classList.contains('mobile-touch'),
+      charOpen: this.charWindow.isOpen,
+      bagsShown: bagsWindowShown($('#bags').style.display),
+      bankOpen: this.bankWindow.isOpen,
+      vendorOpen: this.vendorOpen,
+    });
+    document.body.classList.toggle('char-bags-paired', paired);
   }
 
   private renderCharPreview(): void {
@@ -11851,7 +10326,7 @@ export class Hud {
         'aria-label',
         option.kind === 'class'
           ? t('auth.chromaOption', { n: labelNumber })
-          : this.mechChromaName(option.chromaId),
+          : mechChromaName(option.chromaId),
       );
       b.addEventListener('click', () => {
         row.querySelectorAll('.skin-swatch').forEach((x) => {
@@ -11902,7 +10377,7 @@ export class Hud {
         this.attachTooltip(
           b,
           () =>
-            `<div class="tt-name">${esc(this.mechChromaName(option.chromaId))}</div><div class="tt-sub">${esc(t('skinEvent.unlocked'))}</div>`,
+            `<div class="tt-name">${esc(mechChromaName(option.chromaId))}</div><div class="tt-sub">${esc(t('skinEvent.unlocked'))}</div>`,
         );
       }
       row.appendChild(b);
@@ -11923,853 +10398,10 @@ export class Hud {
       this.attachTooltip(
         unequip,
         () =>
-          `<div class="tt-name">${esc(this.mechChromaName(currentChroma.id))}</div><div class="tt-sub">${esc(t('skinEvent.unequip'))}</div>`,
+          `<div class="tt-name">${esc(mechChromaName(currentChroma.id))}</div><div class="tt-sub">${esc(t('skinEvent.unequip'))}</div>`,
       );
       row.appendChild(unequip);
     }
-  }
-
-  // -------------------------------------------------------------------------
-  // Cosmetic skin-select event overlay (opened by the server-rolled `skinEvent`
-  // cue). Left column: rank-gated tier list of selectable skins. Right column:
-  // the shared rotatable 3D preview + a Lock In button that commits the choice
-  // through IWorld.claimEventSkin (re-validated server-side against the rank).
-  // -------------------------------------------------------------------------
-
-  private static readonly SKIN_RANK_NAME_KEY: Record<SkinRank, TranslationKey> = {
-    uncommon: 'itemUi.quality.uncommon',
-    rare: 'itemUi.quality.rare',
-    epic: 'itemUi.quality.epic',
-  };
-
-  private skinRankName(rank: SkinRank): string {
-    return t(Hud.SKIN_RANK_NAME_KEY[rank]);
-  }
-
-  // Combat Mech chroma id -> display-name key. Keyed by MECH_CHROMAS[].id.
-  private static readonly MECH_NAME_KEY: Record<string, TranslationKey> = {
-    amber_crimson: 'skinEvent.mech.amber_crimson',
-    crimson_amber: 'skinEvent.mech.crimson_amber',
-    cyan_magenta: 'skinEvent.mech.cyan_magenta',
-    magenta_cyan: 'skinEvent.mech.magenta_cyan',
-    orange_steel: 'skinEvent.mech.orange_steel',
-    steel_orange: 'skinEvent.mech.steel_orange',
-    forest_pink: 'skinEvent.mech.forest_pink',
-    pink_forest: 'skinEvent.mech.pink_forest',
-    amethyst_silver: 'skinEvent.mech.amethyst_silver',
-    ivory_copper: 'skinEvent.mech.ivory_copper',
-    onyx_gold: 'skinEvent.mech.onyx_gold',
-    imperial_crimson: 'skinEvent.mech.imperial_crimson',
-    imperial_gold: 'skinEvent.mech.imperial_gold',
-    vanguard_azure: 'skinEvent.mech.vanguard_azure',
-    vanguard_chrome: 'skinEvent.mech.vanguard_chrome',
-  };
-
-  private mechChromaName(id: string): string {
-    const key = Hud.MECH_NAME_KEY[id];
-    return key ? t(key) : id;
-  }
-
-  // The selectable skins for the current overlay mode, each carrying its rank,
-  // skin index, a stable choice key, and (mech only) the chroma id for naming.
-  private skinEventChoices(): { rank: SkinRank; index: number; key: string; id?: string }[] {
-    if (this.skinEventMode === 'mech') {
-      return MECH_CHROMAS.map((c, i) => ({ rank: c.rank, index: i, key: `mech:${i}`, id: c.id }));
-    }
-    return this.skinEventTiers.map((tier) => ({
-      rank: tier.rank,
-      index: tier.skin,
-      key: this.skinTierKey(tier),
-    }));
-  }
-
-  private skinEventPreviewKey(): string {
-    return this.skinEventMode === 'mech' ? 'player_mech' : `player_${this.sim.cfg.playerClass}`;
-  }
-
-  // Whether a choice's skin actually exists to render. Mech chromas always do;
-  // class skins are bounded by how many that class's model ships.
-  private skinChoiceAvailable(index: number): boolean {
-    if (this.skinEventMode === 'mech') return true;
-    return index < skinCount(`player_${this.sim.cfg.playerClass}`);
-  }
-
-  private skinChoiceThumb(index: number): string | null {
-    return this.skinEventMode === 'mech'
-      ? visualPortraitDataUrl('player_mech', index)
-      : playerPortraitDataUrl(this.sim.cfg.playerClass, index);
-  }
-
-  /** Best choice the rolled rank unlocks AND that exists, or null. Works for
-   *  both modes via skinEventChoices(). */
-  private defaultChoiceSelection(rank: SkinRank): { index: number; key: string } | null {
-    const granted = skinRankOrder(rank);
-    let best: { index: number; key: string } | null = null;
-    let bestOrder = -1;
-    for (const ch of this.skinEventChoices()) {
-      const order = skinRankOrder(ch.rank);
-      if (order > granted || !this.skinChoiceAvailable(ch.index)) continue;
-      if (order > bestOrder) {
-        bestOrder = order;
-        best = { index: ch.index, key: ch.key };
-      }
-    }
-    return best;
-  }
-
-  /** Open the skin-select overlay for a server-rolled rank, defaulting the
-   *  selection to the best skin the rank unlocks.
-   *  `opts.mech` opens the real Combat Mech cosmetic catalog. */
-  openSkinEvent(rank: SkinRank, opts?: { mech?: boolean }): void {
-    for (let i = 0; i < 20 && this.closeAll(); i++) {
-      /* close stacked HUD overlays before the roll reveal */
-    }
-    this.skinEventRank = rank;
-    this.skinEventMode = opts?.mech ? 'mech' : 'class';
-    if (this.skinEventMode === 'mech') {
-      // Kick off the lazy asset fetch; the reveal waits on it before rendering.
-      this.mechAssetsPromise = preloadMechAssets();
-    } else {
-      this.skinEventTiers = EVENT_SKIN_TIERS;
-    }
-    this.skinEventWheelAngle = this.randomSkinEventLandingAngle(rank);
-    const selected = this.defaultChoiceSelection(rank);
-    this.skinEventSelected = selected?.index ?? -1;
-    this.skinEventSelectedKey = selected?.key ?? '';
-    this.hideTooltip();
-    // Render the tier list once data + assets are ready. For mech that means the
-    // lazy GLB/chromas; otherwise once portraits finish their boot preload.
-    const reveal = (): void => {
-      if (this.skinEventRank === null) return;
-      if (this.skinEventMode === 'mech' && this.mechAssetsPromise) {
-        void this.mechAssetsPromise.then(() => {
-          if (this.skinEventRank !== null) this.renderSkinEvent();
-        });
-      } else {
-        this.renderSkinEvent();
-      }
-    };
-    onPortraitsReady(() => {
-      if (this.skinEventEl?.classList.contains('open') && this.skinEventRevealTimer === null)
-        reveal();
-    });
-    this.renderSkinEventWheel();
-    const reduceMotion =
-      typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (this.skinEventRevealTimer !== null) window.clearTimeout(this.skinEventRevealTimer);
-    this.skinEventRevealTimer = window.setTimeout(
-      () => {
-        this.skinEventRevealTimer = null;
-        reveal();
-      },
-      reduceMotion ? 140 : 6600,
-    );
-    audio.bagOpen();
-  }
-
-  closeSkinEvent(): void {
-    if (!this.skinEventEl) return;
-    if (this.skinEventRevealTimer !== null) {
-      window.clearTimeout(this.skinEventRevealTimer);
-      this.skinEventRevealTimer = null;
-    }
-    this.skinEventEl.classList.remove('open');
-    this.skinEventTrap?.release();
-    this.skinEventTrap = null;
-    this.skinEventRank = null;
-    this.skinEventTiers = EVENT_SKIN_TIERS;
-    this.skinEventMode = 'class';
-    this.skinEventSelectedKey = '';
-    this.skinEventWheelAngle = 0;
-    audio.bagClose();
-  }
-
-  private skinTierKey(tier: SkinTier): string {
-    return `${tier.rank}:${tier.skin}`;
-  }
-
-  private randomSkinEventLandingAngle(rank: SkinRank): number {
-    // CSS wheel uses `conic-gradient(from -90deg, ...)`, so the visual centers
-    // are shifted 90deg from the raw stop midpoints. Add bounded per-roll
-    // jitter so repeat rolls of the same rarity do not stop at the same point.
-    const jitter = (span: number): number => (Math.random() - 0.5) * span;
-    switch (rank) {
-      case 'uncommon':
-        return -15 + jitter(150);
-      case 'rare':
-        return -172.5 + jitter(72);
-      case 'epic':
-        return -247.5 + jitter(28);
-    }
-    return 0;
-  }
-
-  private renderSkinEventWheel(): void {
-    const rank = this.skinEventRank;
-    if (rank === null) return;
-
-    let el = this.skinEventEl;
-    if (!el) {
-      el = document.createElement('div');
-      el.id = 'skin-event';
-      el.className = 'skin-event-overlay';
-      el.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') this.closeSkinEvent();
-      });
-      el.addEventListener('mousedown', (e) => {
-        if (e.target === el) this.closeSkinEvent();
-      });
-      document.body.appendChild(el);
-      this.skinEventEl = el;
-    }
-
-    const title = esc(t('skinEvent.title'));
-    const landed = esc(this.skinRankName(rank));
-    el.innerHTML =
-      `<div class="se-wheel-stage" role="dialog" aria-modal="true" aria-label="${title}">` +
-      `<div class="se-wheel-pointer" aria-hidden="true"></div>` +
-      `<div class="se-wheel" style="--land-angle:${this.skinEventWheelAngle}deg" aria-hidden="true">` +
-      `<svg class="se-wheel-labels" viewBox="0 0 200 200">` +
-      `<defs><path id="se-wheel-label-ring" d="M 100 25 A 75 75 0 1 1 99.9 25"/></defs>` +
-      `<text class="se-wheel-label-bg uncommon"><textPath href="#se-wheel-label-ring" startOffset="4%">${esc(this.skinRankName('uncommon'))}</textPath></text>` +
-      `<text class="se-wheel-label-bg rare"><textPath href="#se-wheel-label-ring" startOffset="48%">${esc(this.skinRankName('rare'))}</textPath></text>` +
-      `<text class="se-wheel-label-bg epic"><textPath href="#se-wheel-label-ring" startOffset="69%">${esc(this.skinRankName('epic'))}</textPath></text>` +
-      `<text class="se-wheel-label-fg"><textPath href="#se-wheel-label-ring" startOffset="4%">${esc(this.skinRankName('uncommon'))}</textPath></text>` +
-      `<text class="se-wheel-label-fg"><textPath href="#se-wheel-label-ring" startOffset="48%">${esc(this.skinRankName('rare'))}</textPath></text>` +
-      `<text class="se-wheel-label-fg"><textPath href="#se-wheel-label-ring" startOffset="69%">${esc(this.skinRankName('epic'))}</textPath></text>` +
-      `</svg>` +
-      `</div>` +
-      `<div class="se-wheel-result" style="--tier-color:${QUALITY_COLOR[rank] ?? '#fff'}">` +
-      `<span>${landed}</span>` +
-      `<i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>` +
-      `<b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b>` +
-      `<b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b></div>` +
-      `</div>`;
-    if (!this.skinEventTrap)
-      this.skinEventTrap = this.focusManager.open({ root: () => this.skinEventEl });
-    el.classList.add('open');
-  }
-
-  private renderSkinEvent(): void {
-    const rank = this.skinEventRank;
-    if (rank === null) return;
-    const cls = this.sim.cfg.playerClass;
-    const granted = skinRankOrder(rank);
-    const mech = this.skinEventMode === 'mech';
-    const previewKey = this.skinEventPreviewKey();
-
-    // Build the shell once and reuse it across opens so the single 3D canvas
-    // can be moved in/out via setContainer without being recreated.
-    let el = this.skinEventEl;
-    if (!el) {
-      el = document.createElement('div');
-      el.id = 'skin-event';
-      el.className = 'skin-event-overlay';
-      el.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') this.closeSkinEvent();
-      });
-      el.addEventListener('mousedown', (e) => {
-        if (e.target === el) this.closeSkinEvent();
-      });
-      document.body.appendChild(el);
-      this.skinEventEl = el;
-    }
-
-    const title = esc(t('skinEvent.title'));
-    const rankName = this.skinRankName(rank);
-    el.innerHTML =
-      `<div class="panel skin-event-panel" role="dialog" aria-modal="true" aria-label="${title}">` +
-      `<div class="se-body"><div class="se-left">` +
-      `<div class="se-roll-banner" style="--tier-color:${QUALITY_COLOR[rank] ?? '#fff'}">${esc(t('skinEvent.rolled', { rank: rankName }))}</div>` +
-      `<div class="se-tiers" role="radiogroup" aria-label="${title}"></div>` +
-      `<button type="button" class="btn se-lockin" data-lockin>${esc(t('skinEvent.lockIn'))}</button>` +
-      `</div><div class="se-preview-col">` +
-      `<div class="se-preview"><div class="se-preview-hint">${esc(t('skinEvent.previewHint'))}</div></div>` +
-      `<div class="se-preview-name" data-preview-name></div>` +
-      `</div></div></div>`;
-
-    const tiersEl = el.querySelector('.se-tiers') as HTMLElement;
-    const lockInBtn = el.querySelector('[data-lockin]') as HTMLButtonElement;
-    const swatches: HTMLButtonElement[] = [];
-
-    const syncSelection = (): void => {
-      let selectedCanLock = false;
-      for (const b of swatches) {
-        const sel = b.dataset.choice === this.skinEventSelectedKey;
-        b.classList.toggle('sel', sel);
-        b.setAttribute('aria-checked', String(sel));
-        b.tabIndex = sel ? 0 : -1;
-        if (sel && b.dataset.lockable === 'true') selectedCanLock = true;
-      }
-      lockInBtn.disabled = !selectedCanLock;
-    };
-
-    const nameEl = el.querySelector('[data-preview-name]') as HTMLElement;
-    const choiceName = (ch: { rank: SkinRank; id?: string }): string =>
-      mech && ch.id ? this.mechChromaName(ch.id) : this.skinRankName(ch.rank);
-
-    const select = (ch: { rank: SkinRank; index: number; key: string; id?: string }): void => {
-      this.skinEventSelected = ch.index;
-      this.skinEventSelectedKey = ch.key;
-      this.charPreview?.setSkin(ch.index);
-      nameEl.textContent = choiceName(ch);
-      syncSelection();
-      audio.click();
-    };
-
-    const choices = this.skinEventChoices();
-    // Highest rank at the top (epic → uncommon), matching the design sketch.
-    // Class mode shows one swatch per tier; mech mode shows every chroma in it.
-    for (const tierRank of [...SKIN_RANKS].reverse()) {
-      const rankChoices = choices.filter((c) => c.rank === tierRank);
-      if (!rankChoices.length) continue;
-      const order = skinRankOrder(tierRank);
-      const unlocked = order <= granted;
-      const anyAvailable = rankChoices.some((c) => this.skinChoiceAvailable(c.index));
-      const rawName = this.skinRankName(tierRank);
-      const row = document.createElement('div');
-      row.className = `se-tier${unlocked ? '' : ' locked'}`;
-      row.style.setProperty('--tier-color', QUALITY_COLOR[tierRank] ?? '#fff');
-      const hint = !unlocked
-        ? `<span class="se-tier-hint">${svgIcon('lock')}${esc(t('skinEvent.lockedHint', { rank: rawName }))}</span>`
-        : !anyAvailable
-          ? `<span class="se-tier-hint">${esc(t('skinEvent.unavailable'))}</span>`
-          : '';
-      row.innerHTML =
-        `<div class="se-tier-head"><span class="se-tier-name">${esc(rawName)}</span>${hint}</div>` +
-        `<div class="se-swatches"></div>`;
-      const swatchesEl = row.querySelector('.se-swatches') as HTMLElement;
-
-      rankChoices.forEach((ch, i) => {
-        const available = this.skinChoiceAvailable(ch.index);
-        const label = choiceName(ch);
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'se-swatch';
-        b.dataset.skin = String(ch.index);
-        b.dataset.choice = ch.key;
-        b.dataset.lockable = String(unlocked && available);
-        b.setAttribute('role', 'radio');
-        if (available) {
-          const url = this.skinChoiceThumb(ch.index);
-          if (!unlocked) b.classList.add('locked');
-          b.innerHTML = url ? `<img src="${esc(url)}" alt="">` : String(i + 1);
-          b.setAttribute(
-            'aria-label',
-            mech ? label : t('skinEvent.optionAria', { rank: rawName, index: i + 1 }),
-          );
-          b.addEventListener('click', () => select(ch));
-          this.attachTooltip(
-            b,
-            () =>
-              `<div class="tt-name">${esc(label)}</div>` +
-              (unlocked
-                ? ''
-                : `<div class="tt-sub">${esc(t('skinEvent.lockedHint', { rank: rawName }))}</div>`),
-          );
-          swatches.push(b);
-        } else {
-          b.classList.add('unavailable');
-          b.setAttribute('aria-disabled', 'true');
-          b.innerHTML = unlocked
-            ? '<span class="se-lock">—</span>'
-            : `<span class="se-lock">${svgIcon('lock')}</span>`;
-          b.setAttribute(
-            'aria-label',
-            unlocked ? t('skinEvent.unavailable') : t('skinEvent.locked'),
-          );
-          this.attachTooltip(
-            b,
-            () =>
-              `<div class="tt-name">${esc(rawName)}</div><div class="tt-sub">${esc(t('skinEvent.unavailable'))}</div>`,
-          );
-        }
-        swatchesEl.appendChild(b);
-      });
-      tiersEl.appendChild(row);
-    }
-
-    lockInBtn.addEventListener('click', () => {
-      if (this.skinEventSelected < 0 || lockInBtn.disabled) return;
-      if (mech) {
-        this.sim.claimEventSkin(this.skinEventSelected);
-        this.showBanner(t('skinEvent.unlocked'));
-        audio.levelUp();
-        this.closeSkinEvent();
-        if ($('#bags').style.display !== 'none') this.renderBags();
-        return;
-      }
-      this.sim.claimEventSkin(this.skinEventSelected);
-      this.showBanner(t('skinEvent.unlocked'));
-      audio.levelUp();
-      this.closeSkinEvent();
-      if ($('#bags').style.display !== 'none') this.renderBags();
-    });
-
-    // Show, mount the shared 3D preview into the right column, focus the choice.
-    if (!this.skinEventTrap)
-      this.skinEventTrap = this.focusManager.open({ root: () => this.skinEventEl });
-    el.classList.add('open');
-    this.mountCharPreview(
-      el.querySelector('.se-preview') as HTMLElement,
-      cls,
-      this.skinEventSelected >= 0 ? this.skinEventSelected : 0,
-      mech ? previewKey : undefined,
-    );
-    const selChoice = choices.find((c) => c.key === this.skinEventSelectedKey);
-    if (selChoice) nameEl.textContent = choiceName(selChoice);
-    syncSelection();
-    (swatches.find((b) => b.dataset.choice === this.skinEventSelectedKey) ?? swatches[0])?.focus();
-  }
-
-  // -------------------------------------------------------------------------
-  // Shareable player card. Captures a crisp close-up of the character from the
-  // character-window preview, composites it with the player's stats, gear, and
-  // $WOC holder badge, and offers share/download/publish actions. Hosting a
-  // public card link is online-only (requires the injected uploader); offline
-  // play still gets download + native share.
-  // -------------------------------------------------------------------------
-
-  private async openPlayerCard(): Promise<void> {
-    // The button lives in the character window, so the preview already exists;
-    // create it defensively in case that ever changes.
-    if (!this.charPreview) this.renderCharPreview();
-    const preview = this.charPreview;
-    if (!preview) return;
-
-    this.closePlayerCardModal(false);
-    // Pull a fresh on-chain $WOC balance so the holder badge isn't stale. The
-    // async result lands via onWalletUiChange → recomposeOpenCard (below), which
-    // re-composites the card with the current pose once the new value arrives.
-    this.optionsHooks?.refreshWocBalance();
-    this.cardModalTrap = this.focusManager.open({ root: () => this.cardModalEl });
-    const back = document.createElement('div');
-    back.className = 'modal-backdrop';
-    back.id = 'player-card-modal';
-    const poseBtns = CARD_POSES.map(
-      (p, i) =>
-        `<button type="button" class="btn pc-pose${i === 0 ? ' sel' : ''}" data-pose="${i}">${esc(t(p.labelKey))}</button>`,
-    ).join('');
-    back.innerHTML =
-      `<div class="panel pc-modal" role="dialog" aria-modal="true" aria-labelledby="player-card-modal-title">` +
-      `<div class="panel-title"><span id="player-card-modal-title">${esc(t('playerCard.title'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('playerCard.close'))}">${svgIcon('close')}</button></div>` +
-      `<div class="pc-preview pc-loading">${esc(t('playerCard.loading'))}</div>` +
-      `<div class="pc-poses" role="group" aria-label="${esc(t('playerCard.poseGroup'))}">${poseBtns}</div>` +
-      `<div class="pc-options"><button type="button" class="btn pc-wallet-toggle" data-wallet-card-toggle><span>${esc(t('hudChrome.playerCard.showWalletBadge'))}</span><span class="pc-toggle-state"></span></button></div>` +
-      `<div class="pc-actions"></div>` +
-      `<div class="pc-link" hidden><span class="pc-link-label">${esc(t('playerCard.referralLinkLabel'))}</span>` +
-      `<input class="pc-link-input" type="text" readonly aria-label="${esc(t('playerCard.referralLinkAria'))}"></div>` +
-      `<div class="pc-status" aria-live="polite"></div>` +
-      `</div>`;
-    document.body.appendChild(back);
-    this.cardModalEl = back;
-    const close = () => this.closePlayerCardModal();
-    back.addEventListener('click', (e) => {
-      if (e.target === back) close();
-    });
-    back.addEventListener('keydown', (e) => {
-      if (e.key !== 'Escape') return;
-      e.preventDefault();
-      e.stopPropagation();
-      close();
-    });
-    back.querySelector('[data-close]')?.addEventListener('click', () => {
-      audio.click();
-      close();
-    });
-    this.cardModalTrap?.focusFirst('[data-close]');
-
-    const previewBox = back.querySelector('.pc-preview') as HTMLElement;
-    const status = back.querySelector('.pc-status') as HTMLElement;
-    const linkRow = back.querySelector('.pc-link') as HTMLElement;
-    const setStatus = (msg: string) => {
-      status.textContent = msg;
-    };
-    const walletToggle = back.querySelector<HTMLButtonElement>('[data-wallet-card-toggle]');
-    const walletToggleState = walletToggle?.querySelector<HTMLElement>('.pc-toggle-state') ?? null;
-
-    // Current card state, shared with the action handlers by reference so a pose
-    // change (which re-captures + re-composites) also invalidates any publish.
-    const state: {
-      canvas: HTMLCanvasElement | null;
-      data: PlayerCardData | null;
-      published: PublishedCard | null;
-    } = { canvas: null, data: null, published: null };
-
-    const poseButtons = Array.from(back.querySelectorAll<HTMLButtonElement>('.pc-pose'));
-    let requestedPoseIndex = 0;
-    let showWalletOnCard =
-      walletDisplayAvailable() &&
-      (this.optionsHooks?.settings.get('showWalletOnPlayerCard') ?? true);
-    let metadataReady = false;
-    let referral: Awaited<ReturnType<typeof fetchReferralInfo>> = null;
-    let standing: CharacterStanding | null = null;
-    const selectPose = (poseIndex: number): void => {
-      requestedPoseIndex = poseIndex;
-      poseButtons.forEach((b, i) => {
-        b.classList.toggle('sel', i === poseIndex);
-      });
-    };
-    const syncWalletToggle = (): void => {
-      if (!walletToggle || !walletToggleState) return;
-      const on = walletDisplayAvailable() && showWalletOnCard;
-      walletToggle.classList.toggle('off', !on);
-      walletToggle.setAttribute('aria-pressed', on ? 'true' : 'false');
-      walletToggle.setAttribute('aria-label', t('hudChrome.playerCard.showWalletBadge'));
-      walletToggleState.textContent = on ? t('hud.options.on') : t('hud.options.off');
-    };
-    syncWalletToggle();
-    // Generation guard: rapid pose clicks fire concurrent async renders; only the
-    // most recent one may apply its result, or a slow earlier render could
-    // overwrite a newer pose and desync state.canvas from what's shown.
-    let composeSeq = 0;
-    const compose = async (poseIndex: number): Promise<void> => {
-      const seq = ++composeSeq;
-      const pose = CARD_POSES[poseIndex];
-      selectPose(poseIndex);
-      try {
-        const characterImage = preview.captureCloseup({
-          poseClips: pose.clips,
-          poseFraction: pose.fraction,
-        });
-        const data = this.buildPlayerCardData(
-          characterImage,
-          referral,
-          standing,
-          walletDisplayAvailable() && showWalletOnCard,
-        );
-        const canvas = await renderPlayerCardCanvas(data);
-        if (this.cardModalEl !== back || seq !== composeSeq) return; // closed or superseded
-        canvas.classList.add('pc-card-canvas');
-        previewBox.classList.remove('pc-loading');
-        previewBox.innerHTML = '';
-        previewBox.appendChild(canvas);
-        // A new pose is a different image, so any prior publish is stale.
-        state.canvas = canvas;
-        state.data = data;
-        state.published = null;
-        linkRow.hidden = true;
-        setStatus('');
-      } catch {
-        // A failed capture/composite must not leave the modal stuck on "Forging…".
-        if (this.cardModalEl !== back || seq !== composeSeq) return;
-        previewBox.classList.remove('pc-loading');
-        previewBox.textContent = t('playerCard.renderFailed');
-        setStatus(t('playerCard.renderFailedStatus'));
-      }
-    };
-
-    poseButtons.forEach((b, i) => {
-      b.addEventListener('click', () => {
-        if (requestedPoseIndex === i) return;
-        audio.click();
-        if (!metadataReady) {
-          selectPose(i);
-          return;
-        }
-        void compose(i);
-      });
-    });
-    walletToggle?.addEventListener('click', () => {
-      if (!walletDisplayAvailable()) return;
-      audio.click();
-      showWalletOnCard = !showWalletOnCard;
-      this.optionsHooks?.onSettingChange('showWalletOnPlayerCard', showWalletOnCard);
-      syncWalletToggle();
-      state.published = null;
-      linkRow.hidden = true;
-      setStatus('');
-      if (metadataReady) void compose(requestedPoseIndex);
-    });
-
-    // Re-composite the card with the current pose whenever the wallet balance
-    // (or availability) changes while this modal is open — e.g. the fresh read
-    // kicked at open lands, or tokens move during the session. Registered BEFORE
-    // the awaits below so a balance landing during that window isn't dropped; it
-    // no-ops until metadataReady, and the first compose picks up the fresh store
-    // value anyway.
-    this.recomposeOpenCard = () => {
-      if (this.cardModalEl === back && metadataReady) void compose(requestedPoseIndex);
-    };
-
-    // Referral info + realm standing are online-only (null offline). Fetch once
-    // and reuse across pose re-renders. Pose clicks before this resolves update
-    // requestedPoseIndex, so the latest visible choice renders when ready.
-    [referral, standing] = await Promise.all([fetchReferralInfo(), fetchStanding()]);
-    metadataReady = true;
-    if (this.cardModalEl !== back) return; // modal closed while awaiting
-
-    await compose(requestedPoseIndex);
-    if (this.cardModalEl !== back) return;
-    this.wireCardActions(back, state, setStatus);
-  }
-
-  private closePlayerCardModal(restoreFocus = true): void {
-    const back = this.cardModalEl;
-    if (!back) return;
-    back.remove();
-    if (this.cardModalEl === back) this.cardModalEl = null;
-    this.recomposeOpenCard = null;
-    this.cardModalTrap?.release(restoreFocus);
-    this.cardModalTrap = null;
-  }
-
-  private wireCardActions(
-    back: HTMLElement,
-    state: {
-      canvas: HTMLCanvasElement | null;
-      data: PlayerCardData | null;
-      published: PublishedCard | null;
-    },
-    setStatus: (msg: string) => void,
-  ): void {
-    const actions = back.querySelector('.pc-actions') as HTMLElement;
-    const linkRow = back.querySelector('.pc-link') as HTMLElement;
-    const linkInput = back.querySelector('.pc-link-input') as HTMLInputElement;
-    const fileName = () =>
-      `${(state.data?.referralHandle || t('playerCard.fileNameFallback')).replace(/[^a-z0-9-]/g, '')}-woc-card.png`;
-    const mkBtn = (label: string, cls = ''): HTMLButtonElement => {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.className = `btn${cls ? ` ${cls}` : ''}`;
-      b.textContent = label;
-      actions.appendChild(b);
-      return b;
-    };
-    const errMsg = () => t('playerCard.statusGenericError');
-
-    // Publish-once per pose: hosting a public card is needed for X / copy-link.
-    // The result is cached on `state` and cleared whenever the pose changes, so
-    // switching pose after publishing re-uploads the new image on next share.
-    const publishOnce = async (): Promise<PublishedCard> => {
-      if (state.published) return state.published;
-      if (!state.canvas) throw new Error(t('playerCard.statusStillRendering'));
-      setStatus(t('playerCard.statusPublishing'));
-      const pub = await publishCard(await cardCanvasToUploadBlob(state.canvas), {
-        level: state.data?.level ?? this.sim.player.level,
-      });
-      state.published = pub;
-      linkInput.value = pub.url;
-      linkRow.hidden = false;
-      setStatus(t('playerCard.statusPublished'));
-      return pub;
-    };
-
-    if (cardHostingAvailable()) {
-      const xb = mkBtn(t('playerCard.actionShareX'), 'cd-ok');
-      xb.addEventListener('click', async () => {
-        audio.click();
-        xb.disabled = true;
-        try {
-          // X's intent URL can only carry text + a link; it cannot attach media.
-          // So copy the card PNG to the clipboard first (inside the click gesture,
-          // passing the blob promise to ClipboardItem so the write stays valid
-          // while the PNG encodes) for the user to paste (⌘V) into the post. The
-          // link still rides along and unfurls the card image on a public domain.
-          let copied = false;
-          if (state.canvas && typeof ClipboardItem !== 'undefined' && navigator.clipboard?.write) {
-            try {
-              await navigator.clipboard.write([
-                new ClipboardItem({ 'image/png': cardCanvasToBlob(state.canvas) }),
-              ]);
-              copied = true;
-            } catch {
-              copied = false; /* clipboard blocked → fall back to link-only */
-            }
-          }
-          const pub = await publishOnce();
-          const text = state.data
-            ? this.cardShareText(state.data)
-            : t('playerCard.nativeShareTitle');
-          const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(pub.url)}`;
-          window.open(intent, '_blank', 'noopener,noreferrer');
-          setStatus(
-            copied ? t('playerCard.statusOpenedXWithImage') : t('playerCard.statusOpenedXWithLink'),
-          );
-        } catch {
-          setStatus(errMsg());
-        } finally {
-          xb.disabled = false;
-        }
-      });
-      const cb = mkBtn(t('playerCard.actionCopyReferral'));
-      cb.addEventListener('click', async () => {
-        audio.click();
-        cb.disabled = true;
-        try {
-          const pub = await publishOnce();
-          await navigator.clipboard.writeText(pub.url);
-          linkInput.select();
-          setStatus(t('playerCard.statusReferralCopied'));
-        } catch {
-          setStatus(errMsg());
-        } finally {
-          cb.disabled = false;
-        }
-      });
-    }
-
-    const dl = mkBtn(t('playerCard.actionDownload'));
-    dl.addEventListener('click', async () => {
-      audio.click();
-      if (!state.canvas) return;
-      const blob = await cardCanvasToBlob(state.canvas);
-      const href = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = href;
-      a.download = fileName();
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(() => URL.revokeObjectURL(href), 4000);
-      setStatus(t('playerCard.statusDownloaded'));
-    });
-
-    // Native share (mobile): share the PNG file, plus the hosted link when one
-    // is available. navigator.canShare with files is the capability gate.
-    const nav = navigator as Navigator & { canShare?: (d?: ShareData) => boolean };
-    if (typeof nav.canShare === 'function') {
-      const sb = mkBtn(t('playerCard.actionShareNative'));
-      sb.addEventListener('click', async () => {
-        audio.click();
-        if (!state.canvas) return;
-        sb.disabled = true;
-        try {
-          const file = new File([await cardCanvasToBlob(state.canvas)], fileName(), {
-            type: 'image/png',
-          });
-          const payload: ShareData = {
-            files: [file],
-            title: t('playerCard.nativeShareTitle'),
-            text: state.data ? this.cardShareText(state.data) : t('playerCard.nativeShareTitle'),
-          };
-          // Attach the hosted link when hosting is available; if publishing
-          // fails, fall back to sharing just the image file.
-          if (cardHostingAvailable()) {
-            try {
-              payload.url = (await publishOnce()).url;
-            } catch {
-              /* share file-only */
-            }
-          }
-          if (nav.canShare?.(payload)) await nav.share?.(payload);
-          else if (nav.canShare?.({ files: [file] })) await nav.share?.({ files: [file] });
-          else setStatus(t('playerCard.statusShareUnsupported'));
-        } catch (err) {
-          if (!(err instanceof Error && err.name === 'AbortError')) setStatus(errMsg());
-        } finally {
-          sb.disabled = false;
-        }
-      });
-    }
-  }
-
-  private cardShareText(data: PlayerCardData): string {
-    const tier = holderTierForBalance(data.balance);
-    const tierBit = tier ? t('playerCard.shareTierBit', { tier: holderTierDisplayName(tier) }) : '';
-    // The URL X appends to this text is the player's card page; it unfurls the
-    // card image and credits the referral when a recruit joins through it.
-    return t('playerCard.shareText', {
-      level: formatNumber(data.level, { maximumFractionDigits: 0 }),
-      className: data.className,
-      tierBit,
-    });
-  }
-
-  private buildPlayerCardData(
-    characterImage: string,
-    referral: { count: number; slug: string | null } | null,
-    standing: CharacterStanding | null,
-    showWallet: boolean,
-  ): PlayerCardData {
-    const sim = this.sim;
-    const p = sim.player;
-    const cls = sim.cfg.playerClass;
-    const classColor = `#${(p.color & 0xffffff).toString(16).padStart(6, '0')}`;
-    const num = (n: number) => formatNumber(n, { maximumFractionDigits: 0 });
-    const pct = (n: number) =>
-      `${formatNumber(n * 100, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`;
-
-    // Realm standing by lifetime XP: the same metric the in-game leaderboard
-    // ranks on (server: lifetimeXpStanding). Surfaced as a "TOP N%" flex when the
-    // realm has enough players to be meaningful and the character is in the top
-    // half, since no one wants to broadcast "Top 90%".
-    let topPercent: number | null = null;
-    if (standing && standing.total >= 5 && standing.rank >= 1) {
-      const p100 = (standing.rank / standing.total) * 100;
-      if (p100 <= 50) topPercent = p100;
-    }
-
-    const wpn = sim.equipment.mainhand ? ITEMS[sim.equipment.mainhand] : null;
-    const dps = weaponDps(wpn?.weapon, p.attackPower);
-
-    const primaryStats: PlayerCardStat[] = [
-      { label: t('itemUi.stats.str'), value: num(p.stats.str) },
-      { label: t('itemUi.stats.agi'), value: num(p.stats.agi) },
-      { label: t('itemUi.stats.sta'), value: num(p.stats.sta) },
-      { label: t('itemUi.stats.int'), value: num(p.stats.int) },
-      { label: t('itemUi.stats.spi'), value: num(p.stats.spi) },
-      { label: t('itemUi.stats.armor'), value: num(p.stats.armor) },
-    ];
-    const combatStats: PlayerCardStat[] = [
-      { label: t('itemUi.stats.attackPower'), value: num(p.attackPower) },
-      {
-        label: t('itemUi.stats.dps'),
-        value: formatNumber(dps, { minimumFractionDigits: 1, maximumFractionDigits: 1 }),
-      },
-      { label: t('itemUi.stats.critChance'), value: pct(p.critChance) },
-      { label: t('itemUi.stats.dodge'), value: pct(p.dodgeChance) },
-    ];
-    const rating = sim.arenaInfo?.rating ?? null;
-    if (rating !== null) combatStats.push({ label: t('playerCard.arenaStat'), value: num(rating) });
-    if (sim.prestigeRank > 0)
-      combatStats.push({ label: t('game.prestige.rank'), value: num(sim.prestigeRank) });
-
-    // Developer badge: a global display preference (no per-card modal toggle
-    // like the wallet flair has, since "hide dev badges" is meant to apply
-    // everywhere at once, not be re-decided per export).
-    const showDevBadges = this.optionsHooks?.settings.get('showDevBadges') ?? true;
-
-    const slots: EquipSlot[] = ['mainhand', 'chest', 'legs', 'feet'];
-    const gear = slots.map((slot) => {
-      const id = sim.equipment[slot];
-      const item = id ? ITEMS[id] : null;
-      return {
-        slot: itemSlotName(slot),
-        name: item ? itemDisplayName(item) : t('itemUi.equipment.empty'),
-        color: item ? (QUALITY_COLOR[item.quality ?? 'common'] ?? '#cfc3a0') : '#7c7058',
-      };
-    });
-
-    return {
-      name: p.name,
-      className: classDisplayName(cls),
-      classColor,
-      level: p.level,
-      realm: sim.realm,
-      characterImage,
-      primaryStats,
-      combatStats,
-      gear,
-      topPercent,
-      balance: showWallet ? verifiedWocBalance() : null,
-      devTier: showDevBadges ? (p.devTier ?? null) : null,
-      devMergedPrs: showDevBadges ? (p.devMergedPrs ?? null) : null,
-      referralHandle: referral?.slug ?? this.cardSlug(p.name),
-      referralCount: referral?.count ?? null,
-      siteUrl: 'worldofclaudecraft.com',
-    };
-  }
-
-  // Client-side mirror of the server's slugify (server/player_card.ts), used
-  // only for the footer handle preview before the card is published.
-  private cardSlug(name: string): string {
-    return name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '')
-      .slice(0, 40);
   }
 
   // -------------------------------------------------------------------------
@@ -12819,9 +10451,17 @@ export class Hud {
     const sim = this.sim;
     const vlevel = virtualLevel(sim.lifetimeXp);
     const unlocked = new Set(sim.unlockedMilestones);
-    const badges = MILESTONES.filter((m) => unlocked.has(m.id))
-      .map((m) => `<span class="ms-badge ms-${m.kind}">${this.milestoneName(m.id)}</span>`)
+    // Earned Book of Deeds border rewards join the badge row through the same
+    // ms-badge plumbing (nameplate border display is a deliberate v1 cut).
+    const borderBadges = DEED_ORDER.filter(
+      (id) => DEEDS[id].reward?.kind === 'border' && sim.deedsEarned.has(id),
+    )
+      .map((id) => `<span class="ms-badge ms-deed-border">${esc(deedName(id))}</span>`)
       .join('');
+    const badges =
+      MILESTONES.filter((m) => unlocked.has(m.id))
+        .map((m) => `<span class="ms-badge ms-${m.kind}">${this.milestoneName(m.id)}</span>`)
+        .join('') + borderBadges;
     let html = `<div class="cp-title">${t('game.progression.heading')}</div>`;
     html += `<div class="char-stats cp-stats">
       <span>${t('game.progression.totalXp')}: <b>${formatXp(sim.lifetimeXp)}</b></span>
@@ -12830,6 +10470,15 @@ export class Hud {
       html += `<span>${t('game.progression.prestigeRank')}: <b>★ ${sim.prestigeRank}</b></span>`;
     html += `</div>`;
     html += `<div class="cp-milestones"><span class="cp-ms-label">${t('game.progression.milestones')}:</span> ${badges || `<span class="cp-none">${t('game.progression.none')}</span>`}</div>`;
+    // The active Book of Deeds title line; the button opens the Book (its
+    // Titles section is one click away). Title text is deed content localized
+    // through deed_i18n, never a raw id.
+    const activeTitleText = sim.activeTitle ? deedTitleText(sim.activeTitle) : '';
+    html += `<div class="cp-milestones"><span class="cp-ms-label">${t('hudChrome.deeds.charTitleLabel')}:</span> ${
+      activeTitleText !== ''
+        ? `<b class="cp-active-title">${esc(activeTitleText)}</b>`
+        : `<span class="cp-none">${t('hudChrome.deeds.charTitleNone')}</span>`
+    } <button type="button" class="btn cp-deeds-btn" data-act="open-deeds">${t('hudChrome.deeds.charOpenBook')}</button></div>`;
     if (level >= MAX_LEVEL) {
       // The button reflects the server's authoritative prestige gate (post-cap
       // XP earned). It's disabled — and the requirement shown — until eligible;
@@ -12894,6 +10543,10 @@ export class Hud {
       `<div class="cd-actions"><button type="button" class="btn" data-cancel>${esc(cancelText)}</button><button type="button" class="btn cd-ok" data-ok>${esc(okText)}</button></div>`;
     document.body.appendChild(el);
     this.bringWindowToFront(el);
+    // A confirm prompt is the topmost modal by definition: the window band tops
+    // out at 89 and the armory inspect overlay sits at 90, so floor it above
+    // both or a purchase confirmation opens invisibly underneath.
+    el.style.zIndex = String(Math.max(Number(el.style.zIndex) || 0, 95));
     this.confirmTrap = this.focusManager.open({ root: () => el });
     el.querySelector<HTMLElement>('[data-ok]')?.focus();
     const close = () => {
@@ -13077,30 +10730,7 @@ export class Hud {
     });
     root.addEventListener('keydown', (e) => {
       const action = dropdownKeyNav(e.key, isOpen(), focusedIndex(), items.length);
-      if (action.kind === 'none') {
-        // First-letter typeahead for long listboxes (7+ options, e.g. the language
-        // picker): a single printable key jumps to the next matching option. Below
-        // the threshold, arrow navigation is enough (WAI-ARIA listbox convention).
-        if (
-          isOpen() &&
-          items.length >= TYPEAHEAD_MIN_OPTIONS &&
-          e.key.length === 1 &&
-          !e.ctrlKey &&
-          !e.altKey &&
-          !e.metaKey
-        ) {
-          const target = typeaheadTarget(
-            items.map((it) => it.textContent ?? ''),
-            focusedIndex(),
-            e.key,
-          );
-          if (target !== null) {
-            e.preventDefault();
-            items[target].focus();
-          }
-        }
-        return;
-      }
+      if (action.kind === 'none') return;
       // Tab closes the menu and returns focus to the trigger button (a real
       // tab-order element) WITHOUT preventDefault, so the native Tab/Shift+Tab
       // then deterministically advances/retreats from there. Without returning
@@ -13161,6 +10791,59 @@ export class Hud {
     this.refreshDailyRewardsLauncher(true);
   }
 
+  openWocStore(): void {
+    if (!this.dailyRewardsEnabled()) return;
+    this.dailyRewardsWindow.openStore();
+    this.refreshDailyRewardsLauncher(true);
+  }
+
+  /** Inject the online economy hooks that back the Claudium window (main.ts, online only). */
+  attachClaudium(hooks: ClaudiumHooks): void {
+    this.claudiumHooks = hooks;
+    this.syncDailyRewardsSurfaceLabels();
+    this.claudiumLauncherBalance = null;
+    this.claudiumLauncherBalanceLastMs = 0;
+    this.claudiumLauncherBalanceSeq++;
+    this.claudiumLauncherBalancePending = false;
+    this.refreshClaudiumLauncherBalance(true);
+  }
+
+  attachStorePromoCard(): void {
+    if (this.storePromoCard || !this.claudiumHooks) return;
+    const host = document.getElementById('chatlog-wrap');
+    if (!host) return;
+    this.storePromoCard = mountStorePromoCard(host, {
+      labels: {
+        open: t('hudChrome.wocStore.title'),
+        close: t('hudChrome.wocStore.close'),
+        season: t('hudChrome.wocStore.seasonOne'),
+        title: t('hudChrome.wocStore.armoryTitle'),
+        cta: t('hudChrome.wocStore.title'),
+      },
+      returnFocusTo: () => document.getElementById('daily-rewards-button'),
+      onOpenStore: () => this.openWocStore(),
+      onDismiss: () => {
+        this.storePromoCard = null;
+      },
+    });
+    this.chatGeometry.reapply();
+  }
+
+  /**
+   * Open or close the Claudium store. Always renders: with no hooks (offline or the
+   * service off) the window shows its clean disabled state, never a boot crash.
+   */
+  toggleClaudium(): void {
+    if (!this.claudiumHooks) return;
+    this.claudiumWindow.toggle();
+  }
+
+  async refreshClaudium(): Promise<void> {
+    this.refreshClaudiumLauncherBalance(true);
+    if (!this.claudiumWindow.isOpen) return;
+    await this.claudiumWindow.render();
+  }
+
   // -------------------------------------------------------------------------
   // Spellbook
   // -------------------------------------------------------------------------
@@ -13192,11 +10875,19 @@ export class Hud {
 
   // Restore a saved loadout's action bar into the per-class slot map (reuses the
   // existing hotbar persistence; only places ids that resolve to real abilities).
+  // A SavedLoadout's bar is ability ids only (currentBar strips item shortcuts
+  // before saving, see the talentsWindow deps below), so this must not replace
+  // the WHOLE bar wholesale: that would also silently clear any potion/food/drink
+  // shortcut the player had placed, since the loadout never recorded it either
+  // way (#1889). applyLoadoutBarActions keeps an existing item slot wherever the
+  // loadout leaves that slot blank.
   private applyLoadoutBar(bar: (string | null)[]): void {
-    this.hotbarActions = Array.from({ length: Hud.BAR_ABILITY_SLOTS }, (_, i) => {
-      const v = bar[i];
-      return typeof v === 'string' && ABILITIES[v] ? { type: 'ability' as const, id: v } : null;
-    });
+    this.hotbarActions = applyLoadoutBarActions(
+      this.hotbarActions,
+      bar,
+      Hud.BAR_ABILITY_SLOTS,
+      (id) => !!ABILITIES[id],
+    );
     this.saveSlotMap();
   }
 
@@ -13290,11 +10981,33 @@ export class Hud {
     // Hoist the cheap signature (a single string pass, no intermediate arrays) AHEAD
     // of the selector so an unchanged party short-circuits before selectPartyFrameMembers
     // allocates its sorted / filtered / mapped arrays.
-    const sig = partyFrameSignature(info, this.sim.playerId, this.sim.player.pos);
+    const settings = this.optionsHooks?.settings;
+    const config = {
+      showSelf: settings?.get('partyFrameShowSelf') ?? false,
+      showResource: settings?.get('partyFrameShowResource') ?? true,
+      showAbsorbs: settings?.get('partyFrameShowAbsorbs') ?? true,
+      showAuras: settings?.get('partyFrameShowAuras') ?? true,
+      presentation: Math.round(settings?.get('partyFrameStyle') ?? 0) as 0 | 1 | 2,
+      healthText: Math.round(settings?.get('partyFrameHealthText') ?? 1) as 0 | 1 | 2 | 3,
+      sort: Math.round(settings?.get('partyFrameSort') ?? 0) as 0 | 1 | 2,
+    };
+    const sig = partyFrameSignature(
+      info,
+      this.sim.playerId,
+      this.sim.player.pos,
+      undefined,
+      config,
+    );
     if (sig === this.lastPartySig) return;
     this.lastPartySig = sig;
-    const others = selectPartyFrameMembers(info, this.sim.playerId, this.sim.player.pos);
-    this.partyFramesPainter.sync(others, info.leader, info.raid);
+    const others = selectPartyFrameMembers(
+      info,
+      this.sim.playerId,
+      this.sim.player.pos,
+      undefined,
+      config,
+    );
+    this.partyFramesPainter.sync(others, info.leader, info.raid, config);
     // Re-dock the Loot Settings panel below the (just re-synced) party frames when their
     // size changes (row count / raid grouping). Gated so the layout measure runs on a real
     // geometry change, not every combat tick; positionLootSettingsPanel honors a manual drag.
@@ -13311,36 +11024,25 @@ export class Hud {
   // Context menu on players
   // -------------------------------------------------------------------------
 
-  private openSelfContextMenu(x: number, y: number): void {
+  private openSelfContextMenu(x: number, y: number, opener: HTMLElement | null = null): void {
     const el = $('#ctx-menu');
+    this.ctxMenuOpener = opener;
     const party = this.sim.partyInfo;
-    const canConvert =
-      !!party && party.leader === this.sim.playerId && !party.raid && party.members.length >= 5;
-    const canUnconvert =
-      !!party && party.leader === this.sim.playerId && party.raid && party.members.length <= 5;
     let html = `<div class="ctx-title ctx-title-player">${portraitChipHtml({ cls: this.sim.cfg.playerClass, skin: this.sim.player.skin ?? 0, name: this.sim.player.name, variant: 'sm' })}<span class="ctx-title-name">${esc(this.sim.player.name)}</span></div>`;
-    if (canConvert)
-      html += `<div class="ctx-item" data-act="convert-raid">${esc(t('hud.chat.context.convertToRaid'))}</div>`;
-    if (canUnconvert)
-      html += `<div class="ctx-item" data-act="convert-party">${esc(t('hud.chat.context.convertToParty'))}</div>`;
-    if (party)
-      html += `<div class="ctx-item" data-act="loot-settings">${esc(t('hudChrome.lootSettings.menuItem'))}</div>`;
-    // Dungeon difficulty (classic portrait-menu placement): the label states
-    // the ACTION (switch to the other difficulty). Solo players and party
-    // leaders only; the sim refuses the change from other members. The
-    // confirmation toast comes back from the sim ("Dungeon difficulty set
-    // to ..."), re-localized by sim_i18n like every sim emit.
-    if (!party || party.leader === this.sim.playerId) {
-      const isHeroic = this.sim.dungeonDifficulty() === 'heroic';
-      html += `<div class="ctx-item" data-act="dungeon-difficulty">${esc(
-        t(
-          isHeroic
-            ? 'hudChrome.dungeonDifficulty.setNormal'
-            : 'hudChrome.dungeonDifficulty.setHeroic',
-        ),
-      )}</div>`;
+    // Party membership actions (convert, loot, leave), the dungeon-difficulty
+    // toggle, the reset-dungeons action, and close, resolved by the pure
+    // selfPlayerContextActions. Leaving the party lives here now, not a
+    // permanent button under the party frames.
+    const actions = selfPlayerContextActions({
+      inParty: !!party,
+      isLeader: party?.leader === this.sim.playerId,
+      isRaid: party?.raid ?? false,
+      partySize: party?.members.length ?? 1,
+      isHeroic: this.sim.dungeonDifficulty() === 'heroic',
+    });
+    for (const action of actions) {
+      html += `<div class="ctx-item" data-act="${action.id}">${esc(action.label)}</div>`;
     }
-    html += `<div class="ctx-item" data-act="close">${esc(t('hud.chat.context.cancel'))}</div>`;
     el.innerHTML = html;
     hydratePortraits(el);
     el.style.display = 'block';
@@ -13356,9 +11058,18 @@ export class Hud {
         this.sim.convertRaidToParty();
         this.socialWindow.selectRaidTab();
       } else if (act === 'loot-settings') this.openLootSettings();
+      else if (act === 'leave-party') this.sim.partyLeave();
       else if (act === 'dungeon-difficulty') {
         this.sim.setDungeonDifficulty(
           this.sim.dungeonDifficulty() === 'heroic' ? 'normal' : 'heroic',
+        );
+      } else if (act === 'reset-dungeons') {
+        this.confirmDialog(
+          t('hudChrome.dungeonDifficulty.resetConfirmTitle'),
+          t('hudChrome.dungeonDifficulty.resetConfirmBody'),
+          t('hudChrome.dungeonDifficulty.resetConfirm'),
+          t('hud.chat.context.cancel'),
+          () => this.sim.chat('/dungeon reset'),
         );
       }
     });
@@ -13388,26 +11099,102 @@ export class Hud {
     }
   }
 
+  /**
+   * The stream-link rows both player menus share. Resolved by NAME through
+   * IWorld.accountFlair, which works for a player far outside your ~120yd interest
+   * scope (a name you only ever saw in chat); the live entity's wire fields are the
+   * fallback for the in-view case. streamerMenuActions re-validates every URL, so a
+   * link that is not a plain https URL on that platform's own host never becomes a
+   * row at all.
+   */
+  private streamerLinksFor(name: string, ent?: Entity): StreamerLinks | undefined {
+    return (
+      this.sim.accountFlair(name)?.links ?? (ent?.kind === 'player' ? ent.streamerLinks : undefined)
+    );
+  }
+
+  private streamerActionsFor(name: string, ent?: Entity): PlayerContextAction[] {
+    return streamerMenuActions(this.streamerLinksFor(name, ent));
+  }
+
+  /**
+   * Is this account AI-operated? Same two sources, same precedence as
+   * streamerLinksFor: the by-name flair cache first (so it resolves for a player who
+   * is nowhere near you and only ever spoke in chat), then the live entity.
+   */
+  private isAiAccount(name: string, ent?: Entity): boolean {
+    return (
+      this.sim.accountFlair(name)?.ai ?? (ent?.kind === 'player' ? ent.aiAccount === true : false)
+    );
+  }
+
+  /**
+   * The player-menu header: portrait chip, then the name, with the [AI] mark inside
+   * the name span rather than beside it. The header is a flex row with a wide gap, so
+   * a sibling tag would drift away from the name it qualifies; nested, it stays glued
+   * to the name and the name's ellipsis still governs the overflow. Shared by both
+   * player menus (chat-name and nameplate) so the two cannot drift apart.
+   */
+  private ctxPlayerTitleHtml(name: string, entCls: PlayerClass | null, ent?: Entity): string {
+    const chip = entCls
+      ? portraitChipHtml({ cls: entCls, skin: ent?.skin ?? 0, name, variant: 'sm' })
+      : '';
+    const label = esc(t('hudChrome.playerMenu.aiTagTitle'));
+    const ai = this.isAiAccount(name, ent)
+      ? `<span class="ai-tag ctx-title-ai" role="img" aria-label="${label}" title="${label}">${esc(t('hudChrome.playerMenu.aiTag'))}</span>`
+      : '';
+    return `<div class="ctx-title ctx-title-player">${chip}<span class="ctx-title-name">${ai}${esc(name)}</span></div>`;
+  }
+
+  /**
+   * NEVER interpolate `action.href` into this markup, not even inside a quoted
+   * attribute. A streamer link is operator-entered text, and while
+   * normalizeStreamerLink pins it to an https URL on the platform's own host, the
+   * WHATWG URL parser leaves a single quote (and `&`) UNENCODED in the path: a
+   * legal-but-hostile `https://twitch.tv/a'onmouseover=alert(1)'` would break out
+   * of a single-quoted or unquoted attribute. The href is deliberately kept in the
+   * JS `actions` array and handed straight to window.open by openStreamerLink, so
+   * it never becomes HTML. Only the fixed enum id, the fixed-registry icon, and an
+   * esc()'d t() label are interpolated here. tests/chat_context_menu.test.ts pins this.
+   */
+  private ctxItemHtml(action: PlayerContextAction): string {
+    const icon = action.icon ? svgIcon(action.icon) : '';
+    return `<div class="ctx-item${action.icon ? ' ctx-stream' : ''}" data-act="${action.id}">${icon}${esc(action.label)}</div>`;
+  }
+
+  /**
+   * Open a stream-link row's channel, if `act` is one; false for every other row.
+   * The URL is re-validated HERE, at click time, even though the server validated it
+   * on write and streamerLinkList validated it again when the row was built: this is
+   * the last gate before an operator-entered string reaches window.open.
+   */
+  private openStreamerLink(act: string, actions: PlayerContextAction[]): boolean {
+    const platform = streamerActionPlatform(act as PlayerContextActionId);
+    if (!platform) return false;
+    const url = normalizeStreamerLink(platform, actions.find((a) => a.id === act)?.href);
+    if (url) window.open(url, '_blank', 'noopener,noreferrer');
+    return true;
+  }
+
   openContextMenu(pid: number, name: string, x: number, y: number): void {
     const el = $('#ctx-menu');
     const party = this.sim.partyInfo;
     const isLeader = party?.leader === this.sim.playerId;
     const isMember = !!party?.members.some((m) => m.pid === pid);
-    // online play exposes persistent friends/ignore/guild; offline falls back
-    // to the client-only chat ignore stored in localStorage
-    const online = this.sim.socialInfo !== null;
-    const social = this.sim.socialInfo;
-    const isFriend = !!social?.friends.some((f) => f.name === name);
-    const inGuildWithInvite = !!social?.guild && social.guild.rank !== 'member';
-    const alreadyGuilded = !!social?.guild?.members.some((m) => m.name === name);
-    const ignored = online
-      ? !!social?.blocks.some((b) => b.name === name)
-      : this.isChatIgnored(name);
+    // Same flag resolution the chat-name menu uses, so the two menus can never
+    // disagree about whether this player is muted, blocked, friended or guilded.
+    const flags = this.playerSocialFlags(name);
+    const { online, isFriend, ignored, blocked } = flags;
+    const inGuildWithInvite = flags.canGuildInvite;
+    const alreadyGuilded = flags.alreadyGuilded;
     const ent = this.sim.entities.get(pid);
     const entCls = ent && ent.kind === 'player' ? (ent.templateId as PlayerClass) : null;
-    let html = `<div class="ctx-title ctx-title-player">${entCls ? portraitChipHtml({ cls: entCls, skin: ent?.skin ?? 0, name, variant: 'sm' }) : ''}<span class="ctx-title-name">${esc(name)}</span></div>`;
-    if (entCls)
-      html += `<div class="ctx-item" data-act="inspect">${esc(t('character.viewProfile'))}</div>`;
+    // An official streamer's own channels lead, right under the title, exactly as
+    // they do on the chat-name menu (both build their rows from streamerMenuActions).
+    const streamActions = this.streamerActionsFor(name, ent);
+    let html = this.ctxPlayerTitleHtml(name, entCls, ent);
+    html += streamActions.map((a) => this.ctxItemHtml(a)).join('');
+    html += `<div class="ctx-item" data-act="info">${esc(t('hudChrome.playerMenu.info'))}</div>`;
     if (pid !== this.sim.playerId)
       html += `<div class="ctx-item" data-act="whisper">${esc(t('hud.chat.context.whisper'))}</div>`;
     if (!isMember)
@@ -13418,17 +11205,9 @@ export class Hud {
       html += `<div class="ctx-item" data-act="${isFriend ? 'unfriend' : 'friend'}">${esc(t(isFriend ? 'hud.chat.context.removeFriend' : 'hud.chat.context.addFriend'))}</div>`;
     if (inGuildWithInvite && !alreadyGuilded)
       html += `<div class="ctx-item" data-act="ginvite">${esc(t('hud.chat.context.inviteGuild'))}</div>`;
-    html += `<div class="ctx-item" data-act="ignore">${esc(
-      t(
-        ignored
-          ? online
-            ? 'hud.chat.context.unignore'
-            : 'hud.chat.context.unignoreChat'
-          : online
-            ? 'hud.chat.context.ignore'
-            : 'hud.chat.context.ignoreChat',
-      ),
-    )}</div>`;
+    html += `<div class="ctx-item" data-act="ignore">${esc(t(ignored ? 'hud.chat.context.unignore' : 'hud.chat.context.ignore'))}</div>`;
+    if (online)
+      html += `<div class="ctx-item" data-act="block">${esc(t(blocked ? 'hudChrome.playerMenu.unblock' : 'hudChrome.playerMenu.block'))}</div>`;
     if (this.reportHooks && pid !== this.sim.playerId)
       html += `<div class="ctx-item" data-act="report">${esc(t('hud.chat.context.report'))}</div>`;
     if (isLeader && isMember && pid !== this.sim.playerId) {
@@ -13451,7 +11230,8 @@ export class Hud {
     this.placePopupAt(el, x, y, 170, ctxReserveBottom);
     this.keepPopupOnScreen(el);
     this.bindContextMenuActions((act) => {
-      if (act === 'inspect') this.openInspect(pid);
+      if (this.openStreamerLink(act, streamActions)) return;
+      if (act === 'info') this.openPlayerInfo(name, pid);
       else if (act === 'whisper') this.startWhisper(name);
       else if (act === 'invite') this.sim.partyInvite(pid);
       else if (act === 'trade') this.sim.tradeRequest(pid);
@@ -13459,11 +11239,9 @@ export class Hud {
       else if (act === 'friend') this.sim.friendAdd(name);
       else if (act === 'unfriend') this.sim.friendRemove(name);
       else if (act === 'ginvite') this.sim.guildInvite(name);
-      else if (act === 'ignore') {
-        if (online) {
-          ignored ? this.sim.blockRemove(name) : this.sim.blockAdd(name);
-        } else this.toggleChatIgnore(name);
-      } else if (act === 'report') this.openReportWindow({ pid, name });
+      else if (act === 'ignore') this.togglePlayerIgnore(name, ignored);
+      else if (act === 'block') this.togglePlayerBlock(name, blocked);
+      else if (act === 'report') this.openReportWindow({ pid, name });
       else if (act === 'promote') this.sim.partyPromote(pid);
       else if (act === 'kick') this.sim.partyKick(pid);
       else if (act === 'loot-settings') this.openLootSettings();
@@ -13478,9 +11256,13 @@ export class Hud {
     const tier = target.discordTier ?? 0;
     const showDevBadges = this.optionsHooks?.settings.get('showDevBadges') ?? true;
     const devIdx = showDevBadges ? (target.devTier ?? 0) : 0;
+    // The AI mark rides this line too, so it has to be in BOTH the early-out below
+    // and the signature: without it an AI account carrying no Discord/dev flair
+    // would never render the line at all, and a live flag flip would never repaint.
+    const isAi = target.aiAccount === true;
     if (
       target.kind !== 'player' ||
-      (!tier && !target.discordName && !target.discordRole && !devIdx)
+      (!tier && !target.discordName && !target.discordRole && !devIdx && !isAi)
     ) {
       if (this.targetDiscordSig !== '') {
         this.targetDiscordSig = '';
@@ -13492,7 +11274,7 @@ export class Hud {
     // This runs every frame the target frame updates; only rebuild when the Discord
     // content actually changes (else a fresh <img> per frame would re-fetch the
     // avatar and, on a failing CDN load, flicker between the broken glyph and hidden).
-    const sig = `${tier}|${target.discordName ?? ''}|${target.discordRole ?? ''}|${target.discordAvatar ?? ''}|${devIdx}`;
+    const sig = `${tier}|${target.discordName ?? ''}|${target.discordRole ?? ''}|${target.discordAvatar ?? ''}|${devIdx}|${isAi ? 1 : 0}`;
     if (sig === this.targetDiscordSig) return;
     this.targetDiscordSig = sig;
     const parts: string[] = [];
@@ -13515,6 +11297,20 @@ export class Hud {
     if (devDef) {
       parts.push(`<span class="uf-dc-chip dev">${esc(devTierDisplayName(devDef))}</span>`);
     }
+    if (isAi) {
+      // The shared .ai-tag mark, and deliberately NOT a .uf-dc-chip: the chip rules
+      // live UNLAYERED in index.extra.css, and unlayered CSS beats every @layer rule,
+      // so the chip's own color/background would override the gradient in
+      // @layer components and paint straight over it. The flair line is a flex row,
+      // so a bare span sits inline beside the chips anyway.
+      parts.push(
+        // role=img + aria-label, not just title: this is a DISCLOSURE, and assistive
+        // tech announces `title` inconsistently on a non-focusable span. Screen-reader
+        // users must hear "AI-operated account", not the bare "[AI]" literal (or, if
+        // the title is skipped entirely, nothing at all). Mirrors chatAiTagEl.
+        `<span class="ai-tag" role="img" aria-label="${esc(t('hudChrome.playerMenu.aiTagTitle'))}" title="${esc(t('hudChrome.playerMenu.aiTagTitle'))}">${esc(t('hudChrome.playerMenu.aiTag'))}</span>`,
+      );
+    }
     el.innerHTML = parts.join('');
     // Hide the external Discord avatar if its CDN image fails to load, so the line
     // never shows the browser's broken-image placeholder (the nickname stays).
@@ -13525,6 +11321,39 @@ export class Hud {
 
   /** Inspect another player: a profile window with their portrait, name, level
    *  and class — rendered locally from their entity's class + skin. */
+  /**
+   * The out-of-range Player Info card: the same #inspect-window, painted from the
+   * public character sheet. Deliberately thinner than openInspect: no worn gear,
+   * no wallet balance, no Discord/GitHub identity. Those live on the per-entity
+   * wire and stay proximity-gated, so standing next to someone still shows you
+   * strictly more than looking their name up from chat.
+   */
+  private openRemoteProfile(profile: CharacterProfile): void {
+    const cls = profile.cls as PlayerClass;
+    const el = $('#inspect-window');
+    this.closeOtherWindows('#inspect-window');
+    const guildHtml = profile.guild ? `<div class="inspect-meta">${esc(profile.guild)}</div>` : '';
+    el.innerHTML =
+      `<div class="panel-title"><span>${esc(t('character.profile'))}</span>` +
+      `<button type="button" class="x-btn" data-close aria-label="${esc(t('character.closeProfile'))}">${svgIcon('close')}</button></div>` +
+      `<div class="inspect-card">` +
+      portraitChipHtml({ cls, skin: profile.skin, name: profile.name, variant: 'lg' }) +
+      `<div class="inspect-name">${esc(profile.name)}</div>` +
+      `<div class="inspect-meta">${esc(
+        t('itemUi.equipment.levelClass', {
+          level: formatNumber(profile.level, { maximumFractionDigits: 0 }),
+          className: classDisplayName(cls),
+        }),
+      )}</div>` +
+      guildHtml +
+      `</div>`;
+    hydratePortraits(el);
+    el.querySelector('[data-close]')?.addEventListener('click', () => {
+      el.style.display = 'none';
+    });
+    el.style.display = 'block';
+  }
+
   openInspect(pid: number): void {
     const e = this.sim.entities.get(pid);
     if (e?.kind !== 'player') return;
@@ -13600,8 +11429,13 @@ export class Hud {
       `<div class="panel-title"><span>${esc(t('character.profile'))}</span>` +
       `<button type="button" class="x-btn" data-close aria-label="${esc(t('character.closeProfile'))}">${svgIcon('close')}</button></div>` +
       `<div class="inspect-card">` +
-      portraitChipHtml({ cls, skin: e.skin ?? 0, name: e.name, variant: 'lg' }) +
+      portraitChipHtml({ cls, skin: e.skin ?? 0, name: e.name, variant: 'lg', framing: 'body' }) +
       `<div class="inspect-name">${esc(e.name)}</div>` +
+      // The active Book of Deeds title (the entity `title` wire field, a deed
+      // id): a subtitle line under the name, exactly the nameplate surface.
+      (e.title && deedTitleText(e.title) !== ''
+        ? `<div class="inspect-title">${esc(deedTitleText(e.title))}</div>`
+        : '') +
       `<div class="inspect-meta">${esc(t('itemUi.equipment.levelClass', { level: formatNumber(e.level, { maximumFractionDigits: 0 }), className }))}</div>` +
       holderHtml +
       discordHtml +
@@ -13806,59 +11640,88 @@ export class Hud {
     });
   }
 
-  private openChatPlayerContextMenu(name: string, x: number, y: number): void {
+  private openChatPlayerContextMenu(
+    name: string,
+    x: number,
+    y: number,
+    opener?: HTMLElement,
+  ): void {
     const el = $('#ctx-menu');
-    const online = this.sim.socialInfo !== null;
-    const social = this.sim.socialInfo;
-    const isFriend = !!social?.friends.some((f) => f.name === name);
-    const canGuildInvite = !!social?.guild && social.guild.rank !== 'member';
-    const alreadyGuilded = !!social?.guild?.members.some((m) => m.name === name);
-    const ignored = online
-      ? !!social?.blocks.some((b) => b.name === name)
-      : this.isChatIgnored(name);
+    // Clicking the same name twice closes the menu. Without this branch, the
+    // outside-click dismiss refuses to close a menu whose opener was clicked
+    // (it treats the opener as "inside"), so the second click would silently
+    // re-open it instead of toggling it shut.
+    if (opener && el.style.display === 'block' && this.ctxMenuOpener === opener) {
+      this.closeContextMenu();
+      return;
+    }
+    const flags = this.playerSocialFlags(name);
+    // A portrait chip only when the player is close enough to have a live entity;
+    // for a name seen in /world or /lfg the title is name-only. Player Info still
+    // works either way (it falls back to the public character sheet).
+    const livePidForMenu = this.playerPidByName(name);
+    const ent = livePidForMenu !== null ? this.sim.entities.get(livePidForMenu) : undefined;
     const actions = chatPlayerContextActions({
       playerName: name,
       selfName: this.sim.player.name,
-      online,
-      isFriend,
-      ignored,
-      canGuildInvite,
-      alreadyGuilded,
+      online: flags.online,
+      isFriend: flags.isFriend,
+      ignored: flags.ignored,
+      blocked: flags.blocked,
+      canGuildInvite: flags.canGuildInvite,
+      alreadyGuilded: flags.alreadyGuilded,
       canReport: !!this.reportHooks?.submitByName,
+      streamerLinks: this.streamerLinksFor(name, ent),
     });
-    // If the player is in view we know their class+skin, so show a portrait and
-    // a "View Profile" entry; otherwise the menu is name-only as before.
-    const livePidForMenu = this.playerPidByName(name);
-    const ent = livePidForMenu !== null ? this.sim.entities.get(livePidForMenu) : undefined;
     const entCls = ent && ent.kind === 'player' ? (ent.templateId as PlayerClass) : null;
-    const titleHtml = `<div class="ctx-title ctx-title-player">${entCls ? portraitChipHtml({ cls: entCls, skin: ent?.skin ?? 0, name, variant: 'sm' }) : ''}<span class="ctx-title-name">${esc(name)}</span></div>`;
-    const inspectHtml = entCls
-      ? `<div class="ctx-item" data-act="inspect">${esc(t('character.viewProfile'))}</div>`
-      : '';
-    el.innerHTML =
-      titleHtml +
-      inspectHtml +
-      actions.map((a) => `<div class="ctx-item" data-act="${a.id}">${esc(a.label)}</div>`).join('');
+    const titleHtml = this.ctxPlayerTitleHtml(name, entCls, ent);
+    el.innerHTML = titleHtml + actions.map((a) => this.ctxItemHtml(a)).join('');
     hydratePortraits(el);
     el.style.display = 'block';
-    this.placePopupAt(el, x, y, 170, 240);
+    // Reserve the real height (title + one row per action) instead of a fixed 240,
+    // which the mobile 40px item floor now overflows.
+    const reserveBottom = 80 + actions.length * (this.isMobileLayout() ? 44 : 28);
+    this.placePopupAt(el, x, y, 170, reserveBottom);
     this.keepPopupOnScreen(el);
+    this.ctxMenuOpener = opener ?? null;
     this.bindContextMenuActions((act) => {
+      if (this.openStreamerLink(act, actions)) return;
       const livePid = this.playerPidByName(name);
-      if (act === 'inspect') {
-        if (livePid !== null) this.openInspect(livePid);
-      } else if (act === 'whisper') this.startWhisper(name);
+      if (act === 'info') this.openPlayerInfo(name, livePid);
+      else if (act === 'whisper') this.startWhisper(name);
       else if (act === 'invite') {
+        // Route by NAME, not by pid: a chat name from /world, /lfg or /guild has
+        // no entity inside our ~120yd interest scope, but the server-side sim
+        // resolves /invite against every player on the realm.
         if (livePid !== null) this.sim.partyInvite(livePid);
-        else this.showError(t('hud.system.playerNotNearby'));
+        else this.sim.chat(`/invite ${name}`);
       } else if (act === 'friend') this.sim.friendAdd(name);
       else if (act === 'unfriend') this.sim.friendRemove(name);
       else if (act === 'ginvite') this.sim.guildInvite(name);
-      else if (act === 'ignore') {
-        if (online) {
-          ignored ? this.sim.blockRemove(name) : this.sim.blockAdd(name);
-        } else this.toggleChatIgnore(name);
-      } else if (act === 'report') this.openReportWindow({ name });
+      else if (act === 'ignore') this.togglePlayerIgnore(name, flags.ignored);
+      else if (act === 'block') this.togglePlayerBlock(name, flags.blocked);
+      else if (act === 'report') this.openReportWindow({ name });
+    });
+  }
+
+  /**
+   * Player Info for a name. In view we have the live entity, so open the full
+   * inspect card (gear + $WOC/Discord/dev flair, all of which ride the
+   * proximity-gated entity wire). Out of view, fall back to the PUBLIC character
+   * sheet, which is the same subset the crawlable /c/<name> page already serves,
+   * so looking someone up from chat exposes nothing new about them.
+   */
+  private openPlayerInfo(name: string, pid: number | null): void {
+    if (pid !== null && this.sim.entities.get(pid)?.kind === 'player') {
+      this.openInspect(pid);
+      return;
+    }
+    void this.sim.characterProfile(name).then((profile) => {
+      if (!profile) {
+        this.showError(t('hudChrome.playerMenu.profileUnavailable', { name }));
+        return;
+      }
+      this.openRemoteProfile(profile);
     });
   }
 
@@ -13974,43 +11837,53 @@ export class Hud {
     return keyByMessage[text] ? t(keyByMessage[text]) : t('hud.report.failed');
   }
 
-  private chatIgnoreKey(name: string): string {
-    return name.trim().toLowerCase();
+  /** The per-player flags both context menus render from. */
+  private playerSocialFlags(name: string): PlayerSocialFlags {
+    return resolvePlayerSocialFlags(name, this.sim.socialInfo, this.localIgnoredNames);
   }
 
-  private isChatIgnored(name: string): boolean {
-    return this.ignoredChatNames.has(this.chatIgnoreKey(name));
-  }
-
-  private loadIgnoredChatNames(): Set<string> {
+  private loadLocalIgnoredNames(): Set<string> {
     try {
-      const raw = localStorage.getItem(IGNORED_CHAT_NAMES_KEY);
-      const parsed = raw ? JSON.parse(raw) : [];
-      return new Set(
-        Array.isArray(parsed)
-          ? parsed.filter((name): name is string => typeof name === 'string')
-          : [],
-      );
+      return parseIgnoreList(localStorage.getItem(LOCAL_IGNORES_KEY));
     } catch {
       return new Set();
     }
   }
 
-  private saveIgnoredChatNames(): void {
-    localStorage.setItem(IGNORED_CHAT_NAMES_KEY, JSON.stringify([...this.ignoredChatNames]));
+  private saveLocalIgnoredNames(): void {
+    try {
+      localStorage.setItem(LOCAL_IGNORES_KEY, serializeIgnoreList(this.localIgnoredNames));
+    } catch {
+      // a full or blocked localStorage must never break chat
+    }
   }
 
-  private toggleChatIgnore(name: string): void {
-    const key = this.chatIgnoreKey(name);
+  /**
+   * Toggle an ignore. Online the server owns the list (it is what filters the
+   * chat before it ever reaches us, and it follows the account to another
+   * browser); offline there is no server, so the local set is the whole store.
+   */
+  private togglePlayerIgnore(name: string, ignored: boolean): void {
+    if (this.sim.socialInfo !== null) {
+      ignored ? this.sim.ignoreRemove(name) : this.sim.ignoreAdd(name);
+      return;
+    }
+    const key = ignoreKey(name);
     if (!key) return;
-    if (this.ignoredChatNames.has(key)) {
-      this.ignoredChatNames.delete(key);
+    if (this.localIgnoredNames.has(key)) {
+      this.localIgnoredNames.delete(key);
       this.log(t('hud.system.noLongerIgnoring', { name }), '#aaf');
     } else {
-      this.ignoredChatNames.add(key);
+      this.localIgnoredNames.add(key);
       this.log(t('hud.system.ignoringChat', { name }), '#aaf');
     }
-    this.saveIgnoredChatNames();
+    this.saveLocalIgnoredNames();
+  }
+
+  /** Blocking is a server-side social action, so it only exists online. */
+  private togglePlayerBlock(name: string, blocked: boolean): void {
+    if (this.sim.socialInfo === null) return;
+    blocked ? this.sim.blockRemove(name) : this.sim.blockAdd(name);
   }
 
   closeContextMenu(): void {
@@ -14031,6 +11904,10 @@ export class Hud {
 
   toggleSocial(): void {
     this.socialWindow.toggle();
+  }
+
+  toggleDevCommandWindow(): boolean {
+    return this.devCommandWindow.toggle();
   }
 
   // Open the chat bar pre-filled with a whisper to this player (classic-MMO-style DM).
@@ -14181,13 +12058,7 @@ export class Hud {
     cancelBtn.className = 'btn';
     cancelBtn.textContent = t('hud.trade.cancel');
     cancelBtn.addEventListener('click', () => this.sim.tradeCancel());
-    // One wrapper row for the primary actions: on touch it rides sticky at the
-    // window bottom so Accept/Cancel never sit below the fold of the root
-    // scroller on a short landscape phone (live bug, PR #1736 audit).
-    const actions = document.createElement('div');
-    actions.className = 'trade-actions';
-    actions.append(acceptBtn, cancelBtn);
-    el.append(actions);
+    el.append(acceptBtn, cancelBtn);
     el.querySelector('[data-close]')?.addEventListener('click', () => this.sim.tradeCancel());
     el.querySelectorAll('.trade-item.mine').forEach((row) => {
       row.addEventListener('click', () => {
@@ -14234,6 +12105,12 @@ export class Hud {
     this.bugReportHooks = hooks;
   }
 
+  // Wired by main.ts to toggleDiscordPanel, giving the desktop micro-menu
+  // (#mm-discord) a discoverable path to the same panel the 'U' keybind opens.
+  attachDiscordHook(toggle: () => void): void {
+    this.discordHook = toggle;
+  }
+
   get optionsOpen(): boolean {
     return this.optionsWindow.isOpen;
   }
@@ -14244,7 +12121,7 @@ export class Hud {
       this.optionsOpen ||
       this.emoteWheelOpen ||
       $('#emote-editor').style.display === 'block' ||
-      this.cardModalEl !== null
+      this.playerCard.isOpen
     );
   }
 
@@ -14265,51 +12142,6 @@ export class Hud {
   // controller can point at bag slots / vendor items, not just modal dialogs.
   isWindowOpen(): boolean {
     return this.isModalOpen() || this.topmostOpenWindow() !== null;
-  }
-
-  /** True while a focus trap owns the HUD (the Esc menu or another modal). The
-   *  gamepad reads this to switch into menu-navigation mode: while trapped it emits
-   *  menu intents and consumes every edge so world input never double-fires. */
-  isFocusTrapped(): boolean {
-    return this.focusManager.hasActiveTrap();
-  }
-
-  /** Route one resolved gamepad menu verb (spec section 5). When the Esc menu owns
-   *  focus it drives the full navigation; otherwise a generic fallback keeps any
-   *  other trapped dialog (quest reward, crafting, town focus, delve board, loot
-   *  settings, rite, skin event, card modal, confirm/prompt) operable: B closes it,
-   *  A activates the focused control, D-pad Up/Down steps focus over the trap
-   *  root's visible focusables, and LT/RT page-scroll its body. */
-  handleMenuGamepadIntent(intent: MenuIntentKind): void {
-    const optionsRoot = $('#options-menu');
-    const active = document.activeElement;
-    // Route to the Esc menu while focus is INSIDE it, and also when focus was
-    // dropped entirely (body/null, e.g. a repaint detached the focused node) while
-    // it is open: the menu self-heals by re-homing row focus. Focus resting inside
-    // a DIFFERENT element (a stacked confirm dialog) keeps the generic fallback so
-    // the top trap stays in charge.
-    const focusLost = !(active instanceof HTMLElement) || active === document.body;
-    if (this.optionsWindow.isOpen && (optionsRoot.contains(active) || focusLost)) {
-      this.optionsWindow.handleMenuIntent(intent);
-      return;
-    }
-    if (intent === 'back') {
-      this.closeAll();
-    } else if (intent === 'activate' && active instanceof HTMLElement) {
-      active.click();
-    } else if (intent === 'rowPrev' || intent === 'rowNext') {
-      // The generic focus step (mirrors OptionsWindow.stepRowFocus): the pad's
-      // virtual cursor is suppressed in menu mode, so without this every
-      // non-options trapped dialog would lose pad focus movement entirely.
-      this.focusManager.stepTrapFocus(intent === 'rowNext' ? 1 : -1);
-    } else if (intent === 'pageUp' || intent === 'pageDown') {
-      const root = this.focusManager.activeTrapRoot();
-      const scroll = root?.querySelector<HTMLElement>('.window-body') ?? root;
-      if (scroll) {
-        scroll.scrollTop +=
-          (intent === 'pageDown' ? 1 : -1) * scroll.clientHeight * TRAP_PAGE_SCROLL_FRACTION;
-      }
-    }
   }
 
   toggleOptionsMenu(): void {
@@ -14343,12 +12175,12 @@ export class Hud {
 
   // Closes the topmost UI. Returns true if something was closed.
   closeAll(): boolean {
-    if (this.openLootChestId !== null) {
+    if (this.lootWindow.hasOpenChest) {
       this.closeLoot();
       return true;
     }
-    if (this.cardModalEl) {
-      this.closePlayerCardModal();
+    if (this.playerCard.isOpen) {
+      this.playerCard.close();
       return true;
     }
     const ctx = $('#ctx-menu');
@@ -14581,9 +12413,22 @@ function abilityRangeLine(def: AbilityDef): string | null {
   return t('abilityUi.tooltip.range', { range: formatAbilityNumber(def.range) });
 }
 
-// `spellHaste` (the live character's set-bonus spell haste, a fraction) shortens
-// the shown cast / channel time exactly as the sim does, so a hasted caster's
-// tooltips reflect the real, faster cast.
+// The live caster's TOTAL spell-haste fraction: the resolved stat (set bonuses + spec
+// mastery) PLUS active buff_spellhaste auras (Arcane Power, Icy Veins, Metamorphosis).
+// Mirrors the sim's spellHasteMult (spell_combat.ts) EXACTLY, including its
+// `Math.max(0, ...)` floor, so a shown cast time never disagrees with the real one (a
+// net-negative haste, e.g. a cast-slow debuff, floors at 0 for both). ui/ cannot import
+// the sim-combat helper across the seam, so the formula is kept identical here by hand.
+function playerSpellHasteFrac(p: Entity | null | undefined): number {
+  if (!p) return 0;
+  let frac = p.spellHaste;
+  for (const a of p.auras) if (a.kind === 'buff_spellhaste') frac += a.value;
+  return Math.max(0, frac);
+}
+
+// `spellHaste` (the live character's total spell haste, a fraction) shortens the shown
+// cast / channel time exactly as the sim does, so a hasted caster's tooltips reflect the
+// real, faster cast.
 function abilityCastLine(known: ResolvedAbility, spellHaste = 0): string {
   const h = 1 + Math.max(0, spellHaste);
   if (known.def.channel) {
@@ -14642,10 +12487,19 @@ function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling): stri
       case 'directDamage':
       case 'heal':
       case 'aoeDamage':
+      case 'aoeHeal':
       case 'aoeRoot':
       case 'groundAoE':
       case 'drainTick':
         return abilityAmountRange(primary.min, primary.max) + suffix(primary);
+      case 'consumeAura':
+        if (primary.deal) {
+          return abilityAmountRange(primary.deal.min, primary.deal.max) + suffix(primary);
+        }
+        if (primary.heal) {
+          return abilityAmountRange(primary.heal.min, primary.heal.max) + suffix(primary);
+        }
+        return '';
       case 'weaponDamage':
       case 'weaponStrike':
         return formatAbilityNumber(primary.bonus);

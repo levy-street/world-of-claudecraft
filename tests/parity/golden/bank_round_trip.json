@@ -16,7 +16,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 406,
+      "nextId": 409,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -30,9 +30,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 407,
-      "state": "6436b912",
-      "events": "f4023cf3",
+      "nextId": 410,
+      "state": "445904bd",
+      "events": "35432b6e",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -57,9 +57,19 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "wolf_fang",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 406,
+          "entityId": 409,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -98,7 +108,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 406,
+          "id": 409,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -141,8 +151,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 407,
-      "state": "bfaacaa8",
+      "nextId": 410,
+      "state": "b3e67f45",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -175,9 +185,22 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "wolf_fang",
+              "worn_sword"
+            ],
+            "visited": [
+              "npc:bursar_fernando"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 406,
+          "entityId": 409,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -216,7 +239,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 406,
+          "id": 409,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -259,8 +282,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 407,
-      "state": "aad563f4",
+      "nextId": 410,
+      "state": "4603a38b",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -293,9 +316,22 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "wolf_fang",
+              "worn_sword"
+            ],
+            "visited": [
+              "npc:bursar_fernando"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 406,
+          "entityId": 409,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -330,7 +366,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 406,
+          "id": 409,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -373,8 +409,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 407,
-      "state": "1dd01cf0",
+      "nextId": 410,
+      "state": "4ff29da9",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -407,9 +443,22 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "wolf_fang",
+              "worn_sword"
+            ],
+            "visited": [
+              "npc:bursar_fernando"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 406,
+          "entityId": 409,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -448,7 +497,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 406,
+          "id": 409,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -491,8 +540,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 407,
-      "state": "6436b912",
+      "nextId": 410,
+      "state": "206afb33",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -518,9 +567,22 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "wolf_fang",
+              "worn_sword"
+            ],
+            "visited": [
+              "npc:bursar_fernando"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 406,
+          "entityId": 409,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -559,7 +621,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 406,
+          "id": 409,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -602,9 +664,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 407,
-      "state": "644eab6a",
-      "events": "6a9caacc",
+      "nextId": 410,
+      "state": "2272dded",
+      "events": "7c29da1d",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -631,9 +693,22 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "wolf_fang",
+              "worn_sword"
+            ],
+            "visited": [
+              "npc:bursar_fernando"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 406,
+          "entityId": 409,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -672,7 +747,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 406,
+          "id": 409,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -715,9 +790,9 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 407,
-      "state": "4b8dacdc",
-      "events": "741638a5",
+      "nextId": 410,
+      "state": "c2fd7489",
+      "events": "ba91bafb",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -744,9 +819,32 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "wolf_fang",
+              "worn_sword"
+            ],
+            "visited": [
+              "npc:bursar_fernando"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "soc_meet_bursar",
+              ""
+            ],
+            [
+              "soc_room_for_more",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 406,
+          "entityId": 409,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -766,6 +864,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "renown": 10,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -785,7 +884,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.1,
           "hp": 90,
-          "id": 406,
+          "id": 409,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",

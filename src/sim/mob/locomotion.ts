@@ -29,6 +29,7 @@
 import { VALE_CUP_BALL_TEMPLATE_ID } from '../content/vale_cup';
 import { YUMI_TEMPLATE_ID } from '../content/yumi';
 import { DUNGEON_X_THRESHOLD, MOBS } from '../data';
+import * as deedsMod from '../deeds';
 import { resetDrownedLitanyBossEncounter } from '../delves/drowned_litany_boss';
 import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
 import type { SimContext } from '../sim_context';
@@ -96,6 +97,12 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     }
     // dungeon mobs stay dead until the instance resets
     const isInstanceMob = mob.spawnPos.x > DUNGEON_X_THRESHOLD;
+    // Corpse-decay window (classic-faithful, issue #1539): an in-place respawn
+    // reuses this entity id and respawnMob wipes the loot, so while the corpse is
+    // still lootable the respawn is DEFERRED until its corpse timer elapses. The
+    // tapping player thus gets the full bounded window (corpseTimer, default
+    // CORPSE_DURATION, capped by any fixed respawnSeconds) to loot; un-looted
+    // drops then decay with the corpse and are never lost before the window ends.
     if (!isInstanceMob && mob.respawnTimer <= 0 && (mob.corpseTimer <= 0 || !mob.lootable)) {
       ctx.respawnMob(mob);
     }
@@ -244,7 +251,21 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         const template = MOBS[mob.templateId];
         let detected: Entity | null = null;
         let detectedD = Infinity;
-        ctx.playerGrid.forEachInRadius(mob.pos.x, mob.pos.z, 25, (e, d2) => {
+        // Resolved once per scan, not per candidate: the ctx member is a live getter
+        // chain and this callback is a per-visit hot path.
+        const counters = ctx.mobScanCounters;
+        // Query only to MAX_AGGRO_RADIUS: both idle scans clamp the effective detection
+        // radius to it (the general branch's delve/stealth modifiers only shrink it
+        // further) and detect strictly (d < radius), so a wider query only visits
+        // never-detectable players. One caveat: the grid buckets by end-of-tick
+        // position with a 1 yd pad (spatial.ts), so a mid-tick displacement past the
+        // pad (a knockback) defers that player's detection to the next tick's
+        // rebucket. The former 25 yd query had the same one-tick-deferral miss
+        // class, but its 5 yd slack meant only displacements past ~6 yd could
+        // fall outside it; this query defers any inward displacement past the
+        // pad. Ruled acceptable: one 50 ms deferral, uniform across hosts.
+        ctx.playerGrid.forEachInRadius(mob.pos.x, mob.pos.z, MAX_AGGRO_RADIUS, (e, d2) => {
+          counters.aggroScanPlayerVisits++;
           if (e.dead) return;
           const radius = Math.max(
             4,
@@ -262,7 +283,10 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       const template = MOBS[mob.templateId];
       let detected: Entity | null = null;
       let detectedD = Infinity;
-      ctx.playerGrid.forEachInRadius(mob.pos.x, mob.pos.z, 25, (e, d2) => {
+      // Resolved once per scan, not per candidate (same reason as the boss branch).
+      const counters = ctx.mobScanCounters;
+      ctx.playerGrid.forEachInRadius(mob.pos.x, mob.pos.z, MAX_AGGRO_RADIUS, (e, d2) => {
+        counters.aggroScanPlayerVisits++;
         if (e.dead) return;
         if (isTrivialTo(mob, e)) return;
         let radius = Math.max(
@@ -637,6 +661,8 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   // a wiped pull must not receive a personal slot from a later kill).
   mob.bossDamagers.clear();
   ctx.despawnSummonedAdds(mob);
+  // An evade ends the attempt; the deed window re-arms.
+  deedsMod.resetDeedEncounter(ctx, mob);
   mob.firedSummons = 0;
   mob.enraged = false;
   mob.healedThisPull = false;
@@ -647,6 +673,8 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   mob.loudYellIndex = 0;
   mob.mendTimer = MOBS[mob.templateId]?.mendAlly?.every ?? 0;
   mob.wardTimer = MOBS[mob.templateId]?.wardAllies?.every ?? 0;
+  mob.channelTimer = MOBS[mob.templateId]?.channelHeal?.every ?? 0;
+  mob.channelRamp = 0;
   mob.stoneskinTimer = MOBS[mob.templateId]?.stoneskin?.every ?? 0;
   mob.rallyTimer = MOBS[mob.templateId]?.rally?.every ?? 0;
   mob.warcryTimer = MOBS[mob.templateId]?.warcry?.every ?? 0;

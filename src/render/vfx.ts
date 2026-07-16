@@ -342,6 +342,16 @@ export class Vfx {
     return Math.random() <= dt * ratePerSecond * (0.35 + 0.65 * this.quality);
   }
 
+  // Frame-rate-independent variant for continuous auras: emitChance caps at one
+  // spawn per frame, which starves a steady aura on a slow frame (a 15 fps
+  // client would show a third of the particles a 60 fps client does). Returns
+  // the whole expected count plus a Bernoulli draw on the fraction.
+  private emitCount(ratePerSecond: number, dt: number): number {
+    const expected = dt * ratePerSecond * (0.35 + 0.65 * this.quality);
+    const n = Math.floor(expected);
+    return n + (Math.random() <= expected - n ? 1 : 0);
+  }
+
   private spawn(
     x: number,
     y: number,
@@ -422,6 +432,68 @@ export class Vfx {
 
   // A "bolt-shaped" traveling projectile: fires a homing bolt with the SAME
   // travel + impact timing as a normal spell projectile (so the damage lands when
+  // Chain Heal's signature arc: a bright green cord that lifts in a gentle parabola
+  // from the source ally to the target, denser and softer than a nuke beam so it
+  // reads as flowing healing water rather than crackling lightning. Each hop of the
+  // chain emits one; the per-target heal glow (healGlow, on the heal2 event) lands
+  // the burst at each ally, so this method only draws the connecting cord.
+  chainHealArc(sourceId: number, targetId: number): void {
+    const from = this.anchor(sourceId, 0.62);
+    const to = this.anchor(targetId, 0.55);
+    if (!from || !to) return;
+    const core = new THREE.Color(0xbaf7a0).multiplyScalar(hdr(2.4));
+    const soft = new THREE.Color(0x86e86a).multiplyScalar(hdr(1.7));
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    const dz = to.z - from.z;
+    const len = Math.hypot(dx, dz);
+    if (len <= 0.001 && Math.abs(dy) <= 0.001) return;
+    // Arc height scales with distance so a long jump bows more; capped so a short
+    // hop still curves. The lift peaks at the midpoint (sin(pi*f)).
+    const lift = Math.min(1.6, 0.5 + len * 0.12);
+    const steps = Math.min(34, Math.max(12, Math.ceil(len / 0.8)));
+    for (let i = 0; i <= steps; i++) {
+      const f = i / steps;
+      const arc = Math.sin(f * Math.PI) * lift;
+      const jitterX = (Math.random() - 0.5) * 0.1;
+      const jitterZ = (Math.random() - 0.5) * 0.1;
+      // Alternate a bright core sprite and a soft glow so the cord has depth.
+      const bright = i % 2 === 0;
+      this.spawn(
+        from.x + dx * f + jitterX,
+        from.y + dy * f + arc + (Math.random() - 0.5) * 0.08,
+        from.z + dz * f + jitterZ,
+        0,
+        0.4,
+        0,
+        bright ? core : soft,
+        bright ? 0.42 : 0.55,
+        0.5 + Math.random() * 0.18,
+        -0.4,
+        bright ? SPR.glowCore : SPR.glowSoft,
+      );
+    }
+    // A few rising sparkles along the cord for the living-water feel.
+    const sparkles = this.scaledCount(8);
+    for (let i = 0; i < sparkles; i++) {
+      const f = Math.random();
+      const arc = Math.sin(f * Math.PI) * lift;
+      this.spawn(
+        from.x + dx * f + (Math.random() - 0.5) * 0.3,
+        from.y + dy * f + arc + 0.1,
+        from.z + dz * f + (Math.random() - 0.5) * 0.3,
+        0,
+        1.3 + Math.random() * 0.8,
+        0,
+        core,
+        0.28,
+        0.55 + Math.random() * 0.3,
+        -1.4,
+        SPR.sparkle,
+      );
+    }
+  }
+
   // it arrives, no flash-then-wait), but its flying head renders as a short jagged
   // blue-white electric streak instead of a round glowing comet (the shape is
   // drawn in the projectile update loop). Original procedural effect (no assets).
@@ -674,6 +746,88 @@ export class Vfx {
       -0.5,
       school === 'fire' ? SPR.flame : SPR.magicWisp,
     );
+  }
+
+  // Shapeshift-form aura (continuous, called per frame while the form aura is
+  // on). Each form reads distinctly at a glance: metamorph = flame tongues +
+  // stray embers, moonkin = drifting star motes, shadowform = gloom wisps +
+  // smoke curls.
+  formAura(entityId: number, form: 'metamorph' | 'moonkin' | 'shadowform', dt: number): void {
+    if (form === 'metamorph') {
+      const n = this.emitCount(48, dt);
+      if (!n) return;
+      const at = this.anchor(entityId, 0.3);
+      if (!at) return;
+      for (let k = 0; k < n; k++) {
+        const a = Math.random() * Math.PI * 2;
+        // wide ring: Metamorphosis also grows the body (Entity.scale), so the
+        // flames must clear the fattened silhouette or they vanish inside it
+        const r = 0.6 + Math.random() * 0.45;
+        const ember = Math.random() < 0.45;
+        this.spawn(
+          at.x + Math.sin(a) * r,
+          at.y + Math.random() * 0.9,
+          at.z + Math.cos(a) * r,
+          Math.sin(a) * 0.25,
+          0.9 + Math.random() * 0.8,
+          Math.cos(a) * 0.25,
+          ember ? 0xffe08a : 0xffa040,
+          ember ? 0.24 : 0.62,
+          0.8 + Math.random() * 0.4,
+          -0.3,
+          ember ? SPR.sparkBurst : SPR.flame,
+          (Math.random() - 0.5) * 0.6,
+        );
+      }
+      return;
+    }
+    if (form === 'moonkin') {
+      const n = this.emitCount(30, dt);
+      if (!n) return;
+      const at = this.anchor(entityId, 0.55);
+      if (!at) return;
+      for (let k = 0; k < n; k++) {
+        const a = Math.random() * Math.PI * 2;
+        const r = 0.45 + Math.random() * 0.5;
+        this.spawn(
+          at.x + Math.sin(a) * r,
+          at.y + (Math.random() - 0.3) * 0.8,
+          at.z + Math.cos(a) * r,
+          Math.sin(a) * 0.15,
+          0.35 + Math.random() * 0.5,
+          Math.cos(a) * 0.15,
+          Math.random() < 0.35 ? 0xd98aff : 0xfff2c0,
+          0.24 + Math.random() * 0.18,
+          1.1 + Math.random() * 0.5,
+          -0.15,
+          SPR.star,
+        );
+      }
+      return;
+    }
+    // shadowform: dark wisps curling around the silhouette, the odd smoke curl
+    const n = this.emitCount(24, dt);
+    if (!n) return;
+    const at = this.anchor(entityId, 0.45);
+    if (!at) return;
+    for (let k = 0; k < n; k++) {
+      const a = Math.random() * Math.PI * 2;
+      const r = 0.4 + Math.random() * 0.4;
+      const smoke = Math.random() < 0.25;
+      this.spawn(
+        at.x + Math.sin(a) * r,
+        at.y + (Math.random() - 0.2) * 0.7,
+        at.z + Math.cos(a) * r,
+        -Math.cos(a) * 0.6,
+        0.4 + Math.random() * 0.5,
+        Math.sin(a) * 0.6,
+        smoke ? 0x3a2a55 : 0x9a5df0,
+        smoke ? 0.5 : 0.34,
+        0.85 + Math.random() * 0.5,
+        -0.2,
+        smoke ? SPR.smoke : SPR.magicWisp,
+      );
+    }
   }
 
   swimRipple(at: THREE.Vector3, dt: number): void {

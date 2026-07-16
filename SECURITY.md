@@ -17,7 +17,7 @@ Instead, report privately using one of these channels:
   maintainers until a fix is ready.
 - **Discord.** If you can't use GitHub advisories, send a private message to a
   member of the **Levy St**, **Admin**, or **Devs** group on the
-  [community Discord](https://discord.gg/GjhnUsBtw) and ask for a secure way to
+  [community Discord](https://discord.com/invite/worldofclaudecraft) and ask for a secure way to
   share the details.
 
 Please include as much as you can:

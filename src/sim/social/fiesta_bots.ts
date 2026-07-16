@@ -57,6 +57,8 @@ export function startFiestaPractice(sim: Sim): boolean {
   ];
   for (let i = 0; i < kit.length; i++) {
     const pid = sim.addPlayer(kit[i].cls, kit[i].name);
+    const botMeta = sim.players.get(pid);
+    if (botMeta) botMeta.isFiestaBot = true;
     const e = sim.entities.get(pid);
     if (e) {
       const ang = (i / kit.length) * Math.PI * 2;

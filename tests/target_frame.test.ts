@@ -15,10 +15,11 @@
 
 import { describe, expect, it } from 'vitest';
 import { castBarState } from '../src/render/cast_bar';
+import { MOBS } from '../src/sim/data';
 import type { Aura, Entity } from '../src/sim/types';
+import { titledNameDecoration } from '../src/ui/deed_i18n';
+import { targetRankView } from '../src/ui/target_rank_view';
 import { type UnitFrameDescriptor, unitFrameView } from '../src/ui/unit_frame';
-
-const BOSS_SKULL_GLYPH = '☠';
 
 function shield(value: number): Aura {
   return {
@@ -41,8 +42,8 @@ interface TargetState {
   hp: number;
   maxHp: number;
   level: number;
+  templateId: string;
   dead: boolean;
-  boss: boolean;
   hostile: boolean;
   displayName: string;
   auras: Aura[];
@@ -53,6 +54,9 @@ interface TargetState {
   resourceType: 'mana' | 'rage' | 'energy' | null;
   resource: number;
   maxResource: number;
+  // Book of Deeds display title: a deed id on the identity wire (players
+  // only; null/absent for mobs, and online.ts mirrors it verbatim).
+  title: string | null;
 }
 
 const GAMEPLAY: TargetState = {
@@ -61,8 +65,8 @@ const GAMEPLAY: TargetState = {
   hp: 420,
   maxHp: 600,
   level: 62,
+  templateId: 'morthen',
   dead: false,
-  boss: true,
   hostile: true,
   displayName: 'Nythraxis',
   auras: [shield(90)],
@@ -76,6 +80,7 @@ const GAMEPLAY: TargetState = {
   resourceType: 'mana',
   resource: 350,
   maxResource: 500,
+  title: null,
 };
 
 // Build a Sim-shaped entity: the offline core's live fields plus Sim-only extras
@@ -107,6 +112,7 @@ function clientTarget(over: Partial<TargetState> = {}): Entity {
 // point is that BOTH hosts feed the SAME mapping and the wired fields land identically).
 function targetDescriptor(e: Entity): UnitFrameDescriptor {
   const t = e as unknown as TargetState;
+  const titleDecoration = titledNameDecoration(t.title ?? null);
   return {
     present: true,
     hpFrac: t.hp / Math.max(1, t.maxHp),
@@ -114,8 +120,10 @@ function targetDescriptor(e: Entity): UnitFrameDescriptor {
     resourceKind: t.dead || !t.resourceType ? 'none' : t.resourceType,
     resFrac: t.dead || !t.resourceType ? 0 : t.resource / Math.max(1, t.maxResource),
     resText: t.dead || !t.resourceType ? '' : `${Math.round(t.resource)} / ${t.maxResource}`,
-    levelText: t.boss ? BOSS_SKULL_GLYPH : String(t.level),
+    levelText: String(t.level),
     name: t.displayName,
+    titlePre: titleDecoration.pre,
+    titlePost: titleDecoration.post,
     portraitKey: String(t.id),
     absorb: t.dead ? null : { hp: t.hp, maxHp: t.maxHp, auras: t.auras },
     dead: false,
@@ -129,6 +137,11 @@ function targetNameColor(e: Entity): string {
   return (e as unknown as TargetState).hostile ? 'var(--color-hostile)' : 'var(--color-friendly)';
 }
 
+function targetRank(e: Entity): ReturnType<typeof targetRankView> {
+  const templateId = (e as unknown as TargetState).templateId;
+  return targetRankView(MOBS[templateId]);
+}
+
 // Combo points are character-bound (retail-style): the pips moved to the PLAYER
 // frame and light straight from the wire-mirrored `comboPoints` self field, so
 // there is no per-target pip selection left in the target frame to diverge.
@@ -140,7 +153,9 @@ describe('target frame: Sim-vs-ClientWorld parity', () => {
     // Every field the frame reads survives the wire now (including the absorb overlay), so
     // the whole view is identical across hosts.
     expect(fromClient).toEqual(fromSim);
-    expect(fromSim.levelText).toBe(BOSS_SKULL_GLYPH); // boss skull, not a number
+    expect(fromSim.levelText).toBe('62');
+    expect(targetRank(simTarget())).toBe('boss');
+    expect(targetRank(clientTarget())).toBe(targetRank(simTarget()));
     expect(fromSim.resClass).toBe('mana'); // a caster target shows its power bar
     expect(fromSim.resText).toBe('350 / 500');
     // A resource-less beast (rtype null) turns every type class off: the bar hides.
@@ -172,6 +187,31 @@ describe('target frame: Sim-vs-ClientWorld parity', () => {
       castBarState(clientTarget({ dead: true })),
     );
     expect(castBarState(simTarget({ dead: true })).visible).toBe(false);
+  });
+
+  it('a titled player target renders the same decoration across hosts; untitled stays empty', () => {
+    // The title rides the identity wire as a deed id (only when non-null);
+    // both hosts resolve the SAME pattern-key decoration client-side.
+    const over: Partial<TargetState> = {
+      kind: 'player',
+      templateId: '',
+      hostile: false,
+      displayName: 'Hilda',
+      title: 'prog_veteran',
+    };
+    const fromSim = unitFrameView(targetDescriptor(simTarget(over)));
+    const fromClient = unitFrameView(targetDescriptor(clientTarget(over)));
+    expect(fromClient).toEqual(fromSim);
+    expect(fromSim.titlePre).toBe('');
+    expect(fromSim.titlePost).toBe(' [Veteran]');
+    // Untitled (every mob, and a player with no selection): both decorations empty.
+    const plain = unitFrameView(targetDescriptor(simTarget()));
+    expect(plain.titlePre).toBe('');
+    expect(plain.titlePost).toBe('');
+    // A stale/content-drifted id degrades to untitled on both hosts, never text.
+    const stale = { ...over, title: 'removed_deed' };
+    expect(unitFrameView(targetDescriptor(simTarget(stale))).titlePost).toBe('');
+    expect(unitFrameView(targetDescriptor(clientTarget(stale))).titlePost).toBe('');
   });
 
   it('the target cast bar (remaining + fill + label) matches across hosts', () => {

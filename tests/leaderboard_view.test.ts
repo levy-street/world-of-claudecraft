@@ -23,7 +23,7 @@ import {
 } from '../src/ui/leaderboard_view';
 import type { LeaderboardEntry, LeaderboardPage } from '../src/world_api';
 
-const VIEWER: LeaderboardViewer = { name: 'Me', level: 60, lifetimeXp: 999_999 };
+const VIEWER: LeaderboardViewer = { name: 'Me', level: 60, lifetimeXp: 999_999, title: null };
 
 function entry(over: Partial<LeaderboardEntry> = {}): LeaderboardEntry {
   return {
@@ -35,6 +35,7 @@ function entry(over: Partial<LeaderboardEntry> = {}): LeaderboardEntry {
     lifetimeXp: 5_000_000,
     prestigeRank: 0,
     ...over,
+    title: over.title ?? null,
   };
 }
 
@@ -140,6 +141,21 @@ describe('buildLeaderboardView: row derivation', () => {
     expect(v.rows[0].virtualLevel).toBe(12);
     expect(v.rows[0].lifetimeXp).toBe(5_000_000);
   });
+
+  it('passes the Book of Deeds title through as a DEED ID, null when untitled', () => {
+    const v = ranked(
+      buildLeaderboardView({
+        kind: 'page',
+        page: page('sim', [
+          entry({ name: 'Titled', title: 'prog_veteran' }),
+          entry({ rank: 2, name: 'Plain' }),
+        ]),
+        viewer: VIEWER,
+      }),
+    );
+    expect(v.rows[0].title).toBe('prog_veteran');
+    expect(v.rows[1].title).toBeNull();
+  });
 });
 
 describe('buildLeaderboardView: off-page "your standing" sticky row', () => {
@@ -159,6 +175,7 @@ describe('buildLeaderboardView: off-page "your standing" sticky row', () => {
       // it is distinct from the viewer's level (60), so a level/vlevel swap is caught.
       virtualLevel: virtualLevel(999_999),
       lifetimeXp: 999_999,
+      title: null,
     });
   });
 
@@ -171,6 +188,28 @@ describe('buildLeaderboardView: off-page "your standing" sticky row', () => {
       }),
     );
     expect(v.standing).toBeNull();
+  });
+
+  it("carries the off-page viewer's own title through to the sticky standing as a DEED ID", () => {
+    const v = ranked(
+      buildLeaderboardView({
+        kind: 'page',
+        page: page('sim', [entry({ name: 'Someone' })]),
+        viewer: { ...VIEWER, title: 'deed_x' },
+      }),
+    );
+    expect(v.standing?.title).toBe('deed_x');
+  });
+
+  it('carries a null title through to the sticky standing when the viewer is untitled', () => {
+    const v = ranked(
+      buildLeaderboardView({
+        kind: 'page',
+        page: page('sim', [entry({ name: 'Someone' })]),
+        viewer: { ...VIEWER, title: null },
+      }),
+    );
+    expect(v.standing?.title).toBeNull();
   });
 });
 

@@ -26,7 +26,9 @@ import { routes as adminRoutes } from '../admin';
 import { routes as appleAuthRoutes } from '../apple_auth';
 import { routes as authRoutes } from '../auth_routes';
 import { routes as characterRoutes } from '../characters';
+import { routes as claudiumRoutes } from '../claudium';
 import { routes as dailyRewardRoutes } from '../daily_rewards';
+import { routes as deedsRoutes } from '../deeds';
 import { routes as desktopLoginRoutes } from '../desktop_login_routes';
 import { routes as discordRoutes } from '../discord';
 import { routes as githubRoutes } from '../github';
@@ -35,6 +37,7 @@ import { routes as leaderboardRoutes } from '../leaderboard';
 import { routes as mapsRoutes } from '../maps_routes';
 import { routes as oauthRoutes } from '../oauth';
 import { routes as reportsRoutes } from '../reports';
+import { routes as steamRoutes } from '../steam';
 import { routes as userAssetsRoutes } from '../user_assets_routes';
 import { routes as walletRoutes } from '../wallet';
 // new:endpoint imports appear above this line (npm run new:endpoint)
@@ -120,12 +123,15 @@ export const apiRoutes: readonly RouteDef[] = [
   ...discordRoutes,
   ...githubRoutes,
   ...desktopLoginRoutes,
+  ...claudiumRoutes,
   ...dailyRewardRoutes,
   ...mapsRoutes,
   ...userAssetsRoutes,
   ...adminRoutes,
   ...oauthRoutes,
   ...internalRoutes,
+  ...deedsRoutes,
+  ...steamRoutes,
   // new:endpoint spreads appear above this line (npm run new:endpoint)
 ];
 

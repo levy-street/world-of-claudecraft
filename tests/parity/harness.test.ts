@@ -153,6 +153,9 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
       'vx',
       'vy',
       'vz',
+      'weaponSkinId',
+      'weaponSkinLoadout',
+      'weaponStowed',
     ]);
   });
 

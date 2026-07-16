@@ -53,12 +53,39 @@ describe('Infernal Abyss content', () => {
 
     const azazel = MOBS.azazel_infernal_lord;
     expect(azazel).toMatchObject({ minLevel: 20, maxLevel: 20, elite: true, boss: true });
-    expect(azazel.bigCast).toBeDefined();
-    expect(azazel.aoePulse).toBeDefined();
-    expect(azazel.stomp).toBeDefined();
-    expect(azazel.summonAdds?.atHpPct).toEqual([0.7, 0.4]);
-    expect(azazel.terrify).toBeDefined();
-    expect(azazel.enrage).toBeDefined();
+    // Literal pins for the whole encounter script: any retune reds this test
+    // deliberately (the values are the design-doc numbers, not derived).
+    expect(azazel.bigCast).toMatchObject({
+      castId: 'azazel_apocalypse_flame',
+      castTime: 3,
+      every: 18,
+      radius: 17,
+      min: 42,
+      max: 58,
+      school: 'fire',
+    });
+    expect(azazel.aoePulse).toMatchObject({
+      min: 30,
+      max: 42,
+      radius: 13,
+      every: 9,
+      school: 'fire',
+    });
+    expect(azazel.stomp).toMatchObject({
+      radius: 11,
+      every: 15,
+      duration: 1.5,
+      min: 24,
+      max: 34,
+      school: 'fire',
+    });
+    expect(azazel.summonAdds).toMatchObject({
+      mobId: 'infernal_cinderling',
+      count: 3,
+      atHpPct: [0.7, 0.4],
+    });
+    expect(azazel.terrify).toMatchObject({ radius: 14, every: 20, duration: 3, school: 'shadow' });
+    expect(azazel.enrage).toEqual({ belowHpPct: 0.2, dmgMult: 1.6, hasteMult: 1.3 });
     expect(azazel.yells).toMatchObject({ engage: expect.any(String), enrage: expect.any(String) });
   });
 
@@ -79,6 +106,16 @@ describe('Infernal Abyss content', () => {
         expect(ITEMS[itemId], `${questId}: ${itemId}`).toBeDefined();
       }
     }
+  });
+
+  it('keeps the Azazel armor roll group guaranteed (chances sum to exactly 1)', () => {
+    // 0.34 + 0.33 + 0.33: a typo in any row silently turns the guaranteed
+    // armor drop into a sometimes-nothing roll, so pin the exact sum.
+    const rows = MOBS.azazel_infernal_lord.loot.filter(
+      (row) => row.rollGroup === 'azazel_guaranteed_armor',
+    );
+    expect(rows).toHaveLength(3);
+    expect(rows.reduce((sum, row) => sum + row.chance, 0)).toBeCloseTo(1, 10);
   });
 
   it('registers Caddis three-step lore chain across four dungeon objects and Azazel', () => {

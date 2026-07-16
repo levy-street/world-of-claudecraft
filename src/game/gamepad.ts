@@ -19,7 +19,6 @@ import {
   TRIGGER_THRESHOLD,
 } from './gamepad_map';
 import type { Input } from './input';
-import { type MenuIntentKind, mapMenuGamepad } from './menu_gamepad_nav';
 
 export interface GamepadCallbacks {
   // Record one physical button rising edge for the HUD's APM readout.
@@ -31,13 +30,6 @@ export interface GamepadCallbacks {
   // True while any interactive HUD window is open, switching the pad into the
   // virtual-cursor UI-navigation mode (movement/camera/abilities are suspended).
   isPointerMode(): boolean;
-  // True while a focus trap owns the HUD (the Esc menu and other modal windows):
-  // the pad switches into the deterministic MENU-navigation mode, consuming every
-  // edge so world input never double-fires. Optional (falls back to pointer mode).
-  isMenuMode?(): boolean;
-  // Dispatch one menu navigation verb resolved from the pad this frame (a testable
-  // seam: the wiring accepts intents here, never reaching for navigator itself).
-  onMenuIntent?(intent: MenuIntentKind): void;
   // Current local-player health, for rumble-on-damage. Optional.
   getPlayerHealth?(): number;
   // A pad connected or disconnected, so the detected brand (and thus the button
@@ -51,10 +43,6 @@ export class GamepadManager {
   private index: number | null = null;
   private kind: GamepadKind = 'generic';
   private prevPressed: boolean[] = new Array(STANDARD_BUTTON_COUNT).fill(false);
-  // Left-stick X from the previous poll, for the menu mode's single-fire value
-  // adjust (a held deflection must not repeat). Kept in sync in every branch so
-  // entering menu mode never sees a stale crossing.
-  private prevStickX = 0;
   private deadzone = 0.18;
   private camSpeed = 2.4;
   private invertY = false;
@@ -100,7 +88,6 @@ export class GamepadManager {
     this.index = null;
     this.kind = 'generic';
     this.prevPressed.fill(false);
-    this.prevStickX = 0;
     this.input.clearGamepadMove();
     this.hideCursor();
   }
@@ -146,10 +133,6 @@ export class GamepadManager {
       this.index = null;
       this.kind = 'generic';
       this.prevPressed.fill(false);
-      // Mirror stop(): a reconnect must behave like a fresh acquisition, never
-      // read the pre-disconnect deflection, or the menu mode's single-fire
-      // value adjust can mis-resolve one stale crossing across the reconnect.
-      this.prevStickX = 0;
       this.input.clearGamepadMove();
       this.hideCursor();
       this.cb.onConnectionChange?.();
@@ -185,12 +168,6 @@ export class GamepadManager {
     const cur: boolean[] = [];
     for (let i = 0; i < STANDARD_BUTTON_COUNT; i++) cur[i] = pressed(i);
 
-    // Track the left-stick X every poll (in ALL branches) so the menu mode's
-    // single-fire value adjust never sees a stale crossing on the frame it engages.
-    const lx = pad.axes[AXIS.LEFT_X] ?? 0;
-    const prevStickX = this.prevStickX;
-    this.prevStickX = lx;
-
     // Match keyboard and mouse, which the browser only delivers to a focused
     // window: an unfocused window takes no pad input. Consume the button state
     // without dispatching so a button held across a refocus does not fire a
@@ -204,31 +181,6 @@ export class GamepadManager {
 
     this.checkRumble();
 
-    // Menu-navigation mode (spec section 5): a focus trap owns the HUD, so the pad
-    // drives deterministic menu intents and swallows every edge (the pure core is
-    // menu_gamepad_nav). Checked BEFORE pointer mode so a trapped modal (the Esc
-    // menu) uses real navigation, not the virtual cursor. DOM is driven only on an
-    // intent, never per poll, so an idle pad costs nothing.
-    if (this.cb.isMenuMode?.()) {
-      this.input.clearGamepadMove();
-      this.hideCursor();
-      const result = mapMenuGamepad({
-        prev: this.prevPressed,
-        cur,
-        stickX: lx,
-        prevStickX,
-        adjustThreshold: this.deadzone,
-        trapActive: true,
-      });
-      // Every rising edge is consumed (APM still counts the physical press); the
-      // resolved verbs dispatch through the injected seam. World input is never
-      // reached, so no default pad binding (camera, movement, Esc) double-fires.
-      for (let i = 0; i < result.consumedButtons.length; i++) this.cb.onInputEdge();
-      for (const intent of result.intents) this.cb.onMenuIntent?.(intent);
-      this.prevPressed = cur;
-      return;
-    }
-
     if (this.cb.isPointerMode()) {
       // UI-navigation cursor mode: stick drives a software pointer. Clear any
       // lingering stick movement (a non-modal window like bags doesn't freeze
@@ -240,7 +192,8 @@ export class GamepadManager {
     }
     this.hideCursor();
 
-    // Movement: left stick (lx captured above for the menu-mode adjust tracking).
+    // Movement: left stick.
+    const lx = pad.axes[AXIS.LEFT_X] ?? 0;
     const ly = pad.axes[AXIS.LEFT_Y] ?? 0;
     this.input.setGamepadMove(stickToMoveFlags(lx, ly, this.deadzone));
 

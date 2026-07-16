@@ -162,6 +162,13 @@ export const GUIDE_ROUTES: GuideRoute[] = [
     descKey: 'guide.valeCupPage.intro',
   },
   {
+    id: 'deeds',
+    sub: 'deeds',
+    navKey: 'guide.nav.deeds',
+    group: 'compendium',
+    descKey: 'guide.deedsPage.intro',
+  },
+  {
     id: 'controls',
     sub: 'reference/controls',
     navKey: 'guide.nav.controls',

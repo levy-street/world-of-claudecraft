@@ -63,9 +63,12 @@ await sleep(2500);
 // --- Shot 1: Options > Controller panel -----------------------------------
 await page.evaluate(() => window.__game.hud.toggleOptionsMenu());
 await sleep(300);
-// Open the Controller category on the redesigned rail (stable data-category id).
+// Click the "Controller" entry in the game menu by its label.
 await page.evaluate(() => {
-  document.querySelector('#options-menu .opt-tab[data-category="controller"]')?.click();
+  const btn = [...document.querySelectorAll('#options-menu .opt-btn')].find((b) =>
+    /controller|手柄|手把|コントローラー|컨트롤러|геймпад/i.test(b.textContent),
+  );
+  btn?.click();
 });
 await sleep(500);
 await page.screenshot({ path: 'tmp/gamepad_panel.png' });

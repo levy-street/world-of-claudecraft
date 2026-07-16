@@ -1,0 +1,145 @@
+# The Book of Deeds: achievements, Renown, and the authoring contract
+
+The achievements system. One deterministic evaluator in the sim, cosmetic-only
+rewards, a server that observes but never decides. This page is the system in
+brief plus the contract every new deed (and every new piece of conquerable
+content) must follow.
+
+## Vocabulary (player-facing, all rendered through t())
+
+| Term | Meaning |
+|---|---|
+| Deed | One achievement. The everyday word in chat and broadcasts. |
+| Book of Deeds | The achievements window (default `Z`). |
+| Renown | Achievement points, quantized 5, 10, 25, 50. Zero for luck-based deeds and for all Feats. |
+| Chronicle | A per-zone task set, split into Chapters, fronted by a Chronicler NPC. |
+| Chronicler | The in-world NPC face of a zone's Chronicle (Saul, Osric Fenn, Zenzie). |
+| Feat | A zero-Renown deed: legacy, world-first, or unobtainable-by-design. Excluded from completion percentages. |
+| Title | A cosmetic name suffix a player can select and display (nameplate, chat, target frame, character panel, boards). |
+| Border | A cosmetic badge border flourish on capstone deeds. |
+
+## Architecture
+
+The catalog is data-as-code: `src/sim/content/deeds.ts` exports `DEEDS`
+(id to `DeedDef`) and the append-only `DEED_ORDER`, and the same table runs
+identically in the offline browser world, on the authoritative server, and in
+the headless RL env. The evaluator (`src/sim/deeds.ts`, a system module behind
+the `SimContext` seam) runs at the very end of the tick tail (grant
+evaluation over dirty players only, plus a 1 Hz proximity sweep that sets
+visit marks), draws zero rng, grants into `PlayerMeta.deedsEarned`, maintains
+the `renown` sum and the persisted `deedStats` lifetime counters, and emits
+the id-based `deedUnlocked` event (never English text); on world join it
+re-evaluates every predicate against loaded state and grants with
+`retro: true`, so veterans get credit for anything their character verifiably
+already did. The server is an observer, never the authority: it upserts
+unlocks into the `character_deeds` table fire-and-forget
+(`server/deeds_records.ts`), fans out marquee broadcasts, and serves rarity
+percentages and the account-level Renown leaderboard (scored by
+`server/deeds_board.ts`) from TTL caches in `server/main.ts`. Render and UI reach all of it only through the
+`IWorldDeeds` facet of `IWorld`; the window is `src/ui/deeds_view.ts` (pure
+core) plus `src/ui/deeds_window.ts` (painter), and deed names re-localize
+client-side through `src/ui/deed_i18n.ts`. Steam is a dark, env-gated mirror
+(`STEAM_ENABLED`, off by default): linked accounts (link, never login) get
+their earned-and-mapped deeds pushed to Steam via `server/steam/`, with the
+server store always canonical.
+
+## Rules that bind every deed
+
+1. **Cosmetic only.** Rewards are titles and borders. No deed, reward, or
+   Steam surface may confer power, convenience, or actionable information.
+2. **Renown scale**: 5 routine, 10 standard, 25 notable, 50 prestige. ZERO
+   Renown for anything luck-dependent (rare drops), for dynamic metas whose
+   requirements grow with content, and for all Feats. The account score must
+   never be able to decrease on any content patch.
+3. **Closed trigger vocabulary.** Every trigger is one of the `DeedTrigger`
+   kinds in `src/sim/types.ts`: a predicate over persisted state (`level`,
+   `lifetimeXp`, `quest`/`quests`, `arenaRating`, `craftSkill`, `gathering`,
+   `meter`, `flag`), a lifetime counter threshold (`stat` over `deedStats`,
+   `dungeonClears`, `delveClears`), a collection (`collectItems`), an
+   interaction mark (`visit`/`visits`), a meta over other deeds (`meta`), or
+   an explicit bespoke grant (`manual`, for encounter mechanical, perfection,
+   restriction, and speed tasks). Do not invent a new kind when an existing
+   one fits.
+4. **Skill tasks fail only through player error, never RNG.**
+5. **No permanently missable deeds.** Anything tied to seasonal or retired
+   content becomes a Feat, preserved visibly, never deleted.
+6. **Count outcomes, not attempts.** No deed may reward griefing, AFK
+   attendance, or pure login. PvP uses rating thresholds and milestones that
+   cannot be win-traded profitably; multiplayer deeds must be satisfiable
+   only by being a better teammate. Encounter skill tasks deliberately credit
+   the instance/room presence roster, so a healer or taunt tank who leaves no
+   damage trace is still credited, and because instance slots are group-private
+   a passenger riding the kill is the group's own choice, not open-world AFK.
+7. **Thresholds sit where natural play lands.** Most of the catalog is
+   reachable in the first two-thirds of a character's journey; sub-1%
+   unlocks are deliberate prestige only.
+8. **Hidden deeds are a small delight/spoiler set**, fully invisible until
+   earned, and stripped from every public surface (the wiki generator, the
+   rarity endpoint, third-party character sheets). Everything else shows its
+   criteria and progress.
+9. **Never retro-edit an existing trigger.** Widening a trigger list changes
+   mid-progress fractions and re-scopes what an earned deed meant; new
+   coverage lands as NEW deeds. Earned records are append-only.
+10. **Era feats** resolve via the `DEEDS_ERA` constant in
+    `src/sim/content/deeds.ts`, bumped only by the maintainer at era
+    boundaries.
+
+## Adding a deed (the recipe)
+
+1. Think the block through first: id (lower_snake with its category prefix:
+   `prog_`, `cmb_`, `dgn_`, `dlv_`, `chr_`, `col_`, `pvp_`, `soc_`, `exp_`,
+   `feat_`, `hid_`), English name and one-sentence criteria desc in the
+   game's playful classic voice, Renown on the scale above, a trigger from
+   the closed vocabulary, reward (most deeds: none), hidden flag, Steam
+   decision.
+2. Add the `DeedDef` at the END of the `DEEDS` table in
+   `src/sim/content/deeds.ts`. `DEED_ORDER` derives from table order, so the
+   table is append-only: never reorder or edit existing entries.
+3. If no persisted state covers the trigger, add a `DeedStatKey` counter and
+   bump it at the gameplay site through the append-only `SimContext`
+   callbacks (`bumpDeedStat`, which also marks the player dirty; a site that
+   changes trigger-relevant state without a counter calls `markDeedsDirty`),
+   or call the bespoke grant helper for `manual` deeds. Never ship a counter
+   no deed reads, and never ship a deed no site can satisfy (a
+   visible-but-unearnable deed is worse than none).
+4. Tests: `tests/deeds_content.test.ts` pins the catalog (ids, renown
+   values, trigger integrity against the real content tables);
+   `tests/deeds_sites.test.ts` covers grant sites. New counters and sites
+   get decisive assertions in the same change.
+5. Regenerate the wiki (`npm run wiki:content`, gated by
+   `tests/guide.test.ts`); hidden deeds are filtered structurally and must
+   never appear in the generated guide.
+6. Icons: real art ships as 512px sources ingested to 128px WebP by
+   `scripts/convert_deed_icons_webp.mjs` (regenerates
+   `src/ui/deed_image_ids.ts`); an artless deed falls back to its procedural
+   category crest, so art can trail the deed. Flag new ids to the maintainer
+   for the commissioned set (a line in the PR body listing the new ids is
+   enough).
+7. Steam: if the deed is marquee, legible, and spoiler-safe, add its
+   `ACH_<UPPER_SNAKE>` mapping in `server/steam/achievement_map.ts` (hard
+   cap 100 registered names; API names are stable forever).
+
+Every new piece of conquerable content (a dungeon, delve, raid, world boss,
+zone, or rare) authors its deeds in the SAME change that adds the content;
+the root `CLAUDE.md` content rule points here.
+
+## Deliberately deferred (do not "fix" these by shipping them)
+
+- **Account-level deeds** (`prog_three_paths`, `prog_ninefold`, and the
+  seven server-assisted `feat_*` world/realm firsts): the v1 evaluator is
+  strictly per-character and `server/deeds_records.ts` is observer-only; an
+  account-level grant lane must exist first.
+- **`prog_ringwright`**: jewelcrafting and inscription have zero recipes
+  today, and enchanting (which ships an enchant table and gains skill from
+  disenchant and apply-enchant in the sim) has no player-facing wiring on
+  any host yet, so the ten-craft ring cannot complete and the deed would be
+  visible yet unearnable.
+- **The salvage pair** (`soc_first_salvage`, `soc_salvage_50`): salvage has
+  no player-facing wiring on any host yet (no `IWorld` member, no UI caller,
+  no wire or server command).
+- **`pvp_vcup_bet_flex`**: cut; no betting-adjacent deeds ship, even at 0
+  Renown.
+
+The reviewed design blocks for all of these live in the deed catalog's
+authoring history; a deferred deed stays out of `DEED_ORDER` and off Steam
+until its blocker actually lands.

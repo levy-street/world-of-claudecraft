@@ -13,15 +13,8 @@
 // NON-modal companion of the bags window: the window itself installs no focus
 // trap (the bags-style capture-and-return deps), and only the buy-slots confirm
 // and withdraw-quantity prompts trap (their own Tab cycle, appended to
-// #prompt-stack).
-//
-// Chrome is the shared AAA window frame (window_frame.ts) mounted on an inner
-// container so the #bank-window root stays pristine for the docking CSS; the frame
-// IS the dialog (role + aria-labelledby, so no separate markDialogRoot). The slot
-// grid uses the .item-cell grammar (rarity via data-quality from the quality tokens,
-// no raw hex in the painter), the filter is a .filter-row / .chip / .search-field
-// header, empty states use .empty-state, and the buy-slots row sits in the sticky
-// .window-footer.
+// #prompt-stack). No raw hex: the item-quality color comes from the shared
+// QUALITY_COLOR map and the unranked fallback is the --color-quality-default token.
 
 import { audio } from '../game/audio';
 import { ITEMS } from '../sim/data';
@@ -50,25 +43,19 @@ import {
   hasDepositableMaterials,
   planDepositAllMaterials,
 } from './bank_view';
+import { markDialogRoot } from './dialog_root';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { FOCUSABLE_SELECTOR } from './focus_manager';
 import { formatMoney, formatNumber, type TranslationKey, t } from './i18n';
+import { QUALITY_COLOR } from './icons';
 import type { PainterHostPresentation } from './painter_host';
-import { renderWindowFrame } from './window_frame';
-import type { WindowFrameDescriptor } from './window_frame_view';
+import { svgIcon } from './ui_icons';
 
-// A closable, footer-bearing frame: the capacity counter, filter toolbar, transient
-// deposit-all status, and the scrollable grid+bonus region render into the body; the
-// buy-slots expansion row is the sticky-footer bottom action. Reuses the existing
-// bank title + close keys. Instance-parameterized on '#bank-window' (title id
-// 'bank-window-title').
-const BANK_FRAME: WindowFrameDescriptor = {
-  id: 'bank-window',
-  titleKey: 'hudChrome.bank.title',
-  closeLabelKey: 'hudChrome.bank.close',
-  footer: true,
-};
+// The unranked quality fallback as a CSS custom property. The shared QUALITY_COLOR
+// map carries the real per-quality hex; this token covers an item with no quality
+// field, so no raw hex lives in the painter (mirrors bags' --bag-slot-quality).
+const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)';
 
 // Grace before a null bankInfo closes the window: online the bank mirror rides the
 // proximity snapshot, so it can lag the open by about a tick (copies the mailbox's
@@ -297,32 +284,22 @@ export class BankWindow {
       el.inert = false;
     }
     this.deps.hideTooltip();
+    markDialogRoot(el, { label: t('hudChrome.bank.title') });
     // .bank-scroll (not #bank-window) is the scroll container; it is recreated on
     // every rebuild, so capture its scroll offset and reapply it to the fresh one,
     // else a withdraw snaps the list back to the top (the bags idiom).
     const prevScrollTop = el.querySelector('.bank-scroll')?.scrollTop ?? 0;
     const model = buildBankView(this.deps.world().bankInfo, (id) => ITEMS[id]);
-    // Stamp the shared AAA window frame onto an INNER mount, leaving the #bank-window
-    // root pristine (never a builder class / role / aria): the frame IS the dialog
-    // (role + aria-labelledby), and the root stays the docking anchor the cluster CSS
-    // targets by id. The body scrolls between the pinned titlebar and the sticky
-    // footer that hosts the buy-slots row.
-    const mount = document.createElement('div');
-    const { body, footer } = renderWindowFrame(mount, BANK_FRAME, { onClose: () => this.close() });
-    // The title carries a subtitle (the Gilded Strongbox flavour) the frame builder
-    // cannot interpolate; set it on the frame title span (cold-path innerHTML, esc()d).
-    const titleEl = mount.querySelector<HTMLElement>('.window-title');
-    if (titleEl) {
-      titleEl.innerHTML = `${esc(t('hudChrome.bank.title'))} <span class="panel-subtitle">${esc(t('hudChrome.bank.subtitle'))}</span>`;
-    }
+    el.innerHTML =
+      `<div class="panel-title"><span>${esc(t('hudChrome.bank.title'))} <span class="panel-subtitle">${esc(t('hudChrome.bank.subtitle'))}</span></span>` +
+      `<button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.bank.close'))}">${svgIcon('close')}</button></div>`;
+    el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
+    if (hadFocus && !searchFocus) (el.querySelector('[data-close]') as HTMLElement | null)?.focus();
     if (model.kind === 'away') {
       const away = document.createElement('div');
-      away.className = 'empty-state';
+      away.className = 'bank-empty';
       away.textContent = t('hudChrome.bank.tooFar');
-      body.appendChild(away);
-      el.replaceChildren(mount);
-      if (hadFocus && !searchFocus)
-        (el.querySelector('[data-window-close]') as HTMLElement | null)?.focus();
+      el.appendChild(away);
       return;
     }
     const capacity = document.createElement('div');
@@ -331,19 +308,19 @@ export class BankWindow {
     const total = this.fmt(model.capacity.total);
     capacity.textContent = t('hudChrome.bank.capacity', { used, total });
     capacity.setAttribute('aria-label', t('hudChrome.bank.capacityAria', { used, total }));
-    body.appendChild(capacity);
+    el.appendChild(capacity);
     // Always mount the toolbar in the bank state: the deposit-all button belongs there
     // even over an empty bank, while buildFilterBar drops the search/category/sort
     // controls when there is nothing yet to filter.
-    body.appendChild(this.buildFilterBar(model.empty));
+    el.appendChild(this.buildFilterBar(model.empty));
     const status = this.buildDepositStatus();
-    if (status) body.appendChild(status);
+    if (status) el.appendChild(status);
     // One shared scroll region holds the grid plus the bonus breakdown as its tail:
     // at a 360px-tall phone the rigid chrome (title, capacity, toolbar, buy row)
     // leaves less than one cell row of flex space, so a fixed below-the-buy-row
     // footer either crushed the grid or clipped itself (found live in QA).
     // Scrolling past the last cells reaches the bonus copy on every viewport, and
-    // the transactional buy row stays pinned below in the sticky footer.
+    // the transactional buy row stays pinned below, always visible.
     const scroll = document.createElement('div');
     scroll.className = 'bank-scroll';
     const grid = document.createElement('div');
@@ -354,14 +331,9 @@ export class BankWindow {
     // it advertises what account links earn.
     const bonus = this.buildBonusSection(model.bonus);
     if (bonus) scroll.appendChild(bonus);
-    body.appendChild(scroll);
-    // The buy-slots expansion row is the window's bottom transactional action: it
-    // rides the sticky footer, always visible while the body scrolls.
-    if (footer) footer.appendChild(this.buildBuyRow(model.buy));
-    el.replaceChildren(mount);
+    el.appendChild(scroll);
     scroll.scrollTop = prevScrollTop;
-    if (hadFocus && !searchFocus)
-      (el.querySelector('[data-window-close]') as HTMLElement | null)?.focus();
+    el.appendChild(this.buildBuyRow(model.buy));
     if (searchFocus) {
       const fresh = el.querySelector('.bag-search') as HTMLInputElement | null;
       if (fresh) {
@@ -370,7 +342,7 @@ export class BankWindow {
       } else if (hadFocus) {
         // The rebuild dropped the search box (the bank emptied): fall back to the
         // close button rather than dropping focus to <body>.
-        (el.querySelector('[data-window-close]') as HTMLElement | null)?.focus();
+        (el.querySelector('[data-close]') as HTMLElement | null)?.focus();
       }
     }
   }
@@ -410,7 +382,7 @@ export class BankWindow {
     empty: boolean,
   ): void {
     if (empty) {
-      grid.innerHTML = `<div class="empty-state">${esc(t('hudChrome.bank.empty'))}</div>`;
+      grid.innerHTML = `<div class="bank-empty">${esc(t('hudChrome.bank.empty'))}</div>`;
       return;
     }
     // Apply the window-local filter/sort. slotIndex rides through, so a filtered or
@@ -428,7 +400,7 @@ export class BankWindow {
       // (only dormant unknown-id slots remain) there is nothing to "match", so keep the
       // classic empty-square pad instead of a misleading no-match line.
       if (isDefault) this.appendEmptyCells(grid, emptyCells);
-      else grid.innerHTML = `<div class="empty-state">${esc(t('hudChrome.bags.noMatch'))}</div>`;
+      else grid.innerHTML = `<div class="bank-empty">${esc(t('hudChrome.bags.noMatch'))}</div>`;
       return;
     }
     for (const slot of visible) {
@@ -436,17 +408,15 @@ export class BankWindow {
       if (!item) continue;
       const cell = document.createElement('button');
       cell.type = 'button';
-      // AAA item-cell grammar: rarity border from the quality tokens via data-quality
-      // (the view core already resolved slot.qualityKey), the stack count in the
-      // corner, and the shared focus ring.
-      cell.className = 'item-cell';
-      cell.setAttribute('data-quality', slot.qualityKey);
+      cell.className = `bank-item q-${slot.qualityKey}`;
+      const qColor = QUALITY_COLOR[slot.qualityKey] ?? QUALITY_DEFAULT_COLOR;
+      cell.style.setProperty('--bank-slot-quality', qColor);
       const itemName = itemDisplayName(item);
       cell.setAttribute(
         'aria-label',
         t('itemUi.bags.itemAria', { item: itemName, count: this.fmt(slot.count) }),
       );
-      cell.innerHTML = `${this.deps.itemIcon(item)}${slot.showCount ? `<span class="item-cell-count">${esc(t('itemUi.bags.stackCount', { count: this.fmt(slot.count) }))}</span>` : ''}`;
+      cell.innerHTML = `${this.deps.itemIcon(item)}<span class="bank-count">${slot.showCount ? esc(t('itemUi.bags.stackCount', { count: this.fmt(slot.count) })) : ''}</span>`;
       cell.addEventListener('click', (ev) => {
         // On touch, the click that ends a long-press peek inspects the slot (its
         // tooltip is already shown) instead of withdrawing: the release dismisses
@@ -475,7 +445,7 @@ export class BankWindow {
   private appendEmptyCells(grid: HTMLElement, n: number): void {
     for (let i = 0; i < n; i++) {
       const cell = document.createElement('div');
-      cell.className = 'item-cell is-empty';
+      cell.className = 'bank-item empty';
       cell.setAttribute('aria-hidden', 'true');
       grid.appendChild(cell);
     }
@@ -526,13 +496,13 @@ export class BankWindow {
 
     if (!bankEmpty) {
       const chips = document.createElement('div');
-      chips.className = 'filter-row';
+      chips.className = 'bag-chips';
       chips.setAttribute('role', 'group');
       chips.setAttribute('aria-label', t('hudChrome.bank.filterGroupAria'));
       for (const category of BAG_CATEGORIES) {
         const chip = document.createElement('button');
         chip.type = 'button';
-        chip.className = 'chip';
+        chip.className = `bag-chip${this.filter.category === category ? ' active' : ''}`;
         chip.textContent = t(BANK_CATEGORY_LABEL_KEYS[category]);
         chip.setAttribute('aria-pressed', this.filter.category === category ? 'true' : 'false');
         chip.addEventListener('click', () => {
@@ -546,8 +516,6 @@ export class BankWindow {
       }
       bar.appendChild(chips);
 
-      const searchField = document.createElement('div');
-      searchField.className = 'search-field';
       const search = document.createElement('input');
       search.type = 'search';
       search.className = 'bag-search';
@@ -559,8 +527,7 @@ export class BankWindow {
         this.persistFilter();
         this.refreshGrid();
       });
-      searchField.appendChild(search);
-      tools.appendChild(searchField);
+      tools.appendChild(search);
 
       const sort = document.createElement('select');
       sort.className = 'bag-sort';
@@ -819,7 +786,7 @@ export class BankWindow {
       dismiss();
       // render() rebuilds the window, detaching the opener button, so land focus on
       // the always-present close button rather than letting it fall to <body>.
-      (this.deps.root().querySelector('[data-window-close]') as HTMLElement | null)?.focus();
+      (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
     });
     cancel.addEventListener('click', dismissAndReturn);
     stack.appendChild(prompt);
@@ -863,7 +830,7 @@ export class BankWindow {
       const live = this.deps.world().bankInfo?.slots[slotIndex];
       if (!live || !slot || live.itemId !== slot.itemId) {
         dismiss();
-        (this.deps.root().querySelector('[data-window-close]') as HTMLElement | null)?.focus();
+        (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
         return;
       }
       const count = Math.max(
@@ -877,7 +844,7 @@ export class BankWindow {
       dismiss();
       // The grid rebuilds on the withdraw event, detaching the opener slot, so land on
       // the always-present close button rather than dropping focus to <body>.
-      (this.deps.root().querySelector('[data-window-close]') as HTMLElement | null)?.focus();
+      (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
     };
     confirm.addEventListener('click', submit);
     cancel.addEventListener('click', dismissAndReturn);
@@ -946,7 +913,7 @@ export class BankWindow {
       // chat/jump bind and steals the WCAG 2.4.3 focus return. The event path is
       // fixed at dispatch, so this listener still runs after the detach; only THEN
       // cancel the default too, or the browser runs the key's activation against
-      // the freshly re-landed focus (Enter ghost-clicking [data-window-close] and closing
+      // the freshly re-landed focus (Enter ghost-clicking [data-close] and closing
       // the whole window).
       if (ke.key === 'Enter' || ke.key === ' ' || ke.code === 'Space') {
         ke.stopPropagation();

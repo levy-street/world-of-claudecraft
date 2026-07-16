@@ -2,9 +2,9 @@
 //
 // Behavioral pin for the per-corpse harvest picker painter (the pure row/button
 // decisions are unit-tested in corpse_harvest_view via the sim suite). Unlike the
-// other batch-5 windows, this is NOT a standalone framed window: hud.ts (read-only
-// here) composes renderCorpseHarvestPicker into its existing cursor-anchored
-// #loot-window popup (openLoot), which is neither draggable nor resizable, so it
+// other batch-5 windows, this is NOT a standalone framed window: the loot window
+// controller composes renderCorpseHarvestPicker into its cursor-anchored popup,
+// which is neither draggable nor resizable, so it
 // stays a picker section rather than adopting the .window-frame chrome. This test
 // locks the load-bearing contract the AAA pass must NOT disturb: the checkbox
 // selection maps straight through to onHarvest (the tags drive the concentrated
@@ -12,8 +12,8 @@
 // requires stay untouched), the harvest-disabled state, and the empty short-circuit.
 
 import { describe, expect, it, vi } from 'vitest';
-import type { CorpseHarvestViewModel } from '../src/ui/corpse_harvest_view';
-import { renderCorpseHarvestPicker } from '../src/ui/corpse_harvest_window';
+import type { CorpseHarvestViewModel } from '../src/ui/hud/loot/corpse_harvest_view';
+import { renderCorpseHarvestPicker } from '../src/ui/hud/loot/corpse_harvest_window';
 
 function view(overrides: Partial<CorpseHarvestViewModel> = {}): CorpseHarvestViewModel {
   return {
@@ -49,6 +49,14 @@ describe('renderCorpseHarvestPicker: picker section', () => {
     const container = document.createElement('div');
     renderCorpseHarvestPicker(container, view({ harvestDisabled: true }), { onHarvest: () => {} });
     expect(container.querySelector<HTMLButtonElement>('.corpse-harvest-btn')?.disabled).toBe(true);
+  });
+
+  it('exposes what Harvest does via a tooltip, distinct from Take All (playtester clarity)', () => {
+    const container = document.createElement('div');
+    renderCorpseHarvestPicker(container, view(), { onHarvest: () => {} });
+    const btn = container.querySelector<HTMLButtonElement>('.corpse-harvest-btn');
+    expect(btn?.title).toBeTruthy();
+    expect(btn?.title.length).toBeGreaterThan(0);
   });
 
   it('reports exactly the currently-checked tags to onHarvest (the concentration/timing contract)', () => {

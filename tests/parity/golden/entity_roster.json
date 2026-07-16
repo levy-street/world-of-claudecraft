@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 407,
-      "state": "3aab6491",
+      "nextId": 410,
+      "state": "dac3634b",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -42,9 +42,18 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 406,
+          "entityId": 409,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -79,7 +88,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 406,
+          "id": 409,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -122,9 +131,9 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 409,
-      "state": "d207df1d",
-      "events": "8dd7da22",
+      "nextId": 412,
+      "state": "cf22f985",
+      "events": "edb4e25e",
       "rng": {
         "draws": 4,
         "digest": "7ba9533d"
@@ -133,8 +142,8 @@
     {
       "tick": 4,
       "time": 0.2,
-      "nextId": 409,
-      "state": "82afe67b",
+      "nextId": 412,
+      "state": "21218eff",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -144,8 +153,8 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 409,
-      "state": "b3e7c507",
+      "nextId": 412,
+      "state": "e543a133",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -171,9 +180,32 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 406,
+          "entityId": 409,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -190,6 +222,7 @@
           "lifetimeXp": 27600,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "renown": 20,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -209,7 +242,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.25,
           "hp": 50000,
-          "id": 406,
+          "id": 409,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -252,8 +285,8 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 409,
-      "state": "42ff7398",
+      "nextId": 412,
+      "state": "bc4cc5dc",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -279,9 +312,32 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 406,
+          "entityId": 409,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -298,6 +354,7 @@
           "lifetimeXp": 27600,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "renown": 20,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -324,7 +381,7 @@
           "fiveSecondRule": 99.25,
           "ghost": true,
           "hp": 432,
-          "id": 406,
+          "id": 409,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -367,9 +424,9 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 409,
-      "state": "dbff6eaa",
-      "events": "b3e796d6",
+      "nextId": 412,
+      "state": "3ad1c711",
+      "events": "e6ba317e",
       "rng": {
         "draws": 4,
         "digest": "7ba9533d"
@@ -394,9 +451,32 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 406,
+          "entityId": 409,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -413,6 +493,7 @@
           "lifetimeXp": 27600,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "renown": 20,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -432,7 +513,7 @@
               "name": "Resurrection Sickness",
               "remaining": 60,
               "school": "shadow",
-              "sourceId": 406,
+              "sourceId": 409,
               "value": -0.75
             }
           ],
@@ -444,7 +525,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.25,
           "hp": 44,
-          "id": 406,
+          "id": 409,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -487,8 +568,8 @@
     {
       "tick": 6,
       "time": 0.3,
-      "nextId": 409,
-      "state": "9468d5b5",
+      "nextId": 412,
+      "state": "57b94810",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -498,8 +579,8 @@
     {
       "tick": 7,
       "time": 0.35,
-      "nextId": 409,
-      "state": "31218b7d",
+      "nextId": 412,
+      "state": "ae9f3f68",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -525,9 +606,32 @@
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 406,
+          "entityId": 409,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -544,6 +648,7 @@
           "lifetimeXp": 27600,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "renown": 20,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -563,7 +668,7 @@
               "name": "Resurrection Sickness",
               "remaining": 59.9,
               "school": "shadow",
-              "sourceId": 406,
+              "sourceId": 409,
               "value": -0.75
             }
           ],
@@ -575,7 +680,7 @@
           "fallStartY": 1.511848,
           "fiveSecondRule": 99.35,
           "hp": 44,
-          "id": 406,
+          "id": 409,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",

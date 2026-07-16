@@ -732,6 +732,26 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(druid?.auras?.some((a: Ev) => a.kind === 'form_bear')).toBe(false);
   });
 
+  it('hit_rating_heroic pair: gear changes the threshold, never the RNG draw order', () => {
+    const ungearedScenario = SCENARIOS.find((s) => s.name === 'hit_rating_heroic_ungeared')!;
+    const gearedScenario = SCENARIOS.find((s) => s.name === 'hit_rating_heroic_geared')!;
+    const ungeared = record(ungearedScenario);
+    const geared = record(gearedScenario);
+
+    expect(ungeared.rec.sim.player.hitRating).toBe(0);
+    expect(geared.rec.sim.player.hitRating).toBe(170);
+    const gearedMob = (geared.rec.sim as any).entities.get(geared.rec.notes.mobId);
+    expect(gearedMob.level - geared.rec.sim.player.level).toBe(3);
+    expect(
+      geared.rec.allEvents.some(
+        (e: Ev) => e.type === 'damage' && e.sourceId === geared.rec.sim.player.id,
+      ),
+    ).toBe(true);
+
+    expect(geared.trace.draws).toBe(ungeared.trace.draws);
+    expect(geared.trace.drawDigest).toBe(ungeared.trace.drawDigest);
+  });
+
   it('c5_auto_attack: melee swing table + ranged Auto Shot + wand + queued on-swing fire', () => {
     const rec = run('c5_auto_attack');
     const ev = rec.allEvents as Ev[];

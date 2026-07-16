@@ -413,6 +413,37 @@ export function resetAssetUploadRateLimits(): void {
   assetUploadAccountAttempts.clear();
 }
 
+// Steam link attempts get their own per-IP AND per-account bucket, mirroring
+// the wallet-link throttle: every allowed attempt costs an upstream
+// AuthenticateUserTicket call, so the budget is deliberately tighter than the
+// wallet's, and a link flood can never burn a player's login budget.
+export const STEAM_LINK_MAX_PER_MINUTE = 5;
+const steamLinkIpAttempts = new Map<string, number[]>();
+const steamLinkAccountAttempts = new Map<number, number[]>();
+
+export function steamLinkRateLimited(
+  req: http.IncomingMessage,
+  accountId: number,
+): RateLimitOutcome {
+  const ip = recordSlidingWindowAttempt(
+    steamLinkIpAttempts,
+    requestIp(req),
+    STEAM_LINK_MAX_PER_MINUTE,
+  );
+  const account = recordSlidingWindowAttempt(
+    steamLinkAccountAttempts,
+    accountId,
+    STEAM_LINK_MAX_PER_MINUTE,
+  );
+  return mergeFusedOutcomes(ip, account);
+}
+
+/** Reset Steam link throttles. Test-only: keeps scoped buckets isolated. */
+export function resetSteamLinkRateLimits(): void {
+  steamLinkIpAttempts.clear();
+  steamLinkAccountAttempts.clear();
+}
+
 export function walletLinkRateLimited(
   req: http.IncomingMessage,
   accountId: number,
@@ -576,6 +607,76 @@ export function characterMutationRateLimited(
 export function resetCharacterMutationRateLimits(): void {
   characterMutationIpAttempts.clear();
   characterMutationAccountAttempts.clear();
+}
+
+// Claudium writes can create payment sessions, persist on-chain quotes, poll a
+// settlement verifier, or debit the account ledger. Each action receives its own
+// pre-auth IP bucket plus the existing post-auth fused IP AND account bucket, so
+// invalid-token floods stop before a DB lookup while authenticated account abuse
+// remains capped. Confirm is deliberately the roomiest because the client retries
+// pending chain settlement; purchase remains strict because every accepted call
+// can create a new provider-side payment object.
+export const CLAUDIUM_PURCHASE_MAX_PER_MINUTE = 10;
+export const CLAUDIUM_QUOTE_MAX_PER_MINUTE = 20;
+export const CLAUDIUM_CONFIRM_MAX_PER_MINUTE = 60;
+export const CLAUDIUM_SPEND_MAX_PER_MINUTE = 30;
+
+export type ClaudiumMutationAction = 'purchase' | 'quote' | 'confirm' | 'spend';
+
+const claudiumMutationIpAttempts = new Map<string, number[]>();
+const claudiumMutationAccountAttempts = new Map<string, number[]>();
+const claudiumPreAuthIpAttempts = new Map<string, number[]>();
+
+export function claudiumMutationLimit(action: ClaudiumMutationAction): number {
+  switch (action) {
+    case 'purchase':
+      return CLAUDIUM_PURCHASE_MAX_PER_MINUTE;
+    case 'quote':
+      return CLAUDIUM_QUOTE_MAX_PER_MINUTE;
+    case 'confirm':
+      return CLAUDIUM_CONFIRM_MAX_PER_MINUTE;
+    case 'spend':
+      return CLAUDIUM_SPEND_MAX_PER_MINUTE;
+  }
+}
+
+/** Per-IP monetary throttle that runs before bearer-token database resolution. */
+export function claudiumPreAuthRateLimited(
+  req: http.IncomingMessage,
+  action: ClaudiumMutationAction,
+): RateLimitOutcome {
+  return recordSlidingWindowAttempt(
+    claudiumPreAuthIpAttempts,
+    `${action}:${requestIp(req)}`,
+    claudiumMutationLimit(action),
+  );
+}
+
+/** Fused per-IP and per-account throttle for one monetary mutation action. */
+export function claudiumMutationRateLimited(
+  req: http.IncomingMessage,
+  accountId: number,
+  action: ClaudiumMutationAction,
+): RateLimitOutcome {
+  const limit = claudiumMutationLimit(action);
+  const ip = recordSlidingWindowAttempt(
+    claudiumMutationIpAttempts,
+    `${action}:${requestIp(req)}`,
+    limit,
+  );
+  const account = recordSlidingWindowAttempt(
+    claudiumMutationAccountAttempts,
+    `${action}:${accountId}`,
+    limit,
+  );
+  return mergeFusedOutcomes(ip, account);
+}
+
+/** Reset Claudium mutation throttles. Test-only. */
+export function resetClaudiumMutationRateLimits(): void {
+  claudiumMutationIpAttempts.clear();
+  claudiumMutationAccountAttempts.clear();
+  claudiumPreAuthIpAttempts.clear();
 }
 
 // Player-report creation had no dedicated limiter (it was gated only by the full

@@ -11,7 +11,7 @@ import {
   type ActionBarPaintDescriptor,
   ActionBarPainter,
   type ActionBarSlotElements,
-} from '../src/ui/action_bar_painter';
+} from '../src/ui/hud/action_bar/action_bar_painter';
 import {
   type ActionBarAbility,
   type ActionBarDeps,
@@ -19,7 +19,7 @@ import {
   type ActionBarState,
   type ActionBarWorldInput,
   createActionBarView,
-} from '../src/ui/action_bar_view';
+} from '../src/ui/hud/action_bar/action_bar_view';
 import { makeWriterFacet, type PainterHostWriters } from '../src/ui/painter_host';
 
 type Call = { m: keyof PainterHostWriters; args: unknown[] };
@@ -196,6 +196,7 @@ function idleWorld(): ActionBarWorldInput {
       gcdRemaining: 0,
       potionCdRemaining: 0,
       queuedOnSwing: null,
+      stealthed: false,
       pos: { x: 0, y: 0, z: 0 },
     },
     target: null,
@@ -232,7 +233,7 @@ describe('ActionBarPainter: aria-label + icon elision (Top risks 1 + 4)', () => 
         slots: [
           {
             slotIndex: 0,
-            isAttack: false,
+            isAttack: () => false,
             hasAction: () => true,
             ability: () => ability('fireball'),
             item: () => null,
@@ -264,7 +265,10 @@ describe('ActionBarPainter: aria-label + icon elision (Top risks 1 + 4)', () => 
 });
 
 describe('ActionBarPainter: no raw DOM writes, no magic values', () => {
-  const src = readFileSync(new URL('../src/ui/action_bar_painter.ts', import.meta.url), 'utf8');
+  const src = readFileSync(
+    new URL('../src/ui/hud/action_bar/action_bar_painter.ts', import.meta.url),
+    'utf8',
+  );
   const code = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
 
   it('makes no raw style / textContent / classList / className / setAttribute / setProperty write', () => {

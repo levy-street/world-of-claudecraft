@@ -4,7 +4,7 @@
 // scrolls away with the content; the grip visual is a background layer on
 // `.window.window-resizable`, see src/styles/layout.css).
 //
-// Event-driven chrome like the hud.ts window drag (not a per-frame painter):
+// Event-driven chrome like window_drag.ts (not a per-frame painter):
 // document-level pointer delegation, pointer capture on the window, and the
 // same visual-vs-author space correction (see src/ui/ui_scale.ts). Owned state
 // is one pending/active session; everything else is injected via deps (never Hud).
@@ -34,10 +34,7 @@ export interface WindowResizeDeps {
 }
 
 // Windows whose body is not reflowable content: fixed-size boards/popups and
-// the modal prompts. Everything else gets the grip. The Esc options menu (the
-// Warden's Codex) is NO LONGER excluded: per maintainer direction it drags by its
-// titlebar and resizes by the corner band like every other grammar window (this
-// supersedes the esc-menu-redesign spec section 2 fixed-window ruling).
+// the modal prompts. Everything else gets the grip.
 const NON_RESIZABLE_WINDOW_IDS = new Set([
   'map-window',
   'loot-window',

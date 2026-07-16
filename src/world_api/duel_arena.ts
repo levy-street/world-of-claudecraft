@@ -144,6 +144,10 @@ export interface IWorldDuelArena {
   duelAccept(): void;
   duelDecline(): void;
   arenaInfo: ArenaInfo | null;
+  /** Spendable soulbound PvP currency for the local/observed character. */
+  honor: number;
+  /** Monotonic total Honor earned by the local/observed character. */
+  lifetimeHonor: number;
   arenaQueueJoin(format?: ArenaFormat): void;
   arenaQueueLeave(): void;
   // 2v2 Fiesta: lock in one of the augments currently on offer

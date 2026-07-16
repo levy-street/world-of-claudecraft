@@ -244,6 +244,11 @@ export async function mergedPrsForLogin(login: string): Promise<number> {
  * The top contributors as ranked developer-leaderboard rows (rank 1 = most
  * merged PRs), each with the dev tier its merged-PR count earns. Capped at
  * LEADERBOARD_MAX. Reads the cached snapshot (refreshing if stale).
+ *
+ * DELIBERATELY EXEMPT from the moderation delisting every player-derived
+ * board applies (db.ts ELIGIBLE_ACCOUNT_SQL): this board ranks GitHub
+ * identities from the public repo stats, with no game-account linkage, so
+ * there is nothing to moderate against. A decision, not an omission.
  */
 export async function topContributors(limit = LEADERBOARD_MAX): Promise<DevLeaderboardEntry[]> {
   const { stats } = await getContributors();

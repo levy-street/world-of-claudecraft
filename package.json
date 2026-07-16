@@ -1,6 +1,6 @@
 {
   "name": "world-of-claudecraft",
-  "version": "0.24.0",
+  "version": "0.27.0",
   "private": true,
   "license": "MIT",
   "author": {
@@ -16,7 +16,7 @@
     "release:prepare": "node scripts/release_version.mjs prepare",
     "version:sync": "node scripts/version_sync.mjs",
     "version": "node scripts/version_sync.mjs && git add android/app/build.gradle ios/App/App.xcodeproj/project.pbxproj",
-    "build": "npm run i18n:build && npm run i18n:admin && npm run i18n:scan && npm run wiki:content && npm run sitemap:build && node scripts/build_media_manifest.mjs generate && vite build && node scripts/check_backdrop_survival.mjs && node scripts/build_media_manifest.mjs emit",
+    "build": "npm run i18n:build && npm run i18n:admin && npm run i18n:scan && npm run wiki:content && npm run sitemap:build && npm run sfx:manifest && node scripts/build_media_manifest.mjs generate && vite build && node scripts/check_backdrop_survival.mjs && node scripts/build_media_manifest.mjs emit",
     "wiki:content": "node scripts/wiki/build_content.mjs",
     "wiki:stills": "node scripts/wiki/render_model_stills.mjs",
     "sitemap:build": "node scripts/build_sitemap.mjs",
@@ -55,9 +55,12 @@
     "i18n:worklist": "node scripts/i18n_fill_worklist.mjs",
     "perf:tour": "node scripts/perf_tour.mjs",
     "perf:prewarm": "node scripts/prewarm_travel_bench.mjs",
+    "ops:cpu-monitor": "node scripts/prod_cpu_monitor.mjs",
     "feel:smoke": "node scripts/feel_smoke.mjs",
     "asset:budget": "node scripts/asset_budget.mjs",
+    "assets:items": "node scripts/convert_item_icons_webp.mjs",
     "assets:skills": "node scripts/convert_skill_icons_webp.mjs",
+    "assets:deeds": "node scripts/convert_deed_icons_webp.mjs",
     "build:env": "esbuild headless/env_server.ts --bundle --platform=node --format=cjs --outfile=dist-env/env_server.cjs",
     "env": "npm run build:env && node dist-env/env_server.cjs",
     "bench": "npm run build:env && node dist-env/env_server.cjs --bench",
@@ -77,8 +80,12 @@
     "voices:gen": "node scripts/gen_npc_voices.mjs",
     "voices:lines": "node scripts/gen_npc_lines.mjs",
     "sfx:gen": "node scripts/gen_sfx.mjs",
+    "sfx:ui": "node scripts/gen_ui_sfx.mjs",
+    "sfx:manifest": "node scripts/build_sfx_manifest.mjs",
     "sfx:check": "node scripts/sfx_conform.mjs",
     "sfx:conform": "node scripts/sfx_conform.mjs --fix",
+    "sfx:studio": "node scripts/sfx_studio/index.mjs",
+    "sfx:studio:smoke": "node scripts/sfx_studio/e2e.mjs",
     "wiki:seed": "node scripts/mediawiki/build_seed.mjs",
     "sim:nythraxis-matrix": "tsx scripts/nythraxis_matrix.ts"
   },
@@ -136,6 +143,9 @@
     "typescript": "^5.5.0",
     "vite": "^8.0.16",
     "vitest": "4.1.8"
+  },
+  "optionalDependencies": {
+    "steamworks.js": "^0.4.0"
   },
   "build": {
     "appId": "com.worldofclaudecraft.desktop",

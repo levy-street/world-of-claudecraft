@@ -5,6 +5,7 @@
   import { auth } from '../state/auth.svelte';
   import { fmtDate } from '../format';
   import { t } from '../i18n';
+  import { moderationActionLabel, moderationActionVariant } from '../labels';
   import AccountLink from '../components/AccountLink.svelte';
   import Badge from '../components/Badge.svelte';
   import IpLink from '../components/IpLink.svelte';
@@ -12,7 +13,6 @@
   import Panel from '../components/Panel.svelte';
 
   type ModerationHistoryTab = 'all' | 'mine' | 'notes';
-  type BadgeVariant = 'default' | 'neutral' | 'warn' | 'bad' | 'success';
 
   const LIMIT = 100;
 
@@ -48,60 +48,6 @@
     tab = nextTab;
     page = 1;
     void refresh();
-  }
-
-  function actionLabel(action: string): string {
-    if (action === 'suspend') return t('moderationHistory.actionSuspend');
-    if (action === 'unsuspend') return t('moderationHistory.actionUnsuspend');
-    if (action === 'ban') return t('moderationHistory.actionBan');
-    if (action === 'unban') return t('moderationHistory.actionUnban');
-    if (action === 'chat_mute') return t('moderationHistory.actionChatMute');
-    if (action === 'chat_unmute') return t('moderationHistory.actionChatUnmute');
-    if (action === 'force_rename') return t('moderationHistory.actionForceRename');
-    if (action === 'kick') return t('moderationHistory.actionKick');
-    if (action === 'kill') return t('moderationHistory.actionKill');
-    if (action === 'jail') return t('moderationHistory.actionJail');
-    if (action === 'unjail') return t('moderationHistory.actionUnjail');
-    if (action === 'note') return t('moderationHistory.actionNote');
-    if (action === 'reset_password') return t('moderationHistory.actionResetPassword');
-    if (action === 'daily_rewards_ban') return t('moderationHistory.actionDailyRewardsBan');
-    if (action === 'daily_rewards_unban') return t('moderationHistory.actionDailyRewardsUnban');
-    if (action === 'daily_rewards_ip_ban') return t('moderationHistory.actionDailyRewardsIpBan');
-    if (action === 'daily_rewards_ip_unban') return t('moderationHistory.actionDailyRewardsIpUnban');
-    if (action === 'block') return t('moderationHistory.actionIpBlock');
-    if (action === 'unblock') return t('moderationHistory.actionIpUnblock');
-    return t('moderationHistory.actionUnknown');
-  }
-
-  function actionVariant(action: string): BadgeVariant {
-    if (
-      action === 'ban' ||
-      action === 'block' ||
-      action === 'daily_rewards_ban' ||
-      action === 'daily_rewards_ip_ban'
-    ) return 'bad';
-    if (
-      action === 'suspend' ||
-      action === 'chat_mute' ||
-      action === 'reset_password' ||
-      action === 'kick' ||
-      action === 'kill' ||
-      action === 'jail'
-    ) {
-      return 'warn';
-    }
-    if (
-      action === 'unban' ||
-      action === 'unsuspend' ||
-      action === 'chat_unmute' ||
-      action === 'unjail' ||
-      action === 'unblock'
-      || action === 'daily_rewards_unban'
-      || action === 'daily_rewards_ip_unban'
-    ) {
-      return 'success';
-    }
-    return 'neutral';
   }
 
   onMount(() => {
@@ -144,8 +90,8 @@
             <tr>
               <td><time datetime={entry.createdAt}>{fmtDate(entry.createdAt)}</time></td>
               <td>
-                <Badge variant={actionVariant(entry.action)} size="medium">
-                  {actionLabel(entry.action)}
+                <Badge variant={moderationActionVariant(entry.action)} size="medium">
+                  {moderationActionLabel(entry.action)}
                 </Badge>
               </td>
               <td>

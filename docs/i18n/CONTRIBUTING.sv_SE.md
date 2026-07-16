@@ -13,7 +13,7 @@ bugg, bygga en helt ny instans: allt räknas, och du är välkommen här.
 
 Den här guiden hjälper dig att komma igång och göra ditt första bidrag smidigt.
 Du behöver inte vara expert. Om något är oklart, fråga på
-[Discord](https://discord.gg/GjhnUsBtw) så hjälper någon dig gärna.
+[Discord](https://discord.com/invite/worldofclaudecraft) så hjälper någon dig gärna.
 
 Genom att delta godkänner du att följa vår [uppförandekod](../../CODE_OF_CONDUCT.md).
 
@@ -171,7 +171,7 @@ behöver inte skriva någon spelkod för att göra det:
 3. Kör `npx tsc --noEmit` för att bekräfta att inget saknas, och öppna sedan en PR.
 
 För att föreslå ett helt nytt språk, eller för att diskutera ton och terminologi,
-starta en tråd på [Discord](https://discord.gg/GjhnUsBtw) så hjälper vi dig att
+starta en tråd på [Discord](https://discord.com/invite/worldofclaudecraft) så hjälper vi dig att
 koppla in det. Modersmåls- och flytande talare är särskilt välkomna. Bra
 översättningar får spelet att kännas som hemma för spelare överallt.
 
@@ -189,7 +189,7 @@ Använd [issue-mallarna](https://github.com/levy-street/world-of-claudecraft/iss
 ## Få hjälp
 
 Fastnat, eller vill bara säga hej? Gå med i
-[gemenskapens Discord](https://discord.gg/GjhnUsBtw). Ingen fråga är för liten, och
+[gemenskapens Discord](https://discord.com/invite/worldofclaudecraft). Ingen fråga är för liten, och
 nya bidragsgivare är alltid välkomna.
 
 ## Licens

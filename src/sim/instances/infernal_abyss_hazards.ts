@@ -6,6 +6,10 @@ const LAVA_FISSURE_HALF_WIDTH = 1.1;
 const LAVA_FISSURE_HALF_LENGTH = 5;
 const LAVA_DAMAGE_PCT = 0.08;
 
+// Covers lava_moat, lava_pool, and lava_fissure. The two Maw lava_chasm decor
+// pieces are DELIBERATELY not hazards: the maw_bridge walls keep players off
+// them entirely, so they are scenery. If collision ever starts honouring
+// visualOpenings across the Maw, add lava_chasm here in the same change.
 export function infernalLavaAt(x: number, z: number): boolean {
   for (const decor of INFERNAL_ABYSS_LAYOUT.decor ?? []) {
     const scale = decor.scale ?? 1;
@@ -47,10 +51,20 @@ export function infernalLavaAt(x: number, z: number): boolean {
   return false;
 }
 
-export function tickInfernalAbyssLava(ctx: SimContext, origin: { x: number; z: number }): void {
+export function tickInfernalAbyssLava(
+  ctx: SimContext,
+  origin: { x: number; z: number },
+  // The instance-footprint envelope from the call site (updateInstances'
+  // instanceContains): a player outside THIS instance can never be hit, even
+  // if a future layout or slot-spacing change made a foreign player's local
+  // coordinates land inside a lava footprint. Optional so the geometry tests
+  // can drive the footprints directly.
+  contains?: (pos: { x: number; z: number }) => boolean,
+): void {
   for (const meta of ctx.players.values()) {
     const player = ctx.entities.get(meta.entityId);
     if (!player || player.dead) continue;
+    if (contains && !contains(player.pos)) continue;
     const localX = player.pos.x - origin.x;
     const localZ = player.pos.z - origin.z;
     if (!infernalLavaAt(localX, localZ)) continue;

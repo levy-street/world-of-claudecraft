@@ -79,11 +79,7 @@ const hoverInPage = (sel, pick) =>
   page.evaluate(
     (s, p) => {
       const els = [...document.querySelectorAll(s)];
-      const el = p
-        ? (els.find((e) =>
-            new RegExp(p, 'i').test(`${e.textContent || ''} ${e.getAttribute('aria-label') || ''}`),
-          ) ?? els[0])
-        : els[0];
+      const el = p ? (els.find((e) => new RegExp(p, 'i').test(e.textContent)) ?? els[0]) : els[0];
       if (!el) return false;
       const r = el.getBoundingClientRect();
       const x = r.left + r.width / 2,
@@ -100,7 +96,7 @@ const hoverInPage = (sel, pick) =>
 // 1) Open bags and hover the elixir to show its tooltip (name + "Elixir" kind).
 await page.evaluate(() => window.__game.hud.toggleBags());
 await wait(500);
-await hoverInPage('#bags .item-cell', 'Elixir of the Bear');
+await hoverInPage('#bags .bag-item', 'Elixir of the Bear');
 await wait(400);
 await page.screenshot({ path: 'tmp/elixir_tooltip.png' });
 await cropTo('#tooltip', 'tmp/elixir_tooltip_crop.png', 12);

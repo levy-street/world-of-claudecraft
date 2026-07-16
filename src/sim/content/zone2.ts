@@ -28,14 +28,14 @@ export const ZONE2_ZONE: ZoneDef = {
   graveyard: { x: -18, z: 286 },
   lakes: [DEEPFEN_SHALLOWS_LAKE, { x: 60, z: 380, radius: 25 }, { x: -40, z: 450, radius: 20 }],
   pois: [
-    { x: 0, z: 300, label: 'Fenbridge' },
-    { x: -40, z: 230, label: 'Prowler Reeds' },
-    { x: -105, z: 300, label: 'Deepfen Shallows' },
-    { x: 80, z: 315, label: 'Widow Thicket' },
-    { x: 100, z: 435, label: 'Drowned Chapel' },
-    { x: -95, z: 440, label: 'Troll Mounds' },
-    { x: 0, z: 485, label: 'Gravecaller Encampment' },
-    { x: 45, z: 515, label: 'The Sunken Bastion' },
+    { x: 0, z: 300, label: 'Fenbridge', id: 'fenbridge' },
+    { x: -40, z: 230, label: 'Prowler Reeds', id: 'prowler_reeds' },
+    { x: -105, z: 300, label: 'Deepfen Shallows', id: 'deepfen_shallows' },
+    { x: 80, z: 315, label: 'Widow Thicket', id: 'widow_thicket' },
+    { x: 100, z: 435, label: 'Drowned Chapel', id: 'drowned_chapel' },
+    { x: -95, z: 440, label: 'Troll Mounds', id: 'troll_mounds' },
+    { x: 0, z: 485, label: 'Gravecaller Encampment', id: 'gravecaller_encampment' },
+    { x: 45, z: 515, label: 'The Sunken Bastion', id: 'the_sunken_bastion' },
   ],
   welcome: 'Report to Warden Fenwick at the Fenbridge gate.',
 };
@@ -693,6 +693,19 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
     banker: true,
     greeting:
       'The Gilded Strongbox keeps clean ledgers and cleaner vaults. What shall we stow for you?',
+  },
+  chronicler_osric_fenn: {
+    id: 'chronicler_osric_fenn',
+    name: 'Chronicler Osric Fenn',
+    title: 'The Marsh Chronicle',
+    // West side of the square on open ground, looking east toward the gate
+    // (stays west of x=9, the inn's collider margin, see above; nearest
+    // authored neighbor ~10 units, he had been pressed against Fenwick's post).
+    pos: { x: -14, z: 303 },
+    facing: -1.4,
+    color: 0x3fa66b, // fen teal: the chronicler tint is his identity (shared mage visual)
+    questIds: [],
+    greeting: 'Mind the damp on the pages, $N. The fen eats more books than readers ever will.',
   },
 };
 

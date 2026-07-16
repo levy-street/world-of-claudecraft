@@ -12,7 +12,9 @@ under `public/`. Run manually (not part of `npm run build`):
 - **`specs/*.json`** declare *what* to build: `{ items: [{ src, out, type, ... }] }`.
   `src` is usually under `tmp/asset_src` (raw packs, gitignored); `out` is relative
   to `public/`. Specs: `characters`, `characters_v2`, `skeletons_v2`, `dungeon`,
-  `props`, `textures`, `lookdev`, `asset_bits`, `foliage`.
+  `props`, `textures`, `lookdev`, `asset_bits`, `foliage`, `biome_packs`
+  (`ls specs/` for the live set). A new asset pack is a new spec JSON, never
+  hardcoded paths in the script.
 - **`build_assets.mjs`** processes each item with `@gltf-transform` + `meshoptimizer`
   + `sharp`: `resample`, `prune`, `dedup`, `(textureCompress)`, `meshopt`. Types:
   `character`/`static` are geometry-safe (never join/flatten/**simplify**, would

@@ -152,8 +152,8 @@ await page.screenshot({ path: 'tmp/market_03_bought.png' });
 // 4) Sell tab: pick an item from the bags and see the listing form
 await page.evaluate(() => {
   document.querySelector('#market-window [data-tab="sell"]').click();
-  const row = [...document.querySelectorAll('#bags .item-cell')].find((r) =>
-    /Oiled Leather Boots/.test(r.getAttribute('aria-label') || ''),
+  const row = [...document.querySelectorAll('#bags .bag-item')].find((r) =>
+    /Oiled Leather Boots/.test(r.textContent),
   );
   row.click();
 });

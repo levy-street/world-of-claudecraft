@@ -86,6 +86,36 @@ export function completeQuestForDev(ctx: SimContext, questId: string, pid?: numb
   return completeTrackedQuestForDev(ctx, questId, r.meta);
 }
 
+// [dev] /dev attune: mark EVERY quest complete so all requiresQuest / attunement
+// gates open (notably the Nythraxis raid door, which checks
+// questsDone.has('q_nythraxis_bound_guardian')). Unlike the per-quest cheats this
+// does not run the accept/turn-in reward flow (which would flood a 16-slot bag with
+// dozens of reward items); it just stamps questsDone and drops in-progress trackers.
+// The raid entry check reads questsDone server-side, so attunement takes effect at
+// once; wireRev is bumped so the client's quest log reflects it promptly.
+export function completeAllQuestsForDev(ctx: SimContext, pid?: number): number {
+  const r = ctx.resolve(pid);
+  if (!r) return 0;
+  const meta = r.meta;
+  let added = 0;
+  for (const questId of Object.keys(QUESTS)) {
+    if (!meta.questsDone.has(questId)) {
+      meta.questsDone.add(questId);
+      added++;
+    }
+  }
+  // Do NOT clear the quest log: it is persisted CharacterState, and wiping every
+  // in-progress quest is a destructive, irreversible edit to the character. Stamping
+  // questsDone is enough to open every requiresQuest / attunement gate.
+  if (added > 0) meta.wireRev++;
+  ctx.emit({
+    type: 'log',
+    text: `[dev] Attuned: marked ${added} quests complete (in-progress quests untouched).`,
+    pid: meta.entityId,
+  });
+  return added;
+}
+
 export function completeCurrentQuestsForDev(ctx: SimContext, pid?: number): number {
   const r = ctx.resolve(pid);
   if (!r) return 0;

@@ -25,7 +25,10 @@
 import { ABILITIES } from '../sim/data';
 import type { ResolvedAbility } from '../sim/sim';
 import type { PlayerClass } from '../sim/types';
-import { MOBILE_ACTION_PAGE_COUNT, sourceSlotsForMobilePage } from './mobile_action_page_view';
+import {
+  MOBILE_ACTION_PAGE_COUNT,
+  sourceSlotsForMobilePage,
+} from './hud/action_bar/mobile_action_page_view';
 
 /** One spell row: the class kit entry plus its learned / bar state. */
 export interface SpellbookRow {

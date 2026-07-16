@@ -17,7 +17,12 @@ export function itemSetMemberCounts(): Record<string, number> {
   for (const item of Object.values(ITEMS)) {
     if (!item.set) continue;
     const members = membersBySet.get(item.set) ?? new Set<string>();
-    members.add(item.heroicOf ?? item.id);
+    // A set's piece count is its number of distinct SLOTS: the normal item, its
+    // auto-generated heroic variant, and any bespoke heroic raid piece for the same
+    // slot are all one collectible piece (you wear one helmet). Keying on slot keeps
+    // the "X/N" denominator honest (e.g. the 4-slot t2 sets read /4, not an inflated
+    // count from the parallel heroic-variant ids).
+    members.add(item.slot ?? item.id);
     membersBySet.set(item.set, members);
   }
   return Object.fromEntries([...membersBySet].map(([setId, members]) => [setId, members.size]));
