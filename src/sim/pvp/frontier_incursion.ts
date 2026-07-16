@@ -21,6 +21,8 @@ import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { TICK_RATE } from '../types';
 import {
+  FRONTIER_HUB,
+  FRONTIER_HUB_RADIUS,
   FRONTIER_MUSTER,
   FRONTIER_TRASH_HONOR,
   FRONTIER_X_MAX,
@@ -33,6 +35,7 @@ import {
   INCURSION_TRASH_CAP,
   INCURSION_TRASH_KILL_PCT,
   INCURSION_TRASH_RESPAWN_SECONDS,
+  inFrontierHub,
   isFrontierPos,
 } from './frontier';
 import { grantHonor } from './honor';
@@ -82,11 +85,19 @@ function anyPlayerInBand(ctx: SimContext): boolean {
 
 // A deterministic point out in the band for trash spawn number `n` (a ring that walks
 // with the counter, no rng, always inside the band and clear of the safe hub).
-function trashSpawnPoint(n: number): { x: number; z: number } {
+// Exported for the hub-clearance sweep test.
+export function trashSpawnPoint(n: number): { x: number; z: number } {
   const angle = ((n % 12) / 12) * Math.PI * 2;
   const radius = 60 + (n % 5) * 12;
-  const x = Math.min(FRONTIER_X_MAX - 20, FRONTIER_MUSTER.x + Math.cos(angle) * radius);
-  return { x: Math.max(FRONTIER_X_MIN + 20, x), z: Math.sin(angle) * radius };
+  const clamped = Math.min(FRONTIER_X_MAX - 20, FRONTIER_MUSTER.x + Math.cos(angle) * radius);
+  let x = Math.max(FRONTIER_X_MIN + 20, clamped);
+  const z = Math.sin(angle) * radius;
+  // A mouth-facing candidate (angle near pi) sits between the muster point and the
+  // band edge, and can land inside the safe hub (e.g. n % 12 == 6 with n % 5 == 4).
+  // Step it deterministically back out past the hub perimeter, deeper into the band,
+  // so a wisp never spawns on the shoppers (no rng: still a pure function of n).
+  if (inFrontierHub(x, z)) x = FRONTIER_HUB.x + FRONTIER_HUB_RADIUS + 8;
+  return { x, z };
 }
 
 function spawnMob(
@@ -236,8 +247,12 @@ export function frontierIncursionOnHeal(
   if (healed <= 0 || source.kind !== 'player' || !isFrontierPos(target.pos.x)) return;
   const state = ctx.frontierIncursionState;
   addMeter(state, Math.min(healed, INCURSION_HEAL_CAP_PER_CAST) * INCURSION_HEAL_PCT_PER_HP);
-  if (state.phase === 'active' && state.rareId !== null) {
+  // Roster credit is for keeping someone who is actually FIGHTING the rare alive
+  // (the PRD's "healing anyone who is fighting the rare"): the healed target must be
+  // on the rare's threat table, and a self-heal never rides the roster. Otherwise a
+  // hub bystander could self-heal a scratch once and collect the full rare payout.
+  if (state.phase === 'active' && state.rareId !== null && source.id !== target.id) {
     const rare = ctx.entities.get(state.rareId);
-    if (rare && !rare.dead) rare.bossDamagers.add(source.id);
+    if (rare && !rare.dead && rare.threat.has(target.id)) rare.bossDamagers.add(source.id);
   }
 }

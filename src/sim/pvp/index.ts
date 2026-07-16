@@ -43,6 +43,7 @@ export {
   type FrontierIncursionState,
   frontierIncursionOnHeal,
   frontierIncursionOnKill,
+  trashSpawnPoint,
   updateFrontierIncursion,
 } from './frontier_incursion';
 export { awardFrontierPlayerKill, awardFrontierRareKill } from './frontier_rewards';

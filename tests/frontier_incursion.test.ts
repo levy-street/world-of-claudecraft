@@ -3,12 +3,15 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import {
   FRONTIER_MUSTER,
+  FRONTIER_X_MAX,
   FRONTIER_X_MIN,
   frontierIncursionOnHeal,
   frontierIncursionOnKill,
   INCURSION_PLAYER_KILL_PCT,
   INCURSION_TRASH_KILL_PCT,
   INCURSION_TRASH_RESPAWN_SECONDS,
+  inFrontierHub,
+  trashSpawnPoint,
 } from '../src/sim/pvp';
 import { Sim } from '../src/sim/sim';
 
@@ -149,8 +152,23 @@ describe('Frontier incursion: the meter and the spawn', () => {
   });
 });
 
+describe('Frontier incursion: trash spawn geometry', () => {
+  it('never places a trash spawn inside the safe hub, across the whole counter walk', () => {
+    // Deterministic sweep: the spawn point is a pure function of the counter, so
+    // sweeping it covers every (angle, radius) combination the walker can produce,
+    // including the band-edge-clamped mouth-facing candidates (n % 12 == 6 with
+    // n % 5 == 4) that used to land inside FRONTIER_HUB_RADIUS.
+    for (let n = 0; n <= 600; n++) {
+      const { x, z } = trashSpawnPoint(n);
+      expect(inFrontierHub(x, z), `spawn ${n} at (${x}, ${z}) is inside the safe hub`).toBe(false);
+      expect(x).toBeGreaterThanOrEqual(FRONTIER_X_MIN);
+      expect(x).toBeLessThan(FRONTIER_X_MAX);
+    }
+  });
+});
+
 describe('Frontier incursion: healer participation', () => {
-  it('healing in the band drives the meter and, during a rare, credits the healer for the kill', () => {
+  it('drives the meter, and credits only heals on targets fighting the rare (never self-heals)', () => {
     const sim = new Sim({ seed: 33, playerClass: 'priest', noPlayer: true });
     const healerId = sim.addPlayer('priest', 'Mender');
     const woundedId = sim.addPlayer('warrior', 'Tank');
@@ -165,12 +183,24 @@ describe('Frontier incursion: healer participation', () => {
     frontierIncursionOnHeal(sim.ctx, healer, wounded, 300);
     expect(sim.frontierIncursionState.progress).toBeGreaterThan(0);
 
-    // With a rare up, healing credits the healer on the rare's contributor roster
-    // (incentive #2), so the eventual kill rewards them.
     const rare = createMob(90601, MOBS.rimefang_stalker, 20, sim.groundPos(FRONTIER_MUSTER.x, 0));
     sim.addEntity(rare);
     sim.frontierIncursionState.phase = 'active';
     sim.frontierIncursionState.rareId = rare.id;
+
+    // A heal on a player NOT on the rare's threat table (a hub bystander) never
+    // rides the contributor roster.
+    frontierIncursionOnHeal(sim.ctx, healer, wounded, 200);
+    expect(rare.bossDamagers.has(healerId)).toBe(false);
+
+    // A self-heal never credits, even when the healer is fighting the rare.
+    rare.threat.set(healerId, 50);
+    frontierIncursionOnHeal(sim.ctx, healer, healer, 200);
+    expect(rare.bossDamagers.has(healerId)).toBe(false);
+
+    // Healing someone who IS on the rare's threat table credits the healer on the
+    // roster (incentive #2), so the eventual kill rewards them.
+    rare.threat.set(woundedId, 100);
     frontierIncursionOnHeal(sim.ctx, healer, wounded, 200);
     expect(rare.bossDamagers.has(healerId)).toBe(true);
   });
