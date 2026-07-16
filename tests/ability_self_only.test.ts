@@ -1,4 +1,4 @@
-// Truth table for the "Self only" tooltip classifier (src/ui/ability_self_only.ts).
+// Truth table for the "Self only" tooltip classifier (src/ui/hud/action_bar/ability_self_only.ts).
 //
 // A spellbook/action-bar tooltip shows a "Self only" requirement line when an
 // ability can ONLY ever be cast on the caster. That cannot be read off
@@ -8,7 +8,10 @@
 // data so a future ability or an edit to the allowlist can't silently mislabel.
 import { describe, expect, it } from 'vitest';
 import { ABILITIES } from '../src/sim/data';
-import { isSelfOnlyAbility, SELF_ONLY_EFFECT_TYPES } from '../src/ui/ability_self_only';
+import {
+  isSelfOnlyAbility,
+  SELF_ONLY_EFFECT_TYPES,
+} from '../src/ui/hud/action_bar/ability_self_only';
 
 describe('isSelfOnlyAbility', () => {
   // Pin the allowlist to literals: growing or shrinking it is a deliberate change

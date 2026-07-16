@@ -20,7 +20,7 @@ import {
   saveAttackSlotAction,
   shouldSeedFormBar,
   syncHotbarActions,
-} from '../src/ui/hotbar';
+} from '../src/ui/hud/action_bar/hotbar';
 
 const abilityIds = new Set([
   'fireball',

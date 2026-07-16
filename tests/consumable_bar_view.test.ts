@@ -4,7 +4,7 @@ import {
   CONSUMABLE_BAR_SLOTS,
   CONSUMABLE_KIND_ORDER,
   consumableBarItems,
-} from '../src/ui/consumable_bar_view';
+} from '../src/ui/hud/action_bar/consumable_bar_view';
 
 // Minimal synthetic item table: the core reads only `kind` off the def, so a
 // cast keeps the fixture small (same trick as tests/bag_filter.test.ts).

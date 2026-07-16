@@ -1,4 +1,4 @@
-// QuestProgressBanner (src/ui/quest_progress_banner.ts): the WoW-style yellow
+// QuestProgressBanner (src/ui/hud/quest/quest_progress_banner.ts): the WoW-style yellow
 // top-center quest flash. Pins the stack contract: lines append in order, the
 // oldest drops past maxLines, and each line fades then removes on its own
 // timers. Driven over a tiny hand-rolled fake DOM (no jsdom) + fake timers.
@@ -8,7 +8,7 @@ import {
   QUEST_BANNER_LINE_MS,
   QUEST_BANNER_MAX_LINES,
   QuestProgressBanner,
-} from '../src/ui/quest_progress_banner';
+} from '../src/ui/hud/quest/quest_progress_banner';
 
 interface FakeEl {
   className: string;

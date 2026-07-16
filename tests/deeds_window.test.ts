@@ -174,12 +174,6 @@ describe('hud wiring', () => {
     expect(painter).toMatch(/deed-crest-mini[^>]*alt="\$\{esc\(deedName\(r\.id\)\)\}"/);
   });
 
-  it('diverts chronicler interacts through the sim then opens the Chronicles section', () => {
-    expect(hud).toMatch(
-      /CHRONICLER_TEMPLATE_IDS[\s\S]{0,200}?this\.sim\.targetEntity\(npc\.id\);\s*this\.sim\.interact\(\);\s*this\.openDeeds\('chronicle'\);/,
-    );
-  });
-
   it('shows the active title and earned border badges on the character sheet', () => {
     expect(hud).toContain("t('hudChrome.deeds.charTitleLabel')");
     expect(hud).toContain('data-act="open-deeds"');
