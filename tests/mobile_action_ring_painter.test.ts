@@ -77,6 +77,7 @@ function ability(id: string, over: Partial<AbilityDef> = {}): ActionBarAbility {
       ...over,
     } as unknown as AbilityDef,
     cost: 0,
+    effects: [],
   };
 }
 
@@ -102,6 +103,7 @@ function idleWorld(): ActionBarWorldInput {
       queuedOnSwing: null,
       stealthed: false,
       pos: { x: 0, y: 0, z: 0 },
+      auras: [],
     },
     target: null,
     inventory: [],
@@ -209,6 +211,56 @@ describe('MobileActionRingPainter: cooldown/empty rendering parity with the desk
     });
     expect(calls).toContainEqual({ m: 'toggleClass', args: [els[1].btn, 'empty', false] });
     expect(calls).toContainEqual({ m: 'toggleClass', args: [els[0].btn, 'empty', false] });
+  });
+
+  it('paints and clears both proc classes through the shared ring painter', () => {
+    const { calls, writers } = recordingFacet();
+    const els = [0, 1, 2, 3, 4, 5].map((i) => slotElements(`ring${i}`));
+    const painter = new MobileActionRingPainter(
+      writers,
+      {
+        bar: {
+          container: { tag: 'ring-container' } as unknown as HTMLElement,
+          slots: els,
+        },
+        pageToggle: { tag: 'toggle' } as unknown as HTMLElement,
+        pageIndicator: { tag: 'indicator' } as unknown as HTMLElement,
+      },
+      (key) => `URL(${key})`,
+      (key, values) => (values ? `${key}|${JSON.stringify(values)}` : key),
+    );
+    const pageBox = { page: 0 };
+    const view = createActionBarView(
+      { slots: ringDescriptor(pageBox, new Map([[1, ability('icefall')]])) },
+      fakeDeps(),
+    );
+    const world = idleWorld();
+    world.player.auras = [{ id: 'mag_icicles', kind: 'icicles', stacks: 2 }];
+
+    painter.paint(view.tick(world), 0, 2);
+    expect(calls).toContainEqual({
+      m: 'toggleClass',
+      args: [els[1].btn, 'proc-available', true],
+    });
+    expect(calls).toContainEqual({
+      m: 'toggleClass',
+      args: [els[1].btn, 'proc-armed', false],
+    });
+
+    calls.length = 0;
+    world.player.auras = [
+      { id: 'mag_icicles', kind: 'icicles', stacks: 2 },
+      { id: 'mag_frostbite', kind: 'frostbite' },
+    ];
+    painter.paint(view.tick(world), 0, 2);
+    expect(calls).toContainEqual({
+      m: 'toggleClass',
+      args: [els[1].btn, 'proc-available', false],
+    });
+    expect(calls).toContainEqual({
+      m: 'toggleClass',
+      args: [els[1].btn, 'proc-armed', true],
+    });
   });
 });
 

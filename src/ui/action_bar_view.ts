@@ -26,6 +26,8 @@
 
 import {
   type AbilityDef,
+  type AbilityEffect,
+  type AuraKind,
   dist2d,
   GCD,
   type ItemDef,
@@ -37,6 +39,7 @@ import type { InterpolationValues, TranslationKey } from './i18n';
 
 // The four slot kinds (a discriminated tag the painter maps to DOM classes).
 export type ActionBarSlotKind = 'attack' | 'empty' | 'item' | 'ability';
+export type ActionBarProcState = 'none' | 'available' | 'armed';
 
 // Icon-key identities. The core emits a stable key per slot so the painter can elide
 // the (expensive) icon resolution + background-image write to slot-rebind frames
@@ -58,6 +61,11 @@ const COOLDOWN_TEXT_THRESHOLD = 1;
 // The container gets the 'many-spells' class once more than this many slots are
 // bound (the former `hotbarActions.filter(a => a !== null).length > 10`).
 const MANY_SPELLS_THRESHOLD = 10;
+const ICICLES_AURA_ID = 'mag_icicles';
+const ICICLES_MAX_STACKS = 5;
+const FROSTBITE_AURA_ID = 'mag_frostbite';
+const THUNDER_WARD_AURA_ID = 'lightning_shield';
+const FULMINATION_MAX_CHARGES = 9;
 
 // The i18n keys the core renders. They already exist in i18n.catalog/abilities.ts.
 const SLOT_ARIA_KEY: TranslationKey = 'abilityUi.actionBar.slotAria';
@@ -69,6 +77,19 @@ const ATTACK_NAME_KEY: TranslationKey = 'abilityUi.actionBar.attackName';
 export interface ActionBarAbility {
   def: AbilityDef;
   cost: number;
+  /** Talent-resolved effects. Fulmination appends its Thunder Ward vent here,
+   *  which lets the view distinguish it from an ordinary Earthen Jolt without
+   *  consulting the talent tree. */
+  effects: readonly AbilityEffect[];
+}
+
+/** The aura fields proc cues read. Entity auras in both worlds satisfy this
+ *  structural subset; tests can stay focused without constructing full auras. */
+export interface ActionBarAuraInput {
+  id: string;
+  kind: AuraKind;
+  stacks?: number;
+  charges?: number;
 }
 
 /** One slot of the bar descriptor: slot identity plus host-resolved accessors to the
@@ -131,12 +152,16 @@ export interface ActionBarPlayerInput {
    *  stealth, so they looked equally "ready" whether or not the cast would
    *  actually succeed. */
   stealthed: boolean;
+  /** Mirrored self auras are the source of truth for proc/charge cues. */
+  auras: readonly ActionBarAuraInput[];
 }
 
 /** The target fields the bar reads; null when there is no current target. */
 export interface ActionBarTargetInput {
   dead: boolean;
   pos: Vec3;
+  /** Only literal root/stun kinds arm Icefall's frozen-target execute. */
+  auras: readonly ActionBarAuraInput[];
 }
 
 /** The world subset one tick reads: the player, the current target, and inventory
@@ -162,6 +187,8 @@ export interface ActionBarSlotState {
   usable: boolean;
   outOfRange: boolean;
   queued: boolean;
+  /** Tier-independent actionable cue. Cosmetic particle tiers never alter it. */
+  procState: ActionBarProcState;
   ariaLabel: string;
   keybindLabel: string;
 }
@@ -192,9 +219,88 @@ function makeSlotState(): ActionBarSlotState {
     usable: true,
     outOfRange: false,
     queued: false,
+    procState: 'none',
     ariaLabel: '',
     keybindLabel: '',
   };
+}
+
+type ProcStateResolver = (
+  ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+  target: ActionBarTargetInput | null,
+) => ActionBarProcState;
+
+function auraStacks(auras: readonly ActionBarAuraInput[], auraId: string): number {
+  for (const aura of auras) {
+    if (aura.id !== auraId) continue;
+    // AuraWire omits `stacks` when the exact count is one. Presence therefore
+    // reconstructs one online; explicit malformed values stay bounded.
+    const stacks = aura.stacks ?? 1;
+    if (!Number.isFinite(stacks)) return 0;
+    return Math.min(ICICLES_MAX_STACKS, Math.max(0, Math.trunc(stacks)));
+  }
+  return 0;
+}
+
+function auraCharges(auras: readonly ActionBarAuraInput[], auraId: string): number {
+  for (const aura of auras) {
+    if (aura.id === auraId) return Math.max(0, aura.charges ?? 0);
+  }
+  return 0;
+}
+
+function hasAura(auras: readonly ActionBarAuraInput[], auraId: string): boolean {
+  for (const aura of auras) if (aura.id === auraId) return true;
+  return false;
+}
+
+function icefallProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+  target: ActionBarTargetInput | null,
+): ActionBarProcState {
+  if (auraStacks(player.auras, ICICLES_AURA_ID) <= 0) return 'none';
+  if (hasAura(player.auras, FROSTBITE_AURA_ID)) return 'armed';
+  if (target !== null && !target.dead) {
+    for (const aura of target.auras) {
+      if (aura.kind === 'root' || aura.kind === 'stun') return 'armed';
+    }
+  }
+  return 'available';
+}
+
+function fulminationProcState(
+  ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  let ventsThunderWard = false;
+  for (const effect of ability.effects) {
+    if (effect.type === 'consumeAuraChargesDamage' && effect.auraId === THUNDER_WARD_AURA_ID) {
+      ventsThunderWard = true;
+      break;
+    }
+  }
+  if (!ventsThunderWard) return 'none';
+  const charges = auraCharges(player.auras, THUNDER_WARD_AURA_ID);
+  if (charges <= 0) return 'none';
+  return charges >= FULMINATION_MAX_CHARGES ? 'armed' : 'available';
+}
+
+// Ability ids map to pure proc resolvers here, keeping the painter generic. New
+// action cues extend this table rather than adding ability branches to DOM code.
+const PROC_STATE_RESOLVERS: Readonly<Record<string, ProcStateResolver | undefined>> = {
+  icefall: icefallProcState,
+  earth_shock: fulminationProcState,
+};
+
+function procStateForAbility(
+  ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+  target: ActionBarTargetInput | null,
+): ActionBarProcState {
+  const resolve = PROC_STATE_RESOLVERS[ability.def.id];
+  return resolve ? resolve(ability, player, target) : 'none';
 }
 
 function inventoryCount(
@@ -232,6 +338,7 @@ export function createActionBarView(
         const sd = descriptor.slots[i];
         const slot = slots[i];
         const slotLabel = deps.slotLabel(sd.slotIndex);
+        slot.procState = 'none';
 
         // many-spells counts RAW assigned slots (the attack slot reports no action),
         // byte-identical to the former hotbarActions.filter(a => a !== null).length.
@@ -349,6 +456,7 @@ export function createActionBarView(
           (tgtDist > (def.range > 0 ? def.range : MELEE_RANGE) ||
             (def.minRange !== undefined && tgtDist < def.minRange));
         slot.queued = player.queuedOnSwing === def.id;
+        slot.procState = procStateForAbility(ability, player, target);
         slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {
           slot: slotLabel,
           ability: deps.abilityName(def),

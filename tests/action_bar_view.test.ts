@@ -23,15 +23,16 @@ import { t as realT } from '../src/ui/i18n';
 import { assertAllocationStable } from './util/alloc_probe';
 
 function ability(id: string, opts: Partial<AbilityDef> & { cost?: number } = {}): ActionBarAbility {
+  const { cost = 0, effects = [], ...defOpts } = opts;
   const def = {
     id,
     offGcd: false,
     cooldown: 6,
     requiresTarget: false,
     range: 0,
-    ...opts,
+    ...defOpts,
   } as unknown as AbilityDef;
-  return { def, cost: opts.cost ?? 0 };
+  return { def, cost, effects };
 }
 
 function item(id: string, kind?: string): ItemDef {
@@ -92,6 +93,8 @@ interface WorldOpts {
   targetDead?: boolean;
   inventory?: { itemId: string; count: number }[];
   stealthed?: boolean;
+  playerAuras?: ActionBarWorldInput['player']['auras'];
+  targetAuras?: NonNullable<ActionBarWorldInput['target']>['auras'];
 }
 
 function world(opts: WorldOpts = {}): ActionBarWorldInput {
@@ -107,8 +110,16 @@ function world(opts: WorldOpts = {}): ActionBarWorldInput {
       queuedOnSwing: opts.queuedOnSwing ?? null,
       pos: opts.playerPos ?? { x: 0, y: 0, z: 0 },
       stealthed: opts.stealthed ?? false,
+      auras: opts.playerAuras ?? [],
     },
-    target: targetPos === null ? null : { dead: opts.targetDead ?? false, pos: targetPos },
+    target:
+      targetPos === null
+        ? null
+        : {
+            dead: opts.targetDead ?? false,
+            pos: targetPos,
+            auras: opts.targetAuras ?? [],
+          },
     inventory: opts.inventory ?? [],
   };
 }
@@ -304,6 +315,133 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
     );
     expect(view.tick(world({ queuedOnSwing: 'heroicStrike' })).slots[0].queued).toBe(true);
     expect(view.tick(world({ queuedOnSwing: null })).slots[0].queued).toBe(false);
+  });
+});
+
+describe('actionBarView: proc availability cues', () => {
+  const icicles = (stacks: number | undefined) => ({
+    id: 'mag_icicles',
+    kind: 'icicles' as const,
+    stacks,
+  });
+  const frostbite = { id: 'mag_frostbite', kind: 'frostbite' as const };
+  const ward = (charges: number) => ({
+    id: 'lightning_shield',
+    kind: 'thorns' as const,
+    charges,
+  });
+
+  it('keeps ordinary abilities and Icefall without stored Icicles at none', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, { ability: ability('fireball') }),
+        slot(2, { ability: ability('icefall') }),
+      ),
+      fakeDeps(),
+    );
+    const state = view.tick(world({ playerAuras: [frostbite] }));
+
+    expect(state.slots[0].procState).toBe('none');
+    expect(state.slots[1].procState).toBe('none');
+  });
+
+  it('marks Icefall available with Icicles and armed for Frostbite or a rooted/stunned target', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('icefall') })),
+      fakeDeps(),
+    );
+
+    expect(view.tick(world({ playerAuras: [icicles(3)] })).slots[0].procState).toBe('available');
+    // AuraWire omits an exact stack count of one; presence still means one Icicle online.
+    expect(view.tick(world({ playerAuras: [icicles(undefined)] })).slots[0].procState).toBe(
+      'available',
+    );
+    expect(view.tick(world({ playerAuras: [icicles(3), frostbite] })).slots[0].procState).toBe(
+      'armed',
+    );
+    expect(
+      view.tick(
+        world({
+          playerAuras: [icicles(3)],
+          targetPos: { x: 5, y: 0, z: 0 },
+          targetAuras: [{ id: 'frost_nova', kind: 'root' }],
+        }),
+      ).slots[0].procState,
+    ).toBe('armed');
+    expect(
+      view.tick(
+        world({
+          playerAuras: [icicles(3)],
+          targetPos: { x: 5, y: 0, z: 0 },
+          targetAuras: [{ id: 'deep_freeze', kind: 'stun' }],
+        }),
+      ).slots[0].procState,
+    ).toBe('armed');
+    expect(
+      view.tick(
+        world({
+          playerAuras: [icicles(3)],
+          targetPos: { x: 5, y: 0, z: 0 },
+          targetAuras: [{ id: 'frostbolt', kind: 'slow' }],
+        }),
+      ).slots[0].procState,
+    ).toBe('available');
+    expect(
+      view.tick(
+        world({
+          playerAuras: [icicles(3)],
+          targetPos: { x: 5, y: 0, z: 0 },
+          targetDead: true,
+          targetAuras: [{ id: 'frost_nova', kind: 'root' }],
+        }),
+      ).slots[0].procState,
+    ).toBe('available');
+  });
+
+  it('lights Earthen Jolt only for the resolved Fulmination vent, arming at nine charges', () => {
+    const plainJolt = createActionBarView(
+      descriptor(slot(1, { ability: ability('earth_shock') })),
+      fakeDeps(),
+    );
+    const fulminationJolt = createActionBarView(
+      descriptor(
+        slot(1, {
+          ability: ability('earth_shock', {
+            effects: [
+              {
+                type: 'consumeAuraChargesDamage',
+                auraId: 'lightning_shield',
+                damagePerCharge: 8,
+                radius: 8,
+              },
+            ],
+          }),
+        }),
+      ),
+      fakeDeps(),
+    );
+
+    expect(plainJolt.tick(world({ playerAuras: [ward(9)] })).slots[0].procState).toBe('none');
+    expect(fulminationJolt.tick(world()).slots[0].procState).toBe('none');
+    expect(fulminationJolt.tick(world({ playerAuras: [ward(3)] })).slots[0].procState).toBe(
+      'available',
+    );
+    expect(fulminationJolt.tick(world({ playerAuras: [ward(9)] })).slots[0].procState).toBe(
+      'armed',
+    );
+  });
+
+  it('clears a consumed proc state and remains deterministic for identical aura input', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('icefall') })),
+      fakeDeps(),
+    );
+    expect(view.tick(world({ playerAuras: [icicles(1)] })).slots[0].procState).toBe('available');
+    expect(view.tick(world()).slots[0].procState).toBe('none');
+
+    const input = world({ playerAuras: [icicles(5), frostbite] });
+    const first = structuredClone(view.tick(input));
+    expect(view.tick(input)).toEqual(first);
   });
 });
 
