@@ -48,14 +48,17 @@ export function spreadOwnedDot(
     .hostilesInRadius(source, primary.pos, radius)
     .filter((candidate) => candidate.id !== primary.id && ctx.hasLineOfSight(primary, candidate))
     .sort((a, b) => a.id - b.id);
-  for (const target of targets) {
+  if (targets.length > 0) {
     ctx.emit({
-      type: 'spellfx',
-      sourceId: primary.id,
-      targetId: target.id,
+      type: 'spellfxAt',
+      x: primary.pos.x,
+      z: primary.pos.z,
       school: dot.school,
-      fx: 'projectile',
+      fx: 'burst',
+      radius,
     });
+  }
+  for (const target of targets) {
     ctx.applyAura(target, { ...dot });
     ctx.enterCombat(source, target);
   }

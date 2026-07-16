@@ -218,6 +218,8 @@ function runMindfractureSpread(
   nearbyOwn: Aura | undefined;
   nearbyForeign: Aura | undefined;
   farOwn: Aura | undefined;
+  spreadBursts: number;
+  primaryProjectiles: number;
   draws: number[];
 } {
   const sim = new Sim({ seed: 64_909, playerClass: 'priest', autoEquip: false });
@@ -278,6 +280,7 @@ function runMindfractureSpread(
     advancePendingProjectiles(sim.ctx);
   }
   sim.rng.setObserver(null);
+  const events = sim.drainEvents();
 
   const owned = (target: typeof primary) =>
     target.auras.find(
@@ -291,6 +294,13 @@ function runMindfractureSpread(
       (aura) => aura.kind === 'dot' && aura.id === 'shadow_word_pain' && aura.sourceId === 999_999,
     ),
     farOwn: owned(far),
+    spreadBursts: events.filter(
+      (event) => event.type === 'spellfxAt' && event.fx === 'burst' && event.radius === 8,
+    ).length,
+    primaryProjectiles: events.filter(
+      (event) =>
+        event.type === 'spellfx' && event.fx === 'projectile' && event.sourceId === primary.id,
+    ).length,
     draws,
   };
 }
@@ -418,6 +428,8 @@ describe('Litany of Woe channel effects', () => {
       sourceId: 999_999,
     });
     expect(talented.farOwn).toBeUndefined();
+    expect(talented.spreadBursts).toBe(1);
+    expect(talented.primaryProjectiles).toBe(0);
     expect(foreignOnly.nearbyOwn).toBeUndefined();
     expect(talented.draws).toEqual(baseline.draws);
   });
