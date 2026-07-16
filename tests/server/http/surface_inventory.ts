@@ -2105,6 +2105,16 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: null,
     requireOwnedExpected: null,
   },
+  {
+    dispatcher: DISPATCH.internal,
+    method: 'GET',
+    path: '/internal/discord/flaired-ids',
+    handler: 'handleDiscordInternal arm: /internal/discord/flaired-ids',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.secretDiscord,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
   // Daily-rewards ops family (v0.19.0, server/daily_rewards.ts): served by the
   // handleDailyRewardInternalApi sub-dispatcher, which the /internal composite
   // delegate tries FIRST (before handleInternalApi, whose terminal 404 would

@@ -7554,4 +7554,15 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'welcome.armory.cta': 'Vstoupit a prohlédnout si Zbrojnici',
   'welcome.news.new': 'Nové',
   'welcome.news.viewAll': 'Zobrazit všechny aktualizace na GitHubu',
+  'entities.letters.heroic_marks_reward.sender': 'Hrdinský zásobovač',
+  'entities.letters.heroic_marks_reward.subject': 'Vaše hrdinské marky',
+  'entities.letters.heroic_marks_reward.body':
+    'Vaše skupina zdolala hrdinskou zkoušku, zatímco jste bojovali v týlu nebo leželi poraženi. Také vaše uzamčení bylo zaznamenáno, takže váš podíl hrdinských marek dorazil sem, místo aby se ztratil. Využijte je dobře.\n\n- Hrdinský zásobovač',
+  'guide.dungeonsPage.resetTitle': 'Resetování instancí',
+  'guide.dungeonsPage.resetBody':
+    'Když změníte obtížnost, zatímco skupina stále drží přidělené průchody, staré nároky chvíli zůstanou a pak samy zmizí. Vůdce skupiny je může opustit okamžitě volbou Resetovat všechny instance v nabídce vlastního portrétu nebo příkazem /dungeon reset. Obtížnost musí být skutečně změněna, uvnitř nesmí zůstat nikdo živý ani padlý a mezi resety je krátká prodleva. U dveří na špatné obtížnosti vás hra varuje před začátkem. Raid se takto nikdy neresetuje; platí pro něj vlastní pravidla uzamčení.',
+  'guide.gear.itemLevelBody':
+    'Pro rychlé porovnání dvou kusů zapněte v možnostech Zobrazit úroveň předmětu. Výbava se známým původem, od nepřátel, z úkolů a řemesel, pak ukazuje úroveň předmětu: jediné číslo, které přibližně vyjadřuje sílu podle zdroje a umožňuje poznat lepší vylepšení i mezi různými sloty. Kusy bez takového původu, například základní zboží obchodníků a počáteční výbava, úroveň neukazují; chybějící číslo je normální.',
+  'guide.professions.craftHowBody':
+    'Otevřete okno Výroba (výchozí klávesa T) a uvidíte všechny známé recepty, jejich požadavky i své zásoby; máte-li materiály, stačí jedno kliknutí. Běžné recepty lze vyrábět kdekoli. Některé pokročilé recepty, včetně nástrojů vyšší úrovně a vzácné zbroje pro sesilatele, vyžadují výrobní centrum v Highwatchi.',
 };
