@@ -149,16 +149,28 @@ describe('mobile action ring: source-slot state per page', () => {
     expect(state.slots[1].abilityId).toBe('fireball');
   });
 
-  it('the same button index shows source slot 6 on page 1 (no rebuild, same descriptor)', () => {
+  it('the same button index follows source slots 1, 6, 11, and 16 across all four pages', () => {
     const pageBox = { page: 0 };
     const bySlot = new Map<number, ActionBarAbility>([
       [1, ability('fireball')],
       [6, ability('frostbolt')],
+      [11, ability('arcane_blast')],
+      [16, ability('shadow_bolt')],
     ]);
     const view = createActionBarView({ slots: ringDescriptor(pageBox, bySlot) }, fakeDeps());
-    expect(view.tick(idleWorld()).slots[1].abilityId).toBe('fireball');
-    pageBox.page = nextMobilePage(pageBox.page);
-    expect(view.tick(idleWorld()).slots[1].abilityId).toBe('frostbolt');
+    for (const expected of ['fireball', 'frostbolt', 'arcane_blast', 'shadow_bolt']) {
+      expect(view.tick(idleWorld()).slots[1].abilityId).toBe(expected);
+      pageBox.page = nextMobilePage(pageBox.page);
+    }
+    expect(pageBox.page).toBe(0);
+  });
+
+  it('the last button on page 3 shows the action bound to source slot 20', () => {
+    const pageBox = { page: 3 };
+    const bySlot = new Map<number, ActionBarAbility>([[20, ability('execute')]]);
+    const view = createActionBarView({ slots: ringDescriptor(pageBox, bySlot) }, fakeDeps());
+
+    expect(view.tick(idleWorld()).slots[5].abilityId).toBe('execute');
   });
 
   it('an empty source slot renders the empty kind on the ring', () => {
@@ -403,6 +415,16 @@ describe('Hud.buildMobileActionRing wiring (source scan)', () => {
     // (reading this.mobileActionPage fresh) so a page cycle after bind still
     // routes taps to the correct source slot.
     expect(hud).toContain('this.castSlot(sourceSlotForMobileButton(this.mobileActionPage, i));');
+  });
+
+  it('resolves every action-view getter from the current mobile page at tick time', () => {
+    expect(hud).toContain(
+      'this.actionForSlot(sourceSlotForMobileButton(this.mobileActionPage, i)) !== null',
+    );
+    expect(hud).toContain(
+      'this.abilityForSlot(sourceSlotForMobileButton(this.mobileActionPage, i))',
+    );
+    expect(hud).toContain('this.itemForSlot(sourceSlotForMobileButton(this.mobileActionPage, i))');
   });
 
   it('wires the page toggle button to cycleMobileActionPage', () => {

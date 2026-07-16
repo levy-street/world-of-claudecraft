@@ -211,19 +211,30 @@ describe('buildSpellbookView: ClientWorld-vs-Sim parity', () => {
   // for the tooltip/summary), so the parity guarantee is over the DERIVED decision
   // state: a Sim-shaped known carrying extra fields the core ignores must yield the
   // same known-ness / rank / on-bar / disabled state as a ClientWorld-mirror shape.
-  const derived = (shape: 'sim' | 'client') =>
-    buildSpellbookView(
-      input({ known: [known(shape, KIT[0], 2)], barAbilityIds: [KIT[0]], hasFreeSlot: false }),
+  const derived = (shape: 'sim' | 'client') => {
+    const abilityIdByBarSlot: (string | null)[] = new Array(22).fill(null);
+    abilityIdByBarSlot[19] = KIT[0];
+    return buildSpellbookView(
+      input({
+        known: [known(shape, KIT[0], 2)],
+        barAbilityIds: [KIT[0]],
+        hasFreeSlot: false,
+        abilityIdByBarSlot,
+      }),
     ).rows.map((r) => ({
       abilityId: r.abilityId,
       learned: r.known !== null,
       rank: r.rank,
       onBar: r.onBar,
       toggleDisabled: r.toggleDisabled,
+      mobilePage: r.mobilePage,
     }));
+  };
 
   it('derives identical decision state regardless of the known object shape', () => {
-    expect(derived('sim')).toEqual(derived('client'));
+    const simDerived = derived('sim');
+    expect(simDerived.find((row) => row.abilityId === KIT[0])?.mobilePage).toBe(3);
+    expect(simDerived).toEqual(derived('client'));
   });
 
   it('is deterministic: identical inputs produce a deep-equal view', () => {
