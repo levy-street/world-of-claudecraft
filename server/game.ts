@@ -5112,6 +5112,11 @@ export class GameServer {
     // is in the band (null otherwise). Delta-guarded, so it rides only on change.
     maybe('fincur', this.sim.frontierIncursionFor(anchorSession.pid));
     maybe('adaily', this.sim.arenaDailyInfoFor(anchorSession.pid));
+    // Daily-quest ids already done on the current host day, so the client's
+    // questState shows a turned-in daily as done-for-today (a daily never enters
+    // qdone; without this the client re-offers it while the server refuses).
+    // Delta-guarded: re-ships on turn-in and on the UTC day roll.
+    maybe('dailyq', this.sim.dailyQuestsDoneTodayFor(anchorSession.pid));
     if (this.sim.tickCount - session.lastArenaWireTick >= ARENA_WIRE_INTERVAL_TICKS) {
       session.lastArenaWireTick = this.sim.tickCount;
       maybe('arena', this.sim.arenaInfoFor(anchorSession.pid));

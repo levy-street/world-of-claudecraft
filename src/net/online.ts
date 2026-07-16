@@ -1135,6 +1135,11 @@ export class ClientWorld implements IWorld {
   activeLoadout = -1;
   questLog = new Map<string, QuestProgress>();
   questsDone = new Set<string>();
+  // Daily-quest ids already completed on the current host day, mirrored from the
+  // snapshot self (`s.dailyq`, delta-omitted). A daily never enters questsDone, so
+  // questState reads this to show it done-for-today (it re-opens on the day roll,
+  // when the server ships a fresh, emptied list).
+  private dailyQuestsDoneToday = new Set<string>();
   // --- IWorldParty: party/raid roster, mirrored from the snapshot self (`party`).
   // The raid-target markers ride the `markers` map below; IWorldPet keeps no mirror
   // field (pet state lives on the owned-mob entity wire). ---
@@ -2148,6 +2153,7 @@ export class ClientWorld implements IWorld {
       if (s.qlog !== undefined)
         this.questLog = new Map((s.qlog as QuestProgress[]).map((q) => [q.questId, q]));
       if (s.qdone !== undefined) this.questsDone = new Set(s.qdone);
+      if (s.dailyq !== undefined) this.dailyQuestsDoneToday = new Set(s.dailyq ?? []);
       if (s.lockouts !== undefined) this.selfLockouts = s.lockouts as Record<string, number>;
       if (s.ddiff === 'normal' || s.ddiff === 'heroic') this.selectedDungeonDifficulty = s.ddiff;
       if (s.qlog !== undefined || s.qdone !== undefined) this.pendingQuestCommands?.clear();
@@ -2295,6 +2301,7 @@ export class ClientWorld implements IWorld {
       this.questsDone,
       this.pendingQuestCommands,
       this.player.level,
+      this.dailyQuestsDoneToday.has(questId),
     );
   }
 

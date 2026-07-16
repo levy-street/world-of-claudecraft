@@ -29,6 +29,10 @@ export function optimisticQuestState(
   questsDone: Set<string>,
   pendingQuestCommands: Map<string, 'accept' | 'turnin'>,
   playerLevel: number,
+  // A daily quest already completed on the current host day (mirrored from the
+  // server's `dailyq` snapshot self-field): forwarded to computeQuestState so the
+  // online client shows the daily done-for-today exactly like the offline Sim.
+  dailyCompletedToday = false,
 ): QuestState {
   let effectiveDone = questsDone;
   if (pendingQuestCommands.size > 0) {
@@ -39,7 +43,13 @@ export function optimisticQuestState(
       }
     }
   }
-  const state = computeQuestState(questId, questLog, effectiveDone, playerLevel);
+  const state = computeQuestState(
+    questId,
+    questLog,
+    effectiveDone,
+    playerLevel,
+    dailyCompletedToday,
+  );
   const pending = pendingQuestCommands.get(questId);
   if (
     (pending === 'accept' && state === 'available') ||

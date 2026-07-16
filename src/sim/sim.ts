@@ -7098,6 +7098,16 @@ export class Sim {
     return honorMod.arenaDailyInfo(meta, this.utcDay);
   }
 
+  // Daily-quest ids already completed on the current host day (empty when the day
+  // has rolled or the host set no calendar). The server ships this to the online
+  // client (the `dailyq` snapshot self-field) so ClientWorld.questState shows a
+  // turned-in daily as done-for-today exactly like the offline Sim's questState.
+  dailyQuestsDoneTodayFor(pid: number): string[] {
+    const d = this.players.get(pid)?.dailyQuests;
+    if (!d || d.date !== this.utcDay) return [];
+    return [...d.done];
+  }
+
   get arenaDaily(): import('../world_api').ArenaDailyInfo {
     return this.primaryId === -1
       ? { status: 'unavailable', honor: 0, hero: 0 }

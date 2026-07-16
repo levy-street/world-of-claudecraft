@@ -115,6 +115,7 @@ function bareClient(pid: number): ClientWorld {
   c.known = [];
   c.questLog = new Map();
   c.questsDone = new Set();
+  c.dailyQuestsDoneToday = new Set();
   c.pendingQuestCommands = new Map();
   c.partyInfo = null;
   c.selectedDungeonDifficulty = 'normal';
@@ -2482,7 +2483,7 @@ describe('lockpick view rebuilds from events on the online client', () => {
 // while the prior decoded value is preserved.
 // ---------------------------------------------------------------------------
 
-// The pinned set of the 44 `maybe(...)` delta keys, sorted. Cross-checked below
+// The pinned set of `maybe(...)` delta keys, sorted. Cross-checked below
 // against the live `maybe(...)` calls scraped from server/game.ts source, so a
 // 45th unregistered delta key reddens this gate.
 const ALL_DELTA_KEYS = [
@@ -2495,6 +2496,7 @@ const ALL_DELTA_KEYS = [
   'cds',
   'corpse',
   'cosmetics',
+  'dailyq',
   'dclears',
   'dcomp',
   'dcompanion',
@@ -2679,6 +2681,12 @@ function dirtyEveryDeltaField(): {
   // seconds and nodeHarvestableByMe reports it not ready.
   meta.nodeHarvestReadyAt[GATHER_NODES[0].id] = sim.time + 30;
   meta.delveDaily = { date: '2099-01-01', firstClearXp: new Set(['x']), markClears: 4 };
+  // `dailyq`: a daily quest turned in on the current host day. The real loop feeds
+  // sim.utcDay from the wall clock each tick; broadcast() alone never sets it, so
+  // pin a day here (the same one `delveDaily` above uses, so its done-today record
+  // stays current) and stamp the completion on it.
+  sim.utcDay = '2099-01-01';
+  meta.dailyQuests = { date: '2099-01-01', done: ['frontier_daily_muster'] };
   meta.talents = { spec: 'arms', ranks: {}, choices: {} };
   // Book of Deeds: two earned deeds with DISTINCT utcDay stamps (an empty map
   // would be a vacuous pin), a non-zero stat block covering the counter, both
@@ -2798,6 +2806,10 @@ describe('full self-state snapshot delta fixture', () => {
       { questId: 'q_widows', counts: [10, 0], state: 'active' },
     ]); // qlog -> questLog (Map)
     expect(client.questsDone.has('q_wolves')).toBe(true); // qdone -> questsDone (Set)
+    // dailyq -> dailyQuestsDoneToday (private), surfaced through questState: the
+    // turned-in Frontier daily reads done-for-today online, matching the server's
+    // refusal to re-accept it (a daily never enters qdone).
+    expect(client.questState('frontier_daily_muster')).toBe('done');
     expect(client.unlockedMilestones).toEqual(['milestone_test']); // milestones -> unlockedMilestones
     // lockouts -> selfLockouts (private), via the raidLockouts() accessor
     expect(client.raidLockouts().map((l) => l.id)).toEqual(['nythraxis_boss_arena']);
@@ -2936,9 +2948,9 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 49 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(49);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(49);
+  it('ALL_DELTA_KEYS contains exactly 50 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(50);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(50);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2950,7 +2962,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.size).toBe(49);
+    expect(scraped.size).toBe(50);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
