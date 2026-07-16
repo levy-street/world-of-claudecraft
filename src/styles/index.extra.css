@@ -283,3 +283,191 @@
     font-size: 12.5px;
   }
 }
+
+/* ── Merch store (homepage #store-view) ────────────────────────────────────── */
+/* Painted by src/ui/merch_store_page.ts into #merch-store-root; the section is
+   hidden (nav + view) unless /api/merch/products answers enabled:true. Tokens
+   with fallbacks match the homepage panel palette above. */
+.merch-panel {
+  max-width: 900px;
+  width: 100%;
+}
+.merch-store-root {
+  text-align: left;
+}
+.merch-section {
+  margin: 18px 0 0;
+}
+.merch-section h3 {
+  font-family: var(--font-heading, serif);
+  color: var(--gold, #d4af37);
+  margin: 0 0 10px;
+}
+.merch-loading,
+.merch-pending {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text-muted, #9a8f70);
+}
+.merch-spinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--color-text-muted, #9a8f70);
+  border-top-color: transparent;
+  animation: merch-spin 0.9s linear infinite;
+}
+@keyframes merch-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .merch-spinner {
+    animation: none;
+  }
+}
+.merch-notice,
+.merch-confirm,
+.merch-empty,
+.merch-total-note,
+.merch-disclosure {
+  color: var(--color-text-muted, #9a8f70);
+  font-size: 13px;
+}
+.merch-confirm {
+  color: var(--gold, #d4af37);
+}
+.merch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+.merch-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--color-border, #463a1c);
+  border-radius: var(--radius-md, 8px);
+  background: var(--color-panel, rgb(20 16 8 / 70%));
+}
+.merch-card-img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: var(--radius-sm, 4px);
+  background: rgb(0 0 0 / 25%);
+}
+.merch-card-img-empty {
+  border: 1px dashed var(--color-border, #463a1c);
+}
+.merch-card-name {
+  margin: 0;
+  color: var(--color-text, #e8dcc0);
+}
+.merch-card-desc {
+  margin: 0;
+  flex: 1 1 auto;
+  color: var(--color-text-muted, #9a8f70);
+  font-size: 13px;
+}
+.merch-variant,
+.merch-input {
+  width: 100%;
+  min-height: 40px;
+  padding: 6px 8px;
+  font-size: 16px;
+  color: var(--color-text, #e8dcc0);
+  background: rgb(0 0 0 / 35%);
+  border: 1px solid var(--color-border, #463a1c);
+  border-radius: var(--radius-sm, 4px);
+}
+.merch-add,
+.merch-checkout {
+  min-height: 40px;
+}
+.merch-cart-row,
+.merch-order-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--color-border, #463a1c);
+}
+.merch-cart-name,
+.merch-order-items {
+  flex: 1 1 200px;
+  color: var(--color-text, #e8dcc0);
+}
+.merch-remove {
+  width: 40px;
+  height: 40px;
+  color: var(--color-text-muted, #9a8f70);
+  background: none;
+  border: 1px solid var(--color-border, #463a1c);
+  border-radius: var(--radius-sm, 4px);
+  cursor: pointer;
+}
+.merch-remove:hover,
+.merch-remove:focus-visible {
+  color: var(--color-text, #e8dcc0);
+}
+.merch-cart-total {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0 2px;
+  color: var(--color-text, #e8dcc0);
+}
+.merch-shipping {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 10px 14px;
+  margin: 0 0 12px;
+}
+.merch-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.merch-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted, #9a8f70);
+}
+.merch-rails {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+.merch-rail {
+  min-height: 40px;
+  padding: 6px 16px;
+  color: var(--color-text, #e8dcc0);
+  background: rgb(0 0 0 / 35%);
+  border: 1px solid var(--color-border, #463a1c);
+  border-radius: var(--radius-sm, 4px);
+  cursor: pointer;
+}
+.merch-rail[aria-pressed="true"] {
+  border-color: var(--gold, #d4af37);
+  color: var(--gold, #d4af37);
+}
+.merch-rail:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.merch-order-status,
+.merch-order-total,
+.merch-order-date {
+  color: var(--color-text-muted, #9a8f70);
+  font-size: 13px;
+}
+.merch-tracking {
+  color: var(--gold, #d4af37);
+}

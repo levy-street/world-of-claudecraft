@@ -247,6 +247,7 @@ export const en = {
     wiki: 'Wiki',
     news: 'News',
     download: 'Download',
+    store: 'Store',
     loginRegister: 'Login/Register',
     account: 'Account',
     logout: 'Logout',

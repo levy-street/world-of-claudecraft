@@ -307,6 +307,13 @@ For off-box safety, sync the directory to S3 occasionally:
   economy service, use `http://host.docker.internal:8798/v1/claudium/`.
   A separately deployed economy service should use its internal or remote DNS
   URL instead.
+- **Merch store**: `MERCH_STORE_ENABLED=1` reveals the homepage Store tab and
+  enables the `/api/merch/*` player surface over the same economy-service pair;
+  leave it unset until the service's merch half is live. Flipping it off is the
+  rollback: the player surface fails closed immediately, while the webhook
+  relays keep delivering payment/fulfillment callbacks for existing orders
+  (they key on the service pair, not the flag). See
+  `docs/prd/woc/merch-store.md`.
 - **Never** set `ALLOW_DEV_COMMANDS=1` in production: it enables the full
   `/dev` cheat set (the level/teleport cheats the test bots use, plus item
   grants, mob spawns, instance teleports, and the dev command GUI).

@@ -94,6 +94,7 @@ import {
   disconnectDesktopWalletSession,
 } from './net/desktop_wallet_manager';
 import { EconomyClient, newIdempotencyKey, startClaudiumPurchase } from './net/economy_sdk';
+import { MerchClient, startMerchCheckout } from './net/merch_sdk';
 // The wallet module is loaded lazily via dynamic import() in the wallet
 // controller below, so it stays out of the main entry chunk and only loads when
 // the feature is enabled + used.
@@ -233,6 +234,7 @@ import {
 import { defaultIconPrewarmEntries, prewarmIconCache } from './ui/icon_prewarm';
 import { iconDataUrl } from './ui/icons';
 import { createLoadingTipRotation, type LoadingTipRotation } from './ui/loading_tips';
+import { MerchStorePage } from './ui/merch_store_page';
 import { showMobileWalletLauncher } from './ui/mobile_wallet_launcher';
 import { applyNativeDeviceLanguage } from './ui/native_language';
 import { scheduleNativeUpdateCheck } from './ui/native_update_prompt';
@@ -3544,7 +3546,14 @@ const hoverTimeouts: Record<string, number | null> = {
 };
 
 function switchMainView(targetId: string): void {
-  const views = ['#hero-view', '#highscores-view', '#news-view', '#download-view', '#account-view'];
+  const views = [
+    '#hero-view',
+    '#highscores-view',
+    '#news-view',
+    '#download-view',
+    '#store-view',
+    '#account-view',
+  ];
   const currentViewId = views.find((id) => {
     const el = $(id);
     return el && !el.hasAttribute('hidden');
@@ -3557,6 +3566,7 @@ function switchMainView(targetId: string): void {
     '#highscores-view': 'nav-btn-highscores',
     '#news-view': 'nav-btn-news',
     '#download-view': 'nav-btn-download',
+    '#store-view': 'nav-btn-store',
     '#account-view': 'nav-btn-account',
   };
 
@@ -8330,6 +8340,83 @@ function wireStartScreens(): void {
   });
   setupNavBtn(navBtnDownload, '#download-view');
   initDesktopDownload();
+  // Merch store: the SDK hits the game server's same-origin /api/merch/* routes,
+  // which proxy to the economy service and fail closed; the SDK itself returns
+  // typed unavailable states, never throws. The tab stays hidden unless the
+  // public catalog probe answers enabled:true (the MERCH_STORE_ENABLED gate; see
+  // docs/prd/woc/merch-store.md), so a store-off deploy renders an unchanged nav.
+  const navBtnStore = $('#nav-btn-store');
+  const merchClient = new MerchClient({ token: () => api.token, base: api.base });
+  const merchEconomy = new EconomyClient({ token: () => api.token, base: api.base });
+  let merchPage: MerchStorePage | null = null;
+  const ensureMerchStore = (): MerchStorePage => {
+    merchPage ??= new MerchStorePage({
+      root: () => $('#merch-store-root') as HTMLElement,
+      products: () => merchClient.products(),
+      claudiumBalance: async () => (await merchEconomy.balance()).balance,
+      orders: () => merchClient.orders(),
+      loggedIn: () => !!api.token,
+      checkout: (input) =>
+        startMerchCheckout(merchClient, input, {
+          nativePayer:
+            desktopWalletBrowserHandoffAvailable() && linkedWalletPubkey
+              ? linkedWalletPubkey
+              : undefined,
+          stripe: (intent) =>
+            openStripeCheckout(
+              intent,
+              {
+                title: t('hudChrome.merch.checkoutTitle'),
+                close: t('hudChrome.claudium.checkoutClose'),
+                loading: t('hudChrome.claudium.checkoutLoading'),
+                failed: t('hudChrome.merch.checkoutFailed'),
+              },
+              {
+                // The embedded checkout reported a completed payment: upgrade
+                // the pending notice and re-render until the orders list has
+                // caught the webhook-settled status (the claudium cadence).
+                onComplete: () => {
+                  merchPage?.noteStripePaymentComplete();
+                  const refresh = () => void merchPage?.render();
+                  window.setTimeout(refresh, 1500);
+                  window.setTimeout(refresh, 4000);
+                  window.setTimeout(refresh, 8000);
+                },
+              },
+            ),
+          nativeSignAndSend: async (transactionBase64, reference) => {
+            // The desktop shell signs through the browser-handoff wallet manager
+            // (the claudium buy flow's exact branch); the web client stays on the
+            // in-page Wallet Standard connection.
+            if (desktopWalletBrowserHandoffAvailable()) {
+              if (!linkedWalletPubkey) throw new Error('connect a wallet first');
+              const result = await authorizeDesktopWalletInBrowser({
+                kind: 'transaction',
+                reference,
+                expectedAddress: linkedWalletPubkey,
+              });
+              if (result.kind !== 'transaction') {
+                throw new Error('wallet returned an invalid transaction authorization');
+              }
+              desktopWalletBrowserSessionActive = true;
+              updateWalletButton();
+              return result.signature;
+            }
+            const wallet = await loadWallet();
+            return wallet.signAndSendTransactionBase64(transactionBase64);
+          },
+        }),
+    });
+    return merchPage;
+  };
+  setupNavBtn(navBtnStore, '#store-view', () => {
+    switchMainView('#store-view');
+    void ensureMerchStore().render();
+  });
+  void merchClient.products().then((catalog) => {
+    const item = document.getElementById('nav-item-store');
+    if (item) item.hidden = !catalog.enabled;
+  });
   setupNavBtn(navBtnLogin, '#hero-view', () => {
     show('#login-panel');
   });

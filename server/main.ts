@@ -211,6 +211,13 @@ import {
   mapsListMineCore,
   mapsPublicListCore,
 } from './maps_routes';
+import {
+  handleMerchApi,
+  handleMerchPrintfulWebhook,
+  handleMerchProducts,
+  handleMerchStripeWebhook,
+  merchPreAuthMutationRateLimited,
+} from './merch';
 import { metaEventSourceUrl, metaRequestUserData, trackAccountCreated } from './meta_capi';
 import {
   cleanReportReason,
@@ -238,6 +245,7 @@ import {
   discordRateLimited,
   githubRateLimited,
   mapMutationRateLimited,
+  merchProductsRateLimited,
   publicReadRateLimited,
   rateLimited,
   recordAuthFailure,
@@ -2061,6 +2069,31 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
       return handleClaudiumApi(req, res, accountId);
+    }
+    // Merch store (Printful dropship): the webhook relays and the public catalog
+    // probe stay unauthenticated; everything else in the family is bearer-gated.
+    if (req.method === 'POST' && url === '/api/merch/stripe/webhook') {
+      return handleMerchStripeWebhook(req, res);
+    }
+    if (req.method === 'POST' && url === '/api/merch/printful/webhook') {
+      return handleMerchPrintfulWebhook(req, res);
+    }
+    if (req.method === 'GET' && url === '/api/merch/products') {
+      // Public but IP rate-limited (the proxy layer adds the TTL memo), so the
+      // probe can never become an upstream flood: the /api/woc/balance shape.
+      if (!merchProductsRateLimited(req).allowed) {
+        return json(res, 429, { error: 'rate limited' });
+      }
+      return handleMerchProducts(req, res);
+    }
+    if (url.startsWith('/api/merch')) {
+      const preAuthLimit = merchPreAuthMutationRateLimited(req);
+      if (preAuthLimit && !preAuthLimit.allowed) {
+        return json(res, 429, { error: 'rate_limited' });
+      }
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleMerchApi(req, res, accountId);
     }
     // Shareable player card: publish (PNG body) + referral stats for the card.
     if (req.method === 'POST' && url === '/api/card') {

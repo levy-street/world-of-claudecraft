@@ -575,6 +575,11 @@
               <li class="nav-item">
                 <button type="button" class="nav-link" id="nav-btn-download" aria-pressed="false" data-i18n="nav.download">Download</button>
               </li>
+              <!-- Merch store: hidden until GET /api/merch/products answers enabled:true
+                   (the MERCH_STORE_ENABLED fail-closed gate; see docs/prd/woc/merch-store.md). -->
+              <li class="nav-item" id="nav-item-store" hidden>
+                <button type="button" class="nav-link" id="nav-btn-store" aria-pressed="false" data-i18n="nav.store">Store</button>
+              </li>
               <li class="nav-item">
                 <button type="button" class="nav-link" id="nav-btn-login" aria-pressed="false" data-i18n="nav.loginRegister">Login/Register</button>
               </li>
@@ -1159,6 +1164,15 @@
             >Download for Linux</a>
           </div>
           <p class="desktop-download-hint" data-platform-hint="linux" data-i18n="download.linuxHint" hidden>AppImage: make it executable, then run it. No install needed.</p>
+        </div>
+      </section>
+
+      <section id="store-view" class="view-section" hidden aria-hidden="true">
+        <div class="parchment-panel skeleton-panel merch-panel">
+          <h2 class="skeleton-title" data-i18n="hudChrome.merch.title">Merch Store</h2>
+          <p class="skeleton-desc" data-i18n="hudChrome.merch.subtitle">Official World of ClaudeCraft merchandise, shipped worldwide.</p>
+          <!-- Painted by src/ui/merch_store_page.ts; empty until the tab is opened. -->
+          <div id="merch-store-root" class="merch-store-root"></div>
         </div>
       </section>
 

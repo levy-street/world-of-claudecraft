@@ -35,6 +35,7 @@ import { routes as githubRoutes } from '../github';
 import { routes as internalRoutes } from '../internal';
 import { routes as leaderboardRoutes } from '../leaderboard';
 import { routes as mapsRoutes } from '../maps_routes';
+import { routes as merchRoutes } from '../merch';
 import { routes as oauthRoutes } from '../oauth';
 import { routes as reportsRoutes } from '../reports';
 import { routes as steamRoutes } from '../steam';
@@ -125,6 +126,7 @@ export const apiRoutes: readonly RouteDef[] = [
   ...githubRoutes,
   ...desktopLoginRoutes,
   ...claudiumRoutes,
+  ...merchRoutes,
   ...dailyRewardRoutes,
   ...mapsRoutes,
   ...userAssetsRoutes,

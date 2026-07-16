@@ -36,7 +36,14 @@ import {
   DISCORD_MAX_PER_MINUTE,
   discordRateLimited,
   MAP_MUTATION_MAX_PER_MINUTE,
+  MERCH_CHECKOUT_MAX_PER_MINUTE,
+  MERCH_CONFIRM_MAX_PER_MINUTE,
+  MERCH_PRODUCTS_MAX_PER_MINUTE,
+  type MerchMutationAction,
   mapMutationRateLimited,
+  merchMutationRateLimited,
+  merchPreAuthRateLimited,
+  merchProductsRateLimited,
   mergeFusedOutcomes,
   PUBLIC_READ_MAX_PER_MINUTE,
   publicReadRateLimited,
@@ -303,6 +310,68 @@ export const CLAUDIUM_SPEND_POLICY: RateLimitPolicy = claudiumMutationPolicy(
   'spend',
   CLAUDIUM_SPEND_MAX_PER_MINUTE,
 );
+
+// The merch policies mirror the claudium two-tier shape (same limiter core in
+// server/ratelimit.ts): a pre-auth per-IP bucket ahead of the guard, the fused
+// IP-and-account bucket behind it.
+function merchMutationPolicy(
+  name: string,
+  action: MerchMutationAction,
+  limit: number,
+): RateLimitPolicy {
+  return {
+    name,
+    keyClass: 'ip+account',
+    limit,
+    windowSeconds: WINDOW_SECONDS,
+    tier1: (ctx) => merchMutationRateLimited(ctx.req, ctxAccountId(ctx), action),
+    tier2: 'global',
+  };
+}
+
+function merchPreAuthPolicy(
+  name: string,
+  action: MerchMutationAction,
+  limit: number,
+): RateLimitPolicy {
+  return {
+    name,
+    keyClass: 'ip',
+    limit,
+    windowSeconds: WINDOW_SECONDS,
+    tier1: (ctx) => merchPreAuthRateLimited(ctx.req, action),
+    tier2: 'global',
+  };
+}
+
+export const MERCH_CHECKOUT_PRE_AUTH_POLICY: RateLimitPolicy = merchPreAuthPolicy(
+  'merch_checkout_pre_auth',
+  'checkout',
+  MERCH_CHECKOUT_MAX_PER_MINUTE,
+);
+export const MERCH_CONFIRM_PRE_AUTH_POLICY: RateLimitPolicy = merchPreAuthPolicy(
+  'merch_confirm_pre_auth',
+  'confirm',
+  MERCH_CONFIRM_MAX_PER_MINUTE,
+);
+export const MERCH_CHECKOUT_POLICY: RateLimitPolicy = merchMutationPolicy(
+  'merch_checkout',
+  'checkout',
+  MERCH_CHECKOUT_MAX_PER_MINUTE,
+);
+export const MERCH_CONFIRM_POLICY: RateLimitPolicy = merchMutationPolicy(
+  'merch_confirm',
+  'confirm',
+  MERCH_CONFIRM_MAX_PER_MINUTE,
+);
+export const MERCH_PRODUCTS_POLICY: RateLimitPolicy = {
+  name: 'merch_products',
+  keyClass: 'ip',
+  limit: MERCH_PRODUCTS_MAX_PER_MINUTE,
+  windowSeconds: WINDOW_SECONDS,
+  tier1: (ctx) => merchProductsRateLimited(ctx.req),
+  tier2: 'global',
+};
 
 // The character-mutation policies. Each is 'ip+account' (so it must be
 // mounted BEHIND the route's auth guard, which populates ctx.account) and runs the
