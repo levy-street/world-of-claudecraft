@@ -1178,8 +1178,9 @@ async function startGame(
         if (text) {
           world.chat(text);
           // Remember the channel this line reached so the next open (on the All
-          // tab) defaults there and tints the input to its color.
-          hud.noteSentChannel(text);
+          // tab) defaults there and tints the input to its color. Pass the host so a
+          // bare "/g" sticks to guild online but general offline.
+          hud.noteSentChannel(text, online != null);
         }
       }
       // a typed "/join world"/"/leave lfg" opens or closes its channel tab too,

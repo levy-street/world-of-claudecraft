@@ -11,7 +11,6 @@
 // authority for rewards. Pure protocol/diff/embed logic is in ./logic (tested);
 // this file is the wiring. esbuild-bundled for Node via `npm run bot`.
 
-import { DISCORD_SPECIAL_ROLES, specialRoleByName } from '../src/sim/discord_roles';
 import { DISCORD_REWARD_GRANTS } from '../src/sim/discord_tier';
 import { loadConfig } from './config';
 import { DiscordApi } from './discord_api';
@@ -24,11 +23,22 @@ import {
   buildLinkContent,
   buildRelayMessage,
   buildWhoamiContent,
+  chunk,
+  clearDepartedFlair,
+  clearedMemberMeta,
   computeRoleSync,
+  GUILD_LARGE_THRESHOLD,
+  indexSpecialRoleIds,
   isSlashCommand,
+  MEMBERS_META_BATCH,
+  memberRolesFromPayload,
   type RawVoiceState,
+  reconcileMemberRolesFromUpdate,
+  rosterComplete,
   SLASH_COMMANDS,
+  staleFlairedIds,
   tierRoleColor,
+  topSpecialRoleKeyFor,
   voiceMembersForChannel,
 } from './logic';
 import { ServerClient, type VoiceMemberPush } from './server_client';
@@ -90,34 +100,21 @@ async function main(): Promise<void> {
   await ensureTierRoles();
   await refreshTierRoles();
 
-  // Resolve the staff/special role ids by name (every DISCORD_SPECIAL_ROLES
-  // entry, staff and community alike, including catalog aliases so guild-side
-  // renames keep matching), so each member's top special role can be pushed to
-  // the game (name color + tag).
-  const specialRoleIds = new Map<string, string>(); // role key -> guild role id
+  // Resolve the staff/special roles (every catalog entry, staff and community
+  // alike, matched by name or alias so guild-side renames keep matching), so each
+  // member's top special role can be pushed to the game (name color + tag). The
+  // index maps guild role id -> special-role key: ALL matching ids are kept (both
+  // an `Admin` and an `Admins` role map to key `admin`), so a holder of EITHER
+  // resolves. Rebuilt on each refresh from the live guild roles.
+  let specialRoleIndex = new Map<string, string>();
   const refreshSpecialRoles = async (): Promise<void> => {
-    const roles = await discord.guildRoles(cfg.guildId);
-    specialRoleIds.clear();
-    for (const role of roles) {
-      const def = specialRoleByName(role.name);
-      // first match wins per key, mirroring Discord's top-down role order
-      if (def && !specialRoleIds.has(def.key)) specialRoleIds.set(def.key, role.id);
-    }
+    specialRoleIndex = indexSpecialRoleIds(await discord.guildRoles(cfg.guildId));
   };
   await refreshSpecialRoles();
 
   // The highest-priority special role a member holds, or null.
-  const topSpecialRoleKey = (roleIds: readonly string[]): string | null => {
-    const have = new Set(roleIds);
-    let best: { key: string; priority: number } | null = null;
-    for (const def of DISCORD_SPECIAL_ROLES) {
-      const id = specialRoleIds.get(def.key);
-      if (id && have.has(id) && (!best || def.priority > best.priority)) {
-        best = { key: def.key, priority: def.priority };
-      }
-    }
-    return best?.key ?? null;
-  };
+  const topSpecialRoleKey = (roleIds: readonly string[]): string | null =>
+    topSpecialRoleKeyFor(roleIds, specialRoleIndex);
 
   // ── in-memory guild state (seeded by GUILD_CREATE, kept fresh by events) ─────
   const voiceStates = new Map<string, RawVoiceState>();
@@ -129,6 +126,20 @@ async function main(): Promise<void> {
   let memberTotal = 0; // total guild members (from GUILD_CREATE member_count)
   let announced = false; // guards the one-time startup announcement post
   const nameOf = (userId: string): string => memberNames.get(userId) ?? 'Member';
+
+  // Upsert one member (from a GUILD_CREATE member, a GUILD_MEMBER_ADD, or a
+  // GUILD_MEMBERS_CHUNK entry) into the name/role/join caches. Returns the user
+  // id, or '' when the payload has no user id.
+  const upsertMemberFromPayload = (m: Record<string, unknown>): string => {
+    const u = (m.user ?? {}) as Record<string, unknown>;
+    const id = String(u.id ?? '');
+    if (!id) return '';
+    memberNames.set(id, displayNameOf(m, u));
+    memberRoles.set(id, memberRolesFromPayload(m));
+    const joined = typeof m.joined_at === 'string' ? Date.parse(m.joined_at) : NaN;
+    if (Number.isFinite(joined)) memberJoined.set(id, joined);
+    return id;
+  };
 
   let presenceTimer: ReturnType<typeof setTimeout> | null = null;
   const schedulePresencePush = (): void => {
@@ -244,6 +255,14 @@ async function main(): Promise<void> {
         case 'GUILD_CREATE': {
           if (String(d.id ?? '') !== cfg.guildId) return;
           seedGuild(d);
+          // Guilds larger than large_threshold omit offline members from
+          // GUILD_CREATE; backfill the full member list (op 8) so offline holders
+          // of a special role (e.g. Admins) are known. Chunks arrive as
+          // GUILD_MEMBERS_CHUNK dispatches, which re-push member meta and run the
+          // departed-member reconcile when done. A small guild's GUILD_CREATE is
+          // already the complete roster, so it reconciles right away.
+          if (memberTotal > GUILD_LARGE_THRESHOLD) gateway.requestGuildMembers(cfg.guildId);
+          else void reconcileDepartedMembers().catch((e) => console.error(e));
           schedulePresencePush();
           // Sync tier roles for everyone online right away, so a freshly linked
           // member's role matches their points without waiting for the poll.
@@ -285,13 +304,70 @@ async function main(): Promise<void> {
         }
         case 'GUILD_MEMBER_ADD': {
           if (String(d.guild_id ?? '') !== cfg.guildId) return;
-          const u = (d.user ?? {}) as Record<string, unknown>;
-          const userId = String(u.id ?? '');
+          // Cache the joiner's name, roles, and join date so their flair resolves
+          // and their meta can be pushed without waiting for a restart/re-seed.
+          const userId = upsertMemberFromPayload(d);
           if (!userId) return;
-          memberNames.set(userId, displayNameOf(d, u));
           // Mark membership + grant the member reward (server dedupes). No channel
           // welcome message is posted (intentionally quiet).
           void server.setMember(userId, true);
+          void pushMemberMeta(userId).catch((e) => console.error(e));
+          break;
+        }
+        case 'GUILD_MEMBER_UPDATE': {
+          // A member's roles changed live (e.g. the Admins role was granted).
+          // Replace the cached role set and re-push their meta so the new flair
+          // shows in game without a bot restart or the periodic re-seed.
+          if (String(d.guild_id ?? '') !== cfg.guildId) return;
+          const u = (d.user ?? {}) as Record<string, unknown>;
+          const userId = String(u.id ?? '');
+          if (!userId) return;
+          const roles = reconcileMemberRolesFromUpdate(d);
+          if (roles) memberRoles.set(userId, roles);
+          // The update may also carry a changed nick/global_name.
+          memberNames.set(userId, displayNameOf(d, u));
+          void pushMemberMeta(userId).catch((e) => console.error(e));
+          break;
+        }
+        case 'GUILD_MEMBER_REMOVE': {
+          // A member left (or was removed). Clear their server-side membership flag
+          // and stored flair (guildMember: false + a null-role meta record) so
+          // their in-game verified/staff tag is dropped promptly, THEN drop them
+          // from every in-memory cache.
+          if (String(d.guild_id ?? '') !== cfg.guildId) return;
+          const u = (d.user ?? {}) as Record<string, unknown>;
+          const userId = String(u.id ?? '');
+          if (!userId) return;
+          void server.setMember(userId, false);
+          void server
+            .pushMembersMeta([clearedMemberMeta(userId)])
+            .catch((e) => console.error('[bot] clear member meta failed', e));
+          memberRoles.delete(userId);
+          memberNames.delete(userId);
+          memberJoined.delete(userId);
+          voiceStates.delete(userId);
+          onlineUsers.delete(userId);
+          break;
+        }
+        case 'GUILD_MEMBERS_CHUNK': {
+          // Backfill response to REQUEST_GUILD_MEMBERS (op 8): each chunk carries a
+          // batch of members (incl. offline). Upsert them, apply any presences,
+          // then push everyone's meta after the final chunk.
+          if (String(d.guild_id ?? '') !== cfg.guildId) return;
+          for (const m of asArray(d.members)) upsertMemberFromPayload(m);
+          for (const p of asArray(d.presences)) {
+            const pu = (p.user ?? {}) as Record<string, unknown>;
+            const pid = String(pu.id ?? '');
+            if (!pid) continue;
+            if (p.status && p.status !== 'offline') onlineUsers.add(pid);
+            else onlineUsers.delete(pid);
+          }
+          const idx = typeof d.chunk_index === 'number' ? d.chunk_index : 0;
+          const count = typeof d.chunk_count === 'number' ? d.chunk_count : 1;
+          if (idx >= count - 1) {
+            void pushAllMemberMeta().catch((e) => console.error(e));
+            void reconcileDepartedMembers().catch((e) => console.error(e));
+          }
           break;
         }
         case 'MESSAGE_CREATE': {
@@ -318,15 +394,7 @@ async function main(): Promise<void> {
         voiceChannelName = ch.name;
       }
     }
-    for (const m of asArray(d.members)) {
-      const u = (m.user ?? {}) as Record<string, unknown>;
-      const id = String(u.id ?? '');
-      if (!id) continue;
-      memberNames.set(id, displayNameOf(m, u));
-      memberRoles.set(id, asStringArray(m.roles));
-      const joined = typeof m.joined_at === 'string' ? Date.parse(m.joined_at) : NaN;
-      if (Number.isFinite(joined)) memberJoined.set(id, joined);
-    }
+    for (const m of asArray(d.members)) upsertMemberFromPayload(m);
     for (const v of asArray(d.voice_states)) {
       const id = String(v.user_id ?? '');
       const channelId = typeof v.channel_id === 'string' ? v.channel_id : null;
@@ -340,16 +408,48 @@ async function main(): Promise<void> {
     }
   }
 
+  // One members-meta record: nickname + guild join date + top special role.
+  const memberMetaRecord = (id: string) => ({
+    discord_user_id: id,
+    name: memberNames.get(id) ?? null, // server nickname (nick > global > username)
+    joinedAtMs: memberJoined.get(id) ?? null,
+    role: topSpecialRoleKey(memberRoles.get(id) ?? []),
+  });
+
   // Push every known member's guild join date + top special role to the game, so
-  // linked players show "member since" + a colored role tag/name in world.
+  // linked players show "member since" + a colored role tag/name in world. The
+  // server caps each request, so batch the full roster into successive requests
+  // (a large-guild backfill streams well past a single cap; capping the total
+  // would leave every member past the cutoff without meta).
   const pushAllMemberMeta = async (): Promise<void> => {
-    const members = [...memberRoles.entries()].slice(0, 1000).map(([id, roleIds]) => ({
-      discord_user_id: id,
-      name: memberNames.get(id) ?? null, // server nickname (nick > global > username)
-      joinedAtMs: memberJoined.get(id) ?? null,
-      role: topSpecialRoleKey(roleIds),
-    }));
-    if (members.length) await server.pushMembersMeta(members);
+    for (const batch of chunk([...memberRoles.keys()], MEMBERS_META_BATCH)) {
+      await server.pushMembersMeta(batch.map(memberMetaRecord));
+    }
+  };
+
+  // Push a single member's meta (used when a live role change re-resolves their
+  // flair), so a role grant/removal reflects in game without waiting for the poll.
+  const pushMemberMeta = async (id: string): Promise<void> => {
+    if (!id || !memberRoles.has(id)) return;
+    await server.pushMembersMeta([memberMetaRecord(id)]);
+  };
+
+  // Members who left while the bot was OFFLINE never fire GUILD_MEMBER_REMOVE,
+  // so their stored membership flag + role key would stay stale forever. After a
+  // COMPLETE roster seed (small-guild GUILD_CREATE, or the final op 8 chunk),
+  // diff the server's flagged ids against the live roster and clear exactly the
+  // departed ones (clearDepartedFlair owns the ordering, batching, and the
+  // re-observed-member skip; it is unit-tested with fake IO). A server fetch
+  // failure (null) changes nothing.
+  const reconcileDepartedMembers = async (): Promise<void> => {
+    if (!rosterComplete(memberRoles.size, memberTotal)) return;
+    const flagged = await server.flairedIds();
+    if (!flagged) return;
+    const stale = staleFlairedIds(flagged, new Set(memberRoles.keys()));
+    await clearDepartedFlair(stale, (id) => memberRoles.has(id), {
+      pushMembersMeta: (records) => server.pushMembersMeta(records),
+      setMember: (id, guildMember) => server.setMember(id, guildMember),
+    });
   };
 
   // Daily Discord-engagement reward: the first time a linked member posts a message
@@ -439,9 +539,6 @@ async function main(): Promise<void> {
 // ── small helpers ──────────────────────────────────────────────────────────────
 function asArray(v: unknown): Record<string, unknown>[] {
   return Array.isArray(v) ? (v as Record<string, unknown>[]) : [];
-}
-function asStringArray(v: unknown): string[] {
-  return Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : [];
 }
 function displayNameOf(member: Record<string, unknown>, user: Record<string, unknown>): string {
   const nick = typeof member.nick === 'string' ? member.nick : '';

@@ -124,6 +124,7 @@
     "@types/pg": "^8.20.0",
     "@types/three": "^0.185.1",
     "@types/ws": "^8.18.1",
+    "@typescript/native": "npm:typescript@^7.0.2",
     "@vitest/browser": "4.1.10",
     "@vitest/browser-playwright": "4.1.10",
     "axe-core": "4.12.1",
@@ -140,7 +141,7 @@
     "svelte": "^5.56.3",
     "svelte-check": "^4.6.0",
     "tsx": "^4.22.4",
-    "typescript": "^5.5.0",
+    "typescript": "npm:@typescript/typescript6@^6.0.2",
     "vite": "^8.0.16",
     "vitest": "4.1.10"
   },

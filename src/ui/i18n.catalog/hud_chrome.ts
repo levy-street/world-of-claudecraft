@@ -1535,7 +1535,7 @@ export const hudChromeStrings = {
     imbueRange: 'Weapon imbued: {min} to {max} bonus damage on Verdict',
     stealth: 'Concealed; movement speed reduced by {pct}%',
     formBear: 'Bruin Form: increased health and armor',
-    formCat: 'Cat Form: melee damage and energy',
+    formCat: 'Wolf Form: melee damage and energy',
     formTravel: 'Fleet Form: movement speed increased by {pct}%',
     defensiveStance: 'Guarded Stance: reduced damage taken, more threat',
     righteousFury: 'Burning Oath: greatly increased threat from Holy damage',

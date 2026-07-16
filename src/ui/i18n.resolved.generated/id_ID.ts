@@ -2601,7 +2601,7 @@ export const id_ID: EnTranslations = {
       "effectsTitle": "Penguat, pelemah, dan kontrol kerumunan",
       "effectsBody": "Banyak kemampuan memberi efek yang bertahan. Yang menguntungkan (penguat) menaikkan statistikmu, melindungimu, atau menyembuhkanmu sedikit demi sedikit; yang merugikan (pelemah) menguras nyawamu dengan kerusakan seiring waktu atau melemahkanmu. Perhatikan ikon kecil di sudut atas layar, di samping minimap, untuk melihat apa yang menempel padamu dan berapa lama bertahan.",
       "ccBody": "Kontrol kerumunan adalah jenis pelemahan khusus yang membatasi apa yang bisa dilakukan sasaran: pingsan, akar dan pelambatan, pembungkaman yang menghentikan perapalan mantra, pelucutan senjata, ketakutan, dan ubah wujud yang membuat lawan tak berbahaya sejenak. Melawan pemain lain, kontrol menipis bila diulang: jenis yang sama yang dipasang kembali terlalu cepat melemah lalu gagal sama sekali, dan pingsan yang dibuka dari siluman dihitung terpisah dari pingsan yang menyusul, sehingga tak seorang pun bisa dirantai tak berdaya selamanya. Makhluk-makhluk dunia tak menyimpan dendam semacam itu: kontrol tak pernah melemah karena diulang terhadap mereka, meski banyak dari musuh terperkasa, elite bernama dan bos terkuat di antara mereka, sama sekali tak bisa dikendalikan.",
-      "metersBody": "Penasaran bagaimana jalannya sebuah pertarungan? Tekan Z untuk membuka meter party, yang menghitung kerusakan, penyembuhan, dan ancaman bagi kelompokmu, perjumpaan demi perjumpaan.",
+      "metersBody": "Penasaran bagaimana jalannya sebuah pertarungan? Tekan Shift+H untuk membuka meter party, yang menghitung kerusakan, penyembuhan, dan ancaman bagi kelompokmu, perjumpaan demi perjumpaan.",
       "queueTitle": "Gerakan berikutmu sudah termuat",
       "queueBody": "Kamu tak perlu menekan tombol tepat pada framenya. Tekan kemampuan berikutmu di saat-saat akhir perapalan yang sedang berjalan dan ia akan diantrekan, meluncur begitu perapalan selesai, sehingga permainan yang terlatih mengalir tanpa jeda. Tekanan yang terlalu dini cukup ditolak, jadi tak ada yang terbuang. Sebagian serangan jarak dekat bekerja dengan cara sama, ikut meluncur pada ayunan senjatamu berikutnya.",
       "deathTitle": "Saat kamu tumbang",
@@ -2662,7 +2662,7 @@ export const id_ID: EnTranslations = {
       "petBarTerm": "Bilah peliharaan",
       "petBarDef": "Baris perintah yang ditambahkan peliharaan Pemburu atau Penyihir Iblis: Serang, Berhenti, Hasut, Bertahan, dan Agresif, terikat ke Ctrl plus 1 hingga 5 secara bawaan.",
       "metersTerm": "Meter kerusakan",
-      "metersDef": "Jendela papan skor party untuk pertarungan saat ini: kerusakan yang diberikan, penyembuhan yang dilakukan, dan siapa yang memegang ancaman terbesar, disimpan per perjumpaan. Buka dengan keybind-nya (Z secara bawaan).",
+      "metersDef": "Jendela papan skor party untuk pertarungan saat ini: kerusakan yang diberikan, penyembuhan yang dilakukan, dan siapa yang memegang ancaman terbesar, disimpan per perjumpaan. Buka dengan keybind-nya (Shift+H secara bawaan).",
       "targetMarkerTerm": "Penanda sasaran",
       "targetMarkerDef": "Simbol yang bisa disematkan anggota party atau raid mana pun di atas sasaran agar semua orang memusatkan, atau menghindari, sasaran yang sama. Delapan simbol, satu sasaran per simbol.",
       "loadoutTerm": "Loadout",
@@ -2991,6 +2991,8 @@ export const id_ID: EnTranslations = {
       "heroicRewardsTitle": "Tanda Heroik dan rampasan yang ditingkatkan",
       "heroicRewardsBody": "Bos heroik menjatuhkan jarahan yang sudah kamu kenal, ditingkatkan dan diberi label Heroik pada tooltip, dan bos terakhir tiap sesi menambahkan epik yang tak ditemukan di tempat lain. Bunuhan terakhir itu juga meninggalkan Tanda Heroik bagi setiap peserta: mata uang yang dibelanjakan pada Quartermaster Vex di Highwatch, yang stok cincin dan kalungnya adalah satu-satunya perhiasan di realm ini.",
       "heroicLockoutBody": "Dungeon normal bisa dijalankan sepanjang hari. Heroik menuntut kesabaran: membunuh bos terakhir mengunci setiap orang dalam sesi itu pada satu penuntasan heroik dungeon tersebut per hari, dan raid menyimpan kunci harian terpisah untuk tiap tingkat kesulitan. Sesi lima pemain yang sudah dituntaskan tetap terbuka bagi party-nya sendiri untuk lari balik dan menjarah, jadi tak seorang pun terkunci dari apa yang mereka raih di sana. Raid lebih ketat: begitu bunuhannya mengunci kamu, pintu tetap tertutup sampai reset harian, jadi kumpulkan rampasanmu sebelum kamu meninggalkan arena.",
+      "resetTitle": "Mereset instansimu",
+      "resetBody": "Jika kesulitan diganti saat kelompok masih memegang perjalanan yang diklaim, klaim lama bertahan sebentar sebelum hilang sendiri. Pemimpin kelompok dapat segera melepaskannya dengan memilih Reset Semua Instansi di menu potretnya sendiri atau mengetik /dungeon reset. Kesulitan harus benar-benar sudah diubah, tidak boleh ada siapa pun, hidup atau gugur, di dalam, dan ada jeda singkat antarreset. Jika tiba di pintu dengan kesulitan yang salah, permainan akan memberi tahu sebelum perjalanan dimulai. Raid tidak pernah direset dengan cara ini; aturan pengunciannya sendiri tetap berlaku.",
       "templeLoreTitle": "Kuil Tenggelam, sedikit lebih dalam",
       "templeLoreBody": "Kuil itu memiliki legendanya sendiri, lebih tua dari pemujaan yang kamu kejar di tempat lain. Di tepi Glimmermere, sebuah danau yang meneguk cahaya bulan dan mengembalikan mereka yang tenggelam, seorang pengawas sebatang kara menjaga sebuah gerbang cahaya pucat. Di bawah permukaan, sebuah tangga dari batu dingin menurun menuju ke sana. Orang-orang yang tenggelam di sana tidak mati karena kecelakaan: mereka adalah Paduan Suara Pucat, yang tenggelam dalam pemujaan dan tak pernah berhenti bernyanyi. Para penjaga tua menggores satu peringatan ke bebatuan sebelum air menelan mereka, sebuah doa kepada sesuatu yang mereka sebut Bulan Tenggelam, dengan tangan yang lebih mantap menambahkan dua kata di bawahnya: ia hanya tertidur.",
       "cryptLeadTitle": "Pintu yang seharusnya dijaga tetap tertutup oleh orang mati",
@@ -3198,7 +3200,7 @@ export const id_ID: EnTranslations = {
       "qualityNote": "Kualitas yang lebih tinggi biasanya berarti statistik yang lebih baik, tetapi kualitas adalah petunjuk, bukan aturan. Sepotong perlengkapan yang cocok untuk kelas dan levelmu bisa mengalahkan yang lebih mencolok.",
       "upgradeTitle": "Jaga perlengkapanmu tetap mutakhir",
       "upgradeBody": "Mengganti potongan lama dengan peningkatan baru lebih berguna bagimu daripada bermain sempurna dengan perlengkapan yang sudah kamu lampaui. Saat sesuatu yang lebih baik jatuh atau sebuah misi menawarkannya, ambillah. Jangan simpan barang bagusmu untuk nanti.",
-      "itemLevelBody": "Jika kamu ingin cara cepat membandingkan dua potongan, aktifkan Tampilkan Level Item di opsi. Perlengkapan yang didapat di dunia, dari musuh dan misi, lalu menampilkan level item, satu angka untuk kira-kira seberapa kuatnya berdasarkan asalnya, sehingga kamu bisa tahu sekilas peningkatan mana yang lebih berbobot, bahkan lintas slot berbeda. Potongan tanpa asal semacam itu, seperti barang dasar penjaja dan perlengkapan awal, tak menampilkan level item, jadi angka yang hilang itu wajar, bukan kesalahan.",
+      "itemLevelBody": "Untuk membandingkan dua perlengkapan dengan cepat, aktifkan Tampilkan Level Item di opsi. Perlengkapan yang sumbernya diketahui, dari musuh, misi, dan profesi kerajinan, kemudian menampilkan level item: satu angka yang memperkirakan kekuatan berdasarkan asalnya dan memudahkan melihat peningkatan terbaik, bahkan antar-slot. Item tanpa sumber seperti itu, misalnya barang dasar pedagang dan perlengkapan awal, tidak menampilkan level; angka yang tidak ada adalah hal normal.",
       "sourcesTitle": "Dari mana perlengkapan berasal",
       "sourcesBody": "Sebagian besar peningkatan awalmu adalah hadiah misi, jadi lebih menguntungkan menuntaskan misi daripada menggerus musuh. Musuh menjatuhkan perlengkapan saat kamu mengalahkannya, penjaja di kota menjual barang dasar yang andal, perajin mengubah bahan yang dikumpulkan menjadi potongan yang bisa dikenakan, dan pasar pemain memungkinkanmu membeli dari petualang lain. Di puncak bukit, dua mata uang tanda membeli perlengkapan yang tak ditemukan di tempat lain: Tanda Delve pada penjaga delve, dan Tanda Heroik pada Kepala Perbekalan Heroik.",
       "soulboundTitle": "Soulbound: milikmu dan hanya milikmu",
@@ -3242,7 +3244,7 @@ export const id_ID: EnTranslations = {
       "craftRecipesTitle": "Resep dan reagen",
       "craftRecipesBody": "Setiap resep membutuhkan reagen tertentu yang kamu kumpulkan atau beli. Resep paling sederhana hanya meminta bahan umum dan bisa dibuat sejak awal, jadi kamu bisa mulai menekuni sebuah kerajinan begitu mengambilnya. Daftar resep masih terus terisi: beberapa kerajinan sedang menanti resep pertamanya, dan lebih banyak lagi tiba seiring kerajinan berkembang.",
       "craftHowTitle": "Jendela kriya",
-      "craftHowBody": "Buka jendela Kriya (tombol bawaan T) untuk melihat setiap resep yang kamu ketahui, apa yang dibutuhkan masing-masing, dan apa yang kamu punya; saat bahannya tersedia, satu klik menuntaskan pekerjaannya. Resep umum bisa dibuat di mana saja di dunia. Segelintir resep perkakas tingkat lanjut justru mengharuskanmu berdiri di pusat kriya di Highwatch.",
+      "craftHowBody": "Buka jendela Kerajinan (tombol bawaan T) untuk melihat semua resep yang diketahui, kebutuhan tiap resep, dan bahan yang tersedia; jika bahannya lengkap, satu klik menyelesaikannya. Resep umum dapat dibuat di mana saja. Beberapa resep lanjutan, termasuk alat tingkat tinggi dan zirah langka untuk perapal, mengharuskanmu berada di pusat kerajinan Highwatch.",
       "craftMasteryTitle": "Keahlian dan penguasaan",
       "craftMasteryBody": "Berhasil membuat barang menumbuhkan keahlianmu di kerajinan itu, dan keahlian tak pernah mengunci resep sebuah kerajinan: jika kamu mengetahui sebuah resep dan memegang bahannya, kamu bisa mencobanya. Yang justru dibeli keahlian untukmu adalah mutu, tangan yang terlatih menghasilkan karya yang lebih halus. Satu pengecualiannya adalah resep kombinasi, yang mengharuskanmu membuktikan diri di kedua kerajinannya sebelum ia terbuka.",
       "craftComboTitle": "Resep kombinasi",
@@ -6661,7 +6663,7 @@ export const id_ID: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Wolfsblood",
-        "description": "Meningkatkan daya serang sebesar 40 selama 6 detik. Hanya Wujud Serigala."
+        "description": "Meningkatkan daya serang sebesar {buff} selama {duration} detik. Hanya Wujud Serigala."
       },
       "rip": {
         "name": "Robekan",
@@ -9929,6 +9931,11 @@ export const id_ID: EnTranslations = {
         "sender": "The Ravenpost",
         "subject": "Trade goods returned",
         "body": "Your trade did not complete. Everything you offered has been returned."
+      },
+      "heroic_marks_reward": {
+        "sender": "Perbekal heroik",
+        "subject": "Tanda Heroik milikmu",
+        "body": "Kelompokmu menuntaskan ujian heroik saat kamu bertempur di barisan belakang atau telah tumbang. Penguncianmu juga tercatat, jadi bagian Tanda Heroik milikmu dikirim ke sini alih-alih hilang. Gunakan dengan baik.\n\n- Perbekal heroik"
       }
     },
     "itemSets": {

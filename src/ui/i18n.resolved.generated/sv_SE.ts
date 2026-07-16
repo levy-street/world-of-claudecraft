@@ -2601,7 +2601,7 @@ export const sv_SE: EnTranslations = {
       "effectsTitle": "Förstärkningar, försvagningar och masskontroll",
       "effectsBody": "Många förmågor lägger på en effekt som dröjer kvar. Hjälpsamma (förstärkningar) höjer dina egenskaper, skyddar dig eller läker dig lite i taget; skadliga (försvagningar) tömmer din hälsa med skada över tid eller försvagar dig. Håll koll på de små ikonerna i skärmens övre hörn, bredvid minikartan, för att se vad som ligger på dig och hur länge det varar.",
       "ccBody": "Masskontroll är ett särskilt slags försvagning som begränsar vad ett mål kan göra: bedövningar, rötter och nedsaktningar, tystnader som stoppar besvärjelser, avväpningar, skräckeffekter, och förvandlingar som gör en fiende ofarlig för ett ögonblick. Mot andra spelare tunnas kontrollen ut av upprepning: samma slag som läggs på igen för snabbt försvagas och slutar sedan verka helt, och en bedövning som inleds från smygläge räknas skilt från de bedövningar som följer, så ingen kan kedjas hjälplös i all evighet. Världens varelser hyser inget sådant agg: kontroll försvagas aldrig av upprepning mot dem, även om många av de mäktigaste fienderna, namngivna eliter och de starkaste bossarna bland dem, inte kan kontrolleras alls.",
-      "metersBody": "Nyfiken på hur en strid gick? Tryck på Z för att öppna gruppmätarna, som räknar skada, läkning och hot för din grupp, drabbning för drabbning.",
+      "metersBody": "Nyfiken på hur en strid gick? Tryck på Shift+H för att öppna gruppmätarna, som räknar skada, läkning och hot för din grupp, drabbning för drabbning.",
       "queueTitle": "Ditt nästa drag är redan laddat",
       "queueBody": "Du behöver inte tajma dina tryck till bildrutan. Tryck på din nästa förmåga under de sista ögonblicken av den pågående besvärjelsen, så köas den och avfyras i samma stund som besvärjelsen är klar, så att inövat spel flyter utan luckor. Ett tryck för tidigt avvisas helt enkelt, så inget går till spillo. Vissa närstridshugg fungerar likadant och rider ut på din nästa vapensving.",
       "deathTitle": "När du faller",
@@ -2662,7 +2662,7 @@ export const sv_SE: EnTranslations = {
       "petBarTerm": "Djurrad",
       "petBarDef": "Kommandoraden som ett jägar- eller häxmästardjur lägger till: Anfall, Stopp, Håna, Defensiv och Aggressiv, bundna till Ctrl plus 1 till 5 som standard.",
       "metersTerm": "Skademätare",
-      "metersDef": "Gruppens resultattavla för den pågående striden: skada given, läkning utförd och vem som håller mest hot, sparat per drabbning. Öppna den med dess tangentbindning (Z som standard).",
+      "metersDef": "Gruppens resultattavla för den pågående striden: skada given, läkning utförd och vem som håller mest hot, sparat per drabbning. Öppna den med dess tangentbindning (Shift+H som standard).",
       "targetMarkerTerm": "Målmarkör",
       "targetMarkerDef": "En symbol som vilken grupp- eller raidmedlem som helst kan fästa över ett mål så att alla fokuserar på, eller undviker, samma. Åtta symboler, ett mål per symbol.",
       "loadoutTerm": "Uppsättning",
@@ -2991,6 +2991,8 @@ export const sv_SE: EnTranslations = {
       "heroicRewardsTitle": "Heroiska märken och uppgraderat byte",
       "heroicRewardsBody": "Heroiska bossar släpper bytet du känner igen, uppgraderat och märkt Heroisk i verktygstipset, och den sista bossen i varje pass lägger till episka föremål som inte finns någon annanstans. Det sista dråpet lämnar också Heroiska märken åt varje deltagare: en valuta du spenderar hos Kvartersmästare Vex i Highwatch, vars lager av ringar och halsband är rikets enda smycken.",
       "heroicLockoutBody": "Normala fängelsehålor går att köra hela dagen. Heroiskt kräver tålamod: dråpet på den sista bossen låser alla i passet till en heroisk rensning av den fängelsehålan per dag, och raiden håller en daglig spärr för varje svårighetsgrad. Ett rensat pass för fem spelare förblir öppet för den egna gruppen för likfärder och byte, så att ingen låses ute från det de förtjänat där. Raiden är strängare: så snart dess dråp låser dig förblir dörren stängd fram till den dagliga återställningen, så samla dina byten innan du lämnar arenan.",
+      "resetTitle": "Återställa dina instanser",
+      "resetBody": "Om du byter svårighetsgrad medan gruppen fortfarande har hävdade rundor ligger de gamla anspråken kvar en stund. Gruppledaren kan släppa dem direkt genom att välja Återställ alla instanser i menyn på sitt eget porträtt eller skriva /dungeon reset. Svårighetsgraden måste faktiskt ha ändrats, ingen levande eller fallen får vara kvar inuti och en kort väntetid skiljer återställningarna åt. Vid dörren på fel svårighetsgrad varnar spelet innan starten. Raiden återställs aldrig så här; dess egna låsningsregler gäller.",
       "templeLoreTitle": "Det dränkta templet, lite djupare",
       "templeLoreBody": "Templet har sin egen legend, äldre än kulten du jagar på andra håll. Vid stranden av Glimmertjärnen, en tjärn som dricker månljuset och ger tillbaka de dränkta, vaktar en ensam väktare en port av blekt ljus. Under ytan löper en trappa av kall sten ner till den. Folket som sjönk där dränktes inte av olyckshändelse: de var Den bleka kören, som gick under i tillbedjan och aldrig slutade sjunga. De gamla väktarna ristade en enda varning i klipporna innan vattnet tog dem, en bön till något de kallade Den dränkta månen, med en stadigare hand som lade till två ord under den: den bara sover.",
       "cryptLeadTitle": "En dörr de döda var menade att hålla stängd",
@@ -3198,7 +3200,7 @@ export const sv_SE: EnTranslations = {
       "qualityNote": "Högre kvalitet betyder oftast bättre egenskaper, men kvalitet är en ledtråd, inte en regel. En välmatchad pjäs för din klass och nivå kan slå en flashigare.",
       "upgradeTitle": "Håll din utrustning aktuell",
       "upgradeBody": "Att byta ut en gammal pjäs mot en ny uppgradering gör mer för dig än att spela perfekt i utrustning du vuxit ur. När något bättre släpps eller ett uppdrag erbjuder det, ta det. Spara inte dina goda föremål till senare.",
-      "itemLevelBody": "Om du vill ha ett snabbt sätt att jämföra två pjäser, slå på Visa föremålsnivå i alternativen. Utrustning som vunnits ute i världen, från fiender och uppdrag, visar då en föremålsnivå, en enda siffra för ungefär hur kraftfull den är utifrån var den kom ifrån, så att du på ett ögonkast kan se vilken uppgradering som väger tyngst, även mellan olika platser. Pjäser utan en sådan källa, som enkla handlarvaror och nybörjarutrustning, visar ingen föremålsnivå, så en saknad siffra är normalt, inte ett fel.",
+      "itemLevelBody": "Slå på Visa föremålsnivå i alternativen för att snabbt jämföra två delar. Utrustning med känd källa, från fiender, uppdrag och hantverksyrken, visar då en föremålsnivå: ett enda tal som ungefär anger styrkan utifrån ursprunget och gör förbättringar jämförbara även mellan olika platser. Delar utan sådan källa, som enkla handelsvaror och startutrustning, visar ingen nivå; ett saknat tal är normalt.",
       "sourcesTitle": "Var utrustning kommer ifrån",
       "sourcesBody": "Det mesta av dina tidiga uppgraderingar är uppdragsbelöningar, så det lönar sig att slutföra uppdrag snarare än att grinda. Fiender släpper utrustning när du besegrar dem, handlare i staden säljer solida basvaror, hantverkare förvandlar insamlade material till bärbara pjäser, och spelarmarknaden låter dig köpa från andra äventyrare. Högst upp på kullen köper två märkesvalutor utrustning som inte finns någon annanstans: Delve-märken hos delvevaktaren, och heroiska märken hos den heroiska kvartersmästaren.",
       "soulboundTitle": "Själsbunden: din och endast din",
@@ -3242,7 +3244,7 @@ export const sv_SE: EnTranslations = {
       "craftRecipesTitle": "Recept och reagenser",
       "craftRecipesBody": "Varje recept kräver särskilda reagenser du samlar eller köper. De enklaste recepten ber inte om annat än vanliga material och kan tillverkas från allra första början, så du kan börja utöva ett yrke i samma stund du tar upp det. Receptlistorna fylls fortfarande på: några yrken väntar på sina första recept, och fler kommer i takt med att hantverken växer.",
       "craftHowTitle": "Hantverksfönstret",
-      "craftHowBody": "Öppna Hantverksfönstret (standardtangent T) för att se varje recept du kan, vad vart och ett kräver och vad du har till hands; när materialen finns där gör ett klick jobbet. Vanliga recept kan tillverkas var som helst i världen. En handfull avancerade verktygsrecept ber dig i stället att stå vid hantverksnavet i Highwatch.",
+      "craftHowBody": "Öppna hantverksfönstret (standardtangent T) för att se alla recept du kan, vad de kräver och vad du har; när materialen finns räcker ett klick. Vanliga recept kan tillverkas var som helst. Några avancerade recept, däribland verktyg på hög nivå och sällsynta rustningar för besvärjare, kräver hantverksnavet i Highwatch.",
       "craftMasteryTitle": "Skicklighet och mästerskap",
       "craftMasteryBody": "Lyckade hantverk bygger skicklighet i det yrket, och skicklighet låser aldrig bort ett hantverks recept: kan du ett recept och har dess material, kan du försöka dig på det. Vad skicklighet i stället köper dig är kvalitet, en övad hand gör finare arbete. Det enda undantaget är kombinationsrecept, som ber dig ha bevisat dig i båda sina hantverk innan de öppnas.",
       "craftComboTitle": "Kombinationsrecept",
@@ -6661,7 +6663,7 @@ export const sv_SE: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Vargblod",
-        "description": "Ökar attackstyrkan med 40 i 6 sek. Endast vargform."
+        "description": "Ökar attackstyrkan med {buff} i {duration} sek. Endast vargform."
       },
       "rip": {
         "name": "Riv upp",
@@ -9929,6 +9931,11 @@ export const sv_SE: EnTranslations = {
         "sender": "The Ravenpost",
         "subject": "Trade goods returned",
         "body": "Your trade did not complete. Everything you offered has been returned."
+      },
+      "heroic_marks_reward": {
+        "sender": "Heroisk kvartermästare",
+        "subject": "Dina heroiska märken",
+        "body": "Din grupp klarade den heroiska prövningen medan du kämpade i eftertruppen eller låg fallen. Din låsning registrerades ändå, så din andel heroiska märken skickades hit i stället för att gå förlorad. Använd dem väl.\n\n- Heroisk kvartermästare"
       }
     },
     "itemSets": {

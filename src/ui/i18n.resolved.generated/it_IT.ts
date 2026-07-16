@@ -2601,7 +2601,7 @@ export const it_IT: EnTranslations = {
       "effectsTitle": "Potenziamenti, malus e controllo della folla",
       "effectsBody": "Molte abilità applicano un effetto che permane. Quelli benefici (potenziamenti) aumentano le tue statistiche, ti proteggono o ti curano un po' alla volta; quelli dannosi (malus) ti prosciugano la salute con danno nel tempo o ti indeboliscono. Tieni d'occhio le piccole icone nell'angolo in alto dello schermo, accanto alla minimappa, per vedere cosa hai addosso e quanto dura.",
       "ccBody": "Il controllo della folla è un tipo speciale di malus che limita ciò che un bersaglio può fare: stordimenti, radicamenti e rallentamenti, silenzi che fermano il lancio di incantesimi, disarmi, paure e trasformazioni che rendono un nemico inoffensivo per un momento. Contro gli altri giocatori, il controllo si logora con la ripetizione: lo stesso tipo riapplicato troppo in fretta si indebolisce e poi fallisce del tutto, e uno stordimento che apre dalla furtività viene conteggiato a parte rispetto agli stordimenti che seguono, così nessuno può essere incatenato indifeso per sempre. Le creature del mondo non serbano un tale rancore: su di loro il controllo non si indebolisce mai con la ripetizione, anche se molti dei nemici più possenti, gli elite dotati di nome e i boss più forti tra loro, non possono essere controllati affatto.",
-      "metersBody": "Curioso di sapere com'è andato uno scontro? Premi Z per aprire i misuratori del gruppo, che tengono il conto di danno, cure e minaccia della tua squadra, scontro per scontro.",
+      "metersBody": "Curioso di sapere com'è andato uno scontro? Premi Shift+H per aprire i misuratori del gruppo, che tengono il conto di danno, cure e minaccia della tua squadra, scontro per scontro.",
       "queueTitle": "La tua prossima mossa è già pronta",
       "queueBody": "Non devi cronometrare le pressioni al singolo istante. Premi la prossima abilità negli attimi finali del lancio in corso e viene messa in coda, scattando nell'istante in cui il lancio si completa, così il gioco esperto scorre senza pause. Una pressione troppo anticipata viene semplicemente rifiutata, quindi nulla va sprecato. Alcuni colpi in mischia funzionano allo stesso modo, partendo con il tuo prossimo fendente.",
       "deathTitle": "Quando cadi",
@@ -2662,7 +2662,7 @@ export const it_IT: EnTranslations = {
       "petBarTerm": "Barra del famiglio",
       "petBarDef": "La fila di comandi che aggiunge un famiglio del cacciatore o dello stregone: Attacca, Ferma, Provoca, Difensivo e Aggressivo, associati a Ctrl più 1-5 di default.",
       "metersTerm": "Misuratori di danno",
-      "metersDef": "La finestra tabellone del gruppo per lo scontro in corso: danno inflitto, cure prestate e chi regge più minaccia, tenuti scontro per scontro. Aprila con la sua scorciatoia (Z di default).",
+      "metersDef": "La finestra tabellone del gruppo per lo scontro in corso: danno inflitto, cure prestate e chi regge più minaccia, tenuti scontro per scontro. Aprila con la sua scorciatoia (Shift+H di default).",
       "targetMarkerTerm": "Simbolo bersaglio",
       "targetMarkerDef": "Un simbolo che qualsiasi membro del gruppo o dell'incursione può fissare su un bersaglio così tutti si concentrano, o evitano, lo stesso. Otto simboli, un bersaglio per simbolo.",
       "loadoutTerm": "Configurazione",
@@ -2991,6 +2991,8 @@ export const it_IT: EnTranslations = {
       "heroicRewardsTitle": "Marchi Eroici e bottino potenziato",
       "heroicRewardsBody": "I boss eroici lasciano cadere il bottino che conosci, potenziato e contrassegnato come Eroico nel suggerimento, e il boss finale di ogni spedizione aggiunge oggetti epici introvabili altrove. Quell'ultima uccisione lascia anche Marchi Eroici a ogni partecipante: una valuta da spendere con il Quartiermastro Vex a Highwatch, la cui scorta di anelli e collane è l'unica gioielleria del reame.",
       "heroicLockoutBody": "I dungeon normali si possono affrontare tutto il giorno. L'eroica chiede pazienza: l'uccisione del boss finale blocca tutti i presenti a una sola conquista eroica di quel dungeon al giorno, e l'incursione mantiene un blocco giornaliero per ciascuna difficoltà. Una spedizione a cinque giocatori già completata resta aperta al suo stesso gruppo per le corse al cadavere e il bottino, così nessuno viene escluso da ciò che vi ha guadagnato. L'incursione è più severa: una volta che la sua uccisione ti blocca, la porta resta chiusa fino al ripristino giornaliero, perciò raccogli il tuo bottino prima di lasciare l'arena.",
+      "resetTitle": "Reimpostare le istanze",
+      "resetBody": "Se cambi difficoltà mentre il gruppo conserva ancora delle spedizioni assegnate, le vecchie assegnazioni restano per un po’ prima di svanire. Il capogruppo può abbandonarle subito scegliendo Reimposta tutte le istanze dal menu del proprio ritratto oppure digitando /dungeon reset. La difficoltà deve essere stata davvero cambiata, nessuno, vivo o caduto, può trovarsi all’interno e tra due ripristini passa un breve tempo di recupero. Se arrivi all’ingresso con la difficoltà sbagliata, il gioco ti avvisa prima dell’inizio. L’incursione non viene mai reimpostata così e mantiene le proprie regole di vincolo.",
       "templeLoreTitle": "Il Tempio Annegato, un po' più a fondo",
       "templeLoreBody": "Il tempio ha una sua leggenda, più antica del culto che insegui altrove. Sulla riva del Glimmermere, un laghetto che beve la luce della luna e restituisce gli annegati, un solitario guardiano custodisce una porta di pallida luce. Sotto la superficie, una scalinata di pietra fredda scende fino ad esso. Coloro che vi affondarono non annegarono per disgrazia: erano il Coro Pallido, che si immerse in preghiera e non smise mai di cantare. I vecchi custodi incisero un solo avvertimento nelle rocce prima che l'acqua li prendesse, una preghiera a qualcosa che chiamavano la Luna Annegata, con una mano più ferma che aggiunse due parole sotto di essa: dorme soltanto.",
       "cryptLeadTitle": "Una porta che i morti dovevano tenere chiusa",
@@ -3188,7 +3190,7 @@ export const it_IT: EnTranslations = {
       "bagsTitle": "Borse e spazio di carico",
       "bagsBody": "Tutto ciò che raccogli viaggia in un unico zaino condiviso, che ingrandisci equipaggiando borse. La finestra delle borse tiene quattro slot per borse: clicca una borsa nello zaino per infilarla in uno slot libero, e ogni borsa che indossi aggiunge il proprio spazio. Le borse semplici sono merce da poco dei venditori, quelle più capienti cadono dalle bestie, e le migliori vengono dai boss dei dungeon, così il tuo spazio di carico cresce di pari passo con il tuo equipaggiamento.",
       "qualityTitle": "La qualità, a colpo d'occhio",
-      "qualityBody": "Ogni oggetto ha una qualità, e il suo nome è colorato di conseguenza così puoi leggerne il valore a colpo d'occhio. Dal più comune al più pregiato:",
+      "qualityBody": "Ogni oggetto ha una qualità e il suo nome assume il colore corrispondente, così puoi capirne il valore a colpo d’occhio. Dal più comune al più prezioso:",
       "qualityPoor": "Scadente",
       "qualityCommon": "Comune",
       "qualityUncommon": "Non comune",
@@ -3198,7 +3200,7 @@ export const it_IT: EnTranslations = {
       "qualityNote": "Una qualità superiore di solito significa statistiche migliori, ma la qualità è un indizio, non una regola. Un pezzo ben adatto alla tua classe e al tuo livello può battere uno più appariscente.",
       "upgradeTitle": "Tieni il tuo equipaggiamento aggiornato",
       "upgradeBody": "Sostituire un vecchio pezzo con un miglioramento fresco fa di più per te che giocare alla perfezione con un equipaggiamento che hai superato. Quando cade qualcosa di migliore o una missione te lo offre, prendilo. Non conservare i tuoi oggetti buoni per dopo.",
-      "itemLevelBody": "Se vuoi un modo rapido per confrontare due pezzi, attiva Mostra livello oggetto nelle opzioni. L'equipaggiamento conquistato nel mondo, da nemici e missioni, mostra allora un livello oggetto, un singolo numero che indica all'incirca quanto è potente in base alla sua provenienza, così puoi capire a colpo d'occhio quale miglioramento conta di più, anche tra slot diversi. I pezzi privi di tale origine, come le basi comuni dei venditori e l'equipaggiamento iniziale, non mostrano alcun livello oggetto, perciò un numero mancante è normale, non un difetto.",
+      "itemLevelBody": "Per confrontare rapidamente due pezzi, attiva Mostra livello oggetto nelle opzioni. L’equipaggiamento di provenienza nota, ottenuto da nemici, missioni e mestieri, mostra un livello oggetto: un unico valore che ne indica approssimativamente la potenza in base alla fonte e rende immediata la scelta del miglior potenziamento, anche tra slot diversi. I pezzi senza tale provenienza, come gli articoli base dei mercanti e l’equipaggiamento iniziale, non mostrano alcun livello; è normale.",
       "sourcesTitle": "Da dove arriva l'equipaggiamento",
       "sourcesBody": "Gran parte dei tuoi primi miglioramenti sono ricompense delle missioni, perciò conviene portarle a termine invece di macinare nemici. I nemici lasciano cadere equipaggiamento quando li sconfiggi, i venditori in città vendono solide basi, gli artigiani trasformano i materiali raccolti in pezzi indossabili, e il mercato dei giocatori ti permette di comprare da altri avventurieri. In cima alla scalata, due valute in marchi comprano equipaggiamento introvabile altrove: i Sigilli d'Incursione presso il custode delle incursioni, e i Marchi Eroici presso il Quartiermastro Eroico.",
       "soulboundTitle": "Vincolato all'anima: tuo e tuo soltanto",
@@ -3242,7 +3244,7 @@ export const it_IT: EnTranslations = {
       "craftRecipesTitle": "Ricette e reagenti",
       "craftRecipesBody": "Ogni ricetta richiede reagenti specifici da raccogliere o comprare. Le ricette più semplici non chiedono altro che materiali comuni e si possono creare fin dall'inizio, così puoi cominciare a esercitare un mestiere nel momento in cui lo scegli. Le liste delle ricette si stanno ancora completando: alcuni mestieri sono in attesa delle loro prime ricette, e altre ne arrivano man mano che i mestieri crescono.",
       "craftHowTitle": "La finestra di creazione",
-      "craftHowBody": "Apri la finestra di Creazione (tasto predefinito T) per vedere ogni ricetta che conosci, cosa richiede ciascuna e cosa hai a disposizione; quando i materiali ci sono, un clic fa il lavoro. Le ricette comuni si possono creare ovunque nel mondo. Una manciata di ricette avanzate per attrezzi ti chiede invece di trovarti alla postazione artigiana di Highwatch.",
+      "craftHowBody": "Apri la finestra Creazione (tasto predefinito T) per vedere tutte le ricette note, i loro requisiti e ciò che possiedi; quando hai i materiali basta un clic. Le ricette comuni si possono creare ovunque. Alcune ricette avanzate, tra cui strumenti di livello superiore e rare armature da incantatore, richiedono invece il centro di creazione di Highwatch.",
       "craftMasteryTitle": "Abilità e maestria",
       "craftMasteryBody": "Creare con successo accresce l'abilità in quel mestiere, e l'abilità non blocca mai le ricette di un mestiere: se conosci una ricetta e ne possiedi i materiali, puoi tentarla. Ciò che l'abilità ti dà è invece la qualità, una mano esperta produce lavori più fini. L'unica eccezione sono le ricette combinate, che ti chiedono di esserti dimostrato valido in entrambi i loro mestieri prima di aprirsi.",
       "craftComboTitle": "Ricette combinate",
@@ -6661,7 +6663,7 @@ export const it_IT: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Sangue di Lupo",
-        "description": "Aumenta la potenza d'attacco di 40 per 6 sec. Solo Forma del Lupo."
+        "description": "Aumenta la potenza d'attacco di {buff} per {duration} sec. Solo Forma del Lupo."
       },
       "rip": {
         "name": "Squartare",
@@ -9929,6 +9931,11 @@ export const it_IT: EnTranslations = {
         "sender": "The Ravenpost",
         "subject": "Trade goods returned",
         "body": "Your trade did not complete. Everything you offered has been returned."
+      },
+      "heroic_marks_reward": {
+        "sender": "Quartiermastro eroico",
+        "subject": "I tuoi Marchi eroici",
+        "body": "Il tuo gruppo ha superato la prova eroica mentre combattevi nelle retrovie o giacevi a terra. Anche il tuo vincolo è stato registrato, quindi la tua parte di Marchi eroici è arrivata qui invece di andare perduta. Usali bene.\n\n- Quartiermastro eroico"
       }
     },
     "itemSets": {

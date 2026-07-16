@@ -13,7 +13,8 @@ The client even runs `abilitiesKnownAt` / `computeQuestState` locally, but purel
 
 ## Sibling modules (module-first)
 New net logic that does not need `ClientWorld`'s private socket state lands as a
-tested sibling module here, never as more methods on `online.ts`. The live set:
+tested sibling module here, never as more methods on `online.ts`. Exemplars
+(enumerate the live set: `ls src/net`):
 - `char_sort.ts` / `charselect_action.ts`: pure, i18n-KEY-returning character-select
   cores; `charselect_action` is the single source of truth for BOTH the Enter World
   button's label/enabled state AND its enter-vs-takeover click routing, so the two
@@ -30,6 +31,11 @@ tested sibling module here, never as more methods on `online.ts`. The live set:
   attestation, update check), gated on `NATIVE_APP`; each has a `tests/native_*.test.ts`.
 - `wallet.ts`: Wallet-Standard Solana connect in the browser, no `sim/` dependency
   (the account-to-wallet link is verified server-side).
+- `resume_play.ts`: the mobile WebView resume marker (`RESUME_KEY`), stamped while
+  in-world and consumed by `src/main.ts` on boot so an OS-evicted WebView reload
+  re-enters the world instead of landing on home; freshness-bounded
+  (`RESUME_MAX_AGE_MS`), realm-scoped, self-disarming after `MAX_RESUME_ATTEMPTS`,
+  cleared on deliberate logout and session end (`tests/resume_play.test.ts`).
 
 ## Wire protocol: MUST stay in lockstep with `server/game.ts`
 See `server/CLAUDE.md` for server conventions; read `server/game.ts` directly for the exact wire encoding.
@@ -99,6 +105,8 @@ over for good (retries exhausted, or a fatal server `error` frame).
   `sendLogout()` signals a deliberate logout so the server skips the linkdead grace;
   call it before a page reload.
 Tests: `tests/linkdead.test.ts`, `tests/net_online_visibility_reconnect.test.ts`.
+A reload instead of an in-socket reconnect (the mobile WebView eviction case) is
+handled by `resume_play.ts`, above.
 
 ## Adding a networked action
 1. Add the method to the owning FACET interface under `src/world_api/<facet>.ts`

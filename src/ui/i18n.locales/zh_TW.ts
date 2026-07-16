@@ -2557,7 +2557,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.insect_swarm.description':
     '敵人被蟲群侵襲，在 12 秒內受到 {damage} 點自然傷害。',
   'entities.abilities.tigers_fury.name': '狼血之力',
-  'entities.abilities.tigers_fury.description': '使攻擊強度提高 40，持續 6 秒。僅限狼形態。',
+  'entities.abilities.tigers_fury.description':
+    '使攻擊強度提高 {buff}，持續 {duration} 秒。僅限狼形態。',
   'entities.abilities.rip.name': '割裂',
   'entities.abilities.rip.description':
     '終結技，在 12 秒內造成 {damage} 點流血傷害。消耗連擊點。僅限狼形態。',
@@ -4732,6 +4733,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.templeName': '沉沒神殿',
   'guide.dungeonsPage.templeBody': '沼澤大道旁一座沉沒的神龕，是為好奇且準備充分者預備的支線之路。',
   'guide.dungeonsPage.sanctumName': '墓龍聖所',
+  'guide.dungeonsPage.resetBody':
+    '在隊伍仍持有已認領副本時切換難度，舊的認領會保留一段時間後自行清除。隊長也可以立即放棄它們：在自己的頭像選單中選擇「重置所有地城副本」，或輸入 /dungeon reset。重置只有在難度確實更改之後才能進行，且副本內不能有任何人（無論生死）留守，兩次重置之間還隔著一段短暫的冷卻。帶著錯誤的難度來到門口，遊戲會在開打之前直接提醒你。團隊副本永遠不會以這種方式重置；它遵循自己的鎖定規則。',
+  'guide.dungeonsPage.resetTitle': '重置你的地城副本',
   'guide.dungeonsPage.sanctumBody': '棘峰的黑暗核心，邪教漫長的圖謀在此達到恐怖的頂點。',
   'guide.dungeonsPage.raidName': '最終團隊副本',
   'guide.dungeonsPage.raidBody':
@@ -5087,7 +5091,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.gear.intro':
     '裝備是你角色身上穿戴的物件與隨身攜帶的物品。更好的裝備是變強最穩當的途徑，而其中大部分只要遊玩就能取得。',
   'guide.gear.itemLevelBody':
-    '若你想快速比較兩件裝備，可在選項中開啟「顯示物品等級」。在世界中贏得的裝備，來自敵人與任務者，便會顯示一個物品等級，這是依其來源粗略衡量其強度的單一數值，讓你一眼就能看出哪件升級更有分量，即使是不同部位之間也行。沒有這類來源的物品，例如普通的商人基礎貨品與新手裝備，則不會顯示物品等級，因此缺少數值是正常現象，而非瑕疵。',
+    '若你想快速比較兩件裝備，可在選項中開啟「顯示物品等級」。有明確來源的裝備，無論來自敵人、任務還是製作專業，便會顯示一個物品等級，這是依其來源粗略衡量其強度的單一數值，讓你一眼就能看出哪件升級更有分量，即使是不同部位之間也行。沒有這類來源的物品，例如普通的商人基礎貨品與新手裝備，則不會顯示物品等級，因此缺少數值是正常現象，而非瑕疵。',
   'guide.gear.qualityBody':
     '每件物品都有一個品質，其名稱也會以對應的顏色標示，讓你一眼就能看出它的價值。從最常見到最珍貴：',
   'guide.gear.qualityCommon': '普通',
@@ -6554,6 +6558,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.letters.trade_refund.sender': '渡鴉郵驛',
   'entities.letters.trade_refund.subject': '交易物品已退還',
   'entities.letters.trade_refund.body': '交易未能完成。你提供的一切已經退還給你。',
+  'entities.letters.heroic_marks_reward.sender': '英勇軍需官',
+  'entities.letters.heroic_marks_reward.subject': '你的英勇印記',
+  'entities.letters.heroic_marks_reward.body':
+    '你的部隊清剿了英勇試煉，而你在後排作戰，或已倒在塵土之中。你的鎖定同樣已經生效，因此你那一份英勇印記飛到了這裡，而非就此遺失。好好使用它們。\n\n- 英勇軍需官',
   'hudChrome.calendar.title': '活動日曆',
   'hudChrome.calendar.close': '關閉日曆',
   'hudChrome.calendar.keybindLabel': '活動日曆',
@@ -7149,7 +7157,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.bestiary.flavor.sethrael_palecoil':
     '一條骨白如枯的巨蛇，滑行於微光湖深處的水底陡崖，是牠所據有這片水域的沉默守望者。與牠共享此湖的泅泳者，鮮少能再浮上水面。',
   'guide.combat.metersBody':
-    '想知道一場戰鬥打得如何？按下 Z 即可開啟隊伍統計面板，它會逐場戰鬥為你的隊伍統計傷害、治療與威脅值。',
+    '想知道一場戰鬥打得如何？按下 Shift+H 即可開啟隊伍統計面板，它會逐場戰鬥為你的隊伍統計傷害、治療與威脅值。',
   'guide.controls.arrowKeys': '方向鍵',
   'guide.controls.bothMouse': '滑鼠左右鍵',
   'guide.controls.runForward': '向前奔跑',
@@ -7164,7 +7172,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '對最豐厚可重複獎勵的每日上限。每座英雄地城每天只給予一次通關獎勵，團隊副本的普通與英雄模式分開計算，而拾取世界首領也會開始你的鎖定。已通關的五人副本仍對其原隊伍開放；而遭鎖定的團隊副本大門，要到重置後才會再度開啟。',
   'guide.glossary.lockoutTerm': '鎖定',
   'guide.glossary.metersDef':
-    '當前戰鬥的隊伍計分視窗：造成的傷害、完成的治療，以及誰握有最高威脅值，皆逐場戰鬥記錄。以其快捷鍵（預設為 Z）開啟。',
+    '當前戰鬥的隊伍計分視窗：造成的傷害、完成的治療，以及誰握有最高威脅值，皆逐場戰鬥記錄。以其快捷鍵（預設為 Shift+H）開啟。',
   'guide.glossary.metersTerm': '傷害統計面板',
   'guide.glossary.petBarDef':
     '獵人或術士寵物會增添的指令列：攻擊、停止、挑釁、防禦與主動，預設綁定為 Ctrl 加 1 到 5。',
@@ -7181,7 +7189,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.models.groupForms': '德魯伊形態',
   'guide.nav.sidebarLabel': '指南主題',
   'guide.professions.craftHowBody':
-    '開啟製作視窗（預設按鍵 T），即可看到你已學會的每一個配方、各自所需的材料，以及你手邊現有的材料；材料齊備時，一鍵即可完成製作。常見的配方可以在世界任何地方製作。少數進階的工具配方則要求你站在高守哨站的製作站前。',
+    '開啟製作視窗（預設按鍵 T），即可看到你已學會的每一個配方、各自所需的材料，以及你手邊現有的材料；材料齊備時，一鍵即可完成製作。常見的配方可以在世界任何地方製作。少數進階配方，包括高階工具與稀有的施法者護甲，則要求你站在高守哨站的製作站前。',
   'guide.professions.craftHowTitle': '製作視窗',
   'guide.search.typeAbility': '技能',
   'guide.search.typeDeed': '功績',

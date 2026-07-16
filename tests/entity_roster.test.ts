@@ -342,6 +342,7 @@ function makeCtx() {
     queueQuestLetter: vi.fn(),
     // World Market auction letters: the offline-notification hook.
     sendMarketLetter: vi.fn(),
+    mailHeroicMarks: vi.fn(),
     applySetProcs: vi.fn(),
     // The Vale Cup sport-move arms.
     vcupBallKick: vi.fn(),

@@ -2680,7 +2680,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.insect_swarm.description':
     '敵が虫の群れに襲われ、12秒かけて{damage}の自然ダメージを受けます。',
   'entities.abilities.tigers_fury.name': '狼の血',
-  'entities.abilities.tigers_fury.description': '攻撃力を6秒間40上昇させます。ウルフフォーム専用。',
+  'entities.abilities.tigers_fury.description':
+    '攻撃力を{duration}秒間{buff}上昇させます。ウルフフォーム専用。',
   'entities.abilities.rip.name': 'リップ',
   'entities.abilities.rip.description':
     '12秒かけて{damage}の出血ダメージを与えるフィニッシュムーブです。コンボポイントを消費します。ウルフフォーム専用。',
@@ -4951,6 +4952,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.templeBody':
     '沼地の道から外れた場所に沈む祠。好奇心旺盛で、しっかり備えた者のための寄り道です。',
   'guide.dungeonsPage.sanctumName': '墓守竜の聖域',
+  'guide.dungeonsPage.resetBody':
+    'グループがインスタンスを確保したまま難易度を切り替えると、古い確保はしばらく残ってから自然に消えます。パーティリーダーならすぐに手放すこともできます。自分のポートレートメニューから「すべてのインスタンスをリセット」を選ぶか、/dungeon reset と入力しましょう。リセットできるのは難易度を実際に変更したあとだけで、生死を問わず誰もインスタンス内に残っていないことが条件になり、リセットとリセットのあいだには短いクールダウンが挟まります。間違った難易度のまま扉に着けば、ランが始まる前にゲームがそう告げてくれます。レイドはこの方法ではリセットされません。レイドには独自のロックアウトのルールがあります。',
+  'guide.dungeonsPage.resetTitle': 'インスタンスのリセット',
   'guide.dungeonsPage.sanctumBody':
     'ソーンピークの暗き中心。カルトの長きにわたる企てが、おぞましい頂点に達する場所です。',
   'guide.dungeonsPage.raidName': 'エンドコンテンツのレイド',
@@ -5338,7 +5342,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.gear.intro':
     'ギアとは、あなたのキャラクターが身につける装備や持ち歩くアイテムのことです。より良いギアこそが強くなる最も着実な道であり、そのほとんどは遊んでいるだけで手に入ります。',
   'guide.gear.itemLevelBody':
-    '2つの装備を手早く比べたいときは、オプションで「アイテムレベルを表示」をオンにしましょう。敵やクエストなど、世界で勝ち取った装備にはアイテムレベルが表示されます。これは入手元をもとに、その装備のおおよその強さを一つの数値で示したものです。スロットが違っていても、どちらの方が大きく性能を底上げするか、ひと目で見分けられます。商人で売っている素の基本装備や初期装備のように、そうした入手元を持たない品にはアイテムレベルが表示されません。数値がないのは異常ではなく、正常なことです。',
+    '2つの装備を手早く比べたいときは、オプションで「アイテムレベルを表示」をオンにしましょう。敵やクエスト、生産職といった入手元がはっきりしている装備にはアイテムレベルが表示されます。これは入手元をもとに、その装備のおおよその強さを一つの数値で示したものです。スロットが違っていても、どちらの方が大きく性能を底上げするか、ひと目で見分けられます。商人で売っている素の基本装備や初期装備のように、そうした入手元を持たない品にはアイテムレベルが表示されません。数値がないのは異常ではなく、正常なことです。',
   'guide.gear.qualityBody':
     'どのアイテムにも品質があり、その名前は品質に合わせて色付けされているので、ひと目で価値が読み取れます。最もありふれたものから最も値打ちのあるものまで、順に並べると次の通りです。',
   'guide.gear.qualityCommon': '一般',
@@ -6898,6 +6902,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.letters.trade_refund.subject': '取引の品が返却されました',
   'entities.letters.trade_refund.body':
     '取引は成立しませんでした。差し出した品はすべて返却されました。',
+  'entities.letters.heroic_marks_reward.sender': '英雄級補給官',
+  'entities.letters.heroic_marks_reward.subject': 'あなたの英雄の印',
+  'entities.letters.heroic_marks_reward.body':
+    'あなたが後方で、あるいは倒れて戦っている間に、あなたの部隊が英雄級の試練を突破しました。ロックアウトは同じように科されたので、あなたの分の英雄の印は失われることなく、ここへ飛んできました。大切に使ってください。\n\n- 英雄級補給官',
   'hudChrome.calendar.title': 'イベントカレンダー',
   'hudChrome.calendar.close': 'カレンダーを閉じる',
   'hudChrome.calendar.keybindLabel': 'イベントカレンダー',
@@ -7517,7 +7525,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.bestiary.flavor.sethrael_palecoil':
     '骨のように蒼白い蛇で、グリマーミアの深い棚を音もなく滑り、自らのものとした水域を守る無言の番人。この湖を分かち合った泳ぎ手が、水面に戻ることはまずない。',
   'guide.combat.metersBody':
-    '戦いの首尾が気になりますか。Zキーを押すとパーティメーターが開き、グループのダメージ、回復、脅威を戦闘ごとに集計してくれます。',
+    '戦いの首尾が気になりますか。Shift+Hキーを押すとパーティメーターが開き、グループのダメージ、回復、脅威を戦闘ごとに集計してくれます。',
   'guide.controls.arrowKeys': '矢印キー',
   'guide.controls.bothMouse': 'マウスの左右ボタン同時押し',
   'guide.controls.runForward': '前進',
@@ -7532,7 +7540,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '最も大きな繰り返し報酬に設けられた一日ごとの上限です。各ヒロイックダンジョンは一日に一回分の攻略報酬を出し、レイドはノーマルとヒロイックを別々に記録し、ワールドボスをルートするとあなたのロックアウトが始まります。攻略済みの5人用ダンジョンはそのパーティに対しては開いたままですが、ロックされたレイドの扉はリセットまで再び開きません。',
   'guide.glossary.lockoutTerm': 'ロックアウト',
   'guide.glossary.metersDef':
-    '現在の戦いのパーティ用スコアボードのウィンドウです。与えたダメージ、行った回復、そして誰が最も脅威を抱えているかを、戦闘ごとに記録します。キー割り当て（初期設定はZ）で開けます。',
+    '現在の戦いのパーティ用スコアボードのウィンドウです。与えたダメージ、行った回復、そして誰が最も脅威を抱えているかを、戦闘ごとに記録します。キー割り当て（初期設定はShift+H）で開けます。',
   'guide.glossary.metersTerm': 'ダメージメーター',
   'guide.glossary.petBarDef':
     'ハンターやウォーロックのペットが追加する操作の列です。攻撃、停止、挑発、防御、攻撃的の五つで、初期設定ではCtrl+1から5に割り当てられています。',
@@ -7549,7 +7557,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.models.groupForms': 'ドルイドの変身形態',
   'guide.nav.sidebarLabel': 'ガイドの項目',
   'guide.professions.craftHowBody':
-    '製作ウィンドウ（初期設定はTキー）を開くと、あなたが知っているすべてのレシピ、それぞれに必要なもの、そして手持ちの材料が確認できます。材料がそろっていれば、クリック一つで作業が完了します。一般的なレシピは世界のどこでも製作できます。一部の高度な道具レシピだけは、ハイウォッチの製作拠点に立って作る必要があります。',
+    '製作ウィンドウ（初期設定はTキー）を開くと、あなたが知っているすべてのレシピ、それぞれに必要なもの、そして手持ちの材料が確認できます。材料がそろっていれば、クリック一つで作業が完了します。一般的なレシピは世界のどこでも製作できます。一部の高度なレシピ、上位の道具や希少なキャスター防具などは、ハイウォッチの製作拠点に立って作る必要があります。',
   'guide.professions.craftHowTitle': '製作ウィンドウ',
   'guide.search.typeAbility': 'アビリティ',
   'guide.search.typeDeed': '功績',

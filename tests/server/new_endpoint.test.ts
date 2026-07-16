@@ -25,6 +25,7 @@ import {
   rmSync,
   writeFileSync,
 } from 'node:fs';
+import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterAll, describe, expect, it } from 'vitest';
@@ -382,6 +383,34 @@ describe('append-only insertion helpers (synthetic sources)', () => {
     expect(() => appendCodeToArray(`${KNOWN_CODES_CONST}\n`, KNOWN_CODES_CONST, 'x.y')).toThrow(
       UsageError,
     );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Toolchain pin: the active tsc binary.
+// ---------------------------------------------------------------------------
+
+describe('toolchain pin: node_modules/.bin/tsc', () => {
+  it('is the TypeScript 7 native binary, not the 6.x API wrapper', () => {
+    // Both installed majors type-check this repo clean, so a silent bin flip
+    // back to the 6.x wrapper (the `typescript` alias, whose bin is tsc6)
+    // keeps every other suite green while quietly forfeiting the native
+    // toolchain's speed; this pin is the one place that flip goes red.
+    const probe = spawnSync(TSC, ['--version'], { cwd: REPO, encoding: 'utf8' });
+    expect(probe.status, `tsc --version failed:\n${probe.stdout}\n${probe.stderr}`).toBe(0);
+    expect(probe.stdout.trim()).toMatch(/^Version 7\./);
+  });
+
+  it('the typescript package resolves the 6.x JS API wrapper (the svelte-check arm)', () => {
+    // The dual alias's second arm: svelte-check consumes require('typescript')
+    // and needs the 6.x JS API surface (ts.sys). A 7.x takeover of that alias
+    // (the native package reports 7.x and ships no ts.sys) would otherwise
+    // surface only as a cryptic svelte-check crash at gate/CI time, or pass
+    // silently if svelte-check happens to miss the removed API.
+    const requireFromRepo = createRequire(join(REPO, 'package.json'));
+    const ts = requireFromRepo('typescript');
+    expect(String(ts.version)).toMatch(/^6\./);
+    expect(typeof ts.sys).toBe('object');
   });
 });
 

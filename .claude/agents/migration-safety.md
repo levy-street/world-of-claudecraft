@@ -22,8 +22,8 @@ analyze code but never modify files.
 - **There is no migrations directory.** The schema is inline SQL applied in order by
   `ensureSchema()` (`server/db.ts`) as separate `client.query(...)` calls, NOT one concatenated
   batch: `SCHEMA` (`server/db.ts`) first, then the domain schemas it imports (social, oauth,
-  discord, apple_auth, github, ratelimit, maps, user_assets, each an exported `*_SCHEMA` in its
-  `server/<domain>_db.ts`). Read the `ensureSchema()` body for the authoritative order; it is
+  discord, apple_auth, github, ratelimit, maps, user_assets, player_metrics, each an exported
+  `*_SCHEMA` in its `server/<domain>_db.ts`). Read the `ensureSchema()` body for the authoritative order; it is
   load-bearing both within and across the schemas: a new `ALTER`/`CREATE` must come after the
   table it depends on, and the domain schemas run after `SCHEMA` so they may `ALTER` or
   FK-reference a table that `SCHEMA` creates (for example `social_db.ts` alters `characters`).
@@ -42,6 +42,12 @@ analyze code but never modify files.
   save) apply to all of them.
 - Saves happen on a ~30s cadence (accumulated inside the sim loop via `AUTOSAVE_SECONDS`, not
   a standalone interval), and also on player leave and on SIGINT/SIGTERM shutdown.
+- `ensureSchema()` also runs a sanctioned post-commit arm on the same dedicated client: after
+  COMMIT it takes the session-level form of the same advisory lock and builds
+  `CREATE INDEX CONCURRENTLY` indexes (player metrics and daily-rewards events, from
+  `server/player_metrics_db.ts` and `server/daily_rewards_schema.ts`), dropping an INVALID
+  carcass from an interrupted build before rebuilding; ordering and lock discipline are pinned
+  by `tests/schema_wiring.test.ts`.
 
 ## Scope Gate - run this FIRST, before reading the schema
 
@@ -52,11 +58,13 @@ that out wastes budget. Gate yourself before reading any file:
 1. Get the changed files only (cheap): `git diff --cached --name-only`, or if nothing is
    staged, `git diff --name-only "$(git merge-base HEAD "$(git rev-parse --abbrev-ref '@{upstream}' 2>/dev/null || echo origin/main)")"..HEAD`.
 2. You are IN SCOPE if any changed path is `server/db.ts`, any other `server/*_db.ts` (for
-   example `social_db.ts`, `oauth_db.ts`, `chat_filter_db.ts`), or a file that
-   serializes/deserializes a persisted JSONB blob (`characters.state` in `server/db.ts` /
-   `server/game.ts`; `world_state` / `MarketSave` / `MailSave` in `server/db.ts`). A grep
-   of the changed set for `SCHEMA`, `CREATE TABLE`, `ALTER TABLE`, `characters.state`,
-   `world_state`, or a save/load function confirms it.
+   example `social_db.ts`, `oauth_db.ts`, `chat_filter_db.ts`), a dedicated schema module
+   such as `server/daily_rewards_schema.ts` (any file exporting DDL that `ensureSchema()`
+   applies), or a file that serializes/deserializes a persisted JSONB blob
+   (`characters.state` in `server/db.ts` / `server/game.ts`; `world_state` / `MarketSave` /
+   `MailSave` in `server/db.ts`). A grep of the changed set for `SCHEMA`, `CREATE TABLE`,
+   `ALTER TABLE`, `CREATE INDEX`, `characters.state`, `world_state`, or a save/load function
+   confirms it.
 3. EARLY EXIT: if nothing matched, output exactly this and STOP (do not read the `SCHEMA`):
 
    > **Schema & Persistence Safety Review - out of scope.** No DDL or `characters.state`
@@ -136,6 +144,10 @@ If a new column is added to an EXISTING table:
   transaction boundary yourself before asserting this check; if the lock or a seed call is not
   where this prompt claims, report the discrepancy rather than assuming.
 - Flag setup work moved outside the lock, or seed logic that would duplicate rows on re-run.
+  Exception: the post-commit `CREATE INDEX CONCURRENTLY` arm is sanctioned (CONCURRENTLY
+  cannot run inside a transaction); flag transaction-external setup work only when it does
+  not follow that pattern (session-level advisory lock held, idempotent `IF NOT EXISTS`
+  build, invalid-index carcass repair).
 
 ### Check 7 - Save Cadence Coverage (WARNING)
 

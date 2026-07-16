@@ -426,6 +426,14 @@ Rules that keep this working:
    production build, `dev` on anything else).
 2. GPU: log shows `[gpu] feature status` with hardware WebGL2 (no
    `software only`, no SwiftShader/llvmpipe renderer, no softwareRendering warning).
+   The shell forces the high-performance GPU automatically at startup:
+   `electron/gpu_preference.cjs` (called from `electron/main.cjs` before app ready)
+   appends the Chromium `force-high-performance-gpu` switch on every platform, and
+   packaged Windows builds also merge `GpuPreference=2` into the app exe entry under
+   HKCU DirectX `UserGpuPreferences`, preserving the user's other per-app tokens.
+   A hybrid-GPU machine that still reports the integrated adapter in
+   `[gpu] feature status` is therefore a regression, not a user misconfiguration.
+   Pinned by `tests/electron_gpu_preference.test.ts`.
 3. Login both paths: email/password in-app, and Discord via the external browser +
    `worldofclaudecraft://desktop-login` deep link handoff (app focuses and enters
    the world; second-instance and cold-start deep links both work).

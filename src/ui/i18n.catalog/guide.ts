@@ -405,7 +405,7 @@ export const guideStrings = {
     ccBody:
       'Crowd control is a special kind of debuff that limits what a target can do: stuns, roots and slows, silences that stop spellcasting, disarms, fears, and transformations that turn a foe harmless for a moment. Against other players, control wears thin with repetition: the same kind reapplied too quickly weakens and then fails outright, and a stun that opens from stealth is counted apart from the stuns that follow, so nobody can be chained helpless forever. The creatures of the world hold no such grudge: control never weakens with repetition against them, though many of the mightiest foes, named elites and the strongest bosses among them, cannot be controlled at all.',
     metersBody:
-      'Curious how a fight went? Press Z to open the party meters, which tally damage, healing, and threat for your group, encounter by encounter.',
+      'Curious how a fight went? Press Shift+H to open the party meters, which tally damage, healing, and threat for your group, encounter by encounter.',
     // The one-slot ability queue: a press mid-cast is held and fired at cast end.
     queueTitle: 'Your next move is already loaded',
     queueBody:
@@ -492,7 +492,7 @@ export const guideStrings = {
       'The command row a hunter or warlock pet adds: Attack, Stop, Taunt, Defensive, and Aggressive, bound to Ctrl plus 1 through 5 by default.',
     metersTerm: 'Damage meters',
     metersDef:
-      'The party scoreboard window for the current fight: damage dealt, healing done, and who holds the most threat, kept per encounter. Open it with its keybind (Z by default).',
+      'The party scoreboard window for the current fight: damage dealt, healing done, and who holds the most threat, kept per encounter. Open it with its keybind (Shift+H by default).',
     targetMarkerTerm: 'Target marker',
     targetMarkerDef:
       'A symbol any party or raid member can pin over a target so everyone focuses, or avoids, the same one. Eight symbols, one target per symbol.',
@@ -946,6 +946,12 @@ export const guideStrings = {
     heroicLockoutBody:
       'Normal dungeons can be run all day. Heroic asks patience: the final boss kill locks everyone in the run to one heroic clear of that dungeon per day, and the raid keeps a daily lockout for each difficulty. A cleared five-player run stays open to its own party for corpse runs and loot, so nobody is locked away from what they earned there. The raid is stricter: once its kill locks you, the door stays shut until the daily reset, so collect your spoils before you leave the arena.',
 
+    // Reset All Instances: the difficulty-transition escape hatch. Spoiler-safe: no exact
+    // cooldown or timer lengths in the prose.
+    resetTitle: 'Resetting your instances',
+    resetBody:
+      'Switch difficulty while your group still holds claimed runs and the old claims linger for a while before clearing on their own. The party leader can let them go at once instead: choose Reset All Instances on their own portrait menu, or type /dungeon reset. A reset works only after the difficulty has actually been changed, only while nobody, living or fallen, remains inside, and a short cooldown separates one reset from the next. Arrive at the door on the wrong difficulty and the game says so before the run starts. The raid is never reset this way; its own lockout rules stand.',
+
     // Standalone, spoiler-safe lore for the Drowned Temple card (the goddess twist and any
     // boss names are withheld).
     templeLoreTitle: 'The Drowned Temple, a little deeper',
@@ -1279,7 +1285,7 @@ export const guideStrings = {
     upgradeBody:
       'Replacing an old piece with a fresh upgrade does more for you than playing perfectly in gear you have outgrown. When something better drops or a quest offers it, take it. Do not save your good items for later.',
     itemLevelBody:
-      'If you want a quick way to compare two pieces, turn on Show Item Level in the options. Gear won out in the world, from enemies and quests, then shows an item level, a single figure for roughly how powerful it is based on where it came from, so you can tell at a glance which upgrade pulls more weight, even across different slots. Pieces with no such source, like plain vendor basics and starter gear, show no item level, so a missing figure is normal, not a fault.',
+      'If you want a quick way to compare two pieces, turn on Show Item Level in the options. Gear with a known source, from enemies, quests, and the crafting trades, then shows an item level, a single figure for roughly how powerful it is based on where it came from, so you can tell at a glance which upgrade pulls more weight, even across different slots. Pieces with no such source, like plain vendor basics and starter gear, show no item level, so a missing figure is normal, not a fault.',
 
     // Where gear comes from.
     sourcesTitle: 'Where gear comes from',
@@ -1374,7 +1380,7 @@ export const guideStrings = {
 
     craftHowTitle: 'The crafting window',
     craftHowBody:
-      'Open the Crafting window (default key T) to see every recipe you know, what each one needs, and what you have on hand; when the materials are there, one click does the work. Common recipes can be crafted anywhere in the world. A handful of advanced tool recipes instead ask you to stand at the crafting hub in Highwatch.',
+      'Open the Crafting window (default key T) to see every recipe you know, what each one needs, and what you have on hand; when the materials are there, one click does the work. Common recipes can be crafted anywhere in the world. A handful of advanced recipes, higher-tier tools and rare caster armor among them, instead ask you to stand at the crafting hub in Highwatch.',
 
     craftMasteryTitle: 'Skill and mastery',
     craftMasteryBody:

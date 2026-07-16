@@ -10,7 +10,7 @@ content) must follow.
 | Term | Meaning |
 |---|---|
 | Deed | One achievement. The everyday word in chat and broadcasts. |
-| Book of Deeds | The achievements window (default `Z`). |
+| Book of Deeds | The achievements window (default `Shift+Z`). |
 | Renown | Achievement points, quantized 5, 10, 25, 50. Zero for luck-based deeds and for all Feats. |
 | Chronicle | A per-zone task set, split into Chapters, fronted by a Chronicler NPC. |
 | Chronicler | The in-world NPC face of a zone's Chronicle (Saul, Osric Fenn, Zenzie). |

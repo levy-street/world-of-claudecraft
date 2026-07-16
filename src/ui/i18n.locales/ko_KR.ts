@@ -2658,7 +2658,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '적이 곤충 떼에 휩싸여 12초에 걸쳐 {damage}의 자연 피해를 입습니다.',
   'entities.abilities.tigers_fury.name': '늑대의 피',
   'entities.abilities.tigers_fury.description':
-    '전투력을 6초 동안 40만큼 증가시킵니다. 늑대 변신 전용.',
+    '전투력을 {duration}초 동안 {buff}만큼 증가시킵니다. 늑대 변신 전용.',
   'entities.abilities.rip.name': '찢기',
   'entities.abilities.rip.description':
     '12초에 걸쳐 {damage}의 출혈 피해를 입히는 결정타입니다. 연계 점수를 소모합니다. 늑대 변신 전용.',
@@ -4943,6 +4943,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.templeBody':
     '습지 길에서 벗어난 곳에 가라앉은 신전으로, 호기심 많고 만반의 준비를 갖춘 이들을 위한 샛길입니다.',
   'guide.dungeonsPage.sanctumName': '무덤비룡 성소',
+  'guide.dungeonsPage.resetBody':
+    '파티가 인스턴스를 차지한 채로 난이도를 바꾸면, 이전에 차지한 인스턴스는 한동안 남아 있다가 저절로 정리됩니다. 파티장은 이를 곧바로 놓아줄 수도 있습니다. 자신의 초상화 메뉴에서 "모든 인스턴스 초기화"를 고르거나 /dungeon reset을 입력하면 됩니다. 초기화는 난이도를 실제로 바꾼 뒤에만, 그리고 살았든 쓰러졌든 아무도 인스턴스 안에 남아 있지 않을 때에만 이루어지며, 한 번의 초기화와 다음 초기화 사이에는 짧은 재사용 대기시간이 있습니다. 잘못된 난이도로 입구에 도착하면 공략이 시작되기 전에 게임이 알려 줍니다. 공격대는 이 방법으로 초기화되지 않으며, 공격대만의 잠금 규칙을 따릅니다.',
+  'guide.dungeonsPage.resetTitle': '인스턴스 초기화',
   'guide.dungeonsPage.sanctumBody':
     '가시봉우리의 어두운 심장부로, 교단의 오랜 작업이 끔찍한 정점에 다다르는 곳.',
   'guide.dungeonsPage.raidName': '최종 단계 공격대',
@@ -5330,7 +5333,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.gear.intro':
     '장비는 캐릭터가 걸치는 장구이자 지니고 다니는 물건입니다. 더 좋은 장비는 강해지는 가장 꾸준한 길이며, 그 대부분은 그저 플레이하는 것만으로 손에 들어옵니다.',
   'guide.gear.itemLevelBody':
-    '두 장비를 빠르게 비교하고 싶다면 옵션에서 아이템 레벨 표시를 켜십시오. 적과 퀘스트에서 세계를 누비며 얻은 장비에는 아이템 레벨이 표시되는데, 이는 출처를 바탕으로 대략적인 강함을 하나의 숫자로 나타낸 것입니다. 덕분에 서로 다른 부위라도 어느 쪽 업그레이드가 더 값어치 있는지 한눈에 알 수 있습니다. 그런 출처가 없는 물건, 이를테면 평범한 상인 기본품이나 초보용 장비에는 아이템 레벨이 표시되지 않으므로, 숫자가 없는 것은 결함이 아니라 정상입니다.',
+    '두 장비를 빠르게 비교하고 싶다면 옵션에서 아이템 레벨 표시를 켜십시오. 적, 퀘스트, 제작 기술처럼 출처가 분명한 장비에는 아이템 레벨이 표시되는데, 이는 출처를 바탕으로 대략적인 강함을 하나의 숫자로 나타낸 것입니다. 덕분에 서로 다른 부위라도 어느 쪽 업그레이드가 더 값어치 있는지 한눈에 알 수 있습니다. 그런 출처가 없는 물건, 이를테면 평범한 상인 기본품이나 초보용 장비에는 아이템 레벨이 표시되지 않으므로, 숫자가 없는 것은 결함이 아니라 정상입니다.',
   'guide.gear.qualityBody':
     '모든 물건에는 품질이 있고, 한눈에 그 값어치를 읽을 수 있도록 이름이 그에 맞게 색으로 칠해집니다. 가장 흔한 것부터 가장 값진 것까지:',
   'guide.gear.qualityCommon': '일반',
@@ -6874,6 +6877,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.letters.trade_refund.subject': '거래 물품 반환',
   'entities.letters.trade_refund.body':
     '거래가 성사되지 않았습니다. 제시했던 모든 것을 돌려받았습니다.',
+  'entities.letters.heroic_marks_reward.sender': '영웅 병참장교',
+  'entities.letters.heroic_marks_reward.subject': '당신의 영웅의 징표',
+  'entities.letters.heroic_marks_reward.body':
+    '당신이 후방에서, 혹은 쓰러진 채로 싸우는 동안 당신의 부대가 영웅 시련을 돌파했습니다. 잠금은 똑같이 적용되었으니, 당신 몫의 영웅의 징표는 사라지지 않고 이곳으로 날아왔습니다. 잘 쓰십시오.\n\n- 영웅 병참장교',
   'hudChrome.calendar.title': '이벤트 달력',
   'hudChrome.calendar.close': '달력 닫기',
   'hudChrome.calendar.keybindLabel': '이벤트 달력',
@@ -7501,7 +7508,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.bestiary.flavor.sethrael_palecoil':
     '글리머미어의 깊은 벼랑을 미끄러지듯 헤엄치는 뼈처럼 창백한 뱀으로, 자신이 차지한 물의 말없는 파수꾼입니다. 이 못을 함께 쓰는 헤엄치는 이들은 좀처럼 수면 위로 올라오지 못합니다.',
   'guide.combat.metersBody':
-    '싸움이 어땠는지 궁금하신가요? Z 키를 눌러 파티 미터기를 열면 파티의 피해량, 치유량, 위협 수준을 전투별로 집계해 보여줍니다.',
+    '싸움이 어땠는지 궁금하신가요? Shift+H 키를 눌러 파티 미터기를 열면 파티의 피해량, 치유량, 위협 수준을 전투별로 집계해 보여줍니다.',
   'guide.controls.arrowKeys': '방향키',
   'guide.controls.bothMouse': '마우스 양쪽 버튼',
   'guide.controls.runForward': '앞으로 달리기',
@@ -7516,7 +7523,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '가장 큰 반복 보상에 걸린 일일 제한입니다. 각 영웅 던전은 하루에 한 번의 공략만 보상하고, 공격대는 일반과 영웅을 따로 기록하며, 월드 보스의 전리품을 주우면 여러분의 제한이 시작됩니다. 공략을 마친 5인 던전은 해당 파티에게는 계속 열려 있지만, 잠긴 공격대의 문은 초기화 전까지 다시 열리지 않습니다.',
   'guide.glossary.lockoutTerm': '입장 제한',
   'guide.glossary.metersDef':
-    '현재 전투의 파티 점수판 창입니다. 가한 피해, 치유량, 그리고 누가 가장 높은 위협을 지녔는지를 전투별로 기록합니다. 지정된 단축키(기본값 Z)로 엽니다.',
+    '현재 전투의 파티 점수판 창입니다. 가한 피해, 치유량, 그리고 누가 가장 높은 위협을 지녔는지를 전투별로 기록합니다. 지정된 단축키(기본값 Shift+H)로 엽니다.',
   'guide.glossary.metersTerm': '피해 미터기',
   'guide.glossary.petBarDef':
     '사냥꾼이나 흑마법사의 소환수가 추가하는 명령 줄입니다. 공격, 정지, 도발, 방어, 공격적 상태가 있으며, 기본값으로 Ctrl과 1에서 5까지에 지정되어 있습니다.',
@@ -7533,7 +7540,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.models.groupForms': '드루이드 변신',
   'guide.nav.sidebarLabel': '가이드 주제',
   'guide.professions.craftHowBody':
-    '제작 창(기본 키 T)을 열면 여러분이 아는 모든 제작법과 각각에 필요한 재료, 그리고 지금 지닌 재료를 볼 수 있다. 재료가 갖춰져 있으면 클릭 한 번으로 제작된다. 일반적인 제작법은 세계 어디에서나 만들 수 있다. 다만 몇몇 고급 도구 제작법은 하이워치의 제작 거점에 서 있어야 한다.',
+    '제작 창(기본 키 T)을 열면 여러분이 아는 모든 제작법과 각각에 필요한 재료, 그리고 지금 지닌 재료를 볼 수 있다. 재료가 갖춰져 있으면 클릭 한 번으로 제작된다. 일반적인 제작법은 세계 어디에서나 만들 수 있다. 다만 상위 도구와 희귀한 시전자 방어구를 비롯한 몇몇 고급 제작법은 하이워치의 제작 거점에 서 있어야 한다.',
   'guide.professions.craftHowTitle': '제작 창',
   'guide.search.typeAbility': '능력',
   'guide.search.typeDeed': '업적',

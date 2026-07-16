@@ -2201,7 +2201,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menghantam musuh di sekitar sebesar {damage} kerusakan dan memperlambat serangan mereka sebesar 10% selama 10 detik.',
   'entities.abilities.thunder_clap.name': 'Pukulan Gempa',
   'entities.abilities.tigers_fury.description':
-    'Meningkatkan daya serang sebesar 40 selama 6 detik. Hanya Wujud Serigala.',
+    'Meningkatkan daya serang sebesar {buff} selama {duration} detik. Hanya Wujud Serigala.',
   'entities.abilities.tigers_fury.name': 'Wolfsblood',
   'entities.abilities.travel_form.description':
     'Seketika berubah menjadi wujud Fleet yang gesit, meningkatkan kecepatan gerak sebesar 40%. Kau tidak bisa menggunakan kemampuan lain saat berubah wujud, tetapi bisa berubah masuk atau keluar dari pertempuran, ideal untuk melarikan diri.',
@@ -4093,8 +4093,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.gear.fishingTitle': 'Memancing',
   'guide.gear.intro':
     'Perlengkapan adalah peralatan yang dikenakan karaktermu dan barang yang kamu bawa. Perlengkapan yang lebih baik adalah cara paling mantap untuk menjadi lebih kuat, dan kamu mengumpulkan sebagian besarnya hanya dengan bermain.',
-  'guide.gear.itemLevelBody':
-    'Jika kamu ingin cara cepat membandingkan dua potongan, aktifkan Tampilkan Level Item di opsi. Perlengkapan yang didapat di dunia, dari musuh dan misi, lalu menampilkan level item, satu angka untuk kira-kira seberapa kuatnya berdasarkan asalnya, sehingga kamu bisa tahu sekilas peningkatan mana yang lebih berbobot, bahkan lintas slot berbeda. Potongan tanpa asal semacam itu, seperti barang dasar penjaja dan perlengkapan awal, tak menampilkan level item, jadi angka yang hilang itu wajar, bukan kesalahan.',
   'guide.gear.qualityBody':
     'Setiap barang memiliki kualitas, dan namanya diberi warna yang sesuai sehingga kamu bisa membaca nilainya sekilas. Dari yang paling umum hingga yang paling berharga:',
   'guide.gear.qualityCommon': 'Umum',
@@ -7092,7 +7090,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.bestiary.flavor.sethrael_palecoil':
     'Ular pucat sepucat tulang yang meluncur di beting dalam Glimmermere, penjaga bisu atas perairan yang telah diklaimnya. Perenang yang berbagi tasik dengannya jarang muncul kembali ke permukaan.',
   'guide.combat.metersBody':
-    'Penasaran bagaimana jalannya sebuah pertarungan? Tekan Z untuk membuka meter party, yang menghitung kerusakan, penyembuhan, dan ancaman bagi kelompokmu, perjumpaan demi perjumpaan.',
+    'Penasaran bagaimana jalannya sebuah pertarungan? Tekan Shift+H untuk membuka meter party, yang menghitung kerusakan, penyembuhan, dan ancaman bagi kelompokmu, perjumpaan demi perjumpaan.',
   'guide.combat.queueBody':
     'Kamu tak perlu menekan tombol tepat pada framenya. Tekan kemampuan berikutmu di saat-saat akhir perapalan yang sedang berjalan dan ia akan diantrekan, meluncur begitu perapalan selesai, sehingga permainan yang terlatih mengalir tanpa jeda. Tekanan yang terlalu dini cukup ditolak, jadi tak ada yang terbuang. Sebagian serangan jarak dekat bekerja dengan cara sama, ikut meluncur pada ayunan senjatamu berikutnya.',
   'guide.combat.queueTitle': 'Gerakan berikutmu sudah termuat',
@@ -7148,7 +7146,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Batas harian pada hadiah berulang terbesar. Tiap dungeon heroik membayar satu penuntasan per hari, raid melacak normal dan heroik secara terpisah, dan menjarah bos dunia memulai batasmu. Sesi lima pemain yang dituntaskan tetap terbuka bagi party-nya sendiri; pintu raid yang terkunci tak terbuka kembali hingga reset.',
   'guide.glossary.lockoutTerm': 'Lockout',
   'guide.glossary.metersDef':
-    'Jendela papan skor party untuk pertarungan saat ini: kerusakan yang diberikan, penyembuhan yang dilakukan, dan siapa yang memegang ancaman terbesar, disimpan per perjumpaan. Buka dengan keybind-nya (Z secara bawaan).',
+    'Jendela papan skor party untuk pertarungan saat ini: kerusakan yang diberikan, penyembuhan yang dilakukan, dan siapa yang memegang ancaman terbesar, disimpan per perjumpaan. Buka dengan keybind-nya (Shift+H secara bawaan).',
   'guide.glossary.metersTerm': 'Meter kerusakan',
   'guide.glossary.petBarDef':
     'Baris perintah yang ditambahkan peliharaan Pemburu atau Penyihir Iblis: Serang, Berhenti, Hasut, Bertahan, dan Agresif, terikat ke Ctrl plus 1 hingga 5 secara bawaan.',
@@ -7179,8 +7177,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.models.formTravel': 'Wujud Fleet',
   'guide.models.groupForms': 'Wujud Druid',
   'guide.nav.sidebarLabel': 'Topik panduan',
-  'guide.professions.craftHowBody':
-    'Buka jendela Kriya (tombol bawaan T) untuk melihat setiap resep yang kamu ketahui, apa yang dibutuhkan masing-masing, dan apa yang kamu punya; saat bahannya tersedia, satu klik menuntaskan pekerjaannya. Resep umum bisa dibuat di mana saja di dunia. Segelintir resep perkakas tingkat lanjut justru mengharuskanmu berdiri di pusat kriya di Highwatch.',
   'guide.professions.craftHowTitle': 'Jendela kriya',
   'guide.professions.focusBody':
     'Setiap kota pusat menyimpan panel Fokus Kota bagi para pemanen yang berkunjung: berdirilah di kota, buka dari samping minimap, dan arahkan sedikit anggaran poin fokus pada jenis komponen yang kamu pedulikan. Makin banyak fokus yang kamu berikan pada sebuah komponen, makin halus dan kaya ia keluar dari tiap mayat berikutnya; alokasimu mengikuti karaktermu ke mana pun mereka menjelajah, dan kamu bisa mengubahnya, gratis, pada kunjungan berikutnya ke kota.',
@@ -7723,4 +7719,15 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'welcome.armory.cta': 'Masuki dunia dan jelajahi Gudang Senjata',
   'welcome.news.new': 'Baru',
   'welcome.news.viewAll': 'Lihat semua pembaruan di GitHub',
+  'entities.letters.heroic_marks_reward.sender': 'Perbekal heroik',
+  'entities.letters.heroic_marks_reward.subject': 'Tanda Heroik milikmu',
+  'entities.letters.heroic_marks_reward.body':
+    'Kelompokmu menuntaskan ujian heroik saat kamu bertempur di barisan belakang atau telah tumbang. Penguncianmu juga tercatat, jadi bagian Tanda Heroik milikmu dikirim ke sini alih-alih hilang. Gunakan dengan baik.\n\n- Perbekal heroik',
+  'guide.dungeonsPage.resetTitle': 'Mereset instansimu',
+  'guide.dungeonsPage.resetBody':
+    'Jika kesulitan diganti saat kelompok masih memegang perjalanan yang diklaim, klaim lama bertahan sebentar sebelum hilang sendiri. Pemimpin kelompok dapat segera melepaskannya dengan memilih Reset Semua Instansi di menu potretnya sendiri atau mengetik /dungeon reset. Kesulitan harus benar-benar sudah diubah, tidak boleh ada siapa pun, hidup atau gugur, di dalam, dan ada jeda singkat antarreset. Jika tiba di pintu dengan kesulitan yang salah, permainan akan memberi tahu sebelum perjalanan dimulai. Raid tidak pernah direset dengan cara ini; aturan pengunciannya sendiri tetap berlaku.',
+  'guide.gear.itemLevelBody':
+    'Untuk membandingkan dua perlengkapan dengan cepat, aktifkan Tampilkan Level Item di opsi. Perlengkapan yang sumbernya diketahui, dari musuh, misi, dan profesi kerajinan, kemudian menampilkan level item: satu angka yang memperkirakan kekuatan berdasarkan asalnya dan memudahkan melihat peningkatan terbaik, bahkan antar-slot. Item tanpa sumber seperti itu, misalnya barang dasar pedagang dan perlengkapan awal, tidak menampilkan level; angka yang tidak ada adalah hal normal.',
+  'guide.professions.craftHowBody':
+    'Buka jendela Kerajinan (tombol bawaan T) untuk melihat semua resep yang diketahui, kebutuhan tiap resep, dan bahan yang tersedia; jika bahannya lengkap, satu klik menyelesaikannya. Resep umum dapat dibuat di mana saja. Beberapa resep lanjutan, termasuk alat tingkat tinggi dan zirah langka untuk perapal, mengharuskanmu berada di pusat kerajinan Highwatch.',
 };
