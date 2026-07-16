@@ -40,7 +40,8 @@ function cellCoord(v: number, size: number): number | null {
   // Beyond safe integer cell ids, division can collapse distinct representable
   // screen coordinates into one bucket. At that magnitude the float ULP is
   // already wider than the overlap threshold, so only equal coordinates can
-  // collide; keying by the original value preserves that distinction.
+  // collide; keying by the original value preserves that distinction. Its
+  // magnitude also exceeds every safe cell id, so the keyspaces cannot alias.
   if (!Number.isSafeInteger(coord)) return v === 0 ? 0 : v;
   return coord === 0 ? 0 : coord;
 }
