@@ -57,6 +57,7 @@ import { extendOwnedDot } from './dot_mutation';
 import { consumeAuraKind, consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
 import { exclusiveAuraConflicts } from './exclusive_aura';
+import { maybeFulminationOverload } from './fulmination';
 import { armHeroicLeap, relocateSwept } from './heroic_leap';
 import { hasCastShield, noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
 import { consumeSureCritCharge, hasSureCritAura } from './sure_crit';
@@ -325,6 +326,7 @@ export function runEffects(
         if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
         const finalDamage = Math.round(dmg);
         lastDirectDamage = finalDamage;
+        const targetHpBefore = target.hp;
         ctx.dealDamage(
           p,
           target,
@@ -340,6 +342,17 @@ export function runEffects(
           false,
           ability.id,
         );
+        if (isSpell && target.hp < targetHpBefore) {
+          maybeFulminationOverload(
+            ctx,
+            p,
+            target,
+            ability.id,
+            ability.name,
+            ability.school,
+            finalDamage,
+          );
+        }
         if (areaEcho) {
           areaEchoDealt = true;
           echoAreaDamage(ctx, p, target, finalDamage, ability.school, ability.name, threatOpts);
@@ -368,21 +381,39 @@ export function runEffects(
         const charges = aura.charges ?? 0;
         p.auras.splice(auraIndex, 1);
         ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
-        ctx.dealDamage(
-          p,
-          target,
-          charges * eff.damagePerCharge,
-          false,
-          ability.school,
-          ability.name,
-          'hit',
-          false,
-          threatOpts,
-          true,
-          attackAnimationStarted,
-          false,
-          ability.id,
-        );
+        const dischargeTargets = [target];
+        if (eff.radius !== undefined) {
+          ctx.emit({
+            type: 'spellfxAt',
+            x: target.pos.x,
+            z: target.pos.z,
+            school: ability.school,
+            fx: 'nova',
+            radius: eff.radius,
+          });
+          for (const nearby of ctx.hostilesInRadius(p, target.pos, eff.radius)) {
+            if (nearby.id === target.id || !ctx.hasLineOfSight(target, nearby)) continue;
+            dischargeTargets.push(nearby);
+          }
+        }
+        for (const dischargeTarget of dischargeTargets) {
+          if (!ctx.isHostileTo(p, dischargeTarget)) continue;
+          ctx.dealDamage(
+            p,
+            dischargeTarget,
+            charges * eff.damagePerCharge,
+            false,
+            ability.school,
+            ability.name,
+            'hit',
+            false,
+            threatOpts,
+            true,
+            dischargeTarget.id === target.id && attackAnimationStarted,
+            false,
+            ability.id,
+          );
+        }
         break;
       }
       case 'finisherDamage': {

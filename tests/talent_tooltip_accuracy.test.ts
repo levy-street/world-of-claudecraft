@@ -120,7 +120,10 @@ describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
 
     const fulmination = render('shaman', (e) => e.id === 'sha_r11_fulmination');
     expect(fulmination).toContain('up to 9');
+    expect(fulmination).toContain('5% Overload chance');
+    expect(fulmination).toContain('chains to one nearby enemy');
     expect(fulmination).toContain('8 Nature damage each');
+    expect(fulmination).toContain('nearby enemies');
 
     const mastery = render('warrior', (e) => e.id === 'war_row_blood_offering');
     expect(mastery).toContain('ability criticals deal 15% more damage');

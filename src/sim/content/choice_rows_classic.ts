@@ -1674,7 +1674,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
           id: 'sha_r11_fulmination',
           name: 'Fulmination',
           description:
-            'While Thunder Ward is active, each Arc Bolt adds a charge up to 9. Earthen Jolt consumes every charge for 8 Nature damage each.',
+            'While Thunder Ward is active, each Arc Bolt adds a charge up to 9. Each charge gives Arc Bolt 5% Overload chance for a free half-damage repeat that chains to one nearby enemy. Earthen Jolt consumes every charge for 8 Nature damage each to the target and nearby enemies.',
           icon: 'lightning_shield',
           effect: {
             ability: [
@@ -1685,6 +1685,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
                     type: 'consumeAuraChargesDamage',
                     auraId: 'lightning_shield',
                     damagePerCharge: 8,
+                    radius: 8,
                   },
                 ],
               },

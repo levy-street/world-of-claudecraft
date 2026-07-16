@@ -7881,7 +7881,7 @@ function addedEffectDescription(
     case 'consumeDot':
       return `${name} -> ${abilityName(effect.dot)}: ${formatPercent(1, lang)} ${text.statLabels.damage} / 0 s.`;
     case 'consumeAuraChargesDamage':
-      return `${name}: ${abilityName(effect.auraId)} x ${formatNumber(effect.damagePerCharge, lang)} ${text.statLabels.damage}.`;
+      return `${name}: ${abilityName(effect.auraId)} x ${formatNumber(effect.damagePerCharge, lang)} ${text.statLabels.damage}${effect.radius === undefined ? '' : ` (r=${formatNumber(effect.radius, lang)})`}.`;
   }
 }
 

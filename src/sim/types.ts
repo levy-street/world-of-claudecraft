@@ -1510,7 +1510,12 @@ export type AbilityEffect =
       vsFrozenMult?: number;
       consumeAuraStacks?: { auraId: string; maxStacks: number };
     }
-  | { type: 'consumeAuraChargesDamage'; auraId: string; damagePerCharge: number }
+  | {
+      type: 'consumeAuraChargesDamage';
+      auraId: string;
+      damagePerCharge: number;
+      radius?: number;
+    }
   | { type: 'interrupt'; lockout: number; rageOnInterrupt?: number }
   | {
       type: 'chainDamage';

@@ -264,15 +264,20 @@ This pass adds two caster rotations built on the narrow proc vocabulary describe
   rooted or stunned. Rimelance's chill does not open this execute window. The bank is visible
   as an aura and a normalized reinforcement-learning observation.
 - Elemental's level-11 Fulmination choice makes each completed Arc Bolt add one charge to
-  an active Thunder Ward, up to nine. Earthen Jolt consumes the ward and deals 8 bonus
-  Nature damage per charge. The existing visible Thunder Ward charge counter remains the
-  player-facing bank, and its normalized count is also exposed to reinforcement learning.
+  an active Thunder Ward, up to nine. Each charge present when the projectile lands raises
+  Arc Bolt's Overload chance by 5%; the just-completed cast joins the bank before impact.
+  An Overload repeats half of the bolt's damage for free and chains that damage to the nearest
+  enemy within 8 yards. Earthen Jolt consumes the ward and deals 8 bonus Nature damage per
+  charge to the target and nearby enemies. The existing visible Thunder Ward charge counter
+  remains the player-facing bank, and its normalized count is also exposed to reinforcement
+  learning.
 
 Both mechanics preserve mobile play while adding anticipation. Building happens through
 ordinary rotational casts, so movement does not erase progress or force a stationary
 channel. The release decision creates the excitement: Frost creates a hard-control window
-and times Icefall inside it, while Elemental chooses between keeping Thunder Ward protection
-and converting the bank into Earthen Jolt burst. Icefall adds no random draws.
+and times Icefall inside it, while Elemental rides a rising Overload chance before venting the
+bank across a pack. Icefall adds no random draws. Fulmination adds one draw only on a talented
+Shaman's landed Arc Bolt while Thunder Ward is active.
 
 ### PBE-2 mage feedback pass
 
