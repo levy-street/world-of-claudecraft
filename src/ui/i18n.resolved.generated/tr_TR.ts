@@ -2991,8 +2991,8 @@ export const tr_TR: EnTranslations = {
       "heroicRewardsTitle": "Kahramanca Nişanları ve yükseltilmiş ganimetler",
       "heroicRewardsBody": "Kahramanca şefler bildiğin ganimeti düşürür, yükseltilmiş ve ipucunda Kahramanca olarak etiketlenmiş halde; her seferin son şefi ise başka hiçbir yerde bulunmayan epikler ekler. O son öldürme, katılan herkese Kahramanca Nişanları da bırakır: Highwatch'taki Levazımcı Vex ile harcanan bir para birimi; onun yüzük ve kolye stoğu diyardaki tek mücevherdir.",
       "heroicLockoutBody": "Normal zindanlar gün boyu koşulabilir. Kahramanca ise sabır ister: son şefin öldürülmesi, seferdeki herkesi o zindanın günde bir kahramanca temizlemesiyle kilitler ve akın her zorluk için ayrı bir günlük kilit tutar. Temizlenmiş beş oyunculu bir sefer, ceset koşuları ve ganimet için kendi grubuna açık kalır, böylece kimse orada kazandığından mahrum bırakılmaz. Akın daha katıdır: bir kez öldürmesi seni kilitledi mi, kapı günlük sıfırlanmaya dek kapalı kalır, o yüzden arenayı terk etmeden ganimetlerini topla.",
-      "resetTitle": "Resetting your instances",
-      "resetBody": "Switch difficulty while your group still holds claimed runs and the old claims linger for a while before clearing on their own. The party leader can let them go at once instead: choose Reset All Instances on their own portrait menu, or type /dungeon reset. A reset works only after the difficulty has actually been changed, only while nobody, living or fallen, remains inside, and a short cooldown separates one reset from the next. Arrive at the door on the wrong difficulty and the game says so before the run starts. The raid is never reset this way; its own lockout rules stand.",
+      "resetTitle": "Örneklerini sıfırlama",
+      "resetBody": "Grubun sahiplenilmiş koşuları tutarken zorluğu değiştirirsen eski haklar kendiliğinden silinmeden önce bir süre kalır. Grup lideri kendi portre menüsünden Tüm Örnekleri Sıfırla seçeneğini seçerek veya /dungeon reset yazarak bunları hemen bırakabilir. Zorluk gerçekten değiştirilmiş olmalı, içeride canlı ya da düşmüş hiç kimse kalmamalı ve sıfırlamalar arasında kısa bir bekleme süresi vardır. Kapıya yanlış zorlukta gelirsen oyun başlamadan önce uyarır. Baskın bu şekilde asla sıfırlanmaz; kendi kilit kuralları geçerlidir.",
       "templeLoreTitle": "Boğulmuş Tapınak, biraz daha derinde",
       "templeLoreBody": "Tapınağın, başka yerlerde peşine düştüğünüz tarikattan daha eski, kendi efsanesi vardır. Ay ışığını içip boğulmuşları geri veren bir gölet olan Işıltıgöl'ün kıyısında, yalnız bir gözcü solgun ışıktan bir geçidi korur. Yüzeyin altında, soğuk taştan bir merdiven ona doğru iner. Oraya batan halk bir kazayla boğulmadı: ibadet ederek suya gömülen ve şarkı söylemeyi hiç bırakmayan Solgun Koro'ydu onlar. Eski muhafızlar, sular onları almadan önce kayalara tek bir uyarı kazıdılar, Boğulmuş Ay dedikleri bir şeye bir dua; daha sağlam bir el de altına iki kelime ekledi: yalnızca uyuyor.",
       "cryptLeadTitle": "Ölülerin kapalı tutması gereken bir kapı",
@@ -3200,7 +3200,7 @@ export const tr_TR: EnTranslations = {
       "qualityNote": "Daha yüksek kalite genellikle daha iyi nitelik demektir, ama kalite bir kural değil, bir ipucudur. Sınıfınıza ve seviyenize iyi uyan bir parça, daha gösterişli olanı geçebilir.",
       "upgradeTitle": "Teçhizatınızı güncel tutun",
       "upgradeBody": "Eski bir parçayı taze bir yükseltmeyle değiştirmek, geride bıraktığınız teçhizatla kusursuz oynamaktan size daha çok şey kazandırır. Daha iyi bir şey düştüğünde ya da bir görev onu sunduğunda, alın. İyi eşyalarınızı sonraya saklamayın.",
-      "itemLevelBody": "If you want a quick way to compare two pieces, turn on Show Item Level in the options. Gear with a known source, from enemies, quests, and the crafting trades, then shows an item level, a single figure for roughly how powerful it is based on where it came from, so you can tell at a glance which upgrade pulls more weight, even across different slots. Pieces with no such source, like plain vendor basics and starter gear, show no item level, so a missing figure is normal, not a fault.",
+      "itemLevelBody": "İki parçayı hızlıca karşılaştırmak için seçeneklerden Eşya Seviyesini Göster’i aç. Düşmanlardan, görevlerden ve üretim mesleklerinden gelen, kaynağı bilinen teçhizat bir eşya seviyesi gösterir: kaynağına göre gücünü yaklaşık belirten tek bir sayı, farklı yuvalar arasında bile hangi yükseltmenin daha etkili olduğunu gösterir. Basit satıcı eşyaları ve başlangıç teçhizatı gibi böyle bir kaynağı olmayan parçalarda seviye görünmez; sayının olmaması normaldir.",
       "sourcesTitle": "Teçhizat nereden gelir",
       "sourcesBody": "Erken dönem yükseltmelerinizin çoğu görev ödülleridir, bu yüzden grindlemek yerine görevleri bitirmek işe yarar. Düşmanlar yendiğinizde teçhizat düşürür, kasabadaki satıcılar sağlam temel parçalar satar, zanaatkârlar toplanan malzemeleri giyilebilir parçalara dönüştürür ve oyuncu pazarı diğer maceracılardan alışveriş yapmanızı sağlar. Tepenin zirvesinde, başka hiçbir yerde bulunmayan teçhizatı iki nişan para birimi satın alır: mağara seferi bekçisindeki Mağara Nişanları ve Kahramanca Levazımcı'daki Kahramanca Nişanlar.",
       "soulboundTitle": "Ruha bağlı: yalnızca ve yalnızca sizin",
@@ -3243,8 +3243,8 @@ export const tr_TR: EnTranslations = {
       "craftRingBody": "On zanaat sabit bir halkaya dizilmiştir ve bir zanaatın o halkadaki yeri önemlidir: çark üzerinde yan yana duran zanaatlar, karşı taraftakilere kıyasla birbirleriyle daha çok ortaklık taşır. Bir zanaata bağlanmak, yalıtılmış bir beceri seçmek gibi değil, akraba işlerden oluşan bir aileye katılmak gibi hissettirmelidir.",
       "craftRecipesTitle": "Tarifler ve malzemeler",
       "craftRecipesBody": "Her tarif, topladığın ya da satın aldığın belirli malzemeleri ister. En basit tarifler sıradan malzemeden başkasını istemez ve en baştan üretilebilir; böylece bir zanaatı edindiğin an işlemeye başlayabilirsin. Tarif listeleri hala doluyor: birkaç zanaat henüz ilk tariflerini bekliyor ve zanaatlar geliştikçe daha fazlası ekleniyor.",
-      "craftHowTitle": "The crafting window",
-      "craftHowBody": "Open the Crafting window (default key T) to see every recipe you know, what each one needs, and what you have on hand; when the materials are there, one click does the work. Common recipes can be crafted anywhere in the world. A handful of advanced recipes, higher-tier tools and rare caster armor among them, instead ask you to stand at the crafting hub in Highwatch.",
+      "craftHowTitle": "Üretim penceresi",
+      "craftHowBody": "Bildiğin tüm tarifleri, gerekenleri ve elindeki malzemeleri görmek için Üretim penceresini (varsayılan T tuşu) aç; malzemeler hazırsa tek tıklama yeter. Yaygın tarifler dünyanın her yerinde üretilebilir. Yüksek seviye aletler ve nadir büyücü zırhları gibi bazı gelişmiş tarifler ise Highwatch üretim merkezinde bulunmanı ister.",
       "craftMasteryTitle": "Beceri ve ustalık",
       "craftMasteryBody": "Başarılı her üretim o zanaattaki becerini geliştirir ve beceri bir zanaatın tariflerini asla kilit altında tutmaz: bir tarifi biliyor ve malzemelerine sahipsen onu deneyebilirsin. Becerinin sana kazandırdığı şey bunun yerine kalitedir; usta bir el daha iyi işler çıkarır. Tek istisna birleşim tarifleridir; bunlar açılmadan önce her iki zanaatta da kendini kanıtlamış olmanı ister.",
       "craftComboTitle": "Birleşim tarifleri",
@@ -9790,9 +9790,9 @@ export const tr_TR: EnTranslations = {
         "body": "O çukurda neyin gömülü olduğunu çok az kişi bilecek, inanacak olansa daha da az. Ben biliyorum ve unutmayacağım.\n\nYolun hep aydınlık olsun.\n- Birader Aldric"
       },
       "heroic_marks_reward": {
-        "sender": "The Heroic Quartermaster",
-        "subject": "Your Heroic Marks",
-        "body": "Your warband cleared the heroic trial while you fought from the back, or from the dirt. Your lockout was struck all the same, so your share of Heroic Marks flies to you here rather than being lost. Spend them well.\n\n- The Heroic Quartermaster"
+        "sender": "Kahraman levazım subayı",
+        "subject": "Kahramanlık Nişanların",
+        "body": "Birliğin kahramanlık sınavını temizlerken sen arka saflarda savaşıyor ya da yerde yatıyordun. Kilidin yine de kaydedildi, bu yüzden Kahramanlık Nişanlarından payın kaybolmak yerine buraya gönderildi. Onları iyi kullan.\n\n- Kahraman levazım subayı"
       }
     },
     "itemSets": {

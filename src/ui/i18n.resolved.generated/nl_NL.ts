@@ -2991,8 +2991,8 @@ export const nl_NL: EnTranslations = {
       "heroicRewardsTitle": "Heroïsche Merken en verbeterde buit",
       "heroicRewardsBody": "Heroïsche bazen laten de buit vallen die je kent, verbeterd en op de tooltip gemarkeerd als Heroïsch, en de eindbaas van elke run voegt epics toe die je nergens anders vindt. Die laatste kill laat ook Heroïsche Merken achter voor elke deelnemer: een munt die je uitgeeft bij Kwartiermeester Vex in Highwatch, wiens voorraad ringen en halskettingen de enige sieraden in het rijk zijn.",
       "heroicLockoutBody": "Gewone kerkers kun je de hele dag door lopen. Heroïsch vraagt geduld: de kill van de eindbaas zet iedereen in de run vast op één heroïsche clear van die kerker per dag, en de raid houdt voor elke moeilijkheidsgraad een eigen daglockout bij. Een uitgespeelde run voor vijf spelers blijft open voor de eigen groep, voor lijkenlopen en buit, zodat niemand wordt buitengesloten van wat ze daar hebben verdiend. De raid is strenger: zodra de kill je vastzet, blijft de deur dicht tot de dagelijkse reset, dus verzamel je buit voordat je de arena verlaat.",
-      "resetTitle": "Resetting your instances",
-      "resetBody": "Switch difficulty while your group still holds claimed runs and the old claims linger for a while before clearing on their own. The party leader can let them go at once instead: choose Reset All Instances on their own portrait menu, or type /dungeon reset. A reset works only after the difficulty has actually been changed, only while nobody, living or fallen, remains inside, and a short cooldown separates one reset from the next. Arrive at the door on the wrong difficulty and the game says so before the run starts. The raid is never reset this way; its own lockout rules stand.",
+      "resetTitle": "Je instanties resetten",
+      "resetBody": "Als je van moeilijkheid wisselt terwijl je groep nog geclaimde runs heeft, blijven de oude claims even staan voordat ze vanzelf verdwijnen. De groepsleider kan ze direct loslaten via Alle instanties resetten in het menu van het eigen portret, of met /dungeon reset. De moeilijkheid moet echt gewijzigd zijn, er mag niemand, levend of gevallen, binnen zijn en tussen resets geldt een korte afkoeltijd. Bij de deur op de verkeerde moeilijkheid waarschuwt het spel voor de start. De raid wordt nooit zo gereset; daarvoor blijven de eigen lockoutregels gelden.",
       "templeLoreTitle": "De Verdronken Tempel, een beetje dieper",
       "templeLoreBody": "De tempel heeft zijn eigen legende, ouder dan de sekte die je elders najaagt. Aan de oever van de Glansmere, een bergmeer dat het maanlicht drinkt en de verdronkenen teruggeeft, bewaakt een eenzame wachter een poort van bleek licht. Onder het oppervlak loopt een trap van koude steen erheen naar beneden. Het volk dat daar zonk verdronk niet door een ongeluk: het was het Bleke Koor, dat in aanbidding onderging en nooit ophield met zingen. De oude wachters krasten een enkele waarschuwing in de rotsen voordat het water hen nam, een gebed tot iets dat zij de Verdronken Maan noemden, met een vastere hand die twee woorden eronder toevoegde: het slaapt slechts.",
       "cryptLeadTitle": "Een deur die de doden gesloten moesten houden",
@@ -3190,7 +3190,7 @@ export const nl_NL: EnTranslations = {
       "bagsTitle": "Tassen en draagruimte",
       "bagsBody": "Alles wat je oppakt, reist mee in één gedeelde rugzak, en die vergroot je door tassen uit te rusten. Je tassenvenster heeft vier tassloten: klik op een tas in je rugzak om hem in een vrij slot te steken, en elke tas die je draagt, voegt zijn eigen ruimte toe. Eenvoudige tassen zijn goedkope handelswaar, ruimere vallen van beesten, en de fraaiste komen van kerkerbazen, zodat je draagruimte netjes meegroeit met je uitrusting.",
       "qualityTitle": "Kwaliteit, in één oogopslag",
-      "qualityBody": "Every item has a quality, and its name is colored to match so you can read its worth at a glance. From most common to most prized:",
+      "qualityBody": "Elk voorwerp heeft een kwaliteit en de naam krijgt de bijbehorende kleur, zodat je de waarde in één oogopslag ziet. Van gewoon tot kostbaar:",
       "qualityPoor": "Pover",
       "qualityCommon": "Gewoon",
       "qualityUncommon": "Ongewoon",
@@ -3200,7 +3200,7 @@ export const nl_NL: EnTranslations = {
       "qualityNote": "Hogere kwaliteit betekent meestal betere statistieken, maar kwaliteit is een hint, geen regel. Een goed passend stuk voor jouw klasse en niveau kan een flitsender exemplaar verslaan.",
       "upgradeTitle": "Houd je uitrusting actueel",
       "upgradeBody": "Een oud stuk vervangen door een verse verbetering doet meer voor je dan perfect spelen in uitrusting die je ontgroeid bent. Wanneer er iets beters valt of een quest het aanbiedt, neem het. Bewaar je goede voorwerpen niet voor later.",
-      "itemLevelBody": "If you want a quick way to compare two pieces, turn on Show Item Level in the options. Gear with a known source, from enemies, quests, and the crafting trades, then shows an item level, a single figure for roughly how powerful it is based on where it came from, so you can tell at a glance which upgrade pulls more weight, even across different slots. Pieces with no such source, like plain vendor basics and starter gear, show no item level, so a missing figure is normal, not a fault.",
+      "itemLevelBody": "Schakel Itemniveau tonen in de opties in om twee stukken snel te vergelijken. Uitrusting met een bekende bron, van vijanden, quests en ambachten, toont dan een itemniveau: één getal dat de kracht op basis van de herkomst benadert en upgrades zelfs tussen verschillende vakken vergelijkbaar maakt. Stukken zonder zo’n bron, zoals eenvoudige handelswaar en startuitrusting, tonen geen itemniveau; een ontbrekend getal is normaal.",
       "sourcesTitle": "Waar uitrusting vandaan komt",
       "sourcesBody": "De meeste van je vroege verbeteringen zijn questbeloningen, dus het loont om quests af te ronden in plaats van te grinden. Vijanden laten uitrusting vallen wanneer je ze verslaat, verkopers in de stad verkopen degelijke basisspullen, ambachtslieden maken van verzamelde materialen draagbare stukken, en op de spelersmarkt kun je van andere avonturiers kopen. Bovenaan de heuvel kopen twee merkvaluta uitrusting die nergens anders te vinden is: Delve-Merken bij de delvebewaarder, en Heroïsche Merken bij de heroïsche kwartiermeester.",
       "soulboundTitle": "Zielgebonden: van jou en jou alleen",
@@ -3244,7 +3244,7 @@ export const nl_NL: EnTranslations = {
       "craftRecipesTitle": "Recepten en reagentia",
       "craftRecipesBody": "Elk recept vraagt om specifieke reagentia die je verzamelt of koopt. De meest eenvoudige recepten vragen niets anders dan gewone materialen en zijn vanaf het allereerste begin te maken, zodat je een vak meteen kunt gaan uitoefenen zodra je het oppakt. De receptenlijsten worden nog aangevuld: een paar vakken wachten nog op hun eerste recepten, en er komen er meer bij naarmate de ambachten groeien.",
       "craftHowTitle": "Het vervaardigingsvenster",
-      "craftHowBody": "Open the Crafting window (default key T) to see every recipe you know, what each one needs, and what you have on hand; when the materials are there, one click does the work. Common recipes can be crafted anywhere in the world. A handful of advanced recipes, higher-tier tools and rare caster armor among them, instead ask you to stand at the crafting hub in Highwatch.",
+      "craftHowBody": "Open het Vervaardigingsvenster (standaardtoets T) om al je bekende recepten, hun benodigdheden en je voorraad te zien; als de materialen er zijn, volstaat één klik. Gewone recepten kunnen overal worden gemaakt. Enkele geavanceerde recepten, waaronder hoogwaardig gereedschap en zeldzaam pantser voor magiërs, vereisen het vervaardigingscentrum in Highwatch.",
       "craftMasteryTitle": "Vaardigheid en meesterschap",
       "craftMasteryBody": "Succesvol iets maken bouwt vaardigheid op in dat vak, en vaardigheid houdt de recepten van een ambacht nooit achter slot: als je een recept kent en de materialen ervan bezit, kun je het proberen. Wat vaardigheid je in plaats daarvan oplevert, is kwaliteit: een geoefende hand levert fijner werk af. De enige uitzondering zijn combinatierecepten, die vragen dat je jezelf in beide ambachten hebt bewezen voordat ze opengaan.",
       "craftComboTitle": "Combinatierecepten",
@@ -9790,9 +9790,9 @@ export const nl_NL: EnTranslations = {
         "body": "Weinigen zullen ooit weten wat er in die kom begraven lag, en nog minder zouden het geloven. Ik weet het, en ik zal het niet vergeten.\n\nMoge je pad verlicht blijven.\n- Broeder Aldric"
       },
       "heroic_marks_reward": {
-        "sender": "The Heroic Quartermaster",
-        "subject": "Your Heroic Marks",
-        "body": "Your warband cleared the heroic trial while you fought from the back, or from the dirt. Your lockout was struck all the same, so your share of Heroic Marks flies to you here rather than being lost. Spend them well.\n\n- The Heroic Quartermaster"
+        "sender": "Heroïsche kwartiermeester",
+        "subject": "Je heroïsche marken",
+        "body": "Je groep heeft de heroïsche beproeving doorstaan terwijl jij in de achterhoede vocht of verslagen op de grond lag. Ook jouw binding is vastgelegd, dus je aandeel heroïsche marken is hierheen gestuurd in plaats van verloren te gaan. Gebruik ze goed.\n\n- Heroïsche kwartiermeester"
       }
     },
     "itemSets": {

@@ -7629,4 +7629,15 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'welcome.armory.cta': 'Träd in i världen och utforska Vapenhuset',
   'welcome.news.new': 'Ny',
   'welcome.news.viewAll': 'Se alla uppdateringar på GitHub',
+  'entities.letters.heroic_marks_reward.sender': 'Heroisk kvartermästare',
+  'entities.letters.heroic_marks_reward.subject': 'Dina heroiska märken',
+  'entities.letters.heroic_marks_reward.body':
+    'Din grupp klarade den heroiska prövningen medan du kämpade i eftertruppen eller låg fallen. Din låsning registrerades ändå, så din andel heroiska märken skickades hit i stället för att gå förlorad. Använd dem väl.\n\n- Heroisk kvartermästare',
+  'guide.dungeonsPage.resetTitle': 'Återställa dina instanser',
+  'guide.dungeonsPage.resetBody':
+    'Om du byter svårighetsgrad medan gruppen fortfarande har hävdade rundor ligger de gamla anspråken kvar en stund. Gruppledaren kan släppa dem direkt genom att välja Återställ alla instanser i menyn på sitt eget porträtt eller skriva /dungeon reset. Svårighetsgraden måste faktiskt ha ändrats, ingen levande eller fallen får vara kvar inuti och en kort väntetid skiljer återställningarna åt. Vid dörren på fel svårighetsgrad varnar spelet innan starten. Raiden återställs aldrig så här; dess egna låsningsregler gäller.',
+  'guide.gear.itemLevelBody':
+    'Slå på Visa föremålsnivå i alternativen för att snabbt jämföra två delar. Utrustning med känd källa, från fiender, uppdrag och hantverksyrken, visar då en föremålsnivå: ett enda tal som ungefär anger styrkan utifrån ursprunget och gör förbättringar jämförbara även mellan olika platser. Delar utan sådan källa, som enkla handelsvaror och startutrustning, visar ingen nivå; ett saknat tal är normalt.',
+  'guide.professions.craftHowBody':
+    'Öppna hantverksfönstret (standardtangent T) för att se alla recept du kan, vad de kräver och vad du har; när materialen finns räcker ett klick. Vanliga recept kan tillverkas var som helst. Några avancerade recept, däribland verktyg på hög nivå och sällsynta rustningar för besvärjare, kräver hantverksnavet i Highwatch.',
 };

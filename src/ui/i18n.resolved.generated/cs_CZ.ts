@@ -2991,8 +2991,8 @@ export const cs_CZ: EnTranslations = {
       "heroicRewardsTitle": "Hrdinské známky a vylepšená kořist",
       "heroicRewardsBody": "Hrdinští bossové upouštějí kořist, kterou znáš, vylepšenou a v popisku označenou jako Heroic, a poslední boss každého běhu přidává epické předměty, které jinde nenajdeš. To poslední zabití zanechá všem účastníkům i Hrdinské známky: měnu, kterou utratíš u zásobovače Vexe v Highwatchi, jehož zásoba prstenů a náhrdelníků je jediným šperkem v celé říši.",
       "heroicLockoutBody": "Normální dungeony můžeš běhat celý den. Hrdinský žádá trpělivost: zabití posledního bosse uzamkne všechny v běhu na jedno hrdinské vyčištění toho dungeonu za den a raid si drží denní zámek pro každou obtížnost zvlášť. Vyčištěný pětičlenný běh zůstává otevřený vlastní partě pro doběhy k tělu a kořist, takže nikdo nezůstane odříznut od toho, co si tam vydobyl. Raid je přísnější: jakmile tě jeho zabití uzamkne, dveře zůstanou zavřené až do denního resetu, takže si posbírej kořist, než opustíš arénu.",
-      "resetTitle": "Resetting your instances",
-      "resetBody": "Switch difficulty while your group still holds claimed runs and the old claims linger for a while before clearing on their own. The party leader can let them go at once instead: choose Reset All Instances on their own portrait menu, or type /dungeon reset. A reset works only after the difficulty has actually been changed, only while nobody, living or fallen, remains inside, and a short cooldown separates one reset from the next. Arrive at the door on the wrong difficulty and the game says so before the run starts. The raid is never reset this way; its own lockout rules stand.",
+      "resetTitle": "Resetování instancí",
+      "resetBody": "Když změníte obtížnost, zatímco skupina stále drží přidělené průchody, staré nároky chvíli zůstanou a pak samy zmizí. Vůdce skupiny je může opustit okamžitě volbou Resetovat všechny instance v nabídce vlastního portrétu nebo příkazem /dungeon reset. Obtížnost musí být skutečně změněna, uvnitř nesmí zůstat nikdo živý ani padlý a mezi resety je krátká prodleva. U dveří na špatné obtížnosti vás hra varuje před začátkem. Raid se takto nikdy neresetuje; platí pro něj vlastní pravidla uzamčení.",
       "templeLoreTitle": "Utopený chrám, o trochu hlouběji",
       "templeLoreBody": "Chrám má vlastní legendu, starší než kult, který pronásleduješ jinde. Na břehu Třpytivého plesa, horského jezera, které pije měsíční světlo a vrací utopené, drží osamělý hlídač bránu bledého světla. Pod hladinou k ní vede schodiště studeného kamene. Lidé, kteří tam klesli, se neutopili nešťastnou náhodou: byli Bledý sbor, který sestoupil pod vodu v uctívání a nikdy nepřestal zpívat. Staří strážci vyryli do skal jediné varování, než je voda vzala, modlitbu k něčemu, čemu říkali Utopený měsíc, a pevnější ruka pod ni přidala dvě slova: jen spí.",
       "cryptLeadTitle": "Dveře, které měli mrtví udržet zavřené",
@@ -3200,7 +3200,7 @@ export const cs_CZ: EnTranslations = {
       "qualityNote": "Vyšší kvalita obvykle znamená lepší statistiky, ale kvalita je vodítko, ne pravidlo. Dobře padnoucí kus pro tvoji třídu a úroveň může porazit okázalejší předmět.",
       "upgradeTitle": "Udržuj výbavu aktuální",
       "upgradeBody": "Výměna starého kusu za čerstvé vylepšení udělá víc než dokonalá hra ve výbavě, ze které jsi vyrostl. Když padne něco lepšího nebo to nabídne úkol, vezmi to. Neschovávej dobré předměty na později.",
-      "itemLevelBody": "If you want a quick way to compare two pieces, turn on Show Item Level in the options. Gear with a known source, from enemies, quests, and the crafting trades, then shows an item level, a single figure for roughly how powerful it is based on where it came from, so you can tell at a glance which upgrade pulls more weight, even across different slots. Pieces with no such source, like plain vendor basics and starter gear, show no item level, so a missing figure is normal, not a fault.",
+      "itemLevelBody": "Pro rychlé porovnání dvou kusů zapněte v možnostech Zobrazit úroveň předmětu. Výbava se známým původem, od nepřátel, z úkolů a řemesel, pak ukazuje úroveň předmětu: jediné číslo, které přibližně vyjadřuje sílu podle zdroje a umožňuje poznat lepší vylepšení i mezi různými sloty. Kusy bez takového původu, například základní zboží obchodníků a počáteční výbava, úroveň neukazují; chybějící číslo je normální.",
       "sourcesTitle": "Odkud výbava pochází",
       "sourcesBody": "Většina raných vylepšení jsou odměny z úkolů, takže se vyplatí úkoly dokončovat, ne grindit. Nepřátelé pouštějí výbavu po porážce, prodejci ve městě prodávají solidní základy, řemeslníci mění nasbírané suroviny v nositelné kusy a hráčský trh ti dovolí nakupovat od ostatních dobrodruhů. Na vrcholu kopce kupují výbavu, kterou nikde jinde nenajdeš, dvě známkové měny: Známky výprav u správce výprav a Hrdinské značky u hrdinského zásobovače.",
       "soulboundTitle": "Vázané k duši: tvé a jen tvé",
@@ -3244,7 +3244,7 @@ export const cs_CZ: EnTranslations = {
       "craftRecipesTitle": "Recepty a přísady",
       "craftRecipesBody": "Každý recept vyžaduje konkrétní přísady, které nasbíráš nebo koupíš. Nejjednodušší recepty žádají jen běžné materiály a lze je vyrábět od samého začátku, takže se do oboru můžeš pustit hned, jak si ho osvojíš. Seznamy receptů se stále doplňují: pár řemesel čeká na své první recepty a další přibývají, jak řemesla rostou.",
       "craftHowTitle": "Okno výroby",
-      "craftHowBody": "Open the Crafting window (default key T) to see every recipe you know, what each one needs, and what you have on hand; when the materials are there, one click does the work. Common recipes can be crafted anywhere in the world. A handful of advanced recipes, higher-tier tools and rare caster armor among them, instead ask you to stand at the crafting hub in Highwatch.",
+      "craftHowBody": "Otevřete okno Výroba (výchozí klávesa T) a uvidíte všechny známé recepty, jejich požadavky i své zásoby; máte-li materiály, stačí jedno kliknutí. Běžné recepty lze vyrábět kdekoli. Některé pokročilé recepty, včetně nástrojů vyšší úrovně a vzácné zbroje pro sesilatele, vyžadují výrobní centrum v Highwatchi.",
       "craftMasteryTitle": "Dovednost a mistrovství",
       "craftMasteryBody": "Úspěšná výroba zvyšuje dovednost v daném řemesle a dovednost nikdy nezamyká recepty řemesla: pokud recept znáš a máš jeho materiály, můžeš se o něj pokusit. Co ti dovednost místo toho kupuje, je kvalita, zkušená ruka odvede jemnější práci. Jedinou výjimkou jsou kombinované recepty, které tě žádají, aby ses osvědčil v obou jejich řemeslech, než se otevřou.",
       "craftComboTitle": "Kombinované recepty",
@@ -9790,9 +9790,9 @@ export const cs_CZ: EnTranslations = {
         "body": "Jen málokdo se kdy dozví, co bylo pohřbeno v té dutině, a ještě méně by tomu věřilo. Já to vím a nezapomenu.\n\nAť je tvá cesta osvětlena.\n- Bratr Aldric"
       },
       "heroic_marks_reward": {
-        "sender": "The Heroic Quartermaster",
-        "subject": "Your Heroic Marks",
-        "body": "Your warband cleared the heroic trial while you fought from the back, or from the dirt. Your lockout was struck all the same, so your share of Heroic Marks flies to you here rather than being lost. Spend them well.\n\n- The Heroic Quartermaster"
+        "sender": "Hrdinský zásobovač",
+        "subject": "Vaše hrdinské marky",
+        "body": "Vaše skupina zdolala hrdinskou zkoušku, zatímco jste bojovali v týlu nebo leželi poraženi. Také vaše uzamčení bylo zaznamenáno, takže váš podíl hrdinských marek dorazil sem, místo aby se ztratil. Využijte je dobře.\n\n- Hrdinský zásobovač"
       }
     },
     "itemSets": {

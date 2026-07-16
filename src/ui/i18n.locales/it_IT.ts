@@ -7756,4 +7756,18 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'welcome.armory.cta': 'Entra nel mondo ed esplora l’Armeria',
   'welcome.news.new': 'Novità',
   'welcome.news.viewAll': 'Vedi tutti gli aggiornamenti su GitHub',
+  'entities.letters.heroic_marks_reward.sender': 'Quartiermastro eroico',
+  'entities.letters.heroic_marks_reward.subject': 'I tuoi Marchi eroici',
+  'entities.letters.heroic_marks_reward.body':
+    'Il tuo gruppo ha superato la prova eroica mentre combattevi nelle retrovie o giacevi a terra. Anche il tuo vincolo è stato registrato, quindi la tua parte di Marchi eroici è arrivata qui invece di andare perduta. Usali bene.\n\n- Quartiermastro eroico',
+  'guide.dungeonsPage.resetTitle': 'Reimpostare le istanze',
+  'guide.dungeonsPage.resetBody':
+    'Se cambi difficoltà mentre il gruppo conserva ancora delle spedizioni assegnate, le vecchie assegnazioni restano per un po’ prima di svanire. Il capogruppo può abbandonarle subito scegliendo Reimposta tutte le istanze dal menu del proprio ritratto oppure digitando /dungeon reset. La difficoltà deve essere stata davvero cambiata, nessuno, vivo o caduto, può trovarsi all’interno e tra due ripristini passa un breve tempo di recupero. Se arrivi all’ingresso con la difficoltà sbagliata, il gioco ti avvisa prima dell’inizio. L’incursione non viene mai reimpostata così e mantiene le proprie regole di vincolo.',
+  'guide.gear.itemLevelBody':
+    'Per confrontare rapidamente due pezzi, attiva Mostra livello oggetto nelle opzioni. L’equipaggiamento di provenienza nota, ottenuto da nemici, missioni e mestieri, mostra un livello oggetto: un unico valore che ne indica approssimativamente la potenza in base alla fonte e rende immediata la scelta del miglior potenziamento, anche tra slot diversi. I pezzi senza tale provenienza, come gli articoli base dei mercanti e l’equipaggiamento iniziale, non mostrano alcun livello; è normale.',
+  'guide.professions.craftHowBody':
+    'Apri la finestra Creazione (tasto predefinito T) per vedere tutte le ricette note, i loro requisiti e ciò che possiedi; quando hai i materiali basta un clic. Le ricette comuni si possono creare ovunque. Alcune ricette avanzate, tra cui strumenti di livello superiore e rare armature da incantatore, richiedono invece il centro di creazione di Highwatch.',
+  'guide.gear.qualityBody':
+    'Ogni oggetto ha una qualità e il suo nome assume il colore corrispondente, così puoi capirne il valore a colpo d’occhio. Dal più comune al più prezioso:',
+  'guide.gear.qualityCommon': 'Comune',
 };

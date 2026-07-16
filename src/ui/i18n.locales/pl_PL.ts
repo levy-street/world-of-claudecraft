@@ -7671,4 +7671,15 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'welcome.armory.cta': 'Wejdź i przejrzyj Zbrojownię',
   'welcome.news.new': 'Nowe',
   'welcome.news.viewAll': 'Zobacz wszystkie aktualizacje na GitHubie',
+  'entities.letters.heroic_marks_reward.sender': 'Heroiczny kwatermistrz',
+  'entities.letters.heroic_marks_reward.subject': 'Twoje heroiczne znaki',
+  'entities.letters.heroic_marks_reward.body':
+    'Twoja grupa pokonała heroiczną próbę, gdy walczyłeś na tyłach lub leżałeś pokonany. Twoja blokada również została zapisana, dlatego należna część heroicznych znaków trafiła tutaj, zamiast przepaść. Dobrze je wykorzystaj.\n\n- Heroiczny kwatermistrz',
+  'guide.dungeonsPage.resetTitle': 'Resetowanie instancji',
+  'guide.dungeonsPage.resetBody':
+    'Jeśli zmienisz trudność, gdy grupa wciąż ma zajęte podejścia, stare przypisania pozostaną przez pewien czas. Przywódca może porzucić je natychmiast, wybierając Resetuj wszystkie instancje w menu własnego portretu albo wpisując /dungeon reset. Trudność musi faktycznie zostać zmieniona, wewnątrz nie może pozostać nikt żywy ani poległy, a kolejne resety dzieli krótki czas odnowienia. Przy wejściu na złej trudności gra ostrzeże przed rozpoczęciem. Rajdu nie resetuje się w ten sposób; obowiązują jego własne zasady blokady.',
+  'guide.gear.itemLevelBody':
+    'Aby szybko porównać dwa przedmioty, włącz w opcjach Pokaż poziom przedmiotu. Wyposażenie o znanym źródle, zdobyte z wrogów, zadań i profesji rzemieślniczych, pokazuje wtedy poziom przedmiotu: jedną liczbę przybliżającą jego moc na podstawie pochodzenia, co ułatwia ocenę ulepszeń nawet między różnymi miejscami. Przedmioty bez takiego źródła, jak podstawowe towary kupców i sprzęt startowy, nie pokazują poziomu; brak liczby jest normalny.',
+  'guide.professions.craftHowBody':
+    'Otwórz okno Rzemiosła (domyślnie klawisz T), aby zobaczyć wszystkie znane receptury, ich wymagania i posiadane materiały; gdy masz składniki, wystarczy jedno kliknięcie. Zwykłe receptury można tworzyć wszędzie. Niektóre zaawansowane, w tym narzędzia wyższego poziomu i rzadkie pancerze dla czarujących, wymagają centrum rzemiosła w Highwatch.',
 };

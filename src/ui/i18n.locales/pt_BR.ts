@@ -7730,4 +7730,15 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'welcome.armory.cta': 'Entrar no mundo e explorar o Arsenal',
   'welcome.news.new': 'Novo',
   'welcome.news.viewAll': 'Ver todas as atualizações no GitHub',
+  'entities.letters.heroic_marks_reward.sender': 'Intendente heroico',
+  'entities.letters.heroic_marks_reward.subject': 'Suas Marcas heroicas',
+  'entities.letters.heroic_marks_reward.body':
+    'Seu grupo venceu a provação heroica enquanto você lutava na retaguarda ou jazia caído. Seu vínculo também foi registrado, então sua parte das Marcas heroicas chegou aqui em vez de se perder. Use-as bem.\n\n- Intendente heroico',
+  'guide.dungeonsPage.resetTitle': 'Redefinindo suas instâncias',
+  'guide.dungeonsPage.resetBody':
+    'Ao trocar a dificuldade enquanto o grupo ainda mantém incursões reivindicadas, as reivindicações antigas permanecem por algum tempo antes de sumirem. O líder pode abandoná-las imediatamente escolhendo Redefinir todas as instâncias no menu do próprio retrato ou digitando /dungeon reset. Isso só funciona depois que a dificuldade realmente mudou, quando ninguém, vivo ou caído, permanece dentro, e há um curto intervalo entre redefinições. Se você chegar à entrada na dificuldade errada, o jogo avisará antes do início. A raide nunca é redefinida assim; suas próprias regras de vínculo continuam valendo.',
+  'guide.gear.itemLevelBody':
+    'Para comparar duas peças rapidamente, ative Mostrar nível do item nas opções. Equipamentos de origem conhecida, obtidos de inimigos, missões e profissões de criação, passam a mostrar um nível do item: um único número que estima a força com base na origem e permite identificar a melhor melhoria, mesmo entre espaços diferentes. Peças sem essa origem, como itens básicos de vendedores e equipamento inicial, não mostram nível; a ausência do número é normal.',
+  'guide.professions.craftHowBody':
+    'Abra a janela de Criação (tecla padrão T) para ver todas as receitas conhecidas, o que cada uma exige e os materiais disponíveis; quando tudo estiver à mão, basta um clique. Receitas comuns podem ser criadas em qualquer lugar. Algumas receitas avançadas, incluindo ferramentas de nível alto e armaduras raras para conjuradores, exigem o centro de criação de Highwatch.',
 };

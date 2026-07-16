@@ -7796,4 +7796,15 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'welcome.armory.cta': 'Welt betreten und die Waffenkammer durchstöbern',
   'welcome.news.new': 'Neu',
   'welcome.news.viewAll': 'Alle Updates auf GitHub ansehen',
+  'entities.letters.heroic_marks_reward.sender': 'Heroischer Quartiermeister',
+  'entities.letters.heroic_marks_reward.subject': 'Deine heroischen Marken',
+  'entities.letters.heroic_marks_reward.body':
+    'Deine Gruppe hat die heroische Prüfung gemeistert, während du in der Nachhut gekämpft hast oder bereits am Boden lagst. Auch deine Instanzbindung wurde aktiviert, daher ist dein Anteil an heroischen Marken hier angekommen, statt verloren zu gehen. Setze sie klug ein.\n\n- Heroischer Quartiermeister',
+  'guide.dungeonsPage.resetTitle': 'Instanzen zurücksetzen',
+  'guide.dungeonsPage.resetBody':
+    'Wenn ihr die Schwierigkeit wechselt, während eure Gruppe noch beanspruchte Läufe hält, bleiben die alten Ansprüche eine Weile bestehen. Der Gruppenleiter kann sie sofort aufgeben: Wählt im Menü des eigenen Porträts Alle Instanzen zurücksetzen oder gebt /dungeon reset ein. Das funktioniert erst nach einem tatsächlichen Schwierigkeitswechsel, nur wenn niemand, ob lebend oder gefallen, drinnen ist, und zwischen Rücksetzungen gilt eine kurze Abklingzeit. Bei falscher Schwierigkeit warnt euch das Spiel vor dem Start. Der Schlachtzug wird so niemals zurückgesetzt; seine eigenen Bindungsregeln bleiben bestehen.',
+  'guide.gear.itemLevelBody':
+    'Aktiviere Gegenstandsstufe anzeigen in den Optionen, um zwei Ausrüstungsteile schnell zu vergleichen. Ausrüstung bekannter Herkunft, von Gegnern, Quests und Handwerksberufen, zeigt dann eine Gegenstandsstufe: eine einzelne Zahl, die ihre Stärke anhand der Quelle grob angibt und Verbesserungen auch über verschiedene Plätze hinweg vergleichbar macht. Teile ohne solche Herkunft, etwa einfache Händlerware und Startausrüstung, zeigen keine Gegenstandsstufe; eine fehlende Zahl ist normal.',
+  'guide.professions.craftHowBody':
+    'Öffne das Handwerksfenster (Standardtaste T), um alle bekannten Rezepte, ihre Zutaten und deinen Vorrat zu sehen; sind die Materialien vorhanden, genügt ein Klick. Gewöhnliche Rezepte lassen sich überall herstellen. Einige fortgeschrittene Rezepte, darunter höherstufige Werkzeuge und seltene Zaubererrüstung, erfordern dagegen das Handwerkszentrum in Highwatch.',
 };

@@ -7611,4 +7611,15 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'welcome.armory.cta': 'Træd ind i verden, og udforsk Våbenhuset',
   'welcome.news.new': 'Ny',
   'welcome.news.viewAll': 'Se alle opdateringer på GitHub',
+  'entities.letters.heroic_marks_reward.sender': 'Heroisk kvartermester',
+  'entities.letters.heroic_marks_reward.subject': 'Dine heroiske mærker',
+  'entities.letters.heroic_marks_reward.body':
+    'Din gruppe klarede den heroiske prøve, mens du kæmpede i bagtroppen eller lå faldet. Din låsning blev også registreret, så din andel af de heroiske mærker blev sendt hertil i stedet for at gå tabt. Brug dem godt.\n\n- Heroisk kvartermester',
+  'guide.dungeonsPage.resetTitle': 'Nulstilling af dine instanser',
+  'guide.dungeonsPage.resetBody':
+    'Hvis du skifter sværhedsgrad, mens gruppen stadig har krævede gennemløb, bliver de gamle krav stående et stykke tid. Gruppelederen kan straks opgive dem ved at vælge Nulstil alle instanser i menuen på sit eget portræt eller skrive /dungeon reset. Sværhedsgraden skal faktisk være ændret, ingen levende eller faldne må være indenfor, og der er en kort nedkøling mellem nulstillinger. Ved døren på forkert sværhedsgrad advarer spillet før start. Raidet nulstilles aldrig sådan; dets egne låsningsregler gælder.',
+  'guide.gear.itemLevelBody':
+    'Slå Vis genstandsniveau til i indstillingerne for hurtigt at sammenligne to dele. Udstyr med en kendt kilde, fra fjender, opgaver og håndværksfag, viser derefter et genstandsniveau: et enkelt tal, der omtrent angiver styrken ud fra oprindelsen og gør opgraderinger sammenlignelige, selv på tværs af pladser. Dele uden en sådan kilde, som simple handelsvarer og startudstyr, viser intet niveau; et manglende tal er normalt.',
+  'guide.professions.craftHowBody':
+    'Åbn håndværksvinduet (standardtast T) for at se alle kendte opskrifter, deres krav og dine materialer; når materialerne er der, er ét klik nok. Almindelige opskrifter kan fremstilles overalt. Nogle avancerede opskrifter, herunder værktøj på højt niveau og sjældne rustninger til magikere, kræver håndværkscentret i Highwatch.',
 };

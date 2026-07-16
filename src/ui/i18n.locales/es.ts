@@ -7777,4 +7777,15 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'welcome.armory.cta': 'Entrar al Mundo y explorar la Armería',
   'welcome.news.new': 'Nuevo',
   'welcome.news.viewAll': 'Ver todas las actualizaciones en GitHub',
+  'entities.letters.heroic_marks_reward.sender': 'Intendente heroico',
+  'entities.letters.heroic_marks_reward.subject': 'Tus Marcas heroicas',
+  'entities.letters.heroic_marks_reward.body':
+    'Tu grupo superó la prueba heroica mientras luchabas en la retaguardia o yacías derrotado. Tu bloqueo también quedó registrado, así que tu parte de las Marcas heroicas llegó aquí en vez de perderse. Úsalas bien.\n\n- Intendente heroico',
+  'guide.dungeonsPage.resetTitle': 'Restablecer tus instancias',
+  'guide.dungeonsPage.resetBody':
+    'Si cambias la dificultad mientras tu grupo aún conserva recorridos reclamados, las reclamaciones anteriores permanecen un tiempo antes de borrarse solas. El líder del grupo puede liberarlas de inmediato: elige Restablecer todas las instancias en el menú de su propio retrato o escribe /dungeon reset. Solo funciona después de cambiar realmente la dificultad, cuando no queda nadie dentro, vivo o caído, y hay un breve tiempo de espera entre restablecimientos. Si llegas a la entrada con la dificultad equivocada, el juego te avisa antes de comenzar. La banda nunca se restablece así; conserva sus propias reglas de bloqueo.',
+  'guide.gear.itemLevelBody':
+    'Para comparar rápidamente dos piezas, activa Mostrar nivel de objeto en las opciones. El equipo de origen conocido, obtenido de enemigos, misiones y profesiones de artesanía, mostrará un nivel de objeto: una cifra que aproxima su poder según su procedencia y permite ver de un vistazo qué mejora pesa más, incluso entre ranuras distintas. Las piezas sin ese origen, como los artículos básicos de vendedor y el equipo inicial, no muestran nivel de objeto; que falte la cifra es normal, no un error.',
+  'guide.professions.craftHowBody':
+    'Abre la ventana de Artesanía (tecla T de forma predeterminada) para ver todas las recetas que conoces, lo que requiere cada una y los materiales que tienes; cuando estén disponibles, basta un clic. Las recetas comunes pueden elaborarse en cualquier lugar. Algunas recetas avanzadas, como herramientas de nivel superior y armaduras raras para taumaturgos, exigen estar en el centro de artesanía de Highwatch.',
 };

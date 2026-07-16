@@ -7634,4 +7634,16 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'welcome.armory.cta': 'Dünyaya gir ve Cephaneliğe göz at',
   'welcome.news.new': 'Yeni',
   'welcome.news.viewAll': "GitHub'daki tüm güncellemeleri görüntüle",
+  'entities.letters.heroic_marks_reward.sender': 'Kahraman levazım subayı',
+  'entities.letters.heroic_marks_reward.subject': 'Kahramanlık Nişanların',
+  'entities.letters.heroic_marks_reward.body':
+    'Birliğin kahramanlık sınavını temizlerken sen arka saflarda savaşıyor ya da yerde yatıyordun. Kilidin yine de kaydedildi, bu yüzden Kahramanlık Nişanlarından payın kaybolmak yerine buraya gönderildi. Onları iyi kullan.\n\n- Kahraman levazım subayı',
+  'guide.dungeonsPage.resetTitle': 'Örneklerini sıfırlama',
+  'guide.dungeonsPage.resetBody':
+    'Grubun sahiplenilmiş koşuları tutarken zorluğu değiştirirsen eski haklar kendiliğinden silinmeden önce bir süre kalır. Grup lideri kendi portre menüsünden Tüm Örnekleri Sıfırla seçeneğini seçerek veya /dungeon reset yazarak bunları hemen bırakabilir. Zorluk gerçekten değiştirilmiş olmalı, içeride canlı ya da düşmüş hiç kimse kalmamalı ve sıfırlamalar arasında kısa bir bekleme süresi vardır. Kapıya yanlış zorlukta gelirsen oyun başlamadan önce uyarır. Baskın bu şekilde asla sıfırlanmaz; kendi kilit kuralları geçerlidir.',
+  'guide.gear.itemLevelBody':
+    'İki parçayı hızlıca karşılaştırmak için seçeneklerden Eşya Seviyesini Göster’i aç. Düşmanlardan, görevlerden ve üretim mesleklerinden gelen, kaynağı bilinen teçhizat bir eşya seviyesi gösterir: kaynağına göre gücünü yaklaşık belirten tek bir sayı, farklı yuvalar arasında bile hangi yükseltmenin daha etkili olduğunu gösterir. Basit satıcı eşyaları ve başlangıç teçhizatı gibi böyle bir kaynağı olmayan parçalarda seviye görünmez; sayının olmaması normaldir.',
+  'guide.professions.craftHowBody':
+    'Bildiğin tüm tarifleri, gerekenleri ve elindeki malzemeleri görmek için Üretim penceresini (varsayılan T tuşu) aç; malzemeler hazırsa tek tıklama yeter. Yaygın tarifler dünyanın her yerinde üretilebilir. Yüksek seviye aletler ve nadir büyücü zırhları gibi bazı gelişmiş tarifler ise Highwatch üretim merkezinde bulunmanı ister.',
+  'guide.professions.craftHowTitle': 'Üretim penceresi',
 };

@@ -7826,4 +7826,22 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'welcome.armory.cta': 'Entrer dans le monde et parcourir l’Armurerie',
   'welcome.news.new': 'Nouveau',
   'welcome.news.viewAll': 'Voir toutes les mises à jour sur GitHub',
+  'entities.letters.heroic_marks_reward.sender': 'Intendant héroïque',
+  'entities.letters.heroic_marks_reward.subject': 'Vos Marques héroïques',
+  'entities.letters.heroic_marks_reward.body':
+    'Votre groupe a triomphé de l’épreuve héroïque pendant que vous combattiez à l’arrière ou gisiez à terre. Votre verrouillage a tout de même été enregistré, alors votre part de Marques héroïques vous est envoyée ici au lieu d’être perdue. Faites-en bon usage.\n\n- Intendant héroïque',
+  'guide.dungeonsPage.resetTitle': 'Réinitialiser vos instances',
+  'guide.dungeonsPage.resetBody':
+    'Si vous changez de difficulté alors que votre groupe détient encore des parcours revendiqués, les anciennes revendications persistent un moment avant de disparaître. Le chef de groupe peut les abandonner immédiatement : choisissez Réinitialiser toutes les instances dans le menu de son portrait, ou saisissez /dungeon reset. La difficulté doit réellement avoir changé, personne, vivant ou mort, ne doit rester à l’intérieur, et un court délai sépare deux réinitialisations. Si vous arrivez à l’entrée avec la mauvaise difficulté, le jeu vous avertit avant le début. Le raid n’est jamais réinitialisé ainsi ; ses propres règles de verrouillage restent en vigueur.',
+  'guide.gear.itemLevelBody':
+    'Pour comparer rapidement deux pièces, activez Afficher le niveau d’objet dans les options. L’équipement dont la provenance est connue, obtenu sur les ennemis, par les quêtes ou les métiers, affiche alors un niveau d’objet : une valeur unique qui estime sa puissance d’après sa source et permet de repérer la meilleure amélioration, même entre emplacements différents. Les pièces sans telle provenance, comme les articles de base des marchands et l’équipement de départ, n’en affichent pas ; cette absence est normale.',
+  'guide.professions.craftHowBody':
+    'Ouvrez la fenêtre d’artisanat (touche T par défaut) pour voir toutes vos recettes, leurs composants et ce que vous possédez ; lorsque les matériaux sont réunis, un clic suffit. Les recettes courantes se fabriquent partout. Quelques recettes avancées, dont des outils de haut niveau et de rares armures de lanceur de sorts, exigent toutefois le centre d’artisanat de Highwatch.',
+  'guide.gear.qualityBody':
+    'Chaque objet possède une qualité, et son nom prend la couleur correspondante afin que sa valeur soit lisible en un coup d’œil. Du plus courant au plus précieux :',
+  'guide.gear.qualityCommon': 'Commun',
+  'guide.professions.craftHowTitle': 'La fenêtre d’artisanat',
+  'guide.professions.focusTitle': 'Focalisation de la ville',
+  'guide.professions.focusBody':
+    'Chaque ville principale propose un panneau de Focalisation de la ville aux récolteurs de passage : restez en ville, ouvrez-le près de la minicarte et attribuez un petit capital de points aux types de composants qui vous intéressent. Plus un composant reçoit de focalisation, plus les dépouilles suivantes en fournissent une version fine et abondante. Cette répartition suit votre personnage et peut être modifiée gratuitement lors de chaque visite en ville.',
 };
