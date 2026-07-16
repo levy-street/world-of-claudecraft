@@ -203,7 +203,6 @@ import {
   TARGET_FRAME_POS_KEY,
 } from './frame_pos_reset';
 import { FrontierIncursionPainter } from './frontier_incursion_painter';
-import { gossipMenuIsEmpty } from './gossip_menu';
 import { holderTierBadgeDataUrl, holderTierByIndex, holderTierDisplayName } from './holder_tier';
 import { isSelfOnlyAbility } from './hud/action_bar/ability_self_only';
 import {
