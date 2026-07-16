@@ -149,10 +149,7 @@ function runMindfractureRefresh(talented: boolean): {
   sim.entities.set(target.id, target);
   sim.rebucket(target);
   sim.targetEntity(target.id);
-  sim.player.facing = Math.atan2(
-    target.pos.x - sim.player.pos.x,
-    target.pos.z - sim.player.pos.z,
-  );
+  sim.player.facing = Math.atan2(target.pos.x - sim.player.pos.x, target.pos.z - sim.player.pos.z);
 
   const own: Aura = {
     id: 'shadow_word_pain',
@@ -184,7 +181,10 @@ function runMindfractureRefresh(talented: boolean): {
   return { own, foreign, draws };
 }
 
-function runMindfractureSpread(talented: boolean, includeOwnedDirge = true): {
+function runMindfractureSpread(
+  talented: boolean,
+  includeOwnedDirge = true,
+): {
   primaryOwn: Aura | undefined;
   nearbyOwn: Aura | undefined;
   nearbyForeign: Aura;
@@ -253,9 +253,7 @@ function runMindfractureSpread(talented: boolean, includeOwnedDirge = true): {
   const owned = (target: typeof primary) =>
     target.auras.find(
       (aura) =>
-        aura.kind === 'dot' &&
-        aura.id === 'shadow_word_pain' &&
-        aura.sourceId === sim.playerId,
+        aura.kind === 'dot' && aura.id === 'shadow_word_pain' && aura.sourceId === sim.playerId,
     );
   return {
     primaryOwn: owned(primary),

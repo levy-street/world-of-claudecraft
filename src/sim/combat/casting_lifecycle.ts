@@ -844,10 +844,7 @@ function applyChannelTick(
         }
       } else if (eff.type === 'extendDot') {
         extendOwnedDot(tgt, src.id, eff.dot, eff.seconds, eff.maxBonus);
-      } else if (
-        eff.type === 'channelFinisher' &&
-        channelTickNumber === res.def.channel?.ticks
-      ) {
+      } else if (eff.type === 'channelFinisher' && channelTickNumber === res.def.channel?.ticks) {
         detonateChannelFinisher(ctx, src, tgt, res.def, eff);
       }
     }

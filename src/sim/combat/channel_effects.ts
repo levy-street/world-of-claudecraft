@@ -32,14 +32,6 @@ export function detonateChannelFinisher(
   });
   for (const hostile of ctx.hostilesInRadius(source, center.pos, effect.radius)) {
     if (!ctx.hasLineOfSight(center, hostile)) continue;
-    ctx.dealDamage(
-      source,
-      hostile,
-      effect.amount,
-      false,
-      ability.school,
-      ability.name,
-      'hit',
-    );
+    ctx.dealDamage(source, hostile, effect.amount, false, ability.school, ability.name, 'hit');
   }
 }
