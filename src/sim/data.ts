@@ -120,7 +120,7 @@ export {
 } from './content/delves';
 
 import { DELVE_ITEMS } from './content/delves/items';
-import { HEROIC_ITEMS } from './content/heroic_loot';
+import { HEROIC_ITEMS, RETIRED_HEROIC_ITEMS } from './content/heroic_loot';
 import { buildHeroicVariants } from './content/heroic_variants';
 import { HEROIC_VENDOR_ITEMS } from './content/heroic_vendor';
 import { FURY_NPC, WARFARE_ITEMS } from './content/pvp_honor';
@@ -166,6 +166,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   DELVE_ITEMS,
   HEROIC_VENDOR_ITEMS,
   HEROIC_ITEMS,
+  RETIRED_HEROIC_ITEMS,
   WARFARE_ITEMS,
 );
 

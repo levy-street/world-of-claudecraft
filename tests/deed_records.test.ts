@@ -92,7 +92,7 @@ beforeEach(async () => {
   // vi.restoreAllMocks does not touch module-factory vi.fn mocks, so a held
   // or rejecting blob write set by one test must not leak into the next.
   saveStateMock.mockReset();
-  saveStateMock.mockImplementation(async () => {});
+  saveStateMock.mockImplementation(async () => true);
 });
 
 afterEach(async () => {
@@ -659,11 +659,10 @@ describe('deedUnlocked through GameServer.detectActivity', () => {
 
     let releaseSave: () => void = () => {};
     const saveSpy = vi.spyOn(server, 'saveCharacter');
-    saveStateMock.mockImplementation(
-      () =>
-        new Promise<void>((resolve) => {
-          releaseSave = resolve;
-        }),
+    saveStateMock.mockImplementation(() =>
+      new Promise<void>((resolve) => {
+        releaseSave = resolve;
+      }).then(() => true),
     );
     (server as unknown as { detectActivity(events: unknown[]): void }).detectActivity([
       { type: 'deedUnlocked', pid: session.pid, deedId: 'gone_deed' },
@@ -700,17 +699,15 @@ describe('deedUnlocked through GameServer.detectActivity', () => {
     let releaseFirst: () => void = () => {};
     let releaseSecond: () => void = () => {};
     saveStateMock
-      .mockImplementationOnce(
-        () =>
-          new Promise<void>((resolve) => {
-            releaseFirst = resolve;
-          }),
+      .mockImplementationOnce(() =>
+        new Promise<void>((resolve) => {
+          releaseFirst = resolve;
+        }).then(() => true),
       )
-      .mockImplementationOnce(
-        () =>
-          new Promise<void>((resolve) => {
-            releaseSecond = resolve;
-          }),
+      .mockImplementationOnce(() =>
+        new Promise<void>((resolve) => {
+          releaseSecond = resolve;
+        }).then(() => true),
       );
     const detect = (server as unknown as { detectActivity(events: unknown[]): void })
       .detectActivity;
@@ -807,7 +804,7 @@ describe('deedUnlocked through GameServer.detectActivity', () => {
 
     // The next successful save publishes the whole backlog in ONE batch in
     // event order (three deferred ids: a multi-deed drain).
-    saveStateMock.mockImplementation(async () => {});
+    saveStateMock.mockImplementation(async () => true);
     await server.saveCharacter(session);
     await settle();
     expect(insertMock).not.toHaveBeenCalled();
@@ -835,11 +832,10 @@ describe('deedUnlocked through GameServer.detectActivity', () => {
     insertMock.mockClear();
 
     let releaseSave: () => void = () => {};
-    saveStateMock.mockImplementation(
-      () =>
-        new Promise<void>((resolve) => {
-          releaseSave = resolve;
-        }),
+    saveStateMock.mockImplementation(() =>
+      new Promise<void>((resolve) => {
+        releaseSave = resolve;
+      }).then(() => true),
     );
     (server as unknown as { detectActivity(events: unknown[]): void }).detectActivity([
       { type: 'deedUnlocked', pid: session.pid, deedId: 'prog_veteran' },

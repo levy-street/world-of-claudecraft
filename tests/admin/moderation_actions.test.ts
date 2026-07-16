@@ -61,6 +61,19 @@ describe('moderation_actions', () => {
     expect(unban.pending.body).toEqual({ reason: 'appeal accepted' });
   });
 
+  it('builds a timed Daily Rewards ban with a whole-hour duration', () => {
+    const timed = banDailyRewards(42, 'automated play', 12);
+    if (!('pending' in timed)) throw new Error('expected pending');
+    expect(timed.pending.body).toEqual({ reason: 'automated play', durationHours: 12 });
+
+    expect(banDailyRewards(42, 'automated play', 0)).toEqual({
+      errorKey: 'alert.dailyRewardsBanDurationInvalid',
+    });
+    expect(banDailyRewards(42, 'automated play', 1.5)).toEqual({
+      errorKey: 'alert.dailyRewardsBanDurationInvalid',
+    });
+  });
+
   it('builds reason-required Daily Rewards IP ban requests', () => {
     expect(moderateDailyRewardsIp(42, '203.0.113.4', true, '')).toEqual({
       errorKey: 'alert.noteRequired',

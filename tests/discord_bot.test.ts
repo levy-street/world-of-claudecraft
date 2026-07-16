@@ -299,6 +299,8 @@ describe('daily rewards winner cards', () => {
   it('formats the top-10 daily rewards winners without pings', () => {
     const msg = buildDailyRewardWinnersMessage({
       day: '2026-06-30',
+      taskName: 'Complete quests',
+      nextTaskName: 'Win an arena match',
       realm: 'Claudemoon',
       prizePoolUsd: 150,
       finalizedAt: '2026-07-01T00:00:00.000Z',
@@ -327,6 +329,7 @@ describe('daily rewards winner cards', () => {
     }) as {
       allowed_mentions: unknown;
       embeds: Array<{
+        author: { name: string };
         title: string;
         description: string;
         fields: Array<{ name: string; value: string; inline: boolean }>;
@@ -334,13 +337,14 @@ describe('daily rewards winner cards', () => {
     };
 
     expect(msg.allowed_mentions).toEqual({ parse: [] });
+    expect(msg.embeds[0].author).toEqual({ name: 'Task: Complete quests' });
     expect(msg.embeds[0].title).toBe('Top 2 Winners - 2026-06-30');
     expect(msg.embeds[0].description).toContain('**#1** titoisking - 12,345 pts - $30.00 (20%)');
     expect(msg.embeds[0].description).toContain('**#2** alice - 1,000 pts - $22.50 (15%)');
-    expect(msg.embeds[0].fields).toContainEqual({
-      name: 'Prize Pool',
-      value: '$150.00',
-      inline: true,
-    });
+    expect(msg.embeds[0].fields).toEqual([
+      { name: 'Realm', value: 'Claudemoon', inline: true },
+      { name: 'Prize Pool', value: '$150.00', inline: true },
+      { name: 'Next task', value: 'Win an arena match', inline: false },
+    ]);
   });
 });

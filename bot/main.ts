@@ -90,10 +90,10 @@ async function main(): Promise<void> {
   await ensureTierRoles();
   await refreshTierRoles();
 
-  // Resolve the staff/special role ids by name (Levy St / Admin / Core Dev /
-  // Devs / Mods / Artists, including catalog aliases so guild-side renames keep
-  // matching), so each member's top special role can be pushed to the game
-  // (name color + tag).
+  // Resolve the staff/special role ids by name (every DISCORD_SPECIAL_ROLES
+  // entry, staff and community alike, including catalog aliases so guild-side
+  // renames keep matching), so each member's top special role can be pushed to
+  // the game (name color + tag).
   const specialRoleIds = new Map<string, string>(); // role key -> guild role id
   const refreshSpecialRoles = async (): Promise<void> => {
     const roles = await discord.guildRoles(cfg.guildId);

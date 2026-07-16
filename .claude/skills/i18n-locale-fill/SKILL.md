@@ -45,15 +45,12 @@ volume is large, then regenerate once at the end.
 - **The placeholder guard flags a bare "todo" value**, which is also a real word in es/pt.
   Phrase such fills differently (for example "por hacer") so the guard does not trip.
 
-## 3. Regenerate, re-baseline, verify
+## 3. Regenerate, verify
 
 1. `npm run i18n:gen` regenerates the resolved bundles and the status registry.
 2. **Stage the regenerated artifacts in the SAME commit as the fills.** The freshness gate
    diffs the regenerated output against the staged/committed copies; unstaged artifacts fail it.
-3. If the resolved-table hash check fails (`tests/i18n_resolved_equivalence.test.ts`), the
-   change was supposed to alter the table: re-baseline with
-   `node scripts/i18n_resolved_hash.mjs --write` in the same commit.
-4. Prove completion: run the i18n steps release-tier,
+3. Prove completion: run the i18n steps release-tier,
    `I18N_RELEASE_TIER=1 npm run gate` (or at minimum `i18n:gen` + the guard tests), and
    confirm zero `pending` rows remain.
 

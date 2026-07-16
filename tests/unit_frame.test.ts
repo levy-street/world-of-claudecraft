@@ -79,6 +79,8 @@ describe('unitFrameView: the present / hidden gate', () => {
       titlePost: '',
       portraitKey: '',
       absorbFrac: 0,
+      absorbStartFrac: 0,
+      absorbSizeFrac: 0,
       absorbOvershield: false,
       dead: false,
       outOfRange: false,
@@ -125,9 +127,9 @@ describe('unitFrameView: TWO-DESCRIPTOR contract (the FULL field set)', () => {
     expect(v.outOfRange).toBe(false);
   });
 
-  it('drives a TARGET-shaped descriptor: no resource bar (resClass none), boss level glyph, dead, no shield', () => {
-    // A dead boss target: present and shown, but with no resource bar, a skull glyph
-    // for the level, "Dead" hp text, and a null absorb input. The player instance
+  it('drives a TARGET-shaped descriptor: no resource bar, numeric boss level, dead, no shield', () => {
+    // A dead boss target: present and shown, but with no resource bar, a numeric
+    // level over the CSS emblem, "Dead" hp text, and a null absorb input. The player instance
     // never sees these values; the target instance fills them in with no core
     // change.
     const v = unitFrameView({
@@ -137,7 +139,7 @@ describe('unitFrameView: TWO-DESCRIPTOR contract (the FULL field set)', () => {
       resourceKind: 'none',
       resFrac: 0,
       resText: '',
-      levelText: '☠', // the boss skull glyph
+      levelText: '62',
       name: 'Nythraxis',
       portraitKey: 'mob:nythraxis',
       absorb: null,
@@ -147,7 +149,7 @@ describe('unitFrameView: TWO-DESCRIPTOR contract (the FULL field set)', () => {
     expect(v.present).toBe(true);
     expect(v.resClass).toBe('none');
     expect(v.hpText).toBe('Dead');
-    expect(v.levelText).toBe('☠');
+    expect(v.levelText).toBe('62');
     expect(v.dead).toBe(true);
     expect(v.absorbFrac).toBe(0);
   });
