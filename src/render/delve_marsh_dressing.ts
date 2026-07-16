@@ -12,10 +12,113 @@ import {
 import type { DungeonLayout } from '../sim/dungeon_layout';
 import { polygonXAtZ } from '../sim/geometry2d';
 import { hash2 } from '../sim/rng';
+import { loadGltf } from './assets/loader';
+import { registerPreload } from './assets/preload';
 import { GFX, surfaceMat } from './gfx';
 
 // Stable seed for all hash2 calls in this module (render-only dressing, no sim state).
 const MARSH_SEED = 0x4c69746e; // 'Litn' in ASCII
+
+// GLB-backed anchor kinds (Tripo-generated, see public/models/props). Each has
+// a procedural fallback (kept below, used only for pre-load races / headless
+// test hosts) that draws the SAME representative shape the GLB replaced.
+// 'dead_tree'/'reed_cluster'/'sluice_post' lose their per-instance hash2-driven
+// branch/stalk/rope variety when the GLB is loaded (one fixed model instead of
+// many procedural variants); acceptable per-instance trade for real art.
+type MarshGlbAnchorKind =
+  | 'plank_bridge'
+  | 'shrine_fragment'
+  | 'corpse_candle'
+  | 'broken_bell_frame'
+  | 'sluice_post'
+  | 'dead_tree'
+  | 'reed_cluster';
+
+const MARSH_ASSET_URL: Record<MarshGlbAnchorKind, string> = {
+  plank_bridge: '/models/props/marsh_plank_bridge.glb',
+  shrine_fragment: '/models/props/marsh_shrine_fragment.glb',
+  corpse_candle: '/models/props/marsh_corpse_candle.glb',
+  broken_bell_frame: '/models/props/marsh_bell_gallows.glb',
+  sluice_post: '/models/props/marsh_sluice_post.glb',
+  dead_tree: '/models/props/marsh_dead_tree.glb',
+  reed_cluster: '/models/props/marsh_reed_cluster.glb',
+};
+
+// Uniform-rescale target per kind, matched to the footprint the procedural
+// fallback it replaces was authored against (mirrors delve_props.ts
+// buildStandaloneGlb, which normalizes to the procedural prop's original
+// target height via a Box3 measure/rescale). 'span' measures the model's
+// local-X extent (its longest authored axis before any placement rotation);
+// 'height' measures local-Y. Without this every GLB here landed at whatever
+// size Tripo normalized it to, not the size its layout was authored against.
+const MARSH_ASSET_SCALE: Record<MarshGlbAnchorKind, { axis: 'x' | 'y'; target: number }> = {
+  // addPlankBridge's three BoxGeometry(2.4, 0.12, 0.45) planks span x
+  // [-1.75, 1.75]: a 3.5 yd deck, not the GLB's 0.45 yd bounding box.
+  plank_bridge: { axis: 'x', target: 3.5 },
+  // addShrineFragment's BoxGeometry(1.4, 0.9, 0.35) slab.
+  shrine_fragment: { axis: 'x', target: 1.4 },
+  // addCorpseCandleProp's wax cylinder (0.55 tall) plus its flame sphere
+  // (0.14 radius, seated to y 0.62) tops out around 0.76.
+  corpse_candle: { axis: 'y', target: 0.76 },
+  // addBrokenBellFrame's two BoxGeometry(0.25, 2.8, 0.25) posts.
+  broken_bell_frame: { axis: 'y', target: 2.8 },
+  // addSluicePost's tapered CylinderGeometry post, height 2.0-2.4.
+  sluice_post: { axis: 'y', target: 2.2 },
+  // addDeadTree's trunk CylinderGeometry, height 3.2-4.8.
+  dead_tree: { axis: 'y', target: 4.0 },
+  // addReedCluster's tallest stalk, height 1.2-2.6.
+  reed_cluster: { axis: 'y', target: 1.9 },
+};
+
+const loadedMarshGltf = new Map<MarshGlbAnchorKind, THREE.Group>();
+
+if (typeof window !== 'undefined') {
+  for (const [kind, url] of Object.entries(MARSH_ASSET_URL) as [MarshGlbAnchorKind, string][]) {
+    registerPreload(
+      loadGltf(url).then((gltf) => {
+        loadedMarshGltf.set(kind, gltf.scene);
+      }),
+    );
+  }
+}
+
+function placeLoadedMarshAsset(
+  group: THREE.Group,
+  kind: MarshGlbAnchorKind,
+  x: number,
+  z: number,
+  rot: number,
+): boolean {
+  const loaded = loadedMarshGltf.get(kind);
+  if (!loaded) return false;
+  const inst = loaded.clone(true);
+  inst.traverse((child) => {
+    if (child instanceof THREE.Mesh) {
+      child.castShadow = true;
+      child.receiveShadow = true;
+    }
+  });
+  // Rescale before rotating: the target dimension is measured on the
+  // authored (unrotated) local axes, so a placement yaw must not be applied
+  // until after the Box3 measure below.
+  const scaleSpec = MARSH_ASSET_SCALE[kind];
+  const size = new THREE.Vector3();
+  new THREE.Box3().setFromObject(inst).getSize(size);
+  const measured = scaleSpec.axis === 'x' ? size.x : size.y;
+  if (measured > 1e-3) inst.scale.setScalar(scaleSpec.target / measured);
+  const seated = new THREE.Box3().setFromObject(inst);
+  inst.position.y -= seated.min.y;
+  inst.position.x += x;
+  inst.position.z += z;
+  inst.rotation.y = rot;
+  group.add(inst);
+  return true;
+}
+
+/** Test-only window into the preload asset set (mirrors gather_nodes.ts). */
+export const marshDressingPreloadInternalsForTest = {
+  marshAssetUrl: MARSH_ASSET_URL,
+};
 
 /** Minimal sink matching dungeon Placements.add (kit prop names). */
 export interface MarshPlacementSink {
@@ -130,7 +233,7 @@ function addPlankBridge(group: THREE.Group, x: number, z: number, rot = 0): void
   }
 }
 
-function addShrineFragment(group: THREE.Group, x: number, z: number, rot = 0): void {
+function addShrineSlab(group: THREE.Group, x: number, z: number, rot = 0): void {
   const stone = surfaceMat({
     color: 0x5a6058,
     roughness: 0.9,
@@ -140,6 +243,12 @@ function addShrineFragment(group: THREE.Group, x: number, z: number, rot = 0): v
   slab.position.set(x, 0.45, z);
   slab.rotation.y = rot;
   group.add(slab);
+}
+
+// The additive glow: kept outside the GLB/procedural branch (like
+// yumi_maze.ts's flames and door_portal.ts's swirl) so the GLB shrine
+// fragment still reads as lit in a pitch-dark delve instead of going dark.
+function addShrineGlow(group: THREE.Group, x: number, z: number): void {
   const glow = new THREE.Mesh(
     new THREE.PlaneGeometry(0.5, 0.5),
     new THREE.MeshBasicMaterial({
@@ -155,7 +264,7 @@ function addShrineFragment(group: THREE.Group, x: number, z: number, rot = 0): v
   group.add(glow);
 }
 
-function addCorpseCandleProp(group: THREE.Group, x: number, z: number, rot = 0): void {
+function addCorpseCandleWax(group: THREE.Group, x: number, z: number, rot = 0): void {
   const wax = surfaceMat({
     color: 0xc8e8d0,
     emissive: 0x3a8a5a,
@@ -167,6 +276,11 @@ function addCorpseCandleProp(group: THREE.Group, x: number, z: number, rot = 0):
   candle.position.set(x, 0.28, z);
   candle.rotation.y = rot;
   group.add(candle);
+}
+
+// The additive flame: kept outside the GLB/procedural branch (see
+// addShrineGlow above) so the corpse candle keeps its glow with the GLB body.
+function addCorpseCandleFlame(group: THREE.Group, x: number, z: number): void {
   const flame = new THREE.Mesh(
     new THREE.SphereGeometry(0.14, 8, 8),
     new THREE.MeshBasicMaterial({ color: 0x7fe6b0, transparent: true, opacity: 0.85 }),
@@ -320,28 +434,51 @@ function placeDressingAnchor(group: THREE.Group, anchor: LitanyDressingAnchor): 
   const rot = anchor.rot ?? 0;
   switch (anchor.kind) {
     case 'reed_cluster':
-      addReedCluster(group, anchor.x, anchor.z, rot);
+      if (!placeLoadedMarshAsset(group, 'reed_cluster', anchor.x, anchor.z, rot)) {
+        addReedCluster(group, anchor.x, anchor.z, rot);
+      }
       break;
     case 'plank_bridge':
-      addPlankBridge(group, anchor.x, anchor.z, rot);
+      if (!placeLoadedMarshAsset(group, 'plank_bridge', anchor.x, anchor.z, rot)) {
+        addPlankBridge(group, anchor.x, anchor.z, rot);
+      }
       break;
     case 'shrine_fragment':
-      addShrineFragment(group, anchor.x, anchor.z, rot);
+      if (!placeLoadedMarshAsset(group, 'shrine_fragment', anchor.x, anchor.z, rot)) {
+        addShrineSlab(group, anchor.x, anchor.z, rot);
+      }
+      addShrineGlow(group, anchor.x, anchor.z);
       break;
     case 'corpse_candle':
-      addCorpseCandleProp(group, anchor.x, anchor.z, rot);
+      if (!placeLoadedMarshAsset(group, 'corpse_candle', anchor.x, anchor.z, rot)) {
+        addCorpseCandleWax(group, anchor.x, anchor.z, rot);
+      }
+      addCorpseCandleFlame(group, anchor.x, anchor.z);
       break;
     case 'bell_fragment':
+      // No dressing module ever authors a 'bell_fragment' anchor (the bell
+      // now lives inside marsh_bell_gallows.glb / addBrokenBellFrame); no GLB
+      // preload for it, procedural-only so this branch is dead in practice
+      // but stays for LitanyDressingAnchor exhaustiveness.
       addBellFragment(group, anchor.x, anchor.z, rot);
       break;
     case 'broken_bell_frame':
-      addBrokenBellFrame(group, anchor.x, anchor.z, rot);
+      // The GLB (marsh_bell_gallows.glb) already includes the bell, so it
+      // fully replaces frame + addBellFragment composition; the fallback
+      // keeps drawing them separately.
+      if (!placeLoadedMarshAsset(group, 'broken_bell_frame', anchor.x, anchor.z, rot)) {
+        addBrokenBellFrame(group, anchor.x, anchor.z, rot);
+      }
       break;
     case 'dead_tree':
-      addDeadTree(group, anchor.x, anchor.z, rot);
+      if (!placeLoadedMarshAsset(group, 'dead_tree', anchor.x, anchor.z, rot)) {
+        addDeadTree(group, anchor.x, anchor.z, rot);
+      }
       break;
     case 'sluice_post':
-      addSluicePost(group, anchor.x, anchor.z, rot);
+      if (!placeLoadedMarshAsset(group, 'sluice_post', anchor.x, anchor.z, rot)) {
+        addSluicePost(group, anchor.x, anchor.z, rot);
+      }
       break;
     case 'root_wall':
       addRootWall(group, anchor.x, anchor.z, rot);

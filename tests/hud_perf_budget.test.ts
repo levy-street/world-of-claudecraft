@@ -560,6 +560,7 @@ function idleWorld(): ActionBarWorldInput {
       gcdRemaining: 0,
       potionCdRemaining: 0,
       queuedOnSwing: null,
+      stealthed: false,
       pos: { x: 0, y: 0, z: 0 },
     },
     target: null,
@@ -585,7 +586,7 @@ describe('hud_perf_budget ARM 2: per-frame allocation budget (Node, npm test)', 
         slots: [
           {
             slotIndex: 0,
-            isAttack: false,
+            isAttack: () => false,
             hasAction: () => true,
             ability: () => ({
               def: {

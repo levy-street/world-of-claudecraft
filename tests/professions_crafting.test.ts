@@ -628,3 +628,40 @@ describe('self-gathered crafting bonus (#1145)', () => {
     expect(sim.countItem('bone_fragments', pid)).toBe(0);
   });
 });
+
+describe('craft-completion event carries audio-relevant data (#1729)', () => {
+  it('a completed craft emits a personal craftResult carrying quality (rare distinguishable) and pid', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    grantItem(sim, 'spider_leg', 1, pid);
+
+    sim.drainEvents();
+    // The coordinator command (not the pure resolveCraft) is what emits the
+    // craftResult event the client hooks audio onto.
+    sim.craftItem('recipe_tough_jerky', pid);
+    const craft = sim.drainEvents().find((e) => e.type === 'craftResult');
+    if (craft?.type !== 'craftResult') throw new Error('expected a craftResult event');
+    expect(craft.ok).toBe(true);
+    // Personal: carries the acting player's pid so the server routes it only to
+    // the crafter (delivered-to-acting-player acceptance criterion).
+    expect(craft.pid).toBe(pid);
+    // quality is present on a completed craft so the client can distinguish a
+    // rare-quality result from a common one for a special cue. A skill-0 crafter
+    // always rolls common (the rarity ladder puts all weight there at skill 0),
+    // so this exact value is seed-independent.
+    expect(craft.quality).toBe('common');
+  });
+
+  it('a denied craft still emits a craftResult, with ok:false, no quality, and a reason', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    // No materials granted: the insufficient_materials denial path.
+    sim.drainEvents();
+    sim.craftItem('recipe_tough_jerky', pid);
+    const craft = sim.drainEvents().find((e) => e.type === 'craftResult');
+    if (craft?.type !== 'craftResult') throw new Error('expected a craftResult event');
+    expect(craft.ok).toBe(false);
+    expect(craft.quality).toBeUndefined();
+    expect(craft.reason).toBe('insufficient_materials');
+  });
+});

@@ -35,7 +35,7 @@ import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import { getArchetypeTitle, getHobbyCraft } from '../sim/professions/archetype';
 import type { MaterialRarity } from '../sim/professions/gathering';
 import { emptyCraftSkills } from '../sim/professions/wheel';
-import { computeQuestState, type ResolvedAbility } from '../sim/sim';
+import type { ResolvedAbility } from '../sim/sim';
 import {
   type DeedStats,
   type DungeonDifficulty,
@@ -97,7 +97,9 @@ import {
   type SocialInfo,
   type TradeInfo,
 } from '../world_api';
-import { isTransientReconnectRejection } from './reconnect_policy';
+import { computeBackoffDelay } from './backoff';
+import { optimisticQuestState } from './quest_state_optimistic';
+import { isTransientReconnectRejection, isTransientTimeoutRejection } from './reconnect_policy';
 
 // ---------------------------------------------------------------------------
 // REST
@@ -272,14 +274,17 @@ export class Api {
   }
 
   // Live status for a realm (population + reachability), for the realm picker.
-  async realmStatus(url: string): Promise<{ online: boolean; players: number }> {
+  // `cap` is the realm admission cap (players_cap): a positive number is the real
+  // refusal point; 0 means the cap is disabled or the server predates the field.
+  async realmStatus(url: string): Promise<{ online: boolean; players: number; cap: number }> {
     try {
       const res = await fetch(apiUrl('/api/status', url), { signal: AbortSignal.timeout(3000) });
-      if (!res.ok) return { online: false, players: 0 };
+      if (!res.ok) return { online: false, players: 0, cap: 0 };
       const d = await res.json();
-      return { online: true, players: d.players_online ?? 0 };
+      const cap = typeof d.players_cap === 'number' && d.players_cap > 0 ? d.players_cap : 0;
+      return { online: true, players: d.players_online ?? 0, cap };
     } catch {
-      return { online: false, players: 0 };
+      return { online: false, players: 0, cap: 0 };
     }
   }
 
@@ -901,8 +906,13 @@ const DESPAWN_GRACE_MS = 600;
 // Auto-reconnect backoff for an unexpectedly dropped game socket. The server
 // holds the character in-world (linkdead) for five minutes; the retry window
 // is deliberately longer, since past the grace a successful auth simply
-// performs a fresh join from the last save. 1s, 2s, 4s, 8s, then 15s apart:
-// 40 attempts spans roughly nine minutes before giving up for good.
+// performs a fresh join from the last save. Roughly 1s, 2s, 4s, 8s, then 15s
+// apart, with each delay spread over a 0.5x to 1.5x jitter band and clamped at
+// the 15s cap (computeBackoffDelay) so many clients dropped by one server blip
+// do not retry in lockstep. The clamp trims the band's upper half once the
+// schedule reaches the cap, so across 40 attempts the total runs from roughly
+// 4.6 minutes (every draw at the floor) to 9.4 minutes (every draw at the
+// ceiling), with an expected total near 8 minutes, before giving up for good.
 const RECONNECT_BASE_DELAY_MS = 1_000;
 const RECONNECT_MAX_DELAY_MS = 15_000;
 const RECONNECT_MAX_ATTEMPTS = 40;
@@ -971,6 +981,8 @@ function blankEntity(id: number): Entity {
     critChance: 0.05,
     critRating: 0,
     hasteRating: 0,
+    hitRating: 0,
+    hitBonus: 0,
     critDmgSpellBonus: 0,
     critDmgPhysBonus: 0,
     critDmgHealBonus: 0,
@@ -1010,6 +1022,7 @@ function blankEntity(id: number): Entity {
     chargePath: [],
     followTargetId: null,
     sitting: false,
+    weaponStowed: false,
     eating: null,
     drinking: null,
     aiState: 'idle',
@@ -1135,6 +1148,11 @@ export class ClientWorld implements IWorld {
   // arenaInfo.match.fiesta and its dynamics flow over the events queue. ---
   duelInfo: DuelInfo | null = null;
   arenaInfo: ArenaInfo | null = null;
+  // --- IWorldDungeonFinder: group-finder state, mirrored from the snapshot
+  // self (`s.df` personal blob + `s.dfb` shared board, both delta-omitted: a
+  // missing key keeps the prior mirror, an explicit null clears it). ---
+  dungeonFinderInfo: import('../world_api').DungeonFinderInfo | null = null;
+  dungeonFinderBoard: import('../world_api').DungeonFinderBoard | null = null;
   honor = 0;
   lifetimeHonor = 0;
   // --- IWorldValeCup: Vale Cup queue/match state, mirrored from the snapshot
@@ -1207,15 +1225,16 @@ export class ClientWorld implements IWorld {
   professionsState: PlayerProfessionsView = { skills: [] };
   // #1143: persistent town focus allocation, mirrored from the self-wire `tfocus`.
   townFocus: Record<string, number> = {};
-  // Stub for #1121: per-node respawn state is server-authoritative and not yet
-  // wired onto the snapshot (see src/sim/professions/CLAUDE.md), so the client
-  // cannot know another player's, or even its own, real per-node timer yet.
-  // Always reports harvestable; the server re-validates and denies via a
-  // normal error event on an actual attempt, same as every other authoritative
-  // action (see src/net/CLAUDE.md "Never predict an outcome"). Wiring the real
-  // per-player timer is future work once the snapshot carries it.
-  nodeHarvestableByMe(_nodeId: string): boolean {
-    return true;
+  // Per-node respawn readiness (#1121, wired #1866): mirrored from the `ncd`
+  // self-wire delta below, same shape/semantics as `cooldowns` (remaining
+  // seconds as of the last snapshot that changed it; a node with no entry is
+  // ready). The server remains authoritative and re-validates on the actual
+  // `harvest_node` command; this is purely the client's own read of its own
+  // per-player timer, not a prediction of the harvest outcome (src/net/CLAUDE.md
+  // "Never predict an outcome").
+  private nodeCooldowns: Map<string, number> | undefined = new Map();
+  nodeHarvestableByMe(nodeId: string): boolean {
+    return !this.nodeCooldowns?.has(nodeId);
   }
   // Static content read (#1127, extended #1132): the full recipe list (common
   // tier plus combo recipes) ships with the client bundle like every other
@@ -1284,6 +1303,11 @@ export class ClientWorld implements IWorld {
   // consecutive 'character already in world' rejections during a reconnect;
   // see src/net/reconnect_policy.ts for why these are tolerated (bounded)
   private conflictRejections = 0;
+  // consecutive 'authentication timed out' rejections during a reconnect (a
+  // server event-loop stall under saturation, or a database failure that
+  // interrupted the handshake server-side); tolerated on its own bound,
+  // see src/net/reconnect_policy.ts
+  private timeoutRejections = 0;
   private reconnectTimer: number | undefined;
   // set by close() and by a server 'error' frame: the session is over for
   // good, so a subsequent socket close must not schedule a reconnect
@@ -1348,9 +1372,17 @@ export class ClientWorld implements IWorld {
     if (this.sessionEnded) return;
     if (this.ws.readyState === WebSocket.OPEN) return;
     if (this.reconnectTimer !== undefined) {
+      // Retry soon, but with a short random spread (0 to 1000 ms) rather than
+      // instantly, so a fleet of tabs foregrounded together (a phone unlock, a
+      // laptop wake) does not stampede the reconnect endpoint on the same beat.
+      // Reusing reconnectTimer means endSession still clears it and a second
+      // visibilitychange while it is pending takes the clearTimeout branch
+      // below: never two live timers, never a double openSocket.
       clearTimeout(this.reconnectTimer);
-      this.reconnectTimer = undefined;
-      this.openSocket();
+      this.reconnectTimer = window.setTimeout(() => {
+        this.reconnectTimer = undefined;
+        this.openSocket();
+      }, Math.random() * 1000);
       return;
     }
     // No reconnect scheduled yet but the socket is not open: onclose was
@@ -1385,6 +1417,16 @@ export class ClientWorld implements IWorld {
   private socketClosed(): void {
     this.connected = false;
     if (this.sessionEnded) return;
+    // A pending reconnect timer means this close is a duplicate signal of the
+    // SAME physical drop: on the zombie-socket path the visibility handler
+    // drives socketClosed manually and the socket's late real onclose lands
+    // right behind it. One drop counts once: keep the already-scheduled retry
+    // and return, rather than burning a second attempt, re-firing
+    // onConnectionLost, or, at the attempt cap, ending the session while a
+    // legitimate final retry is still pending. (A pending timer can never
+    // belong to a different drop: no socket is open while one is pending, and
+    // the timer clears its own handle before opening the next socket.)
+    if (this.reconnectTimer !== undefined) return;
     if (this.reconnectAttempts >= RECONNECT_MAX_ATTEMPTS) {
       this.endSession();
       this.onDisconnect?.('Connection to the server was lost.');
@@ -1392,11 +1434,19 @@ export class ClientWorld implements IWorld {
     }
     this.reconnectAttempts++;
     this.onConnectionLost?.();
-    const delayMs = Math.min(
+    const delayMs = computeBackoffDelay(
+      this.reconnectAttempts,
+      RECONNECT_BASE_DELAY_MS,
       RECONNECT_MAX_DELAY_MS,
-      RECONNECT_BASE_DELAY_MS * 2 ** (this.reconnectAttempts - 1),
+      Math.random,
     );
-    this.reconnectTimer = window.setTimeout(() => this.openSocket(), delayMs);
+    // Clear our own handle when the timer fires: a stale handle left in
+    // reconnectTimer would make a later visibility event (while the socket is
+    // still CONNECTING) take the pending-timer branch and open a second socket.
+    this.reconnectTimer = window.setTimeout(() => {
+      this.reconnectTimer = undefined;
+      this.openSocket();
+    }, delayMs);
   }
 
   private endSession(): void {
@@ -1569,6 +1619,7 @@ export class ClientWorld implements IWorld {
         // any stale mirrored entities fall out via the snapshot prune
         this.reconnectAttempts = 0;
         this.conflictRejections = 0;
+        this.timeoutRejections = 0;
         this.inputSeq = 0;
         this.lastInputSig = '';
         this.lastInputSentAt = 0;
@@ -1622,6 +1673,15 @@ export class ClientWorld implements IWorld {
         isTransientReconnectRejection(msg.error, this.reconnectAttempts, this.conflictRejections)
       ) {
         this.conflictRejections++;
+        return; // the server closes this socket; onclose schedules the retry
+      }
+      // Mid-reconnect, 'authentication timed out' is the other transient
+      // window: a server event-loop stall kept the handshake from processing
+      // the first auth frame in time, or a database failure interrupted the
+      // handshake server-side. Keep backing off; the next retry lands after
+      // the stall clears or the database recovers. Bounded on its own counter.
+      if (isTransientTimeoutRejection(msg.error, this.reconnectAttempts, this.timeoutRejections)) {
+        this.timeoutRejections++;
         return; // the server closes this socket; onclose schedules the retry
       }
       // any other server rejection (kick, moderation, takeover, failed auth)
@@ -1882,6 +1942,7 @@ export class ClientWorld implements IWorld {
       e.castTotal = w.castTot ?? 0;
       e.channeling = !!w.chan;
       e.sitting = !!w.sit;
+      e.weaponStowed = !!w.ws;
       e.aggroTargetId = w.aggro ?? null;
       e.tappedById = w.tap ?? null;
       e.ownerId = w.own ?? null;
@@ -2005,6 +2066,13 @@ export class ClientWorld implements IWorld {
         e.cooldowns.clear();
         for (const k in s.cds) e.cooldowns.set(k, Number(s.cds[k]));
       }
+      // Reassigns rather than clear()+rebuild: unlike the per-Entity `cooldowns`
+      // Map (always constructed by the shared entity factory), this field lives
+      // on ClientWorld itself, and a hand-built test fixture (`Object.create`,
+      // see tests/CLAUDE.md) may not have pre-initialized it.
+      if (s.ncd !== undefined) {
+        this.nodeCooldowns = new Map(Object.entries(s.ncd).map(([k, v]) => [k, Number(v)]));
+      }
       e.gcdRemaining = s.gcd ?? 0;
       e.potionCdRemaining = s.pcd ?? 0;
       e.comboPoints = s.combo ?? 0;
@@ -2026,11 +2094,13 @@ export class ClientWorld implements IWorld {
       e.spellHaste = s.sh ?? 0;
       e.critChance = s.crit ?? 0.05;
       e.dodgeChance = s.dodge ?? 0.05;
-      // Crit/haste RATING are informational paper-doll stats (combat values ride
-      // crit/sh above); sent always like the other self stats so the online
-      // character sheet shows them instead of the blankEntity 0. Server-recomputed.
+      // Crit/haste/hit RATING are informational paper-doll stats (combat values ride
+      // crit/sh above, and hit resolves server-side); sent always like the other self
+      // stats so the online character sheet shows them instead of the blankEntity 0.
+      // Server-recomputed.
       e.critRating = s.crat ?? 0;
       e.hasteRating = s.hrat ?? 0;
+      e.hitRating = s.hirat ?? 0;
       e.weapon = s.weapon ?? e.weapon;
       e.eating = s.eat
         ? { itemId: '', kind: 'food', hpPer2s: 0, manaPer2s: 0, remaining: s.eat.remaining }
@@ -2116,6 +2186,8 @@ export class ClientWorld implements IWorld {
       if (s.trade !== undefined) this.tradeInfo = s.trade;
       if (s.duel !== undefined) this.duelInfo = s.duel;
       if (s.arena !== undefined) this.arenaInfo = s.arena;
+      if (s.df !== undefined) this.dungeonFinderInfo = s.df;
+      if (s.dfb !== undefined) this.dungeonFinderBoard = s.dfb;
       if (s.honor !== undefined) this.honor = s.honor ?? 0;
       if (s.lhonor !== undefined) this.lifetimeHonor = s.lhonor ?? 0;
       if (s.vcup !== undefined) this.cupInfo = s.vcup;
@@ -2208,15 +2280,13 @@ export class ClientWorld implements IWorld {
   // -----------------------------------------------------------------------
 
   questState(questId: string): QuestState {
-    const state = computeQuestState(questId, this.questLog, this.questsDone, this.player.level);
-    const pending = this.pendingQuestCommands?.get(questId);
-    if (
-      (pending === 'accept' && state === 'available') ||
-      (pending === 'turnin' && state === 'ready')
-    ) {
-      return 'active';
-    }
-    return state;
+    return optimisticQuestState(
+      questId,
+      this.questLog,
+      this.questsDone,
+      this.pendingQuestCommands,
+      this.player.level,
+    );
   }
 
   consumeInventoryChanged(): boolean {
@@ -2366,6 +2436,14 @@ export class ClientWorld implements IWorld {
   equipItem(itemId: string): void {
     this.cmd({ cmd: 'equip', item: itemId });
   }
+  moveInventoryItem(from: number, to: number): void {
+    this.cmd({ cmd: 'inv_move', from, to });
+  }
+  // Same 'equip' wire token with the aimed slot attached: an older server that
+  // ignores the field simply resolves the slot itself, so the field is additive.
+  equipItemToSlot(itemId: string, slot: EquipSlot): void {
+    this.cmd({ cmd: 'equip', item: itemId, slot });
+  }
   unequipItem(slot: EquipSlot): void {
     this.cmd({ cmd: 'unequip_item', slot });
   }
@@ -2420,6 +2498,14 @@ export class ClientWorld implements IWorld {
   claimEventSkin(skin: number): void {
     const idx = Math.max(0, Math.floor(skin));
     this.cmd({ cmd: 'claim_event_skin', skin: idx });
+  }
+  toggleWeaponStow(): void {
+    // Optimistic local nudge (like changeSkin/playEmote) so the sheathe pose and
+    // its sound cue land instantly; the server re-validates (dead-gate) and the
+    // next snapshot's `ws` bit reconciles.
+    const p = this.entities.get(this.playerId);
+    if (p && !p.dead) p.weaponStowed = !p.weaponStowed;
+    this.cmd({ cmd: 'stow_weapon' });
   }
   unequipMechChroma(chromaId: string): void {
     const itemId = mechChromaItemId(chromaId);
@@ -2601,6 +2687,38 @@ export class ClientWorld implements IWorld {
   }
   arenaAugmentPick(augmentId: string): void {
     this.cmd({ cmd: 'arena_augment', augment: augmentId });
+  }
+  // --- IWorldDungeonFinder: group-finder sends (dungeonFinderInfo and
+  // dungeonFinderBoard are snapshot reads, decoded in applySnapshot). ---
+  dungeonFinderSetRoles(roles: import('../sim/content/talents').Role[]): void {
+    this.cmd({ cmd: 'df_roles', roles });
+  }
+  dungeonFinderQueueJoin(activityIds: string[]): void {
+    this.cmd({ cmd: 'df_queue', activities: activityIds });
+  }
+  dungeonFinderQueueLeave(): void {
+    this.cmd({ cmd: 'df_queue_leave' });
+  }
+  dungeonFinderRespond(accept: boolean): void {
+    this.cmd({ cmd: 'df_proposal', accept });
+  }
+  dungeonFinderListingCreate(
+    activityId: string,
+    tags: import('../sim/content/dungeon_finder').FinderListingTag[],
+  ): void {
+    this.cmd({ cmd: 'df_list_create', activity: activityId, tags });
+  }
+  dungeonFinderListingClose(): void {
+    this.cmd({ cmd: 'df_list_close' });
+  }
+  dungeonFinderApply(listingId: number): void {
+    this.cmd({ cmd: 'df_apply', listing: listingId });
+  }
+  dungeonFinderApplyCancel(): void {
+    this.cmd({ cmd: 'df_apply_cancel' });
+  }
+  dungeonFinderApplicationRespond(applicantPid: number, accept: boolean): void {
+    this.cmd({ cmd: 'df_app_respond', applicant: applicantPid, accept });
   }
   // --- IWorldValeCup: boarball queue sends (cupInfo is a snapshot read; the
   // sport-kit swap rides the heavy `sport` self field decoded in applySnapshot). ---

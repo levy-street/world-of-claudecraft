@@ -43,6 +43,14 @@ Turns the player's keyboard/mouse/touch/gamepad into **movement intent** +
 - **`AudioContext` needs a user gesture**: `audio.init()`/`music.init()`/`sfx.init()`
   are called from `enterWorld` in `main.ts`, not at module load. `setVolume` is safe
   before init. (`voice.ts` uses a plain `Audio` element, so it has no gated init.)
+- **SFX assets follow one standard.** Every clip under `public/audio/sfx/` is MP3
+  44.1 kHz, 192 kbps, normalized loudness, and mono, EXCEPT non-positional
+  ambience beds explicitly flagged `stereo: true` in the catalog. Positioned
+  point ambience such as `amb_campfire` and `amb_forge` stays mono; global beds
+  such as `amb_water` retain stereo. The full standard (format, loudness, channel
+  policy per playback path, bitrate ceiling, naming) is
+  `docs/design/sound_effects.md`, enforced by `scripts/sfx_conform.mjs`
+  (`npm run sfx:check`).
 - **SFX mix and speed are runtime data.** The generated SFX manifest resolves the
   category baseline plus per-key fine tune from `scripts/sfx/sfx_gain_map.json`
   and per-key rate from `scripts/sfx/sfx_speed_map.json`. `sfx.ts` applies gain

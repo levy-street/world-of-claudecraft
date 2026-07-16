@@ -76,6 +76,10 @@ export function buildGatherNodes(seed: number): GatherNodesView {
     const y = terrainHeight(node.pos.x, node.pos.z, seed);
     obj.position.set(node.pos.x, y + NODE_Y_OFFSET[node.type], node.pos.z);
     obj.name = node.id;
+    // Click/tap-to-harvest target (#1866): the renderer raycasts clickable node
+    // meshes and reads this back to resolve which node was hit, the same
+    // userData convention entity views use for `entityId`.
+    obj.userData.gatherNodeId = node.id;
     group.add(obj);
   }
   return { group };

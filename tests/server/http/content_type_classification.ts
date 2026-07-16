@@ -129,6 +129,7 @@ export const API_CONTENT_TYPE: Readonly<Record<string, ContentTypeClass>> = {
   '/api/claudium/native/rails': PROBLEM_JSON,
   '/api/claudium/native/price/:rail': PROBLEM_JSON,
   '/api/claudium/native/balance/sol/:owner': PROBLEM_JSON,
+  '/api/claudium/native/balance/usdc/:owner': PROBLEM_JSON,
   '/api/claudium/native/quote': PROBLEM_JSON,
   '/api/claudium/native/confirm': PROBLEM_JSON,
   '/api/claudium/store': PROBLEM_JSON,

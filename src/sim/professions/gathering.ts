@@ -244,6 +244,21 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): void
   // level-gated the same way kill XP is: a max-level player farming a
   // trivial (gray) node gets zero.
   ctx.grantXp(gatherActionXp(node.level, p.level), meta);
+  // Gather-completion event (#1729): personal (pid), so the client can play a
+  // gathering audio cue for the acting player only. Emitted here on the granted
+  // path exactly like craftItem emits craftResult on a completed craft; carries
+  // the rolled rarity so a rare-material harvest is distinguishable for a
+  // special cue. Draws no rng, so the one-rarity-draw-per-harvest contract (see
+  // the rng-draw test) is unaffected.
+  ctx.emit({
+    type: 'gatherResult',
+    pid: meta.entityId,
+    nodeId: node.id,
+    nodeType: node.type,
+    professionId: result.professionId!,
+    itemId: result.itemId!,
+    rarity: result.rarity!,
+  });
 }
 
 export interface PendingGatherGrant {

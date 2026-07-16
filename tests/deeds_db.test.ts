@@ -4,13 +4,31 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 // the real modules load and every query goes through a spy (the
 // bank_ledger_db idiom). This pins the actual SQL the deeds boundary issues,
 // not a mock of it.
-const dbMock = vi.hoisted(() => ({ query: vi.fn(), connect: vi.fn() }));
+const dbMock = vi.hoisted(() => ({ query: vi.fn() }));
 vi.hoisted(() => {
   process.env.DATABASE_URL = 'postgres://test/test';
 });
 vi.mock('pg', () => ({
   Pool: function Pool() {
-    return { query: dbMock.query, connect: dbMock.connect };
+    // deedRarityCounts runs inside runWithStatementTimeout (server/db.ts): a
+    // dedicated pooled client issues BEGIN, SET LOCAL statement_timeout, the two
+    // real reads, then COMMIT. Model connect() as a client that answers the
+    // control statements itself and forwards the real queries back through the
+    // pool's own query, so the dbMock spy records exactly the two reads in order.
+    const poolObj = {
+      query: dbMock.query,
+      connect: async () => ({
+        query: (text: string, values?: unknown[]) =>
+          text === 'BEGIN' ||
+          text === 'COMMIT' ||
+          text === 'ROLLBACK' ||
+          text.startsWith('SET LOCAL')
+            ? Promise.resolve({ rows: [] })
+            : poolObj.query(text, values),
+        release() {},
+      }),
+    };
+    return poolObj;
   },
 }));
 

@@ -108,6 +108,7 @@
     --color-map-outline: #000;
     --color-map-portal-dot: #c084ff;
     --color-map-portal-label: #e0c0ff;
+    --color-map-ping: #ffd76a;
     --color-map-npc-quest: #ffd100;
     /* active-quest objective areas: the classic translucent blue quest-POI blob */
     --color-map-quest-area-fill: rgba(72, 132, 232, 0.22);

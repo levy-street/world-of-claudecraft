@@ -248,6 +248,31 @@ describe('sampled SFX loading', () => {
     expect(internals(player).buffers.get(cue)).toBe(loaded);
   });
 
+  it('retains both channels of the global water ambience bed', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => response()),
+    );
+    const { player, ctx } = startWithStartupCached();
+    ctx.decodedBuffer = {
+      duration: 2 / 48_000,
+      length: 2,
+      numberOfChannels: 2,
+      sampleRate: 48_000,
+      getChannelData(channel: number) {
+        return channel === 0 ? new Float32Array([1, 0]) : new Float32Array([0, 1]);
+      },
+    } as AudioBuffer;
+
+    const loaded = await (
+      player as unknown as { loadBuffer(key: string): Promise<AudioBuffer | null> }
+    ).loadBuffer('amb_water');
+
+    if (!loaded) throw new Error('water ambience did not load');
+    expect(SFX_CLIPS.amb_water.spatial).toBe(false);
+    expect(loaded.numberOfChannels).toBe(2);
+  });
+
   it('deduplicates a shared lazy fetch and decode across one-shots and loops', async () => {
     const gate = deferred<Response>();
     const fetchMock = vi.fn(() => gate.promise);
@@ -492,9 +517,16 @@ describe('sampled SFX loading', () => {
     expect(ctx.sources[0].started).toBe(true);
   });
 
-  it('cycles ordered runtime takes only when a one-shot source is accepted', () => {
+  it('no-repeat-randoms ordered runtime takes only when a one-shot source is accepted', () => {
     vi.stubGlobal('fetch', vi.fn());
+    // The previous variant is downweighted (weight 0.15 of 1), not excluded, so
+    // this needs three concrete roll values rather than one flat stub: 0 with no
+    // prior pick lands on index 0 (equal weights); 0.9 against weights [0.15, 1]
+    // (total 1.15) clears the first bucket and lands on index 1; 0 against
+    // weights [1, 0.15] (total 1.15) lands back on index 0 immediately.
+    const random = vi.spyOn(Math, 'random');
     const { player, ctx } = startWithStartupCached();
+    random.mockReturnValueOnce(0).mockReturnValueOnce(0.9).mockReturnValueOnce(0);
     const state = internals(player);
     const key = 'ui_click';
     const second = { duration: 0.6 } as AudioBuffer;
@@ -527,9 +559,87 @@ describe('sampled SFX loading', () => {
     expect(ctx.sources.map((source) => source.buffer)).toEqual([BUFFER, second, BUFFER]);
   });
 
+  function threeVariantClips(state: SfxInternals, key: keyof typeof SFX_CLIPS) {
+    const second = { duration: 0.6 } as AudioBuffer;
+    const third = { duration: 0.7 } as AudioBuffer;
+    const entry = SFX_CLIPS[key];
+    state.clips = {
+      ...state.clips,
+      [key]: {
+        ...entry,
+        variants: [
+          { ...entry.variants[0], id: '1' },
+          {
+            id: '2',
+            url: `/audio/sfx/blobs/${'a'.repeat(64)}.mp3`,
+            bytes: 1,
+            sha256: 'a'.repeat(64),
+          },
+          {
+            id: '3',
+            url: `/audio/sfx/blobs/${'b'.repeat(64)}.mp3`,
+            bytes: 1,
+            sha256: 'b'.repeat(64),
+          },
+        ],
+      },
+    };
+    state.buffers.set(`${key}:1`, second);
+    state.buffers.set(`${key}:2`, third);
+    return { second, third };
+  }
+
+  it('lands on a distinct variant across a 3-take pool when rolls clear the repeat weight', () => {
+    vi.stubGlobal('fetch', vi.fn());
+    const random = vi.spyOn(Math, 'random');
+    const { player, ctx } = startWithStartupCached();
+    const key = 'ui_click';
+    const { second, third } = threeVariantClips(internals(player), key);
+
+    // Drives every "which weight bucket does the roll land in" branch: first
+    // pick unweighted (equal odds over [0,1,2]); each following roll is high
+    // enough to clear the previous index's downweighted (0.15) bucket, landing
+    // on a fresh variant instead. See REPEAT_VARIANT_WEIGHT in sfx.ts.
+    random.mockReturnValueOnce(0); // equal weights [1,1,1] -> index 0
+    random.mockReturnValueOnce(0.3); // weights [0.15,1,1] clears bucket 0 -> index 1
+    random.mockReturnValueOnce(0.9); // weights [1,0.15,1] clears buckets 0-1 -> index 2
+    random.mockReturnValueOnce(0); // weights [1,1,0.15] -> index 0
+
+    for (let i = 0; i < 4; i++) player.playUi(key, { jitter: false });
+
+    const played = ctx.sources.map((source) => source.buffer);
+    expect(played).toEqual([BUFFER, second, third, BUFFER]);
+    for (let i = 1; i < played.length; i++) expect(played[i]).not.toBe(played[i - 1]);
+  });
+
+  it('can still repeat the immediately previous variant on a low roll, unlike hard exclusion', () => {
+    vi.stubGlobal('fetch', vi.fn());
+    const random = vi.spyOn(Math, 'random');
+    const { player, ctx } = startWithStartupCached();
+    const key = 'ui_click';
+    threeVariantClips(internals(player), key);
+
+    random.mockReturnValueOnce(0); // equal weights [1,1,1] -> index 0
+    // weights [0.15,1,1], total 2.15: a roll under 0.15 / 2.15 lands back in
+    // the downweighted bucket 0, repeating the immediately previous variant.
+    random.mockReturnValueOnce(0.05);
+
+    player.playUi(key, { jitter: false });
+    player.playUi(key, { jitter: false });
+
+    const played = ctx.sources.map((source) => source.buffer);
+    expect(played).toEqual([BUFFER, BUFFER]);
+  });
+
   it('does not advance the ordered take when cooldown rejects a positional play', () => {
     vi.stubGlobal('fetch', vi.fn());
+    // nextVariantIndex is called on every attempt, including a cooldown-rejected
+    // one, but commitVariant only fires once the play is accepted. So the
+    // rejected middle call still consumes a roll (value irrelevant, it is never
+    // committed) between the two that matter: see the weighting comment above.
+    const random = vi.spyOn(Math, 'random');
     const { player, ctx } = startWithStartupCached();
+    random.mockReturnValueOnce(0).mockReturnValueOnce(0.5).mockReturnValueOnce(0.9);
     const state = internals(player);
     const key = 'combat_crit';
     const second = { duration: 0.6 } as AudioBuffer;
@@ -565,7 +675,12 @@ describe('sampled SFX loading', () => {
 
   it('pins a loop to one runtime take while independent loop slots advance the cycle', () => {
     vi.stubGlobal('fetch', vi.fn());
+    // A reused loop id (the second 'cast:first' call) skips variant selection
+    // entirely (its slot already exists), so only two rolls happen: one for
+    // the id's first-ever pick, one for the second, distinct loop id.
+    const random = vi.spyOn(Math, 'random');
     const { player, ctx } = startWithStartupCached();
+    random.mockReturnValueOnce(0).mockReturnValueOnce(0.9);
     const state = internals(player);
     const key = 'cast_fire';
     const second = { duration: 0.6 } as AudioBuffer;

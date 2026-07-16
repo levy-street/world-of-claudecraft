@@ -17,7 +17,7 @@
 process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_deeds_board_sql';
 
 import type { PoolClient, QueryResult } from 'pg';
-import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { deedsBoardRanked, ELIGIBLE_ACCOUNT_SQL, ensureSchema, pool } from '../../server/db';
 import {
   computeDeedsBoard,
@@ -66,7 +66,31 @@ function queryResult(rows: unknown[]): QueryResult {
   return { command: '', rowCount: rows.length, oid: 0, fields: [], rows: rows as never[] };
 }
 
+// deedsBoardRanked now runs inside runWithStatementTimeout (server/db.ts): a
+// dedicated pooled client issues BEGIN, SET LOCAL statement_timeout, the real
+// reads, then COMMIT. Stub pool.connect to a client that answers those control
+// statements itself and forwards the real reads through the spied pool.query, so
+// the existing pool.query spies still capture exactly the real reads in order.
+function stubStatementTimeoutConnect(): void {
+  vi.spyOn(pool, 'connect').mockImplementation(
+    async () =>
+      ({
+        query: (text: string, values?: unknown[]) =>
+          text === 'BEGIN' ||
+          text === 'COMMIT' ||
+          text === 'ROLLBACK' ||
+          text.startsWith('SET LOCAL')
+            ? Promise.resolve({ rows: [] })
+            : (pool.query as (t: string, v?: unknown[]) => Promise<unknown>)(text, values),
+        release() {},
+      }) as unknown as PoolClient,
+  );
+}
+
 describe('deedsBoardRanked SQL shape (mocked pool)', () => {
+  beforeEach(() => {
+    stubStatementTimeoutConnect();
+  });
   afterEach(() => {
     vi.restoreAllMocks();
   });

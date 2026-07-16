@@ -100,7 +100,7 @@ const STATE_TTL_MINUTES = 10;
 // (the player may also type a password / 2FA code on the link path), a bit longer
 // than the OAuth state TTL since a human decision sits in the middle.
 const PENDING_LOGIN_TTL_MINUTES = 15;
-const DEFAULT_INVITE = 'https://discord.gg/GjhnUsBtw';
+const DEFAULT_INVITE = 'https://discord.com/invite/worldofclaudecraft';
 const NATIVE_DISCORD_REDIRECT = 'worldofclaudecraft://discord-auth';
 const NATIVE_REDIRECT_STATE_PREFIX = `${NATIVE_DISCORD_REDIRECT}?challenge=`;
 

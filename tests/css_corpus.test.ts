@@ -123,6 +123,7 @@ const INDEX_SECTIONS = [
   'bags',
   'social',
   'map',
+  'Dungeon Finder',
   'Ashen Coliseum (arena)',
   "The World Market (the Merchant's auction house)",
   'options / game menu (Esc)',
@@ -179,12 +180,12 @@ const PLAY_SECTIONS = INDEX_SECTIONS.filter((name) => !PLAY_OMITS.includes(name)
 const MANIFEST = INDEX_SECTIONS;
 
 describe('css_corpus section manifest', () => {
-  it('pins a non-vacuous manifest: 68 index + 66 play sections, no duplicate names', () => {
-    expect(INDEX_SECTIONS.length).toBe(68);
-    expect(PLAY_SECTIONS.length).toBe(66);
-    expect(MANIFEST.length).toBe(68);
-    expect(new Set(INDEX_SECTIONS).size).toBe(68);
-    expect(new Set(PLAY_SECTIONS).size).toBe(66);
+  it('pins a non-vacuous manifest: 69 index + 67 play sections, no duplicate names', () => {
+    expect(INDEX_SECTIONS.length).toBe(69);
+    expect(PLAY_SECTIONS.length).toBe(67);
+    expect(MANIFEST.length).toBe(69);
+    expect(new Set(INDEX_SECTIONS).size).toBe(69);
+    expect(new Set(PLAY_SECTIONS).size).toBe(67);
   });
 
   it('captures the live corpus markers (the marker regex is non-vacuous, not a zero match)', () => {

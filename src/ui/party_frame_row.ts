@@ -24,7 +24,7 @@ import { type AuraInput, type AurasDeps, createAurasView } from './auras_view';
 import { t } from './i18n';
 import { iconDataUrl } from './icons';
 import type { PainterHostWriters } from './painter_host';
-import type { PartyFrameMember } from './party_frames';
+import { type PartyFrameMember, partyFrameAuraIsRelevant } from './party_frames';
 import { svgIcon } from './ui_icons';
 import { UnitFramePainter } from './unit_frame_painter';
 
@@ -52,10 +52,12 @@ export interface PartyRowSlot {
 }
 
 /** Row interaction callbacks the Hud supplies (target on click / Enter / Space, the
- *  context menu on right-click or the Menu key). */
+ *  context menu on right-click or the Menu key, and the hover tracking behind
+ *  Clique-style mouseover casts: pid on enter, null on leave). */
 export interface PartyRowDeps {
   onTarget: (pid: number) => void;
   onContextMenu: (pid: number, name: string, x: number, y: number) => void;
+  onHover: (pid: number | null) => void;
 }
 
 /** A pooled row: its container element, the live slot, the per-row family painter the
@@ -65,12 +67,13 @@ export interface PartyRow {
   el: HTMLElement;
   slot: PartyRowSlot;
   painter: UnitFramePainter;
-  badges: { dead: HTMLElement; combat: HTMLElement; oor: HTMLElement };
+  badges: { dead: HTMLElement; combat: HTMLElement; oor: HTMLElement; offline: HTMLElement };
   // The aria-hidden leader-star span (the pool writes the glyph through the elided
   // writer) and the visually-hidden raid-group span (the pool writes the localized
   // "Group n"); both are per-frame text the pool drives, the spans built once here.
   leadStar: HTMLElement;
   group: HTMLElement;
+  incoming: HTMLElement;
   relocalize: () => void;
   /** Repaint the member's mini aura strip (its own keyed AurasPainter pool per row).
    *  Called by the pool on each signature-gated sync, never per frame. */
@@ -114,6 +117,10 @@ export function partyRowHandlers(slot: PartyRowSlot, deps: PartyRowDeps) {
         deps.onTarget(slot.member.pid);
       }
     },
+    // Mouseover-cast hover tracking: reads the LIVE slot like the others, so a
+    // recycled row under the cursor reports its current member.
+    mouseenter: (): void => deps.onHover(slot.member.pid),
+    mouseleave: (): void => deps.onHover(null),
   };
 }
 
@@ -122,7 +129,11 @@ export function partyRowHandlers(slot: PartyRowSlot, deps: PartyRowDeps) {
 // a DECORATIVE status cue (aria-hidden): the row's accessible name stays the member's
 // identity (name + level), not the badge glyph; the localized `title` is a sighted
 // hover tooltip the pool re-localizes on a language switch (see relocalize).
-function buildBadge(doc: Document, modifier: 'dead' | 'combat' | 'oor', icon: string): HTMLElement {
+function buildBadge(
+  doc: Document,
+  modifier: 'dead' | 'combat' | 'oor' | 'offline',
+  icon: string,
+): HTMLElement {
   const badge = doc.createElement('span');
   badge.className = `pf-badge ${modifier}`;
   badge.setAttribute('aria-hidden', 'true');
@@ -171,12 +182,15 @@ export function createPartyRow(
   const combatBadge = buildBadge(doc, 'combat', svgIcon('arena'));
   const oorBadge = buildBadge(doc, 'oor', '');
   oorBadge.textContent = OUT_OF_RANGE_GLYPH;
+  const offlineBadge = buildBadge(doc, 'offline', '');
+  offlineBadge.textContent = '!';
   // Re-localize the three badge tooltips (called once now, and again by the pool on a
   // language switch, since the keyed pool reuses the row DOM and never rebuilds it).
   const relocalize = () => {
     deadBadge.title = t('hud.social.status.dead');
     combatBadge.title = t('hud.social.status.combat');
     oorBadge.title = t('hud.errors.outOfRange');
+    offlineBadge.title = t('hud.social.status.offline');
   };
   relocalize();
   // The level chip. The leader marker (a decorative star) lives in its OWN aria-hidden
@@ -193,7 +207,7 @@ export function createPartyRow(
   const leadNum = doc.createElement('span');
   leadNum.className = 'lead-num';
   lead.append(leadStar, leadNum);
-  meta.append(deadBadge, combatBadge, oorBadge, lead);
+  meta.append(deadBadge, combatBadge, oorBadge, offlineBadge, lead);
 
   // The raid-group cue (e.g. "Group 1"), visually hidden but kept in the accessible name
   // so a screen reader conveys which raid group a member sits in. Empty outside raid; the
@@ -209,7 +223,13 @@ export function createPartyRow(
   hpBar.className = 'bar hp';
   const hpFill = doc.createElement('div');
   hpFill.className = 'bar-fill';
-  hpBar.append(hpFill);
+  const hpAbsorb = doc.createElement('div');
+  hpAbsorb.className = 'bar-absorb';
+  const incoming = doc.createElement('div');
+  incoming.className = 'pfm-incoming';
+  const hpText = doc.createElement('span');
+  hpText.className = 'pfm-hp-text';
+  hpBar.append(hpFill, incoming, hpAbsorb, hpText);
 
   const resBar = doc.createElement('div');
   resBar.className = 'bar';
@@ -230,11 +250,12 @@ export function createPartyRow(
   const paintAuras = (auras: readonly PartyMemberAura[]): void => {
     auraInputs.length = 0;
     for (const a of auras) {
+      if (!partyFrameAuraIsRelevant(a)) continue;
       auraInputs.push({
         id: a.id,
         name: a.id,
         kind: a.kind,
-        remaining: Number.POSITIVE_INFINITY,
+        remaining: a.remaining ?? Number.POSITIVE_INFINITY,
         value: a.neg ? -1 : 1,
       });
     }
@@ -247,6 +268,8 @@ export function createPartyRow(
   row.addEventListener('click', handlers.click);
   row.addEventListener('contextmenu', handlers.contextmenu);
   row.addEventListener('keydown', handlers.keydown);
+  row.addEventListener('mouseenter', handlers.mouseenter);
+  row.addEventListener('mouseleave', handlers.mouseleave);
 
   const painter = new UnitFramePainter(
     writers,
@@ -258,6 +281,8 @@ export function createPartyRow(
       // a clean number in the accessible name.
       level: leadNum,
       hpFill,
+      hpText,
+      absorb: hpAbsorb,
       resource: { container: resBar, fill: resFill },
     },
     {
@@ -276,16 +301,17 @@ export function createPartyRow(
     slot,
     painter,
     relocalize,
-    badges: { dead: deadBadge, combat: combatBadge, oor: oorBadge },
+    badges: { dead: deadBadge, combat: combatBadge, oor: oorBadge, offline: offlineBadge },
     leadStar,
     group,
+    incoming,
     paintAuras,
   };
 }
 
 /** The member-rows wrapper class. The wrapper nests every pooled member row one level
  *  under #party-frames so the mobile collapse chip, the rows, the master-loot control,
- *  and the Leave button stack as a simple column (chip alone on its own line), while the
+ *  and the master-loot control stack as a simple column (chip alone on its own line), while the
  *  rows themselves keep the 2-column auto-flow double-stack on the wrapper. */
 export const PARTY_ROWS_CLASS = 'party-rows';
 
@@ -298,15 +324,4 @@ export function createPartyRowsWrapper(doc: Document): HTMLElement {
   const el = doc.createElement('div');
   el.className = PARTY_ROWS_CLASS;
   return el;
-}
-
-/** Build the persistent "Leave Party" button (created once, its click listener
- *  attached once). The pool keeps it last in the container and re-localizes its label
- *  through the elided setText each rebuild. */
-export function createLeaveButton(doc: Document, onLeave: () => void): HTMLButtonElement {
-  const btn = doc.createElement('button');
-  btn.className = 'btn';
-  btn.id = 'party-leave';
-  btn.addEventListener('click', onLeave);
-  return btn;
 }

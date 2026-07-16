@@ -130,11 +130,14 @@ export interface MobileControlCallbacks {
   onDonate(): void;
   onEmotes(): void;
   onArena(): void;
+  onDungeonFinder(): void;
   /** Open the Vale Cup window (queue/roster board for the boarball minigame). */
   onValeCup(): void;
   onQuestLog(): void;
   onCharacter(): void;
   onBags(): void;
+  /** Open the Crafting window, folded into the More tray on mobile. */
+  onCrafting(): void;
   onSpellbook(): void;
   onTalents(): void;
   onMap(): void;
@@ -279,6 +282,17 @@ export class MobileControls {
   // owned by the router and never reach this canvas path.
   private pinchPointers = new Map<number, { x: number; y: number }>();
   private pinchPrevDist: number | null = null;
+  // Pointer ids for which releaseSwipeLook() has just performed its own
+  // deliberate releasePointerCapture() call. An explicit release also fires
+  // lostpointercapture per spec (same as an implicit one), and when a second
+  // finger lands mid pinch, onPinchDown -> releaseSwipeLook releases the
+  // swipe-look pointer's capture. Without this guard, the canvas
+  // lostpointercapture handler treats that echo as a real capture loss and
+  // tears down the pinch that just started (deletes the pointer, nulls
+  // pinchPrevDist), so the pinch is dead on arrival. Each id is consumed
+  // (deleted) by the handler the first time its echo is seen, rather than
+  // cleared on a timer, since the echo is not guaranteed to be synchronous.
+  private readonly releasingCaptureForPointer = new Set<number>();
   private swipeLookPointer: number | null = null;
   private swipeLookStartX = 0;
   private swipeLookStartY = 0;
@@ -418,6 +432,22 @@ export class MobileControls {
       this.onPinchEnd(e);
       this.onSwipeLookEnd(e);
     });
+    // iOS Safari can silently invalidate an active touch's pointer capture (a
+    // system gesture, Control Center swipe, an alert) WITHOUT ever firing
+    // pointerup or pointercancel. Without this, swipe-look/pinch state stays
+    // latched (setTouchLook never flips back), which reads to the player as
+    // the camera getting stuck spinning or losing rotate/zoom control
+    // (issue #1892). `lostpointercapture` is the one event guaranteed to
+    // fire when capture is lost, so treat it exactly like pointercancel here,
+    // mirroring the moveSurface/cameraJoystick handlers above.
+    this.canvas?.addEventListener('lostpointercapture', (e) => {
+      // Ignore the echo from releaseSwipeLook()'s own deliberate release (see
+      // releasingCaptureForPointer above): that release is already handled
+      // inline and must not also run onPinchEnd/onSwipeLookEnd here.
+      if (this.releasingCaptureForPointer.delete(e.pointerId)) return;
+      this.onPinchEnd(e);
+      this.onSwipeLookEnd(e);
+    });
 
     // Tap-outside-to-dismiss: while the More modal is open, a press anywhere
     // outside the modal closes it. The toggle button manages its own state, so
@@ -444,10 +474,12 @@ export class MobileControls {
     this.bindButton('mobile-donate', () => this.callbacks.onDonate());
     this.bindButton('mobile-emote', () => this.callbacks.onEmotes());
     this.bindButton('mobile-arena', () => this.callbacks.onArena());
+    this.bindButton('mobile-dfinder', () => this.callbacks.onDungeonFinder());
     this.bindButton('mobile-valecup', () => this.callbacks.onValeCup());
     this.bindButton('mobile-quest', () => this.callbacks.onQuestLog());
     this.bindButton('mobile-char', () => this.callbacks.onCharacter());
     this.bindButton('mobile-bags', () => this.callbacks.onBags());
+    this.bindButton('mobile-crafting', () => this.callbacks.onCrafting());
     this.bindButton('mobile-spellbook', () => this.callbacks.onSpellbook());
     this.bindButton('mobile-talents', () => this.callbacks.onTalents());
     this.bindButton('mobile-map', () => this.callbacks.onMap());
@@ -1051,6 +1083,7 @@ export class MobileControls {
     if (this.swipeLookPointer !== null) {
       try {
         if (this.canvas?.hasPointerCapture?.(this.swipeLookPointer)) {
+          this.releasingCaptureForPointer.add(this.swipeLookPointer);
           this.canvas.releasePointerCapture(this.swipeLookPointer);
         }
       } catch {

@@ -246,6 +246,7 @@ const FAMILY_ORDER = [
   'undead',
   'elemental',
   'dragonkin',
+  'reptile',
 ];
 // A creature only belongs in the public bestiary if it actually spawns in the open world,
 // i.e. it appears in a camp spawn list (CAMPS merges every zone's camps plus the temple's).

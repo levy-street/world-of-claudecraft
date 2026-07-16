@@ -2,6 +2,12 @@ import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { getActiveWorldContent, WORLD_MIN_Z } from '../sim/data';
+import {
+  DOCK_SECTION_LOCAL_Z,
+  DOCK_SECTION_SURFACE_Y,
+  dockSurfaceLine,
+  dockSurfaceYAt,
+} from '../sim/dock_layout';
 import { hash2 } from '../sim/rng';
 import { terrainHeight, waterLevel } from '../sim/world';
 import { loadGltf } from './assets/loader';
@@ -1183,17 +1189,21 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     const y = ground(d.x, d.z);
     const g = new THREE.Group();
     const key = d.x * 3.3 + d.z * 1.7;
-    for (let i = 0; i < 3; i++) {
-      // step each pier section down toward the water so the far legs stay
-      // grounded on a dropping shore (flat shores keep a level deck)
-      const lz = -1.05 - i * 2.13;
-      const wx = d.x + lz * Math.sin(d.rot);
-      const wz = d.z + lz * Math.cos(d.rot);
-      addParts(g, 'dockPlatform', {
-        z: lz,
-        y: Math.min(0, ground(wx, wz) - y + 0.15),
-        rot: (keyRand(key, i) - 0.5) * 0.04,
-        scale: [0.78, 0.52, 0.85],
+    const surfaceLine = dockSurfaceLine(d, ground);
+    const pitch = -Math.atan(surfaceLine.slope);
+    const zScale = 0.85 / Math.cos(pitch);
+    for (let i = 0; i < DOCK_SECTION_LOCAL_Z.length; i++) {
+      const lz = DOCK_SECTION_LOCAL_Z[i];
+      const section = new THREE.Group();
+      section.position.set(0, dockSurfaceYAt(surfaceLine, lz) - y, lz);
+      section.rotation.x = pitch;
+      g.add(section);
+      // Pivot around the plank surface, not the post feet. Every section then
+      // lies on the same analytic plane exposed by groundHeight. Compensating
+      // z scale preserves the authored footprint after the pitch projection.
+      addParts(section, 'dockPlatform', {
+        y: -DOCK_SECTION_SURFACE_Y,
+        scale: [0.78, 0.52, zScale],
       });
     }
     const hut = propAsset('house3');

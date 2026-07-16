@@ -19,6 +19,8 @@ scripts/*
 !scripts/build_sitemap.mjs
 !scripts/browserslist_targets.mjs
 !scripts/check_backdrop_survival.mjs
+!scripts/prod_cpu_game_helper.mjs
+!scripts/prod_cpu_profile_client.mjs
 !scripts/i18n_*.mjs
 !scripts/sfx/
 !scripts/sfx/**

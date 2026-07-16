@@ -142,6 +142,12 @@ After an extraction or fix, these stay green (run the subset your change touches
   change in thousands of unrelated reformats).
 - `npm run build` before a merge
 
+When the change is database-backed (SQL or a query call site, schema/indexes, query cadence
+or cardinality, pool/lock/timeout behavior, scheduled database work, or stored-data growth),
+get a read-only `database-performance-reviewer` checkpoint BEFORE implementing and carry its
+concrete bounds and evidence requirements into the test-first contract; re-run it on the
+finished diff.
+
 When you extract, the diff should read as move plus import, not rewrite. If you
 "improved" the moved code in the same change, that is scope creep: split it into a
 follow-up so the extraction stays reviewable. Delete the code you replaced; leave no

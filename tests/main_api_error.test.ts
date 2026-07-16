@@ -96,6 +96,49 @@ describe('userFacingApiError parametric codes', () => {
   });
 });
 
+describe('userFacingApiError transport / server-unreachable failures', () => {
+  it('maps a browser fetch failure (server unreachable) to the connection message', () => {
+    // When the game server is not running, the browser fetch in Api.post rejects with a
+    // TypeError and no HTTP status. The login/register form must show the localized
+    // connection message, not the raw "Failed to fetch" browser string.
+    expect(userFacingApiError(new TypeError('Failed to fetch'))).toBe(t('loading.connectionLost'));
+    expect(userFacingApiError(new TypeError('Failed to fetch'))).not.toBe('Failed to fetch');
+  });
+
+  it('recognizes the Firefox, Safari, and Node/undici transport wordings too', () => {
+    // Each engine words an unreachable-server fetch failure differently; all resolve to
+    // the same connection message rather than leaking their raw diagnostic text.
+    expect(
+      userFacingApiError(new TypeError('NetworkError when attempting to fetch resource.')),
+    ).toBe(t('loading.connectionLost'));
+    expect(userFacingApiError(new TypeError('Load failed'))).toBe(t('loading.connectionLost'));
+    expect(userFacingApiError(new TypeError('fetch failed'))).toBe(t('loading.connectionLost'));
+  });
+
+  it('does NOT treat a real HTTP 5xx from a reachable server as a transport failure', () => {
+    // A 500 that carries an HTTP status is an application error from a server that DID
+    // answer, not an unreachable server; it stays the English diagnostic (the
+    // "diagnostics stay English" rule), unchanged by the transport-failure detection.
+    const err = new ApiError('request failed (500)', 500);
+    expect(userFacingApiError(err)).toBe('request failed (500)');
+  });
+
+  it('maps the dev proxy missing-backend 502 to the connection message', () => {
+    // Vite answers a refused /api proxy connection with an empty HTTP 502 response.
+    // Api.post therefore throws this generic status-bearing error rather than the
+    // TypeError produced when fetch itself cannot reach its destination.
+    const err = new ApiError('request failed (502)', 502);
+    expect(userFacingApiError(err)).toBe(t('loading.connectionLost'));
+  });
+
+  it('requires a genuine TypeError before matching browser transport wording', () => {
+    expect(userFacingApiError(new Error('Load failed'))).toBe('Load failed');
+    expect(userFacingApiError(new Error('card upload failed (500)'))).toBe(
+      'card upload failed (500)',
+    );
+  });
+});
+
 describe('userFacingApiError prose fallback (un-migrated routes, until Phase 25)', () => {
   it('preserves the captured suspension date from the legacy prose message', () => {
     const err = new Error('This account is suspended until Wed, 09 Jul 2026 12:00:00 GMT.');
@@ -110,6 +153,16 @@ describe('userFacingApiError prose fallback (un-migrated routes, until Phase 25)
       t('loading.connectionLost'),
     );
     expect(userFacingApiError('rejected by server')).toBe(t('loading.connectionRejected'));
+    // The realm-at-capacity refusal: the server emit and the FATAL reconnect
+    // classification are pinned elsewhere; this pins the localization hop between
+    // them, so a drifted matcher literal or target key cannot silently regress the
+    // refusal overlay to raw English.
+    expect(userFacingApiError('realm is full')).toBe(t('loading.realmFull'));
+    // The per-IP connection-cap refusal takes the same localization hop, so its
+    // matcher literal and target key are pinned the same way.
+    expect(userFacingApiError('too many connections from your network')).toBe(
+      t('loading.tooManyConnections'),
+    );
   });
 
   it('re-localizes a moderation kick through tServer', () => {
@@ -190,6 +243,28 @@ describe('ApiError captures the stable code and params from the response body', 
     expect(err.message).toBe('boom');
     expect(err.code).toBeUndefined();
     expect(err.params).toBeUndefined();
+  });
+
+  it('end-to-end: an empty proxy 502 on registration renders as connection loss', async () => {
+    mockJson(502, {});
+    const err = await rejection(new Api().register('new-user', 'password', 'new@example.com'));
+    expect(err.message).toBe('request failed (502)');
+    expect(userFacingApiError(err)).toBe(t('loading.connectionLost'));
+  });
+
+  it('end-to-end: an RFC problem code on 503 beats the generic gateway fallback', async () => {
+    mockJson(503, {
+      type: 'about:blank',
+      title: 'Service Unavailable',
+      status: 503,
+      detail: 'The Steam service is temporarily unavailable.',
+      instance: '/api/steam/link',
+      code: 'steam.upstream',
+    });
+    const err = await rejection(new Api().steamLink('0123456789abcdef'));
+    expect(err.message).toBe('request failed (503)');
+    expect(err.code).toBe('steam.upstream');
+    expect(userFacingApiError(err)).toBe(t('apiError.steam.upstream'));
   });
 
   it('end-to-end: a captured rate-limit error renders the localized duration', async () => {

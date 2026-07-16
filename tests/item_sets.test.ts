@@ -45,6 +45,7 @@ describe('aggregateSetBonuses (pure resolver)', () => {
       critRating: 0,
       haste: 0,
       hasteRating: 0,
+      hitRating: 0,
       castPushbackReduction: 0,
       knockbackResistance: 0,
       procs: [],
@@ -210,6 +211,19 @@ describe('recalcPlayerStats applies equipped set bonuses (real raid/dungeon gear
       legs: 'wyrmshadow_legguards',
     });
     expect(three.critChance).toBeCloseTo(0.05 + three.stats.agi * 0.0005 + 0.02);
+  });
+
+  it('Crownforged (t2 strength, 4 pieces): the 4-set Hit bonus lands on the equipped hitRating', () => {
+    // End-to-end (not just the pure set-bonus resolver): the +60 four-set Hit rides
+    // through recalcPlayerStats onto e.hitRating, on top of the 20 + 20 the helm and
+    // shoulder carry. Drop the `+ setEff.hitRating` term and this reds.
+    const four = statsFor('warrior', 20, {
+      helmet: 'crownforged_dreadhelm',
+      shoulder: 'crownforged_warspaulders',
+      gloves: 'crownforged_gauntlets',
+      waist: 'crownforged_girdle',
+    });
+    expect(four.hitRating).toBe(20 + 20 + 60);
   });
 
   it('Nighttalon (t2 agility, 2 pieces): reaches the 2-piece +40 AP bonus', () => {

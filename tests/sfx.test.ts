@@ -191,6 +191,46 @@ describe('hasVariants', () => {
   });
 });
 
+// isBuffered/preload back the mob-voice cold-buffer fallback in hud.ts (a
+// crit-only cue like hurt has exactly one trigger, so it can lose the race
+// to fetch+decode unless warmed ahead of time or checked before playing).
+// Both must account for EVERY variant a key can have, not just index 0:
+// playAt no-repeat-randoms across variants, so a two-take family
+// (mob_dragonkin_hurt, mob_spider_hurt) can have variant 0 warm and variant 1
+// still cold.
+describe('isBuffered/preload', () => {
+  it('reports false until every variant of a multi-take key is buffered', () => {
+    const key = 'mob_dragonkin_hurt';
+    expect(SFX_CLIPS[key].variants.length).toBe(2);
+    expect(sfx.isBuffered(key)).toBe(false);
+    const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
+    buffers.set(key, { duration: 0.5 });
+    expect(sfx.isBuffered(key)).toBe(false); // variant 1 still cold
+    buffers.set(`${key}:1`, { duration: 0.5 });
+    expect(sfx.isBuffered(key)).toBe(true);
+  });
+
+  it('reports true immediately for a single-variant key once buffered', () => {
+    const key = 'mob_beast_hurt';
+    expect(SFX_CLIPS[key].variants.length).toBe(1);
+    expect(sfx.isBuffered(key)).toBe(false);
+    const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
+    buffers.set(key, { duration: 0.5 });
+    expect(sfx.isBuffered(key)).toBe(true);
+  });
+
+  it('preload warms every variant of a multi-take key, not just the first', async () => {
+    const key = 'mob_spider_hurt';
+    expect(SFX_CLIPS[key].variants.length).toBe(2);
+    sfx.preload(key);
+    // loadBuffer is async (fetch+decode); flush microtasks so both loads settle.
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const loading = (sfx as unknown as { loading: Map<string, unknown> }).loading;
+    expect(loading.has(key)).toBe(false);
+    expect(loading.has(`${key}:1`)).toBe(false);
+  });
+});
+
 // Footstep sounds ship OFF by default and are toggleable via the footstepSfx
 // setting. While disabled, footstep() must be a no-op (no source created) for
 // self and other entities alike; re-enabling resumes playback.
