@@ -5760,7 +5760,7 @@ export const zh_TW: EnTranslations = {
       },
       "icefall": {
         "name": "冰瀑",
-        "description": "向目標發射所有儲存的冰刺，每枚造成 {damage} 點冰霜傷害。對被定身或寒冷的目標造成雙倍傷害。（冰霜術）"
+        "description": "向目標發射所有儲存的冰刺，每枚造成 {damage} 點冰霜傷害。若目標因定身或昏迷而凍結，則造成 2.5 倍傷害。此固定傷害無法造成致命一擊。（冰霜術）"
       },
       "conjure_water": {
         "name": "縛水術",

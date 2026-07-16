@@ -260,9 +260,9 @@ This pass adds two caster rotations built on the narrow proc vocabulary describe
 
 - Frost mastery now grants Icefall and makes each landed Rimelance build one long-lived
   Icicle, up to five. Icefall is an off-GCD, zero-cost release that consumes the full bank,
-  launches one fixed Frost hit per stack, and doubles its damage against rooted or chilled
-  targets. The bank is visible as an aura and a normalized reinforcement-learning
-  observation.
+  deals 8 Frost damage per stack normally, and deals 20 per stack only while the target is
+  rooted or stunned. Rimelance's chill does not open this execute window. The bank is visible
+  as an aura and a normalized reinforcement-learning observation.
 - Elemental's level-11 Fulmination choice makes each completed Arc Bolt add one charge to
   an active Thunder Ward, up to nine. Earthen Jolt consumes the ward and deals 8 bonus
   Nature damage per charge. The existing visible Thunder Ward charge counter remains the
@@ -270,9 +270,9 @@ This pass adds two caster rotations built on the narrow proc vocabulary describe
 
 Both mechanics preserve mobile play while adding anticipation. Building happens through
 ordinary rotational casts, so movement does not erase progress or force a stationary
-channel. The release decision creates the excitement: Frost chooses when control is ready
-for a doubled Icefall, while Elemental chooses between keeping Thunder Ward protection and
-converting the bank into Earthen Jolt burst. Neither mechanic adds random draws.
+channel. The release decision creates the excitement: Frost creates a hard-control window
+and times Icefall inside it, while Elemental chooses between keeping Thunder Ward protection
+and converting the bank into Earthen Jolt burst. Icefall adds no random draws.
 
 ### PBE-2 mage feedback pass
 

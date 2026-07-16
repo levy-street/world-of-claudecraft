@@ -1503,7 +1503,11 @@ export type AbilityEffect =
       type: 'directDamage';
       min: number;
       max: number;
+      // Uses the authored minimum directly and cannot crit, so resolving the
+      // effect consumes no damage-roll or crit-roll RNG draws.
+      fixedNoCrit?: boolean;
       vsRootedMult?: number;
+      vsFrozenMult?: number;
       consumeAuraStacks?: { auraId: string; maxStacks: number };
     }
   | { type: 'consumeAuraChargesDamage'; auraId: string; damagePerCharge: number }

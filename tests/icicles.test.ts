@@ -68,8 +68,9 @@ describe('Cryomancy Icicles', () => {
   it('explains the full Icicles loop in the authored mastery tooltip', () => {
     const frost = TALENTS.mage?.specs.find((spec) => spec.id === 'frost');
     expect(frost?.mastery.description).toContain('Rimelance hits store an Icicle, up to 5');
-    expect(frost?.mastery.description).toContain('12 Frost damage each');
-    expect(frost?.mastery.description).toContain('double damage to rooted or chilled targets');
+    expect(frost?.mastery.description).toContain('8 Frost damage each');
+    expect(frost?.mastery.description).toContain('20 each against a rooted or stunned target');
+    expect(frost?.mastery.description).toContain('cannot critically strike');
   });
 
   it('localizes the Icicles aura name in every non-Latin release locale', () => {
@@ -108,7 +109,7 @@ describe('Cryomancy Icicles', () => {
     const twoStacks = damageAt(2);
     const fiveStacks = damageAt(5);
     expect(fiveStacks).toBeGreaterThan(twoStacks);
-    expect((fiveStacks - twoStacks) / 3).toBe(12);
+    expect((fiveStacks - twoStacks) / 3).toBe(8);
   });
 
   it('does no damage and draws no RNG when Icefall has no stacks', () => {
@@ -124,17 +125,27 @@ describe('Cryomancy Icicles', () => {
     expect(draws.chanceDraws()).toBe(0);
   });
 
-  it('uses the existing rooted-target damage path for the Icebind payoff', () => {
-    const damage = (rooted: boolean): number => {
+  it('keeps chilled damage low but executes targets frozen by Icebind or a stun', () => {
+    const damage = (state: 'normal' | 'chilled' | 'icebind' | 'stunned'): number => {
       const sim = frostSim();
       const target = targetFor(sim);
-      fixedDamageRng(sim);
-      buildIcicles(sim, target, 3);
-      if (rooted) {
+      const draws = fixedDamageRng(sim);
+      sim.rebucket(target);
+      if (state === 'chilled') {
+        for (let index = 0; index < 3; index++) run(sim, target, 'frostbolt');
+        expect(target.auras.some((aura) => aura.kind === 'slow')).toBe(true);
+      } else {
+        buildIcicles(sim, target, 3);
+      }
+      if (state === 'icebind') {
+        run(sim, target, 'frost_nova');
+        expect(target.auras.some((aura) => aura.kind === 'root')).toBe(true);
+      }
+      if (state === 'stunned') {
         sim.ctx.applyAura(target, {
-          id: 'test_root',
-          name: 'Test Root',
-          kind: 'root',
+          id: 'test_stun',
+          name: 'Test Stun',
+          kind: 'stun',
           remaining: 8,
           duration: 8,
           value: 0,
@@ -142,14 +153,46 @@ describe('Cryomancy Icicles', () => {
           school: 'frost',
         });
       }
+      // Applying the first Icicles aura recalculates derived stats, so zero Spell Power
+      // after setup to isolate the authored per-stack tuning below.
+      sim.player.spellPower = 0;
       const before = target.hp;
+      const rangeDrawsBefore = draws.rangeDraws();
+      const chanceDrawsBefore = draws.chanceDraws();
       run(sim, target, 'icefall');
+      expect(draws.rangeDraws()).toBe(rangeDrawsBefore);
+      expect(draws.chanceDraws()).toBe(chanceDrawsBefore);
       return before - target.hp;
     };
 
-    const normal = damage(false);
-    const shattered = damage(true);
-    expect(shattered).toBe(normal * 2);
+    expect(damage('normal')).toBe(3 * 8);
+    expect(damage('chilled')).toBe(3 * 8);
+    expect(damage('icebind')).toBe(3 * 20);
+    expect(damage('stunned')).toBe(3 * 20);
+  });
+
+  it('does not consume guaranteed-crit charges that Icefall cannot use', () => {
+    const sim = frostSim();
+    const target = targetFor(sim);
+    const draws = fixedDamageRng(sim);
+    buildIcicles(sim, target, 3);
+    sim.ctx.applyAura(sim.player, {
+      id: 'test_sure_crit',
+      name: 'Test Sure Crit',
+      kind: 'sure_crit',
+      remaining: 10,
+      duration: 10,
+      value: 0,
+      charges: 3,
+      sourceId: sim.player.id,
+      school: 'frost',
+    });
+
+    run(sim, target, 'icefall');
+
+    expect(sim.player.auras.find((aura) => aura.id === 'test_sure_crit')?.charges).toBe(3);
+    expect(draws.rangeDraws()).toBe(0);
+    expect(draws.chanceDraws()).toBe(0);
   });
 
   it('leaves non-Cryomancy mages draw-neutral and without Icicles', () => {

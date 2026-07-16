@@ -52,7 +52,7 @@ import {
   hasSweepingStrikes,
   sweepStrikeDamage,
 } from './area_echo';
-import { isRootedOrChilled } from './cc';
+import { isFrozenForIcefall, isRootedOrChilled } from './cc';
 import { extendOwnedDot } from './dot_mutation';
 import { consumeAuraKind, consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
@@ -292,13 +292,16 @@ export function runEffects(
             : isSpell
               ? ctx.spellCrit(p)
               : p.critChance;
-        let dmg = ctx.rng.range(eff.min, eff.max) * stackMultiplier;
+        let dmg = (eff.fixedNoCrit ? eff.min : ctx.rng.range(eff.min, eff.max)) * stackMultiplier;
         // The flat rider scales with the school's rating: Spell Power for spells,
         // Ranged AP for hunter shots, melee Attack Power for physical specials.
         // abilityScalingPower picks the rating; powerScale (inside directHitBonus)
         // applies the AP scale-down. A non-scaling effect just contributes 0.
         dmg += directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
         if (eff.vsRootedMult !== undefined && rooted) dmg *= eff.vsRootedMult;
+        if (eff.vsFrozenMult !== undefined && isFrozenForIcefall(target)) {
+          dmg *= eff.vsFrozenMult;
+        }
         const abilityMod = mods.abilities[ability.id];
         const vsDotted = abilityMod?.dmgPctVsDotted ?? 0;
         const requiredDot = abilityMod?.dmgPctVsDottedAbility;
@@ -313,8 +316,10 @@ export function runEffects(
         ) {
           dmg *= 1 + vsDotted;
         }
-        const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : critChance) || sureCrit;
-        if (sureCrit) sureCritRolled = true;
+        const crit =
+          !eff.fixedNoCrit &&
+          (ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : critChance) || sureCrit);
+        if (!eff.fixedNoCrit && sureCrit) sureCritRolled = true;
         if (crit) dmg *= (isSpell ? 1.5 : 2) + (isSpell ? p.critDmgSpellBonus : p.critDmgPhysBonus);
         if (isSpell) dmg *= spellDamageMultFromAuras(p);
         if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);

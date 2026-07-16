@@ -17,14 +17,15 @@ export const TALENT_ABILITIES_V2_B = {
     effects: [
       {
         type: 'directDamage',
-        min: 12,
-        max: 12,
-        vsRootedMult: 2,
+        min: 8,
+        max: 8,
+        fixedNoCrit: true,
+        vsFrozenMult: 2.5,
         consumeAuraStacks: { auraId: 'mag_icicles', maxStacks: 5 },
       },
     ],
     description:
-      'Launches every stored Icicle at the target for $d Frost damage each. Deals double damage to rooted or chilled targets. (Cryomancy)',
+      'Launches every stored Icicle at the target for $d Frost damage each. Deals 2.5 times damage if the target is frozen by a root or stun. This fixed damage cannot critically strike. (Cryomancy)',
   },
   spellsteal: {
     id: 'spellsteal',

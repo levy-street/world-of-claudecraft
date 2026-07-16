@@ -5760,7 +5760,7 @@ export const sv_SE: EnTranslations = {
       },
       "icefall": {
         "name": "Icefall",
-        "description": "Launches every stored Icicle at the target for {damage} Frost damage each. Deals double damage to rooted or chilled targets. (Cryomancy)"
+        "description": "Launches every stored Icicle at the target for {damage} Frost damage each. Deals 2.5 times damage if the target is frozen by a root or stun. This fixed damage cannot critically strike. (Cryomancy)"
       },
       "conjure_water": {
         "name": "Vattenbindning",
