@@ -40,3 +40,33 @@ const HARMFUL_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
 export function isDebuffAura(kind: AuraKind, value: number): boolean {
   return HARMFUL_AURA_KINDS.has(kind) || (kind.startsWith('buff_') && value < 0);
 }
+
+// Helpful auras worth surfacing on a compact party/raid frame: heal-over-time and
+// the absorb shields (the maintenance buffs, forms, and personal damage procs stay
+// on the normal aura UI). Kept narrow so the tiny party aura strip is not noisy.
+const PARTY_FRAME_HELPFUL_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
+  'hot',
+  'absorb',
+  'cast_shield',
+]);
+
+// Evasion shares buff_dodge with long-lived maintenance buffs, so its stable
+// ability id distinguishes the major defensive from passive upkeep.
+const PARTY_FRAME_HELPFUL_IDS: ReadonlySet<string> = new Set(['evasion']);
+
+/** Effects worth surfacing on a compact party/raid frame: any debuff, a short list
+ *  of helpful kinds (HoTs, absorbs), or a named major defensive. Generic maintenance
+ *  buffs, forms, stances, and personal damage procs are deliberately excluded. */
+export function isPartyFrameRelevantAura(aura: {
+  id: string;
+  kind: AuraKind;
+  value?: number;
+  neg?: 1;
+}): boolean {
+  const value = aura.neg ? -1 : (aura.value ?? 1);
+  return (
+    isDebuffAura(aura.kind, value) ||
+    PARTY_FRAME_HELPFUL_KINDS.has(aura.kind) ||
+    PARTY_FRAME_HELPFUL_IDS.has(aura.id)
+  );
+}

@@ -414,6 +414,40 @@ describe('taunt and growl', () => {
     expect(wolf.forcedTargetTimer).toBeGreaterThan(0);
   });
 
+  it('Sacred Goad always lands (never resists), even against a higher-level mob', () => {
+    // The paladin taunt is holy-school (a spell), so on impact it used to roll a full
+    // resist. A resisted taunt silently breaks tanking, so taunts now skip the roll.
+    // Against a +3 mob the old roll would resist a large fraction of the time; across
+    // many seeds the taunt must now land every time and never emit a 'resist'.
+    for (let seed = 1; seed <= 40; seed++) {
+      const sim = new Sim({ seed, playerClass: 'paladin', noPlayer: true });
+      const tank = sim.entities.get(sim.addPlayer('paladin', 'Tank'))!;
+      const dps = sim.entities.get(sim.addPlayer('mage', 'Dps'))!;
+      sim.setPlayerLevel(10, tank.id);
+      const wolf = nearestMob(sim, 'forest_wolf', tank);
+      wolf.level = tank.level + 3; // a wide level gap: a spell would often fully resist
+      teleport(sim, tank, wolf.pos.x + 25, wolf.pos.z);
+      teleport(sim, dps, wolf.pos.x - 2, wolf.pos.z);
+      wolf.threat.set(dps.id, 1000);
+      wolf.aggroTargetId = dps.id;
+      wolf.aiState = 'chase';
+      wolf.inCombat = true;
+      sim.targetEntity(wolf.id, tank.id);
+      tank.facing = Math.atan2(wolf.pos.x - tank.pos.x, wolf.pos.z - tank.pos.z);
+
+      sim.castAbility('holy_taunt', tank.id);
+      let resisted = false;
+      for (let i = 0; i < 25; i++) {
+        for (const ev of sim.tick()) {
+          if (ev.type === 'damage' && ev.kind === 'resist' && ev.ability === 'Sacred Goad')
+            resisted = true;
+        }
+      }
+      expect(resisted, `seed ${seed}`).toBe(false);
+      expect(wolf.aggroTargetId, `seed ${seed}`).toBe(tank.id);
+    }
+  });
+
   it('growl requires bear form', () => {
     const sim = makeSim('druid');
     sim.setPlayerLevel(10);

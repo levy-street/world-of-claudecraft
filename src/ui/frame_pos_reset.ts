@@ -13,6 +13,10 @@ export const LAYOUT_RESET_EPOCH_KEY = 'woc_layout_reset_epoch';
 // reset and the movers can never drift apart.
 export const PLAYER_FRAME_POS_KEY = 'woc_player_frame_pos';
 export const TARGET_FRAME_POS_KEY = 'woc_target_frame_pos';
+// The movable party/raid frame's persisted top-left. New in the party-frames
+// rework; deliberately NOT in FRAME_POS_RESET_KEYS, since the one-time epoch
+// clear only unwound the reverted #1736 overhaul's player/target positions.
+export const PARTY_FRAME_POS_KEY = 'woc_party_frame_pos';
 export const FRAME_POS_RESET_KEYS = [PLAYER_FRAME_POS_KEY, TARGET_FRAME_POS_KEY] as const;
 
 // The subset of Storage the reset touches, so tests can pass a plain fake.

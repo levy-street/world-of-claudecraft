@@ -150,7 +150,7 @@ describe('i18n whole-catalog completeness', () => {
   // leaves that legitimately stay identical are brand / URL strings, kept verbatim
   // in every locale on purpose; everything else must differ. Add a key here only if
   // it is a genuine brand/URL that should never be translated.
-  it('non-Latin locales ship no untranslated English (only brand/URL leaves stay identical)', () => {
+  it('non-Latin player surfaces ship no untranslated English', () => {
     const BRAND_ALLOW = new Set([
       'footer.copyright', // "{year} World of ClaudeCraft" - brand
       'footer.githubLink', // repository URL
@@ -174,19 +174,29 @@ describe('i18n whole-catalog completeness', () => {
       'auth.emailPlaceholder', // "you@example.com" - RFC 2606 example address, kept verbatim
     ]);
     const wordy = (v: string) => /[a-z]{4,}/.test(v.replace(/\{[^}]*\}/g, ''));
+    // The command center is enabled only in Vite development builds and cannot reach
+    // a player-facing production surface. Keep its contributor-owned catalog
+    // English-only, like other developer tooling, while release localization remains
+    // strict for every namespace that ships to players.
+    const isDevelopmentOnly = (key: string) => key.startsWith('devCommand.');
     const nonLatin: SupportedLanguage[] = ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'];
     const leaks: string[] = [];
     for (const lang of nonLatin) {
       const flat = flatten(TABLES[lang]);
       for (const [key, enValue] of Object.entries(enFlat)) {
-        if (wordy(enValue) && flat[key] === enValue && !BRAND_ALLOW.has(key)) {
+        if (
+          wordy(enValue) &&
+          flat[key] === enValue &&
+          !BRAND_ALLOW.has(key) &&
+          !isDevelopmentOnly(key)
+        ) {
           leaks.push(`${lang} ${key}: "${enValue}"`);
         }
       }
     }
     expect(
       leaks,
-      `untranslated English leaked into non-Latin locales:\n${leaks.join('\n')}`,
+      `untranslated English leaked into non-Latin player surfaces:\n${leaks.join('\n')}`,
     ).toEqual([]);
   });
 });

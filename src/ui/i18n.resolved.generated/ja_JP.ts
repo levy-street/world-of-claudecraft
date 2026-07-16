@@ -20,6 +20,154 @@ export const ja_JP: EnTranslations = {
     "rp": "RP",
     "rpPvp": "RP-PvP"
   },
+  "devCommand": {
+    "dialogLabel": "Developer Command Center",
+    "kicker": "Development tools",
+    "title": "Command Center",
+    "subtitle": "Authoritative test controls for the active world.",
+    "closeAria": "Close developer commands",
+    "categoryNavAria": "Developer command categories",
+    "categories": {
+      "player": "Player",
+      "spawns": "Spawns",
+      "inventory": "Inventory",
+      "progress": "Progress",
+      "travel": "Travel",
+      "scenarios": "Scenarios"
+    },
+    "filterLabel": "Filter commands",
+    "filterPlaceholder": "Search this category",
+    "noMatches": "No matching commands.",
+    "serverRequirement": "Server cheats still require ALLOW_DEV_COMMANDS=1.",
+    "invalidValues": "Choose valid values before running this command.",
+    "sent": "Sent: {command}",
+    "run": "Run",
+    "fields": {
+      "level": "Level",
+      "mob": "Mob",
+      "count": "Count",
+      "item": "Item",
+      "gold": "Gold",
+      "quest": "Quest",
+      "profession": "Profession",
+      "amount": "Amount",
+      "x": "X",
+      "z": "Z",
+      "dungeon": "Dungeon",
+      "difficulty": "Difficulty",
+      "name": "Name"
+    },
+    "difficulty": {
+      "normal": "Normal",
+      "heroic": "Heroic"
+    },
+    "actions": {
+      "heal": {
+        "label": "Restore health",
+        "description": "Fill the health pool."
+      },
+      "resource": {
+        "label": "Restore resource",
+        "description": "Fill mana, rage, or energy."
+      },
+      "cooldowns": {
+        "label": "Clear cooldowns",
+        "description": "Reset ability, GCD, and potion timers."
+      },
+      "god": {
+        "label": "Toggle god mode",
+        "description": "Toggle invulnerability and boosted damage."
+      },
+      "revive": {
+        "label": "Revive",
+        "description": "Revive through the normal resurrection path."
+      },
+      "kill": {
+        "label": "Kill player",
+        "description": "Test death, ghost, and corpse flows."
+      },
+      "combatreset": {
+        "label": "Reset combat",
+        "description": "Clear combat state and hostile threat."
+      },
+      "level": {
+        "label": "Set level",
+        "description": "Set the current character level."
+      },
+      "spawn": {
+        "label": "Spawn mob",
+        "description": "Create a concrete mob near the player."
+      },
+      "killtarget": {
+        "label": "Kill target",
+        "description": "Kill the selected living mob."
+      },
+      "despawntarget": {
+        "label": "Despawn target",
+        "description": "Remove a selected mob created by this tool."
+      },
+      "despawnall": {
+        "label": "Clear my spawns",
+        "description": "Remove every mob spawned by this developer."
+      },
+      "give": {
+        "label": "Give item",
+        "description": "Add an item to the player inventory."
+      },
+      "gold": {
+        "label": "Add gold",
+        "description": "Add gold to the current purse."
+      },
+      "quest": {
+        "label": "Complete quest",
+        "description": "Complete a specific quest by id."
+      },
+      "quests": {
+        "label": "Complete active quests",
+        "description": "Complete every quest in the current log."
+      },
+      "attune": {
+        "label": "Unlock attunements",
+        "description": "Mark all attunement requirements complete."
+      },
+      "gather": {
+        "label": "Grant gathering skill",
+        "description": "Increase a gathering profession."
+      },
+      "teleport": {
+        "label": "Teleport",
+        "description": "Move to exact world coordinates."
+      },
+      "dungeon": {
+        "label": "Enter dungeon",
+        "description": "Enter a dungeon with dev gate bypass."
+      },
+      "raid": {
+        "label": "Enter raid",
+        "description": "Enter the Nythraxis arena directly."
+      },
+      "raidreset": {
+        "label": "Reset raid lockout",
+        "description": "Clear the current raid lockouts."
+      },
+      "bot": {
+        "label": "Spawn social bot",
+        "description": "Create a whisperable stationary player."
+      },
+      "lfgqueue": {
+        "label": "Seed finder queue",
+        "description": "Create a Dungeon Finder queue scenario."
+      },
+      "lfgraid": {
+        "label": "Seed raid finder",
+        "description": "Create a raid finder scenario."
+      },
+      "lfgboard": {
+        "label": "Seed listing board",
+        "description": "Create a premade listing scenario."
+      }
+    }
+  },
   "game": {
     "xp": {
       "suffix": "経験値",
@@ -203,6 +351,7 @@ export const ja_JP: EnTranslations = {
       "remainingLessThanMinute": "1分未満",
       "remainingMinutes": "{minutes}分",
       "remainingHoursMinutes": "{hours}時間{minutes}分",
+      "remainingDaysHours": "{days}日{hours}時間",
       "score": "スコア",
       "walletValue": "ウォレット価値 (WOC)",
       "usd": "{amount} USD",
@@ -241,7 +390,8 @@ export const ja_JP: EnTranslations = {
         "no_wallet": "$20 USD 相当以上のWOCを保有するウォレットを接続してください。",
         "under_minimum": "ウォレットが最低額の $20 USD 相当のWOCを下回っています。",
         "price_unavailable": "WOCの価格を取得できないため、報酬は一時的にロックされています。",
-        "banned": "デイリー報酬への参加が禁止されています。理由: {reason}"
+        "banned": "デイリー報酬への参加が禁止されています。理由: {reason}",
+        "bannedUntil": "デイリー報酬への参加はあと{remaining}禁止されています。解除日時: {until}。理由: {reason}"
       }
     },
     "wocStore": {
@@ -466,6 +616,7 @@ export const ja_JP: EnTranslations = {
       "balanceLabel": "残高",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL：{amount}",
+      "usdcBalance": "USDC: {amount}",
       "wocBalance": "WOC：{amount}",
       "unavailable": "Claudiumストアは現在利用できません。残高と購入内容に影響はありません。しばらくしてからお試しください。",
       "disclosure": "Claudiumは一方向のゲーム内通貨です。現金で購入して外見アイテムに使用でき、換金、譲渡、払い戻しはできません。",
@@ -473,6 +624,7 @@ export const ja_JP: EnTranslations = {
       "railLabel": "支払い方法",
       "railStripe": "カード",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "20%オフ",
       "railWocUnavailable": "WOC価格は現在利用できません。",
@@ -979,6 +1131,7 @@ export const ja_JP: EnTranslations = {
         "spellPower": "呪文威力",
         "critRating": "クリティカルレーティング",
         "hasteRating": "ヘイストレーティング",
+        "hitRating": "命中レーティング",
         "warfare": "ウォーフェア"
       },
       "warfareValue": "与ダメージ +{increase}% / 被ダメージ -{reduction}%",
@@ -996,6 +1149,7 @@ export const ja_JP: EnTranslations = {
         "dodge": "迫り来る近接攻撃を完全に回避し、ダメージを受けない確率です。",
         "critRating": "装備とセットボーナスによるクリティカルレーティング。クリティカル率が上昇します。約10レーティングで1%クリティカル。",
         "hasteRating": "装備とセットボーナスによるヘイストレーティング。攻撃と詠唱の速度が上昇します。約10レーティングで1%ヘイスト。",
+        "hitRating": "装備とセットボーナスによる命中レーティング。攻撃がミスする頻度と呪文が抵抗される頻度を減らし、特に高レベルの敵に有効です。約10レーティングで1%命中。",
         "warfare": "プレイヤーに与えるダメージが {increase}% 増加し、プレイヤーから受けるダメージが {reduction}% 減少します。"
       },
       "effects": {
@@ -1281,7 +1435,20 @@ export const ja_JP: EnTranslations = {
     },
     "dungeonDifficulty": {
       "setHeroic": "ダンジョン難易度をヒロイックに設定",
-      "setNormal": "ダンジョン難易度をノーマルに設定"
+      "setNormal": "ダンジョン難易度をノーマルに設定",
+      "resetAll": "すべてのインスタンスをリセット",
+      "resetDone": "すべてのインスタンスをリセットしました。",
+      "resetNone": "リセットできるインスタンスがありません。",
+      "resetOccupied": "中にプレイヤーがいる間はインスタンスをリセットできません。",
+      "resetSameDifficulty": "インスタンスをリセットする前にダンジョン難易度を変更してください。空のインスタンスは5分後に自動的にリセットされます。",
+      "resetLoot": "中に戦利品が残っている間はインスタンスをリセットできません。",
+      "resetConfirmTitle": "すべてのインスタンスをリセットしますか？",
+      "resetConfirmBody": "以前選択していた難易度の空のインスタンスを放棄します。未取得の戦利品がある場合はリセットできません。",
+      "resetConfirm": "インスタンスをリセット",
+      "resetCooldown": "インスタンスをリセットできるのは5分に1回だけです。",
+      "resetUsage": "難易度を変更した後、/dungeon reset で空のインスタンスを放棄できます。",
+      "entryMismatchNormal": "このインスタンスはノーマル難易度に設定されています。ヒロイックで新しく始めるには「すべてのインスタンスをリセット」を使用してください。",
+      "entryMismatchHeroic": "このインスタンスはヒロイック難易度に設定されています。ノーマルで新しく始めるには「すべてのインスタンスをリセット」を使用してください。"
     },
     "bags": {
       "cannotDestroy": "このアイテムは破壊できません。",
@@ -1361,6 +1528,8 @@ export const ja_JP: EnTranslations = {
       },
       "dodge": "回避率を{pct}%上昇させる",
       "dodgeReduce": "回避率を{pct}%低下させる",
+      "damageReduction": "受けるすべてのダメージを{pct}%軽減する",
+      "guardianWard": "次に受ける敵の致死攻撃を防ぎ、代わりに体力を{pct}%まで回復する",
       "armorFlat": "防御力を{value}低下させる",
       "armorFlatStacks": "防御力を{value}低下させる({stacks}スタック)",
       "armorPct": "防御力を{pct}%低下させる",
@@ -1448,6 +1617,33 @@ export const ja_JP: EnTranslations = {
     "playerFrame": {
       "unlock": "プレイヤーフレームを移動",
       "lock": "プレイヤーフレームを固定"
+    },
+    "partyFrames": {
+      "section": "パーティ・レイドフレーム",
+      "unlock": "パーティ・レイドフレームを移動",
+      "lock": "パーティ・レイドフレームを固定",
+      "style": "フレームスタイル",
+      "styleAutomatic": "自動",
+      "styleClassic": "クラシックパーティフレーム",
+      "styleRaid": "レイドフレーム",
+      "scale": "フレームスケール",
+      "width": "フレームの幅",
+      "height": "フレームの高さ",
+      "spacing": "フレームの間隔",
+      "columns": "レイドの列数",
+      "healthText": "体力テキスト",
+      "healthNone": "None",
+      "healthPercent": "パーセント",
+      "healthCurrent": "現在値",
+      "healthCurrentMax": "現在値 / 最大値",
+      "sort": "プレイヤーの並び順",
+      "sortGroup": "グループ",
+      "sortRole": "Role",
+      "sortName": "Name",
+      "showResource": "マナ・怒り・エネルギーを表示",
+      "showAbsorbs": "吸収シールドを表示",
+      "showAuras": "バフとデバフを表示",
+      "showSelf": "自分のフレームを表示"
     },
     "frameReset": {
       "label": "フレーム位置をリセット"
@@ -1542,8 +1738,8 @@ export const ja_JP: EnTranslations = {
         "juniormods": "ジュニアモデレーター",
         "artists": "アーティスト",
         "contentcreator": "コンテンツクリエイター",
-        "legend": "LEGEND",
-        "shill": "SHILL"
+        "legend": "レジェンド",
+        "shill": "サポーター"
       },
       "guildMember": "認証済みメンバー",
       "notMember": "まだサーバーに参加していません",
@@ -3709,6 +3905,7 @@ export const ja_JP: EnTranslations = {
     "title": "デスクトップランチャーのダウンロード",
     "desc": "最適化されたパフォーマンスと全画面表示でのプレイのために、スタンドアロン版ランチャーを入手してください。",
     "macCta": "macOS版をダウンロード",
+    "windowsCta": "Windows版をダウンロード",
     "linuxCta": "Linux版をダウンロード",
     "linuxHint": "AppImage形式です。実行権限を付けてそのまま起動でき、インストールは不要です。",
     "windowsPending": "Windows版は準備中です。"
@@ -4596,6 +4793,8 @@ export const ja_JP: EnTranslations = {
     "connectionLost": "サーバーとの接続が切断されました。",
     "reconnecting": "サーバーとの接続が切断されました。再接続しています...",
     "connectionRejected": "サーバーが接続を閉じました。",
+    "realmFull": "このワールドは現在満員です。数分後にもう一度お試しください。",
+    "tooManyConnections": "お使いのネットワークからこのワールドへの接続が多すぎます。余分なゲームウィンドウを閉じるか、数分後にもう一度お試しください。",
     "tips": {
       "classes": "ヒント：9つのクラスはそれぞれ遊び方が異なります。決める前にいくつか試してみましょう。",
       "talents": "ヒント：非戦闘中ならいつでも特性をリセットできるので、最初の選択が失敗になることはありません。",
@@ -4673,9 +4872,9 @@ export const ja_JP: EnTranslations = {
     "medium": "中",
     "low": "低",
     "popTipLow": "低人口：現在オンラインのプレイヤーは15人未満。余裕があり、新規スタートに最適です。",
-    "popTipMedium": "中人口：現在オンラインのプレイヤーは15〜39人。健全で活発なワールドです。",
-    "popTipHigh": "高人口：現在オンラインのプレイヤーは40〜79人。混雑しており、多くのプレイヤーがいます。",
-    "popTipFull": "満員：現在オンラインのプレイヤーは80人以上。非常に混雑しており、ログイン待ちが発生する場合があります。",
+    "popTipMedium": "中人口：現在オンラインのプレイヤーは15〜79人。健全で活発なワールドです。",
+    "popTipHigh": "高人口：現在オンラインのプレイヤーは80人以上。混雑しており、多くのプレイヤーがいます。",
+    "popTipFull": "満員：このワールドは現在プレイヤー数の上限に達しています。他のプレイヤーがログアウトするまで、新規ログインは拒否されます。",
     "popTipOffline": "オフライン：このワールドは現在接続できず、参加できません。",
     "characterCountOne": "{count}キャラクター",
     "characterCountOther": "{count}キャラクター",
@@ -6278,6 +6477,18 @@ export const ja_JP: EnTranslations = {
       "barkskin": {
         "name": "樫の肌",
         "description": "肌が樹皮のように硬くなり、15秒間アーマーが150増加します。"
+      },
+      "ironhold": {
+        "name": "鉄壁",
+        "description": "堅固な守りで身を固め、8秒間、受けるすべてのダメージを40%軽減します。"
+      },
+      "sacred_bulwark": {
+        "name": "聖なる防壁",
+        "description": "{duration}秒間、次に敵から受ける致命的な一撃を無効化し、代わりに体力を最大値の35%まで回復します。"
+      },
+      "primal_reflexes": {
+        "name": "原始の反射",
+        "description": "本能が研ぎ澄まされ、6秒間、回避率が50%上昇します。"
       },
       "starfire": {
         "name": "天墜",

@@ -32,6 +32,7 @@ import {
   claudiumSpend,
   claudiumStore,
   claudiumStripeWebhook,
+  claudiumUsdcBalance,
 } from './claudium_proxy';
 import { accountAndScopeForToken, grantAccountWeaponSkins, moderationStatusForAccount } from './db';
 import { ctxAccountId } from './http/context';
@@ -88,7 +89,7 @@ function parseRail(value: unknown): ClaudiumPriceRail | null {
 }
 
 function parseNativeRail(value: unknown): ClaudiumNativeRail | null {
-  return value === 'sol' || value === 'woc' ? value : null;
+  return value === 'sol' || value === 'usdc' || value === 'woc' ? value : null;
 }
 
 function parseSpendKind(value: unknown): 'cosmetic' | 'skin' | 'item' | null {
@@ -223,6 +224,10 @@ export async function handleClaudiumApi(
   const solBalanceMatch = /^\/api\/claudium\/native\/balance\/sol\/(\w+)$/.exec(path);
   if (req.method === 'GET' && solBalanceMatch) {
     return json(res, 200, await claudiumSolBalance(decodeURIComponent(solBalanceMatch[1])));
+  }
+  const usdcBalanceMatch = /^\/api\/claudium\/native\/balance\/usdc\/(\w+)$/.exec(path);
+  if (req.method === 'GET' && usdcBalanceMatch) {
+    return json(res, 200, await claudiumUsdcBalance(decodeURIComponent(usdcBalanceMatch[1])));
   }
   if (req.method === 'GET' && path === '/api/claudium/store') {
     const store = await claudiumStore(accountId);
@@ -400,6 +405,14 @@ export const routes: RouteDef[] = [
   {
     method: 'GET',
     path: '/api/claudium/native/balance/sol/:owner',
+    surface: 'api',
+    meta: { publicRead: true },
+    middleware: [activeGuard],
+    handler: claudiumHandler,
+  },
+  {
+    method: 'GET',
+    path: '/api/claudium/native/balance/usdc/:owner',
     surface: 'api',
     meta: { publicRead: true },
     middleware: [activeGuard],

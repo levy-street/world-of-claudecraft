@@ -9,8 +9,8 @@
 process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_title_reads';
 
 import { readFileSync } from 'node:fs';
-import type { QueryResult } from 'pg';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import type { PoolClient, QueryResult } from 'pg';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { pool, topLifetimeXp } from '../../server/db';
 import { PgSocialDb } from '../../server/social_db';
 
@@ -19,6 +19,27 @@ const TITLE_SQL_LITERAL = "state->>'activeTitle' AS active_title";
 function result(rows: Record<string, unknown>[]): QueryResult {
   return { command: '', rowCount: rows.length, oid: 0, fields: [], rows } as QueryResult;
 }
+
+// topLifetimeXp now runs inside runWithStatementTimeout (server/db.ts): a dedicated
+// pooled client issues BEGIN, SET LOCAL statement_timeout, the real read, then
+// COMMIT. Stub pool.connect to a client that answers those control statements
+// itself and forwards the real read through the spied pool.query, so each test's
+// pool.query spy still captures exactly the one real read.
+beforeEach(() => {
+  vi.spyOn(pool, 'connect').mockImplementation(
+    async () =>
+      ({
+        query: (text: string, values?: unknown[]) =>
+          text === 'BEGIN' ||
+          text === 'COMMIT' ||
+          text === 'ROLLBACK' ||
+          text.startsWith('SET LOCAL')
+            ? Promise.resolve(result([]))
+            : (pool.query as (t: string, v?: unknown[]) => Promise<unknown>)(text, values),
+        release() {},
+      }) as unknown as PoolClient,
+  );
+});
 
 afterEach(() => {
   vi.restoreAllMocks();

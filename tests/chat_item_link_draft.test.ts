@@ -33,14 +33,14 @@ describe('item links in a chat draft', () => {
     const draftHud = hud as unknown as {
       pendingChatLinks: Map<string, string>;
       activeChatTab: string;
-      stickyChannel: string;
+      stickyTarget: string;
       activeChatPlaceholder: () => string;
     };
     draftHud.pendingChatLinks = new Map();
     draftHud.activeChatTab = 'all';
     // The All tab falls back to the sticky send channel; say is the neutral default
     // (a bare Object.create instance skips the field initializer, so set it here).
-    draftHud.stickyChannel = 'say';
+    draftHud.stickyTarget = 'say';
     draftHud.activeChatPlaceholder = () => 'Chat';
 
     setLanguage('en');

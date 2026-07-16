@@ -320,7 +320,7 @@
     <div id="bottom-bar">
       <div id="actionbar-row">
         <div id="actionbar-stack">
-          <div id="player-frame" class="unitframe" role="group" data-i18n-aria="hudChrome.unitFrame.playerLabel" aria-label="Your Hero">
+          <div id="player-frame" class="unitframe" role="group" tabindex="0" aria-haspopup="menu" data-i18n-aria="hudChrome.unitFrame.playerLabel" aria-label="Your Hero">
             <div class="portrait-wrap">
               <div class="portrait"><canvas id="pf-portrait" width="54" height="54"></canvas></div>
               <div class="level-chip" id="pf-level">1</div>
@@ -426,6 +426,7 @@
       <button type="button" class="micro-btn" id="mm-deeds" data-i18n-title="hudChrome.deeds.title" data-i18n-aria="hudChrome.deeds.title" title="Book of Deeds" aria-label="Book of Deeds" data-icon="book"><span class="keybind">s-z</span></button>
       <button type="button" class="micro-btn" id="mm-map" data-i18n-title="hud.keybinds.actions.map" data-i18n-aria="hud.keybinds.actions.map" title="World Map" aria-label="World Map" data-icon="map"><span class="keybind">m</span></button>
       <button type="button" class="micro-btn" id="mm-bag" data-i18n-title="itemUi.bags.title" data-i18n-aria="itemUi.bags.title" title="Bags" aria-label="Bags" data-icon="bags"><span class="keybind">b</span></button>
+      <button type="button" class="micro-btn" id="mm-crafting" data-i18n-title="hudChrome.crafting.title" data-i18n-aria="hudChrome.crafting.title" title="Crafting" aria-label="Crafting" data-icon="crafting"><span class="keybind">t</span></button>
       <button type="button" class="micro-btn" id="mm-arena" data-i18n-title="hud.keybinds.actions.arena" data-i18n-aria="hud.keybinds.actions.arena" title="Arena (Ashen Coliseum)" aria-label="Arena (Ashen Coliseum)" data-icon="arena"><span class="keybind">g</span></button>
       <button type="button" class="micro-btn" id="mm-dfinder" data-i18n-title="hudChrome.finder.title" data-i18n-aria="hudChrome.finder.title" title="Dungeon Finder" aria-label="Dungeon Finder" data-icon="dfinder"><span class="keybind">Shift+I</span></button>
       <button type="button" class="micro-btn" id="mm-valecup" data-i18n-title="hudChrome.keybinds.valecup" data-i18n-aria="hudChrome.keybinds.valecup" title="Vale Cup" aria-label="Vale Cup" data-icon="ball"><span class="keybind">y</span></button>
@@ -1139,18 +1140,23 @@
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="mac"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.25.0-mac-universal.dmg"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.27.0-mac-universal.dmg"
               data-i18n="download.macCta"
             >Download for macOS</a>
             <a
               class="btn btn-primary desktop-download-link"
+              data-platform="win"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.27.0-win.exe"
+              data-i18n="download.windowsCta"
+            >Download for Windows</a>
+            <a
+              class="btn btn-primary desktop-download-link"
               data-platform="linux"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.25.0-linux-x86_64.AppImage"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.27.0-linux-x86_64.AppImage"
               data-i18n="download.linuxCta"
             >Download for Linux</a>
           </div>
           <p class="desktop-download-hint" data-platform-hint="linux" data-i18n="download.linuxHint" hidden>AppImage: make it executable, then run it. No install needed.</p>
-          <div class="desktop-download-status" data-i18n="download.windowsPending">Windows build pending.</div>
         </div>
       </section>
 
@@ -1355,7 +1361,7 @@
           <span data-i18n="nav.donate">Donate</span>
         </a>
       </div>
-      <div id="game-version">v0.25.0</div>
+      <div id="game-version">v0.27.0</div>
       </div>
       <div class="footer-legal-row">
         <a href="/World-of-ClaudeCraft-Whitepaper-v1.0.pdf" class="footer-link" data-i18n="footer.whitepaper">Whitepaper</a>
@@ -1467,6 +1473,7 @@
           <button type="button" class="mobile-btn" id="mobile-valecup" data-i18n-title="hudChrome.keybinds.valecup" data-i18n-aria="hudChrome.keybinds.valecup" title="Vale Cup" aria-label="Vale Cup" data-icon="ball"><span class="mobile-label" data-i18n="hudChrome.vcup.mobileLabel">Cup</span></button>
           <button type="button" class="mobile-btn" id="mobile-char" data-i18n-title="hud.keybinds.actions.char" data-i18n-aria="hud.keybinds.actions.char" title="Character" aria-label="Character" data-icon="character"><span class="mobile-label" data-i18n="hud.keybinds.actions.char">Character</span></button>
           <button type="button" class="mobile-btn" id="mobile-bags" data-i18n-title="hud.keybinds.actions.bags" data-i18n-aria="hud.keybinds.actions.bags" title="Bags" aria-label="Bags" data-icon="bags"><span class="mobile-label" data-i18n="hud.keybinds.actions.bags">Bags</span></button>
+          <button type="button" class="mobile-btn" id="mobile-crafting" data-i18n-title="hudChrome.crafting.title" data-i18n-aria="hudChrome.crafting.title" title="Crafting" aria-label="Crafting" data-icon="crafting"><span class="mobile-label" data-i18n="hudChrome.crafting.title">Crafting</span></button>
           <button type="button" class="mobile-btn" id="mobile-spellbook" data-i18n-title="abilityUi.spellbook.title" data-i18n-aria="abilityUi.spellbook.title" title="Spellbook" aria-label="Spellbook" data-icon="spellbook"><span class="mobile-label" data-i18n="abilityUi.spellbook.title">Spellbook</span></button>
           <button type="button" class="mobile-btn" id="mobile-talents" data-i18n-title="game.talents.title" data-i18n-aria="game.talents.title" title="Talents" aria-label="Talents" data-icon="talents"><span class="mobile-label" data-i18n="game.talents.title">Talents</span></button>
           <button type="button" class="mobile-btn" id="mobile-map" data-i18n-title="hud.keybinds.actions.map" data-i18n-aria="hud.keybinds.actions.map" title="World Map" aria-label="World Map" data-icon="map"><span class="mobile-label" data-i18n="hud.core.mobileMap">Map</span></button>

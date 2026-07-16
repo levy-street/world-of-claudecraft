@@ -67,7 +67,11 @@ export function retargetMob(ctx: SimContext, mob: Entity): void {
 export function highestThreatTarget(ctx: SimContext, mob: Entity): Entity | null {
   let best: Entity | null = null;
   let bestT = -1;
+  // Resolved once per walk, not per entry: the ctx member is a live getter chain
+  // and this loop is a per-entry hot path.
+  const counters = ctx.mobScanCounters;
   for (const [id, t] of mob.threat) {
+    counters.threatEntryVisits++;
     const e = ctx.entities.get(id);
     if (!e || e.dead) {
       mob.threat.delete(id);
@@ -121,7 +125,10 @@ export function updateMobTarget(ctx: SimContext, mob: Entity): void {
     MELEE_RANGE * 1.2,
     combatProfileForMob(mob.templateId, mob.scale).meleeRange,
   );
+  // Resolved once per walk, not per entry (same reason as highestThreatTarget).
+  const counters = ctx.mobScanCounters;
   for (const [id, t] of mob.threat) {
+    counters.threatEntryVisits++;
     if (id === cur.id || t <= bestT) continue;
     const e = ctx.entities.get(id);
     if (!e || e.dead) {

@@ -435,6 +435,8 @@ export interface DailyRewardWinner {
 
 export interface DailyRewardWinnersDay {
   day: string;
+  taskName: string;
+  nextTaskName: string;
   realm: string;
   prizePoolUsd: number;
   finalizedAt: string | null;
@@ -469,12 +471,13 @@ export function buildDailyRewardWinnersMessage(
     embeds: [
       {
         color: 0xf0b743,
-        author: { name: 'Daily Rewards' },
+        author: { name: `Task: ${day.taskName}` },
         title: `Top ${Math.min(day.payouts.length, 10)} Winners - ${day.day}`,
         description,
         fields: [
           { name: 'Realm', value: day.realm, inline: true },
           { name: 'Prize Pool', value: usd(day.prizePoolUsd), inline: true },
+          { name: 'Next task', value: day.nextTaskName, inline: false },
         ],
         footer: { text: 'World of ClaudeCraft' },
       },
