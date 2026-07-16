@@ -9805,6 +9805,11 @@ export const cs_CZ: EnTranslations = {
         "sender": "Bratr Aldric",
         "subject": "Tvůj čin v temnotě",
         "body": "Jen málokdo se kdy dozví, co bylo pohřbeno v té dutině, a ještě méně by tomu věřilo. Já to vím a nezapomenu.\n\nAť je tvá cesta osvětlena.\n- Bratr Aldric"
+      },
+      "heroic_marks_reward": {
+        "sender": "The Heroic Quartermaster",
+        "subject": "Your Heroic Marks",
+        "body": "Your warband cleared the heroic trial while you fought from the back, or from the dirt. Your lockout was struck all the same, so your share of Heroic Marks flies to you here rather than being lost. Spend them well.\n\n- The Heroic Quartermaster"
       }
     },
     "itemSets": {

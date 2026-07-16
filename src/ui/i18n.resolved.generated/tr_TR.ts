@@ -9805,6 +9805,11 @@ export const tr_TR: EnTranslations = {
         "sender": "Birader Aldric",
         "subject": "Karanlıkta yaptıkların",
         "body": "O çukurda neyin gömülü olduğunu çok az kişi bilecek, inanacak olansa daha da az. Ben biliyorum ve unutmayacağım.\n\nYolun hep aydınlık olsun.\n- Birader Aldric"
+      },
+      "heroic_marks_reward": {
+        "sender": "The Heroic Quartermaster",
+        "subject": "Your Heroic Marks",
+        "body": "Your warband cleared the heroic trial while you fought from the back, or from the dirt. Your lockout was struck all the same, so your share of Heroic Marks flies to you here rather than being lost. Spend them well.\n\n- The Heroic Quartermaster"
       }
     },
     "itemSets": {

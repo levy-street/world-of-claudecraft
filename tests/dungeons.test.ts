@@ -6,9 +6,11 @@
 import { describe, expect, it } from 'vitest';
 import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
 import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
+import { HEROIC_MARK_LETTER } from '../src/sim/content/letters';
 import { DUNGEON_X_THRESHOLD, DUNGEONS, ITEMS, instanceOrigin, MOBS } from '../src/sim/data';
 import { spawnNythraxisAdds } from '../src/sim/encounters/nythraxis';
 import {
+  awardHeroicMarks,
   enterDungeon,
   instanceKeyFor,
   instanceLockoutMetas,
@@ -19,11 +21,13 @@ import {
 } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
 import {
+  dist2d,
   type Entity,
   INSTANCE_EMPTY_TIMEOUT,
   type MobTemplate,
   NYTHRAXIS_ADD_ID,
   NYTHRAXIS_BOSS_ID,
+  PARTY_XP_RANGE,
 } from '../src/sim/types';
 
 type AnySim = Sim & Record<string, any>;
@@ -55,6 +59,17 @@ function claimedDungeon(sim: AnySim, dungeonId: string, difficulty = 'normal'): 
   return (sim.instances as any[]).find(
     (i) => i.dungeonId === dungeonId && i.difficulty === difficulty && i.partyKey !== null,
   );
+}
+
+// Total Heroic Marks riding the Ravenpost for one player (awardHeroicMarks's
+// mail arm), summed across every letter addressed to them.
+function mailedMarksTo(sim: AnySim, pid: number): number {
+  const name = sim.players.get(pid)!.name;
+  return ((sim.postOffice as any).mail as any[])
+    .filter((m) => m.recipientName === name)
+    .flatMap((m) => m.items as { itemId: string; count: number }[])
+    .filter((s) => s.itemId === HEROIC_MARK_ITEM_ID)
+    .reduce((n, s) => n + s.count, 0);
 }
 
 function mobInInstance(sim: AnySim, inst: any, templateId: string): AnyEntity {
@@ -1342,11 +1357,48 @@ describe('dungeons: heroic daily lockouts', () => {
       );
     }
     // ...while marks stay participation-gated: only the nearby leader is paid.
+    // The camper never walked through the door this run, so the mail arm skips
+    // them too: roster membership alone earns the lockout, never mailed income.
     expect(sim.countItem(HEROIC_MARK_ITEM_ID, leader)).toBe(1);
     expect(sim.countItem(HEROIC_MARK_ITEM_ID, camper)).toBe(0);
+    expect(mailedMarksTo(sim, camper)).toBe(0);
     expect(
       ((morthen.loot?.items ?? []) as any[]).some((s) => s.itemId === HEROIC_MARK_ITEM_ID),
     ).toBe(false);
+  });
+
+  it('mails a healer waiting back at camp who entered this run, and never twice', () => {
+    const sim = makeSim(5);
+    const leader = sim.addPlayer('warrior', 'Lead');
+    const healer = sim.addPlayer('priest', 'Heals');
+    sim.partyInvite(healer, leader);
+    sim.partyAccept(healer);
+    sim.setDungeonDifficulty('heroic', leader);
+    enterDungeon(sim.ctx, 'hollow_crypt', leader);
+    enterDungeon(sim.ctx, 'hollow_crypt', healer);
+    const inst = claimedDungeon(sim, 'hollow_crypt', 'heroic');
+    const morthen = mobInInstance(sim, inst, 'morthen');
+    const le = sim.entities.get(leader) as AnyEntity;
+    teleport(sim, le, morthen.pos.x + 1, morthen.pos.z);
+    // The healer ran the dungeon, then stepped out to wait at camp: still a
+    // group member, far from the corpse at kill time.
+    leaveDungeon(sim.ctx, healer);
+    teleport(sim, sim.entities.get(healer) as AnyEntity, 0, 0);
+
+    (sim as any).dealDamage(le, morthen, morthen.hp + 10, false, 'physical', null, 'hit');
+    expect(morthen.dead).toBe(true);
+
+    // Locked and paid by mail: they entered this run, so distance costs them
+    // only the delivery route, never the reward.
+    expect(sim.players.get(healer)!.raidLockouts.has('hollow_crypt:heroic')).toBe(true);
+    expect(sim.countItem(HEROIC_MARK_ITEM_ID, healer)).toBe(0);
+    expect(mailedMarksTo(sim, healer)).toBe(1);
+
+    // A repeat settlement on the same claim (the alreadyLocked guard) must not
+    // pay anyone again, bags or mail.
+    awardHeroicMarks(sim.ctx, morthen, [sim.players.get(leader)!]);
+    expect(sim.countItem(HEROIC_MARK_ITEM_ID, leader)).toBe(1);
+    expect(mailedMarksTo(sim, healer)).toBe(1);
   });
 
   it("uses a released participant's corpse position for loot and Heroic Mark eligibility", () => {
@@ -1410,6 +1462,10 @@ describe('dungeons: heroic daily lockouts', () => {
         false,
       );
     }
+    // The quitter ran the dungeon (they entered this run and stood in the boss
+    // room) but left the credit party, so their marks ride the Ravenpost.
+    expect(sim.countItem(HEROIC_MARK_ITEM_ID, quitter)).toBe(0);
+    expect(mailedMarksTo(sim, quitter)).toBe(1);
   });
 
   it("locks a released member who leaves the party using their corpse's instance position", () => {
@@ -1444,7 +1500,23 @@ describe('dungeons: heroic daily lockouts', () => {
     (sim as any).dealDamage(le, morthen, morthen.hp + 10, false, 'physical', null, 'hit');
 
     expect(sim.players.get(quitter)!.raidLockouts.has('hollow_crypt:heroic')).toBe(true);
+    // Locked away from the corpse but a real participant (they entered and died
+    // in there), so the marks arrive end to end as the reward letter's exact
+    // attachment rather than dropping into distant bags.
     expect(sim.countItem(HEROIC_MARK_ITEM_ID, quitter)).toBe(0);
+    const letter = ((sim.postOffice as any).mail as any[]).find(
+      (m) =>
+        m.recipientName === sim.players.get(quitter)!.name &&
+        m.letterId === HEROIC_MARK_LETTER.letterId,
+    );
+    expect(letter).toBeDefined();
+    expect(letter.items).toEqual([
+      {
+        itemId: HEROIC_MARK_ITEM_ID,
+        count: HEROIC_DUNGEON_TUNING.hollow_crypt.marksPerParticipant,
+      },
+    ]);
+    expect(mailedMarksTo(sim, quitter)).toBe(1);
   });
 
   it('ignores a released corpse bound to an older instance claim', () => {
@@ -1481,6 +1553,7 @@ describe('dungeons: heroic daily lockouts', () => {
     (sim as any).dealDamage(le, morthen, morthen.hp + 10, false, 'physical', null, 'hit');
     expect(sim.players.get(stale)!.raidLockouts.has('hollow_crypt:heroic')).toBe(false);
     expect(sim.countItem(HEROIC_MARK_ITEM_ID, stale)).toBe(0);
+    expect(mailedMarksTo(sim, stale)).toBe(0);
   });
 
   it('an uncredited final-boss death still locks the owning party (no marks, no credit)', () => {
@@ -1501,10 +1574,15 @@ describe('dungeons: heroic daily lockouts', () => {
     (sim as any).dealDamage(null, morthen, morthen.hp + 10, false, 'physical', null, 'hit');
     expect(morthen.dead).toBe(true);
 
-    // No credit means no marks were created...
+    // No credit means no marks were created: nobody is paid to bags and the
+    // Ravenpost carries nothing, for anyone.
     expect(
       ((morthen.loot?.items ?? []) as any[]).some((s) => s.itemId === HEROIC_MARK_ITEM_ID),
     ).toBe(false);
+    for (const pid of [leader, member]) {
+      expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid), `bags pid ${pid}`).toBe(0);
+      expect(mailedMarksTo(sim, pid), `mail pid ${pid}`).toBe(0);
+    }
     // ...but the kill-site lockout is credit-free and still locks the party.
     expect(sim.players.get(leader)!.raidLockouts.has('hollow_crypt:heroic')).toBe(true);
     expect(sim.players.get(member)!.raidLockouts.has('hollow_crypt:heroic')).toBe(true);
@@ -1678,8 +1756,9 @@ describe('dungeons: heroic daily lockouts', () => {
 
 describe('dungeons: heroic Nythraxis raid arena', () => {
   // Compact attuned-raid harness (the full version lives in
-  // tests/nythraxis_encounter.test.ts): five raiders, tank attuned, leader
-  // selects the difficulty, tank enters and claims the arena.
+  // tests/nythraxis_encounter.test.ts): five raiders, all attuned, leader
+  // selects the difficulty, tank claims the arena and everyone walks in (the
+  // per-run entry record is what the heroic mail arm pays against).
   function raidSetup(difficulty: 'normal' | 'heroic') {
     const sim = makeSim(77);
     const tank = sim.addPlayer('warrior', 'Tank');
@@ -1687,14 +1766,17 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
     const raiders: number[] = [tank];
     for (let i = 0; i < 4; i++) {
       const pid = sim.addPlayer('mage', `Dps${i}`);
+      sim.players.get(pid)!.questsDone.add('q_nythraxis_bound_guardian');
       sim.partyInvite(pid, tank);
       sim.partyAccept(pid);
       raiders.push(pid);
     }
     sim.convertPartyToRaid(tank);
     if (difficulty === 'heroic') sim.setDungeonDifficulty('heroic', tank);
-    sim.enterDungeon('nythraxis_crypt', tank);
-    sim.enterDungeon('nythraxis_boss_arena', tank);
+    for (const pid of raiders) {
+      sim.enterDungeon('nythraxis_crypt', pid);
+      sim.enterDungeon('nythraxis_boss_arena', pid);
+    }
     const inst = claimedDungeon(sim, 'nythraxis_boss_arena', difficulty);
     return { sim, tank, raiders, inst };
   }
@@ -1761,6 +1843,43 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
     expect(((boss.loot?.items ?? []) as any[]).some((s) => s.itemId === HEROIC_MARK_ITEM_ID)).toBe(
       false,
     );
+  });
+
+  it('mails the marks to a raider locked from far back, so lockout never outruns reward', () => {
+    const { sim, raiders, inst } = raidSetup('heroic');
+    const boss = mobInInstance(sim, inst, NYTHRAXIS_BOSS_ID);
+    // The melee stack takes the kill at the boss; the back-line healer holds
+    // well past PARTY_XP_RANGE, but is still a raid member inside the instance.
+    raiders.slice(0, 4).forEach((pid, i) => {
+      teleport(sim, sim.entities.get(pid) as AnyEntity, boss.pos.x + (i - 2), boss.pos.z - 4);
+    });
+    const healer = raiders[4];
+    teleport(sim, sim.entities.get(healer) as AnyEntity, boss.pos.x, boss.pos.z + 140);
+    expect(dist2d(sim.entities.get(healer)!.pos, boss.pos)).toBeGreaterThan(PARTY_XP_RANGE);
+
+    (sim as any).dealDamage(
+      sim.entities.get(raiders[0]),
+      boss,
+      boss.hp + 100,
+      false,
+      'physical',
+      null,
+      'hit',
+    );
+    expect(boss.dead).toBe(true);
+
+    // The whole raid takes the daily lockout, the far healer included...
+    expect(sim.players.get(healer)!.raidLockouts.has('nythraxis_boss_arena:heroic')).toBe(true);
+    // ...so the marks must reach them too. Not present at the corpse to loot, so
+    // they ride the Ravenpost instead of dropping into a distant player's bags.
+    expect(sim.countItem(HEROIC_MARK_ITEM_ID, healer)).toBe(0);
+    const healerName = sim.players.get(healer)!.name;
+    const mailedMarks = ((sim.postOffice as any).mail as any[])
+      .filter((m) => m.recipientName === healerName)
+      .flatMap((m) => m.items as { itemId: string; count: number }[])
+      .filter((s) => s.itemId === HEROIC_MARK_ITEM_ID)
+      .reduce((n, s) => n + s.count, 0);
+    expect(mailedMarks).toBe(3);
   });
 
   it('lets a locked ghost return to its defeated heroic raid instance for loot', () => {

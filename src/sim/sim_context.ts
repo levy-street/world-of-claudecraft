@@ -722,6 +722,11 @@ export interface SimContextCallbacks {
   // through this; the binding points at the PostOffice instance on Sim.
   queueQuestLetter(questId: string, pid: number): void;
 
+  // Ravenpost mail: posts Heroic Marks to a heroic final-boss participant who took
+  // the daily lockout but was not at the corpse to loot them (awardHeroicMarks in
+  // instances/dungeons.ts). Binding points at the PostOffice instance on Sim.
+  mailHeroicMarks(pid: number, itemId: string, count: number): void;
+
   // Set proc firing is owned by combat/set_procs.ts.
   applySetProcs(source: Entity, target: Entity | null, trigger: SetProc['trigger']): void;
   // Book of Deeds (deeds.ts owns every body; append-only additions). The
@@ -1157,6 +1162,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     canAddItem: host.canAddItem,
     // Ravenpost mail: the quest turn-in letter hook (points at the PostOffice on Sim).
     queueQuestLetter: host.queueQuestLetter,
+    mailHeroicMarks: host.mailHeroicMarks,
     applySetProcs: host.applySetProcs,
     // Book of Deeds seam (points at deeds.ts via the Sim-bound arrows).
     bumpDeedStat: host.bumpDeedStat,

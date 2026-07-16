@@ -808,6 +808,12 @@ export interface InstanceSlot {
   // exception admits only these: a player locked by an earlier run can never
   // treat someone else's cleared claim as their own loot run.
   clearedBy: Set<number>;
+  // Players who stepped through this claim's door during this run (enterDungeon).
+  // Session-only like clearedBy, cleared with the claim. The heroic mail arm
+  // (instances/dungeons awardHeroicMarks) pays a locked-but-absent player only
+  // when they actually entered this run: a door-camper or a member parked in
+  // town takes the lockout without turning roster membership into mailed income.
+  enteredBy: Set<number>;
 }
 
 export interface ResolvedAbility {
@@ -1620,6 +1626,7 @@ export class Sim {
             emptyFor: 0,
             resetAvailableAt: 0,
             clearedBy: new Set(),
+            enteredBy: new Set(),
           });
         }
         continue;
@@ -1648,6 +1655,7 @@ export class Sim {
           emptyFor: 0,
           resetAvailableAt: 0,
           clearedBy: new Set(),
+          enteredBy: new Set(),
         });
       }
     }
@@ -3582,6 +3590,7 @@ export class Sim {
       partyCapacity: (party) => sim.party.partyCapacity(party),
       marketListingBelongsTo: (listing, meta) => sim.market.marketListingBelongsTo(listing, meta),
       queueQuestLetter: (questId, pid) => sim.postOffice.queueQuestLetter(questId, pid),
+      mailHeroicMarks: (pid, itemId, count) => sim.postOffice.mailHeroicMarks(pid, itemId, count),
       // Book of Deeds seam callbacks (owned by deeds.ts). Late-bound arrows so
       // sim.ctx resolves at call time (the Q1 pattern).
       bumpDeedStat: (meta, stat, delta) => deedsMod.bumpDeedStat(sim.ctx, meta, stat, delta),

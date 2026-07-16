@@ -9805,6 +9805,11 @@ export const en: EnTranslations = {
         "sender": "Brother Aldric",
         "subject": "What you did in the dark",
         "body": "Few will ever know what was buried in that hollow, and fewer still would believe it. I know, and I will not forget.\n\nMay your road stay lit.\n- Brother Aldric"
+      },
+      "heroic_marks_reward": {
+        "sender": "The Heroic Quartermaster",
+        "subject": "Your Heroic Marks",
+        "body": "Your warband cleared the heroic trial while you fought from the back, or from the dirt. Your lockout was struck all the same, so your share of Heroic Marks flies to you here rather than being lost. Spend them well.\n\n- The Heroic Quartermaster"
       }
     },
     "itemSets": {
