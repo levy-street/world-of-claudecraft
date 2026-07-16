@@ -293,7 +293,9 @@ Woe's Crescendo competes on the same level-17 row: reaching Litany's final tick 
 fixed, draw-free Shadow burst around the locked target, while clipping the channel produces
 no burst. Ninefold Litany alone does not grant the finisher. At level 14, Deathless Dirge
 makes Mindfracture refresh the priest's own Dirge of Decay to its full duration without
-changing the DoT snapshot or tick cadence.
+changing the DoT snapshot or tick cadence. Plague Chorus competes on that same row and copies
+the caster-owned Dirge snapshot to enemies within 8 yards, turning Mindfracture into the
+Shadow area-damage enabler without adding a random draw.
 
 ### PBE-2 mage feedback pass
 

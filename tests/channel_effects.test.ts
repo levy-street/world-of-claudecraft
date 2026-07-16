@@ -184,6 +184,88 @@ function runMindfractureRefresh(talented: boolean): {
   return { own, foreign, draws };
 }
 
+function runMindfractureSpread(talented: boolean, includeOwnedDirge = true): {
+  primaryOwn: Aura | undefined;
+  nearbyOwn: Aura | undefined;
+  nearbyForeign: Aura;
+  farOwn: Aura | undefined;
+  draws: number[];
+} {
+  const sim = new Sim({ seed: 64_909, playerClass: 'priest', autoEquip: false });
+  sim.setPlayerLevel(20);
+  if (talented) {
+    expect(sim.applyTalents({ spec: null, rows: { 14: 'pri_r14_plague_chorus' } })).toBe(true);
+  }
+  sim.player.spellPower = 0;
+  sim.player.critChance = 0;
+  sim.player.resource = sim.player.maxResource;
+  const addTarget = (id: number, xOffset: number) => {
+    const target = createMob(id, MOBS.forest_wolf, 1, {
+      x: sim.player.pos.x + xOffset,
+      y: sim.player.pos.y,
+      z: sim.player.pos.z + 6,
+    });
+    target.maxHp = 100_000;
+    target.hp = target.maxHp;
+    sim.entities.set(target.id, target);
+    sim.rebucket(target);
+    return target;
+  };
+  const primary = addTarget(93_001, 0);
+  const nearby = addTarget(93_002, 4);
+  const far = addTarget(93_003, 10);
+  sim.targetEntity(primary.id);
+  sim.player.facing = Math.atan2(
+    primary.pos.x - sim.player.pos.x,
+    primary.pos.z - sim.player.pos.z,
+  );
+
+  const dirge: Aura = {
+    id: 'shadow_word_pain',
+    name: 'Dirge of Decay',
+    kind: 'dot',
+    remaining: 7,
+    duration: 18,
+    value: 9,
+    tickInterval: 3,
+    tickTimer: 1.25,
+    sourceId: sim.playerId,
+    school: 'shadow',
+  };
+  primary.auras.push({ ...dirge, remaining: 13, value: 77, sourceId: 999_999 });
+  if (includeOwnedDirge) primary.auras.push(dirge);
+  const nearbyForeign: Aura = { ...dirge, remaining: 11, value: 55, sourceId: 999_999 };
+  nearby.auras.push(nearbyForeign);
+
+  const meta = sim.meta(sim.playerId);
+  if (!meta) throw new Error('missing priest metadata');
+  const draws: number[] = [];
+  sim.rng.setObserver((value) => draws.push(value));
+  sim.castAbility('mind_blast');
+  for (let tick = 0; tick < 200 && sim.player.castingAbility; tick++) {
+    updateCasting(sim.ctx, sim.player, meta);
+  }
+  for (let tick = 0; tick < 200 && sim.ctx.pendingProjectiles.length > 0; tick++) {
+    advancePendingProjectiles(sim.ctx);
+  }
+  sim.rng.setObserver(null);
+
+  const owned = (target: typeof primary) =>
+    target.auras.find(
+      (aura) =>
+        aura.kind === 'dot' &&
+        aura.id === 'shadow_word_pain' &&
+        aura.sourceId === sim.playerId,
+    );
+  return {
+    primaryOwn: owned(primary),
+    nearbyOwn: owned(nearby),
+    nearbyForeign,
+    farOwn: owned(far),
+    draws,
+  };
+}
+
 describe('Litany of Woe channel effects', () => {
   it('ramps from the one-based tick ordinal without its own RNG', () => {
     expect(rampedDrainTickDamage(12, 0.3, 1)).toBe(12);
@@ -263,9 +345,35 @@ describe('Litany of Woe channel effects', () => {
   it('places Deathless Dirge after both of its level prerequisites', () => {
     const row = rowForLevel('priest', 14);
     const choice = row?.options.find((option) => option.id === 'pri_r14_deathless_dirge');
+    const spread = row?.options.find((option) => option.id === 'pri_r14_plague_chorus');
 
     expect(choice?.effect.ability?.[0]?.ability).toBe('mind_blast');
+    expect(spread?.effect.ability?.[0]?.ability).toBe('mind_blast');
     expect(ABILITIES.mind_blast.learnLevel).toBeLessThanOrEqual(14);
     expect(ABILITIES.shadow_word_pain.learnLevel).toBeLessThanOrEqual(14);
+  });
+
+  it('spreads only the current caster-owned Dirge and adds no RNG draws', () => {
+    const baseline = runMindfractureSpread(false);
+    const talented = runMindfractureSpread(true);
+    const foreignOnly = runMindfractureSpread(true, false);
+
+    expect(baseline.nearbyOwn).toBeUndefined();
+    expect(talented.nearbyOwn).toMatchObject({
+      remaining: 7,
+      duration: 18,
+      value: 9,
+      tickInterval: 3,
+      tickTimer: 1.25,
+    });
+    expect(talented.nearbyOwn).not.toBe(talented.primaryOwn);
+    expect(talented.nearbyForeign).toMatchObject({
+      remaining: 11,
+      value: 55,
+      sourceId: 999_999,
+    });
+    expect(talented.farOwn).toBeUndefined();
+    expect(foreignOnly.nearbyOwn).toBeUndefined();
+    expect(talented.draws).toEqual(baseline.draws);
   });
 });

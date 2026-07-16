@@ -340,7 +340,7 @@ export interface Aura {
   // Lingering Dread lets a break-on-damage fear absorb this much damage before
   // breaking. Undefined retains the normal break-on-any-damage behavior.
   breakThreshold?: number;
-  // Per-application cap bookkeeping for effects such as Endless Dirge.
+  // Per-application bookkeeping for effects with capped duration extensions.
   extendedBy?: number;
   stacks?: number; // sunder armor: applications stack up to the effect's cap
   charges?: number; // thorns: remaining reflect charges (Lightning Shield); undefined => unlimited
@@ -1588,6 +1588,7 @@ export type AbilityEffect =
     }
   | { type: 'extendDot'; dot: string; seconds: number; maxBonus: number }
   | { type: 'refreshDot'; dot: string }
+  | { type: 'spreadDot'; dot: string; radius: number }
   | { type: 'consumeDot'; dot: string }
   | { type: 'slow'; mult: number; duration: number }
   | { type: 'root'; duration: number }

@@ -69,7 +69,8 @@ The supporting choice rows keep that identity on existing buttons. Ninefold Lita
 the commitment to nine seconds and nine ticks. Woe's Crescendo instead rewards reaching the
 baseline final tick with a fixed, draw-free area burst. Deathless Dirge makes Mindfracture
 refresh the priest's own Dirge of Decay without resnapshotting it or resetting its tick
-cadence.
+cadence. Plague Chorus competes with that upkeep choice and instead copies the current Dirge
+snapshot to enemies within 8 yards. Refreshing and spreading are both draw-free.
 
 ## Determinism and rollout
 

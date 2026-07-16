@@ -871,6 +871,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': 'Senda de la naturaleza',
     'Path of Spirits': 'Llamada elemental',
     'Pitiless Blows': 'Ataques despiadados',
+    'Plague Chorus': 'Coro de la Plaga',
     'Poleaxe Discipline': 'Especialización en alabardas',
     'Practiced Steel': 'Pericia con armas',
     "Predator's Cunning": 'Golpes predatorios',
@@ -1219,6 +1220,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': 'Senda de la naturaleza',
     'Path of Spirits': 'Llamada elemental',
     'Pitiless Blows': 'Ataques despiadados',
+    'Plague Chorus': 'Coro de la Plaga',
     'Poleaxe Discipline': 'Especialización en hachas de guerra',
     'Practiced Steel': 'Pericia con armas',
     "Predator's Cunning": 'Golpes de depredador',
@@ -1567,6 +1569,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': 'Voie de la nature',
     'Path of Spirits': 'Appel élémentaire',
     'Pitiless Blows': 'Attaques sans pitié',
+    'Plague Chorus': 'Chœur de la Peste',
     'Poleaxe Discipline': "Spécialisation hache d'armes",
     'Practiced Steel': 'Expertise des armes',
     "Predator's Cunning": 'Frappes prédatrices',
@@ -1915,6 +1918,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': 'Voie de la nature',
     'Path of Spirits': 'Appel élémentaire',
     'Pitiless Blows': 'Attaques sans pitié',
+    'Plague Chorus': 'Chœur de la Peste',
     'Poleaxe Discipline': "Spécialisation des haches d'armes",
     'Practiced Steel': 'Expertise des armes',
     "Predator's Cunning": 'Frappes de prédateur',
@@ -2263,6 +2267,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': 'Sentiero della natura',
     'Path of Spirits': 'Richiamo elementale',
     'Pitiless Blows': 'Attacchi spietati',
+    'Plague Chorus': 'Coro della Piaga',
     'Poleaxe Discipline': 'Specializzazione in alabarde',
     'Practiced Steel': 'Competenza nelle armi',
     "Predator's Cunning": 'Colpi predatori',
@@ -2611,6 +2616,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': 'Pfad der Natur',
     'Path of Spirits': 'Ruf der Elemente',
     'Pitiless Blows': 'Reuelose Angriffe',
+    'Plague Chorus': 'Seuchenchor',
     'Poleaxe Discipline': 'Streitaxtspezialisierung',
     'Practiced Steel': 'Waffenkunde',
     "Predator's Cunning": 'Raubtierschläge',
@@ -2960,6 +2966,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': '自然之径',
     'Path of Spirits': '元素召唤',
     'Pitiless Blows': '冷酷攻击',
+    'Plague Chorus': '瘟疫合唱',
     'Poleaxe Discipline': '长柄武器专精',
     'Practiced Steel': '武器专家',
     "Predator's Cunning": '掠食打击',
@@ -3309,6 +3316,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': '自然之徑',
     'Path of Spirits': '元素召喚',
     'Pitiless Blows': '冷酷攻擊',
+    'Plague Chorus': '瘟疫合唱',
     'Poleaxe Discipline': '斧鉞專精',
     'Practiced Steel': '武器專精',
     "Predator's Cunning": '掠食打擊',
@@ -3658,6 +3666,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': '자연의 길',
     'Path of Spirits': '정령 부름',
     'Pitiless Blows': '무자비한 공격',
+    'Plague Chorus': '역병의 합창',
     'Poleaxe Discipline': '도끼창 전문화',
     'Practiced Steel': '무기 전문화',
     "Predator's Cunning": '포식자의 일격',
@@ -4007,6 +4016,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': '自然の小径',
     'Path of Spirits': 'エレメンタル・コーリング',
     'Pitiless Blows': '非情なる攻撃',
+    'Plague Chorus': '疫病の合唱',
     'Poleaxe Discipline': '鉾槍専門化',
     'Practiced Steel': '武器練達',
     "Predator's Cunning": '捕食者の一撃',
@@ -4355,6 +4365,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': 'Caminho da Natureza',
     'Path of Spirits': 'Chamado Elemental',
     'Pitiless Blows': 'Ataques Impiedosos',
+    'Plague Chorus': 'Coro da Peste',
     'Poleaxe Discipline': 'Especialização em Alabarda',
     'Practiced Steel': 'Perícia em Armas',
     "Predator's Cunning": 'Golpes Predatórios',
@@ -4704,6 +4715,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': 'Путь природы',
     'Path of Spirits': 'Зов стихий',
     'Pitiless Blows': 'Беспощадные атаки',
+    'Plague Chorus': 'Чумной хор',
     'Poleaxe Discipline': 'Специализация по древковому оружию',
     'Practiced Steel': 'Мастерское владение оружием',
     "Predator's Cunning": 'Хищные удары',
@@ -5052,6 +5064,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': 'Cesta ročních období',
     'Path of Spirits': 'Cesta duchů',
     'Pitiless Blows': 'Nelítostné rány',
+    'Plague Chorus': 'Morový sbor',
     'Poleaxe Discipline': 'Disciplína sudlice',
     'Practiced Steel': 'Cvičená ocel',
     "Predator's Cunning": 'Lstivost dravce',
@@ -5400,6 +5413,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': 'Natuurpad',
     'Path of Spirits': 'Elementaire Roeping',
     'Pitiless Blows': 'Genadeloze Aanvallen',
+    'Plague Chorus': 'Pestkoor',
     'Poleaxe Discipline': 'Strijdbijl-Specialisatie',
     'Practiced Steel': 'Wapenexpertise',
     "Predator's Cunning": 'Roofzuchtige Slagen',
@@ -5748,6 +5762,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': 'Ścieżka natury',
     'Path of Spirits': 'Zew żywiołów',
     'Pitiless Blows': 'Bezwzględne ataki',
+    'Plague Chorus': 'Chór Zarazy',
     'Poleaxe Discipline': 'Specjalizacja w berdyszu',
     'Practiced Steel': 'Biegłość w broni',
     "Predator's Cunning": 'Drapieżne uderzenia',
@@ -6096,6 +6111,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': 'Jalan Alam',
     'Path of Spirits': 'Panggilan Elemental',
     'Pitiless Blows': 'Serangan Tanpa Ampun',
+    'Plague Chorus': 'Paduan Suara Wabah',
     'Poleaxe Discipline': 'Spesialisasi Kapak Tombak',
     'Practiced Steel': 'Keahlian Senjata',
     "Predator's Cunning": 'Serangan Pemangsa',
@@ -6444,6 +6460,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': 'Doğa Yolu',
     'Path of Spirits': 'Elementsel Çağrı',
     'Pitiless Blows': 'Acımasız Saldırılar',
+    'Plague Chorus': 'Veba Korosu',
     'Poleaxe Discipline': 'Balta-Mızrak Uzmanlığı',
     'Practiced Steel': 'Silah Ustalığı',
     "Predator's Cunning": 'Yırtıcı Darbeler',
@@ -6792,6 +6809,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': 'Naturens väg',
     'Path of Spirits': 'Elementär kallelse',
     'Pitiless Blows': 'Skoningslösa attacker',
+    'Plague Chorus': 'Pestkör',
     'Poleaxe Discipline': 'Stridsyxespecialisering',
     'Practiced Steel': 'Vapenexpertis',
     "Predator's Cunning": 'Rovdjurshugg',
@@ -7140,6 +7158,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': 'Con Đường Tự Nhiên',
     'Path of Spirits': 'Tiếng Gọi Nguyên Tố',
     'Pitiless Blows': 'Đòn Tàn Nhẫn',
+    'Plague Chorus': 'Hợp Xướng Dịch Bệnh',
     'Poleaxe Discipline': 'Chuyên Môn Rìu Thương',
     'Practiced Steel': 'Thành Thạo Vũ Khí',
     "Predator's Cunning": 'Đòn Săn Mồi',
@@ -7488,6 +7507,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': 'Naturens Vej',
     'Path of Spirits': 'Elementært Kald',
     'Pitiless Blows': 'Skånselsløse Angreb',
+    'Plague Chorus': 'Pestkor',
     'Poleaxe Discipline': 'Stridsøkse-Specialisering',
     'Practiced Steel': 'Våbenekspertise',
     "Predator's Cunning": 'Rovdyrslag',
@@ -7897,6 +7917,7 @@ type DescribedAddedEffect = Extract<
       | 'dot'
       | 'extendDot'
       | 'refreshDot'
+      | 'spreadDot'
       | 'channelFinisher'
       | 'interrupt'
       | 'consumeDot'
@@ -7913,6 +7934,7 @@ function assertDescribedAddedEffect(effect: AbilityEffect): asserts effect is De
     effect.type !== 'dot' &&
     effect.type !== 'extendDot' &&
     effect.type !== 'refreshDot' &&
+    effect.type !== 'spreadDot' &&
     effect.type !== 'channelFinisher' &&
     effect.type !== 'interrupt' &&
     effect.type !== 'consumeDot' &&
@@ -7951,6 +7973,8 @@ function addedEffectDescription(
       const dot = ABILITIES[effect.dot]?.effects.find((candidate) => candidate.type === 'dot');
       return `${name} -> ${abilityName(effect.dot)}: ${seconds(dot?.duration ?? 0, lang)}.`;
     }
+    case 'spreadDot':
+      return `${name} -> ${abilityName(effect.dot)} (r=${formatNumber(effect.radius, lang)}).`;
     case 'channelFinisher':
       return `${name}: ${formatNumber(effect.amount, lang)} ${text.statLabels.damage} (r=${formatNumber(effect.radius, lang)}).`;
     case 'interrupt':

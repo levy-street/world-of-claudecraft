@@ -37,6 +37,7 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   dot: 'damage',
   extendDot: 'other',
   refreshDot: 'other',
+  spreadDot: 'other',
   consumeDot: 'other',
   aoeDamage: 'damage',
   chainDamage: 'damage',

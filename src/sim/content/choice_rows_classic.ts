@@ -1409,7 +1409,7 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 14,
       theme: 'investment',
-      decision: 'Dirge refresh vs emergency heal echo vs extended decay',
+      decision: 'single-target Dirge refresh vs emergency heal echo vs area Dirge spread',
       options: [
         {
           id: 'pri_r14_deathless_dirge',
@@ -1443,18 +1443,16 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
           },
         },
         {
-          id: 'pri_r14_pain_and_suffering',
-          name: 'Endless Dirge',
+          id: 'pri_r14_plague_chorus',
+          name: 'Plague Chorus',
           description:
-            'Each Litany of Woe tick extends your Dirge of Decay on the target by 1 sec, up to 6 added sec.',
-          icon: 'mind_flay',
+            'Mindfracture copies your Dirge of Decay on the target to enemies within 8 yards.',
+          icon: 'mind_blast',
           effect: {
             ability: [
               {
-                ability: 'mind_flay',
-                addEffects: [
-                  { type: 'extendDot', dot: 'shadow_word_pain', seconds: 1, maxBonus: 6 },
-                ],
+                ability: 'mind_blast',
+                addEffects: [{ type: 'spreadDot', dot: 'shadow_word_pain', radius: 8 }],
               },
             ],
           },
