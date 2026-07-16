@@ -3279,6 +3279,7 @@ export const da_DK: EnTranslations = {
       "marketBody": "Købmanden driver Verdensmarkedet, en spillerdrevet børs, hvor du kan købe og sælge med folk, du måske aldrig møder. Tal med Købmanden i Eastbrook, eller med Auktionarius Voss oppe i Highwatch, for at åbne det: begge vogtere betjener det ene fælles marked. Købmanden har også et fast lager af sine egne varer opslået der, så der er altid noget at købe, selv når ingen andre spillere har lagt noget op.",
       "marketBrowse": "Gennemse: rul gennem opslagene eller søg efter navn for at finde, hvad der er til salg. Hvert opslag viser varerne, sælgeren og den ønskede pris for hele stakken.",
       "marketPost": "Opslag: vælg en stak fra dine tasker, sæt din pris, og slå den op. Varerne holdes af Købmanden, indtil nogen køber dem. Usolgte opslag kommer tilbage til dig efter et stykke tid, og du kan kræve et tilbage tidligt, hvis du skifter mening.",
+      "marketBidding": "Auctions: some listings take bids instead of a fixed price. A bid must clear the posted minimum, and outbidding someone always refunds them. When the seller sets a buyout, any bid that reaches it wins the lot on the spot.",
       "marketCollect": "Indsamling: når dine varer sælges, venter dit udbytte på dig hos Købmanden. Vend tilbage for at hente mønterne sammen med alt, der kom usolgt retur. Købmanden tager en lille andel af hvert gennemført salg.",
       "marketPricing": "Prissætningen er op til dig. At slå en smule under, hvad andre forlanger, plejer at sælge hurtigere, mens en stejl pris kan blive liggende urørt. Gennemse først for at se, hvad den gængse pris ligger på, før du slår op."
     },
@@ -5845,6 +5846,10 @@ export const da_DK: EnTranslations = {
       "filterWeaponAll": "Alle våben",
       "filterRarity": "Sjældenhed",
       "filterRarityAll": "Alle sjældenheder",
+      "sortLabel": "Sort",
+      "sortNewest": "Newest",
+      "sortPrice": "Price",
+      "sortTimeLeft": "Time left",
       "weaponSword": "Sværd",
       "weaponDagger": "Dolke",
       "weaponStaff": "Stave",
@@ -5863,17 +5868,48 @@ export const da_DK: EnTranslations = {
       "reclaim": "Tag tilbage",
       "buyAria": "Køb {item} for {price}",
       "reclaimAria": "Tag {item} tilbage",
+      "timeLeft": "{time} left",
+      "yourBidBadge": "Your bid",
+      "currentBidLabel": "Bid:",
+      "noBidsYet": "No bids yet",
+      "minNextBid": "Min bid {money}",
+      "buyoutLabel": "Buyout {money}",
+      "auctionBadge": "Auction",
+      "leadingBid": "You're leading",
+      "bidInputAria": "Bid amount for {item}",
+      "bidButton": "Bid",
+      "bidAria": "Bid on {item}",
+      "buyoutButton": "Buyout",
+      "buyoutAria": "Buy out {item} for {price}",
+      "buyQuantityAria": "Quantity of {item} to buy",
       "sellNote": "Sæt varer fra dine tasker til salg. Købmanden tager {cut}% i afgift, når en genstand sælges. Du bruger {used}/{max} salgspladser.",
       "sellPickEmpty": "Klik på en genstand i dine tasker for at vælge, hvad du vil sælge.",
       "quantity": "Antal",
       "quantityOf": "af {count}",
       "priceEach": "Pris pr. styk",
+      "listingTypeLabel": "Listing type",
+      "listingTypeFixed": "Fixed price",
+      "listingTypeAuction": "Auction",
+      "durationLabel": "Duration",
+      "durationOption": "{hours}h",
+      "startingBidLabel": "Starting bid",
+      "buyoutOptionalLabel": "Buyout (optional)",
+      "totalLabel": "Total",
+      "depositPreviewLabel": "Listing deposit",
       "listButton": "Sæt til salg på Verdensmarkedet",
       "minPriceError": "Angiv en pris på mindst 1 kobber.",
+      "cancelConfirmTitle": "Reclaim listing",
+      "cancelConfirmBody": "Reclaim {item} from the market? The {money} deposit will be forfeited.",
+      "cancelConfirmBodyNoDeposit": "Reclaim {item} from the market?",
+      "cancelConfirmDismiss": "Cancel",
       "collectEmpty": "Intet venter. Salgsindtægter og udløbne varer hentes her.",
       "collectNote": "Indtjening og returnerede varer, som Købmanden holder for dig.",
       "saleProceeds": "Salgsindtægt",
-      "collectAll": "Hent alt"
+      "collectAll": "Hent alt",
+      "outbidToast": "You were outbid on {item}. {money} refunded to your collection box.",
+      "wonToast": "You won the auction for {item}! Collect it at the Merchant.",
+      "soldToast": "Your {item} sold for {money}. Collect it at the Merchant.",
+      "expiredToast": "Your listing of {item} expired unsold. Collect it at the Merchant."
     },
     "logs": {
       "listedItem": "Satte {item} til salg på Verdensmarkedet for {money}.",
@@ -5882,6 +5918,8 @@ export const da_DK: EnTranslations = {
       "collectedMoney": "Du henter {money} fra Købmanden.",
       "reclaimedItem": "Tog {item} tilbage fra markedet.",
       "expiredListing": "Din markedsvare {item} udløb og venter hos Købmanden.",
+      "postedAuction": "Posted {item} for auction (starting bid {money}).",
+      "bidPlaced": "Bid placed: {money} on {item}.",
       "boughtBackItem": "Købte {item} tilbage for {money}."
     },
     "errors": {
@@ -5898,7 +5936,16 @@ export const da_DK: EnTranslations = {
       "ownListing": "Det er din egen vare. Annuller den for at tage den tilbage.",
       "cannotAfford": "Det har du ikke råd til.",
       "notYourListing": "Det er ikke din vare.",
-      "nothingToCollect": "Du har intet at hente."
+      "nothingToCollect": "Du har intet at hente.",
+      "minStartingBid": "Name a starting bid of at least 1 copper.",
+      "buyoutTooLow": "The buyout must beat the starting bid.",
+      "chooseDuration": "Choose a listing duration of 12, 24, or 48 hours.",
+      "cannotAffordDeposit": "You cannot afford the listing deposit.",
+      "bidsOnly": "That lot takes bids only.",
+      "notAuction": "That lot is not up for auction.",
+      "cannotBidOwnLot": "You cannot bid on your own lot.",
+      "alreadyHighBidder": "You are already the high bidder.",
+      "bidTooLow": "Bid at least {min}."
     },
     "loot": {
       "takeAll": "Tag alt",
@@ -9738,6 +9785,26 @@ export const da_DK: EnTranslations = {
         "sender": "Broder Aldric",
         "subject": "Det, du gjorde i mørket",
         "body": "Kun få vil nogensinde vide, hvad der lå begravet i den lavning, og endnu færre ville tro det. Jeg ved det, og jeg glemmer det ikke.\n\nMå din vej forblive oplyst.\n- Broder Aldric"
+      },
+      "market_outbid": {
+        "sender": "The Merchant",
+        "subject": "You have been outbid",
+        "body": "Another buyer has raised the bidding on a lot you wanted. Your copper waits in your collection box at the World Market; come see me to take it back or bid again.\n\n- The Merchant"
+      },
+      "market_won": {
+        "sender": "The Merchant",
+        "subject": "Your winning bid",
+        "body": "The hammer has fallen and the lot is yours. Your goods wait in your collection box at the World Market; come see me to claim them.\n\n- The Merchant"
+      },
+      "market_sold": {
+        "sender": "The Merchant",
+        "subject": "Your lot has sold",
+        "body": "A buyer has taken your goods off my hands. Your proceeds wait in your collection box at the World Market; come see me to collect them.\n\n- The Merchant"
+      },
+      "market_expired": {
+        "sender": "The Merchant",
+        "subject": "Your listing expired",
+        "body": "No buyer came for your goods before the listing ran out. They wait in your collection box at the World Market; come see me to take them back.\n\n- The Merchant"
       }
     },
     "itemSets": {

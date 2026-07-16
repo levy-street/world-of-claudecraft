@@ -1,4 +1,9 @@
-import { type LetterDef, QUEST_LETTERS, WELCOME_LETTER } from '../sim/content/letters';
+import {
+  AUCTION_LETTERS,
+  type LetterDef,
+  QUEST_LETTERS,
+  WELCOME_LETTER,
+} from '../sim/content/letters';
 import {
   ABILITIES,
   CLASSES,
@@ -158,6 +163,7 @@ const LETTERS_BY_ID: Record<string, LetterDef> = {
   [WELCOME_LETTER.letterId]: WELCOME_LETTER,
 };
 for (const letter of Object.values(QUEST_LETTERS)) LETTERS_BY_ID[letter.letterId] = letter;
+for (const letter of Object.values(AUCTION_LETTERS)) LETTERS_BY_ID[letter.letterId] = letter;
 
 function entityPathSegment(value: string): string {
   return value.replace(/[^A-Za-z0-9_]/g, '_');

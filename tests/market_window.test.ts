@@ -23,7 +23,9 @@ describe('market_window: no magic values', () => {
   });
 
   it('names the coin-conversion constants instead of bare 10000 / 100', () => {
-    expect(painter).toContain('gg * COPPER_PER_GOLD + ss * COPPER_PER_SILVER + cc');
+    expect(painter).toContain("inputVal('mkt-g') * COPPER_PER_GOLD");
+    expect(painter).toContain("inputVal('mkt-s') * COPPER_PER_SILVER");
+    expect(painter).toContain("inputVal('mkt-c')");
     expect(painter.match(/\b10000\b/g) ?? [], 'no bare 10000 copper-per-gold literal').toEqual([]);
   });
 
@@ -49,8 +51,16 @@ describe('market_window: WCAG 2.2 AA', () => {
     expect(painter).toContain('aria-haspopup="listbox"');
     expect(painter).toContain('aria-selected=');
     expect(painter).toContain("search.setAttribute('aria-label', t('itemUi.market.searchAria'))");
-    // buy/reclaim buttons get a programmatic name even though their face text is plain
-    expect(painter).toContain("t(l.mine ? 'itemUi.market.reclaimAria' : 'itemUi.market.buyAria'");
+    // buy/reclaim/bid/buyout controls all get a programmatic name even though
+    // their face text is plain
+    expect(painter).toContain("t('itemUi.market.reclaimAria', { item: itemName })");
+    expect(painter).toContain('itemUi.market.buyAria');
+    expect(painter).toContain('itemUi.market.bidAria');
+    expect(painter).toContain('itemUi.market.buyoutAria');
+    expect(painter).toContain('itemUi.market.buyQuantityAria');
+    // the listing-type and duration toggles are labeled groups, not bare buttons
+    expect(painter).toContain("kindToggle.setAttribute('role', 'group')");
+    expect(painter).toContain("durationToggle.setAttribute('role', 'group')");
   });
 
   it('makes the filter listboxes keyboard-operable via the shared dropdownKeyNav core', () => {
@@ -93,9 +103,35 @@ describe('market_window: behavior preserved through the core', () => {
   it('preserves the buy / list / cancel / collect dispatch and money formatting', () => {
     expect(painter).toContain('.marketBuy(l.id)');
     expect(painter).toContain('.marketCancel(l.id)');
-    expect(painter).toContain('.marketList(view.form.itemId, qty, each * qty)');
+    expect(painter).toContain('.marketList(view.form.itemId, qty, each, opts)');
     expect(painter).toContain('.marketCollect()');
     expect(painter).toContain('this.deps.moneyHtml(');
     expect(painter).toContain('formatLocalizedMoney(');
+  });
+
+  it('wires the new auction-house dispatch: quantity buys, bids, buyouts, and sort', () => {
+    // per-unit fixed rows buy a chosen quantity, not always the whole stack
+    expect(painter).toContain('.marketBuy(l.id, clampedQty())');
+    // auction rows bid and (optionally) buy out instantly
+    expect(painter).toContain('.marketBid(l.id, amount)');
+    // the sort dropdown is a real filter-menu key, driving MarketQuery.sort
+    expect(painter).toContain("key === 'sort'");
+    expect(painter).toContain('this.sortOrder = value as MarketSortOrder');
+    expect(painter).toContain('sort: this.sortOrder');
+  });
+
+  it('shows a deposit-aware confirmation before reclaiming a listing', () => {
+    // Reclaim no longer dispatches unconditionally: the shared confirmDialog gates
+    // it, and the body copy branches on whether a deposit would be forfeited.
+    expect(painter).toContain('this.deps.confirmDialog(');
+    expect(painter).toContain('itemUi.market.cancelConfirmBody');
+    expect(painter).toContain('itemUi.market.cancelConfirmBodyNoDeposit');
+    expect(painter).toContain('l.depositTotal ?? 0');
+  });
+
+  it('previews the listing deposit via the pure sim helper, never inventing its own formula', () => {
+    expect(painter).toContain('marketDepositPerUnit');
+    expect(painter).toContain("from '../sim/market'");
+    expect(painter).toContain('marketDepositPerUnit(item, this.sellDurationHours)');
   });
 });

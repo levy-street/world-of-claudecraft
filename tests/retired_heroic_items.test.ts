@@ -248,7 +248,12 @@ describe('retired heroic items: the four ids v0.25.0 orphaned resolve again', ()
     sim.loadMail(mailSave);
 
     const reserializedMarket = sim.serializeMarket();
-    expect(reserializedMarket.listings).toEqual(marketSave.listings);
+    // An old-shape blob re-serializes with the auction-house defaults added
+    // (kind 'fixed', durationSeconds, depositPerUnit 0); every legacy field it
+    // carried, including the retired item id, must survive verbatim.
+    expect(reserializedMarket.listings).toHaveLength(1);
+    expect(reserializedMarket.listings[0]).toMatchObject(marketSave.listings[0]);
+    expect(reserializedMarket.listings[0].kind).toBe('fixed');
     expect(reserializedMarket.collections).toEqual(marketSave.collections);
     expect(sim.serializeMail()).toEqual(mailSave);
   });

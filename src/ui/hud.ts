@@ -3911,6 +3911,8 @@ export class Hud {
     ...this.windowFocus('#market-window'),
     showError: (text) => this.showError(text),
     slotName: (slot) => itemSlotName(slot),
+    confirmDialog: (title, body, okText, cancelText, onOk) =>
+      this.confirmDialog(title, body, okText, cancelText, onOk),
     syncBags: (open) => {
       if (open) {
         this.renderBags();
@@ -10430,6 +10432,45 @@ export class Hud {
           }
           break;
         }
+        // World Market auction outcomes. Structured data only (the mail letter
+        // precedent): every visible string is built here from t() keys, never
+        // spliced from sim text, so no localizeLootText/localizeErrorText matcher
+        // is needed for these (S3 stays clean). Offline recipients get the
+        // AUCTION_LETTERS letter instead (sim/market.ts sendMarketLetter); this
+        // switch only ever sees the online-recipient shape.
+        case 'marketOutbid': {
+          const item = marketEventItemLabel(ev.itemId, ev.count);
+          this.log(
+            t('itemUi.market.outbidToast', { item, money: formatLocalizedMoney(ev.refund) }),
+            '#dcd29f',
+          );
+          audio.click();
+          break;
+        }
+        case 'marketWon': {
+          const item = marketEventItemLabel(ev.itemId, ev.count);
+          this.log(t('itemUi.market.wonToast', { item }), '#7fdc4f');
+          audio.coin();
+          break;
+        }
+        case 'marketSold': {
+          const item = marketEventItemLabel(ev.itemId, ev.count);
+          this.log(
+            t('itemUi.market.soldToast', { item, money: formatLocalizedMoney(ev.proceeds) }),
+            '#7fdc4f',
+          );
+          audio.coin();
+          break;
+        }
+        case 'marketExpired': {
+          // The sim also emits a legacy 'log' event for this (parity-pinned text,
+          // itemUi.logs.expiredListing) that already lands in General/Chat; this
+          // structured companion carries no additional sound, matching expiry's
+          // existing quiet treatment (a deliberate choice, not an oversight).
+          const item = marketEventItemLabel(ev.itemId, ev.count);
+          this.log(t('itemUi.market.expiredToast', { item }), '#caa472');
+          break;
+        }
       }
     }
     if (deedUnlocks.length > 0) this.handleDeedUnlocks(deedUnlocks);
@@ -10737,6 +10778,14 @@ export class Hud {
       'You cannot afford that.': 'itemUi.errors.cannotAfford',
       'That is not your listing.': 'itemUi.errors.notYourListing',
       'You have nothing to collect.': 'itemUi.errors.nothingToCollect',
+      'Name a starting bid of at least 1 copper.': 'itemUi.errors.minStartingBid',
+      'The buyout must beat the starting bid.': 'itemUi.errors.buyoutTooLow',
+      'Choose a listing duration of 12, 24, or 48 hours.': 'itemUi.errors.chooseDuration',
+      'You cannot afford the listing deposit.': 'itemUi.errors.cannotAffordDeposit',
+      'That lot takes bids only.': 'itemUi.errors.bidsOnly',
+      'That lot is not up for auction.': 'itemUi.errors.notAuction',
+      'You cannot bid on your own lot.': 'itemUi.errors.cannotBidOwnLot',
+      'You are already the high bidder.': 'itemUi.errors.alreadyHighBidder',
       "You can't assist yourself.": 'hud.errors.assistSelf',
       'Assist whom? Target a player or use /assist <name>.': 'hud.errors.assistWhom',
       'Invite whom? Usage: /invite <name>.': 'hudChrome.party.inviteUsage',
@@ -10797,6 +10846,8 @@ export class Hud {
       });
     match = /^That is your own listing (?:\u2014|-) cancel it to reclaim it\.$/.exec(text);
     if (match) return t('itemUi.errors.ownListing');
+    match = /^Bid at least (.+)\.$/.exec(text);
+    if (match) return t('itemUi.errors.bidTooLow', { min: this.localizeSimMoney(match[1]) });
     match = /^All instances of (.+) are busy\. Try again soon\.$/.exec(text);
     if (match) {
       const busyName = match[1];
@@ -10981,6 +11032,18 @@ export class Hud {
       return t('itemUi.logs.listedItem', {
         item: itemStackDisplayName(match[1], match[2]),
         money: this.localizeSimMoney(match[3]),
+      });
+    match = /^Posted (.+?)( x\d+)? for auction \(starting bid (.+)\)\.$/.exec(text);
+    if (match)
+      return t('itemUi.logs.postedAuction', {
+        item: itemStackDisplayName(match[1], match[2]),
+        money: this.localizeSimMoney(match[3]),
+      });
+    match = /^Bid placed: (.+) on (.+)\.$/.exec(text);
+    if (match)
+      return t('itemUi.logs.bidPlaced', {
+        money: this.localizeSimMoney(match[1]),
+        item: itemDisplayNameFromSource(match[2]),
       });
     match = /^(.+) bought your (.+) for (.+?) (?:\u2014|-) collect (.+) from the Merchant\.$/.exec(
       text,
@@ -15607,6 +15670,17 @@ function itemStackDisplayName(item: string, stackSuffix?: string): string {
   if (!stackSuffix) return itemName;
   const count = Number(stackSuffix.trim().slice(1));
   return `${itemName} ${t('itemUi.bags.stackCount', { count: formatNumber(count, { maximumFractionDigits: 0 }) })}`;
+}
+
+// The market's structured SimEvents (marketOutbid/Won/Sold/Expired) carry an
+// itemId + count directly, unlike the loot-channel text scrapes above: no
+// English source string to parse, so the display name + stack suffix build
+// straight from the ids.
+function marketEventItemLabel(itemId: string, count: number): string {
+  const item = ITEMS[itemId];
+  const name = item ? itemDisplayName(item) : itemId;
+  if (count <= 1) return name;
+  return `${name} ${t('itemUi.market.stackCount', { count: formatNumber(count, { maximumFractionDigits: 0 }) })}`;
 }
 
 function mobDisplayName(mobId: string): string {

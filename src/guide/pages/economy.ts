@@ -32,6 +32,7 @@ export const economy: GuidePage = {
           <p>${esc(t('guide.economy.marketBody'))}</p>
           <p>${esc(t('guide.economy.marketBrowse'))}</p>
           <p>${esc(t('guide.economy.marketPost'))}</p>
+          <p>${esc(t('guide.economy.marketBidding'))}</p>
           <p>${esc(t('guide.economy.marketCollect'))}</p>
           <p>${esc(t('guide.economy.marketPricing'))}</p>
         </section>

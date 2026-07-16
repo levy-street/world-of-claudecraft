@@ -38,6 +38,9 @@ export const MARKET_WEAPON_TYPE_FILTERS = [
   'other',
 ] as const;
 export const MARKET_RARITY_FILTERS = ['all', 'poor', 'common', 'uncommon', 'rare', 'epic'] as const;
+// Browse sort orders: 'newest' (listing id desc), 'priceAsc' (effective per-unit
+// price ascending), 'timeLeft' (soonest expiry first, house stock last).
+export const MARKET_SORT_ORDERS = ['newest', 'priceAsc', 'timeLeft'] as const;
 
 // Listings per browse page (the count of OTHER sellers' listings shown at a time;
 // the player's own listings are always wired on top for quick reclaim).
@@ -48,25 +51,34 @@ export type MarketArmorTypeFilter = (typeof MARKET_ARMOR_TYPE_FILTERS)[number];
 export type MarketWeaponTypeFilter = (typeof MARKET_WEAPON_TYPE_FILTERS)[number];
 export type MarketSubtypeFilter = MarketArmorTypeFilter | MarketWeaponTypeFilter;
 export type MarketRarityFilter = (typeof MARKET_RARITY_FILTERS)[number];
+export type MarketSortOrder = (typeof MARKET_SORT_ORDERS)[number];
 
-/** The full browse state: search text, the three filters, and the page index. */
+/** The full browse state: search text, the three filters, the sort, and the page index. */
 export interface MarketQuery {
   search: string;
   itemType: MarketItemTypeFilter;
   subtype: MarketSubtypeFilter;
   rarity: MarketRarityFilter;
+  sort: MarketSortOrder;
   page: number;
 }
 
 export function defaultMarketQuery(): MarketQuery {
-  return { search: '', itemType: 'all', subtype: 'all', rarity: 'all', page: 0 };
+  return { search: '', itemType: 'all', subtype: 'all', rarity: 'all', sort: 'newest', page: 0 };
 }
 
 // Coerce an untrusted (wire) query into a valid MarketQuery: unknown enum values
 // fall back to 'all', the search is trimmed to 40 chars, the page floored at 0.
 export function sanitizeMarketQuery(
   raw:
-    | { search?: unknown; itemType?: unknown; subtype?: unknown; rarity?: unknown; page?: unknown }
+    | {
+        search?: unknown;
+        itemType?: unknown;
+        subtype?: unknown;
+        rarity?: unknown;
+        sort?: unknown;
+        page?: unknown;
+      }
     | null
     | undefined,
 ): MarketQuery {
@@ -85,6 +97,7 @@ export function sanitizeMarketQuery(
       'all',
     ),
     rarity: oneOf(MARKET_RARITY_FILTERS, raw?.rarity, 'all'),
+    sort: oneOf(MARKET_SORT_ORDERS, raw?.sort, 'newest'),
     page,
   };
 }

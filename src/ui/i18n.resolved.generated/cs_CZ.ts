@@ -3279,6 +3279,7 @@ export const cs_CZ: EnTranslations = {
       "marketBody": "Kupec provozuje Světový trh, hráči řízenou burzu, kde můžeš nakupovat a prodávat s lidmi, které možná nikdy nepotkáš. Promluv s Kupcem v Eastbrooku, nebo s dražitelem Vossem nahoře v Highwatchi, a otevřeš ho: oba správci slouží jednomu společnému trhu. Kupec tam také drží stálou zásobu vlastního zboží, takže je vždy co koupit, i když ostatní hráči nic nevystavili.",
       "marketBrowse": "Prohlížení: posouvej nabídky nebo hledej podle jména, co je na prodej. Každá nabídka ukazuje zboží, prodejce a požadovanou cenu za celý stack.",
       "marketPost": "Vystavení: vyber stack z batohů, nastav cenu a vystav ho. Zboží drží kupec, dokud ho někdo nekoupí. Neprodané nabídky se po čase vrátí a jednu můžeš stáhnout dřív, když si to rozmyslíš.",
+      "marketBidding": "Auctions: some listings take bids instead of a fixed price. A bid must clear the posted minimum, and outbidding someone always refunds them. When the seller sets a buyout, any bid that reaches it wins the lot on the spot.",
       "marketCollect": "Vyzvednutí: když se zboží prodá, výnos čeká u kupce. Vrať se pro mince i cokoli, co se vrátilo neprodané. Kupec si bere malý podíl z každého dokončeného prodeje.",
       "marketPricing": "Cena je na tobě. Nabídka trochu pod ostatními se obvykle prodá rychleji, zatímco přestřelená cena může ležet bez povšimnutí. Před vystavením si nejdřív prohlédni, jak vypadá běžná sazba."
     },
@@ -5845,6 +5846,10 @@ export const cs_CZ: EnTranslations = {
       "filterWeaponAll": "Všechny zbraně",
       "filterRarity": "Vzácnost",
       "filterRarityAll": "Všechny vzácnosti",
+      "sortLabel": "Sort",
+      "sortNewest": "Newest",
+      "sortPrice": "Price",
+      "sortTimeLeft": "Time left",
       "weaponSword": "Meče",
       "weaponDagger": "Dýky",
       "weaponStaff": "Hole",
@@ -5863,17 +5868,48 @@ export const cs_CZ: EnTranslations = {
       "reclaim": "Získat zpět",
       "buyAria": "Koupit {item} za {price}",
       "reclaimAria": "Získat zpět {item}",
+      "timeLeft": "{time} left",
+      "yourBidBadge": "Your bid",
+      "currentBidLabel": "Bid:",
+      "noBidsYet": "No bids yet",
+      "minNextBid": "Min bid {money}",
+      "buyoutLabel": "Buyout {money}",
+      "auctionBadge": "Auction",
+      "leadingBid": "You're leading",
+      "bidInputAria": "Bid amount for {item}",
+      "bidButton": "Bid",
+      "bidAria": "Bid on {item}",
+      "buyoutButton": "Buyout",
+      "buyoutAria": "Buy out {item} for {price}",
+      "buyQuantityAria": "Quantity of {item} to buy",
       "sellNote": "Nabídni zboží ze svých batohů. Obchodník si při prodeji vezme provizi {cut} %. Používáš {used}/{max} slotů pro nabídky.",
       "sellPickEmpty": "Klikni na předmět v batozích a vyber, co chceš prodat.",
       "quantity": "Množství",
       "quantityOf": "z {count}",
       "priceEach": "Cena za kus",
+      "listingTypeLabel": "Listing type",
+      "listingTypeFixed": "Fixed price",
+      "listingTypeAuction": "Auction",
+      "durationLabel": "Duration",
+      "durationOption": "{hours}h",
+      "startingBidLabel": "Starting bid",
+      "buyoutOptionalLabel": "Buyout (optional)",
+      "totalLabel": "Total",
+      "depositPreviewLabel": "Listing deposit",
       "listButton": "Nabídnout na Světovém trhu",
       "minPriceError": "Zadej cenu alespoň 1 měď.",
+      "cancelConfirmTitle": "Reclaim listing",
+      "cancelConfirmBody": "Reclaim {item} from the market? The {money} deposit will be forfeited.",
+      "cancelConfirmBodyNoDeposit": "Reclaim {item} from the market?",
+      "cancelConfirmDismiss": "Cancel",
       "collectEmpty": "Nic nečeká. Tady si vyzvedneš výnosy z prodeje a vypršelé nabídky.",
       "collectNote": "Výdělky a vrácené zboží, které pro tebe drží Obchodník.",
       "saleProceeds": "Výnosy z prodeje",
-      "collectAll": "Vyzvednout vše"
+      "collectAll": "Vyzvednout vše",
+      "outbidToast": "You were outbid on {item}. {money} refunded to your collection box.",
+      "wonToast": "You won the auction for {item}! Collect it at the Merchant.",
+      "soldToast": "Your {item} sold for {money}. Collect it at the Merchant.",
+      "expiredToast": "Your listing of {item} expired unsold. Collect it at the Merchant."
     },
     "logs": {
       "listedItem": "{item} nabídnut na Světovém trhu za {money}.",
@@ -5882,6 +5918,8 @@ export const cs_CZ: EnTranslations = {
       "collectedMoney": "Vyzvedáváš si od Obchodníka {money}.",
       "reclaimedItem": "{item} získán zpět z trhu.",
       "expiredListing": "Tvá tržní nabídka {item} vypršela a čeká u Obchodníka.",
+      "postedAuction": "Posted {item} for auction (starting bid {money}).",
+      "bidPlaced": "Bid placed: {money} on {item}.",
       "boughtBackItem": "Odkoupeno zpět: {item} za {money}."
     },
     "errors": {
@@ -5898,7 +5936,16 @@ export const cs_CZ: EnTranslations = {
       "ownListing": "To je tvoje vlastní nabídka. Zruš ji, pokud ji chceš získat zpět.",
       "cannotAfford": "To si nemůžeš dovolit.",
       "notYourListing": "Toto není tvoje nabídka.",
-      "nothingToCollect": "Nemáš nic k vyzvednutí."
+      "nothingToCollect": "Nemáš nic k vyzvednutí.",
+      "minStartingBid": "Name a starting bid of at least 1 copper.",
+      "buyoutTooLow": "The buyout must beat the starting bid.",
+      "chooseDuration": "Choose a listing duration of 12, 24, or 48 hours.",
+      "cannotAffordDeposit": "You cannot afford the listing deposit.",
+      "bidsOnly": "That lot takes bids only.",
+      "notAuction": "That lot is not up for auction.",
+      "cannotBidOwnLot": "You cannot bid on your own lot.",
+      "alreadyHighBidder": "You are already the high bidder.",
+      "bidTooLow": "Bid at least {min}."
     },
     "loot": {
       "takeAll": "Vzít vše",
@@ -9738,6 +9785,26 @@ export const cs_CZ: EnTranslations = {
         "sender": "Bratr Aldric",
         "subject": "Tvůj čin v temnotě",
         "body": "Jen málokdo se kdy dozví, co bylo pohřbeno v té dutině, a ještě méně by tomu věřilo. Já to vím a nezapomenu.\n\nAť je tvá cesta osvětlena.\n- Bratr Aldric"
+      },
+      "market_outbid": {
+        "sender": "The Merchant",
+        "subject": "You have been outbid",
+        "body": "Another buyer has raised the bidding on a lot you wanted. Your copper waits in your collection box at the World Market; come see me to take it back or bid again.\n\n- The Merchant"
+      },
+      "market_won": {
+        "sender": "The Merchant",
+        "subject": "Your winning bid",
+        "body": "The hammer has fallen and the lot is yours. Your goods wait in your collection box at the World Market; come see me to claim them.\n\n- The Merchant"
+      },
+      "market_sold": {
+        "sender": "The Merchant",
+        "subject": "Your lot has sold",
+        "body": "A buyer has taken your goods off my hands. Your proceeds wait in your collection box at the World Market; come see me to collect them.\n\n- The Merchant"
+      },
+      "market_expired": {
+        "sender": "The Merchant",
+        "subject": "Your listing expired",
+        "body": "No buyer came for your goods before the listing ran out. They wait in your collection box at the World Market; come see me to take them back.\n\n- The Merchant"
       }
     },
     "itemSets": {

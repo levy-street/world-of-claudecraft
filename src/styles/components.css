@@ -7815,14 +7815,14 @@
   }
   .mkt-filters {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 8px;
     margin: 0 0 8px;
     position: relative;
     z-index: 3;
   }
   .mkt-filters.has-subtype {
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
   }
   .mkt-filter {
     display: flex;
@@ -7991,11 +7991,32 @@
   .mkt-row .mkt-name .seller.house {
     color: var(--gold-dim);
   }
+  .mkt-row .mkt-name .time-left {
+    font-size: 10.5px;
+    color: #8c8468;
+  }
+  .mkt-row .mkt-name .mkt-mybid {
+    font-size: 10px;
+    font-family: var(--title-font);
+    color: var(--gold);
+    border: 1px solid #6f5a2a;
+    border-radius: 3px;
+    padding: 0 4px;
+    margin-left: 4px;
+    vertical-align: middle;
+  }
   .mkt-row .mkt-price {
     font-size: 11.5px;
     color: var(--color-accent);
     white-space: nowrap;
     text-align: right;
+  }
+  .mkt-auction-badge {
+    font-size: 10px;
+    font-family: var(--title-font);
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: var(--gold-dim);
   }
   .mkt-btn {
     font-family: var(--title-font);
@@ -8014,6 +8035,43 @@
   .mkt-btn.cancel {
     background: linear-gradient(#6a3a18, #4a2810 60%, #381c0c);
     color: #ffd8b8;
+  }
+  /* The Browse row's action cell, when it holds more than one control: a
+     per-unit fixed row's quantity spinner + live total + Buy button, or an
+     auction row's Buyout button + bid input/button (or the "leading" badge). */
+  .mkt-buy-form,
+  .mkt-auction-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+  }
+  .mkt-bid-form {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .mkt-qty-input,
+  .mkt-bid-input {
+    width: 48px;
+    background: #120d07;
+    border: 1px solid #5a4a2a;
+    color: #ffe6a8;
+    border-radius: 4px;
+    padding: 3px 5px;
+    font-family: var(--ui-font, inherit);
+    font-size: 11px;
+  }
+  .mkt-buy-total {
+    font-size: 11px;
+    color: var(--color-accent);
+    white-space: nowrap;
+  }
+  .mkt-mybid-lead {
+    font-family: var(--title-font);
+    font-size: 10.5px;
+    color: var(--gold);
+    white-space: nowrap;
   }
   .mkt-page {
     display: flex;
@@ -8080,6 +8138,44 @@
   }
   .mkt-sell-pick .ps-name {
     font-size: 13px;
+  }
+  /* Sell tab: listing-type (fixed/auction) and duration toggles. Small button
+     groups, not the filter-menu listbox (a 2-/3-way closed choice does not need
+     one) and never a slider (numeric-input precedent). */
+  .mkt-type-toggle,
+  .mkt-duration-toggle {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .mkt-type-btn,
+  .mkt-duration-btn {
+    flex: 1;
+    text-align: center;
+    font-family: var(--title-font);
+    font-size: 11.5px;
+    color: var(--color-text-muted);
+    padding: 6px 4px;
+    border: 1px solid #6f5a2a;
+    border-radius: 5px;
+    background: #120d07;
+    cursor: var(--cursor-point);
+  }
+  .mkt-type-btn:hover,
+  .mkt-duration-btn:hover {
+    border-color: #cc9a3c;
+    color: var(--color-accent);
+  }
+  .mkt-type-btn.sel,
+  .mkt-duration-btn.sel {
+    color: var(--gold);
+    background: #cc9a3c2e;
+    border-color: #cc9a3c;
+  }
+  .mkt-type-btn:focus-visible,
+  .mkt-duration-btn:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
   }
   .mkt-price-form {
     display: flex;

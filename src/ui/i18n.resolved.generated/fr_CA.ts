@@ -3279,6 +3279,7 @@ export const fr_CA: EnTranslations = {
       "marketBody": "Le Marchand tient le Marché mondial, une bourse animée par les joueurs où vous achetez et vendez avec des gens que vous ne rencontrerez peut-être jamais. Parlez au Marchand à Eastbrook, ou au commissaire-priseur Voss là-haut à Highwatch, pour l'ouvrir : les deux gardiens desservent le même marché commun. Le Marchand y tient aussi en permanence un stock de ses propres marchandises, si bien qu'il y a toujours quelque chose à acheter, même quand aucun autre joueur n'a rien mis en vente.",
       "marketBrowse": "Parcourir : faites défiler les annonces ou cherchez par nom pour trouver ce qui est à vendre. Chaque annonce indique la marchandise, le vendeur et le prix demandé pour la pile entière.",
       "marketPost": "Mettre en vente : choisissez une pile dans vos sacs, fixez votre prix et publiez l'annonce. La marchandise est conservée par le Marchand jusqu'à ce que quelqu'un l'achète. Les annonces invendues vous reviennent au bout d'un moment, et vous pouvez en reprendre une plus tôt si vous changez d'avis.",
+      "marketBidding": "Auctions: some listings take bids instead of a fixed price. A bid must clear the posted minimum, and outbidding someone always refunds them. When the seller sets a buyout, any bid that reaches it wins the lot on the spot.",
       "marketCollect": "Encaisser : quand vos marchandises se vendent, vos gains vous attendent chez le Marchand. Revenez récupérer les pièces, ainsi que tout ce qui est revenu invendu. Le Marchand prélève une petite commission sur chaque vente conclue.",
       "marketPricing": "Le prix ne dépend que de vous. Annoncer un peu en dessous des autres tend à vendre plus vite, tandis qu'un prix trop élevé peut rester sans preneur. Parcourez d'abord le marché pour voir le cours du moment avant de publier."
     },
@@ -5845,6 +5846,10 @@ export const fr_CA: EnTranslations = {
       "filterWeaponAll": "Toutes les armes",
       "filterRarity": "Rareté",
       "filterRarityAll": "Toutes les raretés",
+      "sortLabel": "Sort",
+      "sortNewest": "Newest",
+      "sortPrice": "Price",
+      "sortTimeLeft": "Time left",
       "weaponSword": "Épées",
       "weaponDagger": "Dagues",
       "weaponStaff": "Bâtons",
@@ -5863,17 +5868,48 @@ export const fr_CA: EnTranslations = {
       "reclaim": "Reprendre",
       "buyAria": "Acheter {item} pour {price}",
       "reclaimAria": "Reprendre {item}",
+      "timeLeft": "{time} left",
+      "yourBidBadge": "Your bid",
+      "currentBidLabel": "Bid:",
+      "noBidsYet": "No bids yet",
+      "minNextBid": "Min bid {money}",
+      "buyoutLabel": "Buyout {money}",
+      "auctionBadge": "Auction",
+      "leadingBid": "You're leading",
+      "bidInputAria": "Bid amount for {item}",
+      "bidButton": "Bid",
+      "bidAria": "Bid on {item}",
+      "buyoutButton": "Buyout",
+      "buyoutAria": "Buy out {item} for {price}",
+      "buyQuantityAria": "Quantity of {item} to buy",
       "sellNote": "Listez des marchandises depuis vos sacs. Le Marchand prend {cut}% quand un objet est vendu. Vous utilisez {used}/{max} emplacements.",
       "sellPickEmpty": "Cliquez sur un objet dans vos sacs pour choisir quoi vendre.",
       "quantity": "Quantité",
       "quantityOf": "sur {count}",
       "priceEach": "Prix unitaire",
+      "listingTypeLabel": "Listing type",
+      "listingTypeFixed": "Fixed price",
+      "listingTypeAuction": "Auction",
+      "durationLabel": "Duration",
+      "durationOption": "{hours}h",
+      "startingBidLabel": "Starting bid",
+      "buyoutOptionalLabel": "Buyout (optional)",
+      "totalLabel": "Total",
+      "depositPreviewLabel": "Listing deposit",
       "listButton": "Publier au Marché mondial",
       "minPriceError": "Indiquez un prix d'au moins 1 cuivre.",
+      "cancelConfirmTitle": "Reclaim listing",
+      "cancelConfirmBody": "Reclaim {item} from the market? The {money} deposit will be forfeited.",
+      "cancelConfirmBodyNoDeposit": "Reclaim {item} from the market?",
+      "cancelConfirmDismiss": "Cancel",
       "collectEmpty": "Rien en attente. Les recettes et annonces expirées se récupèrent ici.",
       "collectNote": "Recettes et biens retournés que le Marchand garde pour vous.",
       "saleProceeds": "Recettes de vente",
-      "collectAll": "Tout récupérer"
+      "collectAll": "Tout récupérer",
+      "outbidToast": "You were outbid on {item}. {money} refunded to your collection box.",
+      "wonToast": "You won the auction for {item}! Collect it at the Merchant.",
+      "soldToast": "Your {item} sold for {money}. Collect it at the Merchant.",
+      "expiredToast": "Your listing of {item} expired unsold. Collect it at the Merchant."
     },
     "logs": {
       "listedItem": "{item} listé au Marché mondial pour {money}.",
@@ -5882,6 +5918,8 @@ export const fr_CA: EnTranslations = {
       "collectedMoney": "Vous récupérez {money} auprès du Marchand.",
       "reclaimedItem": "{item} repris du marché.",
       "expiredListing": "Votre annonce de {item} a expiré et attend chez le Marchand.",
+      "postedAuction": "Posted {item} for auction (starting bid {money}).",
+      "bidPlaced": "Bid placed: {money} on {item}.",
       "boughtBackItem": "Vous avez racheté {item} pour {money}."
     },
     "errors": {
@@ -5898,7 +5936,16 @@ export const fr_CA: EnTranslations = {
       "ownListing": "C'est votre propre annonce. Annulez-la pour la récupérer.",
       "cannotAfford": "Vous n'avez pas les moyens.",
       "notYourListing": "Cette annonce n'est pas la vôtre.",
-      "nothingToCollect": "Vous n'avez rien à récupérer."
+      "nothingToCollect": "Vous n'avez rien à récupérer.",
+      "minStartingBid": "Name a starting bid of at least 1 copper.",
+      "buyoutTooLow": "The buyout must beat the starting bid.",
+      "chooseDuration": "Choose a listing duration of 12, 24, or 48 hours.",
+      "cannotAffordDeposit": "You cannot afford the listing deposit.",
+      "bidsOnly": "That lot takes bids only.",
+      "notAuction": "That lot is not up for auction.",
+      "cannotBidOwnLot": "You cannot bid on your own lot.",
+      "alreadyHighBidder": "You are already the high bidder.",
+      "bidTooLow": "Bid at least {min}."
     },
     "loot": {
       "takeAll": "Tout prendre",
@@ -9738,6 +9785,26 @@ export const fr_CA: EnTranslations = {
         "sender": "Frère Aldric",
         "subject": "Ce que vous avez accompli dans le noir",
         "body": "Rares sont ceux qui sauront jamais ce qui était enterré dans ce creux, et plus rares encore ceux qui le croiraient. Moi, je le sais, et je ne l’oublierai pas.\n\nQue votre route reste éclairée.\n- Frère Aldric"
+      },
+      "market_outbid": {
+        "sender": "The Merchant",
+        "subject": "You have been outbid",
+        "body": "Another buyer has raised the bidding on a lot you wanted. Your copper waits in your collection box at the World Market; come see me to take it back or bid again.\n\n- The Merchant"
+      },
+      "market_won": {
+        "sender": "The Merchant",
+        "subject": "Your winning bid",
+        "body": "The hammer has fallen and the lot is yours. Your goods wait in your collection box at the World Market; come see me to claim them.\n\n- The Merchant"
+      },
+      "market_sold": {
+        "sender": "The Merchant",
+        "subject": "Your lot has sold",
+        "body": "A buyer has taken your goods off my hands. Your proceeds wait in your collection box at the World Market; come see me to collect them.\n\n- The Merchant"
+      },
+      "market_expired": {
+        "sender": "The Merchant",
+        "subject": "Your listing expired",
+        "body": "No buyer came for your goods before the listing ran out. They wait in your collection box at the World Market; come see me to take them back.\n\n- The Merchant"
       }
     },
     "itemSets": {

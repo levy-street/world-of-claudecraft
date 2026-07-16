@@ -3279,6 +3279,7 @@ export const id_ID: EnTranslations = {
       "marketBody": "Sang Pedagang menjalankan Pasar Dunia, sebuah bursa yang digerakkan pemain tempat kamu bisa membeli dan menjual dengan orang yang mungkin tak pernah kamu temui. Bicaralah dengan Sang Pedagang di Eastbrook, atau dengan Auctioneer Voss di Highwatch, untuk membukanya: kedua penjaga melayani satu pasar bersama yang sama. Sang Pedagang juga selalu menyediakan stok barang miliknya sendiri yang terdaftar di sana, jadi selalu ada sesuatu untuk dibeli bahkan ketika tak ada pemain lain yang memasang.",
       "marketBrowse": "Menelusuri: gulir daftar barang atau cari berdasarkan nama untuk menemukan apa yang dijual. Setiap entri menampilkan barangnya, sang penjual, dan harga yang diminta untuk seluruh tumpukan.",
       "marketPost": "Memasang: pilih sebuah tumpukan dari tasmu, tentukan harga, dan daftarkan. Barang disimpan oleh Sang Pedagang sampai seseorang membelinya. Entri yang tak terjual kembali kepadamu setelah beberapa waktu, dan kamu bisa menariknya lebih awal jika berubah pikiran.",
+      "marketBidding": "Auctions: some listings take bids instead of a fixed price. A bid must clear the posted minimum, and outbidding someone always refunds them. When the seller sets a buyout, any bid that reaches it wins the lot on the spot.",
       "marketCollect": "Mengambil: saat barangmu terjual, hasilnya menantimu di Sang Pedagang. Kembalilah untuk mengambil koin, beserta apa pun yang kembali karena tak terjual. Sang Pedagang mengambil potongan kecil dari setiap penjualan yang tuntas.",
       "marketPricing": "Penentuan harga terserah padamu. Memasang sedikit di bawah harga yang diminta orang lain cenderung lebih cepat laku, sementara harga selangit mungkin teronggok tak tersentuh. Telusuri dulu untuk melihat seperti apa harga pasaran sebelum kamu memasang."
     },
@@ -5845,6 +5846,10 @@ export const id_ID: EnTranslations = {
       "filterWeaponAll": "Semua senjata",
       "filterRarity": "Kelangkaan",
       "filterRarityAll": "Semua kelangkaan",
+      "sortLabel": "Sort",
+      "sortNewest": "Newest",
+      "sortPrice": "Price",
+      "sortTimeLeft": "Time left",
       "weaponSword": "Pedang",
       "weaponDagger": "Belati",
       "weaponStaff": "Tongkat Sihir",
@@ -5863,17 +5868,48 @@ export const id_ID: EnTranslations = {
       "reclaim": "Tarik Kembali",
       "buyAria": "Beli {item} seharga {price}",
       "reclaimAria": "Tarik kembali {item}",
+      "timeLeft": "{time} left",
+      "yourBidBadge": "Your bid",
+      "currentBidLabel": "Bid:",
+      "noBidsYet": "No bids yet",
+      "minNextBid": "Min bid {money}",
+      "buyoutLabel": "Buyout {money}",
+      "auctionBadge": "Auction",
+      "leadingBid": "You're leading",
+      "bidInputAria": "Bid amount for {item}",
+      "bidButton": "Bid",
+      "bidAria": "Bid on {item}",
+      "buyoutButton": "Buyout",
+      "buyoutAria": "Buy out {item} for {price}",
+      "buyQuantityAria": "Quantity of {item} to buy",
       "sellNote": "Pajang barang dari tasmu. Pedagang mengambil potongan {cut}% saat barang terjual. Kamu memakai {used}/{max} slot daftar jual.",
       "sellPickEmpty": "Klik barang di tasmu untuk memilih yang akan dijual.",
       "quantity": "Jumlah",
       "quantityOf": "dari {count}",
       "priceEach": "Harga satuan",
+      "listingTypeLabel": "Listing type",
+      "listingTypeFixed": "Fixed price",
+      "listingTypeAuction": "Auction",
+      "durationLabel": "Duration",
+      "durationOption": "{hours}h",
+      "startingBidLabel": "Starting bid",
+      "buyoutOptionalLabel": "Buyout (optional)",
+      "totalLabel": "Total",
+      "depositPreviewLabel": "Listing deposit",
       "listButton": "Pajang di Pasar Dunia",
       "minPriceError": "Tetapkan harga minimal 1 tembaga.",
+      "cancelConfirmTitle": "Reclaim listing",
+      "cancelConfirmBody": "Reclaim {item} from the market? The {money} deposit will be forfeited.",
+      "cancelConfirmBodyNoDeposit": "Reclaim {item} from the market?",
+      "cancelConfirmDismiss": "Cancel",
       "collectEmpty": "Tidak ada yang menunggu. Hasil penjualan dan daftar kedaluwarsa terkumpul di sini.",
       "collectNote": "Pendapatan dan barang kembalian yang disimpan Pedagang untukmu.",
       "saleProceeds": "Hasil penjualan",
-      "collectAll": "Ambil Semua"
+      "collectAll": "Ambil Semua",
+      "outbidToast": "You were outbid on {item}. {money} refunded to your collection box.",
+      "wonToast": "You won the auction for {item}! Collect it at the Merchant.",
+      "soldToast": "Your {item} sold for {money}. Collect it at the Merchant.",
+      "expiredToast": "Your listing of {item} expired unsold. Collect it at the Merchant."
     },
     "logs": {
       "listedItem": "Mendaftarkan {item} di Pasar Dunia seharga {money}.",
@@ -5882,6 +5918,8 @@ export const id_ID: EnTranslations = {
       "collectedMoney": "Kamu mengambil {money} dari Pedagang.",
       "reclaimedItem": "Mengambil kembali {item} dari pasar.",
       "expiredListing": "Daftar pasarmu untuk {item} kedaluwarsa dan menunggu di Pedagang.",
+      "postedAuction": "Posted {item} for auction (starting bid {money}).",
+      "bidPlaced": "Bid placed: {money} on {item}.",
       "boughtBackItem": "Membeli kembali {item} seharga {money}."
     },
     "errors": {
@@ -5898,7 +5936,16 @@ export const id_ID: EnTranslations = {
       "ownListing": "Itu daftar jualanmu sendiri. Batalkan untuk mengambilnya kembali.",
       "cannotAfford": "Kamu tidak mampu membelinya.",
       "notYourListing": "Itu bukan daftar jualanmu.",
-      "nothingToCollect": "Tidak ada yang bisa kamu ambil."
+      "nothingToCollect": "Tidak ada yang bisa kamu ambil.",
+      "minStartingBid": "Name a starting bid of at least 1 copper.",
+      "buyoutTooLow": "The buyout must beat the starting bid.",
+      "chooseDuration": "Choose a listing duration of 12, 24, or 48 hours.",
+      "cannotAffordDeposit": "You cannot afford the listing deposit.",
+      "bidsOnly": "That lot takes bids only.",
+      "notAuction": "That lot is not up for auction.",
+      "cannotBidOwnLot": "You cannot bid on your own lot.",
+      "alreadyHighBidder": "You are already the high bidder.",
+      "bidTooLow": "Bid at least {min}."
     },
     "loot": {
       "takeAll": "Ambil Semua",
@@ -9738,6 +9785,26 @@ export const id_ID: EnTranslations = {
         "sender": "Bruder Aldric",
         "subject": "Apa yang kaulakukan dalam gelap",
         "body": "Hanya segelintir yang akan tahu apa yang terkubur di lembah itu, dan lebih sedikit lagi yang akan percaya. Aku tahu, dan aku tidak akan melupakannya.\n\nSemoga jalanmu tetap terang.\n- Bruder Aldric"
+      },
+      "market_outbid": {
+        "sender": "The Merchant",
+        "subject": "You have been outbid",
+        "body": "Another buyer has raised the bidding on a lot you wanted. Your copper waits in your collection box at the World Market; come see me to take it back or bid again.\n\n- The Merchant"
+      },
+      "market_won": {
+        "sender": "The Merchant",
+        "subject": "Your winning bid",
+        "body": "The hammer has fallen and the lot is yours. Your goods wait in your collection box at the World Market; come see me to claim them.\n\n- The Merchant"
+      },
+      "market_sold": {
+        "sender": "The Merchant",
+        "subject": "Your lot has sold",
+        "body": "A buyer has taken your goods off my hands. Your proceeds wait in your collection box at the World Market; come see me to collect them.\n\n- The Merchant"
+      },
+      "market_expired": {
+        "sender": "The Merchant",
+        "subject": "Your listing expired",
+        "body": "No buyer came for your goods before the listing ran out. They wait in your collection box at the World Market; come see me to take them back.\n\n- The Merchant"
       }
     },
     "itemSets": {

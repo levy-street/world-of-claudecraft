@@ -721,6 +721,16 @@ export interface SimContextCallbacks {
   // (quests/quest_commands.ts) queues the giver's authored thank-you letter
   // through this; the binding points at the PostOffice instance on Sim.
   queueQuestLetter(questId: string, pid: number): void;
+  // World Market auction letters (mail/post_office.ts): market.ts notifies an
+  // OFFLINE seller/bidder of an auction outcome through this (online players
+  // get the structured market* events instead). The binding points at the
+  // PostOffice instance on Sim with the AUCTION_LETTERS entry for `kind`,
+  // mailed as a 'system' letter (the queueQuestLetter precedent).
+  sendMarketLetter(
+    recipientKey: string,
+    recipientName: string,
+    kind: 'outbid' | 'won' | 'sold' | 'expired',
+  ): void;
 
   // Set proc firing is owned by combat/set_procs.ts.
   applySetProcs(source: Entity, target: Entity | null, trigger: SetProc['trigger']): void;
@@ -1157,6 +1167,8 @@ export function createSimContext(host: SimContextHost): SimContext {
     canAddItem: host.canAddItem,
     // Ravenpost mail: the quest turn-in letter hook (points at the PostOffice on Sim).
     queueQuestLetter: host.queueQuestLetter,
+    // World Market auction letters: the offline-notification hook (PostOffice on Sim).
+    sendMarketLetter: host.sendMarketLetter,
     applySetProcs: host.applySetProcs,
     // Book of Deeds seam (points at deeds.ts via the Sim-bound arrows).
     bumpDeedStat: host.bumpDeedStat,

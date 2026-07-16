@@ -799,8 +799,81 @@ describe('coverage: each scenario fires its subsystem', () => {
     ).toBe(true);
     // marketCollect moved the proceeds into the seller's purse.
     expect(loot(/^You collect /)).toBe(true);
-    expect(sim.players.get(seller)?.copper).toBe(285); // 300 sale - 5% cut
-    expect(sim.players.get(buyer)?.copper).toBe(4700); // 5000 - 300
+    // marketList's price arg is now the PER-UNIT ask (the auction-house extension),
+    // so 2 x 300/unit = 600 total, not 300: proceeds = floor(600*0.95).
+    expect(sim.players.get(seller)?.copper).toBe(570); // 600 sale - 5% cut
+    expect(sim.players.get(buyer)?.copper).toBe(4400); // 5000 - 600
+  });
+
+  it('market_auction: bid/outbid/buyout/expiry-win all fire and coin + goods move to the right party', () => {
+    const rec = run('market_auction');
+    const sim = rec.sim as any;
+    const ev = rec.allEvents as Ev[];
+    const seller = rec.notes.seller as number;
+    const bidderA = rec.notes.bidderA as number;
+    const bidderB = rec.notes.bidderB as number;
+    // marketList posted an auction lot (not a fixed listing).
+    expect(
+      ev.some(
+        (e) =>
+          e.type === 'loot' && typeof e.text === 'string' && /^Posted .* for auction/.test(e.text),
+      ),
+    ).toBe(true);
+    // marketBid escrowed both the opening bid and the outbid.
+    expect(ev.filter((e) => e.type === 'loot' && /^Bid placed: /.test(String(e.text))).length).toBe(
+      3,
+    );
+    // the outbid loser (bidder A) was refunded via the structured event (online).
+    const outbid = ev.find((e) => e.type === 'marketOutbid');
+    expect(outbid?.pid).toBe(bidderA);
+    expect(outbid?.refund).toBe(50);
+    // Lot B's buyout settled: bidder B's purchase confirmation fired.
+    expect(
+      ev.some((e) => e.type === 'loot' && /^Bought Cold Well Water for /.test(String(e.text))),
+    ).toBe(true);
+    // Lot A's expiry-with-bid sweep declared bidder B the winner and notified the seller.
+    const won = ev.find((e) => e.type === 'marketWon');
+    expect(won?.pid).toBe(bidderB);
+    expect(won?.paid).toBe(100);
+    expect(ev.filter((e) => e.type === 'marketSold').length).toBe(2); // Lot A win + Lot B buyout
+    // Final settlement: seller collects both sales' proceeds (95 + 190), bidder A
+    // collects both refunds (50 + 30) back to a net-zero bid spend, bidder B holds
+    // both lots (one via the buyout bag-drop, one via the collected auction win).
+    expect(sim.players.get(seller)?.copper).toBe(285);
+    expect(sim.players.get(bidderA)?.copper).toBe(500); // both bids fully refunded
+    expect(sim.players.get(bidderB)?.copper).toBe(700); // 1000 - 100 (won bid) - 200 (buyout)
+    expect(sim.countItem('wolf_fang', bidderB)).toBe(1); // collected off the auction win
+    expect(sim.countItem('spring_water', bidderB)).toBeGreaterThanOrEqual(1); // the buyout
+  });
+
+  it('market_partial: two different buyers split one per-unit stack; deposits conserve exactly', () => {
+    const rec = run('market_partial');
+    const sim = rec.sim as any;
+    const ev = rec.allEvents as Ev[];
+    const seller = rec.notes.seller as number;
+    const buyerA = rec.notes.buyerA as number;
+    const buyerB = rec.notes.buyerB as number;
+    // Two distinct partial purchases against the same listing fired.
+    const bought = ev.filter(
+      (e) => e.type === 'loot' && /^Bought Arcanite Bar x\d for /.test(String(e.text)),
+    );
+    expect(bought.length).toBe(2);
+    // the remainder's expiry returned the item (deposit forfeited, not refunded).
+    expect(
+      ev.some(
+        (e) => e.type === 'log' && typeof e.text === 'string' && /expired and waits/.test(e.text),
+      ),
+    ).toBe(true);
+    // Buyers paid exactly qty * pricePerUnit (100/unit): 2 units and 3 units.
+    expect(sim.players.get(buyerA)?.copper).toBe(800); // 1000 - 2*100
+    expect(sim.players.get(buyerB)?.copper).toBe(700); // 1000 - 3*100
+    // Deposit conservation: 72 charged at list time (6 units * 12/unit), 60
+    // refunded across the two partial sales (24 + 36), 12 forfeited on the
+    // unsold remainder -- 60 + 12 == 72 exactly, and marketSaleCopper (the
+    // deed-stat counter) only ever counts collected sale proceeds, not deposits.
+    expect(sim.players.get(seller)?.copper).toBe(1463); // 1000 - 72 deposit + 535 collected
+    expect(sim.players.get(seller)?.deedStats.counters.marketSaleCopper).toBe(535);
+    expect(sim.countItem('arcanite_bar', seller)).toBe(1); // the forfeited remainder returned
   });
 
   it('g1b_xp_prestige: rested XP accrues in the inn, then prestige resets the bar and bumps rank', () => {

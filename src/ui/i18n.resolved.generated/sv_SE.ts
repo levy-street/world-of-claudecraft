@@ -3279,6 +3279,7 @@ export const sv_SE: EnTranslations = {
       "marketBody": "Köpmannen driver Världsmarknaden, en spelardriven börs där du kan köpa och sälja med folk du kanske aldrig träffar. Tala med Köpmannen i Östbäck, eller med Auktionsförrättare Voss uppe i Highwatch, för att öppna den: båda förvaltarna betjänar en och samma delade marknad. Köpmannen håller också ett stående lager av sina egna varor listade där, så det finns alltid något att köpa även när inga andra spelare har lagt upp något.",
       "marketBrowse": "Bläddra: skrolla genom annonserna eller sök på namn för att hitta det som är till salu. Varje annons visar varorna, säljaren och begärt pris för hela bunten.",
       "marketPost": "Lägg upp: välj en bunt från dina väskor, sätt ditt pris och annonsera den. Varorna hålls av Köpmannen tills någon köper dem. Osålda annonser kommer tillbaka till dig efter ett tag, och du kan ta tillbaka en i förtid om du ångrar dig.",
+      "marketBidding": "Auctions: some listings take bids instead of a fixed price. A bid must clear the posted minimum, and outbidding someone always refunds them. When the seller sets a buyout, any bid that reaches it wins the lot on the spot.",
       "marketCollect": "Hämta: när dina varor säljs väntar din ersättning på dig hos Köpmannen. Återvänd för att hämta mynten, tillsammans med allt som kom tillbaka osålt. Köpmannen tar en liten andel av varje genomförd försäljning.",
       "marketPricing": "Prissättningen är upp till dig. Att lägga sig lite under vad andra begär brukar sälja snabbare, medan ett brant pris kan bli liggande orört. Bläddra först för att se hur gångpriset ser ut innan du lägger upp."
     },
@@ -5845,6 +5846,10 @@ export const sv_SE: EnTranslations = {
       "filterWeaponAll": "Alla vapen",
       "filterRarity": "Sällsynthet",
       "filterRarityAll": "Alla sällsyntheter",
+      "sortLabel": "Sort",
+      "sortNewest": "Newest",
+      "sortPrice": "Price",
+      "sortTimeLeft": "Time left",
       "weaponSword": "Svärd",
       "weaponDagger": "Dolkar",
       "weaponStaff": "Stavar",
@@ -5863,17 +5868,48 @@ export const sv_SE: EnTranslations = {
       "reclaim": "Återkalla",
       "buyAria": "Köp {item} för {price}",
       "reclaimAria": "Återkalla {item}",
+      "timeLeft": "{time} left",
+      "yourBidBadge": "Your bid",
+      "currentBidLabel": "Bid:",
+      "noBidsYet": "No bids yet",
+      "minNextBid": "Min bid {money}",
+      "buyoutLabel": "Buyout {money}",
+      "auctionBadge": "Auction",
+      "leadingBid": "You're leading",
+      "bidInputAria": "Bid amount for {item}",
+      "bidButton": "Bid",
+      "bidAria": "Bid on {item}",
+      "buyoutButton": "Buyout",
+      "buyoutAria": "Buy out {item} for {price}",
+      "buyQuantityAria": "Quantity of {item} to buy",
       "sellNote": "Lägg upp varor från dina väskor. Köpmannen tar {cut}% i provision när ett föremål säljs. Du använder {used}/{max} listningsplatser.",
       "sellPickEmpty": "Klicka på ett föremål i dina väskor för att välja vad du vill sälja.",
       "quantity": "Antal",
       "quantityOf": "av {count}",
       "priceEach": "Pris per styck",
+      "listingTypeLabel": "Listing type",
+      "listingTypeFixed": "Fixed price",
+      "listingTypeAuction": "Auction",
+      "durationLabel": "Duration",
+      "durationOption": "{hours}h",
+      "startingBidLabel": "Starting bid",
+      "buyoutOptionalLabel": "Buyout (optional)",
+      "totalLabel": "Total",
+      "depositPreviewLabel": "Listing deposit",
       "listButton": "Lägg upp på Världsmarknaden",
       "minPriceError": "Ange ett pris på minst 1 koppar.",
+      "cancelConfirmTitle": "Reclaim listing",
+      "cancelConfirmBody": "Reclaim {item} from the market? The {money} deposit will be forfeited.",
+      "cancelConfirmBodyNoDeposit": "Reclaim {item} from the market?",
+      "cancelConfirmDismiss": "Cancel",
       "collectEmpty": "Inget väntar. Försäljningsintäkter och utgångna annonser hämtas här.",
       "collectNote": "Intäkter och returnerade varor som Handlaren håller åt dig.",
       "saleProceeds": "Försäljningsintäkter",
-      "collectAll": "Hämta allt"
+      "collectAll": "Hämta allt",
+      "outbidToast": "You were outbid on {item}. {money} refunded to your collection box.",
+      "wonToast": "You won the auction for {item}! Collect it at the Merchant.",
+      "soldToast": "Your {item} sold for {money}. Collect it at the Merchant.",
+      "expiredToast": "Your listing of {item} expired unsold. Collect it at the Merchant."
     },
     "logs": {
       "listedItem": "Annonserade {item} på Världsmarknaden för {money}.",
@@ -5882,6 +5918,8 @@ export const sv_SE: EnTranslations = {
       "collectedMoney": "Du hämtar {money} från Handlaren.",
       "reclaimedItem": "Återtog {item} från marknaden.",
       "expiredListing": "Din marknadsannons av {item} gick ut och väntar hos Handlaren.",
+      "postedAuction": "Posted {item} for auction (starting bid {money}).",
+      "bidPlaced": "Bid placed: {money} on {item}.",
       "boughtBackItem": "Köpte tillbaka {item} för {money}."
     },
     "errors": {
@@ -5898,7 +5936,16 @@ export const sv_SE: EnTranslations = {
       "ownListing": "Det är din egen annons. Avbryt den för att återta den.",
       "cannotAfford": "Du har inte råd med det.",
       "notYourListing": "Det är inte din annons.",
-      "nothingToCollect": "Du har inget att hämta."
+      "nothingToCollect": "Du har inget att hämta.",
+      "minStartingBid": "Name a starting bid of at least 1 copper.",
+      "buyoutTooLow": "The buyout must beat the starting bid.",
+      "chooseDuration": "Choose a listing duration of 12, 24, or 48 hours.",
+      "cannotAffordDeposit": "You cannot afford the listing deposit.",
+      "bidsOnly": "That lot takes bids only.",
+      "notAuction": "That lot is not up for auction.",
+      "cannotBidOwnLot": "You cannot bid on your own lot.",
+      "alreadyHighBidder": "You are already the high bidder.",
+      "bidTooLow": "Bid at least {min}."
     },
     "loot": {
       "takeAll": "Ta allt",
@@ -9738,6 +9785,26 @@ export const sv_SE: EnTranslations = {
         "sender": "Broder Aldric",
         "subject": "Det du gjorde i mörkret",
         "body": "Få kommer någonsin att veta vad som låg begravet i den sänkan, och ännu färre skulle tro det. Jag vet, och jag kommer inte att glömma.\n\nMå din väg förbli upplyst.\n- Broder Aldric"
+      },
+      "market_outbid": {
+        "sender": "The Merchant",
+        "subject": "You have been outbid",
+        "body": "Another buyer has raised the bidding on a lot you wanted. Your copper waits in your collection box at the World Market; come see me to take it back or bid again.\n\n- The Merchant"
+      },
+      "market_won": {
+        "sender": "The Merchant",
+        "subject": "Your winning bid",
+        "body": "The hammer has fallen and the lot is yours. Your goods wait in your collection box at the World Market; come see me to claim them.\n\n- The Merchant"
+      },
+      "market_sold": {
+        "sender": "The Merchant",
+        "subject": "Your lot has sold",
+        "body": "A buyer has taken your goods off my hands. Your proceeds wait in your collection box at the World Market; come see me to collect them.\n\n- The Merchant"
+      },
+      "market_expired": {
+        "sender": "The Merchant",
+        "subject": "Your listing expired",
+        "body": "No buyer came for your goods before the listing ran out. They wait in your collection box at the World Market; come see me to take them back.\n\n- The Merchant"
       }
     },
     "itemSets": {

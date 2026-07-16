@@ -2638,6 +2638,20 @@ function dirtyEveryDeltaField(): {
   (sim as any).targeting.partyMarkers.set(party.id, new Map([[mp, 3]]));
   const merchant = sim.entities.get(sim.market.merchantIds[0]);
   if (merchant) merchant.pos = { ...p.pos };
+  // Auction-house widened wire fields (kind/pricePerUnit/secondsLeft/buyoutPrice/
+  // minNextBid/currentBid/myBid/durationsHours): the leader lists a fixed 12h
+  // per-unit lot, the member lists an auction lot with a buyout (both stand at the
+  // relocated Merchant above), then the leader bids on the member's lot so
+  // currentBid/myBid populate on the leader's own snapshot too.
+  const pMember = sim.entities.get(mp);
+  if (pMember) pMember.pos = { ...p.pos };
+  meta.copper = 1000; // enough to cover the 75-copper bid escrowed below
+  sim.addItem('wolf_fang', 3, lp);
+  sim.marketList('wolf_fang', 3, 40, lp, { durationHours: 12 });
+  sim.addItem('spring_water', 1, mp);
+  sim.marketList('spring_water', 1, 0, mp, { auction: { startingBid: 50, buyoutPrice: 500 } });
+  const memberLot = sim.marketListings.find((l) => l.itemId === 'spring_water' && !l.house)!;
+  sim.marketBid(memberLot.id, 75, lp);
   // `mail`: mailInfoFor is null unless near a mailbox, so relocate one onto the
   // player. `mailU` is already non-zero: every fresh character got the one-time
   // Ravenpost welcome letter (delay 0) at join.
@@ -2796,6 +2810,26 @@ describe('full self-state snapshot delta fixture', () => {
     expect((client.duelInfo as any)?.state).toBe('countdown'); // duel -> duelInfo
     expect(client.arenaInfo).not.toBeNull(); // arena -> arenaInfo
     expect(client.marketInfo).not.toBeNull(); // market -> marketInfo
+    // Auction-house widened MarketInfo/MarketListingView fields survive the wire.
+    expect(client.marketInfo?.durationsHours).toEqual([12, 24, 48]);
+    const myFixedLot = client.marketInfo?.listings.find((l) => l.itemId === 'wolf_fang' && l.mine);
+    expect(myFixedLot).toMatchObject({
+      kind: 'fixed',
+      pricePerUnit: 40,
+      count: 3,
+      myBid: false,
+    });
+    expect(myFixedLot?.secondsLeft).toBeGreaterThan(0);
+    expect(myFixedLot?.secondsLeft).toBeLessThanOrEqual(12 * 3600);
+    const bidLot = client.marketInfo?.listings.find((l) => l.itemId === 'spring_water');
+    expect(bidLot).toMatchObject({
+      kind: 'auction',
+      mine: false,
+      myBid: true,
+      currentBid: 75,
+      buyoutPrice: 500,
+    });
+    expect(bidLot?.minNextBid).toBe(75 + Math.max(1, Math.floor(75 * 0.05)));
     expect(client.bankInfo).not.toBeNull(); // bank -> bankInfo
     expect(client.bankInfo?.slots).toEqual([{ itemId: 'wolf_fang', count: 2 }]); // bank contents mirror
     expect(client.activeLootRolls().map((r) => r.rollId)).toEqual([1]); // lroll -> lootRollPrompts

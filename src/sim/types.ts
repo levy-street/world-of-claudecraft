@@ -2347,6 +2347,16 @@ export type SimEvent = { pid?: number } & (
   | { type: 'bank' }
   | { type: 'mailArrived'; senderName: string; letterId?: string }
   | { type: 'mailResult'; code: MailResultCode; value?: number; name?: string }
+  // World Market auction outcomes. Structured data only, the client builds every
+  // visible string (the mail precedent). All personal (pid set when emitted to an
+  // online player); offline recipients get a Ravenpost letter instead. `refund` is
+  // the outbid escrow returned to the collection box, `paid` the winning bid, and
+  // `proceeds` the seller's cut-adjusted sale copper (deposit refunds ride the
+  // collection box, not the event).
+  | { type: 'marketOutbid'; listingId: number; itemId: string; count: number; refund: number }
+  | { type: 'marketWon'; listingId: number; itemId: string; count: number; paid: number }
+  | { type: 'marketSold'; listingId: number; itemId: string; count: number; proceeds: number }
+  | { type: 'marketExpired'; listingId: number; itemId: string; count: number }
   // Guild calendar outcome. Emitted only by the server's SocialService (the
   // sim never books guild events); declared here so the one client event
   // switch stays exhaustively typed.

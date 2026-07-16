@@ -3277,8 +3277,9 @@ export const en_CA: EnTranslations = {
       "dailyBody": "A treasure chest button on your screen opens the daily rewards window. Each day sets out a handful of tasks, complete quests, fight in the Ashen Coliseum, win a Vale Cup match, and offers a free spin of the prize wheel, all worth points toward that day's standings, and the day's top earners share a prize pool for holders of the optional community token. None of it grants power in the game. The window itself spells out the day's rules and who is eligible, shows the leaderboard, and keeps your history.",
       "marketTitle": "The World Market",
       "marketBody": "The Merchant runs the World Market, a player-driven exchange where you can buy and sell with people you may never meet. Speak to the Merchant in Eastbrook, or to Auctioneer Voss up in Highwatch, to open it: both keepers serve the one shared market. The Merchant also keeps a standing stock of their own goods listed there, so there is always something to buy even when no other players have posted.",
-      "marketBrowse": "Browsing: scroll the listings or search by name to find what is for sale. Each listing shows the goods, the seller, and the asking price for the whole stack.",
-      "marketPost": "Posting: choose a stack from your bags, set your price, and list it. The goods are held by the Merchant until someone buys them. Unsold listings come back to you after a while, and you can reclaim one early if you change your mind.",
+      "marketBrowse": "Browsing: scroll the listings or search by name to find what is for sale. Each listing shows the goods, the seller, how much time is left, and either a per-item price for a bulk stack you can buy in part, or the standing bid on an auction lot.",
+      "marketPost": "Posting: choose a stack from your bags, pick how long to list it, 12, 24, or 48 hours, and set a per-item price, or open it to auction with a starting bid and an optional buyout. Listing takes a small deposit that scales with the duration; it comes back to you as your goods sell and is only lost on whatever goes unsold. The goods are held by the Merchant until someone buys them or the auction ends, and you can reclaim a listing early if you change your mind.",
+      "marketBidding": "Auctions: some listings take bids instead of a fixed price. A bid must clear the posted minimum, and outbidding someone always refunds them. When the seller sets a buyout, any bid that reaches it wins the lot on the spot.",
       "marketCollect": "Collecting: when your goods sell, your proceeds wait for you at the Merchant. Return to collect the coin, along with anything that came back unsold. The Merchant takes a small cut of every completed sale.",
       "marketPricing": "Pricing is up to you. Listing a little under what others are asking tends to sell faster, while a steep price may sit untouched. Browse first to see what the going rate looks like before you post."
     },
@@ -5845,6 +5846,10 @@ export const en_CA: EnTranslations = {
       "filterWeaponAll": "All weapons",
       "filterRarity": "Rarity",
       "filterRarityAll": "All rarities",
+      "sortLabel": "Sort",
+      "sortNewest": "Newest",
+      "sortPrice": "Price",
+      "sortTimeLeft": "Time left",
       "weaponSword": "Swords",
       "weaponDagger": "Daggers",
       "weaponStaff": "Staves",
@@ -5863,17 +5868,48 @@ export const en_CA: EnTranslations = {
       "reclaim": "Reclaim",
       "buyAria": "Buy {item} for {price}",
       "reclaimAria": "Reclaim {item}",
+      "timeLeft": "{time} left",
+      "yourBidBadge": "Your bid",
+      "currentBidLabel": "Bid:",
+      "noBidsYet": "No bids yet",
+      "minNextBid": "Min bid {money}",
+      "buyoutLabel": "Buyout {money}",
+      "auctionBadge": "Auction",
+      "leadingBid": "You're leading",
+      "bidInputAria": "Bid amount for {item}",
+      "bidButton": "Bid",
+      "bidAria": "Bid on {item}",
+      "buyoutButton": "Buyout",
+      "buyoutAria": "Buy out {item} for {price}",
+      "buyQuantityAria": "Quantity of {item} to buy",
       "sellNote": "List goods from your bags. The Merchant takes a {cut}% cut when an item sells. You are using {used}/{max} listing slots.",
       "sellPickEmpty": "Click an item in your bags to choose what to sell.",
       "quantity": "Quantity",
       "quantityOf": "of {count}",
       "priceEach": "Price each",
+      "listingTypeLabel": "Listing type",
+      "listingTypeFixed": "Fixed price",
+      "listingTypeAuction": "Auction",
+      "durationLabel": "Duration",
+      "durationOption": "{hours}h",
+      "startingBidLabel": "Starting bid",
+      "buyoutOptionalLabel": "Buyout (optional)",
+      "totalLabel": "Total",
+      "depositPreviewLabel": "Listing deposit",
       "listButton": "List on the World Market",
       "minPriceError": "Name a price of at least 1 copper.",
+      "cancelConfirmTitle": "Reclaim listing",
+      "cancelConfirmBody": "Reclaim {item} from the market? The {money} deposit will be forfeited.",
+      "cancelConfirmBodyNoDeposit": "Reclaim {item} from the market?",
+      "cancelConfirmDismiss": "Cancel",
       "collectEmpty": "Nothing waiting. Sale proceeds and expired listings collect here.",
       "collectNote": "Earnings and returned goods the Merchant is holding for you.",
       "saleProceeds": "Sale proceeds",
-      "collectAll": "Collect All"
+      "collectAll": "Collect All",
+      "outbidToast": "You were outbid on {item}. {money} refunded to your collection box.",
+      "wonToast": "You won the auction for {item}! Collect it at the Merchant.",
+      "soldToast": "Your {item} sold for {money}. Collect it at the Merchant.",
+      "expiredToast": "Your listing of {item} expired unsold. Collect it at the Merchant."
     },
     "logs": {
       "listedItem": "Listed {item} on the World Market for {money}.",
@@ -5882,6 +5918,8 @@ export const en_CA: EnTranslations = {
       "collectedMoney": "You collect {money} from the Merchant.",
       "reclaimedItem": "Reclaimed {item} from the market.",
       "expiredListing": "Your market listing of {item} expired and waits at the Merchant.",
+      "postedAuction": "Posted {item} for auction (starting bid {money}).",
+      "bidPlaced": "Bid placed: {money} on {item}.",
       "boughtBackItem": "Bought back {item} for {money}."
     },
     "errors": {
@@ -5898,7 +5936,16 @@ export const en_CA: EnTranslations = {
       "ownListing": "That is your own listing. Cancel it to reclaim it.",
       "cannotAfford": "You cannot afford that.",
       "notYourListing": "That is not your listing.",
-      "nothingToCollect": "You have nothing to collect."
+      "nothingToCollect": "You have nothing to collect.",
+      "minStartingBid": "Name a starting bid of at least 1 copper.",
+      "buyoutTooLow": "The buyout must beat the starting bid.",
+      "chooseDuration": "Choose a listing duration of 12, 24, or 48 hours.",
+      "cannotAffordDeposit": "You cannot afford the listing deposit.",
+      "bidsOnly": "That lot takes bids only.",
+      "notAuction": "That lot is not up for auction.",
+      "cannotBidOwnLot": "You cannot bid on your own lot.",
+      "alreadyHighBidder": "You are already the high bidder.",
+      "bidTooLow": "Bid at least {min}."
     },
     "loot": {
       "takeAll": "Take All",
@@ -9738,6 +9785,26 @@ export const en_CA: EnTranslations = {
         "sender": "Brother Aldric",
         "subject": "What you did in the dark",
         "body": "Few will ever know what was buried in that hollow, and fewer still would believe it. I know, and I will not forget.\n\nMay your road stay lit.\n- Brother Aldric"
+      },
+      "market_outbid": {
+        "sender": "The Merchant",
+        "subject": "You have been outbid",
+        "body": "Another buyer has raised the bidding on a lot you wanted. Your copper waits in your collection box at the World Market; come see me to take it back or bid again.\n\n- The Merchant"
+      },
+      "market_won": {
+        "sender": "The Merchant",
+        "subject": "Your winning bid",
+        "body": "The hammer has fallen and the lot is yours. Your goods wait in your collection box at the World Market; come see me to claim them.\n\n- The Merchant"
+      },
+      "market_sold": {
+        "sender": "The Merchant",
+        "subject": "Your lot has sold",
+        "body": "A buyer has taken your goods off my hands. Your proceeds wait in your collection box at the World Market; come see me to collect them.\n\n- The Merchant"
+      },
+      "market_expired": {
+        "sender": "The Merchant",
+        "subject": "Your listing expired",
+        "body": "No buyer came for your goods before the listing ran out. They wait in your collection box at the World Market; come see me to take them back.\n\n- The Merchant"
       }
     },
     "itemSets": {

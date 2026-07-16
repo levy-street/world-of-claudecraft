@@ -3277,8 +3277,9 @@ export const zh_CN: EnTranslations = {
       "dailyBody": "屏幕上有一个宝箱按钮，点击即可打开每日奖励窗口。每天都会列出几项任务：完成任务、在灰烬斗技场中作战、赢下一场溪谷杯比赛，还提供一次免费的转盘抽奖，这些都能为当天的排名累积积分；当日积分最高者会共享一个奖池，面向持有可选社区代币的玩家。这一切都不会赋予游戏中的战力。窗口本身会写明当天的规则与参赛资格，展示排行榜，并保留你的历史记录。",
       "marketTitle": "世界市场",
       "marketBody": "商人经营着世界市场，这是一个由玩家驱动的交易所，你可以在此与素未谋面的人买卖。与东溪镇的商人交谈，或与高守哨站上的拍卖师沃斯交谈，即可将它打开：两位管理者服务于同一个共享市场。商人还会在那里长期挂售自己的一批货物，因此即便没有其他玩家上架，也总有东西可买。",
-      "marketBrowse": "浏览：翻看列表或按名称搜索，找到正在出售的商品。每条挂单都会显示货物、卖家，以及整组货物的要价。",
-      "marketPost": "挂单：从背包中选一组货物，定下价格并挂出。在有人买下之前，货物会由商人代为保管。未售出的挂单过一段时间后会退还给你，若你改变主意，也可以提前取回其中一件。",
+      "marketBrowse": "浏览：翻看列表或按名称搜索，找到正在出售的商品。每条挂单都会显示货物、卖家、剩余时间，以及可分批购买的整组货物单价，或是拍卖品的当前出价。",
+      "marketPost": "挂单：从背包中选一组货物，选择上架时长（12、24 或 48 小时）并定下单价，或改为拍卖并设定起拍价及可选的一口价。上架需要缴纳一笔与时长相关的押金；货物售出时会随之退还，只有未售出的部分才会被没收。在有人买下或拍卖结束之前，货物会由商人代为保管，若你改变主意，也可以提前取回。",
+      "marketBidding": "拍卖：部分挂单接受出价而非固定价格。出价必须不低于公示的最低出价，一旦你的出价被超过，先前的出价会全额退还。若卖家设置了一口价，出价达到该金额即可当场拍下整批货物。",
       "marketCollect": "收取：当你的货物售出后，所得钱款会在商人处等你领取。回去收取钱币，连同任何未售出而退回的货物。商人会从每笔成交中抽取少许佣金。",
       "marketPricing": "定价由你说了算。比别人略低一点往往卖得更快，而要价过高则可能无人问津。挂单前不妨先浏览一番，看看当下的行情如何。"
     },
@@ -5845,6 +5846,10 @@ export const zh_CN: EnTranslations = {
       "filterWeaponAll": "全部武器",
       "filterRarity": "稀有度",
       "filterRarityAll": "全部稀有度",
+      "sortLabel": "排序",
+      "sortNewest": "最新",
+      "sortPrice": "价格",
+      "sortTimeLeft": "剩余时间",
       "weaponSword": "剑",
       "weaponDagger": "匕首",
       "weaponStaff": "法杖",
@@ -5863,17 +5868,48 @@ export const zh_CN: EnTranslations = {
       "reclaim": "取回",
       "buyAria": "以 {price} 购买 {item}",
       "reclaimAria": "取回 {item}",
+      "timeLeft": "剩余{time}",
+      "yourBidBadge": "你的出价",
+      "currentBidLabel": "出价：",
+      "noBidsYet": "暂无出价",
+      "minNextBid": "最低出价 {money}",
+      "buyoutLabel": "一口价 {money}",
+      "auctionBadge": "拍卖",
+      "leadingBid": "你正在领先",
+      "bidInputAria": "{item} 的出价金额",
+      "bidButton": "出价",
+      "bidAria": "对 {item} 出价",
+      "buyoutButton": "一口价购买",
+      "buyoutAria": "以 {price} 一口价购买 {item}",
+      "buyQuantityAria": "购买 {item} 的数量",
       "sellNote": "从背包上架货物。物品售出时商人抽取 {cut}%。你正在使用 {used}/{max} 个上架位。",
       "sellPickEmpty": "点击背包中的物品来选择要出售的货物。",
       "quantity": "数量",
       "quantityOf": "共 {count}",
       "priceEach": "单价",
+      "listingTypeLabel": "上架类型",
+      "listingTypeFixed": "一口价",
+      "listingTypeAuction": "拍卖",
+      "durationLabel": "持续时间",
+      "durationOption": "{hours}小时",
+      "startingBidLabel": "起拍价",
+      "buyoutOptionalLabel": "一口价（可选）",
+      "totalLabel": "总计",
+      "depositPreviewLabel": "上架押金",
       "listButton": "上架到世界市场",
       "minPriceError": "价格至少为 1 铜币。",
+      "cancelConfirmTitle": "取回上架物品",
+      "cancelConfirmBody": "从市场取回 {item}？押金 {money} 将被没收。",
+      "cancelConfirmBodyNoDeposit": "从市场取回 {item}？",
+      "cancelConfirmDismiss": "取消",
       "collectEmpty": "没有待领取内容。销售收益和过期上架会在这里领取。",
       "collectNote": "商人为你保管的收益和退回货物。",
       "saleProceeds": "销售收益",
-      "collectAll": "全部领取"
+      "collectAll": "全部领取",
+      "outbidToast": "你在 {item} 的出价被超过了。{money} 已退还至你的领取箱。",
+      "wonToast": "你赢得了 {item} 的拍卖！请到商人处领取。",
+      "soldToast": "你的 {item} 以 {money} 售出。请到商人处领取。",
+      "expiredToast": "你的 {item} 上架已过期未售出。请到商人处领取。"
     },
     "logs": {
       "listedItem": "已将 {item} 以 {money} 上架到世界市场。",
@@ -5882,6 +5918,8 @@ export const zh_CN: EnTranslations = {
       "collectedMoney": "你从商人处领取了 {money}。",
       "reclaimedItem": "已从市场取回 {item}。",
       "expiredListing": "你的 {item} 市场上架已过期，正在商人处等待领取。",
+      "postedAuction": "已将 {item} 上架拍卖（起拍价 {money}）。",
+      "bidPlaced": "已出价：{money}，竞拍 {item}。",
       "boughtBackItem": "你以 {money} 回购了 {item}。"
     },
     "errors": {
@@ -5898,7 +5936,16 @@ export const zh_CN: EnTranslations = {
       "ownListing": "这是你自己的上架。取消即可取回。",
       "cannotAfford": "你买不起。",
       "notYourListing": "这不是你的上架。",
-      "nothingToCollect": "你没有可领取内容。"
+      "nothingToCollect": "你没有可领取内容。",
+      "minStartingBid": "起拍价至少为 1 铜币。",
+      "buyoutTooLow": "一口价必须高于起拍价。",
+      "chooseDuration": "请选择 12、24 或 48 小时的上架时长。",
+      "cannotAffordDeposit": "你无法支付上架押金。",
+      "bidsOnly": "该拍品仅接受出价。",
+      "notAuction": "该拍品并非拍卖品。",
+      "cannotBidOwnLot": "你不能对自己的拍品出价。",
+      "alreadyHighBidder": "你已经是当前最高出价者。",
+      "bidTooLow": "出价至少为 {min}。"
     },
     "loot": {
       "takeAll": "全部拾取",
@@ -9738,6 +9785,26 @@ export const zh_CN: EnTranslations = {
         "sender": "奥德里克修士",
         "subject": "你在黑暗中所做的一切",
         "body": "很少有人会知道那处洼地里埋葬着什么，愿意相信的人更少。但我知道，而且我不会忘记。\n\n愿你的道路常明。\n- 奥德里克修士"
+      },
+      "market_outbid": {
+        "sender": "商人",
+        "subject": "你的出价被超过了",
+        "body": "另一位买家提高了你所竞拍的一件拍品的出价。你的铜币正等在世界市场的领取箱中；来找我取回，或者重新出价。\n\n- 商人"
+      },
+      "market_won": {
+        "sender": "商人",
+        "subject": "你的中标拍品",
+        "body": "拍卖槌落下，这件拍品归你所有了。你的货物正等在世界市场的领取箱中；来找我领取吧。\n\n- 商人"
+      },
+      "market_sold": {
+        "sender": "商人",
+        "subject": "你的拍品已售出",
+        "body": "有买家买走了你的货物。你的收益正等在世界市场的领取箱中；来找我领取吧。\n\n- 商人"
+      },
+      "market_expired": {
+        "sender": "商人",
+        "subject": "你的上架已过期",
+        "body": "在上架到期前没有买家出现。它正等在世界市场的领取箱中；来找我取回吧。\n\n- 商人"
       }
     },
     "itemSets": {

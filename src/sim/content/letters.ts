@@ -80,3 +80,47 @@ export const QUEST_LETTERS: Record<string, LetterDef> = {
     delaySeconds: 150,
   },
 };
+
+// World Market auction outcomes: the Merchant writes when the affected player
+// is OFFLINE (online players get the structured market events instead). The
+// letters carry NO coin or items: every refund, payout, and returned lot moves
+// through the Merchant's collection box, never the mail. Ids are append-only
+// like every letterId above.
+export const AUCTION_LETTERS: Record<'outbid' | 'won' | 'sold' | 'expired', LetterDef> = {
+  outbid: {
+    letterId: 'market_outbid',
+    senderName: 'The Merchant',
+    subject: 'You have been outbid',
+    body:
+      'Another buyer has raised the bidding on a lot you wanted. Your copper ' +
+      'waits in your collection box at the World Market; come see me to take ' +
+      'it back or bid again.\n\n- The Merchant',
+  },
+  won: {
+    letterId: 'market_won',
+    senderName: 'The Merchant',
+    subject: 'Your winning bid',
+    body:
+      'The hammer has fallen and the lot is yours. Your goods wait in your ' +
+      'collection box at the World Market; come see me to claim them.\n\n' +
+      '- The Merchant',
+  },
+  sold: {
+    letterId: 'market_sold',
+    senderName: 'The Merchant',
+    subject: 'Your lot has sold',
+    body:
+      'A buyer has taken your goods off my hands. Your proceeds wait in your ' +
+      'collection box at the World Market; come see me to collect them.\n\n' +
+      '- The Merchant',
+  },
+  expired: {
+    letterId: 'market_expired',
+    senderName: 'The Merchant',
+    subject: 'Your listing expired',
+    body:
+      'No buyer came for your goods before the listing ran out. They wait in ' +
+      'your collection box at the World Market; come see me to take them ' +
+      'back.\n\n- The Merchant',
+  },
+};

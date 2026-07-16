@@ -3277,8 +3277,9 @@ export const ko_KR: EnTranslations = {
       "dailyBody": "화면의 보물 상자 버튼을 누르면 일일 보상 창이 열립니다. 매일 몇 가지 과제가 주어지는데, 퀘스트 완수, 잿빛 콜로세움에서의 전투, 베일 컵 경기 승리 등이 있으며, 상품 수레바퀴를 무료로 한 번 돌릴 수도 있습니다. 이 모두가 그날의 순위를 위한 점수가 되고, 그날 최고 점수를 올린 이들은 선택 사항인 커뮤니티 토큰 보유자를 위한 상금 풀을 나눠 갖습니다. 이 중 어느 것도 게임 내에서 힘을 주지는 않습니다. 창 자체가 그날의 규칙과 참가 자격을 설명하고, 순위표를 보여주며, 여러분의 기록을 보관합니다.",
       "marketTitle": "세계 시장",
       "marketBody": "상인이 세계 시장을 운영합니다. 만날 일 없을지도 모를 사람들과 사고팔 수 있는, 플레이어가 이끄는 거래소입니다. 이스트브룩의 상인에게 말을 걸거나 하이워치의 경매인 보스에게 말을 걸어 열 수 있으며, 두 관리인 모두 하나의 공용 시장을 담당합니다. 상인은 자신의 물품도 상시 목록에 올려 두므로, 다른 플레이어가 아무것도 올리지 않았을 때에도 언제나 살 것이 있습니다.",
-      "marketBrowse": "둘러보기: 목록을 넘겨 보거나 이름으로 검색해 무엇이 매물로 나와 있는지 찾으세요. 각 매물에는 물품, 판매자, 그리고 묶음 전체의 호가가 표시됩니다.",
-      "marketPost": "등록하기: 가방에서 묶음을 고르고 가격을 매겨 매물로 올리세요. 누군가 살 때까지 물품은 상인이 보관합니다. 팔리지 않은 매물은 얼마 뒤 당신에게 돌아오며, 마음이 바뀌면 하나를 일찍 되찾을 수도 있습니다.",
+      "marketBrowse": "둘러보기: 목록을 넘겨 보거나 이름으로 검색해 무엇이 매물로 나와 있는지 찾으세요. 각 매물에는 물품, 판매자, 남은 시간, 그리고 나눠서 살 수 있는 묶음의 개당 가격이나 경매 물품의 현재 입찰가가 표시됩니다.",
+      "marketPost": "등록하기: 가방에서 묶음을 고르고 등록 기간(12시간, 24시간, 48시간)을 선택해 개당 가격을 매기거나, 경매로 전환해 시작 입찰가와 선택적인 즉시구매가를 설정하세요. 등록에는 기간에 비례하는 보증금이 필요하지만 물품이 팔릴 때마다 돌려받으며, 팔리지 않은 만큼만 몰수됩니다. 누군가 살 때까지, 또는 경매가 끝날 때까지 물품은 상인이 보관하며, 마음이 바뀌면 일찍 되찾을 수도 있습니다.",
+      "marketBidding": "경매: 일부 매물은 고정 가격 대신 입찰을 받습니다. 입찰가는 공시된 최소 금액 이상이어야 하며, 당신의 입찰이 밀리면 이전 입찰 금액은 전액 반환됩니다. 판매자가 즉시구매가를 설정한 경우, 그 금액에 도달하는 입찰이 있으면 그 자리에서 낙찰됩니다.",
       "marketCollect": "수령하기: 물품이 팔리면 그 수익이 상인에게서 당신을 기다립니다. 돌아가 동전을, 그리고 팔리지 않고 돌아온 물건이 있다면 함께 수령하세요. 상인은 성사된 거래마다 약간의 수수료를 가져갑니다.",
       "marketPricing": "가격은 당신의 몫입니다. 남들이 부르는 값보다 조금 낮게 올리면 더 빨리 팔리는 경향이 있고, 지나치게 높은 값은 손도 닿지 않은 채 남을 수 있습니다. 등록하기 전에 먼저 둘러보며 시세가 어떤지 살펴보세요."
     },
@@ -5845,6 +5846,10 @@ export const ko_KR: EnTranslations = {
       "filterWeaponAll": "모든 무기",
       "filterRarity": "희귀도",
       "filterRarityAll": "모든 희귀도",
+      "sortLabel": "정렬",
+      "sortNewest": "최신순",
+      "sortPrice": "가격순",
+      "sortTimeLeft": "남은 시간순",
       "weaponSword": "검",
       "weaponDagger": "단검",
       "weaponStaff": "지팡이",
@@ -5863,17 +5868,48 @@ export const ko_KR: EnTranslations = {
       "reclaim": "회수",
       "buyAria": "{price}에 {item} 구매",
       "reclaimAria": "{item} 회수",
+      "timeLeft": "{time} 남음",
+      "yourBidBadge": "내 입찰",
+      "currentBidLabel": "입찰가:",
+      "noBidsYet": "아직 입찰 없음",
+      "minNextBid": "최소 입찰가 {money}",
+      "buyoutLabel": "즉시구매가 {money}",
+      "auctionBadge": "경매",
+      "leadingBid": "현재 최고 입찰자입니다",
+      "bidInputAria": "{item}에 대한 입찰 금액",
+      "bidButton": "입찰",
+      "bidAria": "{item}에 입찰",
+      "buyoutButton": "즉시구매",
+      "buyoutAria": "{item}을(를) {price}에 즉시구매",
+      "buyQuantityAria": "구매할 {item} 수량",
       "sellNote": "가방의 상품을 올립니다. 아이템이 팔리면 상인이 {cut}%를 가져갑니다. 등록 칸 {used}/{max}개 사용 중입니다.",
       "sellPickEmpty": "판매할 아이템을 선택하려면 가방에서 클릭하세요.",
       "quantity": "수량",
       "quantityOf": "/ {count}",
       "priceEach": "개당 가격",
+      "listingTypeLabel": "등록 방식",
+      "listingTypeFixed": "정가 판매",
+      "listingTypeAuction": "경매",
+      "durationLabel": "등록 기간",
+      "durationOption": "{hours}시간",
+      "startingBidLabel": "시작 입찰가",
+      "buyoutOptionalLabel": "즉시구매가 (선택)",
+      "totalLabel": "합계",
+      "depositPreviewLabel": "등록 보증금",
       "listButton": "세계 시장에 등록",
       "minPriceError": "가격은 최소 1동화여야 합니다.",
+      "cancelConfirmTitle": "등록 회수",
+      "cancelConfirmBody": "{item}을(를) 시장에서 회수하시겠습니까? 보증금 {money}이(가) 몰수됩니다.",
+      "cancelConfirmBodyNoDeposit": "{item}을(를) 시장에서 회수하시겠습니까?",
+      "cancelConfirmDismiss": "취소",
       "collectEmpty": "기다리는 물건이 없습니다. 판매 대금과 만료된 등록품은 여기에서 받습니다.",
       "collectNote": "상인이 보관 중인 수익과 반환된 상품입니다.",
       "saleProceeds": "판매 대금",
-      "collectAll": "모두 수령"
+      "collectAll": "모두 수령",
+      "outbidToast": "{item}에 대한 입찰이 다른 사람에게 밀렸습니다. {money}이(가) 수거함으로 반환되었습니다.",
+      "wonToast": "{item} 경매에서 낙찰되었습니다! 상인에게서 수령하세요.",
+      "soldToast": "{item}이(가) {money}에 판매되었습니다. 상인에게서 수령하세요.",
+      "expiredToast": "{item} 등록이 판매되지 않고 만료되었습니다. 상인에게서 수령하세요."
     },
     "logs": {
       "listedItem": "{item}을(를) {money}에 세계 시장에 등록했습니다.",
@@ -5882,6 +5918,8 @@ export const ko_KR: EnTranslations = {
       "collectedMoney": "상인에게서 {money}을(를) 수령합니다.",
       "reclaimedItem": "시장에서 {item}을(를) 회수했습니다.",
       "expiredListing": "{item} 시장 등록이 만료되어 상인에게 보관되었습니다.",
+      "postedAuction": "{item}을(를) 경매에 등록했습니다 (시작가 {money}).",
+      "bidPlaced": "입찰함: {item}에 {money}.",
       "boughtBackItem": "{item}을(를) {money}에 되샀습니다."
     },
     "errors": {
@@ -5898,7 +5936,16 @@ export const ko_KR: EnTranslations = {
       "ownListing": "자신의 등록입니다. 취소하면 회수할 수 있습니다.",
       "cannotAfford": "그것을 살 돈이 부족합니다.",
       "notYourListing": "당신의 등록이 아닙니다.",
-      "nothingToCollect": "수령할 것이 없습니다."
+      "nothingToCollect": "수령할 것이 없습니다.",
+      "minStartingBid": "시작 입찰가는 최소 1구리로 설정하세요.",
+      "buyoutTooLow": "즉시구매가는 시작 입찰가보다 높아야 합니다.",
+      "chooseDuration": "등록 기간을 12시간, 24시간, 48시간 중에서 선택하세요.",
+      "cannotAffordDeposit": "등록 보증금을 지불할 수 없습니다.",
+      "bidsOnly": "이 물품은 입찰만 가능합니다.",
+      "notAuction": "이 물품은 경매 등록이 아닙니다.",
+      "cannotBidOwnLot": "자신의 등록 물품에는 입찰할 수 없습니다.",
+      "alreadyHighBidder": "이미 최고 입찰자입니다.",
+      "bidTooLow": "최소 {min} 이상 입찰하세요."
     },
     "loot": {
       "takeAll": "모두 가져가기",
@@ -9738,6 +9785,26 @@ export const ko_KR: EnTranslations = {
         "sender": "알드릭 수사",
         "subject": "그대가 어둠 속에서 해낸 일",
         "body": "그 구렁에 무엇이 묻혀 있었는지 아는 이는 거의 없고, 믿을 이는 더 적을 것입니다. 저는 알고 있고, 잊지 않겠습니다.\n\n그대의 길에 늘 빛이 함께하기를.\n- 알드릭 수사"
+      },
+      "market_outbid": {
+        "sender": "상인",
+        "subject": "입찰이 밀렸습니다",
+        "body": "다른 구매자가 당신이 노리던 물품의 입찰가를 올렸습니다. 당신의 구리는 세계 시장의 수거함에서 기다리고 있습니다. 찾아와서 회수하거나 다시 입찰하세요.\n\n- 상인"
+      },
+      "market_won": {
+        "sender": "상인",
+        "subject": "낙찰 소식",
+        "body": "경매봉이 내려졌고 이 물품은 이제 당신의 것입니다. 당신의 물건은 세계 시장의 수거함에서 기다리고 있습니다. 찾아와서 수령하세요.\n\n- 상인"
+      },
+      "market_sold": {
+        "sender": "상인",
+        "subject": "물품이 판매되었습니다",
+        "body": "구매자가 당신의 물건을 가져갔습니다. 판매 수익은 세계 시장의 수거함에서 기다리고 있습니다. 찾아와서 수령하세요.\n\n- 상인"
+      },
+      "market_expired": {
+        "sender": "상인",
+        "subject": "등록이 만료되었습니다",
+        "body": "등록 기간이 끝날 때까지 구매자가 나타나지 않았습니다. 물건은 세계 시장의 수거함에서 기다리고 있습니다. 찾아와서 회수하세요.\n\n- 상인"
       }
     },
     "itemSets": {

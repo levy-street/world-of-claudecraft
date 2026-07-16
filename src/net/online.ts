@@ -30,6 +30,7 @@ import { deadTargetSelectable } from '../sim/dead_target';
 import { freshDeedStats } from '../sim/deeds';
 import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
 import type { Ante, PickAction } from '../sim/lockpick';
+import type { MarketListOptions } from '../sim/market';
 import type { MarketQuery } from '../sim/market_query';
 import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import { getArchetypeTitle, getHobbyCraft } from '../sim/professions/archetype';
@@ -2902,14 +2903,28 @@ export class ClientWorld implements IWorld {
       itemType: query.itemType,
       subtype: query.subtype,
       rarity: query.rarity,
+      sort: query.sort,
       page: query.page,
     });
   }
-  marketList(itemId: string, count: number, price: number): void {
-    this.cmd({ cmd: 'market_list', item: itemId, count, price });
+  marketList(itemId: string, count: number, pricePerUnit: number, opts?: MarketListOptions): void {
+    // `price` on the wire is the PER-UNIT ask of a fixed listing (ignored for an
+    // auction lot); duration/startingBid/buyout ride only when chosen.
+    this.cmd({
+      cmd: 'market_list',
+      item: itemId,
+      count,
+      price: pricePerUnit,
+      duration: opts?.durationHours,
+      startingBid: opts?.auction?.startingBid,
+      buyout: opts?.auction?.buyoutPrice,
+    });
   }
-  marketBuy(listingId: number): void {
-    this.cmd({ cmd: 'market_buy', id: listingId });
+  marketBuy(listingId: number, quantity?: number): void {
+    this.cmd({ cmd: 'market_buy', id: listingId, qty: quantity });
+  }
+  marketBid(listingId: number, amount: number): void {
+    this.cmd({ cmd: 'market_bid', id: listingId, amount });
   }
   marketCancel(listingId: number): void {
     this.cmd({ cmd: 'market_cancel', id: listingId });

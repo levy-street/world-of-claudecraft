@@ -392,6 +392,8 @@ export const COMMAND_NAMES = [
   'ignore_add',
   'ignore_remove',
   'stow_weapon',
+  // World Market auction bids (the auction-house extension of IWorldMarket).
+  'market_bid',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -576,6 +578,7 @@ export const COMMAND_FACETS = {
   market_buy: 'IWorldMarket',
   market_cancel: 'IWorldMarket',
   market_collect: 'IWorldMarket',
+  market_bid: 'IWorldMarket',
   // IWorldMail: Ravenpost letters (snake_case wire strings, by design). mailInfo /
   // mailUnread are snapshot reads (no send, untagged).
   mail_send: 'IWorldMail',

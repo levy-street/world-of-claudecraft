@@ -3279,6 +3279,7 @@ export const pt_BR: EnTranslations = {
       "marketBody": "O Mercador comanda o Mercado Mundial, uma central movida por jogadores onde você pode comprar e vender com pessoas que talvez nunca encontre. Fale com o Mercador em Eastbrook, ou com o Leiloeiro Voss lá em Highwatch, para abri-lo: ambos os guardiões servem ao mesmo mercado compartilhado. O Mercador também mantém um estoque fixo de suas próprias mercadorias listado lá, então sempre há algo para comprar mesmo quando nenhum outro jogador anunciou nada.",
       "marketBrowse": "Navegando: percorra as listagens ou busque por nome para achar o que está à venda. Cada listagem mostra os itens, o vendedor e o preço pedido pelo lote inteiro.",
       "marketPost": "Anunciando: escolha um lote das suas bolsas, defina o preço e liste-o. Os itens ficam guardados com o Mercador até alguém comprá-los. Listagens não vendidas voltam para você depois de um tempo, e você pode reaver uma mais cedo se mudar de ideia.",
+      "marketBidding": "Auctions: some listings take bids instead of a fixed price. A bid must clear the posted minimum, and outbidding someone always refunds them. When the seller sets a buyout, any bid that reaches it wins the lot on the spot.",
       "marketCollect": "Coletando: quando seus itens são vendidos, seus ganhos ficam esperando por você no Mercador. Volte para coletar as moedas, junto com qualquer coisa que tenha voltado sem ser vendida. O Mercador fica com uma pequena parte de cada venda concluída.",
       "marketPricing": "O preço fica a seu critério. Listar um pouco abaixo do que os outros pedem tende a vender mais rápido, enquanto um preço alto pode ficar parado. Navegue primeiro para ver qual é o preço de mercado antes de anunciar."
     },
@@ -5845,6 +5846,10 @@ export const pt_BR: EnTranslations = {
       "filterWeaponAll": "Todas as armas",
       "filterRarity": "Raridade",
       "filterRarityAll": "Todas as raridades",
+      "sortLabel": "Sort",
+      "sortNewest": "Newest",
+      "sortPrice": "Price",
+      "sortTimeLeft": "Time left",
       "weaponSword": "Espadas",
       "weaponDagger": "Adagas",
       "weaponStaff": "Cajados",
@@ -5863,17 +5868,48 @@ export const pt_BR: EnTranslations = {
       "reclaim": "Recuperar",
       "buyAria": "Comprar {item} por {price}",
       "reclaimAria": "Recuperar {item}",
+      "timeLeft": "{time} left",
+      "yourBidBadge": "Your bid",
+      "currentBidLabel": "Bid:",
+      "noBidsYet": "No bids yet",
+      "minNextBid": "Min bid {money}",
+      "buyoutLabel": "Buyout {money}",
+      "auctionBadge": "Auction",
+      "leadingBid": "You're leading",
+      "bidInputAria": "Bid amount for {item}",
+      "bidButton": "Bid",
+      "bidAria": "Bid on {item}",
+      "buyoutButton": "Buyout",
+      "buyoutAria": "Buy out {item} for {price}",
+      "buyQuantityAria": "Quantity of {item} to buy",
       "sellNote": "Liste mercadorias das suas bolsas. O Mercador fica com {cut}% quando um item é vendido. Você usa {used}/{max} espaços.",
       "sellPickEmpty": "Clique em um item nas suas bolsas para escolher o que vender.",
       "quantity": "Quantidade",
       "quantityOf": "de {count}",
       "priceEach": "Preço unitário",
+      "listingTypeLabel": "Listing type",
+      "listingTypeFixed": "Fixed price",
+      "listingTypeAuction": "Auction",
+      "durationLabel": "Duration",
+      "durationOption": "{hours}h",
+      "startingBidLabel": "Starting bid",
+      "buyoutOptionalLabel": "Buyout (optional)",
+      "totalLabel": "Total",
+      "depositPreviewLabel": "Listing deposit",
       "listButton": "Listar no Mercado Mundial",
       "minPriceError": "Informe um preço de pelo menos 1 cobre.",
+      "cancelConfirmTitle": "Reclaim listing",
+      "cancelConfirmBody": "Reclaim {item} from the market? The {money} deposit will be forfeited.",
+      "cancelConfirmBodyNoDeposit": "Reclaim {item} from the market?",
+      "cancelConfirmDismiss": "Cancel",
       "collectEmpty": "Nada esperando. Receitas de venda e listagens expiradas ficam aqui.",
       "collectNote": "Receitas e bens devolvidos que o Mercador guarda para você.",
       "saleProceeds": "Receitas da venda",
-      "collectAll": "Coletar tudo"
+      "collectAll": "Coletar tudo",
+      "outbidToast": "You were outbid on {item}. {money} refunded to your collection box.",
+      "wonToast": "You won the auction for {item}! Collect it at the Merchant.",
+      "soldToast": "Your {item} sold for {money}. Collect it at the Merchant.",
+      "expiredToast": "Your listing of {item} expired unsold. Collect it at the Merchant."
     },
     "logs": {
       "listedItem": "{item} listado no Mercado Mundial por {money}.",
@@ -5882,6 +5918,8 @@ export const pt_BR: EnTranslations = {
       "collectedMoney": "Você coleta {money} com o Mercador.",
       "reclaimedItem": "{item} recuperado do mercado.",
       "expiredListing": "Sua listagem de {item} expirou e espera com o Mercador.",
+      "postedAuction": "Posted {item} for auction (starting bid {money}).",
+      "bidPlaced": "Bid placed: {money} on {item}.",
       "boughtBackItem": "Você recomprou {item} por {money}."
     },
     "errors": {
@@ -5898,7 +5936,16 @@ export const pt_BR: EnTranslations = {
       "ownListing": "Essa é sua própria listagem. Cancele para recuperá-la.",
       "cannotAfford": "Você não pode pagar por isso.",
       "notYourListing": "Essa listagem não é sua.",
-      "nothingToCollect": "Você não tem nada para coletar."
+      "nothingToCollect": "Você não tem nada para coletar.",
+      "minStartingBid": "Name a starting bid of at least 1 copper.",
+      "buyoutTooLow": "The buyout must beat the starting bid.",
+      "chooseDuration": "Choose a listing duration of 12, 24, or 48 hours.",
+      "cannotAffordDeposit": "You cannot afford the listing deposit.",
+      "bidsOnly": "That lot takes bids only.",
+      "notAuction": "That lot is not up for auction.",
+      "cannotBidOwnLot": "You cannot bid on your own lot.",
+      "alreadyHighBidder": "You are already the high bidder.",
+      "bidTooLow": "Bid at least {min}."
     },
     "loot": {
       "takeAll": "Pegar tudo",
@@ -9738,6 +9785,26 @@ export const pt_BR: EnTranslations = {
         "sender": "Irmão Aldric",
         "subject": "O que você fez na escuridão",
         "body": "Poucos saberão o que estava enterrado naquela baixada, e menos ainda acreditariam. Eu sei, e não vou esquecer.\n\nQue seu caminho continue iluminado.\n- Irmão Aldric"
+      },
+      "market_outbid": {
+        "sender": "The Merchant",
+        "subject": "You have been outbid",
+        "body": "Another buyer has raised the bidding on a lot you wanted. Your copper waits in your collection box at the World Market; come see me to take it back or bid again.\n\n- The Merchant"
+      },
+      "market_won": {
+        "sender": "The Merchant",
+        "subject": "Your winning bid",
+        "body": "The hammer has fallen and the lot is yours. Your goods wait in your collection box at the World Market; come see me to claim them.\n\n- The Merchant"
+      },
+      "market_sold": {
+        "sender": "The Merchant",
+        "subject": "Your lot has sold",
+        "body": "A buyer has taken your goods off my hands. Your proceeds wait in your collection box at the World Market; come see me to collect them.\n\n- The Merchant"
+      },
+      "market_expired": {
+        "sender": "The Merchant",
+        "subject": "Your listing expired",
+        "body": "No buyer came for your goods before the listing ran out. They wait in your collection box at the World Market; come see me to take them back.\n\n- The Merchant"
       }
     },
     "itemSets": {

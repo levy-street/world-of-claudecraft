@@ -22,6 +22,9 @@ function listing(itemId: string, over: Partial<MarketListingView> = {}): MarketL
     price: 100,
     mine: false,
     house: false,
+    secondsLeft: 3600,
+    kind: 'fixed',
+    myBid: false,
     ...over,
   };
 }
@@ -38,6 +41,7 @@ function info(over: Partial<MarketInfo> = {}): MarketInfo {
     cutPct: 5,
     maxListings: 10,
     myListingCount: 0,
+    durationsHours: [12, 24, 48],
     ...over,
   };
 }
@@ -96,7 +100,12 @@ describe('market_view: top-level state union', () => {
     });
     expect(sell.kind).toBe('sell');
     if (sell.kind === 'sell')
-      expect(sell.meta).toEqual({ cutPct: 5, myListingCount: 0, maxListings: 10 });
+      expect(sell.meta).toEqual({
+        cutPct: 5,
+        myListingCount: 0,
+        maxListings: 10,
+        durationsHours: [12, 24, 48],
+      });
     expect(
       buildMarketView({
         info: i,
@@ -186,6 +195,27 @@ describe('market_view: browse states', () => {
     expect(body.page.total).toBe(1); // only the OTHER listing counts toward the range
     expect(body.page.start).toBe(0);
     expect(body.page.end).toBe(1); // one OTHER listing on the page; the mine row is extra
+  });
+
+  it('passes every auction-house field through unchanged (the core adds nothing, drops nothing)', () => {
+    // buildMarketBrowse only resolves the item and drops unknown ids; every other
+    // field on MarketListingView (auction shape, time-left, deposit) rides straight
+    // through to the row untouched. This is the painter's read surface for the
+    // time-left column, the auction badge/bid/buyout display, and the deposit-aware
+    // cancel confirmation.
+    const auctionLot = listing('keen_dirk', {
+      mine: true,
+      kind: 'auction',
+      secondsLeft: 5400, // 1h 30m
+      currentBid: 250,
+      minNextBid: 262,
+      buyoutPrice: 900,
+      myBid: false,
+      depositTotal: 40,
+    });
+    const body = buildMarketBrowse(info({ listings: [auctionLot], totalCount: 1 }), ALL);
+    if (body.state !== 'list') throw new Error('expected list');
+    expect(body.page.items[0].listing).toEqual(auctionLot);
   });
 });
 
@@ -308,7 +338,23 @@ describe('market_view: determinism + ClientWorld-vs-Sim parity', () => {
     const simInfo = Object.assign(
       Object.create({ wireVersion: 7 }),
       info({
-        listings: [listing('keen_dirk'), listing('greyjaw_pelt_cloak'), listing('roasted_boar')],
+        listings: [
+          listing('keen_dirk'),
+          listing('greyjaw_pelt_cloak'),
+          listing('roasted_boar'),
+          // An auction lot with every optional field set: the JSON round-trip
+          // must carry currentBid/minNextBid/buyoutPrice/depositTotal exactly
+          // (no server-only prototype leakage, no dropped fields).
+          listing('healing_potion', {
+            mine: true,
+            kind: 'auction',
+            secondsLeft: 1800,
+            currentBid: 80,
+            minNextBid: 84,
+            buyoutPrice: 500,
+            depositTotal: 12,
+          }),
+        ],
         filter: '',
         collectionCopper: 250,
         collectionItems: [{ itemId: 'bone_fragments', count: 4 }],

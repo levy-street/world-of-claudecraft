@@ -350,3 +350,25 @@ describe('command facet tags (deeds)', () => {
     }
   });
 });
+
+// W11: append the auction-house bid extension of the market cluster (W10 above is
+// append-only, so this is a new block rather than an edit to W10_TAGS). Pins the
+// facet for the one new wire command. Append-only: never edit a tag.
+const W11_TAGS: Readonly<Record<string, string>> = {
+  market_bid: 'IWorldMarket',
+};
+
+describe('command facet tags (W11)', () => {
+  const tags = COMMAND_FACETS as Readonly<Record<string, string>>;
+
+  it('tags market_bid with the IWorldMarket facet', () => {
+    for (const [cmd, facet] of Object.entries(W11_TAGS)) {
+      expect(tags[cmd], `facet tag for '${cmd}'`).toBe(facet);
+    }
+  });
+
+  it('preserves the snake_case market_bid wire string (never normalized to camelCase)', () => {
+    expect('market_bid' in tags).toBe(true);
+    expect('marketBid' in tags).toBe(false);
+  });
+});

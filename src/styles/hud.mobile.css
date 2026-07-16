@@ -2737,6 +2737,8 @@
   body.mobile-touch .mkt-tab,
   body.mobile-touch .mkt-btn,
   body.mobile-touch .mkt-list-btn,
+  body.mobile-touch .mkt-type-btn,
+  body.mobile-touch .mkt-duration-btn,
   body.mobile-touch #loot-window .btn,
   body.mobile-touch .loot-roll-btn,
   body.mobile-touch .soc-tab,
@@ -2968,6 +2970,16 @@
   }
   body.mobile-touch .mkt-price-row .coininput {
     min-height: 40px;
+    font-size: 16px;
+    box-sizing: border-box;
+  }
+  /* Browse row quantity/bid inputs: same 40px/16px touch floor as the sell
+     form's coininputs, plus room so a fat-finger tap doesn't miss the row's
+     Buy/Bid button beside them. */
+  body.mobile-touch .mkt-qty-input,
+  body.mobile-touch .mkt-bid-input {
+    min-height: 40px;
+    min-width: 40px;
     font-size: 16px;
     box-sizing: border-box;
   }

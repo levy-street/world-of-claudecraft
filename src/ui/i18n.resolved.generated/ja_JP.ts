@@ -3277,8 +3277,9 @@ export const ja_JP: EnTranslations = {
       "dailyBody": "画面上の宝箱ボタンを押すと、デイリー報酬のウィンドウが開きます。毎日いくつかの課題が用意され、クエストを達成したり、灰の闘技場で戦ったり、ヴェイルカップの試合に勝ったりでき、さらに賞品ホイールを一日一回無料で回せます。これらはすべてその日の順位に向けたポイントになり、上位の獲得者たちは、任意のコミュニティトークンの保有者向けの賞金プールを分け合います。いずれもゲーム内で力を授けることはありません。ウィンドウにはその日のルールと参加資格が示され、リーダーボードが表示され、あなたの履歴も残されます。",
       "marketTitle": "ワールドマーケット",
       "marketBody": "商人はワールドマーケットを運営しています。これは会うことのないかもしれない相手とも売買できる、プレイヤー主導の取引所です。イーストブルックの商人、あるいはハイウォッチの競売人ヴォスに話しかけると開けます。どちらの管理人も同じ一つの共有マーケットを扱っています。商人は自らの品も常に在庫として出品しているので、他のプレイヤーが何も出していないときでも、いつでも買えるものがあります。",
-      "marketBrowse": "閲覧：出品を一覧でスクロールするか、名前で検索して売り物を探します。各出品には品物、出品者、そしてスタック全体の希望価格が表示されます。",
-      "marketPost": "出品：バッグからスタックを選び、価格を決めて出品します。品物は誰かが買うまで商人が預かります。売れ残った出品はしばらくすると手元に戻り、気が変われば早めに引き取ることもできます。",
+      "marketBrowse": "閲覧：出品を一覧でスクロールするか、名前で検索して売り物を探します。各出品には品物、出品者、残り時間、そして分割購入できるスタックの単価か、オークション品の現在の入札額が表示されます。",
+      "marketPost": "出品：バッグからスタックを選び、出品期間（12時間、24時間、48時間）を選んで単価を決めるか、オークションに切り替えて開始価格と任意の即決価格を設定します。出品には期間に応じた保証金がかかりますが、品物が売れるたびに返還され、売れ残った分だけが没収されます。品物は誰かが買うかオークションが終わるまで商人が預かり、気が変われば早めに引き取ることもできます。",
+      "marketBidding": "オークション：一部の出品は固定価格ではなく入札制です。入札額は表示された最低額を満たす必要があり、あなたの入札が上回られると、それまでの入札額は全額返還されます。出品者が即決価格を設定している場合、その額に達する入札があれば即座に落札となります。",
       "marketCollect": "受け取り：品物が売れると、その代金は商人のもとで待っています。戻ってコインを受け取りましょう。売れ残って戻ってきたものも一緒です。商人は成立した売却ごとにわずかな手数料を取ります。",
       "marketPricing": "値付けはあなた次第です。他より少し安く出品すると早く売れる傾向があり、高すぎる値はそのまま放置されがちです。出品する前にまず閲覧して、相場がどうなっているか確かめましょう。"
     },
@@ -5845,6 +5846,10 @@ export const ja_JP: EnTranslations = {
       "filterWeaponAll": "すべての武器",
       "filterRarity": "レア度",
       "filterRarityAll": "すべてのレア度",
+      "sortLabel": "並び替え",
+      "sortNewest": "新着順",
+      "sortPrice": "価格順",
+      "sortTimeLeft": "残り時間順",
       "weaponSword": "剣",
       "weaponDagger": "短剣",
       "weaponStaff": "杖",
@@ -5863,17 +5868,48 @@ export const ja_JP: EnTranslations = {
       "reclaim": "回収",
       "buyAria": "{item}を{price}で購入",
       "reclaimAria": "{item}を回収",
+      "timeLeft": "残り{time}",
+      "yourBidBadge": "あなたの入札",
+      "currentBidLabel": "入札額：",
+      "noBidsYet": "まだ入札がありません",
+      "minNextBid": "最低入札額 {money}",
+      "buyoutLabel": "即決価格 {money}",
+      "auctionBadge": "オークション",
+      "leadingBid": "あなたがリードしています",
+      "bidInputAria": "{item} への入札額",
+      "bidButton": "入札",
+      "bidAria": "{item} に入札する",
+      "buyoutButton": "即決購入",
+      "buyoutAria": "{item} を {price} で即決購入",
+      "buyQuantityAria": "{item} の購入数量",
       "sellNote": "バッグから品物を出品します。売れると商人が{cut}%を受け取ります。出品枠 {used}/{max} を使用中です。",
       "sellPickEmpty": "売るものを選ぶにはバッグ内のアイテムをクリックしてください。",
       "quantity": "数量",
       "quantityOf": "/ {count}",
       "priceEach": "単価",
+      "listingTypeLabel": "出品形式",
+      "listingTypeFixed": "即売",
+      "listingTypeAuction": "オークション",
+      "durationLabel": "出品期間",
+      "durationOption": "{hours}時間",
+      "startingBidLabel": "開始価格",
+      "buyoutOptionalLabel": "即決価格（任意）",
+      "totalLabel": "合計",
+      "depositPreviewLabel": "出品保証金",
       "listButton": "ワールドマーケットに出品",
       "minPriceError": "価格は最低1銅貨にしてください。",
+      "cancelConfirmTitle": "出品の取り下げ",
+      "cancelConfirmBody": "{item} を市場から取り下げますか？保証金 {money} は没収されます。",
+      "cancelConfirmBodyNoDeposit": "{item} を市場から取り下げますか？",
+      "cancelConfirmDismiss": "キャンセル",
       "collectEmpty": "待機中のものはありません。売上と期限切れの出品はここで受け取ります。",
       "collectNote": "商人が預かっている売上と返却品です。",
       "saleProceeds": "売上",
-      "collectAll": "すべて受け取る"
+      "collectAll": "すべて受け取る",
+      "outbidToast": "{item} への入札が他の人に上回られました。{money} が回収箱に返却されました。",
+      "wonToast": "{item} のオークションを落札しました！商人のもとで受け取ってください。",
+      "soldToast": "あなたの {item} が {money} で売れました。商人のもとで受け取ってください。",
+      "expiredToast": "{item} の出品は買い手がつかず期限切れになりました。商人のもとで受け取ってください。"
     },
     "logs": {
       "listedItem": "{item}を{money}でワールドマーケットに出品しました。",
@@ -5882,6 +5918,8 @@ export const ja_JP: EnTranslations = {
       "collectedMoney": "商人から{money}を受け取ります。",
       "reclaimedItem": "市場から{item}を回収しました。",
       "expiredListing": "{item}の市場出品が期限切れになり、商人のもとで待機しています。",
+      "postedAuction": "{item} をオークションに出品しました（開始価格 {money}）。",
+      "bidPlaced": "{item} に {money} で入札しました。",
       "boughtBackItem": "{item}を{money}で買い戻しました。"
     },
     "errors": {
@@ -5898,7 +5936,16 @@ export const ja_JP: EnTranslations = {
       "ownListing": "それは自分の出品です。キャンセルすると回収できます。",
       "cannotAfford": "購入するお金が足りません。",
       "notYourListing": "それはあなたの出品ではありません。",
-      "nothingToCollect": "受け取るものはありません。"
+      "nothingToCollect": "受け取るものはありません。",
+      "minStartingBid": "開始価格は最低でも1銅貨にしてください。",
+      "buyoutTooLow": "即決価格は開始価格を上回っている必要があります。",
+      "chooseDuration": "出品期間は12時間、24時間、48時間のいずれかを選んでください。",
+      "cannotAffordDeposit": "出品保証金を支払えません。",
+      "bidsOnly": "このロットは入札のみ受け付けています。",
+      "notAuction": "このロットはオークション出品ではありません。",
+      "cannotBidOwnLot": "自分の出品には入札できません。",
+      "alreadyHighBidder": "あなたはすでに最高入札者です。",
+      "bidTooLow": "最低 {min} 以上で入札してください。"
     },
     "loot": {
       "takeAll": "すべて取る",
@@ -9738,6 +9785,26 @@ export const ja_JP: EnTranslations = {
         "sender": "アルドリック修道士",
         "subject": "あなたが暗闇で成したこと",
         "body": "あの窪地に何が葬られていたのかを知る者はごくわずかで、信じる者はさらに少ないでしょう。私は知っています。そして忘れません。\n\nあなたの道に光がありますように。\n- アルドリック修道士"
+      },
+      "market_outbid": {
+        "sender": "商人",
+        "subject": "入札が上回られました",
+        "body": "別の買い手があなたの狙っていたロットの入札額を引き上げました。あなたの銅貨はワールドマーケットの回収箱で待っています。取り戻すか、再び入札しに来てください。\n\n- 商人"
+      },
+      "market_won": {
+        "sender": "商人",
+        "subject": "落札のお知らせ",
+        "body": "槌が下り、このロットはあなたのものになりました。あなたの品はワールドマーケットの回収箱で待っています。受け取りに来てください。\n\n- 商人"
+      },
+      "market_sold": {
+        "sender": "商人",
+        "subject": "出品が売れました",
+        "body": "買い手があなたの品を買い取りました。あなたの収益はワールドマーケットの回収箱で待っています。受け取りに来てください。\n\n- 商人"
+      },
+      "market_expired": {
+        "sender": "商人",
+        "subject": "出品期限切れ",
+        "body": "期限内に買い手が現れませんでした。品はワールドマーケットの回収箱で待っています。取り戻しに来てください。\n\n- 商人"
       }
     },
     "itemSets": {

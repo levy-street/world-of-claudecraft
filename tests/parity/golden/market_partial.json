@@ -1,15 +1,14 @@
 {
-  "scenario": "market_round_trip",
-  "seed": 1019,
+  "scenario": "market_partial",
+  "seed": 1031,
   "sampleEvery": 20,
   "ticks": 20,
   "coverage": [
-    "World Market: marketList escrow (ctx.removeItem pulls the stack from bags)",
-    "marketSearch browse filter (narrow to a substring, then clear)",
-    "marketBuy cross-player sale: buyer copper - price + addItem; seller proceeds = floor(price*(1-MARKET_CUT))",
-    "marketCancel reclaim escrow to bags",
-    "updateMarket once-a-second expiry sweep (% 20): expired listing -> seller collection",
-    "marketCollect: gold + expired items move to bags, collection cleared"
+    "marketList per-unit stack with a non-zero listing deposit (depositPerUnit * count escrowed up front)",
+    "marketBuy partial quantity by one buyer: cost = qty * pricePerUnit, remainder stays listed",
+    "marketBuy partial quantity by a SECOND, different buyer against the same listing",
+    "the per-unit deposit stake rides back to the seller collection with each partial sale",
+    "updateMarket expiry sweep on the unsold remainder: item returns, its deposit share is forfeited"
   ],
   "draws": 0,
   "drawDigest": "811c9dc5",
@@ -31,14 +30,14 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 410,
-      "state": "440bfb61",
-      "events": "52925026",
+      "nextId": 411,
+      "state": "f117d397",
+      "events": "fafd769d",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
       },
-      "label": "market-setup",
+      "label": "partial-setup",
       "players": [
         {
           "activeLoadout": -1,
@@ -54,6 +53,7 @@
           "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
+          "copper": 1000,
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
@@ -61,10 +61,13 @@
             "counters": {},
             "dungeonClears": {},
             "itemsDiscovered": [
+              "arcanite_bar",
               "baked_bread",
               "recruit_tunic",
-              "wolf_fang",
               "worn_sword"
+            ],
+            "visited": [
+              "quality:epic"
             ]
           },
           "delveClears": {},
@@ -83,8 +86,8 @@
               "itemId": "baked_bread"
             },
             {
-              "count": 4,
-              "itemId": "wolf_fang"
+              "count": 6,
+              "itemId": "arcanite_bar"
             }
           ],
           "mailWelcomed": true,
@@ -109,7 +112,7 @@
           "bank": {},
           "cls": "mage",
           "companionUpgrades": {},
-          "copper": 5000,
+          "copper": 1000,
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
@@ -141,6 +144,57 @@
             {
               "count": 5,
               "itemId": "spring_water"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "talents": {
+            "choices": {},
+            "ranks": {}
+          },
+          "townFocus": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "rogue",
+          "companionUpgrades": {},
+          "copper": 1000,
+          "counters": {},
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "rusty_dagger"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 410,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "rusty_dagger"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
             }
           ],
           "mailWelcomed": true,
@@ -251,15 +305,66 @@
             "min": 3,
             "speed": 2.9
           }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 42,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.0625,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0625,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 62,
+          "id": 410,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 62,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 1.337475,
+            "y": 1.5,
+            "z": 8.040014
+          },
+          "potionCooldownUntil": -1,
+          "resource": 100,
+          "resourceType": "energy",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 6,
+          "stats": {
+            "agi": 25,
+            "armor": 104,
+            "int": 11,
+            "spi": 12,
+            "sta": 17,
+            "str": 17
+          },
+          "templateId": "rogue",
+          "weapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          }
         }
       ]
     },
     {
       "tick": 0,
       "time": 0,
-      "nextId": 410,
-      "state": "01ee998f",
-      "events": "a2f0b1a5",
+      "nextId": 411,
+      "state": "b1403a3b",
+      "events": "84b694f4",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -280,6 +385,7 @@
           "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
+          "copper": 928,
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
@@ -287,10 +393,13 @@
             "counters": {},
             "dungeonClears": {},
             "itemsDiscovered": [
+              "arcanite_bar",
               "baked_bread",
               "recruit_tunic",
-              "wolf_fang",
               "worn_sword"
+            ],
+            "visited": [
+              "quality:epic"
             ]
           },
           "delveClears": {},
@@ -307,10 +416,6 @@
             {
               "count": 5,
               "itemId": "baked_bread"
-            },
-            {
-              "count": 2,
-              "itemId": "wolf_fang"
             }
           ],
           "mailWelcomed": true,
@@ -335,7 +440,7 @@
           "bank": {},
           "cls": "mage",
           "companionUpgrades": {},
-          "copper": 5000,
+          "copper": 1000,
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
@@ -376,6 +481,57 @@
             "ranks": {}
           },
           "townFocus": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "rogue",
+          "companionUpgrades": {},
+          "copper": 1000,
+          "counters": {},
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "rusty_dagger"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 410,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "rusty_dagger"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "talents": {
+            "choices": {},
+            "ranks": {}
+          },
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -477,20 +633,71 @@
             "min": 3,
             "speed": 2.9
           }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 42,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.0625,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0625,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 62,
+          "id": 410,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 62,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 1.337475,
+            "y": 1.5,
+            "z": 8.040014
+          },
+          "potionCooldownUntil": -1,
+          "resource": 100,
+          "resourceType": "energy",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 6,
+          "stats": {
+            "agi": 25,
+            "armor": 104,
+            "int": 11,
+            "spi": 12,
+            "sta": 17,
+            "str": 17
+          },
+          "templateId": "rogue",
+          "weapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          }
         }
       ]
     },
     {
       "tick": 0,
       "time": 0,
-      "nextId": 410,
-      "state": "01ee998f",
-      "events": "741638a5",
+      "nextId": 411,
+      "state": "4f88bfe5",
+      "events": "01350309",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
       },
-      "label": "searched",
+      "label": "bought-partial-a",
       "players": [
         {
           "activeLoadout": -1,
@@ -506,6 +713,7 @@
           "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
+          "copper": 928,
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
@@ -513,10 +721,13 @@
             "counters": {},
             "dungeonClears": {},
             "itemsDiscovered": [
+              "arcanite_bar",
               "baked_bread",
               "recruit_tunic",
-              "wolf_fang",
               "worn_sword"
+            ],
+            "visited": [
+              "quality:epic"
             ]
           },
           "delveClears": {},
@@ -533,10 +744,6 @@
             {
               "count": 5,
               "itemId": "baked_bread"
-            },
-            {
-              "count": 2,
-              "itemId": "wolf_fang"
             }
           ],
           "mailWelcomed": true,
@@ -561,7 +768,7 @@
           "bank": {},
           "cls": "mage",
           "companionUpgrades": {},
-          "copper": 5000,
+          "copper": 800,
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
@@ -570,9 +777,13 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "apprentice_robe",
+              "arcanite_bar",
               "baked_bread",
               "gnarled_staff",
               "spring_water"
+            ],
+            "visited": [
+              "quality:epic"
             ]
           },
           "delveClears": {},
@@ -593,6 +804,61 @@
             {
               "count": 5,
               "itemId": "spring_water"
+            },
+            {
+              "count": 2,
+              "itemId": "arcanite_bar"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "talents": {
+            "choices": {},
+            "ranks": {}
+          },
+          "townFocus": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "rogue",
+          "companionUpgrades": {},
+          "copper": 1000,
+          "counters": {},
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "rusty_dagger"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 410,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "rusty_dagger"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
             }
           ],
           "mailWelcomed": true,
@@ -703,20 +969,71 @@
             "min": 3,
             "speed": 2.9
           }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 42,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.0625,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0625,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 62,
+          "id": 410,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 62,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 1.337475,
+            "y": 1.5,
+            "z": 8.040014
+          },
+          "potionCooldownUntil": -1,
+          "resource": 100,
+          "resourceType": "energy",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 6,
+          "stats": {
+            "agi": 25,
+            "armor": 104,
+            "int": 11,
+            "spi": 12,
+            "sta": 17,
+            "str": 17
+          },
+          "templateId": "rogue",
+          "weapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          }
         }
       ]
     },
     {
       "tick": 0,
       "time": 0,
-      "nextId": 410,
-      "state": "01ee998f",
-      "events": "741638a5",
+      "nextId": 411,
+      "state": "4b81839d",
+      "events": "fd8936ae",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
       },
-      "label": "search-cleared",
+      "label": "bought-partial-b",
       "players": [
         {
           "activeLoadout": -1,
@@ -732,6 +1049,7 @@
           "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
+          "copper": 928,
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
@@ -739,10 +1057,13 @@
             "counters": {},
             "dungeonClears": {},
             "itemsDiscovered": [
+              "arcanite_bar",
               "baked_bread",
               "recruit_tunic",
-              "wolf_fang",
               "worn_sword"
+            ],
+            "visited": [
+              "quality:epic"
             ]
           },
           "delveClears": {},
@@ -759,10 +1080,6 @@
             {
               "count": 5,
               "itemId": "baked_bread"
-            },
-            {
-              "count": 2,
-              "itemId": "wolf_fang"
             }
           ],
           "mailWelcomed": true,
@@ -787,7 +1104,7 @@
           "bank": {},
           "cls": "mage",
           "companionUpgrades": {},
-          "copper": 5000,
+          "copper": 800,
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
@@ -796,9 +1113,13 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "apprentice_robe",
+              "arcanite_bar",
               "baked_bread",
               "gnarled_staff",
               "spring_water"
+            ],
+            "visited": [
+              "quality:epic"
             ]
           },
           "delveClears": {},
@@ -819,6 +1140,69 @@
             {
               "count": 5,
               "itemId": "spring_water"
+            },
+            {
+              "count": 2,
+              "itemId": "arcanite_bar"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "talents": {
+            "choices": {},
+            "ranks": {}
+          },
+          "townFocus": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "rogue",
+          "companionUpgrades": {},
+          "copper": 700,
+          "counters": {},
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "arcanite_bar",
+              "baked_bread",
+              "footpad_jerkin",
+              "rusty_dagger"
+            ],
+            "visited": [
+              "quality:epic"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 410,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "rusty_dagger"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 3,
+              "itemId": "arcanite_bar"
             }
           ],
           "mailWelcomed": true,
@@ -929,155 +1313,23 @@
             "min": 3,
             "speed": 2.9
           }
-        }
-      ]
-    },
-    {
-      "tick": 0,
-      "time": 0,
-      "nextId": 410,
-      "state": "dfecd4db",
-      "events": "9631fece",
-      "rng": {
-        "draws": 0,
-        "digest": "811c9dc5"
-      },
-      "label": "bought",
-      "players": [
-        {
-          "activeLoadout": -1,
-          "archetype": {},
-          "arena2v2Rating": 1500,
-          "arenaRating": 1500,
-          "bags": [
-            null,
-            null,
-            null,
-            null
-          ],
-          "bank": {},
-          "cls": "warrior",
-          "companionUpgrades": {},
-          "counters": {},
-          "craftSkills": {},
-          "craftThrottle": {},
-          "deedStats": {
-            "counters": {},
-            "dungeonClears": {},
-            "itemsDiscovered": [
-              "baked_bread",
-              "recruit_tunic",
-              "wolf_fang",
-              "worn_sword"
-            ]
-          },
-          "delveClears": {},
-          "delveDaily": {},
-          "entityId": 408,
-          "equipment": {
-            "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
-          },
-          "equipmentInstance": {},
-          "gatheringProficiency": {},
-          "heroicDaily": {},
-          "inventory": [
-            {
-              "count": 5,
-              "itemId": "baked_bread"
-            },
-            {
-              "count": 2,
-              "itemId": "wolf_fang"
-            }
-          ],
-          "mailWelcomed": true,
-          "nodeHarvestReadyAt": {},
-          "talents": {
-            "choices": {},
-            "ranks": {}
-          },
-          "townFocus": {}
         },
         {
-          "activeLoadout": -1,
-          "archetype": {},
-          "arena2v2Rating": 1500,
-          "arenaRating": 1500,
-          "bags": [
-            null,
-            null,
-            null,
-            null
-          ],
-          "bank": {},
-          "cls": "mage",
-          "companionUpgrades": {},
-          "copper": 4400,
-          "counters": {},
-          "craftSkills": {},
-          "craftThrottle": {},
-          "deedStats": {
-            "counters": {},
-            "dungeonClears": {},
-            "itemsDiscovered": [
-              "apprentice_robe",
-              "baked_bread",
-              "gnarled_staff",
-              "spring_water",
-              "wolf_fang"
-            ]
-          },
-          "delveClears": {},
-          "delveDaily": {},
-          "entityId": 409,
-          "equipment": {
-            "chest": "apprentice_robe",
-            "mainhand": "gnarled_staff"
-          },
-          "equipmentInstance": {},
-          "gatheringProficiency": {},
-          "heroicDaily": {},
-          "inventory": [
-            {
-              "count": 5,
-              "itemId": "baked_bread"
-            },
-            {
-              "count": 5,
-              "itemId": "spring_water"
-            },
-            {
-              "count": 2,
-              "itemId": "wolf_fang"
-            }
-          ],
-          "mailWelcomed": true,
-          "nodeHarvestReadyAt": {},
-          "talents": {
-            "choices": {},
-            "ranks": {}
-          },
-          "townFocus": {}
-        }
-      ],
-      "entities": [
-        {
           "aiState": "idle",
-          "attackPower": 46,
+          "attackPower": 42,
           "combatTimer": 99,
           "comboUntil": -1,
-          "critChance": 0.06,
+          "critChance": 0.0625,
           "detonateTimer": "Infinity",
-          "dodgeChance": 0.06,
+          "dodgeChance": 0.0625,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 90,
-          "id": 408,
+          "hp": 62,
+          "id": 410,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 90,
+          "maxHp": 62,
           "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
@@ -1089,307 +1341,28 @@
             "z": 8.040014
           },
           "potionCooldownUntil": -1,
-          "resourceType": "rage",
+          "resource": 100,
+          "resourceType": "energy",
           "spawnPos": {
             "x": 2,
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 5,
+          "spellPower": 6,
           "stats": {
-            "agi": 20,
-            "armor": 110,
-            "int": 10,
-            "spi": 11,
-            "sta": 22,
-            "str": 23
+            "agi": 25,
+            "armor": 104,
+            "int": 11,
+            "spi": 12,
+            "sta": 17,
+            "str": 17
           },
-          "templateId": "warrior",
+          "templateId": "rogue",
           "weapon": {
-            "max": 5,
+            "dagger": true,
+            "max": 4,
             "min": 2,
-            "speed": 2
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 10,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.056,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.056,
-          "fallStartY": 1.5,
-          "fiveSecondRule": 99,
-          "hp": 54,
-          "id": 409,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 54,
-          "maxResource": 195,
-          "moveSpeed": 7,
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": 1.337475,
-            "y": 1.5,
-            "z": 8.040014
-          },
-          "potionCooldownUntil": -1,
-          "resource": 195,
-          "resourceType": "mana",
-          "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
-          },
-          "spellPower": 13,
-          "stats": {
-            "agi": 12,
-            "armor": 57,
-            "int": 25,
-            "spi": 22,
-            "sta": 14,
-            "str": 10
-          },
-          "templateId": "mage",
-          "weapon": {
-            "max": 6,
-            "min": 3,
-            "speed": 2.9
-          }
-        }
-      ]
-    },
-    {
-      "tick": 0,
-      "time": 0,
-      "nextId": 410,
-      "state": "dfecd4db",
-      "events": "3c05f6df",
-      "rng": {
-        "draws": 0,
-        "digest": "811c9dc5"
-      },
-      "label": "cancelled",
-      "players": [
-        {
-          "activeLoadout": -1,
-          "archetype": {},
-          "arena2v2Rating": 1500,
-          "arenaRating": 1500,
-          "bags": [
-            null,
-            null,
-            null,
-            null
-          ],
-          "bank": {},
-          "cls": "warrior",
-          "companionUpgrades": {},
-          "counters": {},
-          "craftSkills": {},
-          "craftThrottle": {},
-          "deedStats": {
-            "counters": {},
-            "dungeonClears": {},
-            "itemsDiscovered": [
-              "baked_bread",
-              "recruit_tunic",
-              "wolf_fang",
-              "worn_sword"
-            ]
-          },
-          "delveClears": {},
-          "delveDaily": {},
-          "entityId": 408,
-          "equipment": {
-            "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
-          },
-          "equipmentInstance": {},
-          "gatheringProficiency": {},
-          "heroicDaily": {},
-          "inventory": [
-            {
-              "count": 5,
-              "itemId": "baked_bread"
-            },
-            {
-              "count": 2,
-              "itemId": "wolf_fang"
-            }
-          ],
-          "mailWelcomed": true,
-          "nodeHarvestReadyAt": {},
-          "talents": {
-            "choices": {},
-            "ranks": {}
-          },
-          "townFocus": {}
-        },
-        {
-          "activeLoadout": -1,
-          "archetype": {},
-          "arena2v2Rating": 1500,
-          "arenaRating": 1500,
-          "bags": [
-            null,
-            null,
-            null,
-            null
-          ],
-          "bank": {},
-          "cls": "mage",
-          "companionUpgrades": {},
-          "copper": 4400,
-          "counters": {},
-          "craftSkills": {},
-          "craftThrottle": {},
-          "deedStats": {
-            "counters": {},
-            "dungeonClears": {},
-            "itemsDiscovered": [
-              "apprentice_robe",
-              "baked_bread",
-              "gnarled_staff",
-              "spring_water",
-              "wolf_fang"
-            ]
-          },
-          "delveClears": {},
-          "delveDaily": {},
-          "entityId": 409,
-          "equipment": {
-            "chest": "apprentice_robe",
-            "mainhand": "gnarled_staff"
-          },
-          "equipmentInstance": {},
-          "gatheringProficiency": {},
-          "heroicDaily": {},
-          "inventory": [
-            {
-              "count": 5,
-              "itemId": "baked_bread"
-            },
-            {
-              "count": 5,
-              "itemId": "spring_water"
-            },
-            {
-              "count": 2,
-              "itemId": "wolf_fang"
-            }
-          ],
-          "mailWelcomed": true,
-          "nodeHarvestReadyAt": {},
-          "talents": {
-            "choices": {},
-            "ranks": {}
-          },
-          "townFocus": {}
-        }
-      ],
-      "entities": [
-        {
-          "aiState": "idle",
-          "attackPower": 46,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.06,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.06,
-          "fallStartY": 1.5,
-          "fiveSecondRule": 99,
-          "hp": 90,
-          "id": 408,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 90,
-          "maxResource": 100,
-          "moveSpeed": 7,
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": 1.337475,
-            "y": 1.5,
-            "z": 8.040014
-          },
-          "potionCooldownUntil": -1,
-          "resourceType": "rage",
-          "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
-          },
-          "spellPower": 5,
-          "stats": {
-            "agi": 20,
-            "armor": 110,
-            "int": 10,
-            "spi": 11,
-            "sta": 22,
-            "str": 23
-          },
-          "templateId": "warrior",
-          "weapon": {
-            "max": 5,
-            "min": 2,
-            "speed": 2
-          }
-        },
-        {
-          "aiState": "idle",
-          "attackPower": 10,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.056,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.056,
-          "fallStartY": 1.5,
-          "fiveSecondRule": 99,
-          "hp": 54,
-          "id": 409,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 54,
-          "maxResource": 195,
-          "moveSpeed": 7,
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": 1.337475,
-            "y": 1.5,
-            "z": 8.040014
-          },
-          "potionCooldownUntil": -1,
-          "resource": 195,
-          "resourceType": "mana",
-          "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
-          },
-          "spellPower": 13,
-          "stats": {
-            "agi": 12,
-            "armor": 57,
-            "int": 25,
-            "spi": 22,
-            "sta": 14,
-            "str": 10
-          },
-          "templateId": "mage",
-          "weapon": {
-            "max": 6,
-            "min": 3,
-            "speed": 2.9
+            "speed": 1.8
           }
         }
       ]
@@ -1397,9 +1370,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 410,
-      "state": "cff22280",
-      "events": "b531a963",
+      "nextId": 411,
+      "state": "9fd89d69",
+      "events": "fe0ce561",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1408,14 +1381,14 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 410,
-      "state": "cff22280",
+      "nextId": 411,
+      "state": "9fd89d69",
       "events": "741638a5",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
       },
-      "label": "expired",
+      "label": "remainder-expired",
       "players": [
         {
           "activeLoadout": -1,
@@ -1431,6 +1404,7 @@
           "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
+          "copper": 928,
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
@@ -1438,15 +1412,22 @@
             "counters": {},
             "dungeonClears": {},
             "itemsDiscovered": [
+              "arcanite_bar",
               "baked_bread",
               "recruit_tunic",
-              "wolf_fang",
               "worn_sword"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook"
+              "poi:eastbrook_vale:eastbrook",
+              "quality:epic"
             ]
           },
+          "deedsEarned": [
+            [
+              "col_first_epic",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
           "entityId": 408,
@@ -1461,10 +1442,6 @@
             {
               "count": 5,
               "itemId": "baked_bread"
-            },
-            {
-              "count": 1,
-              "itemId": "wolf_fang"
             }
           ],
           "mailWelcomed": true,
@@ -1489,7 +1466,7 @@
           "bank": {},
           "cls": "mage",
           "companionUpgrades": {},
-          "copper": 4400,
+          "copper": 800,
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
@@ -1498,15 +1475,22 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "apprentice_robe",
+              "arcanite_bar",
               "baked_bread",
               "gnarled_staff",
-              "spring_water",
-              "wolf_fang"
+              "spring_water"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook"
+              "poi:eastbrook_vale:eastbrook",
+              "quality:epic"
             ]
           },
+          "deedsEarned": [
+            [
+              "col_first_epic",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
           "entityId": 409,
@@ -1528,7 +1512,73 @@
             },
             {
               "count": 2,
-              "itemId": "wolf_fang"
+              "itemId": "arcanite_bar"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "talents": {
+            "choices": {},
+            "ranks": {}
+          },
+          "townFocus": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "rogue",
+          "companionUpgrades": {},
+          "copper": 700,
+          "counters": {},
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "arcanite_bar",
+              "baked_bread",
+              "footpad_jerkin",
+              "rusty_dagger"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook",
+              "quality:epic"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "col_first_epic",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 410,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "rusty_dagger"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 3,
+              "itemId": "arcanite_bar"
             }
           ],
           "mailWelcomed": true,
@@ -1639,15 +1689,66 @@
             "min": 3,
             "speed": 2.9
           }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 42,
+          "combatTimer": 100,
+          "comboUntil": -1,
+          "critChance": 0.0625,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0625,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 100,
+          "hp": 62,
+          "id": 410,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 62,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 1.337475,
+            "y": 1.5,
+            "z": 8.040014
+          },
+          "potionCooldownUntil": -1,
+          "resource": 100,
+          "resourceType": "energy",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 6,
+          "stats": {
+            "agi": 25,
+            "armor": 104,
+            "int": 11,
+            "spi": 12,
+            "sta": 17,
+            "str": 17
+          },
+          "templateId": "rogue",
+          "weapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          }
         }
       ]
     },
     {
       "tick": 20,
       "time": 1,
-      "nextId": 410,
-      "state": "c7676c3e",
-      "events": "8cac0036",
+      "nextId": 411,
+      "state": "899892b8",
+      "events": "70526a30",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1668,25 +1769,32 @@
           "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 570,
+          "copper": 1463,
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "marketSaleCopper": 570
+              "marketSaleCopper": 535
             },
             "dungeonClears": {},
             "itemsDiscovered": [
+              "arcanite_bar",
               "baked_bread",
               "recruit_tunic",
-              "wolf_fang",
               "worn_sword"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook"
+              "poi:eastbrook_vale:eastbrook",
+              "quality:epic"
             ]
           },
+          "deedsEarned": [
+            [
+              "col_first_epic",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
           "entityId": 408,
@@ -1703,8 +1811,8 @@
               "itemId": "baked_bread"
             },
             {
-              "count": 2,
-              "itemId": "wolf_fang"
+              "count": 1,
+              "itemId": "arcanite_bar"
             }
           ],
           "mailWelcomed": true,
@@ -1729,7 +1837,7 @@
           "bank": {},
           "cls": "mage",
           "companionUpgrades": {},
-          "copper": 4400,
+          "copper": 800,
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
@@ -1738,15 +1846,22 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "apprentice_robe",
+              "arcanite_bar",
               "baked_bread",
               "gnarled_staff",
-              "spring_water",
-              "wolf_fang"
+              "spring_water"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook"
+              "poi:eastbrook_vale:eastbrook",
+              "quality:epic"
             ]
           },
+          "deedsEarned": [
+            [
+              "col_first_epic",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
           "entityId": 409,
@@ -1768,7 +1883,73 @@
             },
             {
               "count": 2,
-              "itemId": "wolf_fang"
+              "itemId": "arcanite_bar"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "talents": {
+            "choices": {},
+            "ranks": {}
+          },
+          "townFocus": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "rogue",
+          "companionUpgrades": {},
+          "copper": 700,
+          "counters": {},
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "arcanite_bar",
+              "baked_bread",
+              "footpad_jerkin",
+              "rusty_dagger"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook",
+              "quality:epic"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "col_first_epic",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 410,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "rusty_dagger"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 3,
+              "itemId": "arcanite_bar"
             }
           ],
           "mailWelcomed": true,
@@ -1879,14 +2060,65 @@
             "min": 3,
             "speed": 2.9
           }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 42,
+          "combatTimer": 100,
+          "comboUntil": -1,
+          "critChance": 0.0625,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0625,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 100,
+          "hp": 62,
+          "id": 410,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 62,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 1.337475,
+            "y": 1.5,
+            "z": 8.040014
+          },
+          "potionCooldownUntil": -1,
+          "resource": 100,
+          "resourceType": "energy",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 6,
+          "stats": {
+            "agi": 25,
+            "armor": 104,
+            "int": 11,
+            "spi": 12,
+            "sta": 17,
+            "str": 17
+          },
+          "templateId": "rogue",
+          "weapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          }
         }
       ]
     },
     {
       "tick": 20,
       "time": 1,
-      "nextId": 410,
-      "state": "c7676c3e",
+      "nextId": 411,
+      "state": "899892b8",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1908,25 +2140,32 @@
           "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 570,
+          "copper": 1463,
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "marketSaleCopper": 570
+              "marketSaleCopper": 535
             },
             "dungeonClears": {},
             "itemsDiscovered": [
+              "arcanite_bar",
               "baked_bread",
               "recruit_tunic",
-              "wolf_fang",
               "worn_sword"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook"
+              "poi:eastbrook_vale:eastbrook",
+              "quality:epic"
             ]
           },
+          "deedsEarned": [
+            [
+              "col_first_epic",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
           "entityId": 408,
@@ -1943,8 +2182,8 @@
               "itemId": "baked_bread"
             },
             {
-              "count": 2,
-              "itemId": "wolf_fang"
+              "count": 1,
+              "itemId": "arcanite_bar"
             }
           ],
           "mailWelcomed": true,
@@ -1969,7 +2208,7 @@
           "bank": {},
           "cls": "mage",
           "companionUpgrades": {},
-          "copper": 4400,
+          "copper": 800,
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
@@ -1978,15 +2217,22 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "apprentice_robe",
+              "arcanite_bar",
               "baked_bread",
               "gnarled_staff",
-              "spring_water",
-              "wolf_fang"
+              "spring_water"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook"
+              "poi:eastbrook_vale:eastbrook",
+              "quality:epic"
             ]
           },
+          "deedsEarned": [
+            [
+              "col_first_epic",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
           "entityId": 409,
@@ -2008,7 +2254,73 @@
             },
             {
               "count": 2,
-              "itemId": "wolf_fang"
+              "itemId": "arcanite_bar"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "talents": {
+            "choices": {},
+            "ranks": {}
+          },
+          "townFocus": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "rogue",
+          "companionUpgrades": {},
+          "copper": 700,
+          "counters": {},
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "arcanite_bar",
+              "baked_bread",
+              "footpad_jerkin",
+              "rusty_dagger"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook",
+              "quality:epic"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "col_first_epic",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 410,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "rusty_dagger"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 3,
+              "itemId": "arcanite_bar"
             }
           ],
           "mailWelcomed": true,
@@ -2118,6 +2430,57 @@
             "max": 6,
             "min": 3,
             "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 42,
+          "combatTimer": 100,
+          "comboUntil": -1,
+          "critChance": 0.0625,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0625,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 100,
+          "hp": 62,
+          "id": 410,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 62,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 1.337475,
+            "y": 1.5,
+            "z": 8.040014
+          },
+          "potionCooldownUntil": -1,
+          "resource": 100,
+          "resourceType": "energy",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 6,
+          "stats": {
+            "agi": 25,
+            "armor": 104,
+            "int": 11,
+            "spi": 12,
+            "sta": 17,
+            "str": 17
+          },
+          "templateId": "rogue",
+          "weapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
           }
         }
       ]

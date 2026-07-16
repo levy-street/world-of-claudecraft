@@ -63,6 +63,7 @@ import { isSpellResisted } from './combat/spell_resist';
 // moved to social/fiesta.ts with that logic; sim.ts keeps only the type used by
 // the PlayerMeta interface + the power-up catalog the fiestaMatchInfo accessor reads.
 import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content/augments';
+import { AUCTION_LETTERS } from './content/letters';
 import { MAILBOXES } from './content/mailboxes';
 import type { GatheringProfessionId } from './content/professions';
 import { FURY_ENTITY_ID, FURY_NPC_ID } from './content/pvp_honor';
@@ -198,7 +199,7 @@ import {
   submitLootRoll as submitLootRollImpl,
 } from './loot/loot_roll';
 import { type MailSave, PostOffice } from './mail/post_office';
-import { Market, type MarketListing, type MarketSave } from './market';
+import { Market, type MarketListing, type MarketListOptions, type MarketSave } from './market';
 import { defaultMarketQuery, type MarketQuery } from './market_query';
 import {
   mobCombatProfile as mobCombatProfileFn,
@@ -3582,6 +3583,11 @@ export class Sim {
       partyCapacity: (party) => sim.party.partyCapacity(party),
       marketListingBelongsTo: (listing, meta) => sim.market.marketListingBelongsTo(listing, meta),
       queueQuestLetter: (questId, pid) => sim.postOffice.queueQuestLetter(questId, pid),
+      // World Market auction letters: the offline-notification hook. Late-bound
+      // arrow (call-time lookup) like queueQuestLetter above; always a 'system'
+      // letter so the Merchant's notices sort with the service mail.
+      sendMarketLetter: (recipientKey, recipientName, kind) =>
+        sim.postOffice.sendLetter(recipientKey, recipientName, AUCTION_LETTERS[kind], 'system'),
       // Book of Deeds seam callbacks (owned by deeds.ts). Late-bound arrows so
       // sim.ctx resolves at call time (the Q1 pattern).
       bumpDeedStat: (meta, stat, delta) => deedsMod.bumpDeedStat(sim.ctx, meta, stat, delta),
@@ -7432,12 +7438,28 @@ export class Sim {
     this.market.marketSearch(query, pid);
   }
 
-  marketList(itemId: string, count: number, price: number, pid?: number): void {
-    this.market.marketList(itemId, count, price, pid);
+  // IWorld callers (the offline HUD drives Sim directly as its world) pass the
+  // list options as the 4th argument (the facet carries no pid); sim/server/test
+  // callers pass pid 4th and options 5th. Disambiguated by runtime type so both
+  // shapes resolve without a wrapper.
+  marketList(
+    itemId: string,
+    count: number,
+    pricePerUnit: number,
+    pidOrOpts?: number | MarketListOptions,
+    opts?: MarketListOptions,
+  ): void {
+    const pid = typeof pidOrOpts === 'number' ? pidOrOpts : undefined;
+    const options = typeof pidOrOpts === 'object' && pidOrOpts !== null ? pidOrOpts : opts;
+    this.market.marketList(itemId, count, pricePerUnit, pid, options);
   }
 
-  marketBuy(listingId: number, pid?: number): void {
-    this.market.marketBuy(listingId, pid);
+  marketBuy(listingId: number, quantity?: number, pid?: number): void {
+    this.market.marketBuy(listingId, quantity, pid);
+  }
+
+  marketBid(listingId: number, amount: number, pid?: number): void {
+    this.market.marketBid(listingId, amount, pid);
   }
 
   marketCancel(listingId: number, pid?: number): void {

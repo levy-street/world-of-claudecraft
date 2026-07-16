@@ -538,6 +538,7 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'prestige',
   'market_list',
   'market_buy',
+  'market_bid', // escrows/refunds copper: refresh the self snapshot so the purse updates
   'market_cancel',
   'market_collect',
   'mail_send',
@@ -4455,6 +4456,7 @@ export class GameServer {
             itemType: msg.itemType,
             subtype: msg.subtype,
             rarity: msg.rarity,
+            sort: msg.sort,
             page: typeof msg.page === 'number' ? msg.page : 0,
           }),
           pid,
@@ -4468,11 +4470,40 @@ export class GameServer {
           typeof msg.price === 'number' &&
           Number.isFinite(msg.price)
         ) {
-          sim.marketList(msg.item, msg.count, msg.price, pid);
+          // Optional auction-house fields: numeric-shape checks only; the sim
+          // validates the values (tier membership, bid/buyout bounds).
+          const durationHours =
+            typeof msg.duration === 'number' && Number.isFinite(msg.duration)
+              ? msg.duration
+              : undefined;
+          const auction =
+            typeof msg.startingBid === 'number' && Number.isFinite(msg.startingBid)
+              ? {
+                  startingBid: msg.startingBid,
+                  buyoutPrice:
+                    typeof msg.buyout === 'number' && Number.isFinite(msg.buyout)
+                      ? msg.buyout
+                      : undefined,
+                }
+              : undefined;
+          sim.marketList(msg.item, msg.count, msg.price, pid, { durationHours, auction });
         }
         break;
       case 'market_buy':
-        if (typeof msg.id === 'number') sim.marketBuy(msg.id, pid);
+        if (typeof msg.id === 'number')
+          sim.marketBuy(
+            msg.id,
+            typeof msg.qty === 'number' && Number.isFinite(msg.qty) ? msg.qty : undefined,
+            pid,
+          );
+        break;
+      case 'market_bid':
+        if (
+          typeof msg.id === 'number' &&
+          typeof msg.amount === 'number' &&
+          Number.isFinite(msg.amount)
+        )
+          sim.marketBid(msg.id, msg.amount, pid);
         break;
       case 'market_cancel':
         if (typeof msg.id === 'number') sim.marketCancel(msg.id, pid);

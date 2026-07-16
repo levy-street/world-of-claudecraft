@@ -3279,6 +3279,7 @@ export const tr_TR: EnTranslations = {
       "marketBody": "Tüccar, asla karşılaşmayabileceğiniz insanlarla alıp satabileceğiniz, oyuncuların yürüttüğü bir takas olan Dünya Pazarı'nı işletir. Açmak için Doğudere'deki Tüccar'la ya da Highwatch'taki Müzayedeci Voss ile konuşun: iki görevli de aynı ortak pazara hizmet eder. Tüccar ayrıca orada kendi mallarından sürekli bir stok bulundurur, böylece başka hiçbir oyuncu ilan vermemişken bile satın alınacak her zaman bir şey vardır.",
       "marketBrowse": "Göz atma: satışta neyin olduğunu bulmak için ilanları kaydırın ya da isme göre arayın. Her ilan malları, satıcıyı ve tüm yığın için istenen fiyatı gösterir.",
       "marketPost": "İlan verme: çantalarınızdan bir yığın seçin, fiyatınızı belirleyin ve listeleyin. Mallar biri satın alana dek Tüccar tarafından tutulur. Satılmayan ilanlar bir süre sonra size geri döner ve fikrinizi değiştirirseniz birini erkenden geri alabilirsiniz.",
+      "marketBidding": "Auctions: some listings take bids instead of a fixed price. A bid must clear the posted minimum, and outbidding someone always refunds them. When the seller sets a buyout, any bid that reaches it wins the lot on the spot.",
       "marketCollect": "Toplama: mallarınız satıldığında, geliriniz Tüccar'da sizi bekler. Satılmadan geri gelen her şeyle birlikte altını toplamak için geri dönün. Tüccar tamamlanan her satıştan küçük bir pay alır.",
       "marketPricing": "Fiyatlama size kalmış. Başkalarının istediğinden biraz daha düşüğe listelemek genellikle daha hızlı satar, fahiş bir fiyat ise el sürülmeden kalabilir. İlan vermeden önce piyasanın nasıl olduğunu görmek için önce göz atın."
     },
@@ -5845,6 +5846,10 @@ export const tr_TR: EnTranslations = {
       "filterWeaponAll": "Tüm silahlar",
       "filterRarity": "Nadirlik",
       "filterRarityAll": "Tüm nadirlikler",
+      "sortLabel": "Sort",
+      "sortNewest": "Newest",
+      "sortPrice": "Price",
+      "sortTimeLeft": "Time left",
       "weaponSword": "Kılıçlar",
       "weaponDagger": "Hançerler",
       "weaponStaff": "Asalar",
@@ -5863,17 +5868,48 @@ export const tr_TR: EnTranslations = {
       "reclaim": "Geri al",
       "buyAria": "{item} eşyasını {price} karşılığında satın al",
       "reclaimAria": "{item} eşyasını geri al",
+      "timeLeft": "{time} left",
+      "yourBidBadge": "Your bid",
+      "currentBidLabel": "Bid:",
+      "noBidsYet": "No bids yet",
+      "minNextBid": "Min bid {money}",
+      "buyoutLabel": "Buyout {money}",
+      "auctionBadge": "Auction",
+      "leadingBid": "You're leading",
+      "bidInputAria": "Bid amount for {item}",
+      "bidButton": "Bid",
+      "bidAria": "Bid on {item}",
+      "buyoutButton": "Buyout",
+      "buyoutAria": "Buy out {item} for {price}",
+      "buyQuantityAria": "Quantity of {item} to buy",
       "sellNote": "Çantalarınızdaki malları satışa koyun. Bir eşya satıldığında Tüccar %{cut} pay alır. {max} ilan yuvasından {used} tanesini kullanıyorsunuz.",
       "sellPickEmpty": "Satılacak eşyayı seçmek için çantalarınızdaki bir eşyaya tıklayın.",
       "quantity": "Miktar",
       "quantityOf": "/ {count}",
       "priceEach": "Adet fiyatı",
+      "listingTypeLabel": "Listing type",
+      "listingTypeFixed": "Fixed price",
+      "listingTypeAuction": "Auction",
+      "durationLabel": "Duration",
+      "durationOption": "{hours}h",
+      "startingBidLabel": "Starting bid",
+      "buyoutOptionalLabel": "Buyout (optional)",
+      "totalLabel": "Total",
+      "depositPreviewLabel": "Listing deposit",
       "listButton": "Dünya Pazarı'na koy",
       "minPriceError": "En az 1 bakır bir fiyat belirleyin.",
+      "cancelConfirmTitle": "Reclaim listing",
+      "cancelConfirmBody": "Reclaim {item} from the market? The {money} deposit will be forfeited.",
+      "cancelConfirmBodyNoDeposit": "Reclaim {item} from the market?",
+      "cancelConfirmDismiss": "Cancel",
       "collectEmpty": "Bekleyen bir şey yok. Satış gelirleri ve süresi dolan ilanlar burada toplanır.",
       "collectNote": "Tüccar'ın senin için tuttuğu kazançlar ve geri dönen mallar.",
       "saleProceeds": "Satış geliri",
-      "collectAll": "Hepsini Topla"
+      "collectAll": "Hepsini Topla",
+      "outbidToast": "You were outbid on {item}. {money} refunded to your collection box.",
+      "wonToast": "You won the auction for {item}! Collect it at the Merchant.",
+      "soldToast": "Your {item} sold for {money}. Collect it at the Merchant.",
+      "expiredToast": "Your listing of {item} expired unsold. Collect it at the Merchant."
     },
     "logs": {
       "listedItem": "{item} eşyasını Dünya Pazarı'nda {money} karşılığında ilana koydun.",
@@ -5882,6 +5918,8 @@ export const tr_TR: EnTranslations = {
       "collectedMoney": "Tüccar'dan {money} topladın.",
       "reclaimedItem": "{item} eşyasını pazardan geri aldın.",
       "expiredListing": "{item} pazar ilanının süresi doldu ve Tüccar'da seni bekliyor.",
+      "postedAuction": "Posted {item} for auction (starting bid {money}).",
+      "bidPlaced": "Bid placed: {money} on {item}.",
       "boughtBackItem": "{item} eşyasını {money} karşılığında geri aldın."
     },
     "errors": {
@@ -5898,7 +5936,16 @@ export const tr_TR: EnTranslations = {
       "ownListing": "O kendi ilanın. Geri almak için iptal et.",
       "cannotAfford": "Buna paran yetmez.",
       "notYourListing": "O senin ilanın değil.",
-      "nothingToCollect": "Toplayacak bir şeyin yok."
+      "nothingToCollect": "Toplayacak bir şeyin yok.",
+      "minStartingBid": "Name a starting bid of at least 1 copper.",
+      "buyoutTooLow": "The buyout must beat the starting bid.",
+      "chooseDuration": "Choose a listing duration of 12, 24, or 48 hours.",
+      "cannotAffordDeposit": "You cannot afford the listing deposit.",
+      "bidsOnly": "That lot takes bids only.",
+      "notAuction": "That lot is not up for auction.",
+      "cannotBidOwnLot": "You cannot bid on your own lot.",
+      "alreadyHighBidder": "You are already the high bidder.",
+      "bidTooLow": "Bid at least {min}."
     },
     "loot": {
       "takeAll": "Hepsini Al",
@@ -9738,6 +9785,26 @@ export const tr_TR: EnTranslations = {
         "sender": "Birader Aldric",
         "subject": "Karanlıkta yaptıkların",
         "body": "O çukurda neyin gömülü olduğunu çok az kişi bilecek, inanacak olansa daha da az. Ben biliyorum ve unutmayacağım.\n\nYolun hep aydınlık olsun.\n- Birader Aldric"
+      },
+      "market_outbid": {
+        "sender": "The Merchant",
+        "subject": "You have been outbid",
+        "body": "Another buyer has raised the bidding on a lot you wanted. Your copper waits in your collection box at the World Market; come see me to take it back or bid again.\n\n- The Merchant"
+      },
+      "market_won": {
+        "sender": "The Merchant",
+        "subject": "Your winning bid",
+        "body": "The hammer has fallen and the lot is yours. Your goods wait in your collection box at the World Market; come see me to claim them.\n\n- The Merchant"
+      },
+      "market_sold": {
+        "sender": "The Merchant",
+        "subject": "Your lot has sold",
+        "body": "A buyer has taken your goods off my hands. Your proceeds wait in your collection box at the World Market; come see me to collect them.\n\n- The Merchant"
+      },
+      "market_expired": {
+        "sender": "The Merchant",
+        "subject": "Your listing expired",
+        "body": "No buyer came for your goods before the listing ran out. They wait in your collection box at the World Market; come see me to take them back.\n\n- The Merchant"
       }
     },
     "itemSets": {

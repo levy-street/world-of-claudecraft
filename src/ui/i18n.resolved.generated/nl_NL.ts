@@ -3279,6 +3279,7 @@ export const nl_NL: EnTranslations = {
       "marketBody": "De Koopman runt de Wereldmarkt, een door spelers gedreven beurs waar je kunt kopen en verkopen met mensen die je misschien nooit ontmoet. Spreek de Koopman aan in Oostbeek, of Veilingmeester Voss boven in Highwatch, om hem te openen: beide beheerders bedienen dezelfde gedeelde markt. De Koopman houdt er ook een vaste voorraad eigen goederen aangeboden, dus er is altijd iets te kopen, zelfs wanneer geen andere spelers iets hebben geplaatst.",
       "marketBrowse": "Bladeren: scrol door de aanbiedingen of zoek op naam om te vinden wat te koop is. Elke aanbieding toont de waren, de verkoper en de vraagprijs voor de hele stapel.",
       "marketPost": "Plaatsen: kies een stapel uit je tassen, stel je prijs in en zet hem in de lijst. De waren worden door de Koopman bewaard totdat iemand ze koopt. Onverkochte aanbiedingen komen na een tijdje naar je terug, en je kunt er een vroegtijdig terugvragen als je je bedenkt.",
+      "marketBidding": "Auctions: some listings take bids instead of a fixed price. A bid must clear the posted minimum, and outbidding someone always refunds them. When the seller sets a buyout, any bid that reaches it wins the lot on the spot.",
       "marketCollect": "Innen: wanneer je waren verkocht zijn, wacht je opbrengst op je bij de Koopman. Keer terug om de munten te innen, samen met alles wat onverkocht terugkwam. De Koopman neemt een klein deel van elke voltooide verkoop.",
       "marketPricing": "De prijs bepaal je zelf. Net iets onder de vraagprijs van anderen aanbieden verkoopt meestal sneller, terwijl een steile prijs onaangeroerd kan blijven liggen. Blader eerst rond om te zien wat de gangbare prijs is voordat je iets plaatst."
     },
@@ -5845,6 +5846,10 @@ export const nl_NL: EnTranslations = {
       "filterWeaponAll": "Alle wapens",
       "filterRarity": "Zeldzaamheid",
       "filterRarityAll": "Alle zeldzaamheden",
+      "sortLabel": "Sort",
+      "sortNewest": "Newest",
+      "sortPrice": "Price",
+      "sortTimeLeft": "Time left",
       "weaponSword": "Zwaarden",
       "weaponDagger": "Dolken",
       "weaponStaff": "Staven",
@@ -5863,17 +5868,48 @@ export const nl_NL: EnTranslations = {
       "reclaim": "Terugnemen",
       "buyAria": "{item} kopen voor {price}",
       "reclaimAria": "{item} terugnemen",
+      "timeLeft": "{time} left",
+      "yourBidBadge": "Your bid",
+      "currentBidLabel": "Bid:",
+      "noBidsYet": "No bids yet",
+      "minNextBid": "Min bid {money}",
+      "buyoutLabel": "Buyout {money}",
+      "auctionBadge": "Auction",
+      "leadingBid": "You're leading",
+      "bidInputAria": "Bid amount for {item}",
+      "bidButton": "Bid",
+      "bidAria": "Bid on {item}",
+      "buyoutButton": "Buyout",
+      "buyoutAria": "Buy out {item} for {price}",
+      "buyQuantityAria": "Quantity of {item} to buy",
       "sellNote": "Bied goederen uit je tassen aan. De handelaar neemt een aandeel van {cut}% wanneer een voorwerp verkocht wordt. Je gebruikt {used}/{max} aanbiedingsplekken.",
       "sellPickEmpty": "Klik op een voorwerp in je tassen om te kiezen wat je verkoopt.",
       "quantity": "Aantal",
       "quantityOf": "van {count}",
       "priceEach": "Prijs per stuk",
+      "listingTypeLabel": "Listing type",
+      "listingTypeFixed": "Fixed price",
+      "listingTypeAuction": "Auction",
+      "durationLabel": "Duration",
+      "durationOption": "{hours}h",
+      "startingBidLabel": "Starting bid",
+      "buyoutOptionalLabel": "Buyout (optional)",
+      "totalLabel": "Total",
+      "depositPreviewLabel": "Listing deposit",
       "listButton": "Aanbieden op de Wereldmarkt",
       "minPriceError": "Noem een prijs van minstens 1 koper.",
+      "cancelConfirmTitle": "Reclaim listing",
+      "cancelConfirmBody": "Reclaim {item} from the market? The {money} deposit will be forfeited.",
+      "cancelConfirmBodyNoDeposit": "Reclaim {item} from the market?",
+      "cancelConfirmDismiss": "Cancel",
       "collectEmpty": "Niets in afwachting. Verkoopopbrengsten en verlopen aanbiedingen komen hier binnen.",
       "collectNote": "Verdiensten en teruggekeerde waren die de Koopman voor je bewaart.",
       "saleProceeds": "Verkoopopbrengst",
-      "collectAll": "Alles ophalen"
+      "collectAll": "Alles ophalen",
+      "outbidToast": "You were outbid on {item}. {money} refunded to your collection box.",
+      "wonToast": "You won the auction for {item}! Collect it at the Merchant.",
+      "soldToast": "Your {item} sold for {money}. Collect it at the Merchant.",
+      "expiredToast": "Your listing of {item} expired unsold. Collect it at the Merchant."
     },
     "logs": {
       "listedItem": "{item} op de Wereldmarkt gezet voor {money}.",
@@ -5882,6 +5918,8 @@ export const nl_NL: EnTranslations = {
       "collectedMoney": "Je haalt {money} op bij de Koopman.",
       "reclaimedItem": "{item} teruggehaald van de markt.",
       "expiredListing": "Je marktaanbieding van {item} is verlopen en wacht bij de Koopman.",
+      "postedAuction": "Posted {item} for auction (starting bid {money}).",
+      "bidPlaced": "Bid placed: {money} on {item}.",
       "boughtBackItem": "{item} teruggekocht voor {money}."
     },
     "errors": {
@@ -5898,7 +5936,16 @@ export const nl_NL: EnTranslations = {
       "ownListing": "Dat is je eigen aanbieding. Annuleer deze om hem terug te halen.",
       "cannotAfford": "Dat kun je niet betalen.",
       "notYourListing": "Dat is niet jouw aanbieding.",
-      "nothingToCollect": "Je hebt niets om op te halen."
+      "nothingToCollect": "Je hebt niets om op te halen.",
+      "minStartingBid": "Name a starting bid of at least 1 copper.",
+      "buyoutTooLow": "The buyout must beat the starting bid.",
+      "chooseDuration": "Choose a listing duration of 12, 24, or 48 hours.",
+      "cannotAffordDeposit": "You cannot afford the listing deposit.",
+      "bidsOnly": "That lot takes bids only.",
+      "notAuction": "That lot is not up for auction.",
+      "cannotBidOwnLot": "You cannot bid on your own lot.",
+      "alreadyHighBidder": "You are already the high bidder.",
+      "bidTooLow": "Bid at least {min}."
     },
     "loot": {
       "takeAll": "Alles nemen",
@@ -9738,6 +9785,26 @@ export const nl_NL: EnTranslations = {
         "sender": "Broeder Aldric",
         "subject": "Wat je in het donker hebt gedaan",
         "body": "Weinigen zullen ooit weten wat er in die kom begraven lag, en nog minder zouden het geloven. Ik weet het, en ik zal het niet vergeten.\n\nMoge je pad verlicht blijven.\n- Broeder Aldric"
+      },
+      "market_outbid": {
+        "sender": "The Merchant",
+        "subject": "You have been outbid",
+        "body": "Another buyer has raised the bidding on a lot you wanted. Your copper waits in your collection box at the World Market; come see me to take it back or bid again.\n\n- The Merchant"
+      },
+      "market_won": {
+        "sender": "The Merchant",
+        "subject": "Your winning bid",
+        "body": "The hammer has fallen and the lot is yours. Your goods wait in your collection box at the World Market; come see me to claim them.\n\n- The Merchant"
+      },
+      "market_sold": {
+        "sender": "The Merchant",
+        "subject": "Your lot has sold",
+        "body": "A buyer has taken your goods off my hands. Your proceeds wait in your collection box at the World Market; come see me to collect them.\n\n- The Merchant"
+      },
+      "market_expired": {
+        "sender": "The Merchant",
+        "subject": "Your listing expired",
+        "body": "No buyer came for your goods before the listing ran out. They wait in your collection box at the World Market; come see me to take them back.\n\n- The Merchant"
       }
     },
     "itemSets": {

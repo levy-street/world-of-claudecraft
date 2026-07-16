@@ -3279,6 +3279,7 @@ export const vi_VN: EnTranslations = {
       "marketBody": "Thương Nhân điều hành Chợ Thế Giới, một sàn giao dịch do người chơi vận hành nơi bạn có thể mua bán với những người có thể bạn chẳng bao giờ gặp. Hãy nói chuyện với Thương Nhân ở Eastbrook, hoặc với Đấu Giá Viên Voss trên Highwatch, để mở nó: cả hai người trông coi đều phục vụ chung một cái chợ. Thương Nhân cũng luôn niêm yết một lượng hàng hóa của riêng họ ở đó, nên luôn có thứ để mua ngay cả khi không người chơi nào khác đăng bán.",
       "marketBrowse": "Duyệt: cuộn qua danh sách hoặc tìm theo tên để thấy thứ đang được rao bán. Mỗi mục rao hiển thị món hàng, người bán, và giá yêu cầu cho cả chồng.",
       "marketPost": "Đăng bán: chọn một chồng hàng từ túi của bạn, đặt giá, và rao lên. Hàng hóa được Thương Nhân giữ cho đến khi có người mua. Những mục chưa bán sẽ trở về với bạn sau một thời gian, và bạn có thể lấy lại sớm một mục nếu đổi ý.",
+      "marketBidding": "Auctions: some listings take bids instead of a fixed price. A bid must clear the posted minimum, and outbidding someone always refunds them. When the seller sets a buyout, any bid that reaches it wins the lot on the spot.",
       "marketCollect": "Thu nhận: khi hàng của bạn bán được, tiền lời chờ bạn tại Thương Nhân. Hãy quay lại nhận bạc, cùng với bất cứ thứ gì trả về chưa bán được. Thương Nhân lấy một khoản nhỏ từ mỗi giao dịch hoàn tất.",
       "marketPricing": "Định giá là tùy bạn. Rao thấp hơn một chút so với người khác thường bán nhanh hơn, trong khi giá cao ngất có thể nằm im không ai động đến. Hãy duyệt trước để xem mức giá hiện hành trông thế nào trước khi đăng."
     },
@@ -5845,6 +5846,10 @@ export const vi_VN: EnTranslations = {
       "filterWeaponAll": "Tất cả vũ khí",
       "filterRarity": "Độ hiếm",
       "filterRarityAll": "Tất cả độ hiếm",
+      "sortLabel": "Sort",
+      "sortNewest": "Newest",
+      "sortPrice": "Price",
+      "sortTimeLeft": "Time left",
       "weaponSword": "Kiếm",
       "weaponDagger": "Dao Găm",
       "weaponStaff": "Trượng",
@@ -5863,17 +5868,48 @@ export const vi_VN: EnTranslations = {
       "reclaim": "Thu hồi",
       "buyAria": "Mua {item} với giá {price}",
       "reclaimAria": "Thu hồi {item}",
+      "timeLeft": "{time} left",
+      "yourBidBadge": "Your bid",
+      "currentBidLabel": "Bid:",
+      "noBidsYet": "No bids yet",
+      "minNextBid": "Min bid {money}",
+      "buyoutLabel": "Buyout {money}",
+      "auctionBadge": "Auction",
+      "leadingBid": "You're leading",
+      "bidInputAria": "Bid amount for {item}",
+      "bidButton": "Bid",
+      "bidAria": "Bid on {item}",
+      "buyoutButton": "Buyout",
+      "buyoutAria": "Buy out {item} for {price}",
+      "buyQuantityAria": "Quantity of {item} to buy",
       "sellNote": "Rao bán hàng hóa từ túi của bạn. Thương Nhân thu {cut}% phí khi vật phẩm được bán. Bạn đang dùng {used}/{max} ô rao bán.",
       "sellPickEmpty": "Nhấp vào một vật phẩm trong túi để chọn món muốn bán.",
       "quantity": "Số lượng",
       "quantityOf": "trong {count}",
       "priceEach": "Giá mỗi món",
+      "listingTypeLabel": "Listing type",
+      "listingTypeFixed": "Fixed price",
+      "listingTypeAuction": "Auction",
+      "durationLabel": "Duration",
+      "durationOption": "{hours}h",
+      "startingBidLabel": "Starting bid",
+      "buyoutOptionalLabel": "Buyout (optional)",
+      "totalLabel": "Total",
+      "depositPreviewLabel": "Listing deposit",
       "listButton": "Rao bán trên Chợ Thế Giới",
       "minPriceError": "Hãy đặt giá ít nhất 1 đồng.",
+      "cancelConfirmTitle": "Reclaim listing",
+      "cancelConfirmBody": "Reclaim {item} from the market? The {money} deposit will be forfeited.",
+      "cancelConfirmBodyNoDeposit": "Reclaim {item} from the market?",
+      "cancelConfirmDismiss": "Cancel",
       "collectEmpty": "Không có gì đang chờ. Tiền bán và mặt hàng hết hạn sẽ được thu về tại đây.",
       "collectNote": "Tiền lời và hàng hóa trả lại mà Thương Nhân đang giữ cho bạn.",
       "saleProceeds": "Tiền bán được",
-      "collectAll": "Thu Tất Cả"
+      "collectAll": "Thu Tất Cả",
+      "outbidToast": "You were outbid on {item}. {money} refunded to your collection box.",
+      "wonToast": "You won the auction for {item}! Collect it at the Merchant.",
+      "soldToast": "Your {item} sold for {money}. Collect it at the Merchant.",
+      "expiredToast": "Your listing of {item} expired unsold. Collect it at the Merchant."
     },
     "logs": {
       "listedItem": "Đã rao bán {item} trên Chợ Thế Giới với giá {money}.",
@@ -5882,6 +5918,8 @@ export const vi_VN: EnTranslations = {
       "collectedMoney": "Bạn thu về {money} từ Thương Nhân.",
       "reclaimedItem": "Đã nhận lại {item} từ chợ.",
       "expiredListing": "Mặt hàng rao {item} của bạn đã hết hạn và đang chờ tại chỗ Thương Nhân.",
+      "postedAuction": "Posted {item} for auction (starting bid {money}).",
+      "bidPlaced": "Bid placed: {money} on {item}.",
       "boughtBackItem": "Đã mua lại {item} với giá {money}."
     },
     "errors": {
@@ -5898,7 +5936,16 @@ export const vi_VN: EnTranslations = {
       "ownListing": "Đó là mặt hàng rao của chính bạn. Hủy nó để nhận lại.",
       "cannotAfford": "Bạn không đủ tiền mua thứ đó.",
       "notYourListing": "Đó không phải mặt hàng rao của bạn.",
-      "nothingToCollect": "Bạn không có gì để thu về."
+      "nothingToCollect": "Bạn không có gì để thu về.",
+      "minStartingBid": "Name a starting bid of at least 1 copper.",
+      "buyoutTooLow": "The buyout must beat the starting bid.",
+      "chooseDuration": "Choose a listing duration of 12, 24, or 48 hours.",
+      "cannotAffordDeposit": "You cannot afford the listing deposit.",
+      "bidsOnly": "That lot takes bids only.",
+      "notAuction": "That lot is not up for auction.",
+      "cannotBidOwnLot": "You cannot bid on your own lot.",
+      "alreadyHighBidder": "You are already the high bidder.",
+      "bidTooLow": "Bid at least {min}."
     },
     "loot": {
       "takeAll": "Lấy Tất Cả",
@@ -9738,6 +9785,26 @@ export const vi_VN: EnTranslations = {
         "sender": "Tu Huynh Aldric",
         "subject": "Điều bạn đã làm trong bóng tối",
         "body": "Hiếm ai sẽ biết thứ gì từng bị chôn dưới lòng chảo ấy, và càng hiếm ai tin. Tôi biết, và tôi sẽ không quên.\n\nMong con đường của bạn luôn sáng tỏ.\n- Tu Huynh Aldric"
+      },
+      "market_outbid": {
+        "sender": "The Merchant",
+        "subject": "You have been outbid",
+        "body": "Another buyer has raised the bidding on a lot you wanted. Your copper waits in your collection box at the World Market; come see me to take it back or bid again.\n\n- The Merchant"
+      },
+      "market_won": {
+        "sender": "The Merchant",
+        "subject": "Your winning bid",
+        "body": "The hammer has fallen and the lot is yours. Your goods wait in your collection box at the World Market; come see me to claim them.\n\n- The Merchant"
+      },
+      "market_sold": {
+        "sender": "The Merchant",
+        "subject": "Your lot has sold",
+        "body": "A buyer has taken your goods off my hands. Your proceeds wait in your collection box at the World Market; come see me to collect them.\n\n- The Merchant"
+      },
+      "market_expired": {
+        "sender": "The Merchant",
+        "subject": "Your listing expired",
+        "body": "No buyer came for your goods before the listing ran out. They wait in your collection box at the World Market; come see me to take them back.\n\n- The Merchant"
       }
     },
     "itemSets": {

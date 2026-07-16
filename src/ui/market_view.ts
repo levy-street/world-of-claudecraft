@@ -75,11 +75,14 @@ export type MarketSellBody =
   | { state: 'cannot-market' }
   | { state: 'form'; form: MarketSellForm };
 
-/** The Merchant-cut + listing-cap figures the Sell tab note shows. */
+/** The Merchant-cut + listing-cap figures the Sell tab note shows, plus the
+ *  duration tiers the sim will accept (mirrored from MarketInfo so the Sell tab
+ *  never invents its own duration list). */
 export interface MarketSellMeta {
   cutPct: number;
   myListingCount: number;
   maxListings: number;
+  durationsHours: readonly number[];
 }
 
 /** One Collect row: a returned/expired stack waiting to be reclaimed. */
@@ -211,6 +214,7 @@ export function buildMarketView(input: MarketViewInput): MarketView {
         cutPct: info.cutPct,
         myListingCount: info.myListingCount,
         maxListings: info.maxListings,
+        durationsHours: info.durationsHours,
       },
     };
   }

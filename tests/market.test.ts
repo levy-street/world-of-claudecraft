@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { bagCapacity } from '../src/sim/bags';
+import { ITEMS } from '../src/sim/data';
 import type { MarketQuery } from '../src/sim/market_query';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
@@ -10,7 +12,15 @@ function makeWorld() {
 
 // A full browse query with sensible defaults; tests vary only what they care about.
 function q(search = '', extra: Partial<MarketQuery> = {}): MarketQuery {
-  return { search, itemType: 'all', subtype: 'all', rarity: 'all', page: 0, ...extra };
+  return {
+    search,
+    itemType: 'all',
+    subtype: 'all',
+    rarity: 'all',
+    sort: 'newest',
+    page: 0,
+    ...extra,
+  };
 }
 
 function merchant(sim: Sim): Entity {
@@ -69,6 +79,7 @@ describe('the World Market — the Merchant', () => {
     standAtMerchant(sim, seller);
     sim.addItem('wolf_fang', 1, seller);
     sim.addItem('bone_fragments', 1, seller);
+    sim.players.get(seller)!.copper = 10; // covers the bone_fragments listing deposit
     sim.marketList('wolf_fang', 1, 100, seller);
     sim.marketList('bone_fragments', 1, 100, seller);
 
@@ -102,8 +113,9 @@ describe('the World Market — the Merchant', () => {
     const book = sim.market.marketListings;
     book.length = 0; // drop the seeded house stock so the page math is exact
 
-    // 60 other sellers' listings of one item: same name, so they sort by price, which
-    // puts the 50 cheapest on page 0 and the last 10 on page 1.
+    // 60 other sellers' listings of one item; the default 'newest' sort walks the
+    // book by listing id descending, so the newest 50 land on page 0 and the
+    // oldest 10 on page 1.
     for (let i = 0; i < 60; i++) {
       book.push({
         id: 100 + i,
@@ -112,6 +124,9 @@ describe('the World Market — the Merchant', () => {
         itemId: 'bone_fragments',
         count: 1,
         price: 100 + i,
+        kind: 'fixed',
+        durationSeconds: 0,
+        depositPerUnit: 0,
         expiresAt: Number.POSITIVE_INFINITY,
         house: false,
       });
@@ -125,6 +140,9 @@ describe('the World Market — the Merchant', () => {
       itemId: 'wolf_fang',
       count: 1,
       price: 500,
+      kind: 'fixed',
+      durationSeconds: 0,
+      depositPerUnit: 0,
       expiresAt: Number.POSITIVE_INFINITY,
       house: false,
     });
@@ -135,7 +153,7 @@ describe('the World Market — the Merchant', () => {
     expect(p0.totalCount).toBe(61); // 60 others + 1 own (the full match count)
     const othersP0 = p0.listings.filter((l) => !l.mine);
     expect(othersP0).toHaveLength(50);
-    expect(othersP0[0].price).toBe(100); // sorted by price within the same item name
+    expect(othersP0[0].price).toBe(159); // 'newest' default: highest listing id first
     expect(p0.listings.some((l) => l.mine && l.itemId === 'wolf_fang')).toBe(true);
 
     // Page 1: the viewer own listing still rides on top; only the last 10 others remain.
@@ -163,7 +181,15 @@ describe('the World Market — the Merchant', () => {
     expect(sim.countItem('wolf_fang', seller)).toBe(1); // 2 escrowed
     const mine = sim.marketListings.filter((l) => l.sellerKey === marketSellerKey(seller));
     expect(mine.length).toBe(1);
-    expect(mine[0]).toMatchObject({ itemId: 'wolf_fang', count: 2, price: 100, house: false });
+    // the wire price is per-unit; the listing keeps the whole-stack total in `price`
+    expect(mine[0]).toMatchObject({
+      itemId: 'wolf_fang',
+      count: 2,
+      price: 200,
+      pricePerUnit: 100,
+      kind: 'fixed',
+      house: false,
+    });
     expect(Number.isFinite(mine[0].expiresAt)).toBe(true);
   });
 
@@ -179,15 +205,15 @@ describe('the World Market — the Merchant', () => {
     const listing = sim.marketListings.find((l) => l.sellerKey === marketSellerKey(seller))!;
     sim.events.length = 0;
 
-    sim.marketBuy(listing.id, buyer);
+    sim.marketBuy(listing.id, undefined, buyer);
 
     expect(errorsSince(sim)).toEqual([]);
-    expect(copperOf(sim, buyer)).toBe(900);
+    expect(copperOf(sim, buyer)).toBe(800); // 2 units at 100 each
     expect(sim.countItem('wolf_fang', buyer)).toBe(2);
     expect(sim.marketListings.some((l) => l.id === listing.id)).toBe(false);
-    // 5% cut: seller is owed 95, waiting to be collected
+    // 5% cut on the 200 total: seller is owed 190, waiting to be collected
     const info = sim.marketInfoFor(seller)!;
-    expect(info.collectionCopper).toBe(95);
+    expect(info.collectionCopper).toBe(190);
   });
 
   it("collecting moves waiting gold into the seller's purse", () => {
@@ -201,6 +227,7 @@ describe('the World Market — the Merchant', () => {
     sim.marketList('wolf_fang', 1, 200, seller);
     sim.marketBuy(
       sim.marketListings.find((l) => l.sellerKey === marketSellerKey(seller))!.id,
+      undefined,
       buyer,
     );
     expect(copperOf(sim, seller)).toBe(0);
@@ -221,7 +248,7 @@ describe('the World Market — the Merchant', () => {
     const listing = sim.marketListings.find((l) => l.sellerKey === marketSellerKey(seller))!;
     sim.events.length = 0;
 
-    sim.marketBuy(listing.id, seller);
+    sim.marketBuy(listing.id, undefined, seller);
     expect(errorsSince(sim).join(' ')).toMatch(/your own listing/i);
     expect(copperOf(sim, seller)).toBe(10000); // unchanged
 
@@ -246,7 +273,7 @@ describe('the World Market — the Merchant', () => {
     expect(info.listings.find((l) => l.id === listing.id)?.mine).toBe(true);
 
     sim.events.length = 0;
-    sim.marketBuy(listing.id, seller);
+    sim.marketBuy(listing.id, undefined, seller);
     expect(errorsSince(sim).join(' ')).toMatch(/your own listing/i);
     expect(copperOf(sim, seller)).toBe(10000);
 
@@ -266,7 +293,7 @@ describe('the World Market — the Merchant', () => {
     const listing = sim.marketListings.find((l) => !l.house && l.itemId === 'wolf_fang')!;
 
     renameLiveCharacter(sim, seller, 'Renamed');
-    sim.marketBuy(listing.id, buyer);
+    sim.marketBuy(listing.id, undefined, buyer);
     expect(sim.marketInfoFor(seller)!.collectionCopper).toBe(190);
 
     sim.marketCollect(seller);
@@ -309,7 +336,7 @@ describe('the World Market — the Merchant', () => {
     const listing = sim.marketListings.find((l) => l.sellerKey === marketSellerKey(seller))!;
     sim.events.length = 0;
 
-    sim.marketBuy(listing.id, buyer);
+    sim.marketBuy(listing.id, undefined, buyer);
     expect(errorsSince(sim).join(' ')).toMatch(/afford/i);
     expect(copperOf(sim, buyer)).toBe(50);
     expect(sim.marketListings.some((l) => l.id === listing.id)).toBe(true);
@@ -321,7 +348,7 @@ describe('the World Market — the Merchant', () => {
     standAtMerchant(sim, buyer);
     const house = sim.marketListings.find((l) => l.house)!;
     sim.players.get(buyer)!.copper = house.price + 1000;
-    sim.marketBuy(house.id, buyer);
+    sim.marketBuy(house.id, undefined, buyer);
     // the listing is still on the board and the buyer received the goods
     expect(sim.marketListings.some((l) => l.id === house.id)).toBe(true);
     expect(sim.countItem(house.itemId, buyer)).toBeGreaterThanOrEqual(house.count);
@@ -426,6 +453,7 @@ describe('the World Market — the Merchant', () => {
     sim.marketList('wolf_fang', 2, 150, seller); // this one stays listed
     sim.marketBuy(
       sim.marketListings.find((l) => l.sellerKey === marketSellerKey(seller) && l.count === 1)!.id,
+      undefined,
       buyer,
     );
 
@@ -443,7 +471,9 @@ describe('the World Market — the Merchant', () => {
       sellerKey: marketSellerKey(seller),
       itemId: 'wolf_fang',
       count: 2,
-      price: 150,
+      price: 300, // whole-stack total: 2 units at the 150 per-unit ask
+      pricePerUnit: 150,
+      kind: 'fixed',
     });
     expect(Number.isFinite(loaded[0].expiresAt)).toBe(true);
     // house stock is reseeded, not duplicated from the save
@@ -457,6 +487,7 @@ describe('the World Market — the Merchant', () => {
     const seller2 = sim2.addPlayer('warrior', 'Seller');
     standAtMerchant(sim2, seller2);
     sim2.addItem('bone_fragments', 1, seller2);
+    sim2.players.get(seller2)!.copper = 10; // covers the listing deposit
     sim2.marketList('bone_fragments', 1, 50, seller2);
     const ids = sim2.marketListings.map((l) => l.id);
     expect(new Set(ids).size).toBe(ids.length); // no id collisions
@@ -551,6 +582,321 @@ describe('the World Market — the Merchant', () => {
     expect(mineWired).toBe(info.myListingCount);
     // The wire cap is still respected overall.
     expect(info.listings.length).toBeLessThanOrEqual(120);
+  });
+});
+
+describe('World Market: durations, deposits, and per-unit partial buys (auction house)', () => {
+  it('sets expiresAt from the chosen duration tier and stores it on the listing', () => {
+    for (const hours of [12, 24, 48] as const) {
+      const sim = makeWorld();
+      const seller = sim.addPlayer('warrior', 'Seller');
+      standAtMerchant(sim, seller);
+      sim.addItem('wolf_fang', 1, seller);
+      sim.events.length = 0;
+
+      sim.marketList('wolf_fang', 1, 100, seller, { durationHours: hours });
+
+      expect(errorsSince(sim)).toEqual([]);
+      const l = sim.marketListings.find((x) => x.sellerKey === marketSellerKey(seller))!;
+      expect(l.durationSeconds).toBe(hours * 3600);
+      expect(l.expiresAt).toBe(sim.time + hours * 3600);
+    }
+  });
+
+  it('refuses a duration outside the 12/24/48 tiers without escrowing anything', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    standAtMerchant(sim, seller);
+    sim.addItem('wolf_fang', 1, seller);
+    sim.events.length = 0;
+
+    sim.marketList('wolf_fang', 1, 100, seller, { durationHours: 6 });
+
+    expect(errorsSince(sim)).toEqual(['Choose a listing duration of 12, 24, or 48 hours.']);
+    expect(sim.countItem('wolf_fang', seller)).toBe(1);
+    expect(sim.marketListings.some((l) => l.sellerKey === marketSellerKey(seller))).toBe(false);
+  });
+
+  it('charges the deposit at list time, scaled by the duration tier', () => {
+    // bone_fragments sellValue 7 -> floor(7 * 0.15) = 1 per unit at the 12h tier.
+    for (const [hours, mult] of [
+      [12, 1],
+      [24, 2],
+      [48, 4],
+    ] as const) {
+      const sim = makeWorld();
+      const seller = sim.addPlayer('warrior', 'Seller');
+      standAtMerchant(sim, seller);
+      sim.addItem('bone_fragments', 2, seller);
+      sim.players.get(seller)!.copper = 100;
+      sim.events.length = 0;
+
+      sim.marketList('bone_fragments', 2, 50, seller, { durationHours: hours });
+
+      expect(errorsSince(sim)).toEqual([]);
+      const l = sim.marketListings.find((x) => x.sellerKey === marketSellerKey(seller))!;
+      expect(l.depositPerUnit).toBe(mult);
+      expect(copperOf(sim, seller)).toBe(100 - 2 * mult);
+    }
+  });
+
+  it('refuses a listing whose deposit the seller cannot pay, before any escrow', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    standAtMerchant(sim, seller);
+    sim.addItem('bone_fragments', 2, seller); // deposit 4/unit at 48h
+    sim.players.get(seller)!.copper = 7; // needs 8
+    sim.events.length = 0;
+
+    sim.marketList('bone_fragments', 2, 50, seller);
+
+    expect(errorsSince(sim)).toEqual(['You cannot afford the listing deposit.']);
+    expect(sim.countItem('bone_fragments', seller)).toBe(2); // nothing escrowed
+    expect(copperOf(sim, seller)).toBe(7); // nothing charged
+    expect(sim.marketListings.some((l) => l.sellerKey === marketSellerKey(seller))).toBe(false);
+  });
+
+  it('conserves copper exactly across list + partial sale + cancel: cut and forfeited deposit only', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    const buyer = sim.addPlayer('mage', 'Buyer');
+    standAtMerchant(sim, seller);
+    standAtMerchant(sim, buyer);
+    sim.addItem('bone_fragments', 4, seller);
+    sim.players.get(seller)!.copper = 16; // exactly the 48h deposit: 4 units * 4
+    sim.players.get(buyer)!.copper = 1000;
+    sim.events.length = 0;
+
+    // list 4 at 50 each (48h -> depositPerUnit 4, depositTotal 16)
+    sim.marketList('bone_fragments', 4, 50, seller);
+    expect(errorsSince(sim)).toEqual([]);
+    expect(copperOf(sim, seller)).toBe(0);
+    const listing = sim.marketListings.find((l) => l.sellerKey === marketSellerKey(seller))!;
+
+    // buyer takes 1 unit: cost 50, cut 3, proceeds 47, deposit refund 4
+    sim.marketBuy(listing.id, 1, buyer);
+    expect(errorsSince(sim)).toEqual([]);
+    expect(copperOf(sim, buyer)).toBe(950);
+    expect(sim.countItem('bone_fragments', buyer)).toBe(1);
+    expect(listing.count).toBe(3);
+    expect(listing.price).toBe(150); // running total tracks the remainder
+    expect(sim.marketInfoFor(seller)!.collectionCopper).toBe(51); // 47 + 4
+
+    // seller reclaims the remaining 3: goods back, remaining 12 deposit forfeited
+    sim.marketCancel(listing.id, seller);
+    expect(sim.countItem('bone_fragments', seller)).toBe(3);
+
+    // CONSERVATION: 1016 copper entered the flow (16 seller + 1000 buyer). What
+    // remains across every purse and box is 1016 minus the 3 cut minus the 12
+    // forfeited deposit, exactly.
+    const totalNow =
+      copperOf(sim, seller) + copperOf(sim, buyer) + sim.marketInfoFor(seller)!.collectionCopper;
+    expect(totalNow).toBe(1016 - 3 - 12);
+    // items conserved exactly: 4 = 3 (reclaimed) + 1 (bought)
+    expect(sim.countItem('bone_fragments', seller) + sim.countItem('bone_fragments', buyer)).toBe(
+      4,
+    );
+  });
+
+  it('forfeits the deposit on expiry: only the goods return to the collection', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    standAtMerchant(sim, seller);
+    sim.addItem('bone_fragments', 2, seller);
+    sim.players.get(seller)!.copper = 8;
+    sim.marketList('bone_fragments', 2, 50, seller); // deposit 8 charged
+    expect(copperOf(sim, seller)).toBe(0);
+    const listing = sim.marketListings.find((l) => l.sellerKey === marketSellerKey(seller))!;
+    listing.expiresAt = sim.time - 1;
+    for (let i = 0; i < 20; i++) sim.tick();
+
+    const info = sim.marketInfoFor(seller)!;
+    expect(info.collectionItems).toEqual([{ itemId: 'bone_fragments', count: 2 }]);
+    expect(info.collectionCopper).toBe(0); // the deposit is gone (a gold sink)
+  });
+
+  it('sells a per-unit stack in tranches: decrement, per-tranche proceeds, splice at zero', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    const buyer = sim.addPlayer('mage', 'Buyer');
+    standAtMerchant(sim, seller);
+    standAtMerchant(sim, buyer);
+    sim.addItem('wolf_fang', 5, seller); // sellValue 4 -> deposit 0
+    sim.players.get(buyer)!.copper = 1000;
+    sim.marketList('wolf_fang', 5, 100, seller);
+    const listing = sim.marketListings.find((l) => l.sellerKey === marketSellerKey(seller))!;
+    sim.events.length = 0;
+
+    sim.marketBuy(listing.id, 2, buyer);
+    expect(errorsSince(sim)).toEqual([]);
+    expect(copperOf(sim, buyer)).toBe(800);
+    expect(sim.countItem('wolf_fang', buyer)).toBe(2);
+    expect(listing.count).toBe(3);
+    expect(sim.marketInfoFor(seller)!.collectionCopper).toBe(190); // floor(200 * 0.95)
+
+    sim.marketBuy(listing.id, 3, buyer);
+    expect(errorsSince(sim)).toEqual([]);
+    expect(copperOf(sim, buyer)).toBe(500);
+    expect(sim.countItem('wolf_fang', buyer)).toBe(5);
+    expect(sim.marketListings.some((l) => l.id === listing.id)).toBe(false); // spliced at 0
+    expect(sim.marketInfoFor(seller)!.collectionCopper).toBe(190 + 285); // + floor(300 * 0.95)
+  });
+
+  it('clamps a partial-buy quantity into 1..remaining', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    const buyer = sim.addPlayer('mage', 'Buyer');
+    standAtMerchant(sim, seller);
+    standAtMerchant(sim, buyer);
+    sim.addItem('wolf_fang', 3, seller);
+    sim.players.get(buyer)!.copper = 1000;
+    sim.marketList('wolf_fang', 3, 10, seller);
+    const listing = sim.marketListings.find((l) => l.sellerKey === marketSellerKey(seller))!;
+
+    sim.marketBuy(listing.id, 0, buyer); // floors to 1
+    expect(listing.count).toBe(2);
+    expect(copperOf(sim, buyer)).toBe(990);
+
+    sim.marketBuy(listing.id, 99, buyer); // clamps to the remaining 2
+    expect(copperOf(sim, buyer)).toBe(970);
+    expect(sim.marketListings.some((l) => l.id === listing.id)).toBe(false);
+  });
+
+  it('gates a partial buy on bag capacity without moving any copper', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    const buyer = sim.addPlayer('mage', 'Buyer');
+    standAtMerchant(sim, seller);
+    standAtMerchant(sim, buyer);
+    sim.addItem('wolf_fang', 2, seller);
+    sim.players.get(buyer)!.copper = 1000;
+    sim.marketList('wolf_fang', 2, 100, seller);
+    const listing = sim.marketListings.find((l) => l.sellerKey === marketSellerKey(seller))!;
+    // fill every free buyer slot with distinct 1-per-slot gear (the bags.test.ts idiom)
+    const buyerMeta = sim.players.get(buyer)!;
+    const gearIds = Object.values(ITEMS)
+      .filter((d) => d.kind === 'weapon' || d.kind === 'armor')
+      .map((d) => d.id);
+    let i = 0;
+    while (buyerMeta.inventory.length < bagCapacity(buyerMeta.bags)) {
+      sim.addItem(gearIds[i % gearIds.length], 1, buyer);
+      i++;
+    }
+    sim.events.length = 0;
+
+    sim.marketBuy(listing.id, 1, buyer);
+
+    expect(errorsSince(sim)).toEqual(['Your bags are full.']);
+    expect(copperOf(sim, buyer)).toBe(1000);
+    expect(listing.count).toBe(2);
+  });
+
+  it('keeps a legacy whole-lot row (old-shape save) all-or-nothing at its stored total', () => {
+    const sim = makeWorld();
+    const buyer = sim.addPlayer('mage', 'Buyer');
+    standAtMerchant(sim, buyer);
+    sim.players.get(buyer)!.copper = 1000;
+    // an old-shape blob: no kind/pricePerUnit/duration/deposit fields at all
+    sim.loadMarket({
+      listings: [
+        {
+          id: 7007, // clear of the reseeded house-stock id range
+          sellerKey: 'oldtimer',
+          sellerName: 'Oldtimer',
+          itemId: 'wolf_fang',
+          count: 3,
+          price: 300,
+          secondsLeft: 600,
+        },
+      ],
+      collections: [],
+      nextListingId: 7008,
+    });
+    // find by seller key: the reseeded house stock also uses the low id range
+    const legacy = sim.marketListings.find((l) => l.sellerKey === 'oldtimer')!;
+    expect(legacy.kind).toBe('fixed');
+    expect(legacy.pricePerUnit).toBeUndefined();
+    expect(legacy.depositPerUnit).toBe(0);
+    sim.events.length = 0;
+
+    // a quantity ask is ignored: the lot always transacts in full at 300
+    sim.marketBuy(legacy.id, 1, buyer);
+
+    expect(errorsSince(sim)).toEqual([]);
+    expect(copperOf(sim, buyer)).toBe(700);
+    expect(sim.countItem('wolf_fang', buyer)).toBe(3);
+    expect(sim.marketListings.some((l) => l.id === 7007)).toBe(false);
+    // the seller collection got the legacy proceeds with no deposit refund
+    const col = (
+      sim.market as unknown as { marketCollections: Map<string, { copper: number }> }
+    ).marketCollections.get('oldtimer');
+    expect(col?.copper).toBe(285); // floor(300 * 0.95)
+  });
+
+  it('sorts the browse by newest, priceAsc (effective per-unit), and timeLeft with house last', () => {
+    const sim = makeWorld();
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, viewer);
+    const book = sim.market.marketListings;
+    book.length = 0;
+    const row = (id: number, over: Partial<(typeof book)[number]> = {}): (typeof book)[number] => ({
+      id,
+      sellerKey: 'rival',
+      sellerName: 'Rival',
+      itemId: 'bone_fragments',
+      count: 1,
+      price: 100,
+      kind: 'fixed',
+      durationSeconds: 3600,
+      depositPerUnit: 0,
+      expiresAt: sim.time + 3600,
+      house: false,
+      ...over,
+    });
+    book.push(
+      // legacy whole-lot: effective per-unit 400/4 = 100 exactly
+      row(10, { count: 4, price: 400, expiresAt: sim.time + 500 }),
+      // per-unit fixed at 90
+      row(11, { pricePerUnit: 90, price: 90, expiresAt: sim.time + 2000 }),
+      // auction with a standing bid of 95
+      row(12, {
+        kind: 'auction',
+        price: 60,
+        startingBid: 60,
+        bid: { amount: 95, bidderKey: 'x', bidderName: 'X' },
+        expiresAt: sim.time + 100,
+      }),
+      // house stock: never expires, sorts last under timeLeft
+      row(13, { house: true, pricePerUnit: 85, price: 85, expiresAt: Infinity }),
+    );
+
+    const ids = () => sim.marketInfoFor(viewer)!.listings.map((l) => l.id);
+
+    sim.marketSearch(q('', { sort: 'newest' }), viewer);
+    expect(ids()).toEqual([13, 12, 11, 10]);
+
+    sim.marketSearch(q('', { sort: 'priceAsc' }), viewer);
+    expect(ids()).toEqual([13, 11, 12, 10]); // 85 < 90 < 95 < 100
+
+    sim.marketSearch(q('', { sort: 'timeLeft' }), viewer);
+    expect(ids()).toEqual([12, 10, 11, 13]); // 100s < 500s < 2000s < house (never)
+  });
+
+  it('wires secondsLeft on every listing view (-1 for house stock)', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    standAtMerchant(sim, seller);
+    sim.addItem('wolf_fang', 1, seller);
+    sim.marketList('wolf_fang', 1, 100, seller, { durationHours: 12 });
+
+    const info = sim.marketInfoFor(seller)!;
+    const mine = info.listings.find((l) => l.mine)!;
+    expect(mine.secondsLeft).toBe(12 * 3600);
+    expect(mine.kind).toBe('fixed');
+    expect(mine.pricePerUnit).toBe(100);
+    const house = info.listings.find((l) => l.house)!;
+    expect(house.secondsLeft).toBe(-1);
+    expect(info.durationsHours).toEqual([12, 24, 48]);
   });
 });
 
