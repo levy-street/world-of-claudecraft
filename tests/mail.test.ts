@@ -4,7 +4,8 @@
 // and rename rekeying. Pure sim tests: construct a Sim, advance fixed ticks.
 
 import { describe, expect, it } from 'vitest';
-import { QUEST_LETTERS, WELCOME_LETTER } from '../src/sim/content/letters';
+import { HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
+import { HEROIC_MARK_LETTER, QUEST_LETTERS, WELCOME_LETTER } from '../src/sim/content/letters';
 import { MAILBOXES } from '../src/sim/content/mailboxes';
 import {
   MAIL_DELIVERY_SECONDS,
@@ -460,6 +461,31 @@ describe('quest thank-you letters', () => {
     expect(letter).toBeDefined();
     expect(letter?.kind).toBe('npc');
     expect(letter?.copper).toBe(QUEST_LETTERS.q_wolves.copper);
+  });
+});
+
+describe('the Heroic Marks reward letter (mailHeroicMarks)', () => {
+  it('books a system letter carrying the exact mark count as its attachment', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Backline');
+    sim.postOffice.mailHeroicMarks(pid, HEROIC_MARK_ITEM_ID, 3);
+    tickFor(sim, 1);
+    moveToMailbox(sim, pid);
+    const info = sim.mailInfoFor(pid);
+    const letter = info?.messages.find((m) => m.letterId === HEROIC_MARK_LETTER.letterId);
+    expect(letter).toBeDefined();
+    expect(letter?.kind).toBe('system');
+    expect(letter?.items).toEqual([{ itemId: HEROIC_MARK_ITEM_ID, count: 3 }]);
+  });
+
+  it('refuses an unknown recipient and a non-positive count', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Backline');
+    const before = (sim.postOffice as any).mail.length;
+    sim.postOffice.mailHeroicMarks(999999, HEROIC_MARK_ITEM_ID, 3); // no such player
+    sim.postOffice.mailHeroicMarks(pid, HEROIC_MARK_ITEM_ID, 0);
+    sim.postOffice.mailHeroicMarks(pid, HEROIC_MARK_ITEM_ID, -2);
+    expect((sim.postOffice as any).mail.length).toBe(before);
   });
 });
 
