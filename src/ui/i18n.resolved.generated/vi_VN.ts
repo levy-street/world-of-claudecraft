@@ -712,6 +712,9 @@ export const vi_VN: EnTranslations = {
       "clock24h": "24 giờ",
       "note": "Thêm thời điểm tin nhắn đến vào đầu mỗi dòng trò chuyện mới, ví dụ [14:32]. Chỉ áp dụng cho tin nhắn nhận được khi tùy chọn đang bật."
     },
+    "chatFilter": {
+      "chatOnly": "Chat Only"
+    },
     "chatWindow": {
       "move": "Kéo để di chuyển cửa sổ trò chuyện",
       "resize": "Kéo để thay đổi kích thước cửa sổ trò chuyện",

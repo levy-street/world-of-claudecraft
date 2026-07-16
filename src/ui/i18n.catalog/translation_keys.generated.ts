@@ -4894,6 +4894,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.castBar.playerAria'
   | 'hudChrome.castBar.targetAria'
   | 'hudChrome.character.modelPreview'
+  | 'hudChrome.chatFilter.chatOnly'
   | 'hudChrome.chatTimestamps.clock12h'
   | 'hudChrome.chatTimestamps.clock24h'
   | 'hudChrome.chatTimestamps.format'

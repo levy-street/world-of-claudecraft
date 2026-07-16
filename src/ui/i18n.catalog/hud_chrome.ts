@@ -301,6 +301,13 @@ export const hudChromeStrings = {
     clock24h: '24-hour',
     note: 'Prefixes each new chat line with the time it arrived, e.g. [14:32]. Only affects messages received while the option is on.',
   },
+  // The All-tab toggle that hides system/event lines (loot, XP, zone welcome,
+  // quest/system notices) so player chat reads clean. Pressed = chat-only view.
+  // Terse two-word label (no 4+ lowercase run, so M16 stays green as an
+  // English-only add); the pressed state (aria-pressed) carries the on/off meaning.
+  chatFilter: {
+    chatOnly: 'Chat Only',
+  },
   chatWindow: {
     move: 'Drag to move the chat window',
     resize: 'Drag to resize the chat window',

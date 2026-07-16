@@ -712,6 +712,9 @@ export const sv_SE: EnTranslations = {
       "clock24h": "24-timmars",
       "note": "Inleder varje ny chattrad med tiden den kom, t.ex. [14:32]. Påverkar bara meddelanden som tas emot medan alternativet är på."
     },
+    "chatFilter": {
+      "chatOnly": "Chat Only"
+    },
     "chatWindow": {
       "move": "Dra för att flytta chattfönstret",
       "resize": "Dra för att ändra storlek på chattfönstret",

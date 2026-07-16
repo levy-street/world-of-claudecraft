@@ -712,6 +712,9 @@ export const fr_FR: EnTranslations = {
       "clock24h": "24 heures",
       "note": "Préfixe chaque nouvelle ligne de discussion avec l'heure de réception, par ex. [14:32]. N'affecte que les messages reçus quand l'option est activée."
     },
+    "chatFilter": {
+      "chatOnly": "Chat Only"
+    },
     "chatWindow": {
       "move": "Faites glisser pour déplacer la fenêtre de discussion",
       "resize": "Faites glisser pour redimensionner la fenêtre de discussion",

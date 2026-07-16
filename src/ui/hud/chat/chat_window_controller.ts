@@ -10,6 +10,7 @@ import {
   type ChatTabId,
   channelNeedsJoin,
   chatInputTint,
+  chatLineVisible,
   chatOpenTabLabelKey,
   composeChatLine,
   composeWhisperReply,
@@ -24,6 +25,10 @@ import {
 
 const CHAT_TABS_KEY = 'woc_chat_tabs';
 const CHAT_ACTIVE_TAB_KEY = 'woc_chat_active_tab';
+// Persisted opt-in: hide system/event lines (loot, XP, zone welcome, quest/system
+// notices) on the All tab so player chat reads clean. Off by default (the classic
+// All view shows everything).
+const CHAT_HIDE_SYSTEM_KEY = 'woc_chat_hide_system';
 
 export interface ChatContextMenuPort {
   readonly element: HTMLElement;
@@ -61,6 +66,9 @@ export interface ChatWindowControllerDeps {
 export class ChatWindowController {
   private chatTabs: ChatOpenTab[] = [];
   private activeChatTab: ChatTabId = 'all';
+  // All-tab opt-in: when true, system/event lines (chan 'system') are hidden on
+  // the All view (see the tab-strip toggle). Off preserves the classic behavior.
+  private hideSystemInAll = false;
   // The last target the player actually sent to (classic sticky-channel behavior):
   // a standing channel OR the whisper collector (a `/r` reply). On the All/combat
   // views a plain typed line goes here and the input is tinted to match; a
@@ -79,12 +87,15 @@ export class ChatWindowController {
     this.initialized = true;
     let savedTabs: string | null = null;
     let savedActive: string | null = null;
+    let savedHideSystem: string | null = null;
     try {
       savedTabs = this.deps.storage.getItem(CHAT_TABS_KEY);
       savedActive = this.deps.storage.getItem(CHAT_ACTIVE_TAB_KEY);
+      savedHideSystem = this.deps.storage.getItem(CHAT_HIDE_SYSTEM_KEY);
     } catch {
       // Storage can be unavailable in private browsing modes.
     }
+    this.hideSystemInAll = savedHideSystem === '1';
     this.chatTabs = parseChatTabs(savedTabs);
     this.activeChatTab =
       savedActive === 'all' ||
@@ -111,8 +122,8 @@ export class ChatWindowController {
   }
 
   hideIfFiltered(element: HTMLElement, channel: string): void {
-    const filter = this.filterTab();
-    if (filter !== null && channel !== filter) element.classList.add('chat-hidden');
+    if (!chatLineVisible(this.filterTab(), channel, this.hideSystemInAll))
+      element.classList.add('chat-hidden');
   }
 
   applyInputPresentation(): void {
@@ -191,6 +202,7 @@ export class ChatWindowController {
     try {
       this.deps.storage.setItem(CHAT_TABS_KEY, serializeChatTabs(this.chatTabs));
       this.deps.storage.setItem(CHAT_ACTIVE_TAB_KEY, this.activeChatTab);
+      this.deps.storage.setItem(CHAT_HIDE_SYSTEM_KEY, this.hideSystemInAll ? '1' : '0');
     } catch {
       // Storage can be unavailable in private browsing modes.
     }
@@ -236,6 +248,18 @@ export class ChatWindowController {
       });
       bar.append(button);
     }
+    // All-tab toggle: hide system/event lines so player chat reads clean. Sits
+    // just left of the "+" button; shown only while the All view is active (its
+    // effect is All-only, the channel tabs already exclude system lines).
+    const sysLabel = t('hudChrome.chatFilter.chatOnly');
+    const sysButton = this.deps.document.createElement('button');
+    sysButton.type = 'button';
+    sysButton.className = 'chat-tab chat-tab-sysfilter';
+    sysButton.textContent = sysLabel;
+    sysButton.title = sysLabel;
+    sysButton.setAttribute('aria-pressed', this.hideSystemInAll ? 'true' : 'false');
+    sysButton.addEventListener('click', () => this.toggleHideSystemInAll(sysButton));
+    bar.append(sysButton);
     const add = this.deps.document.createElement('button');
     add.type = 'button';
     add.className = 'chat-tab chat-tab-add';
@@ -256,15 +280,25 @@ export class ChatWindowController {
   }
 
   private updateActiveTabStyles(): void {
-    this.requireElement('chatlog-tabs')
-      .querySelectorAll<HTMLButtonElement>('.chat-tab')
-      .forEach((button) => {
-        if (button.classList.contains('chat-tab-add')) return;
-        const active = button.dataset.tab === this.activeChatTab;
-        button.classList.toggle('active', active);
-        button.setAttribute('aria-selected', active ? 'true' : 'false');
-        button.tabIndex = active ? 0 : -1;
-      });
+    const bar = this.requireElement('chatlog-tabs');
+    bar.querySelectorAll<HTMLButtonElement>('.chat-tab').forEach((button) => {
+      // The "+" add button and the system-filter toggle are controls, not tabs:
+      // they keep their own keyboard reachability and never take tab selection.
+      if (
+        button.classList.contains('chat-tab-add') ||
+        button.classList.contains('chat-tab-sysfilter')
+      )
+        return;
+      const active = button.dataset.tab === this.activeChatTab;
+      button.classList.toggle('active', active);
+      button.setAttribute('aria-selected', active ? 'true' : 'false');
+      button.tabIndex = active ? 0 : -1;
+    });
+    // The system-filter toggle is only meaningful on the All view (channel tabs
+    // already exclude system lines), so it is shown there and hidden elsewhere.
+    const sysButton = bar.querySelector<HTMLElement>('.chat-tab-sysfilter');
+    if (sysButton)
+      sysButton.classList.toggle('chat-tab-sysfilter-hidden', this.activeChatTab !== 'all');
   }
 
   private selectTab(tab: ChatTabId, persist = true): void {
@@ -354,9 +388,21 @@ export class ChatWindowController {
     const filter = this.filterTab();
     for (const child of Array.from(this.deps.chatLog.children)) {
       const element = child as HTMLElement;
-      element.classList.toggle('chat-hidden', filter !== null && element.dataset.chan !== filter);
+      element.classList.toggle(
+        'chat-hidden',
+        !chatLineVisible(filter, element.dataset.chan ?? '', this.hideSystemInAll),
+      );
     }
     this.deps.chatLog.scrollTop = this.deps.chatLog.scrollHeight;
+  }
+
+  // Flip the All-tab "hide system lines" toggle: persist it, reflect the pressed
+  // state on the control, and re-apply the filter so the log updates at once.
+  private toggleHideSystemInAll(button: HTMLButtonElement): void {
+    this.hideSystemInAll = !this.hideSystemInAll;
+    button.setAttribute('aria-pressed', this.hideSystemInAll ? 'true' : 'false');
+    this.persist();
+    this.applyFilter();
   }
 
   private presentInput(input: HTMLTextAreaElement | HTMLInputElement): void {

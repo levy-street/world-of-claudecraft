@@ -712,6 +712,9 @@ export const id_ID: EnTranslations = {
       "clock24h": "24 jam",
       "note": "Memberi awalan pada setiap baris obrolan baru dengan waktu kedatangannya, mis. [14:32]. Hanya memengaruhi pesan yang diterima saat opsi ini aktif."
     },
+    "chatFilter": {
+      "chatOnly": "Chat Only"
+    },
     "chatWindow": {
       "move": "Seret untuk memindahkan jendela obrolan",
       "resize": "Seret untuk mengubah ukuran jendela obrolan",
