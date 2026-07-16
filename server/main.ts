@@ -2613,9 +2613,12 @@ export async function startServer(): Promise<http.Server> {
   await game.loadMarket();
   await game.loadMail();
   // Resolve any external-currency trade left mid-settlement by the previous boot.
-  // Runs after the mail store is loaded so escrow delivery/refund letters land in
-  // the live Ravenpost state; a failure here is logged, never fatal to boot.
-  await game
+  // Kicked off after the mail store is loaded so escrow delivery/refund letters land
+  // in the live Ravenpost state, but NOT awaited before the realm listen: the
+  // persisted settlement rows already keep escrow anchored, so recovery must not
+  // gate the port open (the same non-blocking treatment as the market lane). A
+  // failure here is logged, never fatal to boot.
+  void game
     .recoverOpenTradeSettlements()
     .catch((err) => console.error('trade settlement recovery failed:', err));
   await game.loadChatFilter();

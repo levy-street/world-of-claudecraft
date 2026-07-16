@@ -14,7 +14,7 @@ import { ITEMS } from '../sim/data';
 import { markDialogRoot } from './dialog_root';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
-import { formatMoney as formatLocalizedMoney, formatNumber, t } from './i18n';
+import { formatMoney as formatLocalizedMoney, formatNumber, type TranslationKey, t } from './i18n';
 import type { PainterHostPresentation } from './painter_host';
 import type {
   TradeItemRowModel,
@@ -69,6 +69,24 @@ function rowInner(row: TradeItemRowModel, deps: TradeWindowDeps): string {
   return `${icon}<span>${esc(label)}</span>`;
 }
 
+// Rolled-affix stat ids (str, agi, armor, ... the enchant statBonus set) localize
+// through the shared itemUi.stats.* labels the rest of the item UI uses (hud.ts's
+// item tooltips read the identical map); an unknown affix id falls back to its raw
+// id rather than crashing on a non-catalog stat.
+const INSTANCE_STAT_LABEL_KEYS: Record<string, TranslationKey> = {
+  armor: 'itemUi.stats.armor',
+  str: 'itemUi.stats.str',
+  agi: 'itemUi.stats.agi',
+  sta: 'itemUi.stats.sta',
+  int: 'itemUi.stats.int',
+  spi: 'itemUi.stats.spi',
+};
+
+function instanceStatLabel(stat: string): string {
+  const key = INSTANCE_STAT_LABEL_KEYS[stat];
+  return key ? t(key) : stat;
+}
+
 // A signer / rolled-stats line for an instanced row (fix F7d/r8#2), so a player
 // can tell a signed/enchanted/rolled copy apart from a plain one before
 // confirming. Every interpolated value routes through esc().
@@ -81,7 +99,16 @@ function instanceTooltipLine(instance: TradeItemRowModel['instance']): string {
   const stats = instance.rolled?.stats;
   const entries = stats ? Object.entries(stats) : [];
   if (entries.length > 0) {
-    lines.push(esc(entries.map(([k, v]) => `${k} ${v >= 0 ? '+' : ''}${v}`).join(', ')));
+    lines.push(
+      esc(
+        entries
+          .map(
+            ([k, v]) =>
+              `${instanceStatLabel(k)} ${v >= 0 ? '+' : '-'}${formatNumber(Math.abs(v), { maximumFractionDigits: 0 })}`,
+          )
+          .join(', '),
+      ),
+    );
   }
   if (lines.length === 0) lines.push(esc(t('hud.trade.instanceUnique')));
   return lines.map((line) => `<div class="tt-instance">${line}</div>`).join('');
