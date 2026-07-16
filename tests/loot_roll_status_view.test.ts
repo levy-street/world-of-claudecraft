@@ -3,7 +3,7 @@ import type { LootRollGroupStatus } from '../src/sim/types';
 import {
   computeLootRollStatusRows,
   lootRollStatusFingerprint,
-} from '../src/ui/loot_roll_status_view';
+} from '../src/ui/hud/loot/loot_roll_status_view';
 
 // Unit tests for the pure loot-roll vote-strip core: prompt/watch row split,
 // self marking, and the render-on-change fingerprint. No DOM; the hud is a

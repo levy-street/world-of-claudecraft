@@ -21,150 +21,150 @@ export const ja_JP: EnTranslations = {
     "rpPvp": "RP-PvP"
   },
   "devCommand": {
-    "dialogLabel": "Developer Command Center",
-    "kicker": "Development tools",
-    "title": "Command Center",
-    "subtitle": "Authoritative test controls for the active world.",
-    "closeAria": "Close developer commands",
-    "categoryNavAria": "Developer command categories",
+    "dialogLabel": "開発者コマンドセンター",
+    "kicker": "開発ツール",
+    "title": "コマンドセンター",
+    "subtitle": "現在のワールドをサーバー権限でテストするための操作です。",
+    "closeAria": "開発者コマンドを閉じる",
+    "categoryNavAria": "開発者コマンドのカテゴリ",
     "categories": {
-      "player": "Player",
-      "spawns": "Spawns",
-      "inventory": "Inventory",
-      "progress": "Progress",
-      "travel": "Travel",
-      "scenarios": "Scenarios"
+      "player": "プレイヤー",
+      "spawns": "出現物",
+      "inventory": "インベントリ",
+      "progress": "進行",
+      "travel": "移動",
+      "scenarios": "シナリオ"
     },
-    "filterLabel": "Filter commands",
-    "filterPlaceholder": "Search this category",
-    "noMatches": "No matching commands.",
-    "serverRequirement": "Server cheats still require ALLOW_DEV_COMMANDS=1.",
-    "invalidValues": "Choose valid values before running this command.",
-    "sent": "Sent: {command}",
-    "run": "Run",
+    "filterLabel": "コマンドを絞り込む",
+    "filterPlaceholder": "このカテゴリを検索",
+    "noMatches": "一致するコマンドはありません。",
+    "serverRequirement": "サーバーのチート機能には引き続き ALLOW_DEV_COMMANDS=1 が必要です。",
+    "invalidValues": "実行する前に有効な値を選択してください。",
+    "sent": "送信済み：{command}",
+    "run": "実行",
     "fields": {
-      "level": "Level",
-      "mob": "Mob",
-      "count": "Count",
-      "item": "Item",
-      "gold": "Gold",
-      "quest": "Quest",
-      "profession": "Profession",
-      "amount": "Amount",
+      "level": "レベル",
+      "mob": "モブ",
+      "count": "個数",
+      "item": "アイテム",
+      "gold": "ゴールド",
+      "quest": "クエスト",
+      "profession": "専門職",
+      "amount": "数量",
       "x": "X",
       "z": "Z",
-      "dungeon": "Dungeon",
-      "difficulty": "Difficulty",
-      "name": "Name"
+      "dungeon": "ダンジョン",
+      "difficulty": "難易度",
+      "name": "名前"
     },
     "difficulty": {
-      "normal": "Normal",
-      "heroic": "Heroic"
+      "normal": "ノーマル",
+      "heroic": "ヒロイック"
     },
     "actions": {
       "heal": {
-        "label": "Restore health",
-        "description": "Fill the health pool."
+        "label": "体力を回復",
+        "description": "体力を全回復します。"
       },
       "resource": {
-        "label": "Restore resource",
-        "description": "Fill mana, rage, or energy."
+        "label": "リソースを回復",
+        "description": "マナ、怒り、またはエネルギーを全回復します。"
       },
       "cooldowns": {
-        "label": "Clear cooldowns",
-        "description": "Reset ability, GCD, and potion timers."
+        "label": "クールダウンを消去",
+        "description": "アビリティ、GCD、ポーションのタイマーをリセットします。"
       },
       "god": {
-        "label": "Toggle god mode",
-        "description": "Toggle invulnerability and boosted damage."
+        "label": "無敵モードを切り替え",
+        "description": "無敵状態と強化ダメージを切り替えます。"
       },
       "revive": {
-        "label": "Revive",
-        "description": "Revive through the normal resurrection path."
+        "label": "復活",
+        "description": "通常の蘇生経路で復活します。"
       },
       "kill": {
-        "label": "Kill player",
-        "description": "Test death, ghost, and corpse flows."
+        "label": "プレイヤーを死亡させる",
+        "description": "死亡、霊体、死体の流れをテストします。"
       },
       "combatreset": {
-        "label": "Reset combat",
-        "description": "Clear combat state and hostile threat."
+        "label": "戦闘をリセット",
+        "description": "戦闘状態と敵の脅威値を消去します。"
       },
       "level": {
-        "label": "Set level",
-        "description": "Set the current character level."
+        "label": "レベルを設定",
+        "description": "現在のキャラクターレベルを設定します。"
       },
       "spawn": {
-        "label": "Spawn mob",
-        "description": "Create a concrete mob near the player."
+        "label": "モブを出現",
+        "description": "プレイヤーの近くに指定したモブを作成します。"
       },
       "killtarget": {
-        "label": "Kill target",
-        "description": "Kill the selected living mob."
+        "label": "ターゲットを倒す",
+        "description": "選択中の生きているモブを倒します。"
       },
       "despawntarget": {
-        "label": "Despawn target",
-        "description": "Remove a selected mob created by this tool."
+        "label": "ターゲットを消去",
+        "description": "このツールで作成した選択中のモブを削除します。"
       },
       "despawnall": {
-        "label": "Clear my spawns",
-        "description": "Remove every mob spawned by this developer."
+        "label": "自分の出現物を消去",
+        "description": "この開発者が出現させたすべてのモブを削除します。"
       },
       "give": {
-        "label": "Give item",
-        "description": "Add an item to the player inventory."
+        "label": "アイテムを付与",
+        "description": "プレイヤーのインベントリにアイテムを追加します。"
       },
       "gold": {
-        "label": "Add gold",
-        "description": "Add gold to the current purse."
+        "label": "ゴールドを追加",
+        "description": "現在の所持金にゴールドを追加します。"
       },
       "quest": {
-        "label": "Complete quest",
-        "description": "Complete a specific quest by id."
+        "label": "クエストを完了",
+        "description": "IDを指定してクエストを完了します。"
       },
       "quests": {
-        "label": "Complete active quests",
-        "description": "Complete every quest in the current log."
+        "label": "進行中のクエストを完了",
+        "description": "現在のクエストログにある全クエストを完了します。"
       },
       "attune": {
-        "label": "Unlock attunements",
-        "description": "Mark all attunement requirements complete."
+        "label": "前提条件を解除",
+        "description": "すべての前提条件を完了済みにします。"
       },
       "gather": {
-        "label": "Grant gathering skill",
-        "description": "Increase a gathering profession."
+        "label": "採集スキルを付与",
+        "description": "採集専門職のスキルを上げます。"
       },
       "teleport": {
-        "label": "Teleport",
-        "description": "Move to exact world coordinates."
+        "label": "テレポート",
+        "description": "正確なワールド座標へ移動します。"
       },
       "dungeon": {
-        "label": "Enter dungeon",
-        "description": "Enter a dungeon with dev gate bypass."
+        "label": "ダンジョンに入る",
+        "description": "開発者用の制限を無視してダンジョンに入ります。"
       },
       "raid": {
-        "label": "Enter raid",
-        "description": "Enter the Nythraxis arena directly."
+        "label": "レイドに入る",
+        "description": "ナイスラクシスのレイドアリーナへ直接入ります。"
       },
       "raidreset": {
-        "label": "Reset raid lockout",
-        "description": "Clear the current raid lockouts."
+        "label": "レイドロックアウトをリセット",
+        "description": "現在のレイドロックアウトを消去します。"
       },
       "bot": {
-        "label": "Spawn social bot",
-        "description": "Create a whisperable stationary player."
+        "label": "ソーシャルボットを出現",
+        "description": "ウィスパー可能な静止プレイヤーを作成します。"
       },
       "lfgqueue": {
-        "label": "Seed finder queue",
-        "description": "Create a Dungeon Finder queue scenario."
+        "label": "ファインダー待機列を準備",
+        "description": "ダンジョンファインダーの待機列シナリオを作成します。"
       },
       "lfgraid": {
-        "label": "Seed raid finder",
-        "description": "Create a raid finder scenario."
+        "label": "レイドファインダーを準備",
+        "description": "レイドファインダーのシナリオを作成します。"
       },
       "lfgboard": {
-        "label": "Seed listing board",
-        "description": "Create a premade listing scenario."
+        "label": "募集掲示板を準備",
+        "description": "事前編成の募集掲示シナリオを作成します。"
       }
     }
   },
@@ -616,7 +616,7 @@ export const ja_JP: EnTranslations = {
       "balanceLabel": "残高",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL：{amount}",
-      "usdcBalance": "USDC: {amount}",
+      "usdcBalance": "USDC：{amount}",
       "wocBalance": "WOC：{amount}",
       "unavailable": "Claudiumストアは現在利用できません。残高と購入内容に影響はありません。しばらくしてからお試しください。",
       "disclosure": "Claudiumは一方向のゲーム内通貨です。現金で購入して外見アイテムに使用でき、換金、譲渡、払い戻しはできません。",
@@ -996,6 +996,7 @@ export const ja_JP: EnTranslations = {
       "interfaceModeTouch": "タッチ",
       "interfaceModeNote": "自動では、デバイスに応じてデスクトップ操作かタッチ操作を選びます。デスクトップを選ぶとキーボードとマウスに固定され（キーボード付きタブレットなどに便利）、タッチを選ぶと画面上の操作になります。",
       "footstepSounds": "足音",
+      "interfaceSounds": "インターフェースとフィードバック音",
       "clickFeedback": "クリックマーカー",
       "lockCursorOnRotate": "回転中はカーソルを固定",
       "keybindHelpLockCursorOnRotate": "ドラッグでカメラを回転させている間、マウスカーソルをウィンドウ内に固定し、画面の端や別のモニターに移動しないようにします。自由なカーソルを好む場合はオフにしてください。",
@@ -1632,14 +1633,14 @@ export const ja_JP: EnTranslations = {
       "spacing": "フレームの間隔",
       "columns": "レイドの列数",
       "healthText": "体力テキスト",
-      "healthNone": "None",
+      "healthNone": "なし",
       "healthPercent": "パーセント",
       "healthCurrent": "現在値",
       "healthCurrentMax": "現在値 / 最大値",
       "sort": "プレイヤーの並び順",
       "sortGroup": "グループ",
-      "sortRole": "Role",
-      "sortName": "Name",
+      "sortRole": "ロール",
+      "sortName": "名前",
       "showResource": "マナ・怒り・エネルギーを表示",
       "showAbsorbs": "吸収シールドを表示",
       "showAuras": "バフとデバフを表示",
@@ -2304,6 +2305,9 @@ export const ja_JP: EnTranslations = {
       "already_linked": "このアカウントには既にSteamアカウントが連携されています。",
       "account_taken": "そのSteamアカウントは既に別のアカウントに連携されています。",
       "upstream": "Steamから応答がありません。しばらくしてからもう一度お試しください。"
+    },
+    "welcome": {
+      "invalid_input": "入力が無効です。"
     }
   },
   "guide": {
@@ -2597,7 +2601,7 @@ export const ja_JP: EnTranslations = {
       "effectsTitle": "バフ、デバフ、群衆制御",
       "effectsBody": "多くのアビリティは、しばらく残る効果を付与します。有益なもの（バフ）はステータスを上げ、盾を張り、少しずつ回復させてくれます。有害なもの（デバフ）は継続ダメージで体力を削り、あるいはあなたを弱体化させます。画面の上隅、ミニマップの脇にある小さなアイコンを見れば、何が付いていて、あとどれくらい続くのかがわかります。",
       "ccBody": "群衆制御は、対象にできることを制限する特殊なデバフです。スタン、根縛りや減速、呪文詠唱を止めるサイレンス、武装解除、フィアー、そして一瞬だけ敵を無害にする変身系があります。相手が他のプレイヤーの場合、制御は繰り返すほど利きが薄れます。同じ種類をあまりに早く再付与すると弱まり、やがて完全に効かなくなり、またステルスから仕掛けるスタンはその後に続くスタンとは別に数えられるので、誰も永遠に無力なまま連鎖され続けることはありません。世界のクリーチャーたちはそのような恨みを抱かず、彼らには繰り返しても制御が弱まることはありません。ただし最強の敵たちの多く、名前を持つエリートやその中でも最強のボスたちは、そもそも制御がまったく効きません。",
-      "metersBody": "戦いの首尾が気になりますか。Zキーを押すとパーティメーターが開き、グループのダメージ、回復、脅威を戦闘ごとに集計してくれます。",
+      "metersBody": "戦いの首尾が気になりますか。Shift+Hキーを押すとパーティメーターが開き、グループのダメージ、回復、脅威を戦闘ごとに集計してくれます。",
       "queueTitle": "次の一手はもう装填済み",
       "queueBody": "ボタンを押す瞬間をフレーム単位で合わせる必要はありません。今のアビリティを詠唱している間に次のアビリティを押せば先行入力として蓄えられ、詠唱が完了した瞬間に発動します。だから練達のプレイは途切れなく流れていきます。一部の近接攻撃も同じ仕組みで、次の武器の一振りに乗って繰り出されます。",
       "deathTitle": "倒れたとき",
@@ -2658,7 +2662,7 @@ export const ja_JP: EnTranslations = {
       "petBarTerm": "ペットバー",
       "petBarDef": "ハンターやウォーロックのペットが追加する操作の列です。攻撃、停止、挑発、防御、攻撃的の五つで、初期設定ではCtrl+1から5に割り当てられています。",
       "metersTerm": "ダメージメーター",
-      "metersDef": "現在の戦いのパーティ用スコアボードのウィンドウです。与えたダメージ、行った回復、そして誰が最も脅威を抱えているかを、戦闘ごとに記録します。キー割り当て（初期設定はZ）で開けます。",
+      "metersDef": "現在の戦いのパーティ用スコアボードのウィンドウです。与えたダメージ、行った回復、そして誰が最も脅威を抱えているかを、戦闘ごとに記録します。キー割り当て（初期設定はShift+H）で開けます。",
       "targetMarkerTerm": "ターゲットマーカー",
       "targetMarkerDef": "パーティやレイドのメンバーが誰でも対象の上に付けられる記号で、全員が同じ相手に集中したり、逆に避けたりできます。記号は八種類で、一つの記号につき一体の対象に付けられます。",
       "loadoutTerm": "保存ビルド",
@@ -2987,6 +2991,8 @@ export const ja_JP: EnTranslations = {
       "heroicRewardsTitle": "英雄の証と強化された戦利品",
       "heroicRewardsBody": "ヒロイックのボスは、おなじみの戦利品を強化し、ツールチップにヒロイックの表記を添えて落とします。さらに各ランの最後のボスは、ほかでは見つからないエピックを加えてくれます。その最後の討伐は、参加者全員に英雄の証も残します。ハイウォッチの補給係ヴェックスのもとで使う通貨で、彼の扱う指輪と首飾りは、このレルムで手に入る唯一の装身具です。",
       "heroicLockoutBody": "ノーマルのダンジョンは一日中回れます。ヒロイックは辛抱を求めます。各ダンジョンが報酬を出すヒロイッククリアは一日に一度で、レイドは難易度ごとに一日のロックアウトを保ちます。クリア済みのランはそのパーティに常に開かれたままなので、勝ち取った戦利品から締め出される者はいません。",
+      "resetTitle": "インスタンスのリセット",
+      "resetBody": "グループがインスタンスを確保したまま難易度を切り替えると、古い確保はしばらく残ってから自然に消えます。パーティリーダーならすぐに手放すこともできます。自分のポートレートメニューから「すべてのインスタンスをリセット」を選ぶか、/dungeon reset と入力しましょう。リセットできるのは難易度を実際に変更したあとだけで、生死を問わず誰もインスタンス内に残っていないことが条件になり、リセットとリセットのあいだには短いクールダウンが挟まります。間違った難易度のまま扉に着けば、ランが始まる前にゲームがそう告げてくれます。レイドはこの方法ではリセットされません。レイドには独自のロックアウトのルールがあります。",
       "templeLoreTitle": "水没の神殿、もう少し深く",
       "templeLoreBody": "神殿には、あなたが他所で追うカルトよりも古い、それ自身の伝説があります。月明かりを飲み込み、溺れた者を返すという山上の湖グリマーミアの岸辺で、一人の見張り役が淡い光の門を守っています。水面の下には、そこへ続く冷たい石の階段が伸びています。そこに沈んだ者たちは不運で溺れたのではありません。彼らは礼拝のうちに沈み、決して歌うのをやめなかった蒼白の聖歌隊でした。古き守り人たちは水に呑まれる前に、岩へただ一つの警告を刻みました。彼らが溺れし月と呼ぶものへの祈りです。そしてその下に、より落ち着いた手が二つの言葉を書き添えていました。それはただ眠っているだけだ、と。",
       "cryptLeadTitle": "死者が閉ざしておくべきだった扉",
@@ -3194,7 +3200,7 @@ export const ja_JP: EnTranslations = {
       "qualityNote": "品質が高いほど、たいていステータスも良くなりますが、品質は目安であって決まりではありません。クラスとレベルにうまく合った一品は、より派手なものを上回ることもあります。",
       "upgradeTitle": "ギアは常に最新に",
       "upgradeBody": "古い一品を新たなアップグレードに替えるほうが、もう手に余る装備で完璧に立ち回るより効果があります。より良いものがドロップしたり、クエストで提示されたりしたら、受け取りましょう。良いアイテムを後のために取っておいてはいけません。",
-      "itemLevelBody": "2つの装備を手早く比べたいときは、オプションで「アイテムレベルを表示」をオンにしましょう。敵やクエストなど、世界で勝ち取った装備にはアイテムレベルが表示されます。これは入手元をもとに、その装備のおおよその強さを一つの数値で示したものです。スロットが違っていても、どちらの方が大きく性能を底上げするか、ひと目で見分けられます。商人で売っている素の基本装備や初期装備のように、そうした入手元を持たない品にはアイテムレベルが表示されません。数値がないのは異常ではなく、正常なことです。",
+      "itemLevelBody": "2つの装備を手早く比べたいときは、オプションで「アイテムレベルを表示」をオンにしましょう。敵やクエスト、生産職といった入手元がはっきりしている装備にはアイテムレベルが表示されます。これは入手元をもとに、その装備のおおよその強さを一つの数値で示したものです。スロットが違っていても、どちらの方が大きく性能を底上げするか、ひと目で見分けられます。商人で売っている素の基本装備や初期装備のように、そうした入手元を持たない品にはアイテムレベルが表示されません。数値がないのは異常ではなく、正常なことです。",
       "sourcesTitle": "ギアの入手先",
       "sourcesBody": "序盤のアップグレードのほとんどはクエスト報酬なので、稼ぎ作業よりクエストを終わらせるほうが得です。敵は倒されると装備を落とし、町の商人は手堅い基本装備を売り、職人は採集した素材を身につけられる品へと変え、プレイヤーマーケットでは他の冒険者から買えます。そして頂の上では、二つの刻印通貨が、ほかでは見つからない装備を買わせてくれます。デルヴの番人のもとではデルヴの刻印、英雄補給係のもとでは英雄の証です。",
       "soulboundTitle": "魂縛：あなただけのもの",
@@ -3238,7 +3244,7 @@ export const ja_JP: EnTranslations = {
       "craftRecipesTitle": "レシピと材料",
       "craftRecipesBody": "どのレシピにも、採集または購入して手に入れる特定の材料が必要です。最も単純なレシピは一般的な材料だけで作れ、最初から製作できるので、その職を手に入れた瞬間から作業を始められます。レシピ一覧はまだ充実の途中です。いくつかの職は最初のレシピを待っている状態で、職が育つにつれてさらに増えていきます。",
       "craftHowTitle": "製作ウィンドウ",
-      "craftHowBody": "製作ウィンドウ（初期設定はTキー）を開くと、あなたが知っているすべてのレシピ、それぞれに必要なもの、そして手持ちの材料が確認できます。材料がそろっていれば、クリック一つで作業が完了します。一般的なレシピは世界のどこでも製作できます。一部の高度な道具レシピだけは、ハイウォッチの製作拠点に立って作る必要があります。",
+      "craftHowBody": "製作ウィンドウ（初期設定はTキー）を開くと、あなたが知っているすべてのレシピ、それぞれに必要なもの、そして手持ちの材料が確認できます。材料がそろっていれば、クリック一つで作業が完了します。一般的なレシピは世界のどこでも製作できます。一部の高度なレシピ、上位の道具や希少なキャスター防具などは、ハイウォッチの製作拠点に立って作る必要があります。",
       "craftMasteryTitle": "技能と熟達",
       "craftMasteryBody": "製作に成功するとその職の技能が上がりますが、技能がレシピを閉ざしてしまうことはありません。レシピを知っていて材料を持っていれば、いつでも挑戦できます。技能が高まって得られるのは品質です。熟練した手ほど、より上等な品を作り上げます。唯一の例外は組み合わせレシピで、これは解放される前に、その両方の職で腕前を証明しておくことを求めます。",
       "craftComboTitle": "組み合わせレシピ",
@@ -5000,6 +5006,29 @@ export const ja_JP: EnTranslations = {
     "body": "ゲームサービスを再起動しています。Claudemoonはまもなく戻る予定です。このページは自動的に確認を続けます。",
     "status": "まもなく復帰"
   },
+  "welcome": {
+    "back": "おかえりなさい、{name}さん",
+    "level": "レベル {level}",
+    "lastPlayed": "最終プレイ：{when}",
+    "continue": "ワールドに入る",
+    "continueHint": "Enterで続行、Escでスキップ",
+    "continueHintTouch": "タップして続行",
+    "discord": {
+      "title": "コミュニティはDiscordで活動しています",
+      "sub": "パッチプレビュー、イベント、開発者チャット、連携でボーナス銀行スロット2枠。",
+      "join": "Discordに参加する"
+    },
+    "chest": {
+      "ready": "デイリーチェストの準備ができました"
+    },
+    "armory": {
+      "cta": "武器庫を見に行く"
+    },
+    "news": {
+      "new": "新着",
+      "viewAll": "GitHubですべての更新を見る"
+    }
+  },
   "hud": {
     "core": {
       "elite": "エリート",
@@ -6528,7 +6557,7 @@ export const ja_JP: EnTranslations = {
       },
       "tigers_fury": {
         "name": "狼の血",
-        "description": "攻撃力を6秒間40上昇させます。ウルフフォーム専用。"
+        "description": "攻撃力を{duration}秒間{buff}上昇させます。ウルフフォーム専用。"
       },
       "rip": {
         "name": "リップ",
@@ -6819,6 +6848,24 @@ export const ja_JP: EnTranslations = {
       },
       "eastbrook_wool_trousers": {
         "name": "イーストブルックの羊毛ズボン"
+      },
+      "eastbrook_ritual_vestments": {
+        "name": "イーストブルックの儀式衣装"
+      },
+      "eastbrook_druids_hide": {
+        "name": "イーストブルックのドルイドの皮"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "イーストブルックの守護レギンス"
+      },
+      "wardweave_cowl": {
+        "name": "ワードウィーヴのフード"
+      },
+      "duskhide_wraps": {
+        "name": "ダスクハイドの手甲"
+      },
+      "sootscale_mantle": {
+        "name": "ススウロコのマント"
       },
       "gravecaller_blade": {
         "name": "グレイブコーラーの大刃"

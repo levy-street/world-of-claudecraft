@@ -21,150 +21,150 @@ export const tr_TR: EnTranslations = {
     "rpPvp": "RP-PvP"
   },
   "devCommand": {
-    "dialogLabel": "Developer Command Center",
-    "kicker": "Development tools",
-    "title": "Command Center",
-    "subtitle": "Authoritative test controls for the active world.",
-    "closeAria": "Close developer commands",
-    "categoryNavAria": "Developer command categories",
+    "dialogLabel": "Geliştirici Komuta Merkezi",
+    "kicker": "Geliştirme araçları",
+    "title": "Komuta Merkezi",
+    "subtitle": "Etkin dünya için yetkili test denetimleri.",
+    "closeAria": "Geliştirici komutlarını kapat",
+    "categoryNavAria": "Geliştirici komutu kategorileri",
     "categories": {
-      "player": "Player",
-      "spawns": "Spawns",
-      "inventory": "Inventory",
-      "progress": "Progress",
-      "travel": "Travel",
-      "scenarios": "Scenarios"
+      "player": "Oyuncu",
+      "spawns": "Oluşturulanlar",
+      "inventory": "Envanter",
+      "progress": "İlerleme",
+      "travel": "Seyahat",
+      "scenarios": "Senaryolar"
     },
-    "filterLabel": "Filter commands",
-    "filterPlaceholder": "Search this category",
-    "noMatches": "No matching commands.",
-    "serverRequirement": "Server cheats still require ALLOW_DEV_COMMANDS=1.",
-    "invalidValues": "Choose valid values before running this command.",
-    "sent": "Sent: {command}",
-    "run": "Run",
+    "filterLabel": "Komutları filtrele",
+    "filterPlaceholder": "Bu kategoride ara",
+    "noMatches": "Eşleşen komut yok.",
+    "serverRequirement": "Sunucu hileleri için yine de ALLOW_DEV_COMMANDS=1 gerekir.",
+    "invalidValues": "Bu komutu çalıştırmadan önce geçerli değerler seç.",
+    "sent": "Gönderildi: {command}",
+    "run": "Çalıştır",
     "fields": {
-      "level": "Level",
-      "mob": "Mob",
-      "count": "Count",
-      "item": "Item",
-      "gold": "Gold",
-      "quest": "Quest",
-      "profession": "Profession",
-      "amount": "Amount",
+      "level": "Seviye",
+      "mob": "Yaratık",
+      "count": "Sayı",
+      "item": "Öğe",
+      "gold": "Altın",
+      "quest": "Görev",
+      "profession": "Meslek",
+      "amount": "Miktar",
       "x": "X",
       "z": "Z",
-      "dungeon": "Dungeon",
-      "difficulty": "Difficulty",
-      "name": "Name"
+      "dungeon": "Zindan",
+      "difficulty": "Zorluk",
+      "name": "Ad"
     },
     "difficulty": {
       "normal": "Normal",
-      "heroic": "Heroic"
+      "heroic": "Kahramanca"
     },
     "actions": {
       "heal": {
-        "label": "Restore health",
-        "description": "Fill the health pool."
+        "label": "Canı yenile",
+        "description": "Can havuzunu tamamen doldur."
       },
       "resource": {
-        "label": "Restore resource",
-        "description": "Fill mana, rage, or energy."
+        "label": "Kaynağı yenile",
+        "description": "Mana, öfke veya enerjiyi doldur."
       },
       "cooldowns": {
-        "label": "Clear cooldowns",
-        "description": "Reset ability, GCD, and potion timers."
+        "label": "Bekleme sürelerini temizle",
+        "description": "Yetenek, GCD ve iksir sayaçlarını sıfırla."
       },
       "god": {
-        "label": "Toggle god mode",
-        "description": "Toggle invulnerability and boosted damage."
+        "label": "Tanrı modunu aç veya kapat",
+        "description": "Dokunulmazlığı ve artırılmış hasarı aç veya kapat."
       },
       "revive": {
-        "label": "Revive",
-        "description": "Revive through the normal resurrection path."
+        "label": "Diril",
+        "description": "Normal dirilme sürecini kullanarak diril."
       },
       "kill": {
-        "label": "Kill player",
-        "description": "Test death, ghost, and corpse flows."
+        "label": "Oyuncuyu öldür",
+        "description": "Ölüm, hayalet ve ceset durumlarını sına."
       },
       "combatreset": {
-        "label": "Reset combat",
-        "description": "Clear combat state and hostile threat."
+        "label": "Savaşı sıfırla",
+        "description": "Savaş durumunu ve düşman tehdit değerini temizle."
       },
       "level": {
-        "label": "Set level",
-        "description": "Set the current character level."
+        "label": "Seviyeyi ayarla",
+        "description": "Mevcut karakter seviyesini ayarla."
       },
       "spawn": {
-        "label": "Spawn mob",
-        "description": "Create a concrete mob near the player."
+        "label": "Yaratık oluştur",
+        "description": "Oyuncunun yakınında belirli bir yaratık oluştur."
       },
       "killtarget": {
-        "label": "Kill target",
-        "description": "Kill the selected living mob."
+        "label": "Hedefi öldür",
+        "description": "Seçili canlı yaratığı öldür."
       },
       "despawntarget": {
-        "label": "Despawn target",
-        "description": "Remove a selected mob created by this tool."
+        "label": "Hedefi kaldır",
+        "description": "Bu araçla oluşturulan seçili yaratığı kaldır."
       },
       "despawnall": {
-        "label": "Clear my spawns",
-        "description": "Remove every mob spawned by this developer."
+        "label": "Oluşturduklarımı temizle",
+        "description": "Bu geliştiricinin oluşturduğu tüm yaratıkları kaldır."
       },
       "give": {
-        "label": "Give item",
-        "description": "Add an item to the player inventory."
+        "label": "Öğe ver",
+        "description": "Oyuncu envanterine bir öğe ekle."
       },
       "gold": {
-        "label": "Add gold",
-        "description": "Add gold to the current purse."
+        "label": "Altın ekle",
+        "description": "Mevcut keseye altın ekle."
       },
       "quest": {
-        "label": "Complete quest",
-        "description": "Complete a specific quest by id."
+        "label": "Görevi tamamla",
+        "description": "Kimliğine göre belirli bir görevi tamamla."
       },
       "quests": {
-        "label": "Complete active quests",
-        "description": "Complete every quest in the current log."
+        "label": "Etkin görevleri tamamla",
+        "description": "Mevcut görev günlüğündeki tüm görevleri tamamla."
       },
       "attune": {
-        "label": "Unlock attunements",
-        "description": "Mark all attunement requirements complete."
+        "label": "Uyumlanmaları aç",
+        "description": "Tüm uyumlanma gereksinimlerini tamamlanmış olarak işaretle."
       },
       "gather": {
-        "label": "Grant gathering skill",
-        "description": "Increase a gathering profession."
+        "label": "Toplama becerisi ver",
+        "description": "Bir toplama mesleğini geliştir."
       },
       "teleport": {
-        "label": "Teleport",
-        "description": "Move to exact world coordinates."
+        "label": "Işınlan",
+        "description": "Kesin dünya koordinatlarına git."
       },
       "dungeon": {
-        "label": "Enter dungeon",
-        "description": "Enter a dungeon with dev gate bypass."
+        "label": "Zindana gir",
+        "description": "Geliştirici erişim kontrolünü atlayarak bir zindana gir."
       },
       "raid": {
-        "label": "Enter raid",
-        "description": "Enter the Nythraxis arena directly."
+        "label": "Akına gir",
+        "description": "Doğrudan Nythraxis arenasına gir."
       },
       "raidreset": {
-        "label": "Reset raid lockout",
-        "description": "Clear the current raid lockouts."
+        "label": "Akın kilidini sıfırla",
+        "description": "Mevcut akın kilitlerini temizle."
       },
       "bot": {
-        "label": "Spawn social bot",
-        "description": "Create a whisperable stationary player."
+        "label": "Sosyal bot oluştur",
+        "description": "Fısıltı gönderilebilen sabit bir oyuncu oluştur."
       },
       "lfgqueue": {
-        "label": "Seed finder queue",
-        "description": "Create a Dungeon Finder queue scenario."
+        "label": "Bulucu kuyruğunu doldur",
+        "description": "Bir Zindan Bulucu kuyruğu senaryosu oluştur."
       },
       "lfgraid": {
-        "label": "Seed raid finder",
-        "description": "Create a raid finder scenario."
+        "label": "Akın bulucuyu doldur",
+        "description": "Bir akın bulucu senaryosu oluştur."
       },
       "lfgboard": {
-        "label": "Seed listing board",
-        "description": "Create a premade listing scenario."
+        "label": "İlan panosunu doldur",
+        "description": "Hazır bir grup ilanı senaryosu oluştur."
       }
     }
   },
@@ -351,7 +351,7 @@ export const tr_TR: EnTranslations = {
       "remainingLessThanMinute": "<1dk",
       "remainingMinutes": "{minutes}dk",
       "remainingHoursMinutes": "{hours}sa {minutes}dk",
-      "remainingDaysHours": "{days}d {hours}h",
+      "remainingDaysHours": "{days} gün {hours} saat",
       "score": "Skor",
       "walletValue": "Cüzdan Değeri (WOC)",
       "usd": "{amount} USD",
@@ -391,7 +391,7 @@ export const tr_TR: EnTranslations = {
         "under_minimum": "Cüzdan, 20 USD değerindeki WOC alt sınırının altında.",
         "price_unavailable": "WOC fiyatı alınamıyor, ödüller geçici olarak kilitli.",
         "banned": "Günlük Ödüllerden yasaklandın. Gerekçe: {reason}",
-        "bannedUntil": "You are banned from Daily Rewards for another {remaining}. Access returns {until}. Reason: {reason}"
+        "bannedUntil": "Günlük Ödüller'e erişim yasağın {remaining} daha sürecek. Erişim {until} tarihinde geri açılır. Gerekçe: {reason}"
       }
     },
     "wocStore": {
@@ -996,6 +996,7 @@ export const tr_TR: EnTranslations = {
       "interfaceModeTouch": "Dokunmatik",
       "interfaceModeNote": "Otomatik, cihazınıza göre masaüstü veya dokunmatik denetimleri seçer. Klavye ve fareyi zorlamak için Masaüstü'nü seçin (klavyeli bir tablette kullanışlıdır) ya da ekran üzeri denetimler için Dokunmatik'i seçin.",
       "footstepSounds": "Ayak Sesleri",
+      "interfaceSounds": "Arayüz ve Geri Bildirim Sesleri",
       "clickFeedback": "Tıklama İşareti",
       "lockCursorOnRotate": "Döndürürken İmleci Kilitle",
       "keybindHelpLockCursorOnRotate": "Kamerayı döndürmek için sürüklerken fare imlecini pencerenin içinde tutar, böylece ekran kenarına ulaşamaz veya başka bir monitöre geçemez. Serbest imleç tercih ediyorsanız kapatın.",
@@ -1619,31 +1620,31 @@ export const tr_TR: EnTranslations = {
       "lock": "Oyuncu çerçevesini kilitle"
     },
     "partyFrames": {
-      "section": "Party and Raid Frames",
-      "unlock": "Move party and raid frames",
-      "lock": "Lock party and raid frames",
-      "style": "Frame Style",
-      "styleAutomatic": "Automatic",
-      "styleClassic": "Classic Party Frames",
-      "styleRaid": "Raid Frames",
-      "scale": "Frame Scale",
-      "width": "Frame Width",
-      "height": "Frame Height",
-      "spacing": "Frame Spacing",
-      "columns": "Raid Columns",
-      "healthText": "Health Text",
-      "healthNone": "None",
-      "healthPercent": "Percent",
-      "healthCurrent": "Current",
-      "healthCurrentMax": "Current / Max",
-      "sort": "Sort Players",
-      "sortGroup": "Group",
-      "sortRole": "Role",
-      "sortName": "Name",
-      "showResource": "Show Mana, Rage, and Energy",
-      "showAbsorbs": "Show Absorb Shields",
-      "showAuras": "Show Buffs and Debuffs",
-      "showSelf": "Show Your Frame"
+      "section": "Grup ve Akın Çerçeveleri",
+      "unlock": "Grup ve akın çerçevelerini taşı",
+      "lock": "Grup ve akın çerçevelerini kilitle",
+      "style": "Çerçeve Stili",
+      "styleAutomatic": "Otomatik",
+      "styleClassic": "Klasik Grup Çerçeveleri",
+      "styleRaid": "Akın Çerçeveleri",
+      "scale": "Çerçeve Ölçeği",
+      "width": "Çerçeve Genişliği",
+      "height": "Çerçeve Yüksekliği",
+      "spacing": "Çerçeve Aralığı",
+      "columns": "Akın Sütunları",
+      "healthText": "Can Metni",
+      "healthNone": "Yok",
+      "healthPercent": "Yüzde",
+      "healthCurrent": "Mevcut",
+      "healthCurrentMax": "Mevcut / Azami",
+      "sort": "Oyuncuları Sırala",
+      "sortGroup": "Grup",
+      "sortRole": "Rol",
+      "sortName": "Ad",
+      "showResource": "Mana, Öfke ve Enerjiyi Göster",
+      "showAbsorbs": "Soğurma Kalkanlarını Göster",
+      "showAuras": "Güçlendirmeleri ve Zayıflatmaları Göster",
+      "showSelf": "Kendi Çerçeveni Göster"
     },
     "frameReset": {
       "label": "Çerçeve Konumlarını Sıfırla"
@@ -2304,6 +2305,9 @@ export const tr_TR: EnTranslations = {
       "already_linked": "Hesabına zaten bağlı bir Steam hesabı var.",
       "account_taken": "Bu Steam hesabı zaten başka bir hesaba bağlı.",
       "upstream": "Steam yanıt vermedi. Birazdan tekrar dene."
+    },
+    "welcome": {
+      "invalid_input": "Geçersiz girdi."
     }
   },
   "guide": {
@@ -2597,7 +2601,7 @@ export const tr_TR: EnTranslations = {
       "effectsTitle": "Güçlendirmeler, zayıflatmalar ve kalabalık kontrolü",
       "effectsBody": "Birçok yetenek, süren bir etki uygular. Faydalı olanlar (güçlendirmeler) istatistiklerini yükseltir, seni kalkanla korur ya da azar azar iyileştirir; zararlı olanlar (zayıflatmalar) zamanla hasarla canını tüketir ya da seni zayıflatır. Üzerinde ne olduğunu ve ne kadar süreceğini görmek için ekranın üst köşesindeki, mini haritanın yanındaki küçük simgeleri izle.",
       "ccBody": "Kalabalık kontrolü, bir hedefin yapabileceklerini sınırlayan özel bir tür zayıflatmadır: sersemletmeler, kökler ve yavaşlatmalar, büyü okumayı durduran susturmalar, silahsızlandırmalar, korkutmalar ve bir düşmanı bir anlığına zararsız kılan dönüştürmeler. Diğer oyunculara karşı kontrol tekrarla aşınır: aynı tür çok hızlı yeniden uygulanınca önce zayıflar, sonra büsbütün etkisiz kalır; gizlilikten açılan bir sersemletme ise onu izleyen sersemletmelerden ayrı sayılır, böylece hiç kimse sonsuza dek çaresiz zincirlenemez. Dünyanın yaratıkları böyle bir kin gütmez: kontrol tekrarla onların üzerinde asla zayıflamaz; yine de en güçlü düşmanların çoğu, adlı seçkinler ve aralarındaki en güçlü şefler, hiç kontrol edilemez.",
-      "metersBody": "Bir dövüşün nasıl geçtiğini merak mı ediyorsun? Z'ye basıp grup sayaçlarını aç; bunlar grubunun hasarını, iyileştirmesini ve tehdidini karşılaşma karşılaşma toplar.",
+      "metersBody": "Bir dövüşün nasıl geçtiğini merak mı ediyorsun? Shift+H'ye basıp grup sayaçlarını aç; bunlar grubunun hasarını, iyileştirmesini ve tehdidini karşılaşma karşılaşma toplar.",
       "queueTitle": "Bir sonraki hamlen çoktan hazır",
       "queueBody": "Basışlarını kareye göre zamanlamak zorunda değilsin. Bir sonraki yeteneğine mevcut büyünün son anlarında bas; sıraya alınır ve büyü biter bitmez tetiklenir, böylece pratikli oyun boşluksuz akar. Çok erken bir basış ise basitçe reddedilir, dolayısıyla hiçbir şey boşa gitmez. Bazı yakın dövüş darbeleri de aynı şekilde çalışır, bir sonraki silah savuruşunla birlikte çıkar.",
       "deathTitle": "Düştüğünde",
@@ -2658,7 +2662,7 @@ export const tr_TR: EnTranslations = {
       "petBarTerm": "Evcil çubuğu",
       "petBarDef": "Bir Avcı ya da Karabüyücü evcilinin eklediği komut sırası: Saldır, Dur, Tahrik, Savunmacı ve Saldırgan; varsayılan olarak Ctrl artı 1'den 5'e atanmıştır.",
       "metersTerm": "Hasar sayaçları",
-      "metersDef": "Mevcut dövüş için grup skor tablosu penceresi: verilen hasar, yapılan iyileştirme ve en çok tehdidi kimin tuttuğu, karşılaşma başına tutulur. Tuş atamasıyla aç (varsayılan olarak Z).",
+      "metersDef": "Mevcut dövüş için grup skor tablosu penceresi: verilen hasar, yapılan iyileştirme ve en çok tehdidi kimin tuttuğu, karşılaşma başına tutulur. Tuş atamasıyla aç (varsayılan olarak Shift+H).",
       "targetMarkerTerm": "Hedef işareti",
       "targetMarkerDef": "Herhangi bir grup ya da akın üyesinin bir hedefin üzerine iğneleyebildiği bir simge; böylece herkes aynı hedefe yönelir ya da ondan kaçınır. Sekiz simge, simge başına bir hedef.",
       "loadoutTerm": "Düzen",
@@ -2987,6 +2991,8 @@ export const tr_TR: EnTranslations = {
       "heroicRewardsTitle": "Kahramanca Nişanları ve yükseltilmiş ganimetler",
       "heroicRewardsBody": "Kahramanca şefler bildiğin ganimeti düşürür, yükseltilmiş ve ipucunda Kahramanca olarak etiketlenmiş halde; her seferin son şefi ise başka hiçbir yerde bulunmayan epikler ekler. O son öldürme, katılan herkese Kahramanca Nişanları da bırakır: Highwatch'taki Levazımcı Vex ile harcanan bir para birimi; onun yüzük ve kolye stoğu diyardaki tek mücevherdir.",
       "heroicLockoutBody": "Normal zindanlar gün boyu koşulabilir. Kahramanca ise sabır ister: son şefin öldürülmesi, seferdeki herkesi o zindanın günde bir kahramanca temizlemesiyle kilitler ve akın her zorluk için ayrı bir günlük kilit tutar. Temizlenmiş beş oyunculu bir sefer, ceset koşuları ve ganimet için kendi grubuna açık kalır, böylece kimse orada kazandığından mahrum bırakılmaz. Akın daha katıdır: bir kez öldürmesi seni kilitledi mi, kapı günlük sıfırlanmaya dek kapalı kalır, o yüzden arenayı terk etmeden ganimetlerini topla.",
+      "resetTitle": "Resetting your instances",
+      "resetBody": "Switch difficulty while your group still holds claimed runs and the old claims linger for a while before clearing on their own. The party leader can let them go at once instead: choose Reset All Instances on their own portrait menu, or type /dungeon reset. A reset works only after the difficulty has actually been changed, only while nobody, living or fallen, remains inside, and a short cooldown separates one reset from the next. Arrive at the door on the wrong difficulty and the game says so before the run starts. The raid is never reset this way; its own lockout rules stand.",
       "templeLoreTitle": "Boğulmuş Tapınak, biraz daha derinde",
       "templeLoreBody": "Tapınağın, başka yerlerde peşine düştüğünüz tarikattan daha eski, kendi efsanesi vardır. Ay ışığını içip boğulmuşları geri veren bir gölet olan Işıltıgöl'ün kıyısında, yalnız bir gözcü solgun ışıktan bir geçidi korur. Yüzeyin altında, soğuk taştan bir merdiven ona doğru iner. Oraya batan halk bir kazayla boğulmadı: ibadet ederek suya gömülen ve şarkı söylemeyi hiç bırakmayan Solgun Koro'ydu onlar. Eski muhafızlar, sular onları almadan önce kayalara tek bir uyarı kazıdılar, Boğulmuş Ay dedikleri bir şeye bir dua; daha sağlam bir el de altına iki kelime ekledi: yalnızca uyuyor.",
       "cryptLeadTitle": "Ölülerin kapalı tutması gereken bir kapı",
@@ -3194,7 +3200,7 @@ export const tr_TR: EnTranslations = {
       "qualityNote": "Daha yüksek kalite genellikle daha iyi nitelik demektir, ama kalite bir kural değil, bir ipucudur. Sınıfınıza ve seviyenize iyi uyan bir parça, daha gösterişli olanı geçebilir.",
       "upgradeTitle": "Teçhizatınızı güncel tutun",
       "upgradeBody": "Eski bir parçayı taze bir yükseltmeyle değiştirmek, geride bıraktığınız teçhizatla kusursuz oynamaktan size daha çok şey kazandırır. Daha iyi bir şey düştüğünde ya da bir görev onu sunduğunda, alın. İyi eşyalarınızı sonraya saklamayın.",
-      "itemLevelBody": "İki parçayı karşılaştırmanın hızlı bir yolunu istiyorsanız, seçeneklerden Eşya Seviyesini Göster ayarını açın. Dünyada, düşmanlardan ve görevlerden kazanılan teçhizat o zaman bir eşya seviyesi gösterir; nereden geldiğine bağlı olarak kabaca ne kadar güçlü olduğunu belirten tek bir rakam. Böylece farklı yuvalar arasında bile hangi yükseltmenin daha ağır bastığını bir bakışta anlayabilirsiniz. Sıradan satıcı mallarıyla başlangıç teçhizatı gibi böyle bir kaynağı olmayan parçalar eşya seviyesi göstermez; yani eksik bir rakam kusur değil, normaldir.",
+      "itemLevelBody": "If you want a quick way to compare two pieces, turn on Show Item Level in the options. Gear with a known source, from enemies, quests, and the crafting trades, then shows an item level, a single figure for roughly how powerful it is based on where it came from, so you can tell at a glance which upgrade pulls more weight, even across different slots. Pieces with no such source, like plain vendor basics and starter gear, show no item level, so a missing figure is normal, not a fault.",
       "sourcesTitle": "Teçhizat nereden gelir",
       "sourcesBody": "Erken dönem yükseltmelerinizin çoğu görev ödülleridir, bu yüzden grindlemek yerine görevleri bitirmek işe yarar. Düşmanlar yendiğinizde teçhizat düşürür, kasabadaki satıcılar sağlam temel parçalar satar, zanaatkârlar toplanan malzemeleri giyilebilir parçalara dönüştürür ve oyuncu pazarı diğer maceracılardan alışveriş yapmanızı sağlar. Tepenin zirvesinde, başka hiçbir yerde bulunmayan teçhizatı iki nişan para birimi satın alır: mağara seferi bekçisindeki Mağara Nişanları ve Kahramanca Levazımcı'daki Kahramanca Nişanlar.",
       "soulboundTitle": "Ruha bağlı: yalnızca ve yalnızca sizin",
@@ -3237,8 +3243,8 @@ export const tr_TR: EnTranslations = {
       "craftRingBody": "On zanaat sabit bir halkaya dizilmiştir ve bir zanaatın o halkadaki yeri önemlidir: çark üzerinde yan yana duran zanaatlar, karşı taraftakilere kıyasla birbirleriyle daha çok ortaklık taşır. Bir zanaata bağlanmak, yalıtılmış bir beceri seçmek gibi değil, akraba işlerden oluşan bir aileye katılmak gibi hissettirmelidir.",
       "craftRecipesTitle": "Tarifler ve malzemeler",
       "craftRecipesBody": "Her tarif, topladığın ya da satın aldığın belirli malzemeleri ister. En basit tarifler sıradan malzemeden başkasını istemez ve en baştan üretilebilir; böylece bir zanaatı edindiğin an işlemeye başlayabilirsin. Tarif listeleri hala doluyor: birkaç zanaat henüz ilk tariflerini bekliyor ve zanaatlar geliştikçe daha fazlası ekleniyor.",
-      "craftHowTitle": "Üretim penceresi",
-      "craftHowBody": "Bildiğin her tarifi, her birinin neye ihtiyaç duyduğunu ve elinde ne olduğunu görmek için Üretim penceresini aç (varsayılan tuş T); malzemeler oradaysa, bir tıklama işi görür. Sıradan tarifler dünyanın her yerinde üretilebilir. Bir avuç ileri düzey alet tarifi ise Highwatch'taki üretim merkezinde durmanı ister.",
+      "craftHowTitle": "The crafting window",
+      "craftHowBody": "Open the Crafting window (default key T) to see every recipe you know, what each one needs, and what you have on hand; when the materials are there, one click does the work. Common recipes can be crafted anywhere in the world. A handful of advanced recipes, higher-tier tools and rare caster armor among them, instead ask you to stand at the crafting hub in Highwatch.",
       "craftMasteryTitle": "Beceri ve ustalık",
       "craftMasteryBody": "Başarılı her üretim o zanaattaki becerini geliştirir ve beceri bir zanaatın tariflerini asla kilit altında tutmaz: bir tarifi biliyor ve malzemelerine sahipsen onu deneyebilirsin. Becerinin sana kazandırdığı şey bunun yerine kalitedir; usta bir el daha iyi işler çıkarır. Tek istisna birleşim tarifleridir; bunlar açılmadan önce her iki zanaatta da kendini kanıtlamış olmanı ister.",
       "craftComboTitle": "Birleşim tarifleri",
@@ -5000,6 +5006,29 @@ export const tr_TR: EnTranslations = {
     "body": "Oyun hizmetini yeniden başlatıyoruz ve Claudemoon'un kısa süre içinde geri döneceğini umuyoruz. Bu sayfa otomatik olarak denetlemeye devam edecek.",
     "status": "Birazdan döneriz"
   },
+  "welcome": {
+    "back": "Tekrar hoş geldin, {name}",
+    "level": "Seviye {level}",
+    "lastPlayed": "Son oynama tarihi: {when}",
+    "continue": "Dünyaya Gir",
+    "continueHint": "Devam etmek için Enter'a, atlamak için Esc'ye bas",
+    "continueHintTouch": "Devam etmek için dokun",
+    "discord": {
+      "title": "Topluluk Discord'da yaşıyor",
+      "sub": "Yama ön izlemeleri, etkinlikler, geliştirici sohbeti ve Discord hesabını bağlayınca 2 bonus banka yuvası.",
+      "join": "Discord topluluğumuza katıl"
+    },
+    "chest": {
+      "ready": "Günlük sandık hazır"
+    },
+    "armory": {
+      "cta": "Dünyaya gir ve Cephaneliğe göz at"
+    },
+    "news": {
+      "new": "Yeni",
+      "viewAll": "GitHub'daki tüm güncellemeleri görüntüle"
+    }
+  },
   "hud": {
     "core": {
       "elite": "SEÇKİN",
@@ -6528,7 +6557,7 @@ export const tr_TR: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Kurt Kanı",
-        "description": "Saldırı gücünü 6 saniye boyunca 40 artırır. Yalnızca Kurt Formu."
+        "description": "Saldırı gücünü {duration} saniye boyunca {buff} artırır. Yalnızca Kurt Formu."
       },
       "rip": {
         "name": "Parçalama",
@@ -6819,6 +6848,24 @@ export const tr_TR: EnTranslations = {
       },
       "eastbrook_wool_trousers": {
         "name": "Doğudere Yün Pantolonu"
+      },
+      "eastbrook_ritual_vestments": {
+        "name": "Doğudere Ayin Cübbesi"
+      },
+      "eastbrook_druids_hide": {
+        "name": "Doğudere Druidinin Postu"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "Doğudere Koruma Tozlukları"
+      },
+      "wardweave_cowl": {
+        "name": "Koruma Dokumalı Başlık"
+      },
+      "duskhide_wraps": {
+        "name": "Alacakaranlık Postu Sargıları"
+      },
+      "sootscale_mantle": {
+        "name": "İs Pulu Pelerini"
       },
       "gravecaller_blade": {
         "name": "Mezarçağıran'ın Geniş Kılıcı"

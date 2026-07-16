@@ -30,13 +30,15 @@ Subdirectories (plus one shared fixture):
 - `browser/`: OPT-IN real-browser Playwright suite (`*.browser.test.ts`,
   `npm run test:browser`) for WebKit/Safari CSS, axe, target-size; never a bare `vitest run`.
 - `progression/`: mirrors `src/sim/progression/` (unit tests for the extracted modules).
-- `helpers/` + `util/`: shared cross-suite utilities (`i18n_determinism.ts`, `alloc_probe.ts`).
+- `helpers/` + `util/`: shared cross-suite utilities (`fake_dom.ts`, the reusable
+  hand-rolled fake DOM for controller suites, `i18n_determinism.ts`, `alloc_probe.ts`).
 - `global_setup.ts`: runs on every vitest invocation (`vite.config.ts` `test.globalSetup`);
   mints the SFX Studio temp root (`WOC_SFX_STUDIO_TEST_ROOT`).
 
 ## The core idiom (sim tests)
 Most files construct a `Sim` and advance fixed ticks. Sim test files redefine small
-local helpers (shared fakes are a `tests/server/` thing); copy the pattern from `sim.test.ts`:
+local helpers (cross-suite fakes live in `tests/server/helpers/` and `tests/helpers/`);
+copy the pattern from `sim.test.ts`:
 
 ```ts
 const makeSim = (cls='warrior', seed=42) => new Sim({ seed, playerClass: cls, autoEquip: true });
@@ -102,10 +104,12 @@ yourself or the S3 guard throws "status.json is missing".
 - **DOM in tests, the two-branch rule.** The default Vitest env is plain Node (no
   `document`/`window`). Game-HUD/UI tests stay there: stub a single global on `globalThis`
   (`localStorage` in `keybinds.test.ts`, `WebSocket` in `snapshots.test.ts`) or build a small
-  **hand-rolled fake DOM** modeling only the contract under test (`focus_manager.test.ts`,
-  `painter_host.test.ts`); never jsdom. The sanctioned jsdom branch is the Svelte admin suite
-  (`tests/admin/`, per-file `// @vitest-environment jsdom` docblock plus `import './_setup'`)
-  and the DOM-download tests (`desktop_download_dom.test.ts`, `corpse_harvest_window.test.ts`);
-  jsdom stays scoped per-file so the hundreds of Node-env files keep the fast default.
+  **hand-rolled fake DOM** modeling only the contract under test (reuse
+  `tests/helpers/fake_dom.ts` before hand-rolling a new one; `focus_manager.test.ts`,
+  `painter_host.test.ts`); prefer these for pure cores and painters. A HUD controller/window
+  suite that needs a real DOM tree opts in with a per-file `// @vitest-environment jsdom`
+  docblock (`fiesta_controller.test.ts`; the Svelte admin suite in `tests/admin/` additionally
+  imports `./_setup`); jsdom stays scoped per-file so the Node-env majority keeps the fast
+  default.
   Enumerate the live jsdom set with `grep -rl '@vitest-environment jsdom' tests/`.
 - Add/update a test here when you change sim or server behavior (see root CLAUDE.md).

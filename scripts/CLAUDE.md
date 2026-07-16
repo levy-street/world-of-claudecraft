@@ -36,7 +36,7 @@ imported by a type-checked Vitest suite carries a hand-written `.d.mts` next to 
 | Browser E2E (offline) | `smoke_browser.mjs`, `smoke_mage.mjs`, `smoke_rogue.mjs`, `check_directions.mjs` | dev |
 | MP E2E (browser) | `mp_browser.mjs`, `mp_combat_visibility.mjs`, `market_mp_e2e.mjs` | dev + server |
 | MP integration (ws) | `mp_integration.mjs`, `chat_e2e.mjs`, `chat_log_persistence.mjs`, `social_e2e.mjs`, `crypt_raid.mjs` | server (+`ALLOW_DEV_COMMANDS=1` for raid) |
-| Season 1 Armory | `armory_skins_e2e.mjs` (ws: buy/apply/wire/reconnect, 19 checks), `armory_visual_e2e.mjs` (browser: browse/inspect/buy/apply + screenshots), `armory_thumbs.mjs` (+ `armory_thumbs_entry.js`: pre-render the store thumbnails to `public/ui/store/armory/`), `browser_path_resolve.mjs` (lazy browser resolver for the asset pipeline) | server + economy service (+ dev for visual) / none (thumbs) |
+| Season 1 Armory | `armory_skins_e2e.mjs` (ws: buy/apply/wire/reconnect), `armory_visual_e2e.mjs` (browser: browse/inspect/buy/apply + screenshots), `armory_thumbs.mjs` (+ `armory_thumbs_entry.js`: pre-render the store thumbnails to `public/ui/store/armory/`), `browser_path_resolve.mjs` (lazy browser resolver for the asset pipeline) | server + economy service (+ dev for visual) / none (thumbs) |
 | Security | `ws_security_e2e.mjs` (server), `malware_scan.mjs` (release-gate malicious-code flagger over the whole tree): `security:scan` exits 1 on ANY finding (most are expected false positives an agent triages); `security:gate` (CI) fails only on a HIGH finding surviving the path-aware priors (catalog: `docs/security/malware-scan-catalog.md`) | server / none |
 | PR automation | `pr_screenshots.mjs` + `pr_shot_targets.mjs` + `pr_comment_shots.mjs` (+ `gh_image_host.mjs`, `gh_sticky_comment.mjs`) produce and post the PR screenshots the root workflow requires; `prepare_ai_review.mjs` + `post_ai_review.mjs` + `redact_secrets.mjs` power the CI review bot. See `docs/ai-pr-bot.md`. | dev / CI |
 | Perf / profiling | `profile.mjs` (scenario CLI, see its `SCENARIOS` map) over `scripts/profiler/` (own CLAUDE.md); `perf_tour.mjs` (`perf:tour`), `prewarm_travel_bench.mjs` (`perf:prewarm`), `server_load_jitter.mjs` (`perf:load`), `feel_smoke.mjs` (`feel:smoke`), `asset_budget.mjs` (`asset:budget`) | dev (some + server) |
@@ -71,7 +71,10 @@ imported by a type-checked Vitest suite carries a hand-written `.d.mts` next to 
   test into its own module if it is buried), then the smallest change that turns it green.
 - **Browser E2E / tour:** copy `smoke_browser.mjs` / `visual_tour.mjs`; import
   `BROWSER_PATH` from `./browser_path.mjs`, read state through `window.__game`,
-  `mkdirSync('tmp')` before screenshots.
+  `mkdirSync('tmp')` before screenshots. Offline shot and tour scripts enter the running
+  game via `enterOfflineGame` (`scripts/enter_offline_game.mjs`), which also dismisses the
+  intro, tutorial, and camera-prompt overlays that must never appear in a captured
+  screenshot, rather than re-implementing the entry flow.
 - **MP integration:** copy `mp_integration.mjs`; reuse its `Client` class + merge helpers.
 
 ## Never

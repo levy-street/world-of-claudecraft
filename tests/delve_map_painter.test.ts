@@ -13,8 +13,8 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { DELVE_MODULE_LAYOUTS } from '../src/sim/delve_layout';
-import { delveLocalToCanvas, delveSchematicStatic } from '../src/ui/delve_map';
-import { delveDrawModel } from '../src/ui/delve_map_painter';
+import { delveLocalToCanvas, delveSchematicStatic } from '../src/ui/hud/delve/delve_map';
+import { delveDrawModel } from '../src/ui/hud/delve/delve_map_painter';
 import type { IWorld } from '../src/world_api';
 
 // --- Pure draw model: Sim-vs-ClientWorld parity + both-sites determinism --------
@@ -176,7 +176,10 @@ describe('delveDrawModel (pure draw model)', () => {
 // --- No-magic-values canvas guard (MANDATORY for a Canvas painter) --
 
 describe('delve_map_painter: no magic values', () => {
-  const src = readFileSync(new URL('../src/ui/delve_map_painter.ts', import.meta.url), 'utf8');
+  const src = readFileSync(
+    new URL('../src/ui/hud/delve/delve_map_painter.ts', import.meta.url),
+    'utf8',
+  );
   // Drop comments so prose can't create a false positive (mirrors architecture.test).
   const code = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
 
@@ -220,7 +223,10 @@ describe('delve_map_painter: no magic values', () => {
 // real text node (setText -> textContent), which IS in scope.
 
 describe('vendor window WCAG-chrome (compositional, markup intact)', () => {
-  const vendor = readFileSync(new URL('../src/ui/vendor_window.ts', import.meta.url), 'utf8');
+  const vendor = readFileSync(
+    new URL('../src/ui/hud/vendor/vendor_window.ts', import.meta.url),
+    'utf8',
+  );
 
   it('composes the PainterHostPresentation base', () => {
     expect(vendor).toContain('extends PainterHostPresentation');
