@@ -5015,6 +5015,16 @@ function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): void {
   if (am) {
     if (am.costPct) entry.cost = Math.max(0, Math.round(entry.cost * (1 + am.costPct)));
     if (am.castPct) entry.castTime = Math.max(0, entry.castTime * (1 + am.castPct));
+    if (am.channelDurationPct && entry.def.channel) {
+      const multiplier = 1 + am.channelDurationPct;
+      entry.def = {
+        ...entry.def,
+        channel: {
+          duration: entry.def.channel.duration * multiplier,
+          ticks: Math.max(1, Math.round(entry.def.channel.ticks * multiplier)),
+        },
+      };
+    }
     if (am.cooldownPct) entry.cooldown = Math.max(0, entry.cooldown * (1 + am.cooldownPct));
     if (am.castWhileMoving) entry.castWhileMoving = true;
     if (am.damagePushbackImmune) entry.damagePushbackImmune = true;

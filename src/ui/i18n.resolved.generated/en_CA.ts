@@ -6028,7 +6028,7 @@ export const en_CA: EnTranslations = {
       },
       "mind_flay": {
         "name": "Litany of Woe",
-        "description": "Assaults the target's mind with Shadow energy, causing {damage} damage each second for 3 sec."
+        "description": "Assaults the target's mind with Shadow energy for 3 sec. Each successive tick deals 30% more Shadow damage than the first."
       },
       "flash_heal": {
         "name": "Urgent Prayer",

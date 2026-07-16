@@ -69,6 +69,7 @@ export interface AbilityModEffect {
   costPct?: number;
   cooldownPct?: number;
   castPct?: number;
+  channelDurationPct?: number;
   buffPct?: number;
   castWhileMoving?: boolean;
   damagePushbackImmune?: boolean;
@@ -208,6 +209,7 @@ export interface ResolvedAbilityMod {
   costPct: number;
   cooldownPct: number;
   castPct: number;
+  channelDurationPct: number;
   buffPct: number;
   castWhileMoving: boolean;
   damagePushbackImmune: boolean;
@@ -473,6 +475,7 @@ function zeroAbilityMod(): ResolvedAbilityMod {
     costPct: 0,
     cooldownPct: 0,
     castPct: 0,
+    channelDurationPct: 0,
     buffPct: 0,
     castWhileMoving: false,
     damagePushbackImmune: false,
@@ -566,6 +569,7 @@ export function accumulateTalentEffect(
     target.costPct += (ability.costPct ?? 0) * multiplier;
     target.cooldownPct += (ability.cooldownPct ?? 0) * multiplier;
     target.castPct += (ability.castPct ?? 0) * multiplier;
+    target.channelDurationPct += (ability.channelDurationPct ?? 0) * multiplier;
     target.buffPct += (ability.buffPct ?? 0) * multiplier;
     target.bonusCharges += (ability.bonusCharges ?? 0) * multiplier;
     if (ability.castWhileMoving) target.castWhileMoving = true;

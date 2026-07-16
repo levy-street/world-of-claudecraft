@@ -1457,14 +1457,14 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 17,
       theme: 'resilience',
-      decision: 'instant self-heal vs stronger party fortitude vs reactive ward',
+      decision: 'long Litany commitment vs stronger party fortitude vs reactive ward',
       options: [
         {
-          id: 'pri_r17_desperate_prayer',
-          name: 'Last Prayer',
-          description: 'Grants Last Prayer.',
-          icon: 'desperate_prayer',
-          effect: { grant: { ability: 'desperate_prayer' } },
+          id: 'pri_r17_ninefold_litany',
+          name: 'Ninefold Litany',
+          description: 'Litany of Woe channels for 9 sec and strikes 9 times.',
+          icon: 'mind_flay',
+          effect: { ability: [{ ability: 'mind_flay', channelDurationPct: 2 }] },
         },
         {
           id: 'pri_r17_improved_fortitude',

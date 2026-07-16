@@ -1,18 +1,27 @@
 import { describe, expect, it } from 'vitest';
 import { updateCasting } from '../src/sim/combat/casting_lifecycle';
 import { rampedDrainTickDamage } from '../src/sim/combat/channel_effects';
-import { MOBS } from '../src/sim/data';
+import { rowForLevel, TALENTS, validateTalentTree } from '../src/sim/content/talents';
+import { ABILITIES, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { advancePendingProjectiles } from '../src/sim/projectile_travel';
 import { Sim } from '../src/sim/sim';
 
-function runLitany(seed: number): {
+function runLitany(
+  seed: number,
+  talentId?: string,
+): {
   amounts: number[];
   draws: number[];
   healthLost: number;
+  duration: number;
+  ticks: number;
 } {
   const sim = new Sim({ seed, playerClass: 'priest', autoEquip: false });
   sim.setPlayerLevel(20);
+  if (talentId) {
+    expect(sim.applyTalents({ spec: null, rows: { 17: talentId } })).toBe(true);
+  }
   sim.player.spellPower = 0;
   sim.player.resource = sim.player.maxResource;
 
@@ -30,6 +39,9 @@ function runLitany(seed: number): {
 
   const meta = sim.meta(sim.playerId);
   if (!meta) throw new Error('missing priest metadata');
+  const litany = sim.resolvedAbility('mind_flay');
+  if (!litany?.def.channel) throw new Error('missing Litany channel');
+  const { duration, ticks } = litany.def.channel;
   const draws: number[] = [];
   sim.rng.setObserver((value) => draws.push(value));
 
@@ -49,7 +61,7 @@ function runLitany(seed: number): {
     .flatMap((event) =>
       event.type === 'damage' && event.ability === 'Litany of Woe' ? [event.amount] : [],
     );
-  return { amounts, draws, healthLost: target.maxHp - target.hp };
+  return { amounts, draws, healthLost: target.maxHp - target.hp, duration, ticks };
 }
 
 describe('Litany of Woe channel effects', () => {
@@ -73,5 +85,26 @@ describe('Litany of Woe channel effects', () => {
 
     expect(replay.amounts).toEqual(first.amounts);
     expect(replay.draws).toEqual(first.draws);
+  });
+
+  it('triples duration and ticks with the level-17 Ninefold Litany choice', () => {
+    const result = runLitany(39_109, 'pri_r17_ninefold_litany');
+
+    expect(result.duration).toBe(9);
+    expect(result.ticks).toBe(9);
+    expect(result.amounts).toEqual([12, 16, 19, 23, 26, 30, 34, 37, 41]);
+    expect(result.amounts.at(-1)).toBeGreaterThan(19);
+    expect(result.draws).toHaveLength(9);
+    expect(ABILITIES.mind_flay.channel).toEqual({ duration: 3, ticks: 3 });
+  });
+
+  it('places the Litany choice after its level-16 prerequisite and keeps the tree valid', () => {
+    const row = rowForLevel('priest', 17);
+    const choice = row?.options.find((option) => option.id === 'pri_r17_ninefold_litany');
+
+    expect(choice).toBeDefined();
+    expect(choice?.effect.ability?.[0]?.ability).toBe('mind_flay');
+    expect(ABILITIES.mind_flay.learnLevel).toBeLessThanOrEqual(17);
+    expect(validateTalentTree(TALENTS.priest)).toEqual([]);
   });
 });

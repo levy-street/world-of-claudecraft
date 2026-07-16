@@ -282,6 +282,14 @@ chance before venting the bank across a pack. Icefall adds no random draws. Fros
 draw only on a Cryomancy Mage's landed Rimelance, and Fulmination adds one draw only on a
 talented Shaman's landed Arc Bolt while Thunder Ward is active.
 
+### Shadow DoT-weaver and ramping Litany
+
+Shadow's baseline Litany of Woe is a 30-yard, three-second channel whose second and third
+ticks deal 30% and 60% more damage than its first tick. Ninefold Litany occupies a level-17
+choice because Litany itself is learned at level 16. It triples the channel to nine seconds
+and nine ticks, preserving the one-second cadence so the ordinal ramp reaches a much higher
+ceiling. The choice asks the priest to trade mobility for a long, rooted damage commitment.
+
 ### PBE-2 mage feedback pass
 
 - Flickerstep is baseline for every Mage at level 5. Frigid Reversal replaces its old
