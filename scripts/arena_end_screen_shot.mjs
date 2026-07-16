@@ -81,6 +81,34 @@ const fiestaModal = modalHtml({
   reward: '<div class="ae-reward">+18 Honor</div>',
 });
 
+const drawModal = modalHtml({
+  result: 'draw',
+  resultLabel: 'Draw',
+  ranked: true,
+  rows: [
+    { name: 'Kaelra', cls: 'Warrior', kb: 0, dmg: 96204, heal: 0, ally: true, me: true, ratingAfter: 1716, change: 0 },
+    { name: 'Duskblade', cls: 'Rogue', kb: 0, dmg: 88110, heal: 0, ally: false, me: false, ratingAfter: 1522, change: 0 },
+  ],
+  ratingLine: '<div class="ae-rating-summary">Your Rating: 1716 to 1716</div>',
+  reward: '',
+});
+
+const yumiModal = modalHtml({
+  result: 'win',
+  resultLabel: 'Victory',
+  ranked: false,
+  rows: [
+    { name: 'Kaelra', cls: 'Warrior', kb: 2, dmg: 74320, heal: 0, ally: true, me: true },
+    { name: 'Sunweaver', cls: 'Priest', kb: 0, dmg: 12040, heal: 168220, ally: true, me: false },
+    { name: 'Ashbringer', cls: 'Paladin', kb: 1, dmg: 51900, heal: 33110, ally: true, me: false },
+    { name: 'Grimjaw', cls: 'Rogue', kb: 3, dmg: 96110, heal: 0, ally: false, me: false },
+    { name: 'Mosswhisper', cls: 'Druid', kb: 1, dmg: 40220, heal: 121400, ally: false, me: false },
+    { name: 'Nightfall', cls: 'Hunter', kb: 2, dmg: 88770, heal: 0, ally: false, me: false },
+  ],
+  ratingLine: '',
+  reward: '<div class="ae-reward">+30 Honor</div>',
+});
+
 const pageFor = (modal) => `<!doctype html><html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <style>
@@ -107,6 +135,8 @@ try {
   const shots = [
     { name: 'ranked-2v2-victory-desktop', modal: rankedModal, width: 900, height: 560 },
     { name: 'fiesta-defeat-desktop', modal: fiestaModal, width: 900, height: 560 },
+    { name: 'ranked-1v1-draw-desktop', modal: drawModal, width: 900, height: 460 },
+    { name: 'yumi5-victory-desktop', modal: yumiModal, width: 900, height: 640 },
     { name: 'ranked-2v2-victory-mobile', modal: rankedModal, width: 393, height: 760 },
   ];
   for (const s of shots) {
