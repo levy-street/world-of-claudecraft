@@ -18,7 +18,7 @@ import {
   createActionBarView,
   EMPTY_ICON_KEY,
   ITEM_ICON_PREFIX,
-} from '../src/ui/action_bar_view';
+} from '../src/ui/hud/action_bar/action_bar_view';
 import { t as realT } from '../src/ui/i18n';
 import { assertAllocationStable } from './util/alloc_probe';
 

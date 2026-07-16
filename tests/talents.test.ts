@@ -903,6 +903,36 @@ describe('persisted talents are revalidated on load (FR security)', () => {
   });
 });
 
+describe('spec switch cancels orphaned form auras', () => {
+  it('drops Moonkin Form (and its buffs) when respeccing away from Balance', () => {
+    const sim = new Sim({ seed: 11, playerClass: 'druid' });
+    sim.setPlayerLevel(MAX_LEVEL);
+    expect(sim.setSpec('balance')).toBe(true);
+    sim.castAbility('moonkin_form', sim.playerId);
+    const p = sim.entities.get(sim.playerId)!;
+    expect(p.auras.some((a) => a.kind === 'form_moonkin')).toBe(true);
+    const armorInForm = p.stats.armor;
+
+    expect(sim.setSpec('restoration')).toBe(true);
+
+    expect(p.auras.some((a) => a.kind === 'form_moonkin')).toBe(false);
+    expect(p.stats.armor).toBeLessThan(armorInForm);
+  });
+
+  it('drops Gloamveil Form when respeccing a priest away from Shadow', () => {
+    const sim = new Sim({ seed: 12, playerClass: 'priest' });
+    sim.setPlayerLevel(MAX_LEVEL);
+    expect(sim.setSpec('shadow')).toBe(true);
+    sim.castAbility('shadowform', sim.playerId);
+    const p = sim.entities.get(sim.playerId)!;
+    expect(p.auras.some((a) => a.kind === 'form_shadow')).toBe(true);
+
+    expect(sim.setSpec('holy')).toBe(true);
+
+    expect(p.auras.some((a) => a.kind === 'form_shadow')).toBe(false);
+  });
+});
+
 describe('performance invariant (no per-tick tree walk)', () => {
   it('keeps the resolved known-ability set stable across many ticks', () => {
     const sim = warriorAtCap();

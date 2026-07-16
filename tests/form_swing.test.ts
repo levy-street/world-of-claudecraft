@@ -111,14 +111,19 @@ describe('Wolf Form swing speed', () => {
     giveForm(sim, a, 'form_cat', 'Wolf Form');
     const wolf = firstWhiteHit(sim, a);
 
-    // A control druid on the same staff but NOT in form: AP normalized by the slow staff.
+    // The control druid on the same staff in BEAR form: a melee shapeshift that
+    // keeps the weapon cadence, so its AP is normalized by the slow staff. (It
+    // used to be an un-shifted druid, but a caster-form druid now auto-attacks
+    // with the class wand at any range, wand-style, so it never lands a melee
+    // white hit; bear form preserves the staff-speed control this test needs.)
     const sim2 = makeWorld();
-    const b = sim2.addPlayer('druid', 'Caster');
+    const b = sim2.addPlayer('druid', 'Bruin');
     sim2.setPlayerLevel(20, b);
     sim2.tick();
+    giveForm(sim2, b, 'form_bear', 'Bear Form');
     const staff = firstWhiteHit(sim2, b);
 
-    // Wolf Form's per-swing AP uses the rogue speed (1.8); the staff druid's the staff.
+    // Wolf Form's per-swing AP uses the rogue speed (1.8); the bear druid's the staff.
     expect(wolf.amount).toBe(expectAt(wolf.ap, ROGUE_BASE_SWING_SPEED, wolf.dr));
     expect(staff.amount).toBe(expectAt(staff.ap, staffSpeed, staff.dr));
     // The bug would have been Wolf Form normalizing by the slow staff instead: prove
