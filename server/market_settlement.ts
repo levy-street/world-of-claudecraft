@@ -659,15 +659,27 @@ export class MarketSettlements {
   }
 
   private async recoverOne(rec: MarketPendingRecord): Promise<void> {
+    // A rail UNCONFIGURED at boot must never resolve an ANCHORED pending: the
+    // pre-crash payment may have committed (on-chain or on the service ledger)
+    // and without the rail there is no way to ask. Keep the lot locked and log
+    // loudly every boot until the operator restores the rail config; failing it
+    // here would strand a buyer's committed payment while returning the goods.
     if (rec.denom === 'woc') {
       const cfg = this.deps.cfg.woc;
-      if (cfg && rec.reference && rec.buyerWallet && rec.sellerWallet && rec.costWoc) {
+      const anchored = !!(rec.reference && rec.buyerWallet && rec.sellerWallet && rec.costWoc);
+      if (!cfg && anchored) {
+        console.error(
+          `[market-settle] WOC rail unconfigured at boot with an anchored pending on listing ${rec.listingId}; keeping it locked (restore WOC_TRADE_ENABLED config to resolve)`,
+        );
+        return;
+      }
+      if (cfg && anchored) {
         const res = await this.deps.wocTrade
           .verifyWocPayment(cfg, {
-            reference: rec.reference,
-            payerPubkey: rec.buyerWallet,
-            recipientPubkey: rec.sellerWallet,
-            amountUi: rec.costWoc,
+            reference: rec.reference as string,
+            payerPubkey: rec.buyerWallet as string,
+            recipientPubkey: rec.sellerWallet as string,
+            amountUi: rec.costWoc as string,
           })
           .catch(() => 'pending' as VerifyWocResult);
         if (typeof res === 'object' && 'signature' in res) {
@@ -676,24 +688,36 @@ export class MarketSettlements {
           return;
         }
       }
+      // Unverified at boot (never anchored, or the one-shot re-verify found no
+      // payment): unlock, and arm the buyer's retry cooldown exactly as a live
+      // unpaid timeout does, so a restart is not a cooldown bypass.
+      this.noteWocCooldown(rec.buyerKey);
       this.deps.sim.marketPendingFail(rec.listingId);
       return;
     }
-    if (
-      this.deps.cfg.claudium &&
-      rec.costClaudium !== undefined &&
-      Number.isSafeInteger(rec.costClaudium) &&
-      rec.costClaudium > 0 &&
-      rec.buyerAccountId !== undefined &&
-      rec.sellerAccountId !== undefined
-    ) {
+    const cost = rec.costClaudium;
+    const buyerAccountId = rec.buyerAccountId;
+    const sellerAccountId = rec.sellerAccountId;
+    const claudiumAnchored =
+      cost !== undefined &&
+      Number.isSafeInteger(cost) &&
+      cost > 0 &&
+      buyerAccountId !== undefined &&
+      sellerAccountId !== undefined;
+    if (!this.deps.cfg.claudium && claudiumAnchored) {
+      console.error(
+        `[market-settle] Claudium rail unconfigured at boot with an anchored pending on listing ${rec.listingId}; keeping it locked (restore CLAUDIUM_TRADE_ENABLED config to resolve)`,
+      );
+      return;
+    }
+    if (this.deps.cfg.claudium && claudiumAnchored) {
       const dedupeKey = this.claudiumDedupeKey(rec.listingId, rec.purchaseSeq);
       const result = await this.deps
-        .transferClaudium(rec.buyerAccountId, rec.sellerAccountId, rec.costClaudium, dedupeKey)
+        .transferClaudium(buyerAccountId, sellerAccountId, cost, dedupeKey)
         .catch(() => ({ ok: false, reason: 'unavailable' }) as ClaudiumTransferResult);
       if (result.ok) {
         this.deps.sim.marketPendingComplete(rec.listingId);
-        await this.writeLedger(rec, { claudium: rec.costClaudium });
+        await this.writeLedger(rec, { claudium: cost });
         return;
       }
       if (!claudiumRefusalIsDefinitive(result)) {
@@ -704,9 +728,9 @@ export class MarketSettlements {
           listingId: rec.listingId,
           buyerPid: this.deps.sim.marketBuyerPid(rec.buyerKey) ?? -1,
           buyerKey: rec.buyerKey,
-          fromAccountId: rec.buyerAccountId,
-          toAccountId: rec.sellerAccountId,
-          amount: rec.costClaudium,
+          fromAccountId: buyerAccountId,
+          toAccountId: sellerAccountId,
+          amount: cost,
           dedupeKey,
         });
         console.error(

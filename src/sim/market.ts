@@ -1633,6 +1633,22 @@ export class Market {
       1,
     );
     this.nextPurchaseSeq = Math.max(this.nextPurchaseSeq, save.nextPurchaseSeq ?? 1, maxSeq);
+    // The one-pending-per-buyer invariant is enforced at purchase start; a blob
+    // carrying several pendings for one buyer means tampering or corruption.
+    // Every pending is an anchored maybe-paid state, so none may be dropped
+    // here (unlocking a possibly-paid lot loses the buyer's money) - keep them
+    // all locked for boot recovery to resolve independently, and say so.
+    const pendingByBuyer = new Map<string, number>();
+    for (const l of this.marketListings) {
+      if (!l.pending) continue;
+      const n = (pendingByBuyer.get(l.pending.buyerKey) ?? 0) + 1;
+      pendingByBuyer.set(l.pending.buyerKey, n);
+      if (n === 2) {
+        console.error(
+          `[market] loaded save holds multiple pending purchases for buyer ${l.pending.buyerKey}; keeping all locked for recovery`,
+        );
+      }
+    }
     this.reclaimSoulboundListings();
   }
 

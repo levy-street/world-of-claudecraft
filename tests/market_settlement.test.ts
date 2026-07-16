@@ -718,4 +718,58 @@ describe('MarketSettlements: boot recovery from the persisted market blob', () =
     expect(boot.state.ledger[0]).toMatchObject({ context: key, claudiumA: 20 });
     expect(boot.state.transferCalls.map((c) => c.dedupeKey)).toEqual([key, key]);
   });
+
+  it('a rail UNCONFIGURED at boot keeps an anchored pending locked instead of failing it', async () => {
+    // claudium: the pre-crash transfer may have committed on the service ledger
+    const simA = makeSim();
+    const a = listAndBuyer(simA, 'claudium', { count: 2, pricePerUnit: 10 });
+    const harnessA = buildOrchestrator(simA, { transferUnavailable: true });
+    await startPurchase(simA, harnessA.orch, a.listingId, a.buyer);
+    const bootA = reboot(simA.serializeMarket(), { cfg: { claudium: false, woc: WOC_CFG } });
+    await bootA.orch.recoverPendingPurchases();
+    const listingA = bootA.sim.marketListings.find((l) => l.id === a.listingId)!;
+    expect(listingA.pending).toBeTruthy();
+    expect(bootA.state.transferCalls).toEqual([]);
+    expect(bootA.state.ledger).toEqual([]);
+
+    // woc: the pre-crash payment may have landed on-chain
+    const simB = makeSim();
+    const b = listAndBuyer(simB, 'woc', { count: 2, priceWoc: '1.5' });
+    const harnessB = buildOrchestrator(simB);
+    await startPurchase(simB, harnessB.orch, b.listingId, b.buyer);
+    const bootB = reboot(simB.serializeMarket(), { cfg: { claudium: true, woc: null } });
+    await bootB.orch.recoverPendingPurchases();
+    const listingB = bootB.sim.marketListings.find((l) => l.id === b.listingId)!;
+    expect(listingB.pending).toBeTruthy();
+    expect(bootB.state.ledger).toEqual([]);
+  });
+
+  it('an unpaid woc pending failed at boot arms the buyer cooldown (a restart is not a bypass)', async () => {
+    const sim = makeSim();
+    const { buyer, listingId } = listAndBuyer(sim, 'woc', { count: 2, priceWoc: '2' });
+    const harness = buildOrchestrator(sim);
+    await startPurchase(sim, harness.orch, listingId, buyer);
+
+    const boot = reboot(sim.serializeMarket());
+    await boot.orch.recoverPendingPurchases();
+    const listing = boot.sim.marketListings.find((l) => l.id === listingId)!;
+    expect(listing.pending).toBeUndefined();
+
+    // the same buyer (same deterministic entity id, hence the same buyerKey the
+    // cooldown was armed under) immediately retrying on the rebooted server is
+    // refused via the busy path
+    const rebornSeller = boot.sim.addPlayer('warrior', 'Seller');
+    const rebornBuyer = boot.sim.addPlayer('mage', 'Buyer');
+    expect(String(rebornBuyer)).toBe(String(buyer));
+    void rebornSeller;
+    standAtMerchant(boot.sim, rebornBuyer);
+    boot.sim.players.get(rebornBuyer)!.copper = 1_000_000;
+    await startPurchase(boot.sim, boot.orch, listingId, rebornBuyer);
+    expect(boot.sim.marketListings.find((l) => l.id === listingId)?.pending).toBeUndefined();
+
+    // once the cooldown lapses the purchase may start
+    boot.state.clock.value += 120_000 + 1;
+    await startPurchase(boot.sim, boot.orch, listingId, rebornBuyer);
+    expect(boot.sim.marketListings.find((l) => l.id === listingId)?.pending).toBeTruthy();
+  });
 });
