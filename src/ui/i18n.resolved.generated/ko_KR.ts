@@ -6823,6 +6823,24 @@ export const ko_KR: EnTranslations = {
       "eastbrook_wool_trousers": {
         "name": "이스트브룩 양모 바지"
       },
+      "eastbrook_ritual_vestments": {
+        "name": "이스트브룩 의식 예복"
+      },
+      "eastbrook_druids_hide": {
+        "name": "이스트브룩 드루이드 가죽"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "이스트브룩 방호 각반"
+      },
+      "wardweave_cowl": {
+        "name": "워드위브 두건"
+      },
+      "duskhide_wraps": {
+        "name": "더스크하이드 손목보호대"
+      },
+      "sootscale_mantle": {
+        "name": "수트스케일 망토"
+      },
       "gravecaller_blade": {
         "name": "무덤부름 넓은날검"
       },

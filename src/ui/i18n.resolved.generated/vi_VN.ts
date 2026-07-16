@@ -6823,6 +6823,24 @@ export const vi_VN: EnTranslations = {
       "eastbrook_wool_trousers": {
         "name": "Quần Len Đông Khê"
       },
+      "eastbrook_ritual_vestments": {
+        "name": "Eastbrook Ritual Vestments"
+      },
+      "eastbrook_druids_hide": {
+        "name": "Eastbrook Druid's Hide"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "Eastbrook Warded Leggings"
+      },
+      "wardweave_cowl": {
+        "name": "Wardweave Cowl"
+      },
+      "duskhide_wraps": {
+        "name": "Duskhide Wraps"
+      },
+      "sootscale_mantle": {
+        "name": "Sootscale Mantle"
+      },
       "gravecaller_blade": {
         "name": "Đại Đao Của Triệu Mộ Giả"
       },

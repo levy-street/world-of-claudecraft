@@ -12,6 +12,11 @@
 // body.mobile-touch in headless, dismissing the mobile preflight, opening a window, the
 // screenshot itself) stay in each script.
 //
+// Before returning, this also dismisses the three overlays that must never appear in a
+// captured screenshot (repo-wide rule): the first-spawn intro cinematic/logo, the
+// new-adventurer tutorial overlay, and the camera-mode-choice prompt. Every screenshot
+// script that calls enterOfflineGame gets this for free.
+//
 // opts:
 //   charClass  data-class of the class card to pick (default 'warrior')
 //   charName   name typed into #char-name when that field is present (default 'Adventurer')
@@ -45,4 +50,38 @@ export async function enterOfflineGame(page, opts = {}) {
   // does not race the loader. Falls back to the settle delay if the hook never shows.
   await page.waitForFunction(() => window.__game?.sim?.player, { timeout: 30000 }).catch(() => {});
   if (settleMs > 0) await new Promise((r) => setTimeout(r, settleMs));
+
+  await dismissEntryOverlays(page);
+}
+
+// Skip the first-spawn intro cinematic (Escape is its documented skip gesture), click any
+// "skip tutorial" button, and confirm the camera-mode-choice prompt. Polls a few rounds
+// since the intro cinematic's own listeners can attach a beat after the world boots.
+async function dismissEntryOverlays(page) {
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  for (let i = 0; i < 5; i++) {
+    const state = await page
+      .evaluate(() => {
+        const visible = (el) => !!el && getComputedStyle(el).display !== 'none';
+        const introLogo = document.getElementById('intro-logo');
+        const skipBtn = [...document.querySelectorAll('button.tut-skip')][0];
+        return {
+          introUp: visible(introLogo) || document.getElementById('ui')?.style.display === 'none',
+          tutorialUp: visible(skipBtn),
+          cameraPromptUp: visible(document.querySelector('.camera-prompt-backdrop')),
+        };
+      })
+      .catch(() => ({ introUp: false, tutorialUp: false, cameraPromptUp: false }));
+    if (!state.introUp && !state.tutorialUp && !state.cameraPromptUp) return;
+    if (state.introUp) await page.keyboard.press('Escape').catch(() => {});
+    if (state.tutorialUp) {
+      await page.evaluate(() => document.querySelector('button.tut-skip')?.click()).catch(() => {});
+    }
+    if (state.cameraPromptUp) {
+      await page
+        .evaluate(() => document.querySelector('.camera-prompt-confirm')?.click())
+        .catch(() => {});
+    }
+    await sleep(400);
+  }
 }

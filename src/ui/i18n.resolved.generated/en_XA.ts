@@ -6823,6 +6823,24 @@ export const en_XA: EnTranslations = {
       "eastbrook_wool_trousers": {
         "name": "[Éášţƀŕóóķ Ŵóóļ Ţŕóúšéŕš]"
       },
+      "eastbrook_ritual_vestments": {
+        "name": "[Éášţƀŕóóķ Ŕíţúáļ Ʋéšţɱéñţš]"
+      },
+      "eastbrook_druids_hide": {
+        "name": "[Éášţƀŕóóķ Ðŕúíð'š Ĥíðé]"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "[Éášţƀŕóóķ Ŵáŕðéð Ļéĝĝíñĝš]"
+      },
+      "wardweave_cowl": {
+        "name": "[Ŵáŕðŵéáʋé Çóŵļ]"
+      },
+      "duskhide_wraps": {
+        "name": "[Ðúšķĥíðé Ŵŕáþš]"
+      },
+      "sootscale_mantle": {
+        "name": "[Šóóţšçáļé Ɱáñţļé]"
+      },
       "gravecaller_blade": {
         "name": "[Ĝŕáʋéçáļļéŕ'š Ɓŕóáðƀļáðé]"
       },

@@ -6823,6 +6823,24 @@ export const fr_CA: EnTranslations = {
       "eastbrook_wool_trousers": {
         "name": "Pantalon de laine d'Eastbrook"
       },
+      "eastbrook_ritual_vestments": {
+        "name": "Eastbrook Ritual Vestments"
+      },
+      "eastbrook_druids_hide": {
+        "name": "Eastbrook Druid's Hide"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "Eastbrook Warded Leggings"
+      },
+      "wardweave_cowl": {
+        "name": "Wardweave Cowl"
+      },
+      "duskhide_wraps": {
+        "name": "Duskhide Wraps"
+      },
+      "sootscale_mantle": {
+        "name": "Sootscale Mantle"
+      },
       "gravecaller_blade": {
         "name": "Grande lame de Gravecaller"
       },

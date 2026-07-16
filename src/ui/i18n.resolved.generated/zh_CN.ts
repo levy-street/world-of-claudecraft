@@ -6823,6 +6823,24 @@ export const zh_CN: EnTranslations = {
       "eastbrook_wool_trousers": {
         "name": "东溪羊毛长裤"
       },
+      "eastbrook_ritual_vestments": {
+        "name": "东溪仪典法衣"
+      },
+      "eastbrook_druids_hide": {
+        "name": "东溪德鲁伊兽皮"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "东溪护法护腿"
+      },
+      "wardweave_cowl": {
+        "name": "织卫兜帽"
+      },
+      "duskhide_wraps": {
+        "name": "暮影裹手"
+      },
+      "sootscale_mantle": {
+        "name": "灰鳞披肩"
+      },
       "gravecaller_blade": {
         "name": "唤墓者宽刃剑"
       },

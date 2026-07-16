@@ -6823,6 +6823,24 @@ export const ja_JP: EnTranslations = {
       "eastbrook_wool_trousers": {
         "name": "イーストブルックの羊毛ズボン"
       },
+      "eastbrook_ritual_vestments": {
+        "name": "イーストブルックの儀式衣装"
+      },
+      "eastbrook_druids_hide": {
+        "name": "イーストブルックのドルイドの皮"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "イーストブルックの守護レギンス"
+      },
+      "wardweave_cowl": {
+        "name": "ワードウィーヴのフード"
+      },
+      "duskhide_wraps": {
+        "name": "ダスクハイドの手甲"
+      },
+      "sootscale_mantle": {
+        "name": "ススウロコのマント"
+      },
       "gravecaller_blade": {
         "name": "グレイブコーラーの大刃"
       },
