@@ -984,7 +984,7 @@ export function endArenaMatch(
       const meta = ctx.players.get(pid);
       if (!meta) continue;
       const honorBefore = meta.honor;
-      // Fiesta / yumi are unranked party play — they never move the ladder, so report
+      // Fiesta / yumi are unranked party play: they never move the ladder, so report
       // an unchanged rating; ranked bouts go through the per-bracket updater.
       let ratingBefore: number, ratingAfter: number;
       if (ranked) {

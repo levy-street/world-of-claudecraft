@@ -551,11 +551,18 @@ export function dealDamage(
   // below, plus encounter participant tracking for the roster tasks.
   if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
 
+  // Arena end-screen scoreboard: damage dealt this bout, with pet damage credited to
+  // the owner's row (the same pet -> owner resolution killing blows use in
+  // handleDeath). No-op outside a match; draws no rng.
+  if (source && source.id !== target.id) {
+    const arenaPid = source.kind === 'player' ? source.id : source.ownerId;
+    if (arenaPid !== null && arenaPid !== target.id) {
+      bumpArenaMatchStat(ctx, arenaPid, 'damageDone', amount);
+    }
+  }
   if (source && source.kind === 'player' && source.id !== target.id) {
     const meta = ctx.players.get(source.id);
     if (meta) meta.counters.damageDealt += amount;
-    // Arena end-screen scoreboard: damage dealt this bout (no-op outside a match).
-    bumpArenaMatchStat(ctx, source.id, 'damageDone', amount);
     if (source.resourceType === 'rage' && !noRage && school === 'physical' && !ability) {
       source.resource = Math.min(
         source.maxResource,

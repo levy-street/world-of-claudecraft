@@ -115,9 +115,11 @@ export function applyHeal(
   // Legendary on-heal weapon procs (e.g. Deathless Heartwood's Lifebloom). No-op
   // (no rng draw) unless the healer wields a proc weapon with a heal proc.
   runWeaponProcs(ctx, source, target, 'heal');
-  // Arena end-screen scoreboard: effective healing done this bout (no-op outside a
-  // match, and only for a player healer). Draws no rng.
-  if (source.kind === 'player') bumpArenaMatchStat(ctx, source.id, 'healingDone', healed);
+  // Arena end-screen scoreboard: effective healing done this bout, with pet healing
+  // credited to the owner's row (the same pet -> owner resolution killing blows use
+  // in handleDeath). No-op outside a match; draws no rng.
+  const arenaPid = source.kind === 'player' ? source.id : source.ownerId;
+  if (arenaPid !== null) bumpArenaMatchStat(ctx, arenaPid, 'healingDone', healed);
 }
 
 // Classic healing threat: 0.5 per point of EFFECTIVE healing (overheal is

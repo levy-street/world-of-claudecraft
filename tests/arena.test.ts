@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { arenaOrigin, isArenaPos } from '../src/sim/data';
 import { DUNGEON_WALL_X } from '../src/sim/dungeon_layout';
 import { eloDelta, Sim } from '../src/sim/sim';
-import type { PlayerClass } from '../src/sim/types';
+import type { PlayerClass, SimEvent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
 function makeWorld() {
@@ -266,6 +266,65 @@ describe('arena: a full bout', () => {
     sim.arenaQueueJoin(b);
     sim.tick();
     expect(sim.arenaMatchFor(a)).toBeTruthy();
+  });
+});
+
+describe('arena: end-of-match scoreboard', () => {
+  it('the arenaEnd event carries the full scoreboard, with pet damage and the pet killing blow credited to the owner row', () => {
+    const { sim, a, b } = queueDuo('warlock', 'mage');
+    startBout(sim);
+    const ea = sim.entities.get(a)!;
+    const eb = sim.entities.get(b)!;
+
+    // The warlock's imp does ALL of team A's damage: its damage and its killing
+    // blow must land on the OWNER's scoreboard row, not vanish with the pet.
+    (sim as any).summonPet(ea, 'emberkin');
+    const pet = sim.petOf(a)!;
+    (sim as any).dealDamage(pet, eb, 10, false, 'physical', null, 'hit');
+    expect(eb.hp).toBeLessThan(eb.maxHp);
+
+    // The mage self-heals some of it back: effective healing on their own row.
+    (sim as any).applyHeal(eb, eb, 3, 'heal');
+
+    // The imp lands the killing blow, ending the bout.
+    (sim as any).dealDamage(pet, eb, 99999, false, 'physical', null, 'hit');
+    const ev = sim.tick();
+    const ends = ev.filter(
+      (e): e is Extract<SimEvent, { type: 'arenaEnd' }> => e.type === 'arenaEnd',
+    );
+
+    // One personal event per fighter, each tagged with the viewer's own team.
+    expect(ends.length).toBe(2);
+    const endA = ends.find((e) => e.pid === a)!;
+    const endB = ends.find((e) => e.pid === b)!;
+    expect(endA.won).toBe(true);
+    expect(endB.won).toBe(false);
+    expect(endA.draw).toBe(false);
+    expect(endA.myTeam).not.toBe(endB.myTeam);
+
+    // Both events carry the SAME complete scoreboard (every participant).
+    expect(endA.scoreboard.map((r) => r.pid).sort()).toEqual([a, b].sort());
+    expect(endB.scoreboard.map((r) => r.pid).sort()).toEqual([a, b].sort());
+    const rowA = endA.scoreboard.find((r) => r.pid === a)!;
+    const rowB = endA.scoreboard.find((r) => r.pid === b)!;
+    expect(rowA.team).toBe(endA.myTeam);
+    expect(rowB.team).toBe(endB.myTeam);
+
+    // Pet credit: the imp's killing blow and damage sit on the warlock's row.
+    expect(rowA.killingBlows).toBe(1);
+    expect(rowA.damageDone).toBeGreaterThan(0);
+    expect(rowA.healingDone).toBe(0);
+    // The mage never dealt damage; their row keeps only the self-heal.
+    expect(rowB.killingBlows).toBe(0);
+    expect(rowB.damageDone).toBe(0);
+    expect(rowB.healingDone).toBeGreaterThan(0);
+
+    // Even 1500 ratings split 16 points; the winner banks honor, the loser none.
+    expect(rowA.ratingChange).toBe(16);
+    expect(rowB.ratingChange).toBe(-16);
+    expect(rowA.ratingAfter - rowA.ratingBefore).toBe(16);
+    expect(endA.honor).toBeGreaterThan(0);
+    expect(endB.honor).toBe(0);
   });
 });
 
