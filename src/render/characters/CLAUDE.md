@@ -31,7 +31,23 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
   camera/loop), driven from `src/main.ts`; `preview_appearance.ts` resolves a
   `PreviewAppearance` (class, skin, mech, mainhand) to its visual key + weapon layout.
 - `portrait.ts`: offscreen-WebGL headshot factory: renders a (class/visual-key, skin)
-  head-and-shoulders PNG from the real model, caches the data URL.
+  PNG at the requested `PortraitFraming` from the real model, caches the data URL.
+- `weapon_grip.ts`: pure, three-free per-weapon grip nudges
+  (`WEAPON_GRIP_OVERRIDES`) layered on the family `VariantGrip`; shared with
+  the asset pipeline's live inspector.
+- `weapon_skin_materials.ts`: tracks and disposes the materials a displayed
+  weapon skin owns (`tests/weapon_skin_materials.test.ts`).
+- `skin_attack.ts`: skin-driven attack-clip substitution (a bow skin swaps
+  the hunter's crossbow shot); pure over the skin catalog
+  (`tests/weapon_skins.test.ts`).
+- `back_grips.ts`: back-carry transforms for sheathed weapons on the chest
+  bone; pure data + math (`tests/back_grips.test.ts`).
+- `stow_transition.ts`: the sheathe-transition state machine (defers the
+  hands-to-back prop swap to the gesture midpoint); pure
+  (`tests/stow_transition.test.ts`).
+- `portrait_framing.ts`: pure camera-framing math per `PortraitFraming`
+  (headshot chip vs 3/4 body, e.g. the Inspect window) for `portrait.ts`
+  (`tests/portrait_framing.test.ts`).
 - `index.ts`: public exports + `createCharacterVisual(e, formKey?)` factory.
 
 ## Keys & dispatch

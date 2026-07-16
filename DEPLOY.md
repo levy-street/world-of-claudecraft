@@ -280,14 +280,21 @@ For off-box safety, sync the directory to S3 occasionally:
   the host `.env` into the game container. The key is a secret: it must never
   appear in logs or client code. Linking is a cosmetic mirror for deed
   achievements only; login with Steam does not exist.
+- **Season 1 Armory promo card (welcome screen)**: **off until configured**: the
+  welcome screen shows the Season 1 Armory store promo card only when
+  `ARMORY_PROMO_ENABLED=1` is set in the game server runtime env. The flag is
+  read by `server/welcome.ts` (behind a short in-process cache) and served to
+  signed-in clients via `GET /api/welcome/flags`; the client-side half of the
+  gate lives in `src/ui/store_promo_card.ts`.
 - **Claudium economy service**: `WOC_ECONOMY_SERVICE_URL` is resolved by the
   game server. Use `http://127.0.0.1:8798/v1/claudium/` only when both services
   run directly on the host. For the Compose game container with a host-run
   economy service, use `http://host.docker.internal:8798/v1/claudium/`.
   A separately deployed economy service should use its internal or remote DNS
   URL instead.
-- **Never** set `ALLOW_DEV_COMMANDS=1` in production: it enables the
-  level/teleport cheats used by the test bots.
+- **Never** set `ALLOW_DEV_COMMANDS=1` in production: it enables the full
+  `/dev` cheat set (the level/teleport cheats the test bots use, plus item
+  grants, mob spawns, instance teleports, and the dev command GUI).
 - **Bot detector (implementation)**: the open-source tree ships with a no-op stub
   (`server/bot_detector/stub.ts`). Detection hooks are wired in, but they observe
   nothing and never act. To bundle the real behavioral detector, clone the private

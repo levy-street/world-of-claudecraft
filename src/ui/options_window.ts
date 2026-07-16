@@ -40,10 +40,10 @@ import {
 } from '../game/settings';
 import type { IWorld } from '../world_api';
 import { appVersionInfo } from './app_version';
-import type { ChatClock } from './chat_timestamp';
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
 import type { BugReportHooks, OptionsHooks } from './hud';
+import type { ChatClock } from './hud/chat/chat_timestamp';
 import {
   formatNumber,
   getLanguage,

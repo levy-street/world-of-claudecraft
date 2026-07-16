@@ -246,7 +246,8 @@ function stubRewardConfig(config: Partial<DailyRewardRuntimeConfig> = {}) {
     vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = new URL(String(input));
       expect(url.pathname).toBe('/daily-config');
-      expect((init?.headers as Record<string, string>)['x-woc-daily-reward-secret']).toBe('secret');
+      const headers = (init?.headers ?? {}) as Record<string, string>;
+      expect(headers['x-woc-daily-reward-secret']).toBe('secret');
       return new Response(JSON.stringify(rewardConfig(config)), { status: 200 });
     }),
   );
@@ -384,7 +385,8 @@ describe('daily rewards', () => {
       const url = new URL(String(input));
       expect(url.pathname).toBe('/daily-config');
       expect(url.searchParams.get('day')).toBe('2026-06-30');
-      expect((init?.headers as Record<string, string>)['x-woc-daily-reward-secret']).toBe('secret');
+      const headers = (init?.headers ?? {}) as Record<string, string>;
+      expect(headers['x-woc-daily-reward-secret']).toBe('secret');
       return new Response(
         JSON.stringify(
           rewardConfig({
