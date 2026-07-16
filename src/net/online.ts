@@ -181,6 +181,20 @@ export interface RealmEntry {
   flags?: RealmFlag[];
 }
 
+// The per-realm casino feature bundle advertised on GET /api/status (mirrors
+// server/realm_features.ts RealmFeatures). Advisory: it decides what UI to show,
+// never what the server permits. Optional/absent when the server predates it.
+export interface RealmFeatures {
+  casino: boolean;
+  wagering: boolean;
+  dexSwap: boolean;
+  trade: boolean;
+  slots: boolean;
+  packs: boolean;
+  hilo: boolean;
+  sportsbook: boolean;
+}
+
 export interface RealmDirectory {
   current: string;
   realms: RealmEntry[];
@@ -282,15 +296,21 @@ export class Api {
   // Live status for a realm (population + reachability), for the realm picker.
   // `cap` is the realm admission cap (players_cap): a positive number is the real
   // refusal point; 0 means the cap is disabled or the server predates the field.
-  async realmStatus(url: string): Promise<{ online: boolean; players: number; cap: number }> {
+  // `features` is the realm's casino feature bundle (null when the server
+  // predates it), read by casino windows to self-hide UI the realm does not run.
+  async realmStatus(
+    url: string,
+  ): Promise<{ online: boolean; players: number; cap: number; features: RealmFeatures | null }> {
     try {
       const res = await fetch(apiUrl('/api/status', url), { signal: AbortSignal.timeout(3000) });
-      if (!res.ok) return { online: false, players: 0, cap: 0 };
+      if (!res.ok) return { online: false, players: 0, cap: 0, features: null };
       const d = await res.json();
       const cap = typeof d.players_cap === 'number' && d.players_cap > 0 ? d.players_cap : 0;
-      return { online: true, players: d.players_online ?? 0, cap };
+      const features =
+        d.features && typeof d.features === 'object' ? (d.features as RealmFeatures) : null;
+      return { online: true, players: d.players_online ?? 0, cap, features };
     } catch {
-      return { online: false, players: 0, cap: 0 };
+      return { online: false, players: 0, cap: 0, features: null };
     }
   }
 

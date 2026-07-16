@@ -62,6 +62,7 @@ import type { LiveReportTarget } from './moderation_db';
 import { recordUsageMetric } from './provider_usage';
 import { publicReadRateLimited } from './ratelimit';
 import { REALM, REALM_DIRECTORY } from './realm';
+import { OWN_REALM_FEATURES } from './realm_features';
 import { realmsVisibleToRequest } from './realm_platform_guard';
 // From the config module directly (not the ./steam barrel): the barrel drags
 // routes.ts and its load-time middleware construction into this module's
@@ -567,6 +568,9 @@ async function projectStatsHandler(ctx: Ctx): Promise<void> {
  * Steam link UI (dual-arm edit: the legacy main.ts twin carries the same field).
  * players_cap is the configured realm player cap (0 when disabled), also a dual-arm
  * edit: the legacy main.ts twin carries the same field with the same semantics.
+ * features is the per-realm casino feature bundle the client reads to self-hide
+ * UI (advisory only; every money route re-checks server-side); dual-arm edit,
+ * the legacy main.ts twin carries the identical field.
  */
 async function statusHandler(ctx: Ctx): Promise<void> {
   const rt = useRuntime();
@@ -576,6 +580,7 @@ async function statusHandler(ctx: Ctx): Promise<void> {
     players_online: rt.playersOnline(),
     players_cap: rt.playersCap(),
     steam: { enabled: steamEnabled() },
+    features: OWN_REALM_FEATURES,
   });
 }
 

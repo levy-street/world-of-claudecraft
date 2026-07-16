@@ -253,6 +253,7 @@ import {
   REALM,
   REALM_DIRECTORY,
 } from './realm';
+import { OWN_REALM_FEATURES } from './realm_features';
 import {
   globallyExcludedRealms,
   realmsVisibleToRequest,
@@ -1690,6 +1691,10 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         players_cap: canonicalPlayersCap(),
         names: [...liveGame().clients.values()].map((s) => s.name),
         steam: { enabled: false },
+        // The per-realm casino feature bundle the client reads to self-hide UI
+        // (advisory only; every money route re-checks server-side). Dual-arm
+        // edit: the migrated statusHandler carries the identical field.
+        features: OWN_REALM_FEATURES,
       });
     }
     // Dev-only world-loop perf profile (per-phase tick p95/max), for the load

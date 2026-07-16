@@ -23,6 +23,8 @@ describe('Api.realmStatus players_cap decode', () => {
       online: true,
       players: 3,
       cap: 5000,
+      // No features object on the response: an older server predating the field.
+      features: null,
     });
   });
 
@@ -35,6 +37,7 @@ describe('Api.realmStatus players_cap decode', () => {
       online: true,
       players: 42,
       cap: 0,
+      features: null,
     });
   });
 
@@ -60,6 +63,7 @@ describe('Api.realmStatus players_cap decode', () => {
       online: false,
       players: 0,
       cap: 0,
+      features: null,
     });
   });
 
@@ -74,6 +78,28 @@ describe('Api.realmStatus players_cap decode', () => {
       online: false,
       players: 0,
       cap: 0,
+      features: null,
     });
+  });
+
+  it('decodes the casino feature bundle when the server advertises it', async () => {
+    const features = {
+      casino: true,
+      wagering: false,
+      dexSwap: false,
+      trade: false,
+      slots: true,
+      packs: false,
+      hilo: false,
+      sportsbook: false,
+    };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () =>
+        statusResponse({ ok: true, players_online: 7, players_cap: 100, features }),
+      ),
+    );
+    const out = await api.realmStatus('http://realm.test');
+    expect(out.features).toEqual(features);
   });
 });

@@ -44,6 +44,7 @@ import {
 import { RATELIMIT_PRUNE_SQL, RATELIMIT_SCHEMA } from './ratelimit_db';
 import { REALM } from './realm';
 import { chooseArchiveName } from './reclaim_name';
+import { RG_SCHEMA } from './rg_db';
 import { SOCIAL_SCHEMA } from './social_db';
 import { USER_ASSETS_SCHEMA } from './user_assets_db';
 
@@ -1033,6 +1034,12 @@ export async function ensureSchema(): Promise<void> {
         'rate_limits table missing after DDL: RATELIMIT_SCHEMA (server/ratelimit_db.ts) was not applied',
       );
     }
+    // RiverBoat responsible-gambling tables (age attestation, realm ToS
+    // acceptance, self-exclusion, inflow flow counters, per-account limits).
+    // FK-reference accounts(id), so they run after SCHEMA. Applied
+    // unconditionally (idempotent), like the Discord/GitHub tables, so they exist
+    // before the casino realm enables its money rails.
+    await client.query(RG_SCHEMA);
     // Reclaim expired tier-2 windows at boot (rows older than two windows are
     // dead by construction; see RATELIMIT_PRUNE_SQL). A concurrent serving realm
     // is unaffected: only expired windows match, and a racing UPSERT on a pruned

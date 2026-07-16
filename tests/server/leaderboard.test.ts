@@ -535,7 +535,7 @@ describe('readPublicSheet (FakeCharactersDb, resolved by name)', () => {
 // ---------------------------------------------------------------------------
 
 describe('status handler (name-list trim deviation)', () => {
-  it('returns counts only: { ok, realm, players_online, players_cap, steam } with NO names list', async () => {
+  it('returns counts only: { ok, realm, players_online, players_cap, steam, features } with NO names list', async () => {
     configureLeaderboardRuntime(fakeRuntime({ playersOnline: () => 4, playersCap: () => 250 }));
     const ctx = fakeCtx({ method: 'GET', url: '/api/status' });
     await handlerFor('/api/status')(ctx);
@@ -548,6 +548,18 @@ describe('status handler (name-list trim deviation)', () => {
       // The configured realm cap, advertised so the client realm list can show Full.
       players_cap: 250,
       steam: { enabled: false },
+      // The per-realm casino feature bundle; all-off on the default (non-p2w) test
+      // realm. Advisory-only client hint (every money route re-checks server-side).
+      features: {
+        casino: false,
+        wagering: false,
+        dexSwap: false,
+        trade: false,
+        slots: false,
+        packs: false,
+        hilo: false,
+        sportsbook: false,
+      },
     });
     expect('names' in (body as object)).toBe(false);
   });
