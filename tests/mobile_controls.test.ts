@@ -552,6 +552,7 @@ function mobileCallbacks() {
     onQuestLog: noop,
     onCharacter: noop,
     onBags: noop,
+    onCrafting: noop,
     onSpellbook: noop,
     onTalents: noop,
     onMap: noop,

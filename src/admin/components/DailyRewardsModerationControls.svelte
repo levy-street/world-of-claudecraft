@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { AccountDetail } from '../types';
+  import { fmtDate, fmtDuration } from '../format';
   import { t } from '../i18n';
   import {
     banDailyRewards,
@@ -19,11 +20,13 @@
   } = $props();
 
   let selected = $state<{ action: 'ban' | 'unban' | 'ip-ban' | 'ip-unban'; ip?: string } | null>(null);
+  let durationHours = $state<number | undefined>(undefined);
   let ips = $derived(recentAccountIps(target));
 
   $effect(() => {
     target.id;
     selected = null;
+    durationHours = undefined;
   });
 
   async function confirm(values: { reason: string }): Promise<void> {
@@ -40,7 +43,7 @@
     }
     const built = selected?.action === 'unban'
       ? unbanDailyRewards(target.id, values.reason)
-      : banDailyRewards(target.id, values.reason);
+      : banDailyRewards(target.id, values.reason, durationHours);
     if ('errorKey' in built) {
       window.alert(t(built.errorKey));
       return;
@@ -55,9 +58,40 @@
     {#if target.dailyRewardsBan}
       <div class="moderation-reason participation-reason">
         {t('detail.dailyRewardsBanReason', { value: target.dailyRewardsBan.reason })}
+        {#if target.dailyRewardsBan.expiresAt}
+          <span>
+            {t('detail.dailyRewardsBanUntil', {
+              value: fmtDate(target.dailyRewardsBan.expiresAt),
+            })}
+          </span>
+          <span>
+            {t('detail.dailyRewardsBanRemaining', {
+              value: fmtDuration(
+                Math.max(
+                  0,
+                  Math.ceil((Date.parse(target.dailyRewardsBan.expiresAt) - Date.now()) / 1000),
+                ),
+              ),
+            })}
+          </span>
+        {:else}
+          <span>{t('detail.dailyRewardsPermanent')}</span>
+        {/if}
       </div>
       <button onclick={() => (selected = { action: 'unban' })}>{t('detail.dailyRewardsUnban')}</button>
     {:else}
+      <label class="ban-duration">
+        <span>{t('detail.dailyRewardsBanDuration')}</span>
+        <input
+          type="number"
+          min="1"
+          max="8760"
+          step="1"
+          bind:value={durationHours}
+          placeholder={t('detail.dailyRewardsBanDurationPlaceholder')}
+        />
+        <small>{t('detail.dailyRewardsBanDurationHint')}</small>
+      </label>
       <button class="danger" onclick={() => (selected = { action: 'ban' })}>{t('detail.dailyRewardsBan')}</button>
     {/if}
   </div>
@@ -113,6 +147,14 @@
                 ? t('dialog.actionDailyRewardsIpBan')
                 : t('dialog.actionDailyRewardsIpUnban'),
         },
+        ...(action === 'ban'
+          ? [{
+              label: t('dialog.length'),
+              value: durationHours === undefined
+                ? t('detail.dailyRewardsPermanent')
+                : t('detail.lengthHours', { count: durationHours }),
+            }]
+          : []),
       ]}
       danger={action === 'ban' || action === 'ip-ban'}
       onConfirm={confirm}
@@ -143,6 +185,27 @@
   .participation-reason,
   .empty-ips {
     margin: 5px 0 8px;
+  }
+
+  .participation-reason span {
+    display: block;
+    margin-top: 4px;
+  }
+
+  .ban-duration {
+    display: grid;
+    gap: 4px;
+    margin: 5px 0 8px;
+    color: var(--text-dim);
+    font-size: 12px;
+  }
+
+  .ban-duration input {
+    width: min(100%, 180px);
+  }
+
+  .ban-duration small {
+    color: var(--text-dim);
   }
 
   .ip-restrictions {

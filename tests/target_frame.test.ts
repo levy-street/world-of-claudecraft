@@ -15,11 +15,11 @@
 
 import { describe, expect, it } from 'vitest';
 import { castBarState } from '../src/render/cast_bar';
+import { MOBS } from '../src/sim/data';
 import type { Aura, Entity } from '../src/sim/types';
 import { titledNameDecoration } from '../src/ui/deed_i18n';
+import { targetRankView } from '../src/ui/target_rank_view';
 import { type UnitFrameDescriptor, unitFrameView } from '../src/ui/unit_frame';
-
-const BOSS_SKULL_GLYPH = '☠';
 
 function shield(value: number): Aura {
   return {
@@ -42,8 +42,8 @@ interface TargetState {
   hp: number;
   maxHp: number;
   level: number;
+  templateId: string;
   dead: boolean;
-  boss: boolean;
   hostile: boolean;
   displayName: string;
   auras: Aura[];
@@ -65,8 +65,8 @@ const GAMEPLAY: TargetState = {
   hp: 420,
   maxHp: 600,
   level: 62,
+  templateId: 'morthen',
   dead: false,
-  boss: true,
   hostile: true,
   displayName: 'Nythraxis',
   auras: [shield(90)],
@@ -120,7 +120,7 @@ function targetDescriptor(e: Entity): UnitFrameDescriptor {
     resourceKind: t.dead || !t.resourceType ? 'none' : t.resourceType,
     resFrac: t.dead || !t.resourceType ? 0 : t.resource / Math.max(1, t.maxResource),
     resText: t.dead || !t.resourceType ? '' : `${Math.round(t.resource)} / ${t.maxResource}`,
-    levelText: t.boss ? BOSS_SKULL_GLYPH : String(t.level),
+    levelText: String(t.level),
     name: t.displayName,
     titlePre: titleDecoration.pre,
     titlePost: titleDecoration.post,
@@ -137,6 +137,11 @@ function targetNameColor(e: Entity): string {
   return (e as unknown as TargetState).hostile ? 'var(--color-hostile)' : 'var(--color-friendly)';
 }
 
+function targetRank(e: Entity): ReturnType<typeof targetRankView> {
+  const templateId = (e as unknown as TargetState).templateId;
+  return targetRankView(MOBS[templateId]);
+}
+
 // Combo points are character-bound (retail-style): the pips moved to the PLAYER
 // frame and light straight from the wire-mirrored `comboPoints` self field, so
 // there is no per-target pip selection left in the target frame to diverge.
@@ -148,7 +153,9 @@ describe('target frame: Sim-vs-ClientWorld parity', () => {
     // Every field the frame reads survives the wire now (including the absorb overlay), so
     // the whole view is identical across hosts.
     expect(fromClient).toEqual(fromSim);
-    expect(fromSim.levelText).toBe(BOSS_SKULL_GLYPH); // boss skull, not a number
+    expect(fromSim.levelText).toBe('62');
+    expect(targetRank(simTarget())).toBe('boss');
+    expect(targetRank(clientTarget())).toBe(targetRank(simTarget()));
     expect(fromSim.resClass).toBe('mana'); // a caster target shows its power bar
     expect(fromSim.resText).toBe('350 / 500');
     // A resource-less beast (rtype null) turns every type class off: the bar hides.
@@ -187,7 +194,7 @@ describe('target frame: Sim-vs-ClientWorld parity', () => {
     // both hosts resolve the SAME pattern-key decoration client-side.
     const over: Partial<TargetState> = {
       kind: 'player',
-      boss: false,
+      templateId: '',
       hostile: false,
       displayName: 'Hilda',
       title: 'prog_veteran',

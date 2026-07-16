@@ -191,6 +191,35 @@ describe('standardized percent raid buffs', () => {
     expect(blessings[0].remaining).toBe(1800);
   });
 
+  it('does not stack Sureflight Aura from two hunters (same-class group buff)', () => {
+    // trueshot_aura (Sureflight Aura) is a talent-granted hunter aura applied as
+    // `${abilityId}_ap` by aoeAllyAttackPower. Two hunters used to stack two copies
+    // on the same target; now the second REPLACES the first (source-independent).
+    const sim = makeWorld();
+    const first = sim.addPlayer('hunter', 'Rax');
+    const second = sim.addPlayer('hunter', 'Vess');
+    const target = sim.entities.get(sim.addPlayer('warrior', 'War'))!;
+    const sureflight = (sourceId: number): Aura => ({
+      id: 'trueshot_aura_ap',
+      name: 'Sureflight Aura',
+      kind: 'buff_ap_pct',
+      remaining: 1800,
+      duration: 1800,
+      value: 10,
+      sourceId,
+      school: 'nature',
+    });
+    const applyAura = (a: Aura) =>
+      (sim as unknown as { applyAura(t: Entity, a: Aura): void }).applyAura(target, a);
+
+    applyAura(sureflight(first));
+    applyAura(sureflight(second));
+
+    const auras = target.auras.filter((a) => a.id === 'trueshot_aura_ap');
+    expect(auras).toHaveLength(1);
+    expect(auras[0].sourceId).toBe(second);
+  });
+
   it('keeps the newest stronger Blessing of Might value', () => {
     const sim = makeWorld();
     const first = sim.addPlayer('paladin', 'Ald');

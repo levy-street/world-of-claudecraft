@@ -41,14 +41,20 @@ export interface CharactersDb {
   deleteCharacter(accountId: number, characterId: number): Promise<boolean>;
   characterCountsByRealm(accountId: number): Promise<Record<string, number>>;
   searchCharacters(prefix: string, limit?: number): Promise<Db.CharacterSearchRow[]>;
-  saveCharacterState(characterId: number, level: number, state: CharacterState): Promise<void>;
+  saveCharacterState(
+    characterId: number,
+    level: number,
+    state: CharacterState,
+    leaseNonce?: string,
+  ): Promise<boolean>;
   saveCharacterAndMarketState(
     characterId: number,
     level: number,
     state: CharacterState,
     market: MarketSave,
     mail: MailSave,
-  ): Promise<void>;
+    leaseNonce?: string,
+  ): Promise<boolean>;
   lifetimeXpStanding(
     accountId: number,
     characterId: number,
@@ -204,9 +210,11 @@ export class FakeCharactersDb implements CharactersDb {
     characterId: number,
     level: number,
     state: CharacterState,
-  ): Promise<void> {
+    _leaseNonce?: string,
+  ): Promise<boolean> {
     const row = this.rows.get(characterId);
     if (row) this.rows.set(characterId, { ...row, level, state });
+    return true;
   }
 
   async saveCharacterAndMarketState(
@@ -215,10 +223,12 @@ export class FakeCharactersDb implements CharactersDb {
     state: CharacterState,
     market: MarketSave,
     mail: MailSave,
-  ): Promise<void> {
+    _leaseNonce?: string,
+  ): Promise<boolean> {
     await this.saveCharacterState(characterId, level, state);
     this.lastMarket = market;
     this.lastMail = mail;
+    return true;
   }
 
   async lifetimeXpStanding(

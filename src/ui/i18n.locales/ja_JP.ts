@@ -13,6 +13,8 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.discord.roleTag.legend': 'レジェンド',
+  'hudChrome.discord.roleTag.shill': 'サポーター',
   'hudChrome.wocStore.title': 'WOCストア',
   'hudChrome.wocStore.close': 'WOCストアを閉じる',
   'hudChrome.wocStore.tabsLabel': 'WOCストアのセクション',
@@ -363,6 +365,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.reason.price_unavailable':
     'WOCの価格を取得できないため、報酬は一時的にロックされています。',
   'hudChrome.dailyRewards.reason.banned': 'デイリー報酬への参加が禁止されています。理由: {reason}',
+  'hudChrome.dailyRewards.reason.bannedUntil':
+    'デイリー報酬への参加はあと{remaining}禁止されています。解除日時: {until}。理由: {reason}',
   'hudChrome.keybinds.discord': 'Discord',
   'hudChrome.spectate.banner': '{name}を観戦中',
   'hudChrome.readyCheck.prompt': '{name} が準備確認を開始しました。準備はいいですか？',
@@ -386,6 +390,28 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetFrame.lock': 'ターゲットフレームを固定',
   'hudChrome.playerFrame.unlock': 'プレイヤーフレームを移動',
   'hudChrome.playerFrame.lock': 'プレイヤーフレームを固定',
+  'hudChrome.partyFrames.section': 'パーティ・レイドフレーム',
+  'hudChrome.partyFrames.unlock': 'パーティ・レイドフレームを移動',
+  'hudChrome.partyFrames.lock': 'パーティ・レイドフレームを固定',
+  'hudChrome.partyFrames.style': 'フレームスタイル',
+  'hudChrome.partyFrames.styleAutomatic': '自動',
+  'hudChrome.partyFrames.styleClassic': 'クラシックパーティフレーム',
+  'hudChrome.partyFrames.styleRaid': 'レイドフレーム',
+  'hudChrome.partyFrames.scale': 'フレームスケール',
+  'hudChrome.partyFrames.width': 'フレームの幅',
+  'hudChrome.partyFrames.height': 'フレームの高さ',
+  'hudChrome.partyFrames.spacing': 'フレームの間隔',
+  'hudChrome.partyFrames.columns': 'レイドの列数',
+  'hudChrome.partyFrames.healthText': '体力テキスト',
+  'hudChrome.partyFrames.healthPercent': 'パーセント',
+  'hudChrome.partyFrames.healthCurrent': '現在値',
+  'hudChrome.partyFrames.healthCurrentMax': '現在値 / 最大値',
+  'hudChrome.partyFrames.sort': 'プレイヤーの並び順',
+  'hudChrome.partyFrames.sortGroup': 'グループ',
+  'hudChrome.partyFrames.showResource': 'マナ・怒り・エネルギーを表示',
+  'hudChrome.partyFrames.showAbsorbs': '吸収シールドを表示',
+  'hudChrome.partyFrames.showAuras': 'バフとデバフを表示',
+  'hudChrome.partyFrames.showSelf': '自分のフレームを表示',
   'hudChrome.frameReset.label': 'フレーム位置をリセット',
   'hudChrome.options.playerFrameScale': 'プレイヤーフレームの大きさ',
   'hudChrome.options.targetFrameScale': 'ターゲットフレームの大きさ',
@@ -505,6 +531,26 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.lootSettings.menuItem': '分配設定',
   'hudChrome.dungeonDifficulty.setHeroic': 'ダンジョン難易度をヒロイックに設定',
   'hudChrome.dungeonDifficulty.setNormal': 'ダンジョン難易度をノーマルに設定',
+  'hudChrome.dungeonDifficulty.resetAll': 'すべてのインスタンスをリセット',
+  'hudChrome.dungeonDifficulty.resetDone': 'すべてのインスタンスをリセットしました。',
+  'hudChrome.dungeonDifficulty.resetNone': 'リセットできるインスタンスがありません。',
+  'hudChrome.dungeonDifficulty.resetOccupied':
+    '中にプレイヤーがいる間はインスタンスをリセットできません。',
+  'hudChrome.dungeonDifficulty.resetSameDifficulty':
+    'インスタンスをリセットする前にダンジョン難易度を変更してください。空のインスタンスは5分後に自動的にリセットされます。',
+  'hudChrome.dungeonDifficulty.resetUsage':
+    '難易度を変更した後、/dungeon reset で空のインスタンスを放棄できます。',
+  'hudChrome.dungeonDifficulty.resetLoot':
+    '中に戦利品が残っている間はインスタンスをリセットできません。',
+  'hudChrome.dungeonDifficulty.resetConfirmTitle': 'すべてのインスタンスをリセットしますか？',
+  'hudChrome.dungeonDifficulty.resetConfirmBody':
+    '以前選択していた難易度の空のインスタンスを放棄します。未取得の戦利品がある場合はリセットできません。',
+  'hudChrome.dungeonDifficulty.resetConfirm': 'インスタンスをリセット',
+  'hudChrome.dungeonDifficulty.resetCooldown': 'インスタンスをリセットできるのは5分に1回だけです。',
+  'hudChrome.dungeonDifficulty.entryMismatchNormal':
+    'このインスタンスはノーマル難易度に設定されています。ヒロイックで新しく始めるには「すべてのインスタンスをリセット」を使用してください。',
+  'hudChrome.dungeonDifficulty.entryMismatchHeroic':
+    'このインスタンスはヒロイック難易度に設定されています。ノーマルで新しく始めるには「すべてのインスタンスをリセット」を使用してください。',
   'hudChrome.lootSettings.method': '分配方式',
   'hudChrome.lootSettings.rollThreshold': 'ロールしきい値',
   'hudChrome.lootSettings.groupLoot': 'グループルート',
@@ -572,6 +618,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.names.spellPower': '呪文威力',
   'hudChrome.statInfo.names.critRating': 'クリティカルレーティング',
   'hudChrome.statInfo.names.hasteRating': 'ヘイストレーティング',
+  'hudChrome.statInfo.names.hitRating': '命中レーティング',
+  'hudChrome.statInfo.desc.hitRating':
+    '装備とセットボーナスによる命中レーティング。攻撃がミスする頻度と呪文が抵抗される頻度を減らし、特に高レベルの敵に有効です。約10レーティングで1%命中。',
   'hudChrome.statInfo.names.warfare': 'ウォーフェア',
   'hudChrome.statInfo.warfareValue': '与ダメージ +{increase}% / 被ダメージ -{reduction}%',
   'hudChrome.statInfo.desc.critRating':
@@ -898,6 +947,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'download.linuxCta': 'Linux版をダウンロード',
   'download.linuxHint':
     'AppImage形式です。実行権限を付けてそのまま起動でき、インストールは不要です。',
+  'download.windowsCta': 'Windows版をダウンロード',
   'download.windowsPending': 'Windows版は準備中です。',
   'download.desc':
     '最適化されたパフォーマンスと全画面表示でのプレイのために、スタンドアロン版ランチャーを入手してください。',
@@ -1172,6 +1222,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'loading.connectionLost': 'サーバーとの接続が切断されました。',
   'loading.reconnecting': 'サーバーとの接続が切断されました。再接続しています...',
   'loading.connectionRejected': 'サーバーが接続を閉じました。',
+  'loading.realmFull': 'このワールドは現在満員です。数分後にもう一度お試しください。',
+  'loading.tooManyConnections':
+    'お使いのネットワークからこのワールドへの接続が多すぎます。余分なゲームウィンドウを閉じるか、数分後にもう一度お試しください。',
   'errors.nothingInteract': '操作できるものがありません。',
   'errors.noEnemyNearby': '近くに敵がいません。',
   'errors.characterNameRequired': 'キャラクター名を入力してください。',
@@ -1221,11 +1274,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'realm.low': '低',
   'realm.popTipLow':
     '低人口：現在オンラインのプレイヤーは15人未満。余裕があり、新規スタートに最適です。',
-  'realm.popTipMedium': '中人口：現在オンラインのプレイヤーは15〜39人。健全で活発なワールドです。',
+  'realm.popTipMedium': '中人口：現在オンラインのプレイヤーは15〜79人。健全で活発なワールドです。',
   'realm.popTipHigh':
-    '高人口：現在オンラインのプレイヤーは40〜79人。混雑しており、多くのプレイヤーがいます。',
+    '高人口：現在オンラインのプレイヤーは80人以上。混雑しており、多くのプレイヤーがいます。',
   'realm.popTipFull':
-    '満員：現在オンラインのプレイヤーは80人以上。非常に混雑しており、ログイン待ちが発生する場合があります。',
+    '満員：このワールドは現在プレイヤー数の上限に達しています。他のプレイヤーがログアウトするまで、新規ログインは拒否されます。',
   'realm.popTipOffline': 'オフライン：このワールドは現在接続できず、参加できません。',
   'realm.characterCountOne': '{count}キャラクター',
   'realm.characterCountOther': '{count}キャラクター',
@@ -2484,6 +2537,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.barkskin.name': '樫の肌',
   'entities.abilities.barkskin.description':
     '肌が樹皮のように硬くなり、15秒間アーマーが150増加します。',
+  'entities.abilities.ironhold.name': '鉄壁',
+  'entities.abilities.ironhold.description':
+    '堅固な守りで身を固め、8秒間、受けるすべてのダメージを40%軽減します。',
+  'entities.abilities.sacred_bulwark.name': '聖なる防壁',
+  'entities.abilities.sacred_bulwark.description':
+    '{duration}秒間、次に敵から受ける致命的な一撃を無効化し、代わりに体力を最大値の35%まで回復します。',
+  'entities.abilities.primal_reflexes.name': '原始の反射',
+  'entities.abilities.primal_reflexes.description':
+    '本能が研ぎ澄まされ、6秒間、回避率が50%上昇します。',
   'entities.abilities.starfire.name': '天墜',
   'entities.abilities.starfire.description':
     '星の炎を呼び下ろし、{damage} の秘術ダメージを与えます。',
@@ -5689,6 +5751,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.attackSpeedFast': '攻撃速度を{pct}%上昇させる',
   'hudChrome.auraEffect.haste': '攻撃速度と詠唱速度を{pct}%上昇させる',
   'hudChrome.auraEffect.tongues': '詠唱時間を{pct}%増加させる',
+  'hudChrome.auraEffect.damageReduction': '受けるすべてのダメージを{pct}%軽減する',
+  'hudChrome.auraEffect.guardianWard':
+    '次に受ける敵の致死攻撃を防ぎ、代わりに体力を{pct}%まで回復する',
   'hudChrome.auraEffect.increase.ap': '攻撃力を{value}上昇させる',
   'hudChrome.auraEffect.increase.armor': '防御力を{value}上昇させる',
   'hudChrome.auraEffect.increase.int': '知力を{value}上昇させる',
@@ -6496,6 +6561,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'あなたは沼地の果てへ登り、ハルヴェン修道士のもとへ戻る。',
   'hudChrome.dailyRewards.endsIn': '終了まで{time}',
   'hudChrome.dailyRewards.remainingHoursMinutes': '{hours}時間{minutes}分',
+  'hudChrome.dailyRewards.remainingDaysHours': '{days}日{hours}時間',
   'hudChrome.dailyRewards.remainingLessThanMinute': '1分未満',
   'hudChrome.dailyRewards.remainingMinutes': '{minutes}分',
   'hudChrome.dailyRewards.sol': '{amount} SOL',

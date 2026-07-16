@@ -1,170 +1,217 @@
-// The business-aggregate half of the /metrics exporter (Phase 3): signups,
-// characters, active sessions, average playtime, and peak online, published as
-// bounded prom-client gauges on the SAME registry the RED exporter builds
-// (server/http/metrics.ts), exactly like the game-state half
-// (server/http/game_metrics.ts). Prometheus attaches env / service=game /
-// server_name at scrape time, so nothing here emits those.
-//
-// SAMPLED ON AN INTERVAL, CACHED, PUBLISHED AT SCRAPE TIME. Unlike the game-state
-// gauges (cheap in-memory live reads), each value here comes from a Postgres
-// aggregate, so a PeriodicCollector (server/http/periodic_collector.ts) runs the
-// ONE overviewCounts() batch on a 30-60s interval and caches it; the gauges publish
-// the cached snapshot when registry.metrics() runs. A scrape never hits the DB, so a
-// scrape storm can never become a query storm. Before the first refresh (or after a
-// failed one) the collector holds null and the gauges publish nothing.
-//
-// SQL IS REUSED, NOT DUPLICATED. Every value comes from overviewCounts() in
-// server/admin_db.ts (the admin dashboard's overview query); this module only maps
-// its fields onto gauges. No SQL lives here.
-//
-// CARDINALITY IS BOUNDED BY DESIGN, same contract as server/http/metrics.ts: the
-// only label is `window`, drawn from a fixed small set (today/week/month, all_time).
-// Nothing per-entity (account id, character id, name) is ever a label.
+// Cached player and business gauges. The refresh reads only compact indexed
+// lifecycle facts through playerBusinessSnapshot(); Prometheus scrapes never
+// query Postgres, and the fixed period/segment/day labels bound cardinality.
 
 import { Gauge, type Registry } from 'prom-client';
-import type { OverviewCounts } from '../admin_db';
-import { overviewCounts } from '../admin_db';
+import { pool } from '../db';
+import {
+  type PlayerBusinessDay,
+  type PlayerBusinessSnapshot,
+  playerBusinessSnapshot,
+} from '../player_metrics_db';
+import { REALM } from '../realm';
 import { PeriodicCollector } from './periodic_collector';
 
-/** Total registered accounts. */
-export const WOC_ACCOUNTS_TOTAL = 'woc_accounts_total';
+export const WOC_PLAYER_ACCOUNTS_CREATED = 'woc_player_accounts_created';
+export const WOC_PLAYER_CHARACTERS_CREATED = 'woc_player_characters_created';
+export const WOC_PLAYER_FIRST_CHARACTER_ACCOUNTS = 'woc_player_first_character_accounts';
+export const WOC_PLAYER_FIRST_WORLD_ENTRY_RATE = 'woc_player_first_world_entry_rate';
+export const WOC_PLAYER_DAILY_ACTIVE_ACCOUNTS = 'woc_player_daily_active_accounts';
+export const WOC_PLAYER_DAILY_PLAYTIME_SECONDS = 'woc_player_daily_playtime_seconds';
+export const WOC_PLAYER_FIRST_SESSION_MEDIAN_SECONDS = 'woc_player_first_session_median_seconds';
+export const WOC_PLAYER_FIRST_SESSION_LEVEL_RATE = 'woc_player_first_session_level_rate';
+export const WOC_PLAYER_RETENTION_RATE = 'woc_player_retention_rate';
 
-/** New account signups within a fixed window, labeled by `window` (today/week/month). */
-export const WOC_SIGNUPS_TOTAL = 'woc_signups_total';
+/** Business data changes slowly; one bounded database sample every 15 minutes is enough. */
+export const BUSINESS_METRICS_REFRESH_MS = 15 * 60_000;
 
-/** Total created characters. */
-export const WOC_CHARACTERS_TOTAL = 'woc_characters_total';
+const PERIODS = ['today', 'yesterday'] as const;
+const PLAYTIME_SEGMENTS = ['all', 'new', 'level_20'] as const;
+const FIRST_SESSION_LEVELS = [2, 5] as const;
+const RETENTION_DAYS = [1, 7, 30] as const;
 
-/** Distinct accounts with an active play session in a window, labeled by `window` (today/week/month). */
-export const WOC_ACTIVE_SESSIONS = 'woc_active_sessions';
+export type BusinessMetricsCollector = PeriodicCollector<PlayerBusinessSnapshot>;
 
-/** Average lifetime playtime per account, in SECONDS. */
-export const WOC_AVG_PLAYTIME_SECONDS = 'woc_avg_playtime_seconds';
+function dayFor(snapshot: PlayerBusinessSnapshot, period: string): PlayerBusinessDay | undefined {
+  return snapshot.days.find((day) => day.period === period);
+}
 
-/** Peak concurrent players online in a window, labeled by `window` (today/all_time). */
-export const WOC_PEAK_ONLINE = 'woc_peak_online';
+function setIfPresent(
+  gauge: Gauge<string>,
+  labels: Record<string, string>,
+  value: number | null,
+): void {
+  if (value !== null) gauge.set(labels, value);
+}
 
-/**
- * How often the collector re-runs overviewCounts(). 60s keeps the query cost
- * negligible (one batched read per minute, independent of scrape frequency) while
- * staying fresh enough for a business dashboard, and matches ADMIN_ONLINE_SAMPLE_MS
- * so the peak-online sample it reads is at most one interval stale.
- */
-export const BUSINESS_METRICS_REFRESH_MS = 60_000;
-
-/**
- * The fixed signup windows exposed on woc_signups_total, mapped to their
- * OverviewCounts field. This list (not the data) bounds the `window` label set.
- */
-const SIGNUP_WINDOWS: ReadonlyArray<{ window: string; field: keyof OverviewCounts }> = [
-  { window: 'today', field: 'accountsToday' },
-  { window: 'week', field: 'accountsWeek' },
-  { window: 'month', field: 'accountsMonth' },
-];
-
-/** The fixed active-session windows exposed on woc_active_sessions. */
-const ACTIVE_SESSION_WINDOWS: ReadonlyArray<{ window: string; field: keyof OverviewCounts }> = [
-  { window: 'today', field: 'activeAccountsToday' },
-  { window: 'week', field: 'activeAccountsWeek' },
-  { window: 'month', field: 'activeAccountsMonth' },
-];
-
-/** The fixed peak-online windows exposed on woc_peak_online. */
-const PEAK_ONLINE_WINDOWS: ReadonlyArray<{ window: string; field: keyof OverviewCounts }> = [
-  { window: 'today', field: 'peakOnlineToday' },
-  { window: 'all_time', field: 'peakOnlineAllTime' },
-];
-
-/** The handle main.ts holds to start/stop the interval; tests refresh() it directly. */
-export type BusinessMetricsCollector = PeriodicCollector<OverviewCounts>;
-
-/**
- * Register the business-aggregate gauges on `registry` and return the collector
- * that feeds them. The gauges publish the collector's CACHED snapshot at scrape
- * time (nothing if it is still null), so registry.metrics() never queries Postgres.
- * Boot (main.ts) calls collector.start() to begin the interval; a test injects a
- * fake query and calls refresh() by hand.
- *
- * @param registry the shared exporter registry.
- * @param query the aggregate source; defaults to overviewCounts (admin_db.ts). A
- *   test passes a fake so no Postgres is needed.
- * @param intervalMs the refresh cadence; defaults to BUSINESS_METRICS_REFRESH_MS.
- */
 export function registerBusinessMetrics(
   registry: Registry,
-  query: () => Promise<OverviewCounts> = overviewCounts,
+  query: () => Promise<PlayerBusinessSnapshot> = () => playerBusinessSnapshot(pool, REALM),
   intervalMs: number = BUSINESS_METRICS_REFRESH_MS,
 ): BusinessMetricsCollector {
   const collector = new PeriodicCollector(query, intervalMs);
 
   new Gauge({
-    name: WOC_ACCOUNTS_TOTAL,
-    help: 'Total registered accounts.',
+    name: WOC_PLAYER_ACCOUNTS_CREATED,
+    help: 'Accounts created during a UTC calendar period.',
+    labelNames: ['period'],
     registers: [registry],
     collect() {
-      const counts = collector.current();
-      if (counts) this.set(counts.accounts);
-    },
-  });
-
-  new Gauge({
-    name: WOC_SIGNUPS_TOTAL,
-    help: 'New account signups within a fixed window, by window (today/week/month).',
-    labelNames: ['window'],
-    registers: [registry],
-    collect() {
-      const counts = collector.current();
-      if (!counts) return;
-      for (const { window, field } of SIGNUP_WINDOWS) {
-        this.set({ window }, counts[field]);
+      this.reset();
+      const snapshot = collector.current();
+      if (!snapshot) return;
+      for (const period of PERIODS) {
+        const day = dayFor(snapshot, period);
+        if (day) this.set({ period }, day.accountsCreated);
       }
     },
   });
 
   new Gauge({
-    name: WOC_CHARACTERS_TOTAL,
-    help: 'Total created characters.',
+    name: WOC_PLAYER_CHARACTERS_CREATED,
+    help: 'Characters created during a UTC calendar period.',
+    labelNames: ['period'],
     registers: [registry],
     collect() {
-      const counts = collector.current();
-      if (counts) this.set(counts.characters);
-    },
-  });
-
-  new Gauge({
-    name: WOC_ACTIVE_SESSIONS,
-    help: 'Distinct accounts with an active play session in a window, by window (today/week/month).',
-    labelNames: ['window'],
-    registers: [registry],
-    collect() {
-      const counts = collector.current();
-      if (!counts) return;
-      for (const { window, field } of ACTIVE_SESSION_WINDOWS) {
-        this.set({ window }, counts[field]);
+      this.reset();
+      const snapshot = collector.current();
+      if (!snapshot) return;
+      for (const period of PERIODS) {
+        const day = dayFor(snapshot, period);
+        if (day) this.set({ period }, day.charactersCreated);
       }
     },
   });
 
   new Gauge({
-    name: WOC_AVG_PLAYTIME_SECONDS,
-    help: 'Average lifetime playtime per account, in seconds.',
+    name: WOC_PLAYER_FIRST_CHARACTER_ACCOUNTS,
+    help: 'Accounts creating their first character during a UTC calendar period.',
+    labelNames: ['period'],
     registers: [registry],
     collect() {
-      const counts = collector.current();
-      if (counts) this.set(counts.avgPlaytimeSeconds);
+      this.reset();
+      const snapshot = collector.current();
+      if (!snapshot) return;
+      for (const period of PERIODS) {
+        const day = dayFor(snapshot, period);
+        if (day) this.set({ period }, day.firstCharacterAccounts);
+      }
     },
   });
 
   new Gauge({
-    name: WOC_PEAK_ONLINE,
-    help: 'Peak concurrent players online in a window, by window (today/all_time).',
-    labelNames: ['window'],
+    name: WOC_PLAYER_FIRST_WORLD_ENTRY_RATE,
+    help: 'Share of accounts created in a UTC calendar period that first played that day.',
+    labelNames: ['period'],
     registers: [registry],
     collect() {
-      const counts = collector.current();
-      if (!counts) return;
-      for (const { window, field } of PEAK_ONLINE_WINDOWS) {
-        this.set({ window }, counts[field]);
+      this.reset();
+      const snapshot = collector.current();
+      if (!snapshot) return;
+      for (const period of PERIODS) {
+        const day = dayFor(snapshot, period);
+        if (day) setIfPresent(this, { period }, day.firstWorldEntryRate);
+      }
+    },
+  });
+
+  new Gauge({
+    name: WOC_PLAYER_DAILY_ACTIVE_ACCOUNTS,
+    help: 'Active accounts during a UTC calendar period, split by new or returning.',
+    labelNames: ['period', 'segment'],
+    registers: [registry],
+    collect() {
+      this.reset();
+      const snapshot = collector.current();
+      if (!snapshot) return;
+      for (const period of PERIODS) {
+        const day = dayFor(snapshot, period);
+        if (!day) continue;
+        this.set({ period, segment: 'new' }, day.activeNew);
+        this.set({ period, segment: 'returning' }, day.activeReturning);
+      }
+    },
+  });
+
+  new Gauge({
+    name: WOC_PLAYER_DAILY_PLAYTIME_SECONDS,
+    help: 'Average daily playtime per active account in seconds, split by lifecycle segment.',
+    labelNames: ['period', 'segment'],
+    registers: [registry],
+    collect() {
+      this.reset();
+      const snapshot = collector.current();
+      if (!snapshot) return;
+      for (const period of PERIODS) {
+        const day = dayFor(snapshot, period);
+        if (!day) continue;
+        const values: Record<(typeof PLAYTIME_SEGMENTS)[number], number | null> = {
+          all: day.avgPlaytimeSecondsAll,
+          new: day.avgPlaytimeSecondsNew,
+          level_20: day.avgPlaytimeSecondsLevel20,
+        };
+        for (const segment of PLAYTIME_SEGMENTS) {
+          setIfPresent(this, { period, segment }, values[segment]);
+        }
+      }
+    },
+  });
+
+  new Gauge({
+    name: WOC_PLAYER_FIRST_SESSION_MEDIAN_SECONDS,
+    help: 'Median completed first-session duration in seconds for a UTC first-play cohort.',
+    labelNames: ['period'],
+    registers: [registry],
+    collect() {
+      this.reset();
+      const snapshot = collector.current();
+      if (!snapshot) return;
+      for (const period of PERIODS) {
+        const day = dayFor(snapshot, period);
+        if (day) setIfPresent(this, { period }, day.firstSessionMedianSeconds);
+      }
+    },
+  });
+
+  new Gauge({
+    name: WOC_PLAYER_FIRST_SESSION_LEVEL_RATE,
+    help: 'Share of completed first sessions reaching a fixed level threshold.',
+    labelNames: ['period', 'level'],
+    registers: [registry],
+    collect() {
+      this.reset();
+      const snapshot = collector.current();
+      if (!snapshot) return;
+      for (const period of PERIODS) {
+        const day = dayFor(snapshot, period);
+        if (!day) continue;
+        const values = {
+          2: day.firstSessionLevel2Rate,
+          5: day.firstSessionLevel5Rate,
+        } as const;
+        for (const level of FIRST_SESSION_LEVELS) {
+          setIfPresent(this, { period, level: String(level) }, values[level]);
+        }
+      }
+    },
+  });
+
+  new Gauge({
+    name: WOC_PLAYER_RETENTION_RATE,
+    help: 'Share of a first-play cohort active again after a fixed number of UTC days.',
+    labelNames: ['period', 'day'],
+    registers: [registry],
+    collect() {
+      this.reset();
+      const snapshot = collector.current();
+      if (!snapshot) return;
+      for (const period of PERIODS) {
+        for (const day of RETENTION_DAYS) {
+          const retention = snapshot.retention.find(
+            (item) => item.period === period && item.day === day,
+          );
+          if (retention) setIfPresent(this, { period, day: String(day) }, retention.rate);
+        }
       }
     },
   });
