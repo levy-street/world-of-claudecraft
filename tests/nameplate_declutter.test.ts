@@ -307,19 +307,28 @@ describe('nameplate declutter: spatial-hash hot path', () => {
     expect(metrics.candidateChecks).toBe(anchors.length);
   });
 
-  it('rejects dense diagonal neighbour buckets without a quadratic cross-product', () => {
+  it.each([
+    ['left cell below right', { sx: 79, sy: 0 }, { sx: 0, sy: 17 }, { sx: 158, sy: 34 }],
+    ['left cell above right', { sx: 79, sy: 35 }, { sx: 0, sy: 18 }, { sx: 158, sy: 0 }],
+  ])('rejects dense diagonal neighbour buckets without a false merge when the %s', (_label, leftXBound, leftYBound, right) => {
     const anchors: NameplateAnchor[] = [];
-    for (let i = 0; i < 2_000; i++) anchors.push({ id: i, sx: 79, sy: 0 });
-    for (let i = 0; i < 2_000; i++) anchors.push({ id: 2_000 + i, sx: 0, sy: 17 });
-    for (let i = 0; i < 4_000; i++) anchors.push({ id: 4_000 + i, sx: 158, sy: 34 });
+    for (let i = 0; i < 2_000; i++) anchors.push({ id: i, ...leftXBound });
+    for (let i = 0; i < 2_000; i++) anchors.push({ id: 2_000 + i, ...leftYBound });
+    for (let i = 0; i < 4_000; i++) anchors.push({ id: 4_000 + i, ...right });
     const metrics: NameplateDeclutterMetrics = { candidateChecks: 0, spatialHashResizes: 0 };
 
     declutterNameplatesInPlace(anchors, anchors.length, metrics);
 
+    const leftBaseSy = (leftXBound.sy + leftYBound.sy) / 2;
+    const componentMid = (4_000 - 1) / 2;
+    expect(anchors[0].sy).toBe(leftBaseSy - componentMid * 20);
+    expect(anchors[3_999].sy).toBe(leftBaseSy + componentMid * 20);
+    expect(anchors[4_000].sy).toBe(right.sy - componentMid * 20);
+    expect(anchors[7_999].sy).toBe(right.sy + componentMid * 20);
     expect(metrics.candidateChecks).toBeLessThan(anchors.length * 2);
   });
 
-  it('does not resize the spatial hash after its high-water capacity is warm', () => {
+  it('does not resize typed spatial buffers after their high-water capacity is warm', () => {
     const anchors: NameplateAnchor[] = [];
     for (let i = 0; i < 10_000; i++) {
       anchors.push({ id: i, sx: i * 1_000, sy: i * 1_000 });
@@ -333,6 +342,10 @@ describe('nameplate declutter: spatial-hash hot path', () => {
       declutterNameplatesInPlace(anchors, count, metrics);
       expect(metrics.spatialHashResizes).toBe(0);
     }
+
+    metrics.spatialHashResizes = -1;
+    declutterNameplatesInPlace(anchors, anchors.length, metrics);
+    expect(metrics.spatialHashResizes).toBe(0);
   });
 
   it('does not self-collide when adjacent far cell coordinates round together', () => {

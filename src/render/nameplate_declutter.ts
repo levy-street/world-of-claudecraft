@@ -16,7 +16,9 @@ export interface NameplateAnchor {
 }
 
 export interface NameplateDeclutterMetrics {
+  /** Anchor visits in component collection and diagonal queries, not total operations. */
   candidateChecks: number;
+  /** Explicit typed-buffer growth events, not transient engine or Array.sort allocations. */
   spatialHashResizes: number;
 }
 
@@ -48,8 +50,8 @@ function cellCoord(v: number, size: number): number | null {
 
 // ---------------------------------------------------------------------------
 // Reusable workspace. The painter calls this once per frame on one thread, so a
-// module-level scratch is safe and keeps the pass allocation-free after its
-// high-water capacity is established.
+// module-level scratch is safe and keeps the explicit hash/traversal buffers at
+// their established high-water capacity.
 // ---------------------------------------------------------------------------
 const cluster: number[] = [];
 const cellQueue: number[] = [];
