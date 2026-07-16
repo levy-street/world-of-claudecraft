@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { CLASSES } from '../src/sim/content/classes';
+import { emptyAllocation } from '../src/sim/content/talents';
 import {
   actionForAttackSlot,
   applyLoadoutBar,
@@ -12,6 +13,7 @@ import {
   handleMobileAttackTap,
   hotbarActionsEqual,
   loadAttackSlotAction,
+  loadoutKnownAbilityIds,
   parseHotbarActions,
   parseStoredHotbarAction,
   placeAbilityOnSlot,
@@ -501,6 +503,46 @@ describe('applying a saved talent loadout bar', () => {
     const current = [{ type: 'ability' as const, id: 'fireball' }];
 
     expect(applyLoadoutBar(current, ['no_such_ability'], 1, abilityExists)).toEqual([null]);
+  });
+});
+
+describe('loadoutKnownAbilityIds', () => {
+  // Regression: switching talent loadouts scrambled the action bar (shaman bug
+  // report). applyLoadoutBar's "does this ability id exist" check must resolve
+  // against what the TARGET build actually grants, not the global ability
+  // table: two shaman specs grant disjoint signature abilities (stormstrike for
+  // Enhancement, chain_heal for Restoration), and stormstrike/chain_heal both
+  // exist in ABILITIES regardless of which spec is active.
+  it('only includes abilities the loadout own allocation actually grants', () => {
+    const enhancement = { ...emptyAllocation(), spec: 'enhancement' };
+    const restoration = { ...emptyAllocation(), spec: 'restoration' };
+
+    const enhancementKnown = loadoutKnownAbilityIds('shaman', enhancement, 20);
+    const restorationKnown = loadoutKnownAbilityIds('shaman', restoration, 20);
+
+    expect(enhancementKnown.has('stormstrike')).toBe(true);
+    expect(enhancementKnown.has('chain_heal')).toBe(false);
+    expect(restorationKnown.has('chain_heal')).toBe(true);
+    expect(restorationKnown.has('stormstrike')).toBe(false);
+  });
+
+  it('still includes base class-kit abilities regardless of spec', () => {
+    const known = loadoutKnownAbilityIds('shaman', { ...emptyAllocation(), spec: 'elemental' }, 20);
+    expect(known.has('lightning_bolt')).toBe(true);
+  });
+
+  // Pins the actual applyLoadoutBar call site wiring, not just the predicate in
+  // isolation: reverting the predicate to `(id) => !!ABILITIES[id]` would let
+  // stormstrike survive a switch to a Restoration loadout without failing this.
+  it("rejects a foreign-spec ability when used as applyLoadoutBar's predicate", () => {
+    const restoration = { ...emptyAllocation(), spec: 'restoration' };
+    const restorationKnown = loadoutKnownAbilityIds('shaman', restoration, 20);
+
+    const current = [{ type: 'ability' as const, id: 'stormstrike' }];
+
+    expect(applyLoadoutBar(current, ['stormstrike'], 1, (id) => restorationKnown.has(id))).toEqual([
+      null,
+    ]);
   });
 });
 

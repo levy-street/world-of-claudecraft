@@ -1,3 +1,7 @@
+import { computeTalentModifiers, type TalentAllocation } from '../../../sim/content/talents';
+import { abilitiesKnownAt } from '../../../sim/data';
+import type { PlayerClass } from '../../../sim/types';
+
 export type HotbarAction = { type: 'ability'; id: string } | { type: 'item'; id: string } | null;
 
 export interface HotbarStorage {
@@ -43,8 +47,8 @@ export function parseStoredHotbarAction(
   }
 }
 
-export function attackSlotStorageKey(normalSlotMapKey: string): string {
-  return `${normalSlotMapKey}:s0`;
+export function attackSlotStorageKey(formSlotMapKey: string): string {
+  return `${formSlotMapKey}:s0`;
 }
 
 export function loadAttackSlotAction(
@@ -236,6 +240,25 @@ export function shouldSeedFormBar(
   if (alreadySeeded) return false;
   if (parsedForm.every((action) => action === null)) return true;
   return hotbarActionsEqual(parsedForm, parsedNormal);
+}
+
+// Ability ids the loadout's OWN talent allocation actually grants, independent of
+// whichever build happens to be active client-side right now. `applyLoadoutBar`'s
+// `abilityExists` predicate must be built from this, never from "does the id exist
+// anywhere in ABILITIES": two builds on the same class can grant disjoint ability
+// sets (e.g. a shaman's Enhancement loadout grants stormstrike, Restoration grants
+// chain_heal, and both ids exist globally regardless of which spec is active), so
+// a global-existence check lets a stale/foreign-spec id survive the switch and land
+// on the bar. Computed from the loadout's `alloc` directly rather than the live
+// `known` list, since switchTalentLoadout's server round trip has not necessarily
+// resolved yet when the client applies the bar.
+export function loadoutKnownAbilityIds(
+  cls: PlayerClass,
+  alloc: TalentAllocation,
+  level: number,
+): Set<string> {
+  const mods = computeTalentModifiers(cls, alloc, level);
+  return new Set(abilitiesKnownAt(cls, level, mods).map((k) => k.def.id));
 }
 
 // Rebuild the bar for a switched talent loadout. A `SavedLoadout.bar` only ever

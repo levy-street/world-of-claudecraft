@@ -100,10 +100,13 @@ into a pure module if needed), then the smallest change that turns it green.
   `main.ts`. Action-bar slots (`slot0..11`) already route to `onAbility`.
 - **A new SFX:** add the catalog entry and sampled asset, regenerate
   `sfx_manifest.generated.ts`, and route the typed key through `sfx.ts`. Personal
-  UI/event call surfaces stay on `GameAudio`; author and publish them through the
-  SFX Studio or the deterministic UI generator. Tune cross-clip gain and speed
-  through the Studio-backed checked-in maps, never by editing the generated
-  manifest or baking those values into the asset.
+  UI/event call surfaces stay on `GameAudio`, and choose the cue's gate
+  deliberately: `playFeedback` for notification/reward feedback the
+  `interfaceSfx` setting can silence, `play` for timing/affordance cues that must
+  always sound (the split is pinned by `tests/game_audio.test.ts`); author and
+  publish them through the SFX Studio or the deterministic UI generator. Tune
+  cross-clip gain and speed through the Studio-backed checked-in maps, never by
+  editing the generated manifest or baking those values into the asset.
 - **A new music cue/zone:** add a `MusicZone`, a `composeX()` theme, register it
   in the `buildMusicThemes()` map (music.ts), and drive it from
   `music.update(zone, inCombat)`.

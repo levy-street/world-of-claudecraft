@@ -79,7 +79,24 @@ const adhocMacSign =
     : [];
 
 function run(command, args) {
-  const result = spawnSync(command, args, { env, stdio: 'inherit', cwd: root });
+  // On Windows the npm and electron-builder launchers are .cmd batch shims, and
+  // Node 20.12+/22 (the CVE-2024-27980 hardening) refuses to spawn a batch file
+  // without a shell: spawnSync returns EINVAL with a null status and nothing on
+  // stderr. Route through the shell there, quoting any argument with spaces
+  // ourselves because shell mode joins argv without re-quoting. The sign hook's
+  // azuresigntool call stays shell-less on purpose (it is a real .exe and its
+  // argv carries the client secret, which must never pass through cmd.exe).
+  const useShell = process.platform === 'win32';
+  const shellArgs = useShell ? args.map((a) => (/\s/.test(a) ? `"${a}"` : a)) : args;
+  const result = spawnSync(command, shellArgs, {
+    env,
+    stdio: 'inherit',
+    cwd: root,
+    shell: useShell,
+  });
+  if (result.error) {
+    console.error(`electron-build: failed to spawn ${command}: ${result.error.message}`);
+  }
   if (result.status !== 0) process.exit(result.status ?? 1);
 }
 

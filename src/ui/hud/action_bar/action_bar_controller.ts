@@ -87,8 +87,10 @@ export class ActionBarController {
     const next = this.resolveActiveForm();
     if (next === this.activeFormState) return false;
     this.saveActions();
+    this.saveAttackAction();
     this.activeFormState = next;
     this.loadActions();
+    this.loadAttackAction();
     return true;
   }
 
@@ -191,7 +193,7 @@ export class ActionBarController {
     try {
       writeAttackSlotAction(
         this.deps.storage,
-        attackSlotStorageKey(this.slotMapKey('normal')),
+        attackSlotStorageKey(this.slotMapKey()),
         this.attackActionState,
       );
     } catch {
@@ -370,7 +372,7 @@ export class ActionBarController {
     try {
       this.attackActionState = readAttackSlotAction(
         this.deps.storage,
-        attackSlotStorageKey(this.slotMapKey('normal')),
+        attackSlotStorageKey(this.slotMapKey()),
         (id) => this.deps.knownAbilityIds().includes(id),
         (id) => this.isHotbarItemId(id),
       );

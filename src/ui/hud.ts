@@ -240,6 +240,8 @@ import {
   HOTBAR_ACTION_MIME,
   type HotbarAction,
   handleMobileAttackTap,
+  loadAttackSlotAction,
+  loadoutKnownAbilityIds,
   parseHotbarAction,
   placeAbilityOnSlot,
   placeItemOnSlot,
@@ -311,10 +313,11 @@ import { lowHealthVignette } from './low_health';
 import { lowResourceView } from './low_resource';
 import { mailIndicatorView } from './mailbox_view';
 import { MailboxWindow } from './mailbox_window';
+import { bindMapPinchZoom, finishMapTap, mapTapReleaseFromPointer } from './map_pinch_zoom';
+import { MAP_TAP_MOVE_TOLERANCE_PX, nextMapZoom } from './map_pinch_zoom_core';
 import { type MapRegion, mapCanvasHeight, paintTerrainRows } from './map_terrain';
 import { MapWindowPainter } from './map_window_painter';
 import {
-  MAP_MAX_ZOOM,
   type MapNpcMarker,
   type MapQuestAreaMarker,
   mapWindowMode,
@@ -1835,9 +1838,16 @@ export class Hud {
     );
     $('#map-zoom-in')?.addEventListener('click', () => this.zoomMap(1.4));
     $('#map-zoom-out')?.addEventListener('click', () => this.zoomMap(1 / 1.4));
+    const mapPinch = bindMapPinchZoom(mapCanvas, {
+      onPinchStart: () => {
+        this.mapDrag = null;
+        mapCanvas.style.cursor = '';
+      },
+      onZoom: (factor) => this.zoomMap(factor),
+    });
     // drag to pan (only meaningful while zoomed in; at zoom 1 the whole zone fits)
     mapCanvas.addEventListener('pointerdown', (ev) => {
-      if (!this.mapView || this.mapZoom <= 1) return;
+      if (mapPinch.isPinching() || !this.mapView || this.mapZoom <= 1) return;
       const base = this.mapCenter ?? { x: this.sim.player.pos.x, z: this.sim.player.pos.z };
       this.mapCenter = { ...base };
       this.mapDrag = { px: ev.clientX, py: ev.clientY, cx: base.x, cz: base.z };
@@ -1845,7 +1855,7 @@ export class Hud {
       mapCanvas.style.cursor = 'grabbing';
     });
     mapCanvas.addEventListener('pointermove', (ev) => {
-      if (!this.mapDrag || !this.mapView) return;
+      if (mapPinch.isPinching() || !this.mapDrag || !this.mapView) return;
       const rect = mapCanvas.getBoundingClientRect();
       // "grab the paper" pan: the world point under the cursor stays under it.
       // toMap draws +X to the left and +Z up (mx = (maxX-x)/span, my = (maxZ-z)/
@@ -1873,7 +1883,6 @@ export class Hud {
     // with live tracker progress. Both hit-tests run against the markers of the
     // last paint, scaled from CSS px to the canvas backing space the model projects
     // into.
-    const TAP_MOVE_TOLERANCE_PX = 10;
     let mapAreaTipShown = false;
     let mapTapStart: { x: number; y: number } | null = null;
     const hideMapAreaTip = (): void => {
@@ -1917,16 +1926,21 @@ export class Hud {
     // release can tell a stationary marker tap from a pan.
     mapCanvas.addEventListener('pointerdown', (ev) => {
       hideMapAreaTip();
-      mapTapStart = ev.pointerType === 'mouse' ? null : { x: ev.clientX, y: ev.clientY };
+      mapTapStart =
+        ev.pointerType === 'mouse' || mapPinch.isPinching()
+          ? null
+          : { x: ev.clientX, y: ev.clientY };
     });
     // A stationary touch release reveals the marker under the finger. iOS can raise
     // pointercancel (not pointerup) for a tap it briefly mistook for a gesture, so
     // both end the tap; a release that moved past the tolerance was a pan.
     const endMapTap = (ev: PointerEvent): void => {
-      if (ev.pointerType === 'mouse' || !mapTapStart) return;
-      const moved = Math.hypot(ev.clientX - mapTapStart.x, ev.clientY - mapTapStart.y);
+      finishMapTap(
+        mapPinch,
+        mapTapReleaseFromPointer(ev, mapTapStart, MAP_TAP_MOVE_TOLERANCE_PX),
+        showMapTipAt,
+      );
       mapTapStart = null;
-      if (moved <= TAP_MOVE_TOLERANCE_PX) showMapTipAt(ev.clientX, ev.clientY);
     };
     mapCanvas.addEventListener('pointerup', endMapTap);
     mapCanvas.addEventListener('pointercancel', endMapTap);
@@ -2648,8 +2662,8 @@ export class Hud {
     this.chatWindow.applyInputPresentation();
   }
 
-  noteSentChannel(sentLine: string): void {
-    this.chatWindow.noteSentChannel(sentLine);
+  noteSentChannel(sentLine: string, online: boolean): void {
+    this.chatWindow.noteSentChannel(sentLine, online);
   }
 
   composeChatSend(typed: string): string {
@@ -3246,7 +3260,7 @@ export class Hud {
     saveLoadout: (name, bar, alloc) => this.sim.saveLoadout(name, bar, alloc),
     switchLoadout: (i) => this.sim.switchLoadout(i),
     deleteLoadout: (i) => this.sim.deleteLoadout(i),
-    applyLoadoutBar: (bar) => this.applyLoadoutBar(bar),
+    applyLoadoutBar: (bar, alloc) => this.applyLoadoutBar(bar, alloc),
     buildDropdown: (options, current, onChange, placeholder, a11y) =>
       this.buildDropdown(options, current, onChange, placeholder, a11y),
     inputDialog: (opts) => this.inputDialog(opts),
@@ -7420,7 +7434,7 @@ export class Hud {
   // scroll-wheel / button zoom for the world map (clamped to [1, MAP_MAX_ZOOM])
   private zoomMap(factor: number): void {
     const prev = this.mapZoom;
-    this.mapZoom = Math.max(1, Math.min(MAP_MAX_ZOOM, this.mapZoom * factor));
+    this.mapZoom = nextMapZoom(this.mapZoom, factor);
     // zooming back to 1 resumes following the player; a fresh zoom-in from the
     // follow view anchors the pan at the player so dragging starts from there
     if (this.mapZoom === 1) this.mapCenter = null;
@@ -7583,12 +7597,16 @@ export class Hud {
         if (swing && src) {
           this.combat(swing, src.pos.x, src.pos.y, src.pos.z, 0.5, { cooldown: 0.08 });
         }
+        // The miss/dodge/resist/parry "avoid" cues are interface feedback (they report
+        // an outcome, not a world impact), so the Interface & Feedback Sounds toggle
+        // silences them. The early return stays either way, so a muted avoid never
+        // falls through to an impact sound.
         if (ev.kind === 'miss' || ev.kind === 'dodge' || ev.kind === 'resist') {
-          this.combat('combat_dodge', tp.x, tp.y, tp.z, 0.5);
+          if (audio.feedbackEnabled) this.combat('combat_dodge', tp.x, tp.y, tp.z, 0.5);
           return;
         }
         if (ev.kind === 'parry') {
-          this.combat('combat_parry', tp.x, tp.y, tp.z, 0.6);
+          if (audio.feedbackEnabled) this.combat('combat_parry', tp.x, tp.y, tp.z, 0.6);
           return;
         }
         if (src?.kind === 'mob') this.playAttackerSfx(src);
@@ -10842,19 +10860,29 @@ export class Hud {
   }
 
   // Restore a saved loadout's action bar into the per-class slot map (reuses the
-  // existing hotbar persistence; only places ids that resolve to real abilities).
-  // A SavedLoadout's bar is ability ids only (currentBar strips item shortcuts
-  // before saving, see the talentsWindow deps below), so this must not replace
-  // the WHOLE bar wholesale: that would also silently clear any potion/food/drink
-  // shortcut the player had placed, since the loadout never recorded it either
-  // way (#1889). applyLoadoutBarActions keeps an existing item slot wherever the
-  // loadout leaves that slot blank.
-  private applyLoadoutBar(bar: (string | null)[]): void {
+  // existing hotbar persistence; only places ids the TARGET build's own allocation
+  // actually grants). A SavedLoadout's bar is ability ids only (currentBar strips
+  // item shortcuts before saving, see the talentsWindow deps below), so this must
+  // not replace the WHOLE bar wholesale: that would also silently clear any
+  // potion/food/drink shortcut the player had placed, since the loadout never
+  // recorded it either way (#1889). applyLoadoutBarActions keeps an existing item
+  // slot wherever the loadout leaves that slot blank.
+  //
+  // The ability predicate is resolved from `alloc` (the loadout's own talent
+  // allocation), not `!!ABILITIES[id]`: two builds on one class can grant disjoint
+  // ability sets (e.g. a shaman's Enhancement vs. Restoration loadout), and
+  // checking global existence let a stale/foreign-spec id survive a switch and
+  // scramble the bar. Resolving from `alloc` also sidesteps switchLoadout's server
+  // round trip, which has not necessarily landed in `this.sim.known` yet when this
+  // runs (see the talentsWindow dropdown handler, which calls switchLoadout and
+  // applyLoadoutBar back to back).
+  private applyLoadoutBar(bar: (string | null)[], alloc: TalentAllocation): void {
+    const known = loadoutKnownAbilityIds(this.sim.cfg.playerClass, alloc, this.sim.player.level);
     this.hotbarActions = applyLoadoutBarActions(
       this.hotbarActions,
       bar,
       Hud.BAR_ABILITY_SLOTS,
-      (id) => !!ABILITIES[id],
+      (id) => known.has(id),
     );
     this.saveSlotMap();
   }

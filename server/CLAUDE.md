@@ -57,7 +57,7 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
 | `deeds_db.ts` / `deeds_records.ts` | deeds SQL boundary (`character_deeds` upserts, rarity counts, recent earns, broadcast opt-out; the board roll-up is `deedsBoardRanked` in `db.ts`, aggregated SQL-side with Renown passed as parameters) / the `deedUnlocked` observer: fire-and-forget FIFO upserts, the `isMarqueeDeed` predicate, and the env-gated Steam mirror hook (the marquee guild/friend broadcast fan-out itself lives in `game.ts`); the sim decides unlocks, this only records them |
 | `deeds_board.ts` / `deeds.ts` | the Renown leaderboard's pure scoring core (account-level dedupe, entry floor, score-then-earliest tie-break; Renown values come from the content table, never SQL) / the `RouteDef` API surface (public rarity read, broadcast toggle), TTL-cached in `main.ts` |
 | `steam/` | the env-gated (`STEAM_ENABLED`, off by default) Steam achievements mirror: link-not-login ticket handshake, `achievement_map.ts` (deed id to `ACH_*`, hard cap 100), publisher Web API push + reconcile-on-link |
-| `daily_rewards.ts`/`daily_rewards_db.ts` | wallet-gated daily reward tasks + Discord winner announcements; participation bans live HERE, not in `moderation_db` |
+| `daily_rewards.ts`/`daily_rewards_db.ts` | wallet-gated daily reward tasks + Discord winner announcements; participation bans are WRITTEN in `moderation_db.ts` (`setDailyRewardsBan`, permanent or timed via `durationHours`, recorded in the moderation audit; `tests/moderation_db.test.ts`), this pair owns only the eligibility read (`banForAccount`, `tests/daily_rewards_ban_db.test.ts`) |
 | `discord.ts` (+ `discord_oauth`/`discord_db`/`discord_relay`/`discord_activity`) | Discord integration: link/unlink OAuth shell + rewards, in-game `!` community-command relay, activity feed the bot drains |
 | `github.ts` (+ `github_oauth`/`github_db`/`github_contributors`) | GitHub contributor linking for the developer badge + merged-PR tally |
 | `oauth.ts`/`oauth_db.ts`, `character_sheet.ts`, `profile_page.ts`, `avatar.ts` | read-only companion API: OAuth code+PKCE and device grants (scope `character:read`), pure sheet normalizer, public SEO profile pages + generated avatars |
@@ -72,14 +72,18 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
   `dispatchMessage` (game.ts) type-checks each field before calling a `sim.*`
   method, keep that guarding when you add a command.
 - **Wire protocol lockstep with `src/net/online.ts`.** Server sends `hello` /
-  `snap` (with `self`/`ents`/`keep`) / `events` / `social` / `error`; client
+  `snap` (with `self`/`ents`/`keep`) / `events` / `social` / `censor` / `error`; client
   first sends `{t:'auth',token,character}`. Any wire change must land in both files together.
 - **No browser/render/ui imports.** This bundles for Node, import only from
   `src/sim/`, `src/world_api.ts`, and `node:*`. Never from `render/`/`ui/`/`game/`/`net/`.
 - **SQL lives only in `db.ts` and `*_db.ts`.** Logic modules (`game.ts`,
   `social.ts`, `admin.ts`) carry zero raw SQL: `SocialService` talks to a
   `SocialDb` interface so tests use an in-memory fake. Don't inline `pool.query` in a logic module.
-- **`ALLOW_DEV_COMMANDS=1` gates `dev_level`/`dev_teleport`/`dev_give`** (dev/E2E only, **never prod**).
+- **`ALLOW_DEV_COMMANDS=1` gates the whole dev-cheat surface** (dev/E2E only, **never prod**):
+  every `dev_*` case in `dispatchMessage` (game.ts), `Sim.devCommands` (set from the env var
+  when `GameServer` constructs the `Sim`, enabling the full `/dev` chat set in
+  `src/sim/dev_commands.ts`, `handleDevChat`: level, teleport, give, spawn, heal, and friends),
+  and the dev-only `GET /api/perf` read (both dispatch arms).
 
 ## Persistence model
 - Character level + full state (gear/bags/bank/quests/position/money/talents/arena/lifetimeXp/

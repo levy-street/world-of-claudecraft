@@ -60,7 +60,17 @@ Any file dropped here is picked up automatically by
   each species GLB via `loadGltf()` + `registerPreload()` at module import
   time, clones the loaded scene per pool instance, and falls back to the
   original merged-primitive body if the GLB has not finished loading yet
-  (headless/test hosts, or a slow preload race online).
+  (headless/test hosts, or a slow preload race online). A new species also
+  needs its own entry in that module's `CREATURE_FORWARD_YAW` table
+  (exported as `creatureForwardCorrectionYaw()`), verified by eye in the
+  live scene so the nose leads along +Z. Do NOT infer the yaw from the
+  model's bounding box: the long-axis heuristic gets both the axis and the
+  sign wrong (a wingspan can be longer than nose-to-tail, and a box cannot
+  tell nose from tail). At spawn each clone is Box3 re-seated so its base
+  sits at y=0 (a GLB origin is not guaranteed to be at the feet), and both
+  corrections are baked on an inner node under an outer wrapper `Group`,
+  because the per-frame loop hard-writes the outer object's position and
+  heading every tick. The yaw table is pinned by `tests/critters.test.ts`.
 - Ambient fish: `src/render/fish.ts` follows the same load/clone/fallback
   pattern for the single leaping-fish species.
 

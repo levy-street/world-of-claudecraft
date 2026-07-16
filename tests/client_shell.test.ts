@@ -87,6 +87,10 @@ const mainTs = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8').
   /\r\n/g,
   '\n',
 );
+const newsFeedTs = readFileSync(new URL('../src/ui/news_feed.ts', import.meta.url), 'utf8').replace(
+  /\r\n/g,
+  '\n',
+);
 const hudTs = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8').replace(
   /\r\n/g,
   '\n',
@@ -914,14 +918,11 @@ describe('client HTML shell', () => {
     // .donate links in hud.css.
     expect(hudCss).toContain('body.native-app #mobile-donate,');
     // The tap targets: the account panel with the invite as the logged-out /
-    // offline fallback, and the Ko-fi page, pinned to the shells' URLs.
-    expect(mainTs).toContain(
-      "const DISCORD_INVITE_URL = 'https://discord.com/invite/worldofclaudecraft';",
-    );
+    // offline fallback (discordInviteUrl() itself falls back to
+    // DEFAULT_DISCORD_INVITE_URL in discord_status.ts), and the Ko-fi page,
+    // pinned to the shells' URLs.
     expect(mainTs).toContain("const DONATE_URL = 'https://ko-fi.com/worldofclaudecraft';");
-    expect(mainTs).toContain(
-      "window.open(discordInviteUrl() || DISCORD_INVITE_URL, '_blank', 'noopener,noreferrer');",
-    );
+    expect(mainTs).toContain("window.open(discordInviteUrl(), '_blank', 'noopener,noreferrer');");
     expect(mainTs).toContain(
       "onDonate: () => window.open(DONATE_URL, '_blank', 'noopener,noreferrer'),",
     );
@@ -1460,9 +1461,10 @@ describe('client HTML shell', () => {
   });
 
   it('places news release metadata below the heading on mobile', () => {
-    expect(mainTs).toContain(
+    // The renderer moved to src/ui/news_feed.ts (extracted out of main.ts).
+    expect(newsFeedTs).toContain(
       // biome-ignore lint/suspicious/noTemplateCurlyInString: asserting the source literally contains this template expression
-      '<h3 class="news-item-title">${title}</h3><div class="news-item-meta">${tag}${badge}${when}</div></div>',
+      '<h3 class="news-item-title">${title}</h3><div class="news-item-meta">${tag}${newBadge}${badge}${when}</div></div>',
     );
     expect(shellCss).toContain(
       'body.mobile-touch .news-item-head {\n    flex-direction: column;\n    align-items: flex-start;',

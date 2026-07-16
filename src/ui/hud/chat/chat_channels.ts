@@ -168,8 +168,8 @@ export function composeWhisperReply(typed: string): string {
 // there. Plain text (no leading slash) went to `say`. An explicit slash command
 // maps by its leading token; only the standing channels below are recognized, so
 // whisper / reply (`/w`, `/r`), emotes (`/me`, `/dance`), rolls (`/roll`),
-// channel membership (`/join`, `/leave`), the ambiguous bare `/g` (say offline,
-// guild online), and any unknown command return null and leave the sticky
+// channel membership (`/join`, `/leave`), the ambiguous bare `/g` (general
+// offline, guild online), and any unknown command return null and leave the sticky
 // channel unchanged. A `!` community command (`!lfg`, `!events`) is a transient
 // command like a roll, and it is host-dependent anyway (the server relay gate
 // consumes it online; offline it would land in say), so it also returns null.
@@ -206,6 +206,22 @@ export function sentLineTarget(line: string): ChatInputTintTarget | null {
   const text = line.trim();
   if (/^\/r(eply)?\s/i.test(text)) return WHISPER_TAB;
   return sentLineChannel(line);
+}
+
+// Host-aware sticky resolution for the ONE alias sentLineTarget cannot resolve on
+// its own: bare "/g". It routes to GUILD online (the server intercepts it, see
+// server/game.ts) but GENERAL offline (the sim router, src/sim/social/chat.ts), so
+// the host-independent map deliberately returns null for it. The client knows its
+// host, so it resolves "/g" here and keeps the player in the channel they just spoke
+// in (the reported bug: talking in guild via "/g" then reverting to General). Every
+// other line, including the unambiguous "/gu"/"/guild", falls through to
+// sentLineTarget unchanged.
+export function sentLineTargetForHost(
+  line: string,
+  opts: { online: boolean },
+): ChatInputTintTarget | null {
+  if (/^\/g\s/i.test(line.trim())) return opts.online ? 'guild' : 'general';
+  return sentLineTarget(line);
 }
 
 // Persistence: the ordered list of channel tabs the player has opened. The
