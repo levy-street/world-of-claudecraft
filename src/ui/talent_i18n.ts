@@ -981,6 +981,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: 'Feral',
     Wildsurge: 'Furor',
     Winterguard: 'Resguardo de escarcha',
+    "Woe's Crescendo": 'Crescendo del Dolor',
     Woodwise: 'Naturalista',
     Wrack: 'Devastación',
     'Wrathful Psalm': 'Furia divina',
@@ -1327,6 +1328,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: 'Feral',
     Wildsurge: 'Furor',
     Winterguard: 'Protección contra escarcha',
+    "Woe's Crescendo": 'Crescendo del Dolor',
     Woodwise: 'Naturalista',
     Wrack: 'Devastación',
     'Wrathful Psalm': 'Furia divina',
@@ -1673,6 +1675,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: 'Farouche',
     Wildsurge: 'Furie',
     Winterguard: 'Garde de givre',
+    "Woe's Crescendo": 'Crescendo du Malheur',
     Woodwise: 'Naturaliste',
     Wrack: 'Dévastation',
     'Wrathful Psalm': 'Fureur divine',
@@ -2019,6 +2022,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: 'Farouche',
     Wildsurge: 'Furor',
     Winterguard: 'Protection contre le givre',
+    "Woe's Crescendo": 'Crescendo du Malheur',
     Woodwise: 'Naturaliste',
     Wrack: 'Dévastation',
     'Wrathful Psalm': 'Fureur divine',
@@ -2365,6 +2369,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: 'Ferino',
     Wildsurge: 'Furore',
     Winterguard: 'Protezione dal gelo',
+    "Woe's Crescendo": 'Crescendo del Dolore',
     Woodwise: 'Naturalista',
     Wrack: 'Devastazione',
     'Wrathful Psalm': 'Furia divina',
@@ -2711,6 +2716,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: 'Wilder Kampf',
     Wildsurge: 'Furor',
     Winterguard: 'Frostschutz',
+    "Woe's Crescendo": 'Crescendo des Leids',
     Woodwise: 'Naturkundiger',
     Wrack: 'Verwüstung',
     'Wrathful Psalm': 'Göttlicher Furor',
@@ -3058,6 +3064,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: '野性',
     Wildsurge: '暴怒',
     Winterguard: '冰霜防护',
+    "Woe's Crescendo": '苦难渐强',
     Woodwise: '自然学识',
     Wrack: '毁坏',
     'Wrathful Psalm': '神圣狂怒',
@@ -3405,6 +3412,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: '野性',
     Wildsurge: '暴怒',
     Winterguard: '冰霜防護',
+    "Woe's Crescendo": '苦難漸強',
     Woodwise: '自然學家',
     Wrack: '摧殘',
     'Wrathful Psalm': '神聖狂怒',
@@ -3752,6 +3760,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: '야성',
     Wildsurge: '격노',
     Winterguard: '냉기 수호',
+    "Woe's Crescendo": '비탄의 절정',
     Woodwise: '자연주의자',
     Wrack: '파괴력',
     'Wrathful Psalm': '신성한 분노',
@@ -4099,6 +4108,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: 'フェラル',
     Wildsurge: '激情',
     Winterguard: 'フロスト・ウォーディング',
+    "Woe's Crescendo": '苦悶のクレッシェンド',
     Woodwise: '博物学者',
     Wrack: '破滅的猛攻',
     'Wrathful Psalm': '神聖憤怒',
@@ -4445,6 +4455,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: 'Feral',
     Wildsurge: 'Furor',
     Winterguard: 'Proteção contra Gelo',
+    "Woe's Crescendo": 'Crescendo do Sofrimento',
     Woodwise: 'Naturalista',
     Wrack: 'Devastação',
     'Wrathful Psalm': 'Fúria Divina',
@@ -4792,6 +4803,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: 'Сила зверя',
     Wildsurge: 'Ярость',
     Winterguard: 'Защита от холода',
+    "Woe's Crescendo": 'Крещендо скорби',
     Woodwise: 'Натуралист',
     Wrack: 'Опустошение',
     'Wrathful Psalm': 'Божественное неистовство',
@@ -5138,6 +5150,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: 'Divoký tesák',
     Wildsurge: 'Divoký příval',
     Winterguard: 'Zimní stráž',
+    "Woe's Crescendo": 'Crescendo žalu',
     Woodwise: 'Lesní moudrost',
     Wrack: 'Muka',
     'Wrathful Psalm': 'Hněvivý žalm',
@@ -5484,6 +5497,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: 'Wild',
     Wildsurge: 'Furie',
     Winterguard: 'Vorstbescherming',
+    "Woe's Crescendo": 'Crescendo van Wee',
     Woodwise: 'Naturalist',
     Wrack: 'Verwoesting',
     'Wrathful Psalm': 'Goddelijke Furie',
@@ -5830,6 +5844,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: 'Dzika natura',
     Wildsurge: 'Wściekłość',
     Winterguard: 'Mroźna osłona',
+    "Woe's Crescendo": 'Crescendo Niedoli',
     Woodwise: 'Przyrodnik',
     Wrack: 'Spustoszenie',
     'Wrathful Psalm': 'Boska furia',
@@ -6176,6 +6191,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: 'Buas',
     Wildsurge: 'Kegeraman',
     Winterguard: 'Tameng Beku',
+    "Woe's Crescendo": 'Kresendo Duka',
     Woodwise: 'Naturalis',
     Wrack: 'Pemusnahan',
     'Wrathful Psalm': 'Murka Ilahi',
@@ -6522,6 +6538,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: 'Vahşi',
     Wildsurge: 'Hiddet',
     Winterguard: 'Ayaz Koruması',
+    "Woe's Crescendo": 'Keder Kreşendosu',
     Woodwise: 'Doğabilimci',
     Wrack: 'Tahribat',
     'Wrathful Psalm': 'Kutsal Hiddet',
@@ -6868,6 +6885,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: 'Vild',
     Wildsurge: 'Vredesmod',
     Winterguard: 'Frostskydd',
+    "Woe's Crescendo": 'Lidandets Crescendo',
     Woodwise: 'Naturalist',
     Wrack: 'Förödelse',
     'Wrathful Psalm': 'Gudomligt raseri',
@@ -7214,6 +7232,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: 'Hoang Dã',
     Wildsurge: 'Cuồng Nhiệt',
     Winterguard: 'Phòng Hộ Băng Giá',
+    "Woe's Crescendo": 'Cao Trào Khổ Đau',
     Woodwise: 'Nhà Tự Nhiên',
     Wrack: 'Tàn Phá',
     'Wrathful Psalm': 'Phẫn Nộ Thần Thánh',
@@ -7560,6 +7579,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: 'Forvildet',
     Wildsurge: 'Hidsighed',
     Winterguard: 'Frostværn',
+    "Woe's Crescendo": 'Veens Crescendo',
     Woodwise: 'Naturalist',
     Wrack: 'Forødelse',
     'Wrathful Psalm': 'Guddommeligt Raseri',
@@ -7856,6 +7876,7 @@ type DescribedAddedEffect = Extract<
       | 'absorb'
       | 'dot'
       | 'extendDot'
+      | 'channelFinisher'
       | 'interrupt'
       | 'consumeDot'
       | 'consumeAuraChargesDamage';
@@ -7870,6 +7891,7 @@ function assertDescribedAddedEffect(effect: AbilityEffect): asserts effect is De
     effect.type !== 'absorb' &&
     effect.type !== 'dot' &&
     effect.type !== 'extendDot' &&
+    effect.type !== 'channelFinisher' &&
     effect.type !== 'interrupt' &&
     effect.type !== 'consumeDot' &&
     effect.type !== 'consumeAuraChargesDamage'
@@ -7903,6 +7925,8 @@ function addedEffectDescription(
     }
     case 'extendDot':
       return `${name} -> ${abilityName(effect.dot)}: +${seconds(effect.seconds, lang)} (<= +${seconds(effect.maxBonus, lang)}).`;
+    case 'channelFinisher':
+      return `${name}: ${formatNumber(effect.amount, lang)} ${text.statLabels.damage} (r=${formatNumber(effect.radius, lang)}).`;
     case 'interrupt':
       return `${name}: ${t('hudChrome.auraEffect.lockout')} (${seconds(effect.lockout, lang)}).`;
     case 'consumeDot':

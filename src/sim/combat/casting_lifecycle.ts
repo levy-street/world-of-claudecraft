@@ -51,7 +51,7 @@ import {
   normAngle,
 } from '../types';
 import { isInStasis, isLockedOut, isSilenced, isStunned, tonguesMult } from './cc';
-import { rampedDrainTickDamage } from './channel_effects';
+import { detonateChannelFinisher, rampedDrainTickDamage } from './channel_effects';
 import { extendOwnedDot } from './dot_mutation';
 import {
   consumeFreeCostFor,
@@ -844,6 +844,11 @@ function applyChannelTick(
         }
       } else if (eff.type === 'extendDot') {
         extendOwnedDot(tgt, src.id, eff.dot, eff.seconds, eff.maxBonus);
+      } else if (
+        eff.type === 'channelFinisher' &&
+        channelTickNumber === res.def.channel?.ticks
+      ) {
+        detonateChannelFinisher(ctx, src, tgt, res.def, eff);
       }
     }
   });

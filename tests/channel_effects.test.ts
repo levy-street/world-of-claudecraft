@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { updateCasting } from '../src/sim/combat/casting_lifecycle';
+import { cancelCast, updateCasting } from '../src/sim/combat/casting_lifecycle';
 import { rampedDrainTickDamage } from '../src/sim/combat/channel_effects';
 import { rowForLevel, TALENTS, validateTalentTree } from '../src/sim/content/talents';
 import { ABILITIES, MOBS } from '../src/sim/data';
@@ -64,6 +64,67 @@ function runLitany(
   return { amounts, draws, healthLost: target.maxHp - target.hp, duration, ticks };
 }
 
+function runFinisher(
+  talentId: string | undefined,
+  clipAfterTicks = 0,
+): { burstTargets: number[]; draws: number[]; primaryId: number; nearbyId: number } {
+  const sim = new Sim({ seed: 54_821, playerClass: 'priest', autoEquip: false });
+  sim.setPlayerLevel(20);
+  if (talentId) {
+    expect(sim.applyTalents({ spec: null, rows: { 17: talentId } })).toBe(true);
+  }
+  sim.player.spellPower = 0;
+  sim.player.resource = sim.player.maxResource;
+
+  const addTarget = (id: number, xOffset: number, zOffset: number) => {
+    const target = createMob(id, MOBS.forest_wolf, 20, {
+      x: sim.player.pos.x + xOffset,
+      y: sim.player.pos.y,
+      z: sim.player.pos.z + zOffset,
+    });
+    target.maxHp = 100_000;
+    target.hp = target.maxHp;
+    sim.entities.set(target.id, target);
+    sim.rebucket(target);
+    return target;
+  };
+  const primary = addTarget(91_001, 0, 25);
+  const nearby = addTarget(91_002, 4, 25);
+  addTarget(91_003, 10, 25);
+  sim.targetEntity(primary.id);
+  sim.player.facing = Math.atan2(
+    primary.pos.x - sim.player.pos.x,
+    primary.pos.z - sim.player.pos.z,
+  );
+
+  const meta = sim.meta(sim.playerId);
+  if (!meta) throw new Error('missing priest metadata');
+  const draws: number[] = [];
+  sim.rng.setObserver((value) => draws.push(value));
+  sim.castAbility('mind_flay');
+  for (let tick = 0; tick < 300 && sim.player.castingAbility; tick++) {
+    updateCasting(sim.ctx, sim.player, meta);
+    advancePendingProjectiles(sim.ctx);
+    if (clipAfterTicks > 0 && (sim.player.channelTicksFired ?? 0) >= clipAfterTicks) {
+      cancelCast(sim.ctx, sim.player);
+    }
+  }
+  for (let tick = 0; tick < 200 && sim.ctx.pendingProjectiles.length > 0; tick++) {
+    advancePendingProjectiles(sim.ctx);
+  }
+  sim.rng.setObserver(null);
+
+  const burstTargets = sim
+    .drainEvents()
+    .flatMap((event) =>
+      event.type === 'damage' && event.ability === 'Litany of Woe' && event.amount === 36
+        ? [event.targetId]
+        : [],
+    )
+    .sort((a, b) => a - b);
+  return { burstTargets, draws, primaryId: primary.id, nearbyId: nearby.id };
+}
+
 describe('Litany of Woe channel effects', () => {
   it('ramps from the one-based tick ordinal without its own RNG', () => {
     expect(rampedDrainTickDamage(12, 0.3, 1)).toBe(12);
@@ -101,10 +162,27 @@ describe('Litany of Woe channel effects', () => {
   it('places the Litany choice after its level-16 prerequisite and keeps the tree valid', () => {
     const row = rowForLevel('priest', 17);
     const choice = row?.options.find((option) => option.id === 'pri_r17_ninefold_litany');
+    const finisher = row?.options.find((option) => option.id === 'pri_r17_woes_crescendo');
 
     expect(choice).toBeDefined();
     expect(choice?.effect.ability?.[0]?.ability).toBe('mind_flay');
+    expect(finisher).toBeDefined();
+    expect(finisher?.effect.ability?.[0]?.ability).toBe('mind_flay');
     expect(ABILITIES.mind_flay.learnLevel).toBeLessThanOrEqual(17);
     expect(validateTalentTree(TALENTS.priest)).toEqual([]);
+  });
+
+  it('bursts only after a talented full channel and does not add RNG draws', () => {
+    const baseline = runFinisher(undefined);
+    const full = runFinisher('pri_r17_woes_crescendo');
+    const clipped = runFinisher('pri_r17_woes_crescendo', 2);
+    const extendedOnly = runFinisher('pri_r17_ninefold_litany');
+
+    expect(full.burstTargets).toEqual([full.primaryId, full.nearbyId]);
+    expect(clipped.burstTargets).toEqual([]);
+    expect(baseline.burstTargets).toEqual([]);
+    expect(extendedOnly.burstTargets).toEqual([]);
+    expect(full.draws).toEqual(baseline.draws);
+    expect(clipped.draws).toHaveLength(2);
   });
 });

@@ -1555,6 +1555,7 @@ export type AbilityEffect =
   | { type: 'judgement'; dmgMult?: number; flat?: number } // consume your imbue, deal its judgement damage to the target
   | { type: 'lifeTap'; hp: number; mana: number }
   | { type: 'drainTick'; min: number; max: number; healFrac: number; rampPct?: number } // channel tick that may heal the caster or ramp by ordinal
+  | { type: 'channelFinisher'; amount: number; radius: number } // deterministic AoE on a channel's final tick
   | {
       type: 'buffTarget';
       kind: AuraKind;

@@ -1457,7 +1457,7 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 17,
       theme: 'resilience',
-      decision: 'long Litany commitment vs stronger party fortitude vs reactive ward',
+      decision: 'long Litany commitment vs stronger party fortitude vs completion burst',
       options: [
         {
           id: 'pri_r17_ninefold_litany',
@@ -1475,18 +1475,18 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
           effect: { ability: [{ ability: 'power_word_fortitude', buffPct: 0.5 }] },
         },
         {
-          id: 'pri_r17_inner_fire',
-          name: 'Wounded Halo',
+          id: 'pri_r17_woes_crescendo',
+          name: "Woe's Crescendo",
           description:
-            'Taking a hit for at least 15% of your maximum health kindles a ward absorbing 70 damage for 10 sec. 20 sec internal cooldown.',
-          icon: 'power_word_shield',
+            'The final tick of a completed Litany of Woe bursts for 36 Shadow damage to enemies within 8 yards of the target.',
+          icon: 'mind_flay',
           effect: {
-            proc: {
-              id: 'pri_inner_fire',
-              name: 'Wounded Halo',
-              trigger: { on: 'bigHitTaken', hpFrac: 0.15, icd: 20 },
-              responses: [{ kind: 'absorb', amount: 70, duration: 10, name: 'Wounded Halo' }],
-            },
+            ability: [
+              {
+                ability: 'mind_flay',
+                addEffects: [{ type: 'channelFinisher', amount: 36, radius: 8 }],
+              },
+            ],
           },
         },
       ],

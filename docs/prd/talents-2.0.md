@@ -289,6 +289,9 @@ ticks deal 30% and 60% more damage than its first tick. Ninefold Litany occupies
 choice because Litany itself is learned at level 16. It triples the channel to nine seconds
 and nine ticks, preserving the one-second cadence so the ordinal ramp reaches a much higher
 ceiling. The choice asks the priest to trade mobility for a long, rooted damage commitment.
+Woe's Crescendo competes on the same level-17 row: reaching Litany's final tick detonates a
+fixed, draw-free Shadow burst around the locked target, while clipping the channel produces
+no burst. Ninefold Litany alone does not grant the finisher.
 
 ### PBE-2 mage feedback pass
 

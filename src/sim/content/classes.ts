@@ -4924,6 +4924,8 @@ function scaleEffect(
       return { ...eff, min: Math.round(eff.min * dmgMult), max: Math.round(eff.max * dmgMult) };
     case 'drainTick':
       return { ...eff, min: Math.round(eff.min * dmgMult), max: Math.round(eff.max * dmgMult) };
+    case 'channelFinisher':
+      return { ...eff, amount: Math.round(eff.amount * dmgMult + flat) };
     case 'finisherDamage':
       return {
         ...eff,

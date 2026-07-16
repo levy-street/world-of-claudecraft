@@ -45,6 +45,7 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   aoeRoot: 'damage',
   consumeAura: 'other',
   drainTick: 'damage',
+  channelFinisher: 'damage',
   judgement: 'damage',
   incapacitate: 'breakCC',
   polymorph: 'breakCC',
