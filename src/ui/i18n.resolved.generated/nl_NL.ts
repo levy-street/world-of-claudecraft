@@ -7987,6 +7987,33 @@ export const nl_NL: EnTranslations = {
       "heroic_mark": {
         "name": "Heroïsch Merk"
       },
+      "emberforged_hauberk": {
+        "name": "Sintelgesmede Maliënkolder"
+      },
+      "emberforged_legguards": {
+        "name": "Sintelgesmede Beenplaten"
+      },
+      "emberforged_girdle": {
+        "name": "Sintelgesmede Gordel"
+      },
+      "cinderhide_vest": {
+        "name": "Vest van Sintelleer"
+      },
+      "moltencore_maul": {
+        "name": "Strijdknots van de Gesmolten Kern"
+      },
+      "brand_of_the_first_flame": {
+        "name": "Brandmerk van de Eerste Vlam"
+      },
+      "emberseal_of_the_covenant": {
+        "name": "Sintelzegel van het Verbroken Verbond"
+      },
+      "bloodember_band": {
+        "name": "Ring van Bloedsintel"
+      },
+      "ashcoil_signet": {
+        "name": "Zegelring van de Askronkel"
+      },
       "morthens_cryptforged_hauberk": {
         "name": "Morthens Kryptgesmede Maliënkolder"
       },

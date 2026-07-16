@@ -7987,6 +7987,33 @@ export const cs_CZ: EnTranslations = {
       "heroic_mark": {
         "name": "Hrdinská značka"
       },
+      "emberforged_hauberk": {
+        "name": "Řetězová zbroj kovaná v žáru"
+      },
+      "emberforged_legguards": {
+        "name": "Chrániče nohou kované v žáru"
+      },
+      "emberforged_girdle": {
+        "name": "Opasek kovaný v žáru"
+      },
+      "cinderhide_vest": {
+        "name": "Vesta z popelové kůže"
+      },
+      "moltencore_maul": {
+        "name": "Palcát roztaveného jádra"
+      },
+      "brand_of_the_first_flame": {
+        "name": "Znamení Prvního Plamene"
+      },
+      "emberseal_of_the_covenant": {
+        "name": "Žhavá pečeť zlomené úmluvy"
+      },
+      "bloodember_band": {
+        "name": "Prsten krvavého žáru"
+      },
+      "ashcoil_signet": {
+        "name": "Pečetní prsten popelové spirály"
+      },
       "morthens_cryptforged_hauberk": {
         "name": "Morthenův kryptově kovaný hauberk"
       },

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
+import { ABYSS_JEWELRY_IDS, HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { ITEMS, MOBS } from '../src/sim/data';
 import {
   expectedStatBudget,
@@ -235,7 +235,10 @@ describe('item level: heroic boss drops are budget-exact (five-mans 31, raid 33/
     expect(raidIds.size).toBe(3); // the three heroic-only raid weapons
     const ids = Object.values(HEROIC_BOSS_LOOT)
       .flat()
-      .flatMap((e) => (e.itemId ? [e.itemId] : []));
+      .flatMap((e) => (e.itemId ? [e.itemId] : []))
+      // The Molten Abyss neck/rings are the intentional exception (item level 25);
+      // they are covered by the jewelry test below.
+      .filter((id) => !ABYSS_JEWELRY_IDS.has(id));
     expect(ids.length).toBeGreaterThanOrEqual(12); // the full five-man heroic set + raid weapons
     for (const id of ids) {
       const item = ITEMS[id];
@@ -244,6 +247,22 @@ describe('item level: heroic boss drops are budget-exact (five-mans 31, raid 33/
       expect(itemSourceLevel(id), `${id} source`).toBe(raid ? 27 : 25);
       expect(item.quality, id).toBe('epic');
       expect(itemLevel(item), `${id} ilvl`).toBe(raid ? 33 : 31);
+      expect(primaryStatSum(item), `${id} stat sum == budget`).toBe(expectedStatBudget(item));
+    }
+  });
+
+  it('the Molten Abyss neck/rings read item level 25, one tier under the marks vendor', () => {
+    const jewelry = [...ABYSS_JEWELRY_IDS];
+    expect(jewelry.length).toBe(3); // one neck, two rings
+    for (const id of jewelry) {
+      const item = ITEMS[id];
+      expect(item, `${id} is a real item`).toBeTruthy();
+      expect(item.quality, id).toBe('epic');
+      expect(item.slot === 'neck' || item.slot === 'ring', `${id} is jewelry`).toBe(true);
+      // Item level 25 (source 19 + epic bump 6), a step below the item-level-26 vendor
+      // jewelry, so a lucky drop never supersedes a mark-bought neck or ring.
+      expect(itemSourceLevel(id), `${id} source`).toBe(19);
+      expect(itemLevel(item), `${id} ilvl`).toBe(25);
       expect(primaryStatSum(item), `${id} stat sum == budget`).toBe(expectedStatBudget(item));
     }
   });

@@ -7987,6 +7987,33 @@ export const en_XA: EnTranslations = {
       "heroic_mark": {
         "name": "[Ĥéŕóíç Ɱáŕķ]"
       },
+      "emberforged_hauberk": {
+        "name": "[Éɱƀéŕƒóŕĝéð Ĥáúƀéŕķ]"
+      },
+      "emberforged_legguards": {
+        "name": "[Éɱƀéŕƒóŕĝéð Ļéĝĝúáŕðš]"
+      },
+      "emberforged_girdle": {
+        "name": "[Éɱƀéŕƒóŕĝéð Ĝíŕðļé]"
+      },
+      "cinderhide_vest": {
+        "name": "[Çíñðéŕĥíðé Ʋéšţ]"
+      },
+      "moltencore_maul": {
+        "name": "[Ɱóļţéñçóŕé Ɱáúļ]"
+      },
+      "brand_of_the_first_flame": {
+        "name": "[Ɓŕáñð óƒ ţĥé Ƒíŕšţ Ƒļáɱé]"
+      },
+      "emberseal_of_the_covenant": {
+        "name": "[Éɱƀéŕšéáļ óƒ ţĥé Ɓŕóķéñ Çóʋéñáñţ]"
+      },
+      "bloodember_band": {
+        "name": "[Ɓļóóðéɱƀéŕ Ɓáñð]"
+      },
+      "ashcoil_signet": {
+        "name": "[Ášĥçóíļ Šíĝñéţ]"
+      },
       "morthens_cryptforged_hauberk": {
         "name": "[Ɱóŕţĥéñ'š Çŕýþţƒóŕĝéð Ĥáúƀéŕķ]"
       },

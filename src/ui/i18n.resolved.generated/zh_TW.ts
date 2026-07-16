@@ -7987,6 +7987,33 @@ export const zh_TW: EnTranslations = {
       "heroic_mark": {
         "name": "英雄徽記"
       },
+      "emberforged_hauberk": {
+        "name": "餘燼鍛造鎖子甲"
+      },
+      "emberforged_legguards": {
+        "name": "餘燼鍛造護腿"
+      },
+      "emberforged_girdle": {
+        "name": "餘燼鍛造腰帶"
+      },
+      "cinderhide_vest": {
+        "name": "煤燼皮背心"
+      },
+      "moltencore_maul": {
+        "name": "熔核巨錘"
+      },
+      "brand_of_the_first_flame": {
+        "name": "初焰烙印"
+      },
+      "emberseal_of_the_covenant": {
+        "name": "破碎誓約的餘燼封印"
+      },
+      "bloodember_band": {
+        "name": "血燼指環"
+      },
+      "ashcoil_signet": {
+        "name": "灰燼盤繞印戒"
+      },
       "morthens_cryptforged_hauberk": {
         "name": "莫爾森的墓鑄鎖甲"
       },

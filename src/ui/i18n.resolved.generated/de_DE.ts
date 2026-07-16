@@ -7987,6 +7987,33 @@ export const de_DE: EnTranslations = {
       "heroic_mark": {
         "name": "Heroische Marke"
       },
+      "emberforged_hauberk": {
+        "name": "Glutgeschmiedeter Kettenpanzer"
+      },
+      "emberforged_legguards": {
+        "name": "Glutgeschmiedete Beinschienen"
+      },
+      "emberforged_girdle": {
+        "name": "Glutgeschmiedeter Gürtel"
+      },
+      "cinderhide_vest": {
+        "name": "Weste aus Aschenleder"
+      },
+      "moltencore_maul": {
+        "name": "Schmelzkern-Streitkolben"
+      },
+      "brand_of_the_first_flame": {
+        "name": "Zeichen der Ersten Flamme"
+      },
+      "emberseal_of_the_covenant": {
+        "name": "Glutsiegel des gebrochenen Bundes"
+      },
+      "bloodember_band": {
+        "name": "Blutglut-Ring"
+      },
+      "ashcoil_signet": {
+        "name": "Aschenschlangen-Siegelring"
+      },
       "morthens_cryptforged_hauberk": {
         "name": "Morthens gruftgeschmiedetes Kettenhemd"
       },

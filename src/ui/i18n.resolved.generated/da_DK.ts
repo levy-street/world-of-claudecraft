@@ -7987,6 +7987,33 @@ export const da_DK: EnTranslations = {
       "heroic_mark": {
         "name": "Heroisk Mærke"
       },
+      "emberforged_hauberk": {
+        "name": "Gløddesmedet brynje"
+      },
+      "emberforged_legguards": {
+        "name": "Gløddesmedede benskinner"
+      },
+      "emberforged_girdle": {
+        "name": "Gløddesmedet bælte"
+      },
+      "cinderhide_vest": {
+        "name": "Vest af glødlæder"
+      },
+      "moltencore_maul": {
+        "name": "Smeltekernens stridskølle"
+      },
+      "brand_of_the_first_flame": {
+        "name": "Den Første Flammes brændemærke"
+      },
+      "emberseal_of_the_covenant": {
+        "name": "Den brudte pagts glødsegl"
+      },
+      "bloodember_band": {
+        "name": "Blodgløddens ring"
+      },
+      "ashcoil_signet": {
+        "name": "Askehvirvlens signetring"
+      },
       "morthens_cryptforged_hauberk": {
         "name": "Morthens Kryptsmedede Brynje"
       },

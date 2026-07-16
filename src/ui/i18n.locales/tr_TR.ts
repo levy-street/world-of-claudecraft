@@ -171,6 +171,15 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'İpucu: dizilimini sınamak için başka bir oyuncuya dostça düello teklif et veya Kül Koliseumu arenası sırasına gir.',
   'loading.tips.talents':
     'İpucu: savaş dışında olduğun sürece yeteneklerini istediğin zaman sıfırlayabilirsin, bu yüzden erken bir seçim asla tuzak değildir.',
+  'entities.items.emberforged_hauberk.name': 'Köz Dövmesi Zırh Gömleği',
+  'entities.items.emberforged_legguards.name': 'Köz Dövmesi Bacaklık',
+  'entities.items.emberforged_girdle.name': 'Köz Dövmesi Kemer',
+  'entities.items.cinderhide_vest.name': 'Köz Derisi Yelek',
+  'entities.items.moltencore_maul.name': 'Ergimiş Çekirdek Topuzu',
+  'entities.items.brand_of_the_first_flame.name': 'İlk Alevin Dağı',
+  'entities.items.emberseal_of_the_covenant.name': 'Bozulmuş Ahdin Köz Mührü',
+  'entities.items.bloodember_band.name': 'Kan Közü Yüzüğü',
+  'entities.items.ashcoil_signet.name': 'Kül Sarmalı Mühür Yüzüğü',
   'entities.items.chunk_of_ore.name': 'Maden Parçası',
   'entities.quests.q_prof_intro.completion':
     'Gördün mü? Çantanda maden, ellerinde nasır. Yollarda gezerken madenciliğe, odunculuğa ve ot toplamaya devam et. Kasabaya döndüğünde pazarın yanındaki Kasaba Odağı panosuna ve yakındaki üretim tezgahına göz at. İstersen bunların hepsinde iyi bir geçim var.',

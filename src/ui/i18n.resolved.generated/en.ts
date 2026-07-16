@@ -7987,6 +7987,33 @@ export const en: EnTranslations = {
       "heroic_mark": {
         "name": "Heroic Mark"
       },
+      "emberforged_hauberk": {
+        "name": "Emberforged Hauberk"
+      },
+      "emberforged_legguards": {
+        "name": "Emberforged Legguards"
+      },
+      "emberforged_girdle": {
+        "name": "Emberforged Girdle"
+      },
+      "cinderhide_vest": {
+        "name": "Cinderhide Vest"
+      },
+      "moltencore_maul": {
+        "name": "Moltencore Maul"
+      },
+      "brand_of_the_first_flame": {
+        "name": "Brand of the First Flame"
+      },
+      "emberseal_of_the_covenant": {
+        "name": "Emberseal of the Broken Covenant"
+      },
+      "bloodember_band": {
+        "name": "Bloodember Band"
+      },
+      "ashcoil_signet": {
+        "name": "Ashcoil Signet"
+      },
       "morthens_cryptforged_hauberk": {
         "name": "Morthen's Cryptforged Hauberk"
       },

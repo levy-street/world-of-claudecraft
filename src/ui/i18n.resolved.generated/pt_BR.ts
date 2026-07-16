@@ -7987,6 +7987,33 @@ export const pt_BR: EnTranslations = {
       "heroic_mark": {
         "name": "Marca Heroica"
       },
+      "emberforged_hauberk": {
+        "name": "Cota de Malha Forjada em Brasas"
+      },
+      "emberforged_legguards": {
+        "name": "Perneiras Forjadas em Brasas"
+      },
+      "emberforged_girdle": {
+        "name": "Cinto Forjado em Brasas"
+      },
+      "cinderhide_vest": {
+        "name": "Colete de Couro de Cinzas"
+      },
+      "moltencore_maul": {
+        "name": "Maça do Núcleo Fundido"
+      },
+      "brand_of_the_first_flame": {
+        "name": "Tição da Primeira Chama"
+      },
+      "emberseal_of_the_covenant": {
+        "name": "Selo de Brasas do Pacto Rompido"
+      },
+      "bloodember_band": {
+        "name": "Anel de Brasa Sangrenta"
+      },
+      "ashcoil_signet": {
+        "name": "Anel-Sinete da Espiral de Cinzas"
+      },
       "morthens_cryptforged_hauberk": {
         "name": "Cota de Malha Forjada na Cripta de Morthen"
       },

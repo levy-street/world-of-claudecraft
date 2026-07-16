@@ -7987,6 +7987,33 @@ export const ru_RU: EnTranslations = {
       "heroic_mark": {
         "name": "Героический знак"
       },
+      "emberforged_hauberk": {
+        "name": "Кольчуга, кованная в углях"
+      },
+      "emberforged_legguards": {
+        "name": "Поножи, кованные в углях"
+      },
+      "emberforged_girdle": {
+        "name": "Пояс, кованный в углях"
+      },
+      "cinderhide_vest": {
+        "name": "Жилет из пепельной кожи"
+      },
+      "moltencore_maul": {
+        "name": "Молот расплавленного ядра"
+      },
+      "brand_of_the_first_flame": {
+        "name": "Клеймо Первого Пламени"
+      },
+      "emberseal_of_the_covenant": {
+        "name": "Тлеющая печать нарушенного завета"
+      },
+      "bloodember_band": {
+        "name": "Кольцо кровавых углей"
+      },
+      "ashcoil_signet": {
+        "name": "Печатка пепельного витка"
+      },
       "morthens_cryptforged_hauberk": {
         "name": "Кольчуга Мортена из гробничной стали"
       },

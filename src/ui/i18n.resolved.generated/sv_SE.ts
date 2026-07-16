@@ -7987,6 +7987,33 @@ export const sv_SE: EnTranslations = {
       "heroic_mark": {
         "name": "Heroiskt märke"
       },
+      "emberforged_hauberk": {
+        "name": "Glödsmidd ringbrynja"
+      },
+      "emberforged_legguards": {
+        "name": "Glödsmidda benskenor"
+      },
+      "emberforged_girdle": {
+        "name": "Glödsmidd gördel"
+      },
+      "cinderhide_vest": {
+        "name": "Väst av glödläder"
+      },
+      "moltencore_maul": {
+        "name": "Smältkärnans stridsklubba"
+      },
+      "brand_of_the_first_flame": {
+        "name": "Den första lågans brandjärn"
+      },
+      "emberseal_of_the_covenant": {
+        "name": "Det brutna förbundets glödsigill"
+      },
+      "bloodember_band": {
+        "name": "Blodglödens ring"
+      },
+      "ashcoil_signet": {
+        "name": "Askvirvelns sigillring"
+      },
       "morthens_cryptforged_hauberk": {
         "name": "Morthens kryptsmidda brynja"
       },

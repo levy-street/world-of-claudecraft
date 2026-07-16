@@ -7987,6 +7987,33 @@ export const pl_PL: EnTranslations = {
       "heroic_mark": {
         "name": "Znak heroiczny"
       },
+      "emberforged_hauberk": {
+        "name": "Kolczuga kuta w żarze"
+      },
+      "emberforged_legguards": {
+        "name": "Nagolenniki kute w żarze"
+      },
+      "emberforged_girdle": {
+        "name": "Pas kuty w żarze"
+      },
+      "cinderhide_vest": {
+        "name": "Kamizelka z popielnej skóry"
+      },
+      "moltencore_maul": {
+        "name": "Buława stopionego rdzenia"
+      },
+      "brand_of_the_first_flame": {
+        "name": "Głownia Pierwszego Płomienia"
+      },
+      "emberseal_of_the_covenant": {
+        "name": "Żarowa pieczęć złamanego przymierza"
+      },
+      "bloodember_band": {
+        "name": "Pierścień krwawego żaru"
+      },
+      "ashcoil_signet": {
+        "name": "Sygnet popielnego zwoju"
+      },
       "morthens_cryptforged_hauberk": {
         "name": "Kryptokuta kolczuga Morthena"
       },

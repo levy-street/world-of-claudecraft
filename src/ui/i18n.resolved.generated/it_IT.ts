@@ -7987,6 +7987,33 @@ export const it_IT: EnTranslations = {
       "heroic_mark": {
         "name": "Marchio Eroico"
       },
+      "emberforged_hauberk": {
+        "name": "Usbergo forgiato nella brace"
+      },
+      "emberforged_legguards": {
+        "name": "Gambali forgiati nella brace"
+      },
+      "emberforged_girdle": {
+        "name": "Cintura forgiata nella brace"
+      },
+      "cinderhide_vest": {
+        "name": "Corpetto in cuoio di cenere"
+      },
+      "moltencore_maul": {
+        "name": "Mazza del nucleo fuso"
+      },
+      "brand_of_the_first_flame": {
+        "name": "Tizzone della Prima Fiamma"
+      },
+      "emberseal_of_the_covenant": {
+        "name": "Sigillo di brace del patto infranto"
+      },
+      "bloodember_band": {
+        "name": "Anello di brace sanguigna"
+      },
+      "ashcoil_signet": {
+        "name": "Anello con sigillo della spira di cenere"
+      },
       "morthens_cryptforged_hauberk": {
         "name": "Usbergo forgiacripta di Morthen"
       },

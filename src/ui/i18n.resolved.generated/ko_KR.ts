@@ -7987,6 +7987,33 @@ export const ko_KR: EnTranslations = {
       "heroic_mark": {
         "name": "영웅의 징표"
       },
+      "emberforged_hauberk": {
+        "name": "잉걸불로 벼린 사슬갑옷"
+      },
+      "emberforged_legguards": {
+        "name": "잉걸불로 벼린 다리보호구"
+      },
+      "emberforged_girdle": {
+        "name": "잉걸불로 벼린 허리띠"
+      },
+      "cinderhide_vest": {
+        "name": "잿가죽 조끼"
+      },
+      "moltencore_maul": {
+        "name": "용융핵 철퇴"
+      },
+      "brand_of_the_first_flame": {
+        "name": "첫 불꽃의 낙인"
+      },
+      "emberseal_of_the_covenant": {
+        "name": "깨진 맹약의 잉걸불 인장"
+      },
+      "bloodember_band": {
+        "name": "피잉걸 반지"
+      },
+      "ashcoil_signet": {
+        "name": "잿빛 고리 인장반지"
+      },
       "morthens_cryptforged_hauberk": {
         "name": "모르텐의 묘지주조 사슬갑옷"
       },

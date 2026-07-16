@@ -7987,6 +7987,33 @@ export const fr_CA: EnTranslations = {
       "heroic_mark": {
         "name": "Marque héroïque"
       },
+      "emberforged_hauberk": {
+        "name": "Haubert forgé dans la braise"
+      },
+      "emberforged_legguards": {
+        "name": "Jambières forgées dans la braise"
+      },
+      "emberforged_girdle": {
+        "name": "Ceinturon forgé dans la braise"
+      },
+      "cinderhide_vest": {
+        "name": "Gilet en cuir de cendre"
+      },
+      "moltencore_maul": {
+        "name": "Masse du cœur de magma"
+      },
+      "brand_of_the_first_flame": {
+        "name": "Tison de la Première Flamme"
+      },
+      "emberseal_of_the_covenant": {
+        "name": "Sceau de braise du pacte brisé"
+      },
+      "bloodember_band": {
+        "name": "Anneau de braise sanglante"
+      },
+      "ashcoil_signet": {
+        "name": "Chevalière de la spire de cendre"
+      },
       "morthens_cryptforged_hauberk": {
         "name": "Haubert Cryptforged de Morthen"
       },

@@ -23,6 +23,19 @@ import type { ItemDef, LootEntry } from '../types';
 // epic pieces land at item level 31 (25 + the epic bump of 6).
 export const HEROIC_LOOT_SOURCE_LEVEL = 25;
 
+// The Molten Abyss (Azazel) neck and rings register one tier BELOW the five-man
+// heroic gear: source level 19 puts these epics at item level 25, a step under the
+// Heroic Marks vendor jewelry at item level 26. That keeps the vendor the reliable
+// jewelry source (its necks and rings are never out-scaled by a lucky farm drop),
+// while Azazel still has a themed jewel to hand out. item_level.ts reads this set to
+// give these ids their own source level instead of the standard heroic 25.
+export const HEROIC_ABYSS_JEWELRY_SOURCE_LEVEL = 19;
+export const ABYSS_JEWELRY_IDS: ReadonlySet<string> = new Set([
+  'emberseal_of_the_covenant',
+  'bloodember_band',
+  'ashcoil_signet',
+]);
+
 // The 10-player heroic raid (Heroic Nythraxis) is one tier ABOVE the five-man
 // heroics: its drop table registers at source level 27 so its epics land at item
 // level 33 and its legendaries at 37 (27 + the quality bump). Its heroic set
@@ -470,6 +483,117 @@ export const RETIRED_HEROIC_ITEMS: Record<string, ItemDef> = {
     sellValue: 14000,
     requiredClass: HEAL_MAIL,
   },
+  // ================= Heroic Molten Abyss: Azazel the Abyssal Lord =================
+  // The forge boss arms the most underserved archetype: healer mail (int/spi paladin
+  // and shaman), which the four earlier heroics leave without a chest, legs, or waist.
+  // It also introduces two new weapon shapes (a one-hand strength maul and a one-hand
+  // caster scepter) and a leather chest that closes the agility gap.
+  emberforged_hauberk: {
+    id: 'emberforged_hauberk',
+    name: 'Emberforged Hauberk',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'chest',
+    quality: 'epic',
+    requiredLevel: 20,
+    stats: { int: 12, spi: 10 },
+    sellValue: 14000,
+    requiredClass: HEAL_MAIL,
+  },
+  emberforged_legguards: {
+    id: 'emberforged_legguards',
+    name: 'Emberforged Legguards',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'legs',
+    quality: 'epic',
+    requiredLevel: 20,
+    stats: { int: 12, spi: 8 },
+    sellValue: 12000,
+    requiredClass: HEAL_MAIL,
+  },
+  emberforged_girdle: {
+    id: 'emberforged_girdle',
+    name: 'Emberforged Girdle',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'waist',
+    quality: 'epic',
+    requiredLevel: 20,
+    stats: { int: 9, spi: 6 },
+    sellValue: 9500,
+    requiredClass: HEAL_MAIL,
+  },
+  cinderhide_vest: {
+    id: 'cinderhide_vest',
+    name: 'Cinderhide Vest',
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'chest',
+    quality: 'epic',
+    requiredLevel: 20,
+    stats: { agi: 12, sta: 10 },
+    sellValue: 14000,
+    requiredClass: AGILE_WILD,
+  },
+  moltencore_maul: {
+    id: 'moltencore_maul',
+    name: 'Moltencore Maul',
+    kind: 'weapon',
+    slot: 'mainhand',
+    quality: 'epic',
+    requiredLevel: 20,
+    weapon: { min: 30, max: 50, speed: 2.5 },
+    stats: { str: 13, sta: 9 },
+    sellValue: 16000,
+    requiredClass: HEAVY,
+  },
+  brand_of_the_first_flame: {
+    id: 'brand_of_the_first_flame',
+    name: 'Brand of the First Flame',
+    kind: 'weapon',
+    slot: 'mainhand',
+    quality: 'epic',
+    requiredLevel: 20,
+    weapon: { min: 29, max: 48, speed: 2.4 },
+    stats: { int: 13, spi: 9 },
+    sellValue: 16000,
+    requiredClass: CASTER,
+  },
+  // Item level 25 jewelry (source level 19, see ABYSS_JEWELRY_IDS): one tier under the
+  // Heroic Marks vendor necks (12 pts) and rings (11 pts) at item level 26, so a lucky
+  // Azazel drop is a bonus and never an upgrade over a mark-bought vendor piece. Rings
+  // and necks carry no requiredClass (any class can wear them), each split by archetype.
+  emberseal_of_the_covenant: {
+    id: 'emberseal_of_the_covenant',
+    name: 'Emberseal of the Broken Covenant',
+    kind: 'armor',
+    slot: 'neck',
+    quality: 'epic',
+    requiredLevel: 20,
+    stats: { int: 6, spi: 5 },
+    sellValue: 5000,
+  },
+  bloodember_band: {
+    id: 'bloodember_band',
+    name: 'Bloodember Band',
+    kind: 'armor',
+    slot: 'ring',
+    quality: 'epic',
+    requiredLevel: 20,
+    stats: { str: 6, sta: 5 },
+    sellValue: 4500,
+  },
+  ashcoil_signet: {
+    id: 'ashcoil_signet',
+    name: 'Ashcoil Signet',
+    kind: 'armor',
+    slot: 'ring',
+    quality: 'epic',
+    requiredLevel: 20,
+    stats: { agi: 6, sta: 5 },
+    sellValue: 4500,
+  },
 };
 
 // Heroic-only drop tables per final boss, TWO rollGroups each (chances inside a
@@ -507,6 +631,22 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     { itemId: 'gravewyrm_claws', chance: 0.34, rollGroup: 'korzul_heroic2' },
     { itemId: 'gravescale_girdle', chance: 0.33, rollGroup: 'korzul_heroic2' },
     { itemId: 'wyrmchoir_handwraps', chance: 0.33, rollGroup: 'korzul_heroic2' },
+  ],
+  azazel_infernal_lord: [
+    // Two item-level-31 gear groups (one drops each), matching the other five-man
+    // heroic bosses: healer mail + a new weapon in each.
+    { itemId: 'emberforged_hauberk', chance: 0.34, rollGroup: 'azazel_heroic' },
+    { itemId: 'cinderhide_vest', chance: 0.33, rollGroup: 'azazel_heroic' },
+    { itemId: 'moltencore_maul', chance: 0.33, rollGroup: 'azazel_heroic' },
+    { itemId: 'emberforged_legguards', chance: 0.34, rollGroup: 'azazel_heroic2' },
+    { itemId: 'brand_of_the_first_flame', chance: 0.33, rollGroup: 'azazel_heroic2' },
+    { itemId: 'emberforged_girdle', chance: 0.33, rollGroup: 'azazel_heroic2' },
+    // Item-level-25 jewelry: a THIRD group whose chances sum to 0.5, so a neck or ring
+    // drops only about half of heroic kills, a bonus on top of the two guaranteed gear
+    // pieces that never supersedes the Heroic Marks vendor jewelry (see ABYSS_JEWELRY_IDS).
+    { itemId: 'emberseal_of_the_covenant', chance: 0.18, rollGroup: 'azazel_heroic_jewel' },
+    { itemId: 'bloodember_band', chance: 0.16, rollGroup: 'azazel_heroic_jewel' },
+    { itemId: 'ashcoil_signet', chance: 0.16, rollGroup: 'azazel_heroic_jewel' },
   ],
   nythraxis_scourge_of_thornpeak: [
     // The heroic set pieces and legendaries come free from the heroic loot swap:

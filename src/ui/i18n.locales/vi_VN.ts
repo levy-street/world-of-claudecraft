@@ -168,6 +168,15 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Mẹo: thách đấu người chơi khác trong một trận giao hữu, hoặc xếp hàng vào Đấu Trường Tro Tàn, để thử sức lối xây dựng của bạn.',
   'loading.tips.talents':
     'Mẹo: bạn có thể đặt lại tài năng bất cứ lúc nào ngoài chiến đấu, nên lựa chọn ban đầu không bao giờ là cái bẫy.',
+  'entities.items.emberforged_hauberk.name': 'Áo Giáp Rèn Từ Than Hồng',
+  'entities.items.emberforged_legguards.name': 'Giáp Chân Rèn Từ Than Hồng',
+  'entities.items.emberforged_girdle.name': 'Đai Lưng Rèn Từ Than Hồng',
+  'entities.items.cinderhide_vest.name': 'Áo Da Tro Tàn',
+  'entities.items.moltencore_maul.name': 'Chùy Lõi Nóng Chảy',
+  'entities.items.brand_of_the_first_flame.name': 'Ấn Hỏa Ngọn Lửa Đầu Tiên',
+  'entities.items.emberseal_of_the_covenant.name': 'Ấn Than Hồng của Giao Ước Tan Vỡ',
+  'entities.items.bloodember_band.name': 'Nhẫn Than Máu',
+  'entities.items.ashcoil_signet.name': 'Nhẫn Ấn Xoáy Tro',
   'entities.items.chunk_of_ore.name': 'Khối Quặng',
   'entities.quests.q_prof_intro.completion':
     'Thấy chưa? Quặng trong túi, chai sạn trên tay. Cứ tiếp tục khai khoáng, đốn gỗ và hái thảo dược dọc đường. Khi về thị trấn, nhớ ghé bảng Trọng Tâm Thị Trấn cạnh chợ và bàn chế tác gần đó. Nếu muốn, mọi việc ấy đều có thể thành một nghề kiếm sống đàng hoàng.',

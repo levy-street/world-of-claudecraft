@@ -172,6 +172,15 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Kiat: tantang pemain lain untuk berduel persahabatan, atau masuk antrean arena Koloseum Abu, untuk menguji build-mu.',
   'loading.tips.talents':
     'Kiat: kamu dapat mengatur ulang talenta kapan saja saat tidak bertarung, jadi pilihan awal tidak akan menjadi jebakan.',
+  'entities.items.emberforged_hauberk.name': 'Baju Zirah Tempaan Bara',
+  'entities.items.emberforged_legguards.name': 'Pelindung Kaki Tempaan Bara',
+  'entities.items.emberforged_girdle.name': 'Sabuk Tempaan Bara',
+  'entities.items.cinderhide_vest.name': 'Rompi Kulit Bara',
+  'entities.items.moltencore_maul.name': 'Gada Inti Cair',
+  'entities.items.brand_of_the_first_flame.name': 'Tanda Api Pertama',
+  'entities.items.emberseal_of_the_covenant.name': 'Segel Bara Perjanjian yang Retak',
+  'entities.items.bloodember_band.name': 'Cincin Bara Darah',
+  'entities.items.ashcoil_signet.name': 'Cincin Meterai Pusaran Abu',
   'entities.items.chunk_of_ore.name': 'Bongkahan Bijih',
   'entities.quests.q_prof_intro.completion':
     'Lihat? Bijih di tasmu dan kapalan di tanganmu. Teruslah menambang, menebang, dan memetik herba selama menjelajahi jalanan. Saat kembali ke kota, perhatikan papan Fokus Kota di dekat pasar dan bangku kerajinan di sebelahnya. Semua itu bisa menjadi mata pencaharian yang layak, jika kamu menginginkannya.',

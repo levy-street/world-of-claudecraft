@@ -7987,6 +7987,33 @@ export const tr_TR: EnTranslations = {
       "heroic_mark": {
         "name": "Kahramanca Nişan"
       },
+      "emberforged_hauberk": {
+        "name": "Köz Dövmesi Zırh Gömleği"
+      },
+      "emberforged_legguards": {
+        "name": "Köz Dövmesi Bacaklık"
+      },
+      "emberforged_girdle": {
+        "name": "Köz Dövmesi Kemer"
+      },
+      "cinderhide_vest": {
+        "name": "Köz Derisi Yelek"
+      },
+      "moltencore_maul": {
+        "name": "Ergimiş Çekirdek Topuzu"
+      },
+      "brand_of_the_first_flame": {
+        "name": "İlk Alevin Dağı"
+      },
+      "emberseal_of_the_covenant": {
+        "name": "Bozulmuş Ahdin Köz Mührü"
+      },
+      "bloodember_band": {
+        "name": "Kan Közü Yüzüğü"
+      },
+      "ashcoil_signet": {
+        "name": "Kül Sarmalı Mühür Yüzüğü"
+      },
       "morthens_cryptforged_hauberk": {
         "name": "Morthen'in Mezardövümü Zırh Gömleği"
       },

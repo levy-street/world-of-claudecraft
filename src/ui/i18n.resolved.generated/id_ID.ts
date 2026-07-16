@@ -7987,6 +7987,33 @@ export const id_ID: EnTranslations = {
       "heroic_mark": {
         "name": "Tanda Heroik"
       },
+      "emberforged_hauberk": {
+        "name": "Baju Zirah Tempaan Bara"
+      },
+      "emberforged_legguards": {
+        "name": "Pelindung Kaki Tempaan Bara"
+      },
+      "emberforged_girdle": {
+        "name": "Sabuk Tempaan Bara"
+      },
+      "cinderhide_vest": {
+        "name": "Rompi Kulit Bara"
+      },
+      "moltencore_maul": {
+        "name": "Gada Inti Cair"
+      },
+      "brand_of_the_first_flame": {
+        "name": "Tanda Api Pertama"
+      },
+      "emberseal_of_the_covenant": {
+        "name": "Segel Bara Perjanjian yang Retak"
+      },
+      "bloodember_band": {
+        "name": "Cincin Bara Darah"
+      },
+      "ashcoil_signet": {
+        "name": "Cincin Meterai Pusaran Abu"
+      },
       "morthens_cryptforged_hauberk": {
         "name": "Baju Zirah Tempaan Kripta Morthen"
       },

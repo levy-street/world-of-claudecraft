@@ -7987,6 +7987,33 @@ export const vi_VN: EnTranslations = {
       "heroic_mark": {
         "name": "Dấu Ấn Anh Hùng"
       },
+      "emberforged_hauberk": {
+        "name": "Áo Giáp Rèn Từ Than Hồng"
+      },
+      "emberforged_legguards": {
+        "name": "Giáp Chân Rèn Từ Than Hồng"
+      },
+      "emberforged_girdle": {
+        "name": "Đai Lưng Rèn Từ Than Hồng"
+      },
+      "cinderhide_vest": {
+        "name": "Áo Da Tro Tàn"
+      },
+      "moltencore_maul": {
+        "name": "Chùy Lõi Nóng Chảy"
+      },
+      "brand_of_the_first_flame": {
+        "name": "Ấn Hỏa Ngọn Lửa Đầu Tiên"
+      },
+      "emberseal_of_the_covenant": {
+        "name": "Ấn Than Hồng của Giao Ước Tan Vỡ"
+      },
+      "bloodember_band": {
+        "name": "Nhẫn Than Máu"
+      },
+      "ashcoil_signet": {
+        "name": "Nhẫn Ấn Xoáy Tro"
+      },
       "morthens_cryptforged_hauberk": {
         "name": "Áo Giáp Lưới Rèn Hầm Mộ của Morthen"
       },

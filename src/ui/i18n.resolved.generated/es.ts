@@ -7987,6 +7987,33 @@ export const es: EnTranslations = {
       "heroic_mark": {
         "name": "Marca Heroica"
       },
+      "emberforged_hauberk": {
+        "name": "Loriga forjada en brasas"
+      },
+      "emberforged_legguards": {
+        "name": "Grebas forjadas en brasas"
+      },
+      "emberforged_girdle": {
+        "name": "Cinturón forjado en brasas"
+      },
+      "cinderhide_vest": {
+        "name": "Chaleco de piel de ceniza"
+      },
+      "moltencore_maul": {
+        "name": "Maza del núcleo fundido"
+      },
+      "brand_of_the_first_flame": {
+        "name": "Tizón de la Primera Llama"
+      },
+      "emberseal_of_the_covenant": {
+        "name": "Sello de brasas del pacto roto"
+      },
+      "bloodember_band": {
+        "name": "Anillo de brasa sangrienta"
+      },
+      "ashcoil_signet": {
+        "name": "Sello de la espiral de ceniza"
+      },
       "morthens_cryptforged_hauberk": {
         "name": "Loriga forjada en cripta de Morthen"
       },

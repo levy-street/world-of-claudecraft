@@ -7987,6 +7987,33 @@ export const ja_JP: EnTranslations = {
       "heroic_mark": {
         "name": "英雄の証"
       },
+      "emberforged_hauberk": {
+        "name": "残り火鍛造のホーバーク"
+      },
+      "emberforged_legguards": {
+        "name": "残り火鍛造のレッグガード"
+      },
+      "emberforged_girdle": {
+        "name": "残り火鍛造のガードル"
+      },
+      "cinderhide_vest": {
+        "name": "燃え殻革のベスト"
+      },
+      "moltencore_maul": {
+        "name": "溶核のモール"
+      },
+      "brand_of_the_first_flame": {
+        "name": "最初の炎の烙印"
+      },
+      "emberseal_of_the_covenant": {
+        "name": "破られし契約の残り火印"
+      },
+      "bloodember_band": {
+        "name": "血残り火の指輪"
+      },
+      "ashcoil_signet": {
+        "name": "灰渦の印章指輪"
+      },
       "morthens_cryptforged_hauberk": {
         "name": "モルセンの墓鋳ホーバーク"
       },

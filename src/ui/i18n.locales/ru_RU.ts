@@ -2657,6 +2657,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.revive_pet.name': 'Оживление питомца',
   'entities.abilities.revive_pet.description':
     'Оживляет вашего павшего питомца и возвращает его к вам.',
+  'entities.items.emberforged_hauberk.name': 'Кольчуга, кованная в углях',
+  'entities.items.emberforged_legguards.name': 'Поножи, кованные в углях',
+  'entities.items.emberforged_girdle.name': 'Пояс, кованный в углях',
+  'entities.items.cinderhide_vest.name': 'Жилет из пепельной кожи',
+  'entities.items.moltencore_maul.name': 'Молот расплавленного ядра',
+  'entities.items.brand_of_the_first_flame.name': 'Клеймо Первого Пламени',
+  'entities.items.emberseal_of_the_covenant.name': 'Тлеющая печать нарушенного завета',
+  'entities.items.bloodember_band.name': 'Кольцо кровавых углей',
+  'entities.items.ashcoil_signet.name': 'Печатка пепельного витка',
   'entities.abilities.holy_shock.name': 'Шок небес',
   'entities.abilities.holy_shock.description':
     'Поражает дружественную цель энергией Света и исцеляет ее на {damage}. (знаковое умение Света)',

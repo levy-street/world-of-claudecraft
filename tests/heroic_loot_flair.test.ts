@@ -113,7 +113,14 @@ describe('heroic loot flair: weapon dps tracks item level', () => {
     const w = ITEMS[id].weapon!;
     return (w.min + w.max) / 2 / w.speed;
   };
-  const FIVEMAN_SET_WEAPONS = ['gravewyrm_cleaver', 'mistcallers_fang', 'lunar_tide_greatstaff'];
+  const FIVEMAN_SET_WEAPONS = [
+    'gravewyrm_cleaver',
+    'mistcallers_fang',
+    'lunar_tide_greatstaff',
+    // Azazel (Molten Abyss) weapons sit at the five-man heroic tier (item level 31).
+    'moltencore_maul',
+    'brand_of_the_first_flame',
+  ];
   // The heroic-only Nythraxis raid weapons are one tier up (item level 33).
   const RAID_WEAPONS = [
     'scepter_of_the_deathless_court',
