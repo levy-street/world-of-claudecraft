@@ -89,6 +89,22 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
   // story content and deliberately has NO heroic record. The daily raid
   // lockout is difficulty-scoped (the :heroic key beside the plain dungeon
   // id): one normal AND one heroic Nythraxis kill per day.
+  // Fifth five-man: the Molten Abyss trash carries the biggest base weapon damage
+  // of the ladder (avg elite swing base ~76.8 at the L22 pin vs gravewyrm's ~70),
+  // so equalizing to the same ~300 post-mitigation reference swing inverts to the
+  // smallest 5-man multiplier yet: 300 / (0.5145 DR x 76.8 base x 1.5 elite) = 5.1.
+  // Azazel lands ~23% of the reference shaman's hp per swing, inside the 22-24%
+  // final-boss band.
+  infernal_abyss: {
+    id: 'infernal_abyss',
+    difficulty: 'heroic',
+    level: 22,
+    healthMultiplier: 2.0,
+    damageMultiplier: 5.1,
+    armorMultiplier: 1.2,
+    finalBossId: 'azazel_infernal_lord',
+    marksPerParticipant: 1,
+  },
   nythraxis_boss_arena: {
     id: 'nythraxis_boss_arena',
     difficulty: 'heroic',

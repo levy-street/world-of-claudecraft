@@ -1967,6 +1967,27 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 5,
     trigger: { kind: 'visit', markId: 'fish:mirefen_marsh' },
   },
+  dgn_infernal_abyss: {
+    id: 'dgn_infernal_abyss',
+    name: 'Lord of Nothing',
+    desc: 'Defeat Azazel the Abyssal Lord in the Molten Abyss.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'dungeonClears', dungeonId: 'infernal_abyss', count: 1 },
+  },
+  dgn_infernal_abyss_heroic: {
+    id: 'dgn_infernal_abyss_heroic',
+    name: 'Heroic: The Molten Abyss',
+    desc: 'Defeat Azazel the Abyssal Lord in the Molten Abyss on Heroic difficulty.',
+    category: 'dungeon',
+    renown: 10,
+    trigger: {
+      kind: 'dungeonClears',
+      dungeonId: 'infernal_abyss',
+      difficulty: 'heroic',
+      count: 1,
+    },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

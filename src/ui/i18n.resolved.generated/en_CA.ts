@@ -2979,6 +2979,7 @@ export const en_CA: EnTranslations = {
       "bastionBody": "A flooded fortress lost to the marsh, held by drowned defenders and the rising tide itself.",
       "templeBody": "A moonlit shrine sunk beneath a glowing tarn high in the peaks, reached through a gate of cold light. A drowned cult still sings down there in its rotted vestments, and the warnings carved on the shore say something below only sleeps. A self-contained mystery, set apart from the main story, for the curious and the well-prepared.",
       "sanctumBody": "The dark heart of Thornpeak, where the cult's long work reaches its terrible peak.",
+      "abyssBody": "A burning rift beneath Stormcrag where a chained legion stokes the forges of its abyssal lord. The only way out is down, past the lava and the maw, to the heart of the abyss.",
       "raidName": "The endgame raid",
       "raidBody": "Beyond a sealed royal door waits a ten-player trial: a multi-stage fight and a deathless power the whole raid must shut down together. Earn your way in, then bring nine friends.",
       "heroicTitle": "Heroic mode",
@@ -5619,7 +5620,9 @@ export const en_CA: EnTranslations = {
     "cast": {
       "fishing": "Fishing",
       "demonHeal": "Demon Heal",
-      "thunzharrStormcall": "Stormcall"
+      "thunzharrStormcall": "Stormcall",
+      "forgekeepersWrath": "Forgekeeper's Wrath",
+      "azazelApocalypseFlame": "Apocalypse Flame"
     }
   },
   "questUi": {
@@ -7345,6 +7348,57 @@ export const en_CA: EnTranslations = {
       "sunpetal_herb": {
         "name": "Sunpetal Herb"
       },
+      "infernal_slag": {
+        "name": "Abyssal Slag"
+      },
+      "charred_legion_tablet": {
+        "name": "Charred Legion Tablet"
+      },
+      "brands_of_the_first_flame": {
+        "name": "Brands of the First Flame"
+      },
+      "forgekeepers_ledger": {
+        "name": "Forgekeeper's Ledger"
+      },
+      "azazels_broken_covenant": {
+        "name": "Azazel's Broken Covenant"
+      },
+      "emberforged_vambraces": {
+        "name": "Emberforged Vambraces"
+      },
+      "cinderthread_mantle": {
+        "name": "Cinderthread Mantle"
+      },
+      "hellstalker_boots": {
+        "name": "Hellstalker Boots"
+      },
+      "forgekeepers_warhammer": {
+        "name": "Forgekeeper's Warhammer"
+      },
+      "forgekeepers_runestaff": {
+        "name": "Forgekeeper's Runestaff"
+      },
+      "forgekeepers_fang": {
+        "name": "Forgekeeper's Fang"
+      },
+      "azazels_ruinblade": {
+        "name": "Azazel's Ruinblade"
+      },
+      "azazels_soulstaff": {
+        "name": "Azazel's Soulstaff"
+      },
+      "azazels_emberfang": {
+        "name": "Azazel's Emberfang"
+      },
+      "hellforged_bulwark": {
+        "name": "Hellforged Bulwark"
+      },
+      "cinderseer_raiment": {
+        "name": "Cinderseer Raiment"
+      },
+      "abysswalker_harness": {
+        "name": "Abysswalker Harness"
+      },
       "furyforged_warhelm": {
         "name": "Furyforged Warhelm"
       },
@@ -8408,6 +8462,33 @@ export const en_CA: EnTranslations = {
       },
       "thunzharr_stormling": {
         "name": "Roused Stormling"
+      },
+      "abyssal_legionnaire": {
+        "name": "Abyssal Legionnaire"
+      },
+      "cinder_magus": {
+        "name": "Cinder Magus"
+      },
+      "molten_hellhound": {
+        "name": "Molten Hellhound"
+      },
+      "flamebound_smith": {
+        "name": "Flamebound Smith"
+      },
+      "abyssal_gladiator": {
+        "name": "Abyssal Gladiator"
+      },
+      "infernal_cinderling": {
+        "name": "Abyssal Cinderling"
+      },
+      "forgekeeper": {
+        "name": "The Forgekeeper"
+      },
+      "pyre_golem": {
+        "name": "Pyre Golem"
+      },
+      "azazel_infernal_lord": {
+        "name": "Azazel the Abyssal Lord"
       },
       "ironvein_foreman": {
         "name": "Ironvein Foreman"
@@ -9503,6 +9584,42 @@ export const en_CA: EnTranslations = {
           }
         }
       },
+      "q_infernal_abyss_echoes": {
+        "title": "Echoes Beneath Stormcrag",
+        "text": "Stormcrag was not born from a storm, {playerName}. The oldest tablets call it a lid, hammered over a fire that fell from beyond the world. A new fissure has opened beneath the eastern crag. Enter it with four allies and recover the legion tablet and the brands carved beside the first flame.",
+        "completion": "The tablet names a host that marched willingly into the fire. The brands name the power they served: Azazel. This was never a prison built to keep demons out, {playerName}. It was a gate built to let their lord in.",
+        "objectives": {
+          "0": {
+            "label": "Charred Legion Tablet deciphered"
+          },
+          "1": {
+            "label": "Brands of the First Flame studied"
+          }
+        }
+      },
+      "q_infernal_abyss_covenant": {
+        "title": "The Broken Covenant",
+        "text": "The legion's oath promised Azazel a road into our world, but every covenant has a price and a flaw. Return to the Molten Abyss. Find the Forgekeeper's ledger and the broken covenant near the Maw. If we learn what bound him, we may learn how he can be slain.",
+        "completion": "Here is the flaw: Azazel fed the gate with the names of his own legion. Every servant consumed made him stronger, but tied his life to the forge below. Break the lord in the heart of that forge, and the gate must die with him.",
+        "objectives": {
+          "0": {
+            "label": "Forgekeeper's Ledger recovered"
+          },
+          "1": {
+            "label": "Azazel's Broken Covenant read"
+          }
+        }
+      },
+      "q_infernal_abyss_azazel": {
+        "title": "Lord of the Molten Abyss",
+        "text": "The covenant gives us one chance, {playerName}. Descend past the forge and the Maw with companions you trust. Face Azazel where the first flame touches our world, endure his legions, and extinguish the Abyssal Lord before Stormcrag becomes his open gate.",
+        "completion": "The mountain is quiet. Not sleeping, not waiting, simply quiet. Azazel built eternity from stolen names, and you ended it with one mortal name of your own. Highwatch will remember it, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Azazel the Abyssal Lord slain"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "The Drowned Choir",
         "text": "The waders do not act alone. Among them walk the Drowned Votaries — the cult that sank with the temple, still in their rotted vestments, still singing the prayer from the shore-rocks. Silence eight of them, and bring me six of the offerings they carry. I would know what they mean to give their goddess.",
@@ -9699,6 +9816,11 @@ export const en_CA: EnTranslations = {
         "name": "Nythraxis Raid Arena",
         "enterText": "You pass through the sealed royal door.",
         "leaveText": "You return to the cold air of Thornpeak."
+      },
+      "infernal_abyss": {
+        "name": "Molten Abyss",
+        "enterText": "You descend beneath Stormcrag into the Molten Abyss.",
+        "leaveText": "You climb from the furnace-dark into the mountain wind."
       },
       "drowned_temple": {
         "name": "The Drowned Temple",

@@ -17,6 +17,7 @@
 
 import {
   DUNGEON_LIST,
+  dungeonAt,
   isDelvePos,
   PROPS,
   QUESTS,
@@ -53,7 +54,7 @@ const CAMPFIRE_RADIUS_PPU = 0.5;
 
 /** Which world-map surface a given world renders: the delve schematic (owned by
  *  delve_map_painter) or the overworld map (this core). */
-export type MapWindowMode = 'delve' | 'overworld';
+export type MapWindowMode = 'delve' | 'infernalAbyss' | 'overworld';
 
 /** A map region in world coords, used with two meanings for spanX/spanZ. The
  *  internal `full` rect carries the full committed-zone spans (the whole world in
@@ -263,6 +264,7 @@ export interface OverworldMapInput {
 /** Which world-map surface this world renders. Delve when the player stands in a
  *  delve band and a run is active (matches the inline guard); overworld otherwise. */
 export function mapWindowMode(world: IWorld): MapWindowMode {
+  if (dungeonAt(world.player.pos.x)?.id === 'infernal_abyss') return 'infernalAbyss';
   return isDelvePos(world.player.pos.x) && world.delveRun ? 'delve' : 'overworld';
 }
 

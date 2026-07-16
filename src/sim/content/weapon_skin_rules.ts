@@ -108,6 +108,13 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   nhalias_litany_rod: 'wand',
   scepter_of_the_deathless_court: 'wand',
   stormcallers_focus: 'wand',
+  // Molten Abyss drops (heroic_ variants resolve through these base rows)
+  forgekeepers_warhammer: 'mace',
+  forgekeepers_runestaff: 'staff',
+  forgekeepers_fang: 'dagger',
+  azazels_ruinblade: 'sword',
+  azazels_soulstaff: 'staff',
+  azazels_emberfang: 'dagger',
   // Polearms (no skins target these)
   tidereaver_gaff: 'polearm',
   fen_reaver_glaive: 'polearm',

@@ -196,6 +196,19 @@ const BIPED14: ClipMap = {
   death: 'Death',
 };
 
+// Asset-pipeline biped vocabulary. Tripo retargets each generated creature to
+// these stable names and validates that locomotion stays in-place.
+const PIPELINE_BIPED: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: ['Attack'],
+  hit: ['Hit'],
+  death: 'Death',
+  cast: 'Cast',
+  jump: 'Jump',
+};
+
 // 2023 enemy rig (goblin/giant)
 const ENEMY7: ClipMap = {
   idle: 'Idle',
@@ -766,6 +779,19 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.35,
   },
+  infernal_abyss_azazel: {
+    url: `${CREATURES}/infernal_abyss_azazel.glb`,
+    // Four times the authored presentation size. The entity template scale stays
+    // unchanged, so combat reach and navigation remain stable while Azazel reads
+    // as the colossal endgame encounter the Heart Cairn was built around.
+    height: 9.4,
+    clips: PIPELINE_BIPED,
+  },
+  infernal_abyss_pyre_golem: {
+    url: `${CREATURES}/pyre_golem.glb`,
+    height: 2,
+    clips: PIPELINE_BIPED,
+  },
 
   // -- delve-specific variants (same rigs, colour-differentiated via mob.color) -
   delve_skel_wraith: {
@@ -1062,6 +1088,8 @@ const MOB_KEYS: Record<string, string> = {
   duskborn: 'mob_demon',
   warlock_imp: 'mob_demon_flying',
   warlock_voidwalker: 'mob_demonalt',
+  azazel_infernal_lord: 'infernal_abyss_azazel',
+  pyre_golem: 'infernal_abyss_pyre_golem',
   wild_boar: 'mob_boar',
   // beasts that would otherwise fall back to the wolf model (FAMILY_KEYS.beast)
   old_cragmaw: 'mob_bear',

@@ -2979,6 +2979,7 @@ export const zh_CN: EnTranslations = {
       "bastionBody": "一座沉入沼泽、被淹没守军和不断上涨的潮水所占据的失落要塞。",
       "templeBody": "沼泽小路旁一座沉没的圣殿，是为好奇者与有备而来者准备的岔路。",
       "sanctumBody": "棘峰的黑暗核心，邪教漫长的图谋在此达到可怖的顶点。",
+      "abyssBody": "风暴峭壁之下的灼热裂隙，被锁链束缚的军团在此为炼狱之主鼓动熔炉。唯一的出路是向下：越过熔岩与深渊巨口，直抵深渊之心。",
       "raidName": "终局团队副本",
       "raidBody": "在一扇封印的皇家大门之后，等待着一场十人试炼：一场多阶段的战斗，以及一股不死之力，需要整支团队齐心协力将其镇压。先赢得入场资格，再带上九位好友。",
       "heroicTitle": "英雄模式",
@@ -5619,7 +5620,9 @@ export const zh_CN: EnTranslations = {
     "cast": {
       "fishing": "钓鱼",
       "demonHeal": "恶魔治疗",
-      "thunzharrStormcall": "风暴召唤"
+      "thunzharrStormcall": "风暴召唤",
+      "forgekeepersWrath": "铸炉守卫之怒",
+      "azazelApocalypseFlame": "天启之焰"
     }
   },
   "questUi": {
@@ -7345,6 +7348,57 @@ export const zh_CN: EnTranslations = {
       "sunpetal_herb": {
         "name": "阳瓣草"
       },
+      "infernal_slag": {
+        "name": "炼狱熔渣"
+      },
+      "charred_legion_tablet": {
+        "name": "焦黑军团石板"
+      },
+      "brands_of_the_first_flame": {
+        "name": "第一烈焰的烙印"
+      },
+      "forgekeepers_ledger": {
+        "name": "铸炉守卫的账簿"
+      },
+      "azazels_broken_covenant": {
+        "name": "阿撒兹勒的破碎契约"
+      },
+      "emberforged_vambraces": {
+        "name": "烬铸臂甲"
+      },
+      "cinderthread_mantle": {
+        "name": "灰线披肩"
+      },
+      "hellstalker_boots": {
+        "name": "地狱猎手之靴"
+      },
+      "forgekeepers_warhammer": {
+        "name": "铸炉守卫的战锤"
+      },
+      "forgekeepers_runestaff": {
+        "name": "铸炉守卫的符文杖"
+      },
+      "forgekeepers_fang": {
+        "name": "铸炉守卫之牙"
+      },
+      "azazels_ruinblade": {
+        "name": "阿撒兹勒的毁灭之刃"
+      },
+      "azazels_soulstaff": {
+        "name": "阿撒兹勒的灵魂法杖"
+      },
+      "azazels_emberfang": {
+        "name": "阿撒兹勒的余烬之牙"
+      },
+      "hellforged_bulwark": {
+        "name": "狱火壁垒"
+      },
+      "cinderseer_raiment": {
+        "name": "烬视者法衣"
+      },
+      "abysswalker_harness": {
+        "name": "深渊行者甲胄"
+      },
       "furyforged_warhelm": {
         "name": "怒铸战盔"
       },
@@ -8408,6 +8462,33 @@ export const zh_CN: EnTranslations = {
       },
       "thunzharr_stormling": {
         "name": "被惊醒的风暴元素"
+      },
+      "abyssal_legionnaire": {
+        "name": "深渊军团士兵"
+      },
+      "cinder_magus": {
+        "name": "灰烬法师"
+      },
+      "molten_hellhound": {
+        "name": "熔火地狱犬"
+      },
+      "flamebound_smith": {
+        "name": "缚焰铁匠"
+      },
+      "abyssal_gladiator": {
+        "name": "深渊角斗士"
+      },
+      "infernal_cinderling": {
+        "name": "炼狱烬灵"
+      },
+      "forgekeeper": {
+        "name": "铸炉守卫"
+      },
+      "pyre_golem": {
+        "name": "火葬魔像"
+      },
+      "azazel_infernal_lord": {
+        "name": "炼狱之主阿撒兹勒"
       },
       "ironvein_foreman": {
         "name": "铁脉工头"
@@ -9503,6 +9584,42 @@ export const zh_CN: EnTranslations = {
           }
         }
       },
+      "q_infernal_abyss_echoes": {
+        "title": "风暴峭壁之下的回响",
+        "text": "风暴峭壁并非诞生于风暴，{playerName}。最古老的石板称它为一只盖子，锤打在一团从世界之外坠落的烈火之上。东部峭壁下方裂开了一道新缝隙。与四名盟友一同进入，找回军团石板，以及刻在第一团烈焰旁的烙印。",
+        "completion": "石板记载着一支自愿踏入烈火的大军。烙印则揭示了他们侍奉的力量：阿撒兹勒。这从来不是为了把恶魔挡在外面的监牢，{playerName}。这是一扇让他们的领主进入此世的大门。",
+        "objectives": {
+          "0": {
+            "label": "已解读焦黑军团石板"
+          },
+          "1": {
+            "label": "已研究第一烈焰的烙印"
+          }
+        }
+      },
+      "q_infernal_abyss_covenant": {
+        "title": "破碎的契约",
+        "text": "军团的誓言许诺为阿撒兹勒打开一条通往我们世界的道路，但每份契约都有代价，也有破绽。返回炼狱深渊。找到铸炉守卫的账簿，以及深渊巨口附近的破碎契约。若能弄清束缚他的力量，我们或许就能知道如何杀死他。",
+        "completion": "破绽就在这里：阿撒兹勒以自己军团成员的名字为大门供能。每吞噬一名仆从，他都会变得更强，却也将自己的性命系在了下方的熔炉上。在那座熔炉的核心击溃领主，大门也必将随他一同消亡。",
+        "objectives": {
+          "0": {
+            "label": "已找回铸炉守卫的账簿"
+          },
+          "1": {
+            "label": "已阅读阿撒兹勒的破碎契约"
+          }
+        }
+      },
+      "q_infernal_abyss_azazel": {
+        "title": "炼狱深渊之主",
+        "text": "这份契约只给了我们一次机会，{playerName}。与值得信赖的同伴一同越过熔炉和深渊巨口，继续向下。在第一烈焰触及我们世界之处直面阿撒兹勒，抵挡他的军团，并在风暴峭壁成为他敞开的大门之前熄灭这位炼狱之主。",
+        "completion": "山中寂静无声。不是沉睡，不是等待，只是彻底安静。阿撒兹勒用偷来的名字铸成永恒，而你用自己的一个凡人名字终结了它。高岗城会记住这个名字，{playerName}。",
+        "objectives": {
+          "0": {
+            "label": "已击杀炼狱之主阿撒兹勒"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "溺亡唱诗班",
         "text": "那些涉行者并非孤身行动。它们之中游走着溺亡信徒——随神殿一同沉没的邪教徒，至今仍披着腐烂的法衣，仍在岸边礁石上吟唱祷词。让其中八名永远噤声，再为我带回它们随身携带的六件祭品。我想知道它们打算献给女神什么。",
@@ -9699,6 +9816,11 @@ export const zh_CN: EnTranslations = {
         "name": "尼思拉克西斯团队竞技场",
         "enterText": "你穿过封印的王室之门。",
         "leaveText": "你回到荆峰的寒冷空气中。"
+      },
+      "infernal_abyss": {
+        "name": "炼狱深渊",
+        "enterText": "你深入风暴峭壁之下，进入炼狱深渊。",
+        "leaveText": "你从炉火般的黑暗中攀出，回到山风之中。"
       },
       "drowned_temple": {
         "name": "溺亡神殿",

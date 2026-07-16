@@ -134,6 +134,34 @@
     --color-map-mudhut: #7a6a4a;
     --color-map-campfire: #ff9a3c;
 
+    /* Infernal Abyss full-window parchment schematic. */
+    --color-infernal-map-parchment: #c39055;
+    --color-infernal-map-parchment-light: #e2bf7a;
+    --color-infernal-map-parchment-edge: #542719;
+    --color-infernal-map-parchment-fiber: #f2d08c;
+    --color-infernal-map-scorch: #32110a;
+    --color-infernal-map-scorch-fade: rgba(50, 17, 10, 0);
+    --color-infernal-map-ink: #24100b;
+    --color-infernal-map-ink-soft: #5a2b1c;
+    --color-infernal-map-room: #cda56a;
+    --color-infernal-map-room-deep: #9e7044;
+    --color-infernal-map-room-highlight: #e5c98c;
+    --color-infernal-map-maze-room: #a76f42;
+    --color-infernal-map-armory-room: #8f6448;
+    --color-infernal-map-forge-room: #b24b25;
+    --color-infernal-map-pit-room: #79382b;
+    --color-infernal-map-heart-room: #663027;
+    --color-infernal-map-boss-room: #4b1e1c;
+    --color-infernal-map-boss-glow: #e85a20;
+    --color-infernal-map-lava: #e44815;
+    --color-infernal-map-lava-core: #ffc24b;
+    --color-infernal-map-void: #24151a;
+    --color-infernal-map-void-core: #0e0a0d;
+    --color-infernal-map-route: #6a2d1d;
+    --color-infernal-map-route-highlight: #d49a56;
+    --color-infernal-map-glyph: #f0c878;
+    --color-infernal-map-lore: #78c8b1;
+
     /* overworld minimap markers (resolved by minimap_painter.ts via getComputedStyle:
        a 2D canvas context cannot read a CSS var directly). Exact pre-existing values
        from the inline updateMinimap overworld branch. */

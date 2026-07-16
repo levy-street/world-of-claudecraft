@@ -1891,6 +1891,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.forms.cat': '늑대',
   'abilityUi.cast.fishing': '낚시',
   'abilityUi.cast.thunzharrStormcall': '폭풍의 부름',
+  'abilityUi.cast.forgekeepersWrath': '용광로지기의 분노',
+  'abilityUi.cast.azazelApocalypseFlame': '종말의 불꽃',
   'abilityUi.cast.demonHeal': '악마 치유',
   'questUi.tracker.title': '퀘스트',
   'questUi.tracker.complete': '완료',
@@ -4833,6 +4835,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.sanctumName': '무덤비룡 성소',
   'guide.dungeonsPage.sanctumBody':
     '가시봉우리의 어두운 심장부로, 교단의 오랜 작업이 끔찍한 정점에 다다르는 곳.',
+  'guide.dungeonsPage.abyssBody':
+    '폭풍바위 아래 불타는 균열로, 사슬에 묶인 군단이 지옥 군주를 위해 용광로를 달구는 곳. 길은 오직 아래로, 용암과 심연의 아가리를 지나 심연의 심장으로 이어집니다.',
   'guide.dungeonsPage.raidName': '최종 단계 공격대',
   'guide.dungeonsPage.raidBody':
     '봉인된 왕실 문 너머에는 10인 시련이 기다립니다. 여러 단계로 이어지는 전투와, 공격대 전원이 함께 꺼뜨려야 하는 불사의 힘입니다. 입장할 자격을 스스로 얻은 뒤, 친구 아홉을 데려오세요.',
@@ -7328,6 +7332,56 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '팁: 특성 로드아웃을 여러 개 저장해 두면 포인트를 다시 쓰지 않고도 빌드를 바꿀 수 있습니다.',
   'loading.tips.pvp':
     '팁: 다른 플레이어에게 친선 결투를 신청하거나 잿빛 콜로세움 투기장에 참가해 빌드를 시험해보세요.',
+  'entities.items.infernal_slag.name': '지옥불 광재',
+  'entities.items.charred_legion_tablet.name': '그을린 군단 석판',
+  'entities.items.brands_of_the_first_flame.name': '최초의 불꽃 낙인',
+  'entities.items.forgekeepers_ledger.name': '용광로지기의 장부',
+  'entities.items.azazels_broken_covenant.name': '아자젤의 깨진 계약',
+  'entities.items.emberforged_vambraces.name': '잿불벼림 완갑',
+  'entities.items.cinderthread_mantle.name': '잿불실 어깨덧옷',
+  'entities.items.hellstalker_boots.name': '지옥추적자 장화',
+  'entities.items.forgekeepers_warhammer.name': '용광로지기의 전쟁망치',
+  'entities.items.forgekeepers_runestaff.name': '용광로지기의 룬지팡이',
+  'entities.items.forgekeepers_fang.name': '용광로지기의 송곳니',
+  'entities.items.azazels_ruinblade.name': '아자젤의 파멸검',
+  'entities.items.azazels_soulstaff.name': '아자젤의 영혼지팡이',
+  'entities.items.azazels_emberfang.name': '아자젤의 잿불송곳니',
+  'entities.items.hellforged_bulwark.name': '지옥벼림 철벽갑',
+  'entities.items.cinderseer_raiment.name': '잿불예언자 의복',
+  'entities.items.abysswalker_harness.name': '심연방랑자 멜빵갑옷',
+  'entities.mobs.abyssal_legionnaire.name': '심연의 군단병',
+  'entities.mobs.cinder_magus.name': '잿불 마법사',
+  'entities.mobs.molten_hellhound.name': '용암 지옥사냥개',
+  'entities.mobs.flamebound_smith.name': '화염결속 대장장이',
+  'entities.mobs.abyssal_gladiator.name': '심연의 검투사',
+  'entities.mobs.infernal_cinderling.name': '지옥불 잿불령',
+  'entities.mobs.forgekeeper.name': '용광로지기',
+  'entities.mobs.pyre_golem.name': '화장불 골렘',
+  'entities.mobs.azazel_infernal_lord.name': '지옥불 군주 아자젤',
+  'entities.quests.q_infernal_abyss_echoes.title': '폭풍바위 아래의 메아리',
+  'entities.quests.q_infernal_abyss_echoes.text':
+    '폭풍바위는 폭풍에서 태어난 곳이 아니네, {playerName}. 가장 오래된 석판은 이곳을 세계 너머에서 떨어진 불 위에 두드려 박은 뚜껑이라고 부르지. 동쪽 바위 아래에 새로운 균열이 열렸네. 동료 네 명과 함께 들어가 군단의 석판과 최초의 불꽃 곁에 새겨진 낙인을 되찾아 오게.',
+  'entities.quests.q_infernal_abyss_echoes.completion':
+    '석판에는 스스로 불 속으로 진군한 군세의 이름이 적혀 있네. 낙인은 그들이 섬긴 힘의 이름을 밝히고 있군. 아자젤. 이곳은 악마를 밖에 가두려 지은 감옥이 아니었네, {playerName}. 그들의 군주를 들이기 위해 세운 관문이었어.',
+  'entities.quests.q_infernal_abyss_echoes.objectives.0.label': '그을린 군단 석판 해독',
+  'entities.quests.q_infernal_abyss_echoes.objectives.1.label': '최초의 불꽃 낙인 조사',
+  'entities.quests.q_infernal_abyss_covenant.title': '깨진 계약',
+  'entities.quests.q_infernal_abyss_covenant.text':
+    '군단의 맹세는 아자젤에게 우리 세계로 이어지는 길을 약속했지만, 모든 계약에는 대가와 허점이 있는 법이네. 지옥불 심연으로 돌아가게. 용광로지기의 장부와 아가리 근처에 있는 깨진 계약을 찾아오게. 무엇이 그를 속박했는지 알게 된다면, 그를 죽일 방법도 알아낼 수 있을 걸세.',
+  'entities.quests.q_infernal_abyss_covenant.completion':
+    '허점은 이것이네. 아자젤은 자기 군단의 이름을 먹여 관문에 힘을 공급했어. 하수인을 삼킬 때마다 강해졌지만, 그의 목숨도 아래의 용광로에 묶였지. 그 용광로의 심장부에서 군주를 쓰러뜨리면 관문도 그와 함께 사라질 걸세.',
+  'entities.quests.q_infernal_abyss_covenant.objectives.0.label': '용광로지기의 장부 회수',
+  'entities.quests.q_infernal_abyss_covenant.objectives.1.label': '아자젤의 깨진 계약 열람',
+  'entities.quests.q_infernal_abyss_azazel.title': '지옥불 심연의 군주',
+  'entities.quests.q_infernal_abyss_azazel.text':
+    '계약이 준 기회는 단 한 번뿐이네, {playerName}. 믿을 만한 동료들과 함께 용광로와 아가리를 지나 더 깊이 내려가게. 최초의 불꽃이 우리 세계에 닿는 곳에서 아자젤과 맞서 군단을 견뎌내고, 폭풍바위가 그의 열린 관문이 되기 전에 지옥불 군주를 꺼뜨리게.',
+  'entities.quests.q_infernal_abyss_azazel.completion':
+    '산이 고요하군. 잠든 것도, 기다리는 것도 아닌 그저 고요함뿐이야. 아자젤은 훔친 이름으로 영원을 쌓았고, 자네는 필멸자인 자신의 이름 하나로 그것을 끝냈네. 하이워치는 그 이름을 기억할 걸세, {playerName}.',
+  'entities.quests.q_infernal_abyss_azazel.objectives.0.label': '지옥불 군주 아자젤 처치',
+  'entities.dungeons.infernal_abyss.name': '지옥불 심연',
+  'entities.dungeons.infernal_abyss.enterText': '폭풍바위 아래로 내려가 지옥불 심연에 들어섭니다.',
+  'entities.dungeons.infernal_abyss.leaveText':
+    '용광로처럼 어두운 곳에서 기어올라 산바람 속으로 돌아옵니다.',
   // Baseline class interrupts.
   'entities.abilities.pummel.name': '턱 강타',
   'entities.abilities.pummel.description':

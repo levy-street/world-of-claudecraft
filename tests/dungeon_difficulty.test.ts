@@ -37,11 +37,12 @@ const SYNTHETIC: MobTemplate = {
 };
 
 describe('heroic tuning data contract', () => {
-  it('covers the four five-player dungeons plus the raid arena, with their final bosses', () => {
+  it('covers the five five-player dungeons plus the raid arena, with their final bosses', () => {
     expect([...HEROIC_DUNGEON_IDS].sort()).toEqual([
       'drowned_temple',
       'gravewyrm_sanctum',
       'hollow_crypt',
+      'infernal_abyss',
       'nythraxis_boss_arena',
       'sunken_bastion',
     ]);
@@ -52,6 +53,7 @@ describe('heroic tuning data contract', () => {
       sunken_bastion: 'vael_the_mistcaller',
       drowned_temple: 'ysolei',
       gravewyrm_sanctum: 'korzul_the_gravewyrm',
+      infernal_abyss: 'azazel_infernal_lord',
       nythraxis_boss_arena: 'nythraxis_scourge_of_thornpeak',
     });
     for (const tuning of Object.values(HEROIC_DUNGEON_TUNING)) {
@@ -69,6 +71,7 @@ describe('heroic tuning data contract', () => {
       sunken_bastion: 1,
       drowned_temple: 1,
       gravewyrm_sanctum: 1,
+      infernal_abyss: 1,
       nythraxis_boss_arena: 3,
     });
   });
@@ -93,6 +96,9 @@ describe('heroic tuning data contract', () => {
       sunken_bastion: [2.0, 6.2, 1.3],
       drowned_temple: [2.6, 5.7, 1.25],
       gravewyrm_sanctum: [2.0, 5.4, 1.2],
+      // The Molten Abyss trash carries the biggest base weapon damage of the
+      // ladder, so equalizing inverts to the smallest 5-man multiplier yet.
+      infernal_abyss: [2.0, 5.1, 1.2],
       // The raid multiplier is smaller in RELATIVE terms because normal
       // Nythraxis already lands the game's hardest hits (see the tuning
       // table's comment); its percentage mechanics scale separately in

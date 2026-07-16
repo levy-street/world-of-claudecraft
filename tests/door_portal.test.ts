@@ -9,6 +9,14 @@ import { isSharedGeometry, isSharedMaterial } from '../src/render/shared_resourc
 const meshes = (body: THREE.Group): THREE.Mesh[] =>
   body.children.filter((c): c is THREE.Mesh => (c as THREE.Mesh).isMesh);
 
+const descendantMeshes = (body: THREE.Group): THREE.Mesh[] => {
+  const found: THREE.Mesh[] = [];
+  body.traverse((child) => {
+    if ((child as THREE.Mesh).isMesh) found.push(child as THREE.Mesh);
+  });
+  return found;
+};
+
 describe('buildDoorBody: standard arch door', () => {
   it('builds arch + keystone + two plinths + portal, and returns the portal mesh', () => {
     const { body, portal } = buildDoorBody(true, null, false);
@@ -47,6 +55,29 @@ describe('buildDoorBody: Nythraxis crypt click-box', () => {
 
   it('the special-case only applies when entering (an exit uses the normal arch)', () => {
     const { body, portal } = buildDoorBody(false, 'nythraxis_crypt', false);
+    expect(meshes(body).length).toBe(5);
+    expect(portal).toBeDefined();
+  });
+});
+
+describe('buildDoorBody: Infernal Abyss exterior gate', () => {
+  it('replaces the generic stone dome with a bespoke infernal threshold', () => {
+    const { body, portal, height } = buildDoorBody(true, 'infernal_abyss', false);
+    const gateMeshes = descendantMeshes(body);
+
+    expect(body.name).toBe('infernal-abyss-exterior-gate');
+    expect(body.getObjectByName('infernal-gate-frame')).toBeDefined();
+    expect(body.getObjectByName('infernal-threshold-flame')).toBeDefined();
+    expect(gateMeshes.some((mesh) => mesh.geometry.type === 'ExtrudeGeometry')).toBe(false);
+    expect(gateMeshes.some((mesh) => mesh.geometry.type === 'CircleGeometry')).toBe(false);
+    expect(height).toBeGreaterThan(6);
+    expect(portal).toBeUndefined();
+  });
+
+  it('keeps the Infernal Abyss exit on the standard blue portal contract', () => {
+    const { body, portal } = buildDoorBody(false, 'infernal_abyss', false);
+
+    expect(body.name).not.toBe('infernal-abyss-exterior-gate');
     expect(meshes(body).length).toBe(5);
     expect(portal).toBeDefined();
   });

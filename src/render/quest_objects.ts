@@ -26,6 +26,10 @@ const QUEST_OBJECT_URLS: Record<string, string> = {
   grave_sir_aldren: '/models/dungeon/gravestone.glb',
   grave_high_priest_malric: '/models/dungeon/gravestone.glb',
   grave_captain_voss: '/models/dungeon/gravestone.glb',
+  charred_legion_tablet: '/models/props/chained_demon_obelisk.glb',
+  brands_of_the_first_flame: '/models/props/chained_demon_obelisk.glb',
+  forgekeepers_ledger: '/models/quest/weathered_ledger_page.glb',
+  azazels_broken_covenant: '/models/props/abyssal_heart_altar.glb',
 };
 
 const QUEST_OBJECT_HEIGHTS: Record<string, number> = {
@@ -37,6 +41,10 @@ const QUEST_OBJECT_HEIGHTS: Record<string, number> = {
   grave_sir_aldren: 1.6,
   grave_high_priest_malric: 1.6,
   grave_captain_voss: 1.6,
+  charred_legion_tablet: 1.8,
+  brands_of_the_first_flame: 1.8,
+  forgekeepers_ledger: 1.2,
+  azazels_broken_covenant: 1.8,
 };
 
 const SCROLL_ITEM_IDS = new Set(['weathered_ledger_page', 'fen_muster_order', 'highwatch_summons']);
@@ -51,17 +59,36 @@ interface ScrollStyle {
 
 const SCROLL_STYLES: Record<string, ScrollStyle> = {
   weathered_ledger_page: { parchmentTint: 0xd4c4a0, ink: 0x3a2818, textLines: 4 },
-  fen_muster_order: { parchmentTint: 0xddd0b0, ribbon: 0xc9a227, seal: 0xa02020, ink: 0x2a1800, textLines: 3 },
-  highwatch_summons: { parchmentTint: 0xd8dce8, ribbon: 0x4a6a9a, seal: 0x607888, ink: 0x1a2840, textLines: 3 },
+  fen_muster_order: {
+    parchmentTint: 0xddd0b0,
+    ribbon: 0xc9a227,
+    seal: 0xa02020,
+    ink: 0x2a1800,
+    textLines: 3,
+  },
+  highwatch_summons: {
+    parchmentTint: 0xd8dce8,
+    ribbon: 0x4a6a9a,
+    seal: 0x607888,
+    ink: 0x1a2840,
+    textLines: 3,
+  },
 };
 
-const ITEM_MAT_OVERRIDES: Record<string, { emissive?: number; emissiveIntensity?: number; color?: number }> = {
+const ITEM_MAT_OVERRIDES: Record<
+  string,
+  { emissive?: number; emissiveIntensity?: number; color?: number }
+> = {
   gravecaller_sigil: { emissive: 0x6b3fa0, emissiveIntensity: 0.35 },
   gravewyrm_sigil: { emissive: 0x1a4060, emissiveIntensity: 0.45 },
   bastion_ward_stone: { emissive: 0x6b3fa0, emissiveIntensity: 0.3 },
   soulshard_pillar: { color: 0x6f1b2c, emissive: 0x8f1232, emissiveIntensity: 0.42 },
   sanctum_key_shard: { emissive: 0x1a4060, emissiveIntensity: 0.5 },
   morthen_grimoire: { emissive: 0x3a1850, emissiveIntensity: 0.12 },
+  charred_legion_tablet: { emissive: 0xff3b0a, emissiveIntensity: 0.4 },
+  brands_of_the_first_flame: { emissive: 0xff6a12, emissiveIntensity: 0.55 },
+  forgekeepers_ledger: { color: 0x9a4a28, emissive: 0x6a1808, emissiveIntensity: 0.15 },
+  azazels_broken_covenant: { emissive: 0xff2108, emissiveIntensity: 0.5 },
 };
 
 const gltfByUrl = new Map<string, GLTF>();
@@ -72,7 +99,11 @@ if (typeof window !== 'undefined') {
   const urls = [...new Set(Object.values(QUEST_OBJECT_URLS))];
   for (const url of urls) {
     registerPreload(
-      loadGltf(url).then((g) => { gltfByUrl.set(url, g); }).catch(() => undefined),
+      loadGltf(url)
+        .then((g) => {
+          gltfByUrl.set(url, g);
+        })
+        .catch(() => undefined),
     );
   }
 }
@@ -139,7 +170,7 @@ function convertMaterial(src: THREE.Material, itemId: string): THREE.Material {
   const s = src as THREE.MeshStandardMaterial;
   const ov = ITEM_MAT_OVERRIDES[itemId];
   const scrollTint = SCROLL_STYLES[itemId]?.parchmentTint;
-  const baseColor = ov?.color ?? scrollTint ?? (s.color?.getHex() ?? 0xffffff);
+  const baseColor = ov?.color ?? scrollTint ?? s.color?.getHex() ?? 0xffffff;
   const color = new THREE.Color(baseColor);
   if (scrollTint !== undefined && s.map) {
     color.lerp(new THREE.Color(scrollTint), 0.35);
@@ -192,37 +223,25 @@ function buildRitualCircleTemplate(): THREE.Group {
     flatShading: !GFX.standardMaterials,
   });
 
-  const base = new THREE.Mesh(
-    new THREE.CylinderGeometry(3.8, 4.1, 0.18, 28),
-    darkStoneMat,
-  );
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(3.8, 4.1, 0.18, 28), darkStoneMat);
   base.position.y = 0.09;
   base.castShadow = true;
   base.receiveShadow = true;
   root.add(base);
 
-  const outerRing = new THREE.Mesh(
-    new THREE.TorusGeometry(3.15, 0.15, 8, 32),
-    stoneMat,
-  );
+  const outerRing = new THREE.Mesh(new THREE.TorusGeometry(3.15, 0.15, 8, 32), stoneMat);
   outerRing.rotation.x = Math.PI / 2;
   outerRing.position.y = 0.25;
   outerRing.castShadow = true;
   outerRing.receiveShadow = true;
   root.add(outerRing);
 
-  const innerRing = new THREE.Mesh(
-    new THREE.TorusGeometry(1.95, 0.08, 8, 28),
-    runeMat,
-  );
+  const innerRing = new THREE.Mesh(new THREE.TorusGeometry(1.95, 0.08, 8, 28), runeMat);
   innerRing.rotation.x = Math.PI / 2;
   innerRing.position.y = 0.29;
   root.add(innerRing);
 
-  const tableTop = new THREE.Mesh(
-    new THREE.BoxGeometry(2.2, 0.24, 1.2),
-    slabMat,
-  );
+  const tableTop = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.24, 1.2), slabMat);
   tableTop.position.set(0, 0.86, 0);
   tableTop.rotation.y = 0.16;
   tableTop.castShadow = true;
@@ -230,10 +249,7 @@ function buildRitualCircleTemplate(): THREE.Group {
   root.add(tableTop);
 
   for (const x of [-0.78, 0.78]) {
-    const leg = new THREE.Mesh(
-      new THREE.BoxGeometry(0.22, 0.66, 0.82),
-      darkStoneMat,
-    );
+    const leg = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.66, 0.82), darkStoneMat);
     leg.position.set(x, 0.45, 0);
     leg.rotation.y = 0.16;
     leg.castShadow = true;
@@ -244,10 +260,7 @@ function buildRitualCircleTemplate(): THREE.Group {
   for (let i = 0; i < 8; i++) {
     const angle = (i / 8) * Math.PI * 2;
     const radius = i % 2 === 0 ? 3.05 : 2.45;
-    const marker = new THREE.Mesh(
-      new THREE.BoxGeometry(0.58, 0.035, 0.13),
-      runeMat,
-    );
+    const marker = new THREE.Mesh(new THREE.BoxGeometry(0.58, 0.035, 0.13), runeMat);
     marker.position.set(Math.cos(angle) * radius, 0.38, Math.sin(angle) * radius);
     marker.rotation.y = -angle;
     root.add(marker);
@@ -255,20 +268,14 @@ function buildRitualCircleTemplate(): THREE.Group {
 
   for (let i = 0; i < 4; i++) {
     const angle = (i / 4) * Math.PI * 2 + Math.PI / 4;
-    const pillar = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.28, 0.34, 0.92, 6),
-      stoneMat,
-    );
+    const pillar = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.34, 0.92, 6), stoneMat);
     pillar.position.set(Math.cos(angle) * 3.45, 0.56, Math.sin(angle) * 3.45);
     pillar.rotation.y = angle;
     pillar.castShadow = true;
     pillar.receiveShadow = true;
     root.add(pillar);
 
-    const cap = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.22, 0.18, 0.08, 6),
-      runeMat,
-    );
+    const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.18, 0.08, 6), runeMat);
     cap.position.set(pillar.position.x, 1.05, pillar.position.z);
     root.add(cap);
   }
@@ -317,9 +324,13 @@ function prepareItem(itemId: string): THREE.Group | null {
   return root;
 }
 
-export function buildGroundQuestObject(itemId: string, entityId: number): { group: THREE.Group; height: number } {
+export function buildGroundQuestObject(
+  itemId: string,
+  entityId: number,
+): { group: THREE.Group; height: number } {
   const group = new THREE.Group();
-  const key = itemId === 'crypt_ritual_circle' || QUEST_OBJECT_URLS[itemId] ? itemId : 'supply_crate';
+  const key =
+    itemId === 'crypt_ritual_circle' || QUEST_OBJECT_URLS[itemId] ? itemId : 'supply_crate';
   const template = prepareItem(key);
   if (template) {
     const model = template.clone(true);

@@ -9,7 +9,16 @@
 // getComputedStyle and are covered by the no-magic-values source guard instead.
 
 import { describe, expect, it } from 'vitest';
-import { CAMPS, DUNGEON_LIST, QUESTS, WORLD_MAX_X, WORLD_MIN_X, ZONES } from '../src/sim/data';
+import {
+  CAMPS,
+  DUNGEON_LIST,
+  DUNGEONS,
+  instanceOrigin,
+  QUESTS,
+  WORLD_MAX_X,
+  WORLD_MIN_X,
+  ZONES,
+} from '../src/sim/data';
 import { isQuestTurnInNpc, type QuestProgress } from '../src/sim/types';
 import type { Decoration } from '../src/sim/world';
 import { overworldDungeonPortals } from '../src/ui/map_dungeon_portals';
@@ -111,6 +120,28 @@ function makeDelveWorld(shape: 'sim' | 'client'): IWorld {
   } as unknown as IWorld;
 }
 
+function makeInfernalWorld(shape: 'sim' | 'client'): IWorld {
+  const origin = instanceOrigin(DUNGEONS.infernal_abyss.index, 0);
+  const simJunk = shape === 'sim' ? { hp: 100 } : {};
+  return {
+    player: {
+      id: 1,
+      kind: 'player',
+      name: 'Me',
+      pos: { x: origin.x, z: origin.z - 10 },
+      facing: 0,
+      ...simJunk,
+    },
+    entities: new Map(),
+    socialInfo: null,
+    delveRun: null,
+    cfg: { seed: 42, playerClass: 'warrior' },
+    playerId: 1,
+    questState: () => 'unavailable',
+    questLog: new Map(),
+  } as unknown as IWorld;
+}
+
 const NO_DECOR: Decoration[] = [];
 
 function input(
@@ -130,6 +161,11 @@ describe('mapWindowMode (delve vs overworld discriminator)', () => {
   it('returns delve when the player is in a delve band with an active run (both shapes)', () => {
     expect(mapWindowMode(makeDelveWorld('sim'))).toBe('delve');
     expect(mapWindowMode(makeDelveWorld('client'))).toBe('delve');
+  });
+
+  it('returns the Infernal Abyss schematic inside its dungeon band (both shapes)', () => {
+    expect(mapWindowMode(makeInfernalWorld('sim'))).toBe('infernalAbyss');
+    expect(mapWindowMode(makeInfernalWorld('client'))).toBe('infernalAbyss');
   });
 
   it('returns overworld in a delve band when no run is active (the data-absent trap)', () => {

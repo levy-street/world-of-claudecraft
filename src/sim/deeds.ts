@@ -80,6 +80,7 @@ const FINAL_BOSS_DUNGEONS: Record<string, string> = {
   ysolei: 'drowned_temple',
   korzul_the_gravewyrm: 'gravewyrm_sanctum',
   nythraxis_scourge_of_thornpeak: 'nythraxis_boss_arena',
+  azazel_infernal_lord: 'infernal_abyss',
 };
 
 // Perfection tasks: zero player deaths inside the boss's heroic instance

@@ -1412,6 +1412,14 @@ export const GUIDE_DUNGEONS: GuideDungeon[] = [
     "name": "Gravewyrm Sanctum"
   },
   {
+    "id": "infernal_abyss",
+    "isRaid": false,
+    "suggestedPlayers": 5,
+    "min": 20,
+    "max": 20,
+    "name": "Molten Abyss"
+  },
+  {
     "id": "raid",
     "isRaid": true,
     "suggestedPlayers": 10,
@@ -3373,6 +3381,20 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "renown": 5,
     "feat": false,
     "crest": "/ui/deeds/chr_marsh_first_cast.webp"
+  },
+  {
+    "id": "dgn_infernal_abyss",
+    "name": "Lord of Nothing",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_infernal_abyss_heroic",
+    "name": "Heroic: The Molten Abyss",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
   }
 ];
 

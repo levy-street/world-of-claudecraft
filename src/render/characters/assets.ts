@@ -1024,7 +1024,17 @@ function bakeStaticPose(
     }
     out.setAttribute('position', new THREE.BufferAttribute(baked, 3));
     const uv = srcGeo.getAttribute('uv');
-    if (uv) out.setAttribute('uv', uv.clone());
+    if (uv) {
+      // Dequantize to float (getComponent denormalizes) so primitives with
+      // different source quantizations merge; a raw clone keeps the source
+      // array type and mergeGeometries refuses mixed-type uv attributes.
+      const uvArr = new Float32Array(uv.count * 2);
+      for (let i = 0; i < uv.count; i++) {
+        uvArr[i * 2] = uv.getComponent(i, 0);
+        uvArr[i * 2 + 1] = uv.getComponent(i, 1);
+      }
+      out.setAttribute('uv', new THREE.BufferAttribute(uvArr, 2));
+    }
     if (srcGeo.index) out.setIndex(srcGeo.index.clone());
     out.computeVertexNormals();
     geos.push(out);

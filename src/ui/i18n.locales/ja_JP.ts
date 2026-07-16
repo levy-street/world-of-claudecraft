@@ -1909,6 +1909,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.forms.cat': '狼',
   'abilityUi.cast.fishing': '釣り',
   'abilityUi.cast.thunzharrStormcall': '嵐の呼び声',
+  'abilityUi.cast.forgekeepersWrath': '炉の番人の怒り',
+  'abilityUi.cast.azazelApocalypseFlame': '黙示の炎',
   'abilityUi.cast.demonHeal': '悪魔の治癒',
   'questUi.tracker.title': 'クエスト',
   'questUi.tracker.complete': '完了',
@@ -4839,6 +4841,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.sanctumName': '墓守竜の聖域',
   'guide.dungeonsPage.sanctumBody':
     'ソーンピークの暗き中心。カルトの長きにわたる企てが、おぞましい頂点に達する場所です。',
+  'guide.dungeonsPage.abyssBody':
+    'ストームクラッグの地下に口を開く灼熱の裂け目。鎖につながれた軍団が、獄炎の主のために炉をたぎらせています。道はただ下へ。溶岩と深淵の大口を越えた先に、深淵の心臓が待っています。',
   'guide.dungeonsPage.raidName': 'エンドコンテンツのレイド',
   'guide.dungeonsPage.raidBody':
     '封じられた王家の扉の奥で、10人用の試練が待ち受けます。複数段階の戦いと、レイド全員で力を合わせて封じねばならない不死の力です。挑む資格を勝ち取り、9人の仲間を連れて挑みましょう。',
@@ -7345,6 +7349,56 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ヒント：複数の特性ロードアウトを保存しておけば、ポイントを使い直さずにビルドを切り替えられます。',
   'loading.tips.pvp':
     'ヒント：他のプレイヤーに友好的な決闘を申し込むか、灰塵のコロシアムに参加してビルドを試してみましょう。',
+  'entities.items.infernal_slag.name': '獄炎の鉱滓',
+  'entities.items.charred_legion_tablet.name': '焦げた軍団の石板',
+  'entities.items.brands_of_the_first_flame.name': '最初の炎の烙印',
+  'entities.items.forgekeepers_ledger.name': '炉の番人の台帳',
+  'entities.items.azazels_broken_covenant.name': 'アザゼルの破られた盟約',
+  'entities.items.emberforged_vambraces.name': '熾火鍛造の腕甲',
+  'entities.items.cinderthread_mantle.name': '灰糸の肩衣',
+  'entities.items.hellstalker_boots.name': 'ヘルストーカーのブーツ',
+  'entities.items.forgekeepers_warhammer.name': '炉の番人の戦槌',
+  'entities.items.forgekeepers_runestaff.name': '炉の番人のルーン杖',
+  'entities.items.forgekeepers_fang.name': '炉の番人の牙',
+  'entities.items.azazels_ruinblade.name': 'アザゼルの破滅剣',
+  'entities.items.azazels_soulstaff.name': 'アザゼルの魂杖',
+  'entities.items.azazels_emberfang.name': 'アザゼルの燼牙',
+  'entities.items.hellforged_bulwark.name': '獄炎鍛造の胸壁',
+  'entities.items.cinderseer_raiment.name': '灰燼の予見者の法衣',
+  'entities.items.abysswalker_harness.name': '深淵歩きの胴衣',
+  'entities.mobs.abyssal_legionnaire.name': '深淵の軍団兵',
+  'entities.mobs.cinder_magus.name': '灰燼の魔導師',
+  'entities.mobs.molten_hellhound.name': '溶岩のヘルハウンド',
+  'entities.mobs.flamebound_smith.name': '炎縛りの鍛冶師',
+  'entities.mobs.abyssal_gladiator.name': '深淵の剣闘士',
+  'entities.mobs.infernal_cinderling.name': '獄炎の燼霊',
+  'entities.mobs.forgekeeper.name': '炉の番人',
+  'entities.mobs.pyre_golem.name': '火葬のゴーレム',
+  'entities.mobs.azazel_infernal_lord.name': '獄炎の王アザゼル',
+  'entities.quests.q_infernal_abyss_echoes.title': 'ストームクラッグの下の残響',
+  'entities.quests.q_infernal_abyss_echoes.text':
+    'ストームクラッグは嵐から生まれたのではない、{playerName}。最古の石板は、ここを世界の外から落ちた炎の上に打ちつけられた蓋と呼んでいる。東の岩山の下に新たな亀裂が開いた。四人の仲間とそこへ入り、軍団の石板と、最初の炎のそばに刻まれた烙印を回収せよ。',
+  'entities.quests.q_infernal_abyss_echoes.completion':
+    '石板には、自ら進んで炎へ行軍した軍勢の名がある。烙印が示す彼らの主はアザゼル。これは悪魔を外に留めるための牢獄ではなかった、{playerName}。彼らの王をこの世界へ招き入れる門だったのだ。',
+  'entities.quests.q_infernal_abyss_echoes.objectives.0.label': '焦げた軍団の石板を解読した',
+  'entities.quests.q_infernal_abyss_echoes.objectives.1.label': '最初の炎の烙印を調べた',
+  'entities.quests.q_infernal_abyss_covenant.title': '破られた盟約',
+  'entities.quests.q_infernal_abyss_covenant.text':
+    '軍団の誓いはアザゼルに我らの世界への道を約束した。だが、どの盟約にも代償と綻びがある。獄炎の深淵へ戻れ。炉の番人の台帳と、大口の近くにある破られた盟約を見つけ出すのだ。何が彼を縛ったのか分かれば、倒す術も分かるかもしれない。',
+  'entities.quests.q_infernal_abyss_covenant.completion':
+    '綻びはこれだ。アザゼルは配下の軍団の名を門の糧とした。しもべを食らうたびに力を増したが、その命は地下の炉に結びついた。炉の中心で王を砕けば、門も彼とともに滅びるはずだ。',
+  'entities.quests.q_infernal_abyss_covenant.objectives.0.label': '炉の番人の台帳を回収した',
+  'entities.quests.q_infernal_abyss_covenant.objectives.1.label': 'アザゼルの破られた盟約を読んだ',
+  'entities.quests.q_infernal_abyss_azazel.title': '獄炎の深淵の王',
+  'entities.quests.q_infernal_abyss_azazel.text':
+    '盟約が与えた機会は一度きりだ、{playerName}。信頼する仲間と炉と大口を越え、さらに深くへ降りよ。最初の炎が我らの世界に触れる場所でアザゼルと対峙し、その軍団を耐え抜き、ストームクラッグが奴の開かれた門となる前に獄炎の王を消し去るのだ。',
+  'entities.quests.q_infernal_abyss_azazel.completion':
+    '山は静かだ。眠っているのでも、待っているのでもない。ただ静まり返っている。アザゼルは奪った名から永遠を築き、お前は自らの一つの人の名でそれを終わらせた。ハイウォッチはその名を忘れない、{playerName}。',
+  'entities.quests.q_infernal_abyss_azazel.objectives.0.label': '獄炎の王アザゼルを討伐した',
+  'entities.dungeons.infernal_abyss.name': '獄炎の深淵',
+  'entities.dungeons.infernal_abyss.enterText':
+    'ストームクラッグの地下へ降り、獄炎の深淵へ踏み込む。',
+  'entities.dungeons.infernal_abyss.leaveText': '炉のような闇から這い上がり、山風の中へ戻る。',
   // Baseline class interrupts.
   'entities.abilities.pummel.name': '顎砕き',
   'entities.abilities.pummel.description': '対象の呪文詠唱を中断し、4秒間その系統の呪文を封じる。',

@@ -2979,6 +2979,7 @@ export const ja_JP: EnTranslations = {
       "bastionBody": "沼地に呑まれて失われた水没の要塞。溺れた守備兵と、満ちゆく潮そのものに守られています。",
       "templeBody": "沼地の道から外れた場所に沈む祠。好奇心旺盛で、しっかり備えた者のための寄り道です。",
       "sanctumBody": "ソーンピークの暗き中心。カルトの長きにわたる企てが、おぞましい頂点に達する場所です。",
+      "abyssBody": "ストームクラッグの地下に口を開く灼熱の裂け目。鎖につながれた軍団が、獄炎の主のために炉をたぎらせています。道はただ下へ。溶岩と深淵の大口を越えた先に、深淵の心臓が待っています。",
       "raidName": "エンドコンテンツのレイド",
       "raidBody": "封じられた王家の扉の奥で、10人用の試練が待ち受けます。複数段階の戦いと、レイド全員で力を合わせて封じねばならない不死の力です。挑む資格を勝ち取り、9人の仲間を連れて挑みましょう。",
       "heroicTitle": "ヒロイックモード",
@@ -5619,7 +5620,9 @@ export const ja_JP: EnTranslations = {
     "cast": {
       "fishing": "釣り",
       "demonHeal": "悪魔の治癒",
-      "thunzharrStormcall": "嵐の呼び声"
+      "thunzharrStormcall": "嵐の呼び声",
+      "forgekeepersWrath": "炉の番人の怒り",
+      "azazelApocalypseFlame": "黙示の炎"
     }
   },
   "questUi": {
@@ -7345,6 +7348,57 @@ export const ja_JP: EnTranslations = {
       "sunpetal_herb": {
         "name": "サンペタル草"
       },
+      "infernal_slag": {
+        "name": "獄炎の鉱滓"
+      },
+      "charred_legion_tablet": {
+        "name": "焦げた軍団の石板"
+      },
+      "brands_of_the_first_flame": {
+        "name": "最初の炎の烙印"
+      },
+      "forgekeepers_ledger": {
+        "name": "炉の番人の台帳"
+      },
+      "azazels_broken_covenant": {
+        "name": "アザゼルの破られた盟約"
+      },
+      "emberforged_vambraces": {
+        "name": "熾火鍛造の腕甲"
+      },
+      "cinderthread_mantle": {
+        "name": "灰糸の肩衣"
+      },
+      "hellstalker_boots": {
+        "name": "ヘルストーカーのブーツ"
+      },
+      "forgekeepers_warhammer": {
+        "name": "炉の番人の戦槌"
+      },
+      "forgekeepers_runestaff": {
+        "name": "炉の番人のルーン杖"
+      },
+      "forgekeepers_fang": {
+        "name": "炉の番人の牙"
+      },
+      "azazels_ruinblade": {
+        "name": "アザゼルの破滅剣"
+      },
+      "azazels_soulstaff": {
+        "name": "アザゼルの魂杖"
+      },
+      "azazels_emberfang": {
+        "name": "アザゼルの燼牙"
+      },
+      "hellforged_bulwark": {
+        "name": "獄炎鍛造の胸壁"
+      },
+      "cinderseer_raiment": {
+        "name": "灰燼の予見者の法衣"
+      },
+      "abysswalker_harness": {
+        "name": "深淵歩きの胴衣"
+      },
       "furyforged_warhelm": {
         "name": "憤怒鋳りの戦兜"
       },
@@ -8408,6 +8462,33 @@ export const ja_JP: EnTranslations = {
       },
       "thunzharr_stormling": {
         "name": "目覚めた嵐の精"
+      },
+      "abyssal_legionnaire": {
+        "name": "深淵の軍団兵"
+      },
+      "cinder_magus": {
+        "name": "灰燼の魔導師"
+      },
+      "molten_hellhound": {
+        "name": "溶岩のヘルハウンド"
+      },
+      "flamebound_smith": {
+        "name": "炎縛りの鍛冶師"
+      },
+      "abyssal_gladiator": {
+        "name": "深淵の剣闘士"
+      },
+      "infernal_cinderling": {
+        "name": "獄炎の燼霊"
+      },
+      "forgekeeper": {
+        "name": "炉の番人"
+      },
+      "pyre_golem": {
+        "name": "火葬のゴーレム"
+      },
+      "azazel_infernal_lord": {
+        "name": "獄炎の王アザゼル"
       },
       "ironvein_foreman": {
         "name": "鉄脈の現場監督"
@@ -9503,6 +9584,42 @@ export const ja_JP: EnTranslations = {
           }
         }
       },
+      "q_infernal_abyss_echoes": {
+        "title": "ストームクラッグの下の残響",
+        "text": "ストームクラッグは嵐から生まれたのではない、{playerName}。最古の石板は、ここを世界の外から落ちた炎の上に打ちつけられた蓋と呼んでいる。東の岩山の下に新たな亀裂が開いた。四人の仲間とそこへ入り、軍団の石板と、最初の炎のそばに刻まれた烙印を回収せよ。",
+        "completion": "石板には、自ら進んで炎へ行軍した軍勢の名がある。烙印が示す彼らの主はアザゼル。これは悪魔を外に留めるための牢獄ではなかった、{playerName}。彼らの王をこの世界へ招き入れる門だったのだ。",
+        "objectives": {
+          "0": {
+            "label": "焦げた軍団の石板を解読した"
+          },
+          "1": {
+            "label": "最初の炎の烙印を調べた"
+          }
+        }
+      },
+      "q_infernal_abyss_covenant": {
+        "title": "破られた盟約",
+        "text": "軍団の誓いはアザゼルに我らの世界への道を約束した。だが、どの盟約にも代償と綻びがある。獄炎の深淵へ戻れ。炉の番人の台帳と、大口の近くにある破られた盟約を見つけ出すのだ。何が彼を縛ったのか分かれば、倒す術も分かるかもしれない。",
+        "completion": "綻びはこれだ。アザゼルは配下の軍団の名を門の糧とした。しもべを食らうたびに力を増したが、その命は地下の炉に結びついた。炉の中心で王を砕けば、門も彼とともに滅びるはずだ。",
+        "objectives": {
+          "0": {
+            "label": "炉の番人の台帳を回収した"
+          },
+          "1": {
+            "label": "アザゼルの破られた盟約を読んだ"
+          }
+        }
+      },
+      "q_infernal_abyss_azazel": {
+        "title": "獄炎の深淵の王",
+        "text": "盟約が与えた機会は一度きりだ、{playerName}。信頼する仲間と炉と大口を越え、さらに深くへ降りよ。最初の炎が我らの世界に触れる場所でアザゼルと対峙し、その軍団を耐え抜き、ストームクラッグが奴の開かれた門となる前に獄炎の王を消し去るのだ。",
+        "completion": "山は静かだ。眠っているのでも、待っているのでもない。ただ静まり返っている。アザゼルは奪った名から永遠を築き、お前は自らの一つの人の名でそれを終わらせた。ハイウォッチはその名を忘れない、{playerName}。",
+        "objectives": {
+          "0": {
+            "label": "獄炎の王アザゼルを討伐した"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "溺れし聖歌隊",
         "text": "渡り手どもは独りで動いているのではない。その中に溺れし信徒たちが歩いている——神殿とともに沈んだ教団だ。腐った祭服をまとったまま、岸の岩場から祈りを歌い続けている。八体を沈黙させ、奴らが携える供物を六つ持ち帰れ。奴らが女神に何を捧げようとしているのか、私は知りたいのだ。",
@@ -9699,6 +9816,11 @@ export const ja_JP: EnTranslations = {
         "name": "ナイスラクシスのレイドアリーナ",
         "enterText": "封印された王家の扉を通り抜けます。",
         "leaveText": "ソーンピークの冷たい空気へ戻ります。"
+      },
+      "infernal_abyss": {
+        "name": "獄炎の深淵",
+        "enterText": "ストームクラッグの地下へ降り、獄炎の深淵へ踏み込む。",
+        "leaveText": "炉のような闇から這い上がり、山風の中へ戻る。"
       },
       "drowned_temple": {
         "name": "溺れし神殿",

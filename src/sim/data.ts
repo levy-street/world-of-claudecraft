@@ -45,6 +45,13 @@ import {
 } from './content/graveyards';
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
 import {
+  INFERNAL_ABYSS_DUNGEON_DEFS,
+  INFERNAL_ABYSS_ITEMS,
+  INFERNAL_ABYSS_MOBS,
+  INFERNAL_ABYSS_QUEST_ORDER,
+  INFERNAL_ABYSS_QUESTS,
+} from './content/infernal_abyss';
+import {
   ALL_RECIPES as ALL_RECIPES_CONTENT,
   COMMON_RECIPES as COMMON_RECIPES_CONTENT,
   TOOL_RECIPES as TOOL_RECIPES_CONTENT,
@@ -162,6 +169,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   BASE_ITEMS,
   ZONE2_ITEMS,
   ZONE3_ITEMS,
+  INFERNAL_ABYSS_ITEMS,
   TEMPLE_ITEMS,
   DELVE_ITEMS,
   HEROIC_VENDOR_ITEMS,
@@ -178,6 +186,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...ZONE2_MOBS,
   ...ZONE3_MOBS,
   ...DUNGEON_MOBS,
+  ...INFERNAL_ABYSS_MOBS,
   ...WARLOCK_PET_MOBS,
   ...TEMPLE_MOBS,
   ...TEMPLE_DUNGEON_MOBS,
@@ -215,6 +224,7 @@ export const QUESTS: Record<string, QuestDef> = {
   ...ZONE1_QUESTS,
   ...ZONE2_QUESTS,
   ...ZONE3_QUESTS,
+  ...INFERNAL_ABYSS_QUESTS,
   ...TEMPLE_QUESTS,
 };
 
@@ -222,6 +232,7 @@ export const QUEST_ORDER: string[] = [
   ...ZONE1_QUEST_ORDER,
   ...ZONE2_QUEST_ORDER,
   ...ZONE3_QUEST_ORDER,
+  ...INFERNAL_ABYSS_QUEST_ORDER,
   ...TEMPLE_QUEST_ORDER,
 ];
 
@@ -413,7 +424,11 @@ export function instanceOrigin(dungeonIndex: number, slot: number): { x: number;
   return { x: 900 + dungeonIndex * 600, z: -1250 + slot * 500 };
 }
 
-export const DUNGEONS: Record<string, DungeonDef> = { ...DUNGEON_DEFS, ...TEMPLE_DUNGEON_DEFS };
+export const DUNGEONS: Record<string, DungeonDef> = {
+  ...DUNGEON_DEFS,
+  ...TEMPLE_DUNGEON_DEFS,
+  ...INFERNAL_ABYSS_DUNGEON_DEFS,
+};
 
 export const DUNGEON_LIST: DungeonDef[] = Object.values(DUNGEONS).sort((a, b) => a.index - b.index);
 
@@ -421,22 +436,22 @@ export function dungeonByIndex(index: number): DungeonDef | null {
   return DUNGEON_LIST.find((d) => d.index === index) ?? null;
 }
 
-// Which dungeon a far-off instance position belongs to, by x-band.
+// Which dungeon a far-off instance position belongs to, by x-band. The arena
+// cuts a finite hole between the Nythraxis and Infernal Abyss bands.
 export function dungeonAt(x: number): DungeonDef | null {
-  if (x <= DUNGEON_X_THRESHOLD || x >= ARENA_X_MIN) return null;
+  if (x <= DUNGEON_X_THRESHOLD || isArenaPos(x) || x >= DELVE_BAND_X_MIN) return null;
   return dungeonByIndex(Math.round((x - 900) / 600));
 }
 
 // ---------------------------------------------------------------------------
-// The Ashen Coliseum — 1v1 ranked arena. Its match instances live in their own
-// far-off flat-ground x-band, well past the dungeon bands (index 0/1/2 sit at
-// x 900/1500/2100). Like dungeons, x beyond DUNGEON_X_THRESHOLD means flat
-// ground (world.groundHeight) and instance-local collision (sim/colliders.ts);
-// the band split below keeps arena positions from being read as a dungeon.
+// The Ashen Coliseum — 1v1 ranked arena. Its match instances occupy a finite
+// far-off flat-ground band between dungeon indexes 5 and 6. Like dungeons, x
+// beyond DUNGEON_X_THRESHOLD means flat ground and instance-local collision.
 // ---------------------------------------------------------------------------
 
 export const ARENA_X = 4200; // arena instances share this x; slots stack along z
-export const ARENA_X_MIN = ARENA_X; // x at/after this = an arena instance, not a dungeon
+export const ARENA_X_MIN = 4160; // includes the complete 44yd arena footprint plus camera margin
+export const ARENA_X_MAX = 4240;
 export const ARENA_SLOT_COUNT = 4; // concurrent 1v1 matches the world can host
 const ARENA_Z0 = -1250;
 const ARENA_SLOT_SPACING = 120; // > the pit footprint (~44yd) so slots never overlap
@@ -446,7 +461,7 @@ export function arenaOrigin(slot: number): { x: number; z: number } {
 }
 
 export function isArenaPos(x: number): boolean {
-  return x >= ARENA_X_MIN && x < DELVE_BAND_X_MIN;
+  return x >= ARENA_X_MIN && x < ARENA_X_MAX;
 }
 
 // Nearest arena instance origin to a far-off position, matched by z-band (the
@@ -474,11 +489,11 @@ export const CRYPT_SPAWNS = DUNGEONS.hollow_crypt.spawns;
 
 // ---------------------------------------------------------------------------
 // Delves, private party instances past the arena x-band (see docs/prd/delves.md).
-// DELVE_X_MIN must stay above ARENA_X_MIN (4000) and ARENA_X (4200).
+// DELVE_X_MIN must stay above the arena and every dungeon instance band.
 // ---------------------------------------------------------------------------
 
-// 4800 sits clear of the v0.10.0 layout: dungeons end at ARENA_X_MIN (4000) and
-// the arena pit is centred at ARENA_X (4200, ~±22u footprint). The delve band's
+// 4800 sits clear of the Infernal Abyss at x=4500 and the arena pit centred at
+// ARENA_X (4200, about 22u half-width). The delve band's
 // west edge (DELVE_BAND_X_MIN = 4773) leaves a comfortable margin past the arena.
 export const DELVE_X_MIN = 4800;
 // Each delve room is centred at DELVE_X_MIN + index*600. Delve modules use wider

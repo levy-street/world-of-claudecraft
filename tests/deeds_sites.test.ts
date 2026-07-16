@@ -148,6 +148,32 @@ function fiestaMatch(sim: Sim, teamA: number[], teamB: number[]): ArenaMatch {
 }
 
 describe('encounter mechanical arms (onMobKillCreditForDeeds)', () => {
+  it('dgn_infernal_abyss: an Azazel kill credits the clear on the tier it happened', () => {
+    // Normal tier: the normal deed grants, the heroic one does not.
+    const normal = makeSim();
+    const n = encounterInstance(normal, 'azazel_infernal_lord', 'infernal_abyss', 'normal', [
+      'Tank',
+      'Healer',
+    ]);
+    onMobKillCreditForDeeds(normal.ctx, n.boss, null, n.recipients[0], n.recipients);
+    updateDeeds(normal.ctx);
+    for (const m of n.recipients) {
+      expect(m.deedStats.dungeonClears.infernal_abyss).toBe(1);
+      expect(m.deedsEarned.has('dgn_infernal_abyss')).toBe(true);
+      expect(m.deedsEarned.has('dgn_infernal_abyss_heroic')).toBe(false);
+    }
+
+    // Heroic tier: the heroic deed grants too.
+    const heroic = makeSim();
+    const h = encounterInstance(heroic, 'azazel_infernal_lord', 'infernal_abyss', 'heroic', [
+      'Tank',
+    ]);
+    onMobKillCreditForDeeds(heroic.ctx, h.boss, null, h.recipients[0], h.recipients);
+    updateDeeds(heroic.ctx);
+    expect(h.recipients[0].deedStats.dungeonClears['infernal_abyss:heroic']).toBe(1);
+    expect(h.recipients[0].deedsEarned.has('dgn_infernal_abyss_heroic')).toBe(true);
+  });
+
   it('dgn_morthen_flawless: a clean heroic kill grants; a death taint or normal tier blocks', () => {
     const clean = makeSim();
     const c = encounterInstance(clean, 'morthen', 'hollow_crypt', 'heroic', ['Tank', 'Healer']);

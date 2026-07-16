@@ -11,6 +11,7 @@
 //   Gravewyrm Sanctum (interior 'sanctum')                 - green ritual fire, necromantic
 //   Drowned Temple (interior 'temple')                     - pale moon-violet, drowned reliquaries
 //   Abandoned Crypt raid (interior 'nythraxis')            - dark violet soul wards
+//   Infernal Abyss (interior 'infernal_abyss')              - obsidian rooms, lava and forge-fire
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
@@ -26,12 +27,14 @@ import {
   DUNGEON_WALL_X,
   type DungeonLayout,
   type GridPoint,
+  INFERNAL_ABYSS_LAYOUT,
   NYTHRAXIS_LAYOUT,
   SANCTUM_LAYOUT,
   TEMPLE_LAYOUT,
   TOMB_HD,
   type WallStub,
 } from '../sim/dungeon_layout';
+import { authoredWallSegments, inAnyRoom } from '../sim/dungeon_rooms';
 import { polygonContainsPoint, polygonXAtZ } from '../sim/geometry2d';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
@@ -44,6 +47,13 @@ import {
   placeMarshWallDressing,
 } from './delve_marsh_dressing';
 import { sharedUniforms } from './gfx';
+import { placeInfernalAbyssAtmosphere } from './infernal_abyss_atmosphere';
+import {
+  ensureInfernalAbyssAssets,
+  type InfernalPortcullis,
+  placeInfernalAbyssDressing,
+} from './infernal_abyss_dressing';
+import { placeInfernalAbyssFloorAccents } from './infernal_abyss_floor_accents';
 import { radialGlowTexture } from './textures';
 
 const FLAME_EMISSIVE_HIGH = 2.2;
@@ -65,6 +75,7 @@ export type DungeonInteriorVariant =
   | 'temple'
   | 'arena'
   | 'nythraxis'
+  | 'infernal_abyss'
   // Collapsed Reliquary delve sub-themes (share the ember crypt-stone base, see
   // isDelveVariant; differ only in wall-side props, clutter, and the dais).
   | 'delve_ossuary'
@@ -118,6 +129,7 @@ const TORCH_COLORS: Record<Variant, TorchColors> = {
   // the Ashen Coliseum burns warm — amber braziers ringing the fighting sands
   arena: { flame: 0xffb24a, emissive: 0xcc5a14, light: 0xff9a3c },
   nythraxis: { flame: 0x8f5cff, emissive: 0x4b1c9a, light: 0x7b4dff },
+  infernal_abyss: { flame: 0xffb02e, emissive: 0xe43a0b, light: 0xff4a16 },
   // delve reliquaries burn with grave-ember red: warm coals over cold stone
   delve_ossuary: { flame: 0xff7a3c, emissive: 0xcc3a14, light: 0xff6a3c },
   delve_bell: { flame: 0xff7a3c, emissive: 0xcc3a14, light: 0xff6a3c },
@@ -227,6 +239,9 @@ const KIT_MODELS = [
   'banner_green',
   'banner_patternC_green',
   'banner_triple_green',
+  'banner_red',
+  'banner_patternc_red',
+  'banner_thin_brown',
   'chest',
   'chest_gold',
   'coin_stack_medium',
@@ -603,8 +618,11 @@ export class DungeonInteriors {
   // instance draws (see marshMaterial). Never touched by any other variant.
   private marshWallMats = new Map<Pack, THREE.Material>();
   private marshFloorMats = new Map<Pack, THREE.Material>();
+  private infernalWallMats = new Map<Pack, THREE.Material>();
+  private infernalFloorMats = new Map<Pack, THREE.Material>();
   private waterMat: THREE.ShaderMaterial | null = null;
   private arenaHideables: ArenaHideable[] = [];
+  private infernalPortcullises: Array<InfernalPortcullis & { worldX: number; worldZ: number }> = [];
 
   constructor(
     private scene: THREE.Scene,
@@ -677,6 +695,7 @@ export class DungeonInteriors {
     },
   ): Promise<void> {
     await ensureDungeonAssets();
+    if (interior === 'infernal_abyss') await ensureInfernalAbyssAssets();
     // Delve modules pass an explicit per-module layout so render geometry matches
     // the SAME layout sim/colliders.ts derives collision from (what you see is
     // what you collide with). Without it, every module fell back to CRYPT_LAYOUT
@@ -691,7 +710,9 @@ export class DungeonInteriors {
             ? ARENA_LAYOUT
             : interior === 'nythraxis'
               ? NYTHRAXIS_LAYOUT
-              : CRYPT_LAYOUT);
+              : interior === 'infernal_abyss'
+                ? INFERNAL_ABYSS_LAYOUT
+                : CRYPT_LAYOUT);
     const variant = opts?.variant ?? this.variantFor(interior, ox);
     const group = new THREE.Group();
     const p = new Placements();
@@ -702,9 +723,23 @@ export class DungeonInteriors {
     this.placePillarsAndTorches(group, p, layout, variant);
     this.placeTombs(p, layout, variant);
     this.placeStubs(p, layout.stubs, variant);
-    this.placeDais(group, p, layout, variant);
-    this.placeAisleClutter(p, layout, variant);
-    this.placeWallDressing(p, layout, variant, arenaWalls);
+    if (variant !== 'infernal_abyss') {
+      this.placeDais(group, p, layout, variant);
+      this.placeAisleClutter(p, layout, variant);
+    }
+    if (variant !== 'infernal_abyss') this.placeWallDressing(p, layout, variant, arenaWalls);
+    else {
+      const portcullises = placeInfernalAbyssDressing(group, layout, this.lowGfx, this.fireLights);
+      for (const portcullis of portcullises) {
+        this.infernalPortcullises.push({
+          ...portcullis,
+          worldX: ox + portcullis.x,
+          worldZ: oz + portcullis.z,
+        });
+      }
+      placeInfernalAbyssFloorAccents(group, layout, this.lowGfx);
+      placeInfernalAbyssAtmosphere(group, layout, this.lowGfx);
+    }
     if (variant === 'temple') {
       this.placeFloodwater(group, layout);
       this.placeAquaticDressing(group, layout);
@@ -735,7 +770,28 @@ export class DungeonInteriors {
     this.scene.add(group);
   }
 
-  update(camX: number, camY: number, camZ: number, eyeX: number, eyeY: number, eyeZ: number): void {
+  update(
+    camX: number,
+    camY: number,
+    camZ: number,
+    eyeX: number,
+    eyeY: number,
+    eyeZ: number,
+    playerX: number,
+    playerZ: number,
+    dt: number,
+  ): void {
+    for (const portcullis of this.infernalPortcullises) {
+      const dx = playerX - portcullis.worldX;
+      const dz = playerZ - portcullis.worldZ;
+      const distanceSq = dx * dx + dz * dz;
+      if (portcullis.open ? distanceSq > 14 * 14 : distanceSq < 11 * 11) {
+        portcullis.open = !portcullis.open;
+      }
+      const targetY = portcullis.open ? portcullis.raisedY : portcullis.closedY;
+      const travel = Math.min(Math.abs(targetY - portcullis.model.position.y), dt * 11);
+      portcullis.model.position.y += Math.sign(targetY - portcullis.model.position.y) * travel;
+    }
     for (const h of this.arenaHideables) {
       const hide = arenaWallSegmentHits(h.footprint, eyeX, eyeY, eyeZ, camX, camY, camZ);
       if (hide === h.hidden) continue;
@@ -906,6 +962,7 @@ export class DungeonInteriors {
   private variantFor(interior: string, ox: number): Variant {
     if (interior === 'arena') return 'arena';
     if (interior === 'nythraxis') return 'nythraxis';
+    if (interior === 'infernal_abyss') return 'infernal_abyss';
     if (interior === 'sanctum') return 'sanctum';
     if (interior === 'temple') return 'temple';
     const bastionX = instanceOrigin(1, 0).x;
@@ -955,6 +1012,23 @@ export class DungeonInteriors {
     return mat;
   }
 
+  private infernalMaterial(pack: Pack, surface: 'wall' | 'floor'): THREE.Material {
+    const cache = surface === 'wall' ? this.infernalWallMats : this.infernalFloorMats;
+    let mat = cache.get(pack);
+    if (mat) return mat;
+    const base = this.material(pack).clone() as
+      | THREE.MeshLambertMaterial
+      | THREE.MeshStandardMaterial;
+    base.color.multiply(new THREE.Color(surface === 'wall' ? 0x8a6659 : 0x69534c));
+    if (base instanceof THREE.MeshStandardMaterial) {
+      base.roughness = 0.9;
+      base.metalness = surface === 'wall' ? 0.12 : 0.04;
+    }
+    mat = base;
+    cache.set(pack, mat);
+    return mat;
+  }
+
   private emit(group: THREE.Group, p: Placements, variant: Variant): void {
     const isMarsh = variant === 'delve_marsh' || variant === 'delve_marsh_apse';
     for (const [kind, mats] of p.byKind) {
@@ -970,6 +1044,10 @@ export class DungeonInteriors {
       let mat = this.material(asset.pack);
       if (isMarsh && WALL_PILLAR_KINDS.has(kind)) mat = this.marshMaterial(asset.pack, 'wall');
       else if (isMarsh && RECEIVER_KINDS.has(kind)) mat = this.marshMaterial(asset.pack, 'floor');
+      else if (variant === 'infernal_abyss' && WALL_PILLAR_KINDS.has(kind))
+        mat = this.infernalMaterial(asset.pack, 'wall');
+      else if (variant === 'infernal_abyss' && RECEIVER_KINDS.has(kind))
+        mat = this.infernalMaterial(asset.pack, 'floor');
       const mesh = new THREE.InstancedMesh(asset.geo, mat, mats.length);
       for (let i = 0; i < mats.length; i++) mesh.setMatrixAt(i, mats[i]);
       mesh.instanceMatrix.needsUpdate = true;
@@ -1048,6 +1126,18 @@ export class DungeonInteriors {
   // -------------------------------------------------------------------------
 
   private floorKind(variant: Variant, t: number): string {
+    if (variant === 'infernal_abyss') {
+      return pickKind(
+        [
+          ['floor_tile_large', 54],
+          ['floor_tile_large_rocks', 18],
+          ['floor_dirt_large_rocky', 10],
+          ['grate', 6],
+          ['quad', 12],
+        ],
+        t,
+      );
+    }
     if (variant === 'bastion') {
       return pickKind(
         [
@@ -1113,6 +1203,17 @@ export class DungeonInteriors {
   }
 
   private floorQuadKind(variant: Variant, t: number): string {
+    if (variant === 'infernal_abyss') {
+      return pickKind(
+        [
+          ['floor_tile_small', 30],
+          ['floor_tile_small_broken_A', 25],
+          ['floor_tile_small_broken_B', 25],
+          ['floor_tile_small_decorated', 20],
+        ],
+        t,
+      );
+    }
     if (variant === 'bastion') {
       return pickKind(
         [
@@ -1171,10 +1272,20 @@ export class DungeonInteriors {
     const quarter = Math.PI / 2;
     // Default the floor to the inner wall face so wider rooms (delve |x|=25)
     // are not left with a bare strip between the aisle floor and the side walls.
+    const rooms = layout.rooms;
+    const roomX0 = rooms ? Math.min(...rooms.map((room) => room.x0)) : 0;
+    const roomX1 = rooms ? Math.max(...rooms.map((room) => room.x1)) : 0;
+    const roomZ0 = rooms ? Math.min(...rooms.map((room) => room.z0)) : layout.zMin;
+    const roomZ1 = rooms ? Math.max(...rooms.map((room) => room.z1)) : layout.zMax;
     const floorHalfX = layout.floorHalfX ?? (layout.wallX ?? DUNGEON_WALL_X) - 1;
     const poly = layout.shellPolygon;
-    for (let z = layout.zMin - 2; z <= layout.zMax + 2; z += FLOOR_CELL) {
-      for (let x = -floorHalfX; x <= floorHalfX; x += FLOOR_CELL) {
+    const xMin = rooms ? roomX0 + 2 : -floorHalfX;
+    const xMax = rooms ? roomX1 - 2 : floorHalfX;
+    const zMin = rooms ? roomZ0 + 2 : layout.zMin - 2;
+    const zMax = rooms ? roomZ1 - 2 : layout.zMax + 2;
+    for (let z = zMin; z <= zMax; z += FLOOR_CELL) {
+      for (let x = xMin; x <= xMax; x += FLOOR_CELL) {
+        if (rooms && !inAnyRoom(rooms, x, z)) continue;
         // Polygon shell: mask the rectangular grid down to the authored room
         // outline (same grid stepping and tile-kind logic, just skip cells
         // whose own center falls outside the polygon). Boundary tiles will
@@ -1208,6 +1319,18 @@ export class DungeonInteriors {
   }
 
   private wallKind(variant: Variant, t: number): string {
+    if (variant === 'infernal_abyss') {
+      return pickKind(
+        [
+          ['wall', 34],
+          ['wall_pillar', 24],
+          ['wall_cracked', 24],
+          ['wall_arched', 12],
+          ['wall_archedwindow_gated', 6],
+        ],
+        t,
+      );
+    }
     if (variant === 'bastion') {
       return pickKind(
         [
@@ -1271,6 +1394,16 @@ export class DungeonInteriors {
   }
 
   private bannerKind(variant: Variant, t: number): string {
+    if (variant === 'infernal_abyss') {
+      return pickKind(
+        [
+          ['banner_red', 5],
+          ['banner_patternc_red', 3],
+          ['banner_thin_brown', 2],
+        ],
+        t,
+      );
+    }
     if (variant === 'bastion') {
       return pickKind(
         [
@@ -1329,6 +1462,10 @@ export class DungeonInteriors {
     variant: Variant,
     arenaWalls?: PendingArenaWalls,
   ): void {
+    if (layout.rooms) {
+      this.placeAuthoredWalls(p, layout, variant);
+      return;
+    }
     if (layout.shellPolygon) {
       this.placePolygonWalls(p, layout.shellPolygon, variant);
       return;
@@ -1384,6 +1521,32 @@ export class DungeonInteriors {
         Math.PI,
         MODULE_SCALE,
       );
+    }
+  }
+
+  private placeAuthoredWalls(p: Placements, layout: DungeonLayout, variant: Variant): void {
+    const rooms = layout.rooms ?? [];
+    const segments = authoredWallSegments(rooms, [
+      ...(layout.doors ?? []),
+      ...(layout.visualOpenings ?? []),
+    ]);
+    let placed = 0;
+    for (const segment of segments) {
+      const horizontal = segment.hw >= segment.hd;
+      const halfLength = horizontal ? segment.hw : segment.hd;
+      const length = halfLength * 2;
+      const count = Math.max(1, Math.ceil(length / 8));
+      const rotation = horizontal ? 0 : Math.PI / 2;
+      for (let i = 0; i < count; i++, placed++) {
+        const along = -halfLength + (length * (i + 0.5)) / count;
+        const x = horizontal ? segment.x + along : segment.x;
+        const z = horizontal ? segment.z : segment.z + along;
+        const kind = this.wallKind(variant, hash2(x * 13.7, z));
+        p.add(kind, x, 0, z, rotation, [length / count / 4, MODULE_SCALE, MODULE_SCALE]);
+        if (placed % 4 === 2 && kind !== 'wall_archedwindow_gated') {
+          p.add(this.bannerKind(variant, hash2(z, x * 7.3)), x, 0, z, rotation, MODULE_SCALE);
+        }
+      }
     }
   }
 

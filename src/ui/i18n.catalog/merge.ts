@@ -482,7 +482,13 @@ const mergePetHud = {
 const mergeStringsEn = {
   abilityUi: {
     ...abilityStrings.en.abilityUi,
-    cast: { fishing: 'Fishing', demonHeal: 'Demon Heal', thunzharrStormcall: 'Stormcall' },
+    cast: {
+      fishing: 'Fishing',
+      demonHeal: 'Demon Heal',
+      thunzharrStormcall: 'Stormcall',
+      forgekeepersWrath: "Forgekeeper's Wrath",
+      azazelApocalypseFlame: 'Apocalypse Flame',
+    },
     actionBar: {
       ...abilityStrings.en.abilityUi.actionBar,
       clearHint: 'Shift-right-click or Shift-Delete to clear',
@@ -659,6 +665,8 @@ export const mergeStrings = {
         fishing: 'Pesca',
         demonHeal: 'Sanación demoníaca',
         thunzharrStormcall: 'Llamada de la tormenta',
+        forgekeepersWrath: 'Ira del Guardián de la Forja',
+        azazelApocalypseFlame: 'Llama del Apocalipsis',
       },
       actionBar: {
         ...abilityStrings.es.abilityUi.actionBar,
@@ -827,6 +835,8 @@ export const mergeStrings = {
         fishing: 'Pêche',
         demonHeal: 'Soin démoniaque',
         thunzharrStormcall: 'Appel de la tempête',
+        forgekeepersWrath: 'Courroux du Gardien de la forge',
+        azazelApocalypseFlame: "Flamme de l'apocalypse",
       },
       actionBar: {
         ...abilityStrings.fr_FR.abilityUi.actionBar,
@@ -996,6 +1006,8 @@ export const mergeStrings = {
         fishing: 'Pesca',
         demonHeal: 'Cura demoniaca',
         thunzharrStormcall: 'Richiamo della tempesta',
+        forgekeepersWrath: 'Ira del Custode della forgia',
+        azazelApocalypseFlame: "Fiamma dell'apocalisse",
       },
       actionBar: {
         ...abilityStrings.it_IT.abilityUi.actionBar,
@@ -1158,7 +1170,13 @@ export const mergeStrings = {
   de_DE: {
     abilityUi: {
       ...abilityStrings.de_DE.abilityUi,
-      cast: { fishing: 'Angeln', demonHeal: 'Dämonenheilung', thunzharrStormcall: 'Sturmruf' },
+      cast: {
+        fishing: 'Angeln',
+        demonHeal: 'Dämonenheilung',
+        thunzharrStormcall: 'Sturmruf',
+        forgekeepersWrath: 'Zorn des Schmiedewächters',
+        azazelApocalypseFlame: 'Apokalypseflamme',
+      },
       actionBar: {
         ...abilityStrings.de_DE.abilityUi.actionBar,
         clearHint: 'Umschalt-Rechtsklick oder Umschalt-Entf zum Leeren',
@@ -1320,7 +1338,13 @@ export const mergeStrings = {
   zh_CN: {
     abilityUi: {
       ...abilityStrings.zh_CN.abilityUi,
-      cast: { fishing: '钓鱼', demonHeal: '恶魔治疗', thunzharrStormcall: '风暴召唤' },
+      cast: {
+        fishing: '钓鱼',
+        demonHeal: '恶魔治疗',
+        thunzharrStormcall: '风暴召唤',
+        forgekeepersWrath: '铸炉守卫之怒',
+        azazelApocalypseFlame: '天启之焰',
+      },
       actionBar: {
         ...abilityStrings.zh_CN.abilityUi.actionBar,
         clearHint: 'Shift-右键或 Shift-Delete 清除',
@@ -1479,7 +1503,13 @@ export const mergeStrings = {
   zh_TW: {
     abilityUi: {
       ...abilityStrings.zh_TW.abilityUi,
-      cast: { fishing: '釣魚', demonHeal: '惡魔治療', thunzharrStormcall: '風暴召喚' },
+      cast: {
+        fishing: '釣魚',
+        demonHeal: '惡魔治療',
+        thunzharrStormcall: '風暴召喚',
+        forgekeepersWrath: '鑄爐守衛之怒',
+        azazelApocalypseFlame: '天啟之焰',
+      },
       actionBar: {
         ...abilityStrings.zh_TW.abilityUi.actionBar,
         clearHint: 'Shift-右鍵或 Shift-Delete 清除',
@@ -1638,7 +1668,13 @@ export const mergeStrings = {
   ko_KR: {
     abilityUi: {
       ...abilityStrings.ko_KR.abilityUi,
-      cast: { fishing: '낚시', demonHeal: '악마 치유', thunzharrStormcall: '폭풍의 부름' },
+      cast: {
+        fishing: '낚시',
+        demonHeal: '악마 치유',
+        thunzharrStormcall: '폭풍의 부름',
+        forgekeepersWrath: '용광로지기의 분노',
+        azazelApocalypseFlame: '종말의 불꽃',
+      },
       actionBar: {
         ...abilityStrings.ko_KR.abilityUi.actionBar,
         clearHint: 'Shift-우클릭 또는 Shift-Delete로 비우기',
@@ -1800,7 +1836,13 @@ export const mergeStrings = {
   ja_JP: {
     abilityUi: {
       ...abilityStrings.ja_JP.abilityUi,
-      cast: { fishing: '釣り', demonHeal: '悪魔の治癒', thunzharrStormcall: '嵐の呼び声' },
+      cast: {
+        fishing: '釣り',
+        demonHeal: '悪魔の治癒',
+        thunzharrStormcall: '嵐の呼び声',
+        forgekeepersWrath: '炉の番人の怒り',
+        azazelApocalypseFlame: '黙示の炎',
+      },
       actionBar: {
         ...abilityStrings.ja_JP.abilityUi.actionBar,
         clearHint: 'Shift-右クリックまたはShift-Deleteで消去',
@@ -1965,6 +2007,8 @@ export const mergeStrings = {
         fishing: 'Pesca',
         demonHeal: 'Cura demoníaca',
         thunzharrStormcall: 'Chamado da Tempestade',
+        forgekeepersWrath: 'Ira do Guardião da Forja',
+        azazelApocalypseFlame: 'Chama do Apocalipse',
       },
       actionBar: {
         ...abilityStrings.pt_BR.abilityUi.actionBar,
@@ -2132,6 +2176,8 @@ export const mergeStrings = {
         fishing: 'Рыбная ловля',
         demonHeal: 'Исцеление демона',
         thunzharrStormcall: 'Зов бури',
+        forgekeepersWrath: 'Гнев Хранителя горна',
+        azazelApocalypseFlame: 'Пламя апокалипсиса',
       },
       actionBar: {
         ...abilityStrings.ru_RU.abilityUi.actionBar,

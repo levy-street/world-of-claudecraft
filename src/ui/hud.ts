@@ -299,6 +299,7 @@ import {
   tPlural,
 } from './i18n';
 import { iconDataUrl, QUALITY_COLOR, raidMarkerDataUrl } from './icons';
+import { InfernalAbyssWorldMapPainter } from './infernal_abyss_world_map_painter';
 import { itemArmorTypeLabelKey } from './item_armor_type';
 import { requiredClassesForTooltip } from './item_class_restriction';
 import { itemStatDeltas } from './item_compare';
@@ -623,6 +624,8 @@ const castDisplayName = (id: string): string => {
   if (id === FISHING_CAST_ID) return t('abilityUi.cast.fishing');
   if (id === 'demon_heal') return t('abilityUi.cast.demonHeal');
   if (id === 'thunzharr_stormcall') return t('abilityUi.cast.thunzharrStormcall');
+  if (id === 'forgekeepers_wrath') return t('abilityUi.cast.forgekeepersWrath');
+  if (id === 'azazel_apocalypse_flame') return t('abilityUi.cast.azazelApocalypseFlame');
   const ability = ABILITIES[id];
   return ability ? abilityDisplayName(ability) : id;
 };
@@ -3122,6 +3125,7 @@ export class Hud {
   // Overworld world-map painter (the delve branch stays with delvePainter). Owns
   // the cached whole-world decorations; redraws from the mediumHud band while open.
   private readonly mapPainter = new MapWindowPainter();
+  private readonly infernalWorldMapPainter = new InfernalAbyssWorldMapPainter();
   // The aura strips are the keyed-pool aura painter, two instances of the
   // auras_view core + AurasPainter: the player buff bar (#buff-bar, mode
   // 'all') and the target strip (#tf-debuffs, mode 'all' too: a target's buffs AND
@@ -7294,6 +7298,15 @@ export class Hud {
       );
       return;
     }
+    if (mode === 'infernalAbyss') {
+      this.minimapPainter.paintInfernalAbyss(
+        ctx,
+        this.sim,
+        $('#zone-label'),
+        dungeonDisplayName('infernal_abyss'),
+      );
+      return;
+    }
     // The overworld minimap: a pure marker core (minimap_markers) + the thin canvas
     // painter. It owns the cached terrain blit + the marker draws and writes
     // '#zone-label' through the write-elision facet.
@@ -7442,7 +7455,26 @@ export class Hud {
     const p = this.sim.player;
     const summaryEl = $('#map-summary');
 
-    if (mapWindowMode(this.sim) === 'delve') {
+    const mode = mapWindowMode(this.sim);
+    if (mode === 'infernalAbyss') {
+      this.mapQuestAreas = [];
+      this.mapNpcMarkers = [];
+      this.infernalWorldMapPainter.paint(
+        ctx,
+        this.sim,
+        S,
+        dungeonDisplayName('infernal_abyss'),
+        classCss,
+      );
+      if (!this.mapDrag) canvas.style.cursor = 'default';
+      this.setText(
+        summaryEl,
+        t('hud.core.mapSummary', { zone: dungeonDisplayName('infernal_abyss') }),
+      );
+      return;
+    }
+
+    if (mode === 'delve') {
       // The delve painter owns the full world-map schematic render (the area
       // title is drawn on-canvas, since the world map has no DOM zone label).
       this.mapQuestAreas = [];

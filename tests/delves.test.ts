@@ -11,10 +11,12 @@ import {
   DELVE_MODULES,
   DELVE_X_MIN,
   DELVES,
+  DUNGEONS,
   delveAt,
   delveModuleZOffset,
   delveOrigin,
   dungeonAt,
+  instanceOrigin,
   isArenaPos,
   isDelvePos,
   MOBS,
@@ -168,18 +170,20 @@ describe('delve spatial band', () => {
     expect(isDelvePos(ARENA_X)).toBe(false);
   });
 
-  it('pins the absolute 4800 boundary against the arena seam (relocation regression)', () => {
-    // DELVE_X_MIN moved 3600 -> 4800 when v0.10.0 pushed the arena to x=4200.
-    // Pin the load-bearing constant and the exact arena/delve seam so a future
-    // arena or delve respacing that re-introduces overlap fails here.
+  it('pins the absolute 4800 boundary against the dungeon seam (relocation regression)', () => {
+    // Infernal Abyss occupies index 6 at x=4500 between the finite arena band
+    // and the delves. Pin the exact dungeon/delve seam so future respacing
+    // cannot make the bands overlap.
     expect(DELVE_X_MIN).toBe(4800);
-    // The seam: DELVE_BAND_X_MIN is the first delve x; the x just below it is arena.
-    expect(isArenaPos(DELVE_BAND_X_MIN - 1)).toBe(true);
+    // The seam: DELVE_BAND_X_MIN is the first delve x; the x just below it
+    // remains in the Infernal Abyss dungeon band, never the arena.
+    expect(isArenaPos(DELVE_BAND_X_MIN - 1)).toBe(false);
     expect(isDelvePos(DELVE_BAND_X_MIN - 1)).toBe(false);
+    expect(dungeonAt(DELVE_BAND_X_MIN - 1)?.id).toBe('infernal_abyss');
     expect(isDelvePos(DELVE_BAND_X_MIN)).toBe(true);
     expect(isArenaPos(DELVE_BAND_X_MIN)).toBe(false);
-    // Keep a real gap between the arena anchor and the delve band.
-    expect(DELVE_BAND_X_MIN - ARENA_X).toBeGreaterThanOrEqual(500);
+    const infernalX = instanceOrigin(DUNGEONS.infernal_abyss.index, 0).x;
+    expect(DELVE_BAND_X_MIN - infernalX).toBeGreaterThanOrEqual(250);
   });
 
   it('a character saved inside a delve relogs at the board door, not a dungeon door (FR-1.6)', () => {

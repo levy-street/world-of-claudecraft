@@ -929,6 +929,8 @@ export const guideStrings = {
       'A moonlit shrine sunk beneath a glowing tarn high in the peaks, reached through a gate of cold light. A drowned cult still sings down there in its rotted vestments, and the warnings carved on the shore say something below only sleeps. A self-contained mystery, set apart from the main story, for the curious and the well-prepared.',
     sanctumBody:
       "The dark heart of Thornpeak, where the cult's long work reaches its terrible peak.",
+    abyssBody:
+      'A burning rift beneath Stormcrag where a chained legion stokes the forges of its abyssal lord. The only way out is down, past the lava and the maw, to the heart of the abyss.',
     raidName: 'The endgame raid',
     raidBody:
       'Beyond a sealed royal door waits a ten-player trial: a multi-stage fight and a deathless power the whole raid must shut down together. Earn your way in, then bring nine friends.',

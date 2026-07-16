@@ -253,6 +253,7 @@ const HOT_PAINTERS: ReadonlyArray<{
 // cadence-throttled nameplate_painter, are intentionally outside this HUD-painter file.)
 const CANVAS_PAINTERS: ReadonlyArray<string> = [
   'hud/delve/delve_map_painter.ts',
+  'infernal_abyss_world_map_painter.ts',
   'map_window_painter.ts',
   'minimap_painter.ts',
   'perf_graph_painter.ts',

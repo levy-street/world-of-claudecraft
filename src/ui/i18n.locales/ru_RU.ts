@@ -1934,6 +1934,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.forms.cat': 'волка',
   'abilityUi.cast.fishing': 'Рыбная ловля',
   'abilityUi.cast.thunzharrStormcall': 'Зов бури',
+  'abilityUi.cast.forgekeepersWrath': 'Гнев Хранителя горна',
+  'abilityUi.cast.azazelApocalypseFlame': 'Пламя апокалипсиса',
   'abilityUi.cast.demonHeal': 'Исцеление демона',
   'questUi.tracker.title': 'Задания',
   'questUi.tracker.complete': 'Готово',
@@ -4898,6 +4900,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.sanctumName': 'Святилище Могильного змия',
   'guide.dungeonsPage.sanctumBody':
     'Темное сердце Терновых высот, где долгий труд культа достигает своего ужасающего пика.',
+  'guide.dungeonsPage.abyssBody':
+    'Пылающий разлом под Грозовым кряжем, где закованный в цепи легион раздувает горны своего инфернального владыки. Путь один: вниз, мимо лавы и пасти бездны, к самому сердцу бездны.',
   'guide.dungeonsPage.raidName': 'Финальный рейд',
   'guide.dungeonsPage.raidBody':
     'За запечатанной королевской дверью ждёт испытание для десяти игроков: многофазная битва и не знающая смерти сила, которую весь рейд должен пресечь сообща. Заслужите право войти, а затем приведите девятерых друзей.',
@@ -7480,6 +7484,59 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Совет: сохраните несколько наборов талантов, чтобы менять билды, не тратя очки заново.',
   'loading.tips.pvp':
     'Совет: вызовите другого игрока на дружескую дуэль или встаньте в очередь на арену Пепельного Колизея, чтобы испытать свой билд.',
+  'entities.items.infernal_slag.name': 'Адский шлак',
+  'entities.items.charred_legion_tablet.name': 'Обугленная табличка легиона',
+  'entities.items.brands_of_the_first_flame.name': 'Клейма первого пламени',
+  'entities.items.forgekeepers_ledger.name': 'Книга Хранителя горна',
+  'entities.items.azazels_broken_covenant.name': 'Разорванный договор Азазеля',
+  'entities.items.emberforged_vambraces.name': 'Наручи, выкованные в углях',
+  'entities.items.cinderthread_mantle.name': 'Оплечье из пепельной нити',
+  'entities.items.hellstalker_boots.name': 'Сапоги адского охотника',
+  'entities.items.forgekeepers_warhammer.name': 'Боевой молот Хранителя горна',
+  'entities.items.forgekeepers_runestaff.name': 'Рунный посох Хранителя горна',
+  'entities.items.forgekeepers_fang.name': 'Клык Хранителя горна',
+  'entities.items.azazels_ruinblade.name': 'Клинок погибели Азазеля',
+  'entities.items.azazels_soulstaff.name': 'Посох душ Азазеля',
+  'entities.items.azazels_emberfang.name': 'Угольный клык Азазеля',
+  'entities.items.hellforged_bulwark.name': 'Оплот адской ковки',
+  'entities.items.cinderseer_raiment.name': 'Одеяние провидца углей',
+  'entities.items.abysswalker_harness.name': 'Портупея странника Бездны',
+  'entities.mobs.abyssal_legionnaire.name': 'Легионер Бездны',
+  'entities.mobs.cinder_magus.name': 'Маг углей',
+  'entities.mobs.molten_hellhound.name': 'Расплавленная адская гончая',
+  'entities.mobs.flamebound_smith.name': 'Скованный пламенем кузнец',
+  'entities.mobs.abyssal_gladiator.name': 'Гладиатор Бездны',
+  'entities.mobs.infernal_cinderling.name': 'Адский уголёк',
+  'entities.mobs.forgekeeper.name': 'Хранитель горна',
+  'entities.mobs.pyre_golem.name': 'Голем погребального костра',
+  'entities.mobs.azazel_infernal_lord.name': 'Азазель, владыка Преисподней',
+  'entities.quests.q_infernal_abyss_echoes.title': 'Эхо под Грозовым кряжем',
+  'entities.quests.q_infernal_abyss_echoes.text':
+    'Грозовой кряж породила не буря, {playerName}. Древнейшие таблички называют его крышкой, выкованной над пламенем, которое упало из-за пределов мира. Под восточной скалой открылась новая трещина. Войдите туда с четырьмя союзниками и найдите табличку легиона и клейма, высеченные у первого пламени.',
+  'entities.quests.q_infernal_abyss_echoes.completion':
+    'На табличке названо войско, которое добровольно шагнуло в огонь. Клейма называют силу, которой оно служило: Азазель. Эту темницу построили не для того, чтобы не впустить демонов, {playerName}. Это врата, через которые должен был войти их владыка.',
+  'entities.quests.q_infernal_abyss_echoes.objectives.0.label':
+    'Обугленная табличка легиона расшифрована',
+  'entities.quests.q_infernal_abyss_echoes.objectives.1.label': 'Клейма первого пламени изучены',
+  'entities.quests.q_infernal_abyss_covenant.title': 'Разорванный договор',
+  'entities.quests.q_infernal_abyss_covenant.text':
+    'Клятва легиона обещала Азазелю путь в наш мир, но у каждого договора есть цена и изъян. Вернитесь в Адскую бездну. Найдите книгу Хранителя горна и разорванный договор возле Пасти. Если мы узнаем, что связывало Азазеля, то, возможно, поймём, как его убить.',
+  'entities.quests.q_infernal_abyss_covenant.completion':
+    'Вот изъян: Азазель питал врата именами собственного легиона. Каждый поглощённый слуга делал его сильнее, но привязывал его жизнь к горну в глубине. Сокрушите владыку в сердце этого горна, и врата погибнут вместе с ним.',
+  'entities.quests.q_infernal_abyss_covenant.objectives.0.label': 'Книга Хранителя горна найдена',
+  'entities.quests.q_infernal_abyss_covenant.objectives.1.label':
+    'Разорванный договор Азазеля прочитан',
+  'entities.quests.q_infernal_abyss_azazel.title': 'Владыка Адской бездны',
+  'entities.quests.q_infernal_abyss_azazel.text':
+    'Договор даёт нам лишь один шанс, {playerName}. Спуститесь с верными спутниками за горн и Пасть. Сразитесь с Азазелем там, где первое пламя касается нашего мира, выстойте против его легионов и погасите владыку Преисподней, прежде чем Грозовой кряж станет его открытыми вратами.',
+  'entities.quests.q_infernal_abyss_azazel.completion':
+    'Гора затихла. Она не спит, не ждёт, а просто молчит. Азазель возвёл вечность из украденных имён, а вы положили ей конец одним собственным смертным именем. Высокий Дозор запомнит его, {playerName}.',
+  'entities.quests.q_infernal_abyss_azazel.objectives.0.label':
+    'Азазель, владыка Преисподней, повержен',
+  'entities.dungeons.infernal_abyss.name': 'Адская бездна',
+  'entities.dungeons.infernal_abyss.enterText': 'Вы спускаетесь под Грозовой кряж в Адскую бездну.',
+  'entities.dungeons.infernal_abyss.leaveText':
+    'Вы поднимаетесь из горнильной тьмы навстречу горному ветру.',
   // Baseline class interrupts.
   'entities.abilities.pummel.name': 'Челюстолом',
   'entities.abilities.pummel.description':

@@ -103,6 +103,16 @@ const MOB_IDS = [
   // Thornpeak Heights world boss + its summoned adds
   'thunzharr_waking_peak',
   'thunzharr_stormling',
+  // Infernal Abyss dungeon mobs
+  'abyssal_legionnaire',
+  'cinder_magus',
+  'molten_hellhound',
+  'flamebound_smith',
+  'abyssal_gladiator',
+  'infernal_cinderling',
+  'forgekeeper',
+  'pyre_golem',
+  'azazel_infernal_lord',
 ] as const;
 
 const NPC_IDS = [
@@ -219,6 +229,9 @@ const QUEST_IDS = [
   'q_mogger',
   'q_archetype_acceptance',
   'q_prof_make_amends',
+  'q_infernal_abyss_echoes',
+  'q_infernal_abyss_covenant',
+  'q_infernal_abyss_azazel',
 ] as const;
 
 const ZONE_IDS = ['eastbrook_vale', 'mirefen_marsh', 'thornpeak_heights'] as const;
@@ -228,6 +241,7 @@ const DUNGEON_IDS = [
   'gravewyrm_sanctum',
   'nythraxis_crypt',
   'nythraxis_boss_arena',
+  'infernal_abyss',
 ] as const;
 const DELVE_IDS = ['collapsed_reliquary', 'drowned_litany'] as const;
 // Ravenpost authored letters (src/sim/content/letters.ts): the welcome letter

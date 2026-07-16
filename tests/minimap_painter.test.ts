@@ -29,6 +29,7 @@ const MINIMAP_COLOR_TOKENS = [
   '--color-minimap-party-pip',
   '--color-minimap-player',
   '--color-minimap-outline',
+  '--color-delve-room',
 ];
 
 describe('minimap_painter: no magic values (canvas sub-rule)', () => {
@@ -54,10 +55,12 @@ describe('minimap_painter: no magic values (canvas sub-rule)', () => {
     // alone would not catch relocating the resolve into the per-marker loop, since the
     // string lives only at the definition site). The per-marker loop lives in
     // drawMarkers; assert resolveColors() is called exactly once per entry point
-    // (paintOverworld + the Protect Yumi paintYumiMaze) and is never referenced inside
+    // (paintOverworld + Protect Yumi + Infernal Abyss) and is never referenced inside
     // the drawMarkers body. A runtime getComputedStyle spy is deferred to the browser
     // suite.
-    expect(code.match(/this\.resolveColors\(\)/g) ?? []).toHaveLength(2);
+    expect(code.match(/this\.resolveColors\(\)/g) ?? []).toHaveLength(3);
+    expect(code).toContain('paintInfernalAbyss(');
+    expect(code).toContain('infernalAbyssMapModel(');
     const drawMarkersBody = code.slice(code.indexOf('private drawMarkers('));
     expect(drawMarkersBody.length).toBeGreaterThan(0);
     expect(drawMarkersBody).not.toContain('resolveColors');
