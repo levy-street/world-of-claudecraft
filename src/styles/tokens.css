@@ -173,6 +173,18 @@
     --transition-speed: 0.25s;
     --transition-ease: cubic-bezier(0.4, 0, 0.2, 1);
 
+    /* Floating combat text type and timing. The painter removes standard and crit
+       entries at 1250ms, so the CSS lifetime must not exceed --dur-fct. */
+    --font-size-fct-enhanced: 28px;
+    --font-size-fct-enhanced-crit: 44px;
+    --font-size-fct-enhanced-avoidance: 25px;
+    --font-size-fct-enhanced-mobile: 21px;
+    --font-size-fct-enhanced-mobile-crit: 34px;
+    --dur-fct: 1250ms;
+    --dur-fct-xp: 1800ms;
+    --dur-fct-impact: 480ms;
+    --dur-fct-burst: 420ms;
+
     /* Custom scrollbar tokens */
     --scrollbar-thumb: #5c4722;
     --scrollbar-track: rgba(10, 10, 15, 0.7);

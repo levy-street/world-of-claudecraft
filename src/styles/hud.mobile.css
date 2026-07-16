@@ -4605,6 +4605,88 @@
     animation-name: fct-rise-mobile;
   }
 
+  :root[data-combat-text="enhanced"] body.mobile-touch .fct {
+    font-size: calc(var(--font-size-fct-enhanced-mobile) * var(--fct-scale, 1));
+    animation-name: fct-enhanced-hit-mobile;
+  }
+  :root[data-combat-text="enhanced"] body.mobile-touch .fct.crit {
+    font-size: calc(var(--font-size-fct-enhanced-mobile-crit) * var(--fct-scale, 1));
+    animation-name: fct-enhanced-crit-mobile;
+  }
+  :root[data-combat-text="enhanced"] body.mobile-touch .fct-miss-self,
+  :root[data-combat-text="enhanced"] body.mobile-touch .fct-miss-other,
+  :root[data-combat-text="enhanced"] body.mobile-touch .fct-dodge-self,
+  :root[data-combat-text="enhanced"] body.mobile-touch .fct-dodge-other,
+  :root[data-combat-text="enhanced"] body.mobile-touch .fct-parry-self,
+  :root[data-combat-text="enhanced"] body.mobile-touch .fct-parry-other,
+  :root[data-combat-text="enhanced"] body.mobile-touch .fct-block-self,
+  :root[data-combat-text="enhanced"] body.mobile-touch .fct-block-other {
+    font-size: calc(var(--font-size-fct-enhanced-mobile) * var(--fct-scale, 1));
+    animation-name: fct-enhanced-deflect-mobile;
+  }
+  @keyframes fct-enhanced-hit-mobile {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+      scale: 1.45;
+      rotate: var(--fct-kick);
+    }
+    18% {
+      opacity: 1;
+      scale: 1;
+      rotate: 0deg;
+    }
+    100% {
+      opacity: 0;
+      translate: -50% calc(-50% - 72px);
+      scale: 1;
+      rotate: 0deg;
+    }
+  }
+  @keyframes fct-enhanced-crit-mobile {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+      scale: 1;
+      rotate: var(--fct-kick);
+    }
+    10% {
+      opacity: 1;
+      scale: 1.9;
+    }
+    26% {
+      scale: 1.2;
+      rotate: 0deg;
+    }
+    100% {
+      opacity: 0;
+      translate: -50% calc(-50% - 88px);
+      scale: 1;
+      rotate: 0deg;
+    }
+  }
+  @keyframes fct-enhanced-deflect-mobile {
+    0% {
+      opacity: 1;
+      translate: calc(-50% + var(--fct-drift)) -50%;
+      scale: 1.35;
+      rotate: var(--fct-kick);
+    }
+    22% {
+      translate: -50% -50%;
+      scale: 1;
+      rotate: 0deg;
+    }
+    100% {
+      opacity: 0;
+      translate: -50% calc(-50% - 66px);
+      scale: 1;
+    }
+  }
+  :root[data-fx-level="low"][data-combat-text="enhanced"] body.mobile-touch .fct.crit {
+    animation-name: fct-static;
+  }
+
   /* ---------- Dungeon Finder (mobile) ---------- */
   /* One navigable pane: the catalogue rail and the detail never compete for
      width; the painter's df-pane-* class picks which one shows, and the Back

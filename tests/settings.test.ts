@@ -248,6 +248,7 @@ describe('Interface & Comfort settings pack', () => {
     expect(s.get('hudOpacity')).toBe(1);
     expect(s.get('tooltipScale')).toBe(1);
     expect(s.get('fctScale')).toBe(1);
+    expect(s.get('combatTextStyle')).toBe(0);
     expect(s.get('chatFontScale')).toBe(1);
     expect(s.get('chatOpacity')).toBe(1);
     expect(s.get('reduceMotion')).toBe(false);
@@ -268,8 +269,18 @@ describe('Interface & Comfort settings pack', () => {
     expect(s.set('hudOpacity', 9)).toBe(SETTING_RANGES.hudOpacity.max);
     expect(s.set('tooltipScale', 9)).toBe(SETTING_RANGES.tooltipScale.max);
     expect(s.set('fctScale', 0)).toBe(SETTING_RANGES.fctScale.min);
+    expect(s.set('combatTextStyle', 9)).toBe(SETTING_RANGES.combatTextStyle.max);
+    expect(s.set('combatTextStyle', -1)).toBe(SETTING_RANGES.combatTextStyle.min);
     expect(s.set('chatFontScale', 1.2)).toBe(1.2);
     expect(s.set('chatOpacity', 0)).toBe(SETTING_RANGES.chatOpacity.min);
+  });
+
+  it('persists the combat-text style and restores Classic on reset', () => {
+    const s = new Settings();
+    s.set('combatTextStyle', 1);
+    expect(new Settings().get('combatTextStyle')).toBe(1);
+    s.reset();
+    expect(s.get('combatTextStyle')).toBe(0);
   });
 
   it('persists the comfort toggles across reloads and restores them on reset', () => {

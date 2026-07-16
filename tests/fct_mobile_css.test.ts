@@ -132,3 +132,25 @@ describe('mobile FCT css (hud.mobile.css)', () => {
     expect(m![1]).not.toMatch(/fct-xp-pop-mobile/);
   });
 });
+
+describe('Enhanced mobile FCT remains loud but phone-safe', () => {
+  it('uses the enhanced mobile base, crit, and avoidance sizes', () => {
+    expect(HUD_MOBILE_CSS).toMatch(
+      /:root\[data-combat-text="enhanced"\]\s+body\.mobile-touch\s+\.fct\s*\{[^}]*font-size:\s*calc\(var\(--font-size-fct-enhanced-mobile\)\s*\*\s*var\(--fct-scale/,
+    );
+    expect(HUD_MOBILE_CSS).toMatch(
+      /:root\[data-combat-text="enhanced"\]\s+body\.mobile-touch\s+\.fct\.crit\s*\{[^}]*font-size:\s*calc\(var\(--font-size-fct-enhanced-mobile-crit\)\s*\*\s*var\(--fct-scale/,
+    );
+    expect(HUD_MOBILE_CSS).toMatch(
+      /\.fct-parry-self,[\s\S]*?font-size:\s*calc\(var\(--font-size-fct-enhanced-mobile\)\s*\*\s*var\(--fct-scale/,
+    );
+  });
+
+  it('uses dedicated mobile enhanced motion and makes low-tier crit static', () => {
+    expect(HUD_MOBILE_CSS).toContain('@keyframes fct-enhanced-hit-mobile');
+    expect(HUD_MOBILE_CSS).toContain('@keyframes fct-enhanced-crit-mobile');
+    expect(HUD_MOBILE_CSS).toMatch(
+      /:root\[data-fx-level="low"\]\[data-combat-text="enhanced"\]\s+body\.mobile-touch\s+\.fct\.crit\s*\{[^}]*animation-name:\s*fct-static/,
+    );
+  });
+});

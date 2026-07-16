@@ -279,6 +279,7 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       'partyFrameShowSelf',
       'hudOpacity',
       'tooltipScale',
+      'combatTextStyle',
       'fctScale',
       'chatFontScale',
       'chatOpacity',
@@ -304,6 +305,20 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
     expect(find(controls, 'reduceMotion')).toMatchObject({ control: 'boolToggle' });
   });
 
+  it('offers Classic and Enhanced as a persisted combat-text choice', () => {
+    const enhanced = find(
+      buildInterfaceControls(makeSource({ combatTextStyle: 1 })),
+      'combatTextStyle',
+    );
+    expect(enhanced).toMatchObject({
+      control: 'choice',
+      current: 1,
+      options: [
+        { value: 0, labelKey: 'hudChrome.options.combatTextClassic' },
+        { value: 1, labelKey: 'hudChrome.options.combatTextEnhanced' },
+      ],
+    });
+  });
   it('marks only uiScale as commit-on-release; the other comfort sliders stay live (#1558)', () => {
     const controls = buildInterfaceControls(makeSource());
     // uiScale rescales the whole UI (window included), so it must apply on release.

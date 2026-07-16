@@ -397,6 +397,16 @@ export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl
     boolToggle(s, 'partyFrameShowSelf', 'hudChrome.partyFrames.showSelf'),
     slider(s, 'hudOpacity', 'hud.options.hudOpacity'),
     slider(s, 'tooltipScale', 'hud.options.tooltipScale'),
+    choice(s, 'combatTextStyle', 'hudChrome.options.combatTextStyle', [
+      {
+        value: 0,
+        labelKey: 'hudChrome.options.combatTextClassic',
+      },
+      {
+        value: 1,
+        labelKey: 'hudChrome.options.combatTextEnhanced',
+      },
+    ]),
     slider(s, 'fctScale', 'hud.options.fctScale'),
     slider(s, 'chatFontScale', 'hud.options.chatFontScale'),
     slider(s, 'chatOpacity', 'hud.options.chatOpacity'),

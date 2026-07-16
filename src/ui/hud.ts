@@ -7794,7 +7794,12 @@ export class Hud {
           const isPlayerSource = ev.sourceId === sim.playerId;
           const isPlayerTarget = ev.targetId === sim.playerId;
           if (isPlayerSource || isPlayerTarget) this.lastCombatEventAt = performance.now();
-          if (ev.kind === 'miss' || ev.kind === 'dodge' || ev.kind === 'resist') {
+          if (
+            ev.kind === 'miss' ||
+            ev.kind === 'dodge' ||
+            ev.kind === 'resist' ||
+            ev.kind === 'parry'
+          ) {
             // self vs other (carried on the shape's isSelf) drives the avoidance colour
             // token (#bbb vs #fff); the localized word stays at the call site. A resisted
             // spell is an avoidance word like miss/dodge (classic fidelity: spells resist,
@@ -7816,7 +7821,9 @@ export class Hud {
                       ? t('hud.combat.floatingMiss')
                       : ev.kind === 'dodge'
                         ? t('hud.combat.floatingDodge')
-                        : t('hud.combat.floatingResist'),
+                        : ev.kind === 'resist'
+                          ? t('hud.combat.floatingResist')
+                          : t('hud.combat.floatingParry'),
                   target: tgt,
                 },
                 now,
@@ -7832,7 +7839,9 @@ export class Hud {
                   ? 'hud.combat.miss'
                   : ev.kind === 'dodge'
                     ? 'hud.combat.dodged'
-                    : 'hud.combat.resisted';
+                    : ev.kind === 'resist'
+                      ? 'hud.combat.resisted'
+                      : 'hud.combat.parried';
               this.combatLog(
                 t(logKey, {
                   ability: combatAbilityName(ev.ability),
@@ -7859,7 +7868,7 @@ export class Hud {
             (hitShape.kind === 'damage-done-ability' || hitShape.kind === 'damage-done-auto')
           ) {
             this.fctPainter.spawn(
-              { ...hitShape, text: `${ev.amount}${ev.crit ? '!' : ''}`, target: tgt },
+              { ...hitShape, text: `${formatNumber(ev.amount)}${ev.crit ? '!' : ''}`, target: tgt },
               now,
             );
             this.combatLog(
@@ -7875,7 +7884,10 @@ export class Hud {
             // Fiesta: every blow you land kicks the camera (bigger on a crit).
             if (this.inFiesta()) this.renderer.addShake(ev.crit ? 0.3 : 0.12);
           } else if (hitShape && hitShape.kind === 'damage-taken') {
-            this.fctPainter.spawn({ ...hitShape, text: `-${ev.amount}`, target: tgt }, now);
+            this.fctPainter.spawn(
+              { ...hitShape, text: `-${formatNumber(ev.amount)}`, target: tgt },
+              now,
+            );
             this.combatLog(
               t(ev.crit ? 'hud.combat.damageTakenCrit' : 'hud.combat.damageTaken', {
                 source: src ? entityDisplayName(src) : '?',
@@ -7898,7 +7910,10 @@ export class Hud {
               isPlayerTarget: ev.targetId === sim.playerId,
             });
             if (healed && shape)
-              this.fctPainter.spawn({ ...shape, text: `+${ev.amount}`, target: healed }, now);
+              this.fctPainter.spawn(
+                { ...shape, text: `+${formatNumber(ev.amount)}`, target: healed },
+                now,
+              );
           }
           break;
         }
@@ -7914,7 +7929,7 @@ export class Hud {
             this.fctPainter.spawn(
               {
                 ...xpShape,
-                text: t('hud.core.xpFloat', { amount: ev.amount }),
+                text: t('hud.core.xpFloat', { amount: formatNumber(ev.amount) }),
                 target: sim.player,
               },
               now,
@@ -7925,7 +7940,7 @@ export class Hud {
               this.fctPainter.spawn(
                 {
                   ...restedShape,
-                  text: t('hud.core.xpFloatRested', { amount: ev.rested }),
+                  text: t('hud.core.xpFloatRested', { amount: formatNumber(ev.rested) }),
                   target: sim.player,
                 },
                 now,
@@ -8342,7 +8357,11 @@ export class Hud {
             });
             if (shape)
               this.fctPainter.spawn(
-                { ...shape, text: `+${ev.amount}${ev.crit ? '!' : ''}`, target: tgt },
+                {
+                  ...shape,
+                  text: `+${formatNumber(ev.amount)}${ev.crit ? '!' : ''}`,
+                  target: tgt,
+                },
                 now,
               );
             if (ev.sourceId === sim.playerId) {

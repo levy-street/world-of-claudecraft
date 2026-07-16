@@ -72,6 +72,8 @@ describe('describeFct: color token by kind + flags', () => {
     dodge: { self: 'dodge-self', other: 'dodge-other' },
     resist: { self: 'miss-self', other: 'miss-other' },
     'damage-done-ability': { self: 'damage-done-ability', other: 'damage-done-ability' },
+    parry: { self: 'parry-self', other: 'parry-other' },
+    block: { self: 'block-self', other: 'block-other' },
     'damage-done-auto': { self: 'damage-done-auto', other: 'damage-done-auto' },
     'damage-taken': { self: 'damage-taken', other: 'damage-taken' },
     heal: { self: 'heal', other: 'heal' },
@@ -92,12 +94,18 @@ describe('describeFct: color token by kind + flags', () => {
     }
   });
 
-  it('only miss/dodge/resist change color with isSelf; every other kind ignores it', () => {
+  it('only avoidance outcomes change color with isSelf; every other kind ignores it', () => {
     for (const kind of Object.keys(expected) as FctKind[]) {
       const selfToken = describeFct(makeEvent({ kind, isSelf: true }), 0.5).colorToken;
       const otherToken = describeFct(makeEvent({ kind, isSelf: false }), 0.5).colorToken;
       // resist reuses the miss token (self grey / other white), so it varies with isSelf too.
-      if (kind === 'miss' || kind === 'dodge' || kind === 'resist')
+      if (
+        kind === 'miss' ||
+        kind === 'dodge' ||
+        kind === 'resist' ||
+        kind === 'parry' ||
+        kind === 'block'
+      )
         expect(selfToken).not.toBe(otherToken);
       else expect(selfToken).toBe(otherToken);
     }
@@ -123,6 +131,9 @@ describe('describeFct: ttl is a pure function of kind (constant across kinds, ex
       'dodge',
       'damage-done-ability',
       'damage-done-auto',
+      'resist',
+      'parry',
+      'block',
       'damage-taken',
       'heal',
       'honor',
@@ -222,7 +233,18 @@ describe('isDamageFctKind: the combat-damage taxonomy (damage-number classifier)
   it('treats informational / avoidance floaters as NON-damage (kept on low)', () => {
     // These are the low-volume floaters the low-tier drop must NOT shed: progression,
     // the self-note UX hint, heals, and avoidance words.
-    const nonDamage: FctKind[] = ['miss', 'dodge', 'heal', 'xp', 'rested-xp', 'honor', 'self-note'];
+    const nonDamage: FctKind[] = [
+      'miss',
+      'dodge',
+      'resist',
+      'parry',
+      'block',
+      'heal',
+      'xp',
+      'rested-xp',
+      'honor',
+      'self-note',
+    ];
     for (const kind of nonDamage) expect(isDamageFctKind(kind)).toBe(false);
   });
 });

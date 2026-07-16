@@ -101,6 +101,10 @@ export const SETTING_RANGES = {
   // Scales floating combat text (the damage/heal numbers over units). Bigger
   // for readability on a TV; smaller to declutter a busy fight.
   fctScale: { min: 0.7, max: 1.8, def: 1 },
+  // 0 = Classic, the shipped combat text. 1 = Enhanced, the opt-in loud
+  // numerals, distinct crit treatment, impact burst, and defensive-word motion.
+  // Presentation only: this never changes combat events or simulation outcomes.
+  combatTextStyle: { min: 0, max: 1, def: 0 },
   // Fades the HUD panels & windows as a whole; lets players see more of the
   // world behind their frames without hiding them entirely.
   hudOpacity: { min: 0.5, max: 1, def: 1 },

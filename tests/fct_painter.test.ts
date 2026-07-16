@@ -610,3 +610,61 @@ describe('FCT colour tokens: the .fct-<token> hex stays byte-faithful to the old
     }
   });
 });
+describe('Enhanced FCT visual language', () => {
+  const css = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
+
+  it('uses the approved Alegreya UI token with tabular outlined numerics', () => {
+    expect(css).toMatch(
+      /:root\[data-combat-text="enhanced"\]\s+\.fct\s*\{[^}]*font-family:\s*var\(--font-ui\)/,
+    );
+    expect(css).toMatch(/font-variant-numeric:\s*tabular-nums/);
+    expect(css).toMatch(/-webkit-text-stroke:\s*2px\s+var\(--text-outline-color/);
+    expect(css).not.toMatch(/Impact|Haettenschweiler|Arial Black/);
+  });
+
+  it('consumes named FCT size and duration tokens', () => {
+    const tokens = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8');
+    expect(tokens).toMatch(/--font-size-fct-enhanced:\s*28px/);
+    expect(tokens).toMatch(/--font-size-fct-enhanced-crit:\s*44px/);
+    expect(tokens).toMatch(/--dur-fct:\s*1250ms/);
+    expect(css).toMatch(/font-size:\s*calc\(var\(--font-size-fct-enhanced\)\s*\*/);
+    expect(css).toMatch(/animation-duration:\s*var\(--dur-fct\)/);
+  });
+
+  it('makes standard hits loud and critical hits unmistakably larger', () => {
+    expect(css).toMatch(
+      /:root\[data-combat-text="enhanced"\]\s+\.fct\s*\{[^}]*font-size:\s*calc\(var\(--font-size-fct-enhanced\)\s*\*\s*var\(--fct-scale/,
+    );
+    expect(css).toMatch(
+      /:root\[data-combat-text="enhanced"\]\s+\.fct\.crit\s*\{[^}]*font-size:\s*calc\(var\(--font-size-fct-enhanced-crit\)\s*\*\s*var\(--fct-scale/,
+    );
+    expect(css).toMatch(/@keyframes\s+fct-enhanced-crit[\s\S]*?scale:\s*2\.2/);
+  });
+
+  it('uses semantic project color tokens for standard, crit, taken, heal, parry, and block', () => {
+    expect(css).toMatch(/\.fct-damage-done-auto,[\s\S]*?color:\s*var\(--color-text-overlay\)/);
+    expect(css).toMatch(/\.crit\.fct-damage-done-ability[\s\S]*?color:\s*var\(--color-accent\)/);
+    expect(css).toMatch(/\.fct-damage-taken\s*\{[^}]*color:\s*var\(--color-text-error\)/);
+    expect(css).toMatch(/\.fct-heal\s*\{[^}]*color:\s*var\(--color-text-success\)/);
+    expect(css).toMatch(/\.fct-parry-other\s*\{[^}]*color:\s*var\(--color-mana\)/);
+    expect(css).toMatch(/\.fct-block-other\s*\{[^}]*color:\s*var\(--color-accent\)/);
+  });
+
+  it('gives avoidance words their own deflection motion and makes low-tier crit static', () => {
+    expect(css).toMatch(/\.fct-parry-self,[\s\S]*?animation-name:\s*fct-enhanced-deflect/);
+    expect(css).toMatch(
+      /:root\[data-fx-level="low"\]\[data-combat-text="enhanced"\]\s+\.fct\.crit\s*\{[^}]*animation-name:\s*fct-static/,
+    );
+  });
+});
+
+it('keeps information visible without translation under both reduced-motion channels', () => {
+  const css = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
+  expect(css).toMatch(
+    /body\.reduce-motion\s+\.fct\s*\{[^}]*animation-name:\s*fct-static\s*!important[^}]*animation-duration:\s*var\(--dur-fct\)\s*!important/,
+  );
+  expect(css).toMatch(
+    /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*?\.fct\s*\{[^}]*animation-name:\s*fct-static\s*!important/,
+  );
+  expect(css).toMatch(/@keyframes\s+fct-static[\s\S]*?translate:\s*-50%\s+-50%/);
+});

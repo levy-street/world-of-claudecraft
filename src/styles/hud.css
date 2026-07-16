@@ -3126,6 +3126,229 @@
     color: #ff8c66;
   }
 
+  /* Enhanced combat text is an opt-in presentation layer. It keeps the pooled
+     FCT data path intact and uses the approved Alegreya face, project color
+     tokens, tabular numerics, and the existing comfort-setting scale. */
+  :root[data-combat-text="enhanced"] .fct {
+    --fct-kick: -5deg;
+    --fct-drift: -16px;
+    font-family: var(--font-ui);
+    font-size: calc(var(--font-size-fct-enhanced) * var(--fct-scale, 1));
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    -webkit-text-stroke: 2px var(--text-outline-color);
+    paint-order: stroke fill;
+    text-shadow:
+      0 2px 0 var(--text-outline-color),
+      2px 3px 0 var(--text-outline-color),
+      0 0 10px var(--text-outline-color);
+    animation-name: fct-enhanced-hit;
+    animation-duration: var(--dur-fct);
+    animation-timing-function: ease-out;
+  }
+  :root[data-combat-text="enhanced"] .fct:nth-child(even) {
+    --fct-kick: 5deg;
+    --fct-drift: 16px;
+  }
+  :root[data-combat-text="enhanced"] .fct-damage-done-auto,
+  :root[data-combat-text="enhanced"] .fct-damage-done-ability {
+    color: var(--color-text-overlay);
+  }
+  :root[data-combat-text="enhanced"] .fct.crit.fct-damage-done-auto,
+  :root[data-combat-text="enhanced"] .fct.crit.fct-damage-done-ability {
+    color: var(--color-accent);
+  }
+  :root[data-combat-text="enhanced"] .fct-damage-taken {
+    color: var(--color-text-error);
+  }
+  :root[data-combat-text="enhanced"] .fct-heal {
+    color: var(--color-text-success);
+  }
+  :root[data-combat-text="enhanced"] .fct-miss-self,
+  :root[data-combat-text="enhanced"] .fct-dodge-self {
+    color: var(--color-text-muted);
+  }
+  :root[data-combat-text="enhanced"] .fct-miss-other,
+  :root[data-combat-text="enhanced"] .fct-dodge-other {
+    color: var(--color-text-overlay);
+  }
+  :root[data-combat-text="enhanced"] .fct-parry-self,
+  :root[data-combat-text="enhanced"] .fct-parry-other {
+    color: var(--color-mana);
+  }
+  :root[data-combat-text="enhanced"] .fct-block-self,
+  :root[data-combat-text="enhanced"] .fct-block-other {
+    color: var(--color-accent);
+  }
+  :root[data-combat-text="enhanced"] .fct.crit {
+    font-size: calc(var(--font-size-fct-enhanced-crit) * var(--fct-scale, 1));
+    -webkit-text-stroke-width: 3px;
+    animation-name: fct-enhanced-crit;
+    animation-duration: var(--dur-fct);
+    z-index: 7;
+  }
+  :root[data-combat-text="enhanced"] .fct.crit::before,
+  :root[data-combat-text="enhanced"] .fct.crit::after {
+    content: "";
+    position: absolute;
+    inset: 50%;
+    pointer-events: none;
+    z-index: -1;
+  }
+  :root[data-combat-text="enhanced"] .fct.crit::before {
+    width: 2.4em;
+    height: 2.4em;
+    border: 2px solid var(--color-accent);
+    border-radius: 50%;
+    translate: -50% -50%;
+    animation: fct-enhanced-halo var(--dur-fct-impact) ease-out forwards;
+  }
+  :root[data-combat-text="enhanced"] .fct.crit::after {
+    width: 3.1em;
+    height: 3.1em;
+    translate: -50% -50%;
+    background: conic-gradient(
+      from 22.5deg,
+      transparent 0deg 12deg,
+      var(--color-accent) 12deg 18deg,
+      transparent 18deg 42deg,
+      var(--color-accent) 42deg 48deg,
+      transparent 48deg 90deg
+    );
+    clip-path: polygon(
+      48% 0%,
+      54% 38%,
+      82% 10%,
+      65% 43%,
+      100% 48%,
+      64% 55%,
+      88% 86%,
+      56% 64%,
+      50% 100%,
+      44% 64%,
+      12% 88%,
+      36% 55%,
+      0% 48%,
+      35% 42%,
+      10% 12%,
+      44% 38%
+    );
+    animation: fct-enhanced-burst var(--dur-fct-burst) ease-out forwards;
+  }
+  :root[data-combat-text="enhanced"] .fct-miss-self,
+  :root[data-combat-text="enhanced"] .fct-miss-other,
+  :root[data-combat-text="enhanced"] .fct-dodge-self,
+  :root[data-combat-text="enhanced"] .fct-dodge-other,
+  :root[data-combat-text="enhanced"] .fct-parry-self,
+  :root[data-combat-text="enhanced"] .fct-parry-other,
+  :root[data-combat-text="enhanced"] .fct-block-self,
+  :root[data-combat-text="enhanced"] .fct-block-other {
+    font-size: calc(var(--font-size-fct-enhanced-avoidance) * var(--fct-scale, 1));
+    animation-name: fct-enhanced-deflect;
+  }
+  @keyframes fct-enhanced-hit {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+      scale: 1.65;
+      rotate: var(--fct-kick);
+    }
+    18% {
+      opacity: 1;
+      scale: 1;
+      rotate: 0deg;
+    }
+    100% {
+      opacity: 0;
+      translate: -50% calc(-50% - 108px);
+      scale: 1;
+      rotate: 0deg;
+    }
+  }
+  @keyframes fct-enhanced-crit {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+      scale: 1;
+      rotate: var(--fct-kick);
+    }
+    10% {
+      opacity: 1;
+      scale: 2.2;
+    }
+    26% {
+      scale: 1.28;
+      rotate: 0deg;
+    }
+    100% {
+      opacity: 0;
+      translate: -50% calc(-50% - 138px);
+      scale: 1;
+      rotate: 0deg;
+    }
+  }
+  @keyframes fct-enhanced-deflect {
+    0% {
+      opacity: 1;
+      translate: calc(-50% + var(--fct-drift)) -50%;
+      scale: 1.5;
+      rotate: var(--fct-kick);
+    }
+    22% {
+      translate: -50% -50%;
+      scale: 1;
+      rotate: 0deg;
+    }
+    100% {
+      opacity: 0;
+      translate: -50% calc(-50% - 96px);
+      scale: 1;
+    }
+  }
+  @keyframes fct-static {
+    0%,
+    85% {
+      opacity: 1;
+      translate: -50% -50%;
+      scale: 1;
+      rotate: 0deg;
+    }
+    100% {
+      opacity: 0;
+      translate: -50% -50%;
+      scale: 1;
+      rotate: 0deg;
+    }
+  }
+  @keyframes fct-enhanced-halo {
+    from {
+      opacity: 0.9;
+      scale: 0.35;
+    }
+    to {
+      opacity: 0;
+      scale: 1.25;
+    }
+  }
+  @keyframes fct-enhanced-burst {
+    from {
+      opacity: 0.95;
+      scale: 0.3;
+      rotate: -12deg;
+    }
+    to {
+      opacity: 0;
+      scale: 1.15;
+      rotate: 8deg;
+    }
+  }
+  :root[data-fx-level="low"][data-combat-text="enhanced"] .fct.crit {
+    animation-name: fct-static;
+  }
+  :root[data-fx-level="low"][data-combat-text="enhanced"] .fct.crit::before,
+  :root[data-fx-level="low"][data-combat-text="enhanced"] .fct.crit::after {
+    display: none;
+  }
   /* ---------- Interface & Comfort settings ----------
      Each rule is driven by a CSS custom property set on :root from main.ts, or by
      a body class toggled there. Defaults reproduce the classic look exactly. */
@@ -3197,9 +3420,33 @@
       1px 1px 2px var(--text-outline-color, #000),
       -1px -1px 2px var(--text-outline-color, #000);
   }
-  /* Reduce Motion, drop HUD animations/transitions (mirrors prefers-reduced-motion). */
+  /* Reduced motion keeps every number visible for its normal lifetime, but removes
+     translation, scale, rotation, halo, and burst. Information is never shed. */
   body.reduce-motion .fct {
-    animation-duration: 0.01ms !important;
+    animation-name: fct-static !important;
+    animation-duration: var(--dur-fct) !important;
+  }
+  body.reduce-motion .fct-xp,
+  body.reduce-motion .fct-rested-xp {
+    animation-duration: var(--dur-fct-xp) !important;
+  }
+  body.reduce-motion .fct::before,
+  body.reduce-motion .fct::after {
+    display: none !important;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .fct {
+      animation-name: fct-static !important;
+      animation-duration: var(--dur-fct) !important;
+    }
+    .fct-xp,
+    .fct-rested-xp {
+      animation-duration: var(--dur-fct-xp) !important;
+    }
+    .fct::before,
+    .fct::after {
+      display: none !important;
+    }
   }
   body.reduce-motion *,
   body.reduce-motion *::before,

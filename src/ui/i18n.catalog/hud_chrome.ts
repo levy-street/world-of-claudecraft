@@ -812,6 +812,11 @@ export const hudChromeStrings = {
     // (wordy, M16: the five non-Latin fills land in the same change as each).
     playerFrameScale: 'Player Frame Scale',
     targetFrameScale: 'Target Frame Scale',
+    // Floating combat text presentation. Classic preserves the release look;
+    // Enhanced enables the louder outlined treatment without changing events.
+    combatTextStyle: 'Combat Text Style',
+    combatTextClassic: 'Classic',
+    combatTextEnhanced: 'Enhanced',
     // Interface panel toggle: anchor the player's own buff row to the movable
     // player frame (the debuff row then slides up beside the minimap) instead
     // of the classic two-row top-right corner (wordy, M16: the five non-Latin

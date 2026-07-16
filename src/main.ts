@@ -1771,6 +1771,9 @@ async function startGame(
       case 'chatOpacity':
         document.documentElement.style.setProperty('--chat-opacity', String(v));
         break;
+      case 'combatTextStyle':
+        document.documentElement.dataset.combatText = v >= 0.5 ? 'enhanced' : 'classic';
+        break;
       case 'fctScale':
         document.documentElement.style.setProperty('--fct-scale', String(v));
         break;

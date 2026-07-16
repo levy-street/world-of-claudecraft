@@ -9,25 +9,115 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hud.combat.floatingParry",
+    "hud.combat.parried",
+    "hudChrome.options.combatTextClassic",
+    "hudChrome.options.combatTextEnhanced",
+    "hudChrome.options.combatTextStyle"
+  ],
+  "es_ES": [
+    "hud.combat.floatingParry",
+    "hud.combat.parried",
+    "hudChrome.options.combatTextClassic",
+    "hudChrome.options.combatTextEnhanced",
+    "hudChrome.options.combatTextStyle"
+  ],
+  "fr_FR": [
+    "hud.combat.floatingParry",
+    "hud.combat.parried",
+    "hudChrome.options.combatTextClassic",
+    "hudChrome.options.combatTextEnhanced",
+    "hudChrome.options.combatTextStyle"
+  ],
+  "fr_CA": [
+    "hud.combat.floatingParry",
+    "hud.combat.parried",
+    "hudChrome.options.combatTextClassic",
+    "hudChrome.options.combatTextEnhanced",
+    "hudChrome.options.combatTextStyle"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hud.combat.floatingParry",
+    "hud.combat.parried",
+    "hudChrome.options.combatTextClassic",
+    "hudChrome.options.combatTextEnhanced",
+    "hudChrome.options.combatTextStyle"
+  ],
+  "de_DE": [
+    "hud.combat.floatingParry",
+    "hud.combat.parried",
+    "hudChrome.options.combatTextClassic",
+    "hudChrome.options.combatTextEnhanced",
+    "hudChrome.options.combatTextStyle"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hud.combat.floatingParry",
+    "hud.combat.parried",
+    "hudChrome.options.combatTextClassic",
+    "hudChrome.options.combatTextEnhanced",
+    "hudChrome.options.combatTextStyle"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hud.combat.floatingParry",
+    "hud.combat.parried",
+    "hudChrome.options.combatTextClassic",
+    "hudChrome.options.combatTextEnhanced",
+    "hudChrome.options.combatTextStyle"
+  ],
+  "nl_NL": [
+    "hud.combat.floatingParry",
+    "hud.combat.parried",
+    "hudChrome.options.combatTextClassic",
+    "hudChrome.options.combatTextEnhanced",
+    "hudChrome.options.combatTextStyle"
+  ],
+  "pl_PL": [
+    "hud.combat.floatingParry",
+    "hud.combat.parried",
+    "hudChrome.options.combatTextClassic",
+    "hudChrome.options.combatTextEnhanced",
+    "hudChrome.options.combatTextStyle"
+  ],
+  "id_ID": [
+    "hud.combat.floatingParry",
+    "hud.combat.parried",
+    "hudChrome.options.combatTextClassic",
+    "hudChrome.options.combatTextEnhanced",
+    "hudChrome.options.combatTextStyle"
+  ],
+  "tr_TR": [
+    "hud.combat.floatingParry",
+    "hud.combat.parried",
+    "hudChrome.options.combatTextClassic",
+    "hudChrome.options.combatTextEnhanced",
+    "hudChrome.options.combatTextStyle"
+  ],
+  "sv_SE": [
+    "hud.combat.floatingParry",
+    "hud.combat.parried",
+    "hudChrome.options.combatTextClassic",
+    "hudChrome.options.combatTextEnhanced",
+    "hudChrome.options.combatTextStyle"
+  ],
+  "vi_VN": [
+    "hud.combat.floatingParry",
+    "hud.combat.parried",
+    "hudChrome.options.combatTextClassic",
+    "hudChrome.options.combatTextEnhanced",
+    "hudChrome.options.combatTextStyle"
+  ],
+  "da_DK": [
+    "hud.combat.floatingParry",
+    "hud.combat.parried",
+    "hudChrome.options.combatTextClassic",
+    "hudChrome.options.combatTextEnhanced",
+    "hudChrome.options.combatTextStyle"
+  ]
 };
