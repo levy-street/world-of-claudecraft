@@ -1,9 +1,11 @@
 // Screenshot pack for the Protect Yumi PR: the play window (Arena + Protect
 // Yumi sections) and, on the feature branch, the in-match extras (the `(?)`
-// mystery orb and the hold-to-grab bar). Captures are desktop-only.
+// mystery orb and the hold-to-grab bar). DEVICE=mobile applies the phone
+// viewport and mobile HUD class after the offline world has booted, so the
+// mobile Use control and layout are present in the evidence shot.
 // Offline world, no server needed beyond `npm run dev`.
 //
-//   GAME_URL=http://localhost:5173 SHOT_PREFIX=after SHOTS=all \
+//   GAME_URL=http://localhost:5173 SHOT_PREFIX=after SHOTS=all DEVICE=mobile \
 //     node scripts/yumi_review_screens.mjs
 //
 // SHOTS=window captures only the play window (for a base checkout that
@@ -17,7 +19,21 @@ import { BROWSER_PATH } from './browser_path.mjs';
 const URL = process.env.GAME_URL ?? 'http://localhost:5173';
 const PREFIX = process.env.SHOT_PREFIX ?? 'after';
 const SHOTS = process.env.SHOTS ?? 'all';
+const MOBILE = process.env.DEVICE === 'mobile';
+const DESKTOP_VIEWPORT = { width: 1280, height: 820, deviceScaleFactor: 1 };
+const MOBILE_VIEWPORT = { width: 844, height: 390, deviceScaleFactor: 1 };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const waitForPage = async (page, fn, timeout, label) => {
+  const deadline = Date.now() + timeout;
+  while (Date.now() < deadline) {
+    // page.evaluate runs in the page's main world, where the dev-only __game
+    // hook lives. Puppeteer's waitForFunction uses an isolated world in newer
+    // releases and therefore cannot see that hook.
+    if (await page.evaluate(fn)) return;
+    await sleep(300);
+  }
+  throw new Error(`Timed out waiting for ${label}`);
+};
 fs.mkdirSync('tmp', { recursive: true });
 
 const shot = (name) => `tmp/${PREFIX}-${name}.png`;
@@ -28,31 +44,29 @@ const browser = await puppeteer.launch({
   protocolTimeout: 60000,
   // Anti-throttle so the offline rAF loop keeps ticking headless.
   args: [
-    '--window-size=1280,820',
+    `--window-size=${DESKTOP_VIEWPORT.width},${DESKTOP_VIEWPORT.height}`,
     '--use-angle=swiftshader',
     '--enable-unsafe-swiftshader',
     '--disable-background-timer-throttling',
     '--disable-renderer-backgrounding',
     '--disable-backgrounding-occluded-windows',
   ],
-  defaultViewport: { width: 1280, height: 820 },
+  defaultViewport: DESKTOP_VIEWPORT,
 });
 const page = await browser.newPage();
 page.on('pageerror', (e) => console.error(`PAGEERROR: ${e.message}`));
 
 await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
-await sleep(800);
-await page.evaluate(() => {
-  document.querySelector('#btn-offline')?.click();
-});
-await sleep(400);
-await page.evaluate(() => {
-  document.querySelector('#offline-select .mini-class[data-class="warrior"]')?.click();
-  const name = document.querySelector('#char-name');
-  if (name) name.value = 'Yumishots';
-  document.querySelector('#btn-start-offline')?.click();
-});
-await page.waitForFunction(() => window.__game?.sim?.player, { timeout: 60000, polling: 300 });
+await page.waitForSelector('#server-select-trigger');
+await page.click('#server-select-trigger');
+await page.click('#server-opt-offline');
+await page.click('#btn-play');
+await page.waitForSelector('#offline-select:not([hidden])');
+await page.click('#offline-select .mini-class[data-class="warrior"]');
+await page.type('#char-name', 'Yumishots');
+await sleep(300);
+await page.evaluate(() => document.querySelector('#btn-start-offline')?.click());
+await waitForPage(page, () => !!window.__game?.sim?.player, 60000, 'offline game');
 // The world is up once the loading screen fades (a cold vite cache can hold it
 // for a while).
 await page.waitForFunction(
@@ -79,14 +93,24 @@ await page.evaluate(() => {
   document.querySelector('.tut-skip')?.click();
 });
 await sleep(500);
+// v0.27 adds a mouse-camera first-run prompt. The screenshot is about the play
+// window / Yumi HUD, so accept its default Classic choice before framing.
+await page.evaluate(() => document.querySelector('.camera-prompt-confirm')?.click());
+await sleep(300);
+if (MOBILE) {
+  await page.setViewport(MOBILE_VIEWPORT);
+  await page.evaluate(() => document.body.classList.add('mobile-touch'));
+  await sleep(900);
+}
 
 // ---- The play window (Arena + Protect Yumi sections) ----------------------
 await page.evaluate(() => {
   window.__game.hud.toggleArena();
 });
 await sleep(900);
-await page.screenshot({ path: shot('play-window-desktop') });
-console.log(`wrote ${shot('play-window-desktop')}`);
+const device = MOBILE ? 'mobile' : 'desktop';
+await page.screenshot({ path: shot(`play-window-${device}`) });
+console.log(`wrote ${shot(`play-window-${device}`)}`);
 await sleep(400);
 await page.evaluate(() => {
   window.__game.hud.toggleArena(); // close it again
@@ -101,13 +125,15 @@ if (SHOTS === 'all') {
     const pids = [sim.playerId, ...classes.map((c, i) => sim.addPlayer(c, `Bot${i}`))];
     for (const pid of pids) sim.arenaQueueJoin(pid, 'yumi3');
   });
-  await page.waitForFunction(
+  await waitForPage(
+    page,
     () => {
       const sim = window.__game.sim;
       const m = sim.arenaMatchFor(sim.playerId);
       return !!m && m.state === 'active';
     },
-    { timeout: 30000, polling: 300 },
+    30000,
+    'active Yumi match',
   );
   await sleep(2500); // maze interior + HUD strip
 
@@ -117,13 +143,15 @@ if (SHOTS === 'all') {
     const m = sim.arenaMatchFor(sim.playerId);
     m.yumi.powerupTimer = 0.05;
   });
-  await page.waitForFunction(
+  await waitForPage(
+    page,
     () => {
       const sim = window.__game.sim;
       const m = sim.arenaMatchFor(sim.playerId);
       return m && m.yumi.powerups.length > 0;
     },
-    { timeout: 10000, polling: 200 },
+    10000,
+    'Yumi power-up spawn',
   );
   await page.evaluate(() => {
     const g = window.__game;
@@ -165,8 +193,8 @@ if (SHOTS === 'all') {
     p.yumiGrabTotal = 1.8;
   });
   await sleep(1200);
-  await page.screenshot({ path: shot('yumi-orb-grab-desktop') });
-  console.log(`wrote ${shot('yumi-orb-grab-desktop')}`);
+  await page.screenshot({ path: shot(`yumi-orb-grab-${device}`) });
+  console.log(`wrote ${shot(`yumi-orb-grab-${device}`)}`);
 }
 
 await browser.close();
