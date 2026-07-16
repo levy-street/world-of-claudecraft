@@ -171,7 +171,7 @@ function drawFist(g: CanvasRenderingContext2D, cx: number, cy: number, s: number
   // a blocky raised fist: palm slab, four knuckle blocks, thumb bar
   const r = s * 0.12;
   const rr = (x: number, y: number, w: number, h: number): void => {
-    // manual rounded rect (matches the src/ui/player_card.ts helper style)
+    // manual rounded rect (matches the src/ui/hud/player_card/player_card.ts helper style)
     const rad = Math.min(r, w / 2, h / 2);
     g.beginPath();
     g.moveTo(x + rad, y);

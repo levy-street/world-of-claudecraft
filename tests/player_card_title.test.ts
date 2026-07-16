@@ -1,12 +1,12 @@
 // The player card's Book of Deeds title line. The canvas compositor is
 // browser-only (renderPlayerCardCanvas needs document/fonts/Image), so the
 // pin altitude is the pure layout gate (cardTitleLayout, which the ONE guarded
-// draw call consumes) plus source pins on the guarded draw site and the hud
+// draw call consumes) plus source pins on the guarded draw site and the data
 // build-site fill; the untitled byte-identical guarantee IS the null return
 // (nothing extra ever draws when it is null).
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { cardTitleLayout } from '../src/ui/player_card';
+import { cardTitleLayout } from '../src/ui/hud/player_card/player_card';
 
 describe('cardTitleLayout (the pure title-line gate)', () => {
   it('returns null for absent, empty, and whitespace titles (untitled cards draw nothing)', () => {
@@ -28,7 +28,10 @@ describe('cardTitleLayout (the pure title-line gate)', () => {
   });
 
   it('the compositor guards its ONE title draw call on this gate (source pin)', () => {
-    const src = readFileSync(new URL('../src/ui/player_card.ts', import.meta.url), 'utf8');
+    const src = readFileSync(
+      new URL('../src/ui/hud/player_card/player_card.ts', import.meta.url),
+      'utf8',
+    );
     const drawSite = src.slice(src.indexOf('const titleLine = cardTitleLayout('));
     expect(drawSite.length).toBeGreaterThan(0);
     expect(drawSite.slice(0, 300)).toContain('if (titleLine) {');
@@ -39,10 +42,15 @@ describe('cardTitleLayout (the pure title-line gate)', () => {
     expect(src.split('cardTitleLayout(').length - 1).toBe(2); // the export + the one call
   });
 
-  it('the hud build site resolves the deed id to display text and omits it when empty', () => {
-    const hudSrc = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
-    const site = hudSrc.slice(hudSrc.indexOf('const cardTitleText ='));
-    expect(site.slice(0, 200)).toContain("sim.activeTitle ? deedTitleText(sim.activeTitle) : ''");
-    expect(site.slice(0, 600)).toContain('...(cardTitleText ? { titleText: cardTitleText } : {})');
+  it('the data builder resolves the deed id to display text and omits it when empty', () => {
+    const dataSrc = readFileSync(
+      new URL('../src/ui/hud/player_card/player_card_data.ts', import.meta.url),
+      'utf8',
+    );
+    const site = dataSrc.slice(dataSrc.indexOf('const titleText ='));
+    expect(site.slice(0, 200)).toContain(
+      "world.activeTitle ? deedTitleText(world.activeTitle) : ''",
+    );
+    expect(site.slice(0, 600)).toContain('...(titleText ? { titleText } : {})');
   });
 });

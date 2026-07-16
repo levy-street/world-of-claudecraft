@@ -5,7 +5,7 @@ import {
   abilityStartsAutoAttack,
   deferAutoAttackUntilCastEnd,
   hasAutoAttackTarget,
-} from '../src/ui/attack_on_ability';
+} from '../src/ui/hud/action_bar/attack_on_ability';
 
 // Resolve a real ability's rank-1 effects by id, so the test pins behavior against
 // the actual content tables (not hand-mocked shapes that could drift).

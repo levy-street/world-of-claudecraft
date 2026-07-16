@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { InvSlot, ItemDef } from '../src/sim/types';
-import { buildVendorView } from '../src/ui/vendor_view';
+import { buildVendorView } from '../src/ui/hud/vendor/vendor_view';
 
 // Minimal ItemDef fixtures: buildVendorView only reads id / buyValue / sellValue.
 function item(

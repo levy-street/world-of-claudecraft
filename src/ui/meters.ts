@@ -68,12 +68,32 @@ export class MeterData {
     this.allTime = { ...newEncounter(now), label: 'All (session)' };
   }
 
-  private tally(enc: Encounter, pid: number, name: string, cls: string | null): MemberTally {
+  private tally(
+    enc: Encounter,
+    pid: number,
+    name: string,
+    cls: string | null,
+    partyPids: Set<number>,
+  ): MemberTally {
     let t = enc.tallies.get(pid);
-    if (!t) {
-      t = { pid, name, cls, dmg: 0, heal: 0, dmgByMob: new Map() };
-      enc.tallies.set(pid, t);
+    if (t) return t;
+    // a reconnect issues the same character a new entity id mid-encounter; find
+    // its previous row by name and re-key it instead of starting a duplicate.
+    // Only treat a name match as a reconnect when the old pid is no longer a
+    // live party member: pet names come from their template/tamed-target name
+    // and are not unique, so two live same-named pets must stay separate
+    // rows instead of ping-ponging the merge back and forth.
+    for (const [oldPid, existing] of enc.tallies) {
+      if (existing.name === name && oldPid !== pid && !partyPids.has(oldPid)) {
+        enc.tallies.delete(oldPid);
+        existing.pid = pid;
+        existing.cls = cls ?? existing.cls;
+        enc.tallies.set(pid, existing);
+        return existing;
+      }
     }
+    t = { pid, name, cls, dmg: 0, heal: 0, dmgByMob: new Map() };
+    enc.tallies.set(pid, t);
     return t;
   }
 
@@ -98,7 +118,7 @@ export class MeterData {
         const cls =
           member?.cls ?? (ev.sourceId === world.player.id ? world.player.templateId : null);
         for (const enc of [this.current, this.allTime]) {
-          const t = this.tally(enc, ev.sourceId, name, cls);
+          const t = this.tally(enc, ev.sourceId, name, cls, partyPids);
           t.dmg += ev.amount;
           if (enc === this.current) {
             t.dmgByMob.set(ev.targetId, (t.dmgByMob.get(ev.targetId) ?? 0) + ev.amount);
@@ -119,7 +139,7 @@ export class MeterData {
       const name = member?.name ?? src?.name ?? `#${ev.sourceId}`;
       const cls = member?.cls ?? (ev.sourceId === world.player.id ? world.player.templateId : null);
       for (const enc of [this.current, this.allTime]) {
-        this.tally(enc, ev.sourceId, name, cls).heal += ev.amount;
+        this.tally(enc, ev.sourceId, name, cls, partyPids).heal += ev.amount;
       }
     }
   }

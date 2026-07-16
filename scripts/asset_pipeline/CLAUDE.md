@@ -12,8 +12,8 @@ origins, y=0 bases, in-place clips, WebP 512 textures, meshopt), so a generated 
 to the existing KayKit/Quaternius-style set without looking imported.
 
 Run: `node scripts/asset_pipeline/pipeline.mjs <command> [options]` (`--help` prints usage).
-Commands: `weapon`, `prop`, `creature`, `skin`, `skinset`, `skinmodel`, `library`, `qa`,
-`validate`, `preview`, `preview-held`, `status`, `balance`, `inspect`, `inplace-check`.
+Commands: `weapon`, `prop`, `creature`, `skin`, `skinset`, `skinmodel`, `rig-manual`, `library`,
+`qa`, `validate`, `preview`, `preview-held`, `status`, `balance`, `inspect`, `inplace-check`.
 
 **`qa --job <id>` is the mandatory last step for every generated asset.** It re-verifies
 the finished job structurally (lane-aware: rig + required clips, grip convention + HUD icon

@@ -8,7 +8,7 @@ import {
   createGroundAimState,
   DEFAULT_GROUND_AOE_RADIUS,
   enterGroundAim,
-} from '../src/ui/ground_aim';
+} from '../src/ui/hud/action_bar/ground_aim';
 
 function casterAt(x: number, z: number): Pick<Entity, 'pos'> {
   return { pos: { x, y: 0, z } };

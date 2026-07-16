@@ -649,24 +649,23 @@ describe('ops routes: fail-closed secret gate', () => {
     expect(h.db.pendingPayouts).toHaveBeenCalledWith(100, '2026-07-01');
   });
 
-  it.each([
-    '2026-7-01',
-    '2026/07/01',
-    'not-a-day',
-  ])('rejects an invalid pending-payout day filter: %s', async (day) => {
-    process.env[OPS_SECRET_ENV] = OPS_SECRET;
-    const r = await runRoute('POST', '/internal/daily-rewards/pending-payouts', {
-      url: `/internal/daily-rewards/pending-payouts?day=${encodeURIComponent(day)}`,
-      headers: OPS_HEADERS,
-    });
-    expect(r.status).toBe(400);
-    expect(r.body).toEqual({
-      success: false,
-      data: null,
-      error: 'invalid reward day',
-    });
-    expect(h.db.pendingPayouts).not.toHaveBeenCalled();
-  });
+  it.each(['2026-7-01', '2026/07/01', 'not-a-day'])(
+    'rejects an invalid pending-payout day filter: %s',
+    async (day) => {
+      process.env[OPS_SECRET_ENV] = OPS_SECRET;
+      const r = await runRoute('POST', '/internal/daily-rewards/pending-payouts', {
+        url: `/internal/daily-rewards/pending-payouts?day=${encodeURIComponent(day)}`,
+        headers: OPS_HEADERS,
+      });
+      expect(r.status).toBe(400);
+      expect(r.body).toEqual({
+        success: false,
+        data: null,
+        error: 'invalid reward day',
+      });
+      expect(h.db.pendingPayouts).not.toHaveBeenCalled();
+    },
+  );
 
   it('runs payout-history to a 200 admin envelope on the correct secret', async () => {
     process.env[OPS_SECRET_ENV] = OPS_SECRET;

@@ -12,7 +12,7 @@ import { enterDungeon } from '../src/sim/instances/dungeons';
 import { expectedStatBudget, itemLevel, primaryStatSum } from '../src/sim/item_level';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
-import { buildHeroicVendorView } from '../src/ui/heroic_vendor_view';
+import { buildHeroicVendorView } from '../src/ui/hud/vendor/heroic_vendor_view';
 
 type AnySim = Sim & Record<string, any>;
 type AnyEntity = Entity & Record<string, any>;
