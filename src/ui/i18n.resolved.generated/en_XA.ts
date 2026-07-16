@@ -1125,7 +1125,7 @@ export const en_XA: EnTranslations = {
       "arenaDailyReward": "[{honor} Ĥóñóŕ + {hero} Ĥéŕó Þóíñţš]",
       "arenaDailyClaimed": "[Ýóú ĥáʋé áļŕéáðý çļáíɱéð ýóúŕ ðáíļý áŕéñá ŕéŵáŕð ţóðáý.]",
       "arenaDailyNotEntered": "[Éñţéŕ áñ áŕéñá ɱáţçĥ ţóðáý ţó çļáíɱ ýóúŕ ðáíļý ŕéŵáŕð.]",
-      "heroGain": "[Ýóú ĝáíñ {amount} ĥéŕó þóíñţš ({reason}).]",
+      "heroGain": "[Ýóú ĝáíñ {amount} Ĥéŕó Þóíñţš ({reason}).]",
       "notEnoughHonor": "[Ñóţ éñóúĝĥ Ĥóñóŕ.]",
       "notEnoughHero": "[Ñóţ éñóúĝĥ ĥéŕó þóíñţš.]",
       "reasons": {

@@ -1125,7 +1125,7 @@ export const pl_PL: EnTranslations = {
       "arenaDailyReward": "{honor} Honor + {hero} Hero Points",
       "arenaDailyClaimed": "You have already claimed your daily arena reward today.",
       "arenaDailyNotEntered": "Enter an arena match today to claim your daily reward.",
-      "heroGain": "You gain {amount} hero points ({reason}).",
+      "heroGain": "You gain {amount} Hero Points ({reason}).",
       "notEnoughHonor": "Za mało Honoru.",
       "notEnoughHero": "Not enough hero points.",
       "reasons": {
