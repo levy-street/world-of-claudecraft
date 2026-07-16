@@ -100,6 +100,7 @@ const KNOWN_CODES = [
   'steam.already_linked',
   'steam.account_taken',
   'steam.upstream',
+  'welcome.invalid_input',
 ];
 
 // The parametric contract pins: the matcher

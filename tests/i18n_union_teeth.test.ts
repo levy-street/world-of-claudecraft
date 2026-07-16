@@ -14,7 +14,7 @@ import type { TranslationKey } from '../src/ui/i18n.catalog';
 // halves: type-level probes compiled by `npx tsc --noEmit` (the gate, the
 // pre-push floor, CI check:types, and editors), and runtime pins for the two
 // legs the type probes cannot see (per-file annotations and the artifact's
-// line-item shape, decision D6 in docs/toolchain-modernization/state.md).
+// line-item shape, toolchain packet decision D6; packet summary on issue #1868).
 
 // Anti-vacuity pin: if TranslationKey ever absorbs `string` (e.g. the generator
 // gains a widening member like `| (string & {})`), the conditional type below
