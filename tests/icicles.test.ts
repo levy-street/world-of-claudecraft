@@ -5,6 +5,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { encodeObs } from '../src/sim/obs';
 import { type ResolvedAbility, Sim } from '../src/sim/sim';
+import { directHitBonus } from '../src/sim/spell_scaling';
 import type { Entity } from '../src/sim/types';
 import { localizeTalentTitle } from '../src/ui/talent_i18n';
 
@@ -331,5 +332,43 @@ describe('Cryomancy Icicles', () => {
     expect(sim.player.auras.some((entry) => entry.id === 'mag_frostbite')).toBe(false);
     expect(draws.rangeDraws()).toBe(0);
     expect(draws.chanceDraws()).toBe(0);
+  });
+
+  it('keeps Icefall at the fixed 8 and 20 per icicle regardless of Spell Power', () => {
+    const damageAt = (spellPower: number, stunned: boolean): number => {
+      const sim = frostSim();
+      const target = targetFor(sim);
+      fixedDamageRng(sim);
+      buildIcicles(sim, target, 3);
+      if (stunned) {
+        sim.ctx.applyAura(target, {
+          id: 'test_stun',
+          name: 'Test Stun',
+          kind: 'stun',
+          remaining: 8,
+          duration: 8,
+          value: 0,
+          sourceId: sim.player.id,
+          school: 'frost',
+        });
+      }
+      // Applying the proc auras recalculates derived stats, so set Spell Power
+      // after setup: fixedNoCrit must ignore it either way.
+      sim.player.spellPower = spellPower;
+      const before = target.hp;
+      run(sim, target, 'icefall');
+      return before - target.hp;
+    };
+
+    // The rider Icefall skips would be nonzero at this Spell Power, so equal
+    // damage below proves the fixed path really excludes it.
+    const sim = frostSim();
+    const icefall = resolved(sim, 'icefall');
+    expect(directHitBonus(150, icefall.def, icefall.castTime)).toBeGreaterThan(0);
+
+    expect(damageAt(150, false)).toBe(3 * 8);
+    expect(damageAt(150, false)).toBe(damageAt(0, false));
+    expect(damageAt(150, true)).toBe(3 * 20);
+    expect(damageAt(150, true)).toBe(damageAt(0, true));
   });
 });

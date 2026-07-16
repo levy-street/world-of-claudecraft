@@ -1505,7 +1505,9 @@ export type AbilityEffect =
       min: number;
       max: number;
       // Uses the authored minimum directly and cannot crit, so resolving the
-      // effect consumes no damage-roll or crit-roll RNG draws.
+      // effect consumes no damage-roll or crit-roll RNG draws. Fixed also
+      // means no power rider: the flat Spell Power / Attack Power hit bonus is
+      // skipped, so the authored number is the real per-hit amount on any gear.
       fixedNoCrit?: boolean;
       vsRootedMult?: number;
       vsFrozenMult?: number;

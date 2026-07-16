@@ -303,7 +303,14 @@ export function runEffects(
         // Ranged AP for hunter shots, melee Attack Power for physical specials.
         // abilityScalingPower picks the rating; powerScale (inside directHitBonus)
         // applies the AP scale-down. A non-scaling effect just contributes 0.
-        dmg += directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
+        // fixedNoCrit means FIXED damage by design: just as it skips the
+        // damage-roll and crit draws, it excludes the power rider, so the
+        // tooltip's authored number is the real per-hit amount regardless of
+        // gear (Icefall: exactly 8 per icicle, 20 shattered). directHitBonus is
+        // a pure computation (no rng), so gating it changes no draw order.
+        if (!eff.fixedNoCrit) {
+          dmg += directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
+        }
         if (eff.vsRootedMult !== undefined && rooted) dmg *= eff.vsRootedMult;
         if (
           eff.vsFrozenMult !== undefined &&
