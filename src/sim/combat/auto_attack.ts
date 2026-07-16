@@ -191,7 +191,7 @@ export function rangedSwing(
     targetId: target.id,
     school,
     fx: 'projectile',
-    ...(ranged.wand ? {} : { attackAnimation: 'ranged-shot' as const }),
+    ...(ranged.wand ? { wand: true as const } : { attackAnimation: 'ranged-shot' as const }),
   });
   // The shot/bolt is in flight: its miss roll and damage land when it reaches the
   // target (projectile_travel), and fizzle if the target dies before impact.

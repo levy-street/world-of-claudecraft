@@ -118,13 +118,38 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
     expectAtLeastFloor(row, 'party-frame');
   });
 
-  it('the party leave button', () => {
-    const frames = el('div', { id: 'party-frames', class: 'party-expanded' });
-    const leave = el('button', { id: 'party-leave' });
-    leave.textContent = 'Leave Party';
-    frames.appendChild(leave);
+  it('keeps a full raid roster reachable inside the landscape viewport', () => {
+    const frames = el('div', {
+      id: 'party-frames',
+      class: 'party-expanded party-style-raid',
+    });
+    const chip = el('button', { id: 'party-chip' });
+    chip.textContent = 'Party';
+    const rows = el('div', { class: 'party-rows' });
+    for (let i = 0; i < 19; i++) {
+      const row = el('div', { class: 'party-frame', role: 'button', tabindex: '0' });
+      row.textContent = `Member ${i + 1}`;
+      rows.appendChild(row);
+    }
+    frames.append(chip, rows);
     document.body.appendChild(frames);
-    expectAtLeastFloor(leave, '#party-leave');
+
+    const rect = rows.getBoundingClientRect();
+    expect(rect.right).toBeLessThanOrEqual(window.innerWidth + EPSILON);
+    expect(rect.bottom).toBeLessThanOrEqual(window.innerHeight + EPSILON);
+    expect(rows.scrollHeight).toBeGreaterThan(rows.clientHeight);
+    rows.scrollTop = rows.scrollHeight;
+    expect(rows.scrollTop).toBeGreaterThan(0);
+  });
+
+  it('the Leave Party context-menu action', () => {
+    const menu = el('div', { id: 'ctx-menu', class: 'panel' });
+    menu.style.display = 'block';
+    const leave = el('div', { class: 'ctx-item', 'data-act': 'leave-party' });
+    leave.textContent = 'Leave Party';
+    menu.appendChild(leave);
+    document.body.appendChild(menu);
+    expectAtLeastFloor(leave, '[data-act="leave-party"]');
   });
 
   it('the mobile More-tray close button', () => {
@@ -148,6 +173,18 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
     tray.appendChild(grid);
     document.body.appendChild(tray);
     expectAtLeastFloor(donate, '#mobile-donate');
+  });
+
+  it('the Crafting button in the mobile More tray', () => {
+    document.body.className = 'mobile-touch game-active mobile-more-open';
+    const tray = el('div', { id: 'mobile-extra-controls', class: 'window panel' });
+    const grid = el('div', { id: 'mobile-extra-grid' });
+    const crafting = el('button', { id: 'mobile-crafting', class: 'mobile-btn' });
+    crafting.textContent = 'Crafting';
+    grid.appendChild(crafting);
+    tray.appendChild(grid);
+    document.body.appendChild(tray);
+    expectAtLeastFloor(crafting, '#mobile-crafting');
   });
 
   it('the movement / camera joystick', () => {

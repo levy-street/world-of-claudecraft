@@ -28,7 +28,12 @@ vi.mock('../server/db', () => ({
   releaseAllCharacterLeases: vi.fn(async () => {}),
 }));
 
-import { heartbeatCharacterLeases, releaseCharacterLease } from '../server/db';
+import {
+  heartbeatCharacterLeases,
+  releaseCharacterLease,
+  saveCharacterAndMarketState,
+  saveCharacterState,
+} from '../server/db';
 import { GameServer } from '../server/game';
 
 function fakeWs() {
@@ -135,6 +140,94 @@ describe('character load lease, GameServer wiring', () => {
     expect(vi.mocked(releaseCharacterLease)).toHaveBeenCalledTimes(1);
 
     resolveRelease();
+  });
+
+  it('saveCharacter forwards the session lease nonce as the trailing save arg (plain and market)', async () => {
+    const server = new GameServer();
+    const s = join(server, 100, 7, 'Saver', 'nonce-c');
+    expect('error' in s).toBe(false);
+
+    await (server as any).saveCharacter(s);
+    // saveCharacterState(characterId, level, state, leaseNonce): nonce is arg 4.
+    const plainCall = vi.mocked(saveCharacterState).mock.calls.at(-1);
+    expect(plainCall?.[3]).toBe('nonce-c');
+
+    await (server as any).saveCharacter(s, { withMarket: true });
+    // saveCharacterAndMarketState(characterId, level, state, market, mail, leaseNonce):
+    // nonce is arg 6.
+    const marketCall = vi.mocked(saveCharacterAndMarketState).mock.calls.at(-1);
+    expect(marketCall?.[5]).toBe('nonce-c');
+  });
+
+  it('a fenced-out save (false) warns, freezes lastSave, keeps deed records queued, and kicks the displaced session', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      const server = new GameServer();
+      const fw = fakeWs();
+      const s = server.join(fw.ws as any, 100, 7, 'Doomed', 'warrior', null, false, {
+        leaseNonce: 'nonce-c',
+      }) as any;
+      expect('error' in s).toBe(false);
+      s.blockListLoaded = true;
+      s.pendingDeedRecords.push('deed-a', 'deed-b');
+      s.lastSave = 111;
+
+      // A same-account takeover reclaimed the lease: EVERY later fenced write from
+      // this displaced session reports false, including its own leave save.
+      vi.mocked(saveCharacterState).mockResolvedValue(false as any);
+      vi.mocked(saveCharacterAndMarketState).mockResolvedValue(false as any);
+      await (server as any).saveCharacter(s);
+
+      // A deed must never publish ahead of the blob that proves it, and lastSave must
+      // not claim a write that did not land.
+      expect(warn).toHaveBeenCalled();
+      expect(String(warn.mock.calls.at(-1)?.[0])).toMatch(/fenced out/);
+      expect(s.lastSave).toBe(111);
+      expect(s.pendingDeedRecords).toEqual(['deed-a', 'deed-b']);
+
+      // The displaced session is not left playing unsaved: it gets the same explicit
+      // takeover signal the in-process path sends, and the world slot clears so the
+      // player can reconnect cleanly.
+      await vi.waitFor(() => {
+        expect(s.left).toBe(true);
+        // The character-session index clears only after leave()'s own (fenced,
+        // no-op) save settles, so poll it here rather than asserting once.
+        expect(server.hasSessionForCharacter(7)).toBe(false);
+      });
+      expect(fw.sent).toContainEqual({ t: 'error', error: 'character taken over' });
+
+      // A session whose lease is intact still drains normally (re-zero proof): the
+      // fence-out above cannot leak into an unrelated healthy session.
+      vi.mocked(saveCharacterState).mockResolvedValue(true as any);
+      const healthy = join(server, 200, 8, 'Healthy', 'nonce-h');
+      expect('error' in healthy).toBe(false);
+      healthy.pendingDeedRecords.push('deed-z');
+      healthy.lastSave = 111;
+      await (server as any).saveCharacter(healthy);
+      expect(healthy.lastSave).not.toBe(111);
+      expect(healthy.pendingDeedRecords).toEqual([]);
+    } finally {
+      // Restore the factory defaults so later tests see the pre-test mock shape.
+      vi.mocked(saveCharacterState).mockImplementation(async () => undefined as any);
+      vi.mocked(saveCharacterAndMarketState).mockImplementation(async () => undefined as any);
+      warn.mockRestore();
+    }
+  });
+
+  it('a session with no lease nonce saves via the legacy path (undefined nonce) and advances lastSave', async () => {
+    const server = new GameServer();
+    const s = join(server, 100, 7, 'Legacy');
+    expect('error' in s).toBe(false);
+    expect(s.leaseNonce).toBeUndefined();
+    s.lastSave = 222;
+
+    await (server as any).saveCharacter(s);
+
+    const call = vi.mocked(saveCharacterState).mock.calls.at(-1);
+    // No nonce forwarded: the legacy unconditional write reports success, so the
+    // post-save steps run and lastSave advances.
+    expect(call?.[3]).toBeUndefined();
+    expect(s.lastSave).not.toBe(222);
   });
 
   it('the autosave flush heartbeats leases, gated on the autosave interval and reset after', () => {

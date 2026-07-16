@@ -227,6 +227,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "pummel",
         "name": "Jawcrack"
+      },
+      {
+        "id": "ironhold",
+        "name": "Ironhold"
       }
     ],
     "model": "player_warrior",
@@ -347,6 +351,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "rebuke",
         "name": "Reproach"
+      },
+      {
+        "id": "sacred_bulwark",
+        "name": "Sacred Bulwark"
       }
     ],
     "model": "player_paladin",
@@ -1268,6 +1276,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "skull_bash",
         "name": "Headbutt"
+      },
+      {
+        "id": "primal_reflexes",
+        "name": "Primal Reflexes"
       }
     ],
     "model": "player_druid",

@@ -61,7 +61,7 @@ import { buildCritters, type CritterField } from './critters';
 import { animatesEveryFrame, crowdLodScaleSq, midAnimCadence } from './crowd_lod';
 import { shouldPlayDeedFirework } from './deed_fx_gate';
 import { buildDelveModule } from './delve_interiors';
-import { buildDelveInteractable } from './delve_props';
+import { buildDelveInteractable, syncDelveInteractableVisibility } from './delve_props';
 import { buildDoorBody } from './door_portal';
 import { DungeonInteriors, ensureDungeonAssets } from './dungeon';
 import { objectDisplayName } from './entity_labels';
@@ -4456,8 +4456,12 @@ export class Renderer {
           continue;
         }
         const isPortalObject = isPersistentPortalObject(e);
-        const vis = e.lootable && (!isPortalObject || d2 <= ENTITY_VIEW_CREATE_RANGE_SQ);
-        v.group.visible = vis;
+        const vis = syncDelveInteractableVisibility(
+          v.group,
+          e.templateId,
+          e.lootable,
+          !isPortalObject || d2 <= ENTITY_VIEW_CREATE_RANGE_SQ,
+        );
         if (v.sparkle && vis) {
           // sub-pixel beyond ~45u but still a full transparent draw each
           // (d2 is this entity's player distance, computed once above)

@@ -213,18 +213,32 @@ export function unbanAccount(accountId: number, note: string): Built {
   };
 }
 
-export function banDailyRewards(accountId: number, note: string): Built {
+export function banDailyRewards(accountId: number, note: string, durationHours?: number): Built {
   if (!note) return { errorKey: 'alert.noteRequired' };
+  if (
+    durationHours !== undefined &&
+    (!Number.isInteger(durationHours) || durationHours < 1 || durationHours > 8760)
+  ) {
+    return { errorKey: 'alert.dailyRewardsBanDurationInvalid' };
+  }
+  const durationRow =
+    durationHours === undefined
+      ? { label: t('dialog.length'), value: t('detail.dailyRewardsPermanent') }
+      : {
+          label: t('dialog.length'),
+          value: t('detail.lengthHours', { count: durationHours }),
+        };
   return {
     pending: {
       title: t('dialog.confirmDailyRewardsBan'),
       rows: [
         accountRow(accountId),
         { label: t('dialog.action'), value: t('dialog.actionDailyRewardsBan') },
+        durationRow,
         reasonRow(note),
       ],
       endpoint: `/admin/api/moderation/accounts/${accountId}/daily-rewards-ban`,
-      body: { reason: note },
+      body: durationHours === undefined ? { reason: note } : { reason: note, durationHours },
       danger: true,
     },
   };

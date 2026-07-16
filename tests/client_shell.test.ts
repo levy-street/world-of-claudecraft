@@ -307,7 +307,7 @@ describe('client HTML shell', () => {
     // tag also locks the attribute order + the exact i18n key across entries.
     for (const entry of [html, playHtml]) {
       expect(entry).toContain(
-        'id="player-frame" class="unitframe" role="group" data-i18n-aria="hudChrome.unitFrame.playerLabel"',
+        'id="player-frame" class="unitframe" role="group" tabindex="0" aria-haspopup="menu" data-i18n-aria="hudChrome.unitFrame.playerLabel"',
       );
     }
   });
@@ -507,14 +507,13 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain(
       'body.mobile-touch #party-frames.party-expanded #party-chip .ui-icon {\n    transform: rotate(90deg);',
     );
-    // Collapsed OR chat-yielded (no .party-expanded on mobile) hides the member rows +
-    // Leave button, so both states leave only the chip (if present) as the party UI.
+    // Collapsed OR chat-yielded (no .party-expanded on mobile) hides the member rows,
+    // leaving only the chip (if present) as the party UI. (Leaving the party moved to
+    // the self portrait context menu, so there is no longer a #party-leave button.)
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #party-frames:not(.party-expanded) .party-frame,',
+      'body.mobile-touch #party-frames:not(.party-expanded) .party-frame {\n    display: none;',
     );
-    expect(hudMobileCss).toContain(
-      'body.mobile-touch #party-frames:not(.party-expanded) #party-leave {\n    display: none;',
-    );
+    expect(hudMobileCss).not.toContain('#party-frames:not(.party-expanded) #party-leave');
   });
 
   it('drives the arena window relocalize from refreshLocalizedDynamicUi (live language switch)', () => {
@@ -573,13 +572,19 @@ describe('client HTML shell', () => {
     expect(hudTs.match(/\$\('#tf-absorb'\)/g)).toHaveLength(1);
   });
 
-  it('routes the target elite class + name color + combo pips + hostile cue through the elided writers', () => {
-    // The two raw writes the four original writers cannot express (the elite class and
+  it('routes target rank classes + name color + combo pips + hostile cue through elided writers', () => {
+    // The raw writes the four original writers cannot express (the rank classes and
     // the hostile/friendly name color) go through the toggleClass / setStyleProp,
     // and the combo pip `on` toggle (now on the PLAYER frame: combo points are
     // character-bound) through toggleClass. No raw classList/style write on either
     // frame survives (those silently collapse the hot-DOM skip rate).
-    expect(hudTs).toContain("this.toggleClass(this.targetFrameEl, 'elite'");
+    expect(hudTs).toContain('const targetRank = targetRankView(targetTemplate);');
+    expect(hudTs).toContain('levelText: String(target.level),');
+    expect(hudTs).toContain(
+      "this.toggleClass(this.targetFrameEl, 'elite', targetUsesEliteFrame(targetRank));",
+    );
+    expect(hudTs).toContain("this.toggleClass(this.targetFrameEl, 'boss', targetRank === 'boss');");
+    expect(hudTs).toContain("targetRank === 'boss' ? t('hud.core.boss') : t('hud.core.elite'),");
     expect(hudTs).toMatch(/this\.setStyleProp\(\s*this\.targetNameEl,\s*'color',/);
     expect(hudTs).toContain("this.toggleClass(pips[i] as HTMLElement, 'on', i < p.comboPoints);");
     // The forced-colors hostile cue is a non-color redundant marker on the target
@@ -588,6 +593,7 @@ describe('client HTML shell', () => {
     expect(hudTs).toContain("this.toggleClass(this.targetNameEl, 'hostile', target.hostile);");
     expect(hudTs).not.toContain("this.targetNameEl.classList.toggle('hostile'");
     expect(hudTs).not.toContain("this.targetFrameEl.classList.toggle('elite'");
+    expect(hudTs).not.toContain("this.targetFrameEl.classList.toggle('boss'");
     expect(hudTs).not.toContain('this.targetNameEl.style.color');
     expect(hudTs).not.toContain("pip.classList.toggle('on'");
   });
@@ -1227,23 +1233,27 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain(
       'body.mobile-touch #party-frames .party-frame:not(:first-of-type) {\n    margin-top: -1px;',
     );
-    // F1: the container is a simple flex column now (chip, rows wrapper, master-loot,
-    // leave), so the leave button carries no grid placement and no member frame can
-    // auto-flow beside the chip.
+    // F1: the container is a simple flex column now (chip, rows wrapper, master-loot),
+    // so no member frame can auto-flow beside the chip. The leave button is gone (moved
+    // to the self portrait context menu), so no #party-leave rule remains on mobile.
     expect(hudMobileCss).toMatch(
       /body\.mobile-touch #party-frames \{[^}]*display: flex;[^}]*flex-direction: column;/,
     );
+    expect(hudMobileCss).not.toContain('body.mobile-touch #party-frames #party-leave');
+    // The mobile double-stack keeps its own two-row column grid. On desktop the
+    // .party-rows wrapper now drives the configurable party layout: a column grid
+    // sized by the --party-frame-columns / --party-frame-width / --party-frame-spacing
+    // custom properties (columns default to 1, i.e. the classic single stack).
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #party-frames #party-leave {\n    width: auto;\n    min-width: 0;\n    min-height: 40px;',
+      'body.mobile-touch #party-frames .party-rows {\n    display: grid;\n    zoom: 1;\n    grid-template-columns: none;\n    grid-auto-flow: column;\n    grid-template-rows: repeat(2, auto);',
     );
-    expect(hudMobileCss).not.toMatch(/#party-leave \{\n {4}grid-column/);
-    // The double-stack grid the container used to carry moved to the .party-rows WRAPPER;
-    // on desktop the wrapper is transparent (display: contents), so the desktop stack is
-    // unchanged. Both pins guard the two-arm structure.
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #party-frames .party-rows {\n    display: grid;\n    grid-auto-flow: column;\n    grid-template-rows: repeat(2, auto);',
+      'max-height: calc(100dvh - max(8px, env(safe-area-inset-top)) - 129px);',
     );
-    expect(hudCss).toContain('#party-frames .party-rows {\n    display: contents;\n  }');
+    expect(hudMobileCss).toContain('overflow: auto;');
+    expect(hudCss).toContain(
+      '#party-frames .party-rows {\n    display: grid;\n    grid-template-columns: repeat(var(--party-frame-columns, 1), var(--party-frame-width, 170px));',
+    );
     expect(hudMobileCss).toContain(
       'body.mobile-touch #party-frames .party-frame {\n      width: calc(100px * var(--mobile-chrome-scale, 1));\n      min-height: 40px;',
     );
@@ -1275,10 +1285,11 @@ describe('client HTML shell', () => {
     // If a future change moves the pool back inline or drops the keyed builder, this
     // fails instead of silently losing the guard.
 
-    // Party rows: the per-member row + the #party-leave button are built once by
-    // the pooled row builder, not re-created on every party rebuild in hud.ts.
+    // Party rows: the per-member row is built once by the pooled row builder, not
+    // re-created on every party rebuild in hud.ts. (Leaving the party moved from a
+    // per-row button to the self portrait context menu, so the row no longer builds
+    // a #party-leave button.)
     expect(partyFrameRowTs).toContain("row.className = 'party-frame panel';");
-    expect(partyFrameRowTs).toContain("btn.id = 'party-leave';");
 
     // Aura slots: one node per aura id, held in a keyed pool and built once in
     // createNode() as .buff > .dur + .stacks. The hud.ts-wiring assertion (mirroring the
@@ -1496,11 +1507,13 @@ describe('client HTML shell', () => {
     );
     expect(html).toContain('id="mobile-more-close"');
     expect(html).toContain('<div id="mobile-extra-grid">');
-    // Daily Rewards and the Book of Deeds ride the More grid in BOTH entries
-    // (play.html historically lags index.html; these pins keep them in step).
+    // Daily Rewards, the Book of Deeds, and Crafting ride the More grid in BOTH
+    // entries (play.html historically lags index.html; these pins keep them in
+    // step).
     for (const entry of [html, playHtml]) {
       expect(entry).toContain('id="mobile-daily-rewards"');
       expect(entry).toContain('id="mobile-deeds"');
+      expect(entry).toContain('id="mobile-crafting"');
     }
     expect(hudMobileCss).toContain(
       'body.mobile-touch.mobile-more-open #mobile-controls {\n    z-index: 140;\n  }',

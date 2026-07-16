@@ -94,6 +94,10 @@ export function fmtNumber(value: number): string {
   return new Intl.NumberFormat(adminLanguageTag()).format(Math.round(value));
 }
 
+export function fmtDecimal(value: number, maximumFractionDigits = 2): string {
+  return new Intl.NumberFormat(adminLanguageTag(), { maximumFractionDigits }).format(value);
+}
+
 export function fmtPercent(value: number): string {
   return new Intl.NumberFormat(adminLanguageTag(), {
     style: 'percent',
