@@ -47,6 +47,11 @@ export interface ClaudiumSolBalanceResult {
   lamports: string | null;
 }
 
+export interface ClaudiumUsdcBalanceResult {
+  owner: string;
+  amountBase: string | null;
+}
+
 /** One rung of the SKU ladder. usd/claudium both come from the service. */
 export interface ClaudiumSku {
   sku: string;
@@ -61,9 +66,9 @@ export interface ClaudiumSkusResult {
   skus: ClaudiumSku[];
 }
 
-export type ClaudiumRail = 'stripe' | 'sol' | 'woc';
+export type ClaudiumRail = 'stripe' | 'sol' | 'usdc' | 'woc';
 export type ClaudiumPriceRail = 'stripe' | 'woc';
-export type ClaudiumNativeRail = 'sol' | 'woc';
+export type ClaudiumNativeRail = 'sol' | 'usdc' | 'woc';
 
 /** The stripe-rail purchase-intent leg (client uses clientSecret with Stripe.js). */
 export interface ClaudiumStripeIntent {
@@ -313,6 +318,17 @@ export async function claudiumSolBalance(owner: string): Promise<ClaudiumSolBala
   };
 }
 
+export async function claudiumUsdcBalance(owner: string): Promise<ClaudiumUsdcBalanceResult> {
+  const data = await callService<{ owner?: string; amountBase?: string | null }>({
+    method: 'GET',
+    path: `native/balance/usdc/${encodeURIComponent(owner)}`,
+  });
+  return {
+    owner: data?.owner ?? owner,
+    amountBase: typeof data?.amountBase === 'string' ? data.amountBase : null,
+  };
+}
+
 export async function claudiumNativeRails(): Promise<ClaudiumNativeRailsResult> {
   const data = await callService<{ rails?: Partial<Record<ClaudiumNativeRail, boolean>> }>({
     method: 'GET',
@@ -321,7 +337,11 @@ export async function claudiumNativeRails(): Promise<ClaudiumNativeRailsResult> 
   const available = data !== null && typeof data.rails === 'object' && data.rails !== null;
   return {
     available,
-    rails: { sol: data?.rails?.sol === true, woc: data?.rails?.woc === true },
+    rails: {
+      sol: data?.rails?.sol === true,
+      usdc: data?.rails?.usdc === true,
+      woc: data?.rails?.woc === true,
+    },
   };
 }
 
@@ -376,7 +396,9 @@ export async function claudiumPurchase(input: {
   const purchaseId =
     typeof data.purchaseId === 'string' && data.purchaseId !== '' ? data.purchaseId : null;
   const rail =
-    data.rail === 'stripe' || data.rail === 'sol' || data.rail === 'woc' ? data.rail : null;
+    data.rail === 'stripe' || data.rail === 'sol' || data.rail === 'usdc' || data.rail === 'woc'
+      ? data.rail
+      : null;
   const claudium =
     typeof data.claudium === 'number' && Number.isInteger(data.claudium) && data.claudium > 0
       ? data.claudium

@@ -13,6 +13,8 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.discord.roleTag.legend': '전설',
+  'hudChrome.discord.roleTag.shill': '홍보대사',
   'hudChrome.wocStore.title': 'WOC 상점',
   'hudChrome.wocStore.close': 'WOC 상점 닫기',
   'hudChrome.wocStore.tabsLabel': 'WOC 상점 구역',
@@ -358,6 +360,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.reason.price_unavailable':
     'WOC 가격을 확인할 수 없어 보상이 일시적으로 잠겨 있습니다.',
   'hudChrome.dailyRewards.reason.banned': '일일 보상 참여가 금지되었습니다. 사유: {reason}',
+  'hudChrome.dailyRewards.reason.bannedUntil':
+    '일일 보상 참여가 앞으로 {remaining} 동안 금지됩니다. 해제 시각: {until}. 사유: {reason}',
   'hudChrome.keybinds.discord': 'Discord',
   'hudChrome.spectate.banner': '{name} 관전 중',
   'hudChrome.readyCheck.prompt': '{name} 님이 준비 확인을 시작했습니다. 준비되셨습니까?',
@@ -380,6 +384,28 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetFrame.lock': '대상 프레임 고정',
   'hudChrome.playerFrame.unlock': '플레이어 프레임 이동',
   'hudChrome.playerFrame.lock': '플레이어 프레임 고정',
+  'hudChrome.partyFrames.section': '파티 및 공격대 프레임',
+  'hudChrome.partyFrames.unlock': '파티 및 공격대 프레임 이동',
+  'hudChrome.partyFrames.lock': '파티 및 공격대 프레임 고정',
+  'hudChrome.partyFrames.style': '프레임 스타일',
+  'hudChrome.partyFrames.styleAutomatic': '자동',
+  'hudChrome.partyFrames.styleClassic': '클래식 파티 프레임',
+  'hudChrome.partyFrames.styleRaid': '공격대 프레임',
+  'hudChrome.partyFrames.scale': '프레임 배율',
+  'hudChrome.partyFrames.width': '프레임 너비',
+  'hudChrome.partyFrames.height': '프레임 높이',
+  'hudChrome.partyFrames.spacing': '프레임 간격',
+  'hudChrome.partyFrames.columns': '공격대 열 수',
+  'hudChrome.partyFrames.healthText': '생명력 텍스트',
+  'hudChrome.partyFrames.healthPercent': '백분율',
+  'hudChrome.partyFrames.healthCurrent': '현재 값',
+  'hudChrome.partyFrames.healthCurrentMax': '현재 / 최대',
+  'hudChrome.partyFrames.sort': '플레이어 정렬',
+  'hudChrome.partyFrames.sortGroup': '그룹',
+  'hudChrome.partyFrames.showResource': '마나, 분노, 에너지 표시',
+  'hudChrome.partyFrames.showAbsorbs': '흡수 보호막 표시',
+  'hudChrome.partyFrames.showAuras': '버프 및 디버프 표시',
+  'hudChrome.partyFrames.showSelf': '내 프레임 표시',
   'hudChrome.frameReset.label': '프레임 위치 초기화',
   'hudChrome.options.playerFrameScale': '플레이어 프레임 크기',
   'hudChrome.options.targetFrameScale': '대상 프레임 크기',
@@ -497,6 +523,26 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.lootSettings.menuItem': '전리품 설정',
   'hudChrome.dungeonDifficulty.setHeroic': '던전 난이도 설정: 영웅',
   'hudChrome.dungeonDifficulty.setNormal': '던전 난이도 설정: 일반',
+  'hudChrome.dungeonDifficulty.resetAll': '모든 인스턴스 초기화',
+  'hudChrome.dungeonDifficulty.resetDone': '모든 인스턴스가 초기화되었습니다.',
+  'hudChrome.dungeonDifficulty.resetNone': '초기화할 인스턴스가 없습니다.',
+  'hudChrome.dungeonDifficulty.resetOccupied':
+    '아직 안에 플레이어가 있으면 인스턴스를 초기화할 수 없습니다.',
+  'hudChrome.dungeonDifficulty.resetSameDifficulty':
+    '인스턴스를 초기화하기 전에 던전 난이도를 변경하세요. 비어 있는 인스턴스는 5분 후 자동으로 초기화됩니다.',
+  'hudChrome.dungeonDifficulty.resetUsage':
+    '난이도를 변경한 후 /dungeon reset 으로 빈 인스턴스를 포기할 수 있습니다.',
+  'hudChrome.dungeonDifficulty.resetLoot':
+    '안에 전리품이 남아 있으면 인스턴스를 초기화할 수 없습니다.',
+  'hudChrome.dungeonDifficulty.resetConfirmTitle': '모든 인스턴스를 초기화할까요?',
+  'hudChrome.dungeonDifficulty.resetConfirmBody':
+    '이전에 선택한 난이도의 빈 인스턴스를 포기합니다. 획득하지 않은 전리품이 있으면 초기화할 수 없습니다.',
+  'hudChrome.dungeonDifficulty.resetConfirm': '인스턴스 초기화',
+  'hudChrome.dungeonDifficulty.resetCooldown': '인스턴스는 5분마다 한 번만 초기화할 수 있습니다.',
+  'hudChrome.dungeonDifficulty.entryMismatchNormal':
+    '이 인스턴스는 일반 난이도로 설정되어 있습니다. 영웅 난이도로 새로 시작하려면 모든 인스턴스 초기화를 사용하세요.',
+  'hudChrome.dungeonDifficulty.entryMismatchHeroic':
+    '이 인스턴스는 영웅 난이도로 설정되어 있습니다. 일반 난이도로 새로 시작하려면 모든 인스턴스 초기화를 사용하세요.',
   'hudChrome.lootSettings.method': '전리품 방식',
   'hudChrome.lootSettings.rollThreshold': '주사위 기준',
   'hudChrome.lootSettings.groupLoot': '파티 분배',
@@ -564,6 +610,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.names.spellPower': '주문력',
   'hudChrome.statInfo.names.critRating': '치명타 등급',
   'hudChrome.statInfo.names.hasteRating': '가속 등급',
+  'hudChrome.statInfo.names.hitRating': '명중 등급',
+  'hudChrome.statInfo.desc.hitRating':
+    '장비와 세트 보너스에서 얻는 명중 등급으로 공격이 빗나가거나 주문이 저항되는 빈도를 줄이며, 특히 더 높은 레벨의 적에게 효과적입니다. 약 10등급당 1% 명중.',
   'hudChrome.statInfo.names.warfare': '워페어',
   'hudChrome.statInfo.warfareValue': '주는 피해 +{increase}% / 받는 피해 -{reduction}%',
   'hudChrome.statInfo.desc.critRating':
@@ -893,6 +942,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'download.linuxCta': 'Linux용 다운로드',
   'download.linuxHint':
     'AppImage 형식입니다. 실행 권한만 부여하면 바로 실행되며, 설치는 필요 없습니다.',
+  'download.windowsCta': 'Windows용 다운로드',
   'download.windowsPending': 'Windows 빌드는 준비 중입니다.',
   'download.desc': '최적화된 성능과 전체 화면 플레이를 위해 독립형 런처를 다운로드하세요.',
   'comingSoon.placeholder': '준비 중...',
@@ -2466,6 +2516,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.barkskin.name': '참나무 가죽',
   'entities.abilities.barkskin.description':
     '피부가 나무껍질처럼 단단해져 15초 동안 방어도가 150만큼 증가합니다.',
+  'entities.abilities.ironhold.name': '철벽',
+  'entities.abilities.ironhold.description':
+    '굳건한 방어 태세로 8초 동안 받는 모든 피해를 40% 감소시킵니다.',
+  'entities.abilities.sacred_bulwark.name': '신성한 방벽',
+  'entities.abilities.sacred_bulwark.description':
+    '{duration}초 동안 다음 적의 치명적인 공격을 무효화하고, 대신 생명력을 최대치의 35%까지 회복합니다.',
+  'entities.abilities.primal_reflexes.name': '원시의 반사',
+  'entities.abilities.primal_reflexes.description':
+    '본능이 예리해져 6초 동안 회피율이 50% 증가합니다.',
   'entities.abilities.starfire.name': '창공 낙하',
   'entities.abilities.starfire.description':
     '별의 불꽃을 불러 내려 {damage}의 비전 피해를 입힙니다.',
@@ -5688,6 +5747,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.attackSpeedFast': '공격 속도를 {pct}% 증가시킵니다',
   'hudChrome.auraEffect.haste': '공격 속도와 시전 속도를 {pct}% 증가시킵니다',
   'hudChrome.auraEffect.tongues': '시전 시간을 {pct}% 증가시킵니다',
+  'hudChrome.auraEffect.damageReduction': '받는 모든 피해가 {pct}% 감소합니다',
+  'hudChrome.auraEffect.guardianWard':
+    '다음 적의 치명적인 공격을 막고 대신 생명력을 {pct}%까지 회복합니다',
   'hudChrome.auraEffect.increase.ap': '공격력을 {value} 증가시킵니다',
   'hudChrome.auraEffect.increase.armor': '방어도를 {value} 증가시킵니다',
   'hudChrome.auraEffect.increase.int': '지능을 {value} 증가시킵니다',
@@ -6481,6 +6543,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '그대는 늪지의 끝자락으로 올라가 할벤 수사에게 돌아간다.',
   'hudChrome.dailyRewards.endsIn': '{time} 후 종료',
   'hudChrome.dailyRewards.remainingHoursMinutes': '{hours}시간 {minutes}분',
+  'hudChrome.dailyRewards.remainingDaysHours': '{days}일 {hours}시간',
   'hudChrome.dailyRewards.remainingLessThanMinute': '1분 미만',
   'hudChrome.dailyRewards.remainingMinutes': '{minutes}분',
   'hudChrome.dailyRewards.sol': '{amount} SOL',

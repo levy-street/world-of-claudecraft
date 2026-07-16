@@ -10180,4 +10180,173 @@
       animation: none;
     }
   }
+
+  /* ---------- developer command center ---------- */
+  #dev-command-window {
+    width: min(920px, calc(100vw - 48px));
+    height: min(680px, calc(100vh - 48px));
+    padding: 0;
+    overflow: hidden;
+    display: none;
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    background: var(--panel-bg);
+  }
+  #dev-command-window.open {
+    display: grid;
+  }
+  .dev-command-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 20px 14px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(
+      100deg,
+      color-mix(in srgb, var(--gold) 10%, transparent),
+      transparent 56%
+    );
+  }
+  .dev-command-header h2 {
+    margin: 1px 0 3px;
+    color: var(--gold);
+    font-family: var(--title-font);
+    font-size: 25px;
+    letter-spacing: 0.04em;
+  }
+  .dev-command-header p,
+  .dev-command-card p {
+    margin: 0;
+    color: var(--color-text-muted);
+  }
+  .dev-command-kicker {
+    color: var(--gold-dim);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .dev-command-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 230px;
+    gap: 14px;
+    align-items: end;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    background: color-mix(in srgb, var(--panel-base) 82%, transparent);
+  }
+  .dev-command-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .dev-command-tabs button,
+  .dev-command-run {
+    min-height: 34px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--color-text);
+    background: color-mix(in srgb, var(--panel-base) 82%, var(--gold) 5%);
+    cursor: pointer;
+  }
+  .dev-command-tabs button {
+    padding: 5px 11px;
+  }
+  .dev-command-tabs button[aria-pressed="true"] {
+    border-color: var(--gold);
+    color: var(--gold);
+    box-shadow: inset 0 -2px 0 var(--gold-dim);
+  }
+  .dev-command-search,
+  .dev-command-field {
+    display: grid;
+    gap: 4px;
+    color: var(--color-text-muted);
+    font-size: 11px;
+  }
+  .dev-command-search input,
+  .dev-command-field input,
+  .dev-command-field select {
+    min-width: 0;
+    height: 34px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 5px 8px;
+    color: var(--color-text);
+    background: var(--panel-base);
+  }
+  .dev-command-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: start;
+    gap: 10px;
+    padding: 14px 16px;
+    overflow: auto;
+  }
+  .dev-command-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px;
+    align-items: center;
+    min-height: 92px;
+    padding: 13px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: color-mix(in srgb, var(--panel-base) 88%, var(--gold) 3%);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--gold) 12%, transparent);
+  }
+  .dev-command-card:focus-within {
+    border-color: var(--gold-dim);
+  }
+  .dev-command-card h3 {
+    margin: 0 0 4px;
+    color: var(--color-text);
+    font-family: var(--title-font);
+    font-size: 15px;
+  }
+  .dev-command-card p {
+    font-size: 11px;
+    line-height: 1.35;
+  }
+  .dev-command-fields {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .dev-command-run {
+    min-width: 62px;
+    padding: 6px 12px;
+    color: var(--gold);
+  }
+  .dev-command-run:hover,
+  .dev-command-run:focus-visible,
+  .dev-command-tabs button:hover,
+  .dev-command-tabs button:focus-visible {
+    border-color: var(--gold);
+  }
+  .dev-command-run:focus-visible,
+  .dev-command-tabs button:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+  .dev-command-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 42px;
+    padding: 10px 16px;
+    border-top: 1px solid var(--border);
+    color: var(--color-text-muted);
+    font-size: 11px;
+  }
+  .dev-command-footer output {
+    color: var(--gold-dim);
+    text-align: right;
+  }
+  .dev-command-empty {
+    grid-column: 1 / -1;
+    padding: 36px;
+    color: var(--color-text-muted);
+    text-align: center;
+  }
 }

@@ -167,7 +167,6 @@ import { createAccessLogSink } from './http/access_log';
 import { setAttackSignalSink } from './http/attack_signals';
 import { registerBusinessMetrics } from './http/business_metrics';
 import { handleClientError } from './http/client_error';
-import { registerClientPerfMetrics } from './http/client_perf_metrics';
 import { type Config, DEFAULT_DISPATCH, type DispatchMode, loadConfig } from './http/config';
 import {
   type ApiDelegate,
@@ -2753,15 +2752,12 @@ export async function startServer(): Promise<http.Server> {
   // tests/server/game_boot_order.test.ts pins against).
   registerLivenessSource(gameStateSource);
 
-  // The app-aggregate /metrics collectors (Phase 3 business, Phase 4 client-perf):
-  // each registers bounded gauges on the SAME exporter registry and runs ONE cached
-  // Postgres aggregate on a fixed interval, so a scrape publishes the cached snapshot
-  // and never queries the DB. start() kicks off an immediate refresh plus the
-  // interval (both unref()'d); shutdown stops them below.
+  // Business gauges run one bounded, timeout-protected fact query every 15 minutes.
+  // Scrapes publish only the cached snapshot and never query Postgres. Client FPS
+  // stays available in the admin tooling but is intentionally not polled for the
+  // business dashboard.
   const businessMetrics = registerBusinessMetrics(httpMetrics.registry);
-  const clientPerfMetrics = registerClientPerfMetrics(httpMetrics.registry);
   businessMetrics.start();
-  clientPerfMetrics.start();
 
   game.start();
   server.listen(config.port, () => {
@@ -2779,8 +2775,7 @@ export async function startServer(): Promise<http.Server> {
     // Stop the app-aggregate metric collectors so no refresh query races the pool
     // close below (their intervals are unref()'d, but an in-flight tick could still
     // fire before pool.end()).
-    businessMetrics.stop();
-    clientPerfMetrics.stop();
+    await businessMetrics.stop();
     game.stop();
     await game.saveAll('shutdown');
     await game.saveMarket();

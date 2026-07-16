@@ -140,6 +140,8 @@ const UI_PURE_CORES = [
   'src/ui/delve_map.ts',
   'src/ui/raid_lockout_view.ts',
   'src/ui/stat_tooltip_view.ts',
+  'src/ui/target_portrait_view.ts',
+  'src/ui/target_rank_view.ts',
   'src/ui/mob_tooltip_view.ts',
   'src/ui/talents_view.ts',
   'src/ui/social_view.ts',
@@ -173,6 +175,7 @@ const UI_PURE_CORES = [
   'src/ui/leaderboard_view.ts',
   'src/ui/guild_leaderboard_view.ts',
   'src/ui/dev_leaderboard_view.ts',
+  'src/ui/dev_command_view.ts',
   'src/ui/deeds_leaderboard_view.ts',
   'src/ui/daily_rewards_view.ts',
   'src/ui/deeds_view.ts',
@@ -214,6 +217,7 @@ const UI_PURE_CORES = [
 // the same contract for the map editor's realtime terrain/water edits.
 const RENDER_PURE_CORES = [
   'src/render/cast_bar.ts',
+  'src/render/delve_interactable_visibility_core.ts',
   'src/render/nameplate_view.ts',
   'src/render/net_interp_core.ts',
   'src/render/terrain_region_core.ts',

@@ -164,11 +164,13 @@ describe('self stat wire round-trip', () => {
         rtype: 'mana',
         crat: 20,
         hrat: 150,
+        hirat: 30,
       },
     });
     // Without the wire fields these read the blankEntity default 0 (the bug this guards).
     expect(client.player.critRating).toBe(20);
     expect(client.player.hasteRating).toBe(150);
+    expect(client.player.hitRating).toBe(30);
   });
 
   it('backfills WARFARE fractions when an older server sends the legacy six-field stats shape', () => {
@@ -972,6 +974,37 @@ describe('raid party wire', () => {
     expect(client.partyInfo).not.toBeNull();
     expect(client.partyInfo?.raid).toBe(true);
     expect(client.partyInfo?.members.find((m) => m.pid === member.pid)?.group).toBe(2);
+  });
+
+  it('ships tactical frame fields and the authoritative connection state', () => {
+    const entity = server.sim.entities.get(member.pid)!;
+    const meta = server.sim.meta(member.pid)!;
+    meta.talentMods.role = 'healer';
+    entity.auras.push({
+      id: 'power_word_shield',
+      name: 'Psalm of Warding',
+      kind: 'absorb',
+      remaining: 6,
+      duration: 12,
+      value: 90,
+      sourceId: member.pid,
+      school: 'holy',
+    });
+    member.linkdead = true;
+
+    broadcast(server);
+    const snap = lastSnap(fcLeader.sent);
+    const wired = snap.self.party.members.find((m: any) => m.pid === member.pid);
+    expect(wired).toMatchObject({ absorb: 90, role: 'healer', connected: 0 });
+    expect(wired.auras).toEqual([{ id: 'power_word_shield', kind: 'absorb', remaining: 6 }]);
+
+    const client = bareClient(leader.pid);
+    (client as any).applySnapshot(snap);
+    expect(client.partyInfo?.members.find((m) => m.pid === member.pid)).toMatchObject({
+      absorb: 90,
+      role: 'healer',
+      connected: 0,
+    });
   });
 });
 

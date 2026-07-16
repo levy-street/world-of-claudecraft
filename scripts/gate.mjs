@@ -1,8 +1,11 @@
 // The full local pre-merge gate: the CI checks from .github/workflows/ci.yml run
-// locally. Order: the pr-gate job's steps, with the parallel lint job's
-// changed-files biome pulled forward as an early fast-fail; on a release/**
-// branch the steps run release-tier (I18N_RELEASE_TIER=1), mirroring the
-// release-gate job. This script exists because ad-hoc shell chains get the gate
+// locally. Order: the PR tier's combined step list (CI splits it across the
+// parallel pr-gate and pr-checks jobs and fans the test step across a 4-shard
+// matrix; this script runs the same list serially with ONE full unsharded
+// vitest run by design), with the parallel lint job's changed-files biome pulled forward
+// as an early fast-fail; on a release/** branch the steps run release-tier
+// (I18N_RELEASE_TIER=1), mirroring the release-gate job. This script exists
+// because ad-hoc shell chains get the gate
 // wrong in two known ways: piping `npm test` through `tail` masks vitest's exit
 // code (a red run can print "PASS"), and an unbounded full run saturates every
 // core and flakes the heavy sim suites when other work shares the machine
@@ -11,19 +14,30 @@
 // Keep the step list in sync with .github/workflows/ci.yml (and vice versa).
 import { spawnSync } from 'node:child_process';
 import os from 'node:os';
+import { FFMPEG_PATH, FFPROBE_PATH } from './sfx/ffmpeg_paths.mjs';
 
 const workers = Math.max(1, Math.floor(os.cpus().length / 2));
 // npm/npx resolve to .cmd files on Windows, which spawnSync only finds via a shell.
 const shell = process.platform === 'win32';
 
-const missingAudioTools = ['ffmpeg', 'ffprobe'].filter((tool) => {
-  const probe = spawnSync(tool, ['-version'], { stdio: 'ignore', shell });
+// Probe the resolved binaries BY EXECUTION: the ffmpeg-static/ffprobe-static
+// packages download their binary via an allowlisted install script, so a
+// scripts-skipped install leaves a missing file behind the import, and the PATH
+// fallback may not exist either. Failing here is cheaper and clearer than
+// failing mid-suite.
+const missingAudioTools = [
+  ['ffmpeg', FFMPEG_PATH],
+  ['ffprobe', FFPROBE_PATH],
+].filter(([, toolPath]) => {
+  const probe = spawnSync(toolPath, ['-version'], { stdio: 'ignore', shell });
   return probe.error !== undefined || probe.status !== 0;
 });
 if (missingAudioTools.length > 0) {
   console.error(
-    `[gate] missing required SFX audio tooling on PATH: ${missingAudioTools.join(', ')}\n` +
-      '[gate] install FFmpeg (including ffprobe), then re-run npm run gate',
+    `[gate] missing required SFX audio tooling: ${missingAudioTools.map(([name]) => name).join(', ')}\n` +
+      '[gate] the bundled ffmpeg-static/ffprobe-static binaries are absent or broken (a\n' +
+      '[gate] scripts-skipped install leaves them missing): reinstall with npm ci, or\n' +
+      '[gate] install FFmpeg (including ffprobe) on PATH, then re-run npm run gate',
   );
   process.exit(1);
 }

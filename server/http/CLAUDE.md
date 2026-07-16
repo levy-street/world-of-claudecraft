@@ -49,7 +49,7 @@ PR (see the flag model and Dual-edit below).
 
 ## Observability (the /metrics exporter)
 Every series registers on the ONE prom-client `Registry` built by `metrics.ts`; `main.ts`
-wires each half at boot. Three source patterns:
+wires each active exporter at boot. Three source patterns:
 - **Request-layer RED** (`metrics.ts`): the request counter/histogram fed by the
   `metric_sink` frame, plus the attack-signal counters. Their scattered emission sites
   (rate_limit, ratelimit.ts auth failures, require_owned, the tier-2 pg store) emit
@@ -57,12 +57,12 @@ wires each half at boot. Three source patterns:
 - **Game-state** (`game_metrics.ts`): gauges (players online, tick rate) read live at
   scrape time from a captured `GameStateSource`; throughput counters emit through the
   `game_signals.ts` slot (same pattern as attack_signals; an unwired slot no-ops).
-- **DB-backed aggregates** (`business_metrics.ts`, `client_perf_metrics.ts`): a
+- **DB-backed aggregates** (`business_metrics.ts`): a
   Postgres-backed value MUST go through a `PeriodicCollector` (`periodic_collector.ts`)
   that runs one batched query on an interval and caches it; gauges publish the cached
   snapshot at scrape time. A scrape NEVER queries Postgres (a scrape storm must never
-  become a query storm). SQL is reused from existing query modules (`business_metrics.ts`
-  reuses `admin_db.overviewCounts`), never written in a metrics module.
+  become a query storm). SQL lives in the owning query module
+  (`player_metrics_db.ts`), never in a metrics module.
 Labels are bounded everywhere (policy / kind / key_kind / route TEMPLATE); never label with
 an ip, account, token, or concrete id. `mismatch_warn_throttle.ts` caps the two log-only
 mismatch sinks (content_type, origin_check), keyed on route template + method.

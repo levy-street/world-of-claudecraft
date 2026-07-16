@@ -13,6 +13,8 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.discord.roleTag.legend': 'ЛЕГЕНДА',
+  'hudChrome.discord.roleTag.shill': 'ГЛАШАТАЙ',
   'hudChrome.wocStore.title': 'Магазин WOC',
   'hudChrome.wocStore.close': 'Закрыть магазин WOC',
   'hudChrome.wocStore.tabsLabel': 'Разделы магазина WOC',
@@ -360,6 +362,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Цена WOC недоступна, награды временно заблокированы.',
   'hudChrome.dailyRewards.reason.banned':
     'Вам запрещено участвовать в ежедневных наградах. Причина: {reason}',
+  'hudChrome.dailyRewards.reason.bannedUntil':
+    'Запрет на участие в ежедневных наградах действует еще {remaining}. Доступ вернется {until}. Причина: {reason}',
   'hudChrome.keybinds.discord': 'Discord',
   'hudChrome.spectate.banner': 'Наблюдение за {name}',
   'hudChrome.readyCheck.prompt': '{name} начал проверку готовности. Вы готовы?',
@@ -382,6 +386,28 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetFrame.lock': 'Закрепить рамку цели',
   'hudChrome.playerFrame.unlock': 'Переместить рамку игрока',
   'hudChrome.playerFrame.lock': 'Закрепить рамку игрока',
+  'hudChrome.partyFrames.section': 'Рамки группы и рейда',
+  'hudChrome.partyFrames.unlock': 'Переместить рамки группы и рейда',
+  'hudChrome.partyFrames.lock': 'Закрепить рамки группы и рейда',
+  'hudChrome.partyFrames.style': 'Стиль рамок',
+  'hudChrome.partyFrames.styleAutomatic': 'Автоматически',
+  'hudChrome.partyFrames.styleClassic': 'Классические рамки группы',
+  'hudChrome.partyFrames.styleRaid': 'Рамки рейда',
+  'hudChrome.partyFrames.scale': 'Масштаб рамок',
+  'hudChrome.partyFrames.width': 'Ширина рамок',
+  'hudChrome.partyFrames.height': 'Высота рамок',
+  'hudChrome.partyFrames.spacing': 'Интервал между рамками',
+  'hudChrome.partyFrames.columns': 'Столбцы рейда',
+  'hudChrome.partyFrames.healthText': 'Текст здоровья',
+  'hudChrome.partyFrames.healthPercent': 'Проценты',
+  'hudChrome.partyFrames.healthCurrent': 'Текущее',
+  'hudChrome.partyFrames.healthCurrentMax': 'Текущее / Максимум',
+  'hudChrome.partyFrames.sort': 'Сортировка игроков',
+  'hudChrome.partyFrames.sortGroup': 'Группа',
+  'hudChrome.partyFrames.showResource': 'Показывать ману, ярость и энергию',
+  'hudChrome.partyFrames.showAbsorbs': 'Показывать щиты поглощения',
+  'hudChrome.partyFrames.showAuras': 'Показывать усиления и ослабления',
+  'hudChrome.partyFrames.showSelf': 'Показывать вашу рамку',
   'hudChrome.frameReset.label': 'Сбросить положение рамок',
   'hudChrome.options.playerFrameScale': 'Размер рамки игрока',
   'hudChrome.options.targetFrameScale': 'Размер рамки цели',
@@ -503,6 +529,27 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.lootSettings.menuItem': 'Настройки добычи',
   'hudChrome.dungeonDifficulty.setHeroic': 'Установить сложность подземелий: героическая',
   'hudChrome.dungeonDifficulty.setNormal': 'Установить сложность подземелий: обычная',
+  'hudChrome.dungeonDifficulty.resetAll': 'Сбросить все подземелья',
+  'hudChrome.dungeonDifficulty.resetDone': 'Все подземелья сброшены.',
+  'hudChrome.dungeonDifficulty.resetNone': 'Нет подземелий для сброса.',
+  'hudChrome.dungeonDifficulty.resetOccupied':
+    'Нельзя сбросить подземелья, пока внутри кто-то находится.',
+  'hudChrome.dungeonDifficulty.resetSameDifficulty':
+    'Смените сложность подземелья перед сбросом этих подземелий. Пустые подземелья сбрасываются сами через 5 минут.',
+  'hudChrome.dungeonDifficulty.resetUsage':
+    'После смены сложности используйте /dungeon reset, чтобы отказаться от пустых подземелий.',
+  'hudChrome.dungeonDifficulty.resetLoot':
+    'Нельзя сбросить подземелья, пока внутри остаётся добыча.',
+  'hudChrome.dungeonDifficulty.resetConfirmTitle': 'Сбросить все подземелья?',
+  'hudChrome.dungeonDifficulty.resetConfirmBody':
+    'Это отменит пустые подземелья прежней выбранной сложности. Неполученная добыча не позволит выполнить сброс.',
+  'hudChrome.dungeonDifficulty.resetConfirm': 'Сбросить подземелья',
+  'hudChrome.dungeonDifficulty.resetCooldown':
+    'Подземелья можно сбрасывать только один раз в 5 минут.',
+  'hudChrome.dungeonDifficulty.entryMismatchNormal':
+    'Это подземелье настроено на обычную сложность. Используйте «Сбросить все подземелья», чтобы начать новое героическое прохождение.',
+  'hudChrome.dungeonDifficulty.entryMismatchHeroic':
+    'Это подземелье настроено на героическую сложность. Используйте «Сбросить все подземелья», чтобы начать новое обычное прохождение.',
   'hudChrome.lootSettings.method': 'Способ добычи',
   'hudChrome.lootSettings.rollThreshold': 'Порог броска',
   'hudChrome.lootSettings.groupLoot': 'Групповая добыча',
@@ -571,6 +618,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.names.spellPower': 'Сила заклинаний',
   'hudChrome.statInfo.names.critRating': 'Рейтинг крит. удара',
   'hudChrome.statInfo.names.hasteRating': 'Рейтинг ускорения',
+  'hudChrome.statInfo.names.hitRating': 'Рейтинг меткости',
+  'hudChrome.statInfo.desc.hitRating':
+    'Рейтинг меткости от снаряжения и бонусов комплекта снижает частоту промахов ваших атак и сопротивления вашим заклинаниям, особенно против противников более высокого уровня. Примерно 10 рейтинга дают 1% меткости.',
   'hudChrome.statInfo.names.warfare': 'Боевая мощь',
   'hudChrome.statInfo.warfareValue': '+{increase}% к урону / -{reduction}% получаемого',
   'hudChrome.statInfo.desc.critRating':
@@ -909,6 +959,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'download.linuxCta': 'Скачать для Linux',
   'download.linuxHint':
     'Формат AppImage: сделайте файл исполняемым и запустите его, установка не требуется.',
+  'download.windowsCta': 'Скачать для Windows',
   'download.windowsPending': 'Сборка для Windows готовится.',
   'download.desc':
     'Загрузите отдельный клиент для оптимальной производительности и игры на весь экран.',
@@ -2512,6 +2563,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.barkskin.name': 'Дубовая шкура',
   'entities.abilities.barkskin.description':
     'Ваша кожа твердеет, как кора, повышая броню на 150 на 15 сек.',
+  'entities.abilities.ironhold.name': 'Железная стена',
+  'entities.abilities.ironhold.description':
+    'Укрывшись за щитом, вы снижаете весь получаемый урон на 40% на 8 сек.',
+  'entities.abilities.sacred_bulwark.name': 'Священный оплот',
+  'entities.abilities.sacred_bulwark.description':
+    'В течение {duration} сек. следующий смертельный удар противника не убьет вас, а восстановит здоровье до 35% от максимума.',
+  'entities.abilities.primal_reflexes.name': 'Первобытные рефлексы',
+  'entities.abilities.primal_reflexes.description':
+    'Ваши инстинкты обостряются, повышая шанс уклонения на 50% на 6 сек.',
   'entities.abilities.starfire.name': 'Падение небес',
   'entities.abilities.starfire.description':
     'Обрушивает вспышку звездного огня, нанося {damage} ед. урона от тайной магии.',
@@ -5790,6 +5850,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.attackSpeedFast': 'Повышает скорость атаки на {pct}%',
   'hudChrome.auraEffect.haste': 'Повышает скорость атаки и произнесения заклинаний на {pct}%',
   'hudChrome.auraEffect.tongues': 'Увеличивает время произнесения заклинаний на {pct}%',
+  'hudChrome.auraEffect.damageReduction': 'Уменьшает весь получаемый урон на {pct}%',
+  'hudChrome.auraEffect.guardianWard':
+    'Следующий смертельный удар противника вместо этого восстанавливает здоровье до {pct}%',
   'hudChrome.auraEffect.increase.ap': 'Повышает силу атаки на {value}',
   'hudChrome.auraEffect.increase.armor': 'Повышает броню на {value}',
   'hudChrome.auraEffect.increase.int': 'Повышает интеллект на {value}',
@@ -6615,6 +6678,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Вы поднимаетесь обратно к брату Хальвену на краю топи.',
   'hudChrome.dailyRewards.endsIn': 'Осталось {time}',
   'hudChrome.dailyRewards.remainingHoursMinutes': '{hours}ч {minutes}м',
+  'hudChrome.dailyRewards.remainingDaysHours': '{days}д {hours}ч',
   'hudChrome.dailyRewards.remainingLessThanMinute': '<1м',
   'hudChrome.dailyRewards.remainingMinutes': '{minutes}м',
   'hudChrome.dailyRewards.sol': '{amount} SOL',

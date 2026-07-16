@@ -652,7 +652,7 @@ describe('game.* side effects preserved', () => {
     const r = await runRoute('POST', '/admin/api/moderation/accounts/:id/daily-rewards-ban', {
       headers: { authorization: BEARER },
       params: { id: '5' },
-      body: { reason: 'automated play' },
+      body: { reason: 'automated play', durationHours: 12 },
     });
     expect(r.status).toBe(200);
     expect(setDailyRewardsBan).toHaveBeenCalledWith({
@@ -660,6 +660,7 @@ describe('game.* side effects preserved', () => {
       adminAccountId: ADMIN_ACCOUNT_ID,
       banned: true,
       reason: 'automated play',
+      durationHours: 12,
     });
   });
 
@@ -680,6 +681,65 @@ describe('game.* side effects preserved', () => {
       banned: true,
       reason: 'multi-account abuse',
     });
+  });
+
+  it('returns a bounded Daily Rewards point event log for a validated date', async () => {
+    const dailyRewardPointEvents = vi.fn(async () => ({
+      day: '2026-07-16',
+      rows: [],
+      total: 0,
+      truncated: false,
+    }));
+    authedAdminDb({ dailyRewardPointEvents });
+    installAdminRuntime();
+
+    const response = await runRoute('GET', '/admin/api/accounts/:id/daily-rewards-events', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      url: '/admin/api/accounts/5/daily-rewards-events?day=2026-07-16&limit=100',
+    });
+
+    expect(response.status).toBe(200);
+    expect(dailyRewardPointEvents).toHaveBeenCalledWith(5, '2026-07-16', 100);
+  });
+
+  it('defaults the Daily Rewards point event log to the server reward day', async () => {
+    const dailyRewardPointEvents = vi.fn(async (_accountId: number, day: string) => ({
+      day,
+      rows: [],
+      total: 0,
+      truncated: false,
+    }));
+    authedAdminDb({ dailyRewardPointEvents });
+    installAdminRuntime();
+
+    const response = await runRoute('GET', '/admin/api/accounts/:id/daily-rewards-events', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      url: '/admin/api/accounts/5/daily-rewards-events?limit=100',
+    });
+
+    expect(response.status).toBe(200);
+    expect(dailyRewardPointEvents).toHaveBeenCalledWith(
+      5,
+      expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/),
+      100,
+    );
+  });
+
+  it('rejects an invalid Daily Rewards point event date', async () => {
+    const dailyRewardPointEvents = vi.fn();
+    authedAdminDb({ dailyRewardPointEvents });
+    installAdminRuntime();
+
+    const response = await runRoute('GET', '/admin/api/accounts/:id/daily-rewards-events', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      url: '/admin/api/accounts/5/daily-rewards-events?day=2026-02-30',
+    });
+
+    expect(response.status).toBe(400);
+    expect(dailyRewardPointEvents).not.toHaveBeenCalled();
   });
 
   it('force-rename disconnects the character owner', async () => {

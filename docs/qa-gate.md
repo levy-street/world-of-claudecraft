@@ -39,7 +39,9 @@ fixing a red gate.
 changed-file formatting, the SFX conformance check, the full test suite, typecheck, and
 env, server, and client builds. Release branches use the release i18n tier. It stops at
 the first failure and bounds Vitest workers to avoid load flakes on shared machines. It
-requires FFmpeg (`ffmpeg` and `ffprobe`) on PATH and refuses to run without them.
+resolves FFmpeg (`ffmpeg` and `ffprobe`) from the bundled `ffmpeg-static`/`ffprobe-static`
+npm packages, falling back to PATH, and refuses to run when neither source yields a
+working binary.
 
 Use this command instead of an ad hoc shell pipeline. Piping a test run can hide its exit
 status, and unconstrained full-suite parallelism can make healthy heavy sim tests flake.
