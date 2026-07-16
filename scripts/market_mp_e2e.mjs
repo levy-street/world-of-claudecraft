@@ -39,7 +39,7 @@ const browser = await puppeteer.launch({
 });
 
 async function enter(page, charName, cls, mode) {
-  page.on('pageerror', (e) => fails.push(`[${charName}] ` + e.message));
+  page.on('pageerror', (e) => fails.push(`[${charName}] ${e.message}`));
   await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
   await sleep(700);
   await page.evaluate(
@@ -162,7 +162,7 @@ if (PHASE === 'sell') {
   await goToMerchant(buyer);
   await buyer.evaluate((id) => window.__game.world.marketBuy(id), seen.boots.id);
   await sleep(700);
-  const bought = await buyer.evaluate(() => (window.__game.sim.countItem ? null : null)); // sim not on client
+  const _bought = await buyer.evaluate(() => (window.__game.sim.countItem ? null : null)); // sim not on client
   const buyerHasBoots = await buyer.evaluate(() =>
     window.__game.world.inventory.some((s) => s.itemId === 'oiled_boots'),
   );
@@ -209,6 +209,6 @@ await browser.close();
 console.log(
   fails.length === 0
     ? `\nPHASE "${PHASE}" PASSED`
-    : `\n${fails.length} CHECK(S) FAILED:\n - ` + fails.join('\n - '),
+    : `\n${fails.length} CHECK(S) FAILED:\n - ${fails.join('\n - ')}`,
 );
 process.exit(fails.length === 0 ? 0 : 1);

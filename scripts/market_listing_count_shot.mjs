@@ -42,7 +42,7 @@ await wait(1500);
 // Stand the player on the Merchant, list all 12 of their slots, then flood the
 // market with 200 cheaper other-seller listings that sort first.
 const setup = await page.evaluate(() => {
-  const { sim, hud } = window.__game;
+  const { sim } = window.__game;
   const me = [...sim.players.keys()][0];
   let merch = null;
   for (const e of sim.entities.values()) if (e.templateId === 'the_merchant') merch = e;

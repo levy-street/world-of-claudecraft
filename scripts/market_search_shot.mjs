@@ -30,7 +30,7 @@ const browser = await puppeteer.launch({
   defaultViewport: { width: 1600, height: 900 },
 });
 const page = await browser.newPage();
-page.on('pageerror', (e) => fails.push('PAGEERROR: ' + e.message));
+page.on('pageerror', (e) => fails.push(`PAGEERROR: ${e.message}`));
 page.on('console', (m) => {
   if (m.type() === 'error') console.log('CONSOLE-ERR:', m.text());
 });
@@ -84,11 +84,11 @@ const scene = await page.evaluate(() => {
     'boar_tusk',
     'cracked_fang',
   ];
-  let listed = 0;
+  let _listed = 0;
   for (let i = 0; i < 14; i++) {
     const pid = sim.addPlayer(
       ['mage', 'rogue', 'priest', 'hunter'][i % 4],
-      'Seller' + 'ABCDEFGHIJKLMN'[i],
+      `Seller${'ABCDEFGHIJKLMN'[i]}`,
     );
     const e = sim.entities.get(pid);
     at(e, merchant.pos.x + (i % 5) - 2, merchant.pos.z + 2 + (i % 3));
@@ -97,7 +97,7 @@ const scene = await page.evaluate(() => {
     for (let j = 0; j < 12; j++) {
       const id = goods[(i + j) % goods.length];
       sim.addItem(id, 1, pid);
-      if (sim.marketList(id, 1, 100 + j * 10, pid) !== false) listed++;
+      if (sim.marketList(id, 1, 100 + j * 10, pid) !== false) _listed++;
     }
   }
   return { merchant: !!merchant, total: sim.marketListings.length };
@@ -163,6 +163,6 @@ await browser.close();
 console.log(
   fails.length === 0
     ? '\nALL MARKET-SEARCH CHECKS PASSED'
-    : `\n${fails.length} CHECK(S) FAILED:\n - ` + fails.join('\n - '),
+    : `\n${fails.length} CHECK(S) FAILED:\n - ${fails.join('\n - ')}`,
 );
 process.exit(fails.length === 0 ? 0 : 1);
