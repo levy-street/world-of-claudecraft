@@ -31,7 +31,7 @@ import {
 import { stunDrCategory } from '../stun_dr';
 import { addThreat } from '../threat';
 import type { AbilityDef, Entity } from '../types';
-import { armorReduction, FISHING_CAST_ID, swingMissChance } from '../types';
+import { armorReduction, FISHING_CAST_ID, isFormAuraKind, swingMissChance } from '../types';
 import { isRootedOrChilled } from './cc';
 import { consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
@@ -1002,12 +1002,7 @@ export function runEffects(
       }
       case 'selfBuff': {
         // forms, stances and stealth are toggles: casting again cancels
-        const isFormKind =
-          eff.kind === 'form_bear' ||
-          eff.kind === 'form_cat' ||
-          eff.kind === 'form_travel' ||
-          eff.kind === 'form_moonkin' ||
-          eff.kind === 'form_shadow';
+        const isFormKind = isFormAuraKind(eff.kind);
         const isToggle =
           isFormKind ||
           eff.kind === 'defensive_stance' ||
@@ -1033,14 +1028,7 @@ export function runEffects(
         if (isFormKind) {
           for (let i = p.auras.length - 1; i >= 0; i--) {
             const a = p.auras[i];
-            if (
-              (a.kind === 'form_bear' ||
-                a.kind === 'form_cat' ||
-                a.kind === 'form_travel' ||
-                a.kind === 'form_moonkin' ||
-                a.kind === 'form_shadow') &&
-              a.kind !== eff.kind
-            ) {
+            if (isFormAuraKind(a.kind) && a.kind !== eff.kind) {
               p.auras.splice(i, 1);
               ctx.emit({ type: 'aura', targetId: p.id, name: a.name, gained: false });
             }

@@ -1,6 +1,6 @@
 // Thin DOM consumer for the Discord HUD window (#discord-window).
 //
-// Mirrors src/ui/vendor_window.ts: it imports t/esc/svgIcon + the formatters and
+// Mirrors src/ui/hud/vendor/vendor_window.ts: it imports t/esc/svgIcon + the formatters and
 // the pure tier presentation directly, but takes Hud's shared painters
 // (attachTooltip/hideTooltip) and the action callbacks via an injected `deps`
 // object. It owns no state and never imports Hud. The branching logic lives in

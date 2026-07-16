@@ -839,6 +839,20 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: 'wocBalanceRateLimited',
     requireOwnedExpected: null,
   },
+  // Welcome Screen server flags (server/welcome.ts): the Season 1 Armory promo
+  // gate. Registry-only RouteDef born after the migration (new-route rule,
+  // server/http/CLAUDE.md): no legacy ladder arm. Bearer-only (read or full
+  // token), no per-route rate limiter.
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'GET',
+    path: '/api/welcome/flags',
+    handler: 'server/welcome.ts welcomeHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.bearer,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
   // Daily-rewards player family (v0.19.0, server/daily_rewards.ts): served by
   // the handleDailyRewardApi sub-dispatcher behind the main.ts PREFIX arm
   // `url.startsWith('/api/daily-rewards')`, which runs bearerActiveAccount

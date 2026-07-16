@@ -109,98 +109,98 @@ describe('Claudium spend entitlement mirroring', () => {
     }
   });
 
-  it.each(
-    MONETARY_MUTATION_ROUTES,
-  )('limits invalid-token floods on $path before they can perform unlimited DB reads', async ({
-    path,
-    limit,
-  }) => {
-    const accountAndScopeForToken = vi.fn(async () => null);
-    setClaudiumDbForTests({ accountAndScopeForToken });
-    const route = routes.find((entry) => entry.method === 'POST' && entry.path === path);
-    if (!route?.middleware) throw new Error(`missing mutation middleware for ${path}`);
-    const runMiddleware = compose([...route.middleware]);
+  it.each(MONETARY_MUTATION_ROUTES)(
+    'limits invalid-token floods on $path before they can perform unlimited DB reads',
+    async ({ path, limit }) => {
+      const accountAndScopeForToken = vi.fn(async () => null);
+      setClaudiumDbForTests({ accountAndScopeForToken });
+      const route = routes.find((entry) => entry.method === 'POST' && entry.path === path);
+      if (!route?.middleware) throw new Error(`missing mutation middleware for ${path}`);
+      const runMiddleware = compose([...route.middleware]);
 
-    for (let i = 0; i < limit; i++) {
-      const ctx = fakeCtx({
+      for (let i = 0; i < limit; i++) {
+        const ctx = fakeCtx({
+          method: 'POST',
+          url: path,
+          headers: { authorization: `Bearer ${'a'.repeat(64)}` },
+        });
+        await runMiddleware(ctx);
+        expect((ctx.res as unknown as FakeRes).statusCode).toBe(401);
+      }
+
+      const limited = fakeCtx({
         method: 'POST',
         url: path,
         headers: { authorization: `Bearer ${'a'.repeat(64)}` },
       });
-      await runMiddleware(ctx);
-      expect((ctx.res as unknown as FakeRes).statusCode).toBe(401);
-    }
+      await expect(runMiddleware(limited)).rejects.toMatchObject({ status: 429 });
+      expect(accountAndScopeForToken).toHaveBeenCalledTimes(limit);
+    },
+  );
 
-    const limited = fakeCtx({
-      method: 'POST',
-      url: path,
-      headers: { authorization: `Bearer ${'a'.repeat(64)}` },
-    });
-    await expect(runMiddleware(limited)).rejects.toMatchObject({ status: 429 });
-    expect(accountAndScopeForToken).toHaveBeenCalledTimes(limit);
-  });
+  it.each(MONETARY_MUTATION_ROUTES)(
+    'fuses authenticated $path limits across IP and account keys',
+    async ({ path, limit }) => {
+      const accountAndScopeForToken = vi.fn(async () => ({
+        accountId: 41,
+        scope: 'full' as const,
+      }));
+      const moderationStatusForAccount = vi.fn(async () => ({ locked: false }) as never);
+      setClaudiumDbForTests({ accountAndScopeForToken, moderationStatusForAccount });
+      const route = routes.find((entry) => entry.method === 'POST' && entry.path === path);
+      if (!route?.middleware) throw new Error(`missing mutation middleware for ${path}`);
+      const runMiddleware = compose([...route.middleware]);
 
-  it.each(
-    MONETARY_MUTATION_ROUTES,
-  )('fuses authenticated $path limits across IP and account keys', async ({ path, limit }) => {
-    const accountAndScopeForToken = vi.fn(async () => ({ accountId: 41, scope: 'full' as const }));
-    const moderationStatusForAccount = vi.fn(async () => ({ locked: false }) as never);
-    setClaudiumDbForTests({ accountAndScopeForToken, moderationStatusForAccount });
-    const route = routes.find((entry) => entry.method === 'POST' && entry.path === path);
-    if (!route?.middleware) throw new Error(`missing mutation middleware for ${path}`);
-    const runMiddleware = compose([...route.middleware]);
-
-    for (let i = 0; i < limit; i++) {
-      const ctx = fakeCtx({
-        method: 'POST',
-        url: path,
-        ip: `192.0.2.${i + 1}`,
-        headers: {
-          authorization: `Bearer ${'b'.repeat(64)}`,
-          'x-forwarded-for': `192.0.2.${i + 1}`,
-        },
-      });
-      await runMiddleware(ctx);
-      expect(ctx.account?.accountId).toBe(41);
-    }
-
-    const limited = fakeCtx({
-      method: 'POST',
-      url: path,
-      ip: '198.51.100.1',
-      headers: {
-        authorization: `Bearer ${'b'.repeat(64)}`,
-        'x-forwarded-for': '198.51.100.1',
-      },
-    });
-    await expect(runMiddleware(limited)).rejects.toMatchObject({ status: 429 });
-    expect(accountAndScopeForToken).toHaveBeenCalledTimes(limit + 1);
-  });
-
-  it.each(
-    MONETARY_MUTATION_ROUTES,
-  )('lets the legacy pre-auth helper stop $path before bearer resolution', async ({
-    path,
-    limit,
-  }) => {
-    const resolveBearer = vi.fn(async () => undefined);
-    const attempt = async (): Promise<boolean> => {
-      const outcome = claudiumPreAuthMutationRateLimited(
-        makeReq({
+      for (let i = 0; i < limit; i++) {
+        const ctx = fakeCtx({
           method: 'POST',
           url: path,
-          headers: { authorization: `Bearer ${'a'.repeat(64)}` },
-        }),
-      );
-      if (outcome && !outcome.allowed) return false;
-      await resolveBearer();
-      return true;
-    };
+          ip: `192.0.2.${i + 1}`,
+          headers: {
+            authorization: `Bearer ${'b'.repeat(64)}`,
+            'x-forwarded-for': `192.0.2.${i + 1}`,
+          },
+        });
+        await runMiddleware(ctx);
+        expect(ctx.account?.accountId).toBe(41);
+      }
 
-    for (let i = 0; i < limit; i++) expect(await attempt()).toBe(true);
-    expect(await attempt()).toBe(false);
-    expect(resolveBearer).toHaveBeenCalledTimes(limit);
-  });
+      const limited = fakeCtx({
+        method: 'POST',
+        url: path,
+        ip: '198.51.100.1',
+        headers: {
+          authorization: `Bearer ${'b'.repeat(64)}`,
+          'x-forwarded-for': '198.51.100.1',
+        },
+      });
+      await expect(runMiddleware(limited)).rejects.toMatchObject({ status: 429 });
+      expect(accountAndScopeForToken).toHaveBeenCalledTimes(limit + 1);
+    },
+  );
+
+  it.each(MONETARY_MUTATION_ROUTES)(
+    'lets the legacy pre-auth helper stop $path before bearer resolution',
+    async ({ path, limit }) => {
+      const resolveBearer = vi.fn(async () => undefined);
+      const attempt = async (): Promise<boolean> => {
+        const outcome = claudiumPreAuthMutationRateLimited(
+          makeReq({
+            method: 'POST',
+            url: path,
+            headers: { authorization: `Bearer ${'a'.repeat(64)}` },
+          }),
+        );
+        if (outcome && !outcome.allowed) return false;
+        await resolveBearer();
+        return true;
+      };
+
+      for (let i = 0; i < limit; i++) expect(await attempt()).toBe(true);
+      expect(await attempt()).toBe(false);
+      expect(resolveBearer).toHaveBeenCalledTimes(limit);
+    },
+  );
 
   it('filters retired catalog rows and unknown skins out of the game storefront', async () => {
     storeMock.mockResolvedValue({

@@ -322,43 +322,41 @@ describe('Sacred Bulwark (paladin): divine cheat-death', () => {
     );
   });
 
-  it.each([
-    'duel',
-    '1v1',
-    'fiesta',
-    'yumi3',
-  ] as const)('saves the paladin from an enemy lethal hit in %s', (mode) => {
-    let sim: Sim;
-    let victimPid: number;
-    let sourcePid: number;
-    let match: ArenaMatch | null = null;
-    if (mode === 'duel') {
-      sim = new Sim({ seed: 9, playerClass: 'warrior', noPlayer: true });
-      victimPid = sim.addPlayer('paladin', 'Paladin');
-      sourcePid = sim.addPlayer('warrior', 'Warrior');
-      const duel = { a: victimPid, b: sourcePid, state: 'active' as const, timer: 0 };
-      sim.ctx.duels.set(victimPid, duel);
-      sim.ctx.duels.set(sourcePid, duel);
-    } else {
-      ({ sim, match, victimPid, sourcePid } = startArenaMode(mode));
-    }
-    const victim = sim.entities.get(victimPid)!;
-    const source = sim.entities.get(sourcePid)!;
-    victim.auras.push(guardianWard(victimPid));
-    victim.hp = victim.maxHp;
-    expect(victim.dead).toBe(false);
-    expect(victim.auras.some((a) => a.kind === 'guardian_ward')).toBe(true);
-    sim.drainEvents();
+  it.each(['duel', '1v1', 'fiesta', 'yumi3'] as const)(
+    'saves the paladin from an enemy lethal hit in %s',
+    (mode) => {
+      let sim: Sim;
+      let victimPid: number;
+      let sourcePid: number;
+      let match: ArenaMatch | null = null;
+      if (mode === 'duel') {
+        sim = new Sim({ seed: 9, playerClass: 'warrior', noPlayer: true });
+        victimPid = sim.addPlayer('paladin', 'Paladin');
+        sourcePid = sim.addPlayer('warrior', 'Warrior');
+        const duel = { a: victimPid, b: sourcePid, state: 'active' as const, timer: 0 };
+        sim.ctx.duels.set(victimPid, duel);
+        sim.ctx.duels.set(sourcePid, duel);
+      } else {
+        ({ sim, match, victimPid, sourcePid } = startArenaMode(mode));
+      }
+      const victim = sim.entities.get(victimPid)!;
+      const source = sim.entities.get(sourcePid)!;
+      victim.auras.push(guardianWard(victimPid));
+      victim.hp = victim.maxHp;
+      expect(victim.dead).toBe(false);
+      expect(victim.auras.some((a) => a.kind === 'guardian_ward')).toBe(true);
+      sim.drainEvents();
 
-    (sim as any).dealDamage(source, victim, victim.hp * 5, false, 'physical', null, 'hit');
+      (sim as any).dealDamage(source, victim, victim.hp * 5, false, 'physical', null, 'hit');
 
-    expect(victim.dead).toBe(false);
-    expect(victim.hp).toBe(Math.round(victim.maxHp * 0.35));
-    if (mode === 'duel') expect(sim.ctx.duels.has(victimPid)).toBe(true);
-    if (mode === '1v1') expect(match!.defeated.has(victimPid)).toBe(false);
-    if (mode === 'fiesta') expect(match!.fiesta!.respawn.has(victimPid)).toBe(false);
-    if (mode === 'yumi3') expect(match!.yumi!.respawn.has(victimPid)).toBe(false);
-  });
+      expect(victim.dead).toBe(false);
+      expect(victim.hp).toBe(Math.round(victim.maxHp * 0.35));
+      if (mode === 'duel') expect(sim.ctx.duels.has(victimPid)).toBe(true);
+      if (mode === '1v1') expect(match!.defeated.has(victimPid)).toBe(false);
+      if (mode === 'fiesta') expect(match!.fiesta!.respawn.has(victimPid)).toBe(false);
+      if (mode === 'yumi3') expect(match!.yumi!.respawn.has(victimPid)).toBe(false);
+    },
+  );
 });
 
 describe('Primal Reflexes (druid): dodge cooldown', () => {
@@ -377,6 +375,26 @@ describe('Primal Reflexes (druid): dodge cooldown', () => {
     cast(sim2, 'primal_reflexes', pid2);
     expect(p2.auras.some((a) => a.kind === 'buff_dodge')).toBe(true);
     expect(p2.dodgeChance).toBeCloseTo(bearDodge + 0.5, 10);
+  });
+});
+
+describe('Oakhide (druid): armor cooldown usable while shapeshifted', () => {
+  it('applies its armor buff in Bruin Form and Wolf Form, not just caster form', () => {
+    const { sim, p, pid } = make('druid');
+    cast(sim, 'barkskin', pid);
+    expect(p.auras.some((a) => a.kind === 'buff_armor' && a.value === 150)).toBe(true);
+
+    const { sim: sim2, p: p2, pid: pid2 } = make('druid');
+    cast(sim2, 'bear_form', pid2);
+    expect(p2.auras.some((a) => a.kind === 'form_bear')).toBe(true);
+    cast(sim2, 'barkskin', pid2);
+    expect(p2.auras.some((a) => a.kind === 'buff_armor' && a.value === 150)).toBe(true);
+
+    const { sim: sim3, p: p3, pid: pid3 } = make('druid');
+    cast(sim3, 'cat_form', pid3);
+    expect(p3.auras.some((a) => a.kind === 'form_cat')).toBe(true);
+    cast(sim3, 'barkskin', pid3);
+    expect(p3.auras.some((a) => a.kind === 'buff_armor' && a.value === 150)).toBe(true);
   });
 });
 

@@ -64,6 +64,44 @@ npm run dev          # in another terminal; the client proxies to the server
 The [README](README.md) has the full host, develop, and play guide, and the
 `CLAUDE.md` files throughout the repo document the conventions for each area.
 
+### TypeScript toolchain
+
+Type checking runs on TypeScript 7, the native compiler: `npx tsc --noEmit` works
+exactly as before and a full repo check now takes a few seconds instead of tens of
+seconds. The install is the official dual alias: the `typescript` package resolves
+the TypeScript 6 JS API (via the `@typescript/typescript6` wrapper) because
+`svelte-check` still consumes that API, while `@typescript/native` provides the
+`tsc` binary. Things to know:
+
+- **Editors.** VS Code needs the "TypeScript 7" marketplace extension
+  (`TypeScriptTeam.native-preview`) for native language service support until the
+  built-in support ships; it toggles via the `js/ts.experimental.useTsgo` setting,
+  and its "Disable TypeScript 7 Language Server" command is the sanctioned
+  fallback to the TypeScript 6 tsserver. JetBrains IDEs auto-detect the native
+  server only under the `@typescript/native-preview` package name, so they will
+  not pick it up from this repo's `@typescript/native` alias; their bundled
+  TypeScript 6 support works fine.
+- **Useful tsc flags.** `--checkers N` sets the parallel type-checker worker count
+  (default 4; results are identical at any count): lower it to cap memory on a
+  constrained runner, raise it on a many-core machine, and measure either way,
+  since more is not always faster. `--singleThreaded` disables all parallelism.
+  Checking a single file ad hoc (`npx tsc somefile.ts`) errors when the directory
+  has a `tsconfig.json`; pass `--ignoreConfig` for the old behavior.
+- **Lockfile.** Regenerate `package-lock.json` only with
+  `npx npm@10 install --package-lock-only`: the file uses npm-10 semantics (CI
+  runs Node 22's bundled npm), and newer npm majors silently drop
+  `svelte-check`'s nested optional-peer entries, which desyncs `npm ci` in CI.
+  Plain `npm ci` is safe under any npm major. After regenerating, confirm
+  `npm ci --dry-run` is in sync under both npm 10 and your workstation's npm.
+- **When to revisit.** Collapse the dual alias back to a single `typescript`
+  dependency once BOTH hold: the TypeScript 7.1 stable JS API has shipped
+  (TypeScript 7.0 ships no JS API at all; the replacement is tracked in
+  microsoft/typescript-go issue 2824), and sveltejs/language-tools issue 3063 has
+  closed with a released `svelte-check` that adopts it. svelte-check's
+  experimental `--tsgo` modes do not lift its TypeScript 6 API requirement, and
+  its in-progress TypeScript 7 loading (language-tools PR 3073) reads the
+  `@typescript/native` alias this repo already uses, so no rename is needed.
+
 ## Making your change
 
 1. **Create a branch** from the current `release/vX.Y.Z` branch: `feature/<short-slug>`

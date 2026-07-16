@@ -21,150 +21,150 @@ export const id_ID: EnTranslations = {
     "rpPvp": "RP-PvP"
   },
   "devCommand": {
-    "dialogLabel": "Developer Command Center",
-    "kicker": "Development tools",
-    "title": "Command Center",
-    "subtitle": "Authoritative test controls for the active world.",
-    "closeAria": "Close developer commands",
-    "categoryNavAria": "Developer command categories",
+    "dialogLabel": "Pusat Perintah Pengembang",
+    "kicker": "Alat pengembangan",
+    "title": "Pusat Perintah",
+    "subtitle": "Kontrol pengujian otoritatif untuk dunia aktif.",
+    "closeAria": "Tutup perintah pengembang",
+    "categoryNavAria": "Kategori perintah pengembang",
     "categories": {
-      "player": "Player",
-      "spawns": "Spawns",
-      "inventory": "Inventory",
-      "progress": "Progress",
-      "travel": "Travel",
-      "scenarios": "Scenarios"
+      "player": "Pemain",
+      "spawns": "Kemunculan",
+      "inventory": "Inventaris",
+      "progress": "Kemajuan",
+      "travel": "Perjalanan",
+      "scenarios": "Skenario"
     },
-    "filterLabel": "Filter commands",
-    "filterPlaceholder": "Search this category",
-    "noMatches": "No matching commands.",
-    "serverRequirement": "Server cheats still require ALLOW_DEV_COMMANDS=1.",
-    "invalidValues": "Choose valid values before running this command.",
-    "sent": "Sent: {command}",
-    "run": "Run",
+    "filterLabel": "Saring perintah",
+    "filterPlaceholder": "Cari dalam kategori ini",
+    "noMatches": "Tidak ada perintah yang cocok.",
+    "serverRequirement": "Perintah curang server tetap memerlukan ALLOW_DEV_COMMANDS=1.",
+    "invalidValues": "Pilih nilai yang valid sebelum menjalankan perintah ini.",
+    "sent": "Terkirim: {command}",
+    "run": "Jalankan",
     "fields": {
-      "level": "Level",
-      "mob": "Mob",
-      "count": "Count",
-      "item": "Item",
-      "gold": "Gold",
-      "quest": "Quest",
-      "profession": "Profession",
-      "amount": "Amount",
+      "level": "Tingkat",
+      "mob": "Makhluk",
+      "count": "Hitungan",
+      "item": "Barang",
+      "gold": "Emas",
+      "quest": "Misi",
+      "profession": "Profesi",
+      "amount": "Jumlah",
       "x": "X",
       "z": "Z",
       "dungeon": "Dungeon",
-      "difficulty": "Difficulty",
-      "name": "Name"
+      "difficulty": "Tingkat kesulitan",
+      "name": "Nama"
     },
     "difficulty": {
       "normal": "Normal",
-      "heroic": "Heroic"
+      "heroic": "Heroik"
     },
     "actions": {
       "heal": {
-        "label": "Restore health",
-        "description": "Fill the health pool."
+        "label": "Pulihkan kesehatan",
+        "description": "Penuhi seluruh bar kesehatan."
       },
       "resource": {
-        "label": "Restore resource",
-        "description": "Fill mana, rage, or energy."
+        "label": "Pulihkan sumber daya",
+        "description": "Isi mana, amukan, atau energi."
       },
       "cooldowns": {
-        "label": "Clear cooldowns",
-        "description": "Reset ability, GCD, and potion timers."
+        "label": "Hapus waktu tunggu",
+        "description": "Atur ulang pewaktu kemampuan, GCD, dan ramuan."
       },
       "god": {
-        "label": "Toggle god mode",
-        "description": "Toggle invulnerability and boosted damage."
+        "label": "Alihkan mode dewa",
+        "description": "Aktifkan atau nonaktifkan kekebalan dan peningkatan kerusakan."
       },
       "revive": {
-        "label": "Revive",
-        "description": "Revive through the normal resurrection path."
+        "label": "Hidupkan kembali",
+        "description": "Hidupkan kembali melalui jalur kebangkitan normal."
       },
       "kill": {
-        "label": "Kill player",
-        "description": "Test death, ghost, and corpse flows."
+        "label": "Bunuh pemain",
+        "description": "Uji alur kematian, hantu, dan mayat."
       },
       "combatreset": {
-        "label": "Reset combat",
-        "description": "Clear combat state and hostile threat."
+        "label": "Atur ulang pertempuran",
+        "description": "Hapus status pertempuran dan ancaman musuh."
       },
       "level": {
-        "label": "Set level",
-        "description": "Set the current character level."
+        "label": "Atur level",
+        "description": "Atur level karakter saat ini."
       },
       "spawn": {
-        "label": "Spawn mob",
-        "description": "Create a concrete mob near the player."
+        "label": "Munculkan makhluk",
+        "description": "Munculkan makhluk tertentu di dekat pemain."
       },
       "killtarget": {
-        "label": "Kill target",
-        "description": "Kill the selected living mob."
+        "label": "Bunuh target",
+        "description": "Bunuh makhluk hidup yang dipilih."
       },
       "despawntarget": {
-        "label": "Despawn target",
-        "description": "Remove a selected mob created by this tool."
+        "label": "Hilangkan target",
+        "description": "Hapus makhluk terpilih yang dibuat dengan alat ini."
       },
       "despawnall": {
-        "label": "Clear my spawns",
-        "description": "Remove every mob spawned by this developer."
+        "label": "Hapus semua kemunculanku",
+        "description": "Hapus semua makhluk yang dimunculkan oleh pengembang ini."
       },
       "give": {
-        "label": "Give item",
-        "description": "Add an item to the player inventory."
+        "label": "Berikan barang",
+        "description": "Tambahkan barang ke inventaris pemain."
       },
       "gold": {
-        "label": "Add gold",
-        "description": "Add gold to the current purse."
+        "label": "Tambah emas",
+        "description": "Tambahkan emas ke dompet saat ini."
       },
       "quest": {
-        "label": "Complete quest",
-        "description": "Complete a specific quest by id."
+        "label": "Selesaikan misi",
+        "description": "Selesaikan misi tertentu berdasarkan id."
       },
       "quests": {
-        "label": "Complete active quests",
-        "description": "Complete every quest in the current log."
+        "label": "Selesaikan misi aktif",
+        "description": "Selesaikan setiap misi dalam catatan saat ini."
       },
       "attune": {
-        "label": "Unlock attunements",
-        "description": "Mark all attunement requirements complete."
+        "label": "Buka penyelarasan",
+        "description": "Tandai semua persyaratan penyelarasan sebagai selesai."
       },
       "gather": {
-        "label": "Grant gathering skill",
-        "description": "Increase a gathering profession."
+        "label": "Berikan keterampilan mengumpulkan",
+        "description": "Tingkatkan profesi pengumpulan."
       },
       "teleport": {
-        "label": "Teleport",
-        "description": "Move to exact world coordinates."
+        "label": "Teleportasi",
+        "description": "Pindah ke koordinat dunia yang tepat."
       },
       "dungeon": {
-        "label": "Enter dungeon",
-        "description": "Enter a dungeon with dev gate bypass."
+        "label": "Masuk dungeon",
+        "description": "Masuki penjara bawah tanah dengan melewati persyaratan masuk mode pengembang."
       },
       "raid": {
-        "label": "Enter raid",
-        "description": "Enter the Nythraxis arena directly."
+        "label": "Masuk raid",
+        "description": "Masuki arena Nythraxis secara langsung."
       },
       "raidreset": {
-        "label": "Reset raid lockout",
-        "description": "Clear the current raid lockouts."
+        "label": "Atur ulang penguncian raid",
+        "description": "Hapus penguncian raid saat ini."
       },
       "bot": {
-        "label": "Spawn social bot",
-        "description": "Create a whisperable stationary player."
+        "label": "Munculkan bot sosial",
+        "description": "Buat pemain diam yang dapat menerima pesan bisikan."
       },
       "lfgqueue": {
-        "label": "Seed finder queue",
-        "description": "Create a Dungeon Finder queue scenario."
+        "label": "Isi antrean pencari",
+        "description": "Buat skenario antrean Pencari Dungeon."
       },
       "lfgraid": {
-        "label": "Seed raid finder",
-        "description": "Create a raid finder scenario."
+        "label": "Isi pencari raid",
+        "description": "Buat skenario pencari raid."
       },
       "lfgboard": {
-        "label": "Seed listing board",
-        "description": "Create a premade listing scenario."
+        "label": "Isi papan daftar",
+        "description": "Buat skenario daftar grup siap pakai."
       }
     }
   },
@@ -351,7 +351,7 @@ export const id_ID: EnTranslations = {
       "remainingLessThanMinute": "<1m",
       "remainingMinutes": "{minutes}m",
       "remainingHoursMinutes": "{hours}j {minutes}m",
-      "remainingDaysHours": "{days}d {hours}h",
+      "remainingDaysHours": "{days} hari {hours} jam",
       "score": "Skor",
       "walletValue": "Nilai Dompet (WOC)",
       "usd": "{amount} USD",
@@ -391,7 +391,7 @@ export const id_ID: EnTranslations = {
         "under_minimum": "Dompet di bawah batas minimum $20 USD WOC.",
         "price_unavailable": "Harga WOC tidak tersedia, hadiah terkunci sementara.",
         "banned": "Kamu dilarang mengikuti Hadiah Harian. Alasan: {reason}",
-        "bannedUntil": "You are banned from Daily Rewards for another {remaining}. Access returns {until}. Reason: {reason}"
+        "bannedUntil": "Kamu dilarang mengikuti Hadiah Harian selama {remaining} lagi. Akses kembali pada {until}. Alasan: {reason}"
       }
     },
     "wocStore": {
@@ -996,6 +996,7 @@ export const id_ID: EnTranslations = {
       "interfaceModeTouch": "Sentuh",
       "interfaceModeNote": "Otomatis memilih kontrol desktop atau sentuh dari perangkat Anda. Pilih Desktop untuk memaksa keyboard dan mouse (berguna pada tablet dengan keyboard), atau Sentuh untuk kontrol di layar.",
       "footstepSounds": "Suara Langkah Kaki",
+      "interfaceSounds": "Suara Antarmuka dan Umpan Balik",
       "clickFeedback": "Penanda Klik",
       "lockCursorOnRotate": "Kunci Kursor Saat Memutar",
       "keybindHelpLockCursorOnRotate": "Menjaga kursor mouse tetap di dalam jendela saat Anda menyeret untuk memutar kamera, sehingga tidak mencapai tepi layar atau berpindah ke monitor lain. Matikan jika Anda lebih suka kursor bebas.",
@@ -1619,31 +1620,31 @@ export const id_ID: EnTranslations = {
       "lock": "Kunci bingkai pemain"
     },
     "partyFrames": {
-      "section": "Party and Raid Frames",
-      "unlock": "Move party and raid frames",
-      "lock": "Lock party and raid frames",
-      "style": "Frame Style",
-      "styleAutomatic": "Automatic",
-      "styleClassic": "Classic Party Frames",
-      "styleRaid": "Raid Frames",
-      "scale": "Frame Scale",
-      "width": "Frame Width",
-      "height": "Frame Height",
-      "spacing": "Frame Spacing",
-      "columns": "Raid Columns",
-      "healthText": "Health Text",
-      "healthNone": "None",
-      "healthPercent": "Percent",
-      "healthCurrent": "Current",
-      "healthCurrentMax": "Current / Max",
-      "sort": "Sort Players",
-      "sortGroup": "Group",
-      "sortRole": "Role",
-      "sortName": "Name",
-      "showResource": "Show Mana, Rage, and Energy",
-      "showAbsorbs": "Show Absorb Shields",
-      "showAuras": "Show Buffs and Debuffs",
-      "showSelf": "Show Your Frame"
+      "section": "Bingkai Grup dan Raid",
+      "unlock": "Pindahkan bingkai grup dan raid",
+      "lock": "Kunci bingkai grup dan raid",
+      "style": "Gaya Bingkai",
+      "styleAutomatic": "Otomatis",
+      "styleClassic": "Bingkai Grup Klasik",
+      "styleRaid": "Bingkai Raid",
+      "scale": "Skala Bingkai",
+      "width": "Lebar Bingkai",
+      "height": "Tinggi Bingkai",
+      "spacing": "Jarak Bingkai",
+      "columns": "Kolom Raid",
+      "healthText": "Teks Kesehatan",
+      "healthNone": "Tidak Ada",
+      "healthPercent": "Persen",
+      "healthCurrent": "Saat Ini",
+      "healthCurrentMax": "Saat Ini / Maksimum",
+      "sort": "Urutkan Pemain",
+      "sortGroup": "Grup",
+      "sortRole": "Peran",
+      "sortName": "Nama",
+      "showResource": "Tampilkan Mana, Amukan, dan Energi",
+      "showAbsorbs": "Tampilkan Perisai Serap",
+      "showAuras": "Tampilkan Buff dan Debuff",
+      "showSelf": "Tampilkan Bingkaimu"
     },
     "frameReset": {
       "label": "Atur Ulang Posisi Bingkai"
@@ -2304,6 +2305,9 @@ export const id_ID: EnTranslations = {
       "already_linked": "Akunmu sudah memiliki akun Steam yang tertaut.",
       "account_taken": "Akun Steam itu sudah tertaut ke akun lain.",
       "upstream": "Steam tidak merespons. Coba lagi dalam beberapa saat."
+    },
+    "welcome": {
+      "invalid_input": "Data yang dimasukkan tidak valid."
     }
   },
   "guide": {
@@ -2597,7 +2601,7 @@ export const id_ID: EnTranslations = {
       "effectsTitle": "Penguat, pelemah, dan kontrol kerumunan",
       "effectsBody": "Banyak kemampuan memberi efek yang bertahan. Yang menguntungkan (penguat) menaikkan statistikmu, melindungimu, atau menyembuhkanmu sedikit demi sedikit; yang merugikan (pelemah) menguras nyawamu dengan kerusakan seiring waktu atau melemahkanmu. Perhatikan ikon kecil di sudut atas layar, di samping minimap, untuk melihat apa yang menempel padamu dan berapa lama bertahan.",
       "ccBody": "Kontrol kerumunan adalah jenis pelemahan khusus yang membatasi apa yang bisa dilakukan sasaran: pingsan, akar dan pelambatan, pembungkaman yang menghentikan perapalan mantra, pelucutan senjata, ketakutan, dan ubah wujud yang membuat lawan tak berbahaya sejenak. Melawan pemain lain, kontrol menipis bila diulang: jenis yang sama yang dipasang kembali terlalu cepat melemah lalu gagal sama sekali, dan pingsan yang dibuka dari siluman dihitung terpisah dari pingsan yang menyusul, sehingga tak seorang pun bisa dirantai tak berdaya selamanya. Makhluk-makhluk dunia tak menyimpan dendam semacam itu: kontrol tak pernah melemah karena diulang terhadap mereka, meski banyak dari musuh terperkasa, elite bernama dan bos terkuat di antara mereka, sama sekali tak bisa dikendalikan.",
-      "metersBody": "Penasaran bagaimana jalannya sebuah pertarungan? Tekan Z untuk membuka meter party, yang menghitung kerusakan, penyembuhan, dan ancaman bagi kelompokmu, perjumpaan demi perjumpaan.",
+      "metersBody": "Penasaran bagaimana jalannya sebuah pertarungan? Tekan Shift+H untuk membuka meter party, yang menghitung kerusakan, penyembuhan, dan ancaman bagi kelompokmu, perjumpaan demi perjumpaan.",
       "queueTitle": "Gerakan berikutmu sudah termuat",
       "queueBody": "Kamu tak perlu menekan tombol tepat pada framenya. Tekan kemampuan berikutmu di saat-saat akhir perapalan yang sedang berjalan dan ia akan diantrekan, meluncur begitu perapalan selesai, sehingga permainan yang terlatih mengalir tanpa jeda. Tekanan yang terlalu dini cukup ditolak, jadi tak ada yang terbuang. Sebagian serangan jarak dekat bekerja dengan cara sama, ikut meluncur pada ayunan senjatamu berikutnya.",
       "deathTitle": "Saat kamu tumbang",
@@ -2658,7 +2662,7 @@ export const id_ID: EnTranslations = {
       "petBarTerm": "Bilah peliharaan",
       "petBarDef": "Baris perintah yang ditambahkan peliharaan Pemburu atau Penyihir Iblis: Serang, Berhenti, Hasut, Bertahan, dan Agresif, terikat ke Ctrl plus 1 hingga 5 secara bawaan.",
       "metersTerm": "Meter kerusakan",
-      "metersDef": "Jendela papan skor party untuk pertarungan saat ini: kerusakan yang diberikan, penyembuhan yang dilakukan, dan siapa yang memegang ancaman terbesar, disimpan per perjumpaan. Buka dengan keybind-nya (Z secara bawaan).",
+      "metersDef": "Jendela papan skor party untuk pertarungan saat ini: kerusakan yang diberikan, penyembuhan yang dilakukan, dan siapa yang memegang ancaman terbesar, disimpan per perjumpaan. Buka dengan keybind-nya (Shift+H secara bawaan).",
       "targetMarkerTerm": "Penanda sasaran",
       "targetMarkerDef": "Simbol yang bisa disematkan anggota party atau raid mana pun di atas sasaran agar semua orang memusatkan, atau menghindari, sasaran yang sama. Delapan simbol, satu sasaran per simbol.",
       "loadoutTerm": "Loadout",
@@ -2987,6 +2991,8 @@ export const id_ID: EnTranslations = {
       "heroicRewardsTitle": "Tanda Heroik dan rampasan yang ditingkatkan",
       "heroicRewardsBody": "Bos heroik menjatuhkan jarahan yang sudah kamu kenal, ditingkatkan dan diberi label Heroik pada tooltip, dan bos terakhir tiap sesi menambahkan epik yang tak ditemukan di tempat lain. Bunuhan terakhir itu juga meninggalkan Tanda Heroik bagi setiap peserta: mata uang yang dibelanjakan pada Quartermaster Vex di Highwatch, yang stok cincin dan kalungnya adalah satu-satunya perhiasan di realm ini.",
       "heroicLockoutBody": "Dungeon normal bisa dijalankan sepanjang hari. Heroik menuntut kesabaran: membunuh bos terakhir mengunci setiap orang dalam sesi itu pada satu penuntasan heroik dungeon tersebut per hari, dan raid menyimpan kunci harian terpisah untuk tiap tingkat kesulitan. Sesi lima pemain yang sudah dituntaskan tetap terbuka bagi party-nya sendiri untuk lari balik dan menjarah, jadi tak seorang pun terkunci dari apa yang mereka raih di sana. Raid lebih ketat: begitu bunuhannya mengunci kamu, pintu tetap tertutup sampai reset harian, jadi kumpulkan rampasanmu sebelum kamu meninggalkan arena.",
+      "resetTitle": "Resetting your instances",
+      "resetBody": "Switch difficulty while your group still holds claimed runs and the old claims linger for a while before clearing on their own. The party leader can let them go at once instead: choose Reset All Instances on their own portrait menu, or type /dungeon reset. A reset works only after the difficulty has actually been changed, only while nobody, living or fallen, remains inside, and a short cooldown separates one reset from the next. Arrive at the door on the wrong difficulty and the game says so before the run starts. The raid is never reset this way; its own lockout rules stand.",
       "templeLoreTitle": "Kuil Tenggelam, sedikit lebih dalam",
       "templeLoreBody": "Kuil itu memiliki legendanya sendiri, lebih tua dari pemujaan yang kamu kejar di tempat lain. Di tepi Glimmermere, sebuah danau yang meneguk cahaya bulan dan mengembalikan mereka yang tenggelam, seorang pengawas sebatang kara menjaga sebuah gerbang cahaya pucat. Di bawah permukaan, sebuah tangga dari batu dingin menurun menuju ke sana. Orang-orang yang tenggelam di sana tidak mati karena kecelakaan: mereka adalah Paduan Suara Pucat, yang tenggelam dalam pemujaan dan tak pernah berhenti bernyanyi. Para penjaga tua menggores satu peringatan ke bebatuan sebelum air menelan mereka, sebuah doa kepada sesuatu yang mereka sebut Bulan Tenggelam, dengan tangan yang lebih mantap menambahkan dua kata di bawahnya: ia hanya tertidur.",
       "cryptLeadTitle": "Pintu yang seharusnya dijaga tetap tertutup oleh orang mati",
@@ -3194,7 +3200,7 @@ export const id_ID: EnTranslations = {
       "qualityNote": "Kualitas yang lebih tinggi biasanya berarti statistik yang lebih baik, tetapi kualitas adalah petunjuk, bukan aturan. Sepotong perlengkapan yang cocok untuk kelas dan levelmu bisa mengalahkan yang lebih mencolok.",
       "upgradeTitle": "Jaga perlengkapanmu tetap mutakhir",
       "upgradeBody": "Mengganti potongan lama dengan peningkatan baru lebih berguna bagimu daripada bermain sempurna dengan perlengkapan yang sudah kamu lampaui. Saat sesuatu yang lebih baik jatuh atau sebuah misi menawarkannya, ambillah. Jangan simpan barang bagusmu untuk nanti.",
-      "itemLevelBody": "Jika kamu ingin cara cepat membandingkan dua potongan, aktifkan Tampilkan Level Item di opsi. Perlengkapan yang didapat di dunia, dari musuh dan misi, lalu menampilkan level item, satu angka untuk kira-kira seberapa kuatnya berdasarkan asalnya, sehingga kamu bisa tahu sekilas peningkatan mana yang lebih berbobot, bahkan lintas slot berbeda. Potongan tanpa asal semacam itu, seperti barang dasar penjaja dan perlengkapan awal, tak menampilkan level item, jadi angka yang hilang itu wajar, bukan kesalahan.",
+      "itemLevelBody": "If you want a quick way to compare two pieces, turn on Show Item Level in the options. Gear with a known source, from enemies, quests, and the crafting trades, then shows an item level, a single figure for roughly how powerful it is based on where it came from, so you can tell at a glance which upgrade pulls more weight, even across different slots. Pieces with no such source, like plain vendor basics and starter gear, show no item level, so a missing figure is normal, not a fault.",
       "sourcesTitle": "Dari mana perlengkapan berasal",
       "sourcesBody": "Sebagian besar peningkatan awalmu adalah hadiah misi, jadi lebih menguntungkan menuntaskan misi daripada menggerus musuh. Musuh menjatuhkan perlengkapan saat kamu mengalahkannya, penjaja di kota menjual barang dasar yang andal, perajin mengubah bahan yang dikumpulkan menjadi potongan yang bisa dikenakan, dan pasar pemain memungkinkanmu membeli dari petualang lain. Di puncak bukit, dua mata uang tanda membeli perlengkapan yang tak ditemukan di tempat lain: Tanda Delve pada penjaga delve, dan Tanda Heroik pada Kepala Perbekalan Heroik.",
       "soulboundTitle": "Soulbound: milikmu dan hanya milikmu",
@@ -3238,7 +3244,7 @@ export const id_ID: EnTranslations = {
       "craftRecipesTitle": "Resep dan reagen",
       "craftRecipesBody": "Setiap resep membutuhkan reagen tertentu yang kamu kumpulkan atau beli. Resep paling sederhana hanya meminta bahan umum dan bisa dibuat sejak awal, jadi kamu bisa mulai menekuni sebuah kerajinan begitu mengambilnya. Daftar resep masih terus terisi: beberapa kerajinan sedang menanti resep pertamanya, dan lebih banyak lagi tiba seiring kerajinan berkembang.",
       "craftHowTitle": "Jendela kriya",
-      "craftHowBody": "Buka jendela Kriya (tombol bawaan T) untuk melihat setiap resep yang kamu ketahui, apa yang dibutuhkan masing-masing, dan apa yang kamu punya; saat bahannya tersedia, satu klik menuntaskan pekerjaannya. Resep umum bisa dibuat di mana saja di dunia. Segelintir resep perkakas tingkat lanjut justru mengharuskanmu berdiri di pusat kriya di Highwatch.",
+      "craftHowBody": "Open the Crafting window (default key T) to see every recipe you know, what each one needs, and what you have on hand; when the materials are there, one click does the work. Common recipes can be crafted anywhere in the world. A handful of advanced recipes, higher-tier tools and rare caster armor among them, instead ask you to stand at the crafting hub in Highwatch.",
       "craftMasteryTitle": "Keahlian dan penguasaan",
       "craftMasteryBody": "Berhasil membuat barang menumbuhkan keahlianmu di kerajinan itu, dan keahlian tak pernah mengunci resep sebuah kerajinan: jika kamu mengetahui sebuah resep dan memegang bahannya, kamu bisa mencobanya. Yang justru dibeli keahlian untukmu adalah mutu, tangan yang terlatih menghasilkan karya yang lebih halus. Satu pengecualiannya adalah resep kombinasi, yang mengharuskanmu membuktikan diri di kedua kerajinannya sebelum ia terbuka.",
       "craftComboTitle": "Resep kombinasi",
@@ -5000,6 +5006,29 @@ export const id_ID: EnTranslations = {
     "body": "Kami sedang memulai ulang layanan game dan memperkirakan Claudemoon akan kembali sebentar lagi. Halaman ini akan terus memeriksa secara otomatis.",
     "status": "Segera kembali"
   },
+  "welcome": {
+    "back": "Selamat datang kembali, {name}",
+    "level": "Level {level}",
+    "lastPlayed": "Terakhir dimainkan: {when}",
+    "continue": "Masuki Dunia",
+    "continueHint": "Tekan Enter untuk melanjutkan, Esc untuk melewati",
+    "continueHintTouch": "Ketuk untuk melanjutkan",
+    "discord": {
+      "title": "Komunitas berkumpul di Discord",
+      "sub": "Pratinjau pembaruan, acara, obrolan pengembang, serta 2 slot bank bonus saat Discord ditautkan.",
+      "join": "Gabung ke Discord kami"
+    },
+    "chest": {
+      "ready": "Peti harian siap dibuka"
+    },
+    "armory": {
+      "cta": "Masuki dunia dan jelajahi Gudang Senjata"
+    },
+    "news": {
+      "new": "Baru",
+      "viewAll": "Lihat semua pembaruan di GitHub"
+    }
+  },
   "hud": {
     "core": {
       "elite": "ELITE",
@@ -6528,7 +6557,7 @@ export const id_ID: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Wolfsblood",
-        "description": "Meningkatkan daya serang sebesar 40 selama 6 detik. Hanya Wujud Serigala."
+        "description": "Meningkatkan daya serang sebesar {buff} selama {duration} detik. Hanya Wujud Serigala."
       },
       "rip": {
         "name": "Robekan",
@@ -6819,6 +6848,24 @@ export const id_ID: EnTranslations = {
       },
       "eastbrook_wool_trousers": {
         "name": "Celana Wol Eastbrook"
+      },
+      "eastbrook_ritual_vestments": {
+        "name": "Jubah Ritual Eastbrook"
+      },
+      "eastbrook_druids_hide": {
+        "name": "Kulit Druid Eastbrook"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "Celana Pelindung Eastbrook"
+      },
+      "wardweave_cowl": {
+        "name": "Tudung Tenun Pelindung"
+      },
+      "duskhide_wraps": {
+        "name": "Balutan Kulit Senja"
+      },
+      "sootscale_mantle": {
+        "name": "Mantel Sisik Jelaga"
       },
       "gravecaller_blade": {
         "name": "Bilah Lebar Gravecaller"

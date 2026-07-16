@@ -10,9 +10,12 @@ import {
   SETTING_RANGES,
   Settings,
 } from '../../src/game/settings';
-import type { ActionBarSlotElements } from '../../src/ui/action_bar_painter';
-import type { ActionBarSlotState, ActionBarState } from '../../src/ui/action_bar_view';
-import { MobileActionRingPainter } from '../../src/ui/mobile_action_ring_painter';
+import type { ActionBarSlotElements } from '../../src/ui/hud/action_bar/action_bar_painter';
+import type {
+  ActionBarSlotState,
+  ActionBarState,
+} from '../../src/ui/hud/action_bar/action_bar_view';
+import { MobileActionRingPainter } from '../../src/ui/hud/action_bar/mobile_action_ring_painter';
 import { boolToggleNextValue, buildInterfaceControls } from '../../src/ui/options_view';
 import { makeWriterFacet } from '../../src/ui/painter_host';
 import '../../src/styles/index.css';

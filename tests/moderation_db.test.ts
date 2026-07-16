@@ -526,22 +526,21 @@ describe('moderation report helpers', () => {
     expect(connect).not.toHaveBeenCalled();
   });
 
-  it.each([
-    true,
-    '12',
-    [12],
-  ])('rejects non-number Daily Rewards ban duration %j', async (durationHours) => {
-    await expect(
-      setDailyRewardsBan({
-        accountId: 2,
-        adminAccountId: 1,
-        banned: true,
-        reason: 'automated play',
-        durationHours,
-      }),
-    ).rejects.toThrow('daily rewards ban duration must be between 1 and 8760 hours');
-    expect(connect).not.toHaveBeenCalled();
-  });
+  it.each([true, '12', [12]])(
+    'rejects non-number Daily Rewards ban duration %j',
+    async (durationHours) => {
+      await expect(
+        setDailyRewardsBan({
+          accountId: 2,
+          adminAccountId: 1,
+          banned: true,
+          reason: 'automated play',
+          durationHours,
+        }),
+      ).rejects.toThrow('daily rewards ban duration must be between 1 and 8760 hours');
+      expect(connect).not.toHaveBeenCalled();
+    },
+  );
 
   it('removes and audits a Daily Rewards ban atomically', async () => {
     const client = clientStub();

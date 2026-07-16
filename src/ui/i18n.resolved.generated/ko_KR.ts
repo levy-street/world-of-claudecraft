@@ -21,150 +21,150 @@ export const ko_KR: EnTranslations = {
     "rpPvp": "롤플레잉 PvP"
   },
   "devCommand": {
-    "dialogLabel": "Developer Command Center",
-    "kicker": "Development tools",
-    "title": "Command Center",
-    "subtitle": "Authoritative test controls for the active world.",
-    "closeAria": "Close developer commands",
-    "categoryNavAria": "Developer command categories",
+    "dialogLabel": "개발자 명령 센터",
+    "kicker": "개발 도구",
+    "title": "명령 센터",
+    "subtitle": "현재 세계를 서버 권한으로 시험하는 제어 기능입니다.",
+    "closeAria": "개발자 명령어 닫기",
+    "categoryNavAria": "개발자 명령어 범주",
     "categories": {
-      "player": "Player",
-      "spawns": "Spawns",
-      "inventory": "Inventory",
-      "progress": "Progress",
-      "travel": "Travel",
-      "scenarios": "Scenarios"
+      "player": "플레이어",
+      "spawns": "생성물",
+      "inventory": "소지품",
+      "progress": "진행",
+      "travel": "이동",
+      "scenarios": "시나리오"
     },
-    "filterLabel": "Filter commands",
-    "filterPlaceholder": "Search this category",
-    "noMatches": "No matching commands.",
-    "serverRequirement": "Server cheats still require ALLOW_DEV_COMMANDS=1.",
-    "invalidValues": "Choose valid values before running this command.",
-    "sent": "Sent: {command}",
-    "run": "Run",
+    "filterLabel": "명령어 필터",
+    "filterPlaceholder": "이 범주 검색",
+    "noMatches": "일치하는 명령어가 없습니다.",
+    "serverRequirement": "서버 치트 기능에는 여전히 ALLOW_DEV_COMMANDS=1이 필요합니다.",
+    "invalidValues": "명령을 실행하기 전에 올바른 값을 선택하세요.",
+    "sent": "전송됨: {command}",
+    "run": "실행",
     "fields": {
-      "level": "Level",
-      "mob": "Mob",
-      "count": "Count",
-      "item": "Item",
-      "gold": "Gold",
-      "quest": "Quest",
-      "profession": "Profession",
-      "amount": "Amount",
+      "level": "레벨",
+      "mob": "몹",
+      "count": "개수",
+      "item": "아이템",
+      "gold": "골드",
+      "quest": "퀘스트",
+      "profession": "전문 기술",
+      "amount": "수량",
       "x": "X",
       "z": "Z",
-      "dungeon": "Dungeon",
-      "difficulty": "Difficulty",
-      "name": "Name"
+      "dungeon": "던전",
+      "difficulty": "난이도",
+      "name": "이름"
     },
     "difficulty": {
-      "normal": "Normal",
-      "heroic": "Heroic"
+      "normal": "일반",
+      "heroic": "영웅"
     },
     "actions": {
       "heal": {
-        "label": "Restore health",
-        "description": "Fill the health pool."
+        "label": "생명력 회복",
+        "description": "생명력을 가득 채웁니다."
       },
       "resource": {
-        "label": "Restore resource",
-        "description": "Fill mana, rage, or energy."
+        "label": "자원 회복",
+        "description": "마나, 분노 또는 기력을 가득 채웁니다."
       },
       "cooldowns": {
-        "label": "Clear cooldowns",
-        "description": "Reset ability, GCD, and potion timers."
+        "label": "재사용 대기시간 초기화",
+        "description": "기술, 전역 재사용 대기시간, 물약 타이머를 초기화합니다."
       },
       "god": {
-        "label": "Toggle god mode",
-        "description": "Toggle invulnerability and boosted damage."
+        "label": "무적 모드 전환",
+        "description": "무적 상태와 강화된 피해를 전환합니다."
       },
       "revive": {
-        "label": "Revive",
-        "description": "Revive through the normal resurrection path."
+        "label": "부활",
+        "description": "정상적인 부활 경로로 되살아납니다."
       },
       "kill": {
-        "label": "Kill player",
-        "description": "Test death, ghost, and corpse flows."
+        "label": "플레이어 처치",
+        "description": "사망, 유령, 시체 흐름을 시험합니다."
       },
       "combatreset": {
-        "label": "Reset combat",
-        "description": "Clear combat state and hostile threat."
+        "label": "전투 초기화",
+        "description": "전투 상태와 적의 위협 수준을 초기화합니다."
       },
       "level": {
-        "label": "Set level",
-        "description": "Set the current character level."
+        "label": "레벨 설정",
+        "description": "현재 캐릭터 레벨을 설정합니다."
       },
       "spawn": {
-        "label": "Spawn mob",
-        "description": "Create a concrete mob near the player."
+        "label": "몹 생성",
+        "description": "플레이어 근처에 지정된 몹을 생성합니다."
       },
       "killtarget": {
-        "label": "Kill target",
-        "description": "Kill the selected living mob."
+        "label": "대상 처치",
+        "description": "선택한 살아 있는 몹을 처치합니다."
       },
       "despawntarget": {
-        "label": "Despawn target",
-        "description": "Remove a selected mob created by this tool."
+        "label": "대상 제거",
+        "description": "이 도구로 만든 선택된 몹을 제거합니다."
       },
       "despawnall": {
-        "label": "Clear my spawns",
-        "description": "Remove every mob spawned by this developer."
+        "label": "내 생성물 제거",
+        "description": "이 개발자가 생성한 모든 몹을 제거합니다."
       },
       "give": {
-        "label": "Give item",
-        "description": "Add an item to the player inventory."
+        "label": "아이템 지급",
+        "description": "플레이어 소지품에 아이템을 추가합니다."
       },
       "gold": {
-        "label": "Add gold",
-        "description": "Add gold to the current purse."
+        "label": "골드 추가",
+        "description": "현재 소지금에 골드를 추가합니다."
       },
       "quest": {
-        "label": "Complete quest",
-        "description": "Complete a specific quest by id."
+        "label": "퀘스트 완료",
+        "description": "ID로 특정 퀘스트를 완료합니다."
       },
       "quests": {
-        "label": "Complete active quests",
-        "description": "Complete every quest in the current log."
+        "label": "진행 중인 퀘스트 완료",
+        "description": "현재 퀘스트 목록의 모든 퀘스트를 완료합니다."
       },
       "attune": {
-        "label": "Unlock attunements",
-        "description": "Mark all attunement requirements complete."
+        "label": "선행 조건 해제",
+        "description": "모든 선행 조건을 완료 처리합니다."
       },
       "gather": {
-        "label": "Grant gathering skill",
-        "description": "Increase a gathering profession."
+        "label": "채집 기술 부여",
+        "description": "채집 전문 기술을 올립니다."
       },
       "teleport": {
-        "label": "Teleport",
-        "description": "Move to exact world coordinates."
+        "label": "순간이동",
+        "description": "정확한 세계 좌표로 이동합니다."
       },
       "dungeon": {
-        "label": "Enter dungeon",
-        "description": "Enter a dungeon with dev gate bypass."
+        "label": "던전 입장",
+        "description": "개발자 제한을 우회해 던전에 입장합니다."
       },
       "raid": {
-        "label": "Enter raid",
-        "description": "Enter the Nythraxis arena directly."
+        "label": "공격대 입장",
+        "description": "니트락시스 투기장에 바로 입장합니다."
       },
       "raidreset": {
-        "label": "Reset raid lockout",
-        "description": "Clear the current raid lockouts."
+        "label": "공격대 잠금 초기화",
+        "description": "현재 공격대 잠금을 초기화합니다."
       },
       "bot": {
-        "label": "Spawn social bot",
-        "description": "Create a whisperable stationary player."
+        "label": "소셜 봇 생성",
+        "description": "귓속말을 받을 수 있는 정지 플레이어를 생성합니다."
       },
       "lfgqueue": {
-        "label": "Seed finder queue",
-        "description": "Create a Dungeon Finder queue scenario."
+        "label": "찾기 대기열 채우기",
+        "description": "던전 찾기 대기열 시나리오를 만듭니다."
       },
       "lfgraid": {
-        "label": "Seed raid finder",
-        "description": "Create a raid finder scenario."
+        "label": "공격대 찾기 채우기",
+        "description": "공격대 찾기 시나리오를 만듭니다."
       },
       "lfgboard": {
-        "label": "Seed listing board",
-        "description": "Create a premade listing scenario."
+        "label": "모집 게시판 채우기",
+        "description": "사전 구성 파티 모집 시나리오를 만듭니다."
       }
     }
   },
@@ -996,6 +996,7 @@ export const ko_KR: EnTranslations = {
       "interfaceModeTouch": "터치",
       "interfaceModeNote": "자동은 기기에 따라 데스크톱 또는 터치 조작을 선택합니다. 데스크톱을 선택하면 키보드와 마우스로 고정되며(키보드가 있는 태블릿 등에 유용), 터치를 선택하면 화면 조작이 됩니다.",
       "footstepSounds": "발소리",
+      "interfaceSounds": "인터페이스 및 피드백 소리",
       "clickFeedback": "클릭 표시",
       "lockCursorOnRotate": "회전 중 커서 고정",
       "keybindHelpLockCursorOnRotate": "드래그하여 카메라를 회전하는 동안 마우스 커서를 창 안에 유지하여 화면 가장자리에 닿거나 다른 모니터로 이동하지 않도록 합니다. 자유로운 커서를 원하면 끄세요.",
@@ -1632,14 +1633,14 @@ export const ko_KR: EnTranslations = {
       "spacing": "프레임 간격",
       "columns": "공격대 열 수",
       "healthText": "생명력 텍스트",
-      "healthNone": "None",
+      "healthNone": "없음",
       "healthPercent": "백분율",
       "healthCurrent": "현재 값",
       "healthCurrentMax": "현재 / 최대",
       "sort": "플레이어 정렬",
       "sortGroup": "그룹",
-      "sortRole": "Role",
-      "sortName": "Name",
+      "sortRole": "역할",
+      "sortName": "이름",
       "showResource": "마나, 분노, 에너지 표시",
       "showAbsorbs": "흡수 보호막 표시",
       "showAuras": "버프 및 디버프 표시",
@@ -2304,6 +2305,9 @@ export const ko_KR: EnTranslations = {
       "already_linked": "계정에 이미 연동된 Steam 계정이 있습니다.",
       "account_taken": "해당 Steam 계정은 이미 다른 계정에 연결되어 있습니다.",
       "upstream": "Steam이 응답하지 않습니다. 잠시 후 다시 시도해 주세요."
+    },
+    "welcome": {
+      "invalid_input": "입력이 올바르지 않습니다."
     }
   },
   "guide": {
@@ -2597,7 +2601,7 @@ export const ko_KR: EnTranslations = {
       "effectsTitle": "강화, 약화, 그리고 군중 제어",
       "effectsBody": "많은 능력이 일정 시간 남는 효과를 부여합니다. 이로운 효과(강화)는 능력치를 올리거나 보호막을 씌우거나 조금씩 치유해 주고, 해로운 효과(약화)는 지속 피해로 생명력을 깎거나 여러분을 약하게 만듭니다. 화면 위쪽 구석, 미니맵 옆의 작은 아이콘을 보고 무엇이 걸려 있고 얼마나 남았는지 확인하세요.",
       "ccBody": "군중 제어는 대상이 할 수 있는 행동을 제한하는 특별한 종류의 약화 효과입니다. 기절, 속박과 둔화, 주문 시전을 막는 침묵, 무장 해제, 공포, 그리고 잠시 적을 무력하게 만드는 변신이 있습니다. 다른 플레이어를 상대로는 군중 제어가 반복될수록 무뎌집니다. 같은 종류를 너무 빨리 다시 걸면 약해지다가 아예 걸리지 않게 되고, 은신에서 여는 기절은 그 뒤에 이어지는 기절과 따로 계산되므로, 누구도 영원히 무력하게 묶여 있을 수는 없습니다. 세계의 생명체들은 그런 앙심을 품지 않아, 군중 제어가 반복해도 그들에게는 결코 약해지지 않습니다. 다만 가장 강력한 적 다수, 이름을 지닌 정예와 그중에서도 가장 강한 우두머리들은 아예 군중 제어를 걸 수 없습니다.",
-      "metersBody": "싸움이 어땠는지 궁금하신가요? Z 키를 눌러 파티 미터기를 열면 파티의 피해량, 치유량, 위협 수준을 전투별로 집계해 보여줍니다.",
+      "metersBody": "싸움이 어땠는지 궁금하신가요? Shift+H 키를 눌러 파티 미터기를 열면 파티의 피해량, 치유량, 위협 수준을 전투별로 집계해 보여줍니다.",
       "queueTitle": "다음 한 수는 이미 장전되어 있습니다",
       "queueBody": "입력을 프레임 단위로 맞출 필요는 없습니다. 지금 능력을 시전하는 동안 다음 능력을 눌러 두면 예약되어, 시전이 끝나는 순간 곧바로 나갑니다. 그래서 손에 익은 플레이는 빈틈없이 흘러갑니다. 일부 근접 공격도 같은 방식으로, 다음 무기 휘두름에 실려 나갑니다.",
       "deathTitle": "쓰러졌을 때",
@@ -2658,7 +2662,7 @@ export const ko_KR: EnTranslations = {
       "petBarTerm": "소환수 바",
       "petBarDef": "사냥꾼이나 흑마법사의 소환수가 추가하는 명령 줄입니다. 공격, 정지, 도발, 방어, 공격적 상태가 있으며, 기본값으로 Ctrl과 1에서 5까지에 지정되어 있습니다.",
       "metersTerm": "피해 미터기",
-      "metersDef": "현재 전투의 파티 점수판 창입니다. 가한 피해, 치유량, 그리고 누가 가장 높은 위협을 지녔는지를 전투별로 기록합니다. 지정된 단축키(기본값 Z)로 엽니다.",
+      "metersDef": "현재 전투의 파티 점수판 창입니다. 가한 피해, 치유량, 그리고 누가 가장 높은 위협을 지녔는지를 전투별로 기록합니다. 지정된 단축키(기본값 Shift+H)로 엽니다.",
       "targetMarkerTerm": "대상 표식",
       "targetMarkerDef": "파티나 공격대 구성원 누구나 대상 위에 찍을 수 있는 표식으로, 모두가 같은 대상에 집중하거나 그 대상을 피하도록 해 줍니다. 여덟 가지 표식이 있으며, 표식 하나에 대상 하나입니다.",
       "loadoutTerm": "저장한 빌드",
@@ -2987,6 +2991,8 @@ export const ko_KR: EnTranslations = {
       "heroicRewardsTitle": "영웅의 징표와 업그레이드된 전리품",
       "heroicRewardsBody": "영웅 우두머리들은 익숙한 전리품을 업그레이드된 모습으로, 툴팁에 영웅 표시를 달고 떨어뜨리며, 매 공략의 마지막 우두머리는 다른 어디에서도 나오지 않는 영웅 등급 아이템을 더합니다. 그 마지막 처치는 참가자 전원에게 영웅의 징표도 남깁니다. 하이워치의 병참장교 벡스에게 쓰는 화폐로, 그가 갖춘 반지와 목걸이는 왕국의 유일한 장신구입니다.",
       "heroicLockoutBody": "일반 던전은 하루 종일 돌 수 있습니다. 영웅은 인내를 요구합니다. 각 던전은 하루에 한 번의 영웅 클리어만 보상하고, 공격대는 난이도마다 하루 단위의 잠금을 유지합니다. 이미 끝낸 공략은 그 파티에게는 언제나 열려 있으므로, 스스로 얻어 낸 전리품에서 잠겨 나가는 사람은 없습니다.",
+      "resetTitle": "인스턴스 초기화",
+      "resetBody": "파티가 인스턴스를 차지한 채로 난이도를 바꾸면, 이전에 차지한 인스턴스는 한동안 남아 있다가 저절로 정리됩니다. 파티장은 이를 곧바로 놓아줄 수도 있습니다. 자신의 초상화 메뉴에서 \"모든 인스턴스 초기화\"를 고르거나 /dungeon reset을 입력하면 됩니다. 초기화는 난이도를 실제로 바꾼 뒤에만, 그리고 살았든 쓰러졌든 아무도 인스턴스 안에 남아 있지 않을 때에만 이루어지며, 한 번의 초기화와 다음 초기화 사이에는 짧은 재사용 대기시간이 있습니다. 잘못된 난이도로 입구에 도착하면 공략이 시작되기 전에 게임이 알려 줍니다. 공격대는 이 방법으로 초기화되지 않으며, 공격대만의 잠금 규칙을 따릅니다.",
       "templeLoreTitle": "익사한 신전, 조금 더 깊이",
       "templeLoreBody": "이 신전에는 당신이 다른 곳에서 쫓는 교단보다 오래된 그만의 전설이 있습니다. 달빛을 들이마시고 익사자를 되돌려 주는 작은 호수, 글리머미어의 기슭에서 한 외로운 감시자가 창백한 빛의 관문을 지킵니다. 수면 아래로는 차가운 돌계단이 그곳까지 내려갑니다. 그곳에 가라앉은 이들은 불운으로 익사한 것이 아닙니다. 그들은 창백한 합창단이었고, 경배 속에 물밑으로 들어가 노래를 멈추지 않았습니다. 옛 수호자들은 물이 자신들을 삼키기 전에 바위에 단 하나의 경고를 새겼습니다. 익사한 달이라 부르던 무언가를 향한 기도였고, 그 아래에 한층 차분한 손길이 두 마디를 덧붙였습니다. 그것은 잠들어 있을 뿐.",
       "cryptLeadTitle": "죽은 자들이 닫아 두려 했던 문",
@@ -3194,7 +3200,7 @@ export const ko_KR: EnTranslations = {
       "qualityNote": "품질이 높을수록 대개 능력치가 더 좋지만, 품질은 규칙이 아니라 단서일 뿐입니다. 당신의 직업과 레벨에 잘 맞는 물건이 더 화려한 것을 이길 수도 있습니다.",
       "upgradeTitle": "장비를 늘 최신으로",
       "upgradeBody": "낡은 부위를 새 업그레이드로 바꾸는 것이, 이미 자라난 몸에 맞지 않는 장비로 완벽하게 플레이하는 것보다 당신에게 더 큰 도움이 됩니다. 더 좋은 것이 떨어지거나 퀘스트가 내어 줄 때 받으세요. 좋은 물건을 나중을 위해 아껴 두지 마세요.",
-      "itemLevelBody": "두 장비를 빠르게 비교하고 싶다면 옵션에서 아이템 레벨 표시를 켜십시오. 적과 퀘스트에서 세계를 누비며 얻은 장비에는 아이템 레벨이 표시되는데, 이는 출처를 바탕으로 대략적인 강함을 하나의 숫자로 나타낸 것입니다. 덕분에 서로 다른 부위라도 어느 쪽 업그레이드가 더 값어치 있는지 한눈에 알 수 있습니다. 그런 출처가 없는 물건, 이를테면 평범한 상인 기본품이나 초보용 장비에는 아이템 레벨이 표시되지 않으므로, 숫자가 없는 것은 결함이 아니라 정상입니다.",
+      "itemLevelBody": "두 장비를 빠르게 비교하고 싶다면 옵션에서 아이템 레벨 표시를 켜십시오. 적, 퀘스트, 제작 기술처럼 출처가 분명한 장비에는 아이템 레벨이 표시되는데, 이는 출처를 바탕으로 대략적인 강함을 하나의 숫자로 나타낸 것입니다. 덕분에 서로 다른 부위라도 어느 쪽 업그레이드가 더 값어치 있는지 한눈에 알 수 있습니다. 그런 출처가 없는 물건, 이를테면 평범한 상인 기본품이나 초보용 장비에는 아이템 레벨이 표시되지 않으므로, 숫자가 없는 것은 결함이 아니라 정상입니다.",
       "sourcesTitle": "장비는 어디서 나오는가",
       "sourcesBody": "초반 업그레이드 대부분은 퀘스트 보상이므로, 사냥을 반복하기보다 퀘스트를 끝내는 편이 이득입니다. 적은 처치하면 장비를 떨어뜨리고, 마을 상인은 든든한 기본 장비를 팔며, 제작자는 채집한 재료를 착용할 수 있는 장비로 바꾸고, 플레이어 시장에서는 다른 모험가에게서 살 수 있습니다. 그리고 성장의 정점에 이르면, 다른 어디에서도 구할 수 없는 장비를 파는 두 가지 증표 화폐가 기다립니다. 탐굴 증표는 탐굴 관리인에게, 영웅의 징표는 영웅 병참장교에게 씁니다.",
       "soulboundTitle": "귀속: 오직 당신의 것",
@@ -3238,7 +3244,7 @@ export const ko_KR: EnTranslations = {
       "craftRecipesTitle": "제작법과 재료",
       "craftRecipesBody": "각 제작법은 여러분이 채집하거나 구매하는 특정 재료를 필요로 한다. 가장 단순한 제작법은 일반 재료만으로 충분하며 처음부터 만들 수 있어, 전문직을 익히는 즉시 작업을 시작할 수 있다. 제작법 목록은 아직 채워지는 중이다. 몇몇 전문직은 첫 제작법을 기다리고 있으며, 전문직이 성장함에 따라 더 많은 제작법이 추가된다.",
       "craftHowTitle": "제작 창",
-      "craftHowBody": "제작 창(기본 키 T)을 열면 여러분이 아는 모든 제작법과 각각에 필요한 재료, 그리고 지금 지닌 재료를 볼 수 있다. 재료가 갖춰져 있으면 클릭 한 번으로 제작된다. 일반적인 제작법은 세계 어디에서나 만들 수 있다. 다만 몇몇 고급 도구 제작법은 하이워치의 제작 거점에 서 있어야 한다.",
+      "craftHowBody": "제작 창(기본 키 T)을 열면 여러분이 아는 모든 제작법과 각각에 필요한 재료, 그리고 지금 지닌 재료를 볼 수 있다. 재료가 갖춰져 있으면 클릭 한 번으로 제작된다. 일반적인 제작법은 세계 어디에서나 만들 수 있다. 다만 상위 도구와 희귀한 시전자 방어구를 비롯한 몇몇 고급 제작법은 하이워치의 제작 거점에 서 있어야 한다.",
       "craftMasteryTitle": "숙련도와 통달",
       "craftMasteryBody": "제작에 성공하면 해당 전문직의 숙련도가 오르며, 숙련도가 제작법을 잠가 두는 일은 결코 없다. 제작법을 알고 그 재료를 지녔다면 언제든 시도할 수 있다. 숙련도가 대신 안겨 주는 것은 품질이니, 손에 익은 솜씨일수록 더 뛰어난 결과물을 내놓는다. 유일한 예외는 조합 제작법으로, 열리기 전에 두 전문직 모두에서 실력을 입증하기를 요구한다.",
       "craftComboTitle": "조합 제작법",
@@ -5000,6 +5006,29 @@ export const ko_KR: EnTranslations = {
     "body": "게임 서비스를 재시작하고 있으며 Claudemoon은 곧 돌아올 예정입니다. 이 페이지는 자동으로 계속 확인합니다.",
     "status": "곧 돌아옵니다"
   },
+  "welcome": {
+    "back": "다시 오신 것을 환영합니다, {name}",
+    "level": "레벨 {level}",
+    "lastPlayed": "마지막 플레이: {when}",
+    "continue": "월드 입장",
+    "continueHint": "Enter로 계속, Esc로 건너뛰기",
+    "continueHintTouch": "탭하여 계속",
+    "discord": {
+      "title": "커뮤니티는 Discord에서 활동합니다",
+      "sub": "패치 미리보기, 이벤트, 개발자 채팅, 연동 시 보너스 은행 슬롯 2개.",
+      "join": "Discord에 참여하기"
+    },
+    "chest": {
+      "ready": "일일 상자 준비 완료"
+    },
+    "armory": {
+      "cta": "무기고 둘러보기"
+    },
+    "news": {
+      "new": "신규",
+      "viewAll": "GitHub에서 모든 업데이트 보기"
+    }
+  },
   "hud": {
     "core": {
       "elite": "정예",
@@ -6528,7 +6557,7 @@ export const ko_KR: EnTranslations = {
       },
       "tigers_fury": {
         "name": "늑대의 피",
-        "description": "전투력을 6초 동안 40만큼 증가시킵니다. 늑대 변신 전용."
+        "description": "전투력을 {duration}초 동안 {buff}만큼 증가시킵니다. 늑대 변신 전용."
       },
       "rip": {
         "name": "찢기",
@@ -6819,6 +6848,24 @@ export const ko_KR: EnTranslations = {
       },
       "eastbrook_wool_trousers": {
         "name": "이스트브룩 양모 바지"
+      },
+      "eastbrook_ritual_vestments": {
+        "name": "이스트브룩 의식 예복"
+      },
+      "eastbrook_druids_hide": {
+        "name": "이스트브룩 드루이드 가죽"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "이스트브룩 방호 각반"
+      },
+      "wardweave_cowl": {
+        "name": "워드위브 두건"
+      },
+      "duskhide_wraps": {
+        "name": "더스크하이드 손목보호대"
+      },
+      "sootscale_mantle": {
+        "name": "수트스케일 망토"
       },
       "gravecaller_blade": {
         "name": "무덤부름 넓은날검"
