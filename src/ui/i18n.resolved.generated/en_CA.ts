@@ -6620,7 +6620,7 @@ export const en_CA: EnTranslations = {
       },
       "shadowform": {
         "name": "Gloamveil Form",
-        "description": "Assume a Shadowform, increasing your Shadow damage by 15 and empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)"
+        "description": "Assume a Shadowform, increasing your Shadow damage by 15% and empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)"
       },
       "elemental_mastery": {
         "name": "Primal Mastery",
@@ -6636,7 +6636,7 @@ export const en_CA: EnTranslations = {
       },
       "moonkin_form": {
         "name": "Moonwing Form",
-        "description": "Shapeshift into a fearsome Moonkin, increasing your spell damage by 20% and your armor by 50%. Lasts until you shift out. Cast again to return to caster form. (Balance signature)"
+        "description": "Shapeshift into a fearsome Moonkin, increasing your spell damage by 15% and your armor by 50%. Lasts until you shift out. Cast again to return to caster form. (Balance signature)"
       },
       "feral_charge": {
         "name": "Primal Surge",

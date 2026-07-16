@@ -1287,7 +1287,7 @@ const classAbilityNamesEn = {
       [
         'shadowform',
         'Gloamveil Form',
-        'Assume a Shadowform, increasing your Shadow damage by 15 and empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)',
+        'Assume a Shadowform, increasing your Shadow damage by 15% and empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)',
       ],
       [
         'elemental_mastery',
@@ -1307,7 +1307,7 @@ const classAbilityNamesEn = {
       [
         'moonkin_form',
         'Moonwing Form',
-        'Shapeshift into a fearsome Moonkin, increasing your spell damage by 20% and your armor by 50%. Lasts until you shift out. Cast again to return to caster form. (Balance signature)',
+        'Shapeshift into a fearsome Moonkin, increasing your spell damage by 15% and your armor by 50%. Lasts until you shift out. Cast again to return to caster form. (Balance signature)',
       ],
       [
         'feral_charge',

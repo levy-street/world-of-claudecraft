@@ -11,9 +11,9 @@ import { spellDamageMultFromAuras } from '../src/sim/combat/spell_combat';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
 import { computeTalentModifiers } from '../src/sim/content/talents';
 import { MOBS } from '../src/sim/data';
-import { createMob } from '../src/sim/entity';
+import { createMob, recalcPlayerStats } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
-import type { Aura, Entity } from '../src/sim/types';
+import type { Aura, Entity, PlayerClass } from '../src/sim/types';
 
 describe('mastery does not corrupt utility rate buffs (F1)', () => {
   it("an Elemental shaman's spell-damage mastery leaves Ghost Wolf's 1.4x speed intact", () => {
@@ -202,16 +202,120 @@ describe('Balance druid permanent spell-damage stack matches the priest template
       duration: 3600,
       sourceId: 0,
     } as Aura);
-    expect(spellDamageMultFromAuras(p)).toBeCloseTo(1.15);
+    expect(spellDamageMultFromAuras(p)).toBe(1.15);
   });
 
   it('the Moonrage mastery grants +10% spell damage (not +15%)', () => {
     // The spec mastery folds into the flat global mods at allocation time. With no talent
     // points spent, the balance mastery is the only contributor to global spell damage.
     const mods = computeTalentModifiers('druid', { spec: 'balance', ranks: {}, choices: {} }, 20);
-    expect(mods.global.spellDmgPct ?? 0).toBeCloseTo(0.1);
+    expect(mods.global.spellDmgPct ?? 0).toBe(0.1);
     // Haste is unchanged by this pass.
-    expect(mods.global.spellHastePct ?? 0).toBeCloseTo(0.1);
+    expect(mods.global.spellHastePct ?? 0).toBe(0.1);
+  });
+
+  it('the two levers COMPOSE on one cast: specced-in-form vs specless is ~1.265x, not 1.38x', () => {
+    // End-to-end stack proof through the real cast pipeline: a Lunar Tempest (instant, so
+    // the mastery's haste cannot shift the cast tick) from a balance druid in Moonkin Form
+    // vs the identical specless druid on the SAME seed. The mastery (+10%) scales the
+    // resolved effect min/max at cast; the form (+15%) multiplies per hit in
+    // effect_dispatch, so the composed hit is 1.10 x 1.15 = ~1.265x the baseline, where
+    // the pre-fix pair (form 1.20 x mastery 1.15) landed at ~1.38x.
+    //
+    // Determinism: neither setSpec nor the pushed auras draw rng and no tick runs before
+    // the cast, so both sims' rng streams stay draw-for-draw aligned through the bolt's
+    // landing tick and the base damage rolls share the same uniform draw. Rank-3 Lunar
+    // Tempest rolls range(28, 34); the mastery-resolved copy rolls range(31, 37) (same
+    // width 6), so the specced roll is EXACTLY the specless roll + 3 before the form's
+    // 1.15x.
+    const drive = (specced: boolean): number => {
+      const sim = new Sim({ seed: 7, playerClass: 'druid', autoEquip: false });
+      sim.setPlayerLevel(20);
+      if (specced) expect(sim.setSpec('balance')).toBe(true);
+      const p = sim.entities.get(sim.playerId) as Entity;
+      p.facing = 0;
+      p.maxHp = p.hp = 5_000_000;
+      p.resource = p.maxResource;
+      // Cancel the int-derived Spell Power rider (it is mastery-exempt, so it would
+      // dilute the headline ratio) and force crits off; BOTH druids get both auras.
+      p.auras.push({
+        kind: 'buff_spellpower',
+        name: 'test-no-sp',
+        value: -100000,
+        remaining: 60,
+        duration: 60,
+        sourceId: p.id,
+        school: 'arcane',
+      } as Aura);
+      p.auras.push({
+        kind: 'buff_spellcrit',
+        name: 'test-no-crit',
+        value: -5,
+        remaining: 60,
+        duration: 60,
+        sourceId: p.id,
+        school: 'arcane',
+      } as Aura);
+      if (specced) {
+        // The form toggle is rng-free; push the aura directly (the signature test above
+        // covers the castAbility path) so the two rng streams stay aligned.
+        p.auras.push({
+          kind: 'form_moonkin',
+          name: 'Moonwing Form',
+          value: 0,
+          remaining: 3600,
+          duration: 3600,
+          sourceId: p.id,
+        } as Aura);
+      }
+      // Fold the pushed auras into the derived stats now (recalc floors Spell Power at
+      // 0), the same recalc the sim runs when an aura is gained through a cast.
+      const meta = (sim as unknown as { players: Map<number, { cls: PlayerClass }> }).players.get(
+        sim.playerId,
+      ) as {
+        cls: PlayerClass;
+        equipment: Record<string, string>;
+        equipmentInstance: Record<string, unknown>;
+      };
+      recalcPlayerStats(
+        p,
+        meta.cls,
+        meta.equipment as never,
+        (sim as unknown as { playerMods(m: unknown): undefined }).playerMods(meta),
+        meta.equipmentInstance as never,
+      );
+      expect(p.spellPower).toBe(0);
+      const dummy = createMob(
+        (sim as unknown as { nextId: number }).nextId++,
+        MOBS.ridge_stalker,
+        20,
+        { x: p.pos.x, y: p.pos.y, z: p.pos.z + 3 },
+      );
+      dummy.maxHp = dummy.hp = 5_000_000;
+      dummy.hostile = true;
+      (sim as unknown as { addEntity(e: Entity): void }).addEntity(dummy);
+      sim.targetEntity(dummy.id, sim.playerId);
+      sim.castAbility('moonfire', sim.playerId);
+      // 1 s: enough for the bolt to land (3 yd at 26 yd/s), short enough that the rider
+      // DoT (first tick 3 s after application) contributes nothing; only the direct hit
+      // is measured.
+      for (let i = 0; i < 20; i++) sim.tick();
+      return dummy.maxHp - dummy.hp;
+    };
+    const plain = drive(false);
+    const stacked = drive(true);
+    // Specless: round(roll), roll in [28, 34] (rider and crit are cancelled).
+    expect(plain).toBeGreaterThanOrEqual(28);
+    expect(plain).toBeLessThanOrEqual(34);
+    // The composed prediction, exact up to two roundings: specced roll = specless roll
+    // + 3, then the form's 1.15x per-hit multiplier. round() slop on plain (0.5 * 1.15)
+    // plus on stacked (0.5) bounds the error at 1.075.
+    expect(Math.abs(stacked - (plain + 3) * 1.15)).toBeLessThanOrEqual(1.1);
+    // And the headline ratio: ~1.265 (1.10 mastery x 1.15 form), decisively below the
+    // pre-fix ~1.38 and above either lever alone.
+    const ratio = stacked / plain;
+    expect(ratio).toBeGreaterThan(1.2);
+    expect(ratio).toBeLessThan(1.31);
   });
 });
 
@@ -328,7 +432,7 @@ describe('caster mastery outliers trimmed to sibling parity', () => {
     // outlier matching the pre-fix balance druid. The mastery now carries only dotDmgPct, so
     // the form is the general shadow multiplier and the mastery is the DoT specialization.
     const mods = computeTalentModifiers('priest', { spec: 'shadow', ranks: {}, choices: {} }, 20);
-    expect(mods.global.dotDmgPct ?? 0).toBeCloseTo(0.15);
+    expect(mods.global.dotDmgPct ?? 0).toBe(0.15);
     expect(mods.global.spellDmgPct ?? 0).toBe(0);
   });
 
