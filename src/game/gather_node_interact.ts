@@ -6,15 +6,13 @@
 // handlePickedEntity): DOM/Three-free so tests/gather_node_interact.test.ts
 // drives it directly, main.ts is the thin consumer.
 //
-// Range mirrors the object/corpse interact tolerance in interactions.ts
-// (INTERACT_RANGE + 1, a touch past the sim's own INTERACT_RANGE gate in
-// src/sim/professions/gathering.ts harvestNode, so a legitimate click at the
-// edge of range is not flagged too-far by the client a tick before the
-// player's position update lands). Readiness (`ready`) is per-VIEWER, from
+// Range mirrors the sim's authoritative INTERACT_RANGE gate in
+// src/sim/professions/gathering.ts harvestNode. Readiness (`ready`) is per-VIEWER, from
 // IWorldProfessions#nodeHarvestableByMe: the caller resolves it fresh, this
 // core never caches it.
 
 import { dist2d, INTERACT_RANGE } from '../sim/types';
+import type { InteractionOutcome } from './interaction_autorun';
 
 export type GatherNodeVerdict = 'too_far' | 'not_ready' | 'harvest';
 
@@ -24,14 +22,14 @@ export function decideGatherNodeAction(
   ready: boolean,
 ): GatherNodeVerdict {
   const d = dist2d(playerPos, { x: nodePos.x, y: playerPos.y, z: nodePos.z });
-  if (d > INTERACT_RANGE + 1) return 'too_far';
+  if (d > INTERACT_RANGE) return 'too_far';
   if (!ready) return 'not_ready';
   return 'harvest';
 }
 
 export interface GatherNodeInteractWorld {
   nodeHarvestableByMe(nodeId: string): boolean;
-  harvestNode(nodeId: string): void;
+  harvestNode(nodeId: string): InteractionOutcome;
 }
 
 export interface GatherNodeInteractHud {
@@ -50,7 +48,7 @@ export function handleGatherNodeInteract(
   nodePos: { x: number; z: number },
   tooFarText: string,
   notReadyText: string,
-): boolean {
+): InteractionOutcome {
   const verdict = decideGatherNodeAction(playerPos, nodePos, world.nodeHarvestableByMe(nodeId));
   if (verdict === 'too_far') {
     hud.showError(tooFarText);
@@ -60,6 +58,5 @@ export function handleGatherNodeInteract(
     hud.showError(notReadyText);
     return false;
   }
-  world.harvestNode(nodeId);
-  return true;
+  return world.harvestNode(nodeId);
 }

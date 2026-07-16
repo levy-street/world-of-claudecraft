@@ -1330,6 +1330,11 @@ export class ClientWorld implements IWorld {
   profanityWords: string[] = [];
   private profanityDirty = false;
   private pendingQuestCommands = new Map<string, 'accept' | 'turnin'>();
+  private nextCommandOutcomeId = 1;
+  private pendingCommandOutcomes = new Map<
+    number,
+    { resolve: (succeeded: boolean) => void; timeout: ReturnType<typeof setTimeout> }
+  >();
   private mouselookFacing: number | null = null;
   private sendTimer: number | undefined;
   private lastInputSentAt = 0;
@@ -1416,6 +1421,7 @@ export class ClientWorld implements IWorld {
   // 'error' frame, handled in onMessage, which sets sessionEnded).
   private socketClosed(): void {
     this.connected = false;
+    this.failPendingCommandOutcomes();
     if (this.sessionEnded) return;
     // A pending reconnect timer means this close is a duplicate signal of the
     // SAME physical drop: on the zombie-socket path the visibility handler
@@ -1451,6 +1457,7 @@ export class ClientWorld implements IWorld {
 
   private endSession(): void {
     this.sessionEnded = true;
+    this.failPendingCommandOutcomes();
     clearInterval(this.sendTimer);
     if (this.reconnectTimer !== undefined) clearTimeout(this.reconnectTimer);
     if (typeof document !== 'undefined') {
@@ -1590,6 +1597,44 @@ export class ClientWorld implements IWorld {
     this.rawCmd(payload);
   }
 
+  private cmdWithOutcome(
+    payload: { cmd: ClientCommand } & Record<string, unknown>,
+  ): Promise<boolean> {
+    if (typeof this.spectating === 'string' || !this.canSendCommand()) {
+      return Promise.resolve(false);
+    }
+    if (!this.pendingCommandOutcomes) this.pendingCommandOutcomes = new Map();
+    const rid = this.nextCommandOutcomeId ?? 1;
+    this.nextCommandOutcomeId = rid >= Number.MAX_SAFE_INTEGER ? 1 : rid + 1;
+    return new Promise<boolean>((resolve) => {
+      const timeout = setTimeout(() => {
+        const pending = this.pendingCommandOutcomes?.get(rid);
+        if (!pending) return;
+        this.pendingCommandOutcomes.delete(rid);
+        pending.resolve(false);
+      }, 5000);
+      this.pendingCommandOutcomes.set(rid, { resolve, timeout });
+      this.rawCmd({ ...payload, rid });
+    });
+  }
+
+  private resolveCommandOutcome(rid: number, succeeded: boolean): void {
+    const pending = this.pendingCommandOutcomes?.get(rid);
+    if (!pending) return;
+    clearTimeout(pending.timeout);
+    this.pendingCommandOutcomes.delete(rid);
+    pending.resolve(succeeded);
+  }
+
+  private failPendingCommandOutcomes(): void {
+    if (!this.pendingCommandOutcomes) return;
+    for (const pending of this.pendingCommandOutcomes.values()) {
+      clearTimeout(pending.timeout);
+      pending.resolve(false);
+    }
+    this.pendingCommandOutcomes.clear();
+  }
+
   /** Raw WS command — used by dev scripts and browser console when online. */
   devCmd(payload: Record<string, unknown>): void {
     this.rawCmd(payload);
@@ -1600,6 +1645,15 @@ export class ClientWorld implements IWorld {
     try {
       msg = JSON.parse(raw);
     } catch {
+      return;
+    }
+    if (
+      msg.t === 'commandOutcome' &&
+      Number.isSafeInteger(msg.rid) &&
+      msg.rid > 0 &&
+      typeof msg.ok === 'boolean'
+    ) {
+      this.resolveCommandOutcome(msg.rid, msg.ok);
       return;
     }
     if (msg.t === 'hello') {
@@ -1640,6 +1694,7 @@ export class ClientWorld implements IWorld {
       return;
     }
     if (msg.t === 'spectate') {
+      if (typeof msg.name === 'string') this.failPendingCommandOutcomes();
       this.spectating = typeof msg.name === 'string' ? msg.name : null;
       this.spectateFacingPending = true;
       this.pendingSpectateFacing = null;
@@ -2351,8 +2406,8 @@ export class ClientWorld implements IWorld {
   resurrectAtCorpse(): void {
     this.cmd({ cmd: 'resurrect_corpse' });
   }
-  resurrectAtSpiritHealer(): void {
-    this.cmd({ cmd: 'resurrect_healer' });
+  resurrectAtSpiritHealer(): Promise<boolean> {
+    return this.cmdWithOutcome({ cmd: 'resurrect_healer' });
   }
 
   // --- IWorldTargeting: target selection + tab cycling ---
@@ -2386,8 +2441,8 @@ export class ClientWorld implements IWorld {
   interact(): void {
     this.cmd({ cmd: 'interact' });
   }
-  lootCorpse(id: number): void {
-    this.cmd({ cmd: 'loot', id });
+  lootCorpse(id: number): Promise<boolean> {
+    return this.cmdWithOutcome({ cmd: 'loot', id });
   }
   autoLoot(id: number): void {
     this.cmd({ cmd: 'autoloot', id });
@@ -2408,8 +2463,8 @@ export class ClientWorld implements IWorld {
   lootRollGroupStatus(): LootRollGroupStatus[] {
     return this.lootRollGroup;
   }
-  pickUpObject(id: number): void {
-    this.cmd({ cmd: 'pickup', id });
+  pickUpObject(id: number): Promise<boolean> {
+    return this.cmdWithOutcome({ cmd: 'pickup', id });
   }
   acceptQuest(questId: string): void {
     if (!this.canSendCommand()) return;
@@ -2465,8 +2520,8 @@ export class ClientWorld implements IWorld {
   buyItem(npcId: number, itemId: string): void {
     this.cmd({ cmd: 'buy', npc: npcId, item: itemId });
   }
-  harvestNode(nodeId: string): void {
-    this.cmd({ cmd: 'harvest_node', node: nodeId });
+  harvestNode(nodeId: string): Promise<boolean> {
+    return this.cmdWithOutcome({ cmd: 'harvest_node', node: nodeId });
   }
   craftItem(recipeId: string): void {
     this.cmd({ cmd: 'craft_item', recipe: recipeId });
@@ -2984,11 +3039,11 @@ export class ClientWorld implements IWorld {
   // countdown locally so it ticks without traffic. enter_crypt/leave_crypt are legacy
   // dispatch-only aliases ClientWorld never sends (the enterCrypt/leaveCrypt helpers
   // below just forward to enterDungeon/leaveDungeon). ---
-  enterDungeon(dungeonId: string): void {
-    this.cmd({ cmd: 'enter_dungeon', dungeon: dungeonId });
+  enterDungeon(dungeonId: string): Promise<boolean> {
+    return this.cmdWithOutcome({ cmd: 'enter_dungeon', dungeon: dungeonId });
   }
-  leaveDungeon(): void {
-    this.cmd({ cmd: 'leave_dungeon' });
+  leaveDungeon(): Promise<boolean> {
+    return this.cmdWithOutcome({ cmd: 'leave_dungeon' });
   }
   dungeonDifficulty(): DungeonDifficulty {
     return this.selectedDungeonDifficulty ?? 'normal';
@@ -3023,8 +3078,8 @@ export class ClientWorld implements IWorld {
   leaveDelve(): void {
     this.cmd({ cmd: 'leave_delve' });
   }
-  delveInteract(objectId: number): void {
-    this.cmd({ cmd: 'delve_interact', objectId });
+  delveInteract(objectId: number): Promise<boolean> {
+    return this.cmdWithOutcome({ cmd: 'delve_interact', objectId });
   }
   companionUpgrade(companionId: string): void {
     this.cmd({ cmd: 'companion_upgrade', companionId });

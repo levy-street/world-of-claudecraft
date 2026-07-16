@@ -190,29 +190,29 @@ export function enterDungeon(
   // so a lone tester can zone into the raid. Dev-gated (never in production). The
   // raid LOCKOUT is deliberately NOT bypassed (use /dev raid reset for that).
   devBypass = false,
-): void {
+): boolean {
   const r = ctx.resolve(pid);
   const dungeon = DUNGEONS[dungeonId];
-  if (!r || !dungeon) return;
+  if (!r || !dungeon) return false;
   const bypass = devBypass && ctx.devCommands;
   // A living player enters normally; a ghost that has run its spirit back re-enters to
   // resurrect at the entrance (below). A fresh corpse (dead, spirit not yet released)
   // cannot move, so it never reaches the door.
-  if (r.e.dead && !r.e.ghost) return;
+  if (r.e.dead && !r.e.ghost) return false;
   const party = ctx.partyOf(r.meta.entityId);
   const raidAllowed = RAID_ALLOWED_DUNGEON_IDS.has(dungeonId);
   const raidRequired = RAID_REQUIRED_DUNGEON_IDS.has(dungeonId);
   if (party?.raid && !raidAllowed) {
     ctx.error(r.meta.entityId, 'Raid groups cannot enter standard dungeons.');
-    return;
+    return false;
   }
   if (!party?.raid && raidRequired && !bypass) {
     ctx.error(r.meta.entityId, 'You must convert your party to a raid group first.');
-    return;
+    return false;
   }
   if (dungeonId === 'nythraxis_boss_arena' && !canEnterNythraxisRaid(r.meta) && !bypass) {
     ctx.error(r.meta.entityId, 'The royal door is sealed to you.');
-    return;
+    return false;
   }
   if (dungeonId === 'nythraxis_boss_arena') {
     const engaged = ctx.instances.find(
@@ -220,7 +220,7 @@ export function enterDungeon(
     );
     if (engaged && nythraxisInstanceSealed(ctx, engaged)) {
       ctx.error(r.meta.entityId, 'Nythraxis is engaged — the royal door has sealed shut.');
-      return;
+      return false;
     }
   }
   const key = instanceKeyFor(ctx, r.meta.entityId);
@@ -247,7 +247,7 @@ export function enterDungeon(
           ? `You are locked to Heroic ${dungeon.name}.`
           : 'You are locked to Nythraxis Raid Arena.',
       );
-      return;
+      return false;
     }
   }
   // A locked player may walk back into a LIVE heroic claim only when its final
@@ -267,7 +267,7 @@ export function enterDungeon(
     (heroicFinalBossAlive(ctx, inst) || !inst.clearedBy.has(r.meta.entityId))
   ) {
     ctx.error(r.meta.entityId, `You are locked to Heroic ${dungeon.name}.`);
-    return;
+    return false;
   }
   // Party ids are intentionally ephemeral. During a reset cooldown, every durable
   // owner may re-enter only the exact replacement claim created by that reset.
@@ -286,7 +286,7 @@ export function enterDungeon(
       : undefined;
   if (conflictingResetLock) {
     ctx.error(r.meta.entityId, 'Instances can only be reset once every 5 minutes.');
-    return;
+    return false;
   }
   // The claim-wins rule above is silent, and silence is exactly the reported
   // confusion: a player who toggled the selection and walked back in landed in
@@ -305,12 +305,12 @@ export function enterDungeon(
     // never gated.
     if (difficulty === 'heroic' && isRaidLocked(ctx, r.meta, heroicLockoutId(dungeonId))) {
       ctx.error(r.meta.entityId, `You are locked to Heroic ${dungeon.name}.`);
-      return;
+      return false;
     }
     inst = ctx.instances.find((i) => i.dungeonId === dungeonId && i.partyKey === null);
     if (!inst) {
       ctx.error(r.meta.entityId, `All instances of ${dungeon.name} are busy. Try again soon.`);
-      return;
+      return false;
     }
     claimInstance(ctx, inst, key, difficulty);
   }
@@ -358,6 +358,7 @@ export function enterDungeon(
   ctx.emit({ type: 'log', text: dungeon.enterText, color: '#b9f', pid: r.meta.entityId });
   // Stepping through the moongate is a Chronicle task.
   if (dungeonId === 'drowned_temple') ctx.markVisited(r.meta, 'dungeon:drowned_temple');
+  return true;
 }
 
 function canEnterNythraxisRaid(meta: PlayerMeta): boolean {
@@ -432,23 +433,23 @@ function defeatedNythraxisCorpseRunClaim(
   return inst;
 }
 
-export function leaveDungeon(ctx: SimContext, pid?: number): void {
+export function leaveDungeon(ctx: SimContext, pid?: number): boolean {
   const r = ctx.resolve(pid);
   // A fresh corpse cannot move, but a released ghost crossing the nested Nythraxis
   // approach must be able to backtrack outside if its arena claim becomes unavailable.
-  if (!r || (r.e.dead && !r.e.ghost)) return;
+  if (!r || (r.e.dead && !r.e.ghost)) return false;
   const p = r.e;
   // not inside any instance: nothing to leave (no DUNGEON_LIST[0] fallback —
   // that silently teleported outdoor callers to the Hollow Crypt door)
   const dungeon = dungeonAt(p.pos.x);
-  if (!dungeon) return;
+  if (!dungeon) return false;
   if (dungeon.id === 'nythraxis_boss_arena') {
     const inst = ctx.instances.find(
       (i) => i.dungeonId === dungeon.id && i.partyKey === instanceKeyFor(ctx, p.id),
     );
     if (inst && nythraxisInstanceSealed(ctx, inst)) {
       ctx.error(r.meta.entityId, 'The royal door is sealed — Nythraxis must fall first.');
-      return;
+      return false;
     }
   }
   p.pos = ctx.groundPos(dungeon.doorPos.x, dungeon.doorPos.z - 4);
@@ -457,6 +458,7 @@ export function leaveDungeon(ctx: SimContext, pid?: number): void {
   p.targetId = null;
   p.autoAttack = false;
   ctx.emit({ type: 'log', text: dungeon.leaveText, color: '#b9f', pid: r.meta.entityId });
+  return true;
 }
 
 // Legacy single-dungeon entry points (tests + scripts use these).

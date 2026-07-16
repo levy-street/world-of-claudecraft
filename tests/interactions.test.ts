@@ -9,7 +9,7 @@ import {
   isAttackHoverTarget,
   shouldApproachPickedEntity,
 } from '../src/game/interactions';
-import type { Entity } from '../src/sim/types';
+import { type Entity, INTERACT_RANGE } from '../src/sim/types';
 
 function stubEntity(partial: Partial<Entity> & Pick<Entity, 'id' | 'kind'>): Entity {
   return {
@@ -418,9 +418,18 @@ describe('handlePickedEntity', () => {
         [2, object],
       ]),
       targetEntity: () => {},
-      enterDungeon: () => calls.push('enterDungeon'),
-      leaveDungeon: () => calls.push('leaveDungeon'),
-      pickUpObject: () => calls.push('pickUpObject'),
+      enterDungeon: () => {
+        calls.push('enterDungeon');
+        return true;
+      },
+      leaveDungeon: () => {
+        calls.push('leaveDungeon');
+        return true;
+      },
+      pickUpObject: () => {
+        calls.push('pickUpObject');
+        return true;
+      },
     } as unknown as Parameters<typeof handlePickedEntity>[0];
     const hud = {
       openMailbox: () => calls.push('openMailbox'),
@@ -429,6 +438,32 @@ describe('handlePickedEntity', () => {
 
     expect(handlePickedEntity(world, hud, 2, button as number, 10, 20)).toBe(true);
     expect(calls).toEqual([expected]);
+  });
+
+  it('returns a rejected authoritative pickup result', async () => {
+    const player = stubEntity({ id: 1, kind: 'player' });
+    const object = stubEntity({
+      id: 2,
+      kind: 'object',
+      lootable: true,
+      pos: { x: 1, y: 0, z: 0 },
+    });
+    const world = {
+      playerId: 1,
+      player,
+      entities: new Map([
+        [1, player],
+        [2, object],
+      ]),
+      targetEntity: () => {},
+      pickUpObject: vi.fn(async () => false),
+    } as unknown as Parameters<typeof handlePickedEntity>[0];
+    const hud = {
+      closeContextMenu: () => {},
+    } as unknown as Parameters<typeof handlePickedEntity>[1];
+
+    await expect(handlePickedEntity(world, hud, 2, 0, 10, 20)).resolves.toBe(false);
+    expect(world.pickUpObject).toHaveBeenCalledWith(2);
   });
 
   it('targets and starts auto-attack on a hostile mob on right-click', () => {
@@ -530,11 +565,20 @@ describe('handlePickedEntity while dead (the ghost/death loop)', () => {
       duelInfo: null,
       arenaInfo: null,
       targetEntity: () => {},
-      enterDungeon: () => calls.push('enterDungeon'),
-      leaveDungeon: () => {},
-      pickUpObject: () => calls.push('pickUpObject'),
+      enterDungeon: () => {
+        calls.push('enterDungeon');
+        return true;
+      },
+      leaveDungeon: () => true,
+      pickUpObject: () => {
+        calls.push('pickUpObject');
+        return true;
+      },
       startAutoAttack: () => {},
-      resurrectAtSpiritHealer: () => calls.push('resurrectAtSpiritHealer'),
+      resurrectAtSpiritHealer: () => {
+        calls.push('resurrectAtSpiritHealer');
+        return true;
+      },
     };
     const hud = {
       openLoot: () => calls.push('openLoot'),
@@ -677,6 +721,17 @@ describe('shouldApproachPickedEntity', () => {
     expect(shouldApproachPickedEntity(player, distantNpc, false)).toBe(true);
     expect(shouldApproachPickedEntity(player, hostile, false)).toBe(true);
     expect(shouldApproachPickedEntity(player, distantCorpse, false)).toBe(true);
+  });
+
+  it('approaches an object outside the authoritative interaction range while confirmation is pending', () => {
+    const object = stubEntity({
+      id: 2,
+      kind: 'object',
+      lootable: true,
+      pos: { x: INTERACT_RANGE + 0.5, y: 0, z: 0 },
+    });
+
+    expect(shouldApproachPickedEntity(player, object, false)).toBe(true);
   });
 
   it('approaches distant harvest remains only when the host mirrors claim state', () => {

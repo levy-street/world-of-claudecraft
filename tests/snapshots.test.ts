@@ -3410,3 +3410,70 @@ describe('client mirror of the server tick rate', () => {
     expect(client.serverTickHz).toBe(20);
   });
 });
+
+describe('authoritative interaction command outcomes', () => {
+  it.each([
+    ['loot', { id: -1 }],
+    ['pickup', { id: -1 }],
+    ['harvest_node', {}],
+    ['enter_dungeon', {}],
+    ['leave_dungeon', {}],
+    ['delve_interact', {}],
+  ])('reports a rejected %s command to the requesting client', (cmd, payload) => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Interactor');
+    fc.sent.length = 0;
+    const rid = 41;
+
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd, ...payload, rid }));
+
+    expect(fc.sent).toContainEqual({ t: 'commandOutcome', rid, ok: false });
+  });
+
+  it('reports a successful command to the requesting client', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Interactor');
+    fc.sent.length = 0;
+
+    const player = server.sim.entities.get(session.pid)!;
+    player.dead = true;
+    player.ghost = false;
+    player.hp = 0;
+    server.sim.releaseSpirit(session.pid);
+    expect(player.ghost).toBe(true);
+
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'resurrect_healer', rid: 42 }));
+    expect(fc.sent).toContainEqual({ t: 'commandOutcome', rid: 42, ok: true });
+    expect(player.dead).toBe(false);
+  });
+
+  it('forwards a valid pickup payload and reports the resulting world change', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Interactor');
+    const player = server.sim.entities.get(session.pid)!;
+    const object = [...server.sim.entities.values()].find(
+      (entity) =>
+        entity.kind === 'object' && entity.objectItemId === 'supply_crate' && entity.lootable,
+    )!;
+    server.sim.players.get(session.pid)!.questLog.set('q_supplies', {
+      questId: 'q_supplies',
+      counts: [0],
+      state: 'active',
+    });
+    player.pos = { ...object.pos };
+    player.prevPos = { ...object.pos };
+    fc.sent.length = 0;
+
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'pickup', id: object.id, rid: 43 }),
+    );
+
+    expect(fc.sent).toContainEqual({ t: 'commandOutcome', rid: 43, ok: true });
+    expect(server.sim.countItem('supply_crate', session.pid)).toBe(1);
+    expect(object.lootable).toBe(false);
+  });
+});

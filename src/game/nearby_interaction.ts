@@ -1,19 +1,20 @@
 import { dist2d, type Entity, type GatherNodeDef, INTERACT_RANGE } from '../sim/types';
 import { corpseLootAvailability } from './corpse_loot_availability';
 import { handleGatherNodeInteract } from './gather_node_interact';
+import type { InteractionOutcome } from './interaction_autorun';
 
 export interface NearbyInteractionWorld {
   player: Entity;
   playerId?: number;
   entities: ReadonlyMap<number, Entity>;
-  lootCorpse(id: number): void;
-  delveInteract(id: number): void;
-  enterDungeon(dungeonId: string): void;
-  leaveDungeon(): void;
-  pickUpObject(id: number): void;
-  resurrectAtSpiritHealer(): void;
+  lootCorpse(id: number): InteractionOutcome;
+  delveInteract(id: number): InteractionOutcome;
+  enterDungeon(dungeonId: string): InteractionOutcome;
+  leaveDungeon(): InteractionOutcome;
+  pickUpObject(id: number): InteractionOutcome;
+  resurrectAtSpiritHealer(): InteractionOutcome;
   nodeHarvestableByMe(nodeId: string): boolean;
-  harvestNode(nodeId: string): void;
+  harvestNode(nodeId: string): InteractionOutcome;
 }
 
 export interface NearbyInteractionHud {
@@ -33,7 +34,8 @@ export function tryNearbyInteraction(
   tooFarText: string,
   notReadyText: string,
   nothingToInteractText: string,
-): boolean {
+  harvestStateReliable = true,
+): InteractionOutcome {
   const player = world.player;
   const playerId = world.playerId ?? player.id;
   let bestCorpse: number | null = null;
@@ -68,7 +70,7 @@ export function tryNearbyInteraction(
       entity.kind === 'mob' &&
       entity.dead &&
       entity.lootable &&
-      corpseLootAvailability(entity, playerId).hasLoot &&
+      corpseLootAvailability(entity, playerId, harvestStateReliable).hasLoot &&
       distance < bestCorpseDistance
     ) {
       bestCorpse = entity.id;
@@ -96,32 +98,30 @@ export function tryNearbyInteraction(
   }
 
   if (bestCorpse !== null) {
-    world.lootCorpse(bestCorpse);
-    return true;
+    return world.lootCorpse(bestCorpse);
   }
   if (bestDelve !== null) {
-    world.delveInteract(bestDelve);
-    return true;
+    return world.delveInteract(bestDelve);
   }
   if (bestObject !== null) {
     const object = world.entities.get(bestObject);
     if (!object) return false;
     if (object.templateId === 'dungeon_door' && object.dungeonId) {
-      world.enterDungeon(object.dungeonId);
+      return world.enterDungeon(object.dungeonId);
     } else if (object.templateId === 'dungeon_exit') {
-      world.leaveDungeon();
+      return world.leaveDungeon();
     } else if (object.templateId === 'mailbox') {
       hud.openMailbox();
+      return true;
     } else {
-      world.pickUpObject(bestObject);
+      return world.pickUpObject(bestObject);
     }
-    return true;
   }
   if (bestNpc !== null) {
     const npc = world.entities.get(bestNpc);
     if (npc?.kind !== 'npc') return false;
     if (npc.templateId === 'spirit_healer') {
-      world.resurrectAtSpiritHealer();
+      return world.resurrectAtSpiritHealer();
     } else if (npc.templateId === 'brother_halven' || npc.templateId === 'brother_halven_marsh') {
       hud.openDelveBoard(bestNpc);
     } else {

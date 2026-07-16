@@ -196,31 +196,31 @@ export function resolveHarvest(
 // node has not elapsed, or their bags are full (matching the pickupObject
 // capacity pre-check, interaction.ts); a denial never touches another
 // player's state and never consumes that player's respawn timer.
-export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): void {
+export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): boolean {
   const r = ctx.resolve(pid);
-  if (!r) return;
+  if (!r) return false;
   const { meta, e: p } = r;
   if (p.dead) {
     ctx.error(meta.entityId, "You can't do that while dead.");
-    return;
+    return false;
   }
   const node = gatherNodeById(nodeId);
   if (!node) {
     ctx.error(meta.entityId, 'That resource node does not exist.');
-    return;
+    return false;
   }
   if (distToNode(p.pos, node.pos) > INTERACT_RANGE) {
     ctx.error(meta.entityId, 'Too far away.');
-    return;
+    return false;
   }
   if (!isNodeHarvestableBy(meta, node.id, ctx.time)) {
     ctx.error(meta.entityId, 'This resource node has not respawned for you yet.');
-    return;
+    return false;
   }
   const entry = NODE_HARVEST_TABLE[node.type];
   if (!ctx.canAddItem(entry.itemId, 1, meta.entityId)) {
     ctx.error(meta.entityId, 'Your bags are full.');
-    return;
+    return false;
   }
   const questItemId = neededNodeQuestItem(ctx, meta, node);
   const result = resolveHarvest(meta, node, ctx.time, ctx.rng);
@@ -229,7 +229,7 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): void
     // but kept as a defensive fallback so a future resolveHarvest change
     // cannot silently grant with no player-visible denial.
     ctx.error(meta.entityId, 'This resource node has not respawned for you yet.');
-    return;
+    return false;
   }
   ctx.addItem(result.itemId!, 1, meta.entityId);
   // Resolved against the timer/bags gates above, before the timer-consuming
@@ -259,6 +259,7 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): void
     itemId: result.itemId!,
     rarity: result.rarity!,
   });
+  return true;
 }
 
 export interface PendingGatherGrant {

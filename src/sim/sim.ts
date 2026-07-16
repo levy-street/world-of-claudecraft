@@ -6130,8 +6130,8 @@ export class Sim {
   // Gather-node harvest (#1121): a thin delegate onto
   // src/sim/professions/gathering.ts, resolved on the deterministic tick the
   // command arrives on, same as buyItem/useItem above.
-  harvestNode(nodeId: string, pid?: number): void {
-    harvestNodeImpl(this.ctx, nodeId, pid);
+  harvestNode(nodeId: string, pid?: number): boolean {
+    return harvestNodeImpl(this.ctx, nodeId, pid);
   }
 
   // IWorld read surface (IWorldProfessions): whether the given node is
@@ -6274,8 +6274,8 @@ export class Sim {
   // tests resolve them on the Sim facade unchanged; each forwards via this.ctx. The
   // quest-NPC dispatch they fan into (talkToNpc / isQuestInteractionEntity below) STAYS
   // on Sim (W4) and is reached through two append-only SimContext callbacks.
-  lootCorpse(mobId: number, pid?: number): void {
-    interaction.lootCorpse(this.ctx, mobId, pid);
+  lootCorpse(mobId: number, pid?: number): boolean {
+    return interaction.lootCorpse(this.ctx, mobId, pid);
   }
 
   // Walk-by autoloot: the passive counterpart to lootCorpse, called every
@@ -6290,8 +6290,8 @@ export class Sim {
     interaction.harvestCorpse(this.ctx, mobId, components, pid);
   }
 
-  pickUpObject(objId: number, pid?: number): void {
-    interaction.pickUpObject(this.ctx, objId, pid);
+  pickUpObject(objId: number, pid?: number): boolean {
+    return interaction.pickUpObject(this.ctx, objId, pid);
   }
 
   townFocusFor(pid: number): Record<string, number> {
@@ -6466,8 +6466,8 @@ export class Sim {
     resurrectAtCorpse(this.ctx, pid);
   }
 
-  resurrectAtSpiritHealer(pid?: number): void {
-    resurrectAtSpiritHealer(this.ctx, pid);
+  resurrectAtSpiritHealer(pid?: number): boolean {
+    return resurrectAtSpiritHealer(this.ctx, pid);
   }
 
   revivePlayerAt(pid: number, pos: Vec3, hpFrac = 1): void {
@@ -7543,12 +7543,12 @@ export class Sim {
     updateDoorTriggersImpl(this.ctx, p);
   }
 
-  enterDungeon(dungeonId: string, pid?: number): void {
-    enterDungeonImpl(this.ctx, dungeonId, pid);
+  enterDungeon(dungeonId: string, pid?: number): boolean {
+    return enterDungeonImpl(this.ctx, dungeonId, pid);
   }
 
-  leaveDungeon(pid?: number): void {
-    leaveDungeonImpl(this.ctx, pid);
+  leaveDungeon(pid?: number): boolean {
+    return leaveDungeonImpl(this.ctx, pid);
   }
 
   resetDungeonInstances(pid?: number): void {
@@ -8051,8 +8051,8 @@ export class Sim {
     this.emit({ type: 'companionBark', barkId, companionId: run.companion.companionId, pid });
   }
 
-  delveInteract(objectId: number, pid?: number): void {
-    runsMod.delveInteract(this.ctx, objectId, pid);
+  delveInteract(objectId: number, pid?: number): boolean {
+    return runsMod.delveInteract(this.ctx, objectId, pid);
   }
 
   // -------------------------------------------------------------------------

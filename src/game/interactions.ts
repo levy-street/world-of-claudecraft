@@ -4,6 +4,7 @@ import { tSim } from '../ui/sim_i18n';
 import type { IWorld } from '../world_api';
 import { corpseLootAvailability } from './corpse_loot_availability';
 import type { HoverCursorKind } from './cursors';
+import type { InteractionOutcome } from './interaction_autorun';
 
 export interface PickInteractionWorld {
   player: IWorld['player'];
@@ -12,11 +13,11 @@ export interface PickInteractionWorld {
   duelInfo?: IWorld['duelInfo'];
   arenaInfo?: IWorld['arenaInfo'];
   targetEntity(id: number | null): void;
-  enterDungeon(dungeonId: string): void;
-  leaveDungeon(): void;
-  pickUpObject(id: number): void;
+  enterDungeon(dungeonId: string): InteractionOutcome;
+  leaveDungeon(): InteractionOutcome;
+  pickUpObject(id: number): InteractionOutcome;
   startAutoAttack(): void;
-  resurrectAtSpiritHealer(): void;
+  resurrectAtSpiritHealer(): InteractionOutcome;
 }
 
 export interface PickInteractionHud {
@@ -129,7 +130,7 @@ export function shouldApproachPickedEntity(
       corpseLootAvailability(entity, player.id, harvestStateReliable).canOpen
     );
   }
-  if (entity.kind === 'object') return d > INTERACT_RANGE + 1;
+  if (entity.kind === 'object') return d > INTERACT_RANGE;
   if (entity.kind === 'npc') return d > INTERACT_RANGE + 2;
   return true;
 }
@@ -143,7 +144,7 @@ export function handlePickedEntity(
   screenX: number,
   screenY: number,
   harvestStateReliable = true,
-): boolean {
+): InteractionOutcome {
   const e = world.entities.get(id);
   if (!e) return false;
 
@@ -158,15 +159,17 @@ export function handlePickedEntity(
         hud.showError(tSim('error.cantWhileDead'));
         return false;
       }
-      if (d > INTERACT_RANGE + 1) {
+      if (d > INTERACT_RANGE) {
         hud.showError(t('questUi.errors.tooFar'));
         return false;
       }
-      if (e.templateId === 'dungeon_door' && e.dungeonId) world.enterDungeon(e.dungeonId);
-      else if (e.templateId === 'dungeon_exit') world.leaveDungeon();
-      else if (e.templateId === 'mailbox') hud.openMailbox();
-      else world.pickUpObject(id);
-      return true;
+      if (e.templateId === 'dungeon_door' && e.dungeonId) return world.enterDungeon(e.dungeonId);
+      if (e.templateId === 'dungeon_exit') return world.leaveDungeon();
+      if (e.templateId === 'mailbox') {
+        hud.openMailbox();
+        return true;
+      }
+      return world.pickUpObject(id);
     } else if (e.kind === 'mob' && e.dead && e.lootable) {
       if (world.player.dead) {
         hud.showError(tSim('error.cantWhileDead'));
@@ -188,7 +191,7 @@ export function handlePickedEntity(
         if (e.templateId === 'spirit_healer') {
           // The Spirit Healer resurrects a ghost in place (with Resurrection
           // Sickness). To the living it offers only watchful flavor.
-          if (world.player.ghost) world.resurrectAtSpiritHealer();
+          if (world.player.ghost) return world.resurrectAtSpiritHealer();
           else {
             hud.showError(t('hudChrome.death.spiritHealerAlive'));
             return false;
@@ -224,12 +227,14 @@ export function handlePickedEntity(
         return false;
       }
       const d = dist2d(world.player.pos, e.pos);
-      if (d > INTERACT_RANGE + 1) return false;
-      if (e.templateId === 'dungeon_door' && e.dungeonId) world.enterDungeon(e.dungeonId);
-      else if (e.templateId === 'dungeon_exit') world.leaveDungeon();
-      else if (e.templateId === 'mailbox') hud.openMailbox();
-      else world.pickUpObject(id);
-      return true;
+      if (d > INTERACT_RANGE) return false;
+      if (e.templateId === 'dungeon_door' && e.dungeonId) return world.enterDungeon(e.dungeonId);
+      if (e.templateId === 'dungeon_exit') return world.leaveDungeon();
+      if (e.templateId === 'mailbox') {
+        hud.openMailbox();
+        return true;
+      }
+      return world.pickUpObject(id);
     } else if (e.kind === 'mob' && e.dead && e.lootable) {
       if (world.player.dead) {
         hud.showError(tSim('error.cantWhileDead'));

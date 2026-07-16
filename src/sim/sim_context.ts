@@ -249,8 +249,8 @@ export interface SimContextCallbacks {
   instanceKeyFor(pid: number): string;
   instanceOriginOf(inst: InstanceSlot): { x: number; z: number };
   instanceClaimIdAt(pos: Vec3): number | null;
-  enterDungeon(dungeonId: string, pid?: number): void;
-  leaveDungeon(pid?: number): void;
+  enterDungeon(dungeonId: string, pid?: number): boolean;
+  leaveDungeon(pid?: number): boolean;
   resetDungeonInstances(pid?: number): void;
   inheritDungeonResetLocks(pid: number): void;
   dungeonDifficulty(pid?: number): DungeonDifficulty;

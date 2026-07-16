@@ -978,6 +978,10 @@ export class Hud {
   // that helper lives behind the game-layer seam). Null until wired; the
   // attack handler then falls back to the fixed attack control.
   onMobileAttackNearest: (() => void) | null = null;
+  // The healer button lives in the non-blocking ghost overlay, but successful
+  // resurrection must still flow through main.ts so authoritative outcomes can
+  // stop autorun without making Hud own Input or MobileControls.
+  onResurrectAtSpiritHealer: (() => void) | null = null;
   private hotbarActions: HotbarAction[] = []; // index = barSlot-1
   private loadedSlotMapFromStorage = false;
   private knownAbilityIdsAtLastSlotSync: Set<string> | null = null;
@@ -1551,7 +1555,7 @@ export class Hud {
       this.sim.releaseSpirit();
     });
     bindTouchTap(this.resurrectCorpseBtnEl, () => this.sim.resurrectAtCorpse());
-    bindTouchTap(this.resurrectHealerBtnEl, () => this.sim.resurrectAtSpiritHealer());
+    bindTouchTap(this.resurrectHealerBtnEl, () => this.onResurrectAtSpiritHealer?.());
     document.addEventListener('pointerdown', (ev) => {
       const target = ev.target as Node | null;
       if (!target) return;

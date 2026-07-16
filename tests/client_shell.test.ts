@@ -1170,7 +1170,10 @@ describe('client HTML shell', () => {
       'bindTouchTap(this.resurrectCorpseBtnEl, () => this.sim.resurrectAtCorpse());',
     );
     expect(hudTs).toContain(
-      'bindTouchTap(this.resurrectHealerBtnEl, () => this.sim.resurrectAtSpiritHealer());',
+      'bindTouchTap(this.resurrectHealerBtnEl, () => this.onResurrectAtSpiritHealer?.());',
+    );
+    expect(mainTs).toContain(
+      'hud.onResurrectAtSpiritHealer = () => {\n    void stopAutorunForInteraction(world.resurrectAtSpiritHealer(), input, mobileControls);\n  };',
     );
     expect(hudTs).not.toMatch(
       /(?:releaseSpiritBtnEl|resurrectCorpseBtnEl|resurrectHealerBtnEl)\.addEventListener\('click'/,
@@ -1851,20 +1854,24 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain('body.mobile-touch #mobile-autorun-target.near,');
     expect(hudMobileCss).toContain('body.mobile-touch #mobile-autorun-target.locked {');
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #mobile-autorun-target.locked {\n    top: 50%;\n    transform: translate(-50%, -50%) scale(1);',
+      'body.mobile-touch #mobile-autorun-target.locked {\n    top: 50%;\n    z-index: 1;\n    transform: translate(-50%, -50%) scale(1);',
+    );
+    expect(hudMobileCss).toContain(
+      '@media (prefers-reduced-motion: reduce) {\n    body.mobile-touch #mobile-autorun-target {\n      transition: none;',
     );
     expect(mainTs).toContain(
       "import { stopAutorunForInteraction } from './game/interaction_autorun';",
     );
     expect(mainTs).toContain("import { tryNearbyInteraction } from './game/nearby_interaction';");
     expect(mainTs).toContain('stopAutorunForInteraction(\n      tryNearbyInteraction(');
+    expect(mainTs).toContain("t('errors.nothingInteract'),\n        online === null,");
+    expect(mainTs).toContain('const interactionOutcome = handlePickedEntity(');
     expect(mainTs).toContain(
-      'const didInteract = handlePickedEntity(world, hud, id, button, x, y, online === null);',
+      'isClickMoveButton &&\n        shouldApproachPickedEntity(world.player, e, didInteractImmediately, online === null)',
     );
     expect(mainTs).toContain(
-      'isClickMoveButton &&\n        shouldApproachPickedEntity(world.player, e, didInteract, online === null)',
+      'stopAutorunForInteraction(interactionOutcome, input, mobileControls);',
     );
-    expect(mainTs).toContain('stopAutorunForInteraction(didInteract, input, mobileControls);');
     expect(mainTs).toContain('stopAutorunForInteraction(\n          handleGatherNodeInteract(');
     expect(hudMobileCss).not.toContain('body.mobile-touch #mobile-utility-cluster');
     expect(hudMobileCss).not.toContain('body.mobile-touch #mobile-autorun {');

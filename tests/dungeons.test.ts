@@ -91,6 +91,16 @@ function expectedHeroicStats(template: MobTemplate, dungeonId: string) {
 }
 
 describe('dungeons: door-trigger entry/exit', () => {
+  it('reports whether direct dungeon entry and exit changed the world', () => {
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'Solo');
+
+    expect(enterDungeon(sim.ctx, 'missing_dungeon', pid)).toBe(false);
+    expect(enterDungeon(sim.ctx, 'hollow_crypt', pid)).toBe(true);
+    expect(leaveDungeon(sim.ctx, pid)).toBe(true);
+    expect(leaveDungeon(sim.ctx, pid)).toBe(false);
+  });
+
   it('walking onto a dungeon door teleports the player into a freshly claimed instance', () => {
     const sim = makeSim();
     const pid = sim.addPlayer('warrior', 'Solo');

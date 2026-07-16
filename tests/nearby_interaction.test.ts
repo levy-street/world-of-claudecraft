@@ -26,14 +26,35 @@ function rig(targets: Entity[] = [], nodes: GatherNodeDef[] = []) {
       [player.id, player],
       ...targets.map((target): [number, Entity] => [target.id, target]),
     ]),
-    lootCorpse: (id: number) => calls.push(`loot:${id}`),
-    delveInteract: (id: number) => calls.push(`delve:${id}`),
-    enterDungeon: (id: string) => calls.push(`enter:${id}`),
-    leaveDungeon: () => calls.push('leave'),
-    pickUpObject: (id: number) => calls.push(`pickup:${id}`),
-    resurrectAtSpiritHealer: () => calls.push('resurrect'),
+    lootCorpse: (id: number) => {
+      calls.push(`loot:${id}`);
+      return true;
+    },
+    delveInteract: (id: number) => {
+      calls.push(`delve:${id}`);
+      return true;
+    },
+    enterDungeon: (id: string) => {
+      calls.push(`enter:${id}`);
+      return true;
+    },
+    leaveDungeon: () => {
+      calls.push('leave');
+      return true;
+    },
+    pickUpObject: (id: number) => {
+      calls.push(`pickup:${id}`);
+      return true;
+    },
+    resurrectAtSpiritHealer: () => {
+      calls.push('resurrect');
+      return true;
+    },
     nodeHarvestableByMe: vi.fn(() => true),
-    harvestNode: (id: string) => calls.push(`harvest:${id}`),
+    harvestNode: (id: string) => {
+      calls.push(`harvest:${id}`);
+      return true;
+    },
   };
   const hud = {
     openMailbox: () => calls.push('mailbox'),
@@ -44,24 +65,32 @@ function rig(targets: Entity[] = [], nodes: GatherNodeDef[] = []) {
   return { world, hud, nodes, calls, player };
 }
 
-function interact(r: ReturnType<typeof rig>): boolean {
+function interact(r: ReturnType<typeof rig>) {
   return tryNearbyInteraction(r.world, r.hud, r.nodes, 'too far', 'not ready', 'nothing');
 }
 
 describe('tryNearbyInteraction', () => {
   it('dispatches the nearest visible corpse loot', () => {
-    const corpse = entity({
+    const fartherCorpse = entity({
       id: 2,
+      kind: 'mob',
+      dead: true,
+      lootable: true,
+      loot: { copper: 1, items: [] },
+      pos: { x: 3, y: 0, z: 0 },
+    });
+    const nearerCorpse = entity({
+      id: 3,
       kind: 'mob',
       dead: true,
       lootable: true,
       loot: { copper: 1, items: [] },
       pos: { x: 1, y: 0, z: 0 },
     });
-    const r = rig([corpse]);
+    const r = rig([fartherCorpse, nearerCorpse]);
 
     expect(interact(r)).toBe(true);
-    expect(r.calls).toEqual(['loot:2']);
+    expect(r.calls).toEqual(['loot:3']);
   });
 
   it('skips corpse loot that is personal to another player', () => {
@@ -205,5 +234,17 @@ describe('tryNearbyInteraction', () => {
 
     expect(interact(r)).toBe(false);
     expect(r.calls).toEqual(['error:nothing']);
+  });
+
+  it('returns a rejected authoritative pickup result', async () => {
+    const target = entity({ id: 2, kind: 'object', lootable: true });
+    const r = rig([target]);
+    (r.world as any).pickUpObject = async (id: number) => {
+      r.calls.push(`pickup:${id}`);
+      return false;
+    };
+
+    await expect(interact(r)).resolves.toBe(false);
+    expect(r.calls).toEqual(['pickup:2']);
   });
 });

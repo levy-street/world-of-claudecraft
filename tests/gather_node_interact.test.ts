@@ -5,7 +5,7 @@ import { INTERACT_RANGE } from '../src/sim/types';
 describe('decideGatherNodeAction', () => {
   const nodePos = { x: 100, z: 200 };
 
-  it('reports too_far past INTERACT_RANGE + 1', () => {
+  it('reports too_far past INTERACT_RANGE', () => {
     const playerPos = { x: 100, y: 0, z: 200 + INTERACT_RANGE + 2 };
     expect(decideGatherNodeAction(playerPos, nodePos, true)).toBe('too_far');
   });
@@ -20,8 +20,8 @@ describe('decideGatherNodeAction', () => {
     expect(decideGatherNodeAction(playerPos, nodePos, true)).toBe('harvest');
   });
 
-  it('is inclusive right at the INTERACT_RANGE + 1 boundary', () => {
-    const playerPos = { x: 100, y: 0, z: 200 + INTERACT_RANGE + 1 };
+  it('is inclusive right at the INTERACT_RANGE boundary', () => {
+    const playerPos = { x: 100, y: 0, z: 200 + INTERACT_RANGE };
     expect(decideGatherNodeAction(playerPos, nodePos, true)).toBe('harvest');
   });
 });
@@ -36,7 +36,10 @@ describe('handleGatherNodeInteract', () => {
     return {
       world: {
         nodeHarvestableByMe: (_nodeId: string) => ready,
-        harvestNode: (nodeId: string) => calls.push(nodeId),
+        harvestNode: (nodeId: string) => {
+          calls.push(nodeId);
+          return true;
+        },
       },
       calls,
     };
@@ -99,5 +102,31 @@ describe('handleGatherNodeInteract', () => {
     ).toBe(false);
     expect(calls).toEqual([]);
     expect(errors).toEqual([notReadyText]);
+  });
+
+  it('returns the authoritative harvest result', async () => {
+    const calls: string[] = [];
+    const world = {
+      nodeHarvestableByMe: () => true,
+      harvestNode: async (nodeId: string) => {
+        calls.push(nodeId);
+        return false;
+      },
+    };
+    const { hud, errors } = fakeHud();
+
+    await expect(
+      handleGatherNodeInteract(
+        world,
+        hud,
+        { x: 0, y: 0, z: 0 },
+        'node_a',
+        nodePos,
+        tooFarText,
+        notReadyText,
+      ),
+    ).resolves.toBe(false);
+    expect(calls).toEqual(['node_a']);
+    expect(errors).toEqual([]);
   });
 });
