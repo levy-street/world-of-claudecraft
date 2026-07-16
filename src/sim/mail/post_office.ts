@@ -16,7 +16,12 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/
 // Date.now (enforced by tests/architecture.test.ts). The post draws NO rng.
 
-import { type LetterDef, QUEST_LETTERS, WELCOME_LETTER } from '../content/letters';
+import {
+  HEROIC_MARK_LETTER,
+  type LetterDef,
+  QUEST_LETTERS,
+  WELCOME_LETTER,
+} from '../content/letters';
 import { ITEMS } from '../data';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -470,6 +475,21 @@ export class PostOffice {
   // The one-time service letter; the caller flips meta.mailWelcomed.
   sendWelcome(meta: PlayerMeta): void {
     this.sendLetter(this.mailKeyFor(meta), meta.name, WELCOME_LETTER, 'system');
+  }
+
+  // Heroic Marks reward hook (awardHeroicMarks): posts a participant's marks when
+  // they took the daily lockout but were not at the corpse to loot them (a distant
+  // healer, a fallen raider). The letter's attachment carries the exact mark count
+  // for this kill. No postage, no proximity gate: the raid already earned it.
+  mailHeroicMarks(pid: number, itemId: string, count: number): void {
+    const meta = this.ctx.players.get(pid);
+    if (!meta || count <= 0) return;
+    this.sendLetter(
+      this.mailKeyFor(meta),
+      meta.name,
+      { ...HEROIC_MARK_LETTER, items: [{ itemId, count }] },
+      'system',
+    );
   }
 
   // Quest turn-in hook (turnInQuestCore): quests with an authored letter have

@@ -6769,6 +6769,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.subject': 'あなたが暗闇で成したこと',
   'entities.letters.letter_q_hollow.body':
     'あの窪地に何が葬られていたのかを知る者はごくわずかで、信じる者はさらに少ないでしょう。私は知っています。そして忘れません。\n\nあなたの道に光がありますように。\n- アルドリック修道士',
+  'entities.letters.heroic_marks_reward.sender': '英雄級補給官',
+  'entities.letters.heroic_marks_reward.subject': 'あなたの英雄の印',
+  'entities.letters.heroic_marks_reward.body':
+    'あなたが後方で、あるいは倒れて戦っている間に、あなたの部隊が英雄級の試練を突破しました。ロックアウトは同じように科されたので、あなたの分の英雄の印は失われることなく、ここへ飛んできました。大切に使ってください。\n\n- 英雄級補給官',
   'hudChrome.calendar.title': 'イベントカレンダー',
   'hudChrome.calendar.close': 'カレンダーを閉じる',
   'hudChrome.calendar.keybindLabel': 'イベントカレンダー',
