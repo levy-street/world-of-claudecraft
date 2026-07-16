@@ -6028,7 +6028,7 @@ export const id_ID: EnTranslations = {
       },
       "mind_flay": {
         "name": "Litani Nestapa",
-        "description": "Menyerang pikiran target dengan energi Bayangan, menimbulkan {damage} kerusakan setiap detik selama 3 detik."
+        "description": "Menyerang pikiran target dengan energi Bayangan selama 3 detik. Setiap detak meningkatkan kerusakan sebesar 30% dari kerusakan detak pertama."
       },
       "flash_heal": {
         "name": "Doa Mendesak",

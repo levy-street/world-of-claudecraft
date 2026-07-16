@@ -2631,7 +2631,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Медленная, но мощная молитва, исцеляющая дружественную цель на {damage}.',
   'entities.abilities.mind_flay.name': 'Литания скорби',
   'entities.abilities.mind_flay.description':
-    'Терзает разум цели темной энергией, нанося {damage} ед. урона каждую секунду в течение 3 сек.',
+    'Терзает разум цели темной энергией в течение 3 сек. С каждым тиком урон увеличивается на 30% от урона первого тика.',
   'entities.abilities.flash_heal.name': 'Спешная молитва',
   'entities.abilities.flash_heal.description':
     'Быстрая молитва, исцеляющая дружественную цель на {damage}.',

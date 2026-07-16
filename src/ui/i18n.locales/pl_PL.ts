@@ -2035,7 +2035,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Razi umysł celu, zadając {damage} obrażeń od cienia.',
   'entities.abilities.mind_blast.name': 'Roztrzaskanie umysłu',
   'entities.abilities.mind_flay.description':
-    'Naciera na umysł celu energią cienia, zadając {damage} obrażeń co sekundę przez 3 sek.',
+    'Naciera na umysł celu energią cienia przez 3 sek. Z każdym tyknięciem obrażenia rosną o 30% obrażeń pierwszego tyknięcia.',
   'entities.abilities.mind_flay.name': 'Litania niedoli',
   'entities.abilities.mongoose_bite.description':
     'Kontratak po uniku celu, zadający obrażenia broni plus {damage}. Nie można uniknąć.',

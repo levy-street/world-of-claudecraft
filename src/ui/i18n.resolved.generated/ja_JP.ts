@@ -6028,7 +6028,7 @@ export const ja_JP: EnTranslations = {
       },
       "mind_flay": {
         "name": "嘆きの連祷",
-        "description": "暗黒エネルギーで対象の精神を攻撃し、3秒間、毎秒{damage}ダメージを与えます。"
+        "description": "暗黒エネルギーで対象の精神を3秒間攻撃します。各ティックのダメージは、最初のティックのダメージの30%ずつ増加します。"
       },
       "flash_heal": {
         "name": "緊急の祈り",

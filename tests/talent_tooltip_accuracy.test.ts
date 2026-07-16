@@ -103,6 +103,28 @@ describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
     expect(unresolved.map((entry) => `${entry.cls}:${entry.id}`)).toEqual([]);
   });
 
+  it('keeps Shadow mechanic conditions explicit in a non-Latin locale', async () => {
+    await ensureLocaleLoaded('ja_JP');
+    setLanguage('ja_JP');
+    try {
+      const renderChoice = (id: string): string => {
+        const choice = Object.values(ROW_TREES)
+          .flat()
+          .flatMap((row) => row.options)
+          .find((option) => option.id === id);
+        if (!choice) throw new Error(`missing talent choice ${id}`);
+        return tTalent({ kind: 'talentChoice', choice, field: 'description' });
+      };
+
+      expect(renderChoice('pri_r17_ninefold_litany')).toContain('/ 9x');
+      expect(renderChoice('pri_r17_woes_crescendo')).toContain('3/3 -> AoE 36');
+      expect(renderChoice('pri_r14_deathless_dirge')).toContain('↻ 18');
+      expect(renderChoice('pri_r14_plague_chorus')).toContain('-> AoE (r=8)');
+    } finally {
+      setLanguage('en');
+    }
+  });
+
   it('regression locks: vague tooltips now read real numbers; egregious effects honor their promise', () => {
     setLanguage('en');
     const render = (cls: string, finder: (e: Entry) => boolean) => {

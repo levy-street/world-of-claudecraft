@@ -2124,7 +2124,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Meledakkan pikiran target sebesar {damage} kerusakan Bayangan.',
   'entities.abilities.mind_blast.name': 'Mindfracture',
   'entities.abilities.mind_flay.description':
-    'Menyerang pikiran target dengan energi Bayangan, menimbulkan {damage} kerusakan setiap detik selama 3 detik.',
+    'Menyerang pikiran target dengan energi Bayangan selama 3 detik. Setiap detak meningkatkan kerusakan sebesar 30% dari kerusakan detak pertama.',
   'entities.abilities.mind_flay.name': 'Litani Nestapa',
   'entities.abilities.mongoose_bite.description':
     'Serangan balasan setelah target mengelak sebesar kerusakan senjata ditambah {damage}. Tidak dapat dielakkan.',

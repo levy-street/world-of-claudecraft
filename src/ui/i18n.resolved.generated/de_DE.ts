@@ -6028,7 +6028,7 @@ export const de_DE: EnTranslations = {
       },
       "mind_flay": {
         "name": "Litanei des Leids",
-        "description": "Greift den Geist des Ziels mit Schattenenergie an und verursacht 3 Sek. lang jede Sekunde {damage} Schaden."
+        "description": "Greift den Geist des Ziels 3 Sek. lang mit Schattenenergie an. Mit jedem Tick steigt der Schaden um 30 % des Schadens des ersten Ticks."
       },
       "flash_heal": {
         "name": "Dringendes Gebet",

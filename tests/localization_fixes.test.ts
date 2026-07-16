@@ -444,6 +444,16 @@ describe('M1c: entity strings preserve every placeholder (incl {className})', ()
   });
 });
 
+describe('Litany of Woe ramp localization', () => {
+  it('describes the 30% per-tick ramp instead of the retired flat tick', () => {
+    for (const lang of supportedLanguages) {
+      const description = locales[lang].entities.abilities.mind_flay.description as string;
+      expect(description, lang).toContain('30');
+      expect(description, lang).not.toContain('{damage}');
+    }
+  });
+});
+
 // --- H4b: every shipped talent name resolves via override or ability, and renders
 // non-empty & (for non-en) differs from English unless a deliberate cognate override. ---
 describe('H4b: talent-name resolution is complete (no silent English fallthrough)', () => {

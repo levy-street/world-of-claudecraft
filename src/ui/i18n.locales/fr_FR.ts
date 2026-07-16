@@ -3672,7 +3672,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Une prière lente mais puissante qui rend {damage} points de vie à une cible alliée.',
   'entities.abilities.mind_flay.name': 'Litanie du malheur',
   'entities.abilities.mind_flay.description':
-    "Assaille l'esprit de la cible avec de l'énergie d'Ombre et inflige {damage} points de dégâts chaque seconde pendant 3 s.",
+    "Assaille l'esprit de la cible avec de l'énergie d'Ombre pendant 3 s. À chaque pulsation, les dégâts augmentent de 30 % des dégâts de la première pulsation.",
   'entities.abilities.flash_heal.name': 'Prière urgente',
   'entities.abilities.flash_heal.description':
     'Une prière rapide qui rend {damage} points de vie à une cible alliée.',

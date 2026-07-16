@@ -6028,7 +6028,7 @@ export const it_IT: EnTranslations = {
       },
       "mind_flay": {
         "name": "Litania della Sventura",
-        "description": "Assale la mente del bersaglio con energia d'Ombra, infliggendo {damage} danni ogni secondo per 3 s."
+        "description": "Assale la mente del bersaglio con energia d'Ombra per 3 s. A ogni impulso, i danni aumentano del 30% dei danni del primo impulso."
       },
       "flash_heal": {
         "name": "Preghiera Urgente",

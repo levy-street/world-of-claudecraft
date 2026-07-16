@@ -6028,7 +6028,7 @@ export const zh_TW: EnTranslations = {
       },
       "mind_flay": {
         "name": "哀禍連禱",
-        "description": "用暗影能量攻擊目標的心靈，持續 3 秒，每秒造成 {damage} 點傷害。"
+        "description": "用暗影能量攻擊目標的心靈，持續3秒。每次跳動的傷害都會提高，增幅相當於首次跳動傷害的30%。"
       },
       "flash_heal": {
         "name": "急切祈禱",

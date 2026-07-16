@@ -7971,12 +7971,17 @@ function addedEffectDescription(
       return `${name} -> ${abilityName(effect.dot)}: +${seconds(effect.seconds, lang)} (<= +${seconds(effect.maxBonus, lang)}).`;
     case 'refreshDot': {
       const dot = ABILITIES[effect.dot]?.effects.find((candidate) => candidate.type === 'dot');
-      return `${name} -> ${abilityName(effect.dot)}: ${seconds(dot?.duration ?? 0, lang)}.`;
+      return `${name}: ${abilityName(effect.dot)} ↻ ${seconds(dot?.duration ?? 0, lang)}.`;
     }
     case 'spreadDot':
-      return `${name} -> ${abilityName(effect.dot)} (r=${formatNumber(effect.radius, lang)}).`;
-    case 'channelFinisher':
-      return `${name}: ${formatNumber(effect.amount, lang)} ${text.statLabels.damage} (r=${formatNumber(effect.radius, lang)}).`;
+      return `${name}: ${abilityName(effect.dot)} -> AoE (r=${formatNumber(effect.radius, lang)}).`;
+    case 'channelFinisher': {
+      const ticks = ABILITIES[sourceAbility]?.channel?.ticks;
+      const completion = ticks
+        ? `${formatNumber(ticks, lang)}/${formatNumber(ticks, lang)}`
+        : '100%';
+      return `${name}: ${completion} -> AoE ${formatNumber(effect.amount, lang)} ${text.statLabels.damage} (r=${formatNumber(effect.radius, lang)}).`;
+    }
     case 'interrupt':
       return `${name}: ${t('hudChrome.auraEffect.lockout')} (${seconds(effect.lockout, lang)}).`;
     case 'consumeDot':
@@ -8125,7 +8130,12 @@ function effectDescription(
       const duration = channel?.duration
         ? channel.duration * (1 + mod.channelDurationPct)
         : mod.channelDurationPct;
-      parts.push(`${name}: ${seconds(duration, lang)}.`);
+      const ticks = channel
+        ? Math.max(1, Math.round(channel.ticks * (1 + mod.channelDurationPct)))
+        : undefined;
+      parts.push(
+        `${name}: ${seconds(duration, lang)}${ticks === undefined ? '' : ` / ${formatNumber(ticks, lang)}x`}.`,
+      );
     }
     // buffPct strengthens the named buff itself (e.g. "Increases Devotion Aura by 20%").
     if (mod.buffPct) parts.push(text.increase(name, formatPercent(mod.buffPct, lang), perRank));

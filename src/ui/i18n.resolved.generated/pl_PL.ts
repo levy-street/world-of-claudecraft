@@ -6028,7 +6028,7 @@ export const pl_PL: EnTranslations = {
       },
       "mind_flay": {
         "name": "Litania niedoli",
-        "description": "Naciera na umysł celu energią cienia, zadając {damage} obrażeń co sekundę przez 3 sek."
+        "description": "Naciera na umysł celu energią cienia przez 3 sek. Z każdym tyknięciem obrażenia rosną o 30% obrażeń pierwszego tyknięcia."
       },
       "flash_heal": {
         "name": "Pilna modlitwa",

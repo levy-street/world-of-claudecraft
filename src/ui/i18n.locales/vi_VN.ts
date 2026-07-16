@@ -2100,7 +2100,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Nổ tung tâm trí của mục tiêu gây {damage} sát thương Bóng Tối.',
   'entities.abilities.mind_blast.name': 'Nứt Vỡ Tâm Trí',
   'entities.abilities.mind_flay.description':
-    'Công kích tâm trí mục tiêu bằng năng lượng Bóng Tối, gây {damage} sát thương mỗi giây trong 3 giây.',
+    'Công kích tâm trí mục tiêu bằng năng lượng Bóng Tối trong 3 giây. Mỗi nhịp tăng sát thương thêm 30% sát thương của nhịp đầu tiên.',
   'entities.abilities.mind_flay.name': 'Kinh Cầu Thống Khổ',
   'entities.abilities.mongoose_bite.description':
     'Phản công sau khi mục tiêu né đòn, gây sát thương vũ khí cộng thêm {damage}. Không thể bị né.',

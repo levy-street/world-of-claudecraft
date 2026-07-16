@@ -2606,7 +2606,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '遅いが強力な祈りで、味方対象の体力を {damage} 回復します。',
   'entities.abilities.mind_flay.name': '嘆きの連祷',
   'entities.abilities.mind_flay.description':
-    '暗黒エネルギーで対象の精神を攻撃し、3秒間、毎秒{damage}ダメージを与えます。',
+    '暗黒エネルギーで対象の精神を3秒間攻撃します。各ティックのダメージは、最初のティックのダメージの30%ずつ増加します。',
   'entities.abilities.flash_heal.name': '緊急の祈り',
   'entities.abilities.flash_heal.description': '素早い祈りで味方対象の体力を {damage} 回復します。',
   'entities.abilities.lightning_bolt.name': '電弧の矢',

@@ -6028,7 +6028,7 @@ export const es_ES: EnTranslations = {
       },
       "mind_flay": {
         "name": "Letanía de Aflicción",
-        "description": "Asalta la mente del objetivo con energía de las Sombras e inflige {damage} de daño cada segundo durante 3 s."
+        "description": "Asalta la mente del objetivo con energía de las Sombras durante 3 s. Con cada pulso, el daño aumenta un 30% del daño del primer pulso."
       },
       "flash_heal": {
         "name": "Plegaria Urgente",

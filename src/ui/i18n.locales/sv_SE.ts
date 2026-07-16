@@ -2022,7 +2022,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mind_blast.description': 'Spränger målets sinne för {damage} skuggskada.',
   'entities.abilities.mind_blast.name': 'Sinnessplittring',
   'entities.abilities.mind_flay.description':
-    'Angriper målets sinne med skuggenergi och vållar {damage} skada varje sekund i 3 sek.',
+    'Angriper målets sinne med skuggenergi i 3 sek. För varje tick ökar skadan med 30 % av det första tickets skada.',
   'entities.abilities.mind_flay.name': 'Sorgens litania',
   'entities.abilities.mongoose_bite.description':
     'Motanfall efter att målet väjt undan för vapenskada plus {damage}. Kan inte väjas undan.',

@@ -4191,7 +4191,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mind_blast.description': 'Rozdrtí mysl cíle za {damage} stínového poškození.',
   'entities.abilities.mind_blast.name': 'Zlomení mysli',
   'entities.abilities.mind_flay.description':
-    'Útočí na mysl cíle stínovou energií a způsobí {damage} poškození každou sekundu po dobu 3 s.',
+    'Útočí na mysl cíle stínovou energií po dobu 3 s. S každým dalším zásahem se poškození zvýší o 30 % poškození prvního zásahu.',
   'entities.abilities.mind_flay.name': 'Litanie běd',
   'entities.abilities.mongoose_bite.description':
     'Protiútok po uhnutí cíle za poškození zbraně plus {damage}. Nelze mu uhnout.',

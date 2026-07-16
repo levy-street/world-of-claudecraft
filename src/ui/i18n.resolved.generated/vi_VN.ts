@@ -6028,7 +6028,7 @@ export const vi_VN: EnTranslations = {
       },
       "mind_flay": {
         "name": "Kinh Cầu Thống Khổ",
-        "description": "Công kích tâm trí mục tiêu bằng năng lượng Bóng Tối, gây {damage} sát thương mỗi giây trong 3 giây."
+        "description": "Công kích tâm trí mục tiêu bằng năng lượng Bóng Tối trong 3 giây. Mỗi nhịp tăng sát thương thêm 30% sát thương của nhịp đầu tiên."
       },
       "flash_heal": {
         "name": "Lời Nguyện Khẩn Cấp",

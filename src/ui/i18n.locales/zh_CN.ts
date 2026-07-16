@@ -2496,7 +2496,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.heal.description': '缓慢但强大的祈祷，为一个友方目标恢复 {damage} 点生命值。',
   'entities.abilities.mind_flay.name': '悲苦连祷',
   'entities.abilities.mind_flay.description':
-    '用暗影能量攻击目标的心灵，持续 3 秒，每秒造成 {damage} 点伤害。',
+    '用暗影能量攻击目标的心灵，持续3秒。每次跳动的伤害都会提高，增幅相当于首次跳动伤害的30%。',
   'entities.abilities.flash_heal.name': '紧急祈祷',
   'entities.abilities.flash_heal.description': '快速祈祷，为一个友方目标恢复 {damage} 点生命值。',
   'entities.abilities.lightning_bolt.name': '电弧箭',

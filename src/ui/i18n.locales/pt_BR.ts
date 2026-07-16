@@ -3268,7 +3268,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Uma prece lenta, mas poderosa, que cura um alvo aliado em {damage}.',
   'entities.abilities.mind_flay.name': 'Litania da Aflição',
   'entities.abilities.mind_flay.description':
-    'Assalta a mente do alvo com energia de Sombra, causando {damage} de dano por segundo durante 3 s.',
+    'Assalta a mente do alvo com energia de Sombra por 3 s. A cada pulso, o dano aumenta em 30% do dano do primeiro pulso.',
   'entities.abilities.flash_heal.name': 'Prece Urgente',
   'entities.abilities.flash_heal.description':
     'Uma prece rápida que cura um alvo aliado em {damage}.',

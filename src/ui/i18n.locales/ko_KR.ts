@@ -2585,7 +2585,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '느리지만 강력한 기도로 아군 대상의 생명력을 {damage}만큼 회복시킵니다.',
   'entities.abilities.mind_flay.name': '비탄의 연도',
   'entities.abilities.mind_flay.description':
-    '암흑 에너지로 대상의 정신을 공격해 3초 동안 매초 {damage}의 피해를 입힙니다.',
+    '암흑 에너지로 대상의 정신을 3초 동안 공격합니다. 각 틱의 피해가 첫 틱 피해의 30%만큼 증가합니다.',
   'entities.abilities.flash_heal.name': '다급한 기도',
   'entities.abilities.flash_heal.description':
     '빠른 기도로 아군 대상의 생명력을 {damage}만큼 회복시킵니다.',

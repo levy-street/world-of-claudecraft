@@ -6028,7 +6028,7 @@ export const sv_SE: EnTranslations = {
       },
       "mind_flay": {
         "name": "Sorgens litania",
-        "description": "Angriper målets sinne med skuggenergi och vållar {damage} skada varje sekund i 3 sek."
+        "description": "Angriper målets sinne med skuggenergi i 3 sek. För varje tick ökar skadan med 30 % av det första tickets skada."
       },
       "flash_heal": {
         "name": "Brådskande bön",

@@ -6028,7 +6028,7 @@ export const fr_CA: EnTranslations = {
       },
       "mind_flay": {
         "name": "Litanie du malheur",
-        "description": "Assaille l'esprit de la cible avec de l'énergie d'Ombre et inflige {damage} points de dégâts chaque seconde pendant 3 s."
+        "description": "Assaille l'esprit de la cible avec de l'énergie d'Ombre pendant 3 s. À chaque pulsation, les dégâts augmentent de 30 % des dégâts de la première pulsation."
       },
       "flash_heal": {
         "name": "Prière urgente",

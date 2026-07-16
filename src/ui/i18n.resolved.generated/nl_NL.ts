@@ -6028,7 +6028,7 @@ export const nl_NL: EnTranslations = {
       },
       "mind_flay": {
         "name": "Litanie van Leed",
-        "description": "Bestookt de geest van het doelwit met Schaduwenergie en brengt elke seconde {damage} schade toe gedurende 3 sec."
+        "description": "Bestookt de geest van het doelwit 3 sec. lang met Schaduwenergie. Met elke tik neemt de schade toe met 30% van de schade van de eerste tik."
       },
       "flash_heal": {
         "name": "Dringend Gebed",

@@ -3295,7 +3295,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Ein langsames, aber mächtiges Gebet, das ein freundliches Ziel um {damage} heilt.',
   'entities.abilities.mind_flay.name': 'Litanei des Leids',
   'entities.abilities.mind_flay.description':
-    'Greift den Geist des Ziels mit Schattenenergie an und verursacht 3 Sek. lang jede Sekunde {damage} Schaden.',
+    'Greift den Geist des Ziels 3 Sek. lang mit Schattenenergie an. Mit jedem Tick steigt der Schaden um 30 % des Schadens des ersten Ticks.',
   'entities.abilities.flash_heal.name': 'Dringendes Gebet',
   'entities.abilities.flash_heal.description':
     'Ein schnelles Gebet, das ein freundliches Ziel um {damage} heilt.',

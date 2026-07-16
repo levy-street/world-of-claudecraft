@@ -3289,7 +3289,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Una plegaria lenta pero poderosa que sana a un objetivo amistoso por {damage}.',
   'entities.abilities.mind_flay.name': 'Letanía de Aflicción',
   'entities.abilities.mind_flay.description':
-    'Asalta la mente del objetivo con energía de las Sombras e inflige {damage} de daño cada segundo durante 3 s.',
+    'Asalta la mente del objetivo con energía de las Sombras durante 3 s. Con cada pulso, el daño aumenta un 30% del daño del primer pulso.',
   'entities.abilities.flash_heal.name': 'Plegaria Urgente',
   'entities.abilities.flash_heal.description':
     'Una plegaria rápida que sana a un objetivo amistoso por {damage}.',

@@ -2018,7 +2018,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mind_blast.description': 'Sprænger målets sind for {damage} skyggeskade.',
   'entities.abilities.mind_blast.name': 'Sindsbrud',
   'entities.abilities.mind_flay.description':
-    'Angriber målets sind med skyggeenergi, hvilket volder {damage} skade hvert sekund i 3 sek.',
+    'Angriber målets sind med skyggeenergi i 3 sek. For hvert tick øges skaden med 30 % af det første ticks skade.',
   'entities.abilities.mind_flay.name': 'Jammerens Litani',
   'entities.abilities.mongoose_bite.description':
     'Modangreb efter målet undviger for våbenskade plus {damage}. Kan ikke undviges.',

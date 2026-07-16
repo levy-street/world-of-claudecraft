@@ -6028,7 +6028,7 @@ export const tr_TR: EnTranslations = {
       },
       "mind_flay": {
         "name": "Keder Yakarışı",
-        "description": "Hedefin zihnini Gölge enerjisiyle sarsar ve 3 saniye boyunca her saniye {damage} hasar verir."
+        "description": "Hedefin zihnini 3 saniye boyunca Gölge enerjisiyle sarsar. Her tikte hasar, ilk tikin hasarının %30’u kadar artar."
       },
       "flash_heal": {
         "name": "Acil Dua",

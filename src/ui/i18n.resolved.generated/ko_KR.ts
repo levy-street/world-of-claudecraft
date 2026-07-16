@@ -6028,7 +6028,7 @@ export const ko_KR: EnTranslations = {
       },
       "mind_flay": {
         "name": "비탄의 연도",
-        "description": "암흑 에너지로 대상의 정신을 공격해 3초 동안 매초 {damage}의 피해를 입힙니다."
+        "description": "암흑 에너지로 대상의 정신을 3초 동안 공격합니다. 각 틱의 피해가 첫 틱 피해의 30%만큼 증가합니다."
       },
       "flash_heal": {
         "name": "다급한 기도",

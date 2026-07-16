@@ -6028,7 +6028,7 @@ export const pt_BR: EnTranslations = {
       },
       "mind_flay": {
         "name": "Litania da Aflição",
-        "description": "Assalta a mente do alvo com energia de Sombra, causando {damage} de dano por segundo durante 3 s."
+        "description": "Assalta a mente do alvo com energia de Sombra por 3 s. A cada pulso, o dano aumenta em 30% do dano do primeiro pulso."
       },
       "flash_heal": {
         "name": "Prece Urgente",

@@ -6028,7 +6028,7 @@ export const cs_CZ: EnTranslations = {
       },
       "mind_flay": {
         "name": "Litanie běd",
-        "description": "Útočí na mysl cíle stínovou energií a způsobí {damage} poškození každou sekundu po dobu 3 s."
+        "description": "Útočí na mysl cíle stínovou energií po dobu 3 s. S každým dalším zásahem se poškození zvýší o 30 % poškození prvního zásahu."
       },
       "flash_heal": {
         "name": "Naléhavá modlitba",

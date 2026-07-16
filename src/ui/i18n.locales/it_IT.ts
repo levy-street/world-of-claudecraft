@@ -3281,7 +3281,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Una preghiera lenta ma potente che cura un bersaglio alleato di {damage}.',
   'entities.abilities.mind_flay.name': 'Litania della Sventura',
   'entities.abilities.mind_flay.description':
-    "Assale la mente del bersaglio con energia d'Ombra, infliggendo {damage} danni ogni secondo per 3 s.",
+    "Assale la mente del bersaglio con energia d'Ombra per 3 s. A ogni impulso, i danni aumentano del 30% dei danni del primo impulso.",
   'entities.abilities.flash_heal.name': 'Preghiera Urgente',
   'entities.abilities.flash_heal.description':
     'Una preghiera veloce che cura un bersaglio alleato di {damage}.',

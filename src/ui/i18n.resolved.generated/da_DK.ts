@@ -6028,7 +6028,7 @@ export const da_DK: EnTranslations = {
       },
       "mind_flay": {
         "name": "Jammerens Litani",
-        "description": "Angriber målets sind med skyggeenergi, hvilket volder {damage} skade hvert sekund i 3 sek."
+        "description": "Angriber målets sind med skyggeenergi i 3 sek. For hvert tick øges skaden med 30 % af det første ticks skade."
       },
       "flash_heal": {
         "name": "Hastende Bøn",

@@ -2061,7 +2061,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Treft de geest van het doelwit voor {damage} Schaduwschade.',
   'entities.abilities.mind_blast.name': 'Geestbreuk',
   'entities.abilities.mind_flay.description':
-    'Bestookt de geest van het doelwit met Schaduwenergie en brengt elke seconde {damage} schade toe gedurende 3 sec.',
+    'Bestookt de geest van het doelwit 3 sec. lang met Schaduwenergie. Met elke tik neemt de schade toe met 30% van de schade van de eerste tik.',
   'entities.abilities.mind_flay.name': 'Litanie van Leed',
   'entities.abilities.mongoose_bite.description':
     'Tegenaanval nadat het doelwit ontwijkt voor wapenschade plus {damage}. Kan niet worden ontweken.',
