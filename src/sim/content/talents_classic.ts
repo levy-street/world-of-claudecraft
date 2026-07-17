@@ -64,8 +64,30 @@ const PALADIN_SPECS: SpecDef[] = [
     'A holy warrior who judges enemies with weapon strikes and radiant burst.',
     'crusader_strike',
     'Blood Debt',
-    'Increases your Holy and physical ability damage by 20%.',
-    { global: { meleeDmgPct: 0.2, spellDmgPct: 0.2 } },
+    "Each landed melee auto-attack and Crusader Strike has a 20% chance to clear Rite of Expulsion's cooldown and make your next Rite of Expulsion free for 8 sec. Increases your Holy and physical ability damage by 20%.",
+    {
+      global: { meleeDmgPct: 0.2, spellDmgPct: 0.2 },
+      proc: {
+        id: 'pal_blood_debt',
+        name: 'Blood Debt',
+        spec: 'retribution',
+        school: 'holy',
+        trigger: {
+          on: 'meleeHit',
+          abilities: ['auto_attack', 'crusader_strike'],
+          chance: 0.2,
+        },
+        responses: [
+          { kind: 'cooldownRefund', ability: 'exorcism', seconds: 'reset' },
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_free',
+            abilities: ['exorcism'],
+            duration: 8,
+          },
+        ],
+      },
+    },
   ),
 ];
 

@@ -287,11 +287,19 @@ function fulminationProcState(
   return charges >= FULMINATION_MAX_CHARGES ? 'armed' : 'available';
 }
 
+function bloodDebtProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'pal_blood_debt') ? 'armed' : 'none';
+}
+
 // Ability ids map to pure proc resolvers here, keeping the painter generic. New
 // action cues extend this table rather than adding ability branches to DOM code.
 const PROC_STATE_RESOLVERS: Readonly<Record<string, ProcStateResolver | undefined>> = {
   icefall: icefallProcState,
   earth_shock: fulminationProcState,
+  exorcism: bloodDebtProcState,
 };
 
 function procStateForAbility(

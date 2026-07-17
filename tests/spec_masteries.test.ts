@@ -109,6 +109,26 @@ describe('spec masteries', () => {
     });
     expect(TALENTS.paladin?.specs.find((s) => s.id === 'retribution')?.mastery.effect).toEqual({
       global: { meleeDmgPct: 0.2, spellDmgPct: 0.2 },
+      proc: {
+        id: 'pal_blood_debt',
+        name: 'Blood Debt',
+        spec: 'retribution',
+        school: 'holy',
+        trigger: {
+          on: 'meleeHit',
+          abilities: ['auto_attack', 'crusader_strike'],
+          chance: 0.2,
+        },
+        responses: [
+          { kind: 'cooldownRefund', ability: 'exorcism', seconds: 'reset' },
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_free',
+            abilities: ['exorcism'],
+            duration: 8,
+          },
+        ],
+      },
     });
     expect(TALENTS.hunter?.specs.find((s) => s.id === 'marksmanship')?.mastery.effect).toEqual({
       global: { meleeDmgPct: 0.2 },

@@ -431,6 +431,19 @@ describe('actionBarView: proc availability cues', () => {
     );
   });
 
+  it('arms Rite of Expulsion only while Blood Debt is waiting to be spent', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('exorcism') })),
+      fakeDeps(),
+    );
+
+    expect(view.tick(world()).slots[0].procState).toBe('none');
+    expect(
+      view.tick(world({ playerAuras: [{ id: 'pal_blood_debt', kind: 'next_cast_free' }] })).slots[0]
+        .procState,
+    ).toBe('armed');
+  });
+
   it('clears a consumed proc state and remains deterministic for identical aura input', () => {
     const view = createActionBarView(
       descriptor(slot(1, { ability: ability('icefall') })),
