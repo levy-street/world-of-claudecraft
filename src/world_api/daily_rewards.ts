@@ -1,5 +1,6 @@
 export interface DailyRewardTaskView {
   id: string;
+  type: string;
   title: string;
   description: string;
   points: number;

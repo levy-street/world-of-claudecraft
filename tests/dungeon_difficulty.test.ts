@@ -76,28 +76,33 @@ describe('heroic tuning data contract', () => {
   it('pins the classic-era heroic multipliers per dungeon', () => {
     // The four five-mans are damage-EQUALIZED at the level-22 pin: the raw
     // damageMultiplier per dungeon is set so an average elite-trash swing lands
-    // ~300 post-mitigation on the reference geared shaman (see the tuning
-    // table's comment), which inverts the multiplier ladder because the harder
-    // dungeons already carry bigger base weapon damage. Exact literals so an
-    // accidental retune (or a revert to the old un-equalized ladder) reddens
-    // deliberately.
+    // ~225 post-mitigation on the reference geared shaman (see the tuning
+    // table's comment; the whole ladder was cut 25% from the original ~300
+    // calibration after live heroics proved overtuned), which inverts the
+    // multiplier ladder because the harder dungeons already carry bigger base
+    // weapon damage. Boss-summoned add waves swing at addDamageMultiplier,
+    // roughly half the trash value, because they stack on the boss's own
+    // output. Exact literals so an accidental retune (or a revert to the old
+    // un-equalized ladder) reddens deliberately.
     expect(
       Object.fromEntries(
         Object.values(HEROIC_DUNGEON_TUNING).map((t) => [
           t.id,
-          [t.healthMultiplier, t.damageMultiplier, t.armorMultiplier],
+          [t.healthMultiplier, t.damageMultiplier, t.addDamageMultiplier, t.armorMultiplier],
         ]),
       ),
     ).toEqual({
-      hollow_crypt: [1.9, 6.8, 1.3],
-      sunken_bastion: [2.0, 6.2, 1.3],
-      drowned_temple: [2.6, 5.7, 1.25],
-      gravewyrm_sanctum: [2.0, 5.4, 1.2],
+      hollow_crypt: [1.9, 5.1, 2.55, 1.3],
+      sunken_bastion: [2.0, 4.65, 2.3, 1.3],
+      drowned_temple: [2.6, 4.3, 2.15, 1.25],
+      gravewyrm_sanctum: [2.0, 4.05, 2.0, 1.2],
       // The raid multiplier is smaller in RELATIVE terms because normal
       // Nythraxis already lands the game's hardest hits (see the tuning
       // table's comment); its percentage mechanics scale separately in
-      // encounters/nythraxis.ts (Soul Rend 1.5x, lethal Deathless Rage).
-      nythraxis_boss_arena: [1.6, 2.0, 1.2],
+      // encounters/nythraxis.ts (Soul Rend 1.5x, lethal Deathless Rage), and
+      // its add waves spawn through the encounter script, never
+      // spawnBossAdds, so its addDamageMultiplier mirrors damageMultiplier.
+      nythraxis_boss_arena: [1.6, 2.0, 2.0, 1.2],
     });
   });
 });
@@ -123,14 +128,14 @@ describe('mobTemplateForDungeonDifficulty', () => {
   it('produces an exact heroic transform without mutating the base template', () => {
     const before = JSON.stringify(SYNTHETIC);
     const heroic = mobTemplateForDungeonDifficulty(SYNTHETIC, 'hollow_crypt', 'heroic');
-    // hollow_crypt tuning: health x1.9, damage x6.8, armor x1.3, level 22.
+    // hollow_crypt tuning: health x1.9, damage x5.1, armor x1.3, level 22.
     expect(heroic).not.toBe(SYNTHETIC);
     expect(heroic.minLevel).toBe(22);
     expect(heroic.maxLevel).toBe(22);
     expect(heroic.hpBase).toBeCloseTo(190, 10);
     expect(heroic.hpPerLevel).toBeCloseTo(19, 10);
-    expect(heroic.dmgBase).toBeCloseTo(136, 10);
-    expect(heroic.dmgPerLevel).toBeCloseTo(13.6, 10);
+    expect(heroic.dmgBase).toBeCloseTo(102, 10);
+    expect(heroic.dmgPerLevel).toBeCloseTo(10.2, 10);
     expect(heroic.armorPerLevel).toBeCloseTo(5.2, 10);
     // Every heroic mob is floored to the anti-kite speed (player RUN_SPEED is
     // 7); a template already at or above the floor keeps its own speed.
@@ -142,6 +147,25 @@ describe('mobTemplateForDungeonDifficulty', () => {
     // Untouched fields carry over; the base template is never mutated.
     expect(heroic.attackSpeed).toBe(SYNTHETIC.attackSpeed);
     expect(JSON.stringify(SYNTHETIC)).toBe(before);
+  });
+
+  it('scales a boss-SUMMONED add by addDamageMultiplier, everything else unchanged', () => {
+    const add = mobTemplateForDungeonDifficulty(SYNTHETIC, 'hollow_crypt', 'heroic', {
+      summonedAdd: true,
+    });
+    // hollow_crypt addDamageMultiplier is 2.55: half the 5.1 trash multiplier.
+    expect(add.dmgBase).toBeCloseTo(51, 10);
+    expect(add.dmgPerLevel).toBeCloseTo(5.1, 10);
+    // Health, armor, level, and the speed floor stay on the dungeon-wide tuning.
+    expect(add.hpBase).toBeCloseTo(190, 10);
+    expect(add.hpPerLevel).toBeCloseTo(19, 10);
+    expect(add.armorPerLevel).toBeCloseTo(5.2, 10);
+    expect(add.minLevel).toBe(22);
+    expect(add.moveSpeed).toBe(8);
+    // The role flag does nothing outside heroic.
+    expect(
+      mobTemplateForDungeonDifficulty(SYNTHETIC, 'hollow_crypt', 'normal', { summonedAdd: true }),
+    ).toBe(SYNTHETIC);
   });
 });
 
@@ -159,6 +183,14 @@ describe('applyHeroicMobTuning', () => {
     applyHeroicMobTuning(mob, 'sunken_bastion', 'heroic');
     expect(mob.mechanicDamageMult).toBe(HEROIC_DUNGEON_TUNING.sunken_bastion.damageMultiplier);
     expect(mob.mechanicHealMult).toBe(HEROIC_DUNGEON_TUNING.sunken_bastion.healthMultiplier);
+
+    // A boss-summoned add stamps the softer add multiplier on its mechanics too.
+    const summoned = { mechanicDamageMult: undefined, mechanicHealMult: undefined } as Entity;
+    applyHeroicMobTuning(summoned, 'sunken_bastion', 'heroic', { summonedAdd: true });
+    expect(summoned.mechanicDamageMult).toBe(
+      HEROIC_DUNGEON_TUNING.sunken_bastion.addDamageMultiplier,
+    );
+    expect(summoned.mechanicHealMult).toBe(HEROIC_DUNGEON_TUNING.sunken_bastion.healthMultiplier);
 
     const normalMob = { mechanicDamageMult: undefined, mechanicHealMult: undefined } as Entity;
     applyHeroicMobTuning(normalMob, 'sunken_bastion', 'normal');

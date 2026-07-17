@@ -68,6 +68,9 @@ export interface DesktopBridge {
   openBrowserLogin(): Promise<void>;
   takeLoginCode(): Promise<string | null>;
   onLoginCode(callback: (code: string) => void): () => void;
+  openWalletBrowser?(code: string): Promise<boolean>;
+  takeWalletHandoffCode?(): Promise<string | null>;
+  onWalletHandoffCode?(callback: (code: string) => void): () => void;
   // Optional: these shipped after the three login methods, so an older
   // installed shell may not expose them; feature-check before use. The bridge
   // detection below deliberately requires only the login trio, or a shell
@@ -85,6 +88,9 @@ export interface DesktopBridge {
   // shells that predate the capability probe: fall back to steamLinkTicket
   // presence there. Feature-check before use like the other post-trio methods.
   steamLinkSupported?(): Promise<boolean>;
+  // Website-distributed desktop builds may connect external wallets. Steam
+  // builds return false so wallet code and controls remain absent there.
+  walletConnectionSupported?(): Promise<boolean>;
   // Signals that the link POST settled (success or failure) so the shell can
   // cancel the outstanding Steam auth ticket promptly (Valve's CancelAuthTicket
   // contract). Absent on older shells: feature-check before use.

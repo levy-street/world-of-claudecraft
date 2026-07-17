@@ -55,7 +55,7 @@ describe('gather node harvest (#1121)', () => {
     const entry = NODE_HARVEST_TABLE[node.type];
 
     const before = sim.countItem(entry.itemId, pid);
-    sim.harvestNode(NODE_ID, pid);
+    expect(sim.harvestNode(NODE_ID, pid)).toBe(true);
     sim.tick();
     expect(sim.countItem(entry.itemId, pid)).toBe(before + 1);
   });
@@ -72,7 +72,7 @@ describe('gather node harvest (#1121)', () => {
     const node = mustNode(NODE_ID);
     const entry = NODE_HARVEST_TABLE[node.type];
     const before = sim.countItem(entry.itemId, pid);
-    sim.harvestNode(NODE_ID, pid);
+    expect(sim.harvestNode(NODE_ID, pid)).toBe(false);
     sim.tick();
     expect(sim.countItem(entry.itemId, pid)).toBe(before);
   });
@@ -173,7 +173,7 @@ describe('gather node harvest (#1121)', () => {
   it('an unknown node id is denied without throwing', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Unknown');
-    expect(() => sim.harvestNode('not_a_real_node', pid)).not.toThrow();
+    expect(sim.harvestNode('not_a_real_node', pid)).toBe(false);
     sim.tick();
     expect(sim.nodeHarvestableByMeFor('not_a_real_node', pid)).toBe(false);
   });

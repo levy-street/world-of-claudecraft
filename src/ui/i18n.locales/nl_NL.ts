@@ -1155,6 +1155,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.hideChestConfirmTitle': 'Kist met dagelijkse beloningen verbergen?',
   'hudChrome.dailyRewards.pointsGained': '{points} punten voor dagelijkse beloningen verdiend.',
   'hudChrome.dailyRewards.taskMultiplier': 'x{multiplier} vermenigvuldiger',
+  'hudChrome.dailyRewards.oneVsOneExcluded':
+    '1-tegen-1-wedstrijden leveren geen punten voor dagelijkse beloningen op.',
   'hudChrome.dailyRewards.totalPlayer': '{count} speler vandaag',
   'hudChrome.dailyRewards.totalPlayers': '{count} spelers vandaag',
   'hudChrome.death.resurrectAtCorpse': 'Herrijs bij je lijk',
@@ -6336,7 +6338,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.greyjaw_stalker.bonus3': 'Verhoogt aanvals- en spreuksnelheid met 15%.',
   'entities.itemSets.necromancers.name': 'Mournweave-Gewaden',
   'entities.itemSets.necromancers.bonus2':
-    'Je kunt niet worden teruggeslagen (100% terugslagweerstand).',
+    'Verhoogt spreukkracht met 20. Opgelopen schade vertraagt je spreuken niet meer (100% weerstand tegen spreukvertraging).',
   'entities.itemSets.necromancers.bonus3':
     'Verhoogt intellect met 10 en uithoudingsvermogen met 10.',
   'entities.itemSets.nighttalon.name': 'Direfang-Pels',
@@ -6345,12 +6347,12 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Verhoogt behendigheid met 15, kritieke kans met 2% en aanvals- en spreuksnelheid met 15%.',
   'entities.itemSets.soulflame.name': 'Wraithfire-Regalia',
   'entities.itemSets.soulflame.bonus2':
-    'Je kunt niet worden teruggeslagen (100% terugslagweerstand).',
+    'Verhoogt spreukkracht met 20. Opgelopen schade vertraagt je spreuken niet meer (100% weerstand tegen spreukvertraging).',
   'entities.itemSets.soulflame.bonus3':
     'Verhoogt intellect met 15, geest met 15 en aanvals- en spreuksnelheid met 15%.',
   'entities.itemSets.stormcallers.name': 'Galecall-Gewaden',
   'entities.itemSets.stormcallers.bonus2':
-    'Je kunt niet worden teruggeslagen (100% terugslagweerstand).',
+    'Verhoogt spreukkracht met 20. Opgelopen schade vertraagt je spreuken niet meer (100% weerstand tegen spreukvertraging).',
   'entities.itemSets.stormcallers.bonus3':
     'Verhoogt intellect met 15, geest met 15 en aanvals- en spreuksnelheid met 15%.',
   'entities.itemSets.vale_arcanist.name': 'Gewaden van de Dal-arcanist',
@@ -6960,15 +6962,11 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.deedsPage.howHeading': 'Hoe daden werken',
   'guide.deedsPage.intro':
     'In het Boek der Daden houdt de wereld de stand bij van alles wat je hebt verricht, van je eerste stappen buiten het dal waar je begon tot de zwaarste gevechten die het rijk te bieden heeft. Behaal daden terwijl je speelt, draag de titels die ze schenken en zie je Roem stijgen.',
-  'guide.deedsPage.renownBody':
-    'Roem is de score achter het Boek. Elke daad die je behaalt is een vaste hoeveelheid waard, en je totaal stijgt alleen maar, dus een rustige week kost je nooit terrein. Een handvol daden hangt af van geluk in plaats van kunde, en Wapenfeiten zijn een eer op zich, dus beide leveren helemaal geen Roem op.',
   'guide.deedsPage.renownHeading': 'Roem',
   'guide.deedsPage.rewardBorder': 'Rand',
   'guide.deedsPage.rewardsBody':
     'De beloningen zijn puur voor de sier, en dat is precies de bedoeling. Sommige daden schenken een titel die je kunt dragen of een rand die je naam omlijst, en nooit iets dat je held sterker maakt. Kies de titel die je wilt in het Boek der Daden en hij reist mee op je naamplaatje, in de chat en op de ranglijsten, voor iedereen zichtbaar.',
   'guide.deedsPage.rewardsHeading': 'Titels en randen',
-  'guide.deedsPage.standingsNote':
-    'De rijken houden een doorlopende telling van Roem bij over elk account. Om te zien wie waar staat, open je de Ranglijst in het spel en blader je naar het tabblad Roem; de standen leven daar, niet op de wiki.',
   'guide.nav.deeds': 'Boek der Daden',
   'hudChrome.deeds.broadcastLine': '{name} heeft een daad volbracht: {deed}',
   'hudChrome.deeds.broadcastsLabel': 'Deel behaalde daden met je gilde en vrienden',
@@ -7001,9 +6999,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.filterNearly': 'Bijna klaar',
   'hudChrome.deeds.filterUnearned': 'Niet behaald',
   'hudChrome.deeds.hiddenBadge': 'Verborgen',
-  'hudChrome.deeds.lbDeedsCol': 'Daden',
   'hudChrome.deeds.lbEmpty': 'Nog geen kroniekschrijvers op de ranglijst.',
-  'hudChrome.deeds.lbSelf': 'Jouw positie: rang {rank}, top {percent} procent',
   'hudChrome.deeds.lbTab': 'Roem',
   'hudChrome.deeds.lbTitleCol': 'Titel',
   'hudChrome.deeds.nearestLabel': 'Bijna zover:',

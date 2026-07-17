@@ -7,6 +7,7 @@ import { randomBytes } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { readSfxGainCeilings } from './sfx_gain_ceiling.mjs';
 import { SFX } from './sfx_prompts.mjs';
 
 export const DEFAULT_SFX_PROFILE_REPO_ROOT = fileURLToPath(new URL('../..', import.meta.url));
@@ -32,6 +33,14 @@ const PLAYBACK_RATE_MIN = 0.25;
 const PLAYBACK_RATE_MAX = 4;
 const SFX_KEYS = new Set(SFX.map((entry) => entry.key));
 const CATEGORY_SET = new Set(SFX_PLAYBACK_CATEGORIES);
+// Computed per-key headroom for custom (hand-mastered) keys only, see
+// sfx_gain_ceiling.mjs: a key with a real generated entry here may resolve
+// ABOVE RESOLVED_GAIN_MAX_DB, up to its own measured-headroom ceiling. Every
+// other key keeps the flat 0dB ceiling exactly as before. Read once at module
+// load from the committed, regenerated-alongside-the-manifest artifact, not
+// re-measured live: this file's callers (Studio, the manifest builder) run in
+// short-lived Node processes, so a stale in-process cache is not a concern.
+const SFX_GAIN_CEILINGS = readSfxGainCeilings(DEFAULT_SFX_PROFILE_REPO_ROOT);
 
 const neutralCategories = () =>
   Object.fromEntries(SFX_PLAYBACK_CATEGORIES.map((category) => [category, 0]));
@@ -94,16 +103,25 @@ export function categoryForSfx(key) {
   return 'other';
 }
 
+// A custom key with a computed ceiling (see sfx_gain_ceiling.mjs) may resolve
+// above the flat 0dB default, up to its own measured-headroom ceiling; every
+// other key is unaffected (ceiling falls back to the original flat max).
+export function resolvedGainCeilingDb(key) {
+  return SFX_GAIN_CEILINGS[key] ?? RESOLVED_GAIN_MAX_DB;
+}
+
+// Linear form of resolvedGainCeilingDb, for callers (the generated manifest,
+// the runtime pack validator) that work in gain multipliers, not dB.
+export function resolvedGainCeiling(key) {
+  return Number((10 ** (resolvedGainCeilingDb(key) / 20)).toFixed(6));
+}
+
 function resolvedGainDb(key, gainMap) {
   const category = categoryForSfx(key);
   const baseline = gainMap.categoryBaselineDb[category];
   const trim = gainMap.keyTrimDb[key] ?? 0;
-  return boundedNumber(
-    baseline + trim,
-    RESOLVED_GAIN_MIN_DB,
-    RESOLVED_GAIN_MAX_DB,
-    `resolved gain for ${key}`,
-  );
+  const maxDb = resolvedGainCeilingDb(key);
+  return boundedNumber(baseline + trim, RESOLVED_GAIN_MIN_DB, maxDb, `resolved gain for ${key}`);
 }
 
 export function normalizeSfxGainMap(raw) {

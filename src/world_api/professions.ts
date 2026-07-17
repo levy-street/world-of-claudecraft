@@ -1,5 +1,6 @@
 import type { MaterialRarity } from '../sim/professions/gathering';
 import type { PlayerProfessionSkill, ProfessionRecipeRecord } from '../sim/professions/types';
+import type { WorldInteractionOutcome } from './interaction';
 
 // Render-safe projection of a player's professions standing. Stub as of
 // #1164, now real for the gathering professions (#1119): `skills` carries one
@@ -65,7 +66,7 @@ export interface CraftResultView {
 export interface IWorldProfessions {
   professionsState: PlayerProfessionsView;
   nodeHarvestableByMe(nodeId: string): boolean;
-  harvestNode(nodeId: string): void;
+  harvestNode(nodeId: string): WorldInteractionOutcome;
   recipeList: readonly RecipeDef[];
   lastCraftResult: CraftResultView | null;
   craftItem(recipeId: string): void;

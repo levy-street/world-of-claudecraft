@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   closeOrphanPlayerSessions,
   closePlayerSession,
+  DAY_ONE_FUNNEL_STAGES,
   openPlayerSession,
   PLAYER_BUSINESS_SNAPSHOT_SQL,
   PLAYER_METRICS_CONCURRENT_INDEX_SQL,
@@ -102,6 +103,40 @@ describe('player business snapshot safety', () => {
     expect(PLAYER_BUSINESS_SNAPSHOT_SQL).not.toMatch(/FROM characters\b/);
   });
 
+  it('bounds first-play engagement and the account-created funnel to indexed daily cohorts', () => {
+    expect(PLAYER_BUSINESS_SNAPSHOT_SQL).toContain('AS playtime_p50_new');
+    expect(PLAYER_BUSINESS_SNAPSHOT_SQL).toContain('AS playtime_p90_new');
+    expect(PLAYER_BUSINESS_SNAPSHOT_SQL).toContain('AS sessions_p50_new');
+    expect(PLAYER_BUSINESS_SNAPSHOT_SQL).toContain('AS new_playtime_lt_10m');
+    expect(PLAYER_BUSINESS_SNAPSHOT_SQL).toContain('AS new_playtime_10m_30m');
+    expect(PLAYER_BUSINESS_SNAPSHOT_SQL).toContain('AS new_playtime_30m_1h');
+    expect(PLAYER_BUSINESS_SNAPSHOT_SQL).toContain('AS new_playtime_1h_3h');
+    expect(PLAYER_BUSINESS_SNAPSHOT_SQL).toContain('AS new_playtime_gte_3h');
+    expect(PLAYER_BUSINESS_SNAPSHOT_SQL).toMatch(
+      /WHERE facts\.realm = \$1\s+AND facts\.first_play_at >= days\.day/,
+    );
+    expect(PLAYER_BUSINESS_SNAPSHOT_SQL).toContain('AS funnel_created');
+    expect(PLAYER_BUSINESS_SNAPSHOT_SQL).toContain('AS funnel_first_character');
+    expect(PLAYER_BUSINESS_SNAPSHOT_SQL).toContain('AS funnel_entered_world');
+    expect(PLAYER_BUSINESS_SNAPSHOT_SQL).toContain('AS funnel_played_10m');
+    expect(PLAYER_BUSINESS_SNAPSHOT_SQL).toContain('AS funnel_reached_level_2');
+    expect(PLAYER_BUSINESS_SNAPSHOT_SQL).toContain('AS funnel_reached_level_5');
+    expect(PLAYER_BUSINESS_SNAPSHOT_SQL).toContain('FROM accounts');
+    expect(PLAYER_BUSINESS_SNAPSHOT_SQL).toContain('facts.account_id = accounts.id');
+    expect(PLAYER_BUSINESS_SNAPSHOT_SQL).toContain('activity.account_id = accounts.id');
+    expect(PLAYER_BUSINESS_SNAPSHOT_SQL).toContain('accounts.created_at >= days.day');
+    expect(PLAYER_BUSINESS_SNAPSHOT_SQL).toContain('accounts.created_at < days.day + 1');
+    expect(PLAYER_BUSINESS_SNAPSHOT_SQL).not.toContain('facts.account_created_at');
+    expect(DAY_ONE_FUNNEL_STAGES).toEqual([
+      'created',
+      'first_character',
+      'entered_world',
+      'played_10m',
+      'reached_level_2',
+      'reached_level_5',
+    ]);
+  });
+
   it('uses read-only server-side timeouts and maps nullable rates', async () => {
     const query = vi.fn(async (sql: string, _params?: unknown[]) => {
       if (sql === PLAYER_BUSINESS_SNAPSHOT_SQL) {
@@ -121,6 +156,19 @@ describe('player business snapshot safety', () => {
               median_seconds: 60,
               level_2_rate: 0.75,
               level_5_rate: null,
+              playtime_p50_new: 90,
+              playtime_p90_new: null,
+              sessions_p50_new: 1,
+              new_playtime_lt_10m: 1,
+              new_playtime_10m_30m: 0,
+              new_playtime_30m_1h: 0,
+              new_playtime_1h_3h: 0,
+              new_playtime_gte_3h: 0,
+              funnel_first_character: 1,
+              funnel_entered_world: 1,
+              funnel_played_10m: 0,
+              funnel_reached_level_2: 1,
+              funnel_reached_level_5: 0,
               retention: { 1: 0.4, 7: null, 30: null },
             },
             {
@@ -137,6 +185,19 @@ describe('player business snapshot safety', () => {
               median_seconds: 40,
               level_2_rate: 0.5,
               level_5_rate: 0,
+              playtime_p50_new: 80,
+              playtime_p90_new: 80,
+              sessions_p50_new: 2,
+              new_playtime_lt_10m: 0,
+              new_playtime_10m_30m: 0,
+              new_playtime_30m_1h: 0,
+              new_playtime_1h_3h: 1,
+              new_playtime_gte_3h: 0,
+              funnel_first_character: 1,
+              funnel_entered_world: 1,
+              funnel_played_10m: 1,
+              funnel_reached_level_2: 1,
+              funnel_reached_level_5: 1,
               retention: { 1: 0.6, 7: 0.3, 30: null },
             },
           ],
@@ -172,6 +233,45 @@ describe('player business snapshot safety', () => {
       firstSessionMedianSeconds: 60,
       firstSessionLevel2Rate: 0.75,
       firstSessionLevel5Rate: null,
+      firstDayPlaytimeP50Seconds: 90,
+      firstDayPlaytimeP90Seconds: null,
+      firstDaySessionsMedian: 1,
+      firstDayPlaytimeAccounts: {
+        lt_10m: 1,
+        '10m_30m': 0,
+        '30m_1h': 0,
+        '1h_3h': 0,
+        gte_3h: 0,
+      },
+      dayOneFunnelAccounts: {
+        created: 2,
+        first_character: 1,
+        entered_world: 1,
+        played_10m: 0,
+        reached_level_2: 1,
+        reached_level_5: 0,
+      },
+    });
+    expect(result.days[1]).toMatchObject({
+      period: 'yesterday',
+      firstDayPlaytimeP50Seconds: 80,
+      firstDayPlaytimeP90Seconds: 80,
+      firstDaySessionsMedian: 2,
+      firstDayPlaytimeAccounts: {
+        lt_10m: 0,
+        '10m_30m': 0,
+        '30m_1h': 0,
+        '1h_3h': 1,
+        gte_3h: 0,
+      },
+      dayOneFunnelAccounts: {
+        created: 1,
+        first_character: 1,
+        entered_world: 1,
+        played_10m: 1,
+        reached_level_2: 1,
+        reached_level_5: 1,
+      },
     });
     expect(result.retention).toEqual([
       { period: 'today', day: 1, rate: 0.4 },

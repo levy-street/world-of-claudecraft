@@ -94,7 +94,7 @@ describe('interaction.lootCorpse', () => {
     const { sim, a, b } = twoPlayers();
     const mob = corpse(sim, 20, 22, b, [{ itemId: 'worn_sword', count: 1 }]);
     sim.events = [];
-    interaction.lootCorpse(ctxOf(sim), mob.id, a);
+    expect(interaction.lootCorpse(ctxOf(sim), mob.id, a)).toBe(false);
     expect(errors(sim)).toContain("You don't have permission to loot that.");
     expect(sim.countItem('worn_sword', a)).toBe(0);
     expect(mob.loot?.items[0].count).toBe(1); // untouched: looting bailed before any mutation
@@ -105,7 +105,7 @@ describe('interaction.lootCorpse', () => {
     // tapped by a (shared rights) but placed beyond INTERACT_RANGE.
     const mob = corpse(sim, 20 + INTERACT_RANGE + 3, 20, a, [{ itemId: 'worn_sword', count: 1 }]);
     sim.events = [];
-    interaction.lootCorpse(ctxOf(sim), mob.id, a);
+    expect(interaction.lootCorpse(ctxOf(sim), mob.id, a)).toBe(false);
     expect(errors(sim)).toContain('Too far away.');
     expect(sim.countItem('worn_sword', a)).toBe(0);
   });
@@ -114,7 +114,7 @@ describe('interaction.lootCorpse', () => {
     const { sim, a } = twoPlayers();
     const mob = corpse(sim, 20, 22, 999999, [{ itemId: 'wolf_fang', count: 2, openToAll: true }]);
     sim.events = [];
-    interaction.lootCorpse(ctxOf(sim), mob.id, a);
+    expect(interaction.lootCorpse(ctxOf(sim), mob.id, a)).toBe(true);
     expect(sim.countItem('wolf_fang', a)).toBe(2);
     expect(mob.loot).toBeNull(); // open slot drained to 0 -> pruneCorpseLoot cleared it
   });
@@ -125,7 +125,7 @@ describe('interaction.lootCorpse', () => {
       { itemId: 'gnarled_staff', count: 1, personalFor: [a] },
     ]);
     sim.events = [];
-    interaction.lootCorpse(ctxOf(sim), mob.id, a);
+    expect(interaction.lootCorpse(ctxOf(sim), mob.id, a)).toBe(true);
     expect(sim.countItem('gnarled_staff', a)).toBe(1);
     // claimed personal slot is filtered to [] then pruned away -> corpse emptied.
     expect(mob.loot).toBeNull();
@@ -137,7 +137,7 @@ describe('interaction.lootCorpse', () => {
     const player = sim.entities.get(a) as AnyEntity;
     player.targetId = mob.id;
     sim.events = [];
-    interaction.lootCorpse(ctxOf(sim), mob.id, a);
+    expect(interaction.lootCorpse(ctxOf(sim), mob.id, a)).toBe(true);
     expect(sim.countItem('worn_sword', a)).toBe(1);
     expect(mob.loot).toBeNull(); // pruneCorpseLoot cleared the emptied corpse
     expect(player.targetId).toBeNull();
@@ -149,7 +149,7 @@ describe('interaction.pickUpObject', () => {
     const { sim, a } = twoPlayers();
     const obj = groundObj(sim, 'wolf_fang', 20, 21);
     sim.events = [];
-    interaction.pickUpObject(ctxOf(sim), obj.id, a);
+    expect(interaction.pickUpObject(ctxOf(sim), obj.id, a)).toBe(true);
     expect(sim.countItem('wolf_fang', a)).toBe(1);
     expect(obj.lootable).toBe(false);
     expect(obj.respawnTimer).toBe(OBJECT_RESPAWN);
@@ -159,7 +159,7 @@ describe('interaction.pickUpObject', () => {
     const { sim, a } = twoPlayers();
     const obj = groundObj(sim, 'supply_crate', 20, 21);
     sim.events = [];
-    interaction.pickUpObject(ctxOf(sim), obj.id, a);
+    expect(interaction.pickUpObject(ctxOf(sim), obj.id, a)).toBe(false);
     expect(sim.countItem('supply_crate', a)).toBe(0);
     expect(obj.lootable).toBe(true);
     // the relocated def.pickupDeny literal still emits unchanged at the new site.
@@ -172,7 +172,7 @@ describe('interaction.pickUpObject', () => {
     meta.questLog.set('q_supplies', { questId: 'q_supplies', counts: [0], state: 'active' });
     const obj = groundObj(sim, 'supply_crate', 20, 21);
     sim.events = [];
-    interaction.pickUpObject(ctxOf(sim), obj.id, a);
+    expect(interaction.pickUpObject(ctxOf(sim), obj.id, a)).toBe(true);
     expect(sim.countItem('supply_crate', a)).toBe(1);
     expect(obj.lootable).toBe(false);
   });
@@ -181,7 +181,7 @@ describe('interaction.pickUpObject', () => {
     const { sim, a } = twoPlayers();
     const obj = groundObj(sim, 'wolf_fang', 20 + INTERACT_RANGE + 3, 20);
     sim.events = [];
-    interaction.pickUpObject(ctxOf(sim), obj.id, a);
+    expect(interaction.pickUpObject(ctxOf(sim), obj.id, a)).toBe(false);
     expect(errors(sim)).toContain('Too far away.');
     expect(sim.countItem('wolf_fang', a)).toBe(0);
     expect(obj.lootable).toBe(true);

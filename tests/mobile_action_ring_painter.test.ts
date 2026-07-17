@@ -18,6 +18,7 @@ import {
 } from '../src/ui/hud/action_bar/action_bar_view';
 import {
   clampMobilePage,
+  mobilePageCount,
   nextMobilePage,
   sourceSlotForMobileButton,
 } from '../src/ui/hud/action_bar/mobile_action_page_view';
@@ -148,16 +149,28 @@ describe('mobile action ring: source-slot state per page', () => {
     expect(state.slots[1].abilityId).toBe('fireball');
   });
 
-  it('the same button index shows source slot 6 on page 1 (no rebuild, same descriptor)', () => {
+  it('the same button index follows source slots 1, 6, 11, and 16 across all four pages', () => {
     const pageBox = { page: 0 };
     const bySlot = new Map<number, ActionBarAbility>([
       [1, ability('fireball')],
       [6, ability('frostbolt')],
+      [11, ability('arcane_blast')],
+      [16, ability('shadow_bolt')],
     ]);
     const view = createActionBarView({ slots: ringDescriptor(pageBox, bySlot) }, fakeDeps());
-    expect(view.tick(idleWorld()).slots[1].abilityId).toBe('fireball');
-    pageBox.page = nextMobilePage(pageBox.page);
-    expect(view.tick(idleWorld()).slots[1].abilityId).toBe('frostbolt');
+    for (const expected of ['fireball', 'frostbolt', 'arcane_blast', 'shadow_bolt']) {
+      expect(view.tick(idleWorld()).slots[1].abilityId).toBe(expected);
+      pageBox.page = nextMobilePage(pageBox.page);
+    }
+    expect(pageBox.page).toBe(0);
+  });
+
+  it('the last button on page 3 shows the action bound to source slot 20', () => {
+    const pageBox = { page: 3 };
+    const bySlot = new Map<number, ActionBarAbility>([[20, ability('execute')]]);
+    const view = createActionBarView({ slots: ringDescriptor(pageBox, bySlot) }, fakeDeps());
+
+    expect(view.tick(idleWorld()).slots[5].abilityId).toBe('execute');
   });
 
   it('an empty source slot renders the empty kind on the ring', () => {
@@ -228,13 +241,13 @@ describe('MobileActionRingPainter: page indicator + toggle aria', () => {
       (key) => `URL(${key})`,
       (key, values) => (values ? `${key}|${JSON.stringify(values)}` : key),
     );
-    const pageBox = { page: 0 };
+    const pageBox = { page: 3 };
     const view = createActionBarView({ slots: ringDescriptor(pageBox, new Map()) }, fakeDeps());
-    painter.paint(view.tick(idleWorld()), 0, 2);
+    painter.paint(view.tick(idleWorld()), pageBox.page, mobilePageCount());
 
     expect(calls).toContainEqual({
       m: 'setText',
-      args: [indicator, 'hudChrome.mobile.actionPageIndicator|{"page":1,"count":2}'],
+      args: [indicator, 'hudChrome.mobile.actionPageIndicator|{"page":4,"count":4}'],
     });
     expect(calls).toContainEqual({
       m: 'setAttr',
@@ -404,6 +417,16 @@ describe('Hud.buildMobileActionRing wiring (source scan)', () => {
     expect(hud).toContain('this.castSlot(sourceSlotForMobileButton(this.mobileActionPage, i));');
   });
 
+  it('resolves every action-view getter from the current mobile page at tick time', () => {
+    expect(hud).toContain(
+      'this.actionForSlot(sourceSlotForMobileButton(this.mobileActionPage, i)) !== null',
+    );
+    expect(hud).toContain(
+      'this.abilityForSlot(sourceSlotForMobileButton(this.mobileActionPage, i))',
+    );
+    expect(hud).toContain('this.itemForSlot(sourceSlotForMobileButton(this.mobileActionPage, i))');
+  });
+
   it('wires the page toggle button to cycleMobileActionPage', () => {
     expect(hud).toContain('this.cycleMobileActionPage();');
   });
@@ -417,6 +440,12 @@ describe('Hud.buildMobileActionRing wiring (source scan)', () => {
   it('passes the live Show Attack Button setting into the mobile ring painter', () => {
     expect(hud).toMatch(
       /this\.mobileActionRingPainter\.paint\([\s\S]*?this\.attackSlotIsAttack\(\),[\s\S]*?\);/,
+    );
+  });
+
+  it('passes the shared mobile page count into the mobile ring painter', () => {
+    expect(hud).toMatch(
+      /this\.mobileActionRingPainter\.paint\([\s\S]*?mobilePageCount\(\),[\s\S]*?\);/,
     );
   });
 

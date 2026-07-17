@@ -8,9 +8,13 @@ import {
   WOC_PLAYER_DAILY_ACTIVE_ACCOUNTS,
   WOC_PLAYER_DAILY_PLAYTIME_SECONDS,
   WOC_PLAYER_FIRST_CHARACTER_ACCOUNTS,
+  WOC_PLAYER_FIRST_DAY_PLAYTIME_ACCOUNTS,
+  WOC_PLAYER_FIRST_DAY_PLAYTIME_SECONDS,
+  WOC_PLAYER_FIRST_DAY_SESSIONS,
   WOC_PLAYER_FIRST_SESSION_LEVEL_RATE,
   WOC_PLAYER_FIRST_SESSION_MEDIAN_SECONDS,
   WOC_PLAYER_FIRST_WORLD_ENTRY_RATE,
+  WOC_PLAYER_FUNNEL_ACCOUNTS,
   WOC_PLAYER_RETENTION_RATE,
 } from '../../../server/http/business_metrics';
 import type { PlayerBusinessSnapshot } from '../../../server/player_metrics_db';
@@ -32,6 +36,24 @@ function snapshot(): PlayerBusinessSnapshot {
         firstSessionMedianSeconds: 720,
         firstSessionLevel2Rate: 0.6,
         firstSessionLevel5Rate: 0.25,
+        firstDayPlaytimeP50Seconds: 480,
+        firstDayPlaytimeP90Seconds: 5400,
+        firstDaySessionsMedian: 1,
+        firstDayPlaytimeAccounts: {
+          lt_10m: 5,
+          '10m_30m': 1,
+          '30m_1h': 1,
+          '1h_3h': 1,
+          gte_3h: 0,
+        },
+        dayOneFunnelAccounts: {
+          created: 12,
+          first_character: 9,
+          entered_world: 8,
+          played_10m: 3,
+          reached_level_2: 2,
+          reached_level_5: 1,
+        },
       },
       {
         period: 'yesterday',
@@ -47,6 +69,24 @@ function snapshot(): PlayerBusinessSnapshot {
         firstSessionMedianSeconds: 700,
         firstSessionLevel2Rate: 0.5,
         firstSessionLevel5Rate: 0.2,
+        firstDayPlaytimeP50Seconds: null,
+        firstDayPlaytimeP90Seconds: null,
+        firstDaySessionsMedian: null,
+        firstDayPlaytimeAccounts: {
+          lt_10m: 4,
+          '10m_30m': 1,
+          '30m_1h': 0,
+          '1h_3h': 0,
+          gte_3h: 1,
+        },
+        dayOneFunnelAccounts: {
+          created: 10,
+          first_character: 7,
+          entered_world: 6,
+          played_10m: 2,
+          reached_level_2: 1,
+          reached_level_5: 0,
+        },
       },
     ],
     retention: [
@@ -106,6 +146,43 @@ describe('registerBusinessMetrics', () => {
     expect(sample(text, WOC_PLAYER_RETENTION_RATE, 'period="today",day="7"')).toBe('0.2');
     expect(sample(text, WOC_PLAYER_RETENTION_RATE, 'period="yesterday",day="30"')).toBe('0.05');
     expect(text).not.toContain('woc_player_retention_rate{period="today",day="30"}');
+
+    expect(WOC_PLAYER_FIRST_DAY_PLAYTIME_SECONDS).toBe('woc_player_first_day_playtime_seconds');
+    expect(WOC_PLAYER_FIRST_DAY_SESSIONS).toBe('woc_player_first_day_sessions');
+    expect(WOC_PLAYER_FIRST_DAY_PLAYTIME_ACCOUNTS).toBe('woc_player_first_day_playtime_accounts');
+    expect(WOC_PLAYER_FUNNEL_ACCOUNTS).toBe('woc_player_funnel_accounts');
+
+    expect(sample(text, WOC_PLAYER_FIRST_DAY_PLAYTIME_SECONDS, 'period="today",stat="p50"')).toBe(
+      '480',
+    );
+    expect(sample(text, WOC_PLAYER_FIRST_DAY_PLAYTIME_SECONDS, 'period="today",stat="p90"')).toBe(
+      '5400',
+    );
+    expect(text).not.toContain(
+      'woc_player_first_day_playtime_seconds{period="yesterday",stat="p50"}',
+    );
+    expect(sample(text, WOC_PLAYER_FIRST_DAY_SESSIONS, 'period="today",stat="p50"')).toBe('1');
+    expect(text).not.toContain('woc_player_first_day_sessions{period="yesterday",stat="p50"}');
+    expect(
+      sample(text, WOC_PLAYER_FIRST_DAY_PLAYTIME_ACCOUNTS, 'period="today",bucket="lt_10m"'),
+    ).toBe('5');
+    expect(
+      sample(text, WOC_PLAYER_FIRST_DAY_PLAYTIME_ACCOUNTS, 'period="yesterday",bucket="gte_3h"'),
+    ).toBe('1');
+    expect(sample(text, WOC_PLAYER_FUNNEL_ACCOUNTS, 'period="today",stage="created"')).toBe('12');
+    expect(sample(text, WOC_PLAYER_FUNNEL_ACCOUNTS, 'period="today",stage="first_character"')).toBe(
+      '9',
+    );
+    expect(sample(text, WOC_PLAYER_FUNNEL_ACCOUNTS, 'period="today",stage="entered_world"')).toBe(
+      '8',
+    );
+    expect(sample(text, WOC_PLAYER_FUNNEL_ACCOUNTS, 'period="today",stage="played_10m"')).toBe('3');
+    expect(sample(text, WOC_PLAYER_FUNNEL_ACCOUNTS, 'period="today",stage="reached_level_2"')).toBe(
+      '2',
+    );
+    expect(
+      sample(text, WOC_PLAYER_FUNNEL_ACCOUNTS, 'period="yesterday",stage="reached_level_5"'),
+    ).toBe('0');
   });
 
   it('never queries on scrape and bounds every label value', async () => {
@@ -124,6 +201,20 @@ describe('registerBusinessMetrics', () => {
     expect(labelValues('segment')).toEqual(new Set(['new', 'returning', 'all', 'level_20']));
     expect(labelValues('level')).toEqual(new Set(['2', '5']));
     expect(labelValues('day')).toEqual(new Set(['1', '7', '30']));
+    expect(labelValues('stat')).toEqual(new Set(['p50', 'p90']));
+    expect(labelValues('bucket')).toEqual(
+      new Set(['lt_10m', '10m_30m', '30m_1h', '1h_3h', 'gte_3h']),
+    );
+    expect(labelValues('stage')).toEqual(
+      new Set([
+        'created',
+        'first_character',
+        'entered_world',
+        'played_10m',
+        'reached_level_2',
+        'reached_level_5',
+      ]),
+    );
     for (const forbidden of ['account_id', 'character_id', 'player', 'name', 'ip']) {
       expect(labelValues(forbidden).size).toBe(0);
     }

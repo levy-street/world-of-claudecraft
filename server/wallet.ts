@@ -21,9 +21,11 @@ import {
   unlinkWallet,
   walletForAccount,
 } from './db';
+import { type DesktopWalletHandoffResult, desktopWalletHandoffs } from './desktop_wallet_handoff';
 import { ctxAccountId } from './http/context';
 import {
   CARD_UPLOAD_POLICY,
+  PUBLIC_READ_POLICY,
   rateLimit,
   WALLET_LINK_POLICY,
   WOC_BALANCE_POLICY,
@@ -32,7 +34,7 @@ import type { Ctx, Middleware, RouteDef } from './http/types';
 import { json, moderationErrorBody, readBody } from './http_util';
 import { cardUploadContentLengthTooLarge, handleCardUpload } from './player_card';
 import { recordUsageMetric } from './provider_usage';
-import { walletLinkRateLimited } from './ratelimit';
+import { requestIp, walletLinkRateLimited } from './ratelimit';
 import { buildLinkMessage, isSolanaAddress, verifySolanaSignature } from './wallet_link';
 import { handleWocBalance, parseWocBalanceQuery } from './woc_balance';
 
@@ -72,6 +74,14 @@ async function walletChallengeCore(
   const address = typeof body.address === 'string' ? body.address.trim() : '';
   if (!isSolanaAddress(address)) return json(res, 400, { error: 'invalid Solana wallet address' });
 
+  return json(res, 200, await issueWalletChallenge(req, accountId, address));
+}
+
+async function issueWalletChallenge(
+  req: http.IncomingMessage,
+  accountId: number,
+  address: string,
+): Promise<{ nonce: string; message: string }> {
   await pruneWalletChallenges();
   const nonce = randomBytes(16).toString('hex');
   const issuedAt = new Date().toISOString();
@@ -83,7 +93,132 @@ async function walletChallengeCore(
     issuedAt,
   });
   await createWalletChallenge(nonce, accountId, address, message, CHALLENGE_TTL_MINUTES);
-  return json(res, 200, { nonce, message });
+  return { nonce, message };
+}
+
+function handoffFailure(res: http.ServerResponse, error: unknown): void {
+  const message = error instanceof Error ? error.message : 'wallet authorization failed';
+  json(res, 400, { error: message, code: 'wallet.handoff_invalid' });
+}
+
+/** Create one browser-authorized wallet operation for the authenticated desktop account. */
+export async function handleDesktopWalletHandoffCreate(
+  req: http.IncomingMessage,
+  res: http.ServerResponse,
+  accountId: number,
+): Promise<void> {
+  const body = await readBody(req);
+  try {
+    if (body.kind === 'link') {
+      return json(
+        res,
+        200,
+        desktopWalletHandoffs.create(accountId, requestIp(req), { kind: 'link' }),
+      );
+    }
+    const expectedAddress =
+      typeof body.expectedAddress === 'string' ? body.expectedAddress.trim() : '';
+    const reference = typeof body.reference === 'string' ? body.reference.trim() : '';
+    if (
+      body.kind !== 'transaction' ||
+      !isSolanaAddress(expectedAddress) ||
+      !reference ||
+      reference.length > 256
+    ) {
+      return json(res, 400, {
+        error: 'invalid desktop wallet operation',
+        code: 'wallet.handoff_invalid',
+      });
+    }
+    const linkedWallet = await walletForAccount(accountId);
+    if (!linkedWallet || linkedWallet.pubkey !== expectedAddress) {
+      return json(res, 400, {
+        error: 'transaction wallet does not match the linked account wallet',
+        code: 'wallet.handoff_invalid',
+      });
+    }
+    return json(
+      res,
+      200,
+      desktopWalletHandoffs.createTransaction(accountId, requestIp(req), {
+        reference,
+        expectedAddress,
+      }),
+    );
+  } catch (error) {
+    return handoffFailure(res, error);
+  }
+}
+
+/** Reveal the single operation to the browser holding its fragment-only secret. */
+export async function handleDesktopWalletHandoffClaim(
+  req: http.IncomingMessage,
+  res: http.ServerResponse,
+): Promise<void> {
+  const body = await readBody(req);
+  try {
+    const action = desktopWalletHandoffs.claim(body.code, requestIp(req));
+    if (action.kind === 'transaction') return json(res, 200, action);
+    const address = typeof body.address === 'string' ? body.address.trim() : '';
+    if (!address) return json(res, 200, { kind: 'link' });
+    if (!isSolanaAddress(address)) {
+      return json(res, 400, {
+        error: 'invalid Solana wallet address',
+        code: 'wallet.handoff_invalid',
+      });
+    }
+    const challenge = await desktopWalletHandoffs.claimLink(
+      body.code,
+      requestIp(req),
+      address,
+      (accountId, claimedAddress) => issueWalletChallenge(req, accountId, claimedAddress),
+    );
+    return json(res, 200, challenge);
+  } catch (error) {
+    return handoffFailure(res, error);
+  }
+}
+
+/** Store a browser signature until the authenticated desktop app consumes it. */
+export async function handleDesktopWalletHandoffComplete(
+  req: http.IncomingMessage,
+  res: http.ServerResponse,
+): Promise<void> {
+  const body = await readBody(req);
+  const address = typeof body.address === 'string' ? body.address.trim() : '';
+  const signature = typeof body.signature === 'string' ? body.signature.trim() : '';
+  const nonce = typeof body.nonce === 'string' ? body.nonce.trim() : '';
+  if (!isSolanaAddress(address) || !signature || (body.kind === 'link' && !nonce)) {
+    return json(res, 400, {
+      error: 'invalid wallet authorization result',
+      code: 'wallet.handoff_invalid',
+    });
+  }
+  let result: DesktopWalletHandoffResult;
+  if (body.kind === 'link') result = { kind: 'link', address, signature, nonce };
+  else if (body.kind === 'transaction') result = { kind: 'transaction', address, signature };
+  else {
+    return json(res, 400, {
+      error: 'invalid wallet authorization result',
+      code: 'wallet.handoff_invalid',
+    });
+  }
+  try {
+    desktopWalletHandoffs.complete(body.code, requestIp(req), result);
+    return json(res, 200, { completed: true });
+  } catch (error) {
+    return handoffFailure(res, error);
+  }
+}
+
+/** Poll and consume the result from the same authenticated account that created it. */
+export async function handleDesktopWalletHandoffResult(
+  req: http.IncomingMessage,
+  res: http.ServerResponse,
+  accountId: number,
+): Promise<void> {
+  const body = await readBody(req);
+  return json(res, 200, desktopWalletHandoffs.result(accountId, body.code));
 }
 
 // POST /api/wallet/link  { address, signature, nonce }  → { pubkey, linked }
@@ -362,6 +497,22 @@ async function walletGetHandler(ctx: Ctx): Promise<void> {
   return handleWalletGet(ctx.req, ctx.res, ctxAccountId(ctx));
 }
 
+async function desktopWalletCreateHandler(ctx: Ctx): Promise<void> {
+  return handleDesktopWalletHandoffCreate(ctx.req, ctx.res, ctxAccountId(ctx));
+}
+
+async function desktopWalletClaimHandler(ctx: Ctx): Promise<void> {
+  return handleDesktopWalletHandoffClaim(ctx.req, ctx.res);
+}
+
+async function desktopWalletCompleteHandler(ctx: Ctx): Promise<void> {
+  return handleDesktopWalletHandoffComplete(ctx.req, ctx.res);
+}
+
+async function desktopWalletResultHandler(ctx: Ctx): Promise<void> {
+  return handleDesktopWalletHandoffResult(ctx.req, ctx.res, ctxAccountId(ctx));
+}
+
 /** GET /api/woc/balance: the public $WOC balance proxy (IP rate-limited by middleware). */
 async function wocBalanceHandler(ctx: Ctx): Promise<void> {
   const { owner, fresh } = parseWocBalanceQuery(ctx.req.url ?? '');
@@ -397,6 +548,34 @@ async function referralsHandler(ctx: Ctx): Promise<void> {
 // ---------------------------------------------------------------------------
 
 export const routes: RouteDef[] = [
+  {
+    method: 'POST',
+    path: '/api/desktop-wallet/create',
+    surface: 'api',
+    middleware: [activeGuard, rateLimit(WALLET_LINK_POLICY)],
+    handler: desktopWalletCreateHandler,
+  },
+  {
+    method: 'POST',
+    path: '/api/desktop-wallet/claim',
+    surface: 'api',
+    middleware: [rateLimit(PUBLIC_READ_POLICY)],
+    handler: desktopWalletClaimHandler,
+  },
+  {
+    method: 'POST',
+    path: '/api/desktop-wallet/complete',
+    surface: 'api',
+    middleware: [rateLimit(PUBLIC_READ_POLICY)],
+    handler: desktopWalletCompleteHandler,
+  },
+  {
+    method: 'POST',
+    path: '/api/desktop-wallet/result',
+    surface: 'api',
+    middleware: [activeGuard],
+    handler: desktopWalletResultHandler,
+  },
   {
     method: 'POST',
     path: '/api/wallet/link/challenge',

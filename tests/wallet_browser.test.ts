@@ -48,6 +48,7 @@ function makeWallet(
     address?: string;
     authorized?: boolean;
     delayConnect?: () => Promise<void>;
+    disconnectError?: Error;
     modifySignedMessage?: boolean;
     transactionSupport?: boolean;
   } = {},
@@ -71,6 +72,7 @@ function makeWallet(
   const disconnect = vi.fn(async () => {
     accounts = [];
     emitAccounts();
+    if (opts.disconnectError) throw opts.disconnectError;
   });
   const signMessage = vi.fn(
     async (
@@ -129,8 +131,11 @@ function makeWallet(
 
 afterEach(() => {
   while (unregisters.length) unregisters.pop()?.();
+  vi.doUnmock('../src/net/mobile_wallet_deeplink');
+  vi.doUnmock('../src/net/wallet_connect');
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
+  vi.unstubAllEnvs();
 });
 
 describe('Wallet Standard Solana adapter', () => {
@@ -259,6 +264,227 @@ describe('Wallet Standard Solana adapter', () => {
 
     expect(mock.disconnect).toHaveBeenCalledOnce();
     expect(wallet.currentWallet()).toEqual({ address: null, isConnected: false });
+  });
+
+  it('lets the wallet manager disconnect the current browser wallet session', async () => {
+    const mock = makeWallet({ authorized: true });
+    registerWallet(mock.wallet);
+    const wallet = await freshWalletModule();
+    wallet.setWalletPicker(async () => ({ action: 'disconnect' }));
+
+    await wallet.openWalletModal();
+
+    expect(mock.disconnect).toHaveBeenCalledOnce();
+    expect(wallet.currentWallet()).toEqual({ address: null, isConnected: false });
+  });
+
+  it('lets the wallet manager disconnect a WalletConnect session', async () => {
+    const disconnect = vi.fn(async () => {});
+    const listeners = new Set<(state: { address: string | null }) => void>();
+    vi.doMock('../src/net/wallet_connect', () => ({
+      createWalletConnectClient: vi.fn(async () => ({
+        current: () => ({ address: null }),
+        connect: async () => ({ address: 'WalletConnectAddress' }),
+        disconnect,
+        signMessageBase58: vi.fn(),
+        signAndSendTransactionBase64: vi.fn(),
+        onChange: (listener: (state: { address: string | null }) => void) => {
+          listeners.add(listener);
+          return () => listeners.delete(listener);
+        },
+      })),
+    }));
+    const wallet = await freshWalletModule();
+    const states: Array<ReturnType<typeof wallet.currentWallet>> = [];
+    wallet.configureWalletConnect('project-id');
+    wallet.onWalletChange((state) => states.push(state));
+    wallet.setWalletPicker(async (options) => options[0]?.id ?? null);
+    await wallet.openWalletModal();
+    expect(wallet.currentWallet()).toEqual({
+      address: 'WalletConnectAddress',
+      isConnected: true,
+    });
+
+    wallet.setWalletPicker(async () => ({ action: 'disconnect' }));
+    await wallet.openWalletModal();
+
+    expect(disconnect).toHaveBeenCalledOnce();
+    expect(wallet.currentWallet()).toEqual({ address: null, isConnected: false });
+    expect(states.at(-1)).toEqual({ address: null, isConnected: false });
+  });
+
+  it('opens the sole WalletConnect option directly instead of showing a duplicate picker', async () => {
+    const connect = vi.fn(async () => ({ address: 'WalletConnectAddress' }));
+    vi.doMock('../src/net/wallet_connect', () => ({
+      createWalletConnectClient: vi.fn(async () => ({
+        current: () => ({ address: null }),
+        connect,
+        disconnect: vi.fn(async () => {}),
+        signMessageBase58: vi.fn(),
+        signAndSendTransactionBase64: vi.fn(),
+        onChange: () => () => {},
+      })),
+    }));
+    const wallet = await freshWalletModule();
+    const picker = vi.fn(async () => null);
+    wallet.configureWalletConnect('project-id');
+    wallet.setWalletPicker(picker);
+
+    await wallet.openWalletModal();
+
+    expect(picker).not.toHaveBeenCalled();
+    expect(connect).toHaveBeenCalledOnce();
+    expect(wallet.currentWallet()).toEqual({
+      address: 'WalletConnectAddress',
+      isConnected: true,
+    });
+  });
+
+  it('shows Phantom and Solflare app handoffs instead of a generic Reown option on iOS web', async () => {
+    vi.stubGlobal('navigator', {
+      userAgent:
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148 Safari/604.1',
+      platform: 'iPhone',
+      maxTouchPoints: 5,
+    });
+    const mobileConnect = vi.fn(async () => ({
+      address: 'MobileWalletAddress',
+      chain: 'solana:mainnet',
+    }));
+    const createMobileWalletClient = vi.fn(async () => ({
+      current: () => ({ address: null, chain: null }),
+      connect: mobileConnect,
+      disconnect: vi.fn(async () => {}),
+      signMessageBase58: vi.fn(),
+      signAndSendTransactionBase64: vi.fn(),
+      onChange: () => () => {},
+    }));
+    vi.doMock('../src/net/mobile_wallet_deeplink', () => ({ createMobileWalletClient }));
+    const wallet = await freshWalletModule();
+    wallet.configureWalletConnect('project-id');
+    let optionNames: string[] = [];
+    let pickerMode = '';
+    wallet.setWalletPicker(async (options, _selected, mode) => {
+      optionNames = options.map((option) => option.name);
+      pickerMode = mode;
+      return options[0]?.id ?? null;
+    });
+
+    await wallet.openWalletModal();
+
+    expect(optionNames).toEqual(['Phantom', 'Solflare']);
+    expect(pickerMode).toBe('mobile');
+    expect(mobileConnect).toHaveBeenCalledOnce();
+    expect(createMobileWalletClient).toHaveBeenCalledWith('phantom', undefined);
+    expect(wallet.currentWallet()).toEqual({ address: 'MobileWalletAddress', isConnected: true });
+  });
+
+  it('keeps direct iOS handoffs when Reown is not configured', async () => {
+    vi.stubGlobal('navigator', {
+      userAgent:
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148 Safari/604.1',
+      platform: 'iPhone',
+      maxTouchPoints: 5,
+    });
+    const wallet = await freshWalletModule();
+
+    expect(wallet.availableWallets().map((option) => option.name)).toEqual(['Phantom', 'Solflare']);
+  });
+
+  it('does not offer wallet handoffs inside an installed iOS web app', async () => {
+    const injected = makeWallet({ authorized: true, name: 'Phantom' });
+    registerWallet(injected.wallet);
+    vi.stubGlobal('navigator', {
+      userAgent:
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148',
+      platform: 'iPhone',
+      maxTouchPoints: 5,
+      standalone: true,
+    });
+    vi.stubGlobal('window', {
+      matchMedia: () => ({ matches: true }),
+    });
+    const wallet = await freshWalletModule();
+    wallet.configureWalletConnect('project-id');
+    let optionNames: string[] = [];
+    let pickerMode = '';
+    wallet.setWalletPicker(async (options, _selected, mode) => {
+      optionNames = options.map((option) => option.name);
+      pickerMode = mode;
+      return null;
+    });
+
+    await expect(wallet.openWalletModal()).rejects.toSatisfy(wallet.isWalletSelectionCancelled);
+
+    expect(optionNames).toEqual([]);
+    expect(pickerMode).toBe('standalone');
+    expect(injected.connect).not.toHaveBeenCalled();
+    expect(wallet.currentWallet()).toEqual({ address: null, isConnected: false });
+  });
+
+  it('preserves the current wallet when the manager is cancelled', async () => {
+    const mock = makeWallet({ authorized: true });
+    registerWallet(mock.wallet);
+    const wallet = await freshWalletModule();
+    const modalStates: boolean[] = [];
+    wallet.onWalletModalChange((open) => modalStates.push(open));
+    wallet.setWalletPicker(async () => null);
+
+    await expect(wallet.openWalletModal()).rejects.toSatisfy(wallet.isWalletSelectionCancelled);
+
+    expect(mock.disconnect).not.toHaveBeenCalled();
+    expect(wallet.currentWallet().address).toBe(mock.account.address);
+    expect(modalStates).toEqual([false, true, false]);
+  });
+
+  it('closes the manager when its picker rejects', async () => {
+    const mock = makeWallet({ authorized: true });
+    registerWallet(mock.wallet);
+    const wallet = await freshWalletModule();
+    const modalStates: boolean[] = [];
+    wallet.onWalletModalChange((open) => modalStates.push(open));
+    wallet.setWalletPicker(async () => {
+      throw new Error('picker failed');
+    });
+
+    await expect(wallet.openWalletModal()).rejects.toThrow('picker failed');
+
+    expect(wallet.currentWallet().address).toBe(mock.account.address);
+    expect(modalStates).toEqual([false, true, false]);
+  });
+
+  it('keeps local state disconnected when the provider disconnect reports an error', async () => {
+    const mock = makeWallet({ authorized: true, disconnectError: new Error('provider failed') });
+    registerWallet(mock.wallet);
+    const wallet = await freshWalletModule();
+    wallet.setWalletPicker(async () => ({ action: 'disconnect' }));
+
+    await expect(wallet.openWalletModal()).rejects.toThrow('provider failed');
+
+    expect(mock.disconnect).toHaveBeenCalledOnce();
+    expect(wallet.currentWallet()).toEqual({ address: null, isConnected: false });
+  });
+
+  it('routes WOC balance reads through the configured desktop API origin', async () => {
+    vi.stubEnv('VITE_DESKTOP_API_ORIGIN', 'http://127.0.0.1:9876');
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 Electron/43.0.0',
+      platform: 'MacIntel',
+      maxTouchPoints: 0,
+    });
+    const fetchMock = vi.fn(async () => ({
+      ok: true,
+      json: async () => ({ balance: 42 }),
+    }));
+    vi.stubGlobal('fetch', fetchMock);
+    vi.resetModules();
+    const wallet = await import('../src/net/wallet');
+
+    await expect(wallet.fetchWocBalance('DesktopWallet', true)).resolves.toBe(42);
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://127.0.0.1:9876/api/woc/balance?owner=DesktopWallet&fresh=1',
+    );
   });
 
   it('picks up a compatible wallet registered after initialization', async () => {
