@@ -1134,3 +1134,12 @@ npm run build on PR4/PR5.
   Last Blessing level-17 option opens an 8 sec instant Solemn or Urgent Prayer. Last
   Blessing is now explicitly gated to Doctrine and Benison, so Vespers cannot receive
   the healer handoff. The option id and both Vespers channel choices remain unchanged.
+
+## Shaman healer identity pass
+
+- Spiritmend keeps Cleansing Tides' 20% mana reduction and gains a deterministic
+  Chain-Heal rotation. Completing Chain Heal opens an 8 sec half-mana Mending Waters;
+  the stable Tideflow level-17 option turns every third completed Mending Waters into
+  an 8 sec instant, full-cost Chain Heal, which reopens Cleansing Tides. This replaces
+  the passive-only mastery and the old instant-travel filler without adding a resource.
+  Tideflow remains restoration-gated, and Thundercall and Warspirit are unchanged.

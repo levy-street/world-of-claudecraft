@@ -808,6 +808,34 @@ describe('actionBarView: proc availability cues', () => {
     ).toBe('none');
   });
 
+  it('prices Cleansing Tides and cues Tideflow without making Chain Heal free', () => {
+    const mending = createActionBarView(
+      descriptor(slot(1, { ability: ability('healing_wave', { cost: 80 }) })),
+      fakeDeps(),
+    );
+    const cleansingTides = [{ id: 'sha_cleansing_tides', kind: 'next_cast_cheap' as const }];
+    expect(
+      mending.tick(world({ resource: 39, playerAuras: cleansingTides })).slots[0],
+    ).toMatchObject({ usable: false, procState: 'armed' });
+    expect(
+      mending.tick(world({ resource: 40, playerAuras: cleansingTides })).slots[0],
+    ).toMatchObject({ usable: true, procState: 'armed' });
+
+    const chain = createActionBarView(
+      descriptor(slot(1, { ability: ability('chain_heal', { cost: 80 }) })),
+      fakeDeps(),
+    );
+    const tideflow = [{ id: 'sha_tideflow', kind: 'next_cast_instant' as const }];
+    expect(chain.tick(world({ resource: 79, playerAuras: tideflow })).slots[0]).toMatchObject({
+      usable: false,
+      procState: 'armed',
+    });
+    expect(chain.tick(world({ resource: 80, playerAuras: tideflow })).slots[0]).toMatchObject({
+      usable: true,
+      procState: 'armed',
+    });
+  });
+
   it('keeps ordinary abilities and Icefall without stored Icicles at none', () => {
     const view = createActionBarView(
       descriptor(

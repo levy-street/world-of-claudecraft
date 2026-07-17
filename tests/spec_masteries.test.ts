@@ -103,6 +103,23 @@ describe('spec masteries', () => {
         { ability: 'chain_heal', costPct: -0.2 },
         { ability: 'healing_wave', costPct: -0.2 },
       ],
+      proc: {
+        id: 'sha_cleansing_tides',
+        name: 'Cleansing Tides',
+        spec: 'restoration',
+        requiresKnownAbility: 'chain_heal',
+        school: 'nature',
+        trigger: { on: 'castNth', n: 1, abilities: ['chain_heal'] },
+        responses: [
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_cheap',
+            abilities: ['healing_wave'],
+            duration: 8,
+            costPct: 0.5,
+          },
+        ],
+      },
     });
     expect(TALENTS.warlock?.specs.find((s) => s.id === 'affliction')?.mastery.effect).toEqual({
       global: { dotDmgPct: 0.1 },

@@ -97,6 +97,8 @@ const ACTIONABLE_AURA_IDS: ReadonlySet<string> = new Set([
   'pri_fixed_purpose',
   'pri_grave_mercy',
   'pri_last_blessing',
+  'sha_cleansing_tides',
+  'sha_tideflow',
   'pal_kindled_faith',
   'pal_dawns_reply',
   'pal_oathward',

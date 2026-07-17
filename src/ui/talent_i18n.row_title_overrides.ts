@@ -234,6 +234,7 @@ const WARRIOR_TITLES: Partial<Record<SupportedLanguage, Partial<TitleMap>>> = {
     'Grove Covenant': 'Завет рощи',
     'Red Haze': 'Багровая дымка',
     'Last Blessing': 'Последнее благословение',
+    Tideflow: 'Приливный поток',
   },
   cs_CZ: {
     'Double Charge': 'Dvojitý výpad',

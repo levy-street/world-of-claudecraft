@@ -344,6 +344,17 @@ describe('createAurasView: derivation per mode', () => {
     expect(state.slots.slice(0, 2).map((slot) => slot.isActionable)).toEqual([true, true]);
   });
 
+  it('marks both Spiritmend healing handoffs as actionable windows', () => {
+    const state = createAurasView('all', deps()).tick(
+      entity([
+        aura({ id: 'sha_cleansing_tides', kind: 'next_cast_cheap' }),
+        aura({ id: 'sha_tideflow', kind: 'next_cast_instant' }),
+      ]),
+    );
+
+    expect(state.slots.slice(0, 2).map((slot) => slot.isActionable)).toEqual([true, true]);
+  });
+
   it('marks both Sacrament healing handoffs as actionable windows', () => {
     const state = createAurasView('all', deps()).tick(
       entity([

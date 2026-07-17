@@ -1944,7 +1944,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 17,
       theme: 'warding',
-      decision: 'ground root vs instant travel form vs reactive absorb',
+      decision: 'ground root vs Mending-to-Chain weave vs reactive absorb',
       options: [
         {
           id: 'sha_r17_earthbind',
