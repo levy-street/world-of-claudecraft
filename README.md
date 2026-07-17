@@ -364,4 +364,4 @@ Contributions of every kind are welcome: code, translations, bug reports, and do
 
 The code is [MIT licensed](LICENSE), so fork it, remix it, and host your own world.
 
-The bundled third-party art assets (models, textures, HDRIs, fonts) keep their own licenses, mostly CC0 public domain, documented per pack in [CREDITS.md](CREDITS.md).
+The bundled third-party art assets (models, textures, HDRIs, fonts) keep their own licenses, mostly CC0 public domain, documented per pack in [CREDITS.md](CREDITS.md). Original sound recordings contributed by individual authors may carry their own terms (see the Audio section of [CREDITS.md](CREDITS.md)) rather than the project's default license.

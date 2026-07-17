@@ -24,7 +24,9 @@ import type { PlayerClass } from '../sim/types';
 import type { DeedsLeaderboardPage } from '../world_api';
 import type { LeaderboardPager } from './leaderboard_view';
 
-/** One ranked account row, faced by its display character. */
+/** One ranked account row, faced by its display character. Renown is the one
+ *  ranked number on the row: the deprecated wire deedCount is deliberately NOT
+ *  mapped here (issue #2044; the completion count lives in the Book header). */
 export interface DeedsLeaderboardRow {
   rank: number;
   name: string;
@@ -34,7 +36,6 @@ export interface DeedsLeaderboardRow {
   knownClass: boolean;
   level: number;
   renown: number;
-  deedCount: number;
   /** The display character's selected title as a DEED ID (null untitled);
    *  the painter localizes through deed_i18n.ts. */
   title: string | null;
@@ -44,11 +45,14 @@ export interface DeedsLeaderboardRow {
 }
 
 /** The viewer's own board standing, as the server resolved it (authenticated
- *  and ranked callers only). */
-export interface DeedsLeaderboardSelfLine {
-  rank: number;
-  topPercent: number;
-}
+ *  and ranked callers only). The CORE decides which arm applies, so the
+ *  choice is behaviorally testable: 'account' carries the board-scored
+ *  Renown (a current server), 'rank' is the fallback when an OLDER server
+ *  (rolling deploy, self-hosted) omits it. The painter only maps each kind
+ *  to its t() key. */
+export type DeedsLeaderboardSelfLine =
+  | { kind: 'account'; rank: number; topPercent: number; renown: number }
+  | { kind: 'rank'; rank: number; topPercent: number };
 
 /** The Renown-tab view-model: the async-state discriminators or a page. */
 export type DeedsLeaderboardView =
@@ -96,7 +100,6 @@ export function buildDeedsLeaderboardView(input: DeedsLeaderboardInput): DeedsLe
     knownClass: Boolean(CLASSES[e.cls]),
     level: e.level,
     renown: e.renown,
-    deedCount: e.deedCount,
     title: e.title,
     me: selfRank !== null && e.rank === selfRank,
   }));
@@ -109,5 +112,15 @@ export function buildDeedsLeaderboardView(input: DeedsLeaderboardInput): DeedsLe
           prevDisabled: page.page <= 0,
           nextDisabled: page.page >= page.pageCount - 1,
         };
-  return { kind: 'ranked', rows, self: page.self ?? null, pager, page: page.page };
+  const self: DeedsLeaderboardSelfLine | null = page.self
+    ? page.self.renown !== undefined
+      ? {
+          kind: 'account',
+          rank: page.self.rank,
+          topPercent: page.self.topPercent,
+          renown: page.self.renown,
+        }
+      : { kind: 'rank', rank: page.self.rank, topPercent: page.self.topPercent }
+    : null;
+  return { kind: 'ranked', rows, self, pager, page: page.page };
 }

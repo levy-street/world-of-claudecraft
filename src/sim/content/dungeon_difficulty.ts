@@ -11,6 +11,13 @@ export interface HeroicDungeonTuning {
   level: number;
   healthMultiplier: number;
   damageMultiplier: number;
+  // Boss-SUMMONED add waves (MobTemplate.summonAdds, spawned through
+  // spawnBossAdds) use this damage multiplier instead of the dungeon-wide one:
+  // an add pack lands ON TOP of the boss's own swings and mechanics, so each
+  // add is tuned to roughly HALF the trash calibration. Trash spawned from the
+  // dungeon spawn list (including the guards flanking a boss) stays on
+  // damageMultiplier.
+  addDamageMultiplier: number;
   armorMultiplier: number;
   // The dungeon's last boss: killing it in a heroic instance awards Heroic
   // Marks for every eligible participant.
@@ -22,27 +29,36 @@ export interface HeroicDungeonTuning {
 // Tuning model: every heroic mob is pinned to LEVEL 22 (two above the level-20
 // player cap) and the four five-mans are damage-EQUALIZED, so a heroic feels
 // the same whichever one you run. The calibration target is an average elite
-// TRASH swing landing ~300 post-mitigation on the reference GEARED shaman
+// TRASH swing landing ~225 post-mitigation on the reference GEARED shaman
 // (full heroic mail: 2142 armor, 1493 hp, 48.55% DR vs a level-22 attacker),
-// i.e. ~20% of max hp per hit, with final bosses ~22-24%. Solving each dungeon
+// i.e. ~15% of max hp per hit, with final bosses ~17-18%. Solving each dungeon
 // for that target INVERTS the multiplier ladder, because the harder dungeons
 // already carry bigger base weapon damage: hollow_crypt needs the largest
 // multiplier, gravewyrm_sanctum the smallest. Gear-band reference points at
-// these constants: full-heroic mail lands ~300 trash / ~330-350 boss per hit;
-// endgame blues tank (~1150 hp, ~31% DR at L22) ~35% trash / ~40% boss; blues
-// cloth (~640 hp, ~17% DR) ~76% per trash hit and a trash CRIT one-shots, so
-// heroics are gear-gated by design. Mechanic damage lands RAW (no armor step;
-// see aoePulse/stomp in ../mob/locomotion.ts) and scales with the same
+// these constants: full-heroic mail lands ~225 trash / ~250-265 boss per hit;
+// endgame blues tank (~1150 hp, ~31% DR at L22) ~26% trash / ~30% boss; blues
+// cloth (~640 hp, ~17% DR) ~57% per trash hit, so heroics stay gear-gated by
+// design. (The original calibration targeted ~20% per trash hit; the whole
+// ladder was cut 25% after live heroics proved overtuned.) Boss-summoned add
+// waves swing at addDamageMultiplier, about half the trash target, because
+// they stack on the boss's own output. Mechanic damage lands RAW (no armor
+// step; see aoePulse/stomp in ../mob/locomotion.ts) and scales with the same
 // per-dungeon multiplier via mechanicDamageMult; support heals scale with
 // mechanicHealMult (= healthMultiplier); both wired in
 // ../instances/difficulty.ts.
+//
+// Rounding note: the 25% cut and the ~half add values are calibration-rounded
+// to tidy multipliers (drowned_temple 5.7 to 4.3 is a 24.6% cut, hollow_crypt
+// 5.1 to 2.55 is exactly half); the round numbers are intentional, do not
+// "fix" one back to the exact fraction.
 export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
   hollow_crypt: {
     id: 'hollow_crypt',
     difficulty: 'heroic',
     level: 22,
     healthMultiplier: 1.9,
-    damageMultiplier: 6.8,
+    damageMultiplier: 5.1,
+    addDamageMultiplier: 2.55,
     armorMultiplier: 1.3,
     finalBossId: 'morthen',
     marksPerParticipant: 1,
@@ -52,7 +68,8 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     difficulty: 'heroic',
     level: 22,
     healthMultiplier: 2.0,
-    damageMultiplier: 6.2,
+    damageMultiplier: 4.65,
+    addDamageMultiplier: 2.3,
     armorMultiplier: 1.3,
     finalBossId: 'vael_the_mistcaller',
     marksPerParticipant: 1,
@@ -62,7 +79,8 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     difficulty: 'heroic',
     level: 22,
     healthMultiplier: 2.6,
-    damageMultiplier: 5.7,
+    damageMultiplier: 4.3,
+    addDamageMultiplier: 2.15,
     armorMultiplier: 1.25,
     finalBossId: 'ysolei',
     marksPerParticipant: 1,
@@ -72,7 +90,8 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     difficulty: 'heroic',
     level: 22,
     healthMultiplier: 2.0,
-    damageMultiplier: 5.4,
+    damageMultiplier: 4.05,
+    addDamageMultiplier: 2.0,
     armorMultiplier: 1.2,
     finalBossId: 'korzul_the_gravewyrm',
     marksPerParticipant: 1,
@@ -95,6 +114,10 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     level: 22,
     healthMultiplier: 1.6,
     damageMultiplier: 2.0,
+    // The raid's add waves spawn through the encounter script
+    // (encounters/nythraxis.ts), never spawnBossAdds, so this field is inert
+    // there; it mirrors damageMultiplier to state that nothing is softened.
+    addDamageMultiplier: 2.0,
     armorMultiplier: 1.2,
     finalBossId: 'nythraxis_scourge_of_thornpeak',
     marksPerParticipant: 3,

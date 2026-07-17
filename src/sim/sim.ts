@@ -356,6 +356,8 @@ export { computeQuestState } from './quests/quest_commands';
 
 import { completeCurrentQuestsForDev, completeQuestForDev } from './quests/dev_quest_commands';
 import * as arenaMod from './social/arena';
+import type { CardDuelMatch } from './social/card_duel';
+import * as cardDuelMod from './social/card_duel';
 import * as duelMod from './social/duel';
 // A4: Protect Yumi (formats yumi3/yumi5); match logic in social/yumi.ts, reached
 // via ctx callbacks + the two hostility arms in isHostileTo/isFriendlyTo.
@@ -808,6 +810,12 @@ export interface InstanceSlot {
   // exception admits only these: a player locked by an earlier run can never
   // treat someone else's cleared claim as their own loot run.
   clearedBy: Set<number>;
+  // Players who stepped through this claim's door during this run (enterDungeon).
+  // Session-only like clearedBy, cleared with the claim. The heroic mail arm
+  // (instances/dungeons awardHeroicMarks) pays a locked-but-absent player only
+  // when they actually entered this run: a door-camper or a member parked in
+  // town takes the lockout without turning roster membership into mailed income.
+  enteredBy: Set<number>;
 }
 
 export interface ResolvedAbility {
@@ -1367,6 +1375,10 @@ export class Sim {
   tradeInvites = new Map<number, { fromPid: number; expires: number }>();
   duels = new Map<number, DuelState>(); // pid -> shared duel (both pids)
   duelInvites = new Map<number, { fromPid: number; expires: number }>();
+  // Card Duel minigame (src/sim/social/card_duel.ts): its own FIFO queue and
+  // live-match map, independent of the HP-based duels above.
+  cardDuelQueue: number[] = [];
+  cardDuels = new Map<number, CardDuelMatch>(); // pid -> shared match (both pids)
   // arena: format-specific queues, live bouts keyed by every participant pid,
   // and the set of busy instance slots
   arenaQueue1v1: number[] = [];
@@ -1620,6 +1632,7 @@ export class Sim {
             emptyFor: 0,
             resetAvailableAt: 0,
             clearedBy: new Set(),
+            enteredBy: new Set(),
           });
         }
         continue;
@@ -1648,6 +1661,7 @@ export class Sim {
           emptyFor: 0,
           resetAvailableAt: 0,
           clearedBy: new Set(),
+          enteredBy: new Set(),
         });
       }
     }
@@ -2262,6 +2276,11 @@ export class Sim {
     // arena: leaving the queue is free; disconnecting mid-bout forfeits it
     this.arenaDequeue(pid);
     this.arenaResolveDesertion(pid);
+    // Card Duel: leaving the queue is free; a live match is forfeited to the
+    // opponent (mirrors the disconnect/jail paths in server/game.ts, and keeps
+    // the offline Sim / headless env from leaking cardDuels/cardDuelQueue
+    // entries for a departed pid).
+    this.leaveCardMinigameEntirely(pid);
     // Vale Cup: leaving the queue is free; deserting a counted match benches
     // the fighter (the team plays short), takes the loss, and arms the
     // Groundskeeper's lockout. Idempotent: the server already resolved it
@@ -3106,6 +3125,12 @@ export class Sim {
       get duels() {
         return sim.duels;
       },
+      get cardDuelQueue() {
+        return sim.cardDuelQueue;
+      },
+      get cardDuels() {
+        return sim.cardDuels;
+      },
       get cfg() {
         return sim.cfg;
       },
@@ -3582,6 +3607,7 @@ export class Sim {
       partyCapacity: (party) => sim.party.partyCapacity(party),
       marketListingBelongsTo: (listing, meta) => sim.market.marketListingBelongsTo(listing, meta),
       queueQuestLetter: (questId, pid) => sim.postOffice.queueQuestLetter(questId, pid),
+      mailHeroicMarks: (pid, itemId, count) => sim.postOffice.mailHeroicMarks(pid, itemId, count),
       // Book of Deeds seam callbacks (owned by deeds.ts). Late-bound arrows so
       // sim.ctx resolves at call time (the Q1 pattern).
       bumpDeedStat: (meta, stat, delta) => deedsMod.bumpDeedStat(sim.ctx, meta, stat, delta),
@@ -3920,6 +3946,9 @@ export class Sim {
 
     this.updateDuels();
     lap?.('duels');
+    this.updateCardDuelQueue();
+    this.updateCardDuelDeadlines();
+    lap?.('cardDuel');
     this.updateArena();
     lap?.('arena');
     this.updateTradesAndInvites();
@@ -5750,13 +5779,16 @@ export class Sim {
         template,
         inst?.dungeonId ?? '',
         difficulty,
+        { summonedAdd: true },
       );
       const level = mobLevelForDungeonDifficulty(inst?.dungeonId ?? '', difficulty, rolledLevel);
       const add = createMob(this.nextId++, addTemplate, level, pos);
-      applyHeroicMobTuning(add, inst?.dungeonId ?? '', difficulty);
-      // Leash to the boss's ORIGINAL spawn (not his current, possibly-kited position):
-      // pulled too far from it, the add's chase-case leash check evades it home.
-      add.spawnPos = { ...boss.spawnPos };
+      applyHeroicMobTuning(add, inst?.dungeonId ?? '', difficulty, { summonedAdd: true });
+      // The add is anchored where it ERUPTED (createMob already set spawnPos to the
+      // spawn point beside the boss): a boss kited far from HIS original spawn must
+      // not hatch adds that are instantly past their own leash and evade home without
+      // ever swinging. Kited from here, the chase-case leash check walks it back to
+      // this eruption point, not the boss's distant home.
       add.tappedById = boss.tappedById;
       this.addEntity(add);
       boss.summonedIds.push(add.id);
@@ -5766,6 +5798,9 @@ export class Sim {
         add.aggroTargetId = victim.id;
         add.inCombat = true;
         add.aiState = dist2d(add.pos, victim.pos) > this.mobMeleeRange(add) ? 'chase' : 'attack';
+        // Same seeding aggroMob does on a normal pull: the leash measures from the
+        // eruption point until a hostile player action refreshes it.
+        add.leashAnchor = { ...add.pos };
         addThreat(add, victim.id, 1);
       }
       // Book of Deeds kill-order tasks track every add this attempt summoned.
@@ -6924,6 +6959,63 @@ export class Sim {
 
   duelFor(pid: number): DuelState | null {
     return duelMod.duelFor(this.ctx, pid);
+  }
+
+  // -------------------------------------------------------------------------
+  // Card Duel minigame (src/sim/social/card_duel.ts): thin delegates for the
+  // IWorld card_minigame facet.
+  private updateCardDuelQueue(): void {
+    cardDuelMod.updateCardDuelQueue(this.ctx);
+  }
+
+  private updateCardDuelDeadlines(): void {
+    cardDuelMod.updateCardDuelDeadlines(this.ctx);
+  }
+
+  joinCardDuelQueue(pid?: number): void {
+    cardDuelMod.joinCardMinigameQueue(this.ctx, pid);
+  }
+
+  leaveCardDuelQueue(pid?: number): void {
+    cardDuelMod.leaveCardMinigameQueue(this.ctx, pid);
+  }
+
+  isQueuedForCardMinigame(pid: number): boolean {
+    return cardDuelMod.isQueuedForCardMinigame(this.ctx, pid);
+  }
+
+  cardDuelMatchFor(pid: number): CardDuelMatch | null {
+    return cardDuelMod.cardDuelMatchFor(this.ctx, pid);
+  }
+
+  playCardInDuel(cardValue: number, pid?: number): void {
+    cardDuelMod.playCardInDuel(this.ctx, cardValue, pid);
+  }
+
+  // Player-issuable forfeit of a LIVE match (distinct from leaveCardDuelQueue,
+  // which only leaves the matchmaking queue): lets a player stuck against an
+  // idle opponent get out immediately instead of waiting for the AFK deadline.
+  forfeitCardDuel(pid?: number): void {
+    cardDuelMod.forfeitCardDuelMatch(this.ctx, pid);
+  }
+
+  // IWorldCardMinigame read surface: the local player's queue/match snapshot.
+  get cardMinigameInfo(): cardDuelMod.CardMinigameInfo {
+    return this.cardMinigameInfoFor(this.primaryId);
+  }
+
+  // Server-side pid-parameterized reader (like arenaInfoFor), for wiring an
+  // arbitrary session's snapshot rather than only the local/primary player.
+  // View assembly itself lives in card_duel.ts (buildCardMinigameInfo): it
+  // needs nothing from Sim's private state, matching the six thin delegates
+  // directly above.
+  cardMinigameInfoFor(pid: number): cardDuelMod.CardMinigameInfo {
+    return cardDuelMod.buildCardMinigameInfo(this.ctx, pid);
+  }
+
+  // Called from the leave/disconnect path (mirrors duel forfeit-on-leave).
+  leaveCardMinigameEntirely(pid: number): void {
+    cardDuelMod.leaveCardMinigameEntirely(this.ctx, pid);
   }
 
   // -------------------------------------------------------------------------

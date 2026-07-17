@@ -1196,6 +1196,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.hideChestConfirmTitle': 'Ẩn Rương Phần Thưởng Hằng Ngày?',
   'hudChrome.dailyRewards.pointsGained': 'Nhận được {points} điểm phần thưởng hằng ngày.',
   'hudChrome.dailyRewards.taskMultiplier': 'hệ số x{multiplier}',
+  'hudChrome.dailyRewards.oneVsOneExcluded': 'Trận đấu 1v1 không trao điểm phần thưởng hằng ngày.',
   'hudChrome.dailyRewards.totalPlayer': '{count} người chơi hôm nay',
   'hudChrome.dailyRewards.totalPlayers': '{count} người chơi hôm nay',
   'hudChrome.death.resurrectAtCorpse': 'Hồi Sinh Tại Xác Chết',
@@ -6342,18 +6343,21 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.greyjaw_stalker.name': 'Bộ Kẻ Rình Rập Greyjaw',
   'entities.itemSets.greyjaw_stalker.bonus3': 'Tăng tốc độ tấn công cùng thi triển thêm 15%.',
   'entities.itemSets.necromancers.name': 'Y Phục Mournweave',
-  'entities.itemSets.necromancers.bonus2': 'Bạn không thể bị đẩy lùi (kháng đẩy lùi 100%).',
+  'entities.itemSets.necromancers.bonus2':
+    'Tăng sức mạnh phép thuật thêm 20. Sát thương phải chịu không còn làm chậm việc thi triển phép của bạn (kháng trì hoãn thi triển 100%).',
   'entities.itemSets.necromancers.bonus3': 'Tăng trí tuệ thêm 10 và thể lực thêm 10.',
   'entities.itemSets.nighttalon.name': 'Bộ Da Direfang',
   'entities.itemSets.nighttalon.bonus2': 'Tăng sức mạnh tấn công thêm 40.',
   'entities.itemSets.nighttalon.bonus3':
     'Tăng nhanh nhẹn thêm 15, tỉ lệ chí mạng thêm 2% và tốc độ tấn công cùng thi triển thêm 15%.',
   'entities.itemSets.soulflame.name': 'Lễ Phục Wraithfire',
-  'entities.itemSets.soulflame.bonus2': 'Bạn không thể bị đẩy lùi (kháng đẩy lùi 100%).',
+  'entities.itemSets.soulflame.bonus2':
+    'Tăng sức mạnh phép thuật thêm 20. Sát thương phải chịu không còn làm chậm việc thi triển phép của bạn (kháng trì hoãn thi triển 100%).',
   'entities.itemSets.soulflame.bonus3':
     'Tăng trí tuệ thêm 15, tinh thần thêm 15 và tốc độ tấn công cùng thi triển thêm 15%.',
   'entities.itemSets.stormcallers.name': 'Áo Lễ Galecall',
-  'entities.itemSets.stormcallers.bonus2': 'Bạn không thể bị đẩy lùi (kháng đẩy lùi 100%).',
+  'entities.itemSets.stormcallers.bonus2':
+    'Tăng sức mạnh phép thuật thêm 20. Sát thương phải chịu không còn làm chậm việc thi triển phép của bạn (kháng trì hoãn thi triển 100%).',
   'entities.itemSets.stormcallers.bonus3':
     'Tăng trí tuệ thêm 15, tinh thần thêm 15 và tốc độ tấn công cùng thi triển thêm 15%.',
   'entities.itemSets.vale_arcanist.name': 'Bộ Arcanist Thung Khê',
@@ -6942,15 +6946,11 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.deedsPage.howHeading': 'Cách kỳ công hoạt động',
   'guide.deedsPage.intro':
     'Sách Kỳ Công là nơi thế giới ghi sổ tất cả những gì bạn đã làm, từ những bước chân đầu tiên rời thung lũng khởi đầu cho đến những trận đánh khó nhất mà vương quốc có thể bày ra. Hãy lập kỳ công khi chơi, mang những danh hiệu chúng ban tặng, và nhìn Danh Vọng của bạn leo cao.',
-  'guide.deedsPage.renownBody':
-    'Danh Vọng là điểm số đứng sau cuốn Sách. Mỗi kỳ công bạn lập được đều mang về một lượng điểm cố định, và tổng điểm chỉ có tăng chứ không bao giờ giảm, nên một tuần thảnh thơi không hề khiến bạn tụt lại. Một nhúm kỳ công phụ thuộc vào may mắn hơn là kỹ năng, còn Kỳ Tích là một vinh dự riêng, nên cả hai loại này đều không mang chút Danh Vọng nào.',
   'guide.deedsPage.renownHeading': 'Danh Vọng',
   'guide.deedsPage.rewardBorder': 'Viền',
   'guide.deedsPage.rewardsBody':
     'Phần thưởng đều chỉ để phô diễn, và đó chính là chủ ý. Một số kỳ công ban danh hiệu để bạn mang hoặc viền để đóng khung tên bạn, và không bao giờ có thứ gì khiến anh hùng của bạn mạnh hơn. Hãy chọn danh hiệu bạn muốn trong Sách Kỳ Công, nó sẽ theo bạn trên bảng tên, trong kênh trò chuyện và trên các bảng xếp hạng cho mọi người cùng thấy.',
   'guide.deedsPage.rewardsHeading': 'Danh hiệu và viền tên',
-  'guide.deedsPage.standingsNote':
-    'Các vương quốc luôn ghi sổ Danh Vọng của mọi tài khoản. Muốn biết ai đứng ở đâu, hãy mở Bảng Xếp Hạng trong trò chơi và lật đến thẻ Danh Vọng của nó; bảng xếp hạng nằm ở đó, không nằm trên wiki.',
   'guide.nav.deeds': 'Sách Kỳ Công',
   'hudChrome.deeds.broadcastLine': '{name} vừa lập một kỳ công: {deed}',
   'hudChrome.deeds.broadcastsLabel': 'Chia sẻ kỳ công vừa lập với bang hội và bạn bè',
@@ -6983,9 +6983,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.filterNearly': 'Sắp Xong',
   'hudChrome.deeds.filterUnearned': 'Chưa Lập',
   'hudChrome.deeds.hiddenBadge': 'Ẩn',
-  'hudChrome.deeds.lbDeedsCol': 'Kỳ Công',
   'hudChrome.deeds.lbEmpty': 'Chưa có sử quan nào được xếp hạng.',
-  'hudChrome.deeds.lbSelf': 'Thứ hạng của bạn: hạng {rank}, trong top {percent} phần trăm',
   'hudChrome.deeds.lbTab': 'Danh Vọng',
   'hudChrome.deeds.lbTitleCol': 'Danh Hiệu',
   'hudChrome.deeds.nearestLabel': 'Sắp đạt:',
@@ -7651,4 +7649,15 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'welcome.armory.cta': 'Vào thế giới và khám phá Kho Vũ Khí',
   'welcome.news.new': 'Mới',
   'welcome.news.viewAll': 'Xem tất cả cập nhật trên GitHub',
+  'entities.letters.heroic_marks_reward.sender': 'Quân nhu Anh Hùng',
+  'entities.letters.heroic_marks_reward.subject': 'Dấu Ấn Anh Hùng của bạn',
+  'entities.letters.heroic_marks_reward.body':
+    'Đội của bạn đã vượt qua thử thách Anh Hùng khi bạn chiến đấu ở hậu tuyến hoặc đã ngã xuống. Khóa lượt của bạn vẫn được ghi nhận, vì vậy phần Dấu Ấn Anh Hùng của bạn được gửi đến đây thay vì thất lạc. Hãy sử dụng chúng thật tốt.\n\n- Quân nhu Anh Hùng',
+  'guide.dungeonsPage.resetTitle': 'Đặt lại phụ bản của bạn',
+  'guide.dungeonsPage.resetBody':
+    'Nếu đổi độ khó khi đội vẫn giữ các lượt đã nhận, quyền cũ sẽ tồn tại một lúc rồi tự xóa. Trưởng nhóm có thể bỏ chúng ngay bằng cách chọn Đặt Lại Tất Cả Phụ Bản trong menu chân dung của mình hoặc gõ /dungeon reset. Độ khó phải thực sự đã đổi, không ai dù còn sống hay đã ngã xuống được ở bên trong, và có thời gian chờ ngắn giữa các lần đặt lại. Nếu đến cửa với độ khó sai, trò chơi sẽ báo trước khi bắt đầu. Raid không bao giờ được đặt lại theo cách này; quy tắc khóa riêng vẫn áp dụng.',
+  'guide.gear.itemLevelBody':
+    'Để so sánh nhanh hai món, hãy bật Hiện Cấp Vật Phẩm trong tùy chọn. Trang bị có nguồn rõ ràng từ kẻ địch, nhiệm vụ và nghề chế tạo sẽ hiện cấp vật phẩm: một con số ước lượng sức mạnh theo nguồn gốc, giúp nhận ra nâng cấp tốt hơn ngay cả giữa các ô khác nhau. Các món không có nguồn như vậy, chẳng hạn hàng cơ bản của thương nhân và trang bị khởi đầu, không hiện cấp; thiếu con số là bình thường.',
+  'guide.professions.craftHowBody':
+    'Mở cửa sổ Chế Tạo (phím mặc định T) để xem mọi công thức đã biết, nguyên liệu cần thiết và số bạn đang có; khi đủ nguyên liệu, chỉ cần một lần nhấp. Công thức thường có thể chế tạo ở bất cứ đâu. Một số công thức nâng cao, gồm công cụ cấp cao và giáp hiếm cho người thi triển, yêu cầu đứng tại trung tâm chế tạo ở Highwatch.',
 };

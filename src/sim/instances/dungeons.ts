@@ -22,6 +22,7 @@ import type { InstanceSlot, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { arenaQueueLeave } from '../social/arena';
 import { resurrectOnInstanceReentry } from '../spirit';
+import { dropThreat } from '../threat';
 import {
   dist2d,
   type Entity,
@@ -342,6 +343,9 @@ export function enterDungeon(
   p.targetId = null;
   p.autoAttack = false;
   inst.emptyFor = 0;
+  // Session participation record for this run: awardHeroicMarks pays the mail
+  // arm only to locked players who actually walked through the door.
+  inst.enteredBy.add(r.meta.entityId);
   // Stepping inside removes you from any arena queue: a match must never form for
   // a player standing in an instance and teleport them back inside fully restored
   // (issue #1600). No-op if they were not queued; notifies any 2v2 teammate.
@@ -451,12 +455,39 @@ export function leaveDungeon(ctx: SimContext, pid?: number): void {
       return;
     }
   }
+  // Stepping out of the instance removes the leaver (and anything they own,
+  // e.g. their pet) from every inside mob's hate table: dancing in and out of
+  // the exit portal cannot be used to kite a pull to the door and back.
+  // Re-entering means earning aggro from scratch.
+  const inst = ctx.instances.find(
+    (i) => i.partyKey !== null && instanceClaimContains(ctx, i, p.pos),
+  );
+  if (inst) scrubInstanceThreat(ctx, inst, p.id);
   p.pos = ctx.groundPos(dungeon.doorPos.x, dungeon.doorPos.z - 4);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
   p.targetId = null;
   p.autoAttack = false;
   ctx.emit({ type: 'log', text: dungeon.leaveText, color: '#b9f', pid: r.meta.entityId });
+}
+
+// Drop one departing player (and every entity they own) from the hate tables of
+// all mobs in the instance, releasing any aggro locked onto them. With the table
+// entry gone, updateMobTarget re-targets the remaining party next tick, or the
+// mob evades home when nobody is left on the table.
+function scrubInstanceThreat(ctx: SimContext, inst: InstanceSlot, pid: number): void {
+  for (const id of inst.mobIds) {
+    const mob = ctx.entities.get(id);
+    if (!mob || mob.dead) continue;
+    dropThreat(mob, pid);
+    for (const srcId of [...mob.threat.keys()]) {
+      if (ctx.entities.get(srcId)?.ownerId === pid) dropThreat(mob, srcId);
+    }
+    if (mob.aggroTargetId !== null) {
+      const tgt = ctx.entities.get(mob.aggroTargetId);
+      if (mob.aggroTargetId === pid || tgt?.ownerId === pid) mob.aggroTargetId = null;
+    }
+  }
 }
 
 // Legacy single-dungeon entry points (tests + scripts use these).
@@ -481,6 +512,7 @@ function claimInstance(
   // The Sanctum speed deed measures from the claim.
   inst.claimedAt = ctx.time;
   inst.clearedBy = new Set();
+  inst.enteredBy = new Set();
   const origin = instanceOriginOf(inst);
   for (const spawn of dungeon.spawns) {
     const template = MOBS[spawn.mobId];
@@ -555,6 +587,7 @@ function freeInstance(ctx: SimContext, inst: InstanceSlot): void {
   inst.resetAvailableAt = 0;
   inst.claimedAt = undefined;
   inst.clearedBy = new Set();
+  inst.enteredBy = new Set();
 }
 
 // Explicit classic-style reset for the caller's standard dungeon claims. Durable
@@ -706,13 +739,20 @@ function heroicRewardWindowToken(lockedUntil: number): string {
   return `reset:${Math.floor(lockedUntil / HEROIC_REWARD_WINDOW_MS)}`;
 }
 
-// Settle a heroic final-boss kill in one synchronous mutation. The whole group
-// owning the claim (plus anyone still inside) receives the realm-reset lockout,
-// while the death-time participation snapshot receives the configured marks.
-// A recipient already locked for this reset is not paid again. This makes the
-// authoritative lockout boundary the only income gate and removes the former
-// UTC-day mismatch. Marks go straight into inventory, so corpse cleanup, a UI
-// failure, or logout cannot persist an entitlement without its reward.
+// Settle a heroic final-boss kill in one synchronous mutation. Every player who
+// takes the realm-reset lockout for this kill (the whole group owning the claim,
+// plus anyone still inside) also earns the configured marks, provided they took
+// part: locked AND entered this run means paid, so the lockout can never outrun
+// the reward for anyone who actually ran the dungeon. A recipient already locked
+// for this reset is not paid again. Delivery splits on presence at the corpse: a
+// player in the death-time participation snapshot takes the marks straight to
+// bags (they were there to loot), while one locked from afar who walked through
+// the door this run (a back-line healer, a fallen or released raider) has them
+// posted to the Ravenpost so a distant participant never eats the daily lockout
+// without the reward. A member who never entered (a door-camper, an alt parked
+// in town) takes the lockout with no pay: roster membership alone is not income.
+// An uncredited death (no tap and no killer credit resolves, so the death-time
+// snapshot is empty) pays nobody, bags or mail, while the lockout still strikes.
 export function awardHeroicMarks(ctx: SimContext, mob: Entity, recipients: PlayerMeta[]): void {
   const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(mob.id));
   if (!inst || inst.difficulty !== 'heroic') return;
@@ -720,7 +760,11 @@ export function awardHeroicMarks(ctx: SimContext, mob: Entity, recipients: Playe
   if (!tuning || mob.templateId !== tuning.finalBossId) return;
   const lockedUntil = ctx.raidResetMs(ctx.lockoutNowMs());
   const rewardWindow = heroicRewardWindowToken(lockedUntil);
-  const rewardIds = new Set(recipients.map((meta) => meta.entityId));
+  // recipients is the death-time participation snapshot (damage.ts): it is empty
+  // exactly when the kill resolved without player credit, and a credited kill
+  // always carries at least the credited player.
+  const credited = recipients.length > 0;
+  const presentIds = new Set(recipients.map((meta) => meta.entityId));
   const lockoutRecipients = new Map<number, PlayerMeta>();
   for (const meta of instanceLockoutMetas(ctx, inst)) lockoutRecipients.set(meta.entityId, meta);
   // A tap holder who left both party and instance before the kill remains in
@@ -729,15 +773,24 @@ export function awardHeroicMarks(ctx: SimContext, mob: Entity, recipients: Playe
 
   for (const meta of lockoutRecipients.values()) {
     const alreadyLocked = isRaidLocked(ctx, meta, heroicLockoutId(inst.dungeonId));
-    if (!alreadyLocked && rewardIds.has(meta.entityId)) {
-      ctx.addItem(HEROIC_MARK_ITEM_ID, tuning.marksPerParticipant, meta.entityId);
+    if (!alreadyLocked && credited) {
+      let paid = false;
+      if (presentIds.has(meta.entityId)) {
+        ctx.addItem(HEROIC_MARK_ITEM_ID, tuning.marksPerParticipant, meta.entityId);
+        paid = true;
+      } else if (inst.enteredBy.has(meta.entityId)) {
+        ctx.mailHeroicMarks(meta.entityId, HEROIC_MARK_ITEM_ID, tuning.marksPerParticipant);
+        paid = true;
+      }
       // The Book of Deeds daily circuit observes successful rewards, but it is
       // telemetry only: the realm-reset lockout above remains the income gate.
-      if (meta.heroicDaily.date !== rewardWindow) {
-        meta.heroicDaily = { date: rewardWindow, marked: new Set() };
+      if (paid) {
+        if (meta.heroicDaily.date !== rewardWindow) {
+          meta.heroicDaily = { date: rewardWindow, marked: new Set() };
+        }
+        meta.heroicDaily.marked.add(inst.dungeonId);
+        ctx.markDeedsDirty(meta.entityId);
       }
-      meta.heroicDaily.marked.add(inst.dungeonId);
-      ctx.markDeedsDirty(meta.entityId);
     }
     lockToHeroicClaim(ctx, inst, meta, lockedUntil);
   }

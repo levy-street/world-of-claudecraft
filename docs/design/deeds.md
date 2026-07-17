@@ -14,7 +14,8 @@ content) must follow.
 | Renown | Achievement points, quantized 5, 10, 25, 50. Zero for luck-based deeds and for all Feats. |
 | Chronicle | A per-zone task set, split into Chapters, fronted by a Chronicler NPC. |
 | Chronicler | The in-world NPC face of a zone's Chronicle (Saul, Osric Fenn, Zenzie). |
-| Feat | A zero-Renown deed: legacy, world-first, or unobtainable-by-design. Excluded from completion percentages. |
+| Feat | A deed flagged `feat: true`: legacy, world-first, or unobtainable-by-design records. Every Feat is zero-Renown, but zero Renown does not make a deed a Feat (see Zero-Renown deed). Feats sit outside the completion count entirely. |
+| Zero-Renown deed | A deed authored at Renown 0 under rule 2: luck-based drops (`col_first_rare`), the `col_set_*` armor-set collections, dynamic metas, and hidden luck moments (`hid_roll_hundred`). It counts toward Book completion like any other deed; it never scores on the Renown board. The exact non-feat set is pinned by `tests/deeds_completion.test.ts`, so growing it is a conscious, reviewed act. |
 | Title | A cosmetic name suffix a player can select and display (nameplate, chat, target frame, character panel, boards). |
 | Border | A cosmetic badge border flourish on capstone deeds. |
 
@@ -50,7 +51,13 @@ server store always canonical.
 2. **Renown scale**: 5 routine, 10 standard, 25 notable, 50 prestige. ZERO
    Renown for anything luck-dependent (rare drops), for dynamic metas whose
    requirements grow with content, and for all Feats. The account score must
-   never be able to decrease on any content patch.
+   never be able to decrease on any content patch. The luck-free guarantee
+   covers the Renown board's SCORE, its completion-time tie-break, and its
+   entry floor (the scoring set, `server/deeds_board.ts`); a zero-Renown deed
+   still counts toward Book completion through the shared predicate
+   (`src/sim/deeds_completion.ts`), it simply never scores. Do not "fix" the
+   board by counting zero-Renown deeds into it, and do not "fix" the Book by
+   hiding them from completion: the split is the design.
 3. **Closed trigger vocabulary.** Every trigger is one of the `DeedTrigger`
    kinds in `src/sim/types.ts`: a predicate over persisted state (`level`,
    `lifetimeXp`, `quest`/`quests`, `arenaRating`, `craftSkill`, `gathering`,
@@ -83,6 +90,41 @@ server store always canonical.
 10. **Era feats** resolve via the `DEEDS_ERA` constant in
     `src/sim/content/deeds.ts`, bumped only by the maintainer at era
     boundaries.
+
+## Counting rules and surfaces (one predicate, one scoring set)
+
+Two player-facing quantities exist, and every readout names which one it
+shows. **Completion** is the shared predicate `countsTowardCompletion` in
+`src/sim/deeds_completion.ts`: non-feat live-catalog deeds, hidden ones
+joining only once earned, zero-Renown deeds included. **The scoring set** is
+the distinct renown-bearing deed ids (`server/deeds_board.ts`, mirrored by the
+SQL twin `deedsBoardRanked` in `server/db.ts`), deduped once per ACCOUNT; it
+drives the Renown board's score, entry floor, and completion-time tie-break,
+and it surfaces as Renown, never as a count.
+
+| Readout | Set | Scope |
+|---|---|---|
+| Book of Deeds header pair (earned/total) | Completion | Character |
+| Book of Deeds category counts | Visible deeds per display bucket (the Feats shelf shows its own bucket) | Character |
+| Book of Deeds Renown stat | Scoring set, summed (the evaluator's denormalized sum) | Character |
+| Character sheet `deeds.earnedCount` (JSON sheet + companion OAuth) | Completion | Character |
+| Renown board score | Scoring set, summed | Account |
+| Renown board tie-break | Scoring set, max over each deed's earliest earn | Account |
+| Renown board entry floor | Scoring set, summed | Account |
+| Wiki deed catalog | Completion universe minus hidden (structural strip) | Content |
+
+**The ranked-surface rule** (learned from the 142-vs-129 count report): any
+number shown on a ranked surface must be either recomputable by the player
+from an in-game surface or explicitly labeled with its set and scope. The
+Renown board therefore displays Renown alone: there is no deed-count column
+(the retired wire field is deprecated and tracked for removal in issue
+#2044), the account scope is stated in visible text on the tab
+(`hudChrome.deeds.lbScopeNote`), and the self line carries the account's
+board-scored Renown so a single-character player can verify it against their
+Book. If a deed count is ever re-added to a ranked surface, it must be named
+by its set (never the Book's bare word "Deeds") and derive from the same set
+as the score and tie-break on that row. Cross-surface agreement is pinned by
+`tests/deeds_completion.test.ts`.
 
 ## Adding a deed (the recipe)
 

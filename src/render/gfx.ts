@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { EFFECTS_QUALITY_LOW_CUTOFF } from '../game/ui_effects_profile';
+import { isSoftwareRendererName } from './software_renderer';
 
 // Quality tiers: every tier-dependent knob keys off this module instead of
 // scattered LOW_GFX ternaries.
@@ -477,12 +478,13 @@ export type GpuClass =
 export function classifyGpuRenderer(name: string | undefined): GpuClass {
   const n = (name ?? '').toLowerCase();
   if (!n) return 'unknown';
-  // Software rasterizers (no real GPU): always the lowest tier. The bare "software" token is kept
-  // in lockstep with isSoftwareGL below so the two software detectors never disagree: a string like
-  // "Apple Software Renderer" must classify as software here (-> low) so the device-aware 3D tier and
-  // the data-fx-level HUD tier both land on low, never one low and one medium.
-  if (/swiftshader|llvmpipe|basic render|softpipe|microsoft basic|software/.test(n))
-    return 'software';
+  // Software rasterizers (no real GPU): always the lowest tier. The token set lives in
+  // src/render/software_renderer.ts (SOFTWARE_RENDERER_PATTERN), shared by every adapter-name
+  // software detector (this, isSoftwareGL below, perf_doctor, perf_reporter) so they never disagree:
+  // a string like "Apple Software Renderer" or the WARP "Microsoft Basic Render Driver" must classify
+  // as software here (-> low) so the device-aware 3D tier and the data-fx-level HUD tier both land on
+  // low, never one low and one medium. (n is already lowercased; the /i pattern makes that fine.)
+  if (isSoftwareRendererName(n)) return 'software';
   // The older Intel integrated parts the codebase already names as weak (kept AHEAD of the
   // mid-integrated bucket so an Iris Plus 6xx / UHD 6xx / HD 5xx-6xx stays weak, consistent with
   // the existing leanFoliage treatment in settingsFor).
@@ -638,7 +640,7 @@ function rendererName(webgl: THREE.WebGLRenderer): string {
 }
 
 export function isSoftwareGL(webgl: THREE.WebGLRenderer): boolean {
-  return /swiftshader|llvmpipe|software/i.test(rendererName(webgl));
+  return isSoftwareRendererName(rendererName(webgl));
 }
 
 export function isWeakIntegratedGpu(name: string | undefined): boolean {
@@ -651,6 +653,16 @@ export function isWeakIntegratedGpu(name: string | undefined): boolean {
   );
 }
 
+// The resolved software-GL verdict from the live GL context, cached at initGfxTier
+// so a player-facing "no real GPU" notice can consume it without re-probing. False
+// until initGfxTier runs (module-load best-guess never had a context).
+let softwareGlDetected = false;
+
+/** True when the live WebGL context resolved to a software rasterizer (set in initGfxTier). */
+export function gfxSoftwareRendering(): boolean {
+  return softwareGlDetected;
+}
+
 // Best-guess settings from the URL alone (so module-load consumers see sane
 // values); initGfxTier() re-resolves once the GL context exists. The renderer
 // MUST call initGfxTier() right after creating its WebGLRenderer and before
@@ -659,7 +671,8 @@ export let GFX: GfxSettings = settingsFor(tierFromHints(runtimeHints(), false), 
 
 export function initGfxTier(webgl: THREE.WebGLRenderer): GfxTier {
   const hints = { ...runtimeHints(), gpuRenderer: rendererName(webgl) };
-  const tier = tierFromHints(hints, isSoftwareGL(webgl));
+  softwareGlDetected = isSoftwareGL(webgl);
+  const tier = tierFromHints(hints, softwareGlDetected);
   GFX = settingsFor(tier, hints);
   return tier;
 }
@@ -670,6 +683,7 @@ export const gfxInternalsForTest = {
   resetGpuRendererProbe: () => {
     gpuRendererProbed = false;
     probedGpuRenderer = undefined;
+    softwareGlDetected = false;
   },
 };
 

@@ -204,7 +204,7 @@ export class CharWindow {
       world.hobbyCraft !== null
         ? `<span class="panel-subtitle char-hobby-craft">${esc(t('hudChrome.archetypeTitle.hobbyLabel'))}: ${esc(hobbyCraft)}</span>`
         : '';
-    let html = `<div class="panel-title char-title-portrait">${portraitChipHtml({ cls: world.cfg.playerClass, skin: p.skin ?? 0, name: p.name, variant: 'md' })}<span class="char-title-text" id="char-title">${esc(p.name)} <span class="panel-subtitle">${esc(t('itemUi.equipment.levelClass', { level, className }))}</span><span class="panel-subtitle char-archetype-title">${esc(t('hudChrome.archetypeTitle.label'))}: ${esc(archetypeTitle)}</span>${hobbyRow}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
+    let html = `<div class="panel-title char-title-portrait">${portraitChipHtml({ cls: world.cfg.playerClass, skin: p.skin ?? 0, name: p.name, variant: 'md' })}<span class="char-title-text" id="char-title">${esc(p.name)} <span class="panel-subtitle">${esc(t('itemUi.equipment.levelClass', { level, className }))}</span><span class="panel-subtitle char-archetype-title">${esc(t('hudChrome.archetypeTitle.label'))}: ${esc(archetypeTitle)}</span>${hobbyRow}<span class="panel-subtitle char-honor-balance">${esc(t('hudChrome.warfare.balance', { amount: formatNumber(world.honor, { maximumFractionDigits: 0 }) }))}</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
     html += `<div class="paperdoll">
       <div class="equip-col" id="equip-col-left"></div>
       <div class="char-model-panel">

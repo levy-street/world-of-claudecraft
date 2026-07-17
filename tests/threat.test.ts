@@ -6,6 +6,7 @@ import { Sim } from '../src/sim/sim';
 import {
   BEAR_FORM_THREAT_MULT,
   DEFENSIVE_STANCE_THREAT_MULT,
+  dropThreat,
   RIGHTEOUS_FURY_THREAT_MULT,
 } from '../src/sim/threat';
 import type { Entity } from '../src/sim/types';
@@ -72,6 +73,38 @@ function beefUp(mob: Entity) {
   mob.maxHp = 5000;
   mob.hp = 5000;
 }
+
+describe('dropThreat (single-attacker removal)', () => {
+  it('removes only that attacker and releases a taunt lock pointing at them', () => {
+    const mob = {
+      threat: new Map([
+        [1, 50],
+        [2, 80],
+      ]),
+      forcedTargetId: 1,
+      forcedTargetTimer: 2,
+    } as unknown as Entity;
+    dropThreat(mob, 1);
+    expect(mob.threat.has(1)).toBe(false);
+    expect(mob.threat.get(2)).toBe(80);
+    expect(mob.forcedTargetId).toBeNull();
+    expect(mob.forcedTargetTimer).toBe(0);
+  });
+
+  it('leaves a taunt lock held by a DIFFERENT attacker in place', () => {
+    const mob = {
+      threat: new Map([
+        [1, 50],
+        [2, 80],
+      ]),
+      forcedTargetId: 2,
+      forcedTargetTimer: 2,
+    } as unknown as Entity;
+    dropThreat(mob, 1);
+    expect(mob.forcedTargetId).toBe(2);
+    expect(mob.forcedTargetTimer).toBe(2);
+  });
+});
 
 describe('threat from damage', () => {
   it('damage lands on the hate table 1:1 without modifiers (plus the aggro seed)', () => {
