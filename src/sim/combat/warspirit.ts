@@ -7,7 +7,13 @@ export const SKYREND_MAX_STACKS = 5;
 export const SKYREND_CAST_REDUCTION_PER_STACK = 0.2;
 export const SKYREND_DAMAGE_BONUS_PER_STACK = 0.1;
 
-function skyrendStacks(ctx: SimContext, player: Entity, meta: PlayerMeta): number {
+export function warspiritArcBoltStacks(
+  ctx: SimContext,
+  player: Entity,
+  meta: PlayerMeta,
+  abilityId: string,
+): number {
+  if (abilityId !== 'lightning_bolt') return 0;
   if (meta.cls !== 'shaman' || ctx.playerMods(meta).spec !== 'enhancement') return 0;
   const aura = player.auras.find(
     (candidate) =>
@@ -24,9 +30,9 @@ export function warspiritArcBoltCastTime(
   meta: PlayerMeta,
   abilityId: string,
   baseCastTime: number,
+  stacks = warspiritArcBoltStacks(ctx, player, meta, abilityId),
 ): number {
   if (abilityId !== 'lightning_bolt' || baseCastTime <= 0) return baseCastTime;
-  const stacks = skyrendStacks(ctx, player, meta);
   return Math.max(0, baseCastTime * (1 - stacks * SKYREND_CAST_REDUCTION_PER_STACK));
 }
 
@@ -37,7 +43,9 @@ function consumeWarspiritArcBolt(
   abilityId: string,
 ): number {
   if (abilityId !== 'lightning_bolt') return 1;
-  const stacks = skyrendStacks(ctx, player, meta);
+  const stacks =
+    player.warspiritArcBoltStacks ?? warspiritArcBoltStacks(ctx, player, meta, abilityId);
+  delete player.warspiritArcBoltStacks;
   if (stacks <= 0) return 1;
   const index = player.auras.findIndex(
     (candidate) =>
@@ -45,10 +53,15 @@ function consumeWarspiritArcBolt(
       candidate.sourceId === player.id &&
       candidate.kind === 'stormcharge',
   );
-  if (index < 0) return 1;
-  const [aura] = player.auras.splice(index, 1);
-  ctx.emit({ type: 'aura', targetId: player.id, name: aura.name, gained: false });
+  if (index >= 0) {
+    const [aura] = player.auras.splice(index, 1);
+    ctx.emit({ type: 'aura', targetId: player.id, name: aura.name, gained: false });
+  }
   return 1 + stacks * SKYREND_DAMAGE_BONUS_PER_STACK;
+}
+
+export function clearWarspiritArcBoltSnapshot(player: Entity): void {
+  delete player.warspiritArcBoltStacks;
 }
 
 export function prepareWarspiritArcBolt(

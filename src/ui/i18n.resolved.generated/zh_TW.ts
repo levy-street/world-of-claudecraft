@@ -1396,6 +1396,8 @@ export const zh_TW: EnTranslations = {
       "formTravel": "迅捷形態：移動速度提高 {pct}%",
       "defensiveStance": "戒備姿態：受到的傷害降低，威脅值提高",
       "righteousFury": "燃燒誓言：神聖傷害產生的威脅值大幅提高",
+      "stormcharge": "喚風者 {stacks}/{max}：每層使電弧箭施法時間縮短 {castPct}%，傷害提高 {damagePct}%",
+      "nextAbilityDamage": "使下一個受影響技能的傷害提高 {pct}%",
       "scale": "體型增大 {pct}%",
       "jump": "跳躍高度提高 {pct}%",
       "school": {

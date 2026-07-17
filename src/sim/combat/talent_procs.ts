@@ -24,7 +24,12 @@ function procsFor(ctx: SimContext, player: Entity): ProcDef[] {
   const meta = ctx.players.get(player.id);
   if (!meta) return [];
   const mods = ctx.playerMods(meta);
-  return mods.procs.filter((def) => def.spec === undefined || def.spec === mods.spec);
+  return mods.procs.filter(
+    (def) =>
+      (def.spec === undefined || def.spec === mods.spec) &&
+      (def.requiresKnownAbility === undefined ||
+        meta.known.some((ability) => ability.def.id === def.requiresKnownAbility)),
+  );
 }
 
 function fire(ctx: SimContext, player: Entity, def: ProcDef, subject: Entity): void {

@@ -51,9 +51,13 @@ function buildSkyrend(sim: Sim, count: number): void {
 function castAndLandArcBolt(
   sim: Sim,
   target: Entity,
+  expireBankAfterCastStarts = false,
 ): { castTime: number; damage: number; remainingStacks: number } {
   const meta = sim.meta(sim.playerId);
   if (!meta) throw new Error('missing player metadata');
+  // Applying the visible stack aura recalculates derived stats. Hold Spell Power at
+  // zero here so these assertions isolate only Skyrend's authored multiplier.
+  sim.player.spellPower = 0;
   fixedDamageRng(sim);
   sim.targetEntity(target.id);
   sim.player.facing = Math.atan2(target.pos.x - sim.player.pos.x, target.pos.z - sim.player.pos.z);
@@ -63,6 +67,9 @@ function castAndLandArcBolt(
 
   sim.castAbility('lightning_bolt');
   const castTime = sim.player.castTotal;
+  if (expireBankAfterCastStarts) {
+    sim.player.auras = sim.player.auras.filter((aura) => aura.id !== 'sha_skyrend');
+  }
   for (let tick = 0; tick < 200 && sim.player.castingAbility; tick++) {
     updateCasting(sim.ctx, sim.player, meta);
   }
@@ -135,6 +142,38 @@ describe('Warspirit Skyrend', () => {
     expect(sim.player.auras.find((aura) => aura.id === 'sha_skyrend')?.stacks).toBe(2);
   });
 
+  it('does not build or roll from production-path misses and dodges', () => {
+    const sim = warspiritSim();
+    const missTarget = targetFor(sim);
+    const rng = sim.ctx.rng as typeof sim.ctx.rng & {
+      next(): number;
+      chance(probability: number): boolean;
+    };
+    let chanceCalls = 0;
+    rng.chance = () => {
+      chanceCalls++;
+      return true;
+    };
+
+    rng.next = () => 0;
+    expect(sim.ctx.meleeSwing(sim.player, missTarget, 0, null, { abilityId: 'auto_attack' })).toBe(
+      false,
+    );
+
+    const dodgerId = sim.addPlayer('rogue', 'Skyrend Dodger');
+    sim.setPlayerLevel(1, dodgerId);
+    const dodgeTarget = sim.entities.get(dodgerId);
+    if (!dodgeTarget) throw new Error('missing dodge target');
+    dodgeTarget.dodgeChance = 1;
+    rng.next = () => 0.5;
+    expect(sim.ctx.meleeSwing(sim.player, dodgeTarget, 0, null, { abilityId: 'auto_attack' })).toBe(
+      false,
+    );
+
+    expect(chanceCalls).toBe(0);
+    expect(sim.player.auras.some((aura) => aura.id === 'sha_skyrend')).toBe(false);
+  });
+
   it('shortens Arc Bolt by 20% per stack, becomes instant at five, boosts damage, and clears', () => {
     const baseline = warspiritSim();
     const baselineResult = castAndLandArcBolt(baseline, targetFor(baseline));
@@ -149,10 +188,23 @@ describe('Warspirit Skyrend', () => {
 
     expect(partialResult.castTime).toBeCloseTo(baselineResult.castTime * 0.6, 5);
     expect(cappedResult.castTime).toBe(0);
-    expect(partialResult.damage).toBeGreaterThan(baselineResult.damage);
-    expect(cappedResult.damage).toBeGreaterThan(partialResult.damage);
+    expect(partialResult.damage).toBe(Math.round(baselineResult.damage * 1.2));
+    expect(cappedResult.damage).toBe(Math.round(baselineResult.damage * 1.5));
     expect(partialResult.remainingStacks).toBe(0);
     expect(cappedResult.remainingStacks).toBe(0);
+  });
+
+  it('snapshots the same Skyrend bank for cast time and damage if the aura expires mid-cast', () => {
+    const baseline = warspiritSim();
+    const baselineResult = castAndLandArcBolt(baseline, targetFor(baseline));
+    const sim = warspiritSim();
+    buildSkyrend(sim, 2);
+
+    const result = castAndLandArcBolt(sim, targetFor(sim), true);
+
+    expect(result.castTime).toBeCloseTo(baselineResult.castTime * 0.6, 5);
+    expect(result.damage).toBe(Math.round(baselineResult.damage * 1.2));
+    expect(result.remainingStacks).toBe(0);
   });
 
   it('does not grant Skyrend to the other Shaman specializations', () => {

@@ -5693,6 +5693,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.formTravel': '迅捷形态：移动速度提高 {pct}%',
   'hudChrome.auraEffect.defensiveStance': '戒备姿态：受到的伤害降低，威胁值提高',
   'hudChrome.auraEffect.righteousFury': '炽燃誓约：神圣伤害产生的威胁值大幅提高',
+  'hudChrome.auraEffect.stormcharge':
+    '风暴召唤者 {stacks}/{max}：每层使电弧箭施法时间缩短 {castPct}%，伤害提高 {damagePct}%',
+  'hudChrome.auraEffect.nextAbilityDamage': '使下一个受影响技能的伤害提高 {pct}%',
   'hudChrome.auraEffect.scale': '体型增大 {pct}%',
   'hudChrome.auraEffect.jump': '跳跃高度提高 {pct}%',
   'hudChrome.auraEffect.school.physical': '物理',

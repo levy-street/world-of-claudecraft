@@ -2122,6 +2122,10 @@ export interface Entity {
   castingAbility: string | null;
   castRemaining: number;
   castTotal: number;
+  /** Skyrend stacks captured when an Arc Bolt cast starts. Timed casts re-resolve
+   *  their ability at completion, so this transient snapshot keeps the damage
+   *  payoff tied to the same bank that shortened the cast. */
+  warspiritArcBoltStacks?: number;
   // Entity-targeted casting: the target captured at cast start for entity-targeted
   // casts (hostile and friendly) and channels. Timed casts and channel ticks resolve
   // against this id, so retargeting mid-cast/mid-channel cannot redirect the spell,

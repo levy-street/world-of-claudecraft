@@ -125,6 +125,32 @@ describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
     }
   });
 
+  it('keeps both melee mastery loops explicit and hides pseudo ids in Japanese', async () => {
+    await ensureLocaleLoaded('ja_JP');
+    setLanguage('ja_JP');
+    try {
+      const mastery = (cls: 'shaman' | 'paladin', specId: string): string => {
+        const spec = TALENTS[cls].specs.find((candidate) => candidate.id === specId);
+        if (!spec) throw new Error(`missing ${cls} ${specId} specialization`);
+        return tTalent({ kind: 'talentMastery', spec, field: 'description' });
+      };
+
+      const skyrend = mastery('shaman', 'enhancement');
+      expect(skyrend).not.toContain('auto_attack');
+      expect(skyrend).toContain('20%');
+      expect(skyrend).toContain('10%');
+      expect(skyrend).toContain('x5');
+      expect(skyrend).toContain('x0');
+
+      const bloodDebt = mastery('paladin', 'retribution');
+      expect(bloodDebt).not.toContain('auto_attack');
+      expect(bloodDebt).toContain('20%');
+      expect(bloodDebt).toContain('8');
+    } finally {
+      setLanguage('en');
+    }
+  });
+
   it('regression locks: vague tooltips now read real numbers; egregious effects honor their promise', () => {
     setLanguage('en');
     const render = (cls: string, finder: (e: Entry) => boolean) => {

@@ -71,6 +71,7 @@ const PALADIN_SPECS: SpecDef[] = [
         id: 'pal_blood_debt',
         name: 'Blood Debt',
         spec: 'retribution',
+        requiresKnownAbility: 'exorcism',
         school: 'holy',
         trigger: {
           on: 'meleeHit',

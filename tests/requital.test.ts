@@ -72,6 +72,7 @@ describe('Requital Blood Debt', () => {
       name: 'Blood Debt',
       school: 'holy',
       spec: 'retribution',
+      requiresKnownAbility: 'exorcism',
       trigger: {
         on: 'meleeHit',
         abilities: ['auto_attack', 'crusader_strike'],
@@ -97,6 +98,80 @@ describe('Requital Blood Debt', () => {
     expect(first.draws).toBe(64);
     expect(first.procs.some(Boolean)).toBe(true);
     expect(first.procs.every(Boolean)).toBe(false);
+  });
+
+  it('uses the authored 20% chance polarity for both a proc and a failure', () => {
+    const sim = paladinSim();
+    const outcomes = [true, false];
+    const probabilities: number[] = [];
+    const rng = sim.ctx.rng as typeof sim.ctx.rng & {
+      chance(probability: number): boolean;
+    };
+    rng.chance = (probability) => {
+      probabilities.push(probability);
+      return outcomes.shift() ?? false;
+    };
+
+    onMeleeSwing(sim.ctx, sim.player, 'auto_attack');
+    expect(sim.player.auras.some((aura) => aura.id === 'pal_blood_debt')).toBe(true);
+
+    sim.player.auras = sim.player.auras.filter((aura) => aura.id !== 'pal_blood_debt');
+    onMeleeSwing(sim.ctx, sim.player, 'auto_attack');
+    expect(sim.player.auras.some((aura) => aura.id === 'pal_blood_debt')).toBe(false);
+    expect(probabilities).toEqual([0.2, 0.2]);
+  });
+
+  it('does not roll Blood Debt before Rite of Expulsion is learned', () => {
+    const sim = new Sim({ seed: 170728, playerClass: 'paladin', autoEquip: false });
+    sim.setPlayerLevel(5);
+    expect(sim.applyTalents({ spec: 'retribution', rows: {} })).toBe(true);
+    const meta = sim.meta(sim.playerId);
+    expect(meta?.known.some((ability) => ability.def.id === 'exorcism')).toBe(false);
+    const rng = sim.ctx.rng as typeof sim.ctx.rng & {
+      chance(probability: number): boolean;
+    };
+    let procChanceCalls = 0;
+    rng.chance = (probability) => {
+      if (probability === 0.2) procChanceCalls++;
+      return true;
+    };
+
+    onMeleeSwing(sim.ctx, sim.player, 'auto_attack');
+
+    expect(procChanceCalls).toBe(0);
+    expect(sim.player.auras.some((aura) => aura.id === 'pal_blood_debt')).toBe(false);
+  });
+
+  it('does not roll or arm Blood Debt from production-path misses and dodges', () => {
+    const sim = paladinSim();
+    const missTarget = targetFor(sim);
+    const rng = sim.ctx.rng as typeof sim.ctx.rng & {
+      next(): number;
+      chance(probability: number): boolean;
+    };
+    let procChanceCalls = 0;
+    rng.chance = (probability) => {
+      if (probability === 0.2) procChanceCalls++;
+      return true;
+    };
+
+    rng.next = () => 0;
+    expect(sim.ctx.meleeSwing(sim.player, missTarget, 0, null, { abilityId: 'auto_attack' })).toBe(
+      false,
+    );
+
+    const dodgerId = sim.addPlayer('rogue', 'Debt Dodger');
+    sim.setPlayerLevel(1, dodgerId);
+    const dodgeTarget = sim.entities.get(dodgerId);
+    if (!dodgeTarget) throw new Error('missing dodge target');
+    dodgeTarget.dodgeChance = 1;
+    rng.next = () => 0.5;
+    expect(sim.ctx.meleeSwing(sim.player, dodgeTarget, 0, null, { abilityId: 'auto_attack' })).toBe(
+      false,
+    );
+
+    expect(procChanceCalls).toBe(0);
+    expect(sim.player.auras.some((aura) => aura.id === 'pal_blood_debt')).toBe(false);
   });
 
   it('draws no proc RNG outside Requital or for an unrelated landed ability', () => {

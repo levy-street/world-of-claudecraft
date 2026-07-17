@@ -5964,6 +5964,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.defensiveStance':
     'ガーデッドスタンス: 受けるダメージが減少し、脅威度が上昇',
   'hudChrome.auraEffect.righteousFury': 'バーニングオース: 神聖ダメージによる脅威度が大幅に上昇',
+  'hudChrome.auraEffect.stormcharge':
+    'ストームコーラー {stacks}/{max}: 1スタックごとに電弧の矢の詠唱時間を{castPct}%短縮し、ダメージを{damagePct}%増加',
+  'hudChrome.auraEffect.nextAbilityDamage': '次の対象アビリティのダメージが{pct}%増加',
   'hudChrome.auraEffect.scale': 'サイズが{pct}%増加',
   'hudChrome.auraEffect.jump': 'ジャンプの高さが{pct}%増加',
   'hudChrome.auraEffect.school.physical': '物理',

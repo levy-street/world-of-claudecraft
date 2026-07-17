@@ -2866,6 +2866,13 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
     ['glow'],
   ),
   aura_frostbite: r('frost', 'ice', ['hand', { p: 'snowflake', ...TR }], ['glow']),
+  aura_stormcharge: r(
+    'storm',
+    'sky',
+    ['lightning', { p: 'sword', ...BR, pal: 'silverWhite' }],
+    ['glow'],
+  ),
+  aura_next_ability_damage: r('holy', 'holyGold', ['sword', { p: 'sunburst', ...TR }], ['glow']),
 };
 
 // Crests: class / mob-family / status glyphs, painted with the same primitive

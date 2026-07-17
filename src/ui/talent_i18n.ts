@@ -1,4 +1,9 @@
 import {
+  SKYREND_CAST_REDUCTION_PER_STACK,
+  SKYREND_DAMAGE_BONUS_PER_STACK,
+  SKYREND_MAX_STACKS,
+} from '../sim/combat/warspirit';
+import {
   type ClassTalents,
   type GlobalModEffect,
   type ProcDef,
@@ -7835,7 +7840,11 @@ function seconds(value: number, lang: SupportedLanguage): string {
 }
 
 function abilityList(ids: readonly string[] | undefined): string {
-  return ids && ids.length > 0 ? ids.map(abilityName).join(' / ') : '*';
+  return ids && ids.length > 0
+    ? ids
+        .map((id) => (id === 'auto_attack' ? t('abilityUi.actionBar.attackName') : abilityName(id)))
+        .join(' / ')
+    : '*';
 }
 
 function procTriggerDescription(
@@ -8172,6 +8181,20 @@ function className(id: PlayerClass): string {
   return tEntity({ kind: 'class', id, field: 'name' });
 }
 
+function warspiritMasteryDescription(spec: SpecDef, lang: SupportedLanguage): string {
+  const text = localeText[lang];
+  const globalDescription = effectDescription({ global: spec.mastery.effect.global }, 1, lang);
+  const skyrend = translateTitle(spec.mastery.name, lang);
+  const arcBolt = abilityName('lightning_bolt');
+  const trigger = spec.mastery.effect.proc?.trigger;
+  const triggerAbilities = trigger?.on === 'meleeHit' ? trigger.abilities : [];
+  return [
+    globalDescription,
+    `${abilityList(triggerAbilities)} -> ${skyrend}: +1 (<= ${formatNumber(SKYREND_MAX_STACKS, lang)}).`,
+    `${arcBolt}: ${skyrend} x1 = -${formatPercent(SKYREND_CAST_REDUCTION_PER_STACK, lang)} ${text.statLabels.castTime}, +${formatPercent(SKYREND_DAMAGE_BONUS_PER_STACK, lang)} ${text.statLabels.spellDmgPct}; ${skyrend} x${formatNumber(SKYREND_MAX_STACKS, lang)} = 0 s ${text.statLabels.castTime}; -> ${skyrend} x0.`,
+  ].join(' ');
+}
+
 export function tTalent(request: TalentTranslationRequest): string {
   const lang = getLanguage();
   // English is the authored source of truth: the hand-written `description` strings carry
@@ -8197,6 +8220,9 @@ export function tTalent(request: TalentTranslationRequest): string {
 
   if (request.kind === 'talentMastery') {
     if (request.field === 'name') return translateTitle(request.spec.mastery.name, lang);
+    if (request.spec.class === 'shaman' && request.spec.id === 'enhancement') {
+      return warspiritMasteryDescription(request.spec, lang);
+    }
     return (
       localeText[lang].masteryDescriptions?.[request.spec.id] ??
       effectDescription(request.spec.mastery.effect, 1, lang)

@@ -6065,6 +6065,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.defensiveStance': 'Стойка стража: сниженный получаемый урон, больше угрозы',
   'hudChrome.auraEffect.righteousFury':
     'Пылающая клятва: значительно повышенная угроза от урона Святой школы',
+  'hudChrome.auraEffect.stormcharge':
+    'Призыватель бури {stacks}/{max}: каждый заряд сокращает время применения Дуговой стрелы на {castPct}% и повышает её урон на {damagePct}%',
+  'hudChrome.auraEffect.nextAbilityDamage':
+    'Урон следующей подходящей способности повышен на {pct}%',
   'hudChrome.auraEffect.scale': 'Размер увеличен на {pct}%',
   'hudChrome.auraEffect.jump': 'Высота прыжка увеличена на {pct}%',
   'hudChrome.auraEffect.school.physical': 'Физическая',

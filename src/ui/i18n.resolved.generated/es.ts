@@ -1396,6 +1396,8 @@ export const es: EnTranslations = {
       "formTravel": "Forma Fleet: velocidad de movimiento aumentada un {pct}%",
       "defensiveStance": "Actitud en Guardia: daño recibido reducido, más amenaza",
       "righteousFury": "Juramento Ardiente: amenaza de daño Sagrado muy aumentada",
+      "stormcharge": "Skyrend {stacks}/{max}: each stack reduces Arc Bolt cast time by {castPct}% and increases its damage by {damagePct}%",
+      "nextAbilityDamage": "Increases the next affected ability damage by {pct}%",
       "scale": "Tamaño aumentado un {pct}%",
       "jump": "Altura de salto aumentada un {pct}%",
       "school": {

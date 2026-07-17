@@ -70,7 +70,12 @@ import {
 } from './spell_combat';
 import { isSpellResisted } from './spell_resist';
 import { onCastCompleted } from './talent_procs';
-import { prepareWarspiritArcBolt, warspiritArcBoltCastTime } from './warspirit';
+import {
+  clearWarspiritArcBoltSnapshot,
+  prepareWarspiritArcBolt,
+  warspiritArcBoltCastTime,
+  warspiritArcBoltStacks,
+} from './warspirit';
 
 // Shaman shocks (earth/flame/frost) share one cooldown; lightning_shock joins them
 // for the shared-cooldown predicate. Moved with the casting slice (only callers).
@@ -210,6 +215,7 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
     }
     const res = ctx.resolvedAbility(castId, p.id);
     if (res) applyAbility(ctx, p, meta, res);
+    clearWarspiritArcBoltSnapshot(p);
     // the aim point is consumed by the resolved area effects; drop it so a later
     // non-aimed cast can't inherit a stale target point.
     p.castAim = null;
@@ -241,6 +247,7 @@ export function cancelCast(ctx: SimContext, p: Entity): void {
   delete p.channelTicksFired;
   p.castAim = null;
   p.castTargetId = null;
+  clearWarspiritArcBoltSnapshot(p);
   // an interrupted cast never completed, so its queued follow-up is dropped too
   p.queuedCastAbility = null;
   p.queuedCastAim = null;
@@ -583,7 +590,17 @@ export function castAbility(
     consumeNextCastInstant(ctx, p, ability.id)
       ? 0
       : res.castTime;
-  const castTime = warspiritArcBoltCastTime(ctx, p, meta, ability.id, empoweredCastTime);
+  const arcBoltStacks = warspiritArcBoltStacks(ctx, p, meta, ability.id);
+  if (arcBoltStacks > 0) p.warspiritArcBoltStacks = arcBoltStacks;
+  else clearWarspiritArcBoltSnapshot(p);
+  const castTime = warspiritArcBoltCastTime(
+    ctx,
+    p,
+    meta,
+    ability.id,
+    empoweredCastTime,
+    arcBoltStacks,
+  );
   // A free cast is consumed where the cost is actually billed: here for channels
   // and instants (this tick resolves them via the local `res`), but for cast-time
   // spells the bill lands in applyAbility at completion, which RE-RESOLVES the
@@ -652,6 +669,7 @@ export function castAbility(
 
   if (!ability.offGcd) p.gcdRemaining = Math.max(p.gcdRemaining, gcd);
   applyAbility(ctx, p, meta, res);
+  clearWarspiritArcBoltSnapshot(p);
   // instant ground-targeted cast: its effects have consumed the aim point.
   p.castAim = null;
   p.castTargetId = null;

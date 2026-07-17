@@ -72,6 +72,56 @@ describe('Warspirit row replacement', () => {
     expect(first.resets.every(Boolean)).toBe(false);
   });
 
+  it('uses the authored 20% chance polarity for both a proc and a failure', () => {
+    const sim = shamanSim();
+    const outcomes = [true, false];
+    const probabilities: number[] = [];
+    const rng = sim.ctx.rng as typeof sim.ctx.rng & {
+      chance(probability: number): boolean;
+    };
+    rng.chance = (probability) => {
+      probabilities.push(probability);
+      return outcomes.shift() ?? false;
+    };
+
+    sim.player.cooldowns.set('stormstrike', 10);
+    onMeleeSwing(sim.ctx, sim.player, 'stormstrike');
+    expect(sim.player.cooldowns.has('stormstrike')).toBe(false);
+
+    sim.player.cooldowns.set('stormstrike', 10);
+    onMeleeSwing(sim.ctx, sim.player, 'stormstrike');
+    expect(sim.player.cooldowns.get('stormstrike')).toBe(10);
+    expect(probabilities).toEqual([0.2, 0.2]);
+  });
+
+  it('does not roll or reset from a production-path dodged Ancestral Strike', () => {
+    const sim = shamanSim();
+    const dodgerId = sim.addPlayer('rogue', 'Reprise Dodger');
+    sim.setPlayerLevel(1, dodgerId);
+    const target = sim.entities.get(dodgerId);
+    if (!target) throw new Error('missing dodge target');
+    target.dodgeChance = 1;
+    const rng = sim.ctx.rng as typeof sim.ctx.rng & {
+      next(): number;
+      chance(probability: number): boolean;
+    };
+    let procChanceCalls = 0;
+    rng.next = () => 0.5;
+    rng.chance = (probability) => {
+      if (probability === 0.2) procChanceCalls++;
+      return false;
+    };
+    sim.player.cooldowns.set('stormstrike', 10);
+
+    expect(sim.ctx.meleeSwing(sim.player, target, 0, null, { abilityId: 'stormstrike' })).toBe(
+      false,
+    );
+
+    expect(procChanceCalls).toBe(0);
+    expect(sim.player.cooldowns.get('stormstrike')).toBe(10);
+    expect(sim.player.auras.some((aura) => aura.id === 'sha_skyrend')).toBe(false);
+  });
+
   it('draws no proc RNG for an auto-attack, an unselected row, or another Shaman spec', () => {
     const cases: Array<[Sim, string]> = [
       [shamanSim(), 'auto_attack'],

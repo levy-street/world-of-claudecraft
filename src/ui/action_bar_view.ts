@@ -255,6 +255,14 @@ function hasAura(auras: readonly ActionBarAuraInput[], auraId: string): boolean 
   return false;
 }
 
+function bloodDebtMakesRiteFree(auras: readonly ActionBarAuraInput[], abilityId: string): boolean {
+  if (abilityId !== 'exorcism') return false;
+  for (const aura of auras) {
+    if (aura.id === 'pal_blood_debt' && aura.kind === 'next_cast_free') return true;
+  }
+  return false;
+}
+
 function icefallProcState(
   _ability: ActionBarAbility,
   player: ActionBarPlayerInput,
@@ -465,7 +473,8 @@ export function createActionBarView(
         slot.cdText = cd > COOLDOWN_TEXT_THRESHOLD ? deps.formatCount(Math.ceil(cd)) : '';
         slot.count = '';
         slot.usable =
-          !(player.resource < ability.cost) && (!def.requiresStealth || player.stealthed);
+          (player.resource >= ability.cost || bloodDebtMakesRiteFree(player.auras, def.id)) &&
+          (!def.requiresStealth || player.stealthed);
         slot.outOfRange =
           def.requiresTarget &&
           tgtDist !== null &&

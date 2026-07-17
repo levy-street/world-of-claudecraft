@@ -433,15 +433,38 @@ describe('actionBarView: proc availability cues', () => {
 
   it('arms Rite of Expulsion only while Blood Debt is waiting to be spent', () => {
     const view = createActionBarView(
-      descriptor(slot(1, { ability: ability('exorcism') })),
+      descriptor(slot(1, { ability: ability('exorcism', { cost: 35 }) })),
       fakeDeps(),
     );
 
-    expect(view.tick(world()).slots[0].procState).toBe('none');
+    const unaffordable = view.tick(world({ resource: 0 })).slots[0];
+    expect(unaffordable.procState).toBe('none');
+    expect(unaffordable.usable).toBe(false);
+
+    const freeRite = view.tick(
+      world({
+        resource: 0,
+        playerAuras: [{ id: 'pal_blood_debt', kind: 'next_cast_free' }],
+      }),
+    ).slots[0];
+    expect(freeRite.procState).toBe('armed');
+    expect(freeRite.usable).toBe(true);
+  });
+
+  it('does not make an unrelated unaffordable ability usable during Blood Debt', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('holy_shock', { cost: 35 }) })),
+      fakeDeps(),
+    );
+
     expect(
-      view.tick(world({ playerAuras: [{ id: 'pal_blood_debt', kind: 'next_cast_free' }] })).slots[0]
-        .procState,
-    ).toBe('armed');
+      view.tick(
+        world({
+          resource: 0,
+          playerAuras: [{ id: 'pal_blood_debt', kind: 'next_cast_free' }],
+        }),
+      ).slots[0].usable,
+    ).toBe(false);
   });
 
   it("arms Crusader Strike only while Oath's Due is waiting to be spent", () => {

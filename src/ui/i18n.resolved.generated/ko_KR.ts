@@ -1396,6 +1396,8 @@ export const ko_KR: EnTranslations = {
       "formTravel": "쾌속 형태: 이동 속도가 {pct}% 증가합니다",
       "defensiveStance": "방어 태세: 받는 피해 감소, 위협 수준 증가",
       "righteousFury": "불타는 맹세: 신성 피해로 인한 위협 수준이 크게 증가합니다",
+      "stormcharge": "폭풍소환사 {stacks}/{max}: 중첩당 전격 화살의 시전 시간이 {castPct}% 감소하고 피해가 {damagePct}% 증가합니다",
+      "nextAbilityDamage": "다음 대상 능력의 피해가 {pct}% 증가합니다",
       "scale": "크기가 {pct}% 증가합니다",
       "jump": "도약 높이가 {pct}% 증가합니다",
       "school": {
