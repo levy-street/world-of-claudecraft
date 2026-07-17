@@ -335,6 +335,14 @@ import {
   minimapZoomValue,
   nextMinimapZoom,
 } from './minimap_zoom';
+import {
+  type IdleBarkCandidate,
+  MOB_IDLE_CHECK_INTERVAL_MS,
+  MOB_IDLE_GAIN,
+  MOB_IDLE_KEY_COOLDOWN_S,
+  MOB_IDLE_SCAN_RADIUS,
+  pickIdleBarkCandidates,
+} from './mob_idle_sfx';
 import { type MobTooltipI18n, type MobTooltipModel, mobTooltipHtml } from './mob_tooltip_view';
 import { MovableFrame } from './movable_frame';
 import { OptionsWindow } from './options_window';
@@ -1206,6 +1214,12 @@ export class Hud {
   // roars and subsequent strikes use the attack vocalization). Cleared on death
   // or when the entity leaves interest (reconcileSfx).
   private mobAggroed = new Set<number>();
+  // entity id -> performance.now() of its last successful idle bark (see
+  // sweepMobIdleBarks). Only stamped when sfx.playAt reports the sound
+  // actually played, not merely attempted (see pickIdleBarkCandidates' doc
+  // comment for why). Pruned in reconcileSfx, same pattern as mobAggroed.
+  private mobLastIdleBarkAt = new Map<number, number>();
+  private lastIdleSweepAt = 0;
   // entity ids with a sustained cast-loop SFX playing, so reconcileSfx can stop
   // loops for casters that left interest mid-channel (no castStop/death arrives).
   private castLoopIds = new Set<number>();
@@ -6363,6 +6377,10 @@ export class Hud {
       this.lastHudFastAt = now;
       this.reconcileSfx();
     }
+    if (now - this.lastIdleSweepAt >= MOB_IDLE_CHECK_INTERVAL_MS) {
+      this.lastIdleSweepAt = now;
+      this.sweepMobIdleBarks();
+    }
     const mediumHud = now - this.lastHudMediumAt >= 250;
     if (mediumHud) this.lastHudMediumAt = now;
     const slowHud = now - this.lastHudSlowAt >= 500;
@@ -7629,6 +7647,11 @@ export class Hud {
     if (this.mobAggroed.size) {
       for (const id of this.mobAggroed) if (!sim.entities.has(id)) this.mobAggroed.delete(id);
     }
+    if (this.mobLastIdleBarkAt.size) {
+      for (const id of this.mobLastIdleBarkAt.keys()) {
+        if (!sim.entities.has(id)) this.mobLastIdleBarkAt.delete(id);
+      }
+    }
     if (this.castLoopIds.size) {
       for (const id of this.castLoopIds) {
         const ent = sim.entities.get(id);
@@ -7637,6 +7660,42 @@ export class Hud {
           this.castLoopIds.delete(id);
         }
       }
+    }
+  }
+
+  // Ambient "the world is alive" bark pass: a shared periodic sweep (throttled
+  // in update(), not per-mob-per-frame) rather than each mob rolling its own
+  // dice, so this stays O(n) over nearby mobs instead of O(mobs * frames). Only
+  // considers mobs the player can currently hear (MOB_IDLE_SCAN_RADIUS) that
+  // are not already mid-combat (aggroed) or muted (Nythraxis); the actual
+  // density damping and per-entity cooldown check live in the pure
+  // pickIdleBarkCandidates so they are independently testable.
+  private sweepMobIdleBarks(): void {
+    const sim = this.sim;
+    const p = sim.player;
+    const candidates: IdleBarkCandidate[] = [];
+    for (const e of sim.entities.values()) {
+      if (
+        e.kind === 'mob' &&
+        !e.dead &&
+        !this.mobAggroed.has(e.id) &&
+        shouldPlayMobVoiceSfxForEntity(e) &&
+        dist2d(p.pos, e.pos) <= MOB_IDLE_SCAN_RADIUS
+      ) {
+        candidates.push({ id: e.id, templateId: e.templateId, x: e.pos.x, y: e.pos.y, z: e.pos.z });
+      }
+    }
+    if (!candidates.length) return;
+    const now = performance.now();
+    const picked = pickIdleBarkCandidates(candidates, now, this.mobLastIdleBarkAt);
+    for (const c of picked) {
+      const voice = availableMobVoiceCue(c.templateId, 'idle');
+      if (!voice) continue;
+      const played = sfx.playAt(voice, c.x, c.y, c.z, {
+        gain: MOB_IDLE_GAIN,
+        cooldown: MOB_IDLE_KEY_COOLDOWN_S,
+      });
+      if (played) this.mobLastIdleBarkAt.set(c.id, now);
     }
   }
 

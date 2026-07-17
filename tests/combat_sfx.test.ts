@@ -311,6 +311,29 @@ describe('combat SFX policy', () => {
     }
   });
 
+  it('resolves a real idle cue for every mob family, same table as hurt', () => {
+    const familyByTemplateId: Record<string, string> = {
+      forest_wolf: 'beast',
+      wild_boar: 'boar',
+      mire_widow: 'spider',
+      mudfin_murloc: 'mudfin',
+      tunnel_rat: 'burrower',
+      mogger: 'humanoid',
+      crypt_shambler: 'undead',
+      fen_troll: 'troll',
+      korgath_the_bound: 'ogre',
+      stormcrag_elemental: 'elemental',
+      sanctum_drakonid: 'dragonkin',
+      emberkin: 'demon',
+      deepfen_spearjaw: 'reptile',
+    };
+    for (const [templateId, family] of Object.entries(familyByTemplateId)) {
+      const expected = `mob_${family}_idle`;
+      expect(mobVoiceCue(templateId, 'idle'), templateId).toBe(expected);
+      expect(expected in SFX_CLIPS, expected).toBe(true);
+    }
+  });
+
   it('keeps MOB_VOICE_CUES in lockstep with the real family list', () => {
     // A family added to one and forgotten in the other resolves at runtime
     // to a key with no clip: no error, it just plays nothing.
