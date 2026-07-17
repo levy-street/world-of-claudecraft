@@ -611,6 +611,14 @@ const mergeStringsEn = {
       guildHeadMany: 'you are {rank}, {count} members',
     },
     trade: {
+      // G2b added hud.ts's own `hud.trade.*` sub-object (Claudium/WOC pledge
+      // rows, the settling status panel): spread it first, mirroring this
+      // file's `options:` block just above, so this overlay's own literal
+      // keys (still the base window-body strings, historically owned here)
+      // layer on top instead of silently replacing it (a plain nested key
+      // here is NOT a deep merge with the top-level `...hudStrings.en.hud`
+      // spread above).
+      ...hudStrings.en.hud.trade,
       title: 'Trade with {name}',
       yourOffer: 'Your offer',
       theirOffer: "{name}'s offer",

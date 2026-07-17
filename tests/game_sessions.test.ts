@@ -356,7 +356,7 @@ describe('GameServer sessions', () => {
     server.sim.addItem('wolf_fang', 1, leaver.pid);
     server.sim.tradeRequest(stayer.pid, leaver.pid);
     server.sim.tradeAccept(stayer.pid);
-    server.sim.tradeSetOffer([{ itemId: 'wolf_fang', count: 1 }], 0, leaver.pid);
+    server.sim.tradeSetOffer([{ itemId: 'wolf_fang', count: 1 }], 0, 0, '0', leaver.pid);
     server.sim.tradeConfirm(leaver.pid);
 
     let resolveSave!: () => void;

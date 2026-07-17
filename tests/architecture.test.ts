@@ -205,6 +205,7 @@ const UI_PURE_CORES = [
   'src/ui/gpu_notice_view.ts',
   'src/ui/hud/loot/corpse_harvest_view.ts',
   'src/ui/town_focus_view.ts',
+  'src/ui/trade_view.ts',
   'src/ui/pet_action_icons.ts',
   'src/ui/welcome_screen_view.ts',
   'src/game/ui_effects_profile.ts',

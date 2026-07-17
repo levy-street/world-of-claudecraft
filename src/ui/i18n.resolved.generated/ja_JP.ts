@@ -5462,7 +5462,17 @@ export const ja_JP: EnTranslations = {
       "tradeInProgress": "すでに取引が進行中です。",
       "tradeTooFar": "対象が遠すぎて取引できません。",
       "tradeExpired": "取引リクエストは期限切れです。",
-      "tradeFailed": "取引失敗: アイテムまたは所持金が利用できません。"
+      "tradeFailed": "取引失敗: アイテムまたは所持金が利用できません。",
+      "tradeBusy": "そのプレイヤーはすでに取引中です。",
+      "tradeUsage": "誰と取引しますか？ 使い方: /trade <名前>",
+      "claudiumTradeOff": "Claudium取引は現在利用できません。",
+      "wocTradeOff": "WOC取引は現在利用できません。",
+      "wocTradeLink": "WOCを取引するにはウォレットを連携してください。",
+      "wocTradePartnerLink": "取引相手はウォレットを連携していません。",
+      "wocTradeOneSide": "取引でWOCを提供できるのは片方のみです。",
+      "tradeSettleTimeout": "取引はキャンセルされました：支払いの待機時間が終了したため、品物は返却されました。",
+      "tradeSettleCancelled": "取引はキャンセルされました。品物は返却されました。",
+      "tradeSettleUnavailable": "取引を決済できませんでした。品物は返却されました。"
     },
     "logs": {
       "standUp": "立ち上がりました。",
@@ -5482,6 +5492,7 @@ export const ja_JP: EnTranslations = {
       "tradeOpened": "取引ウィンドウが開きました。",
       "tradeComplete": "取引完了。",
       "tradeCancelled": "取引キャンセル。",
+      "tradeDeclined": "{name}があなたの取引の申し出を断りました。",
       "lootReceiveItem": "{item}を入手しました。",
       "lootReceiveMoney": "{money}を受け取りました。",
       "lootMoney": "{money}を拾いました。",
@@ -5490,6 +5501,34 @@ export const ja_JP: EnTranslations = {
       "soldJunkMany": "不要品{count}個を{money}で売却しました。",
       "friendOnline": "{name}がオンラインになりました。",
       "friendOffline": "{name}がオフラインになりました。"
+    },
+    "trade": {
+      "claudiumLabel": "Claudium",
+      "wocLabel": "WOC",
+      "settlingTitle": "取引を決済中…",
+      "legYourClaudium": "Your Claudium",
+      "legTheirClaudium": "Their Claudium",
+      "legYourWoc": "あなたのWOC支払い",
+      "legTheirWoc": "相手のWOC支払い",
+      "statusPending": "処理中",
+      "statusDone": "Done",
+      "wocPayPrompt": "連携したウォレットから{amount} WOCを送って取引を完了してください。",
+      "openInWallet": "ウォレットで開く",
+      "copyLink": "支払いリンクをコピー",
+      "copiedLink": "支払いリンクをコピーしました。",
+      "instanceSignedBy": "署名者: {name}",
+      "instanceUnique": "固有の一点物",
+      "title": "{name}と取引",
+      "yourOffer": "自分の提示",
+      "theirOffer": "{name}の提示",
+      "emptyMine": "バッグ内のアイテムをクリックして追加",
+      "emptyTheirs": "まだ何も提示されていません",
+      "money": "所持金",
+      "copper": "銅貨",
+      "hint": "提示したアイテムをクリックすると取り下げます。双方が取引承認を押す必要があります。",
+      "accept": "取引承認",
+      "waiting": "待機中...",
+      "cancel": "キャンセル"
     },
     "tutorial": {
       "title": "新米冒険者",
@@ -5617,19 +5656,6 @@ export const ja_JP: EnTranslations = {
       },
       "guildHeadOne": "あなたは{rank}、{count}人のメンバー",
       "guildHeadMany": "あなたは{rank}、{count}人のメンバー"
-    },
-    "trade": {
-      "title": "{name}と取引",
-      "yourOffer": "自分の提示",
-      "theirOffer": "{name}の提示",
-      "emptyMine": "バッグ内のアイテムをクリックして追加",
-      "emptyTheirs": "まだ何も提示されていません",
-      "money": "所持金",
-      "copper": "銅貨",
-      "hint": "提示したアイテムをクリックすると取り下げます。双方が取引承認を押す必要があります。",
-      "accept": "取引承認",
-      "waiting": "待機中...",
-      "cancel": "キャンセル"
     },
     "arena": {
       "title": "灰の闘技場",
@@ -9858,6 +9884,16 @@ export const ja_JP: EnTranslations = {
         "sender": "アルドリック修道士",
         "subject": "あなたが暗闇で成したこと",
         "body": "あの窪地に何が葬られていたのかを知る者はごくわずかで、信じる者はさらに少ないでしょう。私は知っています。そして忘れません。\n\nあなたの道に光がありますように。\n- アルドリック修道士"
+      },
+      "trade_delivery": {
+        "sender": "レイヴンポスト",
+        "subject": "取引の品が届きました",
+        "body": "取引で得た品が届きました。鞄に入りきらなかった分はワタリガラスが運んでくれました。"
+      },
+      "trade_refund": {
+        "sender": "レイヴンポスト",
+        "subject": "取引の品が返却されました",
+        "body": "取引は成立しませんでした。差し出した品はすべて返却されました。"
       },
       "heroic_marks_reward": {
         "sender": "英雄級補給官",

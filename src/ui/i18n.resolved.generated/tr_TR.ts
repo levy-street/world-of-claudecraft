@@ -5462,7 +5462,17 @@ export const tr_TR: EnTranslations = {
       "tradeInProgress": "Zaten devam eden bir takas var.",
       "tradeTooFar": "Hedef takas için çok uzakta.",
       "tradeExpired": "Takas isteğinin süresi doldu.",
-      "tradeFailed": "Takas başarısız: eşyalar ya da para artık mevcut değil."
+      "tradeFailed": "Takas başarısız: eşyalar ya da para artık mevcut değil.",
+      "tradeBusy": "That player is already trading.",
+      "tradeUsage": "Trade whom? Usage: /trade <name>.",
+      "claudiumTradeOff": "Claudium trading is not available.",
+      "wocTradeOff": "WOC trading is not available.",
+      "wocTradeLink": "Link a wallet to trade WOC.",
+      "wocTradePartnerLink": "Your trade partner has no linked wallet.",
+      "wocTradeOneSide": "Only one side of a trade can offer WOC.",
+      "tradeSettleTimeout": "Trade cancelled: the payment window expired. Your goods were returned.",
+      "tradeSettleCancelled": "Trade cancelled. Your goods were returned.",
+      "tradeSettleUnavailable": "Trade could not settle. Your goods were returned."
     },
     "logs": {
       "standUp": "Ayağa kalkıyorsun.",
@@ -5482,6 +5492,7 @@ export const tr_TR: EnTranslations = {
       "tradeOpened": "Takas penceresi açıldı.",
       "tradeComplete": "Takas tamamlandı.",
       "tradeCancelled": "Takas iptal edildi.",
+      "tradeDeclined": "{name} declined your trade request.",
       "lootReceiveItem": "Aldın: {item}.",
       "lootReceiveMoney": "{money} aldın.",
       "lootMoney": "{money} yağmaladın.",
@@ -5490,6 +5501,34 @@ export const tr_TR: EnTranslations = {
       "soldJunkMany": "{count} değersiz eşya {money} karşılığında satıldı.",
       "friendOnline": "{name} çevrimiçi oldu.",
       "friendOffline": "{name} çevrimdışı oldu."
+    },
+    "trade": {
+      "claudiumLabel": "Claudium",
+      "wocLabel": "WOC",
+      "settlingTitle": "Settling trade...",
+      "legYourClaudium": "Your Claudium",
+      "legTheirClaudium": "Their Claudium",
+      "legYourWoc": "Your WOC payment",
+      "legTheirWoc": "Their WOC payment",
+      "statusPending": "Pending",
+      "statusDone": "Done",
+      "wocPayPrompt": "Send {amount} WOC from your linked wallet to complete the trade.",
+      "openInWallet": "Open in wallet",
+      "copyLink": "Copy payment link",
+      "copiedLink": "Payment link copied.",
+      "instanceSignedBy": "Signed by {name}",
+      "instanceUnique": "Unique copy",
+      "title": "{name} ile takas",
+      "yourOffer": "Senin teklifin",
+      "theirOffer": "{name} oyuncusunun teklifi",
+      "emptyMine": "Eklemek için çantalarındaki eşyalara tıkla",
+      "emptyTheirs": "Henüz bir şey teklif edilmedi",
+      "money": "Para",
+      "copper": "bakır",
+      "hint": "Teklif edilen bir eşyayı kaldırmak için tıkla. İki taraf da Takası Kabul Et'e basmalı.",
+      "accept": "Takası Kabul Et",
+      "waiting": "Bekleniyor...",
+      "cancel": "İptal"
     },
     "tutorial": {
       "title": "Yeni Maceracı",
@@ -5617,19 +5656,6 @@ export const tr_TR: EnTranslations = {
       },
       "guildHeadOne": "{rank} rütbesindesin, {count} üye",
       "guildHeadMany": "{rank} rütbesindesin, {count} üye"
-    },
-    "trade": {
-      "title": "{name} ile takas",
-      "yourOffer": "Senin teklifin",
-      "theirOffer": "{name} oyuncusunun teklifi",
-      "emptyMine": "Eklemek için çantalarındaki eşyalara tıkla",
-      "emptyTheirs": "Henüz bir şey teklif edilmedi",
-      "money": "Para",
-      "copper": "bakır",
-      "hint": "Teklif edilen bir eşyayı kaldırmak için tıkla. İki taraf da Takası Kabul Et'e basmalı.",
-      "accept": "Takası Kabul Et",
-      "waiting": "Bekleniyor...",
-      "cancel": "İptal"
     },
     "arena": {
       "title": "Kül Kolezyumu",
@@ -9858,6 +9884,16 @@ export const tr_TR: EnTranslations = {
         "sender": "Birader Aldric",
         "subject": "Karanlıkta yaptıkların",
         "body": "O çukurda neyin gömülü olduğunu çok az kişi bilecek, inanacak olansa daha da az. Ben biliyorum ve unutmayacağım.\n\nYolun hep aydınlık olsun.\n- Birader Aldric"
+      },
+      "trade_delivery": {
+        "sender": "The Ravenpost",
+        "subject": "Trade delivery",
+        "body": "Goods from your trade have arrived. The raven carried what your bags could not."
+      },
+      "trade_refund": {
+        "sender": "The Ravenpost",
+        "subject": "Trade goods returned",
+        "body": "Your trade did not complete. Everything you offered has been returned."
       },
       "heroic_marks_reward": {
         "sender": "Kahraman levazım subayı",

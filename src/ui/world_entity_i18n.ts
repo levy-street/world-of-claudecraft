@@ -2,6 +2,7 @@ import {
   HEROIC_MARK_LETTER,
   type LetterDef,
   QUEST_LETTERS,
+  TRADE_LETTERS,
   WELCOME_LETTER,
 } from '../sim/content/letters';
 import { DELVES, DUNGEONS, MOBS, NPCS, QUESTS, ZONES } from '../sim/data';
@@ -236,13 +237,16 @@ const DUNGEON_IDS = [
   'nythraxis_boss_arena',
 ] as const;
 const DELVE_IDS = ['collapsed_reliquary', 'drowned_litany'] as const;
-// Ravenpost authored letters (src/sim/content/letters.ts): the welcome letter
-// plus every quest thank-you letter, keyed by letterId.
+// Ravenpost authored letters (src/sim/content/letters.ts): the welcome letter,
+// every quest thank-you letter, and the G2b trade settlement letters, keyed
+// by letterId.
 const LETTER_IDS = [
   'ravenpost_welcome',
   'letter_q_wolves',
   'letter_q_greyjaw',
   'letter_q_hollow',
+  'trade_delivery',
+  'trade_refund',
   'heroic_marks_reward',
 ] as const;
 
@@ -381,6 +385,7 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
     [HEROIC_MARK_LETTER.letterId]: HEROIC_MARK_LETTER,
   };
   for (const letter of Object.values(QUEST_LETTERS)) lettersById[letter.letterId] = letter;
+  for (const letter of Object.values(TRADE_LETTERS)) lettersById[letter.letterId] = letter;
   const letters = {} as LetterTranslations;
   orderedValues(LETTER_IDS, lettersById).forEach((letter) => {
     letters[letter.letterId as LetterId] = {

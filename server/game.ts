@@ -63,6 +63,7 @@ import {
   isDungeonDifficulty,
   MAX_LEVEL,
   type MobFamily,
+  OFFLINE_TRADE_RAILS,
   PARTY_MEMBER_AURA_CAP,
   RUN_SPEED,
   type SimEvent,
@@ -95,6 +96,7 @@ import {
 } from './chat_filter_commands';
 import { applyChatStrike, loadChatFilterState, recordChatViolation } from './chat_filter_db';
 import { ChatLogger } from './chat_log';
+import { createClaudiumTrade } from './claudium_trade';
 import { dailyRewardService } from './daily_rewards';
 import type { AccountChatMuteStatus, AccountCosmetics, RequestMetadata } from './db';
 import {
@@ -171,7 +173,20 @@ import { PgSocialDb } from './social_db';
 import { reconcileOnLogin } from './steam/mirror';
 import { TickProfiler } from './tick_profiler';
 import { hrtimeToMs, TickRateMeter } from './tick_rate_meter';
+import {
+  claimTradeSettlementForRecovery,
+  insertSettlementAndSaveBoth,
+  insertTradeLedger,
+  loadOpenTradeSettlements,
+  markTradeSettlement,
+  saveTradePairAndLedger,
+  type TradeLedgerRow,
+  type TradePairSaveSide,
+} from './trade_db';
+import { readTradeRailsConfig } from './trade_rails_boot';
+import { type SettlementSession, TradeSettlements } from './trade_settlement';
 import { holderInfoForPubkey } from './woc_balance';
+import { makeReference, solanaPayUri, verifyWocPayment } from './woc_trade';
 import { isBackpressureExceeded } from './ws_backpressure';
 
 const WORLD_SEED = 20061;
@@ -571,6 +586,9 @@ const HEAVY_SELF_EVENTS = new Set<string>([
   'skinEvent',
   'skinSelect',
   'tradeDone',
+  // an escrowed settlement was returned to bags: refresh the self snapshot so the
+  // recovered goods and copper show without waiting for the next heavy tick
+  'tradeSettleFailed',
   'vendor',
   'tamePet',
   'summonPet',
@@ -1252,6 +1270,10 @@ export class GameServer {
   // Throttle for the optional over-budget stutter log (PERF_TICK_LOG=1).
   private lastPerfLogTick = 0;
   private readonly ipSessionCounts = new Map<string, number>();
+  // External-currency trade settlement orchestrator (Claudium/$WOC legs). Always
+  // constructed; its rails read their own fail-closed config, so with both flags
+  // unset every method returns inert values and no external leg ever runs.
+  private tradeSettlements?: TradeSettlements;
 
   constructor() {
     this.sim = new Sim({
@@ -1287,8 +1309,14 @@ export class GameServer {
         this.simLapMark = t;
       },
       valeCupShowcase: true, // idle Sowfield auto-runs a bot exhibition to watch/bet on
+      // External trade rails. Late-bound arrow: the Sim is constructed before the
+      // settlement orchestrator, so this reads this.tradeSettlements at call time
+      // and falls back to all-off until the orchestrator exists (and forever when
+      // a pid has no live session).
+      tradeRails: (pid) => this.tradeSettlements?.tradeRailsView(pid) ?? OFFLINE_TRADE_RAILS,
     });
     this.social = new SocialService(this.socialDb, this.socialTransport());
+    this.tradeSettlements = this.buildTradeSettlements();
     this.moderation = new ModerationService(this.moderationHost(), {
       recordAction: (input) => recordInGameAction(input),
       mute: (input) => muteAccountChat(input),
@@ -2690,6 +2718,12 @@ export class GameServer {
     void this.refreshAccountFlair(session).catch((err) =>
       console.error('account flair refresh failed:', err),
     );
+    // Warm the trade-rails cache (cached Claudium balance + wallet-link) for this
+    // account so the sim's synchronous rails view is accurate by the time the
+    // player opens a trade. Best-effort: a cache read must never affect joining.
+    void this.tradeSettlements
+      ?.refreshAccount(session.accountId)
+      .catch((err) => console.error('trade rails refresh failed:', err));
     return session;
   }
 
@@ -4202,18 +4236,41 @@ export class GameServer {
         break;
       // trade
       case 'trade_req':
-        if (typeof msg.id === 'number') sim.tradeRequest(msg.id, pid);
+        if (typeof msg.id === 'number') {
+          sim.tradeRequest(msg.id, pid);
+          // Refresh this account's trade-rails cache on a VALID trade request so a
+          // pledge is clamped against a current balance/link (best-effort; the
+          // settlement re-validates authoritatively regardless). Gated on the id
+          // guard and cooldown-throttled inside refreshAccount so a client cannot
+          // spam trade_req into a per-message DB SELECT + economy-service call (F4).
+          void this.tradeSettlements?.refreshAccount(session.accountId).catch(() => {});
+        }
         break;
       case 'trade_accept':
         sim.tradeAccept(pid);
         break;
+      case 'trade_decline':
+        sim.tradeDecline(pid);
+        break;
       case 'trade_offer':
-        if (Array.isArray(msg.items)) sim.tradeSetOffer(msg.items, Number(msg.copper) || 0, pid);
+        if (Array.isArray(msg.items)) {
+          sim.tradeSetOffer(
+            msg.items,
+            Number(msg.copper) || 0,
+            Number(msg.claudium) || 0,
+            typeof msg.woc === 'string' ? msg.woc : '0',
+            pid,
+          );
+        }
         break;
       case 'trade_confirm':
         sim.tradeConfirm(pid);
         break;
       case 'trade_cancel':
+        // a settling trade is past sim-side cancellation; route the request to
+        // the settlement orchestrator, which unwinds it only while that is
+        // still safe (no external leg executed yet)
+        if (this.tradeSettlements?.requestCancel(pid)) break;
         sim.tradeCancel(pid);
         break;
       // duels
@@ -5332,19 +5389,111 @@ export class GameServer {
   }
 
   private tradeWire(pid: number): unknown {
-    const t = this.sim.tradeFor(pid);
-    if (!t) return null;
-    const mine = t.a === pid;
-    const otherPid = mine ? t.b : t.a;
-    const other = this.sim.meta(otherPid);
+    // sim-owned base view (offers, accepts, phase, rails; the rails flags flow
+    // from the cfg.tradeRails callback this server injects), then the
+    // server-only settlement enrichment: per-leg progress for both parties and
+    // the Solana Pay request for a payer who still owes the $WOC leg. The
+    // offline Sim builds the same base shape without the enrichment.
+    const info = this.sim.tradeInfoView(pid);
+    if (!info) return null;
+    if (info.phase !== 'settling' || !this.tradeSettlements) return info;
     return {
-      otherPid,
-      otherName: other?.name ?? '?',
-      myOffer: mine ? t.offerA : t.offerB,
-      theirOffer: mine ? t.offerB : t.offerA,
-      myAccepted: mine ? t.acceptedA : t.acceptedB,
-      theirAccepted: mine ? t.acceptedB : t.acceptedA,
+      ...info,
+      settle: this.tradeSettlements.settleStatusFor(pid),
+      wocPay: this.tradeSettlements.wocPayFor(pid),
     };
+  }
+
+  // Build the external-trade settlement orchestrator. readTradeRailsConfig()
+  // throws at boot on a half-configured or typo'd money-rail flag (fail-closed
+  // doctrine); with both flags unset the orchestrator is inert.
+  private buildTradeSettlements(): TradeSettlements {
+    return new TradeSettlements({
+      sim: this.sim,
+      realm: REALM,
+      cfg: readTradeRailsConfig(),
+      db: {
+        insertSettlementAndSaveBoth,
+        markTradeSettlement,
+        loadOpenTradeSettlements,
+        claimTradeSettlementForRecovery,
+        insertTradeLedger,
+      },
+      claudiumTrade: createClaudiumTrade(),
+      wocTrade: { makeReference, solanaPayUri, verifyWocPayment },
+      walletPubkeyFor: async (accountId) => (await walletForAccount(accountId))?.pubkey ?? null,
+      sessionFor: (pid) => this.settlementSessionFor(pid),
+      saveSideFor: (pid) => this.settlementSaveSide(pid),
+      forceSave: (pid) => this.forceSaveForSettlement(pid),
+      savePairAndLedger: (a, b, ledger) => this.saveTradePair(a, b, ledger),
+    });
+  }
+
+  // A lease-fenced save side for the atomic escrow anchor: the same serialization
+  // the classic pair-save path uses (serializeCharacter + the session's lease
+  // nonce), so the settling lane persists exactly what the classic lane would.
+  private settlementSaveSide(pid: number): TradePairSaveSide | null {
+    const s = this.clients.get(pid);
+    const state = this.sim.serializeCharacter(pid);
+    if (!s || !state) return null;
+    return {
+      characterId: s.characterId,
+      level: state.level,
+      state,
+      leaseNonce: s.leaseNonce,
+    };
+  }
+
+  private settlementSessionFor(pid: number): SettlementSession | undefined {
+    const s = this.clients.get(pid);
+    if (!s) return undefined;
+    return {
+      accountId: s.accountId,
+      characterId: s.characterId,
+      leaseNonce: s.leaseNonce,
+      name: s.name,
+    };
+  }
+
+  private async forceSaveForSettlement(pid: number): Promise<void> {
+    const s = this.clients.get(pid);
+    if (s) await this.saveCharacter(s);
+  }
+
+  // Classic-lane durability (fix A8): persist both post-swap character rows AND
+  // the ledger row in ONE lease-fenced transaction when both parties are still
+  // online. If a side left mid-trade or a lease fence misses, fall back to writing
+  // just the audit row (the character rows still persist on their own cadence).
+  private async saveTradePair(a: number, b: number, ledger: TradeLedgerRow): Promise<void> {
+    const sa = this.clients.get(a);
+    const sb = this.clients.get(b);
+    const stateA = this.sim.serializeCharacter(a);
+    const stateB = this.sim.serializeCharacter(b);
+    if (sa && sb && stateA && stateB) {
+      const ok = await saveTradePairAndLedger(
+        {
+          characterId: sa.characterId,
+          level: stateA.level,
+          state: stateA,
+          leaseNonce: sa.leaseNonce,
+        },
+        {
+          characterId: sb.characterId,
+          level: stateB.level,
+          state: stateB,
+          leaseNonce: sb.leaseNonce,
+        },
+        ledger,
+      );
+      if (ok) return;
+    }
+    await insertTradeLedger(ledger);
+  }
+
+  // Resolve any settlement left open by a crash on the previous boot. Called from
+  // main.ts after ensureSchema + market/mail load, before the loop starts.
+  async recoverOpenTradeSettlements(): Promise<void> {
+    if (this.tradeSettlements) await this.tradeSettlements.recoverOpenSettlements();
   }
 
   private duelWire(pid: number): unknown {
@@ -5631,6 +5780,31 @@ export class GameServer {
       const flair = this.chatFlairForPid(ev.fromPid);
       if (flair) ev.flair = flair;
     }
+    // External trade settlement accounting events are server-only. Hand them to the
+    // orchestrator and SWALLOW them so no client ever receives them. `tradeSettle`
+    // also escrowed both parties' bags (goods just left them), so mark both self
+    // snapshots heavy-dirty here since the event itself never reaches the routing
+    // that would otherwise do it.
+    const swallowedTradeEvents = new Set<SimEvent>();
+    for (const ev of events) {
+      if (ev.type === 'tradeSettle') {
+        swallowedTradeEvents.add(ev);
+        for (const pid of [ev.a, ev.b]) {
+          const s = this.clients.get(pid);
+          if (s) s.selfHeavyDirty = true;
+        }
+        const settle = ev;
+        void this.tradeSettlements
+          ?.onTradeSettle(settle)
+          .catch((err) => console.error('[trade-settle] onTradeSettle failed:', err));
+      } else if (ev.type === 'tradeLedger') {
+        swallowedTradeEvents.add(ev);
+        const ledger = ev;
+        void this.tradeSettlements
+          ?.onTradeLedger(ledger)
+          .catch((err) => console.error('[trade-settle] onTradeLedger failed:', err));
+      }
+    }
     // ignore list: social invites from blocked senders are resolved once per
     // batch (dropped for every session and declined in the sim), not per
     // receiving session, so spectators of the target never see them either.
@@ -5653,7 +5827,9 @@ export class GameServer {
         }
         const mine: SimEvent[] = [];
         for (const ev of events) {
-          if (suppressedInvites?.has(ev)) continue;
+          if (suppressedInvites !== null && suppressedInvites.has(ev)) continue;
+          // server-only trade accounting events never reach a client
+          if (swallowedTradeEvents.has(ev)) continue;
           // ignore list: drop chat originating from a character this player has
           // blocked, before it ever reaches their client
           if (

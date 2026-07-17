@@ -5462,7 +5462,17 @@ export const vi_VN: EnTranslations = {
       "tradeInProgress": "Một giao dịch đang diễn ra.",
       "tradeTooFar": "Mục tiêu ở quá xa để giao dịch.",
       "tradeExpired": "Yêu cầu giao dịch đã hết hạn.",
-      "tradeFailed": "Giao dịch thất bại: vật phẩm hoặc tiền không còn khả dụng."
+      "tradeFailed": "Giao dịch thất bại: vật phẩm hoặc tiền không còn khả dụng.",
+      "tradeBusy": "That player is already trading.",
+      "tradeUsage": "Trade whom? Usage: /trade <name>.",
+      "claudiumTradeOff": "Claudium trading is not available.",
+      "wocTradeOff": "WOC trading is not available.",
+      "wocTradeLink": "Link a wallet to trade WOC.",
+      "wocTradePartnerLink": "Your trade partner has no linked wallet.",
+      "wocTradeOneSide": "Only one side of a trade can offer WOC.",
+      "tradeSettleTimeout": "Trade cancelled: the payment window expired. Your goods were returned.",
+      "tradeSettleCancelled": "Trade cancelled. Your goods were returned.",
+      "tradeSettleUnavailable": "Trade could not settle. Your goods were returned."
     },
     "logs": {
       "standUp": "Bạn đứng dậy.",
@@ -5482,6 +5492,7 @@ export const vi_VN: EnTranslations = {
       "tradeOpened": "Đã mở cửa sổ giao dịch.",
       "tradeComplete": "Giao dịch hoàn tất.",
       "tradeCancelled": "Đã hủy giao dịch.",
+      "tradeDeclined": "{name} declined your trade request.",
       "lootReceiveItem": "Bạn nhận được: {item}.",
       "lootReceiveMoney": "Bạn nhận được {money}.",
       "lootMoney": "Bạn nhặt được {money}.",
@@ -5490,6 +5501,34 @@ export const vi_VN: EnTranslations = {
       "soldJunkMany": "Đã bán {count} vật phẩm rác được {money}.",
       "friendOnline": "{name} đã trực tuyến.",
       "friendOffline": "{name} đã ngoại tuyến."
+    },
+    "trade": {
+      "claudiumLabel": "Claudium",
+      "wocLabel": "WOC",
+      "settlingTitle": "Settling trade...",
+      "legYourClaudium": "Your Claudium",
+      "legTheirClaudium": "Their Claudium",
+      "legYourWoc": "Your WOC payment",
+      "legTheirWoc": "Their WOC payment",
+      "statusPending": "Pending",
+      "statusDone": "Done",
+      "wocPayPrompt": "Send {amount} WOC from your linked wallet to complete the trade.",
+      "openInWallet": "Open in wallet",
+      "copyLink": "Copy payment link",
+      "copiedLink": "Payment link copied.",
+      "instanceSignedBy": "Signed by {name}",
+      "instanceUnique": "Unique copy",
+      "title": "Giao dịch với {name}",
+      "yourOffer": "Vật trao của bạn",
+      "theirOffer": "Vật trao của {name}",
+      "emptyMine": "Nhấp vào vật phẩm trong túi để thêm vào",
+      "emptyTheirs": "Chưa có gì được trao",
+      "money": "Tiền",
+      "copper": "đồng",
+      "hint": "Nhấp vào vật phẩm đã trao để gỡ ra. Cả hai bên đều phải nhấn Chấp Nhận Giao Dịch.",
+      "accept": "Chấp Nhận Giao Dịch",
+      "waiting": "Đang chờ...",
+      "cancel": "Hủy"
     },
     "tutorial": {
       "title": "Nhà Thám Hiểm Mới",
@@ -5617,19 +5656,6 @@ export const vi_VN: EnTranslations = {
       },
       "guildHeadOne": "bạn là {rank}, {count} thành viên",
       "guildHeadMany": "bạn là {rank}, {count} thành viên"
-    },
-    "trade": {
-      "title": "Giao dịch với {name}",
-      "yourOffer": "Vật trao của bạn",
-      "theirOffer": "Vật trao của {name}",
-      "emptyMine": "Nhấp vào vật phẩm trong túi để thêm vào",
-      "emptyTheirs": "Chưa có gì được trao",
-      "money": "Tiền",
-      "copper": "đồng",
-      "hint": "Nhấp vào vật phẩm đã trao để gỡ ra. Cả hai bên đều phải nhấn Chấp Nhận Giao Dịch.",
-      "accept": "Chấp Nhận Giao Dịch",
-      "waiting": "Đang chờ...",
-      "cancel": "Hủy"
     },
     "arena": {
       "title": "Đấu Trường Tro Tàn",
@@ -9858,6 +9884,16 @@ export const vi_VN: EnTranslations = {
         "sender": "Tu Huynh Aldric",
         "subject": "Điều bạn đã làm trong bóng tối",
         "body": "Hiếm ai sẽ biết thứ gì từng bị chôn dưới lòng chảo ấy, và càng hiếm ai tin. Tôi biết, và tôi sẽ không quên.\n\nMong con đường của bạn luôn sáng tỏ.\n- Tu Huynh Aldric"
+      },
+      "trade_delivery": {
+        "sender": "The Ravenpost",
+        "subject": "Trade delivery",
+        "body": "Goods from your trade have arrived. The raven carried what your bags could not."
+      },
+      "trade_refund": {
+        "sender": "The Ravenpost",
+        "subject": "Trade goods returned",
+        "body": "Your trade did not complete. Everything you offered has been returned."
       },
       "heroic_marks_reward": {
         "sender": "Quân nhu Anh Hùng",

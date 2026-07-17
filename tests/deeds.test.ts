@@ -1723,7 +1723,7 @@ describe('trade completion counts only non-empty trades (soc_first_trade)', () =
     sim.addItem('wolf_fang', 1, a);
     sim.tradeRequest(b, a);
     sim.tradeAccept(b);
-    sim.tradeSetOffer([{ itemId: 'wolf_fang', count: 1 }], 0, a);
+    sim.tradeSetOffer([{ itemId: 'wolf_fang', count: 1 }], 0, 0, '0', a);
     sim.tradeConfirm(a);
     sim.tradeConfirm(b);
     sim.tick();
@@ -1754,7 +1754,7 @@ describe('trade completion counts only non-empty trades (soc_first_trade)', () =
     const copperABefore = metaA.copper;
     sim.tradeRequest(b, a); // a initiates: the session's receiver side is b
     sim.tradeAccept(b);
-    sim.tradeSetOffer([], 1, b); // the receiver offers 1 copper, no items anywhere
+    sim.tradeSetOffer([], 1, 0, '0', b); // the receiver offers 1 copper, no items anywhere
     sim.tradeConfirm(a);
     sim.tradeConfirm(b);
     sim.tick();

@@ -3961,8 +3961,8 @@ function playerTrade(): Scenario {
       // 1) atomic swap: A gives 2 wolf_fang + 30 copper, B gives 1 baked_bread + 10 copper.
       sim.tradeRequest(b, a);
       sim.tradeAccept(b);
-      sim.tradeSetOffer([{ itemId: 'wolf_fang', count: 2 }], 30, a);
-      sim.tradeSetOffer([{ itemId: 'baked_bread', count: 1 }], 10, b);
+      sim.tradeSetOffer([{ itemId: 'wolf_fang', count: 2 }], 30, 0, '0', a);
+      sim.tradeSetOffer([{ itemId: 'baked_bread', count: 1 }], 10, 0, '0', b);
       sim.tradeConfirm(a);
       sim.tradeConfirm(b);
       rec.snapshot('swapped');
@@ -3970,7 +3970,7 @@ function playerTrade(): Scenario {
       // 2) cancel path: open another session, A confirms, B cancels it (no swap).
       sim.tradeRequest(b, a);
       sim.tradeAccept(b);
-      sim.tradeSetOffer([{ itemId: 'wolf_fang', count: 1 }], 0, a);
+      sim.tradeSetOffer([{ itemId: 'wolf_fang', count: 1 }], 0, 0, '0', a);
       sim.tradeConfirm(a);
       sim.tradeCancel(b);
       rec.snapshot('cancelled');
@@ -3983,6 +3983,84 @@ function playerTrade(): Scenario {
       teleport(sim, sim.entities.get(b) as AnyEntity, 40, -40);
       rec.tick(1);
       rec.snapshot('drift-cancelled');
+    },
+  };
+}
+
+// Player-to-player trade, instance-aware (G2b): an offer row may carry a specific
+// instanced copy (signed/rolled/enchanted, #1165) instead of a plain fungible
+// stack; the sim captures the payload from the OWNER's real inventory (never off
+// the wire) and it survives the swap intact. Both sides offer an instance row plus
+// copper (a hand-placed copy via addItemInstance stands in for a crafted/enchanted
+// grant; no dev command mints one directly). Only the classic items+copper lane is
+// reachable here: external (Claudium/$WOC) pledges need a live server settlement
+// orchestrator the offline sim cannot drive, so this scenario never touches them.
+function playerTradeInstances(): Scenario {
+  return {
+    name: 'player_trade_instances',
+    coverage: [
+      'tradeSetOffer captures an instance payload from the OWNER real inventory (never off the wire)',
+      'tradeConfirm swaps an instance row + a plain fungible row atomically, both directions',
+      'the instance payload (signer/rolled.stats) survives the swap intact (#1165 data-loss regression)',
+    ],
+    build: () => new Sim({ seed: 1023, playerClass: 'warrior', noPlayer: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const a = sim.addPlayer('warrior', 'Ayla');
+      const b = sim.addPlayer('mage', 'Borin');
+      teleport(sim, sim.entities.get(a) as AnyEntity, 0, -40);
+      teleport(sim, sim.entities.get(b) as AnyEntity, 3, -40);
+
+      // dev-grant a plain stack, then hand-place an instanced copy alongside it
+      // (the sim internals other scenarios use to stage state directly).
+      sim.addItem('wolf_fang', 2, a);
+      sim.addItemInstance('wolf_fang', { signer: 'Ayla', rolled: { stats: { str: 5 } } }, a);
+      sim.addItem('apprentice_staff', 1, b);
+      sim.addItemInstance(
+        'apprentice_staff',
+        { signer: 'Borin', rolled: { stats: { int: 2 } } },
+        b,
+      );
+      sim.players.get(a)!.copper = 100;
+      sim.players.get(b)!.copper = 50;
+      rec.notes.a = a;
+      rec.notes.b = b;
+      rec.snapshot('trade-instances-setup');
+
+      // Both sides offer their instanced copy plus copper; the offline sim reads
+      // the selector as a match against the owner's real inventory, so the
+      // captured payload rides on the WIRE selector rather than the input count.
+      sim.tradeRequest(b, a);
+      sim.tradeAccept(b);
+      sim.tradeSetOffer(
+        [
+          {
+            itemId: 'wolf_fang',
+            count: 1,
+            instance: { signer: 'Ayla', rolled: { stats: { str: 5 } } },
+          },
+        ],
+        30,
+        0,
+        '0',
+        a,
+      );
+      sim.tradeSetOffer(
+        [
+          {
+            itemId: 'apprentice_staff',
+            count: 1,
+            instance: { signer: 'Borin', rolled: { stats: { int: 2 } } },
+          },
+        ],
+        10,
+        0,
+        '0',
+        b,
+      );
+      sim.tradeConfirm(a);
+      sim.tradeConfirm(b);
+      rec.snapshot('trade-instances-swapped');
     },
   };
 }
@@ -4137,5 +4215,6 @@ export const SCENARIOS: Scenario[] = [
   bankRoundTrip(),
   g1bXpPrestige(),
   playerTrade(),
+  playerTradeInstances(),
   chatSocial(),
 ];

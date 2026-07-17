@@ -5462,7 +5462,17 @@ export const fr_CA: EnTranslations = {
       "tradeInProgress": "Un échange est déjà en cours.",
       "tradeTooFar": "La cible est trop éloignée pour échanger.",
       "tradeExpired": "La demande d'échange a expiré.",
-      "tradeFailed": "Échange échoué : objets ou argent indisponibles."
+      "tradeFailed": "Échange échoué : objets ou argent indisponibles.",
+      "tradeBusy": "That player is already trading.",
+      "tradeUsage": "Trade whom? Usage: /trade <name>.",
+      "claudiumTradeOff": "Claudium trading is not available.",
+      "wocTradeOff": "WOC trading is not available.",
+      "wocTradeLink": "Link a wallet to trade WOC.",
+      "wocTradePartnerLink": "Your trade partner has no linked wallet.",
+      "wocTradeOneSide": "Only one side of a trade can offer WOC.",
+      "tradeSettleTimeout": "Trade cancelled: the payment window expired. Your goods were returned.",
+      "tradeSettleCancelled": "Trade cancelled. Your goods were returned.",
+      "tradeSettleUnavailable": "Trade could not settle. Your goods were returned."
     },
     "logs": {
       "standUp": "Vous vous levez.",
@@ -5482,6 +5492,7 @@ export const fr_CA: EnTranslations = {
       "tradeOpened": "Fenêtre d'échange ouverte.",
       "tradeComplete": "Échange terminé.",
       "tradeCancelled": "Échange annulé.",
+      "tradeDeclined": "{name} declined your trade request.",
       "lootReceiveItem": "Vous recevez : {item}.",
       "lootReceiveMoney": "Vous recevez {money}.",
       "lootMoney": "Vous ramassez {money}.",
@@ -5490,6 +5501,34 @@ export const fr_CA: EnTranslations = {
       "soldJunkMany": "Vous avez vendu {count} objets gris pour {money}.",
       "friendOnline": "{name} vient de se connecter.",
       "friendOffline": "{name} vient de se déconnecter."
+    },
+    "trade": {
+      "claudiumLabel": "Claudium",
+      "wocLabel": "WOC",
+      "settlingTitle": "Settling trade...",
+      "legYourClaudium": "Your Claudium",
+      "legTheirClaudium": "Their Claudium",
+      "legYourWoc": "Your WOC payment",
+      "legTheirWoc": "Their WOC payment",
+      "statusPending": "Pending",
+      "statusDone": "Done",
+      "wocPayPrompt": "Send {amount} WOC from your linked wallet to complete the trade.",
+      "openInWallet": "Open in wallet",
+      "copyLink": "Copy payment link",
+      "copiedLink": "Payment link copied.",
+      "instanceSignedBy": "Signed by {name}",
+      "instanceUnique": "Unique copy",
+      "title": "Échange avec {name}",
+      "yourOffer": "Votre offre",
+      "theirOffer": "Offre de {name}",
+      "emptyMine": "Cliquez sur des objets dans vos sacs pour les ajouter",
+      "emptyTheirs": "Rien n'est encore proposé",
+      "money": "Argent",
+      "copper": "cuivre",
+      "hint": "Cliquez sur un objet proposé pour le retirer. Les deux joueurs doivent appuyer sur Accepter l'échange.",
+      "accept": "Accepter l'échange",
+      "waiting": "En attente...",
+      "cancel": "Annuler"
     },
     "tutorial": {
       "title": "Nouvel aventurier",
@@ -5617,19 +5656,6 @@ export const fr_CA: EnTranslations = {
       },
       "guildHeadOne": "vous êtes {rank}, {count} membre",
       "guildHeadMany": "vous êtes {rank}, {count} membres"
-    },
-    "trade": {
-      "title": "Échange avec {name}",
-      "yourOffer": "Votre offre",
-      "theirOffer": "Offre de {name}",
-      "emptyMine": "Cliquez sur des objets dans vos sacs pour les ajouter",
-      "emptyTheirs": "Rien n'est encore proposé",
-      "money": "Argent",
-      "copper": "cuivre",
-      "hint": "Cliquez sur un objet proposé pour le retirer. Les deux joueurs doivent appuyer sur Accepter l'échange.",
-      "accept": "Accepter l'échange",
-      "waiting": "En attente...",
-      "cancel": "Annuler"
     },
     "arena": {
       "title": "Colisée cendré",
@@ -9858,6 +9884,16 @@ export const fr_CA: EnTranslations = {
         "sender": "Frère Aldric",
         "subject": "Ce que vous avez accompli dans le noir",
         "body": "Rares sont ceux qui sauront jamais ce qui était enterré dans ce creux, et plus rares encore ceux qui le croiraient. Moi, je le sais, et je ne l’oublierai pas.\n\nQue votre route reste éclairée.\n- Frère Aldric"
+      },
+      "trade_delivery": {
+        "sender": "The Ravenpost",
+        "subject": "Trade delivery",
+        "body": "Goods from your trade have arrived. The raven carried what your bags could not."
+      },
+      "trade_refund": {
+        "sender": "The Ravenpost",
+        "subject": "Trade goods returned",
+        "body": "Your trade did not complete. Everything you offered has been returned."
       },
       "heroic_marks_reward": {
         "sender": "Intendant héroïque",

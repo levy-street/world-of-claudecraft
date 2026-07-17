@@ -5462,7 +5462,17 @@ export const da_DK: EnTranslations = {
       "tradeInProgress": "En handel er allerede i gang.",
       "tradeTooFar": "Målet er for langt væk til at handle.",
       "tradeExpired": "Handelsanmodningen er udløbet.",
-      "tradeFailed": "Handel mislykkedes: genstande eller penge er ikke længere tilgængelige."
+      "tradeFailed": "Handel mislykkedes: genstande eller penge er ikke længere tilgængelige.",
+      "tradeBusy": "That player is already trading.",
+      "tradeUsage": "Trade whom? Usage: /trade <name>.",
+      "claudiumTradeOff": "Claudium trading is not available.",
+      "wocTradeOff": "WOC trading is not available.",
+      "wocTradeLink": "Link a wallet to trade WOC.",
+      "wocTradePartnerLink": "Your trade partner has no linked wallet.",
+      "wocTradeOneSide": "Only one side of a trade can offer WOC.",
+      "tradeSettleTimeout": "Trade cancelled: the payment window expired. Your goods were returned.",
+      "tradeSettleCancelled": "Trade cancelled. Your goods were returned.",
+      "tradeSettleUnavailable": "Trade could not settle. Your goods were returned."
     },
     "logs": {
       "standUp": "Du rejser dig op.",
@@ -5482,6 +5492,7 @@ export const da_DK: EnTranslations = {
       "tradeOpened": "Handelsvindue åbnet.",
       "tradeComplete": "Handel fuldført.",
       "tradeCancelled": "Handel annulleret.",
+      "tradeDeclined": "{name} declined your trade request.",
       "lootReceiveItem": "Du modtager: {item}.",
       "lootReceiveMoney": "Du modtager {money}.",
       "lootMoney": "Du plyndrer {money}.",
@@ -5490,6 +5501,34 @@ export const da_DK: EnTranslations = {
       "soldJunkMany": "Solgte {count} skrammelgenstande for {money}.",
       "friendOnline": "{name} er kommet online.",
       "friendOffline": "{name} er gået offline."
+    },
+    "trade": {
+      "claudiumLabel": "Claudium",
+      "wocLabel": "WOC",
+      "settlingTitle": "Settling trade...",
+      "legYourClaudium": "Your Claudium",
+      "legTheirClaudium": "Their Claudium",
+      "legYourWoc": "Your WOC payment",
+      "legTheirWoc": "Their WOC payment",
+      "statusPending": "Pending",
+      "statusDone": "Done",
+      "wocPayPrompt": "Send {amount} WOC from your linked wallet to complete the trade.",
+      "openInWallet": "Open in wallet",
+      "copyLink": "Copy payment link",
+      "copiedLink": "Payment link copied.",
+      "instanceSignedBy": "Signed by {name}",
+      "instanceUnique": "Unique copy",
+      "title": "Handl med {name}",
+      "yourOffer": "Dit tilbud",
+      "theirOffer": "{name}s tilbud",
+      "emptyMine": "Klik på genstande i dine tasker for at tilføje dem",
+      "emptyTheirs": "Intet tilbudt endnu",
+      "money": "Penge",
+      "copper": "kobber",
+      "hint": "Klik på en tilbudt genstand for at fjerne den. Begge parter skal trykke på Accepter handel.",
+      "accept": "Accepter handel",
+      "waiting": "Venter...",
+      "cancel": "Annuller"
     },
     "tutorial": {
       "title": "Ny eventyrer",
@@ -5617,19 +5656,6 @@ export const da_DK: EnTranslations = {
       },
       "guildHeadOne": "du er {rank}, {count} medlem",
       "guildHeadMany": "du er {rank}, {count} medlemmer"
-    },
-    "trade": {
-      "title": "Handl med {name}",
-      "yourOffer": "Dit tilbud",
-      "theirOffer": "{name}s tilbud",
-      "emptyMine": "Klik på genstande i dine tasker for at tilføje dem",
-      "emptyTheirs": "Intet tilbudt endnu",
-      "money": "Penge",
-      "copper": "kobber",
-      "hint": "Klik på en tilbudt genstand for at fjerne den. Begge parter skal trykke på Accepter handel.",
-      "accept": "Accepter handel",
-      "waiting": "Venter...",
-      "cancel": "Annuller"
     },
     "arena": {
       "title": "Det Askegrå Colosseum",
@@ -9858,6 +9884,16 @@ export const da_DK: EnTranslations = {
         "sender": "Broder Aldric",
         "subject": "Det, du gjorde i mørket",
         "body": "Kun få vil nogensinde vide, hvad der lå begravet i den lavning, og endnu færre ville tro det. Jeg ved det, og jeg glemmer det ikke.\n\nMå din vej forblive oplyst.\n- Broder Aldric"
+      },
+      "trade_delivery": {
+        "sender": "The Ravenpost",
+        "subject": "Trade delivery",
+        "body": "Goods from your trade have arrived. The raven carried what your bags could not."
+      },
+      "trade_refund": {
+        "sender": "The Ravenpost",
+        "subject": "Trade goods returned",
+        "body": "Your trade did not complete. Everything you offered has been returned."
       },
       "heroic_marks_reward": {
         "sender": "Heroisk kvartermester",

@@ -5462,7 +5462,17 @@ export const zh_CN: EnTranslations = {
       "tradeInProgress": "已有交易正在进行。",
       "tradeTooFar": "目标太远，无法交易。",
       "tradeExpired": "交易请求已过期。",
-      "tradeFailed": "交易失败：物品或金钱已不可用。"
+      "tradeFailed": "交易失败：物品或金钱已不可用。",
+      "tradeBusy": "该玩家已在进行其他交易。",
+      "tradeUsage": "与谁交易？用法：/trade <名字>。",
+      "claudiumTradeOff": "Claudium 交易当前不可用。",
+      "wocTradeOff": "WOC 交易当前不可用。",
+      "wocTradeLink": "请先绑定钱包才能交易 WOC。",
+      "wocTradePartnerLink": "你的交易对象尚未绑定钱包。",
+      "wocTradeOneSide": "一次交易只能由一方提供 WOC。",
+      "tradeSettleTimeout": "交易已取消：付款等待超时，你的物品已退还。",
+      "tradeSettleCancelled": "交易已取消，你的物品已退还。",
+      "tradeSettleUnavailable": "交易无法结算，你的物品已退还。"
     },
     "logs": {
       "standUp": "你站了起来。",
@@ -5482,6 +5492,7 @@ export const zh_CN: EnTranslations = {
       "tradeOpened": "交易窗口已打开。",
       "tradeComplete": "交易完成。",
       "tradeCancelled": "交易已取消。",
+      "tradeDeclined": "{name} 拒绝了你的交易请求。",
       "lootReceiveItem": "你获得：{item}。",
       "lootReceiveMoney": "你获得 {money}。",
       "lootMoney": "你拾取 {money}。",
@@ -5490,6 +5501,34 @@ export const zh_CN: EnTranslations = {
       "soldJunkMany": "你以 {money} 卖出 {count} 件杂物。",
       "friendOnline": "{name} 上线了。",
       "friendOffline": "{name} 下线了。"
+    },
+    "trade": {
+      "claudiumLabel": "Claudium",
+      "wocLabel": "WOC",
+      "settlingTitle": "交易结算中…",
+      "legYourClaudium": "Your Claudium",
+      "legTheirClaudium": "Their Claudium",
+      "legYourWoc": "你的 WOC 付款",
+      "legTheirWoc": "对方的 WOC 付款",
+      "statusPending": "进行中",
+      "statusDone": "Done",
+      "wocPayPrompt": "请从你已绑定的钱包发送 {amount} WOC 以完成交易。",
+      "openInWallet": "在钱包中打开",
+      "copyLink": "复制付款链接",
+      "copiedLink": "付款链接已复制。",
+      "instanceSignedBy": "签名者：{name}",
+      "instanceUnique": "独特的副本",
+      "title": "与 {name} 交易",
+      "yourOffer": "你的报价",
+      "theirOffer": "{name} 的报价",
+      "emptyMine": "点击背包中的物品来加入交易",
+      "emptyTheirs": "对方尚未提供物品",
+      "money": "金钱",
+      "copper": "铜币",
+      "hint": "点击已提供的物品可将其移除。双方都必须点击接受交易。",
+      "accept": "接受交易",
+      "waiting": "等待中...",
+      "cancel": "取消"
     },
     "tutorial": {
       "title": "新冒险者",
@@ -5617,19 +5656,6 @@ export const zh_CN: EnTranslations = {
       },
       "guildHeadOne": "你是{rank}，{count}名成员",
       "guildHeadMany": "你是{rank}，{count}名成员"
-    },
-    "trade": {
-      "title": "与 {name} 交易",
-      "yourOffer": "你的报价",
-      "theirOffer": "{name} 的报价",
-      "emptyMine": "点击背包中的物品来加入交易",
-      "emptyTheirs": "对方尚未提供物品",
-      "money": "金钱",
-      "copper": "铜币",
-      "hint": "点击已提供的物品可将其移除。双方都必须点击接受交易。",
-      "accept": "接受交易",
-      "waiting": "等待中...",
-      "cancel": "取消"
     },
     "arena": {
       "title": "灰烬斗技场",
@@ -9858,6 +9884,16 @@ export const zh_CN: EnTranslations = {
         "sender": "奥德里克修士",
         "subject": "你在黑暗中所做的一切",
         "body": "很少有人会知道那处洼地里埋葬着什么，愿意相信的人更少。但我知道，而且我不会忘记。\n\n愿你的道路常明。\n- 奥德里克修士"
+      },
+      "trade_delivery": {
+        "sender": "渡鸦邮驿",
+        "subject": "交易货品送达",
+        "body": "你交易所得的货品已经送达。渡鸦帮你捎来了背包装不下的东西。"
+      },
+      "trade_refund": {
+        "sender": "渡鸦邮驿",
+        "subject": "交易物品已退还",
+        "body": "交易未能完成。你提供的一切已经退还给你。"
       },
       "heroic_marks_reward": {
         "sender": "英勇军需官",
