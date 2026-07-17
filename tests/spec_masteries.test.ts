@@ -221,6 +221,22 @@ describe('spec masteries', () => {
     expect(TALENTS.rogue?.specs.find((s) => s.id === 'assassination')?.mastery.effect).toEqual({
       global: { dotDmgPct: 0.2 },
       stats: { crit: 0.03 },
+      proc: {
+        id: 'rog_redhanded',
+        name: 'Redhanded',
+        spec: 'assassination',
+        requiresKnownAbility: 'crippling_poison',
+        school: 'nature',
+        trigger: { on: 'spellHit', abilities: ['crippling_poison'] },
+        responses: [
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_free',
+            abilities: ['eviscerate', 'rupture'],
+            duration: 8,
+          },
+        ],
+      },
     });
     expect(TALENTS.rogue?.specs.find((s) => s.id === 'subtlety')?.mastery.effect).toEqual({
       global: { critDmgPhysPct: 0.4 },

@@ -293,8 +293,27 @@ const ROGUE_SPECS: SpecDef[] = [
     'A burst specialist using critical strikes and finishers.',
     'cold_blood',
     'Redhanded',
-    'Increases your bleed damage by 20% and critical strike chance by 3%.',
-    { global: { dotDmgPct: 0.2 }, stats: { crit: 0.03 } },
+    'Increases your bleed damage by 20% and critical strike chance by 3%. Landing Leaden Venom makes your next Dirt Nap or Bleed Out within 8 sec free.',
+    {
+      global: { dotDmgPct: 0.2 },
+      stats: { crit: 0.03 },
+      proc: {
+        id: 'rog_redhanded',
+        name: 'Redhanded',
+        spec: 'assassination',
+        requiresKnownAbility: 'crippling_poison',
+        school: 'nature',
+        trigger: { on: 'spellHit', abilities: ['crippling_poison'] },
+        responses: [
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_free',
+            abilities: ['eviscerate', 'rupture'],
+            duration: 8,
+          },
+        ],
+      },
+    },
   ),
   spec(
     'combat',

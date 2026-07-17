@@ -970,3 +970,10 @@ npm run build on PR4/PR5.
   replaces flat Arrowfall damage with a protected channel that banks a separate
   10 sec Gutting Strike payoff, giving the hybrid a ranged-area route back into
   melee without changing the other apex choices.
+
+## Rogue DPS identity pass
+
+- Knifework uses Redhanded as a poison-to-finisher conversion. Landing Leaden Venom
+  opens an 8 sec window for a free Dirt Nap or Bleed Out, so the assassination loop
+  deliberately weaves poison between combo-point building and its direct or bleed
+  payoff while preserving energy as the limiting resource outside that window.
