@@ -597,6 +597,39 @@ describe('actionBarView: proc availability cues', () => {
     });
   });
 
+  it('prices and cues both halves of the Moonrage spell relay', () => {
+    const lunarWindow = [{ id: 'dru_moonrage_lunar', kind: 'next_cast_cheap' as const }];
+    for (const [abilityId, cost] of [
+      ['moonfire', 80],
+      ['starfire', 80],
+    ] as const) {
+      const view = createActionBarView(
+        descriptor(slot(1, { ability: ability(abilityId, { cost }) })),
+        fakeDeps(),
+      );
+      expect(view.tick(world({ resource: 39, playerAuras: lunarWindow })).slots[0]).toMatchObject({
+        usable: false,
+        procState: 'armed',
+      });
+      expect(view.tick(world({ resource: 40, playerAuras: lunarWindow })).slots[0]).toMatchObject({
+        usable: true,
+        procState: 'armed',
+      });
+    }
+
+    const wildbolt = createActionBarView(
+      descriptor(slot(1, { ability: ability('wrath', { cost: 70 }) })),
+      fakeDeps(),
+    );
+    expect(
+      wildbolt.tick(
+        world({
+          playerAuras: [{ id: 'dru_moonrage_wild', kind: 'next_cast_instant' }],
+        }),
+      ).slots[0].procState,
+    ).toBe('armed');
+  });
+
   it('keeps ordinary abilities and Icefall without stored Icicles at none', () => {
     const view = createActionBarView(
       descriptor(

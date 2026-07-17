@@ -265,6 +265,8 @@ const FREE_COST_AURA_IDS_BY_ABILITY: Readonly<Record<string, readonly string[]>>
 };
 
 const CHEAP_COST_AURA_IDS_BY_ABILITY: Readonly<Record<string, readonly string[]>> = {
+  moonfire: ['dru_moonrage_lunar'],
+  starfire: ['dru_moonrage_lunar'],
   sinister_strike: ['rog_dusk_dividend'],
   backstab: ['rog_dusk_dividend'],
   gouge: ['rog_dusk_dividend'],
@@ -437,6 +439,20 @@ function conflagrateProcState(
   return hasAura(player.auras, 'wlk_desolation_conflagrate') ? 'armed' : 'none';
 }
 
+function moonrageLunarProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'dru_moonrage_lunar') ? 'armed' : 'none';
+}
+
+function moonrageWildProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'dru_moonrage_wild') ? 'armed' : 'none';
+}
+
 // Ability ids map to pure proc resolvers here, keeping the painter generic. New
 // action cues extend this table rather than adding ability branches to DOM code.
 const PROC_STATE_RESOLVERS: Readonly<Record<string, ProcStateResolver | undefined>> = {
@@ -461,6 +477,9 @@ const PROC_STATE_RESOLVERS: Readonly<Record<string, ProcStateResolver | undefine
   shadow_bolt: gloomBoltProcState,
   immolate: burningPactProcState,
   conflagrate: conflagrateProcState,
+  wrath: moonrageWildProcState,
+  moonfire: moonrageLunarProcState,
+  starfire: moonrageLunarProcState,
 };
 
 function procStateForAbility(

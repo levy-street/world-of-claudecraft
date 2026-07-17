@@ -249,7 +249,7 @@ and remain unchanged.
 | priest/holy | global: healPct 0.2 |
 | priest/shadow | global: dotDmgPct 0.15, spellDmgPct 0.1 |
 | shaman/enhancement | global: meleeHastePct 0.1, meleeDmgPct 0.1; Skyrend melee-fed Arc Bolt bank |
-| druid/balance | global: spellDmgPct 0.15, spellHastePct 0.1 |
+| druid/balance | global: spellDmgPct 0.15, spellHastePct 0.1; Moonrage nature-to-lunar relay |
 | druid/feral | global: meleeDmgPct 0.15, dotDmgPct 0.15, threatPct 0.2 |
 | warlock/destruction | global: critDmgPct 0.5; stats: crit 0.02 |
 
@@ -1063,3 +1063,12 @@ npm run build on PR4/PR5.
   Ruinbolt replaces its isolated ability-grant filler with a landed-hit Duskfire reset,
   retaining the grant and both sibling capstones while enabling a deliberate Duskfire,
   Ruinbolt, Duskfire burst sequence for every Warlock spec that selects it.
+
+## Druid role identity pass
+
+- Moongrove uses Moonrage as a deterministic nature-to-lunar relay. A landed Wildbolt
+  opens an 8 sec half-cost Lunar Tempest or Skyfall decision, and landing either lunar
+  spell opens an 8 sec instant Wildbolt. The caster alternates schools, chooses between
+  DoT upkeep and a heavier lunar cast, and keeps mana meaningful while gaining a mobile
+  handoff. Both windows require the Moongrove spec and known Moonwing Form, add no random
+  draws, and remain visible on the aura strip and matching action-bar abilities.

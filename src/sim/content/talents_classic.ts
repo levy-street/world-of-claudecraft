@@ -673,8 +673,45 @@ const DRUID_SPECS: SpecDef[] = [
     'A caster who uses lunar and nature magic from range.',
     'moonkin_form',
     'Moonrage',
-    'Increases your spell damage by 15% and your spell haste by 10%.',
-    { global: { spellDmgPct: 0.15, spellHastePct: 0.1 } },
+    'A landed Wildbolt makes your next Lunar Tempest or Skyfall within 8 sec cost 50% less. Landing Lunar Tempest or Skyfall makes your next Wildbolt within 8 sec instant. Increases your spell damage by 15% and your spell haste by 10%.',
+    {
+      global: { spellDmgPct: 0.15, spellHastePct: 0.1 },
+      procs: [
+        {
+          id: 'dru_moonrage_lunar',
+          name: 'Moonrage',
+          spec: 'balance',
+          requiresKnownAbility: 'moonkin_form',
+          school: 'nature',
+          trigger: { on: 'spellHit', abilities: ['wrath'] },
+          responses: [
+            {
+              kind: 'empowerNext',
+              aura: 'next_cast_cheap',
+              abilities: ['moonfire', 'starfire'],
+              duration: 8,
+              costPct: 0.5,
+            },
+          ],
+        },
+        {
+          id: 'dru_moonrage_wild',
+          name: 'Moonrage',
+          spec: 'balance',
+          requiresKnownAbility: 'moonkin_form',
+          school: 'arcane',
+          trigger: { on: 'spellHit', abilities: ['moonfire', 'starfire'] },
+          responses: [
+            {
+              kind: 'empowerNext',
+              aura: 'next_cast_instant',
+              abilities: ['wrath'],
+              duration: 8,
+            },
+          ],
+        },
+      ],
+    },
   ),
   spec(
     'feral',

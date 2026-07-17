@@ -437,6 +437,41 @@ describe('spec masteries', () => {
     });
     expect(TALENTS.druid?.specs.find((s) => s.id === 'balance')?.mastery.effect).toEqual({
       global: { spellDmgPct: 0.15, spellHastePct: 0.1 },
+      procs: [
+        {
+          id: 'dru_moonrage_lunar',
+          name: 'Moonrage',
+          spec: 'balance',
+          requiresKnownAbility: 'moonkin_form',
+          school: 'nature',
+          trigger: { on: 'spellHit', abilities: ['wrath'] },
+          responses: [
+            {
+              kind: 'empowerNext',
+              aura: 'next_cast_cheap',
+              abilities: ['moonfire', 'starfire'],
+              duration: 8,
+              costPct: 0.5,
+            },
+          ],
+        },
+        {
+          id: 'dru_moonrage_wild',
+          name: 'Moonrage',
+          spec: 'balance',
+          requiresKnownAbility: 'moonkin_form',
+          school: 'arcane',
+          trigger: { on: 'spellHit', abilities: ['moonfire', 'starfire'] },
+          responses: [
+            {
+              kind: 'empowerNext',
+              aura: 'next_cast_instant',
+              abilities: ['wrath'],
+              duration: 8,
+            },
+          ],
+        },
+      ],
     });
     expect(TALENTS.druid?.specs.find((s) => s.id === 'feral')?.mastery.effect).toEqual({
       global: { meleeDmgPct: 0.15, dotDmgPct: 0.15, threatPct: 0.2 },
