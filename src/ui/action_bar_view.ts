@@ -483,6 +483,13 @@ function redHazeAttackProcState(
   return hasAura(player.auras, 'dru_red_haze_relay') ? 'armed' : 'none';
 }
 
+function grovesGiftProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'dru_groves_gift') ? 'armed' : 'none';
+}
+
 // Ability ids map to pure proc resolvers here, keeping the painter generic. New
 // action cues extend this table rather than adding ability branches to DOM code.
 const PROC_STATE_RESOLVERS: Readonly<Record<string, ProcStateResolver | undefined>> = {
@@ -518,6 +525,7 @@ const PROC_STATE_RESOLVERS: Readonly<Record<string, ProcStateResolver | undefine
   rake: redHazeAttackProcState,
   ferocious_bite: redHazeAttackProcState,
   rip: redHazeAttackProcState,
+  regrowth: grovesGiftProcState,
 };
 
 function procStateForAbility(

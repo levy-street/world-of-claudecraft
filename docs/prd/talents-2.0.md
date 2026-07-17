@@ -1087,3 +1087,9 @@ npm run build on PR4/PR5.
   banks one free form attack for Wildfang. This enables Primal Surge, Red Haze, free
   Bonecrush, fresh threat bank, and a second Primal Surge mitigation sequence. Moongrove
   and Groveheart retain Red Haze's previous grant behavior.
+- Groveheart uses Grove's Gift to turn HoT timing into a deterministic healing choice.
+  Letting Wildbloom complete naturally opens an 8 sec instant, full-mana Second Bloom;
+  refreshing Wildbloom delays the handoff, while consuming it early with Swiftmend
+  forgoes the handoff in exchange for immediate healing. The window requires Groveheart
+  and known Second Bloom, adds no random draw, and remains visible on the aura strip and
+  Second Bloom action-bar slot. The existing 25% HoT-healing mastery bonus remains intact.

@@ -47,6 +47,24 @@ describe('spec masteries', () => {
     });
     expect(TALENTS.druid?.specs.find((s) => s.id === 'restoration')?.mastery.effect).toEqual({
       global: { hotHealPct: 0.25 },
+      procs: [
+        {
+          id: 'dru_groves_gift',
+          name: "Grove's Gift",
+          spec: 'restoration',
+          requiresKnownAbility: 'regrowth',
+          school: 'nature',
+          trigger: { on: 'hotExpired', ability: 'rejuvenation' },
+          responses: [
+            {
+              kind: 'empowerNext',
+              aura: 'next_cast_instant',
+              abilities: ['regrowth'],
+              duration: 8,
+            },
+          ],
+        },
+      ],
     });
     expect(TALENTS.shaman?.specs.find((s) => s.id === 'restoration')?.mastery.effect).toEqual({
       ability: [

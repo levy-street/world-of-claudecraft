@@ -768,8 +768,28 @@ const DRUID_SPECS: SpecDef[] = [
     'A healer using heal-over-time effects and efficient nature magic.',
     'swiftmend',
     "Grove's Gift",
-    'Your heal-over-time effects heal 25% more.',
-    { global: { hotHealPct: 0.25 } },
+    'When Wildbloom completes naturally, it opens an instant Second Bloom within 8 sec. Your heal-over-time effects heal 25% more.',
+    {
+      global: { hotHealPct: 0.25 },
+      procs: [
+        {
+          id: 'dru_groves_gift',
+          name: "Grove's Gift",
+          spec: 'restoration',
+          requiresKnownAbility: 'regrowth',
+          school: 'nature',
+          trigger: { on: 'hotExpired', ability: 'rejuvenation' },
+          responses: [
+            {
+              kind: 'empowerNext',
+              aura: 'next_cast_instant',
+              abilities: ['regrowth'],
+              duration: 8,
+            },
+          ],
+        },
+      ],
+    },
   ),
 ];
 

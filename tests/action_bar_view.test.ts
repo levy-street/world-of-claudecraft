@@ -702,6 +702,23 @@ describe('actionBarView: proc availability cues', () => {
     });
   });
 
+  it("cues Second Bloom during Grove's Gift without discounting its mana", () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('regrowth', { cost: 70 }) })),
+      fakeDeps(),
+    );
+    const playerAuras = [{ id: 'dru_groves_gift', kind: 'next_cast_instant' as const }];
+
+    expect(view.tick(world({ resource: 69, playerAuras })).slots[0]).toMatchObject({
+      usable: false,
+      procState: 'armed',
+    });
+    expect(view.tick(world({ resource: 70, playerAuras })).slots[0]).toMatchObject({
+      usable: true,
+      procState: 'armed',
+    });
+  });
+
   it('keeps ordinary abilities and Icefall without stored Icicles at none', () => {
     const view = createActionBarView(
       descriptor(
