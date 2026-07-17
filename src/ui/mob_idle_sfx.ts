@@ -6,11 +6,13 @@ import { mobVoiceFamily, shouldPlayMobVoiceSfxForEntity } from './combat_sfx';
 // the design writeup; the short version: a shared periodic sweep (not
 // per-mob-per-frame) picks which nearby mobs attempt an idle bark, damped by
 // how many same-family mobs are clustered together so a pack does not all
-// bark in the same sweep. The mastered idle takes are quiet even boosted, so
-// these constants start on the generous side; tune by ear in-game.
+// bark in the same sweep. MOB_IDLE_BASE_CHANCE started at 0.35 (generous, on
+// the theory that the mastered idle takes are quiet even boosted) and was
+// tuned down by ear in-game to 0.17, which felt right around both the wolf
+// camps and the ogre war-camp.
 export const MOB_IDLE_CHECK_INTERVAL_MS = 2500;
 export const MOB_IDLE_SCAN_RADIUS = 40;
-export const MOB_IDLE_BASE_CHANCE = 0.35;
+export const MOB_IDLE_BASE_CHANCE = 0.17;
 export const MOB_IDLE_PER_ENTITY_COOLDOWN_MS = 12_000;
 export const MOB_IDLE_KEY_COOLDOWN_S = 3;
 export const MOB_IDLE_GAIN = 0.55;
