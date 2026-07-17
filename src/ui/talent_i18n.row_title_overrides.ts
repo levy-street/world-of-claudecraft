@@ -103,6 +103,7 @@ const RETAINED_ROW_TITLE_SOURCES = [
   'Oaken Reflex',
   'Ironhide Reflex',
   'Storm Refrain',
+  'Red Haze',
   'Tempest Reprise',
 ] as const;
 
@@ -228,6 +229,7 @@ const WARRIOR_TITLES: Partial<Record<SupportedLanguage, Partial<TitleMap>>> = {
     'Ember Relay': 'Передача углей',
     Aetherwell: 'Эфирный колодец',
     Typhoon: 'Тайфун',
+    'Red Haze': 'Багровая дымка',
   },
   cs_CZ: {
     'Double Charge': 'Dvojitý výpad',
@@ -434,6 +436,7 @@ const CJK_TITLES: Partial<Record<SupportedLanguage, Partial<TitleMap>>> = {
     'Oaken Reflex': '橡木瞬应',
     'Ironhide Reflex': '铁甲瞬应',
     'Storm Refrain': '风暴复唱',
+    'Red Haze': '赤红迷雾',
     'Tempest Reprise': '风暴复奏',
   },
   zh_TW: {
@@ -534,6 +537,7 @@ const CJK_TITLES: Partial<Record<SupportedLanguage, Partial<TitleMap>>> = {
     'Oaken Reflex': '橡木瞬應',
     'Ironhide Reflex': '鐵甲瞬應',
     'Storm Refrain': '風暴複唱',
+    'Red Haze': '赤紅迷霧',
     'Tempest Reprise': '風暴複奏',
   },
   ja_JP: {
@@ -634,6 +638,7 @@ const CJK_TITLES: Partial<Record<SupportedLanguage, Partial<TitleMap>>> = {
     'Oaken Reflex': '樫皮の即応',
     'Ironhide Reflex': '鉄皮の即応',
     'Storm Refrain': '嵐の反唱',
+    'Red Haze': '赤き霞',
     'Tempest Reprise': '嵐の再演',
   },
   ko_KR: {
@@ -734,6 +739,7 @@ const CJK_TITLES: Partial<Record<SupportedLanguage, Partial<TitleMap>>> = {
     'Oaken Reflex': '참나무껍질의 즉응',
     'Ironhide Reflex': '무쇠가죽의 즉응',
     'Storm Refrain': '폭풍의 후렴',
+    'Red Haze': '붉은 안개',
     'Tempest Reprise': '폭풍의 재현',
   },
 };

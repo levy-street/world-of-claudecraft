@@ -257,6 +257,12 @@ function hasAura(auras: readonly ActionBarAuraInput[], auraId: string): boolean 
 
 const FREE_COST_AURA_IDS_BY_ABILITY: Readonly<Record<string, readonly string[]>> = {
   hurricane: ['dru_typhoon_relay'],
+  maul: ['dru_red_haze_relay'],
+  swipe: ['dru_red_haze_relay'],
+  claw: ['dru_red_haze_relay'],
+  rake: ['dru_red_haze_relay'],
+  ferocious_bite: ['dru_red_haze_relay'],
+  rip: ['dru_red_haze_relay'],
   exorcism: ['pal_blood_debt'],
   arcane_shot: ['hun_venom_relay', 'hun_packbond', 'hun_menders_signal'],
   eviscerate: ['rog_redhanded'],
@@ -470,6 +476,13 @@ function primalSurgeProcState(
   return hasAura(target.auras, 'dru_primal_heart_bleed') ? 'armed' : 'none';
 }
 
+function redHazeAttackProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'dru_red_haze_relay') ? 'armed' : 'none';
+}
+
 // Ability ids map to pure proc resolvers here, keeping the painter generic. New
 // action cues extend this table rather than adding ability branches to DOM code.
 const PROC_STATE_RESOLVERS: Readonly<Record<string, ProcStateResolver | undefined>> = {
@@ -499,6 +512,12 @@ const PROC_STATE_RESOLVERS: Readonly<Record<string, ProcStateResolver | undefine
   starfire: moonrageLunarProcState,
   hurricane: galeheartProcState,
   feral_charge: primalSurgeProcState,
+  maul: redHazeAttackProcState,
+  swipe: redHazeAttackProcState,
+  claw: redHazeAttackProcState,
+  rake: redHazeAttackProcState,
+  ferocious_bite: redHazeAttackProcState,
+  rip: redHazeAttackProcState,
 };
 
 function procStateForAbility(

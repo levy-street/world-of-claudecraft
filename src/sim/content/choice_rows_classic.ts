@@ -2682,9 +2682,29 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'dru_r20_berserk',
           name: 'Red Haze',
-          description: 'Grants Red Haze.',
+          description:
+            'Grants Red Haze. Wildfang: casting Red Haze resets Primal Surge and makes your next form attack within 8 sec free.',
           icon: 'berserk',
-          effect: { grant: { ability: 'berserk' } },
+          effect: {
+            grant: { ability: 'berserk' },
+            proc: {
+              id: 'dru_red_haze_relay',
+              name: 'Red Haze',
+              spec: 'feral',
+              requiresKnownAbility: 'berserk',
+              school: 'physical',
+              trigger: { on: 'castNth', n: 1, abilities: ['berserk'] },
+              responses: [
+                { kind: 'cooldownRefund', ability: 'feral_charge', seconds: 'reset' },
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_free',
+                  abilities: ['maul', 'swipe', 'claw', 'rake', 'ferocious_bite', 'rip'],
+                  duration: 8,
+                },
+              ],
+            },
+          },
         },
         {
           id: 'dru_r20_tranquility',

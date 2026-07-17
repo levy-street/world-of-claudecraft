@@ -1082,4 +1082,8 @@ npm run build on PR4/PR5.
   damage, capped at 20% maximum health. Primal Surge still grants 50 Rage for the next
   threat, area-control, or recovery decision. Wolf Form keeps its existing Energy surge
   and cannot consume the bank. Every new step is spec, signature, form, target, owner,
-  and positive-damage gated and adds no random draw.
+  and positive-damage gated and adds no random draw. Red Haze keeps its stable capstone
+  ID, +70 attack-power cooldown, and sibling options, but now resets Primal Surge and
+  banks one free form attack for Wildfang. This enables Primal Surge, Red Haze, free
+  Bonecrush, fresh threat bank, and a second Primal Surge mitigation sequence. Moongrove
+  and Groveheart retain Red Haze's previous grant behavior.

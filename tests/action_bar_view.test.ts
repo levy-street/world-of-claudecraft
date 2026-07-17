@@ -679,6 +679,29 @@ describe('actionBarView: proc availability cues', () => {
     ).toBe('none');
   });
 
+  it('cues and funds every Red Haze form attack without freeing another ability', () => {
+    const playerAuras = [{ id: 'dru_red_haze_relay', kind: 'next_cast_free' as const }];
+    for (const abilityId of ['maul', 'swipe', 'claw', 'rake', 'ferocious_bite', 'rip']) {
+      const view = createActionBarView(
+        descriptor(slot(1, { ability: ability(abilityId, { cost: 40 }) })),
+        fakeDeps(),
+      );
+      expect(view.tick(world({ resource: 0, playerAuras })).slots[0]).toMatchObject({
+        usable: true,
+        procState: 'armed',
+      });
+    }
+
+    const wildbolt = createActionBarView(
+      descriptor(slot(1, { ability: ability('wrath', { cost: 40 }) })),
+      fakeDeps(),
+    );
+    expect(wildbolt.tick(world({ resource: 0, playerAuras })).slots[0]).toMatchObject({
+      usable: false,
+      procState: 'none',
+    });
+  });
+
   it('keeps ordinary abilities and Icefall without stored Icicles at none', () => {
     const view = createActionBarView(
       descriptor(
