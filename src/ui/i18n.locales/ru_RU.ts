@@ -2840,9 +2840,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.trueshot_aura.name': 'Аура меткого выстрела',
   'entities.abilities.trueshot_aura.description':
     'Воодушевляет ближайших союзников, повышая силу атаки на 35 на 5 мин. (знаковое умение Стрельбы)',
-  'entities.abilities.wyvern_sting.name': 'Укус виверны',
+  'entities.abilities.wyvern_sting.name': 'Терновая ловушка',
   'entities.abilities.wyvern_sting.description':
-    'Поражает врага издалека и выводит его из строя на срок до 4 сек. Любой урон прерывает эффект. (знаковое умение Выживания)',
+    'Устанавливает в выбранной области терновую ловушку, обездвиживая врагов в радиусе 5 м на 4 сек. (знаковое умение Полевого ремесла)',
   'entities.abilities.arcane_power.name': 'Мощь тайной магии',
   'entities.abilities.arcane_power.description':
     'Повышает урон от заклинаний на 20% и скорость заклинаний на 10% на 10 сек. (знаковое умение Тайной магии)',

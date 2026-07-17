@@ -2811,9 +2811,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.trueshot_aura.name': 'トゥルーショットオーラ',
   'entities.abilities.trueshot_aura.description':
     '近くの味方を鼓舞し、5分間攻撃力を35上げます。（マークスマンシップ特性のシグネチャ）',
-  'entities.abilities.wyvern_sting.name': 'ワイバーンスティング',
+  'entities.abilities.wyvern_sting.name': '茨の罠',
   'entities.abilities.wyvern_sting.description':
-    '遠距離から敵を刺し、最大4秒間行動不能にします。ダメージを受けると効果は解除されます。（サバイバル特性のシグネチャ）',
+    '指定地点に茨の罠を仕掛け、5ヤード以内の敵を4秒間移動不能にします。（フィールドクラフトのシグネチャー）',
   'entities.abilities.arcane_power.name': 'アーケインパワー',
   'entities.abilities.arcane_power.description':
     '10秒間、呪文ダメージが20%、呪文ヘイストが10%上がります。（アーケイン特性のシグネチャ）',

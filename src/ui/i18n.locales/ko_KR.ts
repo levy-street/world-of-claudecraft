@@ -2793,9 +2793,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.trueshot_aura.name': '정조준 오라',
   'entities.abilities.trueshot_aura.description':
     '주위 아군을 고무하여 5분 동안 전투력을 35만큼 증가시킵니다. (사격 전문화 상징)',
-  'entities.abilities.wyvern_sting.name': '비룡 쐐기',
+  'entities.abilities.wyvern_sting.name': '가시덤불 덫',
   'entities.abilities.wyvern_sting.description':
-    '원거리에서 적을 쏘아 최대 4초 동안 행동 불가로 만듭니다. 피해를 받으면 효과가 해제됩니다. (생존 전문화 상징)',
+    '대상 지역에 가시덤불 덫을 설치해 5미터 내의 적을 4초 동안 이동 불가 상태로 만듭니다. (현장술 전문화 상징)',
   'entities.abilities.arcane_power.name': '신비의 마법 강화',
   'entities.abilities.arcane_power.description':
     '10초 동안 주문 공격력이 20%, 주문 가속이 10% 증가합니다. (비전 전문화 상징)',

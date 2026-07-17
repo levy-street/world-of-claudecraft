@@ -6277,8 +6277,8 @@ export const en: EnTranslations = {
         "description": "Inspires nearby allies, increasing attack power by 10% for 30 min. (Marksmanship signature)"
       },
       "wyvern_sting": {
-        "name": "Wyvern Sting",
-        "description": "Stings the enemy from range, incapacitating it for up to 4 sec. Any damage breaks the effect. (Survival signature)"
+        "name": "Briar Trap",
+        "description": "Sets a briar trap at the target area, rooting enemies within 5 yd for 4 sec. (Fieldcraft signature)"
       },
       "arcane_power": {
         "name": "Aether Surge",

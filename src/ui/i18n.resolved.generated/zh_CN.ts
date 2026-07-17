@@ -6277,8 +6277,8 @@ export const zh_CN: EnTranslations = {
         "description": "鼓舞附近盟友，使攻击强度提高35点，持续5分钟。（射击专精招牌）"
       },
       "wyvern_sting": {
-        "name": "翼龙钉刺",
-        "description": "从远处钉刺敌人，使其瘫痪最多4秒。受到任何伤害都会打破效果。（生存专精招牌）"
+        "name": "荆棘陷阱",
+        "description": "在目标区域设置荆棘陷阱，使5码内的敌人定身4秒。（战地技艺专精招牌）"
       },
       "arcane_power": {
         "name": "奥术强化",

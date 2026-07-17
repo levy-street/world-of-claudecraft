@@ -6277,8 +6277,8 @@ export const ko_KR: EnTranslations = {
         "description": "주위 아군을 고무하여 5분 동안 전투력을 35만큼 증가시킵니다. (사격 전문화 상징)"
       },
       "wyvern_sting": {
-        "name": "비룡 쐐기",
-        "description": "원거리에서 적을 쏘아 최대 4초 동안 행동 불가로 만듭니다. 피해를 받으면 효과가 해제됩니다. (생존 전문화 상징)"
+        "name": "가시덤불 덫",
+        "description": "대상 지역에 가시덤불 덫을 설치해 5미터 내의 적을 4초 동안 이동 불가 상태로 만듭니다. (현장술 전문화 상징)"
       },
       "arcane_power": {
         "name": "신비의 마법 강화",

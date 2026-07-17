@@ -78,25 +78,31 @@ function effectAbilityReferences(effect: TalentEffect): string[] {
     ...(effect.grant ? [effect.grant.ability] : []),
     ...(effect.ability ?? []).map((modifier) => modifier.ability),
   ];
-  const proc = effect.proc;
-  if (!proc) return references;
-
-  const trigger = proc.trigger;
-  if (trigger.on === 'castNth' || trigger.on === 'spellHit' || trigger.on === 'meleeHit') {
-    references.push(...trigger.abilities);
-  } else if (trigger.on === 'spellCrit' && trigger.abilities) references.push(...trigger.abilities);
-  else if (
-    trigger.on === 'shieldConsumed' ||
-    trigger.on === 'hotExpired' ||
-    trigger.on === 'thornsReflect'
-  ) {
-    references.push(trigger.ability);
-  }
-  for (const response of proc.responses) {
-    if (response.kind === 'cooldownRefund') references.push(response.ability);
-    if (response.kind === 'addAuraCharges') references.push(response.ability);
-    if (response.kind === 'empowerNext' && response.abilities) {
-      references.push(...response.abilities);
+  const procs = [...(effect.proc ? [effect.proc] : []), ...(effect.procs ?? [])];
+  for (const proc of procs) {
+    const trigger = proc.trigger;
+    if (
+      trigger.on === 'castNth' ||
+      trigger.on === 'spellHit' ||
+      trigger.on === 'rangedHit' ||
+      trigger.on === 'meleeHit'
+    ) {
+      references.push(...trigger.abilities);
+    } else if (trigger.on === 'spellCrit' && trigger.abilities) {
+      references.push(...trigger.abilities);
+    } else if (
+      trigger.on === 'shieldConsumed' ||
+      trigger.on === 'hotExpired' ||
+      trigger.on === 'thornsReflect'
+    ) {
+      references.push(trigger.ability);
+    }
+    for (const response of proc.responses) {
+      if (response.kind === 'cooldownRefund') references.push(response.ability);
+      if (response.kind === 'addAuraCharges') references.push(response.ability);
+      if (response.kind === 'empowerNext' && response.abilities) {
+        references.push(...response.abilities);
+      }
     }
   }
   return references;

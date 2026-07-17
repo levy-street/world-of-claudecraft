@@ -8177,6 +8177,7 @@ function effectDescription(
   }
 
   if (effect.proc) parts.push(procDescription(effect.proc, lang, text));
+  for (const proc of effect.procs ?? []) parts.push(procDescription(proc, lang, text));
 
   return parts.length > 0 ? parts.join(' ') : text.noEffect;
 }

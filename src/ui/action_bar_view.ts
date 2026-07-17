@@ -325,6 +325,13 @@ function longDrawProcState(
   return hasAura(player.auras, 'hun_iron_aim') ? 'armed' : 'none';
 }
 
+function guttingStrikeProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'hun_quickblood_setup') ? 'armed' : 'none';
+}
+
 // Ability ids map to pure proc resolvers here, keeping the painter generic. New
 // action cues extend this table rather than adding ability branches to DOM code.
 const PROC_STATE_RESOLVERS: Readonly<Record<string, ProcStateResolver | undefined>> = {
@@ -334,6 +341,7 @@ const PROC_STATE_RESOLVERS: Readonly<Record<string, ProcStateResolver | undefine
   crusader_strike: oathsDueProcState,
   arcane_shot: fellShotProcState,
   aimed_shot: longDrawProcState,
+  raptor_strike: guttingStrikeProcState,
 };
 
 function procStateForAbility(

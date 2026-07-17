@@ -190,6 +190,7 @@ export interface TalentEffect {
   stats?: StatModEffect;
   grant?: { ability: string; rank?: number };
   proc?: ProcDef;
+  procs?: ProcDef[];
   ability?: AbilityModEffect[];
   global?: GlobalModEffect;
 }
@@ -611,6 +612,7 @@ export function accumulateTalentEffect(
     modifiers.grants.push({ ability: effect.grant.ability, rank: effect.grant.rank ?? 1 });
   }
   if (effect.proc) modifiers.procs.push(effect.proc);
+  if (effect.procs) modifiers.procs.push(...effect.procs);
 }
 
 export const accumulate = accumulateTalentEffect;

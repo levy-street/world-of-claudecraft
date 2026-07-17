@@ -170,8 +170,42 @@ const HUNTER_SPECS: SpecDef[] = [
     'A skirmisher who controls distance and survives close pressure.',
     'wyvern_sting',
     'Quickblood',
-    'Increases your Agility by 15% and physical ability damage by 15%.',
-    { global: { meleeDmgPct: 0.15 }, stats: { agiPct: 0.15 } },
+    'Increases your Agility and physical ability damage by 5%. Briar Trap and Rime Snare make your next Gutting Strike within 12 sec deal 50% more damage. A landed Gutting Strike restores 10 mana and reduces Briar Trap cooldown by 8 sec.',
+    {
+      global: { meleeDmgPct: 0.05 },
+      stats: { agiPct: 0.05 },
+      procs: [
+        {
+          id: 'hun_quickblood_setup',
+          name: 'Quickblood',
+          spec: 'survival',
+          requiresKnownAbility: 'wyvern_sting',
+          school: 'nature',
+          trigger: { on: 'castNth', n: 1, abilities: ['wyvern_sting', 'frost_trap'] },
+          responses: [
+            {
+              kind: 'empowerNext',
+              aura: 'next_ability_damage',
+              abilities: ['raptor_strike'],
+              duration: 12,
+              dmgPct: 0.5,
+            },
+          ],
+        },
+        {
+          id: 'hun_quickblood_return',
+          name: 'Quickblood',
+          spec: 'survival',
+          requiresKnownAbility: 'wyvern_sting',
+          school: 'physical',
+          trigger: { on: 'meleeHit', abilities: ['raptor_strike'] },
+          responses: [
+            { kind: 'resource', amount: 10 },
+            { kind: 'cooldownRefund', ability: 'wyvern_sting', seconds: 8 },
+          ],
+        },
+      ],
+    },
   ),
 ];
 

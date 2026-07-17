@@ -6277,8 +6277,8 @@ export const zh_TW: EnTranslations = {
         "description": "鼓舞附近盟友，使攻擊強度提高35點，持續5分鐘。（射擊專精招牌）"
       },
       "wyvern_sting": {
-        "name": "翼龍釘刺",
-        "description": "從遠處釘刺敵人，使其癱瘓最多4秒。受到任何傷害都會打破效果。（生存專精招牌）"
+        "name": "荊棘陷阱",
+        "description": "在目標區域設置荊棘陷阱，使5碼內的敵人定身4秒。（戰地技藝專精招牌）"
       },
       "arcane_power": {
         "name": "祕法強化",

@@ -2690,9 +2690,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.trueshot_aura.name': '強擊光環',
   'entities.abilities.trueshot_aura.description':
     '鼓舞附近盟友，使攻擊強度提高35點，持續5分鐘。（射擊專精招牌）',
-  'entities.abilities.wyvern_sting.name': '翼龍釘刺',
+  'entities.abilities.wyvern_sting.name': '荊棘陷阱',
   'entities.abilities.wyvern_sting.description':
-    '從遠處釘刺敵人，使其癱瘓最多4秒。受到任何傷害都會打破效果。（生存專精招牌）',
+    '在目標區域設置荊棘陷阱，使5碼內的敵人定身4秒。（戰地技藝專精招牌）',
   'entities.abilities.arcane_power.name': '祕法強化',
   'entities.abilities.arcane_power.description':
     '法術傷害提高20%，法術加速提高10%，持續10秒。（祕法專精招牌）',

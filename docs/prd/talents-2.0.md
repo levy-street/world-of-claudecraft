@@ -963,3 +963,7 @@ npm run build on PR4/PR5.
   while keeping the payoff mobile and the mana cost meaningful. Second Bearing
   replaces flat Long Draw scaling with a landed payoff that restores 20 mana and
   resets Rattling Shot, allowing the sequence to be deliberately set up again.
+- Fieldcraft turns Briar Trap into the ranged setup for a melee field circuit.
+  Briar Trap or Rime Snare banks a 12 sec empowered Gutting Strike; landing that
+  strike restores 10 mana and advances Briar Trap by 8 sec, so control, closing
+  distance, and the melee payoff continually feed the next field setup.

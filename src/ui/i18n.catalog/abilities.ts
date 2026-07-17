@@ -1223,8 +1223,8 @@ const classAbilityNamesEn = {
       ],
       [
         'wyvern_sting',
-        'Wyvern Sting',
-        'Stings the enemy from range, incapacitating it for up to 4 sec. Any damage breaks the effect. (Survival signature)',
+        'Briar Trap',
+        'Sets a briar trap at the target area, rooting enemies within 5 yd for 4 sec. (Fieldcraft signature)',
       ],
       [
         'arcane_power',

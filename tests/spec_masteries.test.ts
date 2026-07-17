@@ -174,8 +174,39 @@ describe('spec masteries', () => {
       },
     });
     expect(TALENTS.hunter?.specs.find((s) => s.id === 'survival')?.mastery.effect).toEqual({
-      global: { meleeDmgPct: 0.15 },
-      stats: { agiPct: 0.15 },
+      global: { meleeDmgPct: 0.05 },
+      stats: { agiPct: 0.05 },
+      procs: [
+        {
+          id: 'hun_quickblood_setup',
+          name: 'Quickblood',
+          spec: 'survival',
+          requiresKnownAbility: 'wyvern_sting',
+          school: 'nature',
+          trigger: { on: 'castNth', n: 1, abilities: ['wyvern_sting', 'frost_trap'] },
+          responses: [
+            {
+              kind: 'empowerNext',
+              aura: 'next_ability_damage',
+              abilities: ['raptor_strike'],
+              duration: 12,
+              dmgPct: 0.5,
+            },
+          ],
+        },
+        {
+          id: 'hun_quickblood_return',
+          name: 'Quickblood',
+          spec: 'survival',
+          requiresKnownAbility: 'wyvern_sting',
+          school: 'physical',
+          trigger: { on: 'meleeHit', abilities: ['raptor_strike'] },
+          responses: [
+            { kind: 'resource', amount: 10 },
+            { kind: 'cooldownRefund', ability: 'wyvern_sting', seconds: 8 },
+          ],
+        },
+      ],
     });
     expect(TALENTS.mage?.specs.find((s) => s.id === 'arcane')?.mastery.effect).toEqual({
       global: { spellDmgPct: 0.15, spellHastePct: 0.1 },
@@ -432,7 +463,7 @@ describe('spec masteries', () => {
       hunter: {
         beast_mastery: { global: 'petDmgPct', value: 0.2 },
         marksmanship: { global: 'meleeDmgPct', value: 0.1 },
-        survival: { global: 'meleeDmgPct', value: 0.15 },
+        survival: { global: 'meleeDmgPct', value: 0.05 },
       },
       mage: {
         arcane: { global: 'spellDmgPct', value: 0.15 },
