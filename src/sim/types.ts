@@ -220,6 +220,19 @@ export type AuraKind =
   | 'hot'
   | 'absorb'
   | 'imbue'
+  // Enhancement shaman tank kit. `earth_shield`: a charge-limited damage-taken
+  // reduction (value = fraction less, `charges` = remaining attacks, spent in
+  // src/sim/combat/earth_shield.ts). `earthbound_weapon`: a weapon-enchant buff
+  // that multiplies all threat the wearer generates (see threat.ts); it swaps
+  // with the damage imbues (one weapon enchant at a time) but adds no swing
+  // damage of its own.
+  | 'earth_shield'
+  | 'earthbound_weapon'
+  // Tidal Ward (shaman tank cooldown): raises the healing the wearer RECEIVES
+  // (value = fraction more, e.g. 0.4 = +40%), read by healingTakenMult so it lifts
+  // both the ward's own HoT and any incoming ally heal. The positive mirror of
+  // mortal_wound.
+  | 'heal_taken_up'
   // Warrior Ironhold: a big, short, all-school damage-taken reduction (value =
   // fraction less, e.g. 0.4 = 40% less), applied in damage.ts.
   | 'shield_wall'
@@ -1595,6 +1608,14 @@ export type AbilityEffect =
   | { type: 'sunder'; armor: number; maxStacks: number; full?: boolean }
   | { type: 'faerieFire'; duration: number } // fixed-percent armor reduction (AuraKind 'faerie_fire')
   | { type: 'taunt' } // taunt/growl: match top threat and force-attack the caster
+  // Enhancement shaman tank kit. `earthbindWeapon`: apply the Anchorbound Weapon
+  // threat-imbue (swaps out any other weapon enchant; +100% threat while up).
+  // `unleashWeapon`: discharge the active weapon enchant for `min..max` damage
+  // plus an enchant-keyed rider (see src/sim/combat/unleash_weapon.ts).
+  | { type: 'earthbindWeapon'; duration: number }
+  | { type: 'unleashWeapon'; min: number; max: number }
+  // Tidal Ward: buff the healing the caster RECEIVES for a while (heal_taken_up).
+  | { type: 'healTakenBuff'; value: number; duration: number }
   | { type: 'tamePet' } // hunter tame beast: the targeted mob becomes the caster's pet
   | { type: 'dismissPet' } // release the caster's pet back to the wild
   | { type: 'summonPet'; templateId: string } // warlock demon summon: creates/replaces a controlled pet

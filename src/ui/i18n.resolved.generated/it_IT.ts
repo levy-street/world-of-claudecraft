@@ -6521,6 +6521,26 @@ export const it_IT: EnTranslations = {
         "name": "Colpo Ancestrale",
         "description": "Canalizza la tempesta attraverso la tua arma, colpendo istantaneamente per danni dell'arma più {damage}."
       },
+      "earth_shield": {
+        "name": "Stone Aegis",
+        "description": "Sheathes you in living stone, reducing damage taken by 20% for the next 6 attacks. Recast to renew the shield."
+      },
+      "earthbound_weapon": {
+        "name": "Anchorbound Weapon",
+        "description": "Anchors your weapon to the earth, increasing all threat you generate by 100% for 5 min. Replaces any other weapon enchant."
+      },
+      "elemental_demand": {
+        "name": "Elemental Demand",
+        "description": "Command the elements to seize the target, taunting it to attack you for 3 sec. Range 15 yards."
+      },
+      "unleash_weapon": {
+        "name": "Elemental Discharge",
+        "description": "Discharges your active weapon enchant at the target for {damage} damage plus an effect based on the enchant: a threat spike (Anchorbound), a fire burn (Pyrebrand), or a movement slow (Rimebound)."
+      },
+      "tidal_ward": {
+        "name": "Tidal Ward",
+        "description": "A rising tide washes over you, healing you every 2 sec and increasing all healing you receive by 40% for 8 sec."
+      },
       "shadow_bolt": {
         "name": "Dardo di Tenebra",
         "description": "Invia un dardo oscuro contro il nemico per {damage} danni da Ombra."

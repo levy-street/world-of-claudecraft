@@ -37,6 +37,7 @@ export function healingTakenMult(ctx: SimContext, target: Entity): number {
   let mult = 1;
   for (const a of target.auras) {
     if (a.kind === 'mortal_wound') mult *= 1 - a.value;
+    else if (a.kind === 'heal_taken_up') mult *= 1 + a.value; // Tidal Ward
   }
   return mult < 0 ? 0 : mult;
 }

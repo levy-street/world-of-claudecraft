@@ -1027,6 +1027,32 @@ const classAbilityNamesEn = {
         'Channels the storm through your weapon, instantly striking for weapon damage plus {damage}.',
       ],
       [
+        'earth_shield',
+        'Stone Aegis',
+        'Sheathes you in living stone, reducing damage taken by 20% for the next 6 attacks. Recast to renew the shield.',
+      ],
+      [
+        'earthbound_weapon',
+        'Anchorbound Weapon',
+        'Anchors your weapon to the earth, increasing all threat you generate by 100% for 5 min. Replaces any other weapon enchant.',
+      ],
+      [
+        'elemental_demand',
+        'Elemental Demand',
+        'Command the elements to seize the target, taunting it to attack you for 3 sec. Range 15 yards.',
+      ],
+      [
+        'unleash_weapon',
+        'Elemental Discharge',
+        'Discharges your active weapon enchant at the target for {damage} damage plus an effect based on the enchant: a threat spike (Anchorbound), a fire burn (Pyrebrand), or a movement slow (Rimebound).',
+      ],
+      // Shaman defensive cooldown (heal-through), part of the Enhancement tank kit.
+      [
+        'tidal_ward',
+        'Tidal Ward',
+        'A rising tide washes over you, healing you every 2 sec and increasing all healing you receive by 40% for 8 sec.',
+      ],
+      [
         'shadow_bolt',
         'Gloom Bolt',
         'Sends a shadowy bolt at the enemy for {damage} Shadow damage.',

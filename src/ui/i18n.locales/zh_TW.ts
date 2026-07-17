@@ -2405,6 +2405,21 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stormstrike.name': '先祖打擊',
   'entities.abilities.stormstrike.description':
     '將風暴導入武器，立即攻擊並造成武器傷害加 {damage}。',
+  'entities.abilities.earth_shield.name': '石之守護',
+  'entities.abilities.earth_shield.description':
+    '以堅岩護體，使受到的傷害降低 20%，可抵擋接下來 6 次攻擊。再次施放可刷新護盾。',
+  'entities.abilities.earthbound_weapon.name': '大地之錨武器',
+  'entities.abilities.earthbound_weapon.description':
+    '將武器與大地相連，使你造成的所有威脅值提高 100%，持續 5 分鐘。取代其他任何武器附魔。',
+  'entities.abilities.elemental_demand.name': '元素號令',
+  'entities.abilities.elemental_demand.description':
+    '號令元素鎖定目標，嘲諷其攻擊你，持續 3 秒。射程 15 碼。',
+  'entities.abilities.unleash_weapon.name': '元素釋放',
+  'entities.abilities.unleash_weapon.description':
+    '釋放當前武器附魔的能量攻擊目標，造成 {damage} 點傷害，並根據附魔產生額外效果：威脅值爆發（大地之錨）、火焰灼燒（烈焰）或減速（寒冰）。',
+  'entities.abilities.tidal_ward.name': '潮汐守護',
+  'entities.abilities.tidal_ward.description':
+    '湧動的潮水沖刷全身，每 2 秒治療你一次，並使你受到的所有治療提高 40%，持續 8 秒。',
   'entities.abilities.shadow_bolt.name': '幽暗箭',
   'entities.abilities.shadow_bolt.description': '向敵人發射暗影箭，造成 {damage} 點暗影傷害。',
   'entities.abilities.demon_skin.name': '邪魔之皮',

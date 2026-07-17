@@ -2592,6 +2592,93 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Channels the storm through your weapon, instantly striking for weapon damage plus $d.',
   },
+  // Enhancement tank kit (granted only via the Enhancement spec, not the base
+  // kit): the melee shaman's toolkit for holding aggro. Mitigation (Stone Aegis),
+  // a threat imbue (Anchorbound Weapon), a ranged taunt (Elemental Demand), and an
+  // enchant discharge (Elemental Discharge). See docs/design and the
+  // enhancement_tank tests.
+  earth_shield: {
+    id: 'earth_shield',
+    name: 'Stone Aegis',
+    class: 'shaman',
+    learnLevel: 20,
+    cost: 30,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'nature',
+    requiresTarget: false,
+    effects: [{ type: 'selfBuff', kind: 'earth_shield', value: 0.2, duration: 120, charges: 6 }],
+    description:
+      'Sheathes you in living stone, reducing damage taken by 20% for the next 6 attacks. Recast to renew the shield.',
+  },
+  earthbound_weapon: {
+    id: 'earthbound_weapon',
+    name: 'Anchorbound Weapon',
+    class: 'shaman',
+    learnLevel: 20,
+    cost: 25,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'nature',
+    requiresTarget: false,
+    effects: [{ type: 'earthbindWeapon', duration: 300 }],
+    description:
+      'Anchors your weapon to the earth, increasing all threat you generate by 100% for 5 min. Replaces any other weapon enchant.',
+  },
+  elemental_demand: {
+    id: 'elemental_demand',
+    name: 'Elemental Demand',
+    class: 'shaman',
+    learnLevel: 20,
+    cost: 20,
+    castTime: 0,
+    cooldown: 8,
+    range: 15,
+    school: 'nature',
+    requiresTarget: true,
+    effects: [{ type: 'taunt' }],
+    description:
+      'Command the elements to seize the target, taunting it to attack you for 3 sec. Range 15 yards.',
+  },
+  unleash_weapon: {
+    id: 'unleash_weapon',
+    name: 'Elemental Discharge',
+    class: 'shaman',
+    learnLevel: 20,
+    cost: 30,
+    castTime: 0,
+    cooldown: 6,
+    range: 0,
+    school: 'nature',
+    requiresTarget: true,
+    effects: [{ type: 'unleashWeapon', min: 20, max: 26 }],
+    description:
+      'Discharges your active weapon enchant at the target for $d damage plus an effect based on the enchant: a threat spike (Anchorbound), a fire burn (Pyrebrand), or a movement slow (Rimebound).',
+  },
+  // Shaman defensive cooldown: heal-through, not mitigation. A tide washes over the
+  // shaman, healing them each tick AND raising all healing they receive, so the ward
+  // amplifies its own HoT and any ally heal. Rounds out the Enhancement tank kit.
+  tidal_ward: {
+    id: 'tidal_ward',
+    name: 'Tidal Ward',
+    class: 'shaman',
+    learnLevel: 20,
+    cost: 30,
+    castTime: 0,
+    cooldown: 60,
+    range: 0,
+    school: 'frost',
+    requiresTarget: false,
+    offGcd: true,
+    effects: [
+      { type: 'hot', total: 1200, duration: 8, interval: 2 },
+      { type: 'healTakenBuff', value: 0.4, duration: 8 },
+    ],
+    description:
+      'A rising tide washes over you, healing you every 2 sec and increasing all healing you receive by 40% for 8 sec.',
+  },
 
   // ====================== WARLOCK ======================
   shadow_bolt: {

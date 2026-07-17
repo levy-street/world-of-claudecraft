@@ -136,6 +136,11 @@ export interface SpecDef {
   icon: string;
   description: string;
   signature: string; // ability id granted on spec selection
+  // Extra ability ids granted on spec selection, alongside the signature. For a
+  // spec whose identity is a multi-button KIT rather than one signature (e.g. the
+  // Enhancement shaman tank kit); each bypasses learnLevel exactly like the
+  // signature. Empty/undefined for a single-signature spec.
+  extraGrants?: string[];
   mastery: { name: string; description: string; effect: TalentEffect };
 }
 
@@ -708,6 +713,7 @@ export function computeTalentModifiers(
     mods.spec = spec.id;
     mods.role = spec.role;
     mods.grants.push({ ability: spec.signature, rank: 1 }); // signature ability
+    for (const a of spec.extraGrants ?? []) mods.grants.push({ ability: a, rank: 1 }); // spec kit
     accumulate(mods, spec.mastery.effect, Math.min(1, level / 20)); // Mastery passive
   }
 

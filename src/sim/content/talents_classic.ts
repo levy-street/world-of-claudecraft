@@ -114,6 +114,7 @@ function spec(
   masteryName: string,
   masteryDescription: string,
   effect: TalentEffect,
+  extraGrants?: string[],
 ): SpecDef {
   return {
     id,
@@ -123,6 +124,7 @@ function spec(
     icon,
     description,
     signature,
+    ...(extraGrants ? { extraGrants } : {}),
     mastery: { name: masteryName, description: masteryDescription, effect },
   };
 }
@@ -2697,11 +2699,15 @@ const SHAMAN_SPECS: SpecDef[] = [
     'Warspirit',
     'dps',
     'x',
-    'A weapon fighter who channels the storm through melee swings.',
+    'A weapon fighter who channels the storm through melee swings, and the only shaman who can stand in as an off-tank.',
     'stormstrike',
     'Skyrend',
     'Increases your melee attack speed by 10% and your physical ability damage by 10%.',
     { global: { meleeHastePct: 0.1, meleeDmgPct: 0.1 } },
+    // Enhancement tank kit, granted alongside Ancestral Strike so a melee shaman
+    // can hold aggro: mitigation, a threat imbue, a taunt, an enchant discharge,
+    // and a Shield Wall-style defensive cooldown.
+    ['earth_shield', 'earthbound_weapon', 'elemental_demand', 'unleash_weapon', 'tidal_ward'],
   ),
   spec(
     'restoration',
