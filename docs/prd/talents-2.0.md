@@ -241,8 +241,8 @@ and remain unchanged.
 |---|---|
 | paladin/protection | global: threatPct 0.5; stats: armorPct 0.2 |
 | paladin/retribution | global: meleeDmgPct 0.2, spellDmgPct 0.2; Blood Debt proc from landed melee attacks |
-| hunter/marksmanship | global: meleeDmgPct 0.2; stats: crit 0.03 |
-| hunter/survival | global: meleeDmgPct 0.15; stats: agiPct 0.15 |
+| hunter/marksmanship | ranged shot ability dmgPct 0.1; stats: crit 0.03; Iron Aim landed-shot setup |
+| hunter/survival | global: meleeDmgPct 0.05; stats: agiPct 0.05; Quickblood trap circuit |
 | mage/arcane | global: spellDmgPct 0.15, spellHastePct 0.1 |
 | rogue/assassination | global: dotDmgPct 0.2; stats: crit 0.03 |
 | rogue/subtlety | global: critDmgPct 0.4; stats: agiPct 0.1 |
@@ -384,9 +384,9 @@ The designated scalable axis per spec (base value = shipped magnitude):
 | paladin/holy | heal crit damage (critDmgPct on heals) | +50% (2x) |
 | paladin/protection | threat (threatPct) | 50% |
 | paladin/retribution | Holy + physical ability damage (paired meleeDmgPct + spellDmgPct, scale together) | 20% |
-| hunter/beast_mastery | pet damage (petDmgPct) | 35% |
-| hunter/marksmanship | physical ability damage (meleeDmgPct) | 20% |
-| hunter/survival | physical ability damage (meleeDmgPct) | 15% |
+| hunter/beast_mastery | pet damage (petDmgPct) | 20% |
+| hunter/marksmanship | ranged shot damage (shot ability dmgPct) | 10% |
+| hunter/survival | physical ability damage (meleeDmgPct) | 5% |
 | mage/arcane | spell damage (spellDmgPct) | 15% |
 | mage/fire | spell crit damage (critDmgPct) | +50% (2x) |
 | mage/frost | Frost spell damage (frost-kit ability dmgPct) | 25% |

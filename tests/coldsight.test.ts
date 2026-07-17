@@ -3,6 +3,7 @@ import { onRangedHit } from '../src/sim/combat/talent_procs';
 import { TALENTS, validateTalentTree } from '../src/sim/content/talents';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { advancePendingProjectiles } from '../src/sim/projectile_travel';
 import { Sim } from '../src/sim/sim';
 import type { Aura, Entity } from '../src/sim/types';
 import { localizeTalentTitle } from '../src/ui/talent_i18n';
@@ -45,6 +46,12 @@ describe('Coldsight Iron Aim', () => {
     expect(spec?.mastery.name).toBe('Iron Aim');
     expect(spec?.mastery.description).toContain('landed Rattling Shot');
     expect(spec?.mastery.description).toContain('Long Draw');
+    expect(spec?.mastery.effect.global).toBeUndefined();
+    expect(spec?.mastery.effect.ability).toEqual(
+      ['serpent_sting', 'arcane_shot', 'concussive_shot', 'aimed_shot', 'multi_shot', 'volley'].map(
+        (ability) => ({ ability, dmgPct: 0.1 }),
+      ),
+    );
     expect(spec?.mastery.effect.proc).toEqual({
       id: 'hun_iron_aim',
       name: 'Iron Aim',
@@ -109,6 +116,61 @@ describe('Coldsight Iron Aim', () => {
       },
     });
     expect(run()).toEqual(run());
+  });
+
+  it('arms on Rattling Shot impact, not launch, and fizzles with a dead target', () => {
+    const sim = hunterSim();
+    const target = targetFor(sim);
+    faceAndTarget(sim, target);
+
+    sim.castAbility('concussive_shot');
+
+    expect(sim.ctx.pendingProjectiles).toHaveLength(1);
+    expect(sim.player.auras.some((aura) => aura.id === 'hun_iron_aim')).toBe(false);
+    for (let tick = 0; tick < 200 && sim.ctx.pendingProjectiles.length > 0; tick++) {
+      advancePendingProjectiles(sim.ctx);
+    }
+    expect(sim.ctx.pendingProjectiles).toHaveLength(0);
+    expect(sim.player.auras.some((aura) => aura.id === 'hun_iron_aim')).toBe(true);
+
+    const fizzled = hunterSim();
+    const deadTarget = targetFor(fizzled);
+    faceAndTarget(fizzled, deadTarget);
+    fizzled.castAbility('concussive_shot');
+    deadTarget.dead = true;
+    advancePendingProjectiles(fizzled.ctx);
+
+    expect(fizzled.ctx.pendingProjectiles).toHaveLength(0);
+    expect(fizzled.player.auras.some((aura) => aura.id === 'hun_iron_aim')).toBe(false);
+  });
+
+  it('counts a Rattling Shot hit that ends a duel at the one-health guard', () => {
+    const sim = hunterSim();
+    const rivalId = sim.addPlayer('warrior', 'Rival');
+    const rival = sim.entities.get(rivalId);
+    if (!rival) throw new Error('missing duel rival');
+    const duel = { a: sim.playerId, b: rivalId, state: 'active' as const, timer: 0 };
+    sim.ctx.duels.set(sim.playerId, duel);
+    sim.ctx.duels.set(rivalId, duel);
+
+    sim.dealDamage(
+      sim.player,
+      rival,
+      rival.hp + 100,
+      false,
+      'physical',
+      'Rattling Shot',
+      'hit',
+      false,
+      undefined,
+      true,
+      false,
+      false,
+      'concussive_shot',
+    );
+
+    expect(rival.hp).toBe(1);
+    expect(sim.player.auras.some((aura) => aura.id === 'hun_iron_aim')).toBe(true);
   });
 
   it('does not arm from zero damage, absorbed damage, incidental damage, or another shot', () => {

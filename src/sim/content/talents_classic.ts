@@ -141,7 +141,14 @@ const HUNTER_SPECS: SpecDef[] = [
     'Iron Aim',
     'Increases your ranged ability damage by 10% and critical strike chance by 3%. A landed Rattling Shot makes your next Long Draw within 8 sec instant.',
     {
-      global: { meleeDmgPct: 0.1 },
+      ability: [
+        { ability: 'serpent_sting', dmgPct: 0.1 },
+        { ability: 'arcane_shot', dmgPct: 0.1 },
+        { ability: 'concussive_shot', dmgPct: 0.1 },
+        { ability: 'aimed_shot', dmgPct: 0.1 },
+        { ability: 'multi_shot', dmgPct: 0.1 },
+        { ability: 'volley', dmgPct: 0.1 },
+      ],
       stats: { crit: 0.03 },
       proc: {
         id: 'hun_iron_aim',

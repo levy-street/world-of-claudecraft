@@ -354,6 +354,24 @@ describe('actionBarView: proc availability cues', () => {
     ).toBe('armed');
   });
 
+  it('makes a proc-funded Fell Shot usable at zero mana without freeing other shots', () => {
+    const fellShot = createActionBarView(
+      descriptor(slot(1, { ability: ability('arcane_shot', { cost: 55 }) })),
+      fakeDeps(),
+    );
+    const longDraw = createActionBarView(
+      descriptor(slot(1, { ability: ability('aimed_shot', { cost: 50 }) })),
+      fakeDeps(),
+    );
+
+    expect(fellShot.tick(world({ resource: 0 })).slots[0].usable).toBe(false);
+    for (const id of ['hun_venom_relay', 'hun_packbond', 'hun_menders_signal']) {
+      const playerAuras = [{ id, kind: 'next_cast_free' as const }];
+      expect(fellShot.tick(world({ resource: 0, playerAuras })).slots[0].usable).toBe(true);
+      expect(longDraw.tick(world({ resource: 0, playerAuras })).slots[0].usable).toBe(false);
+    }
+  });
+
   it('marks Long Draw armed during the Iron Aim instant-shot window', () => {
     const view = createActionBarView(
       descriptor(slot(1, { ability: ability('aimed_shot') })),

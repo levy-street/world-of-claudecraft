@@ -87,6 +87,29 @@ function ignoresDamagePushback(ctx: SimContext, target: Entity, abilityId: strin
   );
 }
 
+// Hunter cadence/setup procs are keyed to a landed direct hit. Keep their dispatch in
+// one seam so the normal damage path and the four clamped PvP terminal paths agree.
+// A dead player cannot bank a new window from an in-flight shot or a companion that
+// remains active after its owner falls.
+function dispatchLandedHunterTalentHit(
+  ctx: SimContext,
+  source: Entity | null,
+  target: Entity,
+  amount: number,
+  direct: boolean,
+  school: string,
+  abilityId: string | null,
+): void {
+  if (!source || source.id === target.id || amount <= 0 || !direct) return;
+  if (source.ownerId !== null) {
+    const owner = ctx.entities.get(source.ownerId);
+    if (owner?.kind === 'player' && !owner.dead) onPetHit(ctx, owner, target);
+  }
+  if (source.kind === 'player' && !source.dead && school === 'physical' && abilityId !== null) {
+    onRangedHit(ctx, source, abilityId, target);
+  }
+}
+
 export function dealDamage(
   ctx: SimContext,
   source: Entity | null,
@@ -394,6 +417,7 @@ export function dealDamage(
       // Book of Deeds: the clamped terminal hit counts (zero rng; the early
       // return skips the shared deed site and the session RewardCounters).
       if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
+      dispatchLandedHunterTalentHit(ctx, source, target, amount, direct, school, abilityId);
       ctx.endDuel(duel, sourcePlayer.id);
       return;
     }
@@ -439,6 +463,7 @@ export function dealDamage(
       });
       // Book of Deeds: the clamped terminal hit counts (zero rng).
       if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
+      dispatchLandedHunterTalentHit(ctx, source, target, amount, direct, school, abilityId);
       ctx.fiestaTakedown(match, sourcePlayer.id, target);
       return;
     }
@@ -468,6 +493,7 @@ export function dealDamage(
       });
       // Book of Deeds: the clamped terminal hit counts (zero rng).
       if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
+      dispatchLandedHunterTalentHit(ctx, source, target, amount, direct, school, abilityId);
       ctx.yumiPlayerDown(match, target, sourcePlayer.id);
       return;
     }
@@ -501,6 +527,7 @@ export function dealDamage(
       });
       // Book of Deeds: the clamped terminal hit counts (zero rng).
       if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
+      dispatchLandedHunterTalentHit(ctx, source, target, amount, direct, school, abilityId);
       handleDeath(ctx, target, source);
       const loserTeam = ctx.arenaTeamOf(match, target.id);
       if (loserTeam && ctx.isArenaTeamWiped(match, loserTeam)) {
@@ -690,20 +717,11 @@ export function dealDamage(
   // below, plus encounter participant tracking for the roster tasks.
   if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
 
-  // Owned-pet cadence is a landed-hit hook: absorbs, zero-damage hits, and incidental
-  // damage cannot advance it. The owner spec and learned-signature gates run inside
-  // procsFor before any counter changes, so sibling specs remain state-identical.
-  if (source && source.ownerId !== null && amount > 0 && direct) {
-    const owner = ctx.entities.get(source.ownerId);
-    if (owner?.kind === 'player') onPetHit(ctx, owner, target);
-  }
+  dispatchLandedHunterTalentHit(ctx, source, target, amount, direct, school, abilityId);
 
   if (source && source.kind === 'player' && source.id !== target.id) {
     const meta = ctx.players.get(source.id);
     if (meta) meta.counters.damageDealt += amount;
-    if (amount > 0 && direct && school === 'physical' && abilityId) {
-      onRangedHit(ctx, source, abilityId, target);
-    }
     if (amount > 0 && school !== 'physical' && abilityId) {
       onSpellHit(ctx, source, abilityId, target);
     }

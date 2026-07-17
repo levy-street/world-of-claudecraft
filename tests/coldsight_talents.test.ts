@@ -2,7 +2,11 @@ import { describe, expect, it } from 'vitest';
 import { onRangedHit } from '../src/sim/combat/talent_procs';
 import { ROW_TREES, validateRowTree } from '../src/sim/content/talent_rows';
 import { TALENTS, validateTalentTree } from '../src/sim/content/talents';
+import { MOBS } from '../src/sim/data';
+import { createMob } from '../src/sim/entity';
+import { advancePendingProjectiles } from '../src/sim/projectile_travel';
 import { Sim } from '../src/sim/sim';
+import type { Entity } from '../src/sim/types';
 import { localizeTalentTitle } from '../src/ui/talent_i18n';
 
 const SECOND_BEARING_ID = 'hun_r14_sniper_training';
@@ -19,6 +23,34 @@ function hunterSim(
     }),
   ).toBe(true);
   return sim;
+}
+
+function targetFor(sim: Sim): Entity {
+  const target = createMob(97_202, MOBS.forest_wolf, 1, {
+    x: sim.player.pos.x,
+    y: sim.player.pos.y,
+    z: sim.player.pos.z + 10,
+  });
+  target.hostile = true;
+  target.stats = { ...target.stats, armor: 0 };
+  target.maxHp = 100_000;
+  target.hp = target.maxHp;
+  sim.entities.set(target.id, target);
+  sim.rebucket(target);
+  return target;
+}
+
+function faceAndTarget(sim: Sim, target: Entity): void {
+  sim.targetEntity(target.id);
+  sim.player.facing = Math.atan2(target.pos.x - sim.player.pos.x, target.pos.z - sim.player.pos.z);
+  sim.player.gcdRemaining = 0;
+}
+
+function landProjectiles(sim: Sim): void {
+  for (let tick = 0; tick < 200 && sim.ctx.pendingProjectiles.length > 0; tick++) {
+    advancePendingProjectiles(sim.ctx);
+  }
+  expect(sim.ctx.pendingProjectiles).toHaveLength(0);
 }
 
 describe('Coldsight talent: Second Bearing', () => {
@@ -74,6 +106,29 @@ describe('Coldsight talent: Second Bearing', () => {
 
     expect(run()).toEqual({ resource: 30, hasCooldown: false, draws: 0 });
     expect(run()).toEqual(run());
+  });
+
+  it('pays Second Bearing only when the real Long Draw projectile lands', () => {
+    const sim = hunterSim();
+    const target = targetFor(sim);
+    sim.player.resource = sim.player.maxResource;
+    faceAndTarget(sim, target);
+
+    sim.castAbility('concussive_shot');
+    landProjectiles(sim);
+    expect(sim.player.auras.some((aura) => aura.id === 'hun_iron_aim')).toBe(true);
+    expect(sim.player.cooldowns.has('concussive_shot')).toBe(true);
+
+    sim.player.resource = 50;
+    sim.player.gcdRemaining = 0;
+    sim.castAbility('aimed_shot');
+
+    expect(sim.player.resource).toBe(0);
+    expect(sim.player.cooldowns.has('concussive_shot')).toBe(true);
+    expect(sim.ctx.pendingProjectiles).toHaveLength(1);
+    landProjectiles(sim);
+    expect(sim.player.resource).toBe(20);
+    expect(sim.player.cooldowns.has('concussive_shot')).toBe(false);
   });
 
   it('does not pay out for another shot or when the stable row option is not selected', () => {

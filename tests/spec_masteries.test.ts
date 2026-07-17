@@ -154,7 +154,14 @@ describe('spec masteries', () => {
       },
     });
     expect(TALENTS.hunter?.specs.find((s) => s.id === 'marksmanship')?.mastery.effect).toEqual({
-      global: { meleeDmgPct: 0.1 },
+      ability: [
+        { ability: 'serpent_sting', dmgPct: 0.1 },
+        { ability: 'arcane_shot', dmgPct: 0.1 },
+        { ability: 'concussive_shot', dmgPct: 0.1 },
+        { ability: 'aimed_shot', dmgPct: 0.1 },
+        { ability: 'multi_shot', dmgPct: 0.1 },
+        { ability: 'volley', dmgPct: 0.1 },
+      ],
       stats: { crit: 0.03 },
       proc: {
         id: 'hun_iron_aim',
@@ -462,7 +469,17 @@ describe('spec masteries', () => {
       },
       hunter: {
         beast_mastery: { global: 'petDmgPct', value: 0.2 },
-        marksmanship: { global: 'meleeDmgPct', value: 0.1 },
+        marksmanship: {
+          abilities: [
+            'serpent_sting',
+            'arcane_shot',
+            'concussive_shot',
+            'aimed_shot',
+            'multi_shot',
+            'volley',
+          ],
+          dmgPct: 0.1,
+        },
         survival: { global: 'meleeDmgPct', value: 0.05 },
       },
       mage: {

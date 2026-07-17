@@ -255,10 +255,19 @@ function hasAura(auras: readonly ActionBarAuraInput[], auraId: string): boolean 
   return false;
 }
 
-function bloodDebtMakesRiteFree(auras: readonly ActionBarAuraInput[], abilityId: string): boolean {
-  if (abilityId !== 'exorcism') return false;
+const FREE_COST_AURA_IDS_BY_ABILITY: Readonly<Record<string, readonly string[]>> = {
+  exorcism: ['pal_blood_debt'],
+  arcane_shot: ['hun_venom_relay', 'hun_packbond', 'hun_menders_signal'],
+};
+
+function talentProcMakesAbilityFree(
+  auras: readonly ActionBarAuraInput[],
+  abilityId: string,
+): boolean {
+  const auraIds = FREE_COST_AURA_IDS_BY_ABILITY[abilityId];
+  if (!auraIds) return false;
   for (const aura of auras) {
-    if (aura.id === 'pal_blood_debt' && aura.kind === 'next_cast_free') return true;
+    if (aura.kind === 'next_cast_free' && auraIds.includes(aura.id)) return true;
   }
   return false;
 }
@@ -501,7 +510,7 @@ export function createActionBarView(
         slot.cdText = cd > COOLDOWN_TEXT_THRESHOLD ? deps.formatCount(Math.ceil(cd)) : '';
         slot.count = '';
         slot.usable =
-          (player.resource >= ability.cost || bloodDebtMakesRiteFree(player.auras, def.id)) &&
+          (player.resource >= ability.cost || talentProcMakesAbilityFree(player.auras, def.id)) &&
           (!def.requiresStealth || player.stealthed);
         slot.outOfRange =
           def.requiresTarget &&

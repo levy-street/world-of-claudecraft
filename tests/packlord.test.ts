@@ -115,6 +115,39 @@ describe('Packlord Packbond', () => {
     });
   });
 
+  it('does not feed Packbond after the pet owner dies', () => {
+    const sim = hunterSim();
+    const target = targetFor(sim);
+    const pet = ownedPetFor(sim);
+    sim.player.dead = true;
+
+    for (let hit = 0; hit < 3; hit++) {
+      sim.dealDamage(pet, target, 10, false, 'physical', 'Pet Test', 'hit');
+    }
+
+    expect(sim.player.procState?.counters.hun_packbond).toBeUndefined();
+    expect(sim.player.auras.some((aura) => aura.id === 'hun_packbond')).toBe(false);
+  });
+
+  it('counts a companion hit that ends a duel at the one-health guard', () => {
+    const sim = hunterSim();
+    const pet = ownedPetFor(sim);
+    const rivalId = sim.addPlayer('warrior', 'Rival');
+    const rival = sim.entities.get(rivalId);
+    if (!rival) throw new Error('missing duel rival');
+    const duel = { a: sim.playerId, b: rivalId, state: 'active' as const, timer: 0 };
+    sim.ctx.duels.set(sim.playerId, duel);
+    sim.ctx.duels.set(rivalId, duel);
+
+    sim.dealDamage(pet, rival, 1, false, 'physical', 'Pet Test', 'hit');
+    sim.dealDamage(pet, rival, 1, false, 'physical', 'Pet Test', 'hit');
+    sim.dealDamage(pet, rival, rival.hp + 100, false, 'physical', 'Pet Test', 'hit');
+
+    expect(rival.hp).toBe(1);
+    expect(sim.player.procState?.counters.hun_packbond).toBe(0);
+    expect(sim.player.auras.some((aura) => aura.id === 'hun_packbond')).toBe(true);
+  });
+
   it('gates the counter before the signature is learned and outside Packlord', () => {
     const withoutSignature = hunterSim();
     const meta = withoutSignature.meta(withoutSignature.playerId);
