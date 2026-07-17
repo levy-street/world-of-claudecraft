@@ -366,6 +366,7 @@ export const zh_CN: EnTranslations = {
       "spinButton": "转动",
       "tasks": "任务",
       "taskMultiplier": "{multiplier}倍倍率",
+      "oneVsOneExcluded": "1对1比赛不会获得每日奖励积分。",
       "pointsGained": "已获得 {points} 每日奖励积分。",
       "showChestButton": "显示宝箱",
       "hideChestButton": "隐藏宝箱",
@@ -415,6 +416,18 @@ export const zh_CN: EnTranslations = {
       "armoryEyebrow": "第一赛季",
       "armoryTitle": "兵器库",
       "armoryBody": "第一赛季兵器库限定武器外观。全账号通用，纯装饰性，周围所有玩家都能看到。",
+      "wallet": {
+        "title": "Solana 钱包",
+        "unlinked": "连接钱包应用，然后签名一次，将其公开地址绑定到你的 WoC 账号。我们绝不会获取你的恢复短语或私钥。",
+        "connectedUnlinked": "钱包应用已连接到此浏览器，但其公开地址尚未绑定到你的 WoC 账号。",
+        "linkedDisconnected": "你的公开地址已绑定。需要用 SOL 或 WOC 支付时，请重新连接该钱包应用。",
+        "linkedConnected": "已绑定的钱包应用已连接，可以使用 SOL 或 WOC 购买。",
+        "mismatched": "当前连接的是另一个钱包。验证它即可替换已绑定的地址，或重新连接原先绑定的钱包。",
+        "connect": "连接钱包",
+        "verify": "验证并绑定",
+        "reconnect": "重新连接钱包",
+        "manage": "管理钱包"
+      },
       "collectionLine": "{collection}系列",
       "collections": {
         "guildmark": "公会印记",
@@ -2199,9 +2212,10 @@ export const zh_CN: EnTranslations = {
       "charTitleNone": "未选择头衔",
       "charOpenBook": "功绩之书",
       "lbTab": "名望",
-      "lbDeedsCol": "功绩",
       "lbTitleCol": "头衔",
-      "lbSelf": "你的排名：第 {rank} 名，位居前 {percent}%",
+      "lbScopeNote": "排行榜按账号的累计名望排名。每个功绩在一个账号的所有角色中只计一次。",
+      "lbSelfAccount": "你的账号：第 {rank} 名，位居前 {percent}%，名望 {renown}",
+      "lbSelfRank": "你的账号：第 {rank} 名，位居前 {percent}%",
       "lbEmpty": "暂无上榜的编年史家。",
       "broadcastsLabel": "与公会和好友分享功绩达成",
       "titledName": "{name}【{title}】"
@@ -2305,6 +2319,9 @@ export const zh_CN: EnTranslations = {
       "already_linked": "你的账号已关联一个 Steam 账号。",
       "account_taken": "该 Steam 账号已关联到另一个账号。",
       "upstream": "Steam 未响应。请稍后重试。"
+    },
+    "wallet": {
+      "handoff_invalid": "钱包授权已过期或无法验证。请重试。"
     },
     "welcome": {
       "invalid_input": "输入无效。"
@@ -3100,7 +3117,7 @@ export const zh_CN: EnTranslations = {
       "howHeading": "功绩如何运作",
       "howBody": "功绩以单个角色为单位逐一赢得并留存，因此你所扮演的每一位英雄都会各自积累自己的功绩之书；只有王国的排行榜才会汇总你所扮演的所有角色的名望，且每个功绩只计一次。每个功绩都在游戏内的功绩之书中清楚写明它的要求，让你始终知道该追求什么；你还可以对心仪的功绩设置追踪，让它们在你游玩时时刻不离视线。少数功绩会保持隐秘，只有在你赢得它们之后才会揭晓。这本书还讲求诚实：凡是你过往的记录足以证明的，它都会当场记上，因此老玩家绝不会翻开一页空白；只有计数类的功绩才从零开始累计。",
       "renownHeading": "名望",
-      "renownBody": "名望是功绩之书背后的分数。你赢得的每个功绩都价值固定的点数，而你的总分只增不减，因此清闲的一周绝不会让你失去已有的成绩。少数功绩取决于运气而非技巧，而壮举则自成一份荣誉，因此这两者都不提供任何名望。",
+      "renownBody": "名望是功绩之书背后的分数。你赢得的每个功绩都价值固定的点数，而你的总分只增不减，因此清闲的一周绝不会让你失去已有的成绩。少数功绩取决于运气而非技巧，而壮举则自成一份荣誉，因此这两者都不提供任何名望。不带名望的功绩仍会计入功绩之书的完成度，只是从不计分。",
       "rewardsHeading": "头衔与边框",
       "rewardsBody": "这些奖励纯粹是为了炫耀，而这正是它们的意义所在。有些功绩会授予你可佩戴的头衔，或是为你的名字增添装饰的边框，绝不会给出任何让你的英雄变强的东西。在功绩之书中选择你想要的头衔，它便会显示在你的铭牌上、聊天中和排行榜上，供所有人观看。",
       "chroniclesHeading": "编年史",
@@ -3109,7 +3126,7 @@ export const zh_CN: EnTranslations = {
       "featsBody": "壮举自成一类：它们是传承与世界首创的记录，是那些与逝去纪元相关、或只会发生一次的功绩。它们不带来任何名望，也不计入完成度，将作为对往昔功业的纪念被永久保存。",
       "catalogHeading": "功绩全录",
       "catalogBody": "这里列出了功绩之书所能容纳的每一个功绩，按类别整理。隐秘的功绩被特意略去，等待你自己去发现。在游戏内打开功绩之书，即可查看每个功绩的具体要求。",
-      "standingsNote": "各王国会统计所有账号累积的名望。想知道谁位居何处，请在游戏内打开排行榜并转到它的名望标签页；排名在那里，而不在维基上。",
+      "standingsNote": "各王国会统计所有账号累积的名望：排行榜按账号的累计名望排名，每个功绩在你所有角色中只计一次，且榜上只显示名望，因此不带名望的功绩即使计入你的功绩之书，也绝不会影响排名。想知道谁位居何处，请在游戏内打开排行榜并转到它的名望标签页；排名在那里，而不在维基上。",
       "catHeading": "{label}（{count}）",
       "colName": "功绩",
       "colRenown": "名望",
@@ -4025,6 +4042,9 @@ export const zh_CN: EnTranslations = {
     "balancePreviewTitle": "已连接钱包的 $WOC 余额预览",
     "balancePreviewAria": "已连接钱包余额预览：{balance}。绑定钱包即可验证持有者标识。",
     "balanceAmount": "{amount} $WOC",
+    "bagConnect": "绑定钱包",
+    "bagLink": "验证钱包",
+    "bagReconnect": "重新连接钱包",
     "connected": "已连接：{address}",
     "connectedWithBalance": "已连接：{balance} - {address}",
     "connectedLinked": "已验证：{address}",
@@ -4039,12 +4059,37 @@ export const zh_CN: EnTranslations = {
     "helpLinkedDisconnected": "持有者特权已启用。需要签名或消费时请连接应用。",
     "helpLinkedDisconnectedWithBalance": "持有者特权已启用。需要签名或消费时请连接应用。",
     "extensionHelp": "若要在此处看到钱包，请保持 Solflare Wallet 等浏览器钱包扩展处于启用状态。",
+    "mobileAppHelp": "选择 Phantom 或 Solflare。钱包应用会请求批准。请保持游戏打开，完成后返回游戏。",
+    "standaloneAppHelp": "主屏幕应用暂不支持连接钱包。若要使用 Phantom 或 Solflare，请在 Safari 或 Chrome 中打开 World of ClaudeCraft。",
+    "openAppTitle": "在 {wallet} 中继续",
+    "openAppHelp": "打开 {wallet} 查看此请求。钱包应用处于活动状态时，请保持此游戏标签页打开。",
+    "openAppButton": "打开 {wallet}",
+    "manualReturnBrowserHelp": "批准后请返回此游戏标签页。如果 iOS 打开了其他浏览器，请将其关闭并手动返回原浏览器。",
+    "manualReturnStandaloneHelp": "批准后请从主屏幕返回 World of ClaudeCraft。如果 iOS 打开了浏览器，请将其关闭并重新打开主屏幕应用。",
+    "preparingAppButton": "正在准备 {wallet}...",
+    "walletAppUnavailable": "无法准备 {wallet}。请关闭此窗口并重试。",
     "flowConnect": "选择一个钱包。验证会自动继续。",
     "flowSign": "在钱包应用中签署验证消息。无需交易或 SOL。",
     "flowVerify": "正在验证钱包所有权...",
     "linkFailed": "钱包验证失败。",
     "verifyFailed": "钱包验证失败。",
     "unlinkFailed": "无法解除钱包绑定。",
+    "browser": {
+      "eyebrow": "桌面钱包授权",
+      "title": "连接 Solana 钱包",
+      "linkBody": "在此浏览器中选择钱包扩展。签署验证消息后返回桌面应用。",
+      "paymentBody": "选择已关联到账号的钱包，并在此浏览器中批准交易。",
+      "extensionHelp": "未找到兼容的钱包扩展。请安装或解锁 Phantom、Solflare 或其他 Solana 浏览器钱包，然后重试。",
+      "safety": "World of ClaudeCraft 绝不会索要助记词或私钥。",
+      "continueWith": "使用 {wallet} 继续",
+      "reviewTitle": "在钱包中查看",
+      "reviewBody": "按照 {wallet} 中的提示操作。请保持此浏览器页面打开。",
+      "completeTitle": "钱包授权完成",
+      "completeBody": "现在可以返回 World of ClaudeCraft 桌面应用。",
+      "returnButton": "返回桌面应用",
+      "failed": "钱包授权失败或已过期。请返回桌面应用并重试。",
+      "retry": "重试"
+    },
     "holder": "$WOC 持有者",
     "holderTierTitle": "{tier} $WOC 持有者",
     "holderTiers": {
@@ -4365,6 +4410,24 @@ export const zh_CN: EnTranslations = {
   "heroicShop": {
     "balance": "英雄徽记: {count}",
     "buyAria": "用{marks}枚英雄徽记购买{item}"
+  },
+  "cardDuel": {
+    "title": "纸牌对决",
+    "close": "关闭",
+    "join": "加入队列",
+    "joinAria": "加入纸牌对决队列",
+    "leave": "离开队列",
+    "leaveAria": "离开纸牌对决队列",
+    "forfeit": "认输",
+    "forfeitAria": "认输退出纸牌对决",
+    "queued": "正在等待对手……",
+    "unavailable": "纸牌对决需要另一名玩家在线。",
+    "vsOpponent": "对战 {name}",
+    "round": "局分：{mine} - {theirs}",
+    "counts": "牌堆：{deck} · 弃牌堆：{discard}",
+    "playCardAria": "打出 {value} 号牌",
+    "waitingOnOpponent": "正在等待对手出牌……",
+    "yourTurn": "出一张牌"
   },
   "delveUi": {
     "board": {
@@ -4864,6 +4927,11 @@ export const zh_CN: EnTranslations = {
       "quit": "退出",
       "fatalBody": "World of ClaudeCraft 遇到意外错误，需要关闭。"
     }
+  },
+  "gpuNotice": {
+    "bodyDesktop": "游戏正在没有 GPU 加速的情况下运行，会非常缓慢。请更新显卡驱动后重启游戏。在 Windows 上，还请在 设置 > 系统 > 显示 > 显示卡 中将本游戏设为“高性能”。",
+    "bodyWeb": "游戏正在没有 GPU 加速的情况下运行，会非常缓慢。请在浏览器设置中启用硬件加速，更新显卡驱动，然后重启浏览器。",
+    "dismiss": "关闭"
   },
   "realm": {
     "noRealms": "没有可用服务器。",
@@ -8707,6 +8775,11 @@ export const zh_CN: EnTranslations = {
         "title": "镀金保险箱",
         "greeting": "欢迎来到镀金保险箱。你的财物在我们的锁后安然无恙。"
       },
+      "card_master": {
+        "name": "牌局大师",
+        "title": "运气经销人",
+        "greeting": "来一局纸牌对决？三局两胜，赢家赢得吹嘘的资本。"
+      },
       "bursar_petra_vell": {
         "name": "司库佩特拉·维尔",
         "title": "镀金保险箱",
@@ -9851,7 +9924,7 @@ export const zh_CN: EnTranslations = {
       },
       "necromancers": {
         "name": "哀织法衣",
-        "bonus2": "你不会被击退（击退抗性 100%）。",
+        "bonus2": "法术强度提高 20 点。受到伤害不再延迟你的施法（施法延迟抗性 100%）。",
         "bonus3": "智力提高 10 点，耐力提高 10 点。",
         "bonus4": "你的法术有 10% 的几率触发“清晰施法”，使你的下一个法术免费施放。"
       },
@@ -9863,13 +9936,13 @@ export const zh_CN: EnTranslations = {
       },
       "soulflame": {
         "name": "魂焰法衣",
-        "bonus2": "你不会被击退（击退抗性 100%）。",
+        "bonus2": "法术强度提高 20 点。受到伤害不再延迟你的施法（施法延迟抗性 100%）。",
         "bonus3": "智力提高 15 点，精神提高 15 点，攻击速度和施法速度提高 15%。",
         "bonus4": "你的法术有 10% 的几率触发“灼魂之焰”，使法术强度提高 40 点，持续 10 秒。"
       },
       "stormcallers": {
         "name": "唤风法衣",
-        "bonus2": "你不会被击退（击退抗性 100%）。",
+        "bonus2": "法术强度提高 20 点。受到伤害不再延迟你的施法（施法延迟抗性 100%）。",
         "bonus3": "智力提高 15 点，精神提高 15 点，攻击速度和施法速度提高 15%。",
         "bonus4": "你的法术有 10% 的几率触发“灼魂之焰”，使法术强度提高 40 点，持续 10 秒。"
       },

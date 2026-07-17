@@ -55,6 +55,12 @@ export interface SpellbookWindowDeps {
   abilityIdByBarSlot(): (string | null)[];
   /** The action bar has at least one empty slot. */
   hasFreeSlot(): boolean;
+  /** The Attack toggle currently occupies bar slot 0 (showAttackButton on). */
+  attackOnBar(): boolean;
+  /** Restore (true) or remove (false) the Attack toggle on bar slot 0; routes
+   *  through the same Interface showAttackButton setting the options window and
+   *  the slot's right-click use, so all three controls stay one state. */
+  setAttackOnBar(on: boolean): void;
   /** Place an ability on the first free slot; returns whether it changed. */
   addToBar(abilityId: string): boolean;
   /** Remove an ability from the bar; returns whether it changed. */
@@ -173,6 +179,7 @@ export class SpellbookWindow {
       barAbilityIds: this.deps.barAbilityIds(),
       abilityIdByBarSlot: this.deps.abilityIdByBarSlot(),
       hasFreeSlot: this.deps.hasFreeSlot(),
+      attackOnBar: this.deps.attackOnBar(),
       hasFormBars: this.deps.hasFormBars(),
     });
     const className = classDisplayName(view.classId);
@@ -187,6 +194,7 @@ export class SpellbookWindow {
     list.className = 'spell-list';
     list.setAttribute('role', 'list');
     el.appendChild(list);
+    this.appendAttackRow(list, view.attackOnBar);
     for (const row of view.rows) this.appendRow(list, row);
     if (view.empty) {
       const empty = document.createElement('div');
@@ -210,6 +218,25 @@ export class SpellbookWindow {
   // keybind use) without a full rebuild. Mirrors the inline refreshSpellbookHotbar
   // controls but scoped to this window's root.
   refreshHotbarControls(): void {
+    // The Attack toggle tracks the Interface showAttackButton setting, which can
+    // flip while the window is open (the options window, or a right-click on the
+    // slot-0 button itself). Same elision discipline as the ability toggles:
+    // rewrite only when the on-bar state actually flips.
+    const attackBtn = this.deps.root().querySelector<HTMLButtonElement>('[data-attack-toggle]');
+    if (attackBtn) {
+      const onBar = this.deps.attackOnBar();
+      if ((attackBtn.getAttribute('aria-pressed') === 'true') !== onBar) {
+        attackBtn.textContent = onBar ? '-' : '+';
+        attackBtn.classList.toggle('remove', onBar);
+        attackBtn.setAttribute('aria-pressed', onBar ? 'true' : 'false');
+        attackBtn.setAttribute(
+          'aria-label',
+          t(onBar ? 'hudChrome.spellbook.removeFromBarAria' : 'hudChrome.spellbook.addToBarAria', {
+            name: t('abilityUi.actionBar.attackName'),
+          }),
+        );
+      }
+    }
     const barIds = new Set(this.deps.barAbilityIds());
     const hasFree = this.deps.hasFreeSlot();
     this.deps
@@ -249,6 +276,54 @@ export class SpellbookWindow {
         }
         btn.disabled = !onBar && !hasFree;
       });
+  }
+
+  // The pinned basic Attack row, first in the list (classic spellbooks lead with
+  // Attack). Attack is not an ability: its +/- toggle restores or removes the
+  // fixed Attack button on bar slot 0 through the same Interface
+  // showAttackButton setting the options window drives, so a player who
+  // right-clicked the button away can always get it back from here. Reuses the
+  // existing attackName/attackTooltip keys and the add/remove aria pair; no new
+  // player strings.
+  private appendAttackRow(list: HTMLElement, onBar: boolean): void {
+    const name = t('abilityUi.actionBar.attackName');
+    const summary = t('abilityUi.actionBar.attackTooltip');
+    const el = document.createElement('div');
+    el.className = 'spell-row';
+    el.tabIndex = 0;
+    el.setAttribute('role', 'listitem');
+    // No aria-label override: the row's own localized text (name + summary) is
+    // the accessible content, unlike ability rows whose label folds in rank.
+    el.innerHTML = `<div class="spell-icon" style="background-image:url(${iconDataUrl('ability', 'attack')})"></div>
+        <div class="spell-text"><div class="spell-name">${esc(name)}</div>
+        <div class="spell-sub">${esc(summary)}</div></div>`;
+    const toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = `spell-hotbar-toggle${onBar ? ' remove' : ''}`;
+    toggle.dataset.attackToggle = '1';
+    toggle.textContent = onBar ? '-' : '+';
+    toggle.setAttribute(
+      'aria-label',
+      t(onBar ? 'hudChrome.spellbook.removeFromBarAria' : 'hudChrome.spellbook.addToBarAria', {
+        name,
+      }),
+    );
+    toggle.setAttribute('aria-pressed', onBar ? 'true' : 'false');
+    toggle.addEventListener('pointerdown', (ev) => ev.stopPropagation());
+    toggle.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      this.deps.setAttackOnBar(!this.deps.attackOnBar());
+      audio.click();
+      this.refreshHotbarControls();
+    });
+    el.appendChild(toggle);
+    this.deps.attachTooltip(
+      el,
+      () =>
+        `<div class="tt-title">${esc(t('abilityUi.actionBar.attackName'))}</div><div class="tt-sub">${esc(t('abilityUi.actionBar.attackTooltip'))}</div>`,
+    );
+    list.appendChild(el);
   }
 
   private appendRow(list: HTMLElement, row: SpellbookRow): void {

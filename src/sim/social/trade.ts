@@ -24,7 +24,7 @@
 // refuse them.
 
 import type { TradeInfo } from '../../world_api';
-import { bagCapacity, fitsAll, removeStacked } from '../bags';
+import { addStacked, bagCapacity, countFit, removeStacked } from '../bags';
 import { ITEMS } from '../data';
 import type { PlayerMeta, TradeOfferState, TradeSession } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -359,15 +359,42 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
     return;
   }
   // capacity gate: each side must fit what they RECEIVE after what they GIVE
-  // leaves their bags (simulated on a scratch copy; nothing moved yet)
-  const fitsAfterSwap = (meta: PlayerMeta, gives: InvSlot[], receives: InvSlot[]): boolean => {
+  // leaves their bags (simulated on a scratch copy; nothing moved yet). A
+  // receive is not uniformly fungible: transferOffer (below) grants each
+  // instanced copy via addItemInstance, which always takes a fresh slot and
+  // never merges into a plain stack of the same itemId (bags.ts addStacked
+  // skips slots with `.instance`). fitsAll alone assumes every unit of a
+  // receive can stack, which under-predicts slot usage whenever the giver's
+  // stock for that item is (partly) instanced copies, letting a receiver end
+  // up over capacity. Mirror removePreferFungible's own split here: only the
+  // giver's fungible stock can stack on arrival; the rest needs one free slot
+  // each, exactly like the real transfer.
+  const fitsAfterSwap = (
+    meta: PlayerMeta,
+    giverPid: number,
+    gives: InvSlot[],
+    receives: InvSlot[],
+  ): boolean => {
     const scratch = meta.inventory.map((s) => ({ ...s }));
-    for (const s of gives) scratchRemove(scratch, s);
-    return fitsAll(scratch, bagCapacity(meta.bags), receives);
+    for (const s of gives) removeStacked(scratch, s.itemId, s.count);
+    const capacity = bagCapacity(meta.bags);
+    for (const s of receives) {
+      const instancedCount = Math.max(0, s.count - ctx.countFungibleItem(s.itemId, giverPid));
+      const plainCount = s.count - instancedCount;
+      if (plainCount > 0) {
+        if (countFit(scratch, capacity, s.itemId, plainCount) < plainCount) return false;
+        addStacked(scratch, s.itemId, plainCount);
+      }
+      for (let i = 0; i < instancedCount; i++) {
+        if (scratch.length >= capacity) return false;
+        scratch.push({ itemId: s.itemId, count: 1, instance: {} });
+      }
+    }
+    return true;
   };
   if (
-    !fitsAfterSwap(metaA, session.offerA.items, session.offerB.items) ||
-    !fitsAfterSwap(metaB, session.offerB.items, session.offerA.items)
+    !fitsAfterSwap(metaA, session.b, session.offerA.items, session.offerB.items) ||
+    !fitsAfterSwap(metaB, session.a, session.offerB.items, session.offerA.items)
   ) {
     for (const tPid of [session.a, session.b])
       ctx.error(tPid, 'Trade failed: not enough bag space.');
@@ -515,20 +542,6 @@ export function tradeSettleFail(
 }
 
 // --- internals ------------------------------------------------------------------
-
-// scratch-copy removal for the capacity simulation: an instance row frees its
-// own whole slot (never decrements a plain stack), a fungible row decrements
-// stacks highest-index-first exactly as the real removal will
-function scratchRemove(scratch: InvSlot[], row: InvSlot): void {
-  if (row.instance) {
-    const idx = scratch.findIndex(
-      (s) => s.itemId === row.itemId && s.instance && instanceEq(s.instance, row.instance!),
-    );
-    if (idx >= 0) scratch.splice(idx, 1);
-    return;
-  }
-  removeStacked(scratch, row.itemId, row.count);
-}
 
 // moves one side's offered items to the counterparty, preserving instance
 // payloads (offer coverage was re-validated immediately before)

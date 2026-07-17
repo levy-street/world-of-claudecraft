@@ -32,6 +32,7 @@ describeDb('player metrics lifecycle SQL (real Postgres)', () => {
           id SERIAL PRIMARY KEY,
           created_at TIMESTAMPTZ NOT NULL DEFAULT now()
         );
+        CREATE INDEX accounts_created_at ON accounts(created_at DESC);
         CREATE TABLE characters (
           id SERIAL PRIMARY KEY,
           account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
@@ -77,6 +78,7 @@ describeDb('player metrics lifecycle SQL (real Postgres)', () => {
   async function scopedClient() {
     const client = await pool.connect();
     await client.query(`SET search_path TO ${SCHEMA}`);
+    await client.query("SET TIME ZONE 'UTC'");
     return client;
   }
 
@@ -136,6 +138,21 @@ describeDb('player metrics lifecycle SQL (real Postgres)', () => {
     }
     await closePlayerSession(scopedPool(), sessionId, 'eastbrook', 5);
 
+    // Keep the snapshot fixture independent of the wall clock. During the
+    // first hour after UTC midnight, the one-hour session above correctly
+    // splits most playtime onto yesterday even though it opened today.
+    const activity = await scopedClient();
+    try {
+      await activity.query(
+        `UPDATE player_activity_daily
+            SET playtime_seconds = 3600
+          WHERE realm = 'eastbrook' AND day = current_date AND account_id = $1`,
+        [accountId],
+      );
+    } finally {
+      activity.release();
+    }
+
     const snapshot = await playerBusinessSnapshot(scopedPool(), 'eastbrook');
     const today = snapshot.days.find((day) => day.period === 'today');
     expect(today).toMatchObject({
@@ -147,9 +164,48 @@ describeDb('player metrics lifecycle SQL (real Postgres)', () => {
       activeReturning: 0,
       firstSessionLevel2Rate: 1,
       firstSessionLevel5Rate: 1,
+      dayOneFunnelAccounts: {
+        created: 1,
+        first_character: 1,
+        entered_world: 1,
+        played_10m: 1,
+        reached_level_2: 1,
+        reached_level_5: 1,
+      },
     });
     expect(today?.avgPlaytimeSecondsAll).toBeGreaterThanOrEqual(3599);
     expect(today?.firstSessionMedianSeconds).toBeGreaterThanOrEqual(3599);
+    expect(today?.firstDayPlaytimeP50Seconds).toBeGreaterThanOrEqual(3599);
+    expect(today?.firstDayPlaytimeP90Seconds).toBeGreaterThanOrEqual(3599);
+    expect(today?.firstDaySessionsMedian).toBe(1);
+    const buckets = today?.firstDayPlaytimeAccounts;
+    expect(buckets?.lt_10m).toBe(0);
+    // The one-hour session floors to right at the 1h edge; accept either side
+    // of it so a sub-second clock skew between statements cannot flake this.
+    expect((buckets?.['30m_1h'] ?? 0) + (buckets?.['1h_3h'] ?? 0)).toBe(1);
+    expect(buckets?.gte_3h).toBe(0);
+    const bucketTotal = Object.values(buckets ?? {}).reduce((sum, count) => sum + count, 0);
+    expect(bucketTotal).toBe(today?.activeNew);
+    const yesterday = snapshot.days.find((day) => day.period === 'yesterday');
+    expect(yesterday).toMatchObject({
+      dayOneFunnelAccounts: {
+        created: 0,
+        first_character: 0,
+        entered_world: 0,
+        played_10m: 0,
+        reached_level_2: 0,
+        reached_level_5: 0,
+      },
+      firstDayPlaytimeP50Seconds: null,
+      firstDaySessionsMedian: null,
+      firstDayPlaytimeAccounts: {
+        lt_10m: 0,
+        '10m_30m': 0,
+        '30m_1h': 0,
+        '1h_3h': 0,
+        gte_3h: 0,
+      },
+    });
     expect(snapshot.retention).toEqual([
       { period: 'today', day: 1, rate: null },
       { period: 'today', day: 7, rate: null },
@@ -158,6 +214,134 @@ describeDb('player metrics lifecycle SQL (real Postgres)', () => {
       { period: 'yesterday', day: 7, rate: null },
       { period: 'yesterday', day: 30, rate: null },
     ]);
+  });
+
+  it('keeps the signup funnel on one cohort while engagement follows first play', async () => {
+    const db = await scopedClient();
+    try {
+      const accounts = await db.query(
+        `INSERT INTO accounts (created_at)
+         VALUES
+           (current_date),
+           (current_date + interval '2 hours'),
+           (current_date + interval '3 hours'),
+           (current_date + 1),
+           (current_date + interval '4 hours'),
+           (current_date - 1 + interval '12 hours'),
+           (current_date + interval '5 hours')
+         RETURNING id`,
+      );
+      const ids = accounts.rows.map((row) => Number(row.id));
+      await db.query(
+        `INSERT INTO player_account_facts (
+           realm, account_id, account_created_at, first_character_at, first_play_at
+         ) VALUES
+           ('eastbrook', $1, current_date,
+            current_date + interval '2 hours', current_date + interval '3 hours'),
+           ('eastbrook', $2, current_date + interval '2 hours',
+            current_date + interval '3 hours', current_date + interval '4 hours'),
+           ('eastbrook', $3, current_date + interval '3 hours',
+            current_date + interval '4 hours', NULL),
+           ('eastbrook', $4, current_date - 1 + interval '12 hours',
+            current_date + interval '1 hour', current_date + interval '2 hours'),
+           ('other', $5, current_date + interval '5 hours',
+            current_date + interval '6 hours', current_date + interval '7 hours')`,
+        [ids[0], ids[1], ids[2], ids[5], ids[6]],
+      );
+      await db.query(
+        `INSERT INTO player_activity_daily (
+           realm, day, account_id, sessions, playtime_seconds, max_level
+         ) VALUES
+           ('eastbrook', current_date, $1, 1, 1200, 5),
+           ('eastbrook', current_date, $2, 1, 300, 1),
+           ('eastbrook', current_date, $3, 1, 3600, 10),
+           ('other', current_date, $4, 1, 7200, 20)`,
+        [ids[0], ids[1], ids[5], ids[6]],
+      );
+    } finally {
+      db.release();
+    }
+
+    const snapshot = await playerBusinessSnapshot(scopedPool(), 'eastbrook');
+    const today = snapshot.days.find((day) => day.period === 'today');
+    expect(today).toMatchObject({
+      accountsCreated: 5,
+      firstCharacterAccounts: 4,
+      firstWorldEntryRate: 0.4,
+      activeNew: 3,
+      firstDaySessionsMedian: 1,
+      firstDayPlaytimeAccounts: {
+        lt_10m: 1,
+        '10m_30m': 1,
+        '30m_1h': 0,
+        '1h_3h': 1,
+        gte_3h: 0,
+      },
+      dayOneFunnelAccounts: {
+        created: 5,
+        first_character: 3,
+        entered_world: 2,
+        played_10m: 1,
+        reached_level_2: 1,
+        reached_level_5: 1,
+      },
+    });
+    const funnel = today?.dayOneFunnelAccounts;
+    expect(funnel?.created).toBeGreaterThanOrEqual(funnel?.first_character ?? 0);
+    expect(funnel?.first_character).toBeGreaterThanOrEqual(funnel?.entered_world ?? 0);
+    expect(funnel?.entered_world).toBeGreaterThanOrEqual(funnel?.played_10m ?? 0);
+    expect(funnel?.entered_world).toBeGreaterThanOrEqual(funnel?.reached_level_2 ?? 0);
+    expect(funnel?.reached_level_2).toBeGreaterThanOrEqual(funnel?.reached_level_5 ?? 0);
+    expect(today?.firstDayPlaytimeP90Seconds).toBeGreaterThan(1200);
+  });
+
+  it('assigns exact first-day playtime boundaries to one bucket each', async () => {
+    const db = await scopedClient();
+    try {
+      const accounts = await db.query(
+        `INSERT INTO accounts (created_at)
+         SELECT current_date FROM generate_series(1, 5)
+         RETURNING id`,
+      );
+      const ids = accounts.rows.map((row) => Number(row.id));
+      await db.query(
+        `INSERT INTO player_account_facts (
+           realm, account_id, account_created_at, first_play_at
+         ) VALUES
+           ('eastbrook', $1, current_date, current_date),
+           ('eastbrook', $2, current_date, current_date),
+           ('eastbrook', $3, current_date, current_date),
+           ('eastbrook', $4, current_date, current_date),
+           ('eastbrook', $5, current_date, current_date)`,
+        ids,
+      );
+      await db.query(
+        `INSERT INTO player_activity_daily (
+           realm, day, account_id, sessions, playtime_seconds, max_level
+         ) VALUES
+           ('eastbrook', current_date, $1, 1, 599, 1),
+           ('eastbrook', current_date, $2, 1, 600, 1),
+           ('eastbrook', current_date, $3, 1, 1800, 1),
+           ('eastbrook', current_date, $4, 1, 3600, 1),
+           ('eastbrook', current_date, $5, 1, 10800, 1)`,
+        ids,
+      );
+    } finally {
+      db.release();
+    }
+
+    const snapshot = await playerBusinessSnapshot(scopedPool(), 'eastbrook');
+    const today = snapshot.days.find((day) => day.period === 'today');
+    expect(today).toMatchObject({
+      activeNew: 5,
+      firstDayPlaytimeAccounts: {
+        lt_10m: 1,
+        '10m_30m': 1,
+        '30m_1h': 1,
+        '1h_3h': 1,
+        gte_3h: 1,
+      },
+    });
   });
 
   it('keeps live and completed retention cohorts separate', async () => {

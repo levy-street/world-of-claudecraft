@@ -15,6 +15,8 @@
 // The functions mirror the service SDK v1 surface; they do NOT recompute any
 // value, they only pass through what the service returns.
 
+import { DESKTOP_WALLET_HANDOFF_TTL_MS, desktopWalletHandoffs } from './desktop_wallet_handoff';
+
 const SERVICE_TIMEOUT_MS = 5000;
 const NATIVE_CONFIRM_TIMEOUT_MS = 60_000;
 
@@ -496,6 +498,36 @@ export async function claudiumNativeQuote(input: {
       reason: refusalReason ?? 'unavailable',
     };
   }
+  const quoteExpiryMs =
+    typeof data.quoteExpiryMs === 'number'
+      ? data.quoteExpiryMs
+      : Date.now() + DESKTOP_WALLET_HANDOFF_TTL_MS;
+  try {
+    desktopWalletHandoffs.authorizeTransaction(input.accountId, {
+      reference: data.reference,
+      transactionBase64: data.transactionBase64,
+      expectedAddress: input.payer,
+      rail: data.rail ?? input.rail,
+      amountBase: data.amountBase ?? null,
+      destination: data.destination ?? null,
+      expiresAtMs: quoteExpiryMs,
+    });
+  } catch {
+    return {
+      ok: false,
+      reference: null,
+      rail: null,
+      claudium: null,
+      amountBase: null,
+      destination: null,
+      mint: null,
+      memo: null,
+      quoteExpiryMs: null,
+      transactionBase64: null,
+      split: null,
+      reason: 'unavailable',
+    };
+  }
   return {
     ok: true,
     reference: data.reference,
@@ -505,7 +537,7 @@ export async function claudiumNativeQuote(input: {
     destination: data.destination ?? null,
     mint: data.mint ?? null,
     memo: data.memo ?? null,
-    quoteExpiryMs: typeof data.quoteExpiryMs === 'number' ? data.quoteExpiryMs : null,
+    quoteExpiryMs,
     transactionBase64: data.transactionBase64,
     split: data.split ?? null,
     reason: data.reason ?? null,

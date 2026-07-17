@@ -37,6 +37,24 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.armoryTitle': '무기고',
   'hudChrome.wocStore.armoryBody':
     '시즌 1 무기고의 한정 무기 스킨입니다. 계정 전체에 적용되는 순수 장식이며 주변 모든 플레이어에게 보입니다.',
+  'hudChrome.wocStore.wallet.title': 'Solana 지갑',
+  'hudChrome.wocStore.wallet.unlinked':
+    '지갑 앱을 연결한 뒤 한 번 서명하여 공개 주소를 WoC 계정에 연결하세요. 복구 문구나 개인 키는 절대로 전달되지 않습니다.',
+  'hudChrome.wocStore.wallet.connectedUnlinked':
+    '지갑 앱이 이 브라우저에 연결되었지만 공개 주소는 아직 WoC 계정에 연결되지 않았습니다.',
+  'hudChrome.wocStore.wallet.linkedDisconnected':
+    '공개 주소가 연결되어 있습니다. SOL 또는 WOC로 결제할 때 해당 지갑 앱을 다시 연결하세요.',
+  'hudChrome.wocStore.wallet.linkedConnected':
+    '연결된 지갑 앱이 접속되어 SOL 또는 WOC 구매에 사용할 수 있습니다.',
+  'hudChrome.wocStore.wallet.mismatched':
+    '다른 지갑이 접속되어 있습니다. 인증하여 연결된 주소를 바꾸거나 기존에 연결된 지갑을 다시 접속하세요.',
+  'hudChrome.wocStore.wallet.connect': '지갑 연결',
+  'hudChrome.wocStore.wallet.verify': '인증하고 연결',
+  'hudChrome.wocStore.wallet.reconnect': '지갑 다시 연결',
+  'hudChrome.wocStore.wallet.manage': '지갑 관리',
+  'wallet.bagConnect': '지갑 연결',
+  'wallet.bagLink': '지갑 인증',
+  'wallet.bagReconnect': '지갑 다시 연결',
   'hudChrome.wocStore.collectionLine': '{collection} 컬렉션',
   'hudChrome.wocStore.collections.guildmark': '길드마크',
   'hudChrome.wocStore.collections.emberwrought': '엠버로트',
@@ -331,6 +349,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.spinButton': '돌리기',
   'hudChrome.dailyRewards.tasks': '과제',
   'hudChrome.dailyRewards.taskMultiplier': '{multiplier}배 배율',
+  'hudChrome.dailyRewards.oneVsOneExcluded':
+    '1대1 경기에서는 일일 보상 포인트를 획득할 수 없습니다.',
   'hudChrome.dailyRewards.pointsGained': '{points} 일일 보상 포인트를 획득했습니다.',
   'hudChrome.dailyRewards.showChestButton': '보물상자 표시',
   'hudChrome.dailyRewards.hideChestButton': '보물상자 숨기기',
@@ -1056,11 +1076,42 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '보유자 혜택이 활성화되었습니다. 서명이나 지출이 필요할 때 앱을 연결하세요.',
   'wallet.extensionHelp':
     '여기에 지갑이 표시되려면 Solflare Wallet 같은 브라우저 지갑 확장 프로그램이 활성화되어 있어야 합니다.',
+  'wallet.mobileAppHelp':
+    'Phantom 또는 Solflare를 선택하세요. 지갑 앱에서 승인을 요청합니다. 게임을 열어 둔 채 완료 후 돌아오세요.',
+  'wallet.standaloneAppHelp':
+    '홈 화면 앱에서는 아직 지갑 연결을 사용할 수 없습니다. Phantom 또는 Solflare를 사용하려면 Safari나 Chrome에서 World of ClaudeCraft를 여세요.',
+  'wallet.openAppTitle': '{wallet}에서 계속',
+  'wallet.openAppHelp':
+    '{wallet}을 열어 이 요청을 확인하세요. 지갑 앱을 사용하는 동안 이 게임 탭을 열어 두세요.',
+  'wallet.openAppButton': '{wallet} 열기',
+  'wallet.manualReturnBrowserHelp':
+    '승인 후 이 게임 탭으로 돌아오세요. iOS에서 다른 브라우저가 열리면 닫고 원래 브라우저로 직접 돌아오세요.',
+  'wallet.manualReturnStandaloneHelp':
+    '승인 후 홈 화면에서 World of ClaudeCraft로 돌아오세요. iOS에서 브라우저가 열리면 닫고 홈 화면 앱을 다시 여세요.',
+  'wallet.preparingAppButton': '{wallet} 준비 중...',
+  'wallet.walletAppUnavailable': '{wallet}을 준비하지 못했습니다. 이 창을 닫고 다시 시도하세요.',
   'wallet.flowConnect': '지갑을 선택하세요. 인증은 자동으로 계속됩니다.',
   'wallet.flowSign': '지갑 앱에서 인증 메시지에 서명하세요. 트랜잭션이나 SOL은 필요 없습니다.',
   'wallet.flowVerify': '지갑 소유권 인증 중...',
   'wallet.linkFailed': '지갑 인증에 실패했습니다.',
   'wallet.verifyFailed': '지갑 인증에 실패했습니다.',
+  'wallet.browser.eyebrow': '데스크톱 지갑 인증',
+  'wallet.browser.title': 'Solana 지갑 연결',
+  'wallet.browser.linkBody':
+    '이 브라우저에서 지갑 확장 프로그램을 선택하세요. 인증 메시지에 서명한 뒤 데스크톱 앱으로 돌아갑니다.',
+  'wallet.browser.paymentBody': '계정에 연결된 지갑을 선택하고 이 브라우저에서 거래를 승인하세요.',
+  'wallet.browser.extensionHelp':
+    '호환되는 지갑 확장 프로그램을 찾지 못했습니다. Phantom, Solflare 또는 다른 Solana 브라우저 지갑을 설치하거나 잠금 해제한 뒤 다시 시도하세요.',
+  'wallet.browser.safety': 'World of ClaudeCraft는 복구 문구나 개인 키를 요청하지 않습니다.',
+  'wallet.browser.continueWith': '{wallet}(으)로 계속',
+  'wallet.browser.reviewTitle': '지갑에서 검토',
+  'wallet.browser.reviewBody': '{wallet}의 안내를 따르세요. 이 브라우저 페이지를 열어 두세요.',
+  'wallet.browser.completeTitle': '지갑 인증 완료',
+  'wallet.browser.completeBody': 'World of ClaudeCraft 데스크톱 앱으로 돌아갈 수 있습니다.',
+  'wallet.browser.returnButton': '데스크톱 앱으로 돌아가기',
+  'wallet.browser.failed':
+    '지갑 인증에 실패했거나 만료되었습니다. 데스크톱 앱으로 돌아가 다시 시도하세요.',
+  'wallet.browser.retry': '다시 시도',
   'wallet.unlinkFailed': '지갑 연결을 해제하지 못했습니다.',
   'wallet.holder': '$WOC 보유자',
   'wallet.holderTierTitle': '{tier} $WOC 보유자',
@@ -3138,6 +3189,26 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.heroic_quartermaster.title': '영웅 병참장교',
   'entities.npcs.heroic_quartermaster.greeting':
     '영웅 던전의 증표는 하이워치 최고의 반지와 펜던트로 바꿀 수 있소. 징표를 보여 주시오.',
+  'entities.npcs.card_master.name': '카드 마스터',
+  'entities.npcs.card_master.title': '운명의 딜러',
+  'entities.npcs.card_master.greeting':
+    '카드 대결 한 판 어떻소? 삼판양승, 승자에게는 자랑거리가 생기지.',
+  'cardDuel.title': '카드 대결',
+  'cardDuel.close': '닫기',
+  'cardDuel.join': '대기열 참가',
+  'cardDuel.joinAria': '카드 대결 대기열에 참가',
+  'cardDuel.leave': '대기열 나가기',
+  'cardDuel.leaveAria': '카드 대결 대기열에서 나가기',
+  'cardDuel.queued': '상대를 기다리는 중...',
+  'cardDuel.vsOpponent': '{name}와(과) 대결',
+  'cardDuel.round': '라운드 점수: {mine} - {theirs}',
+  'cardDuel.forfeit': '기권',
+  'cardDuel.forfeitAria': '카드 대결 기권하기',
+  'cardDuel.unavailable': '카드 대결을 하려면 다른 플레이어가 온라인 상태여야 합니다.',
+  'cardDuel.counts': '덱: {deck} · 버린 카드: {discard}',
+  'cardDuel.playCardAria': '{value} 카드 내기',
+  'cardDuel.waitingOnOpponent': '상대의 카드를 기다리는 중...',
+  'cardDuel.yourTurn': '카드를 내세요',
   'entities.npcs.loremaster_caddis.name': '현자 캐디스',
   'entities.npcs.loremaster_caddis.title': '현자',
   'entities.npcs.loremaster_caddis.greeting':
@@ -4366,14 +4437,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.deedsPage.intro':
     '업적의 서는 시작의 골짜기를 벗어나는 첫걸음부터 왕국이 내놓을 수 있는 가장 힘든 싸움까지, 당신이 이룬 모든 것을 세계가 기록해 두는 곳입니다. 플레이하며 업적을 얻고, 그것이 주는 칭호를 걸치고, 명성이 오르는 것을 지켜보세요.',
   'guide.deedsPage.renownBody':
-    '명성은 업적의 서 뒤에 있는 점수입니다. 당신이 얻는 모든 업적은 정해진 점수를 지니며, 총점은 오르기만 하므로 한가한 한 주가 있어도 쌓아 온 것을 잃지 않습니다. 일부 업적은 실력이 아니라 운에 달려 있고, 위업은 그 자체로 하나의 영예이므로, 그 둘은 모두 명성을 전혀 주지 않습니다.',
+    '명성은 업적의 서 뒤에 있는 점수입니다. 당신이 얻는 모든 업적은 정해진 점수를 지니며, 총점은 오르기만 하므로 한가한 한 주가 있어도 쌓아 온 것을 잃지 않습니다. 일부 업적은 실력이 아니라 운에 달려 있고, 위업은 그 자체로 하나의 영예이므로, 그 둘은 모두 명성을 전혀 주지 않습니다. 명성이 없는 업적도 업적의 서의 달성 수에는 포함되지만, 점수가 되지는 않습니다.',
   'guide.deedsPage.renownHeading': '명성',
   'guide.deedsPage.rewardBorder': '테두리',
   'guide.deedsPage.rewardsBody':
     '보상은 모두 과시를 위한 것이며, 바로 그것이 핵심입니다. 일부 업적은 걸칠 수 있는 칭호나 이름을 꾸미는 테두리를 주지만, 영웅을 더 강하게 만드는 것은 결코 주지 않습니다. 업적의 서에서 원하는 칭호를 고르면 그것이 당신의 이름표와 채팅, 그리고 순위표에까지 따라붙어 모두의 눈에 보입니다.',
   'guide.deedsPage.rewardsHeading': '칭호와 테두리',
   'guide.deedsPage.standingsNote':
-    '각 왕국은 모든 계정에 걸친 명성의 누계를 기록합니다. 누가 어디에 서 있는지 보려면 게임 내에서 순위표를 열고 명성 탭으로 넘어가세요. 순위는 위키가 아니라 그곳에 있습니다.',
+    '각 왕국은 모든 계정에 걸친 명성의 누계를 기록합니다. 순위표는 계정 전체를 평생 명성으로 순위 매기며, 각 업적은 당신의 모든 캐릭터를 통틀어 한 번만 계산되고, 표시되는 것은 명성뿐입니다. 따라서 명성이 없는 업적은 업적의 서에는 계산되더라도 순위를 움직이지 않습니다. 누가 어디에 서 있는지 보려면 게임 내에서 순위표를 열고 명성 탭으로 넘어가세요. 순위는 위키가 아니라 그곳에 있습니다.',
   'guide.delvesPage.affixesBody':
     '더 어려운 탐굴에서는 진행 방식을 바꾸는 고난 요소가 하나 붙습니다. 잠들지 못한 죽은 자부터 탁한 공기, 무너져 가는 천장까지 그 종류는 다양합니다. 고난 요소는 위험과 보상을 함께 끌어올립니다. 각 탐굴은 저마다의 주제에 어울리는 고난 요소만 뽑아 쓰며, 왕국 전체로 보면 그 목록은 다음과 같습니다:',
   'guide.delvesPage.affixesHeading': '고난 요소',
@@ -5856,7 +5927,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.greyjaw_stalker.name': '그레이죠 추적자의 장비',
   'entities.itemSets.greyjaw_stalker.bonus3': '공격 속도와 시전 속도가 15% 증가합니다.',
   'entities.itemSets.necromancers.name': '비탄직물 의복',
-  'entities.itemSets.necromancers.bonus2': '넉백되지 않습니다 (넉백 저항 100%).',
+  'entities.itemSets.necromancers.bonus2':
+    '주문력이 20 증가합니다. 피해를 입어도 주문 시전이 지연되지 않습니다 (시전 지연 저항 100%).',
   'entities.itemSets.necromancers.bonus3': '지능이 10, 체력이 10만큼 증가합니다.',
   'entities.itemSets.necromancers.bonus4':
     '주문 사용 시 10% 확률로 "선명한 시전"이 발동하여 다음 주문을 무료로 시전합니다.',
@@ -5867,13 +5939,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.nighttalon.bonus4':
     '무기 치명타 적중 시 "찢어진 상처"를 내어 대상이 12초 동안 2초마다 6의 출혈 피해를 입습니다. 최대 3번 중첩됩니다.',
   'entities.itemSets.soulflame.name': '망령불꽃 의복',
-  'entities.itemSets.soulflame.bonus2': '넉백되지 않습니다 (넉백 저항 100%).',
+  'entities.itemSets.soulflame.bonus2':
+    '주문력이 20 증가합니다. 피해를 입어도 주문 시전이 지연되지 않습니다 (시전 지연 저항 100%).',
   'entities.itemSets.soulflame.bonus3':
     '지능이 15, 정신력이 15만큼 증가하고 공격 속도와 시전 속도가 15% 증가합니다.',
   'entities.itemSets.soulflame.bonus4':
     '주문 사용 시 10% 확률로 "영혼의 불길"이 발동하여 주문력이 40만큼 증가합니다. 10초 동안 지속됩니다.',
   'entities.itemSets.stormcallers.name': '강풍부름 의복',
-  'entities.itemSets.stormcallers.bonus2': '넉백되지 않습니다 (넉백 저항 100%).',
+  'entities.itemSets.stormcallers.bonus2':
+    '주문력이 20 증가합니다. 피해를 입어도 주문 시전이 지연되지 않습니다 (시전 지연 저항 100%).',
   'entities.itemSets.stormcallers.bonus3':
     '지능이 15, 정신력이 15만큼 증가하고 공격 속도와 시전 속도가 15% 증가합니다.',
   'entities.itemSets.stormcallers.bonus4':
@@ -6076,6 +6150,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.reload': '다시 불러오기',
   'desktop.crash.quit': '종료',
   'desktop.crash.fatalBody': 'World of ClaudeCraft에 예기치 않은 오류가 발생하여 종료해야 합니다.',
+  'gpuNotice.bodyDesktop':
+    '게임이 GPU 가속 없이 실행되고 있어 매우 느립니다. 그래픽 드라이버를 업데이트한 뒤 게임을 다시 시작하세요. Windows에서는 설정 > 시스템 > 디스플레이 > 그래픽에서 이 게임을 "고성능"으로 설정하세요.',
+  'gpuNotice.bodyWeb':
+    '게임이 GPU 가속 없이 실행되고 있어 매우 느립니다. 브라우저 설정에서 하드웨어 가속을 켜고 그래픽 드라이버를 업데이트한 뒤 브라우저를 다시 시작하세요.',
+  'gpuNotice.dismiss': '닫기',
   'editor.appTitle': '맵 편집기',
   'editor.docTitle': '맵 편집기 - World of ClaudeCraft',
   'editor.untitledMap': '제목 없는 맵',
@@ -6633,6 +6712,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.body.unsupported_media_type': '지원되지 않는 요청 형식입니다.',
   'apiError.deeds.invalid_input': '입력이 올바르지 않습니다.',
   'apiError.steam.disabled': '현재 Steam 연동을 사용할 수 없습니다.',
+  'apiError.wallet.handoff_invalid':
+    '지갑 인증이 만료되었거나 확인할 수 없습니다. 다시 시도해 주세요.',
   'apiError.steam.invalid_ticket':
     'Steam이 이 연동 요청을 확인하지 못했습니다. 데스크톱 앱에서 다시 시도해 주세요.',
   'apiError.steam.banned': '해당 Steam 계정은 연동할 수 없습니다.',
@@ -7345,9 +7426,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.charTitleNone': '선택한 칭호 없음',
   'hudChrome.deeds.charOpenBook': '업적의 서',
   'hudChrome.deeds.lbTab': '명성',
-  'hudChrome.deeds.lbDeedsCol': '업적',
   'hudChrome.deeds.lbTitleCol': '칭호',
-  'hudChrome.deeds.lbSelf': '내 순위: {rank}위, 상위 {percent}%',
+  'hudChrome.deeds.lbScopeNote':
+    '계정의 평생 명성으로 순위를 매깁니다. 각 업적은 계정의 모든 캐릭터를 통틀어 한 번만 계산됩니다.',
+  'hudChrome.deeds.lbSelfAccount': '내 계정: {rank}위, 상위 {percent}%, 명성 {renown}',
+  'hudChrome.deeds.lbSelfRank': '내 계정: {rank}위, 상위 {percent}%',
   'hudChrome.deeds.lbEmpty': '아직 순위에 오른 연대기 작가가 없습니다.',
   'hudChrome.deeds.broadcastsLabel': '업적 달성을 길드와 친구에게 공유',
   'guide.deedsPage.catHeading': '{label} ({count})',

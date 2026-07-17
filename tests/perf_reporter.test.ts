@@ -546,3 +546,29 @@ describe('perf reporter payload', () => {
     ).toBe(false);
   });
 });
+
+describe('gpuBucket software classification', () => {
+  const { gpuBucket } = perfReporterInternalsForTest;
+
+  it('buckets WARP and other software rasterizers as software (WARP was missed before)', () => {
+    // WARP: the Windows D3D11 software fallback Chromium 141 switched to after removing SwiftShader.
+    expect(
+      gpuBucket('ANGLE (Microsoft, Microsoft Basic Render Driver Direct3D11 vs_5_0 ps_5_0)'),
+    ).toBe('software');
+    expect(gpuBucket('Google SwiftShader')).toBe('software');
+    expect(gpuBucket('Mesa/X.org llvmpipe (LLVM 15.0.6, 256 bits)')).toBe('software');
+  });
+
+  it('keeps real GPUs in their own hardware buckets', () => {
+    expect(
+      gpuBucket(
+        'ANGLE (NVIDIA, NVIDIA GeForce RTX 3090 (0x00002204) Direct3D11 vs_5_0 ps_5_0, D3D11)',
+      ),
+    ).toBe('nvidia');
+    expect(
+      gpuBucket(
+        'ANGLE (Intel, Intel(R) UHD Graphics 620 (0x00003EA0) Direct3D11 vs_5_0 ps_5_0, D3D11)',
+      ),
+    ).toBe('intel-uhd');
+  });
+});

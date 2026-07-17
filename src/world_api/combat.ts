@@ -1,4 +1,5 @@
 import type { ResolvedAbility } from '../sim/sim';
+import type { WorldInteractionOutcome } from './interaction';
 
 export interface IWorldCombat {
   known: ResolvedAbility[];
@@ -19,5 +20,5 @@ export interface IWorldCombat {
   // resurrectAtSpiritHealer revives at the angel with Resurrection Sickness.
   releaseSpirit(): void;
   resurrectAtCorpse(): void;
-  resurrectAtSpiritHealer(): void;
+  resurrectAtSpiritHealer(): WorldInteractionOutcome;
 }

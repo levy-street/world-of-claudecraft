@@ -88,6 +88,16 @@ contextBridge.exposeInMainWorld('wocDesktop', {
     ipcRenderer.on('desktop-login-code', listener);
     return () => ipcRenderer.removeListener('desktop-login-code', listener);
   },
+  openWalletBrowser: (code) => ipcRenderer.invoke('desktop-wallet-open-browser', code),
+  takeWalletHandoffCode: () => ipcRenderer.invoke('desktop-wallet-take-code'),
+  onWalletHandoffCode: (callback) => {
+    if (typeof callback !== 'function') return () => {};
+    const listener = (_event, code) => {
+      if (typeof code === 'string') callback(code);
+    };
+    ipcRenderer.on('desktop-wallet-handoff-code', listener);
+    return () => ipcRenderer.removeListener('desktop-wallet-handoff-code', listener);
+  },
   // Push the renderer's t()-rendered shell strings (crash dialog text) to the
   // main process, which has no i18n runtime of its own. Fire-and-forget.
   setShellStrings: (strings) => {
@@ -107,6 +117,7 @@ contextBridge.exposeInMainWorld('wocDesktop', {
   // website builds): the renderer hides the Link button instead of offering
   // a click whose ticket can never exist.
   steamLinkSupported: () => ipcRenderer.invoke('desktop-steam-capability'),
+  walletConnectionSupported: () => ipcRenderer.invoke('desktop-wallet-capability'),
   // Signal that a link attempt has settled (the server verify resolved or
   // rejected) so the shell can cancel the Steam auth ticket (Valve's
   // CancelAuthTicket contract). Fire-and-forget; the main handler is idempotent.

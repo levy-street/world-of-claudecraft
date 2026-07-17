@@ -12,6 +12,7 @@ import {
   gfxInternalsForTest,
   graphicsPresetLabel,
   isConstrainedBrowser,
+  isSoftwareGL,
   isWeakIntegratedGpu,
   resolveDefaultGraphicsPreset,
   shouldUseAutoGovernor,
@@ -241,6 +242,13 @@ describe('graphics tier resolution', () => {
     expect(classifyGpuRenderer('Google SwiftShader')).toBe('software');
     expect(classifyGpuRenderer('Mesa llvmpipe (LLVM 15.0.7, 256 bits)')).toBe('software');
     expect(classifyGpuRenderer('Apple Software Renderer')).toBe('software');
+    // WARP, the Windows D3D11 software fallback Chromium 141 switched to after removing the
+    // SwiftShader WebGL path: caught via its "Microsoft Basic Render" tokens, not a bare "warp".
+    expect(
+      classifyGpuRenderer(
+        'ANGLE (Microsoft, Microsoft Basic Render Driver Direct3D11 vs_5_0 ps_5_0)',
+      ),
+    ).toBe('software');
     // the codebase's named weak-integrated parts stay weak (checked before mid-integrated)
     expect(classifyGpuRenderer('ANGLE (Intel, Intel(R) Iris(TM) Plus Graphics 655)')).toBe('weak');
     expect(classifyGpuRenderer('Adreno (TM) 330')).toBe('weak');
@@ -268,6 +276,26 @@ describe('graphics tier resolution', () => {
     expect(classifyGpuRenderer('Apple GPU')).toBe('unknown');
     expect(classifyGpuRenderer(undefined)).toBe('unknown');
     expect(classifyGpuRenderer('')).toBe('unknown');
+  });
+
+  it('isSoftwareGL reads the live GL context and flags WARP + SwiftShader, not a real GPU', () => {
+    const fakeRenderer = (rendererString: string): THREE.WebGLRenderer => {
+      const getParameter = vi.fn(() => rendererString);
+      const getExtension = vi.fn((name: string) =>
+        name === 'WEBGL_debug_renderer_info' ? { UNMASKED_RENDERER_WEBGL: 0x9246 } : null,
+      );
+      const gl = { getExtension, getParameter };
+      return { getContext: () => gl } as unknown as THREE.WebGLRenderer;
+    };
+    // WARP is now caught here too (the narrow /swiftshader|llvmpipe|software/ used to miss it).
+    expect(
+      isSoftwareGL(
+        fakeRenderer('ANGLE (Microsoft, Microsoft Basic Render Driver Direct3D11 vs_5_0 ps_5_0)'),
+      ),
+    ).toBe(true);
+    expect(isSoftwareGL(fakeRenderer('Google SwiftShader'))).toBe(true);
+    expect(isSoftwareGL(fakeRenderer('Mesa/X.org llvmpipe (LLVM 15.0.6, 256 bits)'))).toBe(true);
+    expect(isSoftwareGL(fakeRenderer('ANGLE (NVIDIA, NVIDIA GeForce RTX 4080)'))).toBe(false);
   });
 
   describe('resolveDefaultGraphicsPreset: device-aware first-run default (medium fallback)', () => {

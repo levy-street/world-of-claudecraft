@@ -48,8 +48,10 @@ bundled into the game client or server. Root `CLAUDE.md` and
   Recheck the original source codec and bitrate at render time so legacy drafts
   cannot bypass the lossy floor. Require a conformed public MP3 before publish.
 - Cross-clip mix gain has two additive dB layers: the category baseline and the
-  per-key fine tune. Their resolved sum must stay at or below 0 dB so runtime
-  playback cannot defeat peak QA.
+  per-key fine tune. Their resolved sum must stay at or below the key's ceiling
+  (0 dB for every key by default; a `custom: true` key may have its own higher
+  computed ceiling, see `scripts/sfx/sfx_gain_ceiling.mjs` and `SFX_GAIN_LIMITS`
+  in the generated manifest) so runtime playback cannot defeat peak QA.
 - Keep studio-only waveform, prompt, analysis, and history data out of the game
   bundle. Trim, slices, fades, seam construction, reverse, EQ, dynamics,
   loudness, and encoding stay baked in the published asset. Category baseline

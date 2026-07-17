@@ -100,6 +100,7 @@ const KNOWN_CODES = [
   'steam.already_linked',
   'steam.account_taken',
   'steam.upstream',
+  'wallet.handoff_invalid',
   'welcome.invalid_input',
 ];
 

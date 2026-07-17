@@ -776,10 +776,10 @@ export class DailyRewardService {
       completedAt?: Date;
     },
   ): Promise<number> {
-    // Protect Yumi (yumi3/yumi5) is an unranked objective mode: its bouts do
-    // not count toward the arena daily-reward task (maintainer decision;
-    // fiesta keeps its historical counting behavior).
-    if (result.format === 'yumi3' || result.format === 'yumi5') return 0;
+    // One-player teams are too easy to coordinate for daily-reward scoring.
+    // Protect Yumi (yumi3/yumi5) is also an unranked objective mode. Fiesta
+    // keeps its historical counting behavior.
+    if (result.format === '1v1' || result.format === 'yumi3' || result.format === 'yumi5') return 0;
     const completedAt = result.completedAt ?? new Date();
     const { day, config } = await dailyRewardClock(completedAt);
     await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
@@ -932,6 +932,7 @@ export class DailyRewardService {
       completedAt: Date;
     },
   ): Promise<number> {
+    if (result.bracket === 1) return 0;
     if (!result.won) return 0;
     if (result.rated === false && result.hasBots !== true && result.practice !== true) return 0;
     const completedAt = result.completedAt;

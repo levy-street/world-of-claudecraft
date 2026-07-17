@@ -1,3 +1,5 @@
+import { isSoftwareRendererName } from '../render/software_renderer';
+
 export type PerfSuggestionSeverity = 'info' | 'warning' | 'critical';
 
 export interface PerfSuggestion {
@@ -45,15 +47,13 @@ function lowGraphicsHref(search: string): string {
   return `${path}${qs ? `?${qs}` : ''}${hash}`;
 }
 
-function isSoftwareRenderer(glRenderer: string): boolean {
-  return /swiftshader|llvmpipe|software/i.test(glRenderer);
-}
-
 function isBadFrameWindow(s: PerfDoctorSnapshot): boolean {
   const w = s.windows.last10s;
   return w.frames !== 0 && (w.fps < 45 || w.frameMs.p95 >= 28 || w.frameMs.long50 >= 3);
 }
 
+// This module is currently a dev-only diagnostics LIBRARY with no live importer (only its test
+// drives it), so its suggestion strings stay English by design rather than going through t().
 export function analyzePerfSuggestions(
   s: PerfDoctorSnapshot,
   search = typeof location !== 'undefined' ? location.search : '',
@@ -62,12 +62,12 @@ export function analyzePerfSuggestions(
   const badFrames = isBadFrameWindow(s);
   const renderer = s.renderer;
 
-  if (renderer && isSoftwareRenderer(renderer.glRenderer)) {
+  if (renderer && isSoftwareRendererName(renderer.glRenderer)) {
     out.push({
       id: 'hardware-acceleration',
       severity: 'critical',
-      title: 'Browser is using software rendering',
-      body: 'The game is not using the real GPU. Enable hardware acceleration in your browser settings, then fully restart the browser.',
+      title: 'Software rendering (no real GPU)',
+      body: 'The game is not running on a real GPU. Update your graphics drivers. On Windows, set the game to High performance under Settings > System > Display > Graphics; in a browser, enable hardware acceleration and restart it.',
     });
   }
 

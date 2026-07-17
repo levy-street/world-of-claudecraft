@@ -10,10 +10,15 @@
 //   until earned; once earned it renders with an earned-only badge.
 // - Hidden deeds carry category 'hidden' and no home-category data, so they
 //   surface in the Feats display bucket (their authoring home); unlike feats
-//   they bear Renown and count toward completion once earned.
+//   they count toward completion once earned (and MAY bear Renown; the two
+//   luck-based ones carry none).
 // - Feats always render, marked, and never count toward completion or appear
 //   in the nearest list.
+// - The header's earned/total pair follows the shared completion predicate
+//   (src/sim/deeds_completion.ts), the one definition of "deeds completed"
+//   every surface consumes; the Renown leaderboard displays no deed count.
 
+import { countsTowardCompletion } from '../sim/deeds_completion';
 import type { DeedDef, DeedStats, DeedTrigger } from '../sim/types';
 import type { DeedsRarity } from '../world_api';
 import { DEED_IMAGE_IDS } from './deed_image_ids';
@@ -251,7 +256,9 @@ export function buildDeedsView(input: DeedsViewInput): DeedsViewModel {
       bucketCounts.visible++;
       if (earned) bucketCounts.earned++;
     }
-    if (!feat) {
+    // The shared completion predicate; at this point hidden-unearned already
+    // skipped above, so this is the feat exclusion arm.
+    if (countsTowardCompletion(def, earned)) {
       visibleTotal++;
       if (earned) earnedCount++;
     }

@@ -86,6 +86,7 @@ export const hudChromeStrings = {
     spinButton: 'Spin',
     tasks: 'Tasks',
     taskMultiplier: 'x{multiplier} multiplier',
+    oneVsOneExcluded: '1v1 matches do not grant daily reward points.',
     pointsGained: '{points} daily rewards points gained.',
     showChestButton: 'Show Chest',
     hideChestButton: 'Hide Chest',
@@ -141,6 +142,22 @@ export const hudChromeStrings = {
     armoryTitle: 'The Armory',
     armoryBody:
       'Limited weapon skins from the Season 1 Armory. Account-wide, purely cosmetic, and shown to everyone around you.',
+    wallet: {
+      title: 'Solana wallet',
+      unlinked:
+        'Connect a wallet app, then sign once to link its public address to your WoC account. We never receive your recovery phrase or private key.',
+      connectedUnlinked:
+        'The wallet app is connected to this browser, but its public address is not linked to your WoC account yet.',
+      linkedDisconnected:
+        'Your public address is linked. Reconnect that wallet app when you want to pay with SOL or WOC.',
+      linkedConnected: 'Your linked wallet app is connected and ready for SOL or WOC purchases.',
+      mismatched:
+        'A different wallet is connected. Verify it to replace the linked address, or reconnect the linked wallet.',
+      connect: 'Connect wallet',
+      verify: 'Verify and link',
+      reconnect: 'Reconnect wallet',
+      manage: 'Manage wallet',
+    },
     collectionLine: '{collection} Collection',
     collections: armoryCollectionStrings,
     skins: armorySkinStrings,
@@ -2298,12 +2315,17 @@ export const hudChromeStrings = {
     charOpenBook: 'Book of Deeds',
     // The Renown tab of the high-score window: tab label, the deeds-board
     // column headers (rank/name reuse the shared game.leaderboard.* headers,
-    // the Renown column reuses renownLabel above), the viewer's standing
-    // line, and the empty-board state.
+    // the Renown column reuses renownLabel above), the visible account-scope
+    // note, the viewer's standing line (the Renown-carrying arm for a current
+    // server, the rank-only arm when an older server omits self.renown), and
+    // the empty-board state. Renown is the ONE ranked number on the board:
+    // there is deliberately no deed-count column (issue #2044).
     lbTab: 'Renown',
-    lbDeedsCol: 'Deeds',
     lbTitleCol: 'Title',
-    lbSelf: 'Your standing: rank {rank}, top {percent} percent',
+    lbScopeNote:
+      'Accounts ranked by lifetime Renown. Each deed counts once across all characters on an account.',
+    lbSelfAccount: 'Your account: rank {rank}, top {percent} percent, {renown} Renown',
+    lbSelfRank: 'Your account: rank {rank}, top {percent} percent',
     lbEmpty: 'No ranked chroniclers yet.',
     // The options-window account row (accounts.deed_broadcasts): whether a
     // marquee unlock is shared with guildmates and followers.

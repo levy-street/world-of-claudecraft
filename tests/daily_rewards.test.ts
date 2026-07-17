@@ -36,7 +36,7 @@ import {
   resetDailyRewardPriceCacheForTests,
   rewardDayForDate,
 } from '../server/daily_rewards';
-import { buildDailyRewardsView } from '../src/ui/daily_rewards_view';
+import { buildDailyRewardsView, dailyRewardTaskDescription } from '../src/ui/daily_rewards_view';
 
 class FakeDailyRewardDb implements DailyRewardDb {
   banReason: string | null = null;
@@ -587,29 +587,39 @@ describe('daily rewards', () => {
         new Date(`2026-06-30T12:${String(minute).padStart(2, '0')}:00.000Z`),
       );
     }
-    await service.recordArenaResult(1, {
+    const excluded = await service.recordArenaResult(1, {
       won: true,
       format: '1v1',
       ratingBefore: 1500,
       ratingAfter: 1516,
       completedAt: new Date('2026-06-30T13:00:00.000Z'),
     });
+    expect(excluded).toBe(0);
+    expect(db.events.filter((event) => event.kind === 'task')).toHaveLength(0);
+
+    await service.recordArenaResult(1, {
+      won: true,
+      format: '2v2',
+      ratingBefore: 1500,
+      ratingAfter: 1516,
+      completedAt: new Date('2026-06-30T13:01:00.000Z'),
+    });
     await service.recordArenaResult(1, {
       won: false,
-      format: '1v1',
+      format: '2v2',
       ratingBefore: 1516,
       ratingAfter: 1500,
-      completedAt: new Date('2026-06-30T13:01:00.000Z'),
+      completedAt: new Date('2026-06-30T13:02:00.000Z'),
     });
     const taskEvents = db.events.filter((event) => event.kind === 'task');
     expect(taskEvents).toHaveLength(2);
     expect(taskEvents[0]).toMatchObject({
       points: 60,
-      meta: { format: '1v1', won: true, onlineMinutes: 60, multiplier: 3, basePoints: 20 },
+      meta: { format: '2v2', won: true, onlineMinutes: 60, multiplier: 3, basePoints: 20 },
     });
     expect(taskEvents[1]).toMatchObject({
       points: 30,
-      meta: { format: '1v1', won: false, onlineMinutes: 60, multiplier: 3, basePoints: 10 },
+      meta: { format: '2v2', won: false, onlineMinutes: 60, multiplier: 3, basePoints: 10 },
     });
     expect(db.score).toBe(90);
   });
@@ -718,19 +728,28 @@ describe('daily rewards', () => {
       matchId: 42,
       completedAt: new Date('2026-06-30T13:01:00.000Z'),
     });
+    expect(db.events.filter((event) => event.kind === 'task')).toHaveLength(0);
+    expect(db.score).toBe(0);
+
+    await service.recordValeCupResult(1, {
+      won: true,
+      bracket: 2,
+      matchId: 45,
+      completedAt: new Date('2026-06-30T13:01:30.000Z'),
+    });
 
     const taskEvents = db.events.filter((event) => event.kind === 'task');
     expect(taskEvents).toHaveLength(1);
     expect(taskEvents[0]).toMatchObject({
       points: 75,
-      key: 'task:vale_cup_ranked_wins:vale_cup:42:win:2026-06-30T13:01:00.000Z',
+      key: 'task:vale_cup_ranked_wins:vale_cup:45:win:2026-06-30T13:01:30.000Z',
       meta: {
         taskId: 'vale_cup_ranked_wins',
         taskType: 'vale_cup_result',
-        bracket: 1,
-        matchId: 42,
+        bracket: 2,
+        matchId: 45,
         completionId: null,
-        completedAt: '2026-06-30T13:01:00.000Z',
+        completedAt: '2026-06-30T13:01:30.000Z',
         won: true,
         matchType: 'ranked',
         rated: true,
@@ -744,7 +763,7 @@ describe('daily rewards', () => {
 
     await service.recordValeCupResult(1, {
       won: true,
-      bracket: 1,
+      bracket: 2,
       matchId: 43,
       rated: false,
       hasBots: true,
@@ -758,7 +777,7 @@ describe('daily rewards', () => {
       meta: {
         taskId: 'vale_cup_ranked_wins',
         taskType: 'vale_cup_result',
-        bracket: 1,
+        bracket: 2,
         matchId: 43,
         completionId: null,
         completedAt: '2026-06-30T13:02:00.000Z',
@@ -776,7 +795,7 @@ describe('daily rewards', () => {
 
     await service.recordValeCupResult(1, {
       won: true,
-      bracket: 1,
+      bracket: 2,
       matchId: 44,
       rated: false,
       hasBots: true,
@@ -791,7 +810,7 @@ describe('daily rewards', () => {
       meta: {
         taskId: 'vale_cup_ranked_wins',
         taskType: 'vale_cup_result',
-        bracket: 1,
+        bracket: 2,
         matchId: 44,
         completionId: null,
         completedAt: '2026-06-30T13:03:00.000Z',
@@ -844,14 +863,14 @@ describe('daily rewards', () => {
       const completedAt = new Date('2026-06-30T20:59:00.000Z');
       const beforeRestartResult = {
         won: true,
-        bracket: 1,
+        bracket: 2,
         matchId: 7,
         completionId: 'before-restart-match-7',
         completedAt,
       };
       const afterRestartResult = {
         won: true,
-        bracket: 1,
+        bracket: 2,
         matchId: 7,
         completionId: 'after-restart-match-7',
         completedAt,
@@ -901,7 +920,7 @@ describe('daily rewards', () => {
         },
       ],
     });
-    const result = { won: true, bracket: 1, matchId: 7 };
+    const result = { won: true, bracket: 2, matchId: 7 };
     const firstCompletedAt = new Date('2026-06-30T13:20:00.000Z');
     const secondCompletedAt = new Date('2026-06-30T13:21:00.000Z');
 
@@ -1273,5 +1292,21 @@ describe('daily rewards', () => {
       },
     });
     expect(view).toMatchObject({ kind: 'ready', locked: true, lockReason: 'under_minimum' });
+  });
+
+  it('marks Arena and Vale Cup task descriptions with the 1v1 restriction', () => {
+    const restriction = '1v1 matches do not grant daily reward points.';
+    expect(dailyRewardTaskDescription('arena_result', 'Complete arena matches.', restriction)).toBe(
+      `Complete arena matches. ${restriction}`,
+    );
+    expect(
+      dailyRewardTaskDescription('vale_cup_result', 'Win Vale Cup matches.', restriction),
+    ).toBe(`Win Vale Cup matches. ${restriction}`);
+    expect(dailyRewardTaskDescription('quest_completion', 'Complete quests.', restriction)).toBe(
+      'Complete quests.',
+    );
+    expect(dailyRewardTaskDescription('delve_clear', 'Complete delves.', restriction)).toBe(
+      'Complete delves.',
+    );
   });
 });
