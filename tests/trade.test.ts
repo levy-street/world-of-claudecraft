@@ -396,6 +396,45 @@ describe('trade module (direct, no Sim)', () => {
     );
   });
 
+  it('rejects an over-capacity instanced grant even when the giver also holds fungible stock of that item', () => {
+    // The narrow hole the instance-aware fitsAfterSwap branch closes: the giver
+    // offers a single instanced copy of an itemId of which they ALSO hold a
+    // plain fungible stack. countFungibleItem(itemId, giver) is then >= 1, so the
+    // old `count - countFungibleItem` split classified the offered instance row
+    // as fungible (instancedCount 0) and modelled it merging into the receiver's
+    // partial plain stack (0 new slots). Delivery still runs giveOffer ->
+    // addItemInstance, which always takes a fresh slot, so the receiver would end
+    // up one slot over capacity. Branching on the row's own `.instance` keeps the
+    // pre-check honest: an offered instance row is always one fresh slot.
+    const instance = { signer: 'Borin' };
+    const giverInv = [
+      { itemId: 'wolf_fang', count: 5 }, // plain fungible stock of the SAME itemId
+      { itemId: 'wolf_fang', count: 1, instance }, // the instanced copy being offered
+    ];
+    const receiverInv = [
+      { itemId: 'wolf_fang', count: 1 }, // partial plain stack (room to stack, not a free slot)
+      ...Array.from({ length: 15 }, (_, i) => ({ itemId: `filler_${i}`, count: 1 })),
+    ];
+    const { ctx, players, events } = makeInstancedTradeCtx(giverInv, receiverInv);
+    expect(players.get(2).inventory).toHaveLength(16);
+
+    tradeMod.tradeRequest(ctx, 2, 1);
+    tradeMod.tradeAccept(ctx, 2);
+    // Offer only the instanced copy (explicit count-1 instance row, F1/F1a); the
+    // giver keeps their plain stock.
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'wolf_fang', count: 1, instance }], 0, 0, '0', 1);
+    tradeMod.tradeConfirm(ctx, 1);
+    tradeMod.tradeConfirm(ctx, 2);
+
+    // Rejected: the receiver must not silently overflow to 17 slots, and nothing moves.
+    expect(players.get(2).inventory).toHaveLength(16);
+    expect(players.get(2).inventory.some((s: any) => s.instance)).toBe(false);
+    expect(players.get(1).inventory).toHaveLength(2);
+    expect(events.some((e) => e.type === 'error' && /not enough bag space/.test(e.text))).toBe(
+      true,
+    );
+  });
+
   it('carries a mixed offer of the giver’s plain and instanced copies in one transfer', () => {
     // Covers the untested arm: a plain row and an explicit instance row for the
     // SAME itemId travel together in one tradeSetOffer call (instance-aware

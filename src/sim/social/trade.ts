@@ -368,7 +368,10 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
   // stock for that item is (partly) instanced copies, letting a receiver end
   // up over capacity. Mirror removePreferFungible's own split here: only the
   // giver's fungible stock can stack on arrival; the rest needs one free slot
-  // each, exactly like the real transfer.
+  // each, exactly like the real transfer. An offered row that itself carries an
+  // `.instance` is delivered by giveOffer via addItemInstance no matter what
+  // else the giver holds, so it always counts as one fresh slot regardless of
+  // the giver's fungible stock of the same itemId.
   const fitsAfterSwap = (
     meta: PlayerMeta,
     giverPid: number,
@@ -379,7 +382,9 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
     for (const s of gives) removeStacked(scratch, s.itemId, s.count);
     const capacity = bagCapacity(meta.bags);
     for (const s of receives) {
-      const instancedCount = Math.max(0, s.count - ctx.countFungibleItem(s.itemId, giverPid));
+      const instancedCount = s.instance
+        ? 1
+        : Math.max(0, s.count - ctx.countFungibleItem(s.itemId, giverPid));
       const plainCount = s.count - instancedCount;
       if (plainCount > 0) {
         if (countFit(scratch, capacity, s.itemId, plainCount) < plainCount) return false;
