@@ -123,10 +123,16 @@ export type ProcTrigger =
 export type ProcResponse =
   | {
       kind: 'empowerNext';
-      aura: 'next_cast_free' | 'next_execute_free' | 'next_cast_instant' | 'next_cast_cheap';
+      aura:
+        | 'next_cast_free'
+        | 'next_execute_free'
+        | 'next_cast_instant'
+        | 'next_cast_cheap'
+        | 'next_ability_damage';
       abilities?: string[];
       duration: number;
       costPct?: number;
+      dmgPct?: number;
     }
   | { kind: 'cooldownRefund'; ability: string; seconds: number | 'reset' }
   | ({ kind: 'resource'; resourceType?: ResourceType } & (

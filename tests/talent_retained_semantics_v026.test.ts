@@ -91,10 +91,23 @@ function effect<T extends AbilityEffect['type']>(
 }
 
 describe('retained v0.26 all-class Talents V2 semantics', () => {
-  it('resolves the final Swift Verdicts, Sniper Training, Tempest Reprise, and content values', () => {
-    const verdict = resolved('paladin', 'judgement', { 14: 'pal_r14_swift_verdicts' });
-    expect(verdict.cost).toBe(24);
-    expect(effect(verdict, 'judgement')).toMatchObject({ dmgMult: 1.25 });
+  it("resolves the final Oath's Due, Sniper Training, Tempest Reprise, and content values", () => {
+    const oathsDue = ROW_TREES.paladin
+      .flatMap((row) => row.options)
+      .find((option) => option.id === 'pal_r14_swift_verdicts');
+    expect(oathsDue?.effect.proc).toMatchObject({
+      spec: 'retribution',
+      trigger: { on: 'castNth', n: 1, abilities: ['judgement'] },
+      responses: [
+        {
+          kind: 'empowerNext',
+          aura: 'next_ability_damage',
+          abilities: ['crusader_strike'],
+          duration: 7,
+          dmgPct: 0.5,
+        },
+      ],
+    });
 
     const aimed = resolved('hunter', 'aimed_shot', { 14: 'hun_r14_sniper_training' });
     expect(aimed.castTime).toBeCloseTo(2.1);

@@ -118,3 +118,7 @@ export function consumeNextCastCheap(
 export function consumeNextAttackCrit(ctx: SimContext, e: Entity): boolean {
   return consumeAuraKind(ctx, e, 'next_attack_crit') !== null;
 }
+
+export function consumeNextAbilityDamage(ctx: SimContext, e: Entity, abilityId: string): number {
+  return consumeAuraKind(ctx, e, 'next_ability_damage', abilityId)?.value ?? 0;
+}

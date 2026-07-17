@@ -240,7 +240,7 @@ and remain unchanged.
 | Spec | New mastery fields |
 |---|---|
 | paladin/protection | global: threatPct 0.5; stats: armorPct 0.2 |
-| paladin/retribution | global: meleeDmgPct 0.2, spellDmgPct 0.2 |
+| paladin/retribution | global: meleeDmgPct 0.2, spellDmgPct 0.2; Blood Debt proc from landed melee attacks |
 | hunter/marksmanship | global: meleeDmgPct 0.2; stats: crit 0.03 |
 | hunter/survival | global: meleeDmgPct 0.15; stats: agiPct 0.15 |
 | mage/arcane | global: spellDmgPct 0.15, spellHastePct 0.1 |
@@ -248,7 +248,7 @@ and remain unchanged.
 | rogue/subtlety | global: critDmgPct 0.4; stats: agiPct 0.1 |
 | priest/holy | global: healPct 0.2 |
 | priest/shadow | global: dotDmgPct 0.15, spellDmgPct 0.1 |
-| shaman/enhancement | global: meleeHastePct 0.1, meleeDmgPct 0.1 |
+| shaman/enhancement | global: meleeHastePct 0.1, meleeDmgPct 0.1; Skyrend melee-fed Arc Bolt bank |
 | druid/balance | global: spellDmgPct 0.15, spellHastePct 0.1 |
 | druid/feral | global: meleeDmgPct 0.15, dotDmgPct 0.15, threatPct 0.2 |
 | warlock/destruction | global: critDmgPct 0.5; stats: crit 0.02 |
@@ -281,6 +281,35 @@ window or reacts to Frostbite before timing Icefall, while Elemental rides a ris
 chance before venting the bank across a pack. Icefall adds no random draws. Frostbite adds one
 draw only on a Cryomancy Mage's landed Rimelance, and Fulmination adds one draw only on a
 talented Shaman's landed Arc Bolt while Thunder Ward is active.
+
+### Warspirit + Requital melee-DPS identity pass
+
+Paladin and Shaman choice rows are class-wide. A row allocation survives a specialization
+change, so the defining melee rotations live in the Warspirit and Requital masteries. The
+two replaced row options keep their stable IDs for saved builds, compete in their existing
+rows, and carry explicit DPS-spec gates. The healer and tank siblings remain available, and
+the separate enhancement tank grants are not part of this pass.
+
+- Warspirit mastery now builds Skyrend from each landed melee auto-attack and Ancestral
+  Strike, up to five stacks. Arc Bolt spends the full bank. Each stack cuts 20% from its cast
+  time and adds 10% damage, so five stacks make it instant. The visible stack aura supports a
+  choice between spending early for pressure and banking a mobile burst. Tempest Reprise
+  replaces Earthen Fury in the level-20 row: landed Ancestral Strikes have a 20% chance to
+  reset their own cooldown. The roll happens only after the row, Warspirit spec, and landed
+  ability gates pass.
+- Requital mastery now grants Blood Debt. Landed melee auto-attacks and Crusader Strike have
+  a 20% chance to clear Rite of Expulsion's cooldown and make the next Rite free for eight
+  seconds. Oath's Due replaces Swift Verdicts in the level-14 row: Verdict opens a seven
+  second self-buff, and the next landed Crusader Strike consumes it for 50% more damage. A
+  miss preserves the window. Rite of Expulsion and Crusader Strike receive action-bar proc
+  cues while their respective payoffs are armed, and Oathwheel remains the row's alternative
+  auto-weave loop.
+
+The Shadowlands-era inspiration is the cadence, not the original names: melee actions build
+or reveal a short spell payoff, and a deliberate setup cast creates a time-bounded melee
+execute. All player-facing mechanic names use this game's storm, oath, and reckoning
+vocabulary. Skyrend itself is draw-free. Tempest Reprise and Blood Debt each add exactly one
+shared RNG draw only after their DPS-specific landed-hit gates; Oath's Due adds no draw.
 
 ### Shadow DoT-weaver and ramping Litany
 

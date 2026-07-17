@@ -280,6 +280,7 @@ export type AuraKind =
   | 'next_cast_free'
   | 'next_execute_free'
   | 'next_cast_cheap'
+  | 'next_ability_damage'
   | 'resource_sap'
   | 'next_attack_crit'
   | 'heal_echo'

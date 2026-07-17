@@ -7875,6 +7875,9 @@ function procResponseDescription(
     case 'empowerNext': {
       const name = abilityList(response.abilities);
       const window = `(${seconds(response.duration, lang)})`;
+      if (response.aura === 'next_ability_damage') {
+        return `${name}: +${formatPercent(response.dmgPct ?? 0, lang)} ${text.statLabels.meleeDmgPct} ${window}`;
+      }
       if (response.aura === 'next_cast_instant') {
         return `${name}: -${formatPercent(1, lang)} ${text.statLabels.castTime} ${window}`;
       }

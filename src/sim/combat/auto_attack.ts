@@ -49,7 +49,7 @@ import {
 } from '../types';
 import { applyRageSpendCooldownRefund, spendResource } from './casting_lifecycle';
 import { blindMissBonus, isDisarmed, isStunned } from './cc';
-import { consumeNextAttackCrit } from './empower_next';
+import { consumeNextAbilityDamage, consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
 import { baseSwingSpeed } from './form_swing';
 import { rangedShotProfile } from './ranged_shot';
@@ -415,6 +415,8 @@ export function meleeSwing(
     ctx.enterCombat(attacker, target);
     return false;
   }
+  const nextAbilityDamagePct =
+    opts.abilityId === undefined ? 0 : consumeNextAbilityDamage(ctx, attacker, opts.abilityId);
   const mult = opts.weaponMult ?? 1;
   const weapon = opts.weapon ?? attacker.weapon;
   const apSwingSpeed = opts.apSwingSpeed ?? baseSwingSpeed(attacker);
@@ -431,6 +433,7 @@ export function meleeSwing(
       mult +
     bonus +
     imbueBonus;
+  dmg *= 1 + nextAbilityDamagePct;
   const critChance = Math.max(
     0.005,
     attacker.critChance - Math.max(0, target.level - attacker.level) * 0.002,

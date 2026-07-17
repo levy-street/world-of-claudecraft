@@ -557,14 +557,32 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 14,
       theme: 'reckoning',
-      decision: 'banked Verdicts vs area holy burst vs Oathbrand-fed Verdict tempo',
+      decision: 'Verdict setup vs area holy burst vs Oathbrand-fed Verdict tempo',
       options: [
         {
           id: 'pal_r14_swift_verdicts',
-          name: 'Swift Verdicts',
-          description: 'Verdict costs 20% less mana and deals 25% more damage.',
+          name: "Oath's Due",
+          description:
+            "Casting Verdict grants Oath's Due for 7 sec, causing your next landed Crusader Strike to deal 50% more damage.",
           icon: 'judgement',
-          effect: { ability: [{ ability: 'judgement', costPct: -0.2, dmgPct: 0.25 }] },
+          effect: {
+            proc: {
+              id: 'pal_oaths_due',
+              name: "Oath's Due",
+              spec: 'retribution',
+              school: 'holy',
+              trigger: { on: 'castNth', n: 1, abilities: ['judgement'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_ability_damage',
+                  abilities: ['crusader_strike'],
+                  duration: 7,
+                  dmgPct: 0.5,
+                },
+              ],
+            },
+          },
         },
         {
           id: 'pal_r14_holy_wrath',

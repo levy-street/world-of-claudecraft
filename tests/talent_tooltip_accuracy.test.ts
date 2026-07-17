@@ -132,9 +132,11 @@ describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
       if (!entry) throw new Error(`no talent entry matched for ${cls}`);
       return entry.render();
     };
-    const swift = render('paladin', (e) => e.id === 'pal_r14_swift_verdicts');
-    expect(swift).toContain('20%');
-    expect(swift).toContain('25%');
+    const oathsDue = render('paladin', (e) => e.id === 'pal_r14_swift_verdicts');
+    expect(oathsDue).toContain('Verdict');
+    expect(oathsDue).toContain('Crusader Strike');
+    expect(oathsDue).toContain('50%');
+    expect(oathsDue).toContain('7');
 
     const reprise = render('shaman', (e) => e.id === 'sha_r20_elemental_fury');
     expect(reprise).toContain('20%');

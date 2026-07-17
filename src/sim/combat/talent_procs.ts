@@ -40,6 +40,12 @@ function fireOne(
 ): void {
   switch (response.kind) {
     case 'empowerNext': {
+      const value =
+        response.aura === 'next_ability_damage'
+          ? (response.dmgPct ?? 0)
+          : response.costPct !== undefined
+            ? 1 - response.costPct
+            : 0;
       const existing = player.auras.find(
         (aura) => aura.id === def.id && aura.sourceId === player.id,
       );
@@ -47,7 +53,7 @@ function fireOne(
         existing.kind = response.aura;
         existing.remaining = response.duration;
         existing.duration = response.duration;
-        existing.value = response.costPct !== undefined ? 1 - response.costPct : 0;
+        existing.value = value;
         existing.empowerAbilities = response.abilities;
       } else {
         ctx.applyAura(player, {
@@ -56,7 +62,7 @@ function fireOne(
           kind: response.aura,
           remaining: response.duration,
           duration: response.duration,
-          value: response.costPct !== undefined ? 1 - response.costPct : 0,
+          value,
           sourceId: player.id,
           school: def.school ?? 'holy',
           empowerAbilities: response.abilities,
