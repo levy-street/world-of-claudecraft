@@ -238,8 +238,34 @@ const MAGE_SPECS: SpecDef[] = [
     'A volatile caster built around fast, high-damage Fire spells.',
     'combustion',
     'Afterflame',
-    'Your spell critical strikes deal double damage. Increases critical strike chance by 2%.',
-    { global: { critDmgSpellPct: 0.5 }, stats: { crit: 0.02 } },
+    'Direct Cinderbolt, Cinderfall, Scald, and Pyrelance critical strikes store 20% of the damage dealt as a rolling Afterflame over 6 sec. A landed Cinderfall detonates the remaining Afterflame before a critical Cinderfall starts a fresh one. Your spell critical strikes deal double damage. Increases critical strike chance by 2%.',
+    {
+      global: { critDmgSpellPct: 0.5 },
+      stats: { crit: 0.02 },
+      procs: [
+        {
+          id: 'mag_afterflame',
+          name: 'Afterflame',
+          spec: 'fire',
+          requiresKnownAbility: 'combustion',
+          school: 'fire',
+          trigger: {
+            on: 'spellCrit',
+            abilities: ['fireball', 'fire_blast', 'scorch', 'pyroblast'],
+          },
+          responses: [{ kind: 'rollingDot', pctDamage: 0.2, duration: 6, interval: 2 }],
+        },
+        {
+          id: 'mag_afterflame_detonate',
+          name: 'Afterflame',
+          spec: 'fire',
+          requiresKnownAbility: 'combustion',
+          school: 'fire',
+          trigger: { on: 'spellHit', abilities: ['fire_blast'] },
+          responses: [{ kind: 'detonateOwnedDot', auraId: 'mag_afterflame' }],
+        },
+      ],
+    },
   ),
   spec(
     'frost',

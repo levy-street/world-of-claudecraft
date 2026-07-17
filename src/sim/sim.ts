@@ -4830,6 +4830,7 @@ export class Sim {
     attackAnimationStarted = false,
     alreadyFinal = false,
     abilityId: string | null = null,
+    damageModifiersResolved = false,
   ): void {
     dealDamageImpl(
       this.ctx,
@@ -4846,6 +4847,7 @@ export class Sim {
       attackAnimationStarted,
       alreadyFinal,
       abilityId,
+      damageModifiersResolved,
     );
   }
 

@@ -1,6 +1,7 @@
 import type { ProcDef, ProcResponse } from '../content/talents';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
+import { detonateOwnedDot, rollOwnedDot } from './dot_mutation';
 
 function state(player: Entity): NonNullable<Entity['procState']> {
   if (!player.procState) player.procState = { counters: {}, icds: {} };
@@ -32,8 +33,16 @@ function procsFor(ctx: SimContext, player: Entity): ProcDef[] {
   );
 }
 
-function fire(ctx: SimContext, player: Entity, def: ProcDef, subject: Entity): void {
-  for (const response of def.responses) fireOne(ctx, player, def, subject, response);
+function fire(
+  ctx: SimContext,
+  player: Entity,
+  def: ProcDef,
+  subject: Entity,
+  landedDamage = 0,
+): void {
+  for (const response of def.responses) {
+    fireOne(ctx, player, def, subject, response, landedDamage);
+  }
 }
 
 function fireOne(
@@ -42,6 +51,7 @@ function fireOne(
   def: ProcDef,
   subject: Entity,
   response: ProcResponse,
+  landedDamage: number,
 ): void {
   switch (response.kind) {
     case 'empowerNext': {
@@ -131,6 +141,35 @@ function fireOne(
       });
       break;
     }
+    case 'rollingDot': {
+      const banked = rollOwnedDot(
+        ctx,
+        player,
+        subject,
+        {
+          id: def.id,
+          name: def.name,
+          school: def.school ?? 'fire',
+          pctDamage: response.pctDamage,
+          duration: response.duration,
+          interval: response.interval,
+        },
+        landedDamage,
+      );
+      if (banked > 0) {
+        ctx.emit({
+          type: 'spellfx',
+          sourceId: player.id,
+          targetId: subject.id,
+          school: def.school ?? 'fire',
+          fx: 'procSurge',
+        });
+      }
+      break;
+    }
+    case 'detonateOwnedDot':
+      if (landedDamage > 0) detonateOwnedDot(ctx, player, subject, response.auraId);
+      break;
     case 'chanceAura': {
       // The response sits behind procsFor + the trigger's ability gate, so this is
       // the only draw: Frostbite rolls only after a landed Cryomancy Rimelance hit.
@@ -264,6 +303,7 @@ export function onSpellCrit(
   player: Entity,
   abilityId: string | null,
   target: Entity,
+  landedDamage = 0,
 ): void {
   for (const def of procsFor(ctx, player)) {
     const trigger = def.trigger;
@@ -276,7 +316,7 @@ export function onSpellCrit(
       if (procState.icds[def.id] !== undefined) continue;
       procState.icds[def.id] = trigger.icd;
     }
-    fire(ctx, player, def, target);
+    fire(ctx, player, def, target, landedDamage);
   }
 }
 
@@ -285,11 +325,12 @@ export function onSpellHit(
   player: Entity,
   abilityId: string,
   target: Entity,
+  landedDamage = 0,
 ): void {
   for (const def of procsFor(ctx, player)) {
     const trigger = def.trigger;
     if (trigger.on !== 'spellHit' || !trigger.abilities.includes(abilityId)) continue;
-    fire(ctx, player, def, target);
+    fire(ctx, player, def, target, landedDamage);
   }
 }
 

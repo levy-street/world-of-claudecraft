@@ -282,6 +282,22 @@ chance before venting the bank across a pack. Icefall adds no random draws. Fros
 draw only on a Cryomancy Mage's landed Rimelance, and Fulmination adds one draw only on a
 talented Shaman's landed Arc Bolt while Thunder Ward is active.
 
+### Pyromancy identity pass
+
+Pyromancy keeps its existing mana bar, critical-damage mastery, Flashfire burst window, and
+Slow Burn cadence proc. Direct critical strikes from Cinderbolt, Cinderfall, Scald, and
+Pyrelance now bank 20% of their landed damage into one visible, caster-owned Afterflame on
+the target. New criticals roll the remaining damage into a fresh six-second, three-tick
+window instead of creating parallel burns. A landed Cinderfall detonates the old bank;
+when that Cinderfall is also critical, the landed-hit detonation resolves first and the
+critical-hit response then begins a fresh Afterflame.
+
+The rotation is therefore crit, bank, and choose a Cinderfall detonation point, while Slow
+Burn separately rewards every third direct Fire cast with an instant Cinderbolt or
+Pyrelance. Afterflame adds no random draws and does nothing until the Pyromancy spec,
+known Flashfire signature, explicit direct-Fire ability, critical result, and positive
+post-absorb damage gates have all passed.
+
 ### Warspirit + Requital melee-DPS identity pass
 
 Paladin and Shaman choice rows are class-wide. A row allocation survives a specialization

@@ -7920,6 +7920,10 @@ function procResponseDescription(
       return `+${response.pctMax !== undefined ? formatPercent(response.pctMax, lang) : formatNumber(response.amount, lang)} ${t('classDetails.labels.resource')}`;
     case 'stackAura':
       return `+1 (<= ${formatNumber(response.maxStacks, lang)})`;
+    case 'rollingDot':
+      return `+${formatPercent(response.pctDamage, lang)} ${text.statLabels.damage} / ${seconds(response.duration, lang)} (${seconds(response.interval, lang)})`;
+    case 'detonateOwnedDot':
+      return `${formatPercent(1, lang)} ${text.statLabels.damage} / 0 s`;
     case 'chanceAura':
       return `${translateTitle(response.name, lang)}: ${formatPercent(response.chance, lang)} (${seconds(response.duration, lang)})`;
     case 'addAuraCharges':

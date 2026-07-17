@@ -156,6 +156,8 @@ export type ProcResponse =
       maxStacks: number;
       duration: number;
     }
+  | { kind: 'rollingDot'; pctDamage: number; duration: number; interval: number }
+  | { kind: 'detonateOwnedDot'; auraId: string }
   | {
       kind: 'chanceAura';
       id: string;

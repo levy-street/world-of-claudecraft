@@ -336,6 +336,10 @@ export interface Aura {
   value3?: number; // imbue: judgement max
   tickInterval?: number;
   tickTimer?: number;
+  // The tick amount was banked from damage that already passed source and target
+  // multipliers. Replaying it must still hit absorbs and terminal bookkeeping, but
+  // must not apply live damage multipliers a second time.
+  damageModifiersResolved?: boolean;
   sourceId: number;
   school: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
   breaksOnDamage?: boolean;
