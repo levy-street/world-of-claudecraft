@@ -300,16 +300,20 @@ the separate enhancement tank grants are not part of this pass.
 - Requital mastery now grants Blood Debt. Landed melee auto-attacks and Crusader Strike have
   a 20% chance to clear Rite of Expulsion's cooldown and make the next Rite free for eight
   seconds. Oath's Due replaces Swift Verdicts in the level-14 row: Verdict opens a seven
-  second self-buff, and the next landed Crusader Strike consumes it for 50% more damage. A
-  miss preserves the window. Rite of Expulsion and Crusader Strike receive action-bar proc
-  cues while their respective payoffs are armed, and Oathwheel remains the row's alternative
-  auto-weave loop.
+  second self-buff, and the next landed Crusader Strike consumes it for 50% more damage while
+  raising that strike's Blood Debt chance to 70%. A Blood-Debt-freed Rite refreshes Oath's
+  Due to seven seconds instead of extending it, preparing the next empowered strike. A miss
+  preserves the current window, while the 30% Blood Debt failure chance breaks the direct
+  empowered chain; a later baseline Blood Debt proc can still restart it without Verdict. Rite
+  of Expulsion and Crusader Strike receive action-bar proc cues while their respective payoffs
+  are armed, and Oathwheel remains the row's alternative auto-weave loop.
 
 The Shadowlands-era inspiration is the cadence, not the original names: melee actions build
 or reveal a short spell payoff, and a deliberate setup cast creates a time-bounded melee
 execute. All player-facing mechanic names use this game's storm, oath, and reckoning
 vocabulary. Skyrend itself is draw-free. Tempest Reprise and Blood Debt each add exactly one
-shared RNG draw only after their DPS-specific landed-hit gates; Oath's Due adds no draw.
+shared RNG draw only after their DPS-specific landed-hit gates. Oath's Due changes Blood
+Debt's chance for its consumed strike but adds no draw, and its free-Rite refresh is draw-free.
 
 ### Shadow DoT-weaver and ramping Litany
 

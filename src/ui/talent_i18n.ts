@@ -8200,7 +8200,7 @@ export function tTalent(request: TalentTranslationRequest): string {
   // English is the authored source of truth: the hand-written `description` strings carry
   // the real numbers (kept honest against the effect by tests/talent_tooltip_accuracy.ts).
   // Release locales generate ordinary effects from data. The narrow retained-description
-  // table handles the four Warrior globals whose stance/resource prose cannot be expressed by
+  // table handles the few global descriptions whose cross-effect prose cannot be expressed by
   // the generic renderer without losing behavior.
   if (lang === 'en' || lang === 'en_CA') {
     if (request.kind === 'talentMastery') {

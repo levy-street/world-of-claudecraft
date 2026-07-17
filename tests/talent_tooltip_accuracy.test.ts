@@ -162,6 +162,10 @@ describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
     expect(oathsDue).toContain('Verdict');
     expect(oathsDue).toContain('Crusader Strike');
     expect(oathsDue).toContain('50%');
+    expect(oathsDue).toContain('20%');
+    expect(oathsDue).toContain('70%');
+    expect(oathsDue).toContain('free Rite of Expulsion');
+    expect(oathsDue).toContain("refreshes Oath's Due");
     expect(oathsDue).toContain('7');
 
     const reprise = render('shaman', (e) => e.id === 'sha_r20_elemental_fury');

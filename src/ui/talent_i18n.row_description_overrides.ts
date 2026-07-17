@@ -1,14 +1,19 @@
 import type { SupportedLanguage } from './i18n';
 
-// Authored winning-Warrior row descriptions that cannot be generated from
-// primitive effect metadata alone. Keep description data separate from title data.
-type RetainedRowDescriptionId =
+// Authored row descriptions that cannot be generated from primitive effect
+// metadata alone. Keep description data separate from title data.
+type RequiredRetainedRowDescriptionId =
   | 'war_row_second_wind'
   | 'war_row_anger_management'
   | 'war_row_blood_offering'
   | 'war_row_battle_rhythm';
 
-type DescriptionMap = Readonly<Record<RetainedRowDescriptionId, string>>;
+type OptionalRetainedRowDescriptionId = 'pal_r14_swift_verdicts';
+
+type DescriptionMap = Readonly<
+  Record<RequiredRetainedRowDescriptionId, string> &
+    Partial<Record<OptionalRetainedRowDescriptionId, string>>
+>;
 
 export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
   Record<SupportedLanguage, DescriptionMap>
@@ -90,6 +95,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Ваши стойки получают дополнительные эффекты. Боевая стойка: критические удары способностей наносят на 15% больше урона. Стойка берсерка: автоматические атаки совершаются на 5% быстрее. Стойка стража: удар, который отнял бы не менее 20% максимального здоровья, наносит на 15% меньше урона.',
     war_row_battle_rhythm:
       'Каждая третья использованная способность генерирует на 20% больше ярости и наносит на 5% больше урона.',
+    pal_r14_swift_verdicts:
+      'Применение «Приговора» дает «Долг клятвы» на 7 сек. Следующий попавший по цели «Удар воина Света» наносит на 50% больше урона и повышает шанс «Возмездия» сделать «Обряд изгнания» бесплатным с 20% до 70%. Применение этого бесплатного «Обряда изгнания» обновляет «Долг клятвы» до 7 сек.',
   },
   cs_CZ: {
     war_row_second_wind: 'Pod 35 % zdraví si každou sekundu obnovujete 1,5 % zdraví.',
@@ -167,6 +174,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_blood_offering:
       '你的姿态获得额外效果。战斗姿态：你的技能暴击造成的伤害提高15%。狂暴姿态：你的自动攻击加快5%。戒备姿态：若一次命中会使你损失至少20%的最大生命值，则该次伤害降低15%。',
     war_row_battle_rhythm: '你每使用第三个技能时，该技能产生的怒气提高20%，造成的伤害提高5%。',
+    pal_r14_swift_verdicts:
+      '施放裁决会获得持续7秒的誓约之偿。下一次命中的十字军打击造成的伤害提高50%，并使复仇授予免费驱逐仪式的几率从20%提高到70%。施放该免费驱逐仪式会将誓约之偿刷新至7秒。',
   },
   zh_TW: {
     war_row_second_wind: '生命值低於35%時，你每秒恢復1.5%的生命值。',
@@ -174,6 +183,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_blood_offering:
       '你的姿態獲得額外效果。戰鬥姿態：你的技能致命一擊造成的傷害提高15%。狂暴姿態：你的自動攻擊加快5%。戒備姿態：若一次命中會使你損失至少20%的最大生命值，則該次傷害降低15%。',
     war_row_battle_rhythm: '你每使用第三個技能時，該技能產生的怒氣提高20%，造成的傷害提高5%。',
+    pal_r14_swift_verdicts:
+      '施放裁決會獲得持續7秒的誓約之償。下一次命中的十字軍聖擊造成的傷害提高50%，並使復仇賦予免費驅逐儀式的機率從20%提高到70%。施放該免費驅逐儀式會將誓約之償刷新至7秒。',
   },
   ja_JP: {
     war_row_second_wind: '体力が35%未満の間、毎秒、体力を1.5%回復します。',
@@ -181,6 +192,8 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_blood_offering:
       '各スタンスに追加効果を与えます。バトルスタンス：アビリティのクリティカルダメージが15%増加します。バーサーカースタンス：自動攻撃が5%速くなります。ガーデッドスタンス：最大体力の20%以上を失う攻撃のダメージが15%減少します。',
     war_row_battle_rhythm: '3回目に使用するアビリティは、怒気生成量が20%、ダメージが5%増加します。',
+    pal_r14_swift_verdicts:
+      'ヴァーディクトを使用すると、7秒間「誓約の報い」を得ます。次に命中したクルセイダー ストライクのダメージが50%増加し、復讐が追放の儀式を無料にする確率が20%から70%に上昇します。その無料の追放の儀式を使用すると、「誓約の報い」が7秒に更新されます。',
   },
   ko_KR: {
     war_row_second_wind: '생명력이 35% 미만이면 매초 생명력의 1.5%를 회복합니다.',
@@ -188,5 +201,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_blood_offering:
       '각 태세에 추가 효과가 부여됩니다. 전투 태세: 능력의 치명타 피해가 15% 증가합니다. 광전사 태세: 자동 공격이 5% 빨라집니다. 방어 태세: 최대 생명력의 20% 이상을 잃게 할 공격의 피해가 15% 감소합니다.',
     war_row_battle_rhythm: '세 번째로 사용하는 능력은 분노 생성량이 20%, 피해가 5% 증가합니다.',
+    pal_r14_swift_verdicts:
+      '선고를 사용하면 7초 동안 맹세의 대가를 얻습니다. 다음으로 적중한 성전사의 일격의 피해가 50% 증가하고, 복수가 추방 의식을 무료로 만드는 확률이 20%에서 70%로 증가합니다. 그 무료 추방 의식을 사용하면 맹세의 대가가 7초로 갱신됩니다.',
   },
 };

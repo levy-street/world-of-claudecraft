@@ -563,7 +563,7 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
           id: 'pal_r14_swift_verdicts',
           name: "Oath's Due",
           description:
-            "Casting Verdict grants Oath's Due for 7 sec, causing your next landed Crusader Strike to deal 50% more damage.",
+            "Casting Verdict grants Oath's Due for 7 sec. Its next landed Crusader Strike deals 50% more damage and raises Blood Debt's chance to grant a free Rite of Expulsion from 20% to 70%. Casting that free Rite refreshes Oath's Due to 7 sec.",
           icon: 'judgement',
           effect: {
             proc: {
@@ -571,6 +571,10 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
               name: "Oath's Due",
               spec: 'retribution',
               school: 'holy',
+              refreshOnFreeCast: {
+                ability: 'exorcism',
+                consumedAuraId: 'pal_blood_debt',
+              },
               trigger: { on: 'castNth', n: 1, abilities: ['judgement'] },
               responses: [
                 {

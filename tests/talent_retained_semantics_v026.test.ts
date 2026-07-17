@@ -97,6 +97,10 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
       .find((option) => option.id === 'pal_r14_swift_verdicts');
     expect(oathsDue?.effect.proc).toMatchObject({
       spec: 'retribution',
+      refreshOnFreeCast: {
+        ability: 'exorcism',
+        consumedAuraId: 'pal_blood_debt',
+      },
       trigger: { on: 'castNth', n: 1, abilities: ['judgement'] },
       responses: [
         {

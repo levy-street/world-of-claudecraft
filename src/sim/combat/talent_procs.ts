@@ -221,6 +221,20 @@ export function onCastCompleted(
   }
 }
 
+export function onFreeCastConsumed(
+  ctx: SimContext,
+  player: Entity,
+  abilityId: string,
+  consumedAuraId: string,
+): void {
+  for (const def of procsFor(ctx, player)) {
+    const refresh = def.refreshOnFreeCast;
+    if (refresh?.ability !== abilityId || refresh.consumedAuraId !== consumedAuraId) continue;
+    fire(ctx, player, def, player);
+    return;
+  }
+}
+
 export function onThornsReflect(ctx: SimContext, player: Entity, abilityId: string): void {
   for (const def of procsFor(ctx, player)) {
     const trigger = def.trigger;

@@ -174,6 +174,11 @@ export interface ProcDef {
   spec?: string;
   /** Do not expose or roll this proc until its payoff ability is learned. */
   requiresKnownAbility?: string;
+  /** Re-fire this proc's responses when the named free-cost aura pays for the ability. */
+  refreshOnFreeCast?: {
+    ability: string;
+    consumedAuraId: string;
+  };
   school?: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
   trigger: ProcTrigger;
   responses: ProcResponse[];
