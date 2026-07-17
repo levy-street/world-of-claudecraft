@@ -1,7 +1,7 @@
 import type { ProcDef, ProcResponse } from '../content/talents';
 import type { SimContext } from '../sim_context';
 import type { Entity, ResourceType } from '../types';
-import { detonateOwnedDot, rollOwnedDot } from './dot_mutation';
+import { consumeOwnedDot, detonateOwnedDot, rollOwnedDot } from './dot_mutation';
 
 function state(player: Entity): NonNullable<Entity['procState']> {
   if (!player.procState) player.procState = { counters: {}, icds: {} };
@@ -39,9 +39,10 @@ function fire(
   def: ProcDef,
   subject: Entity,
   landedDamage = 0,
+  landedTarget: Entity = subject,
 ): void {
   for (const response of def.responses) {
-    fireOne(ctx, player, def, subject, response, landedDamage);
+    fireOne(ctx, player, def, subject, response, landedDamage, landedTarget);
   }
 }
 
@@ -52,6 +53,7 @@ function fireOne(
   subject: Entity,
   response: ProcResponse,
   landedDamage: number,
+  landedTarget: Entity,
 ): void {
   switch (response.kind) {
     case 'empowerNext': {
@@ -171,7 +173,7 @@ function fireOne(
       const banked = rollOwnedDot(
         ctx,
         player,
-        subject,
+        landedTarget,
         {
           id: def.id,
           name: def.name,
@@ -186,7 +188,7 @@ function fireOne(
         ctx.emit({
           type: 'spellfx',
           sourceId: player.id,
-          targetId: subject.id,
+          targetId: landedTarget.id,
           school: def.school ?? 'fire',
           fx: 'procSurge',
         });
@@ -194,8 +196,43 @@ function fireOne(
       break;
     }
     case 'detonateOwnedDot':
-      if (landedDamage > 0) detonateOwnedDot(ctx, player, subject, response.auraId);
+      if (landedDamage > 0) detonateOwnedDot(ctx, player, landedTarget, response.auraId);
       break;
+    case 'consumeOwnedDotAbsorb': {
+      if (
+        response.requiresForm === 'bear' &&
+        !player.auras.some((aura) => aura.kind === 'form_bear')
+      ) {
+        break;
+      }
+      const target = player.targetId === null ? undefined : ctx.entities.get(player.targetId);
+      if (!target || target.dead || !ctx.isHostileTo(player, target)) break;
+      const remainingDamage = consumeOwnedDot(ctx, player, target, response.auraId);
+      if (remainingDamage <= 0) break;
+      const amount = Math.min(
+        Math.round(player.maxHp * response.maxHpPct),
+        Math.round(remainingDamage * response.multiplier),
+      );
+      if (amount <= 0) break;
+      ctx.applyAura(player, {
+        id: def.id,
+        name: def.name,
+        kind: 'absorb',
+        remaining: response.duration,
+        duration: response.duration,
+        value: amount,
+        sourceId: player.id,
+        school: def.school ?? 'physical',
+      });
+      ctx.emit({
+        type: 'spellfx',
+        sourceId: player.id,
+        targetId: player.id,
+        school: def.school ?? 'physical',
+        fx: 'wardBloom',
+      });
+      break;
+    }
     case 'chanceAura': {
       // The response sits behind procsFor + the trigger's ability gate, so this is
       // the only draw: Frostbite rolls only after a landed Cryomancy Rimelance hit.
@@ -439,12 +476,15 @@ export function onMeleeSwing(
   player: Entity,
   abilityId = 'auto_attack',
   consumedEmpowerAuraId?: string,
+  landedTarget?: Entity,
+  landedDamage = 0,
 ): void {
   const activeProcs = procsFor(ctx, player);
   for (const def of activeProcs) {
     const trigger = def.trigger;
     if (trigger.on === 'meleeHit') {
       if (!trigger.abilities.includes(abilityId)) continue;
+      if (trigger.positiveDamage && landedDamage <= 0) continue;
       const empowered = trigger.chanceWhenEmpowered;
       const chance =
         empowered !== undefined &&
@@ -454,7 +494,7 @@ export function onMeleeSwing(
           ? empowered.chance
           : trigger.chance;
       if (chance !== undefined && !ctx.rng.chance(chance)) continue;
-      fire(ctx, player, def, player);
+      fire(ctx, player, def, player, landedDamage, landedTarget ?? player);
       continue;
     }
     if (

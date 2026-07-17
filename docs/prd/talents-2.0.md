@@ -250,7 +250,7 @@ and remain unchanged.
 | priest/shadow | global: dotDmgPct 0.15, spellDmgPct 0.1 |
 | shaman/enhancement | global: meleeHastePct 0.1, meleeDmgPct 0.1; Skyrend melee-fed Arc Bolt bank |
 | druid/balance | global: spellDmgPct 0.15, spellHastePct 0.1; Moonrage nature-to-lunar relay |
-| druid/feral | global: meleeDmgPct 0.15, dotDmgPct 0.15, threatPct 0.2 |
+| druid/feral | global: meleeDmgPct 0.15, dotDmgPct 0.15, threatPct 0.2; Primal Heart threat-to-guard conversion |
 | warlock/destruction | global: critDmgPct 0.5; stats: crit 0.02 |
 
 ### Icicles (Frost) and Fulmination (Elemental)
@@ -1075,3 +1075,11 @@ npm run build on PR4/PR5.
   keeps its stable option ID and knockback grant, but is no longer an isolated grant for
   Moongrove: casting it now banks an 8 sec free Galeheart channel. The other Druid specs
   retain Typhoon's previous behavior, and both sibling disruption choices remain intact.
+- Wildfang uses Primal Heart to turn threat into an active-mitigation choice. A landed
+  Bruin-form Bonecrush banks 25% of its damage in a rolling 6 sec bleed and advances
+  Primal Surge by 12 sec. The tank can leave that bank ticking for threat or use Primal
+  Surge in Bruin Form to consume it for a 6 sec absorb worth four times its remaining
+  damage, capped at 20% maximum health. Primal Surge still grants 50 Rage for the next
+  threat, area-control, or recovery decision. Wolf Form keeps its existing Energy surge
+  and cannot consume the bank. Every new step is spec, signature, form, target, owner,
+  and positive-damage gated and adds no random draw.

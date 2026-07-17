@@ -650,6 +650,35 @@ describe('actionBarView: proc availability cues', () => {
     ).toMatchObject({ usable: true, procState: 'armed' });
   });
 
+  it('arms Primal Surge only for a Bruin facing a Primal Heart bleed', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('feral_charge') })),
+      fakeDeps(),
+    );
+    const target = {
+      targetPos: { x: 2, y: 0, z: 0 },
+      targetAuras: [{ id: 'dru_primal_heart_bleed', kind: 'dot' as const }],
+    };
+
+    expect(view.tick(world(target)).slots[0].procState).toBe('none');
+    expect(
+      view.tick(
+        world({
+          ...target,
+          playerAuras: [{ id: 'bear_form', kind: 'form_bear' }],
+        }),
+      ).slots[0].procState,
+    ).toBe('armed');
+    expect(
+      view.tick(
+        world({
+          ...target,
+          playerAuras: [{ id: 'cat_form', kind: 'form_cat' }],
+        }),
+      ).slots[0].procState,
+    ).toBe('none');
+  });
+
   it('keeps ordinary abilities and Icefall without stored Icicles at none', () => {
     const view = createActionBarView(
       descriptor(

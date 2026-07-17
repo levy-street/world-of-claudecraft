@@ -7935,6 +7935,8 @@ function procResponseDescription(
       return `+${formatPercent(response.pctDamage, lang)} ${text.statLabels.damage} / ${seconds(response.duration, lang)} (${seconds(response.interval, lang)})`;
     case 'detonateOwnedDot':
       return `${formatPercent(1, lang)} ${text.statLabels.damage} / 0 s`;
+    case 'consumeOwnedDotAbsorb':
+      return `${t('hudChrome.auraEffect.absorb', { value: `x${formatNumber(response.multiplier, lang)}` })} (<= ${formatPercent(response.maxHpPct, lang)} ${text.statLabels.maxHpPct}; ${seconds(response.duration, lang)})`;
     case 'chanceAura':
       return `${translateTitle(response.name, lang)}: ${formatPercent(response.chance, lang)} (${seconds(response.duration, lang)})`;
     case 'addAuraCharges':

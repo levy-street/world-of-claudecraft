@@ -449,6 +449,7 @@ export function meleeSwing(
     dmg = Math.max(1, dmg - target.blockValue);
   }
   const dealtAmount = Math.max(1, Math.round(dmg));
+  const targetHpBefore = target.hp;
   ctx.dealDamage(attacker, target, dealtAmount, crit, 'physical', abilityName, 'hit', false, {
     flat: opts.threatFlat ?? 0,
     mult: opts.threatMult ?? 1,
@@ -462,7 +463,14 @@ export function meleeSwing(
   // weapon's on-hit proc fires. This is observable for defensive healing and
   // preserves the authored Oathwheel, Venom Dividend, and imbue proc cadence.
   if (attacker.kind === 'player') {
-    onMeleeSwing(ctx, attacker, opts.abilityId, nextAbilityDamage?.id);
+    onMeleeSwing(
+      ctx,
+      attacker,
+      opts.abilityId,
+      nextAbilityDamage?.id,
+      target,
+      Math.max(0, targetHpBefore - target.hp),
+    );
   }
   // thorns / lightning shield: melee attackers take damage back. Charge-limited
   // thorns (Lightning Shield) consume a charge and gate on an internal cooldown.

@@ -461,6 +461,15 @@ function galeheartProcState(
   return hasAura(player.auras, 'dru_typhoon_relay') ? 'armed' : 'none';
 }
 
+function primalSurgeProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+  target: ActionBarTargetInput | null,
+): ActionBarProcState {
+  if (!hasAura(player.auras, 'bear_form') || target === null || target.dead) return 'none';
+  return hasAura(target.auras, 'dru_primal_heart_bleed') ? 'armed' : 'none';
+}
+
 // Ability ids map to pure proc resolvers here, keeping the painter generic. New
 // action cues extend this table rather than adding ability branches to DOM code.
 const PROC_STATE_RESOLVERS: Readonly<Record<string, ProcStateResolver | undefined>> = {
@@ -489,6 +498,7 @@ const PROC_STATE_RESOLVERS: Readonly<Record<string, ProcStateResolver | undefine
   moonfire: moonrageLunarProcState,
   starfire: moonrageLunarProcState,
   hurricane: galeheartProcState,
+  feral_charge: primalSurgeProcState,
 };
 
 function procStateForAbility(

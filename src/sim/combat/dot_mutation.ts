@@ -75,6 +75,24 @@ function scheduledDotDamage(dot: Entity['auras'][number]): number {
   return Math.round(dot.value * ticksLeft);
 }
 
+/** Remove one caster-owned DoT and return its scheduled damage without dealing it. */
+export function consumeOwnedDot(
+  ctx: SimContext,
+  source: Entity,
+  target: Entity,
+  dotId: string,
+): number {
+  const dotIndex = target.auras.findIndex(
+    (aura) => aura.kind === 'dot' && aura.id === dotId && aura.sourceId === source.id,
+  );
+  if (dotIndex < 0) return 0;
+  const dot = target.auras[dotIndex];
+  const remainingDamage = scheduledDotDamage(dot);
+  target.auras.splice(dotIndex, 1);
+  ctx.emit({ type: 'aura', targetId: target.id, name: dot.name, gained: false });
+  return remainingDamage;
+}
+
 /** Add damage to one rolling caster-owned DoT and reschedule it over a fresh window. */
 export function rollOwnedDot(
   ctx: SimContext,

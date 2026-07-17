@@ -122,6 +122,7 @@ export type ProcTrigger =
   | {
       on: 'meleeHit';
       abilities: string[];
+      positiveDamage?: boolean;
       chance?: number;
       chanceWhenEmpowered?: {
         ability: string;
@@ -165,6 +166,14 @@ export type ProcResponse =
     }
   | { kind: 'rollingDot'; pctDamage: number; duration: number; interval: number }
   | { kind: 'detonateOwnedDot'; auraId: string }
+  | {
+      kind: 'consumeOwnedDotAbsorb';
+      auraId: string;
+      multiplier: number;
+      maxHpPct: number;
+      duration: number;
+      requiresForm: 'bear';
+    }
   | {
       kind: 'chanceAura';
       id: string;

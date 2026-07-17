@@ -475,6 +475,38 @@ describe('spec masteries', () => {
     });
     expect(TALENTS.druid?.specs.find((s) => s.id === 'feral')?.mastery.effect).toEqual({
       global: { meleeDmgPct: 0.15, dotDmgPct: 0.15, threatPct: 0.2 },
+      procs: [
+        {
+          id: 'dru_primal_heart_bleed',
+          name: 'Primal Heart',
+          spec: 'feral',
+          requiresKnownAbility: 'feral_charge',
+          school: 'physical',
+          trigger: { on: 'meleeHit', abilities: ['maul'], positiveDamage: true },
+          responses: [
+            { kind: 'rollingDot', pctDamage: 0.25, duration: 6, interval: 2 },
+            { kind: 'cooldownRefund', ability: 'feral_charge', seconds: 12 },
+          ],
+        },
+        {
+          id: 'dru_primal_heart_guard',
+          name: 'Primal Heart',
+          spec: 'feral',
+          requiresKnownAbility: 'feral_charge',
+          school: 'physical',
+          trigger: { on: 'castNth', n: 1, abilities: ['feral_charge'] },
+          responses: [
+            {
+              kind: 'consumeOwnedDotAbsorb',
+              auraId: 'dru_primal_heart_bleed',
+              multiplier: 4,
+              maxHpPct: 0.2,
+              duration: 6,
+              requiresForm: 'bear',
+            },
+          ],
+        },
+      ],
     });
     expect(
       TALENTS.warlock?.specs.find((s) => s.id === 'destruction')?.mastery.effect,

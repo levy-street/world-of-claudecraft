@@ -722,8 +722,42 @@ const DRUID_SPECS: SpecDef[] = [
     'A shapeshifter who tanks in bear form and fights up close.',
     'feral_charge',
     'Primal Heart',
-    'Increases your physical ability damage by 15%, your bleed damage by 15%, and threat by 20%.',
-    { global: { meleeDmgPct: 0.15, dotDmgPct: 0.15, threatPct: 0.2 } },
+    'A landed Bonecrush stores 25% of its damage in a rolling 6 sec bleed and reduces Primal Surge cooldown by 12 sec. In Bruin Form, Primal Surge may consume that bleed for a 6 sec absorb worth four times its remaining damage, up to 20% of your maximum health. Increases your physical ability damage by 15%, your bleed damage by 15%, and threat by 20%.',
+    {
+      global: { meleeDmgPct: 0.15, dotDmgPct: 0.15, threatPct: 0.2 },
+      procs: [
+        {
+          id: 'dru_primal_heart_bleed',
+          name: 'Primal Heart',
+          spec: 'feral',
+          requiresKnownAbility: 'feral_charge',
+          school: 'physical',
+          trigger: { on: 'meleeHit', abilities: ['maul'], positiveDamage: true },
+          responses: [
+            { kind: 'rollingDot', pctDamage: 0.25, duration: 6, interval: 2 },
+            { kind: 'cooldownRefund', ability: 'feral_charge', seconds: 12 },
+          ],
+        },
+        {
+          id: 'dru_primal_heart_guard',
+          name: 'Primal Heart',
+          spec: 'feral',
+          requiresKnownAbility: 'feral_charge',
+          school: 'physical',
+          trigger: { on: 'castNth', n: 1, abilities: ['feral_charge'] },
+          responses: [
+            {
+              kind: 'consumeOwnedDotAbsorb',
+              auraId: 'dru_primal_heart_bleed',
+              multiplier: 4,
+              maxHpPct: 0.2,
+              duration: 6,
+              requiresForm: 'bear',
+            },
+          ],
+        },
+      ],
+    },
   ),
   spec(
     'restoration',
