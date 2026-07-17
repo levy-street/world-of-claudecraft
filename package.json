@@ -223,6 +223,9 @@
         }
       ]
     },
+    "nsis": {
+      "include": "build/installer.nsh"
+    },
     "linux": {
       "category": "Game",
       "icon": "build/icon.png",

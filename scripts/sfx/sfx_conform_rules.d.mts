@@ -22,11 +22,13 @@ export interface FileStats {
   lufs?: number | null;
   isLossless?: boolean;
   isMp3?: boolean;
+  preserveLoudness?: boolean;
 }
 
 export interface Classification {
   reject: boolean;
   problems: string[];
+  advisories: string[];
   normBranch: 'peak' | 'lufs' | null;
 }
 

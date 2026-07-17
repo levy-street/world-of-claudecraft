@@ -366,6 +366,7 @@ export const en: EnTranslations = {
       "spinButton": "Spin",
       "tasks": "Tasks",
       "taskMultiplier": "x{multiplier} multiplier",
+      "oneVsOneExcluded": "1v1 matches do not grant daily reward points.",
       "pointsGained": "{points} daily rewards points gained.",
       "showChestButton": "Show Chest",
       "hideChestButton": "Hide Chest",
@@ -2199,9 +2200,10 @@ export const en: EnTranslations = {
       "charTitleNone": "No title chosen",
       "charOpenBook": "Book of Deeds",
       "lbTab": "Renown",
-      "lbDeedsCol": "Deeds",
       "lbTitleCol": "Title",
-      "lbSelf": "Your standing: rank {rank}, top {percent} percent",
+      "lbScopeNote": "Accounts ranked by lifetime Renown. Each deed counts once across all characters on an account.",
+      "lbSelfAccount": "Your account: rank {rank}, top {percent} percent, {renown} Renown",
+      "lbSelfRank": "Your account: rank {rank}, top {percent} percent",
       "lbEmpty": "No ranked chroniclers yet.",
       "broadcastsLabel": "Share deed unlocks with guild and friends",
       "titledName": "{name} [{title}]"
@@ -3100,7 +3102,7 @@ export const en: EnTranslations = {
       "howHeading": "How deeds work",
       "howBody": "Deeds are earned and kept one character at a time, so every hero you play builds a Book of their own; only the realm leaderboard gathers your Renown across every character you play, counting each deed just once. Each deed spells out plainly what it asks of you, right there in the Book of Deeds in game, so you always know what to chase, and you can set a watch on the ones you are after to keep them in sight while you play. A small few stay secret and reveal themselves only once you have earned them. The Book also keeps itself honest: whatever your past record can prove, it credits on the spot, so a veteran never opens it to an empty page; only the counting deeds begin their tally fresh.",
       "renownHeading": "Renown",
-      "renownBody": "Renown is the score behind the Book. Every deed you earn is worth a set amount, and your total only ever climbs, so a quiet week never costs you ground. A handful of deeds turn on luck rather than skill, and Feats are an honor of their own, so both of those are worth no Renown at all.",
+      "renownBody": "Renown is the score behind the Book. Every deed you earn is worth a set amount, and your total only ever climbs, so a quiet week never costs you ground. A handful of deeds turn on luck rather than skill, and Feats are an honor of their own, so both of those are worth no Renown at all. Deeds without Renown still count toward completion in your Book; they simply never score.",
       "rewardsHeading": "Titles and borders",
       "rewardsBody": "The rewards are all for show, and that is the point. Some deeds grant a title you can wear or a border to frame your name, and never anything that makes your hero stronger. Choose the title you want from the Book of Deeds and it rides along on your nameplate, in chat, and on the boards for everyone to see.",
       "chroniclesHeading": "Chronicles",
@@ -3109,7 +3111,7 @@ export const en: EnTranslations = {
       "featsBody": "Feats are a shelf apart: records of legacy and world firsts, the deeds tied to a bygone era or a moment that will only ever happen once. They carry no Renown and sit outside the completion count, kept forever as a memory of what was done.",
       "catalogHeading": "The full roll of deeds",
       "catalogBody": "Here is every deed the Book can hold, gathered by category. The secret ones are left out on purpose, waiting for you to find them. Open the Book of Deeds in game to see exactly what each one asks.",
-      "standingsNote": "The realms keep a running tally of Renown across every account. To see who stands where, open the Leaderboard in game and turn to its Renown tab; the standings live there, not on the wiki.",
+      "standingsNote": "The realms keep a running tally of Renown across every account: the board ranks whole accounts by lifetime Renown, counting each deed once across all your characters, and it shows Renown alone, so deeds that carry none never move the standings even though they count in your Book. To see who stands where, open the Leaderboard in game and turn to its Renown tab; the standings live there, not on the wiki.",
       "catHeading": "{label} ({count})",
       "colName": "Deed",
       "colRenown": "Renown",
@@ -4366,6 +4368,24 @@ export const en: EnTranslations = {
     "balance": "Heroic Marks: {count}",
     "buyAria": "Buy {item} for {marks} Heroic Marks"
   },
+  "cardDuel": {
+    "title": "Card Duel",
+    "close": "Close",
+    "join": "Join Queue",
+    "joinAria": "Join the Card Duel queue",
+    "leave": "Leave Queue",
+    "leaveAria": "Leave the Card Duel queue",
+    "forfeit": "Forfeit",
+    "forfeitAria": "Forfeit the Card Duel",
+    "queued": "Waiting for an opponent...",
+    "unavailable": "Card Duel requires another player online.",
+    "vsOpponent": "vs {name}",
+    "round": "Round score: {mine} - {theirs}",
+    "counts": "Deck: {deck} · Discard: {discard}",
+    "playCardAria": "Play the {value} card",
+    "waitingOnOpponent": "Waiting on your opponent's card...",
+    "yourTurn": "Play a card"
+  },
   "delveUi": {
     "board": {
       "title": "Delve Board",
@@ -4864,6 +4884,11 @@ export const en: EnTranslations = {
       "quit": "Quit",
       "fatalBody": "World of ClaudeCraft hit an unexpected error and needs to close."
     }
+  },
+  "gpuNotice": {
+    "bodyDesktop": "The game is running without GPU acceleration and will be slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
+    "bodyWeb": "The game is running without GPU acceleration and will be slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.",
+    "dismiss": "Dismiss"
   },
   "realm": {
     "noRealms": "No worlds available.",
@@ -8701,6 +8726,11 @@ export const en: EnTranslations = {
         "title": "The Gilded Strongbox",
         "greeting": "Welcome to the Gilded Strongbox. Your goods rest safe behind our locks."
       },
+      "card_master": {
+        "name": "Card Master",
+        "title": "Dealer of Chance",
+        "greeting": "Care for a Card Duel? Best of three, winner takes the bragging rights."
+      },
       "bursar_petra_vell": {
         "name": "Bursar Petra Vell",
         "title": "The Gilded Strongbox",
@@ -9835,7 +9865,7 @@ export const en: EnTranslations = {
       },
       "necromancers": {
         "name": "Mournweave Raiment",
-        "bonus2": "Increases spell power by 20. You cannot be knocked back (100% knockback resistance).",
+        "bonus2": "Increases spell power by 20. Damage taken no longer delays your spellcasting (100% pushback resistance).",
         "bonus3": "Increases Intellect by 10 and Stamina by 10.",
         "bonus4": "Your spells have a 10% chance to grant Clearcasting, making your next spell free."
       },
@@ -9847,13 +9877,13 @@ export const en: EnTranslations = {
       },
       "soulflame": {
         "name": "Wraithfire Regalia",
-        "bonus2": "Increases spell power by 20. You cannot be knocked back (100% knockback resistance).",
+        "bonus2": "Increases spell power by 20. Damage taken no longer delays your spellcasting (100% pushback resistance).",
         "bonus3": "Increases Intellect by 15, Spirit by 15, and attack and casting speed by 15%.",
         "bonus4": "Your spells have a 10% chance to grant Soulblaze, increasing spell power by 40 for 10 sec."
       },
       "stormcallers": {
         "name": "Galecall Vestments",
-        "bonus2": "Increases spell power by 20. You cannot be knocked back (100% knockback resistance).",
+        "bonus2": "Increases spell power by 20. Damage taken no longer delays your spellcasting (100% pushback resistance).",
         "bonus3": "Increases Intellect by 15, Spirit by 15, and attack and casting speed by 15%.",
         "bonus4": "Your spells have a 10% chance to grant Soulblaze, increasing spell power by 40 for 10 sec."
       },

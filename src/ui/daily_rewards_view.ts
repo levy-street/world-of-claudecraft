@@ -16,6 +16,16 @@ export type DailyRewardsInput =
   | { kind: 'error'; message: string }
   | { kind: 'status'; status: DailyRewardStatus; history: DailyRewardHistory };
 
+export function dailyRewardTaskDescription(
+  type: string,
+  description: string,
+  oneVsOneRestriction: string,
+): string {
+  return type === 'arena_result' || type === 'vale_cup_result'
+    ? `${description} ${oneVsOneRestriction}`
+    : description;
+}
+
 export function buildDailyRewardsView(input: DailyRewardsInput): DailyRewardsView {
   if (input.kind === 'loading') return { kind: 'loading' };
   if (input.kind === 'error') return { kind: 'error', message: input.message };

@@ -366,6 +366,7 @@ export const it_IT: EnTranslations = {
       "spinButton": "Gira",
       "tasks": "Incarichi",
       "taskMultiplier": "Moltiplicatore x{multiplier}",
+      "oneVsOneExcluded": "Le partite 1 contro 1 non assegnano punti per le ricompense giornaliere.",
       "pointsGained": "{points} punti ricompense giornaliere ottenuti.",
       "showChestButton": "Mostra forziere",
       "hideChestButton": "Nascondi forziere",
@@ -2199,9 +2200,10 @@ export const it_IT: EnTranslations = {
       "charTitleNone": "Nessun titolo scelto",
       "charOpenBook": "Libro delle Imprese",
       "lbTab": "Fama",
-      "lbDeedsCol": "Imprese",
       "lbTitleCol": "Titolo",
-      "lbSelf": "Il tuo piazzamento: posizione {rank}, nel {percent} percento dei migliori",
+      "lbScopeNote": "Accounts ranked by lifetime Renown. Each deed counts once across all characters on an account.",
+      "lbSelfAccount": "Your account: rank {rank}, top {percent} percent, {renown} Renown",
+      "lbSelfRank": "Your account: rank {rank}, top {percent} percent",
       "lbEmpty": "Ancora nessun cronista in classifica.",
       "broadcastsLabel": "Condividi le imprese ottenute con la gilda e gli amici",
       "titledName": "{name} [{title}]"
@@ -2991,8 +2993,8 @@ export const it_IT: EnTranslations = {
       "heroicRewardsTitle": "Marchi Eroici e bottino potenziato",
       "heroicRewardsBody": "I boss eroici lasciano cadere il bottino che conosci, potenziato e contrassegnato come Eroico nel suggerimento, e il boss finale di ogni spedizione aggiunge oggetti epici introvabili altrove. Quell'ultima uccisione lascia anche Marchi Eroici a ogni partecipante: una valuta da spendere con il Quartiermastro Vex a Highwatch, la cui scorta di anelli e collane è l'unica gioielleria del reame.",
       "heroicLockoutBody": "I dungeon normali si possono affrontare tutto il giorno. L'eroica chiede pazienza: l'uccisione del boss finale blocca tutti i presenti a una sola conquista eroica di quel dungeon al giorno, e l'incursione mantiene un blocco giornaliero per ciascuna difficoltà. Una spedizione a cinque giocatori già completata resta aperta al suo stesso gruppo per le corse al cadavere e il bottino, così nessuno viene escluso da ciò che vi ha guadagnato. L'incursione è più severa: una volta che la sua uccisione ti blocca, la porta resta chiusa fino al ripristino giornaliero, perciò raccogli il tuo bottino prima di lasciare l'arena.",
-      "resetTitle": "Resetting your instances",
-      "resetBody": "Switch difficulty while your group still holds claimed runs and the old claims linger for a while before clearing on their own. The party leader can let them go at once instead: choose Reset All Instances on their own portrait menu, or type /dungeon reset. A reset works only after the difficulty has actually been changed, only while nobody, living or fallen, remains inside, and a short cooldown separates one reset from the next. Arrive at the door on the wrong difficulty and the game says so before the run starts. The raid is never reset this way; its own lockout rules stand.",
+      "resetTitle": "Reimpostare le istanze",
+      "resetBody": "Se cambi difficoltà mentre il gruppo conserva ancora delle spedizioni assegnate, le vecchie assegnazioni restano per un po’ prima di svanire. Il capogruppo può abbandonarle subito scegliendo Reimposta tutte le istanze dal menu del proprio ritratto oppure digitando /dungeon reset. La difficoltà deve essere stata davvero cambiata, nessuno, vivo o caduto, può trovarsi all’interno e tra due ripristini passa un breve tempo di recupero. Se arrivi all’ingresso con la difficoltà sbagliata, il gioco ti avvisa prima dell’inizio. L’incursione non viene mai reimpostata così e mantiene le proprie regole di vincolo.",
       "templeLoreTitle": "Il Tempio Annegato, un po' più a fondo",
       "templeLoreBody": "Il tempio ha una sua leggenda, più antica del culto che insegui altrove. Sulla riva del Glimmermere, un laghetto che beve la luce della luna e restituisce gli annegati, un solitario guardiano custodisce una porta di pallida luce. Sotto la superficie, una scalinata di pietra fredda scende fino ad esso. Coloro che vi affondarono non annegarono per disgrazia: erano il Coro Pallido, che si immerse in preghiera e non smise mai di cantare. I vecchi custodi incisero un solo avvertimento nelle rocce prima che l'acqua li prendesse, una preghiera a qualcosa che chiamavano la Luna Annegata, con una mano più ferma che aggiunse due parole sotto di essa: dorme soltanto.",
       "cryptLeadTitle": "Una porta che i morti dovevano tenere chiusa",
@@ -3100,7 +3102,7 @@ export const it_IT: EnTranslations = {
       "howHeading": "Come funzionano le imprese",
       "howBody": "Le imprese si ottengono e si custodiscono con un personaggio alla volta, così ogni eroe che giochi costruisce un Libro tutto suo; solo la Classifica del reame raccoglie la tua Fama su tutti i personaggi che giochi, e conta ogni impresa una volta sola. Ogni impresa dichiara chiaramente che cosa ti chiede, direttamente nel Libro delle Imprese in gioco, così sai sempre a che cosa dare la caccia, e puoi seguire quelle che ti stanno a cuore per tenerle in vista mentre giochi. Poche restano segrete e si rivelano soltanto una volta ottenute. Il Libro si mantiene anche onesto: tutto ciò che il tuo passato può dimostrare, te lo accredita all'istante, così un veterano non lo apre mai su una pagina vuota; solo le imprese a conteggio iniziano il loro computo da zero.",
       "renownHeading": "Fama",
-      "renownBody": "La Fama è il punteggio dietro il Libro. Ogni impresa che ottieni vale una cifra fissa, e il tuo totale non fa che salire, così una settimana tranquilla non ti fa mai perdere terreno. Una manciata di imprese dipende dalla fortuna più che dall'abilità, e le Prodezze sono un onore a sé: né le une né le altre valgono alcuna Fama.",
+      "renownBody": "Renown is the score behind the Book. Every deed you earn is worth a set amount, and your total only ever climbs, so a quiet week never costs you ground. A handful of deeds turn on luck rather than skill, and Feats are an honor of their own, so both of those are worth no Renown at all. Deeds without Renown still count toward completion in your Book; they simply never score.",
       "rewardsHeading": "Titoli e bordi",
       "rewardsBody": "Le ricompense sono tutte estetiche, ed è proprio questo il punto. Alcune imprese concedono un titolo da indossare o un bordo che incornicia il tuo nome, e mai nulla che renda più forte il tuo eroe. Scegli il titolo che preferisci dal Libro delle Imprese e ti seguirà sulla targhetta del nome, in chat e in classifica, sotto gli occhi di tutti.",
       "chroniclesHeading": "Cronache",
@@ -3109,7 +3111,7 @@ export const it_IT: EnTranslations = {
       "featsBody": "Le Prodezze sono uno scaffale a parte: memorie di un'eredità e primati del mondo, le imprese legate a un'epoca ormai passata o a un momento che accadrà una volta sola. Non valgono Fama e restano fuori dal conteggio di completamento, custodite per sempre a ricordo di ciò che è stato compiuto.",
       "catalogHeading": "Il registro completo delle imprese",
       "catalogBody": "Ecco ogni impresa che il Libro può contenere, raccolta per categoria. Quelle segrete sono lasciate fuori di proposito, in attesa che sia tu a scoprirle. Apri il Libro delle Imprese in gioco per vedere esattamente che cosa chiede ciascuna.",
-      "standingsNote": "I reami tengono un conteggio continuo della Fama di ogni account. Per vedere chi sta dove, apri la Classifica in gioco e passa alla sua scheda Fama; le graduatorie vivono lì, non sulla wiki.",
+      "standingsNote": "The realms keep a running tally of Renown across every account: the board ranks whole accounts by lifetime Renown, counting each deed once across all your characters, and it shows Renown alone, so deeds that carry none never move the standings even though they count in your Book. To see who stands where, open the Leaderboard in game and turn to its Renown tab; the standings live there, not on the wiki.",
       "catHeading": "{label} ({count})",
       "colName": "Impresa",
       "colRenown": "Fama",
@@ -3190,9 +3192,9 @@ export const it_IT: EnTranslations = {
       "bagsTitle": "Borse e spazio di carico",
       "bagsBody": "Tutto ciò che raccogli viaggia in un unico zaino condiviso, che ingrandisci equipaggiando borse. La finestra delle borse tiene quattro slot per borse: clicca una borsa nello zaino per infilarla in uno slot libero, e ogni borsa che indossi aggiunge il proprio spazio. Le borse semplici sono merce da poco dei venditori, quelle più capienti cadono dalle bestie, e le migliori vengono dai boss dei dungeon, così il tuo spazio di carico cresce di pari passo con il tuo equipaggiamento.",
       "qualityTitle": "La qualità, a colpo d'occhio",
-      "qualityBody": "Every item has a quality, and its name is colored to match so you can read its worth at a glance. From most common to most prized:",
+      "qualityBody": "Ogni oggetto ha una qualità e il suo nome assume il colore corrispondente, così puoi capirne il valore a colpo d’occhio. Dal più comune al più prezioso:",
       "qualityPoor": "Scadente",
-      "qualityCommon": "Common",
+      "qualityCommon": "Comune",
       "qualityUncommon": "Non comune",
       "qualityRare": "Raro",
       "qualityEpic": "Epico",
@@ -3200,7 +3202,7 @@ export const it_IT: EnTranslations = {
       "qualityNote": "Una qualità superiore di solito significa statistiche migliori, ma la qualità è un indizio, non una regola. Un pezzo ben adatto alla tua classe e al tuo livello può battere uno più appariscente.",
       "upgradeTitle": "Tieni il tuo equipaggiamento aggiornato",
       "upgradeBody": "Sostituire un vecchio pezzo con un miglioramento fresco fa di più per te che giocare alla perfezione con un equipaggiamento che hai superato. Quando cade qualcosa di migliore o una missione te lo offre, prendilo. Non conservare i tuoi oggetti buoni per dopo.",
-      "itemLevelBody": "If you want a quick way to compare two pieces, turn on Show Item Level in the options. Gear with a known source, from enemies, quests, and the crafting trades, then shows an item level, a single figure for roughly how powerful it is based on where it came from, so you can tell at a glance which upgrade pulls more weight, even across different slots. Pieces with no such source, like plain vendor basics and starter gear, show no item level, so a missing figure is normal, not a fault.",
+      "itemLevelBody": "Per confrontare rapidamente due pezzi, attiva Mostra livello oggetto nelle opzioni. L’equipaggiamento di provenienza nota, ottenuto da nemici, missioni e mestieri, mostra un livello oggetto: un unico valore che ne indica approssimativamente la potenza in base alla fonte e rende immediata la scelta del miglior potenziamento, anche tra slot diversi. I pezzi senza tale provenienza, come gli articoli base dei mercanti e l’equipaggiamento iniziale, non mostrano alcun livello; è normale.",
       "sourcesTitle": "Da dove arriva l'equipaggiamento",
       "sourcesBody": "Gran parte dei tuoi primi miglioramenti sono ricompense delle missioni, perciò conviene portarle a termine invece di macinare nemici. I nemici lasciano cadere equipaggiamento quando li sconfiggi, i venditori in città vendono solide basi, gli artigiani trasformano i materiali raccolti in pezzi indossabili, e il mercato dei giocatori ti permette di comprare da altri avventurieri. In cima alla scalata, due valute in marchi comprano equipaggiamento introvabile altrove: i Sigilli d'Incursione presso il custode delle incursioni, e i Marchi Eroici presso il Quartiermastro Eroico.",
       "soulboundTitle": "Vincolato all'anima: tuo e tuo soltanto",
@@ -3244,7 +3246,7 @@ export const it_IT: EnTranslations = {
       "craftRecipesTitle": "Ricette e reagenti",
       "craftRecipesBody": "Ogni ricetta richiede reagenti specifici da raccogliere o comprare. Le ricette più semplici non chiedono altro che materiali comuni e si possono creare fin dall'inizio, così puoi cominciare a esercitare un mestiere nel momento in cui lo scegli. Le liste delle ricette si stanno ancora completando: alcuni mestieri sono in attesa delle loro prime ricette, e altre ne arrivano man mano che i mestieri crescono.",
       "craftHowTitle": "La finestra di creazione",
-      "craftHowBody": "Open the Crafting window (default key T) to see every recipe you know, what each one needs, and what you have on hand; when the materials are there, one click does the work. Common recipes can be crafted anywhere in the world. A handful of advanced recipes, higher-tier tools and rare caster armor among them, instead ask you to stand at the crafting hub in Highwatch.",
+      "craftHowBody": "Apri la finestra Creazione (tasto predefinito T) per vedere tutte le ricette note, i loro requisiti e ciò che possiedi; quando hai i materiali basta un clic. Le ricette comuni si possono creare ovunque. Alcune ricette avanzate, tra cui strumenti di livello superiore e rare armature da incantatore, richiedono invece il centro di creazione di Highwatch.",
       "craftMasteryTitle": "Abilità e maestria",
       "craftMasteryBody": "Creare con successo accresce l'abilità in quel mestiere, e l'abilità non blocca mai le ricette di un mestiere: se conosci una ricetta e ne possiedi i materiali, puoi tentarla. Ciò che l'abilità ti dà è invece la qualità, una mano esperta produce lavori più fini. L'unica eccezione sono le ricette combinate, che ti chiedono di esserti dimostrato valido in entrambi i loro mestieri prima di aprirsi.",
       "craftComboTitle": "Ricette combinate",
@@ -4366,6 +4368,24 @@ export const it_IT: EnTranslations = {
     "balance": "Marchi Eroici: {count}",
     "buyAria": "Compra {item} per {marks} Marchi Eroici"
   },
+  "cardDuel": {
+    "title": "Card Duel",
+    "close": "Close",
+    "join": "Join Queue",
+    "joinAria": "Join the Card Duel queue",
+    "leave": "Leave Queue",
+    "leaveAria": "Leave the Card Duel queue",
+    "forfeit": "Forfeit",
+    "forfeitAria": "Forfeit the Card Duel",
+    "queued": "Waiting for an opponent...",
+    "unavailable": "Card Duel requires another player online.",
+    "vsOpponent": "vs {name}",
+    "round": "Round score: {mine} - {theirs}",
+    "counts": "Deck: {deck} · Discard: {discard}",
+    "playCardAria": "Play the {value} card",
+    "waitingOnOpponent": "Waiting on your opponent's card...",
+    "yourTurn": "Play a card"
+  },
   "delveUi": {
     "board": {
       "title": "Tabellone delle Incursioni",
@@ -4864,6 +4884,11 @@ export const it_IT: EnTranslations = {
       "quit": "Esci",
       "fatalBody": "World of ClaudeCraft ha riscontrato un errore imprevisto e deve chiudersi."
     }
+  },
+  "gpuNotice": {
+    "bodyDesktop": "The game is running without GPU acceleration and will be slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
+    "bodyWeb": "The game is running without GPU acceleration and will be slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.",
+    "dismiss": "Dismiss"
   },
   "realm": {
     "noRealms": "Nessun mondo disponibile.",
@@ -8701,6 +8726,11 @@ export const it_IT: EnTranslations = {
         "title": "Il Forziere Dorato",
         "greeting": "Ti diamo il benvenuto al Forziere Dorato. I tuoi beni riposano al sicuro dietro le nostre serrature."
       },
+      "card_master": {
+        "name": "Card Master",
+        "title": "Dealer of Chance",
+        "greeting": "Care for a Card Duel? Best of three, winner takes the bragging rights."
+      },
       "bursar_petra_vell": {
         "name": "Economa Petra Vell",
         "title": "Il Forziere Dorato",
@@ -9807,9 +9837,9 @@ export const it_IT: EnTranslations = {
         "body": "Pochi sapranno mai cosa giaceva sepolto in quella conca, e ancora meno ci crederebbero. Io lo so, e non lo dimenticherò.\n\nChe la tua strada resti illuminata.\n- Fratello Aldric"
       },
       "heroic_marks_reward": {
-        "sender": "The Heroic Quartermaster",
-        "subject": "Your Heroic Marks",
-        "body": "Your warband cleared the heroic trial while you fought from the back, or from the dirt. Your lockout was struck all the same, so your share of Heroic Marks flies to you here rather than being lost. Spend them well.\n\n- The Heroic Quartermaster"
+        "sender": "Quartiermastro eroico",
+        "subject": "I tuoi Marchi eroici",
+        "body": "Il tuo gruppo ha superato la prova eroica mentre combattevi nelle retrovie o giacevi a terra. Anche il tuo vincolo è stato registrato, quindi la tua parte di Marchi eroici è arrivata qui invece di andare perduta. Usali bene.\n\n- Quartiermastro eroico"
       }
     },
     "itemSets": {
@@ -9835,7 +9865,7 @@ export const it_IT: EnTranslations = {
       },
       "necromancers": {
         "name": "Vesti Mournweave",
-        "bonus2": "Non puoi essere respinto (100% di resistenza alla respinta).",
+        "bonus2": "Aumenta il potere degli incantesimi di 20. I danni subiti non ritardano più i tuoi incantesimi (100% di resistenza al ritardo di lancio).",
         "bonus3": "Aumenta l'intelletto di 10 e la tempra di 10.",
         "bonus4": "I tuoi incantesimi hanno una probabilità del 10% di conferire Lancio Limpido, rendendo gratuito il tuo prossimo incantesimo."
       },
@@ -9847,13 +9877,13 @@ export const it_IT: EnTranslations = {
       },
       "soulflame": {
         "name": "Paramenti Wraithfire",
-        "bonus2": "Non puoi essere respinto (100% di resistenza alla respinta).",
+        "bonus2": "Aumenta il potere degli incantesimi di 20. I danni subiti non ritardano più i tuoi incantesimi (100% di resistenza al ritardo di lancio).",
         "bonus3": "Aumenta l'intelletto di 15, lo spirito di 15 e la velocità d'attacco e di lancio del 15%.",
         "bonus4": "I tuoi incantesimi hanno una probabilità del 10% di conferire Vampanima, aumentando la potenza magica di 40 per 10 sec."
       },
       "stormcallers": {
         "name": "Vesti Galecall",
-        "bonus2": "Non puoi essere respinto (100% di resistenza alla respinta).",
+        "bonus2": "Aumenta il potere degli incantesimi di 20. I danni subiti non ritardano più i tuoi incantesimi (100% di resistenza al ritardo di lancio).",
         "bonus3": "Aumenta l'intelletto di 15, lo spirito di 15 e la velocità d'attacco e di lancio del 15%.",
         "bonus4": "I tuoi incantesimi hanno una probabilità del 10% di conferire Vampanima, aumentando la potenza magica di 40 per 10 sec."
       },

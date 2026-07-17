@@ -11,13 +11,18 @@ const nodePath = require('node:path');
 // at the process/OS level here instead. Two independent levers, because neither is a
 // guarantee on its own:
 //
-//  1. Chromium command-line switch. force-high-performance-gpu makes the GPU process ask
-//     DXGI for the high-performance adapter at startup. Chromium 150 (Electron 43) registers
-//     the switch name with HYPHENS in gpu/config/gpu_switches.cc; Electron's own docs spell
-//     it with underscores. Chromium matches switch names EXACTLY (it does not fold
-//     underscores to hyphens), so we append BOTH spellings; an unrecognized switch is a
-//     silent no-op. This takes effect the current launch, but is not reliable on every
-//     Windows/driver combo (electron/electron#31355), hence lever 2.
+//  1. Chromium command-line switch. force-high-performance-gpu makes the GPU process bind
+//     the default ANGLE/EGL display to the adapter IDXGIFactory6::EnumAdapterByGpuPreference
+//     tags as high performance. BOTH spellings are live, at two different layers, so never
+//     "clean up" either one: the HYPHEN form is the real browser-side switch (Chromium 150
+//     gpu/config/gpu_switches.cc), which gpu_process_host.cc translates into the workaround
+//     string on the GPU-process command line; the UNDERSCORE form is that workaround's own
+//     NAME (gpu/config/gpu_workaround_list.txt), which the browser forwards verbatim and the
+//     GPU process parses directly (GpuDriverBugList::AppendWorkaroundsFromCommandLine).
+//     Chromium matches switch names EXACTLY (no underscore folding) and ignores unknown
+//     switches, so appending both is harmless and survives either matcher moving. The switch
+//     silently no-ops when Chromium's GPU info collection sees one adapter or IDXGIFactory6
+//     is unavailable (electron/electron#31355), hence lever 2.
 //
 //  2. Windows per-app GPU preference (the OS-authoritative lever, and the one that fixes it
 //     for good). Setting GpuPreference=2 on the HKCU\Software\Microsoft\DirectX\
@@ -25,10 +30,22 @@ const nodePath = require('node:path');
 //     Display > Graphics > High performance sets, and on Windows 10 20H1+ / Windows 11 it
 //     OVERRIDES the NVIDIA Control Panel. That ONE value packs other semicolon-separated
 //     per-app tokens too (the Windows 11 "Optimizations for windowed games" toggle stores
-//     SwapEffectUpgradeEnable=1; per-app Auto HDR stores AutoHDREnable tokens), so we never
-//     replace the value wholesale: the stored data is queried first and only the
-//     GpuPreference token is replaced (or appended), preserving the user's other per-app
-//     graphics settings. Electron's child processes (GPU, renderer, utility) share this exe
+//     SwapEffectUpgradeEnable=1; per-app Auto HDR stores AutoHDREnable tokens; Windows 11's
+//     "Specific GPU" choice stores GpuPreference=1073741824 plus a SpecificAdapter=VEN&DEV&
+//     SUBSYS token), so we never replace the value wholesale: the stored data is queried
+//     first and only the GpuPreference token is replaced (or appended), preserving the
+//     user's other per-app graphics settings (a SpecificAdapter token left dangling next to
+//     GpuPreference=2 is simply ignored by Windows). The SAME key also holds the user's
+//     machine-wide Graphics toggles under the special value name DirectXUserGlobalSettings;
+//     we only ever address the value named by our exe path, never that one. Windows is read
+//     lazily, per process, at D3D/DXGI initialization, keyed by the exe path, which is what
+//     makes the before-GPU-process write effective the same launch.
+//     Accepted theoretical hazards, deliberately not coded around ("REG_SZ" as an exe-path
+//     component, embedded newlines in hand-edited data, REG_EXPAND_SZ rewritten as REG_SZ,
+//     8.3/symlink path drift vs Windows Settings): each needs a hand-edited registry or an
+//     absurd install path, and the worst outcome is a malformed token Windows ignores next
+//     to a still-valid GpuPreference=2.
+//     Electron's child processes (GPU, renderer, utility) share this exe
 //     path, so the preference steers all of them; the NSIS install path is stable across
 //     auto-updates, so the entry persists. HKCU needs no elevation. We write only when the
 //     value is missing or not already high-performance, so an already-correct launch does no
@@ -102,10 +119,16 @@ function mergeHighPerformancePreference(existingData) {
 
 /**
  * True when the `reg query` output already pins the high-performance GPU (GpuPreference=2).
- * The negative lookahead keeps a hypothetical "=20" from matching; real values are 0, 1, or 2.
+ * Parses the stored data first and compares whole semicolon-separated tokens,
+ * case-insensitively, exactly like mergeHighPerformancePreference tokenizes: a raw substring
+ * match over the whole stdout would false-positive on a hypothetical sibling token that merely
+ * ENDS in "GpuPreference=2" and would miss a hand-edited "gpupreference=2".
  */
 function alreadyHighPerformance(regQueryStdout) {
-  return /GpuPreference=2(?![0-9])/.test(String(regQueryStdout ?? ''));
+  return parseRegQueryData(regQueryStdout)
+    .split(';')
+    .map((token) => token.trim())
+    .some((token) => /^GpuPreference=2$/i.test(token));
 }
 
 function defaultRegExe(env) {
@@ -113,6 +136,54 @@ function defaultRegExe(env) {
   // Always a Windows path (this branch only runs on win32); win32.join keeps it correct
   // regardless of the host that exercises it (macOS/Linux CI would otherwise use "/").
   return nodePath.win32.join(root, 'System32', 'reg.exe');
+}
+
+/**
+ * True when a thrown `reg query` error means "the value (or key) does not exist": reg.exe
+ * exits 1 for a missing value, which execFileSync surfaces as status 1 with no signal. Every
+ * OTHER failure (timeout kill, reg.exe missing/blocked, access denied) leaves the stored
+ * value in an UNKNOWN state, and writing from an assumed-empty state on unknown would
+ * silently delete the user's sibling per-app tokens; those failures must skip the write.
+ */
+function isRegValueAbsent(err) {
+  return err?.status === 1 && !err?.killed && !err?.signal;
+}
+
+/**
+ * True when a SUCCESSFUL `reg query` returned a value we cannot parse: a type other than
+ * REG_SZ / REG_EXPAND_SZ (say a hand-edited REG_MULTI_SZ). parseRegQueryData returns '' for
+ * those, and overwriting would both change the value's type and destroy its data, so the
+ * write is skipped. An empty parse WITHOUT a foreign type token is just an empty REG_SZ
+ * value, which is safe to overwrite.
+ */
+function hasUnparseableValueType(regQueryStdout) {
+  return /\bREG_(?!SZ\b|EXPAND_SZ\b)[A-Z_]+/.test(String(regQueryStdout ?? ''));
+}
+
+// Vendor ids as getGPUInfo reports them: NVIDIA 0x10de, AMD 0x1002, Intel 0x8086,
+// Microsoft 0x1414 (the WARP software adapter).
+const DISCRETE_VENDOR_IDS = [0x10de, 0x1002];
+const INTEGRATED_OR_SOFTWARE_VENDOR_IDS = [0x8086, 0x1414];
+
+/**
+ * Compact, loggable summary of Electron's getGPUInfo gpuDevice list. `discreteInactive` is
+ * the smoking gun for the hybrid-laptop wrong-adapter case: an NVIDIA/AMD adapter is present
+ * but INACTIVE while the active adapter is Intel or the Microsoft WARP device, meaning
+ * neither the per-app OS preference nor the Chromium switch took effect on this machine.
+ * Deliberately conservative: an active AMD adapter never flags (AMD APU + NVIDIA dGPU rigs
+ * would false-positive), so a miss is possible but a false alarm is not. Pure for tests.
+ */
+function summarizeGpuDevices(gpuDevices) {
+  const devices = (Array.isArray(gpuDevices) ? gpuDevices : []).map((d) => ({
+    vendorId: `0x${(d?.vendorId ?? 0).toString(16).padStart(4, '0')}`,
+    deviceId: `0x${(d?.deviceId ?? 0).toString(16).padStart(4, '0')}`,
+    active: d?.active === true,
+  }));
+  const raw = Array.isArray(gpuDevices) ? gpuDevices : [];
+  const discreteInactive =
+    raw.some((d) => d?.active !== true && DISCRETE_VENDOR_IDS.includes(d?.vendorId)) &&
+    raw.some((d) => d?.active === true && INTEGRATED_OR_SOFTWARE_VENDOR_IDS.includes(d?.vendorId));
+  return { devices, discreteInactive };
 }
 
 /**
@@ -153,7 +224,10 @@ function forceHighPerformanceGpu(deps = {}) {
   if (!exePath) return;
 
   const reg = deps.regExe ?? defaultRegExe(env);
-  const runOpts = { timeout: 4000, windowsHide: true };
+  // Both calls are synchronous on the boot path by design (the write must beat the GPU
+  // process spawn to count for THIS launch), so the timeout bounds the worst-case boot
+  // stall: 2 x 1500 ms, with 10x-plus headroom over reg.exe's normal sub-100 ms runs.
+  const runOpts = { timeout: 1500, windowsHide: true };
 
   let existingData = '';
   try {
@@ -162,9 +236,21 @@ function forceHighPerformanceGpu(deps = {}) {
       stdio: ['ignore', 'pipe', 'ignore'],
     });
     if (alreadyHighPerformance(stdout)) return; // already pinned; nothing to do
+    if (hasUnparseableValueType(stdout)) {
+      // The value exists but with a type we cannot round-trip: rewriting would destroy it.
+      log?.warn?.('[gpu] per-app GPU preference has an unexpected value type; leaving it');
+      return;
+    }
     existingData = parseRegQueryData(stdout);
-  } catch {
-    // Missing value/key (reg exits non-zero) or reg unavailable: fall through and write.
+  } catch (err) {
+    if (!isRegValueAbsent(err)) {
+      // Timeout, reg.exe missing/blocked, access denied: the stored value is UNKNOWN, and
+      // writing from an assumed-empty state could delete the user's sibling tokens
+      // (SwapEffectUpgradeEnable, AutoHDREnable). Skip; next launch retries.
+      log?.warn?.('[gpu] could not read the per-app GPU preference; skipping the write', err);
+      return;
+    }
+    // Missing value/key (reg exits 1): fall through and write the fresh preference.
   }
 
   try {
@@ -187,5 +273,7 @@ module.exports = {
   parseRegQueryData,
   mergeHighPerformancePreference,
   alreadyHighPerformance,
+  hasUnparseableValueType,
+  summarizeGpuDevices,
   forceHighPerformanceGpu,
 };

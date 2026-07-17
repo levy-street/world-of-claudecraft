@@ -366,6 +366,7 @@ export const fr_FR: EnTranslations = {
       "spinButton": "Tourner",
       "tasks": "Tâches",
       "taskMultiplier": "Multiplicateur x{multiplier}",
+      "oneVsOneExcluded": "Les matchs en 1 contre 1 ne rapportent pas de points de récompenses quotidiennes.",
       "pointsGained": "{points} points de récompenses quotidiennes gagnés.",
       "showChestButton": "Afficher le coffre",
       "hideChestButton": "Masquer le coffre",
@@ -2199,9 +2200,10 @@ export const fr_FR: EnTranslations = {
       "charTitleNone": "Aucun titre choisi",
       "charOpenBook": "Livre des hauts faits",
       "lbTab": "Renommée",
-      "lbDeedsCol": "Hauts faits",
       "lbTitleCol": "Titre",
-      "lbSelf": "Votre position: rang {rank}, dans le top {percent} %",
+      "lbScopeNote": "Accounts ranked by lifetime Renown. Each deed counts once across all characters on an account.",
+      "lbSelfAccount": "Your account: rank {rank}, top {percent} percent, {renown} Renown",
+      "lbSelfRank": "Your account: rank {rank}, top {percent} percent",
       "lbEmpty": "Aucun chroniqueur classé pour le moment.",
       "broadcastsLabel": "Partager les hauts faits accomplis avec la guilde et les amis",
       "titledName": "{name} « {title} »"
@@ -2991,8 +2993,8 @@ export const fr_FR: EnTranslations = {
       "heroicRewardsTitle": "Marques héroïques et butin amélioré",
       "heroicRewardsBody": "Les boss héroïques lâchent le butin que vous connaissez, amélioré et estampillé Héroïque dans l'infobulle, et le boss final de chaque expédition ajoute des objets épiques introuvables ailleurs. Cette dernière mort laisse aussi des Marques héroïques à chaque participant : une monnaie que l'on dépense auprès de l'Intendant Vex à Highwatch, dont le stock d'anneaux et de colliers constitue les seuls bijoux du royaume.",
       "heroicLockoutBody": "Les donjons normaux se parcourent à volonté. L'héroïque demande de la patience : la mort du boss final verrouille chaque membre de l'expédition à un seul nettoyage héroïque de ce donjon par jour, et le raid tient un verrou quotidien pour chaque difficulté. Une expédition à cinq joueurs déjà nettoyée reste ouverte à son propre groupe pour les retours au corps et le butin, si bien que personne n'est privé de ce qu'il y a gagné. Le raid est plus strict : une fois que sa mort vous verrouille, la porte reste close jusqu'à la réinitialisation quotidienne, alors récupérez votre butin avant de quitter l'arène.",
-      "resetTitle": "Resetting your instances",
-      "resetBody": "Switch difficulty while your group still holds claimed runs and the old claims linger for a while before clearing on their own. The party leader can let them go at once instead: choose Reset All Instances on their own portrait menu, or type /dungeon reset. A reset works only after the difficulty has actually been changed, only while nobody, living or fallen, remains inside, and a short cooldown separates one reset from the next. Arrive at the door on the wrong difficulty and the game says so before the run starts. The raid is never reset this way; its own lockout rules stand.",
+      "resetTitle": "Réinitialiser vos instances",
+      "resetBody": "Si vous changez de difficulté alors que votre groupe détient encore des parcours revendiqués, les anciennes revendications persistent un moment avant de disparaître. Le chef de groupe peut les abandonner immédiatement : choisissez Réinitialiser toutes les instances dans le menu de son portrait, ou saisissez /dungeon reset. La difficulté doit réellement avoir changé, personne, vivant ou mort, ne doit rester à l’intérieur, et un court délai sépare deux réinitialisations. Si vous arrivez à l’entrée avec la mauvaise difficulté, le jeu vous avertit avant le début. Le raid n’est jamais réinitialisé ainsi ; ses propres règles de verrouillage restent en vigueur.",
       "templeLoreTitle": "Le Temple noyé, un peu plus profond",
       "templeLoreBody": "Le temple a sa propre légende, plus ancienne que le culte que vous traquez ailleurs. Sur la rive du Glimmermere, un lac de montagne qui boit le clair de lune et rend les noyés, un veilleur solitaire garde une porte de lumière pâle. Sous la surface, un escalier de pierre froide y descend. Les gens qui ont sombré là ne se sont pas noyés par accident : c'était le Chœur pâle, qui s'est enfoncé en pleine adoration sans jamais cesser de chanter. Les anciens gardiens ont gravé un seul avertissement dans les rochers avant que l'eau ne les emporte, une prière à ce qu'ils appelaient la Lune noyée, qu'une main plus ferme a complété de deux mots en dessous : elle ne fait que dormir.",
       "cryptLeadTitle": "Une porte que les morts devaient garder close",
@@ -3100,7 +3102,7 @@ export const fr_FR: EnTranslations = {
       "howHeading": "Comment fonctionnent les hauts faits",
       "howBody": "Les hauts faits s'obtiennent et se conservent personnage par personnage, si bien que chaque héros que vous jouez se bâtit son propre Livre ; seul le Classement du royaume rassemble votre Renommée sur l'ensemble des personnages que vous jouez, en ne comptant chaque haut fait qu'une seule fois. Chaque haut fait énonce clairement ce qu'il attend de vous, directement dans le Livre des hauts faits en jeu, si bien que vous savez toujours quoi viser, et vous pouvez suivre ceux que vous convoitez pour les garder sous les yeux en jouant. Une petite poignée restent secrets et ne se dévoilent qu'une fois obtenus. Le Livre se tient aussi honnête : tout ce que votre passé peut prouver, il vous le crédite sur-le-champ, si bien qu'un vétéran ne l'ouvre jamais sur une page vide ; seuls les hauts faits à décompte commencent leur comptage de zéro.",
       "renownHeading": "Renommée",
-      "renownBody": "La Renommée est le score qui se cache derrière le Livre. Chaque haut fait obtenu vaut un montant fixe, et votre total ne fait que grimper: une semaine calme ne vous fait jamais perdre de terrain. Une poignée de hauts faits tiennent à la chance plutôt qu'au talent, et les Prouesses sont un honneur à part; ni les uns ni les autres ne rapportent la moindre Renommée.",
+      "renownBody": "Renown is the score behind the Book. Every deed you earn is worth a set amount, and your total only ever climbs, so a quiet week never costs you ground. A handful of deeds turn on luck rather than skill, and Feats are an honor of their own, so both of those are worth no Renown at all. Deeds without Renown still count toward completion in your Book; they simply never score.",
       "rewardsHeading": "Titres et bordures",
       "rewardsBody": "Les récompenses sont purement d'apparat, et c'est bien le but. Certains hauts faits confèrent un titre à porter ou une bordure pour encadrer votre nom, jamais rien qui rende votre héros plus fort. Choisissez le titre qui vous plaît dans le Livre des hauts faits: il vous accompagne sur votre plaque de nom, dans le chat et sur les classements, à la vue de tous.",
       "chroniclesHeading": "Chroniques",
@@ -3109,7 +3111,7 @@ export const fr_FR: EnTranslations = {
       "featsBody": "Les Prouesses forment une étagère à part: les annales de l'héritage et des premières mondiales, ces hauts faits liés à une époque révolue ou à un instant qui ne se produira qu'une seule fois. Elles ne rapportent aucune Renommée et restent hors du compte d'achèvement, conservées à jamais en mémoire de ce qui fut accompli.",
       "catalogHeading": "Le registre complet des hauts faits",
       "catalogBody": "Voici tous les hauts faits que le Livre peut contenir, regroupés par catégorie. Les hauts faits secrets en sont volontairement absents, attendant que vous les découvriez. Ouvrez le Livre des hauts faits en jeu pour voir exactement ce que chacun demande.",
-      "standingsNote": "Les royaumes tiennent un décompte continu de la Renommée sur l'ensemble des comptes. Pour savoir qui se place où, ouvrez le Classement en jeu et rendez-vous sur son onglet Renommée ; le classement se trouve là, pas sur le wiki.",
+      "standingsNote": "The realms keep a running tally of Renown across every account: the board ranks whole accounts by lifetime Renown, counting each deed once across all your characters, and it shows Renown alone, so deeds that carry none never move the standings even though they count in your Book. To see who stands where, open the Leaderboard in game and turn to its Renown tab; the standings live there, not on the wiki.",
       "catHeading": "{label} ({count})",
       "colName": "Haut fait",
       "colRenown": "Renommée",
@@ -3190,9 +3192,9 @@ export const fr_FR: EnTranslations = {
       "bagsTitle": "Sacs et capacité de transport",
       "bagsBody": "Tout ce que vous ramassez tient dans un sac commun, que vous agrandissez en équipant des sacs. Votre fenêtre de sacs comporte quatre emplacements de sac : cliquez sur un sac dans votre besace pour le glisser dans un emplacement libre, et chaque sac porté ajoute sa propre place. Les sacs simples sont des articles bon marché de marchand, les plus spacieux tombent des bêtes, et les plus beaux proviennent des boss de donjon, si bien que votre capacité de transport grandit au rythme de votre équipement.",
       "qualityTitle": "La qualité, d'un coup d'œil",
-      "qualityBody": "Every item has a quality, and its name is colored to match so you can read its worth at a glance. From most common to most prized:",
+      "qualityBody": "Chaque objet possède une qualité, et son nom prend la couleur correspondante afin que sa valeur soit lisible en un coup d’œil. Du plus courant au plus précieux :",
       "qualityPoor": "Médiocre",
-      "qualityCommon": "Common",
+      "qualityCommon": "Commun",
       "qualityUncommon": "Inhabituel",
       "qualityRare": "Rare",
       "qualityEpic": "Épique",
@@ -3200,7 +3202,7 @@ export const fr_FR: EnTranslations = {
       "qualityNote": "Une qualité supérieure signifie en général de meilleures caractéristiques, mais la qualité est un indice, pas une règle. Une pièce bien adaptée à votre classe et à votre niveau peut surpasser une autre plus tape-à-l'œil.",
       "upgradeTitle": "Gardez votre équipement à jour",
       "upgradeBody": "Remplacer une vieille pièce par une amélioration toute fraîche vous sert davantage que de jouer à la perfection dans un équipement que vous avez dépassé. Quand quelque chose de meilleur tombe ou qu'une quête vous le propose, prenez-le. Ne gardez pas vos bons objets pour plus tard.",
-      "itemLevelBody": "If you want a quick way to compare two pieces, turn on Show Item Level in the options. Gear with a known source, from enemies, quests, and the crafting trades, then shows an item level, a single figure for roughly how powerful it is based on where it came from, so you can tell at a glance which upgrade pulls more weight, even across different slots. Pieces with no such source, like plain vendor basics and starter gear, show no item level, so a missing figure is normal, not a fault.",
+      "itemLevelBody": "Pour comparer rapidement deux pièces, activez Afficher le niveau d’objet dans les options. L’équipement dont la provenance est connue, obtenu sur les ennemis, par les quêtes ou les métiers, affiche alors un niveau d’objet : une valeur unique qui estime sa puissance d’après sa source et permet de repérer la meilleure amélioration, même entre emplacements différents. Les pièces sans telle provenance, comme les articles de base des marchands et l’équipement de départ, n’en affichent pas ; cette absence est normale.",
       "sourcesTitle": "D'où vient l'équipement",
       "sourcesBody": "La plupart de vos premières améliorations sont des récompenses de quête, alors mieux vaut terminer les quêtes que de farmer. Les ennemis lâchent de l'équipement quand vous les vainquez, les marchands en ville vendent de bonnes bases, les artisans transforment les matériaux récoltés en pièces à porter, et le marché des joueurs vous permet d'acheter auprès d'autres aventuriers. Au sommet de la progression, deux monnaies de marques achètent un équipement introuvable ailleurs : les Marques de plongée auprès du gardien de plongée, et les Marques héroïques auprès de l'intendant héroïque.",
       "soulboundTitle": "Lié à l'âme : à vous et à vous seul",
@@ -3235,16 +3237,16 @@ export const fr_FR: EnTranslations = {
       "gatherToolsBody": "Les marchands vendent des outils de base pour chaque métier de récolte, et de meilleurs peuvent être fabriqués. Aucun outil n'est requis pour exploiter un gisement aujourd'hui : les outils posent les bases des gisements plus riches à venir, où pioches, haches et faucilles de niveau supérieur seront la voie d'accès.",
       "harvestTitle": "Dépecer la chasse elle-même",
       "harvestBody": "La récolte ne s'arrête pas aux gisements. Certaines bêtes abattues peuvent être dépecées pour des composants, cuirs, crocs, soie et choses plus étranges encore, directement sur le cadavre en plus de son butin ordinaire. Un seul récolteur par proie : le premier à dépecer rafle tout. Le choix vous appartient à chaque fois : prélevez tout ce que le cadavre offre, ou concentrez-vous sur un seul composant pour en tirer une qualité plus fine. N'importe quel personnage peut récolter, sans métier ni apprentissage requis, et un composant particulièrement fin porte même le nom de celui qui l'a récolté.",
-      "focusTitle": "Town Focus",
-      "focusBody": "Every hub town keeps a Town Focus panel for visiting harvesters: stand in town, open it from beside the minimap, and aim a small budget of focus points at the component types you care about. The more focus you give a component, the finer and richer it comes off every later corpse; your allocation follows your character wherever they roam, and you can rework it, free, on any later visit to town.",
+      "focusTitle": "Focalisation de la ville",
+      "focusBody": "Chaque ville principale propose un panneau de Focalisation de la ville aux récolteurs de passage : restez en ville, ouvrez-le près de la minicarte et attribuez un petit capital de points aux types de composants qui vous intéressent. Plus un composant reçoit de focalisation, plus les dépouilles suivantes en fournissent une version fine et abondante. Cette répartition suit votre personnage et peut être modifiée gratuitement lors de chaque visite en ville.",
       "craftTitle": "Les dix métiers d'artisanat",
       "craftIntro": "Dix métiers d'artisanat transforment les matériaux récoltés en équipement et en marchandises : la fabrication d'armures, la forge d'armes et la joaillerie façonnent la matière brute en équipement portable ; l'alchimie et l'ingénierie avancent par essais et erreurs ; la cuisine, la calligraphie et l'enchantement touchent chacun au produit des autres métiers ; la couture et le travail du cuir suivent des patrons précis. Ensemble, ils forment une roue où chaque métier siège entre deux voisins, à l'opposé d'un autre.",
       "craftRingTitle": "Une roue de spécialités",
       "craftRingBody": "Les dix métiers sont disposés en un anneau fixe, et la place d'un métier sur cet anneau compte : les métiers voisins sur la roue ont plus en commun entre eux que ceux qui se font face. S'engager dans un métier doit donner le sentiment de rejoindre une famille de métiers apparentés, pas de choisir une compétence isolée.",
       "craftRecipesTitle": "Recettes et composants",
       "craftRecipesBody": "Chaque recette réclame des composants précis que vous récoltez ou achetez. Les recettes les plus simples ne demandent que des matériaux communs et se fabriquent dès le tout début, si bien que vous pouvez exercer un métier dès l'instant où vous l'adoptez. Les listes de recettes se remplissent encore : quelques métiers attendent leurs premières recettes, et d'autres arrivent à mesure que les métiers s'étoffent.",
-      "craftHowTitle": "The crafting window",
-      "craftHowBody": "Open the Crafting window (default key T) to see every recipe you know, what each one needs, and what you have on hand; when the materials are there, one click does the work. Common recipes can be crafted anywhere in the world. A handful of advanced recipes, higher-tier tools and rare caster armor among them, instead ask you to stand at the crafting hub in Highwatch.",
+      "craftHowTitle": "La fenêtre d’artisanat",
+      "craftHowBody": "Ouvrez la fenêtre d’artisanat (touche T par défaut) pour voir toutes vos recettes, leurs composants et ce que vous possédez ; lorsque les matériaux sont réunis, un clic suffit. Les recettes courantes se fabriquent partout. Quelques recettes avancées, dont des outils de haut niveau et de rares armures de lanceur de sorts, exigent toutefois le centre d’artisanat de Highwatch.",
       "craftMasteryTitle": "Compétence et maîtrise",
       "craftMasteryBody": "Réussir une fabrication fait progresser votre compétence dans ce métier, et la compétence ne verrouille jamais les recettes d'un métier : si vous connaissez une recette et en détenez les matériaux, vous pouvez la tenter. Ce que la compétence vous apporte, c'est la qualité, une main exercée produit un ouvrage plus fin. La seule exception, ce sont les recettes combinées, qui exigent que vous ayez fait vos preuves dans leurs deux métiers avant de s'ouvrir.",
       "craftComboTitle": "Recettes combinées",
@@ -4366,6 +4368,24 @@ export const fr_FR: EnTranslations = {
     "balance": "Marques héroïques : {count}",
     "buyAria": "Acheter {item} pour {marks} marques héroïques"
   },
+  "cardDuel": {
+    "title": "Card Duel",
+    "close": "Close",
+    "join": "Join Queue",
+    "joinAria": "Join the Card Duel queue",
+    "leave": "Leave Queue",
+    "leaveAria": "Leave the Card Duel queue",
+    "forfeit": "Forfeit",
+    "forfeitAria": "Forfeit the Card Duel",
+    "queued": "Waiting for an opponent...",
+    "unavailable": "Card Duel requires another player online.",
+    "vsOpponent": "vs {name}",
+    "round": "Round score: {mine} - {theirs}",
+    "counts": "Deck: {deck} · Discard: {discard}",
+    "playCardAria": "Play the {value} card",
+    "waitingOnOpponent": "Waiting on your opponent's card...",
+    "yourTurn": "Play a card"
+  },
   "delveUi": {
     "board": {
       "title": "Tableau des plongées",
@@ -4864,6 +4884,11 @@ export const fr_FR: EnTranslations = {
       "quit": "Quitter",
       "fatalBody": "World of ClaudeCraft a rencontré une erreur inattendue et doit se fermer."
     }
+  },
+  "gpuNotice": {
+    "bodyDesktop": "The game is running without GPU acceleration and will be slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
+    "bodyWeb": "The game is running without GPU acceleration and will be slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.",
+    "dismiss": "Dismiss"
   },
   "realm": {
     "noRealms": "Aucun monde disponible.",
@@ -8701,6 +8726,11 @@ export const fr_FR: EnTranslations = {
         "title": "Le Coffre doré",
         "greeting": "Bienvenue au Coffre doré. Vos biens reposent à l'abri derrière nos serrures."
       },
+      "card_master": {
+        "name": "Card Master",
+        "title": "Dealer of Chance",
+        "greeting": "Care for a Card Duel? Best of three, winner takes the bragging rights."
+      },
       "bursar_petra_vell": {
         "name": "Trésorière Petra Vell",
         "title": "Le Coffre doré",
@@ -9807,9 +9837,9 @@ export const fr_FR: EnTranslations = {
         "body": "Rares sont ceux qui sauront jamais ce qui était enterré dans ce creux, et plus rares encore ceux qui le croiraient. Moi, je le sais, et je ne l’oublierai pas.\n\nQue votre route reste éclairée.\n- Frère Aldric"
       },
       "heroic_marks_reward": {
-        "sender": "The Heroic Quartermaster",
-        "subject": "Your Heroic Marks",
-        "body": "Your warband cleared the heroic trial while you fought from the back, or from the dirt. Your lockout was struck all the same, so your share of Heroic Marks flies to you here rather than being lost. Spend them well.\n\n- The Heroic Quartermaster"
+        "sender": "Intendant héroïque",
+        "subject": "Vos Marques héroïques",
+        "body": "Votre groupe a triomphé de l’épreuve héroïque pendant que vous combattiez à l’arrière ou gisiez à terre. Votre verrouillage a tout de même été enregistré, alors votre part de Marques héroïques vous est envoyée ici au lieu d’être perdue. Faites-en bon usage.\n\n- Intendant héroïque"
       }
     },
     "itemSets": {
@@ -9835,7 +9865,7 @@ export const fr_FR: EnTranslations = {
       },
       "necromancers": {
         "name": "Parure de Mournweave",
-        "bonus2": "Vous ne pouvez pas être projeté en arrière (100% de résistance à la projection).",
+        "bonus2": "Augmente la puissance des sorts de 20. Les dégâts subis ne retardent plus vos incantations (100% de résistance au retard des sorts).",
         "bonus3": "Augmente l'intelligence de 10 et l'endurance de 10.",
         "bonus4": "Vos sorts ont 10% de chances de conférer Incantation limpide, rendant votre prochain sort gratuit."
       },
@@ -9847,13 +9877,13 @@ export const fr_FR: EnTranslations = {
       },
       "soulflame": {
         "name": "Tenue d'apparat Wraithfire",
-        "bonus2": "Vous ne pouvez pas être projeté en arrière (100% de résistance à la projection).",
+        "bonus2": "Augmente la puissance des sorts de 20. Les dégâts subis ne retardent plus vos incantations (100% de résistance au retard des sorts).",
         "bonus3": "Augmente l'intelligence de 15, l'esprit de 15 et la vitesse d'attaque et d'incantation de 15%.",
         "bonus4": "Vos sorts ont 10% de chances de conférer Embrasement d'âme, augmentant la puissance des sorts de 40 pendant 10 s."
       },
       "stormcallers": {
         "name": "Vêtements de Galecall",
-        "bonus2": "Vous ne pouvez pas être projeté en arrière (100% de résistance à la projection).",
+        "bonus2": "Augmente la puissance des sorts de 20. Les dégâts subis ne retardent plus vos incantations (100% de résistance au retard des sorts).",
         "bonus3": "Augmente l'intelligence de 15, l'esprit de 15 et la vitesse d'attaque et d'incantation de 15%.",
         "bonus4": "Vos sorts ont 10% de chances de conférer Embrasement d'âme, augmentant la puissance des sorts de 40 pendant 10 s."
       },

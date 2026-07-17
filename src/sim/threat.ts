@@ -69,6 +69,17 @@ export function clearThreat(mob: Entity): void {
   mob.forcedTargetTimer = 0;
 }
 
+/** Remove ONE attacker from the hate table (they left the instance or otherwise
+ *  stopped existing for this mob). A taunt lock (forcedTargetId) pointing at
+ *  that attacker is released with the entry. */
+export function dropThreat(mob: Entity, sourceId: number): void {
+  mob.threat.delete(sourceId);
+  if (mob.forcedTargetId === sourceId) {
+    mob.forcedTargetId = null;
+    mob.forcedTargetTimer = 0;
+  }
+}
+
 /** Highest threat value on the table (0 when empty) — taunt matches this. */
 export function topThreatValue(mob: Entity): number {
   let top = 0;

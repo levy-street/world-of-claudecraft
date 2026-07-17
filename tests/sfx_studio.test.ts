@@ -371,8 +371,13 @@ describe('SFX Studio project schema', () => {
       }
       expect(readFileSync(mixPath)).toEqual(mixBytes);
       const manifest = buildSfxManifestData(fixture);
+      // foot_grass is explicitly overridden by this draft (categoryBaselineDb
+      // -6, keyTrimDb 3 => -3dB), unaffected by its own pinned ceiling trim.
+      // foot_stone shares the same movement category baseline (-6dB) but
+      // keeps its OWN currently-pinned keyTrimDb (a real custom-key gain
+      // ceiling value, not neutral), so its resolved gain reflects that too.
       expect(manifest.foot_grass).toMatchObject({ gain: 0.707946, playbackRate: 1.2 });
-      expect(manifest.foot_stone).toMatchObject({ gain: 0.501187, playbackRate: 1 });
+      expect(manifest.foot_stone).toMatchObject({ gain: 0.912011, playbackRate: 1 });
       realTrackedPaths.forEach((path, index) => {
         expect(readFileSync(path)).toEqual(realTrackedBefore[index]);
       });
@@ -382,12 +387,15 @@ describe('SFX Studio project schema', () => {
   it('keeps workspace playback maps strict, resolved, and separate from render projects', async () => {
     await withIsolatedPlaybackDraft(() => {
       const initial = getPlaybackProfileState('foot_grass');
+      // foot_grass is a custom key currently pinned to its own computed gain
+      // ceiling in the real checked-in gain map (not neutral), so its initial
+      // (undrafted) resolved state reflects that real pinned value.
       expect(initial.playback).toMatchObject({
         category: 'movement',
         categoryBaselineDb: 0,
-        keyTrimDb: 0,
-        resolvedGainDb: 0,
-        gain: 1,
+        keyTrimDb: 5.1,
+        resolvedGainDb: 5.1,
+        gain: 1.798871,
         playbackRate: 1,
       });
       expect(initial.playbackProfileHash).toMatch(/^[a-f0-9]{64}$/);
@@ -426,11 +434,16 @@ describe('SFX Studio project schema', () => {
       );
       const sibling = getPlaybackProfileState('foot_stone').playback;
       expect(shared.playback.resolvedGainDb).toBe(0);
+      // foot_stone is a custom key currently pinned to its own real ceiling
+      // trim in the checked-in gain map (not neutral), so its resolved state
+      // reflects that pin on top of the shared category baseline this draft
+      // just set; categoryBaselineMaxDb likewise reflects the tightest actual
+      // ceiling headroom across the real 'movement' category's custom keys.
       expect(sibling).toMatchObject({
         categoryBaselineDb: -6,
-        categoryBaselineMaxDb: -6,
-        keyTrimDb: 0,
-        resolvedGainDb: -6,
+        categoryBaselineMaxDb: -6.1,
+        keyTrimDb: 5.2,
+        resolvedGainDb: -0.7999999999999998,
       });
       expect(() =>
         savePlaybackProfileDraft('foot_grass', {
@@ -1223,7 +1236,18 @@ describe('SFX runtime manifest generation', () => {
     const built = buildSfxManifestData(ROOT);
     const catalogKeys = SFX.map((entry: { key: string }) => entry.key).sort();
 
-    expect(Object.keys(built)).toEqual(catalogKeys);
+    // Every declared catalog key must be present; the manifest may ALSO carry
+    // mob subfamily extension keys (mob_<family>_<sub>_<action>, e.g.
+    // mob_beast_wolf_attack) that are purely filesystem-discovered and never
+    // appear in the static catalog array by design (see sfx_prompts.mjs).
+    const builtKeys = Object.keys(built).sort();
+    for (const key of catalogKeys) {
+      expect(builtKeys, key).toContain(key);
+    }
+    const extraKeys = builtKeys.filter((key) => !catalogKeys.includes(key));
+    for (const key of extraKeys) {
+      expect(key, key).toMatch(/^mob_[a-z]+_[a-z]+_(aggro|attack|death|hurt|idle)$/);
+    }
     expect(built).toEqual(SFX_CLIPS);
   });
 
