@@ -24,6 +24,8 @@ function mob(overrides: Partial<Entity> = {}): Entity {
     templateId: 'forest_wolf',
     pos: { x: 0, y: 0, z: 0 },
     dead: false,
+    ownerId: null,
+    aggroTargetId: null,
     ...overrides,
   } as unknown as Entity;
 }
@@ -40,43 +42,51 @@ describe('idleDensityFactor', () => {
 describe('isIdleBarkCandidate', () => {
   const playerPos = { x: 0, y: 0, z: 0 };
 
-  it('accepts a living, non-aggroed, unmuted, in-range mob', () => {
-    expect(isIdleBarkCandidate(mob(), playerPos, new Set())).toBe(true);
+  it('accepts a living, unowned, non-dummy, non-aggroed, unmuted, in-range mob', () => {
+    expect(isIdleBarkCandidate(mob(), playerPos)).toBe(true);
   });
 
   it('rejects a non-mob entity (player, npc)', () => {
-    expect(isIdleBarkCandidate(mob({ kind: 'player' }), playerPos, new Set())).toBe(false);
-    expect(isIdleBarkCandidate(mob({ kind: 'npc' }), playerPos, new Set())).toBe(false);
+    expect(isIdleBarkCandidate(mob({ kind: 'player' }), playerPos)).toBe(false);
+    expect(isIdleBarkCandidate(mob({ kind: 'npc' }), playerPos)).toBe(false);
   });
 
   it('rejects a dead mob', () => {
-    expect(isIdleBarkCandidate(mob({ dead: true }), playerPos, new Set())).toBe(false);
+    expect(isIdleBarkCandidate(mob({ dead: true }), playerPos)).toBe(false);
   });
 
-  it('rejects a mob already tracked as aggroed (mid-combat)', () => {
-    expect(isIdleBarkCandidate(mob({ id: 5 }), playerPos, new Set([5]))).toBe(false);
-    // A DIFFERENT mob's id in the aggroed set does not exclude this one.
-    expect(isIdleBarkCandidate(mob({ id: 5 }), playerPos, new Set([6]))).toBe(true);
+  it('rejects a mob currently chasing or being chased (aggroTargetId set)', () => {
+    expect(isIdleBarkCandidate(mob({ aggroTargetId: 42 }), playerPos)).toBe(false);
+  });
+
+  it('accepts a mob that fought and then leashed/evaded (aggroTargetId cleared)', () => {
+    // The bug this replaced: gating on a "ever fought" set never re-admits an
+    // evaded mob for the rest of the session. aggroTargetId is the live signal.
+    expect(isIdleBarkCandidate(mob({ aggroTargetId: null }), playerPos)).toBe(true);
+  });
+
+  it('rejects an owned entity (tamed/summoned pet, delve companion)', () => {
+    expect(isIdleBarkCandidate(mob({ ownerId: 7 }), playerPos)).toBe(false);
+  });
+
+  it('rejects a dummy mob (the Training Dummy)', () => {
+    expect(isIdleBarkCandidate(mob({ templateId: 'training_dummy' }), playerPos)).toBe(false);
   });
 
   it('rejects a muted mob (the Nythraxis mute list)', () => {
     expect(
-      isIdleBarkCandidate(
-        mob({ templateId: 'nythraxis_scourge_of_thornpeak' }),
-        playerPos,
-        new Set(),
-      ),
+      isIdleBarkCandidate(mob({ templateId: 'nythraxis_scourge_of_thornpeak' }), playerPos),
     ).toBe(false);
-    expect(
-      isIdleBarkCandidate(mob({ templateId: 'nythraxis_skeleton_warrior' }), playerPos, new Set()),
-    ).toBe(false);
+    expect(isIdleBarkCandidate(mob({ templateId: 'nythraxis_skeleton_warrior' }), playerPos)).toBe(
+      false,
+    );
   });
 
   it('rejects a mob outside the scan radius, accepts one just inside it', () => {
     const justOutside = mob({ pos: { x: MOB_IDLE_SCAN_RADIUS + 0.1, y: 0, z: 0 } });
     const justInside = mob({ pos: { x: MOB_IDLE_SCAN_RADIUS - 0.1, y: 0, z: 0 } });
-    expect(isIdleBarkCandidate(justOutside, playerPos, new Set())).toBe(false);
-    expect(isIdleBarkCandidate(justInside, playerPos, new Set())).toBe(true);
+    expect(isIdleBarkCandidate(justOutside, playerPos)).toBe(false);
+    expect(isIdleBarkCandidate(justInside, playerPos)).toBe(true);
   });
 });
 

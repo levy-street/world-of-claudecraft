@@ -7675,13 +7675,13 @@ export class Hud {
     const p = sim.player;
     const candidates: IdleBarkCandidate[] = [];
     for (const e of sim.entities.values()) {
-      if (isIdleBarkCandidate(e, p.pos, this.mobAggroed)) {
+      if (isIdleBarkCandidate(e, p.pos)) {
         candidates.push({ id: e.id, templateId: e.templateId, x: e.pos.x, y: e.pos.y, z: e.pos.z });
       }
     }
     if (!candidates.length) return;
     const now = performance.now();
-    const picked = pickIdleBarkCandidates(candidates, now, this.mobLastIdleBarkAt);
+    const picked = pickIdleBarkCandidates(candidates, now, this.mobLastIdleBarkAt, Math.random);
     for (const c of picked) {
       const voice = availableMobVoiceCue(c.templateId, 'idle');
       if (!voice) continue;

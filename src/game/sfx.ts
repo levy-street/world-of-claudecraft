@@ -392,13 +392,13 @@ class Sfx {
     return dx * dx + dz * dz > MAX_DISTANCE_SQ;
   }
 
-  /** Positional one-shot at world (x,y,z). */
-  /** Returns whether this call actually scheduled a sound (false for out of
-   *  range, an unbuffered clip still loading, the voice cap, or a per-key
-   *  cooldown block). A caller that only wants to know "did MY attempt make
-   *  a sound, not some other source that beat me to this key's cooldown"
-   *  (e.g. the mob idle-bark sweep's per-entity cooldown stamping, see
-   *  src/ui/mob_idle_sfx.ts) needs this instead of firing blind. */
+  /** Positional one-shot at world (x,y,z). Returns whether this call actually
+   *  scheduled a sound: false if the audio context is not yet initialized,
+   *  out of range, an unbuffered clip still loading, the voice cap, or a
+   *  per-key cooldown block. A caller that only wants to know "did MY
+   *  attempt make a sound, not some other source that beat me to this key's
+   *  cooldown" (e.g. the mob idle-bark sweep's per-entity cooldown stamping,
+   *  see src/ui/mob_idle_sfx.ts) needs this instead of firing blind. */
   playAt(key: string, x: number, y: number, z: number, opts?: PlayOpts): boolean {
     const ctx = this.ctx,
       master = this.master;

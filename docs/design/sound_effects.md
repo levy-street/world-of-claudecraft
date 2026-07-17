@@ -274,14 +274,17 @@ pitched-up `attack`. Families: `beast`, `boar`, `spider`, `mudfin`, `burrower`,
 | `demon` | a demon — sinister hissing snarl / shrieking demonic strike / agonized demonic death wail |
 
 ### Idle vocalizations (spatial, ambient bark)
-`mob_<family>_idle` (one per family, `reptile` included, 14 total), plus a
-subfamily-specific `mob_<family>_<subfamily>_idle` for the wolf and skeleton
-aliases (see `SUBFAMILY_ALIAS` in `src/ui/combat_sfx.ts`). Unlike the reactive
+`mob_<family>_idle` (one per family, `reptile` included, 13 total), plus a
+subfamily-specific `mob_<family>_<subfamily>_idle` for the wolf aliases (see
+`SUBFAMILY_ALIAS` in `src/ui/combat_sfx.ts`; a matching `mob_undead_skeleton_*`
+set exists on disk but is not currently wired to any live template, an
+inherited gap this feature did not introduce). Unlike the reactive
 aggro/attack/death/hurt vocalizations (fired directly off sim combat events),
 idle barks are presentation-only ambience: a shared periodic sweep
 (`Hud.sweepMobIdleBarks`, throttled to `MOB_IDLE_CHECK_INTERVAL_MS` from
-`update()`, never per-mob-per-frame) considers every non-combat, unmuted mob
-within `MOB_IDLE_SCAN_RADIUS` of the player and rolls each one independently
+`update()`, never per-mob-per-frame) considers every non-combat, unowned,
+non-dummy, unmuted mob within `MOB_IDLE_SCAN_RADIUS` of the player and rolls
+each one independently
 against `MOB_IDLE_BASE_CHANCE`, damped by how many same-family mobs are
 clustered nearby (`idleDensityFactor`, `src/ui/mob_idle_sfx.ts`) so a dense
 pack does not all bark in the same sweep. A per-entity cooldown

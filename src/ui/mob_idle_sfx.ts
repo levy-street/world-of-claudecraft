@@ -1,3 +1,4 @@
+import { MOBS } from '../sim/data';
 import type { Entity, Vec3 } from '../sim/types';
 import { dist2d } from '../sim/types';
 import { mobVoiceFamily, shouldPlayMobVoiceSfxForEntity } from './combat_sfx';
@@ -27,21 +28,25 @@ export function idleDensityFactor(sameFamilyCount: number): number {
 }
 
 /** Whether `e` is even eligible to be considered for an idle bark this
- *  sweep: a living mob, not already mid-combat (aggroed, tracked by the
- *  caller's own id set since idle barks defer to the reactive
- *  aggro/attack/hurt/death vocalizations, see hud.ts's mobAggroed), not
- *  muted (the Nythraxis mute list, shouldPlayMobVoiceSfxForEntity), and
- *  within earshot of the player. Pulled out of hud.ts's sweep so the
- *  exclusion logic is testable without a running Hud/DOM. */
-export function isIdleBarkCandidate(
-  e: Entity,
-  playerPos: Vec3,
-  aggroedIds: ReadonlySet<number>,
-): boolean {
+ *  sweep: a living, unowned, non-dummy mob, not currently chasing/being
+ *  chased (`aggroTargetId`, mirrored on both hosts and correctly cleared on
+ *  leash/evade, unlike the aggro-voice-dedupe `mobAggroed` set in hud.ts,
+ *  which is a different concern: idle barks defer to the reactive
+ *  aggro/attack/hurt/death vocalizations, but only while combat is actually
+ *  live), not muted (the Nythraxis mute list, shouldPlayMobVoiceSfxForEntity),
+ *  and within earshot of the player. `ownerId === null` excludes tamed/
+ *  summoned pets and delve companions (owned mob entities that stand next to
+ *  you all session and would otherwise bark at point-blank range); the dummy
+ *  check excludes the Training Dummy (a stationary practice target, not a
+ *  living creature). Pulled out of hud.ts's sweep so the exclusion logic is
+ *  testable without a running Hud/DOM. */
+export function isIdleBarkCandidate(e: Entity, playerPos: Vec3): boolean {
   return (
     e.kind === 'mob' &&
     !e.dead &&
-    !aggroedIds.has(e.id) &&
+    e.ownerId === null &&
+    !MOBS[e.templateId]?.dummy &&
+    e.aggroTargetId === null &&
     shouldPlayMobVoiceSfxForEntity(e) &&
     dist2d(playerPos, e.pos) <= MOB_IDLE_SCAN_RADIUS
   );
@@ -69,7 +74,7 @@ export function pickIdleBarkCandidates(
   candidates: readonly IdleBarkCandidate[],
   now: number,
   lastBarkAt: ReadonlyMap<number, number>,
-  rng: () => number = Math.random,
+  rng: () => number,
 ): IdleBarkCandidate[] {
   const familyCounts = new Map<string, number>();
   for (const c of candidates) {

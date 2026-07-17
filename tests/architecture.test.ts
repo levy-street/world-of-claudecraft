@@ -123,6 +123,7 @@ const UI_PURE_CORES = [
   'src/ui/char_bags_pairing_core.ts',
   'src/ui/equip_drop_core.ts',
   'src/ui/log_event_route.ts',
+  'src/ui/mob_idle_sfx.ts',
   'src/ui/unit_portrait.ts',
   'src/ui/xp_bar.ts',
   'src/ui/absorb_bar.ts',
@@ -238,6 +239,7 @@ const RENDER_PURE_CORES = [
 // updating this list) fails the cross-check instead of silently escaping the
 // reverse-completeness guard.
 const BARE_NAMED = [
+  'src/ui/mob_idle_sfx.ts',
   'src/ui/unit_portrait.ts',
   'src/ui/xp_bar.ts',
   'src/ui/absorb_bar.ts',
