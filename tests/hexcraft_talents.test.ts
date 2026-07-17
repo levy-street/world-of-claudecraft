@@ -104,10 +104,11 @@ describe('Hexcraft talent: Deepened Hex', () => {
     }
   });
 
-  it('does not extend foreign hexes or add RNG draws to Gloom Bolt', () => {
+  it('requires the selected option, preserves foreign hexes, and adds no Gloom Bolt draws', () => {
     const run = (selected: boolean) => {
       const sim = warlockSim({ selected, seed: 170_744 });
       const target = targetFor(sim, selected ? 97_405 : 97_406);
+      for (const hexId of HEX_IDS) runAbility(sim, target, hexId);
       target.auras.push({
         id: 'corruption',
         name: 'Foreign Blackrot',
@@ -122,13 +123,20 @@ describe('Hexcraft talent: Deepened Hex', () => {
       sim.ctx.rng.setObserver((value) => draws.push(value));
       runAbility(sim, target, 'shadow_bolt');
       sim.ctx.rng.setObserver(null);
-      return { draws, foreign: target.auras[0] };
+      return {
+        draws,
+        ownExtendedBy: ownedHex(target, sim.player.id, 'corruption').extendedBy ?? 0,
+        foreign: target.auras.find((aura) => aura.id === 'corruption' && aura.sourceId === 777),
+      };
     };
 
     const talented = run(true);
     const baseline = run(false);
     expect(talented.draws).toEqual(baseline.draws);
+    expect(talented.ownExtendedBy).toBe(3);
+    expect(baseline.ownExtendedBy).toBe(0);
     expect(talented.foreign).toMatchObject({ duration: 18, remaining: 18 });
+    expect(baseline.foreign).toMatchObject({ duration: 18, remaining: 18 });
   });
 
   it('keeps the shared upkeep option functional for Pactbound and Ruination', () => {

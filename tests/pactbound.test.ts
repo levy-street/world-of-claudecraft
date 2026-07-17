@@ -89,9 +89,14 @@ describe('Pactbound Fiendlore', () => {
     const sim = warlockSim();
     const target = targetFor(sim);
     const pet = ownedPetFor(sim);
+    const foreignOwnerId = sim.addPlayer('warrior', 'Foreign Owner');
+    const foreignPet = ownedPetFor(sim, 97_411);
+    foreignPet.ownerId = foreignOwnerId;
     let draws = 0;
     sim.ctx.rng.setObserver(() => draws++);
 
+    sim.dealDamage(foreignPet, target, 10, false, 'physical', 'Foreign Pet Test', 'hit');
+    sim.dealDamage(foreignPet, target, 10, false, 'physical', 'Foreign Pet Test', 'hit');
     sim.dealDamage(pet, target, 0, false, 'physical', 'Demon Test', 'hit');
     sim.dealDamage(
       pet,

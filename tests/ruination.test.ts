@@ -45,6 +45,18 @@ function runAbility(sim: Sim, target: Entity, abilityId: string): void {
   sim.ctx.runEffects(sim.player, meta, target, ability);
 }
 
+function advanceCastAndProjectile(sim: Sim): void {
+  for (
+    let tick = 0;
+    tick < 200 && (sim.player.castingAbility !== null || sim.ctx.pendingProjectiles.length > 0);
+    tick++
+  ) {
+    sim.tick();
+  }
+  expect(sim.player.castingAbility).toBeNull();
+  expect(sim.ctx.pendingProjectiles).toHaveLength(0);
+}
+
 describe('Ruination Desolation', () => {
   it('authors a valid cross-school critical relay without a new resource', () => {
     const spec = TALENTS.warlock.specs.find((candidate) => candidate.id === 'destruction');
@@ -127,6 +139,44 @@ describe('Ruination Desolation', () => {
     expect(sim.player.auras.some((aura) => aura.id.startsWith('wlk_desolation_'))).toBe(false);
   });
 
+  it('acquires both relay windows through real critical spell damage and ignores non-criticals', () => {
+    const critical = warlockSim();
+    const criticalTarget = targetFor(critical, 97_419);
+    criticalTarget.level = 1;
+    critical.player.stats.int = 2_000;
+
+    critical.castAbility('searing_pain');
+    advanceCastAndProjectile(critical);
+    expect(critical.player.auras.find((aura) => aura.id === 'wlk_desolation_gloom')).toMatchObject({
+      kind: 'next_cast_instant',
+      empowerAbilities: ['shadow_bolt'],
+    });
+
+    critical.player.resource = critical.player.maxResource;
+    critical.player.gcdRemaining = 0;
+    critical.player.stats.int = 2_000;
+    critical.castAbility('shadow_bolt');
+    advanceCastAndProjectile(critical);
+    expect(
+      critical.player.auras.find((aura) => aura.id === 'wlk_desolation_conflagrate'),
+    ).toMatchObject({ kind: 'next_cast_free', empowerAbilities: ['conflagrate'] });
+
+    const nonCritical = warlockSim();
+    const nonCriticalTarget = targetFor(nonCritical, 97_420);
+    nonCriticalTarget.level = 1;
+    nonCritical.player.stats.int = -100;
+    nonCritical.castAbility('searing_pain');
+    advanceCastAndProjectile(nonCritical);
+    nonCritical.player.resource = nonCritical.player.maxResource;
+    nonCritical.player.gcdRemaining = 0;
+    nonCritical.castAbility('shadow_bolt');
+    advanceCastAndProjectile(nonCritical);
+
+    expect(nonCritical.player.auras.some((aura) => aura.id.startsWith('wlk_desolation_'))).toBe(
+      false,
+    );
+  });
+
   it('gates both relay windows by Ruination and the known Conflagrate signature', () => {
     const withoutSignature = warlockSim();
     const meta = withoutSignature.meta(withoutSignature.playerId);
@@ -134,7 +184,7 @@ describe('Ruination Desolation', () => {
     meta.known = meta.known.filter((ability) => ability.def.id !== 'conflagrate');
 
     for (const sim of [warlockSim('affliction'), warlockSim('demonology'), withoutSignature]) {
-      const target = targetFor(sim, 97_419 + sim.player.id);
+      const target = targetFor(sim, 97_421 + sim.player.id);
       onSpellCrit(sim.ctx, sim.player, 'immolate', target);
       onSpellCrit(sim.ctx, sim.player, 'shadow_bolt', target);
 

@@ -149,6 +149,20 @@ describe('Hexcraft Creeping Rot', () => {
     expect(sibling.extendedBy).toBe(0);
   });
 
+  it('drops the Consume extension immediately after a live spec change', () => {
+    const sim = warlockSim('affliction', 170_743);
+    const target = targetFor(sim, 97_404);
+    applyDot(sim, target, 'corruption');
+
+    sim.player.inCombat = false;
+    expect(sim.applyTalents({ spec: 'demonology', rows: {} })).toBe(true);
+    sim.player.resource = sim.player.maxResource;
+    sim.player.gcdRemaining = 0;
+    channelToEnd(sim);
+
+    expect(ownedDot(target, sim.player.id, 'corruption').extendedBy ?? 0).toBe(0);
+  });
+
   it('localizes the visible Creeping Rot identity in every non-Latin release locale', () => {
     for (const language of ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'] as const) {
       expect(localizeTalentTitle('Creeping Rot', language)).not.toBe('Creeping Rot');
