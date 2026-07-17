@@ -1,4 +1,6 @@
-import { mobVoiceFamily } from './combat_sfx';
+import type { Entity, Vec3 } from '../sim/types';
+import { dist2d } from '../sim/types';
+import { mobVoiceFamily, shouldPlayMobVoiceSfxForEntity } from './combat_sfx';
 
 // Idle mob-voice bark trigger tuning. See docs/design/sound_effects.md for
 // the design writeup; the short version: a shared periodic sweep (not
@@ -20,6 +22,27 @@ export const MOB_IDLE_GAIN = 0.55;
 export function idleDensityFactor(sameFamilyCount: number): number {
   if (sameFamilyCount <= 1) return 1;
   return 1 / Math.sqrt(sameFamilyCount);
+}
+
+/** Whether `e` is even eligible to be considered for an idle bark this
+ *  sweep: a living mob, not already mid-combat (aggroed, tracked by the
+ *  caller's own id set since idle barks defer to the reactive
+ *  aggro/attack/hurt/death vocalizations, see hud.ts's mobAggroed), not
+ *  muted (the Nythraxis mute list, shouldPlayMobVoiceSfxForEntity), and
+ *  within earshot of the player. Pulled out of hud.ts's sweep so the
+ *  exclusion logic is testable without a running Hud/DOM. */
+export function isIdleBarkCandidate(
+  e: Entity,
+  playerPos: Vec3,
+  aggroedIds: ReadonlySet<number>,
+): boolean {
+  return (
+    e.kind === 'mob' &&
+    !e.dead &&
+    !aggroedIds.has(e.id) &&
+    shouldPlayMobVoiceSfxForEntity(e) &&
+    dist2d(playerPos, e.pos) <= MOB_IDLE_SCAN_RADIUS
+  );
 }
 
 export interface IdleBarkCandidate {

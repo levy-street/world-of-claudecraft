@@ -337,10 +337,10 @@ import {
 } from './minimap_zoom';
 import {
   type IdleBarkCandidate,
+  isIdleBarkCandidate,
   MOB_IDLE_CHECK_INTERVAL_MS,
   MOB_IDLE_GAIN,
   MOB_IDLE_KEY_COOLDOWN_S,
-  MOB_IDLE_SCAN_RADIUS,
   pickIdleBarkCandidates,
 } from './mob_idle_sfx';
 import { type MobTooltipI18n, type MobTooltipModel, mobTooltipHtml } from './mob_tooltip_view';
@@ -7675,13 +7675,7 @@ export class Hud {
     const p = sim.player;
     const candidates: IdleBarkCandidate[] = [];
     for (const e of sim.entities.values()) {
-      if (
-        e.kind === 'mob' &&
-        !e.dead &&
-        !this.mobAggroed.has(e.id) &&
-        shouldPlayMobVoiceSfxForEntity(e) &&
-        dist2d(p.pos, e.pos) <= MOB_IDLE_SCAN_RADIUS
-      ) {
+      if (isIdleBarkCandidate(e, p.pos, this.mobAggroed)) {
         candidates.push({ id: e.id, templateId: e.templateId, x: e.pos.x, y: e.pos.y, z: e.pos.z });
       }
     }

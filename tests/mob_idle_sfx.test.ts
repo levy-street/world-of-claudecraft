@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vitest';
+import type { Entity } from '../src/sim/types';
 import {
   type IdleBarkCandidate,
   idleDensityFactor,
+  isIdleBarkCandidate,
   MOB_IDLE_BASE_CHANCE,
   MOB_IDLE_PER_ENTITY_COOLDOWN_MS,
+  MOB_IDLE_SCAN_RADIUS,
   pickIdleBarkCandidates,
 } from '../src/ui/mob_idle_sfx';
 
@@ -14,12 +17,66 @@ function candidate(id: number, templateId: string): IdleBarkCandidate {
   return { id, templateId, x: 0, y: 0, z: 0 };
 }
 
+function mob(overrides: Partial<Entity> = {}): Entity {
+  return {
+    id: 1,
+    kind: 'mob',
+    templateId: 'forest_wolf',
+    pos: { x: 0, y: 0, z: 0 },
+    dead: false,
+    ...overrides,
+  } as unknown as Entity;
+}
+
 describe('idleDensityFactor', () => {
   it('is 1 for a lone mob and shrinks as the same-family cluster grows', () => {
     expect(idleDensityFactor(0)).toBe(1);
     expect(idleDensityFactor(1)).toBe(1);
     expect(idleDensityFactor(4)).toBe(0.5);
     expect(idleDensityFactor(9)).toBeCloseTo(1 / 3);
+  });
+});
+
+describe('isIdleBarkCandidate', () => {
+  const playerPos = { x: 0, y: 0, z: 0 };
+
+  it('accepts a living, non-aggroed, unmuted, in-range mob', () => {
+    expect(isIdleBarkCandidate(mob(), playerPos, new Set())).toBe(true);
+  });
+
+  it('rejects a non-mob entity (player, npc)', () => {
+    expect(isIdleBarkCandidate(mob({ kind: 'player' }), playerPos, new Set())).toBe(false);
+    expect(isIdleBarkCandidate(mob({ kind: 'npc' }), playerPos, new Set())).toBe(false);
+  });
+
+  it('rejects a dead mob', () => {
+    expect(isIdleBarkCandidate(mob({ dead: true }), playerPos, new Set())).toBe(false);
+  });
+
+  it('rejects a mob already tracked as aggroed (mid-combat)', () => {
+    expect(isIdleBarkCandidate(mob({ id: 5 }), playerPos, new Set([5]))).toBe(false);
+    // A DIFFERENT mob's id in the aggroed set does not exclude this one.
+    expect(isIdleBarkCandidate(mob({ id: 5 }), playerPos, new Set([6]))).toBe(true);
+  });
+
+  it('rejects a muted mob (the Nythraxis mute list)', () => {
+    expect(
+      isIdleBarkCandidate(
+        mob({ templateId: 'nythraxis_scourge_of_thornpeak' }),
+        playerPos,
+        new Set(),
+      ),
+    ).toBe(false);
+    expect(
+      isIdleBarkCandidate(mob({ templateId: 'nythraxis_skeleton_warrior' }), playerPos, new Set()),
+    ).toBe(false);
+  });
+
+  it('rejects a mob outside the scan radius, accepts one just inside it', () => {
+    const justOutside = mob({ pos: { x: MOB_IDLE_SCAN_RADIUS + 0.1, y: 0, z: 0 } });
+    const justInside = mob({ pos: { x: MOB_IDLE_SCAN_RADIUS - 0.1, y: 0, z: 0 } });
+    expect(isIdleBarkCandidate(justOutside, playerPos, new Set())).toBe(false);
+    expect(isIdleBarkCandidate(justInside, playerPos, new Set())).toBe(true);
   });
 });
 
