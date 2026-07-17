@@ -82,7 +82,11 @@ const TOGGLE_IDS: ReadonlySet<string> = new Set(['ghost_wolf']);
 // stable content ids so Sim auras and wire-mirrored auras derive the same priority.
 // Add each empowerment in the commit that authors it; long passive raid buffs remain
 // eligible for overflow shedding.
-const ACTIONABLE_AURA_IDS: ReadonlySet<string> = new Set(['mag_ember_relay', 'mag_aetheric_flux']);
+const ACTIONABLE_AURA_IDS: ReadonlySet<string> = new Set([
+  'mag_ember_relay',
+  'mag_aetheric_flux',
+  'mag_aetherwell_relay',
+]);
 
 /** The localized single-letter unit suffixes the compact duration label uses. */
 export interface DurationUnits {

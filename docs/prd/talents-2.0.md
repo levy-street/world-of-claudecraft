@@ -317,6 +317,13 @@ stacks, then choose when to Surge and recover up to 20% mana. It is deterministi
 no new resource or random draw. The paid-cost hook runs only after the Aethermancy spec,
 known Aether Surge signature, mana resource, positive spend, and explicit builder gates.
 
+The stable `mag_r20_evocation` choice still grants Aetherwell and its immediate 220 mana,
+but it is no longer only a flat refill. Casting it now resets Aether Surge and makes the
+next Aether Darts within eight seconds free. Aethermancy can therefore Surge, spend into
+Flux, use Aetherwell to recover and reset, then open a second Surge before channeling the
+free Darts. The row remains class-wide, so Pyromancy and Cryomancy retain the mana grant and
+free Darts while receiving no reset payoff without their unlearned Aether Surge signature.
+
 ### Warspirit + Requital melee-DPS identity pass
 
 Paladin and Shaman choice rows are class-wide. A row allocation survives a specialization

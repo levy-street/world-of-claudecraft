@@ -400,7 +400,7 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 20,
       theme: 'finishing_power',
-      decision: 'single-target frost control vs area fire devastation vs mana recovery',
+      decision: 'single-target frost control vs area fire devastation vs mana burst relay',
       options: [
         {
           id: 'mag_r20_deep_freeze',
@@ -419,9 +419,28 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'mag_r20_evocation',
           name: 'Aetherwell',
-          description: 'Grants Aetherwell.',
+          description:
+            'Grants Aetherwell. Casting Aetherwell resets Aether Surge and makes your next Aether Darts within 8 sec free.',
           icon: 'evocation',
-          effect: { grant: { ability: 'evocation' } },
+          effect: {
+            grant: { ability: 'evocation' },
+            proc: {
+              id: 'mag_aetherwell_relay',
+              name: 'Aetherwell',
+              requiresKnownAbility: 'evocation',
+              school: 'arcane',
+              trigger: { on: 'castNth', n: 1, abilities: ['evocation'] },
+              responses: [
+                { kind: 'cooldownRefund', ability: 'arcane_power', seconds: 'reset' },
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_free',
+                  abilities: ['arcane_missiles'],
+                  duration: 8,
+                },
+              ],
+            },
+          },
         },
       ],
     },
