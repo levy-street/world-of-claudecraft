@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { buildClaudiumView, type ClaudiumViewInput } from '../src/ui/claudium_view';
+import {
+  buildClaudiumView,
+  type ClaudiumViewInput,
+  claudiumBalanceAddress,
+} from '../src/ui/claudium_view';
 
 // The pure Claudium view core is DOM/i18n/net-free, so it drives directly here.
 // Two states matter: a funded state (service on) and the service-off disabled
@@ -199,5 +203,21 @@ describe('buildClaudiumView funded state (service on)', () => {
 describe('buildClaudiumView is a pure projection', () => {
   it('returns identical structure for identical input (no hidden state)', () => {
     expect(buildClaudiumView(funded)).toEqual(buildClaudiumView(funded));
+  });
+});
+
+describe('claudiumBalanceAddress (which wallet funds the affordability reads)', () => {
+  it('prefers the actively connected session wallet over the linked wallet', () => {
+    expect(claudiumBalanceAddress('SessionPubkey111', 'LinkedPubkey222')).toBe('SessionPubkey111');
+  });
+
+  it('falls back to the server-verified linked wallet when nothing is connected', () => {
+    // A linked-but-disconnected player still gets live buy buttons off the
+    // linked balance; the buy click surfaces the connect prompt to sign.
+    expect(claudiumBalanceAddress(null, 'LinkedPubkey222')).toBe('LinkedPubkey222');
+  });
+
+  it('returns null with neither wallet, so the caller performs no balance read', () => {
+    expect(claudiumBalanceAddress(null, null)).toBeNull();
   });
 });

@@ -356,7 +356,7 @@ describe('Nythraxis raid encounter', () => {
       const relic = objects(sim, itemId, origin)[0];
       expect(relic, itemId).toBeTruthy();
       teleport(sim, pid, relic.pos.x, relic.pos.z);
-      sim.pickUpObject(relic.id, pid);
+      expect(sim.pickUpObject(relic.id, pid)).toBe(true);
       expect(mob(sim, summonId), summonId).toBeTruthy();
     }
   });
@@ -2343,7 +2343,7 @@ describe('Nythraxis raid encounter', () => {
     const ward = objects(sim, 'bastion_ward_stone', origin)[0];
     const pid = sim.addPlayer('priest', 'Clicker');
     teleport(sim, pid, ward.pos.x, ward.pos.z);
-    sim.pickUpObject(ward.id, pid);
+    expect(sim.pickUpObject(ward.id, pid)).toBe(true);
 
     const channel = boss.nythraxis!.wardChannels.find((c) => c.objectId === ward.id)!;
     expect(channel.playerId).toBe(pid);
@@ -2352,6 +2352,7 @@ describe('Nythraxis raid encounter', () => {
     expect(
       sim.players.get(pid)!.inventory.some((slot) => slot?.itemId === 'bastion_ward_stone'),
     ).toBe(false);
+    expect(sim.pickUpObject(ward.id, pid)).toBe(false);
   });
 
   it('never leashes/resets when kited — keeps chasing instead of evading home', () => {

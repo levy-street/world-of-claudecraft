@@ -93,6 +93,12 @@ function updaterAllowed({ distribution, isPackaged }) {
   return isPackaged === true && distribution === 'website';
 }
 
+// Wallet handoff is intentionally limited to the website-distributed shell.
+// Keep this decision pure and tested so the Steam IPC cannot drift open.
+function walletConnectionSupported({ distribution }) {
+  return distribution === 'website';
+}
+
 // One-call summary used by electron/main.cjs at startup. updateChannel is a
 // pure function of the resolved apiOrigin (electron/update_guard.cjs): there
 // is deliberately no stamp and no env hatch for it, so a build baked with a
@@ -115,5 +121,6 @@ module.exports = {
   resolveCrashSubmitUrl,
   resolveDesktopOrigins,
   updaterAllowed,
+  walletConnectionSupported,
   resolveDesktopConfig,
 };

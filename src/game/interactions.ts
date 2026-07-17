@@ -2,7 +2,9 @@ import { dist2d, type Entity, INTERACT_RANGE } from '../sim/types';
 import { t } from '../ui/i18n';
 import { tSim } from '../ui/sim_i18n';
 import type { IWorld } from '../world_api';
+import { corpseLootAvailability } from './corpse_loot_availability';
 import type { HoverCursorKind } from './cursors';
+import type { InteractionOutcome } from './interaction_autorun';
 
 export interface PickInteractionWorld {
   player: IWorld['player'];
@@ -11,11 +13,11 @@ export interface PickInteractionWorld {
   duelInfo?: IWorld['duelInfo'];
   arenaInfo?: IWorld['arenaInfo'];
   targetEntity(id: number | null): void;
-  enterDungeon(dungeonId: string): void;
-  leaveDungeon(): void;
-  pickUpObject(id: number): void;
+  enterDungeon(dungeonId: string): InteractionOutcome;
+  leaveDungeon(): InteractionOutcome;
+  pickUpObject(id: number): InteractionOutcome;
   startAutoAttack(): void;
-  resurrectAtSpiritHealer(): void;
+  resurrectAtSpiritHealer(): InteractionOutcome;
 }
 
 export interface PickInteractionHud {
@@ -111,6 +113,29 @@ export function isActivePvpOpponent(world: PickInteractionWorld, e: Entity): boo
   );
 }
 
+/** Whether an otherwise incomplete entity click represents a useful movement intent. */
+export function shouldApproachPickedEntity(
+  player: Entity,
+  entity: Entity,
+  didInteract: boolean,
+  harvestStateReliable = true,
+): boolean {
+  if (didInteract || player.dead || entity.id === player.id) return false;
+  const d = dist2d(player.pos, entity.pos);
+  if (entity.dead) {
+    return (
+      entity.kind === 'mob' &&
+      entity.lootable &&
+      d > INTERACT_RANGE + 1 &&
+      corpseLootAvailability(entity, player.id, harvestStateReliable).canOpen
+    );
+  }
+  if (entity.kind === 'object') return d > INTERACT_RANGE;
+  if (entity.kind === 'npc') return d > INTERACT_RANGE + 2;
+  return true;
+}
+
+/** Route a picked entity and report only completed non-combat world interactions. */
 export function handlePickedEntity(
   world: PickInteractionWorld,
   hud: PickInteractionHud,
@@ -118,9 +143,10 @@ export function handlePickedEntity(
   button: number,
   screenX: number,
   screenY: number,
-): void {
+  harvestStateReliable = true,
+): InteractionOutcome {
   const e = world.entities.get(id);
-  if (!e) return;
+  if (!e) return false;
 
   if (e.kind !== 'object') world.targetEntity(id);
 
@@ -129,36 +155,59 @@ export function handlePickedEntity(
     // players: right-click only targets — the interaction menu lives on the
     // target portrait (right-click it), like classic-MMO unit frames
     if (e.kind === 'object') {
-      if (d > INTERACT_RANGE + 1) {
-        hud.showError(t('questUi.errors.tooFar'));
-        return;
+      if (world.player.dead) {
+        hud.showError(tSim('error.cantWhileDead'));
+        return false;
       }
-      if (e.templateId === 'dungeon_door' && e.dungeonId) world.enterDungeon(e.dungeonId);
-      else if (e.templateId === 'dungeon_exit') world.leaveDungeon();
-      else if (e.templateId === 'mailbox') {
-        // Dead players (ghosts included) cannot use the mail; the server-side
-        // interact path refuses too, this just keeps the window from opening.
-        if (world.player.dead) hud.showError(tSim('error.cantWhileDead'));
-        else hud.openMailbox();
-      } else world.pickUpObject(id);
+      if (d > INTERACT_RANGE) {
+        hud.showError(t('questUi.errors.tooFar'));
+        return false;
+      }
+      if (e.templateId === 'dungeon_door' && e.dungeonId) return world.enterDungeon(e.dungeonId);
+      if (e.templateId === 'dungeon_exit') return world.leaveDungeon();
+      if (e.templateId === 'mailbox') {
+        hud.openMailbox();
+        return true;
+      }
+      return world.pickUpObject(id);
     } else if (e.kind === 'mob' && e.dead && e.lootable) {
-      if (d <= INTERACT_RANGE + 1) hud.openLoot(id, screenX, screenY);
-      else hud.showError(t('questUi.errors.tooFar'));
+      if (world.player.dead) {
+        hud.showError(tSim('error.cantWhileDead'));
+        return false;
+      }
+      if (d <= INTERACT_RANGE + 1) {
+        if (
+          !corpseLootAvailability(e, world.playerId ?? world.player.id, harvestStateReliable)
+            .canOpen
+        )
+          return false;
+        hud.openLoot(id, screenX, screenY);
+        return true;
+      }
+      hud.showError(t('questUi.errors.tooFar'));
+      return false;
     } else if (e.kind === 'npc') {
       if (d <= INTERACT_RANGE + 2) {
         if (e.templateId === 'spirit_healer') {
           // The Spirit Healer resurrects a ghost in place (with Resurrection
           // Sickness). To the living it offers only watchful flavor.
-          if (world.player.ghost) world.resurrectAtSpiritHealer();
-          else hud.showError(t('hudChrome.death.spiritHealerAlive'));
+          if (world.player.ghost) return world.resurrectAtSpiritHealer();
+          else {
+            hud.showError(t('hudChrome.death.spiritHealerAlive'));
+            return false;
+          }
         } else if (world.player.dead) {
           // Dead players and ghosts cannot talk to NPCs (the server refuses the
           // command too); do not open the quest dialog client-side.
           hud.showError(tSim('error.cantWhileDead'));
+          return false;
         } else if (e.templateId === 'brother_halven' || e.templateId === 'brother_halven_marsh')
           hud.openDelveBoard(id);
         else hud.openQuestDialog(id);
-      } else hud.showError(t('questUi.errors.tooFar'));
+        return true;
+      }
+      hud.showError(t('questUi.errors.tooFar'));
+      return false;
     } else if (
       isAttackableEntity(e, world.playerId ?? world.player.id, activePvpOpponentIds(world))
     ) {
@@ -169,20 +218,38 @@ export function handlePickedEntity(
       // drag threshold, so only a deliberate right-click attacks.
       world.startAutoAttack();
     }
+    return false;
   } else if (button === 0) {
     hud.closeContextMenu();
     if (e.kind === 'object') {
+      if (world.player.dead) {
+        hud.showError(tSim('error.cantWhileDead'));
+        return false;
+      }
       const d = dist2d(world.player.pos, e.pos);
-      if (d > INTERACT_RANGE + 1) return;
-      if (e.templateId === 'dungeon_door' && e.dungeonId) world.enterDungeon(e.dungeonId);
-      else if (e.templateId === 'dungeon_exit') world.leaveDungeon();
-      else if (e.templateId === 'mailbox') {
-        if (world.player.dead) hud.showError(tSim('error.cantWhileDead'));
-        else hud.openMailbox();
-      } else world.pickUpObject(id);
+      if (d > INTERACT_RANGE) return false;
+      if (e.templateId === 'dungeon_door' && e.dungeonId) return world.enterDungeon(e.dungeonId);
+      if (e.templateId === 'dungeon_exit') return world.leaveDungeon();
+      if (e.templateId === 'mailbox') {
+        hud.openMailbox();
+        return true;
+      }
+      return world.pickUpObject(id);
     } else if (e.kind === 'mob' && e.dead && e.lootable) {
+      if (world.player.dead) {
+        hud.showError(tSim('error.cantWhileDead'));
+        return false;
+      }
       const d = dist2d(world.player.pos, e.pos);
-      if (d <= INTERACT_RANGE + 1) hud.openLoot(id, screenX, screenY);
+      if (d <= INTERACT_RANGE + 1) {
+        if (
+          !corpseLootAvailability(e, world.playerId ?? world.player.id, harvestStateReliable)
+            .canOpen
+        )
+          return false;
+        hud.openLoot(id, screenX, screenY);
+        return true;
+      }
     } else if (e.kind === 'npc') {
       // left-click talks too — Mac trackpads make right-click a chore;
       // out of range it just targets (no error spam while exploring)
@@ -193,7 +260,9 @@ export function handlePickedEntity(
         if (e.templateId === 'brother_halven' || e.templateId === 'brother_halven_marsh')
           hud.openDelveBoard(id);
         else hud.openQuestDialog(id);
+        return true;
       }
     }
   }
+  return false;
 }

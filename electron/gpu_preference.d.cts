@@ -11,6 +11,17 @@ export function buildRegWriteArgs(exePath: string, data?: string): string[];
 export function parseRegQueryData(regQueryStdout: unknown): string;
 export function mergeHighPerformancePreference(existingData: unknown): string;
 export function alreadyHighPerformance(regQueryStdout: unknown): boolean;
+export function hasUnparseableValueType(regQueryStdout: unknown): boolean;
+
+export interface GpuDeviceSummary {
+  vendorId: string;
+  deviceId: string;
+  active: boolean;
+}
+export function summarizeGpuDevices(gpuDevices: unknown): {
+  devices: GpuDeviceSummary[];
+  discreteInactive: boolean;
+};
 
 export interface ForceHighPerformanceGpuDeps {
   app?: {

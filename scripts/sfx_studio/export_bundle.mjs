@@ -26,18 +26,28 @@ import {
   serializeRuntimeSfxPack,
 } from '../sfx/manifest.mjs';
 import { readSfxPlaybackProfile } from '../sfx/playback_profile.mjs';
+import { buildSfxConformPolicy } from '../sfx/sfx_conform_inventory.mjs';
 import {
   DURATION_THRESHOLD,
   MIN_SOURCE_BITRATE,
   TARGET_BITRATE,
   TARGET_SAMPLE_RATE,
 } from '../sfx/sfx_conform_rules.mjs';
+import { SFX } from '../sfx/sfx_prompts.mjs';
 import { buildDeterministicZip } from './zip.mjs';
 
 const EXPORT_FORMAT = 'woc-sfx-production-bundle';
 const EXPORT_VERSION = 1;
 const MAX_CONFORMANCE_CACHE_ENTRIES = 1024;
 const conformanceCache = new Set();
+
+// isCustomMaster only actually depends on the catalog itself (see
+// sfx_conform_inventory.mjs), so a cheap policy built with no discovered
+// entries or filesystem scan still resolves it correctly; a custom
+// (hand-mastered) key's export must not be re-validated against the generic
+// loudness target it was deliberately never re-targeted to, same as
+// scripts/sfx_conform.mjs's own preserveLoudness handling.
+const customMasterPolicy = buildSfxConformPolicy(SFX, {}, []);
 
 // The published-conformance verdict must be measured with the same toolchain that
 // gates the checked-in assets: npm run sfx:check (scripts/sfx_conform.mjs) and the
@@ -76,12 +86,14 @@ function validateProductionTrack(path, identity, bytes) {
     tmpdir(),
     `.woc-sfx-export-${process.pid}-${randomBytes(8).toString('hex')}.mp3`,
   );
+  const preserveLoudness = customMasterPolicy.isCustomMaster(basename(path));
   let report;
   try {
     writeFileSync(validationPath, bytes, { flag: 'wx', mode: 0o600 });
     report = inspectSfxConformance(validationPath, {
       ffmpegPath: CONFORMANCE_FFMPEG_PATH,
       ffprobePath: CONFORMANCE_FFPROBE_PATH,
+      preserveLoudness,
     });
   } catch (error) {
     throw new Error(
@@ -106,7 +118,10 @@ function validateProductionTrack(path, identity, bytes) {
   if (expectedBranch === 'peak' && !Number.isFinite(report.peakDb)) {
     errors.push('peak loudness must be measurable');
   }
-  if (expectedBranch === 'lufs' && !Number.isFinite(report.lufs)) {
+  // A preserveLoudness (custom, hand-mastered) key deliberately skips LUFS
+  // measurement entirely (see inspectSfxConformance): peak safety is the
+  // only thing enforced for it, so a null lufs here is correct, not a defect.
+  if (expectedBranch === 'lufs' && !preserveLoudness && !Number.isFinite(report.lufs)) {
     errors.push('integrated loudness must be measurable');
   }
   const uniqueErrors = [...new Set(errors)];

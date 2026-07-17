@@ -243,6 +243,7 @@ import {
   recordAuthFailure,
   requestIp,
   setRateLimitTier2Store,
+  walletLinkRateLimited,
   wocBalanceRateLimited,
 } from './ratelimit';
 import { createPgRateLimitStore } from './ratelimit_db';
@@ -284,6 +285,10 @@ import {
 } from './user_assets_routes';
 import {
   configureWalletRuntime,
+  handleDesktopWalletHandoffClaim,
+  handleDesktopWalletHandoffComplete,
+  handleDesktopWalletHandoffCreate,
+  handleDesktopWalletHandoffResult,
   handleWalletChallenge,
   handleWalletGet,
   handleWalletLink,
@@ -340,6 +345,8 @@ const STATIC_PAGE_ALIASES = new Map([
   ['/social-media-links/', '/links.html'],
   ['/play', '/play.html'],
   ['/play/', '/play.html'],
+  ['/wallet-handoff', '/wallet-handoff.html'],
+  ['/wallet-handoff/', '/wallet-handoff.html'],
   ['/privacy', '/privacy.html'],
   ['/privacy/', '/privacy.html'],
   ['/terms', '/terms.html'],
@@ -1927,6 +1934,27 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       return handleEmailUnsubscribe(res, token);
     }
     // Non-custodial Solana wallet linking, all account-scoped.
+    if (req.method === 'POST' && url === '/api/desktop-wallet/create') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (!walletLinkRateLimited(req, accountId).allowed) {
+        return json(res, 429, { error: 'rate limited' });
+      }
+      return handleDesktopWalletHandoffCreate(req, res, accountId);
+    }
+    if (req.method === 'POST' && url === '/api/desktop-wallet/claim') {
+      if (!publicReadRateLimited(req).allowed) return json(res, 429, { error: 'rate_limited' });
+      return handleDesktopWalletHandoffClaim(req, res);
+    }
+    if (req.method === 'POST' && url === '/api/desktop-wallet/complete') {
+      if (!publicReadRateLimited(req).allowed) return json(res, 429, { error: 'rate_limited' });
+      return handleDesktopWalletHandoffComplete(req, res);
+    }
+    if (req.method === 'POST' && url === '/api/desktop-wallet/result') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleDesktopWalletHandoffResult(req, res, accountId);
+    }
     if (req.method === 'POST' && url === '/api/wallet/link/challenge') {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;

@@ -38,6 +38,8 @@ import { esc } from './esc';
 import { t } from './i18n';
 import type { PainterHostPresentation } from './painter_host';
 import { rovingTarget } from './roving_index';
+import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
+import { tabStripHtml, tabStripModel } from './tab_strip_view';
 import { talentBodyMaxHeight } from './talent_body_fit';
 import { roleLabel, tTalent } from './talent_i18n';
 import { talentChoiceIconDataUrl, talentNodeIconDataUrl } from './talent_icons';
@@ -202,36 +204,43 @@ export class TalentsWindow {
       `<div class="panel-title"><span>${t('game.talents.title')} <span style="color:${TAL_COLOR.classAccent};font-size:11px">${esc(classDisplayName(cls))}</span></span>${close}</div>` +
       `<div class="tal-head"><span>${t('game.talents.available')}: <b>${view.available}</b> / ${view.total}</span><span>${t('game.talents.spent')}: <b>${view.spent}</b></span></div>` +
       `<div class="tal-help">${esc(t('game.talents.pointSource').replace('{first}', String(FIRST_TALENT_LEVEL)).replace('{cap}', String(MAX_LEVEL)))}</div>` +
-      `<div class="tal-tabs" role="tablist" aria-label="${esc(t('game.talents.title'))}">` +
-      `<div class="tal-tab${this.tab === 'class' ? ' active' : ''}" role="tab" tabindex="${this.tab === 'class' ? '0' : '-1'}" aria-selected="${this.tab === 'class'}" aria-controls="tal-body" data-tab="class"><span class="tal-tab-label">${t('game.talents.classTab')}</span><span class="tt-pts">${view.classSpent}</span></div>` +
-      `<div class="tal-tab${this.tab === 'spec' ? ' active' : ''}" role="tab" tabindex="${this.tab === 'spec' ? '0' : '-1'}" aria-selected="${this.tab === 'spec'}" aria-controls="tal-body" data-tab="spec"><span class="tal-tab-label">${t('game.talents.specTab')}</span><span class="tt-pts">${view.specSpent}</span></div>` +
-      `</div><div id="tal-body" role="tabpanel"></div>` +
+      // WAI-ARIA tabs, built from the shared tab_strip_view core (div tag + a
+      // per-tab spent-points badge, the same markup contract social_window
+      // follows for its plain-button strip).
+      tabStripHtml(
+        tabStripModel({
+          ariaLabel: t('game.talents.title'),
+          panelId: 'tal-body',
+          stripClass: 'tal-tabs',
+          tabClass: 'tal-tab',
+          selectedClass: 'active',
+          tag: 'div',
+          tabs: [
+            {
+              id: 'class',
+              label: t('game.talents.classTab'),
+              extraHtml: `<span class="tt-pts">${view.classSpent}</span>`,
+            },
+            {
+              id: 'spec',
+              label: t('game.talents.specTab'),
+              extraHtml: `<span class="tt-pts">${view.specSpent}</span>`,
+            },
+          ],
+          selected: this.tab,
+        }),
+      ) +
+      `<div id="tal-body" role="tabpanel"></div>` +
       this.footerHtml(view);
 
-    const switchTab = (tab: HTMLElement): void => {
-      this.tab = tab.dataset.tab as 'class' | 'spec';
+    // The roving Arrow/Home/End + Enter/Space wiring lives in the shared
+    // tab_strip_painter core; a keyboard move re-renders the window (the root
+    // persists) and refocuses the freshly active tab afterward, matching the
+    // prior hand-rolled handler.
+    wireTabStrip(el, 'tal-tab', (id, focusFollow) => {
+      this.tab = id as 'class' | 'spec';
       this.render();
-    };
-    // WAI-ARIA tabs: roving arrow navigation (Left/Right/Home/End) plus Enter/Space.
-    // switchTab re-renders the window; the root persists, so focus the freshly active
-    // tab afterward to keep the roving-tabindex focus on the selected tab.
-    const tabs = Array.from(el.querySelectorAll<HTMLElement>('.tal-tab'));
-    tabs.forEach((tab, i) => {
-      tab.addEventListener('click', () => switchTab(tab));
-      tab.addEventListener('keydown', (e) => {
-        const ke = e as KeyboardEvent;
-        const next = rovingTarget(ke.key, i, tabs.length, 'horizontal');
-        if (next !== null) {
-          ke.preventDefault();
-          const target = tabs[next];
-          if (target && target !== tab) {
-            switchTab(target);
-            (el.querySelector('.tal-tab.active') as HTMLElement | null)?.focus();
-          }
-          return;
-        }
-        this.keyboardActivate(ke, () => switchTab(tab));
-      });
+      if (focusFollow) focusActiveTab(el, 'tal-tab', 'active');
     });
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
 

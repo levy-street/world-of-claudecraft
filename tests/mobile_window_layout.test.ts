@@ -45,4 +45,23 @@ describe('mobile window layout CSS', () => {
     expect(block).toContain('width: min(330px, calc(var(--app-vw) / var(--ui-scale, 1) - 32px));');
     expect(block).toContain('max-width: calc(var(--app-vw) / var(--ui-scale, 1) - 32px);');
   });
+
+  it('places the Claudium wallet card beside the balance in mobile landscape', () => {
+    expect(mobileCss).toContain(`@media (orientation: landscape) {
+    body.mobile-touch #claudium-window .cl-body:has(> .cl-wallet-connect) {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: stretch;
+      gap: 10px;
+    }`);
+    expect(mobileCss).toContain(`body.mobile-touch
+      #claudium-window
+      .cl-body:has(> .cl-wallet-connect)
+      > :not(.cl-balance, .cl-wallet-connect) {
+      grid-column: 1 / -1;
+    }`);
+    expect(mobileCss).toContain(`body.mobile-touch #claudium-window .cl-wallet-connect {
+      margin-top: 0;
+    }`);
+  });
 });

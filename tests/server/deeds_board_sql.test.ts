@@ -111,7 +111,9 @@ describe('deedsBoardRanked SQL shape (mocked pool)', () => {
     // Renown values arrive as query params (content-owned, never stored in SQL),
     // with the exact unnest element types.
     expect(agg).toContain('unnest($1::text[], $2::int[])');
-    // Zero-renown deeds never enter the counted set (score AND count exclusion).
+    // Zero-renown deeds never enter the SCORING set: they never score and
+    // never move the tie-break or the entry floor. (deed_count, the scoring
+    // set's size, is a deprecated wire-compat output; issue #2044.)
     expect(agg).toContain('WHERE u.renown > 0');
     // Per-deed earliest earn (a re-earn on a second character cannot move it).
     expect(agg).toContain('per_deed AS (');

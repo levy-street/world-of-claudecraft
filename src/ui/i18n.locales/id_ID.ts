@@ -1207,6 +1207,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.hideChestConfirmTitle': 'Sembunyikan Peti Hadiah Harian?',
   'hudChrome.dailyRewards.pointsGained': '{points} poin hadiah harian diperoleh.',
   'hudChrome.dailyRewards.taskMultiplier': 'pengali x{multiplier}',
+  'hudChrome.dailyRewards.oneVsOneExcluded':
+    'Pertandingan 1 lawan 1 tidak memberikan poin hadiah harian.',
   'hudChrome.dailyRewards.totalPlayer': '{count} pemain hari ini',
   'hudChrome.dailyRewards.totalPlayers': '{count} pemain hari ini',
   'hudChrome.death.resurrectAtCorpse': 'Bangkit di Jasad',
@@ -6397,7 +6399,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.greyjaw_stalker.bonus3':
     'Meningkatkan kecepatan serangan dan rapal sebesar 15%.',
   'entities.itemSets.necromancers.name': 'Jubah Mournweave',
-  'entities.itemSets.necromancers.bonus2': 'Kamu tidak dapat terpental (ketahanan pentalan 100%).',
+  'entities.itemSets.necromancers.bonus2':
+    'Meningkatkan kekuatan sihir sebesar 20. Kerusakan yang diterima tidak lagi menunda perapalan sihirmu (ketahanan penundaan rapalan 100%).',
   'entities.itemSets.necromancers.bonus3':
     'Meningkatkan kecerdasan sebesar 10 dan stamina sebesar 10.',
   'entities.itemSets.nighttalon.name': 'Perlengkapan Kulit Direfang',
@@ -6405,11 +6408,13 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.nighttalon.bonus3':
     'Meningkatkan kelincahan sebesar 15, peluang kritis sebesar 2%, serta kecepatan serangan dan rapal sebesar 15%.',
   'entities.itemSets.soulflame.name': 'Regalia Wraithfire',
-  'entities.itemSets.soulflame.bonus2': 'Kamu tidak dapat terpental (ketahanan pentalan 100%).',
+  'entities.itemSets.soulflame.bonus2':
+    'Meningkatkan kekuatan sihir sebesar 20. Kerusakan yang diterima tidak lagi menunda perapalan sihirmu (ketahanan penundaan rapalan 100%).',
   'entities.itemSets.soulflame.bonus3':
     'Meningkatkan kecerdasan sebesar 15, roh sebesar 15, serta kecepatan serangan dan rapal sebesar 15%.',
   'entities.itemSets.stormcallers.name': 'Jubah Galecall',
-  'entities.itemSets.stormcallers.bonus2': 'Kamu tidak dapat terpental (ketahanan pentalan 100%).',
+  'entities.itemSets.stormcallers.bonus2':
+    'Meningkatkan kekuatan sihir sebesar 20. Kerusakan yang diterima tidak lagi menunda perapalan sihirmu (ketahanan penundaan rapalan 100%).',
   'entities.itemSets.stormcallers.bonus3':
     'Meningkatkan kecerdasan sebesar 15, roh sebesar 15, serta kecepatan serangan dan rapal sebesar 15%.',
   'entities.itemSets.vale_arcanist.name': 'Perlengkapan Arkanis Lembah',
@@ -7007,15 +7012,11 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.deedsPage.howHeading': 'Cara kerja jasa',
   'guide.deedsPage.intro':
     'Kitab Jasa adalah tempat dunia mencatat segala yang telah kamu lakukan, dari langkah pertamamu keluar dari lembah permulaan hingga pertarungan tersulit yang bisa disodorkan realm ini. Raih jasa sembari bermain, sandang gelar yang dianugerahkannya, dan saksikan Kemasyhuranmu menanjak.',
-  'guide.deedsPage.renownBody':
-    'Kemasyhuran adalah angka di balik Kitab. Setiap jasa yang kamu raih bernilai jumlah tertentu, dan totalmu hanya akan menanjak, jadi sepekan yang sepi tak pernah membuatmu merosot. Segelintir jasa bergantung pada keberuntungan alih-alih kecakapan, dan Mahajasa adalah kehormatan tersendiri, sehingga keduanya sama sekali tak bernilai Kemasyhuran.',
   'guide.deedsPage.renownHeading': 'Kemasyhuran',
   'guide.deedsPage.rewardBorder': 'Bingkai',
   'guide.deedsPage.rewardsBody':
     'Semua hadiahnya sekadar untuk dipamerkan, dan memang itulah intinya. Sebagian jasa menganugerahkan gelar yang bisa kamu sandang atau bingkai untuk menghiasi namamu, dan tidak pernah ada yang membuat pahlawanmu lebih kuat. Pilih gelar yang kamu inginkan dari Kitab Jasa, dan gelar itu akan menyertaimu di papan namamu, dalam obrolan, dan di papan peringkat untuk dilihat semua orang.',
   'guide.deedsPage.rewardsHeading': 'Gelar dan bingkai',
-  'guide.deedsPage.standingsNote':
-    'Realm-realm menyimpan hitungan berjalan Kemasyhuran di setiap akun. Untuk melihat siapa berdiri di mana, buka Papan Peringkat dalam permainan dan buka tab Kemasyhurannya; papan peringkat itu ada di sana, bukan di wiki ini.',
   'guide.nav.deeds': 'Kitab Jasa',
   'hudChrome.deeds.broadcastLine': '{name} telah mengukir jasa: {deed}',
   'hudChrome.deeds.broadcastsLabel': 'Bagikan jasa yang diraih kepada guild dan teman',
@@ -7048,9 +7049,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.filterNearly': 'Hampir Selesai',
   'hudChrome.deeds.filterUnearned': 'Belum Diraih',
   'hudChrome.deeds.hiddenBadge': 'Tersembunyi',
-  'hudChrome.deeds.lbDeedsCol': 'Jasa',
   'hudChrome.deeds.lbEmpty': 'Belum ada nama yang tercatat di peringkat.',
-  'hudChrome.deeds.lbSelf': 'Kedudukanmu: peringkat {rank}, {percent} persen teratas',
   'hudChrome.deeds.lbTab': 'Kemasyhuran',
   'hudChrome.deeds.lbTitleCol': 'Gelar',
   'hudChrome.deeds.nearestLabel': 'Hampir tercapai:',

@@ -16,6 +16,7 @@ import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
 import { formatNumber, t } from './i18n';
 import { svgIcon } from './ui_icons';
+import type { WalletConnectionView } from './wallet_connection_view';
 
 export type ClaudiumRail = 'stripe' | 'sol' | 'usdc' | 'woc';
 
@@ -54,6 +55,8 @@ export interface ClaudiumWindowDeps {
   snapshot(): Promise<ClaudiumSnapshot>;
   /** Begin a purchase on the chosen rail for the chosen SKU. */
   buy(rail: ClaudiumRail, sku: string): Promise<void>;
+  onWalletConnect?(): void;
+  walletState?(): WalletConnectionView;
 }
 
 const EMPTY_SNAPSHOT: ClaudiumSnapshot = {
@@ -66,7 +69,7 @@ const USDC_DECIMALS = 6;
 const WOC_ICON_URL = '/woc_logo_square.webp';
 const SOL_ICON_URL = '/claudium/icons/solana-icon.webp';
 const USDC_ICON_URL = '/claudium/icons/usdc-icon.webp';
-type ClaudiumFocusTarget = { kind: 'rail' | 'sku'; value: string };
+type ClaudiumFocusTarget = { kind: 'rail' | 'sku'; value: string } | { kind: 'wallet' };
 
 function sameClaudiumView(left: ClaudiumView | null, right: ClaudiumView): boolean {
   return left !== null && JSON.stringify(left) === JSON.stringify(right);
@@ -83,11 +86,22 @@ export class ClaudiumWindow {
   private selectedRail: ClaudiumRail = 'stripe';
   private pendingPurchase: { rail: ClaudiumRail; sku: string } | null = null;
   private purchaseError: string | null = null;
+  private paintedWalletMarkup: string | null = null;
 
   constructor(private readonly deps: ClaudiumWindowDeps) {}
 
   get isOpen(): boolean {
     return this.deps.root().style.display === 'block';
+  }
+
+  onWalletChanged(): void {
+    if (!this.isOpen) return;
+    const focused = this.captureBodyFocus();
+    if (this.currentView && this.walletConnectionHtml() !== this.paintedWalletMarkup) {
+      this.paint(this.currentView);
+      this.restoreBodyFocus(focused);
+    }
+    void this.render(null, focused);
   }
 
   toggle(): void {
@@ -210,6 +224,7 @@ export class ClaudiumWindow {
     const body = this.deps.root().querySelector<HTMLElement>('.cl-body');
     const active = document.activeElement as HTMLElement | null;
     if (!body || !active || !body.contains(active)) return null;
+    if (active.dataset.claudiumWallet !== undefined) return { kind: 'wallet' };
     if (active.dataset.sku) return { kind: 'sku', value: active.dataset.sku };
     if (active.dataset.rail) return { kind: 'rail', value: active.dataset.rail };
     return null;
@@ -219,6 +234,10 @@ export class ClaudiumWindow {
     if (!target) return;
     const body = this.deps.root().querySelector<HTMLElement>('.cl-body');
     if (!body) return;
+    if (target.kind === 'wallet') {
+      body.querySelector<HTMLButtonElement>('[data-claudium-wallet]')?.focus();
+      return;
+    }
     const attribute = target.kind === 'sku' ? 'data-sku' : 'data-rail';
     const match = Array.from(body.querySelectorAll<HTMLButtonElement>(`[${attribute}]`)).find(
       (button) => button.dataset[target.kind] === target.value && !button.disabled,
@@ -235,8 +254,14 @@ export class ClaudiumWindow {
   private paint(view: ClaudiumView): void {
     const body = this.deps.root().querySelector<HTMLElement>('.cl-body');
     if (!body) return;
+    const walletMarkup = this.walletConnectionHtml();
     body.innerHTML =
-      this.balanceHtml(view) + this.noticeHtml(view) + this.buyHtml(view) + this.disclosureHtml();
+      this.balanceHtml(view) +
+      walletMarkup +
+      this.noticeHtml(view) +
+      this.buyHtml(view) +
+      this.disclosureHtml();
+    this.paintedWalletMarkup = walletMarkup;
     this.wire(body, view);
   }
 
@@ -280,6 +305,51 @@ export class ClaudiumWindow {
       `<span>${esc(t('hudChrome.claudium.solBalance', { amount: sol }))}</span>` +
       `<span>${esc(t('hudChrome.claudium.usdcBalance', { amount: usdc }))}</span>` +
       `<span>${esc(t('hudChrome.claudium.wocBalance', { amount: woc }))}</span>` +
+      `</div>`
+    );
+  }
+
+  private walletConnectionHtml(): string {
+    const state = this.deps.walletState?.();
+    if (!state?.enabled) return '';
+    let bodyKey:
+      | 'hudChrome.wocStore.wallet.unlinked'
+      | 'hudChrome.wocStore.wallet.connectedUnlinked'
+      | 'hudChrome.wocStore.wallet.linkedDisconnected'
+      | 'hudChrome.wocStore.wallet.linkedConnected'
+      | 'hudChrome.wocStore.wallet.mismatched';
+    let actionKey:
+      | 'hudChrome.wocStore.wallet.connect'
+      | 'hudChrome.wocStore.wallet.verify'
+      | 'hudChrome.wocStore.wallet.reconnect'
+      | 'hudChrome.wocStore.wallet.manage';
+    switch (state.kind) {
+      case 'connected_unlinked':
+        bodyKey = 'hudChrome.wocStore.wallet.connectedUnlinked';
+        actionKey = 'hudChrome.wocStore.wallet.verify';
+        break;
+      case 'linked_disconnected':
+        bodyKey = 'hudChrome.wocStore.wallet.linkedDisconnected';
+        actionKey = 'hudChrome.wocStore.wallet.reconnect';
+        break;
+      case 'linked_connected':
+        bodyKey = 'hudChrome.wocStore.wallet.linkedConnected';
+        actionKey = 'hudChrome.wocStore.wallet.manage';
+        break;
+      case 'mismatched':
+        bodyKey = 'hudChrome.wocStore.wallet.mismatched';
+        actionKey = 'hudChrome.wocStore.wallet.verify';
+        break;
+      default:
+        bodyKey = 'hudChrome.wocStore.wallet.unlinked';
+        actionKey = 'hudChrome.wocStore.wallet.connect';
+        break;
+    }
+    return (
+      `<div class="cl-wallet-connect">` +
+      `<strong>${esc(t('hudChrome.wocStore.wallet.title'))}</strong>` +
+      `<p>${esc(t(bodyKey))}</p>` +
+      `<button type="button" data-claudium-wallet>${esc(t(actionKey))}</button>` +
       `</div>`
     );
   }
@@ -424,6 +494,11 @@ export class ClaudiumWindow {
   }
 
   private wire(body: HTMLElement, view: ClaudiumView): void {
+    body
+      .querySelector<HTMLButtonElement>('[data-claudium-wallet]')
+      ?.addEventListener('click', () => {
+        this.deps.onWalletConnect?.();
+      });
     body.querySelectorAll<HTMLButtonElement>('[data-rail]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const rail =

@@ -876,7 +876,7 @@ describe('delve reward chest + surface exit flow', () => {
     sim.player.pos = { ...chestEnt.pos };
     sim.player.prevPos = { ...chestEnt.pos };
 
-    sim.delveInteract(chestId);
+    expect(sim.delveInteract(chestId)).toBe(true);
     const events = sim.tick();
     const offer = events.find((e) => e.type === 'lockpickOffer');
     expect(offer).toBeDefined();
@@ -1047,7 +1047,7 @@ describe('delve reward chest + surface exit flow', () => {
     killBoss(sim, run);
     const chestId = pickLockFlawless(sim, run, 1);
 
-    sim.delveInteract(chestId); // already looted
+    expect(sim.delveInteract(chestId)).toBe(false); // already looted
     const events = sim.tick();
     const emptyLog = events.find(
       (ev) => ev.type === 'log' && (ev as any).text === 'The chest is empty.',
@@ -2388,13 +2388,13 @@ describe('The Drowned Litany (Phase 5 room puzzles)', () => {
     sim.tick();
     expect(run.objectState[ropeId!].triggered).toBe(false);
     expect(cantor.hp).toBe(hp0);
-    sim.delveInteract(ropeId!);
+    expect(sim.delveInteract(ropeId!)).toBe(true);
     expect(run.objectState[ropeId!].triggered).toBe(true);
     expect(rope.templateId).toBe('delve_bell_rope_pulled');
     expect(hp0 - cantor.hp).toBe(18);
     // A second pull on a slack rope is inert.
     sim.drainEvents();
-    sim.delveInteract(ropeId!);
+    expect(sim.delveInteract(ropeId!)).toBe(false);
     const events = sim.drainEvents();
     expect(events.some((e) => e.type === 'error' && e.text === 'Nothing happens.')).toBe(true);
     expect(hp0 - cantor.hp).toBe(18);

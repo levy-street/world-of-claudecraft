@@ -38,4 +38,5 @@ export function updaterAllowed(input: {
   distribution: string;
   isPackaged: boolean | undefined;
 }): boolean;
+export function walletConnectionSupported(input: { distribution: string }): boolean;
 export function resolveDesktopConfig(input?: DesktopConfigInput): DesktopConfig;
