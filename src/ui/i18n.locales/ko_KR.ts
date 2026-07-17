@@ -2811,9 +2811,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blade_flurry.name': '폭풍의 칼날',
   'entities.abilities.blade_flurry.description':
     '칼날의 폭풍을 일으켜 12초 동안 공격 속도를 20% 증가시킵니다. (전투 전문화 상징)',
-  'entities.abilities.hemorrhage.name': '과다출혈',
+  'entities.abilities.hemorrhage.name': '가면 낙하',
   'entities.abilities.hemorrhage.description':
-    '적을 공격하여 무기 피해에 더해 {damage}의 피해를 주고 12초 동안 출혈 피해를 줍니다. 연계 점수 1점을 얻습니다. (잠행 전문화 상징)',
+    '무기로 적을 공격해 무기 피해에 더해 {damage}의 피해를 줍니다. 연계 점수 1점을 얻습니다. (기만 전문화 상징)',
   'entities.abilities.power_infusion.name': '마력 주입',
   'entities.abilities.power_infusion.description':
     '아군 대상에게 힘을 주입하여 15초 동안 주문력을 28만큼 증가시킵니다. (수양 전문화 상징)',

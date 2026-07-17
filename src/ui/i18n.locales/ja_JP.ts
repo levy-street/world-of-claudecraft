@@ -2829,9 +2829,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blade_flurry.name': 'ブレードフラリー',
   'entities.abilities.blade_flurry.description':
     '刃の連撃を放ち、12秒間攻撃速度を20%上げます。（コンバット特性のシグネチャ）',
-  'entities.abilities.hemorrhage.name': 'ヘモリッジ',
+  'entities.abilities.hemorrhage.name': '仮面落とし',
   'entities.abilities.hemorrhage.description':
-    '敵を攻撃して武器ダメージに加え{damage}を与え、12秒間出血ダメージを与えます。コンボポイントを1得ます。（サブテリティ特性のシグネチャ）',
+    '敵を武器で攻撃し、武器ダメージに加えて{damage}のダメージを与えます。コンボポイントを1得ます。（策略特性のシグネチャ）',
   'entities.abilities.power_infusion.name': 'パワーインフュージョン',
   'entities.abilities.power_infusion.description':
     '味方に力を注ぎ、15秒間呪文力を28上げます。（ディシプリン特性のシグネチャ）',

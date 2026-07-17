@@ -6301,8 +6301,8 @@ export const ko_KR: EnTranslations = {
         "description": "칼날의 폭풍을 일으켜 12초 동안 공격 속도를 20% 증가시킵니다. (전투 전문화 상징)"
       },
       "hemorrhage": {
-        "name": "과다출혈",
-        "description": "적을 공격하여 무기 피해에 더해 {damage}의 피해를 주고 12초 동안 출혈 피해를 줍니다. 연계 점수 1점을 얻습니다. (잠행 전문화 상징)"
+        "name": "가면 낙하",
+        "description": "무기로 적을 공격해 무기 피해에 더해 {damage}의 피해를 줍니다. 연계 점수 1점을 얻습니다. (기만 전문화 상징)"
       },
       "power_infusion": {
         "name": "마력 주입",

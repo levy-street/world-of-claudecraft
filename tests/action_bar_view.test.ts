@@ -486,6 +486,21 @@ describe('actionBarView: proc availability cues', () => {
     expect(finisher.tick(world({ playerAuras })).slots[0].procState).toBe('none');
   });
 
+  it('marks Maskfall armed during either False Face or Redline Habit', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('hemorrhage') })),
+      fakeDeps(),
+    );
+
+    expect(view.tick(world()).slots[0].procState).toBe('none');
+    for (const id of ['rog_false_face', 'rog_adrenaline_junkie']) {
+      expect(
+        view.tick(world({ playerAuras: [{ id, kind: 'next_ability_damage' }] })).slots[0].procState,
+        id,
+      ).toBe('armed');
+    }
+  });
+
   it('keeps ordinary abilities and Icefall without stored Icicles at none', () => {
     const view = createActionBarView(
       descriptor(

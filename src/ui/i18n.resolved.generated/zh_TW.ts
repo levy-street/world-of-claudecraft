@@ -6301,8 +6301,8 @@ export const zh_TW: EnTranslations = {
         "description": "釋放劍刃亂舞，攻擊速度提高20%，持續12秒。（戰鬥專精招牌）"
       },
       "hemorrhage": {
-        "name": "出血",
-        "description": "攻擊敵人，造成武器傷害加{damage}點傷害，並在12秒內造成流血傷害。獎勵1個連擊點。（敏銳專精招牌）"
+        "name": "假面落幕",
+        "description": "以武器攻擊敵人，造成武器傷害加{damage}點傷害。獎勵1個連擊點。（詭術專精招牌）"
       },
       "power_infusion": {
         "name": "能量灌注",

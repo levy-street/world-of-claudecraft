@@ -2858,9 +2858,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blade_flurry.name': 'Шквал клинков',
   'entities.abilities.blade_flurry.description':
     'Обрушивает шквал клинков, повышая скорость атаки на 20% на 12 сек. (знаковое умение Боя)',
-  'entities.abilities.hemorrhage.name': 'Кровоизлияние',
+  'entities.abilities.hemorrhage.name': 'Падение маски',
   'entities.abilities.hemorrhage.description':
-    'Бьет врага, нанося урон оружием плюс {damage}, и вызывает кровотечение на 12 сек. Дает 1 прием. (знаковое умение Скрытности)',
+    'Бьет врага оружием, нанося урон оружием плюс {damage}. Дает 1 прием. (знаковое умение Тайных приемов)',
   'entities.abilities.power_infusion.name': 'Придание сил',
   'entities.abilities.power_infusion.description':
     'Наполняет дружественную цель силой, повышая ее силу заклинаний на 28 на 15 сек. (знаковое умение Послушания)',

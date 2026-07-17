@@ -110,6 +110,23 @@ describe('canonical Talents V2 row registry', () => {
     expect(TALENTS.rogue.specs.find((spec) => spec.id === 'subtlety')?.mastery.effect).toEqual({
       global: { critDmgPhysPct: 0.4 },
       stats: { agiPct: 0.1 },
+      proc: {
+        id: 'rog_false_face',
+        name: 'False Face',
+        spec: 'subtlety',
+        requiresKnownAbility: 'hemorrhage',
+        school: 'shadow',
+        trigger: { on: 'castNth', n: 1, abilities: ['ambush', 'garrote', 'cheap_shot'] },
+        responses: [
+          {
+            kind: 'empowerNext',
+            aura: 'next_ability_damage',
+            abilities: ['hemorrhage'],
+            duration: 8,
+            dmgPct: 0.5,
+          },
+        ],
+      },
     });
 
     const warrior = Object.fromEntries(

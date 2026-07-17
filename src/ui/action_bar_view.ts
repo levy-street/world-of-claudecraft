@@ -371,6 +371,15 @@ function redlineWeaponProcState(
   return hasAura(player.auras, 'rog_adrenaline_junkie') ? 'armed' : 'none';
 }
 
+function maskfallProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'rog_false_face') || hasAura(player.auras, 'rog_adrenaline_junkie')
+    ? 'armed'
+    : 'none';
+}
+
 // Ability ids map to pure proc resolvers here, keeping the painter generic. New
 // action cues extend this table rather than adding ability branches to DOM code.
 const PROC_STATE_RESOLVERS: Readonly<Record<string, ProcStateResolver | undefined>> = {
@@ -387,7 +396,7 @@ const PROC_STATE_RESOLVERS: Readonly<Record<string, ProcStateResolver | undefine
   sinister_strike: redlineWeaponProcState,
   backstab: redlineWeaponProcState,
   ambush: redlineWeaponProcState,
-  hemorrhage: redlineWeaponProcState,
+  hemorrhage: maskfallProcState,
   ghostly_strike: redlineWeaponProcState,
 };
 

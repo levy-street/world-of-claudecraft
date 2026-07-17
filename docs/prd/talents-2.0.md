@@ -451,7 +451,7 @@ demotions: no existing character loses an ability they have today.
 | mage/frost | ice_barrier | Cone of Cold (instant frost cone AoE) |
 | rogue/assassination | eviscerate | Cold Blood (next attack guaranteed crit) |
 | rogue/combat | adrenaline_rush | Blade Flurry (strikes cleave for 12s) |
-| rogue/subtlety | ambush | Hemorrhage (bleed strike) |
+| rogue/subtlety | ambush | Maskfall (front-loaded weapon strike) |
 | priest/discipline | power_word_shield | Power Infusion (ally +spell dmg active) |
 | priest/holy | flash_heal | Holy Nova (AoE heal + damage) |
 | priest/shadow | mind_flay | Shadowform (form: +shadow dmg, -phys taken) |
@@ -987,3 +987,8 @@ npm run build on PR4/PR5.
   Redline Habit replaces automatic finisher cooldown arithmetic: Quickened Blood now
   banks an 8 sec empowered weapon strike, creating a deliberate energy surge, builder,
   finisher, and loaded-auto sequence without changing the other capstone choices.
+- Skulduggery uses False Face as a stealth setup into concentrated shadow burst.
+  Lurker's Strike, Throat Wire, or Gut Punch opens an 8 sec window for a 50% stronger
+  Maskfall. Maskfall moves the old signature's delayed bleed budget into one front-loaded
+  weapon strike, so Duskveil or Smokestep creates a clear opener, burst, and finisher arc
+  without competing with Knifework's poison-and-bleed identity.

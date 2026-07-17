@@ -358,11 +358,31 @@ const ROGUE_SPECS: SpecDef[] = [
     'Skulduggery',
     'dps',
     '>',
-    'A stealth attacker built around openers, control, and avoidance.',
+    'A stealth attacker who turns hidden openers into concentrated shadow burst.',
     'hemorrhage',
     'False Face',
-    'Increases the damage of your critical strikes by 40% and your Agility by 10%.',
-    { global: { critDmgPhysPct: 0.4 }, stats: { agiPct: 0.1 } },
+    "Increases the damage of your critical strikes by 40% and your Agility by 10%. Using Lurker's Strike, Throat Wire, or Gut Punch makes your next Maskfall within 8 sec deal 50% more damage.",
+    {
+      global: { critDmgPhysPct: 0.4 },
+      stats: { agiPct: 0.1 },
+      proc: {
+        id: 'rog_false_face',
+        name: 'False Face',
+        spec: 'subtlety',
+        requiresKnownAbility: 'hemorrhage',
+        school: 'shadow',
+        trigger: { on: 'castNth', n: 1, abilities: ['ambush', 'garrote', 'cheap_shot'] },
+        responses: [
+          {
+            kind: 'empowerNext',
+            aura: 'next_ability_damage',
+            abilities: ['hemorrhage'],
+            duration: 8,
+            dmgPct: 0.5,
+          },
+        ],
+      },
+    },
   ),
 ];
 

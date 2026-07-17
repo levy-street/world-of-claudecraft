@@ -4555,7 +4555,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   hemorrhage: {
     id: 'hemorrhage',
-    name: 'Red Ribbon',
+    name: 'Maskfall',
     class: 'rogue',
     learnLevel: 10,
     cost: 35,
@@ -4565,13 +4565,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: true,
     awardsCombo: 1,
-    effects: [
-      { type: 'weaponStrike', bonus: 16 },
-      { type: 'dot', total: 36, duration: 12, interval: 3 },
-      { type: 'applyDebuff', kind: 'bleed_vuln', value: 0.4, duration: 12 },
-    ],
+    effects: [{ type: 'weaponStrike', bonus: 52 }],
     description:
-      'Strikes the enemy for weapon damage plus $d, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. (Subtlety signature)',
+      'Strikes the enemy for weapon damage plus $d. Awards 1 combo point. (Skulduggery signature)',
   },
   power_infusion: {
     id: 'power_infusion',

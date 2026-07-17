@@ -6301,8 +6301,8 @@ export const en_CA: EnTranslations = {
         "description": "Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Combat signature)"
       },
       "hemorrhage": {
-        "name": "Red Ribbon",
-        "description": "Strikes the enemy for weapon damage plus {damage}, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. (Subtlety signature)"
+        "name": "Maskfall",
+        "description": "Strikes the enemy for weapon damage plus {damage}. Awards 1 combo point. (Skulduggery signature)"
       },
       "power_infusion": {
         "name": "Anointing",

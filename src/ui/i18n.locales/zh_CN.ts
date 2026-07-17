@@ -2705,9 +2705,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blade_flurry.name': '剑刃乱舞',
   'entities.abilities.blade_flurry.description':
     '释放剑刃乱舞，攻击速度提高20%，持续12秒。（战斗专精招牌）',
-  'entities.abilities.hemorrhage.name': '出血',
+  'entities.abilities.hemorrhage.name': '假面落幕',
   'entities.abilities.hemorrhage.description':
-    '攻击敌人，造成武器伤害加{damage}点伤害，并在12秒内造成流血伤害。奖励1个连击点。（敏锐专精招牌）',
+    '以武器攻击敌人，造成武器伤害加{damage}点伤害。奖励1个连击点。（诡术专精招牌）',
   'entities.abilities.power_infusion.name': '能量灌注',
   'entities.abilities.power_infusion.description':
     '向一个友方目标灌注能量，使其法术强度提高28点，持续15秒。（戒律专精招牌）',
