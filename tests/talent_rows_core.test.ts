@@ -129,6 +129,22 @@ describe('canonical Talents V2 row registry', () => {
     });
     expect(TALENTS.paladin.specs.find((spec) => spec.id === 'holy')?.mastery.effect).toEqual({
       global: { critDmgHealPct: 0.5 },
+      proc: {
+        id: 'pal_kindled_faith',
+        name: 'Kindled Faith',
+        spec: 'holy',
+        requiresKnownAbility: 'holy_shock',
+        school: 'holy',
+        trigger: { on: 'castNth', n: 3, abilities: ['holy_light', 'flash_of_light'] },
+        responses: [
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_free',
+            abilities: ['holy_shock'],
+            duration: 10,
+          },
+        ],
+      },
     });
     expect(TALENTS.rogue.specs.find((spec) => spec.id === 'subtlety')?.mastery.effect).toEqual({
       global: { critDmgPhysPct: 0.4 },

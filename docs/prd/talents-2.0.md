@@ -1098,3 +1098,14 @@ npm run build on PR4/PR5.
   Lifesap and Formrush remain unchanged, and the new relay remains class-wide so the shared
   Druid row stays useful outside Groveheart. For Groveheart, the discounted Wildbloom can
   mature into Grove's Gift and continue the direct-heal, HoT, instant-heal weave.
+
+## Paladin role identity pass
+
+- Sacrament uses Kindled Faith as a deterministic heal-to-proc weave. Every third
+  Mending Light or Lightmend opens a 10 sec free Holy Shock, letting the healer save an
+  instant, mobile response for damage, movement, or an offensive Holy Shock. Dawn's Reply
+  retains Oath Returned's stable level-5 choice ID but replaces its flat Verdict mana
+  refund: for Sacrament, Holy Shock opens an 8 sec half-mana Lightmend. The resulting
+  Mending Light or Lightmend, free Holy Shock, discounted Lightmend sequence keeps mana
+  meaningful outside the two short windows. Pilgrim's Light and Ashen Sentence are
+  unchanged, and neither Blood Debt nor Oath's Due is altered.

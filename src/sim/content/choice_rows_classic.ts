@@ -452,19 +452,31 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 5,
       theme: 'holy_tempo',
-      decision: 'Verdict-fed mana vs mobile Mending Light vs Verdict-Rite resets',
+      decision: 'Holy Shock-Lightmend weave vs mobile Mending Light vs Verdict-Rite resets',
       options: [
         {
           id: 'pal_r5_crusaders_zeal',
-          name: 'Oath Returned',
-          description: 'Verdict restores 25 mana when cast.',
-          icon: 'judgement',
+          name: "Dawn's Reply",
+          description:
+            'For Sacrament, casting Holy Shock makes your next Lightmend within 8 sec cost 50% less.',
+          icon: 'holy_shock',
           effect: {
             proc: {
-              id: 'pal_oath_returned',
-              name: 'Oath Returned',
-              trigger: { on: 'castNth', n: 1, abilities: ['judgement'] },
-              responses: [{ kind: 'resource', amount: 25, resourceType: 'mana' }],
+              id: 'pal_dawns_reply',
+              name: "Dawn's Reply",
+              spec: 'holy',
+              requiresKnownAbility: 'holy_shock',
+              school: 'holy',
+              trigger: { on: 'castNth', n: 1, abilities: ['holy_shock'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_cheap',
+                  abilities: ['flash_of_light'],
+                  duration: 8,
+                  costPct: 0.5,
+                },
+              ],
             },
           },
         },

@@ -867,6 +867,35 @@ describe('actionBarView: proc availability cues', () => {
     expect(freeRite.usable).toBe(true);
   });
 
+  it("prices and cues Sacrament's Holy Shock and Lightmend handoff", () => {
+    const freeShock = createActionBarView(
+      descriptor(slot(1, { ability: ability('holy_shock', { cost: 55 }) })),
+      fakeDeps(),
+    );
+    expect(
+      freeShock.tick(
+        world({
+          resource: 0,
+          playerAuras: [{ id: 'pal_kindled_faith', kind: 'next_cast_free' }],
+        }),
+      ).slots[0],
+    ).toMatchObject({ usable: true, procState: 'armed' });
+
+    const cheapLightmend = createActionBarView(
+      descriptor(slot(1, { ability: ability('flash_of_light', { cost: 35 }) })),
+      fakeDeps(),
+    );
+    const playerAuras = [{ id: 'pal_dawns_reply', kind: 'next_cast_cheap' as const }];
+    expect(cheapLightmend.tick(world({ resource: 17, playerAuras })).slots[0]).toMatchObject({
+      usable: false,
+      procState: 'armed',
+    });
+    expect(cheapLightmend.tick(world({ resource: 18, playerAuras })).slots[0]).toMatchObject({
+      usable: true,
+      procState: 'armed',
+    });
+  });
+
   it('does not make an unrelated unaffordable ability usable during Blood Debt', () => {
     const view = createActionBarView(
       descriptor(slot(1, { ability: ability('holy_shock', { cost: 35 }) })),

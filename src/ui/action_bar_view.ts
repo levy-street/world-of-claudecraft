@@ -268,6 +268,7 @@ const FREE_COST_AURA_IDS_BY_ABILITY: Readonly<Record<string, readonly string[]>>
   ferocious_bite: ['dru_red_haze_relay'],
   rip: ['dru_red_haze_relay'],
   exorcism: ['pal_blood_debt'],
+  holy_shock: ['pal_kindled_faith'],
   arcane_shot: ['hun_venom_relay', 'hun_packbond', 'hun_menders_signal'],
   eviscerate: ['rog_redhanded'],
   rupture: ['rog_redhanded'],
@@ -279,6 +280,7 @@ const CHEAP_COST_AURA_IDS_BY_ABILITY: Readonly<Record<string, readonly string[]>
   moonfire: ['dru_moonrage_lunar'],
   starfire: ['dru_moonrage_lunar'],
   rejuvenation: ['dru_grove_covenant'],
+  flash_of_light: ['pal_dawns_reply'],
   sinister_strike: ['rog_dusk_dividend'],
   backstab: ['rog_dusk_dividend'],
   gouge: ['rog_dusk_dividend'],
@@ -354,6 +356,20 @@ function oathsDueProcState(
   player: ActionBarPlayerInput,
 ): ActionBarProcState {
   return hasAura(player.auras, 'pal_oaths_due') ? 'armed' : 'none';
+}
+
+function kindledFaithProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'pal_kindled_faith') ? 'armed' : 'none';
+}
+
+function dawnsReplyProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'pal_dawns_reply') ? 'armed' : 'none';
 }
 
 function fellShotProcState(
@@ -512,6 +528,8 @@ const PROC_STATE_RESOLVERS: Readonly<Record<string, ProcStateResolver | undefine
   earth_shock: fulminationProcState,
   exorcism: bloodDebtProcState,
   crusader_strike: oathsDueProcState,
+  holy_shock: kindledFaithProcState,
+  flash_of_light: dawnsReplyProcState,
   arcane_shot: fellShotProcState,
   aimed_shot: longDrawProcState,
   raptor_strike: guttingStrikeProcState,

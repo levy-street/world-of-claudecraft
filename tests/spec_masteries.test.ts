@@ -40,6 +40,22 @@ describe('spec masteries', () => {
   it('authors the ten PR B mastery effects exactly', () => {
     expect(TALENTS.paladin?.specs.find((s) => s.id === 'holy')?.mastery.effect).toEqual({
       global: { critDmgHealPct: 0.5 },
+      proc: {
+        id: 'pal_kindled_faith',
+        name: 'Kindled Faith',
+        spec: 'holy',
+        requiresKnownAbility: 'holy_shock',
+        school: 'holy',
+        trigger: { on: 'castNth', n: 3, abilities: ['holy_light', 'flash_of_light'] },
+        responses: [
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_free',
+            abilities: ['holy_shock'],
+            duration: 10,
+          },
+        ],
+      },
     });
     expect(TALENTS.priest?.specs.find((s) => s.id === 'discipline')?.mastery.effect).toEqual({
       global: { absorbPct: 0.3 },

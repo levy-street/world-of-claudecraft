@@ -40,8 +40,26 @@ const PALADIN_SPECS: SpecDef[] = [
     'A devoted healer who turns the Light into steady single-target recovery.',
     'holy_shock',
     'Kindled Faith',
-    'Your healing spells critically heal for double.',
-    { global: { critDmgHealPct: 0.5 } },
+    'Every 3rd Mending Light or Lightmend makes your next Holy Shock within 10 sec free. Your healing spells critically heal for double.',
+    {
+      global: { critDmgHealPct: 0.5 },
+      proc: {
+        id: 'pal_kindled_faith',
+        name: 'Kindled Faith',
+        spec: 'holy',
+        requiresKnownAbility: 'holy_shock',
+        school: 'holy',
+        trigger: { on: 'castNth', n: 3, abilities: ['holy_light', 'flash_of_light'] },
+        responses: [
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_free',
+            abilities: ['holy_shock'],
+            duration: 10,
+          },
+        ],
+      },
+    },
   ),
   spec(
     'protection',
