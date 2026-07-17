@@ -5866,7 +5866,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.spiritbinder_legguards.name': '정령결속 다리갑옷',
   'entities.items.spiritbinder_pauldrons.name': '정령결속 어깨갑옷',
   'entities.items.spiritbinder_treads.name': '정령결속 장화',
-  'entities.itemSets.necromancers.bonus2': '넉백되지 않습니다 (넉백 저항 100%).',
   'entities.itemSets.necromancers.bonus2':
     '주문력이 20 증가합니다. 피해를 입어도 주문 시전이 지연되지 않습니다 (시전 지연 저항 100%).',
   'entities.itemSets.necromancers.bonus3': '지능이 10, 체력이 10만큼 증가합니다.',

@@ -5600,7 +5600,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.spiritbinder_legguards.name': '縛靈護腿',
   'entities.items.spiritbinder_pauldrons.name': '縛靈護肩',
   'entities.items.spiritbinder_treads.name': '縛靈戰靴',
-  'entities.itemSets.necromancers.bonus2': '你不會被擊退（擊退抗性 100%）。',
   'entities.itemSets.necromancers.bonus2':
     '法術強度提高 20 點。受到傷害不再延遲你的施法（施法延遲抗性 100%）。',
   'entities.itemSets.necromancers.bonus3': '智力提高 10 點，耐力提高 10 點。',

@@ -5870,7 +5870,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.spiritbinder_legguards.name': 'スピリットバインダーの脚甲',
   'entities.items.spiritbinder_pauldrons.name': 'スピリットバインダーの肩当て',
   'entities.items.spiritbinder_treads.name': 'スピリットバインダーのブーツ',
-  'entities.itemSets.necromancers.bonus2': 'ノックバックされなくなります（ノックバック耐性100%）。',
   'entities.itemSets.necromancers.bonus2':
     '呪文の威力が20増加します。被ダメージによって詠唱が遅れなくなります（詠唱妨害耐性100%）。',
   'entities.itemSets.necromancers.bonus3': '知力が10、スタミナが10上昇します。',
