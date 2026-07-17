@@ -77,7 +77,13 @@ describe('warlock low-level sustained damage tuning', () => {
     expect(spec('destruction').mastery.effect.stats?.crit).toBe(0.02);
 
     expect(abilityEffects('wlk_r14_amplify_curse')).toEqual([
-      { ability: 'shadow_bolt', dmgPctVsDotted: 0.2 },
+      {
+        ability: 'shadow_bolt',
+        addEffects: [
+          { type: 'extendDot', dot: 'corruption', seconds: 3, maxBonus: 6 },
+          { type: 'extendDot', dot: 'curse_of_agony', seconds: 3, maxBonus: 6 },
+        ],
+      },
     ]);
     const amplified = computeTalentModifiers(
       'warlock',
@@ -85,7 +91,11 @@ describe('warlock low-level sustained damage tuning', () => {
       20,
     );
     expect(amplified.global.dotDmgPct).toBe(0.1);
-    expect(amplified.abilities.shadow_bolt?.dmgPctVsDotted).toBe(0.2);
+    expect(amplified.abilities.shadow_bolt?.dmgPctVsDotted).toBe(0);
+    expect(amplified.abilities.shadow_bolt?.addEffects).toEqual([
+      { type: 'extendDot', dot: 'corruption', seconds: 3, maxBonus: 6 },
+      { type: 'extendDot', dot: 'curse_of_agony', seconds: 3, maxBonus: 6 },
+    ]);
   });
 
   it('pins the final Hellglass Ward absorb instead of the obsolete point-tree bonuses', () => {

@@ -246,37 +246,51 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
     expect(dot?.school).toBe('nature');
   });
 
-  it("applies conditional bolt damage only for the caster's DoT", () => {
-    const damage = (withOwnDot: boolean): number => {
-      const sim = harness(new Sim({ seed: 2611, playerClass: 'warlock', autoEquip: false }));
-      sim.setPlayerLevel(20);
-      expect(sim.selectTalentRow(14, 'wlk_r14_amplify_curse')).toBe(true);
-      const player = sim.player;
-      const target = spawnTarget(sim, player);
-      if (withOwnDot) {
-        target.auras.push({
-          id: 'corruption',
-          name: 'Blackrot',
-          kind: 'dot',
-          remaining: 18,
-          duration: 18,
-          value: 1,
-          sourceId: player.id,
-          school: 'shadow',
-        });
-      }
-      const res = sim.resolvedAbility('shadow_bolt');
-      if (!res) throw new Error('missing Gloom Bolt');
-      sim.events = [];
-      runEffects(sim.ctx, player, metaOf(sim), target, res);
-      const event = sim.events.find(
-        (candidate) => candidate.type === 'damage' && candidate.ability === res.def.name,
-      );
-      if (!event || event.type !== 'damage') throw new Error('missing Gloom Bolt damage');
-      return event.amount;
-    };
+  it("extends only the caster's hexes after Gloom Bolt lands", () => {
+    const sim = harness(new Sim({ seed: 2611, playerClass: 'warlock', autoEquip: false }));
+    sim.setPlayerLevel(20);
+    expect(sim.selectTalentRow(14, 'wlk_r14_amplify_curse')).toBe(true);
+    const player = sim.player;
+    const target = spawnTarget(sim, player);
+    for (const [id, duration] of [
+      ['corruption', 18],
+      ['curse_of_agony', 24],
+    ] as const) {
+      target.auras.push({
+        id,
+        name: id,
+        kind: 'dot',
+        remaining: duration,
+        duration,
+        value: 1,
+        sourceId: player.id,
+        school: 'shadow',
+      });
+    }
+    target.auras.push({
+      id: 'corruption',
+      name: 'Foreign Blackrot',
+      kind: 'dot',
+      remaining: 18,
+      duration: 18,
+      value: 1,
+      sourceId: 777,
+      school: 'shadow',
+    });
+    const res = sim.resolvedAbility('shadow_bolt');
+    if (!res) throw new Error('missing Gloom Bolt');
 
-    expect(damage(true)).toBeGreaterThan(damage(false));
+    runEffects(sim.ctx, player, metaOf(sim), target, res);
+
+    expect(
+      target.auras.find((aura) => aura.id === 'corruption' && aura.sourceId === player.id),
+    ).toMatchObject({ duration: 21, remaining: 21, extendedBy: 3 });
+    expect(
+      target.auras.find((aura) => aura.id === 'curse_of_agony' && aura.sourceId === player.id),
+    ).toMatchObject({ duration: 27, remaining: 27, extendedBy: 3 });
+    expect(
+      target.auras.find((aura) => aura.id === 'corruption' && aura.sourceId === 777),
+    ).toMatchObject({ duration: 18, remaining: 18 });
   });
 
   it('Rainbreak prevents damage pushback without changing baseline channels', () => {

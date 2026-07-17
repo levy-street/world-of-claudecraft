@@ -1002,3 +1002,6 @@ npm run build on PR4/PR5.
   caster-owned effects by 1 sec, up to 3 sec per application. The warlock chooses how
   long to channel for damage, healing, and upkeep before returning to Gloom Bolt and
   Hard Bargain, with the maintained target timers providing the visible feedback.
+  Deepened Hex replaces its flat conditional bolt scalar with a 3 sec Gloom Bolt
+  extension for Blackrot and Hex of Anguish, capped at 6 sec per application, so the
+  shared row now offers active upkeep without disturbing its other two choices.

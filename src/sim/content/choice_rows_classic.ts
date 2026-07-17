@@ -2100,9 +2100,20 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'wlk_r14_amplify_curse',
           name: 'Deepened Hex',
-          description: 'Gloom Bolt deals 20% more damage to targets afflicted by your DoTs.',
+          description:
+            'Gloom Bolt extends your Blackrot and Hex of Anguish on the target by 3 sec, up to 6 sec per application.',
           icon: 'curse_of_agony',
-          effect: { ability: [{ ability: 'shadow_bolt', dmgPctVsDotted: 0.2 }] },
+          effect: {
+            ability: [
+              {
+                ability: 'shadow_bolt',
+                addEffects: [
+                  { type: 'extendDot', dot: 'corruption', seconds: 3, maxBonus: 6 },
+                  { type: 'extendDot', dot: 'curse_of_agony', seconds: 3, maxBonus: 6 },
+                ],
+              },
+            ],
+          },
         },
         {
           id: 'wlk_r14_ruin',
