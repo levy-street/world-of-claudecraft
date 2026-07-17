@@ -957,12 +957,27 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'hun_r20_improved_volley',
-          name: 'Steady Rain',
+          name: 'Rainbreak',
           description:
-            'Arrowfall deals 50% more damage, and taking damage cannot shorten its channel.',
+            'Taking damage cannot shorten Arrowfall. Starting Arrowfall makes your next Gutting Strike within 10 sec deal 50% more damage.',
           icon: 'volley',
           effect: {
-            ability: [{ ability: 'volley', dmgPct: 0.5, damagePushbackImmune: true }],
+            ability: [{ ability: 'volley', damagePushbackImmune: true }],
+            proc: {
+              id: 'hun_rainbreak',
+              name: 'Rainbreak',
+              school: 'physical',
+              trigger: { on: 'castNth', n: 1, abilities: ['volley'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_ability_damage',
+                  abilities: ['raptor_strike'],
+                  duration: 10,
+                  dmgPct: 0.5,
+                },
+              ],
+            },
           },
         },
         {

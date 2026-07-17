@@ -966,4 +966,7 @@ npm run build on PR4/PR5.
 - Fieldcraft turns Briar Trap into the ranged setup for a melee field circuit.
   Briar Trap or Rime Snare banks a 12 sec empowered Gutting Strike; landing that
   strike restores 10 mana and advances Briar Trap by 8 sec, so control, closing
-  distance, and the melee payoff continually feed the next field setup.
+  distance, and the melee payoff continually feed the next field setup. Rainbreak
+  replaces flat Arrowfall damage with a protected channel that banks a separate
+  10 sec Gutting Strike payoff, giving the hybrid a ranged-area route back into
+  melee without changing the other apex choices.

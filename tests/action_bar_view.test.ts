@@ -370,7 +370,7 @@ describe('actionBarView: proc availability cues', () => {
     ).toBe('armed');
   });
 
-  it('marks Gutting Strike armed during the Quickblood trap window', () => {
+  it('marks Gutting Strike armed during either Fieldcraft melee window', () => {
     const view = createActionBarView(
       descriptor(slot(1, { ability: ability('raptor_strike') })),
       fakeDeps(),
@@ -381,6 +381,13 @@ describe('actionBarView: proc availability cues', () => {
       view.tick(
         world({
           playerAuras: [{ id: 'hun_quickblood_setup', kind: 'next_ability_damage' }],
+        }),
+      ).slots[0].procState,
+    ).toBe('armed');
+    expect(
+      view.tick(
+        world({
+          playerAuras: [{ id: 'hun_rainbreak', kind: 'next_ability_damage' }],
         }),
       ).slots[0].procState,
     ).toBe('armed');

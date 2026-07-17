@@ -329,7 +329,9 @@ function guttingStrikeProcState(
   _ability: ActionBarAbility,
   player: ActionBarPlayerInput,
 ): ActionBarProcState {
-  return hasAura(player.auras, 'hun_quickblood_setup') ? 'armed' : 'none';
+  return hasAura(player.auras, 'hun_quickblood_setup') || hasAura(player.auras, 'hun_rainbreak')
+    ? 'armed'
+    : 'none';
 }
 
 // Ability ids map to pure proc resolvers here, keeping the painter generic. New
