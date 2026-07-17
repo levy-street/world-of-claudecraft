@@ -35,6 +35,7 @@ import type {
   ResolvedAbility,
   TradeSession,
 } from './sim';
+import type { CardDuelMatch } from './social/card_duel';
 import type { FinderFormationUnit } from './social/party';
 import type { VcState } from './social/vale_cup';
 import type { SpatialGrid } from './spatial';
@@ -118,6 +119,12 @@ export interface SimContextPrimitives {
   // Backing fields stay on Sim. `duels` is also read per-attack by isHostileTo/
   // dealDamage (PvP hostility), so it stays Sim-owned (A2).
   readonly duels: Map<number, DuelState>;
+  // Card Duel minigame (src/sim/social/card_duel.ts): its own FIFO queue
+  // (mutated in place via shift/splice/push, like cardDuels below, so this is
+  // a readonly getter, not reassigned) and live-match map, independent of the
+  // HP-based duels above.
+  readonly cardDuelQueue: number[];
+  readonly cardDuels: Map<number, CardDuelMatch>;
   // `world` stays optional (custom play-test map, else undefined; perfLap is the
   // temporary host-owned tick profiler probe); the rest defaulted.
   readonly cfg: Required<Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap'>> &
@@ -846,6 +853,12 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get duels() {
       return host.duels;
+    },
+    get cardDuelQueue() {
+      return host.cardDuelQueue;
+    },
+    get cardDuels() {
+      return host.cardDuels;
     },
     get cfg() {
       return host.cfg;

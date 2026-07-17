@@ -1,7 +1,8 @@
 // Caster tier-set 2-piece: grants +20 spell power (mirroring the +40 attack power
-// the melee 2-sets give) AND 100% knockback resistance that ACTUALLY stops knockback
-// (the bug: one applyKnockback caller passed a raw distance, so casters were still
-// shoved and their casts interrupted; resistance is now applied centrally).
+// the melee 2-sets give) AND 100% cast-pushback immunity: damage taken never
+// delays the wearer's cast timer (castPushbackReduction 1 makes pushbackCast a
+// no-op). It is NOT physical knockback resistance; that entity stat still works
+// (the applyKnockback suite below pins it) but no shipped set grants it.
 import { describe, expect, it } from 'vitest';
 import { aggregateSetBonuses, SET_NECROMANCERS } from '../src/sim/content/item_sets';
 import { MOBS } from '../src/sim/data';
@@ -19,20 +20,21 @@ function statsFor(cls: PlayerClass, level: number, equipment: Record<string, str
 }
 
 describe('caster set 2-piece bonus', () => {
-  it('grants +20 spell power and 100% knockback resistance at 2 pieces', () => {
+  it('grants +20 spell power and 100% cast-pushback immunity at 2 pieces', () => {
     const two = aggregateSetBonuses(counts({ [SET_NECROMANCERS]: 2 }));
     expect(two.sp).toBe(20);
-    expect(two.knockbackResistance).toBe(1);
+    expect(two.castPushbackReduction).toBe(1);
+    expect(two.knockbackResistance).toBe(0); // spell pushback, never physical knockback
     // one piece: no 2-piece bonus yet
     const one = aggregateSetBonuses(counts({ [SET_NECROMANCERS]: 1 }));
     expect(one.sp).toBe(0);
-    expect(one.knockbackResistance).toBe(0);
+    expect(one.castPushbackReduction).toBe(0);
   });
 
   it('folds the +20 spell power into the wearer, on top of gear', () => {
     const eq = { chest: 'necromancers_starshroud', feet: 'necromancers_soulsteps' };
     const withSet = statsFor('mage', 20, eq);
-    expect(withSet.knockbackResistance).toBe(1);
+    expect(withSet.castPushbackReduction).toBe(1);
     // Neither piece carries flat spell power, so the wearer's spell power is
     // exactly the int-derived term plus the 2-piece flat +20 (an integer, so it
     // commutes with the rounding); a one-piece wearer has no flat term at all.

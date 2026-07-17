@@ -1178,6 +1178,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.hideChestConfirmTitle': 'Truhe der täglichen Belohnungen ausblenden?',
   'hudChrome.dailyRewards.pointsGained': '{points} Punkte für tägliche Belohnungen erhalten.',
   'hudChrome.dailyRewards.taskMultiplier': 'x{multiplier}-Multiplikator',
+  'hudChrome.dailyRewards.oneVsOneExcluded':
+    '1-gegen-1-Matches gewähren keine Punkte für tägliche Belohnungen.',
   'hudChrome.dailyRewards.totalPlayer': '{count} Spieler heute',
   'hudChrome.dailyRewards.totalPlayers': '{count} Spieler heute',
   'hudChrome.death.resurrectAtCorpse': 'Am Leichnam wiederbeleben',
@@ -6402,7 +6404,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.greyjaw_stalker.bonus3': 'Erhöht Angriffs- und Zaubertempo um 15%.',
   'entities.itemSets.necromancers.name': 'Mournweave-Gewänder',
   'entities.itemSets.necromancers.bonus2':
-    'Ihr könnt nicht zurückgestoßen werden (100% Rückstoßwiderstand).',
+    'Erhöht Zaubermacht um 20. Erlittener Schaden verzögert Eure Zauber nicht mehr (100% Widerstand gegen Zauberverzögerung).',
   'entities.itemSets.necromancers.bonus3': 'Erhöht Intelligenz um 10 und Ausdauer um 10.',
   'entities.itemSets.nighttalon.name': 'Direfang-Pelz',
   'entities.itemSets.nighttalon.bonus2': 'Erhöht Angriffskraft um 40.',
@@ -6410,12 +6412,12 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Erhöht Beweglichkeit um 15, kritische Trefferchance um 2% sowie Angriffs- und Zaubertempo um 15%.',
   'entities.itemSets.soulflame.name': 'Wraithfire-Gewänder',
   'entities.itemSets.soulflame.bonus2':
-    'Ihr könnt nicht zurückgestoßen werden (100% Rückstoßwiderstand).',
+    'Erhöht Zaubermacht um 20. Erlittener Schaden verzögert Eure Zauber nicht mehr (100% Widerstand gegen Zauberverzögerung).',
   'entities.itemSets.soulflame.bonus3':
     'Erhöht Intelligenz um 15, Willenskraft um 15 sowie Angriffs- und Zaubertempo um 15%.',
   'entities.itemSets.stormcallers.name': 'Galecall-Gewänder',
   'entities.itemSets.stormcallers.bonus2':
-    'Ihr könnt nicht zurückgestoßen werden (100% Rückstoßwiderstand).',
+    'Erhöht Zaubermacht um 20. Erlittener Schaden verzögert Eure Zauber nicht mehr (100% Widerstand gegen Zauberverzögerung).',
   'entities.itemSets.stormcallers.bonus3':
     'Erhöht Intelligenz um 15, Willenskraft um 15 sowie Angriffs- und Zaubertempo um 15%.',
   'entities.itemSets.vale_arcanist.name': 'Ornat des Talarkanisten',
@@ -7023,15 +7025,11 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.deedsPage.howHeading': 'So funktionieren Taten',
   'guide.deedsPage.intro':
     'Im Buch der Taten führt die Welt Buch über alles, was du vollbracht hast: von deinen ersten Schritten aus dem Starttal bis zu den härtesten Kämpfen, die das Reich zu bieten hat. Erringe Taten, während du spielst, trage die Titel, die sie verleihen, und sieh zu, wie dein Ansehen wächst.',
-  'guide.deedsPage.renownBody':
-    'Ansehen ist die Wertung hinter dem Buch. Jede errungene Tat ist einen festen Betrag wert, und deine Summe kann nur steigen, eine ruhige Woche kostet dich also nie Boden. Eine Handvoll Taten hängt eher vom Glück als vom Können ab, und Heldentaten sind eine Ehre für sich; beide bringen daher überhaupt kein Ansehen.',
   'guide.deedsPage.renownHeading': 'Ansehen',
   'guide.deedsPage.rewardBorder': 'Rahmen',
   'guide.deedsPage.rewardsBody':
     'Die Belohnungen sind reine Zierde, und genau das ist der Sinn. Manche Taten verleihen einen Titel, den du tragen kannst, oder einen Rahmen für deinen Namen, aber niemals etwas, das deinen Helden stärker macht. Wähle im Buch der Taten den Titel, der dir gefällt, und er begleitet dich auf deinem Namensschild, im Chat und auf den Ranglisten, für alle sichtbar.',
   'guide.deedsPage.rewardsHeading': 'Titel und Rahmen',
-  'guide.deedsPage.standingsNote':
-    'Die Reiche führen eine laufende Zählung des Ansehens über alle Konten hinweg. Um zu sehen, wer wo steht, öffne die Bestenliste im Spiel und wechsle zu ihrem Ansehen-Reiter; die Platzierungen sind dort zu Hause, nicht im Wiki.',
   'guide.nav.deeds': 'Buch der Taten',
   'hudChrome.deeds.broadcastLine': '{name} hat eine Tat vollbracht: {deed}',
   'hudChrome.deeds.broadcastsLabel': 'Errungene Taten mit Gilde und Freunden teilen',
@@ -7064,9 +7062,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.filterNearly': 'Fast geschafft',
   'hudChrome.deeds.filterUnearned': 'Nicht errungen',
   'hudChrome.deeds.hiddenBadge': 'Verborgen',
-  'hudChrome.deeds.lbDeedsCol': 'Taten',
   'hudChrome.deeds.lbEmpty': 'Noch keine platzierten Chronisten.',
-  'hudChrome.deeds.lbSelf': 'Deine Platzierung: Rang {rank}, unter den besten {percent} Prozent',
   'hudChrome.deeds.lbTab': 'Ansehen',
   'hudChrome.deeds.lbTitleCol': 'Titel',
   'hudChrome.deeds.nearestLabel': 'Kurz davor:',
@@ -7796,4 +7792,15 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'welcome.armory.cta': 'Welt betreten und die Waffenkammer durchstöbern',
   'welcome.news.new': 'Neu',
   'welcome.news.viewAll': 'Alle Updates auf GitHub ansehen',
+  'entities.letters.heroic_marks_reward.sender': 'Heroischer Quartiermeister',
+  'entities.letters.heroic_marks_reward.subject': 'Deine heroischen Marken',
+  'entities.letters.heroic_marks_reward.body':
+    'Deine Gruppe hat die heroische Prüfung gemeistert, während du in der Nachhut gekämpft hast oder bereits am Boden lagst. Auch deine Instanzbindung wurde aktiviert, daher ist dein Anteil an heroischen Marken hier angekommen, statt verloren zu gehen. Setze sie klug ein.\n\n- Heroischer Quartiermeister',
+  'guide.dungeonsPage.resetTitle': 'Instanzen zurücksetzen',
+  'guide.dungeonsPage.resetBody':
+    'Wenn ihr die Schwierigkeit wechselt, während eure Gruppe noch beanspruchte Läufe hält, bleiben die alten Ansprüche eine Weile bestehen. Der Gruppenleiter kann sie sofort aufgeben: Wählt im Menü des eigenen Porträts Alle Instanzen zurücksetzen oder gebt /dungeon reset ein. Das funktioniert erst nach einem tatsächlichen Schwierigkeitswechsel, nur wenn niemand, ob lebend oder gefallen, drinnen ist, und zwischen Rücksetzungen gilt eine kurze Abklingzeit. Bei falscher Schwierigkeit warnt euch das Spiel vor dem Start. Der Schlachtzug wird so niemals zurückgesetzt; seine eigenen Bindungsregeln bleiben bestehen.',
+  'guide.gear.itemLevelBody':
+    'Aktiviere Gegenstandsstufe anzeigen in den Optionen, um zwei Ausrüstungsteile schnell zu vergleichen. Ausrüstung bekannter Herkunft, von Gegnern, Quests und Handwerksberufen, zeigt dann eine Gegenstandsstufe: eine einzelne Zahl, die ihre Stärke anhand der Quelle grob angibt und Verbesserungen auch über verschiedene Plätze hinweg vergleichbar macht. Teile ohne solche Herkunft, etwa einfache Händlerware und Startausrüstung, zeigen keine Gegenstandsstufe; eine fehlende Zahl ist normal.',
+  'guide.professions.craftHowBody':
+    'Öffne das Handwerksfenster (Standardtaste T), um alle bekannten Rezepte, ihre Zutaten und deinen Vorrat zu sehen; sind die Materialien vorhanden, genügt ein Klick. Gewöhnliche Rezepte lassen sich überall herstellen. Einige fortgeschrittene Rezepte, darunter höherstufige Werkzeuge und seltene Zaubererrüstung, erfordern dagegen das Handwerkszentrum in Highwatch.',
 };

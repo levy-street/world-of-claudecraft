@@ -5,6 +5,7 @@ import {
   consumeDiscordOAuthState,
   consumeDiscordPendingLogin,
   createDiscordPendingLogin,
+  discordIdsWithGuildFlair,
   grantRewardPoints,
   linkDiscordToAccount,
   loadRewardState,
@@ -110,6 +111,52 @@ describe('linkDiscordToAccount', () => {
     expect(insert!.sql).toContain('discord_email');
     expect(insert!.sql).toContain('COALESCE(EXCLUDED.discord_email, discord_links.discord_email)');
     expect(insert!.params).toContain('maxp@example.com');
+  });
+
+  it('resets the bot-pushed guild meta when the link repoints at a different Discord id', async () => {
+    const { pool, calls } = makePool((s) => {
+      if (s.includes('SELECT account_id FROM discord_links WHERE discord_user_id')) return NONE;
+      if (s.includes('INSERT INTO discord_links')) return { rows: [], rowCount: 1 };
+      return NONE;
+    });
+    await linkDiscordToAccount(pool, 1, {
+      discordUserId: '80351110224678912',
+      username: 'maxp',
+      avatar: null,
+      email: null,
+      guildMember: true,
+    });
+    const insert = calls.find((c) => c.sql.includes('INSERT INTO discord_links'));
+    // discord_role and discord_joined_at belong to the OLD Discord identity, so
+    // the upsert must reset both to NULL when the id changes (a same-id relink
+    // keeps them). Without this a relinked account keeps the previous user's
+    // staff flair until the next bot sync happens to cover the new id.
+    expect(insert!.sql).toContain(
+      'discord_role = CASE WHEN discord_links.discord_user_id = EXCLUDED.discord_user_id THEN discord_links.discord_role ELSE NULL END',
+    );
+    expect(insert!.sql).toContain(
+      'discord_joined_at = CASE WHEN discord_links.discord_user_id = EXCLUDED.discord_user_id THEN discord_links.discord_joined_at ELSE NULL END',
+    );
+  });
+});
+
+describe('discordIdsWithGuildFlair', () => {
+  it('selects only links still flagged as guild member or carrying a role key', async () => {
+    const { pool, calls } = makePool((s) =>
+      s.includes('SELECT discord_user_id FROM discord_links')
+        ? { rows: [{ discord_user_id: 'u1' }, { discord_user_id: 'u2' }], rowCount: 2 }
+        : NONE,
+    );
+    expect(await discordIdsWithGuildFlair(pool)).toEqual(['u1', 'u2']);
+    const q = calls.find((c) => c.sql.includes('SELECT discord_user_id FROM discord_links'));
+    // The WHERE is what keeps the list small AND what scopes the bot's
+    // departed-member clearing to links that actually have something to clear.
+    expect(q!.sql).toContain('WHERE guild_member = TRUE OR discord_role IS NOT NULL');
+  });
+
+  it('returns an empty list when nothing is flagged', async () => {
+    const { pool } = makePool(() => NONE);
+    expect(await discordIdsWithGuildFlair(pool)).toEqual([]);
   });
 });
 

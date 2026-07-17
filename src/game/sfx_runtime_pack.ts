@@ -1,5 +1,6 @@
 import {
   SFX_FIXED_CATALOG_KEYS,
+  SFX_GAIN_LIMITS,
   SFX_MAX_RUNTIME_PACK_BYTES,
   SFX_MAX_TOTAL_AUDIO_BYTES,
   SFX_MAX_TRACK_BYTES,
@@ -9,6 +10,14 @@ import {
   type SfxEntry,
   type SfxVariant,
 } from './sfx_manifest.generated';
+
+// A custom key's own computed headroom ceiling (see sfx_gain_ceiling.mjs) may
+// exceed the flat 1.0 (0dB) default every other key is bound to; a key with
+// no entry here (mob subfamily extensions, not yet covered by that
+// mechanism) keeps the original flat ceiling.
+function maxGainForKey(key: string): number {
+  return (SFX_GAIN_LIMITS as Record<string, number>)[key] ?? 1;
+}
 
 const PACK_FORMAT = 'woc-sfx-runtime-pack';
 const PACK_VERSION = 1;
@@ -176,7 +185,7 @@ export async function parseRuntimeSfxPack(
     if (!Array.isArray(clip.variants) || clip.variants.length < 1) return null;
     if (clip.variants.length > SFX_MAX_TRACKS_PER_KEY) return null;
     if (typeof clip.gain !== 'number' || !Number.isFinite(clip.gain)) return null;
-    if (clip.gain < 0 || clip.gain > 1) return null;
+    if (clip.gain < 0 || clip.gain > maxGainForKey(key)) return null;
     if (typeof clip.playbackRate !== 'number' || !Number.isFinite(clip.playbackRate)) return null;
     if (clip.playbackRate < 0.25 || clip.playbackRate > 4) return null;
 

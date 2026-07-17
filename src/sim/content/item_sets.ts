@@ -4,14 +4,15 @@
 // (tier 1) and the Nythraxis raid (tier 2), plus three leveling "haste kit"
 // families assembled from existing world-drop items. Wearing enough pieces of
 // a family grants stacking 2-, 3-, and 4-piece bonuses, resolved in
-// `recalcPlayerStats` (primary stats, attack power, crit, haste, knockback
-// resistance). Every epic family's 4-piece tier is a proc (see SetProc):
+// `recalcPlayerStats` (primary stats, attack power, crit, haste, cast pushback
+// immunity). Every epic family's 4-piece tier is a proc (see SetProc):
 // weapon-crit-triggered for the plate and leather archetypes, spell-cast-
 // triggered for the caster archetypes, resolved by combat/set_procs.ts.
 //
 // Bonuses are keyed by archetype: the plate (Strength) families get attack
 // power then Strength/Stamina; the leather (Agility) families get attack power
-// then Agility/crit; the cloth (caster) families get knockback resistance at 2
+// then Agility/crit; the cloth (caster) families get full spell-pushback
+// immunity (damage taken never delays a cast; NOT physical knockback) at 2
 // pieces and Intellect plus Stamina for tier 1, or Intellect plus Spirit for
 // tier 2, at 3 pieces. Every tier-2 3-piece bonus ALSO grants haste (ONE stat:
 // faster melee and ranged swings AND shorter casts/channels), and the three
@@ -100,8 +101,8 @@ const AGILITY_T1_BONUSES: SetBonusTier[] = [
 const CASTER_T1_BONUSES: SetBonusTier[] = [
   {
     pieces: 2,
-    effect: { knockbackResistance: 1, sp: 20 },
-    text: 'Increases spell power by 20. You cannot be knocked back (100% knockback resistance).',
+    effect: { castPushbackReduction: 1, sp: 20 },
+    text: 'Increases spell power by 20. Damage taken no longer delays your spellcasting (100% pushback resistance).',
   },
   {
     pieces: 3,
@@ -193,8 +194,8 @@ const AGILITY_T2_BONUSES: SetBonusTier[] = [
 const CASTER_T2_BONUSES: SetBonusTier[] = [
   {
     pieces: 2,
-    effect: { knockbackResistance: 1, sp: 20 },
-    text: 'Increases spell power by 20. You cannot be knocked back (100% knockback resistance).',
+    effect: { castPushbackReduction: 1, sp: 20 },
+    text: 'Increases spell power by 20. Damage taken no longer delays your spellcasting (100% pushback resistance).',
   },
   {
     pieces: 3,

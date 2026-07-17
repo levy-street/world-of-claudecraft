@@ -251,8 +251,31 @@ describe('leaderboard_window: Renown (deeds) board tab', () => {
   });
 
   it('renders the localized self standing line only when the server resolved one', () => {
-    expect(code).toContain("t('hudChrome.deeds.lbSelf'");
-    expect(code).toMatch(/deedsSelfHtml\([\s\S]{0,220}if \(!self\) return '';/);
+    // Two arms decided by the PURE CORE (kind 'account' with renown, kind
+    // 'rank' without; behaviorally pinned in deeds_leaderboard_view.test.ts).
+    // Here each t() key is bound to ITS arm of the ternary, so swapping the
+    // keys between arms fails this pin, not just a bare contains-scan.
+    expect(code).toMatch(
+      /self\.kind === 'account'\s*\?\s*t\('hudChrome\.deeds\.lbSelfAccount'[\s\S]{0,220}:\s*t\('hudChrome\.deeds\.lbSelfRank'/,
+    );
+    expect(code).toMatch(/deedsSelfHtml\([\s\S]{0,400}if \(!self\) return '';/);
+    // The renown value goes through formatNumber, never raw interpolation.
+    expect(code).toMatch(/renown: formatNumber\(self\.renown/);
+  });
+
+  it('renders the visible account-scope note on every deeds-board state it owns', () => {
+    // The caption is VISIBLE text (a title-attr tooltip does not exist on
+    // touch): prepended in the error, empty, and ranked arms alike.
+    expect(code).toContain("t('hudChrome.deeds.lbScopeNote')");
+    expect(code.match(/this\.deedsScopeNoteHtml\(\)/g)?.length).toBe(3);
+    expect(code).not.toMatch(/title="[^"]*lbScopeNote/);
+  });
+
+  it('renders no deed-count column: Renown is the one ranked number on the board', () => {
+    // The column was removed deliberately (issue #2044): the completion count
+    // lives in the Book of Deeds header, never on a ranked surface.
+    expect(code).not.toContain('lb-deeds-count');
+    expect(code).not.toContain('deedCount');
   });
 
   it('renders the localized Renown-tab empty state', () => {

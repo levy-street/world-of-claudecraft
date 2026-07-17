@@ -175,7 +175,16 @@ export function buildSfxConformArgs({ inputFile, outputFile, duration, gainDb, c
   };
 }
 
-/** Conform one source to an MP3 without changing or deleting the input file. */
+/** Conform one source to an MP3 without changing or deleting the input file.
+ *  `preserveLoudness: true` (a custom/hand-mastered key, see
+ *  sfx_conform_inventory.mjs's isCustomMaster) skips loudness re-targeting
+ *  entirely: the author's own mix is authoritative, likely measured against a
+ *  different metric than this pipeline's integrated-LUFS target (e.g.
+ *  momentary LUFS in their own DAW), so re-targeting it here would silently
+ *  stack a second, mismatched loudness pass on top of an already-finished
+ *  mix. Only the true-peak safety ceiling is enforced, and only downward:
+ *  a file already under the ceiling passes through with format-only changes
+ *  (bitrate/sample-rate/channels), never gets boosted. */
 export function conformSfxAudio({
   inputFile,
   outputFile,
@@ -183,7 +192,11 @@ export function conformSfxAudio({
   ffmpegPath,
   peakDb = null,
   channels = null,
+  preserveLoudness = false,
 }) {
+  if (preserveLoudness) {
+    return conformCustomMaster({ inputFile, outputFile, duration, ffmpegPath, peakDb, channels });
+  }
   const normBranch = duration < DURATION_THRESHOLD ? 'peak' : 'lufs';
   const measuredInput =
     normBranch === 'peak'
@@ -291,18 +304,73 @@ export function conformSfxAudio({
   }
 }
 
-export function inspectSfxConformance(file, { ffmpegPath, ffprobePath }) {
+/** Peak-safety-only conform for a preserved-loudness (custom/hand-mastered)
+ *  key: never re-targets loudness, only pulls true peak down if it exceeds
+ *  the safety ceiling. See conformSfxAudio's preserveLoudness doc comment. */
+function conformCustomMaster({ inputFile, outputFile, duration, ffmpegPath, peakDb, channels }) {
+  const measuredInput = Number.isFinite(peakDb)
+    ? peakDb
+    : measureSfxTruePeakDb(inputFile, ffmpegPath);
+  const overshoot = measuredInput - TARGET_PEAK_DBFS;
+  // Only ever attenuate (never boost): an already-safe file gets format-only
+  // changes (bitrate/sample-rate/channels via buildSfxConformArgs's fixed
+  // aformat/encoder args), preserving the author's own gain decision exactly.
+  let gainDb = overshoot > 0 ? -overshoot : 0;
+  const temporary = join(
+    dirname(outputFile),
+    `.${basename(outputFile, extname(outputFile))}.${process.pid}.${randomBytes(6).toString('hex')}.tmp.mp3`,
+  );
+  try {
+    for (let attempt = 0; attempt < 8; attempt++) {
+      const plan = buildSfxConformArgs({
+        inputFile,
+        outputFile: temporary,
+        duration,
+        gainDb,
+        channels,
+      });
+      run(ffmpegPath, plan.args);
+      const measuredOutput = measureSfxTruePeakDb(temporary, ffmpegPath);
+      const stillOver = measuredOutput - TARGET_PEAK_DBFS;
+      if (stillOver <= NORM_TOLERANCE) {
+        renameSync(temporary, outputFile);
+        return {
+          outputFile,
+          normBranch: 'preserve',
+          inputLevel: measuredInput,
+          outputLevel: measuredOutput,
+          gainDb: filterNumber(gainDb),
+        };
+      }
+      // MP3 encoding overshoot (see the LONG_FORM_LIMIT_DB comment above) can
+      // still leave real peak slightly over even after an attenuating pass;
+      // pull down by the residual and re-encode rather than accept a clip.
+      gainDb -= stillOver;
+    }
+    throw new Error(
+      `preserved-loudness master could not be brought under ${TARGET_PEAK_DBFS}dBFS true peak`,
+    );
+  } finally {
+    rmSync(temporary, { force: true });
+  }
+}
+
+export function inspectSfxConformance(file, { ffmpegPath, ffprobePath, preserveLoudness = false }) {
   const stats = probeSfxAudio(file, ffprobePath);
   const extension = extname(file);
   const isLossless = LOSSLESS_EXTENSIONS.has(extension.toLowerCase());
   const isMp3 = extension === '.mp3' && stats.codec.toLowerCase() === 'mp3';
-  const preliminary = classify({ ...stats, isLossless, isMp3 });
+  const preliminary = classify({ ...stats, isLossless, isMp3, preserveLoudness });
   if (preliminary.reject) {
     return { ...stats, isLossless, isMp3, ...preliminary, peakDb: null, lufs: null };
   }
   // Measured for BOTH branches: the lufs branch's own loudness figure cannot
-  // reveal a true-peak overshoot (see classify's peak check below), so a
+  // reveal a true-peak overshoot (see classify's peak check above), so a
   // LUFS-target file needs its real peak measured too, not just its LUFS.
+  // LUFS is measured for a preserveLoudness file too (not to re-target it,
+  // classify() never does that for preserveLoudness): the wrong-branch
+  // fingerprint check below needs the real value to compare against
+  // TARGET_LUFS.
   const peakDb = measureSfxTruePeakDb(file, ffmpegPath);
   const lufs = preliminary.normBranch === 'lufs' ? measureSfxLufs(file, ffmpegPath) : null;
   return {
@@ -311,6 +379,6 @@ export function inspectSfxConformance(file, { ffmpegPath, ffprobePath }) {
     isMp3,
     peakDb,
     lufs,
-    ...classify({ ...stats, isLossless, isMp3, peakDb, lufs }),
+    ...classify({ ...stats, isLossless, isMp3, peakDb, lufs, preserveLoudness }),
   };
 }

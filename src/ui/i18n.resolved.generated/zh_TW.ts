@@ -366,6 +366,7 @@ export const zh_TW: EnTranslations = {
       "spinButton": "轉動",
       "tasks": "任務",
       "taskMultiplier": "{multiplier}倍倍率",
+      "oneVsOneExcluded": "1對1比賽不會獲得每日獎勵點數。",
       "pointsGained": "已獲得 {points} 每日獎勵點數。",
       "showChestButton": "顯示寶箱",
       "hideChestButton": "隱藏寶箱",
@@ -2199,9 +2200,10 @@ export const zh_TW: EnTranslations = {
       "charTitleNone": "未選擇頭銜",
       "charOpenBook": "功績之書",
       "lbTab": "名望",
-      "lbDeedsCol": "功績",
       "lbTitleCol": "頭銜",
-      "lbSelf": "你的排名：第 {rank} 名，位居前 {percent}%",
+      "lbScopeNote": "排行榜按帳號的累計名望排名。每個功績在一個帳號的所有角色中只計一次。",
+      "lbSelfAccount": "你的帳號：第 {rank} 名，位居前 {percent}%，名望 {renown}",
+      "lbSelfRank": "你的帳號：第 {rank} 名，位居前 {percent}%",
       "lbEmpty": "尚無上榜的編年史家。",
       "broadcastsLabel": "與公會和好友分享功績達成",
       "titledName": "{name}【{title}】"
@@ -3100,7 +3102,7 @@ export const zh_TW: EnTranslations = {
       "howHeading": "功績如何運作",
       "howBody": "功績以單一角色為單位逐一贏得並留存，因此你所扮演的每一位英雄都會各自累積自己的功績之書；只有王國的排行榜才會匯總你所扮演的所有角色的名望，且每個功績只計一次。每個功績都在遊戲內的功績之書中清楚寫明它的要求，讓你始終知道該追求什麼；你也可以追蹤心儀的功績，讓它們在遊玩時常在眼前。少數功績會保持隱密，只有在你贏得它們之後才會揭曉。功績之書也對自己誠實：凡是你過往的記錄能夠證明的，它都會當場記上功勞，因此老練的玩家絕不會翻開一頁空白；只有計數類的功績才會從零開始累計。",
       "renownHeading": "名望",
-      "renownBody": "名望是功績之書背後的分數。你贏得的每個功績都價值固定的點數，而你的總分只增不減，因此清閒的一週絕不會讓你失去已有的成績。少數功績取決於運氣而非技巧，而壯舉則自成一份榮譽，因此這兩者都不提供任何名望。",
+      "renownBody": "名望是功績之書背後的分數。你贏得的每個功績都價值固定的點數，而你的總分只增不減，因此清閒的一週絕不會讓你失去已有的成績。少數功績取決於運氣而非技巧，而壯舉則自成一份榮譽，因此這兩者都不提供任何名望。不帶名望的功績仍會計入功績之書的完成度，只是從不計分。",
       "rewardsHeading": "頭銜與邊框",
       "rewardsBody": "這些獎勵純粹是為了炫耀，而這正是它們的意義所在。有些功績會授予你可佩戴的頭銜，或是為你的名字增添裝飾的邊框，絕不會給出任何讓你的英雄變強的東西。在功績之書中選擇你想要的頭銜，它便會隨你出現在銘牌上、聊天中與排行榜上，供所有人觀看。",
       "chroniclesHeading": "編年史",
@@ -3109,7 +3111,7 @@ export const zh_TW: EnTranslations = {
       "featsBody": "壯舉自成一類：它們是傳承與世界首創的記錄，是那些與逝去紀元相關、或只會發生一次的功績。它們不帶來任何名望，也不計入完成度，將作為對往昔功業的紀念被永久保存。",
       "catalogHeading": "功績全錄",
       "catalogBody": "這裡列出了功績之書所能容納的每一個功績，按類別整理。隱密的功績被特意略去，等待你自己去發現。在遊戲內打開功績之書，即可查看每個功績的具體要求。",
-      "standingsNote": "各王國會持續統計所有帳號累積的名望。想知道誰位居何處，請在遊戲內打開排行榜並轉到其名望分頁；排名在那裡，而不在維基上。",
+      "standingsNote": "各王國會持續統計所有帳號累積的名望：排行榜按帳號的累計名望排名，每個功績在你所有角色中只計一次，且榜上只顯示名望，因此不帶名望的功績即使計入你的功績之書，也絕不會影響排名。想知道誰位居何處，請在遊戲內打開排行榜並轉到其名望分頁；排名在那裡，而不在維基上。",
       "catHeading": "{label}（{count}）",
       "colName": "功績",
       "colRenown": "名望",
@@ -4366,6 +4368,24 @@ export const zh_TW: EnTranslations = {
     "balance": "英雄徽記: {count}",
     "buyAria": "用{marks}枚英雄徽記購買{item}"
   },
+  "cardDuel": {
+    "title": "紙牌對決",
+    "close": "關閉",
+    "join": "加入隊列",
+    "joinAria": "加入紙牌對決隊列",
+    "leave": "離開隊列",
+    "leaveAria": "離開紙牌對決隊列",
+    "forfeit": "認輸",
+    "forfeitAria": "認輸退出紙牌對決",
+    "queued": "正在等待對手……",
+    "unavailable": "紙牌對決需要另一名玩家在線。",
+    "vsOpponent": "對戰 {name}",
+    "round": "局分：{mine} - {theirs}",
+    "counts": "牌堆：{deck} · 棄牌堆：{discard}",
+    "playCardAria": "打出 {value} 號牌",
+    "waitingOnOpponent": "正在等待對手出牌……",
+    "yourTurn": "出一張牌"
+  },
   "delveUi": {
     "board": {
       "title": "秘探看板",
@@ -4864,6 +4884,11 @@ export const zh_TW: EnTranslations = {
       "quit": "離開",
       "fatalBody": "World of ClaudeCraft 發生未預期的錯誤，必須關閉。"
     }
+  },
+  "gpuNotice": {
+    "bodyDesktop": "遊戲目前在沒有 GPU 加速的情況下執行，會非常緩慢。請更新顯示卡驅動程式後重新啟動遊戲。在 Windows 上，還請在 設定 > 系統 > 顯示器 > 顯示卡 中將本遊戲設為「高效能」。",
+    "bodyWeb": "遊戲目前在沒有 GPU 加速的情況下執行，會非常緩慢。請在瀏覽器設定中啟用硬體加速，更新顯示卡驅動程式，然後重新啟動瀏覽器。",
+    "dismiss": "關閉"
   },
   "realm": {
     "noRealms": "沒有可用的世界。",
@@ -8684,6 +8709,11 @@ export const zh_TW: EnTranslations = {
         "title": "鍍金保險箱",
         "greeting": "歡迎來到鍍金保險箱。你的財物在我們的鎖後安然無恙。"
       },
+      "card_master": {
+        "name": "牌局大師",
+        "title": "運氣經銷人",
+        "greeting": "來一局紙牌對決？三局兩勝，贏家贏得吹噓的資本。"
+      },
       "bursar_petra_vell": {
         "name": "司庫佩特拉·維爾",
         "title": "鍍金保險箱",
@@ -9818,7 +9848,7 @@ export const zh_TW: EnTranslations = {
       },
       "necromancers": {
         "name": "哀織法衣",
-        "bonus2": "你不會被擊退（擊退抗性 100%）。",
+        "bonus2": "法術強度提高 20 點。受到傷害不再延遲你的施法（施法延遲抗性 100%）。",
         "bonus3": "智力提高 10 點，耐力提高 10 點。",
         "bonus4": "你的法術有 10% 的機率觸發「清晰施法」，使你的下一個法術免費施放。"
       },
@@ -9830,13 +9860,13 @@ export const zh_TW: EnTranslations = {
       },
       "soulflame": {
         "name": "怨焰法衣",
-        "bonus2": "你不會被擊退（擊退抗性 100%）。",
+        "bonus2": "法術強度提高 20 點。受到傷害不再延遲你的施法（施法延遲抗性 100%）。",
         "bonus3": "智力提高 15 點，精神提高 15 點，攻擊速度和施法速度提高 15%。",
         "bonus4": "你的法術有 10% 的機率觸發「灼魂之焰」，使法術強度提高 40 點，持續 10 秒。"
       },
       "stormcallers": {
         "name": "喚風法衣",
-        "bonus2": "你不會被擊退（擊退抗性 100%）。",
+        "bonus2": "法術強度提高 20 點。受到傷害不再延遲你的施法（施法延遲抗性 100%）。",
         "bonus3": "智力提高 15 點，精神提高 15 點，攻擊速度和施法速度提高 15%。",
         "bonus4": "你的法術有 10% 的機率觸發「灼魂之焰」，使法術強度提高 40 點，持續 10 秒。"
       },

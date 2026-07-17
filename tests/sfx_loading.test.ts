@@ -165,11 +165,24 @@ function internals(player: typeof sfx): SfxInternals {
   return player as unknown as SfxInternals;
 }
 
+// Mirrors sfx.ts's private assetCacheKey: variant 0 caches under the bare
+// key, every other variant under `${key}:${index}`.
+function assetCacheKeyForTest(key: string, variantIndex: number): string {
+  return variantIndex === 0 ? key : `${key}:${variantIndex}`;
+}
+
 function startWithStartupCached(): { player: typeof sfx; ctx: FakeAudioContext } {
   const player = makeSfx();
   const state = internals(player);
   for (const [key, entry] of Object.entries(SFX_CLIPS)) {
-    if (entry.preload === 'startup') state.buffers.set(key, BUFFER);
+    if (entry.preload !== 'startup') continue;
+    // Seed EVERY variant's cache key, not just the first: preloadStartup()
+    // eagerly loads every variant of every startup key, and a key with more
+    // than one take (most combat/movement/UI keys now do) would otherwise
+    // still trigger real fetches for its later variants during init().
+    entry.variants.forEach((_variant, index) => {
+      state.buffers.set(assetCacheKeyForTest(key, index), BUFFER);
+    });
   }
   player.init();
   return { player, ctx: last(FakeAudioContext.instances, 'audio context') };
