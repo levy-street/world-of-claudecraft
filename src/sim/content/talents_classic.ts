@@ -77,6 +77,11 @@ const PALADIN_SPECS: SpecDef[] = [
           on: 'meleeHit',
           abilities: ['auto_attack', 'crusader_strike'],
           chance: 0.2,
+          chanceWhenEmpowered: {
+            ability: 'crusader_strike',
+            auraId: 'pal_oaths_due',
+            chance: 0.7,
+          },
         },
         responses: [
           { kind: 'cooldownRefund', ability: 'exorcism', seconds: 'reset' },

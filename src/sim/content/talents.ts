@@ -116,7 +116,16 @@ export type ProcTrigger =
   | { on: 'shieldConsumed'; ability: string }
   | { on: 'hotExpired'; ability: string }
   | { on: 'bigHitTaken'; hpFrac: number; icd: number }
-  | { on: 'meleeHit'; abilities: string[]; chance?: number }
+  | {
+      on: 'meleeHit';
+      abilities: string[];
+      chance?: number;
+      chanceWhenEmpowered?: {
+        ability: string;
+        auraId: string;
+        chance: number;
+      };
+    }
   | { on: 'meleeSwingWhile'; auraKind: string }
   | { on: 'thornsReflect'; ability: string };
 

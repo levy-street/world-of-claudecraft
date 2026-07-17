@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { onCastCompleted } from '../src/sim/combat/talent_procs';
+import { onCastCompleted, onMeleeSwing } from '../src/sim/combat/talent_procs';
 import { ROW_TREES, validateRowTree } from '../src/sim/content/talent_rows';
 import { TALENTS, validateTalentTree } from '../src/sim/content/talents';
 import { MOBS } from '../src/sim/data';
@@ -58,6 +58,19 @@ function crusaderStrike(sim: Sim, target: Entity): number {
   const before = target.hp;
   sim.ctx.runEffects(sim.player, meta, target, strike);
   return before - target.hp;
+}
+
+function bloodDebtRolls(sim: Sim, abilityId: string, consumedEmpowerAuraId?: string): number[] {
+  const probabilities: number[] = [];
+  const rng = sim.ctx.rng as typeof sim.ctx.rng & {
+    chance(probability: number): boolean;
+  };
+  rng.chance = (probability) => {
+    probabilities.push(probability);
+    return false;
+  };
+  onMeleeSwing(sim.ctx, sim.player, abilityId, consumedEmpowerAuraId);
+  return probabilities;
 }
 
 describe("Requital Oath's Due", () => {
@@ -135,6 +148,33 @@ describe("Requital Oath's Due", () => {
     expect(empowered).toBeGreaterThan(baseline * 1.4);
     expect(empowered).toBeLessThan(baseline * 1.6);
     expect(sim.player.auras.some((aura) => aura.id === 'pal_oaths_due')).toBe(false);
+  });
+
+  it("gives an Oath's Due strike one boosted Blood Debt roll and leaves other strikes at 20%", () => {
+    const windowed = paladinSim();
+    const target = targetFor(windowed);
+    const procProbabilities: number[] = [];
+    const rng = windowed.ctx.rng as typeof windowed.ctx.rng & {
+      next(): number;
+      range(min: number, max: number): number;
+      chance(probability: number): boolean;
+    };
+    rng.next = () => 0.9;
+    rng.range = (min) => min;
+    rng.chance = (probability) => {
+      if (probability === 0.2 || probability === 0.7) procProbabilities.push(probability);
+      return false;
+    };
+    onCastCompleted(windowed.ctx, windowed.player, 'judgement');
+
+    expect(crusaderStrike(windowed, target)).toBeGreaterThan(0);
+    expect(procProbabilities).toEqual([0.7]);
+
+    const plain = paladinSim();
+    expect(bloodDebtRolls(plain, 'crusader_strike')).toEqual([0.2]);
+
+    const withoutOathsDue = paladinSim({ selectOathsDue: false });
+    expect(bloodDebtRolls(withoutOathsDue, 'crusader_strike', 'pal_oaths_due')).toEqual([0.2]);
   });
 
   it('keeps the setup window through a missed Crusader Strike and spends it on the next hit', () => {

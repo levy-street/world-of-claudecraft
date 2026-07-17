@@ -415,8 +415,8 @@ export function meleeSwing(
     ctx.enterCombat(attacker, target);
     return false;
   }
-  const nextAbilityDamagePct =
-    opts.abilityId === undefined ? 0 : consumeNextAbilityDamage(ctx, attacker, opts.abilityId);
+  const nextAbilityDamage =
+    opts.abilityId === undefined ? null : consumeNextAbilityDamage(ctx, attacker, opts.abilityId);
   const mult = opts.weaponMult ?? 1;
   const weapon = opts.weapon ?? attacker.weapon;
   const apSwingSpeed = opts.apSwingSpeed ?? baseSwingSpeed(attacker);
@@ -433,7 +433,7 @@ export function meleeSwing(
       mult +
     bonus +
     imbueBonus;
-  dmg *= 1 + nextAbilityDamagePct;
+  dmg *= 1 + (nextAbilityDamage?.value ?? 0);
   const critChance = Math.max(
     0.005,
     attacker.critChance - Math.max(0, target.level - attacker.level) * 0.002,
@@ -459,7 +459,9 @@ export function meleeSwing(
   // Landed-swing talent responses resolve before the target retaliates or the
   // weapon's on-hit proc fires. This is observable for defensive healing and
   // preserves the authored Oathwheel, Venom Dividend, and imbue proc cadence.
-  if (attacker.kind === 'player') onMeleeSwing(ctx, attacker, opts.abilityId);
+  if (attacker.kind === 'player') {
+    onMeleeSwing(ctx, attacker, opts.abilityId, nextAbilityDamage?.id);
+  }
   // thorns / lightning shield: melee attackers take damage back. Charge-limited
   // thorns (Lightning Shield) consume a charge and gate on an internal cooldown.
   if (!attacker.dead) {
