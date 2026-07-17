@@ -31,9 +31,9 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 192 deeds worth 2365 total Renown', () => {
-    expect(DEED_ORDER.length).toBe(194);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2400);
+  it('ships exactly 195 deeds worth 2405 total Renown', () => {
+    expect(DEED_ORDER.length).toBe(195);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2405);
   });
 
   it('ships the audited per-category counts', () => {
@@ -46,7 +46,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       delve: 13,
       chronicle: 24,
       collection: 24,
-      pvp: 29,
+      pvp: 30,
       social: 16,
       exploration: 9,
       feat: 3,
@@ -67,6 +67,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'pvp_frostreach_slayer',
       'pvp_frostreach_warden',
       'chr_marsh_first_cast',
+      'pvp_card_duel_first_win',
     ]);
     expect(DEEDS.prog_crown_below.renown).toBe(25);
     expect(DEEDS.prog_mere_at_rest.renown).toBe(25);
@@ -76,6 +77,12 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     expect(DEEDS.pvp_frostreach_slayer.renown).toBe(10);
     expect(DEEDS.pvp_frostreach_warden.renown).toBe(25);
     expect(DEEDS.chr_marsh_first_cast.renown).toBe(5);
+    expect(DEEDS.pvp_card_duel_first_win.renown).toBe(5);
+    expect(DEEDS.pvp_card_duel_first_win.trigger).toEqual({
+      kind: 'stat',
+      stat: 'cardDuelsWon',
+      count: 1,
+    });
     // Full trigger literals: the evaluator's .every() is proven elsewhere, but
     // only a literal pin catches a quest id quietly dropped from a chain list.
     expect(DEEDS.prog_crown_below.trigger).toEqual({
@@ -144,7 +151,7 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // Regenerate after a DELIBERATE catalog change, then paste the printed hex
   // into FROZEN_CATALOG_SHA256 below (run from the repo root):
   //   npx tsx -e "import {DEED_ORDER,DEEDS} from './src/sim/content/deeds'; import {createHash} from 'node:crypto'; console.log(createHash('sha256').update(JSON.stringify(DEED_ORDER.map((id)=>[id,DEEDS[id].trigger,DEEDS[id].renown])),'utf8').digest('hex'))"
-  const FROZEN_CATALOG_SHA256 = 'c313a4e6de4bf1158a029aa19da93d3553a6d9a3edea4b2cd66f49a0915de471';
+  const FROZEN_CATALOG_SHA256 = 'a5391eff4fe5bdefbdc6a505c61f6818a5c808e2f3cd7e03919251ba1b9d26fc';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -170,7 +177,7 @@ describe('table shape', () => {
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('chr_marsh_first_cast');
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('pvp_card_duel_first_win');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

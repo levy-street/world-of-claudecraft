@@ -28,7 +28,6 @@ import { markDialogRoot } from './dialog_root';
 import { classDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { formatDateTime, formatNumber, t, tPlural } from './i18n';
-import { rovingTarget } from './roving_index';
 import { localizeZone } from './server_i18n';
 import {
   blockRows,
@@ -39,6 +38,8 @@ import {
   type SocialTab,
   socialStructSig,
 } from './social_view';
+import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
+import { tabStripHtml, tabStripModel } from './tab_strip_view';
 import { svgIcon } from './ui_icons';
 
 // Typeahead timings (named, not bare literals): debounce a keystroke
@@ -209,20 +210,28 @@ export class SocialWindow {
     el.innerHTML =
       `<div class="panel-title"><span>${esc(t('hud.social.title'))}${realmTag}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>` +
       // WAI-ARIA tabs: a real role=tablist / role=tab / role=tabpanel with a
-      // roving tabindex (0 on the active tab, -1 on the rest) and aria-selected, mirroring
-      // talents_window. The `on` class still styles the active tab (byte-faithful to
-      // .soc-tab.on in components.css); aria-selected runs parallel to it. The old
-      // toggle-button pressed-state attribute is dropped (a tab is selected, not pressed).
-      // The roving Arrow/Home/End handler is wired in wireChrome.
-      `<div class="soc-tabs" role="tablist" aria-label="${esc(t('hud.social.title'))}">` +
-      `<button type="button" class="soc-tab ${tab === 'friends' ? 'on' : ''}" data-tab="friends" role="tab" aria-selected="${tab === 'friends' ? 'true' : 'false'}" tabindex="${tab === 'friends' ? '0' : '-1'}" aria-controls="soc-body-panel">${esc(t('hud.social.friendsTab'))}</button>` +
-      `<button type="button" class="soc-tab ${tab === 'guild' ? 'on' : ''}" data-tab="guild" role="tab" aria-selected="${tab === 'guild' ? 'true' : 'false'}" tabindex="${tab === 'guild' ? '0' : '-1'}" aria-controls="soc-body-panel">${esc(t('hud.social.guildTab'))}</button>` +
-      // Ignore and block are two distinct tiers, so they get a tab each: the
-      // Ignored tab lists the chat-only mutes, the Blocked tab the hard blocks.
-      `<button type="button" class="soc-tab ${tab === 'ignore' ? 'on' : ''}" data-tab="ignore" role="tab" aria-selected="${tab === 'ignore' ? 'true' : 'false'}" tabindex="${tab === 'ignore' ? '0' : '-1'}" aria-controls="soc-body-panel">${esc(t('hudChrome.social.ignoredTab'))}</button>` +
-      `<button type="button" class="soc-tab ${tab === 'block' ? 'on' : ''}" data-tab="block" role="tab" aria-selected="${tab === 'block' ? 'true' : 'false'}" tabindex="${tab === 'block' ? '0' : '-1'}" aria-controls="soc-body-panel">${esc(t('hudChrome.social.blockedTab'))}</button>` +
-      `<button type="button" class="soc-tab ${tab === 'raid' ? 'on' : ''}" data-tab="raid" role="tab" aria-selected="${tab === 'raid' ? 'true' : 'false'}" tabindex="${tab === 'raid' ? '0' : '-1'}" aria-controls="soc-body-panel">${esc(t('hud.social.raidTab'))}</button>` +
-      `</div>` +
+      // roving tabindex (0 on the active tab, -1 on the rest) and aria-selected, built
+      // from the shared tab_strip_view core (same markup contract talents_window
+      // follows). Ignore and block are two distinct tiers, so they get a tab each:
+      // the Ignored tab lists the chat-only mutes, the Blocked tab the hard blocks.
+      // The roving Arrow/Home/End handler is wired in wireChrome via wireTabStrip.
+      tabStripHtml(
+        tabStripModel({
+          ariaLabel: t('hud.social.title'),
+          panelId: 'soc-body-panel',
+          stripClass: 'soc-tabs',
+          tabClass: 'soc-tab',
+          selectedClass: 'on',
+          tabs: [
+            { id: 'friends', label: t('hud.social.friendsTab') },
+            { id: 'guild', label: t('hud.social.guildTab') },
+            { id: 'ignore', label: t('hudChrome.social.ignoredTab') },
+            { id: 'block', label: t('hudChrome.social.blockedTab') },
+            { id: 'raid', label: t('hud.social.raidTab') },
+          ],
+          selected: tab,
+        }),
+      ) +
       `<div class="soc-body" id="soc-body-panel" role="tabpanel"></div>` +
       `<div class="soc-notice"></div>` +
       (tab === 'raid' ? '' : online ? this.footer() : '');
@@ -550,44 +559,17 @@ export class SocialWindow {
   // Wire the parts that survive a content refresh: close, tabs, footer + search.
   private wireChrome(el: HTMLElement): void {
     el.querySelector('[data-close]')?.addEventListener('click', () => this.toggle());
-    // WAI-ARIA tabs: click OR roving Arrow/Home/End select a tab; render() rebuilds the
-    // strip, so refocus the freshly active tab afterward (the roving-tabindex focus must
-    // follow the selection), exactly like talents_window. switchTab keeps the existing
-    // click behavior byte-identical.
-    const tabs = Array.from(el.querySelectorAll<HTMLElement>('.soc-tab'));
-    const switchTab = (tabEl: HTMLElement): void => {
-      this.tab = tabEl.dataset.tab as SocialTab;
+    // WAI-ARIA tabs: click OR roving Arrow/Home/End select a tab, wired through the
+    // shared tab_strip_painter core. render() rebuilds the strip, so a keyboard move
+    // refocuses the freshly active tab afterward (the roving-tabindex focus must follow
+    // the selection); a click never moves focus programmatically. Both match the prior
+    // hand-rolled handler byte-for-byte.
+    wireTabStrip(el, 'soc-tab', (id, focusFollow) => {
+      this.tab = id as SocialTab;
       this.notice = null;
       this.lastStruct = this.structSig();
       this.render();
-    };
-    // render() rebuilds the strip, so refocus the freshly active tab after a keyboard
-    // move (the roving-tabindex focus must follow the selection). The click path stays
-    // byte-identical to the old handler (no programmatic focus move).
-    const focusActiveTab = (): void =>
-      (el.querySelector('.soc-tab.on') as HTMLElement | null)?.focus();
-    tabs.forEach((tab, i) => {
-      tab.addEventListener('click', () => switchTab(tab));
-      tab.addEventListener('keydown', (e) => {
-        const ke = e as KeyboardEvent;
-        const next = rovingTarget(ke.key, i, tabs.length, 'horizontal');
-        if (next !== null) {
-          ke.preventDefault();
-          const target = tabs[next];
-          if (target && target !== tab) {
-            switchTab(target);
-            focusActiveTab();
-          }
-          return;
-        }
-        // Enter / Space activate the focused tab (the explicit-activation affordance the
-        // WAI-ARIA tabs pattern expects alongside selection-follows-focus).
-        if (ke.key === 'Enter' || ke.key === ' ') {
-          ke.preventDefault();
-          switchTab(tab);
-          focusActiveTab();
-        }
-      });
+      if (focusFollow) focusActiveTab(el, 'soc-tab', 'on');
     });
     const w = this.deps.world();
     const field = (sel: string): string =>

@@ -2493,6 +2493,7 @@ const ALL_DELTA_KEYS = [
   'bags',
   'bank',
   'buyback',
+  'cardDuel',
   'cds',
   'corpse',
   'cosmetics',
@@ -2948,9 +2949,9 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 50 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(50);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(50);
+  it('ALL_DELTA_KEYS contains exactly 51 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(51);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(51);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2962,7 +2963,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.size).toBe(50);
+    expect(scraped.size).toBe(51);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

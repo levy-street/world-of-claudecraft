@@ -1701,6 +1701,9 @@ export interface NpcDef {
   // The Heroic Quartermaster: talking to this NPC opens the Heroic Marks
   // shop (src/sim/content/heroic_vendor.ts) instead of a copper vendor stock.
   heroicVendor?: boolean;
+  // The Card Master: talking to this NPC joins/leaves the Card Duel minigame
+  // queue (src/sim/social/card_duel.ts) instead of any vendor/bank flow.
+  cardMaster?: boolean;
   greeting: string;
   // Registered but not surface-placed at world init. The owning system spawns
   // the entity on demand (e.g. the Nythraxis encounter walks Brother Aldric in
@@ -3071,6 +3074,7 @@ export type DeedStatKey =
   | 'lootCopper'
   | 'duelsWon'
   | 'duelsLost'
+  | 'cardDuelsWon'
   | 'tradesCompleted'
   | 'mailAttachmentsSent'
   | 'craftsPerformed'
@@ -3096,6 +3100,7 @@ export const DEED_STAT_KEYS: readonly DeedStatKey[] = [
   'lootCopper',
   'duelsWon',
   'duelsLost',
+  'cardDuelsWon',
   'tradesCompleted',
   'mailAttachmentsSent',
   'craftsPerformed',

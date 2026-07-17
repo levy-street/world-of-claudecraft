@@ -4051,6 +4051,40 @@ function chatSocial(): Scenario {
   };
 }
 
+// Card Duel minigame: queue two players at the Card Master, let the tick
+// matchmake them, then play out one full round of cards. Exercises the rng
+// draws createCardHand (two, on match start) and drawOne (two, per round)
+// so they land in the golden trace instead of never being captured (no prior
+// scenario ever queued two players for this system).
+function cardDuel(): Scenario {
+  return {
+    name: 'card_duel',
+    coverage: [
+      'Card Duel minigame: queue + matchmake at the Card Master',
+      'createCardHand rng draw (match start, both sides)',
+      'drawOne rng draw (round resolution, both sides)',
+    ],
+    sampleEvery: 5,
+    build: () => new Sim({ seed: 1010, playerClass: 'warrior', noPlayer: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const a = sim.addPlayer('warrior', 'Aleph');
+      const b = sim.addPlayer('mage', 'Bet');
+      teleport(sim, sim.entities.get(a)!, 13, 2);
+      teleport(sim, sim.entities.get(b)!, 13, 2);
+      sim.joinCardDuelQueue(a);
+      sim.joinCardDuelQueue(b);
+      rec.tick(1); // updateCardDuelQueue() matchmakes the pair (createCardHand x2)
+      const match = sim.cardDuelMatchFor(a);
+      if (match) {
+        sim.playCardInDuel(match.handA.hand[0], a);
+        sim.playCardInDuel(match.handB.hand[0], b); // resolves the round (drawOne x2)
+      }
+      rec.tick(20 * 2);
+    },
+  };
+}
+
 export const SCENARIOS: Scenario[] = [
   soloWarrior(),
   soloMage(),
@@ -4063,6 +4097,7 @@ export const SCENARIOS: Scenario[] = [
   petCommands(),
   paladinConsecration(),
   arena1v1(),
+  cardDuel(),
   fiesta(),
   fiestaPowerups(),
   duelToWinner(),

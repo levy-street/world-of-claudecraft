@@ -86,6 +86,14 @@ policy, do not break the gate before the one-time re-process. Pass
 `npm run sfx:check -- --strict` to promote them to failures, and
 `npm run sfx:conform` (`--fix`) to conform loudness and downmix in a single pass.
 
+A third advisory category flags a `custom: true` key whose measured LUFS lands
+suspiciously close to the generated-content target (`TARGET_LUFS`, -14): the
+fingerprint of a key that was loudness-targeted before `custom: true` was set on
+it and never re-derived from a pristine source since. It is advisory, not a hard
+failure, because an author's own hot mix can coincidentally land there too and
+this checker has no access to the external master-store source to tell the two
+apart; verify by ear or against the source before treating a hit as a defect.
+
 ---
 
 ## Architecture
