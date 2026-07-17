@@ -388,7 +388,7 @@ describe('actionBarView: proc availability cues', () => {
     ).toBe('armed');
   });
 
-  it('marks Gloom Bolt armed during the Fiendlore demon-handoff window', () => {
+  it('marks Gloom Bolt armed during either Warlock instant-cast window', () => {
     const view = createActionBarView(
       descriptor(slot(1, { ability: ability('shadow_bolt') })),
       fakeDeps(),
@@ -399,6 +399,13 @@ describe('actionBarView: proc availability cues', () => {
       view.tick(
         world({
           playerAuras: [{ id: 'wlk_fiendlore_handoff', kind: 'next_cast_instant' }],
+        }),
+      ).slots[0].procState,
+    ).toBe('armed');
+    expect(
+      view.tick(
+        world({
+          playerAuras: [{ id: 'wlk_desolation_gloom', kind: 'next_cast_instant' }],
         }),
       ).slots[0].procState,
     ).toBe('armed');
@@ -418,6 +425,23 @@ describe('actionBarView: proc availability cues', () => {
         }),
       ).slots[0].procState,
     ).toBe('armed');
+  });
+
+  it('marks Desolation Conflagrate armed and usable at zero mana', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('conflagrate', { cost: 55 }) })),
+      fakeDeps(),
+    );
+    const playerAuras = [{ id: 'wlk_desolation_conflagrate', kind: 'next_cast_free' as const }];
+
+    expect(view.tick(world({ resource: 0 })).slots[0]).toMatchObject({
+      procState: 'none',
+      usable: false,
+    });
+    expect(view.tick(world({ resource: 0, playerAuras })).slots[0]).toMatchObject({
+      procState: 'armed',
+      usable: true,
+    });
   });
 
   it('marks Gutting Strike armed during either Fieldcraft melee window', () => {

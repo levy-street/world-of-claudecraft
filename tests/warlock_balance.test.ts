@@ -75,6 +75,46 @@ describe('warlock low-level sustained damage tuning', () => {
     ]);
     expect(spec('destruction').mastery.effect.global?.critDmgSpellPct).toBe(0.5);
     expect(spec('destruction').mastery.effect.stats?.crit).toBe(0.02);
+    expect(spec('destruction').mastery.effect.procs).toEqual([
+      {
+        id: 'wlk_desolation_gloom',
+        name: 'Desolation',
+        spec: 'destruction',
+        requiresKnownAbility: 'conflagrate',
+        school: 'fire',
+        trigger: {
+          on: 'spellCrit',
+          abilities: ['immolate', 'searing_pain', 'conflagrate', 'chaos_bolt'],
+        },
+        responses: [
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_instant',
+            abilities: ['shadow_bolt'],
+            duration: 8,
+          },
+        ],
+      },
+      {
+        id: 'wlk_desolation_conflagrate',
+        name: 'Desolation',
+        spec: 'destruction',
+        requiresKnownAbility: 'conflagrate',
+        school: 'shadow',
+        trigger: {
+          on: 'spellCrit',
+          abilities: ['shadow_bolt', 'shadowburn', 'death_coil'],
+        },
+        responses: [
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_free',
+            abilities: ['conflagrate'],
+            duration: 8,
+          },
+        ],
+      },
+    ]);
 
     expect(abilityEffects('wlk_r14_amplify_curse')).toEqual([
       {

@@ -1013,3 +1013,8 @@ npm run build on PR4/PR5.
   Pain Communion replaces Unyielding Pact's automatic fixed heal with an 8 sec instant
   Burning Pact decision after a hit of at least 15% maximum health, preserving the
   shared pressure row and its other choices while creating an active recovery sequence.
+- Ruination uses Desolation as a cross-school critical relay. A direct Shadow critical
+  strike opens an 8 sec free Conflagrate to consume the caster's Burning Pact; a direct
+  Fire critical strike opens an 8 sec instant, full-mana Gloom Bolt to continue the
+  relay while moving. The warlock reapplies Burning Pact, spends through the burst,
+  and uses Hard Bargain to fund the next setup without adding a new resource bar.

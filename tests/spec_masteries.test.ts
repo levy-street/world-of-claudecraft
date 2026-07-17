@@ -176,6 +176,50 @@ describe('spec masteries', () => {
         },
       ],
     });
+    expect(TALENTS.warlock?.specs.find((s) => s.id === 'destruction')?.mastery.effect).toEqual({
+      global: { critDmgSpellPct: 0.5 },
+      stats: { crit: 0.02 },
+      procs: [
+        {
+          id: 'wlk_desolation_gloom',
+          name: 'Desolation',
+          spec: 'destruction',
+          requiresKnownAbility: 'conflagrate',
+          school: 'fire',
+          trigger: {
+            on: 'spellCrit',
+            abilities: ['immolate', 'searing_pain', 'conflagrate', 'chaos_bolt'],
+          },
+          responses: [
+            {
+              kind: 'empowerNext',
+              aura: 'next_cast_instant',
+              abilities: ['shadow_bolt'],
+              duration: 8,
+            },
+          ],
+        },
+        {
+          id: 'wlk_desolation_conflagrate',
+          name: 'Desolation',
+          spec: 'destruction',
+          requiresKnownAbility: 'conflagrate',
+          school: 'shadow',
+          trigger: {
+            on: 'spellCrit',
+            abilities: ['shadow_bolt', 'shadowburn', 'death_coil'],
+          },
+          responses: [
+            {
+              kind: 'empowerNext',
+              aura: 'next_cast_free',
+              abilities: ['conflagrate'],
+              duration: 8,
+            },
+          ],
+        },
+      ],
+    });
   });
 
   it('authors the all-27 extension mastery effects exactly', () => {
@@ -340,7 +384,9 @@ describe('spec masteries', () => {
     expect(TALENTS.druid?.specs.find((s) => s.id === 'feral')?.mastery.effect).toEqual({
       global: { meleeDmgPct: 0.15, dotDmgPct: 0.15, threatPct: 0.2 },
     });
-    expect(TALENTS.warlock?.specs.find((s) => s.id === 'destruction')?.mastery.effect).toEqual({
+    expect(
+      TALENTS.warlock?.specs.find((s) => s.id === 'destruction')?.mastery.effect,
+    ).toMatchObject({
       global: { critDmgSpellPct: 0.5 },
       stats: { crit: 0.02 },
     });

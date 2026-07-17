@@ -261,6 +261,7 @@ const FREE_COST_AURA_IDS_BY_ABILITY: Readonly<Record<string, readonly string[]>>
   eviscerate: ['rog_redhanded'],
   rupture: ['rog_redhanded'],
   crippling_poison: ['rog_deadly_brew'],
+  conflagrate: ['wlk_desolation_conflagrate'],
 };
 
 const CHEAP_COST_AURA_IDS_BY_ABILITY: Readonly<Record<string, readonly string[]>> = {
@@ -416,7 +417,10 @@ function gloomBoltProcState(
   _ability: ActionBarAbility,
   player: ActionBarPlayerInput,
 ): ActionBarProcState {
-  return hasAura(player.auras, 'wlk_fiendlore_handoff') ? 'armed' : 'none';
+  return hasAura(player.auras, 'wlk_fiendlore_handoff') ||
+    hasAura(player.auras, 'wlk_desolation_gloom')
+    ? 'armed'
+    : 'none';
 }
 
 function burningPactProcState(
@@ -424,6 +428,13 @@ function burningPactProcState(
   player: ActionBarPlayerInput,
 ): ActionBarProcState {
   return hasAura(player.auras, 'wlk_pain_communion') ? 'armed' : 'none';
+}
+
+function conflagrateProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'wlk_desolation_conflagrate') ? 'armed' : 'none';
 }
 
 // Ability ids map to pure proc resolvers here, keeping the painter generic. New
@@ -449,6 +460,7 @@ const PROC_STATE_RESOLVERS: Readonly<Record<string, ProcStateResolver | undefine
   cheap_shot: duskBuilderProcState,
   shadow_bolt: gloomBoltProcState,
   immolate: burningPactProcState,
+  conflagrate: conflagrateProcState,
 };
 
 function procStateForAbility(

@@ -553,9 +553,51 @@ const WARLOCK_SPECS: SpecDef[] = [
     'A burst caster using Gloom Bolt, fire, and Duskfire.',
     'conflagrate',
     'Desolation',
-    'Your Fire spell critical strikes deal double damage, and ' +
-      'your critical strike chance is increased by 2%.',
-    { global: { critDmgSpellPct: 0.5 }, stats: { crit: 0.02 } },
+    'Your direct spell critical strikes deal double damage, and your critical strike chance is increased by 2%. Direct Fire critical strikes make your next Gloom Bolt within 8 sec instant; direct Shadow critical strikes make your next Conflagrate within 8 sec free.',
+    {
+      global: { critDmgSpellPct: 0.5 },
+      stats: { crit: 0.02 },
+      procs: [
+        {
+          id: 'wlk_desolation_gloom',
+          name: 'Desolation',
+          spec: 'destruction',
+          requiresKnownAbility: 'conflagrate',
+          school: 'fire',
+          trigger: {
+            on: 'spellCrit',
+            abilities: ['immolate', 'searing_pain', 'conflagrate', 'chaos_bolt'],
+          },
+          responses: [
+            {
+              kind: 'empowerNext',
+              aura: 'next_cast_instant',
+              abilities: ['shadow_bolt'],
+              duration: 8,
+            },
+          ],
+        },
+        {
+          id: 'wlk_desolation_conflagrate',
+          name: 'Desolation',
+          spec: 'destruction',
+          requiresKnownAbility: 'conflagrate',
+          school: 'shadow',
+          trigger: {
+            on: 'spellCrit',
+            abilities: ['shadow_bolt', 'shadowburn', 'death_coil'],
+          },
+          responses: [
+            {
+              kind: 'empowerNext',
+              aura: 'next_cast_free',
+              abilities: ['conflagrate'],
+              duration: 8,
+            },
+          ],
+        },
+      ],
+    },
   ),
 ];
 
