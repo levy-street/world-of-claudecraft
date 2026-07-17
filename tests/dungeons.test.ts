@@ -1271,6 +1271,40 @@ describe('dungeons: heroic boss drops', () => {
     expect(((nBoss.loot?.items ?? []) as any[]).some((s) => heroicIds.has(s.itemId))).toBe(false);
   });
 
+  it('a heroic SUB-boss drops its Spiritbinder set piece; a normal clear never does', () => {
+    // Hollow Crypt's sub-boss (Sexton Marrow) carries one heroic-ONLY Spiritbinder
+    // piece via HEROIC_SUBBOSS_LOOT, rolled only on a heroic claim. killFinalBoss
+    // reuses the heroic-claim harness for any mob in the instance, sub-boss included.
+    const pieceId = 'spiritbinder_treads';
+    let heroicDrops = 0;
+    for (let seed = 1; seed <= 40; seed++) {
+      const sim = makeSim(seed);
+      const subboss = killFinalBoss(sim, 'hollow_crypt', 'sexton_marrow');
+      if (((subboss.loot?.items ?? []) as any[]).some((s) => s.itemId === pieceId)) heroicDrops++;
+    }
+    expect(heroicDrops).toBeGreaterThan(0); // non-vacuous: it really drops in a heroic claim
+
+    // A NORMAL Sexton Marrow kill never drops it (heroic-only gate).
+    const normal = makeSim(3);
+    const nPid = normal.addPlayer('warrior', 'Norm');
+    enterDungeon(normal.ctx, 'hollow_crypt', nPid);
+    const nSub = mobInInstance(
+      normal,
+      claimedDungeon(normal, 'hollow_crypt', 'normal'),
+      'sexton_marrow',
+    );
+    (normal as any).dealDamage(
+      normal.entities.get(nPid),
+      nSub,
+      nSub.hp + 1000,
+      false,
+      'physical',
+      null,
+      'hit',
+    );
+    expect(((nSub.loot?.items ?? []) as any[]).some((s) => s.itemId === pieceId)).toBe(false);
+  });
+
   it('a heroic Nythraxis kill drops raid-tier heroic set pieces plus one heroic-only weapon', () => {
     // The explicit heroic raid table carries only the heroic-ONLY extras: the
     // three bespoke raid weapons in a single roll group (one drops per kill). The

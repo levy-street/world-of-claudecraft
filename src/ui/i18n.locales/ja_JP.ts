@@ -5919,6 +5919,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.greyjaw_stalker.name': 'グレイジョーの追跡者の装備',
   'entities.itemSets.greyjaw_stalker.bonus3': '攻撃速度と詠唱速度が15%上昇します。',
   'entities.itemSets.necromancers.name': 'モーンウィーヴの法衣',
+  'entities.itemSets.spiritbinder.name': 'スピリットバインダーの法衣',
+  'entities.itemSets.spiritbinder.bonus2':
+    '呪文威力が20上昇します。ノックバックされなくなります（ノックバック耐性100%）。',
+  'entities.itemSets.spiritbinder.bonus3': '知力が10、スタミナが10上昇します。',
+  'entities.itemSets.spiritbinder.bonus4':
+    '呪文に10%の確率でクリアキャスティングが発動し、次の呪文が無償になります。',
+  'entities.items.spiritbinder_hauberk.name': 'スピリットバインダーの胸鎧',
+  'entities.items.spiritbinder_legguards.name': 'スピリットバインダーの脚甲',
+  'entities.items.spiritbinder_pauldrons.name': 'スピリットバインダーの肩当て',
+  'entities.items.spiritbinder_treads.name': 'スピリットバインダーのブーツ',
   'entities.itemSets.necromancers.bonus2':
     '呪文の威力が20増加します。被ダメージによって詠唱が遅れなくなります（詠唱妨害耐性100%）。',
   'entities.itemSets.necromancers.bonus3': '知力が10、スタミナが10上昇します。',

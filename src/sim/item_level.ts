@@ -22,6 +22,8 @@
 import {
   HEROIC_BOSS_LOOT,
   HEROIC_LOOT_SOURCE_LEVEL,
+  HEROIC_SUBBOSS_LOOT,
+  HEROIC_SUBBOSS_SOURCE_LEVEL,
   NYTHRAXIS_RAID_BOSS_ID,
   NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL,
 } from './content/heroic_loot';
@@ -168,6 +170,13 @@ function buildSourceIndex(): Map<string, ItemSource> {
         : HEROIC_LOOT_SOURCE_LEVEL;
     for (const entry of entries) {
       if (entry.itemId) bump(entry.itemId, src, false);
+    }
+  }
+  // Heroic-only SUB-boss drops: one tier below the final-boss heroic loot, so the
+  // epic pieces read item level 28 (HEROIC_SUBBOSS_SOURCE_LEVEL 22 + the epic bump).
+  for (const entries of Object.values(HEROIC_SUBBOSS_LOOT)) {
+    for (const entry of entries) {
+      if (entry.itemId) bump(entry.itemId, HEROIC_SUBBOSS_SOURCE_LEVEL, false);
     }
   }
   // Heroic upgraded drop variants (content/heroic_variants.ts): the "Heroic X"

@@ -5642,6 +5642,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.greyjaw_stalker.name': '灰颚追猎者装备',
   'entities.itemSets.greyjaw_stalker.bonus3': '攻击速度和施法速度提高 15%。',
   'entities.itemSets.necromancers.name': '哀织法衣',
+  'entities.itemSets.spiritbinder.name': '缚灵法衣',
+  'entities.itemSets.spiritbinder.bonus2': '法术强度提高 20 点。你不会被击退（击退抗性 100%）。',
+  'entities.itemSets.spiritbinder.bonus3': '智力提高 10 点，耐力提高 10 点。',
+  'entities.itemSets.spiritbinder.bonus4':
+    '你的法术有 10% 的几率触发清晰施法，使你的下一个法术免费施放。',
+  'entities.items.spiritbinder_hauberk.name': '缚灵胸甲',
+  'entities.items.spiritbinder_legguards.name': '缚灵护腿',
+  'entities.items.spiritbinder_pauldrons.name': '缚灵护肩',
+  'entities.items.spiritbinder_treads.name': '缚灵战靴',
   'entities.itemSets.necromancers.bonus2':
     '法术强度提高 20 点。受到伤害不再延迟你的施法（施法延迟抗性 100%）。',
   'entities.itemSets.necromancers.bonus3': '智力提高 10 点，耐力提高 10 点。',

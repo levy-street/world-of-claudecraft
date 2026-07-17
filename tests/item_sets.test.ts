@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { HEROIC_SUBBOSS_LOOT } from '../src/sim/content/heroic_loot';
 import {
   aggregateSetBonuses,
   ITEM_SETS,
@@ -8,11 +9,13 @@ import {
   SET_DEATHLORD,
   SET_NECROMANCERS,
   SET_SOULFLAME,
+  SET_SPIRITBINDER,
   SET_STORMCALLERS,
   SET_WYRMSHADOW,
 } from '../src/sim/content/item_sets';
 import { ITEMS, MOBS } from '../src/sim/data';
 import { createMob, createPlayer, recalcPlayerStats } from '../src/sim/entity';
+import { itemLevel } from '../src/sim/item_level';
 import { Sim } from '../src/sim/sim';
 import type { Entity, PlayerClass } from '../src/sim/types';
 import { CAST_PUSHBACK_SEC, CHANNEL_PUSHBACK_FRACTION } from '../src/sim/types';
@@ -302,6 +305,94 @@ describe('recalcPlayerStats applies equipped set bonuses (real raid/dungeon gear
     expect(stormcallers.castPushbackReduction).toBe(1);
     expect(stormcallers.stats.int).toBe(shamanBase.stats.int + 10 + 8 + 8 + 15);
     expect(stormcallers.stats.spi).toBe(shamanBase.stats.spi + 15);
+  });
+});
+
+describe('Spiritbinder Regalia (t1 mail caster set for paladin/shaman)', () => {
+  const PIECES = {
+    chest: 'spiritbinder_hauberk',
+    shoulder: 'spiritbinder_pauldrons',
+    legs: 'spiritbinder_legguards',
+    feet: 'spiritbinder_treads',
+  } as const;
+
+  it('is a 4-piece mail int/spi set restricted to the two mail casters', () => {
+    for (const [slot, id] of Object.entries(PIECES)) {
+      const def = ITEMS[id];
+      expect(def, id).toBeDefined();
+      expect(def.set).toBe(SET_SPIRITBINDER);
+      expect(def.kind).toBe('armor');
+      expect((def as { armorType?: string }).armorType).toBe('mail');
+      expect(def.slot).toBe(slot);
+      expect(def.quality).toBe('epic');
+      // Caster identity: intellect + spirit only, no strength/agility.
+      expect(def.stats?.int).toBeGreaterThan(0);
+      expect(def.stats?.spi).toBeGreaterThan(0);
+      expect(def.stats?.str ?? 0).toBe(0);
+      expect(def.stats?.agi ?? 0).toBe(0);
+      // The two mail-wearing hybrids, and only them.
+      expect([...(def.requiredClass ?? [])].sort()).toEqual(['paladin', 'shaman']);
+    }
+  });
+
+  it('is heroic-only item level 28 gear (source 22 + epic bonus), with no normal-mode base', () => {
+    for (const id of Object.values(PIECES)) {
+      expect(itemLevel(ITEMS[id]), id).toBe(28);
+      // Heroic-only: the piece IS the item, not a heroic_<id> variant of a base, so
+      // no auto-variant is generated (buildHeroicVariants only touches mob-loot epics).
+      expect(ITEMS[`heroic_${id}`], `heroic_${id}`).toBeUndefined();
+      expect(ITEMS[id].heroicOf).toBeUndefined();
+    }
+  });
+
+  it('shares the Mournweave caster bonus profile: cast-pushback immunity at 2pc, int/sta at 3pc', () => {
+    const shamanBase = statsFor('shaman', 20, {});
+    const three = statsFor('shaman', 20, {
+      chest: PIECES.chest,
+      shoulder: PIECES.shoulder,
+      legs: PIECES.legs,
+    });
+    // The caster 2-piece is spell-pushback immunity since the tier-set fix
+    // (never physical knockback); Spiritbinder inherits CASTER_T1_BONUSES.
+    expect(three.castPushbackReduction).toBe(1);
+    expect(three.knockbackResistance).toBe(0);
+    const pieceInt = [PIECES.chest, PIECES.shoulder, PIECES.legs].reduce(
+      (s, id) => s + (ITEMS[id].stats?.int ?? 0),
+      0,
+    );
+    expect(three.stats.int).toBe(shamanBase.stats.int + pieceInt + 10); // +10 = 3pc caster int
+    expect(three.stats.sta).toBe(shamanBase.stats.sta + 10); // +10 = 3pc caster sta
+  });
+
+  it('drops heroic-only, one piece per sub-boss, spread across the three lower heroic five-mans', () => {
+    // The four sub-bosses (Hollow Crypt / Sunken Bastion / Drowned Temple x2), each with
+    // exactly one Spiritbinder piece; every piece has a source so all four are collectible.
+    const subbossFor = {
+      sexton_marrow: 'spiritbinder_treads',
+      knight_commander_olen: 'spiritbinder_pauldrons',
+      choirmother_selthe: 'spiritbinder_hauberk',
+      pearlguard_sentinel: 'spiritbinder_legguards',
+    } as const;
+    const dropped = new Set<string>();
+    for (const [mobId, itemId] of Object.entries(subbossFor)) {
+      const entries = HEROIC_SUBBOSS_LOOT[mobId] ?? [];
+      expect(
+        entries.map((e) => e.itemId),
+        mobId,
+      ).toContain(itemId);
+      for (const e of entries) if (e.itemId) dropped.add(e.itemId);
+    }
+    for (const id of Object.values(PIECES)) expect(dropped.has(id), id).toBe(true);
+
+    // Heroic-ONLY: no Spiritbinder piece sits in any normal mob loot table, so a
+    // non-heroic clear can never drop one.
+    const pieceIds = new Set<string>(Object.values(PIECES));
+    for (const mob of Object.values(MOBS)) {
+      for (const entry of mob.loot ?? []) {
+        if (entry.itemId)
+          expect(pieceIds.has(entry.itemId), `${mob.id} -> ${entry.itemId}`).toBe(false);
+      }
+    }
   });
 });
 

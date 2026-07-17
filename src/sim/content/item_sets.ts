@@ -37,6 +37,7 @@ export const SET_HIT_4PC_RATING = 60; // -> +6% hit at 10 rating = 1%
 export const SET_DEATHLORD = 'deathlord'; // t1 plate, Strength
 export const SET_WYRMSHADOW = 'wyrmshadow'; // t1 leather, Agility
 export const SET_NECROMANCERS = 'necromancers'; // t1 cloth, caster
+export const SET_SPIRITBINDER = 'spiritbinder'; // t1 mail, caster (paladin/shaman)
 export const SET_CROWNFORGED = 'crownforged'; // t2 plate, Strength
 export const SET_NIGHTTALON = 'nighttalon'; // t2 leather, Agility
 export const SET_SOULFLAME = 'soulflame'; // t2 cloth, caster
@@ -243,6 +244,16 @@ export const ITEM_SETS: Record<string, ItemSet> = {
   [SET_NECROMANCERS]: {
     id: SET_NECROMANCERS,
     name: 'Mournweave Raiment',
+    bonuses: CASTER_T1_BONUSES,
+  },
+  // The mail sibling of Mournweave: the same caster T1 bonus profile, for the two
+  // mail-wearing hybrids (paladin, shaman). Shares CASTER_T1_BONUSES exactly the way
+  // the two T2 caster sets (Soulflame, Stormcallers) share CASTER_T2_BONUSES. Its
+  // heroic (item level 28) variants populate the sub-boss loot across the heroic
+  // five-mans (see HEROIC_SUBBOSS_LOOT in content/heroic_loot.ts).
+  [SET_SPIRITBINDER]: {
+    id: SET_SPIRITBINDER,
+    name: 'Spiritbinder Regalia',
     bonuses: CASTER_T1_BONUSES,
   },
   [SET_CROWNFORGED]: {

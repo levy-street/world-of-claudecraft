@@ -3808,6 +3808,10 @@ const mergeExtraEn = {
     mistveil_cord: { name: 'Mistveil Cord' },
     mistveil_grips: { name: 'Mistveil Grips' },
     necromancers_soulspire_mantle: { name: 'Mournweave Soulspire Mantle' },
+    spiritbinder_hauberk: { name: 'Spiritbinder Hauberk' },
+    spiritbinder_legguards: { name: 'Spiritbinder Legguards' },
+    spiritbinder_pauldrons: { name: 'Spiritbinder Pauldrons' },
+    spiritbinder_treads: { name: 'Spiritbinder Treads' },
     wyrmshadow_talongrips: { name: 'Nightfang Talongrips' },
   },
   mobs: mergeNameTranslations(
@@ -3954,6 +3958,10 @@ export const mergeExtra = {
       mistveil_cord: { name: 'Cordón Veloniebla' },
       mistveil_grips: { name: 'Agarraderas Veloniebla' },
       necromancers_soulspire_mantle: { name: 'Manto Aguja de Almas del nigromante' },
+      spiritbinder_hauberk: { name: 'Cota del Vínculo Espiritual' },
+      spiritbinder_legguards: { name: 'Grebas del Vínculo Espiritual' },
+      spiritbinder_pauldrons: { name: 'Hombreras del Vínculo Espiritual' },
+      spiritbinder_treads: { name: 'Pisadas del Vínculo Espiritual' },
       wyrmshadow_talongrips: { name: 'Agarraderas Garra Sombravermis' },
     },
     mobs: mergeNameTranslations(
@@ -4097,6 +4105,10 @@ export const mergeExtra = {
       mistveil_cord: { name: 'Corde Voilebrume' },
       mistveil_grips: { name: 'Poignes Voilebrume' },
       necromancers_soulspire_mantle: { name: "Mantelet Flèche-d'âme du nécromancien" },
+      spiritbinder_hauberk: { name: "Haubert du Lieur d'Esprits" },
+      spiritbinder_legguards: { name: "Jambières du Lieur d'Esprits" },
+      spiritbinder_pauldrons: { name: "Épaulières du Lieur d'Esprits" },
+      spiritbinder_treads: { name: "Bottes du Lieur d'Esprits" },
       wyrmshadow_talongrips: { name: 'Poignes Serre Ombrewyrm' },
     },
     mobs: mergeNameTranslations(

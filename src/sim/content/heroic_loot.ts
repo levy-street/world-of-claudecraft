@@ -23,6 +23,13 @@ import type { ItemDef, LootEntry } from '../types';
 // epic pieces land at item level 31 (25 + the epic bump of 6).
 export const HEROIC_LOOT_SOURCE_LEVEL = 25;
 
+// Heroic SUB-boss drops are one tier BELOW the final-boss heroic loot: they read
+// the same source level as the auto-generated heroic variants (22), so their epics
+// land at item level 28 (22 + the epic bump), a notch under the item-level-31 final
+// boss drops. Used by the HEROIC_SUBBOSS_LOOT table below, registered at this source
+// in item_level.buildSourceIndex.
+export const HEROIC_SUBBOSS_SOURCE_LEVEL = 22;
+
 // The 10-player heroic raid (Heroic Nythraxis) is one tier ABOVE the five-man
 // heroics: its drop table registers at source level 27 so its epics land at item
 // level 33 and its legendaries at 37 (27 + the quality bump). Its heroic set
@@ -411,6 +418,88 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     sellValue: 16000,
     requiredClass: HEAL_MAIL,
   },
+  // ============ Heroic SUB-boss set: Spiritbinder Regalia (mail int/spi) ============
+  // The mail sibling of the Mournweave cloth caster set, for the two mail-wearing
+  // int/spi hybrids (paladin, shaman), who had no dedicated caster set at this tier.
+  // Heroic-ONLY (no normal-mode base item): the four pieces drop from the sub-bosses
+  // of the three LOWER heroic five-mans (HEROIC_SUBBOSS_LOOT below), at item level 28
+  // (HEROIC_SUBBOSS_SOURCE_LEVEL 22 + epic bump), one notch under the final-boss heroic
+  // gear. Stats are the caster int/spi identity summed to the exact per-slot item-level-28
+  // budget the tests/item_level.test.ts gate enforces (chest 20, legs 18, shoulder 15,
+  // feet 13). set: 'spiritbinder' carries the CASTER_T1 bonuses (see content/item_sets.ts).
+  spiritbinder_hauberk: {
+    id: 'spiritbinder_hauberk',
+    set: 'spiritbinder',
+    name: 'Spiritbinder Hauberk',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'chest',
+    quality: 'epic',
+    requiredLevel: 20,
+    stats: { armor: 300, int: 12, spi: 8 },
+    sellValue: 12000,
+    requiredClass: HEAL_MAIL,
+  },
+  spiritbinder_legguards: {
+    id: 'spiritbinder_legguards',
+    set: 'spiritbinder',
+    name: 'Spiritbinder Legguards',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'legs',
+    quality: 'epic',
+    requiredLevel: 20,
+    stats: { armor: 270, int: 11, spi: 7 },
+    sellValue: 12000,
+    requiredClass: HEAL_MAIL,
+  },
+  spiritbinder_pauldrons: {
+    id: 'spiritbinder_pauldrons',
+    set: 'spiritbinder',
+    name: 'Spiritbinder Pauldrons',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'shoulder',
+    quality: 'epic',
+    requiredLevel: 20,
+    stats: { armor: 220, int: 9, spi: 6 },
+    sellValue: 11000,
+    requiredClass: HEAL_MAIL,
+  },
+  spiritbinder_treads: {
+    id: 'spiritbinder_treads',
+    set: 'spiritbinder',
+    name: 'Spiritbinder Treads',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'feet',
+    quality: 'epic',
+    requiredLevel: 20,
+    stats: { armor: 200, int: 8, spi: 5 },
+    sellValue: 9500,
+    requiredClass: HEAL_MAIL,
+  },
+};
+
+// Heroic-only SUB-boss drops (item level 28, HEROIC_SUBBOSS_SOURCE_LEVEL): the
+// Spiritbinder Regalia set, one piece per sub-boss, spread across the three LOWER
+// heroic five-mans (Hollow Crypt, Sunken Bastion, Drowned Temple). loot_roll.ts rolls
+// these ONLY for a heroic-claimed instance, exactly like HEROIC_BOSS_LOOT, so the
+// normal loot trace and the parity goldens are unaffected. Each is a standalone entry
+// (no rollGroup) rolled independently, so a heroic clear of a sub-boss has a flat
+// chance at its one set piece. item_level.buildSourceIndex registers these ids at
+// HEROIC_SUBBOSS_SOURCE_LEVEL.
+export const HEROIC_SUBBOSS_LOOT: Record<string, LootEntry[]> = {
+  // Hollow Crypt sub-boss
+  sexton_marrow: [{ itemId: 'spiritbinder_treads', chance: 0.2 }],
+  // Sunken Bastion sub-boss
+  knight_commander_olen: [{ itemId: 'spiritbinder_pauldrons', chance: 0.2 }],
+  // Drowned Temple sub-bosses
+  choirmother_selthe: [{ itemId: 'spiritbinder_hauberk', chance: 0.2 }],
+  // 0.1, not 0.2: the sentinel spawns twice per Drowned Temple run, so the
+  // per-run acquisition chance (~19%) stays uniform with the single-spawn
+  // sub-bosses' 20% pieces. Do not "fix" this back to 0.2.
+  pearlguard_sentinel: [{ itemId: 'spiritbinder_legguards', chance: 0.1 }],
 };
 
 // RETIRED, save-compat only. v0.25.0 replaced the standalone heroic Nythraxis

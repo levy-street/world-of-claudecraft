@@ -7963,6 +7963,18 @@ export const zh_TW: EnTranslations = {
       "necromancers_soulspire_mantle": {
         "name": "哀織魂尖披肩"
       },
+      "spiritbinder_hauberk": {
+        "name": "縛靈胸甲"
+      },
+      "spiritbinder_legguards": {
+        "name": "縛靈護腿"
+      },
+      "spiritbinder_pauldrons": {
+        "name": "縛靈護肩"
+      },
+      "spiritbinder_treads": {
+        "name": "縛靈戰靴"
+      },
       "wyrmshadow_talongrips": {
         "name": "夜牙利爪握套"
       },
@@ -9963,6 +9975,12 @@ export const zh_TW: EnTranslations = {
         "bonus2": "法術強度提高 20 點。受到傷害不再延遲你的施法（施法延遲抗性 100%）。",
         "bonus3": "智力提高 15 點，精神提高 15 點，攻擊速度和施法速度提高 15%。",
         "bonus4": "你的法術有 10% 的機率觸發「灼魂之焰」，使法術強度提高 40 點，持續 10 秒。"
+      },
+      "spiritbinder": {
+        "name": "縛靈法衣",
+        "bonus2": "法術強度提高 20 點。你不會被擊退（擊退抗性 100%）。",
+        "bonus3": "智力提高 10 點，耐力提高 10 點。",
+        "bonus4": "你的法術有 10% 的機率觸發清晰施法，使你的下一個法術免費施放。"
       },
       "stormcallers": {
         "name": "喚風法衣",

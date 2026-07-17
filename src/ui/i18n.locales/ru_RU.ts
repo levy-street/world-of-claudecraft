@@ -6021,6 +6021,16 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.greyjaw_stalker.bonus3':
     'Скорость атаки и произнесения заклинаний повышается на 15%.',
   'entities.itemSets.necromancers.name': 'Одеяние Скорбного плетения',
+  'entities.itemSets.spiritbinder.name': 'Регалия Духосвязующего',
+  'entities.itemSets.spiritbinder.bonus2':
+    'Сила заклинаний повышается на 20. Вас невозможно отбросить (100% сопротивление отбрасыванию).',
+  'entities.itemSets.spiritbinder.bonus3': 'Интеллект повышается на 10, выносливость на 10.',
+  'entities.itemSets.spiritbinder.bonus4':
+    'Ваши заклинания с вероятностью 10% даруют Ясность, делая следующее заклинание бесплатным.',
+  'entities.items.spiritbinder_hauberk.name': 'Кольчуга Духосвязующего',
+  'entities.items.spiritbinder_legguards.name': 'Поножи Духосвязующего',
+  'entities.items.spiritbinder_pauldrons.name': 'Наплечники Духосвязующего',
+  'entities.items.spiritbinder_treads.name': 'Сапоги Духосвязующего',
   'entities.itemSets.necromancers.bonus2':
     'Увеличивает силу заклинаний на 20. Получаемый урон больше не замедляет чтение ваших заклинаний (100% сопротивление замедлению чтения).',
   'entities.itemSets.necromancers.bonus3': 'Интеллект повышается на 10, выносливость на 10.',

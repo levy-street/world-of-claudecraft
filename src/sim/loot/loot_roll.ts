@@ -23,7 +23,7 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
-import { HEROIC_BOSS_LOOT } from '../content/heroic_loot';
+import { HEROIC_BOSS_LOOT, HEROIC_SUBBOSS_LOOT } from '../content/heroic_loot';
 import { heroicVariantId } from '../content/heroic_variants';
 import { ITEMS, MOBS, QUESTS } from '../data';
 import { formatMoney } from '../format_money';
@@ -270,12 +270,13 @@ export function rollLoot(
     if (entry.itemId) items.push({ itemId: heroicItem(entry.itemId), count: 1 });
   }
   // Heroic-only drops: when the mob's claimed instance is heroic and it has a
-  // heroic drop table (the final bosses), roll those entries into the SAME
-  // corpse item list so party need/greed applies unchanged. These rng draws
-  // happen ONLY for a heroic claim, so the normal loot trace and the parity
-  // goldens are byte-identical. rollGroup names never overlap the base
-  // table's, so sharing `rolledGroups` is safe.
-  const heroicEntries = HEROIC_BOSS_LOOT[mob.templateId];
+  // heroic drop table (the final bosses via HEROIC_BOSS_LOOT, or a sub-boss via
+  // HEROIC_SUBBOSS_LOOT), roll those entries into the SAME corpse item list so
+  // party need/greed applies unchanged. These rng draws happen ONLY for a heroic
+  // claim, so the normal loot trace and the parity goldens are byte-identical.
+  // rollGroup names never overlap the base table's, so sharing `rolledGroups` is
+  // safe. A mob is only ever in one of the two heroic tables.
+  const heroicEntries = HEROIC_BOSS_LOOT[mob.templateId] ?? HEROIC_SUBBOSS_LOOT[mob.templateId];
   if (heroicEntries) {
     if (heroicClaim) {
       for (const entry of heroicEntries) {

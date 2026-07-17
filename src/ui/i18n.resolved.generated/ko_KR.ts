@@ -7963,6 +7963,18 @@ export const ko_KR: EnTranslations = {
       "necromancers_soulspire_mantle": {
         "name": "비탄직물 영혼첨탑 어깨덮개"
       },
+      "spiritbinder_hauberk": {
+        "name": "정령결속 사슬갑옷"
+      },
+      "spiritbinder_legguards": {
+        "name": "정령결속 다리갑옷"
+      },
+      "spiritbinder_pauldrons": {
+        "name": "정령결속 어깨갑옷"
+      },
+      "spiritbinder_treads": {
+        "name": "정령결속 장화"
+      },
       "wyrmshadow_talongrips": {
         "name": "밤송곳니 갈퀴손아귀"
       },
@@ -9963,6 +9975,12 @@ export const ko_KR: EnTranslations = {
         "bonus2": "주문력이 20 증가합니다. 피해를 입어도 주문 시전이 지연되지 않습니다 (시전 지연 저항 100%).",
         "bonus3": "지능이 15, 정신력이 15만큼 증가하고 공격 속도와 시전 속도가 15% 증가합니다.",
         "bonus4": "주문 사용 시 10% 확률로 \"영혼의 불길\"이 발동하여 주문력이 40만큼 증가합니다. 10초 동안 지속됩니다."
+      },
+      "spiritbinder": {
+        "name": "정령결속 의복",
+        "bonus2": "주문력이 20 증가합니다. 넉백되지 않습니다 (넉백 저항 100%).",
+        "bonus3": "지능이 10, 체력이 10만큼 증가합니다.",
+        "bonus4": "주문 사용 시 10% 확률로 선명한 시전이 발동하여 다음 주문을 무료로 시전합니다."
       },
       "stormcallers": {
         "name": "강풍부름 의복",
