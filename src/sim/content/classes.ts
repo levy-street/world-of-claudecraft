@@ -3982,7 +3982,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'selfBuff', kind: 'form_moonkin', value: 0, duration: 3600 }],
     description:
-      'Shapeshift into a fearsome Moonkin, increasing your spell damage by 20% and your armor by 50%. Lasts until you shift out. Cast again to return to caster form. (Balance signature)',
+      'Shapeshift into a fearsome Moonkin, increasing your spell damage by 15% and your armor by 50%. Lasts until you shift out. Cast again to return to caster form. (Balance signature)',
   },
   feral_charge: {
     id: 'feral_charge',

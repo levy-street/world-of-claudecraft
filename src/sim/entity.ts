@@ -403,8 +403,9 @@ export function recalcPlayerStats(
     bonusAp += 8 + lvl * 2;
     s.agi += Math.max(2, Math.floor(lvl / 2));
   }
-  // Moonkin Form: a hardy caster form that adds 50% armor (its +20% spell damage rides a
-  // separate buff_spelldmg aura the form applies).
+  // Moonkin Form: a hardy caster form that adds 50% armor (its +15% spell damage is carried
+  // on the form aura itself and read per hit by combat/spell_combat.ts
+  // spellDamageMultFromAuras, so there is no companion buff aura here).
   if (moonkinForm) s.armor = Math.round(s.armor * 1.5);
   if (mods?.stats.armorPct) s.armor = Math.round(s.armor * (1 + mods.stats.armorPct));
   if (buffArmorPct) s.armor = Math.round(s.armor * (1 + buffArmorPct)); // Devotion Aura

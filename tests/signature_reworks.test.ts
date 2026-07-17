@@ -115,14 +115,14 @@ describe('reworked signatures', () => {
     expect(spellHasteMult(p)).toBeCloseTo(1.2);
   });
 
-  it('Moonkin Form grants +20% spell damage and +50% armor', () => {
+  it('Moonkin Form grants +15% spell damage and +50% armor', () => {
     const sim = makeSim('druid', 'balance');
     const p = sim.entities.get(sim.playerId) as Entity;
     const armorBefore = p.stats.armor;
     sim.castAbility('moonkin_form', sim.playerId);
     sim.tick();
     expect(p.auras.some((a) => a.kind === 'form_moonkin')).toBe(true);
-    expect(spellDamageMultFromAuras(p)).toBeCloseTo(1.2);
+    expect(spellDamageMultFromAuras(p)).toBeCloseTo(1.15);
     expect(p.stats.armor).toBe(Math.round(armorBefore * 1.5));
   });
 });

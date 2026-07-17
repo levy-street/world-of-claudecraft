@@ -1255,14 +1255,17 @@ const MAGE_SPECS: SpecDef[] = [
     'A controlling caster who trades peak burst for survival and slows.',
     'icy_veins',
     'Brittlebreak',
-    'Increases your Frost spell damage by 25%. Increases armor by 10%.',
+    'Increases your Frost spell damage by 15%. Increases armor by 10%.',
     // The scalable mastery axis is the Frost-kit damage (ability-scoped so the
     // mage's fire/arcane baseline spells stay untouched); armor is the static
     // secondary. Crit-vs-rooted identity returns as a Shatter-style row option.
+    // The 15% magnitude matches the other caster masteries (arcane/elemental
+    // spellDmgPct 0.15) so frostbolt is not a permanent outlier over its siblings;
+    // the ability-scoping stays so the mage's off-school spells are untouched.
     {
       ability: [
-        { ability: 'frostbolt', dmgPct: 0.25 },
-        { ability: 'frost_nova', dmgPct: 0.25 },
+        { ability: 'frostbolt', dmgPct: 0.15 },
+        { ability: 'frost_nova', dmgPct: 0.15 },
       ],
       stats: { armorPct: 0.1 },
     },
@@ -2220,8 +2223,13 @@ const PRIEST_SPECS: SpecDef[] = [
     'A damage caster built around Shadow damage over time and mind spells.',
     'shadowform',
     'Gloamveil',
-    'Increases your damage-over-time damage by 15% and your spell damage by 10%.',
-    { global: { dotDmgPct: 0.15, spellDmgPct: 0.1 } },
+    'Increases your damage-over-time damage by 15%.',
+    // Single DoT lever. Gloamveil Form already amplifies ALL shadow damage (direct and
+    // periodic) by 15% school-scoped in damage.ts, so a second spellDmgPct on the mastery
+    // stacked into a triple multiply on DoTs (form x spellDmg x dotDmg = ~1.45), an outlier
+    // matching the pre-fix balance druid. Dropping spellDmgPct leaves the form as the general
+    // shadow multiplier and the mastery as the DoT specialization (DoT ~1.32, direct ~1.15).
+    { global: { dotDmgPct: 0.15 } },
   ),
 ];
 
@@ -3675,8 +3683,8 @@ const DRUID_SPECS: SpecDef[] = [
     'A caster who uses lunar and nature magic from range.',
     'moonkin_form',
     'Moonrage',
-    'Increases your spell damage by 15% and your spell haste by 10%.',
-    { global: { spellDmgPct: 0.15, spellHastePct: 0.1 } },
+    'Increases your spell damage by 10% and your spell haste by 10%.',
+    { global: { spellDmgPct: 0.1, spellHastePct: 0.1 } },
   ),
   spec(
     'feral',
