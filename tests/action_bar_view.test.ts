@@ -388,6 +388,22 @@ describe('actionBarView: proc availability cues', () => {
     ).toBe('armed');
   });
 
+  it('marks Gloom Bolt armed during the Fiendlore demon-handoff window', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('shadow_bolt') })),
+      fakeDeps(),
+    );
+
+    expect(view.tick(world()).slots[0].procState).toBe('none');
+    expect(
+      view.tick(
+        world({
+          playerAuras: [{ id: 'wlk_fiendlore_handoff', kind: 'next_cast_instant' }],
+        }),
+      ).slots[0].procState,
+    ).toBe('armed');
+  });
+
   it('marks Gutting Strike armed during either Fieldcraft melee window', () => {
     const view = createActionBarView(
       descriptor(slot(1, { ability: ability('raptor_strike') })),

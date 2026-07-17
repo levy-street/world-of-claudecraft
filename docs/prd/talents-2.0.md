@@ -1005,3 +1005,8 @@ npm run build on PR4/PR5.
   Deepened Hex replaces its flat conditional bolt scalar with a 3 sec Gloom Bolt
   extension for Blackrot and Hex of Anguish, capped at 6 sec per application, so the
   shared row now offers active upkeep without disturbing its other two choices.
+- Pactbound uses Fiendlore as a demon-to-caster handoff around Dread Aspect. Every
+  second landed demon attack banks an 8 sec instant Gloom Bolt; every landed Gloom
+  Bolt advances Dread Aspect by 3 sec, pulling the next shared owner-and-demon burst
+  window forward. The bolt still spends mana, the demon must maintain uptime, and the
+  warlock decides when to cash the mobile cast while using Hard Bargain and class DoTs.

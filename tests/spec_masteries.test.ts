@@ -148,7 +148,33 @@ describe('spec masteries', () => {
     });
     expect(TALENTS.warlock?.specs.find((s) => s.id === 'demonology')?.mastery.effect).toEqual({
       global: { petDmgSharePct: 0.2 },
-      stats: { staPct: 0.1 },
+      procs: [
+        {
+          id: 'wlk_fiendlore_handoff',
+          name: 'Fiendlore',
+          spec: 'demonology',
+          requiresKnownAbility: 'metamorphosis',
+          school: 'shadow',
+          trigger: { on: 'petHitNth', n: 2 },
+          responses: [
+            {
+              kind: 'empowerNext',
+              aura: 'next_cast_instant',
+              abilities: ['shadow_bolt'],
+              duration: 8,
+            },
+          ],
+        },
+        {
+          id: 'wlk_fiendlore_pact',
+          name: 'Fiendlore',
+          spec: 'demonology',
+          requiresKnownAbility: 'metamorphosis',
+          school: 'shadow',
+          trigger: { on: 'spellHit', abilities: ['shadow_bolt'] },
+          responses: [{ kind: 'cooldownRefund', ability: 'metamorphosis', seconds: 3 }],
+        },
+      ],
     });
   });
 
