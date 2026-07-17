@@ -147,15 +147,17 @@ export class AurasPainter {
     // simply not touched this frame, so the recycle sweep below detaches them. The full
     // tiers return an infinite cap, so every active aura renders (the unchanged path).
     //
-    // FAIRNESS: the cap sheds BUFF overflow only, never a DEBUFF. The
+    // FAIRNESS: the cap sheds passive BUFF overflow only, never a DEBUFF or an
+    // ACTIONABLE short-lived buff. The
     // player buff bar is mode 'all' (buffs + debuffs interleaved in sim-application
     // order), and persistent raid buffs fill the front slots, so a flat first-N cap would
     // push a mid-combat boss/mob debuff (DoT / stun / curse) off-screen on low while every
     // other tier still shows it. With no self-dispel, that icon is the player's only read
     // of the debuff, so hiding it makes the game worse to play on low. A debuff is the
-    // actionable half of the bar; a buff is cosmetic, so the budget is spent on buffs and a
-    // debuff always renders: slot i is shown when it is a debuff OR fewer than `cap` auras
-    // have rendered so far. When count <= cap (ALWAYS true on the full tiers, where cap is
+    // actionable half of the bar, and empowerment/resource buffs also drive immediate cast
+    // choices. The budget is spent on passive buffs: a protected slot always renders, while
+    // an ordinary buff renders only when fewer than `cap` auras have rendered so far. When
+    // count <= cap (ALWAYS true on the full tiers, where cap is
     // +Infinity) every aura renders in order, byte-identical to the untiered painter.
     // Capping the render (not the view) keeps the parity-identical core untouched, so the
     // same selection applies under a Sim-shaped and a ClientWorld-mirror state. (Scope: a
@@ -169,7 +171,7 @@ export class AurasPainter {
     let rendered = 0;
     for (let i = 0; i < count; i++) {
       const s = slots[i];
-      if (!s.isDebuff && rendered >= cap) continue; // shed buff overflow; never a debuff
+      if (!s.isDebuff && !s.isActionable && rendered >= cap) continue;
       rendered++;
       // Resolve the pool key. The common case (a unique aura id this frame) takes the
       // base key directly. If the base key is already claimed THIS frame, this is a

@@ -1396,6 +1396,9 @@ export const da_DK: EnTranslations = {
       "formTravel": "Fleet-form: bevægelseshastighed øget med {pct}%",
       "defensiveStance": "Værgende Stilling: mindre modtaget skade, mere trussel",
       "righteousFury": "Brændende Ed: stærkt øget trussel fra Hellig skade",
+      "stormcharge": "Skyrend {stacks}/{max}: each stack reduces Arc Bolt cast time by {castPct}% and increases its damage by {damagePct}%",
+      "aethericFlux": "Aetheric Flux {stacks}/{max}: each stack refunds {cooldown} sec of Aether Surge cooldown; Aether Surge consumes all stacks to restore {manaPct}% maximum mana per stack",
+      "nextAbilityDamage": "Increases the next affected ability damage by {pct}%",
       "scale": "Größe um {pct}% erhöht",
       "jump": "Sprunghöhe um {pct}% erhöht",
       "school": {
@@ -2510,6 +2513,7 @@ export const da_DK: EnTranslations = {
       "frost_armor": "En vedvarende selvforstærkning der hærder din rustning før en kamp.",
       "arcane_intellect": "Hæver Intellekt for at uddybe en allierets manapulje, kast den før kampen.",
       "frostbolt": "Slår fra afstand og sløver målet så det ikke kan komme tæt på dig.",
+      "blink": "Teleports you forward and breaks roots, giving every Mage a reliable escape.",
       "conjure_water": "Frembringer drikke der genopretter mana, så du kan fylde op mellem kampene.",
       "conjure_food": "Frembringer mad der genopretter helbred når du sætter dig ned for at spise.",
       "shadow_bolt": "Et lyn af skygge du kaster mod et mål, din foretrukne bombe.",
@@ -5743,7 +5747,7 @@ export const da_DK: EnTranslations = {
       },
       "fireball": {
         "name": "Glødlyn",
-        "description": "Slynger en flammende kugle, der volder {damage} ildskade plus yderligere skade over tid."
+        "description": "Slynger en flammende kugle, der volder {damage} ildskade plus {overTime} ildskade over tid."
       },
       "frost_armor": {
         "name": "Rimfrost-Kappe",
@@ -5756,6 +5760,10 @@ export const da_DK: EnTranslations = {
       "frostbolt": {
         "name": "Rimlanse",
         "description": "Affyrer et frostlyn, der volder {damage} frostskade og sænker bevægelsen med 40%."
+      },
+      "icefall": {
+        "name": "Icefall",
+        "description": "Launches every stored Icicle at the target for {damage} Frost damage each. Deals 2.5 times damage if the target is frozen by a root or stun, or while Frostbite is active. Consumes Frostbite. This fixed damage cannot critically strike. (Cryomancy)"
       },
       "conjure_water": {
         "name": "Vandbinding",
@@ -5791,7 +5799,7 @@ export const da_DK: EnTranslations = {
       },
       "pyroblast": {
         "name": "Bållanse",
-        "description": "Slynger en enorm flammende kampesten, der volder {damage} ildskade plus yderligere skade over tid."
+        "description": "Slynger en enorm flammende kampesten, der volder {damage} ildskade plus {overTime} ildskade over 12 sek."
       },
       "ice_barrier": {
         "name": "Frostslør",
@@ -6023,7 +6031,7 @@ export const da_DK: EnTranslations = {
       },
       "mind_flay": {
         "name": "Jammerens Litani",
-        "description": "Angriber målets sind med skyggeenergi, hvilket volder {damage} skade hvert sekund i 3 sek."
+        "description": "Angriber målets sind med skyggeenergi i 3 sek. For hvert tick øges skaden med 30 % af det første ticks skade."
       },
       "flash_heal": {
         "name": "Hastende Bøn",

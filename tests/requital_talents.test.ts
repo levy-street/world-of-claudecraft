@@ -1,0 +1,370 @@
+import { describe, expect, it } from 'vitest';
+import { onCastCompleted, onMeleeSwing } from '../src/sim/combat/talent_procs';
+import { ROW_TREES, validateRowTree } from '../src/sim/content/talent_rows';
+import { TALENTS, validateTalentTree } from '../src/sim/content/talents';
+import { MOBS } from '../src/sim/data';
+import { createMob } from '../src/sim/entity';
+import { Sim } from '../src/sim/sim';
+import type { Entity } from '../src/sim/types';
+import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
+import { localizeTalentTitle, tTalent } from '../src/ui/talent_i18n';
+
+const OATHS_DUE_OPTION_ID = 'pal_r14_swift_verdicts';
+
+function paladinSim(
+  options: {
+    spec?: 'holy' | 'protection' | 'retribution';
+    selectOathsDue?: boolean;
+    seed?: number;
+  } = {},
+): Sim {
+  const sim = new Sim({
+    seed: options.seed ?? 170729,
+    playerClass: 'paladin',
+    autoEquip: false,
+  });
+  sim.setPlayerLevel(20);
+  expect(
+    sim.applyTalents({
+      spec: options.spec ?? 'retribution',
+      rows: options.selectOathsDue === false ? {} : { 14: OATHS_DUE_OPTION_ID },
+    }),
+  ).toBe(true);
+  sim.player.critChance = 0;
+  return sim;
+}
+
+function targetFor(sim: Sim): Entity {
+  const target = createMob(97_003, MOBS.forest_wolf, 20, {
+    x: sim.player.pos.x,
+    y: sim.player.pos.y,
+    z: sim.player.pos.z + 3,
+  });
+  target.hostile = true;
+  target.stats = { ...target.stats, armor: 0 };
+  target.maxHp = 100_000;
+  target.hp = target.maxHp;
+  sim.entities.set(target.id, target);
+  sim.rebucket(target);
+  return target;
+}
+
+function setMeleeRoll(sim: Sim, roll: number): void {
+  const rng = sim.ctx.rng as typeof sim.ctx.rng & {
+    next(): number;
+    range(min: number, max: number): number;
+    chance(probability: number): boolean;
+  };
+  rng.next = () => roll;
+  rng.range = (min) => min;
+  rng.chance = () => false;
+}
+
+function crusaderStrike(sim: Sim, target: Entity): number {
+  const meta = sim.meta(sim.playerId);
+  const strike = sim.resolvedAbility('crusader_strike');
+  if (!meta || !strike) throw new Error('missing Requital strike data');
+  const before = target.hp;
+  sim.ctx.runEffects(sim.player, meta, target, strike);
+  return before - target.hp;
+}
+
+function bloodDebtRolls(sim: Sim, abilityId: string, consumedEmpowerAuraId?: string): number[] {
+  const probabilities: number[] = [];
+  const rng = sim.ctx.rng as typeof sim.ctx.rng & {
+    chance(probability: number): boolean;
+  };
+  rng.chance = (probability) => {
+    probabilities.push(probability);
+    return false;
+  };
+  onMeleeSwing(sim.ctx, sim.player, abilityId, consumedEmpowerAuraId);
+  return probabilities;
+}
+
+function empoweredProcSequence(seed: number): { draws: number; procs: boolean[] } {
+  const sim = paladinSim({ seed });
+  let draws = 0;
+  sim.ctx.rng.setObserver(() => draws++);
+  const procs: boolean[] = [];
+  for (let attempt = 0; attempt < 64; attempt++) {
+    sim.player.auras = sim.player.auras.filter((aura) => aura.id !== 'pal_blood_debt');
+    onMeleeSwing(sim.ctx, sim.player, 'crusader_strike', 'pal_oaths_due');
+    procs.push(sim.player.auras.some((aura) => aura.id === 'pal_blood_debt'));
+  }
+  sim.ctx.rng.setObserver(null);
+  return { draws, procs };
+}
+
+function armBloodDebt(sim: Sim): void {
+  const rng = sim.ctx.rng as typeof sim.ctx.rng & {
+    chance(probability: number): boolean;
+  };
+  rng.chance = (probability) => probability === 0.2;
+  sim.player.cooldowns.set('exorcism', 15);
+  onMeleeSwing(sim.ctx, sim.player, 'auto_attack');
+}
+
+function castRite(sim: Sim, target: Entity): void {
+  sim.targetEntity(target.id);
+  sim.player.facing = Math.atan2(target.pos.x - sim.player.pos.x, target.pos.z - sim.player.pos.z);
+  sim.player.gcdRemaining = 0;
+  sim.castAbility('exorcism');
+}
+
+describe("Requital Oath's Due", () => {
+  it('keeps the shared row valid and replaces Swift Verdicts without changing its stable id', () => {
+    const row = ROW_TREES.paladin.find((candidate) => candidate.level === 14);
+    const oathsDue = row?.options.find((option) => option.id === OATHS_DUE_OPTION_ID);
+
+    expect(validateTalentTree(TALENTS.paladin)).toEqual([]);
+    expect(validateRowTree(ROW_TREES.paladin)).toEqual([]);
+    expect(row?.options.map((option) => option.name)).toEqual([
+      "Oath's Due",
+      "Saint's Ire",
+      'Oathwheel',
+    ]);
+    expect(oathsDue?.effect.ability).toBeUndefined();
+    expect(oathsDue?.description).toContain('70%');
+    expect(oathsDue?.description).toContain('free Rite of Expulsion');
+    expect(oathsDue?.description).toContain("refreshes Oath's Due to 7 sec");
+    expect(oathsDue?.effect.proc).toEqual({
+      id: 'pal_oaths_due',
+      name: "Oath's Due",
+      school: 'holy',
+      spec: 'retribution',
+      refreshOnFreeCast: {
+        ability: 'exorcism',
+        consumedAuraId: 'pal_blood_debt',
+      },
+      trigger: { on: 'castNth', n: 1, abilities: ['judgement'] },
+      responses: [
+        {
+          kind: 'empowerNext',
+          aura: 'next_ability_damage',
+          abilities: ['crusader_strike'],
+          duration: 7,
+          dmgPct: 0.5,
+        },
+      ],
+    });
+    expect(row?.options.find((option) => option.name === 'Oathwheel')?.effect.proc).toMatchObject({
+      trigger: { on: 'meleeSwingWhile', auraKind: 'imbue' },
+      responses: [{ kind: 'cooldownRefund', ability: 'judgement', seconds: 0.5 }],
+    });
+  });
+
+  it('opens the seven-second setup window without drawing RNG only for the selected Requital row', () => {
+    const cases: Array<[Sim, string, boolean]> = [
+      [paladinSim(), 'judgement', true],
+      [paladinSim(), 'exorcism', false],
+      [paladinSim({ selectOathsDue: false }), 'judgement', false],
+      [paladinSim({ spec: 'holy' }), 'judgement', false],
+      [paladinSim({ spec: 'protection' }), 'judgement', false],
+    ];
+    for (const [sim, abilityId, expected] of cases) {
+      let draws = 0;
+      sim.ctx.rng.setObserver(() => draws++);
+      onCastCompleted(sim.ctx, sim.player, abilityId);
+      sim.ctx.rng.setObserver(null);
+
+      expect(draws).toBe(0);
+      expect(sim.player.auras.some((aura) => aura.id === 'pal_oaths_due')).toBe(expected);
+    }
+  });
+
+  it('makes the next landed Crusader Strike significantly stronger and consumes the window', () => {
+    const sim = paladinSim();
+    const target = targetFor(sim);
+    setMeleeRoll(sim, 0.9);
+
+    const baseline = crusaderStrike(sim, target);
+    target.hp = target.maxHp;
+    onCastCompleted(sim.ctx, sim.player, 'judgement');
+    const window = sim.player.auras.find((aura) => aura.id === 'pal_oaths_due');
+    expect(window).toMatchObject({
+      kind: 'next_ability_damage',
+      remaining: 7,
+      value: 0.5,
+      empowerAbilities: ['crusader_strike'],
+    });
+
+    const empowered = crusaderStrike(sim, target);
+
+    expect(empowered).toBeGreaterThan(baseline * 1.4);
+    expect(empowered).toBeLessThan(baseline * 1.6);
+    expect(sim.player.auras.some((aura) => aura.id === 'pal_oaths_due')).toBe(false);
+  });
+
+  it("gives an Oath's Due strike one boosted Blood Debt roll and leaves other strikes at 20%", () => {
+    const windowed = paladinSim();
+    const target = targetFor(windowed);
+    const procProbabilities: number[] = [];
+    const rng = windowed.ctx.rng as typeof windowed.ctx.rng & {
+      next(): number;
+      range(min: number, max: number): number;
+      chance(probability: number): boolean;
+    };
+    rng.next = () => 0.9;
+    rng.range = (min) => min;
+    rng.chance = (probability) => {
+      if (probability === 0.2 || probability === 0.7) procProbabilities.push(probability);
+      return false;
+    };
+    onCastCompleted(windowed.ctx, windowed.player, 'judgement');
+
+    expect(crusaderStrike(windowed, target)).toBeGreaterThan(0);
+    expect(procProbabilities).toEqual([0.7]);
+
+    const plain = paladinSim();
+    expect(bloodDebtRolls(plain, 'crusader_strike')).toEqual([0.2]);
+
+    const withoutOathsDue = paladinSim({ selectOathsDue: false });
+    expect(bloodDebtRolls(withoutOathsDue, 'crusader_strike', 'pal_oaths_due')).toEqual([0.2]);
+  });
+
+  it('replays the empowered sequence with exactly one gated draw per landed strike', () => {
+    const first = empoweredProcSequence(170730);
+    const replay = empoweredProcSequence(170730);
+
+    expect(first).toEqual(replay);
+    expect(first.draws).toBe(64);
+    expect(first.procs.some(Boolean)).toBe(true);
+    expect(first.procs.every(Boolean)).toBe(false);
+  });
+
+  it('refreshes to seven seconds once for a Blood Debt Rite but not for a normal Rite', () => {
+    const sim = paladinSim();
+    const target = targetFor(sim);
+    onCastCompleted(sim.ctx, sim.player, 'judgement');
+    const window = sim.player.auras.find((aura) => aura.id === 'pal_oaths_due');
+    if (!window) throw new Error("missing Oath's Due window");
+    window.remaining = 6;
+    armBloodDebt(sim);
+    sim.player.resource = 0;
+
+    castRite(sim, target);
+
+    expect(sim.player.resource).toBe(0);
+    expect(sim.player.auras.some((aura) => aura.id === 'pal_blood_debt')).toBe(false);
+    const refreshedWindows = sim.player.auras.filter((aura) => aura.id === 'pal_oaths_due');
+    expect(refreshedWindows).toHaveLength(1);
+    expect(refreshedWindows[0]).toMatchObject({ remaining: 7, duration: 7 });
+
+    refreshedWindows[0]!.remaining = 4;
+    sim.player.cooldowns.delete('exorcism');
+    sim.player.resource = sim.player.maxResource;
+    const projectilesBeforeNormalRite = sim.ctx.pendingProjectiles.length;
+    castRite(sim, target);
+
+    expect(sim.player.resource).toBeLessThan(sim.player.maxResource);
+    expect(sim.player.cooldowns.get('exorcism')).toBe(15);
+    expect(sim.ctx.pendingProjectiles).toHaveLength(projectilesBeforeNormalRite + 1);
+    expect(sim.player.auras.find((aura) => aura.id === 'pal_oaths_due')?.remaining).toBe(4);
+  });
+
+  it("does not refresh Oath's Due from a free Rite when the talent is not selected", () => {
+    const sim = paladinSim({ selectOathsDue: false });
+    const target = targetFor(sim);
+    armBloodDebt(sim);
+    sim.player.resource = 0;
+
+    castRite(sim, target);
+
+    expect(sim.player.auras.some((aura) => aura.id === 'pal_blood_debt')).toBe(false);
+    expect(sim.player.auras.some((aura) => aura.id === 'pal_oaths_due')).toBe(false);
+  });
+
+  it('sustains on a successful window and cannot self-perpetuate with certainty', () => {
+    const sim = paladinSim();
+    const target = targetFor(sim);
+    const procOutcomes = [true, false];
+    const procProbabilities: number[] = [];
+    const rng = sim.ctx.rng as typeof sim.ctx.rng & {
+      next(): number;
+      range(min: number, max: number): number;
+      chance(probability: number): boolean;
+    };
+    rng.next = () => 0.9;
+    rng.range = (min) => min;
+    rng.chance = (probability) => {
+      if (probability !== 0.7) return false;
+      procProbabilities.push(probability);
+      return procOutcomes.shift() ?? false;
+    };
+    onCastCompleted(sim.ctx, sim.player, 'judgement');
+
+    expect(crusaderStrike(sim, target)).toBeGreaterThan(0);
+    expect(sim.player.auras.some((aura) => aura.id === 'pal_blood_debt')).toBe(true);
+    expect(sim.player.auras.some((aura) => aura.id === 'pal_oaths_due')).toBe(false);
+
+    sim.player.resource = 0;
+    castRite(sim, target);
+    expect(sim.player.auras.find((aura) => aura.id === 'pal_oaths_due')).toMatchObject({
+      remaining: 7,
+      duration: 7,
+    });
+
+    expect(crusaderStrike(sim, target)).toBeGreaterThan(0);
+    expect(procProbabilities).toEqual([0.7, 0.7]);
+    expect(sim.player.auras.some((aura) => aura.id === 'pal_blood_debt')).toBe(false);
+    expect(sim.player.auras.some((aura) => aura.id === 'pal_oaths_due')).toBe(false);
+    expect(sim.player.cooldowns.get('exorcism')).toBe(15);
+
+    const mastery = TALENTS.paladin.specs.find((spec) => spec.id === 'retribution')?.mastery.effect
+      .proc;
+    const boostedChance =
+      mastery?.trigger.on === 'meleeHit' ? mastery.trigger.chanceWhenEmpowered?.chance : undefined;
+    expect(boostedChance).toBeLessThan(1);
+  });
+
+  it('keeps the setup window through a missed Crusader Strike and spends it on the next hit', () => {
+    const sim = paladinSim();
+    const target = targetFor(sim);
+    onCastCompleted(sim.ctx, sim.player, 'judgement');
+
+    setMeleeRoll(sim, 0);
+    expect(crusaderStrike(sim, target)).toBe(0);
+    expect(sim.player.auras.some((aura) => aura.id === 'pal_oaths_due')).toBe(true);
+
+    setMeleeRoll(sim, 0.9);
+    expect(crusaderStrike(sim, target)).toBeGreaterThan(0);
+    expect(sim.player.auras.some((aura) => aura.id === 'pal_oaths_due')).toBe(false);
+  });
+
+  it('clears the spec-owned setup window when Requital is left', () => {
+    const sim = paladinSim();
+    onCastCompleted(sim.ctx, sim.player, 'judgement');
+    expect(sim.player.auras.some((aura) => aura.id === 'pal_oaths_due')).toBe(true);
+
+    expect(sim.applyTalents({ spec: 'holy', rows: { 14: OATHS_DUE_OPTION_ID } })).toBe(true);
+
+    expect(sim.player.auras.some((aura) => aura.id === 'pal_oaths_due')).toBe(false);
+  });
+
+  it("localizes Oath's Due in every non-Latin release locale", () => {
+    for (const language of ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'] as const) {
+      expect(localizeTalentTitle("Oath's Due", language)).not.toBe("Oath's Due");
+    }
+  });
+
+  it("fills Oath's Due loop copy in every non-Latin release locale", async () => {
+    const choice = ROW_TREES.paladin
+      .flatMap((row) => row.options)
+      .find((option) => option.id === OATHS_DUE_OPTION_ID);
+    if (!choice) throw new Error("missing Oath's Due choice");
+    try {
+      for (const language of ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'] as const) {
+        await ensureLocaleLoaded(language);
+        setLanguage(language);
+        const description = tTalent({ kind: 'talentChoice', choice, field: 'description' });
+        expect(description).not.toBe(choice.description);
+        expect(description).toContain('20%');
+        expect(description).toContain('70%');
+        expect(description).toContain('7');
+      }
+    } finally {
+      setLanguage('en');
+    }
+  });
+});

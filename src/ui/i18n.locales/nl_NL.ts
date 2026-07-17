@@ -1943,7 +1943,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Treft de vijand voor {damage} Vuurschade. Ogenblikkelijk.',
   'entities.abilities.fire_blast.name': 'Sintelval',
   'entities.abilities.fireball.description':
-    'Werpt een vurige bal die {damage} Vuurschade toebrengt plus extra schade over tijd.',
+    'Werpt een vurige bal die {damage} Vuurschade plus {overTime} Vuurschade over tijd toebrengt.',
   'entities.abilities.fireball.name': 'Sintelbout',
   'entities.abilities.rain_of_fire.name': 'Vuurregen',
   'entities.abilities.rain_of_fire.description':
@@ -2061,7 +2061,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Treft de geest van het doelwit voor {damage} Schaduwschade.',
   'entities.abilities.mind_blast.name': 'Geestbreuk',
   'entities.abilities.mind_flay.description':
-    'Bestookt de geest van het doelwit met Schaduwenergie en brengt elke seconde {damage} schade toe gedurende 3 sec.',
+    'Bestookt de geest van het doelwit 3 sec. lang met Schaduwenergie. Met elke tik neemt de schade toe met 30% van de schade van de eerste tik.',
   'entities.abilities.mind_flay.name': 'Litanie van Leed',
   'entities.abilities.mongoose_bite.description':
     'Tegenaanval nadat het doelwit ontwijkt voor wapenschade plus {damage}. Kan niet worden ontweken.',
@@ -2091,7 +2091,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Ga in sluiptocht terwijl je in Wolfsgedaante bent en beweeg 50% trager. Kan niet in gevecht worden gebruikt.',
   'entities.abilities.prowl.name': 'Besluipen',
   'entities.abilities.pyroblast.description':
-    'Werpt een immense vurige kei die {damage} Vuurschade toebrengt plus extra schade over tijd.',
+    'Werpt een immense vurige kei die {damage} Vuurschade plus {overTime} Vuurschade over 12 sec. toebrengt.',
   'entities.abilities.pyroblast.name': 'Pyrelans',
   'entities.abilities.rake.description':
     'Een sluipopener die de vijand harkt voor wapenschade plus {damage} en bloedingsschade veroorzaakt gedurende 9 sec. Levert 1 combopunt op. Alleen in Wolfsgedaante.',

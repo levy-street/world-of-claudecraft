@@ -1396,6 +1396,9 @@ export const zh_CN: EnTranslations = {
       "formTravel": "迅捷形态：移动速度提高 {pct}%",
       "defensiveStance": "戒备姿态：受到的伤害降低，威胁值提高",
       "righteousFury": "炽燃誓约：神圣伤害产生的威胁值大幅提高",
+      "stormcharge": "风暴召唤者 {stacks}/{max}：每层使电弧箭施法时间缩短 {castPct}%，伤害提高 {damagePct}%",
+      "aethericFlux": "奥术不稳定性 {stacks}/{max}：每层返还奥术强化 {cooldown} 秒冷却时间；奥术强化会消耗全部层数，每层恢复 {manaPct}% 最大法力",
+      "nextAbilityDamage": "使下一个受影响技能的伤害提高 {pct}%",
       "scale": "体型增大 {pct}%",
       "jump": "跳跃高度提高 {pct}%",
       "school": {
@@ -2510,6 +2513,7 @@ export const zh_CN: EnTranslations = {
       "frost_armor": "持续的自我增益，开战前先硬化你的护甲。",
       "arcane_intellect": "提升智力以扩大盟友的法力上限，开怪前先施放。",
       "frostbolt": "从远处发动攻击并减速目标，让它无法贴近你。",
+      "blink": "向前传送并解除定身，让每位法师都有可靠的脱身手段。",
       "conjure_water": "制造饮品以恢复法力，让你在两次开怪之间补给。",
       "conjure_food": "制造食物，坐下进食时可以恢复生命值。",
       "shadow_bolt": "向目标施放一道暗影箭，是你的常用输出。",
@@ -5743,7 +5747,7 @@ export const zh_CN: EnTranslations = {
       },
       "fireball": {
         "name": "余烬弹",
-        "description": "投掷一团火球，造成 {damage} 点火焰伤害，并附加持续伤害。"
+        "description": "投掷一团火球，造成 {damage} 点火焰伤害，并附加 {overTime} 点持续火焰伤害。"
       },
       "frost_armor": {
         "name": "白霜护罩",
@@ -5756,6 +5760,10 @@ export const zh_CN: EnTranslations = {
       "frostbolt": {
         "name": "凛霜之矛",
         "description": "发射一支寒冰箭，造成 {damage} 点冰霜伤害，并使移动速度降低 40%。"
+      },
+      "icefall": {
+        "name": "冰瀑",
+        "description": "向目标发射所有储存的冰刺，每枚造成 {damage} 点冰霜伤害。若目标被定身或昏迷，或你拥有冻伤效果，则造成 2.5 倍伤害并消耗冻伤。此固定伤害无法造成暴击。（冰霜术）"
       },
       "conjure_water": {
         "name": "束水术",
@@ -5791,7 +5799,7 @@ export const zh_CN: EnTranslations = {
       },
       "pyroblast": {
         "name": "烈焰长矛",
-        "description": "投掷一颗巨大的火焰陨石，造成 {damage} 点火焰伤害，并在一段时间内造成额外伤害。"
+        "description": "投掷一颗巨大的火焰陨石，造成 {damage} 点火焰伤害，并在 12 秒内造成 {overTime} 点火焰伤害。"
       },
       "ice_barrier": {
         "name": "霜帷",
@@ -6023,7 +6031,7 @@ export const zh_CN: EnTranslations = {
       },
       "mind_flay": {
         "name": "悲苦连祷",
-        "description": "用暗影能量攻击目标的心灵，持续 3 秒，每秒造成 {damage} 点伤害。"
+        "description": "用暗影能量攻击目标的心灵，持续3秒。每次跳动的伤害都会提高，增幅相当于首次跳动伤害的30%。"
       },
       "flash_heal": {
         "name": "紧急祈祷",
@@ -6270,8 +6278,8 @@ export const zh_CN: EnTranslations = {
         "description": "鼓舞附近盟友，使攻击强度提高35点，持续5分钟。（射击专精招牌）"
       },
       "wyvern_sting": {
-        "name": "翼龙钉刺",
-        "description": "从远处钉刺敌人，使其瘫痪最多4秒。受到任何伤害都会打破效果。（生存专精招牌）"
+        "name": "荆棘陷阱",
+        "description": "在目标区域设置荆棘陷阱，使5码内的敌人定身4秒。（战地技艺专精招牌）"
       },
       "arcane_power": {
         "name": "奥术强化",
@@ -6294,8 +6302,8 @@ export const zh_CN: EnTranslations = {
         "description": "释放剑刃乱舞，攻击速度提高20%，持续12秒。（战斗专精招牌）"
       },
       "hemorrhage": {
-        "name": "出血",
-        "description": "攻击敌人，造成武器伤害加{damage}点伤害，并在12秒内造成流血伤害。奖励1个连击点。（敏锐专精招牌）"
+        "name": "假面落幕",
+        "description": "以武器攻击敌人，造成武器伤害加{damage}点伤害。奖励1个连击点。（诡术专精招牌）"
       },
       "power_infusion": {
         "name": "能量灌注",

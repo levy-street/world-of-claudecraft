@@ -1499,6 +1499,54 @@
       0 0 9px #ffd100cc,
       inset 0 1px 0 #ffffff18;
   }
+  /* Actionable proc cues are deliberately tier-independent. Never qualify these
+     selectors with data-fx-level, the adaptive FPS governor, or motion settings.
+     Reduced-motion may stop the pulse globally, but the base armed glow remains. */
+  .action-btn.proc-available {
+    border-color: #7fd1ff;
+    box-shadow:
+      0 0 9px #7fd1ffcc,
+      inset 0 0 0 1px #bceaff88,
+      inset 0 1px 0 #ffffff28;
+  }
+  .action-btn.proc-armed {
+    border-color: #fff4a8;
+    box-shadow:
+      0 0 13px #fff4a8ee,
+      0 0 22px #7fd1ff99,
+      inset 0 0 0 1px #ffffffaa;
+    animation: action-proc-armed-pulse 850ms ease-in-out infinite;
+  }
+  @keyframes action-proc-armed-pulse {
+    0%,
+    100% {
+      box-shadow:
+        0 0 11px #fff4a8dd,
+        0 0 18px #7fd1ff77,
+        inset 0 0 0 1px #ffffff99;
+    }
+    50% {
+      box-shadow:
+        0 0 17px #fffbe0,
+        0 0 28px #7fd1ffcc,
+        inset 0 0 0 2px #ffffffcc;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .action-btn.proc-armed {
+      animation: none;
+    }
+  }
+  @media (forced-colors: active) {
+    .action-btn.proc-available {
+      border-style: dashed;
+      border-width: 3px;
+    }
+    .action-btn.proc-armed {
+      border-style: double;
+      border-width: 4px;
+    }
+  }
   .action-btn:not(.empty)[draggable="true"] {
     cursor: grab;
   }

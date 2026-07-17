@@ -78,6 +78,34 @@ const TOGGLE_KINDS: ReadonlySet<AuraKind> = new Set([
 // Sprint also uses, 15s and very much worth a countdown), so it hides by id.
 const TOGGLE_IDS: ReadonlySet<string> = new Set(['ghost_wolf']);
 
+// Short combat decisions must survive the low-effects aura cap. Keep this list on
+// stable content ids so Sim auras and wire-mirrored auras derive the same priority.
+// Add each empowerment in the commit that authors it; long passive raid buffs remain
+// eligible for overflow shedding.
+const ACTIONABLE_AURA_IDS: ReadonlySet<string> = new Set([
+  'mag_ember_relay',
+  'mag_aetheric_flux',
+  'mag_aetherwell_relay',
+  'dru_moonrage_lunar',
+  'dru_moonrage_wild',
+  'dru_typhoon_relay',
+  'dru_primal_heart_bleed',
+  'dru_primal_heart_guard',
+  'dru_red_haze_relay',
+  'dru_groves_gift',
+  'dru_grove_covenant',
+  'pri_fixed_purpose',
+  'pri_grave_mercy',
+  'pri_last_blessing',
+  'sha_cleansing_tides',
+  'sha_tideflow',
+  'pal_kindled_faith',
+  'pal_dawns_reply',
+  'pal_oathward',
+  'pal_oathward_guard',
+  'pal_vigils_refrain',
+]);
+
 /** The localized single-letter unit suffixes the compact duration label uses. */
 export interface DurationUnits {
   s: string;
@@ -182,6 +210,8 @@ export interface AuraSlotState {
   iconKey: string;
   /** Whether this aura reads as a debuff (drives the `debuff` class, not a color). */
   isDebuff: boolean;
+  /** Whether hiding this short-lived buff would conceal a live cast decision. */
+  isActionable: boolean;
   /** The debuff's magic school ('' for a buff), driving the WoW-style per-school
    *  border tint (data-school on the node; the stylesheet maps it to a token).
    *  PARITY: the wire sends `school` sparsely (server/game.ts omits 'physical');
@@ -243,6 +273,7 @@ function makeSlotState(): AuraSlotState {
     key: '',
     iconKey: '',
     isDebuff: false,
+    isActionable: false,
     school: '',
     durationText: '',
     stacksText: '',
@@ -292,18 +323,22 @@ export function createAurasView(
         slot.key = a.id;
         slot.iconKey = deps.iconId(a);
         slot.isDebuff = debuff;
+        slot.isActionable = ACTIONABLE_AURA_IDS.has(a.id);
         slot.school = debuff ? (a.school ?? 'physical') : '';
         slot.durationText =
           TOGGLE_KINDS.has(a.kind) || TOGGLE_IDS.has(a.id)
             ? ''
             : compactAuraDuration(a.remaining, units);
-        // A charge-limited aura badges its remaining charges (shown even at 1); otherwise the
-        // badge shows a stack count, and only when it stacks past 1.
+        // Charge-limited auras and spec-resource meters badge their count even at 1;
+        // ordinary stack auras keep the compact badge only when they stack past 1.
         slot.stacksText =
           a.charges !== undefined
             ? deps.formatStacks(a.charges)
-            : a.stacks && a.stacks > 1
-              ? deps.formatStacks(a.stacks)
+            : a.kind === 'aetheric_flux' ||
+                a.kind === 'icicles' ||
+                a.kind === 'stormcharge' ||
+                (a.stacks && a.stacks > 1)
+              ? deps.formatStacks(a.stacks ?? 1)
               : '';
         slot.name = deps.auraName(a);
         slot.remaining = a.remaining;

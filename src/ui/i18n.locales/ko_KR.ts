@@ -2386,7 +2386,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flamestrike.description':
     '지정한 지역에 화염 폭발을 일으켜 폭발 범위 안의 적에게 {damage}의 화염 피해를 입힙니다.',
   'entities.abilities.fireball.description':
-    '불덩이를 날려 {damage}의 화염 피해와 추가 지속 피해를 입힙니다.',
+    '불덩이를 날려 {damage}의 화염 피해와 {overTime}의 지속 화염 피해를 입힙니다.',
   'entities.abilities.frost_armor.name': '서리 망토',
   'entities.abilities.frost_armor.description':
     '자신을 냉기로 감싸 30분 동안 방어도를 {buff}만큼 증가시킵니다.',
@@ -2395,6 +2395,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.frostbolt.name': '서리 창',
   'entities.abilities.frostbolt.description':
     '냉기의 화살을 발사해 {damage}의 냉기 피해를 입히고 이동 속도를 40%만큼 늦춥니다.',
+  'entities.abilities.icefall.name': '빙폭',
+  'entities.abilities.icefall.description':
+    '저장한 고드름을 모두 대상에게 발사해 하나당 {damage}의 냉기 피해를 입힙니다. 대상이 이동 불가 또는 기절 상태이거나 동상이 활성화되어 있으면 2.5배의 피해를 입히고 동상을 소모합니다. 이 고정 피해는 치명타로 적중하지 않습니다. (빙결술)',
   'entities.abilities.conjure_water.name': '물 창조',
   'entities.abilities.conjure_water.description':
     '마시면 마나를 회복하는 물병 2개를 창조합니다. 높은 등급은 더 순수한 물을 창조합니다.',
@@ -2421,7 +2424,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '적을 불태워 {damage}의 화염 피해를 입힙니다. 빠르게 시전합니다.',
   'entities.abilities.pyroblast.name': '화염 창',
   'entities.abilities.pyroblast.description':
-    '거대한 불덩이를 던져 {damage}의 화염 피해와 추가 지속 피해를 입힙니다.',
+    '거대한 불덩이를 던져 {damage}의 화염 피해와 12초에 걸쳐 {overTime}의 화염 피해를 입힙니다.',
   'entities.abilities.ice_barrier.name': '서리 장막',
   'entities.abilities.ice_barrier.description':
     '얼음으로 자신을 보호해 60초 동안 {damage}의 피해를 흡수합니다.',
@@ -2582,7 +2585,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '느리지만 강력한 기도로 아군 대상의 생명력을 {damage}만큼 회복시킵니다.',
   'entities.abilities.mind_flay.name': '비탄의 연도',
   'entities.abilities.mind_flay.description':
-    '암흑 에너지로 대상의 정신을 공격해 3초 동안 매초 {damage}의 피해를 입힙니다.',
+    '암흑 에너지로 대상의 정신을 3초 동안 공격합니다. 각 틱의 피해가 첫 틱 피해의 30%만큼 증가합니다.',
   'entities.abilities.flash_heal.name': '다급한 기도',
   'entities.abilities.flash_heal.description':
     '빠른 기도로 아군 대상의 생명력을 {damage}만큼 회복시킵니다.',
@@ -2790,9 +2793,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.trueshot_aura.name': '정조준 오라',
   'entities.abilities.trueshot_aura.description':
     '주위 아군을 고무하여 5분 동안 전투력을 35만큼 증가시킵니다. (사격 전문화 상징)',
-  'entities.abilities.wyvern_sting.name': '비룡 쐐기',
+  'entities.abilities.wyvern_sting.name': '가시덤불 덫',
   'entities.abilities.wyvern_sting.description':
-    '원거리에서 적을 쏘아 최대 4초 동안 행동 불가로 만듭니다. 피해를 받으면 효과가 해제됩니다. (생존 전문화 상징)',
+    '대상 지역에 가시덤불 덫을 설치해 5미터 내의 적을 4초 동안 이동 불가 상태로 만듭니다. (현장술 전문화 상징)',
   'entities.abilities.arcane_power.name': '신비의 마법 강화',
   'entities.abilities.arcane_power.description':
     '10초 동안 주문 공격력이 20%, 주문 가속이 10% 증가합니다. (비전 전문화 상징)',
@@ -2808,9 +2811,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blade_flurry.name': '폭풍의 칼날',
   'entities.abilities.blade_flurry.description':
     '칼날의 폭풍을 일으켜 12초 동안 공격 속도를 20% 증가시킵니다. (전투 전문화 상징)',
-  'entities.abilities.hemorrhage.name': '과다출혈',
+  'entities.abilities.hemorrhage.name': '가면 낙하',
   'entities.abilities.hemorrhage.description':
-    '적을 공격하여 무기 피해에 더해 {damage}의 피해를 주고 12초 동안 출혈 피해를 줍니다. 연계 점수 1점을 얻습니다. (잠행 전문화 상징)',
+    '무기로 적을 공격해 무기 피해에 더해 {damage}의 피해를 줍니다. 연계 점수 1점을 얻습니다. (기만 전문화 상징)',
   'entities.abilities.power_infusion.name': '마력 주입',
   'entities.abilities.power_infusion.description':
     '아군 대상에게 힘을 주입하여 15초 동안 주문력을 28만큼 증가시킵니다. (수양 전문화 상징)',
@@ -5040,6 +5043,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.frost_armor': '전투 전에 방어구를 단단하게 만드는 지속형 자기 강화입니다.',
   'guide.abilityHook.frostbolt':
     '원거리에서 타격하며 대상의 이동 속도를 늦춰 다가오지 못하게 합니다.',
+  'guide.abilityHook.blink':
+    '앞으로 순간이동하고 이동 불가 효과를 해제해 모든 마법사에게 확실한 탈출 수단을 줍니다.',
   'guide.abilityHook.garrote': '은신 상태에서 철사로 기습해 시간이 지나며 대상을 출혈시킵니다.',
   'guide.abilityHook.gouge': '대상을 잠시 무력화하여 위치를 바꾸거나 보호할 틈을 만듭니다.',
   'guide.abilityHook.healing_touch':
@@ -5959,6 +5964,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.formTravel': '쾌속 형태: 이동 속도가 {pct}% 증가합니다',
   'hudChrome.auraEffect.defensiveStance': '방어 태세: 받는 피해 감소, 위협 수준 증가',
   'hudChrome.auraEffect.righteousFury': '불타는 맹세: 신성 피해로 인한 위협 수준이 크게 증가합니다',
+  'hudChrome.auraEffect.stormcharge':
+    '폭풍소환사 {stacks}/{max}: 중첩당 전격 화살의 시전 시간이 {castPct}% 감소하고 피해가 {damagePct}% 증가합니다',
+  'hudChrome.auraEffect.aethericFlux':
+    '비전 불안정 {stacks}/{max}: 중첩당 신비의 마법 강화의 재사용 대기시간이 {cooldown}초 감소합니다. 신비의 마법 강화는 모든 중첩을 소모해 중첩당 최대 마나의 {manaPct}%를 회복합니다',
+  'hudChrome.auraEffect.nextAbilityDamage': '다음 대상 능력의 피해가 {pct}% 증가합니다',
   'hudChrome.auraEffect.scale': '크기가 {pct}% 증가합니다',
   'hudChrome.auraEffect.jump': '도약 높이가 {pct}% 증가합니다',
   'hudChrome.auraEffect.school.physical': '물리',

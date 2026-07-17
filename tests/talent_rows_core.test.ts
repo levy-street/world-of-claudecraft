@@ -103,13 +103,69 @@ describe('canonical Talents V2 row registry', () => {
     expect(TALENTS.mage.specs.find((spec) => spec.id === 'fire')?.mastery.effect).toEqual({
       global: { critDmgSpellPct: 0.5 },
       stats: { crit: 0.02 },
+      procs: [
+        {
+          id: 'mag_afterflame',
+          name: 'Afterflame',
+          spec: 'fire',
+          requiresKnownAbility: 'combustion',
+          school: 'fire',
+          trigger: {
+            on: 'spellCrit',
+            abilities: ['fireball', 'fire_blast', 'scorch', 'pyroblast'],
+          },
+          responses: [{ kind: 'rollingDot', pctDamage: 0.2, duration: 6, interval: 2 }],
+        },
+        {
+          id: 'mag_afterflame_detonate',
+          name: 'Afterflame',
+          spec: 'fire',
+          requiresKnownAbility: 'combustion',
+          school: 'fire',
+          trigger: { on: 'spellHit', abilities: ['fire_blast'] },
+          responses: [{ kind: 'detonateOwnedDot', auraId: 'mag_afterflame' }],
+        },
+      ],
     });
     expect(TALENTS.paladin.specs.find((spec) => spec.id === 'holy')?.mastery.effect).toEqual({
       global: { critDmgHealPct: 0.5 },
+      proc: {
+        id: 'pal_kindled_faith',
+        name: 'Kindled Faith',
+        spec: 'holy',
+        requiresKnownAbility: 'holy_shock',
+        school: 'holy',
+        trigger: { on: 'castNth', n: 3, abilities: ['holy_light', 'flash_of_light'] },
+        responses: [
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_free',
+            abilities: ['holy_shock'],
+            duration: 10,
+          },
+        ],
+      },
     });
     expect(TALENTS.rogue.specs.find((spec) => spec.id === 'subtlety')?.mastery.effect).toEqual({
       global: { critDmgPhysPct: 0.4 },
       stats: { agiPct: 0.1 },
+      proc: {
+        id: 'rog_false_face',
+        name: 'False Face',
+        spec: 'subtlety',
+        requiresKnownAbility: 'hemorrhage',
+        school: 'shadow',
+        trigger: { on: 'castNth', n: 1, abilities: ['ambush', 'garrote', 'cheap_shot'] },
+        responses: [
+          {
+            kind: 'empowerNext',
+            aura: 'next_ability_damage',
+            abilities: ['hemorrhage'],
+            duration: 8,
+            dmgPct: 0.5,
+          },
+        ],
+      },
     });
 
     const warrior = Object.fromEntries(
@@ -208,7 +264,8 @@ describe('canonical Talents V2 allocation', () => {
 
   it('folds each selected row exactly once', () => {
     const mods = computeTalentModifiers('mage', { spec: null, rows: { 5: 'mag_r5_impulse' } }, 20);
-    expect(mods.abilities.fire_blast?.bonusCharges).toBe(1);
+    expect(mods.abilities.fire_blast?.bonusCharges ?? 0).toBe(0);
+    expect(mods.procs.filter((proc) => proc.id === 'mag_ember_relay')).toHaveLength(1);
   });
 
   it('round-trips a versioned canonical build without legacy point-tree fields', () => {

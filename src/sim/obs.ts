@@ -122,16 +122,17 @@ export function applyAction(sim: Sim, action: number): void {
 // ---------------------------------------------------------------------------
 
 const NEARBY_MOBS = 5;
+export const SELF_OBS_SIZE = 19;
 
 export function obsSize(): number {
-  return 16 + ABILITY_SLOTS * 2 + 9 + NEARBY_MOBS * 6 + 5 + QUEST_ORDER.length * 2;
+  return SELF_OBS_SIZE + ABILITY_SLOTS * 2 + 9 + NEARBY_MOBS * 6 + 5 + QUEST_ORDER.length * 2;
 }
 
 export function encodeObs(sim: Sim): number[] {
   const p = sim.player;
   const obs: number[] = [];
 
-  // --- self (16) ---
+  // --- self (SELF_OBS_SIZE) ---
   obs.push(p.hp / Math.max(1, p.maxHp));
   obs.push(p.resource / Math.max(1, p.maxResource));
   obs.push(p.level / MAX_LEVEL);
@@ -150,6 +151,13 @@ export function encodeObs(sim: Sim): number[] {
   obs.push(p.comboPoints / 5);
   obs.push(p.sitting || p.eating || p.drinking ? 1 : 0);
   obs.push(sim.time > p.overpowerUntil ? 0 : 1); // dodge proc available
+  const icicles = p.auras.find((aura) => aura.kind === 'icicles')?.stacks ?? 0;
+  obs.push(clamp(icicles / 5, 0, 1));
+  const lightningShieldCharges =
+    p.auras.find((aura) => aura.id === 'lightning_shield')?.charges ?? 0;
+  obs.push(clamp(lightningShieldCharges / 9, 0, 1));
+  const frostbite = p.auras.find((aura) => aura.kind === 'frostbite');
+  obs.push(frostbite ? clamp(frostbite.remaining / Math.max(1, frostbite.duration), 0, 1) : 0);
 
   // --- abilities (10 x 2 = 20) ---
   for (let i = 0; i < ABILITY_SLOTS; i++) {

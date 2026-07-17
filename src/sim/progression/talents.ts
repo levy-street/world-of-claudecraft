@@ -60,10 +60,15 @@ function cleanRemovedProcState(
   previous: TalentModifiers,
   next: TalentModifiers,
 ): void {
-  const nextIds = new Set(next.procs.map((proc) => proc.id));
-  const removedIds = new Set(
-    previous.procs.map((proc) => proc.id).filter((procId) => !nextIds.has(procId)),
-  );
+  const activeProcIds = (mods: TalentModifiers): Set<string> =>
+    new Set(
+      mods.procs
+        .filter((proc) => proc.spec === undefined || proc.spec === mods.spec)
+        .map((proc) => proc.id),
+    );
+  const previousIds = activeProcIds(previous);
+  const nextIds = activeProcIds(next);
+  const removedIds = new Set([...previousIds].filter((procId) => !nextIds.has(procId)));
   if (
     removedIds.size === 0 &&
     !(previous.global.cheatDeathIcd > 0 && next.global.cheatDeathIcd <= 0)

@@ -2429,7 +2429,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flamestrike.description':
     'Обрушивает огненный взрыв на указанную область, нанося {damage} ед. урона от огня врагам в зоне взрыва.',
   'entities.abilities.fireball.description':
-    'Бросает огненный шар, наносящий {damage} ед. урона от огня и дополнительный периодический урон.',
+    'Бросает огненный шар, наносящий {damage} ед. урона от огня и еще {overTime} ед. периодического урона от огня.',
   'entities.abilities.frost_armor.name': 'Мантия инея',
   'entities.abilities.frost_armor.description':
     'Окутывает вас морозом, повышая броню на {buff} на 30 мин.',
@@ -2438,6 +2438,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.frostbolt.name': 'Копьё изморози',
   'entities.abilities.frostbolt.description':
     'Выпускает ледяную стрелу, наносящую {damage} ед. урона от магии льда и замедляющую передвижение на 40%.',
+  'entities.abilities.icefall.name': 'Ледопад',
+  'entities.abilities.icefall.description':
+    'Выпускает в цель все накопленные сосульки. Каждая наносит {damage} ед. урона от магии льда. Если цель обездвижена или оглушена либо действует «Обморожение», урон увеличивается в 2,5 раза, а «Обморожение» расходуется. Этот фиксированный урон не может быть критическим. (Криомантия)',
   'entities.abilities.conjure_water.name': 'Сотворение воды',
   'entities.abilities.conjure_water.description':
     'Создает 2 бутылки воды, восстанавливающей ману при питье. Более высокие ранги создают более чистую воду.',
@@ -2464,7 +2467,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Обжигает врага, нанося {damage} ед. урона от огня. Быстрое заклинание.',
   'entities.abilities.pyroblast.name': 'Огненное копьё',
   'entities.abilities.pyroblast.description':
-    'Обрушивает на врага громадный пылающий камень, наносящий {damage} ед. урона от огня и дополнительный урон с течением времени.',
+    'Обрушивает на врага громадный пылающий камень, наносящий {damage} ед. урона от огня и еще {overTime} ед. урона от огня за 12 сек.',
   'entities.abilities.ice_barrier.name': 'Морозная завеса',
   'entities.abilities.ice_barrier.description':
     'Защищает вас льдом, поглощая {damage} ед. урона в течение 60 сек.',
@@ -2628,7 +2631,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Медленная, но мощная молитва, исцеляющая дружественную цель на {damage}.',
   'entities.abilities.mind_flay.name': 'Литания скорби',
   'entities.abilities.mind_flay.description':
-    'Терзает разум цели темной энергией, нанося {damage} ед. урона каждую секунду в течение 3 сек.',
+    'Терзает разум цели темной энергией в течение 3 сек. С каждым тиком урон увеличивается на 30% от урона первого тика.',
   'entities.abilities.flash_heal.name': 'Спешная молитва',
   'entities.abilities.flash_heal.description':
     'Быстрая молитва, исцеляющая дружественную цель на {damage}.',
@@ -2837,9 +2840,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.trueshot_aura.name': 'Аура меткого выстрела',
   'entities.abilities.trueshot_aura.description':
     'Воодушевляет ближайших союзников, повышая силу атаки на 35 на 5 мин. (знаковое умение Стрельбы)',
-  'entities.abilities.wyvern_sting.name': 'Укус виверны',
+  'entities.abilities.wyvern_sting.name': 'Терновая ловушка',
   'entities.abilities.wyvern_sting.description':
-    'Поражает врага издалека и выводит его из строя на срок до 4 сек. Любой урон прерывает эффект. (знаковое умение Выживания)',
+    'Устанавливает в выбранной области терновую ловушку, обездвиживая врагов в радиусе 5 м на 4 сек. (знаковое умение Полевого ремесла)',
   'entities.abilities.arcane_power.name': 'Мощь тайной магии',
   'entities.abilities.arcane_power.description':
     'Повышает урон от заклинаний на 20% и скорость заклинаний на 10% на 10 сек. (знаковое умение Тайной магии)',
@@ -2855,9 +2858,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blade_flurry.name': 'Шквал клинков',
   'entities.abilities.blade_flurry.description':
     'Обрушивает шквал клинков, повышая скорость атаки на 20% на 12 сек. (знаковое умение Боя)',
-  'entities.abilities.hemorrhage.name': 'Кровоизлияние',
+  'entities.abilities.hemorrhage.name': 'Падение маски',
   'entities.abilities.hemorrhage.description':
-    'Бьет врага, нанося урон оружием плюс {damage}, и вызывает кровотечение на 12 сек. Дает 1 прием. (знаковое умение Скрытности)',
+    'Бьет врага оружием, нанося урон оружием плюс {damage}. Дает 1 прием. (знаковое умение Тайных приемов)',
   'entities.abilities.power_infusion.name': 'Придание сил',
   'entities.abilities.power_infusion.description':
     'Наполняет дружественную цель силой, повышая ее силу заклинаний на 28 на 15 сек. (знаковое умение Послушания)',
@@ -5112,6 +5115,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Длительное усиление на себя, которое укрепляет броню перед боем.',
   'guide.abilityHook.frostbolt':
     'Бьет с дистанции и замедляет цель, чтобы она не смогла к вам приблизиться.',
+  'guide.abilityHook.blink':
+    'Телепортирует вперед и снимает обездвиживание, давая каждому магу надежный способ отступить.',
   'guide.abilityHook.garrote':
     'Открытие из незаметности удавкой, которая наносит цели кровотечение со временем.',
   'guide.abilityHook.gouge':
@@ -6060,6 +6065,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.defensiveStance': 'Стойка стража: сниженный получаемый урон, больше угрозы',
   'hudChrome.auraEffect.righteousFury':
     'Пылающая клятва: значительно повышенная угроза от урона Святой школы',
+  'hudChrome.auraEffect.stormcharge':
+    'Призыватель бури {stacks}/{max}: каждый заряд сокращает время применения Дуговой стрелы на {castPct}% и повышает её урон на {damagePct}%',
+  'hudChrome.auraEffect.aethericFlux':
+    'Тайная нестабильность {stacks}/{max}: каждый заряд сокращает время восстановления Мощи тайной магии на {cooldown} сек.; Мощь тайной магии поглощает все заряды и восстанавливает {manaPct}% максимального запаса маны за каждый',
+  'hudChrome.auraEffect.nextAbilityDamage':
+    'Урон следующей подходящей способности повышен на {pct}%',
   'hudChrome.auraEffect.scale': 'Размер увеличен на {pct}%',
   'hudChrome.auraEffect.jump': 'Высота прыжка увеличена на {pct}%',
   'hudChrome.auraEffect.school.physical': 'Физическая',

@@ -8,7 +8,10 @@ import {
   AURA_VISIBLE_CAP_LOW,
   auraRefreshIntervalMs,
   auraVisibleCap,
+  CHARACTER_AURA_PARTICLE_SCALE_FULL,
+  CHARACTER_AURA_PARTICLE_SCALE_LOW,
   cadenceDue,
+  characterAuraParticleScale,
   coerceFxTier,
   FCT_MAX_CONCURRENT_LOW,
   FCT_TTL_SCALE_FULL,
@@ -46,6 +49,7 @@ describe('ui_tier_knobs - determinism (pure: same input, same output)', () => {
       expect(auraVisibleCap(tier)).toBe(auraVisibleCap(tier));
       expect(auraRefreshIntervalMs(tier)).toBe(auraRefreshIntervalMs(tier));
       expect(targetFrameNonSelfIntervalMs(tier)).toBe(targetFrameNonSelfIntervalMs(tier));
+      expect(characterAuraParticleScale(tier)).toBe(characterAuraParticleScale(tier));
     }
   });
 });
@@ -64,6 +68,7 @@ describe('ui_tier_knobs - no-op on full tiers (ultra byte-equivalent to pre-tier
       expect(minimapRedrawIntervalMs(tier)).toBe(0);
       expect(auraRefreshIntervalMs(tier)).toBe(0);
       expect(targetFrameNonSelfIntervalMs(tier)).toBe(0);
+      expect(characterAuraParticleScale(tier)).toBe(CHARACTER_AURA_PARTICLE_SCALE_FULL);
     }
   });
 
@@ -104,6 +109,12 @@ describe('ui_tier_knobs - low sheds cost on every knob', () => {
     expect(auraRefreshIntervalMs('low')).toBe(AURA_REFRESH_INTERVAL_LOW_MS);
     expect(targetFrameNonSelfIntervalMs('low')).toBe(TARGET_FRAME_NONSELF_INTERVAL_LOW_MS);
   });
+
+  it('character aura emitters keep rendering but shed particle density on low', () => {
+    expect(characterAuraParticleScale('low')).toBe(CHARACTER_AURA_PARTICLE_SCALE_LOW);
+    expect(characterAuraParticleScale('low')).toBeGreaterThan(0);
+    expect(characterAuraParticleScale('low')).toBeLessThan(CHARACTER_AURA_PARTICLE_SCALE_FULL);
+  });
 });
 
 describe('ui_tier_knobs - LOW shed magnitudes are pinned to literals (perf-gate bounds)', () => {
@@ -119,6 +130,7 @@ describe('ui_tier_knobs - LOW shed magnitudes are pinned to literals (perf-gate 
     expect(MINIMAP_REDRAW_INTERVAL_LOW_MS).toBe(250);
     expect(AURA_REFRESH_INTERVAL_LOW_MS).toBe(250);
     expect(TARGET_FRAME_NONSELF_INTERVAL_LOW_MS).toBe(100);
+    expect(CHARACTER_AURA_PARTICLE_SCALE_LOW).toBe(0.45);
   });
 });
 
@@ -282,6 +294,7 @@ describe('ui_tier_knobs - behavioral: only the tier moves a knob', () => {
       auraCap: auraVisibleCap(tier),
       auraRefresh: auraRefreshIntervalMs(tier),
       target: targetFrameNonSelfIntervalMs(tier),
+      characterAuraParticles: characterAuraParticleScale(tier),
     });
     const before = ALL_TIERS.map(snapshot);
     // Unrelated churn that a governor-driven knob would react to (it must not here).
@@ -323,6 +336,58 @@ describe('ui_tier_knobs - two-controller WIRING: Hud.fxTier reads the static sta
     expect(body).not.toMatch(/governor/i);
     expect(body).not.toMatch(/\.state\s*\(/);
     expect(body).not.toMatch(/\.levels\b/);
+  });
+});
+
+describe('ui_tier_knobs - character aura VFX use the static tier, not the FPS governor', () => {
+  const rendererSrc = readFileSync(
+    fileURLToPath(new URL('../src/render/renderer.ts', import.meta.url)),
+    'utf8',
+  );
+  const vfxSrc = readFileSync(
+    fileURLToPath(new URL('../src/render/vfx.ts', import.meta.url)),
+    'utf8',
+  );
+  const setterBody =
+    vfxSrc.match(
+      /setStaticEffectsTier\s*\(tier:\s*UiEffectsTier\)\s*:\s*void\s*\{([\s\S]*?)\n\s{2}\}/,
+    )?.[1] ?? '';
+  const emitBody =
+    vfxSrc.match(
+      /private\s+characterAuraEmitCount\s*\([^)]*\)\s*:\s*number\s*\{([\s\S]*?)\n\s{2}\}/,
+    )?.[1] ?? '';
+  const countBody =
+    vfxSrc.match(
+      /private\s+characterAuraVisibleCount\s*\([^)]*\)\s*:\s*number\s*\{([\s\S]*?)\n\s{2}\}/,
+    )?.[1] ?? '';
+  const icicleOrbitBody =
+    vfxSrc.match(/\bicicleOrbit\s*\([\s\S]*?\)\s*:\s*void\s*\{([\s\S]*?)\n\s{2}\}/)?.[1] ?? '';
+  const thunderWardBody =
+    vfxSrc.match(/\bthunderWard\s*\([\s\S]*?\)\s*:\s*void\s*\{([\s\S]*?)\n\s{2}\}/)?.[1] ?? '';
+
+  it('renderer feeds Vfx from the published static data-fx-level stamp', () => {
+    expect(rendererSrc).toMatch(
+      /const staticEffectsTier = coerceFxTier\(document\.documentElement\.dataset\.fxLevel\)/,
+    );
+    expect(rendererSrc).toMatch(/this\.vfx\.setStaticEffectsTier\(staticEffectsTier\)/);
+  });
+
+  it('the static setter and character-aura density helpers never read adaptive quality', () => {
+    expect(setterBody).toContain('characterAuraParticleScale(tier)');
+    expect(setterBody).not.toMatch(/this\.quality/);
+    expect(emitBody).toContain('this.characterAuraParticleScale');
+    expect(emitBody).not.toMatch(/this\.quality/);
+    expect(countBody).toContain('this.characterAuraParticleScale');
+    expect(countBody).not.toMatch(/this\.quality/);
+  });
+
+  it('both character emitters stay on the static character-aura helpers', () => {
+    expect(icicleOrbitBody).toContain('this.characterAuraEmitCount');
+    expect(icicleOrbitBody).toContain('this.characterAuraVisibleCount');
+    expect(thunderWardBody).toContain('this.characterAuraEmitCount');
+    for (const body of [icicleOrbitBody, thunderWardBody]) {
+      expect(body).not.toMatch(/this\.(?:quality|emitCount|emitChance|scaledCount)/);
+    }
   });
 });
 

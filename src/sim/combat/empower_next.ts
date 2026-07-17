@@ -1,5 +1,6 @@
 import type { SimContext } from '../sim_context';
 import type { Aura, AuraKind, Entity } from '../types';
+import { onFreeCastConsumed } from './talent_procs';
 
 function matches(aura: Aura, abilityId?: string): boolean {
   if (!aura.empowerAbilities) return true;
@@ -77,15 +78,23 @@ export function hasFreeCostFor(e: Entity, abilityId: string): boolean {
   return freeCostAuraActive(e.auras, abilityId);
 }
 
-export function consumeNextCastFree(ctx: SimContext, e: Entity, abilityId?: string): boolean {
+function consumeNextCastFreeAura(ctx: SimContext, e: Entity, abilityId?: string): Aura | null {
   return (
-    consumeAuraKind(ctx, e, 'next_cast_free', abilityId) !== null ||
-    consumeAuraKind(ctx, e, 'next_execute_free', abilityId) !== null
+    consumeAuraKind(ctx, e, 'next_cast_free', abilityId) ??
+    consumeAuraKind(ctx, e, 'next_execute_free', abilityId)
   );
 }
 
+export function consumeNextCastFree(ctx: SimContext, e: Entity, abilityId?: string): boolean {
+  return consumeNextCastFreeAura(ctx, e, abilityId) !== null;
+}
+
 export function consumeFreeCostFor(ctx: SimContext, e: Entity, abilityId: string): boolean {
-  if (consumeNextCastFree(ctx, e, abilityId)) return true;
+  const freeAura = consumeNextCastFreeAura(ctx, e, abilityId);
+  if (freeAura) {
+    onFreeCastConsumed(ctx, e, abilityId, freeAura.id);
+    return true;
+  }
   if (BATTLE_TRANCE_ABILITIES.has(abilityId) && consumeAuraKind(ctx, e, 'battle_trance') !== null) {
     return true;
   }
@@ -117,4 +126,12 @@ export function consumeNextCastCheap(
 
 export function consumeNextAttackCrit(ctx: SimContext, e: Entity): boolean {
   return consumeAuraKind(ctx, e, 'next_attack_crit') !== null;
+}
+
+export function consumeNextAbilityDamage(
+  ctx: SimContext,
+  e: Entity,
+  abilityId: string,
+): Aura | null {
+  return consumeAuraKind(ctx, e, 'next_ability_damage', abilityId);
 }

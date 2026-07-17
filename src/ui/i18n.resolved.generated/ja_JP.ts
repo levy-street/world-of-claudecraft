@@ -1396,6 +1396,9 @@ export const ja_JP: EnTranslations = {
       "formTravel": "フリートフォーム: 移動速度が{pct}%上昇",
       "defensiveStance": "ガーデッドスタンス: 受けるダメージが減少し、脅威度が上昇",
       "righteousFury": "バーニングオース: 神聖ダメージによる脅威度が大幅に上昇",
+      "stormcharge": "ストームコーラー {stacks}/{max}: 1スタックごとに電弧の矢の詠唱時間を{castPct}%短縮し、ダメージを{damagePct}%増加",
+      "aethericFlux": "秘術の不安定 {stacks}/{max}: 1スタックごとにアーケインパワーのクールダウンを{cooldown}秒短縮。アーケインパワーは全スタックを消費し、1スタックごとに最大マナの{manaPct}%を回復",
+      "nextAbilityDamage": "次の対象アビリティのダメージが{pct}%増加",
       "scale": "サイズが{pct}%増加",
       "jump": "ジャンプの高さが{pct}%増加",
       "school": {
@@ -2510,6 +2513,7 @@ export const ja_JP: EnTranslations = {
       "frost_armor": "戦闘の前にアーマーを固める、持続する自己強化です。",
       "arcane_intellect": "知力を上げて仲間のマナ総量を増やします。プルの前に唱えておきましょう。",
       "frostbolt": "遠距離から攻撃し、標的を減速させて近づけなくします。",
+      "blink": "前方へ瞬間移動して移動不能を解除し、すべてのメイジに確実な脱出手段を与えます。",
       "conjure_water": "マナを回復する飲み物を作り出し、プルの合間に補充できます。",
       "conjure_food": "座って食べると体力を回復する食料を作り出します。",
       "shadow_bolt": "標的に放つシャドウのボルト。主力の火力です。",
@@ -5743,7 +5747,7 @@ export const ja_JP: EnTranslations = {
       },
       "fireball": {
         "name": "灰燼の矢",
-        "description": "炎の球を放ち、{damage} の火炎ダメージと追加の継続ダメージを与えます。"
+        "description": "炎の球を放ち、{damage}の火炎ダメージと{overTime}の継続火炎ダメージを与えます。"
       },
       "frost_armor": {
         "name": "白霜の外套",
@@ -5756,6 +5760,10 @@ export const ja_JP: EnTranslations = {
       "frostbolt": {
         "name": "霧氷の槍",
         "description": "氷の矢を放ち、{damage} の冷気ダメージを与え、移動速度を40%低下させます。"
+      },
+      "icefall": {
+        "name": "氷瀑",
+        "description": "蓄えた氷柱をすべて対象へ放ち、1本につき{damage}の冷気ダメージを与えます。対象が移動不能またはスタン状態か、凍傷が有効な間は2.5倍のダメージを与え、凍傷を消費します。この固定ダメージはクリティカルになりません。（氷術）"
       },
       "conjure_water": {
         "name": "水の召喚",
@@ -5791,7 +5799,7 @@ export const ja_JP: EnTranslations = {
       },
       "pyroblast": {
         "name": "火焔槍",
-        "description": "巨大な炎の岩塊を放ち、{damage} の火炎ダメージと追加の継続ダメージを与えます。"
+        "description": "巨大な炎の岩塊を放ち、{damage}の火炎ダメージと12秒間で{overTime}の火炎ダメージを与えます。"
       },
       "ice_barrier": {
         "name": "氷の帳",
@@ -6023,7 +6031,7 @@ export const ja_JP: EnTranslations = {
       },
       "mind_flay": {
         "name": "嘆きの連祷",
-        "description": "暗黒エネルギーで対象の精神を攻撃し、3秒間、毎秒{damage}ダメージを与えます。"
+        "description": "暗黒エネルギーで対象の精神を3秒間攻撃します。各ティックのダメージは、最初のティックのダメージの30%ずつ増加します。"
       },
       "flash_heal": {
         "name": "緊急の祈り",
@@ -6270,8 +6278,8 @@ export const ja_JP: EnTranslations = {
         "description": "近くの味方を鼓舞し、5分間攻撃力を35上げます。（マークスマンシップ特性のシグネチャ）"
       },
       "wyvern_sting": {
-        "name": "ワイバーンスティング",
-        "description": "遠距離から敵を刺し、最大4秒間行動不能にします。ダメージを受けると効果は解除されます。（サバイバル特性のシグネチャ）"
+        "name": "茨の罠",
+        "description": "指定地点に茨の罠を仕掛け、5ヤード以内の敵を4秒間移動不能にします。（フィールドクラフトのシグネチャー）"
       },
       "arcane_power": {
         "name": "アーケインパワー",
@@ -6294,8 +6302,8 @@ export const ja_JP: EnTranslations = {
         "description": "刃の連撃を放ち、12秒間攻撃速度を20%上げます。（コンバット特性のシグネチャ）"
       },
       "hemorrhage": {
-        "name": "ヘモリッジ",
-        "description": "敵を攻撃して武器ダメージに加え{damage}を与え、12秒間出血ダメージを与えます。コンボポイントを1得ます。（サブテリティ特性のシグネチャ）"
+        "name": "仮面落とし",
+        "description": "敵を武器で攻撃し、武器ダメージに加えて{damage}のダメージを与えます。コンボポイントを1得ます。（策略特性のシグネチャ）"
       },
       "power_infusion": {
         "name": "パワーインフュージョン",

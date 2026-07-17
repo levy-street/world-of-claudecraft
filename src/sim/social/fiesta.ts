@@ -158,6 +158,7 @@ export function mergeAugmentMods(base: TalentModifiers, augIds: string[]): Talen
           costPct: 0,
           cooldownPct: 0,
           castPct: 0,
+          channelDurationPct: 0,
           buffPct: 0,
           castWhileMoving: false,
           damagePushbackImmune: false,

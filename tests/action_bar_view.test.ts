@@ -23,15 +23,16 @@ import { t as realT } from '../src/ui/i18n';
 import { assertAllocationStable } from './util/alloc_probe';
 
 function ability(id: string, opts: Partial<AbilityDef> & { cost?: number } = {}): ActionBarAbility {
+  const { cost = 0, effects = [], ...defOpts } = opts;
   const def = {
     id,
     offGcd: false,
     cooldown: 6,
     requiresTarget: false,
     range: 0,
-    ...opts,
+    ...defOpts,
   } as unknown as AbilityDef;
-  return { def, cost: opts.cost ?? 0 };
+  return { def, cost, effects };
 }
 
 function item(id: string, kind?: string): ItemDef {
@@ -80,6 +81,7 @@ function fakeDeps(): ActionBarDeps {
 }
 
 interface WorldOpts {
+  playerId?: number;
   autoAttack?: boolean;
   dead?: boolean;
   resource?: number;
@@ -92,12 +94,15 @@ interface WorldOpts {
   targetDead?: boolean;
   inventory?: { itemId: string; count: number }[];
   stealthed?: boolean;
+  playerAuras?: ActionBarWorldInput['player']['auras'];
+  targetAuras?: NonNullable<ActionBarWorldInput['target']>['auras'];
 }
 
 function world(opts: WorldOpts = {}): ActionBarWorldInput {
   const targetPos = opts.targetPos === undefined ? null : opts.targetPos;
   return {
     player: {
+      id: opts.playerId ?? 7,
       autoAttack: opts.autoAttack ?? false,
       dead: opts.dead ?? false,
       resource: opts.resource ?? 100,
@@ -107,8 +112,16 @@ function world(opts: WorldOpts = {}): ActionBarWorldInput {
       queuedOnSwing: opts.queuedOnSwing ?? null,
       pos: opts.playerPos ?? { x: 0, y: 0, z: 0 },
       stealthed: opts.stealthed ?? false,
+      auras: opts.playerAuras ?? [],
     },
-    target: targetPos === null ? null : { dead: opts.targetDead ?? false, pos: targetPos },
+    target:
+      targetPos === null
+        ? null
+        : {
+            dead: opts.targetDead ?? false,
+            pos: targetPos,
+            auras: opts.targetAuras ?? [],
+          },
     inventory: opts.inventory ?? [],
   };
 }
@@ -304,6 +317,742 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
     );
     expect(view.tick(world({ queuedOnSwing: 'heroicStrike' })).slots[0].queued).toBe(true);
     expect(view.tick(world({ queuedOnSwing: null })).slots[0].queued).toBe(false);
+  });
+});
+
+describe('actionBarView: proc availability cues', () => {
+  const icicles = (stacks: number | undefined) => ({
+    id: 'mag_icicles',
+    kind: 'icicles' as const,
+    stacks,
+  });
+  const frostbite = { id: 'mag_frostbite', kind: 'frostbite' as const };
+  const ward = (charges: number) => ({
+    id: 'lightning_shield',
+    kind: 'thorns' as const,
+    charges,
+  });
+
+  it('marks Fell Shot armed during the Packbond free-shot window', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('arcane_shot') })),
+      fakeDeps(),
+    );
+
+    expect(view.tick(world()).slots[0].procState).toBe('none');
+    expect(
+      view.tick(
+        world({
+          playerAuras: [{ id: 'hun_packbond', kind: 'next_cast_free' }],
+        }),
+      ).slots[0].procState,
+    ).toBe('armed');
+    expect(
+      view.tick(
+        world({
+          playerAuras: [{ id: 'hun_menders_signal', kind: 'next_cast_free' }],
+        }),
+      ).slots[0].procState,
+    ).toBe('armed');
+  });
+
+  it('makes a proc-funded Fell Shot usable at zero mana without freeing other shots', () => {
+    const fellShot = createActionBarView(
+      descriptor(slot(1, { ability: ability('arcane_shot', { cost: 55 }) })),
+      fakeDeps(),
+    );
+    const longDraw = createActionBarView(
+      descriptor(slot(1, { ability: ability('aimed_shot', { cost: 50 }) })),
+      fakeDeps(),
+    );
+
+    expect(fellShot.tick(world({ resource: 0 })).slots[0].usable).toBe(false);
+    for (const id of ['hun_venom_relay', 'hun_packbond', 'hun_menders_signal']) {
+      const playerAuras = [{ id, kind: 'next_cast_free' as const }];
+      expect(fellShot.tick(world({ resource: 0, playerAuras })).slots[0].usable).toBe(true);
+      expect(longDraw.tick(world({ resource: 0, playerAuras })).slots[0].usable).toBe(false);
+    }
+  });
+
+  it('marks Long Draw armed during the Iron Aim instant-shot window', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('aimed_shot') })),
+      fakeDeps(),
+    );
+
+    expect(view.tick(world()).slots[0].procState).toBe('none');
+    expect(
+      view.tick(
+        world({
+          playerAuras: [{ id: 'hun_iron_aim', kind: 'next_cast_instant' }],
+        }),
+      ).slots[0].procState,
+    ).toBe('armed');
+  });
+
+  it('marks Gloom Bolt armed during either Warlock instant-cast window', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('shadow_bolt') })),
+      fakeDeps(),
+    );
+
+    expect(view.tick(world()).slots[0].procState).toBe('none');
+    expect(
+      view.tick(
+        world({
+          playerAuras: [{ id: 'wlk_fiendlore_handoff', kind: 'next_cast_instant' }],
+        }),
+      ).slots[0].procState,
+    ).toBe('armed');
+    expect(
+      view.tick(
+        world({
+          playerAuras: [{ id: 'wlk_desolation_gloom', kind: 'next_cast_instant' }],
+        }),
+      ).slots[0].procState,
+    ).toBe('armed');
+  });
+
+  it('marks Burning Pact armed during the Pain Communion response window', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('immolate') })),
+      fakeDeps(),
+    );
+
+    expect(view.tick(world()).slots[0].procState).toBe('none');
+    expect(
+      view.tick(
+        world({
+          playerAuras: [{ id: 'wlk_pain_communion', kind: 'next_cast_instant' }],
+        }),
+      ).slots[0].procState,
+    ).toBe('armed');
+  });
+
+  it('marks Desolation Conflagrate armed and usable at zero mana', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('conflagrate', { cost: 55 }) })),
+      fakeDeps(),
+    );
+    const playerAuras = [{ id: 'wlk_desolation_conflagrate', kind: 'next_cast_free' as const }];
+
+    expect(view.tick(world({ resource: 0 })).slots[0]).toMatchObject({
+      procState: 'none',
+      usable: false,
+    });
+    expect(view.tick(world({ resource: 0, playerAuras })).slots[0]).toMatchObject({
+      procState: 'armed',
+      usable: true,
+    });
+  });
+
+  it('marks Gutting Strike armed during either Fieldcraft melee window', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('raptor_strike') })),
+      fakeDeps(),
+    );
+
+    expect(view.tick(world()).slots[0].procState).toBe('none');
+    expect(
+      view.tick(
+        world({
+          playerAuras: [{ id: 'hun_quickblood_setup', kind: 'next_ability_damage' }],
+        }),
+      ).slots[0].procState,
+    ).toBe('armed');
+    expect(
+      view.tick(
+        world({
+          playerAuras: [{ id: 'hun_rainbreak', kind: 'next_ability_damage' }],
+        }),
+      ).slots[0].procState,
+    ).toBe('armed');
+  });
+
+  it('marks both Knifework finishers armed and usable during Redhanded', () => {
+    for (const abilityId of ['eviscerate', 'rupture']) {
+      const view = createActionBarView(
+        descriptor(slot(1, { ability: ability(abilityId, { cost: 35 }) })),
+        fakeDeps(),
+      );
+
+      expect(view.tick(world({ resource: 0 })).slots[0]).toMatchObject({
+        procState: 'none',
+        usable: false,
+      });
+      expect(
+        view.tick(
+          world({
+            resource: 0,
+            playerAuras: [{ id: 'rog_redhanded', kind: 'next_cast_free' }],
+          }),
+        ).slots[0],
+      ).toMatchObject({ procState: 'armed', usable: true });
+    }
+  });
+
+  it('marks Leaden Venom armed and usable during Venom Dividend', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('crippling_poison', { cost: 40 }) })),
+      fakeDeps(),
+    );
+
+    expect(view.tick(world({ resource: 0 })).slots[0]).toMatchObject({
+      procState: 'none',
+      usable: false,
+    });
+    expect(
+      view.tick(
+        world({
+          resource: 0,
+          playerAuras: [{ id: 'rog_deadly_brew', kind: 'next_cast_free' }],
+        }),
+      ).slots[0],
+    ).toMatchObject({ procState: 'armed', usable: true });
+  });
+
+  it("marks the melee attack armed during Scrapper's Edge", () => {
+    const view = createActionBarView(descriptor(slot(1, { attack: true })), fakeDeps());
+
+    expect(view.tick(world()).slots[0].procState).toBe('none');
+    expect(
+      view.tick(
+        world({
+          playerAuras: [{ id: 'rog_scrappers_edge', kind: 'next_ability_damage' }],
+        }),
+      ).slots[0].procState,
+    ).toBe('armed');
+  });
+
+  it('marks Redline Habit weapon strikes armed without lighting unrelated attacks', () => {
+    const descriptorFor = (abilityId: string) =>
+      descriptor(slot(1, { ability: ability(abilityId) }));
+    const playerAuras = [{ id: 'rog_adrenaline_junkie', kind: 'next_ability_damage' as const }];
+
+    for (const abilityId of [
+      'sinister_strike',
+      'backstab',
+      'ambush',
+      'hemorrhage',
+      'ghostly_strike',
+    ]) {
+      const view = createActionBarView(descriptorFor(abilityId), fakeDeps());
+      expect(view.tick(world({ playerAuras })).slots[0].procState, abilityId).toBe('armed');
+    }
+
+    const finisher = createActionBarView(descriptorFor('eviscerate'), fakeDeps());
+    expect(finisher.tick(world({ playerAuras })).slots[0].procState).toBe('none');
+  });
+
+  it('marks Maskfall armed during False Face, Redline Habit, or Dusk Dividend', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('hemorrhage') })),
+      fakeDeps(),
+    );
+
+    expect(view.tick(world()).slots[0].procState).toBe('none');
+    const windows = [
+      { id: 'rog_false_face', kind: 'next_ability_damage' as const },
+      { id: 'rog_adrenaline_junkie', kind: 'next_ability_damage' as const },
+      { id: 'rog_dusk_dividend', kind: 'next_cast_cheap' as const },
+    ];
+    for (const aura of windows) {
+      expect(view.tick(world({ playerAuras: [aura] })).slots[0].procState, aura.id).toBe('armed');
+    }
+  });
+
+  it('prices and cues every Dusk Dividend builder at half energy', () => {
+    const playerAuras = [{ id: 'rog_dusk_dividend', kind: 'next_cast_cheap' as const }];
+    const builders = [
+      ['sinister_strike', 45],
+      ['backstab', 60],
+      ['gouge', 45],
+      ['ambush', 60],
+      ['garrote', 50],
+      ['cheap_shot', 60],
+      ['hemorrhage', 35],
+      ['ghostly_strike', 40],
+    ] as const;
+
+    for (const [abilityId, cost] of builders) {
+      const view = createActionBarView(
+        descriptor(slot(1, { ability: ability(abilityId, { cost }) })),
+        fakeDeps(),
+      );
+      const discountedCost = Math.ceil(cost * 0.5);
+      expect(view.tick(world({ resource: discountedCost - 1, playerAuras })).slots[0].usable).toBe(
+        false,
+      );
+      expect(
+        view.tick(world({ resource: discountedCost, playerAuras })).slots[0],
+        abilityId,
+      ).toMatchObject({ usable: true, procState: 'armed' });
+    }
+
+    const finisher = createActionBarView(
+      descriptor(slot(1, { ability: ability('eviscerate', { cost: 35 }) })),
+      fakeDeps(),
+    );
+    expect(finisher.tick(world({ resource: 18, playerAuras })).slots[0]).toMatchObject({
+      usable: false,
+      procState: 'none',
+    });
+  });
+
+  it('prices and cues both halves of the Moonrage spell relay', () => {
+    const lunarWindow = [{ id: 'dru_moonrage_lunar', kind: 'next_cast_cheap' as const }];
+    for (const [abilityId, cost] of [
+      ['moonfire', 80],
+      ['starfire', 80],
+    ] as const) {
+      const view = createActionBarView(
+        descriptor(slot(1, { ability: ability(abilityId, { cost }) })),
+        fakeDeps(),
+      );
+      expect(view.tick(world({ resource: 39, playerAuras: lunarWindow })).slots[0]).toMatchObject({
+        usable: false,
+        procState: 'armed',
+      });
+      expect(view.tick(world({ resource: 40, playerAuras: lunarWindow })).slots[0]).toMatchObject({
+        usable: true,
+        procState: 'armed',
+      });
+    }
+
+    const wildbolt = createActionBarView(
+      descriptor(slot(1, { ability: ability('wrath', { cost: 70 }) })),
+      fakeDeps(),
+    );
+    expect(
+      wildbolt.tick(
+        world({
+          playerAuras: [{ id: 'dru_moonrage_wild', kind: 'next_cast_instant' }],
+        }),
+      ).slots[0].procState,
+    ).toBe('armed');
+  });
+
+  it('makes Galeheart usable at zero mana during the Typhoon relay', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('hurricane', { cost: 90 }) })),
+      fakeDeps(),
+    );
+
+    expect(view.tick(world({ resource: 0 })).slots[0]).toMatchObject({
+      usable: false,
+      procState: 'none',
+    });
+    expect(
+      view.tick(
+        world({
+          resource: 0,
+          playerAuras: [{ id: 'dru_typhoon_relay', kind: 'next_cast_free' }],
+        }),
+      ).slots[0],
+    ).toMatchObject({ usable: true, procState: 'armed' });
+  });
+
+  it('arms Primal Surge only for a Bruin facing a Primal Heart bleed', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('feral_charge') })),
+      fakeDeps(),
+    );
+    const target = {
+      targetPos: { x: 2, y: 0, z: 0 },
+      targetAuras: [{ id: 'dru_primal_heart_bleed', kind: 'dot' as const, sourceId: 7 }],
+    };
+
+    expect(view.tick(world(target)).slots[0].procState).toBe('none');
+    expect(
+      view.tick(
+        world({
+          ...target,
+          playerAuras: [{ id: 'bear_form', kind: 'form_bear' }],
+        }),
+      ).slots[0].procState,
+    ).toBe('armed');
+    expect(
+      view.tick(
+        world({
+          ...target,
+          playerAuras: [{ id: 'bear_form', kind: 'form_bear' }],
+          targetAuras: [{ id: 'dru_primal_heart_bleed', kind: 'dot', sourceId: 8 }],
+        }),
+      ).slots[0].procState,
+    ).toBe('none');
+    expect(
+      view.tick(
+        world({
+          ...target,
+          playerAuras: [{ id: 'cat_form', kind: 'form_cat' }],
+        }),
+      ).slots[0].procState,
+    ).toBe('none');
+  });
+
+  it('cues and funds every Red Haze form attack without freeing another ability', () => {
+    const playerAuras = [{ id: 'dru_red_haze_relay', kind: 'next_cast_free' as const }];
+    for (const abilityId of ['maul', 'swipe', 'claw', 'rake', 'ferocious_bite', 'rip']) {
+      const view = createActionBarView(
+        descriptor(slot(1, { ability: ability(abilityId, { cost: 40 }) })),
+        fakeDeps(),
+      );
+      expect(view.tick(world({ resource: 0, playerAuras })).slots[0]).toMatchObject({
+        usable: true,
+        procState: 'armed',
+      });
+    }
+
+    const wildbolt = createActionBarView(
+      descriptor(slot(1, { ability: ability('wrath', { cost: 40 }) })),
+      fakeDeps(),
+    );
+    expect(wildbolt.tick(world({ resource: 0, playerAuras })).slots[0]).toMatchObject({
+      usable: false,
+      procState: 'none',
+    });
+  });
+
+  it("cues Second Bloom during Grove's Gift without discounting its mana", () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('regrowth', { cost: 70 }) })),
+      fakeDeps(),
+    );
+    const playerAuras = [{ id: 'dru_groves_gift', kind: 'next_cast_instant' as const }];
+
+    expect(view.tick(world({ resource: 69, playerAuras })).slots[0]).toMatchObject({
+      usable: false,
+      procState: 'armed',
+    });
+    expect(view.tick(world({ resource: 70, playerAuras })).slots[0]).toMatchObject({
+      usable: true,
+      procState: 'armed',
+    });
+  });
+
+  it('prices and cues Wildbloom during Grove Covenant', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('rejuvenation', { cost: 80 }) })),
+      fakeDeps(),
+    );
+    const playerAuras = [{ id: 'dru_grove_covenant', kind: 'next_cast_cheap' as const }];
+
+    expect(view.tick(world({ resource: 39, playerAuras })).slots[0]).toMatchObject({
+      usable: false,
+      procState: 'armed',
+    });
+    expect(view.tick(world({ resource: 40, playerAuras })).slots[0]).toMatchObject({
+      usable: true,
+      procState: 'armed',
+    });
+  });
+
+  it('prices and cues each Doctrine prayer during Fixed Purpose', () => {
+    const playerAuras = [{ id: 'pri_fixed_purpose', kind: 'next_cast_cheap' as const }];
+    for (const abilityId of ['lesser_heal', 'heal', 'flash_heal']) {
+      const view = createActionBarView(
+        descriptor(slot(1, { ability: ability(abilityId, { cost: 80 }) })),
+        fakeDeps(),
+      );
+      expect(view.tick(world({ resource: 39, playerAuras })).slots[0]).toMatchObject({
+        usable: false,
+        procState: 'armed',
+      });
+      expect(view.tick(world({ resource: 40, playerAuras })).slots[0]).toMatchObject({
+        usable: true,
+        procState: 'armed',
+      });
+    }
+
+    const renew = createActionBarView(
+      descriptor(slot(1, { ability: ability('renew', { cost: 80 }) })),
+      fakeDeps(),
+    );
+    expect(renew.tick(world({ resource: 40, playerAuras })).slots[0]).toMatchObject({
+      usable: false,
+      procState: 'none',
+    });
+  });
+
+  it('funds Grave Mercy and cues both Last Blessing prayers at full mana cost', () => {
+    const grace = createActionBarView(
+      descriptor(slot(1, { ability: ability('renew', { cost: 80 }) })),
+      fakeDeps(),
+    );
+    const graveMercy = [{ id: 'pri_grave_mercy', kind: 'next_cast_free' as const }];
+    expect(grace.tick(world({ resource: 0, playerAuras: graveMercy })).slots[0]).toMatchObject({
+      usable: true,
+      procState: 'armed',
+    });
+
+    const lastBlessing = [{ id: 'pri_last_blessing', kind: 'next_cast_instant' as const }];
+    for (const abilityId of ['heal', 'flash_heal']) {
+      const prayer = createActionBarView(
+        descriptor(slot(1, { ability: ability(abilityId, { cost: 80 }) })),
+        fakeDeps(),
+      );
+      expect(
+        prayer.tick(world({ resource: 79, playerAuras: lastBlessing })).slots[0],
+      ).toMatchObject({ usable: false, procState: 'armed' });
+      expect(
+        prayer.tick(world({ resource: 80, playerAuras: lastBlessing })).slots[0],
+      ).toMatchObject({ usable: true, procState: 'armed' });
+    }
+
+    const whispered = createActionBarView(
+      descriptor(slot(1, { ability: ability('lesser_heal', { cost: 80 }) })),
+      fakeDeps(),
+    );
+    expect(
+      whispered.tick(world({ resource: 80, playerAuras: lastBlessing })).slots[0].procState,
+    ).toBe('none');
+  });
+
+  it('prices Cleansing Tides and cues Tideflow without making Chain Heal free', () => {
+    const mending = createActionBarView(
+      descriptor(slot(1, { ability: ability('healing_wave', { cost: 80 }) })),
+      fakeDeps(),
+    );
+    const cleansingTides = [{ id: 'sha_cleansing_tides', kind: 'next_cast_cheap' as const }];
+    expect(
+      mending.tick(world({ resource: 39, playerAuras: cleansingTides })).slots[0],
+    ).toMatchObject({ usable: false, procState: 'armed' });
+    expect(
+      mending.tick(world({ resource: 40, playerAuras: cleansingTides })).slots[0],
+    ).toMatchObject({ usable: true, procState: 'armed' });
+
+    const chain = createActionBarView(
+      descriptor(slot(1, { ability: ability('chain_heal', { cost: 80 }) })),
+      fakeDeps(),
+    );
+    const tideflow = [{ id: 'sha_tideflow', kind: 'next_cast_instant' as const }];
+    expect(chain.tick(world({ resource: 79, playerAuras: tideflow })).slots[0]).toMatchObject({
+      usable: false,
+      procState: 'armed',
+    });
+    expect(chain.tick(world({ resource: 80, playerAuras: tideflow })).slots[0]).toMatchObject({
+      usable: true,
+      procState: 'armed',
+    });
+  });
+
+  it('keeps ordinary abilities and Icefall without stored Icicles at none', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, { ability: ability('fireball') }),
+        slot(2, { ability: ability('icefall') }),
+      ),
+      fakeDeps(),
+    );
+    const state = view.tick(world({ playerAuras: [frostbite] }));
+
+    expect(state.slots[0].procState).toBe('none');
+    expect(state.slots[1].procState).toBe('none');
+  });
+
+  it('marks Icefall available with Icicles and armed for Frostbite or a rooted/stunned target', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('icefall') })),
+      fakeDeps(),
+    );
+
+    expect(view.tick(world({ playerAuras: [icicles(3)] })).slots[0].procState).toBe('available');
+    // AuraWire omits an exact stack count of one; presence still means one Icicle online.
+    expect(view.tick(world({ playerAuras: [icicles(undefined)] })).slots[0].procState).toBe(
+      'available',
+    );
+    expect(view.tick(world({ playerAuras: [icicles(3), frostbite] })).slots[0].procState).toBe(
+      'armed',
+    );
+    expect(
+      view.tick(
+        world({
+          playerAuras: [icicles(3)],
+          targetPos: { x: 5, y: 0, z: 0 },
+          targetAuras: [{ id: 'frost_nova', kind: 'root' }],
+        }),
+      ).slots[0].procState,
+    ).toBe('armed');
+    expect(
+      view.tick(
+        world({
+          playerAuras: [icicles(3)],
+          targetPos: { x: 5, y: 0, z: 0 },
+          targetAuras: [{ id: 'deep_freeze', kind: 'stun' }],
+        }),
+      ).slots[0].procState,
+    ).toBe('armed');
+    expect(
+      view.tick(
+        world({
+          playerAuras: [icicles(3)],
+          targetPos: { x: 5, y: 0, z: 0 },
+          targetAuras: [{ id: 'frostbolt', kind: 'slow' }],
+        }),
+      ).slots[0].procState,
+    ).toBe('available');
+    expect(
+      view.tick(
+        world({
+          playerAuras: [icicles(3)],
+          targetPos: { x: 5, y: 0, z: 0 },
+          targetDead: true,
+          targetAuras: [{ id: 'frost_nova', kind: 'root' }],
+        }),
+      ).slots[0].procState,
+    ).toBe('available');
+  });
+
+  it('lights Earthen Jolt only for the resolved Fulmination vent, arming at nine charges', () => {
+    const plainJolt = createActionBarView(
+      descriptor(slot(1, { ability: ability('earth_shock') })),
+      fakeDeps(),
+    );
+    const fulminationJolt = createActionBarView(
+      descriptor(
+        slot(1, {
+          ability: ability('earth_shock', {
+            effects: [
+              {
+                type: 'consumeAuraChargesDamage',
+                auraId: 'lightning_shield',
+                damagePerCharge: 8,
+                radius: 8,
+              },
+            ],
+          }),
+        }),
+      ),
+      fakeDeps(),
+    );
+
+    expect(plainJolt.tick(world({ playerAuras: [ward(9)] })).slots[0].procState).toBe('none');
+    expect(fulminationJolt.tick(world()).slots[0].procState).toBe('none');
+    expect(fulminationJolt.tick(world({ playerAuras: [ward(3)] })).slots[0].procState).toBe(
+      'available',
+    );
+    expect(fulminationJolt.tick(world({ playerAuras: [ward(9)] })).slots[0].procState).toBe(
+      'armed',
+    );
+  });
+
+  it('arms Rite of Expulsion only while Blood Debt is waiting to be spent', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('exorcism', { cost: 35 }) })),
+      fakeDeps(),
+    );
+
+    const unaffordable = view.tick(world({ resource: 0 })).slots[0];
+    expect(unaffordable.procState).toBe('none');
+    expect(unaffordable.usable).toBe(false);
+
+    const freeRite = view.tick(
+      world({
+        resource: 0,
+        playerAuras: [{ id: 'pal_blood_debt', kind: 'next_cast_free' }],
+      }),
+    ).slots[0];
+    expect(freeRite.procState).toBe('armed');
+    expect(freeRite.usable).toBe(true);
+  });
+
+  it("prices and cues Sacrament's Holy Shock and Lightmend handoff", () => {
+    const freeShock = createActionBarView(
+      descriptor(slot(1, { ability: ability('holy_shock', { cost: 55 }) })),
+      fakeDeps(),
+    );
+    expect(
+      freeShock.tick(
+        world({
+          resource: 0,
+          playerAuras: [{ id: 'pal_kindled_faith', kind: 'next_cast_free' }],
+        }),
+      ).slots[0],
+    ).toMatchObject({ usable: true, procState: 'armed' });
+
+    const cheapLightmend = createActionBarView(
+      descriptor(slot(1, { ability: ability('flash_of_light', { cost: 35 }) })),
+      fakeDeps(),
+    );
+    const playerAuras = [{ id: 'pal_dawns_reply', kind: 'next_cast_cheap' as const }];
+    expect(cheapLightmend.tick(world({ resource: 17, playerAuras })).slots[0]).toMatchObject({
+      usable: false,
+      procState: 'armed',
+    });
+    expect(cheapLightmend.tick(world({ resource: 18, playerAuras })).slots[0]).toMatchObject({
+      usable: true,
+      procState: 'armed',
+    });
+  });
+
+  it("prices and cues Vigil's Hallowed Wall and Verdict threat relay", () => {
+    const freeWall = createActionBarView(
+      descriptor(slot(1, { ability: ability('holy_shield', { cost: 30 }) })),
+      fakeDeps(),
+    );
+    expect(
+      freeWall.tick(
+        world({
+          resource: 0,
+          playerAuras: [{ id: 'pal_oathward', kind: 'next_cast_free' }],
+        }),
+      ).slots[0],
+    ).toMatchObject({ usable: true, procState: 'armed' });
+
+    const freeVerdict = createActionBarView(
+      descriptor(slot(1, { ability: ability('judgement', { cost: 30 }) })),
+      fakeDeps(),
+    );
+    expect(
+      freeVerdict.tick(
+        world({
+          resource: 0,
+          playerAuras: [{ id: 'pal_vigils_refrain', kind: 'next_cast_free' }],
+        }),
+      ).slots[0],
+    ).toMatchObject({ usable: true, procState: 'armed' });
+  });
+
+  it('does not make an unrelated unaffordable ability usable during Blood Debt', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('holy_shock', { cost: 35 }) })),
+      fakeDeps(),
+    );
+
+    expect(
+      view.tick(
+        world({
+          resource: 0,
+          playerAuras: [{ id: 'pal_blood_debt', kind: 'next_cast_free' }],
+        }),
+      ).slots[0].usable,
+    ).toBe(false);
+  });
+
+  it("arms Crusader Strike only while Oath's Due is waiting to be spent", () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('crusader_strike') })),
+      fakeDeps(),
+    );
+
+    expect(view.tick(world()).slots[0].procState).toBe('none');
+    expect(
+      view.tick(world({ playerAuras: [{ id: 'pal_oaths_due', kind: 'next_ability_damage' }] }))
+        .slots[0].procState,
+    ).toBe('armed');
+  });
+
+  it('clears a consumed proc state and remains deterministic for identical aura input', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('icefall') })),
+      fakeDeps(),
+    );
+    expect(view.tick(world({ playerAuras: [icicles(1)] })).slots[0].procState).toBe('available');
+    expect(view.tick(world()).slots[0].procState).toBe('none');
+
+    const input = world({ playerAuras: [icicles(5), frostbite] });
+    const first = structuredClone(view.tick(input));
+    expect(view.tick(input)).toEqual(first);
   });
 });
 

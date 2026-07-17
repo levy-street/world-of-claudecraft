@@ -280,6 +280,7 @@ export type AuraKind =
   | 'next_cast_free'
   | 'next_execute_free'
   | 'next_cast_cheap'
+  | 'next_ability_damage'
   | 'resource_sap'
   | 'next_attack_crit'
   | 'heal_echo'
@@ -319,7 +320,11 @@ export type AuraKind =
   | 'aoe_echo'
   | 'sure_crit'
   | 'buff_dr'
-  | 'buff_dr_phys';
+  | 'buff_dr_phys'
+  | 'aetheric_flux'
+  | 'icicles'
+  | 'stormcharge'
+  | 'frostbite';
 
 export interface Aura {
   id: string; // ability id that applied it
@@ -332,13 +337,17 @@ export interface Aura {
   value3?: number; // imbue: judgement max
   tickInterval?: number;
   tickTimer?: number;
+  // The tick amount was banked from damage that already passed source and target
+  // multipliers. Replaying it must still hit absorbs and terminal bookkeeping, but
+  // must not apply live damage multipliers a second time.
+  damageModifiersResolved?: boolean;
   sourceId: number;
   school: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
   breaksOnDamage?: boolean;
   // Lingering Dread lets a break-on-damage fear absorb this much damage before
   // breaking. Undefined retains the normal break-on-any-damage behavior.
   breakThreshold?: number;
-  // Per-application cap bookkeeping for effects such as Endless Dirge.
+  // Per-application bookkeeping for effects with capped duration extensions.
   extendedBy?: number;
   stacks?: number; // sunder armor: applications stack up to the effect's cap
   charges?: number; // thorns: remaining reflect charges (Lightning Shield); undefined => unlimited
@@ -1498,7 +1507,28 @@ export type AbilityEffect =
       requiresBehind?: boolean;
       weaponMult?: number;
     } // instant special attack (sinister strike, overpower, backstab)
-  | { type: 'directDamage'; min: number; max: number; vsRootedMult?: number }
+  | {
+      type: 'directDamage';
+      min: number;
+      max: number;
+      // Uses the authored minimum directly and cannot crit, so resolving the
+      // effect consumes no damage-roll or crit-roll RNG draws. Fixed also
+      // means no power rider: the flat Spell Power / Attack Power hit bonus is
+      // skipped, so the authored number is the real per-hit amount on any gear.
+      fixedNoCrit?: boolean;
+      vsRootedMult?: number;
+      vsFrozenMult?: number;
+      // An owned caster aura that opens this effect's frozen multiplier and is
+      // consumed by the hit. Icefall uses Frostbite as its boss-safe execute path.
+      consumeAuraAsFrozen?: string;
+      consumeAuraStacks?: { auraId: string; maxStacks: number };
+    }
+  | {
+      type: 'consumeAuraChargesDamage';
+      auraId: string;
+      damagePerCharge: number;
+      radius?: number;
+    }
   | { type: 'interrupt'; lockout: number; rageOnInterrupt?: number }
   | {
       type: 'chainDamage';
@@ -1533,7 +1563,8 @@ export type AbilityEffect =
   | { type: 'imbue'; bonus: number; duration: number; judgeMin?: number; judgeMax?: number } // seals / rockbiter: extra damage per swing
   | { type: 'judgement'; dmgMult?: number; flat?: number } // consume your imbue, deal its judgement damage to the target
   | { type: 'lifeTap'; hp: number; mana: number }
-  | { type: 'drainTick'; min: number; max: number; healFrac: number } // channel tick that heals the caster
+  | { type: 'drainTick'; min: number; max: number; healFrac: number; rampPct?: number } // channel tick that may heal the caster or ramp by ordinal
+  | { type: 'channelFinisher'; amount: number; radius: number } // deterministic AoE on a channel's final tick
   | {
       type: 'buffTarget';
       kind: AuraKind;
@@ -1565,6 +1596,8 @@ export type AbilityEffect =
       school?: Aura['school'];
     }
   | { type: 'extendDot'; dot: string; seconds: number; maxBonus: number }
+  | { type: 'refreshDot'; dot: string }
+  | { type: 'spreadDot'; dot: string; radius: number }
   | { type: 'consumeDot'; dot: string }
   | { type: 'slow'; mult: number; duration: number }
   | { type: 'root'; duration: number }
@@ -2094,6 +2127,10 @@ export interface Entity {
   castingAbility: string | null;
   castRemaining: number;
   castTotal: number;
+  /** Skyrend stacks captured when an Arc Bolt cast starts. Timed casts re-resolve
+   *  their ability at completion, so this transient snapshot keeps the damage
+   *  payoff tied to the same bank that shortened the cast. */
+  warspiritArcBoltStacks?: number;
   // Entity-targeted casting: the target captured at cast start for entity-targeted
   // casts (hostile and friendly) and channels. Timed casts and channel ticks resolve
   // against this id, so retargeting mid-cast/mid-channel cannot redirect the spell,
@@ -2107,6 +2144,9 @@ export interface Entity {
   channeling: boolean;
   channelTickTimer: number;
   channelTickEvery: number;
+  // Server-authoritative one-based channel ordinal. Only channels whose effects
+  // depend on their ordinal carry it; the online wire serializer omits it.
+  channelTicksFired?: number;
   gcdRemaining: number;
   cooldowns: Map<string, number>;
   // Native multi-charge abilities recharge sequentially through cooldowns.

@@ -2406,7 +2406,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flamestrike.description':
     '対象地点に炎の爆発を呼び出し、爆発に巻き込まれた敵に{damage}の火炎ダメージを与えます。',
   'entities.abilities.fireball.description':
-    '炎の球を放ち、{damage} の火炎ダメージと追加の継続ダメージを与えます。',
+    '炎の球を放ち、{damage}の火炎ダメージと{overTime}の継続火炎ダメージを与えます。',
   'entities.abilities.frost_armor.name': '白霜の外套',
   'entities.abilities.frost_armor.description':
     '霜で身を包み、30分間アーマーを{buff}増加させます。',
@@ -2415,6 +2415,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.frostbolt.name': '霧氷の槍',
   'entities.abilities.frostbolt.description':
     '氷の矢を放ち、{damage} の冷気ダメージを与え、移動速度を40%低下させます。',
+  'entities.abilities.icefall.name': '氷瀑',
+  'entities.abilities.icefall.description':
+    '蓄えた氷柱をすべて対象へ放ち、1本につき{damage}の冷気ダメージを与えます。対象が移動不能またはスタン状態か、凍傷が有効な間は2.5倍のダメージを与え、凍傷を消費します。この固定ダメージはクリティカルになりません。（氷術）',
   'entities.abilities.conjure_water.name': '水の召喚',
   'entities.abilities.conjure_water.description':
     '飲むとマナを回復する水の瓶を2本召喚します。高ランクではより純粋な水を召喚します。',
@@ -2441,7 +2444,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '敵を焼き、{damage} の火炎ダメージを与えます。詠唱が速い呪文です。',
   'entities.abilities.pyroblast.name': '火焔槍',
   'entities.abilities.pyroblast.description':
-    '巨大な炎の岩塊を放ち、{damage} の火炎ダメージと追加の継続ダメージを与えます。',
+    '巨大な炎の岩塊を放ち、{damage}の火炎ダメージと12秒間で{overTime}の火炎ダメージを与えます。',
   'entities.abilities.ice_barrier.name': '氷の帳',
   'entities.abilities.ice_barrier.description':
     '氷で身を守り、60秒間{damage}ダメージを吸収します。',
@@ -2603,7 +2606,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '遅いが強力な祈りで、味方対象の体力を {damage} 回復します。',
   'entities.abilities.mind_flay.name': '嘆きの連祷',
   'entities.abilities.mind_flay.description':
-    '暗黒エネルギーで対象の精神を攻撃し、3秒間、毎秒{damage}ダメージを与えます。',
+    '暗黒エネルギーで対象の精神を3秒間攻撃します。各ティックのダメージは、最初のティックのダメージの30%ずつ増加します。',
   'entities.abilities.flash_heal.name': '緊急の祈り',
   'entities.abilities.flash_heal.description': '素早い祈りで味方対象の体力を {damage} 回復します。',
   'entities.abilities.lightning_bolt.name': '電弧の矢',
@@ -2808,9 +2811,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.trueshot_aura.name': 'トゥルーショットオーラ',
   'entities.abilities.trueshot_aura.description':
     '近くの味方を鼓舞し、5分間攻撃力を35上げます。（マークスマンシップ特性のシグネチャ）',
-  'entities.abilities.wyvern_sting.name': 'ワイバーンスティング',
+  'entities.abilities.wyvern_sting.name': '茨の罠',
   'entities.abilities.wyvern_sting.description':
-    '遠距離から敵を刺し、最大4秒間行動不能にします。ダメージを受けると効果は解除されます。（サバイバル特性のシグネチャ）',
+    '指定地点に茨の罠を仕掛け、5ヤード以内の敵を4秒間移動不能にします。（フィールドクラフトのシグネチャー）',
   'entities.abilities.arcane_power.name': 'アーケインパワー',
   'entities.abilities.arcane_power.description':
     '10秒間、呪文ダメージが20%、呪文ヘイストが10%上がります。（アーケイン特性のシグネチャ）',
@@ -2826,9 +2829,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blade_flurry.name': 'ブレードフラリー',
   'entities.abilities.blade_flurry.description':
     '刃の連撃を放ち、12秒間攻撃速度を20%上げます。（コンバット特性のシグネチャ）',
-  'entities.abilities.hemorrhage.name': 'ヘモリッジ',
+  'entities.abilities.hemorrhage.name': '仮面落とし',
   'entities.abilities.hemorrhage.description':
-    '敵を攻撃して武器ダメージに加え{damage}を与え、12秒間出血ダメージを与えます。コンボポイントを1得ます。（サブテリティ特性のシグネチャ）',
+    '敵を武器で攻撃し、武器ダメージに加えて{damage}のダメージを与えます。コンボポイントを1得ます。（策略特性のシグネチャ）',
   'entities.abilities.power_infusion.name': 'パワーインフュージョン',
   'entities.abilities.power_infusion.description':
     '味方に力を注ぎ、15秒間呪文力を28上げます。（ディシプリン特性のシグネチャ）',
@@ -5043,6 +5046,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.flame_shock': '前面に一撃を与え、その後も継続して焼き続ける即時の燃焼です。',
   'guide.abilityHook.frost_armor': '戦闘の前にアーマーを固める、持続する自己強化です。',
   'guide.abilityHook.frostbolt': '遠距離から攻撃し、標的を減速させて近づけなくします。',
+  'guide.abilityHook.blink':
+    '前方へ瞬間移動して移動不能を解除し、すべてのメイジに確実な脱出手段を与えます。',
   'guide.abilityHook.garrote': 'ステルスから仕掛け、ワイヤーで標的を継続的に出血させます。',
   'guide.abilityHook.gouge': '標的を短時間行動不能にし、立ち位置を直したりピールしたりできます。',
   'guide.abilityHook.healing_touch':
@@ -5959,6 +5964,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.defensiveStance':
     'ガーデッドスタンス: 受けるダメージが減少し、脅威度が上昇',
   'hudChrome.auraEffect.righteousFury': 'バーニングオース: 神聖ダメージによる脅威度が大幅に上昇',
+  'hudChrome.auraEffect.stormcharge':
+    'ストームコーラー {stacks}/{max}: 1スタックごとに電弧の矢の詠唱時間を{castPct}%短縮し、ダメージを{damagePct}%増加',
+  'hudChrome.auraEffect.aethericFlux':
+    '秘術の不安定 {stacks}/{max}: 1スタックごとにアーケインパワーのクールダウンを{cooldown}秒短縮。アーケインパワーは全スタックを消費し、1スタックごとに最大マナの{manaPct}%を回復',
+  'hudChrome.auraEffect.nextAbilityDamage': '次の対象アビリティのダメージが{pct}%増加',
   'hudChrome.auraEffect.scale': 'サイズが{pct}%増加',
   'hudChrome.auraEffect.jump': 'ジャンプの高さが{pct}%増加',
   'hudChrome.auraEffect.school.physical': '物理',

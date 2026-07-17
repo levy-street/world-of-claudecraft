@@ -49,10 +49,9 @@ describe('mastery does not corrupt utility rate buffs (F1)', () => {
     expect(retThorns && 'value' in retThorns ? retThorns.value : null).toBe(6);
   });
 
-  it('Resolve Unbroken strengthens its stat buff via buffPct, not the buff-exempt dmgPct', () => {
-    // The active Talents V2 row buffs a percent stat buff; with damage mods no longer
-    // scaling percent buffs, it must ride buffPct. The row's 50% modifier scales the
-    // +5% base buff to the authored +7.5%, without rounding the percentage to 8%.
+  it('Last Blessing leaves the retired Fortitude scalar at its base value', () => {
+    // Last Blessing kept the stable row id when it replaced Resolve Unbroken. The
+    // selected healer weave must no longer mutate Litany of Resolve as a hidden rider.
     const mods = computeTalentModifiers(
       'priest',
       { spec: null, rows: { 17: 'pri_r17_improved_fortitude' } },
@@ -64,7 +63,7 @@ describe('mastery does not corrupt utility rate buffs (F1)', () => {
     const buff = fortitude?.effects.find(
       (e) => e.type === 'buffTarget' && e.kind === 'buff_sta_pct',
     );
-    expect(buff && 'value' in buff ? buff.value : null).toBe(7.5);
+    expect(buff && 'value' in buff ? buff.value : null).toBe(5);
   });
 });
 

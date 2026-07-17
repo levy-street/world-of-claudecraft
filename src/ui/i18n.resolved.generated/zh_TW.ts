@@ -1396,6 +1396,9 @@ export const zh_TW: EnTranslations = {
       "formTravel": "迅捷形態：移動速度提高 {pct}%",
       "defensiveStance": "戒備姿態：受到的傷害降低，威脅值提高",
       "righteousFury": "燃燒誓言：神聖傷害產生的威脅值大幅提高",
+      "stormcharge": "喚風者 {stacks}/{max}：每層使電弧箭施法時間縮短 {castPct}%，傷害提高 {damagePct}%",
+      "aethericFlux": "秘法失序 {stacks}/{max}：每層返還祕法強化 {cooldown} 秒冷卻時間；祕法強化會消耗全部層數，每層恢復 {manaPct}% 最大法力",
+      "nextAbilityDamage": "使下一個受影響技能的傷害提高 {pct}%",
       "scale": "體型增大 {pct}%",
       "jump": "跳躍高度提高 {pct}%",
       "school": {
@@ -2510,6 +2513,7 @@ export const zh_TW: EnTranslations = {
       "frost_armor": "持續的自我增益，在戰鬥前強化你的護甲。",
       "arcane_intellect": "提升智力以擴大友方的法力上限，開怪前先施放。",
       "frostbolt": "從遠處攻擊並使目標減速，讓它無法逼近你。",
+      "blink": "向前傳送並解除定身，讓每位法師都有可靠的脫身手段。",
       "conjure_water": "製造飲品以恢復法力，讓你能在每次開怪之間補滿。",
       "conjure_food": "製造食物，坐下進食時可恢復生命。",
       "shadow_bolt": "向目標施放一道暗影箭，是你慣用的核彈。",
@@ -5743,7 +5747,7 @@ export const zh_TW: EnTranslations = {
       },
       "fireball": {
         "name": "燼焰彈",
-        "description": "投擲一團火球，造成 {damage} 點火焰傷害，並附加持續傷害。"
+        "description": "投擲一團火球，造成 {damage} 點火焰傷害，並附加 {overTime} 點持續火焰傷害。"
       },
       "frost_armor": {
         "name": "白霜披風",
@@ -5756,6 +5760,10 @@ export const zh_TW: EnTranslations = {
       "frostbolt": {
         "name": "凜霜矛",
         "description": "發射一支寒冰箭，造成 {damage} 點冰霜傷害，並使移動速度降低 40%。"
+      },
+      "icefall": {
+        "name": "冰瀑",
+        "description": "向目標發射所有儲存的冰刺，每枚造成 {damage} 點冰霜傷害。若目標被定身或昏迷，或你擁有凍傷效果，則造成 2.5 倍傷害並消耗凍傷。此固定傷害無法造成致命一擊。（冰霜術）"
       },
       "conjure_water": {
         "name": "縛水術",
@@ -5791,7 +5799,7 @@ export const zh_TW: EnTranslations = {
       },
       "pyroblast": {
         "name": "烈焰長矛",
-        "description": "投擲一顆巨大的火焰隕石，造成 {damage} 點火焰傷害，並在一段時間內造成額外傷害。"
+        "description": "投擲一顆巨大的火焰隕石，造成 {damage} 點火焰傷害，並在 12 秒內造成 {overTime} 點火焰傷害。"
       },
       "ice_barrier": {
         "name": "冰霜帷幕",
@@ -6023,7 +6031,7 @@ export const zh_TW: EnTranslations = {
       },
       "mind_flay": {
         "name": "哀禍連禱",
-        "description": "用暗影能量攻擊目標的心靈，持續 3 秒，每秒造成 {damage} 點傷害。"
+        "description": "用暗影能量攻擊目標的心靈，持續3秒。每次跳動的傷害都會提高，增幅相當於首次跳動傷害的30%。"
       },
       "flash_heal": {
         "name": "急切祈禱",
@@ -6270,8 +6278,8 @@ export const zh_TW: EnTranslations = {
         "description": "鼓舞附近盟友，使攻擊強度提高35點，持續5分鐘。（射擊專精招牌）"
       },
       "wyvern_sting": {
-        "name": "翼龍釘刺",
-        "description": "從遠處釘刺敵人，使其癱瘓最多4秒。受到任何傷害都會打破效果。（生存專精招牌）"
+        "name": "荊棘陷阱",
+        "description": "在目標區域設置荊棘陷阱，使5碼內的敵人定身4秒。（戰地技藝專精招牌）"
       },
       "arcane_power": {
         "name": "祕法強化",
@@ -6294,8 +6302,8 @@ export const zh_TW: EnTranslations = {
         "description": "釋放劍刃亂舞，攻擊速度提高20%，持續12秒。（戰鬥專精招牌）"
       },
       "hemorrhage": {
-        "name": "出血",
-        "description": "攻擊敵人，造成武器傷害加{damage}點傷害，並在12秒內造成流血傷害。獎勵1個連擊點。（敏銳專精招牌）"
+        "name": "假面落幕",
+        "description": "以武器攻擊敵人，造成武器傷害加{damage}點傷害。獎勵1個連擊點。（詭術專精招牌）"
       },
       "power_infusion": {
         "name": "能量灌注",

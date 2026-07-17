@@ -26,6 +26,8 @@
 
 import {
   type AbilityDef,
+  type AbilityEffect,
+  type AuraKind,
   dist2d,
   GCD,
   type ItemDef,
@@ -37,6 +39,7 @@ import type { InterpolationValues, TranslationKey } from './i18n';
 
 // The four slot kinds (a discriminated tag the painter maps to DOM classes).
 export type ActionBarSlotKind = 'attack' | 'empty' | 'item' | 'ability';
+export type ActionBarProcState = 'none' | 'available' | 'armed';
 
 // Icon-key identities. The core emits a stable key per slot so the painter can elide
 // the (expensive) icon resolution + background-image write to slot-rebind frames
@@ -58,6 +61,11 @@ const COOLDOWN_TEXT_THRESHOLD = 1;
 // The container gets the 'many-spells' class once more than this many slots are
 // bound (the former `hotbarActions.filter(a => a !== null).length > 10`).
 const MANY_SPELLS_THRESHOLD = 10;
+const ICICLES_AURA_ID = 'mag_icicles';
+const ICICLES_MAX_STACKS = 5;
+const FROSTBITE_AURA_ID = 'mag_frostbite';
+const THUNDER_WARD_AURA_ID = 'lightning_shield';
+const FULMINATION_MAX_CHARGES = 9;
 
 // The i18n keys the core renders. They already exist in i18n.catalog/abilities.ts.
 const SLOT_ARIA_KEY: TranslationKey = 'abilityUi.actionBar.slotAria';
@@ -69,6 +77,22 @@ const ATTACK_NAME_KEY: TranslationKey = 'abilityUi.actionBar.attackName';
 export interface ActionBarAbility {
   def: AbilityDef;
   cost: number;
+  /** Talent-resolved effects. Fulmination appends its Thunder Ward vent here,
+   *  which lets the view distinguish it from an ordinary Earthen Jolt without
+   *  consulting the talent tree. */
+  effects: readonly AbilityEffect[];
+}
+
+/** The aura fields proc cues read. Entity auras in both worlds satisfy this
+ *  structural subset; tests can stay focused without constructing full auras. */
+export interface ActionBarAuraInput {
+  id: string;
+  kind: AuraKind;
+  /** Caster identity for ownership-sensitive proc cues. AuraWire and sim auras
+   *  both expose it; optional keeps unrelated presence-only cues lightweight. */
+  sourceId?: number;
+  stacks?: number;
+  charges?: number;
 }
 
 /** One slot of the bar descriptor: slot identity plus host-resolved accessors to the
@@ -115,6 +139,7 @@ export interface ActionBarDeps {
 
 /** The player fields the bar reads; a structural subset both worlds mirror. */
 export interface ActionBarPlayerInput {
+  id: number;
   autoAttack: boolean;
   dead: boolean;
   resource: number;
@@ -131,12 +156,16 @@ export interface ActionBarPlayerInput {
    *  stealth, so they looked equally "ready" whether or not the cast would
    *  actually succeed. */
   stealthed: boolean;
+  /** Mirrored self auras are the source of truth for proc/charge cues. */
+  auras: readonly ActionBarAuraInput[];
 }
 
 /** The target fields the bar reads; null when there is no current target. */
 export interface ActionBarTargetInput {
   dead: boolean;
   pos: Vec3;
+  /** Only literal root/stun kinds arm Icefall's frozen-target execute. */
+  auras: readonly ActionBarAuraInput[];
 }
 
 /** The world subset one tick reads: the player, the current target, and inventory
@@ -162,6 +191,8 @@ export interface ActionBarSlotState {
   usable: boolean;
   outOfRange: boolean;
   queued: boolean;
+  /** Tier-independent actionable cue. Cosmetic particle tiers never alter it. */
+  procState: ActionBarProcState;
   ariaLabel: string;
   keybindLabel: string;
 }
@@ -192,9 +223,418 @@ function makeSlotState(): ActionBarSlotState {
     usable: true,
     outOfRange: false,
     queued: false,
+    procState: 'none',
     ariaLabel: '',
     keybindLabel: '',
   };
+}
+
+type ProcStateResolver = (
+  ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+  target: ActionBarTargetInput | null,
+) => ActionBarProcState;
+
+function auraStacks(auras: readonly ActionBarAuraInput[], auraId: string): number {
+  for (const aura of auras) {
+    if (aura.id !== auraId) continue;
+    // AuraWire omits `stacks` when the exact count is one. Presence therefore
+    // reconstructs one online; explicit malformed values stay bounded.
+    const stacks = aura.stacks ?? 1;
+    if (!Number.isFinite(stacks)) return 0;
+    return Math.min(ICICLES_MAX_STACKS, Math.max(0, Math.trunc(stacks)));
+  }
+  return 0;
+}
+
+function auraCharges(auras: readonly ActionBarAuraInput[], auraId: string): number {
+  for (const aura of auras) {
+    if (aura.id === auraId) return Math.max(0, aura.charges ?? 0);
+  }
+  return 0;
+}
+
+function hasAura(auras: readonly ActionBarAuraInput[], auraId: string): boolean {
+  for (const aura of auras) if (aura.id === auraId) return true;
+  return false;
+}
+
+const FREE_COST_AURA_IDS_BY_ABILITY: Readonly<Record<string, readonly string[]>> = {
+  hurricane: ['dru_typhoon_relay'],
+  maul: ['dru_red_haze_relay'],
+  swipe: ['dru_red_haze_relay'],
+  claw: ['dru_red_haze_relay'],
+  rake: ['dru_red_haze_relay'],
+  ferocious_bite: ['dru_red_haze_relay'],
+  rip: ['dru_red_haze_relay'],
+  exorcism: ['pal_blood_debt'],
+  holy_shock: ['pal_kindled_faith'],
+  holy_shield: ['pal_oathward'],
+  judgement: ['pal_vigils_refrain'],
+  arcane_shot: ['hun_venom_relay', 'hun_packbond', 'hun_menders_signal'],
+  eviscerate: ['rog_redhanded'],
+  rupture: ['rog_redhanded'],
+  crippling_poison: ['rog_deadly_brew'],
+  conflagrate: ['wlk_desolation_conflagrate'],
+  renew: ['pri_grave_mercy'],
+};
+
+const CHEAP_COST_AURA_IDS_BY_ABILITY: Readonly<Record<string, readonly string[]>> = {
+  moonfire: ['dru_moonrage_lunar'],
+  starfire: ['dru_moonrage_lunar'],
+  rejuvenation: ['dru_grove_covenant'],
+  flash_of_light: ['pal_dawns_reply'],
+  lesser_heal: ['pri_fixed_purpose'],
+  heal: ['pri_fixed_purpose'],
+  flash_heal: ['pri_fixed_purpose'],
+  healing_wave: ['sha_cleansing_tides'],
+  sinister_strike: ['rog_dusk_dividend'],
+  backstab: ['rog_dusk_dividend'],
+  gouge: ['rog_dusk_dividend'],
+  ambush: ['rog_dusk_dividend'],
+  garrote: ['rog_dusk_dividend'],
+  cheap_shot: ['rog_dusk_dividend'],
+  hemorrhage: ['rog_dusk_dividend'],
+  ghostly_strike: ['rog_dusk_dividend'],
+};
+
+function talentProcMakesAbilityFree(
+  auras: readonly ActionBarAuraInput[],
+  abilityId: string,
+): boolean {
+  const auraIds = FREE_COST_AURA_IDS_BY_ABILITY[abilityId];
+  if (!auraIds) return false;
+  for (const aura of auras) {
+    if (aura.kind === 'next_cast_free' && auraIds.includes(aura.id)) return true;
+  }
+  return false;
+}
+
+function talentProcCostMultiplier(auras: readonly ActionBarAuraInput[], abilityId: string): number {
+  const auraIds = CHEAP_COST_AURA_IDS_BY_ABILITY[abilityId];
+  if (!auraIds) return 1;
+  for (const aura of auras) {
+    if (aura.kind === 'next_cast_cheap' && auraIds.includes(aura.id)) return 0.5;
+  }
+  return 1;
+}
+
+function icefallProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+  target: ActionBarTargetInput | null,
+): ActionBarProcState {
+  if (auraStacks(player.auras, ICICLES_AURA_ID) <= 0) return 'none';
+  if (hasAura(player.auras, FROSTBITE_AURA_ID)) return 'armed';
+  if (target !== null && !target.dead) {
+    for (const aura of target.auras) {
+      if (aura.kind === 'root' || aura.kind === 'stun') return 'armed';
+    }
+  }
+  return 'available';
+}
+
+function fulminationProcState(
+  ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  let ventsThunderWard = false;
+  for (const effect of ability.effects) {
+    if (effect.type === 'consumeAuraChargesDamage' && effect.auraId === THUNDER_WARD_AURA_ID) {
+      ventsThunderWard = true;
+      break;
+    }
+  }
+  if (!ventsThunderWard) return 'none';
+  const charges = auraCharges(player.auras, THUNDER_WARD_AURA_ID);
+  if (charges <= 0) return 'none';
+  return charges >= FULMINATION_MAX_CHARGES ? 'armed' : 'available';
+}
+
+function bloodDebtProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'pal_blood_debt') ? 'armed' : 'none';
+}
+
+function oathsDueProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'pal_oaths_due') ? 'armed' : 'none';
+}
+
+function kindledFaithProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'pal_kindled_faith') ? 'armed' : 'none';
+}
+
+function dawnsReplyProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'pal_dawns_reply') ? 'armed' : 'none';
+}
+
+function oathwardProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'pal_oathward') ? 'armed' : 'none';
+}
+
+function vigilsRefrainProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'pal_vigils_refrain') ? 'armed' : 'none';
+}
+
+function fellShotProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'hun_packbond') || hasAura(player.auras, 'hun_menders_signal')
+    ? 'armed'
+    : 'none';
+}
+
+function longDrawProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'hun_iron_aim') ? 'armed' : 'none';
+}
+
+function guttingStrikeProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'hun_quickblood_setup') || hasAura(player.auras, 'hun_rainbreak')
+    ? 'armed'
+    : 'none';
+}
+
+function redhandedFinisherProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'rog_redhanded') ? 'armed' : 'none';
+}
+
+function venomDividendProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'rog_deadly_brew') ? 'armed' : 'none';
+}
+
+function attackProcState(player: ActionBarPlayerInput): ActionBarProcState {
+  return hasAura(player.auras, 'rog_scrappers_edge') ? 'armed' : 'none';
+}
+
+function weaponBuilderProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'rog_adrenaline_junkie') ||
+    hasAura(player.auras, 'rog_dusk_dividend')
+    ? 'armed'
+    : 'none';
+}
+
+function maskfallProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'rog_false_face') ||
+    hasAura(player.auras, 'rog_adrenaline_junkie') ||
+    hasAura(player.auras, 'rog_dusk_dividend')
+    ? 'armed'
+    : 'none';
+}
+
+function duskBuilderProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'rog_dusk_dividend') ? 'armed' : 'none';
+}
+
+function gloomBoltProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'wlk_fiendlore_handoff') ||
+    hasAura(player.auras, 'wlk_desolation_gloom')
+    ? 'armed'
+    : 'none';
+}
+
+function burningPactProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'wlk_pain_communion') ? 'armed' : 'none';
+}
+
+function conflagrateProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'wlk_desolation_conflagrate') ? 'armed' : 'none';
+}
+
+function moonrageLunarProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'dru_moonrage_lunar') ? 'armed' : 'none';
+}
+
+function moonrageWildProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'dru_moonrage_wild') ? 'armed' : 'none';
+}
+
+function galeheartProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'dru_typhoon_relay') ? 'armed' : 'none';
+}
+
+function primalSurgeProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+  target: ActionBarTargetInput | null,
+): ActionBarProcState {
+  if (!hasAura(player.auras, 'bear_form') || target === null || target.dead) return 'none';
+  for (const aura of target.auras) {
+    if (aura.id === 'dru_primal_heart_bleed' && aura.sourceId === player.id) return 'armed';
+  }
+  return 'none';
+}
+
+function redHazeAttackProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'dru_red_haze_relay') ? 'armed' : 'none';
+}
+
+function grovesGiftProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'dru_groves_gift') ? 'armed' : 'none';
+}
+
+function groveCovenantProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'dru_grove_covenant') ? 'armed' : 'none';
+}
+
+function fixedPurposeProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'pri_fixed_purpose') ? 'armed' : 'none';
+}
+
+function graveMercyProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'pri_grave_mercy') ? 'armed' : 'none';
+}
+
+function priestPrayerProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'pri_fixed_purpose') || hasAura(player.auras, 'pri_last_blessing')
+    ? 'armed'
+    : 'none';
+}
+
+function cleansingTidesProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'sha_cleansing_tides') ? 'armed' : 'none';
+}
+
+function tideflowProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'sha_tideflow') ? 'armed' : 'none';
+}
+
+// Ability ids map to pure proc resolvers here, keeping the painter generic. New
+// action cues extend this table rather than adding ability branches to DOM code.
+const PROC_STATE_RESOLVERS: Readonly<Record<string, ProcStateResolver | undefined>> = {
+  icefall: icefallProcState,
+  earth_shock: fulminationProcState,
+  exorcism: bloodDebtProcState,
+  crusader_strike: oathsDueProcState,
+  holy_shock: kindledFaithProcState,
+  flash_of_light: dawnsReplyProcState,
+  holy_shield: oathwardProcState,
+  judgement: vigilsRefrainProcState,
+  arcane_shot: fellShotProcState,
+  aimed_shot: longDrawProcState,
+  raptor_strike: guttingStrikeProcState,
+  eviscerate: redhandedFinisherProcState,
+  rupture: redhandedFinisherProcState,
+  crippling_poison: venomDividendProcState,
+  sinister_strike: weaponBuilderProcState,
+  backstab: weaponBuilderProcState,
+  ambush: weaponBuilderProcState,
+  hemorrhage: maskfallProcState,
+  ghostly_strike: weaponBuilderProcState,
+  gouge: duskBuilderProcState,
+  garrote: duskBuilderProcState,
+  cheap_shot: duskBuilderProcState,
+  shadow_bolt: gloomBoltProcState,
+  immolate: burningPactProcState,
+  conflagrate: conflagrateProcState,
+  wrath: moonrageWildProcState,
+  moonfire: moonrageLunarProcState,
+  starfire: moonrageLunarProcState,
+  hurricane: galeheartProcState,
+  feral_charge: primalSurgeProcState,
+  maul: redHazeAttackProcState,
+  swipe: redHazeAttackProcState,
+  claw: redHazeAttackProcState,
+  rake: redHazeAttackProcState,
+  ferocious_bite: redHazeAttackProcState,
+  rip: redHazeAttackProcState,
+  regrowth: grovesGiftProcState,
+  rejuvenation: groveCovenantProcState,
+  lesser_heal: fixedPurposeProcState,
+  heal: priestPrayerProcState,
+  flash_heal: priestPrayerProcState,
+  renew: graveMercyProcState,
+  healing_wave: cleansingTidesProcState,
+  chain_heal: tideflowProcState,
+};
+
+function procStateForAbility(
+  ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+  target: ActionBarTargetInput | null,
+): ActionBarProcState {
+  const resolve = PROC_STATE_RESOLVERS[ability.def.id];
+  return resolve ? resolve(ability, player, target) : 'none';
 }
 
 function inventoryCount(
@@ -232,6 +672,7 @@ export function createActionBarView(
         const sd = descriptor.slots[i];
         const slot = slots[i];
         const slotLabel = deps.slotLabel(sd.slotIndex);
+        slot.procState = 'none';
 
         // many-spells counts RAW assigned slots (the attack slot reports no action),
         // byte-identical to the former hotbarActions.filter(a => a !== null).length.
@@ -256,6 +697,7 @@ export function createActionBarView(
           slot.usable = true;
           slot.outOfRange = tgtDist !== null && tgtDist > MELEE_RANGE;
           slot.queued = player.autoAttack;
+          slot.procState = attackProcState(player);
           slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {
             slot: slotLabel,
             ability: deps.t(ATTACK_NAME_KEY),
@@ -342,13 +784,17 @@ export function createActionBarView(
         slot.cdText = cd > COOLDOWN_TEXT_THRESHOLD ? deps.formatCount(Math.ceil(cd)) : '';
         slot.count = '';
         slot.usable =
-          !(player.resource < ability.cost) && (!def.requiresStealth || player.stealthed);
+          (player.resource >=
+            Math.ceil(ability.cost * talentProcCostMultiplier(player.auras, def.id)) ||
+            talentProcMakesAbilityFree(player.auras, def.id)) &&
+          (!def.requiresStealth || player.stealthed);
         slot.outOfRange =
           def.requiresTarget &&
           tgtDist !== null &&
           (tgtDist > (def.range > 0 ? def.range : MELEE_RANGE) ||
             (def.minRange !== undefined && tgtDist < def.minRange));
         slot.queued = player.queuedOnSwing === def.id;
+        slot.procState = procStateForAbility(ability, player, target);
         slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {
           slot: slotLabel,
           ability: deps.abilityName(def),

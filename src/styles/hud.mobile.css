@@ -829,6 +829,37 @@
       0 0 12px #ffd100aa,
       inset 0 0 0 1px #ffd10077;
   }
+  /* Same tier-independent actionable cue as the desktop action bar. The low
+     graphics preset may shed character particles, never this button state. */
+  body.mobile-touch #mobile-action-ring button.proc-available {
+    border-color: #7fd1ff;
+    box-shadow:
+      0 0 12px #7fd1ffcc,
+      inset 0 0 0 1px #bceaff88;
+  }
+  body.mobile-touch #mobile-action-ring button.proc-armed {
+    border-color: #fff4a8;
+    box-shadow:
+      0 0 16px #fff4a8ee,
+      0 0 25px #7fd1ff99,
+      inset 0 0 0 1px #ffffffaa;
+    animation: action-proc-armed-pulse 850ms ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    body.mobile-touch #mobile-action-ring button.proc-armed {
+      animation: none;
+    }
+  }
+  @media (forced-colors: active) {
+    body.mobile-touch #mobile-action-ring button.proc-available {
+      border-style: dashed;
+      border-width: 3px;
+    }
+    body.mobile-touch #mobile-action-ring button.proc-armed {
+      border-style: double;
+      border-width: 4px;
+    }
+  }
   body.mobile-touch #mobile-action-ring button.used {
     border-color: var(--gold);
   }

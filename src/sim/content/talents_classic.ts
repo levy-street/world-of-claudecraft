@@ -40,8 +40,26 @@ const PALADIN_SPECS: SpecDef[] = [
     'A devoted healer who turns the Light into steady single-target recovery.',
     'holy_shock',
     'Kindled Faith',
-    'Your healing spells critically heal for double.',
-    { global: { critDmgHealPct: 0.5 } },
+    'Every 3rd Mending Light or Lightmend makes your next Holy Shock within 10 sec free. Your healing spells critically heal for double.',
+    {
+      global: { critDmgHealPct: 0.5 },
+      proc: {
+        id: 'pal_kindled_faith',
+        name: 'Kindled Faith',
+        spec: 'holy',
+        requiresKnownAbility: 'holy_shock',
+        school: 'holy',
+        trigger: { on: 'castNth', n: 3, abilities: ['holy_light', 'flash_of_light'] },
+        responses: [
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_free',
+            abilities: ['holy_shock'],
+            duration: 10,
+          },
+        ],
+      },
+    },
   ),
   spec(
     'protection',
@@ -52,8 +70,40 @@ const PALADIN_SPECS: SpecDef[] = [
     'A shield-bearing defender who converts Holy power into threat and mitigation.',
     'holy_shield',
     'Oathward',
-    'Increases all threat you generate by 50% and your armor by 20%.',
-    { global: { threatPct: 0.5 }, stats: { armorPct: 0.2 } },
+    'While Burning Oath is active, every 3rd landed melee attack makes your next Hallowed Wall free for 10 sec. Hallowed Wall grants a ward that absorbs 90 damage for 6 sec. Increases all threat you generate by 50% and your armor by 20%.',
+    {
+      global: { threatPct: 0.5 },
+      stats: { armorPct: 0.2 },
+      procs: [
+        {
+          id: 'pal_oathward_guard',
+          name: 'Oathward',
+          spec: 'protection',
+          requiresKnownAbility: 'holy_shield',
+          school: 'holy',
+          trigger: { on: 'castNth', n: 1, abilities: ['holy_shield'] },
+          responses: [
+            { kind: 'absorb', amount: 90, duration: 6, name: 'Oathward', applyTo: 'self' },
+          ],
+        },
+        {
+          id: 'pal_oathward',
+          name: 'Oathward',
+          spec: 'protection',
+          requiresKnownAbility: 'holy_shield',
+          school: 'holy',
+          trigger: { on: 'meleeSwingWhile', auraKind: 'righteous_fury', n: 3 },
+          responses: [
+            {
+              kind: 'empowerNext',
+              aura: 'next_cast_free',
+              abilities: ['holy_shield'],
+              duration: 10,
+            },
+          ],
+        },
+      ],
+    },
   ),
   spec(
     'retribution',
@@ -64,8 +114,36 @@ const PALADIN_SPECS: SpecDef[] = [
     'A holy warrior who judges enemies with weapon strikes and radiant burst.',
     'crusader_strike',
     'Blood Debt',
-    'Increases your Holy and physical ability damage by 20%.',
-    { global: { meleeDmgPct: 0.2, spellDmgPct: 0.2 } },
+    "Each landed melee auto-attack and Crusader Strike has a 20% chance to clear Rite of Expulsion's cooldown and make your next Rite of Expulsion free for 8 sec. Increases your Holy and physical ability damage by 20%.",
+    {
+      global: { meleeDmgPct: 0.2, spellDmgPct: 0.2 },
+      proc: {
+        id: 'pal_blood_debt',
+        name: 'Blood Debt',
+        spec: 'retribution',
+        requiresKnownAbility: 'exorcism',
+        school: 'holy',
+        trigger: {
+          on: 'meleeHit',
+          abilities: ['auto_attack', 'crusader_strike'],
+          chance: 0.2,
+          chanceWhenEmpowered: {
+            ability: 'crusader_strike',
+            auraId: 'pal_oaths_due',
+            chance: 0.7,
+          },
+        },
+        responses: [
+          { kind: 'cooldownRefund', ability: 'exorcism', seconds: 'reset' },
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_free',
+            abilities: ['exorcism'],
+            duration: 8,
+          },
+        ],
+      },
+    },
   ),
 ];
 
@@ -79,8 +157,28 @@ const HUNTER_SPECS: SpecDef[] = [
     'A wild commander who fights beside a durable companion.',
     'bestial_wrath',
     'Packbond',
-    'Your pet deals 35% more damage. Increases maximum health by 8%.',
-    { global: { petDmgPct: 0.35 }, stats: { maxHpPct: 0.08 } },
+    'Your pet deals 20% more damage and you gain 8% maximum health. Every 3rd landed pet attack reduces Howling Rage cooldown by 4 sec and makes your next Fell Shot within 8 sec free.',
+    {
+      global: { petDmgPct: 0.2 },
+      stats: { maxHpPct: 0.08 },
+      proc: {
+        id: 'hun_packbond',
+        name: 'Packbond',
+        spec: 'beast_mastery',
+        requiresKnownAbility: 'bestial_wrath',
+        school: 'nature',
+        trigger: { on: 'petHitNth', n: 3 },
+        responses: [
+          { kind: 'cooldownRefund', ability: 'bestial_wrath', seconds: 4 },
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_free',
+            abilities: ['arcane_shot'],
+            duration: 8,
+          },
+        ],
+      },
+    },
   ),
   spec(
     'marksmanship',
@@ -91,8 +189,34 @@ const HUNTER_SPECS: SpecDef[] = [
     'A precise archer built around ranged burst and efficient shots.',
     'trueshot_aura',
     'Iron Aim',
-    'Increases your ranged ability damage by 20% and critical strike chance by 3%.',
-    { global: { meleeDmgPct: 0.2 }, stats: { crit: 0.03 } },
+    'Increases your ranged ability damage by 10% and critical strike chance by 3%. A landed Rattling Shot makes your next Long Draw within 8 sec instant.',
+    {
+      ability: [
+        { ability: 'serpent_sting', dmgPct: 0.1 },
+        { ability: 'arcane_shot', dmgPct: 0.1 },
+        { ability: 'concussive_shot', dmgPct: 0.1 },
+        { ability: 'aimed_shot', dmgPct: 0.1 },
+        { ability: 'multi_shot', dmgPct: 0.1 },
+        { ability: 'volley', dmgPct: 0.1 },
+      ],
+      stats: { crit: 0.03 },
+      proc: {
+        id: 'hun_iron_aim',
+        name: 'Iron Aim',
+        spec: 'marksmanship',
+        requiresKnownAbility: 'aimed_shot',
+        school: 'physical',
+        trigger: { on: 'rangedHit', abilities: ['concussive_shot'] },
+        responses: [
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_instant',
+            abilities: ['aimed_shot'],
+            duration: 8,
+          },
+        ],
+      },
+    },
   ),
   spec(
     'survival',
@@ -103,8 +227,42 @@ const HUNTER_SPECS: SpecDef[] = [
     'A skirmisher who controls distance and survives close pressure.',
     'wyvern_sting',
     'Quickblood',
-    'Increases your Agility by 15% and physical ability damage by 15%.',
-    { global: { meleeDmgPct: 0.15 }, stats: { agiPct: 0.15 } },
+    'Increases your Agility and physical ability damage by 5%. Briar Trap and Rime Snare make your next Gutting Strike within 12 sec deal 50% more damage. A landed Gutting Strike restores 10 mana and reduces Briar Trap cooldown by 8 sec.',
+    {
+      global: { meleeDmgPct: 0.05 },
+      stats: { agiPct: 0.05 },
+      procs: [
+        {
+          id: 'hun_quickblood_setup',
+          name: 'Quickblood',
+          spec: 'survival',
+          requiresKnownAbility: 'wyvern_sting',
+          school: 'nature',
+          trigger: { on: 'castNth', n: 1, abilities: ['wyvern_sting', 'frost_trap'] },
+          responses: [
+            {
+              kind: 'empowerNext',
+              aura: 'next_ability_damage',
+              abilities: ['raptor_strike'],
+              duration: 12,
+              dmgPct: 0.5,
+            },
+          ],
+        },
+        {
+          id: 'hun_quickblood_return',
+          name: 'Quickblood',
+          spec: 'survival',
+          requiresKnownAbility: 'wyvern_sting',
+          school: 'physical',
+          trigger: { on: 'meleeHit', abilities: ['raptor_strike'] },
+          responses: [
+            { kind: 'resource', amount: 10 },
+            { kind: 'cooldownRefund', ability: 'wyvern_sting', seconds: 8 },
+          ],
+        },
+      ],
+    },
   ),
 ];
 
@@ -118,8 +276,44 @@ const MAGE_SPECS: SpecDef[] = [
     'A precision caster using mana efficiency and focused arcane barrages.',
     'arcane_power',
     'Aetheric Flux',
-    'Increases your spell damage by 15% and your spell haste by 10%.',
-    { global: { spellDmgPct: 0.15, spellHastePct: 0.1 } },
+    'Spending mana on Aether Darts or Aetherburst builds Aetheric Flux for 20 sec, up to 4, and reduces Aether Surge cooldown by 10 sec. Aether Surge consumes the bank and restores 5% of maximum mana per stack. Increases your spell damage by 15% and your spell haste by 10%.',
+    {
+      global: { spellDmgPct: 0.15, spellHastePct: 0.1 },
+      procs: [
+        {
+          id: 'mag_aetheric_flux',
+          name: 'Aetheric Flux',
+          spec: 'arcane',
+          requiresKnownAbility: 'arcane_power',
+          school: 'arcane',
+          trigger: {
+            on: 'resourceSpent',
+            resourceType: 'mana',
+            abilities: ['arcane_missiles', 'arcane_explosion'],
+          },
+          responses: [
+            { kind: 'stackAura', aura: 'aetheric_flux', maxStacks: 4, duration: 20 },
+            { kind: 'cooldownRefund', ability: 'arcane_power', seconds: 10 },
+          ],
+        },
+        {
+          id: 'mag_aetheric_flux_release',
+          name: 'Aetheric Flux',
+          spec: 'arcane',
+          requiresKnownAbility: 'arcane_power',
+          school: 'arcane',
+          trigger: { on: 'castNth', n: 1, abilities: ['arcane_power'] },
+          responses: [
+            {
+              kind: 'consumeAuraStacksResource',
+              auraId: 'mag_aetheric_flux',
+              resourceType: 'mana',
+              pctMaxPerStack: 0.05,
+            },
+          ],
+        },
+      ],
+    },
   ),
   spec(
     'fire',
@@ -130,8 +324,34 @@ const MAGE_SPECS: SpecDef[] = [
     'A volatile caster built around fast, high-damage Fire spells.',
     'combustion',
     'Afterflame',
-    'Your spell critical strikes deal double damage. Increases critical strike chance by 2%.',
-    { global: { critDmgSpellPct: 0.5 }, stats: { crit: 0.02 } },
+    'Direct Cinderbolt, Cinderfall, Scald, and Pyrelance critical strikes store 20% of the damage dealt as a rolling Afterflame over 6 sec. A landed Cinderfall detonates the remaining Afterflame before a critical Cinderfall starts a fresh one. Your spell critical strikes deal double damage. Increases critical strike chance by 2%.',
+    {
+      global: { critDmgSpellPct: 0.5 },
+      stats: { crit: 0.02 },
+      procs: [
+        {
+          id: 'mag_afterflame',
+          name: 'Afterflame',
+          spec: 'fire',
+          requiresKnownAbility: 'combustion',
+          school: 'fire',
+          trigger: {
+            on: 'spellCrit',
+            abilities: ['fireball', 'fire_blast', 'scorch', 'pyroblast'],
+          },
+          responses: [{ kind: 'rollingDot', pctDamage: 0.2, duration: 6, interval: 2 }],
+        },
+        {
+          id: 'mag_afterflame_detonate',
+          name: 'Afterflame',
+          spec: 'fire',
+          requiresKnownAbility: 'combustion',
+          school: 'fire',
+          trigger: { on: 'spellHit', abilities: ['fire_blast'] },
+          responses: [{ kind: 'detonateOwnedDot', auraId: 'mag_afterflame' }],
+        },
+      ],
+    },
   ),
   spec(
     'frost',
@@ -142,7 +362,7 @@ const MAGE_SPECS: SpecDef[] = [
     'A controlling caster who trades peak burst for survival and slows.',
     'icy_veins',
     'Brittlebreak',
-    'Increases your Frost spell damage by 25%. Increases armor by 10%.',
+    'Increases your Frost spell damage by 25% and armor by 10%. Rimelance hits store an Icicle, up to 5, and have a 15% chance to grant Frostbite for 15 sec. Grants Icefall, which consumes the Icicles for fixed damage that cannot critically strike: 8 Frost damage each, or 20 each against a rooted or stunned target or while Frostbite is active. Icefall consumes Frostbite.',
     // The scalable mastery axis is the Frost-kit damage (ability-scoped so the
     // mage's fire/arcane baseline spells stay untouched); armor is the static
     // secondary. Crit-vs-rooted identity returns as a Shatter-style row option.
@@ -152,6 +372,25 @@ const MAGE_SPECS: SpecDef[] = [
         { ability: 'frost_nova', dmgPct: 0.25 },
       ],
       stats: { armorPct: 0.1 },
+      grant: { ability: 'icefall' },
+      proc: {
+        id: 'mag_icicles',
+        name: 'Icicles',
+        school: 'frost',
+        trigger: { on: 'spellHit', abilities: ['frostbolt'] },
+        responses: [
+          { kind: 'stackAura', aura: 'icicles', maxStacks: 5, duration: 3600 },
+          {
+            kind: 'chanceAura',
+            id: 'mag_frostbite',
+            name: 'Frostbite',
+            aura: 'frostbite',
+            chance: 0.15,
+            duration: 15,
+            charges: 1,
+          },
+        ],
+      },
     },
   ),
 ];
@@ -166,8 +405,27 @@ const ROGUE_SPECS: SpecDef[] = [
     'A burst specialist using critical strikes and finishers.',
     'cold_blood',
     'Redhanded',
-    'Increases your bleed damage by 20% and critical strike chance by 3%.',
-    { global: { dotDmgPct: 0.2 }, stats: { crit: 0.03 } },
+    'Increases your bleed damage by 20% and critical strike chance by 3%. Landing Leaden Venom makes your next Dirt Nap or Bleed Out within 8 sec free.',
+    {
+      global: { dotDmgPct: 0.2 },
+      stats: { crit: 0.03 },
+      proc: {
+        id: 'rog_redhanded',
+        name: 'Redhanded',
+        spec: 'assassination',
+        requiresKnownAbility: 'crippling_poison',
+        school: 'nature',
+        trigger: { on: 'spellHit', abilities: ['crippling_poison'] },
+        responses: [
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_free',
+            abilities: ['eviscerate', 'rupture'],
+            duration: 8,
+          },
+        ],
+      },
+    },
   ),
   spec(
     'combat',
@@ -178,8 +436,33 @@ const ROGUE_SPECS: SpecDef[] = [
     'A sustained fighter focused on direct weapon strikes.',
     'blade_flurry',
     "Scrapper's Edge",
-    'Increases attack speed by 10% and reduces melee ability damage by 10%.',
-    { global: { meleeHastePct: 0.1, meleeDmgPct: -0.1 } },
+    'Increases attack speed by 10% and reduces melee ability damage by 10%. Finishers restore 10 energy, reduce Mirrored Blades cooldown by 4 sec, and empower your next landed melee auto-attack within 8 sec to deal 50% more damage.',
+    {
+      global: { meleeHastePct: 0.1, meleeDmgPct: -0.1 },
+      proc: {
+        id: 'rog_scrappers_edge',
+        name: "Scrapper's Edge",
+        spec: 'combat',
+        requiresKnownAbility: 'blade_flurry',
+        school: 'physical',
+        trigger: {
+          on: 'castNth',
+          n: 1,
+          abilities: ['eviscerate', 'rupture', 'kidney_shot', 'slice_and_dice', 'expose_armor'],
+        },
+        responses: [
+          { kind: 'resource', amount: 10 },
+          { kind: 'cooldownRefund', ability: 'blade_flurry', seconds: 4 },
+          {
+            kind: 'empowerNext',
+            aura: 'next_ability_damage',
+            abilities: ['auto_attack'],
+            duration: 8,
+            dmgPct: 0.5,
+          },
+        ],
+      },
+    },
   ),
   spec(
     'subtlety',
@@ -187,11 +470,31 @@ const ROGUE_SPECS: SpecDef[] = [
     'Skulduggery',
     'dps',
     '>',
-    'A stealth attacker built around openers, control, and avoidance.',
+    'A stealth attacker who turns hidden openers into concentrated shadow burst.',
     'hemorrhage',
     'False Face',
-    'Increases the damage of your critical strikes by 40% and your Agility by 10%.',
-    { global: { critDmgPhysPct: 0.4 }, stats: { agiPct: 0.1 } },
+    "Increases the damage of your critical strikes by 40% and your Agility by 10%. Using Lurker's Strike, Throat Wire, or Gut Punch makes your next Maskfall within 8 sec deal 50% more damage.",
+    {
+      global: { critDmgPhysPct: 0.4 },
+      stats: { agiPct: 0.1 },
+      proc: {
+        id: 'rog_false_face',
+        name: 'False Face',
+        spec: 'subtlety',
+        requiresKnownAbility: 'hemorrhage',
+        school: 'shadow',
+        trigger: { on: 'castNth', n: 1, abilities: ['ambush', 'garrote', 'cheap_shot'] },
+        responses: [
+          {
+            kind: 'empowerNext',
+            aura: 'next_ability_damage',
+            abilities: ['hemorrhage'],
+            duration: 8,
+            dmgPct: 0.5,
+          },
+        ],
+      },
+    },
   ),
 ];
 
@@ -205,8 +508,27 @@ const PRIEST_SPECS: SpecDef[] = [
     'A mitigator who shields allies and heals through controlled efficiency.',
     'power_infusion',
     'Fixed Purpose',
-    'Your shields absorb 30% more. Increases maximum health by 8%.',
-    { global: { absorbPct: 0.3 }, stats: { maxHpPct: 0.08 } },
+    'When Psalm of Warding is fully consumed, it makes your next Whispered Prayer, Solemn Prayer, or Urgent Prayer within 8 sec cost 50% less. Your shields absorb 30% more.',
+    {
+      global: { absorbPct: 0.3 },
+      proc: {
+        id: 'pri_fixed_purpose',
+        name: 'Fixed Purpose',
+        spec: 'discipline',
+        requiresKnownAbility: 'power_word_shield',
+        school: 'holy',
+        trigger: { on: 'shieldConsumed', ability: 'power_word_shield' },
+        responses: [
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_cheap',
+            abilities: ['lesser_heal', 'heal', 'flash_heal'],
+            duration: 8,
+            costPct: 0.5,
+          },
+        ],
+      },
+    },
   ),
   spec(
     'holy',
@@ -217,8 +539,26 @@ const PRIEST_SPECS: SpecDef[] = [
     'A direct healer with strong throughput and restorative prayers.',
     'holy_nova',
     'Grave Mercy',
-    'Increases all healing you do by 20%.',
-    { global: { healPct: 0.2 } },
+    'Casting Sunburst Canticle makes your next Lingering Grace within 8 sec free. Increases all healing you do by 20%.',
+    {
+      global: { healPct: 0.2 },
+      proc: {
+        id: 'pri_grave_mercy',
+        name: 'Grave Mercy',
+        spec: 'holy',
+        requiresKnownAbility: 'holy_nova',
+        school: 'holy',
+        trigger: { on: 'castNth', n: 1, abilities: ['holy_nova'] },
+        responses: [
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_free',
+            abilities: ['renew'],
+            duration: 8,
+          },
+        ],
+      },
+    },
   ),
   spec(
     'shadow',
@@ -256,8 +596,17 @@ const SHAMAN_SPECS: SpecDef[] = [
     'A weapon fighter who channels the storm through melee swings.',
     'stormstrike',
     'Skyrend',
-    'Increases your melee attack speed by 10% and your physical ability damage by 10%.',
-    { global: { meleeHastePct: 0.1, meleeDmgPct: 0.1 } },
+    'Each landed melee auto-attack and Ancestral Strike builds Skyrend, up to 5 stacks. Each stack shortens your next Arc Bolt cast by 20% and increases its damage by 10%. Arc Bolt consumes every stack, becoming instant at 5. Increases your melee attack speed by 10% and your physical ability damage by 10%.',
+    {
+      global: { meleeHastePct: 0.1, meleeDmgPct: 0.1 },
+      proc: {
+        id: 'sha_skyrend',
+        name: 'Skyrend',
+        school: 'nature',
+        trigger: { on: 'meleeHit', abilities: ['auto_attack', 'stormstrike'] },
+        responses: [{ kind: 'stackAura', aura: 'stormcharge', maxStacks: 5, duration: 30 }],
+      },
+    },
   ),
   spec(
     'restoration',
@@ -268,12 +617,29 @@ const SHAMAN_SPECS: SpecDef[] = [
     'A healer using ancestral waves and efficient nature magic.',
     'chain_heal',
     'Cleansing Tides',
-    'Your healing spells cost 20% less mana.',
+    'Completing Chain Heal makes your next Mending Waters within 8 sec cost 50% less. Your healing spells cost 20% less mana.',
     {
       ability: [
         { ability: 'chain_heal', costPct: -0.2 },
         { ability: 'healing_wave', costPct: -0.2 },
       ],
+      proc: {
+        id: 'sha_cleansing_tides',
+        name: 'Cleansing Tides',
+        spec: 'restoration',
+        requiresKnownAbility: 'chain_heal',
+        school: 'nature',
+        trigger: { on: 'castNth', n: 1, abilities: ['chain_heal'] },
+        responses: [
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_cheap',
+            abilities: ['healing_wave'],
+            duration: 8,
+            costPct: 0.5,
+          },
+        ],
+      },
     },
   ),
 ];
@@ -288,8 +654,20 @@ const WARLOCK_SPECS: SpecDef[] = [
     'A curse-weaver using damage over time and drains.',
     'siphon_life',
     'Creeping Rot',
-    'Your damage-over-time effects deal 20% more damage.',
-    { global: { dotDmgPct: 0.2 } },
+    'Your damage-over-time effects deal 10% more damage. Each landed tick of Consume extends your Blackrot, Hex of Anguish, and Veinleech on the target by 1 sec, up to 3 sec per application.',
+    {
+      global: { dotDmgPct: 0.1 },
+      ability: [
+        {
+          ability: 'drain_life',
+          addEffects: [
+            { type: 'extendDot', dot: 'corruption', seconds: 1, maxBonus: 3 },
+            { type: 'extendDot', dot: 'curse_of_agony', seconds: 1, maxBonus: 3 },
+            { type: 'extendDot', dot: 'siphon_life', seconds: 1, maxBonus: 3 },
+          ],
+        },
+      ],
+    },
   ),
   spec(
     'demonology',
@@ -300,8 +678,37 @@ const WARLOCK_SPECS: SpecDef[] = [
     'A durable warlock who survives through demonic resilience.',
     'metamorphosis',
     'Fiendlore',
-    '20% of damage you take is redirected to your demon. Increases Stamina by 10%.',
-    { global: { petDmgSharePct: 0.2 }, stats: { staPct: 0.1 } },
+    '20% of damage you take is redirected to your demon. Every 2nd landed demon attack makes your next Gloom Bolt within 8 sec instant. Landing Gloom Bolt reduces Dread Aspect cooldown by 3 sec.',
+    {
+      global: { petDmgSharePct: 0.2 },
+      procs: [
+        {
+          id: 'wlk_fiendlore_handoff',
+          name: 'Fiendlore',
+          spec: 'demonology',
+          requiresKnownAbility: 'metamorphosis',
+          school: 'shadow',
+          trigger: { on: 'petHitNth', n: 2 },
+          responses: [
+            {
+              kind: 'empowerNext',
+              aura: 'next_cast_instant',
+              abilities: ['shadow_bolt'],
+              duration: 8,
+            },
+          ],
+        },
+        {
+          id: 'wlk_fiendlore_pact',
+          name: 'Fiendlore',
+          spec: 'demonology',
+          requiresKnownAbility: 'metamorphosis',
+          school: 'shadow',
+          trigger: { on: 'spellHit', abilities: ['shadow_bolt'] },
+          responses: [{ kind: 'cooldownRefund', ability: 'metamorphosis', seconds: 3 }],
+        },
+      ],
+    },
   ),
   spec(
     'destruction',
@@ -312,9 +719,51 @@ const WARLOCK_SPECS: SpecDef[] = [
     'A burst caster using Gloom Bolt, fire, and Duskfire.',
     'conflagrate',
     'Desolation',
-    'Your Fire spell critical strikes deal double damage, and ' +
-      'your critical strike chance is increased by 2%.',
-    { global: { critDmgSpellPct: 0.5 }, stats: { crit: 0.02 } },
+    'Your direct spell critical strikes deal double damage, and your critical strike chance is increased by 2%. Direct Fire critical strikes make your next Gloom Bolt within 8 sec instant; direct Shadow critical strikes make your next Conflagrate within 8 sec free.',
+    {
+      global: { critDmgSpellPct: 0.5 },
+      stats: { crit: 0.02 },
+      procs: [
+        {
+          id: 'wlk_desolation_gloom',
+          name: 'Desolation',
+          spec: 'destruction',
+          requiresKnownAbility: 'conflagrate',
+          school: 'fire',
+          trigger: {
+            on: 'spellCrit',
+            abilities: ['immolate', 'searing_pain', 'conflagrate', 'chaos_bolt'],
+          },
+          responses: [
+            {
+              kind: 'empowerNext',
+              aura: 'next_cast_instant',
+              abilities: ['shadow_bolt'],
+              duration: 8,
+            },
+          ],
+        },
+        {
+          id: 'wlk_desolation_conflagrate',
+          name: 'Desolation',
+          spec: 'destruction',
+          requiresKnownAbility: 'conflagrate',
+          school: 'shadow',
+          trigger: {
+            on: 'spellCrit',
+            abilities: ['shadow_bolt', 'shadowburn', 'death_coil'],
+          },
+          responses: [
+            {
+              kind: 'empowerNext',
+              aura: 'next_cast_free',
+              abilities: ['conflagrate'],
+              duration: 8,
+            },
+          ],
+        },
+      ],
+    },
   ),
 ];
 
@@ -328,8 +777,45 @@ const DRUID_SPECS: SpecDef[] = [
     'A caster who uses lunar and nature magic from range.',
     'moonkin_form',
     'Moonrage',
-    'Increases your spell damage by 15% and your spell haste by 10%.',
-    { global: { spellDmgPct: 0.15, spellHastePct: 0.1 } },
+    'A landed Wildbolt makes your next Lunar Tempest or Skyfall within 8 sec cost 50% less. Landing Lunar Tempest or Skyfall makes your next Wildbolt within 8 sec instant. Increases your spell damage by 15% and your spell haste by 10%.',
+    {
+      global: { spellDmgPct: 0.15, spellHastePct: 0.1 },
+      procs: [
+        {
+          id: 'dru_moonrage_lunar',
+          name: 'Moonrage',
+          spec: 'balance',
+          requiresKnownAbility: 'moonkin_form',
+          school: 'nature',
+          trigger: { on: 'spellHit', abilities: ['wrath'] },
+          responses: [
+            {
+              kind: 'empowerNext',
+              aura: 'next_cast_cheap',
+              abilities: ['moonfire', 'starfire'],
+              duration: 8,
+              costPct: 0.5,
+            },
+          ],
+        },
+        {
+          id: 'dru_moonrage_wild',
+          name: 'Moonrage',
+          spec: 'balance',
+          requiresKnownAbility: 'moonkin_form',
+          school: 'arcane',
+          trigger: { on: 'spellHit', abilities: ['moonfire', 'starfire'] },
+          responses: [
+            {
+              kind: 'empowerNext',
+              aura: 'next_cast_instant',
+              abilities: ['wrath'],
+              duration: 8,
+            },
+          ],
+        },
+      ],
+    },
   ),
   spec(
     'feral',
@@ -340,8 +826,42 @@ const DRUID_SPECS: SpecDef[] = [
     'A shapeshifter who tanks in bear form and fights up close.',
     'feral_charge',
     'Primal Heart',
-    'Increases your physical ability damage by 15%, your bleed damage by 15%, and threat by 20%.',
-    { global: { meleeDmgPct: 0.15, dotDmgPct: 0.15, threatPct: 0.2 } },
+    'A landed Bonecrush stores 25% of its damage in a rolling 6 sec bleed and reduces Primal Surge cooldown by 12 sec. In Bruin Form, Primal Surge may consume that bleed for a 6 sec absorb worth four times its remaining damage, up to 20% of your maximum health. Increases your physical ability damage by 15%, your bleed damage by 15%, and threat by 20%.',
+    {
+      global: { meleeDmgPct: 0.15, dotDmgPct: 0.15, threatPct: 0.2 },
+      procs: [
+        {
+          id: 'dru_primal_heart_bleed',
+          name: 'Primal Heart',
+          spec: 'feral',
+          requiresKnownAbility: 'feral_charge',
+          school: 'physical',
+          trigger: { on: 'meleeHit', abilities: ['maul'], positiveDamage: true },
+          responses: [
+            { kind: 'rollingDot', pctDamage: 0.25, duration: 6, interval: 2 },
+            { kind: 'cooldownRefund', ability: 'feral_charge', seconds: 12 },
+          ],
+        },
+        {
+          id: 'dru_primal_heart_guard',
+          name: 'Primal Heart',
+          spec: 'feral',
+          requiresKnownAbility: 'feral_charge',
+          school: 'physical',
+          trigger: { on: 'castNth', n: 1, abilities: ['feral_charge'] },
+          responses: [
+            {
+              kind: 'consumeOwnedDotAbsorb',
+              auraId: 'dru_primal_heart_bleed',
+              multiplier: 4,
+              maxHpPct: 0.2,
+              duration: 6,
+              requiresForm: 'bear',
+            },
+          ],
+        },
+      ],
+    },
   ),
   spec(
     'restoration',
@@ -352,8 +872,28 @@ const DRUID_SPECS: SpecDef[] = [
     'A healer using heal-over-time effects and efficient nature magic.',
     'swiftmend',
     "Grove's Gift",
-    'Your heal-over-time effects heal 25% more.',
-    { global: { hotHealPct: 0.25 } },
+    'When Wildbloom completes naturally, it opens an instant Second Bloom within 8 sec. Your heal-over-time effects heal 25% more.',
+    {
+      global: { hotHealPct: 0.25 },
+      procs: [
+        {
+          id: 'dru_groves_gift',
+          name: "Grove's Gift",
+          spec: 'restoration',
+          requiresKnownAbility: 'regrowth',
+          school: 'nature',
+          trigger: { on: 'hotExpired', ability: 'rejuvenation' },
+          responses: [
+            {
+              kind: 'empowerNext',
+              aura: 'next_cast_instant',
+              abilities: ['regrowth'],
+              duration: 8,
+            },
+          ],
+        },
+      ],
+    },
   ),
 ];
 

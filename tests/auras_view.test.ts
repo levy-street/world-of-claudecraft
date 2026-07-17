@@ -233,6 +233,151 @@ describe('createAurasView: derivation per mode', () => {
     expect(v.tick(entity([aura({ id: 'a', stacks: 4 })])).slots[0].stacksText).toBe('4');
   });
 
+  it('badges spec-resource meters from their first stack', () => {
+    const v = createAurasView('all', deps());
+    expect(
+      v.tick(entity([aura({ id: 'mag_icicles', kind: 'icicles', stacks: 1 })])).slots[0].stacksText,
+    ).toBe('1');
+    expect(
+      v.tick(entity([aura({ id: 'mag_icicles', kind: 'icicles', stacks: 5 })])).slots[0].stacksText,
+    ).toBe('5');
+    expect(
+      v.tick(entity([aura({ id: 'sha_skyrend', kind: 'stormcharge', stacks: 1 })])).slots[0]
+        .stacksText,
+    ).toBe('1');
+    expect(
+      v.tick(entity([aura({ id: 'mag_aetheric_flux', kind: 'aetheric_flux', stacks: 1 })])).slots[0]
+        .stacksText,
+    ).toBe('1');
+  });
+
+  it('marks Aetheric Flux as an actionable state that graphics tiers must retain', () => {
+    const state = createAurasView('all', deps()).tick(
+      entity([
+        aura({ id: 'mag_aetheric_flux', kind: 'aetheric_flux', stacks: 1 }),
+        aura({ id: 'ordinary_raid_buff', kind: 'buff_int' }),
+      ]),
+    );
+
+    expect(state.slots[0].isActionable).toBe(true);
+    expect(state.slots[1].isActionable).toBe(false);
+  });
+
+  it('marks the Aetherwell free-Darts relay as an actionable cast window', () => {
+    const state = createAurasView('all', deps()).tick(
+      entity([aura({ id: 'mag_aetherwell_relay', kind: 'next_cast_free' })]),
+    );
+
+    expect(state.slots[0].isActionable).toBe(true);
+  });
+
+  it('marks both Moonrage handoff windows as actionable cast decisions', () => {
+    const state = createAurasView('all', deps()).tick(
+      entity([
+        aura({ id: 'dru_moonrage_lunar', kind: 'next_cast_cheap' }),
+        aura({ id: 'dru_moonrage_wild', kind: 'next_cast_instant' }),
+      ]),
+    );
+
+    expect(state.slots.slice(0, 2).map((slot) => slot.isActionable)).toEqual([true, true]);
+  });
+
+  it('marks the Typhoon to Galeheart relay as an actionable cast window', () => {
+    const state = createAurasView('all', deps()).tick(
+      entity([aura({ id: 'dru_typhoon_relay', kind: 'next_cast_free' })]),
+    );
+
+    expect(state.slots[0].isActionable).toBe(true);
+  });
+
+  it('marks the Primal Heart threat bank and guard as actionable tank states', () => {
+    const state = createAurasView('all', deps()).tick(
+      entity([
+        aura({ id: 'dru_primal_heart_bleed', kind: 'dot' }),
+        aura({ id: 'dru_primal_heart_guard', kind: 'absorb' }),
+      ]),
+    );
+
+    expect(state.slots.slice(0, 2).map((slot) => slot.isActionable)).toEqual([true, true]);
+  });
+
+  it('marks the Red Haze free form attack as an actionable cast window', () => {
+    const state = createAurasView('all', deps()).tick(
+      entity([aura({ id: 'dru_red_haze_relay', kind: 'next_cast_free' })]),
+    );
+
+    expect(state.slots[0].isActionable).toBe(true);
+  });
+
+  it("marks Grove's Gift as an actionable healing window", () => {
+    const state = createAurasView('all', deps()).tick(
+      entity([aura({ id: 'dru_groves_gift', kind: 'next_cast_instant' })]),
+    );
+
+    expect(state.slots[0].isActionable).toBe(true);
+  });
+
+  it('marks Grove Covenant as an actionable HoT discount', () => {
+    const state = createAurasView('all', deps()).tick(
+      entity([aura({ id: 'dru_grove_covenant', kind: 'next_cast_cheap' })]),
+    );
+
+    expect(state.slots[0].isActionable).toBe(true);
+  });
+
+  it('marks Fixed Purpose as an actionable prayer discount', () => {
+    const state = createAurasView('all', deps()).tick(
+      entity([aura({ id: 'pri_fixed_purpose', kind: 'next_cast_cheap' })]),
+    );
+
+    expect(state.slots[0].isActionable).toBe(true);
+  });
+
+  it('marks both Benison healing handoffs as actionable windows', () => {
+    const state = createAurasView('all', deps()).tick(
+      entity([
+        aura({ id: 'pri_grave_mercy', kind: 'next_cast_free' }),
+        aura({ id: 'pri_last_blessing', kind: 'next_cast_instant' }),
+      ]),
+    );
+
+    expect(state.slots.slice(0, 2).map((slot) => slot.isActionable)).toEqual([true, true]);
+  });
+
+  it('marks both Spiritmend healing handoffs as actionable windows', () => {
+    const state = createAurasView('all', deps()).tick(
+      entity([
+        aura({ id: 'sha_cleansing_tides', kind: 'next_cast_cheap' }),
+        aura({ id: 'sha_tideflow', kind: 'next_cast_instant' }),
+      ]),
+    );
+
+    expect(state.slots.slice(0, 2).map((slot) => slot.isActionable)).toEqual([true, true]);
+  });
+
+  it('marks both Sacrament healing handoffs as actionable windows', () => {
+    const state = createAurasView('all', deps()).tick(
+      entity([
+        aura({ id: 'pal_kindled_faith', kind: 'next_cast_free' }),
+        aura({ id: 'pal_dawns_reply', kind: 'next_cast_cheap' }),
+      ]),
+    );
+
+    expect(state.slots.slice(0, 2).map((slot) => slot.isActionable)).toEqual([true, true]);
+  });
+
+  it("marks Vigil's Wall, ward, and Verdict handoffs as actionable windows", () => {
+    const state = createAurasView('all', deps()).tick(
+      entity([
+        aura({ id: 'pal_oathward', kind: 'next_cast_free' }),
+        aura({ id: 'pal_oathward_guard', kind: 'absorb' }),
+        aura({ id: 'pal_vigils_refrain', kind: 'next_cast_free' }),
+      ]),
+    );
+
+    expect(state.slots.slice(0, 3).map((slot) => slot.isActionable)).toEqual([true, true, true]);
+  });
+
   it('badges remaining charges (shown even at 1) and prefers charges over stacks', () => {
     // A charge-limited aura (Lightning Shield) badges its charge count, unlike stacks it
     // shows at 1, and when both are present charges wins (it is the meaningful count).

@@ -124,26 +124,24 @@ describe('retained v0.26 non-Warrior row runtime contracts', () => {
     expect(sim.player.resource).toBe(30);
   });
 
-  it('adds one talent charge for Twin Fracture and Twin Embers', () => {
-    const priest = simWithRows('priest', { 14: 'pri_r14_mind_melt' });
+  it('keeps Ember Relay on Cinderfall without adding a flat charge', () => {
     const mage = simWithRows('mage', { 5: 'mag_r5_impulse' });
 
-    expect(resolved(priest, 'mind_blast')).toMatchObject({ charges: 2, bonusCharges: 1 });
-    expect(resolved(mage, 'fire_blast')).toMatchObject({ charges: 2, bonusCharges: 1 });
+    expect(resolved(mage, 'fire_blast')).toMatchObject({ bonusCharges: 0 });
   });
 
   it('heals from Imbued Lifeblood only while a weapon imbue is active', () => {
     const sim = simWithRows('shaman', { 5: 'sha_r5_imbue_mastery' });
     const rng = sim.ctx.rng as typeof sim.ctx.rng & { chance(probability: number): boolean };
     rng.chance = () => false;
-    sim.player.hp = sim.player.maxHp - 20;
+    sim.player.hp = sim.player.maxHp - 100;
 
     onMeleeSwing(sim.ctx, sim.player);
-    expect(sim.player.hp).toBe(sim.player.maxHp - 20);
+    expect(sim.player.hp).toBe(sim.player.maxHp - 100);
 
     sim.player.auras.push(aura('test_imbue', 'imbue', sim.playerId, 'nature'));
     onMeleeSwing(sim.ctx, sim.player);
-    expect(sim.player.hp).toBe(sim.player.maxHp - 12);
+    expect(sim.player.hp).toBe(sim.player.maxHp - 100 + Math.round(sim.player.maxHp * 0.04));
   });
 
   it('makes Consume mobile with Walking Hunger', () => {
@@ -227,70 +225,6 @@ describe('retained v0.26 non-Warrior row runtime contracts', () => {
     expect(damage('corruption', 0)).toBe(noDot);
     expect(damage('shadow_word_pain', 999_999)).toBe(noDot);
     expect(damage('shadow_word_pain', 0)).toBeGreaterThan(noDot * 1.2);
-  });
-
-  it('extends only the caster-owned Dirge of Decay and caps extension at six seconds', () => {
-    const sim = simWithRows('priest', { 14: 'pri_r14_pain_and_suffering' });
-    const target = addTarget(sim);
-    const own = {
-      ...aura('shadow_word_pain', 'dot', sim.playerId, 'shadow'),
-      remaining: 8,
-      duration: 8,
-      tickInterval: 2,
-      tickTimer: 2,
-    };
-    const foreign = {
-      ...own,
-      sourceId: 999_999,
-    };
-    target.auras.push(foreign, own);
-    const ability = resolved(sim, 'mind_flay');
-    const extend = ability.effects.find((effect) => effect.type === 'extendDot');
-    if (!extend) throw new Error('missing Endless Dirge effect');
-    const extensionOnly = { ...ability, effects: [extend] };
-    const rng = sim.ctx.rng as typeof sim.ctx.rng & {
-      chance(probability: number): boolean;
-      range(min: number, max: number): number;
-    };
-    let rngDraws = 0;
-    rng.chance = () => {
-      rngDraws++;
-      return false;
-    };
-    rng.range = (min) => {
-      rngDraws++;
-      return min;
-    };
-
-    for (let tick = 0; tick < 8; tick++) runResolved(sim, target, extensionOnly);
-
-    expect(own).toMatchObject({ remaining: 14, duration: 14, extendedBy: 6 });
-    expect(foreign).toMatchObject({ remaining: 8, duration: 8 });
-    expect(foreign.extendedBy).toBeUndefined();
-    expect(rngDraws).toBe(0);
-  });
-
-  it('applies Endless Dirge through each real Litany of Woe channel tick', () => {
-    const sim = simWithRows('priest', { 14: 'pri_r14_pain_and_suffering' });
-    const target = addTarget(sim, 18);
-    const own = {
-      ...aura('shadow_word_pain', 'dot', sim.playerId, 'shadow'),
-      remaining: 8,
-      duration: 8,
-      tickInterval: 2,
-      tickTimer: 2,
-    };
-    const foreign = { ...own, sourceId: 999_999 };
-    target.auras.push(foreign, own);
-    sim.player.resource = sim.player.maxResource;
-
-    sim.castAbility('mind_flay');
-    for (let tick = 0; tick < 80; tick++) sim.tick();
-
-    expect(own.duration).toBe(11);
-    expect(own.extendedBy).toBe(3);
-    expect(foreign.duration).toBe(8);
-    expect(foreign.extendedBy).toBeUndefined();
   });
 
   it('detonates the pending next Cinder Jolt tick and preserves another caster DoT', () => {

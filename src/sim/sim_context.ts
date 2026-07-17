@@ -262,6 +262,8 @@ export interface SimContextCallbacks {
     // Amount is already fully source-modified (redirect shares); skip source-output mods.
     alreadyFinal?: boolean,
     abilityId?: string | null,
+    // Amount already passed both source and target damage multipliers (stored damage).
+    damageModifiersResolved?: boolean,
   ): void;
   handleDeath(entity: Entity, killer: Entity | null): void;
   cancelCast(entity: Entity): void;
@@ -621,6 +623,7 @@ export interface SimContextCallbacks {
     abilityName: string | null,
     opts: {
       cannotBeDodged?: boolean;
+      abilityId?: string;
       weaponMult?: number;
       threatFlat?: number;
       threatMult?: number;

@@ -240,18 +240,161 @@ and remain unchanged.
 | Spec | New mastery fields |
 |---|---|
 | paladin/protection | global: threatPct 0.5; stats: armorPct 0.2 |
-| paladin/retribution | global: meleeDmgPct 0.2, spellDmgPct 0.2 |
-| hunter/marksmanship | global: meleeDmgPct 0.2; stats: crit 0.03 |
-| hunter/survival | global: meleeDmgPct 0.15; stats: agiPct 0.15 |
-| mage/arcane | global: spellDmgPct 0.15, spellHastePct 0.1 |
+| paladin/retribution | global: meleeDmgPct 0.2, spellDmgPct 0.2; Blood Debt proc from landed melee attacks |
+| hunter/marksmanship | ranged shot ability dmgPct 0.1; stats: crit 0.03; Iron Aim landed-shot setup |
+| hunter/survival | global: meleeDmgPct 0.05; stats: agiPct 0.05; Quickblood trap circuit |
+| mage/arcane | global: spellDmgPct 0.15, spellHastePct 0.1; paid Aetheric Flux burst bank |
 | rogue/assassination | global: dotDmgPct 0.2; stats: crit 0.03 |
 | rogue/subtlety | global: critDmgPct 0.4; stats: agiPct 0.1 |
 | priest/holy | global: healPct 0.2 |
 | priest/shadow | global: dotDmgPct 0.15, spellDmgPct 0.1 |
-| shaman/enhancement | global: meleeHastePct 0.1, meleeDmgPct 0.1 |
-| druid/balance | global: spellDmgPct 0.15, spellHastePct 0.1 |
-| druid/feral | global: meleeDmgPct 0.15, dotDmgPct 0.15, threatPct 0.2 |
+| shaman/enhancement | global: meleeHastePct 0.1, meleeDmgPct 0.1; Skyrend melee-fed Arc Bolt bank |
+| druid/balance | global: spellDmgPct 0.15, spellHastePct 0.1; Moonrage nature-to-lunar relay |
+| druid/feral | global: meleeDmgPct 0.15, dotDmgPct 0.15, threatPct 0.2; Primal Heart threat-to-guard conversion |
 | warlock/destruction | global: critDmgPct 0.5; stats: crit 0.02 |
+
+### Icicles (Frost) and Fulmination (Elemental)
+
+This pass adds two caster rotations built on the narrow proc vocabulary described in
+[Caster Proc Rotations](./caster-proc-rotations.md):
+
+- Frost mastery now grants Icefall and makes each landed Rimelance build one long-lived
+  Icicle, up to five, with a 15% chance to grant one charge of Frostbite for 15 seconds.
+  Icefall is an off-GCD, zero-cost release that consumes the full bank, deals 8 Frost damage
+  per stack normally, and deals 20 per stack while the target is rooted or stunned or while
+  Frostbite is active. Icefall consumes Frostbite. Rimelance's chill alone does not open this
+  execute window. Both the bank and proc window are visible as auras and normalized
+  reinforcement-learning observations.
+- Elemental's level-11 Fulmination choice makes each completed Arc Bolt add one charge to
+  an active Thunder Ward, up to nine. Each charge present when the projectile lands raises
+  Arc Bolt's Overload chance by 5%; the just-completed cast joins the bank before impact.
+  An Overload repeats half of the bolt's damage for free and chains that damage to the nearest
+  enemy within 8 yards. Earthen Jolt consumes the ward and deals 8 bonus Nature damage per
+  charge to the target and nearby enemies. The existing visible Thunder Ward charge counter
+  remains the player-facing bank, and its normalized count is also exposed to reinforcement
+  learning.
+
+Both mechanics preserve mobile play while adding anticipation. Building happens through
+ordinary rotational casts, so movement does not erase progress or force a stationary
+channel. The release decision creates the excitement: Frost either creates a hard-control
+window or reacts to Frostbite before timing Icefall, while Elemental rides a rising Overload
+chance before venting the bank across a pack. Icefall adds no random draws. Frostbite adds one
+draw only on a Cryomancy Mage's landed Rimelance, and Fulmination adds one draw only on a
+talented Shaman's landed Arc Bolt while Thunder Ward is active.
+
+### Pyromancy identity pass
+
+Pyromancy keeps its existing mana bar, critical-damage mastery, Flashfire burst window, and
+Slow Burn cadence proc. Direct critical strikes from Cinderbolt, Cinderfall, Scald, and
+Pyrelance now bank 20% of their landed damage into one visible, caster-owned Afterflame on
+the target. New criticals roll the remaining damage into a fresh six-second, three-tick
+window instead of creating parallel burns. A landed Cinderfall detonates the old bank;
+when that Cinderfall is also critical, the landed-hit detonation resolves first and the
+critical-hit response then begins a fresh Afterflame.
+
+The rotation is therefore crit, bank, and choose a Cinderfall detonation point, while Slow
+Burn separately rewards every third direct Fire cast with an instant Cinderbolt or
+Pyrelance. Afterflame adds no random draws and does nothing until the Pyromancy spec,
+known Flashfire signature, explicit direct-Fire ability, critical result, and positive
+post-absorb damage gates have all passed.
+
+The stable `mag_r5_impulse` choice now authors Ember Relay instead of the flat Twin Embers
+charge increase. A landed Cinderfall opens an eight-second window in which the next
+Cinderbolt or Scald costs 50% less. This turns the row choice into a repeatable mana and
+tempo decision after each detonation while leaving Cinder Reprise and Third Current intact.
+
+### Aethermancy identity pass
+
+Aethermancy keeps the Mage mana bar and turns actual mana expenditure into its visible
+burst bank. Paying mana for Aether Darts or Aetherburst adds one Aetheric Flux stack for
+20 seconds, up to four, and removes 10 seconds from Aether Surge's active cooldown. A free
+cast pays no mana, so it neither builds Flux nor refunds the cooldown. Casting Aether Surge
+consumes the full bank and restores 5% of maximum mana per stack while opening its existing
+spell-damage and spell-haste window.
+
+The resulting loop is spend mana, accelerate the burst window, bank up to four visible
+stacks, then choose when to Surge and recover up to 20% mana. It is deterministic and uses
+no new resource or random draw. The paid-cost hook runs only after the Aethermancy spec,
+known Aether Surge signature, mana resource, positive spend, and explicit builder gates.
+
+The stable `mag_r20_evocation` choice still grants Aetherwell and its immediate 220 mana,
+but it is no longer only a flat refill. Casting it now resets Aether Surge and makes the
+next Aether Darts within eight seconds free. Aethermancy can therefore Surge, spend into
+Flux, use Aetherwell to recover and reset, then open a second Surge before channeling the
+free Darts. The row remains class-wide, so Pyromancy and Cryomancy retain the mana grant and
+free Darts while receiving no reset payoff without their unlearned Aether Surge signature.
+
+### Warspirit + Requital melee-DPS identity pass
+
+Paladin and Shaman choice rows are class-wide. A row allocation survives a specialization
+change, so the defining melee rotations live in the Warspirit and Requital masteries. The
+two replaced row options keep their stable IDs for saved builds, compete in their existing
+rows, and carry explicit DPS-spec gates. The healer and tank siblings remain available, and
+the separate enhancement tank grants are not part of this pass.
+
+- Warspirit mastery now builds Skyrend from each landed melee auto-attack and Ancestral
+  Strike, up to five stacks. Arc Bolt spends the full bank. Each stack cuts 20% from its cast
+  time and adds 10% damage, so five stacks make it instant. The visible stack aura supports a
+  choice between spending early for pressure and banking a mobile burst. Tempest Reprise
+  replaces Earthen Fury in the level-20 row: landed Ancestral Strikes have a 20% chance to
+  reset their own cooldown. The roll happens only after the row, Warspirit spec, and landed
+  ability gates pass.
+- Requital mastery now grants Blood Debt. Landed melee auto-attacks and Crusader Strike have
+  a 20% chance to clear Rite of Expulsion's cooldown and make the next Rite free for eight
+  seconds. Oath's Due replaces Swift Verdicts in the level-14 row: Verdict opens a seven
+  second self-buff, and the next landed Crusader Strike consumes it for 50% more damage while
+  raising that strike's Blood Debt chance to 70%. A Blood-Debt-freed Rite refreshes Oath's
+  Due to seven seconds instead of extending it, preparing the next empowered strike. A miss
+  preserves the current window, while the 30% Blood Debt failure chance breaks the direct
+  empowered chain; a later baseline Blood Debt proc can still restart it without Verdict. Rite
+  of Expulsion and Crusader Strike receive action-bar proc cues while their respective payoffs
+  are armed, and Oathwheel remains the row's alternative auto-weave loop.
+
+The Shadowlands-era inspiration is the cadence, not the original names: melee actions build
+or reveal a short spell payoff, and a deliberate setup cast creates a time-bounded melee
+execute. All player-facing mechanic names use this game's storm, oath, and reckoning
+vocabulary. Skyrend itself is draw-free. Tempest Reprise and Blood Debt each add exactly one
+shared RNG draw only after their DPS-specific landed-hit gates. Oath's Due changes Blood
+Debt's chance for its consumed strike but adds no draw, and its free-Rite refresh is draw-free.
+
+### Shadow DoT-weaver and ramping Litany
+
+Shadow's baseline Litany of Woe is a 30-yard, three-second channel whose second and third
+ticks deal 30% and 60% more damage than its first tick. Ninefold Litany occupies a level-17
+choice because Litany itself is learned at level 16. It triples the channel to nine seconds
+and nine ticks, preserving the one-second cadence so the ordinal ramp reaches a much higher
+ceiling. The choice asks the priest to trade mobility for a long, rooted damage commitment.
+Woe's Crescendo competes on the same level-17 row: reaching Litany's final tick detonates a
+fixed, draw-free Shadow burst around the locked target, while clipping the channel produces
+no burst. Ninefold Litany alone does not grant the finisher. At level 14, Deathless Dirge
+makes Mindfracture refresh the priest's own Dirge of Decay to its full duration without
+changing the DoT snapshot or tick cadence. Plague Chorus competes on that same row and copies
+the caster-owned Dirge snapshot to enemies within 8 yards, turning Mindfracture into the
+Shadow area-damage enabler without adding a random draw.
+
+### PBE-2 mage feedback pass
+
+- Flickerstep is baseline for every Mage at level 5. Frigid Reversal replaces its old
+  level-17 row slot with a large-hit Flickerstep reset and instant Rimelance counter.
+- Icy Veins now has a 120 second cooldown, matching Flashfire.
+- Third Current restores 8% of maximum mana while retaining its 50% next-spell discount.
+- Racing Mind now triggers from a spell critical strike, grants an 8 second instant-cast
+  window for cast-time combat spells, and has a 15 second internal cooldown.
+- Top-rank conjured food and water now match the best vendor consumables.
+- Cinderbolt burns for 8 damage per tick at top rank, Pyrelance burns for 12, and both
+  tooltips show the complete over-time total.
+
+### Shaman structural + tuning pass
+
+- A Shaman row option must have at least one live trigger or benefit when its row unlocks;
+  later ability unlocks may broaden that option without leaving it dead at unlock.
+- Rebounding Current moves from level 5 to level 8 with Thunder Ward. Rime Lock moves from
+  level 8 to level 14 with Rime Jolt.
+- Springwell moves from level 11 to level 8, while Returning Current moves from level 8 to
+  level 11. Imbued Tempo moves from level 14 to level 5 as the live-at-unlock backfill.
+- Imbued Lifeblood heals for 4% of maximum health per landed imbued auto-attack, scaling
+  from about 8 healing at level 5 to a meaningful cap-level value.
+- Returning Current restores 8% of maximum mana every third Jolt at its new level 11 tier.
 
 ### Mastery rating readiness (owner directive 2026-07-07)
 
@@ -283,9 +426,9 @@ The designated scalable axis per spec (base value = shipped magnitude):
 | paladin/holy | heal crit damage (critDmgPct on heals) | +50% (2x) |
 | paladin/protection | threat (threatPct) | 50% |
 | paladin/retribution | Holy + physical ability damage (paired meleeDmgPct + spellDmgPct, scale together) | 20% |
-| hunter/beast_mastery | pet damage (petDmgPct) | 35% |
-| hunter/marksmanship | physical ability damage (meleeDmgPct) | 20% |
-| hunter/survival | physical ability damage (meleeDmgPct) | 15% |
+| hunter/beast_mastery | pet damage (petDmgPct) | 20% |
+| hunter/marksmanship | ranged shot damage (shot ability dmgPct) | 10% |
+| hunter/survival | physical ability damage (meleeDmgPct) | 5% |
 | mage/arcane | spell damage (spellDmgPct) | 15% |
 | mage/fire | spell crit damage (critDmgPct) | +50% (2x) |
 | mage/frost | Frost spell damage (frost-kit ability dmgPct) | 25% |
@@ -350,7 +493,7 @@ demotions: no existing character loses an ability they have today.
 | mage/frost | ice_barrier | Cone of Cold (instant frost cone AoE) |
 | rogue/assassination | eviscerate | Cold Blood (next attack guaranteed crit) |
 | rogue/combat | adrenaline_rush | Blade Flurry (strikes cleave for 12s) |
-| rogue/subtlety | ambush | Hemorrhage (bleed strike) |
+| rogue/subtlety | ambush | Maskfall (front-loaded weapon strike) |
 | priest/discipline | power_word_shield | Power Infusion (ally +spell dmg active) |
 | priest/holy | flash_heal | Holy Nova (AoE heal + damage) |
 | priest/shadow | mind_flay | Shadowform (form: +shadow dmg, -phys taken) |
@@ -847,3 +990,156 @@ Review gate on every PR: fresh coverage-review subagent over the diff, then
 fable pass/fail. Checks: npx vitest run <slice tests>, architecture test,
 S3 i18n guard (tests/localization_fixes.test.ts), parity goldens, and
 npm run build on PR4/PR5.
+
+---
+
+## Hunter DPS identity pass
+
+- Packlord uses Packbond as a pet-fed cadence. Every third landed companion attack
+  advances Howling Rage and opens an 8 sec free Fell Shot window, turning pet uptime
+  into a visible mobile payoff while preserving mana as the hunter resource. The
+  Mender's Signal choice replaces flat Patch Up scaling: completing pet maintenance
+  now advances the burst cooldown and banks the same mobile shot payoff.
+- Coldsight uses Iron Aim as a landed setup and execute. Rattling Shot opens an
+  8 sec window for an instant Long Draw, rewarding a deliberate precision sequence
+  while keeping the payoff mobile and the mana cost meaningful. Second Bearing
+  replaces flat Long Draw scaling with a landed payoff that restores 20 mana and
+  resets Rattling Shot, allowing the sequence to be deliberately set up again.
+- Fieldcraft turns Briar Trap into the ranged setup for a melee field circuit.
+  Briar Trap or Rime Snare banks a 12 sec empowered Gutting Strike; landing that
+  strike restores 10 mana and advances Briar Trap by 8 sec, so control, closing
+  distance, and the melee payoff continually feed the next field setup. Rainbreak
+  replaces flat Arrowfall damage with a protected channel that banks a separate
+  10 sec Gutting Strike payoff, giving the hybrid a ranged-area route back into
+  melee without changing the other apex choices.
+
+## Rogue DPS identity pass
+
+- Knifework uses Redhanded as a poison-to-finisher conversion. Landing Leaden Venom
+  opens an 8 sec window for a free Dirt Nap or Bleed Out, so the assassination loop
+  deliberately weaves poison between combo-point building and its direct or bleed
+  payoff while preserving energy as the limiting resource outside that window. Venom
+  Dividend replaces automatic energy trickles: every fourth poisoned weapon hit banks
+  a free Leaden Venom, turning maintained weapon poison and melee uptime into a planned
+  route back to the Redhanded payoff without changing the row's other choices.
+- Thuggery uses Scrapper's Edge as a sustained finisher-to-weapon cadence. Every
+  finisher restores 10 energy, advances Mirrored Blades by 4 sec, and banks an 8 sec
+  50% stronger melee auto-attack. The loop rewards steady combo-point conversion and
+  weapon uptime while asking the player to land the loaded swing before finishing again.
+  Redline Habit replaces automatic finisher cooldown arithmetic: Quickened Blood now
+  banks an 8 sec empowered weapon strike, creating a deliberate energy surge, builder,
+  finisher, and loaded-auto sequence without changing the other capstone choices.
+- Skulduggery uses False Face as a stealth setup into concentrated shadow burst.
+  Lurker's Strike, Throat Wire, or Gut Punch opens an 8 sec window for a 50% stronger
+  Maskfall. Maskfall moves the old signature's delayed bleed budget into one front-loaded
+  weapon strike, so Duskveil or Smokestep creates a clear opener, burst, and finisher arc
+  without competing with Knifework's poison-and-bleed identity. Dusk Dividend replaces
+  the opener's automatic energy refund with an 8 sec half-cost builder choice, preserving
+  the shared row while making the follow-up sequence a deliberate energy decision.
+
+## Warlock DPS identity pass
+
+- Hexcraft uses Creeping Rot as a sustained duration weave. Blackrot, Hex of Anguish,
+  and Veinleech establish the afflictions; each landed Consume tick extends all three
+  caster-owned effects by 1 sec, up to 3 sec per application. The warlock chooses how
+  long to channel for damage, healing, and upkeep before returning to Gloom Bolt and
+  Hard Bargain, with the maintained target timers providing the visible feedback.
+  Deepened Hex replaces its flat conditional bolt scalar with a 3 sec Gloom Bolt
+  extension for Blackrot and Hex of Anguish, capped at 6 sec per application, so the
+  shared row now offers active upkeep without disturbing its other two choices.
+- Pactbound uses Fiendlore as a demon-to-caster handoff around Dread Aspect. Every
+  second landed demon attack banks an 8 sec instant Gloom Bolt; every landed Gloom
+  Bolt advances Dread Aspect by 3 sec, pulling the next shared owner-and-demon burst
+  window forward. The bolt still spends mana, the demon must maintain uptime, and the
+  warlock decides when to cash the mobile cast while using Hard Bargain and class DoTs.
+  Pain Communion replaces Unyielding Pact's automatic fixed heal with an 8 sec instant
+  Burning Pact decision after a hit of at least 15% maximum health, preserving the
+  shared pressure row and its other choices while creating an active recovery sequence.
+- Ruination uses Desolation as a cross-school critical relay. A direct Shadow critical
+  strike opens an 8 sec free Conflagrate to consume the caster's Burning Pact; a direct
+  Fire critical strike opens an 8 sec instant, full-mana Gloom Bolt to continue the
+  relay while moving. The warlock reapplies Burning Pact, spends through the burst,
+  and uses Hard Bargain to fund the next setup without adding a new resource bar.
+  Ruinbolt replaces its isolated ability-grant filler with a landed-hit Duskfire reset,
+  retaining the grant and both sibling capstones while enabling a deliberate Duskfire,
+  Ruinbolt, Duskfire burst sequence for every Warlock spec that selects it.
+
+## Druid role identity pass
+
+- Moongrove uses Moonrage as a deterministic nature-to-lunar relay. A landed Wildbolt
+  opens an 8 sec half-cost Lunar Tempest or Skyfall decision, and landing either lunar
+  spell opens an 8 sec instant Wildbolt. The caster alternates schools, chooses between
+  DoT upkeep and a heavier lunar cast, and keeps mana meaningful while gaining a mobile
+  handoff. Both windows require the Moongrove spec and known Moonwing Form, add no random
+  draws, and remain visible on the aura strip and matching action-bar abilities. Typhoon
+  keeps its stable option ID and knockback grant, but is no longer an isolated grant for
+  Moongrove: casting it now banks an 8 sec free Galeheart channel. The other Druid specs
+  retain Typhoon's previous behavior, and both sibling disruption choices remain intact.
+- Wildfang uses Primal Heart to turn threat into an active-mitigation choice. A landed
+  Bruin-form Bonecrush banks 25% of its damage in a rolling 6 sec bleed and advances
+  Primal Surge by 12 sec. The tank can leave that bank ticking for threat or use Primal
+  Surge in Bruin Form to consume it for a 6 sec absorb worth four times its remaining
+  damage, capped at 20% maximum health. Primal Surge still grants 50 Rage for the next
+  threat, area-control, or recovery decision. Wolf Form keeps its existing Energy surge
+  and cannot consume the bank. Every new step is spec, signature, form, target, owner,
+  and positive-damage gated and adds no random draw. Red Haze keeps its stable capstone
+  ID, +70 attack-power cooldown, and sibling options, but now resets Primal Surge and
+  banks one free form attack for Wildfang. This enables Primal Surge, Red Haze, free
+  Bonecrush, fresh threat bank, and a second Primal Surge mitigation sequence. Moongrove
+  and Groveheart retain Red Haze's previous grant behavior.
+- Groveheart uses Grove's Gift to turn HoT timing into a deterministic healing choice.
+  Letting Wildbloom complete naturally opens an 8 sec instant, full-mana Second Bloom;
+  refreshing Wildbloom delays the handoff, while consuming it early with Swiftmend
+  forgoes the handoff in exchange for immediate healing. The window requires Groveheart
+  and known Second Bloom, adds no random draw, and remains visible on the aura strip and
+  Second Bloom action-bar slot. The existing 25% HoT-healing mastery bonus remains intact.
+  Grove Covenant keeps its stable level-11 option ID but replaces the fixed every-third-
+  heal ward: completing Wildmend or Second Bloom now banks one 8 sec half-mana Wildbloom.
+  Lifesap and Formrush remain unchanged, and the new relay remains class-wide so the shared
+  Druid row stays useful outside Groveheart. For Groveheart, the discounted Wildbloom can
+  mature into Grove's Gift and continue the direct-heal, HoT, instant-heal weave.
+
+## Paladin role identity pass
+
+- Sacrament uses Kindled Faith as a deterministic heal-to-proc weave. Every third
+  Mending Light or Lightmend opens a 10 sec free Holy Shock, letting the healer save an
+  instant, mobile response for damage, movement, or an offensive Holy Shock. Dawn's Reply
+  retains Oath Returned's stable level-5 choice ID but replaces its flat Verdict mana
+  refund: for Sacrament, Holy Shock opens an 8 sec half-mana Lightmend. The resulting
+  Mending Light or Lightmend, free Holy Shock, discounted Lightmend sequence keeps mana
+  meaningful outside the two short windows. Pilgrim's Light and Ashen Sentence are
+  unchanged, and neither Blood Debt nor Oath's Due is altered.
+
+- Vigil turns Hallowed Wall into active mitigation and a threat relay. While Burning Oath
+  is active, each third landed melee attack banks a 10 sec free Hallowed Wall; every Wall
+  still creates Holy threat and now grants Vigil a 6 sec Oathward ward. Vigil's Refrain
+  retains Mercy from Ruin's stable level-11 choice ID but replaces its shield-consumed
+  Last Rite cooldown refund: Hallowed Wall resets Sacred Goad and opens an 8 sec free
+  Verdict. Third Benediction and Afterglow Aegis are unchanged, and neither Blood Debt
+  nor Oath's Due is altered.
+
+## Priest healer identity pass
+
+- Doctrine uses Fixed Purpose as a deterministic ward-to-heal relay. A fully consumed
+  Psalm of Warding opens an 8 sec half-mana Whispered, Solemn, or Urgent Prayer, so the
+  healer chooses where to pre-shield and which damaged ally receives the efficient
+  follow-up. The existing 30% absorption axis remains, while the passive 8% maximum-health
+  filler is removed. Warding Refrain, Shattered Psalm, and Halo Aftershock can feed more
+  wards into the rotation, and the shared Last Blessing option remains available without
+  changing either Vespers channel option.
+
+- Benison keeps Grave Mercy's 20% healing throughput but replaces its passive-only
+  identity with a deterministic prayer weave. Sunburst Canticle opens an 8 sec free
+  Lingering Grace; if that heal-over-time effect completes naturally, the stable
+  Last Blessing level-17 option opens an 8 sec instant Solemn or Urgent Prayer. Last
+  Blessing is now explicitly gated to Doctrine and Benison, so Vespers cannot receive
+  the healer handoff. The option id and both Vespers channel choices remain unchanged.
+
+## Shaman healer identity pass
+
+- Spiritmend keeps Cleansing Tides' 20% mana reduction and gains a deterministic
+  Chain-Heal rotation. Completing Chain Heal opens an 8 sec half-mana Mending Waters;
+  the stable Tideflow level-17 option turns every third completed Mending Waters into
+  an 8 sec instant, full-cost Chain Heal, which reopens Cleansing Tides. This replaces
+  the passive-only mastery and the old instant-travel filler without adding a resource.
+  Tideflow remains restoration-gated, and Thundercall and Warspirit are unchanged.

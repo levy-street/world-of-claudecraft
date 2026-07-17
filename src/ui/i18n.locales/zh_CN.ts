@@ -2307,7 +2307,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flamestrike.description':
     '在目标区域召唤一次烈焰爆发，对爆炸范围内的敌人造成 {damage} 点火焰伤害。',
   'entities.abilities.fireball.description':
-    '投掷一团火球，造成 {damage} 点火焰伤害，并附加持续伤害。',
+    '投掷一团火球，造成 {damage} 点火焰伤害，并附加 {overTime} 点持续火焰伤害。',
   'entities.abilities.frost_armor.name': '白霜护罩',
   'entities.abilities.frost_armor.description': '以寒霜包裹自身，使护甲提高 {buff}，持续 30 分钟。',
   'entities.abilities.arcane_intellect.name': '以太睿智',
@@ -2315,6 +2315,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.frostbolt.name': '凛霜之矛',
   'entities.abilities.frostbolt.description':
     '发射一支寒冰箭，造成 {damage} 点冰霜伤害，并使移动速度降低 40%。',
+  'entities.abilities.icefall.name': '冰瀑',
+  'entities.abilities.icefall.description':
+    '向目标发射所有储存的冰刺，每枚造成 {damage} 点冰霜伤害。若目标被定身或昏迷，或你拥有冻伤效果，则造成 2.5 倍伤害并消耗冻伤。此固定伤害无法造成暴击。（冰霜术）',
   'entities.abilities.conjure_water.name': '束水术',
   'entities.abilities.conjure_water.description':
     '制造 2 瓶水，饮用后恢复法力。更高等级可制造更纯净的水。',
@@ -2339,7 +2342,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.scorch.description': '灼烧敌人，造成 {damage} 点火焰伤害。施法迅速。',
   'entities.abilities.pyroblast.name': '烈焰长矛',
   'entities.abilities.pyroblast.description':
-    '投掷一颗巨大的火焰陨石，造成 {damage} 点火焰伤害，并在一段时间内造成额外伤害。',
+    '投掷一颗巨大的火焰陨石，造成 {damage} 点火焰伤害，并在 12 秒内造成 {overTime} 点火焰伤害。',
   'entities.abilities.ice_barrier.name': '霜帷',
   'entities.abilities.ice_barrier.description':
     '以冰霜护盾保护你，吸收 {damage} 点伤害，持续 60 秒。',
@@ -2493,7 +2496,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.heal.description': '缓慢但强大的祈祷，为一个友方目标恢复 {damage} 点生命值。',
   'entities.abilities.mind_flay.name': '悲苦连祷',
   'entities.abilities.mind_flay.description':
-    '用暗影能量攻击目标的心灵，持续 3 秒，每秒造成 {damage} 点伤害。',
+    '用暗影能量攻击目标的心灵，持续3秒。每次跳动的伤害都会提高，增幅相当于首次跳动伤害的30%。',
   'entities.abilities.flash_heal.name': '紧急祈祷',
   'entities.abilities.flash_heal.description': '快速祈祷，为一个友方目标恢复 {damage} 点生命值。',
   'entities.abilities.lightning_bolt.name': '电弧箭',
@@ -2685,9 +2688,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.trueshot_aura.name': '强击光环',
   'entities.abilities.trueshot_aura.description':
     '鼓舞附近盟友，使攻击强度提高35点，持续5分钟。（射击专精招牌）',
-  'entities.abilities.wyvern_sting.name': '翼龙钉刺',
+  'entities.abilities.wyvern_sting.name': '荆棘陷阱',
   'entities.abilities.wyvern_sting.description':
-    '从远处钉刺敌人，使其瘫痪最多4秒。受到任何伤害都会打破效果。（生存专精招牌）',
+    '在目标区域设置荆棘陷阱，使5码内的敌人定身4秒。（战地技艺专精招牌）',
   'entities.abilities.arcane_power.name': '奥术强化',
   'entities.abilities.arcane_power.description':
     '法术伤害提高20%，法术急速提高10%，持续10秒。（奥术专精招牌）',
@@ -2702,9 +2705,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blade_flurry.name': '剑刃乱舞',
   'entities.abilities.blade_flurry.description':
     '释放剑刃乱舞，攻击速度提高20%，持续12秒。（战斗专精招牌）',
-  'entities.abilities.hemorrhage.name': '出血',
+  'entities.abilities.hemorrhage.name': '假面落幕',
   'entities.abilities.hemorrhage.description':
-    '攻击敌人，造成武器伤害加{damage}点伤害，并在12秒内造成流血伤害。奖励1个连击点。（敏锐专精招牌）',
+    '以武器攻击敌人，造成武器伤害加{damage}点伤害。奖励1个连击点。（诡术专精招牌）',
   'entities.abilities.power_infusion.name': '能量灌注',
   'entities.abilities.power_infusion.description':
     '向一个友方目标灌注能量，使其法术强度提高28点，持续15秒。（戒律专精招牌）',
@@ -4805,6 +4808,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.flame_shock': '瞬发的灼烧，先打出一记，并持续灼烧目标。',
   'guide.abilityHook.frost_armor': '持续的自我增益，开战前先硬化你的护甲。',
   'guide.abilityHook.frostbolt': '从远处发动攻击并减速目标，让它无法贴近你。',
+  'guide.abilityHook.blink': '向前传送并解除定身，让每位法师都有可靠的脱身手段。',
   'guide.abilityHook.garrote': '从潜行中起手，用钢丝使目标持续流血。',
   'guide.abilityHook.gouge': '短暂使目标失去行动能力，方便你重新走位或解围。',
   'guide.abilityHook.healing_touch': '一记施法时间较长的单体大治疗，用于把人奶满。',
@@ -5689,6 +5693,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.formTravel': '迅捷形态：移动速度提高 {pct}%',
   'hudChrome.auraEffect.defensiveStance': '戒备姿态：受到的伤害降低，威胁值提高',
   'hudChrome.auraEffect.righteousFury': '炽燃誓约：神圣伤害产生的威胁值大幅提高',
+  'hudChrome.auraEffect.stormcharge':
+    '风暴召唤者 {stacks}/{max}：每层使电弧箭施法时间缩短 {castPct}%，伤害提高 {damagePct}%',
+  'hudChrome.auraEffect.aethericFlux':
+    '奥术不稳定性 {stacks}/{max}：每层返还奥术强化 {cooldown} 秒冷却时间；奥术强化会消耗全部层数，每层恢复 {manaPct}% 最大法力',
+  'hudChrome.auraEffect.nextAbilityDamage': '使下一个受影响技能的伤害提高 {pct}%',
   'hudChrome.auraEffect.scale': '体型增大 {pct}%',
   'hudChrome.auraEffect.jump': '跳跃高度提高 {pct}%',
   'hudChrome.auraEffect.school.physical': '物理',

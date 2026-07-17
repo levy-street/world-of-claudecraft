@@ -687,7 +687,7 @@ const classAbilityNamesEn = {
       [
         'fireball',
         'Cinderbolt',
-        'Hurls a fiery ball that causes {damage} Fire damage plus additional damage over time.',
+        'Hurls a fiery ball that causes {damage} Fire damage plus {overTime} Fire damage over time.',
       ],
       [
         'frost_armor',
@@ -703,6 +703,11 @@ const classAbilityNamesEn = {
         'frostbolt',
         'Rimelance',
         'Launches a bolt of frost, causing {damage} Frost damage and slowing movement by 40%.',
+      ],
+      [
+        'icefall',
+        'Icefall',
+        'Launches every stored Icicle at the target for {damage} Frost damage each. Deals 2.5 times damage if the target is frozen by a root or stun, or while Frostbite is active. Consumes Frostbite. This fixed damage cannot critically strike. (Cryomancy)',
       ],
       [
         'conjure_water',
@@ -739,7 +744,7 @@ const classAbilityNamesEn = {
       [
         'pyroblast',
         'Pyrelance',
-        'Hurls an immense fiery boulder that causes {damage} Fire damage plus additional damage over time.',
+        'Hurls an immense fiery boulder that causes {damage} Fire damage plus {overTime} Fire damage over 12 sec.',
       ],
       ['ice_barrier', 'Frostveil', 'Shields you in ice, absorbing {damage} damage for 60 sec.'],
       [
@@ -969,7 +974,7 @@ const classAbilityNamesEn = {
       [
         'mind_flay',
         'Litany of Woe',
-        "Assaults the target's mind with Shadow energy, causing {damage} damage each second for 3 sec.",
+        "Assaults the target's mind with Shadow energy for 3 sec. Its damage increases each tick by 30% of the first tick's damage.",
       ],
       ['flash_heal', 'Urgent Prayer', 'A fast prayer that heals a friendly target for {damage}.'],
       ['lightning_bolt', 'Arc Bolt', 'Hurls a bolt of lightning for {damage} Nature damage.'],
@@ -1218,8 +1223,8 @@ const classAbilityNamesEn = {
       ],
       [
         'wyvern_sting',
-        'Wyvern Sting',
-        'Stings the enemy from range, incapacitating it for up to 4 sec. Any damage breaks the effect. (Survival signature)',
+        'Briar Trap',
+        'Sets a briar trap at the target area, rooting enemies within 5 yd for 4 sec. (Fieldcraft signature)',
       ],
       [
         'arcane_power',
@@ -1248,8 +1253,8 @@ const classAbilityNamesEn = {
       ],
       [
         'hemorrhage',
-        'Red Ribbon',
-        'Strikes the enemy for weapon damage plus {damage}, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. (Subtlety signature)',
+        'Maskfall',
+        'Strikes the enemy for weapon damage plus {damage}. Awards 1 combo point. (Skulduggery signature)',
       ],
       [
         'power_infusion',
@@ -1502,7 +1507,7 @@ const classAbilityNamesEn = {
         'Calls down avenging power, increasing attack power by 60 and spell power by 30 for 20 sec. (Paladin talent)',
       ],
       ['berserk', 'Red Haze', 'Increases attack power by 70 for 15 sec. (Druid talent)'],
-      ['blink', 'Flickerstep', 'Teleports you 15 yd forward and breaks roots. (Mage talent)'],
+      ['blink', 'Flickerstep', 'Teleports you 15 yd forward and breaks roots. (Mage)'],
       [
         'bloodlust',
         'Storm Chorus',

@@ -1396,6 +1396,9 @@ export const fr_FR: EnTranslations = {
       "formTravel": "Forme de Fleet : vitesse de déplacement augmentée de {pct}%",
       "defensiveStance": "Posture de garde : dégâts subis réduits, menace accrue",
       "righteousFury": "Serment ardent : menace des dégâts Sacré fortement augmentée",
+      "stormcharge": "Skyrend {stacks}/{max}: each stack reduces Arc Bolt cast time by {castPct}% and increases its damage by {damagePct}%",
+      "aethericFlux": "Aetheric Flux {stacks}/{max}: each stack refunds {cooldown} sec of Aether Surge cooldown; Aether Surge consumes all stacks to restore {manaPct}% maximum mana per stack",
+      "nextAbilityDamage": "Increases the next affected ability damage by {pct}%",
       "scale": "Taille augmentée de {pct}%",
       "jump": "Hauteur de saut augmentée de {pct}%",
       "school": {
@@ -2510,6 +2513,7 @@ export const fr_FR: EnTranslations = {
       "frost_armor": "Une amélioration personnelle durable qui renforce votre armure avant un combat.",
       "arcane_intellect": "Augmente l'Intelligence pour agrandir la réserve de mana d'un allié, à lancer avant d'engager.",
       "frostbolt": "Frappe à distance et ralentit la cible pour qu'elle ne puisse pas vous rejoindre.",
+      "blink": "Teleports you forward and breaks roots, giving every Mage a reliable escape.",
       "conjure_water": "Invoque des boissons qui rendent du mana, pour refaire le plein entre deux engagements.",
       "conjure_food": "Invoque de la nourriture qui rend de la vie quand vous vous asseyez pour manger.",
       "shadow_bolt": "Un trait d'ombre que vous lancez sur une cible, votre frappe de prédilection.",
@@ -5743,7 +5747,7 @@ export const fr_FR: EnTranslations = {
       },
       "fireball": {
         "name": "Cinderbolt",
-        "description": "Lance une boule enflammée qui inflige {damage} points de dégâts de Feu plus des dégâts supplémentaires sur la durée."
+        "description": "Lance une boule enflammée qui inflige {damage} points de dégâts de Feu plus {overTime} points de dégâts de Feu sur la durée."
       },
       "frost_armor": {
         "name": "Manteau de givre",
@@ -5756,6 +5760,10 @@ export const fr_FR: EnTranslations = {
       "frostbolt": {
         "name": "Rimelance",
         "description": "Lance un éclair de givre, inflige {damage} points de dégâts de Givre et ralentit le déplacement de 40%."
+      },
+      "icefall": {
+        "name": "Icefall",
+        "description": "Launches every stored Icicle at the target for {damage} Frost damage each. Deals 2.5 times damage if the target is frozen by a root or stun, or while Frostbite is active. Consumes Frostbite. This fixed damage cannot critically strike. (Cryomancy)"
       },
       "conjure_water": {
         "name": "Waterbind",
@@ -5791,7 +5799,7 @@ export const fr_FR: EnTranslations = {
       },
       "pyroblast": {
         "name": "Pyrelance",
-        "description": "Projette un immense rocher enflammé qui inflige {damage} points de dégâts de Feu plus des dégâts supplémentaires sur la durée."
+        "description": "Projette un immense rocher enflammé qui inflige {damage} points de dégâts de Feu plus {overTime} points de dégâts de Feu en 12 s."
       },
       "ice_barrier": {
         "name": "Voile de givre",
@@ -6023,7 +6031,7 @@ export const fr_FR: EnTranslations = {
       },
       "mind_flay": {
         "name": "Litanie du malheur",
-        "description": "Assaille l'esprit de la cible avec de l'énergie d'Ombre et inflige {damage} points de dégâts chaque seconde pendant 3 s."
+        "description": "Assaille l'esprit de la cible avec de l'énergie d'Ombre pendant 3 s. À chaque pulsation, les dégâts augmentent de 30 % des dégâts de la première pulsation."
       },
       "flash_heal": {
         "name": "Prière urgente",

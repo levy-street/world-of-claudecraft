@@ -40,26 +40,126 @@ describe('spec masteries', () => {
   it('authors the ten PR B mastery effects exactly', () => {
     expect(TALENTS.paladin?.specs.find((s) => s.id === 'holy')?.mastery.effect).toEqual({
       global: { critDmgHealPct: 0.5 },
+      proc: {
+        id: 'pal_kindled_faith',
+        name: 'Kindled Faith',
+        spec: 'holy',
+        requiresKnownAbility: 'holy_shock',
+        school: 'holy',
+        trigger: { on: 'castNth', n: 3, abilities: ['holy_light', 'flash_of_light'] },
+        responses: [
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_free',
+            abilities: ['holy_shock'],
+            duration: 10,
+          },
+        ],
+      },
     });
     expect(TALENTS.priest?.specs.find((s) => s.id === 'discipline')?.mastery.effect).toEqual({
       global: { absorbPct: 0.3 },
-      stats: { maxHpPct: 0.08 },
+      proc: {
+        id: 'pri_fixed_purpose',
+        name: 'Fixed Purpose',
+        spec: 'discipline',
+        requiresKnownAbility: 'power_word_shield',
+        school: 'holy',
+        trigger: { on: 'shieldConsumed', ability: 'power_word_shield' },
+        responses: [
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_cheap',
+            abilities: ['lesser_heal', 'heal', 'flash_heal'],
+            duration: 8,
+            costPct: 0.5,
+          },
+        ],
+      },
     });
     expect(TALENTS.druid?.specs.find((s) => s.id === 'restoration')?.mastery.effect).toEqual({
       global: { hotHealPct: 0.25 },
+      procs: [
+        {
+          id: 'dru_groves_gift',
+          name: "Grove's Gift",
+          spec: 'restoration',
+          requiresKnownAbility: 'regrowth',
+          school: 'nature',
+          trigger: { on: 'hotExpired', ability: 'rejuvenation' },
+          responses: [
+            {
+              kind: 'empowerNext',
+              aura: 'next_cast_instant',
+              abilities: ['regrowth'],
+              duration: 8,
+            },
+          ],
+        },
+      ],
     });
     expect(TALENTS.shaman?.specs.find((s) => s.id === 'restoration')?.mastery.effect).toEqual({
       ability: [
         { ability: 'chain_heal', costPct: -0.2 },
         { ability: 'healing_wave', costPct: -0.2 },
       ],
+      proc: {
+        id: 'sha_cleansing_tides',
+        name: 'Cleansing Tides',
+        spec: 'restoration',
+        requiresKnownAbility: 'chain_heal',
+        school: 'nature',
+        trigger: { on: 'castNth', n: 1, abilities: ['chain_heal'] },
+        responses: [
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_cheap',
+            abilities: ['healing_wave'],
+            duration: 8,
+            costPct: 0.5,
+          },
+        ],
+      },
     });
     expect(TALENTS.warlock?.specs.find((s) => s.id === 'affliction')?.mastery.effect).toEqual({
-      global: { dotDmgPct: 0.2 },
+      global: { dotDmgPct: 0.1 },
+      ability: [
+        {
+          ability: 'drain_life',
+          addEffects: [
+            { type: 'extendDot', dot: 'corruption', seconds: 1, maxBonus: 3 },
+            { type: 'extendDot', dot: 'curse_of_agony', seconds: 1, maxBonus: 3 },
+            { type: 'extendDot', dot: 'siphon_life', seconds: 1, maxBonus: 3 },
+          ],
+        },
+      ],
     });
     expect(TALENTS.mage?.specs.find((s) => s.id === 'fire')?.mastery.effect).toEqual({
       global: { critDmgSpellPct: 0.5 },
       stats: { crit: 0.02 },
+      procs: [
+        {
+          id: 'mag_afterflame',
+          name: 'Afterflame',
+          spec: 'fire',
+          requiresKnownAbility: 'combustion',
+          school: 'fire',
+          trigger: {
+            on: 'spellCrit',
+            abilities: ['fireball', 'fire_blast', 'scorch', 'pyroblast'],
+          },
+          responses: [{ kind: 'rollingDot', pctDamage: 0.2, duration: 6, interval: 2 }],
+        },
+        {
+          id: 'mag_afterflame_detonate',
+          name: 'Afterflame',
+          spec: 'fire',
+          requiresKnownAbility: 'combustion',
+          school: 'fire',
+          trigger: { on: 'spellHit', abilities: ['fire_blast'] },
+          responses: [{ kind: 'detonateOwnedDot', auraId: 'mag_afterflame' }],
+        },
+      ],
     });
     expect(TALENTS.mage?.specs.find((s) => s.id === 'frost')?.mastery.effect).toEqual({
       // Frost-kit scoped so the mage's fire/arcane baseline spells stay untouched;
@@ -69,17 +169,146 @@ describe('spec masteries', () => {
         { ability: 'frost_nova', dmgPct: 0.25 },
       ],
       stats: { armorPct: 0.1 },
+      grant: { ability: 'icefall' },
+      proc: {
+        id: 'mag_icicles',
+        name: 'Icicles',
+        school: 'frost',
+        trigger: { on: 'spellHit', abilities: ['frostbolt'] },
+        responses: [
+          { kind: 'stackAura', aura: 'icicles', maxStacks: 5, duration: 3600 },
+          {
+            kind: 'chanceAura',
+            id: 'mag_frostbite',
+            name: 'Frostbite',
+            aura: 'frostbite',
+            chance: 0.15,
+            duration: 15,
+            charges: 1,
+          },
+        ],
+      },
     });
     expect(TALENTS.hunter?.specs.find((s) => s.id === 'beast_mastery')?.mastery.effect).toEqual({
-      global: { petDmgPct: 0.35 },
+      global: { petDmgPct: 0.2 },
       stats: { maxHpPct: 0.08 },
+      proc: {
+        id: 'hun_packbond',
+        name: 'Packbond',
+        spec: 'beast_mastery',
+        requiresKnownAbility: 'bestial_wrath',
+        school: 'nature',
+        trigger: { on: 'petHitNth', n: 3 },
+        responses: [
+          { kind: 'cooldownRefund', ability: 'bestial_wrath', seconds: 4 },
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_free',
+            abilities: ['arcane_shot'],
+            duration: 8,
+          },
+        ],
+      },
     });
     expect(TALENTS.rogue?.specs.find((s) => s.id === 'combat')?.mastery.effect).toEqual({
       global: { meleeHastePct: 0.1, meleeDmgPct: -0.1 },
+      proc: {
+        id: 'rog_scrappers_edge',
+        name: "Scrapper's Edge",
+        spec: 'combat',
+        requiresKnownAbility: 'blade_flurry',
+        school: 'physical',
+        trigger: {
+          on: 'castNth',
+          n: 1,
+          abilities: ['eviscerate', 'rupture', 'kidney_shot', 'slice_and_dice', 'expose_armor'],
+        },
+        responses: [
+          { kind: 'resource', amount: 10 },
+          { kind: 'cooldownRefund', ability: 'blade_flurry', seconds: 4 },
+          {
+            kind: 'empowerNext',
+            aura: 'next_ability_damage',
+            abilities: ['auto_attack'],
+            duration: 8,
+            dmgPct: 0.5,
+          },
+        ],
+      },
     });
     expect(TALENTS.warlock?.specs.find((s) => s.id === 'demonology')?.mastery.effect).toEqual({
       global: { petDmgSharePct: 0.2 },
-      stats: { staPct: 0.1 },
+      procs: [
+        {
+          id: 'wlk_fiendlore_handoff',
+          name: 'Fiendlore',
+          spec: 'demonology',
+          requiresKnownAbility: 'metamorphosis',
+          school: 'shadow',
+          trigger: { on: 'petHitNth', n: 2 },
+          responses: [
+            {
+              kind: 'empowerNext',
+              aura: 'next_cast_instant',
+              abilities: ['shadow_bolt'],
+              duration: 8,
+            },
+          ],
+        },
+        {
+          id: 'wlk_fiendlore_pact',
+          name: 'Fiendlore',
+          spec: 'demonology',
+          requiresKnownAbility: 'metamorphosis',
+          school: 'shadow',
+          trigger: { on: 'spellHit', abilities: ['shadow_bolt'] },
+          responses: [{ kind: 'cooldownRefund', ability: 'metamorphosis', seconds: 3 }],
+        },
+      ],
+    });
+    expect(TALENTS.warlock?.specs.find((s) => s.id === 'destruction')?.mastery.effect).toEqual({
+      global: { critDmgSpellPct: 0.5 },
+      stats: { crit: 0.02 },
+      procs: [
+        {
+          id: 'wlk_desolation_gloom',
+          name: 'Desolation',
+          spec: 'destruction',
+          requiresKnownAbility: 'conflagrate',
+          school: 'fire',
+          trigger: {
+            on: 'spellCrit',
+            abilities: ['immolate', 'searing_pain', 'conflagrate', 'chaos_bolt'],
+          },
+          responses: [
+            {
+              kind: 'empowerNext',
+              aura: 'next_cast_instant',
+              abilities: ['shadow_bolt'],
+              duration: 8,
+            },
+          ],
+        },
+        {
+          id: 'wlk_desolation_conflagrate',
+          name: 'Desolation',
+          spec: 'destruction',
+          requiresKnownAbility: 'conflagrate',
+          school: 'shadow',
+          trigger: {
+            on: 'spellCrit',
+            abilities: ['shadow_bolt', 'shadowburn', 'death_coil'],
+          },
+          responses: [
+            {
+              kind: 'empowerNext',
+              aura: 'next_cast_free',
+              abilities: ['conflagrate'],
+              duration: 8,
+            },
+          ],
+        },
+      ],
     });
   });
 
@@ -87,45 +316,313 @@ describe('spec masteries', () => {
     expect(TALENTS.paladin?.specs.find((s) => s.id === 'protection')?.mastery.effect).toEqual({
       global: { threatPct: 0.5 },
       stats: { armorPct: 0.2 },
+      procs: [
+        {
+          id: 'pal_oathward_guard',
+          name: 'Oathward',
+          spec: 'protection',
+          requiresKnownAbility: 'holy_shield',
+          school: 'holy',
+          trigger: { on: 'castNth', n: 1, abilities: ['holy_shield'] },
+          responses: [
+            { kind: 'absorb', amount: 90, duration: 6, name: 'Oathward', applyTo: 'self' },
+          ],
+        },
+        {
+          id: 'pal_oathward',
+          name: 'Oathward',
+          spec: 'protection',
+          requiresKnownAbility: 'holy_shield',
+          school: 'holy',
+          trigger: { on: 'meleeSwingWhile', auraKind: 'righteous_fury', n: 3 },
+          responses: [
+            {
+              kind: 'empowerNext',
+              aura: 'next_cast_free',
+              abilities: ['holy_shield'],
+              duration: 10,
+            },
+          ],
+        },
+      ],
     });
     expect(TALENTS.paladin?.specs.find((s) => s.id === 'retribution')?.mastery.effect).toEqual({
       global: { meleeDmgPct: 0.2, spellDmgPct: 0.2 },
+      proc: {
+        id: 'pal_blood_debt',
+        name: 'Blood Debt',
+        spec: 'retribution',
+        requiresKnownAbility: 'exorcism',
+        school: 'holy',
+        trigger: {
+          on: 'meleeHit',
+          abilities: ['auto_attack', 'crusader_strike'],
+          chance: 0.2,
+          chanceWhenEmpowered: {
+            ability: 'crusader_strike',
+            auraId: 'pal_oaths_due',
+            chance: 0.7,
+          },
+        },
+        responses: [
+          { kind: 'cooldownRefund', ability: 'exorcism', seconds: 'reset' },
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_free',
+            abilities: ['exorcism'],
+            duration: 8,
+          },
+        ],
+      },
     });
     expect(TALENTS.hunter?.specs.find((s) => s.id === 'marksmanship')?.mastery.effect).toEqual({
-      global: { meleeDmgPct: 0.2 },
+      ability: [
+        { ability: 'serpent_sting', dmgPct: 0.1 },
+        { ability: 'arcane_shot', dmgPct: 0.1 },
+        { ability: 'concussive_shot', dmgPct: 0.1 },
+        { ability: 'aimed_shot', dmgPct: 0.1 },
+        { ability: 'multi_shot', dmgPct: 0.1 },
+        { ability: 'volley', dmgPct: 0.1 },
+      ],
       stats: { crit: 0.03 },
+      proc: {
+        id: 'hun_iron_aim',
+        name: 'Iron Aim',
+        spec: 'marksmanship',
+        requiresKnownAbility: 'aimed_shot',
+        school: 'physical',
+        trigger: { on: 'rangedHit', abilities: ['concussive_shot'] },
+        responses: [
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_instant',
+            abilities: ['aimed_shot'],
+            duration: 8,
+          },
+        ],
+      },
     });
     expect(TALENTS.hunter?.specs.find((s) => s.id === 'survival')?.mastery.effect).toEqual({
-      global: { meleeDmgPct: 0.15 },
-      stats: { agiPct: 0.15 },
+      global: { meleeDmgPct: 0.05 },
+      stats: { agiPct: 0.05 },
+      procs: [
+        {
+          id: 'hun_quickblood_setup',
+          name: 'Quickblood',
+          spec: 'survival',
+          requiresKnownAbility: 'wyvern_sting',
+          school: 'nature',
+          trigger: { on: 'castNth', n: 1, abilities: ['wyvern_sting', 'frost_trap'] },
+          responses: [
+            {
+              kind: 'empowerNext',
+              aura: 'next_ability_damage',
+              abilities: ['raptor_strike'],
+              duration: 12,
+              dmgPct: 0.5,
+            },
+          ],
+        },
+        {
+          id: 'hun_quickblood_return',
+          name: 'Quickblood',
+          spec: 'survival',
+          requiresKnownAbility: 'wyvern_sting',
+          school: 'physical',
+          trigger: { on: 'meleeHit', abilities: ['raptor_strike'] },
+          responses: [
+            { kind: 'resource', amount: 10 },
+            { kind: 'cooldownRefund', ability: 'wyvern_sting', seconds: 8 },
+          ],
+        },
+      ],
     });
     expect(TALENTS.mage?.specs.find((s) => s.id === 'arcane')?.mastery.effect).toEqual({
       global: { spellDmgPct: 0.15, spellHastePct: 0.1 },
+      procs: [
+        {
+          id: 'mag_aetheric_flux',
+          name: 'Aetheric Flux',
+          spec: 'arcane',
+          requiresKnownAbility: 'arcane_power',
+          school: 'arcane',
+          trigger: {
+            on: 'resourceSpent',
+            resourceType: 'mana',
+            abilities: ['arcane_missiles', 'arcane_explosion'],
+          },
+          responses: [
+            { kind: 'stackAura', aura: 'aetheric_flux', maxStacks: 4, duration: 20 },
+            { kind: 'cooldownRefund', ability: 'arcane_power', seconds: 10 },
+          ],
+        },
+        {
+          id: 'mag_aetheric_flux_release',
+          name: 'Aetheric Flux',
+          spec: 'arcane',
+          requiresKnownAbility: 'arcane_power',
+          school: 'arcane',
+          trigger: { on: 'castNth', n: 1, abilities: ['arcane_power'] },
+          responses: [
+            {
+              kind: 'consumeAuraStacksResource',
+              auraId: 'mag_aetheric_flux',
+              resourceType: 'mana',
+              pctMaxPerStack: 0.05,
+            },
+          ],
+        },
+      ],
     });
     expect(TALENTS.rogue?.specs.find((s) => s.id === 'assassination')?.mastery.effect).toEqual({
       global: { dotDmgPct: 0.2 },
       stats: { crit: 0.03 },
+      proc: {
+        id: 'rog_redhanded',
+        name: 'Redhanded',
+        spec: 'assassination',
+        requiresKnownAbility: 'crippling_poison',
+        school: 'nature',
+        trigger: { on: 'spellHit', abilities: ['crippling_poison'] },
+        responses: [
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_free',
+            abilities: ['eviscerate', 'rupture'],
+            duration: 8,
+          },
+        ],
+      },
     });
     expect(TALENTS.rogue?.specs.find((s) => s.id === 'subtlety')?.mastery.effect).toEqual({
       global: { critDmgPhysPct: 0.4 },
       stats: { agiPct: 0.1 },
+      proc: {
+        id: 'rog_false_face',
+        name: 'False Face',
+        spec: 'subtlety',
+        requiresKnownAbility: 'hemorrhage',
+        school: 'shadow',
+        trigger: { on: 'castNth', n: 1, abilities: ['ambush', 'garrote', 'cheap_shot'] },
+        responses: [
+          {
+            kind: 'empowerNext',
+            aura: 'next_ability_damage',
+            abilities: ['hemorrhage'],
+            duration: 8,
+            dmgPct: 0.5,
+          },
+        ],
+      },
     });
     expect(TALENTS.priest?.specs.find((s) => s.id === 'holy')?.mastery.effect).toEqual({
       global: { healPct: 0.2 },
+      proc: {
+        id: 'pri_grave_mercy',
+        name: 'Grave Mercy',
+        spec: 'holy',
+        requiresKnownAbility: 'holy_nova',
+        school: 'holy',
+        trigger: { on: 'castNth', n: 1, abilities: ['holy_nova'] },
+        responses: [
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_free',
+            abilities: ['renew'],
+            duration: 8,
+          },
+        ],
+      },
     });
     expect(TALENTS.priest?.specs.find((s) => s.id === 'shadow')?.mastery.effect).toEqual({
       global: { dotDmgPct: 0.15, spellDmgPct: 0.1 },
     });
     expect(TALENTS.shaman?.specs.find((s) => s.id === 'enhancement')?.mastery.effect).toEqual({
       global: { meleeHastePct: 0.1, meleeDmgPct: 0.1 },
+      proc: {
+        id: 'sha_skyrend',
+        name: 'Skyrend',
+        school: 'nature',
+        trigger: { on: 'meleeHit', abilities: ['auto_attack', 'stormstrike'] },
+        responses: [{ kind: 'stackAura', aura: 'stormcharge', maxStacks: 5, duration: 30 }],
+      },
     });
     expect(TALENTS.druid?.specs.find((s) => s.id === 'balance')?.mastery.effect).toEqual({
       global: { spellDmgPct: 0.15, spellHastePct: 0.1 },
+      procs: [
+        {
+          id: 'dru_moonrage_lunar',
+          name: 'Moonrage',
+          spec: 'balance',
+          requiresKnownAbility: 'moonkin_form',
+          school: 'nature',
+          trigger: { on: 'spellHit', abilities: ['wrath'] },
+          responses: [
+            {
+              kind: 'empowerNext',
+              aura: 'next_cast_cheap',
+              abilities: ['moonfire', 'starfire'],
+              duration: 8,
+              costPct: 0.5,
+            },
+          ],
+        },
+        {
+          id: 'dru_moonrage_wild',
+          name: 'Moonrage',
+          spec: 'balance',
+          requiresKnownAbility: 'moonkin_form',
+          school: 'arcane',
+          trigger: { on: 'spellHit', abilities: ['moonfire', 'starfire'] },
+          responses: [
+            {
+              kind: 'empowerNext',
+              aura: 'next_cast_instant',
+              abilities: ['wrath'],
+              duration: 8,
+            },
+          ],
+        },
+      ],
     });
     expect(TALENTS.druid?.specs.find((s) => s.id === 'feral')?.mastery.effect).toEqual({
       global: { meleeDmgPct: 0.15, dotDmgPct: 0.15, threatPct: 0.2 },
+      procs: [
+        {
+          id: 'dru_primal_heart_bleed',
+          name: 'Primal Heart',
+          spec: 'feral',
+          requiresKnownAbility: 'feral_charge',
+          school: 'physical',
+          trigger: { on: 'meleeHit', abilities: ['maul'], positiveDamage: true },
+          responses: [
+            { kind: 'rollingDot', pctDamage: 0.25, duration: 6, interval: 2 },
+            { kind: 'cooldownRefund', ability: 'feral_charge', seconds: 12 },
+          ],
+        },
+        {
+          id: 'dru_primal_heart_guard',
+          name: 'Primal Heart',
+          spec: 'feral',
+          requiresKnownAbility: 'feral_charge',
+          school: 'physical',
+          trigger: { on: 'castNth', n: 1, abilities: ['feral_charge'] },
+          responses: [
+            {
+              kind: 'consumeOwnedDotAbsorb',
+              auraId: 'dru_primal_heart_bleed',
+              multiplier: 4,
+              maxHpPct: 0.2,
+              duration: 6,
+              requiresForm: 'bear',
+            },
+          ],
+        },
+      ],
     });
-    expect(TALENTS.warlock?.specs.find((s) => s.id === 'destruction')?.mastery.effect).toEqual({
+    expect(
+      TALENTS.warlock?.specs.find((s) => s.id === 'destruction')?.mastery.effect,
+    ).toMatchObject({
       global: { critDmgSpellPct: 0.5 },
       stats: { crit: 0.02 },
     });
@@ -133,7 +630,7 @@ describe('spec masteries', () => {
 
   it('bakes DoT, HoT, absorb, cost, and melee damage mastery fields into abilities', () => {
     expect(effect(known('warlock', 'corruption'), 'dot').total).toBe(85);
-    expect(effect(known('warlock', 'corruption', 'affliction'), 'dot').total).toBe(102);
+    expect(effect(known('warlock', 'corruption', 'affliction'), 'dot').total).toBe(94);
 
     expect(effect(known('druid', 'rejuvenation'), 'hot').total).toBe(116);
     expect(effect(known('druid', 'rejuvenation', 'restoration'), 'hot').total).toBe(145);
@@ -151,8 +648,8 @@ describe('spec masteries', () => {
   it('applies petDmgPct at BOTH the melee and ranged pet damage sites, not only the helper', () => {
     // Drive the actual damage sites (a regression that drops `dmg *= petDamageMult` at
     // either would still pass a helper-only assertion). Same seed + fixed rolls + an
-    // identical dummy (armor cancels in the ratio) isolate the multiplier: BM's Packbond (petDmgPct 0.35)
-    // must deal exactly 1.35x what a no-pet-mastery spec's identical pet deals.
+    // identical dummy (armor cancels in the ratio) isolate the multiplier: Packlord's
+    // Packbond (petDmgPct 0.2) deals 1.2x a sibling spec's identical pet damage.
     const setup = (spec: string) => {
       const sim = new Sim({ seed: 11, playerClass: 'hunter', autoEquip: true });
       sim.setPlayerLevel(20);
@@ -196,12 +693,12 @@ describe('spec masteries', () => {
     const meleeBm = dealtMelee('beast_mastery');
     const meleeNone = dealtMelee('marksmanship');
     expect(meleeNone).toBeGreaterThan(0);
-    expect(meleeBm / meleeNone).toBeCloseTo(1.35, 2);
+    expect(meleeBm / meleeNone).toBeCloseTo(1.2, 2);
 
     const rangedBm = dealtRanged('beast_mastery');
     const rangedNone = dealtRanged('marksmanship');
     expect(rangedNone).toBeGreaterThan(0);
-    expect(rangedBm / rangedNone).toBeCloseTo(1.35, 2);
+    expect(rangedBm / rangedNone).toBeCloseTo(1.2, 2);
   });
 
   it('Veinleech (siphon_life) leeches: the affliction dot tick heals the caster', () => {
@@ -245,7 +742,7 @@ describe('spec masteries', () => {
     hunterPet.ownerId = hunter.player.id;
     expect(
       (hunter as unknown as { petDamageMult(e: Entity): number }).petDamageMult(hunterPet),
-    ).toBeCloseTo(1.35);
+    ).toBeCloseTo(1.2);
 
     const paladin = new Sim({ seed: 6, playerClass: 'paladin', autoEquip: true });
     paladin.setPlayerLevel(20);
@@ -345,9 +842,19 @@ describe('spec masteries', () => {
         retribution: { global: 'meleeDmgPct', value: 0.2 },
       },
       hunter: {
-        beast_mastery: { global: 'petDmgPct', value: 0.35 },
-        marksmanship: { global: 'meleeDmgPct', value: 0.2 },
-        survival: { global: 'meleeDmgPct', value: 0.15 },
+        beast_mastery: { global: 'petDmgPct', value: 0.2 },
+        marksmanship: {
+          abilities: [
+            'serpent_sting',
+            'arcane_shot',
+            'concussive_shot',
+            'aimed_shot',
+            'multi_shot',
+            'volley',
+          ],
+          dmgPct: 0.1,
+        },
+        survival: { global: 'meleeDmgPct', value: 0.05 },
       },
       mage: {
         arcane: { global: 'spellDmgPct', value: 0.15 },
@@ -370,7 +877,7 @@ describe('spec masteries', () => {
         restoration: { abilities: ['chain_heal', 'healing_wave'], costPct: -0.2 },
       },
       warlock: {
-        affliction: { global: 'dotDmgPct', value: 0.2 },
+        affliction: { global: 'dotDmgPct', value: 0.1 },
         demonology: { global: 'petDmgSharePct', value: 0.2 },
         destruction: { global: 'critDmgSpellPct', value: 0.5 },
       },

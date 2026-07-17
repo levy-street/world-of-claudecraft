@@ -9,25 +9,130 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "entities.abilities.icefall.description",
+    "entities.abilities.icefall.name",
+    "guide.abilityHook.blink",
+    "hudChrome.auraEffect.aethericFlux",
+    "hudChrome.auraEffect.nextAbilityDamage",
+    "hudChrome.auraEffect.stormcharge"
+  ],
+  "es_ES": [
+    "entities.abilities.icefall.description",
+    "entities.abilities.icefall.name",
+    "guide.abilityHook.blink",
+    "hudChrome.auraEffect.aethericFlux",
+    "hudChrome.auraEffect.nextAbilityDamage",
+    "hudChrome.auraEffect.stormcharge"
+  ],
+  "fr_FR": [
+    "entities.abilities.icefall.description",
+    "entities.abilities.icefall.name",
+    "guide.abilityHook.blink",
+    "hudChrome.auraEffect.aethericFlux",
+    "hudChrome.auraEffect.nextAbilityDamage",
+    "hudChrome.auraEffect.stormcharge"
+  ],
+  "fr_CA": [
+    "entities.abilities.icefall.description",
+    "entities.abilities.icefall.name",
+    "guide.abilityHook.blink",
+    "hudChrome.auraEffect.aethericFlux",
+    "hudChrome.auraEffect.nextAbilityDamage",
+    "hudChrome.auraEffect.stormcharge"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "entities.abilities.icefall.description",
+    "entities.abilities.icefall.name",
+    "guide.abilityHook.blink",
+    "hudChrome.auraEffect.aethericFlux",
+    "hudChrome.auraEffect.nextAbilityDamage",
+    "hudChrome.auraEffect.stormcharge"
+  ],
+  "de_DE": [
+    "entities.abilities.icefall.description",
+    "entities.abilities.icefall.name",
+    "guide.abilityHook.blink",
+    "hudChrome.auraEffect.aethericFlux",
+    "hudChrome.auraEffect.nextAbilityDamage",
+    "hudChrome.auraEffect.stormcharge"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "entities.abilities.icefall.description",
+    "entities.abilities.icefall.name",
+    "guide.abilityHook.blink",
+    "hudChrome.auraEffect.aethericFlux",
+    "hudChrome.auraEffect.nextAbilityDamage",
+    "hudChrome.auraEffect.stormcharge"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "entities.abilities.icefall.description",
+    "entities.abilities.icefall.name",
+    "guide.abilityHook.blink",
+    "hudChrome.auraEffect.aethericFlux",
+    "hudChrome.auraEffect.nextAbilityDamage",
+    "hudChrome.auraEffect.stormcharge"
+  ],
+  "nl_NL": [
+    "entities.abilities.icefall.description",
+    "entities.abilities.icefall.name",
+    "guide.abilityHook.blink",
+    "hudChrome.auraEffect.aethericFlux",
+    "hudChrome.auraEffect.nextAbilityDamage",
+    "hudChrome.auraEffect.stormcharge"
+  ],
+  "pl_PL": [
+    "entities.abilities.icefall.description",
+    "entities.abilities.icefall.name",
+    "guide.abilityHook.blink",
+    "hudChrome.auraEffect.aethericFlux",
+    "hudChrome.auraEffect.nextAbilityDamage",
+    "hudChrome.auraEffect.stormcharge"
+  ],
+  "id_ID": [
+    "entities.abilities.icefall.description",
+    "entities.abilities.icefall.name",
+    "guide.abilityHook.blink",
+    "hudChrome.auraEffect.aethericFlux",
+    "hudChrome.auraEffect.nextAbilityDamage",
+    "hudChrome.auraEffect.stormcharge"
+  ],
+  "tr_TR": [
+    "entities.abilities.icefall.description",
+    "entities.abilities.icefall.name",
+    "guide.abilityHook.blink",
+    "hudChrome.auraEffect.aethericFlux",
+    "hudChrome.auraEffect.nextAbilityDamage",
+    "hudChrome.auraEffect.stormcharge"
+  ],
+  "sv_SE": [
+    "entities.abilities.icefall.description",
+    "entities.abilities.icefall.name",
+    "guide.abilityHook.blink",
+    "hudChrome.auraEffect.aethericFlux",
+    "hudChrome.auraEffect.nextAbilityDamage",
+    "hudChrome.auraEffect.stormcharge"
+  ],
+  "vi_VN": [
+    "entities.abilities.icefall.description",
+    "entities.abilities.icefall.name",
+    "guide.abilityHook.blink",
+    "hudChrome.auraEffect.aethericFlux",
+    "hudChrome.auraEffect.nextAbilityDamage",
+    "hudChrome.auraEffect.stormcharge"
+  ],
+  "da_DK": [
+    "entities.abilities.icefall.description",
+    "entities.abilities.icefall.name",
+    "guide.abilityHook.blink",
+    "hudChrome.auraEffect.aethericFlux",
+    "hudChrome.auraEffect.nextAbilityDamage",
+    "hudChrome.auraEffect.stormcharge"
+  ]
 };

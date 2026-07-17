@@ -1978,7 +1978,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fire_blast.description': 'Düşmanı {damage} Ateş hasarıyla patlatır. Anında.',
   'entities.abilities.fire_blast.name': 'Köz Yağmuru',
   'entities.abilities.fireball.description':
-    'Ateşli bir top fırlatarak {damage} Ateş hasarı ve ek olarak zamana yayılı hasar verir.',
+    'Ateşli bir top fırlatarak {damage} Ateş hasarı ve zamana yayılı {overTime} Ateş hasarı verir.',
   'entities.abilities.fireball.name': 'Köz Oku',
   'entities.abilities.rain_of_fire.name': 'Ateş Yağmuru',
   'entities.abilities.rain_of_fire.description':
@@ -2095,7 +2095,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mind_blast.description': 'Hedefin zihnini {damage} Gölge hasarıyla patlatır.',
   'entities.abilities.mind_blast.name': 'Zihin Kırılması',
   'entities.abilities.mind_flay.description':
-    'Hedefin zihnini Gölge enerjisiyle sarsar ve 3 saniye boyunca her saniye {damage} hasar verir.',
+    'Hedefin zihnini 3 saniye boyunca Gölge enerjisiyle sarsar. Her tikte hasar, ilk tikin hasarının %30’u kadar artar.',
   'entities.abilities.mind_flay.name': 'Keder Yakarışı',
   'entities.abilities.mongoose_bite.description':
     'Hedef sıyırma yaptıktan sonra silah hasarı artı {damage} ile karşı saldırı. Sıyrılamaz.',
@@ -2125,7 +2125,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Kurt Formundayken gizliliğe geçer ve 50% daha yavaş hareket edersin. Dövüş sırasında kullanılamaz.',
   'entities.abilities.prowl.name': 'Sinsi Sokulma',
   'entities.abilities.pyroblast.description':
-    'Devasa ateşli bir kaya fırlatarak {damage} Ateş hasarı ve ek olarak zamana yayılı hasar verir.',
+    'Devasa ateşli bir kaya fırlatarak {damage} Ateş hasarı ve 12 sn. boyunca {overTime} Ateş hasarı verir.',
   'entities.abilities.pyroblast.name': 'Alev Mızrağı',
   'entities.abilities.rake.description':
     'Düşmanı silah hasarı artı {damage} ile tırmalayan ve 9 saniye boyunca kanama hasarı yaratan gizlilik açılışı. 1 kombo puanı kazandırır. Yalnızca Kurt Formu.',

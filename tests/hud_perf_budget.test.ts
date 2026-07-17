@@ -481,6 +481,7 @@ function buildHarnesses(shape: WorldShape, facet: PainterHostWriters): PainterHa
           usable: true,
           outOfRange: false,
           queued: false,
+          procState: 'none',
           ariaLabel: 'A',
           keybindLabel: 'K',
         },
@@ -553,6 +554,7 @@ function actionBarDeps(): ActionBarDeps {
 function idleWorld(): ActionBarWorldInput {
   return {
     player: {
+      id: 1,
       autoAttack: false,
       dead: false,
       resource: 100,
@@ -562,6 +564,7 @@ function idleWorld(): ActionBarWorldInput {
       queuedOnSwing: null,
       stealthed: false,
       pos: { x: 0, y: 0, z: 0 },
+      auras: [],
     },
     target: null,
     inventory: [],
@@ -597,6 +600,7 @@ describe('hud_perf_budget ARM 2: per-frame allocation budget (Node, npm test)', 
                 range: 0,
               } as unknown as AbilityDef,
               cost: 0,
+              effects: [],
             }),
             item: () => null,
             keybindLabel: () => '1',

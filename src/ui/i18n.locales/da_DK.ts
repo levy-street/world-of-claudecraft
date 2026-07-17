@@ -1903,7 +1903,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Sprænger fjenden for {damage} ildskade. Øjeblikkelig.',
   'entities.abilities.fire_blast.name': 'Gløderfald',
   'entities.abilities.fireball.description':
-    'Slynger en flammende kugle, der volder {damage} ildskade plus yderligere skade over tid.',
+    'Slynger en flammende kugle, der volder {damage} ildskade plus {overTime} ildskade over tid.',
   'entities.abilities.fireball.name': 'Glødlyn',
   'entities.abilities.rain_of_fire.name': 'Ildregn',
   'entities.abilities.rain_of_fire.description':
@@ -2018,7 +2018,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mind_blast.description': 'Sprænger målets sind for {damage} skyggeskade.',
   'entities.abilities.mind_blast.name': 'Sindsbrud',
   'entities.abilities.mind_flay.description':
-    'Angriber målets sind med skyggeenergi, hvilket volder {damage} skade hvert sekund i 3 sek.',
+    'Angriber målets sind med skyggeenergi i 3 sek. For hvert tick øges skaden med 30 % af det første ticks skade.',
   'entities.abilities.mind_flay.name': 'Jammerens Litani',
   'entities.abilities.mongoose_bite.description':
     'Modangreb efter målet undviger for våbenskade plus {damage}. Kan ikke undviges.',
@@ -2048,7 +2048,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Gå i sneg-tilstand mens du er i Ulveform, og bevæg dig 50 % langsommere. Kan ikke bruges i kamp.',
   'entities.abilities.prowl.name': 'Snig',
   'entities.abilities.pyroblast.description':
-    'Slynger en enorm flammende kampesten, der volder {damage} ildskade plus yderligere skade over tid.',
+    'Slynger en enorm flammende kampesten, der volder {damage} ildskade plus {overTime} ildskade over 12 sek.',
   'entities.abilities.pyroblast.name': 'Bållanse',
   'entities.abilities.rake.description':
     'En snigeåbner der kradser fjenden for våbenskade plus {damage} og volder blødningsskade over 9 sek. Giver 1 kombopoint. Kun i Ulveform.',

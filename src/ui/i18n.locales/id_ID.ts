@@ -2006,7 +2006,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Meledakkan musuh sebesar {damage} kerusakan Api. Seketika.',
   'entities.abilities.fire_blast.name': 'Cinderfall',
   'entities.abilities.fireball.description':
-    'Melontarkan bola berkobar yang menimbulkan {damage} kerusakan Api ditambah kerusakan tambahan seiring waktu.',
+    'Melontarkan bola berkobar yang menimbulkan {damage} kerusakan Api ditambah {overTime} kerusakan Api seiring waktu.',
   'entities.abilities.fireball.name': 'Cinderbolt',
   'entities.abilities.rain_of_fire.name': 'Hujan Api',
   'entities.abilities.rain_of_fire.description':
@@ -2124,7 +2124,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Meledakkan pikiran target sebesar {damage} kerusakan Bayangan.',
   'entities.abilities.mind_blast.name': 'Mindfracture',
   'entities.abilities.mind_flay.description':
-    'Menyerang pikiran target dengan energi Bayangan, menimbulkan {damage} kerusakan setiap detik selama 3 detik.',
+    'Menyerang pikiran target dengan energi Bayangan selama 3 detik. Setiap detak meningkatkan kerusakan sebesar 30% dari kerusakan detak pertama.',
   'entities.abilities.mind_flay.name': 'Litani Nestapa',
   'entities.abilities.mongoose_bite.description':
     'Serangan balasan setelah target mengelak sebesar kerusakan senjata ditambah {damage}. Tidak dapat dielakkan.',
@@ -2154,7 +2154,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Masuk ke siluman saat dalam Wujud Serigala, bergerak 50% lebih lambat. Tidak dapat digunakan dalam pertempuran.',
   'entities.abilities.prowl.name': 'Mengintai',
   'entities.abilities.pyroblast.description':
-    'Melontarkan bongkahan berkobar raksasa yang menimbulkan {damage} kerusakan Api ditambah kerusakan tambahan seiring waktu.',
+    'Melontarkan bongkahan berkobar raksasa yang menimbulkan {damage} kerusakan Api ditambah {overTime} kerusakan Api selama 12 dtk.',
   'entities.abilities.pyroblast.name': 'Pyrelance',
   'entities.abilities.rake.description':
     'Pembuka siluman yang menggaruk musuh sebesar kerusakan senjata ditambah {damage} dan menimbulkan kerusakan berdarah selama 9 detik. Memberi 1 poin kombo. Hanya dalam Wujud Serigala.',

@@ -2,6 +2,32 @@ import type { AbilityDef } from '../types';
 
 /** Retained Talents V2 active grants: Mage, Warlock, and Druid. */
 export const TALENT_ABILITIES_V2_B = {
+  icefall: {
+    id: 'icefall',
+    name: 'Icefall',
+    class: 'mage',
+    learnLevel: 5,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 30,
+    school: 'frost',
+    requiresTarget: true,
+    offGcd: true,
+    effects: [
+      {
+        type: 'directDamage',
+        min: 8,
+        max: 8,
+        fixedNoCrit: true,
+        vsFrozenMult: 2.5,
+        consumeAuraAsFrozen: 'mag_frostbite',
+        consumeAuraStacks: { auraId: 'mag_icicles', maxStacks: 5 },
+      },
+    ],
+    description:
+      'Launches every stored Icicle at the target for $d Frost damage each. Deals 2.5 times damage if the target is frozen by a root or stun, or while Frostbite is active. Consumes Frostbite. This fixed damage cannot critically strike. (Cryomancy)',
+  },
   spellsteal: {
     id: 'spellsteal',
     name: 'Spellsteal',
@@ -57,7 +83,7 @@ export const TALENT_ABILITIES_V2_B = {
     school: 'arcane',
     requiresTarget: false,
     effects: [{ type: 'blinkForward', distance: 15, breakRoots: true }],
-    description: 'Teleports you 15 yd forward and breaks roots. (Mage talent)',
+    description: 'Teleports you 15 yd forward and breaks roots. (Mage)',
   },
   ice_block: {
     id: 'ice_block',

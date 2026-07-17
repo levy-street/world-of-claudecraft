@@ -1396,6 +1396,9 @@ export const de_DE: EnTranslations = {
       "formTravel": "Fleet Form: Bewegungstempo um {pct}% erhöht",
       "defensiveStance": "Wehrhafte Haltung: weniger erlittener Schaden, mehr Bedrohung",
       "righteousFury": "Brennender Eid: stark erhöhte Bedrohung durch Heiligschaden",
+      "stormcharge": "Skyrend {stacks}/{max}: each stack reduces Arc Bolt cast time by {castPct}% and increases its damage by {damagePct}%",
+      "aethericFlux": "Aetheric Flux {stacks}/{max}: each stack refunds {cooldown} sec of Aether Surge cooldown; Aether Surge consumes all stacks to restore {manaPct}% maximum mana per stack",
+      "nextAbilityDamage": "Increases the next affected ability damage by {pct}%",
       "scale": "Größe um {pct}% erhöht",
       "jump": "Sprunghöhe um {pct}% erhöht",
       "school": {
@@ -2510,6 +2513,7 @@ export const de_DE: EnTranslations = {
       "frost_armor": "Eine anhaltende Selbststärkung, die deine Rüstung vor einem Kampf härtet.",
       "arcane_intellect": "Hebt die Intelligenz, um den Manavorrat eines Verbündeten zu vertiefen. Wirke es vor dem Pull.",
       "frostbolt": "Trifft aus der Distanz und verlangsamt das Ziel, sodass es nicht zu dir aufschließen kann.",
+      "blink": "Teleports you forward and breaks roots, giving every Mage a reliable escape.",
       "conjure_water": "Zaubert Getränke herbei, die Mana wiederherstellen, damit du zwischen den Pulls auffüllen kannst.",
       "conjure_food": "Zaubert Nahrung herbei, die Gesundheit wiederherstellt, wenn du dich zum Essen hinsetzt.",
       "shadow_bolt": "Ein Schattenblitz, den du auf ein Ziel wirkst, dein erster Schadenszauber.",
@@ -5743,7 +5747,7 @@ export const de_DE: EnTranslations = {
       },
       "fireball": {
         "name": "Feuerball",
-        "description": "Schleudert einen feurigen Ball, der {damage} Feuerschaden sowie zusätzlichen Schaden über Zeit verursacht."
+        "description": "Schleudert einen feurigen Ball, der {damage} Feuerschaden sowie {overTime} Feuerschaden über Zeit verursacht."
       },
       "frost_armor": {
         "name": "Raureifmantel",
@@ -5756,6 +5760,10 @@ export const de_DE: EnTranslations = {
       "frostbolt": {
         "name": "Rimelance",
         "description": "Schleudert einen Frostblitz, verursacht {damage} Frostschaden und verlangsamt die Bewegung um 40%."
+      },
+      "icefall": {
+        "name": "Icefall",
+        "description": "Launches every stored Icicle at the target for {damage} Frost damage each. Deals 2.5 times damage if the target is frozen by a root or stun, or while Frostbite is active. Consumes Frostbite. This fixed damage cannot critically strike. (Cryomancy)"
       },
       "conjure_water": {
         "name": "Waterbind",
@@ -5791,7 +5799,7 @@ export const de_DE: EnTranslations = {
       },
       "pyroblast": {
         "name": "Pyrelance",
-        "description": "Schleudert einen gewaltigen Feuerbrocken, der {damage} Feuerschaden sowie zusätzlichen Schaden über Zeit verursacht."
+        "description": "Schleudert einen gewaltigen Feuerbrocken, der {damage} Feuerschaden sowie {overTime} Feuerschaden über 12 Sek. verursacht."
       },
       "ice_barrier": {
         "name": "Frostschleier",
@@ -6023,7 +6031,7 @@ export const de_DE: EnTranslations = {
       },
       "mind_flay": {
         "name": "Litanei des Leids",
-        "description": "Greift den Geist des Ziels mit Schattenenergie an und verursacht 3 Sek. lang jede Sekunde {damage} Schaden."
+        "description": "Greift den Geist des Ziels 3 Sek. lang mit Schattenenergie an. Mit jedem Tick steigt der Schaden um 30 % des Schadens des ersten Ticks."
       },
       "flash_heal": {
         "name": "Dringendes Gebet",

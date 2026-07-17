@@ -60,22 +60,82 @@ describe('warlock low-level sustained damage tuning', () => {
   });
 
   it('keeps mastery tuning and the active damage-amplification row canonical', () => {
-    // Masteries were made impactful across all specs (spec identity pass): affliction
-    // amplifies its damage-over-time effects, destruction doubles spell crit damage.
-    expect(spec('affliction').mastery.effect.global?.dotDmgPct).toBe(0.2);
+    // Hexcraft trades half of its former flat DoT scalar for the Consume duration weave;
+    // Ruination retains its direct spell critical-damage axis.
+    expect(spec('affliction').mastery.effect.global?.dotDmgPct).toBe(0.1);
+    expect(spec('affliction').mastery.effect.ability).toEqual([
+      {
+        ability: 'drain_life',
+        addEffects: [
+          { type: 'extendDot', dot: 'corruption', seconds: 1, maxBonus: 3 },
+          { type: 'extendDot', dot: 'curse_of_agony', seconds: 1, maxBonus: 3 },
+          { type: 'extendDot', dot: 'siphon_life', seconds: 1, maxBonus: 3 },
+        ],
+      },
+    ]);
     expect(spec('destruction').mastery.effect.global?.critDmgSpellPct).toBe(0.5);
     expect(spec('destruction').mastery.effect.stats?.crit).toBe(0.02);
+    expect(spec('destruction').mastery.effect.procs).toEqual([
+      {
+        id: 'wlk_desolation_gloom',
+        name: 'Desolation',
+        spec: 'destruction',
+        requiresKnownAbility: 'conflagrate',
+        school: 'fire',
+        trigger: {
+          on: 'spellCrit',
+          abilities: ['immolate', 'searing_pain', 'conflagrate', 'chaos_bolt'],
+        },
+        responses: [
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_instant',
+            abilities: ['shadow_bolt'],
+            duration: 8,
+          },
+        ],
+      },
+      {
+        id: 'wlk_desolation_conflagrate',
+        name: 'Desolation',
+        spec: 'destruction',
+        requiresKnownAbility: 'conflagrate',
+        school: 'shadow',
+        trigger: {
+          on: 'spellCrit',
+          abilities: ['shadow_bolt', 'shadowburn', 'death_coil'],
+        },
+        responses: [
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_free',
+            abilities: ['conflagrate'],
+            duration: 8,
+          },
+        ],
+      },
+    ]);
 
     expect(abilityEffects('wlk_r14_amplify_curse')).toEqual([
-      { ability: 'shadow_bolt', dmgPctVsDotted: 0.2 },
+      {
+        ability: 'shadow_bolt',
+        addEffects: [
+          { type: 'extendDot', dot: 'corruption', seconds: 3, maxBonus: 6 },
+          { type: 'extendDot', dot: 'curse_of_agony', seconds: 3, maxBonus: 6 },
+        ],
+      },
     ]);
     const amplified = computeTalentModifiers(
       'warlock',
       { spec: 'affliction', rows: { 14: 'wlk_r14_amplify_curse' } },
       20,
     );
-    expect(amplified.global.dotDmgPct).toBe(0.2);
-    expect(amplified.abilities.shadow_bolt?.dmgPctVsDotted).toBe(0.2);
+    expect(amplified.global.dotDmgPct).toBe(0.1);
+    expect(amplified.abilities.shadow_bolt?.dmgPctVsDotted).toBe(0);
+    expect(amplified.abilities.shadow_bolt?.addEffects).toEqual([
+      { type: 'extendDot', dot: 'corruption', seconds: 3, maxBonus: 6 },
+      { type: 'extendDot', dot: 'curse_of_agony', seconds: 3, maxBonus: 6 },
+    ]);
   });
 
   it('pins the final Hellglass Ward absorb instead of the obsolete point-tree bonuses', () => {

@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { ROW_TREES, TALENTS } from '../src/sim/content/talents';
+import { tEntity } from '../src/ui/entity_i18n';
 import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
 import { tTalent } from '../src/ui/talent_i18n';
 
@@ -96,11 +97,110 @@ describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
     }
   });
 
+  it('keeps authored riders visible when a grant row has an additional effect', () => {
+    const ruinbolt = ROW_TREES.warlock
+      .flatMap((row) => row.options)
+      .find((option) => option.id === 'wlk_r20_chaos_bolt');
+    if (!ruinbolt) throw new Error('missing Ruinbolt talent');
+
+    const rendered = tTalent({ kind: 'talentChoice', choice: ruinbolt, field: 'description' });
+
+    expect(rendered).toContain('Hurls a bolt of chaotic fire');
+    expect(rendered).toContain("Landing Ruinbolt resets Duskfire's cooldown.");
+  });
+
   it('ships no unresolved ability placeholders in canonical source prose', () => {
     const unresolved = entries.filter((entry) =>
       /\$[A-Za-z0-9_]+|\{[A-Za-z0-9_]+\}/.test(entry.source),
     );
     expect(unresolved.map((entry) => `${entry.cls}:${entry.id}`)).toEqual([]);
+  });
+
+  it('keeps Shadow mechanic conditions explicit in a non-Latin locale', async () => {
+    await ensureLocaleLoaded('ja_JP');
+    setLanguage('ja_JP');
+    try {
+      const renderChoice = (id: string): string => {
+        const choice = Object.values(ROW_TREES)
+          .flat()
+          .flatMap((row) => row.options)
+          .find((option) => option.id === id);
+        if (!choice) throw new Error(`missing talent choice ${id}`);
+        return tTalent({ kind: 'talentChoice', choice, field: 'description' });
+      };
+
+      expect(renderChoice('pri_r17_ninefold_litany')).toContain('/ 9x');
+      expect(renderChoice('pri_r17_woes_crescendo')).toContain('3/3 -> AoE 36');
+      expect(renderChoice('pri_r14_deathless_dirge')).toContain('↻ 18');
+      expect(renderChoice('pri_r14_plague_chorus')).toContain('-> AoE (r=8)');
+    } finally {
+      setLanguage('en');
+    }
+  });
+
+  it('keeps both melee mastery loops explicit and hides pseudo ids in Japanese', async () => {
+    await ensureLocaleLoaded('ja_JP');
+    setLanguage('ja_JP');
+    try {
+      const mastery = (cls: 'shaman' | 'paladin', specId: string): string => {
+        const spec = TALENTS[cls].specs.find((candidate) => candidate.id === specId);
+        if (!spec) throw new Error(`missing ${cls} ${specId} specialization`);
+        return tTalent({ kind: 'talentMastery', spec, field: 'description' });
+      };
+
+      const skyrend = mastery('shaman', 'enhancement');
+      expect(skyrend).not.toContain('auto_attack');
+      expect(skyrend).toContain('20%');
+      expect(skyrend).toContain('10%');
+      expect(skyrend).toContain('x5');
+      expect(skyrend).toContain('x0');
+
+      const bloodDebt = mastery('paladin', 'retribution');
+      expect(bloodDebt).not.toContain('auto_attack');
+      expect(bloodDebt).toContain('20%');
+      expect(bloodDebt).toContain('8');
+    } finally {
+      setLanguage('en');
+    }
+  });
+
+  it('keeps Druid spec, ownership, and form gates explicit in Japanese', async () => {
+    await ensureLocaleLoaded('ja_JP');
+    setLanguage('ja_JP');
+    try {
+      const renderChoice = (id: string): string => {
+        const choice = ROW_TREES.druid
+          .flatMap((row) => row.options)
+          .find((option) => option.id === id);
+        if (!choice) throw new Error(`missing Druid talent choice ${id}`);
+        return tTalent({ kind: 'talentChoice', choice, field: 'description' });
+      };
+      const spec = (id: string) => {
+        const found = TALENTS.druid.specs.find((candidate) => candidate.id === id);
+        if (!found) throw new Error(`missing Druid ${id} specialization`);
+        return found;
+      };
+      const specName = (id: string): string =>
+        tTalent({ kind: 'talentSpec', spec: spec(id), field: 'name' });
+
+      expect(renderChoice('dru_r8_typhoon')).toContain(specName('balance'));
+      expect(renderChoice('dru_r20_berserk')).toContain(specName('feral'));
+
+      const wildfang = spec('feral');
+      const primalHeart = tTalent({
+        kind: 'talentMastery',
+        spec: wildfang,
+        field: 'description',
+      });
+      expect(primalHeart).toContain(specName('feral'));
+      expect(primalHeart).toContain(
+        tTalent({ kind: 'talentMastery', spec: wildfang, field: 'name' }),
+      );
+      expect(primalHeart).toContain(tEntity({ kind: 'ability', id: 'bear_form', field: 'name' }));
+      expect(primalHeart).toContain('100%');
+    } finally {
+      setLanguage('en');
+    }
   });
 
   it('regression locks: vague tooltips now read real numbers; egregious effects honor their promise', () => {
@@ -110,17 +210,32 @@ describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
       if (!entry) throw new Error(`no talent entry matched for ${cls}`);
       return entry.render();
     };
-    const swift = render('paladin', (e) => e.id === 'pal_r14_swift_verdicts');
-    expect(swift).toContain('20%');
-    expect(swift).toContain('25%');
+    const oathsDue = render('paladin', (e) => e.id === 'pal_r14_swift_verdicts');
+    expect(oathsDue).toContain('Verdict');
+    expect(oathsDue).toContain('Crusader Strike');
+    expect(oathsDue).toContain('50%');
+    expect(oathsDue).toContain('20%');
+    expect(oathsDue).toContain('70%');
+    expect(oathsDue).toContain('free Rite of Expulsion');
+    expect(oathsDue).toContain("refreshes Oath's Due");
+    expect(oathsDue).toContain('7');
 
-    const sniper = render('hunter', (e) => e.id === 'hun_r14_sniper_training');
-    expect(sniper).toContain('30%');
-    expect(sniper).toContain('15%');
+    const reprise = render('shaman', (e) => e.id === 'sha_r20_elemental_fury');
+    expect(reprise).toContain('20%');
+    expect(reprise).toContain('Ancestral Strike');
+    expect(reprise).toContain('cooldown');
 
-    const attunement = render('shaman', (e) => e.id === 'sha_r11_elemental_attunement');
-    expect(attunement).toContain('critical strikes');
-    expect(attunement).toContain('instant');
+    const secondBearing = render('hunter', (e) => e.id === 'hun_r14_sniper_training');
+    expect(secondBearing).toContain('landed Long Draw');
+    expect(secondBearing).toContain('20 mana');
+    expect(secondBearing).toContain('Rattling Shot cooldown');
+
+    const fulmination = render('shaman', (e) => e.id === 'sha_r11_fulmination');
+    expect(fulmination).toContain('up to 9');
+    expect(fulmination).toContain('5% Overload chance');
+    expect(fulmination).toContain('chains to one nearby enemy');
+    expect(fulmination).toContain('8 Nature damage each');
+    expect(fulmination).toContain('nearby enemies');
 
     const mastery = render('warrior', (e) => e.id === 'war_row_blood_offering');
     expect(mastery).toContain('ability criticals deal 15% more damage');

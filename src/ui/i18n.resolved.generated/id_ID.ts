@@ -1396,6 +1396,9 @@ export const id_ID: EnTranslations = {
       "formTravel": "Wujud Fleet: kecepatan gerak meningkat sebesar {pct}%",
       "defensiveStance": "Kuda-kuda Waspada: kerusakan yang diterima berkurang, ancaman bertambah",
       "righteousFury": "Sumpah Membara: ancaman dari kerusakan Suci sangat meningkat",
+      "stormcharge": "Skyrend {stacks}/{max}: each stack reduces Arc Bolt cast time by {castPct}% and increases its damage by {damagePct}%",
+      "aethericFlux": "Aetheric Flux {stacks}/{max}: each stack refunds {cooldown} sec of Aether Surge cooldown; Aether Surge consumes all stacks to restore {manaPct}% maximum mana per stack",
+      "nextAbilityDamage": "Increases the next affected ability damage by {pct}%",
       "scale": "Tamaño aumentado un {pct}%",
       "jump": "Altura de salto aumentada un {pct}%",
       "school": {
@@ -2510,6 +2513,7 @@ export const id_ID: EnTranslations = {
       "frost_armor": "Penguat-diri tahan lama yang mengeraskan zirahmu sebelum pertarungan.",
       "arcane_intellect": "Menaikkan Intelek untuk memperdalam kolam mana sekutu, rapalkan sebelum menarik musuh.",
       "frostbolt": "Menyerang dari kejauhan dan melambatkan sasaran sehingga tak bisa mendekatimu.",
+      "blink": "Teleports you forward and breaks roots, giving every Mage a reliable escape.",
       "conjure_water": "Menciptakan minuman yang memulihkan mana, sehingga kamu bisa mengisi ulang di sela tarikan.",
       "conjure_food": "Menciptakan makanan yang memulihkan nyawa saat kamu duduk untuk menyantapnya.",
       "shadow_bolt": "Anak panah bayangan yang kamu rapalkan ke sasaran, serangan andalanmu.",
@@ -5743,7 +5747,7 @@ export const id_ID: EnTranslations = {
       },
       "fireball": {
         "name": "Cinderbolt",
-        "description": "Melontarkan bola berkobar yang menimbulkan {damage} kerusakan Api ditambah kerusakan tambahan seiring waktu."
+        "description": "Melontarkan bola berkobar yang menimbulkan {damage} kerusakan Api ditambah {overTime} kerusakan Api seiring waktu."
       },
       "frost_armor": {
         "name": "Mantel Embun Beku",
@@ -5756,6 +5760,10 @@ export const id_ID: EnTranslations = {
       "frostbolt": {
         "name": "Rimelance",
         "description": "Melepaskan panah embun beku, menimbulkan {damage} kerusakan Beku dan memperlambat gerakan sebesar 40%."
+      },
+      "icefall": {
+        "name": "Icefall",
+        "description": "Launches every stored Icicle at the target for {damage} Frost damage each. Deals 2.5 times damage if the target is frozen by a root or stun, or while Frostbite is active. Consumes Frostbite. This fixed damage cannot critically strike. (Cryomancy)"
       },
       "conjure_water": {
         "name": "Waterbind",
@@ -5791,7 +5799,7 @@ export const id_ID: EnTranslations = {
       },
       "pyroblast": {
         "name": "Pyrelance",
-        "description": "Melontarkan bongkahan berkobar raksasa yang menimbulkan {damage} kerusakan Api ditambah kerusakan tambahan seiring waktu."
+        "description": "Melontarkan bongkahan berkobar raksasa yang menimbulkan {damage} kerusakan Api ditambah {overTime} kerusakan Api selama 12 dtk."
       },
       "ice_barrier": {
         "name": "Selubung Beku",
@@ -6023,7 +6031,7 @@ export const id_ID: EnTranslations = {
       },
       "mind_flay": {
         "name": "Litani Nestapa",
-        "description": "Menyerang pikiran target dengan energi Bayangan, menimbulkan {damage} kerusakan setiap detik selama 3 detik."
+        "description": "Menyerang pikiran target dengan energi Bayangan selama 3 detik. Setiap detak meningkatkan kerusakan sebesar 30% dari kerusakan detak pertama."
       },
       "flash_heal": {
         "name": "Doa Mendesak",

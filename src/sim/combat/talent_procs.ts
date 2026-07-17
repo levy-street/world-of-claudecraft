@@ -1,6 +1,7 @@
 import type { ProcDef, ProcResponse } from '../content/talents';
 import type { SimContext } from '../sim_context';
-import type { Entity } from '../types';
+import type { Entity, ResourceType } from '../types';
+import { consumeOwnedDot, detonateOwnedDot, rollOwnedDot } from './dot_mutation';
 
 function state(player: Entity): NonNullable<Entity['procState']> {
   if (!player.procState) player.procState = { counters: {}, icds: {} };
@@ -22,11 +23,27 @@ export function resetProcState(player: Entity): void {
 
 function procsFor(ctx: SimContext, player: Entity): ProcDef[] {
   const meta = ctx.players.get(player.id);
-  return meta ? ctx.playerMods(meta).procs : [];
+  if (!meta) return [];
+  const mods = ctx.playerMods(meta);
+  return mods.procs.filter(
+    (def) =>
+      (def.spec === undefined || def.spec === mods.spec) &&
+      (def.requiresKnownAbility === undefined ||
+        meta.known.some((ability) => ability.def.id === def.requiresKnownAbility)),
+  );
 }
 
-function fire(ctx: SimContext, player: Entity, def: ProcDef, subject: Entity): void {
-  for (const response of def.responses) fireOne(ctx, player, def, subject, response);
+function fire(
+  ctx: SimContext,
+  player: Entity,
+  def: ProcDef,
+  subject: Entity,
+  landedDamage = 0,
+  landedTarget: Entity = subject,
+): void {
+  for (const response of def.responses) {
+    fireOne(ctx, player, def, subject, response, landedDamage, landedTarget);
+  }
 }
 
 function fireOne(
@@ -35,9 +52,17 @@ function fireOne(
   def: ProcDef,
   subject: Entity,
   response: ProcResponse,
+  landedDamage: number,
+  landedTarget: Entity,
 ): void {
   switch (response.kind) {
     case 'empowerNext': {
+      const value =
+        response.aura === 'next_ability_damage'
+          ? (response.dmgPct ?? 0)
+          : response.costPct !== undefined
+            ? 1 - response.costPct
+            : 0;
       const existing = player.auras.find(
         (aura) => aura.id === def.id && aura.sourceId === player.id,
       );
@@ -45,7 +70,7 @@ function fireOne(
         existing.kind = response.aura;
         existing.remaining = response.duration;
         existing.duration = response.duration;
-        existing.value = response.costPct !== undefined ? 1 - response.costPct : 0;
+        existing.value = value;
         existing.empowerAbilities = response.abilities;
       } else {
         ctx.applyAura(player, {
@@ -54,7 +79,7 @@ function fireOne(
           kind: response.aura,
           remaining: response.duration,
           duration: response.duration,
-          value: response.costPct !== undefined ? 1 - response.costPct : 0,
+          value,
           sourceId: player.id,
           school: def.school ?? 'holy',
           empowerAbilities: response.abilities,
@@ -83,13 +108,169 @@ function fireOne(
       if (response.resourceType !== undefined && player.resourceType !== response.resourceType) {
         break;
       }
-      player.resource = Math.min(player.maxResource, player.resource + response.amount);
+      player.resource = Math.min(
+        player.maxResource,
+        player.resource + (response.amount ?? player.maxResource * response.pctMax),
+      );
       break;
+    case 'stackAura': {
+      const existing = player.auras.find(
+        (aura) => aura.id === def.id && aura.sourceId === player.id,
+      );
+      if (existing) {
+        existing.stacks = Math.min(response.maxStacks, (existing.stacks ?? 0) + 1);
+        existing.remaining = response.duration;
+        existing.duration = response.duration;
+      } else {
+        ctx.applyAura(player, {
+          id: def.id,
+          name: def.name,
+          kind: response.aura,
+          remaining: response.duration,
+          duration: response.duration,
+          value: 0,
+          stacks: 1,
+          sourceId: player.id,
+          school: def.school ?? 'frost',
+        });
+      }
+      ctx.emit({
+        type: 'spellfx',
+        sourceId: player.id,
+        targetId: player.id,
+        school: def.school ?? 'frost',
+        fx: 'procSurge',
+      });
+      break;
+    }
+    case 'consumeAuraStacksResource': {
+      if (response.resourceType !== undefined && player.resourceType !== response.resourceType) {
+        break;
+      }
+      const auraIndex = player.auras.findIndex(
+        (aura) => aura.id === response.auraId && aura.sourceId === player.id,
+      );
+      if (auraIndex < 0) break;
+      const aura = player.auras[auraIndex];
+      const stacks = aura.stacks ?? 0;
+      if (stacks <= 0) break;
+      player.auras.splice(auraIndex, 1);
+      ctx.emit({ type: 'aura', targetId: player.id, name: aura.name, gained: false });
+      player.resource = Math.min(
+        player.maxResource,
+        player.resource + player.maxResource * response.pctMaxPerStack * stacks,
+      );
+      ctx.emit({
+        type: 'spellfx',
+        sourceId: player.id,
+        targetId: player.id,
+        school: def.school ?? 'arcane',
+        fx: 'procSurge',
+      });
+      break;
+    }
+    case 'rollingDot': {
+      const banked = rollOwnedDot(
+        ctx,
+        player,
+        landedTarget,
+        {
+          id: def.id,
+          name: def.name,
+          school: def.school ?? 'fire',
+          pctDamage: response.pctDamage,
+          duration: response.duration,
+          interval: response.interval,
+        },
+        landedDamage,
+      );
+      if (banked > 0) {
+        ctx.emit({
+          type: 'spellfx',
+          sourceId: player.id,
+          targetId: landedTarget.id,
+          school: def.school ?? 'fire',
+          fx: 'procSurge',
+        });
+      }
+      break;
+    }
+    case 'detonateOwnedDot':
+      if (landedDamage > 0) detonateOwnedDot(ctx, player, landedTarget, response.auraId);
+      break;
+    case 'consumeOwnedDotAbsorb': {
+      if (
+        response.requiresForm === 'bear' &&
+        !player.auras.some((aura) => aura.kind === 'form_bear')
+      ) {
+        break;
+      }
+      const target = player.targetId === null ? undefined : ctx.entities.get(player.targetId);
+      if (!target || target.dead || !ctx.isHostileTo(player, target)) break;
+      const remainingDamage = consumeOwnedDot(ctx, player, target, response.auraId);
+      if (remainingDamage <= 0) break;
+      const amount = Math.min(
+        Math.round(player.maxHp * response.maxHpPct),
+        Math.round(remainingDamage * response.multiplier),
+      );
+      if (amount <= 0) break;
+      ctx.applyAura(player, {
+        id: def.id,
+        name: def.name,
+        kind: 'absorb',
+        remaining: response.duration,
+        duration: response.duration,
+        value: amount,
+        sourceId: player.id,
+        school: def.school ?? 'physical',
+      });
+      ctx.emit({
+        type: 'spellfx',
+        sourceId: player.id,
+        targetId: player.id,
+        school: def.school ?? 'physical',
+        fx: 'wardBloom',
+      });
+      break;
+    }
+    case 'chanceAura': {
+      // The response sits behind procsFor + the trigger's ability gate, so this is
+      // the only draw: Frostbite rolls only after a landed Cryomancy Rimelance hit.
+      if (!ctx.rng.chance(response.chance)) break;
+      ctx.applyAura(player, {
+        id: response.id,
+        name: response.name,
+        kind: response.aura,
+        remaining: response.duration,
+        duration: response.duration,
+        value: 0,
+        charges: response.charges,
+        sourceId: player.id,
+        school: def.school ?? 'frost',
+      });
+      break;
+    }
+    case 'addAuraCharges': {
+      const aura = player.auras.find(
+        (entry) => entry.id === response.ability && entry.sourceId === player.id,
+      );
+      if (!aura) break;
+      aura.charges = Math.min(response.maxCharges, (aura.charges ?? 0) + response.amount);
+      ctx.emit({
+        type: 'spellfx',
+        sourceId: player.id,
+        targetId: player.id,
+        school: def.school ?? 'nature',
+        fx: 'procSurge',
+      });
+      break;
+    }
     case 'heal':
-      ctx.applyHeal(player, subject, response.amount, def.name);
+      ctx.applyHeal(player, subject, response.amount ?? player.maxHp * response.pctMax, def.name);
       break;
-    case 'absorb':
-      ctx.applyAura(subject, {
+    case 'absorb': {
+      const recipient = response.applyTo === 'self' ? player : subject;
+      ctx.applyAura(recipient, {
         id: def.id,
         name: def.name,
         kind: 'absorb',
@@ -102,11 +283,12 @@ function fireOne(
       ctx.emit({
         type: 'spellfx',
         sourceId: player.id,
-        targetId: subject.id,
+        targetId: recipient.id,
         school: def.school ?? 'holy',
         fx: 'wardBloom',
       });
       break;
+    }
     case 'echo':
       ctx.applyAura(subject, {
         id: def.id,
@@ -143,6 +325,56 @@ export function onCastCompleted(
   }
 }
 
+export function onResourceSpent(
+  ctx: SimContext,
+  player: Entity,
+  abilityId: string,
+  resourceType: ResourceType,
+  amount: number,
+): void {
+  if (amount <= 0) return;
+  for (const def of procsFor(ctx, player)) {
+    const trigger = def.trigger;
+    if (
+      trigger.on !== 'resourceSpent' ||
+      trigger.resourceType !== resourceType ||
+      !trigger.abilities.includes(abilityId)
+    ) {
+      continue;
+    }
+    fire(ctx, player, def, player);
+  }
+}
+
+export function onPetHit(ctx: SimContext, player: Entity, target: Entity): void {
+  for (const def of procsFor(ctx, player)) {
+    const trigger = def.trigger;
+    if (trigger.on !== 'petHitNth') continue;
+    const procState = state(player);
+    const count = (procState.counters[def.id] ?? 0) + 1;
+    if (count >= trigger.n) {
+      procState.counters[def.id] = 0;
+      fire(ctx, player, def, target);
+    } else {
+      procState.counters[def.id] = count;
+    }
+  }
+}
+
+export function onFreeCastConsumed(
+  ctx: SimContext,
+  player: Entity,
+  abilityId: string,
+  consumedAuraId: string,
+): void {
+  for (const def of procsFor(ctx, player)) {
+    const refresh = def.refreshOnFreeCast;
+    if (refresh?.ability !== abilityId || refresh.consumedAuraId !== consumedAuraId) continue;
+    fire(ctx, player, def, player);
+    return;
+  }
+}
+
 export function onThornsReflect(ctx: SimContext, player: Entity, abilityId: string): void {
   for (const def of procsFor(ctx, player)) {
     const trigger = def.trigger;
@@ -157,6 +389,7 @@ export function onSpellCrit(
   player: Entity,
   abilityId: string | null,
   target: Entity,
+  landedDamage = 0,
 ): void {
   for (const def of procsFor(ctx, player)) {
     const trigger = def.trigger;
@@ -164,6 +397,38 @@ export function onSpellCrit(
     if (trigger.abilities && (abilityId === null || !trigger.abilities.includes(abilityId))) {
       continue;
     }
+    if (trigger.icd !== undefined) {
+      const procState = state(player);
+      if (procState.icds[def.id] !== undefined) continue;
+      procState.icds[def.id] = trigger.icd;
+    }
+    fire(ctx, player, def, target, landedDamage);
+  }
+}
+
+export function onSpellHit(
+  ctx: SimContext,
+  player: Entity,
+  abilityId: string,
+  target: Entity,
+  landedDamage = 0,
+): void {
+  for (const def of procsFor(ctx, player)) {
+    const trigger = def.trigger;
+    if (trigger.on !== 'spellHit' || !trigger.abilities.includes(abilityId)) continue;
+    fire(ctx, player, def, target, landedDamage);
+  }
+}
+
+export function onRangedHit(
+  ctx: SimContext,
+  player: Entity,
+  abilityId: string,
+  target: Entity,
+): void {
+  for (const def of procsFor(ctx, player)) {
+    const trigger = def.trigger;
+    if (trigger.on !== 'rangedHit' || !trigger.abilities.includes(abilityId)) continue;
     fire(ctx, player, def, target);
   }
 }
@@ -208,11 +473,49 @@ export function onDamageTaken(ctx: SimContext, player: Entity, amount: number): 
   }
 }
 
-export function onMeleeSwing(ctx: SimContext, player: Entity): void {
-  for (const def of procsFor(ctx, player)) {
+export function onMeleeSwing(
+  ctx: SimContext,
+  player: Entity,
+  abilityId = 'auto_attack',
+  consumedEmpowerAuraId?: string,
+  landedTarget?: Entity,
+  landedDamage = 0,
+): void {
+  const activeProcs = procsFor(ctx, player);
+  for (const def of activeProcs) {
     const trigger = def.trigger;
-    if (trigger.on !== 'meleeSwingWhile') continue;
-    if (!player.auras.some((aura) => aura.kind === trigger.auraKind)) continue;
-    fire(ctx, player, def, player);
+    if (trigger.on === 'meleeHit') {
+      if (!trigger.abilities.includes(abilityId)) continue;
+      if (trigger.positiveDamage && landedDamage <= 0) continue;
+      const empowered = trigger.chanceWhenEmpowered;
+      const chance =
+        empowered !== undefined &&
+        empowered.ability === abilityId &&
+        empowered.auraId === consumedEmpowerAuraId &&
+        activeProcs.some((candidate) => candidate.id === empowered.auraId)
+          ? empowered.chance
+          : trigger.chance;
+      if (chance !== undefined && !ctx.rng.chance(chance)) continue;
+      fire(ctx, player, def, player, landedDamage, landedTarget ?? player);
+      continue;
+    }
+    if (
+      trigger.on === 'meleeSwingWhile' &&
+      player.auras.some((aura) => aura.kind === trigger.auraKind)
+    ) {
+      const cadence = trigger.n ?? 1;
+      if (cadence <= 1) {
+        fire(ctx, player, def, player);
+        continue;
+      }
+      const procState = state(player);
+      const count = (procState.counters[def.id] ?? 0) + 1;
+      if (count >= cadence) {
+        procState.counters[def.id] = 0;
+        fire(ctx, player, def, player);
+      } else {
+        procState.counters[def.id] = count;
+      }
+    }
   }
 }

@@ -1396,6 +1396,9 @@ export const it_IT: EnTranslations = {
       "formTravel": "Forma di Fleet: velocità di movimento aumentata del {pct}%",
       "defensiveStance": "Posizione Guardinga: danni subiti ridotti, più minaccia",
       "righteousFury": "Giuramento Ardente: minaccia da danni Sacri molto aumentata",
+      "stormcharge": "Skyrend {stacks}/{max}: each stack reduces Arc Bolt cast time by {castPct}% and increases its damage by {damagePct}%",
+      "aethericFlux": "Aetheric Flux {stacks}/{max}: each stack refunds {cooldown} sec of Aether Surge cooldown; Aether Surge consumes all stacks to restore {manaPct}% maximum mana per stack",
+      "nextAbilityDamage": "Increases the next affected ability damage by {pct}%",
       "scale": "Taglia aumentata del {pct}%",
       "jump": "Altezza di salto aumentata del {pct}%",
       "school": {
@@ -2510,6 +2513,7 @@ export const it_IT: EnTranslations = {
       "frost_armor": "Un potenziamento personale duraturo che indurisce la tua corazza prima di uno scontro.",
       "arcane_intellect": "Aumenta l'Intelletto per ampliare la riserva di mana di un alleato, lancialo prima del pull.",
       "frostbolt": "Colpisce dalla distanza e rallenta il bersaglio, così non riesce ad avvicinarsi.",
+      "blink": "Teleports you forward and breaks roots, giving every Mage a reliable escape.",
       "conjure_water": "Evoca bevande che ripristinano il mana, così puoi rifornirti tra un pull e l'altro.",
       "conjure_food": "Evoca del cibo che ripristina la salute quando ti siedi a mangiare.",
       "shadow_bolt": "Un dardo d'ombra che lanci su un bersaglio, il tuo colpo di riferimento.",
@@ -5743,7 +5747,7 @@ export const it_IT: EnTranslations = {
       },
       "fireball": {
         "name": "Dardo di Braci",
-        "description": "Scaglia una palla infuocata che infligge {damage} danni da Fuoco più danni aggiuntivi nel tempo."
+        "description": "Scaglia una palla infuocata che infligge {damage} danni da Fuoco più {overTime} danni da Fuoco nel tempo."
       },
       "frost_armor": {
         "name": "Manto di Brina",
@@ -5756,6 +5760,10 @@ export const it_IT: EnTranslations = {
       "frostbolt": {
         "name": "Lancia di Brina",
         "description": "Lancia un dardo di gelo, infliggendo {damage} danni da Gelo e rallentando il movimento del 40%."
+      },
+      "icefall": {
+        "name": "Icefall",
+        "description": "Launches every stored Icicle at the target for {damage} Frost damage each. Deals 2.5 times damage if the target is frozen by a root or stun, or while Frostbite is active. Consumes Frostbite. This fixed damage cannot critically strike. (Cryomancy)"
       },
       "conjure_water": {
         "name": "Vincolo dell'Acqua",
@@ -5791,7 +5799,7 @@ export const it_IT: EnTranslations = {
       },
       "pyroblast": {
         "name": "Lancia di Pira",
-        "description": "Scaglia un immenso masso infuocato che infligge {damage} danni da Fuoco più danni aggiuntivi nel tempo."
+        "description": "Scaglia un immenso masso infuocato che infligge {damage} danni da Fuoco più {overTime} danni da Fuoco in 12 s."
       },
       "ice_barrier": {
         "name": "Velo di Gelo",
@@ -6023,7 +6031,7 @@ export const it_IT: EnTranslations = {
       },
       "mind_flay": {
         "name": "Litania della Sventura",
-        "description": "Assale la mente del bersaglio con energia d'Ombra, infliggendo {damage} danni ogni secondo per 3 s."
+        "description": "Assale la mente del bersaglio con energia d'Ombra per 3 s. A ogni impulso, i danni aumentano del 30% dei danni del primo impulso."
       },
       "flash_heal": {
         "name": "Preghiera Urgente",

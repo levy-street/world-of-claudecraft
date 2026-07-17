@@ -1396,6 +1396,9 @@ export const sv_SE: EnTranslations = {
       "formTravel": "Fleetform: förflyttningshastighet ökad med {pct}%",
       "defensiveStance": "Gardställning: minskad mottagen skada, mer hot",
       "righteousFury": "Brinnande ed: kraftigt ökat hot från helig skada",
+      "stormcharge": "Skyrend {stacks}/{max}: each stack reduces Arc Bolt cast time by {castPct}% and increases its damage by {damagePct}%",
+      "aethericFlux": "Aetheric Flux {stacks}/{max}: each stack refunds {cooldown} sec of Aether Surge cooldown; Aether Surge consumes all stacks to restore {manaPct}% maximum mana per stack",
+      "nextAbilityDamage": "Increases the next affected ability damage by {pct}%",
       "scale": "Größe um {pct}% erhöht",
       "jump": "Sprunghöhe um {pct}% erhöht",
       "school": {
@@ -2510,6 +2513,7 @@ export const sv_SE: EnTranslations = {
       "frost_armor": "En varaktig självförstärkning som härdar din rustning före en strid.",
       "arcane_intellect": "Höjer Intellekt för att fördjupa en allierads manapool, kasta den före anstormningen.",
       "frostbolt": "Slår från avstånd och saktar ner målet så att det inte kan komma nära dig.",
+      "blink": "Teleports you forward and breaks roots, giving every Mage a reliable escape.",
       "conjure_water": "Frammanar drycker som återställer mana, så du kan fylla på mellan anstormningarna.",
       "conjure_food": "Frammanar mat som återställer hälsa när du sätter dig ner och äter.",
       "shadow_bolt": "En skuggpil du kastar mot ett mål, din förstavalskanon.",
@@ -5743,7 +5747,7 @@ export const sv_SE: EnTranslations = {
       },
       "fireball": {
         "name": "Glödbult",
-        "description": "Slungar ett brinnande klot som vållar {damage} eldskada plus ytterligare skada över tid."
+        "description": "Slungar ett brinnande klot som vållar {damage} eldskada plus {overTime} eldskada över tid."
       },
       "frost_armor": {
         "name": "Rimfrostmantel",
@@ -5756,6 +5760,10 @@ export const sv_SE: EnTranslations = {
       "frostbolt": {
         "name": "Rimlans",
         "description": "Avfyrar en frostpil som vållar {damage} frostskada och saktar förflyttningen med 40 %."
+      },
+      "icefall": {
+        "name": "Icefall",
+        "description": "Launches every stored Icicle at the target for {damage} Frost damage each. Deals 2.5 times damage if the target is frozen by a root or stun, or while Frostbite is active. Consumes Frostbite. This fixed damage cannot critically strike. (Cryomancy)"
       },
       "conjure_water": {
         "name": "Vattenbindning",
@@ -5791,7 +5799,7 @@ export const sv_SE: EnTranslations = {
       },
       "pyroblast": {
         "name": "Pyrolans",
-        "description": "Slungar ett väldigt brinnande stenblock som vållar {damage} eldskada plus ytterligare skada över tid."
+        "description": "Slungar ett väldigt brinnande stenblock som vållar {damage} eldskada plus {overTime} eldskada över 12 sek."
       },
       "ice_barrier": {
         "name": "Frostslöja",
@@ -6023,7 +6031,7 @@ export const sv_SE: EnTranslations = {
       },
       "mind_flay": {
         "name": "Sorgens litania",
-        "description": "Angriper målets sinne med skuggenergi och vållar {damage} skada varje sekund i 3 sek."
+        "description": "Angriper målets sinne med skuggenergi i 3 sek. För varje tick ökar skadan med 30 % av det första tickets skada."
       },
       "flash_heal": {
         "name": "Brådskande bön",

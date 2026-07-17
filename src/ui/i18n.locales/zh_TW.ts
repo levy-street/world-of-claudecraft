@@ -2309,7 +2309,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flamestrike.description':
     '在目標區域召喚一次烈焰爆發，對爆炸範圍內的敵人造成 {damage} 點火焰傷害。',
   'entities.abilities.fireball.description':
-    '投擲一團火球，造成 {damage} 點火焰傷害，並附加持續傷害。',
+    '投擲一團火球，造成 {damage} 點火焰傷害，並附加 {overTime} 點持續火焰傷害。',
   'entities.abilities.frost_armor.name': '白霜披風',
   'entities.abilities.frost_armor.description': '以寒霜包裹自身，使護甲提高 {buff}，持續 30 分鐘。',
   'entities.abilities.arcane_intellect.name': '乙太洞察',
@@ -2317,6 +2317,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.frostbolt.name': '凜霜矛',
   'entities.abilities.frostbolt.description':
     '發射一支寒冰箭，造成 {damage} 點冰霜傷害，並使移動速度降低 40%。',
+  'entities.abilities.icefall.name': '冰瀑',
+  'entities.abilities.icefall.description':
+    '向目標發射所有儲存的冰刺，每枚造成 {damage} 點冰霜傷害。若目標被定身或昏迷，或你擁有凍傷效果，則造成 2.5 倍傷害並消耗凍傷。此固定傷害無法造成致命一擊。（冰霜術）',
   'entities.abilities.conjure_water.name': '縛水術',
   'entities.abilities.conjure_water.description':
     '製造 2 瓶水，飲用後恢復法力。更高等級可製造更純淨的水。',
@@ -2341,7 +2344,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.scorch.description': '灼燒敵人，造成 {damage} 點火焰傷害。施法迅速。',
   'entities.abilities.pyroblast.name': '烈焰長矛',
   'entities.abilities.pyroblast.description':
-    '投擲一顆巨大的火焰隕石，造成 {damage} 點火焰傷害，並在一段時間內造成額外傷害。',
+    '投擲一顆巨大的火焰隕石，造成 {damage} 點火焰傷害，並在 12 秒內造成 {overTime} 點火焰傷害。',
   'entities.abilities.ice_barrier.name': '冰霜帷幕',
   'entities.abilities.ice_barrier.description':
     '以冰霜護盾保護你，吸收 {damage} 點傷害，持續 60 秒。',
@@ -2495,7 +2498,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.heal.description': '緩慢但強大的祈禱，為一個友方目標恢復 {damage} 點生命值。',
   'entities.abilities.mind_flay.name': '哀禍連禱',
   'entities.abilities.mind_flay.description':
-    '用暗影能量攻擊目標的心靈，持續 3 秒，每秒造成 {damage} 點傷害。',
+    '用暗影能量攻擊目標的心靈，持續3秒。每次跳動的傷害都會提高，增幅相當於首次跳動傷害的30%。',
   'entities.abilities.flash_heal.name': '急切祈禱',
   'entities.abilities.flash_heal.description': '快速祈禱，為一個友方目標恢復 {damage} 點生命值。',
   'entities.abilities.lightning_bolt.name': '電弧箭',
@@ -2687,9 +2690,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.trueshot_aura.name': '強擊光環',
   'entities.abilities.trueshot_aura.description':
     '鼓舞附近盟友，使攻擊強度提高35點，持續5分鐘。（射擊專精招牌）',
-  'entities.abilities.wyvern_sting.name': '翼龍釘刺',
+  'entities.abilities.wyvern_sting.name': '荊棘陷阱',
   'entities.abilities.wyvern_sting.description':
-    '從遠處釘刺敵人，使其癱瘓最多4秒。受到任何傷害都會打破效果。（生存專精招牌）',
+    '在目標區域設置荊棘陷阱，使5碼內的敵人定身4秒。（戰地技藝專精招牌）',
   'entities.abilities.arcane_power.name': '祕法強化',
   'entities.abilities.arcane_power.description':
     '法術傷害提高20%，法術加速提高10%，持續10秒。（祕法專精招牌）',
@@ -2705,9 +2708,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blade_flurry.name': '劍刃亂舞',
   'entities.abilities.blade_flurry.description':
     '釋放劍刃亂舞，攻擊速度提高20%，持續12秒。（戰鬥專精招牌）',
-  'entities.abilities.hemorrhage.name': '出血',
+  'entities.abilities.hemorrhage.name': '假面落幕',
   'entities.abilities.hemorrhage.description':
-    '攻擊敵人，造成武器傷害加{damage}點傷害，並在12秒內造成流血傷害。獎勵1個連擊點。（敏銳專精招牌）',
+    '以武器攻擊敵人，造成武器傷害加{damage}點傷害。獎勵1個連擊點。（詭術專精招牌）',
   'entities.abilities.power_infusion.name': '能量灌注',
   'entities.abilities.power_infusion.description':
     '向一名友方目標灌注能量，使其法術強度提高28點，持續15秒。（戒律專精招牌）',
@@ -4819,6 +4822,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.flame_shock': '瞬發灼燒，先給予一記前置傷害並持續灼燒。',
   'guide.abilityHook.frost_armor': '持續的自我增益，在戰鬥前強化你的護甲。',
   'guide.abilityHook.frostbolt': '從遠處攻擊並使目標減速，讓它無法逼近你。',
+  'guide.abilityHook.blink': '向前傳送並解除定身，讓每位法師都有可靠的脫身手段。',
   'guide.abilityHook.garrote': '從潛行中開場，以鋼絲使目標持續流血。',
   'guide.abilityHook.gouge': '短暫使目標無法行動，讓你能重新走位或拉開。',
   'guide.abilityHook.healing_touch': '施法時間較長的大型單體治療，用來把某人補滿。',
@@ -5690,6 +5694,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.formTravel': '迅捷形態：移動速度提高 {pct}%',
   'hudChrome.auraEffect.defensiveStance': '戒備姿態：受到的傷害降低，威脅值提高',
   'hudChrome.auraEffect.righteousFury': '燃燒誓言：神聖傷害產生的威脅值大幅提高',
+  'hudChrome.auraEffect.stormcharge':
+    '喚風者 {stacks}/{max}：每層使電弧箭施法時間縮短 {castPct}%，傷害提高 {damagePct}%',
+  'hudChrome.auraEffect.aethericFlux':
+    '秘法失序 {stacks}/{max}：每層返還祕法強化 {cooldown} 秒冷卻時間；祕法強化會消耗全部層數，每層恢復 {manaPct}% 最大法力',
+  'hudChrome.auraEffect.nextAbilityDamage': '使下一個受影響技能的傷害提高 {pct}%',
   'hudChrome.auraEffect.scale': '體型增大 {pct}%',
   'hudChrome.auraEffect.jump': '跳躍高度提高 {pct}%',
   'hudChrome.auraEffect.school.physical': '物理',

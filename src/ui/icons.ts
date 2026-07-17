@@ -2298,6 +2298,16 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   frost_armor: r('frost', 'ice', ['chestplate', { p: 'snowflake', ...TR }]),
   arcane_intellect: r('arcane', 'arcanePink', ['eye'], ['sparkle']),
   frostbolt: r('frost', 'ice', ['bolt', { p: 'snowflake', ...BR }], ['motion']),
+  icefall: r(
+    'frost',
+    'ice',
+    [
+      { p: 'dagger', x: -10, y: -4, rot: 0.2, s: 0.75 },
+      { p: 'dagger', y: 5, rot: 0.2 },
+      { p: 'dagger', x: 10, y: -4, rot: 0.2, s: 0.75 },
+    ],
+    ['motion', 'glow'],
+  ),
   conjure_water: r('arcane', 'sky', [{ p: 'potion', pal: 'sky' }], ['sparkle']),
   fire_blast: r('fire', 'ember', [{ p: 'sunburst', ...BIG }, 'flame'], ['glow']),
   arcane_missiles: r(
@@ -2845,6 +2855,24 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   aura_cost_tax: r('shadow', 'shadowPurple', ['gem', { p: 'droplet', ...BR }], ['drips']),
   aura_heal_absorb: r('shadow', 'shadowPurple', ['heart'], ['drips']),
   aura_form_bear: r('earth', 'earthBrown', ['paw']),
+  aura_icicles: r(
+    'frost',
+    'ice',
+    [
+      { p: 'dagger', x: -9, s: 0.65 },
+      { p: 'dagger', s: 0.8 },
+      { p: 'dagger', x: 9, s: 0.65 },
+    ],
+    ['glow'],
+  ),
+  aura_frostbite: r('frost', 'ice', ['hand', { p: 'snowflake', ...TR }], ['glow']),
+  aura_stormcharge: r(
+    'storm',
+    'sky',
+    ['lightning', { p: 'sword', ...BR, pal: 'silverWhite' }],
+    ['glow'],
+  ),
+  aura_next_ability_damage: r('holy', 'holyGold', ['sword', { p: 'sunburst', ...TR }], ['glow']),
 };
 
 // Crests: class / mob-family / status glyphs, painted with the same primitive
@@ -3884,6 +3912,9 @@ export function abilityIconRecipe(id: string): IconRecipe {
 }
 export function hasExplicitAbilityIcon(id: string): boolean {
   return id in ABILITY_RECIPES;
+}
+export function hasExplicitAuraIcon(id: string): boolean {
+  return id in AURA_RECIPES;
 }
 
 const DEFAULT_ICON_SIZE = 96; // crisp at 46px buttons on 2x displays

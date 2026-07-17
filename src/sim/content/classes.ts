@@ -131,6 +131,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'frost_armor',
       'arcane_intellect',
       'frostbolt',
+      'blink',
       'conjure_water',
       'conjure_food',
       'fire_blast',
@@ -1226,7 +1227,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [
       { type: 'directDamage', min: 16, max: 25 },
-      { type: 'dot', total: 2, duration: 4, interval: 2 },
+      { type: 'dot', total: 4, duration: 4, interval: 2 },
     ],
     ranks: [
       {
@@ -1236,7 +1237,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         castTime: 2.0,
         effects: [
           { type: 'directDamage', min: 22, max: 31 },
-          { type: 'dot', total: 3, duration: 6, interval: 2 },
+          { type: 'dot', total: 9, duration: 6, interval: 2 },
         ],
       },
       {
@@ -1246,7 +1247,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         castTime: 2.5,
         effects: [
           { type: 'directDamage', min: 36, max: 48 },
-          { type: 'dot', total: 6, duration: 6, interval: 2 },
+          { type: 'dot', total: 18, duration: 6, interval: 2 },
         ],
       },
       {
@@ -1256,11 +1257,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
         castTime: 3.0,
         effects: [
           { type: 'directDamage', min: 58, max: 78 },
-          { type: 'dot', total: 12, duration: 8, interval: 2 },
+          { type: 'dot', total: 32, duration: 8, interval: 2 },
         ],
       },
     ],
-    description: 'Hurls a fiery ball that causes $d Fire damage plus additional damage over time.',
+    description: 'Hurls a fiery ball that causes $d Fire damage plus $o Fire damage over time.',
   },
   frost_armor: {
     id: 'frost_armor',
@@ -1597,10 +1598,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [
       { type: 'directDamage', min: 170, max: 225 },
-      { type: 'dot', total: 48, duration: 12, interval: 2 },
+      { type: 'dot', total: 72, duration: 12, interval: 2 },
     ],
     description:
-      'Hurls an immense fiery boulder that causes $d Fire damage plus additional damage over time.',
+      'Hurls an immense fiery boulder that causes $d Fire damage plus $o Fire damage over 12 sec.',
   },
   ice_barrier: {
     id: 'ice_barrier',
@@ -2711,12 +2712,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     channel: { duration: 3, ticks: 3 },
     cooldown: 0,
-    range: 20,
+    range: 30,
     school: 'shadow',
     requiresTarget: true,
-    effects: [{ type: 'drainTick', min: 12, max: 12, healFrac: 0 }],
+    effects: [{ type: 'drainTick', min: 12, max: 12, healFrac: 0, rampPct: 0.3 }],
     description:
-      "Assaults the target's mind with Shadow energy, causing $d Shadow damage each second for 3 sec.",
+      "Assaults the target's mind with Shadow energy for 3 sec. Its damage increases each tick by 30% of the first tick's damage.",
   },
   flash_heal: {
     id: 'flash_heal',
@@ -4458,20 +4459,19 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   wyvern_sting: {
     id: 'wyvern_sting',
-    name: 'Wyvern Sting',
+    name: 'Briar Trap',
     class: 'hunter',
     learnLevel: 10,
     cost: 35,
     castTime: 0,
-    cooldown: 60,
+    cooldown: 45,
     range: 30,
-    minRange: 8,
     school: 'nature',
-    scalesWith: 'ranged',
-    requiresTarget: true,
-    effects: [{ type: 'incapacitate', duration: 4 }],
+    requiresTarget: false,
+    targetMode: 'position',
+    effects: [{ type: 'aoeRoot', duration: 4, radius: 5, min: 0, max: 0 }],
     description:
-      'Stings the enemy from range, incapacitating it for up to 4 sec. Any damage breaks the effect. (Survival signature)',
+      'Sets a briar trap at the target area, rooting enemies within 5 yd for 4 sec. (Fieldcraft signature)',
   },
   arcane_power: {
     id: 'arcane_power',
@@ -4512,7 +4512,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 10,
     cost: 0,
     castTime: 0,
-    cooldown: 180,
+    cooldown: 120,
     range: 0,
     school: 'frost',
     requiresTarget: false,
@@ -4555,7 +4555,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   hemorrhage: {
     id: 'hemorrhage',
-    name: 'Red Ribbon',
+    name: 'Maskfall',
     class: 'rogue',
     learnLevel: 10,
     cost: 35,
@@ -4565,13 +4565,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: true,
     awardsCombo: 1,
-    effects: [
-      { type: 'weaponStrike', bonus: 16 },
-      { type: 'dot', total: 36, duration: 12, interval: 3 },
-      { type: 'applyDebuff', kind: 'bleed_vuln', value: 0.4, duration: 12 },
-    ],
+    effects: [{ type: 'weaponStrike', bonus: 52 }],
     description:
-      'Strikes the enemy for weapon damage plus $d, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. (Subtlety signature)',
+      'Strikes the enemy for weapon damage plus $d. Awards 1 combo point. (Skulduggery signature)',
   },
   power_infusion: {
     id: 'power_infusion',
@@ -4923,6 +4919,8 @@ function scaleEffect(
       return { ...eff, min: Math.round(eff.min * dmgMult), max: Math.round(eff.max * dmgMult) };
     case 'drainTick':
       return { ...eff, min: Math.round(eff.min * dmgMult), max: Math.round(eff.max * dmgMult) };
+    case 'channelFinisher':
+      return { ...eff, amount: Math.round(eff.amount * dmgMult + flat) };
     case 'finisherDamage':
       return {
         ...eff,
@@ -5014,6 +5012,16 @@ function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): void {
   if (am) {
     if (am.costPct) entry.cost = Math.max(0, Math.round(entry.cost * (1 + am.costPct)));
     if (am.castPct) entry.castTime = Math.max(0, entry.castTime * (1 + am.castPct));
+    if (am.channelDurationPct && entry.def.channel) {
+      const multiplier = 1 + am.channelDurationPct;
+      entry.def = {
+        ...entry.def,
+        channel: {
+          duration: entry.def.channel.duration * multiplier,
+          ticks: Math.max(1, Math.round(entry.def.channel.ticks * multiplier)),
+        },
+      };
+    }
     if (am.cooldownPct) entry.cooldown = Math.max(0, entry.cooldown * (1 + am.cooldownPct));
     if (am.castWhileMoving) entry.castWhileMoving = true;
     if (am.damagePushbackImmune) entry.damagePushbackImmune = true;

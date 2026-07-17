@@ -167,6 +167,24 @@ describe('auraEffectDescriptor', () => {
     expect(desc({ kind: 'imbue', value: 0 })?.key).toBe('hudChrome.auraEffect.imbue');
   });
 
+  it('explains the Skyrend bank and the next-ability damage window', () => {
+    expect(desc({ kind: 'stormcharge', value: 0, stacks: 3 })).toEqual({
+      key: 'hudChrome.auraEffect.stormcharge',
+      nums: { stacks: 3, max: 5, castPct: 20, damagePct: 10 },
+    });
+    expect(desc({ kind: 'next_ability_damage', value: 0.5 })).toEqual({
+      key: 'hudChrome.auraEffect.nextAbilityDamage',
+      nums: { pct: 50 },
+    });
+  });
+
+  it('explains the Aetheric Flux bank from its first visible stack', () => {
+    expect(desc({ kind: 'aetheric_flux', value: 0, stacks: 1 })).toEqual({
+      key: 'hudChrome.auraEffect.aethericFlux',
+      nums: { stacks: 1, max: 4, cooldown: 10, manaPct: 5 },
+    });
+  });
+
   it('returns null for a kind with no meaningful one-line effect', () => {
     expect(desc({ kind: 'righteous_fury', value: 0 })).not.toBeNull();
     // A purely cosmetic / structural kind not handled falls back to null.

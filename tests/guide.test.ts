@@ -241,6 +241,11 @@ describe('Guide generated class content', () => {
     }
   });
 
+  it('includes mastery-granted abilities in the full class kit', () => {
+    const mage = GUIDE_CLASSES.find((entry) => entry.id === 'mage');
+    expect(mage?.abilities).toContainEqual(expect.objectContaining({ id: 'icefall' }));
+  });
+
   it('matches the sim (regenerating leaves the committed file unchanged)', () => {
     execFileSync('node', ['scripts/wiki/build_content.mjs'], {
       cwd: new URL('..', import.meta.url),

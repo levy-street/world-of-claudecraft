@@ -49,7 +49,7 @@ import {
 } from '../types';
 import { applyRageSpendCooldownRefund, spendResource } from './casting_lifecycle';
 import { blindMissBonus, isDisarmed, isStunned } from './cc';
-import { consumeNextAttackCrit } from './empower_next';
+import { consumeNextAbilityDamage, consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
 import { baseSwingSpeed } from './form_swing';
 import { rangedShotProfile } from './ranged_shot';
@@ -156,6 +156,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
   if (p.swingTimer <= 0) {
     let bonus = 0;
     let abilityName: string | null = null;
+    let abilityId = 'auto_attack';
     let threatFlat = 0;
     let threatMult = 1;
     if (p.queuedOnSwing) {
@@ -174,6 +175,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
           if (queued.def.cooldown > 0) p.cooldowns.set(queued.def.id, queued.def.cooldown);
           bonus = eff.bonus;
           abilityName = queued.def.name;
+          abilityId = queued.def.id;
           threatFlat = queued.threatFlat;
           threatMult = queued.threatMult;
         }
@@ -183,6 +185,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
       delete p.queuedOnSwingCostMultiplier;
     }
     const connected = meleeSwing(ctx, p, t, bonus, abilityName, {
+      abilityId,
       threatFlat,
       threatMult,
       whiteDualWieldPenalty: p.dualWielding && abilityName === null,
@@ -326,6 +329,8 @@ export function rangedSwing(
       undefined,
       true,
       !ranged.wand,
+      false,
+      ranged.wand ? null : 'auto_shot',
     );
     // 4-piece set procs keyed to weapon crits (ranged arm). Gated on setProcs
     // inside applySetProcs, so proc-less players draw no rng.
@@ -355,6 +360,7 @@ export function meleeSwing(
     forceCrit?: boolean;
     onDealt?: (amount: number) => void;
     whiteDualWieldPenalty?: boolean;
+    abilityId?: string;
   },
 ): boolean {
   const missChance =
@@ -411,6 +417,8 @@ export function meleeSwing(
     ctx.enterCombat(attacker, target);
     return false;
   }
+  const nextAbilityDamage =
+    opts.abilityId === undefined ? null : consumeNextAbilityDamage(ctx, attacker, opts.abilityId);
   const mult = opts.weaponMult ?? 1;
   const weapon = opts.weapon ?? attacker.weapon;
   const apSwingSpeed = opts.apSwingSpeed ?? baseSwingSpeed(attacker);
@@ -427,6 +435,7 @@ export function meleeSwing(
       mult +
     bonus +
     imbueBonus;
+  dmg *= 1 + (nextAbilityDamage?.value ?? 0);
   const critChance = Math.max(
     0.005,
     attacker.critChance - Math.max(0, target.level - attacker.level) * 0.002,
@@ -440,6 +449,7 @@ export function meleeSwing(
     dmg = Math.max(1, dmg - target.blockValue);
   }
   const dealtAmount = Math.max(1, Math.round(dmg));
+  const targetHpBefore = target.hp;
   ctx.dealDamage(attacker, target, dealtAmount, crit, 'physical', abilityName, 'hit', false, {
     flat: opts.threatFlat ?? 0,
     mult: opts.threatMult ?? 1,
@@ -452,7 +462,16 @@ export function meleeSwing(
   // Landed-swing talent responses resolve before the target retaliates or the
   // weapon's on-hit proc fires. This is observable for defensive healing and
   // preserves the authored Oathwheel, Venom Dividend, and imbue proc cadence.
-  if (attacker.kind === 'player') onMeleeSwing(ctx, attacker);
+  if (attacker.kind === 'player') {
+    onMeleeSwing(
+      ctx,
+      attacker,
+      opts.abilityId,
+      nextAbilityDamage?.id,
+      target,
+      Math.max(0, targetHpBefore - target.hp),
+    );
+  }
   // thorns / lightning shield: melee attackers take damage back. Charge-limited
   // thorns (Lightning Shield) consume a charge and gate on an internal cooldown.
   if (!attacker.dead) {

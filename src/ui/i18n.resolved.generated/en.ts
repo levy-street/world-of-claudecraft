@@ -1396,6 +1396,9 @@ export const en: EnTranslations = {
       "formTravel": "Fleet Form: movement speed increased by {pct}%",
       "defensiveStance": "Guarded Stance: reduced damage taken, more threat",
       "righteousFury": "Burning Oath: greatly increased threat from Holy damage",
+      "stormcharge": "Skyrend {stacks}/{max}: each stack reduces Arc Bolt cast time by {castPct}% and increases its damage by {damagePct}%",
+      "aethericFlux": "Aetheric Flux {stacks}/{max}: each stack refunds {cooldown} sec of Aether Surge cooldown; Aether Surge consumes all stacks to restore {manaPct}% maximum mana per stack",
+      "nextAbilityDamage": "Increases the next affected ability damage by {pct}%",
       "scale": "Size increased by {pct}%",
       "jump": "Jump height increased by {pct}%",
       "school": {
@@ -2510,6 +2513,7 @@ export const en: EnTranslations = {
       "frost_armor": "A lasting self-buff that hardens your armor before a fight.",
       "arcane_intellect": "Raises Intellect to deepen an ally's mana pool, cast it before the pull.",
       "frostbolt": "Strikes from range and slows the target so it cannot close on you.",
+      "blink": "Teleports you forward and breaks roots, giving every Mage a reliable escape.",
       "conjure_water": "Conjures drinks that restore mana, so you can refill between pulls.",
       "conjure_food": "Conjures food that restores health when you sit down to eat.",
       "shadow_bolt": "A bolt of shadow you cast at a target, your go-to nuke.",
@@ -5743,7 +5747,7 @@ export const en: EnTranslations = {
       },
       "fireball": {
         "name": "Cinderbolt",
-        "description": "Hurls a fiery ball that causes {damage} Fire damage plus additional damage over time."
+        "description": "Hurls a fiery ball that causes {damage} Fire damage plus {overTime} Fire damage over time."
       },
       "frost_armor": {
         "name": "Hoarfrost Mantle",
@@ -5756,6 +5760,10 @@ export const en: EnTranslations = {
       "frostbolt": {
         "name": "Rimelance",
         "description": "Launches a bolt of frost, causing {damage} Frost damage and slowing movement by 40%."
+      },
+      "icefall": {
+        "name": "Icefall",
+        "description": "Launches every stored Icicle at the target for {damage} Frost damage each. Deals 2.5 times damage if the target is frozen by a root or stun, or while Frostbite is active. Consumes Frostbite. This fixed damage cannot critically strike. (Cryomancy)"
       },
       "conjure_water": {
         "name": "Waterbind",
@@ -5791,7 +5799,7 @@ export const en: EnTranslations = {
       },
       "pyroblast": {
         "name": "Pyrelance",
-        "description": "Hurls an immense fiery boulder that causes {damage} Fire damage plus additional damage over time."
+        "description": "Hurls an immense fiery boulder that causes {damage} Fire damage plus {overTime} Fire damage over 12 sec."
       },
       "ice_barrier": {
         "name": "Frostveil",
@@ -6023,7 +6031,7 @@ export const en: EnTranslations = {
       },
       "mind_flay": {
         "name": "Litany of Woe",
-        "description": "Assaults the target's mind with Shadow energy, causing {damage} damage each second for 3 sec."
+        "description": "Assaults the target's mind with Shadow energy for 3 sec. Its damage increases each tick by 30% of the first tick's damage."
       },
       "flash_heal": {
         "name": "Urgent Prayer",
@@ -6270,8 +6278,8 @@ export const en: EnTranslations = {
         "description": "Inspires nearby allies, increasing attack power by 10% for 30 min. (Marksmanship signature)"
       },
       "wyvern_sting": {
-        "name": "Wyvern Sting",
-        "description": "Stings the enemy from range, incapacitating it for up to 4 sec. Any damage breaks the effect. (Survival signature)"
+        "name": "Briar Trap",
+        "description": "Sets a briar trap at the target area, rooting enemies within 5 yd for 4 sec. (Fieldcraft signature)"
       },
       "arcane_power": {
         "name": "Aether Surge",
@@ -6294,8 +6302,8 @@ export const en: EnTranslations = {
         "description": "Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Combat signature)"
       },
       "hemorrhage": {
-        "name": "Red Ribbon",
-        "description": "Strikes the enemy for weapon damage plus {damage}, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. (Subtlety signature)"
+        "name": "Maskfall",
+        "description": "Strikes the enemy for weapon damage plus {damage}. Awards 1 combo point. (Skulduggery signature)"
       },
       "power_infusion": {
         "name": "Anointing",
@@ -6503,7 +6511,7 @@ export const en: EnTranslations = {
       },
       "blink": {
         "name": "Flickerstep",
-        "description": "Teleports you 15 yd forward and breaks roots. (Mage talent)"
+        "description": "Teleports you 15 yd forward and breaks roots. (Mage)"
       },
       "bloodlust": {
         "name": "Storm Chorus",

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ABILITIES } from '../src/sim/data';
-import { iconDataUrl } from '../src/ui/icons';
+import { hasExplicitAuraIcon, iconDataUrl } from '../src/ui/icons';
 
 // Buff/debuff aura frames (the player buff bar and a mob's DoT debuffs, both via
 // Hud.renderAuras) request their icon with kind 'aura'. When the aura carries a
@@ -33,6 +33,11 @@ const IMAGE_AURA_IDS = [
 ];
 
 describe('aura icons reuse image-based ability art', () => {
+  it('gives the melee identity auras deliberate fallback recipes', () => {
+    expect(hasExplicitAuraIcon('aura_stormcharge')).toBe(true);
+    expect(hasExplicitAuraIcon('aura_next_ability_damage')).toBe(true);
+  });
+
   it('every sampled aura id actually ships a PNG (guards the fixture)', () => {
     for (const id of IMAGE_AURA_IDS) {
       const url = iconDataUrl('ability', id);

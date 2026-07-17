@@ -35,6 +35,15 @@ const mageDamagingFireSpellAbilityIds = [
   'meteor',
 ];
 
+const mageCastTimeCombatSpellAbilityIds = [
+  'fireball',
+  'frostbolt',
+  'polymorph',
+  'flamestrike',
+  'scorch',
+  'pyroblast',
+];
+
 const hunterRangedShotAbilityIds = [
   'auto_shot',
   'serpent_sting',
@@ -130,16 +139,34 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'mag_r5_impulse',
-          name: 'Twin Embers',
-          description: 'Cinderfall stores 2 uses.',
+          name: 'Ember Relay',
+          description:
+            'A landed Cinderfall makes your next Cinderbolt or Scald within 8 sec cost 50% less.',
           icon: 'fire_blast',
-          effect: { ability: [{ ability: 'fire_blast', bonusCharges: 1 }] },
+          effect: {
+            proc: {
+              id: 'mag_ember_relay',
+              name: 'Ember Relay',
+              requiresKnownAbility: 'fire_blast',
+              school: 'fire',
+              trigger: { on: 'spellHit', abilities: ['fire_blast'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_cheap',
+                  abilities: ['fireball', 'scorch'],
+                  duration: 8,
+                  costPct: 0.5,
+                },
+              ],
+            },
+          },
         },
         {
           id: 'mag_r5_mana_attunement',
           name: 'Third Current',
           description:
-            'Every 3rd mana-spending Mage spell restores 20 mana and makes your next mana-spending Mage spell within 8 sec cost 50% less.',
+            'Every 3rd mana-spending Mage spell restores 8% of your maximum mana and makes your next mana-spending Mage spell within 8 sec cost 50% less.',
           icon: 'arcane_intellect',
           effect: {
             proc: {
@@ -147,7 +174,7 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
               name: 'Third Current',
               trigger: { on: 'castNth', n: 3, abilities: mageManaSpendingSpellAbilityIds },
               responses: [
-                { kind: 'resource', amount: 20 },
+                { kind: 'resource', pctMax: 0.08, resourceType: 'mana' },
                 {
                   kind: 'empowerNext',
                   aura: 'next_cast_cheap',
@@ -262,9 +289,25 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'mag_r14_presence_of_mind',
           name: 'Racing Mind',
-          description: 'Grants Racing Mind.',
+          description:
+            'A spell critical strike makes your next cast-time combat spell within 8 sec instant. 15 sec internal cooldown.',
           icon: 'presence_of_mind',
-          effect: { grant: { ability: 'presence_of_mind' } },
+          effect: {
+            proc: {
+              id: 'mag_racing_mind',
+              name: 'Racing Mind',
+              school: 'arcane',
+              trigger: { on: 'spellCrit', icd: 15 },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_instant',
+                  abilities: mageCastTimeCombatSpellAbilityIds,
+                  duration: 8,
+                },
+              ],
+            },
+          },
         },
         {
           id: 'mag_r14_hot_streak',
@@ -304,14 +347,31 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 17,
       theme: 'survival',
-      decision: 'frequent escape vs emergency stasis vs reactive ward',
+      decision: 'reactive escape-and-counter vs emergency stasis vs reactive ward',
       options: [
         {
-          id: 'mag_r17_blink',
-          name: 'Flickerstep',
-          description: 'Grants Flickerstep.',
-          icon: 'blink',
-          effect: { grant: { ability: 'blink' } },
+          id: 'mag_r17_frigid_reversal',
+          name: 'Frigid Reversal',
+          description:
+            'Taking a hit for at least 15% of your maximum health resets Flickerstep and makes your next Rimelance within 8 sec instant. 20 sec internal cooldown.',
+          icon: 'frostbolt',
+          effect: {
+            proc: {
+              id: 'mag_frigid_reversal',
+              name: 'Frigid Reversal',
+              school: 'frost',
+              trigger: { on: 'bigHitTaken', hpFrac: 0.15, icd: 20 },
+              responses: [
+                { kind: 'cooldownRefund', ability: 'blink', seconds: 'reset' },
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_instant',
+                  abilities: ['frostbolt'],
+                  duration: 8,
+                },
+              ],
+            },
+          },
         },
         {
           id: 'mag_r17_ice_block',
@@ -340,7 +400,7 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 20,
       theme: 'finishing_power',
-      decision: 'single-target frost control vs area fire devastation vs mana recovery',
+      decision: 'single-target frost control vs area fire devastation vs mana burst relay',
       options: [
         {
           id: 'mag_r20_deep_freeze',
@@ -359,9 +419,28 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'mag_r20_evocation',
           name: 'Aetherwell',
-          description: 'Grants Aetherwell.',
+          description:
+            'Grants Aetherwell. Casting Aetherwell resets Aether Surge and makes your next Aether Darts within 8 sec free.',
           icon: 'evocation',
-          effect: { grant: { ability: 'evocation' } },
+          effect: {
+            grant: { ability: 'evocation' },
+            proc: {
+              id: 'mag_aetherwell_relay',
+              name: 'Aetherwell',
+              requiresKnownAbility: 'evocation',
+              school: 'arcane',
+              trigger: { on: 'castNth', n: 1, abilities: ['evocation'] },
+              responses: [
+                { kind: 'cooldownRefund', ability: 'arcane_power', seconds: 'reset' },
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_free',
+                  abilities: ['arcane_missiles'],
+                  duration: 8,
+                },
+              ],
+            },
+          },
         },
       ],
     },
@@ -373,19 +452,31 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 5,
       theme: 'holy_tempo',
-      decision: 'Verdict-fed mana vs mobile Mending Light vs Verdict-Rite resets',
+      decision: 'Holy Shock-Lightmend weave vs mobile Mending Light vs Verdict-Rite resets',
       options: [
         {
           id: 'pal_r5_crusaders_zeal',
-          name: 'Oath Returned',
-          description: 'Verdict restores 25 mana when cast.',
-          icon: 'judgement',
+          name: "Dawn's Reply",
+          description:
+            'For Sacrament, casting Holy Shock makes your next Lightmend within 8 sec cost 50% less.',
+          icon: 'holy_shock',
           effect: {
             proc: {
-              id: 'pal_oath_returned',
-              name: 'Oath Returned',
-              trigger: { on: 'castNth', n: 1, abilities: ['judgement'] },
-              responses: [{ kind: 'resource', amount: 25, resourceType: 'mana' }],
+              id: 'pal_dawns_reply',
+              name: "Dawn's Reply",
+              spec: 'holy',
+              requiresKnownAbility: 'holy_shock',
+              school: 'holy',
+              trigger: { on: 'castNth', n: 1, abilities: ['holy_shock'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_cheap',
+                  abilities: ['flash_of_light'],
+                  duration: 8,
+                  costPct: 0.5,
+                },
+              ],
             },
           },
         },
@@ -453,7 +544,7 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 11,
       theme: 'devotion',
-      decision: 'healing cadence vs shield-to-emergency reset vs critical-heal wards',
+      decision: 'healing cadence vs Hallowed Wall threat relay vs critical-heal wards',
       options: [
         {
           id: 'pal_r11_divine_wisdom',
@@ -479,16 +570,27 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'pal_r11_guardians_favor',
-          name: 'Mercy from Ruin',
+          name: "Vigil's Refrain",
           description:
-            "When Ward of Faith is fully consumed, it shaves 120 sec off Last Rite's cooldown.",
-          icon: 'divine_protection',
+            'For Vigil, Hallowed Wall resets Sacred Goad and makes your next Verdict within 8 sec free.',
+          icon: 'holy_shield',
           effect: {
             proc: {
-              id: 'pal_guardians_favor',
-              name: 'Mercy from Ruin',
-              trigger: { on: 'shieldConsumed', ability: 'divine_protection' },
-              responses: [{ kind: 'cooldownRefund', ability: 'lay_on_hands', seconds: 120 }],
+              id: 'pal_vigils_refrain',
+              name: "Vigil's Refrain",
+              spec: 'protection',
+              requiresKnownAbility: 'holy_shield',
+              school: 'holy',
+              trigger: { on: 'castNth', n: 1, abilities: ['holy_shield'] },
+              responses: [
+                { kind: 'cooldownRefund', ability: 'holy_taunt', seconds: 'reset' },
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_free',
+                  abilities: ['judgement'],
+                  duration: 8,
+                },
+              ],
             },
           },
         },
@@ -515,14 +617,36 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 14,
       theme: 'reckoning',
-      decision: 'banked Verdicts vs area holy burst vs Oathbrand-fed Verdict tempo',
+      decision: 'Verdict setup vs area holy burst vs Oathbrand-fed Verdict tempo',
       options: [
         {
           id: 'pal_r14_swift_verdicts',
-          name: 'Swift Verdicts',
-          description: 'Verdict costs 20% less mana and deals 25% more damage.',
+          name: "Oath's Due",
+          description:
+            "Casting Verdict grants Oath's Due for 7 sec. Its next landed Crusader Strike deals 50% more damage and raises Blood Debt's chance to grant a free Rite of Expulsion from 20% to 70%. Casting that free Rite refreshes Oath's Due to 7 sec.",
           icon: 'judgement',
-          effect: { ability: [{ ability: 'judgement', costPct: -0.2, dmgPct: 0.25 }] },
+          effect: {
+            proc: {
+              id: 'pal_oaths_due',
+              name: "Oath's Due",
+              spec: 'retribution',
+              school: 'holy',
+              refreshOnFreeCast: {
+                ability: 'exorcism',
+                consumedAuraId: 'pal_blood_debt',
+              },
+              trigger: { on: 'castNth', n: 1, abilities: ['judgement'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_ability_damage',
+                  abilities: ['crusader_strike'],
+                  duration: 7,
+                  dmgPct: 0.5,
+                },
+              ],
+            },
+          },
         },
         {
           id: 'pal_r14_holy_wrath',
@@ -723,10 +847,26 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'hun_r11_mend_pet',
-          name: 'Patch Up',
-          description: 'Patch Up heals a living pet for 50% more.',
+          name: "Mender's Signal",
+          description:
+            'Completing Patch Up reduces Howling Rage cooldown by 15 sec and makes your next Fell Shot within 8 sec free.',
           icon: 'mend_pet',
-          effect: { ability: [{ ability: 'revive_pet', dmgPct: 0.5 }] },
+          effect: {
+            proc: {
+              id: 'hun_menders_signal',
+              name: "Mender's Signal",
+              trigger: { on: 'castNth', n: 1, abilities: ['revive_pet'] },
+              responses: [
+                { kind: 'cooldownRefund', ability: 'bestial_wrath', seconds: 15 },
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_free',
+                  abilities: ['arcane_shot'],
+                  duration: 8,
+                },
+              ],
+            },
+          },
         },
         {
           id: 'hun_r11_efficiency',
@@ -786,10 +926,20 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'hun_r14_sniper_training',
-          name: 'Sniper Training',
-          description: "Long Draw's cast time is reduced by 30% and it deals 15% more damage.",
+          name: 'Second Bearing',
+          description: 'A landed Long Draw restores 20 mana and resets Rattling Shot cooldown.',
           icon: 'aimed_shot',
-          effect: { ability: [{ ability: 'aimed_shot', castPct: -0.3, dmgPct: 0.15 }] },
+          effect: {
+            proc: {
+              id: 'hun_second_bearing',
+              name: 'Second Bearing',
+              trigger: { on: 'rangedHit', abilities: ['aimed_shot'] },
+              responses: [
+                { kind: 'resource', amount: 20 },
+                { kind: 'cooldownRefund', ability: 'concussive_shot', seconds: 'reset' },
+              ],
+            },
+          },
         },
         {
           id: 'hun_r14_serpents_venom',
@@ -867,12 +1017,27 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'hun_r20_improved_volley',
-          name: 'Steady Rain',
+          name: 'Rainbreak',
           description:
-            'Arrowfall deals 50% more damage, and taking damage cannot shorten its channel.',
+            'Taking damage cannot shorten Arrowfall. Starting Arrowfall makes your next Gutting Strike within 10 sec deal 50% more damage.',
           icon: 'volley',
           effect: {
-            ability: [{ ability: 'volley', dmgPct: 0.5, damagePushbackImmune: true }],
+            ability: [{ ability: 'volley', damagePushbackImmune: true }],
+            proc: {
+              id: 'hun_rainbreak',
+              name: 'Rainbreak',
+              school: 'physical',
+              trigger: { on: 'castNth', n: 1, abilities: ['volley'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_ability_damage',
+                  abilities: ['raptor_strike'],
+                  duration: 10,
+                  dmgPct: 0.5,
+                },
+              ],
+            },
           },
         },
         {
@@ -906,7 +1071,7 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 5,
       theme: 'opening_rotation',
-      decision: 'Wicked Slash cadence vs Craven Thrust weave vs opener energy',
+      decision: 'Wicked Slash cadence vs Craven Thrust weave vs opener-fed builder discount',
       options: [
         {
           id: 'rog_r5_relentless_strikes',
@@ -947,14 +1112,24 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'rog_r5_opportunist',
           name: 'Dusk Dividend',
-          description: "Using Lurker's Strike or Throat Wire restores 20 energy.",
+          description:
+            "Using Lurker's Strike, Throat Wire, or Gut Punch makes your next builder within 8 sec cost 50% less energy.",
           icon: 'ambush',
           effect: {
             proc: {
               id: 'rog_dusk_dividend',
               name: 'Dusk Dividend',
-              trigger: { on: 'castNth', n: 1, abilities: ['ambush', 'garrote'] },
-              responses: [{ kind: 'resource', amount: 20, resourceType: 'energy' }],
+              school: 'shadow',
+              trigger: { on: 'castNth', n: 1, abilities: ['ambush', 'garrote', 'cheap_shot'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_cheap',
+                  abilities: rogueBuilderAbilityIds,
+                  duration: 8,
+                  costPct: 0.5,
+                },
+              ],
             },
           },
         },
@@ -1063,7 +1238,7 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 14,
       theme: 'combo_engine',
-      decision: 'two-finisher builder discount vs evasive strike vs poison-fed energy',
+      decision: 'two-finisher builder discount vs evasive strike vs poison-fed free cast',
       options: [
         {
           id: 'rog_r14_seal_fate',
@@ -1098,14 +1273,23 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'rog_r14_deadly_brew',
           name: 'Venom Dividend',
-          description: 'Landed melee auto-attacks with an active poison restore 5 energy.',
+          description:
+            'Every 4th landed melee attack with an active weapon poison makes your next Leaden Venom within 8 sec free.',
           icon: 'deadly_poison',
           effect: {
             proc: {
               id: 'rog_deadly_brew',
               name: 'Venom Dividend',
-              trigger: { on: 'meleeSwingWhile', auraKind: 'imbue' },
-              responses: [{ kind: 'resource', amount: 5 }],
+              school: 'nature',
+              trigger: { on: 'meleeSwingWhile', auraKind: 'imbue', n: 4 },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_free',
+                  abilities: ['crippling_poison'],
+                  duration: 8,
+                },
+              ],
             },
           },
         },
@@ -1160,7 +1344,7 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 20,
       theme: 'capstone_execution',
-      decision: 'target teleport vs finisher-fed haste cooldown vs opener-fed finisher discount',
+      decision: 'target teleport vs energy-surge weapon payoff vs opener-fed finisher discount',
       options: [
         {
           id: 'rog_r20_shadowstep',
@@ -1172,14 +1356,30 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'rog_r20_adrenaline_junkie',
           name: 'Redline Habit',
-          description: "Each finisher reduces Quickened Blood's cooldown by 6 sec.",
+          description:
+            'Quickened Blood makes your next landed weapon strike within 8 sec deal 50% more damage.',
           icon: 'adrenaline_rush',
           effect: {
             proc: {
               id: 'rog_adrenaline_junkie',
               name: 'Redline Habit',
-              trigger: { on: 'castNth', n: 1, abilities: rogueFinisherAbilityIds },
-              responses: [{ kind: 'cooldownRefund', ability: 'adrenaline_rush', seconds: 6 }],
+              school: 'physical',
+              trigger: { on: 'castNth', n: 1, abilities: ['adrenaline_rush'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_ability_damage',
+                  abilities: [
+                    'sinister_strike',
+                    'backstab',
+                    'ambush',
+                    'hemorrhage',
+                    'ghostly_strike',
+                  ],
+                  duration: 8,
+                  dmgPct: 0.5,
+                },
+              ],
             },
           },
         },
@@ -1367,14 +1567,21 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 14,
       theme: 'investment',
-      decision: 'banked Mindfractures vs emergency heal echo vs extended decay',
+      decision: 'single-target Dirge refresh vs emergency heal echo vs area Dirge spread',
       options: [
         {
-          id: 'pri_r14_mind_melt',
-          name: 'Twin Fracture',
-          description: 'Mindfracture stores 2 uses.',
+          id: 'pri_r14_deathless_dirge',
+          name: 'Deathless Dirge',
+          description: 'Mindfracture refreshes your Dirge of Decay on its target.',
           icon: 'mind_blast',
-          effect: { ability: [{ ability: 'mind_blast', bonusCharges: 1 }] },
+          effect: {
+            ability: [
+              {
+                ability: 'mind_blast',
+                addEffects: [{ type: 'refreshDot', dot: 'shadow_word_pain' }],
+              },
+            ],
+          },
         },
         {
           id: 'pri_r14_greater_heal',
@@ -1394,18 +1601,16 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
           },
         },
         {
-          id: 'pri_r14_pain_and_suffering',
-          name: 'Endless Dirge',
+          id: 'pri_r14_plague_chorus',
+          name: 'Plague Chorus',
           description:
-            'Each Litany of Woe tick extends your Dirge of Decay on the target by 1 sec, up to 6 added sec.',
-          icon: 'mind_flay',
+            'Mindfracture copies your Dirge of Decay on the target to enemies within 8 yards.',
+          icon: 'mind_blast',
           effect: {
             ability: [
               {
-                ability: 'mind_flay',
-                addEffects: [
-                  { type: 'extendDot', dot: 'shadow_word_pain', seconds: 1, maxBonus: 6 },
-                ],
+                ability: 'mind_blast',
+                addEffects: [{ type: 'spreadDot', dot: 'shadow_word_pain', radius: 8 }],
               },
             ],
           },
@@ -1415,36 +1620,53 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 17,
       theme: 'resilience',
-      decision: 'instant self-heal vs stronger party fortitude vs reactive ward',
+      decision: 'long Litany commitment vs completed-HoT prayer weave vs completion burst',
       options: [
         {
-          id: 'pri_r17_desperate_prayer',
-          name: 'Last Prayer',
-          description: 'Grants Last Prayer.',
-          icon: 'desperate_prayer',
-          effect: { grant: { ability: 'desperate_prayer' } },
+          id: 'pri_r17_ninefold_litany',
+          name: 'Ninefold Litany',
+          description: 'Litany of Woe channels for 9 sec and strikes 9 times.',
+          icon: 'mind_flay',
+          effect: { ability: [{ ability: 'mind_flay', channelDurationPct: 2 }] },
         },
         {
           id: 'pri_r17_improved_fortitude',
-          name: 'Resolve Unbroken',
+          name: 'Last Blessing',
           description:
-            'Litany of Resolve effect increased by 50%, granting your party 7.5% Stamina instead of 5%.',
-          icon: 'power_word_fortitude',
-          effect: { ability: [{ ability: 'power_word_fortitude', buffPct: 0.5 }] },
+            'For Doctrine and Benison, when Lingering Grace runs its full duration, your next Solemn Prayer or Urgent Prayer within 8 sec is instant.',
+          icon: 'renew',
+          effect: {
+            procs: ['discipline', 'holy'].map((spec) => ({
+              id: 'pri_last_blessing',
+              name: 'Last Blessing',
+              spec,
+              requiresKnownAbility: 'renew',
+              school: 'holy',
+              trigger: { on: 'hotExpired' as const, ability: 'renew' },
+              responses: [
+                {
+                  kind: 'empowerNext' as const,
+                  aura: 'next_cast_instant' as const,
+                  abilities: ['heal', 'flash_heal'],
+                  duration: 8,
+                },
+              ],
+            })),
+          },
         },
         {
-          id: 'pri_r17_inner_fire',
-          name: 'Wounded Halo',
+          id: 'pri_r17_woes_crescendo',
+          name: "Woe's Crescendo",
           description:
-            'Taking a hit for at least 15% of your maximum health kindles a ward absorbing 70 damage for 10 sec. 20 sec internal cooldown.',
-          icon: 'power_word_shield',
+            'The final tick of a completed Litany of Woe bursts for 36 Shadow damage to enemies within 8 yards of the target.',
+          icon: 'mind_flay',
           effect: {
-            proc: {
-              id: 'pri_inner_fire',
-              name: 'Wounded Halo',
-              trigger: { on: 'bigHitTaken', hpFrac: 0.15, icd: 20 },
-              responses: [{ kind: 'absorb', amount: 70, duration: 10, name: 'Wounded Halo' }],
-            },
+            ability: [
+              {
+                ability: 'mind_flay',
+                addEffects: [{ type: 'channelFinisher', amount: 36, radius: 8 }],
+              },
+            ],
           },
         },
       ],
@@ -1496,7 +1718,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 5,
       theme: 'elements',
-      decision: 'Arc Bolt-fed free jolt vs reflected-hit instant bolt vs imbued sustain',
+      decision: 'Arc Bolt-fed free jolt vs imbued-melee Jolt cooldowns vs imbued sustain',
       options: [
         {
           id: 'sha_r5_concussion',
@@ -1518,6 +1740,56 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
                 },
               ],
             },
+          },
+        },
+        {
+          id: 'sha_r14_weapon_fury',
+          name: 'Imbued Tempo',
+          description:
+            'Landed melee auto-attacks with an imbued weapon shave 0.5 sec off your Jolt cooldowns.',
+          icon: 'stormstrike',
+          effect: {
+            proc: {
+              id: 'sha_weapon_fury',
+              name: 'Imbued Tempo',
+              trigger: { on: 'meleeSwingWhile', auraKind: 'imbue' },
+              responses: [
+                { kind: 'cooldownRefund', ability: 'earth_shock', seconds: 0.5 },
+                { kind: 'cooldownRefund', ability: 'flame_shock', seconds: 0.5 },
+                { kind: 'cooldownRefund', ability: 'frost_shock', seconds: 0.5 },
+              ],
+            },
+          },
+        },
+        {
+          id: 'sha_r5_imbue_mastery',
+          name: 'Imbued Lifeblood',
+          description:
+            'Each landed melee auto-attack with an active weapon imbue heals you for 4% of your maximum health.',
+          icon: 'rockbiter_weapon',
+          effect: {
+            proc: {
+              id: 'sha_imbued_lifeblood',
+              name: 'Imbued Lifeblood',
+              trigger: { on: 'meleeSwingWhile', auraKind: 'imbue' },
+              responses: [{ kind: 'heal', pctMax: 0.04 }],
+            },
+          },
+        },
+      ],
+    },
+    {
+      level: 8,
+      theme: 'jolts',
+      decision: 'interrupting Earthen Jolt vs reflected-hit instant bolt vs healing spring',
+      options: [
+        {
+          id: 'sha_r8_improved_earth_shock',
+          name: 'Fault Rebuke',
+          description: 'Earthen Jolt also interrupts spellcasting for a 2 sec school lockout.',
+          icon: 'earth_shock',
+          effect: {
+            ability: [{ ability: 'earth_shock', addEffects: [{ type: 'interrupt', lockout: 2 }] }],
           },
         },
         {
@@ -1543,68 +1815,18 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
           },
         },
         {
-          id: 'sha_r5_imbue_mastery',
-          name: 'Imbued Lifeblood',
-          description: 'Each landed melee auto-attack with an active weapon imbue heals you for 8.',
-          icon: 'rockbiter_weapon',
-          effect: {
-            proc: {
-              id: 'sha_imbued_lifeblood',
-              name: 'Imbued Lifeblood',
-              trigger: { on: 'meleeSwingWhile', auraKind: 'imbue' },
-              responses: [{ kind: 'heal', amount: 8 }],
-            },
-          },
-        },
-      ],
-    },
-    {
-      level: 8,
-      theme: 'jolts',
-      decision: 'interrupting Earthen Jolt vs rooting Rime Jolt vs Jolt-fed mana',
-      options: [
-        {
-          id: 'sha_r8_improved_earth_shock',
-          name: 'Fault Rebuke',
-          description: 'Earthen Jolt also interrupts spellcasting for a 2 sec school lockout.',
-          icon: 'earth_shock',
-          effect: {
-            ability: [{ ability: 'earth_shock', addEffects: [{ type: 'interrupt', lockout: 2 }] }],
-          },
-        },
-        {
-          id: 'sha_r8_frost_bind',
-          name: 'Rime Lock',
-          description: 'Rime Jolt also roots the target for 2 sec.',
-          icon: 'frost_shock',
-          effect: {
-            ability: [{ ability: 'frost_shock', addEffects: [{ type: 'root', duration: 2 }] }],
-          },
-        },
-        {
-          id: 'sha_r8_shock_efficiency',
-          name: 'Returning Current',
-          description: 'Every 3rd Jolt restores 30 mana.',
-          icon: 'earth_shock',
-          effect: {
-            proc: {
-              id: 'sha_returning_current',
-              name: 'Returning Current',
-              trigger: {
-                on: 'castNth',
-                n: 3,
-                abilities: ['earth_shock', 'flame_shock', 'frost_shock'],
-              },
-              responses: [{ kind: 'resource', amount: 30, resourceType: 'mana' }],
-            },
-          },
+          id: 'sha_r11_healing_stream',
+          name: 'Springwell',
+          description: 'Grants Springwell.',
+          icon: 'healing_stream',
+          effect: { grant: { ability: 'healing_stream' } },
         },
       ],
     },
     {
       level: 11,
       theme: 'attunement',
-      decision: 'heal-crit tempo vs bolt-crit tempo vs healing-over-time spring',
+      decision: 'heal-crit tempo vs Thunder Ward charge weaving vs Jolt-fed mana',
       options: [
         {
           id: 'sha_r11_ancestral_guidance',
@@ -1629,40 +1851,65 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
           },
         },
         {
-          id: 'sha_r11_elemental_attunement',
-          name: 'Elemental Attunement',
-          description: 'Arc Bolt critical strikes make your next Arc Bolt within 8 sec instant.',
-          icon: 'lightning_bolt',
+          id: 'sha_r11_fulmination',
+          name: 'Fulmination',
+          description:
+            'While Thunder Ward is active, each Arc Bolt adds a charge up to 9. Each charge gives Arc Bolt 5% Overload chance for a free half-damage repeat that chains to one nearby enemy. Earthen Jolt consumes every charge for 8 Nature damage each to the target and nearby enemies.',
+          icon: 'lightning_shield',
           effect: {
+            ability: [
+              {
+                ability: 'earth_shock',
+                addEffects: [
+                  {
+                    type: 'consumeAuraChargesDamage',
+                    auraId: 'lightning_shield',
+                    damagePerCharge: 8,
+                    radius: 8,
+                  },
+                ],
+              },
+            ],
             proc: {
-              id: 'sha_elemental_attunement',
-              name: 'Elemental Attunement',
+              id: 'sha_fulmination',
+              name: 'Fulmination',
               school: 'nature',
-              trigger: { on: 'spellCrit', abilities: ['lightning_bolt'] },
+              trigger: { on: 'castNth', n: 1, abilities: ['lightning_bolt'] },
               responses: [
                 {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_instant',
-                  abilities: ['lightning_bolt'],
-                  duration: 8,
+                  kind: 'addAuraCharges',
+                  ability: 'lightning_shield',
+                  amount: 1,
+                  maxCharges: 9,
                 },
               ],
             },
           },
         },
         {
-          id: 'sha_r11_healing_stream',
-          name: 'Springwell',
-          description: 'Grants Springwell.',
-          icon: 'healing_stream',
-          effect: { grant: { ability: 'healing_stream' } },
+          id: 'sha_r8_shock_efficiency',
+          name: 'Returning Current',
+          description: 'Every 3rd Jolt restores 8% of your maximum mana.',
+          icon: 'earth_shock',
+          effect: {
+            proc: {
+              id: 'sha_returning_current',
+              name: 'Returning Current',
+              trigger: {
+                on: 'castNth',
+                n: 3,
+                abilities: ['earth_shock', 'flame_shock', 'frost_shock'],
+              },
+              responses: [{ kind: 'resource', pctMax: 0.08, resourceType: 'mana' }],
+            },
+          },
         },
       ],
     },
     {
       level: 14,
       theme: 'storm',
-      decision: 'area lightning vs DoT detonation vs imbued-melee Jolt cooldowns',
+      decision: 'area lightning vs DoT detonation vs rooting Rime Jolt',
       options: [
         {
           id: 'sha_r14_chain_lightning',
@@ -1684,22 +1931,12 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
           },
         },
         {
-          id: 'sha_r14_weapon_fury',
-          name: 'Imbued Tempo',
-          description:
-            'Landed melee auto-attacks with an imbued weapon shave 0.5 sec off your Jolt cooldowns.',
-          icon: 'stormstrike',
+          id: 'sha_r8_frost_bind',
+          name: 'Rime Lock',
+          description: 'Rime Jolt also roots the target for 2 sec.',
+          icon: 'frost_shock',
           effect: {
-            proc: {
-              id: 'sha_weapon_fury',
-              name: 'Imbued Tempo',
-              trigger: { on: 'meleeSwingWhile', auraKind: 'imbue' },
-              responses: [
-                { kind: 'cooldownRefund', ability: 'earth_shock', seconds: 0.5 },
-                { kind: 'cooldownRefund', ability: 'flame_shock', seconds: 0.5 },
-                { kind: 'cooldownRefund', ability: 'frost_shock', seconds: 0.5 },
-              ],
-            },
+            ability: [{ ability: 'frost_shock', addEffects: [{ type: 'root', duration: 2 }] }],
           },
         },
       ],
@@ -1707,7 +1944,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 17,
       theme: 'warding',
-      decision: 'ground root vs instant travel form vs reactive absorb',
+      decision: 'ground root vs Mending-to-Chain weave vs reactive absorb',
       options: [
         {
           id: 'sha_r17_earthbind',
@@ -1718,10 +1955,28 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'sha_r17_improved_ghost_wolf',
-          name: 'Wolfstep',
-          description: 'Shadewolf becomes instant.',
-          icon: 'ghost_wolf',
-          effect: { ability: [{ ability: 'ghost_wolf', castPct: -1 }] },
+          name: 'Tideflow',
+          description:
+            'For Spiritmend, every 3rd Mending Waters makes your next Chain Heal within 8 sec instant.',
+          icon: 'chain_heal',
+          effect: {
+            proc: {
+              id: 'sha_tideflow',
+              name: 'Tideflow',
+              spec: 'restoration',
+              requiresKnownAbility: 'chain_heal',
+              school: 'nature',
+              trigger: { on: 'castNth', n: 3, abilities: ['healing_wave'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_instant',
+                  abilities: ['chain_heal'],
+                  duration: 8,
+                },
+              ],
+            },
+          },
         },
         {
           id: 'sha_r17_elemental_warding',
@@ -1743,7 +1998,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 20,
       theme: 'ascendance',
-      decision: 'party haste vs crit-fed Jolt burst vs emergency healing echoes',
+      decision: 'party haste vs melee reset cadence vs emergency healing echoes',
       options: [
         {
           id: 'sha_r20_bloodlust',
@@ -1754,14 +2009,19 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'sha_r20_elemental_fury',
-          name: 'Earthen Fury',
-          description: 'Your Arc Bolt and Earthen Jolt deal 20% more damage.',
-          icon: 'lightning_bolt',
+          name: 'Tempest Reprise',
+          description:
+            "Landed Ancestral Strikes have a 20% chance to reset Ancestral Strike's cooldown.",
+          icon: 'stormstrike',
           effect: {
-            ability: [
-              { ability: 'lightning_bolt', dmgPct: 0.2 },
-              { ability: 'earth_shock', dmgPct: 0.2 },
-            ],
+            proc: {
+              id: 'sha_tempest_reprise',
+              name: 'Tempest Reprise',
+              spec: 'enhancement',
+              school: 'nature',
+              trigger: { on: 'meleeHit', abilities: ['stormstrike'], chance: 0.2 },
+              responses: [{ kind: 'cooldownRefund', ability: 'stormstrike', seconds: 'reset' }],
+            },
           },
         },
         {
@@ -1935,9 +2195,20 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'wlk_r14_amplify_curse',
           name: 'Deepened Hex',
-          description: 'Gloom Bolt deals 20% more damage to targets afflicted by your DoTs.',
+          description:
+            'Gloom Bolt extends your Blackrot and Hex of Anguish on the target by 3 sec, up to 6 sec per application.',
           icon: 'curse_of_agony',
-          effect: { ability: [{ ability: 'shadow_bolt', dmgPctVsDotted: 0.2 }] },
+          effect: {
+            ability: [
+              {
+                ability: 'shadow_bolt',
+                addEffects: [
+                  { type: 'extendDot', dot: 'corruption', seconds: 3, maxBonus: 6 },
+                  { type: 'extendDot', dot: 'curse_of_agony', seconds: 3, maxBonus: 6 },
+                ],
+              },
+            ],
+          },
         },
         {
           id: 'wlk_r14_ruin',
@@ -2020,16 +2291,23 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'wlk_r17_demonic_resilience',
-          name: 'Unyielding Pact',
+          name: 'Pain Communion',
           description:
-            'Taking a hit for at least 15% of your maximum health heals you for 50. 20 sec internal cooldown.',
+            'Taking a hit for at least 15% of your maximum health makes your next Burning Pact within 8 sec instant. 20 sec internal cooldown.',
           icon: 'demon_skin',
           effect: {
             proc: {
-              id: 'wlk_unyielding_pact',
-              name: 'Unyielding Pact',
+              id: 'wlk_pain_communion',
+              name: 'Pain Communion',
               trigger: { on: 'bigHitTaken', hpFrac: 0.15, icd: 20 },
-              responses: [{ kind: 'heal', amount: 50 }],
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_instant',
+                  abilities: ['immolate'],
+                  duration: 8,
+                },
+              ],
             },
           },
         },
@@ -2043,9 +2321,19 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'wlk_r20_chaos_bolt',
           name: 'Ruinbolt',
-          description: 'Grants Ruinbolt.',
+          description: "Grants Ruinbolt. Landing Ruinbolt resets Duskfire's cooldown.",
           icon: 'chaos_bolt',
-          effect: { grant: { ability: 'chaos_bolt' } },
+          effect: {
+            grant: { ability: 'chaos_bolt' },
+            proc: {
+              id: 'wlk_ruinbolt_relay',
+              name: 'Ruinbolt',
+              requiresKnownAbility: 'chaos_bolt',
+              school: 'fire',
+              trigger: { on: 'spellHit', abilities: ['chaos_bolt'] },
+              responses: [{ kind: 'cooldownRefund', ability: 'shadowburn', seconds: 'reset' }],
+            },
+          },
         },
         {
           id: 'wlk_r20_grimoire_of_haste',
@@ -2176,9 +2464,28 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'dru_r8_typhoon',
           name: 'Typhoon',
-          description: 'Grants Typhoon: knock back and daze all enemies within 8 yd.',
+          description:
+            'Grants Typhoon: knock back and daze all enemies within 8 yd. Moongrove: casting Typhoon makes your next Galeheart within 8 sec free.',
           icon: 'typhoon',
-          effect: { grant: { ability: 'typhoon' } },
+          effect: {
+            grant: { ability: 'typhoon' },
+            proc: {
+              id: 'dru_typhoon_relay',
+              name: 'Typhoon',
+              spec: 'balance',
+              requiresKnownAbility: 'typhoon',
+              school: 'nature',
+              trigger: { on: 'castNth', n: 1, abilities: ['typhoon'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_free',
+                  abilities: ['hurricane'],
+                  duration: 8,
+                },
+              ],
+            },
+          },
         },
         {
           id: 'dru_r8_improved_roots',
@@ -2228,7 +2535,7 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 11,
       theme: 'renewal',
-      decision: 'cross-form resource waves vs shapeshift attack discount vs healing cadence ward',
+      decision: 'cross-form resource waves vs shapeshift attack discount vs direct-heal HoT relay',
       options: [
         {
           id: 'dru_r11_innervate',
@@ -2267,14 +2574,25 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'dru_r11_improved_mark',
           name: 'Grove Covenant',
-          description: 'Every 3rd Wildmend shields its target, absorbing 90 damage for 10 sec.',
+          description:
+            'Completing Wildmend or Second Bloom makes your next Wildbloom within 8 sec cost 50% less.',
           icon: 'mark_of_the_wild',
           effect: {
             proc: {
               id: 'dru_grove_covenant',
               name: 'Grove Covenant',
-              trigger: { on: 'castNth', n: 3, abilities: ['healing_touch'] },
-              responses: [{ kind: 'absorb', amount: 90, duration: 10, name: 'Grove Covenant' }],
+              requiresKnownAbility: 'rejuvenation',
+              school: 'nature',
+              trigger: { on: 'castNth', n: 1, abilities: ['healing_touch', 'regrowth'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_cheap',
+                  abilities: ['rejuvenation'],
+                  duration: 8,
+                  costPct: 0.5,
+                },
+              ],
             },
           },
         },
@@ -2433,9 +2751,29 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'dru_r20_berserk',
           name: 'Red Haze',
-          description: 'Grants Red Haze.',
+          description:
+            'Grants Red Haze. Wildfang: casting Red Haze resets Primal Surge and makes your next form attack within 8 sec free.',
           icon: 'berserk',
-          effect: { grant: { ability: 'berserk' } },
+          effect: {
+            grant: { ability: 'berserk' },
+            proc: {
+              id: 'dru_red_haze_relay',
+              name: 'Red Haze',
+              spec: 'feral',
+              requiresKnownAbility: 'berserk',
+              school: 'physical',
+              trigger: { on: 'castNth', n: 1, abilities: ['berserk'] },
+              responses: [
+                { kind: 'cooldownRefund', ability: 'feral_charge', seconds: 'reset' },
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_free',
+                  abilities: ['maul', 'swipe', 'claw', 'rake', 'ferocious_bite', 'rip'],
+                  duration: 8,
+                },
+              ],
+            },
+          },
         },
         {
           id: 'dru_r20_tranquility',

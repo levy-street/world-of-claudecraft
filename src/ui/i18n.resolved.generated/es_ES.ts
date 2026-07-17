@@ -1396,6 +1396,9 @@ export const es_ES: EnTranslations = {
       "formTravel": "Forma Fleet: velocidad de desplazamiento aumentada un {pct}%",
       "defensiveStance": "Guarded Stance: menos daño recibido, más amenaza",
       "righteousFury": "Burning Oath: amenaza por daño Sagrado enormemente aumentada",
+      "stormcharge": "Skyrend {stacks}/{max}: each stack reduces Arc Bolt cast time by {castPct}% and increases its damage by {damagePct}%",
+      "aethericFlux": "Aetheric Flux {stacks}/{max}: each stack refunds {cooldown} sec of Aether Surge cooldown; Aether Surge consumes all stacks to restore {manaPct}% maximum mana per stack",
+      "nextAbilityDamage": "Increases the next affected ability damage by {pct}%",
       "scale": "Talla aumentado un {pct}%",
       "jump": "Salto aumentada un {pct}%",
       "school": {
@@ -2510,6 +2513,7 @@ export const es_ES: EnTranslations = {
       "frost_armor": "Una mejora propia y duradera que refuerza tu armadura antes de un combate.",
       "arcane_intellect": "Aumenta el Intelecto para ampliar la reserva de maná de un aliado; lánzalo antes de iniciar el combate.",
       "frostbolt": "Golpea a distancia y ralentiza al objetivo para que no pueda acercarse a ti.",
+      "blink": "Teleports you forward and breaks roots, giving every Mage a reliable escape.",
       "conjure_water": "Crea bebidas que restauran maná, para que puedas reponerte entre combates.",
       "conjure_food": "Crea comida que restaura salud cuando te sientas a comer.",
       "shadow_bolt": "Una descarga de sombra que lanzas contra un objetivo, tu hechizo de ataque habitual.",
@@ -5743,7 +5747,7 @@ export const es_ES: EnTranslations = {
       },
       "fireball": {
         "name": "Descarga de Ascuas",
-        "description": "Lanza una bola ígnea que causa {damage} de daño de Fuego y daño adicional en el tiempo."
+        "description": "Lanza una bola ígnea que causa {damage} de daño de Fuego y {overTime} de daño de Fuego en el tiempo."
       },
       "frost_armor": {
         "name": "Manto de Escarcha",
@@ -5756,6 +5760,10 @@ export const es_ES: EnTranslations = {
       "frostbolt": {
         "name": "Lanza de Escarcha",
         "description": "Lanza una descarga de escarcha que causa {damage} de daño de Escarcha y reduce la velocidad de movimiento un 40%."
+      },
+      "icefall": {
+        "name": "Icefall",
+        "description": "Launches every stored Icicle at the target for {damage} Frost damage each. Deals 2.5 times damage if the target is frozen by a root or stun, or while Frostbite is active. Consumes Frostbite. This fixed damage cannot critically strike. (Cryomancy)"
       },
       "conjure_water": {
         "name": "Conjurar Agua",
@@ -5791,7 +5799,7 @@ export const es_ES: EnTranslations = {
       },
       "pyroblast": {
         "name": "Lanza Ígnea",
-        "description": "Lanza una enorme roca ígnea que causa {damage} de daño de Fuego y daño adicional en el tiempo."
+        "description": "Lanza una enorme roca ígnea que causa {damage} de daño de Fuego y {overTime} de daño de Fuego durante 12 s."
       },
       "ice_barrier": {
         "name": "Velo de Escarcha",
@@ -6023,7 +6031,7 @@ export const es_ES: EnTranslations = {
       },
       "mind_flay": {
         "name": "Letanía de Aflicción",
-        "description": "Asalta la mente del objetivo con energía de las Sombras e inflige {damage} de daño cada segundo durante 3 s."
+        "description": "Asalta la mente del objetivo con energía de las Sombras durante 3 s. Con cada pulso, el daño aumenta un 30% del daño del primer pulso."
       },
       "flash_heal": {
         "name": "Plegaria Urgente",

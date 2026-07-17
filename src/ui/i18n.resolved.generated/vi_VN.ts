@@ -1396,6 +1396,9 @@ export const vi_VN: EnTranslations = {
       "formTravel": "Fleet Form: tốc độ di chuyển tăng {pct}%.",
       "defensiveStance": "Thế Thủ: giảm sát thương phải chịu, tăng đe dọa.",
       "righteousFury": "Lời Thề Rực Cháy: tăng mạnh đe dọa từ sát thương Thánh.",
+      "stormcharge": "Skyrend {stacks}/{max}: each stack reduces Arc Bolt cast time by {castPct}% and increases its damage by {damagePct}%",
+      "aethericFlux": "Aetheric Flux {stacks}/{max}: each stack refunds {cooldown} sec of Aether Surge cooldown; Aether Surge consumes all stacks to restore {manaPct}% maximum mana per stack",
+      "nextAbilityDamage": "Increases the next affected ability damage by {pct}%",
       "scale": "Tamaño aumentado un {pct}%",
       "jump": "Altura de salto aumentada un {pct}%",
       "school": {
@@ -2510,6 +2513,7 @@ export const vi_VN: EnTranslations = {
       "frost_armor": "Một buff bản thân lâu dài giúp tôi luyện giáp của bạn trước trận đấu.",
       "arcane_intellect": "Tăng Trí Tuệ để mở rộng bể mana của đồng đội, hãy niệm trước khi vào trận.",
       "frostbolt": "Tấn công từ xa và làm chậm mục tiêu để nó không thể áp sát bạn.",
+      "blink": "Teleports you forward and breaks roots, giving every Mage a reliable escape.",
       "conjure_water": "Tạo ra đồ uống hồi mana, để bạn nạp lại giữa các đợt kéo quái.",
       "conjure_food": "Tạo ra thức ăn hồi máu khi bạn ngồi xuống dùng bữa.",
       "shadow_bolt": "Một tia bóng tối bạn niệm vào mục tiêu, đòn chủ lực quen thuộc của bạn.",
@@ -5743,7 +5747,7 @@ export const vi_VN: EnTranslations = {
       },
       "fireball": {
         "name": "Tia Tàn Lửa",
-        "description": "Ném ra một quả cầu lửa rực cháy gây {damage} sát thương Hỏa cùng sát thương cộng dồn theo thời gian."
+        "description": "Ném ra một quả cầu lửa rực cháy gây {damage} sát thương Hỏa cùng {overTime} sát thương Hỏa theo thời gian."
       },
       "frost_armor": {
         "name": "Áo Choàng Sương Giá",
@@ -5756,6 +5760,10 @@ export const vi_VN: EnTranslations = {
       "frostbolt": {
         "name": "Thương Băng Giá",
         "description": "Phóng ra một mũi tiễn băng, gây {damage} sát thương Băng và làm chậm di chuyển 40%."
+      },
+      "icefall": {
+        "name": "Icefall",
+        "description": "Launches every stored Icicle at the target for {damage} Frost damage each. Deals 2.5 times damage if the target is frozen by a root or stun, or while Frostbite is active. Consumes Frostbite. This fixed damage cannot critically strike. (Cryomancy)"
       },
       "conjure_water": {
         "name": "Kết Nước",
@@ -5791,7 +5799,7 @@ export const vi_VN: EnTranslations = {
       },
       "pyroblast": {
         "name": "Thương Liệt Hỏa",
-        "description": "Ném ra một tảng lửa khổng lồ gây {damage} sát thương Hỏa cùng sát thương cộng dồn theo thời gian."
+        "description": "Ném ra một tảng lửa khổng lồ gây {damage} sát thương Hỏa cùng {overTime} sát thương Hỏa trong 12 giây."
       },
       "ice_barrier": {
         "name": "Màn Băng",
@@ -6023,7 +6031,7 @@ export const vi_VN: EnTranslations = {
       },
       "mind_flay": {
         "name": "Kinh Cầu Thống Khổ",
-        "description": "Công kích tâm trí mục tiêu bằng năng lượng Bóng Tối, gây {damage} sát thương mỗi giây trong 3 giây."
+        "description": "Công kích tâm trí mục tiêu bằng năng lượng Bóng Tối trong 3 giây. Mỗi nhịp tăng sát thương thêm 30% sát thương của nhịp đầu tiên."
       },
       "flash_heal": {
         "name": "Lời Nguyện Khẩn Cấp",

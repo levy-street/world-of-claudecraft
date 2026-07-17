@@ -1396,6 +1396,9 @@ export const pt_BR: EnTranslations = {
       "formTravel": "Forma de Fleet: velocidade de movimento aumentada em {pct}%",
       "defensiveStance": "Postura de Guarda: dano recebido reduzido, mais ameaça",
       "righteousFury": "Juramento Ardente: ameaça de dano Sagrado muito aumentada",
+      "stormcharge": "Skyrend {stacks}/{max}: each stack reduces Arc Bolt cast time by {castPct}% and increases its damage by {damagePct}%",
+      "aethericFlux": "Aetheric Flux {stacks}/{max}: each stack refunds {cooldown} sec of Aether Surge cooldown; Aether Surge consumes all stacks to restore {manaPct}% maximum mana per stack",
+      "nextAbilityDamage": "Increases the next affected ability damage by {pct}%",
       "scale": "Tamaño aumentado un {pct}%",
       "jump": "Altura de salto aumentada un {pct}%",
       "school": {
@@ -2510,6 +2513,7 @@ export const pt_BR: EnTranslations = {
       "frost_armor": "Um aprimoramento próprio duradouro que endurece sua armadura antes da luta.",
       "arcane_intellect": "Aumenta o Intelecto para ampliar a reserva de mana de um aliado; lance antes da puxada.",
       "frostbolt": "Atinge à distância e reduz a velocidade do alvo para que ele não chegue até você.",
+      "blink": "Teleports you forward and breaks roots, giving every Mage a reliable escape.",
       "conjure_water": "Conjura bebidas que restauram mana, para você reabastecer entre as puxadas.",
       "conjure_food": "Conjura comida que restaura vida quando você se senta para comer.",
       "shadow_bolt": "Uma seta de sombra que você lança no alvo, sua magia de ataque preferida.",
@@ -5743,7 +5747,7 @@ export const pt_BR: EnTranslations = {
       },
       "fireball": {
         "name": "Raio de Brasa",
-        "description": "Arremessa uma bola flamejante que causa {damage} de dano de Fogo e dano adicional ao longo do tempo."
+        "description": "Arremessa uma bola flamejante que causa {damage} de dano de Fogo e mais {overTime} de dano de Fogo ao longo do tempo."
       },
       "frost_armor": {
         "name": "Manto de Geada",
@@ -5756,6 +5760,10 @@ export const pt_BR: EnTranslations = {
       "frostbolt": {
         "name": "Lança de Geada",
         "description": "Lança uma seta de gelo, causando {damage} de dano de Gelo e reduzindo a velocidade de movimento em 40%."
+      },
+      "icefall": {
+        "name": "Icefall",
+        "description": "Launches every stored Icicle at the target for {damage} Frost damage each. Deals 2.5 times damage if the target is frozen by a root or stun, or while Frostbite is active. Consumes Frostbite. This fixed damage cannot critically strike. (Cryomancy)"
       },
       "conjure_water": {
         "name": "Vínculo de Água",
@@ -5791,7 +5799,7 @@ export const pt_BR: EnTranslations = {
       },
       "pyroblast": {
         "name": "Lança Ígnea",
-        "description": "Arremessa uma imensa rocha flamejante que causa {damage} de dano de Fogo mais dano adicional ao longo do tempo."
+        "description": "Arremessa uma imensa rocha flamejante que causa {damage} de dano de Fogo e mais {overTime} de dano de Fogo em 12 s."
       },
       "ice_barrier": {
         "name": "Véu de Gelo",
@@ -6023,7 +6031,7 @@ export const pt_BR: EnTranslations = {
       },
       "mind_flay": {
         "name": "Litania da Aflição",
-        "description": "Assalta a mente do alvo com energia de Sombra, causando {damage} de dano por segundo durante 3 s."
+        "description": "Assalta a mente do alvo com energia de Sombra por 3 s. A cada pulso, o dano aumenta em 30% do dano do primeiro pulso."
       },
       "flash_heal": {
         "name": "Prece Urgente",

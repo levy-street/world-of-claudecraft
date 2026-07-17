@@ -56,7 +56,15 @@ import {
   xpForLevel,
 } from '../types';
 import { WORLD_BOSS_CORPSE_SECONDS, worldBossLootContributors } from '../world_boss';
-import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
+import {
+  onDamageTaken,
+  onPetHit,
+  onRangedHit,
+  onShieldConsumed,
+  onSpellCrit,
+  onSpellHit,
+  resetProcState,
+} from './talent_procs';
 
 // How long a slain mob's corpse persists (seconds) before it is cleared. Sole user
 // is handleDeath, so the constant lives here with the death-domain code.
@@ -77,6 +85,29 @@ function ignoresDamagePushback(ctx: SimContext, target: Entity, abilityId: strin
     ABILITIES[abilityId]?.uninterruptible === true ||
     ctx.resolvedAbility(abilityId, target.id)?.damagePushbackImmune === true
   );
+}
+
+// Hunter cadence/setup procs are keyed to a landed direct hit. Keep their dispatch in
+// one seam so the normal damage path and the four clamped PvP terminal paths agree.
+// A dead player cannot bank a new window from an in-flight shot or a companion that
+// remains active after its owner falls.
+function dispatchLandedHunterTalentHit(
+  ctx: SimContext,
+  source: Entity | null,
+  target: Entity,
+  amount: number,
+  direct: boolean,
+  school: string,
+  abilityId: string | null,
+): void {
+  if (!source || source.id === target.id || amount <= 0 || !direct) return;
+  if (source.ownerId !== null) {
+    const owner = ctx.entities.get(source.ownerId);
+    if (owner?.kind === 'player' && !owner.dead) onPetHit(ctx, owner, target);
+  }
+  if (source.kind === 'player' && !source.dead && school === 'physical' && abilityId !== null) {
+    onRangedHit(ctx, source, abilityId, target);
+  }
 }
 
 export function dealDamage(
@@ -103,6 +134,9 @@ export function dealDamage(
   alreadyFinal = false,
   // Stable content id for talent-proc filters. `ability` remains the display label.
   abilityId: string | null = null,
+  // Stored damage has already passed every source and target multiplier. Skip those
+  // multipliers while retaining absorbs, threat, events, and death bookkeeping.
+  damageModifiersResolved = false,
 ): void {
   if (target.dead) return;
   if (target.gm || target.devGod) return; // GMs and /dev god are invulnerable (every damage path funnels here)
@@ -118,14 +152,20 @@ export function dealDamage(
   // through raid bosses to inspect drops without one-shotting them past their phase
   // transitions. Gated on devCommands so it can NEVER apply in production (where gm
   // marks real, non-fighting game masters). Draws no rng.
-  if (source?.devGod && source.kind === 'player' && ctx.devCommands)
+  if (!damageModifiersResolved && source?.devGod && source.kind === 'player' && ctx.devCommands)
     amount = Math.round(amount * 100);
 
   // Master Armorer is a live equipment condition, not a stat baked at talent
   // recompute time. It applies to every school while the Arms warrior's current
   // mainhand is two-handed. Redirected already-final damage skips source output
   // modifiers so the same original hit cannot receive the mastery twice.
-  if (!alreadyFinal && source?.kind === 'player' && source.id !== target.id && amount > 0) {
+  if (
+    !damageModifiersResolved &&
+    !alreadyFinal &&
+    source?.kind === 'player' &&
+    source.id !== target.id &&
+    amount > 0
+  ) {
     const sourceMeta = ctx.players.get(source.id);
     const twoHandPct = sourceMeta ? ctx.playerMods(sourceMeta).global.masteryTwoHandDmgPct : 0;
     const mainhandId = sourceMeta?.equipment.mainhand;
@@ -137,6 +177,7 @@ export function dealDamage(
 
   // Defensive Stance, classic: deal 10% less, take 10% less (and +30% threat below)
   if (
+    !damageModifiersResolved &&
     !alreadyFinal &&
     source &&
     source.id !== target.id &&
@@ -145,6 +186,7 @@ export function dealDamage(
     amount = Math.round(amount * 0.9);
   }
   if (
+    !damageModifiersResolved &&
     source &&
     source.id !== target.id &&
     target.auras.some((a) => a.kind === 'defensive_stance')
@@ -155,7 +197,7 @@ export function dealDamage(
   // Expose: a cracked-guard debuff amplifies the physical damage the victim
   // takes (from any attacker) until it expires. Armor is already applied at the
   // swing site, so this rides on top of the post-mitigation amount.
-  if (school === 'physical' && amount > 0) {
+  if (!damageModifiersResolved && school === 'physical' && amount > 0) {
     let exposeMult = 1;
     for (const a of target.auras) if (a.kind === 'expose') exposeMult += a.value;
     if (exposeMult !== 1) amount = Math.round(amount * exposeMult);
@@ -165,7 +207,7 @@ export function dealDamage(
   // damage the victim takes from every attacker. Holy is excluded so healing-
   // school spells are untouched. Stacks additively across active debuffs and
   // lands before absorb shields, so a soaked hit still soaks the amplified total.
-  if (amount > 0 && school !== 'physical' && school !== 'holy') {
+  if (!damageModifiersResolved && amount > 0 && school !== 'physical' && school !== 'holy') {
     let amp = 0;
     for (const a of target.auras) {
       if (a.kind === 'spellvuln') amp += a.value;
@@ -176,7 +218,7 @@ export function dealDamage(
   // Curse of frailty: a cursed victim takes more damage from every source. The
   // offensive mirror of Defensive Stance's cut above. Multiple curses stack
   // additively (sum of amps) so layered curses can't multiply out of control.
-  if (amount > 0) {
+  if (!damageModifiersResolved && amount > 0) {
     let vuln = 0;
     for (const a of target.auras) if (a.kind === 'vulnerability') vuln += a.value;
     if (vuln > 0) amount = Math.round(amount * (1 + vuln));
@@ -184,7 +226,7 @@ export function dealDamage(
 
   // Breachmaker only sharpens the originating Warrior's attacks. It must not
   // become a raid-wide vulnerability when another attacker hits the target.
-  if (source && amount > 0) {
+  if (!damageModifiersResolved && source && amount > 0) {
     let sourceVulnerability = 0;
     for (const aura of target.auras) {
       if (aura.kind === 'vuln_source' && aura.sourceId === source.id) {
@@ -198,12 +240,18 @@ export function dealDamage(
 
   // Weakening Hex: a hexed source deals less damage (mirrors the healing cut in
   // applyHeal). Self-damage paths (source === target) are left untouched.
-  if (!alreadyFinal && source && source.id !== target.id) {
+  if (!damageModifiersResolved && !alreadyFinal && source && source.id !== target.id) {
     const hexMult = ctx.hexOutputMult(source);
     if (hexMult !== 1) amount = Math.round(amount * hexMult);
   }
 
-  if (!alreadyFinal && source && source.id !== target.id && amount > 0) {
+  if (
+    !damageModifiersResolved &&
+    !alreadyFinal &&
+    source &&
+    source.id !== target.id &&
+    amount > 0
+  ) {
     let damageDone = 0;
     for (const aura of source.auras) {
       if (
@@ -220,7 +268,7 @@ export function dealDamage(
     if (damageDone !== 0) amount = Math.round(amount * Math.max(0, 1 + damageDone));
   }
 
-  if (source && source.id !== target.id && amount > 0) {
+  if (!damageModifiersResolved && source && source.id !== target.id && amount > 0) {
     let reduction = 0;
     for (const aura of target.auras) {
       if (aura.kind === 'buff_dr' || aura.kind === 'die_by_sword') reduction += aura.value;
@@ -228,7 +276,13 @@ export function dealDamage(
     if (reduction > 0) amount = Math.round(amount * Math.max(0, 1 - reduction));
   }
 
-  if (source && source.id !== target.id && amount > 0 && school === 'physical') {
+  if (
+    !damageModifiersResolved &&
+    source &&
+    source.id !== target.id &&
+    amount > 0 &&
+    school === 'physical'
+  ) {
     let reduction = 0;
     for (const aura of target.auras) {
       if (aura.kind === 'buff_dr_phys') reduction += aura.value;
@@ -241,7 +295,7 @@ export function dealDamage(
   // source-output mod (skipped when the amount is already final, e.g. a redirect share).
   // Every shadow damage path (direct nuke, DoT tick, Mind Flay channel, AoE) funnels
   // here, so this one site covers them all; the boost is dynamic (it follows the form).
-  if (!alreadyFinal && source && school === 'shadow' && amount > 0) {
+  if (!damageModifiersResolved && !alreadyFinal && source && school === 'shadow' && amount > 0) {
     const form = source.auras.find((a) => a.kind === 'form_shadow');
     if (form) amount = Math.round(amount * (1 + form.value / 100));
   }
@@ -249,7 +303,7 @@ export function dealDamage(
   // "Find Weakness": a critvuln debuff makes the target's exposed flesh take
   // extra damage from CRITICAL hits only (any attacker, any school). Applied
   // after the defensive-stance reduction, before absorb shields soak it.
-  if (crit && amount > 0 && source && source.id !== target.id) {
+  if (!damageModifiersResolved && crit && amount > 0 && source && source.id !== target.id) {
     const bonus = ctx.critVulnBonus(target);
     if (bonus > 0) amount = Math.round(amount * (1 + bonus));
   }
@@ -257,12 +311,20 @@ export function dealDamage(
   // Berserker Stance increases the resolved critical hit without changing how
   // that critical was rolled. The alreadyFinal guard keeps redirected damage
   // from applying the source-side bonus a second time.
-  if (!alreadyFinal && crit && amount > 0 && source && source.id !== target.id) {
+  if (
+    !damageModifiersResolved &&
+    !alreadyFinal &&
+    crit &&
+    amount > 0 &&
+    source &&
+    source.id !== target.id
+  ) {
     const bonus = berserkerCritDamage(source);
     if (bonus > 0) amount = Math.round(amount * (1 + bonus));
   }
 
   if (
+    !damageModifiersResolved &&
     !alreadyFinal &&
     crit &&
     amount > 0 &&
@@ -284,6 +346,7 @@ export function dealDamage(
   // dealDamage receives post-mitigation damage, so this deterministic step sits
   // after the upstream armor/resist roll and before absorb shields.
   if (
+    !damageModifiersResolved &&
     amount > 0 &&
     source?.kind === 'player' &&
     target.kind === 'player' &&
@@ -303,6 +366,7 @@ export function dealDamage(
   }
 
   if (
+    !damageModifiersResolved &&
     source &&
     source.id !== target.id &&
     amount >= target.maxHp * STANCE_MASTERY_GUARDED_HP_PCT &&
@@ -386,6 +450,7 @@ export function dealDamage(
       // Book of Deeds: the clamped terminal hit counts (zero rng; the early
       // return skips the shared deed site and the session RewardCounters).
       if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
+      dispatchLandedHunterTalentHit(ctx, source, target, amount, direct, school, abilityId);
       ctx.endDuel(duel, sourcePlayer.id);
       return;
     }
@@ -431,6 +496,7 @@ export function dealDamage(
       });
       // Book of Deeds: the clamped terminal hit counts (zero rng).
       if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
+      dispatchLandedHunterTalentHit(ctx, source, target, amount, direct, school, abilityId);
       ctx.fiestaTakedown(match, sourcePlayer.id, target);
       return;
     }
@@ -460,6 +526,7 @@ export function dealDamage(
       });
       // Book of Deeds: the clamped terminal hit counts (zero rng).
       if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
+      dispatchLandedHunterTalentHit(ctx, source, target, amount, direct, school, abilityId);
       ctx.yumiPlayerDown(match, target, sourcePlayer.id);
       return;
     }
@@ -493,6 +560,7 @@ export function dealDamage(
       });
       // Book of Deeds: the clamped terminal hit counts (zero rng).
       if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
+      dispatchLandedHunterTalentHit(ctx, source, target, amount, direct, school, abilityId);
       handleDeath(ctx, target, source);
       const loserTeam = ctx.arenaTeamOf(match, target.id);
       if (loserTeam && ctx.isArenaTeamWiped(match, loserTeam)) {
@@ -682,11 +750,16 @@ export function dealDamage(
   // below, plus encounter participant tracking for the roster tasks.
   if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
 
+  dispatchLandedHunterTalentHit(ctx, source, target, amount, direct, school, abilityId);
+
   if (source && source.kind === 'player' && source.id !== target.id) {
     const meta = ctx.players.get(source.id);
     if (meta) meta.counters.damageDealt += amount;
+    if (amount > 0 && school !== 'physical' && abilityId) {
+      onSpellHit(ctx, source, abilityId, target, amount);
+    }
     if (crit && school !== 'physical' && ability) {
-      onSpellCrit(ctx, source, abilityId, target);
+      onSpellCrit(ctx, source, abilityId, target, amount);
     }
     if (source.resourceType === 'rage' && !noRage && school === 'physical' && !ability) {
       const isWarrior = meta?.cls === 'warrior';
@@ -749,17 +822,17 @@ export function dealDamage(
   }
   reflectSpellWard(ctx, source, target, amount, kind, school);
 
-  if (target.hp <= 0) {
+  if (target.hp <= 0 && !target.dead) {
     // A fiesta fighter who somehow bottoms out via a non-takedown path (a
     // friendly DoT tail, self-damage) is benched, not killed — never let the
     // party-mode hp hit a permanent death + graveyard flow.
     const fmatch = target.kind === 'player' ? ctx.arenaMatches.get(target.id) : undefined;
-    if (fmatch?.fiesta && fmatch.state === 'active' && !ctx.arenaIsDown(fmatch, target.id)) {
-      ctx.fiestaDown(fmatch, target, null);
-    } else if (fmatch?.yumi && fmatch.state === 'active' && !ctx.arenaIsDown(fmatch, target.id)) {
+    if (fmatch?.fiesta && fmatch.state === 'active') {
+      if (!ctx.arenaIsDown(fmatch, target.id)) ctx.fiestaDown(fmatch, target, null);
+    } else if (fmatch?.yumi && fmatch.state === 'active') {
       // Same non-takedown bottom-out safety for Protect Yumi: bench, never
       // the permanent death + graveyard flow.
-      ctx.yumiPlayerDown(fmatch, target, null);
+      if (!ctx.arenaIsDown(fmatch, target.id)) ctx.yumiPlayerDown(fmatch, target, null);
     } else {
       handleDeath(ctx, target, source);
     }

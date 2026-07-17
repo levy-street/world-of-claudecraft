@@ -1396,6 +1396,9 @@ export const pl_PL: EnTranslations = {
       "formTravel": "Postać Fleet: prędkość ruchu zwiększona o {pct}%",
       "defensiveStance": "Czujna postawa: mniej otrzymywanych obrażeń, większe zagrożenie",
       "righteousFury": "Płonąca przysięga: znacznie zwiększone zagrożenie od obrażeń od Świętości",
+      "stormcharge": "Skyrend {stacks}/{max}: each stack reduces Arc Bolt cast time by {castPct}% and increases its damage by {damagePct}%",
+      "aethericFlux": "Aetheric Flux {stacks}/{max}: each stack refunds {cooldown} sec of Aether Surge cooldown; Aether Surge consumes all stacks to restore {manaPct}% maximum mana per stack",
+      "nextAbilityDamage": "Increases the next affected ability damage by {pct}%",
       "scale": "Größe um {pct}% erhöht",
       "jump": "Sprunghöhe um {pct}% erhöht",
       "school": {
@@ -2510,6 +2513,7 @@ export const pl_PL: EnTranslations = {
       "frost_armor": "Trwałe wzmocnienie, które utwardza twój pancerz przed walką.",
       "arcane_intellect": "Zwiększa intelekt, by pogłębić zasób many sojusznika; rzuć je przed rozpoczęciem walki.",
       "frostbolt": "Uderza z dystansu i spowalnia cel, by nie mógł się do ciebie zbliżyć.",
+      "blink": "Teleports you forward and breaks roots, giving every Mage a reliable escape.",
       "conjure_water": "Przywołuje napoje przywracające manę, byś mógł uzupełnić ją między walkami.",
       "conjure_food": "Przywołuje jedzenie, które przywraca zdrowie, gdy usiądziesz, by się posilić.",
       "shadow_bolt": "Pocisk cienia rzucany w cel, twój podstawowy atak.",
@@ -5743,7 +5747,7 @@ export const pl_PL: EnTranslations = {
       },
       "fireball": {
         "name": "Żarowy pocisk",
-        "description": "Ciska ognistą kulą, która zadaje {damage} obrażeń od ognia oraz dodatkowe obrażenia w czasie."
+        "description": "Ciska ognistą kulą, która zadaje {damage} obrażeń od ognia oraz {overTime} obrażeń od ognia w czasie."
       },
       "frost_armor": {
         "name": "Płaszcz szronu",
@@ -5756,6 +5760,10 @@ export const pl_PL: EnTranslations = {
       "frostbolt": {
         "name": "Szronowa lanca",
         "description": "Wystrzeliwuje pocisk mrozu, zadając {damage} obrażeń od mrozu i spowalniając ruch o 40%."
+      },
+      "icefall": {
+        "name": "Icefall",
+        "description": "Launches every stored Icicle at the target for {damage} Frost damage each. Deals 2.5 times damage if the target is frozen by a root or stun, or while Frostbite is active. Consumes Frostbite. This fixed damage cannot critically strike. (Cryomancy)"
       },
       "conjure_water": {
         "name": "Przywołanie wody",
@@ -5791,7 +5799,7 @@ export const pl_PL: EnTranslations = {
       },
       "pyroblast": {
         "name": "Ognista lanca",
-        "description": "Ciska ogromnym ognistym głazem, który zadaje {damage} obrażeń od ognia oraz dodatkowe obrażenia w czasie."
+        "description": "Ciska ogromnym ognistym głazem, który zadaje {damage} obrażeń od ognia oraz {overTime} obrażeń od ognia przez 12 sek."
       },
       "ice_barrier": {
         "name": "Lodowa zasłona",
@@ -6023,7 +6031,7 @@ export const pl_PL: EnTranslations = {
       },
       "mind_flay": {
         "name": "Litania niedoli",
-        "description": "Naciera na umysł celu energią cienia, zadając {damage} obrażeń co sekundę przez 3 sek."
+        "description": "Naciera na umysł celu energią cienia przez 3 sek. Z każdym tyknięciem obrażenia rosną o 30% obrażeń pierwszego tyknięcia."
       },
       "flash_heal": {
         "name": "Pilna modlitwa",

@@ -1396,6 +1396,9 @@ export const ko_KR: EnTranslations = {
       "formTravel": "쾌속 형태: 이동 속도가 {pct}% 증가합니다",
       "defensiveStance": "방어 태세: 받는 피해 감소, 위협 수준 증가",
       "righteousFury": "불타는 맹세: 신성 피해로 인한 위협 수준이 크게 증가합니다",
+      "stormcharge": "폭풍소환사 {stacks}/{max}: 중첩당 전격 화살의 시전 시간이 {castPct}% 감소하고 피해가 {damagePct}% 증가합니다",
+      "aethericFlux": "비전 불안정 {stacks}/{max}: 중첩당 신비의 마법 강화의 재사용 대기시간이 {cooldown}초 감소합니다. 신비의 마법 강화는 모든 중첩을 소모해 중첩당 최대 마나의 {manaPct}%를 회복합니다",
+      "nextAbilityDamage": "다음 대상 능력의 피해가 {pct}% 증가합니다",
       "scale": "크기가 {pct}% 증가합니다",
       "jump": "도약 높이가 {pct}% 증가합니다",
       "school": {
@@ -2510,6 +2513,7 @@ export const ko_KR: EnTranslations = {
       "frost_armor": "전투 전에 방어구를 단단하게 만드는 지속형 자기 강화입니다.",
       "arcane_intellect": "지능을 높여 아군의 마나량을 늘려 줍니다. 전투를 시작하기 전에 시전하세요.",
       "frostbolt": "원거리에서 타격하며 대상의 이동 속도를 늦춰 다가오지 못하게 합니다.",
+      "blink": "앞으로 순간이동하고 이동 불가 효과를 해제해 모든 마법사에게 확실한 탈출 수단을 줍니다.",
       "conjure_water": "마나를 회복시켜 주는 음료를 창조하여 전투 사이에 채울 수 있습니다.",
       "conjure_food": "앉아서 먹으면 생명력을 회복시켜 주는 음식을 창조합니다.",
       "shadow_bolt": "대상에게 시전하는 어둠의 화살로, 주력 공격기입니다.",
@@ -5743,7 +5747,7 @@ export const ko_KR: EnTranslations = {
       },
       "fireball": {
         "name": "잉걸 화살",
-        "description": "불덩이를 날려 {damage}의 화염 피해와 추가 지속 피해를 입힙니다."
+        "description": "불덩이를 날려 {damage}의 화염 피해와 {overTime}의 지속 화염 피해를 입힙니다."
       },
       "frost_armor": {
         "name": "서리 망토",
@@ -5756,6 +5760,10 @@ export const ko_KR: EnTranslations = {
       "frostbolt": {
         "name": "서리 창",
         "description": "냉기의 화살을 발사해 {damage}의 냉기 피해를 입히고 이동 속도를 40%만큼 늦춥니다."
+      },
+      "icefall": {
+        "name": "빙폭",
+        "description": "저장한 고드름을 모두 대상에게 발사해 하나당 {damage}의 냉기 피해를 입힙니다. 대상이 이동 불가 또는 기절 상태이거나 동상이 활성화되어 있으면 2.5배의 피해를 입히고 동상을 소모합니다. 이 고정 피해는 치명타로 적중하지 않습니다. (빙결술)"
       },
       "conjure_water": {
         "name": "물 창조",
@@ -5791,7 +5799,7 @@ export const ko_KR: EnTranslations = {
       },
       "pyroblast": {
         "name": "화염 창",
-        "description": "거대한 불덩이를 던져 {damage}의 화염 피해와 추가 지속 피해를 입힙니다."
+        "description": "거대한 불덩이를 던져 {damage}의 화염 피해와 12초에 걸쳐 {overTime}의 화염 피해를 입힙니다."
       },
       "ice_barrier": {
         "name": "서리 장막",
@@ -6023,7 +6031,7 @@ export const ko_KR: EnTranslations = {
       },
       "mind_flay": {
         "name": "비탄의 연도",
-        "description": "암흑 에너지로 대상의 정신을 공격해 3초 동안 매초 {damage}의 피해를 입힙니다."
+        "description": "암흑 에너지로 대상의 정신을 3초 동안 공격합니다. 각 틱의 피해가 첫 틱 피해의 30%만큼 증가합니다."
       },
       "flash_heal": {
         "name": "다급한 기도",
@@ -6270,8 +6278,8 @@ export const ko_KR: EnTranslations = {
         "description": "주위 아군을 고무하여 5분 동안 전투력을 35만큼 증가시킵니다. (사격 전문화 상징)"
       },
       "wyvern_sting": {
-        "name": "비룡 쐐기",
-        "description": "원거리에서 적을 쏘아 최대 4초 동안 행동 불가로 만듭니다. 피해를 받으면 효과가 해제됩니다. (생존 전문화 상징)"
+        "name": "가시덤불 덫",
+        "description": "대상 지역에 가시덤불 덫을 설치해 5미터 내의 적을 4초 동안 이동 불가 상태로 만듭니다. (현장술 전문화 상징)"
       },
       "arcane_power": {
         "name": "신비의 마법 강화",
@@ -6294,8 +6302,8 @@ export const ko_KR: EnTranslations = {
         "description": "칼날의 폭풍을 일으켜 12초 동안 공격 속도를 20% 증가시킵니다. (전투 전문화 상징)"
       },
       "hemorrhage": {
-        "name": "과다출혈",
-        "description": "적을 공격하여 무기 피해에 더해 {damage}의 피해를 주고 12초 동안 출혈 피해를 줍니다. 연계 점수 1점을 얻습니다. (잠행 전문화 상징)"
+        "name": "가면 낙하",
+        "description": "무기로 적을 공격해 무기 피해에 더해 {damage}의 피해를 줍니다. 연계 점수 1점을 얻습니다. (기만 전문화 상징)"
       },
       "power_infusion": {
         "name": "마력 주입",

@@ -1,4 +1,4 @@
-import type { AbilityEffect, ResourceType } from '../types';
+import type { AbilityEffect, AuraKind, ResourceType } from '../types';
 import { ALL_CLASSES, MAX_LEVEL, type PlayerClass } from '../types';
 import {
   isTalentRowLevel,
@@ -69,6 +69,7 @@ export interface AbilityModEffect {
   costPct?: number;
   cooldownPct?: number;
   castPct?: number;
+  channelDurationPct?: number;
   buffPct?: number;
   castWhileMoving?: boolean;
   damagePushbackImmune?: boolean;
@@ -110,30 +111,101 @@ export interface GlobalModEffect {
 
 export type ProcTrigger =
   | { on: 'castNth'; n: number; abilities: string[] }
-  | { on: 'spellCrit'; abilities?: string[] }
+  | { on: 'resourceSpent'; resourceType: ResourceType; abilities: string[] }
+  | { on: 'petHitNth'; n: number }
+  | { on: 'rangedHit'; abilities: string[] }
+  | { on: 'spellHit'; abilities: string[] }
+  | { on: 'spellCrit'; abilities?: string[]; icd?: number }
   | { on: 'shieldConsumed'; ability: string }
   | { on: 'hotExpired'; ability: string }
   | { on: 'bigHitTaken'; hpFrac: number; icd: number }
-  | { on: 'meleeSwingWhile'; auraKind: string }
+  | {
+      on: 'meleeHit';
+      abilities: string[];
+      positiveDamage?: boolean;
+      chance?: number;
+      chanceWhenEmpowered?: {
+        ability: string;
+        auraId: string;
+        chance: number;
+      };
+    }
+  | { on: 'meleeSwingWhile'; auraKind: string; n?: number }
   | { on: 'thornsReflect'; ability: string };
 
 export type ProcResponse =
   | {
       kind: 'empowerNext';
-      aura: 'next_cast_free' | 'next_execute_free' | 'next_cast_instant' | 'next_cast_cheap';
+      aura:
+        | 'next_cast_free'
+        | 'next_execute_free'
+        | 'next_cast_instant'
+        | 'next_cast_cheap'
+        | 'next_ability_damage';
       abilities?: string[];
       duration: number;
       costPct?: number;
+      dmgPct?: number;
     }
   | { kind: 'cooldownRefund'; ability: string; seconds: number | 'reset' }
-  | { kind: 'resource'; amount: number; resourceType?: ResourceType }
-  | { kind: 'heal'; amount: number }
-  | { kind: 'absorb'; amount: number; duration: number; name: string }
+  | ({ kind: 'resource'; resourceType?: ResourceType } & (
+      | { amount: number; pctMax?: never }
+      | { amount?: never; pctMax: number }
+    ))
+  | {
+      kind: 'stackAura';
+      aura: 'aetheric_flux' | 'icicles' | 'stormcharge';
+      maxStacks: number;
+      duration: number;
+    }
+  | {
+      kind: 'consumeAuraStacksResource';
+      auraId: string;
+      resourceType?: ResourceType;
+      pctMaxPerStack: number;
+    }
+  | { kind: 'rollingDot'; pctDamage: number; duration: number; interval: number }
+  | { kind: 'detonateOwnedDot'; auraId: string }
+  | {
+      kind: 'consumeOwnedDotAbsorb';
+      auraId: string;
+      multiplier: number;
+      maxHpPct: number;
+      duration: number;
+      requiresForm: 'bear';
+    }
+  | {
+      kind: 'chanceAura';
+      id: string;
+      name: string;
+      aura: AuraKind;
+      chance: number;
+      duration: number;
+      charges?: number;
+    }
+  | { kind: 'addAuraCharges'; ability: string; amount: number; maxCharges: number }
+  | ({ kind: 'heal' } & ({ amount: number; pctMax?: never } | { amount?: never; pctMax: number }))
+  | {
+      kind: 'absorb';
+      amount: number;
+      duration: number;
+      name: string;
+      /** Most wards protect the cast's subject; active mitigation protects its caster. */
+      applyTo?: 'self';
+    }
   | { kind: 'echo'; belowFrac: number; window: number; heal: number; name: string };
 
 export interface ProcDef {
   id: string;
   name: string;
+  spec?: string;
+  /** Do not expose or roll this proc until its payoff ability is learned. */
+  requiresKnownAbility?: string;
+  /** Re-fire this proc's responses when the named free-cost aura pays for the ability. */
+  refreshOnFreeCast?: {
+    ability: string;
+    consumedAuraId: string;
+  };
   school?: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
   trigger: ProcTrigger;
   responses: ProcResponse[];
@@ -143,6 +215,7 @@ export interface TalentEffect {
   stats?: StatModEffect;
   grant?: { ability: string; rank?: number };
   proc?: ProcDef;
+  procs?: ProcDef[];
   ability?: AbilityModEffect[];
   global?: GlobalModEffect;
 }
@@ -193,6 +266,7 @@ export interface ResolvedAbilityMod {
   costPct: number;
   cooldownPct: number;
   castPct: number;
+  channelDurationPct: number;
   buffPct: number;
   castWhileMoving: boolean;
   damagePushbackImmune: boolean;
@@ -458,6 +532,7 @@ function zeroAbilityMod(): ResolvedAbilityMod {
     costPct: 0,
     cooldownPct: 0,
     castPct: 0,
+    channelDurationPct: 0,
     buffPct: 0,
     castWhileMoving: false,
     damagePushbackImmune: false,
@@ -551,6 +626,7 @@ export function accumulateTalentEffect(
     target.costPct += (ability.costPct ?? 0) * multiplier;
     target.cooldownPct += (ability.cooldownPct ?? 0) * multiplier;
     target.castPct += (ability.castPct ?? 0) * multiplier;
+    target.channelDurationPct += (ability.channelDurationPct ?? 0) * multiplier;
     target.buffPct += (ability.buffPct ?? 0) * multiplier;
     target.bonusCharges += (ability.bonusCharges ?? 0) * multiplier;
     if (ability.castWhileMoving) target.castWhileMoving = true;
@@ -561,6 +637,7 @@ export function accumulateTalentEffect(
     modifiers.grants.push({ ability: effect.grant.ability, rank: effect.grant.rank ?? 1 });
   }
   if (effect.proc) modifiers.procs.push(effect.proc);
+  if (effect.procs) modifiers.procs.push(...effect.procs);
 }
 
 export const accumulate = accumulateTalentEffect;

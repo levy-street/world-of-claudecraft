@@ -3,7 +3,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { summonPet } from '../src/sim/pet/pet_commands';
 import { Sim } from '../src/sim/sim';
-import { DT, type Entity } from '../src/sim/types';
+import type { Entity } from '../src/sim/types';
 
 function entity(sim: Sim, pid: number): Entity {
   const e = sim.entities.get(pid);
@@ -48,9 +48,9 @@ describe('signature mechanics v2', () => {
       (a) => a.kind === 'pet_damage_pct' && a.id === 'bestial_wrath_pet',
     );
     expect(petAura?.value).toBe(100);
-    // 2.0 from the Bestial Wrath pet buff x 1.35 from the Packbond mastery (petDmgPct 0.35
+    // 2.0 from the Howling Rage pet buff x 1.2 from the Packbond mastery (petDmgPct 0.2
     // at full level-20 mastery strength); the two stack multiplicatively by design.
-    expect((sim as any).petDamageMult(pet)).toBeCloseTo(2.7, 10);
+    expect((sim as any).petDamageMult(pet)).toBeCloseTo(2.4, 10);
   });
 
   it('trueshot_aura gives same-party allies a percent AP buff instead of flat AP', () => {
@@ -79,7 +79,7 @@ describe('signature mechanics v2', () => {
     expect(ally.attackPower - allyApBefore).not.toBe(35);
   });
 
-  it('hemorrhage applies bleed vulnerability and makes later bleed ticks hit harder', () => {
+  it('Maskfall front-loads the old bleed budget into one combo-point weapon strike', () => {
     const sim = new Sim({ seed: 13, playerClass: 'rogue', autoEquip: true });
     sim.setPlayerLevel(20);
     expect(sim.setSpec('subtlety')).toBe(true);
@@ -88,37 +88,25 @@ describe('signature mechanics v2', () => {
     rogue.facing = 0;
     const target = addDummy(sim, rogue.pos.x, rogue.pos.z + 4);
     sim.targetEntity(target.id);
+    const rng = sim.ctx.rng as typeof sim.ctx.rng & {
+      next(): number;
+      range(min: number, max: number): number;
+      chance(probability: number): boolean;
+    };
+    rng.next = () => 0.9;
+    rng.range = (min) => min;
+    rng.chance = () => false;
+    const hpBefore = target.hp;
 
     sim.castAbility('hemorrhage');
-    const vuln = target.auras.find(
-      (a) => a.kind === 'bleed_vuln' && a.id === 'hemorrhage_bleed_vuln',
-    );
-    expect(vuln?.value).toBe(0.4);
 
-    target.auras = target.auras.filter((a) => a.kind !== 'dot');
-    target.hp = target.maxHp;
-    const hpBefore = target.hp;
-    target.auras.push({
-      id: 'test_bleed',
-      name: 'Test Bleed',
-      kind: 'dot',
-      remaining: 3,
-      duration: 3,
-      value: 10,
-      tickInterval: DT,
-      tickTimer: DT,
-      sourceId: rogue.id,
-      school: 'physical',
+    expect(sim.resolvedAbility('hemorrhage')).toMatchObject({
+      def: { name: 'Maskfall' },
+      effects: [{ type: 'weaponStrike', bonus: 52 }],
     });
-    const events = sim.tick();
-    const tick = events.find(
-      (e) =>
-        e.type === 'damage' &&
-        e.sourceId === rogue.id &&
-        e.targetId === target.id &&
-        e.ability === 'Test Bleed',
-    );
-    expect(tick?.type === 'damage' ? tick.amount : 0).toBe(14);
-    expect(hpBefore - target.hp).toBe(14);
+    expect(target.hp).toBeLessThan(hpBefore);
+    expect(rogue.comboPoints).toBe(1);
+    expect(target.auras.some((aura) => aura.kind === 'dot')).toBe(false);
+    expect(target.auras.some((aura) => aura.kind === 'bleed_vuln')).toBe(false);
   });
 });

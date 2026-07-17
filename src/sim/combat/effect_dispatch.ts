@@ -52,11 +52,12 @@ import {
   hasSweepingStrikes,
   sweepStrikeDamage,
 } from './area_echo';
-import { isRootedOrChilled } from './cc';
-import { extendOwnedDot } from './dot_mutation';
+import { isFrozenForIcefall, isRootedOrChilled } from './cc';
+import { extendOwnedDot, refreshOwnedDot, spreadOwnedDot } from './dot_mutation';
 import { consumeAuraKind, consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
 import { exclusiveAuraConflicts } from './exclusive_aura';
+import { maybeFulminationOverload } from './fulmination';
 import { armHeroicLeap, relocateSwept } from './heroic_leap';
 import { hasCastShield, noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
 import { consumeSureCritCharge, hasSureCritAura } from './sure_crit';
@@ -227,6 +228,7 @@ export function runEffects(
           bonus = Math.round(bonus * 1.15);
         }
         const hit = ctx.meleeSwing(p, target, bonus, ability.name, {
+          abilityId: ability.id,
           cannotBeDodged: eff.cannotBeDodged,
           weaponMult,
           threatFlat: res.threatFlat,
@@ -271,20 +273,57 @@ export function runEffects(
       case 'directDamage': {
         if (!target) break;
         if (!ctx.isHostileTo(p, target)) break;
+        let stackMultiplier = 1;
+        if (eff.consumeAuraStacks) {
+          const auraIndex = p.auras.findIndex(
+            (aura) =>
+              aura.id === eff.consumeAuraStacks?.auraId &&
+              aura.sourceId === p.id &&
+              (aura.stacks ?? 0) > 0,
+          );
+          if (auraIndex < 0) break;
+          const aura = p.auras[auraIndex];
+          stackMultiplier = Math.min(eff.consumeAuraStacks.maxStacks, aura.stacks ?? 0);
+          p.auras.splice(auraIndex, 1);
+          ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
+        }
         const rooted = isRootedOrChilled(target);
+        const frozenAuraIndex = eff.consumeAuraAsFrozen
+          ? p.auras.findIndex(
+              (aura) => aura.id === eff.consumeAuraAsFrozen && aura.sourceId === p.id,
+            )
+          : -1;
         const critChance =
           isSpell && rooted
             ? ctx.spellCrit(p) + ctx.playerMods(meta).global.critVsRooted
             : isSpell
               ? ctx.spellCrit(p)
               : p.critChance;
-        let dmg = ctx.rng.range(eff.min, eff.max);
+        let dmg = (eff.fixedNoCrit ? eff.min : ctx.rng.range(eff.min, eff.max)) * stackMultiplier;
         // The flat rider scales with the school's rating: Spell Power for spells,
         // Ranged AP for hunter shots, melee Attack Power for physical specials.
         // abilityScalingPower picks the rating; powerScale (inside directHitBonus)
         // applies the AP scale-down. A non-scaling effect just contributes 0.
-        dmg += directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
+        // fixedNoCrit means FIXED damage by design: just as it skips the
+        // damage-roll and crit draws, it excludes the power rider, so the
+        // tooltip's authored number is the real per-hit amount regardless of
+        // gear (Icefall: exactly 8 per icicle, 20 shattered). directHitBonus is
+        // a pure computation (no rng), so gating it changes no draw order.
+        if (!eff.fixedNoCrit) {
+          dmg += directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
+        }
+        dmg *= res.damageMult ?? 1;
         if (eff.vsRootedMult !== undefined && rooted) dmg *= eff.vsRootedMult;
+        if (
+          eff.vsFrozenMult !== undefined &&
+          (isFrozenForIcefall(target) || frozenAuraIndex >= 0)
+        ) {
+          dmg *= eff.vsFrozenMult;
+        }
+        if (frozenAuraIndex >= 0) {
+          const [aura] = p.auras.splice(frozenAuraIndex, 1);
+          ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
+        }
         const abilityMod = mods.abilities[ability.id];
         const vsDotted = abilityMod?.dmgPctVsDotted ?? 0;
         const requiredDot = abilityMod?.dmgPctVsDottedAbility;
@@ -299,13 +338,16 @@ export function runEffects(
         ) {
           dmg *= 1 + vsDotted;
         }
-        const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : critChance) || sureCrit;
-        if (sureCrit) sureCritRolled = true;
+        const crit =
+          !eff.fixedNoCrit &&
+          (ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : critChance) || sureCrit);
+        if (!eff.fixedNoCrit && sureCrit) sureCritRolled = true;
         if (crit) dmg *= (isSpell ? 1.5 : 2) + (isSpell ? p.critDmgSpellBonus : p.critDmgPhysBonus);
         if (isSpell) dmg *= spellDamageMultFromAuras(p);
         if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
         const finalDamage = Math.round(dmg);
         lastDirectDamage = finalDamage;
+        const targetHpBefore = target.hp;
         ctx.dealDamage(
           p,
           target,
@@ -321,6 +363,17 @@ export function runEffects(
           false,
           ability.id,
         );
+        if (isSpell && target.hp < targetHpBefore) {
+          maybeFulminationOverload(
+            ctx,
+            p,
+            target,
+            ability.id,
+            ability.name,
+            ability.school,
+            finalDamage,
+          );
+        }
         if (areaEcho) {
           areaEchoDealt = true;
           echoAreaDamage(ctx, p, target, finalDamage, ability.school, ability.name, threatOpts);
@@ -337,6 +390,51 @@ export function runEffects(
         // routed through this same case does not. No-op (no rng draw) unless the
         // caster wields a proc weapon with a spellDamage proc.
         if (isSpell) runWeaponProcs(ctx, p, target, 'spellDamage');
+        break;
+      }
+      case 'consumeAuraChargesDamage': {
+        if (!target || !ctx.isHostileTo(p, target)) break;
+        const auraIndex = p.auras.findIndex(
+          (aura) => aura.id === eff.auraId && aura.sourceId === p.id && (aura.charges ?? 0) > 0,
+        );
+        if (auraIndex < 0) break;
+        const aura = p.auras[auraIndex];
+        const charges = aura.charges ?? 0;
+        p.auras.splice(auraIndex, 1);
+        ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
+        const dischargeTargets = [target];
+        if (eff.radius !== undefined) {
+          ctx.emit({
+            type: 'spellfxAt',
+            x: target.pos.x,
+            z: target.pos.z,
+            school: ability.school,
+            fx: 'nova',
+            radius: eff.radius,
+          });
+          for (const nearby of ctx.hostilesInRadius(p, target.pos, eff.radius)) {
+            if (nearby.id === target.id || !ctx.hasLineOfSight(target, nearby)) continue;
+            dischargeTargets.push(nearby);
+          }
+        }
+        for (const dischargeTarget of dischargeTargets) {
+          if (!ctx.isHostileTo(p, dischargeTarget)) continue;
+          ctx.dealDamage(
+            p,
+            dischargeTarget,
+            charges * eff.damagePerCharge,
+            false,
+            ability.school,
+            ability.name,
+            'hit',
+            false,
+            threatOpts,
+            true,
+            dischargeTarget.id === target.id && attackAnimationStarted,
+            false,
+            ability.id,
+          );
+        }
         break;
       }
       case 'finisherDamage': {
@@ -875,6 +973,16 @@ export function runEffects(
       case 'extendDot': {
         if (!target) break;
         extendOwnedDot(target, p.id, eff.dot, eff.seconds, eff.maxBonus);
+        break;
+      }
+      case 'refreshDot': {
+        if (!target) break;
+        refreshOwnedDot(target, p.id, eff.dot);
+        break;
+      }
+      case 'spreadDot': {
+        if (!target) break;
+        spreadOwnedDot(ctx, p, target, eff.dot, eff.radius);
         break;
       }
       case 'consumeDot': {

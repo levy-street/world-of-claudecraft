@@ -957,12 +957,12 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Rimelance"
       },
       {
-        "id": "conjure_water",
-        "name": "Waterbind"
+        "id": "blink",
+        "name": "Flickerstep"
       },
       {
-        "id": "conjure_food",
-        "name": "Breadbind"
+        "id": "conjure_water",
+        "name": "Waterbind"
       }
     ],
     "abilities": [
@@ -981,6 +981,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "frostbolt",
         "name": "Rimelance"
+      },
+      {
+        "id": "blink",
+        "name": "Flickerstep"
       },
       {
         "id": "conjure_water",
@@ -1029,6 +1033,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "counterspell",
         "name": "Spellbreak"
+      },
+      {
+        "id": "icefall",
+        "name": "Icefall"
       }
     ],
     "model": "player_mage",

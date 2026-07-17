@@ -3090,7 +3090,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flamestrike.description':
     'Invoca un estallido de fuego en el área objetivo que inflige {damage} de daño de Fuego a los enemigos alcanzados por la explosión.',
   'entities.abilities.fireball.description':
-    'Lanza una bola ígnea que causa {damage} de daño de Fuego y daño adicional en el tiempo.',
+    'Lanza una bola ígnea que causa {damage} de daño de Fuego y {overTime} de daño de Fuego en el tiempo.',
   'entities.abilities.frost_armor.name': 'Manto de Escarcha',
   'entities.abilities.frost_armor.description':
     'Te envuelve en escarcha y aumenta la armadura en {buff} durante 30 min.',
@@ -3126,7 +3126,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Agosta al enemigo por {damage} de daño de Fuego. Lanzamiento rápido.',
   'entities.abilities.pyroblast.name': 'Lanza Ígnea',
   'entities.abilities.pyroblast.description':
-    'Lanza una enorme roca ígnea que causa {damage} de daño de Fuego y daño adicional en el tiempo.',
+    'Lanza una enorme roca ígnea que causa {damage} de daño de Fuego y {overTime} de daño de Fuego durante 12 s.',
   'entities.abilities.ice_barrier.name': 'Velo de Escarcha',
   'entities.abilities.ice_barrier.description':
     'Te protege con hielo y absorbe {damage} de daño durante 60 s.',
@@ -3289,7 +3289,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Una plegaria lenta pero poderosa que sana a un objetivo amistoso por {damage}.',
   'entities.abilities.mind_flay.name': 'Letanía de Aflicción',
   'entities.abilities.mind_flay.description':
-    'Asalta la mente del objetivo con energía de las Sombras e inflige {damage} de daño cada segundo durante 3 s.',
+    'Asalta la mente del objetivo con energía de las Sombras durante 3 s. Con cada pulso, el daño aumenta un 30% del daño del primer pulso.',
   'entities.abilities.flash_heal.name': 'Plegaria Urgente',
   'entities.abilities.flash_heal.description':
     'Una plegaria rápida que sana a un objetivo amistoso por {damage}.',

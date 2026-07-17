@@ -224,19 +224,17 @@ describe('auto_attack meleeSwing: landed talent procs resolve before retaliation
       expected: 4.5,
     },
     {
-      name: 'Venom Dividend resource gain',
+      name: 'Venom Dividend cadence',
       cls: 'rogue' as const,
       row: { 14: 'rog_r14_deadly_brew' },
-      prepare: (player: AnyEntity) => {
-        player.resource = 0;
-      },
-      read: (player: AnyEntity) => player.resource,
-      expected: 5,
+      prepare: () => {},
+      read: (player: AnyEntity) => player.procState?.counters.rog_deadly_brew,
+      expected: 1,
     },
     {
       name: 'Imbued Tempo cooldown refund',
       cls: 'shaman' as const,
-      row: { 14: 'sha_r14_weapon_fury' },
+      row: { 5: 'sha_r14_weapon_fury' },
       prepare: (player: AnyEntity) => player.cooldowns.set('earth_shock', 5),
       read: (player: AnyEntity) => player.cooldowns.get('earth_shock'),
       expected: 4.5,

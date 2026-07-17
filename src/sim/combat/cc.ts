@@ -35,6 +35,12 @@ export function isRootedOrChilled(e: Entity): boolean {
   return isRooted(e) || e.auras.some((a) => a.kind === 'slow');
 }
 
+// Icefall's execute window is narrower than the global Shatter-style predicate:
+// only a literal root or stun counts, never a chill or another total-lockout aura.
+export function isFrozenForIcefall(e: Entity): boolean {
+  return e.auras.some((a) => a.kind === 'root' || a.kind === 'stun');
+}
+
 // Silence locks out spell (non-physical) casts but leaves physical abilities,
 // movement and melee untouched, unlike a stun, which freezes everything.
 export function isSilenced(e: Entity): boolean {

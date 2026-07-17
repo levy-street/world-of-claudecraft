@@ -1907,7 +1907,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fire_blast.description': 'Spränger fienden för {damage} eldskada. Omedelbar.',
   'entities.abilities.fire_blast.name': 'Glödfall',
   'entities.abilities.fireball.description':
-    'Slungar ett brinnande klot som vållar {damage} eldskada plus ytterligare skada över tid.',
+    'Slungar ett brinnande klot som vållar {damage} eldskada plus {overTime} eldskada över tid.',
   'entities.abilities.fireball.name': 'Glödbult',
   'entities.abilities.rain_of_fire.name': 'Eldregn',
   'entities.abilities.rain_of_fire.description':
@@ -2022,7 +2022,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mind_blast.description': 'Spränger målets sinne för {damage} skuggskada.',
   'entities.abilities.mind_blast.name': 'Sinnessplittring',
   'entities.abilities.mind_flay.description':
-    'Angriper målets sinne med skuggenergi och vållar {damage} skada varje sekund i 3 sek.',
+    'Angriper målets sinne med skuggenergi i 3 sek. För varje tick ökar skadan med 30 % av det första tickets skada.',
   'entities.abilities.mind_flay.name': 'Sorgens litania',
   'entities.abilities.mongoose_bite.description':
     'Motanfall efter att målet väjt undan för vapenskada plus {damage}. Kan inte väjas undan.',
@@ -2052,7 +2052,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Gå i smyg medan du är i vargform och rör dig 50 % långsammare. Kan inte användas i strid.',
   'entities.abilities.prowl.name': 'Smygjaga',
   'entities.abilities.pyroblast.description':
-    'Slungar ett väldigt brinnande stenblock som vållar {damage} eldskada plus ytterligare skada över tid.',
+    'Slungar ett väldigt brinnande stenblock som vållar {damage} eldskada plus {overTime} eldskada över 12 sek.',
   'entities.abilities.pyroblast.name': 'Pyrolans',
   'entities.abilities.rake.description':
     'En smygöppnare som krafsar fienden för vapenskada plus {damage} och vållar blödningsskada över 9 sek. Ger 1 kombopoäng. Endast i vargform.',

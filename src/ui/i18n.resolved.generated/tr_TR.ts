@@ -1396,6 +1396,9 @@ export const tr_TR: EnTranslations = {
       "formTravel": "Fleet Formu: hareket hızı %{pct} artar",
       "defensiveStance": "Korumali Durus: alınan hasar azalır, daha fazla tehdit",
       "righteousFury": "Yanan Yemin: Kutsal hasardan gelen tehdit büyük ölçüde artar",
+      "stormcharge": "Skyrend {stacks}/{max}: each stack reduces Arc Bolt cast time by {castPct}% and increases its damage by {damagePct}%",
+      "aethericFlux": "Aetheric Flux {stacks}/{max}: each stack refunds {cooldown} sec of Aether Surge cooldown; Aether Surge consumes all stacks to restore {manaPct}% maximum mana per stack",
+      "nextAbilityDamage": "Increases the next affected ability damage by {pct}%",
       "scale": "Tamaño aumentado un {pct}%",
       "jump": "Altura de salto aumentada un {pct}%",
       "school": {
@@ -2510,6 +2513,7 @@ export const tr_TR: EnTranslations = {
       "frost_armor": "Dövüşten önce zırhını sertleştiren kalıcı bir öz güçlendirmesi.",
       "arcane_intellect": "Zekayı yükselterek bir dostun mana havuzunu derinleştirir, akına girmeden önce kullan.",
       "frostbolt": "Menzilden vurur ve hedefi yavaşlatır, böylece sana yaklaşamaz.",
+      "blink": "Teleports you forward and breaks roots, giving every Mage a reliable escape.",
       "conjure_water": "Mana yenileyen içecekler çağırır, böylece akınlar arasında dolum yapabilirsin.",
       "conjure_food": "Oturup yediğinde can yenileyen yiyecek çağırır.",
       "shadow_bolt": "Bir hedefe okuduğun bir gölge oku; başvuru bombasın.",
@@ -5743,7 +5747,7 @@ export const tr_TR: EnTranslations = {
       },
       "fireball": {
         "name": "Köz Oku",
-        "description": "Ateşli bir top fırlatarak {damage} Ateş hasarı ve ek olarak zamana yayılı hasar verir."
+        "description": "Ateşli bir top fırlatarak {damage} Ateş hasarı ve zamana yayılı {overTime} Ateş hasarı verir."
       },
       "frost_armor": {
         "name": "Kırağı Pelerini",
@@ -5756,6 +5760,10 @@ export const tr_TR: EnTranslations = {
       "frostbolt": {
         "name": "Ayaz Mızrağı",
         "description": "Bir ayaz oku fırlatarak {damage} Ayaz hasarı verir ve hareketi %40 yavaşlatır."
+      },
+      "icefall": {
+        "name": "Icefall",
+        "description": "Launches every stored Icicle at the target for {damage} Frost damage each. Deals 2.5 times damage if the target is frozen by a root or stun, or while Frostbite is active. Consumes Frostbite. This fixed damage cannot critically strike. (Cryomancy)"
       },
       "conjure_water": {
         "name": "Su Bağlama",
@@ -5791,7 +5799,7 @@ export const tr_TR: EnTranslations = {
       },
       "pyroblast": {
         "name": "Alev Mızrağı",
-        "description": "Devasa ateşli bir kaya fırlatarak {damage} Ateş hasarı ve ek olarak zamana yayılı hasar verir."
+        "description": "Devasa ateşli bir kaya fırlatarak {damage} Ateş hasarı ve 12 sn. boyunca {overTime} Ateş hasarı verir."
       },
       "ice_barrier": {
         "name": "Buz Örtüsü",
@@ -6023,7 +6031,7 @@ export const tr_TR: EnTranslations = {
       },
       "mind_flay": {
         "name": "Keder Yakarışı",
-        "description": "Hedefin zihnini Gölge enerjisiyle sarsar ve 3 saniye boyunca her saniye {damage} hasar verir."
+        "description": "Hedefin zihnini 3 saniye boyunca Gölge enerjisiyle sarsar. Her tikte hasar, ilk tikin hasarının %30’u kadar artar."
       },
       "flash_heal": {
         "name": "Acil Dua",

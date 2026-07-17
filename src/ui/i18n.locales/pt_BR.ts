@@ -3073,7 +3073,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flamestrike.description':
     'Invoca uma explosão de chamas no local-alvo, causando {damage} de dano de Fogo aos inimigos atingidos pela explosão.',
   'entities.abilities.fireball.description':
-    'Arremessa uma bola flamejante que causa {damage} de dano de Fogo e dano adicional ao longo do tempo.',
+    'Arremessa uma bola flamejante que causa {damage} de dano de Fogo e mais {overTime} de dano de Fogo ao longo do tempo.',
   'entities.abilities.frost_armor.name': 'Manto de Geada',
   'entities.abilities.frost_armor.description':
     'Envolve você em gelo, aumentando a armadura em {buff} por 30 min.',
@@ -3108,7 +3108,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Chamusca o inimigo com {damage} de dano de Fogo. Lançamento rápido.',
   'entities.abilities.pyroblast.name': 'Lança Ígnea',
   'entities.abilities.pyroblast.description':
-    'Arremessa uma imensa rocha flamejante que causa {damage} de dano de Fogo mais dano adicional ao longo do tempo.',
+    'Arremessa uma imensa rocha flamejante que causa {damage} de dano de Fogo e mais {overTime} de dano de Fogo em 12 s.',
   'entities.abilities.ice_barrier.name': 'Véu de Gelo',
   'entities.abilities.ice_barrier.description':
     'Protege você em gelo, absorvendo {damage} de dano por 60 s.',
@@ -3268,7 +3268,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Uma prece lenta, mas poderosa, que cura um alvo aliado em {damage}.',
   'entities.abilities.mind_flay.name': 'Litania da Aflição',
   'entities.abilities.mind_flay.description':
-    'Assalta a mente do alvo com energia de Sombra, causando {damage} de dano por segundo durante 3 s.',
+    'Assalta a mente do alvo com energia de Sombra por 3 s. A cada pulso, o dano aumenta em 30% do dano do primeiro pulso.',
   'entities.abilities.flash_heal.name': 'Prece Urgente',
   'entities.abilities.flash_heal.description':
     'Uma prece rápida que cura um alvo aliado em {damage}.',

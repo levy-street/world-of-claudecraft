@@ -79,6 +79,7 @@ function slotState(over: Partial<ActionBarSlotState> = {}): ActionBarSlotState {
     usable: true,
     outOfRange: false,
     queued: false,
+    procState: 'none',
     ariaLabel: 'A',
     keybindLabel: 'K',
     ...over,
@@ -104,6 +105,7 @@ describe('ActionBarPainter: routes every write through the elided writers', () =
           usable: false,
           outOfRange: true,
           queued: true,
+          procState: 'armed',
           ariaLabel: 'aria1',
           keybindLabel: '1',
         }),
@@ -121,6 +123,8 @@ describe('ActionBarPainter: routes every write through the elided writers', () =
       { m: 'toggleClass', args: [el.btn, 'unusable', true] },
       { m: 'toggleClass', args: [el.btn, 'oor', true] },
       { m: 'toggleClass', args: [el.btn, 'queued', true] },
+      { m: 'toggleClass', args: [el.btn, 'proc-available', false] },
+      { m: 'toggleClass', args: [el.btn, 'proc-armed', true] },
       { m: 'setAttr', args: [el.btn, 'aria-label', 'aria1'] },
       { m: 'setText', args: [el.keybindEl, '1'] },
     ]);
@@ -173,6 +177,7 @@ function ability(id: string): ActionBarAbility {
       range: 0,
     } as unknown as AbilityDef,
     cost: 0,
+    effects: [],
   };
 }
 
@@ -189,6 +194,7 @@ function fakeDeps(): ActionBarDeps {
 function idleWorld(): ActionBarWorldInput {
   return {
     player: {
+      id: 1,
       autoAttack: false,
       dead: false,
       resource: 100,
@@ -198,6 +204,7 @@ function idleWorld(): ActionBarWorldInput {
       queuedOnSwing: null,
       stealthed: false,
       pos: { x: 0, y: 0, z: 0 },
+      auras: [],
     },
     target: null,
     inventory: [],
@@ -284,5 +291,42 @@ describe('ActionBarPainter: no raw DOM writes, no magic values', () => {
     expect(hex, `hex: ${hex.join(', ')}`).toEqual([]);
     expect(rgb, `rgb: ${rgb.join(', ')}`).toEqual([]);
     expect(px, `px: ${px.join(', ')}`).toEqual([]);
+  });
+});
+
+describe('ActionBarPainter: actionable proc cue fairness', () => {
+  const hudCss = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
+  const mobileCss = readFileSync(new URL('../src/styles/hud.mobile.css', import.meta.url), 'utf8');
+
+  it('keeps available and armed glows outside every graphics-tier gate', () => {
+    for (const css of [hudCss, mobileCss]) {
+      const rules = css.replace(/\/\*[\s\S]*?\*\//g, '');
+      expect(rules).toContain('.proc-available');
+      expect(rules).toContain('.proc-armed');
+      expect(rules).not.toMatch(/data-fx-level[^{}]*\.proc-(?:available|armed)/);
+      expect(rules).not.toMatch(/fx-(?:reduced|minimal)[^{}]*\.proc-(?:available|armed)/);
+    }
+  });
+
+  it('stops the armed pulse for OS reduced motion without removing the static glow rule', () => {
+    for (const css of [hudCss, mobileCss]) {
+      const rules = css.replace(/\/\*[\s\S]*?\*\//g, '');
+      expect(rules).toMatch(
+        /@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{[^{}]*\.proc-armed[^{}]*\{[^{}]*animation:\s*none/s,
+      );
+      expect(rules).toMatch(/\.proc-armed\s*\{[^{}]*box-shadow:/s);
+    }
+  });
+
+  it('keeps available and armed distinct when forced colors suppress their glows', () => {
+    for (const css of [hudCss, mobileCss]) {
+      const rules = css.replace(/\/\*[\s\S]*?\*\//g, '');
+      expect(rules).toMatch(
+        /@media\s*\(forced-colors:\s*active\)[\s\S]*?\.proc-available[^{}]*\{[^{}]*border-style:\s*dashed/s,
+      );
+      expect(rules).toMatch(
+        /@media\s*\(forced-colors:\s*active\)[\s\S]*?\.proc-armed[^{}]*\{[^{}]*border-style:\s*double/s,
+      );
+    }
   });
 });

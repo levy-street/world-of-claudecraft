@@ -91,19 +91,49 @@ function effect<T extends AbilityEffect['type']>(
 }
 
 describe('retained v0.26 all-class Talents V2 semantics', () => {
-  it('resolves the final Swift Verdicts, Sniper Training, Earthen Fury, and content values', () => {
-    const verdict = resolved('paladin', 'judgement', { 14: 'pal_r14_swift_verdicts' });
-    expect(verdict.cost).toBe(24);
-    expect(effect(verdict, 'judgement')).toMatchObject({ dmgMult: 1.25 });
+  it("resolves the final Oath's Due, Second Bearing, Tempest Reprise, and content values", () => {
+    const oathsDue = ROW_TREES.paladin
+      .flatMap((row) => row.options)
+      .find((option) => option.id === 'pal_r14_swift_verdicts');
+    expect(oathsDue?.effect.proc).toMatchObject({
+      spec: 'retribution',
+      refreshOnFreeCast: {
+        ability: 'exorcism',
+        consumedAuraId: 'pal_blood_debt',
+      },
+      trigger: { on: 'castNth', n: 1, abilities: ['judgement'] },
+      responses: [
+        {
+          kind: 'empowerNext',
+          aura: 'next_ability_damage',
+          abilities: ['crusader_strike'],
+          duration: 7,
+          dmgPct: 0.5,
+        },
+      ],
+    });
 
-    const aimed = resolved('hunter', 'aimed_shot', { 14: 'hun_r14_sniper_training' });
-    expect(aimed.castTime).toBeCloseTo(2.1);
-    expect(effect(aimed, 'directDamage')).toMatchObject({ min: 57, max: 71 });
+    const secondBearing = ROW_TREES.hunter
+      .flatMap((row) => row.options)
+      .find((option) => option.id === 'hun_r14_sniper_training');
+    expect(secondBearing?.effect.proc).toEqual({
+      id: 'hun_second_bearing',
+      name: 'Second Bearing',
+      trigger: { on: 'rangedHit', abilities: ['aimed_shot'] },
+      responses: [
+        { kind: 'resource', amount: 20 },
+        { kind: 'cooldownRefund', ability: 'concussive_shot', seconds: 'reset' },
+      ],
+    });
 
-    const bolt = resolved('shaman', 'lightning_bolt', { 20: 'sha_r20_elemental_fury' });
-    const jolt = resolved('shaman', 'earth_shock', { 20: 'sha_r20_elemental_fury' });
-    expect(effect(bolt, 'directDamage')).toMatchObject({ min: 90, max: 102 });
-    expect(effect(jolt, 'directDamage')).toMatchObject({ min: 65, max: 73 });
+    const reprise = ROW_TREES.shaman
+      .flatMap((row) => row.options)
+      .find((option) => option.id === 'sha_r20_elemental_fury');
+    expect(reprise?.effect.proc).toMatchObject({
+      spec: 'enhancement',
+      trigger: { on: 'meleeHit', abilities: ['stormstrike'], chance: 0.2 },
+      responses: [{ kind: 'cooldownRefund', ability: 'stormstrike', seconds: 'reset' }],
+    });
 
     expect(
       effect(resolved('priest', 'mind_sear', { 20: 'pri_r20_mind_sear' }), 'aoeDamage'),
@@ -141,7 +171,7 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
     expect(doubleCharge).toMatchObject({ charges: 2, bonusCharges: 1 });
 
     const mageImpulse = resolved('mage', 'fire_blast', { 5: 'mag_r5_impulse' });
-    expect(mageImpulse).toMatchObject({ charges: 2, bonusCharges: 1 });
+    expect(mageImpulse).toMatchObject({ bonusCharges: 0 });
   });
 
   it('Calloused Hide makes only its scoped physical Long Draw cast instant', () => {
@@ -216,40 +246,54 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
     expect(dot?.school).toBe('nature');
   });
 
-  it("applies conditional bolt damage only for the caster's DoT", () => {
-    const damage = (withOwnDot: boolean): number => {
-      const sim = harness(new Sim({ seed: 2611, playerClass: 'warlock', autoEquip: false }));
-      sim.setPlayerLevel(20);
-      expect(sim.selectTalentRow(14, 'wlk_r14_amplify_curse')).toBe(true);
-      const player = sim.player;
-      const target = spawnTarget(sim, player);
-      if (withOwnDot) {
-        target.auras.push({
-          id: 'corruption',
-          name: 'Blackrot',
-          kind: 'dot',
-          remaining: 18,
-          duration: 18,
-          value: 1,
-          sourceId: player.id,
-          school: 'shadow',
-        });
-      }
-      const res = sim.resolvedAbility('shadow_bolt');
-      if (!res) throw new Error('missing Gloom Bolt');
-      sim.events = [];
-      runEffects(sim.ctx, player, metaOf(sim), target, res);
-      const event = sim.events.find(
-        (candidate) => candidate.type === 'damage' && candidate.ability === res.def.name,
-      );
-      if (!event || event.type !== 'damage') throw new Error('missing Gloom Bolt damage');
-      return event.amount;
-    };
+  it("extends only the caster's hexes after Gloom Bolt lands", () => {
+    const sim = harness(new Sim({ seed: 2611, playerClass: 'warlock', autoEquip: false }));
+    sim.setPlayerLevel(20);
+    expect(sim.selectTalentRow(14, 'wlk_r14_amplify_curse')).toBe(true);
+    const player = sim.player;
+    const target = spawnTarget(sim, player);
+    for (const [id, duration] of [
+      ['corruption', 18],
+      ['curse_of_agony', 24],
+    ] as const) {
+      target.auras.push({
+        id,
+        name: id,
+        kind: 'dot',
+        remaining: duration,
+        duration,
+        value: 1,
+        sourceId: player.id,
+        school: 'shadow',
+      });
+    }
+    target.auras.push({
+      id: 'corruption',
+      name: 'Foreign Blackrot',
+      kind: 'dot',
+      remaining: 18,
+      duration: 18,
+      value: 1,
+      sourceId: 777,
+      school: 'shadow',
+    });
+    const res = sim.resolvedAbility('shadow_bolt');
+    if (!res) throw new Error('missing Gloom Bolt');
 
-    expect(damage(true)).toBeGreaterThan(damage(false));
+    runEffects(sim.ctx, player, metaOf(sim), target, res);
+
+    expect(
+      target.auras.find((aura) => aura.id === 'corruption' && aura.sourceId === player.id),
+    ).toMatchObject({ duration: 21, remaining: 21, extendedBy: 3 });
+    expect(
+      target.auras.find((aura) => aura.id === 'curse_of_agony' && aura.sourceId === player.id),
+    ).toMatchObject({ duration: 27, remaining: 27, extendedBy: 3 });
+    expect(
+      target.auras.find((aura) => aura.id === 'corruption' && aura.sourceId === 777),
+    ).toMatchObject({ duration: 18, remaining: 18 });
   });
 
-  it('Steady Rain prevents damage pushback without changing baseline channels', () => {
+  it('Rainbreak prevents damage pushback without changing baseline channels', () => {
     const castRemainingAfterHit = (selected: boolean): number => {
       const sim = harness(new Sim({ seed: 2612, playerClass: 'hunter', autoEquip: false }));
       sim.setPlayerLevel(20);

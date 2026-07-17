@@ -1,4 +1,9 @@
 import {
+  SKYREND_CAST_REDUCTION_PER_STACK,
+  SKYREND_DAMAGE_BONUS_PER_STACK,
+  SKYREND_MAX_STACKS,
+} from '../sim/combat/warspirit';
+import {
   type ClassTalents,
   type GlobalModEffect,
   type ProcDef,
@@ -12,7 +17,7 @@ import {
   type TalentRowOption,
 } from '../sim/content/talents';
 import { ABILITIES, CLASSES } from '../sim/data';
-import type { AbilityEffect, PlayerClass } from '../sim/types';
+import type { AbilityEffect, PlayerClass, ResourceType } from '../sim/types';
 import { tEntity } from './entity_i18n';
 import {
   getLanguage,
@@ -704,8 +709,12 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Venenos viles',
     'Cruel Wounds': 'Disparos mortales',
     Cryomancy: 'Escarcha',
+    Fulmination: 'Fulminación',
+    'Frigid Reversal': 'Reversión gélida',
+    Icicles: 'Carámbanos',
     'Dead Aim': 'Precisión',
     'Deathless Ardor': 'Defensor ferviente',
+    'Deathless Dirge': 'Endecha Inmortal',
     'Deathless Will': 'Instintos de supervivencia',
     'Deep Reserves': 'Segundo aliento',
     'Deep Rime': 'Escarcha permanente',
@@ -850,6 +859,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Moonwing Path': 'Senda del búho lunar',
     'Night Trade': 'Artes de las Sombras',
     'Nimble Mind': 'Agilidad mental',
+    'Ninefold Litany': 'Letanía Nónuple',
     Nocturns: 'Meditación',
     'Oath of Refuge': 'Bendición de santuario',
     'Oathbrand Command': 'Sello de orden',
@@ -866,6 +876,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': 'Senda de la naturaleza',
     'Path of Spirits': 'Llamada elemental',
     'Pitiless Blows': 'Ataques despiadados',
+    'Plague Chorus': 'Coro de la Plaga',
     'Poleaxe Discipline': 'Especialización en alabardas',
     'Practiced Steel': 'Pericia con armas',
     "Predator's Cunning": 'Golpes predatorios',
@@ -977,6 +988,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: 'Feral',
     Wildsurge: 'Furor',
     Winterguard: 'Resguardo de escarcha',
+    "Woe's Crescendo": 'Crescendo del Dolor',
     Woodwise: 'Naturalista',
     Wrack: 'Devastación',
     'Wrathful Psalm': 'Furia divina',
@@ -1046,8 +1058,12 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Venenos viles',
     'Cruel Wounds': 'Disparos mortales',
     Cryomancy: 'Escarcha',
+    Fulmination: 'Fulminación',
+    'Frigid Reversal': 'Reversión gélida',
+    Icicles: 'Carámbanos',
     'Dead Aim': 'Precisión',
     'Deathless Ardor': 'Defensor ardiente',
+    'Deathless Dirge': 'Endecha Inmortal',
     'Deathless Will': 'Instintos de supervivencia',
     'Deep Reserves': 'Segundo aliento',
     'Deep Rime': 'Permaescarcha',
@@ -1192,6 +1208,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Moonwing Path': 'Senda del búho lunar',
     'Night Trade': 'Artes de las Sombras',
     'Nimble Mind': 'Agilidad mental',
+    'Ninefold Litany': 'Letanía Nónuple',
     Nocturns: 'Meditación',
     'Oath of Refuge': 'Bendición de santuario',
     'Oathbrand Command': 'Sello de mando',
@@ -1208,6 +1225,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': 'Senda de la naturaleza',
     'Path of Spirits': 'Llamada elemental',
     'Pitiless Blows': 'Ataques despiadados',
+    'Plague Chorus': 'Coro de la Plaga',
     'Poleaxe Discipline': 'Especialización en hachas de guerra',
     'Practiced Steel': 'Pericia con armas',
     "Predator's Cunning": 'Golpes de depredador',
@@ -1319,6 +1337,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: 'Feral',
     Wildsurge: 'Furor',
     Winterguard: 'Protección contra escarcha',
+    "Woe's Crescendo": 'Crescendo del Dolor',
     Woodwise: 'Naturalista',
     Wrack: 'Devastación',
     'Wrathful Psalm': 'Furia divina',
@@ -1388,8 +1407,12 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Poisons infâmes',
     'Cruel Wounds': 'Tirs fatals',
     Cryomancy: 'Givre',
+    Fulmination: 'Fulmination',
+    'Frigid Reversal': 'Renversement glacial',
+    Icicles: 'Glaçons',
     'Dead Aim': 'Précision',
     'Deathless Ardor': 'Défenseur ardent',
+    'Deathless Dirge': 'Complainte Éternelle',
     'Deathless Will': 'Instincts de survie',
     'Deep Reserves': 'Second souffle',
     'Deep Rime': 'Permagel',
@@ -1534,6 +1557,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Moonwing Path': 'Voie du sélénien',
     'Night Trade': "Arts de l'ombre",
     'Nimble Mind': 'Agilité mentale',
+    'Ninefold Litany': 'Litanie Nonuple',
     Nocturns: 'Méditation',
     'Oath of Refuge': 'Bénédiction de sanctuaire',
     'Oathbrand Command': "Sceau d'autorité",
@@ -1550,6 +1574,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': 'Voie de la nature',
     'Path of Spirits': 'Appel élémentaire',
     'Pitiless Blows': 'Attaques sans pitié',
+    'Plague Chorus': 'Chœur de la Peste',
     'Poleaxe Discipline': "Spécialisation hache d'armes",
     'Practiced Steel': 'Expertise des armes',
     "Predator's Cunning": 'Frappes prédatrices',
@@ -1661,6 +1686,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: 'Farouche',
     Wildsurge: 'Furie',
     Winterguard: 'Garde de givre',
+    "Woe's Crescendo": 'Crescendo du Malheur',
     Woodwise: 'Naturaliste',
     Wrack: 'Dévastation',
     'Wrathful Psalm': 'Fureur divine',
@@ -1730,8 +1756,12 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Poisons infâmes',
     'Cruel Wounds': 'Tirs fatals',
     Cryomancy: 'Givre',
+    Fulmination: 'Fulmination',
+    'Frigid Reversal': 'Renversement glacial',
+    Icicles: 'Glaçons',
     'Dead Aim': 'Précision',
     'Deathless Ardor': 'Défenseur ardent',
+    'Deathless Dirge': 'Complainte Éternelle',
     'Deathless Will': 'Instincts de survie',
     'Deep Reserves': 'Second souffle',
     'Deep Rime': 'Pergélisol',
@@ -1876,6 +1906,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Moonwing Path': 'Voie du sélénien',
     'Night Trade': "Arts de l'ombre",
     'Nimble Mind': 'Agilité mentale',
+    'Ninefold Litany': 'Litanie Nonuple',
     Nocturns: 'Méditation',
     'Oath of Refuge': 'Bénédiction de sanctuaire',
     'Oathbrand Command': 'Sceau de commandement',
@@ -1892,6 +1923,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': 'Voie de la nature',
     'Path of Spirits': 'Appel élémentaire',
     'Pitiless Blows': 'Attaques sans pitié',
+    'Plague Chorus': 'Chœur de la Peste',
     'Poleaxe Discipline': "Spécialisation des haches d'armes",
     'Practiced Steel': 'Expertise des armes',
     "Predator's Cunning": 'Frappes de prédateur',
@@ -2003,6 +2035,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: 'Farouche',
     Wildsurge: 'Furor',
     Winterguard: 'Protection contre le givre',
+    "Woe's Crescendo": 'Crescendo du Malheur',
     Woodwise: 'Naturaliste',
     Wrack: 'Dévastation',
     'Wrathful Psalm': 'Fureur divine',
@@ -2072,8 +2105,12 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Veleni immondi',
     'Cruel Wounds': 'Colpi mortali',
     Cryomancy: 'Gelo',
+    Fulmination: 'Fulminazione',
+    'Frigid Reversal': 'Inversione gelida',
+    Icicles: 'Ghiaccioli',
     'Dead Aim': 'Precisione',
     'Deathless Ardor': 'Difensore ardente',
+    'Deathless Dirge': 'Lamento Imperituro',
     'Deathless Will': 'Istinti di sopravvivenza',
     'Deep Reserves': 'Secondo respiro',
     'Deep Rime': 'Permagelo',
@@ -2218,6 +2255,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Moonwing Path': 'Sentiero del gufo lunare',
     'Night Trade': "Arti dell'ombra",
     'Nimble Mind': 'Agilità mentale',
+    'Ninefold Litany': 'Litania Nove Volte',
     Nocturns: 'Meditazione',
     'Oath of Refuge': 'Benedizione del Santuario',
     'Oathbrand Command': 'Sigillo del Comando',
@@ -2234,6 +2272,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': 'Sentiero della natura',
     'Path of Spirits': 'Richiamo elementale',
     'Pitiless Blows': 'Attacchi spietati',
+    'Plague Chorus': 'Coro della Piaga',
     'Poleaxe Discipline': 'Specializzazione in alabarde',
     'Practiced Steel': 'Competenza nelle armi',
     "Predator's Cunning": 'Colpi predatori',
@@ -2345,6 +2384,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: 'Ferino',
     Wildsurge: 'Furore',
     Winterguard: 'Protezione dal gelo',
+    "Woe's Crescendo": 'Crescendo del Dolore',
     Woodwise: 'Naturalista',
     Wrack: 'Devastazione',
     'Wrathful Psalm': 'Furia divina',
@@ -2414,8 +2454,12 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Üble Gifte',
     'Cruel Wounds': 'Todbringende Schüsse',
     Cryomancy: 'Frost',
+    Fulmination: 'Entladung',
+    'Frigid Reversal': 'Frostige Umkehr',
+    Icicles: 'Eiszapfen',
     'Dead Aim': 'Präzision',
     'Deathless Ardor': 'Glühender Verteidiger',
+    'Deathless Dirge': 'Unsterbliche Totenklage',
     'Deathless Will': 'Überlebensinstinkte',
     'Deep Reserves': 'Zweiter Wind',
     'Deep Rime': 'Permafrost',
@@ -2560,6 +2604,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Moonwing Path': 'Pfad des Moonkin',
     'Night Trade': 'Schattenkünste',
     'Nimble Mind': 'Geistige Gewandtheit',
+    'Ninefold Litany': 'Neunfache Litanei',
     Nocturns: 'Meditation',
     'Oath of Refuge': 'Segen der Zuflucht',
     'Oathbrand Command': 'Siegel des Befehls',
@@ -2576,6 +2621,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': 'Pfad der Natur',
     'Path of Spirits': 'Ruf der Elemente',
     'Pitiless Blows': 'Reuelose Angriffe',
+    'Plague Chorus': 'Seuchenchor',
     'Poleaxe Discipline': 'Streitaxtspezialisierung',
     'Practiced Steel': 'Waffenkunde',
     "Predator's Cunning": 'Raubtierschläge',
@@ -2687,6 +2733,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: 'Wilder Kampf',
     Wildsurge: 'Furor',
     Winterguard: 'Frostschutz',
+    "Woe's Crescendo": 'Crescendo des Leids',
     Woodwise: 'Naturkundiger',
     Wrack: 'Verwüstung',
     'Wrathful Psalm': 'Göttlicher Furor',
@@ -2756,8 +2803,13 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': '剧毒',
     'Cruel Wounds': '致死射击',
     Cryomancy: '冰霜',
+    Fulmination: '雷霆爆发',
+    'Frigid Reversal': '寒冰逆转',
+    Frostbite: '冻伤',
+    Icicles: '冰刺',
     'Dead Aim': '精准',
     'Deathless Ardor': '炽热防御者',
+    'Deathless Dirge': '不灭挽歌',
     'Deathless Will': '生存本能',
     'Deep Reserves': '二度呼吸',
     'Deep Rime': '永久冻结',
@@ -2902,6 +2954,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Moonwing Path': '枭兽之路',
     'Night Trade': '暗影艺术',
     'Nimble Mind': '精神敏捷',
+    'Ninefold Litany': '九重悲歌',
     Nocturns: '冥想',
     'Oath of Refuge': '庇护祝福',
     'Oathbrand Command': '命令圣印',
@@ -2918,6 +2971,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': '自然之径',
     'Path of Spirits': '元素召唤',
     'Pitiless Blows': '冷酷攻击',
+    'Plague Chorus': '瘟疫合唱',
     'Poleaxe Discipline': '长柄武器专精',
     'Practiced Steel': '武器专家',
     "Predator's Cunning": '掠食打击',
@@ -2945,6 +2999,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Refuge: '庇护所',
     Requital: '惩戒',
     'Rolling Flame': '冲击波',
+    Ruinbolt: '毁灭箭',
     Ruination: '毁灭',
     'Rushing Waters': '自然迅捷',
     'Sablewind Focus': '灵风专注',
@@ -3029,6 +3084,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: '野性',
     Wildsurge: '暴怒',
     Winterguard: '冰霜防护',
+    "Woe's Crescendo": '苦难渐强',
     Woodwise: '自然学识',
     Wrack: '毁坏',
     'Wrathful Psalm': '神圣狂怒',
@@ -3098,8 +3154,13 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': '邪惡毒藥',
     'Cruel Wounds': '致死射擊',
     Cryomancy: '冰霜',
+    Fulmination: '雷霆爆發',
+    'Frigid Reversal': '寒冰逆轉',
+    Frostbite: '凍傷',
+    Icicles: '冰刺',
     'Dead Aim': '精準',
     'Deathless Ardor': '熱忱防衛者',
+    'Deathless Dirge': '不滅輓歌',
     'Deathless Will': '生存本能',
     'Deep Reserves': '復甦之風',
     'Deep Rime': '永凍',
@@ -3244,6 +3305,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Moonwing Path': '梟獸之道',
     'Night Trade': '暗影法術',
     'Nimble Mind': '精神敏捷',
+    'Ninefold Litany': '九重悲歌',
     Nocturns: '冥想',
     'Oath of Refuge': '庇護祝福',
     'Oathbrand Command': '命令聖印',
@@ -3260,6 +3322,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': '自然之徑',
     'Path of Spirits': '元素召喚',
     'Pitiless Blows': '冷酷攻擊',
+    'Plague Chorus': '瘟疫合唱',
     'Poleaxe Discipline': '斧鉞專精',
     'Practiced Steel': '武器專精',
     "Predator's Cunning": '掠食打擊',
@@ -3287,6 +3350,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Refuge: '庇護所',
     Requital: '懲戒',
     'Rolling Flame': '衝擊波',
+    Ruinbolt: '毀滅箭',
     Ruination: '毀滅',
     'Rushing Waters': '自然迅捷',
     'Sablewind Focus': '曳影專注',
@@ -3371,6 +3435,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: '野性',
     Wildsurge: '暴怒',
     Winterguard: '冰霜防護',
+    "Woe's Crescendo": '苦難漸強',
     Woodwise: '自然學家',
     Wrack: '摧殘',
     'Wrathful Psalm': '神聖狂怒',
@@ -3440,8 +3505,13 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': '사악한 독',
     'Cruel Wounds': '필멸의 사격',
     Cryomancy: '냉기',
+    Fulmination: '뇌전 폭발',
+    'Frigid Reversal': '냉기 역전',
+    Frostbite: '동상',
+    Icicles: '고드름',
     'Dead Aim': '정밀함',
     'Deathless Ardor': '헌신적인 수호자',
+    'Deathless Dirge': '불멸의 장송곡',
     'Deathless Will': '생존 본능',
     'Deep Reserves': '재기',
     'Deep Rime': '영구 동결',
@@ -3586,6 +3656,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Moonwing Path': '달빛야수의 길',
     'Night Trade': '암흑 기술',
     'Nimble Mind': '정신 민첩성',
+    'Ninefold Litany': '아홉 겹 비탄',
     Nocturns: '명상',
     'Oath of Refuge': '성역의 축복',
     'Oathbrand Command': '명령의 인장',
@@ -3602,6 +3673,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': '자연의 길',
     'Path of Spirits': '정령 부름',
     'Pitiless Blows': '무자비한 공격',
+    'Plague Chorus': '역병의 합창',
     'Poleaxe Discipline': '도끼창 전문화',
     'Practiced Steel': '무기 전문화',
     "Predator's Cunning": '포식자의 일격',
@@ -3629,6 +3701,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Refuge: '성역',
     Requital: '징벌',
     'Rolling Flame': '폭발의 파동',
+    Ruinbolt: '파멸 화살',
     Ruination: '파괴',
     'Rushing Waters': '자연의 신속함',
     'Sablewind Focus': '황천바람 집중',
@@ -3713,6 +3786,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: '야성',
     Wildsurge: '격노',
     Winterguard: '냉기 수호',
+    "Woe's Crescendo": '비탄의 절정',
     Woodwise: '자연주의자',
     Wrack: '파괴력',
     'Wrathful Psalm': '신성한 분노',
@@ -3782,8 +3856,13 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': '邪悪なる毒',
     'Cruel Wounds': 'モータル・ショット',
     Cryomancy: 'フロスト',
+    Fulmination: '雷撃爆発',
+    'Frigid Reversal': '氷霜逆転',
+    Frostbite: '凍傷',
+    Icicles: '氷柱',
     'Dead Aim': '精密',
     'Deathless Ardor': '熱烈なる守護者',
+    'Deathless Dirge': '不滅の哀歌',
     'Deathless Will': '生存本能',
     'Deep Reserves': '再起の息吹',
     'Deep Rime': '永久凍土',
@@ -3928,6 +4007,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Moonwing Path': 'ムーンキンの道',
     'Night Trade': '影の業',
     'Nimble Mind': '精神の敏捷',
+    'Ninefold Litany': '九重の連祷',
     Nocturns: '瞑想',
     'Oath of Refuge': '聖域の祝福',
     'Oathbrand Command': 'シール・オブ・コマンド',
@@ -3944,6 +4024,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': '自然の小径',
     'Path of Spirits': 'エレメンタル・コーリング',
     'Pitiless Blows': '非情なる攻撃',
+    'Plague Chorus': '疫病の合唱',
     'Poleaxe Discipline': '鉾槍専門化',
     'Practiced Steel': '武器練達',
     "Predator's Cunning": '捕食者の一撃',
@@ -3971,6 +4052,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Refuge: '聖域',
     Requital: '報復',
     'Rolling Flame': 'ブラスト・ウェーブ',
+    Ruinbolt: '破滅の矢',
     Ruination: '破壊',
     'Rushing Waters': '自然の素早さ',
     'Sablewind Focus': 'ネザーウィンド集中',
@@ -4055,6 +4137,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: 'フェラル',
     Wildsurge: '激情',
     Winterguard: 'フロスト・ウォーディング',
+    "Woe's Crescendo": '苦悶のクレッシェンド',
     Woodwise: '博物学者',
     Wrack: '破滅的猛攻',
     'Wrathful Psalm': '神聖憤怒',
@@ -4124,8 +4207,12 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Venenos Vis',
     'Cruel Wounds': 'Disparos Mortais',
     Cryomancy: 'Gelo',
+    Fulmination: 'Fulminação',
+    'Frigid Reversal': 'Reversão gélida',
+    Icicles: 'Sincelos',
     'Dead Aim': 'Precisão',
     'Deathless Ardor': 'Defensor Fervoroso',
+    'Deathless Dirge': 'Lamento Imortal',
     'Deathless Will': 'Instintos de Sobrevivência',
     'Deep Reserves': 'Fôlego Renovado',
     'Deep Rime': 'Gelo Eterno',
@@ -4270,6 +4357,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Moonwing Path': 'Caminho do Moonkin',
     'Night Trade': 'Artes Sombrias',
     'Nimble Mind': 'Agilidade Mental',
+    'Ninefold Litany': 'Ladainha Nônupla',
     Nocturns: 'Meditação',
     'Oath of Refuge': 'Bênção do Santuário',
     'Oathbrand Command': 'Selo de Comando',
@@ -4286,6 +4374,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': 'Caminho da Natureza',
     'Path of Spirits': 'Chamado Elemental',
     'Pitiless Blows': 'Ataques Impiedosos',
+    'Plague Chorus': 'Coro da Peste',
     'Poleaxe Discipline': 'Especialização em Alabarda',
     'Practiced Steel': 'Perícia em Armas',
     "Predator's Cunning": 'Golpes Predatórios',
@@ -4397,6 +4486,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: 'Feral',
     Wildsurge: 'Furor',
     Winterguard: 'Proteção contra Gelo',
+    "Woe's Crescendo": 'Crescendo do Sofrimento',
     Woodwise: 'Naturalista',
     Wrack: 'Devastação',
     'Wrathful Psalm': 'Fúria Divina',
@@ -4466,8 +4556,13 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Мерзкие яды',
     'Cruel Wounds': 'Смертельные выстрелы',
     Cryomancy: 'Лед',
+    Fulmination: 'Разряд',
+    'Frigid Reversal': 'Ледяной разворот',
+    Frostbite: 'Обморожение',
+    Icicles: 'Ледяные осколки',
     'Dead Aim': 'Меткость',
     'Deathless Ardor': 'Ярый защитник',
+    'Deathless Dirge': 'Бессмертная панихида',
     'Deathless Will': 'Инстинкт выживания',
     'Deep Reserves': 'Второе дыхание',
     'Deep Rime': 'Вечная мерзлота',
@@ -4612,6 +4707,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Moonwing Path': 'Путь лунного совуха',
     'Night Trade': 'Искусство Тьмы',
     'Nimble Mind': 'Гибкость ума',
+    'Ninefold Litany': 'Девятикратная литания',
     Nocturns: 'Медитация',
     'Oath of Refuge': 'Благословение защиты',
     'Oathbrand Command': 'Печать повеления',
@@ -4628,6 +4724,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': 'Путь природы',
     'Path of Spirits': 'Зов стихий',
     'Pitiless Blows': 'Беспощадные атаки',
+    'Plague Chorus': 'Чумной хор',
     'Poleaxe Discipline': 'Специализация по древковому оружию',
     'Practiced Steel': 'Мастерское владение оружием',
     "Predator's Cunning": 'Хищные удары',
@@ -4655,6 +4752,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Refuge: 'Убежище',
     Requital: 'Воздаяние',
     'Rolling Flame': 'Взрывная волна',
+    Ruinbolt: 'Стрела погибели',
     Ruination: 'Разрушение',
     'Rushing Waters': 'Природная скорость',
     'Sablewind Focus': 'Сосредоточение Ветра Пустоты',
@@ -4739,6 +4837,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: 'Сила зверя',
     Wildsurge: 'Ярость',
     Winterguard: 'Защита от холода',
+    "Woe's Crescendo": 'Крещендо скорби',
     Woodwise: 'Натуралист',
     Wrack: 'Опустошение',
     'Wrathful Psalm': 'Божественное неистовство',
@@ -4808,8 +4907,12 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Kruté jedy',
     'Cruel Wounds': 'Kruté rány',
     Cryomancy: 'Mrazivá magie',
+    Fulmination: 'Fulminace',
+    'Frigid Reversal': 'Mrazivý zvrat',
+    Icicles: 'Rampouchy',
     'Dead Aim': 'Smrtící muška',
     'Deathless Ardor': 'Nesmrtelný zápal',
+    'Deathless Dirge': 'Nesmrtelný žalozpěv',
     'Deathless Will': 'Nesmrtelná vůle',
     'Deep Reserves': 'Hluboké rezervy',
     'Deep Rime': 'Hluboká jinovatka',
@@ -4954,6 +5057,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Moonwing Path': 'Cesta měsíčního křídla',
     'Night Trade': 'Noční řemeslo',
     'Nimble Mind': 'Hbitá mysl',
+    'Ninefold Litany': 'Devaterá litanie',
     Nocturns: 'Nokturny',
     'Oath of Refuge': 'Přísaha útočiště',
     'Oathbrand Command': 'Velící značka přísahy',
@@ -4970,6 +5074,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': 'Cesta ročních období',
     'Path of Spirits': 'Cesta duchů',
     'Pitiless Blows': 'Nelítostné rány',
+    'Plague Chorus': 'Morový sbor',
     'Poleaxe Discipline': 'Disciplína sudlice',
     'Practiced Steel': 'Cvičená ocel',
     "Predator's Cunning": 'Lstivost dravce',
@@ -5081,6 +5186,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: 'Divoký tesák',
     Wildsurge: 'Divoký příval',
     Winterguard: 'Zimní stráž',
+    "Woe's Crescendo": 'Crescendo žalu',
     Woodwise: 'Lesní moudrost',
     Wrack: 'Muka',
     'Wrathful Psalm': 'Hněvivý žalm',
@@ -5150,8 +5256,12 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Snode Vergiften',
     'Cruel Wounds': 'Fatale Schoten',
     Cryomancy: 'Vorst',
+    Fulmination: 'Fulminatie',
+    'Frigid Reversal': 'IJzige omkering',
+    Icicles: 'IJspegels',
     'Dead Aim': 'Precisie',
     'Deathless Ardor': 'Vurige Verdediger',
+    'Deathless Dirge': 'Onsterfelijke Lijkzang',
     'Deathless Will': 'Overlevingsinstincten',
     'Deep Reserves': 'Tweede Adem',
     'Deep Rime': 'Permafrost',
@@ -5296,6 +5406,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Moonwing Path': 'Moonkin-Pad',
     'Night Trade': 'Schaduwkunsten',
     'Nimble Mind': 'Mentale Behendigheid',
+    'Ninefold Litany': 'Negenvoudige Litanie',
     Nocturns: 'Meditatie',
     'Oath of Refuge': 'Zegen van Toevlucht',
     'Oathbrand Command': 'Zegelbevel',
@@ -5312,6 +5423,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': 'Natuurpad',
     'Path of Spirits': 'Elementaire Roeping',
     'Pitiless Blows': 'Genadeloze Aanvallen',
+    'Plague Chorus': 'Pestkoor',
     'Poleaxe Discipline': 'Strijdbijl-Specialisatie',
     'Practiced Steel': 'Wapenexpertise',
     "Predator's Cunning": 'Roofzuchtige Slagen',
@@ -5423,6 +5535,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: 'Wild',
     Wildsurge: 'Furie',
     Winterguard: 'Vorstbescherming',
+    "Woe's Crescendo": 'Crescendo van Wee',
     Woodwise: 'Naturalist',
     Wrack: 'Verwoesting',
     'Wrathful Psalm': 'Goddelijke Furie',
@@ -5492,8 +5605,12 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Plugawe trucizny',
     'Cruel Wounds': 'Śmiertelne strzały',
     Cryomancy: 'Mróz',
+    Fulmination: 'Fulminacja',
+    'Frigid Reversal': 'Lodowe odwrócenie',
+    Icicles: 'Sople',
     'Dead Aim': 'Precyzja',
     'Deathless Ardor': 'Żarliwy obrońca',
+    'Deathless Dirge': 'Nieśmiertelny Tren',
     'Deathless Will': 'Instynkty przetrwania',
     'Deep Reserves': 'Drugi oddech',
     'Deep Rime': 'Wieczna zmarzlina',
@@ -5638,6 +5755,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Moonwing Path': 'Ścieżka sowoniedźwiedzia',
     'Night Trade': 'Sztuki cienia',
     'Nimble Mind': 'Zwinność umysłu',
+    'Ninefold Litany': 'Dziewięciokrotna Litania',
     Nocturns: 'Medytacja',
     'Oath of Refuge': 'Błogosławieństwo schronienia',
     'Oathbrand Command': 'Pieczęć rozkazu',
@@ -5654,6 +5772,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': 'Ścieżka natury',
     'Path of Spirits': 'Zew żywiołów',
     'Pitiless Blows': 'Bezwzględne ataki',
+    'Plague Chorus': 'Chór Zarazy',
     'Poleaxe Discipline': 'Specjalizacja w berdyszu',
     'Practiced Steel': 'Biegłość w broni',
     "Predator's Cunning": 'Drapieżne uderzenia',
@@ -5765,6 +5884,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: 'Dzika natura',
     Wildsurge: 'Wściekłość',
     Winterguard: 'Mroźna osłona',
+    "Woe's Crescendo": 'Crescendo Niedoli',
     Woodwise: 'Przyrodnik',
     Wrack: 'Spustoszenie',
     'Wrathful Psalm': 'Boska furia',
@@ -5834,8 +5954,12 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Racun Keji',
     'Cruel Wounds': 'Tembakan Maut',
     Cryomancy: 'Beku',
+    Fulmination: 'Ledakan Petir',
+    'Frigid Reversal': 'Pembalikan Beku',
+    Icicles: 'Es Runcing',
     'Dead Aim': 'Presisi',
     'Deathless Ardor': 'Pembela Gigih',
+    'Deathless Dirge': 'Ratapan Abadi',
     'Deathless Will': 'Naluri Bertahan Hidup',
     'Deep Reserves': 'Napas Kedua',
     'Deep Rime': 'Beku Abadi',
@@ -5980,6 +6104,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Moonwing Path': 'Jalan Moonkin',
     'Night Trade': 'Ilmu Bayangan',
     'Nimble Mind': 'Kelincahan Mental',
+    'Ninefold Litany': 'Litani Sembilan Lapis',
     Nocturns: 'Meditasi',
     'Oath of Refuge': 'Berkah Suaka',
     'Oathbrand Command': 'Segel Perintah',
@@ -5996,6 +6121,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': 'Jalan Alam',
     'Path of Spirits': 'Panggilan Elemental',
     'Pitiless Blows': 'Serangan Tanpa Ampun',
+    'Plague Chorus': 'Paduan Suara Wabah',
     'Poleaxe Discipline': 'Spesialisasi Kapak Tombak',
     'Practiced Steel': 'Keahlian Senjata',
     "Predator's Cunning": 'Serangan Pemangsa',
@@ -6107,6 +6233,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: 'Buas',
     Wildsurge: 'Kegeraman',
     Winterguard: 'Tameng Beku',
+    "Woe's Crescendo": 'Kresendo Duka',
     Woodwise: 'Naturalis',
     Wrack: 'Pemusnahan',
     'Wrathful Psalm': 'Murka Ilahi',
@@ -6176,8 +6303,12 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'İğrenç Zehirler',
     'Cruel Wounds': 'Ölümcül Atışlar',
     Cryomancy: 'Ayaz',
+    Fulmination: 'Yıldırım Patlaması',
+    'Frigid Reversal': 'Ayaz Dönüşü',
+    Icicles: 'Buz Sarkıtları',
     'Dead Aim': 'İsabet',
     'Deathless Ardor': 'Ateşli Savunucu',
+    'Deathless Dirge': 'Ölümsüz Ağıt',
     'Deathless Will': 'Hayatta Kalma İçgüdüleri',
     'Deep Reserves': 'İkinci Nefes',
     'Deep Rime': 'Kalıcı Buz',
@@ -6322,6 +6453,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Moonwing Path': 'Ay Kuşu Yolu',
     'Night Trade': 'Gölge Sanatları',
     'Nimble Mind': 'Zihinsel Çeviklik',
+    'Ninefold Litany': 'Dokuz Katlı İlahi',
     Nocturns: 'Meditasyon',
     'Oath of Refuge': 'Sığınak Kutsaması',
     'Oathbrand Command': 'Mühür Emri',
@@ -6338,6 +6470,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': 'Doğa Yolu',
     'Path of Spirits': 'Elementsel Çağrı',
     'Pitiless Blows': 'Acımasız Saldırılar',
+    'Plague Chorus': 'Veba Korosu',
     'Poleaxe Discipline': 'Balta-Mızrak Uzmanlığı',
     'Practiced Steel': 'Silah Ustalığı',
     "Predator's Cunning": 'Yırtıcı Darbeler',
@@ -6449,6 +6582,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: 'Vahşi',
     Wildsurge: 'Hiddet',
     Winterguard: 'Ayaz Koruması',
+    "Woe's Crescendo": 'Keder Kreşendosu',
     Woodwise: 'Doğabilimci',
     Wrack: 'Tahribat',
     'Wrathful Psalm': 'Kutsal Hiddet',
@@ -6518,8 +6652,12 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Vidriga gifter',
     'Cruel Wounds': 'Dödsbringande skott',
     Cryomancy: 'Frost',
+    Fulmination: 'Urladdning',
+    'Frigid Reversal': 'Frostig vändning',
+    Icicles: 'Istappar',
     'Dead Aim': 'Precision',
     'Deathless Ardor': 'Brinnande försvarare',
+    'Deathless Dirge': 'Odödlig Klagosång',
     'Deathless Will': 'Överlevnadsinstinkter',
     'Deep Reserves': 'Andra andan',
     'Deep Rime': 'Permafrost',
@@ -6664,6 +6802,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Moonwing Path': 'Månfågelns väg',
     'Night Trade': 'Skuggkonster',
     'Nimble Mind': 'Mental smidighet',
+    'Ninefold Litany': 'Niofaldig Litania',
     Nocturns: 'Meditation',
     'Oath of Refuge': 'Tillflyktens välsignelse',
     'Oathbrand Command': 'Sigillbefallning',
@@ -6680,6 +6819,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': 'Naturens väg',
     'Path of Spirits': 'Elementär kallelse',
     'Pitiless Blows': 'Skoningslösa attacker',
+    'Plague Chorus': 'Pestkör',
     'Poleaxe Discipline': 'Stridsyxespecialisering',
     'Practiced Steel': 'Vapenexpertis',
     "Predator's Cunning": 'Rovdjurshugg',
@@ -6791,6 +6931,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: 'Vild',
     Wildsurge: 'Vredesmod',
     Winterguard: 'Frostskydd',
+    "Woe's Crescendo": 'Lidandets Crescendo',
     Woodwise: 'Naturalist',
     Wrack: 'Förödelse',
     'Wrathful Psalm': 'Gudomligt raseri',
@@ -6860,8 +7001,12 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Độc Tố Hèn Hạ',
     'Cruel Wounds': 'Phát Bắn Chí Mạng',
     Cryomancy: 'Băng Giá',
+    Fulmination: 'Bùng Nổ Sấm Sét',
+    'Frigid Reversal': 'Đảo Ngược Băng Giá',
+    Icicles: 'Băng Nhọn',
     'Dead Aim': 'Chính Xác',
     'Deathless Ardor': 'Vệ Binh Nhiệt Thành',
+    'Deathless Dirge': 'Ai Ca Bất Diệt',
     'Deathless Will': 'Bản Năng Sinh Tồn',
     'Deep Reserves': 'Hồi Sức',
     'Deep Rime': 'Băng Vĩnh Cửu',
@@ -7006,6 +7151,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Moonwing Path': 'Con Đường Nguyệt Cầm',
     'Night Trade': 'Ám Thuật',
     'Nimble Mind': 'Linh Hoạt Tinh Thần',
+    'Ninefold Litany': 'Thánh Ca Cửu Trùng',
     Nocturns: 'Thiền Định',
     'Oath of Refuge': 'Phúc Lành Thánh Địa',
     'Oathbrand Command': 'Ấn Hiệu Lệnh',
@@ -7022,6 +7168,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': 'Con Đường Tự Nhiên',
     'Path of Spirits': 'Tiếng Gọi Nguyên Tố',
     'Pitiless Blows': 'Đòn Tàn Nhẫn',
+    'Plague Chorus': 'Hợp Xướng Dịch Bệnh',
     'Poleaxe Discipline': 'Chuyên Môn Rìu Thương',
     'Practiced Steel': 'Thành Thạo Vũ Khí',
     "Predator's Cunning": 'Đòn Săn Mồi',
@@ -7133,6 +7280,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: 'Hoang Dã',
     Wildsurge: 'Cuồng Nhiệt',
     Winterguard: 'Phòng Hộ Băng Giá',
+    "Woe's Crescendo": 'Cao Trào Khổ Đau',
     Woodwise: 'Nhà Tự Nhiên',
     Wrack: 'Tàn Phá',
     'Wrathful Psalm': 'Phẫn Nộ Thần Thánh',
@@ -7202,8 +7350,12 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Cruel Venoms': 'Modbydelige Gifte',
     'Cruel Wounds': 'Dødbringende Skud',
     Cryomancy: 'Frost',
+    Fulmination: 'Udladning',
+    'Frigid Reversal': 'Frostvending',
+    Icicles: 'Istapper',
     'Dead Aim': 'Præcision',
     'Deathless Ardor': 'Ihærdig Forsvarer',
+    'Deathless Dirge': 'Udødelig Klagesang',
     'Deathless Will': 'Overlevelsesinstinkter',
     'Deep Reserves': 'Andet Pust',
     'Deep Rime': 'Permafrost',
@@ -7348,6 +7500,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Moonwing Path': 'Måneuglens Vej',
     'Night Trade': 'Skyggekunster',
     'Nimble Mind': 'Mental Smidighed',
+    'Ninefold Litany': 'Nidobbelt Litani',
     Nocturns: 'Meditation',
     'Oath of Refuge': 'Tilflugtens Velsignelse',
     'Oathbrand Command': 'Befalingssegl',
@@ -7364,6 +7517,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Path of Seasons': 'Naturens Vej',
     'Path of Spirits': 'Elementært Kald',
     'Pitiless Blows': 'Skånselsløse Angreb',
+    'Plague Chorus': 'Pestkor',
     'Poleaxe Discipline': 'Stridsøkse-Specialisering',
     'Practiced Steel': 'Våbenekspertise',
     "Predator's Cunning": 'Rovdyrslag',
@@ -7475,6 +7629,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Wildfang: 'Forvildet',
     Wildsurge: 'Hidsighed',
     Winterguard: 'Frostværn',
+    "Woe's Crescendo": 'Veens Crescendo',
     Woodwise: 'Naturalist',
     Wrack: 'Forødelse',
     'Wrathful Psalm': 'Guddommeligt Raseri',
@@ -7682,7 +7837,19 @@ function abilityDescription(id: string): string {
 function authoredChoiceDescription(choice: TalentRowOption): string {
   const grantId = choice.effect.grant?.ability;
   if (!grantId) return choice.description;
-  return [abilityDescription(grantId), grantAbilityMetadata(grantId)].filter(Boolean).join(' ');
+  const grantedAbility = [abilityDescription(grantId), grantAbilityMetadata(grantId)]
+    .filter(Boolean)
+    .join(' ');
+  const hasAdditionalEffect =
+    choice.effect.stats !== undefined ||
+    choice.effect.proc !== undefined ||
+    (choice.effect.procs?.length ?? 0) > 0 ||
+    (choice.effect.ability?.length ?? 0) > 0 ||
+    choice.effect.global !== undefined;
+  if (!hasAdditionalEffect) return grantedAbility;
+
+  const rider = /^Grants [^.]+\.\s*(.+)$/.exec(choice.description)?.[1] ?? choice.description;
+  return [grantedAbility, rider].filter(Boolean).join(' ');
 }
 
 function seconds(value: number, lang: SupportedLanguage): string {
@@ -7690,7 +7857,11 @@ function seconds(value: number, lang: SupportedLanguage): string {
 }
 
 function abilityList(ids: readonly string[] | undefined): string {
-  return ids && ids.length > 0 ? ids.map(abilityName).join(' / ') : '*';
+  return ids && ids.length > 0
+    ? ids
+        .map((id) => (id === 'auto_attack' ? t('abilityUi.actionBar.attackName') : abilityName(id)))
+        .join(' / ')
+    : '*';
 }
 
 function procTriggerDescription(
@@ -7702,6 +7873,14 @@ function procTriggerDescription(
   switch (trigger.on) {
     case 'castNth':
       return `${abilityList(trigger.abilities)}${trigger.n > 1 ? ` x${trigger.n}` : ''}`;
+    case 'resourceSpent':
+      return `${abilityList(trigger.abilities)}: ${localizedResourceName(trigger.resourceType)} ${text.statLabels.cost}`;
+    case 'petHitNth':
+      return `${t('hud.pet.petAttackTitle')} x${trigger.n}`;
+    case 'rangedHit':
+      return abilityList(trigger.abilities);
+    case 'spellHit':
+      return abilityList(trigger.abilities);
     case 'spellCrit':
       return `${text.statLabels.crit}: ${abilityList(trigger.abilities)}`;
     case 'shieldConsumed':
@@ -7710,15 +7889,25 @@ function procTriggerDescription(
       return `${abilityName(trigger.ability)}: 0 s`;
     case 'bigHitTaken':
       return `>= ${formatPercent(trigger.hpFrac, lang)} ${text.statLabels.maxHpPct} (${seconds(trigger.icd, lang)} ${text.statLabels.cooldown})`;
+    case 'meleeHit':
+      return `${trigger.chance === undefined ? '' : `${formatPercent(trigger.chance, lang)}: `}${abilityList(trigger.abilities)}`;
     case 'meleeSwingWhile':
-      return `${text.statLabels.meleeDmgPct} @ ${t('hudChrome.auraEffect.imbue')}`;
+      return `${text.statLabels.meleeDmgPct} @ ${t('hudChrome.auraEffect.imbue')}${trigger.n !== undefined && trigger.n > 1 ? ` x${trigger.n}` : ''}`;
     case 'thornsReflect':
       return `${abilityName(trigger.ability)}: ${t('guide.abilityHook.thorns')}`;
   }
 }
 
+function localizedResourceName(resourceType: ResourceType | undefined): string {
+  if (resourceType === 'mana') return t('abilityUi.resources.mana');
+  if (resourceType === 'rage') return t('abilityUi.resources.rage');
+  if (resourceType === 'energy') return t('abilityUi.resources.energy');
+  return t('classDetails.labels.resource');
+}
+
 function procResponseDescription(
   response: ProcDef['responses'][number],
+  proc: ProcDef,
   lang: SupportedLanguage,
   text: TalentLocaleText,
 ): string {
@@ -7726,6 +7915,9 @@ function procResponseDescription(
     case 'empowerNext': {
       const name = abilityList(response.abilities);
       const window = `(${seconds(response.duration, lang)})`;
+      if (response.aura === 'next_ability_damage') {
+        return `${name}: +${formatPercent(response.dmgPct ?? 0, lang)} ${text.statLabels.meleeDmgPct} ${window}`;
+      }
       if (response.aura === 'next_cast_instant') {
         return `${name}: -${formatPercent(1, lang)} ${text.statLabels.castTime} ${window}`;
       }
@@ -7735,9 +7927,26 @@ function procResponseDescription(
     case 'cooldownRefund':
       return `${abilityName(response.ability)}: -${response.seconds === 'reset' ? formatPercent(1, lang) : seconds(response.seconds, lang)} ${text.statLabels.cooldown}`;
     case 'resource':
-      return `+${formatNumber(response.amount, lang)} ${t('classDetails.labels.resource')}`;
+      return `+${response.pctMax !== undefined ? formatPercent(response.pctMax, lang) : formatNumber(response.amount, lang)} ${localizedResourceName(response.resourceType)}`;
+    case 'stackAura':
+      return `+1 (<= ${formatNumber(response.maxStacks, lang)})`;
+    case 'consumeAuraStacksResource':
+      return `${formatPercent(response.pctMaxPerStack, lang)} ${localizedResourceName(response.resourceType)} / x1`;
+    case 'rollingDot':
+      return `+${formatPercent(response.pctDamage, lang)} ${text.statLabels.damage} / ${seconds(response.duration, lang)} (${seconds(response.interval, lang)})`;
+    case 'detonateOwnedDot':
+      return `${formatPercent(1, lang)} ${text.statLabels.damage} / 0 s`;
+    case 'consumeOwnedDotAbsorb': {
+      const ownedBleed = translateTitle(proc.name, lang);
+      const requiredForm = abilityName(`${response.requiresForm}_form`);
+      return `${ownedBleed}: ${formatPercent(1, lang)} ${text.statLabels.damage} / 0 s @ ${requiredForm} -> ${t('hudChrome.auraEffect.absorb', { value: `x${formatNumber(response.multiplier, lang)}` })} (<= ${formatPercent(response.maxHpPct, lang)} ${text.statLabels.maxHpPct}; ${seconds(response.duration, lang)})`;
+    }
+    case 'chanceAura':
+      return `${translateTitle(response.name, lang)}: ${formatPercent(response.chance, lang)} (${seconds(response.duration, lang)})`;
+    case 'addAuraCharges':
+      return `${abilityName(response.ability)}: +${formatNumber(response.amount, lang)} (<= ${formatNumber(response.maxCharges, lang)})`;
     case 'heal':
-      return `+${formatNumber(response.amount, lang)} ${t('hud.meters.healing')}`;
+      return `+${response.pctMax !== undefined ? formatPercent(response.pctMax, lang) : formatNumber(response.amount, lang)} ${t('hud.meters.healing')}`;
     case 'absorb':
       return `${t('hudChrome.auraEffect.absorb', { value: formatNumber(response.amount, lang) })} (${seconds(response.duration, lang)})`;
     case 'echo':
@@ -7745,18 +7954,40 @@ function procResponseDescription(
   }
 }
 
-function procDescription(proc: ProcDef, lang: SupportedLanguage, text: TalentLocaleText): string {
+function procDescription(
+  proc: ProcDef,
+  lang: SupportedLanguage,
+  text: TalentLocaleText,
+  classId: PlayerClass | undefined,
+): string {
   const trigger = procTriggerDescription(proc, lang, text);
   const responses = proc.responses
-    .map((response) => procResponseDescription(response, lang, text))
+    .map((response) => procResponseDescription(response, proc, lang, text))
     .join('; ');
-  return `${trigger} -> ${responses}.`;
+  const gatedSpec =
+    classId === undefined
+      ? undefined
+      : TALENTS[classId]?.specs.find((spec) => spec.id === proc.spec);
+  const gate = gatedSpec === undefined ? '' : `${translateTitle(gatedSpec.name, lang)}: `;
+  return `${gate}${trigger} -> ${responses}.`;
 }
 
 type DescribedAddedEffect = Extract<
   AbilityEffect,
   {
-    type: 'root' | 'aoeRoot' | 'slow' | 'absorb' | 'dot' | 'extendDot' | 'interrupt' | 'consumeDot';
+    type:
+      | 'root'
+      | 'aoeRoot'
+      | 'slow'
+      | 'absorb'
+      | 'dot'
+      | 'extendDot'
+      | 'refreshDot'
+      | 'spreadDot'
+      | 'channelFinisher'
+      | 'interrupt'
+      | 'consumeDot'
+      | 'consumeAuraChargesDamage';
   }
 >;
 
@@ -7768,8 +7999,12 @@ function assertDescribedAddedEffect(effect: AbilityEffect): asserts effect is De
     effect.type !== 'absorb' &&
     effect.type !== 'dot' &&
     effect.type !== 'extendDot' &&
+    effect.type !== 'refreshDot' &&
+    effect.type !== 'spreadDot' &&
+    effect.type !== 'channelFinisher' &&
     effect.type !== 'interrupt' &&
-    effect.type !== 'consumeDot'
+    effect.type !== 'consumeDot' &&
+    effect.type !== 'consumeAuraChargesDamage'
   ) {
     throw new Error(`Unsupported talent rider effect: ${effect.type}`);
   }
@@ -7800,10 +8035,25 @@ function addedEffectDescription(
     }
     case 'extendDot':
       return `${name} -> ${abilityName(effect.dot)}: +${seconds(effect.seconds, lang)} (<= +${seconds(effect.maxBonus, lang)}).`;
+    case 'refreshDot': {
+      const dot = ABILITIES[effect.dot]?.effects.find((candidate) => candidate.type === 'dot');
+      return `${name}: ${abilityName(effect.dot)} ↻ ${seconds(dot?.duration ?? 0, lang)}.`;
+    }
+    case 'spreadDot':
+      return `${name}: ${abilityName(effect.dot)} -> AoE (r=${formatNumber(effect.radius, lang)}).`;
+    case 'channelFinisher': {
+      const ticks = ABILITIES[sourceAbility]?.channel?.ticks;
+      const completion = ticks
+        ? `${formatNumber(ticks, lang)}/${formatNumber(ticks, lang)}`
+        : '100%';
+      return `${name}: ${completion} -> AoE ${formatNumber(effect.amount, lang)} ${text.statLabels.damage} (r=${formatNumber(effect.radius, lang)}).`;
+    }
     case 'interrupt':
       return `${name}: ${t('hudChrome.auraEffect.lockout')} (${seconds(effect.lockout, lang)}).`;
     case 'consumeDot':
       return `${name} -> ${abilityName(effect.dot)}: ${formatPercent(1, lang)} ${text.statLabels.damage} / 0 s.`;
+    case 'consumeAuraChargesDamage':
+      return `${name}: ${abilityName(effect.auraId)} x ${formatNumber(effect.damagePerCharge, lang)} ${text.statLabels.damage}${effect.radius === undefined ? '' : ` (r=${formatNumber(effect.radius, lang)})`}.`;
   }
 }
 
@@ -7834,6 +8084,7 @@ function effectDescription(
   effect: TalentEffect | undefined,
   maxRank: number,
   lang: SupportedLanguage,
+  classId?: PlayerClass,
 ): string {
   if (!effect) return localeText[lang].noEffect;
   const text = localeText[lang];
@@ -7941,6 +8192,18 @@ function effectDescription(
           perRank,
         ),
       );
+    if (mod.channelDurationPct) {
+      const channel = ABILITIES[mod.ability]?.channel;
+      const duration = channel?.duration
+        ? channel.duration * (1 + mod.channelDurationPct)
+        : mod.channelDurationPct;
+      const ticks = channel
+        ? Math.max(1, Math.round(channel.ticks * (1 + mod.channelDurationPct)))
+        : undefined;
+      parts.push(
+        `${name}: ${seconds(duration, lang)}${ticks === undefined ? '' : ` / ${formatNumber(ticks, lang)}x`}.`,
+      );
+    }
     // buffPct strengthens the named buff itself (e.g. "Increases Devotion Aura by 20%").
     if (mod.buffPct) parts.push(text.increase(name, formatPercent(mod.buffPct, lang), perRank));
     if (mod.dmgPctVsDotted) {
@@ -7962,7 +8225,8 @@ function effectDescription(
     }
   }
 
-  if (effect.proc) parts.push(procDescription(effect.proc, lang, text));
+  if (effect.proc) parts.push(procDescription(effect.proc, lang, text, classId));
+  for (const proc of effect.procs ?? []) parts.push(procDescription(proc, lang, text, classId));
 
   return parts.length > 0 ? parts.join(' ') : text.noEffect;
 }
@@ -7971,12 +8235,26 @@ function className(id: PlayerClass): string {
   return tEntity({ kind: 'class', id, field: 'name' });
 }
 
+function warspiritMasteryDescription(spec: SpecDef, lang: SupportedLanguage): string {
+  const text = localeText[lang];
+  const globalDescription = effectDescription({ global: spec.mastery.effect.global }, 1, lang);
+  const skyrend = translateTitle(spec.mastery.name, lang);
+  const arcBolt = abilityName('lightning_bolt');
+  const trigger = spec.mastery.effect.proc?.trigger;
+  const triggerAbilities = trigger?.on === 'meleeHit' ? trigger.abilities : [];
+  return [
+    globalDescription,
+    `${abilityList(triggerAbilities)} -> ${skyrend}: +1 (<= ${formatNumber(SKYREND_MAX_STACKS, lang)}).`,
+    `${arcBolt}: ${skyrend} x1 = -${formatPercent(SKYREND_CAST_REDUCTION_PER_STACK, lang)} ${text.statLabels.castTime}, +${formatPercent(SKYREND_DAMAGE_BONUS_PER_STACK, lang)} ${text.statLabels.spellDmgPct}; ${skyrend} x${formatNumber(SKYREND_MAX_STACKS, lang)} = 0 s ${text.statLabels.castTime}; -> ${skyrend} x0.`,
+  ].join(' ');
+}
+
 export function tTalent(request: TalentTranslationRequest): string {
   const lang = getLanguage();
   // English is the authored source of truth: the hand-written `description` strings carry
   // the real numbers (kept honest against the effect by tests/talent_tooltip_accuracy.ts).
   // Release locales generate ordinary effects from data. The narrow retained-description
-  // table handles the four Warrior globals whose stance/resource prose cannot be expressed by
+  // table handles the few global descriptions whose cross-effect prose cannot be expressed by
   // the generic renderer without losing behavior.
   if (lang === 'en' || lang === 'en_CA') {
     if (request.kind === 'talentMastery') {
@@ -7996,9 +8274,12 @@ export function tTalent(request: TalentTranslationRequest): string {
 
   if (request.kind === 'talentMastery') {
     if (request.field === 'name') return translateTitle(request.spec.mastery.name, lang);
+    if (request.spec.class === 'shaman' && request.spec.id === 'enhancement') {
+      return warspiritMasteryDescription(request.spec, lang);
+    }
     return (
       localeText[lang].masteryDescriptions?.[request.spec.id] ??
-      effectDescription(request.spec.mastery.effect, 1, lang)
+      effectDescription(request.spec.mastery.effect, 1, lang, request.spec.class)
     );
   }
   if (request.kind === 'talentSpec') {
@@ -8019,7 +8300,12 @@ export function tTalent(request: TalentTranslationRequest): string {
       | undefined;
     const retainedDescription = retainedDescriptions?.[request.choice.id];
     if (retainedDescription !== undefined) return retainedDescription;
-    const generated = effectDescription(request.choice.effect, 1, lang);
+    const owner = talentClassData().find((ct) =>
+      (rowTreeFor(ct.class) ?? []).some((row) =>
+        row.options.some((option) => option.id === request.choice.id),
+      ),
+    );
+    const generated = effectDescription(request.choice.effect, 1, lang, owner?.class);
     return generated === localeText[lang].noEffect ? request.choice.description : generated;
   }
   const exhaustive: never = request;

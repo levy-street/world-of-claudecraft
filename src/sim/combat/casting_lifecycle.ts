@@ -51,6 +51,7 @@ import {
   normAngle,
 } from '../types';
 import { isInStasis, isLockedOut, isSilenced, isStunned, tonguesMult } from './cc';
+import { detonateChannelFinisher, rampedDrainTickDamage } from './channel_effects';
 import { extendOwnedDot } from './dot_mutation';
 import {
   consumeFreeCostFor,
@@ -68,7 +69,13 @@ import {
   spellHasteMult,
 } from './spell_combat';
 import { isSpellResisted } from './spell_resist';
-import { onCastCompleted } from './talent_procs';
+import { onCastCompleted, onResourceSpent } from './talent_procs';
+import {
+  clearWarspiritArcBoltSnapshot,
+  prepareWarspiritArcBolt,
+  warspiritArcBoltCastTime,
+  warspiritArcBoltStacks,
+} from './warspirit';
 
 // Shaman shocks (earth/flame/frost) share one cooldown; lightning_shock joins them
 // for the shared-cooldown predicate. Moved with the casting slice (only callers).
@@ -176,12 +183,17 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
         ctx.applyDemonHealTick(p);
       } else {
         const res = ctx.resolvedAbility(p.castingAbility, p.id);
-        if (res) applyChannelTick(ctx, p, res);
+        if (res) {
+          const channelTickNumber = (p.channelTicksFired ?? 0) + 1;
+          if (p.channelTicksFired !== undefined) p.channelTicksFired = channelTickNumber;
+          applyChannelTick(ctx, p, res, channelTickNumber);
+        }
       }
     }
     if (p.castRemaining <= CAST_COMPLETE_EPS) {
       p.castingAbility = null;
       p.channeling = false;
+      delete p.channelTicksFired;
       // completed ground-targeted channels drop their aim like every other
       // resolve path: castAim is always cleared on resolve
       p.castAim = null;
@@ -203,6 +215,7 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
     }
     const res = ctx.resolvedAbility(castId, p.id);
     if (res) applyAbility(ctx, p, meta, res);
+    clearWarspiritArcBoltSnapshot(p);
     // the aim point is consumed by the resolved area effects; drop it so a later
     // non-aimed cast can't inherit a stale target point.
     p.castAim = null;
@@ -231,8 +244,10 @@ export function cancelCast(ctx: SimContext, p: Entity): void {
   p.castingAbility = null;
   p.castRemaining = 0;
   p.channeling = false;
+  delete p.channelTicksFired;
   p.castAim = null;
   p.castTargetId = null;
+  clearWarspiritArcBoltSnapshot(p);
   // an interrupted cast never completed, so its queued follow-up is dropped too
   p.queuedCastAbility = null;
   p.queuedCastAim = null;
@@ -568,13 +583,24 @@ export function castAbility(
 
   const gcd = ctx.playerGcdFor(meta.cls);
   // A channel keeps its duration, so it must not eat a next_cast_instant charge.
-  const castTime =
+  const empoweredCastTime =
     !ability.channel &&
     res.castTime > 0 &&
     (ability.school !== 'physical' || hasScopedNextCastInstant(p, ability.id)) &&
     consumeNextCastInstant(ctx, p, ability.id)
       ? 0
       : res.castTime;
+  const arcBoltStacks = warspiritArcBoltStacks(ctx, p, meta, ability.id);
+  if (arcBoltStacks > 0) p.warspiritArcBoltStacks = arcBoltStacks;
+  else clearWarspiritArcBoltSnapshot(p);
+  const castTime = warspiritArcBoltCastTime(
+    ctx,
+    p,
+    meta,
+    ability.id,
+    empoweredCastTime,
+    arcBoltStacks,
+  );
   // A free cast is consumed where the cost is actually billed: here for channels
   // and instants (this tick resolves them via the local `res`), but for cast-time
   // spells the bill lands in applyAbility at completion, which RE-RESOLVES the
@@ -599,6 +625,17 @@ export function castAbility(
     p.channeling = true;
     p.channelTickEvery = channelDuration / ability.channel.ticks;
     p.channelTickTimer = p.channelTickEvery;
+    if (
+      res.effects.some(
+        (effect) =>
+          (effect.type === 'drainTick' && effect.rampPct !== undefined) ||
+          effect.type === 'channelFinisher',
+      )
+    ) {
+      p.channelTicksFired = 0;
+    } else {
+      delete p.channelTicksFired;
+    }
     p.gcdRemaining = Math.max(p.gcdRemaining, gcd);
     ctx.emit({
       type: 'castStart',
@@ -632,6 +669,7 @@ export function castAbility(
 
   if (!ability.offGcd) p.gcdRemaining = Math.max(p.gcdRemaining, gcd);
   applyAbility(ctx, p, meta, res);
+  clearWarspiritArcBoltSnapshot(p);
   // instant ground-targeted cast: its effects have consumed the aim point.
   p.castAim = null;
   p.castTargetId = null;
@@ -685,8 +723,12 @@ function spendAbilityCost(
     p.savedMana = Math.max(0, p.savedMana - res.cost);
     return;
   }
+  const resourceBefore = p.resource;
   spendResource(p, res.cost);
   applyRageSpendCooldownRefund(ctx, p, meta, spentRage);
+  if (p.resourceType !== null) {
+    onResourceSpent(ctx, p, res.def.id, p.resourceType, resourceBefore - p.resource);
+  }
 }
 
 function armAbilityCooldown(
@@ -713,7 +755,12 @@ function armAbilityCooldown(
   p.cooldowns.set(abilityId, cooldown);
 }
 
-function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): void {
+function applyChannelTick(
+  ctx: SimContext,
+  p: Entity,
+  res: ResolvedAbility,
+  channelTickNumber: number,
+): void {
   // Ground-targeted channels (Rain of Fire / Volley / Hurricane): each tick pulses
   // the ability's aoeDamage at the aimed point (clamped at cast start, held in
   // castAim for the channel's life), independent of any entity target.
@@ -809,7 +856,11 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
         ctx.dealDamage(src, tgt, Math.round(dmg), crit, res.def.school, res.def.name, 'hit');
         noteSpellHit(ctx, src, crit);
       } else if (eff.type === 'drainTick') {
-        const dmg = Math.round(ctx.rng.range(eff.min, eff.max) + channelSp);
+        const dmg = rampedDrainTickDamage(
+          ctx.rng.range(eff.min, eff.max) + channelSp,
+          eff.rampPct,
+          channelTickNumber,
+        );
         ctx.dealDamage(src, tgt, dmg, false, res.def.school, res.def.name, 'hit');
         if (!src.dead) {
           const healed = Math.min(Math.round(dmg * eff.healFrac), src.maxHp - src.hp);
@@ -828,6 +879,8 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
         }
       } else if (eff.type === 'extendDot') {
         extendOwnedDot(tgt, src.id, eff.dot, eff.seconds, eff.maxBonus);
+      } else if (eff.type === 'channelFinisher' && channelTickNumber === res.def.channel?.ticks) {
+        detonateChannelFinisher(ctx, src, tgt, res.def, eff);
       }
     }
   });
@@ -970,6 +1023,7 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
         : Math.min(p.resource, ability.spendResourceCap);
     res = { ...res, cost: spend };
   }
+  res = prepareWarspiritArcBolt(ctx, p, meta, res);
 
   // helpful spells never miss
   if (

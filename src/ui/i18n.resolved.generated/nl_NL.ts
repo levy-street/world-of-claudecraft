@@ -1396,6 +1396,9 @@ export const nl_NL: EnTranslations = {
       "formTravel": "Fleetgedaante: bewegingssnelheid verhoogd met {pct}%",
       "defensiveStance": "Bewaakte Houding: minder ontvangen schade, meer dreiging",
       "righteousFury": "Brandende Eed: sterk verhoogde dreiging door Heilige schade",
+      "stormcharge": "Skyrend {stacks}/{max}: each stack reduces Arc Bolt cast time by {castPct}% and increases its damage by {damagePct}%",
+      "aethericFlux": "Aetheric Flux {stacks}/{max}: each stack refunds {cooldown} sec of Aether Surge cooldown; Aether Surge consumes all stacks to restore {manaPct}% maximum mana per stack",
+      "nextAbilityDamage": "Increases the next affected ability damage by {pct}%",
       "scale": "Größe um {pct}% erhöht",
       "jump": "Sprunghöhe um {pct}% erhöht",
       "school": {
@@ -2510,6 +2513,7 @@ export const nl_NL: EnTranslations = {
       "frost_armor": "Een blijvende zelfbuff die je pantser verhardt voor een gevecht.",
       "arcane_intellect": "Verhoogt Intellect om de manapoel van een bondgenoot te verdiepen, spreek het uit voor de pull.",
       "frostbolt": "Slaat van afstand toe en vertraagt het doelwit zodat het niet op je kan inlopen.",
+      "blink": "Teleports you forward and breaks roots, giving every Mage a reliable escape.",
       "conjure_water": "Roept drank op die mana herstelt, zodat je tussen pulls kunt bijvullen.",
       "conjure_food": "Roept voedsel op dat gezondheid herstelt wanneer je gaat zitten om te eten.",
       "shadow_bolt": "Een bout van schaduw die je op een doelwit afvuurt, je vertrouwde nuke.",
@@ -5743,7 +5747,7 @@ export const nl_NL: EnTranslations = {
       },
       "fireball": {
         "name": "Sintelbout",
-        "description": "Werpt een vurige bal die {damage} Vuurschade toebrengt plus extra schade over tijd."
+        "description": "Werpt een vurige bal die {damage} Vuurschade plus {overTime} Vuurschade over tijd toebrengt."
       },
       "frost_armor": {
         "name": "Rijpmantel",
@@ -5756,6 +5760,10 @@ export const nl_NL: EnTranslations = {
       "frostbolt": {
         "name": "Rijplans",
         "description": "Lanceert een bout van vorst die {damage} Vorstschade toebrengt en de beweging met 40% vertraagt."
+      },
+      "icefall": {
+        "name": "Icefall",
+        "description": "Launches every stored Icicle at the target for {damage} Frost damage each. Deals 2.5 times damage if the target is frozen by a root or stun, or while Frostbite is active. Consumes Frostbite. This fixed damage cannot critically strike. (Cryomancy)"
       },
       "conjure_water": {
         "name": "Waterbinding",
@@ -5791,7 +5799,7 @@ export const nl_NL: EnTranslations = {
       },
       "pyroblast": {
         "name": "Pyrelans",
-        "description": "Werpt een immense vurige kei die {damage} Vuurschade toebrengt plus extra schade over tijd."
+        "description": "Werpt een immense vurige kei die {damage} Vuurschade plus {overTime} Vuurschade over 12 sec. toebrengt."
       },
       "ice_barrier": {
         "name": "Vorstsluier",
@@ -6023,7 +6031,7 @@ export const nl_NL: EnTranslations = {
       },
       "mind_flay": {
         "name": "Litanie van Leed",
-        "description": "Bestookt de geest van het doelwit met Schaduwenergie en brengt elke seconde {damage} schade toe gedurende 3 sec."
+        "description": "Bestookt de geest van het doelwit 3 sec. lang met Schaduwenergie. Met elke tik neemt de schade toe met 30% van de schade van de eerste tik."
       },
       "flash_heal": {
         "name": "Dringend Gebed",

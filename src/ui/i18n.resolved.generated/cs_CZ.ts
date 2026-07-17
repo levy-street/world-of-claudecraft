@@ -1396,6 +1396,9 @@ export const cs_CZ: EnTranslations = {
       "formTravel": "Cestovní podoba: rychlost pohybu zvýšena o {pct} %",
       "defensiveStance": "Obranný postoj: nižší obdržené poškození, větší hrozba",
       "righteousFury": "Hořící přísaha: výrazně zvýšená hrozba ze svatého poškození",
+      "stormcharge": "Skyrend {stacks}/{max}: each stack reduces Arc Bolt cast time by {castPct}% and increases its damage by {damagePct}%",
+      "aethericFlux": "Aetheric Flux {stacks}/{max}: each stack refunds {cooldown} sec of Aether Surge cooldown; Aether Surge consumes all stacks to restore {manaPct}% maximum mana per stack",
+      "nextAbilityDamage": "Increases the next affected ability damage by {pct}%",
       "scale": "Velikost zvýšena o {pct} %",
       "jump": "Výška skoku zvýšena o {pct} %",
       "school": {
@@ -2510,6 +2513,7 @@ export const cs_CZ: EnTranslations = {
       "frost_armor": "Trvalý self-buff, který před bojem zpevní tvoji zbroj.",
       "arcane_intellect": "Zvedne intelekt a prohloubí spojenci zásobu many, sesílej před pullem.",
       "frostbolt": "Zasáhne z dálky a zpomalí cíl, aby se k tobě nedostal.",
+      "blink": "Teleports you forward and breaks roots, giving every Mage a reliable escape.",
       "conjure_water": "Vyvolá nápoje obnovující manu, abys mezi pully doplnil zásoby.",
       "conjure_food": "Vyvolá jídlo obnovující zdraví, když si sedneš k jídlu.",
       "shadow_bolt": "Stínová střela seslaná na cíl, tvoje základní ničivé kouzlo.",
@@ -5743,7 +5747,7 @@ export const cs_CZ: EnTranslations = {
       },
       "fireball": {
         "name": "Škvárový šíp",
-        "description": "Vrhe ohnivou kouli, která způsobí {damage} ohnivého poškození plus další poškození v čase."
+        "description": "Vrhe ohnivou kouli, která způsobí {damage} ohnivého poškození plus {overTime} ohnivého poškození v čase."
       },
       "frost_armor": {
         "name": "Plášť jinovatky",
@@ -5756,6 +5760,10 @@ export const cs_CZ: EnTranslations = {
       "frostbolt": {
         "name": "Kopí jinovatky",
         "description": "Vypustí mrazivý šíp, způsobí {damage} mrazového poškození a zpomalí pohyb o 40 %."
+      },
+      "icefall": {
+        "name": "Icefall",
+        "description": "Launches every stored Icicle at the target for {damage} Frost damage each. Deals 2.5 times damage if the target is frozen by a root or stun, or while Frostbite is active. Consumes Frostbite. This fixed damage cannot critically strike. (Cryomancy)"
       },
       "conjure_water": {
         "name": "Vodní pouto",
@@ -5791,7 +5799,7 @@ export const cs_CZ: EnTranslations = {
       },
       "pyroblast": {
         "name": "Žárové kopí",
-        "description": "Vrhe obrovský ohnivý balvan, který způsobí {damage} ohnivého poškození plus další poškození v čase."
+        "description": "Vrhe obrovský ohnivý balvan, který způsobí {damage} ohnivého poškození plus {overTime} ohnivého poškození během 12 s."
       },
       "ice_barrier": {
         "name": "Mrazivý závoj",
@@ -6023,7 +6031,7 @@ export const cs_CZ: EnTranslations = {
       },
       "mind_flay": {
         "name": "Litanie běd",
-        "description": "Útočí na mysl cíle stínovou energií a způsobí {damage} poškození každou sekundu po dobu 3 s."
+        "description": "Útočí na mysl cíle stínovou energií po dobu 3 s. S každým dalším zásahem se poškození zvýší o 30 % poškození prvního zásahu."
       },
       "flash_heal": {
         "name": "Naléhavá modlitba",
