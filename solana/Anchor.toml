@@ -1,0 +1,21 @@
+[toolchain]
+
+[features]
+resolver = true
+skip-lint = false
+
+[programs.localnet]
+woc_auction_escrow = "GzkjHHkkJqZf5Qa3YZaJo1iHcKkxi4zUT5sV3zpVeyqZ"
+
+[programs.devnet]
+woc_auction_escrow = "GzkjHHkkJqZf5Qa3YZaJo1iHcKkxi4zUT5sV3zpVeyqZ"
+
+[registry]
+url = "https://api.apr.dev"
+
+[provider]
+cluster = "devnet"
+wallet = "~/.config/solana/id.json"
+
+[scripts]
+test = "ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
