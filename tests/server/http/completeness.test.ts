@@ -137,6 +137,7 @@ const LEGACY_SOURCE_URLS = [
   new URL('../../../server/main.ts', import.meta.url),
   new URL('../../../server/daily_rewards.ts', import.meta.url),
   new URL('../../../server/claudium.ts', import.meta.url),
+  new URL('../../../server/merch.ts', import.meta.url),
 ] as const;
 
 // Every `=== '<path>'` (or "<path>") comparison whose path begins with /api/. The
@@ -335,6 +336,16 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     { method: 'POST', path: '/api/claudium/native/quote' },
     { method: 'POST', path: '/api/claudium/native/confirm' },
     { method: 'POST', path: '/api/claudium/spend' },
+    // Merch store (Printful dropship) proxy family (server/merch.ts), the
+    // claudium twin with a legacy prefix arm in main.ts: the webhook relays and
+    // the catalog probe are public; the player trio is bearer-gated. All static
+    // paths, no :param anywhere in the family.
+    { method: 'POST', path: '/api/merch/stripe/webhook' },
+    { method: 'POST', path: '/api/merch/printful/webhook' },
+    { method: 'GET', path: '/api/merch/products' },
+    { method: 'POST', path: '/api/merch/checkout' },
+    { method: 'POST', path: '/api/merch/checkout/native/confirm' },
+    { method: 'GET', path: '/api/merch/orders' },
     // v0.20.0 third slice: the map editor surface, migrated in-merge. The custom
     // map family (server/maps_routes.ts) and the uploaded-GLB family
     // (server/user_assets_routes.ts). GET /api/assets/:file is the
