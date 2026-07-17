@@ -58,6 +58,7 @@ import {
 import { WORLD_BOSS_CORPSE_SECONDS, worldBossLootContributors } from '../world_boss';
 import {
   onDamageTaken,
+  onPetHit,
   onShieldConsumed,
   onSpellCrit,
   onSpellHit,
@@ -687,6 +688,14 @@ export function dealDamage(
   // persisted lifetime damage counters beside the session RewardCounters
   // below, plus encounter participant tracking for the roster tasks.
   if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
+
+  // Owned-pet cadence is a landed-hit hook: absorbs, zero-damage hits, and incidental
+  // damage cannot advance it. The owner spec and learned-signature gates run inside
+  // procsFor before any counter changes, so sibling specs remain state-identical.
+  if (source && source.ownerId !== null && amount > 0 && direct) {
+    const owner = ctx.entities.get(source.ownerId);
+    if (owner?.kind === 'player') onPetHit(ctx, owner, target);
+  }
 
   if (source && source.kind === 'player' && source.id !== target.id) {
     const meta = ctx.players.get(source.id);

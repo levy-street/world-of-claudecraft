@@ -48,9 +48,9 @@ describe('signature mechanics v2', () => {
       (a) => a.kind === 'pet_damage_pct' && a.id === 'bestial_wrath_pet',
     );
     expect(petAura?.value).toBe(100);
-    // 2.0 from the Bestial Wrath pet buff x 1.35 from the Packbond mastery (petDmgPct 0.35
+    // 2.0 from the Howling Rage pet buff x 1.2 from the Packbond mastery (petDmgPct 0.2
     // at full level-20 mastery strength); the two stack multiplicatively by design.
-    expect((sim as any).petDamageMult(pet)).toBeCloseTo(2.7, 10);
+    expect((sim as any).petDamageMult(pet)).toBeCloseTo(2.4, 10);
   });
 
   it('trueshot_aura gives same-party allies a percent AP buff instead of flat AP', () => {

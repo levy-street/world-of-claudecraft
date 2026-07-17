@@ -221,6 +221,21 @@ export function onCastCompleted(
   }
 }
 
+export function onPetHit(ctx: SimContext, player: Entity, target: Entity): void {
+  for (const def of procsFor(ctx, player)) {
+    const trigger = def.trigger;
+    if (trigger.on !== 'petHitNth') continue;
+    const procState = state(player);
+    const count = (procState.counters[def.id] ?? 0) + 1;
+    if (count >= trigger.n) {
+      procState.counters[def.id] = 0;
+      fire(ctx, player, def, target);
+    } else {
+      procState.counters[def.id] = count;
+    }
+  }
+}
+
 export function onFreeCastConsumed(
   ctx: SimContext,
   player: Entity,

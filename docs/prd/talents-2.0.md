@@ -948,3 +948,11 @@ Review gate on every PR: fresh coverage-review subagent over the diff, then
 fable pass/fail. Checks: npx vitest run <slice tests>, architecture test,
 S3 i18n guard (tests/localization_fixes.test.ts), parity goldens, and
 npm run build on PR4/PR5.
+
+---
+
+## Hunter DPS identity pass
+
+- Packlord uses Packbond as a pet-fed cadence. Every third landed companion attack
+  advances Howling Rage and opens an 8 sec free Fell Shot window, turning pet uptime
+  into a visible mobile payoff while preserving mana as the hunter resource.

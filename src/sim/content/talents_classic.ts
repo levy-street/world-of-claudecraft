@@ -107,8 +107,28 @@ const HUNTER_SPECS: SpecDef[] = [
     'A wild commander who fights beside a durable companion.',
     'bestial_wrath',
     'Packbond',
-    'Your pet deals 35% more damage. Increases maximum health by 8%.',
-    { global: { petDmgPct: 0.35 }, stats: { maxHpPct: 0.08 } },
+    'Your pet deals 20% more damage and you gain 8% maximum health. Every 3rd landed pet attack reduces Howling Rage cooldown by 4 sec and makes your next Fell Shot within 8 sec free.',
+    {
+      global: { petDmgPct: 0.2 },
+      stats: { maxHpPct: 0.08 },
+      proc: {
+        id: 'hun_packbond',
+        name: 'Packbond',
+        spec: 'beast_mastery',
+        requiresKnownAbility: 'bestial_wrath',
+        school: 'nature',
+        trigger: { on: 'petHitNth', n: 3 },
+        responses: [
+          { kind: 'cooldownRefund', ability: 'bestial_wrath', seconds: 4 },
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_free',
+            abilities: ['arcane_shot'],
+            duration: 8,
+          },
+        ],
+      },
+    },
   ),
   spec(
     'marksmanship',

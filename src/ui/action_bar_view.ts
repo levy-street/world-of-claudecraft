@@ -309,6 +309,13 @@ function oathsDueProcState(
   return hasAura(player.auras, 'pal_oaths_due') ? 'armed' : 'none';
 }
 
+function fellShotProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'hun_packbond') ? 'armed' : 'none';
+}
+
 // Ability ids map to pure proc resolvers here, keeping the painter generic. New
 // action cues extend this table rather than adding ability branches to DOM code.
 const PROC_STATE_RESOLVERS: Readonly<Record<string, ProcStateResolver | undefined>> = {
@@ -316,6 +323,7 @@ const PROC_STATE_RESOLVERS: Readonly<Record<string, ProcStateResolver | undefine
   earth_shock: fulminationProcState,
   exorcism: bloodDebtProcState,
   crusader_strike: oathsDueProcState,
+  arcane_shot: fellShotProcState,
 };
 
 function procStateForAbility(

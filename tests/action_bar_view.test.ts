@@ -331,6 +331,22 @@ describe('actionBarView: proc availability cues', () => {
     charges,
   });
 
+  it('marks Fell Shot armed during the Packbond free-shot window', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('arcane_shot') })),
+      fakeDeps(),
+    );
+
+    expect(view.tick(world()).slots[0].procState).toBe('none');
+    expect(
+      view.tick(
+        world({
+          playerAuras: [{ id: 'hun_packbond', kind: 'next_cast_free' }],
+        }),
+      ).slots[0].procState,
+    ).toBe('armed');
+  });
+
   it('keeps ordinary abilities and Icefall without stored Icicles at none', () => {
     const view = createActionBarView(
       descriptor(

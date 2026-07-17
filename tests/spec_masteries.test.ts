@@ -90,8 +90,25 @@ describe('spec masteries', () => {
       },
     });
     expect(TALENTS.hunter?.specs.find((s) => s.id === 'beast_mastery')?.mastery.effect).toEqual({
-      global: { petDmgPct: 0.35 },
+      global: { petDmgPct: 0.2 },
       stats: { maxHpPct: 0.08 },
+      proc: {
+        id: 'hun_packbond',
+        name: 'Packbond',
+        spec: 'beast_mastery',
+        requiresKnownAbility: 'bestial_wrath',
+        school: 'nature',
+        trigger: { on: 'petHitNth', n: 3 },
+        responses: [
+          { kind: 'cooldownRefund', ability: 'bestial_wrath', seconds: 4 },
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_free',
+            abilities: ['arcane_shot'],
+            duration: 8,
+          },
+        ],
+      },
     });
     expect(TALENTS.rogue?.specs.find((s) => s.id === 'combat')?.mastery.effect).toEqual({
       global: { meleeHastePct: 0.1, meleeDmgPct: -0.1 },
@@ -203,8 +220,8 @@ describe('spec masteries', () => {
   it('applies petDmgPct at BOTH the melee and ranged pet damage sites, not only the helper', () => {
     // Drive the actual damage sites (a regression that drops `dmg *= petDamageMult` at
     // either would still pass a helper-only assertion). Same seed + fixed rolls + an
-    // identical dummy (armor cancels in the ratio) isolate the multiplier: BM's Packbond (petDmgPct 0.35)
-    // must deal exactly 1.35x what a no-pet-mastery spec's identical pet deals.
+    // identical dummy (armor cancels in the ratio) isolate the multiplier: Packlord's
+    // Packbond (petDmgPct 0.2) deals 1.2x a sibling spec's identical pet damage.
     const setup = (spec: string) => {
       const sim = new Sim({ seed: 11, playerClass: 'hunter', autoEquip: true });
       sim.setPlayerLevel(20);
@@ -248,12 +265,12 @@ describe('spec masteries', () => {
     const meleeBm = dealtMelee('beast_mastery');
     const meleeNone = dealtMelee('marksmanship');
     expect(meleeNone).toBeGreaterThan(0);
-    expect(meleeBm / meleeNone).toBeCloseTo(1.35, 2);
+    expect(meleeBm / meleeNone).toBeCloseTo(1.2, 2);
 
     const rangedBm = dealtRanged('beast_mastery');
     const rangedNone = dealtRanged('marksmanship');
     expect(rangedNone).toBeGreaterThan(0);
-    expect(rangedBm / rangedNone).toBeCloseTo(1.35, 2);
+    expect(rangedBm / rangedNone).toBeCloseTo(1.2, 2);
   });
 
   it('Veinleech (siphon_life) leeches: the affliction dot tick heals the caster', () => {
@@ -297,7 +314,7 @@ describe('spec masteries', () => {
     hunterPet.ownerId = hunter.player.id;
     expect(
       (hunter as unknown as { petDamageMult(e: Entity): number }).petDamageMult(hunterPet),
-    ).toBeCloseTo(1.35);
+    ).toBeCloseTo(1.2);
 
     const paladin = new Sim({ seed: 6, playerClass: 'paladin', autoEquip: true });
     paladin.setPlayerLevel(20);
@@ -397,7 +414,7 @@ describe('spec masteries', () => {
         retribution: { global: 'meleeDmgPct', value: 0.2 },
       },
       hunter: {
-        beast_mastery: { global: 'petDmgPct', value: 0.35 },
+        beast_mastery: { global: 'petDmgPct', value: 0.2 },
         marksmanship: { global: 'meleeDmgPct', value: 0.2 },
         survival: { global: 'meleeDmgPct', value: 0.15 },
       },
