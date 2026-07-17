@@ -747,6 +747,33 @@ describe('actionBarView: proc availability cues', () => {
     });
   });
 
+  it('prices and cues each Doctrine prayer during Fixed Purpose', () => {
+    const playerAuras = [{ id: 'pri_fixed_purpose', kind: 'next_cast_cheap' as const }];
+    for (const abilityId of ['lesser_heal', 'heal', 'flash_heal']) {
+      const view = createActionBarView(
+        descriptor(slot(1, { ability: ability(abilityId, { cost: 80 }) })),
+        fakeDeps(),
+      );
+      expect(view.tick(world({ resource: 39, playerAuras })).slots[0]).toMatchObject({
+        usable: false,
+        procState: 'armed',
+      });
+      expect(view.tick(world({ resource: 40, playerAuras })).slots[0]).toMatchObject({
+        usable: true,
+        procState: 'armed',
+      });
+    }
+
+    const renew = createActionBarView(
+      descriptor(slot(1, { ability: ability('renew', { cost: 80 }) })),
+      fakeDeps(),
+    );
+    expect(renew.tick(world({ resource: 40, playerAuras })).slots[0]).toMatchObject({
+      usable: false,
+      procState: 'none',
+    });
+  });
+
   it('keeps ordinary abilities and Icefall without stored Icicles at none', () => {
     const view = createActionBarView(
       descriptor(

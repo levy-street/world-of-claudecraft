@@ -325,6 +325,14 @@ describe('createAurasView: derivation per mode', () => {
     expect(state.slots[0].isActionable).toBe(true);
   });
 
+  it('marks Fixed Purpose as an actionable prayer discount', () => {
+    const state = createAurasView('all', deps()).tick(
+      entity([aura({ id: 'pri_fixed_purpose', kind: 'next_cast_cheap' })]),
+    );
+
+    expect(state.slots[0].isActionable).toBe(true);
+  });
+
   it('marks both Sacrament healing handoffs as actionable windows', () => {
     const state = createAurasView('all', deps()).tick(
       entity([

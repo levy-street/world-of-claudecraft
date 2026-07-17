@@ -59,7 +59,23 @@ describe('spec masteries', () => {
     });
     expect(TALENTS.priest?.specs.find((s) => s.id === 'discipline')?.mastery.effect).toEqual({
       global: { absorbPct: 0.3 },
-      stats: { maxHpPct: 0.08 },
+      proc: {
+        id: 'pri_fixed_purpose',
+        name: 'Fixed Purpose',
+        spec: 'discipline',
+        requiresKnownAbility: 'power_word_shield',
+        school: 'holy',
+        trigger: { on: 'shieldConsumed', ability: 'power_word_shield' },
+        responses: [
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_cheap',
+            abilities: ['lesser_heal', 'heal', 'flash_heal'],
+            duration: 8,
+            costPct: 0.5,
+          },
+        ],
+      },
     });
     expect(TALENTS.druid?.specs.find((s) => s.id === 'restoration')?.mastery.effect).toEqual({
       global: { hotHealPct: 0.25 },

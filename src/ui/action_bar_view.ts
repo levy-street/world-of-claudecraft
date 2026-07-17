@@ -283,6 +283,9 @@ const CHEAP_COST_AURA_IDS_BY_ABILITY: Readonly<Record<string, readonly string[]>
   starfire: ['dru_moonrage_lunar'],
   rejuvenation: ['dru_grove_covenant'],
   flash_of_light: ['pal_dawns_reply'],
+  lesser_heal: ['pri_fixed_purpose'],
+  heal: ['pri_fixed_purpose'],
+  flash_heal: ['pri_fixed_purpose'],
   sinister_strike: ['rog_dusk_dividend'],
   backstab: ['rog_dusk_dividend'],
   gouge: ['rog_dusk_dividend'],
@@ -537,6 +540,13 @@ function groveCovenantProcState(
   return hasAura(player.auras, 'dru_grove_covenant') ? 'armed' : 'none';
 }
 
+function fixedPurposeProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'pri_fixed_purpose') ? 'armed' : 'none';
+}
+
 // Ability ids map to pure proc resolvers here, keeping the painter generic. New
 // action cues extend this table rather than adding ability branches to DOM code.
 const PROC_STATE_RESOLVERS: Readonly<Record<string, ProcStateResolver | undefined>> = {
@@ -578,6 +588,9 @@ const PROC_STATE_RESOLVERS: Readonly<Record<string, ProcStateResolver | undefine
   rip: redHazeAttackProcState,
   regrowth: grovesGiftProcState,
   rejuvenation: groveCovenantProcState,
+  lesser_heal: fixedPurposeProcState,
+  heal: fixedPurposeProcState,
+  flash_heal: fixedPurposeProcState,
 };
 
 function procStateForAbility(

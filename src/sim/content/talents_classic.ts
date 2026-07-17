@@ -508,8 +508,27 @@ const PRIEST_SPECS: SpecDef[] = [
     'A mitigator who shields allies and heals through controlled efficiency.',
     'power_infusion',
     'Fixed Purpose',
-    'Your shields absorb 30% more. Increases maximum health by 8%.',
-    { global: { absorbPct: 0.3 }, stats: { maxHpPct: 0.08 } },
+    'When Psalm of Warding is fully consumed, it makes your next Whispered Prayer, Solemn Prayer, or Urgent Prayer within 8 sec cost 50% less. Your shields absorb 30% more.',
+    {
+      global: { absorbPct: 0.3 },
+      proc: {
+        id: 'pri_fixed_purpose',
+        name: 'Fixed Purpose',
+        spec: 'discipline',
+        requiresKnownAbility: 'power_word_shield',
+        school: 'holy',
+        trigger: { on: 'shieldConsumed', ability: 'power_word_shield' },
+        responses: [
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_cheap',
+            abilities: ['lesser_heal', 'heal', 'flash_heal'],
+            duration: 8,
+            costPct: 0.5,
+          },
+        ],
+      },
+    },
   ),
   spec(
     'holy',

@@ -1117,3 +1117,13 @@ npm run build on PR4/PR5.
   Last Rite cooldown refund: Hallowed Wall resets Sacred Goad and opens an 8 sec free
   Verdict. Third Benediction and Afterglow Aegis are unchanged, and neither Blood Debt
   nor Oath's Due is altered.
+
+## Priest healer identity pass
+
+- Doctrine uses Fixed Purpose as a deterministic ward-to-heal relay. A fully consumed
+  Psalm of Warding opens an 8 sec half-mana Whispered, Solemn, or Urgent Prayer, so the
+  healer chooses where to pre-shield and which damaged ally receives the efficient
+  follow-up. The existing 30% absorption axis remains, while the passive 8% maximum-health
+  filler is removed. Warding Refrain, Shattered Psalm, and Halo Aftershock can feed more
+  wards into the rotation, and the shared Last Blessing option remains available without
+  changing either Vespers channel option.

@@ -94,6 +94,7 @@ const ACTIONABLE_AURA_IDS: ReadonlySet<string> = new Set([
   'dru_red_haze_relay',
   'dru_groves_gift',
   'dru_grove_covenant',
+  'pri_fixed_purpose',
   'pal_kindled_faith',
   'pal_dawns_reply',
   'pal_oathward',
