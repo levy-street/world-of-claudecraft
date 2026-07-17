@@ -1909,6 +1909,174 @@ describe('MobileControls pointer lifecycle', () => {
   });
 });
 
+describe('MobileControls pinch lifecycle after camera zoom', () => {
+  function gestureRecorder(): {
+    input: Input;
+    deltas: Array<{ dx: number; dy: number }>;
+    zooms: number[];
+  } {
+    const deltas: Array<{ dx: number; dy: number }> = [];
+    const zooms: number[] = [];
+    const input = {
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+      applyTouchLookDelta: (dx: number, dy: number) => {
+        deltas.push({ dx, dy });
+      },
+      zoomBy: (delta: number) => {
+        zooms.push(delta);
+      },
+    } as unknown as Input;
+    return { input, deltas, zooms };
+  }
+
+  function touch(target: EventTarget, type: string, pointerId: number, x: number, y: number): void {
+    target.dispatchEvent(
+      pointerEvent(type, { pointerId, pointerType: 'touch', clientX: x, clientY: y }),
+    );
+  }
+
+  it('restores camera rotation when a pinch finger lifts over HUD chrome', () => {
+    const { canvas, windowTarget } = installMobileControlDom();
+    const { input, deltas, zooms } = gestureRecorder();
+    new MobileControls(input, mobileCallbacks()).start();
+
+    touch(canvas, 'pointerdown', 31, 140, 300);
+    touch(canvas, 'pointerdown', 32, 260, 300);
+    touch(canvas, 'pointermove', 31, 160, 300);
+    expect(zooms.length).toBeGreaterThan(0);
+    const zoomsDuringPinch = zooms.length;
+
+    windowTarget.dispatchEvent(
+      pointerEvent('pointerup', {
+        pointerId: 31,
+        pointerType: 'touch',
+        clientX: 80,
+        clientY: 600,
+      }),
+    );
+    touch(canvas, 'pointerup', 32, 260, 300);
+
+    touch(canvas, 'pointerdown', 33, 150, 300);
+    touch(canvas, 'pointermove', 33, 190, 300);
+    touch(canvas, 'pointermove', 33, 230, 300);
+    expect(deltas.length).toBeGreaterThan(0);
+    expect(zooms.length).toBe(zoomsDuringPinch);
+  });
+
+  it('restores camera rotation when browser gesture takeover cancels the pinch', () => {
+    const { canvas, windowTarget } = installMobileControlDom();
+    const { input, deltas, zooms } = gestureRecorder();
+    let recenters = 0;
+    new MobileControls(input, {
+      ...mobileCallbacks(),
+      onRecenterCamera: () => {
+        recenters += 1;
+      },
+    }).start();
+
+    touch(canvas, 'pointerdown', 34, 140, 300);
+    touch(canvas, 'pointerdown', 35, 260, 300);
+    touch(canvas, 'pointermove', 34, 160, 300);
+    expect(zooms.length).toBeGreaterThan(0);
+    const zoomsDuringPinch = zooms.length;
+
+    windowTarget.dispatchEvent(
+      pointerEvent('pointercancel', { pointerId: 34, pointerType: 'touch' }),
+    );
+    windowTarget.dispatchEvent(
+      pointerEvent('pointercancel', { pointerId: 35, pointerType: 'touch' }),
+    );
+
+    touch(canvas, 'pointerdown', 36, 150, 300);
+    touch(canvas, 'pointermove', 36, 190, 300);
+    touch(canvas, 'pointermove', 36, 230, 300);
+    expect(deltas.length).toBeGreaterThan(0);
+    expect(zooms.length).toBe(zoomsDuringPinch);
+    expect(recenters).toBe(0);
+  });
+
+  it('hands the remaining finger to camera drag when a pinch becomes one finger', () => {
+    const { canvas } = installMobileControlDom();
+    const { input, deltas, zooms } = gestureRecorder();
+    new MobileControls(input, mobileCallbacks()).start();
+
+    touch(canvas, 'pointerdown', 41, 140, 300);
+    touch(canvas, 'pointerdown', 42, 260, 300);
+    touch(canvas, 'pointermove', 41, 160, 300);
+    expect(zooms.length).toBeGreaterThan(0);
+    const zoomsDuringPinch = zooms.length;
+
+    touch(canvas, 'pointerup', 41, 160, 300);
+    touch(canvas, 'pointermove', 42, 300, 300);
+    expect(deltas).toEqual([]);
+    touch(canvas, 'pointermove', 42, 340, 300);
+    expect(deltas).toEqual([{ dx: 40, dy: 0 }]);
+    touch(canvas, 'pointermove', 42, 380, 300);
+    touch(canvas, 'pointerup', 42, 380, 300);
+
+    expect(deltas.length).toBeGreaterThan(0);
+    expect(zooms.length).toBe(zoomsDuringPinch);
+  });
+
+  it('clears pinch tracking on blur before the next touch', () => {
+    const { canvas, windowTarget } = installMobileControlDom();
+    const { input, deltas, zooms } = gestureRecorder();
+    new MobileControls(input, mobileCallbacks()).start();
+
+    touch(canvas, 'pointerdown', 51, 140, 300);
+    touch(canvas, 'pointerdown', 52, 260, 300);
+    (windowTarget as unknown as EventTarget).dispatchEvent(new Event('blur'));
+
+    touch(canvas, 'pointerdown', 53, 150, 300);
+    touch(canvas, 'pointermove', 53, 190, 300);
+    touch(canvas, 'pointermove', 53, 230, 300);
+    expect(deltas.length).toBeGreaterThan(0);
+    expect(zooms).toEqual([]);
+  });
+
+  it('keeps the normal full pinch cycle intact', () => {
+    const { canvas } = installMobileControlDom();
+    const { input, deltas, zooms } = gestureRecorder();
+    new MobileControls(input, mobileCallbacks()).start();
+
+    touch(canvas, 'pointerdown', 61, 140, 300);
+    touch(canvas, 'pointerdown', 62, 260, 300);
+    touch(canvas, 'pointermove', 61, 160, 300);
+    touch(canvas, 'pointerup', 62, 260, 300);
+    touch(canvas, 'pointerup', 61, 160, 300);
+    expect(zooms.length).toBeGreaterThan(0);
+    const zoomsDuringPinch = zooms.length;
+
+    touch(canvas, 'pointerdown', 63, 150, 300);
+    touch(canvas, 'pointermove', 63, 190, 300);
+    touch(canvas, 'pointermove', 63, 230, 300);
+    expect(deltas.length).toBeGreaterThan(0);
+    expect(zooms.length).toBe(zoomsDuringPinch);
+  });
+
+  it('re-baselines the surviving pair on a three to two finger transition', () => {
+    const { canvas } = installMobileControlDom();
+    const { input, zooms } = gestureRecorder();
+    new MobileControls(input, mobileCallbacks()).start();
+
+    touch(canvas, 'pointerdown', 71, 100, 300);
+    touch(canvas, 'pointerdown', 72, 200, 300);
+    touch(canvas, 'pointerdown', 73, 500, 300);
+    const zoomsBeforeLift = zooms.length;
+
+    touch(canvas, 'pointerup', 71, 100, 300);
+    touch(canvas, 'pointermove', 72, 201, 300);
+    expect(zooms.length).toBe(zoomsBeforeLift);
+
+    touch(canvas, 'pointermove', 72, 300, 300);
+    expect(zooms.length).toBe(zoomsBeforeLift + 1);
+    expect(zooms[zooms.length - 1]).toBeGreaterThan(0);
+  });
+});
+
 describe('MobileControls chrome idle-fade lifecycle', () => {
   afterEach(() => {
     vi.useRealTimers();

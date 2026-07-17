@@ -301,6 +301,11 @@ export class MobileControls {
   private swipeLookActive = false;
   private swipeLookDownAt = 0;
   private lastSwipeTapAt = 0;
+  // A finger inherited from a pinch may have moved outside the canvas before
+  // the other finger lifted. Resync its first live move before rotating, and
+  // never treat that inherited pointer as a camera-recenter tap.
+  private swipeLookResync = false;
+  private swipeLookAdopted = false;
 
   private chatPressTimer: ReturnType<typeof setTimeout> | null = null;
   private chatLongFired = false;
@@ -396,22 +401,26 @@ export class MobileControls {
     window.addEventListener('pointerup', (e) => {
       this.onMoveEnd(e);
       this.onCameraEnd(e);
+      this.onPinchEnd(e);
+      this.onSwipeLookEnd(e);
     });
     window.addEventListener('pointercancel', (e) => {
       this.onMoveEnd(e);
       this.onCameraEnd(e);
+      this.onPinchEnd(e);
+      this.onSwipeLookEnd(e);
     });
     window.addEventListener('blur', () => {
       this.releaseMove();
       this.releaseCamera();
-      this.releaseSwipeLook();
+      this.releasePinch();
       this.touchOwners.releaseAll();
     });
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'hidden') {
         this.releaseMove();
         this.releaseCamera();
-        this.releaseSwipeLook();
+        this.releasePinch();
         this.touchOwners.releaseAll();
       }
     });
@@ -986,8 +995,41 @@ export class MobileControls {
   }
 
   private onPinchEnd(e: PointerEvent): void {
-    this.pinchPointers.delete(e.pointerId);
+    // Canvas releases also reach the window listener, so only the first event
+    // for this pointer may change the gesture state.
+    if (!this.pinchPointers.delete(e.pointerId)) return;
     if (this.pinchPointers.size < 2) this.pinchPrevDist = null;
+    else this.pinchPrevDist = this.currentPinchDist();
+
+    if (
+      this.pinchPointers.size !== 1 ||
+      !this.active ||
+      this.swipeLookPointer !== null ||
+      this.lookPointer !== null ||
+      document.body.classList.contains('mobile-window-open')
+    )
+      return;
+
+    const remainingId = this.pinchPointers.keys().next().value;
+    if (remainingId === undefined) return;
+    const position = this.pinchPointers.get(remainingId);
+    if (!position) return;
+
+    this.touchOwners.set(remainingId, 'camera');
+    this.swipeLookPointer = remainingId;
+    this.swipeLookStartX = position.x;
+    this.swipeLookStartY = position.y;
+    this.swipeLookLastX = position.x;
+    this.swipeLookLastY = position.y;
+    this.swipeLookActive = false;
+    this.swipeLookDownAt = this.now();
+    this.swipeLookResync = true;
+    this.swipeLookAdopted = true;
+    try {
+      this.canvas?.setPointerCapture(remainingId);
+    } catch {
+      /* synthetic test event */
+    }
   }
 
   private releasePinch(): void {
@@ -1043,6 +1085,14 @@ export class MobileControls {
       this.releaseSwipeLook();
       return;
     }
+    if (this.swipeLookResync) {
+      this.swipeLookResync = false;
+      this.swipeLookStartX = e.clientX;
+      this.swipeLookStartY = e.clientY;
+      this.swipeLookLastX = e.clientX;
+      this.swipeLookLastY = e.clientY;
+      return;
+    }
     const totalDx = e.clientX - this.swipeLookStartX;
     const totalDy = e.clientY - this.swipeLookStartY;
     if (!this.swipeLookActive) {
@@ -1069,7 +1119,10 @@ export class MobileControls {
     // never crossed the swipe deadzone (never became a drag); two of those in
     // quick succession recenter the camera, mirroring the joystick logic.
     const now = this.now();
-    const quickTap = !this.swipeLookActive && now - this.swipeLookDownAt <= RECENTER_DOUBLE_TAP_MS;
+    const quickTap =
+      !this.swipeLookAdopted &&
+      !this.swipeLookActive &&
+      now - this.swipeLookDownAt <= RECENTER_DOUBLE_TAP_MS;
     if (quickTap && isRecenterDoubleTap(this.lastSwipeTapAt, now, this.swipeLookActive)) {
       this.callbacks.onRecenterCamera();
       this.lastSwipeTapAt = 0;
@@ -1096,6 +1149,8 @@ export class MobileControls {
       this.input.setTouchLookVector({ x: 0, y: 0 });
     }
     this.swipeLookActive = false;
+    this.swipeLookResync = false;
+    this.swipeLookAdopted = false;
   }
 }
 
