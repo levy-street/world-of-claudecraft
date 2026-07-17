@@ -366,6 +366,7 @@ export const pl_PL: EnTranslations = {
       "spinButton": "Zakręć",
       "tasks": "Zadania",
       "taskMultiplier": "mnożnik x{multiplier}",
+      "oneVsOneExcluded": "Mecze 1 na 1 nie przyznają punktów codziennych nagród.",
       "pointsGained": "Zdobyto {points} pkt. codziennych nagród.",
       "showChestButton": "Pokaż skrzynię",
       "hideChestButton": "Ukryj skrzynię",
@@ -2199,9 +2200,10 @@ export const pl_PL: EnTranslations = {
       "charTitleNone": "Nie wybrano tytułu",
       "charOpenBook": "Księga Czynów",
       "lbTab": "Renoma",
-      "lbDeedsCol": "Czyny",
       "lbTitleCol": "Tytuł",
-      "lbSelf": "Twoja pozycja: miejsce {rank}, czołowe {percent} procent",
+      "lbScopeNote": "Accounts ranked by lifetime Renown. Each deed counts once across all characters on an account.",
+      "lbSelfAccount": "Your account: rank {rank}, top {percent} percent, {renown} Renown",
+      "lbSelfRank": "Your account: rank {rank}, top {percent} percent",
       "lbEmpty": "W rankingu nie ma jeszcze żadnych kronikarzy.",
       "broadcastsLabel": "Ogłaszaj zdobyte czyny gildii i znajomym",
       "titledName": "{name} [{title}]"
@@ -2991,8 +2993,8 @@ export const pl_PL: EnTranslations = {
       "heroicRewardsTitle": "Znaki Heroiczne i ulepszone zdobycze",
       "heroicRewardsBody": "Heroiczni bossowie upuszczają znany ci łup, ulepszony i oznaczony jako Heroiczny w podpowiedzi, a ostatni boss każdego przebiegu dorzuca epiki, których nie znajdziesz nigdzie indziej. To ostatnie zabójstwo zostawia też każdemu uczestnikowi Znaki Heroiczne: walutę wydawaną u Kwatermistrza Vexa w Highwatch, którego zapas pierścieni i naszyjników to jedyna biżuteria w królestwie.",
       "heroicLockoutBody": "Normalne lochy można przemierzać bez końca. Tryb heroiczny wymaga cierpliwości: zabicie ostatniego bossa blokuje wszystkim w przebiegu więcej niż jedno heroiczne ukończenie tego lochu na dzień, a rajd prowadzi osobną dzienną blokadę dla każdej trudności. Ukończony przebieg dla pięciu graczy pozostaje otwarty dla własnej drużyny, na powroty po ciało i łupy, więc nikt nie zostaje odcięty od tego, co tam zdobył. Rajd jest surowszy: gdy jego zabójstwo cię zablokuje, drzwi pozostają zamknięte aż do dziennego resetu, więc zbierz swoje zdobycze, zanim opuścisz arenę.",
-      "resetTitle": "Resetting your instances",
-      "resetBody": "Switch difficulty while your group still holds claimed runs and the old claims linger for a while before clearing on their own. The party leader can let them go at once instead: choose Reset All Instances on their own portrait menu, or type /dungeon reset. A reset works only after the difficulty has actually been changed, only while nobody, living or fallen, remains inside, and a short cooldown separates one reset from the next. Arrive at the door on the wrong difficulty and the game says so before the run starts. The raid is never reset this way; its own lockout rules stand.",
+      "resetTitle": "Resetowanie instancji",
+      "resetBody": "Jeśli zmienisz trudność, gdy grupa wciąż ma zajęte podejścia, stare przypisania pozostaną przez pewien czas. Przywódca może porzucić je natychmiast, wybierając Resetuj wszystkie instancje w menu własnego portretu albo wpisując /dungeon reset. Trudność musi faktycznie zostać zmieniona, wewnątrz nie może pozostać nikt żywy ani poległy, a kolejne resety dzieli krótki czas odnowienia. Przy wejściu na złej trudności gra ostrzeże przed rozpoczęciem. Rajdu nie resetuje się w ten sposób; obowiązują jego własne zasady blokady.",
       "templeLoreTitle": "Zatopiona Świątynia, nieco głębiej",
       "templeLoreBody": "Świątynia ma własną legendę, starszą niż kult, którego tropisz gdzie indziej. Na brzegu Migotliwego Stawu, jeziorka, które pije światło księżyca i oddaje utopionych, samotny strażnik pilnuje bramy bladego światła. Pod powierzchnią schody z zimnego kamienia zbiegają w dół do niej. Lud, który tam zatonął, nie utonął przez nieszczęśliwy wypadek: byli to członkowie Bladego Chóru, którzy zeszli pod wodę w modlitwie i nigdy nie przestali śpiewać. Dawni strażnicy wydrapali jedno ostrzeżenie w skałach, zanim woda ich pochłonęła, modlitwę do czegoś, co nazwali Utopionym Księżycem, a pewniejsza ręka dopisała pod nią dwa słowa: ono tylko śpi.",
       "cryptLeadTitle": "Drzwi, które zmarli mieli trzymać zamknięte",
@@ -3100,7 +3102,7 @@ export const pl_PL: EnTranslations = {
       "howHeading": "Jak działają czyny",
       "howBody": "Czyny zdobywasz i przechowujesz jedną postacią naraz, więc każdy bohater, którym grasz, buduje własną Księgę; dopiero ranking królestwa zbiera twoją Renomę ze wszystkich postaci, którymi grasz, i liczy każdy czyn tylko raz. Każdy czyn jasno opisuje, czego od ciebie wymaga, wprost w Księdze Czynów w grze, więc zawsze wiesz, za czym gonić, a te, na których ci zależy, możesz zacząć śledzić, by mieć je na oku podczas gry. Nieliczne pozostają tajemnicą i ujawniają się dopiero wtedy, gdy je zdobędziesz. Księga dba też o rzetelność: cokolwiek zdoła potwierdzić twoja dotychczasowa historia, zalicza od razu, więc weteran nigdy nie otwiera jej na pustej stronie; jedynie czyny zliczające zaczynają swój rachunek od nowa.",
       "renownHeading": "Renoma",
-      "renownBody": "Renoma to wynik kryjący się za Księgą. Każdy zdobyty czyn jest wart ustaloną liczbę punktów, a twoja suma tylko rośnie, więc spokojny tydzień nigdy nie odbiera ci pozycji. Garść czynów zależy od szczęścia, a nie umiejętności, Wyczyny zaś są osobnym wyróżnieniem, dlatego ani jedne, ani drugie nie są warte żadnej Renomy.",
+      "renownBody": "Renown is the score behind the Book. Every deed you earn is worth a set amount, and your total only ever climbs, so a quiet week never costs you ground. A handful of deeds turn on luck rather than skill, and Feats are an honor of their own, so both of those are worth no Renown at all. Deeds without Renown still count toward completion in your Book; they simply never score.",
       "rewardsHeading": "Tytuły i obramowania",
       "rewardsBody": "Nagrody służą wyłącznie ozdobie i właśnie o to chodzi. Niektóre czyny przyznają tytuł do noszenia albo obramowanie, które oprawi twoje imię, nigdy zaś nic, co uczyniłoby twojego bohatera silniejszym. Wybierz tytuł w Księdze Czynów, a będzie ci towarzyszył na plakietce z imieniem, na czacie i w rankingach, na oczach wszystkich.",
       "chroniclesHeading": "Kroniki",
@@ -3109,7 +3111,7 @@ export const pl_PL: EnTranslations = {
       "featsBody": "Wyczyny to osobna półka: zapisy dziedzictwa i dokonań pierwszych na świecie, czyny związane z minioną erą albo chwilą, która wydarzy się tylko raz. Nie niosą Renomy i nie wliczają się do licznika ukończenia, przechowywane na zawsze jako pamiątka tego, czego dokonano.",
       "catalogHeading": "Pełny rejestr czynów",
       "catalogBody": "Oto wszystkie czyny, jakie mieści Księga, zebrane według kategorii. Te tajemne celowo pominięto: czekają, aż je odnajdziesz. Otwórz Księgę Czynów w grze, aby zobaczyć dokładnie, czego każdy z nich wymaga.",
-      "standingsNote": "Królestwa prowadzą bieżący rachunek Renomy na wszystkich kontach. Aby zobaczyć, kto jak stoi, otwórz Ranking w grze i przejdź do jego zakładki Renomy; zestawienie żyje tam, nie na wiki.",
+      "standingsNote": "The realms keep a running tally of Renown across every account: the board ranks whole accounts by lifetime Renown, counting each deed once across all your characters, and it shows Renown alone, so deeds that carry none never move the standings even though they count in your Book. To see who stands where, open the Leaderboard in game and turn to its Renown tab; the standings live there, not on the wiki.",
       "catHeading": "{label} ({count})",
       "colName": "Czyn",
       "colRenown": "Renoma",
@@ -3200,7 +3202,7 @@ export const pl_PL: EnTranslations = {
       "qualityNote": "Wyższa jakość zwykle oznacza lepsze statystyki, ale jakość to wskazówka, nie reguła. Dobrze dobrany przedmiot do twojej klasy i poziomu może pokonać bardziej efektowny.",
       "upgradeTitle": "Trzymaj wyposażenie na bieżąco",
       "upgradeBody": "Zastąpienie starego elementu świeżym ulepszeniem daje ci więcej niż perfekcyjna gra w wyposażeniu, z którego wyrosłeś. Gdy coś lepszego wypadnie lub zaoferuje to zadanie, weź to. Nie odkładaj dobrych przedmiotów na później.",
-      "itemLevelBody": "If you want a quick way to compare two pieces, turn on Show Item Level in the options. Gear with a known source, from enemies, quests, and the crafting trades, then shows an item level, a single figure for roughly how powerful it is based on where it came from, so you can tell at a glance which upgrade pulls more weight, even across different slots. Pieces with no such source, like plain vendor basics and starter gear, show no item level, so a missing figure is normal, not a fault.",
+      "itemLevelBody": "Aby szybko porównać dwa przedmioty, włącz w opcjach Pokaż poziom przedmiotu. Wyposażenie o znanym źródle, zdobyte z wrogów, zadań i profesji rzemieślniczych, pokazuje wtedy poziom przedmiotu: jedną liczbę przybliżającą jego moc na podstawie pochodzenia, co ułatwia ocenę ulepszeń nawet między różnymi miejscami. Przedmioty bez takiego źródła, jak podstawowe towary kupców i sprzęt startowy, nie pokazują poziomu; brak liczby jest normalny.",
       "sourcesTitle": "Skąd pochodzi wyposażenie",
       "sourcesBody": "Większość twoich wczesnych ulepszeń to nagrody za zadania, więc opłaca się kończyć zadania zamiast młócić wrogów. Wrogowie upuszczają wyposażenie, gdy ich pokonasz, sprzedawcy w mieście oferują solidne podstawy, rzemieślnicy przerabiają zebrane materiały na noszalne części, a rynek graczy pozwala kupować od innych poszukiwaczy przygód. Na samym szczycie dwie waluty znaków kupują ekwipunek nieosiągalny nigdzie indziej: Znaki Wypraw u opiekuna wypraw oraz Znaki heroiczne u heroicznego kwatermistrza.",
       "soulboundTitle": "Związany z duszą: tylko i wyłącznie twój",
@@ -3244,7 +3246,7 @@ export const pl_PL: EnTranslations = {
       "craftRecipesTitle": "Przepisy i składniki",
       "craftRecipesBody": "Każdy przepis wymaga konkretnych składników, które zbierasz lub kupujesz. Najprostsze przepisy potrzebują wyłącznie pospolitych materiałów i są dostępne od samego początku, więc możesz zacząć pracę w fachu od chwili, gdy go podejmiesz. Listy przepisów wciąż się zapełniają: kilka fachów czeka na swoje pierwsze przepisy, a kolejne pojawiają się wraz z rozwojem rzemiosł.",
       "craftHowTitle": "Okno wytwarzania",
-      "craftHowBody": "Open the Crafting window (default key T) to see every recipe you know, what each one needs, and what you have on hand; when the materials are there, one click does the work. Common recipes can be crafted anywhere in the world. A handful of advanced recipes, higher-tier tools and rare caster armor among them, instead ask you to stand at the crafting hub in Highwatch.",
+      "craftHowBody": "Otwórz okno Rzemiosła (domyślnie klawisz T), aby zobaczyć wszystkie znane receptury, ich wymagania i posiadane materiały; gdy masz składniki, wystarczy jedno kliknięcie. Zwykłe receptury można tworzyć wszędzie. Niektóre zaawansowane, w tym narzędzia wyższego poziomu i rzadkie pancerze dla czarujących, wymagają centrum rzemiosła w Highwatch.",
       "craftMasteryTitle": "Umiejętność i biegłość",
       "craftMasteryBody": "Udane wytwarzanie buduje umiejętność w danym fachu, a umiejętność nigdy nie zamyka przepisów rzemiosła: jeśli znasz przepis i masz jego materiały, możesz spróbować. To, co daje ci umiejętność, to jakość, wprawna ręka wykonuje lepszą robotę. Jedynym wyjątkiem są przepisy łączone, które wymagają, byś wykazał się w obu ich fachach, zanim się otworzą.",
       "craftComboTitle": "Przepisy łączone",
@@ -4366,6 +4368,24 @@ export const pl_PL: EnTranslations = {
     "balance": "Znaki heroiczne: {count}",
     "buyAria": "Kup {item} za {marks} Znaków heroicznych"
   },
+  "cardDuel": {
+    "title": "Card Duel",
+    "close": "Close",
+    "join": "Join Queue",
+    "joinAria": "Join the Card Duel queue",
+    "leave": "Leave Queue",
+    "leaveAria": "Leave the Card Duel queue",
+    "forfeit": "Forfeit",
+    "forfeitAria": "Forfeit the Card Duel",
+    "queued": "Waiting for an opponent...",
+    "unavailable": "Card Duel requires another player online.",
+    "vsOpponent": "vs {name}",
+    "round": "Round score: {mine} - {theirs}",
+    "counts": "Deck: {deck} · Discard: {discard}",
+    "playCardAria": "Play the {value} card",
+    "waitingOnOpponent": "Waiting on your opponent's card...",
+    "yourTurn": "Play a card"
+  },
   "delveUi": {
     "board": {
       "title": "Tablica Wypraw",
@@ -4864,6 +4884,11 @@ export const pl_PL: EnTranslations = {
       "quit": "Zakończ",
       "fatalBody": "World of ClaudeCraft napotkał nieoczekiwany błąd i musi się zamknąć."
     }
+  },
+  "gpuNotice": {
+    "bodyDesktop": "The game is running without GPU acceleration and will be slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
+    "bodyWeb": "The game is running without GPU acceleration and will be slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.",
+    "dismiss": "Dismiss"
   },
   "realm": {
     "noRealms": "Brak dostępnych światów.",
@@ -8693,6 +8718,11 @@ export const pl_PL: EnTranslations = {
         "title": "Złocona Szkatuła",
         "greeting": "Witaj w Złoconej Szkatule. Twoje dobra spoczywają bezpiecznie za naszymi zamkami."
       },
+      "card_master": {
+        "name": "Card Master",
+        "title": "Dealer of Chance",
+        "greeting": "Care for a Card Duel? Best of three, winner takes the bragging rights."
+      },
       "bursar_petra_vell": {
         "name": "Skarbniczka Petra Vell",
         "title": "Złocona Szkatuła",
@@ -9799,9 +9829,9 @@ export const pl_PL: EnTranslations = {
         "body": "Niewielu kiedykolwiek się dowie, co było pogrzebane w tamtej kotlinie, a jeszcze mniej by uwierzyło. Ja wiem i nie zapomnę.\n\nNiech twoja droga pozostanie jasna.\n- Brat Aldric"
       },
       "heroic_marks_reward": {
-        "sender": "The Heroic Quartermaster",
-        "subject": "Your Heroic Marks",
-        "body": "Your warband cleared the heroic trial while you fought from the back, or from the dirt. Your lockout was struck all the same, so your share of Heroic Marks flies to you here rather than being lost. Spend them well.\n\n- The Heroic Quartermaster"
+        "sender": "Heroiczny kwatermistrz",
+        "subject": "Twoje heroiczne znaki",
+        "body": "Twoja grupa pokonała heroiczną próbę, gdy walczyłeś na tyłach lub leżałeś pokonany. Twoja blokada również została zapisana, dlatego należna część heroicznych znaków trafiła tutaj, zamiast przepaść. Dobrze je wykorzystaj.\n\n- Heroiczny kwatermistrz"
       }
     },
     "itemSets": {
@@ -9827,7 +9857,7 @@ export const pl_PL: EnTranslations = {
       },
       "necromancers": {
         "name": "Szaty Mournweave",
-        "bonus2": "Nie można cię odrzucić (100% odporności na odrzucenie).",
+        "bonus2": "Zwiększa moc zaklęć o 20. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć (100% odporności na opóźnienie rzucania).",
         "bonus3": "Zwiększa intelekt o 10 i wytrzymałość o 10.",
         "bonus4": "Twoje zaklęcia mają 10% szansy na udzielenie Jasności Umysłu, dzięki czemu następne zaklęcie jest darmowe."
       },
@@ -9839,7 +9869,7 @@ export const pl_PL: EnTranslations = {
       },
       "soulflame": {
         "name": "Regalia Wraithfire",
-        "bonus2": "Nie można cię odrzucić (100% odporności na odrzucenie).",
+        "bonus2": "Zwiększa moc zaklęć o 20. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć (100% odporności na opóźnienie rzucania).",
         "bonus3": "Zwiększa intelekt o 15, ducha o 15 oraz szybkość ataku i rzucania zaklęć o 15%.",
         "bonus4": "Twoje zaklęcia mają 10% szansy na udzielenie Płomienia Duszy, zwiększającego moc zaklęć o 40 na 10 s."
       },
@@ -9851,7 +9881,7 @@ export const pl_PL: EnTranslations = {
       },
       "stormcallers": {
         "name": "Szaty Galecall",
-        "bonus2": "Nie można cię odrzucić (100% odporności na odrzucenie).",
+        "bonus2": "Zwiększa moc zaklęć o 20. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć (100% odporności na opóźnienie rzucania).",
         "bonus3": "Zwiększa intelekt o 15, ducha o 15 oraz szybkość ataku i rzucania zaklęć o 15%.",
         "bonus4": "Twoje zaklęcia mają 10% szansy na udzielenie Płomienia Duszy, zwiększającego moc zaklęć o 40 na 10 s."
       },

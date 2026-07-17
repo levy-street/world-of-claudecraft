@@ -103,8 +103,8 @@ describe('side rail height budget', () => {
   // arithmetic so the next button that would push the chest off-screen fails here.
   const BUDGET_PX = 660; // maximized 1366x768 usable viewport height
   const BOTTOM_ANCHOR_PX = 74; // #side-buttons { bottom: 74px }
-  const COMPACT_MICRO_PX = 25; // .micro-btn height under @media (max-height: 720px)
-  const COMPACT_GAP_PX = 3; // #side-buttons gap under the same media query
+  const COMPACT_MICRO_PX = 24; // .micro-btn height under @media (max-height: 720px)
+  const COMPACT_GAP_PX = 2; // #side-buttons gap under the same media query
   // The Daily Rewards chest block (button plus its gap) at the top of the rail,
   // from the reviewer's offline measurement of the rendered rail.
   const DAILY_CHEST_BLOCK_PX = 128;
@@ -112,9 +112,9 @@ describe('side rail height budget', () => {
   it('keeps the compaction media query and its values in hud.css', () => {
     expect(hudCss).toMatch(/@media \(max-height: 720px\)/);
     expect(hudCss).toMatch(
-      /@media \(max-height: 720px\)[\s\S]*?#side-buttons \.micro-btn \{\s*height: 25px;/,
+      /@media \(max-height: 720px\)[\s\S]*?#side-buttons \.micro-btn \{\s*height: 24px;/,
     );
-    expect(hudCss).toMatch(/@media \(max-height: 720px\)[\s\S]*?#side-buttons \{\s*gap: 3px;/);
+    expect(hudCss).toMatch(/@media \(max-height: 720px\)[\s\S]*?#side-buttons \{\s*gap: 2px;/);
     expect(hudCss).toMatch(/#side-buttons \{[^}]*bottom: 74px;/);
   });
 

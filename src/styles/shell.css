@@ -5687,6 +5687,11 @@
     flex: 1 1 auto;
     min-width: 0;
   }
+  .panel-title.char-title-portrait .char-honor-balance {
+    display: block;
+    color: var(--gold);
+    margin-top: var(--spacing-xs);
+  }
   .panel-title.char-title-portrait .portrait-chip {
     flex: 0 0 auto;
   }
@@ -7457,5 +7462,62 @@
   }
   #desktop-update-toast .desktop-update-restart {
     border-color: var(--color-primary);
+  }
+
+  /* ---------- software rendering notice ---------- */
+  /* Owned by src/ui/gpu_notice_toast.ts: a one-time, dismissible notice shown
+     when the session runs on a software rasterizer (WARP/SwiftShader). Shares
+     the update toast's visual language and top-right slot but sits BELOW that
+     slot so the two can never overlap when both show (desktop build with a
+     pending update on a no-GPU machine). */
+  #gpu-notice {
+    position: fixed;
+    /* The safe-area term keeps the toast clear of a notch on mobile shells
+       (pre-game portrait is allowed there); zero everywhere else. */
+    top: calc(var(--spacing-md) + 56px + env(safe-area-inset-top, 0px));
+    right: var(--spacing-md);
+    z-index: 260;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    max-width: min(440px, calc(100vw - 2 * var(--spacing-md)));
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: linear-gradient(180deg, rgba(21, 21, 31, 0.96) 0%, rgba(11, 11, 18, 0.98) 100%);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-light);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  }
+  #gpu-notice[hidden] {
+    display: none;
+  }
+  #gpu-notice button {
+    flex-shrink: 0;
+    padding: 4px 10px;
+    /* WCAG 2.5.8 absolute floor on any pointer; the coarse-pointer block below
+       raises it to the repo's 40x40 mobile touch floor (unlike the desktop
+       update toast, this one can surface in a mobile browser). */
+    min-height: 24px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    color: inherit;
+    font: inherit;
+    cursor: var(--cursor-point);
+  }
+  #gpu-notice button:hover {
+    border-color: var(--color-primary);
+  }
+  #gpu-notice button:focus-visible {
+    outline: 3px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  @media (pointer: coarse) {
+    #gpu-notice button {
+      min-height: 40px;
+      min-width: 40px;
+    }
   }
 }

@@ -1166,6 +1166,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.hideChestConfirmTitle': 'Ocultar o Baú de Recompensas Diárias?',
   'hudChrome.dailyRewards.pointsGained': '{points} pontos de recompensas diárias ganhos.',
   'hudChrome.dailyRewards.taskMultiplier': 'Multiplicador x{multiplier}',
+  'hudChrome.dailyRewards.oneVsOneExcluded':
+    'Partidas 1 contra 1 não concedem pontos de recompensas diárias.',
   'hudChrome.dailyRewards.totalPlayer': '{count} jogador hoje',
   'hudChrome.dailyRewards.totalPlayers': '{count} jogadores hoje',
   'hudChrome.death.resurrectAtCorpse': 'Ressuscitar no Cadáver',
@@ -6349,7 +6351,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Aumenta a velocidade de ataque e de lançamento em 15%.',
   'entities.itemSets.necromancers.name': 'Vestes Mournweave',
   'entities.itemSets.necromancers.bonus2':
-    'Você não pode ser repelido (100% de resistência a repulsão).',
+    'Aumenta o poder mágico em 20. Dano recebido não atrasa mais suas conjurações (100% de resistência a atraso de conjuração).',
   'entities.itemSets.necromancers.bonus3': 'Aumenta o intelecto em 10 e o vigor em 10.',
   'entities.itemSets.nighttalon.name': 'Traje de Couro Direfang',
   'entities.itemSets.nighttalon.bonus2': 'Aumenta o poder de ataque em 40.',
@@ -6357,12 +6359,12 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Aumenta a agilidade em 15, a chance de crítico em 2% e a velocidade de ataque e de lançamento em 15%.',
   'entities.itemSets.soulflame.name': 'Vestes Wraithfire',
   'entities.itemSets.soulflame.bonus2':
-    'Você não pode ser repelido (100% de resistência a repulsão).',
+    'Aumenta o poder mágico em 20. Dano recebido não atrasa mais suas conjurações (100% de resistência a atraso de conjuração).',
   'entities.itemSets.soulflame.bonus3':
     'Aumenta o intelecto em 15, o espírito em 15 e a velocidade de ataque e de lançamento em 15%.',
   'entities.itemSets.stormcallers.name': 'Vestes Galecall',
   'entities.itemSets.stormcallers.bonus2':
-    'Você não pode ser repelido (100% de resistência a repulsão).',
+    'Aumenta o poder mágico em 20. Dano recebido não atrasa mais suas conjurações (100% de resistência a atraso de conjuração).',
   'entities.itemSets.stormcallers.bonus3':
     'Aumenta o intelecto em 15, o espírito em 15 e a velocidade de ataque e de lançamento em 15%.',
   'entities.itemSets.vale_arcanist.name': 'Vestes do Arcanista do Vale',
@@ -6960,15 +6962,11 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.deedsPage.howHeading': 'Como funcionam os feitos',
   'guide.deedsPage.intro':
     'O Livro dos Feitos é onde o mundo anota tudo o que você já fez, dos primeiros passos fora do vale inicial às lutas mais duras que o reino pode oferecer. Conquiste feitos enquanto joga, ostente os títulos que eles concedem e veja seu Renome subir.',
-  'guide.deedsPage.renownBody':
-    'O Renome é a pontuação por trás do Livro. Cada feito conquistado vale uma quantia fixa, e seu total só sobe, então uma semana parada nunca faz você perder terreno. Um punhado de feitos depende mais de sorte do que de habilidade, e as Proezas são uma honraria à parte, então nenhum dos dois vale Renome algum.',
   'guide.deedsPage.renownHeading': 'Renome',
   'guide.deedsPage.rewardBorder': 'Moldura',
   'guide.deedsPage.rewardsBody':
     'As recompensas servem só para exibir, e é justamente essa a intenção. Alguns feitos concedem um título para ostentar ou uma moldura para o seu nome, e nunca nada que torne seu herói mais forte. Escolha o título que quiser no Livro dos Feitos e ele acompanha você na placa de nome, no chat e nos placares, para que todos vejam.',
   'guide.deedsPage.rewardsHeading': 'Títulos e molduras',
-  'guide.deedsPage.standingsNote':
-    'Os reinos mantêm uma contagem contínua de Renome de todas as contas. Para ver quem está onde, abra o Placar no jogo e vá até a aba de Renome; a classificação fica lá, não na wiki.',
   'guide.nav.deeds': 'Livro dos Feitos',
   'hudChrome.deeds.broadcastLine': '{name} realizou um feito: {deed}',
   'hudChrome.deeds.broadcastsLabel': 'Compartilhar feitos desbloqueados com a guilda e os amigos',
@@ -7001,9 +6999,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.filterNearly': 'Quase lá',
   'hudChrome.deeds.filterUnearned': 'Pendentes',
   'hudChrome.deeds.hiddenBadge': 'Oculto',
-  'hudChrome.deeds.lbDeedsCol': 'Feitos',
   'hudChrome.deeds.lbEmpty': 'Ainda não há cronistas na classificação.',
-  'hudChrome.deeds.lbSelf': 'Sua colocação: posição {rank}, entre os {percent} por cento melhores',
   'hudChrome.deeds.lbTab': 'Renome',
   'hudChrome.deeds.lbTitleCol': 'Título',
   'hudChrome.deeds.nearestLabel': 'Quase lá:',
@@ -7730,4 +7726,15 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'welcome.armory.cta': 'Entrar no mundo e explorar o Arsenal',
   'welcome.news.new': 'Novo',
   'welcome.news.viewAll': 'Ver todas as atualizações no GitHub',
+  'entities.letters.heroic_marks_reward.sender': 'Intendente heroico',
+  'entities.letters.heroic_marks_reward.subject': 'Suas Marcas heroicas',
+  'entities.letters.heroic_marks_reward.body':
+    'Seu grupo venceu a provação heroica enquanto você lutava na retaguarda ou jazia caído. Seu vínculo também foi registrado, então sua parte das Marcas heroicas chegou aqui em vez de se perder. Use-as bem.\n\n- Intendente heroico',
+  'guide.dungeonsPage.resetTitle': 'Redefinindo suas instâncias',
+  'guide.dungeonsPage.resetBody':
+    'Ao trocar a dificuldade enquanto o grupo ainda mantém incursões reivindicadas, as reivindicações antigas permanecem por algum tempo antes de sumirem. O líder pode abandoná-las imediatamente escolhendo Redefinir todas as instâncias no menu do próprio retrato ou digitando /dungeon reset. Isso só funciona depois que a dificuldade realmente mudou, quando ninguém, vivo ou caído, permanece dentro, e há um curto intervalo entre redefinições. Se você chegar à entrada na dificuldade errada, o jogo avisará antes do início. A raide nunca é redefinida assim; suas próprias regras de vínculo continuam valendo.',
+  'guide.gear.itemLevelBody':
+    'Para comparar duas peças rapidamente, ative Mostrar nível do item nas opções. Equipamentos de origem conhecida, obtidos de inimigos, missões e profissões de criação, passam a mostrar um nível do item: um único número que estima a força com base na origem e permite identificar a melhor melhoria, mesmo entre espaços diferentes. Peças sem essa origem, como itens básicos de vendedores e equipamento inicial, não mostram nível; a ausência do número é normal.',
+  'guide.professions.craftHowBody':
+    'Abra a janela de Criação (tecla padrão T) para ver todas as receitas conhecidas, o que cada uma exige e os materiais disponíveis; quando tudo estiver à mão, basta um clique. Receitas comuns podem ser criadas em qualquer lugar. Algumas receitas avançadas, incluindo ferramentas de nível alto e armaduras raras para conjuradores, exigem o centro de criação de Highwatch.',
 };

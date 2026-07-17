@@ -1641,10 +1641,10 @@
      rail-height budget test in tests/crafting_launcher.test.ts. */
   @media (max-height: 720px) {
     #side-buttons {
-      gap: 3px;
+      gap: 2px;
     }
     #side-buttons .micro-btn {
-      height: 25px;
+      height: 24px;
     }
   }
 

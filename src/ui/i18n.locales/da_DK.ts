@@ -1127,6 +1127,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.hideChestConfirmTitle': 'Skjul kisten med daglige belønninger?',
   'hudChrome.dailyRewards.pointsGained': '{points} daglige belønningspoint optjent.',
   'hudChrome.dailyRewards.taskMultiplier': 'x{multiplier} multiplikator',
+  'hudChrome.dailyRewards.oneVsOneExcluded':
+    '1 mod 1-kampe giver ikke point til daglige belønninger.',
   'hudChrome.dailyRewards.totalPlayer': '{count} spiller i dag',
   'hudChrome.dailyRewards.totalPlayers': '{count} spillere i dag',
   'hudChrome.death.resurrectAtCorpse': 'Genopstå ved liget',
@@ -6255,7 +6257,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.greyjaw_stalker.bonus3': 'Øger angrebs- og magihastighed med 15%.',
   'entities.itemSets.necromancers.name': 'Mournweave klæder',
   'entities.itemSets.necromancers.bonus2':
-    'Du kan ikke stødes tilbage (100% modstand mod tilbagestød).',
+    'Øger magikraft med 20. Skade, du tager, forsinker ikke længere dine besværgelser (100% modstand mod fordrøjelse af besværgelser).',
   'entities.itemSets.necromancers.bonus3': 'Øger intellekt med 10 og udholdenhed med 10.',
   'entities.itemSets.nighttalon.name': 'Direfang pels',
   'entities.itemSets.nighttalon.bonus2': 'Øger angrebskraft med 40.',
@@ -6263,12 +6265,12 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Øger smidighed med 15, kritisk chance med 2% og angrebs- og magihastighed med 15%.',
   'entities.itemSets.soulflame.name': 'Wraithfire regalier',
   'entities.itemSets.soulflame.bonus2':
-    'Du kan ikke stødes tilbage (100% modstand mod tilbagestød).',
+    'Øger magikraft med 20. Skade, du tager, forsinker ikke længere dine besværgelser (100% modstand mod fordrøjelse af besværgelser).',
   'entities.itemSets.soulflame.bonus3':
     'Øger intellekt med 15, ånd med 15 og angrebs- og magihastighed med 15%.',
   'entities.itemSets.stormcallers.name': 'Galecall klæder',
   'entities.itemSets.stormcallers.bonus2':
-    'Du kan ikke stødes tilbage (100% modstand mod tilbagestød).',
+    'Øger magikraft med 20. Skade, du tager, forsinker ikke længere dine besværgelser (100% modstand mod fordrøjelse af besværgelser).',
   'entities.itemSets.stormcallers.bonus3':
     'Øger intellekt med 15, ånd med 15 og angrebs- og magihastighed med 15%.',
   'entities.itemSets.vale_arcanist.name': 'Dalarkanistens klæder',
@@ -6857,15 +6859,11 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.deedsPage.howHeading': 'Sådan fungerer bedrifter',
   'guide.deedsPage.intro':
     'Bedrifternes Bog er stedet, hvor verden holder regnskab med alt, hvad du har udrettet, fra dine første skridt ud af startdalen til de hårdeste kampe, riget kan byde på. Opnå bedrifter, mens du spiller, bær de titler, de skænker, og se din hæder stige.',
-  'guide.deedsPage.renownBody':
-    'Hæder er tallet bag Bogen. Hver bedrift, du opnår, er en fast mængde hæder værd, og din samlede sum kan kun stige, så en stille uge koster dig aldrig terræn. En håndfuld bedrifter afgøres af held snarere end kunnen, og Bragder er en ære helt for sig, så begge dele giver slet ingen hæder.',
   'guide.deedsPage.renownHeading': 'Hæder',
   'guide.deedsPage.rewardBorder': 'Ramme',
   'guide.deedsPage.rewardsBody':
     'Belønningerne er ren pynt, og det er hele pointen. Nogle bedrifter skænker en titel, du kan bære, eller en ramme om dit navn, men aldrig noget, der gør din helt stærkere. Vælg den titel, du ønsker, i Bedrifternes Bog, så følger den med på dit navneskilt, i chatten og på ranglisterne, hvor alle kan se den.',
   'guide.deedsPage.rewardsHeading': 'Titler og rammer',
-  'guide.deedsPage.standingsNote':
-    'Rigerne fører et løbende regnskab over Hæder på tværs af alle konti. Vil du se, hvem der står hvor, så åbn ranglisten inde i spillet og slå op på dens Hæder-faneblad; placeringerne bor der, ikke på wikien.',
   'guide.nav.deeds': 'Bedrifternes Bog',
   'hudChrome.deeds.broadcastLine': '{name} har fuldbragt en bedrift: {deed}',
   'hudChrome.deeds.broadcastsLabel': 'Del nye bedrifter med laug og venner',
@@ -6898,9 +6896,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.filterNearly': 'Næsten i mål',
   'hudChrome.deeds.filterUnearned': 'Ikke opnået',
   'hudChrome.deeds.hiddenBadge': 'Skjult',
-  'hudChrome.deeds.lbDeedsCol': 'Bedrifter',
   'hudChrome.deeds.lbEmpty': 'Ingen rangerede krønikeskrivere endnu.',
-  'hudChrome.deeds.lbSelf': 'Din placering: plads {rank}, blandt de øverste {percent} procent',
   'hudChrome.deeds.lbTab': 'Hæder',
   'hudChrome.deeds.lbTitleCol': 'Titel',
   'hudChrome.deeds.nearestLabel': 'Næsten i mål:',
@@ -7611,4 +7607,15 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'welcome.armory.cta': 'Træd ind i verden, og udforsk Våbenhuset',
   'welcome.news.new': 'Ny',
   'welcome.news.viewAll': 'Se alle opdateringer på GitHub',
+  'entities.letters.heroic_marks_reward.sender': 'Heroisk kvartermester',
+  'entities.letters.heroic_marks_reward.subject': 'Dine heroiske mærker',
+  'entities.letters.heroic_marks_reward.body':
+    'Din gruppe klarede den heroiske prøve, mens du kæmpede i bagtroppen eller lå faldet. Din låsning blev også registreret, så din andel af de heroiske mærker blev sendt hertil i stedet for at gå tabt. Brug dem godt.\n\n- Heroisk kvartermester',
+  'guide.dungeonsPage.resetTitle': 'Nulstilling af dine instanser',
+  'guide.dungeonsPage.resetBody':
+    'Hvis du skifter sværhedsgrad, mens gruppen stadig har krævede gennemløb, bliver de gamle krav stående et stykke tid. Gruppelederen kan straks opgive dem ved at vælge Nulstil alle instanser i menuen på sit eget portræt eller skrive /dungeon reset. Sværhedsgraden skal faktisk være ændret, ingen levende eller faldne må være indenfor, og der er en kort nedkøling mellem nulstillinger. Ved døren på forkert sværhedsgrad advarer spillet før start. Raidet nulstilles aldrig sådan; dets egne låsningsregler gælder.',
+  'guide.gear.itemLevelBody':
+    'Slå Vis genstandsniveau til i indstillingerne for hurtigt at sammenligne to dele. Udstyr med en kendt kilde, fra fjender, opgaver og håndværksfag, viser derefter et genstandsniveau: et enkelt tal, der omtrent angiver styrken ud fra oprindelsen og gør opgraderinger sammenlignelige, selv på tværs af pladser. Dele uden en sådan kilde, som simple handelsvarer og startudstyr, viser intet niveau; et manglende tal er normalt.',
+  'guide.professions.craftHowBody':
+    'Åbn håndværksvinduet (standardtast T) for at se alle kendte opskrifter, deres krav og dine materialer; når materialerne er der, er ét klik nok. Almindelige opskrifter kan fremstilles overalt. Nogle avancerede opskrifter, herunder værktøj på højt niveau og sjældne rustninger til magikere, kræver håndværkscentret i Highwatch.',
 };

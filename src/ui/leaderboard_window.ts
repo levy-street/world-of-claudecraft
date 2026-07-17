@@ -310,18 +310,23 @@ export class LeaderboardWindow {
     );
 
     if (view.kind === 'error') {
-      body.innerHTML = `<div class="lb-empty lb-error" role="alert">${esc(t('game.leaderboard.retry'))}</div>`;
+      body.innerHTML =
+        this.deedsScopeNoteHtml() +
+        `<div class="lb-empty lb-error" role="alert">${esc(t('game.leaderboard.retry'))}</div>`;
       this.focusCloseAfterPage(focus);
       return;
     }
     if (view.kind === 'empty') {
-      body.innerHTML = `<div class="lb-empty">${esc(t('hudChrome.deeds.lbEmpty'))}</div>`;
+      body.innerHTML =
+        this.deedsScopeNoteHtml() +
+        `<div class="lb-empty">${esc(t('hudChrome.deeds.lbEmpty'))}</div>`;
       this.focusCloseAfterPage(focus);
       return;
     }
     if (view.kind !== 'ranked') return;
     this.page = view.page;
     body.innerHTML =
+      this.deedsScopeNoteHtml() +
       this.deedsHeaderHtml() +
       view.rows.map((r) => this.deedsRowHtml(r)).join('') +
       this.deedsSelfHtml(view.self) +
@@ -557,17 +562,26 @@ export class LeaderboardWindow {
   }
 
   // Renown-board header: rank, chronicler (the account's highest-Renown
-  // character), Renown, deed count, displayed title. Rank/name reuse the
-  // shared player-board headers; the deeds-specific columns get their own
-  // classes so the grid stays aligned with the other tabs.
+  // character), Renown, displayed title. Renown is the ONE ranked number on
+  // the board (the completion count lives in the Book of Deeds header, never
+  // on a ranked surface; issue #2044 removes the deprecated wire field).
+  // Rank/name reuse the shared player-board headers; the deeds-specific
+  // columns get their own classes so the grid stays aligned with the other tabs.
   private deedsHeaderHtml(): string {
     return (
       `<div class="lb-row lb-row-deeds lb-head"><span class="lb-rank">${esc(t('game.leaderboard.rank'))}</span>` +
       `<span class="lb-name">${esc(t('game.leaderboard.name'))}</span>` +
       `<span class="lb-renown">${esc(t('hudChrome.deeds.renownLabel'))}</span>` +
-      `<span class="lb-deeds-count">${esc(t('hudChrome.deeds.lbDeedsCol'))}</span>` +
       `<span class="lb-deed-title">${esc(t('hudChrome.deeds.lbTitleCol'))}</span></div>`
     );
+  }
+
+  // The account-scope teaching line, VISIBLE text on every deeds-board state
+  // this method owns (never a title-attr tooltip: those do not exist on
+  // touch). Explains the one sanctioned scope difference from the Book: the
+  // board unions each deed once across an account's characters.
+  private deedsScopeNoteHtml(): string {
+    return `<div class="lb-scope-note">${esc(t('hudChrome.deeds.lbScopeNote'))}</div>`;
   }
 
   private deedsRowHtml(r: DeedsLeaderboardRow): string {
@@ -582,19 +596,27 @@ export class LeaderboardWindow {
       `<div class="lb-row lb-row-deeds${r.me ? ' lb-mine' : ''}"><span class="lb-rank">${r.rank}</span>` +
       `<span class="lb-name"${clsTitle}>${esc(r.name)}${you} <span class="lb-realm">${esc(r.realm)}</span></span>` +
       `<span class="lb-renown">${formatNumber(r.renown, { maximumFractionDigits: 0 })}</span>` +
-      `<span class="lb-deeds-count">${formatNumber(r.deedCount, { maximumFractionDigits: 0 })}</span>` +
       `<span class="lb-deed-title">${esc(titleText)}</span></div>`
     );
   }
 
   // The viewer's own account standing, server-resolved (present only for an
-  // authenticated caller who is on the board).
+  // authenticated caller who is on the board). The pure core already decided
+  // the arm ('account' carries the board-scored Renown a single-character
+  // player can verify against their Book; 'rank' is the old-server
+  // fallback); this only maps each kind to its t() key.
   private deedsSelfHtml(self: DeedsLeaderboardSelfLine | null): string {
     if (!self) return '';
-    const line = t('hudChrome.deeds.lbSelf', {
-      rank: formatNumber(self.rank, { maximumFractionDigits: 0 }),
-      percent: formatNumber(self.topPercent, { maximumFractionDigits: 0 }),
-    });
+    const rank = formatNumber(self.rank, { maximumFractionDigits: 0 });
+    const percent = formatNumber(self.topPercent, { maximumFractionDigits: 0 });
+    const line =
+      self.kind === 'account'
+        ? t('hudChrome.deeds.lbSelfAccount', {
+            rank,
+            percent,
+            renown: formatNumber(self.renown, { maximumFractionDigits: 0 }),
+          })
+        : t('hudChrome.deeds.lbSelfRank', { rank, percent });
     return `<div class="lb-self">${esc(line)}</div>`;
   }
 

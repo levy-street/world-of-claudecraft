@@ -1143,6 +1143,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.hideChestConfirmTitle': 'Ukryć skrzynię codziennych nagród?',
   'hudChrome.dailyRewards.pointsGained': 'Zdobyto {points} pkt. codziennych nagród.',
   'hudChrome.dailyRewards.taskMultiplier': 'mnożnik x{multiplier}',
+  'hudChrome.dailyRewards.oneVsOneExcluded':
+    'Mecze 1 na 1 nie przyznają punktów codziennych nagród.',
   'hudChrome.dailyRewards.totalPlayer': '{count} gracz dzisiaj',
   'hudChrome.dailyRewards.totalPlayers': '{count} graczy dzisiaj',
   'hudChrome.death.resurrectAtCorpse': 'Odrodź się przy zwłokach',
@@ -6308,19 +6310,20 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.greyjaw_stalker.bonus3': 'Zwiększa szybkość ataku i rzucania zaklęć o 15%.',
   'entities.itemSets.necromancers.name': 'Szaty Mournweave',
   'entities.itemSets.necromancers.bonus2':
-    'Nie można cię odrzucić (100% odporności na odrzucenie).',
+    'Zwiększa moc zaklęć o 20. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć (100% odporności na opóźnienie rzucania).',
   'entities.itemSets.necromancers.bonus3': 'Zwiększa intelekt o 10 i wytrzymałość o 10.',
   'entities.itemSets.nighttalon.name': 'Skóra Direfang',
   'entities.itemSets.nighttalon.bonus2': 'Zwiększa siłę ataku o 40.',
   'entities.itemSets.nighttalon.bonus3':
     'Zwiększa zręczność o 15, szansę na trafienie krytyczne o 2% oraz szybkość ataku i rzucania zaklęć o 15%.',
   'entities.itemSets.soulflame.name': 'Regalia Wraithfire',
-  'entities.itemSets.soulflame.bonus2': 'Nie można cię odrzucić (100% odporności na odrzucenie).',
+  'entities.itemSets.soulflame.bonus2':
+    'Zwiększa moc zaklęć o 20. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć (100% odporności na opóźnienie rzucania).',
   'entities.itemSets.soulflame.bonus3':
     'Zwiększa intelekt o 15, ducha o 15 oraz szybkość ataku i rzucania zaklęć o 15%.',
   'entities.itemSets.stormcallers.name': 'Szaty Galecall',
   'entities.itemSets.stormcallers.bonus2':
-    'Nie można cię odrzucić (100% odporności na odrzucenie).',
+    'Zwiększa moc zaklęć o 20. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć (100% odporności na opóźnienie rzucania).',
   'entities.itemSets.stormcallers.bonus3':
     'Zwiększa intelekt o 15, ducha o 15 oraz szybkość ataku i rzucania zaklęć o 15%.',
   'entities.itemSets.vale_arcanist.name': 'Szaty Arkanisty z Doliny',
@@ -6915,15 +6918,11 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.deedsPage.howHeading': 'Jak działają czyny',
   'guide.deedsPage.intro':
     'Księga Czynów to miejsce, w którym świat prowadzi rachunek wszystkiego, czego dokonałeś: od pierwszych kroków poza początkową doliną po najtrudniejsze starcia, jakie królestwo ma do zaoferowania. Zdobywaj czyny podczas gry, noś tytuły, które przyznają, i patrz, jak twoja Renoma rośnie.',
-  'guide.deedsPage.renownBody':
-    'Renoma to wynik kryjący się za Księgą. Każdy zdobyty czyn jest wart ustaloną liczbę punktów, a twoja suma tylko rośnie, więc spokojny tydzień nigdy nie odbiera ci pozycji. Garść czynów zależy od szczęścia, a nie umiejętności, Wyczyny zaś są osobnym wyróżnieniem, dlatego ani jedne, ani drugie nie są warte żadnej Renomy.',
   'guide.deedsPage.renownHeading': 'Renoma',
   'guide.deedsPage.rewardBorder': 'Obramowanie',
   'guide.deedsPage.rewardsBody':
     'Nagrody służą wyłącznie ozdobie i właśnie o to chodzi. Niektóre czyny przyznają tytuł do noszenia albo obramowanie, które oprawi twoje imię, nigdy zaś nic, co uczyniłoby twojego bohatera silniejszym. Wybierz tytuł w Księdze Czynów, a będzie ci towarzyszył na plakietce z imieniem, na czacie i w rankingach, na oczach wszystkich.',
   'guide.deedsPage.rewardsHeading': 'Tytuły i obramowania',
-  'guide.deedsPage.standingsNote':
-    'Królestwa prowadzą bieżący rachunek Renomy na wszystkich kontach. Aby zobaczyć, kto jak stoi, otwórz Ranking w grze i przejdź do jego zakładki Renomy; zestawienie żyje tam, nie na wiki.',
   'guide.nav.deeds': 'Księga Czynów',
   'hudChrome.deeds.broadcastLine': '{name} dokonuje czynu: {deed}',
   'hudChrome.deeds.broadcastsLabel': 'Ogłaszaj zdobyte czyny gildii i znajomym',
@@ -6956,9 +6955,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.filterNearly': 'Prawie ukończone',
   'hudChrome.deeds.filterUnearned': 'Niezdobyte',
   'hudChrome.deeds.hiddenBadge': 'Ukryty',
-  'hudChrome.deeds.lbDeedsCol': 'Czyny',
   'hudChrome.deeds.lbEmpty': 'W rankingu nie ma jeszcze żadnych kronikarzy.',
-  'hudChrome.deeds.lbSelf': 'Twoja pozycja: miejsce {rank}, czołowe {percent} procent',
   'hudChrome.deeds.lbTab': 'Renoma',
   'hudChrome.deeds.lbTitleCol': 'Tytuł',
   'hudChrome.deeds.nearestLabel': 'Prawie u celu:',
@@ -7671,4 +7668,15 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'welcome.armory.cta': 'Wejdź i przejrzyj Zbrojownię',
   'welcome.news.new': 'Nowe',
   'welcome.news.viewAll': 'Zobacz wszystkie aktualizacje na GitHubie',
+  'entities.letters.heroic_marks_reward.sender': 'Heroiczny kwatermistrz',
+  'entities.letters.heroic_marks_reward.subject': 'Twoje heroiczne znaki',
+  'entities.letters.heroic_marks_reward.body':
+    'Twoja grupa pokonała heroiczną próbę, gdy walczyłeś na tyłach lub leżałeś pokonany. Twoja blokada również została zapisana, dlatego należna część heroicznych znaków trafiła tutaj, zamiast przepaść. Dobrze je wykorzystaj.\n\n- Heroiczny kwatermistrz',
+  'guide.dungeonsPage.resetTitle': 'Resetowanie instancji',
+  'guide.dungeonsPage.resetBody':
+    'Jeśli zmienisz trudność, gdy grupa wciąż ma zajęte podejścia, stare przypisania pozostaną przez pewien czas. Przywódca może porzucić je natychmiast, wybierając Resetuj wszystkie instancje w menu własnego portretu albo wpisując /dungeon reset. Trudność musi faktycznie zostać zmieniona, wewnątrz nie może pozostać nikt żywy ani poległy, a kolejne resety dzieli krótki czas odnowienia. Przy wejściu na złej trudności gra ostrzeże przed rozpoczęciem. Rajdu nie resetuje się w ten sposób; obowiązują jego własne zasady blokady.',
+  'guide.gear.itemLevelBody':
+    'Aby szybko porównać dwa przedmioty, włącz w opcjach Pokaż poziom przedmiotu. Wyposażenie o znanym źródle, zdobyte z wrogów, zadań i profesji rzemieślniczych, pokazuje wtedy poziom przedmiotu: jedną liczbę przybliżającą jego moc na podstawie pochodzenia, co ułatwia ocenę ulepszeń nawet między różnymi miejscami. Przedmioty bez takiego źródła, jak podstawowe towary kupców i sprzęt startowy, nie pokazują poziomu; brak liczby jest normalny.',
+  'guide.professions.craftHowBody':
+    'Otwórz okno Rzemiosła (domyślnie klawisz T), aby zobaczyć wszystkie znane receptury, ich wymagania i posiadane materiały; gdy masz składniki, wystarczy jedno kliknięcie. Zwykłe receptury można tworzyć wszędzie. Niektóre zaawansowane, w tym narzędzia wyższego poziomu i rzadkie pancerze dla czarujących, wymagają centrum rzemiosła w Highwatch.',
 };

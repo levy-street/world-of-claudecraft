@@ -3021,12 +3021,15 @@ export async function topGuilds(
 // design; deliberately no LIMIT, so it can never become a cap that drops a
 // legitimate account). The output maps 1:1 onto computeDeedsBoard(...).ranked
 // (server/deeds_board.ts is the executable spec this mirrors): per account the
-// COUNTED SET is the distinct renown-bearing deed ids, so a deed earned by two
-// characters counts once; zero-renown deeds score and count nothing; the floor
-// is inclusive; completionTime is max over the counted set of each deed's
-// EARLIEST earn; the display character is the account's highest per-character
-// Renown character, ties to the lowest id; ordering is renown desc, completion
-// asc, accountId asc.
+// SCORING SET is the distinct renown-bearing deed ids, so a deed earned by two
+// characters scores once; zero-renown deeds sit outside the scoring set (they
+// never score and never move the tie-break); the floor is inclusive;
+// completionTime is max over the scoring set of each deed's EARLIEST earn; the
+// display character is the account's highest per-character Renown character,
+// ties to the lowest id; ordering is renown desc, completion asc, accountId
+// asc. deed_count (the scoring-set size) is a deprecated wire-compat output
+// removed next release together with the pure spec's field (issue #2044,
+// executable-spec lockstep both times); it is not displayed by current clients.
 export async function deedsBoardRanked(
   deedIds: readonly string[],
   renowns: readonly number[],

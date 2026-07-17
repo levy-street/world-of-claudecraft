@@ -366,6 +366,7 @@ export const es_ES: EnTranslations = {
       "spinButton": "Girar",
       "tasks": "Tareas",
       "taskMultiplier": "Multiplicador x{multiplier}",
+      "oneVsOneExcluded": "Las partidas 1 contra 1 no otorgan puntos de recompensas diarias.",
       "pointsGained": "{points} puntos de recompensas diarias obtenidos.",
       "showChestButton": "Mostrar cofre",
       "hideChestButton": "Ocultar cofre",
@@ -2199,9 +2200,10 @@ export const es_ES: EnTranslations = {
       "charTitleNone": "Sin título elegido",
       "charOpenBook": "Libro de Gestas",
       "lbTab": "Renombre",
-      "lbDeedsCol": "Gestas",
       "lbTitleCol": "Título",
-      "lbSelf": "Tu posición: puesto {rank}, dentro del {percent} por ciento superior",
+      "lbScopeNote": "Accounts ranked by lifetime Renown. Each deed counts once across all characters on an account.",
+      "lbSelfAccount": "Your account: rank {rank}, top {percent} percent, {renown} Renown",
+      "lbSelfRank": "Your account: rank {rank}, top {percent} percent",
       "lbEmpty": "Aún no hay cronistas clasificados.",
       "broadcastsLabel": "Compartir las gestas conseguidas con la hermandad y los amigos",
       "titledName": "{name} [{title}]"
@@ -2991,8 +2993,8 @@ export const es_ES: EnTranslations = {
       "heroicRewardsTitle": "Marcas Heroicas y botín mejorado",
       "heroicRewardsBody": "Los jefes heroicos sueltan el botín que ya conoces, mejorado y marcado como Heroico en su descripción, y el jefe final de cada incursión añade objetos épicos que no se encuentran en ningún otro sitio. Esa última muerte también deja Marcas Heroicas para cada participante: una moneda que se gasta con el Intendente Vex en Highwatch, cuyo surtido de anillos y collares es la única joyería del reino.",
       "heroicLockoutBody": "Las mazmorras normales pueden recorrerse sin límite durante el día. El modo heroico pide paciencia: matar al jefe final bloquea a cuantos participan en la incursión a una única compleción heroica de esa mazmorra por día, y la banda mantiene un bloqueo diario para cada dificultad. Una incursión de cinco jugadores ya completada sigue abierta para su propio grupo, para volver por el cadáver y por el botín, así que nadie queda apartado de lo que ganó allí. La banda es más estricta: una vez que su muerte te bloquea, la puerta permanece cerrada hasta el reinicio diario, así que reúne tu botín antes de abandonar la arena.",
-      "resetTitle": "Resetting your instances",
-      "resetBody": "Switch difficulty while your group still holds claimed runs and the old claims linger for a while before clearing on their own. The party leader can let them go at once instead: choose Reset All Instances on their own portrait menu, or type /dungeon reset. A reset works only after the difficulty has actually been changed, only while nobody, living or fallen, remains inside, and a short cooldown separates one reset from the next. Arrive at the door on the wrong difficulty and the game says so before the run starts. The raid is never reset this way; its own lockout rules stand.",
+      "resetTitle": "Restablecer tus instancias",
+      "resetBody": "Si cambias la dificultad mientras tu grupo aún conserva recorridos reclamados, las reclamaciones anteriores permanecen un tiempo antes de borrarse solas. El líder del grupo puede liberarlas de inmediato: elige Restablecer todas las instancias en el menú de su propio retrato o escribe /dungeon reset. Solo funciona después de cambiar realmente la dificultad, cuando no queda nadie dentro, vivo o caído, y hay un breve tiempo de espera entre restablecimientos. Si llegas a la entrada con la dificultad equivocada, el juego te avisa antes de comenzar. La banda nunca se restablece así; conserva sus propias reglas de bloqueo.",
       "templeLoreTitle": "El Templo Ahogado, un poco más a fondo",
       "templeLoreBody": "El templo tiene su propia leyenda, más antigua que el culto que persigues en otros lugares. En la orilla del Glimmermere, un lago que bebe la luz de la luna y devuelve a los ahogados, un vigía solitario custodia una puerta de luz pálida. Bajo la superficie, una escalera de piedra fría desciende hasta él. Las gentes que se hundieron allí no se ahogaron por desventura: eran el Coro Pálido, que se sumergió en adoración y nunca dejó de cantar. Los viejos guardianes grabaron una sola advertencia en las rocas antes de que el agua se los llevara, una plegaria a algo que llamaban la Luna Ahogada, con una mano más firme añadiendo dos palabras debajo: solo duerme.",
       "cryptLeadTitle": "Una puerta que los muertos debían mantener cerrada",
@@ -3100,7 +3102,7 @@ export const es_ES: EnTranslations = {
       "howHeading": "Cómo funcionan las gestas",
       "howBody": "Las gestas se consiguen y se guardan personaje a personaje, así que cada héroe que juegues forma su propio Libro; solo la Tabla de Clasificación del reino reúne tu Renombre a lo largo de todos los personajes que juegas, y cuenta cada gesta una sola vez. Cada gesta explica con claridad lo que te pide, allí mismo, en el Libro de Gestas dentro del juego, de modo que siempre sabes qué perseguir, y puedes poner en seguimiento las que buscas para tenerlas a la vista mientras juegas. Unas pocas permanecen secretas y solo se revelan cuando las has conseguido. El Libro también se mantiene honesto consigo mismo: cuanto tu historial pasado pueda demostrar te lo acredita al instante, así que un veterano nunca lo abre en una página en blanco; solo las gestas de recuento empiezan su cuenta desde cero.",
       "renownHeading": "Renombre",
-      "renownBody": "El Renombre es la puntuación detrás del Libro. Cada gesta que consigues vale una cantidad fija, y tu total solo puede subir, así que una semana tranquila nunca te hace perder terreno. Unas pocas gestas dependen de la suerte más que de la destreza, y las proezas son un honor aparte, de modo que ninguna de las dos otorga Renombre.",
+      "renownBody": "Renown is the score behind the Book. Every deed you earn is worth a set amount, and your total only ever climbs, so a quiet week never costs you ground. A handful of deeds turn on luck rather than skill, and Feats are an honor of their own, so both of those are worth no Renown at all. Deeds without Renown still count toward completion in your Book; they simply never score.",
       "rewardsHeading": "Títulos y bordes",
       "rewardsBody": "Las recompensas son pura apariencia, y esa es la gracia. Algunas gestas otorgan un título que puedes lucir o un borde que enmarca tu nombre, y nunca nada que haga más fuerte a tu héroe. Elige el título que quieras desde el Libro de Gestas y te acompañará en tu placa de nombre, en el chat y en las clasificaciones, a la vista de cualquiera.",
       "chroniclesHeading": "Crónicas",
@@ -3109,7 +3111,7 @@ export const es_ES: EnTranslations = {
       "featsBody": "Las proezas son un estante aparte: registros de legado y primicias mundiales, las gestas ligadas a una era pasada o a un momento que solo ocurrirá una vez. No otorgan Renombre y quedan fuera del recuento total, conservadas para siempre como memoria de lo que se hizo.",
       "catalogHeading": "El registro completo de las gestas",
       "catalogBody": "Aquí están todas las gestas que el Libro puede guardar, agrupadas por categoría. Las secretas se omiten a propósito: esperan a que las descubras. Abre el Libro de Gestas dentro del juego para ver exactamente qué pide cada una.",
-      "standingsNote": "Los reinos llevan un recuento continuo del Renombre de cada cuenta. Para ver quién ocupa cada puesto, abre la Tabla de Clasificación dentro del juego y ve a su pestaña de Renombre; las posiciones están allí, no en la wiki.",
+      "standingsNote": "The realms keep a running tally of Renown across every account: the board ranks whole accounts by lifetime Renown, counting each deed once across all your characters, and it shows Renown alone, so deeds that carry none never move the standings even though they count in your Book. To see who stands where, open the Leaderboard in game and turn to its Renown tab; the standings live there, not on the wiki.",
       "catHeading": "{label} ({count})",
       "colName": "Gesta",
       "colRenown": "Renombre",
@@ -3200,7 +3202,7 @@ export const es_ES: EnTranslations = {
       "qualityNote": "Una calidad mayor suele significar mejores características, pero la calidad es una pista, no una regla. Una pieza bien ajustada a tu clase y nivel puede superar a otra más llamativa.",
       "upgradeTitle": "Mantén tu equipo al día",
       "upgradeBody": "Reemplazar una pieza vieja por una mejora reciente te aporta más que jugar a la perfección con un equipo que ya se te ha quedado pequeño. Cuando caiga algo mejor o te lo ofrezca una misión, tómalo. No guardes tus buenos objetos para más adelante.",
-      "itemLevelBody": "If you want a quick way to compare two pieces, turn on Show Item Level in the options. Gear with a known source, from enemies, quests, and the crafting trades, then shows an item level, a single figure for roughly how powerful it is based on where it came from, so you can tell at a glance which upgrade pulls more weight, even across different slots. Pieces with no such source, like plain vendor basics and starter gear, show no item level, so a missing figure is normal, not a fault.",
+      "itemLevelBody": "Para comparar rápidamente dos piezas, activa Mostrar nivel de objeto en las opciones. El equipo de origen conocido, obtenido de enemigos, misiones y profesiones de artesanía, mostrará un nivel de objeto: una cifra que aproxima su poder según su procedencia y permite ver de un vistazo qué mejora pesa más, incluso entre ranuras distintas. Las piezas sin ese origen, como los artículos básicos de vendedor y el equipo inicial, no muestran nivel de objeto; que falte la cifra es normal, no un error.",
       "sourcesTitle": "De dónde viene el equipo",
       "sourcesBody": "La mayoría de tus mejoras tempranas son recompensas de misiones, así que conviene completar misiones en lugar de farmear. Los enemigos sueltan equipo cuando los derrotas, los vendedores del pueblo venden buenas piezas básicas, los artesanos convierten materiales recolectados en piezas que puedes vestir y el mercado de jugadores te permite comprar a otros aventureros. En lo más alto, dos monedas de marcas compran equipo que no se encuentra en ningún otro sitio: las Marcas de Expedición con el guardián de expediciones, y las Marcas Heroicas con el intendente heroico.",
       "soulboundTitle": "Ligado al alma: tuyo y de nadie más",
@@ -3244,7 +3246,7 @@ export const es_ES: EnTranslations = {
       "craftRecipesTitle": "Recetas y reactivos",
       "craftRecipesBody": "Cada receta requiere reactivos concretos que recolectas o compras. Las recetas más sencillas no piden más que materiales comunes y pueden fabricarse desde el primer momento, así que puedes empezar a ejercer un oficio en cuanto lo adoptas. Las listas de recetas aún se están completando: unos pocos oficios esperan sus primeras recetas, y llegan más a medida que los oficios crecen.",
       "craftHowTitle": "La ventana de artesanía",
-      "craftHowBody": "Open the Crafting window (default key T) to see every recipe you know, what each one needs, and what you have on hand; when the materials are there, one click does the work. Common recipes can be crafted anywhere in the world. A handful of advanced recipes, higher-tier tools and rare caster armor among them, instead ask you to stand at the crafting hub in Highwatch.",
+      "craftHowBody": "Abre la ventana de Artesanía (tecla T de forma predeterminada) para ver todas las recetas que conoces, lo que requiere cada una y los materiales que tienes; cuando estén disponibles, basta un clic. Las recetas comunes pueden elaborarse en cualquier lugar. Algunas recetas avanzadas, como herramientas de nivel superior y armaduras raras para taumaturgos, exigen estar en el centro de artesanía de Highwatch.",
       "craftMasteryTitle": "Habilidad y maestría",
       "craftMasteryBody": "Fabricar con éxito aumenta tu habilidad en ese oficio, y la habilidad nunca deja bajo llave las recetas de un oficio: si conoces una receta y tienes sus materiales, puedes intentarla. Lo que la habilidad te compra, en cambio, es calidad: una mano experta produce un trabajo más fino. La única excepción son las recetas combinadas, que te piden haberte probado en ambos oficios antes de abrirse.",
       "craftComboTitle": "Recetas combinadas",
@@ -4366,6 +4368,24 @@ export const es_ES: EnTranslations = {
     "balance": "Marcas Heroicas: {count}",
     "buyAria": "Comprar {item} por {marks} Marcas Heroicas"
   },
+  "cardDuel": {
+    "title": "Card Duel",
+    "close": "Close",
+    "join": "Join Queue",
+    "joinAria": "Join the Card Duel queue",
+    "leave": "Leave Queue",
+    "leaveAria": "Leave the Card Duel queue",
+    "forfeit": "Forfeit",
+    "forfeitAria": "Forfeit the Card Duel",
+    "queued": "Waiting for an opponent...",
+    "unavailable": "Card Duel requires another player online.",
+    "vsOpponent": "vs {name}",
+    "round": "Round score: {mine} - {theirs}",
+    "counts": "Deck: {deck} · Discard: {discard}",
+    "playCardAria": "Play the {value} card",
+    "waitingOnOpponent": "Waiting on your opponent's card...",
+    "yourTurn": "Play a card"
+  },
   "delveUi": {
     "board": {
       "title": "Tablón de Profundidades",
@@ -4864,6 +4884,11 @@ export const es_ES: EnTranslations = {
       "quit": "Salir",
       "fatalBody": "World of ClaudeCraft tuvo un error inesperado y debe cerrarse."
     }
+  },
+  "gpuNotice": {
+    "bodyDesktop": "The game is running without GPU acceleration and will be slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
+    "bodyWeb": "The game is running without GPU acceleration and will be slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.",
+    "dismiss": "Dismiss"
   },
   "realm": {
     "noRealms": "No hay mundos disponibles.",
@@ -8693,6 +8718,11 @@ export const es_ES: EnTranslations = {
         "title": "El Arca Dorada",
         "greeting": "Te damos la bienvenida al Arca Dorada. Tus bienes descansan seguros tras nuestras cerraduras."
       },
+      "card_master": {
+        "name": "Card Master",
+        "title": "Dealer of Chance",
+        "greeting": "Care for a Card Duel? Best of three, winner takes the bragging rights."
+      },
       "bursar_petra_vell": {
         "name": "Tesorera Petra Vell",
         "title": "El Arca Dorada",
@@ -9799,9 +9829,9 @@ export const es_ES: EnTranslations = {
         "body": "Pocos sabrán jamás lo que estaba enterrado en esa hondonada, y menos aún lo creerían. Yo lo sé, y no lo olvidaré.\n\nQue tu camino siga iluminado.\n- Hermano Aldric"
       },
       "heroic_marks_reward": {
-        "sender": "The Heroic Quartermaster",
-        "subject": "Your Heroic Marks",
-        "body": "Your warband cleared the heroic trial while you fought from the back, or from the dirt. Your lockout was struck all the same, so your share of Heroic Marks flies to you here rather than being lost. Spend them well.\n\n- The Heroic Quartermaster"
+        "sender": "Intendente heroico",
+        "subject": "Tus Marcas heroicas",
+        "body": "Tu grupo superó la prueba heroica mientras luchabas en la retaguardia o yacías derrotado. Tu bloqueo también quedó registrado, así que tu parte de las Marcas heroicas llegó aquí en vez de perderse. Úsalas bien.\n\n- Intendente heroico"
       }
     },
     "itemSets": {
@@ -9827,7 +9857,7 @@ export const es_ES: EnTranslations = {
       },
       "necromancers": {
         "name": "Vestiduras de Mournweave",
-        "bonus2": "No puedes ser empujado hacia atrás (100% de resistencia al empuje).",
+        "bonus2": "Aumenta el poder de los hechizos en 20. El daño recibido ya no retrasa tus hechizos (100% de resistencia al retraso de lanzamiento).",
         "bonus3": "Aumenta el intelecto en 10 y el aguante en 10.",
         "bonus4": "Tus hechizos tienen un 10% de probabilidad de otorgar Mente Clara, haciendo que tu próximo hechizo sea gratuito."
       },
@@ -9839,7 +9869,7 @@ export const es_ES: EnTranslations = {
       },
       "soulflame": {
         "name": "Vestiduras de Wraithfire",
-        "bonus2": "No puedes ser empujado hacia atrás (100% de resistencia al empuje).",
+        "bonus2": "Aumenta el poder de los hechizos en 20. El daño recibido ya no retrasa tus hechizos (100% de resistencia al retraso de lanzamiento).",
         "bonus3": "Aumenta el intelecto en 15, el espíritu en 15 y la velocidad de ataque y de lanzamiento en 15%.",
         "bonus4": "Tus hechizos tienen un 10% de probabilidad de otorgar Fulgor del Alma, aumentando el poder con hechizos en 40 durante 10 s."
       },
@@ -9851,7 +9881,7 @@ export const es_ES: EnTranslations = {
       },
       "stormcallers": {
         "name": "Vestiduras de Galecall",
-        "bonus2": "No puedes ser empujado hacia atrás (100% de resistencia al empuje).",
+        "bonus2": "Aumenta el poder de los hechizos en 20. El daño recibido ya no retrasa tus hechizos (100% de resistencia al retraso de lanzamiento).",
         "bonus3": "Aumenta el intelecto en 15, el espíritu en 15 y la velocidad de ataque y de lanzamiento en 15%.",
         "bonus4": "Tus hechizos tienen un 10% de probabilidad de otorgar Fulgor del Alma, aumentando el poder con hechizos en 40 durante 10 s."
       },

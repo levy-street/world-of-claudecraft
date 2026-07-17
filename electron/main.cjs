@@ -38,7 +38,7 @@ const { initLogging } = require('./logging.cjs');
 const { DEFAULT_SHELL_STRINGS, sanitizeShellStrings } = require('./shell_strings.cjs');
 const { attachRendererCrashRecovery, installProcessCrashGuards } = require('./crash_guard.cjs');
 const { initUpdater } = require('./updater.cjs');
-const { forceHighPerformanceGpu } = require('./gpu_preference.cjs');
+const { forceHighPerformanceGpu, summarizeGpuDevices } = require('./gpu_preference.cjs');
 
 const APP_ORIGIN = 'app://worldofclaudecraft';
 // The Vite dev server URL is a DEV-ONLY seam (electron-dev.mjs sets it): its
@@ -280,7 +280,11 @@ function createMainWindow() {
 
   // Report GPU status once the page has loaded (and the renderer has created its WebGL
   // context), by when getGPUFeatureStatus and getGPUInfo have settled to the real values.
-  mainWindow.webContents.once('did-finish-load', logGpuStatus);
+  // Bound with .on, not .once: a GPU-process crash followed by the crash-recovery
+  // auto-reload is exactly when the adapter can flip to the WARP software fallback, and a
+  // .once here would keep only the pre-crash healthy reading in the log. logGpuStatus
+  // dedupes an unchanged renderer line itself.
+  mainWindow.webContents.on('did-finish-load', logGpuStatus);
 
   // Crash recovery for the game view: bounded auto-reload, then an i18n
   // Reload/Quit dialog (electron/crash_guard.cjs).
@@ -469,10 +473,15 @@ if (!singleInstance) {
 // status, 'enabled' means hardware; 'software only' or 'disabled' means Chromium fell back to
 // SwiftShader, which a WebGL game must not silently run on. getGPUInfo('complete') resolves
 // the actual adapter (glRenderer names the real GPU, e.g. "Apple M1", vs "SwiftShader") and
-// auxAttributes.softwareRendering is Chromium's own verdict. This MUST run after the GPU
-// process has reported (call it on the window's did-finish-load, not at whenReady, where
-// getGPUFeatureStatus can still return a pre-initialization 'disabled_off'). Dev-channel
-// diagnostics only (the log file), never user-facing.
+// auxAttributes.softwareRendering is Chromium's own verdict; its gpuDevice list is the one
+// line that settles a hybrid-laptop support ticket from a single player-supplied main.log
+// (both adapters present, wrong one active means the gpu_preference.cjs levers did not take
+// effect). This MUST run after the GPU process has reported (call it on the window's
+// did-finish-load, not at whenReady, where getGPUFeatureStatus can still return a
+// pre-initialization 'disabled_off'). Runs again after every reload (crash recovery); an
+// unchanged renderer reading is deduped to keep the log quiet. Dev-channel diagnostics only
+// (the log file), never user-facing.
+let lastGpuRendererLog = '';
 function logGpuStatus() {
   try {
     const status = app.getGPUFeatureStatus();
@@ -492,10 +501,23 @@ function logGpuStatus() {
       if (aux.softwareRendering) {
         log.warn('[gpu] GPU process reports softwareRendering: the game is on a CPU rasterizer');
       }
-      log.info('[gpu] active renderer', {
+      const { devices, discreteInactive } = summarizeGpuDevices(info?.gpuDevice);
+      const line = {
         glRenderer: aux.glRenderer,
         glVendor: aux.glVendor,
-      });
+        adapters: devices,
+      };
+      const key = JSON.stringify(line);
+      if (key === lastGpuRendererLog) return;
+      lastGpuRendererLog = key;
+      log.info('[gpu] active renderer', line);
+      if (discreteInactive) {
+        log.warn(
+          '[gpu] a discrete GPU is present but INACTIVE: the OS bound the integrated or ' +
+            'software adapter, so the per-app preference and the Chromium switch did not ' +
+            'take effect on this machine',
+        );
+      }
     },
     (err) => log.error('[gpu] could not read gpu info', err),
   );

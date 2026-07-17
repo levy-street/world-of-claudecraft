@@ -22,6 +22,7 @@ import type { InstanceSlot, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { arenaQueueLeave } from '../social/arena';
 import { resurrectOnInstanceReentry } from '../spirit';
+import { dropThreat } from '../threat';
 import {
   dist2d,
   type Entity,
@@ -454,12 +455,39 @@ export function leaveDungeon(ctx: SimContext, pid?: number): void {
       return;
     }
   }
+  // Stepping out of the instance removes the leaver (and anything they own,
+  // e.g. their pet) from every inside mob's hate table: dancing in and out of
+  // the exit portal cannot be used to kite a pull to the door and back.
+  // Re-entering means earning aggro from scratch.
+  const inst = ctx.instances.find(
+    (i) => i.partyKey !== null && instanceClaimContains(ctx, i, p.pos),
+  );
+  if (inst) scrubInstanceThreat(ctx, inst, p.id);
   p.pos = ctx.groundPos(dungeon.doorPos.x, dungeon.doorPos.z - 4);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
   p.targetId = null;
   p.autoAttack = false;
   ctx.emit({ type: 'log', text: dungeon.leaveText, color: '#b9f', pid: r.meta.entityId });
+}
+
+// Drop one departing player (and every entity they own) from the hate tables of
+// all mobs in the instance, releasing any aggro locked onto them. With the table
+// entry gone, updateMobTarget re-targets the remaining party next tick, or the
+// mob evades home when nobody is left on the table.
+function scrubInstanceThreat(ctx: SimContext, inst: InstanceSlot, pid: number): void {
+  for (const id of inst.mobIds) {
+    const mob = ctx.entities.get(id);
+    if (!mob || mob.dead) continue;
+    dropThreat(mob, pid);
+    for (const srcId of [...mob.threat.keys()]) {
+      if (ctx.entities.get(srcId)?.ownerId === pid) dropThreat(mob, srcId);
+    }
+    if (mob.aggroTargetId !== null) {
+      const tgt = ctx.entities.get(mob.aggroTargetId);
+      if (mob.aggroTargetId === pid || tgt?.ownerId === pid) mob.aggroTargetId = null;
+    }
+  }
 }
 
 // Legacy single-dungeon entry points (tests + scripts use these).
