@@ -1166,6 +1166,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.hideChestConfirmTitle': 'Ocultar o Baú de Recompensas Diárias?',
   'hudChrome.dailyRewards.pointsGained': '{points} pontos de recompensas diárias ganhos.',
   'hudChrome.dailyRewards.taskMultiplier': 'Multiplicador x{multiplier}',
+  'hudChrome.dailyRewards.oneVsOneExcluded':
+    'Partidas 1 contra 1 não concedem pontos de recompensas diárias.',
   'hudChrome.dailyRewards.totalPlayer': '{count} jogador hoje',
   'hudChrome.dailyRewards.totalPlayers': '{count} jogadores hoje',
   'hudChrome.death.resurrectAtCorpse': 'Ressuscitar no Cadáver',
@@ -3327,7 +3329,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'O inimigo é atacado por um enxame de insetos, sofrendo {damage} de dano de Natureza ao longo de 12 s.',
   'entities.abilities.tigers_fury.name': 'Sangue de Lobo',
   'entities.abilities.tigers_fury.description':
-    'Aumenta o poder de ataque em 40 por 6 s. Apenas Forma de Lobo.',
+    'Aumenta o poder de ataque em {buff} por {duration} s. Apenas Forma de Lobo.',
   'entities.abilities.rip.name': 'Rasgar',
   'entities.abilities.rip.description':
     'Golpe final que causa {damage} de dano de Sangramento ao longo de 12 s. Consome pontos de combo. Apenas Forma de Lobo.',
@@ -5702,8 +5704,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.gear.fishingTitle': 'Pesca',
   'guide.gear.intro':
     'Equipamento é o que seu personagem veste e os itens que você carrega. Um equipamento melhor é a forma mais constante de ficar mais forte, e você pega a maior parte só de jogar.',
-  'guide.gear.itemLevelBody':
-    'Se você quer um jeito rápido de comparar duas peças, ative Mostrar nível do item nas opções. Equipamento conquistado no mundo, de inimigos e missões, passa a mostrar um nível do item, um único número para o quão poderoso ele é mais ou menos, com base em sua origem, então você percebe num relance qual melhoria pesa mais, mesmo entre espaços diferentes. Peças sem tal origem, como itens básicos de vendedor e equipamento inicial, não mostram nível do item, então um número ausente é normal, não um defeito.',
   'guide.gear.qualityBody':
     'Cada item tem uma qualidade, e seu nome é colorido para combinar, então você lê seu valor num relance. Do mais comum ao mais cobiçado:',
   'guide.gear.qualityCommon': 'Comum',
@@ -6351,7 +6351,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Aumenta a velocidade de ataque e de lançamento em 15%.',
   'entities.itemSets.necromancers.name': 'Vestes Mournweave',
   'entities.itemSets.necromancers.bonus2':
-    'Você não pode ser repelido (100% de resistência a repulsão).',
+    'Aumenta o poder mágico em 20. Dano recebido não atrasa mais suas conjurações (100% de resistência a atraso de conjuração).',
   'entities.itemSets.necromancers.bonus3': 'Aumenta o intelecto em 10 e o vigor em 10.',
   'entities.itemSets.nighttalon.name': 'Traje de Couro Direfang',
   'entities.itemSets.nighttalon.bonus2': 'Aumenta o poder de ataque em 40.',
@@ -6359,12 +6359,12 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Aumenta a agilidade em 15, a chance de crítico em 2% e a velocidade de ataque e de lançamento em 15%.',
   'entities.itemSets.soulflame.name': 'Vestes Wraithfire',
   'entities.itemSets.soulflame.bonus2':
-    'Você não pode ser repelido (100% de resistência a repulsão).',
+    'Aumenta o poder mágico em 20. Dano recebido não atrasa mais suas conjurações (100% de resistência a atraso de conjuração).',
   'entities.itemSets.soulflame.bonus3':
     'Aumenta o intelecto em 15, o espírito em 15 e a velocidade de ataque e de lançamento em 15%.',
   'entities.itemSets.stormcallers.name': 'Vestes Galecall',
   'entities.itemSets.stormcallers.bonus2':
-    'Você não pode ser repelido (100% de resistência a repulsão).',
+    'Aumenta o poder mágico em 20. Dano recebido não atrasa mais suas conjurações (100% de resistência a atraso de conjuração).',
   'entities.itemSets.stormcallers.bonus3':
     'Aumenta o intelecto em 15, o espírito em 15 e a velocidade de ataque e de lançamento em 15%.',
   'entities.itemSets.vale_arcanist.name': 'Vestes do Arcanista do Vale',
@@ -6962,15 +6962,11 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.deedsPage.howHeading': 'Como funcionam os feitos',
   'guide.deedsPage.intro':
     'O Livro dos Feitos é onde o mundo anota tudo o que você já fez, dos primeiros passos fora do vale inicial às lutas mais duras que o reino pode oferecer. Conquiste feitos enquanto joga, ostente os títulos que eles concedem e veja seu Renome subir.',
-  'guide.deedsPage.renownBody':
-    'O Renome é a pontuação por trás do Livro. Cada feito conquistado vale uma quantia fixa, e seu total só sobe, então uma semana parada nunca faz você perder terreno. Um punhado de feitos depende mais de sorte do que de habilidade, e as Proezas são uma honraria à parte, então nenhum dos dois vale Renome algum.',
   'guide.deedsPage.renownHeading': 'Renome',
   'guide.deedsPage.rewardBorder': 'Moldura',
   'guide.deedsPage.rewardsBody':
     'As recompensas servem só para exibir, e é justamente essa a intenção. Alguns feitos concedem um título para ostentar ou uma moldura para o seu nome, e nunca nada que torne seu herói mais forte. Escolha o título que quiser no Livro dos Feitos e ele acompanha você na placa de nome, no chat e nos placares, para que todos vejam.',
   'guide.deedsPage.rewardsHeading': 'Títulos e molduras',
-  'guide.deedsPage.standingsNote':
-    'Os reinos mantêm uma contagem contínua de Renome de todas as contas. Para ver quem está onde, abra o Placar no jogo e vá até a aba de Renome; a classificação fica lá, não na wiki.',
   'guide.nav.deeds': 'Livro dos Feitos',
   'hudChrome.deeds.broadcastLine': '{name} realizou um feito: {deed}',
   'hudChrome.deeds.broadcastsLabel': 'Compartilhar feitos desbloqueados com a guilda e os amigos',
@@ -7003,9 +6999,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.filterNearly': 'Quase lá',
   'hudChrome.deeds.filterUnearned': 'Pendentes',
   'hudChrome.deeds.hiddenBadge': 'Oculto',
-  'hudChrome.deeds.lbDeedsCol': 'Feitos',
   'hudChrome.deeds.lbEmpty': 'Ainda não há cronistas na classificação.',
-  'hudChrome.deeds.lbSelf': 'Sua colocação: posição {rank}, entre os {percent} por cento melhores',
   'hudChrome.deeds.lbTab': 'Renome',
   'hudChrome.deeds.lbTitleCol': 'Título',
   'hudChrome.deeds.nearestLabel': 'Quase lá:',
@@ -7099,7 +7093,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.bestiary.flavor.sethrael_palecoil':
     'Uma serpente pálida como osso que desliza pelo fundo profundo do Glimmermere, guardiã silenciosa das águas que reivindicou para si. Nadadores que dividem o lago com ela raramente voltam à superfície.',
   'guide.combat.metersBody':
-    'Curioso para saber como foi uma luta? Pressione Z para abrir os medidores do grupo, que contabilizam dano, cura e ameaça do seu grupo, confronto a confronto.',
+    'Curioso para saber como foi uma luta? Pressione Shift+H para abrir os medidores do grupo, que contabilizam dano, cura e ameaça do seu grupo, confronto a confronto.',
   'guide.combat.queueBody':
     'Você não precisa cronometrar seus toques à perfeição. Pressione sua próxima habilidade nos instantes finais da conjuração atual e ela entra na fila, disparando no momento exato em que a conjuração termina, então o jogo bem treinado flui sem lacunas. Um toque cedo demais é simplesmente recusado, então nada se perde. Alguns golpes corpo a corpo funcionam do mesmo jeito, saindo junto com o seu próximo golpe de arma.',
   'guide.combat.queueTitle': 'Seu próximo movimento já está engatilhado',
@@ -7155,7 +7149,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Um limite diário sobre as maiores recompensas repetíveis. Cada masmorra heroica paga uma conclusão por dia, a raide controla o normal e o heroico separadamente, e saquear um chefe mundial inicia o seu. Uma incursão de cinco jogadores já concluída continua aberta ao próprio grupo; a porta trancada da raide não reabre até a redefinição.',
   'guide.glossary.lockoutTerm': 'Bloqueio',
   'guide.glossary.metersDef':
-    'A janela de placar do grupo para a luta atual: dano causado, cura realizada e quem detém a maior ameaça, mantidos por confronto. Abra-a com seu atalho (Z por padrão).',
+    'A janela de placar do grupo para a luta atual: dano causado, cura realizada e quem detém a maior ameaça, mantidos por confronto. Abra-a com seu atalho (Shift+H por padrão).',
   'guide.glossary.metersTerm': 'Medidores de dano',
   'guide.glossary.petBarDef':
     'A fileira de comandos que um mascote de caçador ou bruxo adiciona: Atacar, Parar, Provocar, Defensivo e Agressivo, atribuídos a Ctrl mais 1 a 5 por padrão.',
@@ -7186,8 +7180,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.models.formTravel': 'Forma de Fleet',
   'guide.models.groupForms': 'Formas de Druida',
   'guide.nav.sidebarLabel': 'Tópicos do guia',
-  'guide.professions.craftHowBody':
-    'Abra a janela de Criação (tecla padrão T) para ver cada receita que você conhece, o que cada uma exige e o que você tem em mãos; quando os materiais estão ali, um clique faz o trabalho. Receitas comuns podem ser criadas em qualquer lugar do mundo. Um punhado de receitas avançadas de ferramentas, em vez disso, pede que você esteja no polo de criação em Highwatch.',
   'guide.professions.craftHowTitle': 'A janela de criação',
   'guide.professions.focusBody':
     'Toda cidade principal mantém um painel de Foco da Cidade para os coletores de passagem: fique na cidade, abra-o ao lado do minimapa e direcione um pequeno orçamento de pontos de foco aos tipos de componente que lhe interessam. Quanto mais foco você dá a um componente, mais fino e rico ele sai de cada corpo dali em diante; sua distribuição acompanha seu personagem por onde ele andar, e você pode reajustá-la, de graça, em qualquer visita posterior à cidade.',
@@ -7734,4 +7726,15 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'welcome.armory.cta': 'Entrar no mundo e explorar o Arsenal',
   'welcome.news.new': 'Novo',
   'welcome.news.viewAll': 'Ver todas as atualizações no GitHub',
+  'entities.letters.heroic_marks_reward.sender': 'Intendente heroico',
+  'entities.letters.heroic_marks_reward.subject': 'Suas Marcas heroicas',
+  'entities.letters.heroic_marks_reward.body':
+    'Seu grupo venceu a provação heroica enquanto você lutava na retaguarda ou jazia caído. Seu vínculo também foi registrado, então sua parte das Marcas heroicas chegou aqui em vez de se perder. Use-as bem.\n\n- Intendente heroico',
+  'guide.dungeonsPage.resetTitle': 'Redefinindo suas instâncias',
+  'guide.dungeonsPage.resetBody':
+    'Ao trocar a dificuldade enquanto o grupo ainda mantém incursões reivindicadas, as reivindicações antigas permanecem por algum tempo antes de sumirem. O líder pode abandoná-las imediatamente escolhendo Redefinir todas as instâncias no menu do próprio retrato ou digitando /dungeon reset. Isso só funciona depois que a dificuldade realmente mudou, quando ninguém, vivo ou caído, permanece dentro, e há um curto intervalo entre redefinições. Se você chegar à entrada na dificuldade errada, o jogo avisará antes do início. A raide nunca é redefinida assim; suas próprias regras de vínculo continuam valendo.',
+  'guide.gear.itemLevelBody':
+    'Para comparar duas peças rapidamente, ative Mostrar nível do item nas opções. Equipamentos de origem conhecida, obtidos de inimigos, missões e profissões de criação, passam a mostrar um nível do item: um único número que estima a força com base na origem e permite identificar a melhor melhoria, mesmo entre espaços diferentes. Peças sem essa origem, como itens básicos de vendedores e equipamento inicial, não mostram nível; a ausência do número é normal.',
+  'guide.professions.craftHowBody':
+    'Abra a janela de Criação (tecla padrão T) para ver todas as receitas conhecidas, o que cada uma exige e os materiais disponíveis; quando tudo estiver à mão, basta um clique. Receitas comuns podem ser criadas em qualquer lugar. Algumas receitas avançadas, incluindo ferramentas de nível alto e armaduras raras para conjuradores, exigem o centro de criação de Highwatch.',
 };

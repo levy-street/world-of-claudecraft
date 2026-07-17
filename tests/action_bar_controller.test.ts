@@ -72,6 +72,22 @@ describe('ActionBarController form persistence', () => {
     expect(ACTION_BAR_ABILITY_SLOTS).toBe(22);
   });
 
+  it('round-trips source slot 20 through the existing 22-slot storage model', () => {
+    const storage = new MemoryStorage();
+    const slot20Bar = bar();
+    slot20Bar[19] = { type: 'ability', id: 'sinister_strike' };
+    const writer = makeHarness('rogue', ['sinister_strike'], slot20Bar, storage);
+    writer.controller.saveActions();
+
+    const reader = makeHarness('rogue', ['sinister_strike'], bar(), storage);
+    reader.controller.init();
+
+    expect(reader.controller.actions).toHaveLength(ACTION_BAR_ABILITY_SLOTS);
+    expect(reader.controller.actions[19]).toEqual({ type: 'ability', id: 'sinister_strike' });
+    expect(reader.controller.actions[20]).toBeNull();
+    expect(reader.controller.actions[21]).toBeNull();
+  });
+
   it('keeps Rogue normal and stealth pages independently editable', () => {
     const normal = bar('sinister_strike', 'stealth');
     const stealth = bar('ambush', 'garrote', 'stealth');
@@ -301,5 +317,32 @@ describe('ActionBarController attack slot', () => {
     harness.controller.replaceAttackAction(null);
     harness.controller.saveAttackAction();
     expect(storage.getItem('woc_hotbar_warrior_ActionbarTester:s0')).toBeNull();
+  });
+
+  it('reloads a druid form-scoped attack slot on shapeshift instead of leaking the caster slot', () => {
+    const harness = makeHarness('druid', ['bear_form', 'cat_form', 'claw', 'mangle'], bar());
+    harness.state.showAttackButton = false;
+    harness.controller.init();
+
+    harness.controller.replaceAttackAction({ type: 'ability', id: 'mangle' });
+    harness.controller.saveAttackAction();
+    expect(harness.controller.actionForSlot(0)).toEqual({ type: 'ability', id: 'mangle' });
+
+    harness.state.auras = ['form_bear'];
+    harness.controller.syncActiveForm();
+    expect(harness.controller.actionForSlot(0)).toBeNull();
+
+    harness.controller.replaceAttackAction({ type: 'ability', id: 'claw' });
+    harness.controller.saveAttackAction();
+    expect(harness.controller.actionForSlot(0)).toEqual({ type: 'ability', id: 'claw' });
+    expect(harness.storage.getItem('woc_hotbar_druid_ActionbarTester_bear:s0')).not.toBeNull();
+
+    harness.state.auras = [];
+    harness.controller.syncActiveForm();
+    expect(harness.controller.actionForSlot(0)).toEqual({ type: 'ability', id: 'mangle' });
+
+    harness.state.auras = ['form_bear'];
+    harness.controller.syncActiveForm();
+    expect(harness.controller.actionForSlot(0)).toEqual({ type: 'ability', id: 'claw' });
   });
 });

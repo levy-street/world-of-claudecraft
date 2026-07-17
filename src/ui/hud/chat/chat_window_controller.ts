@@ -16,7 +16,7 @@ import {
   isChatOpenTab,
   isChatTabChannel,
   parseChatTabs,
-  sentLineTarget,
+  sentLineTargetForHost,
   serializeChatTabs,
   WHISPER_TAB,
   WHISPER_TAB_LABEL_KEY,
@@ -126,9 +126,11 @@ export class ChatWindowController {
   // Remember the target a just-sent line reached as the sticky default for the next
   // chat open on the All tab: a standing channel, or `whisper` for a `/r` reply so a
   // whisper conversation keeps going. An explicit `/w Name`, emotes, rolls, channel
-  // membership, and unknown commands leave the sticky target unchanged.
-  noteSentChannel(sentLine: string): void {
-    const target = sentLineTarget(sentLine);
+  // membership, and unknown commands leave the sticky target unchanged. `online`
+  // disambiguates the one host-sensitive alias, bare `/g` (guild online, general
+  // offline), so the sticky follows a guild send made with the classic command.
+  noteSentChannel(sentLine: string, online: boolean): void {
+    const target = sentLineTargetForHost(sentLine, { online });
     if (target) this.stickyTarget = target;
   }
 

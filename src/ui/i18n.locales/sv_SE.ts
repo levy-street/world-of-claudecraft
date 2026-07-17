@@ -1134,6 +1134,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.hideChestConfirmTitle': 'Dölj kistan för dagliga belöningar?',
   'hudChrome.dailyRewards.pointsGained': '{points} poäng för dagliga belöningar intjänade.',
   'hudChrome.dailyRewards.taskMultiplier': 'x{multiplier} multiplikator',
+  'hudChrome.dailyRewards.oneVsOneExcluded':
+    '1 mot 1-matcher ger inga poäng för dagliga belöningar.',
   'hudChrome.dailyRewards.totalPlayer': '{count} spelare i dag',
   'hudChrome.dailyRewards.totalPlayers': '{count} spelare i dag',
   'hudChrome.death.resurrectAtCorpse': 'Återuppstå vid liket',
@@ -2095,7 +2097,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Spränger närliggande fiender för {damage} skada och saktar ner deras attacker med 10 % i 10 sek.',
   'entities.abilities.thunder_clap.name': 'Skälvande slag',
   'entities.abilities.tigers_fury.description':
-    'Ökar attackstyrkan med 40 i 6 sek. Endast vargform.',
+    'Ökar attackstyrkan med {buff} i {duration} sek. Endast vargform.',
   'entities.abilities.tigers_fury.name': 'Vargblod',
   'entities.abilities.travel_form.description':
     'Skiftar omedelbart till en snabb Fleetform och ökar förflyttningshastigheten med 40 %. Du kan inte använda andra förmågor i skepnaden, men kan skifta in eller ut i strid, idealiskt för flykt.',
@@ -3974,8 +3976,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.gear.fishingTitle': 'Fiske',
   'guide.gear.intro':
     'Utrustning är det din karaktär bär och föremålen du har med dig. Bättre utrustning är det stadigaste sättet att bli starkare, och du plockar upp det mesta bara genom att spela.',
-  'guide.gear.itemLevelBody':
-    'Om du vill ha ett snabbt sätt att jämföra två pjäser, slå på Visa föremålsnivå i alternativen. Utrustning som vunnits ute i världen, från fiender och uppdrag, visar då en föremålsnivå, en enda siffra för ungefär hur kraftfull den är utifrån var den kom ifrån, så att du på ett ögonkast kan se vilken uppgradering som väger tyngst, även mellan olika platser. Pjäser utan en sådan källa, som enkla handlarvaror och nybörjarutrustning, visar ingen föremålsnivå, så en saknad siffra är normalt, inte ett fel.',
   'guide.gear.qualityBody':
     'Varje föremål har en kvalitet, och dess namn är färglagt för att matcha så att du kan avläsa dess värde med en blick. Från vanligast till mest eftertraktad:',
   'guide.gear.qualityCommon': 'Vanlig',
@@ -6258,7 +6258,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.greyjaw_stalker.bonus3': 'Ökar attack- och magihastighet med 15%.',
   'entities.itemSets.necromancers.name': 'Mournweave-skrud',
   'entities.itemSets.necromancers.bonus2':
-    'Du kan inte knuffas bakåt (100% motstånd mot tillbakastöt).',
+    'Ökar trollformelskraft med 20. Skada du tar fördröjer inte längre dina besvärjelser (100% motstånd mot fördröjning av besvärjelser).',
   'entities.itemSets.necromancers.bonus3': 'Ökar intellekt med 10 och uthållighet med 10.',
   'entities.itemSets.nighttalon.name': 'Direfang-päls',
   'entities.itemSets.nighttalon.bonus2': 'Ökar attackkraft med 40.',
@@ -6266,12 +6266,12 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Ökar smidighet med 15, kritisk chans med 2% samt attack- och magihastighet med 15%.',
   'entities.itemSets.soulflame.name': 'Wraithfire-regalier',
   'entities.itemSets.soulflame.bonus2':
-    'Du kan inte knuffas bakåt (100% motstånd mot tillbakastöt).',
+    'Ökar trollformelskraft med 20. Skada du tar fördröjer inte längre dina besvärjelser (100% motstånd mot fördröjning av besvärjelser).',
   'entities.itemSets.soulflame.bonus3':
     'Ökar intellekt med 15, ande med 15 samt attack- och magihastighet med 15%.',
   'entities.itemSets.stormcallers.name': 'Galecall-skrud',
   'entities.itemSets.stormcallers.bonus2':
-    'Du kan inte knuffas bakåt (100% motstånd mot tillbakastöt).',
+    'Ökar trollformelskraft med 20. Skada du tar fördröjer inte längre dina besvärjelser (100% motstånd mot fördröjning av besvärjelser).',
   'entities.itemSets.stormcallers.bonus3':
     'Ökar intellekt med 15, ande med 15 samt attack- och magihastighet med 15%.',
   'entities.itemSets.vale_arcanist.name': 'Dalarkanistens skrud',
@@ -6876,15 +6876,11 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.deedsPage.howHeading': 'Så fungerar bedrifter',
   'guide.deedsPage.intro':
     'Bedrifternas bok är där världen håller räkning på allt du har uträttat, från dina första steg ut ur startdalen till de hårdaste strider riket kan bjuda. Fullborda bedrifter medan du spelar, bär titlarna de skänker och se din ryktbarhet stiga.',
-  'guide.deedsPage.renownBody':
-    'Ryktbarhet är poängräkningen bakom boken. Varje bedrift du fullbordar är värd en bestämd summa, och din totalsumma kan bara stiga, så en lugn vecka gör aldrig att du tappar mark. En handfull bedrifter avgörs av tur snarare än skicklighet, och bragder är en ära för sig, så ingen av dem ger någon ryktbarhet alls.',
   'guide.deedsPage.renownHeading': 'Ryktbarhet',
   'guide.deedsPage.rewardBorder': 'Ram',
   'guide.deedsPage.rewardsBody':
     'Belöningarna är enbart för syns skull, och det är hela poängen. Vissa bedrifter skänker en titel att bära eller en ram som pryder ditt namn, men aldrig något som gör din hjälte starkare. Välj den titel du vill ha i Bedrifternas bok, så följer den med på din namnskylt, i chatten och på topplistorna där alla kan se den.',
   'guide.deedsPage.rewardsHeading': 'Titlar och ramar',
-  'guide.deedsPage.standingsNote':
-    'Rikena för en löpande räkning av Ryktbarhet över alla konton. Vill du se vem som står var, öppna topplistan i spelet och slå upp dess Ryktbarhet-flik; ställningen finns där, inte på wikin.',
   'guide.nav.deeds': 'Bedrifternas bok',
   'hudChrome.deeds.broadcastLine': '{name} har fullbordat en bedrift: {deed}',
   'hudChrome.deeds.broadcastsLabel': 'Dela fullbordade bedrifter med gille och vänner',
@@ -6917,9 +6913,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.filterNearly': 'Nästan klara',
   'hudChrome.deeds.filterUnearned': 'Ofullbordade',
   'hudChrome.deeds.hiddenBadge': 'Dold',
-  'hudChrome.deeds.lbDeedsCol': 'Bedrifter',
   'hudChrome.deeds.lbEmpty': 'Inga rankade krönikörer ännu.',
-  'hudChrome.deeds.lbSelf': 'Din placering: plats {rank}, bland de främsta {percent} procenten',
   'hudChrome.deeds.lbTab': 'Ryktbarhet',
   'hudChrome.deeds.lbTitleCol': 'Titel',
   'hudChrome.deeds.nearestLabel': 'Nästan framme:',
@@ -7007,7 +7001,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.bestiary.flavor.sethrael_palecoil':
     'En benblek orm som glider längs Skimmertjärnens djupa avsats, tyst väktare över vattnet den gjort till sitt. Simmare som delar tjärnen med den når sällan ytan igen.',
   'guide.combat.metersBody':
-    'Nyfiken på hur en strid gick? Tryck på Z för att öppna gruppmätarna, som räknar skada, läkning och hot för din grupp, drabbning för drabbning.',
+    'Nyfiken på hur en strid gick? Tryck på Shift+H för att öppna gruppmätarna, som räknar skada, läkning och hot för din grupp, drabbning för drabbning.',
   'guide.combat.queueBody':
     'Du behöver inte tajma dina tryck till bildrutan. Tryck på din nästa förmåga under de sista ögonblicken av den pågående besvärjelsen, så köas den och avfyras i samma stund som besvärjelsen är klar, så att inövat spel flyter utan luckor. Ett tryck för tidigt avvisas helt enkelt, så inget går till spillo. Vissa närstridshugg fungerar likadant och rider ut på din nästa vapensving.',
   'guide.combat.queueTitle': 'Ditt nästa drag är redan laddat',
@@ -7063,7 +7057,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Ett dagligt tak på de största upprepbara belöningarna. Varje heroisk fängelsehåla betalar ut en rensning per dag, raiden håller reda på normalt och heroiskt var för sig, och att plundra en världsboss startar din. Ett rensat pass för fem spelare förblir öppet för den egna gruppen; den låsta raiddörren öppnas inte igen förrän återställningen.',
   'guide.glossary.lockoutTerm': 'Spärr',
   'guide.glossary.metersDef':
-    'Gruppens resultattavla för den pågående striden: skada given, läkning utförd och vem som håller mest hot, sparat per drabbning. Öppna den med dess tangentbindning (Z som standard).',
+    'Gruppens resultattavla för den pågående striden: skada given, läkning utförd och vem som håller mest hot, sparat per drabbning. Öppna den med dess tangentbindning (Shift+H som standard).',
   'guide.glossary.metersTerm': 'Skademätare',
   'guide.glossary.petBarDef':
     'Kommandoraden som ett jägar- eller häxmästardjur lägger till: Anfall, Stopp, Håna, Defensiv och Aggressiv, bundna till Ctrl plus 1 till 5 som standard.',
@@ -7094,8 +7088,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.models.formTravel': 'Fleetform',
   'guide.models.groupForms': 'Druidformer',
   'guide.nav.sidebarLabel': 'Guideämnen',
-  'guide.professions.craftHowBody':
-    'Öppna Hantverksfönstret (standardtangent T) för att se varje recept du kan, vad vart och ett kräver och vad du har till hands; när materialen finns där gör ett klick jobbet. Vanliga recept kan tillverkas var som helst i världen. En handfull avancerade verktygsrecept ber dig i stället att stå vid hantverksnavet i Highwatch.',
   'guide.professions.craftHowTitle': 'Hantverksfönstret',
   'guide.professions.focusBody':
     'Varje huvudort har en Stadsfokus-panel för besökande skördare: stå i staden, öppna den bredvid minikartan, och rikta en liten budget av fokuspoäng mot de komponenttyper du bryr dig om. Ju mer fokus du ger en komponent, desto finare och rikare kommer den av varje senare kropp; din fördelning följer din karaktär vart den än vandrar, och du kan göra om den, gratis, vid vilket senare besök i staden som helst.',
@@ -7633,4 +7625,15 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'welcome.armory.cta': 'Träd in i världen och utforska Vapenhuset',
   'welcome.news.new': 'Ny',
   'welcome.news.viewAll': 'Se alla uppdateringar på GitHub',
+  'entities.letters.heroic_marks_reward.sender': 'Heroisk kvartermästare',
+  'entities.letters.heroic_marks_reward.subject': 'Dina heroiska märken',
+  'entities.letters.heroic_marks_reward.body':
+    'Din grupp klarade den heroiska prövningen medan du kämpade i eftertruppen eller låg fallen. Din låsning registrerades ändå, så din andel heroiska märken skickades hit i stället för att gå förlorad. Använd dem väl.\n\n- Heroisk kvartermästare',
+  'guide.dungeonsPage.resetTitle': 'Återställa dina instanser',
+  'guide.dungeonsPage.resetBody':
+    'Om du byter svårighetsgrad medan gruppen fortfarande har hävdade rundor ligger de gamla anspråken kvar en stund. Gruppledaren kan släppa dem direkt genom att välja Återställ alla instanser i menyn på sitt eget porträtt eller skriva /dungeon reset. Svårighetsgraden måste faktiskt ha ändrats, ingen levande eller fallen får vara kvar inuti och en kort väntetid skiljer återställningarna åt. Vid dörren på fel svårighetsgrad varnar spelet innan starten. Raiden återställs aldrig så här; dess egna låsningsregler gäller.',
+  'guide.gear.itemLevelBody':
+    'Slå på Visa föremålsnivå i alternativen för att snabbt jämföra två delar. Utrustning med känd källa, från fiender, uppdrag och hantverksyrken, visar då en föremålsnivå: ett enda tal som ungefär anger styrkan utifrån ursprunget och gör förbättringar jämförbara även mellan olika platser. Delar utan sådan källa, som enkla handelsvaror och startutrustning, visar ingen nivå; ett saknat tal är normalt.',
+  'guide.professions.craftHowBody':
+    'Öppna hantverksfönstret (standardtangent T) för att se alla recept du kan, vad de kräver och vad du har; när materialen finns räcker ett klick. Vanliga recept kan tillverkas var som helst. Några avancerade recept, däribland verktyg på hög nivå och sällsynta rustningar för besvärjare, kräver hantverksnavet i Highwatch.',
 };

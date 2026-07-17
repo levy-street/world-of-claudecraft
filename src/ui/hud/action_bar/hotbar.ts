@@ -47,8 +47,8 @@ export function parseStoredHotbarAction(
   }
 }
 
-export function attackSlotStorageKey(normalSlotMapKey: string): string {
-  return `${normalSlotMapKey}:s0`;
+export function attackSlotStorageKey(formSlotMapKey: string): string {
+  return `${formSlotMapKey}:s0`;
 }
 
 export function loadAttackSlotAction(

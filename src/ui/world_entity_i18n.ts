@@ -1,4 +1,9 @@
-import { type LetterDef, QUEST_LETTERS, WELCOME_LETTER } from '../sim/content/letters';
+import {
+  HEROIC_MARK_LETTER,
+  type LetterDef,
+  QUEST_LETTERS,
+  WELCOME_LETTER,
+} from '../sim/content/letters';
 import { DELVES, DUNGEONS, MOBS, NPCS, QUESTS, ZONES } from '../sim/data';
 
 // English world-entity names + narratives (mobs, NPCs, quests, zones, dungeons).
@@ -129,6 +134,7 @@ const NPC_IDS = [
   'loremaster_caddis',
   'auctioneer_voss', // second World Market auctioneer (Highwatch, zone 3)
   'bursar_fernando', // Gilded Strongbox banker (Eastbrook, zone 1)
+  'card_master', // Card Duel minigame queue desk (Eastbrook, zone 1)
   'bursar_petra_vell', // Gilded Strongbox banker (Fenbridge, zone 2)
   'bursar_aldous_crane', // Gilded Strongbox banker (Highwatch, zone 3)
   'brother_aldric_raid', // dynamically-spawned raid turn-in NPC (Crypt of Nythraxis)
@@ -237,6 +243,7 @@ const LETTER_IDS = [
   'letter_q_wolves',
   'letter_q_greyjaw',
   'letter_q_hollow',
+  'heroic_marks_reward',
 ] as const;
 
 type MobId = (typeof MOB_IDS)[number];
@@ -369,7 +376,10 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
     };
   });
 
-  const lettersById: Record<string, LetterDef> = { [WELCOME_LETTER.letterId]: WELCOME_LETTER };
+  const lettersById: Record<string, LetterDef> = {
+    [WELCOME_LETTER.letterId]: WELCOME_LETTER,
+    [HEROIC_MARK_LETTER.letterId]: HEROIC_MARK_LETTER,
+  };
   for (const letter of Object.values(QUEST_LETTERS)) lettersById[letter.letterId] = letter;
   const letters = {} as LetterTranslations;
   orderedValues(LETTER_IDS, lettersById).forEach((letter) => {

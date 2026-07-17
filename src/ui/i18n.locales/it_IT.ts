@@ -1177,6 +1177,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Nascondere il forziere delle ricompense giornaliere?',
   'hudChrome.dailyRewards.pointsGained': '{points} punti ricompense giornaliere ottenuti.',
   'hudChrome.dailyRewards.taskMultiplier': 'Moltiplicatore x{multiplier}',
+  'hudChrome.dailyRewards.oneVsOneExcluded':
+    'Le partite 1 contro 1 non assegnano punti per le ricompense giornaliere.',
   'hudChrome.dailyRewards.totalPlayer': '{count} giocatore oggi',
   'hudChrome.dailyRewards.totalPlayers': '{count} giocatori oggi',
   'hudChrome.death.resurrectAtCorpse': 'Risorgi al cadavere',
@@ -3342,7 +3344,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Il nemico è assalito da uno sciame di insetti, subendo {damage} danni da Natura in 12 sec.',
   'entities.abilities.tigers_fury.name': 'Sangue di Lupo',
   'entities.abilities.tigers_fury.description':
-    "Aumenta la potenza d'attacco di 40 per 6 sec. Solo Forma del Lupo.",
+    "Aumenta la potenza d'attacco di {buff} per {duration} sec. Solo Forma del Lupo.",
   'entities.abilities.rip.name': 'Squartare',
   'entities.abilities.rip.description':
     'Mossa finale che infligge {damage} danni da sanguinamento in 12 sec. Consuma i punti combo. Solo Forma del Lupo.',
@@ -5725,11 +5727,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.gear.fishingTitle': 'Pesca',
   'guide.gear.intro':
     "L'equipaggiamento è ciò che il tuo personaggio indossa e gli oggetti che porta con sé. Un equipaggiamento migliore è il modo più costante per diventare più forte, e ne raccogli gran parte semplicemente giocando.",
-  'guide.gear.itemLevelBody':
-    "Se vuoi un modo rapido per confrontare due pezzi, attiva Mostra livello oggetto nelle opzioni. L'equipaggiamento conquistato nel mondo, da nemici e missioni, mostra allora un livello oggetto, un singolo numero che indica all'incirca quanto è potente in base alla sua provenienza, così puoi capire a colpo d'occhio quale miglioramento conta di più, anche tra slot diversi. I pezzi privi di tale origine, come le basi comuni dei venditori e l'equipaggiamento iniziale, non mostrano alcun livello oggetto, perciò un numero mancante è normale, non un difetto.",
-  'guide.gear.qualityBody':
-    "Ogni oggetto ha una qualità, e il suo nome è colorato di conseguenza così puoi leggerne il valore a colpo d'occhio. Dal più comune al più pregiato:",
-  'guide.gear.qualityCommon': 'Comune',
   'guide.gear.qualityEpic': 'Epico',
   'guide.gear.qualityLegendary': 'Leggendario',
   'guide.gear.qualityNote':
@@ -6374,7 +6371,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.greyjaw_stalker.bonus3': "Aumenta la velocità d'attacco e di lancio del 15%.",
   'entities.itemSets.necromancers.name': 'Vesti Mournweave',
   'entities.itemSets.necromancers.bonus2':
-    'Non puoi essere respinto (100% di resistenza alla respinta).',
+    'Aumenta il potere degli incantesimi di 20. I danni subiti non ritardano più i tuoi incantesimi (100% di resistenza al ritardo di lancio).',
   'entities.itemSets.necromancers.bonus3': "Aumenta l'intelletto di 10 e la tempra di 10.",
   'entities.itemSets.nighttalon.name': 'Tenuta di cuoio Direfang',
   'entities.itemSets.nighttalon.bonus2': "Aumenta la potenza d'attacco di 40.",
@@ -6382,12 +6379,12 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Aumenta l'agilità di 15, la probabilità di critico del 2% e la velocità d'attacco e di lancio del 15%.",
   'entities.itemSets.soulflame.name': 'Paramenti Wraithfire',
   'entities.itemSets.soulflame.bonus2':
-    'Non puoi essere respinto (100% di resistenza alla respinta).',
+    'Aumenta il potere degli incantesimi di 20. I danni subiti non ritardano più i tuoi incantesimi (100% di resistenza al ritardo di lancio).',
   'entities.itemSets.soulflame.bonus3':
     "Aumenta l'intelletto di 15, lo spirito di 15 e la velocità d'attacco e di lancio del 15%.",
   'entities.itemSets.stormcallers.name': 'Vesti Galecall',
   'entities.itemSets.stormcallers.bonus2':
-    'Non puoi essere respinto (100% di resistenza alla respinta).',
+    'Aumenta il potere degli incantesimi di 20. I danni subiti non ritardano più i tuoi incantesimi (100% di resistenza al ritardo di lancio).',
   'entities.itemSets.stormcallers.bonus3':
     "Aumenta l'intelletto di 15, lo spirito di 15 e la velocità d'attacco e di lancio del 15%.",
   'entities.itemSets.vale_arcanist.name': "Tenuta dell'Arcanista della Valle",
@@ -6991,15 +6988,11 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.deedsPage.howHeading': 'Come funzionano le imprese',
   'guide.deedsPage.intro':
     'Il Libro delle Imprese è il luogo dove il mondo tiene il conto di tutto ciò che hai fatto, dai primi passi fuori dalla valle iniziale agli scontri più duri che il reame possa offrire. Ottieni imprese giocando, indossa i titoli che concedono e guarda salire la tua Fama.',
-  'guide.deedsPage.renownBody':
-    "La Fama è il punteggio dietro il Libro. Ogni impresa che ottieni vale una cifra fissa, e il tuo totale non fa che salire, così una settimana tranquilla non ti fa mai perdere terreno. Una manciata di imprese dipende dalla fortuna più che dall'abilità, e le Prodezze sono un onore a sé: né le une né le altre valgono alcuna Fama.",
   'guide.deedsPage.renownHeading': 'Fama',
   'guide.deedsPage.rewardBorder': 'Bordo',
   'guide.deedsPage.rewardsBody':
     'Le ricompense sono tutte estetiche, ed è proprio questo il punto. Alcune imprese concedono un titolo da indossare o un bordo che incornicia il tuo nome, e mai nulla che renda più forte il tuo eroe. Scegli il titolo che preferisci dal Libro delle Imprese e ti seguirà sulla targhetta del nome, in chat e in classifica, sotto gli occhi di tutti.',
   'guide.deedsPage.rewardsHeading': 'Titoli e bordi',
-  'guide.deedsPage.standingsNote':
-    'I reami tengono un conteggio continuo della Fama di ogni account. Per vedere chi sta dove, apri la Classifica in gioco e passa alla sua scheda Fama; le graduatorie vivono lì, non sulla wiki.',
   'guide.nav.deeds': 'Libro delle Imprese',
   'hudChrome.deeds.broadcastLine': "{name} ha compiuto un'impresa: {deed}",
   'hudChrome.deeds.broadcastsLabel': 'Condividi le imprese ottenute con la gilda e gli amici',
@@ -7032,10 +7025,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.filterNearly': 'Quasi fatte',
   'hudChrome.deeds.filterUnearned': 'Da ottenere',
   'hudChrome.deeds.hiddenBadge': 'Nascosta',
-  'hudChrome.deeds.lbDeedsCol': 'Imprese',
   'hudChrome.deeds.lbEmpty': 'Ancora nessun cronista in classifica.',
-  'hudChrome.deeds.lbSelf':
-    'Il tuo piazzamento: posizione {rank}, nel {percent} percento dei migliori',
   'hudChrome.deeds.lbTab': 'Fama',
   'hudChrome.deeds.lbTitleCol': 'Titolo',
   'hudChrome.deeds.nearestLabel': 'Ci sei quasi:',
@@ -7129,7 +7119,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.bestiary.flavor.sethrael_palecoil':
     "Un serpente pallido come l'osso che scivola lungo la piattaforma profonda del Glimmermere, guardiano silenzioso delle acque che ha reclamato. Chi nuota nel lago in sua compagnia di rado torna a galla.",
   'guide.combat.metersBody':
-    "Curioso di sapere com'è andato uno scontro? Premi Z per aprire i misuratori del gruppo, che tengono il conto di danno, cure e minaccia della tua squadra, scontro per scontro.",
+    "Curioso di sapere com'è andato uno scontro? Premi Shift+H per aprire i misuratori del gruppo, che tengono il conto di danno, cure e minaccia della tua squadra, scontro per scontro.",
   'guide.combat.queueBody':
     "Non devi cronometrare le pressioni al singolo istante. Premi la prossima abilità negli attimi finali del lancio in corso e viene messa in coda, scattando nell'istante in cui il lancio si completa, così il gioco esperto scorre senza pause. Una pressione troppo anticipata viene semplicemente rifiutata, quindi nulla va sprecato. Alcuni colpi in mischia funzionano allo stesso modo, partendo con il tuo prossimo fendente.",
   'guide.combat.queueTitle': 'La tua prossima mossa è già pronta',
@@ -7185,7 +7175,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Un limite giornaliero sulle ricompense ripetibili più grandi. Ogni dungeon eroico paga una conquista al giorno, l'incursione conta normale ed eroica separatamente, e saccheggiare un boss del mondo fa scattare il tuo. Una spedizione a cinque giocatori già completata resta aperta al suo stesso gruppo; la porta bloccata dell'incursione non si riapre fino al ripristino.",
   'guide.glossary.lockoutTerm': 'Blocco',
   'guide.glossary.metersDef':
-    'La finestra tabellone del gruppo per lo scontro in corso: danno inflitto, cure prestate e chi regge più minaccia, tenuti scontro per scontro. Aprila con la sua scorciatoia (Z di default).',
+    'La finestra tabellone del gruppo per lo scontro in corso: danno inflitto, cure prestate e chi regge più minaccia, tenuti scontro per scontro. Aprila con la sua scorciatoia (Shift+H di default).',
   'guide.glossary.metersTerm': 'Misuratori di danno',
   'guide.glossary.petBarDef':
     'La fila di comandi che aggiunge un famiglio del cacciatore o dello stregone: Attacca, Ferma, Provoca, Difensivo e Aggressivo, associati a Ctrl più 1-5 di default.',
@@ -7216,8 +7206,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.models.formTravel': 'Forma di Fleet',
   'guide.models.groupForms': 'Forme del Druido',
   'guide.nav.sidebarLabel': 'Argomenti della guida',
-  'guide.professions.craftHowBody':
-    'Apri la finestra di Creazione (tasto predefinito T) per vedere ogni ricetta che conosci, cosa richiede ciascuna e cosa hai a disposizione; quando i materiali ci sono, un clic fa il lavoro. Le ricette comuni si possono creare ovunque nel mondo. Una manciata di ricette avanzate per attrezzi ti chiede invece di trovarti alla postazione artigiana di Highwatch.',
   'guide.professions.craftHowTitle': 'La finestra di creazione',
   'guide.professions.focusBody':
     'Ogni città principale tiene un pannello Focus Cittadino per i raccoglitori di passaggio: fermati in città, aprilo da accanto alla minimappa e indirizza un piccolo budget di punti focus verso i tipi di componente che ti interessano. Più focus dai a un componente, più fine e ricco esce da ogni cadavere successivo; la tua ripartizione segue il personaggio ovunque vada, e puoi rielaborarla, gratis, a ogni successiva visita in città.',
@@ -7763,4 +7751,18 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'welcome.armory.cta': 'Entra nel mondo ed esplora l’Armeria',
   'welcome.news.new': 'Novità',
   'welcome.news.viewAll': 'Vedi tutti gli aggiornamenti su GitHub',
+  'entities.letters.heroic_marks_reward.sender': 'Quartiermastro eroico',
+  'entities.letters.heroic_marks_reward.subject': 'I tuoi Marchi eroici',
+  'entities.letters.heroic_marks_reward.body':
+    'Il tuo gruppo ha superato la prova eroica mentre combattevi nelle retrovie o giacevi a terra. Anche il tuo vincolo è stato registrato, quindi la tua parte di Marchi eroici è arrivata qui invece di andare perduta. Usali bene.\n\n- Quartiermastro eroico',
+  'guide.dungeonsPage.resetTitle': 'Reimpostare le istanze',
+  'guide.dungeonsPage.resetBody':
+    'Se cambi difficoltà mentre il gruppo conserva ancora delle spedizioni assegnate, le vecchie assegnazioni restano per un po’ prima di svanire. Il capogruppo può abbandonarle subito scegliendo Reimposta tutte le istanze dal menu del proprio ritratto oppure digitando /dungeon reset. La difficoltà deve essere stata davvero cambiata, nessuno, vivo o caduto, può trovarsi all’interno e tra due ripristini passa un breve tempo di recupero. Se arrivi all’ingresso con la difficoltà sbagliata, il gioco ti avvisa prima dell’inizio. L’incursione non viene mai reimpostata così e mantiene le proprie regole di vincolo.',
+  'guide.gear.itemLevelBody':
+    'Per confrontare rapidamente due pezzi, attiva Mostra livello oggetto nelle opzioni. L’equipaggiamento di provenienza nota, ottenuto da nemici, missioni e mestieri, mostra un livello oggetto: un unico valore che ne indica approssimativamente la potenza in base alla fonte e rende immediata la scelta del miglior potenziamento, anche tra slot diversi. I pezzi senza tale provenienza, come gli articoli base dei mercanti e l’equipaggiamento iniziale, non mostrano alcun livello; è normale.',
+  'guide.professions.craftHowBody':
+    'Apri la finestra Creazione (tasto predefinito T) per vedere tutte le ricette note, i loro requisiti e ciò che possiedi; quando hai i materiali basta un clic. Le ricette comuni si possono creare ovunque. Alcune ricette avanzate, tra cui strumenti di livello superiore e rare armature da incantatore, richiedono invece il centro di creazione di Highwatch.',
+  'guide.gear.qualityBody':
+    'Ogni oggetto ha una qualità e il suo nome assume il colore corrispondente, così puoi capirne il valore a colpo d’occhio. Dal più comune al più prezioso:',
+  'guide.gear.qualityCommon': 'Comune',
 };

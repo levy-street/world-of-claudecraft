@@ -216,6 +216,8 @@ function makeCtx() {
     delveModuleEntry: vi.fn(() => ({ x: 0, y: 0, z: 0 })),
     failDelveRun: vi.fn(),
     duels: new Map(),
+    cardDuelQueue: [],
+    cardDuels: new Map(),
     pendingLootRolls: new Map(),
     nextLootRollId: 1,
     devCommands: false,
@@ -340,6 +342,7 @@ function makeCtx() {
     marketListingBelongsTo: vi.fn(() => false),
     // Ravenpost mail: the quest turn-in letter hook.
     queueQuestLetter: vi.fn(),
+    mailHeroicMarks: vi.fn(),
     applySetProcs: vi.fn(),
     // The Vale Cup sport-move arms.
     vcupBallKick: vi.fn(),

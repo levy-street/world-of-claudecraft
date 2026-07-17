@@ -35,6 +35,24 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.armoryTitle': '兵器庫',
   'hudChrome.wocStore.armoryBody':
     '第一賽季兵器庫限定武器外觀。全帳號通用，純裝飾性，周圍所有玩家都能看到。',
+  'hudChrome.wocStore.wallet.title': 'Solana 錢包',
+  'hudChrome.wocStore.wallet.unlinked':
+    '連接錢包應用程式，然後簽署一次，將其公開地址綁定到你的 WoC 帳號。我們絕不會取得你的復原短語或私鑰。',
+  'hudChrome.wocStore.wallet.connectedUnlinked':
+    '錢包應用程式已連接到此瀏覽器，但其公開地址尚未綁定到你的 WoC 帳號。',
+  'hudChrome.wocStore.wallet.linkedDisconnected':
+    '你的公開地址已綁定。需要使用 SOL 或 WOC 付款時，請重新連接該錢包應用程式。',
+  'hudChrome.wocStore.wallet.linkedConnected':
+    '已綁定的錢包應用程式已連接，可以使用 SOL 或 WOC 購買。',
+  'hudChrome.wocStore.wallet.mismatched':
+    '目前連接的是另一個錢包。驗證它即可取代已綁定的地址，或重新連接原先綁定的錢包。',
+  'hudChrome.wocStore.wallet.connect': '連接錢包',
+  'hudChrome.wocStore.wallet.verify': '驗證並綁定',
+  'hudChrome.wocStore.wallet.reconnect': '重新連接錢包',
+  'hudChrome.wocStore.wallet.manage': '管理錢包',
+  'wallet.bagConnect': '綁定錢包',
+  'wallet.bagLink': '驗證錢包',
+  'wallet.bagReconnect': '重新連接錢包',
   'hudChrome.wocStore.collectionLine': '{collection}系列',
   'hudChrome.wocStore.seasonOne': '第一賽季',
   'hudChrome.wocStore.rarity.uncommon': '優秀',
@@ -325,6 +343,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.spinButton': '轉動',
   'hudChrome.dailyRewards.tasks': '任務',
   'hudChrome.dailyRewards.taskMultiplier': '{multiplier}倍倍率',
+  'hudChrome.dailyRewards.oneVsOneExcluded': '1對1比賽不會獲得每日獎勵點數。',
   'hudChrome.dailyRewards.pointsGained': '已獲得 {points} 每日獎勵點數。',
   'hudChrome.dailyRewards.showChestButton': '顯示寶箱',
   'hudChrome.dailyRewards.hideChestButton': '隱藏寶箱',
@@ -1017,11 +1036,39 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'wallet.helpLinkedDisconnectedWithBalance': '持有者特權已啟用。需要簽名或花費時請連接應用程式。',
   'wallet.extensionHelp':
     '若要在此處看到錢包，請保持 Solflare Wallet 等瀏覽器錢包擴充功能處於啟用狀態。',
+  'wallet.mobileAppHelp':
+    '選擇 Phantom 或 Solflare。錢包應用程式會要求核准。請保持遊戲開啟，完成後返回遊戲。',
+  'wallet.standaloneAppHelp':
+    '主畫面應用程式目前尚不支援連接錢包。若要使用 Phantom 或 Solflare，請在 Safari 或 Chrome 中開啟 World of ClaudeCraft。',
+  'wallet.openAppTitle': '在 {wallet} 中繼續',
+  'wallet.openAppHelp': '開啟 {wallet} 檢視此請求。錢包應用程式啟用時，請保持此遊戲分頁開啟。',
+  'wallet.openAppButton': '開啟 {wallet}',
+  'wallet.manualReturnBrowserHelp':
+    '核准後請返回此遊戲分頁。如果 iOS 開啟了其他瀏覽器，請將其關閉並手動返回原本的瀏覽器。',
+  'wallet.manualReturnStandaloneHelp':
+    '核准後請從主畫面返回 World of ClaudeCraft。如果 iOS 開啟了瀏覽器，請將其關閉並重新開啟主畫面 App。',
+  'wallet.preparingAppButton': '正在準備 {wallet}...',
+  'wallet.walletAppUnavailable': '無法準備 {wallet}。請關閉此視窗並重試。',
   'wallet.flowConnect': '選擇一個錢包。驗證會自動繼續。',
   'wallet.flowSign': '在錢包應用程式中簽署驗證訊息。無需交易或 SOL。',
   'wallet.flowVerify': '正在驗證錢包所有權...',
   'wallet.linkFailed': '錢包驗證失敗。',
   'wallet.verifyFailed': '錢包驗證失敗。',
+  'wallet.browser.eyebrow': '桌面錢包授權',
+  'wallet.browser.title': '連接 Solana 錢包',
+  'wallet.browser.linkBody': '在此瀏覽器中選擇錢包擴充功能。簽署驗證訊息後返回桌面應用程式。',
+  'wallet.browser.paymentBody': '選擇已連結至帳號的錢包，並在此瀏覽器中核准交易。',
+  'wallet.browser.extensionHelp':
+    '找不到相容的錢包擴充功能。請安裝或解鎖 Phantom、Solflare 或其他 Solana 瀏覽器錢包，然後再試一次。',
+  'wallet.browser.safety': 'World of ClaudeCraft 絕不會要求復原短語或私鑰。',
+  'wallet.browser.continueWith': '使用 {wallet} 繼續',
+  'wallet.browser.reviewTitle': '在錢包中檢視',
+  'wallet.browser.reviewBody': '按照 {wallet} 的提示操作。請保持此瀏覽器頁面開啟。',
+  'wallet.browser.completeTitle': '錢包授權完成',
+  'wallet.browser.completeBody': '現在可以返回 World of ClaudeCraft 桌面應用程式。',
+  'wallet.browser.returnButton': '返回桌面應用程式',
+  'wallet.browser.failed': '錢包授權失敗或已過期。請返回桌面應用程式並再試一次。',
+  'wallet.browser.retry': '再試一次',
   'wallet.unlinkFailed': '無法解除錢包綁定。',
   'wallet.holder': '$WOC 持有者',
   'wallet.holderTierTitle': '{tier} $WOC 持有者',
@@ -2462,7 +2509,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.insect_swarm.description':
     '敵人被蟲群侵襲，在 12 秒內受到 {damage} 點自然傷害。',
   'entities.abilities.tigers_fury.name': '狼血之力',
-  'entities.abilities.tigers_fury.description': '使攻擊強度提高 40，持續 6 秒。僅限狼形態。',
+  'entities.abilities.tigers_fury.description':
+    '使攻擊強度提高 {buff}，持續 {duration} 秒。僅限狼形態。',
   'entities.abilities.rip.name': '割裂',
   'entities.abilities.rip.description':
     '終結技，在 12 秒內造成 {damage} 點流血傷害。消耗連擊點。僅限狼形態。',
@@ -3015,6 +3063,25 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.heroic_quartermaster.title': '英雄軍需官',
   'entities.npcs.heroic_quartermaster.greeting':
     '英雄深淵的憑證能換來高崖望最上等的戒指和吊墜。把你的徽記拿給我看。',
+  'entities.npcs.card_master.name': '牌局大師',
+  'entities.npcs.card_master.title': '運氣經銷人',
+  'entities.npcs.card_master.greeting': '來一局紙牌對決？三局兩勝，贏家贏得吹噓的資本。',
+  'cardDuel.title': '紙牌對決',
+  'cardDuel.close': '關閉',
+  'cardDuel.join': '加入隊列',
+  'cardDuel.joinAria': '加入紙牌對決隊列',
+  'cardDuel.leave': '離開隊列',
+  'cardDuel.leaveAria': '離開紙牌對決隊列',
+  'cardDuel.queued': '正在等待對手……',
+  'cardDuel.vsOpponent': '對戰 {name}',
+  'cardDuel.round': '局分：{mine} - {theirs}',
+  'cardDuel.forfeit': '認輸',
+  'cardDuel.forfeitAria': '認輸退出紙牌對決',
+  'cardDuel.unavailable': '紙牌對決需要另一名玩家在線。',
+  'cardDuel.counts': '牌堆：{deck} · 棄牌堆：{discard}',
+  'cardDuel.playCardAria': '打出 {value} 號牌',
+  'cardDuel.waitingOnOpponent': '正在等待對手出牌……',
+  'cardDuel.yourTurn': '出一張牌',
   'entities.npcs.loremaster_caddis.name': '凱迪斯博學者',
   'entities.npcs.loremaster_caddis.title': '博學者',
   'entities.npcs.loremaster_caddis.greeting':
@@ -4187,14 +4254,14 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.deedsPage.intro':
     '功績之書記錄著你在這個世界所做的一切，從走出新手山谷的第一步，到王國所能提供的最艱難的戰鬥。一邊遊玩一邊贏得功績，佩戴它們授予的頭銜，看著你的名望不斷攀升。',
   'guide.deedsPage.renownBody':
-    '名望是功績之書背後的分數。你贏得的每個功績都價值固定的點數，而你的總分只增不減，因此清閒的一週絕不會讓你失去已有的成績。少數功績取決於運氣而非技巧，而壯舉則自成一份榮譽，因此這兩者都不提供任何名望。',
+    '名望是功績之書背後的分數。你贏得的每個功績都價值固定的點數，而你的總分只增不減，因此清閒的一週絕不會讓你失去已有的成績。少數功績取決於運氣而非技巧，而壯舉則自成一份榮譽，因此這兩者都不提供任何名望。不帶名望的功績仍會計入功績之書的完成度，只是從不計分。',
   'guide.deedsPage.renownHeading': '名望',
   'guide.deedsPage.rewardBorder': '邊框',
   'guide.deedsPage.rewardsBody':
     '這些獎勵純粹是為了炫耀，而這正是它們的意義所在。有些功績會授予你可佩戴的頭銜，或是為你的名字增添裝飾的邊框，絕不會給出任何讓你的英雄變強的東西。在功績之書中選擇你想要的頭銜，它便會隨你出現在銘牌上、聊天中與排行榜上，供所有人觀看。',
   'guide.deedsPage.rewardsHeading': '頭銜與邊框',
   'guide.deedsPage.standingsNote':
-    '各王國會持續統計所有帳號累積的名望。想知道誰位居何處，請在遊戲內打開排行榜並轉到其名望分頁；排名在那裡，而不在維基上。',
+    '各王國會持續統計所有帳號累積的名望：排行榜按帳號的累計名望排名，每個功績在你所有角色中只計一次，且榜上只顯示名望，因此不帶名望的功績即使計入你的功績之書，也絕不會影響排名。想知道誰位居何處，請在遊戲內打開排行榜並轉到其名望分頁；排名在那裡，而不在維基上。',
   'guide.delvesPage.affixesBody':
     '較高難度的旅程會擲出一項詞綴，改變這趟探索的進行方式，從不安的亡者到污濁的空氣，再到搖搖欲墜的屋頂結構。它們同時提高了危險與獎勵。每座秘探都會從契合自身主題的詞綴中抽取；就整個王國而言，詞綴池如下：',
   'guide.delvesPage.affixesHeading': '旅程詞綴',
@@ -4637,6 +4704,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.templeName': '沉沒神殿',
   'guide.dungeonsPage.templeBody': '沼澤大道旁一座沉沒的神龕，是為好奇且準備充分者預備的支線之路。',
   'guide.dungeonsPage.sanctumName': '墓龍聖所',
+  'guide.dungeonsPage.resetBody':
+    '在隊伍仍持有已認領副本時切換難度，舊的認領會保留一段時間後自行清除。隊長也可以立即放棄它們：在自己的頭像選單中選擇「重置所有地城副本」，或輸入 /dungeon reset。重置只有在難度確實更改之後才能進行，且副本內不能有任何人（無論生死）留守，兩次重置之間還隔著一段短暫的冷卻。帶著錯誤的難度來到門口，遊戲會在開打之前直接提醒你。團隊副本永遠不會以這種方式重置；它遵循自己的鎖定規則。',
+  'guide.dungeonsPage.resetTitle': '重置你的地城副本',
   'guide.dungeonsPage.sanctumBody': '棘峰的黑暗核心，邪教漫長的圖謀在此達到恐怖的頂點。',
   'guide.dungeonsPage.raidName': '最終團隊副本',
   'guide.dungeonsPage.raidBody':
@@ -4988,7 +5058,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.gear.intro':
     '裝備是你角色身上穿戴的物件與隨身攜帶的物品。更好的裝備是變強最穩當的途徑，而其中大部分只要遊玩就能取得。',
   'guide.gear.itemLevelBody':
-    '若你想快速比較兩件裝備，可在選項中開啟「顯示物品等級」。在世界中贏得的裝備，來自敵人與任務者，便會顯示一個物品等級，這是依其來源粗略衡量其強度的單一數值，讓你一眼就能看出哪件升級更有分量，即使是不同部位之間也行。沒有這類來源的物品，例如普通的商人基礎貨品與新手裝備，則不會顯示物品等級，因此缺少數值是正常現象，而非瑕疵。',
+    '若你想快速比較兩件裝備，可在選項中開啟「顯示物品等級」。有明確來源的裝備，無論來自敵人、任務還是製作專業，便會顯示一個物品等級，這是依其來源粗略衡量其強度的單一數值，讓你一眼就能看出哪件升級更有分量，即使是不同部位之間也行。沒有這類來源的物品，例如普通的商人基礎貨品與新手裝備，則不會顯示物品等級，因此缺少數值是正常現象，而非瑕疵。',
   'guide.gear.qualityBody':
     '每件物品都有一個品質，其名稱也會以對應的顏色標示，讓你一眼就能看出它的價值。從最常見到最珍貴：',
   'guide.gear.qualityCommon': '普通',
@@ -5572,7 +5642,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.greyjaw_stalker.name': '灰顎追獵者裝備',
   'entities.itemSets.greyjaw_stalker.bonus3': '攻擊速度和施法速度提高 15%。',
   'entities.itemSets.necromancers.name': '哀織法衣',
-  'entities.itemSets.necromancers.bonus2': '你不會被擊退（擊退抗性 100%）。',
+  'entities.itemSets.necromancers.bonus2':
+    '法術強度提高 20 點。受到傷害不再延遲你的施法（施法延遲抗性 100%）。',
   'entities.itemSets.necromancers.bonus3': '智力提高 10 點，耐力提高 10 點。',
   'entities.itemSets.necromancers.bonus4':
     '你的法術有 10% 的機率觸發「清晰施法」，使你的下一個法術免費施放。',
@@ -5583,13 +5654,15 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.nighttalon.bonus4':
     '你的武器致命一擊會撕開「撕裂傷口」，使目標每 2 秒流血 6 點傷害，持續 12 秒。最多疊加 3 層。',
   'entities.itemSets.soulflame.name': '怨焰法衣',
-  'entities.itemSets.soulflame.bonus2': '你不會被擊退（擊退抗性 100%）。',
+  'entities.itemSets.soulflame.bonus2':
+    '法術強度提高 20 點。受到傷害不再延遲你的施法（施法延遲抗性 100%）。',
   'entities.itemSets.soulflame.bonus3':
     '智力提高 15 點，精神提高 15 點，攻擊速度和施法速度提高 15%。',
   'entities.itemSets.soulflame.bonus4':
     '你的法術有 10% 的機率觸發「灼魂之焰」，使法術強度提高 40 點，持續 10 秒。',
   'entities.itemSets.stormcallers.name': '喚風法衣',
-  'entities.itemSets.stormcallers.bonus2': '你不會被擊退（擊退抗性 100%）。',
+  'entities.itemSets.stormcallers.bonus2':
+    '法術強度提高 20 點。受到傷害不再延遲你的施法（施法延遲抗性 100%）。',
   'entities.itemSets.stormcallers.bonus3':
     '智力提高 15 點，精神提高 15 點，攻擊速度和施法速度提高 15%。',
   'entities.itemSets.stormcallers.bonus4':
@@ -5785,6 +5858,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.reload': '重新載入',
   'desktop.crash.quit': '離開',
   'desktop.crash.fatalBody': 'World of ClaudeCraft 發生未預期的錯誤，必須關閉。',
+  'gpuNotice.bodyDesktop':
+    '遊戲目前在沒有 GPU 加速的情況下執行，會非常緩慢。請更新顯示卡驅動程式後重新啟動遊戲。在 Windows 上，還請在 設定 > 系統 > 顯示器 > 顯示卡 中將本遊戲設為「高效能」。',
+  'gpuNotice.bodyWeb':
+    '遊戲目前在沒有 GPU 加速的情況下執行，會非常緩慢。請在瀏覽器設定中啟用硬體加速，更新顯示卡驅動程式，然後重新啟動瀏覽器。',
+  'gpuNotice.dismiss': '關閉',
   'editor.appTitle': '地圖編輯器',
   'editor.docTitle': '地圖編輯器 - World of ClaudeCraft',
   'editor.untitledMap': '未命名地圖',
@@ -6304,6 +6382,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'apiError.body.unsupported_media_type': '不支援的請求格式。',
   'apiError.deeds.invalid_input': '輸入無效。',
   'apiError.steam.disabled': 'Steam 連結目前無法使用。',
+  'apiError.wallet.handoff_invalid': '錢包授權已過期或無法驗證。請再試一次。',
   'apiError.steam.invalid_ticket': 'Steam 無法驗證此連結請求。請在桌面應用程式中重試。',
   'apiError.steam.banned': '該 Steam 帳號無法連結。',
   'apiError.steam.already_linked': '你的帳號已連結一個 Steam 帳號。',
@@ -6424,6 +6503,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.subject': '你在黑暗中所做的一切',
   'entities.letters.letter_q_hollow.body':
     '很少有人會知道那處窪地裡埋葬著什麼，願意相信的人更少。但我知道，而且我不會忘記。\n\n願你的道路常明。\n- 奧德里克修士',
+  'entities.letters.heroic_marks_reward.sender': '英勇軍需官',
+  'entities.letters.heroic_marks_reward.subject': '你的英勇印記',
+  'entities.letters.heroic_marks_reward.body':
+    '你的部隊清剿了英勇試煉，而你在後排作戰，或已倒在塵土之中。你的鎖定同樣已經生效，因此你那一份英勇印記飛到了這裡，而非就此遺失。好好使用它們。\n\n- 英勇軍需官',
   'hudChrome.calendar.title': '活動日曆',
   'hudChrome.calendar.close': '關閉日曆',
   'hudChrome.calendar.keybindLabel': '活動日曆',
@@ -6979,9 +7062,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.charTitleNone': '未選擇頭銜',
   'hudChrome.deeds.charOpenBook': '功績之書',
   'hudChrome.deeds.lbTab': '名望',
-  'hudChrome.deeds.lbDeedsCol': '功績',
   'hudChrome.deeds.lbTitleCol': '頭銜',
-  'hudChrome.deeds.lbSelf': '你的排名：第 {rank} 名，位居前 {percent}%',
+  'hudChrome.deeds.lbScopeNote':
+    '排行榜按帳號的累計名望排名。每個功績在一個帳號的所有角色中只計一次。',
+  'hudChrome.deeds.lbSelfAccount': '你的帳號：第 {rank} 名，位居前 {percent}%，名望 {renown}',
+  'hudChrome.deeds.lbSelfRank': '你的帳號：第 {rank} 名，位居前 {percent}%',
   'hudChrome.deeds.lbEmpty': '尚無上榜的編年史家。',
   'hudChrome.deeds.broadcastsLabel': '與公會和好友分享功績達成',
   'guide.deedsPage.catHeading': '{label}（{count}）',
@@ -7019,7 +7104,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.bestiary.flavor.sethrael_palecoil':
     '一條骨白如枯的巨蛇，滑行於微光湖深處的水底陡崖，是牠所據有這片水域的沉默守望者。與牠共享此湖的泅泳者，鮮少能再浮上水面。',
   'guide.combat.metersBody':
-    '想知道一場戰鬥打得如何？按下 Z 即可開啟隊伍統計面板，它會逐場戰鬥為你的隊伍統計傷害、治療與威脅值。',
+    '想知道一場戰鬥打得如何？按下 Shift+H 即可開啟隊伍統計面板，它會逐場戰鬥為你的隊伍統計傷害、治療與威脅值。',
   'guide.controls.arrowKeys': '方向鍵',
   'guide.controls.bothMouse': '滑鼠左右鍵',
   'guide.controls.runForward': '向前奔跑',
@@ -7034,7 +7119,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '對最豐厚可重複獎勵的每日上限。每座英雄地城每天只給予一次通關獎勵，團隊副本的普通與英雄模式分開計算，而拾取世界首領也會開始你的鎖定。已通關的五人副本仍對其原隊伍開放；而遭鎖定的團隊副本大門，要到重置後才會再度開啟。',
   'guide.glossary.lockoutTerm': '鎖定',
   'guide.glossary.metersDef':
-    '當前戰鬥的隊伍計分視窗：造成的傷害、完成的治療，以及誰握有最高威脅值，皆逐場戰鬥記錄。以其快捷鍵（預設為 Z）開啟。',
+    '當前戰鬥的隊伍計分視窗：造成的傷害、完成的治療，以及誰握有最高威脅值，皆逐場戰鬥記錄。以其快捷鍵（預設為 Shift+H）開啟。',
   'guide.glossary.metersTerm': '傷害統計面板',
   'guide.glossary.petBarDef':
     '獵人或術士寵物會增添的指令列：攻擊、停止、挑釁、防禦與主動，預設綁定為 Ctrl 加 1 到 5。',
@@ -7051,7 +7136,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.models.groupForms': '德魯伊形態',
   'guide.nav.sidebarLabel': '指南主題',
   'guide.professions.craftHowBody':
-    '開啟製作視窗（預設按鍵 T），即可看到你已學會的每一個配方、各自所需的材料，以及你手邊現有的材料；材料齊備時，一鍵即可完成製作。常見的配方可以在世界任何地方製作。少數進階的工具配方則要求你站在高守哨站的製作站前。',
+    '開啟製作視窗（預設按鍵 T），即可看到你已學會的每一個配方、各自所需的材料，以及你手邊現有的材料；材料齊備時，一鍵即可完成製作。常見的配方可以在世界任何地方製作。少數進階配方，包括高階工具與稀有的施法者護甲，則要求你站在高守哨站的製作站前。',
   'guide.professions.craftHowTitle': '製作視窗',
   'guide.search.typeAbility': '技能',
   'guide.search.typeDeed': '功績',

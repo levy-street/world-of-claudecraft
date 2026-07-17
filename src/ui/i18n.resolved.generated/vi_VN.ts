@@ -366,6 +366,7 @@ export const vi_VN: EnTranslations = {
       "spinButton": "Quay",
       "tasks": "Nhiệm Vụ",
       "taskMultiplier": "hệ số x{multiplier}",
+      "oneVsOneExcluded": "Trận đấu 1v1 không trao điểm phần thưởng hằng ngày.",
       "pointsGained": "Nhận được {points} điểm phần thưởng hằng ngày.",
       "showChestButton": "Hiện rương",
       "hideChestButton": "Ẩn rương",
@@ -415,6 +416,18 @@ export const vi_VN: EnTranslations = {
       "armoryEyebrow": "Mùa 1",
       "armoryTitle": "Kho Vũ Khí",
       "armoryBody": "Ngoại hình vũ khí giới hạn từ Kho Vũ Khí Mùa 1. Dùng chung toàn tài khoản, hoàn toàn mang tính thẩm mỹ và hiển thị với mọi người xung quanh bạn.",
+      "wallet": {
+        "title": "Solana wallet",
+        "unlinked": "Connect a wallet app, then sign once to link its public address to your WoC account. We never receive your recovery phrase or private key.",
+        "connectedUnlinked": "The wallet app is connected to this browser, but its public address is not linked to your WoC account yet.",
+        "linkedDisconnected": "Your public address is linked. Reconnect that wallet app when you want to pay with SOL or WOC.",
+        "linkedConnected": "Your linked wallet app is connected and ready for SOL or WOC purchases.",
+        "mismatched": "A different wallet is connected. Verify it to replace the linked address, or reconnect the linked wallet.",
+        "connect": "Connect wallet",
+        "verify": "Verify and link",
+        "reconnect": "Reconnect wallet",
+        "manage": "Manage wallet"
+      },
       "collectionLine": "Bộ sưu tập {collection}",
       "collections": {
         "guildmark": "Nhãn hiệu bang hội",
@@ -2202,9 +2215,10 @@ export const vi_VN: EnTranslations = {
       "charTitleNone": "Chưa chọn danh hiệu",
       "charOpenBook": "Sách Kỳ Công",
       "lbTab": "Danh Vọng",
-      "lbDeedsCol": "Kỳ Công",
       "lbTitleCol": "Danh Hiệu",
-      "lbSelf": "Thứ hạng của bạn: hạng {rank}, trong top {percent} phần trăm",
+      "lbScopeNote": "Accounts ranked by lifetime Renown. Each deed counts once across all characters on an account.",
+      "lbSelfAccount": "Your account: rank {rank}, top {percent} percent, {renown} Renown",
+      "lbSelfRank": "Your account: rank {rank}, top {percent} percent",
       "lbEmpty": "Chưa có sử quan nào được xếp hạng.",
       "broadcastsLabel": "Chia sẻ kỳ công vừa lập với bang hội và bạn bè",
       "titledName": "{name} [{title}]"
@@ -2308,6 +2322,9 @@ export const vi_VN: EnTranslations = {
       "already_linked": "Tài khoản của bạn đã liên kết với một tài khoản Steam.",
       "account_taken": "Tài khoản Steam đó đã được liên kết với một tài khoản khác.",
       "upstream": "Steam không phản hồi. Hãy thử lại sau giây lát."
+    },
+    "wallet": {
+      "handoff_invalid": "That wallet authorization expired or could not be verified. Try again."
     },
     "welcome": {
       "invalid_input": "Dữ liệu nhập không hợp lệ."
@@ -2604,7 +2621,7 @@ export const vi_VN: EnTranslations = {
       "effectsTitle": "Buff, debuff và khống chế",
       "effectsBody": "Nhiều kỹ năng áp một hiệu ứng lưu lại. Những hiệu ứng có lợi (buff) tăng chỉ số, che chắn, hoặc hồi máu cho bạn từng chút một; những hiệu ứng có hại (debuff) rút máu bạn bằng sát thương theo thời gian hoặc làm bạn suy yếu. Hãy để mắt đến những biểu tượng nhỏ ở góc trên màn hình, cạnh bản đồ nhỏ, để biết những gì đang trên người bạn và còn kéo dài bao lâu.",
       "ccBody": "Khống chế là một dạng debuff đặc biệt giới hạn những gì mục tiêu có thể làm: choáng, trói và làm chậm, câm lặng ngăn niệm phép, tước vũ khí, gieo sợ hãi, và biến hình khiến kẻ thù vô hại trong chốc lát. Khi dùng lên người chơi khác, khống chế mòn dần khi lặp lại: cùng một loại áp lại quá nhanh sẽ yếu đi rồi thất bại hẳn, và một đòn choáng mở màn từ ẩn thân được tính riêng khỏi những đòn choáng nối theo, nên không ai có thể bị trói buộc bất lực mãi mãi. Sinh vật của thế giới không hề để bụng như vậy: khống chế không bao giờ yếu đi khi lặp lại lên chúng, dù nhiều kẻ thù hùng mạnh nhất, gồm những kẻ tinh nhuệ có tên và các trùm mạnh nhất trong số đó, hoàn toàn không thể bị khống chế.",
-      "metersBody": "Tò mò xem một trận đấu diễn ra thế nào? Nhấn Z để mở bảng thống kê tổ đội, ghi lại sát thương, hồi máu và đe dọa của cả nhóm, theo từng trận một.",
+      "metersBody": "Tò mò xem một trận đấu diễn ra thế nào? Nhấn Shift+H để mở bảng thống kê tổ đội, ghi lại sát thương, hồi máu và đe dọa của cả nhóm, theo từng trận một.",
       "queueTitle": "Nước đi kế tiếp của bạn đã sẵn sàng",
       "queueBody": "Bạn không cần canh chính xác từng khung hình để nhấn phím. Hãy nhấn kỹ năng kế tiếp trong những khoảnh khắc cuối của lượt niệm hiện tại và nó sẽ được xếp hàng, kích hoạt ngay khi lượt niệm hoàn tất, nên lối chơi thuần thục trôi chảy không hở nhịp. Một cú nhấn quá sớm chỉ đơn giản bị từ chối, nên không có gì lãng phí. Một số đòn cận chiến cũng hoạt động y như vậy, phát ra theo nhát vung vũ khí kế tiếp của bạn.",
       "deathTitle": "Khi bạn ngã xuống",
@@ -2665,7 +2682,7 @@ export const vi_VN: EnTranslations = {
       "petBarTerm": "Thanh Thú Cưng",
       "petBarDef": "Hàng lệnh mà thú cưng của Thợ Săn hoặc Thuật Sĩ Hắc Ám thêm vào: Tấn Công, Dừng, Khiêu Khích, Phòng Thủ, và Hung Hăng, mặc định gán vào Ctrl cộng 1 tới 5.",
       "metersTerm": "Bảng Sát Thương",
-      "metersDef": "Cửa sổ bảng điểm tổ đội cho trận đấu hiện tại: sát thương gây ra, hồi máu đã làm, và ai đang giữ nhiều đe dọa nhất, lưu theo từng trận. Mở nó bằng phím gán của nó (mặc định là Z).",
+      "metersDef": "Cửa sổ bảng điểm tổ đội cho trận đấu hiện tại: sát thương gây ra, hồi máu đã làm, và ai đang giữ nhiều đe dọa nhất, lưu theo từng trận. Mở nó bằng phím gán của nó (mặc định là Shift+H).",
       "targetMarkerTerm": "Dấu Mục Tiêu",
       "targetMarkerDef": "Một biểu tượng mà bất kỳ thành viên tổ đội hay raid nào cũng có thể ghim lên một mục tiêu để mọi người cùng tập trung, hoặc cùng tránh, đúng mục tiêu ấy. Tám biểu tượng, mỗi biểu tượng một mục tiêu.",
       "loadoutTerm": "Bố Cục",
@@ -2994,6 +3011,8 @@ export const vi_VN: EnTranslations = {
       "heroicRewardsTitle": "Dấu Ấn Anh Hùng và chiến lợi phẩm nâng cấp",
       "heroicRewardsBody": "Trùm Anh Hùng rơi ra thứ chiến lợi phẩm bạn đã quen, được nâng cấp và gắn nhãn Anh Hùng trên chú giải, còn trùm cuối của mỗi lượt chạy thêm những món sử thi không tìm thấy ở đâu khác. Cú hạ cuối cùng đó cũng để lại Dấu Ấn Anh Hùng cho mọi người tham gia: một loại tiền tệ dùng để giao dịch với Quân Nhu Trưởng Vex ở Highwatch, người có kho nhẫn và dây chuyền là món trang sức duy nhất trong cả vương quốc.",
       "heroicLockoutBody": "Hầm ngục thường có thể chạy cả ngày. Chế độ Anh Hùng đòi hỏi kiên nhẫn: cú hạ trùm cuối khóa mọi người trong lượt chạy lại còn một lần dọn sạch Anh Hùng của hầm ngục đó mỗi ngày, và raid giữ một khóa lượt hằng ngày riêng cho từng độ khó. Một lượt chạy năm người đã dọn xong vẫn mở cho chính tổ đội ấy để chạy xác và nhặt đồ, nên không ai bị khóa khỏi thứ họ đã giành được ở đó. Raid thì nghiêm hơn: một khi cú hạ trùm của nó khóa bạn lại, cánh cửa vẫn đóng cho tới lần đặt lại hằng ngày, nên hãy thu chiến lợi phẩm trước khi rời đấu trường.",
+      "resetTitle": "Đặt lại phụ bản của bạn",
+      "resetBody": "Nếu đổi độ khó khi đội vẫn giữ các lượt đã nhận, quyền cũ sẽ tồn tại một lúc rồi tự xóa. Trưởng nhóm có thể bỏ chúng ngay bằng cách chọn Đặt Lại Tất Cả Phụ Bản trong menu chân dung của mình hoặc gõ /dungeon reset. Độ khó phải thực sự đã đổi, không ai dù còn sống hay đã ngã xuống được ở bên trong, và có thời gian chờ ngắn giữa các lần đặt lại. Nếu đến cửa với độ khó sai, trò chơi sẽ báo trước khi bắt đầu. Raid không bao giờ được đặt lại theo cách này; quy tắc khóa riêng vẫn áp dụng.",
       "templeLoreTitle": "Ngôi Đền Chết Chìm, sâu hơn một chút",
       "templeLoreBody": "Ngôi đền có truyền thuyết riêng của nó, cổ xưa hơn cả giáo phái bạn đuổi theo ở nơi khác. Bên bờ Hồ Lung Linh, một hồ băng uống ánh trăng và trả lại những kẻ chết chìm, một người canh gác cô độc giữ một cánh cổng ánh sáng nhợt nhạt. Bên dưới mặt nước, một bậc thang đá lạnh chạy xuống đó. Những kẻ chìm xuống nơi ấy không chết chìm vì tai nạn: họ là Dàn Đồng Ca Nhợt Nhạt, những kẻ chìm xuống trong sự thờ phụng và không bao giờ ngừng ca hát. Những người canh giữ xưa cào một lời cảnh báo duy nhất lên đá trước khi nước nuốt lấy họ, một lời cầu nguyện gửi đến thứ họ gọi là Mặt Trăng Chết Chìm, với một bàn tay vững vàng hơn thêm hai chữ bên dưới: nó chỉ đang ngủ.",
       "cryptLeadTitle": "Một cánh cửa mà người chết được giao nhiệm vụ giữ kín",
@@ -3101,7 +3120,7 @@ export const vi_VN: EnTranslations = {
       "howHeading": "Cách kỳ công hoạt động",
       "howBody": "Kỳ công được lập và giữ lại theo từng nhân vật một, nên mỗi anh hùng bạn chơi đều dựng nên cuốn Sách của riêng mình; chỉ Bảng Xếp Hạng của vương quốc mới gom Danh Vọng của bạn qua tất cả các nhân vật bạn chơi, và tính mỗi kỳ công đúng một lần. Mỗi kỳ công ghi rõ ràng nó đòi hỏi gì ở bạn, ngay trong Sách Kỳ Công trong trò chơi, nên bạn luôn biết mình đang theo đuổi điều gì, và bạn có thể theo dõi những kỳ công mình nhắm tới để giữ chúng trong tầm mắt khi chơi. Một số ít vẫn được giữ bí mật và chỉ lộ diện khi bạn đã lập được chúng. Sách cũng tự giữ mình trung thực: bất cứ điều gì hồ sơ quá khứ của bạn có thể chứng minh, nó ghi công ngay lập tức, nên một kỳ cựu chẳng bao giờ mở sách ra thấy một trang trống; chỉ những kỳ công đếm số mới bắt đầu đếm lại từ đầu.",
       "renownHeading": "Danh Vọng",
-      "renownBody": "Danh Vọng là điểm số đứng sau cuốn Sách. Mỗi kỳ công bạn lập được đều mang về một lượng điểm cố định, và tổng điểm chỉ có tăng chứ không bao giờ giảm, nên một tuần thảnh thơi không hề khiến bạn tụt lại. Một nhúm kỳ công phụ thuộc vào may mắn hơn là kỹ năng, còn Kỳ Tích là một vinh dự riêng, nên cả hai loại này đều không mang chút Danh Vọng nào.",
+      "renownBody": "Renown is the score behind the Book. Every deed you earn is worth a set amount, and your total only ever climbs, so a quiet week never costs you ground. A handful of deeds turn on luck rather than skill, and Feats are an honor of their own, so both of those are worth no Renown at all. Deeds without Renown still count toward completion in your Book; they simply never score.",
       "rewardsHeading": "Danh hiệu và viền tên",
       "rewardsBody": "Phần thưởng đều chỉ để phô diễn, và đó chính là chủ ý. Một số kỳ công ban danh hiệu để bạn mang hoặc viền để đóng khung tên bạn, và không bao giờ có thứ gì khiến anh hùng của bạn mạnh hơn. Hãy chọn danh hiệu bạn muốn trong Sách Kỳ Công, nó sẽ theo bạn trên bảng tên, trong kênh trò chuyện và trên các bảng xếp hạng cho mọi người cùng thấy.",
       "chroniclesHeading": "Biên Niên Sử",
@@ -3110,7 +3129,7 @@ export const vi_VN: EnTranslations = {
       "featsBody": "Kỳ Tích là một ngăn sách riêng: ghi chép về di sản và những lần đầu tiên của thế giới, những kỳ công gắn với một thời đã qua hay một khoảnh khắc chỉ xảy ra đúng một lần. Chúng không mang Danh Vọng và nằm ngoài số đếm hoàn thành, được lưu giữ mãi mãi như ký ức về những gì đã làm nên.",
       "catalogHeading": "Toàn bộ danh mục kỳ công",
       "catalogBody": "Đây là toàn bộ kỳ công mà cuốn Sách có thể lưu giữ, xếp theo từng hạng mục. Những kỳ công bí mật được cố ý lược khỏi danh sách này, chờ chính bạn tìm ra. Hãy mở Sách Kỳ Công trong trò chơi để xem chính xác mỗi kỳ công đòi hỏi điều gì.",
-      "standingsNote": "Các vương quốc luôn ghi sổ Danh Vọng của mọi tài khoản. Muốn biết ai đứng ở đâu, hãy mở Bảng Xếp Hạng trong trò chơi và lật đến thẻ Danh Vọng của nó; bảng xếp hạng nằm ở đó, không nằm trên wiki.",
+      "standingsNote": "The realms keep a running tally of Renown across every account: the board ranks whole accounts by lifetime Renown, counting each deed once across all your characters, and it shows Renown alone, so deeds that carry none never move the standings even though they count in your Book. To see who stands where, open the Leaderboard in game and turn to its Renown tab; the standings live there, not on the wiki.",
       "catHeading": "{label} ({count})",
       "colName": "Kỳ Công",
       "colRenown": "Danh Vọng",
@@ -3201,7 +3220,7 @@ export const vi_VN: EnTranslations = {
       "qualityNote": "Chất lượng cao hơn thường có nghĩa là chỉ số tốt hơn, nhưng chất lượng là một gợi ý, không phải quy tắc. Một món hợp với lớp và cấp của bạn có thể thắng một món hào nhoáng hơn.",
       "upgradeTitle": "Giữ trang bị luôn cập nhật",
       "upgradeBody": "Thay một món cũ bằng một món nâng cấp mới giúp ích cho bạn nhiều hơn là chơi hoàn hảo trong bộ đồ bạn đã vượt qua. Khi thứ gì đó tốt hơn rơi ra hoặc một nhiệm vụ trao tặng nó, hãy nhận lấy. Đừng để dành những món tốt của bạn cho sau này.",
-      "itemLevelBody": "Nếu bạn muốn một cách nhanh để so hai món đồ, hãy bật Hiện Cấp Vật Phẩm trong tùy chọn. Trang bị giành được ngoài thế giới, từ kẻ địch và nhiệm vụ, khi đó sẽ hiện một cấp vật phẩm, một con số duy nhất cho biết đại khái món đó mạnh cỡ nào dựa trên nơi nó đến, nên bạn có thể nhìn thoáng qua là biết món nâng cấp nào nặng ký hơn, kể cả khi khác ô trang bị. Những món không có nguồn như vậy, như hàng cơ bản trơn của người bán và trang bị khởi đầu, không hiện cấp vật phẩm, nên một con số vắng mặt là chuyện thường, không phải lỗi.",
+      "itemLevelBody": "Để so sánh nhanh hai món, hãy bật Hiện Cấp Vật Phẩm trong tùy chọn. Trang bị có nguồn rõ ràng từ kẻ địch, nhiệm vụ và nghề chế tạo sẽ hiện cấp vật phẩm: một con số ước lượng sức mạnh theo nguồn gốc, giúp nhận ra nâng cấp tốt hơn ngay cả giữa các ô khác nhau. Các món không có nguồn như vậy, chẳng hạn hàng cơ bản của thương nhân và trang bị khởi đầu, không hiện cấp; thiếu con số là bình thường.",
       "sourcesTitle": "Trang bị đến từ đâu",
       "sourcesBody": "Phần lớn đồ nâng cấp thuở đầu là phần thưởng nhiệm vụ, nên hoàn thành nhiệm vụ đáng giá hơn là cày cuốc. Kẻ địch rơi trang bị khi bạn đánh bại chúng, người bán trong thị trấn bán những món cơ bản chắc chắn, thợ chế tác biến nguyên liệu thu thập thành những món mặc được, và chợ người chơi cho phép bạn mua từ những nhà phiêu lưu khác. Ở đỉnh cao, hai loại tiền huy hiệu mua được trang bị không tìm thấy ở đâu khác: Huy Hiệu Hang Sâu ở chỗ người giữ hang sâu, và Dấu Ấn Anh Hùng ở chỗ Quân Nhu Trưởng Anh Hùng.",
       "soulboundTitle": "Ràng Buộc Linh Hồn: của bạn và chỉ của riêng bạn",
@@ -3245,7 +3264,7 @@ export const vi_VN: EnTranslations = {
       "craftRecipesTitle": "Công thức và nguyên liệu",
       "craftRecipesBody": "Mỗi công thức đòi hỏi những nguyên liệu cụ thể bạn thu thập hoặc mua. Các công thức đơn giản nhất chẳng cần gì ngoài nguyên liệu thường và chế được ngay từ đầu, nên bạn có thể bắt tay vào một nghề ngay khoảnh khắc nhận nó. Các danh sách công thức vẫn đang được bổ sung: một vài nghề còn đang chờ những công thức đầu tiên, và sẽ có thêm khi các nghề lớn dần.",
       "craftHowTitle": "Cửa sổ chế tác",
-      "craftHowBody": "Mở cửa sổ Chế Tác (phím mặc định T) để xem mọi công thức bạn biết, mỗi công thức cần gì, và bạn đang có sẵn những gì; khi đủ nguyên liệu, một cú bấm là xong việc. Các công thức thông thường có thể chế tác ở bất cứ đâu trên thế giới. Một số ít công thức dụng cụ cao cấp thì lại yêu cầu bạn đứng tại trạm chế tác ở Highwatch.",
+      "craftHowBody": "Mở cửa sổ Chế Tạo (phím mặc định T) để xem mọi công thức đã biết, nguyên liệu cần thiết và số bạn đang có; khi đủ nguyên liệu, chỉ cần một lần nhấp. Công thức thường có thể chế tạo ở bất cứ đâu. Một số công thức nâng cao, gồm công cụ cấp cao và giáp hiếm cho người thi triển, yêu cầu đứng tại trung tâm chế tạo ở Highwatch.",
       "craftMasteryTitle": "Kỹ năng và tinh thông",
       "craftMasteryBody": "Chế tác thành công sẽ tích lũy kỹ năng trong nghề đó, và kỹ năng không bao giờ khóa các công thức của một nghề lại: nếu bạn biết một công thức và có nguyên liệu của nó, bạn có thể thử làm. Thứ mà kỹ năng mang lại cho bạn thay vào đó là phẩm chất, một đôi tay lành nghề cho ra sản phẩm tinh xảo hơn. Ngoại lệ duy nhất là các công thức kết hợp, vốn đòi hỏi bạn phải chứng tỏ mình trong cả hai nghề của chúng trước khi chúng mở ra.",
       "craftComboTitle": "Công thức kết hợp",
@@ -4026,6 +4045,9 @@ export const vi_VN: EnTranslations = {
     "balancePreviewTitle": "Xem trước số dư $WOC của ví đã kết nối",
     "balancePreviewAria": "Xem trước số dư ví đã kết nối: {balance}. Liên kết ví để xác minh huy hiệu chủ sở hữu.",
     "balanceAmount": "{amount} $WOC",
+    "bagConnect": "Link wallet",
+    "bagLink": "Verify wallet",
+    "bagReconnect": "Reconnect wallet",
     "connected": "Đã kết nối: {address}",
     "connectedWithBalance": "Đã kết nối: {balance} - {address}",
     "connectedLinked": "Đã xác minh: {address}",
@@ -4040,12 +4062,37 @@ export const vi_VN: EnTranslations = {
     "helpLinkedDisconnected": "Đặc quyền chủ sở hữu đang hoạt động. Kết nối ứng dụng khi bạn cần ký hoặc chi tiêu.",
     "helpLinkedDisconnectedWithBalance": "Đặc quyền chủ sở hữu đang hoạt động. Kết nối ứng dụng khi bạn cần ký hoặc chi tiêu.",
     "extensionHelp": "Để thấy ví ở đây, hãy giữ một tiện ích ví trình duyệt như Solflare Wallet đang hoạt động.",
+    "mobileAppHelp": "Choose Phantom or Solflare. Your wallet app will ask for approval. Keep this game open and return to it when finished.",
+    "standaloneAppHelp": "Wallet connections are not available in the Home Screen app yet. Open World of ClaudeCraft in Safari or Chrome to use Phantom or Solflare.",
+    "openAppTitle": "Continue in {wallet}",
+    "openAppHelp": "Open {wallet} to review this request. Keep this game tab open while the wallet app is active.",
+    "openAppButton": "Open {wallet}",
+    "manualReturnBrowserHelp": "After approval, return to this game tab. If iOS opens another browser, close it and return to the original browser manually.",
+    "manualReturnStandaloneHelp": "After approval, return to World of ClaudeCraft from your Home Screen. If iOS opens a browser, close it and reopen the Home Screen app manually.",
+    "preparingAppButton": "Preparing {wallet}...",
+    "walletAppUnavailable": "{wallet} could not be prepared. Close this window and try again.",
     "flowConnect": "Chọn một ví. Quá trình xác minh sẽ tiếp tục tự động.",
     "flowSign": "Ký vào thông điệp xác minh trong ứng dụng ví của bạn. Không cần giao dịch hay SOL.",
     "flowVerify": "Đang xác minh quyền sở hữu ví...",
     "linkFailed": "Xác minh ví thất bại.",
     "verifyFailed": "Xác minh ví thất bại.",
     "unlinkFailed": "Không thể hủy liên kết ví.",
+    "browser": {
+      "eyebrow": "Desktop wallet authorization",
+      "title": "Connect a Solana Wallet",
+      "linkBody": "Choose a wallet extension in this browser. You will sign a verification message, then return to the desktop app.",
+      "paymentBody": "Choose the wallet linked to your account and approve the transaction in this browser.",
+      "extensionHelp": "No compatible wallet extension was found. Install or unlock Phantom, Solflare, or another Solana browser wallet, then retry.",
+      "safety": "World of ClaudeCraft never asks for your recovery phrase or private key.",
+      "continueWith": "Continue with {wallet}",
+      "reviewTitle": "Review in your wallet",
+      "reviewBody": "Follow the prompt from {wallet}. Keep this browser page open.",
+      "completeTitle": "Wallet authorization complete",
+      "completeBody": "You can return to the World of ClaudeCraft desktop app.",
+      "returnButton": "Return to desktop app",
+      "failed": "Wallet authorization failed or expired. Return to the desktop app and try again.",
+      "retry": "Retry"
+    },
     "holder": "Chủ sở hữu $WOC",
     "holderTierTitle": "Chủ sở hữu $WOC bậc {tier}",
     "holderTiers": {
@@ -4366,6 +4413,24 @@ export const vi_VN: EnTranslations = {
   "heroicShop": {
     "balance": "Dấu Ấn Anh Hùng: {count}",
     "buyAria": "Mua {item} với giá {marks} Dấu Ấn Anh Hùng"
+  },
+  "cardDuel": {
+    "title": "Card Duel",
+    "close": "Close",
+    "join": "Join Queue",
+    "joinAria": "Join the Card Duel queue",
+    "leave": "Leave Queue",
+    "leaveAria": "Leave the Card Duel queue",
+    "forfeit": "Forfeit",
+    "forfeitAria": "Forfeit the Card Duel",
+    "queued": "Waiting for an opponent...",
+    "unavailable": "Card Duel requires another player online.",
+    "vsOpponent": "vs {name}",
+    "round": "Round score: {mine} - {theirs}",
+    "counts": "Deck: {deck} · Discard: {discard}",
+    "playCardAria": "Play the {value} card",
+    "waitingOnOpponent": "Waiting on your opponent's card...",
+    "yourTurn": "Play a card"
   },
   "delveUi": {
     "board": {
@@ -4865,6 +4930,11 @@ export const vi_VN: EnTranslations = {
       "quit": "Thoát",
       "fatalBody": "World of ClaudeCraft gặp lỗi không mong muốn và cần đóng lại."
     }
+  },
+  "gpuNotice": {
+    "bodyDesktop": "The game is running without GPU acceleration and will be slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
+    "bodyWeb": "The game is running without GPU acceleration and will be slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.",
+    "dismiss": "Dismiss"
   },
   "realm": {
     "noRealms": "Không có thế giới nào khả dụng.",
@@ -6560,7 +6630,7 @@ export const vi_VN: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Huyết Sói",
-        "description": "Tăng 40 sức mạnh tấn công trong 6 giây. Chỉ dùng được ở Hình Sói."
+        "description": "Tăng {buff} sức mạnh tấn công trong {duration} giây. Chỉ dùng được ở Hình Sói."
       },
       "rip": {
         "name": "Xé Rách",
@@ -8684,6 +8754,11 @@ export const vi_VN: EnTranslations = {
         "title": "Két Sắt Mạ Vàng",
         "greeting": "Chào mừng đến với Két Sắt Mạ Vàng. Hàng hóa của ngươi nằm yên an toàn sau những ổ khóa của chúng tôi."
       },
+      "card_master": {
+        "name": "Card Master",
+        "title": "Dealer of Chance",
+        "greeting": "Care for a Card Duel? Best of three, winner takes the bragging rights."
+      },
       "bursar_petra_vell": {
         "name": "Thủ Quỹ Petra Vell",
         "title": "Két Sắt Mạ Vàng",
@@ -9788,6 +9863,11 @@ export const vi_VN: EnTranslations = {
         "sender": "Tu Huynh Aldric",
         "subject": "Điều bạn đã làm trong bóng tối",
         "body": "Hiếm ai sẽ biết thứ gì từng bị chôn dưới lòng chảo ấy, và càng hiếm ai tin. Tôi biết, và tôi sẽ không quên.\n\nMong con đường của bạn luôn sáng tỏ.\n- Tu Huynh Aldric"
+      },
+      "heroic_marks_reward": {
+        "sender": "Quân nhu Anh Hùng",
+        "subject": "Dấu Ấn Anh Hùng của bạn",
+        "body": "Đội của bạn đã vượt qua thử thách Anh Hùng khi bạn chiến đấu ở hậu tuyến hoặc đã ngã xuống. Khóa lượt của bạn vẫn được ghi nhận, vì vậy phần Dấu Ấn Anh Hùng của bạn được gửi đến đây thay vì thất lạc. Hãy sử dụng chúng thật tốt.\n\n- Quân nhu Anh Hùng"
       }
     },
     "itemSets": {
@@ -9813,7 +9893,7 @@ export const vi_VN: EnTranslations = {
       },
       "necromancers": {
         "name": "Y Phục Mournweave",
-        "bonus2": "Bạn không thể bị đẩy lùi (kháng đẩy lùi 100%).",
+        "bonus2": "Tăng sức mạnh phép thuật thêm 20. Sát thương phải chịu không còn làm chậm việc thi triển phép của bạn (kháng trì hoãn thi triển 100%).",
         "bonus3": "Tăng trí tuệ thêm 10 và thể lực thêm 10.",
         "bonus4": "Các phép của bạn có 10% cơ hội ban Tâm Trí Thông Suốt, khiến phép kế tiếp của bạn được thi triển miễn phí."
       },
@@ -9825,13 +9905,13 @@ export const vi_VN: EnTranslations = {
       },
       "soulflame": {
         "name": "Lễ Phục Wraithfire",
-        "bonus2": "Bạn không thể bị đẩy lùi (kháng đẩy lùi 100%).",
+        "bonus2": "Tăng sức mạnh phép thuật thêm 20. Sát thương phải chịu không còn làm chậm việc thi triển phép của bạn (kháng trì hoãn thi triển 100%).",
         "bonus3": "Tăng trí tuệ thêm 15, tinh thần thêm 15 và tốc độ tấn công cùng thi triển thêm 15%.",
         "bonus4": "Các phép của bạn có 10% cơ hội ban Hồn Hỏa, tăng sức mạnh phép thuật thêm 40 trong 10 giây."
       },
       "stormcallers": {
         "name": "Áo Lễ Galecall",
-        "bonus2": "Bạn không thể bị đẩy lùi (kháng đẩy lùi 100%).",
+        "bonus2": "Tăng sức mạnh phép thuật thêm 20. Sát thương phải chịu không còn làm chậm việc thi triển phép của bạn (kháng trì hoãn thi triển 100%).",
         "bonus3": "Tăng trí tuệ thêm 15, tinh thần thêm 15 và tốc độ tấn công cùng thi triển thêm 15%.",
         "bonus4": "Các phép của bạn có 10% cơ hội ban Hồn Hỏa, tăng sức mạnh phép thuật thêm 40 trong 10 giây."
       },

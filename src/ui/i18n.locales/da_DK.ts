@@ -1127,6 +1127,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.hideChestConfirmTitle': 'Skjul kisten med daglige belønninger?',
   'hudChrome.dailyRewards.pointsGained': '{points} daglige belønningspoint optjent.',
   'hudChrome.dailyRewards.taskMultiplier': 'x{multiplier} multiplikator',
+  'hudChrome.dailyRewards.oneVsOneExcluded':
+    '1 mod 1-kampe giver ikke point til daglige belønninger.',
   'hudChrome.dailyRewards.totalPlayer': '{count} spiller i dag',
   'hudChrome.dailyRewards.totalPlayers': '{count} spillere i dag',
   'hudChrome.death.resurrectAtCorpse': 'Genopstå ved liget',
@@ -2087,7 +2089,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thunder_clap.description':
     'Sprænger nærliggende fjender for {damage} skade og sløver deres angreb med 10 % i 10 sek.',
   'entities.abilities.thunder_clap.name': 'Rystende Slag',
-  'entities.abilities.tigers_fury.description': 'Øger angrebskraft med 40 i 6 sek. Kun i Ulveform.',
+  'entities.abilities.tigers_fury.description':
+    'Øger angrebskraft med {buff} i {duration} sek. Kun i Ulveform.',
   'entities.abilities.tigers_fury.name': 'Ulveblod',
   'entities.abilities.travel_form.description':
     'Skift øjeblikkeligt til en hurtig Fleet-form, der øger bevægelseshastighed med 40 %. Du kan ikke bruge andre evner mens du er forvandlet, men kan skifte ind eller ud af kamp, ideelt til at flygte.',
@@ -3963,8 +3966,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.gear.fishingTitle': 'Fiskeri',
   'guide.gear.intro':
     'Udstyr er det udstyr, din figur bærer, og de genstande, du bærer på. Bedre udstyr er den mest stabile måde at blive stærkere på, og du samler det meste af det op bare ved at spille.',
-  'guide.gear.itemLevelBody':
-    'Hvis du vil have en hurtig måde at sammenligne to genstande på, så slå Vis genstandsniveau til i indstillingerne. Udstyr vundet ude i verden, fra fjender og opdrag, viser så et genstandsniveau, et enkelt tal for nogenlunde hvor stærkt det er ud fra, hvor det kom fra, så du med et blik kan se, hvilken opgradering der vejer tungest, selv på tværs af forskellige pladser. Stykker uden en sådan kilde, som simple butiksvarer og startudstyr, viser intet genstandsniveau, så et manglende tal er normalt, ikke en fejl.',
   'guide.gear.qualityBody':
     'Hver genstand har en kvalitet, og dens navn er farvet til at matche, så du kan aflæse dens værd med et blik. Fra mest almindelig til mest eftertragtet:',
   'guide.gear.qualityCommon': 'Almindelig',
@@ -6256,7 +6257,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.greyjaw_stalker.bonus3': 'Øger angrebs- og magihastighed med 15%.',
   'entities.itemSets.necromancers.name': 'Mournweave klæder',
   'entities.itemSets.necromancers.bonus2':
-    'Du kan ikke stødes tilbage (100% modstand mod tilbagestød).',
+    'Øger magikraft med 20. Skade, du tager, forsinker ikke længere dine besværgelser (100% modstand mod fordrøjelse af besværgelser).',
   'entities.itemSets.necromancers.bonus3': 'Øger intellekt med 10 og udholdenhed med 10.',
   'entities.itemSets.nighttalon.name': 'Direfang pels',
   'entities.itemSets.nighttalon.bonus2': 'Øger angrebskraft med 40.',
@@ -6264,12 +6265,12 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Øger smidighed med 15, kritisk chance med 2% og angrebs- og magihastighed med 15%.',
   'entities.itemSets.soulflame.name': 'Wraithfire regalier',
   'entities.itemSets.soulflame.bonus2':
-    'Du kan ikke stødes tilbage (100% modstand mod tilbagestød).',
+    'Øger magikraft med 20. Skade, du tager, forsinker ikke længere dine besværgelser (100% modstand mod fordrøjelse af besværgelser).',
   'entities.itemSets.soulflame.bonus3':
     'Øger intellekt med 15, ånd med 15 og angrebs- og magihastighed med 15%.',
   'entities.itemSets.stormcallers.name': 'Galecall klæder',
   'entities.itemSets.stormcallers.bonus2':
-    'Du kan ikke stødes tilbage (100% modstand mod tilbagestød).',
+    'Øger magikraft med 20. Skade, du tager, forsinker ikke længere dine besværgelser (100% modstand mod fordrøjelse af besværgelser).',
   'entities.itemSets.stormcallers.bonus3':
     'Øger intellekt med 15, ånd med 15 og angrebs- og magihastighed med 15%.',
   'entities.itemSets.vale_arcanist.name': 'Dalarkanistens klæder',
@@ -6858,15 +6859,11 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.deedsPage.howHeading': 'Sådan fungerer bedrifter',
   'guide.deedsPage.intro':
     'Bedrifternes Bog er stedet, hvor verden holder regnskab med alt, hvad du har udrettet, fra dine første skridt ud af startdalen til de hårdeste kampe, riget kan byde på. Opnå bedrifter, mens du spiller, bær de titler, de skænker, og se din hæder stige.',
-  'guide.deedsPage.renownBody':
-    'Hæder er tallet bag Bogen. Hver bedrift, du opnår, er en fast mængde hæder værd, og din samlede sum kan kun stige, så en stille uge koster dig aldrig terræn. En håndfuld bedrifter afgøres af held snarere end kunnen, og Bragder er en ære helt for sig, så begge dele giver slet ingen hæder.',
   'guide.deedsPage.renownHeading': 'Hæder',
   'guide.deedsPage.rewardBorder': 'Ramme',
   'guide.deedsPage.rewardsBody':
     'Belønningerne er ren pynt, og det er hele pointen. Nogle bedrifter skænker en titel, du kan bære, eller en ramme om dit navn, men aldrig noget, der gør din helt stærkere. Vælg den titel, du ønsker, i Bedrifternes Bog, så følger den med på dit navneskilt, i chatten og på ranglisterne, hvor alle kan se den.',
   'guide.deedsPage.rewardsHeading': 'Titler og rammer',
-  'guide.deedsPage.standingsNote':
-    'Rigerne fører et løbende regnskab over Hæder på tværs af alle konti. Vil du se, hvem der står hvor, så åbn ranglisten inde i spillet og slå op på dens Hæder-faneblad; placeringerne bor der, ikke på wikien.',
   'guide.nav.deeds': 'Bedrifternes Bog',
   'hudChrome.deeds.broadcastLine': '{name} har fuldbragt en bedrift: {deed}',
   'hudChrome.deeds.broadcastsLabel': 'Del nye bedrifter med laug og venner',
@@ -6899,9 +6896,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.filterNearly': 'Næsten i mål',
   'hudChrome.deeds.filterUnearned': 'Ikke opnået',
   'hudChrome.deeds.hiddenBadge': 'Skjult',
-  'hudChrome.deeds.lbDeedsCol': 'Bedrifter',
   'hudChrome.deeds.lbEmpty': 'Ingen rangerede krønikeskrivere endnu.',
-  'hudChrome.deeds.lbSelf': 'Din placering: plads {rank}, blandt de øverste {percent} procent',
   'hudChrome.deeds.lbTab': 'Hæder',
   'hudChrome.deeds.lbTitleCol': 'Titel',
   'hudChrome.deeds.nearestLabel': 'Næsten i mål:',
@@ -6989,7 +6984,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.bestiary.flavor.sethrael_palecoil':
     'En knoglebleg slange, der glider hen over Glimmersøens dybe afsats, den tavse vogter af det vand, den har gjort krav på. Svømmere, der deler søen med den, kommer sjældent op til overfladen igen.',
   'guide.combat.metersBody':
-    'Nysgerrig efter, hvordan en kamp gik? Tryk på Z for at åbne gruppens målere, der opgør skade, helbredelse og trussel for din gruppe, kamp for kamp.',
+    'Nysgerrig efter, hvordan en kamp gik? Tryk på Shift+H for at åbne gruppens målere, der opgør skade, helbredelse og trussel for din gruppe, kamp for kamp.',
   'guide.combat.queueBody':
     'Du behøver ikke ramme dine tryk præcist på slaget. Tryk på din næste evne i de sidste øjeblikke af den igangværende besværgelse, så sættes den i kø og udløses i samme nu, besværgelsen er færdig, så øvet spil flyder uden huller. Et tryk for tidligt bliver simpelthen afvist, så intet går til spilde. Nogle nærkampsslag virker på samme måde og rider med på dit næste våbensving.',
   'guide.combat.queueTitle': 'Dit næste træk er allerede ladt',
@@ -7045,7 +7040,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Et dagligt loft over de største gentagelige belønninger. Hver heroisk fangekælder udbetaler én gennemførelse om dagen, raidet sporer normal og heroisk hver for sig, og at samle bytte fra en verdensboss starter din. En gennemført tur for fem spillere står stadig åben for dens egen gruppe; den spærrede raiddør åbner ikke igen før nulstillingen.',
   'guide.glossary.lockoutTerm': 'Spærring',
   'guide.glossary.metersDef':
-    'Gruppens pointtavle for den aktuelle kamp: skade givet, helbredelse ydet, og hvem der bærer mest trussel, ført pr. kamp. Åbn det med dets tastebinding (Z som standard).',
+    'Gruppens pointtavle for den aktuelle kamp: skade givet, helbredelse ydet, og hvem der bærer mest trussel, ført pr. kamp. Åbn det med dets tastebinding (Shift+H som standard).',
   'guide.glossary.metersTerm': 'Skadesmålere',
   'guide.glossary.petBarDef':
     'Den kommandorække, som et jæger- eller heksemesterkæledyr føjer til: Angrib, Stop, Ægge, Defensiv og Aggressiv, bundet til Ctrl plus 1 til 5 som standard.',
@@ -7076,8 +7071,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.models.formTravel': 'Fleet-form',
   'guide.models.groupForms': 'Druideformer',
   'guide.nav.sidebarLabel': 'Guideemner',
-  'guide.professions.craftHowBody':
-    'Åbn Håndværksvinduet (standardtast T) for at se hver opskrift, du kender, hvad hver enkelt kræver, og hvad du har ved hånden; når materialerne er der, klarer ét klik arbejdet. Almindelige opskrifter kan laves hvor som helst i verden. En håndfuld avancerede værktøjsopskrifter beder dig i stedet om at stå ved håndværksknudepunktet i Highwatch.',
   'guide.professions.craftHowTitle': 'Håndværksvinduet',
   'guide.professions.focusBody':
     'Hver hjemmebase har et Byfokus-panel for besøgende høstere: stå i byen, åbn det ved siden af minikortet, og ret et lille budget af fokuspoint mod de komponenttyper, du bryder dig om. Jo mere fokus du giver en komponent, jo finere og rigere kommer den af hvert senere lig; din fordeling følger din karakter, hvor end den færdes, og du kan omarbejde den, gratis, ved ethvert senere besøg i byen.',
@@ -7614,4 +7607,15 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'welcome.armory.cta': 'Træd ind i verden, og udforsk Våbenhuset',
   'welcome.news.new': 'Ny',
   'welcome.news.viewAll': 'Se alle opdateringer på GitHub',
+  'entities.letters.heroic_marks_reward.sender': 'Heroisk kvartermester',
+  'entities.letters.heroic_marks_reward.subject': 'Dine heroiske mærker',
+  'entities.letters.heroic_marks_reward.body':
+    'Din gruppe klarede den heroiske prøve, mens du kæmpede i bagtroppen eller lå faldet. Din låsning blev også registreret, så din andel af de heroiske mærker blev sendt hertil i stedet for at gå tabt. Brug dem godt.\n\n- Heroisk kvartermester',
+  'guide.dungeonsPage.resetTitle': 'Nulstilling af dine instanser',
+  'guide.dungeonsPage.resetBody':
+    'Hvis du skifter sværhedsgrad, mens gruppen stadig har krævede gennemløb, bliver de gamle krav stående et stykke tid. Gruppelederen kan straks opgive dem ved at vælge Nulstil alle instanser i menuen på sit eget portræt eller skrive /dungeon reset. Sværhedsgraden skal faktisk være ændret, ingen levende eller faldne må være indenfor, og der er en kort nedkøling mellem nulstillinger. Ved døren på forkert sværhedsgrad advarer spillet før start. Raidet nulstilles aldrig sådan; dets egne låsningsregler gælder.',
+  'guide.gear.itemLevelBody':
+    'Slå Vis genstandsniveau til i indstillingerne for hurtigt at sammenligne to dele. Udstyr med en kendt kilde, fra fjender, opgaver og håndværksfag, viser derefter et genstandsniveau: et enkelt tal, der omtrent angiver styrken ud fra oprindelsen og gør opgraderinger sammenlignelige, selv på tværs af pladser. Dele uden en sådan kilde, som simple handelsvarer og startudstyr, viser intet niveau; et manglende tal er normalt.',
+  'guide.professions.craftHowBody':
+    'Åbn håndværksvinduet (standardtast T) for at se alle kendte opskrifter, deres krav og dine materialer; når materialerne er der, er ét klik nok. Almindelige opskrifter kan fremstilles overalt. Nogle avancerede opskrifter, herunder værktøj på højt niveau og sjældne rustninger til magikere, kræver håndværkscentret i Highwatch.',
 };

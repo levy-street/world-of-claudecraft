@@ -188,6 +188,10 @@ export class Input {
   private controllerMoveInput: MoveInput | null = null;
   private controllerFacing: number | null = null;
   private emoteWheelHeldCodes = new Set<string>();
+  // Advances only when the player starts or replaces movement. Releasing a held
+  // key/stick is not newer travel intent and must not invalidate a delayed
+  // successful interaction that should stop autorun.
+  private movementIntentRevision = 0;
   // Physical key code -> action-bar slot currently held down, so key UP (or a
   // blur) releases the matching slot (drives the hold-to-charge shoot).
   private heldSlotCodes = new Map<string, number>();
@@ -465,9 +469,13 @@ export class Input {
       move.back !== this.touchMove.back ||
       move.strafeLeft !== this.touchMove.strafeLeft ||
       move.strafeRight !== this.touchMove.strafeRight;
+    const moving = move.forward || move.back || move.strafeLeft || move.strafeRight;
     this.touchMove = move;
     if (move.forward || move.back) this.autorun = false;
-    if (changed) this.noteIntent('move');
+    if (changed) {
+      if (moving) this.noteMovementIntent();
+      else this.noteIntent('move');
+    }
   }
 
   clearTouchMove(): void {
@@ -491,14 +499,20 @@ export class Input {
   // Returns the new state so the on-screen button can reflect it.
   toggleAutorun(): boolean {
     this.autorun = !this.autorun;
+    this.noteMovementIntent();
     return this.autorun;
   }
 
   // Idempotent autorun latch for analog inputs that have a one-way "engage"
   // gesture, such as the mobile move joystick's top band.
   setAutorun(on: boolean): boolean {
+    if (this.autorun !== on) this.noteMovementIntent();
     this.autorun = on;
     return this.autorun;
+  }
+
+  movementIntentVersion(): number {
+    return this.movementIntentRevision;
   }
 
   setTouchLook(active: boolean): void {
@@ -536,9 +550,13 @@ export class Input {
       move.back !== this.gamepadMove.back ||
       move.strafeLeft !== this.gamepadMove.strafeLeft ||
       move.strafeRight !== this.gamepadMove.strafeRight;
+    const moving = move.forward || move.back || move.strafeLeft || move.strafeRight;
     this.gamepadMove = move;
     if (move.forward || move.back) this.autorun = false;
-    if (changed) this.noteIntent('move');
+    if (changed) {
+      if (moving) this.noteMovementIntent();
+      else this.noteIntent('move');
+    }
   }
 
   clearGamepadMove(): void {
@@ -623,7 +641,7 @@ export class Input {
     this.clickMovePulseTarget = target;
     this.clickMovePulse++;
     this.autorun = false;
-    this.noteIntent('move');
+    this.noteMovementIntent();
   }
 
   rerouteClickMoveTarget(
@@ -773,7 +791,7 @@ export class Input {
       // edge) so a fast tap survives until a grounded movement tick samples it.
       if (held === 'jump')
         this.keyJumpUntil = Math.max(this.keyJumpUntil, performance.now() + KEY_JUMP_LATCH_MS);
-      this.noteIntent('move');
+      this.noteMovementIntent();
     }
     const edge = combo ? this.keybinds.edgeActionForCombo(combo) : null;
     if (edge !== null) {
@@ -835,7 +853,7 @@ export class Input {
     switch (action) {
       case 'autorun':
         this.autorun = !this.autorun;
-        this.noteIntent('move');
+        this.noteMovementIntent();
         return;
       case 'target':
         this.cb.onTab();
@@ -1056,6 +1074,11 @@ export class Input {
 
   private noteIntent(kind: 'move' | 'look' | 'zoom'): void {
     this.cb.onInputIntent?.(kind);
+  }
+
+  private noteMovementIntent(): void {
+    this.movementIntentRevision++;
+    this.noteIntent('move');
   }
 
   private isAttackMoveReservedCode(code: string): boolean {

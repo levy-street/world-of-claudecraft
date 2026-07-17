@@ -136,10 +136,13 @@ describe('SFX production bundle', () => {
       }
       writeFileSync(join(repository, 'scripts/sfx/sfx_mix.json'), '{"version":1,"clips":{}}\n');
 
-      const published = join(audioDirectory, 'foot_grass.mp3');
+      // foot_grass has several real takes now (no bare file), so corrupt an
+      // actually-referenced variant, not a filename the export builder would
+      // never look at.
+      const published = join(audioDirectory, 'foot_grass_1.mp3');
       writeFileSync(published, 'not audio');
       expect(() => buildSfxProductionBundle(repository)).toThrow(
-        'published SFX is not decodable: foot_grass.mp3',
+        'published SFX is not decodable: foot_grass_1.mp3',
       );
       execFileSync(ffmpegPath, [
         '-hide_banner',
@@ -159,7 +162,7 @@ describe('SFX production bundle', () => {
         published,
       ]);
       expect(() => buildSfxProductionBundle(repository)).toThrow(
-        'published SFX is not production-conforming: foot_grass.mp3',
+        'published SFX is not production-conforming: foot_grass_1.mp3',
       );
     } finally {
       rmSync(fixture, { recursive: true, force: true });
@@ -380,21 +383,22 @@ describe('SFX production bundle', () => {
       for (const filename of ['sfx_gain_map.json', 'sfx_speed_map.json', 'sfx_mix.json']) {
         copyFileSync(join(ROOT, 'scripts/sfx', filename), join(profileDirectory, filename));
       }
-      const original = join(audioDirectory, 'foot_grass.mp3');
-      copyFileSync(original, join(audioDirectory, 'foot_grass_1.mp3'));
-      copyFileSync(original, join(audioDirectory, 'foot_grass_2.mp3'));
-      rmSync(original);
-
+      // foot_grass already has several real numbered takes now (no bare file
+      // to synthesize a 2-take scenario from); the loop above already copied
+      // every real variant, so this demonstrates round-robin ordering on
+      // real, not synthetic, multi-take data.
       const bundle = buildSfxProductionBundle(fixture);
       expect(
         bundle.runtimePack.clips.foot_grass.variants.map(({ id }: { id: string }) => id),
-      ).toEqual(['1', '2']);
+      ).toEqual(SFX_CLIPS.foot_grass.variants.map(({ id }) => id));
       expect(bundle.runtimePack.clips.foot_grass).toMatchObject({
         gain: SFX_CLIPS.foot_grass.gain,
         playbackRate: SFX_CLIPS.foot_grass.playbackRate,
       });
+      // No synthetic extra file anymore (the fixture loop above copies every
+      // real variant 1:1), so the count matches the real catalog exactly.
       expect(bundle.metadata.trackCount).toBe(
-        Object.values(SFX_CLIPS).reduce((sum, clip) => sum + clip.variants.length, 0) + 1,
+        Object.values(SFX_CLIPS).reduce((sum, clip) => sum + clip.variants.length, 0),
       );
 
       copyFileSync(

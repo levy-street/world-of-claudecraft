@@ -1542,6 +1542,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Masquer le coffre des récompenses quotidiennes ?',
   'hudChrome.dailyRewards.pointsGained': '{points} points de récompenses quotidiennes gagnés.',
   'hudChrome.dailyRewards.taskMultiplier': 'Multiplicateur x{multiplier}',
+  'hudChrome.dailyRewards.oneVsOneExcluded':
+    'Les matchs en 1 contre 1 ne rapportent pas de points de récompenses quotidiennes.',
   'hudChrome.dailyRewards.totalPlayer': "{count} joueur aujourd'hui",
   'hudChrome.dailyRewards.totalPlayers': "{count} joueurs aujourd'hui",
   'hudChrome.death.resurrectAtCorpse': 'Ressusciter près du cadavre',
@@ -3734,7 +3736,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "L'ennemi est assailli par une nuée d'insectes, subissant {damage} points de dégâts de Nature sur 12 s.",
   'entities.abilities.tigers_fury.name': 'Wolfsblood',
   'entities.abilities.tigers_fury.description':
-    "Augmente la puissance d'attaque de 40 pendant 6 s. Forme de loup uniquement.",
+    "Augmente la puissance d'attaque de {buff} pendant {duration} s. Forme de loup uniquement.",
   'entities.abilities.rip.name': 'Lacération',
   'entities.abilities.rip.description':
     'Coup de grâce qui inflige {damage} points de dégâts de saignement sur 12 s. Consomme les points de combo. Forme de loup uniquement.',
@@ -6132,11 +6134,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.gear.fishingTitle': 'Pêche',
   'guide.gear.intro':
     "L'équipement, ce sont les pièces que porte votre personnage et les objets que vous transportez. Un meilleur équipement est la voie la plus sûre vers la puissance, et vous en ramassez l'essentiel rien qu'en jouant.",
-  'guide.gear.itemLevelBody':
-    "Si vous voulez un moyen rapide de comparer deux pièces, activez Afficher le niveau d'objet dans les options. L'équipement gagné dans le monde, auprès des ennemis et des quêtes, affiche alors un niveau d'objet, un chiffre unique indiquant grossièrement sa puissance selon sa provenance, pour que vous voyiez d'un coup d'œil quelle amélioration pèse le plus, même d'un emplacement à l'autre. Les pièces sans une telle origine, comme les articles de base des marchands et l'équipement de départ, n'affichent aucun niveau d'objet : un chiffre absent est donc normal, pas un défaut.",
-  'guide.gear.qualityBody':
-    "Chaque objet a une qualité, et son nom est coloré en conséquence pour que vous lisiez sa valeur d'un coup d'œil. Du plus commun au plus convoité :",
-  'guide.gear.qualityCommon': 'Commun',
   'guide.gear.qualityEpic': 'Épique',
   'guide.gear.qualityLegendary': 'Légendaire',
   'guide.gear.qualityNote':
@@ -6788,7 +6785,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Augmente la vitesse d'attaque et d'incantation de 15%.",
   'entities.itemSets.necromancers.name': 'Parure de Mournweave',
   'entities.itemSets.necromancers.bonus2':
-    'Vous ne pouvez pas être projeté en arrière (100% de résistance à la projection).',
+    'Augmente la puissance des sorts de 20. Les dégâts subis ne retardent plus vos incantations (100% de résistance au retard des sorts).',
   'entities.itemSets.necromancers.bonus3': "Augmente l'intelligence de 10 et l'endurance de 10.",
   'entities.itemSets.nighttalon.name': 'Peau de Direfang',
   'entities.itemSets.nighttalon.bonus2': "Augmente la puissance d'attaque de 40.",
@@ -6796,12 +6793,12 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Augmente l'agilité de 15, les chances de critique de 2% et la vitesse d'attaque et d'incantation de 15%.",
   'entities.itemSets.soulflame.name': "Tenue d'apparat Wraithfire",
   'entities.itemSets.soulflame.bonus2':
-    'Vous ne pouvez pas être projeté en arrière (100% de résistance à la projection).',
+    'Augmente la puissance des sorts de 20. Les dégâts subis ne retardent plus vos incantations (100% de résistance au retard des sorts).',
   'entities.itemSets.soulflame.bonus3':
     "Augmente l'intelligence de 15, l'esprit de 15 et la vitesse d'attaque et d'incantation de 15%.",
   'entities.itemSets.stormcallers.name': 'Vêtements de Galecall',
   'entities.itemSets.stormcallers.bonus2':
-    'Vous ne pouvez pas être projeté en arrière (100% de résistance à la projection).',
+    'Augmente la puissance des sorts de 20. Les dégâts subis ne retardent plus vos incantations (100% de résistance au retard des sorts).',
   'entities.itemSets.stormcallers.bonus3':
     "Augmente l'intelligence de 15, l'esprit de 15 et la vitesse d'attaque et d'incantation de 15%.",
   'entities.itemSets.vale_arcanist.name': "Tenue de l'arcaniste du Val",
@@ -7411,15 +7408,11 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.deedsPage.howHeading': 'Comment fonctionnent les hauts faits',
   'guide.deedsPage.intro':
     "Le Livre des hauts faits est l'endroit où le monde tient le compte de tout ce que vous avez accompli, de vos premiers pas hors de la vallée de départ aux combats les plus rudes que le royaume puisse offrir. Obtenez des hauts faits au fil du jeu, portez les titres qu'ils confèrent et regardez votre Renommée grimper.",
-  'guide.deedsPage.renownBody':
-    "La Renommée est le score qui se cache derrière le Livre. Chaque haut fait obtenu vaut un montant fixe, et votre total ne fait que grimper: une semaine calme ne vous fait jamais perdre de terrain. Une poignée de hauts faits tiennent à la chance plutôt qu'au talent, et les Prouesses sont un honneur à part; ni les uns ni les autres ne rapportent la moindre Renommée.",
   'guide.deedsPage.renownHeading': 'Renommée',
   'guide.deedsPage.rewardBorder': 'Bordure',
   'guide.deedsPage.rewardsBody':
     "Les récompenses sont purement d'apparat, et c'est bien le but. Certains hauts faits confèrent un titre à porter ou une bordure pour encadrer votre nom, jamais rien qui rende votre héros plus fort. Choisissez le titre qui vous plaît dans le Livre des hauts faits: il vous accompagne sur votre plaque de nom, dans le chat et sur les classements, à la vue de tous.",
   'guide.deedsPage.rewardsHeading': 'Titres et bordures',
-  'guide.deedsPage.standingsNote':
-    "Les royaumes tiennent un décompte continu de la Renommée sur l'ensemble des comptes. Pour savoir qui se place où, ouvrez le Classement en jeu et rendez-vous sur son onglet Renommée ; le classement se trouve là, pas sur le wiki.",
   'guide.nav.deeds': 'Livre des hauts faits',
   'hudChrome.deeds.broadcastLine': '{name} a accompli un haut fait: {deed}',
   'hudChrome.deeds.broadcastsLabel':
@@ -7453,9 +7446,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.filterNearly': 'Presque finis',
   'hudChrome.deeds.filterUnearned': 'À obtenir',
   'hudChrome.deeds.hiddenBadge': 'Secret',
-  'hudChrome.deeds.lbDeedsCol': 'Hauts faits',
   'hudChrome.deeds.lbEmpty': 'Aucun chroniqueur classé pour le moment.',
-  'hudChrome.deeds.lbSelf': 'Votre position: rang {rank}, dans le top {percent} %',
   'hudChrome.deeds.lbTab': 'Renommée',
   'hudChrome.deeds.lbTitleCol': 'Titre',
   'hudChrome.deeds.nearestLabel': 'Presque au but:',
@@ -7551,7 +7542,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.bestiary.flavor.sethrael_palecoil':
     "Un serpent d'une pâleur d'os qui glisse dans les profondeurs du Glimmermere, gardien silencieux de l'eau qu'il a faite sienne. Les nageurs qui partagent le lac avec lui refont rarement surface.",
   'guide.combat.metersBody':
-    "Envie de savoir comment un combat s'est déroulé ? Appuyez sur Z pour ouvrir les compteurs de groupe, qui totalisent les dégâts, les soins et la menace de votre groupe, rencontre par rencontre.",
+    "Envie de savoir comment un combat s'est déroulé ? Appuyez sur Shift+H pour ouvrir les compteurs de groupe, qui totalisent les dégâts, les soins et la menace de votre groupe, rencontre par rencontre.",
   'guide.combat.queueBody':
     "Nul besoin de caler vos pressions à la frame près. Appuyez sur votre prochaine capacité dans les derniers instants de l'incantation en cours et elle se met en file d'attente, se déclenchant à la seconde où l'incantation s'achève, si bien qu'un jeu rodé s'enchaîne sans temps mort. Une pression trop hâtive est simplement refusée, donc rien n'est gâché. Certaines attaques de mêlée fonctionnent de la même manière, en s'exécutant sur votre prochain coup d'arme.",
   'guide.combat.queueTitle': 'Votre prochain geste est déjà armé',
@@ -7607,7 +7598,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Un plafond quotidien sur les plus grosses récompenses répétables. Chaque donjon héroïque n'accorde qu'un nettoyage par jour, le raid suit le normal et l'héroïque séparément, et piller un boss de monde déclenche le vôtre. Une expédition à cinq joueurs déjà nettoyée reste ouverte à son propre groupe ; la porte verrouillée du raid ne se rouvre qu'à la réinitialisation.",
   'guide.glossary.lockoutTerm': 'Verrouillage',
   'guide.glossary.metersDef':
-    'La fenêtre de tableau de bord du groupe pour le combat en cours : dégâts infligés, soins prodigués et qui détient le plus de menace, conservés par rencontre. Ouvrez-la avec son raccourci (Z par défaut).',
+    'La fenêtre de tableau de bord du groupe pour le combat en cours : dégâts infligés, soins prodigués et qui détient le plus de menace, conservés par rencontre. Ouvrez-la avec son raccourci (Shift+H par défaut).',
   'guide.glossary.metersTerm': 'Compteurs de dégâts',
   'guide.glossary.petBarDef':
     "La rangée de commandes qu'ajoute un familier de chasseur ou de démoniste : Attaquer, Arrêter, Provoquer, Défensif et Agressif, assignés par défaut à Ctrl plus 1 à 5.",
@@ -7638,12 +7629,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.models.formTravel': 'Forme de Fleet',
   'guide.models.groupForms': 'Formes de druide',
   'guide.nav.sidebarLabel': 'Rubriques du guide',
-  'guide.professions.craftHowBody':
-    "Ouvrez la fenêtre d'Artisanat (touche T par défaut) pour voir toutes les recettes que vous connaissez, ce que chacune réclame et ce que vous avez sous la main ; quand les matériaux sont là, un clic suffit. Les recettes courantes se fabriquent partout dans le monde. Une poignée de recettes d'outils avancées vous demandent en revanche de vous tenir à l'atelier d'artisanat de Highwatch.",
-  'guide.professions.craftHowTitle': "La fenêtre d'artisanat",
-  'guide.professions.focusBody':
-    "Chaque ville principale tient un panneau de Priorités de la ville pour les récolteurs de passage : tenez-vous en ville, ouvrez-le à côté de la minicarte, et affectez un petit budget de points de priorité aux types de composants qui vous importent. Plus vous accordez de priorité à un composant, plus il ressort fin et riche de chaque cadavre ultérieur ; votre répartition suit votre personnage où qu'il aille, et vous pouvez la remanier, gratuitement, à chaque passage ultérieur en ville.",
-  'guide.professions.focusTitle': 'Priorités de la ville',
   'guide.professions.harvestBody':
     "La récolte ne s'arrête pas aux gisements. Certaines bêtes abattues peuvent être dépecées pour des composants, cuirs, crocs, soie et choses plus étranges encore, directement sur le cadavre en plus de son butin ordinaire. Un seul récolteur par proie : le premier à dépecer rafle tout. Le choix vous appartient à chaque fois : prélevez tout ce que le cadavre offre, ou concentrez-vous sur un seul composant pour en tirer une qualité plus fine. N'importe quel personnage peut récolter, sans métier ni apprentissage requis, et un composant particulièrement fin porte même le nom de celui qui l'a récolté.",
   'guide.professions.harvestTitle': 'Dépecer la chasse elle-même',
@@ -7837,4 +7822,22 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'welcome.armory.cta': 'Entrer dans le monde et parcourir l’Armurerie',
   'welcome.news.new': 'Nouveau',
   'welcome.news.viewAll': 'Voir toutes les mises à jour sur GitHub',
+  'entities.letters.heroic_marks_reward.sender': 'Intendant héroïque',
+  'entities.letters.heroic_marks_reward.subject': 'Vos Marques héroïques',
+  'entities.letters.heroic_marks_reward.body':
+    'Votre groupe a triomphé de l’épreuve héroïque pendant que vous combattiez à l’arrière ou gisiez à terre. Votre verrouillage a tout de même été enregistré, alors votre part de Marques héroïques vous est envoyée ici au lieu d’être perdue. Faites-en bon usage.\n\n- Intendant héroïque',
+  'guide.dungeonsPage.resetTitle': 'Réinitialiser vos instances',
+  'guide.dungeonsPage.resetBody':
+    'Si vous changez de difficulté alors que votre groupe détient encore des parcours revendiqués, les anciennes revendications persistent un moment avant de disparaître. Le chef de groupe peut les abandonner immédiatement : choisissez Réinitialiser toutes les instances dans le menu de son portrait, ou saisissez /dungeon reset. La difficulté doit réellement avoir changé, personne, vivant ou mort, ne doit rester à l’intérieur, et un court délai sépare deux réinitialisations. Si vous arrivez à l’entrée avec la mauvaise difficulté, le jeu vous avertit avant le début. Le raid n’est jamais réinitialisé ainsi ; ses propres règles de verrouillage restent en vigueur.',
+  'guide.gear.itemLevelBody':
+    'Pour comparer rapidement deux pièces, activez Afficher le niveau d’objet dans les options. L’équipement dont la provenance est connue, obtenu sur les ennemis, par les quêtes ou les métiers, affiche alors un niveau d’objet : une valeur unique qui estime sa puissance d’après sa source et permet de repérer la meilleure amélioration, même entre emplacements différents. Les pièces sans telle provenance, comme les articles de base des marchands et l’équipement de départ, n’en affichent pas ; cette absence est normale.',
+  'guide.professions.craftHowBody':
+    'Ouvrez la fenêtre d’artisanat (touche T par défaut) pour voir toutes vos recettes, leurs composants et ce que vous possédez ; lorsque les matériaux sont réunis, un clic suffit. Les recettes courantes se fabriquent partout. Quelques recettes avancées, dont des outils de haut niveau et de rares armures de lanceur de sorts, exigent toutefois le centre d’artisanat de Highwatch.',
+  'guide.gear.qualityBody':
+    'Chaque objet possède une qualité, et son nom prend la couleur correspondante afin que sa valeur soit lisible en un coup d’œil. Du plus courant au plus précieux :',
+  'guide.gear.qualityCommon': 'Commun',
+  'guide.professions.craftHowTitle': 'La fenêtre d’artisanat',
+  'guide.professions.focusTitle': 'Focalisation de la ville',
+  'guide.professions.focusBody':
+    'Chaque ville principale propose un panneau de Focalisation de la ville aux récolteurs de passage : restez en ville, ouvrez-le près de la minicarte et attribuez un petit capital de points aux types de composants qui vous intéressent. Plus un composant reçoit de focalisation, plus les dépouilles suivantes en fournissent une version fine et abondante. Cette répartition suit votre personnage et peut être modifiée gratuitement lors de chaque visite en ville.',
 };

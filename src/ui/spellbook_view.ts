@@ -17,7 +17,7 @@
 //
 // Phase 4 of the mobile combat HUD rework adds an optional `mobilePage` per row:
 // which mobile action-ring page (Phase 1, mobile_action_page_view.ts) the row's
-// bar slot falls on, so the touch-only painter can label it ("Page 1"/"Page 2").
+// bar slot falls on, so the touch-only painter can label it ("Page 1" to "Page 4").
 // The page math is NOT duplicated here: sourceSlotsForMobilePage is imported
 // from mobile_action_page_view.ts and this module only looks up which page's
 // slot set contains the row's barSlot.
@@ -45,7 +45,7 @@ export interface SpellbookRow {
   toggleDisabled: boolean;
   /** The mobile action-ring page (0-indexed) this row's bar slot falls on, or
    *  null when the row is off-bar or its slot is outside the ring's reachable
-   *  span (slot 0 / the attack toggle, slot 11, or the secondary bar). Touch-only
+   *  span (slot 0 / the attack toggle or desktop-only slots 21-22). Touch-only
    *  presentation; desktop rendering ignores this field. */
   mobilePage: number | null;
 }
@@ -55,6 +55,11 @@ export interface SpellbookView {
   classId: PlayerClass;
   /** Drives the per-form "reset bar" button (only classes with form bars). */
   hasFormBars: boolean;
+  /** The pinned basic Attack row's toggle state: whether the Attack toggle
+   *  currently occupies action-bar slot 0 (the Interface showAttackButton
+   *  option). Attack is not an ability, so it rides the view beside `rows`
+   *  instead of forging a fake ResolvedAbility row. */
+  attackOnBar: boolean;
   rows: SpellbookRow[];
   /** No rows rendered at all (the class kit was empty). */
   empty: boolean;
@@ -71,6 +76,8 @@ export interface SpellbookInput {
   barAbilityIds: readonly string[];
   /** The action bar has at least one empty slot. */
   hasFreeSlot: boolean;
+  /** The Attack toggle currently occupies bar slot 0 (showAttackButton on). */
+  attackOnBar: boolean;
   /** The class has per-form bars (druid), so the reset-bar button is shown. */
   hasFormBars: boolean;
   /** Optional: the hotbar's ability id per bar slot (index 0 = barSlot 1, matching
@@ -106,6 +113,7 @@ export function buildSpellbookView(input: SpellbookInput): SpellbookView {
   return {
     classId: input.classId,
     hasFormBars: input.hasFormBars,
+    attackOnBar: input.attackOnBar,
     rows,
     empty: rows.length === 0,
   };
@@ -115,7 +123,7 @@ export function buildSpellbookView(input: SpellbookInput): SpellbookView {
  * The mobile action-ring page (0-indexed) whose source slots
  * (sourceSlotsForMobilePage) contain this ability's bar slot, or null when the
  * slot lookup is missing, the ability isn't on the bar, or its slot sits outside
- * every page's span (slot 0's attack toggle, slot 11, or the secondary bar).
+ * every page's span (slot 0's attack toggle or desktop-only slots 21-22).
  */
 function mobilePageForAbility(
   abilityId: string,

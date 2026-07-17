@@ -5,10 +5,8 @@
 // arithmetic. No DOM, no i18n, no Hud state: the ring painter and Hud both import
 // this instead of hand-rolling the slot math twice.
 //
-// SCOPE: pages cover hotbar source slots 1-10 only (2 pages of 5). Slot 11 and the
-// entire secondary bar (slots 12-22) are unreachable from the ring this pass; a
-// future extension would grow MOBILE_ACTION_PAGE_COUNT and mobilePageCount's input,
-// not fork this module.
+// SCOPE: pages cover hotbar source slots 1-20 (4 pages of 5). The remaining
+// secondary-bar slots 21-22 stay desktop-only.
 
 /** Ring buttons per page (the 5 visible action slots; attack is separate, fixed,
  *  and outside the paging system entirely). */
@@ -16,15 +14,16 @@ export const MOBILE_ACTIONS_PER_PAGE = 5;
 /** The first hotbar source slot the ring can reach (barSlot numbering; slot 0 is
  *  the fixed Attack toggle and is never produced by this module). */
 export const MOBILE_ACTION_SOURCE_SLOT_START = 1;
-/** Total hotbar source slots the ring can reach (1..10): 2 pages x 5 buttons. */
-export const MOBILE_ACTION_SOURCE_SLOT_COUNT = 10;
-/** Default page count for the default 10-slot span. */
-export const MOBILE_ACTION_PAGE_COUNT = 2;
+/** Total hotbar source slots the ring can reach (1..20): 4 pages x 5 buttons. */
+export const MOBILE_ACTION_SOURCE_SLOT_COUNT = 20;
+/** Page count for the default 20-slot span. */
+export const MOBILE_ACTION_PAGE_COUNT = Math.ceil(
+  MOBILE_ACTION_SOURCE_SLOT_COUNT / MOBILE_ACTIONS_PER_PAGE,
+);
 
 /** Number of pages needed to cover `totalSlots` source slots at
- *  MOBILE_ACTIONS_PER_PAGE per page, rounded up. Parameterized (not hardcoded to
- *  2) so a future extension can grow the reachable slot span without forking the
- *  arithmetic. */
+ *  MOBILE_ACTIONS_PER_PAGE per page, rounded up. Parameterized so callers can
+ *  reason about other spans without forking the shared arithmetic. */
 export function mobilePageCount(totalSlots: number = MOBILE_ACTION_SOURCE_SLOT_COUNT): number {
   return Math.max(1, Math.ceil(totalSlots / MOBILE_ACTIONS_PER_PAGE));
 }

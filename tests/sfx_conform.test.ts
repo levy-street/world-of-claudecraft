@@ -366,6 +366,67 @@ describe('classify: loudness gate', () => {
   });
 });
 
+describe('classify: preserveLoudness wrong-branch fingerprint', () => {
+  // Regression coverage for a real, previously-shipped bug: 19 custom keys
+  // (including ui_achievement) were conformed through the generated-content
+  // LUFS-targeting branch before `custom: true` was set on them, and no
+  // reconform since re-derived them from a pristine source (conform reads
+  // its input from the same public/audio/sfx file it writes back to), so the
+  // wrong loudness stayed baked in silently. A preserveLoudness file is never
+  // gain-staged toward TARGET_LUFS, so one landing within tolerance of it
+  // anyway is CONSISTENT with that exact bug recurring, but an author's own
+  // hot mix can coincidentally land there too (confirmed for real keys) and
+  // this checker cannot see the external master-store source to tell the two
+  // apart, so it is advisory (problems stays empty; the gate never hard-fails
+  // it), not a hard failure like the other loudness checks.
+  it('surfaces an advisory for a preserveLoudness long clip whose LUFS lands on the generated-content target', () => {
+    const { problems, advisories } = classify({
+      ...AT_SPEC,
+      duration: 2.0,
+      lufs: TARGET_LUFS,
+      peakDb: TARGET_PEAK_DBFS - 3,
+      preserveLoudness: true,
+    });
+    expect(advisories.some((a) => a.includes('loudness-targeted'))).toBe(true);
+    expect(problems).toHaveLength(0);
+  });
+
+  it('does not flag a preserveLoudness long clip sitting well under the target (its own mix)', () => {
+    const { advisories } = classify({
+      ...AT_SPEC,
+      duration: 2.0,
+      lufs: -22.0,
+      peakDb: TARGET_PEAK_DBFS - 3,
+      preserveLoudness: true,
+    });
+    expect(advisories.filter((a) => a.includes('loudness-targeted'))).toHaveLength(0);
+  });
+
+  it('does not apply the wrong-branch fingerprint to a non-preserveLoudness key', () => {
+    // A normal generated key landing on TARGET_LUFS is the CORRECT, intended
+    // result, not a defect; the fingerprint check is preserveLoudness-only.
+    const { advisories } = classify({
+      ...AT_SPEC,
+      duration: 2.0,
+      lufs: TARGET_LUFS,
+      peakDb: TARGET_PEAK_DBFS - 3,
+      preserveLoudness: false,
+    });
+    expect(advisories.filter((a) => a.includes('loudness-targeted'))).toHaveLength(0);
+  });
+
+  it('does not apply the wrong-branch fingerprint on the short-clip peak branch', () => {
+    const { advisories } = classify({
+      ...AT_SPEC,
+      duration: 0.5,
+      lufs: TARGET_LUFS,
+      peakDb: TARGET_PEAK_DBFS,
+      preserveLoudness: true,
+    });
+    expect(advisories.filter((a) => a.includes('loudness-targeted'))).toHaveLength(0);
+  });
+});
+
 describe('classify: lossless sources', () => {
   // WAV/FLAC probe at high bitrates that are meaningless for the quality gate.
   const LOSSLESS = {

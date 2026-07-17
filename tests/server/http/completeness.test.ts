@@ -295,6 +295,10 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     { method: 'DELETE', path: '/api/github' },
     { method: 'POST', path: '/api/desktop-login/create' },
     { method: 'POST', path: '/api/desktop-login/exchange' },
+    { method: 'POST', path: '/api/desktop-wallet/create' },
+    { method: 'POST', path: '/api/desktop-wallet/claim' },
+    { method: 'POST', path: '/api/desktop-wallet/complete' },
+    { method: 'POST', path: '/api/desktop-wallet/result' },
     { method: 'GET', path: '/api/daily-rewards' },
     { method: 'POST', path: '/api/daily-rewards/spin' },
     { method: 'GET', path: '/api/daily-rewards/history' },
@@ -561,9 +565,10 @@ describe('registry completeness: oauth + internal surfaces (server/oauth.ts, ser
   it('derives the expected non-empty ladders', () => {
     expect(oauthPostLadder.length).toBe(5);
     expect(oauthGetLadder.length).toBe(2);
-    // 17 = the handleInternalApi eleven (restart-countdown + the 10 Discord-bot routes)
-    // plus the six-route payout and moderation ops family below.
-    expect(internalLadder.length).toBe(17);
+    // 18 = the handleInternalApi twelve (restart-countdown + the 11 Discord-bot
+    // routes, flaired-ids included) plus the six-route payout and moderation ops
+    // family below.
+    expect(internalLadder.length).toBe(18);
     expect(opsFamilyRows.length).toBe(6);
   });
 

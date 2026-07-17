@@ -25,8 +25,9 @@ Zero new dependencies: Gateway over the existing `ws`, REST via built-in `fetch`
 - `server_client.ts`: client for the game server's secret-gated `/internal/discord/*`
   endpoints (`x-woc-discord-secret`); grep `/internal/discord/` there for the live set.
 - `config.ts`: env to `BotConfig` (throws on missing required).
-- `main.ts`: wiring only: guild state seeded from `GUILD_CREATE`, event dispatch,
-  the poll loops.
+- `main.ts`: wiring only: guild state seeded from `GUILD_CREATE` (plus the op 8
+  member backfill for large guilds), kept live by the `GUILD_MEMBER_*` events,
+  event dispatch, the poll loops.
 
 ## New bot feature recipe (module-first)
 1. Pure message-builder/diff/shaping logic in `logic.ts`, with a test in
@@ -69,8 +70,11 @@ Zero new dependencies: Gateway over the existing `ws`, REST via built-in `fetch`
 - **Staff/special roles** (e.g. Levy St, Core Dev, Mods) live in the shared catalog
   `src/sim/discord_roles.ts`, matched by exact name or alias (case-insensitive);
   the member's top-priority role is pushed via members-meta and drives the
-  in-world name color + tag. **A guild-side rename silently breaks the match**:
-  add an alias to the catalog instead of renaming.
+  in-world name color + tag. Grants and revokes are observed live
+  (`GUILD_MEMBER_UPDATE` re-pushes that member's meta immediately), and EVERY
+  guild role id matching a catalog key is indexed, so duplicate-named roles
+  (an `Admin` and an `Admins`) both resolve. **A guild-side rename silently
+  breaks the match**: add an alias to the catalog instead of renaming.
 
 ## Env (see .env.example; the live set is `grep process.env bot/config.ts`)
 Required: `DISCORD_BOT_TOKEN`, `DISCORD_CLIENT_ID`, `DISCORD_GUILD_ID`,
@@ -84,8 +88,17 @@ is posted). Boot loads `.env`/`.env.local` when present but runs fine from ambie
 env alone (`process.loadEnvFile`).
 
 ## Limits / notes
-- Guild state is seeded from `GUILD_CREATE`; very large guilds may not send all
-  members up front (request-guild-members opcode is not implemented). Fine for
-  small/medium servers.
+- Guild state is seeded from `GUILD_CREATE` and then kept live: `GUILD_MEMBER_ADD`
+  seeds a joiner's roles/join date, `GUILD_MEMBER_UPDATE` reconciles a member's
+  role set (so a role granted or revoked after boot reflects on the next push), and
+  `GUILD_MEMBER_REMOVE` clears their stored flair. Guilds above the IDENTIFY
+  `large_threshold` (250, the gateway max) omit offline members from
+  `GUILD_CREATE`, so the bot backfills the full roster with
+  `REQUEST_GUILD_MEMBERS` (op 8, streamed back as `GUILD_MEMBERS_CHUNK`). After
+  every COMPLETE seed it also reconciles stored flair against the roster
+  (`/internal/discord/flaired-ids`), clearing members who left while the bot was
+  offline. Member-meta pushes are batched by BYTES (`MEMBERS_META_BATCH`), sized
+  so a worst-case batch stays under the server's 64 KiB JSON body cap; the
+  server's 1000-entry slice is defense in depth, never the binding constraint.
 - "Speaking" indicators are not live (that needs a voice-gateway connection); the
   voice list shows membership + self-mute.

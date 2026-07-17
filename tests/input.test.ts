@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Input } from '../src/game/input';
+import { stopAutorunForInteraction } from '../src/game/interaction_autorun';
 import { Keybinds } from '../src/game/keybinds';
 
 function installStorage(): void {
@@ -150,6 +151,43 @@ describe('Input autorun', () => {
     input.setTouchMove({ forward: false, back: false, strafeLeft: true, strafeRight: false });
     expect(input.autorun).toBe(true);
     expect(input.readMoveInput().forward).toBe(true);
+  });
+
+  it('preserves newer click-to-move intent when a delayed interaction succeeds', async () => {
+    const { input } = makeInput();
+    input.setAutorun(true);
+    let resolveOutcome!: (succeeded: boolean) => void;
+    const outcome = new Promise<boolean>((resolve) => {
+      resolveOutcome = resolve;
+    });
+    const syncAutorun = vi.fn();
+    const stopped = stopAutorunForInteraction(outcome, input, { syncAutorun });
+
+    input.setClickMoveTarget({ x: 4, z: 2 }, 0.5);
+    resolveOutcome(true);
+
+    await expect(stopped).resolves.toBe(false);
+    expect(input.clickMoveGoal).toEqual({ x: 4, z: 2 });
+    expect(syncAutorun).not.toHaveBeenCalled();
+  });
+
+  it('still stops autorun when a held strafe is released before the interaction outcome', async () => {
+    const { input } = makeInput();
+    input.setAutorun(true);
+    input.setTouchMove({ forward: false, back: false, strafeLeft: true, strafeRight: false });
+    let resolveOutcome!: (succeeded: boolean) => void;
+    const outcome = new Promise<boolean>((resolve) => {
+      resolveOutcome = resolve;
+    });
+    const syncAutorun = vi.fn();
+    const stopped = stopAutorunForInteraction(outcome, input, { syncAutorun });
+
+    input.clearTouchMove();
+    resolveOutcome(true);
+
+    await expect(stopped).resolves.toBe(true);
+    expect(input.autorun).toBe(false);
+    expect(syncAutorun).toHaveBeenCalledWith(false);
   });
 
   it('keeps autorun running while the Escape menu is open, then keeps running after close', () => {

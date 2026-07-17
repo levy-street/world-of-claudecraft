@@ -1,0 +1,122 @@
+:root {
+  color-scheme: dark;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #090b12;
+  color: #f8f3e7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at 20% 15%, rgba(94, 61, 164, 0.35), transparent 34rem),
+    radial-gradient(circle at 80% 80%, rgba(187, 121, 30, 0.2), transparent 30rem), #090b12;
+}
+
+.wallet-handoff-card {
+  width: min(100%, 520px);
+  padding: 32px;
+  border: 1px solid #9e7b3f;
+  border-radius: 16px;
+  background: rgba(18, 20, 30, 0.96);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+  text-align: center;
+}
+
+.wallet-handoff-logo {
+  width: 72px;
+  height: 72px;
+  border-radius: 16px;
+}
+.wallet-handoff-eyebrow {
+  color: #d7af67;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+h1 {
+  margin: 14px 0 10px;
+  font-family: Cinzel, Georgia, serif;
+}
+p {
+  color: #cbc5b9;
+  line-height: 1.55;
+}
+.wallet-handoff-options {
+  display: grid;
+  gap: 10px;
+  margin: 24px 0;
+}
+
+.wallet-handoff-option,
+.wallet-handoff-return,
+[data-retry] {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid #b99049;
+  border-radius: 10px;
+  background: #3a2915;
+  color: #fff7e8;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.wallet-handoff-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+.wallet-handoff-option img {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+}
+.wallet-handoff-return {
+  display: inline-grid;
+  place-items: center;
+  text-decoration: none;
+  margin-top: 18px;
+}
+.wallet-handoff-help {
+  padding: 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+}
+.wallet-handoff-safety {
+  margin-bottom: 0;
+  font-size: 0.88rem;
+  color: #9d988f;
+}
+.wallet-handoff-spinner {
+  display: inline-block;
+  width: 38px;
+  height: 38px;
+  border: 3px solid #5c4b32;
+  border-top-color: #d7af67;
+  border-radius: 50%;
+  animation: wallet-spin 0.8s linear infinite;
+}
+@keyframes wallet-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 560px) {
+  body {
+    padding: 14px;
+  }
+  .wallet-handoff-card {
+    padding: 24px 18px;
+  }
+}

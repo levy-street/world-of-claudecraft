@@ -650,8 +650,8 @@ hidden inside More; the launcher is a surface, not the input map.
 ### 7.10 Chat
 
 `#chatlog-wrap` keeps its bottom-left anchor, tab model (built-in Chat and Combat Log plus
-player channel tabs from `src/ui/chat_channels.ts`), movable and resizable behavior
-(`src/ui/chat_window.ts`), and live-region semantics. Target styling and behavior:
+player channel tabs from `src/ui/hud/chat/chat_channels.ts`), movable and resizable behavior
+(`src/ui/hud/chat/chat_window.ts`), and live-region semantics. Target styling and behavior:
 
 - Tab strip in the shared tab style (section 10.2); unread markers on inactive tabs.
 - An idle/focus state (new): idle chat rests at the soft fill; focus or hover brings it

@@ -85,19 +85,23 @@ Each module owns the FUNCTIONS for one system; the backing STATE stays on `Sim` 
 | `bags.ts` | pooled bag capacity: the backpack plus equipped bag items raise one flat slot budget |
 | `quests/quest_credit.ts` | kill/collect quest credit + turn-in readiness |
 | `quests/quest_commands.ts` | accept/abandon/turn-in verbs + `queueQuestLetter` (W4; dev arm in `quests/dev_quest_commands.ts`) |
-| `instances/dungeons.ts` | door triggers, enter/leave, instance slots, raid lockouts + raid gates |
+| `instances/dungeons.ts` | door triggers, enter/leave, instance slots, raid lockouts + raid gates, and the manual instance-reset lifecycle (`resetDungeonInstances` behind `/dungeon reset`, character-keyed cooldowns on the `dungeonResetLocks` primitive, `inheritDungeonResetLocks` on party join) |
 | `instances/difficulty.ts` + `instances/heroic_vendor.ts` | heroic dungeons: tuning + `dungeonDifficulty`/`setDungeonDifficulty`, `awardHeroicMarks` and kill lockouts; the Heroic Quartermaster marks vendor |
 | `delves/runs.ts` | delve run lifecycle (`updateDelveRuns`, modules, rewards, shop) |
 | `delves/lockpick_controller.ts` | the lockpick session machine |
 | `delves/companion.ts` | `updateDelveCompanion` |
 | `delves/drowned_litany_boss.ts` / `_rite.ts` / `_rooms.ts` | The Drowned Litany delve: room puzzles, the Sister Nhalia boss, the Rite finale (difficulty knobs in `delves/rite_tuning.ts`, shared with the HUD popup) |
 | `social/party.ts` | the party/raid machine + `partyOf` |
+| `social/dungeon_finder.ts` | the Dungeon Finder (`docs/prd/dungeon-finder.md`): the automatic role queue plus the leader-run premade board; only FORMS groups (via `PartyMachine.formDungeonFinderGroup`), draws no rng; pinned by `tests/dungeon_finder.test.ts` |
 | `social/duel.ts` + `social/arena.ts` | duels + ranked arena (Elo, matchmaking) |
 | `social/fiesta.ts` + `social/fiesta_bots.ts` | fiesta match logic + offline bots |
 | `social/vale_cup.ts` + `social/vale_cup_bots.ts` | Vale Cup boarball: brackets, the one match slot, the `vcup*` seam arms (pure ball math in the `vale_cup_ball.ts`/`vale_cup_layout.ts` leaves); its tick phase draws ZERO shared rng |
 | `social/yumi.ts` | Protect Yumi 3v3/5v5 maze mode (layout leaf `yumi_maze_layout.ts`) |
 | `social/ready_check.ts` | `/ready`: the `readyChecks` primitive + the `updateReadyChecks` phase |
+| `social/card_duel.ts` | the Card Duel minigame (Card Master NPC): queue/match state, the `updateCardDuelQueue` (pairing) and `updateCardDuelDeadlines` (AFK forfeit/void) phases |
+| `instances/card_master.ts` | the Card Master NPC proximity gate (`cardMasterInRange`) `social/card_duel.ts` queues against |
 | `social/trade.ts` + `social/chat.ts` | player trade; the `chat()` router, emotes, whispers, channel membership (readout formatters in `social/chat_readouts.ts`). `Sim` keeps only a thin `chat()` delegate for the `IWorld` facade; new slash commands land in `social/chat.ts`, never on `Sim` |
+| `dev_commands.ts` | the `ctx.devCommands` gated `/dev` cheat surface: `handleDevChat` (re-exported by `social/chat.ts` for the chat router), `spawnMobsForDev`/`despawnMobsForDev` (dev-spawned mobs are torn down in `removePlayer`), `resetCombatForDev`; pinned by `tests/dev_commands.test.ts` |
 | `targeting.ts` | player target selection + raid markers |
 | `market.ts` | the World Market (`Market` class) |
 | `mail/post_office.ts` | player mail (send/take/read/delete, the mailbox anchor gate) |
@@ -105,6 +109,7 @@ Each module owns the FUNCTIONS for one system; the backing STATE stays on `Sim` 
 | `loot/loot_roll.ts` + `loot/loot_ffa.ts` | loot rolls, corpse loot, party-loot strategy, `rollLoot`; the tap-lock FFA timeout |
 | `deeds.ts` | the Book of Deeds evaluator (`updateDeeds`): runs at the very end of the tick tail (grant evaluation over dirty players only via `markDeedsDirty`, plus a 1 Hz proximity sweep for visit marks), draws NO rng, grants into `PlayerMeta.deedsEarned` + maintains `deedStats`/`renown`, emits id-based `deedUnlocked` (retro on join); plus the bespoke `manual`-deed grant sites and the session-only `DeedRuntime` encounter tracking. Authoring contract: `docs/design/deeds.md` |
 | `professions/` | gathering/crafting/enchanting/salvage/archetypes; governed by its own `CLAUDE.md` (hooks `drainGatheringGrants` into the per-player tick) |
+| `pvp/` | WARFARE honor currency + combat-rating rules (`honor.ts` behind the seam; pure rating math in `power.ts`); governed by its own `CLAUDE.md` |
 
 Enumerate the live set: `grep -rl sim_context src/sim --include='*.ts'`; every hit must be
 a row here or a Key files entry (`sim.ts`, `sim_context.ts`, `entity_roster.ts`).
@@ -171,7 +176,8 @@ regen for live players, the ghost-run arm for released spirits, timers + auras f
 players too, intentionally); the per-entity loop (mob update + auras, friendly-NPC aura
 cleanse, object respawn); the `engagedPids` combat-flag pass (reads pet AND mob state
 after both update: this STAYS in the coordinator, never moves into a slice); the
-end-of-tick system block in fixed order (duels through the delayed-event drain, then the
+end-of-tick system block in fixed order (duels, Card Duel pairing + AFK deadlines,
+arena, trades/ready-checks, ..., through the delayed-event drain, then the
 deeds evaluator `updateDeeds`: zero rng, after the drain so it sees same-tick results); grid
 re-bucketing LAST, then drain + return the `SimEvent[]`. The authoritative phase list is
 `tick()` itself: most phases carry a self-naming `lap?('...')` marker (a few adjacent

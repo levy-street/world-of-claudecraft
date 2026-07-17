@@ -366,6 +366,7 @@ export const zh_TW: EnTranslations = {
       "spinButton": "轉動",
       "tasks": "任務",
       "taskMultiplier": "{multiplier}倍倍率",
+      "oneVsOneExcluded": "1對1比賽不會獲得每日獎勵點數。",
       "pointsGained": "已獲得 {points} 每日獎勵點數。",
       "showChestButton": "顯示寶箱",
       "hideChestButton": "隱藏寶箱",
@@ -415,6 +416,18 @@ export const zh_TW: EnTranslations = {
       "armoryEyebrow": "第一賽季",
       "armoryTitle": "兵器庫",
       "armoryBody": "第一賽季兵器庫限定武器外觀。全帳號通用，純裝飾性，周圍所有玩家都能看到。",
+      "wallet": {
+        "title": "Solana 錢包",
+        "unlinked": "連接錢包應用程式，然後簽署一次，將其公開地址綁定到你的 WoC 帳號。我們絕不會取得你的復原短語或私鑰。",
+        "connectedUnlinked": "錢包應用程式已連接到此瀏覽器，但其公開地址尚未綁定到你的 WoC 帳號。",
+        "linkedDisconnected": "你的公開地址已綁定。需要使用 SOL 或 WOC 付款時，請重新連接該錢包應用程式。",
+        "linkedConnected": "已綁定的錢包應用程式已連接，可以使用 SOL 或 WOC 購買。",
+        "mismatched": "目前連接的是另一個錢包。驗證它即可取代已綁定的地址，或重新連接原先綁定的錢包。",
+        "connect": "連接錢包",
+        "verify": "驗證並綁定",
+        "reconnect": "重新連接錢包",
+        "manage": "管理錢包"
+      },
       "collectionLine": "{collection}系列",
       "collections": {
         "guildmark": "公會印記",
@@ -2202,9 +2215,10 @@ export const zh_TW: EnTranslations = {
       "charTitleNone": "未選擇頭銜",
       "charOpenBook": "功績之書",
       "lbTab": "名望",
-      "lbDeedsCol": "功績",
       "lbTitleCol": "頭銜",
-      "lbSelf": "你的排名：第 {rank} 名，位居前 {percent}%",
+      "lbScopeNote": "排行榜按帳號的累計名望排名。每個功績在一個帳號的所有角色中只計一次。",
+      "lbSelfAccount": "你的帳號：第 {rank} 名，位居前 {percent}%，名望 {renown}",
+      "lbSelfRank": "你的帳號：第 {rank} 名，位居前 {percent}%",
       "lbEmpty": "尚無上榜的編年史家。",
       "broadcastsLabel": "與公會和好友分享功績達成",
       "titledName": "{name}【{title}】"
@@ -2308,6 +2322,9 @@ export const zh_TW: EnTranslations = {
       "already_linked": "你的帳號已連結一個 Steam 帳號。",
       "account_taken": "該 Steam 帳號已連結到另一個帳號。",
       "upstream": "Steam 未回應。請稍後重試。"
+    },
+    "wallet": {
+      "handoff_invalid": "錢包授權已過期或無法驗證。請再試一次。"
     },
     "welcome": {
       "invalid_input": "輸入無效。"
@@ -2604,7 +2621,7 @@ export const zh_TW: EnTranslations = {
       "effectsTitle": "增益、減益與控場",
       "effectsBody": "許多技能會施加一個會持續存在的效果。有益的（增益）能提升你的屬性、為你護盾，或一點一滴地治療你；有害的（減益）則以持續傷害消耗你的生命，或使你衰弱。留意畫面頂端角落、小地圖旁的小圖示，便能看出你身上有哪些效果以及還會持續多久。",
       "ccBody": "控場是一種特殊的減益，會限制目標所能做的事：昏迷、定身與緩速、阻斷施法的沉默、繳械、恐懼，還有能讓敵人短暫變得無害的變形。對上其他玩家時，控制會隨著重複而磨損：同一類控場重複施加得太快便會減弱、繼而完全失效，而一記從潛行中開場的昏迷會與其後的昏迷分開計算，因此沒有人能被永無止盡地連鎖控制。這個世界的生物則沒有這種記性：控場對牠們永遠不會因重複而減弱，不過許多最強大的敵人，包括具名的菁英與其中最強的首領，則完全無法被控制。",
-      "metersBody": "想知道一場戰鬥打得如何？按下 Z 即可開啟隊伍統計面板，它會逐場戰鬥為你的隊伍統計傷害、治療與威脅值。",
+      "metersBody": "想知道一場戰鬥打得如何？按下 Shift+H 即可開啟隊伍統計面板，它會逐場戰鬥為你的隊伍統計傷害、治療與威脅值。",
       "queueTitle": "你的下一招早已上膛",
       "queueBody": "你不必把按鍵時機掐準到每一格。在當前技能仍在施放時按下你的下一個技能，它便會排入佇列，在施法完成的那一瞬間立刻發動，讓熟練的操作流暢無間。有些近戰打擊也以同樣的方式運作，隨著你的下一次武器揮擊一併出手。",
       "deathTitle": "當你倒下時",
@@ -2665,7 +2682,7 @@ export const zh_TW: EnTranslations = {
       "petBarTerm": "寵物指令列",
       "petBarDef": "獵人或術士寵物會增添的指令列：攻擊、停止、挑釁、防禦與主動，預設綁定為 Ctrl 加 1 到 5。",
       "metersTerm": "傷害統計面板",
-      "metersDef": "當前戰鬥的隊伍計分視窗：造成的傷害、完成的治療，以及誰握有最高威脅值，皆逐場戰鬥記錄。以其快捷鍵（預設為 Z）開啟。",
+      "metersDef": "當前戰鬥的隊伍計分視窗：造成的傷害、完成的治療，以及誰握有最高威脅值，皆逐場戰鬥記錄。以其快捷鍵（預設為 Shift+H）開啟。",
       "targetMarkerTerm": "目標標記",
       "targetMarkerDef": "任何隊伍或團隊成員都能標記在目標頭上的符號，讓所有人集火，或避開，同一個目標。共有八種符號，每種符號對應一個目標。",
       "loadoutTerm": "配置",
@@ -2994,6 +3011,8 @@ export const zh_TW: EnTranslations = {
       "heroicRewardsTitle": "英雄徽記與升級版戰利品",
       "heroicRewardsBody": "英雄首領掉落你所熟悉的戰利品，經過升級並在提示框上標註「英雄」，而每趟征程的最終首領還會追加別處找不到的史詩裝備。那最後一擊也會為每位參與者留下英雄徽記：一種在高望的軍需官維克斯處花用的貨幣，他存貨中的戒指與項鍊是全王國唯一的珠寶。",
       "heroicLockoutBody": "普通地城可以整天連刷。英雄難度則講求耐心：每座地城每天只獎勵一次英雄通關，團隊副本也為每種難度各保有一個每日鎖定。已通關的征程對它自己的隊伍永遠敞開，所以沒有人會被擋在自己掙得的戰利品之外。",
+      "resetTitle": "重置你的地城副本",
+      "resetBody": "在隊伍仍持有已認領副本時切換難度，舊的認領會保留一段時間後自行清除。隊長也可以立即放棄它們：在自己的頭像選單中選擇「重置所有地城副本」，或輸入 /dungeon reset。重置只有在難度確實更改之後才能進行，且副本內不能有任何人（無論生死）留守，兩次重置之間還隔著一段短暫的冷卻。帶著錯誤的難度來到門口，遊戲會在開打之前直接提醒你。團隊副本永遠不會以這種方式重置；它遵循自己的鎖定規則。",
       "templeLoreTitle": "溺亡神殿，再深入一些",
       "templeLoreBody": "這座神殿有著自己的傳說，比你在別處追查的邪教更為古老。在微光湖的岸邊（那是一座飲下月光、又交還溺亡者的山中湖泊），一名孤獨的看守者守著一道蒼白光芒之門。在水面之下，一道冰冷的石階向下通往那裡。沉沒在此的人並非死於意外：他們是蒼白唱詩班，在禮拜中沉入水底，自此再未停止吟唱。古老的守衛在被湖水吞沒之前，在岩石上刻下了唯一一句警語，一段向他們稱之為溺月之物獻上的禱詞，其下另有一隻更沉穩的手添上了兩個字：它只是沉睡。",
       "cryptLeadTitle": "一道亡者本應永遠緊閉的門",
@@ -3101,7 +3120,7 @@ export const zh_TW: EnTranslations = {
       "howHeading": "功績如何運作",
       "howBody": "功績以單一角色為單位逐一贏得並留存，因此你所扮演的每一位英雄都會各自累積自己的功績之書；只有王國的排行榜才會匯總你所扮演的所有角色的名望，且每個功績只計一次。每個功績都在遊戲內的功績之書中清楚寫明它的要求，讓你始終知道該追求什麼；你也可以追蹤心儀的功績，讓它們在遊玩時常在眼前。少數功績會保持隱密，只有在你贏得它們之後才會揭曉。功績之書也對自己誠實：凡是你過往的記錄能夠證明的，它都會當場記上功勞，因此老練的玩家絕不會翻開一頁空白；只有計數類的功績才會從零開始累計。",
       "renownHeading": "名望",
-      "renownBody": "名望是功績之書背後的分數。你贏得的每個功績都價值固定的點數，而你的總分只增不減，因此清閒的一週絕不會讓你失去已有的成績。少數功績取決於運氣而非技巧，而壯舉則自成一份榮譽，因此這兩者都不提供任何名望。",
+      "renownBody": "名望是功績之書背後的分數。你贏得的每個功績都價值固定的點數，而你的總分只增不減，因此清閒的一週絕不會讓你失去已有的成績。少數功績取決於運氣而非技巧，而壯舉則自成一份榮譽，因此這兩者都不提供任何名望。不帶名望的功績仍會計入功績之書的完成度，只是從不計分。",
       "rewardsHeading": "頭銜與邊框",
       "rewardsBody": "這些獎勵純粹是為了炫耀，而這正是它們的意義所在。有些功績會授予你可佩戴的頭銜，或是為你的名字增添裝飾的邊框，絕不會給出任何讓你的英雄變強的東西。在功績之書中選擇你想要的頭銜，它便會隨你出現在銘牌上、聊天中與排行榜上，供所有人觀看。",
       "chroniclesHeading": "編年史",
@@ -3110,7 +3129,7 @@ export const zh_TW: EnTranslations = {
       "featsBody": "壯舉自成一類：它們是傳承與世界首創的記錄，是那些與逝去紀元相關、或只會發生一次的功績。它們不帶來任何名望，也不計入完成度，將作為對往昔功業的紀念被永久保存。",
       "catalogHeading": "功績全錄",
       "catalogBody": "這裡列出了功績之書所能容納的每一個功績，按類別整理。隱密的功績被特意略去，等待你自己去發現。在遊戲內打開功績之書，即可查看每個功績的具體要求。",
-      "standingsNote": "各王國會持續統計所有帳號累積的名望。想知道誰位居何處，請在遊戲內打開排行榜並轉到其名望分頁；排名在那裡，而不在維基上。",
+      "standingsNote": "各王國會持續統計所有帳號累積的名望：排行榜按帳號的累計名望排名，每個功績在你所有角色中只計一次，且榜上只顯示名望，因此不帶名望的功績即使計入你的功績之書，也絕不會影響排名。想知道誰位居何處，請在遊戲內打開排行榜並轉到其名望分頁；排名在那裡，而不在維基上。",
       "catHeading": "{label}（{count}）",
       "colName": "功績",
       "colRenown": "名望",
@@ -3201,7 +3220,7 @@ export const zh_TW: EnTranslations = {
       "qualityNote": "品質愈高通常代表屬性愈好，但品質只是一種提示，並非定則。一件與你職業和等級相配的裝備，可能勝過一件更花俏的。",
       "upgradeTitle": "保持裝備更新",
       "upgradeBody": "用一件全新的升級品換下舊裝備，對你的助益遠勝於穿著早已過時的裝備打得再完美。當有更好的東西掉落，或任務提供升級時，就收下吧。別把你的好物品留到以後。",
-      "itemLevelBody": "若你想快速比較兩件裝備，可在選項中開啟「顯示物品等級」。在世界中贏得的裝備，來自敵人與任務者，便會顯示一個物品等級，這是依其來源粗略衡量其強度的單一數值，讓你一眼就能看出哪件升級更有分量，即使是不同部位之間也行。沒有這類來源的物品，例如普通的商人基礎貨品與新手裝備，則不會顯示物品等級，因此缺少數值是正常現象，而非瑕疵。",
+      "itemLevelBody": "若你想快速比較兩件裝備，可在選項中開啟「顯示物品等級」。有明確來源的裝備，無論來自敵人、任務還是製作專業，便會顯示一個物品等級，這是依其來源粗略衡量其強度的單一數值，讓你一眼就能看出哪件升級更有分量，即使是不同部位之間也行。沒有這類來源的物品，例如普通的商人基礎貨品與新手裝備，則不會顯示物品等級，因此缺少數值是正常現象，而非瑕疵。",
       "sourcesTitle": "裝備從何而來",
       "sourcesBody": "你早期的升級大多來自任務獎勵，因此完成任務比刷怪更划算。敵人被你擊敗時會掉落裝備，城鎮裡的商人販售扎實的基本款，工匠會把採集來的材料製成可穿戴的裝備，玩家市場則讓你能向其他冒險者購買。而在攀上頂峰之後，兩種印記貨幣能買到別處找不到的裝備：秘探印記在秘探看守人處花用，英雄徽記則在英雄軍需官處花用。",
       "soulboundTitle": "靈魂綁定：屬於你，也僅屬於你",
@@ -3245,7 +3264,7 @@ export const zh_TW: EnTranslations = {
       "craftRecipesTitle": "配方與材料",
       "craftRecipesBody": "每個配方都需要你採集或購買的特定材料。最簡單的配方只需要普通材料，從一開始就能製作，因此你一拿起一門行業就能立刻上手。配方清單仍在持續補齊：少數行業還在等待它們的第一批配方，而隨著這些行業成長，會有更多配方登場。",
       "craftHowTitle": "製作視窗",
-      "craftHowBody": "開啟製作視窗（預設按鍵 T），即可看到你已學會的每一個配方、各自所需的材料，以及你手邊現有的材料；材料齊備時，一鍵即可完成製作。常見的配方可以在世界任何地方製作。少數進階的工具配方則要求你站在高守哨站的製作站前。",
+      "craftHowBody": "開啟製作視窗（預設按鍵 T），即可看到你已學會的每一個配方、各自所需的材料，以及你手邊現有的材料；材料齊備時，一鍵即可完成製作。常見的配方可以在世界任何地方製作。少數進階配方，包括高階工具與稀有的施法者護甲，則要求你站在高守哨站的製作站前。",
       "craftMasteryTitle": "技能與精通",
       "craftMasteryBody": "成功製作會提升你在該行業的技能，而技能從不會把行業的配方鎖起來：只要你會某個配方並持有其材料，就能嘗試製作。技能為你換來的其實是品質，熟練的手藝能做出更精良的作品。唯一的例外是組合配方，它們要求你先在兩門相關行業中都證明過自己，才會開放。",
       "craftComboTitle": "組合配方",
@@ -4026,6 +4045,9 @@ export const zh_TW: EnTranslations = {
     "balancePreviewTitle": "已連線錢包的 $WOC 餘額預覽",
     "balancePreviewAria": "已連線錢包餘額預覽：{balance}。綁定錢包即可驗證持有者標識。",
     "balanceAmount": "{amount} $WOC",
+    "bagConnect": "綁定錢包",
+    "bagLink": "驗證錢包",
+    "bagReconnect": "重新連接錢包",
     "connected": "已連線：{address}",
     "connectedWithBalance": "已連線：{balance} - {address}",
     "connectedLinked": "已驗證：{address}",
@@ -4040,12 +4062,37 @@ export const zh_TW: EnTranslations = {
     "helpLinkedDisconnected": "持有者特權已啟用。需要簽名或花費時請連接應用程式。",
     "helpLinkedDisconnectedWithBalance": "持有者特權已啟用。需要簽名或花費時請連接應用程式。",
     "extensionHelp": "若要在此處看到錢包，請保持 Solflare Wallet 等瀏覽器錢包擴充功能處於啟用狀態。",
+    "mobileAppHelp": "選擇 Phantom 或 Solflare。錢包應用程式會要求核准。請保持遊戲開啟，完成後返回遊戲。",
+    "standaloneAppHelp": "主畫面應用程式目前尚不支援連接錢包。若要使用 Phantom 或 Solflare，請在 Safari 或 Chrome 中開啟 World of ClaudeCraft。",
+    "openAppTitle": "在 {wallet} 中繼續",
+    "openAppHelp": "開啟 {wallet} 檢視此請求。錢包應用程式啟用時，請保持此遊戲分頁開啟。",
+    "openAppButton": "開啟 {wallet}",
+    "manualReturnBrowserHelp": "核准後請返回此遊戲分頁。如果 iOS 開啟了其他瀏覽器，請將其關閉並手動返回原本的瀏覽器。",
+    "manualReturnStandaloneHelp": "核准後請從主畫面返回 World of ClaudeCraft。如果 iOS 開啟了瀏覽器，請將其關閉並重新開啟主畫面 App。",
+    "preparingAppButton": "正在準備 {wallet}...",
+    "walletAppUnavailable": "無法準備 {wallet}。請關閉此視窗並重試。",
     "flowConnect": "選擇一個錢包。驗證會自動繼續。",
     "flowSign": "在錢包應用程式中簽署驗證訊息。無需交易或 SOL。",
     "flowVerify": "正在驗證錢包所有權...",
     "linkFailed": "錢包驗證失敗。",
     "verifyFailed": "錢包驗證失敗。",
     "unlinkFailed": "無法解除錢包綁定。",
+    "browser": {
+      "eyebrow": "桌面錢包授權",
+      "title": "連接 Solana 錢包",
+      "linkBody": "在此瀏覽器中選擇錢包擴充功能。簽署驗證訊息後返回桌面應用程式。",
+      "paymentBody": "選擇已連結至帳號的錢包，並在此瀏覽器中核准交易。",
+      "extensionHelp": "找不到相容的錢包擴充功能。請安裝或解鎖 Phantom、Solflare 或其他 Solana 瀏覽器錢包，然後再試一次。",
+      "safety": "World of ClaudeCraft 絕不會要求復原短語或私鑰。",
+      "continueWith": "使用 {wallet} 繼續",
+      "reviewTitle": "在錢包中檢視",
+      "reviewBody": "按照 {wallet} 的提示操作。請保持此瀏覽器頁面開啟。",
+      "completeTitle": "錢包授權完成",
+      "completeBody": "現在可以返回 World of ClaudeCraft 桌面應用程式。",
+      "returnButton": "返回桌面應用程式",
+      "failed": "錢包授權失敗或已過期。請返回桌面應用程式並再試一次。",
+      "retry": "再試一次"
+    },
     "holder": "$WOC 持有者",
     "holderTierTitle": "{tier} $WOC 持有者",
     "holderTiers": {
@@ -4366,6 +4413,24 @@ export const zh_TW: EnTranslations = {
   "heroicShop": {
     "balance": "英雄徽記: {count}",
     "buyAria": "用{marks}枚英雄徽記購買{item}"
+  },
+  "cardDuel": {
+    "title": "紙牌對決",
+    "close": "關閉",
+    "join": "加入隊列",
+    "joinAria": "加入紙牌對決隊列",
+    "leave": "離開隊列",
+    "leaveAria": "離開紙牌對決隊列",
+    "forfeit": "認輸",
+    "forfeitAria": "認輸退出紙牌對決",
+    "queued": "正在等待對手……",
+    "unavailable": "紙牌對決需要另一名玩家在線。",
+    "vsOpponent": "對戰 {name}",
+    "round": "局分：{mine} - {theirs}",
+    "counts": "牌堆：{deck} · 棄牌堆：{discard}",
+    "playCardAria": "打出 {value} 號牌",
+    "waitingOnOpponent": "正在等待對手出牌……",
+    "yourTurn": "出一張牌"
   },
   "delveUi": {
     "board": {
@@ -4865,6 +4930,11 @@ export const zh_TW: EnTranslations = {
       "quit": "離開",
       "fatalBody": "World of ClaudeCraft 發生未預期的錯誤，必須關閉。"
     }
+  },
+  "gpuNotice": {
+    "bodyDesktop": "遊戲目前在沒有 GPU 加速的情況下執行，會非常緩慢。請更新顯示卡驅動程式後重新啟動遊戲。在 Windows 上，還請在 設定 > 系統 > 顯示器 > 顯示卡 中將本遊戲設為「高效能」。",
+    "bodyWeb": "遊戲目前在沒有 GPU 加速的情況下執行，會非常緩慢。請在瀏覽器設定中啟用硬體加速，更新顯示卡驅動程式，然後重新啟動瀏覽器。",
+    "dismiss": "關閉"
   },
   "realm": {
     "noRealms": "沒有可用的世界。",
@@ -6560,7 +6630,7 @@ export const zh_TW: EnTranslations = {
       },
       "tigers_fury": {
         "name": "狼血之力",
-        "description": "使攻擊強度提高 40，持續 6 秒。僅限狼形態。"
+        "description": "使攻擊強度提高 {buff}，持續 {duration} 秒。僅限狼形態。"
       },
       "rip": {
         "name": "割裂",
@@ -8684,6 +8754,11 @@ export const zh_TW: EnTranslations = {
         "title": "鍍金保險箱",
         "greeting": "歡迎來到鍍金保險箱。你的財物在我們的鎖後安然無恙。"
       },
+      "card_master": {
+        "name": "牌局大師",
+        "title": "運氣經銷人",
+        "greeting": "來一局紙牌對決？三局兩勝，贏家贏得吹噓的資本。"
+      },
       "bursar_petra_vell": {
         "name": "司庫佩特拉·維爾",
         "title": "鍍金保險箱",
@@ -9788,6 +9863,11 @@ export const zh_TW: EnTranslations = {
         "sender": "奧德里克修士",
         "subject": "你在黑暗中所做的一切",
         "body": "很少有人會知道那處窪地裡埋葬著什麼，願意相信的人更少。但我知道，而且我不會忘記。\n\n願你的道路常明。\n- 奧德里克修士"
+      },
+      "heroic_marks_reward": {
+        "sender": "英勇軍需官",
+        "subject": "你的英勇印記",
+        "body": "你的部隊清剿了英勇試煉，而你在後排作戰，或已倒在塵土之中。你的鎖定同樣已經生效，因此你那一份英勇印記飛到了這裡，而非就此遺失。好好使用它們。\n\n- 英勇軍需官"
       }
     },
     "itemSets": {
@@ -9813,7 +9893,7 @@ export const zh_TW: EnTranslations = {
       },
       "necromancers": {
         "name": "哀織法衣",
-        "bonus2": "你不會被擊退（擊退抗性 100%）。",
+        "bonus2": "法術強度提高 20 點。受到傷害不再延遲你的施法（施法延遲抗性 100%）。",
         "bonus3": "智力提高 10 點，耐力提高 10 點。",
         "bonus4": "你的法術有 10% 的機率觸發「清晰施法」，使你的下一個法術免費施放。"
       },
@@ -9825,13 +9905,13 @@ export const zh_TW: EnTranslations = {
       },
       "soulflame": {
         "name": "怨焰法衣",
-        "bonus2": "你不會被擊退（擊退抗性 100%）。",
+        "bonus2": "法術強度提高 20 點。受到傷害不再延遲你的施法（施法延遲抗性 100%）。",
         "bonus3": "智力提高 15 點，精神提高 15 點，攻擊速度和施法速度提高 15%。",
         "bonus4": "你的法術有 10% 的機率觸發「灼魂之焰」，使法術強度提高 40 點，持續 10 秒。"
       },
       "stormcallers": {
         "name": "喚風法衣",
-        "bonus2": "你不會被擊退（擊退抗性 100%）。",
+        "bonus2": "法術強度提高 20 點。受到傷害不再延遲你的施法（施法延遲抗性 100%）。",
         "bonus3": "智力提高 15 點，精神提高 15 點，攻擊速度和施法速度提高 15%。",
         "bonus4": "你的法術有 10% 的機率觸發「灼魂之焰」，使法術強度提高 40 點，持續 10 秒。"
       },

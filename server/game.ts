@@ -300,6 +300,7 @@ export const SIM_LAP_PHASES = [
   'ent.misc',
   'engaged',
   'duels',
+  'cardDuel',
   'arena',
   'trades',
   'lootRolls',
@@ -406,6 +407,7 @@ type ClientMessage = Record<string, unknown> & {
   q?: string;
   quest?: string;
   r?: string;
+  rid?: number;
   role?: string;
   roles?: unknown;
   rollId?: number;
@@ -505,6 +507,7 @@ const JAILED_BLOCKED_COMMANDS = new Set<string>([
   'enter_delve',
   'duel_req',
   'duel_accept',
+  'card_queue_join',
 ]);
 const HEAVY_SELF_CMDS = new Set<string>([
   'equip',
@@ -1468,6 +1471,7 @@ export class GameServer {
     this.sim.arenaQueueLeave(target.pid);
     this.sim.vcupQueueLeave(target.pid);
     this.sim.vcupResolveDesertion(target.pid);
+    this.sim.leaveCardMinigameEntirely(target.pid);
     this.teleportJailedSession(target);
     // System notice (chat log), not the fading error toast: the prisoner must be
     // able to read the sentence after alt-tabbing back, like other moderation
@@ -2863,6 +2867,9 @@ export class GameServer {
     // remaining player's win/honor durable if both combatants disconnect close
     // together; removePlayer repeats the idempotent cleanup after the save.
     this.sim.arenaResolveDesertion(session.pid);
+    // Card Duel: drop the queue slot and forfeit any live match on disconnect,
+    // same idempotent-before-persistence shape as the two lines above.
+    this.sim.leaveCardMinigameEntirely(session.pid);
     // Freeze reward eligibility and reconcile pending loot before the leave
     // snapshot. saveCharacterOnLeave awaits the database; without this
     // synchronous prefix, a roll or boss death can mutate the character after
@@ -3750,6 +3757,7 @@ export class GameServer {
     // straight back, ruining the match for everyone else in it.
     if (session.jailed && typeof msg.cmd === 'string' && JAILED_BLOCKED_COMMANDS.has(msg.cmd)) {
       this.sendChatNotice(session, 'You cannot do that while jailed.');
+      this.sendCommandOutcome(session, msg, false);
       return;
     }
     // A command that can change a heavy self field forces the next snapshot to
@@ -3804,7 +3812,11 @@ export class GameServer {
         sim.interact(pid);
         break;
       case 'loot':
-        if (typeof msg.id === 'number') sim.lootCorpse(msg.id, pid);
+        this.sendCommandOutcome(
+          session,
+          msg,
+          typeof msg.id === 'number' && sim.lootCorpse(msg.id, pid),
+        );
         break;
       case 'autoloot':
         if (typeof msg.id === 'number') sim.autoLoot(msg.id, pid);
@@ -3835,7 +3847,11 @@ export class GameServer {
         }
         break;
       case 'pickup':
-        if (typeof msg.id === 'number') sim.pickUpObject(msg.id, pid);
+        this.sendCommandOutcome(
+          session,
+          msg,
+          typeof msg.id === 'number' && sim.pickUpObject(msg.id, pid),
+        );
         break;
       case 'accept':
         if (typeof msg.quest === 'string') {
@@ -3924,7 +3940,11 @@ export class GameServer {
         if (typeof msg.item === 'string') sim.buyBackItem(msg.item, pid);
         break;
       case 'harvest_node':
-        if (typeof msg.node === 'string') sim.harvestNode(msg.node, pid);
+        this.sendCommandOutcome(
+          session,
+          msg,
+          typeof msg.node === 'string' && sim.harvestNode(msg.node, pid),
+        );
         break;
       case 'craft_item':
         if (typeof msg.recipe === 'string') sim.craftItem(msg.recipe, pid);
@@ -3991,7 +4011,7 @@ export class GameServer {
         sim.resurrectAtCorpse(pid);
         break;
       case 'resurrect_healer':
-        sim.resurrectAtSpiritHealer(pid);
+        this.sendCommandOutcome(session, msg, sim.resurrectAtSpiritHealer(pid));
         break;
       case 'challengeResponse':
         if (typeof msg.n === 'string' && typeof msg.r === 'string' && typeof msg.sig === 'string') {
@@ -4326,6 +4346,21 @@ export class GameServer {
           sim.arenaAugmentPick(msg.augment, pid);
         break;
       }
+
+      // Card Duel minigame (the Card Master NPC, docs: src/sim/social/card_duel.ts).
+      case 'card_queue_join':
+        sim.joinCardDuelQueue(pid);
+        break;
+      case 'card_queue_leave':
+        sim.leaveCardDuelQueue(pid);
+        break;
+      case 'play_card':
+        if (typeof msg.value === 'number' && Number.isInteger(msg.value))
+          sim.playCardInDuel(msg.value, pid);
+        break;
+      case 'card_forfeit':
+        sim.forfeitCardDuel(pid);
+        break;
 
       // The Vale Cup (boarball queue at the Sowfield, docs/prd/vale-cup.md).
       // Deliberately NOT in HEAVY_SELF_CMDS: queueing mutates no heavy self
@@ -4685,13 +4720,20 @@ export class GameServer {
       case 'enter_dungeon': {
         // must actually be near that dungeon's door
         const dungeonId = msg.cmd === 'enter_crypt' ? 'hollow_crypt' : msg.dungeon;
-        if (typeof dungeonId !== 'string') break;
+        if (typeof dungeonId !== 'string') {
+          this.sendCommandOutcome(session, msg, false);
+          break;
+        }
         const e = sim.entities.get(pid);
         const door = [...sim.entities.values()].find(
           (x) => x.templateId === 'dungeon_door' && x.dungeonId === dungeonId,
         );
-        if (e && door && Math.hypot(e.pos.x - door.pos.x, e.pos.z - door.pos.z) < 8)
+        const succeeded =
+          !!e &&
+          !!door &&
+          Math.hypot(e.pos.x - door.pos.x, e.pos.z - door.pos.z) < 8 &&
           sim.enterDungeon(dungeonId, pid);
+        this.sendCommandOutcome(session, msg, succeeded);
         break;
       }
       case 'leave_crypt':
@@ -4704,7 +4746,7 @@ export class GameServer {
                 Math.hypot(e.pos.x - x.pos.x, e.pos.z - x.pos.z) < 8,
             )
           : null;
-        if (exit) sim.leaveDungeon(pid);
+        this.sendCommandOutcome(session, msg, !!exit && sim.leaveDungeon(pid));
         break;
       }
       case 'set_dungeon_difficulty': {
@@ -4735,8 +4777,11 @@ export class GameServer {
         break;
       }
       case 'delve_interact': {
-        if (typeof msg.objectId !== 'number') break;
-        sim.delveInteract(msg.objectId, pid);
+        this.sendCommandOutcome(
+          session,
+          msg,
+          typeof msg.objectId === 'number' && sim.delveInteract(msg.objectId, pid),
+        );
         break;
       }
       case 'companion_upgrade': {
@@ -5092,6 +5137,7 @@ export class GameServer {
     maybe('marks', this.markersWire(anchorSession.pid));
     maybe('trade', this.tradeWire(anchorSession.pid));
     maybe('duel', this.duelWire(anchorSession.pid));
+    maybe('cardDuel', this.sim.cardMinigameInfoFor(anchorSession.pid));
     // Small PvP-ledger scalars. Delta-guarded like delve marks: a fresh
     // session receives both, then they ride only on earn/spend changes.
     maybe('honor', meta.honor);
@@ -5607,7 +5653,7 @@ export class GameServer {
         }
         const mine: SimEvent[] = [];
         for (const ev of events) {
-          if (suppressedInvites !== null && suppressedInvites.has(ev)) continue;
+          if (suppressedInvites?.has(ev)) continue;
           // ignore list: drop chat originating from a character this player has
           // blocked, before it ever reaches their client
           if (
@@ -6168,6 +6214,11 @@ export class GameServer {
 
   private send(session: ClientSession, obj: unknown): void {
     this.sendRaw(session, JSON.stringify(obj));
+  }
+
+  private sendCommandOutcome(session: ClientSession, msg: ClientMessage, succeeded: boolean): void {
+    if (!Number.isSafeInteger(msg.rid) || (msg.rid ?? 0) <= 0) return;
+    this.send(session, { t: 'commandOutcome', rid: msg.rid, ok: succeeded });
   }
 
   private sendRaw(session: ClientSession, payload: string): void {
