@@ -345,14 +345,17 @@ describe('Spiritbinder Regalia (t1 mail caster set for paladin/shaman)', () => {
     }
   });
 
-  it('shares the Mournweave caster bonus profile: knockback resist at 2pc, int/sta at 3pc', () => {
+  it('shares the Mournweave caster bonus profile: cast-pushback immunity at 2pc, int/sta at 3pc', () => {
     const shamanBase = statsFor('shaman', 20, {});
     const three = statsFor('shaman', 20, {
       chest: PIECES.chest,
       shoulder: PIECES.shoulder,
       legs: PIECES.legs,
     });
-    expect(three.knockbackResistance).toBe(1);
+    // The caster 2-piece is spell-pushback immunity since the tier-set fix
+    // (never physical knockback); Spiritbinder inherits CASTER_T1_BONUSES.
+    expect(three.castPushbackReduction).toBe(1);
+    expect(three.knockbackResistance).toBe(0);
     const pieceInt = [PIECES.chest, PIECES.shoulder, PIECES.legs].reduce(
       (s, id) => s + (ITEMS[id].stats?.int ?? 0),
       0,

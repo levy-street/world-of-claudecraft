@@ -5591,7 +5591,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.greyjaw_stalker.name': '灰顎追獵者裝備',
   'entities.itemSets.greyjaw_stalker.bonus3': '攻擊速度和施法速度提高 15%。',
   'entities.itemSets.necromancers.name': '哀織法衣',
-<<<<<<< HEAD
   'entities.itemSets.spiritbinder.name': '縛靈法衣',
   'entities.itemSets.spiritbinder.bonus2': '法術強度提高 20 點。你不會被擊退（擊退抗性 100%）。',
   'entities.itemSets.spiritbinder.bonus3': '智力提高 10 點，耐力提高 10 點。',
@@ -5602,10 +5601,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.spiritbinder_pauldrons.name': '縛靈護肩',
   'entities.items.spiritbinder_treads.name': '縛靈戰靴',
   'entities.itemSets.necromancers.bonus2': '你不會被擊退（擊退抗性 100%）。',
-=======
   'entities.itemSets.necromancers.bonus2':
     '法術強度提高 20 點。受到傷害不再延遲你的施法（施法延遲抗性 100%）。',
->>>>>>> origin/release/v0.27.0
   'entities.itemSets.necromancers.bonus3': '智力提高 10 點，耐力提高 10 點。',
   'entities.itemSets.necromancers.bonus4':
     '你的法術有 10% 的機率觸發「清晰施法」，使你的下一個法術免費施放。',
