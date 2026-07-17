@@ -96,6 +96,18 @@ describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
     }
   });
 
+  it('keeps authored riders visible when a grant row has an additional effect', () => {
+    const ruinbolt = ROW_TREES.warlock
+      .flatMap((row) => row.options)
+      .find((option) => option.id === 'wlk_r20_chaos_bolt');
+    if (!ruinbolt) throw new Error('missing Ruinbolt talent');
+
+    const rendered = tTalent({ kind: 'talentChoice', choice: ruinbolt, field: 'description' });
+
+    expect(rendered).toContain('Hurls a bolt of chaotic fire');
+    expect(rendered).toContain("Landing Ruinbolt resets Duskfire's cooldown.");
+  });
+
   it('ships no unresolved ability placeholders in canonical source prose', () => {
     const unresolved = entries.filter((entry) =>
       /\$[A-Za-z0-9_]+|\{[A-Za-z0-9_]+\}/.test(entry.source),

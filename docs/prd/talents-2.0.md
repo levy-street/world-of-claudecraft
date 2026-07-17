@@ -1018,3 +1018,6 @@ npm run build on PR4/PR5.
   Fire critical strike opens an 8 sec instant, full-mana Gloom Bolt to continue the
   relay while moving. The warlock reapplies Burning Pact, spends through the burst,
   and uses Hard Bargain to fund the next setup without adding a new resource bar.
+  Ruinbolt replaces its isolated ability-grant filler with a landed-hit Duskfire reset,
+  retaining the grant and both sibling capstones while enabling a deliberate Duskfire,
+  Ruinbolt, Duskfire burst sequence for every Warlock spec that selects it.

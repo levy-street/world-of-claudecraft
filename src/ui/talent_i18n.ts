@@ -2999,6 +2999,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Refuge: '庇护所',
     Requital: '惩戒',
     'Rolling Flame': '冲击波',
+    Ruinbolt: '毁灭箭',
     Ruination: '毁灭',
     'Rushing Waters': '自然迅捷',
     'Sablewind Focus': '灵风专注',
@@ -3349,6 +3350,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Refuge: '庇護所',
     Requital: '懲戒',
     'Rolling Flame': '衝擊波',
+    Ruinbolt: '毀滅箭',
     Ruination: '毀滅',
     'Rushing Waters': '自然迅捷',
     'Sablewind Focus': '曳影專注',
@@ -3699,6 +3701,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Refuge: '성역',
     Requital: '징벌',
     'Rolling Flame': '폭발의 파동',
+    Ruinbolt: '파멸 화살',
     Ruination: '파괴',
     'Rushing Waters': '자연의 신속함',
     'Sablewind Focus': '황천바람 집중',
@@ -4049,6 +4052,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Refuge: '聖域',
     Requital: '報復',
     'Rolling Flame': 'ブラスト・ウェーブ',
+    Ruinbolt: '破滅の矢',
     Ruination: '破壊',
     'Rushing Waters': '自然の素早さ',
     'Sablewind Focus': 'ネザーウィンド集中',
@@ -4748,6 +4752,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Refuge: 'Убежище',
     Requital: 'Воздаяние',
     'Rolling Flame': 'Взрывная волна',
+    Ruinbolt: 'Стрела погибели',
     Ruination: 'Разрушение',
     'Rushing Waters': 'Природная скорость',
     'Sablewind Focus': 'Сосредоточение Ветра Пустоты',
@@ -7832,7 +7837,19 @@ function abilityDescription(id: string): string {
 function authoredChoiceDescription(choice: TalentRowOption): string {
   const grantId = choice.effect.grant?.ability;
   if (!grantId) return choice.description;
-  return [abilityDescription(grantId), grantAbilityMetadata(grantId)].filter(Boolean).join(' ');
+  const grantedAbility = [abilityDescription(grantId), grantAbilityMetadata(grantId)]
+    .filter(Boolean)
+    .join(' ');
+  const hasAdditionalEffect =
+    choice.effect.stats !== undefined ||
+    choice.effect.proc !== undefined ||
+    (choice.effect.procs?.length ?? 0) > 0 ||
+    (choice.effect.ability?.length ?? 0) > 0 ||
+    choice.effect.global !== undefined;
+  if (!hasAdditionalEffect) return grantedAbility;
+
+  const rider = /^Grants [^.]+\.\s*(.+)$/.exec(choice.description)?.[1] ?? choice.description;
+  return [grantedAbility, rider].filter(Boolean).join(' ');
 }
 
 function seconds(value: number, lang: SupportedLanguage): string {

@@ -2226,9 +2226,19 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'wlk_r20_chaos_bolt',
           name: 'Ruinbolt',
-          description: 'Grants Ruinbolt.',
+          description: "Grants Ruinbolt. Landing Ruinbolt resets Duskfire's cooldown.",
           icon: 'chaos_bolt',
-          effect: { grant: { ability: 'chaos_bolt' } },
+          effect: {
+            grant: { ability: 'chaos_bolt' },
+            proc: {
+              id: 'wlk_ruinbolt_relay',
+              name: 'Ruinbolt',
+              requiresKnownAbility: 'chaos_bolt',
+              school: 'fire',
+              trigger: { on: 'spellHit', abilities: ['chaos_bolt'] },
+              responses: [{ kind: 'cooldownRefund', ability: 'shadowburn', seconds: 'reset' }],
+            },
+          },
         },
         {
           id: 'wlk_r20_grimoire_of_haste',
