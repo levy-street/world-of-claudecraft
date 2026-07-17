@@ -422,6 +422,11 @@ export function recalcPlayerStats(
   // Moonkin Form: a hardy caster form that adds 50% armor (its +20% spell damage rides a
   // separate buff_spelldmg aura the form applies).
   if (moonkinForm) s.armor = Math.round(s.armor * 1.5);
+  // Ironguard's Vanguard converts fully-summed Strength into armor before the
+  // percentage armor modifier amplifies the result.
+  if (mods?.stats.armorFromStrPct) {
+    s.armor += Math.round(s.str * mods.stats.armorFromStrPct);
+  }
   if (mods?.stats.armorPct) s.armor = Math.round(s.armor * (1 + mods.stats.armorPct));
   if (buffArmorPct) s.armor = Math.round(s.armor * (1 + buffArmorPct)); // Devotion Aura
   // Floor Spirit at 0 so a Spirit-siphoning debuff (negative buff_spi) can never

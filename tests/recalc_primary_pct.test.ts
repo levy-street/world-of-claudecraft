@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { emptyModifiers, type TalentModifiers } from '../src/sim/content/talents';
+import {
+  computeTalentModifiers,
+  emptyModifiers,
+  type TalentModifiers,
+} from '../src/sim/content/talents';
 import { createPlayer, recalcPlayerStats } from '../src/sim/entity';
 import { type PlayerClass, SPELL_POWER_PER_INT } from '../src/sim/types';
 
@@ -87,5 +91,19 @@ describe('recalcPlayerStats primary-attribute multipliers', () => {
     });
     expect(buffed.spi).toBe(Math.round(base.spi * 1.15));
     expect(buffed.spi).toBeGreaterThan(base.spi);
+  });
+
+  it("applies Ironguard's Recompense armor from Strength before its armor multiplier", () => {
+    const base = derive('warrior', 20);
+    const player = createPlayer(0, 'warrior', { x: 0, y: 0, z: 0 }, 'Ironguard');
+    player.level = 20;
+    const recompense = computeTalentModifiers('warrior', { spec: 'prot', rows: {} }, 20);
+
+    recalcPlayerStats(player, 'warrior', {}, recompense, {});
+
+    const strengthArmor = Math.round(player.stats.str * recompense.stats.armorFromStrPct);
+    expect(player.stats.armor).toBe(
+      Math.round((base.armor + strengthArmor) * (1 + recompense.stats.armorPct)),
+    );
   });
 });
