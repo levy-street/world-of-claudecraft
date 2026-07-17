@@ -1164,6 +1164,72 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: null,
     requireOwnedExpected: null,
   },
+  // Merch store (Printful dropship) proxy family (server/merch.ts), the claudium
+  // twin: served by BOTH the migrated RouteDefs and a legacy handleApi prefix arm
+  // (startsWith('/api/merch') -> handleMerchApi), with unauthenticated exact-match
+  // arms in main.ts for the two webhook relays and the public catalog probe. The
+  // exact-path arms live in server/merch.ts, a LEGACY_SOURCE_URL the completeness
+  // scan reads. All static paths (no :param in the family).
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/merch/stripe/webhook',
+    handler: 'handleMerchStripeWebhook',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.public,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/merch/printful/webhook',
+    handler: 'handleMerchPrintfulWebhook',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.public,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'GET',
+    path: '/api/merch/products',
+    handler: 'handleMerchProducts',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.public,
+    limiter: 'merchProductsRateLimited',
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/merch/checkout',
+    handler: 'handleMerchApi arm: /api/merch/checkout',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.full,
+    limiter: 'merchMutationRateLimited',
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/merch/checkout/native/confirm',
+    handler: 'handleMerchApi arm: /api/merch/checkout/native/confirm',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.full,
+    limiter: 'merchMutationRateLimited',
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'GET',
+    path: '/api/merch/orders',
+    handler: 'handleMerchApi arm: /api/merch/orders',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.full,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
   {
     dispatcher: DISPATCH.mainApi,
     method: 'POST',

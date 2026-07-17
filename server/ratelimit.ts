@@ -679,6 +679,88 @@ export function resetClaudiumMutationRateLimits(): void {
   claudiumPreAuthIpAttempts.clear();
 }
 
+// Merch writes mirror the Claudium monetary pattern: every accepted checkout can
+// create a provider-side payment object (a Stripe PaymentIntent or a Solana
+// quote), and every native confirm holds an upstream call with a 60s allowance
+// (NATIVE_CONFIRM_TIMEOUT_MS in merch_proxy.ts). Same two-tier shape: a pre-auth
+// IP bucket stops invalid-token floods before a DB lookup, the post-auth fused
+// IP-and-account bucket caps authenticated abuse. Checkout stays as strict as
+// claudium purchase; confirm is roomier because the client retries pending chain
+// settlement.
+export const MERCH_CHECKOUT_MAX_PER_MINUTE = 10;
+export const MERCH_CONFIRM_MAX_PER_MINUTE = 60;
+// The public catalog probe fires on homepage load AND on every store-page
+// re-render (each cart interaction refreshes stock), so one active shopper
+// legitimately makes dozens per minute; behind it the merch_proxy TTL memo caps
+// upstream reads at 2/min regardless. 60/min (1/s sustained) leaves an active
+// shopper headroom (NAT'd households share an IP) while still stopping a flood.
+export const MERCH_PRODUCTS_MAX_PER_MINUTE = 60;
+
+export type MerchMutationAction = 'checkout' | 'confirm';
+
+const merchMutationIpAttempts = new Map<string, number[]>();
+const merchMutationAccountAttempts = new Map<string, number[]>();
+const merchPreAuthIpAttempts = new Map<string, number[]>();
+const merchProductsIpAttempts = new Map<string, number[]>();
+
+/** Per-IP throttle for the public merch catalog probe (no auth to key on). */
+export function merchProductsRateLimited(req: http.IncomingMessage): RateLimitOutcome {
+  return recordSlidingWindowAttempt(
+    merchProductsIpAttempts,
+    requestIp(req),
+    MERCH_PRODUCTS_MAX_PER_MINUTE,
+  );
+}
+
+export function merchMutationLimit(action: MerchMutationAction): number {
+  switch (action) {
+    case 'checkout':
+      return MERCH_CHECKOUT_MAX_PER_MINUTE;
+    case 'confirm':
+      return MERCH_CONFIRM_MAX_PER_MINUTE;
+  }
+}
+
+/** Per-IP monetary throttle that runs before bearer-token database resolution. */
+export function merchPreAuthRateLimited(
+  req: http.IncomingMessage,
+  action: MerchMutationAction,
+): RateLimitOutcome {
+  return recordSlidingWindowAttempt(
+    merchPreAuthIpAttempts,
+    `${action}:${requestIp(req)}`,
+    merchMutationLimit(action),
+  );
+}
+
+/** Fused per-IP and per-account throttle for one monetary mutation action. */
+export function merchMutationRateLimited(
+  req: http.IncomingMessage,
+  accountId: number,
+  action: MerchMutationAction,
+): RateLimitOutcome {
+  const limit = merchMutationLimit(action);
+  const ip = recordSlidingWindowAttempt(
+    merchMutationIpAttempts,
+    `${action}:${requestIp(req)}`,
+    limit,
+  );
+  const account = recordSlidingWindowAttempt(
+    merchMutationAccountAttempts,
+    `${action}:${accountId}`,
+    limit,
+  );
+  return mergeFusedOutcomes(ip, account);
+}
+
+/** Reset merch mutation + products throttles. Test-only. */
+export function resetMerchMutationRateLimits(): void {
+  merchMutationIpAttempts.clear();
+  merchMutationAccountAttempts.clear();
+  merchPreAuthIpAttempts.clear();
+  merchProductsIpAttempts.clear();
+}
+
 // Player-report creation had no dedicated limiter (it was gated only by the full
 // session plus the per-target 12h duplicate-report window in moderation_db). This
 // adds a coarse per-account create limiter so a single account cannot flood the

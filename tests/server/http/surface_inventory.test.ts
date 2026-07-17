@@ -70,6 +70,9 @@ const DISPATCHER_SOURCES = [
   // exact-path arms (and the price/:rail Match regex) sit behind
   // startsWith('/api/claudium') in main.ts, so the scan must read it too.
   new URL('../../../server/claudium.ts', import.meta.url),
+  // merch.ts is the claudium twin: its exact-path arms sit behind
+  // startsWith('/api/merch') in main.ts, so the scan must read it too.
+  new URL('../../../server/merch.ts', import.meta.url),
 ] as const;
 
 const API_PREFIX_ALTERNATION = '(?:api|admin\\/api|internal|oauth)';
