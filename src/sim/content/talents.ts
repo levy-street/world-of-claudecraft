@@ -116,7 +116,7 @@ export type ProcTrigger =
   | { on: 'shieldConsumed'; ability: string }
   | { on: 'hotExpired'; ability: string }
   | { on: 'bigHitTaken'; hpFrac: number; icd: number }
-  | { on: 'meleeHit'; abilities: string[] }
+  | { on: 'meleeHit'; abilities: string[]; chance?: number }
   | { on: 'meleeSwingWhile'; auraKind: string }
   | { on: 'thornsReflect'; ability: string };
 
@@ -156,6 +156,7 @@ export type ProcResponse =
 export interface ProcDef {
   id: string;
   name: string;
+  spec?: string;
   school?: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
   trigger: ProcTrigger;
   responses: ProcResponse[];

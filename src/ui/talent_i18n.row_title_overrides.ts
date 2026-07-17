@@ -101,6 +101,7 @@ const RETAINED_ROW_TITLE_SOURCES = [
   'Oaken Reflex',
   'Ironhide Reflex',
   'Storm Refrain',
+  'Tempest Reprise',
 ] as const;
 
 type RetainedRowTitle = (typeof RETAINED_ROW_TITLE_SOURCES)[number];
@@ -214,6 +215,7 @@ const WARRIOR_TITLES: Partial<Record<SupportedLanguage, Partial<TitleMap>>> = {
     Bloodbath: 'Кровавая баня',
     'Colossal Might': 'Колоссальная мощь',
     'Master Armorer': 'Мастер-оружейник',
+    'Tempest Reprise': 'Повтор бури',
   },
   cs_CZ: {
     'Double Charge': 'Dvojitý výpad',
@@ -418,6 +420,7 @@ const CJK_TITLES: Partial<Record<SupportedLanguage, Partial<TitleMap>>> = {
     'Oaken Reflex': '橡木瞬应',
     'Ironhide Reflex': '铁甲瞬应',
     'Storm Refrain': '风暴复唱',
+    'Tempest Reprise': '风暴复奏',
   },
   zh_TW: {
     'Double Charge': '雙重衝鋒',
@@ -515,6 +518,7 @@ const CJK_TITLES: Partial<Record<SupportedLanguage, Partial<TitleMap>>> = {
     'Oaken Reflex': '橡木瞬應',
     'Ironhide Reflex': '鐵甲瞬應',
     'Storm Refrain': '風暴複唱',
+    'Tempest Reprise': '風暴複奏',
   },
   ja_JP: {
     'Double Charge': '二連突撃',
@@ -612,6 +616,7 @@ const CJK_TITLES: Partial<Record<SupportedLanguage, Partial<TitleMap>>> = {
     'Oaken Reflex': '樫皮の即応',
     'Ironhide Reflex': '鉄皮の即応',
     'Storm Refrain': '嵐の反唱',
+    'Tempest Reprise': '嵐の再演',
   },
   ko_KR: {
     'Double Charge': '이중 돌진',
@@ -709,6 +714,7 @@ const CJK_TITLES: Partial<Record<SupportedLanguage, Partial<TitleMap>>> = {
     'Oaken Reflex': '참나무껍질의 즉응',
     'Ironhide Reflex': '무쇠가죽의 즉응',
     'Storm Refrain': '폭풍의 후렴',
+    'Tempest Reprise': '폭풍의 재현',
   },
 };
 

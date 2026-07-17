@@ -1805,7 +1805,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 20,
       theme: 'ascendance',
-      decision: 'party haste vs crit-fed Jolt burst vs emergency healing echoes',
+      decision: 'party haste vs melee reset cadence vs emergency healing echoes',
       options: [
         {
           id: 'sha_r20_bloodlust',
@@ -1816,14 +1816,19 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'sha_r20_elemental_fury',
-          name: 'Earthen Fury',
-          description: 'Your Arc Bolt and Earthen Jolt deal 20% more damage.',
-          icon: 'lightning_bolt',
+          name: 'Tempest Reprise',
+          description:
+            "Landed Ancestral Strikes have a 20% chance to reset Ancestral Strike's cooldown.",
+          icon: 'stormstrike',
           effect: {
-            ability: [
-              { ability: 'lightning_bolt', dmgPct: 0.2 },
-              { ability: 'earth_shock', dmgPct: 0.2 },
-            ],
+            proc: {
+              id: 'sha_tempest_reprise',
+              name: 'Tempest Reprise',
+              spec: 'enhancement',
+              school: 'nature',
+              trigger: { on: 'meleeHit', abilities: ['stormstrike'], chance: 0.2 },
+              responses: [{ kind: 'cooldownRefund', ability: 'stormstrike', seconds: 'reset' }],
+            },
           },
         },
         {

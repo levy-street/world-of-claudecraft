@@ -42,7 +42,7 @@ function prerequisiteGroups(effect: TalentEffect): string[][] {
   const proc = effect.proc;
   if (!proc) return groups;
   const trigger = proc.trigger;
-  if (trigger.on === 'castNth' || trigger.on === 'spellHit') {
+  if (trigger.on === 'castNth' || trigger.on === 'spellHit' || trigger.on === 'meleeHit') {
     groups.push(trigger.abilities);
   } else if (trigger.on === 'spellCrit' && trigger.abilities) {
     groups.push(trigger.abilities);
@@ -69,7 +69,10 @@ function prerequisiteGroups(effect: TalentEffect): string[][] {
 }
 
 function isKnownBy(abilityId: string, rowLevel: TalentRowLevel): boolean {
-  return abilitiesKnownAt('shaman', rowLevel).some((known) => known.def.id === abilityId);
+  return (
+    abilitiesKnownAt('shaman', rowLevel).some((known) => known.def.id === abilityId) ||
+    TALENTS.shaman.specs.some((spec) => spec.signature === abilityId)
+  );
 }
 
 function imbuedLifebloodHeal(level: number): { heal: number; maxHp: number } {

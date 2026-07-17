@@ -82,7 +82,7 @@ function effectAbilityReferences(effect: TalentEffect): string[] {
   if (!proc) return references;
 
   const trigger = proc.trigger;
-  if (trigger.on === 'castNth' || trigger.on === 'spellHit') {
+  if (trigger.on === 'castNth' || trigger.on === 'spellHit' || trigger.on === 'meleeHit') {
     references.push(...trigger.abilities);
   } else if (trigger.on === 'spellCrit' && trigger.abilities) references.push(...trigger.abilities);
   else if (

@@ -22,7 +22,9 @@ export function resetProcState(player: Entity): void {
 
 function procsFor(ctx: SimContext, player: Entity): ProcDef[] {
   const meta = ctx.players.get(player.id);
-  return meta ? ctx.playerMods(meta).procs : [];
+  if (!meta) return [];
+  const mods = ctx.playerMods(meta);
+  return mods.procs.filter((def) => def.spec === undefined || def.spec === mods.spec);
 }
 
 function fire(ctx: SimContext, player: Entity, def: ProcDef, subject: Entity): void {
@@ -295,7 +297,9 @@ export function onMeleeSwing(ctx: SimContext, player: Entity, abilityId = 'auto_
   for (const def of procsFor(ctx, player)) {
     const trigger = def.trigger;
     if (trigger.on === 'meleeHit') {
-      if (trigger.abilities.includes(abilityId)) fire(ctx, player, def, player);
+      if (!trigger.abilities.includes(abilityId)) continue;
+      if (trigger.chance !== undefined && !ctx.rng.chance(trigger.chance)) continue;
+      fire(ctx, player, def, player);
       continue;
     }
     if (

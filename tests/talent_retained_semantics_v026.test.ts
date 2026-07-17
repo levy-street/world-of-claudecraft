@@ -91,7 +91,7 @@ function effect<T extends AbilityEffect['type']>(
 }
 
 describe('retained v0.26 all-class Talents V2 semantics', () => {
-  it('resolves the final Swift Verdicts, Sniper Training, Earthen Fury, and content values', () => {
+  it('resolves the final Swift Verdicts, Sniper Training, Tempest Reprise, and content values', () => {
     const verdict = resolved('paladin', 'judgement', { 14: 'pal_r14_swift_verdicts' });
     expect(verdict.cost).toBe(24);
     expect(effect(verdict, 'judgement')).toMatchObject({ dmgMult: 1.25 });
@@ -100,10 +100,14 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
     expect(aimed.castTime).toBeCloseTo(2.1);
     expect(effect(aimed, 'directDamage')).toMatchObject({ min: 57, max: 71 });
 
-    const bolt = resolved('shaman', 'lightning_bolt', { 20: 'sha_r20_elemental_fury' });
-    const jolt = resolved('shaman', 'earth_shock', { 20: 'sha_r20_elemental_fury' });
-    expect(effect(bolt, 'directDamage')).toMatchObject({ min: 90, max: 102 });
-    expect(effect(jolt, 'directDamage')).toMatchObject({ min: 65, max: 73 });
+    const reprise = ROW_TREES.shaman
+      .flatMap((row) => row.options)
+      .find((option) => option.id === 'sha_r20_elemental_fury');
+    expect(reprise?.effect.proc).toMatchObject({
+      spec: 'enhancement',
+      trigger: { on: 'meleeHit', abilities: ['stormstrike'], chance: 0.2 },
+      responses: [{ kind: 'cooldownRefund', ability: 'stormstrike', seconds: 'reset' }],
+    });
 
     expect(
       effect(resolved('priest', 'mind_sear', { 20: 'pri_r20_mind_sear' }), 'aoeDamage'),

@@ -136,6 +136,11 @@ describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
     expect(swift).toContain('20%');
     expect(swift).toContain('25%');
 
+    const reprise = render('shaman', (e) => e.id === 'sha_r20_elemental_fury');
+    expect(reprise).toContain('20%');
+    expect(reprise).toContain('Ancestral Strike');
+    expect(reprise).toContain('cooldown');
+
     const sniper = render('hunter', (e) => e.id === 'hun_r14_sniper_training');
     expect(sniper).toContain('30%');
     expect(sniper).toContain('15%');
