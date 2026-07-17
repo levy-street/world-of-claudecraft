@@ -83,6 +83,22 @@ export interface ClaudiumView {
   buyDisabled: boolean;
 }
 
+/**
+ * Pick the wallet address the window reads its crypto-rail balances from.
+ *
+ * The actively connected session wallet always wins. With nothing connected this
+ * session, fall back to the account's server-verified LINKED wallet, so a
+ * linked-but-disconnected player still sees live buy-button affordability (the
+ * buy click then surfaces the existing "connect a wallet first" prompt to sign).
+ * With neither, return null: the caller skips the balance reads entirely.
+ */
+export function claudiumBalanceAddress(
+  connectedAddress: string | null,
+  linkedWalletPubkey: string | null,
+): string | null {
+  return connectedAddress ?? linkedWalletPubkey;
+}
+
 function affordable(balance: string | null | undefined, cost: string | null | undefined): boolean {
   if (!balance || !cost) return false;
   try {

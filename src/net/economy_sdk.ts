@@ -405,7 +405,12 @@ export async function confirmNativeSettlement(
  */
 export interface ClaudiumSigners {
   stripe?(intent: ClaudiumStripeIntent, purchaseId: string): Promise<void>;
-  nativeSignAndSend?(transactionBase64: string, rail: ClaudiumNativeRail): Promise<string>;
+  nativePayer?: string | null;
+  nativeSignAndSend?(
+    transactionBase64: string,
+    rail: ClaudiumNativeRail,
+    reference: string,
+  ): Promise<string>;
 }
 
 /**
@@ -433,12 +438,11 @@ export async function startClaudiumPurchase(
   }
 
   if (!signers.nativeSignAndSend) return OFF_NATIVE_QUOTE;
-  const wallet = await import('./wallet');
-  const payer = wallet.currentWallet().address;
+  const payer = signers.nativePayer ?? (await import('./wallet')).currentWallet().address;
   if (!payer) return OFF_NATIVE_QUOTE;
   const quote = await client.nativeQuote({ rail, sku, payer });
   if (!quote.ok || !quote.reference || !quote.transactionBase64) return quote;
-  const signature = await signers.nativeSignAndSend(quote.transactionBase64, rail);
+  const signature = await signers.nativeSignAndSend(quote.transactionBase64, rail, quote.reference);
   // Once the wallet has broadcast a signature, confirmation is bounded by its
   // own recovery window rather than the quote's wall-clock expiry. The service
   // validates the transfer's on-chain block time, so a payment broadcast on time

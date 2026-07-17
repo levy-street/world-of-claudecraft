@@ -116,6 +116,7 @@ export const API_ERROR_KEYS = {
   'steam.already_linked': 'apiError.steam.already_linked',
   'steam.account_taken': 'apiError.steam.account_taken',
   'steam.upstream': 'apiError.steam.upstream',
+  'wallet.handoff_invalid': 'apiError.wallet.handoff_invalid',
   'welcome.invalid_input': 'apiError.welcome.invalid_input',
 } satisfies Record<string, TranslationKey>;
 

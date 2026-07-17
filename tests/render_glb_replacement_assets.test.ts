@@ -13,6 +13,7 @@ import { doorPortalPreloadInternalsForTest } from '../src/render/door_portal';
 import { fishPreloadInternalsForTest } from '../src/render/fish';
 import { gatherNodePreloadInternalsForTest } from '../src/render/gather_nodes';
 import { mailboxPreloadInternalsForTest } from '../src/render/mailbox';
+import { questObjectPreloadInternalsForTest } from '../src/render/quest_objects';
 import { yumiMazePreloadInternalsForTest } from '../src/render/yumi_maze';
 
 const publicDir = path.join(__dirname, '..', 'public');
@@ -67,5 +68,11 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
 
   it('dungeon door arch asset', () => {
     expectAssetExistsAndManifested(doorPortalPreloadInternalsForTest.doorArchAssetUrl);
+  });
+
+  it('quest object assets', () => {
+    for (const url of Object.values(questObjectPreloadInternalsForTest.questObjectUrl)) {
+      expectAssetExistsAndManifested(url);
+    }
   });
 });

@@ -366,6 +366,7 @@ export const ja_JP: EnTranslations = {
       "spinButton": "スピン",
       "tasks": "タスク",
       "taskMultiplier": "{multiplier}倍倍率",
+      "oneVsOneExcluded": "1対1の試合ではデイリー報酬ポイントを獲得できません。",
       "pointsGained": "{points} デイリー報酬ポイントを獲得しました。",
       "showChestButton": "宝箱を表示",
       "hideChestButton": "宝箱を隠す",
@@ -415,6 +416,18 @@ export const ja_JP: EnTranslations = {
       "armoryEyebrow": "シーズン1",
       "armoryTitle": "武器庫",
       "armoryBody": "シーズン1武器庫の限定武器スキン。アカウント共有の純粋な装飾で、周囲のプレイヤー全員に表示されます。",
+      "wallet": {
+        "title": "Solanaウォレット",
+        "unlinked": "ウォレットアプリを接続し、一度署名して公開アドレスをWoCアカウントにリンクしてください。リカバリーフレーズや秘密鍵を受け取ることはありません。",
+        "connectedUnlinked": "ウォレットアプリはこのブラウザに接続されていますが、公開アドレスはまだWoCアカウントにリンクされていません。",
+        "linkedDisconnected": "公開アドレスはリンク済みです。SOLまたはWOCで支払うときに、そのウォレットアプリを再接続してください。",
+        "linkedConnected": "リンク済みのウォレットアプリが接続され、SOLまたはWOCで購入できます。",
+        "mismatched": "別のウォレットが接続されています。認証してリンク済みアドレスを置き換えるか、リンク済みウォレットを再接続してください。",
+        "connect": "ウォレットを接続",
+        "verify": "認証してリンク",
+        "reconnect": "ウォレットを再接続",
+        "manage": "ウォレットを管理"
+      },
       "collectionLine": "{collection}コレクション",
       "collections": {
         "guildmark": "ギルドマーク",
@@ -2199,9 +2212,10 @@ export const ja_JP: EnTranslations = {
       "charTitleNone": "称号未選択",
       "charOpenBook": "功績の書",
       "lbTab": "名声",
-      "lbDeedsCol": "功績",
       "lbTitleCol": "称号",
-      "lbSelf": "あなたの順位：{rank} 位（上位 {percent}%）",
+      "lbScopeNote": "アカウントの生涯名声で順位付けされます。各功績は、アカウントの全キャラクターを通じて一度だけ数えられます。",
+      "lbSelfAccount": "あなたのアカウント：{rank} 位（上位 {percent}%）、名声 {renown}",
+      "lbSelfRank": "あなたのアカウント：{rank} 位（上位 {percent}%）",
       "lbEmpty": "ランク入りした年代記作家はまだいません。",
       "broadcastsLabel": "功績の達成をギルドとフレンドに共有する",
       "titledName": "{name}【{title}】"
@@ -2305,6 +2319,9 @@ export const ja_JP: EnTranslations = {
       "already_linked": "このアカウントには既にSteamアカウントが連携されています。",
       "account_taken": "そのSteamアカウントは既に別のアカウントに連携されています。",
       "upstream": "Steamから応答がありません。しばらくしてからもう一度お試しください。"
+    },
+    "wallet": {
+      "handoff_invalid": "ウォレット認証の有効期限が切れたか、確認できませんでした。もう一度お試しください。"
     },
     "welcome": {
       "invalid_input": "入力が無効です。"
@@ -3100,7 +3117,7 @@ export const ja_JP: EnTranslations = {
       "howHeading": "功績の仕組み",
       "howBody": "功績は一人のキャラクターごとに獲得し、そのまま保たれます。ですから、あなたが遊ぶどの英雄も、それぞれ自分だけの功績の書を築いていきます。あなたのすべてのキャラクターにまたがって名声をまとめるのはレルムのリーダーボードだけで、そこでは各功績が一度だけ数えられます。それぞれの功績が何を求めているかは、ゲーム内の功績の書にはっきりと記されているので、次に何を追うべきかはいつでも分かります。狙っている功績には追跡を設定して、遊んでいる間もずっと視界に入れておけます。ごく一部の功績は秘密のままで、獲得して初めて姿を現します。功績の書はまた、自らに正直であり続けます。あなたの過去の記録で証明できるものはその場で認められるので、歴戦の者が開いたページが白紙ということはありません。数を刻む功績だけが、その集計を新たに始めます。",
       "renownHeading": "名声",
-      "renownBody": "名声は功績の書を支える点数です。獲得した功績はそれぞれ定められた点数を持ち、合計は増える一方なので、静かな一週間があっても築いたものが減ることはありません。一部の功績は技量ではなく運によるもので、偉業はそれ自体が誉れであるため、そのどちらも名声を一切もたらしません。",
+      "renownBody": "名声は功績の書を支える点数です。獲得した功績はそれぞれ定められた点数を持ち、合計は増える一方なので、静かな一週間があっても築いたものが減ることはありません。一部の功績は技量ではなく運によるもので、偉業はそれ自体が誉れであるため、そのどちらも名声を一切もたらしません。名声を持たない功績も功績の書の達成数には数えられますが、点数になることはありません。",
       "rewardsHeading": "称号と枠飾り",
       "rewardsBody": "報酬はすべて見せびらかすためのもので、それこそが狙いです。一部の功績は、身につけられる称号や、名前を彩る枠飾りを授けますが、英雄を強くするものは決して与えません。功績の書で好きな称号を選べば、それはネームプレート、チャット、そして順位表にも添えられ、誰の目にも映ります。",
       "chroniclesHeading": "年代記",
@@ -3109,7 +3126,7 @@ export const ja_JP: EnTranslations = {
       "featsBody": "偉業は別格の棚です。それは伝承と世界初の記録であり、過ぎ去った時代に結びついた功績や、二度と起こらない一瞬の功績です。名声はなく、達成率にも数えられず、成し遂げられたことの記憶として永遠に残されます。",
       "catalogHeading": "功績の全目録",
       "catalogBody": "ここには、功績の書が収められるすべての功績を、カテゴリーごとにまとめてあります。秘密の功績はわざと省いてあり、あなた自身が見つけ出すのを待っています。それぞれが何を求めているかは、ゲーム内で功績の書を開いて確かめてください。",
-      "standingsNote": "各レルムは、すべてのアカウントにわたる名声の累計を記録しています。誰がどこに位置しているかを見るには、ゲーム内でリーダーボードを開き、その名声タブに切り替えてください。順位はそこにあり、ウィキにはありません。",
+      "standingsNote": "各レルムは、すべてのアカウントにわたる名声の累計を記録しています。リーダーボードはアカウント全体を生涯名声で順位付けし、各功績はあなたの全キャラクターを通じて一度だけ数えられ、表示されるのは名声のみです。そのため、名声を持たない功績は功績の書には数えられても、順位を動かすことはありません。誰がどこに位置しているかを見るには、ゲーム内でリーダーボードを開き、その名声タブに切り替えてください。順位はそこにあり、ウィキにはありません。",
       "catHeading": "{label}（{count}）",
       "colName": "功績",
       "colRenown": "名声",
@@ -4025,6 +4042,9 @@ export const ja_JP: EnTranslations = {
     "balancePreviewTitle": "接続中ウォレットの$WOC残高プレビュー",
     "balancePreviewAria": "接続中ウォレット残高プレビュー: {balance}。ウォレットを連携するとホルダー表示を認証できます。",
     "balanceAmount": "{amount} $WOC",
+    "bagConnect": "ウォレットをリンク",
+    "bagLink": "ウォレットを認証",
+    "bagReconnect": "ウォレットを再接続",
     "connected": "接続済み: {address}",
     "connectedWithBalance": "接続済み: {balance} - {address}",
     "connectedLinked": "認証済み: {address}",
@@ -4039,12 +4059,37 @@ export const ja_JP: EnTranslations = {
     "helpLinkedDisconnected": "ホルダー特典が有効です。署名や支払いが必要なときはアプリを接続してください。",
     "helpLinkedDisconnectedWithBalance": "ホルダー特典が有効です。署名や支払いが必要なときはアプリを接続してください。",
     "extensionHelp": "ここにウォレットを表示するには、Solflare Wallet などのブラウザ用ウォレット拡張機能を有効にしておいてください。",
+    "mobileAppHelp": "Phantom または Solflare を選択してください。ウォレットアプリで承認を求められます。ゲームを開いたままにし、完了後に戻ってください。",
+    "standaloneAppHelp": "ホーム画面アプリでは、まだウォレットに接続できません。Phantom または Solflare を使用するには、Safari か Chrome で World of ClaudeCraft を開いてください。",
+    "openAppTitle": "{wallet} で続行",
+    "openAppHelp": "{wallet} を開いてこのリクエストを確認してください。ウォレットアプリの使用中も、このゲームタブを開いたままにしてください。",
+    "openAppButton": "{wallet} を開く",
+    "manualReturnBrowserHelp": "承認後、このゲームタブに戻ってください。iOS で別のブラウザが開いた場合は閉じ、元のブラウザに手動で戻ってください。",
+    "manualReturnStandaloneHelp": "承認後、ホーム画面から World of ClaudeCraft に戻ってください。iOS でブラウザが開いた場合は閉じ、ホーム画面のアプリをもう一度開いてください。",
+    "preparingAppButton": "{wallet} を準備中...",
+    "walletAppUnavailable": "{wallet} を準備できませんでした。このウィンドウを閉じて、もう一度お試しください。",
     "flowConnect": "ウォレットを選択してください。認証は自動的に続行されます。",
     "flowSign": "ウォレットアプリで認証メッセージに署名してください。トランザクションや SOL は不要です。",
     "flowVerify": "ウォレット所有権を認証中...",
     "linkFailed": "ウォレット認証に失敗しました。",
     "verifyFailed": "ウォレット認証に失敗しました。",
     "unlinkFailed": "ウォレット連携を解除できませんでした。",
+    "browser": {
+      "eyebrow": "デスクトップウォレット認証",
+      "title": "Solanaウォレットを接続",
+      "linkBody": "このブラウザでウォレット拡張機能を選択してください。確認メッセージに署名した後、デスクトップアプリに戻ります。",
+      "paymentBody": "アカウントにリンクされたウォレットを選択し、このブラウザで取引を承認してください。",
+      "extensionHelp": "対応するウォレット拡張機能が見つかりません。Phantom、Solflare、または別のSolanaブラウザウォレットをインストールまたはロック解除して、再試行してください。",
+      "safety": "World of ClaudeCraftがリカバリーフレーズや秘密鍵を求めることはありません。",
+      "continueWith": "{wallet}で続行",
+      "reviewTitle": "ウォレットで確認",
+      "reviewBody": "{wallet}の指示に従ってください。このブラウザページは開いたままにしてください。",
+      "completeTitle": "ウォレット認証が完了しました",
+      "completeBody": "World of ClaudeCraftデスクトップアプリに戻れます。",
+      "returnButton": "デスクトップアプリに戻る",
+      "failed": "ウォレット認証に失敗したか期限切れです。デスクトップアプリに戻って再試行してください。",
+      "retry": "再試行"
+    },
     "holder": "$WOCホルダー",
     "holderTierTitle": "{tier} $WOCホルダー",
     "holderTiers": {
@@ -4365,6 +4410,24 @@ export const ja_JP: EnTranslations = {
   "heroicShop": {
     "balance": "英雄の証: {count}",
     "buyAria": "英雄の証{marks}個で{item}を購入"
+  },
+  "cardDuel": {
+    "title": "カードデュエル",
+    "close": "閉じる",
+    "join": "キューに参加",
+    "joinAria": "カードデュエルのキューに参加する",
+    "leave": "キューを離れる",
+    "leaveAria": "カードデュエルのキューを離れる",
+    "forfeit": "棄権",
+    "forfeitAria": "カードデュエルを棄権する",
+    "queued": "対戦相手を待っています……",
+    "unavailable": "カードデュエルには、オンラインの対戦相手がもう一人必要です。",
+    "vsOpponent": "対 {name}",
+    "round": "ラウンドスコア：{mine} - {theirs}",
+    "counts": "山札：{deck} ・ 捨て札：{discard}",
+    "playCardAria": "{value}のカードを出す",
+    "waitingOnOpponent": "相手のカードを待っています……",
+    "yourTurn": "カードを出してください"
   },
   "delveUi": {
     "board": {
@@ -4864,6 +4927,11 @@ export const ja_JP: EnTranslations = {
       "quit": "終了",
       "fatalBody": "World of ClaudeCraft で予期しないエラーが発生したため、終了します。"
     }
+  },
+  "gpuNotice": {
+    "bodyDesktop": "ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなります。グラフィックドライバーを更新してから、ゲームを再起動してください。Windowsでは、設定 > システム > ディスプレイ > グラフィック でこのゲームを「高パフォーマンス」に設定してください。",
+    "bodyWeb": "ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなります。ブラウザーの設定でハードウェアアクセラレーションを有効にし、グラフィックドライバーを更新してから、ブラウザーを再起動してください。",
+    "dismiss": "閉じる"
   },
   "realm": {
     "noRealms": "利用可能なワールドがありません。",
@@ -8681,6 +8749,11 @@ export const ja_JP: EnTranslations = {
         "title": "金張りの金庫",
         "greeting": "金張りの金庫へようこそ。あなたの品々は我々の錠の内で安全に保管されます。"
       },
+      "card_master": {
+        "name": "カードマスター",
+        "title": "運命の胴元",
+        "greeting": "カードデュエルはいかが？三本勝負、勝者には自慢の種が手に入る。"
+      },
       "bursar_petra_vell": {
         "name": "出納官ペトラ・ヴェル",
         "title": "金張りの金庫",
@@ -9815,7 +9888,7 @@ export const ja_JP: EnTranslations = {
       },
       "necromancers": {
         "name": "モーンウィーヴの法衣",
-        "bonus2": "ノックバックされなくなります（ノックバック耐性100%）。",
+        "bonus2": "呪文の威力が20増加します。被ダメージによって詠唱が遅れなくなります（詠唱妨害耐性100%）。",
         "bonus3": "知力が10、スタミナが10上昇します。",
         "bonus4": "呪文に10%の確率で「クリアキャスティング」が発動し、次の呪文が無償になります。"
       },
@@ -9827,13 +9900,13 @@ export const ja_JP: EnTranslations = {
       },
       "soulflame": {
         "name": "レイスファイアの法衣",
-        "bonus2": "ノックバックされなくなります（ノックバック耐性100%）。",
+        "bonus2": "呪文の威力が20増加します。被ダメージによって詠唱が遅れなくなります（詠唱妨害耐性100%）。",
         "bonus3": "知力が15、精神力が15上昇し、攻撃速度と詠唱速度が15%上昇します。",
         "bonus4": "呪文に10%の確率で「ソウルブレイズ」が発動し、呪文の威力が10秒間40上昇します。"
       },
       "stormcallers": {
         "name": "ゲイルコールの法衣",
-        "bonus2": "ノックバックされなくなります（ノックバック耐性100%）。",
+        "bonus2": "呪文の威力が20増加します。被ダメージによって詠唱が遅れなくなります（詠唱妨害耐性100%）。",
         "bonus3": "知力が15、精神力が15上昇し、攻撃速度と詠唱速度が15%上昇します。",
         "bonus4": "呪文に10%の確率で「ソウルブレイズ」が発動し、呪文の威力が10秒間40上昇します。"
       },

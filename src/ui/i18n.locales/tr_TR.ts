@@ -1197,6 +1197,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.hideChestConfirmTitle': 'Günlük Ödül Sandığı gizlensin mi?',
   'hudChrome.dailyRewards.pointsGained': '{points} günlük ödül puanı kazanıldı.',
   'hudChrome.dailyRewards.taskMultiplier': 'x{multiplier} çarpan',
+  'hudChrome.dailyRewards.oneVsOneExcluded': "1'e 1 maçlar günlük ödül puanı kazandırmaz.",
   'hudChrome.dailyRewards.totalPlayer': 'Bugün {count} oyuncu',
   'hudChrome.dailyRewards.totalPlayers': 'Bugün {count} oyuncu',
   'hudChrome.death.resurrectAtCorpse': 'Cesedinin Başında Diril',
@@ -6315,17 +6316,20 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.greyjaw_stalker.name': 'Greyjaw İzsürücü takımı',
   'entities.itemSets.greyjaw_stalker.bonus3': 'Saldırı ve büyü hızını %15 artırır.',
   'entities.itemSets.necromancers.name': 'Mournweave Giysileri',
-  'entities.itemSets.necromancers.bonus2': 'Geri itilemezsin (%100 geri itilme direnci).',
+  'entities.itemSets.necromancers.bonus2':
+    'Büyü gücünü 20 artırır. Alınan hasar artık büyü yapmanı geciktirmez (%100 büyü gecikme direnci).',
   'entities.itemSets.necromancers.bonus3': 'Zekayı 10 ve dayanıklılığı 10 artırır.',
   'entities.itemSets.nighttalon.name': 'Direfang Postu',
   'entities.itemSets.nighttalon.bonus2': 'Saldırı gücünü 40 artırır.',
   'entities.itemSets.nighttalon.bonus3':
     'Çevikliği 15, kritik şansını %2, saldırı ve büyü hızını %15 artırır.',
   'entities.itemSets.soulflame.name': 'Wraithfire Kıyafetleri',
-  'entities.itemSets.soulflame.bonus2': 'Geri itilemezsin (%100 geri itilme direnci).',
+  'entities.itemSets.soulflame.bonus2':
+    'Büyü gücünü 20 artırır. Alınan hasar artık büyü yapmanı geciktirmez (%100 büyü gecikme direnci).',
   'entities.itemSets.soulflame.bonus3': 'Zekayı 15, ruhu 15, saldırı ve büyü hızını %15 artırır.',
   'entities.itemSets.stormcallers.name': 'Galecall Cübbeleri',
-  'entities.itemSets.stormcallers.bonus2': 'Geri itilemezsin (%100 geri itilme direnci).',
+  'entities.itemSets.stormcallers.bonus2':
+    'Büyü gücünü 20 artırır. Alınan hasar artık büyü yapmanı geciktirmez (%100 büyü gecikme direnci).',
   'entities.itemSets.stormcallers.bonus3':
     'Zekayı 15, ruhu 15, saldırı ve büyü hızını %15 artırır.',
   'entities.itemSets.vale_arcanist.name': 'Vadi Arkanisti giysileri',
@@ -6921,15 +6925,11 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.deedsPage.howHeading': 'Yiğitlikler nasıl işler',
   'guide.deedsPage.intro':
     'Yiğitlikler Kitabı, dünyanın yaptığın her şeyin hesabını tuttuğu yerdir; başlangıç vadisinden attığın ilk adımlardan diyarın sunabileceği en çetin dövüşlere kadar. Oynadıkça yiğitlikler kazan, verdikleri unvanları taşı ve Ününün tırmanışını izle.',
-  'guide.deedsPage.renownBody':
-    'Ün, Kitabın ardındaki puandır. Kazandığın her yiğitliğin belirli bir değeri vardır ve toplamın yalnızca yükselir; sakin geçen bir hafta sana asla yer kaybettirmez. Bir avuç yiğitlik ustalıktan çok şansa bağlıdır, Destanlar ise başlı başına bir onurdur; bu yüzden ikisi de hiç Ün getirmez.',
   'guide.deedsPage.renownHeading': 'Ün',
   'guide.deedsPage.rewardBorder': 'Çerçeve',
   'guide.deedsPage.rewardsBody':
     "Ödüllerin hepsi gösteriş içindir ve mesele de zaten budur. Bazı yiğitlikler taşıyabileceğin bir unvan ya da adını kuşatan bir çerçeve verir; kahramanını güçlendiren hiçbir şey vermez. İstediğin unvanı Yiğitlikler Kitabı'ndan seç; o da isim levhanda, sohbette ve lider tablolarında herkesin göreceği biçimde seninle gezsin.",
   'guide.deedsPage.rewardsHeading': 'Unvanlar ve çerçeveler',
-  'guide.deedsPage.standingsNote':
-    "Diyarlar, her hesabın Ününü kapsayan güncel bir çetele tutar. Kimin nerede durduğunu görmek için oyun içinde Lider Tablosu'nu aç ve Ün sekmesine geç; sıralamalar wiki'de değil, orada yaşar.",
   'guide.nav.deeds': 'Yiğitlikler Kitabı',
   'hudChrome.deeds.broadcastLine': '{name} bir yiğitliğe imza attı: {deed}',
   'hudChrome.deeds.broadcastsLabel': 'Kazanılan yiğitlikleri lonca ve arkadaşlarınla paylaş',
@@ -6963,9 +6963,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.filterNearly': 'Az Kaldı',
   'hudChrome.deeds.filterUnearned': 'Kazanılmayan',
   'hudChrome.deeds.hiddenBadge': 'Gizli',
-  'hudChrome.deeds.lbDeedsCol': 'Yiğitlik',
   'hudChrome.deeds.lbEmpty': 'Henüz sıralamaya girmiş vakanüvis yok.',
-  'hudChrome.deeds.lbSelf': 'Sıralamadaki yerin: {rank}. sıra, en iyi yüzde {percent} içinde',
   'hudChrome.deeds.lbTab': 'Ün',
   'hudChrome.deeds.lbTitleCol': 'Unvan',
   'hudChrome.deeds.nearestLabel': 'Ramak kaldı:',

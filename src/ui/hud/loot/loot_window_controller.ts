@@ -1,4 +1,5 @@
-import { ITEMS, MOBS } from '../../../sim/data';
+import type { corpseLootAvailability } from '../../../game/corpse_loot_availability';
+import { ITEMS } from '../../../sim/data';
 import { dist2d, type Entity, type ItemDef } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
 import { itemDisplayName } from '../../entity_i18n';
@@ -17,6 +18,7 @@ export interface LootWindowControllerDeps {
   element: HTMLElement;
   document: Document;
   world(): IWorld;
+  corpseAvailability(entity: Entity): ReturnType<typeof corpseLootAvailability>;
   closeTransient(): void;
   hideTooltip(): void;
   entityName(entity: Entity): string;
@@ -52,15 +54,9 @@ export class LootWindowController {
     const world = this.deps.world();
     const mob = world.entities.get(mobId);
     if (!mob) return;
-    const componentTags = MOBS[mob.templateId]?.componentTags;
-    const harvestable = !!componentTags?.length && mob.harvestClaimedBy === null;
-    const visibleItems = mob.loot
-      ? mob.loot.items.filter(
-          (stack) => !stack.personalFor || stack.personalFor.includes(world.playerId),
-        )
-      : [];
-    const hasLoot = !!mob.loot && (mob.loot.copper > 0 || visibleItems.length > 0);
-    if (!hasLoot && !harvestable) return;
+    const { componentTags, harvestable, visibleItems, hasLoot, canOpen } =
+      this.deps.corpseAvailability(mob);
+    if (!canOpen) return;
 
     this.deps.closeTransient();
     this.mobId = mobId;

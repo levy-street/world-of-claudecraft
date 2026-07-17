@@ -1542,6 +1542,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Masquer le coffre des récompenses quotidiennes ?',
   'hudChrome.dailyRewards.pointsGained': '{points} points de récompenses quotidiennes gagnés.',
   'hudChrome.dailyRewards.taskMultiplier': 'Multiplicateur x{multiplier}',
+  'hudChrome.dailyRewards.oneVsOneExcluded':
+    'Les matchs en 1 contre 1 ne rapportent pas de points de récompenses quotidiennes.',
   'hudChrome.dailyRewards.totalPlayer': "{count} joueur aujourd'hui",
   'hudChrome.dailyRewards.totalPlayers': "{count} joueurs aujourd'hui",
   'hudChrome.death.resurrectAtCorpse': 'Ressusciter près du cadavre',
@@ -6783,7 +6785,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Augmente la vitesse d'attaque et d'incantation de 15%.",
   'entities.itemSets.necromancers.name': 'Parure de Mournweave',
   'entities.itemSets.necromancers.bonus2':
-    'Vous ne pouvez pas être projeté en arrière (100% de résistance à la projection).',
+    'Augmente la puissance des sorts de 20. Les dégâts subis ne retardent plus vos incantations (100% de résistance au retard des sorts).',
   'entities.itemSets.necromancers.bonus3': "Augmente l'intelligence de 10 et l'endurance de 10.",
   'entities.itemSets.nighttalon.name': 'Peau de Direfang',
   'entities.itemSets.nighttalon.bonus2': "Augmente la puissance d'attaque de 40.",
@@ -6791,12 +6793,12 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Augmente l'agilité de 15, les chances de critique de 2% et la vitesse d'attaque et d'incantation de 15%.",
   'entities.itemSets.soulflame.name': "Tenue d'apparat Wraithfire",
   'entities.itemSets.soulflame.bonus2':
-    'Vous ne pouvez pas être projeté en arrière (100% de résistance à la projection).',
+    'Augmente la puissance des sorts de 20. Les dégâts subis ne retardent plus vos incantations (100% de résistance au retard des sorts).',
   'entities.itemSets.soulflame.bonus3':
     "Augmente l'intelligence de 15, l'esprit de 15 et la vitesse d'attaque et d'incantation de 15%.",
   'entities.itemSets.stormcallers.name': 'Vêtements de Galecall',
   'entities.itemSets.stormcallers.bonus2':
-    'Vous ne pouvez pas être projeté en arrière (100% de résistance à la projection).',
+    'Augmente la puissance des sorts de 20. Les dégâts subis ne retardent plus vos incantations (100% de résistance au retard des sorts).',
   'entities.itemSets.stormcallers.bonus3':
     "Augmente l'intelligence de 15, l'esprit de 15 et la vitesse d'attaque et d'incantation de 15%.",
   'entities.itemSets.vale_arcanist.name': "Tenue de l'arcaniste du Val",
@@ -7406,15 +7408,11 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.deedsPage.howHeading': 'Comment fonctionnent les hauts faits',
   'guide.deedsPage.intro':
     "Le Livre des hauts faits est l'endroit où le monde tient le compte de tout ce que vous avez accompli, de vos premiers pas hors de la vallée de départ aux combats les plus rudes que le royaume puisse offrir. Obtenez des hauts faits au fil du jeu, portez les titres qu'ils confèrent et regardez votre Renommée grimper.",
-  'guide.deedsPage.renownBody':
-    "La Renommée est le score qui se cache derrière le Livre. Chaque haut fait obtenu vaut un montant fixe, et votre total ne fait que grimper: une semaine calme ne vous fait jamais perdre de terrain. Une poignée de hauts faits tiennent à la chance plutôt qu'au talent, et les Prouesses sont un honneur à part; ni les uns ni les autres ne rapportent la moindre Renommée.",
   'guide.deedsPage.renownHeading': 'Renommée',
   'guide.deedsPage.rewardBorder': 'Bordure',
   'guide.deedsPage.rewardsBody':
     "Les récompenses sont purement d'apparat, et c'est bien le but. Certains hauts faits confèrent un titre à porter ou une bordure pour encadrer votre nom, jamais rien qui rende votre héros plus fort. Choisissez le titre qui vous plaît dans le Livre des hauts faits: il vous accompagne sur votre plaque de nom, dans le chat et sur les classements, à la vue de tous.",
   'guide.deedsPage.rewardsHeading': 'Titres et bordures',
-  'guide.deedsPage.standingsNote':
-    "Les royaumes tiennent un décompte continu de la Renommée sur l'ensemble des comptes. Pour savoir qui se place où, ouvrez le Classement en jeu et rendez-vous sur son onglet Renommée ; le classement se trouve là, pas sur le wiki.",
   'guide.nav.deeds': 'Livre des hauts faits',
   'hudChrome.deeds.broadcastLine': '{name} a accompli un haut fait: {deed}',
   'hudChrome.deeds.broadcastsLabel':
@@ -7448,9 +7446,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.filterNearly': 'Presque finis',
   'hudChrome.deeds.filterUnearned': 'À obtenir',
   'hudChrome.deeds.hiddenBadge': 'Secret',
-  'hudChrome.deeds.lbDeedsCol': 'Hauts faits',
   'hudChrome.deeds.lbEmpty': 'Aucun chroniqueur classé pour le moment.',
-  'hudChrome.deeds.lbSelf': 'Votre position: rang {rank}, dans le top {percent} %',
   'hudChrome.deeds.lbTab': 'Renommée',
   'hudChrome.deeds.lbTitleCol': 'Titre',
   'hudChrome.deeds.nearestLabel': 'Presque au but:',

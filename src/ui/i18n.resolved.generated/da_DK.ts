@@ -366,6 +366,7 @@ export const da_DK: EnTranslations = {
       "spinButton": "Drej",
       "tasks": "Opgaver",
       "taskMultiplier": "x{multiplier} multiplikator",
+      "oneVsOneExcluded": "1 mod 1-kampe giver ikke point til daglige belønninger.",
       "pointsGained": "{points} daglige belønningspoint optjent.",
       "showChestButton": "Vis kiste",
       "hideChestButton": "Skjul kiste",
@@ -415,6 +416,18 @@ export const da_DK: EnTranslations = {
       "armoryEyebrow": "Sæson 1",
       "armoryTitle": "Våbenhuset",
       "armoryBody": "Begrænsede våbenskins fra sæson 1-våbenhuset. De gælder for hele kontoen, er rent kosmetiske og vises for alle omkring dig.",
+      "wallet": {
+        "title": "Solana wallet",
+        "unlinked": "Connect a wallet app, then sign once to link its public address to your WoC account. We never receive your recovery phrase or private key.",
+        "connectedUnlinked": "The wallet app is connected to this browser, but its public address is not linked to your WoC account yet.",
+        "linkedDisconnected": "Your public address is linked. Reconnect that wallet app when you want to pay with SOL or WOC.",
+        "linkedConnected": "Your linked wallet app is connected and ready for SOL or WOC purchases.",
+        "mismatched": "A different wallet is connected. Verify it to replace the linked address, or reconnect the linked wallet.",
+        "connect": "Connect wallet",
+        "verify": "Verify and link",
+        "reconnect": "Reconnect wallet",
+        "manage": "Manage wallet"
+      },
       "collectionLine": "{collection}-samlingen",
       "collections": {
         "guildmark": "Laugsmærke",
@@ -2199,9 +2212,10 @@ export const da_DK: EnTranslations = {
       "charTitleNone": "Ingen titel valgt",
       "charOpenBook": "Bedrifternes Bog",
       "lbTab": "Hæder",
-      "lbDeedsCol": "Bedrifter",
       "lbTitleCol": "Titel",
-      "lbSelf": "Din placering: plads {rank}, blandt de øverste {percent} procent",
+      "lbScopeNote": "Accounts ranked by lifetime Renown. Each deed counts once across all characters on an account.",
+      "lbSelfAccount": "Your account: rank {rank}, top {percent} percent, {renown} Renown",
+      "lbSelfRank": "Your account: rank {rank}, top {percent} percent",
       "lbEmpty": "Ingen rangerede krønikeskrivere endnu.",
       "broadcastsLabel": "Del nye bedrifter med laug og venner",
       "titledName": "{name} [{title}]"
@@ -2305,6 +2319,9 @@ export const da_DK: EnTranslations = {
       "already_linked": "Din konto har allerede en tilknyttet Steam-konto.",
       "account_taken": "Den Steam-konto er allerede knyttet til en anden konto.",
       "upstream": "Steam svarede ikke. Prøv igen om et øjeblik."
+    },
+    "wallet": {
+      "handoff_invalid": "That wallet authorization expired or could not be verified. Try again."
     },
     "welcome": {
       "invalid_input": "Ugyldig indtastning."
@@ -3100,7 +3117,7 @@ export const da_DK: EnTranslations = {
       "howHeading": "Sådan fungerer bedrifter",
       "howBody": "Bedrifter opnås og bevares én karakter ad gangen, så hver helt, du spiller, bygger sin egen Bog; kun rigets rangliste samler din Hæder på tværs af alle de karakterer, du spiller, og tæller hver bedrift kun én gang. Hver bedrift fortæller ligeud, hvad den kræver af dig, lige der i Bedrifternes Bog inde i spillet, så du altid ved, hvad du skal jage, og du kan sætte sporing på dem, du går efter, så du har dem for øje, mens du spiller. Nogle ganske få holder sig skjult og giver sig først til kende, når du har opnået dem. Bogen holder også sig selv ærlig: hvad end din tidligere indsats kan bevise, krediterer den på stedet, så en veteran åbner den aldrig til en tom side; kun de tællende bedrifter begynder deres optælling forfra.",
       "renownHeading": "Hæder",
-      "renownBody": "Hæder er tallet bag Bogen. Hver bedrift, du opnår, er en fast mængde hæder værd, og din samlede sum kan kun stige, så en stille uge koster dig aldrig terræn. En håndfuld bedrifter afgøres af held snarere end kunnen, og Bragder er en ære helt for sig, så begge dele giver slet ingen hæder.",
+      "renownBody": "Renown is the score behind the Book. Every deed you earn is worth a set amount, and your total only ever climbs, so a quiet week never costs you ground. A handful of deeds turn on luck rather than skill, and Feats are an honor of their own, so both of those are worth no Renown at all. Deeds without Renown still count toward completion in your Book; they simply never score.",
       "rewardsHeading": "Titler og rammer",
       "rewardsBody": "Belønningerne er ren pynt, og det er hele pointen. Nogle bedrifter skænker en titel, du kan bære, eller en ramme om dit navn, men aldrig noget, der gør din helt stærkere. Vælg den titel, du ønsker, i Bedrifternes Bog, så følger den med på dit navneskilt, i chatten og på ranglisterne, hvor alle kan se den.",
       "chroniclesHeading": "Krøniker",
@@ -3109,7 +3126,7 @@ export const da_DK: EnTranslations = {
       "featsBody": "Bragder står på en hylde for sig: optegnelser over eftermæle og over det, der blev gjort først i hele verden, de bedrifter, der er bundet til en svunden tid eller et øjeblik, som kun indtræffer én gang. De giver ingen hæder og tæller ikke med i fuldførelsestallet, men bevares for altid som et minde om det, der blev gjort.",
       "catalogHeading": "Den fulde fortegnelse over bedrifter",
       "catalogBody": "Her står hver eneste bedrift, Bogen kan rumme, ordnet efter kategori. De hemmelige er udeladt med vilje; de venter på, at du finder dem. Åbn Bedrifternes Bog inde i spillet for at se præcis, hvad hver enkelt kræver.",
-      "standingsNote": "Rigerne fører et løbende regnskab over Hæder på tværs af alle konti. Vil du se, hvem der står hvor, så åbn ranglisten inde i spillet og slå op på dens Hæder-faneblad; placeringerne bor der, ikke på wikien.",
+      "standingsNote": "The realms keep a running tally of Renown across every account: the board ranks whole accounts by lifetime Renown, counting each deed once across all your characters, and it shows Renown alone, so deeds that carry none never move the standings even though they count in your Book. To see who stands where, open the Leaderboard in game and turn to its Renown tab; the standings live there, not on the wiki.",
       "catHeading": "{label} ({count})",
       "colName": "Bedrift",
       "colRenown": "Hæder",
@@ -4025,6 +4042,9 @@ export const da_DK: EnTranslations = {
     "balancePreviewTitle": "Forhåndsvisning af forbundet pungs $WOC-saldo",
     "balancePreviewAria": "Forhåndsvisning af forbundet pungs saldo: {balance}. Tilknyt pungen for at verificere ejer-pynt.",
     "balanceAmount": "{amount} $WOC",
+    "bagConnect": "Link wallet",
+    "bagLink": "Verify wallet",
+    "bagReconnect": "Reconnect wallet",
     "connected": "Forbundet: {address}",
     "connectedWithBalance": "Forbundet: {balance} - {address}",
     "connectedLinked": "Verificeret: {address}",
@@ -4039,12 +4059,37 @@ export const da_DK: EnTranslations = {
     "helpLinkedDisconnected": "Ejerfordele er aktive. Forbind appen, når du har brug for at underskrive eller bruge midler.",
     "helpLinkedDisconnectedWithBalance": "Ejerfordele er aktive. Forbind appen, når du har brug for at underskrive eller bruge midler.",
     "extensionHelp": "For at se en pung her skal du holde en browser-pungudvidelse som Solflare Wallet aktiv.",
+    "mobileAppHelp": "Choose Phantom or Solflare. Your wallet app will ask for approval. Keep this game open and return to it when finished.",
+    "standaloneAppHelp": "Wallet connections are not available in the Home Screen app yet. Open World of ClaudeCraft in Safari or Chrome to use Phantom or Solflare.",
+    "openAppTitle": "Continue in {wallet}",
+    "openAppHelp": "Open {wallet} to review this request. Keep this game tab open while the wallet app is active.",
+    "openAppButton": "Open {wallet}",
+    "manualReturnBrowserHelp": "After approval, return to this game tab. If iOS opens another browser, close it and return to the original browser manually.",
+    "manualReturnStandaloneHelp": "After approval, return to World of ClaudeCraft from your Home Screen. If iOS opens a browser, close it and reopen the Home Screen app manually.",
+    "preparingAppButton": "Preparing {wallet}...",
+    "walletAppUnavailable": "{wallet} could not be prepared. Close this window and try again.",
     "flowConnect": "Vælg en pung. Verificeringen fortsætter automatisk.",
     "flowSign": "Underskriv verificeringsbeskeden i din pung-app. Ingen transaktion eller SOL kræves.",
     "flowVerify": "Verificerer ejerskab af pung...",
     "linkFailed": "Verificering af pung mislykkedes.",
     "verifyFailed": "Verificering af pung mislykkedes.",
     "unlinkFailed": "Kunne ikke frakoble pungen.",
+    "browser": {
+      "eyebrow": "Desktop wallet authorization",
+      "title": "Connect a Solana Wallet",
+      "linkBody": "Choose a wallet extension in this browser. You will sign a verification message, then return to the desktop app.",
+      "paymentBody": "Choose the wallet linked to your account and approve the transaction in this browser.",
+      "extensionHelp": "No compatible wallet extension was found. Install or unlock Phantom, Solflare, or another Solana browser wallet, then retry.",
+      "safety": "World of ClaudeCraft never asks for your recovery phrase or private key.",
+      "continueWith": "Continue with {wallet}",
+      "reviewTitle": "Review in your wallet",
+      "reviewBody": "Follow the prompt from {wallet}. Keep this browser page open.",
+      "completeTitle": "Wallet authorization complete",
+      "completeBody": "You can return to the World of ClaudeCraft desktop app.",
+      "returnButton": "Return to desktop app",
+      "failed": "Wallet authorization failed or expired. Return to the desktop app and try again.",
+      "retry": "Retry"
+    },
     "holder": "$WOC-ejer",
     "holderTierTitle": "{tier} $WOC-ejer",
     "holderTiers": {
@@ -4365,6 +4410,24 @@ export const da_DK: EnTranslations = {
   "heroicShop": {
     "balance": "Heroiske Mærker: {count}",
     "buyAria": "Køb {item} for {marks} Heroiske Mærker"
+  },
+  "cardDuel": {
+    "title": "Card Duel",
+    "close": "Close",
+    "join": "Join Queue",
+    "joinAria": "Join the Card Duel queue",
+    "leave": "Leave Queue",
+    "leaveAria": "Leave the Card Duel queue",
+    "forfeit": "Forfeit",
+    "forfeitAria": "Forfeit the Card Duel",
+    "queued": "Waiting for an opponent...",
+    "unavailable": "Card Duel requires another player online.",
+    "vsOpponent": "vs {name}",
+    "round": "Round score: {mine} - {theirs}",
+    "counts": "Deck: {deck} · Discard: {discard}",
+    "playCardAria": "Play the {value} card",
+    "waitingOnOpponent": "Waiting on your opponent's card...",
+    "yourTurn": "Play a card"
   },
   "delveUi": {
     "board": {
@@ -4864,6 +4927,11 @@ export const da_DK: EnTranslations = {
       "quit": "Afslut",
       "fatalBody": "World of ClaudeCraft stødte på en uventet fejl og skal lukke."
     }
+  },
+  "gpuNotice": {
+    "bodyDesktop": "The game is running without GPU acceleration and will be slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
+    "bodyWeb": "The game is running without GPU acceleration and will be slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.",
+    "dismiss": "Dismiss"
   },
   "realm": {
     "noRealms": "Ingen verdener tilgængelige.",
@@ -8681,6 +8749,11 @@ export const da_DK: EnTranslations = {
         "title": "Det Forgyldte Pengeskrin",
         "greeting": "Velkommen til Det Forgyldte Pengeskrin. Dine varer hviler trygt bag vores låse."
       },
+      "card_master": {
+        "name": "Card Master",
+        "title": "Dealer of Chance",
+        "greeting": "Care for a Card Duel? Best of three, winner takes the bragging rights."
+      },
       "bursar_petra_vell": {
         "name": "Skatmester Petra Vell",
         "title": "Det Forgyldte Pengeskrin",
@@ -9815,7 +9888,7 @@ export const da_DK: EnTranslations = {
       },
       "necromancers": {
         "name": "Mournweave klæder",
-        "bonus2": "Du kan ikke stødes tilbage (100% modstand mod tilbagestød).",
+        "bonus2": "Øger magikraft med 20. Skade, du tager, forsinker ikke længere dine besværgelser (100% modstand mod fordrøjelse af besværgelser).",
         "bonus3": "Øger intellekt med 10 og udholdenhed med 10.",
         "bonus4": "Dine besværgelser har 10% chance for at give Klartrylleri, som gør din næste besværgelse gratis."
       },
@@ -9827,13 +9900,13 @@ export const da_DK: EnTranslations = {
       },
       "soulflame": {
         "name": "Wraithfire regalier",
-        "bonus2": "Du kan ikke stødes tilbage (100% modstand mod tilbagestød).",
+        "bonus2": "Øger magikraft med 20. Skade, du tager, forsinker ikke længere dine besværgelser (100% modstand mod fordrøjelse af besværgelser).",
         "bonus3": "Øger intellekt med 15, ånd med 15 og angrebs- og magihastighed med 15%.",
         "bonus4": "Dine besværgelser har 10% chance for at give Sjælebrand og øge besværgelseskraft med 40 i 10 sek."
       },
       "stormcallers": {
         "name": "Galecall klæder",
-        "bonus2": "Du kan ikke stødes tilbage (100% modstand mod tilbagestød).",
+        "bonus2": "Øger magikraft med 20. Skade, du tager, forsinker ikke længere dine besværgelser (100% modstand mod fordrøjelse af besværgelser).",
         "bonus3": "Øger intellekt med 15, ånd med 15 og angrebs- og magihastighed med 15%.",
         "bonus4": "Dine besværgelser har 10% chance for at give Sjælebrand og øge besværgelseskraft med 40 i 10 sek."
       },

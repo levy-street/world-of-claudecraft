@@ -366,6 +366,7 @@ export const cs_CZ: EnTranslations = {
       "spinButton": "Zatočit",
       "tasks": "Úkoly",
       "taskMultiplier": "násobitel x{multiplier}",
+      "oneVsOneExcluded": "Zápasy 1 proti 1 neudělují body denních odměn.",
       "pointsGained": "Získáno {points} bodů denních odměn.",
       "showChestButton": "Zobrazit truhlu",
       "hideChestButton": "Skrýt truhlu",
@@ -415,6 +416,18 @@ export const cs_CZ: EnTranslations = {
       "armoryEyebrow": "1. sezóna",
       "armoryTitle": "Zbrojnice",
       "armoryBody": "Omezené vzhledy zbraní ze Zbrojnice 1. sezóny. Platí pro celý účet, jsou čistě kosmetické a uvidí je všichni kolem tebe.",
+      "wallet": {
+        "title": "Solana wallet",
+        "unlinked": "Connect a wallet app, then sign once to link its public address to your WoC account. We never receive your recovery phrase or private key.",
+        "connectedUnlinked": "The wallet app is connected to this browser, but its public address is not linked to your WoC account yet.",
+        "linkedDisconnected": "Your public address is linked. Reconnect that wallet app when you want to pay with SOL or WOC.",
+        "linkedConnected": "Your linked wallet app is connected and ready for SOL or WOC purchases.",
+        "mismatched": "A different wallet is connected. Verify it to replace the linked address, or reconnect the linked wallet.",
+        "connect": "Connect wallet",
+        "verify": "Verify and link",
+        "reconnect": "Reconnect wallet",
+        "manage": "Manage wallet"
+      },
       "collectionLine": "Kolekce {collection}",
       "collections": {
         "guildmark": "Cechovní značka",
@@ -2199,9 +2212,10 @@ export const cs_CZ: EnTranslations = {
       "charTitleNone": "Žádný titul nezvolen",
       "charOpenBook": "Kniha skutků",
       "lbTab": "Věhlas",
-      "lbDeedsCol": "Skutky",
       "lbTitleCol": "Titul",
-      "lbSelf": "Tvoje umístění: pořadí {rank}, horních {percent} procent",
+      "lbScopeNote": "Accounts ranked by lifetime Renown. Each deed counts once across all characters on an account.",
+      "lbSelfAccount": "Your account: rank {rank}, top {percent} percent, {renown} Renown",
+      "lbSelfRank": "Your account: rank {rank}, top {percent} percent",
       "lbEmpty": "V žebříčku zatím nejsou žádní kronikáři.",
       "broadcastsLabel": "Sdílet vykonané skutky s cechem a přáteli",
       "titledName": "{name} [{title}]"
@@ -2305,6 +2319,9 @@ export const cs_CZ: EnTranslations = {
       "already_linked": "Tvůj účet už má propojený účet Steam.",
       "account_taken": "Tento účet Steam už je propojený s jiným účtem.",
       "upstream": "Steam neodpověděl. Zkus to za chvíli znovu."
+    },
+    "wallet": {
+      "handoff_invalid": "That wallet authorization expired or could not be verified. Try again."
     },
     "welcome": {
       "invalid_input": "Neplatný vstup."
@@ -3100,7 +3117,7 @@ export const cs_CZ: EnTranslations = {
       "howHeading": "Jak skutky fungují",
       "howBody": "Skutky se vykonávají a uchovávají vždy za jednu postavu, takže každý hrdina, za kterého hraješ, si buduje vlastní Knihu; teprve žebříček říše shromáždí tvůj věhlas napříč všemi tvými postavami a započítá každý skutek jen jednou. Každý skutek přímo v Knize skutků ve hře jasně říká, co od tebe žádá, takže vždy víš, za čím se hnát, a ty, o které usiluješ, si můžeš označit ke sledování, aby ti při hře zůstaly na očích. Malá hrstka jich zůstává tajných a odhalí se teprve tehdy, když je vykonáš. Kniha se také drží poctivě: cokoli tvůj dosavadní záznam dokáže doložit, připíše ti okamžitě, takže veterán ji nikdy neotevře na prázdné stránce; jen počítací skutky začínají svůj součet od nuly.",
       "renownHeading": "Věhlas",
-      "renownBody": "Věhlas je skóre, které stojí za Knihou. Každý vykonaný skutek má pevně danou hodnotu a tvůj součet jen roste, takže klidný týden tě nikdy nepřipraví o pozici. Hrstka skutků závisí spíš na štěstí než na umu a počiny jsou poctou samy o sobě, proto ani jedny nenesou žádný věhlas.",
+      "renownBody": "Renown is the score behind the Book. Every deed you earn is worth a set amount, and your total only ever climbs, so a quiet week never costs you ground. A handful of deeds turn on luck rather than skill, and Feats are an honor of their own, so both of those are worth no Renown at all. Deeds without Renown still count toward completion in your Book; they simply never score.",
       "rewardsHeading": "Tituly a rámečky",
       "rewardsBody": "Odměny jsou čistě na parádu, a přesně o to jde. Některé skutky udělují titul, který můžeš nosit, nebo rámeček, jenž orámuje tvé jméno, nikdy však nic, co by tvého hrdinu posílilo. Vyber si v Knize skutků titul, o který stojíš, a ponese se s tebou na jmenovce, v chatu i na žebříčcích, všem na očích.",
       "chroniclesHeading": "Kroniky",
@@ -3109,7 +3126,7 @@ export const cs_CZ: EnTranslations = {
       "featsBody": "Počiny stojí na zvláštní polici: záznamy odkazu a světových prvenství, skutky spjaté s minulou érou nebo s okamžikem, který se stane jen jednou. Nenesou žádný věhlas a nepočítají se do celkového dokončení; zůstávají navěky uchované jako památka na to, co bylo vykonáno.",
       "catalogHeading": "Úplný soupis skutků",
       "catalogBody": "Zde je každý skutek, který Kniha pojme, seřazený podle kategorií. Ty tajné tu záměrně chybí a čekají, až je objevíš. Otevři si Knihu skutků ve hře a uvidíš přesně, co který z nich žádá.",
-      "standingsNote": "Světy si vedou průběžný součet věhlasu napříč všemi účty. Chceš-li vidět, kdo si jak stojí, otevři ve hře žebříček a přejdi na jeho záložku Věhlas; pořadí žije tam, ne na wiki.",
+      "standingsNote": "The realms keep a running tally of Renown across every account: the board ranks whole accounts by lifetime Renown, counting each deed once across all your characters, and it shows Renown alone, so deeds that carry none never move the standings even though they count in your Book. To see who stands where, open the Leaderboard in game and turn to its Renown tab; the standings live there, not on the wiki.",
       "catHeading": "{label} ({count})",
       "colName": "Skutek",
       "colRenown": "Věhlas",
@@ -4025,6 +4042,9 @@ export const cs_CZ: EnTranslations = {
     "balancePreviewTitle": "Náhled zůstatku $WOC v připojené peněžence",
     "balancePreviewAria": "Náhled zůstatku připojené peněženky: {balance}. Pro ověření odznaku držitele peněženku propoj.",
     "balanceAmount": "{amount} $WOC",
+    "bagConnect": "Link wallet",
+    "bagLink": "Verify wallet",
+    "bagReconnect": "Reconnect wallet",
     "connected": "Připojeno: {address}",
     "connectedWithBalance": "Připojeno: {balance} - {address}",
     "connectedLinked": "Ověřeno: {address}",
@@ -4039,12 +4059,37 @@ export const cs_CZ: EnTranslations = {
     "helpLinkedDisconnected": "Výhody držitele jsou aktivní. Připoj aplikaci, až budeš potřebovat podepisovat nebo utrácet.",
     "helpLinkedDisconnectedWithBalance": "Výhody držitele jsou aktivní. Připoj aplikaci, až budeš potřebovat podepisovat nebo utrácet.",
     "extensionHelp": "Aby se tu peněženka zobrazila, nech aktivní rozšíření prohlížeče, například Solflare Wallet.",
+    "mobileAppHelp": "Choose Phantom or Solflare. Your wallet app will ask for approval. Keep this game open and return to it when finished.",
+    "standaloneAppHelp": "Wallet connections are not available in the Home Screen app yet. Open World of ClaudeCraft in Safari or Chrome to use Phantom or Solflare.",
+    "openAppTitle": "Continue in {wallet}",
+    "openAppHelp": "Open {wallet} to review this request. Keep this game tab open while the wallet app is active.",
+    "openAppButton": "Open {wallet}",
+    "manualReturnBrowserHelp": "After approval, return to this game tab. If iOS opens another browser, close it and return to the original browser manually.",
+    "manualReturnStandaloneHelp": "After approval, return to World of ClaudeCraft from your Home Screen. If iOS opens a browser, close it and reopen the Home Screen app manually.",
+    "preparingAppButton": "Preparing {wallet}...",
+    "walletAppUnavailable": "{wallet} could not be prepared. Close this window and try again.",
     "flowConnect": "Vyber peněženku. Ověření bude automaticky pokračovat.",
     "flowSign": "Podepiš ověřovací zprávu v aplikaci peněženky. Není potřeba žádná transakce ani SOL.",
     "flowVerify": "Ověřuje se vlastnictví peněženky...",
     "linkFailed": "Ověření peněženky selhalo.",
     "verifyFailed": "Ověření peněženky selhalo.",
     "unlinkFailed": "Peněženku se nepodařilo odpojit od účtu.",
+    "browser": {
+      "eyebrow": "Desktop wallet authorization",
+      "title": "Connect a Solana Wallet",
+      "linkBody": "Choose a wallet extension in this browser. You will sign a verification message, then return to the desktop app.",
+      "paymentBody": "Choose the wallet linked to your account and approve the transaction in this browser.",
+      "extensionHelp": "No compatible wallet extension was found. Install or unlock Phantom, Solflare, or another Solana browser wallet, then retry.",
+      "safety": "World of ClaudeCraft never asks for your recovery phrase or private key.",
+      "continueWith": "Continue with {wallet}",
+      "reviewTitle": "Review in your wallet",
+      "reviewBody": "Follow the prompt from {wallet}. Keep this browser page open.",
+      "completeTitle": "Wallet authorization complete",
+      "completeBody": "You can return to the World of ClaudeCraft desktop app.",
+      "returnButton": "Return to desktop app",
+      "failed": "Wallet authorization failed or expired. Return to the desktop app and try again.",
+      "retry": "Retry"
+    },
     "holder": "držitel $WOC",
     "holderTierTitle": "Držitel $WOC: {tier}",
     "holderTiers": {
@@ -4365,6 +4410,24 @@ export const cs_CZ: EnTranslations = {
   "heroicShop": {
     "balance": "Hrdinské značky: {count}",
     "buyAria": "Koupit {item} za {marks} hrdinských značek"
+  },
+  "cardDuel": {
+    "title": "Card Duel",
+    "close": "Close",
+    "join": "Join Queue",
+    "joinAria": "Join the Card Duel queue",
+    "leave": "Leave Queue",
+    "leaveAria": "Leave the Card Duel queue",
+    "forfeit": "Forfeit",
+    "forfeitAria": "Forfeit the Card Duel",
+    "queued": "Waiting for an opponent...",
+    "unavailable": "Card Duel requires another player online.",
+    "vsOpponent": "vs {name}",
+    "round": "Round score: {mine} - {theirs}",
+    "counts": "Deck: {deck} · Discard: {discard}",
+    "playCardAria": "Play the {value} card",
+    "waitingOnOpponent": "Waiting on your opponent's card...",
+    "yourTurn": "Play a card"
   },
   "delveUi": {
     "board": {
@@ -4864,6 +4927,11 @@ export const cs_CZ: EnTranslations = {
       "quit": "Ukončit",
       "fatalBody": "World of ClaudeCraft narazil na neočekávanou chybu a musí se zavřít."
     }
+  },
+  "gpuNotice": {
+    "bodyDesktop": "The game is running without GPU acceleration and will be slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
+    "bodyWeb": "The game is running without GPU acceleration and will be slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.",
+    "dismiss": "Dismiss"
   },
   "realm": {
     "noRealms": "Nejsou dostupné žádné světy.",
@@ -8681,6 +8749,11 @@ export const cs_CZ: EnTranslations = {
         "title": "Pozlacená truhlice",
         "greeting": "Vítej v Pozlacené truhlici. Tvé zboží odpočívá v bezpečí za našimi zámky."
       },
+      "card_master": {
+        "name": "Card Master",
+        "title": "Dealer of Chance",
+        "greeting": "Care for a Card Duel? Best of three, winner takes the bragging rights."
+      },
       "bursar_petra_vell": {
         "name": "Pokladní Petra Vell",
         "title": "Pozlacená truhlice",
@@ -9815,7 +9888,7 @@ export const cs_CZ: EnTranslations = {
       },
       "necromancers": {
         "name": "Oděv smutkotkaní",
-        "bonus2": "Nelze tě odhodit (100% odolnost proti odhození).",
+        "bonus2": "Zvyšuje sílu kouzel o 20. Utrpěné poškození již nezdržuje tvé sesílání kouzel (100% odolnost proti zdržení sesílání).",
         "bonus3": "Zvyšuje intelekt o 10 a výdrž o 10.",
         "bonus4": "Tvá kouzla mají 10% šanci udělit Jasné sesílání, díky němuž je tvé příští kouzlo zdarma."
       },
@@ -9827,13 +9900,13 @@ export const cs_CZ: EnTranslations = {
       },
       "soulflame": {
         "name": "Regálie přízračného ohně",
-        "bonus2": "Nelze tě odhodit (100% odolnost proti odhození).",
+        "bonus2": "Zvyšuje sílu kouzel o 20. Utrpěné poškození již nezdržuje tvé sesílání kouzel (100% odolnost proti zdržení sesílání).",
         "bonus3": "Zvyšuje intelekt o 15, ducha o 15 a rychlost útoku i sesílání o 15 %.",
         "bonus4": "Tvá kouzla mají 10% šanci udělit Dušový žár, který zvýší sílu kouzel o 40 na 10 s."
       },
       "stormcallers": {
         "name": "Roucha volání vichru",
-        "bonus2": "Nelze tě odhodit (100% odolnost proti odhození).",
+        "bonus2": "Zvyšuje sílu kouzel o 20. Utrpěné poškození již nezdržuje tvé sesílání kouzel (100% odolnost proti zdržení sesílání).",
         "bonus3": "Zvyšuje intelekt o 15, ducha o 15 a rychlost útoku i sesílání o 15 %.",
         "bonus4": "Tvá kouzla mají 10% šanci udělit Dušový žár, který zvýší sílu kouzel o 40 na 10 s."
       },

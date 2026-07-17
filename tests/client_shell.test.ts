@@ -802,22 +802,26 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain("'DiscordClick'");
   });
 
-  it('excludes wallet verification surfaces from native and desktop app builds', () => {
+  it('excludes wallet surfaces from native and Steam builds while allowing website desktop', () => {
     expect(hudCss).toContain('body.native-app #nav-btn-download,');
     expect(hudCss).toContain(
       'body.native-app .cs-wallet,\n  body.native-app .cs-wallet-hidden-note,\n  body.native-app .account-wallet-card',
     );
     expect(hudCss).toContain('body.native-app #performance-tip,');
-    expect(hudCss).toContain(
-      'body.desktop-app #token-ca,\n  body.desktop-app .cs-wallet,\n  body.desktop-app .cs-wallet-hidden-note,\n  body.desktop-app .account-wallet-card,\n  body.desktop-app .official-site-copy',
-    );
+    expect(hudCss).toContain('body.desktop-app #token-ca,\n  body.desktop-app .official-site-copy');
+    expect(hudCss).not.toContain('body.desktop-app .cs-wallet');
     expect(html).toContain('<section class="account-card account-wallet-card">');
     expect(mainTs).toContain("document.body.classList.toggle('desktop-app', DESKTOP_APP);");
-    expect(mainTs).toContain(
-      "!NATIVE_APP && !DESKTOP_APP && String(import.meta.env.VITE_WALLET_DISABLED ?? '').trim() !== '1';",
-    );
+    expect(mainTs).toContain('const walletCapabilityReady = resolveWalletCapability({');
+    expect(mainTs).toContain('nativeApp: NATIVE_APP,');
+    expect(mainTs).toContain('desktopApp: DESKTOP_APP,');
+    expect(mainTs).toContain('bridge: DESKTOP_APP ? desktopBridge() : null,');
     expect(mainTs).toContain("document.querySelector('.cs-wallet')?.remove();");
     expect(mainTs).toContain("document.querySelector('.account-wallet-card')?.remove();");
+    expect(mainTs).toContain("disconnectBtn.className = 'wallet-mini wallet-picker-disconnect';");
+    expect(mainTs).toContain("closeWalletPicker({ action: 'disconnect' });");
+    expect(mainTs).toContain('await openDesktopWalletManager();');
+    expect(shellCss).toContain('.wallet-picker-disconnect {');
   });
 
   it('skips the web mobile preflight in native builds and hard-gates portrait gameplay', () => {
@@ -1181,7 +1185,10 @@ describe('client HTML shell', () => {
       'bindTouchTap(this.resurrectCorpseBtnEl, () => this.sim.resurrectAtCorpse());',
     );
     expect(hudTs).toContain(
-      'bindTouchTap(this.resurrectHealerBtnEl, () => this.sim.resurrectAtSpiritHealer());',
+      'bindTouchTap(this.resurrectHealerBtnEl, () => this.onResurrectAtSpiritHealer?.());',
+    );
+    expect(mainTs).toContain(
+      'hud.onResurrectAtSpiritHealer = () => {\n    void stopAutorunForInteraction(world.resurrectAtSpiritHealer(), input, mobileControls);\n  };',
     );
     expect(hudTs).not.toMatch(
       /(?:releaseSpiritBtnEl|resurrectCorpseBtnEl|resurrectHealerBtnEl)\.addEventListener\('click'/,
@@ -1867,6 +1874,26 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain('top: -104px;');
     expect(hudMobileCss).toContain('body.mobile-touch #mobile-autorun-target.near,');
     expect(hudMobileCss).toContain('body.mobile-touch #mobile-autorun-target.locked {');
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-autorun-target.locked {\n    top: 50%;\n    z-index: 1;\n    transform: translate(-50%, -50%) scale(1);',
+    );
+    expect(hudMobileCss).toContain(
+      '@media (prefers-reduced-motion: reduce) {\n    body.mobile-touch #mobile-autorun-target {\n      transition: none;',
+    );
+    expect(mainTs).toContain(
+      "import { stopAutorunForInteraction } from './game/interaction_autorun';",
+    );
+    expect(mainTs).toContain("import { tryNearbyInteraction } from './game/nearby_interaction';");
+    expect(mainTs).toContain('stopAutorunForInteraction(\n      tryNearbyInteraction(');
+    expect(mainTs).toContain("t('errors.nothingInteract'),\n        online === null,");
+    expect(mainTs).toContain('const interactionOutcome = handlePickedEntity(');
+    expect(mainTs).toContain(
+      'isClickMoveButton &&\n        shouldApproachPickedEntity(world.player, e, didInteractImmediately, online === null)',
+    );
+    expect(mainTs).toContain(
+      'stopAutorunForInteraction(interactionOutcome, input, mobileControls);',
+    );
+    expect(mainTs).toContain('stopAutorunForInteraction(\n          handleGatherNodeInteract(');
     expect(hudMobileCss).not.toContain('body.mobile-touch #mobile-utility-cluster');
     expect(hudMobileCss).not.toContain('body.mobile-touch #mobile-autorun {');
     // The cast bar sits at the classic centre seat above the bottom-centre

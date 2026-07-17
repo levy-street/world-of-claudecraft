@@ -140,9 +140,37 @@ describe('SFX runtime playback profile', () => {
       normalizeSfxGainMap({
         version: 1,
         categoryBaselineDb: {},
-        keyTrimDb: { foot_grass: 1 },
+        // foot_grass has its own computed ceiling above the flat 0dB default
+        // now (see sfx_gain_ceiling.mjs), so this must clear ANY plausible
+        // per-key ceiling, not just the old flat one, to still be unsafe.
+        keyTrimDb: { foot_grass: 20 },
       }),
     ).toThrow('resolved gain for foot_grass');
+    // Accept-path counterpart to the two reject cases above: a custom key's
+    // computed ceiling (see sfx_gain_ceiling.mjs) sits above the flat 0dB a
+    // non-custom key like foot_grass is bound to, so a trim below its OWN
+    // ceiling but above the old flat max must be genuinely honored, not
+    // silently clamped back down to 0dB.
+    const belowCeiling = resolveSfxPlaybackProfile('foot_grass', {
+      gainMap: {
+        version: 1,
+        categoryBaselineDb: {},
+        keyTrimDb: { foot_grass: 5 },
+      },
+      speedMap: DEFAULT_SFX_SPEED_MAP,
+    });
+    expect(belowCeiling.gainDb).toBe(5);
+    expect(belowCeiling.gain).toBeGreaterThan(1);
+    // A non-custom key has no computed ceiling to raise it above the old
+    // flat 0dB max: the ceiling system is opt-in per key, not a blanket
+    // relaxation of the safety floor for everything.
+    expect(() =>
+      normalizeSfxGainMap({
+        version: 1,
+        categoryBaselineDb: {},
+        keyTrimDb: { ui_click: 5 },
+      }),
+    ).toThrow('resolved gain for ui_click');
     expect(() => normalizeSfxSpeedMap({ version: 1, rateByKey: { foot_grass: '1.2' } })).toThrow(
       'finite number',
     );

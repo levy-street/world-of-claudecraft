@@ -178,7 +178,13 @@ describe('WOC Store window contract', () => {
       hud.indexOf('// Spellbook window painter'),
     );
     expect(claudiumDeps).toContain("root: () => $('#claudium-window')");
+    expect(claudiumDeps).toContain('walletState: () => walletConnectionView()');
     expect(claudiumDeps).toContain('onVisibilityChange: () => this.syncAnyWindowOpenState()');
+    const walletUiSubscription = hud.slice(
+      hud.indexOf('onWalletUiChange(() => {'),
+      hud.indexOf("$('#pf-name').textContent"),
+    );
+    expect(walletUiSubscription).toContain('this.claudiumWindow.onWalletChanged();');
     const stackedLayers = componentsCss.match(
       /body\.store-stack-open #daily-rewards-window,\s*body\.store-stack-open #claudium-window \{([^}]*)\}/,
     );

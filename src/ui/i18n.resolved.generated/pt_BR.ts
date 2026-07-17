@@ -366,6 +366,7 @@ export const pt_BR: EnTranslations = {
       "spinButton": "Girar",
       "tasks": "Tarefas",
       "taskMultiplier": "Multiplicador x{multiplier}",
+      "oneVsOneExcluded": "Partidas 1 contra 1 não concedem pontos de recompensas diárias.",
       "pointsGained": "{points} pontos de recompensas diárias ganhos.",
       "showChestButton": "Mostrar Baú",
       "hideChestButton": "Ocultar Baú",
@@ -415,6 +416,18 @@ export const pt_BR: EnTranslations = {
       "armoryEyebrow": "Temporada 1",
       "armoryTitle": "O Arsenal",
       "armoryBody": "Visuais de arma em edição limitada do Arsenal da Temporada 1. Válidos para toda a conta, puramente cosméticos e visíveis a todos ao seu redor.",
+      "wallet": {
+        "title": "Solana wallet",
+        "unlinked": "Connect a wallet app, then sign once to link its public address to your WoC account. We never receive your recovery phrase or private key.",
+        "connectedUnlinked": "The wallet app is connected to this browser, but its public address is not linked to your WoC account yet.",
+        "linkedDisconnected": "Your public address is linked. Reconnect that wallet app when you want to pay with SOL or WOC.",
+        "linkedConnected": "Your linked wallet app is connected and ready for SOL or WOC purchases.",
+        "mismatched": "A different wallet is connected. Verify it to replace the linked address, or reconnect the linked wallet.",
+        "connect": "Connect wallet",
+        "verify": "Verify and link",
+        "reconnect": "Reconnect wallet",
+        "manage": "Manage wallet"
+      },
       "collectionLine": "Coleção {collection}",
       "collections": {
         "guildmark": "Marca da Guilda",
@@ -2199,9 +2212,10 @@ export const pt_BR: EnTranslations = {
       "charTitleNone": "Nenhum título escolhido",
       "charOpenBook": "Livro dos Feitos",
       "lbTab": "Renome",
-      "lbDeedsCol": "Feitos",
       "lbTitleCol": "Título",
-      "lbSelf": "Sua colocação: posição {rank}, entre os {percent} por cento melhores",
+      "lbScopeNote": "Accounts ranked by lifetime Renown. Each deed counts once across all characters on an account.",
+      "lbSelfAccount": "Your account: rank {rank}, top {percent} percent, {renown} Renown",
+      "lbSelfRank": "Your account: rank {rank}, top {percent} percent",
       "lbEmpty": "Ainda não há cronistas na classificação.",
       "broadcastsLabel": "Compartilhar feitos desbloqueados com a guilda e os amigos",
       "titledName": "{name} [{title}]"
@@ -2305,6 +2319,9 @@ export const pt_BR: EnTranslations = {
       "already_linked": "Sua conta já tem uma conta Steam vinculada.",
       "account_taken": "Essa conta Steam já está vinculada a outra conta.",
       "upstream": "O Steam não respondeu. Tente novamente em instantes."
+    },
+    "wallet": {
+      "handoff_invalid": "That wallet authorization expired or could not be verified. Try again."
     },
     "welcome": {
       "invalid_input": "Entrada inválida."
@@ -3100,7 +3117,7 @@ export const pt_BR: EnTranslations = {
       "howHeading": "Como funcionam os feitos",
       "howBody": "Os feitos são conquistados e guardados um personagem de cada vez, então cada herói que você joga forma um Livro só seu; só o Placar do reino reúne o seu Renome por todos os personagens que você joga, e conta cada feito uma única vez. Cada feito diz com clareza o que pede de você, ali mesmo no Livro dos Feitos dentro do jogo, então você sempre sabe o que perseguir, e pode acompanhar os que estiver caçando para mantê-los à vista enquanto joga. Uns poucos permanecem secretos e só se revelam depois de conquistados. O Livro também se mantém honesto: tudo o que o seu histórico passado puder comprovar, ele credita na hora, então um veterano nunca o abre numa página vazia; só os feitos de contagem começam sua conta do zero.",
       "renownHeading": "Renome",
-      "renownBody": "O Renome é a pontuação por trás do Livro. Cada feito conquistado vale uma quantia fixa, e seu total só sobe, então uma semana parada nunca faz você perder terreno. Um punhado de feitos depende mais de sorte do que de habilidade, e as Proezas são uma honraria à parte, então nenhum dos dois vale Renome algum.",
+      "renownBody": "Renown is the score behind the Book. Every deed you earn is worth a set amount, and your total only ever climbs, so a quiet week never costs you ground. A handful of deeds turn on luck rather than skill, and Feats are an honor of their own, so both of those are worth no Renown at all. Deeds without Renown still count toward completion in your Book; they simply never score.",
       "rewardsHeading": "Títulos e molduras",
       "rewardsBody": "As recompensas servem só para exibir, e é justamente essa a intenção. Alguns feitos concedem um título para ostentar ou uma moldura para o seu nome, e nunca nada que torne seu herói mais forte. Escolha o título que quiser no Livro dos Feitos e ele acompanha você na placa de nome, no chat e nos placares, para que todos vejam.",
       "chroniclesHeading": "Crônicas",
@@ -3109,7 +3126,7 @@ export const pt_BR: EnTranslations = {
       "featsBody": "As Proezas são uma prateleira à parte: registros de legado e de primazias mundiais, os feitos ligados a uma era que já passou ou a um momento que só vai acontecer uma vez. Elas não rendem Renome e ficam fora da contagem de conclusão, guardadas para sempre como memória do que foi feito.",
       "catalogHeading": "O rol completo de feitos",
       "catalogBody": "Aqui estão todos os feitos que o Livro pode guardar, reunidos por categoria. Os secretos ficam de fora de propósito, esperando que você os descubra. Abra o Livro dos Feitos no jogo para ver exatamente o que cada um pede.",
-      "standingsNote": "Os reinos mantêm uma contagem contínua de Renome de todas as contas. Para ver quem está onde, abra o Placar no jogo e vá até a aba de Renome; a classificação fica lá, não na wiki.",
+      "standingsNote": "The realms keep a running tally of Renown across every account: the board ranks whole accounts by lifetime Renown, counting each deed once across all your characters, and it shows Renown alone, so deeds that carry none never move the standings even though they count in your Book. To see who stands where, open the Leaderboard in game and turn to its Renown tab; the standings live there, not on the wiki.",
       "catHeading": "{label} ({count})",
       "colName": "Feito",
       "colRenown": "Renome",
@@ -4025,6 +4042,9 @@ export const pt_BR: EnTranslations = {
     "balancePreviewTitle": "Prévia do saldo $WOC da carteira conectada",
     "balancePreviewAria": "Prévia do saldo da carteira conectada: {balance}. Vincule a carteira para verificar o destaque de titular.",
     "balanceAmount": "{amount} $WOC",
+    "bagConnect": "Link wallet",
+    "bagLink": "Verify wallet",
+    "bagReconnect": "Reconnect wallet",
     "connected": "Conectada: {address}",
     "connectedWithBalance": "Conectada: {balance} - {address}",
     "connectedLinked": "Verificada: {address}",
@@ -4039,12 +4059,37 @@ export const pt_BR: EnTranslations = {
     "helpLinkedDisconnected": "As vantagens de titular estão ativas. Conecte o app quando precisar assinar ou gastar.",
     "helpLinkedDisconnectedWithBalance": "As vantagens de titular estão ativas. Conecte o app quando precisar assinar ou gastar.",
     "extensionHelp": "Para ver uma carteira aqui, mantenha ativa uma extensão de carteira do navegador, como a Solflare Wallet.",
+    "mobileAppHelp": "Choose Phantom or Solflare. Your wallet app will ask for approval. Keep this game open and return to it when finished.",
+    "standaloneAppHelp": "Wallet connections are not available in the Home Screen app yet. Open World of ClaudeCraft in Safari or Chrome to use Phantom or Solflare.",
+    "openAppTitle": "Continue in {wallet}",
+    "openAppHelp": "Open {wallet} to review this request. Keep this game tab open while the wallet app is active.",
+    "openAppButton": "Open {wallet}",
+    "manualReturnBrowserHelp": "After approval, return to this game tab. If iOS opens another browser, close it and return to the original browser manually.",
+    "manualReturnStandaloneHelp": "After approval, return to World of ClaudeCraft from your Home Screen. If iOS opens a browser, close it and reopen the Home Screen app manually.",
+    "preparingAppButton": "Preparing {wallet}...",
+    "walletAppUnavailable": "{wallet} could not be prepared. Close this window and try again.",
     "flowConnect": "Escolha uma carteira. A verificação continua automaticamente.",
     "flowSign": "Assine a mensagem de verificação no app da carteira. Não exige transação nem SOL.",
     "flowVerify": "Verificando a propriedade da carteira...",
     "linkFailed": "Falha na verificação da carteira.",
     "verifyFailed": "Falha na verificação da carteira.",
     "unlinkFailed": "Não foi possível desvincular a carteira.",
+    "browser": {
+      "eyebrow": "Desktop wallet authorization",
+      "title": "Connect a Solana Wallet",
+      "linkBody": "Choose a wallet extension in this browser. You will sign a verification message, then return to the desktop app.",
+      "paymentBody": "Choose the wallet linked to your account and approve the transaction in this browser.",
+      "extensionHelp": "No compatible wallet extension was found. Install or unlock Phantom, Solflare, or another Solana browser wallet, then retry.",
+      "safety": "World of ClaudeCraft never asks for your recovery phrase or private key.",
+      "continueWith": "Continue with {wallet}",
+      "reviewTitle": "Review in your wallet",
+      "reviewBody": "Follow the prompt from {wallet}. Keep this browser page open.",
+      "completeTitle": "Wallet authorization complete",
+      "completeBody": "You can return to the World of ClaudeCraft desktop app.",
+      "returnButton": "Return to desktop app",
+      "failed": "Wallet authorization failed or expired. Return to the desktop app and try again.",
+      "retry": "Retry"
+    },
     "holder": "Titular de $WOC",
     "holderTierTitle": "Titular de $WOC de nível {tier}",
     "holderTiers": {
@@ -4365,6 +4410,24 @@ export const pt_BR: EnTranslations = {
   "heroicShop": {
     "balance": "Marcas Heroicas: {count}",
     "buyAria": "Comprar {item} por {marks} Marcas Heroicas"
+  },
+  "cardDuel": {
+    "title": "Card Duel",
+    "close": "Close",
+    "join": "Join Queue",
+    "joinAria": "Join the Card Duel queue",
+    "leave": "Leave Queue",
+    "leaveAria": "Leave the Card Duel queue",
+    "forfeit": "Forfeit",
+    "forfeitAria": "Forfeit the Card Duel",
+    "queued": "Waiting for an opponent...",
+    "unavailable": "Card Duel requires another player online.",
+    "vsOpponent": "vs {name}",
+    "round": "Round score: {mine} - {theirs}",
+    "counts": "Deck: {deck} · Discard: {discard}",
+    "playCardAria": "Play the {value} card",
+    "waitingOnOpponent": "Waiting on your opponent's card...",
+    "yourTurn": "Play a card"
   },
   "delveUi": {
     "board": {
@@ -4864,6 +4927,11 @@ export const pt_BR: EnTranslations = {
       "quit": "Sair",
       "fatalBody": "O World of ClaudeCraft encontrou um erro inesperado e precisa fechar."
     }
+  },
+  "gpuNotice": {
+    "bodyDesktop": "The game is running without GPU acceleration and will be slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
+    "bodyWeb": "The game is running without GPU acceleration and will be slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.",
+    "dismiss": "Dismiss"
   },
   "realm": {
     "noRealms": "Nenhum mundo disponível.",
@@ -8681,6 +8749,11 @@ export const pt_BR: EnTranslations = {
         "title": "A Arca Dourada",
         "greeting": "Bem-vindo à Arca Dourada. Seus bens descansam seguros atrás das nossas fechaduras."
       },
+      "card_master": {
+        "name": "Card Master",
+        "title": "Dealer of Chance",
+        "greeting": "Care for a Card Duel? Best of three, winner takes the bragging rights."
+      },
       "bursar_petra_vell": {
         "name": "Tesoureira Petra Vell",
         "title": "A Arca Dourada",
@@ -9815,7 +9888,7 @@ export const pt_BR: EnTranslations = {
       },
       "necromancers": {
         "name": "Vestes Mournweave",
-        "bonus2": "Você não pode ser repelido (100% de resistência a repulsão).",
+        "bonus2": "Aumenta o poder mágico em 20. Dano recebido não atrasa mais suas conjurações (100% de resistência a atraso de conjuração).",
         "bonus3": "Aumenta o intelecto em 10 e o vigor em 10.",
         "bonus4": "Suas magias têm 10% de chance de conceder Conjuração Clara, tornando sua próxima magia gratuita."
       },
@@ -9827,13 +9900,13 @@ export const pt_BR: EnTranslations = {
       },
       "soulflame": {
         "name": "Vestes Wraithfire",
-        "bonus2": "Você não pode ser repelido (100% de resistência a repulsão).",
+        "bonus2": "Aumenta o poder mágico em 20. Dano recebido não atrasa mais suas conjurações (100% de resistência a atraso de conjuração).",
         "bonus3": "Aumenta o intelecto em 15, o espírito em 15 e a velocidade de ataque e de lançamento em 15%.",
         "bonus4": "Suas magias têm 10% de chance de conceder Chama da Alma, aumentando o poder mágico em 40 por 10 s."
       },
       "stormcallers": {
         "name": "Vestes Galecall",
-        "bonus2": "Você não pode ser repelido (100% de resistência a repulsão).",
+        "bonus2": "Aumenta o poder mágico em 20. Dano recebido não atrasa mais suas conjurações (100% de resistência a atraso de conjuração).",
         "bonus3": "Aumenta o intelecto em 15, o espírito em 15 e a velocidade de ataque e de lançamento em 15%.",
         "bonus4": "Suas magias têm 10% de chance de conceder Chama da Alma, aumentando o poder mágico em 40 por 10 s."
       },

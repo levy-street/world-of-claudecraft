@@ -273,6 +273,31 @@ const baseEnTable = {
   'aura.bonesplinter': 'Bonesplinter',
   'aura.raggedGash': 'Ragged Gash',
   'aura.soulblaze': 'Soulblaze',
+  // Card Duel minigame (Card Master NPC, src/sim/social/card_duel.ts).
+  'log.cardDuelQueued': 'You queue for a Card Duel.',
+  'log.cardDuelLeftQueue': 'You leave the Card Duel queue.',
+  'log.cardDuelBegins': 'Your Card Duel against {name} begins!',
+  // No-opponent-meta arms (the opponent's meta is gone, e.g. they left
+  // mid-match): distinct literals rather than an "?? 'an opponent'" style
+  // fallback interpolated into the templates above (root CLAUDE.md bans that
+  // pattern; the S3 guard only scrapes the outer literal so it cannot catch a
+  // fallback hidden inside a template string).
+  'log.cardDuelBeginsNoOpponent': 'Your Card Duel begins!',
+  'log.cardDuelRound': 'Card Duel round: you played {mine}, opponent played {theirs}.',
+  'log.cardDuelWin': 'You win the Card Duel against {name}!',
+  'log.cardDuelWinNoOpponent': 'You win the Card Duel!',
+  'log.cardDuelLoss': 'You lose the Card Duel against {name}.',
+  'log.cardDuelLossNoOpponent': 'You lose the Card Duel.',
+  'log.cardDuelForfeit': 'You forfeit the Card Duel.',
+  'log.cardDuelOpponentForfeited': 'Your opponent forfeited the Card Duel. You win!',
+  'log.cardDuelVoid': 'Your Card Duel is void: neither side played in time.',
+  'error.cardDuelNotAtMaster': 'You must be at the Card Master to queue for a Card Duel.',
+  'error.cardDuelNotInMatch': 'You are not in a Card Duel.',
+  'error.cardDuelAlreadyPlayed': 'You already played a card this round.',
+  'error.cardDuelNotHeld': "You don't hold that card.",
+  'error.cardDuelAlreadyInDuel': 'You are already in a Card Duel.',
+  'error.cardDuelAlreadyQueued': 'You are already queued for a Card Duel.',
+  'error.cardDuelUnavailable': 'Card Duel requires another player online.',
   // Dungeon Finder (src/sim/social/dungeon_finder.ts emits; docs/prd/dungeon-finder.md).
   'dfinder.needSpec': 'Choose a specialization to use the Dungeon Finder.',
   'dfinder.badRole': 'You cannot fill that role.',
@@ -6565,6 +6590,68 @@ const RULES: Rule[] = [
     re: /^(.+) unleashes (.+)!$/,
     build: (m) =>
       tSim('log.bossUnleashes', { name: locMob(m[1]), mechanic: locBossMechanic(m[2]) }),
+  },
+  // Card Duel minigame (Card Master NPC, src/sim/social/card_duel.ts).
+  { re: /^You queue for a Card Duel\.$/, build: () => tSim('log.cardDuelQueued') },
+  { re: /^You leave the Card Duel queue\.$/, build: () => tSim('log.cardDuelLeftQueue') },
+  {
+    re: /^Your Card Duel against (.+) begins!$/,
+    build: (m) => tSim('log.cardDuelBegins', { name: m[1] }),
+  },
+  {
+    re: /^Your Card Duel begins!$/,
+    build: () => tSim('log.cardDuelBeginsNoOpponent'),
+  },
+  {
+    re: /^Card Duel round: you played (.+), opponent played (.+)\.$/,
+    build: (m) => tSim('log.cardDuelRound', { mine: m[1], theirs: m[2] }),
+  },
+  {
+    re: /^You win the Card Duel against (.+)!$/,
+    build: (m) => tSim('log.cardDuelWin', { name: m[1] }),
+  },
+  {
+    re: /^You win the Card Duel!$/,
+    build: () => tSim('log.cardDuelWinNoOpponent'),
+  },
+  {
+    re: /^You lose the Card Duel against (.+)\.$/,
+    build: (m) => tSim('log.cardDuelLoss', { name: m[1] }),
+  },
+  {
+    re: /^You lose the Card Duel\.$/,
+    build: () => tSim('log.cardDuelLossNoOpponent'),
+  },
+  { re: /^You forfeit the Card Duel\.$/, build: () => tSim('log.cardDuelForfeit') },
+  {
+    re: /^Your opponent forfeited the Card Duel\. You win!$/,
+    build: () => tSim('log.cardDuelOpponentForfeited'),
+  },
+  {
+    re: /^Your Card Duel is void: neither side played in time\.$/,
+    build: () => tSim('log.cardDuelVoid'),
+  },
+  {
+    re: /^You must be at the Card Master to queue for a Card Duel\.$/,
+    build: () => tSim('error.cardDuelNotAtMaster'),
+  },
+  { re: /^You are not in a Card Duel\.$/, build: () => tSim('error.cardDuelNotInMatch') },
+  {
+    re: /^You already played a card this round\.$/,
+    build: () => tSim('error.cardDuelAlreadyPlayed'),
+  },
+  { re: /^You don't hold that card\.$/, build: () => tSim('error.cardDuelNotHeld') },
+  {
+    re: /^You are already in a Card Duel\.$/,
+    build: () => tSim('error.cardDuelAlreadyInDuel'),
+  },
+  {
+    re: /^You are already queued for a Card Duel\.$/,
+    build: () => tSim('error.cardDuelAlreadyQueued'),
+  },
+  {
+    re: /^Card Duel requires another player online\.$/,
+    build: () => tSim('error.cardDuelUnavailable'),
   },
 ];
 

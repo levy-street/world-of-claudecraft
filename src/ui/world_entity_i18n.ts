@@ -134,6 +134,7 @@ const NPC_IDS = [
   'loremaster_caddis',
   'auctioneer_voss', // second World Market auctioneer (Highwatch, zone 3)
   'bursar_fernando', // Gilded Strongbox banker (Eastbrook, zone 1)
+  'card_master', // Card Duel minigame queue desk (Eastbrook, zone 1)
   'bursar_petra_vell', // Gilded Strongbox banker (Fenbridge, zone 2)
   'bursar_aldous_crane', // Gilded Strongbox banker (Highwatch, zone 3)
   'brother_aldric_raid', // dynamically-spawned raid turn-in NPC (Crypt of Nythraxis)

@@ -366,6 +366,7 @@ export const de_DE: EnTranslations = {
       "spinButton": "Drehen",
       "tasks": "Aufgaben",
       "taskMultiplier": "x{multiplier}-Multiplikator",
+      "oneVsOneExcluded": "1-gegen-1-Matches gewähren keine Punkte für tägliche Belohnungen.",
       "pointsGained": "{points} Punkte für tägliche Belohnungen erhalten.",
       "showChestButton": "Truhe anzeigen",
       "hideChestButton": "Truhe ausblenden",
@@ -415,6 +416,18 @@ export const de_DE: EnTranslations = {
       "armoryEyebrow": "Saison 1",
       "armoryTitle": "Die Waffenkammer",
       "armoryBody": "Limitierte Waffenskins aus der Waffenkammer von Saison 1. Accountweit, rein kosmetisch und für alle in deiner Umgebung sichtbar.",
+      "wallet": {
+        "title": "Solana wallet",
+        "unlinked": "Connect a wallet app, then sign once to link its public address to your WoC account. We never receive your recovery phrase or private key.",
+        "connectedUnlinked": "The wallet app is connected to this browser, but its public address is not linked to your WoC account yet.",
+        "linkedDisconnected": "Your public address is linked. Reconnect that wallet app when you want to pay with SOL or WOC.",
+        "linkedConnected": "Your linked wallet app is connected and ready for SOL or WOC purchases.",
+        "mismatched": "A different wallet is connected. Verify it to replace the linked address, or reconnect the linked wallet.",
+        "connect": "Connect wallet",
+        "verify": "Verify and link",
+        "reconnect": "Reconnect wallet",
+        "manage": "Manage wallet"
+      },
       "collectionLine": "Kollektion: {collection}",
       "collections": {
         "guildmark": "Gildenzeichen",
@@ -2199,9 +2212,10 @@ export const de_DE: EnTranslations = {
       "charTitleNone": "Kein Titel gewählt",
       "charOpenBook": "Buch der Taten",
       "lbTab": "Ansehen",
-      "lbDeedsCol": "Taten",
       "lbTitleCol": "Titel",
-      "lbSelf": "Deine Platzierung: Rang {rank}, unter den besten {percent} Prozent",
+      "lbScopeNote": "Accounts ranked by lifetime Renown. Each deed counts once across all characters on an account.",
+      "lbSelfAccount": "Your account: rank {rank}, top {percent} percent, {renown} Renown",
+      "lbSelfRank": "Your account: rank {rank}, top {percent} percent",
       "lbEmpty": "Noch keine platzierten Chronisten.",
       "broadcastsLabel": "Errungene Taten mit Gilde und Freunden teilen",
       "titledName": "{name} [{title}]"
@@ -2305,6 +2319,9 @@ export const de_DE: EnTranslations = {
       "already_linked": "Dein Konto ist bereits mit einem Steam-Konto verknüpft.",
       "account_taken": "Dieses Steam-Konto ist bereits mit einem anderen Konto verknüpft.",
       "upstream": "Steam hat nicht geantwortet. Versuch es gleich noch einmal."
+    },
+    "wallet": {
+      "handoff_invalid": "That wallet authorization expired or could not be verified. Try again."
     },
     "welcome": {
       "invalid_input": "Ungültige Eingabe."
@@ -3100,7 +3117,7 @@ export const de_DE: EnTranslations = {
       "howHeading": "So funktionieren Taten",
       "howBody": "Taten werden mit jeweils einem Charakter errungen und behalten, sodass jeder Held, den du spielst, ein eigenes Buch aufbaut; erst die Bestenliste des Reiches sammelt dein Ansehen über alle Charaktere hinweg, die du spielst, und zählt jede Tat nur ein einziges Mal. Jede Tat benennt klar und deutlich, was sie von dir verlangt, direkt im Buch der Taten im Spiel, sodass du immer weißt, was es zu erjagen gilt; und die Taten, hinter denen du her bist, kannst du verfolgen, um sie beim Spielen im Blick zu behalten. Einige wenige bleiben geheim und geben sich erst zu erkennen, wenn du sie errungen hast. Das Buch hält sich auch selbst ehrlich: Was immer deine bisherige Bilanz belegen kann, schreibt es dir sofort gut, sodass ein Veteran es nie mit leerer Seite aufschlägt; nur die zählenden Taten beginnen ihre Zählung von neuem.",
       "renownHeading": "Ansehen",
-      "renownBody": "Ansehen ist die Wertung hinter dem Buch. Jede errungene Tat ist einen festen Betrag wert, und deine Summe kann nur steigen, eine ruhige Woche kostet dich also nie Boden. Eine Handvoll Taten hängt eher vom Glück als vom Können ab, und Heldentaten sind eine Ehre für sich; beide bringen daher überhaupt kein Ansehen.",
+      "renownBody": "Renown is the score behind the Book. Every deed you earn is worth a set amount, and your total only ever climbs, so a quiet week never costs you ground. A handful of deeds turn on luck rather than skill, and Feats are an honor of their own, so both of those are worth no Renown at all. Deeds without Renown still count toward completion in your Book; they simply never score.",
       "rewardsHeading": "Titel und Rahmen",
       "rewardsBody": "Die Belohnungen sind reine Zierde, und genau das ist der Sinn. Manche Taten verleihen einen Titel, den du tragen kannst, oder einen Rahmen für deinen Namen, aber niemals etwas, das deinen Helden stärker macht. Wähle im Buch der Taten den Titel, der dir gefällt, und er begleitet dich auf deinem Namensschild, im Chat und auf den Ranglisten, für alle sichtbar.",
       "chroniclesHeading": "Chroniken",
@@ -3109,7 +3126,7 @@ export const de_DE: EnTranslations = {
       "featsBody": "Heldentaten stehen auf einem eigenen Regal: Zeugnisse vergangener Zeiten und Welterster, Taten, die an eine vergangene Ära oder einen Moment gebunden sind, der nur ein einziges Mal geschieht. Sie bringen kein Ansehen und fließen nicht in die Abschlusszählung ein, sondern bleiben für immer als Erinnerung an das Vollbrachte erhalten.",
       "catalogHeading": "Das vollständige Tatenverzeichnis",
       "catalogBody": "Hier steht jede Tat, die das Buch fassen kann, geordnet nach Kategorie. Die geheimen fehlen mit Absicht; sie warten darauf, dass du sie findest. Öffne das Buch der Taten im Spiel, um genau zu sehen, was jede einzelne verlangt.",
-      "standingsNote": "Die Reiche führen eine laufende Zählung des Ansehens über alle Konten hinweg. Um zu sehen, wer wo steht, öffne die Bestenliste im Spiel und wechsle zu ihrem Ansehen-Reiter; die Platzierungen sind dort zu Hause, nicht im Wiki.",
+      "standingsNote": "The realms keep a running tally of Renown across every account: the board ranks whole accounts by lifetime Renown, counting each deed once across all your characters, and it shows Renown alone, so deeds that carry none never move the standings even though they count in your Book. To see who stands where, open the Leaderboard in game and turn to its Renown tab; the standings live there, not on the wiki.",
       "catHeading": "{label} ({count})",
       "colName": "Tat",
       "colRenown": "Ansehen",
@@ -4025,6 +4042,9 @@ export const de_DE: EnTranslations = {
     "balancePreviewTitle": "Vorschau auf das $WOC-Guthaben des verbundenen Wallets",
     "balancePreviewAria": "Vorschau auf das Guthaben des verbundenen Wallets: {balance}. Verknüpft das Wallet, um das Inhaber-Flair zu verifizieren.",
     "balanceAmount": "{amount} $WOC",
+    "bagConnect": "Link wallet",
+    "bagLink": "Verify wallet",
+    "bagReconnect": "Reconnect wallet",
     "connected": "Verbunden: {address}",
     "connectedWithBalance": "Verbunden: {balance} - {address}",
     "connectedLinked": "Verifiziert: {address}",
@@ -4039,12 +4059,37 @@ export const de_DE: EnTranslations = {
     "helpLinkedDisconnected": "Inhaberboni sind aktiv. Verbindet die App, wenn Ihr unterschreiben oder ausgeben müsst.",
     "helpLinkedDisconnectedWithBalance": "Inhaberboni sind aktiv. Verbindet die App, wenn Ihr unterschreiben oder ausgeben müsst.",
     "extensionHelp": "Damit hier eine Wallet erscheint, halte eine Browser-Wallet-Erweiterung wie Solflare Wallet aktiv.",
+    "mobileAppHelp": "Choose Phantom or Solflare. Your wallet app will ask for approval. Keep this game open and return to it when finished.",
+    "standaloneAppHelp": "Wallet connections are not available in the Home Screen app yet. Open World of ClaudeCraft in Safari or Chrome to use Phantom or Solflare.",
+    "openAppTitle": "Continue in {wallet}",
+    "openAppHelp": "Open {wallet} to review this request. Keep this game tab open while the wallet app is active.",
+    "openAppButton": "Open {wallet}",
+    "manualReturnBrowserHelp": "After approval, return to this game tab. If iOS opens another browser, close it and return to the original browser manually.",
+    "manualReturnStandaloneHelp": "After approval, return to World of ClaudeCraft from your Home Screen. If iOS opens a browser, close it and reopen the Home Screen app manually.",
+    "preparingAppButton": "Preparing {wallet}...",
+    "walletAppUnavailable": "{wallet} could not be prepared. Close this window and try again.",
     "flowConnect": "Wählt ein Wallet. Die Verifizierung läuft automatisch weiter.",
     "flowSign": "Unterschreibt die Verifizierungsnachricht in Eurer Wallet-App. Keine Transaktion und kein SOL erforderlich.",
     "flowVerify": "Wallet-Besitz wird verifiziert...",
     "linkFailed": "Wallet-Verifizierung fehlgeschlagen.",
     "verifyFailed": "Wallet-Verifizierung fehlgeschlagen.",
     "unlinkFailed": "Wallet konnte nicht getrennt werden.",
+    "browser": {
+      "eyebrow": "Desktop wallet authorization",
+      "title": "Connect a Solana Wallet",
+      "linkBody": "Choose a wallet extension in this browser. You will sign a verification message, then return to the desktop app.",
+      "paymentBody": "Choose the wallet linked to your account and approve the transaction in this browser.",
+      "extensionHelp": "No compatible wallet extension was found. Install or unlock Phantom, Solflare, or another Solana browser wallet, then retry.",
+      "safety": "World of ClaudeCraft never asks for your recovery phrase or private key.",
+      "continueWith": "Continue with {wallet}",
+      "reviewTitle": "Review in your wallet",
+      "reviewBody": "Follow the prompt from {wallet}. Keep this browser page open.",
+      "completeTitle": "Wallet authorization complete",
+      "completeBody": "You can return to the World of ClaudeCraft desktop app.",
+      "returnButton": "Return to desktop app",
+      "failed": "Wallet authorization failed or expired. Return to the desktop app and try again.",
+      "retry": "Retry"
+    },
     "holder": "$WOC-Inhaber",
     "holderTierTitle": "$WOC-Inhaber mit Rang {tier}",
     "holderTiers": {
@@ -4365,6 +4410,24 @@ export const de_DE: EnTranslations = {
   "heroicShop": {
     "balance": "Heroische Marken: {count}",
     "buyAria": "{item} für {marks} Heroische Marken kaufen"
+  },
+  "cardDuel": {
+    "title": "Card Duel",
+    "close": "Close",
+    "join": "Join Queue",
+    "joinAria": "Join the Card Duel queue",
+    "leave": "Leave Queue",
+    "leaveAria": "Leave the Card Duel queue",
+    "forfeit": "Forfeit",
+    "forfeitAria": "Forfeit the Card Duel",
+    "queued": "Waiting for an opponent...",
+    "unavailable": "Card Duel requires another player online.",
+    "vsOpponent": "vs {name}",
+    "round": "Round score: {mine} - {theirs}",
+    "counts": "Deck: {deck} · Discard: {discard}",
+    "playCardAria": "Play the {value} card",
+    "waitingOnOpponent": "Waiting on your opponent's card...",
+    "yourTurn": "Play a card"
   },
   "delveUi": {
     "board": {
@@ -4864,6 +4927,11 @@ export const de_DE: EnTranslations = {
       "quit": "Beenden",
       "fatalBody": "World of ClaudeCraft ist auf einen unerwarteten Fehler gestoßen und muss geschlossen werden."
     }
+  },
+  "gpuNotice": {
+    "bodyDesktop": "The game is running without GPU acceleration and will be slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
+    "bodyWeb": "The game is running without GPU acceleration and will be slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.",
+    "dismiss": "Dismiss"
   },
   "realm": {
     "noRealms": "Keine Welten verfügbar.",
@@ -8681,6 +8749,11 @@ export const de_DE: EnTranslations = {
         "title": "Die Vergoldete Schatulle",
         "greeting": "Willkommen bei der Vergoldeten Schatulle. Deine Waren ruhen sicher hinter unseren Schlössern."
       },
+      "card_master": {
+        "name": "Card Master",
+        "title": "Dealer of Chance",
+        "greeting": "Care for a Card Duel? Best of three, winner takes the bragging rights."
+      },
       "bursar_petra_vell": {
         "name": "Kämmerin Petra Vell",
         "title": "Die Vergoldete Schatulle",
@@ -9815,7 +9888,7 @@ export const de_DE: EnTranslations = {
       },
       "necromancers": {
         "name": "Mournweave-Gewänder",
-        "bonus2": "Ihr könnt nicht zurückgestoßen werden (100% Rückstoßwiderstand).",
+        "bonus2": "Erhöht Zaubermacht um 20. Erlittener Schaden verzögert Eure Zauber nicht mehr (100% Widerstand gegen Zauberverzögerung).",
         "bonus3": "Erhöht Intelligenz um 10 und Ausdauer um 10.",
         "bonus4": "Eure Zauber haben eine Chance von 10%, Klarsicht zu gewähren, wodurch euer nächster Zauber kostenlos wird."
       },
@@ -9827,13 +9900,13 @@ export const de_DE: EnTranslations = {
       },
       "soulflame": {
         "name": "Wraithfire-Gewänder",
-        "bonus2": "Ihr könnt nicht zurückgestoßen werden (100% Rückstoßwiderstand).",
+        "bonus2": "Erhöht Zaubermacht um 20. Erlittener Schaden verzögert Eure Zauber nicht mehr (100% Widerstand gegen Zauberverzögerung).",
         "bonus3": "Erhöht Intelligenz um 15, Willenskraft um 15 sowie Angriffs- und Zaubertempo um 15%.",
         "bonus4": "Eure Zauber haben eine Chance von 10%, Seelenbrand zu gewähren, was die Zaubermacht 10 Sek. lang um 40 erhöht."
       },
       "stormcallers": {
         "name": "Galecall-Gewänder",
-        "bonus2": "Ihr könnt nicht zurückgestoßen werden (100% Rückstoßwiderstand).",
+        "bonus2": "Erhöht Zaubermacht um 20. Erlittener Schaden verzögert Eure Zauber nicht mehr (100% Widerstand gegen Zauberverzögerung).",
         "bonus3": "Erhöht Intelligenz um 15, Willenskraft um 15 sowie Angriffs- und Zaubertempo um 15%.",
         "bonus4": "Eure Zauber haben eine Chance von 10%, Seelenbrand zu gewähren, was die Zaubermacht 10 Sek. lang um 40 erhöht."
       },

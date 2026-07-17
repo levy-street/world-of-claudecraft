@@ -32,6 +32,7 @@ import {
   setClaudiumDbForTests,
 } from '../../server/claudium';
 import { claudiumSpend, claudiumStore, claudiumStripeWebhook } from '../../server/claudium_proxy';
+import { desktopWalletHandoffs } from '../../server/desktop_wallet_handoff';
 import { compose } from '../../server/http/compose';
 import {
   CLAUDIUM_CONFIRM_MAX_PER_MINUTE,
@@ -72,6 +73,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  desktopWalletHandoffs.clear();
   resetClaudiumDbForTests();
   resetClaudiumMutationRateLimits();
   vi.unstubAllEnvs();
@@ -749,6 +751,7 @@ describe('Claudium economy-service transport contract', () => {
   it('accepts USDC as a native quote rail', async () => {
     vi.stubEnv('WOC_ECONOMY_SERVICE_URL', 'https://economy.example/v1/claudium/');
     vi.stubEnv('WOC_ECONOMY_INTERNAL_SECRET', 'test-secret');
+    const quoteExpiryMs = Date.now() + 60_000;
     const fetchMock = vi.fn(
       async (_input: string | URL | Request, _init?: RequestInit) =>
         new Response(
@@ -760,7 +763,7 @@ describe('Claudium economy-service transport contract', () => {
             destination: 'treasury-owner',
             mint: 'usdc-mint',
             memo: 'CLM_usdc',
-            quoteExpiryMs: 123456,
+            quoteExpiryMs,
             transactionBase64: 'transaction',
           }),
           { status: 200 },
@@ -785,6 +788,16 @@ describe('Claudium economy-service transport contract', () => {
       reference: 'CLM_usdc',
       rail: 'usdc',
       amountBase: '4990000',
+    });
+    const created = desktopWalletHandoffs.createTransaction(7, '198.51.100.8', {
+      reference: 'CLM_usdc',
+      expectedAddress: 'payer-address',
+    });
+    expect(desktopWalletHandoffs.claim(created.code, '198.51.100.8')).toMatchObject({
+      kind: 'transaction',
+      reference: 'CLM_usdc',
+      transactionBase64: 'transaction',
+      rail: 'usdc',
     });
     expect(JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body))).toEqual({
       rail: 'usdc',

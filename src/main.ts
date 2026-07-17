@@ -33,12 +33,14 @@ import { GamepadBindings } from './game/gamepad_bindings';
 import { handleGatherNodeInteract } from './game/gather_node_interact';
 import { Input } from './game/input';
 import { InputActivityMeter, installInputActivityTracking } from './game/input_activity';
+import { stopAutorunForInteraction } from './game/interaction_autorun';
 import {
   activePvpOpponentIds,
   HoverPickGate,
   handlePickedEntity,
   hoverCursorKind,
   isAttackableEntity,
+  shouldApproachPickedEntity,
 } from './game/interactions';
 import { createIntroLogoOverlay } from './game/intro_logo_overlay';
 import { Keybinds } from './game/keybinds';
@@ -57,6 +59,7 @@ import { applyMobileHudLayout } from './game/mobile_hud_layout_applier';
 import { mouselookReleaseFacing } from './game/mouselook_release';
 import { diagonalMovementVisualFacing } from './game/movement_visual';
 import { music } from './game/music';
+import { tryNearbyInteraction } from './game/nearby_interaction';
 import { createPerfMonitor } from './game/perf';
 import { startPerfReporter } from './game/perf_reporter';
 import { adaptiveSelfAlphaLead } from './game/self_alpha_lead';
@@ -67,6 +70,7 @@ import {
   Settings,
 } from './game/settings';
 import { sfx } from './game/sfx';
+import { initSoftwareRenderNotice } from './game/software_render_notice';
 import {
   recordSkipTap,
   type SpawnCinematic,
@@ -83,7 +87,16 @@ import {
   sortCharacters,
 } from './net/char_sort';
 import { charselectPrimaryAction } from './net/charselect_action';
+import { performDesktopWalletHandoff } from './net/desktop_wallet_handoff';
+import {
+  desktopWalletManagerAction,
+  desktopWalletManagerView,
+  disconnectDesktopWalletSession,
+} from './net/desktop_wallet_manager';
 import { EconomyClient, newIdempotencyKey, startClaudiumPurchase } from './net/economy_sdk';
+// The wallet module is loaded lazily via dynamic import() in the wallet
+// controller below, so it stays out of the main entry chunk and only loads when
+// the feature is enabled + used.
 import {
   isAppleAuthorizationCancellation,
   isNativeIos,
@@ -117,10 +130,9 @@ import {
   savePlayMarker,
 } from './net/resume_play';
 import { openStripeCheckout } from './net/stripe_checkout';
-// The wallet module is loaded lazily via dynamic import() in the wallet
-// controller below, so it stays out of the main entry chunk and only loads when
-// the feature is enabled + used.
-import type { WalletOption } from './net/wallet';
+import type { WalletOption, WalletPickerMode, WalletPickerResult } from './net/wallet';
+import { resolveWalletCapability } from './net/wallet_capability';
+import { installWalletResumeHandlers } from './net/wallet_resume';
 import { assetsReady } from './render/assets/preload';
 import { CharacterPreview, type PreviewAppearance } from './render/characters';
 import { preloadMechAssets } from './render/characters/assets';
@@ -143,7 +155,6 @@ import { TAB_NEAR_RADIUS, TAB_QUERY_RADIUS, tabConeHalfAt } from './sim/tab_targ
 import {
   DT,
   dist2d,
-  INTERACT_RANGE,
   MELEE_RANGE,
   type PlayerClass,
   RUN_SPEED,
@@ -175,6 +186,7 @@ import {
 import { deleteCharButtonHtml } from './ui/char_delete_button';
 import { ChatCommandMenu } from './ui/chat_command_menu';
 import { CLASS_DETAILS, SIGNATURE_ABILITIES } from './ui/class_details_data';
+import { claudiumBalanceAddress } from './ui/claudium_view';
 import { ensureDeedLocalesLoaded } from './ui/deed_i18n';
 import { isDevGuiCommand } from './ui/dev_command_view';
 import { devTierByIndex, devTierDisplayName } from './ui/dev_tier';
@@ -221,6 +233,7 @@ import {
 import { defaultIconPrewarmEntries, prewarmIconCache } from './ui/icon_prewarm';
 import { iconDataUrl } from './ui/icons';
 import { createLoadingTipRotation, type LoadingTipRotation } from './ui/loading_tips';
+import { showMobileWalletLauncher } from './ui/mobile_wallet_launcher';
 import { applyNativeDeviceLanguage } from './ui/native_language';
 import { scheduleNativeUpdateCheck } from './ui/native_update_prompt';
 import { loadNewsInto } from './ui/news_feed';
@@ -244,11 +257,13 @@ import { UiEffectsApplier } from './ui/ui_effects_applier';
 import { hydrateIcons } from './ui/ui_icons';
 import {
   resolveWocBalanceUpdate,
+  setWalletConnectionAddresses,
   setWalletDisplayAvailable,
   setWalletUiEnabled,
   setWocBalance,
   shouldDisconnectUnverifiedWallet,
 } from './ui/wallet_balance';
+import { buildWalletConnectionView } from './ui/wallet_connection_view';
 import {
   mountWelcomeScreen,
   takeArmoryOpenIntent,
@@ -1005,6 +1020,9 @@ async function startGame(
       renderer.enableTargetConeDebug(tabConeHalfAt, TAB_NEAR_RADIUS, TAB_QUERY_RADIUS);
     }
     perf.setRenderer(renderer);
+    // One-time software-rendering notice (WARP/SwiftShader): the Renderer
+    // constructor ran initGfxTier, so the adapter verdict is resolved by now.
+    initSoftwareRenderNotice(DESKTOP_APP);
     hud = new Hud(world, renderer, keybinds, {
       dailyRewardsEnabled: !NATIVE_APP,
       devCommandsEnabled: import.meta.env.DEV,
@@ -1364,6 +1382,9 @@ async function startGame(
     onRecenterCamera: () => input.recenterCameraBehind(world.player.facing),
   });
   mobileControls.start();
+  hud.onResurrectAtSpiritHealer = () => {
+    void stopAutorunForInteraction(world.resurrectAtSpiritHealer(), input, mobileControls);
+  };
   // reflect the current music state on the touch toggle (it may already be off
   // from a prior session, persisted in localStorage)
   document.getElementById('mobile-music')?.classList.toggle('mm-muted', !music.enabled);
@@ -1982,9 +2003,39 @@ async function startGame(
             nativeRails: pack.nativeRails,
           };
         }
-        const { balance, skus, nativeRails } = pack;
+        const { balance, skus } = pack;
+        const walletEnabled = await walletCapabilityReady;
+        const nativeRails = walletEnabled
+          ? pack.nativeRails
+          : { ...pack.nativeRails, sol: false, usdc: false, woc: false };
+        if (!walletEnabled) {
+          return {
+            available: true,
+            balance,
+            skus,
+            nativeRails,
+            walletBalances: { solLamports: null, usdcBaseUnits: null, wocBaseUnits: null },
+            nativePrices: skus.map((row) => ({
+              sku: row.sku,
+              solAmountBase: null,
+              usdcAmountBase: null,
+              wocAmountBase: null,
+            })),
+          };
+        }
         const wallet = await loadWallet();
-        const walletAddress = wallet.currentWallet().address;
+        // Read the crypto-rail balances from the actively connected wallet, but fall back
+        // to the account's LINKED (verified) wallet when nothing is connected this session.
+        // The player card shows the linked balance even while the extension is disconnected,
+        // so without this fallback a linked-but-disconnected player sees "130k $WOC" yet
+        // every SOL/USDC/WOC buy button stays disabled (null balance => unaffordable). With
+        // it the button enables on the linked balance; the buy click then surfaces the
+        // existing "connect a wallet first" prompt so they connect to sign, instead of
+        // hitting a dead button. Selection pinned by tests/claudium_view.test.ts.
+        const walletAddress = claudiumBalanceAddress(
+          wallet.currentWallet().address,
+          linkedWalletPubkey,
+        );
         const [solBalance, usdcBalance, wocBalance] = walletAddress
           ? await Promise.all([
               economy.solBalance(walletAddress),
@@ -2026,6 +2077,10 @@ async function startGame(
             void hud.refreshClaudium();
           };
           const result = await startClaudiumPurchase(economy, rail, sku, {
+            nativePayer:
+              desktopWalletBrowserHandoffAvailable() && linkedWalletPubkey
+                ? linkedWalletPubkey
+                : undefined,
             stripe: (intent) =>
               openStripeCheckout(
                 intent,
@@ -2044,7 +2099,21 @@ async function startGame(
                   },
                 },
               ),
-            nativeSignAndSend: async (transactionBase64) => {
+            nativeSignAndSend: async (transactionBase64, _rail, reference) => {
+              if (desktopWalletBrowserHandoffAvailable()) {
+                if (!linkedWalletPubkey) throw new Error('connect a wallet first');
+                const result = await authorizeDesktopWalletInBrowser({
+                  kind: 'transaction',
+                  reference,
+                  expectedAddress: linkedWalletPubkey,
+                });
+                if (result.kind !== 'transaction') {
+                  throw new Error('wallet returned an invalid transaction authorization');
+                }
+                desktopWalletBrowserSessionActive = true;
+                updateWalletButton();
+                return result.signature;
+              }
               const wallet = await loadWallet();
               return wallet.signAndSendTransactionBase64(transactionBase64);
             },
@@ -2100,100 +2169,19 @@ async function startGame(
     }
   }
   function interactKey(): void {
-    const p = world.player;
-    let bestCorpse: number | null = null,
-      bestCorpseD = INTERACT_RANGE;
-    let bestObj: number | null = null,
-      bestObjD = INTERACT_RANGE;
-    let bestNpc: number | null = null,
-      bestNpcD = INTERACT_RANGE + 1;
-    // Delve interactables (warded chest, cracked grave, sealed/tombstone passage,
-    // surface stairs) are driven through delveInteract, not the generic pickup
-    // path, the sim owns their per-object proximity + state gating and the
-    // lockpick offer. Selected a touch wider than INTERACT_RANGE so the sim can
-    // emit its precise "move closer to the chest/passage" hint.
-    let bestDelve: number | null = null,
-      bestDelveD = INTERACT_RANGE + 1;
-    // Gather nodes (#1866) are static content (src/sim/data GATHER_NODES), not
-    // entities, so they get their own nearest-in-range scan alongside the
-    // entity loop below rather than living inside it.
-    let bestNode: (typeof GATHER_NODES)[number] | null = null,
-      bestNodeD = INTERACT_RANGE;
-    for (const node of GATHER_NODES) {
-      const d = dist2d(p.pos, { x: node.pos.x, y: p.pos.y, z: node.pos.z });
-      if (d < bestNodeD) {
-        bestNode = node;
-        bestNodeD = d;
-      }
-    }
-    for (const e of world.entities.values()) {
-      const d = dist2d(p.pos, e.pos);
-      if (e.kind === 'mob' && e.lootable && d < bestCorpseD) {
-        bestCorpse = e.id;
-        bestCorpseD = d;
-      }
-      if (e.kind === 'object' && e.templateId?.startsWith('delve_')) {
-        if (d < bestDelveD) {
-          bestDelve = e.id;
-          bestDelveD = d;
-        }
-      } else if (e.kind === 'object' && e.lootable && d < bestObjD) {
-        bestObj = e.id;
-        bestObjD = d;
-      }
-      // The graveyard angel is hidden from (and not interactable by) the living,
-      // same filter renderer.pick() applies to the click path: skip it here too
-      // unless the local player is a released spirit, so it cannot starve a
-      // node sharing its graveyard's interact range for keyboard/gamepad/mobile.
-      if (e.kind === 'npc' && d < bestNpcD && (e.templateId !== 'spirit_healer' || p.ghost)) {
-        bestNpc = e.id;
-        bestNpcD = d;
-      }
-    }
-    if (bestCorpse !== null) {
-      world.lootCorpse(bestCorpse);
-      return;
-    }
-    if (bestDelve !== null) {
-      world.delveInteract(bestDelve);
-      return;
-    }
-    if (bestObj !== null) {
-      const obj = world.entities.get(bestObj)!;
-      if (obj.templateId === 'dungeon_door' && obj.dungeonId) {
-        world.enterDungeon(obj.dungeonId);
-        return;
-      }
-      if (obj.templateId === 'dungeon_exit') {
-        world.leaveDungeon();
-        return;
-      }
-      if (obj.templateId === 'mailbox') {
-        hud.openMailbox();
-        return;
-      }
-      world.pickUpObject(bestObj);
-      return;
-    }
-    if (bestNpc !== null) {
-      const npc = world.entities.get(bestNpc);
-      if (npc?.kind === 'npc' && npc.templateId === 'brother_halven') hud.openDelveBoard(bestNpc);
-      else hud.openQuestDialog(bestNpc);
-      return;
-    }
-    if (bestNode !== null) {
-      handleGatherNodeInteract(
+    stopAutorunForInteraction(
+      tryNearbyInteraction(
         world,
         hud,
-        p.pos,
-        bestNode.id,
-        bestNode.pos,
+        GATHER_NODES,
         t('questUi.errors.tooFar'),
         t('hudChrome.gathering.notReady'),
-      );
-      return;
-    }
-    hud.showError(t('errors.nothingInteract'));
+        t('errors.nothingInteract'),
+        online === null,
+      ),
+      input,
+      mobileControls,
+    );
   }
 
   function attackNearest(): void {
@@ -2274,14 +2262,18 @@ async function startGame(
       const nodeId = renderer.pickGatherNode(x, y);
       const node = nodeId !== null ? GATHER_NODES.find((n) => n.id === nodeId) : undefined;
       if (node) {
-        handleGatherNodeInteract(
-          world,
-          hud,
-          world.player.pos,
-          node.id,
-          node.pos,
-          t('questUi.errors.tooFar'),
-          t('hudChrome.gathering.notReady'),
+        stopAutorunForInteraction(
+          handleGatherNodeInteract(
+            world,
+            hud,
+            world.player.pos,
+            node.id,
+            node.pos,
+            t('questUi.errors.tooFar'),
+            t('hudChrome.gathering.notReady'),
+          ),
+          input,
+          mobileControls,
         );
         return;
       }
@@ -2313,6 +2305,8 @@ async function startGame(
       return;
     }
     const e = world.entities.get(id);
+    const interactionOutcome = handlePickedEntity(world, hud, id, button, x, y, online === null);
+    const didInteractImmediately = interactionOutcome === true;
     if (e && e.id !== world.player.id) {
       // Mark the entity when you engage it: a left-click target, or the click-to-move
       // button that walks you to it, so both routes read the same (red on a hostile,
@@ -2323,12 +2317,15 @@ async function startGame(
       }
       // The configured click-to-move mouse button approaches the entity while the
       // regular click handler still performs target/interact behavior.
-      if (isClickMoveButton) {
+      if (
+        isClickMoveButton &&
+        shouldApproachPickedEntity(world.player, e, didInteractImmediately, online === null)
+      ) {
         const target = resolvedClickMoveTarget({ x: e.pos.x, z: e.pos.z });
         input.setClickMoveTarget(target, 3.5, e.id, clickMovePathTo(target));
       }
     }
-    handlePickedEntity(world, hud, id, button, x, y);
+    stopAutorunForInteraction(interactionOutcome, input, mobileControls);
   }
 
   // Attack Move (MOBA-style): the Attack Move key walks the player toward the
@@ -5619,14 +5616,44 @@ let walletVerifyTimeout: number | null = null;
 let walletVerifyModalUnsubscribe: (() => void) | null = null;
 let walletFlowStatus: 'connect' | 'sign' | 'verify' | null = null;
 let walletHiddenNoticeTimeout: number | null = null;
+let desktopWalletBrowserSessionActive = false;
 
-// Feature flag: Wallet Standard support needs no project id. Keep an escape
-// hatch for deploys that want to hide the wallet UI entirely. Native and desktop
-// app builds intentionally exclude wallet verification for now.
-// client_shell.test guards the native exclusion:
-// const WALLET_ENABLED = !NATIVE_APP && String(import.meta.env.VITE_WALLET_DISABLED ?? '').trim() !== '1';
-const WALLET_ENABLED =
-  !NATIVE_APP && !DESKTOP_APP && String(import.meta.env.VITE_WALLET_DISABLED ?? '').trim() !== '1';
+function desktopWalletBrowserHandoffAvailable(): boolean {
+  const bridge = DESKTOP_APP ? desktopBridge() : null;
+  return !!bridge?.openWalletBrowser;
+}
+
+async function authorizeDesktopWalletInBrowser(
+  action: { kind: 'link' } | { kind: 'transaction'; reference: string; expectedAddress: string },
+) {
+  const bridge = desktopBridge();
+  const openWalletBrowser = bridge?.openWalletBrowser;
+  if (!openWalletBrowser) throw new Error('desktop wallet browser is unavailable');
+  const takeWalletHandoffCode = bridge.takeWalletHandoffCode;
+  const onWalletHandoffCode = bridge.onWalletHandoffCode;
+  const result = await performDesktopWalletHandoff(action, api, {
+    openWalletBrowser: (code) => openWalletBrowser(code),
+    takeWalletHandoffCode: takeWalletHandoffCode ? () => takeWalletHandoffCode() : undefined,
+    onWalletHandoffCode: onWalletHandoffCode
+      ? (callback) => onWalletHandoffCode(callback)
+      : undefined,
+  });
+  return result;
+}
+
+// Resolve the runtime distribution before loading wallet code. Website and
+// mobile web are supported; Capacitor and Steam remain fail-closed. The
+// website-distributed Electron shell opts in through a trusted IPC probe.
+let WALLET_ENABLED = false;
+const walletCapabilityReady = resolveWalletCapability({
+  disabled: String(import.meta.env.VITE_WALLET_DISABLED ?? '').trim() === '1',
+  nativeApp: NATIVE_APP,
+  desktopApp: DESKTOP_APP,
+  bridge: DESKTOP_APP ? desktopBridge() : null,
+}).then((enabled) => {
+  WALLET_ENABLED = enabled;
+  return enabled;
+});
 
 function walletCharacterScreenVisible(): boolean {
   try {
@@ -5671,17 +5698,28 @@ function loadWallet(): Promise<typeof import('./net/wallet')> {
     ? Promise.resolve(walletMod)
     : import('./net/wallet').then((m) => {
         walletMod = m;
+        walletMod.configureWalletConnect(
+          String(import.meta.env.VITE_REOWN_PROJECT_ID ?? '').trim() || null,
+        );
         walletMod.setWalletPicker(showWalletPicker);
+        walletMod.setMobileWalletLauncher((request) =>
+          showMobileWalletLauncher(request, walletFocusManager),
+        );
         return walletMod;
       });
 }
+
+installWalletResumeHandlers(() => {
+  if (!walletMod) return;
+  void walletMod.resumeWalletConnection().catch(() => {});
+});
 
 const shortenAddress = (a: string): string => `${a.slice(0, 4)}…${a.slice(-4)}`;
 const formatWoc = (n: number): string => formatNumber(n, { maximumFractionDigits: 2 });
 const walletBalanceText = (n: number): string =>
   t('wallet.balanceAmount', { amount: formatWoc(n) });
 let walletPickerModal: HTMLDivElement | null = null;
-let walletPickerResolve: ((id: string | null) => void) | null = null;
+let walletPickerResolve: ((result: WalletPickerResult) => void) | null = null;
 // One module-local FocusManager INSTANCE for the pre-game wallet-picker modal:
 // the shared focus-trap implementation, not a second hand-rolled one. It is an instance, NOT
 // a module singleton exported from focus_manager, mirroring
@@ -5697,7 +5735,7 @@ let walletPickerFocusHandle: FocusTrapHandle | null = null;
 // re-reading document.activeElement at the new open would record body, not the real opener.
 let walletPickerOpener: HTMLElement | null = null;
 
-function closeWalletPicker(id: string | null, returnFocus = true): void {
+function closeWalletPicker(result: WalletPickerResult, returnFocus = true): void {
   const modal = walletPickerModal;
   const resolve = walletPickerResolve;
   const focusHandle = walletPickerFocusHandle;
@@ -5714,7 +5752,7 @@ function closeWalletPicker(id: string | null, returnFocus = true): void {
   // picker still returns to where the flow started.
   focusHandle?.release(returnFocus);
   if (returnFocus) walletPickerOpener = null;
-  if (resolve) resolve(id);
+  if (resolve) resolve(result);
 }
 
 // The wallet picker uses the shared src/ui/focus_manager FocusManager, so there
@@ -5724,10 +5762,11 @@ function closeWalletPicker(id: string | null, returnFocus = true): void {
 function showWalletPicker(
   wallets: readonly WalletOption[],
   selectedId: string | null,
-): Promise<string | null> {
+  mode: WalletPickerMode,
+): Promise<WalletPickerResult> {
   const reentrant = walletPickerResolve !== null;
   if (reentrant) closeWalletPicker(null, false);
-  return new Promise((resolve) => {
+  return new Promise<WalletPickerResult>((resolve) => {
     walletPickerResolve = resolve;
     // Capture the opener BEFORE focus moves into the modal; the FocusManager returns focus here
     // on release(). On a re-entrant re-open keep the FIRST opener (the re-entrant close already
@@ -5747,7 +5786,12 @@ function showWalletPicker(
     panel.setAttribute('role', 'dialog');
     panel.setAttribute('aria-modal', 'true');
     panel.setAttribute('aria-labelledby', 'wallet-picker-title');
-    panel.setAttribute('aria-describedby', 'wallet-picker-help wallet-picker-extension-help');
+    panel.setAttribute(
+      'aria-describedby',
+      mode === 'standalone'
+        ? 'wallet-picker-extension-help'
+        : 'wallet-picker-help wallet-picker-extension-help',
+    );
 
     const titleRow = document.createElement('div');
     titleRow.className = 'panel-title';
@@ -5769,12 +5813,17 @@ function showWalletPicker(
     const extensionHelp = document.createElement('p');
     extensionHelp.className = 'wallet-picker-help wallet-picker-extension-help';
     extensionHelp.id = 'wallet-picker-extension-help';
-    extensionHelp.textContent = t('wallet.extensionHelp');
+    extensionHelp.textContent =
+      mode === 'standalone'
+        ? t('wallet.standaloneAppHelp')
+        : mode === 'mobile'
+          ? t('wallet.mobileAppHelp')
+          : t('wallet.extensionHelp');
 
     const list = document.createElement('div');
     list.className = 'wallet-picker-list';
 
-    if (wallets.length === 0) {
+    if (wallets.length === 0 && mode !== 'standalone') {
       const empty = document.createElement('p');
       empty.className = 'wallet-picker-empty';
       empty.textContent = t('wallet.helpDisconnected');
@@ -5809,7 +5858,21 @@ function showWalletPicker(
       }
     }
 
-    panel.append(titleRow, help, extensionHelp, list);
+    panel.appendChild(titleRow);
+    if (mode !== 'standalone') panel.appendChild(help);
+    panel.append(extensionHelp, list);
+    if (wallets.some((option) => option.connected)) {
+      const disconnectBtn = document.createElement('button');
+      disconnectBtn.type = 'button';
+      disconnectBtn.className = 'wallet-mini wallet-picker-disconnect';
+      disconnectBtn.title = t('wallet.signOutTitle');
+      disconnectBtn.setAttribute('aria-label', t('wallet.signOutAria'));
+      disconnectBtn.textContent = t('wallet.signOut');
+      disconnectBtn.addEventListener('click', () => {
+        closeWalletPicker({ action: 'disconnect' });
+      });
+      panel.appendChild(disconnectBtn);
+    }
     back.appendChild(panel);
     document.body.appendChild(back);
     walletPickerModal = back;
@@ -5938,6 +6001,7 @@ function updateWalletButton(): void {
   if (!WALLET_ENABLED) {
     setWocBalance(null, false);
     setWalletDisplayAvailable(false);
+    setWalletConnectionAddresses(null, null, false);
     return;
   }
   syncWalletCharacterScreenVisibility();
@@ -5945,16 +6009,31 @@ function updateWalletButton(): void {
   const { address, isConnected } = walletMod
     ? walletMod.currentWallet()
     : { address: null, isConnected: false };
-  const connected = isConnected && !!address;
-  const linked = connected && linkedWalletPubkey === address;
-  const verifiedBalance = linkedWalletPubkey
-    ? (linkedWocBalance ?? (linked ? connectedWocBalance : null))
-    : null;
-  const previewBalance = connected && !linkedWalletPubkey ? connectedWocBalance : null;
+  const browserConnectedAddress = isConnected && address ? address : null;
+  const connectionView = buildWalletConnectionView({
+    enabled: true,
+    linkedAddress: linkedWalletPubkey,
+    connectedAddress: browserConnectedAddress,
+    linkedBalance: linkedWocBalance,
+    connectedBalance: connectedWocBalance,
+    externalSignerAvailable: desktopWalletBrowserSessionActive,
+  });
+  const connectedAddress = connectionView.connectedAddress;
+  const connected = connectedAddress !== null;
+  const linked = connectionView.kind === 'linked_connected';
+  const verifiedBalance = connectionView.balanceVerified ? connectionView.balance : null;
+  const previewBalance =
+    connectionView.kind === 'connected_unlinked' ? connectionView.balance : null;
   // Mirror the balance into the HUD store so the bag footer stays in sync. Only
   // a balance for the linked wallet may drive verified holder claims.
   setWocBalance(verifiedBalance ?? previewBalance, verifiedBalance !== null);
   setWalletDisplayAvailable(connected || linkedWalletPubkey !== null);
+  const externalSignerAvailable = desktopWalletBrowserSessionActive;
+  setWalletConnectionAddresses(
+    linkedWalletPubkey,
+    browserConnectedAddress,
+    externalSignerAvailable,
+  );
   const btn = document.getElementById('btn-wallet');
   const label = document.getElementById('wallet-label');
   if (!btn || !label) return;
@@ -5997,31 +6076,32 @@ function updateWalletButton(): void {
     setWalletHelp(t('wallet.helpDisconnected'), 'default');
     return;
   }
+  if (!connectedAddress) return;
   // $WOC balance sits to the left of the address once it has loaded.
   if (linked) {
     btn.classList.add('is-linked');
     label.textContent = t('wallet.appConnected');
     btn.title = t('wallet.linkedTitle');
     btn.setAttribute('aria-label', t('wallet.linkedTitle'));
-    setWalletStatus(walletAddressLabel(address, true, verifiedBalance));
-    setWalletHelp(walletHelpText(address, true, verifiedBalance), 'verified');
+    setWalletStatus(walletAddressLabel(connectedAddress, true, verifiedBalance));
+    setWalletHelp(walletHelpText(connectedAddress, true, verifiedBalance), 'verified');
   } else if (api.token) {
     btn.classList.add('needs-link');
     label.textContent = linkedWalletPubkey ? t('wallet.verifyNew') : t('wallet.verify');
     btn.title = t('wallet.verifyTitle');
     btn.setAttribute(
       'aria-label',
-      t('wallet.verifyAddressAria', { address: shortenAddress(address) }),
+      t('wallet.verifyAddressAria', { address: shortenAddress(connectedAddress) }),
     );
     setWalletStatus(null);
-    setWalletHelp(walletHelpText(address, false, connectedWocBalance), 'attention');
+    setWalletHelp(walletHelpText(connectedAddress, false, connectedWocBalance), 'attention');
   } else {
     btn.classList.add('is-connected');
-    label.textContent = walletAddressLabel(address, false, connectedWocBalance);
+    label.textContent = walletAddressLabel(connectedAddress, false, connectedWocBalance);
     btn.title = t('wallet.connectedTitle');
     btn.setAttribute('aria-label', t('wallet.connectedTitle'));
     setWalletStatus(null);
-    setWalletHelp(walletHelpText(address, false, connectedWocBalance), 'default');
+    setWalletHelp(walletHelpText(connectedAddress, false, connectedWocBalance), 'default');
   }
 }
 
@@ -6822,10 +6902,11 @@ function clearDiscordChoice(): void {
 }
 
 async function refreshWalletLinkStatus(): Promise<void> {
-  if (!WALLET_ENABLED) {
+  if (!(await walletCapabilityReady)) {
     linkedWalletPubkey = null;
     linkedWocBalance = null;
     connectedWocBalance = null;
+    desktopWalletBrowserSessionActive = false;
     walletLinkStatusPending = false;
     updateWalletButton();
     return;
@@ -6833,6 +6914,7 @@ async function refreshWalletLinkStatus(): Promise<void> {
   if (!api.token) {
     linkedWalletPubkey = null;
     linkedWocBalance = null;
+    desktopWalletBrowserSessionActive = false;
     walletLinkStatusPending = false;
     updateWalletButton();
     return;
@@ -6903,8 +6985,51 @@ async function completeWalletVerifyFlow(address: string): Promise<void> {
   }
 }
 
+async function completeDesktopWalletVerifyFlow(): Promise<void> {
+  if (!api.token || walletVerifyInProgress) return;
+  walletVerifyPending = false;
+  walletVerifyInProgress = true;
+  let verificationFailed = false;
+  try {
+    setWalletFlowStatus('connect');
+    const authorization = await authorizeDesktopWalletInBrowser({ kind: 'link' });
+    if (authorization.kind !== 'link') throw new Error('invalid wallet link authorization');
+    setWalletFlowStatus('verify');
+    const result = await api.linkWallet(
+      authorization.address,
+      authorization.signature,
+      authorization.nonce,
+    );
+    desktopWalletBrowserSessionActive = true;
+    linkedWalletPubkey = result.pubkey;
+    connectedWocBalance = null;
+    updateWalletButton();
+    try {
+      const wallet = await loadWallet();
+      linkedWocBalance = await wallet.fetchWocBalance(result.pubkey, true);
+      updateWalletButton();
+    } catch (error) {
+      console.error('[wallet] linked wallet balance hydration failed', error);
+    }
+  } catch (err) {
+    console.error('[wallet] desktop browser verification failed', err);
+    desktopWalletBrowserSessionActive = false;
+    updateWalletButton();
+    verificationFailed = true;
+  } finally {
+    walletVerifyPending = false;
+    walletVerifyInProgress = false;
+    setWalletFlowStatus(null);
+    if (verificationFailed) flashWalletError(t('wallet.verifyFailed'));
+  }
+}
+
 async function startWalletVerifyFlow(forcePicker = false): Promise<void> {
   if (!api.token || walletVerifyPending || walletVerifyInProgress) return;
+  if (desktopWalletBrowserHandoffAvailable()) {
+    await completeDesktopWalletVerifyFlow();
+    return;
+  }
   const wallet = await loadWallet();
   if (forcePicker) {
     await wallet.disconnectWallet();
@@ -6936,6 +7061,10 @@ async function startWalletVerifyFlow(forcePicker = false): Promise<void> {
 }
 
 async function onWalletButtonClick(): Promise<void> {
+  if (desktopWalletBrowserHandoffAvailable()) {
+    await openDesktopWalletManager();
+    return;
+  }
   const wallet = await loadWallet();
   const { address, isConnected } = wallet.currentWallet();
   if (linkedWalletPubkey && (!isConnected || linkedWalletPubkey === address)) {
@@ -6945,11 +7074,50 @@ async function onWalletButtonClick(): Promise<void> {
   await startWalletVerifyFlow(false);
 }
 
+async function openDesktopWalletManager(): Promise<void> {
+  const wallet = await loadWallet();
+  const available = wallet.availableWallets();
+  const options =
+    available.length > 0
+      ? available
+      : [
+          {
+            id: wallet.WALLET_CONNECT_ID,
+            name: wallet.WALLET_CONNECT_NAME,
+            icon: wallet.WALLET_CONNECT_ICON,
+            connected: false,
+          },
+        ];
+  const view = desktopWalletManagerView(options, desktopWalletBrowserSessionActive);
+  const result = await showWalletPicker(view.options, view.selectedId, 'desktop');
+  switch (desktopWalletManagerAction(result)) {
+    case 'authorize':
+      await startWalletVerifyFlow(false);
+      return;
+    case 'disconnect':
+      await disconnectDesktopWalletSession(
+        wallet.currentWallet().isConnected ? () => wallet.disconnectWallet() : async () => {},
+        () => {
+          desktopWalletBrowserSessionActive = false;
+          updateWalletButton();
+        },
+      );
+      return;
+    case 'cancel':
+      return;
+  }
+}
+
 // Disconnect the browser wallet-app session. The account↔wallet link persists
 // server-side, so reconnecting the same wallet re-shows the verified state.
 async function signOutWallet(): Promise<void> {
   const wallet = await loadWallet();
-  await wallet.disconnectWallet();
+  try {
+    await wallet.disconnectWallet();
+  } finally {
+    desktopWalletBrowserSessionActive = false;
+    updateWalletButton();
+  }
 }
 
 async function unlinkVerifiedWallet(): Promise<void> {
@@ -6971,7 +7139,9 @@ async function switchWallet(): Promise<void> {
   await startWalletVerifyFlow(true);
 }
 
-function wireWallet(): void {
+async function wireWallet(): Promise<void> {
+  setWalletUiEnabled(false);
+  await walletCapabilityReady;
   setWalletUiEnabled(WALLET_ENABLED);
   // Feature-gate: when explicitly disabled, remove the wallet row entirely and
   // never download the wallet chunk.
@@ -7023,7 +7193,7 @@ function wireWallet(): void {
 
 window.addEventListener('woc:wallet-verify', () => {
   if (!WALLET_ENABLED || !api.token) return;
-  startWalletVerifyFlow(false).catch((err) => {
+  onWalletButtonClick().catch((err) => {
     console.error('[wallet] daily rewards verification failed', err);
   });
 });
@@ -7141,7 +7311,7 @@ function wireStartScreens(): void {
   void loadProjectStats();
   wireContractAddressCopy();
   wireHomepageMusicToggle();
-  wireWallet();
+  void wireWallet();
   wireGithubLink();
   wireSteamLink(api);
 
