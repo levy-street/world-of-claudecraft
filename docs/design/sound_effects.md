@@ -303,7 +303,8 @@ Fiesta) and every world/spatial sound ignore the toggle.
 
 | keys | purpose |
 |---|---|
-| `ui_click`, `ui_error` | basic interaction and invalid-action feedback |
+| `ui_click`, `ui_error` | basic interaction and generic invalid-action feedback |
+| `ui_error_cooldown`, `ui_error_resource`, `ui_error_range` | distinct invalid-action cues for the three highest-frequency failure reasons (ability on cooldown, out of mana/rage/energy/health, can't reach the target); resolved from the raw sim error text by `errorSfxKey` (`src/ui/error_sfx.ts`), rate-limited per key (1.5s) via `sfx.playUi`'s `cooldown` option so repeatedly failing the same action does not spam the cue. Every other error text still plays the generic `ui_error` |
 | `ui_bag_open`, `ui_bag_close` | inventory transitions |
 | `ui_coin`, `ui_loot_item` | currency and item rewards |
 | `ui_quest_accept`, `ui_quest_done`, `ui_level_up` | progression feedback |

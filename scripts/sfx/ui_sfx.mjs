@@ -14,6 +14,9 @@ const MASTER_LIMIT = 0.749894; // -2.5 dBFS leaves MP3 true-peak headroom
 const MASTER_GAINS_DB = {
   ui_click: 8.75,
   ui_error: 8.08,
+  ui_error_cooldown: 8.08,
+  ui_error_resource: 8.08,
+  ui_error_range: 8.08,
   ui_bag_open: 17.44,
   ui_bag_close: 15.95,
   ui_coin: 4.89,
@@ -21,7 +24,6 @@ const MASTER_GAINS_DB = {
   ui_quest_accept: 3.57,
   ui_quest_done: 0.8,
   ui_level_up: -0.37,
-  ui_whisper: 6.25,
   ui_sheep: 6.49,
   ui_death: 5.58,
   ui_duel_challenge: 3.81,
@@ -96,6 +98,24 @@ export const UI_SFX_SPECS = [
     tone(230, 0, 0.16, 0.22, { wave: 'square', endFrequency: 180 }),
     tone(175, 0.12, 0.15, 0.15, { wave: 'square' }),
   ]),
+  // Placeholder error-family variants, split off the generic ui_error buzz so
+  // "ability not ready" / "not enough resource" / "can't reach target" each
+  // get a distinct cue instead of one interchangeable bloop (see errorSfxKey
+  // in src/game/error_sfx.ts). Deliberately just re-pitched/re-shaped
+  // siblings of the same buzz character for now; swap for real recordings
+  // like ui_whisper whenever there's time.
+  cue('ui_error_cooldown', 0.5, 'Short flat double-tick buzz, an ability still recharging.', [
+    tone(200, 0, 0.15, 0.11, { wave: 'square' }),
+    tone(200, 0.13, 0.14, 0.12, { wave: 'square' }),
+  ]),
+  cue('ui_error_resource', 0.55, 'Short low empty-tank buzz, a resource pool running dry.', [
+    tone(150, 0, 0.17, 0.24, { wave: 'square', endFrequency: 90 }),
+    tone(110, 0.14, 0.13, 0.18, { wave: 'square' }),
+  ]),
+  cue('ui_error_range', 0.5, 'Short high denial chirp, an out-of-reach target.', [
+    tone(340, 0, 0.15, 0.16, { wave: 'square', endFrequency: 420 }),
+    tone(300, 0.1, 0.12, 0.12, { wave: 'square' }),
+  ]),
   cue('ui_bag_open', 0.5, 'Leather inventory bag opening with a soft metal clasp.', [
     noise('pink', 0, 0.16, 0.16, { highpass: 130, lowpass: 1500 }),
     tone(660, 0.045, 0.07, 0.11, { wave: 'triangle' }),
@@ -129,11 +149,6 @@ export const UI_SFX_SPECS = [
     tone(784, 0.27, 0.5, 0.13, { wave: 'triangle' }),
     tone(1046, 0.36, 0.52, 0.14, { wave: 'triangle' }),
     noise('white', 0.05, 0.78, 0.025, { highpass: 2600 }),
-  ]),
-  cue('ui_whisper', 0.5, 'Private message notification with two delicate glassy notes.', [
-    tone(1175, 0, 0.12, 0.15),
-    tone(1568, 0.07, 0.16, 0.12),
-    noise('pink', 0.02, 0.19, 0.018, { highpass: 1700 }),
   ]),
   cue('ui_sheep', 0.65, 'Playful magical sheep transformation bleat-like synth cue.', [
     tone(620, 0, 0.44, 0.18, { wave: 'saw', endFrequency: 520 }),

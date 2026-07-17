@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "3c5d49b0d49614a0f02e5e4b4720f74e83881093ca60320ee49a292025c35b83",
-  "catalogHash": "7f3f7eec3e3a6cdc4323deab090e3da3a9fb2c4f64e4170c76a71aa00398832c",
+  "bundleId": "49ee8378443b676574f0d183cae81c1d59ecdd3eb48905622476f6e63f56ae8f",
+  "catalogHash": "0af50eaa9c2bf1aff954a0d8ddf4e8e35e95500f66e507647c5932ac9003a27f",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -2992,6 +2992,42 @@
       "gain": 1,
       "playbackRate": 1
     },
+    "ui_error_cooldown": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_error_cooldown.mp3?v=5e1c85d1a909",
+          "bytes": 13835,
+          "sha256": "5e1c85d1a9096273c443306c95b42416b582256ecb6273034c432ddb9e3c1898"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_error_range": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_error_range.mp3?v=5eb651780390",
+          "bytes": 13835,
+          "sha256": "5eb651780390554c11c653394a13e540d20cf0b5a69ddae2e057bd7137de9cc3"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_error_resource": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_error_resource.mp3?v=f3380541c58b",
+          "bytes": 15089,
+          "sha256": "f3380541c58b71ce0412389438150efecb6dfb7da3b50da81e5cd081b72dc7ae"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
     "ui_fiesta_augment": {
       "variants": [
         {
@@ -3176,9 +3212,9 @@
       "variants": [
         {
           "id": "main",
-          "url": "/audio/sfx/ui_whisper.mp3?v=e2387affefec",
-          "bytes": 13835,
-          "sha256": "e2387affefec944ba197e0a069d5b146d2aef5681869ab1e099f40ff269f7cf8"
+          "url": "/audio/sfx/ui_whisper.mp3?v=4613a094b9c2",
+          "bytes": 16970,
+          "sha256": "4613a094b9c26b9c3b49d1b1e6942a01a57c4adbaa74ebbc0dcb3e2f0b81a335"
         }
       ],
       "gain": 1,

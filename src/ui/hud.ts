@@ -8183,7 +8183,7 @@ export class Hud {
           break;
         }
         case 'error':
-          this.showError(this.localizeErrorText(ev.text));
+          this.showError(this.localizeErrorText(ev.text), ev.text);
           break;
         case 'questAccepted':
           sfx.playUi('quest_accept');
@@ -9673,7 +9673,10 @@ export class Hud {
     this.combatAnnouncer.push(text, performance.now());
   }
 
-  showError(text: string): void {
+  // `rawErrorText` is the pre-localization sim string (when the caller has one),
+  // used only to pick the error cue (see errorSfxKey/audio.error); the toast
+  // and log always render `text` as given.
+  showError(text: string, rawErrorText?: string): void {
     const localized = this.localizeErrorText(text);
     this.errorEl.textContent = localized;
     this.errorEl.style.opacity = '1';
@@ -9681,7 +9684,7 @@ export class Hud {
     this.errorTimer = window.setTimeout(() => {
       this.errorEl.style.opacity = '0';
     }, 1600);
-    audio.error();
+    audio.error(rawErrorText);
     // Mirror into the chat log's system channel (the same one loot/level-up/death
     // lines use) so the toast is not lost once it fades: WoW-style error/system
     // logging. The on-screen toast's own timing above is unchanged. Consecutive

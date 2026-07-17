@@ -62,7 +62,6 @@ describe('sampled GameAudio facade', () => {
       ['whisper', 'ui_whisper'],
       ['sheep', 'ui_sheep'],
       ['death', 'ui_death'],
-      ['error', 'ui_error'],
       ['duelChallenge', 'ui_duel_challenge'],
       ['duelCountdownTick', 'ui_duel_countdown'],
       ['duelStart', 'ui_duel_start'],
@@ -78,6 +77,43 @@ describe('sampled GameAudio facade', () => {
       expect(sfxMock.playUi).toHaveBeenLastCalledWith(key, { jitter: false });
     }
     expect(sfxMock.playUi).toHaveBeenCalledTimes(routes.length);
+  });
+
+  it('classifies the error cue by raw sim text, rate-limited so spamming a failure does not spam the cue', () => {
+    const audio = new GameAudio();
+
+    audio.error();
+    expect(sfxMock.playUi).toHaveBeenLastCalledWith('ui_error', {
+      jitter: false,
+      cooldown: 1.5,
+    });
+
+    audio.error('That ability is not ready yet.');
+    expect(sfxMock.playUi).toHaveBeenLastCalledWith('ui_error_cooldown', {
+      jitter: false,
+      cooldown: 1.5,
+    });
+
+    audio.error('Not enough mana!');
+    expect(sfxMock.playUi).toHaveBeenLastCalledWith('ui_error_resource', {
+      jitter: false,
+      cooldown: 1.5,
+    });
+
+    audio.error('Out of range.');
+    expect(sfxMock.playUi).toHaveBeenLastCalledWith('ui_error_range', {
+      jitter: false,
+      cooldown: 1.5,
+    });
+
+    // Unrecognized text falls back to the generic buzz, same as before the split.
+    audio.error('You have no pet.');
+    expect(sfxMock.playUi).toHaveBeenLastCalledWith('ui_error', {
+      jitter: false,
+      cooldown: 1.5,
+    });
+
+    expect(sfxMock.playUi).toHaveBeenCalledTimes(5);
   });
 
   it('gates the feedback cues on setFeedbackEnabled but leaves timing/affordance cues alone', () => {
@@ -240,11 +276,11 @@ describe('sampled GameAudio facade', () => {
 });
 
 describe('deterministic UI SFX catalog', () => {
-  it('adds 26 unique UI cues to the authoritative studio inventory', () => {
+  it('adds 28 unique UI cues to the authoritative studio inventory', () => {
     const keys = UI_SFX_CATALOG.map((cue: { key: string }) => cue.key);
     const fullCatalogKeys = new Set(SFX.map((cue: { key: string }) => cue.key));
 
-    expect(keys).toHaveLength(26);
+    expect(keys).toHaveLength(28);
     expect(new Set(keys).size).toBe(keys.length);
     expect(keys.every((key: string) => key.startsWith('ui_'))).toBe(true);
     expect(UI_SFX_CATALOG.every((cue: { generator: string }) => cue.generator === 'ffmpeg')).toBe(

@@ -3,12 +3,19 @@
 // GameAudio keeps the established HUD-facing method surface while delegating
 // playback, loading, voice limits, and volume control to the sampled SFX engine.
 
+import { errorSfxKey } from '../ui/error_sfx';
 import { sfx } from './sfx';
 
 // The small procedural WebAudio bed still used by the cues that have no sampled
 // catalog key yet (the ready-check chime and the weapon sheathe/draw pair).
 const PROCEDURAL_BASE_GAIN = 0.32;
 const NOISE_BUFFER_SECONDS = 1;
+
+// Minimum seconds between repeats of the SAME error cue: spamming an ability
+// on cooldown, or holding a cast with no mana, would otherwise refire the
+// bloop every failed attempt. Per-key (via sfx.playUi's own cooldown option),
+// so an unrelated error class right after still sounds immediately.
+const ERROR_SFX_COOLDOWN_SECONDS = 1.5;
 
 const UI_CUES = {
   bagOpen: 'ui_bag_open',
@@ -25,6 +32,9 @@ const UI_CUES = {
   death: 'ui_death',
   playerDeath: 'player_death',
   error: 'ui_error',
+  errorCooldown: 'ui_error_cooldown',
+  errorResource: 'ui_error_resource',
+  errorRange: 'ui_error_range',
   duelChallenge: 'ui_duel_challenge',
   duelCountdown: 'ui_duel_countdown',
   duelStart: 'ui_duel_start',
@@ -180,15 +190,15 @@ export class GameAudio {
     osc.stop(t + duration + 0.05);
   }
 
-  private play(key: UiCue): void {
-    sfx.playUi(key, { jitter: false });
+  private play(key: UiCue, opts?: { cooldown?: number }): void {
+    sfx.playUi(key, { jitter: false, cooldown: opts?.cooldown });
   }
 
   /** Play a cue only when interface/feedback sounds are enabled. The notification
    *  cues (loot, level, quest, whisper, error, polymorph, death) route through here;
    *  the gameplay-timing cues (ready check, duel countdown) call `play` directly. */
-  private playFeedback(key: UiCue): void {
-    if (this.feedbackOn) this.play(key);
+  private playFeedback(key: UiCue, opts?: { cooldown?: number }): void {
+    if (this.feedbackOn) this.play(key, opts);
   }
 
   bagOpen(): void {
@@ -265,8 +275,12 @@ export class GameAudio {
     this.playFeedback(UI_CUES.death);
   }
 
-  error(): void {
-    this.playFeedback(UI_CUES.error);
+  /** `text` is the raw (pre-localization) sim error string; passing it lets
+   *  the cue vary by failure reason (cooldown/resource/range vs. everything
+   *  else, see errorSfxKey). Omitting it plays the generic buzz. */
+  error(text?: string): void {
+    const key = text ? errorSfxKey(text) : UI_CUES.error;
+    this.playFeedback(key, { cooldown: ERROR_SFX_COOLDOWN_SECONDS });
   }
 
   duelChallenge(): void {

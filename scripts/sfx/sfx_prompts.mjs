@@ -625,6 +625,11 @@ export const SFX = [
   // fast. See handleDeedUnlocks in src/ui/hud.ts.
   { key: 'ui_achievement', custom: true },
 
+  // Whisper notification (custom recording, a real tambourine hit, not
+  // ElevenLabs/generated). Replaces the old procedural "two glassy notes"
+  // placeholder; see the cue description below, still pending an update.
+  { key: 'ui_whisper', custom: true },
+
   // --- Wand auto-attacks (custom recordings, not ElevenLabs) ----------------
   // Distinct from the matching proj_<school> real-spell-cast sound, see
   // WAND_CUES in src/ui/combat_sfx.ts (feature/sfx-wand-attack-cues, #1973).
