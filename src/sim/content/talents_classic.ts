@@ -324,8 +324,33 @@ const ROGUE_SPECS: SpecDef[] = [
     'A sustained fighter focused on direct weapon strikes.',
     'blade_flurry',
     "Scrapper's Edge",
-    'Increases attack speed by 10% and reduces melee ability damage by 10%.',
-    { global: { meleeHastePct: 0.1, meleeDmgPct: -0.1 } },
+    'Increases attack speed by 10% and reduces melee ability damage by 10%. Finishers restore 10 energy, reduce Mirrored Blades cooldown by 4 sec, and empower your next landed melee auto-attack within 8 sec to deal 50% more damage.',
+    {
+      global: { meleeHastePct: 0.1, meleeDmgPct: -0.1 },
+      proc: {
+        id: 'rog_scrappers_edge',
+        name: "Scrapper's Edge",
+        spec: 'combat',
+        requiresKnownAbility: 'blade_flurry',
+        school: 'physical',
+        trigger: {
+          on: 'castNth',
+          n: 1,
+          abilities: ['eviscerate', 'rupture', 'kidney_shot', 'slice_and_dice', 'expose_armor'],
+        },
+        responses: [
+          { kind: 'resource', amount: 10 },
+          { kind: 'cooldownRefund', ability: 'blade_flurry', seconds: 4 },
+          {
+            kind: 'empowerNext',
+            aura: 'next_ability_damage',
+            abilities: ['auto_attack'],
+            duration: 8,
+            dmgPct: 0.5,
+          },
+        ],
+      },
+    },
   ),
   spec(
     'subtlety',

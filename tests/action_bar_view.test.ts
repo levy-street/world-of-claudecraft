@@ -453,6 +453,19 @@ describe('actionBarView: proc availability cues', () => {
     ).toMatchObject({ procState: 'armed', usable: true });
   });
 
+  it("marks the melee attack armed during Scrapper's Edge", () => {
+    const view = createActionBarView(descriptor(slot(1, { attack: true })), fakeDeps());
+
+    expect(view.tick(world()).slots[0].procState).toBe('none');
+    expect(
+      view.tick(
+        world({
+          playerAuras: [{ id: 'rog_scrappers_edge', kind: 'next_ability_damage' }],
+        }),
+      ).slots[0].procState,
+    ).toBe('armed');
+  });
+
   it('keeps ordinary abilities and Icefall without stored Icicles at none', () => {
     const view = createActionBarView(
       descriptor(

@@ -360,6 +360,10 @@ function venomDividendProcState(
   return hasAura(player.auras, 'rog_deadly_brew') ? 'armed' : 'none';
 }
 
+function attackProcState(player: ActionBarPlayerInput): ActionBarProcState {
+  return hasAura(player.auras, 'rog_scrappers_edge') ? 'armed' : 'none';
+}
+
 // Ability ids map to pure proc resolvers here, keeping the painter generic. New
 // action cues extend this table rather than adding ability branches to DOM code.
 const PROC_STATE_RESOLVERS: Readonly<Record<string, ProcStateResolver | undefined>> = {
@@ -444,6 +448,7 @@ export function createActionBarView(
           slot.usable = true;
           slot.outOfRange = tgtDist !== null && tgtDist > MELEE_RANGE;
           slot.queued = player.autoAttack;
+          slot.procState = attackProcState(player);
           slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {
             slot: slotLabel,
             ability: deps.t(ATTACK_NAME_KEY),

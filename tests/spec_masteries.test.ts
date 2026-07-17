@@ -112,6 +112,29 @@ describe('spec masteries', () => {
     });
     expect(TALENTS.rogue?.specs.find((s) => s.id === 'combat')?.mastery.effect).toEqual({
       global: { meleeHastePct: 0.1, meleeDmgPct: -0.1 },
+      proc: {
+        id: 'rog_scrappers_edge',
+        name: "Scrapper's Edge",
+        spec: 'combat',
+        requiresKnownAbility: 'blade_flurry',
+        school: 'physical',
+        trigger: {
+          on: 'castNth',
+          n: 1,
+          abilities: ['eviscerate', 'rupture', 'kidney_shot', 'slice_and_dice', 'expose_armor'],
+        },
+        responses: [
+          { kind: 'resource', amount: 10 },
+          { kind: 'cooldownRefund', ability: 'blade_flurry', seconds: 4 },
+          {
+            kind: 'empowerNext',
+            aura: 'next_ability_damage',
+            abilities: ['auto_attack'],
+            duration: 8,
+            dmgPct: 0.5,
+          },
+        ],
+      },
     });
     expect(TALENTS.warlock?.specs.find((s) => s.id === 'demonology')?.mastery.effect).toEqual({
       global: { petDmgSharePct: 0.2 },
