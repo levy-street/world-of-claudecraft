@@ -354,6 +354,22 @@ describe('actionBarView: proc availability cues', () => {
     ).toBe('armed');
   });
 
+  it('marks Long Draw armed during the Iron Aim instant-shot window', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('aimed_shot') })),
+      fakeDeps(),
+    );
+
+    expect(view.tick(world()).slots[0].procState).toBe('none');
+    expect(
+      view.tick(
+        world({
+          playerAuras: [{ id: 'hun_iron_aim', kind: 'next_cast_instant' }],
+        }),
+      ).slots[0].procState,
+    ).toBe('armed');
+  });
+
   it('keeps ordinary abilities and Icefall without stored Icicles at none', () => {
     const view = createActionBarView(
       descriptor(

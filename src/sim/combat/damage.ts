@@ -59,6 +59,7 @@ import { WORLD_BOSS_CORPSE_SECONDS, worldBossLootContributors } from '../world_b
 import {
   onDamageTaken,
   onPetHit,
+  onRangedHit,
   onShieldConsumed,
   onSpellCrit,
   onSpellHit,
@@ -700,6 +701,9 @@ export function dealDamage(
   if (source && source.kind === 'player' && source.id !== target.id) {
     const meta = ctx.players.get(source.id);
     if (meta) meta.counters.damageDealt += amount;
+    if (amount > 0 && direct && school === 'physical' && abilityId) {
+      onRangedHit(ctx, source, abilityId, target);
+    }
     if (amount > 0 && school !== 'physical' && abilityId) {
       onSpellHit(ctx, source, abilityId, target);
     }

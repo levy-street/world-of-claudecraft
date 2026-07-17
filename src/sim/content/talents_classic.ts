@@ -139,8 +139,27 @@ const HUNTER_SPECS: SpecDef[] = [
     'A precise archer built around ranged burst and efficient shots.',
     'trueshot_aura',
     'Iron Aim',
-    'Increases your ranged ability damage by 20% and critical strike chance by 3%.',
-    { global: { meleeDmgPct: 0.2 }, stats: { crit: 0.03 } },
+    'Increases your ranged ability damage by 10% and critical strike chance by 3%. A landed Rattling Shot makes your next Long Draw within 8 sec instant.',
+    {
+      global: { meleeDmgPct: 0.1 },
+      stats: { crit: 0.03 },
+      proc: {
+        id: 'hun_iron_aim',
+        name: 'Iron Aim',
+        spec: 'marksmanship',
+        requiresKnownAbility: 'aimed_shot',
+        school: 'physical',
+        trigger: { on: 'rangedHit', abilities: ['concussive_shot'] },
+        responses: [
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_instant',
+            abilities: ['aimed_shot'],
+            duration: 8,
+          },
+        ],
+      },
+    },
   ),
   spec(
     'survival',

@@ -7858,6 +7858,8 @@ function procTriggerDescription(
       return `${abilityList(trigger.abilities)}${trigger.n > 1 ? ` x${trigger.n}` : ''}`;
     case 'petHitNth':
       return `${t('hud.pet.petAttackTitle')} x${trigger.n}`;
+    case 'rangedHit':
+      return abilityList(trigger.abilities);
     case 'spellHit':
       return abilityList(trigger.abilities);
     case 'spellCrit':

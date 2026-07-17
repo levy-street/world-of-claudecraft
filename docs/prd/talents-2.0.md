@@ -958,3 +958,6 @@ npm run build on PR4/PR5.
   into a visible mobile payoff while preserving mana as the hunter resource. The
   Mender's Signal choice replaces flat Patch Up scaling: completing pet maintenance
   now advances the burst cooldown and banks the same mobile shot payoff.
+- Coldsight uses Iron Aim as a landed setup and execute. Rattling Shot opens an
+  8 sec window for an instant Long Draw, rewarding a deliberate precision sequence
+  while keeping the payoff mobile and the mana cost meaningful.

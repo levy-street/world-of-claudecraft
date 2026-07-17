@@ -154,8 +154,24 @@ describe('spec masteries', () => {
       },
     });
     expect(TALENTS.hunter?.specs.find((s) => s.id === 'marksmanship')?.mastery.effect).toEqual({
-      global: { meleeDmgPct: 0.2 },
+      global: { meleeDmgPct: 0.1 },
       stats: { crit: 0.03 },
+      proc: {
+        id: 'hun_iron_aim',
+        name: 'Iron Aim',
+        spec: 'marksmanship',
+        requiresKnownAbility: 'aimed_shot',
+        school: 'physical',
+        trigger: { on: 'rangedHit', abilities: ['concussive_shot'] },
+        responses: [
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_instant',
+            abilities: ['aimed_shot'],
+            duration: 8,
+          },
+        ],
+      },
     });
     expect(TALENTS.hunter?.specs.find((s) => s.id === 'survival')?.mastery.effect).toEqual({
       global: { meleeDmgPct: 0.15 },
@@ -415,7 +431,7 @@ describe('spec masteries', () => {
       },
       hunter: {
         beast_mastery: { global: 'petDmgPct', value: 0.2 },
-        marksmanship: { global: 'meleeDmgPct', value: 0.2 },
+        marksmanship: { global: 'meleeDmgPct', value: 0.1 },
         survival: { global: 'meleeDmgPct', value: 0.15 },
       },
       mage: {

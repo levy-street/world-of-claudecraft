@@ -293,6 +293,19 @@ export function onSpellHit(
   }
 }
 
+export function onRangedHit(
+  ctx: SimContext,
+  player: Entity,
+  abilityId: string,
+  target: Entity,
+): void {
+  for (const def of procsFor(ctx, player)) {
+    const trigger = def.trigger;
+    if (trigger.on !== 'rangedHit' || !trigger.abilities.includes(abilityId)) continue;
+    fire(ctx, player, def, target);
+  }
+}
+
 export function onShieldConsumed(
   ctx: SimContext,
   player: Entity,

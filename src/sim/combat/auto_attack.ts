@@ -329,6 +329,8 @@ export function rangedSwing(
       undefined,
       true,
       !ranged.wand,
+      false,
+      ranged.wand ? null : 'auto_shot',
     );
     // 4-piece set procs keyed to weapon crits (ranged arm). Gated on setProcs
     // inside applySetProcs, so proc-less players draw no rng.
