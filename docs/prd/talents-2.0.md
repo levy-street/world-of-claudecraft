@@ -960,4 +960,6 @@ npm run build on PR4/PR5.
   now advances the burst cooldown and banks the same mobile shot payoff.
 - Coldsight uses Iron Aim as a landed setup and execute. Rattling Shot opens an
   8 sec window for an instant Long Draw, rewarding a deliberate precision sequence
-  while keeping the payoff mobile and the mana cost meaningful.
+  while keeping the payoff mobile and the mana cost meaningful. Second Bearing
+  replaces flat Long Draw scaling with a landed payoff that restores 20 mana and
+  resets Rattling Shot, allowing the sequence to be deliberately set up again.

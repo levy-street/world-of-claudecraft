@@ -173,9 +173,10 @@ describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
     expect(reprise).toContain('Ancestral Strike');
     expect(reprise).toContain('cooldown');
 
-    const sniper = render('hunter', (e) => e.id === 'hun_r14_sniper_training');
-    expect(sniper).toContain('30%');
-    expect(sniper).toContain('15%');
+    const secondBearing = render('hunter', (e) => e.id === 'hun_r14_sniper_training');
+    expect(secondBearing).toContain('landed Long Draw');
+    expect(secondBearing).toContain('20 mana');
+    expect(secondBearing).toContain('Rattling Shot cooldown');
 
     const fulmination = render('shaman', (e) => e.id === 'sha_r11_fulmination');
     expect(fulmination).toContain('up to 9');

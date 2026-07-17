@@ -91,7 +91,7 @@ function effect<T extends AbilityEffect['type']>(
 }
 
 describe('retained v0.26 all-class Talents V2 semantics', () => {
-  it("resolves the final Oath's Due, Sniper Training, Tempest Reprise, and content values", () => {
+  it("resolves the final Oath's Due, Second Bearing, Tempest Reprise, and content values", () => {
     const oathsDue = ROW_TREES.paladin
       .flatMap((row) => row.options)
       .find((option) => option.id === 'pal_r14_swift_verdicts');
@@ -113,9 +113,18 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
       ],
     });
 
-    const aimed = resolved('hunter', 'aimed_shot', { 14: 'hun_r14_sniper_training' });
-    expect(aimed.castTime).toBeCloseTo(2.1);
-    expect(effect(aimed, 'directDamage')).toMatchObject({ min: 57, max: 71 });
+    const secondBearing = ROW_TREES.hunter
+      .flatMap((row) => row.options)
+      .find((option) => option.id === 'hun_r14_sniper_training');
+    expect(secondBearing?.effect.proc).toEqual({
+      id: 'hun_second_bearing',
+      name: 'Second Bearing',
+      trigger: { on: 'rangedHit', abilities: ['aimed_shot'] },
+      responses: [
+        { kind: 'resource', amount: 20 },
+        { kind: 'cooldownRefund', ability: 'concussive_shot', seconds: 'reset' },
+      ],
+    });
 
     const reprise = ROW_TREES.shaman
       .flatMap((row) => row.options)

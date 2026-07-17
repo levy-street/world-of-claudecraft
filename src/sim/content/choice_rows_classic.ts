@@ -866,10 +866,20 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'hun_r14_sniper_training',
-          name: 'Sniper Training',
-          description: "Long Draw's cast time is reduced by 30% and it deals 15% more damage.",
+          name: 'Second Bearing',
+          description: 'A landed Long Draw restores 20 mana and resets Rattling Shot cooldown.',
           icon: 'aimed_shot',
-          effect: { ability: [{ ability: 'aimed_shot', castPct: -0.3, dmgPct: 0.15 }] },
+          effect: {
+            proc: {
+              id: 'hun_second_bearing',
+              name: 'Second Bearing',
+              trigger: { on: 'rangedHit', abilities: ['aimed_shot'] },
+              responses: [
+                { kind: 'resource', amount: 20 },
+                { kind: 'cooldownRefund', ability: 'concussive_shot', seconds: 'reset' },
+              ],
+            },
+          },
         },
         {
           id: 'hun_r14_serpents_venom',
