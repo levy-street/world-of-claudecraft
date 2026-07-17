@@ -44,7 +44,7 @@ function cellCoord(v: number, size: number): number | null {
   // already wider than the overlap threshold, so only equal coordinates can
   // collide; keying by the original value preserves that distinction. Its
   // magnitude also exceeds every safe cell id, so the keyspaces cannot alias.
-  if (!Number.isSafeInteger(coord)) return v === 0 ? 0 : v;
+  if (!Number.isSafeInteger(coord)) return v;
   return coord === 0 ? 0 : coord;
 }
 
