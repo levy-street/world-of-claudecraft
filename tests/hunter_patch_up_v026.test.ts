@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
-import type { Entity, SimEvent } from '../src/sim/types';
+import { DT, type Entity, type SimEvent } from '../src/sim/types';
 
 type TestSim = Sim & {
   addEntity(entity: Entity): void;
@@ -122,13 +122,14 @@ describe('Hunter Patch Up', () => {
     expect(pet.auras.some((aura) => aura.id === 'revive_pet')).toBe(false);
   });
 
-  it('improves the living-pet heal to exactly 360 without changing its cadence', () => {
+  it("keeps the base heal and turns pet maintenance into Mender's Signal", () => {
     const sim = makeHunter({ 11: 'hun_r11_mend_pet' });
     const pet = addPet(sim, sim.playerId);
+    sim.player.cooldowns.set('bestial_wrath', 60);
 
     expect(sim.resolvedAbility('revive_pet')?.effects).toContainEqual({
       type: 'hot',
-      total: 360,
+      total: 240,
       duration: 12,
       interval: 3,
     });
@@ -139,11 +140,19 @@ describe('Hunter Patch Up', () => {
       expect.objectContaining({
         id: 'revive_pet',
         kind: 'hot',
-        value: 90,
+        value: 60,
         tickInterval: 3,
         sourceId: sim.playerId,
       }),
     );
+    expect(sim.player.cooldowns.get('bestial_wrath')).toBeCloseTo(60 - 61 * DT - 15, 5);
+    const signal = sim.player.auras.find((aura) => aura.id === 'hun_menders_signal');
+    expect(signal).toMatchObject({
+      kind: 'next_cast_free',
+      duration: 8,
+      empowerAbilities: ['arcane_shot'],
+    });
+    expect(signal?.remaining).toBeGreaterThan(7.8);
   });
 
   it('keeps Master Tamer independent from Patch Up healing', () => {

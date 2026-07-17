@@ -955,4 +955,6 @@ npm run build on PR4/PR5.
 
 - Packlord uses Packbond as a pet-fed cadence. Every third landed companion attack
   advances Howling Rage and opens an 8 sec free Fell Shot window, turning pet uptime
-  into a visible mobile payoff while preserving mana as the hunter resource.
+  into a visible mobile payoff while preserving mana as the hunter resource. The
+  Mender's Signal choice replaces flat Patch Up scaling: completing pet maintenance
+  now advances the burst cooldown and banks the same mobile shot payoff.

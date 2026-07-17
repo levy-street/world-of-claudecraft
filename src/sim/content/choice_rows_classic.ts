@@ -787,10 +787,26 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'hun_r11_mend_pet',
-          name: 'Patch Up',
-          description: 'Patch Up heals a living pet for 50% more.',
+          name: "Mender's Signal",
+          description:
+            'Completing Patch Up reduces Howling Rage cooldown by 15 sec and makes your next Fell Shot within 8 sec free.',
           icon: 'mend_pet',
-          effect: { ability: [{ ability: 'revive_pet', dmgPct: 0.5 }] },
+          effect: {
+            proc: {
+              id: 'hun_menders_signal',
+              name: "Mender's Signal",
+              trigger: { on: 'castNth', n: 1, abilities: ['revive_pet'] },
+              responses: [
+                { kind: 'cooldownRefund', ability: 'bestial_wrath', seconds: 15 },
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_free',
+                  abilities: ['arcane_shot'],
+                  duration: 8,
+                },
+              ],
+            },
+          },
         },
         {
           id: 'hun_r11_efficiency',

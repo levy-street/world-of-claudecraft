@@ -313,7 +313,9 @@ function fellShotProcState(
   _ability: ActionBarAbility,
   player: ActionBarPlayerInput,
 ): ActionBarProcState {
-  return hasAura(player.auras, 'hun_packbond') ? 'armed' : 'none';
+  return hasAura(player.auras, 'hun_packbond') || hasAura(player.auras, 'hun_menders_signal')
+    ? 'armed'
+    : 'none';
 }
 
 // Ability ids map to pure proc resolvers here, keeping the painter generic. New

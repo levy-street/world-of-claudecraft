@@ -345,6 +345,13 @@ describe('actionBarView: proc availability cues', () => {
         }),
       ).slots[0].procState,
     ).toBe('armed');
+    expect(
+      view.tick(
+        world({
+          playerAuras: [{ id: 'hun_menders_signal', kind: 'next_cast_free' }],
+        }),
+      ).slots[0].procState,
+    ).toBe('armed');
   });
 
   it('keeps ordinary abilities and Icefall without stored Icicles at none', () => {
