@@ -148,6 +148,7 @@ function slot(over: Partial<AuraSlotState> & { key: string }): AuraSlotState {
   return {
     iconKey: over.key,
     isDebuff: false,
+    isActionable: false,
     school: '',
     own: false,
     durationText: '',
@@ -528,5 +529,53 @@ describe('AurasPainter: a wire-faithful buff_* stat-sap survives the low cap (vi
         (c) => c.m === 'toggleClass' && c.args[0] === 'debuff' && c.args[1] === true,
       ),
     ).toBe(true);
+  });
+});
+
+describe('AurasPainter: actionable Mage windows survive the low cap (view -> painter)', () => {
+  it('renders Ember Relay behind overflowing raid buffs on low', () => {
+    const container = fakeEl('div');
+    const facet = recordingFacet();
+    const tips = recordingTooltips();
+    const iconUrl = makeIconUrl();
+    const painter = new AurasPainter(
+      facet.writers,
+      container as unknown as HTMLElement,
+      {
+        resolveIconUrl: iconUrl,
+        renderTooltip: (name, remaining) => `${name}|${Math.ceil(remaining)}`,
+        attachTooltip: tips.attachTooltip,
+        attachCancel: () => {},
+      },
+      fakeDoc,
+      () => 'low',
+    );
+    const view = createAurasView('all', {
+      iconId: (aura) => aura.id,
+      auraName: (aura) => aura.name,
+      formatStacks: (stacks) => String(stacks),
+      isOwn: () => false,
+      durationUnits: () => ({ s: 's', m: 'm', h: 'h', d: 'd' }),
+      auraEffectHtml: () => '',
+    });
+    const auras: AuraInput[] = Array.from({ length: AURA_VISIBLE_CAP_LOW + 2 }, (_, i) => ({
+      id: `buff${i}`,
+      name: `Buff ${i}`,
+      kind: 'buff_ap',
+      remaining: 600,
+      value: 50,
+    }));
+    auras.push({
+      id: 'mag_ember_relay',
+      name: 'Ember Relay',
+      kind: 'next_cast_cheap',
+      remaining: 8,
+      value: 0.5,
+    });
+
+    painter.paint(view.tick({ auras }));
+
+    expect(container.childNodes).toHaveLength(AURA_VISIBLE_CAP_LOW + 1);
+    expect(iconUrl).toHaveBeenCalledWith('mag_ember_relay');
   });
 });

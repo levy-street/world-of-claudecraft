@@ -298,6 +298,11 @@ Pyrelance. Afterflame adds no random draws and does nothing until the Pyromancy 
 known Flashfire signature, explicit direct-Fire ability, critical result, and positive
 post-absorb damage gates have all passed.
 
+The stable `mag_r5_impulse` choice now authors Ember Relay instead of the flat Twin Embers
+charge increase. A landed Cinderfall opens an eight-second window in which the next
+Cinderbolt or Scald costs 50% less. This turns the row choice into a repeatable mana and
+tempo decision after each detonation while leaving Cinder Reprise and Third Current intact.
+
 ### Warspirit + Requital melee-DPS identity pass
 
 Paladin and Shaman choice rows are class-wide. A row allocation survives a specialization

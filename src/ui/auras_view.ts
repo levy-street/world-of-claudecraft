@@ -78,6 +78,12 @@ const TOGGLE_KINDS: ReadonlySet<AuraKind> = new Set([
 // Sprint also uses, 15s and very much worth a countdown), so it hides by id.
 const TOGGLE_IDS: ReadonlySet<string> = new Set(['ghost_wolf']);
 
+// Short combat decisions must survive the low-effects aura cap. Keep this list on
+// stable content ids so Sim auras and wire-mirrored auras derive the same priority.
+// Add each empowerment in the commit that authors it; long passive raid buffs remain
+// eligible for overflow shedding.
+const ACTIONABLE_AURA_IDS: ReadonlySet<string> = new Set(['mag_ember_relay']);
+
 /** The localized single-letter unit suffixes the compact duration label uses. */
 export interface DurationUnits {
   s: string;
@@ -182,6 +188,8 @@ export interface AuraSlotState {
   iconKey: string;
   /** Whether this aura reads as a debuff (drives the `debuff` class, not a color). */
   isDebuff: boolean;
+  /** Whether hiding this short-lived buff would conceal a live cast decision. */
+  isActionable: boolean;
   /** The debuff's magic school ('' for a buff), driving the WoW-style per-school
    *  border tint (data-school on the node; the stylesheet maps it to a token).
    *  PARITY: the wire sends `school` sparsely (server/game.ts omits 'physical');
@@ -243,6 +251,7 @@ function makeSlotState(): AuraSlotState {
     key: '',
     iconKey: '',
     isDebuff: false,
+    isActionable: false,
     school: '',
     durationText: '',
     stacksText: '',
@@ -292,6 +301,7 @@ export function createAurasView(
         slot.key = a.id;
         slot.iconKey = deps.iconId(a);
         slot.isDebuff = debuff;
+        slot.isActionable = ACTIONABLE_AURA_IDS.has(a.id);
         slot.school = debuff ? (a.school ?? 'physical') : '';
         slot.durationText =
           TOGGLE_KINDS.has(a.kind) || TOGGLE_IDS.has(a.id)

@@ -248,7 +248,8 @@ describe('canonical Talents V2 allocation', () => {
 
   it('folds each selected row exactly once', () => {
     const mods = computeTalentModifiers('mage', { spec: null, rows: { 5: 'mag_r5_impulse' } }, 20);
-    expect(mods.abilities.fire_blast?.bonusCharges).toBe(1);
+    expect(mods.abilities.fire_blast?.bonusCharges ?? 0).toBe(0);
+    expect(mods.procs.filter((proc) => proc.id === 'mag_ember_relay')).toHaveLength(1);
   });
 
   it('round-trips a versioned canonical build without legacy point-tree fields', () => {

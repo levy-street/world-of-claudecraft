@@ -171,7 +171,7 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
     expect(doubleCharge).toMatchObject({ charges: 2, bonusCharges: 1 });
 
     const mageImpulse = resolved('mage', 'fire_blast', { 5: 'mag_r5_impulse' });
-    expect(mageImpulse).toMatchObject({ charges: 2, bonusCharges: 1 });
+    expect(mageImpulse).toMatchObject({ bonusCharges: 0 });
   });
 
   it('Calloused Hide makes only its scoped physical Long Draw cast instant', () => {

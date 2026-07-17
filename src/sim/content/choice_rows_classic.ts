@@ -139,10 +139,28 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'mag_r5_impulse',
-          name: 'Twin Embers',
-          description: 'Cinderfall stores 2 uses.',
+          name: 'Ember Relay',
+          description:
+            'A landed Cinderfall makes your next Cinderbolt or Scald within 8 sec cost 50% less.',
           icon: 'fire_blast',
-          effect: { ability: [{ ability: 'fire_blast', bonusCharges: 1 }] },
+          effect: {
+            proc: {
+              id: 'mag_ember_relay',
+              name: 'Ember Relay',
+              requiresKnownAbility: 'fire_blast',
+              school: 'fire',
+              trigger: { on: 'spellHit', abilities: ['fire_blast'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_cheap',
+                  abilities: ['fireball', 'scorch'],
+                  duration: 8,
+                  costPct: 0.5,
+                },
+              ],
+            },
+          },
         },
         {
           id: 'mag_r5_mana_attunement',
