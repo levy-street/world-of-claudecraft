@@ -373,7 +373,19 @@ export function onMeleeSwing(
       trigger.on === 'meleeSwingWhile' &&
       player.auras.some((aura) => aura.kind === trigger.auraKind)
     ) {
-      fire(ctx, player, def, player);
+      const cadence = trigger.n ?? 1;
+      if (cadence <= 1) {
+        fire(ctx, player, def, player);
+        continue;
+      }
+      const procState = state(player);
+      const count = (procState.counters[def.id] ?? 0) + 1;
+      if (count >= cadence) {
+        procState.counters[def.id] = 0;
+        fire(ctx, player, def, player);
+      } else {
+        procState.counters[def.id] = count;
+      }
     }
   }
 }

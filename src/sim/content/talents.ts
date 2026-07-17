@@ -128,7 +128,7 @@ export type ProcTrigger =
         chance: number;
       };
     }
-  | { on: 'meleeSwingWhile'; auraKind: string }
+  | { on: 'meleeSwingWhile'; auraKind: string; n?: number }
   | { on: 'thornsReflect'; ability: string };
 
 export type ProcResponse =

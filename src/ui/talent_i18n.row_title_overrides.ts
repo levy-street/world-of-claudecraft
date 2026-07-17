@@ -220,6 +220,7 @@ const WARRIOR_TITLES: Partial<Record<SupportedLanguage, Partial<TitleMap>>> = {
     "Mender's Signal": 'Сигнал лекаря',
     'Second Bearing': 'Повторная наводка',
     Rainbreak: 'Прорыв сквозь ливень',
+    'Venom Dividend': 'Ядовитый дивиденд',
   },
   cs_CZ: {
     'Double Charge': 'Dvojitý výpad',

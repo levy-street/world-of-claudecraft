@@ -224,14 +224,12 @@ describe('auto_attack meleeSwing: landed talent procs resolve before retaliation
       expected: 4.5,
     },
     {
-      name: 'Venom Dividend resource gain',
+      name: 'Venom Dividend cadence',
       cls: 'rogue' as const,
       row: { 14: 'rog_r14_deadly_brew' },
-      prepare: (player: AnyEntity) => {
-        player.resource = 0;
-      },
-      read: (player: AnyEntity) => player.resource,
-      expected: 5,
+      prepare: () => {},
+      read: (player: AnyEntity) => player.procState?.counters.rog_deadly_brew,
+      expected: 1,
     },
     {
       name: 'Imbued Tempo cooldown refund',

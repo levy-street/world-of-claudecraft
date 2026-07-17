@@ -260,6 +260,7 @@ const FREE_COST_AURA_IDS_BY_ABILITY: Readonly<Record<string, readonly string[]>>
   arcane_shot: ['hun_venom_relay', 'hun_packbond', 'hun_menders_signal'],
   eviscerate: ['rog_redhanded'],
   rupture: ['rog_redhanded'],
+  crippling_poison: ['rog_deadly_brew'],
 };
 
 function talentProcMakesAbilityFree(
@@ -352,6 +353,13 @@ function redhandedFinisherProcState(
   return hasAura(player.auras, 'rog_redhanded') ? 'armed' : 'none';
 }
 
+function venomDividendProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'rog_deadly_brew') ? 'armed' : 'none';
+}
+
 // Ability ids map to pure proc resolvers here, keeping the painter generic. New
 // action cues extend this table rather than adding ability branches to DOM code.
 const PROC_STATE_RESOLVERS: Readonly<Record<string, ProcStateResolver | undefined>> = {
@@ -364,6 +372,7 @@ const PROC_STATE_RESOLVERS: Readonly<Record<string, ProcStateResolver | undefine
   raptor_strike: guttingStrikeProcState,
   eviscerate: redhandedFinisherProcState,
   rupture: redhandedFinisherProcState,
+  crippling_poison: venomDividendProcState,
 };
 
 function procStateForAbility(

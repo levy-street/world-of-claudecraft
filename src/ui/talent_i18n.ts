@@ -7873,7 +7873,7 @@ function procTriggerDescription(
     case 'meleeHit':
       return `${trigger.chance === undefined ? '' : `${formatPercent(trigger.chance, lang)}: `}${abilityList(trigger.abilities)}`;
     case 'meleeSwingWhile':
-      return `${text.statLabels.meleeDmgPct} @ ${t('hudChrome.auraEffect.imbue')}`;
+      return `${text.statLabels.meleeDmgPct} @ ${t('hudChrome.auraEffect.imbue')}${trigger.n !== undefined && trigger.n > 1 ? ` x${trigger.n}` : ''}`;
     case 'thornsReflect':
       return `${abilityName(trigger.ability)}: ${t('guide.abilityHook.thorns')}`;
   }

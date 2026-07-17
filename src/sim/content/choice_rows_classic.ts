@@ -1168,7 +1168,7 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 14,
       theme: 'combo_engine',
-      decision: 'two-finisher builder discount vs evasive strike vs poison-fed energy',
+      decision: 'two-finisher builder discount vs evasive strike vs poison-fed free cast',
       options: [
         {
           id: 'rog_r14_seal_fate',
@@ -1203,14 +1203,23 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'rog_r14_deadly_brew',
           name: 'Venom Dividend',
-          description: 'Landed melee auto-attacks with an active poison restore 5 energy.',
+          description:
+            'Every 4th landed melee attack with an active weapon poison makes your next Leaden Venom within 8 sec free.',
           icon: 'deadly_poison',
           effect: {
             proc: {
               id: 'rog_deadly_brew',
               name: 'Venom Dividend',
-              trigger: { on: 'meleeSwingWhile', auraKind: 'imbue' },
-              responses: [{ kind: 'resource', amount: 5 }],
+              school: 'nature',
+              trigger: { on: 'meleeSwingWhile', auraKind: 'imbue', n: 4 },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_free',
+                  abilities: ['crippling_poison'],
+                  duration: 8,
+                },
+              ],
             },
           },
         },

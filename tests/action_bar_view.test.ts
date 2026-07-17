@@ -433,6 +433,26 @@ describe('actionBarView: proc availability cues', () => {
     }
   });
 
+  it('marks Leaden Venom armed and usable during Venom Dividend', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('crippling_poison', { cost: 40 }) })),
+      fakeDeps(),
+    );
+
+    expect(view.tick(world({ resource: 0 })).slots[0]).toMatchObject({
+      procState: 'none',
+      usable: false,
+    });
+    expect(
+      view.tick(
+        world({
+          resource: 0,
+          playerAuras: [{ id: 'rog_deadly_brew', kind: 'next_cast_free' }],
+        }),
+      ).slots[0],
+    ).toMatchObject({ procState: 'armed', usable: true });
+  });
+
   it('keeps ordinary abilities and Icefall without stored Icicles at none', () => {
     const view = createActionBarView(
       descriptor(

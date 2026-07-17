@@ -976,4 +976,7 @@ npm run build on PR4/PR5.
 - Knifework uses Redhanded as a poison-to-finisher conversion. Landing Leaden Venom
   opens an 8 sec window for a free Dirt Nap or Bleed Out, so the assassination loop
   deliberately weaves poison between combo-point building and its direct or bleed
-  payoff while preserving energy as the limiting resource outside that window.
+  payoff while preserving energy as the limiting resource outside that window. Venom
+  Dividend replaces automatic energy trickles: every fourth poisoned weapon hit banks
+  a free Leaden Venom, turning maintained weapon poison and melee uptime into a planned
+  route back to the Redhanded payoff without changing the row's other choices.
