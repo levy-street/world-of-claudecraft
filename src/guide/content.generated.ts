@@ -3373,6 +3373,13 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "renown": 5,
     "feat": false,
     "crest": "/ui/deeds/chr_marsh_first_cast.webp"
+  },
+  {
+    "id": "pvp_card_duel_first_win",
+    "name": "House Rules",
+    "category": "pvp",
+    "renown": 5,
+    "feat": false
   }
 ];
 

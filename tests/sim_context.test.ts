@@ -215,6 +215,7 @@ const CALLBACK_KEYS = [
   'marketListingBelongsTo',
   // Ravenpost mail: the quest turn-in letter hook.
   'queueQuestLetter',
+  'mailHeroicMarks',
   // Set proc firing.
   'applySetProcs',
   // The Vale Cup sport-move arms (social/vale_cup.ts).
@@ -259,6 +260,8 @@ function makeFakeHost() {
     dungeonResetLocks: new Map(),
     arenaMatches: new Map(),
     duels: new Map(),
+    cardDuelQueue: [],
+    cardDuels: new Map(),
     cfg: { seed: 1 } as unknown as SimContextHost['cfg'],
     trades: new Map(),
     arenaQueue1v1: [],
@@ -493,6 +496,7 @@ function makeFakeHost() {
     marketListingBelongsTo: vi.fn(() => false),
     // Ravenpost mail: the quest turn-in letter hook.
     queueQuestLetter: vi.fn(),
+    mailHeroicMarks: vi.fn(),
     applySetProcs: vi.fn(),
     // The Vale Cup sport-move arms.
     vcupBallKick: vi.fn(),

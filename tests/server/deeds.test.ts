@@ -315,6 +315,30 @@ describe('characterSheet deeds summary', () => {
     });
   });
 
+  it('earnedCount follows the shared completion predicate over the earned blob', () => {
+    // The three delta classes vs the old raw Object.keys count: a feat never
+    // counts, a removed-content id never counts, an EARNED hidden deed does
+    // (the count reveals no hidden id; the Book header shows the owner the
+    // same number). Fixture guards pin the exemplars' flags in the catalog.
+    expect(DEEDS.feat_era_cap.feat).toBe(true);
+    expect(DEEDS.hid_saul_footnote.hidden).toBe(true);
+    expect(DEEDS.gone_deed).toBeUndefined();
+    const sheet = buildSheet({
+      level: 12,
+      deeds: {
+        prog_first_steps: '2026-07-01',
+        feat_era_cap: '2026-07-02',
+        gone_deed: '2026-07-03',
+        hid_saul_footnote: '2026-07-04',
+      },
+      renown: 15,
+    });
+    // prog_first_steps + hid_saul_footnote: equal to the Book of Deeds header
+    // for this character (the cross-surface contract in
+    // src/sim/deeds_completion.ts).
+    expect(sheet.deeds.earnedCount).toBe(2);
+  });
+
   it('passes the strip verbatim to the owner; the public arm coarsens earnedAt to the UTC day', () => {
     const recent = [
       { deedId: 'prog_veteran', earnedAt: '2026-07-08T10:00:00.000Z' },

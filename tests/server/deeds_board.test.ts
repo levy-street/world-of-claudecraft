@@ -1,8 +1,10 @@
-// The Renown board's pure scoring core (server/deeds_board.ts): counted-set
-// scoring over character_deeds rows, the entry floor, the three ordering keys
-// (score desc, completionTime asc, accountId asc), display-character
-// selection, the self rank + topPercent read, and unknown-deed tolerance.
-// Plain fixtures, no db import: the module is host-agnostic by design.
+// The Renown board's pure scoring core (server/deeds_board.ts): scoring-set
+// aggregation over character_deeds rows, the entry floor, the three ordering
+// keys (score desc, completionTime asc, accountId asc), display-character
+// selection, the self rank + topPercent + renown read, and unknown-deed
+// tolerance. Plain fixtures, no db import: the module is host-agnostic by
+// design. deedCount is a deprecated wire-compat output (issue #2044): still
+// asserted populated here until its removal, never displayed by clients.
 
 import { describe, expect, it } from 'vitest';
 import {
@@ -29,7 +31,10 @@ function deed(id: string, renown: DeedDef['renown']): DeedDef {
   };
 }
 
-// A catalog fixture: two 25s, two 10s, a 5, a 50, and a zero-renown feat.
+// A catalog fixture: two 25s, two 10s, a 5, a 50, a zero-renown feat, and a
+// zero-renown NON-feat collection deed (col0, the class the 142-vs-129 player
+// report was about: it counts in the Book's completion pair but sits outside
+// the board's scoring set).
 const CATALOG: Record<string, DeedDef> = {
   d25a: deed('d25a', 25),
   d25b: deed('d25b', 25),
@@ -38,6 +43,7 @@ const CATALOG: Record<string, DeedDef> = {
   d5: deed('d5', 5),
   d50: deed('d50', 50),
   feat0: { ...deed('feat0', 0), feat: true },
+  col0: { ...deed('col0', 0), category: 'collection' },
 };
 
 function row(
@@ -86,24 +92,41 @@ describe('computeDeedsBoard scoring', () => {
   });
 });
 
-describe('zero-renown deeds', () => {
-  it('neither score nor count', () => {
-    const board = ranked([row(1, 11, 'd50', T1), row(1, 11, 'feat0', T2), row(1, 11, 'd25a', T2)]);
+describe('zero-renown deeds sit outside the scoring set', () => {
+  it('never score, and never enter the deprecated deedCount output', () => {
+    const board = ranked([
+      row(1, 11, 'd50', T1),
+      row(1, 11, 'feat0', T2),
+      row(1, 11, 'col0', T2),
+      row(1, 11, 'd25a', T2),
+    ]);
     expect(board).toHaveLength(1);
     expect(board[0].renown).toBe(75);
     expect(board[0].deedCount).toBe(2);
   });
 
-  it('do not shift the tie-break', () => {
+  it('a zero-renown FEAT does not shift the tie-break', () => {
     // Account 1 reaches 50 at T1 but earns a zero-renown feat at T4; account 2
-    // reaches 50 at T2. If the feat leaked into the counted set, account 1's
+    // reaches 50 at T2. If the feat leaked into the scoring set, account 1's
     // completionTime would be T4 and it would wrongly rank below account 2.
     const board = ranked([row(1, 11, 'd50', T1), row(1, 11, 'feat0', T4), row(2, 21, 'd50', T2)]);
     expect(board.map((a) => a.accountId)).toEqual([1, 2]);
   });
 
+  it('a LATE zero-renown non-feat earn changes nothing on the board', () => {
+    // The exact regression scenario from the player report: a collection deed
+    // with no Renown earned long after the score was reached. It counts in the
+    // Book's completion pair, but on the board it must not score, must not
+    // move completionTime, and must not reorder anyone.
+    const withoutCol = ranked([row(1, 11, 'd50', T1), row(2, 21, 'd50', T2)]);
+    const withCol = ranked([row(1, 11, 'd50', T1), row(1, 11, 'col0', T4), row(2, 21, 'd50', T2)]);
+    expect(withCol).toEqual(withoutCol);
+    expect(withCol.map((a) => a.accountId)).toEqual([1, 2]);
+    expect(withCol[0].completionTime).toBe(Date.parse(T1));
+  });
+
   it('an account with only zero-renown deeds never boards', () => {
-    const board = ranked([row(1, 11, 'feat0', T1)]);
+    const board = ranked([row(1, 11, 'feat0', T1), row(1, 11, 'col0', T2)]);
     expect(board).toHaveLength(0);
   });
 });
@@ -252,17 +275,19 @@ describe('buildDeedsBoardEntries', () => {
 });
 
 describe('deedsBoardSelf', () => {
-  it('returns rank and topPercent for a ranked account', () => {
+  it('returns rank, topPercent, and the board-scored renown for a ranked account', () => {
     const board = ranked([
       row(1, 11, 'd50', T1),
       row(2, 21, 'd50', T2),
       row(3, 31, 'd50', T3),
       row(3, 31, 'd25a', T3),
     ]);
-    // Account 3 scores 75 (rank 1); 1 and 2 tie at 50, broken by time.
-    expect(deedsBoardSelf(board, 3)).toEqual({ rank: 1, topPercent: 34 });
-    expect(deedsBoardSelf(board, 1)).toEqual({ rank: 2, topPercent: 67 });
-    expect(deedsBoardSelf(board, 2)).toEqual({ rank: 3, topPercent: 100 });
+    // Account 3 scores 75 (rank 1); 1 and 2 tie at 50, broken by time. The
+    // renown on the self line is the account's own board score, so a player
+    // can verify it against their Book of Deeds.
+    expect(deedsBoardSelf(board, 3)).toEqual({ rank: 1, topPercent: 34, renown: 75 });
+    expect(deedsBoardSelf(board, 1)).toEqual({ rank: 2, topPercent: 67, renown: 50 });
+    expect(deedsBoardSelf(board, 2)).toEqual({ rank: 3, topPercent: 100, renown: 50 });
   });
 
   it('returns null for an account not on the board', () => {
@@ -282,7 +307,7 @@ describe('deedsBoardSelf', () => {
     }
     const board = ranked(rows);
     expect(board).toHaveLength(1200);
-    expect(deedsBoardSelf(board, 1100)).toEqual({ rank: 1100, topPercent: 92 });
-    expect(deedsBoardSelf(board, 1)).toEqual({ rank: 1, topPercent: 1 });
+    expect(deedsBoardSelf(board, 1100)).toEqual({ rank: 1100, topPercent: 92, renown: 50 });
+    expect(deedsBoardSelf(board, 1)).toEqual({ rank: 1, topPercent: 1, renown: 50 });
   });
 });

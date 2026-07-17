@@ -2107,7 +2107,10 @@
   .lb-row.lb-daily {
     grid-template-columns: 44px 1fr 96px;
   }
+  /* .lb-scope-note is the Renown tab's account-scope teaching line, visible
+     on every deeds-board state (never a title-attr tooltip: touch has none). */
   .lb-total,
+  .lb-scope-note,
   .dr-leaderboard-total {
     margin: 2px 0 8px;
     color: #b9ac82;
@@ -2118,9 +2121,10 @@
     color: var(--color-text-muted);
   }
   /* Renown (deeds) board: rank, chronicler (class tooltip + realm tag),
-     Renown, deed count, displayed title. */
+     Renown, displayed title. Renown is the one ranked number on the board
+     (the completion count lives in the Book of Deeds header). */
   .lb-row-deeds {
-    grid-template-columns: 44px 1fr 56px 48px 110px;
+    grid-template-columns: 44px 1fr 56px 110px;
   }
   .lb-realm {
     color: var(--color-text-muted);
@@ -2129,10 +2133,6 @@
   .lb-renown {
     text-align: right;
     color: #ffe27a;
-  }
-  .lb-deeds-count {
-    text-align: center;
-    color: var(--color-text-muted);
   }
   .lb-deed-title {
     color: var(--color-text-muted);
@@ -4267,6 +4267,69 @@
     #player-card-modal .pc-link-input {
       font-size: 16px;
     }
+  }
+
+  /* ---------- card duel (the Card Master minigame) ---------- */
+  #card-duel-window {
+    width: 320px;
+  }
+  .cd-body {
+    padding: 8px;
+  }
+  .cd-status {
+    font-size: 12px;
+    margin: 4px 0;
+    color: #ddd;
+  }
+  .cd-opponent {
+    font-family: var(--title-font);
+    font-size: 13px;
+    color: var(--gold);
+  }
+  .cd-turn {
+    color: #887c5c;
+  }
+  .cd-hand {
+    display: flex;
+    gap: 6px;
+    margin: 8px 0;
+    flex-wrap: wrap;
+  }
+  .cd-card {
+    width: 40px;
+    height: 56px;
+    border-radius: 4px;
+    border: 1px solid var(--gold);
+    background: #ffffff10;
+    color: inherit;
+    font-family: var(--title-font);
+    font-size: 18px;
+    cursor: var(--cursor-point);
+  }
+  .cd-card:hover:not(:disabled) {
+    background: #ffffff20;
+  }
+  .cd-card:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+  .cd-counts {
+    font-size: 11px;
+    color: #887c5c;
+  }
+  .cd-action-btn {
+    display: block;
+    width: 100%;
+    padding: 8px;
+    border: 0;
+    border-radius: 4px;
+    cursor: var(--cursor-point);
+    background: #ffffff10;
+    color: inherit;
+    font-family: var(--ui-font);
+  }
+  .cd-action-btn:hover {
+    background: #ffffff20;
   }
 
   /* ---------- vendor ---------- */

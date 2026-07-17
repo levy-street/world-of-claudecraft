@@ -5,6 +5,8 @@
 import { Gauge, type Registry } from 'prom-client';
 import { pool } from '../db';
 import {
+  DAY_ONE_FUNNEL_STAGES,
+  FIRST_DAY_PLAYTIME_BUCKETS,
   type PlayerBusinessDay,
   type PlayerBusinessSnapshot,
   playerBusinessSnapshot,
@@ -21,6 +23,10 @@ export const WOC_PLAYER_DAILY_PLAYTIME_SECONDS = 'woc_player_daily_playtime_seco
 export const WOC_PLAYER_FIRST_SESSION_MEDIAN_SECONDS = 'woc_player_first_session_median_seconds';
 export const WOC_PLAYER_FIRST_SESSION_LEVEL_RATE = 'woc_player_first_session_level_rate';
 export const WOC_PLAYER_RETENTION_RATE = 'woc_player_retention_rate';
+export const WOC_PLAYER_FIRST_DAY_PLAYTIME_SECONDS = 'woc_player_first_day_playtime_seconds';
+export const WOC_PLAYER_FIRST_DAY_SESSIONS = 'woc_player_first_day_sessions';
+export const WOC_PLAYER_FIRST_DAY_PLAYTIME_ACCOUNTS = 'woc_player_first_day_playtime_accounts';
+export const WOC_PLAYER_FUNNEL_ACCOUNTS = 'woc_player_funnel_accounts';
 
 /** Business data changes slowly; one bounded database sample every 15 minutes is enough. */
 export const BUSINESS_METRICS_REFRESH_MS = 15 * 60_000;
@@ -211,6 +217,78 @@ export function registerBusinessMetrics(
             (item) => item.period === period && item.day === day,
           );
           if (retention) setIfPresent(this, { period, day: String(day) }, retention.rate);
+        }
+      }
+    },
+  });
+
+  new Gauge({
+    name: WOC_PLAYER_FIRST_DAY_PLAYTIME_SECONDS,
+    help: 'First-day playtime percentiles in seconds for accounts that first played in a UTC calendar period.',
+    labelNames: ['period', 'stat'],
+    registers: [registry],
+    collect() {
+      this.reset();
+      const snapshot = collector.current();
+      if (!snapshot) return;
+      for (const period of PERIODS) {
+        const day = dayFor(snapshot, period);
+        if (!day) continue;
+        setIfPresent(this, { period, stat: 'p50' }, day.firstDayPlaytimeP50Seconds);
+        setIfPresent(this, { period, stat: 'p90' }, day.firstDayPlaytimeP90Seconds);
+      }
+    },
+  });
+
+  new Gauge({
+    name: WOC_PLAYER_FIRST_DAY_SESSIONS,
+    help: 'Median session count on the first day for accounts that first played in a UTC calendar period.',
+    labelNames: ['period', 'stat'],
+    registers: [registry],
+    collect() {
+      this.reset();
+      const snapshot = collector.current();
+      if (!snapshot) return;
+      for (const period of PERIODS) {
+        const day = dayFor(snapshot, period);
+        if (day) setIfPresent(this, { period, stat: 'p50' }, day.firstDaySessionsMedian);
+      }
+    },
+  });
+
+  new Gauge({
+    name: WOC_PLAYER_FIRST_DAY_PLAYTIME_ACCOUNTS,
+    help: 'Accounts that first played in a UTC calendar period, bucketed by first-day playtime.',
+    labelNames: ['period', 'bucket'],
+    registers: [registry],
+    collect() {
+      this.reset();
+      const snapshot = collector.current();
+      if (!snapshot) return;
+      for (const period of PERIODS) {
+        const day = dayFor(snapshot, period);
+        if (!day) continue;
+        for (const bucket of FIRST_DAY_PLAYTIME_BUCKETS) {
+          this.set({ period, bucket }, day.firstDayPlaytimeAccounts[bucket]);
+        }
+      }
+    },
+  });
+
+  new Gauge({
+    name: WOC_PLAYER_FUNNEL_ACCOUNTS,
+    help: 'Accounts created in a UTC calendar period that completed each stage during that same UTC day.',
+    labelNames: ['period', 'stage'],
+    registers: [registry],
+    collect() {
+      this.reset();
+      const snapshot = collector.current();
+      if (!snapshot) return;
+      for (const period of PERIODS) {
+        const day = dayFor(snapshot, period);
+        if (!day) continue;
+        for (const stage of DAY_ONE_FUNNEL_STAGES) {
+          this.set({ period, stage }, day.dayOneFunnelAccounts[stage]);
         }
       }
     },

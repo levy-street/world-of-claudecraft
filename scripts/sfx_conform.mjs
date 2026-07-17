@@ -111,6 +111,7 @@ let failures = 0;
 let rejected = 0;
 let blocked = 0;
 const channelViolations = []; // advisory unless --strict; reported once, in the summary
+const loudnessAdvisories = []; // advisory unless --strict; reported once, in the summary
 
 for (const filename of files) {
   if (fix && !conformPolicy.recognizes(filename)) {
@@ -122,7 +123,8 @@ for (const filename of files) {
   const sourceExtension = path.extname(filename);
   const stem = path.basename(filename, sourceExtension);
   const outputFile = path.join(sfxDirectory, `${stem}.mp3`);
-  const report = inspectSfxConformance(file, { ffmpegPath, ffprobePath });
+  const preserveLoudness = conformPolicy.isCustomMaster(filename);
+  const report = inspectSfxConformance(file, { ffmpegPath, ffprobePath, preserveLoudness });
 
   if (report.reject) {
     console.log(
@@ -135,9 +137,12 @@ for (const filename of files) {
   const expectedChannels = conformPolicy.expectedChannels(filename);
   const chProblem = expectedChannels ? channelProblem(report.channels, expectedChannels) : null;
   if (chProblem) channelViolations.push(`${filename}  [${chProblem}]`);
+  for (const advisory of report.advisories) {
+    loudnessAdvisories.push(`${filename}  [${advisory}]`);
+  }
 
   const loudnessProblems = report.problems;
-  if (loudnessProblems.length === 0 && !chProblem) {
+  if (loudnessProblems.length === 0 && !chProblem && report.advisories.length === 0) {
     console.log(`  ok   ${filename}`);
     continue;
   }
@@ -145,8 +150,11 @@ for (const filename of files) {
   toConform++;
 
   const displayProblems = [...loudnessProblems, ...(chProblem ? [chProblem] : [])];
-  const normLabel =
-    report.normBranch === 'peak' ? `true peak ${TARGET_PEAK_DBFS}dBFS` : `${TARGET_LUFS} LUFS`;
+  const normLabel = preserveLoudness
+    ? `true peak <= ${TARGET_PEAK_DBFS}dBFS (loudness preserved as-authored)`
+    : report.normBranch === 'peak'
+      ? `true peak ${TARGET_PEAK_DBFS}dBFS`
+      : `${TARGET_LUFS} LUFS`;
 
   if (!fix) {
     // Loudness problems fail the check inline; a channel-only mismatch is
@@ -168,6 +176,7 @@ for (const filename of files) {
       peakDb: report.peakDb,
       ffmpegPath,
       channels: expectedChannels ?? null,
+      preserveLoudness,
     });
     if (file !== outputFile) unlinkSync(file);
     console.log('done');
@@ -218,7 +227,22 @@ if (namingViolations.length > 0) {
   }
 }
 
-const strictFailures = strict ? channelViolations.length + namingViolations.length : 0;
+if (loudnessAdvisories.length > 0) {
+  const hint = strict
+    ? ''
+    : ' (advisory; pass --strict to fail; this checker cannot see the external master-store source, so verify by ear or against it before treating this as a defect)';
+  console.log('');
+  console.log(
+    `Loudness: ${loudnessAdvisories.length} preserved-loudness file(s) suspiciously close to the generated-content target${hint}:`,
+  );
+  for (const advisory of loudnessAdvisories) {
+    console.log(`  ${strict ? 'FAIL' : 'WARN'} ${advisory}`);
+  }
+}
+
+const strictFailures = strict
+  ? channelViolations.length + namingViolations.length + loudnessAdvisories.length
+  : 0;
 if (
   failures > 0 ||
   conflicts.length > 0 ||

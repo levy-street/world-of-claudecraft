@@ -292,6 +292,9 @@ describe('response builders (convention B deferred: leaders key preserved)', () 
     const first = (body.leaders as Record<string, unknown>[])[0];
     expect(first.name).toBe('Chronicler1');
     expect(first.renown).toBe(499);
+    // deedCount stays POPULATED on the wire this release (deprecated
+    // wire-compat for stale clients, issue #2044); current clients never
+    // display it.
     expect(first.deedCount).toBe(39);
     expect(first.title).toBe('prog_veteran');
     expect('accountId' in first).toBe(false);
@@ -703,7 +706,8 @@ describe('leaderboard handler (through the injected cache-fronted runtime)', () 
     configureLeaderboardRuntime(
       fakeRuntime({
         getDeedsLeaderboard: async () => [deedsRow(1)],
-        deedsSelfRank: async (accountId) => (accountId === 77 ? { rank: 12, topPercent: 4 } : null),
+        deedsSelfRank: async (accountId) =>
+          accountId === 77 ? { rank: 12, topPercent: 4, renown: 1620 } : null,
       }),
     );
     const ctx = fakeCtx({
@@ -714,7 +718,9 @@ describe('leaderboard handler (through the injected cache-fronted runtime)', () 
     });
     await handlerFor('/api/leaderboard')(ctx);
     const b = captured(ctx.res).body as Record<string, unknown>;
-    expect(b.self).toEqual({ rank: 12, topPercent: 4 });
+    // The account's renown rides the self line verbatim (the client renders
+    // the Renown-carrying arm from it).
+    expect(b.self).toEqual({ rank: 12, topPercent: 4, renown: 1620 });
   });
 
   it('serves an authenticated but UNRANKED caller the board with no self key', async () => {

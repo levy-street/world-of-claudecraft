@@ -22,9 +22,10 @@ const MARSH_SEED = 0x4c69746e; // 'Litn' in ASCII
 // GLB-backed anchor kinds (Tripo-generated, see public/models/props). Each has
 // a procedural fallback (kept below, used only for pre-load races / headless
 // test hosts) that draws the SAME representative shape the GLB replaced.
-// 'dead_tree'/'reed_cluster'/'sluice_post' lose their per-instance hash2-driven
-// branch/stalk/rope variety when the GLB is loaded (one fixed model instead of
-// many procedural variants); acceptable per-instance trade for real art.
+// 'dead_tree'/'reed_cluster'/'sluice_post'/'root_wall' lose their per-instance
+// hash2-driven branch/stalk/rope/root variety when the GLB is loaded (one
+// fixed model instead of many procedural variants); acceptable per-instance
+// trade for real art.
 type MarshGlbAnchorKind =
   | 'plank_bridge'
   | 'shrine_fragment'
@@ -32,7 +33,8 @@ type MarshGlbAnchorKind =
   | 'broken_bell_frame'
   | 'sluice_post'
   | 'dead_tree'
-  | 'reed_cluster';
+  | 'reed_cluster'
+  | 'root_wall';
 
 const MARSH_ASSET_URL: Record<MarshGlbAnchorKind, string> = {
   plank_bridge: '/models/props/marsh_plank_bridge.glb',
@@ -42,6 +44,7 @@ const MARSH_ASSET_URL: Record<MarshGlbAnchorKind, string> = {
   sluice_post: '/models/props/marsh_sluice_post.glb',
   dead_tree: '/models/props/marsh_dead_tree.glb',
   reed_cluster: '/models/props/marsh_reed_cluster.glb',
+  root_wall: '/models/props/marsh_root_wall.glb',
 };
 
 // Uniform-rescale target per kind, matched to the footprint the procedural
@@ -68,6 +71,9 @@ const MARSH_ASSET_SCALE: Record<MarshGlbAnchorKind, { axis: 'x' | 'y'; target: n
   dead_tree: { axis: 'y', target: 4.0 },
   // addReedCluster's tallest stalk, height 1.2-2.6.
   reed_cluster: { axis: 'y', target: 1.9 },
+  // addRootWall's arced root limbs, vertical projection up to ~1.5 (len 2.5
+  // at max tilt, scaled by cos(tilt)*0.6).
+  root_wall: { axis: 'y', target: 1.5 },
 };
 
 const loadedMarshGltf = new Map<MarshGlbAnchorKind, THREE.Group>();
@@ -481,7 +487,9 @@ function placeDressingAnchor(group: THREE.Group, anchor: LitanyDressingAnchor): 
       }
       break;
     case 'root_wall':
-      addRootWall(group, anchor.x, anchor.z, rot);
+      if (!placeLoadedMarshAsset(group, 'root_wall', anchor.x, anchor.z, rot)) {
+        addRootWall(group, anchor.x, anchor.z, rot);
+      }
       break;
     case 'bone_pile':
       // Bones come from the KayKit props via the placement sink in

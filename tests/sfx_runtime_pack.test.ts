@@ -89,8 +89,14 @@ describe('runtime SFX production pack validation', () => {
 
   it('accepts a hashed bare lossless source retained from the release manifest', async () => {
     const pack = clonePack();
-    const variant = (clips(pack).foot_grass.variants as Record<string, unknown>[])[0];
+    // The bare "main" track URL form (no numbered suffix) is only valid when
+    // a key has exactly ONE retained variant; foot_grass has several real
+    // takes now, so trim to just the first for this single-variant scenario.
+    const variants = clips(pack).foot_grass.variants as Record<string, unknown>[];
+    const variant = variants[0];
+    variant.id = 'main';
     variant.url = `/audio/sfx/foot_grass.wav?v=${String(variant.sha256).slice(0, 12)}`;
+    clips(pack).foot_grass.variants = [variant];
     resealPack(pack);
 
     await expect(
@@ -209,7 +215,7 @@ describe('runtime SFX production pack validation', () => {
     );
     expect(fetchMock).toHaveBeenCalledWith(remotePackUrl, expect.any(Object));
     expect(loaded.foot_grass.url).toMatch(
-      /^https:\/\/prod\.example\/audio\/sfx\/foot_grass\.mp3\?v=[a-f0-9]{12}$/,
+      /^https:\/\/prod\.example\/audio\/sfx\/foot_grass_1\.mp3\?v=[a-f0-9]{12}$/,
     );
     expect(loaded.foot_grass.variants[0].url).toBe(loaded.foot_grass.url);
     expect(SFX_CLIPS.foot_grass.url).toMatch(/^\/audio\/sfx\//);
@@ -309,7 +315,10 @@ describe('runtime SFX production pack validation', () => {
 
   it('rejects unsafe mix values, duplicate takes, and excessive take counts', async () => {
     const unsafeGain = clonePack();
-    clips(unsafeGain).foot_grass.gain = 1.01;
+    // foot_grass has its own computed gain ceiling above the flat 1.0 (0dB)
+    // default now (see sfx_gain_ceiling.mjs), so the unsafe value here must
+    // clear ANY plausible per-key ceiling, not just the old flat one.
+    clips(unsafeGain).foot_grass.gain = 10;
     resealPack(unsafeGain);
     await expect(
       parseRuntimeSfxPack(unsafeGain, SFX_CATALOG_HASH, SFX_CLIPS as RuntimeEntries),

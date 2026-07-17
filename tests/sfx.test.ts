@@ -160,7 +160,10 @@ describe('footstep audio', () => {
 // true, otherwise the family-level key mob_${fam}_${action} is used.
 describe('hasVariants', () => {
   it('returns false for an unloaded key', () => {
-    expect(sfx.hasVariants('mob_beast_wolf_attack')).toBe(false);
+    // mob_beast_wolf_attack now has real discovered takes (a genuine
+    // subfamily voice, not a placeholder), so it no longer demonstrates
+    // "unloaded"; a key with no catalog or discovered entry at all does.
+    expect(sfx.hasVariants('mob_nonexistent_family_action')).toBe(false);
   });
 
   it('recognizes a release-discovered subfamily entry before its lazy audio loads', () => {

@@ -381,6 +381,7 @@ export const de_DE: EnTranslations = {
       "spinButton": "Drehen",
       "tasks": "Aufgaben",
       "taskMultiplier": "x{multiplier}-Multiplikator",
+      "oneVsOneExcluded": "1-gegen-1-Matches gewähren keine Punkte für tägliche Belohnungen.",
       "pointsGained": "{points} Punkte für tägliche Belohnungen erhalten.",
       "showChestButton": "Truhe anzeigen",
       "hideChestButton": "Truhe ausblenden",
@@ -2214,9 +2215,10 @@ export const de_DE: EnTranslations = {
       "charTitleNone": "Kein Titel gewählt",
       "charOpenBook": "Buch der Taten",
       "lbTab": "Ansehen",
-      "lbDeedsCol": "Taten",
       "lbTitleCol": "Titel",
-      "lbSelf": "Deine Platzierung: Rang {rank}, unter den besten {percent} Prozent",
+      "lbScopeNote": "Accounts ranked by lifetime Renown. Each deed counts once across all characters on an account.",
+      "lbSelfAccount": "Your account: rank {rank}, top {percent} percent, {renown} Renown",
+      "lbSelfRank": "Your account: rank {rank}, top {percent} percent",
       "lbEmpty": "Noch keine platzierten Chronisten.",
       "broadcastsLabel": "Errungene Taten mit Gilde und Freunden teilen",
       "titledName": "{name} [{title}]"
@@ -3006,8 +3008,8 @@ export const de_DE: EnTranslations = {
       "heroicRewardsTitle": "Heroische Marken und verbesserte Beute",
       "heroicRewardsBody": "Heroische Bosse lassen die Beute fallen, die du kennst, verbessert und im Tooltip als Heroisch gekennzeichnet, und der Endboss jedes Durchgangs fügt Epics hinzu, die es sonst nirgends gibt. Diese letzte Tötung hinterlässt zudem für jeden Teilnehmer Heroische Marken: eine Währung, die du bei Quartiermeister Vex in Highwatch ausgibst, dessen Vorrat an Ringen und Halsketten der einzige Schmuck im Reich ist.",
       "heroicLockoutBody": "Normale Dungeons lassen sich den ganzen Tag lang laufen. Der heroische Modus verlangt Geduld: Die Tötung des Endbosses beschränkt alle im Durchgang auf einen heroischen Abschluss dieses Dungeons pro Tag, und der Schlachtzug führt für jeden Schwierigkeitsgrad eine eigene Tagessperre. Ein abgeschlossener Fünf-Spieler-Durchgang bleibt seiner eigenen Gruppe für Leichenläufe und Beute offen, sodass niemand von dem ausgesperrt wird, was er dort verdient hat. Der Schlachtzug ist strenger: Hat seine Tötung dich einmal gesperrt, bleibt die Tür bis zur täglichen Zurücksetzung verschlossen, sammle also deine Beute ein, bevor du die Arena verlässt.",
-      "resetTitle": "Resetting your instances",
-      "resetBody": "Switch difficulty while your group still holds claimed runs and the old claims linger for a while before clearing on their own. The party leader can let them go at once instead: choose Reset All Instances on their own portrait menu, or type /dungeon reset. A reset works only after the difficulty has actually been changed, only while nobody, living or fallen, remains inside, and a short cooldown separates one reset from the next. Arrive at the door on the wrong difficulty and the game says so before the run starts. The raid is never reset this way; its own lockout rules stand.",
+      "resetTitle": "Instanzen zurücksetzen",
+      "resetBody": "Wenn ihr die Schwierigkeit wechselt, während eure Gruppe noch beanspruchte Läufe hält, bleiben die alten Ansprüche eine Weile bestehen. Der Gruppenleiter kann sie sofort aufgeben: Wählt im Menü des eigenen Porträts Alle Instanzen zurücksetzen oder gebt /dungeon reset ein. Das funktioniert erst nach einem tatsächlichen Schwierigkeitswechsel, nur wenn niemand, ob lebend oder gefallen, drinnen ist, und zwischen Rücksetzungen gilt eine kurze Abklingzeit. Bei falscher Schwierigkeit warnt euch das Spiel vor dem Start. Der Schlachtzug wird so niemals zurückgesetzt; seine eigenen Bindungsregeln bleiben bestehen.",
       "templeLoreTitle": "Der Ertränkte Tempel, ein wenig tiefer",
       "templeLoreBody": "Der Tempel hat seine eigene Legende, älter als der Kult, den du anderswo verfolgst. Am Ufer des Glimmermere, eines Bergsees, der das Mondlicht trinkt und die Ertrunkenen zurückgibt, hütet ein einsamer Wächter ein Tor aus fahlem Licht. Unter der Oberfläche führt eine Treppe aus kaltem Stein zu ihm hinab. Die Leute, die dort versanken, ertranken nicht durch ein Unglück: Sie waren der Bleiche Chor, der im Gebet untertauchte und niemals zu singen aufhörte. Die alten Wärter kratzten eine einzige Warnung in die Felsen, bevor das Wasser sie holte, ein Gebet an etwas, das sie den Ertränkten Mond nannten, mit einer ruhigeren Hand, die zwei Worte darunter setzte: er schläft nur.",
       "cryptLeadTitle": "Eine Tür, die die Toten verschlossen halten sollten",
@@ -3115,7 +3117,7 @@ export const de_DE: EnTranslations = {
       "howHeading": "So funktionieren Taten",
       "howBody": "Taten werden mit jeweils einem Charakter errungen und behalten, sodass jeder Held, den du spielst, ein eigenes Buch aufbaut; erst die Bestenliste des Reiches sammelt dein Ansehen über alle Charaktere hinweg, die du spielst, und zählt jede Tat nur ein einziges Mal. Jede Tat benennt klar und deutlich, was sie von dir verlangt, direkt im Buch der Taten im Spiel, sodass du immer weißt, was es zu erjagen gilt; und die Taten, hinter denen du her bist, kannst du verfolgen, um sie beim Spielen im Blick zu behalten. Einige wenige bleiben geheim und geben sich erst zu erkennen, wenn du sie errungen hast. Das Buch hält sich auch selbst ehrlich: Was immer deine bisherige Bilanz belegen kann, schreibt es dir sofort gut, sodass ein Veteran es nie mit leerer Seite aufschlägt; nur die zählenden Taten beginnen ihre Zählung von neuem.",
       "renownHeading": "Ansehen",
-      "renownBody": "Ansehen ist die Wertung hinter dem Buch. Jede errungene Tat ist einen festen Betrag wert, und deine Summe kann nur steigen, eine ruhige Woche kostet dich also nie Boden. Eine Handvoll Taten hängt eher vom Glück als vom Können ab, und Heldentaten sind eine Ehre für sich; beide bringen daher überhaupt kein Ansehen.",
+      "renownBody": "Renown is the score behind the Book. Every deed you earn is worth a set amount, and your total only ever climbs, so a quiet week never costs you ground. A handful of deeds turn on luck rather than skill, and Feats are an honor of their own, so both of those are worth no Renown at all. Deeds without Renown still count toward completion in your Book; they simply never score.",
       "rewardsHeading": "Titel und Rahmen",
       "rewardsBody": "Die Belohnungen sind reine Zierde, und genau das ist der Sinn. Manche Taten verleihen einen Titel, den du tragen kannst, oder einen Rahmen für deinen Namen, aber niemals etwas, das deinen Helden stärker macht. Wähle im Buch der Taten den Titel, der dir gefällt, und er begleitet dich auf deinem Namensschild, im Chat und auf den Ranglisten, für alle sichtbar.",
       "chroniclesHeading": "Chroniken",
@@ -3124,7 +3126,7 @@ export const de_DE: EnTranslations = {
       "featsBody": "Heldentaten stehen auf einem eigenen Regal: Zeugnisse vergangener Zeiten und Welterster, Taten, die an eine vergangene Ära oder einen Moment gebunden sind, der nur ein einziges Mal geschieht. Sie bringen kein Ansehen und fließen nicht in die Abschlusszählung ein, sondern bleiben für immer als Erinnerung an das Vollbrachte erhalten.",
       "catalogHeading": "Das vollständige Tatenverzeichnis",
       "catalogBody": "Hier steht jede Tat, die das Buch fassen kann, geordnet nach Kategorie. Die geheimen fehlen mit Absicht; sie warten darauf, dass du sie findest. Öffne das Buch der Taten im Spiel, um genau zu sehen, was jede einzelne verlangt.",
-      "standingsNote": "Die Reiche führen eine laufende Zählung des Ansehens über alle Konten hinweg. Um zu sehen, wer wo steht, öffne die Bestenliste im Spiel und wechsle zu ihrem Ansehen-Reiter; die Platzierungen sind dort zu Hause, nicht im Wiki.",
+      "standingsNote": "The realms keep a running tally of Renown across every account: the board ranks whole accounts by lifetime Renown, counting each deed once across all your characters, and it shows Renown alone, so deeds that carry none never move the standings even though they count in your Book. To see who stands where, open the Leaderboard in game and turn to its Renown tab; the standings live there, not on the wiki.",
       "catHeading": "{label} ({count})",
       "colName": "Tat",
       "colRenown": "Ansehen",
@@ -3215,7 +3217,7 @@ export const de_DE: EnTranslations = {
       "qualityNote": "Höhere Qualität bedeutet meist bessere Werte, doch Qualität ist ein Hinweis, keine Regel. Ein gut zu deiner Klasse und Stufe passendes Stück kann ein protzigeres schlagen.",
       "upgradeTitle": "Halte deine Ausrüstung aktuell",
       "upgradeBody": "Ein altes Stück durch eine frische Verbesserung zu ersetzen, bringt dir mehr, als in Ausrüstung, der du entwachsen bist, perfekt zu spielen. Wenn etwas Besseres fällt oder eine Quest es anbietet, nimm es. Spare deine guten Gegenstände nicht für später auf.",
-      "itemLevelBody": "If you want a quick way to compare two pieces, turn on Show Item Level in the options. Gear with a known source, from enemies, quests, and the crafting trades, then shows an item level, a single figure for roughly how powerful it is based on where it came from, so you can tell at a glance which upgrade pulls more weight, even across different slots. Pieces with no such source, like plain vendor basics and starter gear, show no item level, so a missing figure is normal, not a fault.",
+      "itemLevelBody": "Aktiviere Gegenstandsstufe anzeigen in den Optionen, um zwei Ausrüstungsteile schnell zu vergleichen. Ausrüstung bekannter Herkunft, von Gegnern, Quests und Handwerksberufen, zeigt dann eine Gegenstandsstufe: eine einzelne Zahl, die ihre Stärke anhand der Quelle grob angibt und Verbesserungen auch über verschiedene Plätze hinweg vergleichbar macht. Teile ohne solche Herkunft, etwa einfache Händlerware und Startausrüstung, zeigen keine Gegenstandsstufe; eine fehlende Zahl ist normal.",
       "sourcesTitle": "Woher Ausrüstung kommt",
       "sourcesBody": "Die meisten deiner frühen Verbesserungen sind Questbelohnungen, es zahlt sich also aus, Quests abzuschließen, statt zu grinden. Feinde lassen Ausrüstung fallen, wenn du sie bezwingst, Händler in der Stadt verkaufen solide Grundausstattung, Handwerker verwandeln gesammelte Materialien in tragbare Stücke, und der Spielermarkt lässt dich von anderen Abenteurern kaufen. Ganz oben auf dem Berg kaufen zwei Marken-Währungen Ausrüstung, die es sonst nirgends gibt: Tiefgang-Marken beim Tiefgang-Hüter und Heroische Marken beim heroischen Quartiermeister.",
       "soulboundTitle": "Seelengebunden: dein und nur dein",
@@ -3259,7 +3261,7 @@ export const de_DE: EnTranslations = {
       "craftRecipesTitle": "Rezepte und Reagenzien",
       "craftRecipesBody": "Jedes Rezept verlangt bestimmte Reagenzien, die du sammelst oder kaufst. Die einfachsten Rezepte brauchen nichts als gewöhnliche Materialien und lassen sich von Anfang an herstellen, sodass du ein Gewerbe in dem Moment aufnehmen kannst, in dem du es erlernst. Die Rezeptlisten füllen sich noch: Ein paar Gewerbe warten noch auf ihre ersten Rezepte, und weitere kommen hinzu, während die Handwerke wachsen.",
       "craftHowTitle": "Das Handwerksfenster",
-      "craftHowBody": "Open the Crafting window (default key T) to see every recipe you know, what each one needs, and what you have on hand; when the materials are there, one click does the work. Common recipes can be crafted anywhere in the world. A handful of advanced recipes, higher-tier tools and rare caster armor among them, instead ask you to stand at the crafting hub in Highwatch.",
+      "craftHowBody": "Öffne das Handwerksfenster (Standardtaste T), um alle bekannten Rezepte, ihre Zutaten und deinen Vorrat zu sehen; sind die Materialien vorhanden, genügt ein Klick. Gewöhnliche Rezepte lassen sich überall herstellen. Einige fortgeschrittene Rezepte, darunter höherstufige Werkzeuge und seltene Zaubererrüstung, erfordern dagegen das Handwerkszentrum in Highwatch.",
       "craftMasteryTitle": "Fertigkeit und Meisterschaft",
       "craftMasteryBody": "Erfolgreiches Herstellen steigert deine Fertigkeit in diesem Gewerbe, und Fertigkeit sperrt niemals die Rezepte eines Handwerks weg: Kennst du ein Rezept und hältst seine Materialien, kannst du es versuchen. Was Fertigkeit dir stattdessen einbringt, ist Güte, eine geübte Hand liefert feinere Arbeit. Die eine Ausnahme sind Kombinationsrezepte, die verlangen, dass du dich in beiden ihrer Handwerke bewährt hast, bevor sie sich öffnen.",
       "craftComboTitle": "Kombinationsrezepte",
@@ -4381,6 +4383,24 @@ export const de_DE: EnTranslations = {
     "balance": "Heroische Marken: {count}",
     "buyAria": "{item} für {marks} Heroische Marken kaufen"
   },
+  "cardDuel": {
+    "title": "Card Duel",
+    "close": "Close",
+    "join": "Join Queue",
+    "joinAria": "Join the Card Duel queue",
+    "leave": "Leave Queue",
+    "leaveAria": "Leave the Card Duel queue",
+    "forfeit": "Forfeit",
+    "forfeitAria": "Forfeit the Card Duel",
+    "queued": "Waiting for an opponent...",
+    "unavailable": "Card Duel requires another player online.",
+    "vsOpponent": "vs {name}",
+    "round": "Round score: {mine} - {theirs}",
+    "counts": "Deck: {deck} · Discard: {discard}",
+    "playCardAria": "Play the {value} card",
+    "waitingOnOpponent": "Waiting on your opponent's card...",
+    "yourTurn": "Play a card"
+  },
   "delveUi": {
     "board": {
       "title": "Tiefgang-Tafel",
@@ -4879,6 +4899,11 @@ export const de_DE: EnTranslations = {
       "quit": "Beenden",
       "fatalBody": "World of ClaudeCraft ist auf einen unerwarteten Fehler gestoßen und muss geschlossen werden."
     }
+  },
+  "gpuNotice": {
+    "bodyDesktop": "The game is running without GPU acceleration and will be slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
+    "bodyWeb": "The game is running without GPU acceleration and will be slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.",
+    "dismiss": "Dismiss"
   },
   "realm": {
     "noRealms": "Keine Welten verfügbar.",
@@ -8696,6 +8721,11 @@ export const de_DE: EnTranslations = {
         "title": "Die Vergoldete Schatulle",
         "greeting": "Willkommen bei der Vergoldeten Schatulle. Deine Waren ruhen sicher hinter unseren Schlössern."
       },
+      "card_master": {
+        "name": "Card Master",
+        "title": "Dealer of Chance",
+        "greeting": "Care for a Card Duel? Best of three, winner takes the bragging rights."
+      },
       "bursar_petra_vell": {
         "name": "Kämmerin Petra Vell",
         "title": "Die Vergoldete Schatulle",
@@ -9800,6 +9830,11 @@ export const de_DE: EnTranslations = {
         "sender": "Bruder Aldric",
         "subject": "Was Ihr im Dunkeln vollbracht habt",
         "body": "Nur wenige werden je erfahren, was in jener Senke begraben lag, und noch weniger würden es glauben. Ich weiß es, und ich werde es nicht vergessen.\n\nMöge Euer Weg erleuchtet bleiben.\n- Bruder Aldric"
+      },
+      "heroic_marks_reward": {
+        "sender": "Heroischer Quartiermeister",
+        "subject": "Deine heroischen Marken",
+        "body": "Deine Gruppe hat die heroische Prüfung gemeistert, während du in der Nachhut gekämpft hast oder bereits am Boden lagst. Auch deine Instanzbindung wurde aktiviert, daher ist dein Anteil an heroischen Marken hier angekommen, statt verloren zu gehen. Setze sie klug ein.\n\n- Heroischer Quartiermeister"
       }
     },
     "itemSets": {
@@ -9825,7 +9860,7 @@ export const de_DE: EnTranslations = {
       },
       "necromancers": {
         "name": "Mournweave-Gewänder",
-        "bonus2": "Ihr könnt nicht zurückgestoßen werden (100% Rückstoßwiderstand).",
+        "bonus2": "Erhöht Zaubermacht um 20. Erlittener Schaden verzögert Eure Zauber nicht mehr (100% Widerstand gegen Zauberverzögerung).",
         "bonus3": "Erhöht Intelligenz um 10 und Ausdauer um 10.",
         "bonus4": "Eure Zauber haben eine Chance von 10%, Klarsicht zu gewähren, wodurch euer nächster Zauber kostenlos wird."
       },
@@ -9837,13 +9872,13 @@ export const de_DE: EnTranslations = {
       },
       "soulflame": {
         "name": "Wraithfire-Gewänder",
-        "bonus2": "Ihr könnt nicht zurückgestoßen werden (100% Rückstoßwiderstand).",
+        "bonus2": "Erhöht Zaubermacht um 20. Erlittener Schaden verzögert Eure Zauber nicht mehr (100% Widerstand gegen Zauberverzögerung).",
         "bonus3": "Erhöht Intelligenz um 15, Willenskraft um 15 sowie Angriffs- und Zaubertempo um 15%.",
         "bonus4": "Eure Zauber haben eine Chance von 10%, Seelenbrand zu gewähren, was die Zaubermacht 10 Sek. lang um 40 erhöht."
       },
       "stormcallers": {
         "name": "Galecall-Gewänder",
-        "bonus2": "Ihr könnt nicht zurückgestoßen werden (100% Rückstoßwiderstand).",
+        "bonus2": "Erhöht Zaubermacht um 20. Erlittener Schaden verzögert Eure Zauber nicht mehr (100% Widerstand gegen Zauberverzögerung).",
         "bonus3": "Erhöht Intelligenz um 15, Willenskraft um 15 sowie Angriffs- und Zaubertempo um 15%.",
         "bonus4": "Eure Zauber haben eine Chance von 10%, Seelenbrand zu gewähren, was die Zaubermacht 10 Sek. lang um 40 erhöht."
       },

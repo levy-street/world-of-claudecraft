@@ -8,7 +8,11 @@ import {
   weaponSkinCollectionLabel,
   weaponTypeLabel,
 } from './armory_labels';
-import { buildDailyRewardsView, type DailyRewardsView } from './daily_rewards_view';
+import {
+  buildDailyRewardsView,
+  type DailyRewardsView,
+  dailyRewardTaskDescription,
+} from './daily_rewards_view';
 import { markDialogRoot } from './dialog_root';
 import { tEntity } from './entity_i18n';
 import { esc } from './esc';
@@ -834,7 +838,12 @@ export class DailyRewardsWindow {
           typeof task.multiplier === 'number' && Number.isFinite(task.multiplier)
             ? `<em>${esc(t('hudChrome.dailyRewards.taskMultiplier', { multiplier: formatNumber(task.multiplier, { maximumFractionDigits: 2 }) }))}</em>`
             : '';
-        return `<li class="${task.completed ? 'done' : ''}"><span>${esc(task.title)}</span><small><span>${esc(task.description)}</span>${multiplier}</small><b>${formatNumber(task.points, { maximumFractionDigits: 0 })}</b></li>`;
+        const description = dailyRewardTaskDescription(
+          task.type,
+          task.description,
+          t('hudChrome.dailyRewards.oneVsOneExcluded'),
+        );
+        return `<li class="${task.completed ? 'done' : ''}"><span>${esc(task.title)}</span><small><span>${esc(description)}</span>${multiplier}</small><b>${formatNumber(task.points, { maximumFractionDigits: 0 })}</b></li>`;
       })
       .join('');
     return (

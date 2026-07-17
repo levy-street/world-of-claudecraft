@@ -667,7 +667,7 @@ class Sfx {
     const key = FOOTSTEP_CUES[surface];
     if (!key) return;
     this.playAt(key, x, y, z, {
-      gain: running ? 0.8 : 0.55,
+      gain: running ? 0.5 : 0.35,
       rate: (running ? 1.06 : 1) * foot,
       cooldown: 0.05,
       release: running ? 0.17 : 0.22, // < the tightest stride gap (~0.22s at run)

@@ -125,7 +125,7 @@ export class ServerClient {
   }
 
   /** Push guild metadata (nickname + server join date + top special role). */
-  pushMembersMeta(
+  async pushMembersMeta(
     members: {
       discord_user_id: string;
       name: string | null;
@@ -133,6 +133,28 @@ export class ServerClient {
       role: string | null;
     }[],
   ): Promise<unknown> {
-    return this.call('POST', '/internal/discord/members-meta', { members });
+    const data = await this.call<{ updated: number }>('POST', '/internal/discord/members-meta', {
+      members,
+    });
+    // The server coerces an over-cap request body to an EMPTY member list and
+    // answers 200 { updated: 0 }, so a zero on a non-empty push is the one
+    // silent-drop signature worth surfacing (the batch sizing in logic.ts is
+    // built to make this unreachable).
+    if (data && members.length > 0 && data.updated === 0) {
+      console.error(`[bot] members-meta push of ${members.length} processed 0 rows`);
+    }
+    return data;
+  }
+
+  /**
+   * The discord ids whose stored link still carries guild membership or a
+   * special-role key, for the departed-member reconcile. Null when the server
+   * is unreachable or the payload is malformed; the caller MUST treat null as
+   * "change nothing" (an empty ARRAY is a real "nothing flagged" answer).
+   */
+  async flairedIds(): Promise<string[] | null> {
+    const data = await this.call<{ ids: unknown }>('GET', '/internal/discord/flaired-ids');
+    if (!data || !Array.isArray(data.ids)) return null;
+    return data.ids.filter((x): x is string => typeof x === 'string');
   }
 }

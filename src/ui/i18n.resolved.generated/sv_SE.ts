@@ -381,6 +381,7 @@ export const sv_SE: EnTranslations = {
       "spinButton": "Snurra",
       "tasks": "Uppgifter",
       "taskMultiplier": "x{multiplier} multiplikator",
+      "oneVsOneExcluded": "1 mot 1-matcher ger inga poäng för dagliga belöningar.",
       "pointsGained": "{points} poäng för dagliga belöningar intjänade.",
       "showChestButton": "Visa kista",
       "hideChestButton": "Dölj kista",
@@ -2214,9 +2215,10 @@ export const sv_SE: EnTranslations = {
       "charTitleNone": "Ingen titel vald",
       "charOpenBook": "Bedrifternas bok",
       "lbTab": "Ryktbarhet",
-      "lbDeedsCol": "Bedrifter",
       "lbTitleCol": "Titel",
-      "lbSelf": "Din placering: plats {rank}, bland de främsta {percent} procenten",
+      "lbScopeNote": "Accounts ranked by lifetime Renown. Each deed counts once across all characters on an account.",
+      "lbSelfAccount": "Your account: rank {rank}, top {percent} percent, {renown} Renown",
+      "lbSelfRank": "Your account: rank {rank}, top {percent} percent",
       "lbEmpty": "Inga rankade krönikörer ännu.",
       "broadcastsLabel": "Dela fullbordade bedrifter med gille och vänner",
       "titledName": "{name} [{title}]"
@@ -3006,8 +3008,8 @@ export const sv_SE: EnTranslations = {
       "heroicRewardsTitle": "Heroiska märken och uppgraderat byte",
       "heroicRewardsBody": "Heroiska bossar släpper bytet du känner igen, uppgraderat och märkt Heroisk i verktygstipset, och den sista bossen i varje pass lägger till episka föremål som inte finns någon annanstans. Det sista dråpet lämnar också Heroiska märken åt varje deltagare: en valuta du spenderar hos Kvartersmästare Vex i Highwatch, vars lager av ringar och halsband är rikets enda smycken.",
       "heroicLockoutBody": "Normala fängelsehålor går att köra hela dagen. Heroiskt kräver tålamod: dråpet på den sista bossen låser alla i passet till en heroisk rensning av den fängelsehålan per dag, och raiden håller en daglig spärr för varje svårighetsgrad. Ett rensat pass för fem spelare förblir öppet för den egna gruppen för likfärder och byte, så att ingen låses ute från det de förtjänat där. Raiden är strängare: så snart dess dråp låser dig förblir dörren stängd fram till den dagliga återställningen, så samla dina byten innan du lämnar arenan.",
-      "resetTitle": "Resetting your instances",
-      "resetBody": "Switch difficulty while your group still holds claimed runs and the old claims linger for a while before clearing on their own. The party leader can let them go at once instead: choose Reset All Instances on their own portrait menu, or type /dungeon reset. A reset works only after the difficulty has actually been changed, only while nobody, living or fallen, remains inside, and a short cooldown separates one reset from the next. Arrive at the door on the wrong difficulty and the game says so before the run starts. The raid is never reset this way; its own lockout rules stand.",
+      "resetTitle": "Återställa dina instanser",
+      "resetBody": "Om du byter svårighetsgrad medan gruppen fortfarande har hävdade rundor ligger de gamla anspråken kvar en stund. Gruppledaren kan släppa dem direkt genom att välja Återställ alla instanser i menyn på sitt eget porträtt eller skriva /dungeon reset. Svårighetsgraden måste faktiskt ha ändrats, ingen levande eller fallen får vara kvar inuti och en kort väntetid skiljer återställningarna åt. Vid dörren på fel svårighetsgrad varnar spelet innan starten. Raiden återställs aldrig så här; dess egna låsningsregler gäller.",
       "templeLoreTitle": "Det dränkta templet, lite djupare",
       "templeLoreBody": "Templet har sin egen legend, äldre än kulten du jagar på andra håll. Vid stranden av Glimmertjärnen, en tjärn som dricker månljuset och ger tillbaka de dränkta, vaktar en ensam väktare en port av blekt ljus. Under ytan löper en trappa av kall sten ner till den. Folket som sjönk där dränktes inte av olyckshändelse: de var Den bleka kören, som gick under i tillbedjan och aldrig slutade sjunga. De gamla väktarna ristade en enda varning i klipporna innan vattnet tog dem, en bön till något de kallade Den dränkta månen, med en stadigare hand som lade till två ord under den: den bara sover.",
       "cryptLeadTitle": "En dörr de döda var menade att hålla stängd",
@@ -3115,7 +3117,7 @@ export const sv_SE: EnTranslations = {
       "howHeading": "Så fungerar bedrifter",
       "howBody": "Bedrifter fullbordas och bevaras en karaktär i taget, så varje hjälte du spelar bygger en egen Bok; bara rikets topplista samlar din Ryktbarhet över alla karaktärer du spelar, och räknar varje bedrift bara en gång. Varje bedrift berättar rakt på sak vad den kräver av dig, direkt i Bedrifternas bok i spelet, så du vet alltid vad du ska jaga, och du kan bevaka dem du är ute efter för att hålla dem i sikte medan du spelar. Ett litet fåtal förblir hemliga och visar sig först när du har fullbordat dem. Boken håller sig också ärlig: allt som ditt tidigare facit kan bevisa krediterar den på fläcken, så en veteran öppnar den aldrig till en tom sida; bara de räknande bedrifterna börjar sin räkning från noll.",
       "renownHeading": "Ryktbarhet",
-      "renownBody": "Ryktbarhet är poängräkningen bakom boken. Varje bedrift du fullbordar är värd en bestämd summa, och din totalsumma kan bara stiga, så en lugn vecka gör aldrig att du tappar mark. En handfull bedrifter avgörs av tur snarare än skicklighet, och bragder är en ära för sig, så ingen av dem ger någon ryktbarhet alls.",
+      "renownBody": "Renown is the score behind the Book. Every deed you earn is worth a set amount, and your total only ever climbs, so a quiet week never costs you ground. A handful of deeds turn on luck rather than skill, and Feats are an honor of their own, so both of those are worth no Renown at all. Deeds without Renown still count toward completion in your Book; they simply never score.",
       "rewardsHeading": "Titlar och ramar",
       "rewardsBody": "Belöningarna är enbart för syns skull, och det är hela poängen. Vissa bedrifter skänker en titel att bära eller en ram som pryder ditt namn, men aldrig något som gör din hjälte starkare. Välj den titel du vill ha i Bedrifternas bok, så följer den med på din namnskylt, i chatten och på topplistorna där alla kan se den.",
       "chroniclesHeading": "Krönikor",
@@ -3124,7 +3126,7 @@ export const sv_SE: EnTranslations = {
       "featsBody": "Bragder står på en hylla för sig: uppteckningar av arv och av att vara först i världen, bedrifter knutna till en svunnen era eller ett ögonblick som bara inträffar en enda gång. De ger ingen ryktbarhet och räknas inte in i fullbordandet, utan bevaras för alltid som ett minne av det som uträttades.",
       "catalogHeading": "Den fullständiga bedriftsrullan",
       "catalogBody": "Här är alla bedrifter boken rymmer, ordnade efter kategori. De hemliga är utelämnade med flit och väntar på att du ska hitta dem. Öppna Bedrifternas bok i spelet för att se exakt vad var och en kräver.",
-      "standingsNote": "Rikena för en löpande räkning av Ryktbarhet över alla konton. Vill du se vem som står var, öppna topplistan i spelet och slå upp dess Ryktbarhet-flik; ställningen finns där, inte på wikin.",
+      "standingsNote": "The realms keep a running tally of Renown across every account: the board ranks whole accounts by lifetime Renown, counting each deed once across all your characters, and it shows Renown alone, so deeds that carry none never move the standings even though they count in your Book. To see who stands where, open the Leaderboard in game and turn to its Renown tab; the standings live there, not on the wiki.",
       "catHeading": "{label} ({count})",
       "colName": "Bedrift",
       "colRenown": "Ryktbarhet",
@@ -3215,7 +3217,7 @@ export const sv_SE: EnTranslations = {
       "qualityNote": "Högre kvalitet betyder oftast bättre egenskaper, men kvalitet är en ledtråd, inte en regel. En välmatchad pjäs för din klass och nivå kan slå en flashigare.",
       "upgradeTitle": "Håll din utrustning aktuell",
       "upgradeBody": "Att byta ut en gammal pjäs mot en ny uppgradering gör mer för dig än att spela perfekt i utrustning du vuxit ur. När något bättre släpps eller ett uppdrag erbjuder det, ta det. Spara inte dina goda föremål till senare.",
-      "itemLevelBody": "If you want a quick way to compare two pieces, turn on Show Item Level in the options. Gear with a known source, from enemies, quests, and the crafting trades, then shows an item level, a single figure for roughly how powerful it is based on where it came from, so you can tell at a glance which upgrade pulls more weight, even across different slots. Pieces with no such source, like plain vendor basics and starter gear, show no item level, so a missing figure is normal, not a fault.",
+      "itemLevelBody": "Slå på Visa föremålsnivå i alternativen för att snabbt jämföra två delar. Utrustning med känd källa, från fiender, uppdrag och hantverksyrken, visar då en föremålsnivå: ett enda tal som ungefär anger styrkan utifrån ursprunget och gör förbättringar jämförbara även mellan olika platser. Delar utan sådan källa, som enkla handelsvaror och startutrustning, visar ingen nivå; ett saknat tal är normalt.",
       "sourcesTitle": "Var utrustning kommer ifrån",
       "sourcesBody": "Det mesta av dina tidiga uppgraderingar är uppdragsbelöningar, så det lönar sig att slutföra uppdrag snarare än att grinda. Fiender släpper utrustning när du besegrar dem, handlare i staden säljer solida basvaror, hantverkare förvandlar insamlade material till bärbara pjäser, och spelarmarknaden låter dig köpa från andra äventyrare. Högst upp på kullen köper två märkesvalutor utrustning som inte finns någon annanstans: Delve-märken hos delvevaktaren, och heroiska märken hos den heroiska kvartersmästaren.",
       "soulboundTitle": "Själsbunden: din och endast din",
@@ -3259,7 +3261,7 @@ export const sv_SE: EnTranslations = {
       "craftRecipesTitle": "Recept och reagenser",
       "craftRecipesBody": "Varje recept kräver särskilda reagenser du samlar eller köper. De enklaste recepten ber inte om annat än vanliga material och kan tillverkas från allra första början, så du kan börja utöva ett yrke i samma stund du tar upp det. Receptlistorna fylls fortfarande på: några yrken väntar på sina första recept, och fler kommer i takt med att hantverken växer.",
       "craftHowTitle": "Hantverksfönstret",
-      "craftHowBody": "Open the Crafting window (default key T) to see every recipe you know, what each one needs, and what you have on hand; when the materials are there, one click does the work. Common recipes can be crafted anywhere in the world. A handful of advanced recipes, higher-tier tools and rare caster armor among them, instead ask you to stand at the crafting hub in Highwatch.",
+      "craftHowBody": "Öppna hantverksfönstret (standardtangent T) för att se alla recept du kan, vad de kräver och vad du har; när materialen finns räcker ett klick. Vanliga recept kan tillverkas var som helst. Några avancerade recept, däribland verktyg på hög nivå och sällsynta rustningar för besvärjare, kräver hantverksnavet i Highwatch.",
       "craftMasteryTitle": "Skicklighet och mästerskap",
       "craftMasteryBody": "Lyckade hantverk bygger skicklighet i det yrket, och skicklighet låser aldrig bort ett hantverks recept: kan du ett recept och har dess material, kan du försöka dig på det. Vad skicklighet i stället köper dig är kvalitet, en övad hand gör finare arbete. Det enda undantaget är kombinationsrecept, som ber dig ha bevisat dig i båda sina hantverk innan de öppnas.",
       "craftComboTitle": "Kombinationsrecept",
@@ -4381,6 +4383,24 @@ export const sv_SE: EnTranslations = {
     "balance": "Heroiska märken: {count}",
     "buyAria": "Köp {item} för {marks} heroiska märken"
   },
+  "cardDuel": {
+    "title": "Card Duel",
+    "close": "Close",
+    "join": "Join Queue",
+    "joinAria": "Join the Card Duel queue",
+    "leave": "Leave Queue",
+    "leaveAria": "Leave the Card Duel queue",
+    "forfeit": "Forfeit",
+    "forfeitAria": "Forfeit the Card Duel",
+    "queued": "Waiting for an opponent...",
+    "unavailable": "Card Duel requires another player online.",
+    "vsOpponent": "vs {name}",
+    "round": "Round score: {mine} - {theirs}",
+    "counts": "Deck: {deck} · Discard: {discard}",
+    "playCardAria": "Play the {value} card",
+    "waitingOnOpponent": "Waiting on your opponent's card...",
+    "yourTurn": "Play a card"
+  },
   "delveUi": {
     "board": {
       "title": "Delve-tavla",
@@ -4879,6 +4899,11 @@ export const sv_SE: EnTranslations = {
       "quit": "Avsluta",
       "fatalBody": "World of ClaudeCraft stötte på ett oväntat fel och måste stängas."
     }
+  },
+  "gpuNotice": {
+    "bodyDesktop": "The game is running without GPU acceleration and will be slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
+    "bodyWeb": "The game is running without GPU acceleration and will be slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.",
+    "dismiss": "Dismiss"
   },
   "realm": {
     "noRealms": "Inga världar tillgängliga.",
@@ -8696,6 +8721,11 @@ export const sv_SE: EnTranslations = {
         "title": "Förgyllda kassakistan",
         "greeting": "Välkommen till Förgyllda kassakistan. Dina ägodelar vilar tryggt bakom våra lås."
       },
+      "card_master": {
+        "name": "Card Master",
+        "title": "Dealer of Chance",
+        "greeting": "Care for a Card Duel? Best of three, winner takes the bragging rights."
+      },
       "bursar_petra_vell": {
         "name": "Kamrer Petra Vell",
         "title": "Förgyllda kassakistan",
@@ -9800,6 +9830,11 @@ export const sv_SE: EnTranslations = {
         "sender": "Broder Aldric",
         "subject": "Det du gjorde i mörkret",
         "body": "Få kommer någonsin att veta vad som låg begravet i den sänkan, och ännu färre skulle tro det. Jag vet, och jag kommer inte att glömma.\n\nMå din väg förbli upplyst.\n- Broder Aldric"
+      },
+      "heroic_marks_reward": {
+        "sender": "Heroisk kvartermästare",
+        "subject": "Dina heroiska märken",
+        "body": "Din grupp klarade den heroiska prövningen medan du kämpade i eftertruppen eller låg fallen. Din låsning registrerades ändå, så din andel heroiska märken skickades hit i stället för att gå förlorad. Använd dem väl.\n\n- Heroisk kvartermästare"
       }
     },
     "itemSets": {
@@ -9825,7 +9860,7 @@ export const sv_SE: EnTranslations = {
       },
       "necromancers": {
         "name": "Mournweave-skrud",
-        "bonus2": "Du kan inte knuffas bakåt (100% motstånd mot tillbakastöt).",
+        "bonus2": "Ökar trollformelskraft med 20. Skada du tar fördröjer inte längre dina besvärjelser (100% motstånd mot fördröjning av besvärjelser).",
         "bonus3": "Ökar intellekt med 10 och uthållighet med 10.",
         "bonus4": "Dina besvärjelser har 10% chans att ge Klarsyn, vilket gör din nästa besvärjelse gratis."
       },
@@ -9837,13 +9872,13 @@ export const sv_SE: EnTranslations = {
       },
       "soulflame": {
         "name": "Wraithfire-regalier",
-        "bonus2": "Du kan inte knuffas bakåt (100% motstånd mot tillbakastöt).",
+        "bonus2": "Ökar trollformelskraft med 20. Skada du tar fördröjer inte längre dina besvärjelser (100% motstånd mot fördröjning av besvärjelser).",
         "bonus3": "Ökar intellekt med 15, ande med 15 samt attack- och magihastighet med 15%.",
         "bonus4": "Dina besvärjelser har 10% chans att ge Själslåga och öka besvärjelseskraften med 40 i 10 sek."
       },
       "stormcallers": {
         "name": "Galecall-skrud",
-        "bonus2": "Du kan inte knuffas bakåt (100% motstånd mot tillbakastöt).",
+        "bonus2": "Ökar trollformelskraft med 20. Skada du tar fördröjer inte längre dina besvärjelser (100% motstånd mot fördröjning av besvärjelser).",
         "bonus3": "Ökar intellekt med 15, ande med 15 samt attack- och magihastighet med 15%.",
         "bonus4": "Dina besvärjelser har 10% chans att ge Själslåga och öka besvärjelseskraften med 40 i 10 sek."
       },
