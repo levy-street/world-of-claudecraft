@@ -7447,6 +7447,9 @@ export const nl_NL: EnTranslations = {
       "mistcallers_duffel": {
         "name": "Fogbinders Plunjezak"
       },
+      "stormhide_haversack": {
+        "name": "Stormhide Haversack"
+      },
       "copper_mining_pick": {
         "name": "Koperen Mijnpik"
       },

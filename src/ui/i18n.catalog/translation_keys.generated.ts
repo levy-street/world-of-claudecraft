@@ -1774,6 +1774,7 @@ export type TranslationKeyFlat =
   | 'entities.items.stormcallers_handguards.name'
   | 'entities.items.stormcallers_spaulders.name'
   | 'entities.items.stormcallers_waistguard.name'
+  | 'entities.items.stormhide_haversack.name'
   | 'entities.items.stormshard_leggings.name'
   | 'entities.items.sturdy_belt.name'
   | 'entities.items.sunken_court_mantle.name'

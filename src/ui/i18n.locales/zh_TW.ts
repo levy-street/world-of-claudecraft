@@ -2708,6 +2708,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.wolfhide_satchel.name': '狼皮挎包',
   'entities.items.gravewoven_bag.name': '墓織袋',
   'entities.items.mistcallers_duffel.name': '縛霧者行囊',
+  'entities.items.stormhide_haversack.name': '風暴皮行囊',
   'entities.items.bandit_bandana.name': '紅色面巾',
   'entities.items.tough_jerky.name': '鹽漬肉乾',
   'entities.items.mudfin_scale.name': '黏滑泥鰭鱗片',

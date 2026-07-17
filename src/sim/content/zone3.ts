@@ -948,13 +948,23 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     },
     enrage: { belowHpPct: 0.2, dmgMult: 1.5, hasteMult: 1.25 },
     // Personal loot table: rolled INDEPENDENTLY for every contributor (see
-    // rollWorldBossLoot). A guaranteed storm trophy, plus AT MOST ONE epic Tier-2 set
-    // piece. The glove group rolls first at ~32%; the belt group also rolls at ~32% but
-    // the one-gear cap keeps it only when the glove roll missed, so its EFFECTIVE drop
-    // rate is ~22% (0.68 x 0.32) and a single kill never hands out both a glove and a belt.
-    // Keep the glove entries first if this ordering skew is ever retuned.
+    // rollWorldBossLoot). A guaranteed storm trophy and a guaranteed Heroic Mark, a
+    // chance at the epic Stormhide Haversack, plus AT MOST ONE epic Tier-2 set piece.
+    // The ungrouped entries (shard, mark, bag) each roll on their own chance and are
+    // exempt from the one-gear cap; the two rollGroups share that cap. The glove group
+    // rolls first at ~32%; the belt group also rolls at ~32% but the one-gear cap keeps
+    // it only when the glove roll missed, so its EFFECTIVE drop rate is ~22% (0.68 x
+    // 0.32) and a single kill never hands out both a glove and a belt. Keep the glove
+    // entries first if this ordering skew is ever retuned. The world-boss lockout is
+    // per raid reset (a daily 3 AM realm boundary), so a contributor loots this table at
+    // most once per day: the Mark is effectively a once-daily reward for the clear.
     loot: [
       { itemId: 'inert_storm_shard', chance: 1 },
+      // A daily Heroic Mark for clearing the world boss (guaranteed; the daily cadence
+      // is the world-boss loot lockout, isWorldBossLootEligible in world_boss.ts).
+      { itemId: 'heroic_mark', chance: 1 },
+      // A decent shot at a 14-slot epic bag off the storm giant.
+      { itemId: 'stormhide_haversack', chance: 0.18 },
       { itemId: 'crownforged_gauntlets', chance: 0.08, rollGroup: 'thunzharr_t2' },
       { itemId: 'nighttalon_grips', chance: 0.08, rollGroup: 'thunzharr_t2' },
       { itemId: 'soulflame_gloves', chance: 0.08, rollGroup: 'thunzharr_t2' },

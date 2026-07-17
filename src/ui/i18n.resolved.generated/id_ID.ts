@@ -7447,6 +7447,9 @@ export const id_ID: EnTranslations = {
       "mistcallers_duffel": {
         "name": "Tas Fogbinder"
       },
+      "stormhide_haversack": {
+        "name": "Stormhide Haversack"
+      },
       "copper_mining_pick": {
         "name": "Beliung Tambang Tembaga"
       },

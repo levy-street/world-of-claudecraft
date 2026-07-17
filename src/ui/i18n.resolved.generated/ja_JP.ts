@@ -7447,6 +7447,9 @@ export const ja_JP: EnTranslations = {
       "mistcallers_duffel": {
         "name": "フォグバインダーのダッフル"
       },
+      "stormhide_haversack": {
+        "name": "ストームハイドの雑嚢"
+      },
       "copper_mining_pick": {
         "name": "銅の採掘ピック"
       },

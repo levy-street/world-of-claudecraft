@@ -2859,6 +2859,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.wolfhide_satchel.name': 'Сумка из волчьей шкуры',
   'entities.items.gravewoven_bag.name': 'Могильотканая сумка',
   'entities.items.mistcallers_duffel.name': 'Вещмешок Вязателя Тумана',
+  'entities.items.stormhide_haversack.name': 'Ранец из штормовой шкуры',
   'entities.items.bandit_bandana.name': 'Красная бандана',
   'entities.items.tough_jerky.name': 'Солёное вяленое мясо',
   'entities.items.mudfin_scale.name': 'Слизистая чешуя мадфина',

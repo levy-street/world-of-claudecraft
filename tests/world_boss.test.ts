@@ -17,6 +17,10 @@ import {
 const BOSS_ID = 'thunzharr_waking_peak';
 const DAY = '2026-06-28';
 
+// The ungrouped personal drops that are NOT Tier-2 gear (a trophy, the daily Heroic Mark,
+// and the epic bag): each rolls on its own chance and is exempt from the one-gear-per-kill cap.
+const NON_GEAR_DROPS = new Set(['inert_storm_shard', 'heroic_mark', 'stormhide_haversack']);
+
 // Minimal PlayerMeta stand-in for the pure lockout-gate helpers (they touch only
 // .raidLockouts). Cast through unknown to satisfy the full PlayerMeta type.
 function fakeMeta() {
@@ -382,10 +386,11 @@ describe('world boss personal loot', () => {
       killWith(sim, boss, pids);
       const items = boss.loot?.items ?? [];
       for (const pid of pids) {
-        // The guaranteed Inert Storm Shard is a trophy, not a gear drop; every other
-        // personal slot is a Tier-2 set piece from a roll group.
+        // The guaranteed Inert Storm Shard and Heroic Mark are trophies/currency, and the
+        // Stormhide Haversack is a bag, none a gear drop; every OTHER personal slot is a
+        // Tier-2 set piece from a roll group. Only the set pieces are subject to the cap.
         const gear = items.filter(
-          (s) => (s.personalFor ?? []).includes(pid) && s.itemId !== 'inert_storm_shard',
+          (s) => (s.personalFor ?? []).includes(pid) && !NON_GEAR_DROPS.has(s.itemId),
         );
         expect(gear.length).toBeLessThanOrEqual(1);
         if (gear.length === 1) anyGearDropped = true;
@@ -432,6 +437,81 @@ describe('world boss personal loot', () => {
       return JSON.stringify(boss.loot?.items ?? []);
     };
     expect(run()).toBe(run());
+  });
+});
+
+describe('world boss daily Heroic Mark and epic bag', () => {
+  function killWith(sim: Sim, boss: Entity, pids: number[]) {
+    for (const pid of pids) {
+      const e = (sim as any).entities.get(pid) as Entity;
+      (sim as any).dealDamage(e, boss, 10, false, 'physical', 'Chip', 'hit', true);
+    }
+    const killer = (sim as any).entities.get(pids[0]) as Entity;
+    (sim as any).dealDamage(killer, boss, 999_999, false, 'physical', 'Finisher', 'hit', true);
+    expect(boss.dead).toBe(true);
+  }
+
+  it('guarantees a Heroic Mark personal slot for every contributor (the once-daily clear reward)', () => {
+    const sim = makeSim();
+    sim.utcDay = DAY;
+    const p1 = sim.addPlayer('warrior', 'Ada');
+    const p2 = sim.addPlayer('mage', 'Bru');
+    const { boss } = spawnBossNow(sim);
+    killWith(sim, boss, [p1, p2]);
+    const markOwners = (boss.loot?.items ?? [])
+      .filter((s) => s.itemId === 'heroic_mark')
+      .flatMap((s) => s.personalFor ?? []);
+    // chance: 1, so both contributors get their own Mark; the world-boss loot lockout is
+    // per raid reset (daily), so this is effectively a once-per-day Mark for the clear.
+    expect(markOwners).toContain(p1);
+    expect(markOwners).toContain(p2);
+    // Every mark slot is a single-owner personal drop (never a shared/open slot).
+    for (const slot of (boss.loot?.items ?? []).filter((s) => s.itemId === 'heroic_mark')) {
+      expect(slot.personalFor && slot.personalFor.length === 1).toBe(true);
+      expect(slot.openToAll).toBeFalsy();
+    }
+  });
+
+  it('drops the Mark ALONGSIDE a Tier-2 piece: the ungrouped Mark is exempt from the one-gear cap', () => {
+    // Sweep seeds until a contributor rolls a Tier-2 set piece; the guaranteed Mark must
+    // sit in the SAME kill (proving the ungrouped Mark does not consume the gear cap).
+    let sawMarkPlusGear = false;
+    for (let seed = 1; seed <= 40 && !sawMarkPlusGear; seed++) {
+      const sim = makeSim(seed);
+      sim.utcDay = DAY;
+      const pids = [sim.addPlayer('warrior', 'Ada'), sim.addPlayer('mage', 'Bru')];
+      const { boss } = spawnBossNow(sim);
+      killWith(sim, boss, pids);
+      const items = boss.loot?.items ?? [];
+      for (const pid of pids) {
+        const owned = items.filter((s) => (s.personalFor ?? []).includes(pid));
+        const hasMark = owned.some((s) => s.itemId === 'heroic_mark');
+        const hasGear = owned.some((s) => !NON_GEAR_DROPS.has(s.itemId));
+        if (hasMark && hasGear) sawMarkPlusGear = true;
+      }
+    }
+    expect(sawMarkPlusGear).toBe(true);
+  });
+
+  it('drops the epic Stormhide Haversack on its own chance (non-vacuous, single-owner personal)', () => {
+    // The bag is a decent-but-not-guaranteed drop (chance 0.18); across a seed sweep it must
+    // actually land at least once (so the entry is not vacuous) and always as a personal slot.
+    let bagDrops = 0;
+    for (let seed = 1; seed <= 60; seed++) {
+      const sim = makeSim(seed);
+      sim.utcDay = DAY;
+      const p1 = sim.addPlayer('warrior', 'Ada');
+      const { boss } = spawnBossNow(sim);
+      killWith(sim, boss, [p1]);
+      for (const slot of (boss.loot?.items ?? []).filter(
+        (s) => s.itemId === 'stormhide_haversack',
+      )) {
+        bagDrops++;
+        expect(slot.personalFor && slot.personalFor.length === 1).toBe(true);
+        expect(slot.openToAll).toBeFalsy();
+      }
+    }
+    expect(bagDrops).toBeGreaterThan(0);
   });
 });
 

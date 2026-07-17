@@ -7447,6 +7447,9 @@ export const es_ES: EnTranslations = {
       "mistcallers_duffel": {
         "name": "Petate de Fogbinder"
       },
+      "stormhide_haversack": {
+        "name": "Stormhide Haversack"
+      },
       "copper_mining_pick": {
         "name": "Pico de Minería de Cobre"
       },

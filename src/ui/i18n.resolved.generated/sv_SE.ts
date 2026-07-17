@@ -7447,6 +7447,9 @@ export const sv_SE: EnTranslations = {
       "mistcallers_duffel": {
         "name": "Fogbinderns sjösäck"
       },
+      "stormhide_haversack": {
+        "name": "Stormhide Haversack"
+      },
       "copper_mining_pick": {
         "name": "Kopparhacka"
       },

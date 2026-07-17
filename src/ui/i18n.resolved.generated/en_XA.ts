@@ -7447,6 +7447,9 @@ export const en_XA: EnTranslations = {
       "mistcallers_duffel": {
         "name": "[Ƒóĝƀíñðéŕ'š Ðúƒƒéļ]"
       },
+      "stormhide_haversack": {
+        "name": "[Šţóŕɱĥíðé Ĥáʋéŕšáçķ]"
+      },
       "copper_mining_pick": {
         "name": "[Çóþþéŕ Ɱíñíñĝ Þíçķ]"
       },

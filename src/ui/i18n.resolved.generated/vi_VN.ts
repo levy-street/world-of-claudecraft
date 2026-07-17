@@ -7447,6 +7447,9 @@ export const vi_VN: EnTranslations = {
       "mistcallers_duffel": {
         "name": "Túi vải của Fogbinder"
       },
+      "stormhide_haversack": {
+        "name": "Stormhide Haversack"
+      },
       "copper_mining_pick": {
         "name": "Cuốc Khai Khoáng Đồng"
       },

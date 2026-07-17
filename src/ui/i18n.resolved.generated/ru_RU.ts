@@ -7447,6 +7447,9 @@ export const ru_RU: EnTranslations = {
       "mistcallers_duffel": {
         "name": "Вещмешок Вязателя Тумана"
       },
+      "stormhide_haversack": {
+        "name": "Ранец из штормовой шкуры"
+      },
       "copper_mining_pick": {
         "name": "Медная кирка"
       },

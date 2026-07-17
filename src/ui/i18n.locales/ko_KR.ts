@@ -2808,6 +2808,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.wolfhide_satchel.name': '늑대가죽 가방',
   'entities.items.gravewoven_bag.name': '무덤결 가방',
   'entities.items.mistcallers_duffel.name': '안개엮는자의 더플백',
+  'entities.items.stormhide_haversack.name': '폭풍가죽 배낭',
   'entities.items.bandit_bandana.name': '붉은 두건',
   'entities.items.tough_jerky.name': '소금에 절인 육포',
   'entities.items.mudfin_scale.name': '끈적한 진흙지느러미 비늘',

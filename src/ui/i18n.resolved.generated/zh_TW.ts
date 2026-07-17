@@ -7447,6 +7447,9 @@ export const zh_TW: EnTranslations = {
       "mistcallers_duffel": {
         "name": "縛霧者行囊"
       },
+      "stormhide_haversack": {
+        "name": "風暴皮行囊"
+      },
       "copper_mining_pick": {
         "name": "銅製採礦鎬"
       },

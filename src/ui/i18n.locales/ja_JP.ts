@@ -2832,6 +2832,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.wolfhide_satchel.name': '狼皮のサッチェル',
   'entities.items.gravewoven_bag.name': '墓織りのバッグ',
   'entities.items.mistcallers_duffel.name': 'フォグバインダーのダッフル',
+  'entities.items.stormhide_haversack.name': 'ストームハイドの雑嚢',
   'entities.items.bandit_bandana.name': '赤いバンダナ',
   'entities.items.tough_jerky.name': '塩漬けの干し肉',
   'entities.items.mudfin_scale.name': 'ぬめるマッドフィンの鱗',

@@ -432,6 +432,16 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     bagSlots: 14,
     sellValue: 9000,
   },
+  // 14-slot epic bag off the Thunzharr world boss (a decent-chance drop; see the
+  // thunzharr_waking_peak loot table in zone3.ts). Same tier as the Fogbinder's Duffel.
+  stormhide_haversack: {
+    id: 'stormhide_haversack',
+    name: 'Stormhide Haversack',
+    kind: 'bag',
+    quality: 'epic',
+    bagSlots: 14,
+    sellValue: 9000,
+  },
   // --- food & drink (vendor) ---
   baked_bread: {
     id: 'baked_bread',
