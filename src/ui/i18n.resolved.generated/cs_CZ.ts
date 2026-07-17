@@ -4864,6 +4864,7 @@ export const cs_CZ: EnTranslations = {
     "connectionRejected": "Server ukončil připojení.",
     "realmFull": "Tento svět je momentálně plný. Zkus to prosím znovu za několik minut.",
     "tooManyConnections": "Z tvé sítě se k tomuto světu připojuje příliš mnoho spojení. Zavři nadbytečná herní okna nebo to zkus znovu za několik minut.",
+    "webOnlyRealm": "This world can only be entered from a web browser.",
     "tips": {
       "classes": "Tip: každá z 9 tříd se hraje jinak. Než se pro jednu rozhodneš, několik jich vyzkoušej.",
       "talents": "Tip: kdykoli nejsi v boji, můžeš resetovat své talenty, takže časná volba nikdy není past.",
@@ -4937,6 +4938,8 @@ export const cs_CZ: EnTranslations = {
     "noRealms": "Nejsou dostupné žádné světy.",
     "loading": "Načítají se světy...",
     "recommended": "Doporučeno",
+    "p2wBadge": "Pay-to-Win",
+    "p2wTip": "Real-money and crypto mechanics are enabled on this world. Entering is optional and for adults only.",
     "checkingStatus": "Kontroluje se stav...",
     "onlineNow": "{count} online",
     "down": "Svět je mimo provoz",

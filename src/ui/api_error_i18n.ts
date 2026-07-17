@@ -324,6 +324,10 @@ export function userFacingApiError(err: unknown): string {
   // network' is a byte-exact wire contract with server/ws_auth.ts (WS_AUTH_ERROR).
   if (normalized === 'too many connections from your network')
     return t('loading.tooManyConnections');
+  // A web-only realm process refused a native/desktop app-shell client. Byte-exact
+  // wire contract with server/ws_auth.ts (WS_AUTH_ERROR.webOnlyRealm).
+  if (normalized === 'this realm can only be entered from a web browser')
+    return t('loading.webOnlyRealm');
   // NOTE: protocol/transport diagnostics ('bad auth message', 'authentication timed out',
   // etc.) are intentionally NOT translated, they are developer/diagnostic errors and must
   // stay English so browser logs and support reports match the server source.

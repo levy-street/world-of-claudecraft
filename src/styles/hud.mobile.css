@@ -3752,7 +3752,8 @@
     white-space: nowrap;
   }
   body.mobile-touch .realm-name .rn-chars,
-  body.mobile-touch .realm-name .rn-rec {
+  body.mobile-touch .realm-name .rn-rec,
+  body.mobile-touch .realm-name .rn-p2w {
     display: inline-block;
     max-width: 100%;
     vertical-align: middle;

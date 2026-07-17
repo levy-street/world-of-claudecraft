@@ -1216,6 +1216,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'loading.realmFull': '当前服务器已满，请稍后几分钟再试。',
   'loading.tooManyConnections':
     '您的网络向该服务器发起的连接过多。请关闭多余的游戏窗口，或稍后几分钟再试。',
+  'loading.webOnlyRealm': '该世界只能通过网页浏览器进入。',
   'errors.nothingInteract': '附近没有可互动目标。',
   'errors.noEnemyNearby': '附近没有敌人。',
   'errors.characterNameRequired': '请输入角色名称。',
@@ -1253,6 +1254,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'realm.noRealms': '没有可用服务器。',
   'realm.loading': '正在加载服务器...',
   'realm.recommended': '推荐',
+  'realm.p2wBadge': '付费变强',
+  'realm.p2wTip': '该世界启用了真实货币与加密货币机制。进入完全自愿，仅限成年人。',
   'realm.checkingStatus': '正在检查状态...',
   'realm.onlineNow': '当前 {count} 人在线',
   'realm.down': '服务器不可用',

@@ -247,7 +247,18 @@ import {
   wocBalanceRateLimited,
 } from './ratelimit';
 import { createPgRateLimitStore } from './ratelimit_db';
-import { isPublicCorsPath, publicOriginFromRequest, REALM, REALM_DIRECTORY } from './realm';
+import {
+  isPublicCorsPath,
+  OWN_REALM_FLAGS,
+  publicOriginFromRequest,
+  REALM,
+  REALM_DIRECTORY,
+} from './realm';
+import {
+  globallyExcludedRealms,
+  realmsVisibleToRequest,
+  webOnlyRealmRefuses,
+} from './realm_platform_guard';
 import { resolveReportTarget } from './report_target';
 import { BUG_REPORT_MAX_BODY_BYTES, configureReportsRuntime } from './reports';
 import { resolveSfxOverlayFile } from './sfx_overlay';
@@ -431,9 +442,17 @@ const leaderboardCache: Record<
   global: null,
 };
 
+// Pay-to-win realms never rank on the cross-realm boards (lifetime XP, guilds,
+// Renown); their own realm-scoped boards are untouched. Boot constant: the
+// directory and own-realm flags are both resolved once at module load.
+const P2W_EXCLUDED_REALMS = globallyExcludedRealms(REALM_DIRECTORY, REALM, OWN_REALM_FLAGS);
+
 async function refreshLeaderboard(scope: 'realm' | 'global'): Promise<LeaderboardEntry[]> {
   const epoch = boardEpoch;
-  const rows = await topLifetimeXp(LEADERBOARD_SIZE, { global: scope === 'global' });
+  const rows = await topLifetimeXp(LEADERBOARD_SIZE, {
+    global: scope === 'global',
+    excludeRealms: scope === 'global' ? P2W_EXCLUDED_REALMS : undefined,
+  });
   const entries: LeaderboardEntry[] = rows.map((r, i) => ({
     rank: i + 1,
     name: r.name,
@@ -477,7 +496,10 @@ async function refreshGuildLeaderboard(
   scope: 'realm' | 'global',
 ): Promise<GuildLeaderboardEntry[]> {
   const epoch = boardEpoch;
-  const rows = await topGuilds(LEADERBOARD_SIZE, { global: scope === 'global' });
+  const rows = await topGuilds(LEADERBOARD_SIZE, {
+    global: scope === 'global',
+    excludeRealms: scope === 'global' ? P2W_EXCLUDED_REALMS : undefined,
+  });
   const entries: GuildLeaderboardEntry[] = rows.map((r, i) => ({
     rank: i + 1,
     name: r.name,
@@ -531,7 +553,12 @@ async function refreshDeedsBoard(): Promise<DeedsBoardCache> {
   // former computeDeedsBoard(rows).ranked shape.
   const deedIds = Object.keys(DEEDS);
   const renowns = deedIds.map((id) => DEEDS[id].renown);
-  const board = await deedsBoardRanked(deedIds, renowns, DEEDS_BOARD_ENTRY_FLOOR);
+  const board = await deedsBoardRanked(
+    deedIds,
+    renowns,
+    DEEDS_BOARD_ENTRY_FLOOR,
+    P2W_EXCLUDED_REALMS,
+  );
   if (board.unknownDeedIds.length > 0) {
     // Rows for removed/renamed content are skipped, never scored; surface the
     // ids so a content rename is noticed instead of silently shrinking scores.
@@ -1529,10 +1556,20 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     }
     if (req.method === 'GET' && url === '/api/realms') {
       // optionally authenticated: with a token we also return how many
-      // characters the account has on each realm (for the realm-list screen)
+      // characters the account has on each realm (for the realm-list screen).
+      // App-shell clients (native/desktop) never see web-only realms; the
+      // RouteDef twin shapes through the same realmsVisibleToRequest
+      // (dual-arm edit).
       const accountId = await bearerAccount(req);
-      const characters = accountId !== null ? await characterCountsByRealm(accountId) : {};
-      return json(res, 200, { current: REALM, realms: REALM_DIRECTORY, characters });
+      const counts = accountId !== null ? await characterCountsByRealm(accountId) : {};
+      const visible = realmsVisibleToRequest(req, REALM_DIRECTORY);
+      // Key-filter the counts so a hidden realm's name never leaks through them
+      // (same shaping as the RouteDef twin's readRealms).
+      const visibleNames = new Set(visible.map((entry) => entry.name));
+      const characters = Object.fromEntries(
+        Object.entries(counts).filter(([name]) => visibleNames.has(name)),
+      );
+      return json(res, 200, { current: REALM, realms: visible, characters });
     }
     if (req.method === 'GET' && url === '/api/search') {
       const accountId = await bearerAccount(req);
@@ -2755,6 +2792,7 @@ export async function startServer(): Promise<http.Server> {
     acquireCharacterLease,
     releaseCharacterLease,
     bankBonusForAccount: async (id) => computeBankBonus(await bankBonusFactsForAccount(id)),
+    refusesAppShellClient: (req) => webOnlyRealmRefuses(OWN_REALM_FLAGS, req),
   });
   wsAuth.attachUpgrade(server, wss);
 

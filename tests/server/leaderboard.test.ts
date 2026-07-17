@@ -353,11 +353,14 @@ describe('readSearch (FakeCharactersDb)', () => {
 });
 
 describe('readRealms (FakeCharactersDb)', () => {
+  // The fakes bucket every character under this synthetic realm name.
+  const dirEntry = { name: 'test-realm' };
+
   it('returns empty counts for an anonymous (null accountId) caller, no db call', async () => {
     const db = new FakeCharactersDb();
     const spy = vi.spyOn(db, 'characterCountsByRealm');
-    const out = await readRealms(db, null, REALM_NAME, ['dir']);
-    expect(out).toEqual({ current: REALM_NAME, realms: ['dir'], characters: {} });
+    const out = await readRealms(db, null, REALM_NAME, [dirEntry]);
+    expect(out).toEqual({ current: REALM_NAME, realms: [dirEntry], characters: {} });
     expect(spy).not.toHaveBeenCalled();
   });
 
@@ -365,9 +368,19 @@ describe('readRealms (FakeCharactersDb)', () => {
     const db = new FakeCharactersDb();
     db.seed(characterRow(1, 'One'));
     db.seed(characterRow(2, 'Two'));
-    const out = await readRealms(db, 1, REALM_NAME, ['dir']);
+    const out = await readRealms(db, 1, REALM_NAME, [dirEntry]);
     expect(out.current).toBe(REALM_NAME);
     expect(Object.values(out.characters).reduce((a, b) => a + b, 0)).toBe(2);
+  });
+
+  it('key-filters counts to the served directory so a hidden realm name never leaks', async () => {
+    const db = new FakeCharactersDb();
+    db.seed(characterRow(1, 'One'));
+    // The caller's class hid every realm the account has characters on (e.g. a
+    // web-only realm served to an app shell): its name must not ride back
+    // through the counts map.
+    const out = await readRealms(db, 1, REALM_NAME, [{ name: 'SomeOtherRealm' }]);
+    expect(out.characters).toEqual({});
   });
 });
 

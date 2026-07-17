@@ -170,10 +170,16 @@ export function buildWebSocketAuthMessage(
 
 export type RealmType = 'Normal' | 'PvP' | 'RP' | 'RP-PvP';
 
+// Per-realm capability/labeling flags (server/realm.ts RealmFlag): 'web' marks
+// a browser-only realm, 'p2w' a pay-to-win realm the picker badges. Optional
+// on the wire: servers that predate the field simply omit it.
+export type RealmFlag = 'web' | 'p2w';
+
 export interface RealmEntry {
   name: string;
   url: string;
   type: RealmType;
+  flags?: RealmFlag[];
 }
 
 export interface RealmDirectory {
