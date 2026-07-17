@@ -256,6 +256,7 @@ function hasAura(auras: readonly ActionBarAuraInput[], auraId: string): boolean 
 }
 
 const FREE_COST_AURA_IDS_BY_ABILITY: Readonly<Record<string, readonly string[]>> = {
+  hurricane: ['dru_typhoon_relay'],
   exorcism: ['pal_blood_debt'],
   arcane_shot: ['hun_venom_relay', 'hun_packbond', 'hun_menders_signal'],
   eviscerate: ['rog_redhanded'],
@@ -453,6 +454,13 @@ function moonrageWildProcState(
   return hasAura(player.auras, 'dru_moonrage_wild') ? 'armed' : 'none';
 }
 
+function galeheartProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'dru_typhoon_relay') ? 'armed' : 'none';
+}
+
 // Ability ids map to pure proc resolvers here, keeping the painter generic. New
 // action cues extend this table rather than adding ability branches to DOM code.
 const PROC_STATE_RESOLVERS: Readonly<Record<string, ProcStateResolver | undefined>> = {
@@ -480,6 +488,7 @@ const PROC_STATE_RESOLVERS: Readonly<Record<string, ProcStateResolver | undefine
   wrath: moonrageWildProcState,
   moonfire: moonrageLunarProcState,
   starfire: moonrageLunarProcState,
+  hurricane: galeheartProcState,
 };
 
 function procStateForAbility(

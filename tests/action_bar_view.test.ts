@@ -630,6 +630,26 @@ describe('actionBarView: proc availability cues', () => {
     ).toBe('armed');
   });
 
+  it('makes Galeheart usable at zero mana during the Typhoon relay', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('hurricane', { cost: 90 }) })),
+      fakeDeps(),
+    );
+
+    expect(view.tick(world({ resource: 0 })).slots[0]).toMatchObject({
+      usable: false,
+      procState: 'none',
+    });
+    expect(
+      view.tick(
+        world({
+          resource: 0,
+          playerAuras: [{ id: 'dru_typhoon_relay', kind: 'next_cast_free' }],
+        }),
+      ).slots[0],
+    ).toMatchObject({ usable: true, procState: 'armed' });
+  });
+
   it('keeps ordinary abilities and Icefall without stored Icicles at none', () => {
     const view = createActionBarView(
       descriptor(

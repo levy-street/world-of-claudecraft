@@ -2406,9 +2406,28 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'dru_r8_typhoon',
           name: 'Typhoon',
-          description: 'Grants Typhoon: knock back and daze all enemies within 8 yd.',
+          description:
+            'Grants Typhoon: knock back and daze all enemies within 8 yd. Moongrove: casting Typhoon makes your next Galeheart within 8 sec free.',
           icon: 'typhoon',
-          effect: { grant: { ability: 'typhoon' } },
+          effect: {
+            grant: { ability: 'typhoon' },
+            proc: {
+              id: 'dru_typhoon_relay',
+              name: 'Typhoon',
+              spec: 'balance',
+              requiresKnownAbility: 'typhoon',
+              school: 'nature',
+              trigger: { on: 'castNth', n: 1, abilities: ['typhoon'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_free',
+                  abilities: ['hurricane'],
+                  duration: 8,
+                },
+              ],
+            },
+          },
         },
         {
           id: 'dru_r8_improved_roots',

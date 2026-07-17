@@ -1071,4 +1071,7 @@ npm run build on PR4/PR5.
   spell opens an 8 sec instant Wildbolt. The caster alternates schools, chooses between
   DoT upkeep and a heavier lunar cast, and keeps mana meaningful while gaining a mobile
   handoff. Both windows require the Moongrove spec and known Moonwing Form, add no random
-  draws, and remain visible on the aura strip and matching action-bar abilities.
+  draws, and remain visible on the aura strip and matching action-bar abilities. Typhoon
+  keeps its stable option ID and knockback grant, but is no longer an isolated grant for
+  Moongrove: casting it now banks an 8 sec free Galeheart channel. The other Druid specs
+  retain Typhoon's previous behavior, and both sibling disruption choices remain intact.

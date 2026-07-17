@@ -88,6 +88,7 @@ const ACTIONABLE_AURA_IDS: ReadonlySet<string> = new Set([
   'mag_aetherwell_relay',
   'dru_moonrage_lunar',
   'dru_moonrage_wild',
+  'dru_typhoon_relay',
 ]);
 
 /** The localized single-letter unit suffixes the compact duration label uses. */

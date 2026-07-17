@@ -282,6 +282,14 @@ describe('createAurasView: derivation per mode', () => {
     expect(state.slots.slice(0, 2).map((slot) => slot.isActionable)).toEqual([true, true]);
   });
 
+  it('marks the Typhoon to Galeheart relay as an actionable cast window', () => {
+    const state = createAurasView('all', deps()).tick(
+      entity([aura({ id: 'dru_typhoon_relay', kind: 'next_cast_free' })]),
+    );
+
+    expect(state.slots[0].isActionable).toBe(true);
+  });
+
   it('badges remaining charges (shown even at 1) and prefers charges over stacks', () => {
     // A charge-limited aura (Lightning Shield) badges its charge count, unlike stacks it
     // shows at 1, and when both are present charges wins (it is the meaningful count).
