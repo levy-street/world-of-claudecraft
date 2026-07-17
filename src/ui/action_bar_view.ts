@@ -88,6 +88,9 @@ export interface ActionBarAbility {
 export interface ActionBarAuraInput {
   id: string;
   kind: AuraKind;
+  /** Caster identity for ownership-sensitive proc cues. AuraWire and sim auras
+   *  both expose it; optional keeps unrelated presence-only cues lightweight. */
+  sourceId?: number;
   stacks?: number;
   charges?: number;
 }
@@ -136,6 +139,7 @@ export interface ActionBarDeps {
 
 /** The player fields the bar reads; a structural subset both worlds mirror. */
 export interface ActionBarPlayerInput {
+  id: number;
   autoAttack: boolean;
   dead: boolean;
   resource: number;
@@ -474,7 +478,10 @@ function primalSurgeProcState(
   target: ActionBarTargetInput | null,
 ): ActionBarProcState {
   if (!hasAura(player.auras, 'bear_form') || target === null || target.dead) return 'none';
-  return hasAura(target.auras, 'dru_primal_heart_bleed') ? 'armed' : 'none';
+  for (const aura of target.auras) {
+    if (aura.id === 'dru_primal_heart_bleed' && aura.sourceId === player.id) return 'armed';
+  }
+  return 'none';
 }
 
 function redHazeAttackProcState(

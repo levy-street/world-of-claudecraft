@@ -81,6 +81,7 @@ function fakeDeps(): ActionBarDeps {
 }
 
 interface WorldOpts {
+  playerId?: number;
   autoAttack?: boolean;
   dead?: boolean;
   resource?: number;
@@ -101,6 +102,7 @@ function world(opts: WorldOpts = {}): ActionBarWorldInput {
   const targetPos = opts.targetPos === undefined ? null : opts.targetPos;
   return {
     player: {
+      id: opts.playerId ?? 7,
       autoAttack: opts.autoAttack ?? false,
       dead: opts.dead ?? false,
       resource: opts.resource ?? 100,
@@ -657,7 +659,7 @@ describe('actionBarView: proc availability cues', () => {
     );
     const target = {
       targetPos: { x: 2, y: 0, z: 0 },
-      targetAuras: [{ id: 'dru_primal_heart_bleed', kind: 'dot' as const }],
+      targetAuras: [{ id: 'dru_primal_heart_bleed', kind: 'dot' as const, sourceId: 7 }],
     };
 
     expect(view.tick(world(target)).slots[0].procState).toBe('none');
@@ -669,6 +671,15 @@ describe('actionBarView: proc availability cues', () => {
         }),
       ).slots[0].procState,
     ).toBe('armed');
+    expect(
+      view.tick(
+        world({
+          ...target,
+          playerAuras: [{ id: 'bear_form', kind: 'form_bear' }],
+          targetAuras: [{ id: 'dru_primal_heart_bleed', kind: 'dot', sourceId: 8 }],
+        }),
+      ).slots[0].procState,
+    ).toBe('none');
     expect(
       view.tick(
         world({

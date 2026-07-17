@@ -7907,6 +7907,7 @@ function localizedResourceName(resourceType: ResourceType | undefined): string {
 
 function procResponseDescription(
   response: ProcDef['responses'][number],
+  proc: ProcDef,
   lang: SupportedLanguage,
   text: TalentLocaleText,
 ): string {
@@ -7935,8 +7936,11 @@ function procResponseDescription(
       return `+${formatPercent(response.pctDamage, lang)} ${text.statLabels.damage} / ${seconds(response.duration, lang)} (${seconds(response.interval, lang)})`;
     case 'detonateOwnedDot':
       return `${formatPercent(1, lang)} ${text.statLabels.damage} / 0 s`;
-    case 'consumeOwnedDotAbsorb':
-      return `${t('hudChrome.auraEffect.absorb', { value: `x${formatNumber(response.multiplier, lang)}` })} (<= ${formatPercent(response.maxHpPct, lang)} ${text.statLabels.maxHpPct}; ${seconds(response.duration, lang)})`;
+    case 'consumeOwnedDotAbsorb': {
+      const ownedBleed = translateTitle(proc.name, lang);
+      const requiredForm = abilityName(`${response.requiresForm}_form`);
+      return `${ownedBleed}: ${formatPercent(1, lang)} ${text.statLabels.damage} / 0 s @ ${requiredForm} -> ${t('hudChrome.auraEffect.absorb', { value: `x${formatNumber(response.multiplier, lang)}` })} (<= ${formatPercent(response.maxHpPct, lang)} ${text.statLabels.maxHpPct}; ${seconds(response.duration, lang)})`;
+    }
     case 'chanceAura':
       return `${translateTitle(response.name, lang)}: ${formatPercent(response.chance, lang)} (${seconds(response.duration, lang)})`;
     case 'addAuraCharges':
@@ -7950,12 +7954,22 @@ function procResponseDescription(
   }
 }
 
-function procDescription(proc: ProcDef, lang: SupportedLanguage, text: TalentLocaleText): string {
+function procDescription(
+  proc: ProcDef,
+  lang: SupportedLanguage,
+  text: TalentLocaleText,
+  classId: PlayerClass | undefined,
+): string {
   const trigger = procTriggerDescription(proc, lang, text);
   const responses = proc.responses
-    .map((response) => procResponseDescription(response, lang, text))
+    .map((response) => procResponseDescription(response, proc, lang, text))
     .join('; ');
-  return `${trigger} -> ${responses}.`;
+  const gatedSpec =
+    classId === undefined
+      ? undefined
+      : TALENTS[classId]?.specs.find((spec) => spec.id === proc.spec);
+  const gate = gatedSpec === undefined ? '' : `${translateTitle(gatedSpec.name, lang)}: `;
+  return `${gate}${trigger} -> ${responses}.`;
 }
 
 type DescribedAddedEffect = Extract<
@@ -8070,6 +8084,7 @@ function effectDescription(
   effect: TalentEffect | undefined,
   maxRank: number,
   lang: SupportedLanguage,
+  classId?: PlayerClass,
 ): string {
   if (!effect) return localeText[lang].noEffect;
   const text = localeText[lang];
@@ -8210,8 +8225,8 @@ function effectDescription(
     }
   }
 
-  if (effect.proc) parts.push(procDescription(effect.proc, lang, text));
-  for (const proc of effect.procs ?? []) parts.push(procDescription(proc, lang, text));
+  if (effect.proc) parts.push(procDescription(effect.proc, lang, text, classId));
+  for (const proc of effect.procs ?? []) parts.push(procDescription(proc, lang, text, classId));
 
   return parts.length > 0 ? parts.join(' ') : text.noEffect;
 }
@@ -8264,7 +8279,7 @@ export function tTalent(request: TalentTranslationRequest): string {
     }
     return (
       localeText[lang].masteryDescriptions?.[request.spec.id] ??
-      effectDescription(request.spec.mastery.effect, 1, lang)
+      effectDescription(request.spec.mastery.effect, 1, lang, request.spec.class)
     );
   }
   if (request.kind === 'talentSpec') {
@@ -8285,7 +8300,12 @@ export function tTalent(request: TalentTranslationRequest): string {
       | undefined;
     const retainedDescription = retainedDescriptions?.[request.choice.id];
     if (retainedDescription !== undefined) return retainedDescription;
-    const generated = effectDescription(request.choice.effect, 1, lang);
+    const owner = talentClassData().find((ct) =>
+      (rowTreeFor(ct.class) ?? []).some((row) =>
+        row.options.some((option) => option.id === request.choice.id),
+      ),
+    );
+    const generated = effectDescription(request.choice.effect, 1, lang, owner?.class);
     return generated === localeText[lang].noEffect ? request.choice.description : generated;
   }
   const exhaustive: never = request;

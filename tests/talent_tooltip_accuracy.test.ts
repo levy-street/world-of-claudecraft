@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { ROW_TREES, TALENTS } from '../src/sim/content/talents';
+import { tEntity } from '../src/ui/entity_i18n';
 import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
 import { tTalent } from '../src/ui/talent_i18n';
 
@@ -158,6 +159,45 @@ describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
       expect(bloodDebt).not.toContain('auto_attack');
       expect(bloodDebt).toContain('20%');
       expect(bloodDebt).toContain('8');
+    } finally {
+      setLanguage('en');
+    }
+  });
+
+  it('keeps Druid spec, ownership, and form gates explicit in Japanese', async () => {
+    await ensureLocaleLoaded('ja_JP');
+    setLanguage('ja_JP');
+    try {
+      const renderChoice = (id: string): string => {
+        const choice = ROW_TREES.druid
+          .flatMap((row) => row.options)
+          .find((option) => option.id === id);
+        if (!choice) throw new Error(`missing Druid talent choice ${id}`);
+        return tTalent({ kind: 'talentChoice', choice, field: 'description' });
+      };
+      const spec = (id: string) => {
+        const found = TALENTS.druid.specs.find((candidate) => candidate.id === id);
+        if (!found) throw new Error(`missing Druid ${id} specialization`);
+        return found;
+      };
+      const specName = (id: string): string =>
+        tTalent({ kind: 'talentSpec', spec: spec(id), field: 'name' });
+
+      expect(renderChoice('dru_r8_typhoon')).toContain(specName('balance'));
+      expect(renderChoice('dru_r20_berserk')).toContain(specName('feral'));
+
+      const wildfang = spec('feral');
+      const primalHeart = tTalent({
+        kind: 'talentMastery',
+        spec: wildfang,
+        field: 'description',
+      });
+      expect(primalHeart).toContain(specName('feral'));
+      expect(primalHeart).toContain(
+        tTalent({ kind: 'talentMastery', spec: wildfang, field: 'name' }),
+      );
+      expect(primalHeart).toContain(tEntity({ kind: 'ability', id: 'bear_form', field: 'name' }));
+      expect(primalHeart).toContain('100%');
     } finally {
       setLanguage('en');
     }
