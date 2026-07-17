@@ -302,6 +302,21 @@ export const nl_NL: EnTranslations = {
     "spectate": {
       "banner": "Toeschouwer bij {name}"
     },
+    "arenaEnd": {
+      "victory": "Victory",
+      "defeat": "Defeat",
+      "draw": "Draw",
+      "colName": "Name",
+      "colKills": "Killing Blows",
+      "colDamage": "Damage Done",
+      "colHealing": "Healing Done",
+      "colRating": "Rating",
+      "colChange": "Change",
+      "yourRating": "Your Rating: {before} to {after}",
+      "honorEarned": "+{honor} Honor",
+      "leave": "Leave",
+      "close": "Close"
+    },
     "readyCheck": {
       "prompt": "{name} heeft een gereedheidscontrole gestart. Ben je gereed?",
       "ready": "Gereed",

@@ -302,6 +302,21 @@ export const id_ID: EnTranslations = {
     "spectate": {
       "banner": "Menonton {name}"
     },
+    "arenaEnd": {
+      "victory": "Victory",
+      "defeat": "Defeat",
+      "draw": "Draw",
+      "colName": "Name",
+      "colKills": "Killing Blows",
+      "colDamage": "Damage Done",
+      "colHealing": "Healing Done",
+      "colRating": "Rating",
+      "colChange": "Change",
+      "yourRating": "Your Rating: {before} to {after}",
+      "honorEarned": "+{honor} Honor",
+      "leave": "Leave",
+      "close": "Close"
+    },
     "readyCheck": {
       "prompt": "{name} memulai pemeriksaan kesiapan. Apakah kamu siap?",
       "ready": "Siap",

@@ -31,6 +31,7 @@ import type { ArenaMatch, ArenaQueueUnit, ArenaReturnPools, PlayerMeta } from '.
 import type { SimContext } from '../sim_context';
 import {
   type ArenaCombatant,
+  type ArenaEndRow,
   type ArenaFormat,
   type ArenaStanding,
   type CrowdControlDrCategory,
@@ -506,6 +507,20 @@ export function arenaCombatants(ctx: SimContext, pids: number[]): ArenaCombatant
   return out;
 }
 
+// Accumulate a per-match scoreboard stat for a player currently in an arena bout. A
+// no-op outside a match. Draws no rng; called from the combat hot paths (damage/heal/
+// death), so it stays a cheap O(1) map lookup.
+export function bumpArenaMatchStat(
+  ctx: SimContext,
+  pid: number,
+  field: 'killingBlows' | 'damageDone' | 'healingDone',
+  amount: number,
+): void {
+  if (amount <= 0) return;
+  const row = ctx.arenaMatches.get(pid)?.stats?.get(pid);
+  if (row) row[field] += amount;
+}
+
 export function updateArena(ctx: SimContext): void {
   matchmakeArena1v1(ctx);
   matchmakeArena2v2(ctx);
@@ -788,6 +803,9 @@ export function startArenaMatch(
     honorTeamBKey: honorTeamIdentity(ctx, teamB),
     fiesta: isFiesta ? ctx.createFiestaState() : undefined,
   };
+  match.stats = new Map(
+    allPids.map((pid) => [pid, { killingBlows: 0, damageDone: 0, healingDone: 0 }]),
+  );
   for (const pid of allPids) ctx.arenaMatches.set(pid, match);
   const origin = arenaOrigin(slot);
   if (format === '1v1') {
@@ -949,16 +967,24 @@ export function endArenaMatch(
     deltaA = -eloDelta(ratingB0, ratingA0, 1);
   }
 
+  // Score both teams first, collecting the shared scoreboard rows + the per-player
+  // result and honor earned. Then emit the full scoreboard to each participant (so a
+  // player's end screen shows everyone, with ally/enemy resolved client-side from
+  // `myTeam`). Splitting scoring from emit is what lets the scoreboard be complete.
+  const rows: ArenaEndRow[] = [];
+  const honorEarned = new Map<number, number>();
+  const resultByPid = new Map<number, { won: boolean; team: 'A' | 'B' }>();
+
   const scoreTeam = (team: 'A' | 'B', delta: number, won: boolean | null) => {
     const pids = team === 'A' ? match.teamA : match.teamB;
     const enemies = team === 'A' ? match.teamB : match.teamA;
     const opponentTeamKey =
       (team === 'A' ? match.honorTeamBKey : match.honorTeamAKey) ?? honorTeamIdentity(ctx, enemies);
-    const enemyNames = enemies.map((pid) => ctx.players.get(pid)?.name ?? '?').join(' & ');
     for (const pid of pids) {
       const meta = ctx.players.get(pid);
       if (!meta) continue;
-      // Fiesta is unranked party play — it never moves the ladder, so report
+      const honorBefore = meta.honor;
+      // Fiesta / yumi are unranked party play: they never move the ladder, so report
       // an unchanged rating; ranked bouts go through the per-bracket updater.
       let ratingBefore: number, ratingAfter: number;
       if (ranked) {
@@ -975,20 +1001,21 @@ export function endArenaMatch(
           awardFiestaCompletionHonor(ctx, meta, opponentTeamKey, won === true);
         }
       }
-      ctx.emit({
-        type: 'arenaEnd',
+      honorEarned.set(pid, Math.max(0, meta.honor - honorBefore));
+      resultByPid.set(pid, { won: won === true, team });
+      const st = match.stats?.get(pid) ?? { killingBlows: 0, damageDone: 0, healingDone: 0 };
+      rows.push({
         pid,
-        format: match.format,
-        draw: winnerTeam === null,
-        won: won === true,
-        oppName: enemyNames,
+        name: meta.name,
+        cls: meta.cls,
+        level: ctx.entities.get(pid)?.level ?? 1,
+        team,
+        killingBlows: st.killingBlows,
+        damageDone: st.damageDone,
+        healingDone: st.healingDone,
         ratingBefore,
         ratingAfter,
-        allies: arenaCombatants(
-          ctx,
-          pids.filter((p) => p !== pid),
-        ),
-        enemies: arenaCombatants(ctx, enemies),
+        ratingChange: ratingAfter - ratingBefore,
       });
     }
   };
@@ -997,6 +1024,29 @@ export function endArenaMatch(
   const wonB = winnerTeam === null ? null : winnerTeam === 'B';
   scoreTeam('A', deltaA, wonA);
   scoreTeam('B', -deltaA, wonB);
+
+  for (const pid of arenaAllPids(match)) {
+    const res = resultByPid.get(pid);
+    const self = rows.find((r) => r.pid === pid);
+    if (!res || !self) continue;
+    const enemyPids = res.team === 'A' ? match.teamB : match.teamA;
+    const allyPids = (res.team === 'A' ? match.teamA : match.teamB).filter((p) => p !== pid);
+    ctx.emit({
+      type: 'arenaEnd',
+      pid,
+      format: match.format,
+      draw: winnerTeam === null,
+      won: res.won,
+      oppName: enemyPids.map((p) => ctx.players.get(p)?.name ?? '?').join(' & '),
+      ratingBefore: self.ratingBefore,
+      ratingAfter: self.ratingAfter,
+      allies: arenaCombatants(ctx, allyPids),
+      enemies: arenaCombatants(ctx, enemyPids),
+      scoreboard: rows,
+      myTeam: res.team,
+      honor: honorEarned.get(pid) ?? 0,
+    });
+  }
 
   // Ranked standings feed the meter deeds; the Fiesta end-of-bout moments
   // resolve while augment picks are still on the meta. A forfeit is not a

@@ -32,6 +32,7 @@ import { pvpDamageMultiplier } from '../pvp';
 import { aurasSurvivingDeath } from '../resurrection';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
+import { bumpArenaMatchStat } from '../social/arena';
 import { vcupBothSeated } from '../social/vale_cup';
 import { addThreat, clearThreat } from '../threat';
 import type { Entity } from '../types';
@@ -550,6 +551,15 @@ export function dealDamage(
   // below, plus encounter participant tracking for the roster tasks.
   if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
 
+  // Arena end-screen scoreboard: damage dealt this bout, with pet damage credited to
+  // the owner's row (the same pet -> owner resolution killing blows use in
+  // handleDeath). No-op outside a match; draws no rng.
+  if (source && source.id !== target.id) {
+    const arenaPid = source.kind === 'player' ? source.id : source.ownerId;
+    if (arenaPid !== null && arenaPid !== target.id) {
+      bumpArenaMatchStat(ctx, arenaPid, 'damageDone', amount);
+    }
+  }
   if (source && source.kind === 'player' && source.id !== target.id) {
     const meta = ctx.players.get(source.id);
     if (meta) meta.counters.damageDealt += amount;
@@ -709,6 +719,15 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
   e.castingAbility = null;
   e.castTargetId = null;
   ctx.emit({ type: 'death', entityId: e.id, killerId: killer?.id ?? -1 });
+
+  // Arena end-screen scoreboard: a killing blow on a player, credited to the killer
+  // (pet -> owner). No-op outside a match.
+  if (e.kind === 'player' && killer) {
+    const killerPid = killer.kind === 'player' ? killer.id : killer.ownerId;
+    if (killerPid !== null && killerPid !== e.id) {
+      bumpArenaMatchStat(ctx, killerPid, 'killingBlows', 1);
+    }
+  }
 
   // a dead mob keeps no raid marker — respawnMob reuses the same entity id,
   // so a stale mark would otherwise reappear on the respawn

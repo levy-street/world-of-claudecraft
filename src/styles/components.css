@@ -6651,6 +6651,118 @@
     margin-top: 4px;
   }
 
+  /* ---------- arena end scoreboard (Victory/Defeat summation) ---------- */
+  #arena-end-window {
+    width: 640px;
+    max-width: 94vw;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    position: fixed;
+    z-index: 60;
+    padding: 0 0 14px;
+    overflow: hidden;
+  }
+  #arena-end-window .ae-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    font-family: var(--title-font);
+    font-size: 30px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 14px 0;
+    margin-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  }
+  #arena-end-window .ae-banner.ae-win {
+    color: #7fdc4f;
+    text-shadow: 0 0 18px rgba(127, 220, 79, 0.45);
+    background: linear-gradient(180deg, rgba(46, 92, 30, 0.4), transparent);
+  }
+  #arena-end-window .ae-banner.ae-loss {
+    color: #ff7a6a;
+    text-shadow: 0 0 18px rgba(255, 122, 106, 0.4);
+    background: linear-gradient(180deg, rgba(104, 32, 26, 0.4), transparent);
+  }
+  #arena-end-window .ae-banner.ae-draw {
+    color: #f0c860;
+    text-shadow: 0 0 18px rgba(240, 200, 96, 0.35);
+    background: linear-gradient(180deg, rgba(96, 84, 32, 0.4), transparent);
+  }
+  #arena-end-window .ae-banner .x-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  #arena-end-window .ae-board {
+    width: calc(100% - 28px);
+    margin: 0 14px;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  #arena-end-window .ae-board th {
+    text-align: right;
+    font-family: var(--title-font);
+    font-size: 11px;
+    color: #ffb24a;
+    opacity: 0.85;
+    padding: 4px 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  }
+  #arena-end-window .ae-board th.ae-name,
+  #arena-end-window .ae-board td.ae-name {
+    text-align: left;
+  }
+  #arena-end-window .ae-board td {
+    text-align: right;
+    padding: 5px 10px;
+    color: #e8e0c8;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  #arena-end-window .ae-board tr.ae-ally td {
+    background: rgba(80, 150, 220, 0.08);
+  }
+  #arena-end-window .ae-board tr.ae-enemy td {
+    background: rgba(220, 90, 70, 0.07);
+  }
+  #arena-end-window .ae-board tr.ae-me td {
+    box-shadow: inset 2px 0 0 #ffb24a;
+    font-weight: 600;
+  }
+  #arena-end-window .ae-cls {
+    color: #9aa7b4;
+    font-size: 11px;
+  }
+  #arena-end-window .ae-change.up {
+    color: #7fdc4f;
+  }
+  #arena-end-window .ae-change.down {
+    color: #ff7a6a;
+  }
+  #arena-end-window .ae-footer {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 14px 14px 0;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+  }
+  #arena-end-window .ae-rating-summary {
+    font-family: var(--title-font);
+    font-size: 13px;
+    color: #d8cba0;
+  }
+  #arena-end-window .ae-reward {
+    font-size: 13px;
+    color: #f0c860;
+  }
+  #arena-end-window .ae-leave {
+    margin-left: auto;
+  }
+
   /* ---------- The Vale Cup (boarball at the Sowfield) ---------- */
   /* Flag colors are set per element as --vcup-field / --vcup-accent custom
      properties DERIVED from the VC_NATIONS sim data record (vale_cup_flag.ts),

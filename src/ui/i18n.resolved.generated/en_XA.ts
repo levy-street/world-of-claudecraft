@@ -302,6 +302,21 @@ export const en_XA: EnTranslations = {
     "spectate": {
       "banner": "[Šþéçţáţíñĝ {name}]"
     },
+    "arenaEnd": {
+      "victory": "[Ʋíçţóŕý]",
+      "defeat": "[Ðéƒéáţ]",
+      "draw": "[Ðŕáŵ]",
+      "colName": "[Ñáɱé]",
+      "colKills": "[Ķíļļíñĝ Ɓļóŵš]",
+      "colDamage": "[Ðáɱáĝé Ðóñé]",
+      "colHealing": "[Ĥéáļíñĝ Ðóñé]",
+      "colRating": "[Ŕáţíñĝ]",
+      "colChange": "[Çĥáñĝé]",
+      "yourRating": "[Ýóúŕ Ŕáţíñĝ: {before} ţó {after}]",
+      "honorEarned": "[+{honor} Ĥóñóŕ]",
+      "leave": "[Ļéáʋé]",
+      "close": "[Çļóšé]"
+    },
     "readyCheck": {
       "prompt": "[{name} ĥáš šţáŕţéð á ŕéáðý çĥéçķ. Áŕé ýóú ŕéáðý?]",
       "ready": "[Ŕéáðý]",

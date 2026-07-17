@@ -302,6 +302,21 @@ export const ja_JP: EnTranslations = {
     "spectate": {
       "banner": "{name}を観戦中"
     },
+    "arenaEnd": {
+      "victory": "勝利",
+      "defeat": "敗北",
+      "draw": "引き分け",
+      "colName": "名前",
+      "colKills": "キル",
+      "colDamage": "与ダメージ",
+      "colHealing": "回復量",
+      "colRating": "レーティング",
+      "colChange": "変動",
+      "yourRating": "あなたのレーティング：{before} から {after}",
+      "honorEarned": "+{honor} 名誉",
+      "leave": "退出",
+      "close": "閉じる"
+    },
     "readyCheck": {
       "prompt": "{name} が準備確認を開始しました。準備はいいですか？",
       "ready": "準備完了",

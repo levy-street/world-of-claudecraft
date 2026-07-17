@@ -302,6 +302,21 @@ export const zh_CN: EnTranslations = {
     "spectate": {
       "banner": "正在观察 {name}"
     },
+    "arenaEnd": {
+      "victory": "胜利",
+      "defeat": "失败",
+      "draw": "平局",
+      "colName": "名称",
+      "colKills": "击杀",
+      "colDamage": "伤害输出",
+      "colHealing": "治疗量",
+      "colRating": "评分",
+      "colChange": "变化",
+      "yourRating": "你的评分：{before} 至 {after}",
+      "honorEarned": "+{honor} 荣誉",
+      "leave": "离开",
+      "close": "关闭"
+    },
     "readyCheck": {
       "prompt": "{name} 发起了准备确认。你准备好了吗？",
       "ready": "准备就绪",

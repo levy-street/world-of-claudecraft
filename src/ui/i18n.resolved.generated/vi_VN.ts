@@ -302,6 +302,21 @@ export const vi_VN: EnTranslations = {
     "spectate": {
       "banner": "Đang xem {name}"
     },
+    "arenaEnd": {
+      "victory": "Victory",
+      "defeat": "Defeat",
+      "draw": "Draw",
+      "colName": "Name",
+      "colKills": "Killing Blows",
+      "colDamage": "Damage Done",
+      "colHealing": "Healing Done",
+      "colRating": "Rating",
+      "colChange": "Change",
+      "yourRating": "Your Rating: {before} to {after}",
+      "honorEarned": "+{honor} Honor",
+      "leave": "Leave",
+      "close": "Close"
+    },
     "readyCheck": {
       "prompt": "{name} đã bắt đầu kiểm tra sẵn sàng. Bạn đã sẵn sàng chưa?",
       "ready": "Sẵn Sàng",

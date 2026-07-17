@@ -723,6 +723,18 @@ export interface ArenaMatch {
   honorTeamBKey?: string;
   fiesta?: FiestaState; // present only for format === 'fiesta'
   yumi?: YumiMatchState; // present only for format 'yumi3' | 'yumi5'
+  // Per-participant match stats for the end-of-match scoreboard, keyed by pid and
+  // reset each bout (accumulated in dealDamage/applyHeal/handleDeath while the source
+  // is in this match). Optional for synthetic/legacy fixtures.
+  stats?: Map<number, ArenaMatchStats>;
+}
+
+// Per-player accumulators for the arena end-screen summary. Live on the ArenaMatch so
+// they are torn down with the bout (never lifetime). Draw no rng.
+export interface ArenaMatchStats {
+  killingBlows: number;
+  damageDone: number;
+  healingDone: number;
 }
 
 // Everything that makes a Fiesta bout a fiesta. Lives on the ArenaMatch so it is

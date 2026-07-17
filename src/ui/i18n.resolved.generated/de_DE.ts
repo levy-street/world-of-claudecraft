@@ -302,6 +302,21 @@ export const de_DE: EnTranslations = {
     "spectate": {
       "banner": "{name} wird beobachtet"
     },
+    "arenaEnd": {
+      "victory": "Victory",
+      "defeat": "Defeat",
+      "draw": "Draw",
+      "colName": "Name",
+      "colKills": "Killing Blows",
+      "colDamage": "Damage Done",
+      "colHealing": "Healing Done",
+      "colRating": "Rating",
+      "colChange": "Change",
+      "yourRating": "Your Rating: {before} to {after}",
+      "honorEarned": "+{honor} Honor",
+      "leave": "Leave",
+      "close": "Close"
+    },
     "readyCheck": {
       "prompt": "{name} hat einen Bereitschaftscheck gestartet. Bist du bereit?",
       "ready": "Bereit",

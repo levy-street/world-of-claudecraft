@@ -302,6 +302,21 @@ export const ru_RU: EnTranslations = {
     "spectate": {
       "banner": "Наблюдение за {name}"
     },
+    "arenaEnd": {
+      "victory": "Победа",
+      "defeat": "Поражение",
+      "draw": "Ничья",
+      "colName": "Имя",
+      "colKills": "Добивания",
+      "colDamage": "Нанесённый урон",
+      "colHealing": "Исцеление",
+      "colRating": "Рейтинг",
+      "colChange": "Изменение",
+      "yourRating": "Ваш рейтинг: с {before} до {after}",
+      "honorEarned": "+{honor} чести",
+      "leave": "Выйти",
+      "close": "Закрыть"
+    },
     "readyCheck": {
       "prompt": "{name} начал проверку готовности. Вы готовы?",
       "ready": "Готов",

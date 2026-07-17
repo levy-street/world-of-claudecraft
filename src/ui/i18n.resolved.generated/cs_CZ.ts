@@ -302,6 +302,21 @@ export const cs_CZ: EnTranslations = {
     "spectate": {
       "banner": "Sleduješ {name}"
     },
+    "arenaEnd": {
+      "victory": "Victory",
+      "defeat": "Defeat",
+      "draw": "Draw",
+      "colName": "Name",
+      "colKills": "Killing Blows",
+      "colDamage": "Damage Done",
+      "colHealing": "Healing Done",
+      "colRating": "Rating",
+      "colChange": "Change",
+      "yourRating": "Your Rating: {before} to {after}",
+      "honorEarned": "+{honor} Honor",
+      "leave": "Leave",
+      "close": "Close"
+    },
     "readyCheck": {
       "prompt": "Hráč {name} zahájil kontrolu připravenosti. Jsi připraven(a)?",
       "ready": "Připraven(a)",

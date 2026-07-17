@@ -302,6 +302,21 @@ export const zh_TW: EnTranslations = {
     "spectate": {
       "banner": "正在觀察 {name}"
     },
+    "arenaEnd": {
+      "victory": "勝利",
+      "defeat": "失敗",
+      "draw": "平手",
+      "colName": "名稱",
+      "colKills": "擊殺",
+      "colDamage": "傷害輸出",
+      "colHealing": "治療量",
+      "colRating": "評分",
+      "colChange": "變化",
+      "yourRating": "你的評分：{before} 至 {after}",
+      "honorEarned": "+{honor} 榮譽",
+      "leave": "離開",
+      "close": "關閉"
+    },
     "readyCheck": {
       "prompt": "{name} 發起了準備確認。你準備好了嗎？",
       "ready": "準備就緒",

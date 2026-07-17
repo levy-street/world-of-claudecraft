@@ -154,6 +154,23 @@ export interface ArenaCombatant {
   cls: PlayerClass;
   level: number;
 }
+
+// One row of the end-of-match scoreboard (the "summation" screen). Absolute team
+// ('A'/'B'); the client tags ally/enemy from the viewer's own team and `me` from the
+// viewer's pid. Per-match stats are accumulated on the ArenaMatch and reset each bout.
+export interface ArenaEndRow {
+  pid: number;
+  name: string;
+  cls: PlayerClass;
+  level: number;
+  team: 'A' | 'B';
+  killingBlows: number;
+  damageDone: number;
+  healingDone: number;
+  ratingBefore: number;
+  ratingAfter: number;
+  ratingChange: number;
+}
 export const ALL_CLASSES: PlayerClass[] = [
   'warrior',
   'paladin',
@@ -2455,6 +2472,11 @@ export type SimEvent = { pid?: number } & (
       ratingAfter: number;
       allies: ArenaCombatant[];
       enemies: ArenaCombatant[];
+      // The end-of-match scoreboard: every participant (absolute team), the viewer's
+      // own team so the client can tag ally/enemy, and the honor the viewer earned.
+      scoreboard: ArenaEndRow[];
+      myTeam: 'A' | 'B';
+      honor: number;
     }
   // 2v2 Fiesta party mode. All carry pid (personal — delivered to each combatant).
   // `fiestaScore`: the running team tally changed. `fiestaWave`: a new augment

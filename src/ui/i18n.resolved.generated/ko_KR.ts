@@ -302,6 +302,21 @@ export const ko_KR: EnTranslations = {
     "spectate": {
       "banner": "{name} 관전 중"
     },
+    "arenaEnd": {
+      "victory": "승리",
+      "defeat": "패배",
+      "draw": "무승부",
+      "colName": "이름",
+      "colKills": "처치",
+      "colDamage": "피해량",
+      "colHealing": "치유량",
+      "colRating": "평점",
+      "colChange": "변동",
+      "yourRating": "내 평점: {before}에서 {after}로",
+      "honorEarned": "+{honor} 명예",
+      "leave": "나가기",
+      "close": "닫기"
+    },
     "readyCheck": {
       "prompt": "{name} 님이 준비 확인을 시작했습니다. 준비되셨습니까?",
       "ready": "준비 완료",
