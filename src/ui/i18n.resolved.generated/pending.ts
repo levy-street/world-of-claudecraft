@@ -13,6 +13,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.icefall.description",
     "entities.abilities.icefall.name",
     "guide.abilityHook.blink",
+    "hudChrome.auraEffect.aethericFlux",
     "hudChrome.auraEffect.nextAbilityDamage",
     "hudChrome.auraEffect.stormcharge"
   ],
@@ -20,6 +21,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.icefall.description",
     "entities.abilities.icefall.name",
     "guide.abilityHook.blink",
+    "hudChrome.auraEffect.aethericFlux",
     "hudChrome.auraEffect.nextAbilityDamage",
     "hudChrome.auraEffect.stormcharge"
   ],
@@ -27,6 +29,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.icefall.description",
     "entities.abilities.icefall.name",
     "guide.abilityHook.blink",
+    "hudChrome.auraEffect.aethericFlux",
     "hudChrome.auraEffect.nextAbilityDamage",
     "hudChrome.auraEffect.stormcharge"
   ],
@@ -34,6 +37,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.icefall.description",
     "entities.abilities.icefall.name",
     "guide.abilityHook.blink",
+    "hudChrome.auraEffect.aethericFlux",
     "hudChrome.auraEffect.nextAbilityDamage",
     "hudChrome.auraEffect.stormcharge"
   ],
@@ -42,6 +46,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.icefall.description",
     "entities.abilities.icefall.name",
     "guide.abilityHook.blink",
+    "hudChrome.auraEffect.aethericFlux",
     "hudChrome.auraEffect.nextAbilityDamage",
     "hudChrome.auraEffect.stormcharge"
   ],
@@ -49,6 +54,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.icefall.description",
     "entities.abilities.icefall.name",
     "guide.abilityHook.blink",
+    "hudChrome.auraEffect.aethericFlux",
     "hudChrome.auraEffect.nextAbilityDamage",
     "hudChrome.auraEffect.stormcharge"
   ],
@@ -60,6 +66,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.icefall.description",
     "entities.abilities.icefall.name",
     "guide.abilityHook.blink",
+    "hudChrome.auraEffect.aethericFlux",
     "hudChrome.auraEffect.nextAbilityDamage",
     "hudChrome.auraEffect.stormcharge"
   ],
@@ -68,6 +75,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.icefall.description",
     "entities.abilities.icefall.name",
     "guide.abilityHook.blink",
+    "hudChrome.auraEffect.aethericFlux",
     "hudChrome.auraEffect.nextAbilityDamage",
     "hudChrome.auraEffect.stormcharge"
   ],
@@ -75,6 +83,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.icefall.description",
     "entities.abilities.icefall.name",
     "guide.abilityHook.blink",
+    "hudChrome.auraEffect.aethericFlux",
     "hudChrome.auraEffect.nextAbilityDamage",
     "hudChrome.auraEffect.stormcharge"
   ],
@@ -82,6 +91,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.icefall.description",
     "entities.abilities.icefall.name",
     "guide.abilityHook.blink",
+    "hudChrome.auraEffect.aethericFlux",
     "hudChrome.auraEffect.nextAbilityDamage",
     "hudChrome.auraEffect.stormcharge"
   ],
@@ -89,6 +99,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.icefall.description",
     "entities.abilities.icefall.name",
     "guide.abilityHook.blink",
+    "hudChrome.auraEffect.aethericFlux",
     "hudChrome.auraEffect.nextAbilityDamage",
     "hudChrome.auraEffect.stormcharge"
   ],
@@ -96,6 +107,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.icefall.description",
     "entities.abilities.icefall.name",
     "guide.abilityHook.blink",
+    "hudChrome.auraEffect.aethericFlux",
     "hudChrome.auraEffect.nextAbilityDamage",
     "hudChrome.auraEffect.stormcharge"
   ],
@@ -103,6 +115,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.icefall.description",
     "entities.abilities.icefall.name",
     "guide.abilityHook.blink",
+    "hudChrome.auraEffect.aethericFlux",
     "hudChrome.auraEffect.nextAbilityDamage",
     "hudChrome.auraEffect.stormcharge"
   ],
@@ -110,6 +123,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.icefall.description",
     "entities.abilities.icefall.name",
     "guide.abilityHook.blink",
+    "hudChrome.auraEffect.aethericFlux",
     "hudChrome.auraEffect.nextAbilityDamage",
     "hudChrome.auraEffect.stormcharge"
   ],
@@ -117,6 +131,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.abilities.icefall.description",
     "entities.abilities.icefall.name",
     "guide.abilityHook.blink",
+    "hudChrome.auraEffect.aethericFlux",
     "hudChrome.auraEffect.nextAbilityDamage",
     "hudChrome.auraEffect.stormcharge"
   ]

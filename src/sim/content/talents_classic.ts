@@ -226,8 +226,44 @@ const MAGE_SPECS: SpecDef[] = [
     'A precision caster using mana efficiency and focused arcane barrages.',
     'arcane_power',
     'Aetheric Flux',
-    'Increases your spell damage by 15% and your spell haste by 10%.',
-    { global: { spellDmgPct: 0.15, spellHastePct: 0.1 } },
+    'Spending mana on Aether Darts or Aetherburst builds Aetheric Flux for 20 sec, up to 4, and reduces Aether Surge cooldown by 10 sec. Aether Surge consumes the bank and restores 5% of maximum mana per stack. Increases your spell damage by 15% and your spell haste by 10%.',
+    {
+      global: { spellDmgPct: 0.15, spellHastePct: 0.1 },
+      procs: [
+        {
+          id: 'mag_aetheric_flux',
+          name: 'Aetheric Flux',
+          spec: 'arcane',
+          requiresKnownAbility: 'arcane_power',
+          school: 'arcane',
+          trigger: {
+            on: 'resourceSpent',
+            resourceType: 'mana',
+            abilities: ['arcane_missiles', 'arcane_explosion'],
+          },
+          responses: [
+            { kind: 'stackAura', aura: 'aetheric_flux', maxStacks: 4, duration: 20 },
+            { kind: 'cooldownRefund', ability: 'arcane_power', seconds: 10 },
+          ],
+        },
+        {
+          id: 'mag_aetheric_flux_release',
+          name: 'Aetheric Flux',
+          spec: 'arcane',
+          requiresKnownAbility: 'arcane_power',
+          school: 'arcane',
+          trigger: { on: 'castNth', n: 1, abilities: ['arcane_power'] },
+          responses: [
+            {
+              kind: 'consumeAuraStacksResource',
+              auraId: 'mag_aetheric_flux',
+              resourceType: 'mana',
+              pctMaxPerStack: 0.05,
+            },
+          ],
+        },
+      ],
+    },
   ),
   spec(
     'fire',

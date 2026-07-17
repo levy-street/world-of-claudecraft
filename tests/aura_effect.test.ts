@@ -178,6 +178,13 @@ describe('auraEffectDescriptor', () => {
     });
   });
 
+  it('explains the Aetheric Flux bank from its first visible stack', () => {
+    expect(desc({ kind: 'aetheric_flux', value: 0, stacks: 1 })).toEqual({
+      key: 'hudChrome.auraEffect.aethericFlux',
+      nums: { stacks: 1, max: 4, cooldown: 10, manaPct: 5 },
+    });
+  });
+
   it('returns null for a kind with no meaningful one-line effect', () => {
     expect(desc({ kind: 'righteous_fury', value: 0 })).not.toBeNull();
     // A purely cosmetic / structural kind not handled falls back to null.

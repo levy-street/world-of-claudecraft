@@ -5966,6 +5966,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.righteousFury': '불타는 맹세: 신성 피해로 인한 위협 수준이 크게 증가합니다',
   'hudChrome.auraEffect.stormcharge':
     '폭풍소환사 {stacks}/{max}: 중첩당 전격 화살의 시전 시간이 {castPct}% 감소하고 피해가 {damagePct}% 증가합니다',
+  'hudChrome.auraEffect.aethericFlux':
+    '비전 불안정 {stacks}/{max}: 중첩당 신비의 마법 강화의 재사용 대기시간이 {cooldown}초 감소합니다. 신비의 마법 강화는 모든 중첩을 소모해 중첩당 최대 마나의 {manaPct}%를 회복합니다',
   'hudChrome.auraEffect.nextAbilityDamage': '다음 대상 능력의 피해가 {pct}% 증가합니다',
   'hudChrome.auraEffect.scale': '크기가 {pct}% 증가합니다',
   'hudChrome.auraEffect.jump': '도약 높이가 {pct}% 증가합니다',

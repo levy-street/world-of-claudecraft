@@ -5966,6 +5966,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.righteousFury': 'バーニングオース: 神聖ダメージによる脅威度が大幅に上昇',
   'hudChrome.auraEffect.stormcharge':
     'ストームコーラー {stacks}/{max}: 1スタックごとに電弧の矢の詠唱時間を{castPct}%短縮し、ダメージを{damagePct}%増加',
+  'hudChrome.auraEffect.aethericFlux':
+    '秘術の不安定 {stacks}/{max}: 1スタックごとにアーケインパワーのクールダウンを{cooldown}秒短縮。アーケインパワーは全スタックを消費し、1スタックごとに最大マナの{manaPct}%を回復',
   'hudChrome.auraEffect.nextAbilityDamage': '次の対象アビリティのダメージが{pct}%増加',
   'hudChrome.auraEffect.scale': 'サイズが{pct}%増加',
   'hudChrome.auraEffect.jump': 'ジャンプの高さが{pct}%増加',

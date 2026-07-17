@@ -1397,6 +1397,7 @@ export const pt_BR: EnTranslations = {
       "defensiveStance": "Postura de Guarda: dano recebido reduzido, mais ameaça",
       "righteousFury": "Juramento Ardente: ameaça de dano Sagrado muito aumentada",
       "stormcharge": "Skyrend {stacks}/{max}: each stack reduces Arc Bolt cast time by {castPct}% and increases its damage by {damagePct}%",
+      "aethericFlux": "Aetheric Flux {stacks}/{max}: each stack refunds {cooldown} sec of Aether Surge cooldown; Aether Surge consumes all stacks to restore {manaPct}% maximum mana per stack",
       "nextAbilityDamage": "Increases the next affected ability damage by {pct}%",
       "scale": "Tamaño aumentado un {pct}%",
       "jump": "Altura de salto aumentada un {pct}%",

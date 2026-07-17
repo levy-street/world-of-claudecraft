@@ -69,7 +69,7 @@ import {
   spellHasteMult,
 } from './spell_combat';
 import { isSpellResisted } from './spell_resist';
-import { onCastCompleted } from './talent_procs';
+import { onCastCompleted, onResourceSpent } from './talent_procs';
 import {
   clearWarspiritArcBoltSnapshot,
   prepareWarspiritArcBolt,
@@ -723,8 +723,12 @@ function spendAbilityCost(
     p.savedMana = Math.max(0, p.savedMana - res.cost);
     return;
   }
+  const resourceBefore = p.resource;
   spendResource(p, res.cost);
   applyRageSpendCooldownRefund(ctx, p, meta, spentRage);
+  if (p.resourceType !== null) {
+    onResourceSpent(ctx, p, res.def.id, p.resourceType, resourceBefore - p.resource);
+  }
 }
 
 function armAbilityCooldown(

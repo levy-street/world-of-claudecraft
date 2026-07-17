@@ -1397,6 +1397,7 @@ export const zh_CN: EnTranslations = {
       "defensiveStance": "戒备姿态：受到的伤害降低，威胁值提高",
       "righteousFury": "炽燃誓约：神圣伤害产生的威胁值大幅提高",
       "stormcharge": "风暴召唤者 {stacks}/{max}：每层使电弧箭施法时间缩短 {castPct}%，伤害提高 {damagePct}%",
+      "aethericFlux": "奥术不稳定性 {stacks}/{max}：每层返还奥术强化 {cooldown} 秒冷却时间；奥术强化会消耗全部层数，每层恢复 {manaPct}% 最大法力",
       "nextAbilityDamage": "使下一个受影响技能的伤害提高 {pct}%",
       "scale": "体型增大 {pct}%",
       "jump": "跳跃高度提高 {pct}%",

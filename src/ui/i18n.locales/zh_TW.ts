@@ -5696,6 +5696,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.righteousFury': '燃燒誓言：神聖傷害產生的威脅值大幅提高',
   'hudChrome.auraEffect.stormcharge':
     '喚風者 {stacks}/{max}：每層使電弧箭施法時間縮短 {castPct}%，傷害提高 {damagePct}%',
+  'hudChrome.auraEffect.aethericFlux':
+    '秘法失序 {stacks}/{max}：每層返還祕法強化 {cooldown} 秒冷卻時間；祕法強化會消耗全部層數，每層恢復 {manaPct}% 最大法力',
   'hudChrome.auraEffect.nextAbilityDamage': '使下一個受影響技能的傷害提高 {pct}%',
   'hudChrome.auraEffect.scale': '體型增大 {pct}%',
   'hudChrome.auraEffect.jump': '跳躍高度提高 {pct}%',

@@ -243,7 +243,7 @@ and remain unchanged.
 | paladin/retribution | global: meleeDmgPct 0.2, spellDmgPct 0.2; Blood Debt proc from landed melee attacks |
 | hunter/marksmanship | ranged shot ability dmgPct 0.1; stats: crit 0.03; Iron Aim landed-shot setup |
 | hunter/survival | global: meleeDmgPct 0.05; stats: agiPct 0.05; Quickblood trap circuit |
-| mage/arcane | global: spellDmgPct 0.15, spellHastePct 0.1 |
+| mage/arcane | global: spellDmgPct 0.15, spellHastePct 0.1; paid Aetheric Flux burst bank |
 | rogue/assassination | global: dotDmgPct 0.2; stats: crit 0.03 |
 | rogue/subtlety | global: critDmgPct 0.4; stats: agiPct 0.1 |
 | priest/holy | global: healPct 0.2 |
@@ -302,6 +302,20 @@ The stable `mag_r5_impulse` choice now authors Ember Relay instead of the flat T
 charge increase. A landed Cinderfall opens an eight-second window in which the next
 Cinderbolt or Scald costs 50% less. This turns the row choice into a repeatable mana and
 tempo decision after each detonation while leaving Cinder Reprise and Third Current intact.
+
+### Aethermancy identity pass
+
+Aethermancy keeps the Mage mana bar and turns actual mana expenditure into its visible
+burst bank. Paying mana for Aether Darts or Aetherburst adds one Aetheric Flux stack for
+20 seconds, up to four, and removes 10 seconds from Aether Surge's active cooldown. A free
+cast pays no mana, so it neither builds Flux nor refunds the cooldown. Casting Aether Surge
+consumes the full bank and restores 5% of maximum mana per stack while opening its existing
+spell-damage and spell-haste window.
+
+The resulting loop is spend mana, accelerate the burst window, bank up to four visible
+stacks, then choose when to Surge and recover up to 20% mana. It is deterministic and uses
+no new resource or random draw. The paid-cost hook runs only after the Aethermancy spec,
+known Aether Surge signature, mana resource, positive spend, and explicit builder gates.
 
 ### Warspirit + Requital melee-DPS identity pass
 

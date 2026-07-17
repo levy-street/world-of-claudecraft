@@ -82,7 +82,7 @@ const TOGGLE_IDS: ReadonlySet<string> = new Set(['ghost_wolf']);
 // stable content ids so Sim auras and wire-mirrored auras derive the same priority.
 // Add each empowerment in the commit that authors it; long passive raid buffs remain
 // eligible for overflow shedding.
-const ACTIONABLE_AURA_IDS: ReadonlySet<string> = new Set(['mag_ember_relay']);
+const ACTIONABLE_AURA_IDS: ReadonlySet<string> = new Set(['mag_ember_relay', 'mag_aetheric_flux']);
 
 /** The localized single-letter unit suffixes the compact duration label uses. */
 export interface DurationUnits {
@@ -312,7 +312,10 @@ export function createAurasView(
         slot.stacksText =
           a.charges !== undefined
             ? deps.formatStacks(a.charges)
-            : a.kind === 'icicles' || a.kind === 'stormcharge' || (a.stacks && a.stacks > 1)
+            : a.kind === 'aetheric_flux' ||
+                a.kind === 'icicles' ||
+                a.kind === 'stormcharge' ||
+                (a.stacks && a.stacks > 1)
               ? deps.formatStacks(a.stacks ?? 1)
               : '';
         slot.name = deps.auraName(a);

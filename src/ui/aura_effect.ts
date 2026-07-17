@@ -213,6 +213,11 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
         key: `${KEY}.stormcharge`,
         nums: { stacks: a.stacks ?? 1, max: 5, castPct: 20, damagePct: 10 },
       };
+    case 'aetheric_flux':
+      return {
+        key: `${KEY}.aethericFlux`,
+        nums: { stacks: a.stacks ?? 1, max: 4, cooldown: 10, manaPct: 5 },
+      };
     case 'next_ability_damage':
       return { key: `${KEY}.nextAbilityDamage`, nums: { pct: pctFromFrac(a.value) } };
 

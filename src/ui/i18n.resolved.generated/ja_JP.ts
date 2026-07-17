@@ -1397,6 +1397,7 @@ export const ja_JP: EnTranslations = {
       "defensiveStance": "ガーデッドスタンス: 受けるダメージが減少し、脅威度が上昇",
       "righteousFury": "バーニングオース: 神聖ダメージによる脅威度が大幅に上昇",
       "stormcharge": "ストームコーラー {stacks}/{max}: 1スタックごとに電弧の矢の詠唱時間を{castPct}%短縮し、ダメージを{damagePct}%増加",
+      "aethericFlux": "秘術の不安定 {stacks}/{max}: 1スタックごとにアーケインパワーのクールダウンを{cooldown}秒短縮。アーケインパワーは全スタックを消費し、1スタックごとに最大マナの{manaPct}%を回復",
       "nextAbilityDamage": "次の対象アビリティのダメージが{pct}%増加",
       "scale": "サイズが{pct}%増加",
       "jump": "ジャンプの高さが{pct}%増加",

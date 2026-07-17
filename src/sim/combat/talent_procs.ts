@@ -1,6 +1,6 @@
 import type { ProcDef, ProcResponse } from '../content/talents';
 import type { SimContext } from '../sim_context';
-import type { Entity } from '../types';
+import type { Entity, ResourceType } from '../types';
 import { detonateOwnedDot, rollOwnedDot } from './dot_mutation';
 
 function state(player: Entity): NonNullable<Entity['procState']> {
@@ -141,6 +141,32 @@ function fireOne(
       });
       break;
     }
+    case 'consumeAuraStacksResource': {
+      if (response.resourceType !== undefined && player.resourceType !== response.resourceType) {
+        break;
+      }
+      const auraIndex = player.auras.findIndex(
+        (aura) => aura.id === response.auraId && aura.sourceId === player.id,
+      );
+      if (auraIndex < 0) break;
+      const aura = player.auras[auraIndex];
+      const stacks = aura.stacks ?? 0;
+      if (stacks <= 0) break;
+      player.auras.splice(auraIndex, 1);
+      ctx.emit({ type: 'aura', targetId: player.id, name: aura.name, gained: false });
+      player.resource = Math.min(
+        player.maxResource,
+        player.resource + player.maxResource * response.pctMaxPerStack * stacks,
+      );
+      ctx.emit({
+        type: 'spellfx',
+        sourceId: player.id,
+        targetId: player.id,
+        school: def.school ?? 'arcane',
+        fx: 'procSurge',
+      });
+      break;
+    }
     case 'rollingDot': {
       const banked = rollOwnedDot(
         ctx,
@@ -257,6 +283,27 @@ export function onCastCompleted(
     } else {
       procState.counters[def.id] = count;
     }
+  }
+}
+
+export function onResourceSpent(
+  ctx: SimContext,
+  player: Entity,
+  abilityId: string,
+  resourceType: ResourceType,
+  amount: number,
+): void {
+  if (amount <= 0) return;
+  for (const def of procsFor(ctx, player)) {
+    const trigger = def.trigger;
+    if (
+      trigger.on !== 'resourceSpent' ||
+      trigger.resourceType !== resourceType ||
+      !trigger.abilities.includes(abilityId)
+    ) {
+      continue;
+    }
+    fire(ctx, player, def, player);
   }
 }
 

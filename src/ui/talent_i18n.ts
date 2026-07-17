@@ -17,7 +17,7 @@ import {
   type TalentRowOption,
 } from '../sim/content/talents';
 import { ABILITIES, CLASSES } from '../sim/data';
-import type { AbilityEffect, PlayerClass } from '../sim/types';
+import type { AbilityEffect, PlayerClass, ResourceType } from '../sim/types';
 import { tEntity } from './entity_i18n';
 import {
   getLanguage,
@@ -7873,6 +7873,8 @@ function procTriggerDescription(
   switch (trigger.on) {
     case 'castNth':
       return `${abilityList(trigger.abilities)}${trigger.n > 1 ? ` x${trigger.n}` : ''}`;
+    case 'resourceSpent':
+      return `${abilityList(trigger.abilities)}: ${localizedResourceName(trigger.resourceType)} ${text.statLabels.cost}`;
     case 'petHitNth':
       return `${t('hud.pet.petAttackTitle')} x${trigger.n}`;
     case 'rangedHit':
@@ -7896,6 +7898,13 @@ function procTriggerDescription(
   }
 }
 
+function localizedResourceName(resourceType: ResourceType | undefined): string {
+  if (resourceType === 'mana') return t('abilityUi.resources.mana');
+  if (resourceType === 'rage') return t('abilityUi.resources.rage');
+  if (resourceType === 'energy') return t('abilityUi.resources.energy');
+  return t('classDetails.labels.resource');
+}
+
 function procResponseDescription(
   response: ProcDef['responses'][number],
   lang: SupportedLanguage,
@@ -7917,9 +7926,11 @@ function procResponseDescription(
     case 'cooldownRefund':
       return `${abilityName(response.ability)}: -${response.seconds === 'reset' ? formatPercent(1, lang) : seconds(response.seconds, lang)} ${text.statLabels.cooldown}`;
     case 'resource':
-      return `+${response.pctMax !== undefined ? formatPercent(response.pctMax, lang) : formatNumber(response.amount, lang)} ${t('classDetails.labels.resource')}`;
+      return `+${response.pctMax !== undefined ? formatPercent(response.pctMax, lang) : formatNumber(response.amount, lang)} ${localizedResourceName(response.resourceType)}`;
     case 'stackAura':
       return `+1 (<= ${formatNumber(response.maxStacks, lang)})`;
+    case 'consumeAuraStacksResource':
+      return `${formatPercent(response.pctMaxPerStack, lang)} ${localizedResourceName(response.resourceType)} / x1`;
     case 'rollingDot':
       return `+${formatPercent(response.pctDamage, lang)} ${text.statLabels.damage} / ${seconds(response.duration, lang)} (${seconds(response.interval, lang)})`;
     case 'detonateOwnedDot':

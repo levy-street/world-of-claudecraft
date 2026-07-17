@@ -245,6 +245,22 @@ describe('createAurasView: derivation per mode', () => {
       v.tick(entity([aura({ id: 'sha_skyrend', kind: 'stormcharge', stacks: 1 })])).slots[0]
         .stacksText,
     ).toBe('1');
+    expect(
+      v.tick(entity([aura({ id: 'mag_aetheric_flux', kind: 'aetheric_flux', stacks: 1 })])).slots[0]
+        .stacksText,
+    ).toBe('1');
+  });
+
+  it('marks Aetheric Flux as an actionable state that graphics tiers must retain', () => {
+    const state = createAurasView('all', deps()).tick(
+      entity([
+        aura({ id: 'mag_aetheric_flux', kind: 'aetheric_flux', stacks: 1 }),
+        aura({ id: 'ordinary_raid_buff', kind: 'buff_int' }),
+      ]),
+    );
+
+    expect(state.slots[0].isActionable).toBe(true);
+    expect(state.slots[1].isActionable).toBe(false);
   });
 
   it('badges remaining charges (shown even at 1) and prefers charges over stacks', () => {

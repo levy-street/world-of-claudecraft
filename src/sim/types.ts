@@ -321,6 +321,7 @@ export type AuraKind =
   | 'sure_crit'
   | 'buff_dr'
   | 'buff_dr_phys'
+  | 'aetheric_flux'
   | 'icicles'
   | 'stormcharge'
   | 'frostbite';

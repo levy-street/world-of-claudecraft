@@ -111,6 +111,7 @@ export interface GlobalModEffect {
 
 export type ProcTrigger =
   | { on: 'castNth'; n: number; abilities: string[] }
+  | { on: 'resourceSpent'; resourceType: ResourceType; abilities: string[] }
   | { on: 'petHitNth'; n: number }
   | { on: 'rangedHit'; abilities: string[] }
   | { on: 'spellHit'; abilities: string[] }
@@ -152,9 +153,15 @@ export type ProcResponse =
     ))
   | {
       kind: 'stackAura';
-      aura: 'icicles' | 'stormcharge';
+      aura: 'aetheric_flux' | 'icicles' | 'stormcharge';
       maxStacks: number;
       duration: number;
+    }
+  | {
+      kind: 'consumeAuraStacksResource';
+      auraId: string;
+      resourceType?: ResourceType;
+      pctMaxPerStack: number;
     }
   | { kind: 'rollingDot'; pctDamage: number; duration: number; interval: number }
   | { kind: 'detonateOwnedDot'; auraId: string }

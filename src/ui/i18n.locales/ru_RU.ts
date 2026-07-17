@@ -6067,6 +6067,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Пылающая клятва: значительно повышенная угроза от урона Святой школы',
   'hudChrome.auraEffect.stormcharge':
     'Призыватель бури {stacks}/{max}: каждый заряд сокращает время применения Дуговой стрелы на {castPct}% и повышает её урон на {damagePct}%',
+  'hudChrome.auraEffect.aethericFlux':
+    'Тайная нестабильность {stacks}/{max}: каждый заряд сокращает время восстановления Мощи тайной магии на {cooldown} сек.; Мощь тайной магии поглощает все заряды и восстанавливает {manaPct}% максимального запаса маны за каждый',
   'hudChrome.auraEffect.nextAbilityDamage':
     'Урон следующей подходящей способности повышен на {pct}%',
   'hudChrome.auraEffect.scale': 'Размер увеличен на {pct}%',

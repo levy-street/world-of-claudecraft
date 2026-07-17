@@ -5695,6 +5695,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.righteousFury': '炽燃誓约：神圣伤害产生的威胁值大幅提高',
   'hudChrome.auraEffect.stormcharge':
     '风暴召唤者 {stacks}/{max}：每层使电弧箭施法时间缩短 {castPct}%，伤害提高 {damagePct}%',
+  'hudChrome.auraEffect.aethericFlux':
+    '奥术不稳定性 {stacks}/{max}：每层返还奥术强化 {cooldown} 秒冷却时间；奥术强化会消耗全部层数，每层恢复 {manaPct}% 最大法力',
   'hudChrome.auraEffect.nextAbilityDamage': '使下一个受影响技能的伤害提高 {pct}%',
   'hudChrome.auraEffect.scale': '体型增大 {pct}%',
   'hudChrome.auraEffect.jump': '跳跃高度提高 {pct}%',
