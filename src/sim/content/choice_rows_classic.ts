@@ -1631,11 +1631,27 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'pri_r17_improved_fortitude',
-          name: 'Resolve Unbroken',
+          name: 'Last Blessing',
           description:
-            'Litany of Resolve effect increased by 50%, granting your party 7.5% Stamina instead of 5%.',
-          icon: 'power_word_fortitude',
-          effect: { ability: [{ ability: 'power_word_fortitude', buffPct: 0.5 }] },
+            'When your Renew runs its full duration on an ally, your next Solemn Prayer or Urgent Prayer within 8 sec is instant.',
+          icon: 'renew',
+          effect: {
+            proc: {
+              id: 'pri_last_blessing',
+              name: 'Last Blessing',
+              requiresKnownAbility: 'renew',
+              school: 'holy',
+              trigger: { on: 'hotExpired', ability: 'renew' },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_instant',
+                  abilities: ['heal', 'flash_heal'],
+                  duration: 8,
+                },
+              ],
+            },
+          },
         },
         {
           id: 'pri_r17_woes_crescendo',
@@ -1938,10 +1954,28 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'sha_r17_improved_ghost_wolf',
-          name: 'Wolfstep',
-          description: 'Shadewolf becomes instant.',
-          icon: 'ghost_wolf',
-          effect: { ability: [{ ability: 'ghost_wolf', castPct: -1 }] },
+          name: 'Tideflow',
+          description:
+            'For Spiritmend, every 3rd Mending Waters makes your next Chain Heal within 8 sec instant.',
+          icon: 'chain_heal',
+          effect: {
+            proc: {
+              id: 'sha_tideflow',
+              name: 'Tideflow',
+              spec: 'restoration',
+              requiresKnownAbility: 'chain_heal',
+              school: 'nature',
+              trigger: { on: 'castNth', n: 3, abilities: ['healing_wave'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_instant',
+                  abilities: ['chain_heal'],
+                  duration: 8,
+                },
+              ],
+            },
+          },
         },
         {
           id: 'sha_r17_elemental_warding',
