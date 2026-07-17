@@ -2477,7 +2477,7 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 11,
       theme: 'renewal',
-      decision: 'cross-form resource waves vs shapeshift attack discount vs healing cadence ward',
+      decision: 'cross-form resource waves vs shapeshift attack discount vs direct-heal HoT relay',
       options: [
         {
           id: 'dru_r11_innervate',
@@ -2516,14 +2516,25 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'dru_r11_improved_mark',
           name: 'Grove Covenant',
-          description: 'Every 3rd Wildmend shields its target, absorbing 90 damage for 10 sec.',
+          description:
+            'Completing Wildmend or Second Bloom makes your next Wildbloom within 8 sec cost 50% less.',
           icon: 'mark_of_the_wild',
           effect: {
             proc: {
               id: 'dru_grove_covenant',
               name: 'Grove Covenant',
-              trigger: { on: 'castNth', n: 3, abilities: ['healing_touch'] },
-              responses: [{ kind: 'absorb', amount: 90, duration: 10, name: 'Grove Covenant' }],
+              requiresKnownAbility: 'rejuvenation',
+              school: 'nature',
+              trigger: { on: 'castNth', n: 1, abilities: ['healing_touch', 'regrowth'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_cheap',
+                  abilities: ['rejuvenation'],
+                  duration: 8,
+                  costPct: 0.5,
+                },
+              ],
             },
           },
         },

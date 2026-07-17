@@ -317,6 +317,14 @@ describe('createAurasView: derivation per mode', () => {
     expect(state.slots[0].isActionable).toBe(true);
   });
 
+  it('marks Grove Covenant as an actionable HoT discount', () => {
+    const state = createAurasView('all', deps()).tick(
+      entity([aura({ id: 'dru_grove_covenant', kind: 'next_cast_cheap' })]),
+    );
+
+    expect(state.slots[0].isActionable).toBe(true);
+  });
+
   it('badges remaining charges (shown even at 1) and prefers charges over stacks', () => {
     // A charge-limited aura (Lightning Shield) badges its charge count, unlike stacks it
     // shows at 1, and when both are present charges wins (it is the meaningful count).

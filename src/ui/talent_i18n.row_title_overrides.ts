@@ -229,6 +229,7 @@ const WARRIOR_TITLES: Partial<Record<SupportedLanguage, Partial<TitleMap>>> = {
     'Ember Relay': 'Передача углей',
     Aetherwell: 'Эфирный колодец',
     Typhoon: 'Тайфун',
+    'Grove Covenant': 'Завет рощи',
     'Red Haze': 'Багровая дымка',
   },
   cs_CZ: {

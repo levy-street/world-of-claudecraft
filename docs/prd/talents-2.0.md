@@ -1093,3 +1093,8 @@ npm run build on PR4/PR5.
   forgoes the handoff in exchange for immediate healing. The window requires Groveheart
   and known Second Bloom, adds no random draw, and remains visible on the aura strip and
   Second Bloom action-bar slot. The existing 25% HoT-healing mastery bonus remains intact.
+  Grove Covenant keeps its stable level-11 option ID but replaces the fixed every-third-
+  heal ward: completing Wildmend or Second Bloom now banks one 8 sec half-mana Wildbloom.
+  Lifesap and Formrush remain unchanged, and the new relay remains class-wide so the shared
+  Druid row stays useful outside Groveheart. For Groveheart, the discounted Wildbloom can
+  mature into Grove's Gift and continue the direct-heal, HoT, instant-heal weave.

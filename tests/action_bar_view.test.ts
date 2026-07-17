@@ -719,6 +719,23 @@ describe('actionBarView: proc availability cues', () => {
     });
   });
 
+  it('prices and cues Wildbloom during Grove Covenant', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('rejuvenation', { cost: 80 }) })),
+      fakeDeps(),
+    );
+    const playerAuras = [{ id: 'dru_grove_covenant', kind: 'next_cast_cheap' as const }];
+
+    expect(view.tick(world({ resource: 39, playerAuras })).slots[0]).toMatchObject({
+      usable: false,
+      procState: 'armed',
+    });
+    expect(view.tick(world({ resource: 40, playerAuras })).slots[0]).toMatchObject({
+      usable: true,
+      procState: 'armed',
+    });
+  });
+
   it('keeps ordinary abilities and Icefall without stored Icicles at none', () => {
     const view = createActionBarView(
       descriptor(
