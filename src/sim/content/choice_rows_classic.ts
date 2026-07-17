@@ -1274,7 +1274,7 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 20,
       theme: 'capstone_execution',
-      decision: 'target teleport vs finisher-fed haste cooldown vs opener-fed finisher discount',
+      decision: 'target teleport vs energy-surge weapon payoff vs opener-fed finisher discount',
       options: [
         {
           id: 'rog_r20_shadowstep',
@@ -1286,14 +1286,30 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'rog_r20_adrenaline_junkie',
           name: 'Redline Habit',
-          description: "Each finisher reduces Quickened Blood's cooldown by 6 sec.",
+          description:
+            'Quickened Blood makes your next landed weapon strike within 8 sec deal 50% more damage.',
           icon: 'adrenaline_rush',
           effect: {
             proc: {
               id: 'rog_adrenaline_junkie',
               name: 'Redline Habit',
-              trigger: { on: 'castNth', n: 1, abilities: rogueFinisherAbilityIds },
-              responses: [{ kind: 'cooldownRefund', ability: 'adrenaline_rush', seconds: 6 }],
+              school: 'physical',
+              trigger: { on: 'castNth', n: 1, abilities: ['adrenaline_rush'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_ability_damage',
+                  abilities: [
+                    'sinister_strike',
+                    'backstab',
+                    'ambush',
+                    'hemorrhage',
+                    'ghostly_strike',
+                  ],
+                  duration: 8,
+                  dmgPct: 0.5,
+                },
+              ],
             },
           },
         },

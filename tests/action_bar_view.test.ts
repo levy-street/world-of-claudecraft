@@ -466,6 +466,26 @@ describe('actionBarView: proc availability cues', () => {
     ).toBe('armed');
   });
 
+  it('marks Redline Habit weapon strikes armed without lighting unrelated attacks', () => {
+    const descriptorFor = (abilityId: string) =>
+      descriptor(slot(1, { ability: ability(abilityId) }));
+    const playerAuras = [{ id: 'rog_adrenaline_junkie', kind: 'next_ability_damage' as const }];
+
+    for (const abilityId of [
+      'sinister_strike',
+      'backstab',
+      'ambush',
+      'hemorrhage',
+      'ghostly_strike',
+    ]) {
+      const view = createActionBarView(descriptorFor(abilityId), fakeDeps());
+      expect(view.tick(world({ playerAuras })).slots[0].procState, abilityId).toBe('armed');
+    }
+
+    const finisher = createActionBarView(descriptorFor('eviscerate'), fakeDeps());
+    expect(finisher.tick(world({ playerAuras })).slots[0].procState).toBe('none');
+  });
+
   it('keeps ordinary abilities and Icefall without stored Icicles at none', () => {
     const view = createActionBarView(
       descriptor(

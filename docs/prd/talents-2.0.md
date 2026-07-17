@@ -984,3 +984,6 @@ npm run build on PR4/PR5.
   finisher restores 10 energy, advances Mirrored Blades by 4 sec, and banks an 8 sec
   50% stronger melee auto-attack. The loop rewards steady combo-point conversion and
   weapon uptime while asking the player to land the loaded swing before finishing again.
+  Redline Habit replaces automatic finisher cooldown arithmetic: Quickened Blood now
+  banks an 8 sec empowered weapon strike, creating a deliberate energy surge, builder,
+  finisher, and loaded-auto sequence without changing the other capstone choices.

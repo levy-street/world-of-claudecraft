@@ -221,6 +221,7 @@ const WARRIOR_TITLES: Partial<Record<SupportedLanguage, Partial<TitleMap>>> = {
     'Second Bearing': 'Повторная наводка',
     Rainbreak: 'Прорыв сквозь ливень',
     'Venom Dividend': 'Ядовитый дивиденд',
+    'Redline Habit': 'Привычка на пределе',
   },
   cs_CZ: {
     'Double Charge': 'Dvojitý výpad',
