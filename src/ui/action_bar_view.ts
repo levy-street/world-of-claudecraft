@@ -269,6 +269,8 @@ const FREE_COST_AURA_IDS_BY_ABILITY: Readonly<Record<string, readonly string[]>>
   rip: ['dru_red_haze_relay'],
   exorcism: ['pal_blood_debt'],
   holy_shock: ['pal_kindled_faith'],
+  holy_shield: ['pal_oathward'],
+  judgement: ['pal_vigils_refrain'],
   arcane_shot: ['hun_venom_relay', 'hun_packbond', 'hun_menders_signal'],
   eviscerate: ['rog_redhanded'],
   rupture: ['rog_redhanded'],
@@ -370,6 +372,20 @@ function dawnsReplyProcState(
   player: ActionBarPlayerInput,
 ): ActionBarProcState {
   return hasAura(player.auras, 'pal_dawns_reply') ? 'armed' : 'none';
+}
+
+function oathwardProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'pal_oathward') ? 'armed' : 'none';
+}
+
+function vigilsRefrainProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'pal_vigils_refrain') ? 'armed' : 'none';
 }
 
 function fellShotProcState(
@@ -530,6 +546,8 @@ const PROC_STATE_RESOLVERS: Readonly<Record<string, ProcStateResolver | undefine
   crusader_strike: oathsDueProcState,
   holy_shock: kindledFaithProcState,
   flash_of_light: dawnsReplyProcState,
+  holy_shield: oathwardProcState,
+  judgement: vigilsRefrainProcState,
   arcane_shot: fellShotProcState,
   aimed_shot: longDrawProcState,
   raptor_strike: guttingStrikeProcState,

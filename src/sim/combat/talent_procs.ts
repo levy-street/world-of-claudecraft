@@ -268,8 +268,9 @@ function fireOne(
     case 'heal':
       ctx.applyHeal(player, subject, response.amount ?? player.maxHp * response.pctMax, def.name);
       break;
-    case 'absorb':
-      ctx.applyAura(subject, {
+    case 'absorb': {
+      const recipient = response.applyTo === 'self' ? player : subject;
+      ctx.applyAura(recipient, {
         id: def.id,
         name: def.name,
         kind: 'absorb',
@@ -282,11 +283,12 @@ function fireOne(
       ctx.emit({
         type: 'spellfx',
         sourceId: player.id,
-        targetId: subject.id,
+        targetId: recipient.id,
         school: def.school ?? 'holy',
         fx: 'wardBloom',
       });
       break;
+    }
     case 'echo':
       ctx.applyAura(subject, {
         id: def.id,

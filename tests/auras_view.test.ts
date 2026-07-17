@@ -336,6 +336,18 @@ describe('createAurasView: derivation per mode', () => {
     expect(state.slots.slice(0, 2).map((slot) => slot.isActionable)).toEqual([true, true]);
   });
 
+  it("marks Vigil's Wall, ward, and Verdict handoffs as actionable windows", () => {
+    const state = createAurasView('all', deps()).tick(
+      entity([
+        aura({ id: 'pal_oathward', kind: 'next_cast_free' }),
+        aura({ id: 'pal_oathward_guard', kind: 'absorb' }),
+        aura({ id: 'pal_vigils_refrain', kind: 'next_cast_free' }),
+      ]),
+    );
+
+    expect(state.slots.slice(0, 3).map((slot) => slot.isActionable)).toEqual([true, true, true]);
+  });
+
   it('badges remaining charges (shown even at 1) and prefers charges over stacks', () => {
     // A charge-limited aura (Lightning Shield) badges its charge count, unlike stacks it
     // shows at 1, and when both are present charges wins (it is the meaningful count).

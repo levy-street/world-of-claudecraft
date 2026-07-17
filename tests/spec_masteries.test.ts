@@ -283,6 +283,35 @@ describe('spec masteries', () => {
     expect(TALENTS.paladin?.specs.find((s) => s.id === 'protection')?.mastery.effect).toEqual({
       global: { threatPct: 0.5 },
       stats: { armorPct: 0.2 },
+      procs: [
+        {
+          id: 'pal_oathward_guard',
+          name: 'Oathward',
+          spec: 'protection',
+          requiresKnownAbility: 'holy_shield',
+          school: 'holy',
+          trigger: { on: 'castNth', n: 1, abilities: ['holy_shield'] },
+          responses: [
+            { kind: 'absorb', amount: 90, duration: 6, name: 'Oathward', applyTo: 'self' },
+          ],
+        },
+        {
+          id: 'pal_oathward',
+          name: 'Oathward',
+          spec: 'protection',
+          requiresKnownAbility: 'holy_shield',
+          school: 'holy',
+          trigger: { on: 'meleeSwingWhile', auraKind: 'righteous_fury', n: 3 },
+          responses: [
+            {
+              kind: 'empowerNext',
+              aura: 'next_cast_free',
+              abilities: ['holy_shield'],
+              duration: 10,
+            },
+          ],
+        },
+      ],
     });
     expect(TALENTS.paladin?.specs.find((s) => s.id === 'retribution')?.mastery.effect).toEqual({
       global: { meleeDmgPct: 0.2, spellDmgPct: 0.2 },

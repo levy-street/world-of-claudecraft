@@ -544,7 +544,7 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 11,
       theme: 'devotion',
-      decision: 'healing cadence vs shield-to-emergency reset vs critical-heal wards',
+      decision: 'healing cadence vs Hallowed Wall threat relay vs critical-heal wards',
       options: [
         {
           id: 'pal_r11_divine_wisdom',
@@ -570,16 +570,27 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'pal_r11_guardians_favor',
-          name: 'Mercy from Ruin',
+          name: "Vigil's Refrain",
           description:
-            "When Ward of Faith is fully consumed, it shaves 120 sec off Last Rite's cooldown.",
-          icon: 'divine_protection',
+            'For Vigil, Hallowed Wall resets Sacred Goad and makes your next Verdict within 8 sec free.',
+          icon: 'holy_shield',
           effect: {
             proc: {
-              id: 'pal_guardians_favor',
-              name: 'Mercy from Ruin',
-              trigger: { on: 'shieldConsumed', ability: 'divine_protection' },
-              responses: [{ kind: 'cooldownRefund', ability: 'lay_on_hands', seconds: 120 }],
+              id: 'pal_vigils_refrain',
+              name: "Vigil's Refrain",
+              spec: 'protection',
+              requiresKnownAbility: 'holy_shield',
+              school: 'holy',
+              trigger: { on: 'castNth', n: 1, abilities: ['holy_shield'] },
+              responses: [
+                { kind: 'cooldownRefund', ability: 'holy_taunt', seconds: 'reset' },
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_free',
+                  abilities: ['judgement'],
+                  duration: 8,
+                },
+              ],
             },
           },
         },

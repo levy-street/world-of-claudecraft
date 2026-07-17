@@ -96,6 +96,9 @@ const ACTIONABLE_AURA_IDS: ReadonlySet<string> = new Set([
   'dru_grove_covenant',
   'pal_kindled_faith',
   'pal_dawns_reply',
+  'pal_oathward',
+  'pal_oathward_guard',
+  'pal_vigils_refrain',
 ]);
 
 /** The localized single-letter unit suffixes the compact duration label uses. */

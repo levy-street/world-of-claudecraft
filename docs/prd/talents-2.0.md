@@ -1109,3 +1109,11 @@ npm run build on PR4/PR5.
   Mending Light or Lightmend, free Holy Shock, discounted Lightmend sequence keeps mana
   meaningful outside the two short windows. Pilgrim's Light and Ashen Sentence are
   unchanged, and neither Blood Debt nor Oath's Due is altered.
+
+- Vigil turns Hallowed Wall into active mitigation and a threat relay. While Burning Oath
+  is active, each third landed melee attack banks a 10 sec free Hallowed Wall; every Wall
+  still creates Holy threat and now grants Vigil a 6 sec Oathward ward. Vigil's Refrain
+  retains Mercy from Ruin's stable level-11 choice ID but replaces its shield-consumed
+  Last Rite cooldown refund: Hallowed Wall resets Sacred Goad and opens an 8 sec free
+  Verdict. Third Benediction and Afterglow Aegis are unchanged, and neither Blood Debt
+  nor Oath's Due is altered.

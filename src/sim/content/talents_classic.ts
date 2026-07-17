@@ -70,8 +70,40 @@ const PALADIN_SPECS: SpecDef[] = [
     'A shield-bearing defender who converts Holy power into threat and mitigation.',
     'holy_shield',
     'Oathward',
-    'Increases all threat you generate by 50% and your armor by 20%.',
-    { global: { threatPct: 0.5 }, stats: { armorPct: 0.2 } },
+    'While Burning Oath is active, every 3rd landed melee attack makes your next Hallowed Wall free for 10 sec. Hallowed Wall grants a ward that absorbs 90 damage for 6 sec. Increases all threat you generate by 50% and your armor by 20%.',
+    {
+      global: { threatPct: 0.5 },
+      stats: { armorPct: 0.2 },
+      procs: [
+        {
+          id: 'pal_oathward_guard',
+          name: 'Oathward',
+          spec: 'protection',
+          requiresKnownAbility: 'holy_shield',
+          school: 'holy',
+          trigger: { on: 'castNth', n: 1, abilities: ['holy_shield'] },
+          responses: [
+            { kind: 'absorb', amount: 90, duration: 6, name: 'Oathward', applyTo: 'self' },
+          ],
+        },
+        {
+          id: 'pal_oathward',
+          name: 'Oathward',
+          spec: 'protection',
+          requiresKnownAbility: 'holy_shield',
+          school: 'holy',
+          trigger: { on: 'meleeSwingWhile', auraKind: 'righteous_fury', n: 3 },
+          responses: [
+            {
+              kind: 'empowerNext',
+              aura: 'next_cast_free',
+              abilities: ['holy_shield'],
+              duration: 10,
+            },
+          ],
+        },
+      ],
+    },
   ),
   spec(
     'retribution',

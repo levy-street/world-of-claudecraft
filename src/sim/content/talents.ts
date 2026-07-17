@@ -185,7 +185,14 @@ export type ProcResponse =
     }
   | { kind: 'addAuraCharges'; ability: string; amount: number; maxCharges: number }
   | ({ kind: 'heal' } & ({ amount: number; pctMax?: never } | { amount?: never; pctMax: number }))
-  | { kind: 'absorb'; amount: number; duration: number; name: string }
+  | {
+      kind: 'absorb';
+      amount: number;
+      duration: number;
+      name: string;
+      /** Most wards protect the cast's subject; active mitigation protects its caster. */
+      applyTo?: 'self';
+    }
   | { kind: 'echo'; belowFrac: number; window: number; heal: number; name: string };
 
 export interface ProcDef {

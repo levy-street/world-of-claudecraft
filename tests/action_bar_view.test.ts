@@ -896,6 +896,34 @@ describe('actionBarView: proc availability cues', () => {
     });
   });
 
+  it("prices and cues Vigil's Hallowed Wall and Verdict threat relay", () => {
+    const freeWall = createActionBarView(
+      descriptor(slot(1, { ability: ability('holy_shield', { cost: 30 }) })),
+      fakeDeps(),
+    );
+    expect(
+      freeWall.tick(
+        world({
+          resource: 0,
+          playerAuras: [{ id: 'pal_oathward', kind: 'next_cast_free' }],
+        }),
+      ).slots[0],
+    ).toMatchObject({ usable: true, procState: 'armed' });
+
+    const freeVerdict = createActionBarView(
+      descriptor(slot(1, { ability: ability('judgement', { cost: 30 }) })),
+      fakeDeps(),
+    );
+    expect(
+      freeVerdict.tick(
+        world({
+          resource: 0,
+          playerAuras: [{ id: 'pal_vigils_refrain', kind: 'next_cast_free' }],
+        }),
+      ).slots[0],
+    ).toMatchObject({ usable: true, procState: 'armed' });
+  });
+
   it('does not make an unrelated unaffordable ability usable during Blood Debt', () => {
     const view = createActionBarView(
       descriptor(slot(1, { ability: ability('holy_shock', { cost: 35 }) })),
