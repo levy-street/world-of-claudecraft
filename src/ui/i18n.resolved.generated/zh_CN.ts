@@ -2029,17 +2029,31 @@ export const zh_CN: EnTranslations = {
     "archetypeTitle": {
       "label": "称号",
       "none": "无",
-      "hobbyLabel": "爱好",
-      "armorcrafting": "锻甲师",
-      "weaponcrafting": "武器匠",
-      "jewelcrafting": "珠宝匠",
-      "alchemy": "炼金师",
-      "engineering": "工程师",
-      "cooking": "厨师",
-      "inscription": "铭文师",
-      "enchanting": "附魔师",
+      "hobbyLabel": "爱好"
+    },
+    "archetypePair": {
+      "engineering+alchemy": "爆破师",
+      "alchemy+cooking": "药剂师",
+      "cooking+leatherworking": "捕兽人",
+      "leatherworking+tailoring": "制装师",
+      "tailoring+inscription": "织法师",
+      "inscription+enchanting": "秘法师",
+      "enchanting+jewelcrafting": "缚晶师",
+      "jewelcrafting+weaponcrafting": "铸刃师",
+      "weaponcrafting+armorcrafting": "铁匠",
+      "armorcrafting+engineering": "齿轮匠"
+    },
+    "craftName": {
+      "armorcrafting": "护甲锻造",
+      "weaponcrafting": "武器锻造",
+      "jewelcrafting": "珠宝加工",
+      "alchemy": "炼金术",
+      "engineering": "工程学",
+      "cooking": "烹饪",
+      "inscription": "铭文",
+      "enchanting": "附魔",
       "tailoring": "裁缝",
-      "leatherworking": "制皮师"
+      "leatherworking": "制皮"
     },
     "crafting": {
       "title": "制作",
@@ -2053,6 +2067,42 @@ export const zh_CN: EnTranslations = {
       "insufficientMaterials": "你没有足够的材料。",
       "unknownRecipe": "该配方不存在。",
       "comboRequirementUnmet": "你没有达到该配方所需组合的两项制造技能等级。",
+      "comboRequires": "调谐要求：{craftA} + {craftB}，阶级 {tier}。",
+      "comboMet": "已就绪。",
+      "comboSyncing": "正在检查服务器调谐状态。",
+      "comboNotAttuned": "请先选择一个原型组合。",
+      "comboWrongPair": "启用这个确切组合才能制作。",
+      "comboTierUnmet": "将两项主修技艺提升到所需阶级。",
+      "professionChoice": "专业选择",
+      "noProfessionChoice": "当前没有可用的专业选择。",
+      "pairOptionLabel": "{pair} ({craftA} + {craftB})",
+      "attunementPreview": "结果：获得{title}称号；{majorA}和{majorB}成为无上限主修技艺；{hobby}成为上限为稀有品质的爱好技艺；所有其他技能知识都会保留，但休眠时上限为普通品质。",
+      "hobbyPreview": "结果：{hobby}成为上限为稀有品质的爱好技艺。两项主修技艺和所有已保留的技能数值保持不变。",
+      "identity": {
+        "title": "制作身份",
+        "syncing": "正在等待服务器发送你的制作身份。",
+        "unattuned": "当前未启用任何原型组合。你的知识会被保留，但组合配方需要先完成调谐。",
+        "titleLabel": "称号",
+        "majorsLabel": "主修技艺",
+        "hobbyLabel": "爱好",
+        "historyLabel": "历史",
+        "history": "已发现 {pairs} 个组合，已完成 {returns} 次回归",
+        "roleMajor": "主修",
+        "roleHobby": "爱好",
+        "roleDormant": "休眠知识",
+        "roleUnattuned": "未调谐",
+        "ceilingUnlimited": "无强化上限",
+        "ceilingRare": "Rare cap",
+        "ceilingCommon": "普通品质上限",
+        "skillAria": "{craft}，技能 {skill}，阶级 {tier}，{role}，{ceiling}",
+        "colCraft": "专业",
+        "colSkill": "技能",
+        "colRole": "定位",
+        "colCap": "上限",
+        "tutorial": "第一个阶级：将一门技艺提升到技能 {skill}。成功完成配方会提升对应技艺，且不会抹去其他知识。",
+        "nearTier": "{craft}距离下一阶级还差 {points} 点技能。",
+        "dormantKnowledge": "{craft}知识已保留，但在其组合或爱好未启用时处于休眠状态。"
+      },
       "notAtHub": "必须达到所需等级并位于制作站，才能制作该物品。",
       "throttled": "你制作得太快了，请稍等片刻后再试。",
       "recipeNotLearned": "你还没有学会这个配方。"
@@ -8818,11 +8868,11 @@ export const zh_CN: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "人人都有一技之长",
-        "text": "伊斯特布鲁克的每个人都有除了剑术之外的手艺，{playerName}。镇子周围散落着矿脉，去挥镐采上5块矿石带给我。要亲自采，别耍花招，我看得出来。",
-        "completion": "看到了吧？矿石进了包里，手上也磨出了茧子。继续在路上采矿、伐木、采药，回到镇上时，留意市场旁的城镇专注面板和附近的制作台。只要你愿意，靠这些都能正经谋生。",
+        "text": "东溪人人除了舞刀弄剑，还得有门手艺，{playerName}。镇子西南的铜矿坑周围岩石里有矿脉。拿起矿镐，亲手开采5处；别想蒙我，我看得出差别。",
+        "completion": "看吧？矿石采到了，手上也磨出了茧。赶路时继续采矿、伐木和采药；回城后，别忘了市场旁的城镇专注告示板和附近的制作台。只要你愿意，这些手艺都能换来公道的生计。",
         "objectives": {
           "0": {
-            "label": "矿石块"
+            "label": "已开采矿脉"
           }
         }
       },
@@ -9610,21 +9660,31 @@ export const zh_CN: EnTranslations = {
       },
       "q_archetype_acceptance": {
         "title": "属于你自己的技艺",
-        "text": "东溪的每一位匠人最终都会选定一门属于自己的技艺。用一件事证明自己吧，{playerName}，宣告你的道路。",
-        "completion": "你的道路已经选定；愿你走得稳当。",
+        "text": "技艺是学识，{playerName}，而调谐是一份承诺。选择两门相邻的技艺作为你的主修，再把你亲手从谷地矿脉中采出的矿石带给我。",
+        "completion": "承诺已经立下。这两门技艺现为你的主修，与它们相对的技艺则成为你的爱好。",
+        "objectives": {
+          "0": {
+            "label": "已开采矿脉"
+          }
+        }
+      },
+      "q_prof_make_amends": {
+        "title": "弥补",
+        "text": "你曾掌握过这组技艺，{playerName}。重拾旧途并非新的誓言。去帮忙清理谷地道路，让劳作唤醒双手曾经熟悉的节奏。",
+        "completion": "昔日的节奏回来了。你曾经的那组技艺再次生效。",
         "objectives": {
           "0": {
             "label": "击败森林之狼"
           }
         }
       },
-      "q_prof_make_amends": {
-        "title": "弥补",
-        "text": "若要放下一门技艺、转投另一门，匠人必须先为放弃的道路做出弥补，{playerName}。",
-        "completion": "弥补已经完成；一条新的道路已向你敞开。",
+      "q_prof_hobby_switch": {
+        "title": "别样消遣",
+        "text": "主修技艺需要誓言。爱好只问你的好奇心将去往何处，{playerName}。采集一些草药，然后决定要钻研哪一门与主修技艺相对的手艺。",
+        "completion": "这是个轻松些却很实用的选择。追随这份好奇心，直到稀有品质的作品所能抵达之处。",
         "objectives": {
           "0": {
-            "label": "击败森林之狼"
+            "label": "采集草药丛"
           }
         }
       },

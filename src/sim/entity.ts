@@ -267,10 +267,13 @@ export function recalcPlayerStats(
       s.spi += item.stats.spi ?? 0;
       s.armor += item.stats.armor ?? 0;
     }
-    // Enchant bonus (Enchanting profession): additive on top of the item's own
-    // base stats, from this specific instance's rolled.stats (see
-    // src/sim/professions/enchanting.ts applyEnchant). A plain, unenchanted
-    // piece has no entry here, so this is a no-op for the common case.
+    // Instance stat bonus: additive on top of the item's own base stats, from
+    // this specific instance's rolled.stats: an enchant's bonus
+    // (src/sim/professions/enchanting.ts applyEnchant), a Phase 2 masterwork
+    // copy's baked tier-delta bonus (src/sim/professions/masterwork.ts), or
+    // both merged. The equip path carries the consumed inventory instance into
+    // equipmentInstance (items.ts equipItem), so either applies on equip. A
+    // plain piece has no entry here, so this is a no-op for the common case.
     const enchantStats = equipmentInstance?.[slot]?.rolled?.stats;
     if (enchantStats) {
       s.str += enchantStats.str ?? 0;

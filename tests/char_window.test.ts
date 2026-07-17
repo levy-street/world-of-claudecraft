@@ -1,7 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { CRAFT_RING } from '../src/sim/content/professions';
-import { archetypeTitleText, hobbyCraftText } from '../src/ui/char_window';
+import { ARCHETYPE_PAIR_TARGETS } from '../src/sim/professions/archetype';
+import { archetypeTitleText, craftNameText, hobbyCraftText } from '../src/ui/char_window';
 
 // The character window painter is a DOM module; driving the live DOM + events is
 // the opt-in browser suite. This is the no-DOM-suite
@@ -90,53 +91,95 @@ describe('char_window: paperdoll core + HUD-owned preview boundary', () => {
   });
 });
 
-describe('archetypeTitleText (#1130): id-to-key view model', () => {
+describe('archetypeTitleText (#1130, pair-named): id-to-key view model', () => {
   it('falls back to the "no title yet" copy for null', () => {
     expect(archetypeTitleText(null)).toBe('None');
   });
 
-  it('falls back to the "no title yet" copy for an unrecognized craft id', () => {
-    expect(archetypeTitleText('not_a_real_craft')).toBe('None');
+  it('falls back to the "no title yet" copy for an unrecognized pair id', () => {
+    expect(archetypeTitleText('not_a_real_pair')).toBe('None');
   });
 
-  // Table-driven: one named title per craft on the ring, keyed by craft id (see
-  // src/sim/content/professions.ts CRAFT_RING and the archetypeTitle catalog block
-  // in src/ui/i18n.catalog/hud_chrome.ts). Every craft id must resolve to its own
+  it('falls back to the "no title yet" copy for a bare craft id (titles are per PAIR now)', () => {
+    expect(archetypeTitleText('armorcrafting')).toBe('None');
+  });
+
+  // Table-driven: one named title per selectable adjacent pair, keyed by the
+  // canonical pair id (see src/sim/professions/archetype.ts
+  // ARCHETYPE_PAIR_TARGETS and the archetypePair catalog block in
+  // src/ui/i18n.catalog/hud_chrome.ts). Every pair id must resolve to its own
   // distinct, non-fallback title.
   const EXPECTED_TITLE: Record<string, string> = {
-    armorcrafting: 'Armorer',
-    weaponcrafting: 'Weaponsmith',
-    jewelcrafting: 'Jeweler',
-    alchemy: 'Alchemist',
-    engineering: 'Tinkerer',
-    cooking: 'Chef',
-    inscription: 'Scribe',
-    enchanting: 'Enchanter',
-    tailoring: 'Tailor',
-    leatherworking: 'Leathercrafter',
+    'engineering+alchemy': 'Bombardier',
+    'alchemy+cooking': 'Apothecary',
+    'cooking+leatherworking': 'Trapper',
+    'leatherworking+tailoring': 'Outfitter',
+    'tailoring+inscription': 'Mageweaver',
+    'inscription+enchanting': 'Arcanist',
+    'enchanting+jewelcrafting': 'Gembinder',
+    'jewelcrafting+weaponcrafting': 'Bladewright',
+    'weaponcrafting+armorcrafting': 'Smith',
+    'armorcrafting+engineering': 'Cogsmith',
   };
 
-  it('has exactly one expected title per craft on the ring (test table stays in sync)', () => {
-    expect(Object.keys(EXPECTED_TITLE).sort()).toEqual(CRAFT_RING.map((c) => c.id).sort());
+  it('has exactly one expected title per selectable pair (test table stays in sync)', () => {
+    expect(Object.keys(EXPECTED_TITLE).sort()).toEqual([...ARCHETYPE_PAIR_TARGETS].sort());
   });
 
-  it.each(
-    CRAFT_RING.map((craft) => [craft.id, EXPECTED_TITLE[craft.id]] as const),
-  )('resolves %s to its named title, not the fallback', (craftId, expected) => {
-    const text = archetypeTitleText(craftId);
-    expect(text).toBe(expected);
-    expect(text).not.toBe('None');
-  });
+  it.each(ARCHETYPE_PAIR_TARGETS.map((pairId) => [pairId, EXPECTED_TITLE[pairId]] as const))(
+    'resolves %s to its named title, not the fallback',
+    (pairId, expected) => {
+      const text = archetypeTitleText(pairId);
+      expect(text).toBe(expected);
+      expect(text).not.toBe('None');
+    },
+  );
 
-  it('resolves every craft id to a distinct title (no accidental key collision)', () => {
-    const titles = CRAFT_RING.map((craft) => archetypeTitleText(craft.id));
+  it('resolves every pair id to a distinct title (no accidental key collision)', () => {
+    const titles = ARCHETYPE_PAIR_TARGETS.map((pairId) => archetypeTitleText(pairId));
     expect(new Set(titles).size).toBe(titles.length);
   });
 });
 
+describe('craftNameText: id-to-key view model', () => {
+  it('falls back to the "none" copy for null and unrecognized ids', () => {
+    expect(craftNameText(null)).toBe('None');
+    expect(craftNameText('not_a_real_craft')).toBe('None');
+  });
+
+  // Table-driven: one display name per craft on the ring, keyed by craft id
+  // (see src/sim/content/professions.ts CRAFT_RING and the craftName catalog
+  // block in src/ui/i18n.catalog/hud_chrome.ts).
+  const EXPECTED_CRAFT_NAME: Record<string, string> = {
+    armorcrafting: 'Armorcrafting',
+    weaponcrafting: 'Weaponcrafting',
+    jewelcrafting: 'Jewelcrafting',
+    alchemy: 'Alchemy',
+    engineering: 'Engineering',
+    cooking: 'Cooking',
+    inscription: 'Inscription',
+    enchanting: 'Enchanting',
+    tailoring: 'Tailoring',
+    leatherworking: 'Leatherworking',
+  };
+
+  it('has exactly one expected name per craft on the ring (test table stays in sync)', () => {
+    expect(Object.keys(EXPECTED_CRAFT_NAME).sort()).toEqual(CRAFT_RING.map((c) => c.id).sort());
+  });
+
+  it.each(CRAFT_RING.map((craft) => [craft.id, EXPECTED_CRAFT_NAME[craft.id]] as const))(
+    'resolves %s to its display name, not the fallback',
+    (craftId, expected) => {
+      const text = craftNameText(craftId);
+      expect(text).toBe(expected);
+      expect(text).not.toBe('None');
+    },
+  );
+});
+
 describe('hobbyCraftText (#1294): id-to-key view model', () => {
-  // A hobby id IS a craft id on the ring, rendered through the same per-craft
-  // name table as the archetype title (see src/ui/char_window.ts).
+  // A hobby id IS a craft id on the ring, rendered through the per-craft
+  // display-name table (see src/ui/char_window.ts craftNameText).
   it('falls back to the "no hobby yet" copy for null', () => {
     expect(hobbyCraftText(null)).toBe('None');
   });
@@ -145,10 +188,10 @@ describe('hobbyCraftText (#1294): id-to-key view model', () => {
     expect(hobbyCraftText('not_a_real_craft')).toBe('None');
   });
 
-  it('resolves a known craft id to its named title (never the fallback), for every ring craft', () => {
+  it('resolves a known craft id to its craft display name (never the fallback), for every ring craft', () => {
     for (const craft of CRAFT_RING) {
       const text = hobbyCraftText(craft.id);
-      expect(text).toBe(archetypeTitleText(craft.id));
+      expect(text).toBe(craftNameText(craft.id));
       expect(text).not.toBe('None');
     }
   });

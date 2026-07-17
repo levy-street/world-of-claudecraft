@@ -28,6 +28,9 @@ Everything else is a sibling module in one of these families:
   Performance) and `crowd_lod.ts` (pure crowd policy: pulls character
   shadow/anim cadence in as rig counts climb; cosmetic-only, exempts what a
   player reacts to).
+- `view_create_retry.ts`: bounded cooldown state for fail-soft character builds
+  in per-frame paths, including required targets, form swaps, and visual-key
+  swaps (`tests/view_create_retry.test.ts`).
 - `self_motion.ts`/`facing_smooth.ts`: pure display-only self layers (bounded
   online pose extrapolation + rate-limited self yaw; never touch world state,
   see `src/net/CLAUDE.md`).

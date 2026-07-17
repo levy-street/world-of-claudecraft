@@ -404,16 +404,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.walkUp': 'Gå fram till Suggfältet för att titta från läktarna.',
   'hudChrome.archetypeTitle.label': 'Titel',
   'hudChrome.archetypeTitle.none': 'Ingen',
-  'hudChrome.archetypeTitle.armorcrafting': 'Rustningssmed',
-  'hudChrome.archetypeTitle.weaponcrafting': 'Vapensmed',
-  'hudChrome.archetypeTitle.jewelcrafting': 'Juvelerare',
-  'hudChrome.archetypeTitle.alchemy': 'Alkemist',
-  'hudChrome.archetypeTitle.engineering': 'Ingenjör',
-  'hudChrome.archetypeTitle.cooking': 'Kock',
-  'hudChrome.archetypeTitle.inscription': 'Skrivare',
-  'hudChrome.archetypeTitle.enchanting': 'Förtrollare',
-  'hudChrome.archetypeTitle.tailoring': 'Skräddare',
-  'hudChrome.archetypeTitle.leatherworking': 'Garvare',
   'entities.itemSets.crownforged.bonus4':
     'Dina kritiska vapenträffar splittrar målet med Benflisa och får det att blöda för 8 skada var 2:e sek i 12 sek. Staplas upp till 3 gånger.',
   'entities.itemSets.deathlord.bonus4':
@@ -6691,14 +6681,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.mobileCameraJoystick': 'Kamera joystick',
   'hudChrome.options.mobileLeftHanded': 'Vänsterhänt layout',
   'entities.quests.q_archetype_acceptance.title': 'Ett hantverk att kalla ditt eget',
-  'entities.quests.q_archetype_acceptance.text':
-    'Varje hantverkare i Eastbrook nöjer sig så småningom med ett hantverk att kalla sitt eget. Bevisa dig själv med en enda gärning, {playerName}, och förklara din väg.',
-  'entities.quests.q_archetype_acceptance.completion': 'Din väg är vald; gå det bra.',
-  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Skogsvarg dödad',
   'entities.quests.q_prof_make_amends.title': 'Att göra gott',
-  'entities.quests.q_prof_make_amends.text':
-    'För att avsätta ett hantverk åt ett annat måste en hantverkare först göra gott för vägen som inte gicks, {playerName}.',
-  'entities.quests.q_prof_make_amends.completion': 'Gjorda ändringar; en ny väg är öppen för dig.',
   'entities.quests.q_prof_make_amends.objectives.0.label': 'Skogsvarg dödad',
   'entities.npcs.bursar_aldous_crane.greeting':
     'Varje låda, kista och krimskrams är i tryggt förvar hos Förgyllda kassakistan.',
@@ -6951,11 +6934,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.steam.title': 'Steam',
   'hudChrome.steam.unlink': 'Koppla bort Steam',
   'entities.items.chunk_of_ore.name': 'Malmklump',
-  'entities.quests.q_prof_intro.completion':
-    'Ser du? Malm i packningen och valkar på händerna. Fortsätt med gruvdrift, skogsavverkning och örtplockning medan du färdas längs vägarna. När du är tillbaka i staden, kom ihåg Stadsfokus-tavlan vid marknaden och arbetsbänken i närheten. Det går att försörja sig hederligt på alltihop, om du vill.',
-  'entities.quests.q_prof_intro.objectives.0.label': 'Malmklump',
-  'entities.quests.q_prof_intro.text':
-    'Alla i Östbäck har ett yrke vid sidan om svärdet, {playerName}. Det finns malmådror utspridda runt staden, så svinga en hacka och ge mig 5 klumpar. Bryt dem själv, märk väl; jag ser skillnaden.',
   'entities.quests.q_prof_intro.title': 'Ett yrke för varje hand',
   'hudChrome.auth.appleChoiceExpired':
     'Den här Apple-inloggningen har gått ut. Logga in med Apple igen.',

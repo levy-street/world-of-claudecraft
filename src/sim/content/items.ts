@@ -1297,6 +1297,9 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     questId: 'q_greyjaw',
   },
   chunk_of_ore: {
+    // Retired profession-intro workaround. Keep the shipped id resolvable for
+    // older character saves, but no live acquisition path grants it now that
+    // q_prof_intro uses a genuine gather objective.
     id: 'chunk_of_ore',
     name: 'Chunk of Ore',
     kind: 'quest',

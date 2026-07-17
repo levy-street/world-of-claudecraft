@@ -359,37 +359,38 @@ describe('handlePickedEntity', () => {
     expect(hud.openLoot).not.toHaveBeenCalled();
   });
 
-  it.each([
-    0, 2,
-  ])('preserves movement for button %i when an online host only appears to have harvestable remains', (button) => {
-    const player = stubEntity({ id: 1, kind: 'player' });
-    const corpse = stubEntity({
-      id: 2,
-      kind: 'mob',
-      templateId: 'forest_wolf',
-      dead: true,
-      lootable: true,
-      loot: null,
-      harvestClaimedBy: null,
-      pos: { x: 1, y: 0, z: 0 },
-    });
-    const world = {
-      playerId: 1,
-      player,
-      entities: new Map([
-        [1, player],
-        [2, corpse],
-      ]),
-      targetEntity: () => {},
-    } as unknown as Parameters<typeof handlePickedEntity>[0];
-    const hud = {
-      openLoot: vi.fn(),
-      closeContextMenu: () => {},
-    } as unknown as Parameters<typeof handlePickedEntity>[1];
+  it.each([0, 2])(
+    'preserves movement for button %i when an online host only appears to have harvestable remains',
+    (button) => {
+      const player = stubEntity({ id: 1, kind: 'player' });
+      const corpse = stubEntity({
+        id: 2,
+        kind: 'mob',
+        templateId: 'forest_wolf',
+        dead: true,
+        lootable: true,
+        loot: null,
+        harvestClaimedBy: null,
+        pos: { x: 1, y: 0, z: 0 },
+      });
+      const world = {
+        playerId: 1,
+        player,
+        entities: new Map([
+          [1, player],
+          [2, corpse],
+        ]),
+        targetEntity: () => {},
+      } as unknown as Parameters<typeof handlePickedEntity>[0];
+      const hud = {
+        openLoot: vi.fn(),
+        closeContextMenu: () => {},
+      } as unknown as Parameters<typeof handlePickedEntity>[1];
 
-    expect(handlePickedEntity(world, hud, 2, button, 10, 20, false)).toBe(false);
-    expect(hud.openLoot).not.toHaveBeenCalled();
-  });
+      expect(handlePickedEntity(world, hud, 2, button, 10, 20, false)).toBe(false);
+      expect(hud.openLoot).not.toHaveBeenCalled();
+    },
+  );
 
   it.each([
     ['door', 0, { templateId: 'dungeon_door', dungeonId: 'crypt' }, 'enterDungeon'],

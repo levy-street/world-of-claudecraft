@@ -2029,17 +2029,31 @@ export const ko_KR: EnTranslations = {
     "archetypeTitle": {
       "label": "칭호",
       "none": "없음",
-      "hobbyLabel": "취미",
-      "armorcrafting": "방어구 장인",
-      "weaponcrafting": "무기 장인",
-      "jewelcrafting": "보석 세공사",
-      "alchemy": "연금술사",
-      "engineering": "기술자",
-      "cooking": "요리사",
-      "inscription": "필경사",
-      "enchanting": "마법부여사",
-      "tailoring": "재단사",
-      "leatherworking": "가죽공예사"
+      "hobbyLabel": "취미"
+    },
+    "archetypePair": {
+      "engineering+alchemy": "폭격수",
+      "alchemy+cooking": "약제사",
+      "cooking+leatherworking": "덫사냥꾼",
+      "leatherworking+tailoring": "의복 장인",
+      "tailoring+inscription": "마법직조사",
+      "inscription+enchanting": "비전술사",
+      "enchanting+jewelcrafting": "보석결속사",
+      "jewelcrafting+weaponcrafting": "칼날장인",
+      "weaponcrafting+armorcrafting": "대장장이",
+      "armorcrafting+engineering": "톱니장인"
+    },
+    "craftName": {
+      "armorcrafting": "방어구 제작",
+      "weaponcrafting": "무기 제작",
+      "jewelcrafting": "보석세공",
+      "alchemy": "연금술",
+      "engineering": "기계공학",
+      "cooking": "요리",
+      "inscription": "각인",
+      "enchanting": "마법부여",
+      "tailoring": "재봉",
+      "leatherworking": "가죽세공"
     },
     "crafting": {
       "title": "제작",
@@ -2053,6 +2067,42 @@ export const ko_KR: EnTranslations = {
       "insufficientMaterials": "재료가 부족합니다.",
       "unknownRecipe": "해당 제작법이 존재하지 않습니다.",
       "comboRequirementUnmet": "이 조합 제작법에 필요한 두 제작 기술의 숙련도에 도달하지 못했습니다.",
+      "comboRequires": "조율 조건: {craftA} + {craftB}, 티어 {tier}.",
+      "comboMet": "준비 완료.",
+      "comboSyncing": "서버의 조율 상태를 확인하고 있습니다.",
+      "comboNotAttuned": "먼저 원형 기술 조합을 선택하세요.",
+      "comboWrongPair": "제작하려면 이 정확한 조합을 활성화하세요.",
+      "comboTierUnmet": "두 주 전공을 모두 필요한 티어까지 올리세요.",
+      "professionChoice": "전문 기술 선택",
+      "noProfessionChoice": "현재 선택할 수 있는 전문 기술이 없습니다.",
+      "pairOptionLabel": "{pair} ({craftA} + {craftB})",
+      "attunementPreview": "결과: {title} 칭호를 얻고, {majorA}와 {majorB}가 상한 없는 주 전공이 됩니다. {hobby}는 희귀 상한의 취미가 됩니다. 다른 기술 지식은 모두 유지되지만 비활성 상태에서는 일반 상한이 적용됩니다.",
+      "hobbyPreview": "결과: {hobby}가 희귀 상한의 취미가 됩니다. 두 주 전공과 유지된 모든 기술 수치는 그대로입니다.",
+      "identity": {
+        "title": "제작 정체성",
+        "syncing": "서버에서 제작 정체성을 불러오고 있습니다.",
+        "unattuned": "활성화된 원형 기술 조합이 없습니다. 지식은 유지되지만 조합 제작법에는 조율된 조합이 필요합니다.",
+        "titleLabel": "칭호",
+        "majorsLabel": "주 전공",
+        "hobbyLabel": "취미",
+        "historyLabel": "기록",
+        "history": "발견한 조합 {pairs}개, 완료한 복귀 {returns}회",
+        "roleMajor": "주 전공",
+        "roleHobby": "취미",
+        "roleDormant": "비활성 지식",
+        "roleUnattuned": "미조율",
+        "ceilingUnlimited": "강화 상한 없음",
+        "ceilingRare": "Rare cap",
+        "ceilingCommon": "일반 상한",
+        "skillAria": "{craft}, 기술 {skill}, 티어 {tier}, {role}, {ceiling}",
+        "colCraft": "제작 분야",
+        "colSkill": "기술",
+        "colRole": "역할",
+        "colCap": "상한",
+        "tutorial": "첫 티어: 한 기술을 숙련도 {skill}까지 올리세요. 제작에 성공하면 다른 지식을 지우지 않고 해당 기술이 성장합니다.",
+        "nearTier": "{craft}는 다음 티어까지 숙련도 {points}이 필요합니다.",
+        "dormantKnowledge": "{craft} 지식은 유지되지만 해당 조합이나 취미가 활성화될 때까지 비활성 상태입니다."
+      },
       "notAtHub": "그것을 제작하려면 필요한 레벨로 제작 거점에 있어야 합니다.",
       "throttled": "너무 빨리 제작하고 있습니다. 잠시 후 다시 시도하세요.",
       "recipeNotLearned": "아직 그 제작법을 배우지 않았습니다."
@@ -8818,11 +8868,11 @@ export const ko_KR: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "검 말고도 할 수 있는 일",
-        "text": "이스트브룩의 모든 사람은 검 말고도 생업이 있다네, {playerName}. 마을 주변에 광맥이 흩어져 있지. 곡괭이를 휘둘러 광석 5덩이를 가져다 주게. 직접 캐야 하네, 내가 다 구분할 수 있으니까.",
-        "completion": "봤나? 가방엔 광석, 손엔 굳은살이지. 길을 다니며 채광, 벌목, 약초 채집을 계속해 보게. 마을에 돌아오면 시장 옆의 마을 집중 게시판과 근처 제작대도 눈여겨보고. 원한다면 이 모든 일로 떳떳하게 생계를 꾸릴 수 있다네.",
+        "text": "이스트브룩 사람이라면 누구나 검술 말고도 생업 하나는 익히지, {playerName}. 마을 남서쪽 구리 광산 주변 바위에는 광맥이 있다네. 곡괭이를 들고 직접 광맥 5곳을 캐 오게. 속이려 해도 나는 차이를 안다네.",
+        "completion": "보게나. 광석도 모았고 손에는 굳은살도 박였군. 길을 다닐 때도 채광과 벌목, 약초 채집을 계속하게. 마을에 돌아오면 시장 옆의 마을 집중 게시판과 근처 제작대도 잊지 말고. 원한다면 이 모든 일에서 정당한 생계를 찾을 수 있다네.",
         "objectives": {
           "0": {
-            "label": "광석 조각"
+            "label": "광맥 채굴"
           }
         }
       },
@@ -9610,21 +9660,31 @@ export const ko_KR: EnTranslations = {
       },
       "q_archetype_acceptance": {
         "title": "스스로 택하는 기술",
-        "text": "이스트브룩의 모든 장인은 결국 자신만의 기술 하나를 택하게 된다. {playerName}, 하나의 행동으로 스스로를 증명하고 그대의 길을 선언하라.",
-        "completion": "그대의 길이 정해졌다. 그 길을 굳건히 걸어가라.",
+        "text": "기술은 지식이지만, {playerName}, 조율은 약속이라네. 서로 이웃한 두 기술을 주 전공으로 선택하고, 계곡에서 직접 캔 광석을 가져오게.",
+        "completion": "약속이 맺어졌네. 이제 이 두 기술이 자네의 주 전공이고, 그 맞은편의 지식은 취미가 되었네.",
+        "objectives": {
+          "0": {
+            "label": "광맥 채굴"
+          }
+        }
+      },
+      "q_prof_make_amends": {
+        "title": "속죄",
+        "text": "이 조합은 전에 익힌 적이 있군, {playerName}. 돌아가는 것은 새로운 맹세가 아니지. 계곡 길을 안전하게 지키는 일을 돕고, 손이 예전에 알던 감각을 되찾게.",
+        "completion": "옛 감각이 돌아왔네. 이전 조합이 다시 활성화되었어.",
         "objectives": {
           "0": {
             "label": "숲늑대 처치"
           }
         }
       },
-      "q_prof_make_amends": {
-        "title": "속죄",
-        "text": "한 기술을 버리고 다른 기술로 나아가려면, 장인은 먼저 걷지 않은 길에 대해 속죄해야 한다, {playerName}.",
-        "completion": "속죄가 이루어졌다. 그대에게 새로운 길이 열렸다.",
+      "q_prof_hobby_switch": {
+        "title": "색다른 취미",
+        "text": "주 전공에는 맹세가 필요하지만, 취미는 호기심이 어디로 향하는지만 묻지, {playerName}. 약초를 조금 채집하고 두 주 전공의 맞은편 기술 중 무엇을 익힐지 정하게.",
+        "completion": "가벼운 선택이지만 쓸모는 있지. 희귀 등급 작업에 닿을 때까지 그 호기심을 따라가게.",
         "objectives": {
           "0": {
-            "label": "숲늑대 처치"
+            "label": "약초 군락 채집"
           }
         }
       },

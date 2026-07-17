@@ -433,16 +433,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.walkUp': 'Vá até o Sowfield para assistir das arquibancadas.',
   'hudChrome.archetypeTitle.label': 'Título',
   'hudChrome.archetypeTitle.none': 'Nenhum',
-  'hudChrome.archetypeTitle.armorcrafting': 'Armeiro',
-  'hudChrome.archetypeTitle.weaponcrafting': 'Forjador de armas',
-  'hudChrome.archetypeTitle.jewelcrafting': 'Joalheiro',
-  'hudChrome.archetypeTitle.alchemy': 'Alquimista',
-  'hudChrome.archetypeTitle.engineering': 'Engenheiro',
-  'hudChrome.archetypeTitle.cooking': 'Cozinheiro',
-  'hudChrome.archetypeTitle.inscription': 'Escriba',
-  'hudChrome.archetypeTitle.enchanting': 'Encantador',
-  'hudChrome.archetypeTitle.tailoring': 'Alfaiate',
-  'hudChrome.archetypeTitle.leatherworking': 'Curtidor',
   'entities.itemSets.crownforged.bonus4':
     'Seus acertos críticos com armas estilhaçam o alvo com Estilhaço Ósseo, causando 8 de sangramento a cada 2 s por 12 s. Acumula até 3 vezes.',
   'entities.itemSets.deathlord.bonus4':
@@ -6775,15 +6765,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.mobileCameraJoystick': 'Joystick da câmera',
   'hudChrome.options.mobileLeftHanded': 'Layout para canhotos',
   'entities.quests.q_archetype_acceptance.title': 'Um ofício para chamar de seu',
-  'entities.quests.q_archetype_acceptance.text':
-    'Cada artesão de Eastbrook eventualmente escolhe um ofício para chamar de seu. Prove seu valor com uma única ação, {playerName}, e declare seu caminho.',
-  'entities.quests.q_archetype_acceptance.completion': 'Seu caminho está escolhido; ande bem.',
-  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Lobo da Floresta morto',
   'entities.quests.q_prof_make_amends.title': 'Fazendo as pazes',
-  'entities.quests.q_prof_make_amends.text':
-    'Para separar um ofício para outro, um artesão deve primeiro reparar o caminho não percorrido, {playerName}.',
-  'entities.quests.q_prof_make_amends.completion':
-    'Reparações feitas; um novo caminho está aberto para você.',
   'entities.quests.q_prof_make_amends.objectives.0.label': 'Lobo da Floresta morto',
   'entities.npcs.bursar_aldous_crane.greeting':
     'Cada caixote, cofre e bugiganga está a salvo com a Arca Dourada.',
@@ -7058,11 +7040,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.arcane_essence.name': 'Essência Arcana',
   'entities.items.arcane_shard.name': 'Fragmento Arcano',
   'entities.items.chunk_of_ore.name': 'Pedaço de Minério',
-  'entities.quests.q_prof_intro.completion':
-    'Viu só? Minério na mochila e calos nas mãos. Continue minerando, cortando madeira e colhendo ervas enquanto percorre as estradas. Quando voltar à cidade, preste atenção no quadro do Foco da Cidade perto do mercado e na bancada de criação ali ao lado. Dá para ganhar a vida honestamente com tudo isso, se você quiser.',
-  'entities.quests.q_prof_intro.objectives.0.label': 'Pedaço de Minério',
-  'entities.quests.q_prof_intro.text':
-    'Cada pessoa em Eastbrook exerce um ofício além da espada, {playerName}. Há veios de minério espalhados pela cidade, então pegue uma picareta e traga 5 pedaços para mim. Extraia você mesmo, viu? Eu vou saber a diferença.',
   'entities.quests.q_prof_intro.title': 'Um ofício para cada mão',
   'hudChrome.auth.appleChoiceExpired':
     'Esse início de sessão com a Apple expirou. Entre com a Apple novamente.',

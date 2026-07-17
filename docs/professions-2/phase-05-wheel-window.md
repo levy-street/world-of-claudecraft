@@ -89,7 +89,25 @@ Agent view-core deliverables:
 - A refresh signature for slow-band diffing (cheap to compute, changes only when the model
   changes).
 - Absorb or compose the PR 2039 identity card view (profession_identity_view): pick one and
-  record why in the phase notes.
+  record why in the phase notes. Either way, the resulting model PRESERVES the
+  identity-view semantics (2026-07-17 amendment): per-craft role (major / hobby / dormant /
+  unattuned), ceiling (unlimited / rare / common), the nearTier and dormantKnowledge
+  nudges, and the pre-first-tier tutorial state. Dropping any of these is a spec violation,
+  not an implementer choice.
+- A per-craft next-unlock line (2026-07-17 amendment): points to the next tier pip and what
+  crossing it changes (the masterwork-odds step; the 75-skill specialization perks). Phase
+  9's teach tiers and Phase 10's ladders enrich the same line later without a model change;
+  render only from reads that exist today.
+- A switch-cost-at-rest line (2026-07-17 amendment): "next switch costs N" computed
+  client-side from the locked 5 + 3 * switchCount formula using the switchCount already on
+  CraftingIdentityView (src/world_api/professions.ts; profession_identity_view.ts surfaces
+  it to players as returnCount). Display-only; the server still resolves the real cost
+  (Phase 14 owns the pre-commit preview).
+- Progressive disclosure (2026-07-17 amendment): the unattuned and pre-first-tier states
+  render a SIMPLIFIED view: the identity paragraph, one clear call to action (the trending
+  craft and its next step), and the tutorial line promoted; the full ring, ten bars, and
+  perks readout take over at first tier or attunement. A new player sees one next step,
+  never ten bars first.
 
 Agent painter/styles deliverables:
 - src/ui/professions_window.ts: a cold painter on the deeds pattern (injected deps, full rebuild
@@ -183,6 +201,11 @@ STEP 5 - ACCEPTANCE CRITERIA (do not mark complete until all check):
 - [ ] Identity (title, majors, hobby), the ring visualization, ten per-craft skill bars, tier
       pips, and the perks readout all render from both Sim- and ClientWorld-shaped inputs,
       including the pre-cprof (synced false) empty state.
+- [ ] Per-craft role and ceiling, the nudges, and the tutorial state survive from the
+      absorbed identity view; the next-unlock and switch-cost lines render from existing
+      reads only.
+- [ ] The unattuned / pre-first-tier simplified state shows a single clear next step; the
+      full ring takes over at first tier or attunement.
 - [ ] src/ui/professions_view.ts is registered in UI_PURE_CORES and is DOM-free.
 - [ ] Zero hex literals in every new file; existing tokens only; no DESIGN.md phase vocabulary.
 - [ ] The mobile guard trio is green (coverage, transform, layout).

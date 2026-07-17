@@ -273,6 +273,31 @@ pitched-up `attack`. Families: `beast`, `boar`, `spider`, `mudfin`, `burrower`,
 | `dragonkin` | a dragonkin — fierce roaring alert with wing flap / snapping bite roar / dying roar collapse |
 | `demon` | a demon — sinister hissing snarl / shrieking demonic strike / agonized demonic death wail |
 
+### Idle vocalizations (spatial, ambient bark)
+`mob_<family>_idle` (one per family, `reptile` included, 13 total), plus a
+subfamily-specific `mob_<family>_<subfamily>_idle` for the wolf aliases (see
+`SUBFAMILY_ALIAS` in `src/ui/combat_sfx.ts`; a matching `mob_undead_skeleton_*`
+set exists on disk but is not currently wired to any live template, an
+inherited gap this feature did not introduce). Unlike the reactive
+aggro/attack/death/hurt vocalizations (fired directly off sim combat events),
+idle barks are presentation-only ambience: a shared periodic sweep
+(`Hud.sweepMobIdleBarks`, throttled to `MOB_IDLE_CHECK_INTERVAL_MS` from
+`update()`, never per-mob-per-frame) considers every non-combat, unowned,
+non-dummy, unmuted mob within `MOB_IDLE_SCAN_RADIUS` of the player and rolls
+each one independently
+against `MOB_IDLE_BASE_CHANCE`, damped by how many same-family mobs are
+clustered nearby (`idleDensityFactor`, `src/ui/mob_idle_sfx.ts`) so a dense
+pack does not all bark in the same sweep. A per-entity cooldown
+(`MOB_IDLE_PER_ENTITY_COOLDOWN_MS`) additionally rate-limits one mob's own
+repeats, stamped only when `sfx.playAt` reports the sound actually played
+(not merely attempted), so losing the shared per-key playback cooldown
+(`MOB_IDLE_KEY_COOLDOWN_S`, the backstop against two mobs barking the
+identical clip at once) does not silently bench a mob for the full
+per-entity window. Plays at `MOB_IDLE_GAIN`, a dedicated lower bucket
+distinct from the combat layer's `COMBAT_GAIN`. Timing is client-local and
+non-deterministic across players by design (presentation-only, same category
+as footstep variant choice, not gameplay-affecting).
+
 ### Ambient loops
 | key | loop | spatial | prompt summary |
 |---|---|---|---|

@@ -14,7 +14,12 @@
 // short-circuit to zero trickle before any other work, as a single cheap
 // comparison at the top of the handler. Only a rare-or-better instance
 // (isSignableMaterialRarity, the same threshold #1145 already uses to decide
-// whether a harvested/crafted copy gets signed at all) can ever trickle.
+// whether a harvested/crafted copy gets signed at all) can ever trickle. The
+// rarity read is the instance's legacy rolled.quality when present, else the
+// item DEF's static quality: Phase 2 deterministic crafts sign rare-plus-def
+// outputs without writing rolled.quality, so the def fallback is what keeps
+// the trickle alive for new crafted instances (legacy signed instances keep
+// their old rolled.quality read).
 //
 // Additive-only by construction: the only skill-mutating call this module
 // ever makes is gainCraftSkill (professions/wheel.ts), the exact same
@@ -36,6 +41,7 @@
 // rng at all (attribution and the rarity gate are pure lookups).
 
 import { recipeForResultItem } from '../content/recipes';
+import { ITEMS } from '../data';
 import { isSignableMaterialRarity, type MaterialRarity } from './gathering';
 import type { CraftSkills } from './wheel';
 import { gainCraftSkill } from './wheel';
@@ -80,8 +86,10 @@ export interface BattlefieldXpObservation {
  *  the observed item, self-observation only. Returns the amount actually
  *  granted (0 for every short-circuit below, i.e. a genuine no-op):
  *  - no instance payload (a plain fungible item was never signed): 0.
- *  - instance rarity is common/uncommon (or unrolled): 0, checked FIRST and
- *    cheaply, before any attribution work, per the issue's rare-tier gate.
+ *  - rarity (the instance's legacy rolled.quality, else the item def's
+ *    static quality: see the module comment) is common/uncommon or
+ *    unresolvable: 0, checked FIRST and cheaply, before any attribution
+ *    work, per the issue's rare-tier gate.
  *  - the instance was not signed by the observer (someone else's item, or a
  *    bystander/party case): 0. Party/raid weighting for that case is a later
  *    issue; this PR never grants anything but the self-observation trickle.
@@ -101,7 +109,12 @@ export function battlefieldExperienceTrickle(
     observerActiveArchetype,
     observerPairedMajor = null,
   } = observation;
-  const rarity = instance?.rolled?.quality as MaterialRarity | undefined;
+  // Phase 2 deterministic crafts no longer write rolled.quality, so a new
+  // rare-plus-def crafted instance reads its def quality here; a legacy
+  // instance's own rolled.quality still wins when present.
+  const rarity = (instance?.rolled?.quality ?? ITEMS[itemId]?.quality) as
+    | MaterialRarity
+    | undefined;
   if (!rarity || !isSignableMaterialRarity(rarity)) return 0;
   if (!instance?.signer || instance.signer !== observerName) return 0;
   const recipe = recipeForResultItem(itemId);

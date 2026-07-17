@@ -22,6 +22,10 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
   `tests/render_asset_preload.test.ts`). `prepareVisual(key)` memoizes
   normalize transform, resolved clips, click-capsule radius, and a baked
   idle-pose geo (far-LOD/shadow proxy).
+- `asset_miss_log.ts`: once-per-key dev logging for character-asset failures in
+  per-frame render paths; `createCharacterVisual` returns null on such a
+  failure so callers skip the view for the frame instead of stalling the
+  renderer (`tests/character_visual_fail_soft.test.ts`).
 - `rig_merge.ts`: merges a KayKit rig's quantized body-part SkinnedMeshes into
   one draw per material (`assets.ts` `assembleModel` calls it). Read its
   header bind-pose proof before touching bone inverses.

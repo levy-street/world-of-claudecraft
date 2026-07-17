@@ -417,16 +417,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.walkUp': 'Podejdź na Maciorowe Błonie, aby oglądać z trybun.',
   'hudChrome.archetypeTitle.label': 'Tytuł',
   'hudChrome.archetypeTitle.none': 'Brak',
-  'hudChrome.archetypeTitle.armorcrafting': 'Płatnerz',
-  'hudChrome.archetypeTitle.weaponcrafting': 'Zbrojmistrz',
-  'hudChrome.archetypeTitle.jewelcrafting': 'Jubiler',
-  'hudChrome.archetypeTitle.alchemy': 'Alchemik',
-  'hudChrome.archetypeTitle.engineering': 'Inżynier',
-  'hudChrome.archetypeTitle.cooking': 'Kucharz',
-  'hudChrome.archetypeTitle.inscription': 'Skryba',
-  'hudChrome.archetypeTitle.enchanting': 'Zaklinacz',
-  'hudChrome.archetypeTitle.tailoring': 'Krawiec',
-  'hudChrome.archetypeTitle.leatherworking': 'Garbarz',
   'entities.itemSets.crownforged.bonus4':
     'Twoje krytyczne trafienia bronią rozłupują cel Kościaną Drzazgą, zadając 8 obrażeń od krwawienia co 2 s przez 12 s. Kumuluje się do 3 razy.',
   'entities.itemSets.deathlord.bonus4':
@@ -6731,16 +6721,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.mobileCameraJoystick': 'Joystick aparatu',
   'hudChrome.options.mobileLeftHanded': 'Układ leworęczny',
   'entities.quests.q_archetype_acceptance.title': 'Rzemiosło, które możesz nazwać własnym',
-  'entities.quests.q_archetype_acceptance.text':
-    'Każdy rzemieślnik z Eastbrook ostatecznie decyduje się na jedno rzemiosło, które nazywa swoim własnym. Wykaż się jednym czynem, {playerName}, i zadeklaruj swoją ścieżkę.',
-  'entities.quests.q_archetype_acceptance.completion':
-    'Twoja ścieżka została wybrana; chodź dobrze.',
-  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Leśny Wilk zabity',
   'entities.quests.q_prof_make_amends.title': 'Zadośćuczynienie',
-  'entities.quests.q_prof_make_amends.text':
-    'Aby odłożyć jeden statek na drugi, rzemieślnik musi najpierw zadośćuczynić za ścieżkę, którą nie przeszedł, {playerName}.',
-  'entities.quests.q_prof_make_amends.completion':
-    'Poprawki dokonane; otwiera się przed tobą nowa droga.',
   'entities.quests.q_prof_make_amends.objectives.0.label': 'Leśny Wilk zabity',
   'entities.npcs.bursar_aldous_crane.greeting':
     'Każda skrzynia, kufer i błyskotka są bezpieczne w Złoconej Szkatule.',
@@ -6993,11 +6974,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.steam.title': 'Steam',
   'hudChrome.steam.unlink': 'Odłącz Steam',
   'entities.items.chunk_of_ore.name': 'Kawałek rudy',
-  'entities.quests.q_prof_intro.completion':
-    'Widzisz? Ruda w torbie i odciski na dłoniach. Dalej zajmuj się górnictwem, wyrębem i zielarstwem podczas wędrówek, a gdy wrócisz do miasta, pamiętaj o tablicy Priorytetów miasta przy targu i pobliskim stole rzemieślniczym. Na tym wszystkim można uczciwie zarobić, jeśli zechcesz.',
-  'entities.quests.q_prof_intro.objectives.0.label': 'Kawałek rudy',
-  'entities.quests.q_prof_intro.text':
-    'Każdy w Eastbrook para się jakimś fachem oprócz władania mieczem, {playerName}. Wokół miasta pełno żył rudy, więc chwyć za kilof i przynieś mi 5 kawałków. Wydobądź je własnoręcznie; poznam różnicę.',
   'entities.quests.q_prof_intro.title': 'Fach dla każdej dłoni',
   'hudChrome.auth.appleChoiceExpired':
     'To logowanie przez Apple wygasło. Zaloguj się ponownie przez Apple.',

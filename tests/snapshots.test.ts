@@ -25,13 +25,16 @@ import { saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer, wireEntity } from '../server/game';
 import { ClientWorld } from '../src/net/online';
 import { mechHeldWeaponOverride, visualKeyFor } from '../src/render/characters/manifest';
-import { DELVES, GATHER_NODES } from '../src/sim/data';
+import { COMBO_RECIPES } from '../src/sim/content/recipes';
+import { DELVES, GATHER_NODES, ITEMS, MOBS } from '../src/sim/data';
+import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import { type Aura, DT, type PlayerClass } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 import { absorbTotal } from '../src/ui/absorb_bar';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
 import { isAuraDebuff } from '../src/ui/auras_view';
+import { buildCraftingView } from '../src/ui/crafting_view';
 
 const DELTA_KEYS = [
   'inv',
@@ -459,6 +462,62 @@ describe('account flair over the wire', () => {
   });
 });
 
+// Corpse harvest claims over the wire. The corpse picker
+// (src/game/corpse_loot_availability.ts) reads mob.harvestClaimedBy; offline the
+// Sim entity carries it, so online the same field must ride the sparse terse key
+// `hcb` or the online picker keeps offering already-claimed corpses. Same pin
+// shape as the account-flair suite above: the REAL server emit (wireEntity) into
+// the REAL client mirror (applySnapshot), never a hand-built wire record alone.
+describe('corpse harvest claim over the wire', () => {
+  function deadWolfCorpse(id: number): ReturnType<typeof createMob> {
+    const template = MOBS.forest_wolf;
+    const mob = createMob(id, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    mob.dead = true;
+    return mob;
+  }
+
+  it('mirrors the claimer pid onto another player client via hcb', () => {
+    const claimer = 42;
+    const mob = deadWolfCorpse(9001);
+    mob.harvestClaimedBy = claimer;
+
+    const w = wireEntity(mob);
+    expect(w.hcb).toBe(claimer);
+
+    const client = bareClient(claimer + 1000);
+    (client as any).applySnapshot({ t: 'snap', ents: [w] });
+    expect(client.entities.get(mob.id)!.harvestClaimedBy).toBe(claimer);
+  });
+
+  it('keeps an unclaimed corpse sparse: no hcb key, mirrored as null', () => {
+    const mob = deadWolfCorpse(9002);
+
+    const w = wireEntity(mob);
+    // Absent, not `hcb: null`: an unclaimed corpse's record must be byte-unchanged
+    // by this feature, so the per-entity delta cache keeps eliding it.
+    expect(w).not.toHaveProperty('hcb');
+
+    const client = bareClient(1);
+    (client as any).applySnapshot({ t: 'snap', ents: [w] });
+    expect(client.entities.get(mob.id)!.harvestClaimedBy).toBeNull();
+  });
+
+  it('clears a stale mirrored claim when a later record arrives without hcb', () => {
+    const mob = deadWolfCorpse(9003);
+    mob.harvestClaimedBy = 42;
+
+    const client = bareClient(1);
+    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(mob)] });
+    expect(client.entities.get(mob.id)!.harvestClaimedBy).toBe(42);
+
+    // Respawn clears the claim server-side (src/sim/mob/lifecycle.ts); the next
+    // record simply omits hcb, and the mirror must reset, not keep the stale pid.
+    mob.harvestClaimedBy = null;
+    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(mob)] });
+    expect(client.entities.get(mob.id)!.harvestClaimedBy).toBeNull();
+  });
+});
+
 describe('combat ratings over the wire', () => {
   it('mirrors Ranged Attack Power so online hunter attack-spell tooltips can scale', () => {
     const sim = new Sim({ seed: 7, playerClass: 'hunter', autoEquip: true });
@@ -823,6 +882,37 @@ describe('delta snapshots', () => {
     (client as any).applySnapshot(snap);
     expect(client.equipment.mainhand).toBeUndefined();
     expect(client.inventory.some((s) => s.itemId === 'worn_sword')).toBe(true);
+  });
+
+  it('instance payloads (masterwork and legacy quality) ride the inv snapshot verbatim', () => {
+    // Phase 2 back-compat over the wire: the server sends the live
+    // meta.inventory wholesale, so a masterwork copy's full payload (signer,
+    // enchant marker, rolled.masterwork plus baked stats) and a legacy copy's
+    // rolled.quality must both arrive on the client mirror byte-identical.
+    // A future snapshot serializer that field-picks the instance would red
+    // here before it could strip either generation.
+    const masterwork = {
+      signer: 'Testa',
+      enchant: 'enchant_chest_stamina',
+      rolled: { masterwork: true, stats: { int: 2, spi: 1 } },
+    };
+    const legacy = { signer: 'Oldhand', rolled: { quality: 'rare' as const } };
+    server.sim.addItemInstance('eastbrook_ritual_vestments', masterwork, session.pid);
+    server.sim.addItemInstance('apprentice_staff', legacy, session.pid);
+
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    const wireMw = snap.self.inv.find((s: any) => s.itemId === 'eastbrook_ritual_vestments');
+    const wireLegacy = snap.self.inv.find((s: any) => s.itemId === 'apprentice_staff');
+    expect(wireMw?.instance).toEqual(masterwork);
+    expect(wireLegacy?.instance).toEqual(legacy);
+
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(snap);
+    expect(
+      client.inventory.find((s) => s.itemId === 'eastbrook_ritual_vestments')?.instance,
+    ).toEqual(masterwork);
+    expect(client.inventory.find((s) => s.itemId === 'apprentice_staff')?.instance).toEqual(legacy);
   });
 
   it('mirrors vendor buyback deltas to the client', () => {
@@ -2482,9 +2572,9 @@ describe('lockpick view rebuilds from events on the online client', () => {
 // while the prior decoded value is preserved.
 // ---------------------------------------------------------------------------
 
-// The pinned set of the 44 `maybe(...)` delta keys, sorted. Cross-checked below
+// The pinned set of the 47 `maybe(...)` delta keys, sorted. Cross-checked below
 // against the live `maybe(...)` calls scraped from server/game.ts source, so a
-// 45th unregistered delta key reddens this gate.
+// 48th unregistered delta key reddens this gate.
 const ALL_DELTA_KEYS = [
   'arena',
   'atitle',
@@ -2495,6 +2585,7 @@ const ALL_DELTA_KEYS = [
   'cds',
   'corpse',
   'cosmetics',
+  'cprof',
   'dclears',
   'dcomp',
   'dcompanion',
@@ -2549,6 +2640,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   buyback: 'vendorBuyback',
   cds: 'cooldowns',
   cosmetics: 'accountCosmetics',
+  cprof: 'craftingIdentity',
   dclears: 'delveClears',
   dcomp: 'companionUpgrades',
   dcompanion: 'companionState',
@@ -2667,6 +2759,16 @@ function dirtyEveryDeltaField(): {
   meta.delveClears = { 'collapsed_reliquary:heroic': 1 };
   meta.companionUpgrades = { companion_tessa: 2 };
   meta.gatheringProficiency = { mining: 6, logging: 0, herbalism: 0 };
+  meta.craftSkills.armorcrafting = 31;
+  meta.craftSkills.weaponcrafting = 29;
+  meta.archetype = {
+    activeArchetype: 'armorcrafting',
+    pairedMajor: 'weaponcrafting',
+    hobbyCraft: 'leatherworking',
+    attunedPairs: ['weaponcrafting+armorcrafting'],
+    switchCount: 2,
+    amendsProgress: 4,
+  };
   // Per-player gather-node respawn cooldown (#1866): one node still cooling
   // down (readyAt 30s in the sim future), so `ncd` mirrors it as ~30 remaining
   // seconds and nodeHarvestableByMe reports it not ready.
@@ -2734,6 +2836,47 @@ function dirtyEveryDeltaField(): {
 }
 
 describe('full self-state snapshot delta fixture', () => {
+  it('mirrors an exact pair and completes the online combo craft command end to end', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 71, 'Combo');
+    const meta = server.sim.meta(session.pid)!;
+    meta.craftSkills.armorcrafting = 25;
+    meta.craftSkills.weaponcrafting = 25;
+    meta.archetype = {
+      activeArchetype: 'armorcrafting',
+      pairedMajor: 'weaponcrafting',
+      hobbyCraft: 'leatherworking',
+      attunedPairs: ['weaponcrafting+armorcrafting'],
+      switchCount: 0,
+      amendsProgress: 0,
+    };
+    meta.inventory = [
+      { itemId: 'bone_fragments', count: 4 },
+      { itemId: 'linen_scrap', count: 2 },
+    ];
+
+    broadcast(server);
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(lastSnap(fc.sent));
+    const recipe = COMBO_RECIPES.find((entry) => entry.id === 'recipe_ironbound_warplate_helm')!;
+    const view = buildCraftingView(
+      [recipe],
+      client.inventory,
+      ITEMS,
+      client.craftSkills,
+      client.craftingIdentity,
+    );
+    expect(client.craftingIdentity.synced).toBe(true);
+    expect(view.recipes[0].craftable).toBe(true);
+
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'craft_item', recipe: recipe.id }),
+    );
+    expect(server.sim.countItem(recipe.resultItemId, session.pid)).toBe(1);
+  });
+
   it('carries every one of the dirtied delta keys on the first snapshot', () => {
     const { server, fc } = dirtyEveryDeltaField();
     broadcast(server);
@@ -2827,6 +2970,22 @@ describe('full self-state snapshot delta fixture', () => {
         { professionId: 'herbalism', skill: 0, maxSkill: 300 },
       ],
     }); // prof -> professionsState
+    expect(client.craftingIdentity).toMatchObject({
+      version: 1,
+      synced: true,
+      activeArchetype: 'armorcrafting',
+      pairedMajor: 'weaponcrafting',
+      hobbyCraft: 'leatherworking',
+      attunedPairs: ['weaponcrafting+armorcrafting'],
+      switchCount: 2,
+      amendsProgress: 4,
+      amendsRequired: 11,
+    }); // cprof -> craftingIdentity
+    // The pair-named archetype title derives LIVE from the mirrored
+    // craftingIdentity (Professions 2.0 Phase 1): the canonical pair id, not a
+    // craft id, and it must reflect the cprof delta just applied.
+    expect(client.archetypeTitle).toBe('weaponcrafting+armorcrafting');
+    expect(client.craftSkills).toMatchObject({ armorcrafting: 31, weaponcrafting: 29 });
     expect(client.delveClears).toEqual({ 'collapsed_reliquary:heroic': 1 }); // dclears -> delveClears
     expect(client.delveDaily).toMatchObject({ markClears: 4 }); // delveDaily
     // deeds -> deedsEarned: the Map rebuilds from the plain wire object with
@@ -2925,9 +3084,9 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 46 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(46);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(46);
+  it('ALL_DELTA_KEYS contains exactly 47 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(47);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(47);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2939,7 +3098,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.size).toBe(46);
+    expect(scraped.size).toBe(47);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

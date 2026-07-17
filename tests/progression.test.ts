@@ -5,9 +5,11 @@
 import { describe, expect, it } from 'vitest';
 import {
   ABILITIES,
+  ALL_RECIPES,
   CAMPS,
   CLASSES,
   DUNGEON_LIST,
+  GATHER_NODES,
   GROUND_OBJECTS,
   ITEMS,
   MOBS,
@@ -23,14 +25,12 @@ import {
   ZONES,
 } from '../src/sim/data';
 import { canEquipItem } from '../src/sim/equipment_rules';
+import { NODE_HARVEST_TABLE } from '../src/sim/professions/gathering';
 import { ALL_CLASSES, MAX_LEVEL, XP_TABLE, type ZoneDef } from '../src/sim/types';
 import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
 
 const WORLD_SEED = 20061; // production seed (main.ts / server/game.ts)
-// chunk_of_ore (q_prof_intro): granted by an ore-node harvest while the quest
-// is active (NODE_QUEST_GRANT, src/sim/professions/gathering.ts), not by mob
-// loot or a ground object.
-const SCRIPTED_COLLECT_ITEMS = new Set(['the_codfather', 'chunk_of_ore']);
+const SCRIPTED_COLLECT_ITEMS = new Set(['the_codfather']);
 
 describe('content referential integrity', () => {
   it('every quest reference resolves (NPCs, mobs, items, chains)', () => {
@@ -49,6 +49,21 @@ describe('content referential integrity', () => {
         }
         if (obj.type === 'collect' && (!obj.itemId || !ITEMS[obj.itemId])) {
           problems.push(`${q.id}: collect item ${obj.itemId} missing`);
+        }
+        if (obj.type === 'craft' && !ALL_RECIPES.some((recipe) => recipe.id === obj.recipeId)) {
+          problems.push(`${q.id}: craft recipe ${obj.recipeId} missing`);
+        }
+        if (obj.type === 'gather') {
+          if (!obj.nodeType && !obj.itemId) problems.push(`${q.id}: gather target missing`);
+          if (obj.nodeType && !GATHER_NODES.some((node) => node.type === obj.nodeType)) {
+            problems.push(`${q.id}: gather node type ${obj.nodeType} missing`);
+          }
+          if (obj.itemId) {
+            if (!ITEMS[obj.itemId]) problems.push(`${q.id}: gather item ${obj.itemId} missing`);
+            if (!Object.values(NODE_HARVEST_TABLE).some((entry) => entry.itemId === obj.itemId)) {
+              problems.push(`${q.id}: gather item ${obj.itemId} has no node source`);
+            }
+          }
         }
       }
     }

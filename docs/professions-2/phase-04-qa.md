@@ -1,7 +1,8 @@
 # Phase 04 QA: Verify Node materials and pristine veins
 
 Independent audit of the Phase 04 diff: confirm node material tables, signed yields, the
-pristine vein, and the gather feedback landed correctly, completely, and cleanly.
+per-node-type rare events (pristine vein, ancient heartwood, moonlit bloom), and the gather
+feedback landed correctly, completely, and cleanly.
 
 ## QA Starter Prompt
 
@@ -40,23 +41,25 @@ do not restart completed work.
 Agent correctness:
 - Verify every deliverable and acceptance criterion against the real code, not the phase
   summary: per-node-type tables keyed by rolled rarity, zone-appropriate tiers, rare+
-  signing matching the corpse precedent, the pristine vein cadence/yield/signing, the
-  broadcast, the deed hook, the loot line and cue.
+  signing matching the corpse precedent, the rare-event cadence/yield/signing across all
+  three flavors (pristine vein, ancient heartwood, moonlit bloom), the per-flavor
+  broadcasts, the deed hooks, the loot line and cue.
 - Run the phase validation commands:
   npx tsc --noEmit
   npx vitest run tests/gather_node_harvest.test.ts tests/professions_rarity_roll.test.ts \
     tests/gathering.test.ts tests/localization_fixes.test.ts tests/architecture.test.ts
 - Exercise the real behavior: in a seeded sim run, harvest nodes across rarities and zones,
-  force a pristine vein through the pinned Rng path, and confirm the signed payloads, the
-  broadcast id and values, and that gatherResult drives the HUD log line and SFX cue.
+  force EACH rare-event flavor through the pinned Rng path (ore, wood, and herb nodes), and
+  confirm the signed payloads, the per-flavor broadcast ids and values, and that
+  gatherResult drives the HUD log line and SFX cue.
 - Probe the phase-specific QA emphasis items listed in this file.
 
 Agent test coverage:
-- Find untested paths: the vein cadence bounds, the zone-1 tier cap, signing at exactly the
-  rare boundary, the deed hook no-op, matcher rows for the broadcast, and the loot line's
-  quality-color mapping.
+- Find untested paths: the event cadence bounds, the node-type-to-flavor mapping, the
+  zone-1 tier cap, signing at exactly the rare boundary, the deed hook no-ops, matcher rows
+  for all three broadcasts, and the loot line's quality-color mapping.
 - Add missing tests, including a determinism test if sim logic changed and none pins the new
-  draw order (same seed, same yields, vein roll included).
+  draw order (same seed, same yields, rare-event roll included).
 - Remove orphaned tests, especially any that still pin the old placeholder junk grants.
 
 Agent dead code and cleanup:
@@ -64,9 +67,9 @@ Agent dead code and cleanup:
   the junk-grant removal.
 - Sim purity: no DOM/Three/render/ui/game/net imports in src/sim/; no Math.random,
   Date.now, or performance.now in sim logic.
-- Leftover TODOs. The pristine vein deed-mark hook is the one sanctioned deferral: verify it
-  is a named, dormant hook (not a stray TODO comment) and that nothing else was left half
-  wired.
+- Leftover TODOs. The per-flavor deed-mark hooks are the one sanctioned deferral: verify
+  they are named, dormant hooks (not stray TODO comments) and that nothing else was left
+  half wired.
 
 Also spawn review agents per the Review Dispatch Matrix in
 docs/professions-2/implementation-plan.md: check git diff --name-only and spawn ONLY
@@ -103,8 +106,8 @@ STOPPING RULES:
 
 ## Phase-specific QA emphasis
 
-- Draw-order stability with the extra vein roll: confirm the determinism pin covers the
-  pristine vein draw, that pre-existing seeded runs still reproduce, and that any re-pin of
+- Draw-order stability with the extra event roll: confirm the determinism pin covers the
+  rare-event draw, that pre-existing seeded runs still reproduce, and that any re-pin of
   prior draws was deliberate and explained in a commit body, never silent.
 - Junk items still exist as defs: `bone_fragments`, `linen_scrap`, and `spider_leg` remain
   valid ItemDefs (players hold them); only their node sources were removed. Verify catalog

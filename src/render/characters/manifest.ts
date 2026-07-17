@@ -644,6 +644,29 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.35,
   },
+  // Training dummy: the immortal practice target (zone3.ts training_dummy,
+  // hpBase 999999, no drops). Custom Tripo humanoid auto-rigged onto the
+  // biped skeleton, KAYKIT_CLIP_PLAN vocabulary. The dummy never casts or
+  // jumps (sim's dummy handling holds it stationary and ability-less), so
+  // those two clips are stripped from the shipped GLB rather than carried as
+  // dead weight. It appears in exactly one hub (zone3.ts, count: 1, radius:
+  // 0), so it is lazy-preloaded rather than joining every client's eager
+  // boot set.
+  mob_training_dummy: {
+    url: `${CREATURES}/training_dummy.glb`,
+    height: 2.3,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+    },
+    lazyPreload: true,
+    tint: 'entity',
+    tintStrength: 0.35,
+  },
   // Deepfen Spearjaw (The Drowned Litany): unused Quaternius raptor rig, a
   // toothy quadruped that reads far more like a swamp predator than the
   // generic wolf fallback (docs/prd/drowned-litany-asset-generation-plan.md).
@@ -1057,6 +1080,7 @@ const MOB_KEYS: Record<string, string> = {
   // Protect Yumi objective cat: the dedicated Meshy familiar
   // (docs/prd/protect-yumi-assets.md item 1, delivered).
   yumi_cat: 'mob_yumi_cat',
+  training_dummy: 'mob_training_dummy',
   emberkin: 'mob_demon',
   gloomshade: 'mob_demon',
   duskborn: 'mob_demon',

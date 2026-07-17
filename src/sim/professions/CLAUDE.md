@@ -19,7 +19,11 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
 - `wheel.ts`: flat per-craft skills (`CraftSkills`, `gainCraftSkill`,
   `tierForSkill`/`tierCapability`, perk-eligibility reads).
 - `crafting.ts`: `craftItem`/`resolveCraft` (all-or-nothing reagent consume,
-  quality roll clamped to the archetype ceiling, skill gain, recipe acquisition).
+  deterministic def-quality outputs plus the single masterwork proc draw,
+  skill gain, recipe acquisition).
+- `masterwork.ts`: the pure masterwork model (`masterworkProcChance`,
+  `masterworkBumpedQuality`, `masterworkBonusStats`); `crafting.ts` consumes
+  it at the one post-consume proc draw per successful craft.
 - `archetype.ts`: the active-archetype state machine (`ArchetypeState`,
   `archetypeCeilingFor`/`craftCeiling`, `getHobbyCraft`, amends-gated switching).
 - `enchanting.ts` / `salvage.ts`: disenchant + apply an enchant onto a SPECIFIC
@@ -58,16 +62,20 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   capped at rare); every other craft caps at common once an archetype is set,
   and everything caps at rare before one is set (`archetype.ts`
   `archetypeCeilingFor`).
-- The ceiling freezes EMPOWERMENT, never the raw-capability climb: output
-  quality is clamped to the ceiling and a recipe tiered ABOVE the ceiling
-  grants zero skill, but at or below the ceiling the ordinary progress curve
-  runs off raw capability unchanged (`crafting.ts` `resolveCraft`; pinned by
-  `tests/archetype_ceiling.test.ts` and `tests/professions_skill.test.ts`).
+- The ceiling freezes EMPOWERMENT, never the raw-capability climb: outputs
+  are deterministic at the def quality and the ceiling instead gates the
+  masterwork bump (a dormant craft never procs; a hobby or pre-attunement
+  craft cannot bump past rare) and skill gain (a recipe tiered ABOVE the
+  ceiling grants zero skill), but at or below the ceiling the ordinary
+  progress curve runs off raw capability unchanged (`crafting.ts`
+  `resolveCraftForRecipe`; pinned by `tests/archetype_ceiling.test.ts` and
+  `tests/professions_skill.test.ts`).
 
 ## Wire + persistence names (settled)
-- Snapshot deltas: `prof` (the `professionsState` view) and `gprof`
-  (`gatheringProficiency`), diff-sent; the terse-key maps and `ALL_DELTA_KEYS`
-  are pinned in `tests/snapshots.test.ts`.
+- Snapshot deltas: `prof` (`professionsState`), `gprof`
+  (`gatheringProficiency`), and atomic `cprof` (`craftingIdentity`, including
+  craft skills and attunement), all diff-sent. The terse-key maps and
+  `ALL_DELTA_KEYS` are pinned in `tests/snapshots.test.ts`.
 - Persistence (JSONB on the character save row, `server/db.ts`):
   `gatheringProficiency` is the current key (preferred on read, always
   written); `professions` is the legacy pre-rename key, still dual-written on

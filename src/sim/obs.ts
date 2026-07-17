@@ -1,6 +1,15 @@
 import { CLASSES, ITEMS, QUEST_ORDER, QUESTS, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from './data';
 import type { Sim } from './sim';
-import { angleTo, dist2d, type Entity, GCD, MAX_LEVEL, normAngle, xpForLevel } from './types';
+import {
+  angleTo,
+  dist2d,
+  type Entity,
+  GCD,
+  MAX_LEVEL,
+  normAngle,
+  questObjectiveRequired,
+  xpForLevel,
+} from './types';
 
 // ---------------------------------------------------------------------------
 // Discrete action space for RL agents.
@@ -235,9 +244,10 @@ export function encodeObs(sim: Sim): number[] {
       const quest = QUESTS[qid];
       let total = 0,
         have = 0;
-      quest.objectives.forEach((obj, i) => {
-        total += obj.count;
-        have += Math.min(qp.counts[i], obj.count);
+      quest.objectives.forEach((_objective, i) => {
+        const required = questObjectiveRequired(quest, qp, i);
+        total += required;
+        have += Math.min(qp.counts[i], required);
       });
       obs.push(total > 0 ? have / total : 0);
     } else {

@@ -12,6 +12,12 @@ server-authoritative, and no existing character lost a recipe.
   normalize pass changes nothing.
 - GLB budget unchanged if no new GLB landed; if one did land, verify the media manifest regen,
   `registerPreload`, and `npm run asset:budget` all hold.
+- The teach-tier gate and the visible ladder (the 2026-07-17 amendment): a below-tier train
+  attempt denies with the localized tier reason; the Train view SHOWS the locked row with
+  its named requirement (never hidden); crossing the threshold flips it to teachable; the
+  hobby craft uses the same thresholds; common recipes never lock; and a KNOWN recipe is
+  never use-gated regardless of skill (drive a real craft to prove the no-admission-gate
+  rule survived the new predicate).
 
 ## QA Starter Prompt
 

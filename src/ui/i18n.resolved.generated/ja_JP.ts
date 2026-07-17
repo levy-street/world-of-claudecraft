@@ -2029,17 +2029,31 @@ export const ja_JP: EnTranslations = {
     "archetypeTitle": {
       "label": "称号",
       "none": "なし",
-      "hobbyLabel": "趣味",
-      "armorcrafting": "防具鍛冶師",
-      "weaponcrafting": "武器鍛冶師",
-      "jewelcrafting": "宝石職人",
-      "alchemy": "錬金術師",
-      "engineering": "工作師",
-      "cooking": "料理人",
-      "inscription": "銘文師",
-      "enchanting": "エンチャンター",
-      "tailoring": "仕立て屋",
-      "leatherworking": "皮革職人"
+      "hobbyLabel": "趣味"
+    },
+    "archetypePair": {
+      "engineering+alchemy": "爆破師",
+      "alchemy+cooking": "薬師",
+      "cooking+leatherworking": "罠師",
+      "leatherworking+tailoring": "装具師",
+      "tailoring+inscription": "魔織師",
+      "inscription+enchanting": "秘術師",
+      "enchanting+jewelcrafting": "宝石付与師",
+      "jewelcrafting+weaponcrafting": "刃鍛冶",
+      "weaponcrafting+armorcrafting": "鍛冶師",
+      "armorcrafting+engineering": "歯車鍛冶"
+    },
+    "craftName": {
+      "armorcrafting": "防具鍛冶",
+      "weaponcrafting": "武器鍛冶",
+      "jewelcrafting": "宝石細工",
+      "alchemy": "錬金術",
+      "engineering": "工作",
+      "cooking": "料理",
+      "inscription": "銘文",
+      "enchanting": "エンチャント",
+      "tailoring": "裁縫",
+      "leatherworking": "皮革加工"
     },
     "crafting": {
       "title": "製作",
@@ -2053,6 +2067,42 @@ export const ja_JP: EnTranslations = {
       "insufficientMaterials": "材料が不足しています。",
       "unknownRecipe": "そのレシピは存在しません。",
       "comboRequirementUnmet": "その組み合わせレシピに必要な両方の生産スキルの熟練度に達していません。",
+      "comboRequires": "調律条件：{craftA} + {craftB}、ティア {tier}。",
+      "comboMet": "準備完了。",
+      "comboSyncing": "サーバーの調律状態を確認しています。",
+      "comboNotAttuned": "先にアーキタイプの組み合わせを選んでください。",
+      "comboWrongPair": "製作するには、この組み合わせを有効にしてください。",
+      "comboTierUnmet": "両方の主専攻を必要ティアまで上げてください。",
+      "professionChoice": "職業の選択",
+      "noProfessionChoice": "現在選択できる職業はありません。",
+      "pairOptionLabel": "{pair} ({craftA} + {craftB})",
+      "attunementPreview": "結果：{title}の称号を獲得し、{majorA}と{majorB}が上限なしの主専攻になります。{hobby}はレア上限の趣味になります。他の技能知識はすべて保持されますが、休眠中はコモン上限です。",
+      "hobbyPreview": "結果：{hobby}がレア上限の趣味になります。二つの主専攻と保持済みの技能値は変わりません。",
+      "identity": {
+        "title": "製作の専門性",
+        "syncing": "サーバーから製作の専門性を受信しています。",
+        "unattuned": "有効なアーキタイプの組み合わせがありません。知識は保持されますが、コンボレシピには調律済みの組み合わせが必要です。",
+        "titleLabel": "称号",
+        "majorsLabel": "主専攻",
+        "hobbyLabel": "趣味",
+        "historyLabel": "履歴",
+        "history": "発見した組み合わせ：{pairs}、完了した復帰：{returns}",
+        "roleMajor": "主専攻",
+        "roleHobby": "趣味",
+        "roleDormant": "休眠中の知識",
+        "roleUnattuned": "未調律",
+        "ceilingUnlimited": "強化上限なし",
+        "ceilingRare": "Rare cap",
+        "ceilingCommon": "コモン上限",
+        "skillAria": "{craft}、技能 {skill}、ティア {tier}、{role}、{ceiling}",
+        "colCraft": "職種",
+        "colSkill": "技能",
+        "colRole": "役割",
+        "colCap": "上限",
+        "tutorial": "最初のティア：いずれかの技を技能 {skill} まで上げます。レシピの成功は他の知識を消さず、その技を成長させます。",
+        "nearTier": "{craft}は次のティアまであと技能 {points} です。",
+        "dormantKnowledge": "{craft}の知識は保持されていますが、その組み合わせか趣味が有効になるまで休眠します。"
+      },
       "notAtHub": "それを製作するには、必要なレベルで製作拠点にいる必要があります。",
       "throttled": "製作が速すぎます。少し待ってからもう一度お試しください。",
       "recipeNotLearned": "そのレシピはまだ習得していません。"
@@ -8818,11 +8868,11 @@ export const ja_JP: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "剣以外にも稼ぎはある",
-        "text": "イーストブルックの誰もが剣以外の生業を持っているものだ、{playerName}。町の周りに鉱脈が散らばっている。つるはしを振るって鉱石を5個持ってきてくれ。自分で採掘するんだぞ、見ればわかる。",
-        "completion": "どうだ？鞄には鉱石、手にはマメだ。旅の道中も採掘、伐採、薬草採取を続けるといい。町に戻ったら、市場そばのタウンフォーカス掲示板と近くの製作台も気にかけてくれ。その気があれば、どれも実入りのいい仕事になる。",
+        "text": "イーストブルックでは誰もが剣のほかに生業を持つ、{playerName}。町の南西、カッパー・ディグ周辺の岩場には鉱脈がある。つるはしを振るい、自分の手で5か所採掘してこい。ごまかしても分かるぞ。",
+        "completion": "どうだ？ 鉱石を採り、手にはまめができた。旅の途中でも採掘、伐採、薬草採集を続けるんだ。町へ戻ったら、市場そばのタウンフォーカス掲示板と近くの製作台も忘れるな。望むなら、どの仕事にもまっとうな稼ぎが待っている。",
         "objectives": {
           "0": {
-            "label": "鉱石のかけら"
+            "label": "鉱脈を採掘"
           }
         }
       },
@@ -9610,21 +9660,31 @@ export const ja_JP: EnTranslations = {
       },
       "q_archetype_acceptance": {
         "title": "己が選ぶべき技",
-        "text": "イーストブルックの職人は皆いずれ、己が選ぶべき一つの技に落ち着く。{playerName}よ、一つの行いで己を証明し、進むべき道を宣言せよ。",
-        "completion": "あなたの道は定まった。その道をしかと歩むがいい。",
+        "text": "技とは知識だ、{playerName}。だが調律は誓いだ。隣り合う二つの技を主専攻として選び、谷で自ら採掘した鉱石を持ってこい。",
+        "completion": "誓いは結ばれた。この二つの技が今やお前の主専攻となり、その反対側の知識が趣味となる。",
+        "objectives": {
+          "0": {
+            "label": "鉱脈を採掘"
+          }
+        }
+      },
+      "q_prof_make_amends": {
+        "title": "償い",
+        "text": "その組み合わせは以前にも身につけていたな、{playerName}。戻ることは新たな誓いではない。谷の道の安全を守り、かつて手が覚えていた感覚を働きながら取り戻せ。",
+        "completion": "昔の感覚が戻った。以前の組み合わせが再び有効になった。",
         "objectives": {
           "0": {
             "label": "フォレストウルフを討伐"
           }
         }
       },
-      "q_prof_make_amends": {
-        "title": "償い",
-        "text": "一つの技を捨て、別の技へと移るには、職人はまず歩まなかった道への償いを果たさねばならぬ、{playerName}よ。",
-        "completion": "償いは果たされた。新たな道があなたに開かれている。",
+      "q_prof_hobby_switch": {
+        "title": "別の嗜み",
+        "text": "主専攻には誓いが要る。趣味が問うのは、好奇心がどこへ向かうかだけだ、{playerName}。薬草をいくつか採集し、二つの主専攻の反対側にある技のうち、どちらを磨くか決めるのだ。",
+        "completion": "気軽な選択だが、役には立つ。その好奇心を、レア品質の仕事に届くところまで追いかけるといい。",
         "objectives": {
           "0": {
-            "label": "フォレストウルフを討伐"
+            "label": "薬草の群生地を採集"
           }
         }
       },

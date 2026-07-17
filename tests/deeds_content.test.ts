@@ -8,10 +8,28 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { POWERUPS } from '../src/sim/content/augments';
 import { DEED_ORDER, DEEDS, DEEDS_ERA } from '../src/sim/content/deeds';
+import { DELVE_MOBS } from '../src/sim/content/delves/mobs';
+import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
 import { FISHING_TABLES } from '../src/sim/content/items';
 import { CRAFT_RING, GATHERING_PROFESSION_IDS } from '../src/sim/content/professions';
-import { DELVES, DUNGEONS, ITEMS, MOBS, NPCS, QUESTS, ZONES } from '../src/sim/data';
-import { MILESTONE_DEED_TO_LEGACY, VISITED_MARK_NAMESPACES } from '../src/sim/deeds';
+import { WARLOCK_PET_MOBS } from '../src/sim/content/warlock_pets';
+import { YUMI_TEMPLATE_ID } from '../src/sim/content/yumi';
+import {
+  DELVES,
+  DUNGEONS,
+  GROUND_OBJECTS,
+  ITEMS,
+  MOBS,
+  NPCS,
+  QUESTS,
+  ZONES,
+} from '../src/sim/data';
+import {
+  GROUND_PICKUP_PROVING_QUESTS,
+  MAX_CREDITABLE_MOB_LEVEL,
+  MILESTONE_DEED_TO_LEGACY,
+  VISITED_MARK_NAMESPACES,
+} from '../src/sim/deeds';
 import { DEED_STAT_KEYS, type DeedCategory, MILESTONES } from '../src/sim/types';
 
 const ALL = DEED_ORDER.map((id) => DEEDS[id]);
@@ -161,6 +179,81 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
         'allowed but re-baselines this hash. If the change is deliberate, regenerate ' +
         'FROZEN_CATALOG_SHA256 with the one-liner in the comment above and commit it here.',
     ).toBe(FROZEN_CATALOG_SHA256);
+  });
+});
+
+describe('retro fallback proof sets stay anchored to the real tables', () => {
+  it('the ground-pickup proving quests are exactly the single-source collect quests', () => {
+    // A quest proves a sparkle pickup only when its collect objective's item
+    // can come from nowhere but the ground pickup path: any mob-loot or
+    // vendor source would break the inference, and interact objectives never
+    // bump the counter at all. Re-derive that set from the live tables and
+    // hold the pin to it, so a new ground object, loot entry, or vendor row
+    // forces a conscious re-decision here.
+    const groundItemIds = new Set(GROUND_OBJECTS.map((g) => g.itemId));
+    const lootItemIds = new Set(
+      Object.values(MOBS).flatMap((m) => (m.loot ?? []).map((l) => l.itemId)),
+    );
+    const vendorItemIds = new Set(Object.values(NPCS).flatMap((n) => n.vendorItems ?? []));
+    const derived: string[] = [];
+    for (const [questId, quest] of Object.entries(QUESTS)) {
+      const proves = quest.objectives.some(
+        (obj) =>
+          obj.type === 'collect' &&
+          groundItemIds.has(obj.itemId) &&
+          !lootItemIds.has(obj.itemId) &&
+          !vendorItemIds.has(obj.itemId),
+      );
+      if (proves) derived.push(questId);
+    }
+    expect([...GROUND_PICKUP_PROVING_QUESTS].sort()).toEqual(derived.sort());
+    // The pickup gate itself requires the item def to carry the quest id, so
+    // every proving quest's evidence chain resolves end to end.
+    for (const questId of GROUND_PICKUP_PROVING_QUESTS) {
+      const quest = QUESTS[questId];
+      expect(quest, questId).toBeDefined();
+      const collect = quest.objectives.find(
+        (o) => o.type === 'collect' && groundItemIds.has(o.itemId),
+      );
+      expect(collect, questId).toBeDefined();
+      const item = ITEMS[(collect as { itemId: string }).itemId];
+      // kind 'quest' is also the non-transferability guarantee: trade
+      // (social/trade.ts), mail (mail/post_office.ts), and the market
+      // (market.ts) all hard-block that kind, so questsDone proves THIS
+      // character performed the pickup, not a trading partner.
+      expect(item?.kind, questId).toBe('quest');
+      expect(item?.questId, questId).toBe(questId);
+      // A repeatable proving quest would weaken nothing, but none exists; a
+      // future one should be reconsidered here rather than slip in.
+      expect(quest.repeatable ?? false, questId).toBe(false);
+    }
+  });
+
+  it('the creditable mob-level ceiling is the heroic pin', () => {
+    // Giantslayer's stranded heal keys on the highest level a creditable mob
+    // can ever spawn at. Heroic instances pin every mob to one shared level;
+    // outside heroic no spawnable template exceeds the player cap. The only
+    // templates authored above the ceiling can never be credited: warlock
+    // pets sync to their owner's level and die outside kill credit
+    // (combat/damage.ts owned-pet early return), and the Yumi cat's damage
+    // is intercepted before the death path (social/yumi.ts).
+    const heroicLevels = Object.values(HEROIC_DUNGEON_TUNING).map((t) => t.level);
+    expect(Math.max(...heroicLevels)).toBe(MAX_CREDITABLE_MOB_LEVEL);
+    const neverCreditable = new Set([...Object.keys(WARLOCK_PET_MOBS), YUMI_TEMPLATE_ID]);
+    for (const [id, m] of Object.entries(MOBS)) {
+      if (m.dummy || m.worldBoss || neverCreditable.has(id)) continue;
+      expect(m.maxLevel, id).toBeLessThanOrEqual(MAX_CREDITABLE_MOB_LEVEL);
+    }
+    // Delve spawns bypass maxLevel: the live level is minLevel plus the
+    // tier's enemyLevelBonus (delves/runs.ts). Guard the whole delve mob
+    // table against the highest bonus any delve ships, so a future tier or
+    // higher-level delve mob cannot silently pass the ceiling.
+    const maxDelveBonus = Math.max(
+      ...Object.values(DELVES).flatMap((d) => d.tiers.map((t) => t.enemyLevelBonus)),
+    );
+    for (const [id, m] of Object.entries(DELVE_MOBS)) {
+      expect(m.minLevel + maxDelveBonus, id).toBeLessThanOrEqual(MAX_CREDITABLE_MOB_LEVEL);
+    }
   });
 });
 

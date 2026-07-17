@@ -1,12 +1,16 @@
 // #1165: the additive per-instance item payload (signer/charges/rolled/boundTo)
 // on InvSlot. Covers the round-trip through save/load, the bag display view-core
 // not crashing on an instanced slot, and instanced items staying inert (never
-// listed) on the World Market.
+// listed) on the World Market. Professions 2.0 Phase 2 adds the masterwork
+// marker (rolled.masterwork plus baked bonus stats): the cases in the second
+// describe pin the additive JSONB back-compat (legacy rolled.quality payloads
+// keep loading and equipping unchanged) and the masterwork payload round-trip.
 
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
+import { isEnchantedInstance } from '../src/sim/professions/enchanting';
 import { Sim } from '../src/sim/sim';
-import type { Entity } from '../src/sim/types';
+import { cloneItemInstancePayload, type Entity, type ItemInstancePayload } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 import { buildBagGrid } from '../src/ui/bags_view';
 
@@ -158,5 +162,168 @@ describe('item-instance payload (#1165)', () => {
     expect(
       sim.meta(seller)?.inventory.some((s) => s.itemId === 'apprentice_staff' && s.instance),
     ).toBe(true);
+  });
+});
+
+describe('masterwork and legacy instance payloads (Professions 2.0 Phase 2 back-compat)', () => {
+  it('a legacy rolled.quality payload still loads, clones without aliasing, and equips unchanged', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: false });
+    // The Phase 2 model retired NEW rolled.quality writes; a persisted legacy
+    // payload (pre-Phase 2 signed craft) must keep loading exactly as saved.
+    sim.addItemInstance('cryptbone_greaves', { rolled: { quality: 'rare' } }, sim.playerId);
+
+    const state = sim.serializeCharacter(sim.playerId)!;
+    const saved = state.inventory.find((s) => s.itemId === 'cryptbone_greaves')!;
+    expect(saved.instance).toEqual({ rolled: { quality: 'rare' } });
+
+    const sim2 = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: false });
+    const pid2 = sim2.addPlayer('warrior', 'Reloaded', { state });
+    const loaded = sim2.meta(pid2)?.inventory.find((s) => s.itemId === 'cryptbone_greaves');
+    expect(loaded?.instance).toEqual({ rolled: { quality: 'rare' } });
+
+    // Non-aliasing: mutating the snapshot's rolled record reaches neither the
+    // live payload nor the loaded copy.
+    saved.instance!.rolled!.quality = 'legendary';
+    expect(
+      sim.meta(sim.playerId)?.inventory.find((s) => s.itemId === 'cryptbone_greaves')?.instance
+        ?.rolled?.quality,
+    ).toBe('rare');
+    expect(loaded?.instance?.rolled?.quality).toBe('rare');
+
+    // Equips unchanged: the legacy quality is inert metadata. The instance
+    // rides into the worn slot intact, and the stat delta is exactly the def's
+    // own line (cryptbone_greaves: armor 48, sta 2), identical to a plain copy.
+    const before = { ...sim.entities.get(sim.playerId)!.stats };
+    sim.equipItem('cryptbone_greaves', sim.playerId);
+    const meta = sim.meta(sim.playerId)!;
+    expect(meta.equipment.legs).toBe('cryptbone_greaves');
+    expect(meta.equipmentInstance?.legs).toEqual({ rolled: { quality: 'rare' } });
+    const after = sim.entities.get(sim.playerId)!.stats;
+    expect(after.armor - before.armor).toBe(48);
+    expect(after.sta - before.sta).toBe(2);
+
+    const plain = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: false });
+    plain.addItem('cryptbone_greaves', 1, plain.playerId);
+    plain.equipItem('cryptbone_greaves', plain.playerId);
+    expect(sim.entities.get(sim.playerId)!.stats).toEqual(
+      plain.entities.get(plain.playerId)!.stats,
+    );
+  });
+
+  it('a masterwork payload round-trips save/load with non-aliasing', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: false });
+    sim.addItemInstance(
+      'apprentice_staff',
+      { signer: 'Aldric', rolled: { masterwork: true, stats: { int: 2, spi: 1 } } },
+      sim.playerId,
+    );
+
+    const state = sim.serializeCharacter(sim.playerId)!;
+    const saved = state.inventory.find((s) => s.itemId === 'apprentice_staff')!;
+    expect(saved.instance).toEqual({
+      signer: 'Aldric',
+      rolled: { masterwork: true, stats: { int: 2, spi: 1 } },
+    });
+
+    const sim2 = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: false });
+    const pid2 = sim2.addPlayer('warrior', 'Reloaded', { state });
+    const loaded = sim2.meta(pid2)?.inventory.find((s) => s.itemId === 'apprentice_staff');
+    expect(loaded?.instance).toEqual({
+      signer: 'Aldric',
+      rolled: { masterwork: true, stats: { int: 2, spi: 1 } },
+    });
+
+    // Non-aliasing: stripping the snapshot's masterwork marker or zeroing its
+    // baked stats reaches neither the live payload nor the loaded copy.
+    saved.instance!.rolled!.masterwork = false;
+    saved.instance!.rolled!.stats!.int = 0;
+    const live = sim.meta(sim.playerId)?.inventory.find((s) => s.itemId === 'apprentice_staff');
+    expect(live?.instance?.rolled?.masterwork).toBe(true);
+    expect(live?.instance?.rolled?.stats?.int).toBe(2);
+    expect(loaded?.instance?.rolled?.masterwork).toBe(true);
+    expect(loaded?.instance?.rolled?.stats?.int).toBe(2);
+  });
+
+  it('cloneItemInstancePayload deep-clones the masterwork marker alongside its stats', () => {
+    const src: ItemInstancePayload = {
+      signer: 'Aldric',
+      rolled: { masterwork: true, stats: { int: 2, spi: 1 } },
+    };
+    const clone = cloneItemInstancePayload(src);
+    expect(clone).toEqual(src);
+    expect(clone.rolled).not.toBe(src.rolled);
+    expect(clone.rolled?.stats).not.toBe(src.rolled?.stats);
+    clone.rolled!.masterwork = false;
+    clone.rolled!.stats!.int = 99;
+    expect(src.rolled?.masterwork).toBe(true);
+    expect(src.rolled?.stats?.int).toBe(2);
+  });
+
+  it('a combined legacy quality + stats + masterwork payload survives save/load intact', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: false });
+    sim.addItemInstance(
+      'apprentice_staff',
+      {
+        signer: 'Aldric',
+        rolled: { quality: 'rare', stats: { spellPower: 5 }, masterwork: true },
+        boundTo: sim.playerId,
+      },
+      sim.playerId,
+    );
+
+    const state = sim.serializeCharacter(sim.playerId)!;
+    const saved = state.inventory.find((s) => s.itemId === 'apprentice_staff');
+    expect(saved?.instance).toEqual({
+      signer: 'Aldric',
+      rolled: { quality: 'rare', stats: { spellPower: 5 }, masterwork: true },
+      boundTo: sim.playerId,
+    });
+
+    const sim2 = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: false });
+    const pid2 = sim2.addPlayer('warrior', 'Reloaded', { state });
+    expect(
+      sim2.meta(pid2)?.inventory.find((s) => s.itemId === 'apprentice_staff')?.instance,
+    ).toEqual({
+      signer: 'Aldric',
+      rolled: { quality: 'rare', stats: { spellPower: 5 }, masterwork: true },
+      boundTo: sim.playerId,
+    });
+  });
+
+  it('the top-level enchant marker survives save/load intact and keeps the copy enchant-guarded', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: false });
+    // The exact post-Phase-2 shape of an enchanted masterwork copy: signer plus
+    // rolled.masterwork plus baked stats plus the authoritative top-level
+    // enchant id (types.ts ItemInstancePayload.enchant). If persistence dropped
+    // the marker, isEnchantedInstance would fall through to the masterwork arm
+    // (NOT enchanted) and a reloaded copy could be enchanted twice.
+    sim.addItemInstance(
+      'apprentice_staff',
+      {
+        signer: 'Aldric',
+        enchant: 'enchant_weapon_might',
+        rolled: { masterwork: true, stats: { int: 2, spi: 1 } },
+      },
+      sim.playerId,
+    );
+
+    const state = sim.serializeCharacter(sim.playerId)!;
+    const saved = state.inventory.find((s) => s.itemId === 'apprentice_staff')!;
+    expect(saved.instance?.enchant).toBe('enchant_weapon_might');
+
+    const sim2 = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: false });
+    const pid2 = sim2.addPlayer('warrior', 'Reloaded', { state });
+    const loaded = sim2.meta(pid2)?.inventory.find((s) => s.itemId === 'apprentice_staff');
+    expect(loaded?.instance).toEqual({
+      signer: 'Aldric',
+      enchant: 'enchant_weapon_might',
+      rolled: { masterwork: true, stats: { int: 2, spi: 1 } },
+    });
+    // The reloaded copy still reads as already enchanted, so the double-enchant
+    // guard holds across a save/load cycle.
+    expect(isEnchantedInstance(loaded!.instance!)).toBe(true);
+    // And the payload cloner carries the marker alongside signer and rolled.
+    const clone = cloneItemInstancePayload(loaded!.instance!);
+    expect(clone.enchant).toBe('enchant_weapon_might');
   });
 });

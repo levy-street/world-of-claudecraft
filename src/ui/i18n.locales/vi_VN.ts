@@ -169,11 +169,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'loading.tips.talents':
     'Mẹo: bạn có thể đặt lại tài năng bất cứ lúc nào ngoài chiến đấu, nên lựa chọn ban đầu không bao giờ là cái bẫy.',
   'entities.items.chunk_of_ore.name': 'Khối Quặng',
-  'entities.quests.q_prof_intro.completion':
-    'Thấy chưa? Quặng trong túi, chai sạn trên tay. Cứ tiếp tục khai khoáng, đốn gỗ và hái thảo dược dọc đường. Khi về thị trấn, nhớ ghé bảng Trọng Tâm Thị Trấn cạnh chợ và bàn chế tác gần đó. Nếu muốn, mọi việc ấy đều có thể thành một nghề kiếm sống đàng hoàng.',
-  'entities.quests.q_prof_intro.objectives.0.label': 'Khối Quặng',
-  'entities.quests.q_prof_intro.text':
-    'Mọi người ở Đông Khê đều làm một nghề bên cạnh việc cầm kiếm, {playerName}. Các mạch quặng nằm rải rác quanh thị trấn, nên hãy vung cuốc và mang về cho ta 5 khối. Tự tay khai thác nhé, ta sẽ biết nếu không phải vậy.',
   'entities.quests.q_prof_intro.title': 'Nghề Cho Mọi Đôi Tay',
   'hudChrome.auth.appleChoiceExpired':
     'Lần đăng nhập bằng Apple đó đã hết hạn. Vui lòng đăng nhập lại bằng Apple.',
@@ -455,16 +450,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.walkUp': 'Hãy đi tới Sân Heo Nái để xem từ khán đài.',
   'hudChrome.archetypeTitle.label': 'Danh hiệu',
   'hudChrome.archetypeTitle.none': 'Không có',
-  'hudChrome.archetypeTitle.armorcrafting': 'Thợ Giáp',
-  'hudChrome.archetypeTitle.weaponcrafting': 'Thợ Rèn Vũ Khí',
-  'hudChrome.archetypeTitle.jewelcrafting': 'Thợ Kim Hoàn',
-  'hudChrome.archetypeTitle.alchemy': 'Nhà Giả Kim',
-  'hudChrome.archetypeTitle.engineering': 'Kỹ Sư',
-  'hudChrome.archetypeTitle.cooking': 'Đầu Bếp',
-  'hudChrome.archetypeTitle.inscription': 'Thợ Khắc Chữ',
-  'hudChrome.archetypeTitle.enchanting': 'Thợ Phù Phép',
-  'hudChrome.archetypeTitle.tailoring': 'Thợ May',
-  'hudChrome.archetypeTitle.leatherworking': 'Thợ Da',
   'entities.itemSets.crownforged.bonus4':
     'Các đòn chí mạng bằng vũ khí của bạn găm Dằm Xương vào mục tiêu, khiến nó chảy máu nhận 8 sát thương mỗi 2 giây trong 12 giây. Cộng dồn tối đa 3 lần.',
   'entities.itemSets.deathlord.bonus4':
@@ -6760,15 +6745,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.mobileCameraJoystick': 'Cần điều khiển máy ảnh',
   'hudChrome.options.mobileLeftHanded': 'Bố cục thuận tay trái',
   'entities.quests.q_archetype_acceptance.title': 'Một nghề để gọi riêng của bạn',
-  'entities.quests.q_archetype_acceptance.text':
-    'Mỗi nghệ nhân của Eastbrook cuối cùng đều định cư trên một nghề thủ công riêng của họ. Hãy chứng tỏ bản thân bằng một hành động duy nhất, {playerName}, và tuyên bố con đường của bạn.',
-  'entities.quests.q_archetype_acceptance.completion': 'Con đường của bạn đã được chọn; đi bộ tốt.',
-  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Sói rừng bị giết',
   'entities.quests.q_prof_make_amends.title': 'Sửa đổi',
-  'entities.quests.q_prof_make_amends.text':
-    'Để dành một nghề cho một nghề khác, trước tiên một nghệ nhân phải sửa đổi con đường đã không đi, {playerName}.',
-  'entities.quests.q_prof_make_amends.completion':
-    'Đã thực hiện sửa đổi; một con đường mới đang mở ra cho bạn.',
   'entities.quests.q_prof_make_amends.objectives.0.label': 'Sói rừng bị giết',
   'entities.npcs.bursar_aldous_crane.greeting':
     'Mọi thùng hàng, rương tiền, và món trang sức đều an toàn trong tay Két Sắt Mạ Vàng.',

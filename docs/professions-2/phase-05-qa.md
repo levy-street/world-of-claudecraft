@@ -12,7 +12,15 @@ parity, and i18n completeness, then fix what the audit finds.
   rationale for the choice exists in the phase notes.
 - The ClientWorld pre-cprof (synced false) empty state: the window must render a sane empty
   state online before the first cprof delta arrives, with no crash, no NaN bars, and no
-  misleading identity claim.
+  misleading identity claim. Distinguish it from the SIMPLIFIED unattuned/pre-first-tier
+  state below: syncing is a wire condition, simplified is a design state; they must not be
+  conflated.
+- The 2026-07-17 amendment deliverables: the absorbed model preserves per-craft role
+  (major/hobby/dormant/unattuned), ceiling, nudges, and tutorial state; the next-unlock
+  and switch-cost lines render from existing reads (switchCount on CraftingIdentityView;
+  no new wire data); the simplified unattuned/pre-first-tier state shows one clear next
+  step and the full ring takes over at first tier or attunement. Probe each with a real
+  render, not a grep.
 
 ## QA Starter Prompt
 

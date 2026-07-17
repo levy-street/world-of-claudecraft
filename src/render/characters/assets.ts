@@ -513,6 +513,33 @@ export function preloadMechAssets(): Promise<void> {
   return mechAssetsPromise;
 }
 
+// Lazy fetch for the Training Dummy (models/creatures/training_dummy.glb):
+// it appears in exactly one hub (zone3.ts, count: 1), so like the mech it is
+// kept out of the eager boot sweep. Unlike the mech, nothing previously
+// triggered this load: Renderer.createView called resolvedGltf() directly
+// and threw "character asset not preloaded" every frame once a dummy became
+// a view candidate, permanently stalling Renderer.sync() (the screen froze
+// while the sim tick and audio, on a separate per-frame path, kept running).
+// Mirrors preloadMechAssets/mechAssetsReady: memoized, no skin/emissive maps
+// needed since the dummy has no cosmetic variants.
+let trainingDummyAssetsPromise: Promise<void> | null = null;
+export function preloadTrainingDummyAssets(): Promise<void> {
+  if (trainingDummyAssetsPromise) return trainingDummyAssetsPromise;
+  const def = VISUALS.mob_training_dummy;
+  if (!def) return Promise.resolve();
+  trainingDummyAssetsPromise = loadGltf(def.url)
+    .then((g) => {
+      gltfByUrl.set(def.url, g);
+    })
+    .then(() => undefined);
+  return trainingDummyAssetsPromise;
+}
+
+export function trainingDummyAssetsReady(): boolean {
+  const def = VISUALS.mob_training_dummy;
+  return !!def && gltfByUrl.has(assetUrl(def.url));
+}
+
 export function mechAssetsReady(): boolean {
   const def = VISUALS.player_mech;
   if (!def || !gltfByUrl.has(assetUrl(def.url))) return false;

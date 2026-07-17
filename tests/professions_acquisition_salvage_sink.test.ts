@@ -35,7 +35,6 @@ const GATED_RECIPE: ProfessionRecipeRecord = {
   resultCount: 1,
   reagents: [{ itemId: 'bone_fragments', count: 1 }],
   skillReq: 0,
-  trivialAt: 25,
   itemLevelBudget: 1,
   level: 1,
   acquisition: ['trainer'],

@@ -10,7 +10,10 @@
 //
 // DOM-free and i18n-free so tests/crafting_view.test.ts can drive it directly.
 
-import { tierCapability } from '../sim/professions/wheel';
+import {
+  type ComboEligibilityReason,
+  comboEligibility,
+} from '../sim/professions/combo_eligibility';
 import type { InvSlot, ItemDef } from '../sim/types';
 
 export interface RecipeDefLike {
@@ -46,6 +49,14 @@ export interface CraftingRecipeRow {
   result?: ItemDef;
   resultCount: number;
   reagents: CraftingReagentRow[];
+  comboRequirement?: {
+    craftA: string;
+    craftB: string;
+    minTier: number;
+    met: boolean | null;
+    reason: ComboEligibilityReason | 'syncing' | null;
+    unmetCrafts: string[];
+  };
   /** True only when every reagent row is satisfied AND (for a combo recipe) the
    *  player's tier capability meets comboRequirement in both named crafts: the
    *  "Craft" action is enabled. */
@@ -54,6 +65,13 @@ export interface CraftingRecipeRow {
 
 export interface CraftingView {
   recipes: CraftingRecipeRow[];
+}
+
+export interface CraftingIdentityLike {
+  synced: boolean;
+  activeArchetype: string | null;
+  pairedMajor: string | null;
+  hobbyCraft: string | null;
 }
 
 function countInInventory(inventory: readonly InvSlot[], itemId: string): number {
@@ -74,6 +92,12 @@ export function buildCraftingView(
   inventory: readonly InvSlot[],
   items: Record<string, ItemDef>,
   craftSkills: Readonly<Record<string, number>> = {},
+  identity: CraftingIdentityLike = {
+    synced: true,
+    activeArchetype: null,
+    pairedMajor: null,
+    hobbyCraft: null,
+  },
 ): CraftingView {
   const rows: CraftingRecipeRow[] = recipes.map((recipe) => {
     const reagentRows: CraftingReagentRow[] = recipe.reagents.map((reagent) => {
@@ -87,10 +111,20 @@ export function buildCraftingView(
       };
     });
     const combo = recipe.comboRequirement;
-    const comboUnmet = combo
-      ? tierCapability(craftSkills, combo.craftA) < combo.minTier ||
-        tierCapability(craftSkills, combo.craftB) < combo.minTier
-      : false;
+    const eligibility = identity.synced
+      ? comboEligibility(combo, { ...craftSkills }, identity)
+      : null;
+    const comboReason: ComboEligibilityReason | 'syncing' | null = identity.synced
+      ? (eligibility?.reason ?? null)
+      : 'syncing';
+    const comboRequirement = combo
+      ? {
+          ...combo,
+          met: eligibility?.ok ?? null,
+          reason: comboReason,
+          unmetCrafts: eligibility?.unmetCrafts ?? [],
+        }
+      : undefined;
     return {
       recipeId: recipe.id,
       professionId: recipe.professionId,
@@ -98,7 +132,8 @@ export function buildCraftingView(
       result: items[recipe.resultItemId],
       resultCount: recipe.resultCount,
       reagents: reagentRows,
-      craftable: reagentRows.every((r) => r.satisfied) && !comboUnmet,
+      ...(comboRequirement ? { comboRequirement } : {}),
+      craftable: reagentRows.every((r) => r.satisfied) && eligibility?.ok !== false,
     };
   });
   return { recipes: rows };

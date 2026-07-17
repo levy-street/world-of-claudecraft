@@ -911,6 +911,13 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // #1121: per-player node harvest command denials (dead gate, unknown node,
     // range, respawn timer, bag-full pre-check).
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/professions/gathering.ts'), 'utf8'),
+    // #2033 (PR 2039): the quest command bodies (accept/share/abandon/turn-in guards +
+    // the accepted/abandoned/completed logs). The two profession-choice denials
+    // ("That profession choice is not available." / "... no longer available.") have
+    // their ONLY emitter occurrences here; the file's other emits are byte-identical
+    // to literals the hud quest matchers already recognize, so a rewording of THIS
+    // file's sites was invisible to the guard before this entry.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/quests/quest_commands.ts'), 'utf8'),
     // Bank system: the pooled bank deposit/withdraw/buy-slots command bodies
     // emit the quest-item/full/afford/max-slots refusals + the purchase notice.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/bank.ts'), 'utf8'),

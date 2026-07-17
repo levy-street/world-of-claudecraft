@@ -2029,17 +2029,31 @@ export const zh_TW: EnTranslations = {
     "archetypeTitle": {
       "label": "稱號",
       "none": "無",
-      "hobbyLabel": "愛好",
-      "armorcrafting": "鍛甲師",
-      "weaponcrafting": "武器匠",
-      "jewelcrafting": "珠寶匠",
-      "alchemy": "煉金師",
-      "engineering": "工程師",
-      "cooking": "廚師",
-      "inscription": "銘文師",
-      "enchanting": "附魔師",
+      "hobbyLabel": "愛好"
+    },
+    "archetypePair": {
+      "engineering+alchemy": "爆破師",
+      "alchemy+cooking": "藥劑師",
+      "cooking+leatherworking": "捕獸人",
+      "leatherworking+tailoring": "製裝師",
+      "tailoring+inscription": "織法師",
+      "inscription+enchanting": "秘法師",
+      "enchanting+jewelcrafting": "縛晶師",
+      "jewelcrafting+weaponcrafting": "鑄刃師",
+      "weaponcrafting+armorcrafting": "鐵匠",
+      "armorcrafting+engineering": "齒輪匠"
+    },
+    "craftName": {
+      "armorcrafting": "護甲鍛造",
+      "weaponcrafting": "武器鍛造",
+      "jewelcrafting": "珠寶設計",
+      "alchemy": "鍊金術",
+      "engineering": "工程學",
+      "cooking": "烹飪",
+      "inscription": "銘文學",
+      "enchanting": "附魔",
       "tailoring": "裁縫",
-      "leatherworking": "製皮師"
+      "leatherworking": "製皮"
     },
     "crafting": {
       "title": "製作",
@@ -2053,6 +2067,42 @@ export const zh_TW: EnTranslations = {
       "insufficientMaterials": "你沒有足夠的材料。",
       "unknownRecipe": "該配方不存在。",
       "comboRequirementUnmet": "你尚未達到該配方所需組合的兩項製造技能等級。",
+      "comboRequires": "調諧要求：{craftA} + {craftB}，階級 {tier}。",
+      "comboMet": "已就緒。",
+      "comboSyncing": "正在檢查伺服器調諧狀態。",
+      "comboNotAttuned": "請先選擇一個原型組合。",
+      "comboWrongPair": "啟用這個確切組合才能製作。",
+      "comboTierUnmet": "將兩項主修技藝提升到所需階級。",
+      "professionChoice": "專業選擇",
+      "noProfessionChoice": "目前沒有可用的專業選擇。",
+      "pairOptionLabel": "{pair} ({craftA} + {craftB})",
+      "attunementPreview": "結果：獲得{title}稱號；{majorA}和{majorB}成為無上限主修技藝；{hobby}成為上限為稀有品質的嗜好技藝；所有其他技能知識都會保留，但休眠時上限為普通品質。",
+      "hobbyPreview": "結果：{hobby}成為上限為稀有品質的嗜好技藝。兩項主修技藝和所有已保留的技能數值維持不變。",
+      "identity": {
+        "title": "製作身分",
+        "syncing": "正在等待伺服器傳送你的製作身分。",
+        "unattuned": "目前未啟用任何原型組合。你的知識會被保留，但組合配方需要先完成調諧。",
+        "titleLabel": "稱號",
+        "majorsLabel": "主修技藝",
+        "hobbyLabel": "嗜好",
+        "historyLabel": "歷史",
+        "history": "已發現 {pairs} 個組合，已完成 {returns} 次回歸",
+        "roleMajor": "主修",
+        "roleHobby": "嗜好",
+        "roleDormant": "休眠知識",
+        "roleUnattuned": "未調諧",
+        "ceilingUnlimited": "無強化上限",
+        "ceilingRare": "Rare cap",
+        "ceilingCommon": "普通品質上限",
+        "skillAria": "{craft}，技能 {skill}，階級 {tier}，{role}，{ceiling}",
+        "colCraft": "專業",
+        "colSkill": "技能",
+        "colRole": "定位",
+        "colCap": "上限",
+        "tutorial": "第一個階級：將一門技藝提升到技能 {skill}。成功完成配方會提升對應技藝，且不會抹去其他知識。",
+        "nearTier": "{craft}距離下一階級還差 {points} 點技能。",
+        "dormantKnowledge": "{craft}知識已保留，但在其組合或嗜好未啟用時處於休眠狀態。"
+      },
       "notAtHub": "必須達到所需等級並位於製作站，才能製作該物品。",
       "throttled": "你製作得太快了，請稍等片刻後再試。",
       "recipeNotLearned": "你還沒有學會這個配方。"
@@ -8818,11 +8868,11 @@ export const zh_TW: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "人人都有一技之長",
-        "text": "伊斯特布魯克的每個人都有除了劍術之外的手藝，{playerName}。鎮子周圍散落著礦脈，去揮鎬採上5塊礦石帶給我。要親自採，別耍花招，我看得出來。",
-        "completion": "看到了吧？礦石進了包裡，手上也磨出了繭子。繼續在路上採礦、伐木、採藥，回到鎮上時，留意市場旁的城鎮專注面板和附近的製作台。只要你願意，靠這些都能正經謀生。",
+        "text": "東溪人人除了舞刀弄劍，還得有門手藝，{playerName}。鎮子西南的銅礦坑周圍岩石裡有礦脈。拿起礦鎬，親手開採5處；別想蒙我，我看得出差別。",
+        "completion": "看吧？礦石採到了，手上也磨出了繭。趕路時繼續採礦、伐木和採藥；回城後，別忘了市場旁的城鎮專注告示板和附近的製作台。只要你願意，這些手藝都能換來公道的生計。",
         "objectives": {
           "0": {
-            "label": "礦石塊"
+            "label": "已開採礦脈"
           }
         }
       },
@@ -9610,21 +9660,31 @@ export const zh_TW: EnTranslations = {
       },
       "q_archetype_acceptance": {
         "title": "屬於你自己的技藝",
-        "text": "東溪的每一位工匠最終都會選定一門屬於自己的技藝。用一件事證明自己吧，{playerName}，宣告你的道路。",
-        "completion": "你的道路已經選定；願你走得穩當。",
+        "text": "技藝是學識，{playerName}，而調諧是一份承諾。選擇兩門相鄰的技藝作為你的主修，再把你親手從谷地礦脈中採出的礦石帶給我。",
+        "completion": "承諾已經立下。這兩門技藝現為你的主修，與它們相對的技藝則成為你的嗜好。",
+        "objectives": {
+          "0": {
+            "label": "已開採礦脈"
+          }
+        }
+      },
+      "q_prof_make_amends": {
+        "title": "彌補",
+        "text": "你曾掌握過這組技藝，{playerName}。重拾舊途並非新的誓言。去幫忙清理谷地道路，讓勞作喚醒雙手曾經熟悉的節奏。",
+        "completion": "昔日的節奏回來了。你曾經的那組技藝再次生效。",
         "objectives": {
           "0": {
             "label": "擊敗森林之狼"
           }
         }
       },
-      "q_prof_make_amends": {
-        "title": "彌補",
-        "text": "若要放下一門技藝、轉投另一門，工匠必須先為放棄的道路做出彌補，{playerName}。",
-        "completion": "彌補已經完成；一條新的道路已向你敞開。",
+      "q_prof_hobby_switch": {
+        "title": "別樣消遣",
+        "text": "主修技藝需要誓言。嗜好只問你的好奇心將去往何處，{playerName}。採集一些草藥，然後決定要鑽研哪一門與主修技藝相對的手藝。",
+        "completion": "這是個輕鬆些卻很實用的選擇。追隨這份好奇心，直到稀有品質的作品所能抵達之處。",
         "objectives": {
           "0": {
-            "label": "擊敗森林之狼"
+            "label": "採集草藥叢"
           }
         }
       },

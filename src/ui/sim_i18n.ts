@@ -85,6 +85,10 @@ const baseEnTable = {
   'error.corpseNothingToHarvest': 'That corpse has nothing to harvest.',
   'error.gatherNodeMissing': 'That resource node does not exist.',
   'error.gatherNodeNotRespawned': 'This resource node has not respawned for you yet.',
+  // Profession-choice quest denials (src/sim/quests/quest_commands.ts): the archetype
+  // pair or hobby selection fails validation on quest accept or again at turn-in.
+  'error.professionChoiceUnavailable': 'That profession choice is not available.',
+  'error.professionChoiceExpired': 'That profession choice is no longer available.',
   'error.townFocusNotInTown': 'You must be in town to set your focus.',
   'error.townFocusOverBudget': 'That allocation exceeds your focus point budget.',
   'error.townFocusInvalid': 'Invalid focus allocation.',

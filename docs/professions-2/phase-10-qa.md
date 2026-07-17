@@ -16,6 +16,12 @@ component collision fix, and the pinned economy invariant.
   inscription, and enchanting stay shallow).
 - Economy invariant decisiveness: the test must enumerate EVERY recipe (not a sample) and
   price vendor reagents at their purchase price, not their sell price.
+- The 2026-07-17 amendment deliverables: every rare recipe consumes at least one
+  lower-tier material family (cross-tier composition); cooking and alchemy carry
+  combat-worthy consumables at EVERY tier; the perfect specimen component rides
+  rollCorpseMaterialRarity and is always signed at rare+; and the materialTierBonus hook
+  is wired with pinned values at the crafting.ts call site (higher-tier materials raise
+  the proc chance, the cap and the drawCounts pins stay green).
 
 ## QA Starter Prompt
 

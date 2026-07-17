@@ -155,7 +155,12 @@ export type { WorldInteractionOutcome } from './world_api/interaction';
 export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
 export type { MarketInfo, MarketListingView } from './world_api/market';
 export type { PartyInfo, PartyMemberAura, PartyMemberInfo } from './world_api/party';
-export type { CraftResultView, PlayerProfessionsView, RecipeDef } from './world_api/professions';
+export type {
+  CraftingIdentityView,
+  CraftResultView,
+  PlayerProfessionsView,
+  RecipeDef,
+} from './world_api/professions';
 export type {
   DevLeaderboardEntry,
   GuildLeaderboardEntry,

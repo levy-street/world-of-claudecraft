@@ -12,6 +12,7 @@ import {
   disenchantItem,
   disenchantYield,
   isDisenchantable,
+  isEnchantedInstance,
   resolveApplyEnchant,
   resolveDisenchant,
 } from '../src/sim/professions/enchanting';
@@ -424,6 +425,131 @@ describe('applyEnchant', () => {
     expect(result.reason).toBe('insufficient_materials');
     expect(sim.countItem('arcane_dust', pid)).toBe(3);
     expect(sim.countItem('recruit_tunic', pid)).toBe(1);
+  });
+});
+
+// Phase 2 (Professions 2.0 masterwork model): a masterwork proc copy carries
+// rolled.masterwork + baked rolled.stats WITHOUT an enchant, so the old
+// bare-stats-presence guard would have wrongly locked it out of enchanting.
+// The authoritative predicate is now isEnchantedInstance (the explicit
+// `enchant` marker, or the legacy bare-stats arm), the enchant merges stats
+// ADDITIVELY, and double-enchant stays blocked for old and new copies alike.
+describe('isEnchantedInstance (the Phase 2 guard predicate)', () => {
+  it('distinguishes enchanted copies from masterwork and plain crafted copies', () => {
+    // Marker-carrying (new) enchanted copy.
+    expect(isEnchantedInstance({ enchant: 'enchant_weapon_might' })).toBe(true);
+    // Legacy enchanted copy: bare rolled.stats, predating the marker.
+    expect(isEnchantedInstance({ rolled: { stats: { str: 5 } } })).toBe(true);
+    // Masterwork copy: rolled.stats WITH rolled.masterwork is the baked bonus,
+    // not an enchant, so it must stay enchantable.
+    expect(
+      isEnchantedInstance({ signer: 'Tester', rolled: { masterwork: true, stats: { str: 2 } } }),
+    ).toBe(false);
+    // Crafted rare signed copy (legacy rolled.quality shape): never enchanted.
+    expect(isEnchantedInstance({ signer: 'Tester', rolled: { quality: 'rare' } })).toBe(false);
+    // Empty payload: not enchanted.
+    expect(isEnchantedInstance({})).toBe(false);
+  });
+});
+
+describe('applyEnchant on a Phase 2 masterwork copy', () => {
+  // The exact crafting.ts masterwork grant shape: signer + rolled.masterwork +
+  // baked bonus stats, no rolled.quality, no enchant marker.
+  const MASTERWORK_PAYLOAD = {
+    signer: 'Tester',
+    rolled: { masterwork: true, stats: { str: 2, sta: 1 } },
+  };
+
+  it('a masterwork instance is enchantable: baked and enchant stats both survive, additively', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    sim.ctx.addItemInstance('moggers_copper_cudgel', structuredClone(MASTERWORK_PAYLOAD), pid);
+    expect(sim.ctx.countEnchantableItem('moggers_copper_cudgel', pid)).toBe(1);
+    sim.addItem('arcane_dust', 5, pid);
+    const result = resolveApplyEnchant(
+      sim.ctx,
+      pid,
+      'moggers_copper_cudgel',
+      'enchant_weapon_might',
+    );
+    expect(result.ok).toBe(true);
+    const meta = sim.ctx.resolve(pid)?.meta;
+    const slot = meta?.inventory.find((s) => s.itemId === 'moggers_copper_cudgel');
+    // enchant_weapon_might is +5 str (pinned to a literal earlier in this
+    // file): the baked str 2 and the enchant str 5 SUM, and the baked sta 1
+    // (untouched by the enchant) rides along, not overwritten.
+    expect(slot?.instance?.rolled?.stats).toEqual({ str: 7, sta: 1 });
+    expect(slot?.instance?.rolled?.masterwork).toBe(true);
+    expect(slot?.instance?.signer).toBe('Tester');
+    expect(slot?.instance?.enchant).toBe('enchant_weapon_might');
+    // The masterwork copy never carried rolled.quality and the enchant must
+    // not invent one (Phase 2 retired rolled.quality for new writes).
+    expect(slot?.instance?.rolled?.quality).toBeUndefined();
+  });
+
+  it('an enchanted masterwork copy cannot be enchanted again (double-enchant stays blocked)', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    sim.ctx.addItemInstance('moggers_copper_cudgel', structuredClone(MASTERWORK_PAYLOAD), pid);
+    sim.addItem('arcane_dust', 5, pid);
+    expect(
+      resolveApplyEnchant(sim.ctx, pid, 'moggers_copper_cudgel', 'enchant_weapon_might').ok,
+    ).toBe(true);
+    // The enchanted masterwork copy is no longer an eligible target.
+    expect(sim.ctx.countEnchantableItem('moggers_copper_cudgel', pid)).toBe(0);
+    sim.addItem('arcane_dust', 5, pid);
+    const second = resolveApplyEnchant(
+      sim.ctx,
+      pid,
+      'moggers_copper_cudgel',
+      'enchant_weapon_might',
+    );
+    expect(second.ok).toBe(false);
+    expect(second.reason).toBe('not_held');
+    // The copy itself is untouched by the denial: still exactly one, still
+    // carrying the merged record.
+    expect(sim.countItem('moggers_copper_cudgel', pid)).toBe(1);
+  });
+
+  it('equipping the enchanted masterwork copy applies def, baked, and enchant stats together', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    // moggers_copper_cudgel is a rare def, level-gated on equip
+    // (item_level_req.ts): level to the cap first so the equip gate passes.
+    while (sim.player.level < 20) sim.grantXp(xpForLevel(sim.player.level));
+    const baseStr = sim.player.stats.str;
+    const baseSta = sim.player.stats.sta;
+    sim.ctx.addItemInstance('moggers_copper_cudgel', structuredClone(MASTERWORK_PAYLOAD), pid);
+    sim.addItem('arcane_dust', 5, pid);
+    expect(
+      resolveApplyEnchant(sim.ctx, pid, 'moggers_copper_cudgel', 'enchant_weapon_might').ok,
+    ).toBe(true);
+    // Pin the def's own contribution so the +10/+3 breakdowns below stay
+    // honest against a content re-tune.
+    expect(ITEMS.moggers_copper_cudgel.stats).toEqual({ str: 3, sta: 2 });
+    sim.equipItem('moggers_copper_cudgel');
+    // str: def 3 + baked masterwork 2 + enchant 5; sta: def 2 + baked 1.
+    expect(sim.player.stats.str).toBe(baseStr + 10);
+    expect(sim.player.stats.sta).toBe(baseSta + 3);
+  });
+
+  it('a legacy enchanted copy (bare rolled.stats, no marker) is still excluded from re-enchanting', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    // The pre-marker enchanted payload shape: bare rolled.stats, no `enchant`
+    // field, no masterwork flag. The legacy predicate arm must keep it
+    // excluded so old saves cannot be double-enchanted either.
+    sim.ctx.addItemInstance('eastbrook_arming_sword', { rolled: { stats: { str: 5 } } }, pid);
+    expect(sim.ctx.countEnchantableItem('eastbrook_arming_sword', pid)).toBe(0);
+    sim.addItem('arcane_dust', 5, pid);
+    const result = resolveApplyEnchant(
+      sim.ctx,
+      pid,
+      'eastbrook_arming_sword',
+      'enchant_weapon_might',
+    );
+    expect(result.ok).toBe(false);
+    expect(result.reason).toBe('not_held');
   });
 });
 

@@ -26,6 +26,9 @@ build on stations that already exist, gate correctly, and are provably placed sa
   and `CASTER_HUB_RECIPES` (three) which carry `requiresHubStation: true` today, `COMBO_RECIPES`.
 - `src/sim/content/zone1.ts`: `ZONE1_NPCS` (`trader_wilkes` is the NpcDef exemplar with
   `vendorItems`, `questIds`, `greeting`), `ZONE1_MOBS` (`aggroRadius`), `ZONE1_CAMPS`.
+- `src/sim/content/zone2.ts` (`ZONE2_NPCS`, the Fenbridge hub) and `src/sim/content/zone3.ts`
+  (`ZONE3_NPCS`, the Highwatch hub): the out-of-hub masters live here per the 2026-07-17
+  placement ruling in `state.md`.
 - `src/sim/types.ts`: `NpcDef`, `CampDef` (`mobId`, `center`, `radius`, `count`), `MobTemplate`
   (`aggroRadius`), the CAMPS draw-order determinism contract on `WorldContent`.
 - `src/ui/world_entity_i18n.ts`: entity name i18n registration (`tEntity` resolution path) for the
@@ -65,7 +68,9 @@ Spawn one Explore agent to read and summarize:
   src/sim/content/recipes.ts (COMMON_RECIPES, TOOL_RECIPES, CASTER_HUB_RECIPES, COMBO_RECIPES,
   every requiresHubStation carrier)
 - src/sim/content/zone1.ts (ZONE1_NPCS with trader_wilkes as the NpcDef exemplar, ZONE1_MOBS
-  aggroRadius, ZONE1_CAMPS) and the NpcDef / CampDef / MobTemplate shapes in src/sim/types.ts
+  aggroRadius, ZONE1_CAMPS), src/sim/content/zone2.ts (ZONE2_NPCS) and src/sim/content/zone3.ts
+  (ZONE3_NPCS) for the out-of-hub masters, and the NpcDef / CampDef / MobTemplate shapes in
+  src/sim/types.ts
 - src/ui/world_entity_i18n.ts (entity-name i18n registration path)
 - src/sim/CLAUDE.md, src/sim/content/CLAUDE.md, src/sim/professions/CLAUDE.md, src/ui/CLAUDE.md
   (the S3 matcher duty), tests/CLAUDE.md
@@ -102,25 +107,37 @@ Agent sim deliverables:
   recipe requires standing at its stationType. Deny with a STABLE reason id (for example
   'station_required' carrying the stationType value); add the matching t() key (English only)
   and the sim_i18n matcher rule in the SAME change (S3 duty).
+- Retire the level gate: the STATIONS registry replaces CRAFTING_HUB_MIN_LEVEL and no
+  station gate reads player level (the 2026-07-17 placement ruling); migrate or retire
+  canUseCraftingHubStation's level arm with its consumers and prove no recipe strands.
 - FIELD_RECIPES: a named set that is exactly the nine existing COMMON_RECIPES ids today. The T
   window keeps working for them everywhere.
 - Mobile crafting station goes live: an active station (isStationActive) satisfies the station
-  gate; the placement command becomes reachable (dev-gated or specialization-gated, following the
-  existing perk command pattern); update the inert-module header in mobile_station.ts to describe
-  the now-wired state.
+  gate; the placement command becomes reachable, SPECIALIZATION-gated per the locked decision
+  (the 75-skill perk is the craft-anywhere unlock beat; an additional dev-command path for
+  testing is fine), following the existing perk command pattern; update the inert-module header
+  in mobile_station.ts to describe the now-wired state.
 
 Agent content deliverables:
-- Six master NpcDefs in ZONE1_NPCS, one per station type: a smith at the forge (covers both
-  weaponcrafting and armorcrafting, matching the Smith pair), a cook at the kitchens, an
-  alchemist at the apothecary, a leatherworker at the tannery, a tailor at the loom, and
-  engineering's toolwright at the toolworks. Follow the trader_wilkes exemplar shape.
+- Six master NpcDefs, one per station type, spread across the three zone hubs per the
+  2026-07-17 placement ruling in state.md: in the zone 1 hub (ZONE1_NPCS) the smith at the
+  forge (covers both weaponcrafting and armorcrafting, matching the Smith pair), the cook
+  at the kitchens, the tailor at the loom, and engineering's toolwright at the toolworks,
+  so every wave-one archetype keeps a zone-1 anchor master; the leatherworker's tannery
+  roots in Fenbridge (ZONE2_NPCS); the alchemist's apothecary roots in Highwatch
+  (ZONE3_NPCS, keeping the #1297 crafting-hub lore without its level gate). Follow the
+  trader_wilkes exemplar shape. The maintainer may reshuffle the assignment in PR review
+  (a data-only move); flag it in the PR body beside the naming pass.
 - Each master: a real name and title and greeting registered through the entity i18n path
   (src/ui/world_entity_i18n.ts, tEntity); starter vendorItems (base tools and reagents, stock
   only, training UX is Phase 9); an EMPTY questIds hook array for Phase 14.
 - Names are content flavor the maintainer may rename (state.md OPEN item); make them real, not
   lorem, and note the naming-pass flag in the PR body.
-- Station placements: guard-safe town locations inside the zone 1 hub, each master beside its
-  station; reuse CRAFTING_HUB_STATIONS coordinates where they are already guard-safe.
+- Station placements: guard-safe town locations inside each hosting hub, each master beside
+  its station. CRAFTING_HUB_STATIONS offsets are ZONE-3 coordinates (offsets from
+  CRAFTING_HUB_POS at the Highwatch hub, per src/sim/content/professions.ts): they may seed
+  only the Highwatch apothecary placement; the Eastbrook and Fenbridge placements are new
+  coordinates. (The level-gate retirement itself is the sim agent's deliverable above.)
 - Adding the masters must NOT shift the shared Rng draw order (the CAMPS append-only contract;
   NPC creation draws no rng).
 
@@ -129,9 +146,13 @@ Agent tests deliverables:
   tests/professions_station_placement.test.ts): derived from spawn CONTENT, not hardcoded
   distances. For every profession NPC and every STATIONS record, distance to every hostile camp
   (mob template aggroRadius > 0) must exceed camp.radius plus the template's aggroRadius plus a
-  buffer. Choose the buffer as the strictest value every existing town NPC already satisfies and
-  document it in the test; prove the test can fail by temporarily moving one master next to a
-  camp, observing the failure, then restoring.
+  buffer, derived PER ZONE (a Fenbridge master checks against zone 2 camps, the Highwatch
+  master against zone 3 camps). Choose the buffer as the strictest value every existing town
+  NPC already satisfies and document it in the test; prove the test can fail by temporarily
+  moving one master next to a camp, observing the failure, then restoring.
+- A master-to-zone assignment pin: the state.md default (four archetype anchors in zone 1;
+  tannery in Fenbridge; apothecary in Highwatch) pinned as literals so an accidental move
+  fails the test; a deliberate maintainer reshuffle re-pins with a commit-body note.
 - Gate tests (extend tests/professions_crafting_hub.test.ts or a sibling): an uncommon+ recipe
   denies with the stable station reason id away from its station and succeeds at it; each of the
   nine FIELD_RECIPES crafts away from any station; a recipe denies at the WRONG station type;
@@ -195,11 +216,15 @@ STEP 5 - ACCEPTANCE CRITERIA (do not mark complete until all check):
 - [ ] FIELD_RECIPES is exactly the nine pre-phase COMMON_RECIPES ids; all nine craft anywhere and
       the T window works for them everywhere
 - [ ] Six masters exist with entity i18n names/titles/greetings, starter vendorItems, empty
-      questIds hooks, placed guard-safe beside their stations
+      questIds hooks, placed guard-safe beside their stations across the three hubs per the
+      state.md assignment (four archetype anchors in zone 1; tannery in Fenbridge;
+      apothecary in Highwatch), with the assignment pinned by a test
 - [ ] The placement-safety test is green AND proven: it fails when a master is moved next to a
       hostile spawn (mutation tried and reverted)
 - [ ] The mobile crafting station perk is live: isStationActive satisfies the gate, the placement
-      command is reachable, the inert-module header is updated
+      command is reachable and SPECIALIZATION-gated, the inert-module header is updated
+- [ ] CRAFTING_HUB_MIN_LEVEL is retired: no station gate reads player level, and no recipe
+      strands in the transition (pinned)
 - [ ] Every recipe craftable before this phase remains craftable (station or field); nothing
       strands
 - [ ] All STEP 3 validation commands green; no BLOCKING review finding open
@@ -210,9 +235,10 @@ STEP 6 - DOC UPDATES + MEMORY:
   diffs against the phase-start commit).
 - Update docs/professions-2/state.md: the "New surfaces per phase" Phase 8 entry gains the
   station registry module and StationType union, the stationType recipe field, the FIELD_RECIPES
-  set, the six master NPC ids, the deny reason id and its i18n key namespace, the mobile-station
-  activation command, and the placement test file name. Amend "Key existing surfaces" where
-  requiresHubStation / CRAFTING_HUB_STATIONS statements went stale.
+  set, the six master NPC ids with their zone assignment, the deny reason id and its i18n key
+  namespace, the mobile-station activation command, and the placement test file name. Amend
+  "Key existing surfaces" where requiresHubStation / CRAFTING_HUB_STATIONS /
+  CRAFTING_HUB_MIN_LEVEL statements went stale.
 - Record surprises (gate order gotchas, rng draw-order traps, naming decisions) to memory.
 
 STEP 7 - FINAL RESPONSE FORMAT:

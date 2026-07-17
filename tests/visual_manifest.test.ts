@@ -144,6 +144,20 @@ describe('character visual manifest', () => {
     ).toEqual([]);
   });
 
+  it('points the training dummy manifest at clips present in the GLB, with cast/jump deliberately absent', async () => {
+    const visual = VISUALS.mob_training_dummy;
+    const animationNames = await glbAnimationNames(`public/${visual.url}`);
+
+    expect(animationNames.size).toBeGreaterThan(0);
+    expect(
+      [...new Set(expectedClipNames(visual.clips))].filter((name) => !animationNames.has(name)),
+    ).toEqual([]);
+    expect(visual.clips.cast).toBeUndefined();
+    expect(visual.clips.jump).toBeUndefined();
+    expect(animationNames.has('Cast')).toBe(false);
+    expect(animationNames.has('Jump')).toBe(false);
+  });
+
   it('points the baked wolf visuals (form_cat, mob_wolf, greyjaw) at clips in their GLBs', async () => {
     const byUrl = new Map<string, Set<string>>();
     for (const key of ['form_cat', 'mob_wolf', 'greyjaw'] as const) {

@@ -278,12 +278,13 @@ describe('active-quest objective areas (the classic POI blobs)', () => {
   // quest-area branch exercises real content rather than a synthetic fixture.
   function requireKillQuestInZone() {
     for (const q of Object.values(QUESTS)) {
-      const obj = q.objectives.find((o) => o.type === 'kill' && o.targetMobId);
-      if (!obj) continue;
-      const camp = CAMPS.find(
-        (c) => c.mobId === obj.targetMobId && c.center.z >= ZONE.zMin && c.center.z < ZONE.zMax,
-      );
-      if (camp) return { quest: q, camp };
+      for (const obj of q.objectives) {
+        if (obj.type !== 'kill') continue;
+        const camp = CAMPS.find(
+          (c) => c.mobId === obj.targetMobId && c.center.z >= ZONE.zMin && c.center.z < ZONE.zMax,
+        );
+        if (camp) return { quest: q, camp };
+      }
     }
     throw new Error('expected a kill quest with a camp in the first zone');
   }

@@ -2463,6 +2463,22 @@
     max-height: none;
     overflow: hidden;
   }
+  /* The LIST owns the tracks (rows subgrid into it, see components.css), so the
+     tighter mobile template lands on the list; the cap column wraps below. */
+  body.mobile-touch .profession-skill-list {
+    grid-template-columns: minmax(82px, 1fr) 34px minmax(68px, auto);
+  }
+  body.mobile-touch .profession-skill-row > :last-child {
+    grid-column: 1 / -1;
+  }
+  /* The cap value wraps to its own line per row on mobile (no cap column
+     exists), so the Cap column header would float over nothing: hide it. */
+  body.mobile-touch .profession-skill-header > :last-child {
+    display: none;
+  }
+  body.mobile-touch .qd-profession-choice select {
+    min-height: 40px;
+  }
   body.mobile-touch .dev-command-header {
     padding: 10px 54px 9px 12px;
   }

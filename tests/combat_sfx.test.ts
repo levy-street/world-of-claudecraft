@@ -311,6 +311,19 @@ describe('combat SFX policy', () => {
     }
   });
 
+  it('stages a real, buffered idle clip for every family in MOB_VOICE_CUES', () => {
+    // Iterates the live catalog (not a hardcoded template-id table) so a
+    // future 14th family is automatically covered; the `satisfies` clause on
+    // MOB_VOICE_CUES only forces a cue STRING at compile time, not that a
+    // clip is actually staged, which is what this asserts at runtime.
+    const families = Object.entries(MOB_VOICE_CUES);
+    expect(families).toHaveLength(13);
+    for (const [family, cues] of families) {
+      expect(cues.idle, family).toBe(`mob_${family}_idle`);
+      expect(cues.idle in SFX_CLIPS, cues.idle).toBe(true);
+    }
+  });
+
   it('keeps MOB_VOICE_CUES in lockstep with the real family list', () => {
     // A family added to one and forgotten in the other resolves at runtime
     // to a key with no clip: no error, it just plays nothing.

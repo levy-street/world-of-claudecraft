@@ -8,8 +8,8 @@
 // mirror produce identical output, and (unlike world.entities) none of it is
 // interest-radius limited: a camp far across the zone still resolves.
 
-import { CAMPS, GROUND_OBJECTS, MOBS, NPCS, QUESTS } from './data';
-import type { QuestObjective, QuestProgress } from './types';
+import { CAMPS, GATHER_NODES, GROUND_OBJECTS, MOBS, NPCS, QUESTS } from './data';
+import { type QuestObjective, type QuestProgress, questObjectiveRequired } from './types';
 
 /** Identity of one quest objective (the map tooltip resolves its localized
  *  label + live counts from this; the pure layers never carry text). */
@@ -37,15 +37,21 @@ const POINT_AREA_RADIUS = 6;
 // and 'done' quests contribute nothing (the '?' turn-in marker guides those).
 function incompleteObjectives(
   questLog: ReadonlyMap<string, QuestProgress>,
-): { questId: string; objectiveIndex: number; obj: QuestObjective }[] {
-  const out: { questId: string; objectiveIndex: number; obj: QuestObjective }[] = [];
+): { questId: string; objectiveIndex: number; obj: QuestObjective; required: number }[] {
+  const out: {
+    questId: string;
+    objectiveIndex: number;
+    obj: QuestObjective;
+    required: number;
+  }[] = [];
   for (const qp of questLog.values()) {
     if (qp.state !== 'active') continue;
     const quest = QUESTS[qp.questId];
     if (!quest) continue;
     quest.objectives.forEach((obj, i) => {
-      if ((qp.counts[i] ?? 0) < obj.count)
-        out.push({ questId: qp.questId, objectiveIndex: i, obj });
+      const required = questObjectiveRequired(quest, qp, i);
+      if ((qp.counts[i] ?? 0) < required)
+        out.push({ questId: qp.questId, objectiveIndex: i, obj, required });
     });
   }
   return out;
@@ -82,7 +88,7 @@ export function questObjectivesForMob(
 ): MobQuestObjective[] {
   const out: MobQuestObjective[] = [];
   const loot = MOBS[mobTemplateId]?.loot;
-  for (const { questId, objectiveIndex, obj } of incompleteObjectives(questLog)) {
+  for (const { questId, objectiveIndex, obj, required } of incompleteObjectives(questLog)) {
     const advances =
       (obj.type === 'kill' && obj.targetMobId === mobTemplateId) ||
       (obj.type === 'collect' &&
@@ -93,8 +99,8 @@ export function questObjectivesForMob(
     out.push({
       questId,
       objectiveIndex,
-      current: Math.min(qp?.counts[objectiveIndex] ?? 0, obj.count),
-      total: obj.count,
+      current: Math.min(qp?.counts[objectiveIndex] ?? 0, required),
+      total: required,
     });
   }
   return out;
@@ -164,6 +170,11 @@ export function questObjectiveAreas(
       const npc = obj.targetNpcId ? NPCS[obj.targetNpcId] : undefined;
       // fresh {x,z}: never alias the shared NPCS content the sim places from
       if (npc) push(ref, { x: npc.pos.x, z: npc.pos.z }, POINT_AREA_RADIUS);
+    } else if (obj.type === 'gather' && obj.nodeType) {
+      for (const node of GATHER_NODES) {
+        if (node.type === obj.nodeType)
+          push(ref, { x: node.pos.x, z: node.pos.z }, POINT_AREA_RADIUS);
+      }
     }
   }
   return out;

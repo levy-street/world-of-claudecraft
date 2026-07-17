@@ -1864,8 +1864,10 @@ function questCollectTurnIn(): Scenario {
       const sim = rec.sim as AnySim;
       const p = sim.player as AnyEntity;
       const quest = QUESTS.q_boars;
-      const item = quest.objectives[0].itemId as string; // boar_hide
-      const need = quest.objectives[0].count; // 5
+      const objective = quest.objectives[0];
+      if (objective.type !== 'collect') throw new Error('q_boars must collect boar_hide');
+      const item = objective.itemId;
+      const need = objective.count; // 5
       const npc = [...sim.entities.values()].find(
         (e: AnyEntity) => e.kind === 'npc' && e.templateId === quest.giverNpcId,
       ) as AnyEntity | undefined;
@@ -4085,6 +4087,91 @@ function cardDuel(): Scenario {
   };
 }
 
+// Professions 2.0 craft path (Phase 2 masterwork model). The parity net had ZERO
+// craft coverage (grep craft: no hits before this), so the whole craft
+// rng/draw-order/event contract was invisible to the goldens. This scenario pins
+// it permanently in one deterministic sequence with a snapshot after each craft:
+//  1. a DENIAL (no materials) draws no rng and stamps an ok:false lastCraftResult;
+//  2. a plain deterministic craft (recipe_minor_healing_potion) draws EXACTLY ONE
+//     rng at the retired-quality-roll position -- the masterwork proc roll -- and,
+//     because a consumable (potion) def can never masterwork, grants the def
+//     quality (common) with no masterwork effect;
+//  3. a masterwork PROC craft (recipe_eastbrook_ritual_vestments) fires the proc:
+//     it mints a signed instance carrying rolled.masterwork + the baked tier-delta
+//     stats, emits the personal `masterwork` SimEvent, and stashes
+//     PlayerMeta.lastMasterwork -- the whole point of the scenario;
+//  4. one more plain craft so the golden shows the draw stream continuing normally
+//     (one draw per successful craft) after the proc.
+// All setup runs in drive() so the rng observer catches every draw. The craft path
+// draws ctx.rng, which is the shared this.rng the recorder observes, so the single
+// proc draw per successful craft lands in the draw-order digest and the denial adds
+// none. Total observed draws: 3 (one per successful craft; the denial draws zero).
+//
+// Seed HUNTED (bounded scan from seed 1 upward over this exact drive sequence, not
+// committed) so the vestments proc draw lands under the capped 15 percent
+// masterwork chance and the proc fires inside the recorded run; only the found
+// literal is pinned here. Spare seeds 23 and 34 were also verified to fire the proc
+// for this drive.
+function professionsCraft(seed = 21): Scenario {
+  return {
+    name: 'professions_craft',
+    coverage: [
+      'class:warrior (crafter)',
+      'craft denial (insufficient_materials): draws zero rng, lastCraftResult ok:false',
+      'plain craft (recipe_minor_healing_potion): one masterwork-proc draw, no masterwork effect (consumable def), lastCraftResult quality common',
+      'masterwork proc craft (recipe_eastbrook_ritual_vestments, tailoring major @ skill 200): the single proc draw fires',
+      'masterwork effect: signed instance rolled.masterwork + baked tier-delta stats, masterwork SimEvent, PlayerMeta.lastMasterwork',
+      'lastCraftResult mirror fields (quality + masterwork?) on a proc',
+      'post-proc plain craft: the draw stream continues (one draw per successful craft)',
+    ],
+    build: () => new Sim({ seed, playerClass: 'warrior', autoEquip: false }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const pid = sim.playerId as number;
+      const meta = sim.players.get(pid) as any;
+      rec.notes.pid = pid;
+
+      // Phase 1: DENIAL. No materials held -> insufficient_materials; the denial
+      // path returns before the proc draw, so it draws zero rng.
+      sim.craftItem('recipe_minor_healing_potion', pid);
+      rec.snapshot('craft-denied');
+
+      // Phase 2: plain deterministic craft. The single proc draw happens on the
+      // success path, but a consumable (potion) def can never masterwork, so the
+      // effect is gated off; the output is the def quality (common).
+      sim.addItem('linen_scrap', 1, pid);
+      sim.addItem('spider_leg', 1, pid);
+      sim.craftItem('recipe_minor_healing_potion', pid);
+      rec.snapshot('craft-plain');
+
+      // Phase 3: masterwork PROC. Tailoring as the active archetype (a MAJOR craft,
+      // unlimited empowerment ceiling) at skill 200 (tier 8, far above the recipe's
+      // tier 0) plus the self-signed consumed reagent push the proc chance to the
+      // capped 0.15; the equippable uncommon int/spi vestments pass the effect gate
+      // (uncommon bumps to rare, under the major ceiling), so the hunted seed's
+      // single proc draw fires the effect.
+      sim.acceptArchetypeQuest('tailoring');
+      meta.craftSkills.tailoring = 200;
+      // The one self-signed linen scrap satisfies the whole linen requirement (the
+      // #1145 minus-one reduction composes with the #1134 specialization discount:
+      // 3 -> 2 -> floor(2 * 0.8) = 1) and feeds the signed-reagent proc-chance
+      // input (any-signed since the 2026-07-17 ruling; a self-signed copy still
+      // qualifies), mirroring the crafting suite's proc test.
+      sim.addItemInstance('linen_scrap', { signer: meta.name }, pid);
+      sim.addItem('spider_leg', 1, pid);
+      sim.craftItem('recipe_eastbrook_ritual_vestments', pid);
+      rec.snapshot('craft-masterwork');
+
+      // Phase 4: one more plain craft so the golden shows the draw stream continuing
+      // normally (one draw) after the proc.
+      sim.addItem('linen_scrap', 1, pid);
+      sim.addItem('spider_leg', 1, pid);
+      sim.craftItem('recipe_minor_healing_potion', pid);
+      rec.snapshot('craft-plain-2');
+    },
+  };
+}
+
 export const SCENARIOS: Scenario[] = [
   soloWarrior(),
   soloMage(),
@@ -4138,4 +4225,5 @@ export const SCENARIOS: Scenario[] = [
   g1bXpPrestige(),
   playerTrade(),
   chatSocial(),
+  professionsCraft(),
 ];

@@ -2,7 +2,9 @@
 
 Phase 8 landed the typed station registry and master NPC records in sim and server; this phase
 makes them real to players. Stations render as visible props in the world, show on the minimap,
-and their masters teach recipes for gold through a Train view, while a grandfathering step
+and their masters teach recipes for gold through a Train view that is skill-tier gated with a
+visible locked-row ladder (the 2026-07-17 amendment: the RuneScape-style unlock ladder,
+delivered on the LEARNING side, never on use), while a grandfathering step
 backfills every pre-existing recipe as known so acquisition goes live without stranding anyone.
 It is its own slice because it is the presentation-and-wire half of stations: the sim/server
 truth exists (Phase 8), and the recipe ladder content that depends on live training is Phase 10.
@@ -10,7 +12,8 @@ truth exists (Phase 8), and the recipe ladder content that depends on live train
 ## Context pointers
 
 - `docs/professions-2/state.md`: locked decisions binding this phase (acquisition via
-  `acquireRecipe`, the grandfathering rule, training fee tuning targets, hands vs stations),
+  `acquireRecipe`, the grandfathering rule, training fee AND teach-tier tuning targets, hands
+  vs stations, the 2026-07-17 skill-tier training ruling),
   the validation matrix, and the Phase 8 "New surfaces" entry (station registry, master NpcDefs).
 - `docs/professions-2/progress.md`: current status and the Phase 8 handoff.
 - `docs/professions-2/implementation-plan.md`: review dispatch matrix and design-language
@@ -37,8 +40,8 @@ truth exists (Phase 8), and the recipe ladder content that depends on live train
 ```
 This is Phase 09 of the Professions 2.0 feature: Station presence and recipe training.
 Model: Opus 4.8, xhigh effort. Harness: Claude Code.
-Goal: make stations visible places whose masters teach recipes for fees, and turn recipe
-acquisition on without stranding any existing character.
+Goal: make stations visible places whose masters teach recipes for fees behind a visible
+skill-tier ladder, and turn recipe acquisition on without stranding any existing character.
 
 STEP 0 - PRE-FLIGHT:
 - Sync with the LATEST release branch FIRST: git fetch origin "+refs/heads/release/*:refs/remotes/origin/release/*"; pick
@@ -91,7 +94,10 @@ Agent ui deliverables:
 - The master dialog gains a Train view on the vendor window family (src/ui/hud/vendor/): a
   DOM-free pure view core (registered in UI_PURE_CORES if it is a new module) plus a thin
   write-elided painter, following the heroic vendor variant as the extension template.
-- Rows show the recipe, the fee (formatMoney), and known/teachable state; the Train action
+- Rows show the recipe, the fee (formatMoney), and a KNOWN / TEACHABLE / LOCKED tri-state.
+  Locked rows are the visible ladder (2026-07-17 ruling): always SHOWN, grayed, with their
+  requirement named ("Taught at <craft> 50"), never hidden; crossing the threshold is the
+  unlock moment the ladder points at. The Train action
   issues the IWorld command; denial reasons render through the server/sim matcher keys.
 - Every player-visible string is an English-only t() key in the matching
   src/ui/i18n.catalog/<domain>.ts module; mobile rules per src/styles/CLAUDE.md (a deliberate
@@ -103,11 +109,19 @@ Agent sim/wire deliverables:
   command online), with the parity pin updated in tests/world_api_parity.test.ts in the same
   change. Verify liveness, not just member shape (the 2033 stub trap).
 - Server validation in the command dispatch (server/game.ts): proximity to the master's
-  station, fee affordable and charged, recipe teachable at this master; on success grant via
+  station, fee affordable and charged, recipe teachable at this master, AND the skill-tier
+  gate (the 2026-07-17 ruling): a master teaches a recipe only when tierForSkill(the
+  player's craft skill) >= tierForSkill(the recipe's skillReq), the general predicate, so
+  the wave-one ladder is common always, uncommon at 25, rare at 50, and any
+  higher-skillReq recipe a later phase authors gates by the same formula with no extra
+  rule (the state.md teach-tier tuning target). Hobby crafts use the same thresholds. The gate is
+  on LEARNING only; known recipes are never use-gated (the no-admission-gate rule stands
+  untouched). On success grant via
   acquireRecipe. Fee and grant resolve SERVER-side; the client never decides. Fees follow the
   state.md tuning targets (common tier free, uncommon 25s, rare 1g) and are a gold sink.
 - Denial reasons are emitted as stable ids the client matcher re-localizes (S3 duty, in the
-  SAME change).
+  SAME change), including the tier denial (for example 'train_tier_unmet' carrying the
+  craft and the required skill value).
 - Grandfathering: a normalize-on-load step backfills every recipe id that existed before this
   phase as known, for offline saves and server-persisted state alike; deterministic and
   idempotent (running it twice changes nothing).
@@ -116,8 +130,13 @@ Agent sim/wire deliverables:
 
 Agent tests deliverables:
 - Train command tests: the happy path (fee charged exactly once, recipe known after), the
-  denial paths (out of range, insufficient gold, not teachable at this master, already known),
-  and replay/idempotency (a resent or duplicated command cannot double-charge or double-grant).
+  denial paths (out of range, insufficient gold, not teachable at this master, already known,
+  BELOW the teach tier), and replay/idempotency (a resent or duplicated command cannot
+  double-charge or double-grant).
+- Teach-tier gate tests: a below-tier player is denied with the stable tier reason and sees
+  the locked row; crossing the threshold flips the row to teachable; the hobby craft uses
+  the same thresholds; common recipes never lock; a known recipe is NEVER use-gated
+  regardless of skill (pin the no-admission-gate rule against the new predicate).
 - A grandfather test on a legacy save fixture (a pre-phase state blob with craftable recipes
   and no acquisition records) proving nothing is lost. This test is the phase gate.
 - The minimap marker variant tested against BOTH host shapes (tests/minimap_markers.test.ts).
@@ -171,7 +190,7 @@ STEP 3 - VALIDATION + MULTI-AGENT REVIEW:
 
 STEP 4 - COMMIT CADENCE (explicit paths, never git add -A; every commit carries a body):
 - feat(render): station presence (stations module, master NPC keys, minimap marker variant)
-- feat(professions): recipe training command with server-side fee and grant, plus
+- feat(professions): skill-tier-gated recipe training with server-side fee and grant, plus
   grandfathering
 - feat(ui): the Train view on the vendor window family
 - docs(professions-2): Phase 9 progress, state surfaces, and screenshots
@@ -183,6 +202,9 @@ STEP 5 - ACCEPTANCE CRITERIA (do not mark complete until all check):
       tier-identical, tested against both host shapes.
 - [ ] Opening the master presents the Train view; learning a recipe charges the fee and grants
       it via acquireRecipe in BOTH the offline Sim and the online ClientWorld.
+- [ ] The Train view shows locked rows with their named requirement; a below-tier train
+      attempt denies with the localized tier reason; crossing the tier makes the row
+      teachable (the visible ladder); a known recipe is never use-gated regardless of skill.
 - [ ] Fees match the state.md tuning targets (common free, uncommon 25s, rare 1g), are charged
       server-side as a gold sink, and a replayed command cannot double-charge or double-grant.
 - [ ] Every character that existed before this phase knows every recipe it could previously
@@ -198,7 +220,8 @@ STEP 6 - DOC UPDATES + MEMORY:
 - Update docs/professions-2/progress.md (Phase 9 checklist and status, plus the phase-start
   commit for the QA diff) and docs/professions-2/state.md: the "New surfaces per phase" list
   gains Phase 9 (src/render/stations.ts; the station minimap marker variant; the trainRecipe
-  facet member and wire command; the grandfather normalize step; the Train view i18n key
+  facet member and wire command; the teach-tier predicate and its denial id; the grandfather
+  normalize step; the Train view i18n key
   namespace; the trained-not-known recipe default). Resolve or explicitly defer the OPEN item
   "exact FIELD_RECIPES membership" (the default stands: the 9 common recipes stay
   field-craftable) and record the outcome in state.md.

@@ -57,6 +57,9 @@ describe('reviewed localization semantics', () => {
     });
   }
 
+  // Pinned on a stable ITEM name rather than quest prose: the q_prof_intro
+  // rewrite (PR 2039) retired the old quest text these pins used to read, and
+  // quest prose churns with content work while the item name does not.
   const eastbrookNames: Record<string, string> = {
     da_DK: 'Østbæk',
     nl_NL: 'Oostbeek',
@@ -65,23 +68,23 @@ describe('reviewed localization semantics', () => {
 
   for (const [locale, expectedName] of Object.entries(eastbrookNames)) {
     it(`${locale} uses its established Eastbrook place name`, () => {
-      const value = translation(locale, 'entities.quests.q_prof_intro.text');
+      const value = translation(locale, 'entities.items.eastbrook_arming_sword.name');
       expect(value).toContain(expectedName);
       expect(value).not.toContain('Eastbrook');
     });
   }
 
+  // The q_prof_intro rewrite (PR 2039) removed the stale Latin-script fills
+  // for the reworded completion (they sit pending until the release-time
+  // locale fill), so only the non-Latin locales, freshly filled in the same
+  // change, carry a reviewed translation to pin today. Re-add the Latin rows
+  // here when the i18n-locale-fill pass translates the new text.
   const professionEndings: Record<string, string> = {
-    da_DK: 'Der er et hæderligt levebrød i det alt sammen, hvis du ønsker det.',
-    es: 'En esos oficios te espera una vida honrada, si la quieres.',
-    fr_FR: 'Tout cela peut vous offrir un gagne-pain honorable, si le cœur vous en dit.',
-    id_ID: 'Semua itu bisa menjadi mata pencaharian yang layak, jika kamu menginginkannya.',
-    it_IT: 'C’è un mestiere onesto in tutto questo, se ti interessa.',
-    ko_KR: '원한다면 이 모든 일로 떳떳하게 생계를 꾸릴 수 있다네.',
-    pt_BR: 'Dá para ganhar a vida honestamente com tudo isso, se você quiser.',
-    sv_SE: 'Det går att försörja sig hederligt på alltihop, om du vill.',
-    zh_CN: '只要你愿意，靠这些都能正经谋生。',
-    zh_TW: '只要你願意，靠這些都能正經謀生。',
+    ja_JP: '望むなら、どの仕事にもまっとうな稼ぎが待っている。',
+    ko_KR: '원한다면 이 모든 일에서 정당한 생계를 찾을 수 있다네.',
+    ru_RU: 'эти занятия обеспечат честный заработок.',
+    zh_CN: '只要你愿意，这些手艺都能换来公道的生计。',
+    zh_TW: '只要你願意，這些手藝都能換來公道的生計。',
   };
 
   for (const [locale, expectedEnding] of Object.entries(professionEndings)) {

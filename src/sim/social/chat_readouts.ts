@@ -46,6 +46,7 @@ import {
   isFormAuraKind,
   MAX_LEVEL,
   MELEE_RANGE,
+  questObjectiveRequired,
   xpForLevel,
 } from '../types';
 import { groundHeight } from '../world';
@@ -417,7 +418,10 @@ export function questReadout(meta: PlayerMeta): string {
     const quest = QUESTS[qid];
     if (!quest) continue;
     const objs = quest.objectives
-      .map((o, i) => `${o.label} ${Math.min(qp.counts[i] ?? 0, o.count)}/${o.count}`)
+      .map((o, i) => {
+        const required = questObjectiveRequired(quest, qp, i);
+        return `${o.label} ${Math.min(qp.counts[i] ?? 0, required)}/${required}`;
+      })
       .join(', ');
     const tag = qp.state === 'ready' ? ' (ready)' : '';
     lines.push(`${quest.name}${tag} — ${objs}`);

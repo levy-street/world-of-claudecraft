@@ -56,6 +56,15 @@ starter prompt.
 
 Waves for orientation: phases 1 to 7 are the fun kernel (visibility, truth,
 and the first taste of identity); phases 8 to 15 are wave one (stations,
-content, quests, polish). Wave 2+ work (market instance carriage, commissions,
-Jack of All Trades, monster proficiency, salvage UI, battlefield experience)
-is tracked on epic #1866, not in this packet.
+content, quests, polish). End of Phase 7 is the vertical-slice checkpoint:
+the Phase 7 QA session plays the eight-step journey end to end (gather a
+rare event, craft, watch skill move, receive the Guild letter, visit the
+letter's named quest giver and attune via the quest flow (smith_haldren
+stands in until the Phase 8 masters land), celebrate a masterwork, trade
+it) before wave one begins. Ordering relief: Phase 6 depends on Phases 2
+and 4, NOT on Phase 5, so it may run ahead of the wheel window if the
+design-language rollout stalls Phase 5 (the state.md OPEN item).
+Wave 2+ work (market instance carriage, commissions, Jack of All Trades,
+monster proficiency, battlefield experience) is tracked on epic #1866, not
+in this packet; salvage wiring moved INTO Phase 13 by the 2026-07-17
+design-review amendments recorded in state.md.
