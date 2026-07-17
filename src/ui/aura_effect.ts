@@ -62,6 +62,11 @@ const flatStat = (statKey: string, value: number): AuraEffectDescriptor => ({
  */
 export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor | null {
   switch (a.kind) {
+    // dot/hot render the CAST-TIME snapshot `value` at the base `tickInterval`: a stable
+    // baseline, not the live per-tick number. A dynamic dot/hot's real tick amount tracks
+    // the caster's current power and its cadence tracks their haste (combat/periodic_tick.ts),
+    // neither of which rides on the aura; a fully live tooltip would need the caster's current
+    // stats plumbed into the UI and is a deliberate follow-up.
     case 'dot':
       return {
         key: `${KEY}.dot`,

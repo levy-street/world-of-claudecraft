@@ -90,13 +90,37 @@ export function directHealBonus(spellPower: number, castTimeSec: number): number
   return Math.round(spellPower * directSpellCoeff(castTimeSec));
 }
 
+// The scaling rating a periodic aura's power rider (and its haste) read from:
+// Ranged AP for hunter attack-spells, melee AP for physical bleeds, else Spell Power.
+// Pairs with abilityScalingPower (which reads the actual number off the entity).
+export type TickPowerStat = 'spell' | 'ranged' | 'melee';
+export function abilityPowerStat(def: AbilityDef): TickPowerStat {
+  if (def.scalesWith === 'ranged') return 'ranged';
+  if (def.school === 'physical') return 'melee';
+  return 'spell';
+}
+
+// Per-tick power COEFFICIENT for a DoT: multiply the caster's CURRENT scaling power
+// (abilityScalingPower) by this to get the flat rider added to one tick. Folds the
+// AP-vs-SP scale-down in, so it is the reusable core dotTickBonus rounds. Exposed so a
+// dynamic DoT can recompute its rider from live Spell/Attack Power every tick.
+export function dotTickCoeff(def: AbilityDef, durationSec: number, intervalSec: number): number {
+  const ticks = intervalSec > 0 ? Math.max(1, durationSec / intervalSec) : 1;
+  return (dotTotalCoeff(durationSec) / ticks) * powerScale(def);
+}
+
+// Per-tick power coefficient for a HoT: the DoT coefficient with no AP scale-down,
+// since HoTs are pure Spell-Power healing. The reusable core hotTickBonus rounds.
+export function hotTickCoeff(durationSec: number, intervalSec: number): number {
+  const ticks = intervalSec > 0 ? Math.max(1, durationSec / intervalSec) : 1;
+  return dotTotalCoeff(durationSec) / ticks;
+}
+
 // Flat bonus added to ONE HoT tick: the total DoT coefficient (duration / 15)
 // split across its ticks, scaling off Spell Power. Mirrors dotTickBonus but never
 // takes the AP scale-down, since HoTs are pure healing.
 export function hotTickBonus(spellPower: number, durationSec: number, intervalSec: number): number {
-  const ticks = intervalSec > 0 ? Math.max(1, durationSec / intervalSec) : 1;
-  const coeff = dotTotalCoeff(durationSec) / ticks;
-  return Math.round(spellPower * coeff);
+  return Math.round(spellPower * hotTickCoeff(durationSec, intervalSec));
 }
 
 // Flat bonus added to ONE channel tick (e.g. each Arcane Missile / Mind Flay tick).
@@ -114,7 +138,5 @@ export function dotTickBonus(
   durationSec: number,
   intervalSec: number,
 ): number {
-  const ticks = intervalSec > 0 ? Math.max(1, durationSec / intervalSec) : 1;
-  const coeff = dotTotalCoeff(durationSec) / ticks;
-  return Math.round(power * coeff * powerScale(def));
+  return Math.round(power * dotTickCoeff(def, durationSec, intervalSec));
 }

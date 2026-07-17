@@ -20,9 +20,13 @@
 // stay verbatim and in place: reordering either guard, the loop, or any draw forks the
 // shared rng stream for every later draw.
 //
-// This slice draws NO rng of its own. Its only rng-bearing callee is ctx.dealDamage
-// (the DoT tick), reached through the seam. updateGroundAoEs / pulseGroundAoE are NOT
-// here: pulseGroundAoE STAYS on Sim (a shared entry point), and its per-tick driver was
+// DoTs and HoTs are fully DYNAMIC (periodic_tick.ts): each firing tick recomputes its
+// amount from the caster's CURRENT stats (so a Spell/Attack Power buff instantly lifts
+// active dots, no recast), scales the tick RATE by the caster's haste (duration fixed),
+// and rolls ONE crit per tick against the shared Rng. So this slice now DOES draw rng:
+// exactly one draw per firing dot/hot tick, in the backward aura-walk order, plus the
+// draws inside ctx.dealDamage. updateGroundAoEs / pulseGroundAoE are NOT here:
+// pulseGroundAoE STAYS on Sim (a shared entry point), and its per-tick driver was
 // already extracted to entity_roster (tickGroundAoEs) by E1.
 //
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
@@ -32,6 +36,12 @@ import { recalcPlayerStats } from '../entity';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
+import {
+  periodicCritChance,
+  periodicCritMult,
+  periodicTickAmount,
+  periodicTickInterval,
+} from './periodic_tick';
 import { tickThornsCooldown } from './thorns_charge';
 
 // Friendly NPCs reject hostile control / debuff auras: any aura of these kinds is
@@ -151,16 +161,11 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
     if (a.tickInterval) {
       a.tickTimer = (a.tickTimer ?? a.tickInterval) - DT;
       if (a.tickTimer <= CAST_COMPLETE_EPS) {
-        a.tickTimer += a.tickInterval;
+        // Haste raises the tick rate: re-arm with the caster's live hasted interval
+        // (base interval for a haste-less or mob source, so their cadence is unchanged).
+        const src = ctx.entities.get(a.sourceId) ?? null;
+        a.tickTimer += periodicTickInterval(a, src);
         if (a.kind === 'dot') {
-          let tickDamage = a.value;
-          if (a.school === 'physical') {
-            let bleedAmp = 0;
-            for (const targetAura of e.auras) {
-              if (targetAura.kind === 'bleed_vuln') bleedAmp += pctValue(targetAura.value);
-            }
-            if (bleedAmp > 0) tickDamage = Math.round(tickDamage * (1 + bleedAmp));
-          }
           ctx.emit({
             type: 'spellfx',
             sourceId: a.sourceId,
@@ -168,11 +173,29 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             school: a.school,
             fx: 'tick',
           });
+          // Dynamic per-tick amount off the caster's CURRENT stats, then one crit roll.
+          // Only a PLAYER source's dot can crit: mob dot affixes (venom, soulrot, bleed,
+          // frostbite, smolder, cinder, arcaneRot, stackPoison) stay non-critting so this
+          // remains a talent-balance change, not a PvE difficulty bump. The roll is still
+          // drawn unconditionally (chance(0) consumes one rng value), so the draw order is
+          // identical whatever the source; a mob roll simply never lands.
+          let tickDamage = periodicTickAmount(a, src);
+          if (a.school === 'physical') {
+            let bleedAmp = 0;
+            for (const targetAura of e.auras) {
+              if (targetAura.kind === 'bleed_vuln') bleedAmp += pctValue(targetAura.value);
+            }
+            if (bleedAmp > 0) tickDamage = Math.round(tickDamage * (1 + bleedAmp));
+          }
+          const crit = ctx.rng.chance(
+            src?.kind === 'player' ? periodicCritChance(a, src, ctx.spellCrit) : 0,
+          );
+          const dealt = crit ? Math.round(tickDamage * periodicCritMult(a)) : tickDamage;
           ctx.dealDamage(
-            ctx.entities.get(a.sourceId) ?? null,
+            src,
             e,
-            tickDamage,
-            false,
+            dealt,
+            crit,
             a.school,
             a.name,
             'hit',
@@ -182,27 +205,33 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             // mob's leash anchor, so a DoT-kited mob still leashes home.
             false,
           );
-          if (a.leechPct !== undefined) {
-            const src = ctx.entities.get(a.sourceId);
-            if (src && !src.dead) {
-              const healed = Math.min(Math.round(tickDamage * a.leechPct), src.maxHp - src.hp);
-              if (healed > 0) {
-                src.hp += healed;
-                ctx.emit({
-                  type: 'heal2',
-                  sourceId: src.id,
-                  targetId: src.id,
-                  amount: healed,
-                  crit: false,
-                  ability: a.name,
-                });
-                ctx.healingThreat(src, src, healed);
-              }
+          if (a.leechPct !== undefined && src && !src.dead) {
+            const healed = Math.min(Math.round(dealt * a.leechPct), src.maxHp - src.hp);
+            if (healed > 0) {
+              src.hp += healed;
+              ctx.emit({
+                type: 'heal2',
+                sourceId: src.id,
+                targetId: src.id,
+                amount: healed,
+                crit: false,
+                ability: a.name,
+              });
+              ctx.healingThreat(src, src, healed);
             }
           }
           if (e.dead) return;
         } else if (a.kind === 'hot') {
-          const healed = Math.min(Math.round(a.value * ctx.healingTakenMult(e)), e.maxHp - e.hp);
+          // Dynamic HoT: live per-tick amount + a crit roll (heals crit at 1.5x). The
+          // roll is drawn whenever the tick fires (even at full hp) to keep the shared
+          // rng stream deterministic regardless of the target's health. HoTs always crit
+          // off SPELL crit (never physical), so this inlines spellCrit on purpose rather
+          // than periodicCritChance; do not "fix" it to the dot helper. Gated to a living
+          // PLAYER source, matching the dot path (mob-cast hots stay non-critting).
+          const amount = periodicTickAmount(a, src);
+          const crit = ctx.rng.chance(src?.kind === 'player' && !src.dead ? ctx.spellCrit(src) : 0);
+          const raw = crit ? Math.round(amount * 1.5) : amount;
+          const healed = Math.min(Math.round(raw * ctx.healingTakenMult(e)), e.maxHp - e.hp);
           if (healed > 0) {
             e.hp += healed;
             ctx.emit({
@@ -210,10 +239,9 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
               sourceId: a.sourceId,
               targetId: e.id,
               amount: healed,
-              crit: false,
+              crit,
               ability: a.name,
             });
-            const src = ctx.entities.get(a.sourceId);
             if (src) ctx.healingThreat(src, e, healed);
           }
         } else if (a.kind === 'polymorph') {

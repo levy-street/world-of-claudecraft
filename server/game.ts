@@ -805,9 +805,11 @@ interface WireAura {
   kind: string;
   rem: number;
   dur: number;
-  // The aura's magnitude, so buff/debuff hover tooltips show the REAL numbers online, exactly
-  // as offline (the descriptor in src/ui/aura_effect.ts reads value per kind: flat stat amount,
-  // slow/haste multiplier, dot/hot per-tick, absorb remaining, ...). Sent RAW (like `dur`, not
+  // The aura's magnitude, so buff/debuff hover tooltips read the same number online as offline
+  // (the descriptor in src/ui/aura_effect.ts reads value per kind: flat stat amount, slow/haste
+  // multiplier, dot/hot per-tick, absorb remaining, ...). For a dynamic dot/hot this magnitude is
+  // the CAST-TIME snapshot (a stable baseline); the live per-tick amount and hasted cadence track
+  // the caster's current stats and are not re-sent per tick. Sent RAW (like `dur`, not
   // round2) so the exact number and its sign survive JSON: round2 could turn a tiny negative
   // into -0 -> 0 and flip a stat-sap's isAuraDebuff classification. Omitted only when exactly 0,
   // which decodes back to 0, so value-less auras and an old server are unchanged.
@@ -919,8 +921,9 @@ function wireAura(a: Aura): WireAura {
     rem: round2(a.remaining),
     dur: a.duration,
   };
-  // Carry the aura's magnitude so buff/debuff hover tooltips show the real numbers online,
-  // not 0 (the descriptor in src/ui/aura_effect.ts reads value per kind). Sent RAW (like
+  // Carry the aura's magnitude so buff/debuff hover tooltips read a number online, not 0 (the
+  // descriptor in src/ui/aura_effect.ts reads value per kind; for a dynamic dot/hot it is the
+  // cast-time snapshot baseline, not the live per-tick amount). Sent RAW (like
   // `dur`, not round2) so the exact number and its sign survive JSON, keeping a negative
   // stat-sap's isAuraDebuff classification intact (round2 could turn a tiny negative into
   // -0 -> 0). Omitted only when exactly 0, which decodes back to 0, so value-less auras and

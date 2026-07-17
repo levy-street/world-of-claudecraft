@@ -327,6 +327,16 @@ export interface Aura {
   value3?: number; // imbue: judgement max
   tickInterval?: number;
   tickTimer?: number;
+  // Dynamic dot/hot recompute (updateAuras). A dot/hot's live per-tick damage is
+  // tickBase (the static rank/talent amount) PLUS the caster's CURRENT power rider,
+  // round(scalingPower * tickPowerCoeff), recomputed every tick, so a dot tracks live
+  // Spell/Attack Power buffs without a recast. tickPowerStat selects which rating the
+  // rider (and the haste that raises the tick RATE) read. All three are absent on auras
+  // with no power scaling (mob bleeds), which fall back to the snapshot `value`. `value`
+  // itself stays the cast-time snapshot, so tooltips/wire are unchanged.
+  tickBase?: number;
+  tickPowerCoeff?: number;
+  tickPowerStat?: 'spell' | 'ranged' | 'melee';
   sourceId: number;
   school: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
   breaksOnDamage?: boolean;

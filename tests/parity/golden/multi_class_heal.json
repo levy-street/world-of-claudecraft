@@ -13,8 +13,8 @@
     "dealDamage consumers: critVulnBonus (crit-only) + hexOutputMult on a damage hit",
     "multi-class healers: priest/paladin/druid/shaman"
   ],
-  "draws": 10,
-  "drawDigest": "fce7a45d",
+  "draws": 14,
+  "drawDigest": "547eb3f4",
   "frames": [
     {
       "tick": 0,
@@ -1618,8 +1618,8 @@
       "state": "c5e3da2e",
       "events": "73b69d5d",
       "rng": {
-        "draws": 10,
-        "digest": "fce7a45d"
+        "draws": 12,
+        "digest": "4b8464f5"
       }
     },
     {
@@ -1629,8 +1629,8 @@
       "state": "f65cd2e3",
       "events": "73b69d5d",
       "rng": {
-        "draws": 10,
-        "digest": "fce7a45d"
+        "draws": 14,
+        "digest": "547eb3f4"
       },
       "label": "final",
       "players": [
