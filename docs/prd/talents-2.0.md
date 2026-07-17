@@ -1010,3 +1010,6 @@ npm run build on PR4/PR5.
   Bolt advances Dread Aspect by 3 sec, pulling the next shared owner-and-demon burst
   window forward. The bolt still spends mana, the demon must maintain uptime, and the
   warlock decides when to cash the mobile cast while using Hard Bargain and class DoTs.
+  Pain Communion replaces Unyielding Pact's automatic fixed heal with an 8 sec instant
+  Burning Pact decision after a hit of at least 15% maximum health, preserving the
+  shared pressure row and its other choices while creating an active recovery sequence.

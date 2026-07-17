@@ -404,6 +404,22 @@ describe('actionBarView: proc availability cues', () => {
     ).toBe('armed');
   });
 
+  it('marks Burning Pact armed during the Pain Communion response window', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('immolate') })),
+      fakeDeps(),
+    );
+
+    expect(view.tick(world()).slots[0].procState).toBe('none');
+    expect(
+      view.tick(
+        world({
+          playerAuras: [{ id: 'wlk_pain_communion', kind: 'next_cast_instant' }],
+        }),
+      ).slots[0].procState,
+    ).toBe('armed');
+  });
+
   it('marks Gutting Strike armed during either Fieldcraft melee window', () => {
     const view = createActionBarView(
       descriptor(slot(1, { ability: ability('raptor_strike') })),

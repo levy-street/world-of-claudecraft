@@ -2196,16 +2196,23 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'wlk_r17_demonic_resilience',
-          name: 'Unyielding Pact',
+          name: 'Pain Communion',
           description:
-            'Taking a hit for at least 15% of your maximum health heals you for 50. 20 sec internal cooldown.',
+            'Taking a hit for at least 15% of your maximum health makes your next Burning Pact within 8 sec instant. 20 sec internal cooldown.',
           icon: 'demon_skin',
           effect: {
             proc: {
-              id: 'wlk_unyielding_pact',
-              name: 'Unyielding Pact',
+              id: 'wlk_pain_communion',
+              name: 'Pain Communion',
               trigger: { on: 'bigHitTaken', hpFrac: 0.15, icd: 20 },
-              responses: [{ kind: 'heal', amount: 50 }],
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_instant',
+                  abilities: ['immolate'],
+                  duration: 8,
+                },
+              ],
             },
           },
         },

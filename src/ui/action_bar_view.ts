@@ -419,6 +419,13 @@ function gloomBoltProcState(
   return hasAura(player.auras, 'wlk_fiendlore_handoff') ? 'armed' : 'none';
 }
 
+function burningPactProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'wlk_pain_communion') ? 'armed' : 'none';
+}
+
 // Ability ids map to pure proc resolvers here, keeping the painter generic. New
 // action cues extend this table rather than adding ability branches to DOM code.
 const PROC_STATE_RESOLVERS: Readonly<Record<string, ProcStateResolver | undefined>> = {
@@ -441,6 +448,7 @@ const PROC_STATE_RESOLVERS: Readonly<Record<string, ProcStateResolver | undefine
   garrote: duskBuilderProcState,
   cheap_shot: duskBuilderProcState,
   shadow_bolt: gloomBoltProcState,
+  immolate: burningPactProcState,
 };
 
 function procStateForAbility(
