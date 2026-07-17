@@ -991,4 +991,6 @@ npm run build on PR4/PR5.
   Lurker's Strike, Throat Wire, or Gut Punch opens an 8 sec window for a 50% stronger
   Maskfall. Maskfall moves the old signature's delayed bleed budget into one front-loaded
   weapon strike, so Duskveil or Smokestep creates a clear opener, burst, and finisher arc
-  without competing with Knifework's poison-and-bleed identity.
+  without competing with Knifework's poison-and-bleed identity. Dusk Dividend replaces
+  the opener's automatic energy refund with an 8 sec half-cost builder choice, preserving
+  the shared row while making the follow-up sequence a deliberate energy decision.

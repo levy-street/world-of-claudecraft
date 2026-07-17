@@ -222,6 +222,7 @@ const WARRIOR_TITLES: Partial<Record<SupportedLanguage, Partial<TitleMap>>> = {
     Rainbreak: 'Прорыв сквозь ливень',
     'Venom Dividend': 'Ядовитый дивиденд',
     'Redline Habit': 'Привычка на пределе',
+    'Dusk Dividend': 'Сумеречный дивиденд',
   },
   cs_CZ: {
     'Double Charge': 'Dvojitý výpad',

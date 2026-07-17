@@ -486,19 +486,59 @@ describe('actionBarView: proc availability cues', () => {
     expect(finisher.tick(world({ playerAuras })).slots[0].procState).toBe('none');
   });
 
-  it('marks Maskfall armed during either False Face or Redline Habit', () => {
+  it('marks Maskfall armed during False Face, Redline Habit, or Dusk Dividend', () => {
     const view = createActionBarView(
       descriptor(slot(1, { ability: ability('hemorrhage') })),
       fakeDeps(),
     );
 
     expect(view.tick(world()).slots[0].procState).toBe('none');
-    for (const id of ['rog_false_face', 'rog_adrenaline_junkie']) {
-      expect(
-        view.tick(world({ playerAuras: [{ id, kind: 'next_ability_damage' }] })).slots[0].procState,
-        id,
-      ).toBe('armed');
+    const windows = [
+      { id: 'rog_false_face', kind: 'next_ability_damage' as const },
+      { id: 'rog_adrenaline_junkie', kind: 'next_ability_damage' as const },
+      { id: 'rog_dusk_dividend', kind: 'next_cast_cheap' as const },
+    ];
+    for (const aura of windows) {
+      expect(view.tick(world({ playerAuras: [aura] })).slots[0].procState, aura.id).toBe('armed');
     }
+  });
+
+  it('prices and cues every Dusk Dividend builder at half energy', () => {
+    const playerAuras = [{ id: 'rog_dusk_dividend', kind: 'next_cast_cheap' as const }];
+    const builders = [
+      ['sinister_strike', 45],
+      ['backstab', 60],
+      ['gouge', 45],
+      ['ambush', 60],
+      ['garrote', 50],
+      ['cheap_shot', 60],
+      ['hemorrhage', 35],
+      ['ghostly_strike', 40],
+    ] as const;
+
+    for (const [abilityId, cost] of builders) {
+      const view = createActionBarView(
+        descriptor(slot(1, { ability: ability(abilityId, { cost }) })),
+        fakeDeps(),
+      );
+      const discountedCost = Math.ceil(cost * 0.5);
+      expect(view.tick(world({ resource: discountedCost - 1, playerAuras })).slots[0].usable).toBe(
+        false,
+      );
+      expect(
+        view.tick(world({ resource: discountedCost, playerAuras })).slots[0],
+        abilityId,
+      ).toMatchObject({ usable: true, procState: 'armed' });
+    }
+
+    const finisher = createActionBarView(
+      descriptor(slot(1, { ability: ability('eviscerate', { cost: 35 }) })),
+      fakeDeps(),
+    );
+    expect(finisher.tick(world({ resource: 18, playerAuras })).slots[0]).toMatchObject({
+      usable: false,
+      procState: 'none',
+    });
   });
 
   it('keeps ordinary abilities and Icefall without stored Icicles at none', () => {

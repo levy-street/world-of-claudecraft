@@ -263,6 +263,17 @@ const FREE_COST_AURA_IDS_BY_ABILITY: Readonly<Record<string, readonly string[]>>
   crippling_poison: ['rog_deadly_brew'],
 };
 
+const CHEAP_COST_AURA_IDS_BY_ABILITY: Readonly<Record<string, readonly string[]>> = {
+  sinister_strike: ['rog_dusk_dividend'],
+  backstab: ['rog_dusk_dividend'],
+  gouge: ['rog_dusk_dividend'],
+  ambush: ['rog_dusk_dividend'],
+  garrote: ['rog_dusk_dividend'],
+  cheap_shot: ['rog_dusk_dividend'],
+  hemorrhage: ['rog_dusk_dividend'],
+  ghostly_strike: ['rog_dusk_dividend'],
+};
+
 function talentProcMakesAbilityFree(
   auras: readonly ActionBarAuraInput[],
   abilityId: string,
@@ -273,6 +284,15 @@ function talentProcMakesAbilityFree(
     if (aura.kind === 'next_cast_free' && auraIds.includes(aura.id)) return true;
   }
   return false;
+}
+
+function talentProcCostMultiplier(auras: readonly ActionBarAuraInput[], abilityId: string): number {
+  const auraIds = CHEAP_COST_AURA_IDS_BY_ABILITY[abilityId];
+  if (!auraIds) return 1;
+  for (const aura of auras) {
+    if (aura.kind === 'next_cast_cheap' && auraIds.includes(aura.id)) return 0.5;
+  }
+  return 1;
 }
 
 function icefallProcState(
@@ -364,20 +384,32 @@ function attackProcState(player: ActionBarPlayerInput): ActionBarProcState {
   return hasAura(player.auras, 'rog_scrappers_edge') ? 'armed' : 'none';
 }
 
-function redlineWeaponProcState(
+function weaponBuilderProcState(
   _ability: ActionBarAbility,
   player: ActionBarPlayerInput,
 ): ActionBarProcState {
-  return hasAura(player.auras, 'rog_adrenaline_junkie') ? 'armed' : 'none';
+  return hasAura(player.auras, 'rog_adrenaline_junkie') ||
+    hasAura(player.auras, 'rog_dusk_dividend')
+    ? 'armed'
+    : 'none';
 }
 
 function maskfallProcState(
   _ability: ActionBarAbility,
   player: ActionBarPlayerInput,
 ): ActionBarProcState {
-  return hasAura(player.auras, 'rog_false_face') || hasAura(player.auras, 'rog_adrenaline_junkie')
+  return hasAura(player.auras, 'rog_false_face') ||
+    hasAura(player.auras, 'rog_adrenaline_junkie') ||
+    hasAura(player.auras, 'rog_dusk_dividend')
     ? 'armed'
     : 'none';
+}
+
+function duskBuilderProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'rog_dusk_dividend') ? 'armed' : 'none';
 }
 
 // Ability ids map to pure proc resolvers here, keeping the painter generic. New
@@ -393,11 +425,14 @@ const PROC_STATE_RESOLVERS: Readonly<Record<string, ProcStateResolver | undefine
   eviscerate: redhandedFinisherProcState,
   rupture: redhandedFinisherProcState,
   crippling_poison: venomDividendProcState,
-  sinister_strike: redlineWeaponProcState,
-  backstab: redlineWeaponProcState,
-  ambush: redlineWeaponProcState,
+  sinister_strike: weaponBuilderProcState,
+  backstab: weaponBuilderProcState,
+  ambush: weaponBuilderProcState,
   hemorrhage: maskfallProcState,
-  ghostly_strike: redlineWeaponProcState,
+  ghostly_strike: weaponBuilderProcState,
+  gouge: duskBuilderProcState,
+  garrote: duskBuilderProcState,
+  cheap_shot: duskBuilderProcState,
 };
 
 function procStateForAbility(
@@ -556,7 +591,9 @@ export function createActionBarView(
         slot.cdText = cd > COOLDOWN_TEXT_THRESHOLD ? deps.formatCount(Math.ceil(cd)) : '';
         slot.count = '';
         slot.usable =
-          (player.resource >= ability.cost || talentProcMakesAbilityFree(player.auras, def.id)) &&
+          (player.resource >=
+            Math.ceil(ability.cost * talentProcCostMultiplier(player.auras, def.id)) ||
+            talentProcMakesAbilityFree(player.auras, def.id)) &&
           (!def.requiresStealth || player.stealthed);
         slot.outOfRange =
           def.requiresTarget &&

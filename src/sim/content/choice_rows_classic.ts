@@ -1011,7 +1011,7 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 5,
       theme: 'opening_rotation',
-      decision: 'Wicked Slash cadence vs Craven Thrust weave vs opener energy',
+      decision: 'Wicked Slash cadence vs Craven Thrust weave vs opener-fed builder discount',
       options: [
         {
           id: 'rog_r5_relentless_strikes',
@@ -1052,14 +1052,24 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'rog_r5_opportunist',
           name: 'Dusk Dividend',
-          description: "Using Lurker's Strike or Throat Wire restores 20 energy.",
+          description:
+            "Using Lurker's Strike, Throat Wire, or Gut Punch makes your next builder within 8 sec cost 50% less energy.",
           icon: 'ambush',
           effect: {
             proc: {
               id: 'rog_dusk_dividend',
               name: 'Dusk Dividend',
-              trigger: { on: 'castNth', n: 1, abilities: ['ambush', 'garrote'] },
-              responses: [{ kind: 'resource', amount: 20, resourceType: 'energy' }],
+              school: 'shadow',
+              trigger: { on: 'castNth', n: 1, abilities: ['ambush', 'garrote', 'cheap_shot'] },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_cheap',
+                  abilities: rogueBuilderAbilityIds,
+                  duration: 8,
+                  costPct: 0.5,
+                },
+              ],
             },
           },
         },
