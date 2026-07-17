@@ -65,7 +65,7 @@ Each module owns the FUNCTIONS for one system; the backing STATE stays on `Sim` 
 | `combat/effect_dispatch.ts` | `runEffects` (the per-effect switch) |
 | `combat/auto_attack.ts` | start/stop/update auto-attack, `meleeSwing`, `rangedSwing` |
 | `combat/equip_procs.ts` + `combat/set_procs.ts` | legendary weapon on-action procs; item-set bonus procs |
-| `combat/talent_procs.ts` + `combat/fulmination.ts` | data-driven talent procs; Fulmination's gated Arc Bolt Overload and deterministic chain |
+| `combat/talent_procs.ts` + `combat/fulmination.ts` + `combat/warspirit.ts` | data-driven talent procs; Fulmination's gated Arc Bolt Overload and deterministic chain; Warspirit's melee-fed Arc Bolt spend |
 | `combat/channel_effects.ts` | ramping-channel damage (Litany of Woe per-tick escalation) + the talent-gated full-channel completion burst |
 | `combat/empower_next.ts` + `combat/thorns_charge.ts` | next-cast empower/free aura consumption; charge-limited thorns |
 | `projectile_travel.ts` | in-flight homing projectiles: `pendingProjectiles` + the prologue `advancePendingProjectiles` phase |

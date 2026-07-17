@@ -156,6 +156,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
   if (p.swingTimer <= 0) {
     let bonus = 0;
     let abilityName: string | null = null;
+    let abilityId = 'auto_attack';
     let threatFlat = 0;
     let threatMult = 1;
     if (p.queuedOnSwing) {
@@ -174,6 +175,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
           if (queued.def.cooldown > 0) p.cooldowns.set(queued.def.id, queued.def.cooldown);
           bonus = eff.bonus;
           abilityName = queued.def.name;
+          abilityId = queued.def.id;
           threatFlat = queued.threatFlat;
           threatMult = queued.threatMult;
         }
@@ -183,6 +185,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
       delete p.queuedOnSwingCostMultiplier;
     }
     const connected = meleeSwing(ctx, p, t, bonus, abilityName, {
+      abilityId,
       threatFlat,
       threatMult,
       whiteDualWieldPenalty: p.dualWielding && abilityName === null,
@@ -355,6 +358,7 @@ export function meleeSwing(
     forceCrit?: boolean;
     onDealt?: (amount: number) => void;
     whiteDualWieldPenalty?: boolean;
+    abilityId?: string;
   },
 ): boolean {
   const missChance =
@@ -452,7 +456,7 @@ export function meleeSwing(
   // Landed-swing talent responses resolve before the target retaliates or the
   // weapon's on-hit proc fires. This is observable for defensive healing and
   // preserves the authored Oathwheel, Venom Dividend, and imbue proc cadence.
-  if (attacker.kind === 'player') onMeleeSwing(ctx, attacker);
+  if (attacker.kind === 'player') onMeleeSwing(ctx, attacker, opts.abilityId);
   // thorns / lightning shield: melee attackers take damage back. Charge-limited
   // thorns (Lightning Shield) consume a charge and gate on an internal cooldown.
   if (!attacker.dead) {

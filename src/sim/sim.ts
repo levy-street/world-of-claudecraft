@@ -812,6 +812,7 @@ export interface ResolvedAbility {
   damagePushbackImmune?: boolean; // talent-granted immunity to damage-driven cast pushback
   charges?: number; // authored stored uses; undefined means one use
   bonusCharges?: number; // talent-added uses, kept distinct from native maxCharges
+  damageMult?: number; // cast-local proc multiplier, never persisted on known abilities
 }
 
 export interface RewardCounters {
@@ -4800,6 +4801,7 @@ export class Sim {
     abilityName: string | null,
     opts: {
       cannotBeDodged?: boolean;
+      abilityId?: string;
       weaponMult?: number;
       threatFlat?: number;
       threatMult?: number;

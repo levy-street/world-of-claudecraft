@@ -233,7 +233,7 @@ describe('createAurasView: derivation per mode', () => {
     expect(v.tick(entity([aura({ id: 'a', stacks: 4 })])).slots[0].stacksText).toBe('4');
   });
 
-  it('badges the Icicles meter from its first stack', () => {
+  it('badges spec-resource meters from their first stack', () => {
     const v = createAurasView('all', deps());
     expect(
       v.tick(entity([aura({ id: 'mag_icicles', kind: 'icicles', stacks: 1 })])).slots[0].stacksText,
@@ -241,6 +241,10 @@ describe('createAurasView: derivation per mode', () => {
     expect(
       v.tick(entity([aura({ id: 'mag_icicles', kind: 'icicles', stacks: 5 })])).slots[0].stacksText,
     ).toBe('5');
+    expect(
+      v.tick(entity([aura({ id: 'sha_skyrend', kind: 'stormcharge', stacks: 1 })])).slots[0]
+        .stacksText,
+    ).toBe('1');
   });
 
   it('badges remaining charges (shown even at 1) and prefers charges over stacks', () => {

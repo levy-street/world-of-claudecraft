@@ -228,6 +228,7 @@ export function runEffects(
           bonus = Math.round(bonus * 1.15);
         }
         const hit = ctx.meleeSwing(p, target, bonus, ability.name, {
+          abilityId: ability.id,
           cannotBeDodged: eff.cannotBeDodged,
           weaponMult,
           threatFlat: res.threatFlat,
@@ -311,6 +312,7 @@ export function runEffects(
         if (!eff.fixedNoCrit) {
           dmg += directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
         }
+        dmg *= res.damageMult ?? 1;
         if (eff.vsRootedMult !== undefined && rooted) dmg *= eff.vsRootedMult;
         if (
           eff.vsFrozenMult !== undefined &&

@@ -137,6 +137,13 @@ describe('spec masteries', () => {
     });
     expect(TALENTS.shaman?.specs.find((s) => s.id === 'enhancement')?.mastery.effect).toEqual({
       global: { meleeHastePct: 0.1, meleeDmgPct: 0.1 },
+      proc: {
+        id: 'sha_skyrend',
+        name: 'Skyrend',
+        school: 'nature',
+        trigger: { on: 'meleeHit', abilities: ['auto_attack', 'stormstrike'] },
+        responses: [{ kind: 'stackAura', aura: 'stormcharge', maxStacks: 5, duration: 30 }],
+      },
     });
     expect(TALENTS.druid?.specs.find((s) => s.id === 'balance')?.mastery.effect).toEqual({
       global: { spellDmgPct: 0.15, spellHastePct: 0.1 },

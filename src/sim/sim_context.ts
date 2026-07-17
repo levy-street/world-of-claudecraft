@@ -621,6 +621,7 @@ export interface SimContextCallbacks {
     abilityName: string | null,
     opts: {
       cannotBeDodged?: boolean;
+      abilityId?: string;
       weaponMult?: number;
       threatFlat?: number;
       threatMult?: number;

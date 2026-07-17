@@ -291,11 +291,18 @@ export function onDamageTaken(ctx: SimContext, player: Entity, amount: number): 
   }
 }
 
-export function onMeleeSwing(ctx: SimContext, player: Entity): void {
+export function onMeleeSwing(ctx: SimContext, player: Entity, abilityId = 'auto_attack'): void {
   for (const def of procsFor(ctx, player)) {
     const trigger = def.trigger;
-    if (trigger.on !== 'meleeSwingWhile') continue;
-    if (!player.auras.some((aura) => aura.kind === trigger.auraKind)) continue;
-    fire(ctx, player, def, player);
+    if (trigger.on === 'meleeHit') {
+      if (trigger.abilities.includes(abilityId)) fire(ctx, player, def, player);
+      continue;
+    }
+    if (
+      trigger.on === 'meleeSwingWhile' &&
+      player.auras.some((aura) => aura.kind === trigger.auraKind)
+    ) {
+      fire(ctx, player, def, player);
+    }
   }
 }

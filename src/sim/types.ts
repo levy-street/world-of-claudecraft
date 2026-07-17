@@ -321,6 +321,7 @@ export type AuraKind =
   | 'buff_dr'
   | 'buff_dr_phys'
   | 'icicles'
+  | 'stormcharge'
   | 'frostbite';
 
 export interface Aura {

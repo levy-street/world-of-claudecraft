@@ -275,8 +275,17 @@ const SHAMAN_SPECS: SpecDef[] = [
     'A weapon fighter who channels the storm through melee swings.',
     'stormstrike',
     'Skyrend',
-    'Increases your melee attack speed by 10% and your physical ability damage by 10%.',
-    { global: { meleeHastePct: 0.1, meleeDmgPct: 0.1 } },
+    'Each landed melee auto-attack and Ancestral Strike builds Skyrend, up to 5 stacks. Each stack shortens your next Arc Bolt cast by 20% and increases its damage by 10%. Arc Bolt consumes every stack, becoming instant at 5. Increases your melee attack speed by 10% and your physical ability damage by 10%.',
+    {
+      global: { meleeHastePct: 0.1, meleeDmgPct: 0.1 },
+      proc: {
+        id: 'sha_skyrend',
+        name: 'Skyrend',
+        school: 'nature',
+        trigger: { on: 'meleeHit', abilities: ['auto_attack', 'stormstrike'] },
+        responses: [{ kind: 'stackAura', aura: 'stormcharge', maxStacks: 5, duration: 30 }],
+      },
+    },
   ),
   spec(
     'restoration',

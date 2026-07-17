@@ -116,6 +116,7 @@ export type ProcTrigger =
   | { on: 'shieldConsumed'; ability: string }
   | { on: 'hotExpired'; ability: string }
   | { on: 'bigHitTaken'; hpFrac: number; icd: number }
+  | { on: 'meleeHit'; abilities: string[] }
   | { on: 'meleeSwingWhile'; auraKind: string }
   | { on: 'thornsReflect'; ability: string };
 
@@ -132,7 +133,12 @@ export type ProcResponse =
       | { amount: number; pctMax?: never }
       | { amount?: never; pctMax: number }
     ))
-  | { kind: 'stackAura'; aura: 'icicles'; maxStacks: number; duration: number }
+  | {
+      kind: 'stackAura';
+      aura: 'icicles' | 'stormcharge';
+      maxStacks: number;
+      duration: number;
+    }
   | {
       kind: 'chanceAura';
       id: string;

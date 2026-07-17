@@ -70,6 +70,7 @@ import {
 } from './spell_combat';
 import { isSpellResisted } from './spell_resist';
 import { onCastCompleted } from './talent_procs';
+import { prepareWarspiritArcBolt, warspiritArcBoltCastTime } from './warspirit';
 
 // Shaman shocks (earth/flame/frost) share one cooldown; lightning_shock joins them
 // for the shared-cooldown predicate. Moved with the casting slice (only callers).
@@ -575,13 +576,14 @@ export function castAbility(
 
   const gcd = ctx.playerGcdFor(meta.cls);
   // A channel keeps its duration, so it must not eat a next_cast_instant charge.
-  const castTime =
+  const empoweredCastTime =
     !ability.channel &&
     res.castTime > 0 &&
     (ability.school !== 'physical' || hasScopedNextCastInstant(p, ability.id)) &&
     consumeNextCastInstant(ctx, p, ability.id)
       ? 0
       : res.castTime;
+  const castTime = warspiritArcBoltCastTime(ctx, p, meta, ability.id, empoweredCastTime);
   // A free cast is consumed where the cost is actually billed: here for channels
   // and instants (this tick resolves them via the local `res`), but for cast-time
   // spells the bill lands in applyAbility at completion, which RE-RESOLVES the
@@ -999,6 +1001,7 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
         : Math.min(p.resource, ability.spendResourceCap);
     res = { ...res, cost: spend };
   }
+  res = prepareWarspiritArcBolt(ctx, p, meta, res);
 
   // helpful spells never miss
   if (

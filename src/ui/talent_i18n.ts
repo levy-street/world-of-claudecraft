@@ -7857,6 +7857,8 @@ function procTriggerDescription(
       return `${abilityName(trigger.ability)}: 0 s`;
     case 'bigHitTaken':
       return `>= ${formatPercent(trigger.hpFrac, lang)} ${text.statLabels.maxHpPct} (${seconds(trigger.icd, lang)} ${text.statLabels.cooldown})`;
+    case 'meleeHit':
+      return abilityList(trigger.abilities);
     case 'meleeSwingWhile':
       return `${text.statLabels.meleeDmgPct} @ ${t('hudChrome.auraEffect.imbue')}`;
     case 'thornsReflect':
