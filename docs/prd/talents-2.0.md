@@ -994,3 +994,11 @@ npm run build on PR4/PR5.
   without competing with Knifework's poison-and-bleed identity. Dusk Dividend replaces
   the opener's automatic energy refund with an 8 sec half-cost builder choice, preserving
   the shared row while making the follow-up sequence a deliberate energy decision.
+
+## Warlock DPS identity pass
+
+- Hexcraft uses Creeping Rot as a sustained duration weave. Blackrot, Hex of Anguish,
+  and Veinleech establish the afflictions; each landed Consume tick extends all three
+  caster-owned effects by 1 sec, up to 3 sec per application. The warlock chooses how
+  long to channel for damage, healing, and upkeep before returning to Gloom Bolt and
+  Hard Bargain, with the maintained target timers providing the visible feedback.

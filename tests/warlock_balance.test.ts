@@ -60,9 +60,19 @@ describe('warlock low-level sustained damage tuning', () => {
   });
 
   it('keeps mastery tuning and the active damage-amplification row canonical', () => {
-    // Masteries were made impactful across all specs (spec identity pass): affliction
-    // amplifies its damage-over-time effects, destruction doubles spell crit damage.
-    expect(spec('affliction').mastery.effect.global?.dotDmgPct).toBe(0.2);
+    // Hexcraft trades half of its former flat DoT scalar for the Consume duration weave;
+    // Ruination retains its direct spell critical-damage axis.
+    expect(spec('affliction').mastery.effect.global?.dotDmgPct).toBe(0.1);
+    expect(spec('affliction').mastery.effect.ability).toEqual([
+      {
+        ability: 'drain_life',
+        addEffects: [
+          { type: 'extendDot', dot: 'corruption', seconds: 1, maxBonus: 3 },
+          { type: 'extendDot', dot: 'curse_of_agony', seconds: 1, maxBonus: 3 },
+          { type: 'extendDot', dot: 'siphon_life', seconds: 1, maxBonus: 3 },
+        ],
+      },
+    ]);
     expect(spec('destruction').mastery.effect.global?.critDmgSpellPct).toBe(0.5);
     expect(spec('destruction').mastery.effect.stats?.crit).toBe(0.02);
 
@@ -74,7 +84,7 @@ describe('warlock low-level sustained damage tuning', () => {
       { spec: 'affliction', rows: { 14: 'wlk_r14_amplify_curse' } },
       20,
     );
-    expect(amplified.global.dotDmgPct).toBe(0.2);
+    expect(amplified.global.dotDmgPct).toBe(0.1);
     expect(amplified.abilities.shadow_bolt?.dmgPctVsDotted).toBe(0.2);
   });
 

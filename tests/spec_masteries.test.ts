@@ -55,7 +55,17 @@ describe('spec masteries', () => {
       ],
     });
     expect(TALENTS.warlock?.specs.find((s) => s.id === 'affliction')?.mastery.effect).toEqual({
-      global: { dotDmgPct: 0.2 },
+      global: { dotDmgPct: 0.1 },
+      ability: [
+        {
+          ability: 'drain_life',
+          addEffects: [
+            { type: 'extendDot', dot: 'corruption', seconds: 1, maxBonus: 3 },
+            { type: 'extendDot', dot: 'curse_of_agony', seconds: 1, maxBonus: 3 },
+            { type: 'extendDot', dot: 'siphon_life', seconds: 1, maxBonus: 3 },
+          ],
+        },
+      ],
     });
     expect(TALENTS.mage?.specs.find((s) => s.id === 'fire')?.mastery.effect).toEqual({
       global: { critDmgSpellPct: 0.5 },
@@ -312,7 +322,7 @@ describe('spec masteries', () => {
 
   it('bakes DoT, HoT, absorb, cost, and melee damage mastery fields into abilities', () => {
     expect(effect(known('warlock', 'corruption'), 'dot').total).toBe(85);
-    expect(effect(known('warlock', 'corruption', 'affliction'), 'dot').total).toBe(102);
+    expect(effect(known('warlock', 'corruption', 'affliction'), 'dot').total).toBe(94);
 
     expect(effect(known('druid', 'rejuvenation'), 'hot').total).toBe(116);
     expect(effect(known('druid', 'rejuvenation', 'restoration'), 'hot').total).toBe(145);
@@ -559,7 +569,7 @@ describe('spec masteries', () => {
         restoration: { abilities: ['chain_heal', 'healing_wave'], costPct: -0.2 },
       },
       warlock: {
-        affliction: { global: 'dotDmgPct', value: 0.2 },
+        affliction: { global: 'dotDmgPct', value: 0.1 },
         demonology: { global: 'petDmgSharePct', value: 0.2 },
         destruction: { global: 'critDmgSpellPct', value: 0.5 },
       },

@@ -488,8 +488,20 @@ const WARLOCK_SPECS: SpecDef[] = [
     'A curse-weaver using damage over time and drains.',
     'siphon_life',
     'Creeping Rot',
-    'Your damage-over-time effects deal 20% more damage.',
-    { global: { dotDmgPct: 0.2 } },
+    'Your damage-over-time effects deal 10% more damage. Each landed tick of Consume extends your Blackrot, Hex of Anguish, and Veinleech on the target by 1 sec, up to 3 sec per application.',
+    {
+      global: { dotDmgPct: 0.1 },
+      ability: [
+        {
+          ability: 'drain_life',
+          addEffects: [
+            { type: 'extendDot', dot: 'corruption', seconds: 1, maxBonus: 3 },
+            { type: 'extendDot', dot: 'curse_of_agony', seconds: 1, maxBonus: 3 },
+            { type: 'extendDot', dot: 'siphon_life', seconds: 1, maxBonus: 3 },
+          ],
+        },
+      ],
+    },
   ),
   spec(
     'demonology',
