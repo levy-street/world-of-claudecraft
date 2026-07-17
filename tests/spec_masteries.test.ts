@@ -500,6 +500,22 @@ describe('spec masteries', () => {
     });
     expect(TALENTS.priest?.specs.find((s) => s.id === 'holy')?.mastery.effect).toEqual({
       global: { healPct: 0.2 },
+      proc: {
+        id: 'pri_grave_mercy',
+        name: 'Grave Mercy',
+        spec: 'holy',
+        requiresKnownAbility: 'holy_nova',
+        school: 'holy',
+        trigger: { on: 'castNth', n: 1, abilities: ['holy_nova'] },
+        responses: [
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_free',
+            abilities: ['renew'],
+            duration: 8,
+          },
+        ],
+      },
     });
     expect(TALENTS.priest?.specs.find((s) => s.id === 'shadow')?.mastery.effect).toEqual({
       global: { dotDmgPct: 0.15, spellDmgPct: 0.1 },

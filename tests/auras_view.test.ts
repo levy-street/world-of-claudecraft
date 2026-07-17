@@ -333,6 +333,17 @@ describe('createAurasView: derivation per mode', () => {
     expect(state.slots[0].isActionable).toBe(true);
   });
 
+  it('marks both Benison healing handoffs as actionable windows', () => {
+    const state = createAurasView('all', deps()).tick(
+      entity([
+        aura({ id: 'pri_grave_mercy', kind: 'next_cast_free' }),
+        aura({ id: 'pri_last_blessing', kind: 'next_cast_instant' }),
+      ]),
+    );
+
+    expect(state.slots.slice(0, 2).map((slot) => slot.isActionable)).toEqual([true, true]);
+  });
+
   it('marks both Sacrament healing handoffs as actionable windows', () => {
     const state = createAurasView('all', deps()).tick(
       entity([

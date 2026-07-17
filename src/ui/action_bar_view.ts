@@ -276,6 +276,7 @@ const FREE_COST_AURA_IDS_BY_ABILITY: Readonly<Record<string, readonly string[]>>
   rupture: ['rog_redhanded'],
   crippling_poison: ['rog_deadly_brew'],
   conflagrate: ['wlk_desolation_conflagrate'],
+  renew: ['pri_grave_mercy'],
 };
 
 const CHEAP_COST_AURA_IDS_BY_ABILITY: Readonly<Record<string, readonly string[]>> = {
@@ -547,6 +548,22 @@ function fixedPurposeProcState(
   return hasAura(player.auras, 'pri_fixed_purpose') ? 'armed' : 'none';
 }
 
+function graveMercyProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'pri_grave_mercy') ? 'armed' : 'none';
+}
+
+function priestPrayerProcState(
+  _ability: ActionBarAbility,
+  player: ActionBarPlayerInput,
+): ActionBarProcState {
+  return hasAura(player.auras, 'pri_fixed_purpose') || hasAura(player.auras, 'pri_last_blessing')
+    ? 'armed'
+    : 'none';
+}
+
 // Ability ids map to pure proc resolvers here, keeping the painter generic. New
 // action cues extend this table rather than adding ability branches to DOM code.
 const PROC_STATE_RESOLVERS: Readonly<Record<string, ProcStateResolver | undefined>> = {
@@ -589,8 +606,9 @@ const PROC_STATE_RESOLVERS: Readonly<Record<string, ProcStateResolver | undefine
   regrowth: grovesGiftProcState,
   rejuvenation: groveCovenantProcState,
   lesser_heal: fixedPurposeProcState,
-  heal: fixedPurposeProcState,
-  flash_heal: fixedPurposeProcState,
+  heal: priestPrayerProcState,
+  flash_heal: priestPrayerProcState,
+  renew: graveMercyProcState,
 };
 
 function procStateForAbility(

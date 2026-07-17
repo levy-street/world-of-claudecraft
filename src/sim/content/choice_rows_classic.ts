@@ -1620,7 +1620,7 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 17,
       theme: 'resilience',
-      decision: 'long Litany commitment vs stronger party fortitude vs completion burst',
+      decision: 'long Litany commitment vs completed-HoT prayer weave vs completion burst',
       options: [
         {
           id: 'pri_r17_ninefold_litany',
@@ -1633,24 +1633,25 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
           id: 'pri_r17_improved_fortitude',
           name: 'Last Blessing',
           description:
-            'When your Renew runs its full duration on an ally, your next Solemn Prayer or Urgent Prayer within 8 sec is instant.',
+            'For Doctrine and Benison, when Lingering Grace runs its full duration, your next Solemn Prayer or Urgent Prayer within 8 sec is instant.',
           icon: 'renew',
           effect: {
-            proc: {
+            procs: ['discipline', 'holy'].map((spec) => ({
               id: 'pri_last_blessing',
               name: 'Last Blessing',
+              spec,
               requiresKnownAbility: 'renew',
               school: 'holy',
-              trigger: { on: 'hotExpired', ability: 'renew' },
+              trigger: { on: 'hotExpired' as const, ability: 'renew' },
               responses: [
                 {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_instant',
+                  kind: 'empowerNext' as const,
+                  aura: 'next_cast_instant' as const,
                   abilities: ['heal', 'flash_heal'],
                   duration: 8,
                 },
               ],
-            },
+            })),
           },
         },
         {

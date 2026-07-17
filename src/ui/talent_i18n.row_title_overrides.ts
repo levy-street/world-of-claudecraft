@@ -233,6 +233,7 @@ const WARRIOR_TITLES: Partial<Record<SupportedLanguage, Partial<TitleMap>>> = {
     Typhoon: 'Тайфун',
     'Grove Covenant': 'Завет рощи',
     'Red Haze': 'Багровая дымка',
+    'Last Blessing': 'Последнее благословение',
   },
   cs_CZ: {
     'Double Charge': 'Dvojitý výpad',

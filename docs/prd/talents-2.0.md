@@ -1127,3 +1127,10 @@ npm run build on PR4/PR5.
   filler is removed. Warding Refrain, Shattered Psalm, and Halo Aftershock can feed more
   wards into the rotation, and the shared Last Blessing option remains available without
   changing either Vespers channel option.
+
+- Benison keeps Grave Mercy's 20% healing throughput but replaces its passive-only
+  identity with a deterministic prayer weave. Sunburst Canticle opens an 8 sec free
+  Lingering Grace; if that heal-over-time effect completes naturally, the stable
+  Last Blessing level-17 option opens an 8 sec instant Solemn or Urgent Prayer. Last
+  Blessing is now explicitly gated to Doctrine and Benison, so Vespers cannot receive
+  the healer handoff. The option id and both Vespers channel choices remain unchanged.

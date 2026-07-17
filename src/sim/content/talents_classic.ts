@@ -539,8 +539,26 @@ const PRIEST_SPECS: SpecDef[] = [
     'A direct healer with strong throughput and restorative prayers.',
     'holy_nova',
     'Grave Mercy',
-    'Increases all healing you do by 20%.',
-    { global: { healPct: 0.2 } },
+    'Casting Sunburst Canticle makes your next Lingering Grace within 8 sec free. Increases all healing you do by 20%.',
+    {
+      global: { healPct: 0.2 },
+      proc: {
+        id: 'pri_grave_mercy',
+        name: 'Grave Mercy',
+        spec: 'holy',
+        requiresKnownAbility: 'holy_nova',
+        school: 'holy',
+        trigger: { on: 'castNth', n: 1, abilities: ['holy_nova'] },
+        responses: [
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_free',
+            abilities: ['renew'],
+            duration: 8,
+          },
+        ],
+      },
+    },
   ),
   spec(
     'shadow',

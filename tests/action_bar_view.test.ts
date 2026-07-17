@@ -774,6 +774,40 @@ describe('actionBarView: proc availability cues', () => {
     });
   });
 
+  it('funds Grave Mercy and cues both Last Blessing prayers at full mana cost', () => {
+    const grace = createActionBarView(
+      descriptor(slot(1, { ability: ability('renew', { cost: 80 }) })),
+      fakeDeps(),
+    );
+    const graveMercy = [{ id: 'pri_grave_mercy', kind: 'next_cast_free' as const }];
+    expect(grace.tick(world({ resource: 0, playerAuras: graveMercy })).slots[0]).toMatchObject({
+      usable: true,
+      procState: 'armed',
+    });
+
+    const lastBlessing = [{ id: 'pri_last_blessing', kind: 'next_cast_instant' as const }];
+    for (const abilityId of ['heal', 'flash_heal']) {
+      const prayer = createActionBarView(
+        descriptor(slot(1, { ability: ability(abilityId, { cost: 80 }) })),
+        fakeDeps(),
+      );
+      expect(
+        prayer.tick(world({ resource: 79, playerAuras: lastBlessing })).slots[0],
+      ).toMatchObject({ usable: false, procState: 'armed' });
+      expect(
+        prayer.tick(world({ resource: 80, playerAuras: lastBlessing })).slots[0],
+      ).toMatchObject({ usable: true, procState: 'armed' });
+    }
+
+    const whispered = createActionBarView(
+      descriptor(slot(1, { ability: ability('lesser_heal', { cost: 80 }) })),
+      fakeDeps(),
+    );
+    expect(
+      whispered.tick(world({ resource: 80, playerAuras: lastBlessing })).slots[0].procState,
+    ).toBe('none');
+  });
+
   it('keeps ordinary abilities and Icefall without stored Icicles at none', () => {
     const view = createActionBarView(
       descriptor(
