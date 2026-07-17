@@ -35,6 +35,14 @@ import {
 import { abilitiesKnownAt, DUNGEON_X_THRESHOLD, MOBS, NPCS } from '../data';
 import * as deedsMod from '../deeds';
 import { createMob, createNpc, recalcPlayerStats } from '../entity';
+import {
+  type BetPool,
+  commitWager,
+  createBetPool,
+  settlePool,
+  validateWager,
+  type Wager,
+} from '../parimutuel';
 import { restorePetFromDelveStash, stowPetForDelve } from '../pet/pet_commands';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -246,19 +254,11 @@ export interface VcMatch {
 
 // One spectator's wager: a single side and a running copper stake (topping up the
 // same side accumulates). Betting on the opposite side is rejected.
-export interface VcWager {
-  side: 'A' | 'B';
-  stake: number; // copper
-}
-
-// The parimutuel pool for a match. Winners split the WHOLE pool pro-rata to their
-// stake on the winning side; a draw or a winner nobody backed refunds every stake.
-export interface VcBetPool {
-  poolA: number; // total copper staked on A
-  poolB: number; // total copper staked on B
-  wagers: Map<number, VcWager>; // bettor pid -> their wager
-  settled: boolean;
-}
+// The Vale Cup wager and pool are the shared parimutuel shapes (src/sim/parimutuel.ts),
+// keyed by bettor pid; copper is the stake unit. Re-exported under the historical
+// names so existing importers are unchanged.
+export type VcWager = Wager;
+export type VcBetPool = BetPool<number>;
 
 export interface VcState {
   queues: Record<VcBracket, VcQueueUnit[]>;
@@ -872,7 +872,7 @@ export function startCupMatch(
     pocket: null,
     pendingWinner: undefined,
     ended: false,
-    bets: { poolA: 0, poolB: 0, wagers: new Map(), settled: false },
+    bets: createBetPool<number>(),
     guildEntry,
     origin: opts?.origin ?? VC_ORIGIN_ZERO,
     practice: opts?.practice
@@ -1141,57 +1141,60 @@ export function vcupPlaceBet(ctx: SimContext, pid: number, side: 'A' | 'B', amou
   if (!e || !meta) return;
   if (!isAtSowfield(e.pos.x, e.pos.z)) return; // must be at the arena
   const stake = Math.floor(amount);
-  if (!Number.isFinite(stake) || stake < VC_BET_MIN) return;
-  const existing = match.bets.wagers.get(pid);
-  if (existing && existing.side !== side) return; // cannot back both sides
-  const current = existing?.stake ?? 0;
-  if (current + stake > VC_BET_MAX) return; // over the per-player cap
+  // The pure pool validation (bad-stake / closed-side / over-cap), in the same
+  // order as before; a stale or hostile client that trips one is a silent no-op.
+  if (validateWager(match.bets, pid, side, stake, { min: VC_BET_MIN, max: VC_BET_MAX }) !== 'ok')
+    return;
+  // The one non-silent rejection: insufficient funds (a legit race), checked
+  // AFTER the pool validation so an over-cap client never sees this error.
   if (meta.copper < stake) {
     ctx.error(pid, 'Not enough money.');
     return;
   }
   meta.copper -= stake;
-  if (side === 'A') match.bets.poolA += stake;
-  else match.bets.poolB += stake;
-  match.bets.wagers.set(pid, { side, stake: current + stake });
+  commitWager(match.bets, pid, side, stake);
 }
 
 // Settle the pool at the final whistle. Winners get their stake back plus a
 // pro-rata share of the losing pool; a draw (or a winning side nobody backed)
-// voids the book and refunds every stake. Rounding dust stays unpaid.
+// voids the book and refunds every stake. Rounding dust stays unpaid. The pool
+// math is the shared parimutuel core (rake-free here, rakeBps 0); this arm keeps
+// the copper crediting, the vcupBetSettled emits, and the win/loss records.
 function settleBets(ctx: SimContext, match: VcMatch, winner: 'A' | 'B' | null): void {
-  const pool = match.bets;
-  if (pool.settled) return;
-  pool.settled = true;
-  if (pool.wagers.size === 0) return;
-  const winPool = winner === 'A' ? pool.poolA : winner === 'B' ? pool.poolB : 0;
-  const losePool = winner === 'A' ? pool.poolB : winner === 'B' ? pool.poolA : 0;
-  const refundAll = winner === null || winPool === 0;
-  for (const [pid, w] of pool.wagers) {
-    const meta = ctx.players.get(pid);
+  const { rows } = settlePool(match.bets, winner);
+  for (const row of rows) {
+    const meta = ctx.players.get(row.key);
     if (!meta) continue; // bettor left: their stake is forfeit (rare edge)
-    if (refundAll) {
-      meta.copper += w.stake;
+    if (row.outcome === 'refunded') {
+      meta.copper += row.payout;
       ctx.emit({
         type: 'vcupBetSettled',
-        pid,
+        pid: row.key,
         outcome: 'refunded',
-        stake: w.stake,
-        payout: w.stake,
+        stake: row.stake,
+        payout: row.payout,
       });
-      continue;
-    }
-    if (w.side === winner) {
-      const winnings = Math.floor((w.stake * losePool) / winPool);
-      const payout = w.stake + winnings;
-      meta.copper += payout;
+    } else if (row.outcome === 'won') {
+      meta.copper += row.payout;
       meta.vcupBetWins++;
-      meta.vcupBetNet += winnings;
-      ctx.emit({ type: 'vcupBetSettled', pid, outcome: 'won', stake: w.stake, payout });
+      meta.vcupBetNet += row.payout - row.stake;
+      ctx.emit({
+        type: 'vcupBetSettled',
+        pid: row.key,
+        outcome: 'won',
+        stake: row.stake,
+        payout: row.payout,
+      });
     } else {
       meta.vcupBetLosses++;
-      meta.vcupBetNet -= w.stake;
-      ctx.emit({ type: 'vcupBetSettled', pid, outcome: 'lost', stake: w.stake, payout: 0 });
+      meta.vcupBetNet -= row.stake;
+      ctx.emit({
+        type: 'vcupBetSettled',
+        pid: row.key,
+        outcome: 'lost',
+        stake: row.stake,
+        payout: 0,
+      });
     }
   }
 }

@@ -4864,6 +4864,7 @@ export const tr_TR: EnTranslations = {
     "connectionRejected": "Sunucu bağlantıyı kapattı.",
     "realmFull": "Bu dünya şu an dolu. Lütfen birkaç dakika sonra tekrar dene.",
     "tooManyConnections": "Ağından bu dünyaya çok fazla bağlantı geliyor. Lütfen fazladan oyun pencerelerini kapat ya da birkaç dakika sonra tekrar dene.",
+    "webOnlyRealm": "This world can only be entered from a web browser.",
     "tips": {
       "classes": "İpucu: 9 sınıfın her biri farklı oynanır. Birine bağlanmadan önce birkaçını dene.",
       "talents": "İpucu: savaş dışında olduğun sürece yeteneklerini istediğin zaman sıfırlayabilirsin, bu yüzden erken bir seçim asla tuzak değildir.",
@@ -4937,6 +4938,8 @@ export const tr_TR: EnTranslations = {
     "noRealms": "Mevcut dünya yok.",
     "loading": "Dünyalar yükleniyor...",
     "recommended": "Önerilen",
+    "p2wBadge": "Pay-to-Win",
+    "p2wTip": "Real-money and crypto mechanics are enabled on this world. Entering is optional and for adults only.",
     "checkingStatus": "Durum denetleniyor...",
     "onlineNow": "şu anda {count} çevrimiçi",
     "down": "Dünya çevrimdışı",

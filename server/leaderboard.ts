@@ -62,6 +62,8 @@ import type { LiveReportTarget } from './moderation_db';
 import { recordUsageMetric } from './provider_usage';
 import { publicReadRateLimited } from './ratelimit';
 import { REALM, REALM_DIRECTORY } from './realm';
+import { OWN_REALM_FEATURES } from './realm_features';
+import { realmsVisibleToRequest } from './realm_platform_guard';
 // From the config module directly (not the ./steam barrel): the barrel drags
 // routes.ts and its load-time middleware construction into this module's
 // graph, which partial db mocks in tests cannot serve.
@@ -363,14 +365,23 @@ interface RealmsReadDb {
   characterCountsByRealm(accountId: number): Promise<Record<string, number>>;
 }
 
-/** GET /api/realms body: the directory plus per-realm counts for an authed caller. */
+/**
+ * GET /api/realms body: the directory plus per-realm counts for an authed
+ * caller. The counts map is key-filtered to the directory actually served:
+ * when the caller's client class hides a realm (web-only realms for app
+ * shells), its NAME must not leak back through the character counts either.
+ */
 export async function readRealms(
   db: RealmsReadDb,
   accountId: number | null,
   realm: string,
-  directory: readonly unknown[],
+  directory: readonly { name: string }[],
 ): Promise<{ current: string; realms: readonly unknown[]; characters: Record<string, number> }> {
-  const characters = accountId !== null ? await db.characterCountsByRealm(accountId) : {};
+  const counts = accountId !== null ? await db.characterCountsByRealm(accountId) : {};
+  const visibleNames = new Set(directory.map((entry) => entry.name));
+  const characters = Object.fromEntries(
+    Object.entries(counts).filter(([name]) => visibleNames.has(name)),
+  );
   return { current: realm, realms: directory, characters };
 }
 
@@ -557,6 +568,9 @@ async function projectStatsHandler(ctx: Ctx): Promise<void> {
  * Steam link UI (dual-arm edit: the legacy main.ts twin carries the same field).
  * players_cap is the configured realm player cap (0 when disabled), also a dual-arm
  * edit: the legacy main.ts twin carries the same field with the same semantics.
+ * features is the per-realm casino feature bundle the client reads to self-hide
+ * UI (advisory only; every money route re-checks server-side); dual-arm edit,
+ * the legacy main.ts twin carries the identical field.
  */
 async function statusHandler(ctx: Ctx): Promise<void> {
   const rt = useRuntime();
@@ -566,6 +580,7 @@ async function statusHandler(ctx: Ctx): Promise<void> {
     players_online: rt.playersOnline(),
     players_cap: rt.playersCap(),
     steam: { enabled: steamEnabled() },
+    features: OWN_REALM_FEATURES,
   });
 }
 
@@ -612,7 +627,10 @@ async function searchHandler(ctx: Ctx): Promise<void> {
  */
 async function realmsHandler(ctx: Ctx): Promise<void> {
   const accountId = ctx.account?.accountId ?? null;
-  json(ctx.res, 200, await readRealms(dbReads, accountId, REALM, REALM_DIRECTORY));
+  // App-shell clients (native/desktop) never see web-only realms; the legacy
+  // twin arm shapes through the same realmsVisibleToRequest (dual-arm edit).
+  const visible = realmsVisibleToRequest(ctx.req, REALM_DIRECTORY);
+  json(ctx.res, 200, await readRealms(dbReads, accountId, REALM, visible));
 }
 
 /**

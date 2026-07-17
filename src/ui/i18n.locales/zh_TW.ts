@@ -1218,6 +1218,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'loading.realmFull': '這個世界目前已滿，請於幾分鐘後再試。',
   'loading.tooManyConnections':
     '您的網路對這個世界建立的連線過多。請關閉多餘的遊戲視窗，或於幾分鐘後再試。',
+  'loading.webOnlyRealm': '該世界只能透過網頁瀏覽器進入。',
   'errors.nothingInteract': '附近沒有可互動目標。',
   'errors.noEnemyNearby': '附近沒有敵人。',
   'errors.characterNameRequired': '請輸入角色名稱。',
@@ -1255,6 +1256,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'realm.noRealms': '沒有可用的世界。',
   'realm.loading': '正在載入世界...',
   'realm.recommended': '推薦',
+  'realm.p2wBadge': '付費變強',
+  'realm.p2wTip': '該世界啟用了真實貨幣與加密貨幣機制。進入完全自願，僅限成年人。',
   'realm.checkingStatus': '正在檢查狀態...',
   'realm.onlineNow': '目前 {count} 人在線上',
   'realm.down': '世界已離線',

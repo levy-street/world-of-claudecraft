@@ -44,6 +44,7 @@ import {
 import { RATELIMIT_PRUNE_SQL, RATELIMIT_SCHEMA } from './ratelimit_db';
 import { REALM } from './realm';
 import { chooseArchiveName } from './reclaim_name';
+import { RG_SCHEMA } from './rg_db';
 import { SOCIAL_SCHEMA } from './social_db';
 import { USER_ASSETS_SCHEMA } from './user_assets_db';
 
@@ -1033,6 +1034,12 @@ export async function ensureSchema(): Promise<void> {
         'rate_limits table missing after DDL: RATELIMIT_SCHEMA (server/ratelimit_db.ts) was not applied',
       );
     }
+    // RiverBoat responsible-gambling tables (age attestation, realm ToS
+    // acceptance, self-exclusion, inflow flow counters, per-account limits).
+    // FK-reference accounts(id), so they run after SCHEMA. Applied
+    // unconditionally (idempotent), like the Discord/GitHub tables, so they exist
+    // before the casino realm enables its money rails.
+    await client.query(RG_SCHEMA);
     // Reclaim expired tier-2 windows at boot (rows older than two windows are
     // dead by construction; see RATELIMIT_PRUNE_SQL). A concurrent serving realm
     // is unaffected: only expired windows match, and a racing UPSERT on a pruned
@@ -2886,9 +2893,12 @@ export interface LifetimeXpLeaderRow {
 // `global: true` ranks across every realm (for the home-page board); otherwise
 // it is scoped to this process's realm (the in-game panel). Both paths sort on
 // the indexed lifetime-XP expression and are read through the main.ts cache.
+// `excludeRealms` (global scope only) delists whole realms from the cross-realm
+// board: pay-to-win realms rank on their own realm board, never the shared one
+// (the caller passes p2wRealmNames from the shared REALMS directory).
 export async function topLifetimeXp(
   limit = 100,
-  opts: { global?: boolean } = {},
+  opts: { global?: boolean; excludeRealms?: readonly string[] } = {},
 ): Promise<LifetimeXpLeaderRow[]> {
   // Capped at LEADERBOARD_MAX (1000): the in-game board pages through this whole
   // cached window, so a realm with hundreds of max-level players is fully ranked.
@@ -2902,12 +2912,13 @@ export async function topLifetimeXp(
                 state->>'activeTitle' AS active_title
            FROM characters
           WHERE state IS NOT NULL
+            AND realm != ALL($2::text[])
             AND COALESCE((state->>'lifetimeXp')::bigint, 0) > 0
             AND EXISTS (SELECT 1 FROM accounts a
                          WHERE a.id = characters.account_id AND ${ELIGIBLE_ACCOUNT_SQL})
           ORDER BY lifetime_xp DESC, level DESC, name ASC
           LIMIT $1`,
-          [cap],
+          [cap, [...(opts.excludeRealms ?? [])]],
         )
       : query(
           `SELECT name, class, level, realm,
@@ -2953,9 +2964,11 @@ export interface GuildLeaderRow {
   topLevel: number;
 }
 
+// `excludeRealms` mirrors topLifetimeXp: global scope only, delists whole
+// realms (pay-to-win realms never rank on the shared board).
 export async function topGuilds(
   limit = 100,
-  opts: { global?: boolean } = {},
+  opts: { global?: boolean; excludeRealms?: readonly string[] } = {},
 ): Promise<GuildLeaderRow[]> {
   // Capped at LEADERBOARD_MAX (1000) like the player board, so a realm with many
   // guilds is fully ranked through the cached window.
@@ -2981,9 +2994,10 @@ export async function topGuilds(
           `SELECT ${selectAgg}
            ${fromJoin}
           WHERE c.state IS NOT NULL
+            AND g.realm != ALL($2::text[])
           ${groupOrder}
           LIMIT $1`,
-          [cap],
+          [cap, [...(opts.excludeRealms ?? [])]],
         )
       : query(
           `SELECT ${selectAgg}
@@ -3030,10 +3044,16 @@ export async function topGuilds(
 // asc. deed_count (the scoring-set size) is a deprecated wire-compat output
 // removed next release together with the pure spec's field (issue #2044,
 // executable-spec lockstep both times); it is not displayed by current clients.
+// `excludeRealms` mirrors topLifetimeXp: characters on those realms contribute
+// nothing to any account's Renown, count, completion time, or display pick
+// (pay-to-win realms never rank on the shared board). Applied SQL-side before
+// aggregation, so the computeDeedsBoard executable spec models the post-filter
+// input; the default empty list keeps the pg differential in exact parity.
 export async function deedsBoardRanked(
   deedIds: readonly string[],
   renowns: readonly number[],
   floor: number,
+  excludeRealms: readonly string[] = [],
 ): Promise<{ ranked: RankedDeedsAccount[]; totalRanked: number; unknownDeedIds: string[] }> {
   // Both reads run in ONE raised-timeout transaction: the roll-up is a full-table
   // hash aggregate and the unknown-id side read a DISTINCT scan, so a large
@@ -3055,6 +3075,7 @@ export async function deedsBoardRanked(
          JOIN accounts a ON a.id = cd.account_id
          JOIN renown r ON r.deed_id = cd.deed_id
         WHERE ${ELIGIBLE_ACCOUNT_SQL}
+          AND c.realm != ALL($4::text[])
         GROUP BY cd.account_id, cd.deed_id
      ),
      account_agg AS (
@@ -3074,6 +3095,7 @@ export async function deedsBoardRanked(
          JOIN accounts a ON a.id = cd.account_id
          JOIN renown r ON r.deed_id = cd.deed_id
         WHERE ${ELIGIBLE_ACCOUNT_SQL}
+          AND c.realm != ALL($4::text[])
         GROUP BY cd.account_id, cd.character_id
      ),
      display AS (
@@ -3089,7 +3111,7 @@ export async function deedsBoardRanked(
        FROM account_agg aa
        JOIN display d ON d.account_id = aa.account_id
       ORDER BY aa.renown DESC, aa.completion_time ASC, aa.account_id ASC`,
-      [deedIds, renowns, floor],
+      [deedIds, renowns, floor, [...excludeRealms]],
     );
     const ranked: RankedDeedsAccount[] = res.rows.map((r) => ({
       accountId: Number(r.account_id),

@@ -13,6 +13,8 @@ import type { IncomingMessage } from 'node:http';
 import { verifyNativeAttestation } from './native_attestation';
 import { recordUsageMetric } from './provider_usage';
 import { requestIp } from './ratelimit';
+import { OWN_REALM_FLAGS, type RealmFlag } from './realm';
+import { webOnlyRealmRefuses } from './realm_platform_guard';
 import { isDesktopAppRequest, isNativeAppRequest } from './web_login_guard';
 
 const SITEVERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
@@ -69,7 +71,14 @@ export async function passesTurnstile(
   body: Record<string, unknown>,
   secret: string,
   fetchImpl: typeof fetch = fetch,
+  ownRealmFlags: readonly RealmFlag[] = OWN_REALM_FLAGS,
 ): Promise<boolean> {
+  // On a web-only realm process the app-shell admission arms INVERT: the native
+  // attestation and the desktop Origin bypass become rejections, so an app-store
+  // build can never authenticate against this realm's origin (store policy keeps
+  // real-money/crypto realms out of native builds; see realm_platform_guard.ts).
+  // Browser clients are unaffected and keep the exact gate they have today.
+  if (webOnlyRealmRefuses(ownRealmFlags, req)) return false;
   if (isNativeAppRequest(req)) return verifyNativeAttestation(req, body.nativeAttestation);
   if (isDesktopAppRequest(req)) return true;
   if (!secret) return true;

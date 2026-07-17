@@ -4864,6 +4864,7 @@ export const zh_TW: EnTranslations = {
     "connectionRejected": "伺服器已關閉連線。",
     "realmFull": "這個世界目前已滿，請於幾分鐘後再試。",
     "tooManyConnections": "您的網路對這個世界建立的連線過多。請關閉多餘的遊戲視窗，或於幾分鐘後再試。",
+    "webOnlyRealm": "該世界只能透過網頁瀏覽器進入。",
     "tips": {
       "classes": "提示：9 個職業玩法各不相同，投入之前不妨都試一試。",
       "talents": "提示：只要不在戰鬥中，隨時都能重置天賦，因此早期的選擇不會成為陷阱。",
@@ -4937,6 +4938,8 @@ export const zh_TW: EnTranslations = {
     "noRealms": "沒有可用的世界。",
     "loading": "正在載入世界...",
     "recommended": "推薦",
+    "p2wBadge": "付費變強",
+    "p2wTip": "該世界啟用了真實貨幣與加密貨幣機制。進入完全自願，僅限成年人。",
     "checkingStatus": "正在檢查狀態...",
     "onlineNow": "目前 {count} 人在線上",
     "down": "世界已離線",

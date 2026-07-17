@@ -4864,6 +4864,7 @@ export const pl_PL: EnTranslations = {
     "connectionRejected": "Serwer zamknął połączenie.",
     "realmFull": "Ten świat jest teraz pełny. Spróbuj ponownie za kilka minut.",
     "tooManyConnections": "Z twojej sieci pochodzi zbyt wiele połączeń do tego świata. Zamknij dodatkowe okna gry lub spróbuj ponownie za kilka minut.",
+    "webOnlyRealm": "This world can only be entered from a web browser.",
     "tips": {
       "classes": "Wskazówka: każdą z 9 klas gra się inaczej. Wypróbuj kilka, zanim zdecydujesz się na jedną.",
       "talents": "Wskazówka: poza walką możesz w każdej chwili wyzerować talenty, więc wczesny wybór nigdy nie jest pułapką.",
@@ -4937,6 +4938,8 @@ export const pl_PL: EnTranslations = {
     "noRealms": "Brak dostępnych światów.",
     "loading": "Wczytywanie światów...",
     "recommended": "Zalecany",
+    "p2wBadge": "Pay-to-Win",
+    "p2wTip": "Real-money and crypto mechanics are enabled on this world. Entering is optional and for adults only.",
     "checkingStatus": "Sprawdzanie stanu...",
     "onlineNow": "{count} teraz online",
     "down": "Świat jest wyłączony",

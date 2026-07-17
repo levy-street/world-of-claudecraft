@@ -4864,6 +4864,7 @@ export const pt_BR: EnTranslations = {
     "connectionRejected": "O servidor encerrou a conexão.",
     "realmFull": "Este mundo está lotado no momento. Tente novamente em alguns minutos.",
     "tooManyConnections": "Há conexões em excesso a este mundo vindas da sua rede. Feche janelas extras do jogo ou tente novamente em alguns minutos.",
+    "webOnlyRealm": "This world can only be entered from a web browser.",
     "tips": {
       "classes": "Dica: cada uma das 9 classes tem um estilo diferente. Experimente algumas antes de escolher uma.",
       "talents": "Dica: você pode redefinir seus talentos sempre que estiver fora de combate, então uma escolha inicial nunca é definitiva.",
@@ -4937,6 +4938,8 @@ export const pt_BR: EnTranslations = {
     "noRealms": "Nenhum mundo disponível.",
     "loading": "Carregando mundos...",
     "recommended": "Recomendado",
+    "p2wBadge": "Pay-to-Win",
+    "p2wTip": "Real-money and crypto mechanics are enabled on this world. Entering is optional and for adults only.",
     "checkingStatus": "Verificando status...",
     "onlineNow": "{count} online agora",
     "down": "O mundo está fora do ar",

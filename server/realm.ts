@@ -71,6 +71,31 @@ export function resolvePublicOrigin(rawOrigin: string | undefined): string {
   }
 }
 
+// Per-realm capability/labeling flags, carried as an optional 4th REALMS field
+// (plus-separated) and advertised to the client in the /api/realms directory:
+//   web: browser-only realm. Dropped from the directory served to the native
+//        (Capacitor) and desktop (Electron) app classes, and this process
+//        refuses those client classes outright when its own realm carries the
+//        flag (store policy: real-money/crypto surfaces stay out of app-store
+//        builds, which render the directory unfiltered and have no OTA path).
+//   p2w: pay-to-win realm. Labeling only: the realm picker badges the entry,
+//        and p2w realms are excluded from the cross-realm (global) leaderboard
+//        scopes so pay-boosted characters never rank on clean-realm boards.
+// Unknown tokens are dropped (forward compatible both directions: old parsers
+// ignore the extra field, new parsers ignore unknown tokens).
+export type RealmFlag = 'web' | 'p2w';
+const KNOWN_REALM_FLAGS: readonly RealmFlag[] = ['web', 'p2w'];
+
+export function resolveRealmFlags(raw: string | undefined): RealmFlag[] {
+  const out: RealmFlag[] = [];
+  for (const token of (raw ?? '').split(/[+,]/)) {
+    const flag = token.trim().toLowerCase();
+    if ((KNOWN_REALM_FLAGS as readonly string[]).includes(flag) && !out.includes(flag as RealmFlag))
+      out.push(flag as RealmFlag);
+  }
+  return out;
+}
+
 export interface RealmEntry {
   name: string;
   // origin a client should connect to for this realm (e.g.
@@ -78,16 +103,18 @@ export interface RealmEntry {
   // used for the single-realm default
   url: string;
   type: RealmType;
+  flags: RealmFlag[];
 }
 
 // The realm directory drives the client's classic-MMO-style realm-list screen.
-// Configure it with REALMS as a comma-separated list of `Name=https://host=Type`
-// entries (Type optional, defaults Normal), e.g.
-//   REALMS="Claudemoon=https://claudemoon.example.com=Normal,Highwatch=https://highwatch.example.com=PvP"
+// Configure it with REALMS as a comma-separated list of
+// `Name=https://host=Type=Flags` entries (Type optional, defaults Normal; Flags
+// optional, plus-separated RealmFlag tokens), e.g.
+//   REALMS="Claudemoon=https://claudemoon.example.com=Normal,RiverBoat=https://riverboat.example.com=Normal=web+p2w"
 // Every realm process shares the same DATABASE_URL and serves the same
 // directory, so a client on any of them can discover and switch to the others.
 // Unset → a single same-origin realm (this process), i.e. no cross-realm UI.
-function parseRealms(raw: string | undefined): RealmEntry[] {
+export function parseRealms(raw: string | undefined): RealmEntry[] {
   const out: RealmEntry[] = [];
   for (const part of (raw ?? '').split(',')) {
     const seg = part.trim();
@@ -99,14 +126,33 @@ function parseRealms(raw: string | undefined): RealmEntry[] {
     const url = resolvePublicOrigin(rawUrl);
     if (rawUrl && !url) continue; // must be a bare origin
     if (out.some((e) => e.name === name)) continue;
-    out.push({ name, url, type: resolveRealmType(fields[2]) });
+    out.push({
+      name,
+      url,
+      type: resolveRealmType(fields[2]),
+      flags: resolveRealmFlags(fields[3]),
+    });
   }
   return out;
 }
 
+// This process's own flags may also be set directly via REALM_FLAGS (comma or
+// plus separated), for the single-realm default where no REALMS directory
+// exists to carry them.
+const CONFIGURED_REALM_FLAGS: RealmFlag[] = resolveRealmFlags(process.env.REALM_FLAGS);
+
 export const REALM_DIRECTORY: RealmEntry[] = (() => {
   const parsed = parseRealms(process.env.REALMS);
-  return parsed.length > 0 ? parsed : [{ name: REALM, url: '', type: REALM_TYPE }];
+  return parsed.length > 0
+    ? parsed
+    : [{ name: REALM, url: '', type: REALM_TYPE, flags: CONFIGURED_REALM_FLAGS }];
+})();
+
+// The flags this process's own realm carries: the union of REALM_FLAGS and the
+// directory entry for REALM. Everything money/platform-gating keys off these.
+export const OWN_REALM_FLAGS: readonly RealmFlag[] = (() => {
+  const fromDirectory = REALM_DIRECTORY.find((e) => e.name === REALM)?.flags ?? [];
+  return [...new Set([...CONFIGURED_REALM_FLAGS, ...fromDirectory])];
 })();
 
 // Cross-origin requests from these realm origins are allowed (CORS), so a

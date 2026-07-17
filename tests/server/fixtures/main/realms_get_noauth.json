@@ -1,7 +1,7 @@
 {
-  "body": "{\"characters\":{},\"current\":\"Claudemoon\",\"realms\":[{\"name\":\"Claudemoon\",\"type\":\"Normal\",\"url\":\"\"}]}",
+  "body": "{\"characters\":{},\"current\":\"Claudemoon\",\"realms\":[{\"flags\":[],\"name\":\"Claudemoon\",\"type\":\"Normal\",\"url\":\"\"}]}",
   "headers": {
-    "content-length": 98,
+    "content-length": 109,
     "content-type": "application/json",
     "cross-origin-opener-policy": "same-origin",
     "cross-origin-resource-policy": "same-origin",

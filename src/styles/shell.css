@@ -4208,6 +4208,14 @@
     border-radius: 3px;
     padding: 0 4px;
   }
+  .realm-name .rn-p2w {
+    color: #ffb347;
+    font-size: 10px;
+    margin-left: 6px;
+    border: 1px solid #7a5a22;
+    border-radius: 3px;
+    padding: 0 4px;
+  }
   .realm-sub {
     font-size: 11px;
     color: #998d6a;
