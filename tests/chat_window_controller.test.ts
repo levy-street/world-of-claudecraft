@@ -151,4 +151,88 @@ describe('ChatWindowController', () => {
     expect(harness.controller.composeSend('ready')).toBe('/r ready');
     expect(harness.input.style.color).toBe('#ff80ff');
   });
+
+  const sysToggle = (harness: Harness): FakeElement => {
+    const bar = harness.document.getElementById('chatlog-tabs');
+    if (!bar) throw new Error('tab strip missing');
+    const button = bar.querySelector('.chat-tab-sysfilter') as unknown as FakeElement | null;
+    if (!button) throw new Error('system-filter toggle missing');
+    return button;
+  };
+
+  it('starts the system-filter toggle pressed and hides system lines when persisted on', () => {
+    const harness = makeHarness({ woc_chat_hide_system: '1' });
+    const chatLine = harness.document.createElement('div');
+    chatLine.dataset.chan = 'say';
+    const systemLine = harness.document.createElement('div');
+    systemLine.dataset.chan = 'system';
+    harness.chatLog.append(chatLine, systemLine);
+
+    harness.controller.init();
+
+    expect(sysToggle(harness).getAttribute('aria-pressed')).toBe('true');
+    expect(chatLine.classList.contains('chat-hidden')).toBe(false);
+    expect(systemLine.classList.contains('chat-hidden')).toBe(true);
+  });
+
+  it('defaults the system-filter toggle to off, showing system lines, when nothing is persisted', () => {
+    const harness = makeHarness();
+    const systemLine = harness.document.createElement('div');
+    systemLine.dataset.chan = 'system';
+    harness.chatLog.append(systemLine);
+
+    harness.controller.init();
+
+    expect(sysToggle(harness).getAttribute('aria-pressed')).toBe('false');
+    expect(systemLine.classList.contains('chat-hidden')).toBe(false);
+  });
+
+  it('flips, persists, and re-applies the filter to existing lines when the toggle is clicked', () => {
+    const harness = makeHarness();
+    const systemLine = harness.document.createElement('div');
+    systemLine.dataset.chan = 'system';
+    harness.chatLog.append(systemLine);
+    harness.controller.init();
+    const button = sysToggle(harness);
+
+    button.dispatchEvent(new Event('click'));
+
+    expect(button.getAttribute('aria-pressed')).toBe('true');
+    expect(harness.storage.getItem('woc_chat_hide_system')).toBe('1');
+    expect(systemLine.classList.contains('chat-hidden')).toBe(true);
+
+    button.dispatchEvent(new Event('click'));
+
+    expect(button.getAttribute('aria-pressed')).toBe('false');
+    expect(harness.storage.getItem('woc_chat_hide_system')).toBe('0');
+    expect(systemLine.classList.contains('chat-hidden')).toBe(false);
+  });
+
+  it('hides the toggle off the All view yet keeps it a control, never a selectable tab', () => {
+    const harness = makeHarness({
+      woc_chat_tabs: '["world"]',
+      woc_chat_active_tab: 'all',
+    });
+    harness.controller.init();
+    const button = sysToggle(harness);
+
+    // On the All view: visible, and it never takes tab-selection state.
+    expect(button.classList.contains('chat-tab-sysfilter-hidden')).toBe(false);
+    expect(button.getAttribute('aria-selected')).toBe(null);
+    expect(button.tabIndex).toBe(0);
+
+    // Switch to a channel tab: the toggle hides (its effect is All-only) but stays a control.
+    const bar = harness.document.getElementById('chatlog-tabs');
+    if (!bar) throw new Error('tab strip missing');
+    const worldTab = bar
+      .querySelectorAll('.chat-tab')
+      .map((element) => element as unknown as FakeElement)
+      .find((element) => element.dataset.tab === 'world');
+    if (!worldTab) throw new Error('world tab missing');
+    worldTab.dispatchEvent(new Event('click'));
+
+    expect(button.classList.contains('chat-tab-sysfilter-hidden')).toBe(true);
+    expect(button.getAttribute('aria-selected')).toBe(null);
+    expect(button.tabIndex).toBe(0);
+  });
 });

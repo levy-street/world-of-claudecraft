@@ -52,4 +52,14 @@ describe('chat tab strip layout (issue #1365)', () => {
     expect(block(mobile, 'body.mobile-touch .chat-tab-add')).toMatch(/min-width:\s*40px/);
     expect(block(mobile, 'body.mobile-touch .chat-tab')).toMatch(/min-height:\s*40px/);
   });
+
+  it('the system-filter hide survives the mobile layer (issue #1670)', () => {
+    // .chat-tab-sysfilter-hidden { display: none } lives in @layer components, but
+    // body.mobile-touch .chat-tab { display: inline-flex } is in the later @layer
+    // hud-mobile and beats it. hud.mobile.css must mirror the hide with a selector
+    // that also carries .chat-tab so it outranks that rule regardless of order,
+    // otherwise the toggle stays visible on the Combat/channel tabs on mobile.
+    const b = block(mobile, 'body.mobile-touch .chat-tab.chat-tab-sysfilter-hidden');
+    expect(b).toMatch(/display:\s*none/);
+  });
 });
