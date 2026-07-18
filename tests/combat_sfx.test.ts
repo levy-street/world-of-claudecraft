@@ -126,13 +126,14 @@ describe('combat SFX policy', () => {
     expect(mobVoiceCue('water_elemental', 'hurt')).toBe('mob_water_elemental_attack');
     expect(mobVoiceFamily('stormcrag_elemental')).toBe('elemental');
   });
-  it('suppresses crit stingers for boss and dummy targets', () => {
+  it('suppresses the crit ding for a boss but not the Training Dummy', () => {
     expect(shouldPlayCritSfxForTarget(target('mob', 'nythraxis_scourge_of_thornpeak'))).toBe(false);
     expect(shouldPlayCritSfxForTarget(target('mob', 'nythraxis_skeleton_warrior'))).toBe(true);
     expect(shouldPlayCritSfxForTarget(target('player', 'warrior'))).toBe(true);
-    // The Training Dummy soaks hits for the damage meter; it should never
-    // react to a crit like a real fight.
-    expect(shouldPlayCritSfxForTarget(target('mob', 'training_dummy'))).toBe(false);
+    // 2026-07-19 follow-up to #2116: the dummy still gets the plain crit
+    // ding (only the hurt-bark vocalization is suppressed for it, see
+    // mobVoiceActionForDamage below).
+    expect(shouldPlayCritSfxForTarget(target('mob', 'training_dummy'))).toBe(true);
   });
 
   it('suppresses Nythraxis add voice barks without muting ordinary undead', () => {
@@ -351,6 +352,8 @@ describe('combat SFX policy', () => {
     expect(mobVoiceActionForDamage(damage({ crit: true }), mob)).toBe('hurt');
     expect(mobVoiceActionForDamage(damage({ crit: false }), mob)).toBeNull();
     expect(mobVoiceActionForDamage(damage({ crit: true }), boss)).toBeNull();
+    // The dummy is excluded from the hurt bark specifically, even though it
+    // still gets the plain crit ding (shouldPlayCritSfxForTarget, tested above).
     expect(mobVoiceActionForDamage(damage({ crit: true }), dummy)).toBeNull();
     expect(mobVoiceActionForDamage(damage({ crit: true }), player)).toBeNull();
   });

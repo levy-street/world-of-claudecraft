@@ -262,27 +262,36 @@ export function mobVoiceCueWithFallback(
   return mobVoiceCue(templateId, 'attack', hasCue);
 }
 
-/** Gates BOTH crit-reaction cues in hud.ts: the generic `combat_crit` ding
- *  (played directly whenever this returns true) and the mob-voice hurt bark
- *  (via mobVoiceActionForDamage below). A boss or the Training Dummy gets
- *  neither: a boss because a crit sting is a wrong emotional beat mid-boss-fight,
- *  the dummy because it soaks hits for the damage meter and was never meant
- *  to react like a real fight, the ding included. */
+/** Gates the generic `combat_crit` ding in hud.ts (played directly whenever
+ *  this returns true). A boss gets none: a crit sting is a wrong emotional
+ *  beat mid-boss-fight. The Training Dummy DOES still get the ding (2026-07-19
+ *  follow-up to #2116: the dummy soaks hits for the damage meter and was
+ *  never meant to react like a real fight with a pained hurt bark, but the
+ *  plain crit ding is fine and expected feedback while testing rotations
+ *  against it; see mobVoiceActionForDamage below for the hurt-bark-only
+ *  exclusion). */
 export function shouldPlayCritSfxForTarget(target: Entity): boolean {
-  return (
-    target.kind !== 'mob' || (!MOBS[target.templateId]?.boss && !MOBS[target.templateId]?.dummy)
-  );
+  return target.kind !== 'mob' || !MOBS[target.templateId]?.boss;
 }
 
 /** The mob-voice action a damage event's target should react with, or null
- *  for anything that isn't a crit against a non-boss, non-dummy mob (a miss,
- *  an ordinary hit, a player target, a boss immune to crit stingers, the
- *  Training Dummy, whose whole point is soaking hits for the damage meter
- *  without reacting like a real fight). Callers still gate the actual play
+ *  for anything that isn't a crit against a non-boss mob (a miss, an
+ *  ordinary hit, a player target, a boss immune to crit stingers), OR the
+ *  Training Dummy specifically: it still gets the plain combat_crit ding
+ *  (shouldPlayCritSfxForTarget above), just never the pained hurt-bark
+ *  vocalization, since it soaks hits for the damage meter and was never
+ *  meant to react like a real fight. Callers still gate the actual play
  *  through shouldPlayMobVoiceSfxForEntity (the Nythraxis mute list) before
  *  using the resolved cue. */
 export function mobVoiceActionForDamage(event: DamageEvent, target: Entity): MobVoiceAction | null {
-  if (!event.crit || target.kind !== 'mob' || !shouldPlayCritSfxForTarget(target)) return null;
+  if (
+    !event.crit ||
+    target.kind !== 'mob' ||
+    !shouldPlayCritSfxForTarget(target) ||
+    MOBS[target.templateId]?.dummy
+  ) {
+    return null;
+  }
   return 'hurt';
 }
 
