@@ -7,6 +7,10 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_card_duel_first_win: {
+    name: 'Ev Kuralları',
+    desc: "Kart Ustası'nın yanında bir Kart Düellosu kazan.",
+  },
   prog_first_steps: {
     name: 'İlk Adımlar',
     desc: '2. seviyeye ulaş ve uzun bir yolun ilk adımını at.',

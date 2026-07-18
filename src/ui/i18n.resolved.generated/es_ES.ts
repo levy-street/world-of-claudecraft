@@ -425,16 +425,16 @@ export const es_ES: EnTranslations = {
       "armoryTitle": "La Armería",
       "armoryBody": "Apariencias de armas de edición limitada de la Armería de la temporada 1. Válidas para toda la cuenta, puramente cosméticas y visibles para todos los que te rodean.",
       "wallet": {
-        "title": "Solana wallet",
-        "unlinked": "Connect a wallet app, then sign once to link its public address to your WoC account. We never receive your recovery phrase or private key.",
-        "connectedUnlinked": "The wallet app is connected to this browser, but its public address is not linked to your WoC account yet.",
-        "linkedDisconnected": "Your public address is linked. Reconnect that wallet app when you want to pay with SOL or WOC.",
-        "linkedConnected": "Your linked wallet app is connected and ready for SOL or WOC purchases.",
-        "mismatched": "A different wallet is connected. Verify it to replace the linked address, or reconnect the linked wallet.",
-        "connect": "Connect wallet",
-        "verify": "Verify and link",
-        "reconnect": "Reconnect wallet",
-        "manage": "Manage wallet"
+        "title": "Cartera de Solana",
+        "unlinked": "Conecta una aplicación de cartera y firma una vez para vincular su dirección pública a tu cuenta de WoC. Nunca recibimos tu frase de recuperación ni tu clave privada.",
+        "connectedUnlinked": "La aplicación de cartera está conectada a este navegador, pero su dirección pública aún no está vinculada a tu cuenta de WoC.",
+        "linkedDisconnected": "Tu dirección pública está vinculada. Vuelve a conectar esa aplicación de cartera cuando quieras pagar con SOL o WOC.",
+        "linkedConnected": "Tu aplicación de cartera vinculada está conectada y lista para compras con SOL o WOC.",
+        "mismatched": "Hay una cartera diferente conectada. Verifícala para reemplazar la dirección vinculada, o vuelve a conectar la cartera vinculada.",
+        "connect": "Conectar cartera",
+        "verify": "Verificar y vincular",
+        "reconnect": "Volver a conectar cartera",
+        "manage": "Gestionar cartera"
       },
       "collectionLine": "Colección {collection}",
       "collections": {
@@ -1063,8 +1063,8 @@ export const es_ES: EnTranslations = {
       "exampleAbilities": "Habilidades de ejemplo",
       "viewTalents": "Ver talentos",
       "selectSpec": "Seleccionar especialización",
-      "specUnlockBanner": "Specialization Unlocked!",
-      "specUnlockHint": "Press N to choose your specialization."
+      "specUnlockBanner": "¡Especialización Desbloqueada!",
+      "specUnlockHint": "Pulsa N para elegir tu especialización."
     },
     "controller": {
       "title": "Mando",
@@ -1547,10 +1547,10 @@ export const es_ES: EnTranslations = {
       "attackSpeedSlow": "Disminuye la velocidad de ataque un {pct}%",
       "attackSpeedFast": "Incrementa la velocidad de ataque un {pct}%",
       "haste": "Incrementa la velocidad de ataque y lanzamiento un {pct}%",
-      "dmgDone": "Increases damage dealt by {pct}%",
-      "dmgDoneReduce": "Reduces damage dealt by {pct}%",
-      "heatingUp": "Your next consecutive Fire builder critical strike grants Hot Streak; a non-critical builder removes Heating Up",
-      "elementalConvergencePrimed": "Your next spell from the other elemental school grants Elemental Convergence",
+      "dmgDone": "Aumenta el daño infligido un {pct}%",
+      "dmgDoneReduce": "Reduce el daño infligido un {pct}%",
+      "heatingUp": "Tu siguiente golpe crítico consecutivo de Fuego activa Buena Racha; un golpe no crítico elimina Calentando Motores",
+      "elementalConvergencePrimed": "Tu próximo hechizo de la otra escuela elemental otorga Convergencia Elemental",
       "battleStance": "Actitud de Combate: un 10% más de generación de ira",
       "berserkerStance": "Actitud Rabiosa: los críticos aciertan un 3% más a menudo y golpean un 3% más fuerte",
       "crit": "Incrementa la probabilidad de golpe crítico un {pct}%",
@@ -1629,7 +1629,7 @@ export const es_ES: EnTranslations = {
       "formBear": "Forma de Bruin: mayor salud y armadura",
       "formCat": "Forma felina, daño cuerpo a cuerpo y energía",
       "formTravel": "Forma Fleet: velocidad de desplazamiento aumentada un {pct}%",
-      "formFireball": "Ember Form: movement speed increased by {pct}%; attacks and spells are disabled",
+      "formFireball": "Forma de Brasa: velocidad de movimiento aumentada un {pct}%; ataques y hechizos desactivados",
       "defensiveStance": "Guarded Stance: menos daño recibido, más amenaza",
       "righteousFury": "Burning Oath: amenaza por daño Sagrado enormemente aumentada",
       "scale": "Talla aumentado un {pct}%",
@@ -2090,28 +2090,28 @@ export const es_ES: EnTranslations = {
       "hobbyLabel": "Pasatiempo"
     },
     "archetypePair": {
-      "engineering+alchemy": "Bombardier",
-      "alchemy+cooking": "Apothecary",
-      "cooking+leatherworking": "Trapper",
-      "leatherworking+tailoring": "Outfitter",
-      "tailoring+inscription": "Mageweaver",
-      "inscription+enchanting": "Arcanist",
-      "enchanting+jewelcrafting": "Gembinder",
-      "jewelcrafting+weaponcrafting": "Bladewright",
-      "weaponcrafting+armorcrafting": "Smith",
-      "armorcrafting+engineering": "Cogsmith"
+      "engineering+alchemy": "Bombardero",
+      "alchemy+cooking": "Boticario",
+      "cooking+leatherworking": "Trampero",
+      "leatherworking+tailoring": "Pertrechador",
+      "tailoring+inscription": "Tejedormago",
+      "inscription+enchanting": "Arcanista",
+      "enchanting+jewelcrafting": "Gemoencantador",
+      "jewelcrafting+weaponcrafting": "Forjajoyero",
+      "weaponcrafting+armorcrafting": "Herrero",
+      "armorcrafting+engineering": "Mecanoforjador"
     },
     "craftName": {
-      "armorcrafting": "Armorcrafting",
-      "weaponcrafting": "Weaponcrafting",
-      "jewelcrafting": "Jewelcrafting",
-      "alchemy": "Alchemy",
-      "engineering": "Engineering",
-      "cooking": "Cooking",
-      "inscription": "Inscription",
-      "enchanting": "Enchanting",
-      "tailoring": "Tailoring",
-      "leatherworking": "Leatherworking"
+      "armorcrafting": "Forja de armaduras",
+      "weaponcrafting": "Forja de armas",
+      "jewelcrafting": "Joyería",
+      "alchemy": "Alquimia",
+      "engineering": "Ingeniería",
+      "cooking": "Cocina",
+      "inscription": "Inscripción",
+      "enchanting": "Encantamiento",
+      "tailoring": "Sastrería",
+      "leatherworking": "Peletería"
     },
     "crafting": {
       "title": "Elaboración",
@@ -2125,41 +2125,41 @@ export const es_ES: EnTranslations = {
       "insufficientMaterials": "No tienes los materiales para eso.",
       "unknownRecipe": "Esa receta no existe.",
       "comboRequirementUnmet": "No tienes las dos profesiones requeridas al nivel necesario para esa receta.",
-      "comboRequires": "Attunement: {craftA} + {craftB}, tier {tier}.",
-      "comboMet": "Ready.",
-      "comboSyncing": "Checking realm attunement.",
-      "comboNotAttuned": "Choose an archetype pair first.",
-      "comboWrongPair": "Activate this exact pair to craft it.",
-      "comboTierUnmet": "Raise both major crafts to the required tier.",
-      "professionChoice": "Profession choice",
-      "noProfessionChoice": "No valid profession choice is currently available.",
+      "comboRequires": "Sintonización: {craftA} + {craftB}, nivel {tier}.",
+      "comboMet": "Listo.",
+      "comboSyncing": "Comprobando la sintonización del reino.",
+      "comboNotAttuned": "Elige primero un par de arquetipo.",
+      "comboWrongPair": "Activa este par exacto para fabricarlo.",
+      "comboTierUnmet": "Eleva ambas especializaciones principales al nivel requerido.",
+      "professionChoice": "Elección de profesión",
+      "noProfessionChoice": "No hay ninguna elección de profesión válida disponible en este momento.",
       "pairOptionLabel": "{pair} ({craftA} + {craftB})",
-      "attunementPreview": "Result: {title} title; {majorA} and {majorB} become uncapped majors; {hobby} becomes the rare-capped hobby; all other skill knowledge is retained but capped at common while dormant.",
-      "hobbyPreview": "Result: {hobby} becomes the rare-capped hobby. Both majors and all retained skill values stay unchanged.",
+      "attunementPreview": "Resultado: título {title}; {majorA} y {majorB} se convierten en especializaciones principales sin límite; {hobby} pasa a ser la afición con tope de calidad rara; el resto del conocimiento se conserva pero queda limitado a común mientras está inactivo.",
+      "hobbyPreview": "Resultado: {hobby} pasa a ser la afición con tope de calidad rara. Ambas especializaciones principales y los valores de habilidad conservados no cambian.",
       "identity": {
-        "title": "Crafting Identity",
-        "syncing": "Waiting for your crafting identity from the realm.",
-        "unattuned": "No archetype pair is active. Your knowledge is retained, but combo recipes require an attuned pair.",
-        "titleLabel": "Title",
-        "majorsLabel": "Majors",
-        "hobbyLabel": "Hobby",
-        "historyLabel": "History",
-        "history": "{pairs} pairs discovered, {returns} returns completed",
-        "roleMajor": "Major",
-        "roleHobby": "Hobby",
-        "roleDormant": "Dormant knowledge",
-        "roleUnattuned": "Unattuned",
-        "ceilingUnlimited": "No empowerment cap",
-        "ceilingRare": "Rare cap",
-        "ceilingCommon": "Common cap",
-        "skillAria": "{craft}, skill {skill}, tier {tier}, {role}, {ceiling}",
-        "colCraft": "Craft",
-        "colSkill": "Skill",
-        "colRole": "Role",
-        "colCap": "Cap",
-        "tutorial": "First tier: reach skill {skill} in a craft. Successful recipes raise that craft without erasing knowledge elsewhere.",
-        "nearTier": "{craft} is {points} skill from its next tier.",
-        "dormantKnowledge": "{craft} knowledge is retained but dormant until its pair or hobby is active."
+        "title": "Identidad de Artesanía",
+        "syncing": "Esperando tu identidad de artesanía del reino.",
+        "unattuned": "No hay ningún par de arquetipo activo. Tu conocimiento se conserva, pero las recetas combinadas requieren un par sintonizado.",
+        "titleLabel": "Título",
+        "majorsLabel": "Especializaciones principales",
+        "hobbyLabel": "Afición",
+        "historyLabel": "Historial",
+        "history": "{pairs} pares descubiertos, {returns} regresos completados",
+        "roleMajor": "Principal",
+        "roleHobby": "Afición",
+        "roleDormant": "Conocimiento inactivo",
+        "roleUnattuned": "Sin sintonizar",
+        "ceilingUnlimited": "Sin tope de mejora",
+        "ceilingRare": "Tope de calidad rara",
+        "ceilingCommon": "Tope de calidad común",
+        "skillAria": "{craft}, habilidad {skill}, nivel {tier}, {role}, {ceiling}",
+        "colCraft": "Oficio",
+        "colSkill": "Habilidad",
+        "colRole": "Función",
+        "colCap": "Tope",
+        "tutorial": "Primer nivel: alcanza la habilidad {skill} en un oficio. Las recetas completadas con éxito aumentan ese oficio sin borrar el conocimiento en otras áreas.",
+        "nearTier": "{craft} está a {points} puntos de habilidad de su próximo nivel.",
+        "dormantKnowledge": "El conocimiento de {craft} se conserva pero está inactivo hasta que su par o afición estén activos."
       },
       "notAtHub": "Debes estar en el centro de elaboración, con el nivel requerido, para elaborar eso.",
       "throttled": "Estás elaborando demasiado rápido. Espera un momento e inténtalo de nuevo.",
@@ -2324,9 +2324,9 @@ export const es_ES: EnTranslations = {
       "charOpenBook": "Libro de Gestas",
       "lbTab": "Renombre",
       "lbTitleCol": "Título",
-      "lbScopeNote": "Accounts ranked by lifetime Renown. Each deed counts once across all characters on an account.",
-      "lbSelfAccount": "Your account: rank {rank}, top {percent} percent, {renown} Renown",
-      "lbSelfRank": "Your account: rank {rank}, top {percent} percent",
+      "lbScopeNote": "Cuentas clasificadas por Renombre acumulado. Cada gesta cuenta una vez entre todos los personajes de una cuenta.",
+      "lbSelfAccount": "Tu cuenta: posición {rank}, entre el {percent}% superior, {renown} de Renombre",
+      "lbSelfRank": "Tu cuenta: posición {rank}, entre el {percent}% superior",
       "lbEmpty": "Aún no hay cronistas clasificados.",
       "broadcastsLabel": "Compartir las gestas conseguidas con la hermandad y los amigos",
       "titledName": "{name} [{title}]"
@@ -2432,7 +2432,7 @@ export const es_ES: EnTranslations = {
       "upstream": "Steam no respondió. Inténtalo de nuevo en un momento."
     },
     "wallet": {
-      "handoff_invalid": "That wallet authorization expired or could not be verified. Try again."
+      "handoff_invalid": "La autorización de la cartera ha caducado o no se ha podido verificar. Inténtalo de nuevo."
     },
     "welcome": {
       "invalid_input": "Entrada no válida."
@@ -2929,18 +2929,18 @@ export const es_ES: EnTranslations = {
       "lightning_shield": "Te carga de energía para que los atacantes reciban daño de Naturaleza al golpearte.",
       "flame_shock": "Una quemadura instantánea que golpea de inmediato y sigue abrasando con el tiempo.",
       "fireball": "Tu principal hechizo de fuego: golpea con fuerza y deja al objetivo ardiendo.",
-      "fireball_form": "Become a living ember to cross open ground at high speed.",
+      "fireball_form": "Conviértete en una brasa viviente para cruzar terreno abierto a gran velocidad.",
       "frost_armor": "Una mejora propia y duradera que refuerza tu armadura antes de un combate.",
       "arcane_intellect": "Aumenta el Intelecto para ampliar la reserva de maná de un aliado; lánzalo antes de iniciar el combate.",
       "frostbolt": "Golpea a distancia y ralentiza al objetivo para que no pueda acercarse a ti.",
-      "ice_lance": "An instant shard for spending frost procs, it hits far harder on a frozen target.",
-      "flurry": "Three quick bolts that chill the target so your next frost hits land as if it were frozen.",
-      "fingers_of_frost": "Your frost bolts sometimes empower an Ice Lance to strike as if the target were frozen.",
-      "brain_freeze": "Your frost bolts sometimes make the next Flurry instant and harder-hitting.",
-      "shatter": "Your spells crit far more often against frozen targets.",
-      "frozen_orb": "Rolls a slow orb through the pack that chills everything and feeds your frost procs.",
-      "blizzard": "Blankets an area in ice to wear down and slow a whole pack.",
-      "blink": "Teleports you a short distance forward, breaking roots on the way out.",
+      "ice_lance": "Un fragmento instantáneo para gastar activaciones de escarcha; golpea mucho más fuerte sobre un objetivo congelado.",
+      "flurry": "Tres proyectiles rápidos que enfrían al objetivo para que tus próximos golpes de escarcha impacten como si estuviera congelado.",
+      "fingers_of_frost": "Tus proyectiles de escarcha potencian a veces una Ice Lance para golpear como si el objetivo estuviera congelado.",
+      "brain_freeze": "Tus proyectiles de escarcha hacen a veces que el siguiente Winterlash sea instantáneo y golpee más fuerte.",
+      "shatter": "Tus hechizos causan golpes críticos con mucha más frecuencia contra objetivos congelados.",
+      "frozen_orb": "Lanza un orbe lento por el grupo que enfría a cada enemigo y alimenta tus activaciones de escarcha.",
+      "blizzard": "Cubre un área de hielo para desgastar y ralentizar a grupos enteros de enemigos.",
+      "blink": "Te teletransporta una corta distancia hacia adelante, rompiendo los efectos de inmovilización al salir.",
       "conjure_water": "Crea bebidas que restauran maná, para que puedas reponerte entre combates.",
       "conjure_food": "Crea comida que restaura salud cuando te sientas a comer.",
       "shadow_bolt": "Una descarga de sombra que lanzas contra un objetivo, tu hechizo de ataque habitual.",
@@ -3237,7 +3237,7 @@ export const es_ES: EnTranslations = {
       "howHeading": "Cómo funcionan las gestas",
       "howBody": "Las gestas se consiguen y se guardan personaje a personaje, así que cada héroe que juegues forma su propio Libro; solo la Tabla de Clasificación del reino reúne tu Renombre a lo largo de todos los personajes que juegas, y cuenta cada gesta una sola vez. Cada gesta explica con claridad lo que te pide, allí mismo, en el Libro de Gestas dentro del juego, de modo que siempre sabes qué perseguir, y puedes poner en seguimiento las que buscas para tenerlas a la vista mientras juegas. Unas pocas permanecen secretas y solo se revelan cuando las has conseguido. El Libro también se mantiene honesto consigo mismo: cuanto tu historial pasado pueda demostrar te lo acredita al instante, así que un veterano nunca lo abre en una página en blanco; solo las gestas de recuento empiezan su cuenta desde cero.",
       "renownHeading": "Renombre",
-      "renownBody": "Renown is the score behind the Book. Every deed you earn is worth a set amount, and your total only ever climbs, so a quiet week never costs you ground. A handful of deeds turn on luck rather than skill, and Feats are an honor of their own, so both of those are worth no Renown at all. Deeds without Renown still count toward completion in your Book; they simply never score.",
+      "renownBody": "El Renombre es la puntuación detrás del Libro. Cada gesta que consigues vale una cantidad fija, y tu total solo sube, así que una semana tranquila nunca te hace perder terreno. Un puñado de gestas dependen de la suerte más que de la habilidad, y las Proezas son un honor propio, por lo que ninguna de las dos categorías otorga Renombre. Las gestas sin Renombre siguen contando para la consecución en tu Libro; simplemente no puntúan.",
       "rewardsHeading": "Títulos y bordes",
       "rewardsBody": "Las recompensas son pura apariencia, y esa es la gracia. Algunas gestas otorgan un título que puedes lucir o un borde que enmarca tu nombre, y nunca nada que haga más fuerte a tu héroe. Elige el título que quieras desde el Libro de Gestas y te acompañará en tu placa de nombre, en el chat y en las clasificaciones, a la vista de cualquiera.",
       "chroniclesHeading": "Crónicas",
@@ -3246,7 +3246,7 @@ export const es_ES: EnTranslations = {
       "featsBody": "Las proezas son un estante aparte: registros de legado y primicias mundiales, las gestas ligadas a una era pasada o a un momento que solo ocurrirá una vez. No otorgan Renombre y quedan fuera del recuento total, conservadas para siempre como memoria de lo que se hizo.",
       "catalogHeading": "El registro completo de las gestas",
       "catalogBody": "Aquí están todas las gestas que el Libro puede guardar, agrupadas por categoría. Las secretas se omiten a propósito: esperan a que las descubras. Abre el Libro de Gestas dentro del juego para ver exactamente qué pide cada una.",
-      "standingsNote": "The realms keep a running tally of Renown across every account: the board ranks whole accounts by lifetime Renown, counting each deed once across all your characters, and it shows Renown alone, so deeds that carry none never move the standings even though they count in your Book. To see who stands where, open the Leaderboard in game and turn to its Renown tab; the standings live there, not on the wiki.",
+      "standingsNote": "Los reinos llevan un recuento continuo de Renombre entre cuentas: la tabla clasifica cuentas completas por Renombre acumulado, contando cada gesta una vez entre todos tus personajes, y muestra solo el Renombre, por lo que las gestas que no lo otorgan nunca mueven la clasificación aunque cuenten en tu Libro. Para ver quién ocupa qué posición, abre la Tabla de Clasificación dentro del juego y dirígete a su pestaña de Renombre; la clasificación vive allí, no en la wiki.",
       "catHeading": "{label} ({count})",
       "colName": "Gesta",
       "colRenown": "Renombre",
@@ -4162,9 +4162,9 @@ export const es_ES: EnTranslations = {
     "balancePreviewTitle": "Vista previa del saldo de $WOC de la cartera conectada",
     "balancePreviewAria": "Vista previa del saldo de la cartera conectada: {balance}. Vincula la cartera para verificar el distintivo de titular.",
     "balanceAmount": "{amount} $WOC",
-    "bagConnect": "Link wallet",
-    "bagLink": "Verify wallet",
-    "bagReconnect": "Reconnect wallet",
+    "bagConnect": "Vincular cartera",
+    "bagLink": "Verificar cartera",
+    "bagReconnect": "Volver a conectar cartera",
     "connected": "Conectada: {address}",
     "connectedWithBalance": "Conectada: {balance} - {address}",
     "connectedLinked": "Verificada: {address}",
@@ -4179,15 +4179,15 @@ export const es_ES: EnTranslations = {
     "helpLinkedDisconnected": "Las ventajas de titular están activas. Conecta la app cuando necesites firmar o gastar.",
     "helpLinkedDisconnectedWithBalance": "Las ventajas de titular están activas. Conecta la app cuando necesites firmar o gastar.",
     "extensionHelp": "Para ver una cartera aquí, mantén activa una extensión de cartera del navegador como Solflare Wallet.",
-    "mobileAppHelp": "Choose Phantom or Solflare. Your wallet app will ask for approval. Keep this game open and return to it when finished.",
-    "standaloneAppHelp": "Wallet connections are not available in the Home Screen app yet. Open World of ClaudeCraft in Safari or Chrome to use Phantom or Solflare.",
-    "openAppTitle": "Continue in {wallet}",
-    "openAppHelp": "Open {wallet} to review this request. Keep this game tab open while the wallet app is active.",
-    "openAppButton": "Open {wallet}",
-    "manualReturnBrowserHelp": "After approval, return to this game tab. If iOS opens another browser, close it and return to the original browser manually.",
-    "manualReturnStandaloneHelp": "After approval, return to World of ClaudeCraft from your Home Screen. If iOS opens a browser, close it and reopen the Home Screen app manually.",
-    "preparingAppButton": "Preparing {wallet}...",
-    "walletAppUnavailable": "{wallet} could not be prepared. Close this window and try again.",
+    "mobileAppHelp": "Elige Phantom o Solflare. Tu aplicación de cartera pedirá aprobación. Mantén este juego abierto y vuelve a él cuando termines.",
+    "standaloneAppHelp": "Las conexiones de cartera aún no están disponibles en la aplicación de la pantalla de inicio. Abre World of ClaudeCraft en Safari o Chrome para usar Phantom o Solflare.",
+    "openAppTitle": "Continuar en {wallet}",
+    "openAppHelp": "Abre {wallet} para revisar esta solicitud. Mantén esta pestaña del juego abierta mientras la aplicación de cartera esté activa.",
+    "openAppButton": "Abrir {wallet}",
+    "manualReturnBrowserHelp": "Tras la aprobación, vuelve a esta pestaña del juego. Si iOS abre otro navegador, ciérralo y regresa manualmente al navegador original.",
+    "manualReturnStandaloneHelp": "Tras la aprobación, vuelve a World of ClaudeCraft desde tu pantalla de inicio. Si iOS abre un navegador, ciérralo y vuelve a abrir la aplicación de la pantalla de inicio manualmente.",
+    "preparingAppButton": "Preparando {wallet}...",
+    "walletAppUnavailable": "No se pudo preparar {wallet}. Cierra esta ventana e inténtalo de nuevo.",
     "flowConnect": "Elige una cartera. La verificación continúa automáticamente.",
     "flowSign": "Firma el mensaje de verificación en tu app de cartera. No requiere transacción ni SOL.",
     "flowVerify": "Verificando la propiedad de la cartera...",
@@ -4195,20 +4195,20 @@ export const es_ES: EnTranslations = {
     "verifyFailed": "La verificación de cartera falló.",
     "unlinkFailed": "No se pudo desvincular la cartera.",
     "browser": {
-      "eyebrow": "Desktop wallet authorization",
-      "title": "Connect a Solana Wallet",
-      "linkBody": "Choose a wallet extension in this browser. You will sign a verification message, then return to the desktop app.",
-      "paymentBody": "Choose the wallet linked to your account and approve the transaction in this browser.",
-      "extensionHelp": "No compatible wallet extension was found. Install or unlock Phantom, Solflare, or another Solana browser wallet, then retry.",
-      "safety": "World of ClaudeCraft never asks for your recovery phrase or private key.",
-      "continueWith": "Continue with {wallet}",
-      "reviewTitle": "Review in your wallet",
-      "reviewBody": "Follow the prompt from {wallet}. Keep this browser page open.",
-      "completeTitle": "Wallet authorization complete",
-      "completeBody": "You can return to the World of ClaudeCraft desktop app.",
-      "returnButton": "Return to desktop app",
-      "failed": "Wallet authorization failed or expired. Return to the desktop app and try again.",
-      "retry": "Retry"
+      "eyebrow": "Autorización de cartera de escritorio",
+      "title": "Conectar una Cartera de Solana",
+      "linkBody": "Elige una extensión de cartera en este navegador. Firmarás un mensaje de verificación y luego volverás a la aplicación de escritorio.",
+      "paymentBody": "Elige la cartera vinculada a tu cuenta y aprueba la transacción en este navegador.",
+      "extensionHelp": "No se encontró ninguna extensión de cartera compatible. Instala o desbloquea Phantom, Solflare u otra cartera de Solana para el navegador, luego vuelve a intentarlo.",
+      "safety": "World of ClaudeCraft nunca solicita tu frase de recuperación ni tu clave privada.",
+      "continueWith": "Continuar con {wallet}",
+      "reviewTitle": "Revisar en tu cartera",
+      "reviewBody": "Sigue el mensaje de {wallet}. Mantén esta página del navegador abierta.",
+      "completeTitle": "Autorización de cartera completada",
+      "completeBody": "Puedes volver a la aplicación de escritorio de World of ClaudeCraft.",
+      "returnButton": "Volver a la aplicación de escritorio",
+      "failed": "La autorización de la cartera falló o caducó. Vuelve a la aplicación de escritorio e inténtalo de nuevo.",
+      "retry": "Reintentar"
     },
     "holder": "Titular de $WOC",
     "holderTierTitle": "Titular de $WOC de nivel {tier}",
@@ -4532,22 +4532,22 @@ export const es_ES: EnTranslations = {
     "buyAria": "Comprar {item} por {marks} Marcas Heroicas"
   },
   "cardDuel": {
-    "title": "Card Duel",
-    "close": "Close",
-    "join": "Join Queue",
-    "joinAria": "Join the Card Duel queue",
-    "leave": "Leave Queue",
-    "leaveAria": "Leave the Card Duel queue",
-    "forfeit": "Forfeit",
-    "forfeitAria": "Forfeit the Card Duel",
-    "queued": "Waiting for an opponent...",
-    "unavailable": "Card Duel requires another player online.",
-    "vsOpponent": "vs {name}",
-    "round": "Round score: {mine} - {theirs}",
-    "counts": "Deck: {deck} · Discard: {discard}",
-    "playCardAria": "Play the {value} card",
-    "waitingOnOpponent": "Waiting on your opponent's card...",
-    "yourTurn": "Play a card"
+    "title": "Duelo de Cartas",
+    "close": "Cerrar",
+    "join": "Unirse a la cola",
+    "joinAria": "Unirse a la cola del Duelo de Cartas",
+    "leave": "Abandonar la cola",
+    "leaveAria": "Abandonar la cola del Duelo de Cartas",
+    "forfeit": "Rendirse",
+    "forfeitAria": "Rendirse en el Duelo de Cartas",
+    "queued": "Buscando rival...",
+    "unavailable": "El Duelo de Cartas requiere otro jugador en línea.",
+    "vsOpponent": "contra {name}",
+    "round": "Puntuación de la ronda: {mine} - {theirs}",
+    "counts": "Mazo: {deck} · Descarte: {discard}",
+    "playCardAria": "Jugar la carta {value}",
+    "waitingOnOpponent": "Esperando la carta de tu rival...",
+    "yourTurn": "Juega una carta"
   },
   "delveUi": {
     "board": {
@@ -5049,9 +5049,9 @@ export const es_ES: EnTranslations = {
     }
   },
   "gpuNotice": {
-    "bodyDesktop": "The game is running without GPU acceleration and will be slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
-    "bodyWeb": "The game is running without GPU acceleration and will be slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.",
-    "dismiss": "Dismiss"
+    "bodyDesktop": "El juego se ejecuta sin aceleración de GPU y será lento. Actualiza los controladores de gráficos y reinicia el juego. En Windows, establece también el juego como Alto rendimiento en Configuración > Sistema > Pantalla > Gráficos.",
+    "bodyWeb": "El juego se ejecuta sin aceleración de GPU y será lento. Activa la aceleración de hardware en los ajustes del navegador, actualiza los controladores de gráficos y reinicia el navegador.",
+    "dismiss": "Cerrar"
   },
   "realm": {
     "noRealms": "No hay mundos disponibles.",
@@ -5474,8 +5474,8 @@ export const es_ES: EnTranslations = {
       "openTrade": "Abrir comercio",
       "duelRequest": "¡{name} te ha desafiado a un duelo!",
       "acceptDuel": "Aceptar duelo",
-      "resurrectionOffer": "{name} wants to return you to life. Do you accept?",
-      "acceptResurrection": "Accept Resurrection",
+      "resurrectionOffer": "{name} quiere devolverte a la vida. ¿Aceptas?",
+      "acceptResurrection": "Aceptar Resurrección",
       "decline": "Rechazar"
     },
     "combat": {
@@ -5652,7 +5652,7 @@ export const es_ES: EnTranslations = {
     },
     "pet": {
       "attack": "Atacar",
-      "waterJet": "Water Jet",
+      "waterJet": "Chorro de Agua",
       "taunt": "Provocar",
       "healDemon": "Sanar demonio",
       "healPet": "Sanar mascota",
@@ -5661,8 +5661,8 @@ export const es_ES: EnTranslations = {
       "aggressive": "Agresivo",
       "petAttackTitle": "Ataque de mascota",
       "petAttackDesc": "Ordena a tu mascota atacar a tu objetivo hostil actual.",
-      "waterJetTitle": "Water Jet",
-      "waterJetDesc": "Command your Water Elemental to channel a slowing stream for 3 seconds. 8 second cooldown. Right-click to auto-cast it whenever it is off cooldown.",
+      "waterJetTitle": "Chorro de Agua",
+      "waterJetDesc": "Ordena a tu Elemental de Agua que canalice un chorro ralentizador durante 3 segundos. Tiempo de reutilización: 8 segundos. Haz clic derecho para lanzarlo automáticamente cada vez que esté disponible.",
       "petTauntTitle": "Provocación de mascota",
       "petTauntDesc": "Ordena a tu mascota entrar en combate y usar Gruñido al estar en alcance. Reutilización de 10 segundos.",
       "healDemonDesc": "Gasta maná para canalizar sanación hacia tu demonio durante 5 segundos.",
@@ -5972,7 +5972,7 @@ export const es_ES: EnTranslations = {
       "dps": "Daño/seg",
       "critChance": "Prob. de crítico",
       "dodge": "Esquiva",
-      "parry": "Parry"
+      "parry": "Parada"
     },
     "tooltip": {
       "qualityKind": "{kind} {quality}",
@@ -6266,8 +6266,8 @@ export const es_ES: EnTranslations = {
         "description": "Lanza una bola ígnea que causa {damage} de daño de Fuego y daño adicional en el tiempo."
       },
       "fireball_form": {
-        "name": "Ember Form",
-        "description": "Transform into a blazing ember, increasing movement speed by {buff}%. You cannot attack or cast spells while transformed. Recast to return to your normal form."
+        "name": "Forma de Brasa",
+        "description": "Te transformas en una brasa ardiente, aumentando la velocidad de movimiento un {buff}%. No puedes atacar ni lanzar hechizos mientras estás transformado. Vuelve a lanzar la habilidad para recuperar tu forma normal."
       },
       "frost_armor": {
         "name": "Manto de Escarcha",
@@ -6331,43 +6331,43 @@ export const es_ES: EnTranslations = {
       },
       "ice_lance": {
         "name": "Ice Lance",
-        "description": "Hurl a shard of ice, dealing {damage} Frost damage, tripled against a frozen target. Spends Fingers of Frost, or a charge of Winter's Chill, to treat the target as frozen. (Frost)"
+        "description": "Lanza un fragmento de hielo que causa {damage} de daño de Escarcha, triplicado contra un objetivo congelado. Gasta Fingers of Frost o una carga de Frío Invernal para tratar al objetivo como congelado. (Escarcha)"
       },
       "flurry": {
         "name": "Winterlash",
-        "description": "Loose three icy bolts for {damage} Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Winterlash instant, 30% harder, and skips its cooldown. (Frost)"
+        "description": "Lanza tres proyectiles de hielo que causan {damage} de daño de Escarcha cada uno y aplican Frío Invernal al objetivo: sus próximos 2 hechizos compatibles lo tratan como congelado. Brain Freeze hace que Winterlash sea instantáneo, golpee un 30% más fuerte y omita su tiempo de reutilización. (Escarcha)"
       },
       "frozen_orb": {
         "name": "Frozen Orb",
-        "description": "Release an orb of swirling frost that drifts forward for 8 sec, dealing {damage} Frost damage each second to nearby enemies and slowing them by 30%. Its strikes generate Fingers of Frost. (Frost)"
+        "description": "Lanza un orbe de escarcha arremolinada que avanza durante 8 s, causando {damage} de daño de Escarcha por segundo a los enemigos cercanos y ralentizándolos un 30%. Sus golpes generan Fingers of Frost. (Escarcha)"
       },
       "blizzard": {
         "name": "Blizzard",
-        "description": "Calls an ice storm onto the target area for 6 sec, dealing {damage} Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frozen Orb, up to 3 sec per cast. (Frost)"
+        "description": "Desata una tormenta de hielo sobre el área objetivo durante 6 s, causando {damage} de daño de Escarcha por segundo y ralentizando a los enemigos un 40%. Cada enemigo golpeado reduce en 0,5 s el tiempo restante del Orbe Helado, hasta un máximo de 3 s por lanzamiento. (Escarcha)"
       },
       "glacial_spike": {
-        "name": "Glacial Spike",
-        "description": "Conjure a massive spike of ice, consuming 5 Icicles to deal {damage} Frost damage and freeze the target in place for 4 sec. (Frost)"
+        "name": "Espiga Glacial",
+        "description": "Conjura una enorme espiga de hielo, consumiendo 5 Carámbanos para causar {damage} de daño de Escarcha e inmovilizar al objetivo durante 4 s. (Escarcha)"
       },
       "glacial_front": {
-        "name": "Glacial Front",
-        "description": "Hold to gather a widening front of frost, then release it in a cone. Longer charges reach farther and deal more damage. All enemies hit are slowed by 50% for 4 sec; maximum charge also roots them for 1 sec. (Frost)"
+        "name": "Frente Glacial",
+        "description": "Mantén pulsado para concentrar un frente de escarcha cada vez más amplio, luego suéltalo en un cono. Las concentraciones más largas alcanzan más lejos e infligen más daño. Cada enemigo golpeado queda ralentizado un 50% durante 4 s; la concentración máxima también los inmoviliza durante 1 s. (Escarcha)"
       },
       "dragons_breath": {
         "name": "Dragon's Breath",
-        "description": "Hold to gather a widening breath of flame, then release it in a cone. Longer charges reach farther and deal more damage. Enemies hit are disoriented and damage breaks the effect; maximum charge always critically strikes and counts once toward Hot Streak. (Fire)"
+        "description": "Mantén pulsado para concentrar un aliento de llamas cada vez más amplio, luego suéltalo en un cono. Las concentraciones más largas alcanzan más lejos e infligen más daño. Los enemigos golpeados quedan desorientados y el daño rompe el efecto; la concentración máxima siempre es un golpe crítico y cuenta una vez hacia Buena Racha. (Fuego)"
       },
       "fingers_of_frost": {
         "name": "Fingers of Frost",
-        "description": "Rimelance has a 15% chance to grant Fingers of Frost, up to 2 charges: your next Ice Lance treats its target as frozen. (Frost)"
+        "description": "Lanza de Escarcha tiene un 15% de probabilidad de otorgar Fingers of Frost, hasta 2 cargas: tu siguiente Lanza de Hielo trata al objetivo como si estuviera congelado. (Escarcha)"
       },
       "brain_freeze": {
         "name": "Brain Freeze",
-        "description": "Rimelance has a 20% chance to make your next Winterlash instant, 30% harder, and free of its cooldown. (Frost)"
+        "description": "Lanza de Escarcha tiene un 20% de probabilidad de hacer que tu siguiente Winterlash sea instantáneo, golpee un 30% más fuerte y esté libre de su tiempo de reutilización. (Escarcha)"
       },
       "shatter": {
-        "name": "Brittle Ruin",
-        "description": "Your spells gain 50% critical strike chance against frozen targets, and those critical strikes deal 20% more damage. Fingers of Frost and Winter's Chill count as frozen. (Frost)"
+        "name": "Ruina Quebradiza",
+        "description": "Tus hechizos ganan un 50% de probabilidad de golpe crítico contra objetivos congelados, y esos críticos causan un 20% más de daño. Fingers of Frost y Frío Invernal cuentan como congelado. (Escarcha)"
       },
       "conjure_water": {
         "name": "Conjurar Agua",
@@ -7270,12 +7270,12 @@ export const es_ES: EnTranslations = {
         "description": "Marca a un aliado con el eco de un momento más sano y repara {damage} de salud al instante. Durante {duration} s, parte del daño Arcano que infliges se canaliza de vuelta a través del eco para curarlo."
       },
       "temporal_cascade": {
-        "name": "Temporal Cascade",
-        "description": "Sends an echo cascading through your group: the target and up to four of their nearest allies are mended at once and each marked for {duration} sec, drawing part of the Arcane damage you deal back through their echoes to heal them. (Chronomancy)"
+        "name": "Cascada Temporal",
+        "description": "Envía un eco en cascada por tu grupo: el objetivo y hasta cuatro de sus aliados más cercanos son sanados a la vez y quedan marcados durante {duration} s, convirtiendo parte del daño Arcano que causas en sanación a través de sus ecos. (Cronomancia)"
       },
       "temporal_reversal": {
-        "name": "Temporal Reversal",
-        "description": "Rewinds a fallen ally's timeline, returning them to life at their body with a portion of their health and mana, even in the thick of combat. (Chronomancy)"
+        "name": "Inversión Temporal",
+        "description": "Rebobina la línea temporal de un aliado caído, devolviéndolo a la vida junto a su cuerpo con una parte de su salud y maná, incluso en pleno combate. (Cronomancia)"
       },
       "collective_reversal": {
         "name": "Reversión colectiva",
@@ -7283,23 +7283,23 @@ export const es_ES: EnTranslations = {
       },
       "temporal_rewind": {
         "name": "Rewind",
-        "description": "Sends an arcane wave through your group or raid, rewinding time to restore 30% of the damage each ally within 40 yards took over the last 5 seconds (up to 35% of their maximum health). Cannot be a critical effect. (Chronomancy)"
+        "description": "Envía una onda arcana por tu grupo o banda, rebobinando el tiempo para restaurar el 30% del daño que cada aliado en un radio de 40 yardas sufrió durante los últimos 5 segundos (hasta el 35% de su salud máxima). No puede ser un efecto crítico. (Cronomancia)"
       },
       "temporal_hourglass": {
         "name": "Reloj de suspensión",
         "description": "Coloca un reloj de arena temporal en la ubicación seleccionada. Bajo un enemigo, lo suspende {hostilePveDuration} s en JcE o {hostilePvpDuration} s en JcJ e impide que actúe; cualquier daño rompe el efecto. Sobre tus pies o bajo un aliado del grupo, concede estasis durante {duration} s, impide recibir daño y actuar, recupera un {healing}% de la salud máxima y hace que los tiempos de reutilización se recuperen un {selfCooldownRecovery}% más rápido para ti o un {allyCooldownRecovery}% más rápido para un aliado. Si la ubicación está vacía, espera {groundDuration} s y afecta a la primera unidad válida que lo pise. El aura beneficiosa puede eliminarse manualmente."
       },
       "temporal_acceleration": {
-        "name": "Temporal Acceleration",
-        "description": "Accelerates the flow of time for your group or raid, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Temporal Acceleration or Storm Chorus are too exhausted to benefit. (Chronomancy)"
+        "name": "Aceleración Temporal",
+        "description": "Acelera el flujo del tiempo para tu grupo o banda, aumentando la velocidad de ataque, lanzamiento y canalización un 30% durante 15 s. Los aliados afectados recientemente por Aceleración Temporal o Tambores de Guerra están demasiado agotados para beneficiarse. (Cronomancia)"
       },
       "perfect_moment": {
         "name": "Momento perfecto",
         "description": "Obtienes al instante 4 cargas Arcanas y durante 10 s los Dardos de éter no las consumen. (Cronomancia)"
       },
       "arcane_surge": {
-        "name": "Aether Surge",
-        "description": "Draws a surge of raw aether through the enemy for {damage} damage. Each cast leaves an Arcane Charge that raises your next Aether Surge's damage and cast speed (5% faster each) but sharply raises its mana cost, stacking up to 4; Aether Darts spends the charges. Each cast can also arm Aether Rush, making your next Aether Surge free and twice as fast to cast."
+        "name": "Impulso de Éter",
+        "description": "Canaliza un impulso de éter bruto a través del enemigo, causando {damage} de daño. Cada lanzamiento acumula una Carga Arcana que aumenta el daño y la velocidad de lanzamiento del siguiente Impulso de Éter (un 5% más rápido por carga) pero eleva considerablemente su coste de maná, acumulando hasta 4 cargas; Dardos de Éter gasta las cargas. Cada lanzamiento también puede activar Ímpetu de Éter, haciendo que tu siguiente Impulso de Éter sea gratuito y el doble de rápido."
       },
       "mind_sear": {
         "name": "Ardeideas",
@@ -9357,9 +9357,9 @@ export const es_ES: EnTranslations = {
         "greeting": "Te damos la bienvenida al Arca Dorada. Tus bienes descansan seguros tras nuestras cerraduras."
       },
       "card_master": {
-        "name": "Card Master",
-        "title": "Dealer of Chance",
-        "greeting": "Care for a Card Duel? Best of three, winner takes the bragging rights."
+        "name": "Maestro de Cartas",
+        "title": "Repartidor del Azar",
+        "greeting": "¿Un Duelo de Cartas? Al mejor de tres; el ganador se lleva los derechos de presumir."
       },
       "bursar_petra_vell": {
         "name": "Tesorera Petra Vell",
@@ -9420,11 +9420,11 @@ export const es_ES: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "Un oficio para cada mano",
-        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There are ore veins in the rocks around the Copper Dig, southwest of town. Go swing a pick and work 5 of them yourself, mind; I'll know the difference.",
-        "completion": "See? Ore gathered and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
+        "text": "Cada alma en Eastbrook trabaja un oficio además de la espada, {playerName}. Hay vetas de mineral en las rocas alrededor de la Excavación de Cobre, al suroeste del pueblo. Ve a golpear con el pico y trabaja 5 de ellas tú mismo; lo sabré.",
+        "completion": "¿Lo ves? Mineral recogido y callos en las manos. Sigue con la minería, la tala y la herboristería mientras recorres los caminos, y cuando estés de vuelta en el pueblo, fíjate en el Tablón de Enfoque junto al mercado y el banco de artesanía cercano. Hay un trato justo en cada parte, si lo quieres.",
         "objectives": {
           "0": {
-            "label": "Ore vein harvested"
+            "label": "Veta de mineral extraída"
           }
         }
       },
@@ -10212,18 +10212,18 @@ export const es_ES: EnTranslations = {
       },
       "q_archetype_acceptance": {
         "title": "Un oficio que puedes llamar tuyo",
-        "text": "Skill is knowledge, {playerName}, but attunement is a promise. Choose two neighboring crafts whose methods you will carry as your majors, then bring me ore worked from the Vale with your own hands.",
-        "completion": "The promise holds. These two crafts are now your majors, and the knowledge opposite them becomes your hobby.",
+        "text": "La destreza es conocimiento, {playerName}, pero la sintonización es una promesa. Elige dos oficios vecinos cuyos métodos llevarás como especializaciones principales, luego tráeme mineral trabajado del Valle con tus propias manos.",
+        "completion": "La promesa se mantiene. Estos dos oficios son ahora tus especializaciones principales, y el conocimiento contrario a ellos pasa a ser tu afición.",
         "objectives": {
           "0": {
-            "label": "Ore vein harvested"
+            "label": "Veta de mineral extraída"
           }
         }
       },
       "q_prof_make_amends": {
         "title": "Hacer las paces",
-        "text": "You have carried that pair before, {playerName}. Returning is no fresh vow. Help keep the Vale road clear, and the work will remind your hands what they once knew.",
-        "completion": "The old rhythm returns. Your former pair is active once more.",
+        "text": "Ya has llevado antes ese par, {playerName}. Volver no es un voto nuevo. Ayuda a mantener despejado el camino del Valle, y el trabajo recordará a tus manos lo que una vez supieron.",
+        "completion": "El ritmo antiguo regresa. Tu anterior par de oficios está activo de nuevo.",
         "objectives": {
           "0": {
             "label": "Lobo del bosque matado"
@@ -10231,12 +10231,12 @@ export const es_ES: EnTranslations = {
         }
       },
       "q_prof_hobby_switch": {
-        "title": "A Different Pastime",
-        "text": "Majors demand a vow. A hobby only asks where your curiosity wanders, {playerName}. Gather a few herbs and decide which craft opposite your majors you want to pursue.",
-        "completion": "A lighter choice, but a useful one. Follow that curiosity as far as rare work will take it.",
+        "title": "Un Pasatiempo Diferente",
+        "text": "Las especializaciones principales exigen un voto. Una afición solo pregunta hacia dónde vaga tu curiosidad, {playerName}. Recoge algunas hierbas y decide qué oficio, contrario a tus especializaciones principales, quieres desarrollar.",
+        "completion": "Una elección más ligera, pero útil. Sigue esa curiosidad tan lejos como las obras de calidad rara te lleven.",
         "objectives": {
           "0": {
-            "label": "Herb patch harvested"
+            "label": "Mata de hierba recolectada"
           }
         }
       },

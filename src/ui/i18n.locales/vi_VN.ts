@@ -2,6 +2,286 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const vi_VN: Partial<Record<TranslationKey, string>> = {
+  'hud.pet.waterJet': 'Phun Nước',
+  'hud.pet.waterJetDesc':
+    'Ra lệnh cho Nguyên Tố Nước của bạn dồn dập một luồng nước làm chậm trong 3 giây. Thời gian hồi chiêu 8 giây. Nhấp chuột phải để tự động tung chiêu mỗi khi hết thời gian hồi chiêu.',
+  'hud.pet.waterJetTitle': 'Phun Nước',
+  'hud.prompts.acceptResurrection': 'Chấp Nhận Hồi Sinh',
+  'hud.prompts.resurrectionOffer': '{name} muốn đưa bạn trở lại cõi sống. Bạn có chấp nhận không?',
+  'itemUi.stats.parry': 'Đỡ Đòn',
+  'apiError.wallet.handoff_invalid':
+    'Quyền ủy quyền ví đó đã hết hạn hoặc không thể xác minh. Hãy thử lại.',
+  'cardDuel.close': 'Đóng',
+  'cardDuel.counts': 'Bộ bài: {deck} · Thải bài: {discard}',
+  'cardDuel.forfeit': 'Bỏ Cuộc',
+  'cardDuel.forfeitAria': 'Bỏ cuộc Đấu Bài',
+  'cardDuel.join': 'Tham Gia Hàng Chờ',
+  'cardDuel.joinAria': 'Tham gia hàng chờ Đấu Bài',
+  'cardDuel.leave': 'Rời Hàng Chờ',
+  'cardDuel.leaveAria': 'Rời hàng chờ Đấu Bài',
+  'cardDuel.playCardAria': 'Đánh bài {value}',
+  'cardDuel.queued': 'Đang đợi đối thủ...',
+  'cardDuel.round': 'Điểm hiệp: {mine} - {theirs}',
+  'cardDuel.title': 'Đấu Bài',
+  'cardDuel.unavailable': 'Đấu Bài cần có một người chơi khác đang trực tuyến.',
+  'cardDuel.vsOpponent': 'vs {name}',
+  'cardDuel.waitingOnOpponent': 'Đang đợi bài của đối thủ...',
+  'cardDuel.yourTurn': 'Đánh một lá bài',
+  'entities.abilities.arcane_surge.description':
+    'Kéo một đợt aether nguyên chất xuyên qua kẻ thù gây {damage} sát thương. Mỗi lần tung chiêu để lại một Điện Tích Bí Thuật làm tăng sát thương và tốc độ thi triển của Sức Mạnh Bí Thuật tiếp theo (5% nhanh hơn mỗi điện tích) nhưng tăng mạnh chi phí mana, chồng tối đa 4 lần; Phi Tiêu Ê-te tiêu hao các điện tích. Mỗi lần thi triển cũng có thể kích hoạt Aether Rush, khiến Sức Mạnh Bí Thuật tiếp theo miễn phí và thi triển nhanh gấp đôi.',
+  'entities.abilities.arcane_surge.name': 'Sức Mạnh Bí Thuật',
+  'entities.abilities.blizzard.description':
+    'Triệu gọi bão tuyết xuống khu vực mục tiêu trong 6 giây, gây {damage} sát thương Băng mỗi giây và làm chậm kẻ thù 40%. Mỗi kẻ thù bị đánh trúng rút ngắn 0,5 giây của Frozen Orb, tối đa 3 giây mỗi lần thi triển. (Băng)',
+  'entities.abilities.blizzard.name': 'Blizzard',
+  'entities.abilities.brain_freeze.description':
+    'Thương Băng Giá có 20% xác suất khiến Winterlash tiếp theo của bạn lập tức, mạnh hơn 30% và không có thời gian hồi chiêu. (Băng)',
+  'entities.abilities.brain_freeze.name': 'Brain Freeze',
+  'entities.abilities.dragons_breath.description':
+    'Giữ để tích tụ làn hơi thở lửa ngày càng rộng, rồi thả ra thành hình nón. Tích tụ lâu hơn sẽ đạt xa hơn và gây nhiều sát thương hơn. Kẻ thù bị trúng sẽ mất định hướng và sát thương sẽ phá vỡ hiệu ứng; tích tụ tối đa luôn chí mạng và tính một lần vào Hot Streak. (Lửa)',
+  'entities.abilities.dragons_breath.name': "Dragon's Breath",
+  'entities.abilities.fingers_of_frost.description':
+    'Thương Băng Giá có 15% xác suất ban Fingers of Frost, tối đa 2 điện tích: Ice Lance tiếp theo của bạn coi mục tiêu như đang đóng băng. (Băng)',
+  'entities.abilities.fingers_of_frost.name': 'Fingers of Frost',
+  'entities.abilities.fireball_form.description':
+    'Biến thành than hồng rực cháy, tăng tốc độ di chuyển lên {buff}%. Bạn không thể tấn công hay thi triển phép trong khi biến đổi. Thi triển lại để trở về dạng bình thường.',
+  'entities.abilities.fireball_form.name': 'Ember Form',
+  'entities.abilities.flurry.description':
+    'Phóng ba mũi tên băng gây {damage} sát thương Băng mỗi mũi và gắn Cơn Lạnh Mùa Đông lên mục tiêu: 2 phép thi triển hợp lệ tiếp theo sẽ coi mục tiêu như đang đóng băng. Brain Freeze khiến Winterlash lập tức, mạnh hơn 30% và bỏ qua thời gian hồi chiêu. (Băng)',
+  'entities.abilities.flurry.name': 'Winterlash',
+  'entities.abilities.frozen_orb.description':
+    'Phóng ra một quả cầu xoáy băng giá trôi về phía trước trong 8 giây, gây {damage} sát thương Băng mỗi giây cho các kẻ thù lân cận và làm chậm chúng 30%. Các cú đánh của nó tạo ra Fingers of Frost. (Băng)',
+  'entities.abilities.frozen_orb.name': 'Frozen Orb',
+  'entities.abilities.glacial_front.description':
+    'Giữ để tích tụ màn băng giá ngày càng rộng, rồi thả ra thành hình nón. Tích tụ lâu hơn sẽ đạt xa hơn và gây nhiều sát thương hơn. Tất cả kẻ thù bị trúng sẽ bị làm chậm 50% trong 4 giây; tích tụ tối đa còn cố định chúng trong 1 giây. (Băng)',
+  'entities.abilities.glacial_front.name': 'Glacial Front',
+  'entities.abilities.glacial_spike.description':
+    'Triệu hồi một gai băng khổng lồ, tiêu hao 5 Băng Nhọn để gây {damage} sát thương Băng và đóng băng mục tiêu tại chỗ trong 4 giây. (Băng)',
+  'entities.abilities.glacial_spike.name': 'Glacial Spike',
+  'entities.abilities.ice_lance.description':
+    'Phóng một mảnh băng gây {damage} sát thương Băng, nhân ba lần với mục tiêu đang đóng băng. Tiêu hao Fingers of Frost hoặc một điện tích Cơn Lạnh Mùa Đông để coi mục tiêu như đang đóng băng. (Băng)',
+  'entities.abilities.ice_lance.name': 'Ice Lance',
+  'entities.abilities.perfect_moment.description':
+    'Chớp lấy khoảnh khắc hoàn hảo của bạn: lập tức nhận 4 Điện Tích Bí Thuật và trong 10 giây Phi Tiêu Ê-te không tiêu hao chúng. (Thời Thuật)',
+  'entities.abilities.perfect_moment.name': 'Perfect Moment',
+  'entities.abilities.shatter.description':
+    'Phép của bạn có thêm 50% xác suất chí mạng với mục tiêu đang đóng băng, và những cú chí mạng đó gây thêm 20% sát thương. Fingers of Frost và Cơn Lạnh Mùa Đông được tính là đóng băng. (Băng)',
+  'entities.abilities.shatter.name': 'Brittle Ruin',
+  'entities.abilities.temporal_acceleration.description':
+    'Tăng tốc dòng chảy thời gian cho nhóm hoặc đột kích của bạn, tăng tốc độ tấn công, thi triển phép và kênh phép lên 30% trong 15 giây. Đồng minh vừa bị ảnh hưởng bởi Tăng Tốc Thời Gian hoặc Trống Chiến sẽ quá kiệt sức để nhận lợi ích. (Thời Thuật)',
+  'entities.abilities.temporal_acceleration.name': 'Temporal Acceleration',
+  'entities.abilities.temporal_barrier.description':
+    'Dịch chuyển mục tiêu ra khỏi thực tại một nhịp tim, một lớp bọc thời gian hấp thụ {damage} sát thương trong 10 giây trước khi dòng thời gian bật trở lại.',
+  'entities.abilities.temporal_barrier.name': 'Temporal Barrier',
+  'entities.abilities.temporal_cascade.description':
+    'Gửi một tiếng vang lan tỏa qua nhóm của bạn: mục tiêu và tối đa bốn đồng minh gần nhất của họ được chữa lành cùng lúc và mỗi người được đánh dấu trong {duration} giây, kéo một phần sát thương Bí Thuật bạn gây ra trở lại qua những tiếng vang của họ để chữa lành họ. (Thời Thuật)',
+  'entities.abilities.temporal_cascade.name': 'Temporal Cascade',
+  'entities.abilities.temporal_echo.description':
+    'Đánh dấu một đồng minh bằng tiếng vang của một khoảnh khắc khỏe mạnh hơn, hồi phục {damage} máu ngay lập tức. Trong {duration} giây, một phần sát thương Bí Thuật bạn gây ra sẽ được kéo trở lại qua tiếng vang để chữa lành họ.',
+  'entities.abilities.temporal_echo.name': 'Temporal Echo',
+  'entities.abilities.temporal_hourglass.description':
+    'Đặt một đồng hồ cát thời gian tại vị trí đã chọn. Bên dưới kẻ thù, nó treo lơ lửng họ trong {hostilePveDuration} giây trong PvE hoặc {hostilePvpDuration} giây trong PvP và ngăn mọi hành động; sát thương phá vỡ hiệu ứng. Dưới chân bạn hoặc dưới đồng minh trong nhóm, nó ban trạng thái tĩnh lặng trong {duration} giây, ngăn sát thương và hành động, hồi phục {healing}% máu tối đa và giúp thời gian hồi chiêu phục hồi nhanh hơn {selfCooldownRecovery}% cho bạn hoặc {allyCooldownRecovery}% cho đồng minh. Trên nền đất trống, đồng hồ cát chờ trong {groundDuration} giây và ảnh hưởng đến đơn vị hợp lệ đầu tiên bước lên nó. Hào quang có lợi có thể bị hủy bỏ thủ công.',
+  'entities.abilities.temporal_hourglass.name': 'Hourglass of Suspension',
+  'entities.abilities.temporal_mend.description':
+    'Kéo một đồng minh tiến một khoảnh khắc vào tương lai, hồi phục {damage} máu khi cơ thể ổn định vào phiên bản tương lai khỏe mạnh hơn của mình. (Thời Thuật nguyên thủy)',
+  'entities.abilities.temporal_mend.name': 'Temporal Mend',
+  'entities.abilities.temporal_reversal.description':
+    'Tua lại dòng thời gian của một đồng minh đã ngã xuống, đưa họ trở lại cuộc sống tại thân xác với một phần máu và mana, ngay cả giữa chiến đấu. (Thời Thuật)',
+  'entities.abilities.temporal_reversal.name': 'Temporal Reversal',
+  'entities.abilities.temporal_rewind.description':
+    'Gửi một làn sóng bí thuật qua nhóm hoặc đột kích của bạn, tua lại thời gian để phục hồi 30% sát thương mỗi đồng minh trong phạm vi 40 thước đã nhận trong 5 giây qua (tối đa 35% máu tối đa của họ). Không thể là hiệu ứng chí mạng. (Thời Thuật)',
+  'entities.abilities.temporal_rewind.name': 'Rewind',
+  'entities.npcs.card_master.greeting':
+    'Muốn thử Đấu Bài không? Chơi ba ván, người thắng lấy quyền khoe.',
+  'entities.npcs.card_master.name': 'Bậc Thầy Bài',
+  'entities.npcs.card_master.title': 'Kẻ Chia Bài May Rủi',
+  'entities.quests.q_archetype_acceptance.completion':
+    'Lời hứa đã giữ. Hai kỹ nghệ này nay là chuyên ngành của bạn, và kiến thức đối diện với chúng trở thành sở thích của bạn.',
+  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Mỏ quặng đã khai thác',
+  'entities.quests.q_archetype_acceptance.text':
+    'Kỹ năng là kiến thức, {playerName}, nhưng thụ ngộ là một lời hứa. Hãy chọn hai kỹ nghệ liền kề mà bạn sẽ mang theo làm chuyên ngành, rồi mang cho ta quặng được khai thác từ Thung Lũng bằng đôi tay của chính bạn.',
+  'entities.quests.q_prof_hobby_switch.completion':
+    'Một lựa chọn nhẹ nhàng hơn, nhưng hữu ích. Hãy theo đuổi sự tò mò đó đến khi công việc hiếm có đưa nó đi xa nhất.',
+  'entities.quests.q_prof_hobby_switch.objectives.0.label': 'Mảnh thảo dược đã thu hoạch',
+  'entities.quests.q_prof_hobby_switch.text':
+    'Chuyên ngành đòi hỏi lời thề. Sở thích chỉ hỏi sự tò mò của bạn đi đâu, {playerName}. Hãy hái một ít thảo dược và quyết định kỹ nghệ nào đối diện với chuyên ngành của bạn mà bạn muốn theo đuổi.',
+  'entities.quests.q_prof_hobby_switch.title': 'Một Đam Mê Khác',
+  'entities.quests.q_prof_intro.completion':
+    'Thấy chưa? Quặng đã thu thập và tay đã có vết chai. Tiếp tục khai thác mỏ, chặt gỗ và hái thảo dược khi bạn đi trên đường, và khi trở lại thị trấn, chú ý đến bảng Trọng Tâm Thị Trấn gần chợ và bàn thủ công gần đó. Có một giao dịch công bằng chờ đợi trong tất cả, nếu bạn muốn.',
+  'entities.quests.q_prof_intro.objectives.0.label': 'Mỏ quặng đã khai thác',
+  'entities.quests.q_prof_intro.text':
+    'Mỗi người ở Eastbrook đều làm một nghề ngoài kiếm, {playerName}. Có những mỏ quặng trong các tảng đá quanh Hố Đồng, phía tây nam thị trấn. Hãy cầm cuốc và tự tay khai thác 5 mỏ, nhé; ta sẽ biết sự khác biệt.',
+  'entities.quests.q_prof_make_amends.completion':
+    'Nhịp điệu cũ trở lại. Đôi kỹ nghệ trước của bạn đã hoạt động trở lại.',
+  'entities.quests.q_prof_make_amends.text':
+    'Bạn đã mang đôi kỹ nghệ đó trước đây rồi, {playerName}. Quay lại không phải là lời thề mới. Hãy giúp giữ con đường Thung Lũng thông thoáng, và công việc sẽ nhắc đôi tay bạn nhớ lại điều chúng từng biết.',
+  'gpuNotice.bodyDesktop':
+    'Trò chơi đang chạy mà không có tăng tốc GPU và sẽ chậm. Hãy cập nhật trình điều khiển đồ họa, sau đó khởi động lại trò chơi. Trên Windows, hãy đặt trò chơi thành Hiệu suất cao trong Cài đặt > Hệ thống > Màn hình > Đồ họa.',
+  'gpuNotice.bodyWeb':
+    'Trò chơi đang chạy mà không có tăng tốc GPU và sẽ chậm. Hãy bật tăng tốc phần cứng trong cài đặt trình duyệt, cập nhật trình điều khiển đồ họa, sau đó khởi động lại trình duyệt.',
+  'gpuNotice.dismiss': 'Bỏ Qua',
+  'guide.abilityHook.blink':
+    'Dịch chuyển bạn một đoạn ngắn về phía trước, phá vỡ các hiệu ứng cố định khi thoát ra.',
+  'guide.abilityHook.blizzard': 'Phủ băng lên một khu vực để làm hao mòn và làm chậm cả bầy.',
+  'guide.abilityHook.brain_freeze':
+    'Đôi khi các mũi tên băng của bạn khiến Winterlash tiếp theo lập tức và mạnh hơn.',
+  'guide.abilityHook.fingers_of_frost':
+    'Đôi khi các mũi tên băng của bạn tăng cường Ice Lance để đánh như thể mục tiêu đang đóng băng.',
+  'guide.abilityHook.fireball_form':
+    'Trở thành tia lửa sống để vượt qua địa hình trống với tốc độ cao.',
+  'guide.abilityHook.flurry':
+    'Ba mũi tên nhanh làm lạnh mục tiêu để các cú đánh băng tiếp theo của bạn đánh như thể nó đang đóng băng.',
+  'guide.abilityHook.frozen_orb':
+    'Lăn một quả cầu chậm qua bầy, làm lạnh mọi thứ và tạo ra các hiệu ứng băng của bạn.',
+  'guide.abilityHook.ice_lance':
+    'Một mảnh lập tức để tiêu hao hiệu ứng băng, đánh mạnh hơn nhiều với mục tiêu đang đóng băng.',
+  'guide.abilityHook.shatter':
+    'Phép của bạn có tỷ lệ chí mạng cao hơn nhiều với mục tiêu đang đóng băng.',
+  'guide.deedsPage.renownBody':
+    'Danh Vọng là điểm số đằng sau Sách. Mỗi kỳ công bạn lập có giá trị một lượng nhất định, và tổng điểm chỉ tăng lên, vì vậy một tuần lễ yên tĩnh không bao giờ khiến bạn mất vị thế. Một số kỳ công dựa vào may mắn hơn là kỹ năng, và Kỳ Tích là vinh dự riêng, vì vậy cả hai đều không tính Danh Vọng. Kỳ công không có Danh Vọng vẫn tính vào hoàn thành trong Sách của bạn; chúng chỉ không bao giờ ghi điểm.',
+  'guide.deedsPage.standingsNote':
+    'Các vương quốc lưu giữ tổng số Danh Vọng liên tục trên mọi tài khoản: bảng xếp hạng toàn bộ tài khoản theo Danh Vọng trọn đời, tính mỗi kỳ công một lần trên tất cả nhân vật của bạn, và nó chỉ hiển thị Danh Vọng, vì vậy các kỳ công không mang Danh Vọng không bao giờ thay đổi thứ hạng dù chúng tính trong Sách của bạn. Để xem ai đứng ở đâu, hãy mở Bảng Xếp Hạng trong trò chơi và chuyển sang tab Danh Vọng của nó; thứ hạng nằm ở đó, không phải trên wiki.',
+  'hudChrome.archetypePair.alchemy+cooking': 'Dược Sĩ',
+  'hudChrome.archetypePair.armorcrafting+engineering': 'Thợ Cơ Khí',
+  'hudChrome.archetypePair.cooking+leatherworking': 'Thợ Bẫy',
+  'hudChrome.archetypePair.enchanting+jewelcrafting': 'Thợ Đá Quý',
+  'hudChrome.archetypePair.engineering+alchemy': 'Chuyên Gia Nổ',
+  'hudChrome.archetypePair.inscription+enchanting': 'Pháp Sư Học Thuật',
+  'hudChrome.archetypePair.jewelcrafting+weaponcrafting': 'Thợ Rèn Kiếm',
+  'hudChrome.archetypePair.leatherworking+tailoring': 'Thợ Trang Phục',
+  'hudChrome.archetypePair.tailoring+inscription': 'Thợ Dệt Phép',
+  'hudChrome.archetypePair.weaponcrafting+armorcrafting': 'Thợ Rèn',
+  'hudChrome.auraEffect.cheapCast': 'Phép tiếp theo của bạn tốn ít hơn {pct}%',
+  'hudChrome.auraEffect.combustionCrit': 'Các phép Lửa của bạn luôn chí mạng',
+  'hudChrome.auraEffect.dmgDone': 'Tăng sát thương gây ra lên {pct}%',
+  'hudChrome.auraEffect.dmgDoneReduce': 'Giảm sát thương gây ra đi {pct}%',
+  'hudChrome.auraEffect.elementalConvergencePrimed':
+    'Phép tiếp theo của bạn từ trường nguyên tố khác sẽ ban Hội Tụ Nguyên Tố',
+  'hudChrome.auraEffect.formFireball':
+    'Ember Form: tốc độ di chuyển tăng {pct}%; tấn công và thi triển phép bị vô hiệu hóa',
+  'hudChrome.auraEffect.freeCast': 'Lần thi triển tiếp theo của bạn không tốn mana',
+  'hudChrome.auraEffect.heatingUp':
+    'Cú chí mạng tiếp theo của kỹ năng xây dựng Lửa liên tiếp sẽ ban Hot Streak; cú không chí mạng sẽ xóa Đang Nóng Dần',
+  'hudChrome.auraEffect.iceFloesCasts':
+    'Phép tiếp theo {n} của bạn có thời gian thi triển có thể được thi triển trong khi di chuyển',
+  'hudChrome.auraEffect.increase.sp': 'Tăng sức mạnh phép thuật lên {value}',
+  'hudChrome.auraEffect.instantCast': 'Phép tiếp theo của bạn có thời gian thi triển sẽ lập tức',
+  'hudChrome.auraEffect.overloadNext':
+    'Phép tiếp theo của bạn được khuếch đại {pct}% nhưng tốn thêm 50% mana',
+  'hudChrome.auraEffect.powerEchoNext':
+    'Phép trực tiếp tiếp theo của bạn lặp lại với {pct}% sức mạnh trên cùng mục tiêu',
+  'hudChrome.auraEffect.temporalHourglass':
+    'Miễn nhiễm và không thể hành động; hồi phục máu và tăng tốc phục hồi thời gian hồi chiêu. Nhấp chuột phải để hủy bỏ.',
+  'hudChrome.craftName.alchemy': 'Giả Kim',
+  'hudChrome.craftName.armorcrafting': 'Rèn Giáp',
+  'hudChrome.craftName.cooking': 'Nấu Ăn',
+  'hudChrome.craftName.enchanting': 'Pháp Khắc',
+  'hudChrome.craftName.engineering': 'Cơ Khí',
+  'hudChrome.craftName.inscription': 'Khắc Chữ',
+  'hudChrome.craftName.jewelcrafting': 'Chế Tác Đá Quý',
+  'hudChrome.craftName.leatherworking': 'Thuộc Da',
+  'hudChrome.craftName.tailoring': 'May Vá',
+  'hudChrome.craftName.weaponcrafting': 'Rèn Vũ Khí',
+  'hudChrome.crafting.attunementPreview':
+    'Kết quả: danh hiệu {title}; {majorA} và {majorB} trở thành chuyên ngành không giới hạn; {hobby} trở thành sở thích giới hạn hiếm; tất cả kiến thức kỹ năng khác được giữ lại nhưng giới hạn ở thông thường khi không hoạt động.',
+  'hudChrome.crafting.comboMet': 'Sẵn sàng.',
+  'hudChrome.crafting.comboNotAttuned': 'Hãy chọn một đôi kiểu mẫu trước.',
+  'hudChrome.crafting.comboRequires': 'Thụ ngộ: {craftA} + {craftB}, bậc {tier}.',
+  'hudChrome.crafting.comboSyncing': 'Đang kiểm tra thụ ngộ vương quốc.',
+  'hudChrome.crafting.comboTierUnmet': 'Hãy nâng cả hai kỹ nghệ chuyên ngành lên bậc yêu cầu.',
+  'hudChrome.crafting.comboWrongPair': 'Hãy kích hoạt đúng đôi này để chế tác nó.',
+  'hudChrome.crafting.hobbyPreview':
+    'Kết quả: {hobby} trở thành sở thích giới hạn hiếm. Cả hai chuyên ngành và tất cả giá trị kỹ năng đã giữ lại đều không thay đổi.',
+  'hudChrome.crafting.identity.ceilingCommon': 'Giới hạn thông thường',
+  'hudChrome.crafting.identity.ceilingRare': 'Giới hạn hiếm',
+  'hudChrome.crafting.identity.ceilingUnlimited': 'Không giới hạn tăng cường',
+  'hudChrome.crafting.identity.colCap': 'Giới Hạn',
+  'hudChrome.crafting.identity.colCraft': 'Kỹ Nghệ',
+  'hudChrome.crafting.identity.colRole': 'Vai Trò',
+  'hudChrome.crafting.identity.colSkill': 'Kỹ Năng',
+  'hudChrome.crafting.identity.dormantKnowledge':
+    'Kiến thức {craft} được giữ lại nhưng không hoạt động cho đến khi đôi hoặc sở thích của nó được kích hoạt.',
+  'hudChrome.crafting.identity.history':
+    'Đã khám phá {pairs} đôi, đã hoàn thành {returns} lần quay lại',
+  'hudChrome.crafting.identity.historyLabel': 'Lịch Sử',
+  'hudChrome.crafting.identity.hobbyLabel': 'Sở Thích',
+  'hudChrome.crafting.identity.majorsLabel': 'Chuyên Ngành',
+  'hudChrome.crafting.identity.nearTier': '{craft} còn {points} kỹ năng nữa là đến bậc tiếp theo.',
+  'hudChrome.crafting.identity.roleDormant': 'Kiến thức không hoạt động',
+  'hudChrome.crafting.identity.roleHobby': 'Sở Thích',
+  'hudChrome.crafting.identity.roleMajor': 'Chuyên Ngành',
+  'hudChrome.crafting.identity.roleUnattuned': 'Chưa Thụ Ngộ',
+  'hudChrome.crafting.identity.skillAria':
+    '{craft}, kỹ năng {skill}, bậc {tier}, {role}, {ceiling}',
+  'hudChrome.crafting.identity.syncing': 'Đang đợi danh tính chế tác của bạn từ vương quốc.',
+  'hudChrome.crafting.identity.title': 'Danh Tính Chế Tác',
+  'hudChrome.crafting.identity.titleLabel': 'Danh Hiệu',
+  'hudChrome.crafting.identity.tutorial':
+    'Bậc đầu tiên: đạt kỹ năng {skill} trong một kỹ nghệ. Các công thức thành công nâng kỹ nghệ đó mà không xóa kiến thức ở nơi khác.',
+  'hudChrome.crafting.identity.unattuned':
+    'Không có đôi kiểu mẫu nào đang hoạt động. Kiến thức của bạn được giữ lại, nhưng các công thức kết hợp yêu cầu một đôi đã thụ ngộ.',
+  'hudChrome.crafting.noProfessionChoice': 'Hiện không có lựa chọn nghề nghiệp hợp lệ nào.',
+  'hudChrome.crafting.pairOptionLabel': '{pair} ({craftA} + {craftB})',
+  'hudChrome.crafting.professionChoice': 'Lựa chọn nghề nghiệp',
+  'hudChrome.deeds.lbScopeNote':
+    'Tài khoản được xếp hạng theo Danh Vọng trọn đời. Mỗi kỳ công được tính một lần trên tất cả nhân vật trong một tài khoản.',
+  'hudChrome.deeds.lbSelfAccount':
+    'Tài khoản của bạn: hạng {rank}, top {percent} phần trăm, {renown} Danh Vọng',
+  'hudChrome.deeds.lbSelfRank': 'Tài khoản của bạn: hạng {rank}, top {percent} phần trăm',
+  'hudChrome.nameplate.mobEliteLevel': '{level}+',
+  'hudChrome.nameplate.mobLevel': '{level}',
+  'hudChrome.specPanel.specUnlockBanner': 'Chuyên Môn Đã Mở Khóa!',
+  'hudChrome.specPanel.specUnlockHint': 'Nhấn N để chọn chuyên môn của bạn.',
+  'hudChrome.wocStore.wallet.connect': 'Kết nối ví',
+  'hudChrome.wocStore.wallet.connectedUnlinked':
+    'Ứng dụng ví đã kết nối với trình duyệt này, nhưng địa chỉ công khai của nó chưa được liên kết với tài khoản WoC của bạn.',
+  'hudChrome.wocStore.wallet.linkedConnected':
+    'Ứng dụng ví đã liên kết của bạn đã kết nối và sẵn sàng cho các giao dịch mua bằng SOL hoặc WOC.',
+  'hudChrome.wocStore.wallet.linkedDisconnected':
+    'Địa chỉ công khai của bạn đã được liên kết. Hãy kết nối lại ứng dụng ví đó khi bạn muốn thanh toán bằng SOL hoặc WOC.',
+  'hudChrome.wocStore.wallet.manage': 'Quản lý ví',
+  'hudChrome.wocStore.wallet.mismatched':
+    'Một ví khác đang kết nối. Hãy xác minh nó để thay thế địa chỉ đã liên kết, hoặc kết nối lại ví đã liên kết.',
+  'hudChrome.wocStore.wallet.reconnect': 'Kết nối lại ví',
+  'hudChrome.wocStore.wallet.title': 'Ví Solana',
+  'hudChrome.wocStore.wallet.unlinked':
+    'Hãy kết nối một ứng dụng ví, rồi ký một lần để liên kết địa chỉ công khai của nó với tài khoản WoC của bạn. Chúng tôi không bao giờ nhận cụm từ khôi phục hoặc khóa riêng tư của bạn.',
+  'hudChrome.wocStore.wallet.verify': 'Xác minh và liên kết',
+  'wallet.bagConnect': 'Liên kết ví',
+  'wallet.bagLink': 'Xác minh ví',
+  'wallet.bagReconnect': 'Kết nối lại ví',
+  'wallet.browser.completeBody': 'Bạn có thể quay lại ứng dụng máy tính World of ClaudeCraft.',
+  'wallet.browser.completeTitle': 'Ủy quyền ví hoàn tất',
+  'wallet.browser.continueWith': 'Tiếp tục với {wallet}',
+  'wallet.browser.extensionHelp':
+    'Không tìm thấy tiện ích mở rộng ví tương thích nào. Hãy cài đặt hoặc mở khóa Phantom, Solflare hoặc ví trình duyệt Solana khác, rồi thử lại.',
+  'wallet.browser.eyebrow': 'Ủy quyền ví trên máy tính',
+  'wallet.browser.failed':
+    'Ủy quyền ví thất bại hoặc đã hết hạn. Hãy quay lại ứng dụng máy tính và thử lại.',
+  'wallet.browser.linkBody':
+    'Hãy chọn một tiện ích mở rộng ví trong trình duyệt này. Bạn sẽ ký một tin nhắn xác minh, sau đó quay lại ứng dụng máy tính.',
+  'wallet.browser.paymentBody':
+    'Hãy chọn ví đã liên kết với tài khoản của bạn và phê duyệt giao dịch trong trình duyệt này.',
+  'wallet.browser.retry': 'Thử Lại',
+  'wallet.browser.returnButton': 'Quay lại ứng dụng máy tính',
+  'wallet.browser.reviewBody': 'Làm theo hướng dẫn từ {wallet}. Giữ trang trình duyệt này mở.',
+  'wallet.browser.reviewTitle': 'Xem xét trong ví của bạn',
+  'wallet.browser.safety':
+    'World of ClaudeCraft không bao giờ yêu cầu cụm từ khôi phục hoặc khóa riêng tư của bạn.',
+  'wallet.browser.title': 'Kết Nối Ví Solana',
+  'wallet.manualReturnBrowserHelp':
+    'Sau khi phê duyệt, hãy quay lại tab trò chơi này. Nếu iOS mở một trình duyệt khác, hãy đóng nó và quay lại trình duyệt gốc thủ công.',
+  'wallet.manualReturnStandaloneHelp':
+    'Sau khi phê duyệt, hãy quay lại World of ClaudeCraft từ Màn hình chính của bạn. Nếu iOS mở một trình duyệt, hãy đóng nó và mở lại ứng dụng Màn hình chính thủ công.',
+  'wallet.mobileAppHelp':
+    'Hãy chọn Phantom hoặc Solflare. Ứng dụng ví của bạn sẽ yêu cầu phê duyệt. Giữ trò chơi này mở và quay lại khi hoàn thành.',
+  'wallet.openAppButton': 'Mở {wallet}',
+  'wallet.openAppHelp':
+    'Hãy mở {wallet} để xem xét yêu cầu này. Giữ tab trò chơi này mở trong khi ứng dụng ví đang hoạt động.',
+  'wallet.openAppTitle': 'Tiếp tục trong {wallet}',
+  'wallet.preparingAppButton': 'Đang chuẩn bị {wallet}...',
+  'wallet.standaloneAppHelp':
+    'Kết nối ví chưa có sẵn trong ứng dụng Màn hình chính. Hãy mở World of ClaudeCraft trong Safari hoặc Chrome để sử dụng Phantom hoặc Solflare.',
+  'wallet.walletAppUnavailable': 'Không thể chuẩn bị {wallet}. Hãy đóng cửa sổ này và thử lại.',
   'entities.abilities.primal_reflexes.description':
     'Bản năng của bạn trở nên sắc bén, tăng 50% cơ hội né đòn trong 6 giây.',
   'entities.abilities.primal_reflexes.name': 'Phản Xạ Nguyên Thủy',

@@ -15,6 +15,7 @@ import { loadGltf, loadTexture } from '../assets/loader';
 import { registerPreload } from '../assets/preload';
 import { addRimGlow, GFX } from '../gfx';
 import { backGripFor } from './back_grips';
+import { dequantizeAttribute } from './dequantize_attribute';
 import { type HandGrip, KAYKIT_SHIELD_ACCESSORIES, KAYKIT_SHIELD_GRIPS } from './held_item_grips';
 import {
   type AttachDef,
@@ -1101,7 +1102,11 @@ function bakeStaticPose(
     }
     out.setAttribute('position', new THREE.BufferAttribute(baked, 3));
     const uv = srcGeo.getAttribute('uv');
-    if (uv) out.setAttribute('uv', uv.clone());
+    // Different source primitives can quantize uv differently (e.g. a
+    // normalized Uint16Array on one, a plain Float32Array on another);
+    // dequantize so every baked geo's uv shares one typed-array type and
+    // mergeGeometries below can combine them.
+    if (uv) out.setAttribute('uv', dequantizeAttribute(uv as THREE.BufferAttribute));
     if (srcGeo.index) out.setIndex(srcGeo.index.clone());
     out.computeVertexNormals();
     geos.push(out);

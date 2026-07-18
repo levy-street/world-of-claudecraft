@@ -6,6 +6,7 @@
 // OPERATOR RULING, 2026-07-02, ip-refactor/02-WORKING-MEMORY.md); ability/aura IDS are frozen.
 
 import { describe, expect, it } from 'vitest';
+import type { Aura } from '../../src/sim/types';
 import type { Recorder } from './record';
 import { record } from './record';
 import { SCENARIOS } from './scenarios';
@@ -41,6 +42,26 @@ describe('coverage: each scenario fires its subsystem', () => {
   it('solo_mage: casting lifecycle runs', () => {
     const rec = run('solo_mage');
     expect((rec.allEvents as Ev[]).some((e) => e.type === 'castStart')).toBe(true);
+  });
+
+  it('enhancement_tank_kit: mitigation, discharge RNG path, threat rider, and enchant consumption fire', () => {
+    const rec = run('enhancement_tank_kit');
+    const sim = rec.sim as any;
+    const pid = sim.playerId as number;
+    const mob = sim.entities.get(rec.notes.mobId as number);
+    const ev = rec.allEvents as Ev[];
+    expect(rec.notes.shieldChargesAfterHit).toBe(5);
+    expect(
+      ev.some(
+        (e) => e.type === 'damage' && e.sourceId === pid && e.ability === 'Elemental Discharge',
+      ),
+    ).toBe(true);
+    expect(rec.notes.dischargeDamage as number).toBeGreaterThan(0);
+    expect(rec.notes.dischargeThreat as number).toBeGreaterThan(
+      (rec.notes.dischargeDamage as number) * 2,
+    );
+    expect(mob.threat.get(pid)).toBe(rec.notes.dischargeThreat);
+    expect(sim.player.auras.some((a: Aura) => a.kind === 'earthbound_weapon')).toBe(false);
   });
 
   it('solo_rogue: weaponStrike via sinister_strike fires', () => {

@@ -2133,7 +2133,7 @@ export const zh_CN: EnTranslations = {
       "comboTierUnmet": "将两项主修技艺提升到所需阶级。",
       "professionChoice": "专业选择",
       "noProfessionChoice": "当前没有可用的专业选择。",
-      "pairOptionLabel": "{pair} ({craftA} + {craftB})",
+      "pairOptionLabel": "{pair}（{craftA} + {craftB}）",
       "attunementPreview": "结果：获得{title}称号；{majorA}和{majorB}成为无上限主修技艺；{hobby}成为上限为稀有品质的爱好技艺；所有其他技能知识都会保留，但休眠时上限为普通品质。",
       "hobbyPreview": "结果：{hobby}成为上限为稀有品质的爱好技艺。两项主修技艺和所有已保留的技能数值保持不变。",
       "identity": {
@@ -2150,7 +2150,7 @@ export const zh_CN: EnTranslations = {
         "roleDormant": "休眠知识",
         "roleUnattuned": "未调谐",
         "ceilingUnlimited": "无强化上限",
-        "ceilingRare": "Rare cap",
+        "ceilingRare": "稀有品质上限",
         "ceilingCommon": "普通品质上限",
         "skillAria": "{craft}，技能 {skill}，阶级 {tier}，{role}，{ceiling}",
         "colCraft": "专业",

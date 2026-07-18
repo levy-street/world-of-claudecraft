@@ -425,16 +425,16 @@ export const nl_NL: EnTranslations = {
       "armoryTitle": "Het Arsenaal",
       "armoryBody": "Gelimiteerde wapenskins uit de Wapenkamer van seizoen 1. Ze gelden voor je hele account, zijn puur cosmetisch en zijn zichtbaar voor iedereen om je heen.",
       "wallet": {
-        "title": "Solana wallet",
-        "unlinked": "Connect a wallet app, then sign once to link its public address to your WoC account. We never receive your recovery phrase or private key.",
-        "connectedUnlinked": "The wallet app is connected to this browser, but its public address is not linked to your WoC account yet.",
-        "linkedDisconnected": "Your public address is linked. Reconnect that wallet app when you want to pay with SOL or WOC.",
-        "linkedConnected": "Your linked wallet app is connected and ready for SOL or WOC purchases.",
-        "mismatched": "A different wallet is connected. Verify it to replace the linked address, or reconnect the linked wallet.",
-        "connect": "Connect wallet",
-        "verify": "Verify and link",
-        "reconnect": "Reconnect wallet",
-        "manage": "Manage wallet"
+        "title": "Solana-portemonnee",
+        "unlinked": "Verbind een portemonnee-app en teken eenmaal om het openbare adres aan je WoC-account te koppelen. We ontvangen nooit je herstelzin of privésleutel.",
+        "connectedUnlinked": "De portemonnee-app is verbonden met deze browser, maar het openbare adres is nog niet gekoppeld aan je WoC-account.",
+        "linkedDisconnected": "Je openbare adres is gekoppeld. Verbind die portemonnee-app opnieuw wanneer je met SOL of WOC wilt betalen.",
+        "linkedConnected": "Je gekoppelde portemonnee-app is verbonden en klaar voor SOL- of WOC-aankopen.",
+        "mismatched": "Er is een andere portemonnee verbonden. Verifieer hem om het gekoppelde adres te vervangen, of verbind de gekoppelde portemonnee opnieuw.",
+        "connect": "Portemonnee koppelen",
+        "verify": "Verifiëren en koppelen",
+        "reconnect": "Portemonnee opnieuw verbinden",
+        "manage": "Portemonnee beheren"
       },
       "collectionLine": "{collection}-collectie",
       "collections": {
@@ -1063,8 +1063,8 @@ export const nl_NL: EnTranslations = {
       "exampleAbilities": "Voorbeeldvaardigheden",
       "viewTalents": "Talenten bekijken",
       "selectSpec": "Specialisatie kiezen",
-      "specUnlockBanner": "Specialization Unlocked!",
-      "specUnlockHint": "Press N to choose your specialization."
+      "specUnlockBanner": "Specialisatie Ontgrendeld!",
+      "specUnlockHint": "Druk op N om je specialisatie te kiezen."
     },
     "controller": {
       "title": "Controller",
@@ -1547,10 +1547,10 @@ export const nl_NL: EnTranslations = {
       "attackSpeedSlow": "Verlangsamt Angriffstempo um {pct}%",
       "attackSpeedFast": "Erhöht Angriffstempo um {pct}%",
       "haste": "Erhöht Angriffs- und Zaubertempo um {pct}%",
-      "dmgDone": "Increases damage dealt by {pct}%",
-      "dmgDoneReduce": "Reduces damage dealt by {pct}%",
-      "heatingUp": "Your next consecutive Fire builder critical strike grants Hot Streak; a non-critical builder removes Heating Up",
-      "elementalConvergencePrimed": "Your next spell from the other elemental school grants Elemental Convergence",
+      "dmgDone": "Verhoogt aangerichte schade met {pct}%",
+      "dmgDoneReduce": "Vermindert aangerichte schade met {pct}%",
+      "heatingUp": "Je volgende opeenvolgende kritieke treffer van een Vuur-opbouwer verleent Hete reeks; een niet-kritieke opbouwer verwijdert Opwarmen",
+      "elementalConvergencePrimed": "Je volgende spreuk van de andere elementaire school verleent Elementaire Convergentie",
       "battleStance": "Strijdhouding: 10% meer woedeopbouw",
       "berserkerStance": "Berserkerhouding: kritieke treffers landen 3% vaker en raken 3% harder",
       "crit": "Verhoogt kans op kritieke treffers met {pct}%",
@@ -1564,18 +1564,18 @@ export const nl_NL: EnTranslations = {
       "revengeFree": "Je volgende Wraak kost geen woede",
       "victoryRush": "Overwinningsroes is gereed",
       "maxHpPct": "Verhoogt maximale gezondheid met {pct}%",
-      "temporalHourglass": "Immune and unable to act; restores health and accelerates cooldown recovery. Right-click to cancel.",
+      "temporalHourglass": "Immuun en niet in staat te handelen; herstelt gezondheid en versnelt afkoeltijdherstel. Klik met rechts om te annuleren.",
       "tongues": "Erhöht Zauberzeit um {pct}%",
-      "combustionCrit": "Your Fire spells always critically strike",
-      "overloadNext": "Your next spell is amplified by {pct}% but costs 50% more mana",
-      "powerEchoNext": "Your next direct spell repeats at {pct}% power on the same target",
-      "iceFloesCasts": "Your next {n} spells with a cast time can be cast while moving",
-      "freeCast": "Your next cast costs nothing",
-      "instantCast": "Your next spell with a cast time is instant",
-      "cheapCast": "Your next spell costs {pct}% less",
+      "combustionCrit": "Je Vuurspreuken treffen altijd kritiek",
+      "overloadNext": "Je volgende spreuk wordt met {pct}% versterkt maar kost 50% meer mana",
+      "powerEchoNext": "Je volgende directe spreuk herhaalt zich op {pct}% kracht op hetzelfde doelwit",
+      "iceFloesCasts": "Je volgende {n} spreuken met een bezweringstijd kunnen worden uitgesproken terwijl je beweegt",
+      "freeCast": "Je volgende bezwering kost niets",
+      "instantCast": "Je volgende spreuk met een bezweringstijd is direct",
+      "cheapCast": "Je volgende spreuk kost {pct}% minder",
       "increase": {
         "ap": "Erhöht Angriffskraft um {value}",
-        "sp": "Increases spell power by {value}",
+        "sp": "Verhoogt spreukkracht met {value}",
         "armor": "Erhöht Rüstung um {value}",
         "int": "Erhöht Intelligenz um {value}",
         "agi": "Erhöht Beweglichkeit um {value}",
@@ -1629,7 +1629,7 @@ export const nl_NL: EnTranslations = {
       "formBear": "Bruingedaante: verhoogde gezondheid en pantser",
       "formCat": "Katzengestalt: Nahkampfschaden und Energie",
       "formTravel": "Fleetgedaante: bewegingssnelheid verhoogd met {pct}%",
-      "formFireball": "Ember Form: movement speed increased by {pct}%; attacks and spells are disabled",
+      "formFireball": "Ember Form: bewegingssnelheid verhoogd met {pct}%; aanvallen en spreuken zijn uitgeschakeld",
       "defensiveStance": "Bewaakte Houding: minder ontvangen schade, meer dreiging",
       "righteousFury": "Brandende Eed: sterk verhoogde dreiging door Heilige schade",
       "scale": "Größe um {pct}% erhöht",
@@ -2090,28 +2090,28 @@ export const nl_NL: EnTranslations = {
       "hobbyLabel": "Liefhebberij"
     },
     "archetypePair": {
-      "engineering+alchemy": "Bombardier",
-      "alchemy+cooking": "Apothecary",
-      "cooking+leatherworking": "Trapper",
-      "leatherworking+tailoring": "Outfitter",
-      "tailoring+inscription": "Mageweaver",
-      "inscription+enchanting": "Arcanist",
-      "enchanting+jewelcrafting": "Gembinder",
-      "jewelcrafting+weaponcrafting": "Bladewright",
-      "weaponcrafting+armorcrafting": "Smith",
-      "armorcrafting+engineering": "Cogsmith"
+      "engineering+alchemy": "Bommenwerper",
+      "alchemy+cooking": "Apotheker",
+      "cooking+leatherworking": "Jager",
+      "leatherworking+tailoring": "Uitrusser",
+      "tailoring+inscription": "Magiërswerker",
+      "inscription+enchanting": "Arcaneschrijver",
+      "enchanting+jewelcrafting": "Edelsteenbezweerder",
+      "jewelcrafting+weaponcrafting": "Wapensmid",
+      "weaponcrafting+armorcrafting": "Smid",
+      "armorcrafting+engineering": "Radsmid"
     },
     "craftName": {
-      "armorcrafting": "Armorcrafting",
-      "weaponcrafting": "Weaponcrafting",
-      "jewelcrafting": "Jewelcrafting",
-      "alchemy": "Alchemy",
-      "engineering": "Engineering",
-      "cooking": "Cooking",
-      "inscription": "Inscription",
-      "enchanting": "Enchanting",
-      "tailoring": "Tailoring",
-      "leatherworking": "Leatherworking"
+      "armorcrafting": "Harnasmaken",
+      "weaponcrafting": "Wapensmeden",
+      "jewelcrafting": "Juwelenmaken",
+      "alchemy": "Alchemie",
+      "engineering": "Knutselwerk",
+      "cooking": "Koken",
+      "inscription": "Inscriptie",
+      "enchanting": "Betovering",
+      "tailoring": "Kleermaken",
+      "leatherworking": "Leerbewerken"
     },
     "crafting": {
       "title": "Knutselen",
@@ -2125,41 +2125,41 @@ export const nl_NL: EnTranslations = {
       "insufficientMaterials": "Daar heb je de materialen niet voor.",
       "unknownRecipe": "Dat recept bestaat niet.",
       "comboRequirementUnmet": "Je hebt niet beide vereiste ambachten op het vereiste niveau voor dat recept.",
-      "comboRequires": "Attunement: {craftA} + {craftB}, tier {tier}.",
-      "comboMet": "Ready.",
-      "comboSyncing": "Checking realm attunement.",
-      "comboNotAttuned": "Choose an archetype pair first.",
-      "comboWrongPair": "Activate this exact pair to craft it.",
-      "comboTierUnmet": "Raise both major crafts to the required tier.",
-      "professionChoice": "Profession choice",
-      "noProfessionChoice": "No valid profession choice is currently available.",
+      "comboRequires": "Afstemming: {craftA} + {craftB}, rang {tier}.",
+      "comboMet": "Gereed.",
+      "comboSyncing": "Rijksafstemming controleren.",
+      "comboNotAttuned": "Kies eerst een archetype-paar.",
+      "comboWrongPair": "Activeer precies dit paar om het te maken.",
+      "comboTierUnmet": "Breng beide hoofdambachten naar de vereiste rang.",
+      "professionChoice": "Beroepskeuze",
+      "noProfessionChoice": "Er is momenteel geen geldige beroepskeuze beschikbaar.",
       "pairOptionLabel": "{pair} ({craftA} + {craftB})",
-      "attunementPreview": "Result: {title} title; {majorA} and {majorB} become uncapped majors; {hobby} becomes the rare-capped hobby; all other skill knowledge is retained but capped at common while dormant.",
-      "hobbyPreview": "Result: {hobby} becomes the rare-capped hobby. Both majors and all retained skill values stay unchanged.",
+      "attunementPreview": "Resultaat: titel {title}; {majorA} en {majorB} worden ongelimiteerde hoofdambachten; {hobby} wordt de zeldzaam-begrensde liefhebberij; alle andere vakkennis wordt behouden maar begrensd op gewoon zolang het slapend is.",
+      "hobbyPreview": "Resultaat: {hobby} wordt de zeldzaam-begrensde liefhebberij. Beide hoofdambachten en alle behouden vaardigheidswaarden blijven ongewijzigd.",
       "identity": {
-        "title": "Crafting Identity",
-        "syncing": "Waiting for your crafting identity from the realm.",
-        "unattuned": "No archetype pair is active. Your knowledge is retained, but combo recipes require an attuned pair.",
-        "titleLabel": "Title",
-        "majorsLabel": "Majors",
-        "hobbyLabel": "Hobby",
-        "historyLabel": "History",
-        "history": "{pairs} pairs discovered, {returns} returns completed",
-        "roleMajor": "Major",
-        "roleHobby": "Hobby",
-        "roleDormant": "Dormant knowledge",
-        "roleUnattuned": "Unattuned",
-        "ceilingUnlimited": "No empowerment cap",
-        "ceilingRare": "Rare cap",
-        "ceilingCommon": "Common cap",
-        "skillAria": "{craft}, skill {skill}, tier {tier}, {role}, {ceiling}",
-        "colCraft": "Craft",
-        "colSkill": "Skill",
-        "colRole": "Role",
-        "colCap": "Cap",
-        "tutorial": "First tier: reach skill {skill} in a craft. Successful recipes raise that craft without erasing knowledge elsewhere.",
-        "nearTier": "{craft} is {points} skill from its next tier.",
-        "dormantKnowledge": "{craft} knowledge is retained but dormant until its pair or hobby is active."
+        "title": "Ambachtsidentiteit",
+        "syncing": "Wachten op je ambachtsidentiteit van het rijk.",
+        "unattuned": "Er is geen archetype-paar actief. Je kennis wordt behouden, maar combinatierecepten vereisen een afgestemd paar.",
+        "titleLabel": "Titel",
+        "majorsLabel": "Hoofdambachten",
+        "hobbyLabel": "Liefhebberij",
+        "historyLabel": "Geschiedenis",
+        "history": "{pairs} paren ontdekt, {returns} terugkeren voltooid",
+        "roleMajor": "Hoofdambacht",
+        "roleHobby": "Liefhebberij",
+        "roleDormant": "Slapende kennis",
+        "roleUnattuned": "Niet afgestemd",
+        "ceilingUnlimited": "Geen versterkingsbegrenzing",
+        "ceilingRare": "Zeldzame begrenzing",
+        "ceilingCommon": "Gewone begrenzing",
+        "skillAria": "{craft}, vaardigheid {skill}, rang {tier}, {role}, {ceiling}",
+        "colCraft": "Ambacht",
+        "colSkill": "Vaardigheid",
+        "colRole": "Rol",
+        "colCap": "Begrenzing",
+        "tutorial": "Eerste rang: bereik vaardigheid {skill} in een ambacht. Geslaagde recepten verhogen dat ambacht zonder kennis elders te wissen.",
+        "nearTier": "{craft} mist {points} vaardigheid voor zijn volgende rang.",
+        "dormantKnowledge": "{craft}-kennis wordt behouden maar is slapend tot zijn paar of liefhebberij actief is."
       },
       "notAtHub": "Je moet bij de werkbank zijn, op het vereiste niveau, om dat te maken.",
       "throttled": "Je maakt te snel. Wacht even en probeer het opnieuw.",
@@ -2324,9 +2324,9 @@ export const nl_NL: EnTranslations = {
       "charOpenBook": "Boek der Daden",
       "lbTab": "Roem",
       "lbTitleCol": "Titel",
-      "lbScopeNote": "Accounts ranked by lifetime Renown. Each deed counts once across all characters on an account.",
-      "lbSelfAccount": "Your account: rank {rank}, top {percent} percent, {renown} Renown",
-      "lbSelfRank": "Your account: rank {rank}, top {percent} percent",
+      "lbScopeNote": "Accounts gerangschikt op levenslange Roem. Elke daad telt eenmaal over alle personages op een account.",
+      "lbSelfAccount": "Jouw account: rang {rank}, top {percent} procent, {renown} Roem",
+      "lbSelfRank": "Jouw account: rang {rank}, top {percent} procent",
       "lbEmpty": "Nog geen kroniekschrijvers op de ranglijst.",
       "broadcastsLabel": "Deel behaalde daden met je gilde en vrienden",
       "titledName": "{name} [{title}]"
@@ -2432,7 +2432,7 @@ export const nl_NL: EnTranslations = {
       "upstream": "Steam reageerde niet. Probeer het zo meteen opnieuw."
     },
     "wallet": {
-      "handoff_invalid": "That wallet authorization expired or could not be verified. Try again."
+      "handoff_invalid": "Die portemonnee-autorisatie is verlopen of kon niet worden geverifieerd. Probeer het opnieuw."
     },
     "welcome": {
       "invalid_input": "Ongeldige invoer."
@@ -2929,18 +2929,18 @@ export const nl_NL: EnTranslations = {
       "lightning_shield": "Laadt je op zodat aanvallers Natuurschade oplopen wanneer ze je raken.",
       "flame_shock": "Een directe brand die vooraan inslaat en blijft schroeien na verloop van tijd.",
       "fireball": "Je belangrijkste vuurnuke, raakt hard en laat het doelwit branden.",
-      "fireball_form": "Become a living ember to cross open ground at high speed.",
+      "fireball_form": "Word een levende sintel om open terrein snel te doorkruisen.",
       "frost_armor": "Een blijvende zelfbuff die je pantser verhardt voor een gevecht.",
       "arcane_intellect": "Verhoogt Intellect om de manapoel van een bondgenoot te verdiepen, spreek het uit voor de pull.",
       "frostbolt": "Slaat van afstand toe en vertraagt het doelwit zodat het niet op je kan inlopen.",
-      "ice_lance": "An instant shard for spending frost procs, it hits far harder on a frozen target.",
-      "flurry": "Three quick bolts that chill the target so your next frost hits land as if it were frozen.",
-      "fingers_of_frost": "Your frost bolts sometimes empower an Ice Lance to strike as if the target were frozen.",
-      "brain_freeze": "Your frost bolts sometimes make the next Flurry instant and harder-hitting.",
-      "shatter": "Your spells crit far more often against frozen targets.",
-      "frozen_orb": "Rolls a slow orb through the pack that chills everything and feeds your frost procs.",
-      "blizzard": "Blankets an area in ice to wear down and slow a whole pack.",
-      "blink": "Teleports you a short distance forward, breaking roots on the way out.",
+      "ice_lance": "Een directe scherf om vorstprocs mee te verbruiken, raakt veel harder op een bevroren doelwit.",
+      "flurry": "Drie snelle boutten die het doelwit koelen zodat je volgende vorsttreffers landen alsof het bevroren is.",
+      "fingers_of_frost": "Je vorstboutten geven een Ice Lance soms de kracht om te treffen alsof het doelwit bevroren is.",
+      "brain_freeze": "Je vorstboutten maken de volgende Winterlash soms direct en harder rakend.",
+      "shatter": "Je spreuken criten veel vaker tegen bevroren doelwitten.",
+      "frozen_orb": "Rolt een langzame bol door de troep die alles verkilt en je vorstprocs voedt.",
+      "blizzard": "Bedekt een gebied met ijs om een heel roedel te slijten en te vertragen.",
+      "blink": "Teleporteert je een korte afstand vooruit en verbreekt onderweg wortels.",
       "conjure_water": "Roept drank op die mana herstelt, zodat je tussen pulls kunt bijvullen.",
       "conjure_food": "Roept voedsel op dat gezondheid herstelt wanneer je gaat zitten om te eten.",
       "shadow_bolt": "Een bout van schaduw die je op een doelwit afvuurt, je vertrouwde nuke.",
@@ -3237,7 +3237,7 @@ export const nl_NL: EnTranslations = {
       "howHeading": "Hoe daden werken",
       "howBody": "Daden behaal en bewaar je met één personage tegelijk, dus elke held die je speelt bouwt een eigen Boek op; alleen de ranglijst van het rijk bundelt je Roem over alle personages die je speelt, en telt elke daad maar één keer. Elke daad zegt in duidelijke taal wat er van je wordt gevraagd, direct in het Boek der Daden in het spel, zodat je altijd weet waar je op jaagt, en de daden waar je achteraan zit kun je op de volglijst zetten om ze tijdens het spelen in het oog te houden. Een klein aantal blijft geheim en onthult zich pas wanneer je ze hebt behaald. Het Boek houdt zichzelf ook eerlijk: alles wat je verleden kan bewijzen, wordt je meteen toegekend, zodat een veteraan het nooit op een lege bladzijde opent; alleen de tellende daden beginnen hun telling opnieuw.",
       "renownHeading": "Roem",
-      "renownBody": "Renown is the score behind the Book. Every deed you earn is worth a set amount, and your total only ever climbs, so a quiet week never costs you ground. A handful of deeds turn on luck rather than skill, and Feats are an honor of their own, so both of those are worth no Renown at all. Deeds without Renown still count toward completion in your Book; they simply never score.",
+      "renownBody": "Roem is de score achter het Boek. Elke daad die je behaalt is een vast bedrag waard, en je totaal stijgt altijd, dus een rustige week kost je nooit terrein. Een handvol daden draait op geluk in plaats van vaardigheid, en Wapenfeiten zijn een eigen eer, dus beide leveren geen Roem op. Daden zonder Roem tellen nog steeds mee voor voltooiing in je Boek; ze scoren gewoonweg nooit.",
       "rewardsHeading": "Titels en randen",
       "rewardsBody": "De beloningen zijn puur voor de sier, en dat is precies de bedoeling. Sommige daden schenken een titel die je kunt dragen of een rand die je naam omlijst, en nooit iets dat je held sterker maakt. Kies de titel die je wilt in het Boek der Daden en hij reist mee op je naamplaatje, in de chat en op de ranglijsten, voor iedereen zichtbaar.",
       "chroniclesHeading": "Kronieken",
@@ -3246,7 +3246,7 @@ export const nl_NL: EnTranslations = {
       "featsBody": "Wapenfeiten staan op een plank apart: getuigenissen van nalatenschap en wereldprimeurs, de daden die horen bij een vervlogen tijdperk of een moment dat maar één keer zal plaatsvinden. Ze leveren geen Roem op en tellen niet mee voor de voltooiing, maar worden voor altijd bewaard als herinnering aan wat er is verricht.",
       "catalogHeading": "De volledige rol der daden",
       "catalogBody": "Hier staat elke daad die het Boek kan bevatten, geordend per categorie. De geheime daden zijn met opzet weggelaten: die wachten tot jij ze vindt. Open het Boek der Daden in het spel om precies te zien wat elke daad van je vraagt.",
-      "standingsNote": "The realms keep a running tally of Renown across every account: the board ranks whole accounts by lifetime Renown, counting each deed once across all your characters, and it shows Renown alone, so deeds that carry none never move the standings even though they count in your Book. To see who stands where, open the Leaderboard in game and turn to its Renown tab; the standings live there, not on the wiki.",
+      "standingsNote": "De rijken houden een doorlopende telling van Roem bij over elk account: het bord rangschikt hele accounts op levenslange Roem en telt elke daad eenmaal over al je personages, en het toont alleen Roem, dus daden die geen Roem dragen verplaatsen de stand nooit, ook al tellen ze in je Boek. Om te zien wie waar staat, open je het Klassement in het spel en ga je naar het tabblad Roem; de standen staan daar, niet op de wiki.",
       "catHeading": "{label} ({count})",
       "colName": "Daad",
       "colRenown": "Roem",
@@ -4162,9 +4162,9 @@ export const nl_NL: EnTranslations = {
     "balancePreviewTitle": "Voorbeeld van $WOC-saldo van verbonden portemonnee",
     "balancePreviewAria": "Voorbeeld van saldo van verbonden portemonnee: {balance}. Koppel de portemonnee om houderkenmerk te verifiëren.",
     "balanceAmount": "{amount} $WOC",
-    "bagConnect": "Link wallet",
-    "bagLink": "Verify wallet",
-    "bagReconnect": "Reconnect wallet",
+    "bagConnect": "Portemonnee koppelen",
+    "bagLink": "Portemonnee verifiëren",
+    "bagReconnect": "Portemonnee opnieuw verbinden",
     "connected": "Verbonden: {address}",
     "connectedWithBalance": "Verbonden: {balance} - {address}",
     "connectedLinked": "Geverifieerd: {address}",
@@ -4179,15 +4179,15 @@ export const nl_NL: EnTranslations = {
     "helpLinkedDisconnected": "Houdervoordelen zijn actief. Verbind de app wanneer je moet ondertekenen of uitgeven.",
     "helpLinkedDisconnectedWithBalance": "Houdervoordelen zijn actief. Verbind de app wanneer je moet ondertekenen of uitgeven.",
     "extensionHelp": "Om hier een portemonnee te zien, houd je een browserextensie voor portemonnees zoals Solflare Wallet actief.",
-    "mobileAppHelp": "Choose Phantom or Solflare. Your wallet app will ask for approval. Keep this game open and return to it when finished.",
-    "standaloneAppHelp": "Wallet connections are not available in the Home Screen app yet. Open World of ClaudeCraft in Safari or Chrome to use Phantom or Solflare.",
-    "openAppTitle": "Continue in {wallet}",
-    "openAppHelp": "Open {wallet} to review this request. Keep this game tab open while the wallet app is active.",
+    "mobileAppHelp": "Kies Phantom of Solflare. Je portemonnee-app vraagt om goedkeuring. Houd dit spel open en keer ernaar terug wanneer je klaar bent.",
+    "standaloneAppHelp": "Portemonneeverbindingen zijn nog niet beschikbaar in de beginscherm-app. Open World of ClaudeCraft in Safari of Chrome om Phantom of Solflare te gebruiken.",
+    "openAppTitle": "Doorgaan in {wallet}",
+    "openAppHelp": "Open {wallet} om dit verzoek te bekijken. Houd dit speltabblad open terwijl de portemonnee-app actief is.",
     "openAppButton": "Open {wallet}",
-    "manualReturnBrowserHelp": "After approval, return to this game tab. If iOS opens another browser, close it and return to the original browser manually.",
-    "manualReturnStandaloneHelp": "After approval, return to World of ClaudeCraft from your Home Screen. If iOS opens a browser, close it and reopen the Home Screen app manually.",
-    "preparingAppButton": "Preparing {wallet}...",
-    "walletAppUnavailable": "{wallet} could not be prepared. Close this window and try again.",
+    "manualReturnBrowserHelp": "Keer na goedkeuring terug naar dit speltabblad. Als iOS een andere browser opent, sluit die dan en keer handmatig terug naar de oorspronkelijke browser.",
+    "manualReturnStandaloneHelp": "Keer na goedkeuring terug naar World of ClaudeCraft via je beginscherm. Als iOS een browser opent, sluit die dan en open de beginscherm-app handmatig opnieuw.",
+    "preparingAppButton": "{wallet} voorbereiden...",
+    "walletAppUnavailable": "{wallet} kon niet worden voorbereid. Sluit dit venster en probeer het opnieuw.",
     "flowConnect": "Kies een portemonnee. De verificatie gaat automatisch verder.",
     "flowSign": "Onderteken het verificatiebericht in je portemonnee-app. Geen transactie of SOL vereist.",
     "flowVerify": "Eigendom van portemonnee verifiëren...",
@@ -4195,20 +4195,20 @@ export const nl_NL: EnTranslations = {
     "verifyFailed": "Portemonneeverificatie mislukt.",
     "unlinkFailed": "Kon portemonnee niet ontkoppelen.",
     "browser": {
-      "eyebrow": "Desktop wallet authorization",
-      "title": "Connect a Solana Wallet",
-      "linkBody": "Choose a wallet extension in this browser. You will sign a verification message, then return to the desktop app.",
-      "paymentBody": "Choose the wallet linked to your account and approve the transaction in this browser.",
-      "extensionHelp": "No compatible wallet extension was found. Install or unlock Phantom, Solflare, or another Solana browser wallet, then retry.",
-      "safety": "World of ClaudeCraft never asks for your recovery phrase or private key.",
-      "continueWith": "Continue with {wallet}",
-      "reviewTitle": "Review in your wallet",
-      "reviewBody": "Follow the prompt from {wallet}. Keep this browser page open.",
-      "completeTitle": "Wallet authorization complete",
-      "completeBody": "You can return to the World of ClaudeCraft desktop app.",
-      "returnButton": "Return to desktop app",
-      "failed": "Wallet authorization failed or expired. Return to the desktop app and try again.",
-      "retry": "Retry"
+      "eyebrow": "Desktop-portemonnee-autorisatie",
+      "title": "Een Solana-portemonnee verbinden",
+      "linkBody": "Kies een portemonnee-extensie in deze browser. Je tekent een verificatiebericht en keert dan terug naar de desktop-app.",
+      "paymentBody": "Kies de aan je account gekoppelde portemonnee en keur de transactie goed in deze browser.",
+      "extensionHelp": "Geen compatibele portemonnee-extensie gevonden. Installeer of ontgrendel Phantom, Solflare of een andere Solana-browserportemonnee en probeer het opnieuw.",
+      "safety": "World of ClaudeCraft vraagt nooit naar je herstelzin of privésleutel.",
+      "continueWith": "Doorgaan met {wallet}",
+      "reviewTitle": "Bekijken in je portemonnee",
+      "reviewBody": "Volg de aanwijzing van {wallet}. Houd deze browserpagina open.",
+      "completeTitle": "Portemonnee-autorisatie voltooid",
+      "completeBody": "Je kunt terugkeren naar de World of ClaudeCraft desktop-app.",
+      "returnButton": "Terug naar desktop-app",
+      "failed": "Portemonnee-autorisatie mislukt of verlopen. Keer terug naar de desktop-app en probeer het opnieuw.",
+      "retry": "Opnieuw proberen"
     },
     "holder": "$WOC-houder",
     "holderTierTitle": "{tier} $WOC-houder",
@@ -4532,22 +4532,22 @@ export const nl_NL: EnTranslations = {
     "buyAria": "Koop {item} voor {marks} Heroïsche Merken"
   },
   "cardDuel": {
-    "title": "Card Duel",
-    "close": "Close",
-    "join": "Join Queue",
-    "joinAria": "Join the Card Duel queue",
-    "leave": "Leave Queue",
-    "leaveAria": "Leave the Card Duel queue",
-    "forfeit": "Forfeit",
-    "forfeitAria": "Forfeit the Card Duel",
-    "queued": "Waiting for an opponent...",
-    "unavailable": "Card Duel requires another player online.",
-    "vsOpponent": "vs {name}",
-    "round": "Round score: {mine} - {theirs}",
-    "counts": "Deck: {deck} · Discard: {discard}",
-    "playCardAria": "Play the {value} card",
-    "waitingOnOpponent": "Waiting on your opponent's card...",
-    "yourTurn": "Play a card"
+    "title": "Kaartduel",
+    "close": "Sluiten",
+    "join": "Wachtrij Betreden",
+    "joinAria": "De Kaartduelwachtrij betreden",
+    "leave": "Wachtrij Verlaten",
+    "leaveAria": "De Kaartduelwachtrij verlaten",
+    "forfeit": "Opgeven",
+    "forfeitAria": "Het Kaartduel opgeven",
+    "queued": "Wachten op een tegenstander...",
+    "unavailable": "Kaartduel vereist een andere speler die online is.",
+    "vsOpponent": "tegen {name}",
+    "round": "Rondescore: {mine} - {theirs}",
+    "counts": "Deck: {deck} - Aflegstapel: {discard}",
+    "playCardAria": "De kaart {value} spelen",
+    "waitingOnOpponent": "Wachten op de kaart van je tegenstander...",
+    "yourTurn": "Speel een kaart"
   },
   "delveUi": {
     "board": {
@@ -5049,9 +5049,9 @@ export const nl_NL: EnTranslations = {
     }
   },
   "gpuNotice": {
-    "bodyDesktop": "The game is running without GPU acceleration and will be slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
-    "bodyWeb": "The game is running without GPU acceleration and will be slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.",
-    "dismiss": "Dismiss"
+    "bodyDesktop": "Het spel draait zonder GPU-versnelling en zal traag zijn. Werk je grafische stuurprogramma's bij en herstart het spel. Stel op Windows ook het spel in op Hoge prestaties via Instellingen, Systeem, Beeldscherm, Afbeeldingen.",
+    "bodyWeb": "Het spel draait zonder GPU-versnelling en zal traag zijn. Schakel hardwareversnelling in je browserinstellingen in, werk je grafische stuurprogramma's bij en herstart je browser.",
+    "dismiss": "Sluiten"
   },
   "realm": {
     "noRealms": "Geen werelden beschikbaar.",
@@ -5474,8 +5474,8 @@ export const nl_NL: EnTranslations = {
       "openTrade": "Handel openen",
       "duelRequest": "{name} heeft je uitgedaagd tot een duel!",
       "acceptDuel": "Duel aanvaarden",
-      "resurrectionOffer": "{name} wants to return you to life. Do you accept?",
-      "acceptResurrection": "Accept Resurrection",
+      "resurrectionOffer": "{name} wil je terugbrengen tot leven. Aanvaarden?",
+      "acceptResurrection": "Opstanding Aanvaarden",
       "decline": "Weigeren"
     },
     "combat": {
@@ -5652,7 +5652,7 @@ export const nl_NL: EnTranslations = {
     },
     "pet": {
       "attack": "Aanvallen",
-      "waterJet": "Water Jet",
+      "waterJet": "Waterstraal",
       "taunt": "Provoceren",
       "healDemon": "Demon genezen",
       "healPet": "Huisdier genezen",
@@ -5661,8 +5661,8 @@ export const nl_NL: EnTranslations = {
       "aggressive": "Agressief",
       "petAttackTitle": "Huisdier aanval",
       "petAttackDesc": "Beveel je huisdier om je huidige vijandige doelwit aan te vallen.",
-      "waterJetTitle": "Water Jet",
-      "waterJetDesc": "Command your Water Elemental to channel a slowing stream for 3 seconds. 8 second cooldown. Right-click to auto-cast it whenever it is off cooldown.",
+      "waterJetTitle": "Waterstraal",
+      "waterJetDesc": "Beveelt je Waterelementaal om gedurende 3 seconden een vertragend straalwater te kanaliseren. 8 seconden afkoeltijd. Klik met rechts om het automatisch te activeren zodra de afkoeltijd voorbij is.",
       "petTauntTitle": "Huisdier provoceren",
       "petTauntDesc": "Beveel je huisdier om aan te vallen en te Grommen wanneer het binnen bereik is. Afkoeltijd van 10 seconden.",
       "healDemonDesc": "Besteed mana om gedurende 5 seconden genezing in je demon te kanaliseren.",
@@ -5972,7 +5972,7 @@ export const nl_NL: EnTranslations = {
       "dps": "Schade/sec",
       "critChance": "Kritieke Kans",
       "dodge": "Ontwijken",
-      "parry": "Parry"
+      "parry": "Pareren"
     },
     "tooltip": {
       "qualityKind": "{quality} {kind}",
@@ -6267,7 +6267,7 @@ export const nl_NL: EnTranslations = {
       },
       "fireball_form": {
         "name": "Ember Form",
-        "description": "Transform into a blazing ember, increasing movement speed by {buff}%. You cannot attack or cast spells while transformed. Recast to return to your normal form."
+        "description": "Verander in een vlammende sintel, waardoor je bewegingssnelheid met {buff}% toeneemt. Je kunt niet aanvallen of spreuken uitspreken terwijl je getransformeerd bent. Heractiveer om terug te keren naar je normale gedaante."
       },
       "frost_armor": {
         "name": "Rijpmantel",
@@ -6331,43 +6331,43 @@ export const nl_NL: EnTranslations = {
       },
       "ice_lance": {
         "name": "Ice Lance",
-        "description": "Hurl a shard of ice, dealing {damage} Frost damage, tripled against a frozen target. Spends Fingers of Frost, or a charge of Winter's Chill, to treat the target as frozen. (Frost)"
+        "description": "Slingert een ijsscherf die {damage} Vorstschade toebrengt, verdrievoudigd tegen een bevroren doelwit. Verbruikt Fingers of Frost of een lading Winterskil om het doelwit als bevroren te behandelen. (Vorst)"
       },
       "flurry": {
         "name": "Winterlash",
-        "description": "Loose three icy bolts for {damage} Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Winterlash instant, 30% harder, and skips its cooldown. (Frost)"
+        "description": "Schiet drie ijsboutten af die elk {damage} Vorstschade toebrengen en Winterskil op het doelwit leggen: de volgende 2 binnenkomende compatibele spreuken behandelen het als bevroren. Brain Freeze maakt Winterlash direct, 30% harder, en slaat de afkoeltijd over. (Vorst)"
       },
       "frozen_orb": {
         "name": "Frozen Orb",
-        "description": "Release an orb of swirling frost that drifts forward for 8 sec, dealing {damage} Frost damage each second to nearby enemies and slowing them by 30%. Its strikes generate Fingers of Frost. (Frost)"
+        "description": "Laat een bol van wervelende vorst los die 8 sec naar voren drijft, per seconde {damage} Vorstschade toebrengt aan nabije vijanden en ze 30% vertraagt. Zijn treffers genereren Fingers of Frost. (Vorst)"
       },
       "blizzard": {
         "name": "Blizzard",
-        "description": "Calls an ice storm onto the target area for 6 sec, dealing {damage} Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frozen Orb, up to 3 sec per cast. (Frost)"
+        "description": "Roept een ijsstorm op over het doelgebied gedurende 6 sec, die {damage} Vorstschade per seconde toebrengt en vijanden met 40% vertraagt. Elk getroffen vijand haalt 0,5 sec af van Frozen Orb, tot 3 sec per worp. (Vorst)"
       },
       "glacial_spike": {
         "name": "Glacial Spike",
-        "description": "Conjure a massive spike of ice, consuming 5 Icicles to deal {damage} Frost damage and freeze the target in place for 4 sec. (Frost)"
+        "description": "Bezweer een massieve ijspiek die 5 IJsschilfers verbruikt om {damage} Vorstschade toe te brengen en het doelwit 4 sec op zijn plek te bevriezen. (Vorst)"
       },
       "glacial_front": {
         "name": "Glacial Front",
-        "description": "Hold to gather a widening front of frost, then release it in a cone. Longer charges reach farther and deal more damage. All enemies hit are slowed by 50% for 4 sec; maximum charge also roots them for 1 sec. (Frost)"
+        "description": "Houd ingedrukt om een brede vorstgolf op te laden en laat hem los in een kegel. Langere ladingen reiken verder en richten meer schade aan. Alle getroffen vijanden worden gedurende 4 sec met 50% vertraagd; maximale lading wortelt ze ook 1 sec vast. (Vorst)"
       },
       "dragons_breath": {
         "name": "Dragon's Breath",
-        "description": "Hold to gather a widening breath of flame, then release it in a cone. Longer charges reach farther and deal more damage. Enemies hit are disoriented and damage breaks the effect; maximum charge always critically strikes and counts once toward Hot Streak. (Fire)"
+        "description": "Houd ingedrukt om een brede vuurstroom op te laden en laat hem los in een kegel. Langere ladingen reiken verder en richten meer schade aan. Getroffen vijanden raken gedesoriënteerd en schade verbreekt het effect; maximale lading treft altijd kritiek en telt eenmaal mee voor Hete reeks. (Vuur)"
       },
       "fingers_of_frost": {
         "name": "Fingers of Frost",
-        "description": "Rimelance has a 15% chance to grant Fingers of Frost, up to 2 charges: your next Ice Lance treats its target as frozen. (Frost)"
+        "description": "Rijplans heeft 15% kans om Fingers of Frost te verlenen, tot 2 ladingen: je volgende Ice Lance behandelt het doelwit als bevroren. (Vorst)"
       },
       "brain_freeze": {
         "name": "Brain Freeze",
-        "description": "Rimelance has a 20% chance to make your next Winterlash instant, 30% harder, and free of its cooldown. (Frost)"
+        "description": "Rijplans heeft 20% kans om je volgende Winterlash direct, 30% harder en vrij van zijn afkoeltijd te maken. (Vorst)"
       },
       "shatter": {
         "name": "Brittle Ruin",
-        "description": "Your spells gain 50% critical strike chance against frozen targets, and those critical strikes deal 20% more damage. Fingers of Frost and Winter's Chill count as frozen. (Frost)"
+        "description": "Je spreuken krijgen 50% kritieke trefkans tegen bevroren doelwitten, en die kritieke treffers brengen 20% meer schade toe. Fingers of Frost en Winterskil tellen als bevroren. (Vorst)"
       },
       "conjure_water": {
         "name": "Waterbinding",
@@ -7259,23 +7259,23 @@ export const nl_NL: EnTranslations = {
       },
       "temporal_mend": {
         "name": "Temporal Mend",
-        "description": "Draws an ally a moment forward in time, mending {damage} health as the body settles into its healthier future self. (Chronomancy signature)"
+        "description": "Trekt een bondgenoot een moment vooruit in de tijd, waarbij {damage} gezondheid wordt hersteld terwijl het lichaam zijn gezondere toekomstige zelf vindt. (Chronomantie-handtekening)"
       },
       "temporal_barrier": {
         "name": "Temporal Barrier",
-        "description": "Shifts the target a heartbeat out of the present, a temporal shell absorbing {damage} damage for 10 sec before the timeline snaps back."
+        "description": "Verschuift het doelwit een hartslag buiten het heden: een tijdschild absorbeert {damage} schade gedurende 10 sec voordat de tijdlijn terugknalt."
       },
       "temporal_echo": {
         "name": "Temporal Echo",
-        "description": "Marks an ally with an echo of a healthier moment, mending {damage} health at once. For {duration} sec, part of the Arcane damage you deal is drawn back through the echo to heal them."
+        "description": "Markeert een bondgenoot met de echo van een gezonder moment, en herstelt direct {damage} gezondheid. Gedurende {duration} sec stroomt een deel van de Arcaneschade die je aanricht terug door de echo om hen te genezen."
       },
       "temporal_cascade": {
         "name": "Temporal Cascade",
-        "description": "Sends an echo cascading through your group: the target and up to four of their nearest allies are mended at once and each marked for {duration} sec, drawing part of the Arcane damage you deal back through their echoes to heal them. (Chronomancy)"
+        "description": "Stuurt een echo door je groep: het doelwit en tot vier van hun naaste bondgenoten worden tegelijk hersteld en elk gedurende {duration} sec gemarkeerd, waarbij een deel van de Arcaneschade die je aanricht terugstroomt door hun echo om hen te genezen. (Chronomantie)"
       },
       "temporal_reversal": {
         "name": "Temporal Reversal",
-        "description": "Rewinds a fallen ally's timeline, returning them to life at their body with a portion of their health and mana, even in the thick of combat. (Chronomancy)"
+        "description": "Spoelt de tijdlijn van een gevallen bondgenoot terug en brengt hem bij zijn lichaam tot leven met een deel van zijn gezondheid en mana, zelfs middenin een gevecht. (Chronomantie)"
       },
       "collective_reversal": {
         "name": "Collectieve omkering",
@@ -7283,23 +7283,23 @@ export const nl_NL: EnTranslations = {
       },
       "temporal_rewind": {
         "name": "Rewind",
-        "description": "Sends an arcane wave through your group or raid, rewinding time to restore 30% of the damage each ally within 40 yards took over the last 5 seconds (up to 35% of their maximum health). Cannot be a critical effect. (Chronomancy)"
+        "description": "Stuurt een arcanegolf door je groep of raid en spoelt de tijd terug om 30% van de schade te herstellen die elke bondgenoot binnen 40 meter de afgelopen 5 seconden heeft opgelopen (tot 35% van hun maximale gezondheid). Kan geen kritiek effect zijn. (Chronomantie)"
       },
       "temporal_hourglass": {
         "name": "Hourglass of Suspension",
-        "description": "Place a temporal hourglass at the selected location. Beneath an enemy, it suspends them for {hostilePveDuration} sec in PvE or {hostilePvpDuration} sec in PvP and prevents all actions; damage breaks the effect. At your feet or beneath a group ally, it grants stasis for {duration} sec, prevents damage and actions, restores {healing}% of maximum health, and makes cooldowns recover {selfCooldownRecovery}% faster for you or {allyCooldownRecovery}% faster for an ally. On empty ground, the hourglass waits for {groundDuration} sec and affects the first valid unit to step on it. The beneficial aura can be removed manually."
+        "description": "Plaatst een tijdzandloper op de geselecteerde locatie. Onder een vijand schorst het hen {hostilePveDuration} sec in PvE of {hostilePvpDuration} sec in PvP en verhindert alle acties; schade verbreekt het effect. Aan je voeten of onder een groepsbondgenoot verleent het {duration} sec stasis, verhindert schade en acties, herstelt {healing}% van maximale gezondheid, en laat afkoeltijden {selfCooldownRecovery}% sneller herstellen voor jezelf of {allyCooldownRecovery}% sneller voor een bondgenoot. Op leeg terrein wacht de zandloper {groundDuration} sec en treft de eerste geldige eenheid die erop stapt. De heilzame aura kan handmatig worden verwijderd."
       },
       "temporal_acceleration": {
         "name": "Temporal Acceleration",
-        "description": "Accelerates the flow of time for your group or raid, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Temporal Acceleration or Storm Chorus are too exhausted to benefit. (Chronomancy)"
+        "description": "Versnelt de tijdstroom voor je groep of raid, waardoor aanvals-, bezwerings- en kanalisatiesnelheid gedurende 15 sec met 30% toeneemt. Bondgenoten die recentelijk door Temporal Acceleration of Oorlogstrommen zijn getroffen, zijn te uitgeput om ervan te profiteren. (Chronomantie)"
       },
       "perfect_moment": {
         "name": "Perfect Moment",
-        "description": "Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them. (Chronomancy)"
+        "description": "Grijp je perfecte moment: ontvang direct 4 Arcaneladingen, en gedurende 10 sec verbruikt Aetherpijlen ze niet. (Chronomantie)"
       },
       "arcane_surge": {
         "name": "Aether Surge",
-        "description": "Draws a surge of raw aether through the enemy for {damage} damage. Each cast leaves an Arcane Charge that raises your next Aether Surge's damage and cast speed (5% faster each) but sharply raises its mana cost, stacking up to 4; Aether Darts spends the charges. Each cast can also arm Aether Rush, making your next Aether Surge free and twice as fast to cast."
+        "description": "Trekt een golf rauwe aether door de vijand voor {damage} schade. Elke worp laat een Arcanelading achter die de schade en werpsnelheid van je volgende Aether Surge vergroot (5% sneller per lading), maar de manakosten sterk verhoogt, tot maximaal 4 ladingen; Aetherpijlen verbruikt de ladingen. Elke worp kan ook Aetherhaast activeren, waardoor je volgende Aether Surge gratis is en twee keer zo snel te werpen."
       },
       "mind_sear": {
         "name": "Gedachtenbrand",
@@ -9357,9 +9357,9 @@ export const nl_NL: EnTranslations = {
         "greeting": "Welkom bij de Vergulde Geldkist. Je goederen rusten veilig achter onze sloten."
       },
       "card_master": {
-        "name": "Card Master",
-        "title": "Dealer of Chance",
-        "greeting": "Care for a Card Duel? Best of three, winner takes the bragging rights."
+        "name": "Kaartmeester",
+        "title": "Verdeler van het Lot",
+        "greeting": "Zin in een Kaartduel? Beste van drie, de winnaar pakt de praatrechten."
       },
       "bursar_petra_vell": {
         "name": "Thesaurier Petra Vell",
@@ -9420,11 +9420,11 @@ export const nl_NL: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "Een ambacht voor iedere hand",
-        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There are ore veins in the rocks around the Copper Dig, southwest of town. Go swing a pick and work 5 of them yourself, mind; I'll know the difference.",
-        "completion": "See? Ore gathered and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
+        "text": "Elke ziel in Oostbeekdal beoefent een ambacht naast het zwaard, {playerName}. Er zijn ertsslagaders in de rotsen rond de Kopergat, ten zuidwesten van de stad. Ga zelf een houweel zwaaien en bewerk er 5; ik zie het verschil.",
+        "completion": "Zie je? Erts verzameld en eelt op je handen. Ga door met het mijnen, houtkappen en kruidenplukken terwijl je de wegen afloopt, en als je terug in de stad bent, let dan op het Stadsfocusbord bij de markt en de nabijgelegen knutselbank. Er zit een eerlijke handel in dit alles, als je dat wilt.",
         "objectives": {
           "0": {
-            "label": "Ore vein harvested"
+            "label": "Ertsslagader geoogst"
           }
         }
       },
@@ -10212,18 +10212,18 @@ export const nl_NL: EnTranslations = {
       },
       "q_archetype_acceptance": {
         "title": "Een ambacht dat u het uwe kunt noemen",
-        "text": "Skill is knowledge, {playerName}, but attunement is a promise. Choose two neighboring crafts whose methods you will carry as your majors, then bring me ore worked from the Vale with your own hands.",
-        "completion": "The promise holds. These two crafts are now your majors, and the knowledge opposite them becomes your hobby.",
+        "text": "Vaardigheid is kennis, {playerName}, maar afstemming is een belofte. Kies twee naburige ambachten waarvan je de methoden als je hoofdambachten zult dragen, en breng me dan erts dat je zelf met je eigen handen uit het Dal hebt gewonnen.",
+        "completion": "De belofte staat. Deze twee ambachten zijn nu je hoofdambachten, en de kennis die er tegenover staat wordt je liefhebberij.",
         "objectives": {
           "0": {
-            "label": "Ore vein harvested"
+            "label": "Ertsslagader geoogst"
           }
         }
       },
       "q_prof_make_amends": {
         "title": "Het goedmaken",
-        "text": "You have carried that pair before, {playerName}. Returning is no fresh vow. Help keep the Vale road clear, and the work will remind your hands what they once knew.",
-        "completion": "The old rhythm returns. Your former pair is active once more.",
+        "text": "Je hebt dat paar eerder gedragen, {playerName}. Terugkeren is geen nieuwe gelofte. Help de Dalweg vrijhouden, en het werk zal je handen herinneren wat ze ooit kenden.",
+        "completion": "Het oude ritme keert terug. Je vroegere ambachtspaar is opnieuw actief.",
         "objectives": {
           "0": {
             "label": "Boswolf gedood"
@@ -10231,12 +10231,12 @@ export const nl_NL: EnTranslations = {
         }
       },
       "q_prof_hobby_switch": {
-        "title": "A Different Pastime",
-        "text": "Majors demand a vow. A hobby only asks where your curiosity wanders, {playerName}. Gather a few herbs and decide which craft opposite your majors you want to pursue.",
-        "completion": "A lighter choice, but a useful one. Follow that curiosity as far as rare work will take it.",
+        "title": "Een Andere Tijdverdrijf",
+        "text": "Hoofdambachten vragen een gelofte. Een liefhebberij vraagt alleen waar je nieuwsgierigheid ronddwaalt, {playerName}. Pluk een paar kruiden en beslis welk ambacht tegenover je hoofdambachten je wilt beoefenen.",
+        "completion": "Een lichtere keuze, maar een nuttige. Volg die nieuwsgierigheid zo ver als zeldzaam werk haar draagt.",
         "objectives": {
           "0": {
-            "label": "Herb patch harvested"
+            "label": "Kruidenveld geoogst"
           }
         }
       },

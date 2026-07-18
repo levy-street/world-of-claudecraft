@@ -7,6 +7,10 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_card_duel_first_win: {
+    name: '我が流儀',
+    desc: 'カードマスターのもとでカードデュエルに勝利する。',
+  },
   prog_first_steps: {
     name: 'はじめの一歩',
     desc: 'レベル2に到達し、長い旅路の最初の一歩を踏み出す。',

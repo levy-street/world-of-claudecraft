@@ -5,6 +5,7 @@ import {
   renderReleaseArticle,
   renderReleaseBody,
   renderWelcomeNews,
+  stripReleaseNotesPreamble,
 } from '../src/ui/news_feed';
 
 describe('renderReleaseBody', () => {
@@ -161,5 +162,70 @@ describe('renderWelcomeNews: the Welcome Screen compact news column', () => {
   it('escapes the URL passed for the view-all link', () => {
     const html = renderWelcomeNews(releases(1), 'https://example.com/"><script>x</script>');
     expect(html).not.toContain('<script>x</script>');
+  });
+});
+
+describe('stripReleaseNotesPreamble', () => {
+  const v26 = [
+    '# World of ClaudeCraft v0.26.0 Release Notes',
+    '',
+    '**Release:** v0.26.0',
+    '**Date:** 2026-07-15',
+    '**Previous release:** v0.25.0',
+    '',
+    'v0.26.0 is a dungeon finder release.',
+  ].join('\n');
+
+  it('strips the full h1 + Release/Date/Previous-release preamble', () => {
+    expect(stripReleaseNotesPreamble(v26)).toBe('v0.26.0 is a dungeon finder release.');
+  });
+
+  it('strips the shape with no Date row (the v0.24.2 variant)', () => {
+    const md = '# World of ClaudeCraft v0.24.2 Release Notes\n\n**Release:** v0.24.2\n\nBody.';
+    expect(stripReleaseNotesPreamble(md)).toBe('Body.');
+  });
+
+  it('strips the hyphenated h1 variant', () => {
+    const md = '# World of ClaudeCraft - v0.24.0 Release Notes\n\nBody.';
+    expect(stripReleaseNotesPreamble(md)).toBe('Body.');
+  });
+
+  it('normalizes CRLF bodies before matching', () => {
+    const md = '# X Release Notes\r\n\r\n**Release:** v1\r\n\r\nBody.';
+    expect(stripReleaseNotesPreamble(md)).toBe('Body.');
+  });
+
+  it('leaves a preamble-free body unchanged', () => {
+    expect(stripReleaseNotesPreamble('Just prose.')).toBe('Just prose.');
+  });
+
+  it('preserves a meaningful opening h1 and mid-body Release lines', () => {
+    const md = '# Big Feature\n\nProse.\n\n**Release:** cadence note.';
+    expect(stripReleaseNotesPreamble(md)).toBe(md);
+  });
+});
+
+describe('welcome news strips the redundant preamble at render time', () => {
+  it('renders neither the Release Notes h1 nor the metadata rows', () => {
+    const body =
+      '# World of ClaudeCraft v0.26.0 Release Notes\n\n**Release:** v0.26.0\n\nThe real intro.';
+    const html = renderWelcomeNews(
+      [
+        {
+          id: 1,
+          tag: 'v0.26.0',
+          name: 'World of ClaudeCraft v0.26.0',
+          publishedAt: '2026-07-15T00:00:00Z',
+          url: 'https://example.com/releases/v0.26.0',
+          prerelease: false,
+          body,
+          isNew: true,
+        },
+      ],
+      'https://example.com/releases',
+    );
+    expect(html).not.toContain('Release Notes</h1>');
+    expect(html).not.toContain('<strong>Release:</strong>');
+    expect(html).toContain('The real intro.');
   });
 });

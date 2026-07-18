@@ -2133,7 +2133,7 @@ export const ja_JP: EnTranslations = {
       "comboTierUnmet": "両方の主専攻を必要ティアまで上げてください。",
       "professionChoice": "職業の選択",
       "noProfessionChoice": "現在選択できる職業はありません。",
-      "pairOptionLabel": "{pair} ({craftA} + {craftB})",
+      "pairOptionLabel": "{pair}（{craftA} + {craftB}）",
       "attunementPreview": "結果：{title}の称号を獲得し、{majorA}と{majorB}が上限なしの主専攻になります。{hobby}はレア上限の趣味になります。他の技能知識はすべて保持されますが、休眠中はコモン上限です。",
       "hobbyPreview": "結果：{hobby}がレア上限の趣味になります。二つの主専攻と保持済みの技能値は変わりません。",
       "identity": {
@@ -2150,7 +2150,7 @@ export const ja_JP: EnTranslations = {
         "roleDormant": "休眠中の知識",
         "roleUnattuned": "未調律",
         "ceilingUnlimited": "強化上限なし",
-        "ceilingRare": "Rare cap",
+        "ceilingRare": "レア上限",
         "ceilingCommon": "コモン上限",
         "skillAria": "{craft}、技能 {skill}、ティア {tier}、{role}、{ceiling}",
         "colCraft": "職種",

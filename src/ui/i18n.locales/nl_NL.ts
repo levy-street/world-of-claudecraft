@@ -2,6 +2,285 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const nl_NL: Partial<Record<TranslationKey, string>> = {
+  'hud.pet.waterJet': 'Waterstraal',
+  'hud.pet.waterJetDesc':
+    'Beveelt je Waterelementaal om gedurende 3 seconden een vertragend straalwater te kanaliseren. 8 seconden afkoeltijd. Klik met rechts om het automatisch te activeren zodra de afkoeltijd voorbij is.',
+  'hud.pet.waterJetTitle': 'Waterstraal',
+  'hud.prompts.acceptResurrection': 'Opstanding Aanvaarden',
+  'hud.prompts.resurrectionOffer': '{name} wil je terugbrengen tot leven. Aanvaarden?',
+  'itemUi.stats.parry': 'Pareren',
+  'apiError.wallet.handoff_invalid':
+    'Die portemonnee-autorisatie is verlopen of kon niet worden geverifieerd. Probeer het opnieuw.',
+  'cardDuel.close': 'Sluiten',
+  'cardDuel.counts': 'Deck: {deck} - Aflegstapel: {discard}',
+  'cardDuel.forfeit': 'Opgeven',
+  'cardDuel.forfeitAria': 'Het Kaartduel opgeven',
+  'cardDuel.join': 'Wachtrij Betreden',
+  'cardDuel.joinAria': 'De Kaartduelwachtrij betreden',
+  'cardDuel.leave': 'Wachtrij Verlaten',
+  'cardDuel.leaveAria': 'De Kaartduelwachtrij verlaten',
+  'cardDuel.playCardAria': 'De kaart {value} spelen',
+  'cardDuel.queued': 'Wachten op een tegenstander...',
+  'cardDuel.round': 'Rondescore: {mine} - {theirs}',
+  'cardDuel.title': 'Kaartduel',
+  'cardDuel.unavailable': 'Kaartduel vereist een andere speler die online is.',
+  'cardDuel.vsOpponent': 'tegen {name}',
+  'cardDuel.waitingOnOpponent': 'Wachten op de kaart van je tegenstander...',
+  'cardDuel.yourTurn': 'Speel een kaart',
+  'entities.abilities.arcane_surge.description':
+    'Trekt een golf rauwe aether door de vijand voor {damage} schade. Elke worp laat een Arcanelading achter die de schade en werpsnelheid van je volgende Aether Surge vergroot (5% sneller per lading), maar de manakosten sterk verhoogt, tot maximaal 4 ladingen; Aetherpijlen verbruikt de ladingen. Elke worp kan ook Aetherhaast activeren, waardoor je volgende Aether Surge gratis is en twee keer zo snel te werpen.',
+  'entities.abilities.arcane_surge.name': 'Aether Surge',
+  'entities.abilities.blizzard.description':
+    'Roept een ijsstorm op over het doelgebied gedurende 6 sec, die {damage} Vorstschade per seconde toebrengt en vijanden met 40% vertraagt. Elk getroffen vijand haalt 0,5 sec af van Frozen Orb, tot 3 sec per worp. (Vorst)',
+  'entities.abilities.blizzard.name': 'Blizzard',
+  'entities.abilities.brain_freeze.description':
+    'Rijplans heeft 20% kans om je volgende Winterlash direct, 30% harder en vrij van zijn afkoeltijd te maken. (Vorst)',
+  'entities.abilities.brain_freeze.name': 'Brain Freeze',
+  'entities.abilities.dragons_breath.description':
+    'Houd ingedrukt om een brede vuurstroom op te laden en laat hem los in een kegel. Langere ladingen reiken verder en richten meer schade aan. Getroffen vijanden raken gedesoriënteerd en schade verbreekt het effect; maximale lading treft altijd kritiek en telt eenmaal mee voor Hete reeks. (Vuur)',
+  'entities.abilities.dragons_breath.name': "Dragon's Breath",
+  'entities.abilities.fingers_of_frost.description':
+    'Rijplans heeft 15% kans om Fingers of Frost te verlenen, tot 2 ladingen: je volgende Ice Lance behandelt het doelwit als bevroren. (Vorst)',
+  'entities.abilities.fingers_of_frost.name': 'Fingers of Frost',
+  'entities.abilities.fireball_form.description':
+    'Verander in een vlammende sintel, waardoor je bewegingssnelheid met {buff}% toeneemt. Je kunt niet aanvallen of spreuken uitspreken terwijl je getransformeerd bent. Heractiveer om terug te keren naar je normale gedaante.',
+  'entities.abilities.fireball_form.name': 'Ember Form',
+  'entities.abilities.flurry.description':
+    'Schiet drie ijsboutten af die elk {damage} Vorstschade toebrengen en Winterskil op het doelwit leggen: de volgende 2 binnenkomende compatibele spreuken behandelen het als bevroren. Brain Freeze maakt Winterlash direct, 30% harder, en slaat de afkoeltijd over. (Vorst)',
+  'entities.abilities.flurry.name': 'Winterlash',
+  'entities.abilities.frozen_orb.description':
+    'Laat een bol van wervelende vorst los die 8 sec naar voren drijft, per seconde {damage} Vorstschade toebrengt aan nabije vijanden en ze 30% vertraagt. Zijn treffers genereren Fingers of Frost. (Vorst)',
+  'entities.abilities.frozen_orb.name': 'Frozen Orb',
+  'entities.abilities.glacial_front.description':
+    'Houd ingedrukt om een brede vorstgolf op te laden en laat hem los in een kegel. Langere ladingen reiken verder en richten meer schade aan. Alle getroffen vijanden worden gedurende 4 sec met 50% vertraagd; maximale lading wortelt ze ook 1 sec vast. (Vorst)',
+  'entities.abilities.glacial_front.name': 'Glacial Front',
+  'entities.abilities.glacial_spike.description':
+    'Bezweer een massieve ijspiek die 5 IJsschilfers verbruikt om {damage} Vorstschade toe te brengen en het doelwit 4 sec op zijn plek te bevriezen. (Vorst)',
+  'entities.abilities.glacial_spike.name': 'Glacial Spike',
+  'entities.abilities.ice_lance.description':
+    'Slingert een ijsscherf die {damage} Vorstschade toebrengt, verdrievoudigd tegen een bevroren doelwit. Verbruikt Fingers of Frost of een lading Winterskil om het doelwit als bevroren te behandelen. (Vorst)',
+  'entities.abilities.ice_lance.name': 'Ice Lance',
+  'entities.abilities.perfect_moment.description':
+    'Grijp je perfecte moment: ontvang direct 4 Arcaneladingen, en gedurende 10 sec verbruikt Aetherpijlen ze niet. (Chronomantie)',
+  'entities.abilities.perfect_moment.name': 'Perfect Moment',
+  'entities.abilities.shatter.description':
+    'Je spreuken krijgen 50% kritieke trefkans tegen bevroren doelwitten, en die kritieke treffers brengen 20% meer schade toe. Fingers of Frost en Winterskil tellen als bevroren. (Vorst)',
+  'entities.abilities.shatter.name': 'Brittle Ruin',
+  'entities.abilities.temporal_acceleration.description':
+    'Versnelt de tijdstroom voor je groep of raid, waardoor aanvals-, bezwerings- en kanalisatiesnelheid gedurende 15 sec met 30% toeneemt. Bondgenoten die recentelijk door Temporal Acceleration of Oorlogstrommen zijn getroffen, zijn te uitgeput om ervan te profiteren. (Chronomantie)',
+  'entities.abilities.temporal_acceleration.name': 'Temporal Acceleration',
+  'entities.abilities.temporal_barrier.description':
+    'Verschuift het doelwit een hartslag buiten het heden: een tijdschild absorbeert {damage} schade gedurende 10 sec voordat de tijdlijn terugknalt.',
+  'entities.abilities.temporal_barrier.name': 'Temporal Barrier',
+  'entities.abilities.temporal_cascade.description':
+    'Stuurt een echo door je groep: het doelwit en tot vier van hun naaste bondgenoten worden tegelijk hersteld en elk gedurende {duration} sec gemarkeerd, waarbij een deel van de Arcaneschade die je aanricht terugstroomt door hun echo om hen te genezen. (Chronomantie)',
+  'entities.abilities.temporal_cascade.name': 'Temporal Cascade',
+  'entities.abilities.temporal_echo.description':
+    'Markeert een bondgenoot met de echo van een gezonder moment, en herstelt direct {damage} gezondheid. Gedurende {duration} sec stroomt een deel van de Arcaneschade die je aanricht terug door de echo om hen te genezen.',
+  'entities.abilities.temporal_echo.name': 'Temporal Echo',
+  'entities.abilities.temporal_hourglass.description':
+    'Plaatst een tijdzandloper op de geselecteerde locatie. Onder een vijand schorst het hen {hostilePveDuration} sec in PvE of {hostilePvpDuration} sec in PvP en verhindert alle acties; schade verbreekt het effect. Aan je voeten of onder een groepsbondgenoot verleent het {duration} sec stasis, verhindert schade en acties, herstelt {healing}% van maximale gezondheid, en laat afkoeltijden {selfCooldownRecovery}% sneller herstellen voor jezelf of {allyCooldownRecovery}% sneller voor een bondgenoot. Op leeg terrein wacht de zandloper {groundDuration} sec en treft de eerste geldige eenheid die erop stapt. De heilzame aura kan handmatig worden verwijderd.',
+  'entities.abilities.temporal_hourglass.name': 'Hourglass of Suspension',
+  'entities.abilities.temporal_mend.description':
+    'Trekt een bondgenoot een moment vooruit in de tijd, waarbij {damage} gezondheid wordt hersteld terwijl het lichaam zijn gezondere toekomstige zelf vindt. (Chronomantie-handtekening)',
+  'entities.abilities.temporal_mend.name': 'Temporal Mend',
+  'entities.abilities.temporal_reversal.description':
+    'Spoelt de tijdlijn van een gevallen bondgenoot terug en brengt hem bij zijn lichaam tot leven met een deel van zijn gezondheid en mana, zelfs middenin een gevecht. (Chronomantie)',
+  'entities.abilities.temporal_reversal.name': 'Temporal Reversal',
+  'entities.abilities.temporal_rewind.description':
+    'Stuurt een arcanegolf door je groep of raid en spoelt de tijd terug om 30% van de schade te herstellen die elke bondgenoot binnen 40 meter de afgelopen 5 seconden heeft opgelopen (tot 35% van hun maximale gezondheid). Kan geen kritiek effect zijn. (Chronomantie)',
+  'entities.abilities.temporal_rewind.name': 'Rewind',
+  'entities.npcs.card_master.greeting':
+    'Zin in een Kaartduel? Beste van drie, de winnaar pakt de praatrechten.',
+  'entities.npcs.card_master.name': 'Kaartmeester',
+  'entities.npcs.card_master.title': 'Verdeler van het Lot',
+  'entities.quests.q_archetype_acceptance.completion':
+    'De belofte staat. Deze twee ambachten zijn nu je hoofdambachten, en de kennis die er tegenover staat wordt je liefhebberij.',
+  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Ertsslagader geoogst',
+  'entities.quests.q_archetype_acceptance.text':
+    'Vaardigheid is kennis, {playerName}, maar afstemming is een belofte. Kies twee naburige ambachten waarvan je de methoden als je hoofdambachten zult dragen, en breng me dan erts dat je zelf met je eigen handen uit het Dal hebt gewonnen.',
+  'entities.quests.q_prof_hobby_switch.completion':
+    'Een lichtere keuze, maar een nuttige. Volg die nieuwsgierigheid zo ver als zeldzaam werk haar draagt.',
+  'entities.quests.q_prof_hobby_switch.objectives.0.label': 'Kruidenveld geoogst',
+  'entities.quests.q_prof_hobby_switch.text':
+    'Hoofdambachten vragen een gelofte. Een liefhebberij vraagt alleen waar je nieuwsgierigheid ronddwaalt, {playerName}. Pluk een paar kruiden en beslis welk ambacht tegenover je hoofdambachten je wilt beoefenen.',
+  'entities.quests.q_prof_hobby_switch.title': 'Een Andere Tijdverdrijf',
+  'entities.quests.q_prof_intro.completion':
+    'Zie je? Erts verzameld en eelt op je handen. Ga door met het mijnen, houtkappen en kruidenplukken terwijl je de wegen afloopt, en als je terug in de stad bent, let dan op het Stadsfocusbord bij de markt en de nabijgelegen knutselbank. Er zit een eerlijke handel in dit alles, als je dat wilt.',
+  'entities.quests.q_prof_intro.objectives.0.label': 'Ertsslagader geoogst',
+  'entities.quests.q_prof_intro.text':
+    'Elke ziel in Oostbeekdal beoefent een ambacht naast het zwaard, {playerName}. Er zijn ertsslagaders in de rotsen rond de Kopergat, ten zuidwesten van de stad. Ga zelf een houweel zwaaien en bewerk er 5; ik zie het verschil.',
+  'entities.quests.q_prof_make_amends.completion':
+    'Het oude ritme keert terug. Je vroegere ambachtspaar is opnieuw actief.',
+  'entities.quests.q_prof_make_amends.text':
+    'Je hebt dat paar eerder gedragen, {playerName}. Terugkeren is geen nieuwe gelofte. Help de Dalweg vrijhouden, en het werk zal je handen herinneren wat ze ooit kenden.',
+  'gpuNotice.bodyDesktop':
+    "Het spel draait zonder GPU-versnelling en zal traag zijn. Werk je grafische stuurprogramma's bij en herstart het spel. Stel op Windows ook het spel in op Hoge prestaties via Instellingen, Systeem, Beeldscherm, Afbeeldingen.",
+  'gpuNotice.bodyWeb':
+    "Het spel draait zonder GPU-versnelling en zal traag zijn. Schakel hardwareversnelling in je browserinstellingen in, werk je grafische stuurprogramma's bij en herstart je browser.",
+  'gpuNotice.dismiss': 'Sluiten',
+  'guide.abilityHook.blink':
+    'Teleporteert je een korte afstand vooruit en verbreekt onderweg wortels.',
+  'guide.abilityHook.blizzard':
+    'Bedekt een gebied met ijs om een heel roedel te slijten en te vertragen.',
+  'guide.abilityHook.brain_freeze':
+    'Je vorstboutten maken de volgende Winterlash soms direct en harder rakend.',
+  'guide.abilityHook.fingers_of_frost':
+    'Je vorstboutten geven een Ice Lance soms de kracht om te treffen alsof het doelwit bevroren is.',
+  'guide.abilityHook.fireball_form': 'Word een levende sintel om open terrein snel te doorkruisen.',
+  'guide.abilityHook.flurry':
+    'Drie snelle boutten die het doelwit koelen zodat je volgende vorsttreffers landen alsof het bevroren is.',
+  'guide.abilityHook.frozen_orb':
+    'Rolt een langzame bol door de troep die alles verkilt en je vorstprocs voedt.',
+  'guide.abilityHook.ice_lance':
+    'Een directe scherf om vorstprocs mee te verbruiken, raakt veel harder op een bevroren doelwit.',
+  'guide.abilityHook.shatter': 'Je spreuken criten veel vaker tegen bevroren doelwitten.',
+  'guide.deedsPage.renownBody':
+    'Roem is de score achter het Boek. Elke daad die je behaalt is een vast bedrag waard, en je totaal stijgt altijd, dus een rustige week kost je nooit terrein. Een handvol daden draait op geluk in plaats van vaardigheid, en Wapenfeiten zijn een eigen eer, dus beide leveren geen Roem op. Daden zonder Roem tellen nog steeds mee voor voltooiing in je Boek; ze scoren gewoonweg nooit.',
+  'guide.deedsPage.standingsNote':
+    'De rijken houden een doorlopende telling van Roem bij over elk account: het bord rangschikt hele accounts op levenslange Roem en telt elke daad eenmaal over al je personages, en het toont alleen Roem, dus daden die geen Roem dragen verplaatsen de stand nooit, ook al tellen ze in je Boek. Om te zien wie waar staat, open je het Klassement in het spel en ga je naar het tabblad Roem; de standen staan daar, niet op de wiki.',
+  'hudChrome.archetypePair.alchemy+cooking': 'Apotheker',
+  'hudChrome.archetypePair.armorcrafting+engineering': 'Radsmid',
+  'hudChrome.archetypePair.cooking+leatherworking': 'Jager',
+  'hudChrome.archetypePair.enchanting+jewelcrafting': 'Edelsteenbezweerder',
+  'hudChrome.archetypePair.engineering+alchemy': 'Bommenwerper',
+  'hudChrome.archetypePair.inscription+enchanting': 'Arcaneschrijver',
+  'hudChrome.archetypePair.jewelcrafting+weaponcrafting': 'Wapensmid',
+  'hudChrome.archetypePair.leatherworking+tailoring': 'Uitrusser',
+  'hudChrome.archetypePair.tailoring+inscription': 'Magiërswerker',
+  'hudChrome.archetypePair.weaponcrafting+armorcrafting': 'Smid',
+  'hudChrome.auraEffect.cheapCast': 'Je volgende spreuk kost {pct}% minder',
+  'hudChrome.auraEffect.combustionCrit': 'Je Vuurspreuken treffen altijd kritiek',
+  'hudChrome.auraEffect.dmgDone': 'Verhoogt aangerichte schade met {pct}%',
+  'hudChrome.auraEffect.dmgDoneReduce': 'Vermindert aangerichte schade met {pct}%',
+  'hudChrome.auraEffect.elementalConvergencePrimed':
+    'Je volgende spreuk van de andere elementaire school verleent Elementaire Convergentie',
+  'hudChrome.auraEffect.formFireball':
+    'Ember Form: bewegingssnelheid verhoogd met {pct}%; aanvallen en spreuken zijn uitgeschakeld',
+  'hudChrome.auraEffect.freeCast': 'Je volgende bezwering kost niets',
+  'hudChrome.auraEffect.heatingUp':
+    'Je volgende opeenvolgende kritieke treffer van een Vuur-opbouwer verleent Hete reeks; een niet-kritieke opbouwer verwijdert Opwarmen',
+  'hudChrome.auraEffect.iceFloesCasts':
+    'Je volgende {n} spreuken met een bezweringstijd kunnen worden uitgesproken terwijl je beweegt',
+  'hudChrome.auraEffect.increase.sp': 'Verhoogt spreukkracht met {value}',
+  'hudChrome.auraEffect.instantCast': 'Je volgende spreuk met een bezweringstijd is direct',
+  'hudChrome.auraEffect.overloadNext':
+    'Je volgende spreuk wordt met {pct}% versterkt maar kost 50% meer mana',
+  'hudChrome.auraEffect.powerEchoNext':
+    'Je volgende directe spreuk herhaalt zich op {pct}% kracht op hetzelfde doelwit',
+  'hudChrome.auraEffect.temporalHourglass':
+    'Immuun en niet in staat te handelen; herstelt gezondheid en versnelt afkoeltijdherstel. Klik met rechts om te annuleren.',
+  'hudChrome.craftName.alchemy': 'Alchemie',
+  'hudChrome.craftName.armorcrafting': 'Harnasmaken',
+  'hudChrome.craftName.cooking': 'Koken',
+  'hudChrome.craftName.enchanting': 'Betovering',
+  'hudChrome.craftName.engineering': 'Knutselwerk',
+  'hudChrome.craftName.inscription': 'Inscriptie',
+  'hudChrome.craftName.jewelcrafting': 'Juwelenmaken',
+  'hudChrome.craftName.leatherworking': 'Leerbewerken',
+  'hudChrome.craftName.tailoring': 'Kleermaken',
+  'hudChrome.craftName.weaponcrafting': 'Wapensmeden',
+  'hudChrome.crafting.attunementPreview':
+    'Resultaat: titel {title}; {majorA} en {majorB} worden ongelimiteerde hoofdambachten; {hobby} wordt de zeldzaam-begrensde liefhebberij; alle andere vakkennis wordt behouden maar begrensd op gewoon zolang het slapend is.',
+  'hudChrome.crafting.comboMet': 'Gereed.',
+  'hudChrome.crafting.comboNotAttuned': 'Kies eerst een archetype-paar.',
+  'hudChrome.crafting.comboRequires': 'Afstemming: {craftA} + {craftB}, rang {tier}.',
+  'hudChrome.crafting.comboSyncing': 'Rijksafstemming controleren.',
+  'hudChrome.crafting.comboTierUnmet': 'Breng beide hoofdambachten naar de vereiste rang.',
+  'hudChrome.crafting.comboWrongPair': 'Activeer precies dit paar om het te maken.',
+  'hudChrome.crafting.hobbyPreview':
+    'Resultaat: {hobby} wordt de zeldzaam-begrensde liefhebberij. Beide hoofdambachten en alle behouden vaardigheidswaarden blijven ongewijzigd.',
+  'hudChrome.crafting.identity.ceilingCommon': 'Gewone begrenzing',
+  'hudChrome.crafting.identity.ceilingRare': 'Zeldzame begrenzing',
+  'hudChrome.crafting.identity.ceilingUnlimited': 'Geen versterkingsbegrenzing',
+  'hudChrome.crafting.identity.colCap': 'Begrenzing',
+  'hudChrome.crafting.identity.colCraft': 'Ambacht',
+  'hudChrome.crafting.identity.colRole': 'Rol',
+  'hudChrome.crafting.identity.colSkill': 'Vaardigheid',
+  'hudChrome.crafting.identity.dormantKnowledge':
+    '{craft}-kennis wordt behouden maar is slapend tot zijn paar of liefhebberij actief is.',
+  'hudChrome.crafting.identity.history': '{pairs} paren ontdekt, {returns} terugkeren voltooid',
+  'hudChrome.crafting.identity.historyLabel': 'Geschiedenis',
+  'hudChrome.crafting.identity.hobbyLabel': 'Liefhebberij',
+  'hudChrome.crafting.identity.majorsLabel': 'Hoofdambachten',
+  'hudChrome.crafting.identity.nearTier':
+    '{craft} mist {points} vaardigheid voor zijn volgende rang.',
+  'hudChrome.crafting.identity.roleDormant': 'Slapende kennis',
+  'hudChrome.crafting.identity.roleHobby': 'Liefhebberij',
+  'hudChrome.crafting.identity.roleMajor': 'Hoofdambacht',
+  'hudChrome.crafting.identity.roleUnattuned': 'Niet afgestemd',
+  'hudChrome.crafting.identity.skillAria':
+    '{craft}, vaardigheid {skill}, rang {tier}, {role}, {ceiling}',
+  'hudChrome.crafting.identity.syncing': 'Wachten op je ambachtsidentiteit van het rijk.',
+  'hudChrome.crafting.identity.title': 'Ambachtsidentiteit',
+  'hudChrome.crafting.identity.titleLabel': 'Titel',
+  'hudChrome.crafting.identity.tutorial':
+    'Eerste rang: bereik vaardigheid {skill} in een ambacht. Geslaagde recepten verhogen dat ambacht zonder kennis elders te wissen.',
+  'hudChrome.crafting.identity.unattuned':
+    'Er is geen archetype-paar actief. Je kennis wordt behouden, maar combinatierecepten vereisen een afgestemd paar.',
+  'hudChrome.crafting.noProfessionChoice': 'Er is momenteel geen geldige beroepskeuze beschikbaar.',
+  'hudChrome.crafting.pairOptionLabel': '{pair} ({craftA} + {craftB})',
+  'hudChrome.crafting.professionChoice': 'Beroepskeuze',
+  'hudChrome.deeds.lbScopeNote':
+    'Accounts gerangschikt op levenslange Roem. Elke daad telt eenmaal over alle personages op een account.',
+  'hudChrome.deeds.lbSelfAccount':
+    'Jouw account: rang {rank}, top {percent} procent, {renown} Roem',
+  'hudChrome.deeds.lbSelfRank': 'Jouw account: rang {rank}, top {percent} procent',
+  'hudChrome.nameplate.mobEliteLevel': '{level}+',
+  'hudChrome.nameplate.mobLevel': '{level}',
+  'hudChrome.specPanel.specUnlockBanner': 'Specialisatie Ontgrendeld!',
+  'hudChrome.specPanel.specUnlockHint': 'Druk op N om je specialisatie te kiezen.',
+  'hudChrome.wocStore.wallet.connect': 'Portemonnee koppelen',
+  'hudChrome.wocStore.wallet.connectedUnlinked':
+    'De portemonnee-app is verbonden met deze browser, maar het openbare adres is nog niet gekoppeld aan je WoC-account.',
+  'hudChrome.wocStore.wallet.linkedConnected':
+    'Je gekoppelde portemonnee-app is verbonden en klaar voor SOL- of WOC-aankopen.',
+  'hudChrome.wocStore.wallet.linkedDisconnected':
+    'Je openbare adres is gekoppeld. Verbind die portemonnee-app opnieuw wanneer je met SOL of WOC wilt betalen.',
+  'hudChrome.wocStore.wallet.manage': 'Portemonnee beheren',
+  'hudChrome.wocStore.wallet.mismatched':
+    'Er is een andere portemonnee verbonden. Verifieer hem om het gekoppelde adres te vervangen, of verbind de gekoppelde portemonnee opnieuw.',
+  'hudChrome.wocStore.wallet.reconnect': 'Portemonnee opnieuw verbinden',
+  'hudChrome.wocStore.wallet.title': 'Solana-portemonnee',
+  'hudChrome.wocStore.wallet.unlinked':
+    'Verbind een portemonnee-app en teken eenmaal om het openbare adres aan je WoC-account te koppelen. We ontvangen nooit je herstelzin of privésleutel.',
+  'hudChrome.wocStore.wallet.verify': 'Verifiëren en koppelen',
+  'wallet.bagConnect': 'Portemonnee koppelen',
+  'wallet.bagLink': 'Portemonnee verifiëren',
+  'wallet.bagReconnect': 'Portemonnee opnieuw verbinden',
+  'wallet.browser.completeBody': 'Je kunt terugkeren naar de World of ClaudeCraft desktop-app.',
+  'wallet.browser.completeTitle': 'Portemonnee-autorisatie voltooid',
+  'wallet.browser.continueWith': 'Doorgaan met {wallet}',
+  'wallet.browser.extensionHelp':
+    'Geen compatibele portemonnee-extensie gevonden. Installeer of ontgrendel Phantom, Solflare of een andere Solana-browserportemonnee en probeer het opnieuw.',
+  'wallet.browser.eyebrow': 'Desktop-portemonnee-autorisatie',
+  'wallet.browser.failed':
+    'Portemonnee-autorisatie mislukt of verlopen. Keer terug naar de desktop-app en probeer het opnieuw.',
+  'wallet.browser.linkBody':
+    'Kies een portemonnee-extensie in deze browser. Je tekent een verificatiebericht en keert dan terug naar de desktop-app.',
+  'wallet.browser.paymentBody':
+    'Kies de aan je account gekoppelde portemonnee en keur de transactie goed in deze browser.',
+  'wallet.browser.retry': 'Opnieuw proberen',
+  'wallet.browser.returnButton': 'Terug naar desktop-app',
+  'wallet.browser.reviewBody': 'Volg de aanwijzing van {wallet}. Houd deze browserpagina open.',
+  'wallet.browser.reviewTitle': 'Bekijken in je portemonnee',
+  'wallet.browser.safety': 'World of ClaudeCraft vraagt nooit naar je herstelzin of privésleutel.',
+  'wallet.browser.title': 'Een Solana-portemonnee verbinden',
+  'wallet.manualReturnBrowserHelp':
+    'Keer na goedkeuring terug naar dit speltabblad. Als iOS een andere browser opent, sluit die dan en keer handmatig terug naar de oorspronkelijke browser.',
+  'wallet.manualReturnStandaloneHelp':
+    'Keer na goedkeuring terug naar World of ClaudeCraft via je beginscherm. Als iOS een browser opent, sluit die dan en open de beginscherm-app handmatig opnieuw.',
+  'wallet.mobileAppHelp':
+    'Kies Phantom of Solflare. Je portemonnee-app vraagt om goedkeuring. Houd dit spel open en keer ernaar terug wanneer je klaar bent.',
+  'wallet.openAppButton': 'Open {wallet}',
+  'wallet.openAppHelp':
+    'Open {wallet} om dit verzoek te bekijken. Houd dit speltabblad open terwijl de portemonnee-app actief is.',
+  'wallet.openAppTitle': 'Doorgaan in {wallet}',
+  'wallet.preparingAppButton': '{wallet} voorbereiden...',
+  'wallet.standaloneAppHelp':
+    'Portemonneeverbindingen zijn nog niet beschikbaar in de beginscherm-app. Open World of ClaudeCraft in Safari of Chrome om Phantom of Solflare te gebruiken.',
+  'wallet.walletAppUnavailable':
+    '{wallet} kon niet worden voorbereid. Sluit dit venster en probeer het opnieuw.',
   'entities.abilities.primal_reflexes.description':
     'Je instincten verscherpen, waardoor je kans om aan te wijken met 50% stijgt gedurende 6 sec.',
   'entities.abilities.primal_reflexes.name': 'Oerreflexen',

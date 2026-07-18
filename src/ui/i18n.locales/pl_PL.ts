@@ -2,6 +2,287 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const pl_PL: Partial<Record<TranslationKey, string>> = {
+  'hud.pet.waterJet': 'Strumień wody',
+  'hud.pet.waterJetDesc':
+    'Rozkazuje Żywiołakowi Wody kanalizowanie spowalniającego strumienia przez 3 sekundy. Czas odnowienia: 8 sekund. Kliknij prawym przyciskiem myszy, aby włączyć automatyczne rzucanie czaru po zakończeniu czasu odnowienia.',
+  'hud.pet.waterJetTitle': 'Strumień wody',
+  'hud.prompts.acceptResurrection': 'Przyjmij wskrzeszenie',
+  'hud.prompts.resurrectionOffer': '{name} chce przywrócić cię do życia. Czy akceptujesz?',
+  'itemUi.stats.parry': 'Parowanie',
+  'apiError.wallet.handoff_invalid':
+    'Autoryzacja portfela wygasła lub nie mogła zostać zweryfikowana. Spróbuj ponownie.',
+  'cardDuel.close': 'Zamknij',
+  'cardDuel.counts': 'Talia: {deck} · Odrzucone: {discard}',
+  'cardDuel.forfeit': 'Poddaj się',
+  'cardDuel.forfeitAria': 'Poddaj się w Pojedynku Karcianym',
+  'cardDuel.join': 'Dołącz do kolejki',
+  'cardDuel.joinAria': 'Dołącz do kolejki Pojedynku Karcianego',
+  'cardDuel.leave': 'Opuść kolejkę',
+  'cardDuel.leaveAria': 'Opuść kolejkę Pojedynku Karcianego',
+  'cardDuel.playCardAria': 'Zagraj kartę o wartości {value}',
+  'cardDuel.queued': 'Oczekiwanie na przeciwnika...',
+  'cardDuel.round': 'Wynik rundy: {mine} - {theirs}',
+  'cardDuel.title': 'Pojedynek Karciany',
+  'cardDuel.unavailable': 'Pojedynek Karciany wymaga obecności innego gracza.',
+  'cardDuel.vsOpponent': 'kontra {name}',
+  'cardDuel.waitingOnOpponent': 'Oczekiwanie na kartę przeciwnika...',
+  'cardDuel.yourTurn': 'Zagraj kartę',
+  'entities.abilities.arcane_surge.description':
+    'Przepuszcza przez wroga falę surowego eteru, zadając {damage} obrażeń. Każde rzucenie czaru pozostawia Eteryczny Ładunek zwiększający obrażenia i prędkość rzucania kolejnego Aether Surge (o 5% szybciej za każdy), lecz znacznie podnoszący koszt many, maksymalnie do 4; Eteryczne strzały wydają te ładunki. Każde rzucenie może również naładować Eteryczny Pęd, czyniąc następny Aether Surge darmowym i dwukrotnie szybszym w rzucaniu.',
+  'entities.abilities.arcane_surge.name': 'Aether Surge',
+  'entities.abilities.blizzard.description':
+    'Przywołuje burzę lodową nad wybranym obszarem na 6 sek., zadając {damage} obrażeń od Mrozu co sekundę i spowalniając wrogów o 40%. Każdy trafiony wróg skraca odnowienie Frozen Orb o 0,5 sek., maksymalnie 3 sek. na rzucenie. (Mróz)',
+  'entities.abilities.blizzard.name': 'Blizzard',
+  'entities.abilities.brain_freeze.description':
+    'Szronowa lanca ma 20% szansy, aby następny Winterlash był natychmiastowy, 30% silniejszy i bez czasu odnowienia. (Mróz)',
+  'entities.abilities.brain_freeze.name': 'Brain Freeze',
+  'entities.abilities.dragons_breath.description':
+    'Przytrzymaj, aby zebrać rosnący stożek płomieni, a następnie go wypuść. Dłuższe ładowanie sięga dalej i zadaje więcej obrażeń. Trafieni wrogowie zostają zdezorientowani, a obrażenia zrywają efekt; maksymalny ładunek zawsze trafia krytycznie i wlicza się raz do Gorącej Serii. (Ogień)',
+  'entities.abilities.dragons_breath.name': "Dragon's Breath",
+  'entities.abilities.fingers_of_frost.description':
+    'Szronowa lanca ma 15% szansy na przyznanie Palców Mrozu, do 2 ładunków: następna Ice Lance traktuje cel jako zamrożony. (Mróz)',
+  'entities.abilities.fingers_of_frost.name': 'Fingers of Frost',
+  'entities.abilities.fireball_form.description':
+    'Przemienia się w płonący żar, zwiększając prędkość ruchu o {buff}%. W tej postaci nie możesz atakować ani rzucać czarów. Ponownie rzuć, aby powrócić do normalnej formy.',
+  'entities.abilities.fireball_form.name': 'Ember Form',
+  'entities.abilities.flurry.description':
+    'Wypuszcza trzy lodowe pociski zadające po {damage} obrażeń od Mrozu i nakłada Winterowy Chłód na cel: dwa kolejne trafienia odpowiednimi czarami traktują cel jako zamrożony. Brain Freeze czyni Winterlash natychmiastowym, 30% silniejszym i usuwa jego czas odnowienia. (Mróz)',
+  'entities.abilities.flurry.name': 'Winterlash',
+  'entities.abilities.frozen_orb.description':
+    'Wypuszcza orb wirującego mrozu, który unosi się naprzód przez 8 sek., zadając {damage} obrażeń od Mrozu co sekundę pobliskim wrogom i spowalniając ich o 30%. Jego trafienia generują Palce Mrozu. (Mróz)',
+  'entities.abilities.frozen_orb.name': 'Frozen Orb',
+  'entities.abilities.glacial_front.description':
+    'Przytrzymaj, aby zebrać rosnący front lodowy, a następnie go wypuść w stożku. Dłuższe ładowanie sięga dalej i zadaje więcej obrażeń. Wszyscy trafieni wrogowie zostają spowolnieni o 50% na 4 sek.; maksymalny ładunek dodatkowo unieruchamia ich na 1 sek. (Mróz)',
+  'entities.abilities.glacial_front.name': 'Glacial Front',
+  'entities.abilities.glacial_spike.description':
+    'Przywołuje masywny sopel lodu, pochłaniając 5 Soplii, aby zadać {damage} obrażeń od Mrozu i zamrozić cel w miejscu na 4 sek. (Mróz)',
+  'entities.abilities.glacial_spike.name': 'Glacial Spike',
+  'entities.abilities.ice_lance.description':
+    'Ciska odłamkiem lodu, zadając {damage} obrażeń od Mrozu, potrojonych przeciwko zamrożonemu celowi. Wydaje Palce Mrozu lub ładunek Winterowego Chłodu, traktując cel jako zamrożony. (Mróz)',
+  'entities.abilities.ice_lance.name': 'Ice Lance',
+  'entities.abilities.perfect_moment.description':
+    'Uchwyć swój doskonały moment: natychmiast zyskujesz 4 Eteryczne Ładunki i przez 10 sek. Eteryczne strzały ich nie wydają. (Chronomancja)',
+  'entities.abilities.perfect_moment.name': 'Perfect Moment',
+  'entities.abilities.shatter.description':
+    'Twoje czary zyskują 50% szansy na trafienie krytyczne przeciwko zamrożonym celom, a te trafienia krytyczne zadają o 20% więcej obrażeń. Palce Mrozu i Winterowy Chłód liczą się jako zamrożenie. (Mróz)',
+  'entities.abilities.shatter.name': 'Brittle Ruin',
+  'entities.abilities.temporal_acceleration.description':
+    'Przyspiesza bieg czasu dla twojej grupy lub rajdu, zwiększając prędkość ataku, rzucania czarów i kanalizowania o 30% przez 15 sek. Sojusznicy, na których niedawno działała Temporal Acceleration lub Bębny Wojny, są zbyt wyczerpani, aby skorzystać z efektu. (Chronomancja)',
+  'entities.abilities.temporal_acceleration.name': 'Temporal Acceleration',
+  'entities.abilities.temporal_barrier.description':
+    'Przesuwa cel o chwilę poza teraźniejszość, tworząc temporalną powłokę pochłaniającą {damage} obrażeń przez 10 sek., po czym oś czasu powraca do normy.',
+  'entities.abilities.temporal_barrier.name': 'Temporal Barrier',
+  'entities.abilities.temporal_cascade.description':
+    'Wysyła echo kaskadą przez twoją grupę: cel i do czterech najbliższych sojuszników zostają natychmiast uleczeni i naznaczeni przez {duration} sek., przekierowując część zadawanych przez ciebie obrażeń Arkanów z powrotem przez ich echa, aby ich leczyć. (Chronomancja)',
+  'entities.abilities.temporal_cascade.name': 'Temporal Cascade',
+  'entities.abilities.temporal_echo.description':
+    'Naznacza sojusznika echem zdrowszej chwili, natychmiast lecząc {damage} punktów zdrowia. Przez {duration} sek. część zadawanych przez ciebie obrażeń Arkanów jest przekierowywana przez echo, aby go leczyć.',
+  'entities.abilities.temporal_echo.name': 'Temporal Echo',
+  'entities.abilities.temporal_hourglass.description':
+    'Umieszcza temporalną klepsydrę w wybranym miejscu. Pod wrogiem zawiesza go na {hostilePveDuration} sek. w PvE lub {hostilePvpDuration} sek. w PvP, uniemożliwiając wszelkie działania; obrażenia przerywają efekt. U twoich stóp lub pod sojusznikiem z grupy nadaje stazę na {duration} sek., zapobiega obrażeniom i działaniom, przywraca {healing}% maksymalnego zdrowia i przyspiesza regenerację czasu odnowienia o {selfCooldownRecovery}% dla ciebie lub {allyCooldownRecovery}% dla sojusznika. Na pustej ziemi klepsydra czeka {groundDuration} sek. i działa na pierwszą prawidłową postać, która na nią wejdzie. Korzystną aurę można zdjąć ręcznie.',
+  'entities.abilities.temporal_hourglass.name': 'Hourglass of Suspension',
+  'entities.abilities.temporal_mend.description':
+    'Przyciąga sojusznika chwilę naprzód w czasie, lecząc {damage} punktów zdrowia, gdy ciało osiada w swym zdrowszym, przyszłym wcieleniu. (Sygnatura Chronomancji)',
+  'entities.abilities.temporal_mend.name': 'Temporal Mend',
+  'entities.abilities.temporal_reversal.description':
+    'Przewija oś czasu poległego sojusznika, przywracając go do życia przy jego ciele z częścią zdrowia i many, nawet w środku walki. (Chronomancja)',
+  'entities.abilities.temporal_reversal.name': 'Temporal Reversal',
+  'entities.abilities.temporal_rewind.description':
+    'Wysyła arkaniczną falę przez twoją grupę lub rajd, cofając czas, aby przywrócić 30% obrażeń zadanych każdemu sojusznikowi w zasięgu 40 jardów w ciągu ostatnich 5 sekund (maksymalnie 35% ich maksymalnego zdrowia). Nie może być trafieniem krytycznym. (Chronomancja)',
+  'entities.abilities.temporal_rewind.name': 'Rewind',
+  'entities.npcs.card_master.greeting':
+    'Masz ochotę na Pojedynek Karciany? Do trzech razy sztuka, zwycięzca bierze chwałę.',
+  'entities.npcs.card_master.name': 'Mistrz Kart',
+  'entities.npcs.card_master.title': 'Rozdający Los',
+  'entities.quests.q_archetype_acceptance.completion':
+    'Obietnica zostaje dotrzymana. Te dwa rzemiosła stają się teraz twoimi specjalizacjami, a wiedza po przeciwnej stronie kręgu staje się twoim hobby.',
+  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Żyła rudy wydobyta',
+  'entities.quests.q_archetype_acceptance.text':
+    'Umiejętność to wiedza, {playerName}, lecz dostrojenie to obietnica. Wybierz dwa sąsiadujące rzemiosła, których metody będziesz nosić jako swoje specjalizacje, a potem przynieś mi rudę wydobytą w Dolinie własnymi rękami.',
+  'entities.quests.q_prof_hobby_switch.completion':
+    'Lżejszy wybór, ale przydatny. Podążaj za tą ciekawością, tak daleko jak rzadka praca może ją zaprowadzić.',
+  'entities.quests.q_prof_hobby_switch.objectives.0.label': 'Łan ziół zebrany',
+  'entities.quests.q_prof_hobby_switch.text':
+    'Specjalizacje wymagają przysięgi. Hobby pyta jedynie, dokąd wędruje twoja ciekawość, {playerName}. Zbierz kilka ziół i zdecyduj, które rzemiosło po przeciwnej stronie twoich specjalizacji chcesz rozwijać.',
+  'entities.quests.q_prof_hobby_switch.title': 'Inne zajęcie',
+  'entities.quests.q_prof_intro.completion':
+    'Widzisz? Ruda zebrana i odciski na rękach. Nie przerywaj wydobycia, ścinki drzew i zbierania ziół w trakcie podróży po drogach, a gdy wrócisz do miasta, zerknij na Tablicę Skupienia przy rynku i pobliskie stoisko rzemieślnicze. Jest w tym uczciwy zarobek, jeśli go zechcesz.',
+  'entities.quests.q_prof_intro.objectives.0.label': 'Żyła rudy wydobyta',
+  'entities.quests.q_prof_intro.text':
+    'Każda dusza w Eastbrook uprawia jakiś fach oprócz miecza, {playerName}. W skałach wokół Miedzianego Wykopu, na południowym zachodzie od miasta, są żyły rudy. Idź i wydobądź własnoręcznie 5 z nich; poznam różnicę.',
+  'entities.quests.q_prof_make_amends.completion':
+    'Dawny rytm powraca. Twoja poprzednia para rzemiosł jest znów aktywna.',
+  'entities.quests.q_prof_make_amends.text':
+    'Nosiłeś już tę parę, {playerName}. Powrót nie jest nową przysięgą. Pomóż utrzymać drogę w Dolinie w czystości, a praca przypomni twoim rękom, co kiedyś umiały.',
+  'gpuNotice.bodyDesktop':
+    'Gra działa bez akceleracji GPU i będzie wolna. Zaktualizuj sterowniki karty graficznej, a następnie zrestartuj grę. W systemie Windows ustaw grę na Wysoką wydajność w Ustawienia > System > Ekran > Grafika.',
+  'gpuNotice.bodyWeb':
+    'Gra działa bez akceleracji GPU i będzie wolna. Włącz akcelerację sprzętową w ustawieniach przeglądarki, zaktualizuj sterowniki karty graficznej, a następnie zrestartuj przeglądarkę.',
+  'gpuNotice.dismiss': 'Odrzuć',
+  'guide.abilityHook.blink':
+    'Teleportuje cię o krótki dystans do przodu, zrywając unieruchomienia.',
+  'guide.abilityHook.blizzard': 'Pokrywa obszar lodem, by niszczyć i spowalniać całe grupy wrogów.',
+  'guide.abilityHook.brain_freeze':
+    'Twoje lodowe pociski czasem czynią następny Winterlash natychmiastowym i silniejszym.',
+  'guide.abilityHook.fingers_of_frost':
+    'Twoje lodowe pociski czasem wzmacniają Ice Lance, by trafiała cel jak zamrożony.',
+  'guide.abilityHook.fireball_form':
+    'Stań się żywym żarem, by przemierzać otwarte tereny z dużą prędkością.',
+  'guide.abilityHook.flurry':
+    'Trzy szybkie pociski, które mrożą cel, czyniąc kolejne lodowe trafienia jakby był zamrożony.',
+  'guide.abilityHook.frozen_orb':
+    'Toczy powolny orb przez grupę wrogów, mroząc wszystko i zasilając twoje efekty mrozu.',
+  'guide.abilityHook.ice_lance':
+    'Natychmiastowy odłamek do wydawania efektów mrozu, trafia znacznie silniej w zamrożony cel.',
+  'guide.abilityHook.shatter':
+    'Twoje czary trafiają krytycznie znacznie częściej w zamrożone cele.',
+  'guide.deedsPage.renownBody':
+    'Renoma to wynik stojący za Księgą. Każdy zdobyty czyn ma ustaloną wartość, a twój łączny wynik jedynie rośnie, więc spokojny tydzień nigdy cię nie cofa. Garść czynów zależy od szczęścia, nie umiejętności, a Wyczyny to osobna nagroda, więc ani jedne, ani drugie nie przynoszą Renomy. Czyny bez Renomy nadal wliczają się do ukończenia w twojej Księdze; po prostu nigdy nie punktują.',
+  'guide.deedsPage.standingsNote':
+    'Sfery prowadzą bieżące zestawienie Renomy na każdym koncie: tablica rankinguje całe konta według łącznej Renomy zdobytej przez całe życie, licząc każdy czyn raz dla wszystkich postaci na koncie i pokazując wyłącznie Renomę, więc czyny bez niej nigdy nie ruszają tabeli, choć wliczają się do twojej Księgi. Aby zobaczyć, kto i gdzie stoi, otwórz Tablicę Wyników w grze i przejdź do zakładki Renomy; zestawienie jest tam, nie na wiki.',
+  'hudChrome.archetypePair.alchemy+cooking': 'Aptekarz',
+  'hudChrome.archetypePair.armorcrafting+engineering': 'Mechanik',
+  'hudChrome.archetypePair.cooking+leatherworking': 'Traper',
+  'hudChrome.archetypePair.enchanting+jewelcrafting': 'Jubiler',
+  'hudChrome.archetypePair.engineering+alchemy': 'Bombardier',
+  'hudChrome.archetypePair.inscription+enchanting': 'Arkanista',
+  'hudChrome.archetypePair.jewelcrafting+weaponcrafting': 'Miecznik',
+  'hudChrome.archetypePair.leatherworking+tailoring': 'Krawiec-Wytwórca',
+  'hudChrome.archetypePair.tailoring+inscription': 'Tkacz Many',
+  'hudChrome.archetypePair.weaponcrafting+armorcrafting': 'Kowal',
+  'hudChrome.auraEffect.cheapCast': 'Twój następny czar kosztuje {pct}% many mniej',
+  'hudChrome.auraEffect.combustionCrit': 'Twoje czary Ognia zawsze trafiają krytycznie',
+  'hudChrome.auraEffect.dmgDone': 'Zwiększa zadawane obrażenia o {pct}%',
+  'hudChrome.auraEffect.dmgDoneReduce': 'Zmniejsza zadawane obrażenia o {pct}%',
+  'hudChrome.auraEffect.elementalConvergencePrimed':
+    'Twój następny czar z innej szkoły żywiołu nadaje Konwergencję Żywiołów',
+  'hudChrome.auraEffect.formFireball':
+    'Postać Żaru: prędkość ruchu zwiększona o {pct}%; ataki i czary są wyłączone',
+  'hudChrome.auraEffect.freeCast': 'Twoje następne rzucenie czaru nic nie kosztuje',
+  'hudChrome.auraEffect.heatingUp':
+    'Twoje następne krytyczne trafienie budującym czarem Ognia z rzędu nadaje Gorącą Serię; trafienie niekrytyczne usuwa Rozgrzewanie',
+  'hudChrome.auraEffect.iceFloesCasts':
+    'Twoje następne {n} czarów z czasem rzucania można rzucać podczas ruchu',
+  'hudChrome.auraEffect.increase.sp': 'Zwiększa moc zaklęć o {value}',
+  'hudChrome.auraEffect.instantCast': 'Twój następny czar z czasem rzucania jest natychmiastowy',
+  'hudChrome.auraEffect.overloadNext':
+    'Twój następny czar jest wzmocniony o {pct}%, ale kosztuje 50% many więcej',
+  'hudChrome.auraEffect.powerEchoNext':
+    'Twój następny bezpośredni czar powtarza się z {pct}% mocy na tym samym celu',
+  'hudChrome.auraEffect.temporalHourglass':
+    'Odporny i niezdolny do działania; przywraca zdrowie i przyspiesza regenerację czasu odnowienia. Kliknij prawym przyciskiem myszy, aby anulować.',
+  'hudChrome.craftName.alchemy': 'Alchemia',
+  'hudChrome.craftName.armorcrafting': 'Wytwarzanie Pancerzy',
+  'hudChrome.craftName.cooking': 'Gotowanie',
+  'hudChrome.craftName.enchanting': 'Czarodziejstwo',
+  'hudChrome.craftName.engineering': 'Inżynieria',
+  'hudChrome.craftName.inscription': 'Kaligrafia',
+  'hudChrome.craftName.jewelcrafting': 'Jubilerstwo',
+  'hudChrome.craftName.leatherworking': 'Garbarstwo',
+  'hudChrome.craftName.tailoring': 'Krawiectwo',
+  'hudChrome.craftName.weaponcrafting': 'Wytwarzanie Broni',
+  'hudChrome.crafting.attunementPreview':
+    'Wynik: tytuł {title}; {majorA} i {majorB} stają się nieograniczonymi specjalizacjami; {hobby} staje się hobby z pułapem rzadkości; cała pozostała wiedza zostaje zachowana, lecz jest ograniczona do poziomu pospolitego podczas uśpienia.',
+  'hudChrome.crafting.comboMet': 'Gotowe.',
+  'hudChrome.crafting.comboNotAttuned': 'Najpierw wybierz parę archetypów.',
+  'hudChrome.crafting.comboRequires': 'Dostrojenie: {craftA} + {craftB}, poziom {tier}.',
+  'hudChrome.crafting.comboSyncing': 'Sprawdzanie dostrojenia sfery.',
+  'hudChrome.crafting.comboTierUnmet': 'Podnieś obie główne specjalizacje do wymaganego poziomu.',
+  'hudChrome.crafting.comboWrongPair': 'Aktywuj dokładnie tę parę, aby to wykonać.',
+  'hudChrome.crafting.hobbyPreview':
+    'Wynik: {hobby} staje się hobby z pułapem rzadkości. Obie specjalizacje i wszystkie zachowane wartości umiejętności pozostają niezmienione.',
+  'hudChrome.crafting.identity.ceilingCommon': 'Pułap pospolity',
+  'hudChrome.crafting.identity.ceilingRare': 'Pułap rzadki',
+  'hudChrome.crafting.identity.ceilingUnlimited': 'Brak pułapu wzmocnienia',
+  'hudChrome.crafting.identity.colCap': 'Pułap',
+  'hudChrome.crafting.identity.colCraft': 'Rzemiosło',
+  'hudChrome.crafting.identity.colRole': 'Rola',
+  'hudChrome.crafting.identity.colSkill': 'Umiejętność',
+  'hudChrome.crafting.identity.dormantKnowledge':
+    'Wiedza rzemiosła {craft} jest zachowana, lecz uśpiona, dopóki jego para lub hobby nie będzie aktywne.',
+  'hudChrome.crafting.identity.history': 'Odkryto {pairs} par, ukończono {returns} powrotów',
+  'hudChrome.crafting.identity.historyLabel': 'Historia',
+  'hudChrome.crafting.identity.hobbyLabel': 'Hobby',
+  'hudChrome.crafting.identity.majorsLabel': 'Specjalizacje',
+  'hudChrome.crafting.identity.nearTier':
+    'Do następnego poziomu rzemiosła {craft} brakuje {points} umiejętności.',
+  'hudChrome.crafting.identity.roleDormant': 'Wiedza uśpiona',
+  'hudChrome.crafting.identity.roleHobby': 'Hobby',
+  'hudChrome.crafting.identity.roleMajor': 'Specjalizacja',
+  'hudChrome.crafting.identity.roleUnattuned': 'Niedostrojone',
+  'hudChrome.crafting.identity.skillAria':
+    '{craft}, umiejętność {skill}, poziom {tier}, {role}, {ceiling}',
+  'hudChrome.crafting.identity.syncing': 'Oczekiwanie na tożsamość rzemieślniczą ze sfery.',
+  'hudChrome.crafting.identity.title': 'Tożsamość Rzemieślnicza',
+  'hudChrome.crafting.identity.titleLabel': 'Tytuł',
+  'hudChrome.crafting.identity.tutorial':
+    'Pierwszy poziom: osiągnij umiejętność {skill} w danym rzemiośle. Udane przepisy zwiększają to rzemiosło, nie wymazując wiedzy z innych.',
+  'hudChrome.crafting.identity.unattuned':
+    'Brak aktywnej pary archetypów. Twoja wiedza jest zachowana, lecz kombinowane przepisy wymagają dostrojonej pary.',
+  'hudChrome.crafting.noProfessionChoice': 'Aktualnie nie ma dostępnego wyboru profesji.',
+  'hudChrome.crafting.pairOptionLabel': '{pair} ({craftA} + {craftB})',
+  'hudChrome.crafting.professionChoice': 'Wybór profesji',
+  'hudChrome.deeds.lbScopeNote':
+    'Konta sklasyfikowane według łącznej Renomy. Każdy czyn liczy się raz dla wszystkich postaci na koncie.',
+  'hudChrome.deeds.lbSelfAccount': 'Twoje konto: miejsce {rank}, top {percent}%, {renown} Renomy',
+  'hudChrome.deeds.lbSelfRank': 'Twoje konto: miejsce {rank}, top {percent}%',
+  'hudChrome.nameplate.mobEliteLevel': '{level}+',
+  'hudChrome.nameplate.mobLevel': '{level}',
+  'hudChrome.specPanel.specUnlockBanner': 'Odblokowano specjalizację!',
+  'hudChrome.specPanel.specUnlockHint': 'Naciśnij N, aby wybrać swoją specjalizację.',
+  'hudChrome.wocStore.wallet.connect': 'Podłącz portfel',
+  'hudChrome.wocStore.wallet.connectedUnlinked':
+    'Aplikacja portfela jest podłączona do tej przeglądarki, lecz jej publiczny adres nie jest jeszcze powiązany z twoim kontem WoC.',
+  'hudChrome.wocStore.wallet.linkedConnected':
+    'Twój powiązany portfel jest podłączony i gotowy do zakupów za SOL lub WOC.',
+  'hudChrome.wocStore.wallet.linkedDisconnected':
+    'Twój publiczny adres jest powiązany. Podłącz ponownie tę aplikację portfela, gdy chcesz płacić za pomocą SOL lub WOC.',
+  'hudChrome.wocStore.wallet.manage': 'Zarządzaj portfelem',
+  'hudChrome.wocStore.wallet.mismatched':
+    'Podłączony jest inny portfel. Zweryfikuj go, aby zastąpić powiązany adres, lub podłącz ponownie powiązany portfel.',
+  'hudChrome.wocStore.wallet.reconnect': 'Podłącz ponownie portfel',
+  'hudChrome.wocStore.wallet.title': 'Portfel Solana',
+  'hudChrome.wocStore.wallet.unlinked':
+    'Podłącz aplikację portfela, a następnie podpisz raz, aby powiązać jej publiczny adres z twoim kontem WoC. Nigdy nie otrzymujemy twojej frazy odzyskiwania ani klucza prywatnego.',
+  'hudChrome.wocStore.wallet.verify': 'Zweryfikuj i powiąż',
+  'wallet.bagConnect': 'Powiąż portfel',
+  'wallet.bagLink': 'Zweryfikuj portfel',
+  'wallet.bagReconnect': 'Podłącz ponownie portfel',
+  'wallet.browser.completeBody': 'Możesz wrócić do aplikacji desktopowej World of ClaudeCraft.',
+  'wallet.browser.completeTitle': 'Autoryzacja portfela zakończona',
+  'wallet.browser.continueWith': 'Kontynuuj z {wallet}',
+  'wallet.browser.extensionHelp':
+    'Nie znaleziono zgodnego rozszerzenia portfela. Zainstaluj lub odblokuj Phantom, Solflare lub inny portfel Solana w przeglądarce, a następnie spróbuj ponownie.',
+  'wallet.browser.eyebrow': 'Autoryzacja portfela desktopowego',
+  'wallet.browser.failed':
+    'Autoryzacja portfela nie powiodła się lub wygasła. Wróć do aplikacji desktopowej i spróbuj ponownie.',
+  'wallet.browser.linkBody':
+    'Wybierz rozszerzenie portfela w tej przeglądarce. Podpiszesz wiadomość weryfikacyjną, a następnie wrócisz do aplikacji desktopowej.',
+  'wallet.browser.paymentBody':
+    'Wybierz portfel powiązany z twoim kontem i zatwierdź transakcję w tej przeglądarce.',
+  'wallet.browser.retry': 'Spróbuj ponownie',
+  'wallet.browser.returnButton': 'Wróć do aplikacji desktopowej',
+  'wallet.browser.reviewBody':
+    'Postępuj zgodnie z monitem od {wallet}. Pozostaw tę stronę przeglądarki otwartą.',
+  'wallet.browser.reviewTitle': 'Sprawdź w swoim portfelu',
+  'wallet.browser.safety':
+    'World of ClaudeCraft nigdy nie prosi o frazę odzyskiwania ani klucz prywatny.',
+  'wallet.browser.title': 'Podłącz portfel Solana',
+  'wallet.manualReturnBrowserHelp':
+    'Po zatwierdzeniu wróć do tej karty gry. Jeśli iOS otworzy inną przeglądarkę, zamknij ją i wróć ręcznie do oryginalnej przeglądarki.',
+  'wallet.manualReturnStandaloneHelp':
+    'Po zatwierdzeniu wróć do World of ClaudeCraft z ekranu głównego. Jeśli iOS otworzy przeglądarkę, zamknij ją i ręcznie otwórz ponownie aplikację z ekranu głównego.',
+  'wallet.mobileAppHelp':
+    'Wybierz Phantom lub Solflare. Aplikacja portfela poprosi o zatwierdzenie. Pozostaw tę grę otwartą i wróć do niej po zakończeniu.',
+  'wallet.openAppButton': 'Otwórz {wallet}',
+  'wallet.openAppHelp':
+    'Otwórz {wallet}, aby przejrzeć to żądanie. Pozostaw tę kartę gry otwartą, gdy aplikacja portfela jest aktywna.',
+  'wallet.openAppTitle': 'Kontynuuj w {wallet}',
+  'wallet.preparingAppButton': 'Przygotowywanie {wallet}...',
+  'wallet.standaloneAppHelp':
+    'Połączenia z portfelami nie są jeszcze dostępne w aplikacji z ekranu głównego. Otwórz World of ClaudeCraft w Safari lub Chrome, aby używać Phantom lub Solflare.',
+  'wallet.walletAppUnavailable':
+    'Nie udało się przygotować {wallet}. Zamknij to okno i spróbuj ponownie.',
   'entities.abilities.primal_reflexes.description':
     'Twoje instynkty wyostrzają się, zwiększając szansę na unik o 50% przez 6 sek.',
   'entities.abilities.primal_reflexes.name': 'Pierwotne Odruchy',

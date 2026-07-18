@@ -7,6 +7,10 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_card_duel_first_win: {
+    name: 'Zasady Domu',
+    desc: 'Wygraj Pojedynek Karciany u Mistrza Kart.',
+  },
   prog_first_steps: {
     name: 'Pierwsze Kroki',
     desc: 'Osiągnij poziom 2 i postaw pierwszy krok na długiej drodze.',

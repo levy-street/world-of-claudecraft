@@ -207,6 +207,15 @@ describe('Guide generated class content', () => {
     }
   });
 
+  it('includes the Enhancement off-tank kit in the Shaman full kit', () => {
+    const shaman = GUIDE_CLASSES.find((c) => c.id === 'shaman');
+    expect(shaman).toBeDefined();
+    const ids = new Set(shaman?.abilities.map((ability) => ability.id));
+    for (const id of ['earth_shield', 'earthbound_weapon', 'elemental_demand', 'unleash_weapon']) {
+      expect(ids.has(id), `Shaman Guide kit missing ${id}`).toBe(true);
+    }
+  });
+
   it('resolves the new class-page and chooser keys (cast keys are not tsc-checked)', () => {
     setLanguage('en');
     for (const k of [

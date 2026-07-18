@@ -2,6 +2,285 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const sv_SE: Partial<Record<TranslationKey, string>> = {
+  'hud.pet.waterJet': 'Vattenstråle',
+  'hud.pet.waterJetDesc':
+    'Beordra din Vattenelementar att kanalisera en bromsande stråle i 3 sekunder. 8 sekunders nedkylning. Högerklicka för att auto-kasta den så snart nedkylningen är över.',
+  'hud.pet.waterJetTitle': 'Vattenstråle',
+  'hud.prompts.acceptResurrection': 'Acceptera uppståndelse',
+  'hud.prompts.resurrectionOffer': '{name} vill återge dig livet. Accepterar du?',
+  'itemUi.stats.parry': 'Parering',
+  'apiError.wallet.handoff_invalid':
+    'Den plånboksbehörigheten har gått ut eller kunde inte verifieras. Försök igen.',
+  'cardDuel.close': 'Stäng',
+  'cardDuel.counts': 'Kortlek: {deck} · Kasserad: {discard}',
+  'cardDuel.forfeit': 'Ge upp',
+  'cardDuel.forfeitAria': 'Ge upp kortduellen',
+  'cardDuel.join': 'Gå med i kö',
+  'cardDuel.joinAria': 'Gå med i kortduellskön',
+  'cardDuel.leave': 'Lämna kön',
+  'cardDuel.leaveAria': 'Lämna kortduellskön',
+  'cardDuel.playCardAria': 'Spela {value}-kortet',
+  'cardDuel.queued': 'Väntar på en motståndare...',
+  'cardDuel.round': 'Omgångsresultat: {mine} - {theirs}',
+  'cardDuel.title': 'Kortduell',
+  'cardDuel.unavailable': 'Kortduell kräver en annan spelare online.',
+  'cardDuel.vsOpponent': 'mot {name}',
+  'cardDuel.waitingOnOpponent': 'Väntar på motståndarens kort...',
+  'cardDuel.yourTurn': 'Spela ett kort',
+  'entities.abilities.arcane_surge.description':
+    'Drar en våg av rå eter genom fienden och orsakar {damage} skada. Varje kast lämnar en Arkansk Laddning som höjer nästa Etersvalls skada och kasthastighet (5% snabbare för varje) men kraftigt höjer manakostnaden, upp till 4 i stapel; Eterpilar förbrukar laddningarna. Varje kast kan även aktivera Eterrus, vilket gör nästa Etersvall gratis och dubbelt så snabb att kasta.',
+  'entities.abilities.arcane_surge.name': 'Etersvall',
+  'entities.abilities.blizzard.description':
+    'Kallar en isstorm över målområdet i 6 sek, orsakar {damage} Frost-skada varje sekund och saktar ner fiender med 40%. Varje träffad fiende minskar Frozen Orbs nedkylning med 0,5 sek, upp till 3 sek per kast. (Frost)',
+  'entities.abilities.blizzard.name': 'Blizzard',
+  'entities.abilities.brain_freeze.description':
+    'Rimlans har 20% chans att göra nästa Winterlash omedelbar, 30% hårdare och fri från dess nedkylning. (Frost)',
+  'entities.abilities.brain_freeze.name': 'Brain Freeze',
+  'entities.abilities.dragons_breath.description':
+    'Håll intryckt för att samla en vidgande flammande andedräkt, släpp sedan för en kon. Längre laddningar når längre och gör mer skada. Träffade fiender desorienteras och skada bryter effekten; maximal laddning är alltid ett kritiskt slag och räknas en gång mot Het svit. (Eld)',
+  'entities.abilities.dragons_breath.name': "Dragon's Breath",
+  'entities.abilities.fingers_of_frost.description':
+    'Rimlans har 15% chans att ge Fingers of Frost, upp till 2 laddningar: nästa Ice Lance behandlar målet som fryst. (Frost)',
+  'entities.abilities.fingers_of_frost.name': 'Fingers of Frost',
+  'entities.abilities.fireball_form.description':
+    'Förvandlas till en glödande glöd och ökar rörelsehastigheten med {buff}%. Du kan inte attackera eller kasta besvärjelser under förvandlingen. Kasta om för att återgå till normal form.',
+  'entities.abilities.fireball_form.name': 'Ember Form',
+  'entities.abilities.flurry.description':
+    'Avfyrar tre isiga bultar för {damage} Frost-skada var och en och planterar Vinterkyla på målet: dess nästa 2 inkommande kompatibla besvärjelser behandlar det som fryst. Brain Freeze gör Winterlash omedelbar, 30% hårdare och hoppar över dess nedkylning. (Frost)',
+  'entities.abilities.flurry.name': 'Winterlash',
+  'entities.abilities.frozen_orb.description':
+    'Skjuter ut en kula av virvelande frost som glider framåt i 8 sek, orsakar {damage} Frost-skada varje sekund på närliggande fiender och saktar ner dem med 30%. Kulans slag ger Fingers of Frost. (Frost)',
+  'entities.abilities.frozen_orb.name': 'Frozen Orb',
+  'entities.abilities.glacial_front.description':
+    'Håll intryckt för att samla en vidgande frostfront, släpp sedan för en kon. Längre laddningar når längre och gör mer skada. Alla träffade fiender saktas ner med 50% i 4 sek; maximal laddning rotar dem också i 1 sek. (Frost)',
+  'entities.abilities.glacial_front.name': 'Glacial Front',
+  'entities.abilities.glacial_spike.description':
+    'Frammanar en massiv istagge och förbrukar 5 Istappar för att orsaka {damage} Frost-skada och frysa målet på plats i 4 sek. (Frost)',
+  'entities.abilities.glacial_spike.name': 'Glacial Spike',
+  'entities.abilities.ice_lance.description':
+    'Kastar en isbit som orsakar {damage} Frost-skada, trefaldigt mot ett fryst mål. Förbrukar Fingers of Frost, eller en laddning av Vinterkyla, för att behandla målet som fryst. (Frost)',
+  'entities.abilities.ice_lance.name': 'Ice Lance',
+  'entities.abilities.perfect_moment.description':
+    'Grip ditt perfekta ögonblick: vinn genast 4 Arkanska Laddningar, och under 10 sek förbrukar Eterpilar dem inte. (Kronomantik)',
+  'entities.abilities.perfect_moment.name': 'Perfect Moment',
+  'entities.abilities.shatter.description':
+    'Dina besvärjelser får 50% kritisk träffchans mot frysta mål, och dessa kritiska slag gör 20% mer skada. Fingers of Frost och Vinterkyla räknas som fryst. (Frost)',
+  'entities.abilities.shatter.name': 'Brittle Ruin',
+  'entities.abilities.temporal_acceleration.description':
+    'Accelererar tidens flöde för din grupp eller raid, ökar attack-, kast- och kanalisationshastighet med 30% i 15 sek. Allierade som nyligen påverkats av Temporal Acceleration eller Krigstrummor är för utmattade för att dra nytta av det. (Kronomantik)',
+  'entities.abilities.temporal_acceleration.name': 'Temporal Acceleration',
+  'entities.abilities.temporal_barrier.description':
+    'Förskjuter målet ett hjärtslag ur nuet; ett temporalt skal absorberar {damage} skada i 10 sek innan tidslinjen snäpper tillbaka.',
+  'entities.abilities.temporal_barrier.name': 'Temporal Barrier',
+  'entities.abilities.temporal_cascade.description':
+    'Skickar ett eko kaskaderande genom din grupp: målet och upp till fyra av deras närmaste allierade läks på en gång och märks var och en i {duration} sek, och drar en del av den Arkan skada du ger tillbaka genom deras ekon för att läka dem. (Kronomantik)',
+  'entities.abilities.temporal_cascade.name': 'Temporal Cascade',
+  'entities.abilities.temporal_echo.description':
+    'Märker en allierad med ett eko av ett friskare ögonblick och läker {damage} hälsa på en gång. Under {duration} sek dras en del av den Arkan skada du gör tillbaka genom ekoet för att läka dem.',
+  'entities.abilities.temporal_echo.name': 'Temporal Echo',
+  'entities.abilities.temporal_hourglass.description':
+    'Placerar ett temporalt timglas på vald plats. Under en fiende suspenderar det dem i {hostilePveDuration} sek i PvE eller {hostilePvpDuration} sek i PvP och hindrar alla handlingar; skada bryter effekten. Vid dina fötter eller under en gruppallierad ger det stasis i {duration} sek, förhindrar skada och handlingar, återställer {healing}% av maximala hälsan och låter nedkylningar återhämta sig {selfCooldownRecovery}% snabbare för dig eller {allyCooldownRecovery}% snabbare för en allierad. På tom mark väntar timglaset i {groundDuration} sek och påverkar den första giltiga enheten som kliver på det. Den gynnsamma auran kan avlägsnas manuellt.',
+  'entities.abilities.temporal_hourglass.name': 'Hourglass of Suspension',
+  'entities.abilities.temporal_mend.description':
+    'Drar en allierad ett ögonblick framåt i tid och läker {damage} hälsa när kroppen slår sig till ro i sitt friskare framtida jag. (Kronomantik-signatur)',
+  'entities.abilities.temporal_mend.name': 'Temporal Mend',
+  'entities.abilities.temporal_reversal.description':
+    'Spolar tillbaka en fallen allierades tidslinje och återupplivar dem vid kroppen med en del av deras hälsa och mana, även mitt i strid. (Kronomantik)',
+  'entities.abilities.temporal_reversal.name': 'Temporal Reversal',
+  'entities.abilities.temporal_rewind.description':
+    'Skickar en arkan våg genom din grupp eller raid och spolar tillbaka tiden för att återställa 30% av skadan varje allierad inom 40 yards tog under de senaste 5 sekunderna (upp till 35% av deras maximala hälsa). Kan inte vara ett kritiskt slag. (Kronomantik)',
+  'entities.abilities.temporal_rewind.name': 'Rewind',
+  'entities.npcs.card_master.greeting':
+    'Hur är det med en kortduell? Bäst av tre, vinnaren tar skryträtten.',
+  'entities.npcs.card_master.name': 'Kortmästare',
+  'entities.npcs.card_master.title': 'Slumpmakare',
+  'entities.quests.q_archetype_acceptance.completion':
+    'Löftet håller. Dessa två hantverk är nu dina ämnen, och kunskapen om det motstående hantverket blir ditt hobby.',
+  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Malmåder skördad',
+  'entities.quests.q_archetype_acceptance.text':
+    'Skicklighet är kunskap, {playerName}, men inriktning är ett löfte. Välj två angränsande hantverk vars metoder du vill bära som dina ämnen, och ta sedan med mig malm bearbetad i Dalen med dina egna händer.',
+  'entities.quests.q_prof_hobby_switch.completion':
+    'Ett lättare val, men ett nyttigt sådant. Följ den nyfikenheten så långt sällsynt arbete kan bära den.',
+  'entities.quests.q_prof_hobby_switch.objectives.0.label': 'Örtfläck skördad',
+  'entities.quests.q_prof_hobby_switch.text':
+    'Ämnen kräver ett löfte. Ett hobby frågar bara vart din nyfikenhet vandrar, {playerName}. Plocka några örter och bestäm vilket hantverk, det som är motsatt dina ämnen, du vill ägna dig åt.',
+  'entities.quests.q_prof_hobby_switch.title': 'Ett annorlunda tidsfördriv',
+  'entities.quests.q_prof_intro.completion':
+    'Ser du? Malm samlad och valkar på händerna. Håll på med gruvdrift, skogsavverkning och örtskörd när du reser längs vägarna, och när du är tillbaka i staden, håll koll på Stadsanslagstavlan vid marknaden och hantverksbordet i närheten. Det finns en rättvis handel i allt av det, om du vill ha det.',
+  'entities.quests.q_prof_intro.objectives.0.label': 'Malmåder skördad',
+  'entities.quests.q_prof_intro.text':
+    'Varje själ i Östbäck arbetar ett hantverk utöver svärdet, {playerName}. Det finns malmådrar i klipporna runt Koppargropen, sydväst om staden. Gå och sving en hacka och arbeta 5 av dem själv; jag ska kunna se skillnaden.',
+  'entities.quests.q_prof_make_amends.completion':
+    'Den gamla rytmen återvänder. Ditt tidigare par är aktivt igen.',
+  'entities.quests.q_prof_make_amends.text':
+    'Du har burit det paret förut, {playerName}. Att återvända är inget nytt löfte. Hjälp till att hålla Dalsvägen fri, och arbetet ska påminna dina händer om vad de en gång visste.',
+  'gpuNotice.bodyDesktop':
+    'Spelet körs utan GPU-acceleration och kommer att vara långsamt. Uppdatera dina grafikdrivrutiner och starta sedan om spelet. I Windows anger du även spelet till Höga prestanda under Inställningar > System > Skärm > Grafik.',
+  'gpuNotice.bodyWeb':
+    'Spelet körs utan GPU-acceleration och kommer att vara långsamt. Aktivera hårdvaruacceleration i din webbläsares inställningar, uppdatera dina grafikdrivrutiner och starta sedan om din webbläsare.',
+  'gpuNotice.dismiss': 'Stäng',
+  'guide.abilityHook.blink':
+    'Teleporterar dig ett kort stycke framåt och bryter rötter på vägen ut.',
+  'guide.abilityHook.blizzard': 'Täcker ett område med is för att nöta ner och sakta en hel flock.',
+  'guide.abilityHook.brain_freeze':
+    'Dina frostbultar gör ibland nästa Flurry omedelbar och hårdare träffande.',
+  'guide.abilityHook.fingers_of_frost':
+    'Dina frostbultar stärker ibland en Ice Lance att slå som om målet vore fryst.',
+  'guide.abilityHook.fireball_form':
+    'Bli en levande glöd för att ta dig över öppen mark med hög hastighet.',
+  'guide.abilityHook.flurry':
+    'Tre snabba bultar som kyler målet så dina nästa frostträffar landar som om det vore fryst.',
+  'guide.abilityHook.frozen_orb':
+    'Rullar en långsam kula genom flocken som kyler allt och matar dina frostprocsar.',
+  'guide.abilityHook.ice_lance':
+    'En omedelbar bit för att förbruka frostprocsar, träffar mycket hårdare på ett fryst mål.',
+  'guide.abilityHook.shatter': 'Dina besvärjelser kritikträffar mycket oftare mot frysta mål.',
+  'guide.deedsPage.renownBody':
+    'Ryktbarhet är poängen bakom Boken. Varje bedrift du fullbordar är värd ett fast belopp, och din totalsumma klättrar bara uppåt, så en lugn vecka kostar dig aldrig mark. En handfull bedrifter bygger på tur snarare än skicklighet, och Bragder är en heder för sig, så båda är värda noll Ryktbarhet. Bedrifter utan Ryktbarhet räknas fortfarande mot fullbordande i din Bok; de ger bara aldrig poäng.',
+  'guide.deedsPage.standingsNote':
+    'Riken håller löpande räkning på Ryktbarhet för varje konto: tavlan rankar hela konton efter livstids Ryktbarhet, räknar varje bedrift en gång över alla dina karaktärer, och den visar enbart Ryktbarhet, så bedrifter utan Ryktbarhet påverkar aldrig ställningen trots att de räknas i din Bok. För att se vem som står var, öppna Topplistan i spelet och välj dess Ryktbarhets-flik; ställningen finns där, inte på wikin.',
+  'hudChrome.archetypePair.alchemy+cooking': 'Apotekare',
+  'hudChrome.archetypePair.armorcrafting+engineering': 'Kugghjulssmed',
+  'hudChrome.archetypePair.cooking+leatherworking': 'Fångstman',
+  'hudChrome.archetypePair.enchanting+jewelcrafting': 'Stenbindare',
+  'hudChrome.archetypePair.engineering+alchemy': 'Bombbärare',
+  'hudChrome.archetypePair.inscription+enchanting': 'Arkanist',
+  'hudChrome.archetypePair.jewelcrafting+weaponcrafting': 'Klingasmed',
+  'hudChrome.archetypePair.leatherworking+tailoring': 'Utrustare',
+  'hudChrome.archetypePair.tailoring+inscription': 'Magivävare',
+  'hudChrome.archetypePair.weaponcrafting+armorcrafting': 'Smed',
+  'hudChrome.auraEffect.cheapCast': 'Din nästa besvärjelse kostar {pct}% mindre',
+  'hudChrome.auraEffect.combustionCrit': 'Dina Eld-besvärjelser kritikträffar alltid',
+  'hudChrome.auraEffect.dmgDone': 'Ökar orsakad skada med {pct}%',
+  'hudChrome.auraEffect.dmgDoneReduce': 'Minskar orsakad skada med {pct}%',
+  'hudChrome.auraEffect.elementalConvergencePrimed':
+    'Din nästa besvärjelse från den andra elementarskolan ger Elementär konvergens',
+  'hudChrome.auraEffect.formFireball':
+    'Ember Form: rörelsehastigheten ökad med {pct}%; attacker och besvärjelser är inaktiverade',
+  'hudChrome.auraEffect.freeCast': 'Ditt nästa kast kostar ingenting',
+  'hudChrome.auraEffect.heatingUp':
+    'Ditt nästa på varandra följande kritiska Eld-byggarslag ger Het svit; ett icke-kritiskt byggarslag tar bort Värms upp',
+  'hudChrome.auraEffect.iceFloesCasts':
+    'Dina nästa {n} besvärjelser med kasttid kan kastas under rörelse',
+  'hudChrome.auraEffect.increase.sp': 'Ökar besvärjelsekraft med {value}',
+  'hudChrome.auraEffect.instantCast': 'Din nästa besvärjelse med kasttid är omedelbar',
+  'hudChrome.auraEffect.overloadNext':
+    'Din nästa besvärjelse förstärks med {pct}% men kostar 50% mer mana',
+  'hudChrome.auraEffect.powerEchoNext':
+    'Din nästa direkta besvärjelse upprepas med {pct}% kraft på samma mål',
+  'hudChrome.auraEffect.temporalHourglass':
+    'Immun och oförmögen att handla; återställer hälsa och accelererar nedkylningsåterhämtning. Högerklicka för att avbryta.',
+  'hudChrome.craftName.alchemy': 'Alkemi',
+  'hudChrome.craftName.armorcrafting': 'Rustningssmide',
+  'hudChrome.craftName.cooking': 'Matlagning',
+  'hudChrome.craftName.enchanting': 'Förtrollning',
+  'hudChrome.craftName.engineering': 'Ingenjörskonst',
+  'hudChrome.craftName.inscription': 'Inskription',
+  'hudChrome.craftName.jewelcrafting': 'Juveleringskonst',
+  'hudChrome.craftName.leatherworking': 'Läderhantverkeri',
+  'hudChrome.craftName.tailoring': 'Skrädderi',
+  'hudChrome.craftName.weaponcrafting': 'Vapensmide',
+  'hudChrome.crafting.attunementPreview':
+    'Resultat: titeln {title}; {majorA} och {majorB} blir obegränsade ämnen; {hobby} blir det sällsyntsbegränsade hobbyt; all övrig kunskapsbehållning bibehålls men begränsas till vanlig nivå när den är vilande.',
+  'hudChrome.crafting.comboMet': 'Redo.',
+  'hudChrome.crafting.comboNotAttuned': 'Välj ett arketyppar först.',
+  'hudChrome.crafting.comboRequires': 'Inriktning: {craftA} + {craftB}, nivå {tier}.',
+  'hudChrome.crafting.comboSyncing': 'Kontrollerar rikenas inriktning.',
+  'hudChrome.crafting.comboTierUnmet': 'Höj båda hantverksämnena till den krävda nivån.',
+  'hudChrome.crafting.comboWrongPair': 'Aktivera detta exakta par för att tillverka det.',
+  'hudChrome.crafting.hobbyPreview':
+    'Resultat: {hobby} blir det sällsyntsbegränsade hobbyt. Båda ämnena och alla bibehållna kunskapsvärden förblir oförändrade.',
+  'hudChrome.crafting.identity.ceilingCommon': 'Vanlig gräns',
+  'hudChrome.crafting.identity.ceilingRare': 'Sällsynt gräns',
+  'hudChrome.crafting.identity.ceilingUnlimited': 'Ingen förstärkningsgräns',
+  'hudChrome.crafting.identity.colCap': 'Gräns',
+  'hudChrome.crafting.identity.colCraft': 'Hantverk',
+  'hudChrome.crafting.identity.colRole': 'Roll',
+  'hudChrome.crafting.identity.colSkill': 'Färdighet',
+  'hudChrome.crafting.identity.dormantKnowledge':
+    '{craft}-kunskap bibehålls men är vilande tills dess par eller hobby är aktivt.',
+  'hudChrome.crafting.identity.history': '{pairs} par upptäckta, {returns} återkomster slutförda',
+  'hudChrome.crafting.identity.historyLabel': 'Historik',
+  'hudChrome.crafting.identity.hobbyLabel': 'Hobby',
+  'hudChrome.crafting.identity.majorsLabel': 'Ämnen',
+  'hudChrome.crafting.identity.nearTier': '{craft} är {points} färdighetspoäng från nästa nivå.',
+  'hudChrome.crafting.identity.roleDormant': 'Vilande kunskap',
+  'hudChrome.crafting.identity.roleHobby': 'Hobby',
+  'hudChrome.crafting.identity.roleMajor': 'Ämne',
+  'hudChrome.crafting.identity.roleUnattuned': 'Oinriktad',
+  'hudChrome.crafting.identity.skillAria':
+    '{craft}, färdighet {skill}, nivå {tier}, {role}, {ceiling}',
+  'hudChrome.crafting.identity.syncing': 'Väntar på din hantverksidentitet från riket.',
+  'hudChrome.crafting.identity.title': 'Hantverksidentitet',
+  'hudChrome.crafting.identity.titleLabel': 'Titel',
+  'hudChrome.crafting.identity.tutorial':
+    'Första nivån: nå färdighet {skill} i ett hantverk. Lyckade recept höjer det hantverket utan att radera kunskap på andra håll.',
+  'hudChrome.crafting.identity.unattuned':
+    'Inget arketyppar är aktivt. Din kunskap bibehålls, men kombinationsrecept kräver ett inriktat par.',
+  'hudChrome.crafting.noProfessionChoice': 'Inget giltigt yrkesval är för närvarande tillgängligt.',
+  'hudChrome.crafting.pairOptionLabel': '{pair} ({craftA} + {craftB})',
+  'hudChrome.crafting.professionChoice': 'Yrkesval',
+  'hudChrome.deeds.lbScopeNote':
+    'Konton rangordnade efter livstids Ryktbarhet. Varje bedrift räknas en gång för alla karaktärer på ett konto.',
+  'hudChrome.deeds.lbSelfAccount':
+    'Ditt konto: rank {rank}, topp {percent} procent, {renown} Ryktbarhet',
+  'hudChrome.deeds.lbSelfRank': 'Ditt konto: rank {rank}, topp {percent} procent',
+  'hudChrome.nameplate.mobEliteLevel': '{level}+',
+  'hudChrome.nameplate.mobLevel': '{level}',
+  'hudChrome.specPanel.specUnlockBanner': 'Specialisering upplåst!',
+  'hudChrome.specPanel.specUnlockHint': 'Tryck N för att välja din specialisering.',
+  'hudChrome.wocStore.wallet.connect': 'Anslut plånbok',
+  'hudChrome.wocStore.wallet.connectedUnlinked':
+    'Plånboksappen är ansluten till denna webbläsare, men dess offentliga adress är ännu inte länkad till ditt WoC-konto.',
+  'hudChrome.wocStore.wallet.linkedConnected':
+    'Din länkade plånboksapp är ansluten och redo för SOL- eller WOC-köp.',
+  'hudChrome.wocStore.wallet.linkedDisconnected':
+    'Din offentliga adress är länkad. Återanslut den plånboksappen när du vill betala med SOL eller WOC.',
+  'hudChrome.wocStore.wallet.manage': 'Hantera plånbok',
+  'hudChrome.wocStore.wallet.mismatched':
+    'En annan plånbok är ansluten. Verifiera den för att ersätta den länkade adressen, eller återanslut den länkade plånboken.',
+  'hudChrome.wocStore.wallet.reconnect': 'Återanslut plånbok',
+  'hudChrome.wocStore.wallet.title': 'Solana-plånbok',
+  'hudChrome.wocStore.wallet.unlinked':
+    'Anslut en plånboksapp och signera sedan en gång för att länka dess offentliga adress till ditt WoC-konto. Vi tar aldrig emot din återställningsfras eller privata nyckel.',
+  'hudChrome.wocStore.wallet.verify': 'Verifiera och länka',
+  'wallet.bagConnect': 'Länka plånbok',
+  'wallet.bagLink': 'Verifiera plånbok',
+  'wallet.bagReconnect': 'Återanslut plånbok',
+  'wallet.browser.completeBody': 'Du kan återvända till skrivbordsappen för World of ClaudeCraft.',
+  'wallet.browser.completeTitle': 'Plånboksbehörighet slutförd',
+  'wallet.browser.continueWith': 'Fortsätt med {wallet}',
+  'wallet.browser.extensionHelp':
+    'Inget kompatibelt plånbokstillägg hittades. Installera eller lås upp Phantom, Solflare eller en annan Solana-webbläsarplånbok och försök sedan igen.',
+  'wallet.browser.eyebrow': 'Skrivbordsplånboksbehörighet',
+  'wallet.browser.failed':
+    'Plånboksbehörighet misslyckades eller gick ut. Återgå till skrivbordsappen och försök igen.',
+  'wallet.browser.linkBody':
+    'Välj ett plånbokstillägg i denna webbläsare. Du signerar ett verifieringsmeddelande och återvänder sedan till skrivbordsappen.',
+  'wallet.browser.paymentBody':
+    'Välj plånboken länkad till ditt konto och godkänn transaktionen i denna webbläsare.',
+  'wallet.browser.retry': 'Försök igen',
+  'wallet.browser.returnButton': 'Återgå till skrivbordsappen',
+  'wallet.browser.reviewBody': 'Följ uppmaningen från {wallet}. Håll denna webbläsarsida öppen.',
+  'wallet.browser.reviewTitle': 'Granska i din plånbok',
+  'wallet.browser.safety':
+    'World of ClaudeCraft ber aldrig om din återställningsfras eller privata nyckel.',
+  'wallet.browser.title': 'Anslut en Solana-plånbok',
+  'wallet.manualReturnBrowserHelp':
+    'Efter godkännande, återgå till denna spelflik. Om iOS öppnar en annan webbläsare, stäng den och återgå till den ursprungliga webbläsaren manuellt.',
+  'wallet.manualReturnStandaloneHelp':
+    'Efter godkännande, återgå till World of ClaudeCraft från din hemskärm. Om iOS öppnar en webbläsare, stäng den och öppna hemskärmsappen manuellt igen.',
+  'wallet.mobileAppHelp':
+    'Välj Phantom eller Solflare. Din plånboksapp ber om godkännande. Håll det här spelet öppet och återgå till det när du är klar.',
+  'wallet.openAppButton': 'Öppna {wallet}',
+  'wallet.openAppHelp':
+    'Öppna {wallet} för att granska denna begäran. Håll denna spelflik öppen medan plånboksappen är aktiv.',
+  'wallet.openAppTitle': 'Fortsätt i {wallet}',
+  'wallet.preparingAppButton': 'Förbereder {wallet}...',
+  'wallet.standaloneAppHelp':
+    'Plånboksanslutningar är ännu inte tillgängliga i hemskärmsappen. Öppna World of ClaudeCraft i Safari eller Chrome för att använda Phantom eller Solflare.',
+  'wallet.walletAppUnavailable':
+    '{wallet} kunde inte förberedas. Stäng det här fönstret och försök igen.',
   'entities.abilities.primal_reflexes.description':
     'Dina instinkter skärps och ökar din chans att undvika anfall med 50% i 6 sek.',
   'entities.abilities.primal_reflexes.name': 'Ursinnesreflexer',

@@ -2,6 +2,287 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const da_DK: Partial<Record<TranslationKey, string>> = {
+  'hud.pet.waterJet': 'Vandstråle',
+  'hud.pet.waterJetDesc':
+    'Befal dit Vandelementar at kanalisere en bremsende vandstråle i 3 sekunder. 8 sekunders nedkøling. Højreklik for automatisk at kaste det, når det er klar.',
+  'hud.pet.waterJetTitle': 'Vandstråle',
+  'hud.prompts.acceptResurrection': 'Accepter opstandelse',
+  'hud.prompts.resurrectionOffer': '{name} vil gerne bringe dig tilbage til livet. Accepterer du?',
+  'itemUi.stats.parry': 'Parering',
+  'apiError.wallet.handoff_invalid':
+    'Den pung-godkendelse udløb eller kunne ikke bekræftes. Prøv igen.',
+  'cardDuel.close': 'Luk',
+  'cardDuel.counts': 'Bunke: {deck} - Kasserede: {discard}',
+  'cardDuel.forfeit': 'Giv op',
+  'cardDuel.forfeitAria': 'Giv op i Kortduellen',
+  'cardDuel.join': 'Stil dig i kø',
+  'cardDuel.joinAria': 'Stil dig i kø til Kortduellen',
+  'cardDuel.leave': 'Forlad køen',
+  'cardDuel.leaveAria': 'Forlad Kortduel-køen',
+  'cardDuel.playCardAria': 'Spil kortet med værdien {value}',
+  'cardDuel.queued': 'Venter på en modstander...',
+  'cardDuel.round': 'Rundescore: {mine} - {theirs}',
+  'cardDuel.title': 'Kortduel',
+  'cardDuel.unavailable': 'Kortduel kræver en anden spiller online.',
+  'cardDuel.vsOpponent': 'mod {name}',
+  'cardDuel.waitingOnOpponent': 'Venter på modstanderens kort...',
+  'cardDuel.yourTurn': 'Spil et kort',
+  'entities.abilities.arcane_surge.description':
+    'Leder en bølge af rå æter gennem fjenden og påfører {damage} skade. Hvert kast efterlader en Arkan Ladning, der øger din næste Aether Surges skade og kastetempo (5% hurtigere for hvert) men øger manakostningen kraftigt, stablet op til 4; Æterpile bruger ladningerne. Hvert kast kan også udløse Æterrus, der gør din næste Aether Surge gratis og dobbelt så hurtig at kaste.',
+  'entities.abilities.arcane_surge.name': 'Aether Surge',
+  'entities.abilities.blizzard.description':
+    'Kalder en isstorm ned over målområdet i 6 sek., gør {damage} Frost-skade hvert sekund og sætter fjenders hast ned med 40%. Hver fjende ramt reducerer Frozen Orb med 0,5 sek., op til 3 sek. pr. kast. (Frost)',
+  'entities.abilities.blizzard.name': 'Blizzard',
+  'entities.abilities.brain_freeze.description':
+    'Rimlanse har 20% chance for at gøre dit næste Winterlash øjeblikkeligt, 30% hårdere og fri for dets nedkøling. (Frost)',
+  'entities.abilities.brain_freeze.name': 'Brain Freeze',
+  'entities.abilities.dragons_breath.description':
+    'Hold for at samle et stadig bredere åndedrag af flammer, og slip det derefter i en kegle. Længere opladning rækker længere og gør mere skade. Fjender ramt bliver desorienterede og skade afbryder effekten; maksimal opladning rammer altid kritisk og tæller én gang mod Hed Stime. (Ild)',
+  'entities.abilities.dragons_breath.name': "Dragon's Breath",
+  'entities.abilities.fingers_of_frost.description':
+    'Rimlanse har 15% chance for at give Fingers of Frost, op til 2 ladninger: din næste Ice Lance behandler målet som frosset. (Frost)',
+  'entities.abilities.fingers_of_frost.name': 'Fingers of Frost',
+  'entities.abilities.fireball_form.description':
+    'Forvandl dig til en brændende glød og forøg bevægelseshastighed med {buff}%. Du kan ikke angribe eller kaste trolddom, mens du er forvandlet. Genudkast for at vende tilbage til din normale form.',
+  'entities.abilities.fireball_form.name': 'Ember Form',
+  'entities.abilities.flurry.description':
+    'Affyr tre ispile der gør {damage} Frost-skade hver og påfører Vinterkulden på målet: dets næste 2 indkommende kompatible trolddomme behandler det som frosset. Brain Freeze gør Winterlash øjeblikkeligt, 30% hårdere og springer dets nedkøling over. (Frost)',
+  'entities.abilities.flurry.name': 'Winterlash',
+  'entities.abilities.frozen_orb.description':
+    'Udslip en kugle af hvirvlende frost, der driver fremad i 8 sek. og gør {damage} Frost-skade hvert sekund på nærliggende fjender og sætter dem ned med 30%. Dens slag genererer Fingers of Frost. (Frost)',
+  'entities.abilities.frozen_orb.name': 'Frozen Orb',
+  'entities.abilities.glacial_front.description':
+    'Hold for at samle en stadig bredere front af frost, og slip den derefter i en kegle. Længere opladning rækker længere og gør mere skade. Alle fjender ramt sættes ned med 50% i 4 sek.; maksimal opladning rodfæster dem også i 1 sek. (Frost)',
+  'entities.abilities.glacial_front.name': 'Glacial Front',
+  'entities.abilities.glacial_spike.description':
+    'Fremkald en massiv isspids og forbrug 5 Istapper for at gøre {damage} Frost-skade og fryse målet på stedet i 4 sek. (Frost)',
+  'entities.abilities.glacial_spike.name': 'Glacial Spike',
+  'entities.abilities.ice_lance.description':
+    'Kast en isskarv og gør {damage} Frost-skade, tredoblet mod et frosset mål. Bruger Fingers of Frost eller en ladning af Vinterkulden til at behandle målet som frosset. (Frost)',
+  'entities.abilities.ice_lance.name': 'Ice Lance',
+  'entities.abilities.perfect_moment.description':
+    'Grib dit perfekte øjeblik: få øjeblikkeligt 4 Arkane Ladninger, og i 10 sek. bruger Æterpile dem ikke. (Kronomantik)',
+  'entities.abilities.perfect_moment.name': 'Perfect Moment',
+  'entities.abilities.shatter.description':
+    'Dine trolddomme får 50% kritisk chance mod frosne mål, og disse kritiske slag gør 20% mere skade. Fingers of Frost og Vinterkulden tæller som frosset. (Frost)',
+  'entities.abilities.shatter.name': 'Brittle Ruin',
+  'entities.abilities.temporal_acceleration.description':
+    'Fremskynder tidens gang for din gruppe eller raid og øger angrebshastighed, kastetempo og kanaliseringstempo med 30% i 15 sek. Allierede der for nylig blev påvirkede af Temporal Acceleration eller Krigstrommer er for udmattede til at have gavn af det. (Kronomantik)',
+  'entities.abilities.temporal_acceleration.name': 'Temporal Acceleration',
+  'entities.abilities.temporal_barrier.description':
+    'Forskydes målet et hjerteslag ud af nutiden, og et tidsskjold absorberer {damage} skade i 10 sek. inden tidslinjen snapper tilbage.',
+  'entities.abilities.temporal_barrier.name': 'Temporal Barrier',
+  'entities.abilities.temporal_cascade.description':
+    'Sender et ekko kaskadevejende gennem din gruppe: målet og op til fire af deres nærmeste allierede helbredes øjeblikkeligt og markeres hver i {duration} sek., og trækker en del af den Arkane skade du gør tilbage gennem deres ekkooer for at helbrede dem. (Kronomantik)',
+  'entities.abilities.temporal_cascade.name': 'Temporal Cascade',
+  'entities.abilities.temporal_echo.description':
+    'Mærker en alliert med et ekko af et sundere øjeblik og gendanner {damage} helbred øjeblikkeligt. I {duration} sek. trækkes en del af den Arkane skade du gør tilbage gennem ekkoet for at helbrede dem.',
+  'entities.abilities.temporal_echo.name': 'Temporal Echo',
+  'entities.abilities.temporal_hourglass.description':
+    'Placer et tidssandur på det valgte sted. Under en fjende suspenderer det dem i {hostilePveDuration} sek. i PvE eller {hostilePvpDuration} sek. i PvP og forhindrer alle handlinger; skade bryder effekten. Ved dine fødder eller under en gruppealliert giver det stasis i {duration} sek., forhindrer skade og handlinger, gendanner {healing}% af maksimalt helbred og får nedkølingerne til at gendannes {selfCooldownRecovery}% hurtigere for dig eller {allyCooldownRecovery}% hurtigere for en alliert. På tomt terræn venter sandurret i {groundDuration} sek. og påvirker den første gyldige enhed, der træder på det. Den gavnlige aura kan fjernes manuelt.',
+  'entities.abilities.temporal_hourglass.name': 'Hourglass of Suspension',
+  'entities.abilities.temporal_mend.description':
+    'Trækker en alliert et øjeblik fremad i tiden og gendanner {damage} helbred, mens kroppen falder til ro i sin sundere fremtidige form. (Kronomantik-signatur)',
+  'entities.abilities.temporal_mend.name': 'Temporal Mend',
+  'entities.abilities.temporal_reversal.description':
+    'Tilbagespoler en falden allieredes tidslinje og bringer dem tilbage til livet ved deres krop med en del af deres helbred og mana, selv midt i kamp. (Kronomantik)',
+  'entities.abilities.temporal_reversal.name': 'Temporal Reversal',
+  'entities.abilities.temporal_rewind.description':
+    'Sender en arkan bølge gennem din gruppe eller raid og tilbagespoler tiden for at gendanne 30% af den skade, hver alliert inden for 40 yards tog de seneste 5 sekunder (op til 35% af deres maksimale helbred). Kan ikke være en kritisk effekt. (Kronomantik)',
+  'entities.abilities.temporal_rewind.name': 'Rewind',
+  'entities.npcs.card_master.greeting':
+    'Har du lyst til en Kortduel? Bedst af tre, vinderen får pralerrettighederne.',
+  'entities.npcs.card_master.name': 'Kortmester',
+  'entities.npcs.card_master.title': 'Tilfældets Udeler',
+  'entities.quests.q_archetype_acceptance.completion':
+    'Løftet holder. Disse to håndværk er nu dine hovedfag, og den viden, der er modsat dem, bliver din hobby.',
+  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Malmåre høstet',
+  'entities.quests.q_archetype_acceptance.text':
+    'Færdighed er viden, {playerName}, men indstilling er et løfte. Vælg to nabohåndværk, som du vil bære som dine hovedfag, og bring mig så malm, bearbejdet fra Dalen med dine egne hænder.',
+  'entities.quests.q_prof_hobby_switch.completion':
+    'Et lettere valg, men et nyttigt et. Følg den nysgerrighed så langt, som sjældent arbejde kan føre den.',
+  'entities.quests.q_prof_hobby_switch.objectives.0.label': 'Urteplette høstet',
+  'entities.quests.q_prof_hobby_switch.text':
+    'Hovedfag kræver et løfte. En hobby spørger kun, hvor din nysgerrighed vanker, {playerName}. Saml et par urter og beslut dig for, hvilket håndværk modsat dine hovedfag du vil udforske.',
+  'entities.quests.q_prof_hobby_switch.title': 'En Anden Tidsfordriv',
+  'entities.quests.q_prof_intro.completion':
+    'Se? Malm indsamlet og hård hud på hænderne. Bliv ved med minedriften, skovhugsten og urtesamlingen, når du rejser vejene, og når du er tilbage i byen, hold øje med Byfokus-opslagstavlen ved markedet og den nærliggende håndværksbænk. Der er en god handel at finde i alt dette, hvis du vil have det.',
+  'entities.quests.q_prof_intro.objectives.0.label': 'Malmåre høstet',
+  'entities.quests.q_prof_intro.text':
+    'Enhver sjæl i Østbæk arbejder med et håndværk udover sværdet, {playerName}. Der er malmårer i klipperne omkring Kobbergraven, sydvest for byen. Gå sving en hakke og bearbejd 5 af dem selv, forstået; jeg vil kende forskel.',
+  'entities.quests.q_prof_make_amends.completion':
+    'Den gamle rytme vender tilbage. Dit tidligere par er aktivt igen.',
+  'entities.quests.q_prof_make_amends.text':
+    'Du har båret det par før, {playerName}. At vende tilbage er intet nyt løfte. Hjælp med at holde Dalsvejen fri, og arbejdet vil minde dine hænder om, hvad de engang kendte.',
+  'gpuNotice.bodyDesktop':
+    'Spillet kører uden GPU-acceleration og vil være langsomt. Opdater dine grafikdrivere og genstart derefter spillet. På Windows skal du også indstille spillet til Høj ydeevne under Indstillinger, System, Skærm, Grafik.',
+  'gpuNotice.bodyWeb':
+    'Spillet kører uden GPU-acceleration og vil være langsomt. Aktiver hardwareacceleration i din browsers indstillinger, opdater dine grafikdrivere og genstart derefter din browser.',
+  'gpuNotice.dismiss': 'Afvis',
+  'guide.abilityHook.blink':
+    'Teleporterer dig en kort afstand fremad og bryder rodfæstning ved udgangen.',
+  'guide.abilityHook.blizzard':
+    'Dækker et område med is for at nedslide og sætte farten ned på en hel flok.',
+  'guide.abilityHook.brain_freeze':
+    'Dine frostpile gør sommetider dit næste Winterlash øjeblikkeligt og hårdere.',
+  'guide.abilityHook.fingers_of_frost':
+    'Dine frostpile styrker sommetider en Ice Lance til at ramme, som om målet var frosset.',
+  'guide.abilityHook.fireball_form':
+    'Bliv til en levende glød for at krydse åbent terræn med høj hastighed.',
+  'guide.abilityHook.flurry':
+    'Tre hurtige pile der køler målet, så dine næste frostramninger lander, som om det var frosset.',
+  'guide.abilityHook.frozen_orb':
+    'Ruller en langsom kugle gennem flokken, der køler alt ned og giver dine frostudløsere næring.',
+  'guide.abilityHook.ice_lance':
+    'En øjeblikkelig skarv til at bruge frostudløsere, den rammer langt hårdere mod et frosset mål.',
+  'guide.abilityHook.shatter': 'Dine trolddomme får langt oftere kritisk chance mod frosne mål.',
+  'guide.deedsPage.renownBody':
+    'Hæder er den score, der står bag Bogen. Enhver bedrift du optjener er et bestemt beløb værd, og dit samlede antal stiger kun, så en stille uge koster dig aldrig fodfæste. En håndfuld bedrifter afhænger af held snarere end færdighed, og Bragder er en ære for sig selv, så begge er ikke værd nogen Hæder overhovedet. Bedrifter uden Hæder tæller stadig mod fuldførelse i din Bog; de scorer blot aldrig.',
+  'guide.deedsPage.standingsNote':
+    'Rigerne fører løbende optælling over Hæder på tværs af alle konti: listen rangordner hele konti efter livstids Hæder, tæller hver bedrift én gang på tværs af alle dine karakterer, og den viser kun Hæder, så bedrifter uden Hæder aldrig påvirker stillingen, selvom de tæller i din Bog. For at se, hvem der står hvor, åbner du Resultatlisten i spillet og vender til dens Hæder-fane; stillingerne er der, ikke på wikien.',
+  'hudChrome.archetypePair.alchemy+cooking': 'Apoteker',
+  'hudChrome.archetypePair.armorcrafting+engineering': 'Tandhjulsmed',
+  'hudChrome.archetypePair.cooking+leatherworking': 'Fældefanger',
+  'hudChrome.archetypePair.enchanting+jewelcrafting': 'Edelstenbinder',
+  'hudChrome.archetypePair.engineering+alchemy': 'Bombardør',
+  'hudChrome.archetypePair.inscription+enchanting': 'Arkanist',
+  'hudChrome.archetypePair.jewelcrafting+weaponcrafting': 'Klingesmed',
+  'hudChrome.archetypePair.leatherworking+tailoring': 'Udstyrer',
+  'hudChrome.archetypePair.tailoring+inscription': 'Trolddomsvæver',
+  'hudChrome.archetypePair.weaponcrafting+armorcrafting': 'Smed',
+  'hudChrome.auraEffect.cheapCast': 'Din næste trolddom koster {pct}% mindre',
+  'hudChrome.auraEffect.combustionCrit': 'Dine Ild-trolddomme rammer altid kritisk',
+  'hudChrome.auraEffect.dmgDone': 'Øger skade gjort med {pct}%',
+  'hudChrome.auraEffect.dmgDoneReduce': 'Reducerer skade gjort med {pct}%',
+  'hudChrome.auraEffect.elementalConvergencePrimed':
+    'Din næste trolddom fra den anden elementarskole giver Elementar Konvergens',
+  'hudChrome.auraEffect.formFireball':
+    'Ember Form: bevægelseshastighed øget med {pct}%; angreb og trolddomme er deaktiverede',
+  'hudChrome.auraEffect.freeCast': 'Dit næste kast koster ingenting',
+  'hudChrome.auraEffect.heatingUp':
+    'Dit næste på hinanden følgende kritiske Ild-bygger-slag giver Hed Stime; et ikke-kritisk bygger-slag fjerner Opvarmning',
+  'hudChrome.auraEffect.iceFloesCasts':
+    'Dine næste {n} trolddomme med en kastetid kan kastes, mens du bevæger dig',
+  'hudChrome.auraEffect.increase.sp': 'Øger trolddomsstyrke med {value}',
+  'hudChrome.auraEffect.instantCast': 'Din næste trolddom med en kastetid er øjeblikkelig',
+  'hudChrome.auraEffect.overloadNext':
+    'Din næste trolddom er forstærket med {pct}% men koster 50% mere mana',
+  'hudChrome.auraEffect.powerEchoNext':
+    'Din næste direkte trolddom gentages med {pct}% kraft på det samme mål',
+  'hudChrome.auraEffect.temporalHourglass':
+    'Immun og ude af stand til at handle; gendanner helbred og fremskynder nedkølingsgendannelse. Højreklik for at annullere.',
+  'hudChrome.craftName.alchemy': 'Alkymi',
+  'hudChrome.craftName.armorcrafting': 'Rustningsfremstilling',
+  'hudChrome.craftName.cooking': 'Madlavning',
+  'hudChrome.craftName.enchanting': 'Fortryllelse',
+  'hudChrome.craftName.engineering': 'Ingeniørkunst',
+  'hudChrome.craftName.inscription': 'Inskription',
+  'hudChrome.craftName.jewelcrafting': 'Juvelkunst',
+  'hudChrome.craftName.leatherworking': 'Læderhåndværk',
+  'hudChrome.craftName.tailoring': 'Skræderi',
+  'hudChrome.craftName.weaponcrafting': 'Våbenfremstilling',
+  'hudChrome.crafting.attunementPreview':
+    'Resultat: {title}-titel; {majorA} og {majorB} bliver ubegrænsede hovedfag; {hobby} bliver det sjældent-begrænsede hobby; al anden færdighedsviden bevares men begrænses til almindelig, mens den er inaktiv.',
+  'hudChrome.crafting.comboMet': 'Klar.',
+  'hudChrome.crafting.comboNotAttuned': 'Vælg først et arketypepar.',
+  'hudChrome.crafting.comboRequires': 'Indstilling: {craftA} + {craftB}, niveau {tier}.',
+  'hudChrome.crafting.comboSyncing': 'Kontrollerer rigets indstilling.',
+  'hudChrome.crafting.comboTierUnmet': 'Hav begge håndværksfag på det krævede niveau.',
+  'hudChrome.crafting.comboWrongPair': 'Aktiver dette præcise par for at fremstille det.',
+  'hudChrome.crafting.hobbyPreview':
+    'Resultat: {hobby} bliver det sjældent-begrænsede hobby. Begge hovedfag og alle bevarede færdigheder forbliver uændrede.',
+  'hudChrome.crafting.identity.ceilingCommon': 'Almindelig begrænsning',
+  'hudChrome.crafting.identity.ceilingRare': 'Sjælden begrænsning',
+  'hudChrome.crafting.identity.ceilingUnlimited': 'Ingen forstærkningsbegrænsning',
+  'hudChrome.crafting.identity.colCap': 'Begrænsning',
+  'hudChrome.crafting.identity.colCraft': 'Håndværk',
+  'hudChrome.crafting.identity.colRole': 'Rolle',
+  'hudChrome.crafting.identity.colSkill': 'Færdighed',
+  'hudChrome.crafting.identity.dormantKnowledge':
+    '{craft}-viden bevares men er inaktiv, indtil dens par eller hobby er aktiv.',
+  'hudChrome.crafting.identity.history':
+    '{pairs} par opdaget, {returns} tilbagevendinger gennemført',
+  'hudChrome.crafting.identity.historyLabel': 'Historik',
+  'hudChrome.crafting.identity.hobbyLabel': 'Hobby',
+  'hudChrome.crafting.identity.majorsLabel': 'Hovedfag',
+  'hudChrome.crafting.identity.nearTier': '{craft} er {points} færdigheder fra sit næste niveau.',
+  'hudChrome.crafting.identity.roleDormant': 'Inaktiv viden',
+  'hudChrome.crafting.identity.roleHobby': 'Hobby',
+  'hudChrome.crafting.identity.roleMajor': 'Hovedfag',
+  'hudChrome.crafting.identity.roleUnattuned': 'Ikke indstillet',
+  'hudChrome.crafting.identity.skillAria':
+    '{craft}, færdighed {skill}, niveau {tier}, {role}, {ceiling}',
+  'hudChrome.crafting.identity.syncing': 'Venter på din håndværksidentitet fra riget.',
+  'hudChrome.crafting.identity.title': 'Håndværksidentitet',
+  'hudChrome.crafting.identity.titleLabel': 'Titel',
+  'hudChrome.crafting.identity.tutorial':
+    'Første niveau: nå færdighed {skill} i et håndværk. Vellykkede opskrifter øger det håndværk uden at slette viden andre steder.',
+  'hudChrome.crafting.identity.unattuned':
+    'Intet arketypepar er aktivt. Din viden bevares, men komboopskrifter kræver et indstillet par.',
+  'hudChrome.crafting.noProfessionChoice':
+    'Intet gyldigt erhvervsvalg er tilgængeligt i øjeblikket.',
+  'hudChrome.crafting.pairOptionLabel': '{pair} ({craftA} + {craftB})',
+  'hudChrome.crafting.professionChoice': 'Erhvervsvalg',
+  'hudChrome.deeds.lbScopeNote':
+    'Konti rangordnet efter livstids Hæder. Hver bedrift tæller én gang på tværs af alle karakterer på en konto.',
+  'hudChrome.deeds.lbSelfAccount': 'Din konto: rang {rank}, top {percent} procent, {renown} Hæder',
+  'hudChrome.deeds.lbSelfRank': 'Din konto: rang {rank}, top {percent} procent',
+  'hudChrome.nameplate.mobEliteLevel': '{level}+',
+  'hudChrome.nameplate.mobLevel': '{level}',
+  'hudChrome.specPanel.specUnlockBanner': 'Specialisering låst op!',
+  'hudChrome.specPanel.specUnlockHint': 'Tryk N for at vælge din specialisering.',
+  'hudChrome.wocStore.wallet.connect': 'Tilslut pung',
+  'hudChrome.wocStore.wallet.connectedUnlinked':
+    'Pung-appen er tilsluttet denne browser, men dens offentlige adresse er endnu ikke knyttet til din WoC-konto.',
+  'hudChrome.wocStore.wallet.linkedConnected':
+    'Din tilknyttede pung-app er tilsluttet og klar til SOL- eller WOC-køb.',
+  'hudChrome.wocStore.wallet.linkedDisconnected':
+    'Din offentlige adresse er tilknyttet. Gentilslut den pung-app, når du vil betale med SOL eller WOC.',
+  'hudChrome.wocStore.wallet.manage': 'Administrer pung',
+  'hudChrome.wocStore.wallet.mismatched':
+    'En anden pung er tilsluttet. Bekræft den for at erstatte den tilknyttede adresse, eller gentilslut den tilknyttede pung.',
+  'hudChrome.wocStore.wallet.reconnect': 'Gentilslut pung',
+  'hudChrome.wocStore.wallet.title': 'Solana-pung',
+  'hudChrome.wocStore.wallet.unlinked':
+    'Tilslut en pung-app og underskriv derefter én gang for at knytte dens offentlige adresse til din WoC-konto. Vi modtager aldrig din genoprettelsesfrase eller private nøgle.',
+  'hudChrome.wocStore.wallet.verify': 'Bekræft og tilknyt',
+  'wallet.bagConnect': 'Tilknyt pung',
+  'wallet.bagLink': 'Bekræft pung',
+  'wallet.bagReconnect': 'Gentilslut pung',
+  'wallet.browser.completeBody':
+    'Du kan nu vende tilbage til World of ClaudeCraft-skrivebordsappen.',
+  'wallet.browser.completeTitle': 'Pung-godkendelse fuldført',
+  'wallet.browser.continueWith': 'Fortsæt med {wallet}',
+  'wallet.browser.extensionHelp':
+    'Ingen kompatibel pung-udvidelse blev fundet. Installer eller lås Phantom, Solflare eller en anden Solana-browserpung op og prøv derefter igen.',
+  'wallet.browser.eyebrow': 'Skrivebordsappens pung-godkendelse',
+  'wallet.browser.failed':
+    'Pung-godkendelse mislykkedes eller udløb. Vend tilbage til skrivebordsappen og prøv igen.',
+  'wallet.browser.linkBody':
+    'Vælg en pung-udvidelse i denne browser. Du underskriver en bekræftelsesbesked og vender derefter tilbage til skrivebordsappen.',
+  'wallet.browser.paymentBody':
+    'Vælg den pung, der er tilknyttet din konto, og godkend transaktionen i denne browser.',
+  'wallet.browser.retry': 'Prøv igen',
+  'wallet.browser.returnButton': 'Vend tilbage til skrivebordsapp',
+  'wallet.browser.reviewBody': 'Følg prompten fra {wallet}. Hold denne browserside åben.',
+  'wallet.browser.reviewTitle': 'Gennemse i din pung',
+  'wallet.browser.safety':
+    'World of ClaudeCraft beder aldrig om din genoprettelsesfrase eller private nøgle.',
+  'wallet.browser.title': 'Tilslut en Solana-pung',
+  'wallet.manualReturnBrowserHelp':
+    'Efter godkendelse kan du vende tilbage til denne spil-fane. Hvis iOS åbner en anden browser, skal du lukke den og manuelt vende tilbage til den oprindelige browser.',
+  'wallet.manualReturnStandaloneHelp':
+    'Efter godkendelse kan du vende tilbage til World of ClaudeCraft fra din startskærm. Hvis iOS åbner en browser, skal du lukke den og manuelt genåbne startskærmsappen.',
+  'wallet.mobileAppHelp':
+    'Vælg Phantom eller Solflare. Din pung-app beder om godkendelse. Hold dette spil åbent og vend tilbage, når du er færdig.',
+  'wallet.openAppButton': 'Åbn {wallet}',
+  'wallet.openAppHelp':
+    'Åbn {wallet} for at gennemgå denne anmodning. Hold denne spil-fane åben, mens pung-appen er aktiv.',
+  'wallet.openAppTitle': 'Fortsæt i {wallet}',
+  'wallet.preparingAppButton': 'Forbereder {wallet}...',
+  'wallet.standaloneAppHelp':
+    'Pungforbindelser er endnu ikke tilgængelige i startskærmsappen. Åbn World of ClaudeCraft i Safari eller Chrome for at bruge Phantom eller Solflare.',
+  'wallet.walletAppUnavailable': '{wallet} kunne ikke forberedes. Luk dette vindue og prøv igen.',
   'entities.abilities.primal_reflexes.description':
     'Dine instinkter skærpes og øger din chance for at undvige med 50% i 6 sek.',
   'entities.abilities.primal_reflexes.name': 'Primalreflekser',

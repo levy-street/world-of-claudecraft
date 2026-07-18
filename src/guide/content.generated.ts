@@ -910,6 +910,22 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "earthquake",
         "name": "Earthquake"
+      },
+      {
+        "id": "earth_shield",
+        "name": "Stone Aegis"
+      },
+      {
+        "id": "earthbound_weapon",
+        "name": "Anchorbound Weapon"
+      },
+      {
+        "id": "elemental_demand",
+        "name": "Elemental Demand"
+      },
+      {
+        "id": "unleash_weapon",
+        "name": "Elemental Discharge"
       }
     ],
     "model": "player_shaman",

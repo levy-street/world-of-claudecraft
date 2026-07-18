@@ -53,6 +53,9 @@ export interface WelcomeScreenDeps {
   fetchChest(): Promise<WelcomeChestInput>;
   header(): WelcomeScreenHeader | null;
   onContinue(): void;
+  /** Mounts the desktop character stage into the given host; null when the
+   *  stage cannot show (mobile, no live preview). Optional: absent = no stage. */
+  mountStage?(container: HTMLElement): { release(): void } | null;
   /** Read/write the one-shot Armory-open intent; defaults to window.sessionStorage. */
   storage?: Storage;
 }
@@ -95,6 +98,7 @@ export function mountWelcomeScreen(
   const continueBtn = root.querySelector<HTMLButtonElement>('#ws-continue');
   const continueHintEl = root.querySelector<HTMLElement>('#ws-continue-hint');
   const versionEl = root.querySelector<HTMLElement>('#ws-version');
+  const stageEl = root.querySelector<HTMLElement>('#ws-stage');
 
   markDialogRoot(root, { label: t('welcome.continue'), modal: true });
 
@@ -110,6 +114,7 @@ export function mountWelcomeScreen(
   let armoryCard: StorePromoCardController | null = null;
   let connectionReady = deps.platform.offline;
   let focusHandle: FocusTrapHandle | null = null;
+  let stageHandle: { release(): void } | null = null;
 
   function paintHeader(): void {
     const h = deps.header();
@@ -258,6 +263,9 @@ export function mountWelcomeScreen(
 
   async function show(): Promise<void> {
     root.hidden = false;
+    if (stageEl && deps.mountStage && !stageHandle) {
+      stageHandle = deps.mountStage(stageEl);
+    }
     paintHeader();
     setConnectionReady(deps.platform.offline);
     // Focus trap: same shared-FocusManager convention as every other dialog
@@ -321,6 +329,8 @@ export function mountWelcomeScreen(
     focusHandle = null;
     armoryCard?.dismiss();
     armoryCard = null;
+    stageHandle?.release();
+    stageHandle = null;
   }
 
   paintVersion();

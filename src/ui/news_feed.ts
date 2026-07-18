@@ -78,6 +78,20 @@ function newsItemFoot(url: string): string {
     : '';
 }
 
+/** Strips the release body's own redundant preamble (the "<name> Release
+ *  Notes" h1 plus the Release/Date/Previous-release definition rows): the
+ *  article chrome already shows name, tag, and date, so the preamble printed
+ *  the same facts up to four times. Anchored to the LEADING run only; a
+ *  mid-body "**Release:**" line or a meaningful opening h1 survives. */
+export function stripReleaseNotesPreamble(md: string): string {
+  return md
+    .replace(/\r\n/g, '\n')
+    .replace(
+      /^\s*#\s+[^\n]*Release Notes[^\n]*\n(?:\s*\n)*(?:\*\*(?:Release|Date|Previous release):\*\*[^\n]*\n(?:\s*\n)*)*/,
+      '',
+    );
+}
+
 /** One release rendered as the "News & Updates" article markup (expanded form). */
 export function renderReleaseArticle(r: NewsReleaseEntry, opts?: { isNew?: boolean }): string {
   const when = r.publishedAt
@@ -91,7 +105,7 @@ export function renderReleaseArticle(r: NewsReleaseEntry, opts?: { isNew?: boole
     `<article class="news-item">` +
     `<div class="news-item-head">` +
     `<h3 class="news-item-title">${title}</h3><div class="news-item-meta">${tag}${newBadge}${badge}${when}</div></div>` +
-    `<div class="news-body">${renderReleaseBody(r.body)}</div>${newsItemFoot(r.url)}</article>`
+    `<div class="news-body">${renderReleaseBody(stripReleaseNotesPreamble(r.body))}</div>${newsItemFoot(r.url)}</article>`
   );
 }
 
@@ -151,7 +165,7 @@ function renderWelcomeNewsCollapsedRow(r: NewsReleaseEntry & { isNew?: boolean }
     `<summary class="ws-news-collapsed-summary">` +
     `<span class="ws-news-collapsed-version">${label}${newBadge}</span>${when}` +
     `</summary>` +
-    `<div class="news-body">${renderReleaseBody(r.body)}</div>${newsItemFoot(r.url)}` +
+    `<div class="news-body">${renderReleaseBody(stripReleaseNotesPreamble(r.body))}</div>${newsItemFoot(r.url)}` +
     `</details>`
   );
 }

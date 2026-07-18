@@ -13,6 +13,267 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const es: Partial<Record<TranslationKey, string>> = {
+  'hud.combat.floatingParry': 'Parada',
+  'hud.combat.parried': 'Tu {ability} es parada por {target}.',
+  'hud.pet.waterJet': 'Chorro de Agua',
+  'hud.pet.waterJetDesc':
+    'Ordena a tu Elemental de Agua que canalice un chorro ralentizador durante 3 segundos. Tiempo de reutilización: 8 segundos. Haz clic derecho para lanzarlo automáticamente cada vez que esté disponible.',
+  'hud.pet.waterJetTitle': 'Chorro de Agua',
+  'hud.prompts.acceptResurrection': 'Aceptar Resurrección',
+  'hud.prompts.resurrectionOffer': '{name} quiere devolverte a la vida. ¿Aceptas?',
+  'itemUi.stats.parry': 'Parada',
+  'apiError.wallet.handoff_invalid':
+    'La autorización de la cartera ha caducado o no se ha podido verificar. Inténtalo de nuevo.',
+  'cardDuel.close': 'Cerrar',
+  'cardDuel.counts': 'Mazo: {deck} · Descarte: {discard}',
+  'cardDuel.forfeit': 'Rendirse',
+  'cardDuel.forfeitAria': 'Rendirse en el Duelo de Cartas',
+  'cardDuel.join': 'Unirse a la cola',
+  'cardDuel.joinAria': 'Unirse a la cola del Duelo de Cartas',
+  'cardDuel.leave': 'Abandonar la cola',
+  'cardDuel.leaveAria': 'Abandonar la cola del Duelo de Cartas',
+  'cardDuel.playCardAria': 'Jugar la carta {value}',
+  'cardDuel.queued': 'Buscando rival...',
+  'cardDuel.round': 'Puntuación de la ronda: {mine} - {theirs}',
+  'cardDuel.title': 'Duelo de Cartas',
+  'cardDuel.unavailable': 'El Duelo de Cartas requiere otro jugador en línea.',
+  'cardDuel.vsOpponent': 'contra {name}',
+  'cardDuel.waitingOnOpponent': 'Esperando la carta de tu rival...',
+  'cardDuel.yourTurn': 'Juega una carta',
+  'entities.abilities.arcane_surge.description':
+    'Canaliza un impulso de éter bruto a través del enemigo, causando {damage} de daño. Cada lanzamiento acumula una Carga Arcana que aumenta el daño y la velocidad de lanzamiento del siguiente Impulso de Éter (un 5% más rápido por carga) pero eleva considerablemente su coste de maná, acumulando hasta 4 cargas; Dardos de Éter gasta las cargas. Cada lanzamiento también puede activar Ímpetu de Éter, haciendo que tu siguiente Impulso de Éter sea gratuito y el doble de rápido.',
+  'entities.abilities.arcane_surge.name': 'Impulso de Éter',
+  'entities.abilities.blizzard.description':
+    'Desata una tormenta de hielo sobre el área objetivo durante 6 s, causando {damage} de daño de Escarcha por segundo y ralentizando a los enemigos un 40%. Cada enemigo golpeado reduce en 0,5 s el tiempo restante del Orbe Helado, hasta un máximo de 3 s por lanzamiento. (Escarcha)',
+  'entities.abilities.blizzard.name': 'Blizzard',
+  'entities.abilities.brain_freeze.description':
+    'Lanza de Escarcha tiene un 20% de probabilidad de hacer que tu siguiente Winterlash sea instantáneo, golpee un 30% más fuerte y esté libre de su tiempo de reutilización. (Escarcha)',
+  'entities.abilities.brain_freeze.name': 'Brain Freeze',
+  'entities.abilities.dragons_breath.description':
+    'Mantén pulsado para concentrar un aliento de llamas cada vez más amplio, luego suéltalo en un cono. Las concentraciones más largas alcanzan más lejos e infligen más daño. Los enemigos golpeados quedan desorientados y el daño rompe el efecto; la concentración máxima siempre es un golpe crítico y cuenta una vez hacia Buena Racha. (Fuego)',
+  'entities.abilities.dragons_breath.name': "Dragon's Breath",
+  'entities.abilities.fingers_of_frost.description':
+    'Lanza de Escarcha tiene un 15% de probabilidad de otorgar Fingers of Frost, hasta 2 cargas: tu siguiente Lanza de Hielo trata al objetivo como si estuviera congelado. (Escarcha)',
+  'entities.abilities.fingers_of_frost.name': 'Fingers of Frost',
+  'entities.abilities.fireball_form.description':
+    'Te transformas en una brasa ardiente, aumentando la velocidad de movimiento un {buff}%. No puedes atacar ni lanzar hechizos mientras estás transformado. Vuelve a lanzar la habilidad para recuperar tu forma normal.',
+  'entities.abilities.fireball_form.name': 'Forma de Brasa',
+  'entities.abilities.flurry.description':
+    'Lanza tres proyectiles de hielo que causan {damage} de daño de Escarcha cada uno y aplican Frío Invernal al objetivo: sus próximos 2 hechizos compatibles lo tratan como congelado. Brain Freeze hace que Winterlash sea instantáneo, golpee un 30% más fuerte y omita su tiempo de reutilización. (Escarcha)',
+  'entities.abilities.flurry.name': 'Winterlash',
+  'entities.abilities.frozen_orb.description':
+    'Lanza un orbe de escarcha arremolinada que avanza durante 8 s, causando {damage} de daño de Escarcha por segundo a los enemigos cercanos y ralentizándolos un 30%. Sus golpes generan Fingers of Frost. (Escarcha)',
+  'entities.abilities.frozen_orb.name': 'Frozen Orb',
+  'entities.abilities.glacial_front.description':
+    'Mantén pulsado para concentrar un frente de escarcha cada vez más amplio, luego suéltalo en un cono. Las concentraciones más largas alcanzan más lejos e infligen más daño. Cada enemigo golpeado queda ralentizado un 50% durante 4 s; la concentración máxima también los inmoviliza durante 1 s. (Escarcha)',
+  'entities.abilities.glacial_front.name': 'Frente Glacial',
+  'entities.abilities.glacial_spike.description':
+    'Conjura una enorme espiga de hielo, consumiendo 5 Carámbanos para causar {damage} de daño de Escarcha e inmovilizar al objetivo durante 4 s. (Escarcha)',
+  'entities.abilities.glacial_spike.name': 'Espiga Glacial',
+  'entities.abilities.ice_lance.description':
+    'Lanza un fragmento de hielo que causa {damage} de daño de Escarcha, triplicado contra un objetivo congelado. Gasta Fingers of Frost o una carga de Frío Invernal para tratar al objetivo como congelado. (Escarcha)',
+  'entities.abilities.ice_lance.name': 'Ice Lance',
+  'entities.abilities.shatter.description':
+    'Tus hechizos ganan un 50% de probabilidad de golpe crítico contra objetivos congelados, y esos críticos causan un 20% más de daño. Fingers of Frost y Frío Invernal cuentan como congelado. (Escarcha)',
+  'entities.abilities.shatter.name': 'Ruina Quebradiza',
+  'entities.abilities.temporal_acceleration.description':
+    'Acelera el flujo del tiempo para tu grupo o banda, aumentando la velocidad de ataque, lanzamiento y canalización un 30% durante 15 s. Los aliados afectados recientemente por Aceleración Temporal o Tambores de Guerra están demasiado agotados para beneficiarse. (Cronomancia)',
+  'entities.abilities.temporal_acceleration.name': 'Aceleración Temporal',
+  'entities.abilities.temporal_cascade.description':
+    'Envía un eco en cascada por tu grupo: el objetivo y hasta cuatro de sus aliados más cercanos son sanados a la vez y quedan marcados durante {duration} s, convirtiendo parte del daño Arcano que causas en sanación a través de sus ecos. (Cronomancia)',
+  'entities.abilities.temporal_cascade.name': 'Cascada Temporal',
+  'entities.abilities.temporal_reversal.description':
+    'Rebobina la línea temporal de un aliado caído, devolviéndolo a la vida junto a su cuerpo con una parte de su salud y maná, incluso en pleno combate. (Cronomancia)',
+  'entities.abilities.temporal_reversal.name': 'Inversión Temporal',
+  'entities.abilities.temporal_rewind.description':
+    'Envía una onda arcana por tu grupo o banda, rebobinando el tiempo para restaurar el 30% del daño que cada aliado en un radio de 40 yardas sufrió durante los últimos 5 segundos (hasta el 35% de su salud máxima). No puede ser un efecto crítico. (Cronomancia)',
+  'entities.abilities.temporal_rewind.name': 'Rewind',
+  'entities.npcs.card_master.greeting':
+    '¿Un Duelo de Cartas? Al mejor de tres; el ganador se lleva los derechos de presumir.',
+  'entities.npcs.card_master.name': 'Maestro de Cartas',
+  'entities.npcs.card_master.title': 'Repartidor del Azar',
+  'entities.quests.q_archetype_acceptance.completion':
+    'La promesa se mantiene. Estos dos oficios son ahora tus especializaciones principales, y el conocimiento contrario a ellos pasa a ser tu afición.',
+  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Veta de mineral extraída',
+  'entities.quests.q_archetype_acceptance.text':
+    'La destreza es conocimiento, {playerName}, pero la sintonización es una promesa. Elige dos oficios vecinos cuyos métodos llevarás como especializaciones principales, luego tráeme mineral trabajado del Valle con tus propias manos.',
+  'entities.quests.q_prof_hobby_switch.completion':
+    'Una elección más ligera, pero útil. Sigue esa curiosidad tan lejos como las obras de calidad rara te lleven.',
+  'entities.quests.q_prof_hobby_switch.objectives.0.label': 'Mata de hierba recolectada',
+  'entities.quests.q_prof_hobby_switch.text':
+    'Las especializaciones principales exigen un voto. Una afición solo pregunta hacia dónde vaga tu curiosidad, {playerName}. Recoge algunas hierbas y decide qué oficio, contrario a tus especializaciones principales, quieres desarrollar.',
+  'entities.quests.q_prof_hobby_switch.title': 'Un Pasatiempo Diferente',
+  'entities.quests.q_prof_intro.completion':
+    '¿Lo ves? Mineral recogido y callos en las manos. Sigue con la minería, la tala y la herboristería mientras recorres los caminos, y cuando estés de vuelta en el pueblo, fíjate en el Tablón de Enfoque junto al mercado y el banco de artesanía cercano. Hay un trato justo en cada parte, si lo quieres.',
+  'entities.quests.q_prof_intro.objectives.0.label': 'Veta de mineral extraída',
+  'entities.quests.q_prof_intro.text':
+    'Cada alma en Eastbrook trabaja un oficio además de la espada, {playerName}. Hay vetas de mineral en las rocas alrededor de la Excavación de Cobre, al suroeste del pueblo. Ve a golpear con el pico y trabaja 5 de ellas tú mismo; lo sabré.',
+  'entities.quests.q_prof_make_amends.completion':
+    'El ritmo antiguo regresa. Tu anterior par de oficios está activo de nuevo.',
+  'entities.quests.q_prof_make_amends.text':
+    'Ya has llevado antes ese par, {playerName}. Volver no es un voto nuevo. Ayuda a mantener despejado el camino del Valle, y el trabajo recordará a tus manos lo que una vez supieron.',
+  'gpuNotice.bodyDesktop':
+    'El juego se ejecuta sin aceleración de GPU y será lento. Actualiza los controladores de gráficos y reinicia el juego. En Windows, establece también el juego como Alto rendimiento en Configuración > Sistema > Pantalla > Gráficos.',
+  'gpuNotice.bodyWeb':
+    'El juego se ejecuta sin aceleración de GPU y será lento. Activa la aceleración de hardware en los ajustes del navegador, actualiza los controladores de gráficos y reinicia el navegador.',
+  'gpuNotice.dismiss': 'Cerrar',
+  'guide.abilityHook.blink':
+    'Te teletransporta una corta distancia hacia adelante, rompiendo los efectos de inmovilización al salir.',
+  'guide.abilityHook.blizzard':
+    'Cubre un área de hielo para desgastar y ralentizar a grupos enteros de enemigos.',
+  'guide.abilityHook.brain_freeze':
+    'Tus proyectiles de escarcha hacen a veces que el siguiente Winterlash sea instantáneo y golpee más fuerte.',
+  'guide.abilityHook.fingers_of_frost':
+    'Tus proyectiles de escarcha potencian a veces una Ice Lance para golpear como si el objetivo estuviera congelado.',
+  'guide.abilityHook.fireball_form':
+    'Conviértete en una brasa viviente para cruzar terreno abierto a gran velocidad.',
+  'guide.abilityHook.flurry':
+    'Tres proyectiles rápidos que enfrían al objetivo para que tus próximos golpes de escarcha impacten como si estuviera congelado.',
+  'guide.abilityHook.frozen_orb':
+    'Lanza un orbe lento por el grupo que enfría a cada enemigo y alimenta tus activaciones de escarcha.',
+  'guide.abilityHook.ice_lance':
+    'Un fragmento instantáneo para gastar activaciones de escarcha; golpea mucho más fuerte sobre un objetivo congelado.',
+  'guide.abilityHook.shatter':
+    'Tus hechizos causan golpes críticos con mucha más frecuencia contra objetivos congelados.',
+  'guide.deedsPage.renownBody':
+    'El Renombre es la puntuación detrás del Libro. Cada gesta que consigues vale una cantidad fija, y tu total solo sube, así que una semana tranquila nunca te hace perder terreno. Un puñado de gestas dependen de la suerte más que de la habilidad, y las Proezas son un honor propio, por lo que ninguna de las dos categorías otorga Renombre. Las gestas sin Renombre siguen contando para la consecución en tu Libro; simplemente no puntúan.',
+  'guide.deedsPage.standingsNote':
+    'Los reinos llevan un recuento continuo de Renombre entre cuentas: la tabla clasifica cuentas completas por Renombre acumulado, contando cada gesta una vez entre todos tus personajes, y muestra solo el Renombre, por lo que las gestas que no lo otorgan nunca mueven la clasificación aunque cuenten en tu Libro. Para ver quién ocupa qué posición, abre la Tabla de Clasificación dentro del juego y dirígete a su pestaña de Renombre; la clasificación vive allí, no en la wiki.',
+  'hudChrome.archetypePair.alchemy+cooking': 'Boticario',
+  'hudChrome.archetypePair.armorcrafting+engineering': 'Mecanoforjador',
+  'hudChrome.archetypePair.cooking+leatherworking': 'Trampero',
+  'hudChrome.archetypePair.enchanting+jewelcrafting': 'Gemoencantador',
+  'hudChrome.archetypePair.engineering+alchemy': 'Bombardero',
+  'hudChrome.archetypePair.inscription+enchanting': 'Arcanista',
+  'hudChrome.archetypePair.jewelcrafting+weaponcrafting': 'Forjajoyero',
+  'hudChrome.archetypePair.leatherworking+tailoring': 'Pertrechador',
+  'hudChrome.archetypePair.tailoring+inscription': 'Tejedormago',
+  'hudChrome.archetypePair.weaponcrafting+armorcrafting': 'Herrero',
+  'hudChrome.auraEffect.dmgDone': 'Aumenta el daño infligido un {pct}%',
+  'hudChrome.auraEffect.dmgDoneReduce': 'Reduce el daño infligido un {pct}%',
+  'hudChrome.auraEffect.elementalConvergencePrimed':
+    'Tu próximo hechizo de la otra escuela elemental otorga Convergencia Elemental',
+  'hudChrome.auraEffect.formFireball':
+    'Forma de Brasa: velocidad de movimiento aumentada un {pct}%; ataques y hechizos desactivados',
+  'hudChrome.auraEffect.heatingUp':
+    'Tu siguiente golpe crítico consecutivo de Fuego activa Buena Racha; un golpe no crítico elimina Calentando Motores',
+  'hudChrome.craftName.alchemy': 'Alquimia',
+  'hudChrome.craftName.armorcrafting': 'Forja de armaduras',
+  'hudChrome.craftName.cooking': 'Cocina',
+  'hudChrome.craftName.enchanting': 'Encantamiento',
+  'hudChrome.craftName.engineering': 'Ingeniería',
+  'hudChrome.craftName.inscription': 'Inscripción',
+  'hudChrome.craftName.jewelcrafting': 'Joyería',
+  'hudChrome.craftName.leatherworking': 'Peletería',
+  'hudChrome.craftName.tailoring': 'Sastrería',
+  'hudChrome.craftName.weaponcrafting': 'Forja de armas',
+  'hudChrome.crafting.attunementPreview':
+    'Resultado: título {title}; {majorA} y {majorB} se convierten en especializaciones principales sin límite; {hobby} pasa a ser la afición con tope de calidad rara; el resto del conocimiento se conserva pero queda limitado a común mientras está inactivo.',
+  'hudChrome.crafting.comboMet': 'Listo.',
+  'hudChrome.crafting.comboNotAttuned': 'Elige primero un par de arquetipo.',
+  'hudChrome.crafting.comboRequires': 'Sintonización: {craftA} + {craftB}, nivel {tier}.',
+  'hudChrome.crafting.comboSyncing': 'Comprobando la sintonización del reino.',
+  'hudChrome.crafting.comboTierUnmet':
+    'Eleva ambas especializaciones principales al nivel requerido.',
+  'hudChrome.crafting.comboWrongPair': 'Activa este par exacto para fabricarlo.',
+  'hudChrome.crafting.hobbyPreview':
+    'Resultado: {hobby} pasa a ser la afición con tope de calidad rara. Ambas especializaciones principales y los valores de habilidad conservados no cambian.',
+  'hudChrome.crafting.identity.ceilingCommon': 'Tope de calidad común',
+  'hudChrome.crafting.identity.ceilingRare': 'Tope de calidad rara',
+  'hudChrome.crafting.identity.ceilingUnlimited': 'Sin tope de mejora',
+  'hudChrome.crafting.identity.colCap': 'Tope',
+  'hudChrome.crafting.identity.colCraft': 'Oficio',
+  'hudChrome.crafting.identity.colRole': 'Función',
+  'hudChrome.crafting.identity.colSkill': 'Habilidad',
+  'hudChrome.crafting.identity.dormantKnowledge':
+    'El conocimiento de {craft} se conserva pero está inactivo hasta que su par o afición estén activos.',
+  'hudChrome.crafting.identity.history':
+    '{pairs} pares descubiertos, {returns} regresos completados',
+  'hudChrome.crafting.identity.historyLabel': 'Historial',
+  'hudChrome.crafting.identity.hobbyLabel': 'Afición',
+  'hudChrome.crafting.identity.majorsLabel': 'Especializaciones principales',
+  'hudChrome.crafting.identity.nearTier':
+    '{craft} está a {points} puntos de habilidad de su próximo nivel.',
+  'hudChrome.crafting.identity.roleDormant': 'Conocimiento inactivo',
+  'hudChrome.crafting.identity.roleHobby': 'Afición',
+  'hudChrome.crafting.identity.roleMajor': 'Principal',
+  'hudChrome.crafting.identity.roleUnattuned': 'Sin sintonizar',
+  'hudChrome.crafting.identity.skillAria':
+    '{craft}, habilidad {skill}, nivel {tier}, {role}, {ceiling}',
+  'hudChrome.crafting.identity.syncing': 'Esperando tu identidad de artesanía del reino.',
+  'hudChrome.crafting.identity.title': 'Identidad de Artesanía',
+  'hudChrome.crafting.identity.titleLabel': 'Título',
+  'hudChrome.crafting.identity.tutorial':
+    'Primer nivel: alcanza la habilidad {skill} en un oficio. Las recetas completadas con éxito aumentan ese oficio sin borrar el conocimiento en otras áreas.',
+  'hudChrome.crafting.identity.unattuned':
+    'No hay ningún par de arquetipo activo. Tu conocimiento se conserva, pero las recetas combinadas requieren un par sintonizado.',
+  'hudChrome.crafting.noProfessionChoice':
+    'No hay ninguna elección de profesión válida disponible en este momento.',
+  'hudChrome.crafting.pairOptionLabel': '{pair} ({craftA} + {craftB})',
+  'hudChrome.crafting.professionChoice': 'Elección de profesión',
+  'hudChrome.deeds.lbScopeNote':
+    'Cuentas clasificadas por Renombre acumulado. Cada gesta cuenta una vez entre todos los personajes de una cuenta.',
+  'hudChrome.deeds.lbSelfAccount':
+    'Tu cuenta: posición {rank}, entre el {percent}% superior, {renown} de Renombre',
+  'hudChrome.deeds.lbSelfRank': 'Tu cuenta: posición {rank}, entre el {percent}% superior',
+  'hudChrome.nameplate.mobEliteLevel': '{level}+',
+  'hudChrome.nameplate.mobLevel': '{level}',
+  'hudChrome.specPanel.specUnlockBanner': '¡Especialización Desbloqueada!',
+  'hudChrome.specPanel.specUnlockHint': 'Pulsa N para elegir tu especialización.',
+  'hudChrome.wocStore.wallet.connect': 'Conectar cartera',
+  'hudChrome.wocStore.wallet.connectedUnlinked':
+    'La aplicación de cartera está conectada a este navegador, pero su dirección pública aún no está vinculada a tu cuenta de WoC.',
+  'hudChrome.wocStore.wallet.linkedConnected':
+    'Tu aplicación de cartera vinculada está conectada y lista para compras con SOL o WOC.',
+  'hudChrome.wocStore.wallet.linkedDisconnected':
+    'Tu dirección pública está vinculada. Vuelve a conectar esa aplicación de cartera cuando quieras pagar con SOL o WOC.',
+  'hudChrome.wocStore.wallet.manage': 'Gestionar cartera',
+  'hudChrome.wocStore.wallet.mismatched':
+    'Hay una cartera diferente conectada. Verifícala para reemplazar la dirección vinculada, o vuelve a conectar la cartera vinculada.',
+  'hudChrome.wocStore.wallet.reconnect': 'Volver a conectar cartera',
+  'hudChrome.wocStore.wallet.title': 'Cartera de Solana',
+  'hudChrome.wocStore.wallet.unlinked':
+    'Conecta una aplicación de cartera y firma una vez para vincular su dirección pública a tu cuenta de WoC. Nunca recibimos tu frase de recuperación ni tu clave privada.',
+  'hudChrome.wocStore.wallet.verify': 'Verificar y vincular',
+  'wallet.bagConnect': 'Vincular cartera',
+  'wallet.bagLink': 'Verificar cartera',
+  'wallet.bagReconnect': 'Volver a conectar cartera',
+  'wallet.browser.completeBody':
+    'Puedes volver a la aplicación de escritorio de World of ClaudeCraft.',
+  'wallet.browser.completeTitle': 'Autorización de cartera completada',
+  'wallet.browser.continueWith': 'Continuar con {wallet}',
+  'wallet.browser.extensionHelp':
+    'No se encontró ninguna extensión de cartera compatible. Instala o desbloquea Phantom, Solflare u otra cartera de Solana para el navegador, luego vuelve a intentarlo.',
+  'wallet.browser.eyebrow': 'Autorización de cartera de escritorio',
+  'wallet.browser.failed':
+    'La autorización de la cartera falló o caducó. Vuelve a la aplicación de escritorio e inténtalo de nuevo.',
+  'wallet.browser.linkBody':
+    'Elige una extensión de cartera en este navegador. Firmarás un mensaje de verificación y luego volverás a la aplicación de escritorio.',
+  'wallet.browser.paymentBody':
+    'Elige la cartera vinculada a tu cuenta y aprueba la transacción en este navegador.',
+  'wallet.browser.retry': 'Reintentar',
+  'wallet.browser.returnButton': 'Volver a la aplicación de escritorio',
+  'wallet.browser.reviewBody':
+    'Sigue el mensaje de {wallet}. Mantén esta página del navegador abierta.',
+  'wallet.browser.reviewTitle': 'Revisar en tu cartera',
+  'wallet.browser.safety':
+    'World of ClaudeCraft nunca solicita tu frase de recuperación ni tu clave privada.',
+  'wallet.browser.title': 'Conectar una Cartera de Solana',
+  'wallet.manualReturnBrowserHelp':
+    'Tras la aprobación, vuelve a esta pestaña del juego. Si iOS abre otro navegador, ciérralo y regresa manualmente al navegador original.',
+  'wallet.manualReturnStandaloneHelp':
+    'Tras la aprobación, vuelve a World of ClaudeCraft desde tu pantalla de inicio. Si iOS abre un navegador, ciérralo y vuelve a abrir la aplicación de la pantalla de inicio manualmente.',
+  'wallet.mobileAppHelp':
+    'Elige Phantom o Solflare. Tu aplicación de cartera pedirá aprobación. Mantén este juego abierto y vuelve a él cuando termines.',
+  'wallet.openAppButton': 'Abrir {wallet}',
+  'wallet.openAppHelp':
+    'Abre {wallet} para revisar esta solicitud. Mantén esta pestaña del juego abierta mientras la aplicación de cartera esté activa.',
+  'wallet.openAppTitle': 'Continuar en {wallet}',
+  'wallet.preparingAppButton': 'Preparando {wallet}...',
+  'wallet.standaloneAppHelp':
+    'Las conexiones de cartera aún no están disponibles en la aplicación de la pantalla de inicio. Abre World of ClaudeCraft en Safari o Chrome para usar Phantom o Solflare.',
+  'wallet.walletAppUnavailable':
+    'No se pudo preparar {wallet}. Cierra esta ventana e inténtalo de nuevo.',
   'entities.abilities.primal_reflexes.description':
     'Tus instintos se agudizan, aumentando tu probabilidad de esquivar un 50% durante 6 segundos.',
   'entities.abilities.primal_reflexes.name': 'Reflejos Primigenios',

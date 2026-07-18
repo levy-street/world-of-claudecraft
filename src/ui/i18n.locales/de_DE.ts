@@ -13,6 +13,290 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const de_DE: Partial<Record<TranslationKey, string>> = {
+  'hud.combat.floatingParry': 'Pariert',
+  'hud.combat.parried': 'Deine {ability} wird von {target} pariert.',
+  'hud.pet.waterJet': 'Wasserstrahl',
+  'hud.pet.waterJetDesc':
+    'Befiehlt deinem Wasserelementar, 3 Sek. lang einen verlangsamenden Strahl zu kanalisieren. 8 Sek. Abklingzeit. Rechtsklick, um ihn automatisch einzusetzen, sobald er verfügbar ist.',
+  'hud.pet.waterJetTitle': 'Wasserstrahl',
+  'hud.prompts.acceptResurrection': 'Auferstehung annehmen',
+  'hud.prompts.resurrectionOffer': '{name} möchte dich ins Leben zurückrufen. Nimmst du an?',
+  'itemUi.stats.parry': 'Parieren',
+  'apiError.wallet.handoff_invalid':
+    'Diese Wallet-Autorisierung ist abgelaufen oder konnte nicht verifiziert werden. Bitte versuche es erneut.',
+  'cardDuel.close': 'Schließen',
+  'cardDuel.counts': 'Deck: {deck} · Ablagestapel: {discard}',
+  'cardDuel.forfeit': 'Aufgeben',
+  'cardDuel.forfeitAria': 'Den Kartenkampf aufgeben',
+  'cardDuel.join': 'Warteschlange beitreten',
+  'cardDuel.joinAria': 'Der Warteschlange für den Kartenkampf beitreten',
+  'cardDuel.leave': 'Warteschlange verlassen',
+  'cardDuel.leaveAria': 'Die Warteschlange für den Kartenkampf verlassen',
+  'cardDuel.playCardAria': 'Die Karte {value} ausspielen',
+  'cardDuel.queued': 'Warte auf einen Gegner...',
+  'cardDuel.round': 'Rundenpunkte: {mine} - {theirs}',
+  'cardDuel.title': 'Kartenkampf',
+  'cardDuel.unavailable': 'Für den Kartenkampf wird ein weiterer Online-Spieler benötigt.',
+  'cardDuel.vsOpponent': 'gegen {name}',
+  'cardDuel.waitingOnOpponent': 'Warte auf die Karte deines Gegners...',
+  'cardDuel.yourTurn': 'Karte ausspielen',
+  'entities.abilities.arcane_surge.description':
+    'Zieht eine Woge rohen Äthers durch den Feind und verursacht {damage} Schaden. Jeder Einsatz hinterlässt eine Arkane Ladung, die Schaden und Zaubertempo des nächsten Aether Surge erhöhen (jeweils 5% schneller), aber seine Manakosten stark erhöht, bis zu 4 Stapel; Aether-Pfeile verbraucht die Ladungen. Jeder Einsatz kann außerdem Ätheransturm auslösen, sodass dein nächster Aether Surge kostenlos und doppelt so schnell ist.',
+  'entities.abilities.arcane_surge.name': 'Aether Surge',
+  'entities.abilities.blizzard.description':
+    'Ruft 6 Sek. lang einen Eissturm auf das Zielgebiet, der pro Sekunde {damage} Frostschaden verursacht und Feinde um 40% verlangsamt. Jeder getroffene Feind verkürzt Frozen Orb um 0,5 Sek., bis zu 3 Sek. pro Einsatz. (Frost)',
+  'entities.abilities.blizzard.name': 'Blizzard',
+  'entities.abilities.brain_freeze.description':
+    'Rimelance hat eine 20% Chance, deinen nächsten Winterlash sofort, 30% stärker und ohne Abklingzeit werden zu lassen. (Frost)',
+  'entities.abilities.brain_freeze.name': 'Brain Freeze',
+  'entities.abilities.dragons_breath.description':
+    'Halte gedrückt, um einen sich ausbreitenden Flammenodem aufzuladen, und lass ihn dann als Kegel los. Längere Aufladungen reichen weiter und verursachen mehr Schaden. Getroffene Feinde werden desorientiert, und Schaden bricht den Effekt; maximale Aufladung trifft immer kritisch und zählt einmal für Heiße Serie. (Feuer)',
+  'entities.abilities.dragons_breath.name': "Dragon's Breath",
+  'entities.abilities.fingers_of_frost.description':
+    'Rimelance hat eine 15% Chance, Fingers of Frost zu gewähren, bis zu 2 Ladungen: dein nächstes Ice Lance behandelt das Ziel als eingefroren. (Frost)',
+  'entities.abilities.fingers_of_frost.name': 'Fingers of Frost',
+  'entities.abilities.fireball_form.description':
+    'Verwandelt dich in eine lodernde Glut und erhöht die Bewegungsgeschwindigkeit um {buff}%. Während der Verwandlung kannst du weder angreifen noch Zauber wirken. Erneut wirken, um zur normalen Gestalt zurückzukehren.',
+  'entities.abilities.fireball_form.name': 'Glutgestalt',
+  'entities.abilities.flurry.description':
+    'Schießt drei eisige Geschosse ab, die jeweils {damage} Frostschaden verursachen, und legt Winterskälte auf das Ziel: dessen nächste 2 eintreffende kompatible Zauber behandeln es als eingefroren. Brain Freeze macht Winterlash sofort, 30% stärker und lässt seine Abklingzeit entfallen. (Frost)',
+  'entities.abilities.flurry.name': 'Winterlash',
+  'entities.abilities.frozen_orb.description':
+    'Entfesselt eine Kugel wirbelnden Frosts, die 8 Sek. lang vorwärtsdriftet, nahegelegenen Feinden pro Sekunde {damage} Frostschaden zufügt und sie um 30% verlangsamt. Ihre Treffer erzeugen Fingers of Frost. (Frost)',
+  'entities.abilities.frozen_orb.name': 'Frozen Orb',
+  'entities.abilities.glacial_front.description':
+    'Halte gedrückt, um eine sich ausbreitende Frostfront aufzuladen, und lass sie dann als Kegel los. Längere Aufladungen reichen weiter und verursachen mehr Schaden. Alle getroffenen Feinde werden 4 Sek. lang um 50% verlangsamt; maximale Aufladung verwurzelt sie zusätzlich 1 Sek. lang. (Frost)',
+  'entities.abilities.glacial_front.name': 'Glacial Front',
+  'entities.abilities.glacial_spike.description':
+    'Beschwört einen mächtigen Eiszapfen und verbraucht 5 Eiszapfen, um {damage} Frostschaden zu verursachen und das Ziel 4 Sek. lang einzufrieren. (Frost)',
+  'entities.abilities.glacial_spike.name': 'Glacial Spike',
+  'entities.abilities.ice_lance.description':
+    'Schleudert einen Eissplitter und verursacht {damage} Frostschaden, dreifach gegen ein eingefrorenes Ziel. Verbraucht Fingers of Frost oder eine Ladung Winterskälte, um das Ziel als eingefroren zu behandeln. (Frost)',
+  'entities.abilities.ice_lance.name': 'Ice Lance',
+  'entities.abilities.perfect_moment.description':
+    'Nutze deinen perfekten Moment: Gewinne sofort 4 Arkane Ladungen, und für 10 Sek. verbraucht Aether-Pfeile diese nicht. (Chronomantie)',
+  'entities.abilities.perfect_moment.name': 'Perfect Moment',
+  'entities.abilities.shatter.description':
+    'Deine Zauber erhalten 50% kritische Trefferchance gegen eingefrorene Ziele, und diese kritischen Treffer verursachen 20% mehr Schaden. Fingers of Frost und Winterskälte zählen als eingefroren. (Frost)',
+  'entities.abilities.shatter.name': 'Brittle Ruin',
+  'entities.abilities.temporal_acceleration.description':
+    'Beschleunigt den Zeitfluss für deine Gruppe oder deinen Schlachtzug und erhöht Angriffs-, Zauber- und Kanalisierungsgeschwindigkeit 15 Sek. lang um 30%. Verbündete, die kürzlich von Temporaler Beschleunigung oder Kriegstrommeln betroffen waren, sind zu erschöpft, um davon zu profitieren. (Chronomantie)',
+  'entities.abilities.temporal_acceleration.name': 'Temporale Beschleunigung',
+  'entities.abilities.temporal_barrier.description':
+    'Versetzt das Ziel um einen Herzschlag aus der Gegenwart; eine zeitliche Hülle absorbiert 10 Sek. lang {damage} Schaden, bevor der Zeitstrang zurückschnappt.',
+  'entities.abilities.temporal_barrier.name': 'Temporale Barriere',
+  'entities.abilities.temporal_cascade.description':
+    'Sendet ein Echo durch deine Gruppe: Das Ziel und bis zu vier seiner nächsten Verbündeten werden sofort geheilt und jeweils {duration} Sek. lang markiert, wodurch ein Teil des Arkanen Schadens, den du verursachst, durch ihre Echos zurückgeleitet wird und sie heilt. (Chronomantie)',
+  'entities.abilities.temporal_cascade.name': 'Temporale Kaskade',
+  'entities.abilities.temporal_echo.description':
+    'Markiert einen Verbündeten mit dem Echo eines gesünderen Augenblicks und heilt sofort {damage} Gesundheit. Für {duration} Sek. wird ein Teil des Arkanen Schadens, den du verursachst, durch das Echo zurückgeleitet und heilt ihn.',
+  'entities.abilities.temporal_echo.name': 'Temporales Echo',
+  'entities.abilities.temporal_hourglass.description':
+    'Platziert eine temporale Sanduhr am gewählten Ort. Unter einem Feind suspendiert sie diesen im PvE für {hostilePveDuration} Sek. oder im PvP für {hostilePvpDuration} Sek. und verhindert alle Aktionen; Schaden bricht den Effekt. Unter deinen Füßen oder unter einem Gruppenverbündeten gewährt sie {duration} Sek. lang Stasis, verhindert Schaden und Aktionen, stellt {healing}% der maximalen Gesundheit wieder her und lässt Abklingzeiten {selfCooldownRecovery}% schneller für dich oder {allyCooldownRecovery}% schneller für einen Verbündeten regenerieren. Auf leerem Boden wartet die Sanduhr {groundDuration} Sek. und wirkt auf die erste gültige Einheit, die sie betritt. Der vorteilhafte Effekt kann manuell entfernt werden.',
+  'entities.abilities.temporal_hourglass.name': 'Sanduhr der Schwebe',
+  'entities.abilities.temporal_mend.description':
+    'Zieht einen Verbündeten einen Moment in die Zukunft und heilt {damage} Gesundheit, während der Körper in sein gesünderes zukünftiges Selbst eingeht. (Chronomantie-Signatur)',
+  'entities.abilities.temporal_mend.name': 'Temporale Heilung',
+  'entities.abilities.temporal_reversal.description':
+    'Spult den Zeitstrang eines gefallenen Verbündeten zurück und erweckt ihn an seinem Körper mit einem Teil seiner Gesundheit und seines Manas, selbst mitten im Kampf. (Chronomantie)',
+  'entities.abilities.temporal_reversal.name': 'Temporale Umkehr',
+  'entities.abilities.temporal_rewind.description':
+    'Sendet eine arkane Welle durch deine Gruppe oder deinen Schlachtzug und dreht die Zeit zurück, um 30% des Schadens wiederherzustellen, den jeder Verbündete innerhalb von 40 Metern in den letzten 5 Sekunden erlitten hat (bis zu 35% seiner maximalen Gesundheit). Kann kein kritischer Effekt sein. (Chronomantie)',
+  'entities.abilities.temporal_rewind.name': 'Rewind',
+  'entities.npcs.card_master.greeting':
+    'Lust auf einen Kartenkampf? Wer zwei von drei Runden gewinnt, darf sich brüsten.',
+  'entities.npcs.card_master.name': 'Kartenmeister',
+  'entities.npcs.card_master.title': 'Händler des Zufalls',
+  'entities.quests.q_archetype_acceptance.completion':
+    'Das Versprechen gilt. Diese beiden Handwerke sind nun deine Hauptberufe, und das Wissen auf der anderen Seite wird zu deinem Hobby.',
+  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Erzader abgebaut',
+  'entities.quests.q_archetype_acceptance.text':
+    'Können ist Wissen, {playerName}, doch Abstimmung ist ein Versprechen. Wähle zwei benachbarte Handwerke, deren Methoden du als deine Hauptberufe trägst, und bring mir dann Erz, das du im Tal mit eigenen Händen bearbeitet hast.',
+  'entities.quests.q_prof_hobby_switch.completion':
+    'Eine leichtere Wahl, aber eine nützliche. Folge dieser Neugier, so weit sie seltene Arbeit trägt.',
+  'entities.quests.q_prof_hobby_switch.objectives.0.label': 'Kräuterpflanze geerntet',
+  'entities.quests.q_prof_hobby_switch.text':
+    'Hauptberufe erfordern ein Gelöbnis. Ein Hobby fragt nur, wohin deine Neugier wandert, {playerName}. Sammle ein paar Kräuter und entscheide, welches Handwerk dem deiner Hauptberufe gegenüber du verfolgen möchtest.',
+  'entities.quests.q_prof_hobby_switch.title': 'Eine andere Freizeitbeschäftigung',
+  'entities.quests.q_prof_intro.completion':
+    'Siehst du? Erz gesammelt und Schwielen an den Händen. Betreibe Bergbau, Holzfällen und Kräutersammeln weiter auf deinen Reisen, und wenn du wieder in der Stadt bist, schau auf das Stadtfokus-Brett beim Markt und die Werkbank in der Nähe. Da steckt ein fairer Handel drin, wenn du ihn willst.',
+  'entities.quests.q_prof_intro.objectives.0.label': 'Erzader abgebaut',
+  'entities.quests.q_prof_intro.text':
+    'Jede Seele in Eastbrook betreibt neben dem Schwert noch ein Handwerk, {playerName}. Im Gestein rund um die Kupferschürfe südwestlich der Stadt gibt es Erzadern. Geh selbst mit der Spitzhacke ran und bearbeite 5 davon; ich werde den Unterschied merken.',
+  'entities.quests.q_prof_make_amends.completion':
+    'Der alte Rhythmus kehrt zurück. Dein früheres Paar ist wieder aktiv.',
+  'entities.quests.q_prof_make_amends.text':
+    'Du hast dieses Paar bereits getragen, {playerName}. Zurückzukehren ist kein neues Gelöbnis. Hilf, den Weg durch das Tal freizuhalten, und die Arbeit wird deinen Händen in Erinnerung rufen, was sie einst kannten.',
+  'gpuNotice.bodyDesktop':
+    'Das Spiel läuft ohne GPU-Beschleunigung und wird langsam sein. Aktualisiere deine Grafiktreiber und starte das Spiel neu. Unter Windows stelle das Spiel außerdem unter Einstellungen > System > Anzeige > Grafik auf Hohe Leistung ein.',
+  'gpuNotice.bodyWeb':
+    'Das Spiel läuft ohne GPU-Beschleunigung und wird langsam sein. Aktiviere die Hardwarebeschleunigung in deinen Browsereinstellungen, aktualisiere deine Grafiktreiber und starte deinen Browser neu.',
+  'gpuNotice.dismiss': 'Schließen',
+  'guide.abilityHook.blink':
+    'Teleportiert dich eine kurze Strecke vorwärts und bricht dabei Verwurzelungen.',
+  'guide.abilityHook.blizzard':
+    'Bedeckt ein Gebiet mit Eis, um eine ganze Gruppe zu schwächen und zu verlangsamen.',
+  'guide.abilityHook.brain_freeze':
+    'Deine Frostgeschosse lassen das nächste Winterlash manchmal sofort und stärker zuschlagen.',
+  'guide.abilityHook.fingers_of_frost':
+    'Deine Frostgeschosse stärken manchmal ein Ice Lance, als ob das Ziel eingefroren wäre.',
+  'guide.abilityHook.fireball_form':
+    'Werde zu einer lebendigen Glut und überquere offenes Gelände mit hoher Geschwindigkeit.',
+  'guide.abilityHook.flurry':
+    'Drei schnelle Geschosse, die das Ziel kühlen, sodass deine nächsten Frosttreffer landen, als wäre es eingefroren.',
+  'guide.abilityHook.frozen_orb':
+    'Rollt eine langsame Kugel durch die Gruppe, die alles kühlt und deine Frostprocs füttert.',
+  'guide.abilityHook.ice_lance':
+    'Ein sofortiger Splitter zum Verbrauchen von Frostprocs; trifft eingefrorene Ziele weit stärker.',
+  'guide.abilityHook.shatter': 'Deine Zauber treffen eingefrorene Ziele weit öfter kritisch.',
+  'guide.deedsPage.renownBody':
+    'Ansehen ist die Wertung hinter dem Buch. Jede Tat, die du erringst, ist eine feste Menge wert, und dein Gesamtwert steigt nur, sodass eine ruhige Woche dir keinen Boden kostet. Eine Handvoll Taten hängen eher vom Glück als vom Können ab, und Heldentaten sind eine Ehrung für sich, daher zählen beide nicht für das Ansehen. Taten ohne Ansehen zählen dennoch für die Vollständigkeit in deinem Buch; sie ergeben nur keine Punkte.',
+  'guide.deedsPage.standingsNote':
+    'Die Reiche führen eine laufende Ansehenstabelle über alle Konten: Die Tabelle bewertet ganze Konten nach dem lebenslangen Ansehen, zählt jede Tat einmal über alle deine Charaktere hinweg, und zeigt nur das Ansehen, sodass Taten ohne Ansehen die Tabelle nie bewegen, auch wenn sie in deinem Buch zählen. Um zu sehen, wer wo steht, öffne die Bestenliste im Spiel und wechsle zu ihrer Ansehen-Registerkarte; die Tabelle lebt dort, nicht im Wiki.',
+  'hudChrome.archetypePair.alchemy+cooking': 'Apotheker',
+  'hudChrome.archetypePair.armorcrafting+engineering': 'Technikschmied',
+  'hudChrome.archetypePair.cooking+leatherworking': 'Fallensteller',
+  'hudChrome.archetypePair.enchanting+jewelcrafting': 'Edelsteinbinder',
+  'hudChrome.archetypePair.engineering+alchemy': 'Bombardier',
+  'hudChrome.archetypePair.inscription+enchanting': 'Arkanist',
+  'hudChrome.archetypePair.jewelcrafting+weaponcrafting': 'Klingenschmied',
+  'hudChrome.archetypePair.leatherworking+tailoring': 'Ausrüster',
+  'hudChrome.archetypePair.tailoring+inscription': 'Zauberweber',
+  'hudChrome.archetypePair.weaponcrafting+armorcrafting': 'Schmied',
+  'hudChrome.auraEffect.cheapCast': 'Dein nächster Zauber kostet {pct}% weniger',
+  'hudChrome.auraEffect.combustionCrit': 'Deine Feuerzauber treffen immer kritisch',
+  'hudChrome.auraEffect.dmgDone': 'Erhöht den verursachten Schaden um {pct}%',
+  'hudChrome.auraEffect.dmgDoneReduce': 'Verringert den verursachten Schaden um {pct}%',
+  'hudChrome.auraEffect.elementalConvergencePrimed':
+    'Dein nächster Zauber der anderen Elementarschule gewährt Elementarkonvergenz',
+  'hudChrome.auraEffect.formFireball':
+    'Glutgestalt: Bewegungsgeschwindigkeit um {pct}% erhöht; Angriffe und Zauber deaktiviert',
+  'hudChrome.auraEffect.freeCast': 'Dein nächster Zauber ist kostenlos',
+  'hudChrome.auraEffect.heatingUp':
+    'Dein nächster aufeinanderfolgender kritischer Feuer-Builderstreffer gewährt Heiße Serie; ein nicht-kritischer Builder entfernt Aufheizen',
+  'hudChrome.auraEffect.iceFloesCasts':
+    'Deine nächsten {n} Zauber mit Zauberzeit können beim Bewegen gewirkt werden',
+  'hudChrome.auraEffect.increase.sp': 'Erhöht die Zaubermacht um {value}',
+  'hudChrome.auraEffect.instantCast': 'Dein nächster Zauber mit Zauberzeit ist sofort',
+  'hudChrome.auraEffect.overloadNext':
+    'Dein nächster Zauber wird um {pct}% verstärkt, kostet aber 50% mehr Mana',
+  'hudChrome.auraEffect.powerEchoNext':
+    'Dein nächster direkter Zauber wiederholt sich mit {pct}% Kraft auf dasselbe Ziel',
+  'hudChrome.auraEffect.temporalHourglass':
+    'Immun und handlungsunfähig; stellt Gesundheit wieder her und beschleunigt die Abklingzeit-Regeneration. Rechtsklick zum Abbrechen.',
+  'hudChrome.craftName.alchemy': 'Alchemie',
+  'hudChrome.craftName.armorcrafting': 'Rüstungsherstellung',
+  'hudChrome.craftName.cooking': 'Kochen',
+  'hudChrome.craftName.enchanting': 'Verzauberung',
+  'hudChrome.craftName.engineering': 'Ingenieurskunst',
+  'hudChrome.craftName.inscription': 'Inschriftenkunde',
+  'hudChrome.craftName.jewelcrafting': 'Juwelenkunde',
+  'hudChrome.craftName.leatherworking': 'Lederverarbeitung',
+  'hudChrome.craftName.tailoring': 'Schneiderei',
+  'hudChrome.craftName.weaponcrafting': 'Waffenherstellung',
+  'hudChrome.crafting.attunementPreview':
+    'Ergebnis: Titel {title}; {majorA} und {majorB} werden zu unbegrenzten Hauptberufen; {hobby} wird zum selten-begrenzten Hobby; alle anderen Fertigkeitskenntnisse bleiben erhalten, sind aber auf Gewöhnlich begrenzt, solange sie inaktiv sind.',
+  'hudChrome.crafting.comboMet': 'Bereit.',
+  'hudChrome.crafting.comboNotAttuned': 'Wähle zuerst ein Archetyp-Paar.',
+  'hudChrome.crafting.comboRequires': 'Abstimmung: {craftA} + {craftB}, Stufe {tier}.',
+  'hudChrome.crafting.comboSyncing': 'Reichs-Abstimmung wird überprüft.',
+  'hudChrome.crafting.comboTierUnmet': 'Bringe beide Hauptberufe auf die erforderliche Stufe.',
+  'hudChrome.crafting.comboWrongPair': 'Aktiviere genau dieses Paar, um es herzustellen.',
+  'hudChrome.crafting.hobbyPreview':
+    'Ergebnis: {hobby} wird zum selten-begrenzten Hobby. Beide Hauptberufe und alle beibehaltenen Fertigkeitswerte bleiben unverändert.',
+  'hudChrome.crafting.identity.ceilingCommon': 'Gewöhnliche Grenze',
+  'hudChrome.crafting.identity.ceilingRare': 'Seltene Grenze',
+  'hudChrome.crafting.identity.ceilingUnlimited': 'Keine Verbesserungsgrenze',
+  'hudChrome.crafting.identity.colCap': 'Grenze',
+  'hudChrome.crafting.identity.colCraft': 'Beruf',
+  'hudChrome.crafting.identity.colRole': 'Rolle',
+  'hudChrome.crafting.identity.colSkill': 'Fertigkeit',
+  'hudChrome.crafting.identity.dormantKnowledge':
+    'Kenntnisse in {craft} bleiben erhalten, sind aber inaktiv, bis sein Paar oder Hobby aktiv ist.',
+  'hudChrome.crafting.identity.history': '{pairs} Paare entdeckt, {returns} Rückkehr abgeschlossen',
+  'hudChrome.crafting.identity.historyLabel': 'Verlauf',
+  'hudChrome.crafting.identity.hobbyLabel': 'Hobby',
+  'hudChrome.crafting.identity.majorsLabel': 'Hauptberufe',
+  'hudChrome.crafting.identity.nearTier':
+    '{craft} ist {points} Fertigkeitspunkte von der nächsten Stufe entfernt.',
+  'hudChrome.crafting.identity.roleDormant': 'Inaktive Kenntnisse',
+  'hudChrome.crafting.identity.roleHobby': 'Hobby',
+  'hudChrome.crafting.identity.roleMajor': 'Hauptberuf',
+  'hudChrome.crafting.identity.roleUnattuned': 'Nicht abgestimmt',
+  'hudChrome.crafting.identity.skillAria':
+    '{craft}, Fertigkeit {skill}, Stufe {tier}, {role}, {ceiling}',
+  'hudChrome.crafting.identity.syncing': 'Warte auf deine Handwerksidentität vom Reich.',
+  'hudChrome.crafting.identity.title': 'Handwerksidentität',
+  'hudChrome.crafting.identity.titleLabel': 'Titel',
+  'hudChrome.crafting.identity.tutorial':
+    'Erste Stufe: Erreiche Fertigkeit {skill} in einem Beruf. Erfolgreiche Rezepte verbessern diesen Beruf, ohne Kenntnisse anderswo zu löschen.',
+  'hudChrome.crafting.identity.unattuned':
+    'Kein Archetyp-Paar ist aktiv. Deine Kenntnisse bleiben erhalten, aber Kombo-Rezepte erfordern ein abgestimmtes Paar.',
+  'hudChrome.crafting.noProfessionChoice': 'Derzeit ist keine gültige Berufswahl verfügbar.',
+  'hudChrome.crafting.pairOptionLabel': '{pair} ({craftA} + {craftB})',
+  'hudChrome.crafting.professionChoice': 'Berufswahl',
+  'hudChrome.deeds.lbScopeNote':
+    'Konten werden nach lebenslangem Ansehen bewertet. Jede Tat zählt einmal über alle Charaktere eines Kontos.',
+  'hudChrome.deeds.lbSelfAccount':
+    'Dein Konto: Rang {rank}, top {percent} Prozent, {renown} Ansehen',
+  'hudChrome.deeds.lbSelfRank': 'Dein Konto: Rang {rank}, top {percent} Prozent',
+  'hudChrome.nameplate.mobEliteLevel': '{level}+',
+  'hudChrome.nameplate.mobLevel': '{level}',
+  'hudChrome.specPanel.specUnlockBanner': 'Spezialisierung freigeschaltet!',
+  'hudChrome.specPanel.specUnlockHint': 'Drücke N, um deine Spezialisierung zu wählen.',
+  'hudChrome.wocStore.wallet.connect': 'Wallet verbinden',
+  'hudChrome.wocStore.wallet.connectedUnlinked':
+    'Die Wallet-App ist mit diesem Browser verbunden, aber ihre öffentliche Adresse ist noch nicht mit deinem WoC-Konto verknüpft.',
+  'hudChrome.wocStore.wallet.linkedConnected':
+    'Deine verknüpfte Wallet-App ist verbunden und bereit für SOL- oder WOC-Käufe.',
+  'hudChrome.wocStore.wallet.linkedDisconnected':
+    'Deine öffentliche Adresse ist verknüpft. Verbinde diese Wallet-App erneut, wenn du mit SOL oder WOC bezahlen möchtest.',
+  'hudChrome.wocStore.wallet.manage': 'Wallet verwalten',
+  'hudChrome.wocStore.wallet.mismatched':
+    'Eine andere Wallet ist verbunden. Verifiziere sie, um die verknüpfte Adresse zu ersetzen, oder verbinde die verknüpfte Wallet erneut.',
+  'hudChrome.wocStore.wallet.reconnect': 'Wallet erneut verbinden',
+  'hudChrome.wocStore.wallet.title': 'Solana-Wallet',
+  'hudChrome.wocStore.wallet.unlinked':
+    'Verbinde eine Wallet-App und unterschreibe einmal, um ihre öffentliche Adresse mit deinem WoC-Konto zu verknüpfen. Wir erhalten niemals deine Wiederherstellungsphrase oder deinen privaten Schlüssel.',
+  'hudChrome.wocStore.wallet.verify': 'Verifizieren und verknüpfen',
+  'wallet.bagConnect': 'Wallet verknüpfen',
+  'wallet.bagLink': 'Wallet verifizieren',
+  'wallet.bagReconnect': 'Wallet erneut verbinden',
+  'wallet.browser.completeBody': 'Du kannst zur World of ClaudeCraft Desktop-App zurückkehren.',
+  'wallet.browser.completeTitle': 'Wallet-Autorisierung abgeschlossen',
+  'wallet.browser.continueWith': 'Weiter mit {wallet}',
+  'wallet.browser.extensionHelp':
+    'Es wurde keine kompatible Wallet-Erweiterung gefunden. Installiere oder entsperre Phantom, Solflare oder eine andere Solana-Browser-Wallet und versuche es erneut.',
+  'wallet.browser.eyebrow': 'Desktop-Wallet-Autorisierung',
+  'wallet.browser.failed':
+    'Wallet-Autorisierung fehlgeschlagen oder abgelaufen. Kehre zur Desktop-App zurück und versuche es erneut.',
+  'wallet.browser.linkBody':
+    'Wähle eine Wallet-Erweiterung in diesem Browser. Du wirst eine Verifizierungsnachricht unterschreiben und dann zur Desktop-App zurückkehren.',
+  'wallet.browser.paymentBody':
+    'Wähle die mit deinem Konto verknüpfte Wallet und genehmige die Transaktion in diesem Browser.',
+  'wallet.browser.retry': 'Erneut versuchen',
+  'wallet.browser.returnButton': 'Zur Desktop-App zurückkehren',
+  'wallet.browser.reviewBody':
+    'Folge der Aufforderung von {wallet}. Halte diese Browserseite offen.',
+  'wallet.browser.reviewTitle': 'In deiner Wallet prüfen',
+  'wallet.browser.safety':
+    'World of ClaudeCraft fragt niemals nach deiner Wiederherstellungsphrase oder deinem privaten Schlüssel.',
+  'wallet.browser.title': 'Solana-Wallet verbinden',
+  'wallet.manualReturnBrowserHelp':
+    'Kehre nach der Genehmigung zu diesem Spieltab zurück. Falls iOS einen anderen Browser öffnet, schließe ihn und kehre manuell zum ursprünglichen Browser zurück.',
+  'wallet.manualReturnStandaloneHelp':
+    'Kehre nach der Genehmigung von deinem Startbildschirm zu World of ClaudeCraft zurück. Falls iOS einen Browser öffnet, schließe ihn und öffne die Startbildschirm-App manuell erneut.',
+  'wallet.mobileAppHelp':
+    'Wähle Phantom oder Solflare. Deine Wallet-App wird um Genehmigung bitten. Halte dieses Spiel geöffnet und kehre zu ihm zurück, wenn du fertig bist.',
+  'wallet.openAppButton': '{wallet} öffnen',
+  'wallet.openAppHelp':
+    'Öffne {wallet}, um diese Anfrage zu prüfen. Halte diesen Spieltab geöffnet, während die Wallet-App aktiv ist.',
+  'wallet.openAppTitle': 'Weiter in {wallet}',
+  'wallet.preparingAppButton': '{wallet} wird vorbereitet...',
+  'wallet.standaloneAppHelp':
+    'Wallet-Verbindungen sind in der Startbildschirm-App noch nicht verfügbar. Öffne World of ClaudeCraft in Safari oder Chrome, um Phantom oder Solflare zu nutzen.',
+  'wallet.walletAppUnavailable':
+    '{wallet} konnte nicht vorbereitet werden. Schließe dieses Fenster und versuche es erneut.',
   'entities.abilities.primal_reflexes.description':
     'Deine Instinkte schaerfen sich und erhoehen deine Ausweichschance fur 6 Sek. um 50%.',
   'entities.abilities.primal_reflexes.name': 'Urreflexe',

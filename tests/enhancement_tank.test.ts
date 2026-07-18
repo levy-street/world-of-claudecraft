@@ -8,7 +8,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import { threatModifier } from '../src/sim/threat';
-import type { Entity } from '../src/sim/types';
+import type { Entity, SimEvent } from '../src/sim/types';
 
 const TANK_KIT = ['earth_shield', 'earthbound_weapon', 'elemental_demand', 'unleash_weapon'];
 
@@ -24,8 +24,14 @@ function makeEnh(seed = 7) {
   return { sim, p, pid };
 }
 
-function spawnMob(sim: Sim, p: Entity, dz: number, hostile = true) {
-  const mob = createMob((sim as any).nextId++, MOBS.ridge_stalker, 20, {
+function spawnMob(
+  sim: Sim,
+  p: Entity,
+  dz: number,
+  hostile = true,
+  templateId: keyof typeof MOBS = 'ridge_stalker',
+) {
+  const mob = createMob((sim as any).nextId++, MOBS[templateId], 20, {
     x: p.pos.x,
     y: p.pos.y,
     z: p.pos.z + dz,
@@ -42,20 +48,38 @@ function spawnMob(sim: Sim, p: Entity, dz: number, hostile = true) {
 function cast(sim: Sim, id: string, pid: number, aim?: { x: number; z: number }) {
   (sim.entities.get(pid) as any).resource = (sim.entities.get(pid) as any).maxResource;
   sim.castAbility(id, pid, aim);
-  for (let i = 0; i < 32; i++) sim.tick();
+  const events: SimEvent[] = [];
+  for (let i = 0; i < 32; i++) events.push(...sim.tick());
+  return events;
 }
 
 describe('Enhancement tank kit: spec grant', () => {
-  it('grants all four tank abilities to Enhancement only', () => {
-    for (const specId of ['enhancement', 'elemental', 'restoration']) {
+  it('grants all four tank abilities at spec unlock to Enhancement only', () => {
+    for (const specId of [null, 'enhancement', 'elemental', 'restoration']) {
       const sim = new Sim({ seed: 1, playerClass: 'shaman', autoEquip: true });
-      sim.setPlayerLevel(20);
-      sim.setSpec(specId);
+      sim.setPlayerLevel(5);
+      if (specId !== null) expect(sim.setSpec(specId)).toBe(true);
       const isEnh = specId === 'enhancement';
       for (const id of TANK_KIT) {
-        expect(!!sim.resolvedAbility(id), `${specId} knows ${id}`).toBe(isEnh);
+        expect(!!sim.resolvedAbility(id), `${specId ?? 'no spec'} knows ${id}`).toBe(isEnh);
       }
     }
+  });
+
+  it('removes Enhancement-only tank auras when the player changes spec', () => {
+    const { sim, p, pid } = makeEnh();
+    cast(sim, 'earth_shield', pid);
+    cast(sim, 'earthbound_weapon', pid);
+    expect(p.auras.some((a) => a.kind === 'earth_shield')).toBe(true);
+    expect(p.auras.some((a) => a.kind === 'earthbound_weapon')).toBe(true);
+    expect(threatModifier(p, 'nature')).toBe(2);
+
+    expect(sim.setSpec('elemental')).toBe(true);
+
+    expect(TANK_KIT.some((id) => sim.resolvedAbility(id))).toBe(false);
+    expect(p.auras.some((a) => a.kind === 'earth_shield')).toBe(false);
+    expect(p.auras.some((a) => a.kind === 'earthbound_weapon')).toBe(false);
+    expect(threatModifier(p, 'nature')).toBe(1);
   });
 });
 
@@ -80,12 +104,39 @@ describe('Stone Aegis (Earth Shield)', () => {
     expect(p.auras.some((a) => a.kind === 'earth_shield')).toBe(false);
   });
 
-  it('does not spend a charge on non-direct damage (DoT ticks / reflects)', () => {
+  it('takes full spell-reflection damage without spending a charge', () => {
+    const { sim, p, pid } = makeEnh();
+    cast(sim, 'earth_shield', pid);
+    const mob = spawnMob(sim, p, 3, true, 'wyrmcult_necromancer');
+    const ward = MOBS.wyrmcult_necromancer.spellReflect!;
+    const before = p.hp;
+
+    // Drive the real reflection path: a spell landing on the warded mob reflects
+    // incidental damage back to the caster.
+    (sim as any).dealDamage(p, mob, 100, false, 'fire', 'Fireball', 'hit');
+
+    expect(before - p.hp).toBe(ward.value);
+    expect(p.auras.find((a) => a.kind === 'earth_shield')?.charges).toBe(6);
+  });
+
+  it('does not spend charges on source-less, self, or zero damage', () => {
     const { sim, p, pid } = makeEnh();
     cast(sim, 'earth_shield', pid);
     const mob = spawnMob(sim, p, 3, false);
-    // direct=false (10th positional arg): incidental damage leaves the shield intact.
-    (sim as any).dealDamage(mob, p, 100, false, 'physical', null, 'hit', false, undefined, false);
+
+    let before = p.hp;
+    (sim as any).dealDamage(null, p, 100, false, 'physical', null, 'hit');
+    expect(before - p.hp).toBe(100);
+    expect(p.auras.find((a) => a.kind === 'earth_shield')?.charges).toBe(6);
+
+    before = p.hp;
+    (sim as any).dealDamage(p, p, 100, false, 'physical', null, 'hit');
+    expect(before - p.hp).toBe(100);
+    expect(p.auras.find((a) => a.kind === 'earth_shield')?.charges).toBe(6);
+
+    before = p.hp;
+    (sim as any).dealDamage(mob, p, 0, false, 'physical', null, 'hit');
+    expect(p.hp).toBe(before);
     expect(p.auras.find((a) => a.kind === 'earth_shield')?.charges).toBe(6);
   });
 
@@ -129,15 +180,26 @@ describe('Anchorbound Weapon (Earthbound Weapon)', () => {
 });
 
 describe('Elemental Demand (taunt)', () => {
-  it('taunts a mob at 15 yard range, forcing it onto the shaman', () => {
+  function demandAt(dz: number) {
     const { sim, p, pid } = makeEnh();
-    const mob = spawnMob(sim, p, 12); // inside 15 yд
-    mob.threat.set(999, 50); // someone else holds aggro
+    const mob = spawnMob(sim, p, dz);
+    mob.threat.set(999, 50);
     p.facing = 0;
     sim.targetEntity(mob.id, pid);
     cast(sim, 'elemental_demand', pid, { x: mob.pos.x, z: mob.pos.z });
+    return { mob, pid };
+  }
+
+  it('accepts a target exactly 15 yards away', () => {
+    const { mob, pid } = demandAt(15);
     expect(mob.forcedTargetId).toBe(pid);
     expect(mob.threat.get(pid) ?? 0).toBeGreaterThanOrEqual(50);
+  });
+
+  it('rejects a target beyond 15 yards', () => {
+    const { mob, pid } = demandAt(15.01);
+    expect(mob.forcedTargetId).toBeNull();
+    expect(mob.threat.has(pid)).toBe(false);
   });
 });
 
@@ -157,6 +219,7 @@ describe('Elemental Discharge (Unleash Weapon)', () => {
     cast(sim, 'unleash_weapon', pid, { x: mob.pos.x, z: mob.pos.z });
     expect(mob.hp).toBeLessThan(before);
     expect(mob.auras.some((a) => a.kind === 'slow')).toBe(true);
+    expect(p.auras.some((a) => a.kind === 'imbue')).toBe(false);
   });
 
   it('with Pyrebrand (flametongue) active, applies a fire DoT', () => {
@@ -164,13 +227,92 @@ describe('Elemental Discharge (Unleash Weapon)', () => {
     cast(sim, 'flametongue_weapon', pid);
     cast(sim, 'unleash_weapon', pid, { x: mob.pos.x, z: mob.pos.z });
     expect(mob.auras.some((a) => a.kind === 'dot' && a.school === 'fire')).toBe(true);
+    expect(p.auras.some((a) => a.kind === 'imbue')).toBe(false);
   });
 
   it('with Anchorbound active, spikes threat onto the shaman', () => {
     const { sim, p, pid, mob } = setup();
     cast(sim, 'earthbound_weapon', pid);
+    const before = mob.hp;
     cast(sim, 'unleash_weapon', pid, { x: mob.pos.x, z: mob.pos.z });
-    // The discharge itself plus the anchored threat spike put the shaman on top.
-    expect(mob.threat.get(pid) ?? 0).toBeGreaterThan(0);
+    const damage = before - mob.hp;
+    // Anchorbound doubles the hit's pre-health-clamp threat and adds a doubled
+    // 60-point spike. The health delta may differ by one from the internal
+    // pre-clamp amount, so pin the decisive extra threat as a narrow range.
+    const extraThreat = (mob.threat.get(pid) ?? 0) - damage * 2;
+    expect(extraThreat).toBeGreaterThanOrEqual(120);
+    expect(extraThreat).toBeLessThanOrEqual(121);
+    expect(p.auras.some((a) => a.kind === 'earthbound_weapon')).toBe(false);
+  });
+
+  it('with Stonebound active, deals only physical damage and consumes the imbue', () => {
+    const { sim, p, pid, mob } = setup();
+    cast(sim, 'rockbiter_weapon', pid);
+    const before = mob.hp;
+    const events = cast(sim, 'unleash_weapon', pid, { x: mob.pos.x, z: mob.pos.z });
+    const discharge = events.find(
+      (event) =>
+        event.type === 'damage' &&
+        event.sourceId === pid &&
+        event.targetId === mob.id &&
+        event.ability === sim.resolvedAbility('unleash_weapon')?.def.name,
+    );
+    if (discharge?.type !== 'damage') throw new Error('missing Elemental Discharge damage event');
+    expect(mob.hp).toBeLessThan(before);
+    expect(discharge.school).toBe('physical');
+    const excessThreat = (mob.threat.get(pid) ?? 0) - discharge.amount;
+    expect(excessThreat).toBeGreaterThanOrEqual(0);
+    expect(excessThreat).toBeLessThanOrEqual(1);
+    expect(mob.auras.some((a) => a.kind === 'dot' || a.kind === 'slow')).toBe(false);
+    expect(p.auras.some((a) => a.kind === 'imbue')).toBe(false);
+  });
+
+  it('without an enchant, deals the base hit without adding a rider', () => {
+    const { sim, p, pid, mob } = setup();
+    const before = mob.hp;
+    const events = cast(sim, 'unleash_weapon', pid, { x: mob.pos.x, z: mob.pos.z });
+    const discharge = events.find(
+      (event) =>
+        event.type === 'damage' &&
+        event.sourceId === pid &&
+        event.targetId === mob.id &&
+        event.ability === sim.resolvedAbility('unleash_weapon')?.def.name,
+    );
+    if (discharge?.type !== 'damage') throw new Error('missing Elemental Discharge damage event');
+    expect(mob.hp).toBeLessThan(before);
+    const excessThreat = (mob.threat.get(pid) ?? 0) - discharge.amount;
+    expect(excessThreat).toBeGreaterThanOrEqual(0);
+    expect(excessThreat).toBeLessThanOrEqual(1);
+    expect(mob.auras.some((a) => a.kind === 'dot' || a.kind === 'slow')).toBe(false);
+    expect(p.auras.some((a) => a.kind === 'imbue' || a.kind === 'earthbound_weapon')).toBe(false);
+  });
+
+  it('consumes the enchant even when the discharge is lethal', () => {
+    const { sim, p, pid, mob } = setup();
+    cast(sim, 'frostbrand_weapon', pid);
+    mob.hp = 1;
+    cast(sim, 'unleash_weapon', pid, { x: mob.pos.x, z: mob.pos.z });
+    expect(mob.dead).toBe(true);
+    expect(p.auras.some((a) => a.kind === 'imbue')).toBe(false);
+  });
+
+  it('replays the same discharge outcome and RNG stream from the same seed', () => {
+    const run = () => {
+      const { sim, p, pid, mob } = setup();
+      const draws: number[] = [];
+      sim.rng.setObserver((value) => draws.push(value));
+      cast(sim, 'frostbrand_weapon', pid);
+      const before = mob.hp;
+      cast(sim, 'unleash_weapon', pid, { x: mob.pos.x, z: mob.pos.z });
+      sim.rng.setObserver(null);
+      return {
+        damage: before - mob.hp,
+        draws,
+        targetAuras: mob.auras.map((a) => ({ id: a.id, kind: a.kind, remaining: a.remaining })),
+        enchantActive: p.auras.some((a) => a.kind === 'imbue'),
+      };
+    };
+
+    expect(run()).toEqual(run());
   });
 });

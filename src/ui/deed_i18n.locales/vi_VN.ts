@@ -7,6 +7,10 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_card_duel_first_win: {
+    name: 'Luật Của Ta',
+    desc: 'Thắng một ván Đấu Bài tại Bậc Thầy Bài.',
+  },
   prog_first_steps: {
     name: 'Những Bước Đầu Tiên',
     desc: 'Đạt cấp 2 và đặt bước chân đầu tiên lên một con đường dài.',

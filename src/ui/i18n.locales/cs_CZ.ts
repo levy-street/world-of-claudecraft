@@ -2,6 +2,288 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const cs_CZ: Partial<Record<TranslationKey, string>> = {
+  'hud.pet.waterJet': 'Vodní paprsek',
+  'hud.pet.waterJetDesc':
+    'Přikaž svému vodnímu elementálovi, aby po dobu 3 sekund soustředil zpomalující proud. Čas obnovy 8 sekund. Kliknutím pravým tlačítkem aktivuješ automatické seslání, kdykoli je schopnost mimo čas obnovy.',
+  'hud.pet.waterJetTitle': 'Vodní paprsek',
+  'hud.prompts.acceptResurrection': 'Přijmout vzkříšení',
+  'hud.prompts.resurrectionOffer': '{name} tě chce vrátit k životu. Přijímáš?',
+  'itemUi.stats.parry': 'Odražení',
+  'apiError.wallet.handoff_invalid':
+    'Toto oprávnění peněženky vypršelo nebo je neověřitelné. Zkus to znovu.',
+  'cardDuel.close': 'Zavřít',
+  'cardDuel.counts': 'Balíček: {deck} · Odložiště: {discard}',
+  'cardDuel.forfeit': 'Vzdát se',
+  'cardDuel.forfeitAria': 'Vzdát se Karetního souboje',
+  'cardDuel.join': 'Vstoupit do fronty',
+  'cardDuel.joinAria': 'Vstoupit do fronty Karetního souboje',
+  'cardDuel.leave': 'Odejít z fronty',
+  'cardDuel.leaveAria': 'Odejít z fronty Karetního souboje',
+  'cardDuel.playCardAria': 'Zahrát kartu {value}',
+  'cardDuel.queued': 'Čekám na soupeře...',
+  'cardDuel.round': 'Skóre kola: {mine} - {theirs}',
+  'cardDuel.title': 'Karetní souboj',
+  'cardDuel.unavailable': 'Karetní souboj vyžaduje dalšího hráče online.',
+  'cardDuel.vsOpponent': 'vs {name}',
+  'cardDuel.waitingOnOpponent': 'Čekám na soupeřovu kartu...',
+  'cardDuel.yourTurn': 'Zahraj kartu',
+  'entities.abilities.arcane_surge.description':
+    'Prožene nepřítelem příval surového éteru a způsobí mu {damage} poškození. Každé seslání zanechá Éterický náboj, který zvyšuje poškození a rychlost sesílání tvého příštího Přívalu éteru (o 5 % za každý) a ostře zdražuje jeho manový náklad, ukládá se až do 4; Éterické šipky náboje spotřebují. Každé seslání může také aktivovat Éterický spěch, takže tvůj příští Příval éteru nebude nic stát a budeš jej sesílat dvakrát rychleji.',
+  'entities.abilities.arcane_surge.name': 'Příval éteru',
+  'entities.abilities.blizzard.description':
+    'Přivolá ledovou bouři na cílovou plochu po dobu 6 s, působí {damage} mrazivého poškození každou sekundu a zpomaluje nepřátele o 40 %. Každý zasažený nepřítel zkrátí cooldown Zmrzlé sféry o 0,5 s, nejvýše o 3 s za seslání. (Mráz)',
+  'entities.abilities.blizzard.name': 'Blizzard',
+  'entities.abilities.brain_freeze.description':
+    'Kopí jinovatky má 20% šanci způsobit, že tvůj příští Winterlash bude okamžitý, o 30 % silnější a bez cooldownu. (Mráz)',
+  'entities.abilities.brain_freeze.name': 'Brain Freeze',
+  'entities.abilities.dragons_breath.description':
+    'Podrž pro nabití rozšiřujícího se ohnivého dechu, pak ho pusť v kuželi. Delší nabití zasáhne dál a způsobí více poškození. Zasažení nepřátelé jsou dezorientováni; poškození efekt přeruší. Maximální nabití vždy kriticky zasáhne a počítá se jednou pro Žhavou sérii. (Oheň)',
+  'entities.abilities.dragons_breath.name': "Dragon's Breath",
+  'entities.abilities.fingers_of_frost.description':
+    'Kopí jinovatky má 15% šanci udělit Zmrzlé prsty, až 2 nabití: tvoje příští Ice Lance považuje cíl za zmrazený. (Mráz)',
+  'entities.abilities.fingers_of_frost.name': 'Fingers of Frost',
+  'entities.abilities.fireball_form.description':
+    'Přeměníš se v planoucí žar a zvýšíš rychlost pohybu o {buff} %. V přeměněné podobě nemůžeš útočit ani sesílat kouzla. Seslej znovu pro návrat do normální podoby.',
+  'entities.abilities.fireball_form.name': 'Žárová podoba',
+  'entities.abilities.flurry.description':
+    'Vypustíš tři ledové střely, každá za {damage} mrazivého poškození, a na cíl sesadíš Zimní chlad: jeho příštím 2 příchozím slučitelným kouzlům se cíl jeví jako zmrazený. Brain Freeze způsobí, že Winterlash je okamžitý, o 30 % silnější a přeskočí cooldown. (Mráz)',
+  'entities.abilities.flurry.name': 'Winterlash',
+  'entities.abilities.frozen_orb.description':
+    'Vypustíš sféru vířícího mrazu, která se 8 s pohybuje vpřed a způsobuje {damage} mrazivého poškození každou sekundu blízkým nepřátelům a zpomaluje je o 30 %. Její zásahy generují Zmrzlé prsty. (Mráz)',
+  'entities.abilities.frozen_orb.name': 'Zmrzlá sféra',
+  'entities.abilities.glacial_front.description':
+    'Podrž pro nabití rozšiřující se mrazivé fronty, pak ji pusť v kuželi. Delší nabití zasáhne dál a způsobí více poškození. Všichni zasažení nepřátelé jsou zpomaleni o 50 % na 4 s; maximální nabití je také ukotvuje na 1 s. (Mráz)',
+  'entities.abilities.glacial_front.name': 'Ledová fronta',
+  'entities.abilities.glacial_spike.description':
+    'Přivoláš mohutný ledový hrot, spotřebuješ 5 Rampouchů a způsobíš {damage} mrazivého poškození a zmrazíš cíl na místě na 4 s. (Mráz)',
+  'entities.abilities.glacial_spike.name': 'Ledový hrot',
+  'entities.abilities.ice_lance.description':
+    'Vrhneš střep ledu, způsobíš {damage} mrazivého poškození, trojnásobný proti zmrazenému cíli. Spotřebuje Zmrzlé prsty nebo nabití Zimního chladu, aby byl cíl považován za zmrazený. (Mráz)',
+  'entities.abilities.ice_lance.name': 'Ice Lance',
+  'entities.abilities.perfect_moment.description':
+    'Popadneš svůj dokonalý okamžik: okamžitě získáš 4 Éterické náboje a po dobu 10 s Éterické šipky je nespotřebovávají. (Chronomagie)',
+  'entities.abilities.perfect_moment.name': 'Dokonalý okamžik',
+  'entities.abilities.shatter.description':
+    'Tvá kouzla získají 50% šanci na kritický zásah proti zmrazeným cílům a tyto kritické zásahy způsobí o 20 % více poškození. Zmrzlé prsty a Zimní chlad se počítají jako zmrazení. (Mráz)',
+  'entities.abilities.shatter.name': 'Drcení mrazem',
+  'entities.abilities.temporal_acceleration.description':
+    'Urychlí tok času pro tvou skupinu nebo raid a zvýší rychlost útoku, sesílání a kanálování o 30 % po dobu 15 s. Spojenci, kteří nedávno byli pod vlivem Urychlení času nebo Válečných bubnů, jsou příliš vyčerpaní, aby z toho měli prospěch. (Chronomagie)',
+  'entities.abilities.temporal_acceleration.name': 'Urychlení času',
+  'entities.abilities.temporal_barrier.description':
+    'Posuneš cíl o okamžik mimo přítomnost; časová schránka pohltí {damage} poškození po dobu 10 s, než se časová linka zacvakne zpět.',
+  'entities.abilities.temporal_barrier.name': 'Časová bariéra',
+  'entities.abilities.temporal_cascade.description':
+    'Sešle ozvěnu přes tvou skupinu: cíl a až čtyři nejbližší spojenci jsou okamžitě zaceleni a každý je označen na {duration} s; část arcanového poškození, které způsobuješ, se přes jejich ozvěny vrátí a vyléčí je. (Chronomagie)',
+  'entities.abilities.temporal_cascade.name': 'Časová kaskáda',
+  'entities.abilities.temporal_echo.description':
+    'Označíš spojence ozvěnou zdravějšího okamžiku a okamžitě zacelíš {damage} zdraví. Po dobu {duration} s část arcanového poškození, které způsobuješ, se přes tuto ozvěnu vrátí a léčí je.',
+  'entities.abilities.temporal_echo.name': 'Časová ozvěna',
+  'entities.abilities.temporal_hourglass.description':
+    'Umístíš časové přesýpací hodiny na zvolené místo. Pod nepřítelem ho pozastaví na {hostilePveDuration} s v PvE nebo {hostilePvpDuration} s v PvP a zabrání veškerým akcím; poškození efekt přeruší. Pod tvýma nohama nebo pod spojencem ze skupiny udělí stázi na {duration} s, zabrání poškození a akcím, obnoví {healing} % maximálního zdraví a urychlí obnovu cooldownu o {selfCooldownRecovery} % pro tebe nebo o {allyCooldownRecovery} % pro spojence. Na prázdné zemi přesýpací hodiny čekají {groundDuration} s a ovlivní první platnou jednotku, která na ně vstoupí. Prospěšnou auru lze ručně zrušit.',
+  'entities.abilities.temporal_hourglass.name': 'Přesýpací hodiny zastavení',
+  'entities.abilities.temporal_mend.description':
+    'Posuneš spojence okamžikem do budoucnosti a zacelíš {damage} zdraví, jak se tělo usadí do svého zdravějšího budoucího já. (Chronomagie: signaturní schopnost)',
+  'entities.abilities.temporal_mend.name': 'Časové zacelení',
+  'entities.abilities.temporal_reversal.description':
+    'Přetočíš časovou linku padlého spojence a navrátíš ho k životu u jeho těla se zlomkem zdraví a many, i uprostřed boje. (Chronomagie)',
+  'entities.abilities.temporal_reversal.name': 'Časový návrat',
+  'entities.abilities.temporal_rewind.description':
+    'Vyšleš arcanovou vlnu přes svou skupinu nebo raid a přetočíš čas, čímž obnovíš 30 % poškození, které každý spojenec do 40 yardů utrpěl za posledních 5 sekund (nejvýše 35 % jejich maximálního zdraví). Nemůže být kritický efekt. (Chronomagie)',
+  'entities.abilities.temporal_rewind.name': 'Přetočení',
+  'entities.npcs.card_master.greeting':
+    'Jak by byl Karetní souboj? Na tři kola, vítěz získá právo chlubit se.',
+  'entities.npcs.card_master.name': 'Karetní mistr',
+  'entities.npcs.card_master.title': 'Rozdavač osudu',
+  'entities.quests.q_archetype_acceptance.completion':
+    'Slib platí. Tyto dva řemeslné obory jsou nyní tvoje hlavní a znalosti naproti nim se stanou tvým koníčkem.',
+  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Vytěžena rudná žíla',
+  'entities.quests.q_archetype_acceptance.text':
+    'Znalost je vědomost, {playerName}, ale ladění je slib. Zvol si dvě sousední řemesla, jejichž metody budeš nést jako svá hlavní, a pak mi přines rudu zpracovanou ve Vale vlastníma rukama.',
+  'entities.quests.q_prof_hobby_switch.completion':
+    'Lehčí volba, ale užitečná. Následuj tu zvídavost tak daleko, jak vzácná práce dovolí.',
+  'entities.quests.q_prof_hobby_switch.objectives.0.label': 'Sklizena bylinkářská záplata',
+  'entities.quests.q_prof_hobby_switch.text':
+    'Hlavní obory vyžadují slib. Koníček se jen ptá, kam tě zavede tvá zvídavost, {playerName}. Nasbírej pár bylin a rozhodni se, které řemeslo naproti svým hlavním oborům chceš provozovat.',
+  'entities.quests.q_prof_hobby_switch.title': 'Jiná kratochvíle',
+  'entities.quests.q_prof_intro.completion':
+    'Vidíš? Ruda vytěžena a mozoly na rukách. Pokračuj v dolování, těžbě dřeva a sběru bylin cestou po silnicích, a až se vrátíš do města, mrkni na Nástěnku obecního středu u tržiště a na řemeslný stůl poblíž. Je v tom poctivý obchod, pokud ho chceš.',
+  'entities.quests.q_prof_intro.objectives.0.label': 'Vytěžena rudná žíla',
+  'entities.quests.q_prof_intro.text':
+    'Každá duše v Eastbrooku pracuje kromě meče i v nějakém řemesle, {playerName}. V skalách kolem Měděného dolu jihozápadně od města jsou rudné žíly. Jdi si sám zamasat krumpáčem a vytěž jich 5; věř mi, poznám rozdíl.',
+  'entities.quests.q_prof_make_amends.completion':
+    'Starý rytmus se vrací. Tvůj dřívější pár je opět aktivní.',
+  'entities.quests.q_prof_make_amends.text':
+    'Ten pár jsi nesl(a) i dříve, {playerName}. Návrat není nový slib. Pomoz udržovat silnici v Údolí průjezdnou a práce tvým rukám připomene, co kdysi uměly.',
+  'gpuNotice.bodyDesktop':
+    'Hra běží bez grafické akcelerace a bude pomalá. Aktualizuj ovladače grafiky a restartuj hru. Ve Windows nastav hru na Vysoký výkon v Nastavení, Systém, Displej, Grafika.',
+  'gpuNotice.bodyWeb':
+    'Hra běží bez grafické akcelerace a bude pomalá. Povol hardwarovou akceleraci v nastavení prohlížeče, aktualizuj ovladače grafiky a restartuj prohlížeč.',
+  'gpuNotice.dismiss': 'Zavřít',
+  'guide.abilityHook.blink': 'Teleportuje tě krátce dopředu a po cestě ruší ukotvení.',
+  'guide.abilityHook.blizzard':
+    'Pokryje plochu ledem pro postupné ničení a zpomalení celé skupiny nepřátel.',
+  'guide.abilityHook.brain_freeze':
+    'Tvoje mrazivé střely někdy způsobí, že příští Winterlash bude okamžitý a silnější.',
+  'guide.abilityHook.fingers_of_frost':
+    'Tvoje mrazivé střely někdy posílí Ice Lance tak, aby zasáhl, jako by byl cíl zmrazen.',
+  'guide.abilityHook.fireball_form':
+    'Staneš se živým žarem a přeběhneš otevřeným terénem vysokou rychlostí.',
+  'guide.abilityHook.flurry':
+    'Tři rychlé střely, které cíl ochladí, takže tvoje příští mrazivé zásahy dopadnou, jako by byl zmrazen.',
+  'guide.abilityHook.frozen_orb':
+    'Pomalu kutálí sféru skupinou nepřátel, která vše ochladí a živí tvoje mrazivé procsy.',
+  'guide.abilityHook.ice_lance':
+    'Okamžitý střep pro využití mrazivých procsů, zasáhne výrazně silněji zmrazeného cíle.',
+  'guide.abilityHook.shatter':
+    'Tvá kouzla mají mnohem vyšší šanci na kritický zásah proti zmrazeným cílům.',
+  'guide.deedsPage.renownBody':
+    'Věhlas je skóre za Knihou. Každý skutek, který vykonáš, má svou pevnou hodnotu a tvůj celkový součet nikdy neklesne, takže klidný týden tě o nic nepřipraví. Hrstka skutků závisí spíše na štěstí než na dovednosti a Počiny jsou oceněním samy o sobě, takže ani jedny do Věhlasu nepřidávají. Skutky bez Věhlasu se stále počítají jako splněné v tvé Knize; prostě nikdy neskórují.',
+  'guide.deedsPage.standingsNote':
+    'Říše vedou průběžný součet Věhlasu za každý účet: žebříček řadí celé účty podle celoživotního Věhlasu a každý skutek se počítá jednou za všechny postavy, přičemž zobrazuje jen Věhlas, takže skutky bez Věhlasu žebříčkem nikdy nepohnou, i když se v tvé Knize počítají. Chceš-li vidět, kdo kde stojí, otevři v herním menu Žebříček a přejdi na záložku Věhlas; pořadí je tam, nikoli na wiki.',
+  'hudChrome.archetypePair.alchemy+cooking': 'Lékárník',
+  'hudChrome.archetypePair.armorcrafting+engineering': 'Ozubničář',
+  'hudChrome.archetypePair.cooking+leatherworking': 'Lapač',
+  'hudChrome.archetypePair.enchanting+jewelcrafting': 'Klenotovazač',
+  'hudChrome.archetypePair.engineering+alchemy': 'Bombardér',
+  'hudChrome.archetypePair.inscription+enchanting': 'Arkanista',
+  'hudChrome.archetypePair.jewelcrafting+weaponcrafting': 'Čepelář',
+  'hudChrome.archetypePair.leatherworking+tailoring': 'Krejčovský kožešník',
+  'hudChrome.archetypePair.tailoring+inscription': 'Magotkalec',
+  'hudChrome.archetypePair.weaponcrafting+armorcrafting': 'Kovář',
+  'hudChrome.auraEffect.cheapCast': 'Tvoje příští kouzlo stojí o {pct} % méně',
+  'hudChrome.auraEffect.combustionCrit': 'Tvoje ohnivá kouzla vždy kriticky zasáhnou',
+  'hudChrome.auraEffect.dmgDone': 'Zvyšuje způsobené poškození o {pct} %',
+  'hudChrome.auraEffect.dmgDoneReduce': 'Snižuje způsobené poškození o {pct} %',
+  'hudChrome.auraEffect.elementalConvergencePrimed':
+    'Tvoje příští kouzlo z jiné živlové školy udělí Živlovou konvergenci',
+  'hudChrome.auraEffect.formFireball':
+    'Žárová podoba: rychlost pohybu zvýšena o {pct} %; útoky a kouzla jsou zakázány',
+  'hudChrome.auraEffect.freeCast': 'Tvoje příští seslání nestojí nic',
+  'hudChrome.auraEffect.heatingUp':
+    'Tvůj příští po sobě jdoucí kritický zásah stavebního ohnivého kouzla udělí Žhavou sérii; nekritický stavební útok Rozehřívání odstraní',
+  'hudChrome.auraEffect.iceFloesCasts':
+    'Tvoje příštích {n} kouzel s dobou sesílání lze sesílat za pohybu',
+  'hudChrome.auraEffect.increase.sp': 'Zvyšuje sílu kouzel o {value}',
+  'hudChrome.auraEffect.instantCast': 'Tvoje příští kouzlo s dobou sesílání je okamžité',
+  'hudChrome.auraEffect.overloadNext':
+    'Tvoje příští kouzlo je posíleno o {pct} %, ale stojí o 50 % více many',
+  'hudChrome.auraEffect.powerEchoNext':
+    'Tvoje příští přímé kouzlo se zopakuje na stejný cíl za {pct} % síly',
+  'hudChrome.auraEffect.temporalHourglass':
+    'Nezranitelný/á a neschopný/á jednat; obnovuje zdraví a urychluje obnovu cooldownu. Klikni pravým tlačítkem pro zrušení.',
+  'hudChrome.craftName.alchemy': 'Alchymie',
+  'hudChrome.craftName.armorcrafting': 'Zbrojnictví',
+  'hudChrome.craftName.cooking': 'Vaření',
+  'hudChrome.craftName.enchanting': 'Okouzlování',
+  'hudChrome.craftName.engineering': 'Strojírenství',
+  'hudChrome.craftName.inscription': 'Písemnictví',
+  'hudChrome.craftName.jewelcrafting': 'Klenotnictví',
+  'hudChrome.craftName.leatherworking': 'Kožedělnictví',
+  'hudChrome.craftName.tailoring': 'Krejčovství',
+  'hudChrome.craftName.weaponcrafting': 'Kovářství zbraní',
+  'hudChrome.crafting.attunementPreview':
+    'Výsledek: titul {title}; {majorA} a {majorB} se stávají neomezenými hlavními obory; {hobby} se stává koníčkem s omezením na vzácné; veškeré ostatní znalosti řemesla jsou zachovány, ale dočasně omezeny na běžné.',
+  'hudChrome.crafting.comboMet': 'Připraveno.',
+  'hudChrome.crafting.comboNotAttuned': 'Nejprve zvol pár archetypů.',
+  'hudChrome.crafting.comboRequires': 'Ladění: {craftA} + {craftB}, úroveň {tier}.',
+  'hudChrome.crafting.comboSyncing': 'Kontroluji realmové ladění.',
+  'hudChrome.crafting.comboTierUnmet': 'Dostaň oba hlavní obory na požadovanou úroveň.',
+  'hudChrome.crafting.comboWrongPair': 'Pro výrobu aktivuj přesně tento pár.',
+  'hudChrome.crafting.hobbyPreview':
+    'Výsledek: {hobby} se stává koníčkem s omezením na vzácné. Oba hlavní obory a veškeré zachované hodnoty dovedností zůstávají beze změny.',
+  'hudChrome.crafting.identity.ceilingCommon': 'Omezení na běžné',
+  'hudChrome.crafting.identity.ceilingRare': 'Omezení na vzácné',
+  'hudChrome.crafting.identity.ceilingUnlimited': 'Bez omezení posílení',
+  'hudChrome.crafting.identity.colCap': 'Omezení',
+  'hudChrome.crafting.identity.colCraft': 'Řemeslo',
+  'hudChrome.crafting.identity.colRole': 'Role',
+  'hudChrome.crafting.identity.colSkill': 'Dovednost',
+  'hudChrome.crafting.identity.dormantKnowledge':
+    'Znalosti {craft} jsou zachovány, ale dočasně neaktivní, dokud nebude aktivní jejich pár nebo koníček.',
+  'hudChrome.crafting.identity.history': 'Objeveno {pairs} párů, dokončeno {returns} návratů',
+  'hudChrome.crafting.identity.historyLabel': 'Historie',
+  'hudChrome.crafting.identity.hobbyLabel': 'Koníček',
+  'hudChrome.crafting.identity.majorsLabel': 'Hlavní obory',
+  'hudChrome.crafting.identity.nearTier':
+    '{craft} je {points} dovednostních bodů od příští úrovně.',
+  'hudChrome.crafting.identity.roleDormant': 'Dočasně neaktivní znalosti',
+  'hudChrome.crafting.identity.roleHobby': 'Koníček',
+  'hudChrome.crafting.identity.roleMajor': 'Hlavní obor',
+  'hudChrome.crafting.identity.roleUnattuned': 'Neladěno',
+  'hudChrome.crafting.identity.skillAria':
+    '{craft}, dovednost {skill}, úroveň {tier}, {role}, {ceiling}',
+  'hudChrome.crafting.identity.syncing': 'Čeká se na tvou řemeslnou identitu z realmu.',
+  'hudChrome.crafting.identity.title': 'Řemeslná identita',
+  'hudChrome.crafting.identity.titleLabel': 'Titul',
+  'hudChrome.crafting.identity.tutorial':
+    'První úroveň: dosáhni dovednosti {skill} v řemesle. Úspěšné recepty toto řemeslo posunou bez ztráty znalostí jinde.',
+  'hudChrome.crafting.identity.unattuned':
+    'Žádný pár archetypů není aktivní. Tvoje znalosti jsou zachovány, ale kombinované recepty vyžadují naladěný pár.',
+  'hudChrome.crafting.noProfessionChoice':
+    'V tuto chvíli není dostupná žádná platná volba profese.',
+  'hudChrome.crafting.pairOptionLabel': '{pair} ({craftA} + {craftB})',
+  'hudChrome.crafting.professionChoice': 'Volba profese',
+  'hudChrome.deeds.lbScopeNote':
+    'Účty seřazeny podle celoživotního Věhlasu. Každý skutek se počítá jednou za všechny postavy na účtu.',
+  'hudChrome.deeds.lbSelfAccount':
+    'Tvůj účet: pořadí {rank}, top {percent} procent, Věhlas {renown}',
+  'hudChrome.deeds.lbSelfRank': 'Tvůj účet: pořadí {rank}, top {percent} procent',
+  'hudChrome.nameplate.mobEliteLevel': '{level}+',
+  'hudChrome.nameplate.mobLevel': '{level}',
+  'hudChrome.specPanel.specUnlockBanner': 'Specializace odemčena!',
+  'hudChrome.specPanel.specUnlockHint': 'Stiskni N pro výběr specializace.',
+  'hudChrome.wocStore.wallet.connect': 'Připojit peněženku',
+  'hudChrome.wocStore.wallet.connectedUnlinked':
+    'Aplikace peněženky je připojena k tomuto prohlížeči, ale její veřejná adresa ještě není propojena s tvým účtem WoC.',
+  'hudChrome.wocStore.wallet.linkedConnected':
+    'Tvoje propojená aplikace peněženky je připojena a připravena na nákupy za SOL nebo WOC.',
+  'hudChrome.wocStore.wallet.linkedDisconnected':
+    'Tvoje veřejná adresa je propojena. Znovu připoj tuto aplikaci peněženky, když budeš chtít platit za SOL nebo WOC.',
+  'hudChrome.wocStore.wallet.manage': 'Spravovat peněženku',
+  'hudChrome.wocStore.wallet.mismatched':
+    'Je připojena jiná peněženka. Ověř ji pro nahrazení propojené adresy nebo znovu připoj propojenou peněženku.',
+  'hudChrome.wocStore.wallet.reconnect': 'Znovu připojit peněženku',
+  'hudChrome.wocStore.wallet.title': 'Peněženka Solana',
+  'hudChrome.wocStore.wallet.unlinked':
+    'Připoj aplikaci peněženky a jednou podpiš pro propojení její veřejné adresy s tvým účtem WoC. Nikdy nepřijmeme tvoji obnovovací frázi ani soukromý klíč.',
+  'hudChrome.wocStore.wallet.verify': 'Ověřit a propojit',
+  'wallet.bagConnect': 'Propojit peněženku',
+  'wallet.bagLink': 'Ověřit peněženku',
+  'wallet.bagReconnect': 'Znovu připojit peněženku',
+  'wallet.browser.completeBody': 'Můžeš se vrátit do desktopové aplikace World of ClaudeCraft.',
+  'wallet.browser.completeTitle': 'Autorizace peněženky dokončena',
+  'wallet.browser.continueWith': 'Pokračovat s {wallet}',
+  'wallet.browser.extensionHelp':
+    'Nebyla nalezena žádná kompatibilní rozšíření peněženky. Nainstaluj nebo odemkni Phantom, Solflare nebo jiný Solana prohlížečový wallet a zkus to znovu.',
+  'wallet.browser.eyebrow': 'Desktopová autorizace peněženky',
+  'wallet.browser.failed':
+    'Autorizace peněženky selhala nebo vypršela. Vrať se do desktopové aplikace a zkus to znovu.',
+  'wallet.browser.linkBody':
+    'Zvol rozšíření peněženky v tomto prohlížeči. Podepíšeš ověřovací zprávu a vrátíš se do desktopové aplikace.',
+  'wallet.browser.paymentBody':
+    'Zvol peněženku propojenou s tvým účtem a schval transakci v tomto prohlížeči.',
+  'wallet.browser.retry': 'Zkusit znovu',
+  'wallet.browser.returnButton': 'Vrátit se do desktopové aplikace',
+  'wallet.browser.reviewBody':
+    'Postupuj podle výzvy od {wallet}. Nechej tuto stránku prohlížeče otevřenou.',
+  'wallet.browser.reviewTitle': 'Zkontroluj ve své peněžence',
+  'wallet.browser.safety':
+    'World of ClaudeCraft nikdy nepožaduje tvoji obnovovací frázi ani soukromý klíč.',
+  'wallet.browser.title': 'Připojit peněženku Solana',
+  'wallet.manualReturnBrowserHelp':
+    'Po schválení se vrať na tuto záložku hry. Pokud iOS otevře jiný prohlížeč, zavři ho a ručně se vrať do původního prohlížeče.',
+  'wallet.manualReturnStandaloneHelp':
+    'Po schválení se vrať do World of ClaudeCraft z domovské obrazovky. Pokud iOS otevře prohlížeč, zavři ho a ručně znovu otevři aplikaci z domovské obrazovky.',
+  'wallet.mobileAppHelp':
+    'Zvol Phantom nebo Solflare. Tvoje aplikace peněženky požádá o schválení. Nechej tuto hru otevřenou a po dokončení se do ní vrať.',
+  'wallet.openAppButton': 'Otevřít {wallet}',
+  'wallet.openAppHelp':
+    'Otevři {wallet} pro kontrolu tohoto požadavku. Nechej tuto záložku hry otevřenou, zatímco je aplikace peněženky aktivní.',
+  'wallet.openAppTitle': 'Pokračovat v {wallet}',
+  'wallet.preparingAppButton': 'Připravuji {wallet}...',
+  'wallet.standaloneAppHelp':
+    'Připojení peněženky není zatím v aplikaci z domovské obrazovky dostupné. Otevři World of ClaudeCraft v Safari nebo Chrome pro použití Phantom nebo Solflare.',
+  'wallet.walletAppUnavailable': '{wallet} nelze připravit. Zavři toto okno a zkus to znovu.',
   'entities.abilities.primal_reflexes.description':
     'Tvoje instinkty se zostří a tvá šance na vyhnutí se útoku vzroste o 50 % po dobu 6 sekund.',
   'entities.abilities.primal_reflexes.name': 'Prvotní reflexy',

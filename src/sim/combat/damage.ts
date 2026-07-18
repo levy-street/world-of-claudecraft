@@ -989,6 +989,8 @@ function reflectSpellWard(
     ward.name ?? 'Spell Reflection',
     'hit',
     true,
+    undefined,
+    false,
   );
 }
 

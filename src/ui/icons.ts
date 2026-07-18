@@ -2493,6 +2493,10 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   flame_shock: r('fire', 'ember', ['flame'], ['arcs']),
   flametongue_weapon: r('fire', 'ember', ['sword', { p: 'flame', s: 0.6 }], ['glow']),
   frostbrand_weapon: r('frost', 'ice', ['sword', { p: 'snowflake', s: 0.6 }], ['glow']),
+  earth_shield: r('earth', 'earthBrown', ['shield', { p: 'gem', ...TR }], ['crack']),
+  earthbound_weapon: r('earth', 'gold', ['sword', { p: 'tendrils', ...BR }], ['crack']),
+  elemental_demand: r('storm', 'earthBrown', ['roar', { p: 'lightning', ...TR }], ['arcs']),
+  unleash_weapon: r('storm', 'gold', ['sword', { p: 'sunburst', ...BIG }], ['glow', 'motion']),
   // warlock
   shadow_bolt: r('shadow', 'shadowPurple', ['bolt'], ['glow']),
   demon_skin: r('shadow', 'venom', [{ p: 'chestplate', pal: 'venom' }]),

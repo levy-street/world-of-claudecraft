@@ -6,6 +6,9 @@ export const TALENT_NEW: Record<
   TalentLocaleText
 > = {
   cs_CZ: {
+    masteryDescriptions: {
+      arms: 'Pokud máš v rukou obouruční zbraň, způsobuješ o 10 % vyšší poškození.',
+    },
     statLabels: {
       str: 'Síla',
       agi: 'Obratnost',
@@ -57,6 +60,9 @@ export const TALENT_NEW: Record<
     reduce: (target, amount, perRank) => 'Snižuje ' + target + ' o ' + amount + perRank + '.',
   },
   da_DK: {
+    masteryDescriptions: {
+      arms: 'Mens du fører et tohåndsvåben, forøges al skade du gør med 10%.',
+    },
     statLabels: {
       str: 'Styrke',
       agi: 'Adræthed',
@@ -102,6 +108,9 @@ export const TALENT_NEW: Record<
     reduce: (target, amount, perRank) => 'Reducerer ' + target + ' med ' + amount + perRank + '.',
   },
   id_ID: {
+    masteryDescriptions: {
+      arms: 'Saat menggunakan senjata dua tangan, semua kerusakan yang kamu berikan meningkat sebesar 10%.',
+    },
     statLabels: {
       str: 'Kekuatan',
       agi: 'Ketangkasan',
@@ -155,6 +164,9 @@ export const TALENT_NEW: Record<
       'Mengurangi ' + target + ' sebesar ' + amount + perRank + '.',
   },
   nl_NL: {
+    masteryDescriptions: {
+      arms: 'Terwijl je een tweehandswapen draagt, richt je 10% meer schade aan.',
+    },
     statLabels: {
       str: 'Kracht',
       agi: 'Behendigheid',
@@ -205,6 +217,7 @@ export const TALENT_NEW: Record<
     reduce: (target, amount, perRank) => 'Verlaagt ' + target + ' met ' + amount + perRank + '.',
   },
   pl_PL: {
+    masteryDescriptions: { arms: 'Dzierżąc broń dwuręczną, zadajesz o 10% większe obrażenia.' },
     statLabels: {
       str: 'Siła',
       agi: 'Zręczność',
@@ -256,6 +269,7 @@ export const TALENT_NEW: Record<
     reduce: (target, amount, perRank) => 'Zmniejsza ' + target + ' o ' + amount + perRank + '.',
   },
   sv_SE: {
+    masteryDescriptions: { arms: 'När du bär ett tvåhandsvapen ökar all skada du gör med 10 %.' },
     statLabels: {
       str: 'Styrka',
       agi: 'Smidighet',
@@ -301,6 +315,7 @@ export const TALENT_NEW: Record<
     reduce: (target, amount, perRank) => 'Minskar ' + target + ' med ' + amount + perRank + '.',
   },
   tr_TR: {
+    masteryDescriptions: { arms: 'İki elli silah kuşanırken verdiğin tüm hasar %10 artar.' },
     statLabels: {
       str: 'Güç',
       agi: 'Çeviklik',
@@ -346,6 +361,9 @@ export const TALENT_NEW: Record<
     reduce: (target, amount, perRank) => target + ' değerini ' + amount + perRank + ' azaltır.',
   },
   vi_VN: {
+    masteryDescriptions: {
+      arms: 'Khi trang bị vũ khí hai tay, toàn bộ sát thương bạn gây ra tăng 10%.',
+    },
     statLabels: {
       str: 'Sức Mạnh',
       agi: 'Nhanh Nhẹn',

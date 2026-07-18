@@ -178,7 +178,7 @@ function recomputeTalents(ctx: SimContext, meta: PlayerMeta): void {
   if (e) {
     cleanRemovedProcState(ctx, e, previousMods, meta.talentMods);
     normalizeAbilityCharges(e, meta, previousChargeCaps);
-    stripOrphanedFormAuras(ctx, meta, e);
+    stripOrphanedAbilityAuras(ctx, meta, e);
   }
   // The heavy talent snapshot is wireRev-gated. Every live allocation change
   // reaches this one choke point, while character load uses the silent path in
@@ -186,20 +186,19 @@ function recomputeTalents(ctx: SimContext, meta: PlayerMeta): void {
   meta.wireRev++;
 }
 
-// Cancel any active form/stance aura whose granting ability fell out of `meta.known`
-// (a respec, spec switch, or loadout swap), so the shapeshift's buff cannot outlive the
-// ability that grants it. Shapeshift/stance auras are toggled on by casting their
-// granting ability and never expire on their own (see the isFormKind toggle in
-// combat/effect_dispatch.ts), so without this a dropped ability (e.g. Balance's Moonkin
-// Form signature) leaves its buff (spell power, armor, threat mult, ...) folding into
-// recalcPlayerStats well into a different spec.
-function stripOrphanedFormAuras(ctx: SimContext, meta: PlayerMeta, e: Entity | undefined): void {
+// Cancel active form/stance and Enhancement tank auras whose granting ability fell
+// out of `meta.known` after a respec, spec switch, or loadout swap. Forms never expire;
+// Stone Aegis and Anchorbound Weapon are long-lived spec-only combat benefits. None may
+// outlive the ability that grants it and leak into a different spec.
+function stripOrphanedAbilityAuras(ctx: SimContext, meta: PlayerMeta, e: Entity | undefined): void {
   if (!e) return;
   const knownIds = new Set(meta.known.map((k) => k.def.id));
   let changed = false;
   for (let i = e.auras.length - 1; i >= 0; i--) {
     const a = e.auras[i];
-    if (isFormAuraKind(a.kind) && !knownIds.has(a.id)) {
+    const ownedByRemovedAbility =
+      isFormAuraKind(a.kind) || a.kind === 'earth_shield' || a.kind === 'earthbound_weapon';
+    if (ownedByRemovedAbility && !knownIds.has(a.id)) {
       e.auras.splice(i, 1);
       ctx.emit({ type: 'aura', targetId: e.id, name: a.name, gained: false });
       changed = true;

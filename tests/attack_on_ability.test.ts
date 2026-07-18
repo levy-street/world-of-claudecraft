@@ -29,6 +29,11 @@ describe('abilityStartsAutoAttack', () => {
     expect(abilityStartsAutoAttack(effectsOf('mark_of_the_wild'))).toBe(false); // buffTarget (friendly)
   });
 
+  it('keeps Anchorbound utility passive while Elemental Discharge engages', () => {
+    expect(abilityStartsAutoAttack(effectsOf('earthbound_weapon'))).toBe(false);
+    expect(abilityStartsAutoAttack(effectsOf('unleash_weapon'))).toBe(true);
+  });
+
   it('does not engage on pure crowd control', () => {
     expect(abilityStartsAutoAttack(effectsOf('polymorph'))).toBe(false); // polymorph only
     expect(abilityStartsAutoAttack(effectsOf('sap'))).toBe(false); // incapacitate only

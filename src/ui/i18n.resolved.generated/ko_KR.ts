@@ -2150,7 +2150,7 @@ export const ko_KR: EnTranslations = {
         "roleDormant": "비활성 지식",
         "roleUnattuned": "미조율",
         "ceilingUnlimited": "강화 상한 없음",
-        "ceilingRare": "Rare cap",
+        "ceilingRare": "희귀 상한",
         "ceilingCommon": "일반 상한",
         "skillAria": "{craft}, 기술 {skill}, 티어 {tier}, {role}, {ceiling}",
         "colCraft": "제작 분야",

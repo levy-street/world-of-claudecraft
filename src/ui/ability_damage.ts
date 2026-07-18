@@ -54,6 +54,10 @@ export function abilityDamageBonus(
       return def.channel
         ? channelTickBonus(power, def)
         : directHitBonus(power, def, res.castTime, false);
+    case 'unleashWeapon':
+      // Elemental Discharge is a single-target hit whose combat path scales from
+      // effective Attack Power even though the ability's data school is Nature.
+      return directHitBonus(scaling.attackPower, def, res.castTime, false);
     case 'aoeDamage':
     case 'aoeRoot':
     case 'chainDamage':
@@ -121,6 +125,7 @@ export function abilityPrimaryEffect(res: ResolvedAbility): AbilityEffect | unde
   return res.effects.find(
     (eff) =>
       eff.type === 'directDamage' ||
+      eff.type === 'unleashWeapon' ||
       eff.type === 'heal' ||
       eff.type === 'weaponDamage' ||
       eff.type === 'weaponStrike' ||

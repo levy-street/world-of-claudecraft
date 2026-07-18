@@ -7,6 +7,10 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_card_duel_first_win: {
+    name: '我的地盤我的規矩',
+    desc: '在牌局大師處贏得一場紙牌對決。',
+  },
   prog_first_steps: { name: '最初的腳步', desc: '達到2級，在漫漫長路上踏出你的第一步。' },
   prog_finding_your_feet: { name: '站穩腳步', desc: '達到5級；荒野在你眼中已經小了一些。' },
   prog_double_digits: { name: '邁入兩位數', desc: '達到10級並解鎖你的天賦。' },

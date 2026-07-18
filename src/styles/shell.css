@@ -1683,6 +1683,14 @@
     background: var(--color-border-default);
     border-radius: 4px;
   }
+  /* Welcome Screen news column: .ws-news already scrolls as a whole
+     (components.css), so the per-article 460px cap would nest a second
+     scrollbar inside it. */
+  .ws-news .news-body {
+    max-height: none;
+    overflow-y: visible;
+    padding-right: 0;
+  }
   .news-body > :first-child {
     margin-top: 0;
   }

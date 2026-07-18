@@ -2,6 +2,283 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const tr_TR: Partial<Record<TranslationKey, string>> = {
+  'hud.pet.waterJet': 'Su Jeti',
+  'hud.pet.waterJetDesc':
+    'Su Elementalinize 3 saniye boyunca yavaşlatıcı bir akıntı kanalize etmesini emredin. 8 saniyelik bekleme süresi. Bekleme süresi dolduğunda otomatik aktif etmek için sağ tıklayın.',
+  'hud.pet.waterJetTitle': 'Su Jeti',
+  'hud.prompts.acceptResurrection': 'Dirilişi Kabul Et',
+  'hud.prompts.resurrectionOffer': '{name} seni hayata döndürmek istiyor. Kabul ediyor musun?',
+  'itemUi.stats.parry': 'Savuşturma',
+  'apiError.wallet.handoff_invalid':
+    'Cüzdan yetkilendirmesi süresi dolmuş veya doğrulanamadı. Tekrar dene.',
+  'cardDuel.close': 'Kapat',
+  'cardDuel.counts': 'Deste: {deck} · Atılan: {discard}',
+  'cardDuel.forfeit': 'Teslim Ol',
+  'cardDuel.forfeitAria': 'Kart Düellosundan Çekil',
+  'cardDuel.join': 'Sıraya Gir',
+  'cardDuel.joinAria': 'Kart Düellosu sırasına gir',
+  'cardDuel.leave': 'Sıradan Çık',
+  'cardDuel.leaveAria': 'Kart Düellosu sırasından çık',
+  'cardDuel.playCardAria': '{value} kartını oyna',
+  'cardDuel.queued': 'Rakip bekleniyor...',
+  'cardDuel.round': 'Tur puanı: {mine} - {theirs}',
+  'cardDuel.title': 'Kart Düellosu',
+  'cardDuel.unavailable': 'Kart Düellosu için başka bir oyuncu çevrimiçi olmalıdır.',
+  'cardDuel.vsOpponent': '{name} ile',
+  'cardDuel.waitingOnOpponent': 'Rakibinin kartı bekleniyor...',
+  'cardDuel.yourTurn': 'Kart oyna',
+  'entities.abilities.arcane_surge.description':
+    "Düşmanın içinden ham aether dalgası geçirerek {damage} hasar verir. Her kullanım bir Gizemli Yük bırakır: bu yük bir sonraki Aether Dalgası'nın hasarını ve çeviri hızını artırır (her biri %5 daha hızlı) ama mana maliyetini keskin şekilde yükseltir; en fazla 4 yığın yapılabilir. Aether Okları yükleri harcar. Her kullanım aynı zamanda Aether Atılımı'nı harekete geçirebilir ve bir sonraki Aether Dalgası'nı ücretsiz ve iki kat daha hızlı hale getirebilir.",
+  'entities.abilities.arcane_surge.name': 'Aether Dalgası',
+  'entities.abilities.blizzard.description':
+    "Hedef alana 6 saniye boyunca buz fırtınası çağırır, her saniye {damage} Don hasarı verir ve düşmanları %40 yavaşlatır. Vurulan her düşman Donmuş Küre'nin süresini 0,5 saniye azaltır (kullanım başına en fazla 3 saniye). (Don)",
+  'entities.abilities.blizzard.name': 'Blizzard',
+  'entities.abilities.brain_freeze.description':
+    "Ayaz Mızrağı'nın bir sonraki Winterlash'i anlık, %30 daha sert ve bekleme süresiz yapma ihtimali %20'dir. (Don)",
+  'entities.abilities.brain_freeze.name': 'Brain Freeze',
+  'entities.abilities.dragons_breath.description':
+    'Genişleyen bir alev nefesi biriktirmek için basılı tut, ardından bir koni şeklinde bırak. Daha uzun şarjlar daha uzağa ulaşır ve daha fazla hasar verir. Vurulan düşmanlar yönelim kaybeder; hasar bu etkiyi bozar. Azami şarj her zaman kritik vurur ve Sıcak Seri için bir kez sayılır. (Ateş)',
+  'entities.abilities.dragons_breath.name': "Dragon's Breath",
+  'entities.abilities.fingers_of_frost.description':
+    "Ayaz Mızrağı'nın 2 yüke kadar Donmuş Parmaklar kazandırma ihtimali %15'tir: bir sonraki Ice Lance hedefi donmuş gibi değerlendirir. (Don)",
+  'entities.abilities.fingers_of_frost.name': 'Fingers of Frost',
+  'entities.abilities.fireball_form.description':
+    'Alev saçan bir köze dönüşerek hareket hızını {buff}% artır. Dönüşüm sırasında saldıramazsın veya büyü kullanamazsın. Normal formuna dönmek için yeniden kullan.',
+  'entities.abilities.fireball_form.name': 'Kor Formu',
+  'entities.abilities.flurry.description':
+    "Her biri {damage} Don hasarı veren üç buz oku fırlat ve hedefe Kışın Üşümesi'ni uygula: bir sonraki 2 uyumlu büyü onu donmuş gibi değerlendirir. Brain Freeze, Winterlash'i anlık, %30 daha sert yapar ve bekleme süresini atlatır. (Don)",
+  'entities.abilities.flurry.name': 'Winterlash',
+  'entities.abilities.frozen_orb.description':
+    'Yakındaki düşmanlara her saniye {damage} Don hasarı vererek ve onları %30 yavaşlatarak 8 saniye ileri süzülen dönen bir buz küre bırak. Vuruşları Donmuş Parmaklar üretir. (Don)',
+  'entities.abilities.frozen_orb.name': 'Frozen Orb',
+  'entities.abilities.glacial_front.description':
+    'Genişleyen bir don cephesi biriktirmek için basılı tut, ardından bir koni şeklinde bırak. Daha uzun şarjlar daha uzağa ulaşır ve daha fazla hasar verir. Vurulan tüm düşmanlar 4 saniye boyunca %50 yavaşlar. Azami şarj ayrıca onları 1 saniye kökler. (Don)',
+  'entities.abilities.glacial_front.name': 'Glacial Front',
+  'entities.abilities.glacial_spike.description':
+    'Devasa bir buz dikeni çağırarak 5 Buz Parçası tüketir, {damage} Don hasarı verir ve hedefi 4 saniye olduğu yere dondurur. (Don)',
+  'entities.abilities.glacial_spike.name': 'Glacial Spike',
+  'entities.abilities.ice_lance.description':
+    "Bir buz kıymığı fırlatarak {damage} Don hasarı verir; donmuş hedefe karşı üç kat etkilidir. Donmuş Parmaklar'ı veya Kışın Üşümesi'nin bir yükünü harcayarak hedefi donmuş gibi değerlendirir. (Don)",
+  'entities.abilities.ice_lance.name': 'Ice Lance',
+  'entities.abilities.perfect_moment.description':
+    'Mükemmel anını yakala: anında 4 Gizemli Yük kazan ve 10 saniye boyunca Aether Okları onları tüketmez. (Kronomansi)',
+  'entities.abilities.perfect_moment.name': 'Mükemmel An',
+  'entities.abilities.shatter.description':
+    'Büyülerin donmuş hedeflere karşı %50 kritik vuruş şansı kazanır ve bu kritik vuruşlar %20 daha fazla hasar verir. Donmuş Parmaklar ve Kışın Üşümesi donmuş sayılır. (Don)',
+  'entities.abilities.shatter.name': 'Brittle Ruin',
+  'entities.abilities.temporal_acceleration.description':
+    "Grubunuz veya akınınız için zamanın akışını hızlandırarak saldırı, büyü atma ve kanalize hızını 15 saniye boyunca %30 artırır. Yakın zamanda Zamansal Hızlanma veya Savaş Davulları'ndan etkilenen müttefikler bu etkiden yararlanamayacak kadar tükenmiştir. (Kronomansi)",
+  'entities.abilities.temporal_acceleration.name': 'Zamansal Hızlanma',
+  'entities.abilities.temporal_barrier.description':
+    'Hedefi şimdiden bir kalp atışı uzaklaştırarak zamansal bir kabuk oluşturur ve zaman çizelgesi geri dökmeden önce 10 saniye boyunca {damage} hasarı emer.',
+  'entities.abilities.temporal_barrier.name': 'Zamansal Bariyer',
+  'entities.abilities.temporal_cascade.description':
+    'Grubunuza bir yankı dalgası gönderir: hedef ve dört yakın müttefiki aynı anda iyileştirilir ve her biri {duration} saniye işaretlenir; bu süre içinde verdiğin Gizemli hasar kısmen onların yankıları aracılığıyla geri dönerek onları iyileştirir. (Kronomansi)',
+  'entities.abilities.temporal_cascade.name': 'Zamansal Çağlayan',
+  'entities.abilities.temporal_echo.description':
+    'Bir müttefiki daha sağlıklı bir anın yankısıyla işaretleyerek {damage} canı anında iyileştirir. {duration} saniye boyunca verdiğin Gizemli hasar kısmen yankı aracılığıyla geri döner ve onları iyileştirir.',
+  'entities.abilities.temporal_echo.name': 'Zamansal Yankı',
+  'entities.abilities.temporal_hourglass.description':
+    "Seçilen konuma zamansal bir kum saati yerleştir. Bir düşmanın altına yerleştirildiğinde, PvE'de {hostilePveDuration} saniye, PvP'de {hostilePvpDuration} saniye askıya alır ve tüm eylemleri engeller; hasar etkiyi bozar. Ayaklarının dibine veya bir grup müttefikinin altına yerleştirildiğinde, {duration} saniye donukluk verir, hasarı ve eylemleri engeller, azami canın {healing}%'ini geri kazandırır ve bekleme sürelerinin sende {selfCooldownRecovery}% daha hızlı, müttefikte {allyCooldownRecovery}% daha hızlı iyileşmesini sağlar. Boş zemine yerleştirildiğinde, kum saati {groundDuration} saniye bekler ve üzerine basan ilk geçerli birimi etkiler. Yararlı aura manuel olarak kaldırılabilir.",
+  'entities.abilities.temporal_hourglass.name': 'Askıya Alma Kum Saati',
+  'entities.abilities.temporal_mend.description':
+    'Bir müttefiki zamanda biraz ileri çekerek {damage} canı iyileştirir; beden daha sağlıklı geleceğine kavuşur. (Kronomansi imzası)',
+  'entities.abilities.temporal_mend.name': 'Zamansal Onarım',
+  'entities.abilities.temporal_reversal.description':
+    'Düşmüş bir müttefikin zaman çizelgesini geri sararak onları savaşın tam ortasında bile bedeninin yanında, canının ve manasının bir kısmıyla hayata döndürür. (Kronomansi)',
+  'entities.abilities.temporal_reversal.name': 'Zamansal Tersine Çevirme',
+  'entities.abilities.temporal_rewind.description':
+    "Grup veya akın içinden bir gizemli dalga geçirerek 40 yarda yakınındaki her müttefikin son 5 saniyede aldığı hasarın %30'unu geri sarar (azami canlarının %35'ine kadar). Kritik etki olamaz. (Kronomansi)",
+  'entities.abilities.temporal_rewind.name': 'Geri Sar',
+  'entities.npcs.card_master.greeting':
+    'Kart Düellosu ister misin? Üçte iki galip gelen övünme hakkını kazanır.',
+  'entities.npcs.card_master.name': 'Kart Ustası',
+  'entities.npcs.card_master.title': 'Şans Dağıtıcısı',
+  'entities.quests.q_archetype_acceptance.completion':
+    'Söz yerini buldu. Bu iki zanaat artık ana dallarındır; karşısındaki bilgi ise hobine dönüşür.',
+  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Maden damarı işlendi',
+  'entities.quests.q_archetype_acceptance.text':
+    "Beceri bilgidir, {playerName}, ama uyum bir sözdür. Yöntemlerini ana dal olarak taşıyacağın iki komşu zanaatı seç, ardından Vadi'den kendi ellerinle işlediğin cevheri bana getir.",
+  'entities.quests.q_prof_hobby_switch.completion':
+    'Daha hafif bir tercih ama işe yarar bir tercih. O merakı nadir işlerin götüreceği yere kadar takip et.',
+  'entities.quests.q_prof_hobby_switch.objectives.0.label': 'Ot tarlası toplandı',
+  'entities.quests.q_prof_hobby_switch.text':
+    'Ana dallar yemin ister. Bir hobi ise yalnızca merakının nereye gezindiğini sorar, {playerName}. Birkaç ot topla ve ana dallarının karşısındaki hangi zanaatı sürdürmek istediğine karar ver.',
+  'entities.quests.q_prof_hobby_switch.title': 'Farklı Bir Uğraş',
+  'entities.quests.q_prof_intro.completion':
+    'Gördün mü? Cevher toplandı ve ellerin nasırlandı. Yollarda gezerken madenciliğe, odun kesimine ve ot toplamaya devam et; kasabaya döndüğünde çarşının yanındaki Kasaba Odak Panosuna ve yakınındaki zanaat tezgahına dikkat et. İstersen hepsinde adil bir kazanç var.',
+  'entities.quests.q_prof_intro.objectives.0.label': 'Maden damarı işlendi',
+  'entities.quests.q_prof_intro.text':
+    "Eastbrook'taki her ruh kılıcın yanı sıra bir zanaat da icra eder, {playerName}. Kasabanın güneybatısındaki Bakır Kazısı'nın çevresindeki kayalarda maden damarları var. Git bir kazma salla ve bunlardan 5'ini kendin işle; dikkat et, farkı anlayabilirim.",
+  'entities.quests.q_prof_make_amends.completion':
+    'Eski ritim geri döndü. Eski çiftin bir kez daha etkin.',
+  'entities.quests.q_prof_make_amends.text':
+    'O çifti daha önce taşıdın, {playerName}. Geri dönmek yeni bir yemin değil. Vadi yolunu temiz tutmaya yardım et; iş, ellerinin bir zamanlar ne bildiğini hatırlatacak.',
+  'gpuNotice.bodyDesktop':
+    "Oyun GPU hızlandırması olmadan çalışıyor ve yavaş olacak. Grafik sürücülerini güncelleyip oyunu yeniden başlat. Windows'ta ayrıca Ayarlar > Sistem > Ekran > Grafikler altında oyunu Yüksek performans olarak ayarla.",
+  'gpuNotice.bodyWeb':
+    'Oyun GPU hızlandırması olmadan çalışıyor ve yavaş olacak. Tarayıcı ayarlarından donanım hızlandırmayı etkinleştir, grafik sürücülerini güncelleyip tarayıcını yeniden başlat.',
+  'gpuNotice.dismiss': 'Kapat',
+  'guide.abilityHook.blink': 'Sizi kısa bir mesafe ileriye ışınlayarak kökleri koparır.',
+  'guide.abilityHook.blizzard': 'Tüm bir grubu yıpratmak ve yavaşlatmak için alanı buzla kaplar.',
+  'guide.abilityHook.brain_freeze':
+    "Buz okların zaman zaman bir sonraki Winterlash'i anlık ve daha sert yapar.",
+  'guide.abilityHook.fingers_of_frost':
+    "Buz okların zaman zaman bir Ice Lance'e hedef donmuş gibi vurma gücü verir.",
+  'guide.abilityHook.fireball_form':
+    'Açık arazide yüksek hızda hareket etmek için yaşayan bir kora dönüş.',
+  'guide.abilityHook.flurry':
+    'Hedefi soğutan ve bir sonraki don vuruşlarının donmuşmuş gibi isabet etmesini sağlayan üç hızlı ok.',
+  'guide.abilityHook.frozen_orb':
+    'Grubun içinden yavaş bir küre geçirerek her şeyi soğutur ve don tetiklemelerini besler.',
+  'guide.abilityHook.ice_lance':
+    'Don tetiklemeleri harcamaya yarayan anlık bir kıymık; donmuş hedefe çok daha sert vurur.',
+  'guide.abilityHook.shatter': 'Büyülerin donmuş hedeflere karşı çok daha sık kritik vurur.',
+  'guide.deedsPage.renownBody':
+    'Ün, Kitabın arkasındaki puandır. Kazandığın her yiğitlik belirli bir miktar eder ve toplamın yalnızca artar; sakin bir hafta seni hiç geri düşürmez. Birkaç yiğitlik beceri yerine şansa dayalıdır ve Destanlar kendi başına bir onurdur, bu nedenle her ikisi de Ün kazandırmaz. Ünsüz yiğitlikler Kitabındaki tamamlanmışlık sayısına yine de dahildir; yalnızca hiç puan vermezler.',
+  'guide.deedsPage.standingsNote':
+    "Diyarlar her hesabın ömür boyu Ün'ünü sürekli olarak kaydeder: sıralama, tüm karakterlerindeki her yiğitliği bir kez sayarak hesapları ömür boyu Ün'lerine göre sıralar ve yalnızca Ün'ü gösterir; bu nedenle Ün taşımayan yiğitlikler Kitabında sayılsa da sıralamayı hiç etkilemez. Kimin nerede durduğunu görmek için oyun içinde Lider Tablosunu aç ve Ün sekmesine geç; sıralama orada yaşar, wiki'de değil.",
+  'hudChrome.archetypePair.alchemy+cooking': 'Eczacı',
+  'hudChrome.archetypePair.armorcrafting+engineering': 'Çarklı Demirci',
+  'hudChrome.archetypePair.cooking+leatherworking': 'Avcı Ustası',
+  'hudChrome.archetypePair.enchanting+jewelcrafting': 'Mücevher Bağlayıcı',
+  'hudChrome.archetypePair.engineering+alchemy': 'Bombacı',
+  'hudChrome.archetypePair.inscription+enchanting': 'Gizemci',
+  'hudChrome.archetypePair.jewelcrafting+weaponcrafting': 'Bıçakçı Usta',
+  'hudChrome.archetypePair.leatherworking+tailoring': 'Teçhizatçı',
+  'hudChrome.archetypePair.tailoring+inscription': 'Büyü Dokuyucu',
+  'hudChrome.archetypePair.weaponcrafting+armorcrafting': 'Demirci',
+  'hudChrome.auraEffect.cheapCast': 'Bir sonraki büyün {pct}% daha az mana harcar',
+  'hudChrome.auraEffect.combustionCrit': 'Ateş büyülerin her zaman kritik vurur',
+  'hudChrome.auraEffect.dmgDone': 'Verilen hasarı {pct}% artırır',
+  'hudChrome.auraEffect.dmgDoneReduce': 'Verilen hasarı {pct}% azaltır',
+  'hudChrome.auraEffect.elementalConvergencePrimed':
+    'Diğer element okulundan bir sonraki büyün Element Yakınsaması kazandırır',
+  'hudChrome.auraEffect.formFireball':
+    'Kor Formu: hareket hızı {pct}% artırıldı; saldırılar ve büyüler devre dışı',
+  'hudChrome.auraEffect.freeCast': 'Bir sonraki büyün hiçbir şeye mal olmaz',
+  'hudChrome.auraEffect.heatingUp':
+    "Bir sonraki ardışık Ateş kurucu kritik vuruşun Sıcak Seri kazandırır; kritik olmayan bir kurucu Isınıyor'u kaldırır",
+  'hudChrome.auraEffect.iceFloesCasts':
+    'Bir sonraki {n} çeviri süreli büyün hareket ederken atılabilir',
+  'hudChrome.auraEffect.increase.sp': 'Büyü gücünü {value} artırır',
+  'hudChrome.auraEffect.instantCast': 'Çeviri süresi olan bir sonraki büyün anlık olur',
+  'hudChrome.auraEffect.overloadNext':
+    'Bir sonraki büyün {pct}% amplified edilir ama %50 daha fazla mana harcar',
+  'hudChrome.auraEffect.powerEchoNext':
+    'Bir sonraki doğrudan büyün aynı hedef üzerinde {pct}% güçle tekrarlanır',
+  'hudChrome.auraEffect.temporalHourglass':
+    'Bağışık ve eylem yapamaz; canı yeniler ve bekleme süresi iyileşmesini hızlandırır. İptal etmek için sağ tıkla.',
+  'hudChrome.craftName.alchemy': 'Simya',
+  'hudChrome.craftName.armorcrafting': 'Zırh Yapımı',
+  'hudChrome.craftName.cooking': 'Yemek Pişirme',
+  'hudChrome.craftName.enchanting': 'Büyüleme',
+  'hudChrome.craftName.engineering': 'Mühendislik',
+  'hudChrome.craftName.inscription': 'Hat Sanatı',
+  'hudChrome.craftName.jewelcrafting': 'Mücevher İşleme',
+  'hudChrome.craftName.leatherworking': 'Deri İşleme',
+  'hudChrome.craftName.tailoring': 'Terzilik',
+  'hudChrome.craftName.weaponcrafting': 'Silah Yapımı',
+  'hudChrome.crafting.attunementPreview':
+    'Sonuç: {title} unvanı; {majorA} ve {majorB} sınırsız ana dal haline gelir; {hobby} nadir sınırlı hobi olur; diğer tüm zanaat bilgisi korunur ama eylemsizken adi ile sınırlandırılır.',
+  'hudChrome.crafting.comboMet': 'Hazır.',
+  'hudChrome.crafting.comboNotAttuned': 'Önce bir arketip çifti seç.',
+  'hudChrome.crafting.comboRequires': 'Uyum: {craftA} + {craftB}, kademe {tier}.',
+  'hudChrome.crafting.comboSyncing': 'Diyar uyumu kontrol ediliyor.',
+  'hudChrome.crafting.comboTierUnmet': 'Her iki ana zanaatı da gerekli kademeye yükselt.',
+  'hudChrome.crafting.comboWrongPair': 'Onu yapmak için bu tam çifti etkinleştir.',
+  'hudChrome.crafting.hobbyPreview':
+    'Sonuç: {hobby} nadir sınırlı hobi haline gelir. Her iki ana dal ve korunan tüm beceri değerleri değişmeden kalır.',
+  'hudChrome.crafting.identity.ceilingCommon': 'Adi sınır',
+  'hudChrome.crafting.identity.ceilingRare': 'Nadir sınır',
+  'hudChrome.crafting.identity.ceilingUnlimited': 'Güçlendirme sınırı yok',
+  'hudChrome.crafting.identity.colCap': 'Sınır',
+  'hudChrome.crafting.identity.colCraft': 'Zanaat',
+  'hudChrome.crafting.identity.colRole': 'Rol',
+  'hudChrome.crafting.identity.colSkill': 'Beceri',
+  'hudChrome.crafting.identity.dormantKnowledge':
+    '{craft} bilgisi korunuyor ancak çifti veya hobisi etkin olana kadar eylemsiz kalacak.',
+  'hudChrome.crafting.identity.history': '{pairs} çift keşfedildi, {returns} geri dönüş tamamlandı',
+  'hudChrome.crafting.identity.historyLabel': 'Geçmiş',
+  'hudChrome.crafting.identity.hobbyLabel': 'Hobi',
+  'hudChrome.crafting.identity.majorsLabel': 'Ana Dallar',
+  'hudChrome.crafting.identity.nearTier':
+    '{craft}, bir sonraki kademeye {points} beceri uzaklıkta.',
+  'hudChrome.crafting.identity.roleDormant': 'Eylemsiz bilgi',
+  'hudChrome.crafting.identity.roleHobby': 'Hobi',
+  'hudChrome.crafting.identity.roleMajor': 'Ana Dal',
+  'hudChrome.crafting.identity.roleUnattuned': 'Uyumsuz',
+  'hudChrome.crafting.identity.skillAria':
+    '{craft}, beceri {skill}, kademe {tier}, {role}, {ceiling}',
+  'hudChrome.crafting.identity.syncing': 'Diyardan zanaat kimliğin bekleniyor.',
+  'hudChrome.crafting.identity.title': 'Zanaat Kimliği',
+  'hudChrome.crafting.identity.titleLabel': 'Unvan',
+  'hudChrome.crafting.identity.tutorial':
+    'İlk kademe: bir zanaatta {skill} becerisine ulaş. Başarılı tarifler, başka yerlerdeki bilgiyi silmeden o zanaatı yükseltir.',
+  'hudChrome.crafting.identity.unattuned':
+    'Etkin arketip çifti yok. Bilgin korunuyor, ancak birleşik tarifler uyumlu bir çift gerektirir.',
+  'hudChrome.crafting.noProfessionChoice': 'Şu anda geçerli bir meslek seçimi mevcut değil.',
+  'hudChrome.crafting.pairOptionLabel': '{pair} ({craftA} + {craftB})',
+  'hudChrome.crafting.professionChoice': 'Meslek seçimi',
+  'hudChrome.deeds.lbScopeNote':
+    "Hesaplar ömür boyu kazandıkları Ün'e göre sıralanır. Her yiğitlik bir hesaptaki tüm karakterlerde bir kez sayılır.",
+  'hudChrome.deeds.lbSelfAccount': 'Hesabın: {rank}. sıra, ilk {percent} yüzde, {renown} Ün',
+  'hudChrome.deeds.lbSelfRank': 'Hesabın: {rank}. sıra, ilk {percent} yüzde',
+  'hudChrome.nameplate.mobEliteLevel': '{level}+',
+  'hudChrome.nameplate.mobLevel': '{level}',
+  'hudChrome.specPanel.specUnlockBanner': 'Uzmanlık Kilidi Açıldı!',
+  'hudChrome.specPanel.specUnlockHint': "Uzmanlığını seçmek için N'ye bas.",
+  'hudChrome.wocStore.wallet.connect': 'Cüzdan bağla',
+  'hudChrome.wocStore.wallet.connectedUnlinked':
+    'Cüzdan uygulaması bu tarayıcıya bağlı, ancak açık adresi henüz WoC hesabına bağlanmamış.',
+  'hudChrome.wocStore.wallet.linkedConnected':
+    'Bağlı cüzdan uygulan bağlı ve SOL veya WOC alımlarına hazır.',
+  'hudChrome.wocStore.wallet.linkedDisconnected':
+    'Açık adresin bağlı. SOL veya WOC ile ödeme yapmak istediğinde o cüzdan uygulamasını yeniden bağla.',
+  'hudChrome.wocStore.wallet.manage': 'Cüzdanı yönet',
+  'hudChrome.wocStore.wallet.mismatched':
+    'Farklı bir cüzdan bağlı. Bağlı adresi değiştirmek için doğrula ya da bağlı cüzdanı yeniden bağla.',
+  'hudChrome.wocStore.wallet.reconnect': 'Cüzdanı yeniden bağla',
+  'hudChrome.wocStore.wallet.title': 'Solana cüzdanı',
+  'hudChrome.wocStore.wallet.unlinked':
+    'Bir cüzdan uygulaması bağla, ardından açık adresini WoC hesabına bağlamak için bir kez imzala. Kurtarma ifadeni veya özel anahtarını hiçbir zaman almıyoruz.',
+  'hudChrome.wocStore.wallet.verify': 'Doğrula ve bağla',
+  'wallet.bagConnect': 'Cüzdanı bağla',
+  'wallet.bagLink': 'Cüzdanı doğrula',
+  'wallet.bagReconnect': 'Cüzdanı yeniden bağla',
+  'wallet.browser.completeBody': 'World of ClaudeCraft masaüstü uygulamasına dönebilirsin.',
+  'wallet.browser.completeTitle': 'Cüzdan yetkilendirmesi tamamlandı',
+  'wallet.browser.continueWith': '{wallet} ile devam et',
+  'wallet.browser.extensionHelp':
+    'Uyumlu cüzdan uzantısı bulunamadı. Phantom, Solflare veya başka bir Solana tarayıcı cüzdanını yükle ya da kilidini aç, ardından tekrar dene.',
+  'wallet.browser.eyebrow': 'Masaüstü cüzdan yetkilendirmesi',
+  'wallet.browser.failed':
+    'Cüzdan yetkilendirmesi başarısız oldu veya süresi doldu. Masaüstü uygulamasına dön ve tekrar dene.',
+  'wallet.browser.linkBody':
+    'Bu tarayıcıda bir cüzdan uzantısı seç. Bir doğrulama mesajı imzalayacak, ardından masaüstü uygulamasına döneceksin.',
+  'wallet.browser.paymentBody': 'Hesabına bağlı cüzdanı seç ve bu tarayıcıda işlemi onayla.',
+  'wallet.browser.retry': 'Tekrar dene',
+  'wallet.browser.returnButton': 'Masaüstü uygulamasına dön',
+  'wallet.browser.reviewBody':
+    "{wallet}'dan gelen istemi takip et. Bu tarayıcı sayfasını açık bırak.",
+  'wallet.browser.reviewTitle': 'Cüzdanında incele',
+  'wallet.browser.safety':
+    'World of ClaudeCraft hiçbir zaman kurtarma ifadeni veya özel anahtarını istemez.',
+  'wallet.browser.title': 'Solana Cüzdanı Bağla',
+  'wallet.manualReturnBrowserHelp':
+    'Onayladıktan sonra bu oyun sekmesine dön. iOS başka bir tarayıcı açarsa, kapat ve orijinal tarayıcıya manuel olarak dön.',
+  'wallet.manualReturnStandaloneHelp':
+    "Onayladıktan sonra Ana Ekranından World of ClaudeCraft'a dön. iOS bir tarayıcı açarsa, kapat ve Ana Ekran uygulamasını manuel olarak yeniden aç.",
+  'wallet.mobileAppHelp':
+    "Phantom veya Solflare'i seç. Cüzdan uygulan onay isteyecek. Bu oyunu açık bırak ve bittiğinde geri dön.",
+  'wallet.openAppButton': "{wallet}'u aç",
+  'wallet.openAppHelp':
+    "Bu isteği incelemek için {wallet}'u aç. Cüzdan uygulaması etkinken bu oyun sekmesini açık bırak.",
+  'wallet.openAppTitle': "{wallet}'da devam et",
+  'wallet.preparingAppButton': '{wallet} hazırlanıyor...',
+  'wallet.standaloneAppHelp':
+    "Ana Ekran uygulamasında cüzdan bağlantıları henüz mevcut değil. Phantom veya Solflare kullanmak için World of ClaudeCraft'ı Safari veya Chrome'da aç.",
+  'wallet.walletAppUnavailable': '{wallet} hazırlanamadı. Bu pencereyi kapat ve tekrar dene.',
   'entities.abilities.primal_reflexes.description':
     'İçgüdülerin keskinleşerek 6 sn boyunca savurma şansını %50 artırır.',
   'entities.abilities.primal_reflexes.name': 'Yaban Refleksleri',

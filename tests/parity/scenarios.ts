@@ -3608,6 +3608,62 @@ function c4bEffectDispatch(): Scenario {
   };
 }
 
+// Enhancement Shaman tank kit: pins the charge-limited mitigation path and the
+// two shared RNG draws in Elemental Discharge (damage range, then crit). The
+// Anchorbound cast also proves that its doubled damage threat and flat rider are
+// applied before the weapon enchant is consumed.
+function enhancementTankKit(): Scenario {
+  return {
+    name: 'enhancement_tank_kit',
+    coverage: [
+      'class:shaman Enhancement extra-grant tank kit',
+      'Stone Aegis direct-hit mitigation and charge consumption',
+      'Anchorbound Weapon doubled threat and flat discharge rider',
+      'Elemental Discharge range-then-crit shared RNG draws and enchant consumption',
+    ],
+    sampleEvery: 5,
+    build: () => new Sim({ seed: 1025, playerClass: 'shaman', autoEquip: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      sim.setPlayerLevel(20);
+      sim.setSpec('enhancement');
+      const p = sim.player as AnyEntity;
+      beef(p);
+      const mob = spawnMob(sim, 'ridge_stalker', 20, p.pos.x, p.pos.y, p.pos.z + 4);
+      beef(mob, 500000);
+      mob.hostile = true;
+      mob.aiState = 'idle';
+      rec.track(mob.id);
+      rec.notes.mobId = mob.id;
+      face(p, mob);
+      sim.targetEntity(mob.id);
+
+      const ready = (): void => {
+        p.gcdRemaining = 0;
+        p.resource = p.maxResource;
+      };
+
+      ready();
+      sim.castAbility('earth_shield');
+      sim.dealDamage(mob, p, 100, false, 'physical', null, 'hit');
+      rec.notes.shieldChargesAfterHit = p.auras.find(
+        (a: Aura) => a.kind === 'earth_shield',
+      )?.charges;
+      rec.snapshot('stone-aegis-hit');
+
+      ready();
+      sim.castAbility('earthbound_weapon');
+      const before = mob.hp;
+      ready();
+      sim.castAbility('unleash_weapon');
+      rec.tick(10); // let the short projectile reach the 4-yard target
+      rec.notes.dischargeDamage = before - mob.hp;
+      rec.notes.dischargeThreat = mob.threat.get(p.id) ?? 0;
+      rec.snapshot('anchorbound-discharge');
+    },
+  };
+}
+
 // Hit-rating parity pair: the same seeded mage casts once at a +3 target, with and
 // without four authored Hit pieces. The coverage test compares the two traces'
 // shared-RNG count + digest. Gear changes the existing spell-hit threshold and the
@@ -4336,6 +4392,7 @@ export const SCENARIOS: Scenario[] = [
   mobLifecycle(),
   targetingMarkers(),
   c4bEffectDispatch(),
+  enhancementTankKit(),
   hitRatingHeroic(false),
   hitRatingHeroic(true),
   c5AutoAttack(),

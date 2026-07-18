@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
 import {
   computeTalentModifiers,
@@ -19,8 +19,18 @@ import {
   type AbilityScaling,
   abilityBuffValue,
   abilityDamageBonus,
+  abilityPrimaryEffect,
   abilityTemporalHourglassValues,
 } from '../src/ui/ability_damage';
+import { abilityEffectText } from '../src/ui/hud';
+
+vi.mock('../src/render/characters', () => ({ CharacterPreview: class {} }));
+vi.mock('../src/render/characters/assets', () => ({ preloadMechAssets: vi.fn() }));
+vi.mock('../src/render/characters/portrait', () => ({
+  onPortraitsReady: vi.fn(),
+  playerPortraitDataUrl: vi.fn(),
+  visualPortraitDataUrl: vi.fn(),
+}));
 
 function known(cls: Parameters<typeof abilitiesKnownAt>[0], id: string, mods?: TalentModifiers) {
   const ability = abilitiesKnownAt(cls, MAX_LEVEL, mods).find((k) => k.def.id === id);
@@ -39,8 +49,27 @@ const PROT_MODS = computeTalentModifiers('warrior', {
   ...emptyAllocation(),
   spec: 'prot',
 } as never);
+const ENH_MODS = computeTalentModifiers('shaman', {
+  ...emptyAllocation(),
+  spec: 'enhancement',
+} as never);
 
 describe('abilityDamageBonus (tooltip scaling mirrors combat)', () => {
+  it('resolves Elemental Discharge as a direct Attack Power-scaled hit', () => {
+    const discharge = known('shaman', 'unleash_weapon', ENH_MODS);
+    const eff = abilityPrimaryEffect(discharge);
+    expect(eff?.type).toBe('unleashWeapon');
+    if (!eff) return;
+    expect(abilityDamageBonus(discharge, eff, SC)).toBe(
+      directHitBonus(SC.attackPower, discharge.def, discharge.castTime, false),
+    );
+  });
+
+  it('renders the Elemental Discharge base range and Attack Power suffix', () => {
+    const discharge = known('shaman', 'unleash_weapon', ENH_MODS);
+    expect(abilityEffectText(discharge, SC)).toBe('20 to 26 (+60)');
+  });
+
   it('renders Direhowl from its percentage damage reduction, not the retired AP amount', () => {
     expect(abilityBuffValue(known('warrior', 'demoralizing_shout', PROT_MODS))).toBe(20);
   });

@@ -2150,7 +2150,7 @@ export const ru_RU: EnTranslations = {
         "roleDormant": "Неактивные знания",
         "roleUnattuned": "Без настройки",
         "ceilingUnlimited": "Без потолка усиления",
-        "ceilingRare": "Rare cap",
+        "ceilingRare": "Потолок редкого",
         "ceilingCommon": "Потолок обычного качества",
         "skillAria": "{craft}, навык {skill}, ранг {tier}, {role}, {ceiling}",
         "colCraft": "Ремесло",

@@ -277,6 +277,9 @@ const localeTextByBase = {
     reduce: (target, amount, perRank) => `Reduce ${target} en ${amount}${perRank}.`,
   },
   fr_FR: {
+    masteryDescriptions: {
+      arms: 'Lorsque vous maniez une arme à deux mains, tous les dégâts que vous infligez sont augmentés de 10 %.',
+    },
     statLabels: {
       str: 'Force',
       agi: 'Agilité',
@@ -322,6 +325,9 @@ const localeTextByBase = {
     reduce: (target, amount, perRank) => `Réduit ${target} de ${amount}${perRank}.`,
   },
   it_IT: {
+    masteryDescriptions: {
+      arms: "Con un'arma a due mani in mano, tutti i danni che infliggi aumentano del 10%.",
+    },
     statLabels: {
       str: 'Forza',
       agi: 'Agilità',
@@ -367,6 +373,9 @@ const localeTextByBase = {
     reduce: (target, amount, perRank) => `Riduce ${target} di ${amount}${perRank}.`,
   },
   de_DE: {
+    masteryDescriptions: {
+      arms: 'Solange du eine Zweihandwaffe führst, erhöht sich dein verursachter Schaden um 10 %.',
+    },
     statLabels: {
       str: 'Stärke',
       agi: 'Beweglichkeit',
@@ -412,6 +421,7 @@ const localeTextByBase = {
     reduce: (target, amount, perRank) => `Verringert ${target} um ${amount}${perRank}.`,
   },
   zh_CN: {
+    masteryDescriptions: { arms: '装备双手武器时，你造成的所有伤害提高 10%。' },
     statLabels: {
       str: '力量',
       agi: '敏捷',
@@ -457,6 +467,7 @@ const localeTextByBase = {
     reduce: (target, amount, perRank) => `使${target}降低${amount}${perRank}。`,
   },
   zh_TW: {
+    masteryDescriptions: { arms: '揮舞雙手武器時，你造成的所有傷害提高10%。' },
     statLabels: {
       str: '力量',
       agi: '敏捷',
@@ -502,6 +513,7 @@ const localeTextByBase = {
     reduce: (target, amount, perRank) => `使${target}降低${amount}${perRank}。`,
   },
   ko_KR: {
+    masteryDescriptions: { arms: '양손 무기를 장착하면 주는 피해가 10% 증가합니다.' },
     statLabels: {
       str: '힘',
       agi: '민첩',
@@ -547,6 +559,9 @@ const localeTextByBase = {
     reduce: (target, amount, perRank) => `${target}이 ${amount}${perRank} 감소합니다.`,
   },
   ja_JP: {
+    masteryDescriptions: {
+      arms: '両手武器を装備している間、与えるダメージがすべて10%増加します。',
+    },
     statLabels: {
       str: '筋力',
       agi: '敏捷性',
@@ -592,6 +607,9 @@ const localeTextByBase = {
     reduce: (target, amount, perRank) => `${target}を${amount}${perRank}減少させます。`,
   },
   pt_BR: {
+    masteryDescriptions: {
+      arms: 'Enquanto empunha uma arma de duas mãos, o dano que você causa é aumentado em 10%.',
+    },
     statLabels: {
       str: 'Força',
       agi: 'Agilidade',
@@ -637,6 +655,9 @@ const localeTextByBase = {
     reduce: (target, amount, perRank) => `Reduz ${target} em ${amount}${perRank}.`,
   },
   ru_RU: {
+    masteryDescriptions: {
+      arms: 'При использовании двуручного оружия весь наносимый вами урон увеличивается на 10%.',
+    },
     statLabels: {
       str: 'Сила',
       agi: 'Ловкость',

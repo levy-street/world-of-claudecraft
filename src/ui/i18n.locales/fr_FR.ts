@@ -13,6 +13,296 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const fr_FR: Partial<Record<TranslationKey, string>> = {
+  'hud.combat.floatingParry': 'Parade',
+  'hud.combat.parried': 'Votre {ability} est parée par {target}.',
+  'hud.pet.waterJet': "Jet d'eau",
+  'hud.pet.waterJetDesc':
+    "Ordonnez à votre Élémentaire d'eau de canaliser un courant ralentissant pendant 3 secondes. Temps de recharge de 8 secondes. Clic droit pour l'activer automatiquement dès qu'il n'est plus en recharge.",
+  'hud.pet.waterJetTitle': "Jet d'eau",
+  'hud.prompts.acceptResurrection': 'Accepter la résurrection',
+  'hud.prompts.resurrectionOffer': '{name} souhaite vous ramener à la vie. Acceptez-vous ?',
+  'itemUi.stats.parry': 'Parade',
+  'apiError.wallet.handoff_invalid':
+    "Cette autorisation de portefeuille a expiré ou n'a pas pu être vérifiée. Réessayez.",
+  'cardDuel.close': 'Fermer',
+  'cardDuel.counts': 'Deck : {deck} · Défausse : {discard}',
+  'cardDuel.forfeit': 'Abandonner',
+  'cardDuel.forfeitAria': 'Abandonner le Duel de cartes',
+  'cardDuel.join': 'Rejoindre la file',
+  'cardDuel.joinAria': 'Rejoindre la file du Duel de cartes',
+  'cardDuel.leave': 'Quitter la file',
+  'cardDuel.leaveAria': 'Quitter la file du Duel de cartes',
+  'cardDuel.playCardAria': 'Jouer la carte {value}',
+  'cardDuel.queued': "En attente d'un adversaire...",
+  'cardDuel.round': 'Score de la manche : {mine} - {theirs}',
+  'cardDuel.title': 'Duel de cartes',
+  'cardDuel.unavailable': 'Le Duel de cartes nécessite un autre joueur en ligne.',
+  'cardDuel.vsOpponent': 'contre {name}',
+  'cardDuel.waitingOnOpponent': 'En attente de la carte de votre adversaire...',
+  'cardDuel.yourTurn': 'Jouez une carte',
+  'entities.abilities.arcane_surge.description':
+    "Envoie une déferlante d'éther brut à travers l'ennemi pour {damage} points de dégâts. Chaque incantation laisse une Charge d'arcane qui augmente les dégâts et la vitesse d'incantation de votre prochain Aether Surge (5 % plus rapide chacune) mais en relève fortement le coût en mana, cumulant jusqu'à 4 fois ; Traits d'Aether dépense les charges. Chaque incantation peut également armer l'Élan d'Aether, rendant votre prochain Aether Surge gratuit et deux fois plus rapide à lancer.",
+  'entities.abilities.arcane_surge.name': 'Aether Surge',
+  'entities.abilities.blizzard.description':
+    "Déchaîne une tempête de glace sur la zone ciblée pendant 6 s, infligeant {damage} points de dégâts de Givre par seconde et ralentissant les ennemis de 40 %. Chaque ennemi touché réduit le temps de recharge de Frozen Orb de 0,5 s, jusqu'à 3 s par incantation. (Givre)",
+  'entities.abilities.blizzard.name': 'Blizzard',
+  'entities.abilities.brain_freeze.description':
+    'Rimelance a 20 % de chances de rendre votre prochain Winterlash instantané, 30 % plus puissant et exempté de son temps de recharge. (Givre)',
+  'entities.abilities.brain_freeze.name': 'Brain Freeze',
+  'entities.abilities.dragons_breath.description':
+    "Maintenez pour accumuler un souffle de flammes de plus en plus large, puis relâchez-le en cône. Plus la charge est longue, plus la portée et les dégâts augmentent. Les ennemis touchés sont désorientés et les dégâts brisent l'effet ; une charge maximale critique toujours et compte une fois pour Bonne série. (Feu)",
+  'entities.abilities.dragons_breath.name': "Dragon's Breath",
+  'entities.abilities.fingers_of_frost.description':
+    "Rimelance a 15 % de chances d'accorder Fingers of Frost, jusqu'à 2 charges : votre prochain Ice Lance traite sa cible comme gelée. (Givre)",
+  'entities.abilities.fingers_of_frost.name': 'Fingers of Frost',
+  'entities.abilities.fireball_form.description':
+    'Vous vous transformez en braise ardente, augmentant votre vitesse de déplacement de {buff} %. Vous ne pouvez pas attaquer ni lancer de sorts sous cette forme. Réactivez pour reprendre votre forme normale.',
+  'entities.abilities.fireball_form.name': 'Forme de braise',
+  'entities.abilities.flurry.description':
+    "Décochez trois traits de glace infligeant chacun {damage} points de dégâts de Givre et posez Morsure de l'hiver sur la cible : ses 2 prochains sorts compatibles entrants la traitent comme gelée. Brain Freeze rend Winterlash instantané, 30 % plus puissant, et supprime son temps de recharge. (Givre)",
+  'entities.abilities.flurry.name': 'Winterlash',
+  'entities.abilities.frozen_orb.description':
+    "Libérez un orbe de givre tourbillonnant qui dérive vers l'avant pendant 8 s, infligeant {damage} points de dégâts de Givre par seconde aux ennemis proches et les ralentissant de 30 %. Ses frappes génèrent des Fingers of Frost. (Givre)",
+  'entities.abilities.frozen_orb.name': 'Frozen Orb',
+  'entities.abilities.glacial_front.description':
+    'Maintenez pour accumuler un front de givre de plus en plus large, puis relâchez-le en cône. Plus la charge est longue, plus la portée et les dégâts augmentent. Tous les ennemis touchés sont ralentis de 50 % pendant 4 s ; une charge maximale les immobilise également pendant 1 s. (Givre)',
+  'entities.abilities.glacial_front.name': 'Glacial Front',
+  'entities.abilities.glacial_spike.description':
+    'Conjurez un pic de glace massif en consumant 5 glaçons pour infliger {damage} points de dégâts de Givre et geler la cible sur place pendant 4 s. (Givre)',
+  'entities.abilities.glacial_spike.name': 'Glacial Spike',
+  'entities.abilities.ice_lance.description':
+    "Lancez un éclat de glace infligeant {damage} points de dégâts de Givre, triplés contre une cible gelée. Dépense Fingers of Frost ou une charge de Morsure de l'hiver pour traiter la cible comme gelée. (Givre)",
+  'entities.abilities.ice_lance.name': 'Ice Lance',
+  'entities.abilities.perfect_moment.description':
+    "Saisissez votre moment parfait : gagnez instantanément 4 Charges d'arcane, et pendant 10 s Traits d'Aether ne les consomme pas. (Chromancie)",
+  'entities.abilities.perfect_moment.name': 'Moment parfait',
+  'entities.abilities.shatter.description':
+    "Vos sorts gagnent 50 % de chances de coup critique contre les cibles gelées, et ces coups critiques infligent 20 % de dégâts en plus. Fingers of Frost et Morsure de l'hiver comptent comme gelés. (Givre)",
+  'entities.abilities.shatter.name': 'Brittle Ruin',
+  'entities.abilities.temporal_acceleration.description':
+    "Accélère le flux du temps pour votre groupe ou raid, augmentant la vitesse d'attaque, d'incantation et de canalisation de 30 % pendant 15 s. Les alliés récemment affectés par Accélération temporelle ou Tambours de guerre sont trop épuisés pour en bénéficier. (Chromancie)",
+  'entities.abilities.temporal_acceleration.name': 'Accélération temporelle',
+  'entities.abilities.temporal_barrier.description':
+    "Décale la cible d'un battement de coeur hors du présent, une coquille temporelle absorbant {damage} points de dégâts pendant 10 s avant que la chronologie ne se rétablisse.",
+  'entities.abilities.temporal_barrier.name': 'Barrière temporelle',
+  'entities.abilities.temporal_cascade.description':
+    "Envoie un écho en cascade à travers votre groupe : la cible et jusqu'à quatre de ses alliés les plus proches sont soignés simultanément et chacun est marqué pendant {duration} s, canalisant une partie des dégâts d'Arcane que vous infligez de retour à travers leurs échos pour les soigner. (Chromancie)",
+  'entities.abilities.temporal_cascade.name': 'Cascade temporelle',
+  'entities.abilities.temporal_echo.description':
+    "Marque un allié de l'écho d'un moment plus sain, soignant immédiatement {damage} points de vie. Pendant {duration} s, une partie des dégâts d'Arcane que vous infligez est canalisée de retour à travers l'écho pour le soigner.",
+  'entities.abilities.temporal_echo.name': 'Écho temporel',
+  'entities.abilities.temporal_hourglass.description':
+    "Placez un sablier temporel à l'emplacement sélectionné. Sous un ennemi, il le suspend pendant {hostilePveDuration} s en JcE ou {hostilePvpDuration} s en JcJ et empêche toutes ses actions ; les dégâts brisent l'effet. À vos pieds ou sous un allié de groupe, il accorde une stase pendant {duration} s, empêche les dégâts et les actions, restaure {healing} % de la vie maximale, et accélère la récupération des temps de recharge de {selfCooldownRecovery} % pour vous ou de {allyCooldownRecovery} % pour un allié. Sur un sol vide, le sablier attend {groundDuration} s et affecte la première unité valide qui le traverse. L'aura bénéfique peut être annulée manuellement.",
+  'entities.abilities.temporal_hourglass.name': 'Sablier de Suspension',
+  'entities.abilities.temporal_mend.description':
+    "Propulse un allié un instant vers l'avenir, soignant {damage} points de vie tandis que son corps s'installe dans un futur plus sain. (Signature de Chromancie)",
+  'entities.abilities.temporal_mend.name': 'Soin temporel',
+  'entities.abilities.temporal_reversal.description':
+    "Rembobine la chronologie d'un allié tombé, le ramenant à la vie à l'emplacement de son corps avec une partie de sa vie et de son mana, même en plein combat. (Chromancie)",
+  'entities.abilities.temporal_reversal.name': 'Inversion temporelle',
+  'entities.abilities.temporal_rewind.description':
+    "Envoie une vague d'arcane à travers votre groupe ou raid, remontant le temps pour restaurer 30 % des dégâts que chaque allié à moins de 40 mètres a subis au cours des 5 dernières secondes (jusqu'à 35 % de leur vie maximale). Ne peut pas être un effet critique. (Chromancie)",
+  'entities.abilities.temporal_rewind.name': 'Retour en arrière',
+  'entities.npcs.card_master.greeting':
+    'Un Duel de cartes vous tente ? Deux manches gagnantes sur trois, et le vainqueur remporte la gloire.',
+  'entities.npcs.card_master.name': 'Maître des cartes',
+  'entities.npcs.card_master.title': 'Marchand du hasard',
+  'entities.quests.q_archetype_acceptance.completion':
+    'La promesse tient. Ces deux métiers sont désormais vos majeures, et le savoir qui leur est opposé devient votre passe-temps.',
+  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Filon de minerai récolté',
+  'entities.quests.q_archetype_acceptance.text':
+    'Le savoir est connaissance, {playerName}, mais la communion est une promesse. Choisissez deux métiers voisins dont vous porterez les méthodes comme majeures, puis apportez-moi du minerai travaillé dans le Val de vos propres mains.',
+  'entities.quests.q_prof_hobby_switch.completion':
+    'Un choix plus léger, mais utile. Suivez cette curiosité aussi loin que le travail rare saura vous mener.',
+  'entities.quests.q_prof_hobby_switch.objectives.0.label': 'Parcelle de plantes récoltée',
+  'entities.quests.q_prof_hobby_switch.text':
+    "Les majeures exigent un serment. Un passe-temps ne demande qu'où votre curiosité vous mène, {playerName}. Récoltez quelques plantes et décidez quel métier opposé à vos majeures vous souhaitez poursuivre.",
+  'entities.quests.q_prof_hobby_switch.title': 'Un autre passe-temps',
+  'entities.quests.q_prof_intro.completion':
+    "Vous voyez ? Du minerai récolté et des callosités sur les mains. Continuez à miner, couper du bois et cueillir des plantes en parcourant les routes, et quand vous serez de retour en ville, consultez le panneau Focus du bourg près du marché et l'établi à proximité. Un bon échange vous y attend, si vous le souhaitez.",
+  'entities.quests.q_prof_intro.objectives.0.label': 'Filon de minerai récolté',
+  'entities.quests.q_prof_intro.text':
+    "Chaque âme à Eastbrook exerce un métier en plus de l'épée, {playerName}. Il y a des filons de minerai dans les rochers autour de la Mine de cuivre, au sud-ouest de la ville. Allez manier un pic et travailler 5 d'entre eux de vos propres mains ; je verrai la différence.",
+  'entities.quests.q_prof_make_amends.completion':
+    "L'ancien rythme revient. Votre ancienne paire est à nouveau active.",
+  'entities.quests.q_prof_make_amends.text':
+    "Vous avez déjà porté cette paire, {playerName}. Y revenir n'est pas un nouveau serment. Aidez à dégager la route du Val, et le travail rappellera à vos mains ce qu'elles savaient autrefois.",
+  'gpuNotice.bodyDesktop':
+    'Le jeu fonctionne sans accélération GPU et sera lent. Mettez à jour vos pilotes graphiques, puis redémarrez le jeu. Sous Windows, définissez également le jeu sur Performances élevées dans Paramètres, Système, Affichage, Graphiques.',
+  'gpuNotice.bodyWeb':
+    "Le jeu fonctionne sans accélération GPU et sera lent. Activez l'accélération matérielle dans les paramètres de votre navigateur, mettez à jour vos pilotes graphiques, puis redémarrez votre navigateur.",
+  'gpuNotice.dismiss': 'Ignorer',
+  'guide.abilityHook.blink':
+    "Vous téléporte sur une courte distance vers l'avant, brisant les immobilisations au départ.",
+  'guide.abilityHook.blizzard':
+    "Recouvre une zone de glace pour user et ralentir tout un groupe d'ennemis.",
+  'guide.abilityHook.brain_freeze':
+    'Vos traits de givre rendent parfois votre prochain Winterlash instantané et plus dévastateur.',
+  'guide.abilityHook.fingers_of_frost':
+    'Vos traits de givre permettent parfois à un Ice Lance de frapper comme si la cible était gelée.',
+  'guide.abilityHook.fireball_form':
+    'Devenez une braise vivante pour traverser un terrain dégagé à grande vitesse.',
+  'guide.abilityHook.flurry':
+    'Trois traits rapides qui refroidissent la cible pour que vos prochains coups de givre frappent comme si elle était gelée.',
+  'guide.abilityHook.frozen_orb':
+    'Fait rouler un orbe lent dans le groupe, gelant tout sur son passage et alimentant vos déclencheurs de givre.',
+  'guide.abilityHook.ice_lance':
+    'Un éclat instantané pour dépenser vos déclencheurs de givre, il frappe bien plus fort sur une cible gelée.',
+  'guide.abilityHook.shatter':
+    'Vos sorts obtiennent des critiques bien plus souvent contre les cibles gelées.',
+  'guide.deedsPage.renownBody':
+    "La Renommée est le score qui sous-tend le Livre. Chaque haut fait que vous obtenez vaut un montant défini, et votre total ne fait que croître, si bien qu'une semaine calme ne vous coûte jamais de terrain. Une poignée de hauts faits repose sur la chance plutôt que sur le talent, et les Prouesses sont un honneur à part entière : ces deux catégories ne rapportent donc aucune Renommée. Les hauts faits sans Renommée comptent quand même dans votre Livre au titre de la complétion ; ils ne rapportent simplement jamais de points.",
+  'guide.deedsPage.standingsNote':
+    "Les royaumes tiennent un décompte permanent de la Renommée sur tous les comptes : le classement regroupe les comptes entiers par Renommée à vie, comptant chaque haut fait une seule fois sur tous vos personnages, et il affiche uniquement la Renommée, de sorte que les hauts faits sans Renommée ne font jamais bouger le classement même s'ils comptent dans votre Livre. Pour voir qui se situe où, ouvrez le Classement en jeu et consultez son onglet Renommée ; le classement s'y trouve, pas sur le wiki.",
+  'hudChrome.archetypePair.alchemy+cooking': 'Apothicaire',
+  'hudChrome.archetypePair.armorcrafting+engineering': 'Ingénieur-forgeron',
+  'hudChrome.archetypePair.cooking+leatherworking': 'Trappeur',
+  'hudChrome.archetypePair.enchanting+jewelcrafting': 'Pierrelier',
+  'hudChrome.archetypePair.engineering+alchemy': 'Bombardier',
+  'hudChrome.archetypePair.inscription+enchanting': 'Arcaniste',
+  'hudChrome.archetypePair.jewelcrafting+weaponcrafting': 'Maître-lame',
+  'hudChrome.archetypePair.leatherworking+tailoring': 'Équipementier',
+  'hudChrome.archetypePair.tailoring+inscription': 'Tisserand des arcanes',
+  'hudChrome.archetypePair.weaponcrafting+armorcrafting': 'Forgeron',
+  'hudChrome.auraEffect.cheapCast': 'Votre prochain sort coûte {pct} % de mana en moins',
+  'hudChrome.auraEffect.combustionCrit': 'Vos sorts de Feu obtiennent toujours un coup critique',
+  'hudChrome.auraEffect.dmgDone': 'Augmente les dégâts infligés de {pct} %',
+  'hudChrome.auraEffect.dmgDoneReduce': 'Réduit les dégâts infligés de {pct} %',
+  'hudChrome.auraEffect.elementalConvergencePrimed':
+    "Votre prochain sort de l'autre école élémentaire accorde la Convergence élémentaire",
+  'hudChrome.auraEffect.formFireball':
+    'Forme de braise : vitesse de déplacement augmentée de {pct} % ; les attaques et sorts sont désactivés',
+  'hudChrome.auraEffect.freeCast': 'Votre prochaine incantation ne coûte rien',
+  'hudChrome.auraEffect.heatingUp':
+    "Votre prochain coup critique consécutif d'un générateur de Feu accorde Bonne série ; un générateur sans critique supprime Chauffe en cours",
+  'hudChrome.auraEffect.iceFloesCasts':
+    "Vos {n} prochains sorts avec un temps d'incantation peuvent être lancés en mouvement",
+  'hudChrome.auraEffect.increase.sp': 'Augmente la puissance des sorts de {value}',
+  'hudChrome.auraEffect.instantCast':
+    "Votre prochain sort avec un temps d'incantation est instantané",
+  'hudChrome.auraEffect.overloadNext':
+    'Votre prochain sort est amplifié de {pct} % mais coûte 50 % de mana en plus',
+  'hudChrome.auraEffect.powerEchoNext':
+    'Votre prochain sort direct se répète à {pct} % de puissance sur la même cible',
+  'hudChrome.auraEffect.sanguine':
+    "Augmente la vitesse d'attaque de {hastePct} % et les dégâts infligés de {dmgPct} %",
+  'hudChrome.auraEffect.temporalHourglass':
+    "Immunisé et incapable d'agir ; restaure la vie et accélère la récupération des temps de recharge. Clic droit pour annuler.",
+  'hudChrome.craftName.alchemy': 'Alchimie',
+  'hudChrome.craftName.armorcrafting': "Fabrication d'armures",
+  'hudChrome.craftName.cooking': 'Cuisine',
+  'hudChrome.craftName.enchanting': 'Enchantement',
+  'hudChrome.craftName.engineering': 'Ingénierie',
+  'hudChrome.craftName.inscription': 'Calligraphie',
+  'hudChrome.craftName.jewelcrafting': 'Joaillerie',
+  'hudChrome.craftName.leatherworking': 'Travail du cuir',
+  'hudChrome.craftName.tailoring': 'Couture',
+  'hudChrome.craftName.weaponcrafting': "Fabrication d'armes",
+  'hudChrome.crafting.attunementPreview':
+    "Résultat : titre {title} ; {majorA} et {majorB} deviennent des majeures sans plafond ; {hobby} devient le passe-temps plafonné rare ; toutes les autres connaissances de métier sont conservées mais plafonnées à commun tant qu'elles sont dormantes.",
+  'hudChrome.crafting.comboMet': 'Prêt.',
+  'hudChrome.crafting.comboNotAttuned': "Choisissez d'abord une paire d'archétype.",
+  'hudChrome.crafting.comboRequires': 'Communion : {craftA} + {craftB}, palier {tier}.',
+  'hudChrome.crafting.comboSyncing': 'Vérification de la communion du royaume.',
+  'hudChrome.crafting.comboTierUnmet': 'Élevez les deux métiers majeurs au palier requis.',
+  'hudChrome.crafting.comboWrongPair': 'Activez cette paire exacte pour le fabriquer.',
+  'hudChrome.crafting.hobbyPreview':
+    'Résultat : {hobby} devient le passe-temps plafonné rare. Les deux majeures et toutes les valeurs de compétences conservées restent inchangées.',
+  'hudChrome.crafting.identity.ceilingCommon': 'Plafond commun',
+  'hudChrome.crafting.identity.ceilingRare': 'Plafond rare',
+  'hudChrome.crafting.identity.ceilingUnlimited': 'Sans plafond de renforcement',
+  'hudChrome.crafting.identity.colCap': 'Plafond',
+  'hudChrome.crafting.identity.colCraft': 'Métier',
+  'hudChrome.crafting.identity.colRole': 'Rôle',
+  'hudChrome.crafting.identity.colSkill': 'Compétence',
+  'hudChrome.crafting.identity.dormantKnowledge':
+    "La connaissance de {craft} est conservée mais dormante jusqu'à ce que sa paire ou son passe-temps soit actif.",
+  'hudChrome.crafting.identity.history': '{pairs} paires découvertes, {returns} retours effectués',
+  'hudChrome.crafting.identity.historyLabel': 'Historique',
+  'hudChrome.crafting.identity.hobbyLabel': 'Passe-temps',
+  'hudChrome.crafting.identity.majorsLabel': 'Majeures',
+  'hudChrome.crafting.identity.nearTier':
+    '{craft} est à {points} points de compétence de son prochain palier.',
+  'hudChrome.crafting.identity.roleDormant': 'Connaissance dormante',
+  'hudChrome.crafting.identity.roleHobby': 'Passe-temps',
+  'hudChrome.crafting.identity.roleMajor': 'Majeure',
+  'hudChrome.crafting.identity.roleUnattuned': 'Non-communié',
+  'hudChrome.crafting.identity.skillAria':
+    '{craft}, compétence {skill}, palier {tier}, {role}, {ceiling}',
+  'hudChrome.crafting.identity.syncing': "En attente de votre identité d'artisan du royaume.",
+  'hudChrome.crafting.identity.title': "Identité d'artisan",
+  'hudChrome.crafting.identity.titleLabel': 'Titre',
+  'hudChrome.crafting.identity.tutorial':
+    'Premier palier : atteignez {skill} points de compétence dans un métier. Les recettes réussies font progresser ce métier sans effacer les connaissances des autres.',
+  'hudChrome.crafting.identity.unattuned':
+    "Aucune paire d'archétype n'est active. Vos connaissances sont conservées, mais les recettes combinées nécessitent une paire communiée.",
+  'hudChrome.crafting.noProfessionChoice':
+    "Aucun choix de profession valide n'est disponible en ce moment.",
+  'hudChrome.crafting.pairOptionLabel': '{pair} ({craftA} + {craftB})',
+  'hudChrome.crafting.professionChoice': 'Choix de profession',
+  'hudChrome.deeds.lbScopeNote':
+    "Comptes classés par Renommée à vie. Chaque haut fait est comptabilisé une seule fois sur tous les personnages d'un compte.",
+  'hudChrome.deeds.lbSelfAccount':
+    'Votre compte : rang {rank}, top {percent} pourcent, {renown} de Renommée',
+  'hudChrome.deeds.lbSelfRank': 'Votre compte : rang {rank}, top {percent} pourcent',
+  'hudChrome.nameplate.mobEliteLevel': '{level}+',
+  'hudChrome.nameplate.mobLevel': '{level}',
+  'hudChrome.specPanel.specUnlockBanner': 'Spécialisation débloquée !',
+  'hudChrome.specPanel.specUnlockHint': 'Appuyez sur N pour choisir votre spécialisation.',
+  'hudChrome.wocStore.wallet.connect': 'Connecter un portefeuille',
+  'hudChrome.wocStore.wallet.connectedUnlinked':
+    "L'application de portefeuille est connectée à ce navigateur, mais son adresse publique n'est pas encore liée à votre compte WoC.",
+  'hudChrome.wocStore.wallet.linkedConnected':
+    'Votre application de portefeuille liée est connectée et prête pour les achats en SOL ou WOC.',
+  'hudChrome.wocStore.wallet.linkedDisconnected':
+    'Votre adresse publique est liée. Reconnectez cette application de portefeuille quand vous souhaitez payer en SOL ou WOC.',
+  'hudChrome.wocStore.wallet.manage': 'Gérer le portefeuille',
+  'hudChrome.wocStore.wallet.mismatched':
+    "Un portefeuille différent est connecté. Vérifiez-le pour remplacer l'adresse liée, ou reconnectez le portefeuille lié.",
+  'hudChrome.wocStore.wallet.reconnect': 'Reconnecter le portefeuille',
+  'hudChrome.wocStore.wallet.title': 'Portefeuille Solana',
+  'hudChrome.wocStore.wallet.unlinked':
+    'Connectez une application de portefeuille, puis signez une fois pour lier son adresse publique à votre compte WoC. Nous ne recevons jamais votre phrase de récupération ni votre clé privée.',
+  'hudChrome.wocStore.wallet.verify': 'Vérifier et lier',
+  'wallet.bagConnect': 'Lier un portefeuille',
+  'wallet.bagLink': 'Vérifier le portefeuille',
+  'wallet.bagReconnect': 'Reconnecter le portefeuille',
+  'wallet.browser.completeBody':
+    "Vous pouvez retourner dans l'application de bureau World of ClaudeCraft.",
+  'wallet.browser.completeTitle': 'Autorisation du portefeuille effectuée',
+  'wallet.browser.continueWith': 'Continuer avec {wallet}',
+  'wallet.browser.extensionHelp':
+    "Aucune extension de portefeuille compatible n'a été trouvée. Installez ou déverrouillez Phantom, Solflare ou un autre portefeuille Solana pour navigateur, puis réessayez.",
+  'wallet.browser.eyebrow': 'Autorisation du portefeuille de bureau',
+  'wallet.browser.failed':
+    "L'autorisation du portefeuille a échoué ou a expiré. Retournez dans l'application de bureau et réessayez.",
+  'wallet.browser.linkBody':
+    "Choisissez une extension de portefeuille dans ce navigateur. Vous signerez un message de vérification, puis retournerez dans l'application de bureau.",
+  'wallet.browser.paymentBody':
+    'Choisissez le portefeuille lié à votre compte et approuvez la transaction dans ce navigateur.',
+  'wallet.browser.retry': 'Réessayer',
+  'wallet.browser.returnButton': "Retourner dans l'application de bureau",
+  'wallet.browser.reviewBody':
+    "Suivez l'invite de {wallet}. Gardez cette page de navigateur ouverte.",
+  'wallet.browser.reviewTitle': 'Vérifier dans votre portefeuille',
+  'wallet.browser.safety':
+    'World of ClaudeCraft ne vous demande jamais votre phrase de récupération ni votre clé privée.',
+  'wallet.browser.title': 'Connecter un portefeuille Solana',
+  'wallet.manualReturnBrowserHelp':
+    "Après approbation, revenez à cet onglet de jeu. Si iOS ouvre un autre navigateur, fermez-le et revenez manuellement au navigateur d'origine.",
+  'wallet.manualReturnStandaloneHelp':
+    "Après approbation, revenez à World of ClaudeCraft depuis votre écran d'accueil. Si iOS ouvre un navigateur, fermez-le et rouvrez manuellement l'application de l'écran d'accueil.",
+  'wallet.mobileAppHelp':
+    'Choisissez Phantom ou Solflare. Votre application de portefeuille demandera une approbation. Gardez ce jeu ouvert et revenez-y une fois terminé.',
+  'wallet.openAppButton': 'Ouvrir {wallet}',
+  'wallet.openAppHelp':
+    "Ouvrez {wallet} pour examiner cette demande. Gardez cet onglet de jeu ouvert pendant que l'application de portefeuille est active.",
+  'wallet.openAppTitle': 'Continuer dans {wallet}',
+  'wallet.preparingAppButton': 'Préparation de {wallet}...',
+  'wallet.standaloneAppHelp':
+    "Les connexions de portefeuille ne sont pas encore disponibles dans l'application de l'écran d'accueil. Ouvrez World of ClaudeCraft dans Safari ou Chrome pour utiliser Phantom ou Solflare.",
+  'wallet.walletAppUnavailable':
+    "{wallet} n'a pas pu être préparé. Fermez cette fenêtre et réessayez.",
   'entities.abilities.primal_reflexes.description':
     "Vos instincts s'aiguisent, augmentant votre chance d'esquiver de 50 % pendant 6 sec.",
   'entities.abilities.primal_reflexes.name': 'Réflexes primordiaux',
