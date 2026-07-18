@@ -235,4 +235,23 @@ describe('ChatWindowController', () => {
     expect(button.getAttribute('aria-selected')).toBe(null);
     expect(button.tabIndex).toBe(0);
   });
+
+  it('keeps the toggle hidden through a tab-strip re-render on a channel tab', () => {
+    // A typed "/join" adds a tab via addTab(select: false), which re-renders the
+    // strip without a selectTab call. renderTabs() must still leave the toggle
+    // hidden while a channel tab is active (it ends with updateActiveTabStyles),
+    // so the toggle never resurfaces on a non-All view after the rebuild.
+    const harness = makeHarness({
+      woc_chat_tabs: '["world"]',
+      woc_chat_active_tab: 'world',
+    });
+    harness.controller.init();
+    expect(sysToggle(harness).classList.contains('chat-tab-sysfilter-hidden')).toBe(true);
+
+    harness.controller.syncTabsForInput('/join lfg');
+
+    // The rebuilt strip has the new tab and the toggle is still hidden (world active).
+    expect(harness.storage.getItem('woc_chat_tabs')).toBe('["world","lfg"]');
+    expect(sysToggle(harness).classList.contains('chat-tab-sysfilter-hidden')).toBe(true);
+  });
 });
