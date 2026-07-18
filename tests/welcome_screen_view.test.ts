@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   armoryCardVisible,
@@ -9,6 +10,7 @@ import {
   markNewReleases,
   nextLastSeenReleaseId,
   setArmoryOpenIntent,
+  shouldUseWelcomeScreen,
   type WelcomeChestInput,
   type WelcomeDiscordInput,
   type WelcomePlatformInput,
@@ -26,6 +28,16 @@ const NATIVE_APP: WelcomePlatformInput = { ...DESKTOP_WEB, nativeApp: true };
 const OFFLINE: WelcomePlatformInput = { ...DESKTOP_WEB, offline: true };
 
 describe('welcome_screen_view: gating matrix', () => {
+  it('skips the welcome screen only when the Glitch runtime is active', () => {
+    expect(shouldUseWelcomeScreen(false)).toBe(true);
+    expect(shouldUseWelcomeScreen(true)).toBe(false);
+  });
+
+  it('routes both world-entry paths through the Glitch welcome-screen gate', () => {
+    const main = readFileSync('src/main.ts', 'utf8');
+    expect(main.match(/shouldUseWelcomeScreen\(GLITCH_CONFIG\.enabled\)/g)).toHaveLength(2);
+  });
+
   it('Armory card: desktop web AND server flag both must be true', () => {
     expect(armoryCardVisible(DESKTOP_WEB, true)).toBe(true);
     expect(armoryCardVisible(DESKTOP_WEB, false)).toBe(false);

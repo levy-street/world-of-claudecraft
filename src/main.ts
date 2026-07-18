@@ -283,6 +283,7 @@ import {
   shouldDisconnectUnverifiedWallet,
 } from './ui/wallet_balance';
 import { buildWalletConnectionView } from './ui/wallet_connection_view';
+import { shouldUseWelcomeScreen } from './ui/welcome_screen_view';
 import {
   mountWelcomeScreen,
   takeArmoryOpenIntent,
@@ -3463,7 +3464,7 @@ async function startOffline(
   // immediately (no connection to wait on) and every store/chest/discord tile
   // stays hidden per the gating matrix; the news fetch still hits the site
   // origin and fails soft if offline.
-  const welcomeRoot = $('#welcome-screen');
+  const welcomeRoot = shouldUseWelcomeScreen(GLITCH_CONFIG.enabled) ? $('#welcome-screen') : null;
   if (welcomeRoot) {
     await new Promise<void>((resolve) => {
       welcomeScreen = mountWelcomeScreen(welcomeRoot, {
@@ -5382,7 +5383,7 @@ async function enterWorld(
   // is the only way forward, gated on the same readiness condition the old
   // auto-poll used to gate startGame on. Falls back to the old bare loading
   // screen if the welcome-screen DOM is absent (the /play entry lacks it).
-  const welcomeRoot = $('#welcome-screen');
+  const welcomeRoot = shouldUseWelcomeScreen(GLITCH_CONFIG.enabled) ? $('#welcome-screen') : null;
   let started = false;
   const proceedToGame = () => {
     if (started) return;

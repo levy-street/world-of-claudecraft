@@ -62,6 +62,11 @@ export interface WelcomeScreenView {
 
 const MAX_RELEASES_SHOWN = 5;
 
+/** Glitch launches directly through the loading state instead of the post-login news screen. */
+export function shouldUseWelcomeScreen(glitchActive: boolean): boolean {
+  return !glitchActive;
+}
+
 /** Client-side half of the Season 1 Armory gate: platform AND the server flag. */
 export function armoryCardVisible(
   platform: WelcomePlatformInput,
