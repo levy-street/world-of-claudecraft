@@ -1487,7 +1487,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // Winterlash: the Winter's Chill planter. Its three bolts resolve on one
   // projectile arrival; the debuff rider lands in frostMageAfterCast so the
   // bolts themselves can never eat the charges they just applied. Brain
-  // Freeze's instant/harder/no-cooldown override is applyBrainFreezeOverride.
+  // Freeze's instant/no-cooldown override is applyBrainFreezeOverride.
   flurry: {
     id: 'flurry',
     name: 'Winterlash',
@@ -1518,12 +1518,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      "Loose three icy bolts for $d Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Winterlash instant, 30% harder, and skips its cooldown. (Frost)",
+      "Loose three icy bolts for $d Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Winterlash instant and skips its cooldown. (Frost)",
   },
-  // Frozen Orb: the roaming proc generator (combat/frozen_orb.ts). Instant,
+  // Frozen Orb: the roaming Icicle generator (combat/frozen_orb.ts). Instant,
   // 45s cooldown; the orb drifts forward pulsing frost damage + a 30% snare
-  // once per second for 8s. First strike guarantees a Fingers of Frost stack,
-  // then 20% per striking pulse. Blizzard shortens its cooldown (below).
+  // once per second for 8s. Each striking pulse banks one Icicle. Blizzard
+  // shortens its cooldown (below).
   frozen_orb: {
     id: 'frozen_orb',
     name: 'Frozen Orb',
@@ -1546,7 +1546,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Release an orb of swirling frost that drifts forward for 8 sec, dealing $d Frost damage each second to nearby enemies and slowing them by 30%. Its strikes generate Fingers of Frost. (Frost)',
+      'Release an orb of swirling frost that drifts forward for 8 sec, dealing $d Frost damage each second to nearby enemies and slowing them by 30%. Each striking pulse generates one Icicle. (Frost)',
   },
   // Glacial Spike: the frost spec's slow, heavy spender. Gated on a FULL Icicles
   // stack (requiresAuraStacks 5), which the cast consumes; it lands a big frost
@@ -1731,7 +1731,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [],
     description:
-      'Rimelance has a 20% chance to make your next Winterlash instant, 30% harder, and free of its cooldown. (Frost)',
+      'Rimelance has a 20% chance to make your next Winterlash instant and free of its cooldown. (Frost)',
   },
   shatter: {
     id: 'shatter',
@@ -1748,7 +1748,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [],
     description:
-      "Your spells gain 50% critical strike chance against frozen targets, and those critical strikes deal 20% more damage. Fingers of Frost and Winter's Chill count as frozen. (Frost)",
+      "Your spells gain 50% critical strike chance against frozen targets. Fingers of Frost and Winter's Chill count as frozen. (Frost)",
   },
   conjure_water: {
     id: 'conjure_water',

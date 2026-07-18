@@ -293,7 +293,7 @@ export type AuraKind =
   // `fingers_of_frost`: self buff, up to 2 stacks; an Ice Lance spends one to
   // treat its target as frozen (Shatter + its 3x frozen damage).
   // `brain_freeze`: self buff, single; the next Flurry goes instant, skips its
-  // cooldown and hits 30% harder (consumed in castAbility's override).
+  // cooldown, and keeps its base damage (consumed in castAbility's override).
   // `winters_chill`: TARGET debuff with 2 charges; each compatible spell
   // impact spends one to count the target as frozen.
   // `icicles`: self buff, up to 5 stacks, built by Rimelance impacts and Frozen
@@ -1773,9 +1773,10 @@ export type AbilityEffect =
   // feared; absent = fear every hostile in radius (the warlock-style AoE fear).
   | { type: 'aoeFear'; duration: number; radius: number; maxTargets?: number }
   | { type: 'clearCooldowns'; abilities: string[] }
+  | { type: 'breakRoots' }
   | { type: 'breakControl' }
   // Ice Block: strip every player-removable debuff (control, DoTs, stat saps, ...)
-  // off the caster. Broader than breakControl. See effect_dispatch.
+  // Broader than breakRoots and breakControl. See effect_dispatch.
   | { type: 'cleanseSelf' }
   | {
       type: 'repositionToAim';

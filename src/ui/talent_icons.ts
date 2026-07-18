@@ -43,7 +43,12 @@ export function talentEffectIconRef(effect: TalentEffect | undefined): TalentIco
   }
   if (effect?.global?.blinkCast) return { kind: 'ability', id: 'blink_while_casting' };
   if (effect?.global?.barrierDrPct) return { kind: 'ability', id: 'warded' };
-  if (effect?.global?.temporalRift) return { kind: 'ability', id: 'temporal_rift' };
+  if (
+    firstAbility?.ability === 'ice_barrier' &&
+    firstAbility.addEffects?.some((added) => added.type === 'breakRoots')
+  ) {
+    return { kind: 'ability', id: 'temporal_rift' };
+  }
   if (effect?.global?.convergence) return { kind: 'ability', id: 'elemental_convergence' };
   if (effect?.global?.manaDefCdrPer10) return { kind: 'ability', id: 'overflowing_power' };
   if (firstAbility?.ability === 'polymorph' && firstAbility.castPct === -1) {

@@ -5081,38 +5081,6 @@ export class Sim {
       !isUnbreakableControlAura(aura)
     )
       return;
-    // Temporal Rift (mage choice row): every 20 sec the next stun, root or
-    // silence to land on the wearer is cleansed instantly, i.e. never applied.
-    // The ICD rides an 'internal_cd' aura (no new entity field enters the
-    // parity state hash) that the player can watch tick down. Draws no rng.
-    // Encounter-authored unbreakable control is never a cleanse target: the
-    // whole raid freezes for the sequence. Combat CC stays cleansable.
-    if (
-      target.kind === 'player' &&
-      (aura.kind === 'stun' || aura.kind === 'root' || aura.kind === 'silence') &&
-      aura.sourceId !== target.id &&
-      !isUnbreakableControlAura(aura)
-    ) {
-      const riftMeta = this.players.get(target.id);
-      if (
-        riftMeta &&
-        this.playerMods(riftMeta).global.temporalRift > 0 &&
-        !target.auras.some((a) => a.id === 'temporal_rift_cd')
-      ) {
-        this.applyAura(target, {
-          id: 'temporal_rift_cd',
-          name: 'Temporal Rift',
-          kind: 'internal_cd',
-          value: 0,
-          remaining: 20,
-          duration: 20,
-          sourceId: target.id,
-          school: 'arcane',
-        });
-        this.emit({ type: 'aura', targetId: target.id, name: aura.name, gained: false });
-        return;
-      }
-    }
     const replacementConflicts = auraReplacementConflicts(target.auras, aura);
     if (
       !isUnbreakableControlAura(aura) &&

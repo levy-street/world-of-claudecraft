@@ -780,12 +780,12 @@ const classAbilityNamesEn = {
       [
         'flurry',
         'Winterlash',
-        "Loose three icy bolts for {damage} Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Winterlash instant, 30% harder, and skips its cooldown. (Frost)",
+        "Loose three icy bolts for {damage} Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Winterlash instant and skips its cooldown. (Frost)",
       ],
       [
         'frozen_orb',
         'Frozen Orb',
-        'Release an orb of swirling frost that drifts forward for 8 sec, dealing {damage} Frost damage each second to nearby enemies and slowing them by 30%. Its strikes generate Fingers of Frost. (Frost)',
+        'Release an orb of swirling frost that drifts forward for 8 sec, dealing {damage} Frost damage each second to nearby enemies and slowing them by 30%. Each striking pulse generates one Icicle. (Frost)',
       ],
       [
         'blizzard',
@@ -815,12 +815,12 @@ const classAbilityNamesEn = {
       [
         'brain_freeze',
         'Brain Freeze',
-        'Rimelance has a 20% chance to make your next Winterlash instant, 30% harder, and free of its cooldown. (Frost)',
+        'Rimelance has a 20% chance to make your next Winterlash instant and free of its cooldown. (Frost)',
       ],
       [
         'shatter',
         'Brittle Ruin',
-        "Your spells gain 50% critical strike chance against frozen targets, and those critical strikes deal 20% more damage. Fingers of Frost and Winter's Chill count as frozen. (Frost)",
+        "Your spells gain 50% critical strike chance against frozen targets. Fingers of Frost and Winter's Chill count as frozen. (Frost)",
       ],
       [
         'conjure_water',

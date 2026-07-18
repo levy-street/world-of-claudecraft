@@ -156,25 +156,34 @@ describe('mage choice rows (owner tree)', () => {
     expect(ally.hp).toBe(hp0 + mageScaledHeal);
   });
 
-  it('Temporal Rift cleanses the next stun instantly, then cools down 20 sec', () => {
+  it('Shifting Ward breaks roots on barrier cast but never passively ignores a stun', () => {
     const { sim, p } = rig({ 8: 'mag_r8_temporal_rift' });
     const mob = addTargetMob(sim);
-    const applyStun = () =>
+    const row = MAGE_CHOICE_ROWS.rows.find((candidate) => candidate.level === 8);
+    const option = row?.options.find((candidate) => candidate.id === 'mag_r8_temporal_rift');
+    expect(option?.name).toBe('Shifting Ward');
+
+    const applyControl = (kind: 'root' | 'slow' | 'stun') =>
       (sim as unknown as { applyAura(t: Entity, a: object): void }).applyAura(p, {
-        id: 'test_stun',
-        name: 'Test Stun',
-        kind: 'stun',
-        value: 0,
+        id: `test_${kind}`,
+        name: `Test ${kind}`,
+        kind,
+        value: kind === 'slow' ? 0.5 : 0,
         remaining: 3,
         duration: 3,
         sourceId: mob.id,
         school: 'physical',
       });
-    applyStun();
-    expect(p.auras.some((a) => a.kind === 'stun')).toBe(false); // cleansed
-    expect(p.auras.some((a) => a.id === 'temporal_rift_cd')).toBe(true);
-    applyStun();
-    expect(p.auras.some((a) => a.kind === 'stun')).toBe(true); // ICD running
+    applyControl('slow');
+    applyControl('root');
+    expect(p.auras.some((a) => a.kind === 'root')).toBe(true);
+    sim.castAbility('ice_barrier');
+    expect(p.auras.some((a) => a.kind === 'root')).toBe(false);
+    expect(p.auras.some((a) => a.kind === 'slow')).toBe(true);
+
+    applyControl('stun');
+    expect(p.auras.some((a) => a.kind === 'stun')).toBe(true);
+    expect(p.auras.some((a) => a.id === 'temporal_rift_cd')).toBe(false);
   });
 
   it('Temporal Rift never eats scripted encounter control (Nythraxis transition stun)', () => {
@@ -568,16 +577,18 @@ describe('the talents-window registry mirror', () => {
     // selectTalentRow path the talents window's Choices tab drives.
     expect(sim.selectTalentRow(8, 'mag_r8_temporal_rift')).toBe(true);
     (sim as unknown as { applyAura(t: Entity, a: object): void }).applyAura(p, {
-      id: 'test_stun',
-      name: 'Test Stun',
-      kind: 'stun',
+      id: 'test_root',
+      name: 'Test Root',
+      kind: 'root',
       value: 0,
       remaining: 3,
       duration: 3,
       sourceId: 424242,
       school: 'physical',
     });
-    expect(p.auras.some((a) => a.kind === 'stun')).toBe(false); // cleansed
-    expect(p.auras.some((a) => a.id === 'temporal_rift_cd')).toBe(true);
+    expect(p.auras.some((a) => a.kind === 'root')).toBe(true);
+    p.resource = p.maxResource;
+    sim.castAbility('ice_barrier');
+    expect(p.auras.some((a) => a.kind === 'root')).toBe(false);
   });
 });

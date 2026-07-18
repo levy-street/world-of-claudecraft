@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
+  applyBrainFreezeOverride,
   BRAIN_FREEZE_DURATION,
   FINGERS_OF_FROST_DURATION,
   FINGERS_OF_FROST_MAX_STACKS,
   frostProcGlowActive,
+  SHATTER_CRIT_BONUS,
   WINTERS_CHILL_CHARGES,
   WINTERS_CHILL_SPENDERS,
 } from '../src/sim/combat/frost_mage';
@@ -17,6 +19,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
+import type { SimContext } from '../src/sim/sim_context';
 import type { Aura, Entity, SimEvent } from '../src/sim/types';
 
 // Frost mage proc engine (owner design 2026-07-11, combat/frost_mage.ts):
@@ -346,6 +349,28 @@ describe('Ice Lance frozen resolution', () => {
     expect(mob.auras.some((a) => a.kind === 'winters_chill')).toBe(false);
     expect(p.auras.some((a) => a.kind === 'fingers_of_frost')).toBe(false);
   });
+
+  it('Shatter adds crit chance without adding another crit-damage multiplier', () => {
+    expect(SHATTER_CRIT_BONUS).toBe(0.5);
+    const forcedCrit = (rooted: boolean): number => {
+      const { sim, p } = makeSim({ seed: 1337 });
+      const mob = spawnTarget(sim, p);
+      pushAura(p, {
+        id: 'test_forced_spell_crit',
+        name: 'Test Forced Spell Crit',
+        kind: 'buff_spellcrit',
+        value: 5,
+      });
+      if (rooted) pushAura(mob, { id: 'test_root', name: 'Test Root', kind: 'root' });
+      sim.drainEvents();
+      const hits = damageEvents(castAndResolve(sim, p, 'frostbolt', 'Rimelance'), 'Rimelance');
+      expect(hits).toHaveLength(1);
+      expect(hits[0].crit).toBe(true);
+      return hits[0].amount;
+    };
+
+    expect(forcedCrit(true)).toBe(forcedCrit(false));
+  });
 });
 
 describe("Flurry and Winter's Chill", () => {
@@ -384,27 +409,22 @@ describe("Flurry and Winter's Chill", () => {
     expect(mob.auras.find((a) => a.kind === 'winters_chill')?.charges).toBe(WINTERS_CHILL_CHARGES);
   });
 
-  it('an empowered Flurry hits ~30% harder than a hard cast', () => {
-    const seed = 4242;
-    const hardHits = (() => {
-      const { sim, p } = makeSim({ seed });
-      spawnTarget(sim, p);
-      sim.drainEvents();
-      return damageEvents(castAndResolve(sim, p, 'flurry', 'Winterlash'), 'Winterlash');
-    })();
-    const bfHits = (() => {
-      const { sim, p } = makeSim({ seed });
-      spawnTarget(sim, p);
-      pushAura(p, { id: 'brain_freeze', name: 'Brain Freeze', kind: 'brain_freeze' });
-      sim.drainEvents();
-      return damageEvents(castAndResolve(sim, p, 'flurry', 'Winterlash'), 'Winterlash');
-    })();
-    expect(hardHits).toHaveLength(3);
-    expect(bfHits).toHaveLength(3);
-    const sum = (hits: { amount: number }[]) => hits.reduce((s, h) => s + h.amount, 0);
-    // Same seed casts identical underlying rolls; the empowered set must land
-    // meaningfully above the hard set (1.3x baked, before crit noise).
-    expect(sum(bfHits)).toBeGreaterThan(sum(hardHits) * 1.1);
+  it("Brain Freeze preserves Flurry's base damage effects", () => {
+    const { sim, p } = makeSim();
+    const res = sim.resolvedAbility('flurry', p.id);
+    expect(res).toBeDefined();
+    if (!res) throw new Error('missing Flurry');
+    pushAura(p, { id: 'brain_freeze', name: 'Brain Freeze', kind: 'brain_freeze' });
+
+    const overridden = applyBrainFreezeOverride(
+      (sim as unknown as { ctx: SimContext }).ctx,
+      p,
+      res,
+    );
+
+    expect(overridden.castTime).toBe(0);
+    expect(overridden.cooldown).toBe(0);
+    expect(overridden.effects).toEqual(res.effects);
   });
 
   it('an armed Brain Freeze casts Flurry straight through its running cooldown', () => {

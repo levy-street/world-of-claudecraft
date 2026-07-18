@@ -81,7 +81,6 @@ import {
   frostMageChannelStart,
   resolveFrozenCast,
   SHATTER_CRIT_BONUS,
-  SHATTER_CRIT_DMG_BONUS,
 } from './frost_mage';
 import { spawnFrozenOrb } from './frozen_orb';
 import { glacialFrontContains } from './glacial_front';
@@ -394,12 +393,7 @@ export function runEffects(
           // execute override the OUTCOME; the roll above is still drawn.
           fireGuaranteedCrit(ctx, p, ability.id, ability.school, target);
         if (sureCrit) sureCritRolled = true;
-        if (crit)
-          dmg *=
-            (isSpell ? 1.5 : 2) +
-            (isSpell ? p.critDmgSpellBonus : p.critDmgPhysBonus) +
-            // Shatter: crits against a frozen-counting target hit harder.
-            (isSpell && frozen.treatAsFrozen ? SHATTER_CRIT_DMG_BONUS : 0);
+        if (crit) dmg *= (isSpell ? 1.5 : 2) + (isSpell ? p.critDmgSpellBonus : p.critDmgPhysBonus);
         if (isSpell) dmg *= spellDamageMultFromAuras(p);
         if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
         // Aether Surge (Chronomancy Phase 3): each held Arcane Charge scales the
@@ -1009,8 +1003,9 @@ export function runEffects(
       }
       case 'cleanseSelf': {
         // Ice Block strips every player-removable debuff off the caster (control,
-        // DoTs, stat saps, ...), broader than breakControl. Encounter-authored
-        // unbreakable control stays until its owning script releases it.
+        // DoTs, stat saps, ...), broader than breakRoots and breakControl.
+        // Encounter-authored unbreakable control stays until its owning script
+        // releases it.
         for (let i = p.auras.length - 1; i >= 0; i--) {
           const aura = p.auras[i];
           if (isDebuffAura(aura.kind, aura.value) && !isUnbreakableControlAura(aura)) {
@@ -2145,6 +2140,10 @@ export function runEffects(
             ctx.rng.range(eff.heal.min, eff.heal.max) + directHealBonus(p.spellPower, res.castTime);
           ctx.applyHeal(p, target, healAmount, ability.name, ability.id);
         }
+        break;
+      }
+      case 'breakRoots': {
+        removeRootAuras(ctx, p);
         break;
       }
       case 'breakControl': {
