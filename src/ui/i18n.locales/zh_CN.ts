@@ -2578,6 +2578,18 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stormstrike.name': '先祖打击',
   'entities.abilities.stormstrike.description':
     '将风暴导入武器，立即攻击并造成武器伤害加 {damage}。',
+  'entities.abilities.earth_shield.name': '石之守护',
+  'entities.abilities.earth_shield.description':
+    '以坚岩护体，使受到的伤害降低 20%，可抵挡接下来 6 次攻击。再次施放可刷新护盾。',
+  'entities.abilities.earthbound_weapon.name': '大地之锚武器',
+  'entities.abilities.earthbound_weapon.description':
+    '将武器与大地相连，使你造成的所有威胁值提高 100%，持续 5 分钟。取代其他任何武器附魔。',
+  'entities.abilities.elemental_demand.name': '元素号令',
+  'entities.abilities.elemental_demand.description':
+    '号令元素锁定目标，嘲讽其攻击你，持续 3 秒。射程 15 码。',
+  'entities.abilities.unleash_weapon.name': '元素释放',
+  'entities.abilities.unleash_weapon.description':
+    '释放当前武器附魔的能量攻击目标，造成 {damage} 点伤害，并根据附魔产生额外效果：威胁值爆发（大地之锚）、火焰灼烧（烈焰）或减速（寒冰）。',
   'entities.abilities.shadow_bolt.name': '幽暗箭',
   'entities.abilities.shadow_bolt.description': '向敌人发射暗影箭，造成 {damage} 点暗影伤害。',
   'entities.abilities.demon_skin.name': '邪魔硬皮',

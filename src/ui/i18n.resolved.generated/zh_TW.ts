@@ -6685,6 +6685,22 @@ export const zh_TW: EnTranslations = {
         "name": "先祖打擊",
         "description": "將風暴導入武器，立即攻擊並造成武器傷害加 {damage}。"
       },
+      "earth_shield": {
+        "name": "石之守護",
+        "description": "以堅岩護體，使受到的傷害降低 20%，可抵擋接下來 6 次攻擊。再次施放可刷新護盾。"
+      },
+      "earthbound_weapon": {
+        "name": "大地之錨武器",
+        "description": "將武器與大地相連，使你造成的所有威脅值提高 100%，持續 5 分鐘。取代其他任何武器附魔。"
+      },
+      "elemental_demand": {
+        "name": "元素號令",
+        "description": "號令元素鎖定目標，嘲諷其攻擊你，持續 3 秒。射程 15 碼。"
+      },
+      "unleash_weapon": {
+        "name": "元素釋放",
+        "description": "釋放當前武器附魔的能量攻擊目標，造成 {damage} 點傷害，並根據附魔產生額外效果：威脅值爆發（大地之錨）、火焰灼燒（烈焰）或減速（寒冰）。"
+      },
       "shadow_bolt": {
         "name": "幽暗箭",
         "description": "向敵人發射暗影箭，造成 {damage} 點暗影傷害。"

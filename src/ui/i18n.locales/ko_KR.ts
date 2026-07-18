@@ -2672,6 +2672,18 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stormstrike.name': '선조의 일격',
   'entities.abilities.stormstrike.description':
     '무기에 폭풍의 힘을 흘려 넣어 즉시 무기 피해에 {damage}를 더한 피해를 입힙니다.',
+  'entities.abilities.earth_shield.name': '돌의 수호',
+  'entities.abilities.earth_shield.description':
+    '살아있는 돌로 몸을 감싸 다음 6번의 공격 동안 받는 피해를 20% 감소시킵니다. 다시 시전하여 보호막을 갱신합니다.',
+  'entities.abilities.earthbound_weapon.name': '대지결속 무기',
+  'entities.abilities.earthbound_weapon.description':
+    '무기를 대지에 결속시켜 5분 동안 생성하는 모든 위협 수준을 100% 증가시킵니다. 다른 무기 부여 효과를 대체합니다.',
+  'entities.abilities.elemental_demand.name': '정령의 명령',
+  'entities.abilities.elemental_demand.description':
+    '정령에게 명하여 대상을 붙잡아 3초 동안 자신을 공격하도록 도발합니다. 사거리 15미터.',
+  'entities.abilities.unleash_weapon.name': '정령 방출',
+  'entities.abilities.unleash_weapon.description':
+    '현재 무기 부여 효과의 에너지를 대상에게 방출하여 {damage}의 피해를 입히고, 부여 효과에 따라 추가 효과를 발휘합니다: 위협 수준 폭발(대지결속), 화염 화상(화염), 이동 속도 감소(냉기).',
   'entities.abilities.shadow_bolt.name': '어스름 화살',
   'entities.abilities.shadow_bolt.description':
     '적에게 어둠의 화살을 보내 {damage}의 암흑 피해를 입힙니다.',

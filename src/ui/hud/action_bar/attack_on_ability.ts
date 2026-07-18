@@ -68,6 +68,8 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   hot: 'other',
   absorb: 'other',
   imbue: 'other',
+  earthbindWeapon: 'other',
+  unleashWeapon: 'damage',
   lifeTap: 'other',
   buffTarget: 'other',
   debuffTargetSource: 'other',

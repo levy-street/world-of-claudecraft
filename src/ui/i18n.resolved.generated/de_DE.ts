@@ -6685,6 +6685,22 @@ export const de_DE: EnTranslations = {
         "name": "Ahnenhieb",
         "description": "Leitet den Sturm durch eure Waffe und trifft sofort für Waffenschaden plus {damage}."
       },
+      "earth_shield": {
+        "name": "Stone Aegis",
+        "description": "Sheathes you in living stone, reducing damage taken by 20% for the next 6 attacks. Recast to renew the shield."
+      },
+      "earthbound_weapon": {
+        "name": "Anchorbound Weapon",
+        "description": "Anchors your weapon to the earth, increasing all threat you generate by 100% for 5 min. Replaces any other weapon enchant."
+      },
+      "elemental_demand": {
+        "name": "Elemental Demand",
+        "description": "Command the elements to seize the target, taunting it to attack you for 3 sec. Range 15 yards."
+      },
+      "unleash_weapon": {
+        "name": "Elemental Discharge",
+        "description": "Discharges your active weapon enchant at the target for {damage} damage plus an effect based on the enchant: a threat spike (Anchorbound), a fire burn (Pyrebrand), or a movement slow (Rimebound)."
+      },
       "shadow_bolt": {
         "name": "Gloom-Blitz",
         "description": "Sendet einen schattenhaften Blitz auf den Gegner und verursacht {damage} Schattenschaden."

@@ -2715,6 +2715,18 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stormstrike.name': 'Удар предков',
   'entities.abilities.stormstrike.description':
     'Направляет бурю через ваше оружие и мгновенно наносит урон оружием плюс {damage}.',
+  'entities.abilities.earth_shield.name': 'Каменная эгида',
+  'entities.abilities.earth_shield.description':
+    'Окутывает вас живым камнем, снижая получаемый урон на 20% в течение следующих 6 атак. Повторное применение обновляет щит.',
+  'entities.abilities.earthbound_weapon.name': 'Оружие земной привязи',
+  'entities.abilities.earthbound_weapon.description':
+    'Привязывает ваше оружие к земле, увеличивая всю создаваемую вами угрозу на 100% на 5 мин. Заменяет любое другое усиление оружия.',
+  'entities.abilities.elemental_demand.name': 'Веление стихий',
+  'entities.abilities.elemental_demand.description':
+    'Приказывает стихиям завладеть целью, провоцируя ее атаковать вас в течение 3 сек. Дальность 15 м.',
+  'entities.abilities.unleash_weapon.name': 'Стихийный разряд',
+  'entities.abilities.unleash_weapon.description':
+    'Высвобождает энергию активного усиления оружия по цели, нанося {damage} ед. урона и добавляя эффект в зависимости от усиления: всплеск угрозы (земная привязь), огненный ожог (пламя) или замедление (лед).',
   'entities.abilities.shadow_bolt.name': 'Сумрачная стрела',
   'entities.abilities.shadow_bolt.description':
     'Посылает во врага темную стрелу, нанося {damage} ед. урона от темной магии.',

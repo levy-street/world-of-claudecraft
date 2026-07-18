@@ -2692,6 +2692,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stormstrike.name': '祖霊の一撃',
   'entities.abilities.stormstrike.description':
     '武器に嵐を流し込み、即座に武器ダメージに {damage} を加えたダメージを与えます。',
+  'entities.abilities.earth_shield.name': '石の守護',
+  'entities.abilities.earth_shield.description':
+    '生きた石で身を包み、次の6回の攻撃で受けるダメージを20%軽減します。再詠唱で盾を張り直します。',
+  'entities.abilities.earthbound_weapon.name': '大地結びの武器',
+  'entities.abilities.earthbound_weapon.description':
+    '武器を大地に結びつけ、5分間、生み出す脅威度をすべて100%増加させます。他の武器エンチャントを置き換えます。',
+  'entities.abilities.elemental_demand.name': 'エレメンタルの命令',
+  'entities.abilities.elemental_demand.description':
+    'エレメンタルに命じて対象を捉え、3秒間、自分を攻撃するように挑発します。射程15ヤード。',
+  'entities.abilities.unleash_weapon.name': 'エレメンタル解放',
+  'entities.abilities.unleash_weapon.description':
+    '現在の武器エンチャントのエネルギーを対象に解き放ち、{damage} のダメージを与え、エンチャントに応じた追加効果を発揮します：脅威度の爆発（大地結び）、火炎の延焼（フレイム）、移動速度の低下（フロスト）。',
   'entities.abilities.shadow_bolt.name': '暗鬱の矢',
   'entities.abilities.shadow_bolt.description':
     '敵に影の矢を放ち、{damage} の暗黒ダメージを与えます。',
