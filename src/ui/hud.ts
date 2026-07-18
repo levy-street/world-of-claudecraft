@@ -1488,7 +1488,7 @@ export class Hud {
         bagOpen: () => audio.bagOpen(),
         bagClose: () => audio.bagClose(),
         click: () => audio.click(),
-        levelUp: () => audio.levelUp(),
+        cosmeticUnlock: () => audio.cosmeticUnlock(),
       },
     });
     this.chatGeometry = new ChatGeometryController({
@@ -8183,7 +8183,7 @@ export class Hud {
           break;
         }
         case 'error':
-          this.showError(this.localizeErrorText(ev.text), ev.text);
+          this.showError(this.localizeErrorText(ev.text));
           break;
         case 'questAccepted':
           sfx.playUi('quest_accept');
@@ -8423,7 +8423,7 @@ export class Hud {
           break;
         }
         case 'partyInvite':
-          audio.questAccept();
+          audio.duelChallenge();
           this.showPrompt(
             t('hud.prompts.partyInvite', { name: `<b>${esc(ev.fromName)}</b>` }),
             t('hud.prompts.joinParty'),
@@ -8445,7 +8445,7 @@ export class Hud {
           );
           break;
         case 'guildInvite':
-          audio.questAccept();
+          audio.duelChallenge();
           this.showPrompt(
             t('hud.prompts.guildInvite', {
               name: `<b>${esc(ev.fromName)}</b>`,
@@ -8619,7 +8619,7 @@ export class Hud {
               }),
               '#ff7a6a',
             );
-            audio.death();
+            audio.arenaLoss();
           }
           break;
         }
@@ -8693,7 +8693,7 @@ export class Hud {
           break;
         case 'vcupKickoff':
           this.showBanner(t('hudChrome.vcup.bannerKickoff'));
-          audio.duelStart();
+          audio.vcupKickoff();
           break;
         case 'vcupGoal': {
           const scoringNation = vcupNationName(ev.team === 'A' ? ev.nationA : ev.nationB);
@@ -9673,10 +9673,7 @@ export class Hud {
     this.combatAnnouncer.push(text, performance.now());
   }
 
-  // `rawErrorText` is the pre-localization sim string (when the caller has one),
-  // used only to pick the error cue (see errorSfxKey/audio.error); the toast
-  // and log always render `text` as given.
-  showError(text: string, rawErrorText?: string): void {
+  showError(text: string): void {
     const localized = this.localizeErrorText(text);
     this.errorEl.textContent = localized;
     this.errorEl.style.opacity = '1';
@@ -9684,7 +9681,7 @@ export class Hud {
     this.errorTimer = window.setTimeout(() => {
       this.errorEl.style.opacity = '0';
     }, 1600);
-    audio.error(rawErrorText);
+    audio.error();
     // Mirror into the chat log's system channel (the same one loot/level-up/death
     // lines use) so the toast is not lost once it fades: WoW-style error/system
     // logging. The on-screen toast's own timing above is unchanged. Consecutive

@@ -530,6 +530,29 @@ describe('sampled SFX loading', () => {
     expect(ctx.sources[0].started).toBe(true);
   });
 
+  it('playUi enforces an explicit cooldown (opt-in only, no default), unlike playAt', () => {
+    const { player, ctx } = startWithStartupCached();
+    internals(player).buffers.set('ui_error', BUFFER);
+
+    // No cooldown requested: back-to-back calls both play, matching every
+    // pre-existing playUi call site's expectation (variant cycling, clicks).
+    player.playUi('ui_click', { jitter: false });
+    player.playUi('ui_click', { jitter: false });
+    expect(ctx.sources).toHaveLength(2);
+
+    // An explicit cooldown IS enforced: the real bug this closes had
+    // audio.error() pass { cooldown: 1.5 } to playUi, which silently ignored
+    // it entirely, so spamming a failed ability still spammed the sound.
+    ctx.sources.length = 0;
+    player.playUi('ui_error', { jitter: false, cooldown: 1.5 });
+    player.playUi('ui_error', { jitter: false, cooldown: 1.5 });
+    expect(ctx.sources).toHaveLength(1);
+
+    ctx.currentTime += 1.5;
+    player.playUi('ui_error', { jitter: false, cooldown: 1.5 });
+    expect(ctx.sources).toHaveLength(2);
+  });
+
   it('no-repeat-randoms ordered runtime takes only when a one-shot source is accepted', () => {
     vi.stubGlobal('fetch', vi.fn());
     // The previous variant is downweighted (weight 0.15 of 1), not excluded, so

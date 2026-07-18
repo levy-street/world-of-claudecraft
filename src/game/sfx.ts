@@ -417,7 +417,13 @@ class Sfx {
     if (this.active >= MAX_VOICES) return;
     const now = ctx.currentTime;
     const cd = opts?.cooldown ?? 0.03;
-    if (now - (this.lastPlay.get(key) ?? -1) < cd) return;
+    // -Infinity, not -1: a fresh key (never played) must never be blocked, at
+    // any cooldown length. A -1 sentinel worked by accident while every
+    // cooldown here stayed under 1s (now - -1 was always >= cooldown); a
+    // longer cooldown (e.g. audio.error()'s 1.5s) can make now - -1 itself
+    // read as "still on cooldown" moments after AudioContext starts, wrongly
+    // swallowing the very first play of that key.
+    if (now - (this.lastPlay.get(key) ?? Number.NEGATIVE_INFINITY) < cd) return;
     this.lastPlay.set(key, now);
     this.commitVariant(key, variantIndex);
 
@@ -502,6 +508,11 @@ class Sfx {
       return;
     }
     if (this.active >= MAX_VOICES) return;
+    const now = ctx.currentTime;
+    const cd = opts?.cooldown ?? 0;
+    // -Infinity sentinel: see the matching comment on playAt's cooldown check.
+    if (cd > 0 && now - (this.lastPlay.get(key) ?? Number.NEGATIVE_INFINITY) < cd) return;
+    if (cd > 0) this.lastPlay.set(key, now);
     this.commitVariant(key, variantIndex);
     const jitter = opts?.jitter !== false;
     const src = ctx.createBufferSource();

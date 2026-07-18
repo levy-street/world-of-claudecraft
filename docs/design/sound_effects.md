@@ -303,14 +303,13 @@ Fiesta) and every world/spatial sound ignore the toggle.
 
 | keys | purpose |
 |---|---|
-| `ui_click`, `ui_error` | basic interaction and generic invalid-action feedback |
-| `ui_error_cooldown`, `ui_error_resource`, `ui_error_range` | distinct invalid-action cues for the three highest-frequency failure reasons (ability on cooldown, out of mana/rage/energy/health, can't reach the target); resolved from the raw sim error text by `errorSfxKey` (`src/ui/error_sfx.ts`), rate-limited per key (1.5s) via `sfx.playUi`'s `cooldown` option so repeatedly failing the same action does not spam the cue. Every other error text still plays the generic `ui_error` |
+| `ui_click`, `ui_error` | basic interaction and invalid-action feedback (every failure reason shares one `ui_error` cue for now, rate-limited to 1.5s via `sfx.playUi`'s `cooldown` option so repeatedly failing the same action does not spam it; splitting by failure reason was tried and deliberately deferred, see `error_sfx.ts` history) |
 | `ui_bag_open`, `ui_bag_close` | inventory transitions |
 | `ui_coin`, `ui_loot_item` | currency and item rewards |
-| `ui_quest_accept`, `ui_quest_done`, `ui_level_up` | progression feedback |
+| `ui_quest_done`, `ui_level_up` | progression feedback |
 | `ui_achievement` | Book of Deeds unlock chime |
 | `ui_whisper`, `ui_sheep`, `ui_death` | message, transformation, and defeat events |
-| `ui_duel_challenge`, `ui_duel_countdown`, `ui_duel_start`, `ui_duel_end` | duel lifecycle |
+| `ui_duel_challenge`, `ui_duel_countdown`, `ui_duel_start`, `ui_duel_end` | shared "a match is starting" lifecycle: a real duel, an Arena queue pop, AND a Vale Cup match found all reuse this same family (deliberately, not a mixup), plus party and guild invite share `ui_duel_challenge` specifically (the old, separate, misnamed `ui_quest_accept` those two used is retired). Unlike most notification cues, this family is never silenced by the Interface & Feedback Sounds toggle, same category as the ready-check chime. |
 | `ui_fiesta_word_0` through `ui_fiesta_word_3` | escalating Fiesta takedown tiers |
 | `ui_fiesta_score_mine`, `ui_fiesta_score_other` | team score feedback |
 | `ui_fiesta_wave`, `ui_fiesta_augment`, `ui_fiesta_down`, `ui_fiesta_revive` | Fiesta round and player-state feedback |
