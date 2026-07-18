@@ -2364,6 +2364,7 @@ async function startGame(
           nativeApp: NATIVE_APP,
           desktopApp: DESKTOP_APP,
           mobileTouch: document.body.classList.contains('mobile-touch'),
+          glitchActive: GLITCH_CONFIG.enabled,
         })
       ) {
         hud.attachStorePromoCard();

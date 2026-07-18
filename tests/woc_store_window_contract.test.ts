@@ -244,7 +244,11 @@ describe('WOC Store window contract', () => {
     expect(economyWiring).toContain(
       "mobileTouch: document.body.classList.contains('mobile-touch')",
     );
+    expect(economyWiring).toContain('glitchActive: GLITCH_CONFIG.enabled');
     expect(economyWiring).toContain('hud.attachStorePromoCard();');
+    expect(economyWiring).toMatch(
+      /if\s*\(\s*shouldShowStorePromo\(\{[\s\S]*?glitchActive: GLITCH_CONFIG\.enabled,[\s\S]*?\}\)\s*\)\s*\{\s*hud\.attachStorePromoCard\(\);\s*\}/,
+    );
     expect(hud).toContain("returnFocusTo: () => document.getElementById('daily-rewards-button')");
     expect(hud).toContain('storeEnabled: () => this.claudiumHooks !== null');
     expect(hud).toContain(
