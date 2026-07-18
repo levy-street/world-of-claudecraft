@@ -151,4 +151,48 @@ describe('ChatWindowController', () => {
     expect(harness.controller.composeSend('ready')).toBe('/r ready');
     expect(harness.input.style.color).toBe('#ff80ff');
   });
+
+  it('keeps whispering the same player after an explicit /w Name (the reported bug)', () => {
+    const harness = makeHarness();
+    harness.controller.init();
+
+    // The player whispers "strong": the explicit command passes through untouched, and
+    // noteSentChannel records the target as the sticky whisper.
+    const sent = harness.controller.composeSend('/w strong hey');
+    expect(sent).toBe('/w strong hey');
+    harness.controller.noteSentChannel(sent, false);
+
+    // The next plain line must keep whispering strong, not fall back to /say.
+    expect(harness.controller.composeSend('you there?')).toBe('/w strong you there?');
+
+    // And the input tints to the whisper color so the mode is visible.
+    harness.controller.applyInputPresentation();
+    expect(harness.input.style.color).toBe('#ff80ff');
+  });
+
+  it('drops the specific whisper target once the next send goes to a standing channel', () => {
+    const harness = makeHarness();
+    harness.controller.init();
+
+    harness.controller.noteSentChannel('/w strong hey', false);
+    expect(harness.controller.composeSend('again')).toBe('/w strong again');
+
+    // Sending to a standing channel moves the sticky and clears the whisper target,
+    // so plain text no longer whispers.
+    const partySent = harness.controller.composeSend('/p inc');
+    expect(partySent).toBe('/p inc');
+    harness.controller.noteSentChannel(partySent, false);
+    expect(harness.controller.composeSend('gg')).toBe('/p gg');
+  });
+
+  it('a /r reply keeps the whisper sticky but does not glue to a specific /w target', () => {
+    const harness = makeHarness();
+    harness.controller.init();
+
+    // First /w strong, then a /r reply: the reply routes to whoever last whispered you,
+    // so the next plain line must compose as /r, not /w strong.
+    harness.controller.noteSentChannel('/w strong hey', false);
+    harness.controller.noteSentChannel('/r sure', false);
+    expect(harness.controller.composeSend('coming')).toBe('/r coming');
+  });
 });

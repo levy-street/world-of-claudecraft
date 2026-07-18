@@ -13,6 +13,7 @@ import {
   chatOpenTabLabelKey,
   composeChatLine,
   composeWhisperReply,
+  composeWhisperTo,
   isChatOpenTab,
   isChatTabChannel,
   parseChatTabs,
@@ -20,6 +21,7 @@ import {
   serializeChatTabs,
   WHISPER_TAB,
   WHISPER_TAB_LABEL_KEY,
+  whisperTargetName,
 } from './chat_channels';
 
 const CHAT_TABS_KEY = 'woc_chat_tabs';
@@ -68,6 +70,12 @@ export class ChatWindowController {
   // generic placeholder). Tracking whisper here is what keeps a reply conversation
   // going instead of snapping the input back to the previous standing channel.
   private stickyTarget: ChatInputTintTarget = 'say';
+  // When the last explicit whisper was "/w Name" (not a /r reply), the specific target
+  // name sticks here so the next plain line keeps whispering that person via "/w Name",
+  // not "/r" (which the server routes to whoever last whispered YOU). A /r reply or any
+  // standing-channel send clears it. Only meaningful while stickyTarget is the whisper
+  // collector and the active view falls back to the sticky (not the dedicated whisper tab).
+  private stickyWhisperName: string | null = null;
   private tabsWheelBound = false;
   private initialized = false;
   private pendingLinks: readonly { display: string; token: string }[] = [];
@@ -124,20 +132,39 @@ export class ChatWindowController {
   }
 
   // Remember the target a just-sent line reached as the sticky default for the next
-  // chat open on the All tab: a standing channel, or `whisper` for a `/r` reply so a
-  // whisper conversation keeps going. An explicit `/w Name`, emotes, rolls, channel
-  // membership, and unknown commands leave the sticky target unchanged. `online`
-  // disambiguates the one host-sensitive alias, bare `/g` (guild online, general
-  // offline), so the sticky follows a guild send made with the classic command.
+  // chat open on the All tab: a standing channel, `whisper` for a `/r` reply, or a
+  // SPECIFIC player for an explicit `/w Name` so the conversation keeps whispering that
+  // person (the reported bug). Emotes, rolls, channel membership, and unknown commands
+  // leave the sticky target unchanged. `online` disambiguates the one host-sensitive
+  // alias, bare `/g` (guild online, general offline), so the sticky follows a guild send
+  // made with the classic command.
   noteSentChannel(sentLine: string, online: boolean): void {
+    const whisperName = whisperTargetName(sentLine);
+    if (whisperName !== null) {
+      this.stickyTarget = WHISPER_TAB;
+      this.stickyWhisperName = whisperName;
+      return;
+    }
     const target = sentLineTargetForHost(sentLine, { online });
-    if (target) this.stickyTarget = target;
+    if (target) {
+      this.stickyTarget = target;
+      // A /r reply keeps the whisper sticky but has no client-known name (it replies to
+      // the last whisperer); any standing-channel send drops the specific target too.
+      this.stickyWhisperName = null;
+    }
   }
 
   composeSend(typed: string): string {
     const withLinks = this.applyPendingLinks(typed);
     const target = this.effectiveSendTarget();
-    if (target === WHISPER_TAB) return composeWhisperReply(withLinks);
+    if (target === WHISPER_TAB) {
+      // A specific /w target (from the All/combat sticky) keeps whispering that player;
+      // the dedicated whisper collector tab, and a /r-sticky, reply to the last whisperer.
+      if (this.activeChatTab !== WHISPER_TAB && this.stickyWhisperName) {
+        return composeWhisperTo(this.stickyWhisperName, withLinks);
+      }
+      return composeWhisperReply(withLinks);
+    }
     return composeChatLine(target, withLinks);
   }
 
@@ -169,9 +196,14 @@ export class ChatWindowController {
   // Placeholder for the chat input reflecting the active tab and sticky target.
   activePlaceholder(): string {
     const target = this.effectiveSendTarget();
-    // The whisper collector (its own tab, or a sticky `/r` reply) prompts "Whisper".
+    // The whisper collector (its own tab, or a sticky `/r` reply) prompts "Whisper"; a
+    // sticky `/w Name` target names the player so it is clear who plain text will reach.
     if (target === WHISPER_TAB) {
-      return t('hud.core.chatChannels.sendingTo', { channel: t(WHISPER_TAB_LABEL_KEY) });
+      const channel =
+        this.activeChatTab !== WHISPER_TAB && this.stickyWhisperName
+          ? this.stickyWhisperName
+          : t(WHISPER_TAB_LABEL_KEY);
+      return t('hud.core.chatChannels.sendingTo', { channel });
     }
     // A channel-bound tab keeps its "Message {channel}" prompt (unchanged, incl. a
     // Say tab). On the All/combat views a non-say sticky channel surfaces the same
