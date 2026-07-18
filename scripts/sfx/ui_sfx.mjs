@@ -12,22 +12,10 @@ const MASTER_LIMIT = 0.749894; // -2.5 dBFS leaves MP3 true-peak headroom
 // These gains shape the source character before the fixed peak/LUFS conform
 // pass. They are not cross-clip runtime mix values.
 const MASTER_GAINS_DB = {
-  ui_click: 8.75,
-  ui_error: 8.08,
-  ui_bag_open: 17.44,
-  ui_bag_close: 15.95,
-  ui_coin: 4.89,
-  ui_loot_item: 20.6,
-  ui_quest_accept: 3.57,
   ui_quest_done: 0.8,
   ui_level_up: -0.37,
-  ui_whisper: 6.25,
-  ui_sheep: 6.49,
   ui_death: 5.58,
-  ui_duel_challenge: 3.81,
-  ui_duel_countdown: 8.85,
-  ui_duel_start: 0.46,
-  ui_duel_end: 1.86,
+  ui_vcup_kickoff: 0.46,
   ui_fiesta_word_0: 2.68,
   ui_fiesta_word_1: 2.55,
   ui_fiesta_word_2: 0.09,
@@ -88,35 +76,6 @@ function fiestaWord(tier, base) {
 }
 
 export const UI_SFX_SPECS = [
-  cue('ui_click', 0.5, 'Short crisp fantasy interface button click, clean and dry.', [
-    tone(1400, 0, 0.06, 0.24, { wave: 'square' }),
-    tone(900, 0.012, 0.05, 0.08, { wave: 'sine' }),
-  ]),
-  cue('ui_error', 0.5, 'Short low invalid-action interface buzz, clear but not harsh.', [
-    tone(230, 0, 0.16, 0.22, { wave: 'square', endFrequency: 180 }),
-    tone(175, 0.12, 0.15, 0.15, { wave: 'square' }),
-  ]),
-  cue('ui_bag_open', 0.5, 'Leather inventory bag opening with a soft metal clasp.', [
-    noise('pink', 0, 0.16, 0.16, { highpass: 130, lowpass: 1500 }),
-    tone(660, 0.045, 0.07, 0.11, { wave: 'triangle' }),
-  ]),
-  cue('ui_bag_close', 0.5, 'Leather inventory bag closing with a muted clasp.', [
-    noise('pink', 0, 0.14, 0.14, { highpass: 100, lowpass: 900 }),
-    tone(440, 0.02, 0.07, 0.1, { wave: 'triangle' }),
-  ]),
-  cue('ui_coin', 0.5, 'Two bright gold coin pings, compact fantasy reward cue.', [
-    tone(2200, 0, 0.12, 0.19, { wave: 'square' }),
-    tone(2800, 0.055, 0.16, 0.17, { wave: 'square' }),
-    tone(1100, 0, 0.2, 0.045, { wave: 'sine' }),
-  ]),
-  cue('ui_loot_item', 0.5, 'Soft item pickup rustle and compact inventory tick.', [
-    noise('pink', 0, 0.14, 0.16, { highpass: 500, lowpass: 1700 }),
-    tone(950, 0.025, 0.11, 0.055, { wave: 'triangle' }),
-  ]),
-  cue('ui_quest_accept', 0.6, 'Two-note rising fantasy quest accepted chime.', [
-    tone(660, 0, 0.22, 0.18, { wave: 'triangle' }),
-    tone(880, 0.1, 0.3, 0.17, { wave: 'triangle' }),
-  ]),
   cue('ui_quest_done', 0.75, 'Three-note ascending fantasy quest completion chime.', [
     tone(523, 0, 0.35, 0.16, { wave: 'triangle' }),
     tone(659, 0.12, 0.38, 0.16, { wave: 'triangle' }),
@@ -130,34 +89,17 @@ export const UI_SFX_SPECS = [
     tone(1046, 0.36, 0.52, 0.14, { wave: 'triangle' }),
     noise('white', 0.05, 0.78, 0.025, { highpass: 2600 }),
   ]),
-  cue('ui_whisper', 0.5, 'Private message notification with two delicate glassy notes.', [
-    tone(1175, 0, 0.12, 0.15),
-    tone(1568, 0.07, 0.16, 0.12),
-    noise('pink', 0.02, 0.19, 0.018, { highpass: 1700 }),
-  ]),
-  cue('ui_sheep', 0.65, 'Playful magical sheep transformation bleat-like synth cue.', [
-    tone(620, 0, 0.44, 0.18, { wave: 'saw', endFrequency: 520 }),
-    tone(1240, 0.015, 0.27, 0.04, { wave: 'sine', endFrequency: 1040 }),
-  ]),
   cue('ui_death', 1.5, 'Somber descending player defeat sting with a dark soft impact.', [
     tone(220, 0, 1.4, 0.2, { wave: 'saw', endFrequency: 55 }),
     noise('brown', 0, 1.2, 0.12, { lowpass: 360 }),
   ]),
-  cue('ui_duel_challenge', 0.9, 'Short two-note fantasy war horn announcing a duel challenge.', [
-    tone(196, 0, 0.4, 0.23, { wave: 'saw' }),
-    tone(294, 0.18, 0.52, 0.22, { wave: 'saw' }),
-  ]),
-  cue('ui_duel_countdown', 0.5, 'Tight bright duel countdown tick with a firm attack.', [
-    tone(880, 0, 0.08, 0.23, { wave: 'square' }),
-    tone(1760, 0, 0.05, 0.06, { wave: 'sine' }),
-  ]),
-  cue('ui_duel_start', 0.9, 'Compact fantasy duel-start gong with a bright cymbal wash.', [
-    tone(220, 0, 0.72, 0.24, { wave: 'triangle', endFrequency: 110 }),
-    noise('white', 0, 0.42, 0.09, { highpass: 1600 }),
-  ]),
-  cue('ui_duel_end', 0.65, 'Two-note resolved fantasy duel ending cadence.', [
-    tone(392, 0, 0.22, 0.2, { wave: 'triangle' }),
-    tone(523, 0.12, 0.36, 0.2, { wave: 'triangle' }),
+  // Placeholder: split off ui_duel_start so Vale Cup kickoff can get its own
+  // cue distinct from a real duel/arena start. Swap for a real recording
+  // whenever it's ready, same as every other custom cue here started out.
+  cue('ui_vcup_kickoff', 0.8, 'Bright arcade referee whistle and crowd swell kickoff cue.', [
+    tone(1600, 0, 0.14, 0.22, { wave: 'square' }),
+    tone(1900, 0.1, 0.14, 0.2, { wave: 'square' }),
+    noise('white', 0.2, 0.4, 0.05, { highpass: 1200 }),
   ]),
   fiestaWord(0, 523),
   fiestaWord(1, 587),
