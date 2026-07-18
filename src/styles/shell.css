@@ -659,6 +659,34 @@
     font-size: 11px;
     white-space: nowrap;
   }
+  .wallet-picker-disconnect {
+    justify-content: center;
+    width: 100%;
+    margin-top: 12px;
+  }
+  .wallet-picker-disconnect:hover,
+  .wallet-picker-disconnect:focus-visible {
+    color: var(--color-text-error);
+    border-color: var(--color-text-error);
+  }
+  .wallet-app-launch-button {
+    display: flex;
+    justify-content: center;
+    min-height: 48px;
+    font-weight: 700;
+    text-align: center;
+  }
+  .wallet-app-launch-actions {
+    display: grid;
+    gap: 8px;
+  }
+  .wallet-app-launch-status {
+    min-height: 18px;
+    margin-top: 8px;
+    color: var(--color-text-muted);
+    font-size: 12px;
+    text-align: center;
+  }
 
   @media (max-width: 720px) {
     .cs-wallet {
@@ -2456,6 +2484,52 @@
     gap: 8px;
     flex: 0 0 auto;
   }
+  /* Delete character: a QUIET icon affordance, deliberately not a .btn and not the
+     red .btn-danger it used to be. It sits after the primary action (Enter World /
+     Take Over / Rename), so neither the eye nor the tab order reaches it first, and
+     it only takes on its danger tint once hovered or focused. The type-the-name
+     confirm modal is still the safety net; this just stops the control from baiting
+     the reflex click. */
+  .char-delete-btn {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    color: var(--color-text-muted);
+    opacity: 0.5;
+    cursor: pointer;
+    transition:
+      color 0.12s,
+      background 0.12s,
+      border-color 0.12s,
+      opacity 0.12s;
+  }
+  .char-delete-btn .ui-icon {
+    width: 16px;
+    height: 16px;
+  }
+  .char-delete-btn:hover:not(:disabled),
+  .char-delete-btn:focus-visible {
+    opacity: 1;
+    color: #e0705f;
+    border-color: rgba(214, 74, 61, 0.55);
+    background: rgba(90, 23, 20, 0.35);
+  }
+  .char-delete-btn:disabled {
+    opacity: 0.22;
+    cursor: not-allowed;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .char-delete-btn {
+      transition: none;
+    }
+  }
   .char-row .char-inworld-hint {
     display: block;
     color: #ffbf66;
@@ -3118,6 +3192,9 @@
       width: 100%;
       white-space: nowrap;
     }
+    body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-delete-btn {
+      justify-self: end;
+    }
     body:not(.mobile-touch) #charselect-panel.cs-wow .class-details-grid {
       grid-template-columns: minmax(0, 1fr);
       gap: clamp(18px, 2vh, 28px);
@@ -3754,6 +3831,30 @@
     border-color: var(--color-border-focus);
     box-shadow: 0 0 10px rgba(255, 209, 0, 0.2);
     outline: none;
+  }
+  /* The welcome screen's Enter World CTA keeps its gilded design mock. Its
+     .ws-continue rules live in the earlier components layer, so without this
+     re-assertion the generic dark .btn-primary arms above win the cascade and
+     the autofocused CTA renders as the plain dark button wearing the loud
+     offset focus ring (the reported green-ringed button). */
+  .ws-continue,
+  .ws-continue:hover,
+  .ws-continue:focus-visible {
+    color: #1a1608;
+    background: linear-gradient(180deg, #ffe066, var(--gold) 45%, #cfa400);
+    border: 1px solid #8a6f33;
+    box-shadow:
+      0 4px 22px rgba(255, 209, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  }
+  .ws-continue:hover:not(:disabled) {
+    background: linear-gradient(180deg, #fff0a0, #ffdd33 45%, #d9ae00);
+  }
+  .ws-continue:disabled {
+    background: linear-gradient(180deg, #2a2a38, #1b1b26);
+    color: var(--color-text-muted);
+    border-color: var(--color-border-default);
+    box-shadow: none;
   }
 
   .btn-secondary {
@@ -4996,7 +5097,7 @@
   }
   body.mobile-touch .char-row .char-actions {
     display: grid;
-    grid-template-columns: 0.85fr 1.15fr;
+    grid-template-columns: 1fr auto;
     gap: 7px;
     width: 100%;
   }
@@ -5005,6 +5106,13 @@
     padding: 7px 8px;
     font-size: 11px;
     white-space: nowrap;
+  }
+  /* Touch has no hover to reveal the control, so it stays legible; it keeps the
+     40x40 tap floor while staying visually quieter than the primary action. */
+  body.mobile-touch .char-delete-btn {
+    width: 40px;
+    height: 40px;
+    opacity: 0.7;
   }
   body.mobile-touch #charcreate-panel .mini-class-row,
   body.mobile-touch #offline-select .mini-class-row {
@@ -5631,6 +5739,11 @@
     flex: 1 1 auto;
     min-width: 0;
   }
+  .panel-title.char-title-portrait .char-honor-balance {
+    display: block;
+    color: var(--gold);
+    margin-top: var(--spacing-xs);
+  }
   .panel-title.char-title-portrait .portrait-chip {
     flex: 0 0 auto;
   }
@@ -5746,7 +5859,7 @@
       flex: 1 1 auto;
       min-height: 0;
       display: grid;
-      grid-template-columns: 0.85fr 1.15fr;
+      grid-template-columns: 1fr auto;
       gap: 28px;
       align-items: stretch;
     }
@@ -5828,7 +5941,7 @@
        landscape (900-940px) and stack the grandchildren as flex items. */
     body:not(.mobile-touch) #charselect-panel {
       display: grid;
-      grid-template-columns: 0.85fr 1.15fr;
+      grid-template-columns: 1fr auto;
       grid-template-rows: auto auto minmax(0, 1fr);
       column-gap: 28px;
       row-gap: 0;
@@ -5942,7 +6055,7 @@
   body.mobile-touch #char-list .char-row .char-actions {
     grid-area: actions;
     display: grid;
-    grid-template-columns: 0.85fr 1.15fr;
+    grid-template-columns: 1fr auto;
     gap: 7px;
     width: 100%;
   }
@@ -6107,7 +6220,7 @@
     }
     body.mobile-touch #char-list .char-row .char-actions {
       display: grid;
-      grid-template-columns: 0.9fr 1.1fr;
+      grid-template-columns: 1fr auto;
       gap: 6px;
       width: 100%;
     }
@@ -7505,6 +7618,63 @@
       max-width: 100%;
       min-width: 0;
       flex: 1 1 auto;
+    }
+  }
+
+  /* ---------- software rendering notice ---------- */
+  /* Owned by src/ui/gpu_notice_toast.ts: a one-time, dismissible notice shown
+     when the session runs on a software rasterizer (WARP/SwiftShader). Shares
+     the update toast's visual language and top-right slot but sits BELOW that
+     slot so the two can never overlap when both show (desktop build with a
+     pending update on a no-GPU machine). */
+  #gpu-notice {
+    position: fixed;
+    /* The safe-area term keeps the toast clear of a notch on mobile shells
+       (pre-game portrait is allowed there); zero everywhere else. */
+    top: calc(var(--spacing-md) + 56px + env(safe-area-inset-top, 0px));
+    right: var(--spacing-md);
+    z-index: 260;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    max-width: min(440px, calc(100vw - 2 * var(--spacing-md)));
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: linear-gradient(180deg, rgba(21, 21, 31, 0.96) 0%, rgba(11, 11, 18, 0.98) 100%);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-light);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  }
+  #gpu-notice[hidden] {
+    display: none;
+  }
+  #gpu-notice button {
+    flex-shrink: 0;
+    padding: 4px 10px;
+    /* WCAG 2.5.8 absolute floor on any pointer; the coarse-pointer block below
+       raises it to the repo's 40x40 mobile touch floor (unlike the desktop
+       update toast, this one can surface in a mobile browser). */
+    min-height: 24px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    color: inherit;
+    font: inherit;
+    cursor: var(--cursor-point);
+  }
+  #gpu-notice button:hover {
+    border-color: var(--color-primary);
+  }
+  #gpu-notice button:focus-visible {
+    outline: 3px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  @media (pointer: coarse) {
+    #gpu-notice button {
+      min-height: 40px;
+      min-width: 40px;
     }
   }
 }

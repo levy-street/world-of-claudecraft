@@ -36,7 +36,7 @@ export function isFinderRole(value: unknown): value is Role {
 }
 
 // Below FIRST_TALENT_LEVEL there is no specialization, so finder roles come
-// from this fixed class-capability table. From level 10 on, the selected role
+// from this fixed class-capability table. From the spec unlock (FIRST_TALENT_LEVEL) on, the selected role
 // must match the active specialization's role instead (see compatibleFinderRoles
 // in ../social/dungeon_finder.ts).
 export const FINDER_PRE_SPEC_ROLES: Record<Role, readonly PlayerClass[]> = {

@@ -8,6 +8,11 @@ import { describe, expect, it, vi } from 'vitest';
 vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
+  saveCharacterAndMarketState: vi.fn(async () => {}),
+  saveMarketState: vi.fn(async () => {}),
+  saveMailState: vi.fn(async () => {}),
+  loadMarketState: vi.fn(async () => null),
+  loadMailState: vi.fn(async () => null),
   openPlaySession: vi.fn(async () => 1),
   touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
@@ -15,6 +20,13 @@ vi.mock('../server/db', () => ({
   walletForAccount: vi.fn(async () => null),
   markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
+  revokeAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
+  // bank_ledger.ts (imported via game.ts recordBankOp) reads this at call time.
+  insertBankLedgerRow: vi.fn(async () => {}),
+  acquireCharacterLease: vi.fn(async () => true),
+  releaseCharacterLease: vi.fn(async () => {}),
+  heartbeatCharacterLeases: vi.fn(async () => {}),
+  releaseAllCharacterLeases: vi.fn(async () => {}),
 }));
 
 import { type ClientSession, GameServer, wireEntity } from '../server/game';

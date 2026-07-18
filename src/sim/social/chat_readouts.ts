@@ -12,6 +12,7 @@
 
 import { isDebuffAura } from '../aura_classify';
 import { isRooted } from '../combat/cc';
+import { baseSwingSpeed, rangedAutoProfile } from '../combat/form_swing';
 import {
   FIRST_TALENT_LEVEL,
   pointsSpent,
@@ -42,8 +43,10 @@ import {
   type Entity,
   type EquipSlot,
   FISHING_CAST_ID,
+  isFormAuraKind,
   MAX_LEVEL,
   MELEE_RANGE,
+  questObjectiveRequired,
   xpForLevel,
 } from '../types';
 import { groundHeight } from '../world';
@@ -168,10 +171,10 @@ export function dungeonsReadout(): string {
   return `Dungeons (${parts.length}): ${parts.join(', ')}.`;
 }
 // Readout for "/consider": sizes up the current target's level versus yours.
-// The verdict bands track the real combat model — meleeMissChance (types.ts)
-// applies a sharp miss penalty once the target is 3+ levels above you (its
-// `diff > 2` cliff), and dodge/crit also scale with the level gap — so a
-// target 3+ levels up is flagged as a steep step beyond a merely tough one.
+// The verdict bands track the real combat model: meleeMissChance (types.ts) ramps
+// the above-level miss penalty with the gap up to a cap at +3 (the [0,7,14,21]
+// table), and dodge/crit also scale with the level gap, so a target 3+ levels up
+// is flagged as a steep step beyond a merely tough one.
 // Reads only the live target Entity.level versus your own (no new fields).
 export function considerReadout(ctx: SimContext, self: Entity): string {
   const t = self.targetId !== null ? ctx.entities.get(self.targetId) : undefined;
@@ -263,8 +266,9 @@ export function attackReadout(ctx: SimContext, p: Entity, meta: PlayerMeta): str
   const t = p.targetId !== null ? ctx.entities.get(p.targetId) : null;
   if (!t || t.dead) return 'Auto-attack is on, but you have no valid target.';
   // ranged classes (hunter auto shot, caster wands) swing at their ranged
-  // speed; everyone else uses the equipped weapon's speed
-  const base = CLASSES[meta.cls].ranged?.speed ?? p.weapon.speed;
+  // speed; everyone else, including a druid shifted into a wandless form,
+  // uses the form-aware melee cadence (bear: weapon, cat: claw baseline)
+  const base = rangedAutoProfile(p, meta.cls)?.speed ?? baseSwingSpeed(p);
   const interval = base * ctx.swingIntervalMult(p);
   const next = p.swingTimer <= 0 ? 'now' : `in ${p.swingTimer.toFixed(1)}s`;
   return `Auto-attack is on against ${t.name} — next swing ${next} (${interval.toFixed(1)}s swing).`;
@@ -287,11 +291,9 @@ export function overpowerReadout(ctx: SimContext, e: Entity, meta: PlayerMeta): 
 export function formReadout(e: Entity): string {
   const form = e.auras.find(
     (a) =>
-      a.kind === 'form_bear' ||
-      a.kind === 'form_cat' ||
-      a.kind === 'form_travel' ||
-      a.kind === 'form_moonkin' ||
-      a.kind === 'form_shadow' ||
+      isFormAuraKind(a.kind) ||
+      a.kind === 'battle_stance' ||
+      a.kind === 'berserker_stance' ||
       a.kind === 'defensive_stance' ||
       a.kind === 'stealth',
   );
@@ -421,7 +423,10 @@ export function questReadout(meta: PlayerMeta): string {
     const quest = QUESTS[qid];
     if (!quest) continue;
     const objs = quest.objectives
-      .map((o, i) => `${o.label} ${Math.min(qp.counts[i] ?? 0, o.count)}/${o.count}`)
+      .map((o, i) => {
+        const required = questObjectiveRequired(quest, qp, i);
+        return `${o.label} ${Math.min(qp.counts[i] ?? 0, required)}/${required}`;
+      })
       .join(', ');
     const tag = qp.state === 'ready' ? ' (ready)' : '';
     lines.push(`${quest.name}${tag} — ${objs}`);
@@ -434,6 +439,7 @@ export function questReadout(meta: PlayerMeta): string {
 export function gearReadout(meta: PlayerMeta): string {
   const slots: [EquipSlot, string][] = [
     ['mainhand', 'Main Hand'],
+    ['offhand', 'Off Hand'],
     ['helmet', 'Helmet'],
     ['shoulder', 'Shoulder'],
     ['chest', 'Chest'],
@@ -615,22 +621,11 @@ export function talentsReadout(meta: PlayerMeta, e: Entity): string {
   if (total <= 0)
     return `You have not unlocked talents yet — they begin at level ${FIRST_TALENT_LEVEL}.`;
   const spent = pointsSpent(meta.talents);
-  // Split spent points by tree (cold path: walk the allocation once on demand).
-  const byId = new Map(ct.nodes.map((n) => [n.id, n] as const));
-  let classPts = 0;
-  let specPts = 0;
-  for (const id in meta.talents.ranks) {
-    const node = byId.get(id);
-    if (!node) continue;
-    if (node.tree === 'class') classPts += meta.talents.ranks[id];
-    else specPts += meta.talents.ranks[id];
-  }
   const specName = meta.talents.spec
     ? (ct.specs.find((s) => s.id === meta.talents.spec)?.name ?? meta.talents.spec)
     : null;
   const head = specName ?? 'no specialization';
-  const breakdown = specName ? `Class ${classPts}, ${specName} ${specPts}` : `Class ${classPts}`;
   const unspent = total - spent;
   const tail = unspent > 0 ? ` ${unspent} unspent.` : '';
-  return `Talents: ${head} — ${spent}/${total} points spent (${breakdown}).${tail}`;
+  return `Talents: ${head} - ${spent}/${total} rows selected.${tail}`;
 }

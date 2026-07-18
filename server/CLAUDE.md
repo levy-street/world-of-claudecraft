@@ -32,10 +32,11 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
 |---|---|
 | `main.ts` | HTTP server + the prefix-ladder dispatch (`routeHttpRequest` sends `/api` `/admin/api` `/oauth` `/internal` to four flag-gated entries) + the RETAINED legacy handler ladder, WS `/ws` upgrade wiring (builds the `createWsAuth` deps bag), boot/shutdown, leaderboard cache. Migrated routes live in per-domain `RouteDef` modules behind `server/http/` (see `server/http/CLAUDE.md`), NOT in a route table here |
 | `game.ts` | `GameServer`: owns the `Sim`, the 50 ms loop, interest-scoped snapshots, command dispatch, chat. **Largest file; extract beside it, never grow it** (Module-first above) |
-| `ws_auth.ts` | the whole WS auth handshake behind an injected deps bag (`createWsAuth`): first-frame `{t:'auth'}` check, moderation/character checks, per-IP cap, lease acquire, `game.join`. Unit-testable without a DB or HTTP server. Its rejection literals are wire contract the client matches verbatim (`src/ui/api_error_i18n.ts`): change one and the matcher in the SAME commit |
+| `ws_auth.ts` | the whole WS auth handshake behind an injected deps bag (`createWsAuth`): first-frame `{t:'auth'}` check, moderation/character checks, per-IP cap, the realm admission cap (`MAX_PLAYERS_PER_REALM`, default 5000, explicit 0 disables; checked with an in-flight admission counter so racing handshakes cannot admit past it; resumes and admins exempt), lease acquire, `game.join`. Unit-testable without a DB or HTTP server. Its rejection literals are wire contract the client matches verbatim (`src/ui/api_error_i18n.ts`): change one and the matcher in the SAME commit. Every refusal sends an `{t:'error'}` frame before closing (never a bare close code): the client classifies the literal, so a frameless refusal turns into a silent retry loop |
 | `ws_buffer.ts` | buffers in-flight WS frames during the async auth handshake, then replays them |
 | `linkdead.ts` | pure session-lifecycle decision core: `planJoin` (resume/reject/join) + `LINKDEAD_GRACE_MS` (see Persistence) |
-| `db.ts` | `pg` pool, core `SCHEMA` DDL + `ensureSchema`, character/account/token/world-state queries |
+| `keepalive_sweep.ts` | pure self-clocked keepalive-sweep decision (`keepaliveSweepDelayed`, `KEEPALIVE_STALL_FACTOR`): a sweep that fires late (an event-loop stall) re-arms every session instead of terminating them, so one stall can never mass-disconnect the realm; a genuinely dead socket still reaps one clean interval later |
+| `db.ts` | `pg` pool, core `SCHEMA` DDL + `ensureSchema`, character/account/token/world-state queries. Owns the timeout ladder (connect < statement default < the `runWithStatementTimeout` heavy allowance < the driver-side `query_timeout` backstop; constants + rationale at the top, relation pinned by `tests/server/tunables.test.ts`): wrap a known-long read in `runWithStatementTimeout`, never lift the session default, and remember `SET LOCAL` cannot lift the driver backstop. Boot DDL runs on a dedicated non-pool `Client` so schema setup is never capped |
 | `auth.ts` | scrypt hashing, `newToken`, name/password validators (`obscenity` profanity) |
 | `account.ts`, `totp.ts` | account self-service routes: password change/forgot/reset, verified email change, data export, TOTP 2FA (`totp.ts` is the pure RFC 6238 core) |
 | `social.ts`/`social_db.ts` | friends/guilds/blocks/presence, logic / SQL |
@@ -56,12 +57,13 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
 | `deeds_db.ts` / `deeds_records.ts` | deeds SQL boundary (`character_deeds` upserts, rarity counts, recent earns, broadcast opt-out; the board roll-up is `deedsBoardRanked` in `db.ts`, aggregated SQL-side with Renown passed as parameters) / the `deedUnlocked` observer: fire-and-forget FIFO upserts, the `isMarqueeDeed` predicate, and the env-gated Steam mirror hook (the marquee guild/friend broadcast fan-out itself lives in `game.ts`); the sim decides unlocks, this only records them |
 | `deeds_board.ts` / `deeds.ts` | the Renown leaderboard's pure scoring core (account-level dedupe, entry floor, score-then-earliest tie-break; Renown values come from the content table, never SQL) / the `RouteDef` API surface (public rarity read, broadcast toggle), TTL-cached in `main.ts` |
 | `steam/` | the env-gated (`STEAM_ENABLED`, off by default) Steam achievements mirror: link-not-login ticket handshake, `achievement_map.ts` (deed id to `ACH_*`, hard cap 100), publisher Web API push + reconcile-on-link |
-| `daily_rewards.ts`/`daily_rewards_db.ts` | wallet-gated daily reward tasks + Discord winner announcements; participation bans live HERE, not in `moderation_db` |
+| `daily_rewards.ts`/`daily_rewards_db.ts` | wallet-gated daily reward tasks + Discord winner announcements; participation bans are WRITTEN in `moderation_db.ts` (`setDailyRewardsBan`, permanent or timed via `durationHours`, recorded in the moderation audit; `tests/moderation_db.test.ts`), this pair owns only the eligibility read (`banForAccount`, `tests/daily_rewards_ban_db.test.ts`) |
 | `discord.ts` (+ `discord_oauth`/`discord_db`/`discord_relay`/`discord_activity`) | Discord integration: link/unlink OAuth shell + rewards, in-game `!` community-command relay, activity feed the bot drains |
 | `github.ts` (+ `github_oauth`/`github_db`/`github_contributors`) | GitHub contributor linking for the developer badge + merged-PR tally |
 | `oauth.ts`/`oauth_db.ts`, `character_sheet.ts`, `profile_page.ts`, `avatar.ts` | read-only companion API: OAuth code+PKCE and device grants (scope `character:read`), pure sheet normalizer, public SEO profile pages + generated avatars |
 | `maps.ts`/`maps_db.ts`/`maps_routes.ts`, `user_assets*.ts` | map editor: custom-map persistence with fork lineage / hardened player GLB uploads (both mirror the `SocialService`/`SocialDb` split) |
 | `tick_profiler.ts` / `tick_rate_meter.ts` / `client_perf_metrics_db.ts` | debugging the 50 ms budget: rolling per-phase loop timings, achieved wall-clock tick rate (the two can disagree, see the meter header), capped client-perf aggregates behind `/metrics` |
+| `mob_scan_tick_stats.ts` | folds the sim's per-tick mob-scan visit counters (`Sim.mobScanCounters`, observer-only) into the `PERF_TICK_LOG` heartbeat tokens (`aggroVisits=`/`threatVisits=`) and the admin tick-capture accumulators; `game.ts` keeps only the holder and the apply call |
 | `perf_report.ts` / `provider_usage.ts` | rate-limited client perf-report ingestion / process-local provider and usage telemetry for the admin dashboard |
 
 ## Invariants, YOU MUST keep these
@@ -70,14 +72,18 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
   `dispatchMessage` (game.ts) type-checks each field before calling a `sim.*`
   method, keep that guarding when you add a command.
 - **Wire protocol lockstep with `src/net/online.ts`.** Server sends `hello` /
-  `snap` (with `self`/`ents`/`keep`) / `events` / `social` / `error`; client
+  `snap` (with `self`/`ents`/`keep`) / `events` / `social` / `censor` / `error`; client
   first sends `{t:'auth',token,character}`. Any wire change must land in both files together.
 - **No browser/render/ui imports.** This bundles for Node, import only from
   `src/sim/`, `src/world_api.ts`, and `node:*`. Never from `render/`/`ui/`/`game/`/`net/`.
 - **SQL lives only in `db.ts` and `*_db.ts`.** Logic modules (`game.ts`,
   `social.ts`, `admin.ts`) carry zero raw SQL: `SocialService` talks to a
   `SocialDb` interface so tests use an in-memory fake. Don't inline `pool.query` in a logic module.
-- **`ALLOW_DEV_COMMANDS=1` gates `dev_level`/`dev_teleport`/`dev_give`** (dev/E2E only, **never prod**).
+- **`ALLOW_DEV_COMMANDS=1` gates the whole dev-cheat surface** (dev/E2E only, **never prod**):
+  every `dev_*` case in `dispatchMessage` (game.ts), `Sim.devCommands` (set from the env var
+  when `GameServer` constructs the `Sim`, enabling the full `/dev` chat set in
+  `src/sim/dev_commands.ts`, `handleDevChat`: level, teleport, give, spawn, heal, and friends),
+  and the dev-only `GET /api/perf` read (both dispatch arms).
 
 ## Persistence model
 - Character level + full state (gear/bags/bank/quests/position/money/talents/arena/lifetimeXp/
@@ -87,8 +93,14 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
   `world_state` row. Treat the bank rollout as forward-only (a pre-bank binary's save drops the field).
 - **Per-character load lease** (`character_leases`): acquired at the WS handshake between
   `getCharacter` and `game.join` (90 s TTL, heartbeats on the autosave loop, nonce-fenced release),
-  so two processes can never double-load one character. `bank_ledger` is the append-only per-op
-  audit trail (`scripts/bank_audit.mjs` replays it offline).
+  so two processes can never double-load one character. The steal predicate has three arms
+  (expiry, same holder, same AUTHENTICATED account), so a player whose old process died
+  reclaims their own character immediately instead of waiting out the TTL; rows with a NULL
+  `account_id` fail that arm closed. Character saves are lease-fenced: both save functions
+  take the session's lease nonce and land only while the row still carries it (an in-statement
+  EXISTS fence, never check-then-write), and a fenced-out session is kicked with the existing
+  takeover signal, so a displaced zombie can never overwrite live state. `bank_ledger` is the
+  append-only per-op audit trail (`scripts/bank_audit.mjs` replays it offline).
 - **Disconnect is not leave.** `linkdead.ts` holds a dropped session in-world for
   `LINKDEAD_GRACE_MS` (5 min); `planJoin` (pure, unit-tested) decides resume/reject/join, and a
   resume never re-acquires the lease. Forced disconnects (moderation, takeover, anti-bot) skip

@@ -1,7 +1,7 @@
 // The collapse-state pure core for the mobile party-frames chip.
 //
 // On a touch HUD the always-expanded party stack (#party-frames: the member unit
-// frames + the Leave Party button) eats a large top-left area, so mobile replaces
+// frames) eats a large top-left area, so mobile replaces
 // it with a two-state UI: a compact "Party" chip (collapsed, the default) that taps
 // to reveal the full stack (expanded), with the chip staying as a header above it.
 //
@@ -67,12 +67,12 @@ export interface PartyChipInputs {
 }
 
 /** What the painter renders from the inputs: whether the chip exists at all, and
- *  whether the member frames + Leave button are expanded (shown) under it. */
+ *  whether the member frames are expanded (shown) under it. */
 export interface PartyChipState {
   /** The compact chip is shown only while actually in a party, on mobile, AND chat is
    *  not open (chat yields the whole party UI, chip included). */
   chipVisible: boolean;
-  /** The full stack (member frames + Leave Party) shows only when the chip is
+  /** The full stack (member frames) shows only when the chip is
    *  present AND the player has expanded it AND chat is not open. Off desktop the chip
    *  never exists, so the frames are always "expanded" there (the desktop stack is
    *  unchanged). */

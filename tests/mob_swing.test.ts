@@ -123,11 +123,15 @@ describe('mob_swing module: runMobSwingAffixes', () => {
     // Fold the pushed buff into derived stats (mirrors applyAura's recalc).
     recalcPlayerStats(p, meta.cls, meta.equipment, meta.talentMods, meta.equipmentInstance);
     expect(p.stats.armor).toBe(armorBefore + 90);
+    const auraCountBefore = p.auras.length;
 
     const removed = devourBeneficialAura(ctxOf(sim), p, 'Devour Magic');
     expect(removed).toBe(true);
-    expect(p.auras.length).toBe(1); // exactly one eaten (the first devourable, in order)
+    // Stable Warrior stance auras may already be present. Devour still eats
+    // exactly one aura, the first devourable enhancement in authored order.
+    expect(p.auras.length).toBe(auraCountBefore - 1);
     expect(p.auras.some((a: any) => a.id === 'devour_test')).toBe(false);
+    expect(p.auras.some((a: any) => a.id === 'devour_test_2')).toBe(true);
     // recalcPlayer (the new SimContext callback) rebaked stats: the armor un-folded.
     expect(p.stats.armor).toBe(armorBefore);
   });

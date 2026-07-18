@@ -1,4 +1,21 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+// Mock the db layer so no Postgres is needed; only wireEntity is under test.
+vi.mock('../server/db', () => ({
+  pool: { query: vi.fn(async () => ({ rows: [] })) },
+  saveCharacterState: vi.fn(async () => {}),
+  openPlaySession: vi.fn(async () => 1),
+  touchCharacterLogin: vi.fn(async () => {}),
+  closePlaySession: vi.fn(async () => {}),
+  insertChatLogs: vi.fn(async () => {}),
+  walletForAccount: vi.fn(async () => null),
+  markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
+  grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
+}));
+
+import { wireEntity } from '../server/game';
+import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
+import { ClientWorld } from '../src/net/online';
 import { bagCapacity, stackSizeOf } from '../src/sim/bags';
 import { HARVEST_COMPONENT_ITEMS } from '../src/sim/content/professions';
 import { ITEMS, MOBS } from '../src/sim/data';
@@ -279,5 +296,90 @@ describe('signed materials (#1145)', () => {
     // This seed's focus-tier roll lands above the poor floor, so the fungible
     // grant is more than a single unit (harvestTierQuantity(tier), #1142).
     expect(sim.countItem('boar_hide', a)).toBe(2);
+  });
+});
+
+// A ClientWorld without the WebSocket plumbing, to drive applySnapshot directly
+// (the established bare-client idiom; see bareClient in tests/snapshots.test.ts
+// and tests/CLAUDE.md).
+function bareClient(pid: number): ClientWorld {
+  const c: any = Object.create(ClientWorld.prototype);
+  c.cfg = { seed: 20061, playerClass: 'warrior' };
+  c.entities = new Map();
+  c.playerId = pid;
+  c.ownPlayerId = pid;
+  c.ownPlayerClass = 'warrior';
+  c.spectating = null;
+  c.cupInfo = null;
+  c.sportRole = null;
+  c.moveInput = {};
+  c.inventory = [];
+  c.vendorBuyback = [];
+  c.equipment = {};
+  c.accountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
+  c.copper = 0;
+  c.honor = 0;
+  c.lifetimeHonor = 0;
+  c.xp = 0;
+  c.known = [];
+  c.questLog = new Map();
+  c.questsDone = new Set();
+  c.pendingQuestCommands = new Map();
+  c.partyInfo = null;
+  c.selectedDungeonDifficulty = 'normal';
+  c.tradeInfo = null;
+  c.duelInfo = null;
+  c.lastSnapAt = 0;
+  c.snapInterval = 50;
+  c.serverTickHz = null;
+  c.missingSince = new Map();
+  c.pendingFacingDelta = 0;
+  c.connected = true;
+  c.eventQueue = [];
+  c.mouselookFacing = null;
+  c.lastInputSentAt = 0;
+  c.lastInputSig = '';
+  c.inputSeq = 0;
+  c.pendingInputSeqSentAt = new Map();
+  c.ackedInputSeq = 0;
+  c.inputEchoSamples = [];
+  c.spectateFacingPending = false;
+  c.pendingSpectateFacing = null;
+  c.nodeCooldowns = new Map();
+  return c;
+}
+
+// The online half of the claim: the server encodes harvestClaimedBy as the
+// sparse terse key `hcb` (server/game.ts wireEntity), ClientWorld mirrors it,
+// and the corpse picker's availability core (corpseLootAvailability) therefore
+// stops offering an already-claimed corpse online, exactly as offline.
+describe('corpse harvest claim over the wire (online picker parity)', () => {
+  it('a real claim rides hcb, mirrors into ClientWorld, and gates the picker', () => {
+    const { sim, mob, a, b } = setup();
+    sim.harvestCorpse(mob.id, undefined, a);
+    expect(mob.harvestClaimedBy).toBe(a);
+
+    const w = wireEntity(mob);
+    expect(w.hcb).toBe(a);
+
+    // Bravo's client sees Alpha's claim mirrored, and the picker refuses it.
+    const client = bareClient(b);
+    (client as any).applySnapshot({ t: 'snap', ents: [w] });
+    const mirrored = client.entities.get(mob.id)!;
+    expect(mirrored.harvestClaimedBy).toBe(a);
+    expect(corpseLootAvailability(mirrored, b).harvestable).toBe(false);
+  });
+
+  it('an unclaimed tagged corpse stays harvestable through the mirror', () => {
+    const { mob, b } = setup();
+
+    const w = wireEntity(mob);
+    expect(w).not.toHaveProperty('hcb');
+
+    const client = bareClient(b);
+    (client as any).applySnapshot({ t: 'snap', ents: [w] });
+    const mirrored = client.entities.get(mob.id)!;
+    expect(mirrored.harvestClaimedBy).toBeNull();
+    expect(corpseLootAvailability(mirrored, b).harvestable).toBe(true);
   });
 });

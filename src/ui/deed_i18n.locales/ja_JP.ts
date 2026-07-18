@@ -26,8 +26,8 @@ export const table: DeedLocaleTable = {
   prog_specialized: { name: '所信表明', desc: '特化を選び、その象徴となるアビリティを習得する。' },
   prog_deep_roots: { name: '深き根', desc: '最終段のタレントにポイントを振る。' },
   prog_full_build: {
-    name: '十一分の力',
-    desc: '11のタレントポイントすべてをひとつのビルドに振り切る。',
+    name: '六段の極み',
+    desc: '1つのビルドで全6段のタレントから1つずつ選択する。',
   },
   prog_veteran: { name: '古参', desc: '生涯経験値250,000を獲得する。', title: '古参' },
   prog_champion: { name: '勇者', desc: '生涯経験値500,000を獲得する。', title: '勇者' },

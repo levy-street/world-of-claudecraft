@@ -32,8 +32,8 @@ export const table: DeedLocaleTable = {
     desc: 'Brug et talentpoint på et talent i nederste række.',
   },
   prog_full_build: {
-    name: 'Alle Elleve',
-    desc: 'Brug alle elleve talentpoint på ét og samme build.',
+    name: 'Alle Seks',
+    desc: 'Vælg én mulighed i alle seks talentrækker i ét build.',
   },
   prog_veteran: { name: 'Veteran', desc: 'Optjen sammenlagt 250.000 erfaring.', title: 'Veteran' },
   prog_champion: { name: 'Mester', desc: 'Optjen sammenlagt 500.000 erfaring.', title: 'Mester' },

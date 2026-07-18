@@ -48,6 +48,7 @@ import {
   NYTHRAXIS_ROOM_RADIUS,
   normAngle,
   OBJECT_RESPAWN,
+  questObjectiveRequired,
   type SimEvent,
   type Vec3,
   YELL_RANGE,
@@ -1311,23 +1312,27 @@ export function interactObjectForQuests(ctx: SimContext, obj: Entity, meta: Play
         const killIdx = quest.objectives.findIndex(
           (o) => o.type === 'kill' && o.targetMobId === 'bound_guardian',
         );
-        if (killIdx >= 0 && qp.counts[killIdx] < quest.objectives[killIdx].count) {
+        if (killIdx >= 0 && qp.counts[killIdx] < questObjectiveRequired(quest, qp, killIdx)) {
           summonQuestMob(ctx, 'bound_guardian', obj.pos, meta.entityId);
         }
       }
       // The interact objective itself (and its one-time vision) only credits once.
-      if (qp.counts[objectiveIndex] >= objective.count) return;
+      if (qp.counts[objectiveIndex] >= questObjectiveRequired(quest, qp, objectiveIndex)) return;
       const shared = sharedNythraxisObjectParticipants(ctx, meta, obj, qp.questId, objectiveIndex);
       for (const member of shared) {
         const memberQp = member.questLog.get(qp.questId);
         if (memberQp?.state !== 'active') continue;
-        if (memberQp.counts[objectiveIndex] >= objective.count) continue;
+        const required = questObjectiveRequired(quest, memberQp, objectiveIndex);
+        if (memberQp.counts[objectiveIndex] >= required) continue;
         memberQp.counts[objectiveIndex]++;
         member.counters.questProgress++;
         ctx.emit({
           type: 'questProgress',
           questId: memberQp.questId,
-          text: `${objective.label}: ${memberQp.counts[objectiveIndex]}/${objective.count}`,
+          objectiveIndex,
+          current: memberQp.counts[objectiveIndex],
+          required,
+          text: `${objective.label}: ${memberQp.counts[objectiveIndex]}/${required}`,
           pid: member.entityId,
         });
         ctx.checkQuestReady(memberQp, member);

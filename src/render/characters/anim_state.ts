@@ -13,11 +13,23 @@ export interface AnimState {
   reverseBackpedal?: boolean;
   dead: boolean;
   casting: boolean;
+  /** Channeling a self-centered whirl such as Bladestorm. This wins over the
+   *  generic cast and locomotion poses. */
+  spinning?: boolean;
   swimming: boolean;
   sitting: boolean;
 }
 
-export type BaseState = 'idle' | 'walk' | 'walkBack' | 'run' | 'cast' | 'swim' | 'sit' | 'jump';
+export type BaseState =
+  | 'idle'
+  | 'walk'
+  | 'walkBack'
+  | 'run'
+  | 'cast'
+  | 'spin'
+  | 'swim'
+  | 'sit'
+  | 'jump';
 
 const DEFAULT_WALK_REF = 2.2;
 const DEFAULT_RUN_REF = 7;
@@ -25,6 +37,7 @@ const DEFAULT_RUN_REF = 7;
 export function desiredBaseState(s: AnimState, hasWalkBackClip: boolean): BaseState {
   if (s.swimming) return 'swim';
   if (s.airborne) return 'jump';
+  if (s.spinning) return 'spin';
   if (s.casting) return 'cast';
   if (s.sitting) return 'sit';
   if (s.moving) {

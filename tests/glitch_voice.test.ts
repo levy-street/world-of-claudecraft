@@ -146,14 +146,11 @@ describe('Glitch voice API', () => {
       display_name: 'Aster',
       ttl_minutes: 30,
     });
-    expect((calls[1].init?.headers as Record<string, string>).Authorization).toBe(
-      'Bearer title-token',
-    );
+    const joinHeaders = calls[1].init?.headers as Record<string, string> | undefined;
+    expect(joinHeaders?.Authorization).toBe('Bearer title-token');
     expect(calls[0].init?.method).toBe('GET');
     expect(calls[1].init?.method).toBe('POST');
-    expect((calls[1].init?.headers as Record<string, string>)['Content-Type']).toBe(
-      'application/json',
-    );
+    expect(joinHeaders?.['Content-Type']).toBe('application/json');
   });
 
   it('accepts the canonical voice_room field returned by the join endpoint', async () => {
@@ -279,10 +276,9 @@ describe('Glitch voice API', () => {
     expect(calls[3].init?.keepalive).toBe(true);
     for (const call of calls) {
       expect(call.init?.method).toBe('POST');
-      expect((call.init?.headers as Record<string, string>).Authorization).toBeUndefined();
-      expect((call.init?.headers as Record<string, string>)['Content-Type']).toBe(
-        'application/json',
-      );
+      const headers = call.init?.headers as Record<string, string> | undefined;
+      expect(headers?.Authorization).toBeUndefined();
+      expect(headers?.['Content-Type']).toBe('application/json');
     }
   });
 

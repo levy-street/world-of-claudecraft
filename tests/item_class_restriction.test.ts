@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import { canEquipItem } from '../src/sim/equipment_rules';
+import { ALL_CLASSES, type ItemDef } from '../src/sim/types';
 import { requiredClassesForTooltip } from '../src/ui/item_class_restriction';
 
 // Bug #1893: a druid was blocked from equipping "Fang of Korzul" (a rogue/hunter
@@ -19,6 +20,48 @@ describe('requiredClassesForTooltip', () => {
     expect(item).toBeDefined();
     expect(canEquipItem('druid', item)).toBe(false);
     expect(requiredClassesForTooltip(item)).toEqual(['rogue', 'hunter']);
+  });
+
+  it('does not advertise Rogue for a future two-handed weapon', () => {
+    const item = {
+      id: 'future_greatblade',
+      name: 'Future Greatblade',
+      kind: 'weapon' as const,
+      slot: 'mainhand' as const,
+      hand: 'twohand' as const,
+      weapon: { min: 20, max: 30, speed: 3.2 },
+      requiredClass: ['warrior', 'rogue', 'hunter', 'shaman', 'paladin'],
+      sellValue: 1,
+    } satisfies ItemDef;
+
+    expect(canEquipItem('rogue', item)).toBe(false);
+    expect(requiredClassesForTooltip(item)).toEqual(['warrior', 'hunter', 'shaman', 'paladin']);
+  });
+
+  it('shows the literal enforced class list for a shield', () => {
+    const item = {
+      id: 'future_warrior_shield',
+      name: 'Future Warrior Shield',
+      kind: 'armor' as const,
+      slot: 'offhand' as const,
+      armorType: 'mail' as const,
+      shield: true,
+      requiredClass: ['warrior'],
+      sellValue: 1,
+    } satisfies ItemDef;
+
+    expect(canEquipItem('paladin', item)).toBe(false);
+    expect(requiredClassesForTooltip(item)).toEqual(['warrior']);
+  });
+
+  it('derives the enforced classes for unrestricted two-handed vendor weapons', () => {
+    const expected = ALL_CLASSES.filter((cls) => cls !== 'rogue');
+    for (const id of ['eastbrook_greatsword', 'highwatch_greatsword'] as const) {
+      const item = ITEMS[id];
+      expect(item.requiredClass).toBeUndefined();
+      expect(canEquipItem('rogue', item)).toBe(false);
+      expect(requiredClassesForTooltip(item)).toEqual(expected);
+    }
   });
 
   it('names the classes for a warrior/paladin/shaman mail chest (Deathlord Warplate)', () => {

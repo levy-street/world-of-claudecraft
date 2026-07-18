@@ -56,6 +56,7 @@ Read all in-scope files. Also read the CLAUDE.md files that govern each domain i
 - `src/net/CLAUDE.md` (net / wire protocol in scope)
 - `src/render/CLAUDE.md` (and its `characters/` sub-file; the `assets/` notes are a section inside it) (renderer in scope)
 - `src/ui/CLAUDE.md` and `src/styles/CLAUDE.md` (HUD / i18n / CSS in scope)
+- `src/ui/hud/CLAUDE.md` (an extracted HUD domain under `src/ui/hud/` in scope)
 - `src/game/CLAUDE.md` (input / camera / mobile in scope)
 - `src/admin/CLAUDE.md` (admin dashboard SPA in scope)
 - `headless/CLAUDE.md` and `python/CLAUDE.md` (RL env in scope)
@@ -238,7 +239,9 @@ Skip if no `src/sim/content/` files are in scope.
 
 - `npx tsc --noEmit` is clean.
 - The relevant Vitest files pass; for a full check the CI-equivalent gate is green, in the order
-  the CI workflow runs it: `npm run i18n:gen` then the i18n freshness check
+  `npm run gate` (`scripts/gate.mjs`) runs it serially (CI splits the same step list across a
+  sharded test matrix plus a parallel checks job, pinned by `tests/ci_workflow.test.ts`):
+  `npm run i18n:gen` then the i18n freshness check
   (`git diff --exit-code` over the generated i18n artifacts), `npm run security:gate`,
   `npm run ci:changed` (biome, changed files), `npm run sfx:check`,
   `npm test`, `npx tsc --noEmit`, `npm run build:env`, `npm run build:server`, `npm run build`.
@@ -248,9 +251,12 @@ Skip if no `src/sim/content/` files are in scope.
 - Recommend `npm run gate` (`scripts/gate.mjs`) over an ad-hoc shell chain for the full check
   (release-tier automatically on a `release/**` branch); the rationale (piped exit codes,
   load flakes, worker caps) is in root `CLAUDE.md`.
-- The SFX suites need FFmpeg on PATH (CI installs it before `npm test`;
-  `tests/sfx_gate_preflight.test.ts` pins the fail-fast message). A red sfx test on a machine
-  without FFmpeg is environmental, not a regression.
+- FFmpeg comes from the bundled `ffmpeg-static`/`ffprobe-static` packages: the SFX suites and
+  the conformance/export validators bind to the static binaries directly, while the gate
+  preflight and the Studio playback spawns resolve via `scripts/sfx/ffmpeg_paths.mjs` with a
+  PATH fallback (`tests/sfx_gate_preflight.test.ts` pins the fail-fast message). A red sfx
+  test on a machine whose install skipped package scripts (`npm ci` fixes it) is
+  environmental, not a regression.
 - No em dashes, en dashes, or emojis in code, comments, docs, commit/PR text, or player copy. Do
   NOT strip a dash that is native to a locale overlay (for example ru); that is correct there.
 - On a `release/**` branch, the release-tier i18n gate shows pending=0 and the release malware
@@ -262,6 +268,7 @@ Skip if no `src/sim/content/` files are in scope.
 |---|---|
 | `server/`, `src/admin/`, `src/net/`, a deploy/secret file, new SQL/auth/secret/wallet code, or a new `Math.random`/`Date.now`/`performance.now` in `src/sim/` or a pure core | privacy-security-review |
 | `server/*_db.ts` DDL or any persisted JSONB shape (`characters.state`, a `world_state` row incl. market/mail, `accounts.cosmetics`) | migration-safety |
+| SQL or a database call site, schema/indexes, query cadence or cardinality, pool/lock/timeout behavior, scheduled database work, a database driver or Postgres engine/config change, or stored-data growth | database-performance-reviewer |
 | `src/world_api.ts` (IWorld), `src/sim/`, `src/net/online.ts`, `server/game.ts` wire/dispatch, or the sim/server i18n matchers | cross-platform-sync |
 | `src/sim/` (determinism, rng draw-order, tick-phase, SimContext seam, move-not-rewrite on a relocation) | architecture-reviewer |
 | `src/ui/`, `src/styles/`, or `src/render/` presentation change (HUD windows/painters, CSS, mobile, graphics tiering) | frontend-seam-reviewer |

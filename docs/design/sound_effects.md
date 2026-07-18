@@ -49,9 +49,17 @@ through it before writing, so a regenerated clip already meets the standard.
   rejected (re-encoding cannot restore it); a hand-authored MP3 above the
   192 kbps ceiling is re-encoded down to it.
 - **Loudness:** clips under 1 s normalize to a -6 dBFS true peak; clips at or
-  above 1 s normalize to -14 LUFS integrated. Normalization is a consistency
-  measure, not a clipping fix: the engine caps per-play gain at 1.0 under a 0.85
-  master, so clipping is not otherwise possible.
+  above 1 s normalize to -14 LUFS integrated, and the LUFS branch verifies the
+  real post-encode true peak against the same -6 dBFS ceiling on every attempt
+  (MP3 encoding can push a clip's true peak above whatever the pre-encode
+  limiter saw). Peak safety is the binding constraint: a wide-crest-factor clip
+  that cannot reach -14 LUFS without breaching the ceiling ships as the best
+  peak-safe result, under the nominal target and marked `peakLimited`
+  (`conformSfxAudio` in `scripts/sfx/conform_audio.mjs`). `npm run sfx:check`
+  accepts that peak-constrained shortfall and hard-fails an over-target LUFS
+  or a true-peak overshoot (`classify` in `scripts/sfx/sfx_conform_rules.mjs`).
+  On top of the asset ceiling, the engine caps per-play gain at 1.0 under a
+  0.85 master, so runtime gain staging cannot clip a conformed clip.
 - **Channels (mono/stereo policy per playback path):** mono, except global
   ambience beds. `playAt` positions a clip through an equalpower `PannerNode` that
   downmixes to mono before panning, and `playUi` sums to the mono master, so for
@@ -68,8 +76,8 @@ through it before writing, so a regenerated clip already meets the standard.
   (contiguous from `_1`); dynamic creature variants use
   `mob_<family>_<subfamily>_<action>_<n>.mp3`. The category prefixes in use are
   `foot_`, `move_`, `melee_`, `impact_`, `combat_`, `player_`, `cast_`, `proj_`,
-  `spell_`, `heal_`, `buff_`/`debuff_`, `mob_`, `amb_`, `lockpick_`, `quest_`, and
-  `ui_`.
+  `wand_`, `spell_`, `heal_`, `buff_`/`debuff_`, `mob_`, `amb_`, `lockpick_`,
+  `quest_`, and `ui_`.
 
 `npm run sfx:check` reports the loudness, format, and bitrate rules as hard
 failures. The channel and naming rules are advisory by default (they print but do
@@ -77,6 +85,14 @@ not change the exit code), so the shipped world clips, which predate the mono
 policy, do not break the gate before the one-time re-process. Pass
 `npm run sfx:check -- --strict` to promote them to failures, and
 `npm run sfx:conform` (`--fix`) to conform loudness and downmix in a single pass.
+
+A third advisory category flags a `custom: true` key whose measured LUFS lands
+suspiciously close to the generated-content target (`TARGET_LUFS`, -14): the
+fingerprint of a key that was loudness-targeted before `custom: true` was set on
+it and never re-derived from a pristine source since. It is advisory, not a hard
+failure, because an author's own hot mix can coincidentally land there too and
+this checker has no access to the external master-store source to tell the two
+apart; verify by ear or against the source before treating a hit as a defect.
 
 ---
 
@@ -257,6 +273,31 @@ pitched-up `attack`. Families: `beast`, `boar`, `spider`, `mudfin`, `burrower`,
 | `dragonkin` | a dragonkin — fierce roaring alert with wing flap / snapping bite roar / dying roar collapse |
 | `demon` | a demon — sinister hissing snarl / shrieking demonic strike / agonized demonic death wail |
 
+### Idle vocalizations (spatial, ambient bark)
+`mob_<family>_idle` (one per family, `reptile` included, 13 total), plus a
+subfamily-specific `mob_<family>_<subfamily>_idle` for the wolf aliases (see
+`SUBFAMILY_ALIAS` in `src/ui/combat_sfx.ts`; a matching `mob_undead_skeleton_*`
+set exists on disk but is not currently wired to any live template, an
+inherited gap this feature did not introduce). Unlike the reactive
+aggro/attack/death/hurt vocalizations (fired directly off sim combat events),
+idle barks are presentation-only ambience: a shared periodic sweep
+(`Hud.sweepMobIdleBarks`, throttled to `MOB_IDLE_CHECK_INTERVAL_MS` from
+`update()`, never per-mob-per-frame) considers every non-combat, unowned,
+non-dummy, unmuted mob within `MOB_IDLE_SCAN_RADIUS` of the player and rolls
+each one independently
+against `MOB_IDLE_BASE_CHANCE`, damped by how many same-family mobs are
+clustered nearby (`idleDensityFactor`, `src/ui/mob_idle_sfx.ts`) so a dense
+pack does not all bark in the same sweep. A per-entity cooldown
+(`MOB_IDLE_PER_ENTITY_COOLDOWN_MS`) additionally rate-limits one mob's own
+repeats, stamped only when `sfx.playAt` reports the sound actually played
+(not merely attempted), so losing the shared per-key playback cooldown
+(`MOB_IDLE_KEY_COOLDOWN_S`, the backstop against two mobs barking the
+identical clip at once) does not silently bench a mob for the full
+per-entity window. Plays at `MOB_IDLE_GAIN`, a dedicated lower bucket
+distinct from the combat layer's `COMBAT_GAIN`. Timing is client-local and
+non-deterministic across players by design (presentation-only, same category
+as footstep variant choice, not gameplay-affecting).
+
 ### Ambient loops
 | key | loop | spatial | prompt summary |
 |---|---|---|---|
@@ -277,12 +318,21 @@ These cues are non-positional, preload at startup, and keep the existing
 `GameAudio` method surface. They are sampled assets, so they use the same Studio
 editing, mastering, caching, and playback limits as the world catalog.
 
+The Interface and Feedback Sounds toggle (the `interfaceSfx` setting, wired to
+`audio.setFeedbackEnabled` in `src/game/audio.ts`) silences the notification
+cues (coin, loot, level-up, quest, whisper, transformation, death, error) and
+the spatial avoid cues (miss/dodge/resist/parry), which the HUD gates via
+`audio.feedbackEnabled`: they report an outcome, not a world impact. Affordance
+and gameplay-timing cues (click, bag transitions, ready check, duel lifecycle,
+Fiesta) and every world/spatial sound ignore the toggle.
+
 | keys | purpose |
 |---|---|
 | `ui_click`, `ui_error` | basic interaction and invalid-action feedback |
 | `ui_bag_open`, `ui_bag_close` | inventory transitions |
 | `ui_coin`, `ui_loot_item` | currency and item rewards |
 | `ui_quest_accept`, `ui_quest_done`, `ui_level_up` | progression feedback |
+| `ui_achievement` | Book of Deeds unlock chime |
 | `ui_whisper`, `ui_sheep`, `ui_death` | message, transformation, and defeat events |
 | `ui_duel_challenge`, `ui_duel_countdown`, `ui_duel_start`, `ui_duel_end` | duel lifecycle |
 | `ui_fiesta_word_0` through `ui_fiesta_word_3` | escalating Fiesta takedown tiers |

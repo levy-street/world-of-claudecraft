@@ -28,6 +28,104 @@ async function pollForSize(page, selector, attempts = 20, intervalMs = 500) {
 
 export const TARGETS = [
   {
+    key: 'tank-defensive-cds',
+    label: 'Tank defensive cooldowns',
+    when: ['tests/tank_defensive_cds.test.ts'],
+    variants: [
+      {
+        key: 'paladin-desktop',
+        charClass: 'paladin',
+        charName: 'Dawnward',
+        abilityId: 'sacred_bulwark',
+        nearbyAbilityId: 'divine_protection',
+      },
+      {
+        key: 'druid-desktop',
+        charClass: 'druid',
+        charName: 'Leafward',
+        abilityId: 'primal_reflexes',
+        nearbyAbilityId: 'barkskin',
+      },
+      {
+        key: 'paladin-mobile',
+        charClass: 'paladin',
+        charName: 'Sunward',
+        abilityId: 'sacred_bulwark',
+        nearbyAbilityId: 'divine_protection',
+        mobile: true,
+      },
+    ],
+    async capture(page, variant) {
+      await page.keyboard.press('Escape');
+      await wait(400);
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+      });
+      await wait(300);
+      const setup = await page.evaluate((shot) => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!sim || !player) return { known: false };
+        sim.setPlayerLevel?.(20, player.id);
+        player.gm = true;
+        player.resource = player.maxResource;
+        const resolved = sim.resolvedAbility?.(shot.abilityId);
+        const known = !!resolved;
+        if (known) {
+          game.hud.hotbarActions[0] = { type: 'ability', id: shot.abilityId };
+          game.hud.saveSlotMap?.();
+          sim.castAbility?.(shot.abilityId, player.id);
+        }
+        game.hud.toggleSpellbook?.();
+        return { known, abilityName: resolved?.def.name ?? shot.abilityId };
+      }, variant);
+      if (!setup.known) throw new Error(`${variant.abilityId} is not known at level 20`);
+      const open = await pollForSize(page, '#spellbook', 20, 250);
+      if (!open) throw new Error('spellbook did not open');
+      await page.evaluate((shot) => {
+        const row =
+          document.querySelector(`.spell-row[data-ability-id="${shot.abilityId}"]`) ??
+          document.querySelector(`.spell-row[data-ability-id="${shot.nearbyAbilityId}"]`);
+        row?.scrollIntoView({ block: 'center' });
+        if (row?.dataset.abilityId === shot.abilityId) {
+          row.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+          row.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+        }
+      }, variant);
+      await wait(500);
+      const surfaces = await page.evaluate(
+        (shot, abilityName) => {
+          const row = document.querySelector(`.spell-row[data-ability-id="${shot.abilityId}"]`);
+          const actionSelector = shot.mobile
+            ? '#mobile-action-ring .mobile-action-slot'
+            : '#actionbar .action-btn';
+          const action = Array.from(document.querySelectorAll(actionSelector)).find((button) =>
+            button.getAttribute('aria-label')?.includes(abilityName),
+          );
+          const actionIcon = action?.querySelector('.icon-label');
+          const game = window.__game;
+          const player = game?.sim?.player;
+          return {
+            exactSpellRow: !!row && getComputedStyle(row).display !== 'none',
+            exactAction: !!action && getComputedStyle(action).display !== 'none',
+            actionIcon: !!actionIcon && getComputedStyle(actionIcon).backgroundImage !== 'none',
+            auraActive: !!player?.auras.some((a) => a.id === shot.abilityId),
+            auraPainted: document.querySelectorAll('#buff-bar .buff').length > 0,
+            cooldownArmed: (player?.cooldowns.get(shot.abilityId) ?? 0) > 0,
+          };
+        },
+        variant,
+        setup.abilityName,
+      );
+      if (Object.values(surfaces).some((present) => !present)) {
+        throw new Error(`missing ability surfaces: ${JSON.stringify(surfaces)}`);
+      }
+      return {};
+    },
+  },
+  {
     key: 'inventory',
     label: 'Inventory / bags',
     when: ['ui/bags', 'ui/inventory', 'ui/item', 'ui/vendor', 'ui/loot', 'sim/content/items'],
@@ -121,6 +219,34 @@ export const TARGETS = [
     },
   },
   {
+    key: 'card-duel',
+    label: 'Card Duel window (Card Master)',
+    when: [
+      'ui/card_duel',
+      'sim/social/card_duel',
+      'sim/content/card_master',
+      'sim/minigames/card_hand',
+    ],
+    // Teleport next to the Card Master (Eastbrook zone1, {13, 2}) so joinCardDuelQueue's
+    // range gate passes, then open the Card Duel window directly (idle state: this target
+    // only covers the bring-up the diff implies; queued/in-match/complete states are
+    // fixture-driven separately for the PR screenshot set, see docs/screenshots/card-duel).
+    async capture(page) {
+      await page.evaluate(() => {
+        const p = window.__game?.sim?.player;
+        if (p?.pos) {
+          p.pos.x = 13;
+          p.pos.z = 2;
+        }
+        const el = document.querySelector('#card-duel-window');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.toggleCardDuel?.();
+      });
+      const open = await pollForSize(page, '#card-duel-window');
+      return open ? { clip: '#card-duel-window' } : {};
+    },
+  },
+  {
     key: 'char-window',
     label: 'Character window',
     when: ['ui/char_window', 'ui/char_view'],
@@ -195,6 +321,163 @@ export const TARGETS = [
       });
       await wait(200);
       return { clip: '#chatlog-wrap' };
+    },
+  },
+  {
+    key: 'gpu-notice',
+    label: 'Software rendering notice',
+    when: ['ui/gpu_notice', 'render/software_renderer', 'game/software_render_notice'],
+    variants: [
+      { key: 'web-desktop', desktopShell: false },
+      { key: 'desktop-shell', desktopShell: true },
+      { key: 'web-mobile', desktopShell: false, mobile: true },
+    ],
+    // The toast only shows when the session resolved to a software rasterizer, which a
+    // capture machine with a real GPU never does; import the module directly (Vite serves
+    // /src in dev) and force the state, exactly what src/game/software_render_notice.ts
+    // would pass on a WARP box. Clearing the persisted dismissal and any prior element
+    // keeps the recipe rerunnable; the two desktopShell variants show both copy branches.
+    async capture(page, variant) {
+      await page.evaluate(async (desktopShell) => {
+        localStorage.removeItem('woc_gpu_notice_dismissed');
+        document.querySelector('#gpu-notice')?.remove();
+        const mod = await import('/src/ui/gpu_notice_toast.ts');
+        mod.initGpuNotice({ softwareRendering: true, desktopShell });
+      }, Boolean(variant?.desktopShell));
+      const open = await pollForSize(page, '#gpu-notice');
+      return open ? { clip: '#gpu-notice' } : {};
+    },
+  },
+  {
+    key: 'gather-node',
+    label: 'Gather node (click/tap-to-harvest, #1866)',
+    when: ['gather_node', 'gather_nodes'],
+    // Walks the player up to the first gather node the renderer actually built
+    // (`renderer.gatherNodeMeshes`, the same list `pickGatherNode` raycasts),
+    // so the frame shows the node the way a player would approach and click it.
+    async capture(page) {
+      await page.evaluate(() => {
+        const game = window.__game;
+        const mesh = game?.renderer?.gatherNodeMeshes?.[0];
+        const p = game?.world?.player;
+        if (!mesh || !p) return;
+        p.pos.x = mesh.position.x + 2.5;
+        p.pos.y = mesh.position.y;
+        p.pos.z = mesh.position.z + 2.5;
+        p.facing = Math.atan2(mesh.position.x - p.pos.x, mesh.position.z - p.pos.z);
+      });
+      await wait(1200);
+      return {};
+    },
+  },
+  {
+    key: 'renown-board',
+    label: 'High-score window: the Renown (deeds) board tab',
+    when: [
+      'src/ui/leaderboard_window.ts',
+      'src/ui/deeds_leaderboard_view.ts',
+      'src/world_api/deeds.ts',
+      'server/deeds_board.ts',
+    ],
+    variants: [
+      { key: 'desktop', charClass: 'warrior', charName: 'Chronicler' },
+      { key: 'mobile', charClass: 'warrior', charName: 'Chronicler', mobile: true },
+    ],
+    // The offline Sim resolves an EMPTY Renown board (a sandbox has no account
+    // population), so stub the IWorld read with a representative ranked page
+    // before opening: the real pure core + painter render it exactly as the
+    // live board would, self line and me-row highlight included.
+    async capture(page) {
+      // Dismiss the overlays that can outlive entry (camera-mode prompt,
+      // tutorial, the headless-swiftshader GPU notice), the same pre-shot
+      // sweep the tank target does. No Escape: that opens the game menu
+      // behind the window.
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+      });
+      await wait(300);
+      await page.evaluate(() => {
+        const game = window.__game;
+        if (!game) return;
+        const fakePage = {
+          leaders: [
+            // deedCount rides the wire for stale clients (issue #2044); the
+            // pre-change painter renders it, the current one never reads it.
+            {
+              rank: 1,
+              name: 'Aldwin',
+              realm: 'Claudemoon',
+              cls: 'warrior',
+              level: 20,
+              renown: 1620,
+              deedCount: 129,
+              title: 'prog_veteran',
+            },
+            {
+              rank: 2,
+              name: 'Berrin',
+              realm: 'Duskhold',
+              cls: 'mage',
+              level: 20,
+              renown: 1490,
+              deedCount: 117,
+              title: null,
+            },
+            {
+              rank: 3,
+              name: 'Cifern',
+              realm: 'Claudemoon',
+              cls: 'priest',
+              level: 19,
+              renown: 1390,
+              deedCount: 112,
+              title: null,
+            },
+            {
+              rank: 4,
+              name: 'Doran',
+              realm: 'Claudemoon',
+              cls: 'rogue',
+              level: 20,
+              renown: 1350,
+              deedCount: 108,
+              title: 'prog_veteran',
+            },
+            {
+              rank: 5,
+              name: 'Elvane',
+              realm: 'Duskhold',
+              cls: 'druid',
+              level: 18,
+              renown: 1245,
+              deedCount: 97,
+              title: null,
+            },
+          ],
+          page: 0,
+          pageCount: 1,
+          total: 5,
+          pageSize: 50,
+          self: { rank: 1, topPercent: 1, renown: 1620 },
+        };
+        game.world.deedsLeaderboard = async () => fakePage;
+        game.hud.toggleLeaderboard();
+      });
+      let open = await pollForSize(page, '#leaderboard-window', 10, 300);
+      if (!open) throw new Error('leaderboard window did not open');
+      await page.evaluate(() => {
+        document.querySelector('button[data-leaderboard-tab="deeds"]')?.click();
+      });
+      open = await pollForSize(
+        page,
+        '#leaderboard-window .lb-row-deeds, #leaderboard-window .lb-self',
+        10,
+        300,
+      );
+      if (!open) throw new Error('Renown board rows did not render');
+      return { clip: '#leaderboard-window' };
     },
   },
 ];

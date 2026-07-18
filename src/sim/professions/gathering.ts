@@ -16,44 +16,12 @@ import {
   type GatheringProfessionId,
   HARVEST_COMPONENT_ITEMS,
 } from '../content/professions';
-import { QUESTS } from '../data';
 import type { Rng } from '../rng';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type GatherNodeDef, type GatherNodeType, INTERACT_RANGE, type ItemDef } from '../types';
 import { gatherActionXp } from './profession_xp';
 import type { PlayerProfessionSkill } from './types';
-
-// Quest-gated bonus grant (#1701 follow-up review): while the paired quest is
-// active and short of its collect objective, a harvest of this node type also
-// grants the quest's own dedicated item, never NODE_HARVEST_TABLE's shared
-// junk/reagent material. That material (e.g. bone_fragments) drops from mobs,
-// salvage, and the market, so a collect objective targeting it is satisfied by
-// anything but mining; the dedicated item can only ever come from here. Mirrors
-// the mob-loot questId gate (loot_roll.ts needsQuestDrop) but unconditional: a
-// gathering action has no miss chance, so a harvest that clears the node's own
-// respawn gate always also clears the quest need.
-const NODE_QUEST_GRANT: Partial<Record<GatherNodeType, { questId: string; itemId: string }>> = {
-  ore: { questId: 'q_prof_intro', itemId: 'chunk_of_ore' },
-};
-
-function neededNodeQuestItem(
-  ctx: SimContext,
-  meta: PlayerMeta,
-  node: GatherNodeDef,
-): string | undefined {
-  const grant = NODE_QUEST_GRANT[node.type];
-  if (!grant) return undefined;
-  if (meta.questLog.get(grant.questId)?.state !== 'active') return undefined;
-  const quest = QUESTS[grant.questId];
-  const objIdx = quest.objectives.findIndex(
-    (o) => o.type === 'collect' && o.itemId === grant.itemId,
-  );
-  if (objIdx < 0) return undefined;
-  return ctx.countItem(grant.itemId, meta.entityId) < quest.objectives[objIdx].count
-    ? grant.itemId
-    : undefined;
-}
 
 export type GatheringProficiency = Record<GatheringProfessionId, number>;
 
@@ -196,48 +164,50 @@ export function resolveHarvest(
 // node has not elapsed, or their bags are full (matching the pickupObject
 // capacity pre-check, interaction.ts); a denial never touches another
 // player's state and never consumes that player's respawn timer.
-export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): void {
+export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): boolean {
   const r = ctx.resolve(pid);
-  if (!r) return;
+  if (!r) return false;
   const { meta, e: p } = r;
   if (p.dead) {
     ctx.error(meta.entityId, "You can't do that while dead.");
-    return;
+    return false;
   }
   const node = gatherNodeById(nodeId);
   if (!node) {
     ctx.error(meta.entityId, 'That resource node does not exist.');
-    return;
+    return false;
   }
   if (distToNode(p.pos, node.pos) > INTERACT_RANGE) {
     ctx.error(meta.entityId, 'Too far away.');
-    return;
+    return false;
   }
   if (!isNodeHarvestableBy(meta, node.id, ctx.time)) {
     ctx.error(meta.entityId, 'This resource node has not respawned for you yet.');
-    return;
+    return false;
   }
   const entry = NODE_HARVEST_TABLE[node.type];
   if (!ctx.canAddItem(entry.itemId, 1, meta.entityId)) {
     ctx.error(meta.entityId, 'Your bags are full.');
-    return;
+    return false;
   }
-  const questItemId = neededNodeQuestItem(ctx, meta, node);
   const result = resolveHarvest(meta, node, ctx.time, ctx.rng);
   if (!result.granted) {
     // Unreachable in practice (the readiness check above already gates this),
     // but kept as a defensive fallback so a future resolveHarvest change
     // cannot silently grant with no player-visible denial.
     ctx.error(meta.entityId, 'This resource node has not respawned for you yet.');
-    return;
+    return false;
   }
-  ctx.addItem(result.itemId!, 1, meta.entityId);
-  // Resolved against the timer/bags gates above, before the timer-consuming
-  // resolveHarvest call, so a full-bags quest item never eats the node's
-  // per-player respawn timer on its own.
-  if (questItemId && ctx.canAddItem(questItemId, 1, meta.entityId)) {
-    ctx.addItem(questItemId, 1, meta.entityId);
+  const { itemId, professionId, rarity } = result;
+  if (!itemId || !professionId || !rarity) {
+    // resolveHarvest's granted branch always supplies these fields. Keep the
+    // boundary defensive without introducing a player-visible impossible case.
+    // false: nothing was granted, so this is not a successful interaction for
+    // the autorun-stop contract (#1982).
+    return false;
   }
+  ctx.addItem(itemId, 1, meta.entityId);
+  ctx.onNodeGatheredForQuests(node, itemId, meta);
   // Zone gather mark: one entry per zone and node type ever harvested.
   ctx.markVisited(meta, `gather:${node.zoneId}:${node.type}`);
   // Character XP for the harvest (profession_xp.ts), tier-scaled and
@@ -255,10 +225,11 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): void
     pid: meta.entityId,
     nodeId: node.id,
     nodeType: node.type,
-    professionId: result.professionId!,
-    itemId: result.itemId!,
-    rarity: result.rarity!,
+    professionId,
+    itemId,
+    rarity,
   });
+  return true;
 }
 
 export interface PendingGatherGrant {
@@ -509,28 +480,4 @@ export function rollCorpseMaterialRarity(rng: Rng): MaterialRarity {
 // stays a plain fungible stack, same as before this issue.
 export function isSignableMaterialRarity(rarity: MaterialRarity): boolean {
   return rarity === 'rare' || rarity === 'epic' || rarity === 'legendary';
-}
-
-// Fixed rarity ladder, low to high, matching the tier-index scale professions/
-// archetype.ts's empowerment ceiling already uses (common=0, uncommon=1,
-// rare=2, epic=3, legendary=4).
-const MATERIAL_RARITY_ORDER: readonly MaterialRarity[] = [
-  'common',
-  'uncommon',
-  'rare',
-  'epic',
-  'legendary',
-];
-
-/** Clamp a rolled rarity down to at most `maxTier` (a tier index on the same
- *  ladder, e.g. from archetype.ts `archetypeCeilingFor`; `Infinity` is a no-op).
- *  Used to cap crafted-output quality at the #1129 empowerment ceiling: a
- *  dormant or hobby craft can still ROLL a high rarity off raw skill, but the
- *  actual result granted never exceeds what that craft is empowered to
- *  produce. Never raises a roll, only lowers it. */
-export function clampMaterialRarity(rarity: MaterialRarity, maxTier: number): MaterialRarity {
-  if (!Number.isFinite(maxTier)) return rarity;
-  const cap = Math.max(0, Math.min(MATERIAL_RARITY_ORDER.length - 1, Math.floor(maxTier)));
-  const rolled = MATERIAL_RARITY_ORDER.indexOf(rarity);
-  return MATERIAL_RARITY_ORDER[Math.min(rolled, cap)];
 }

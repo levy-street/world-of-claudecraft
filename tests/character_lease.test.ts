@@ -18,11 +18,15 @@ import {
   acquireCharacterLease,
   heartbeatCharacterLeases,
   LEASE_TTL_SECONDS,
+  openMarketWriteGate,
   PROCESS_LEASE_HOLDER,
   releaseAllCharacterLeases,
   releaseCharacterLease,
+  saveCharacterAndMarketState,
+  saveCharacterState,
 } from '../server/db';
 import { REALM } from '../server/realm';
+import type { CharacterState, MailSave, MarketSave } from '../src/sim/sim';
 
 // The load-bearing values are pinned as bare literals below, never as the same
 // constant re-derived from itself. The TTL is 90 seconds (three missed 30s
@@ -55,41 +59,42 @@ describe('LEASE_TTL_SECONDS', () => {
 
 describe('acquireCharacterLease', () => {
   it('upserts the lease with the nonce column, the reclaim-or-own predicate, and TTL interval', async () => {
-    const ok = await acquireCharacterLease(42, 'nonce-1');
+    const ok = await acquireCharacterLease(42, 100, 'nonce-1');
     expect(ok).toBe(true);
 
     const sql = firstSql();
     expect(sql).toContain(
-      'INSERT INTO character_leases (character_id, realm, holder, nonce, acquired_at, heartbeat_at, expires_at)',
+      'INSERT INTO character_leases (character_id, realm, holder, nonce, account_id, acquired_at, heartbeat_at, expires_at)',
     );
     expect(sql).toContain('ON CONFLICT (character_id) DO UPDATE');
     // The fence: every acquire re-stamps the nonce, so a later release keyed to an
     // older nonce is a no-op.
     expect(sql).toContain('nonce = EXCLUDED.nonce');
     // The reclaim arm (expired) OR the same-holder arm (a linkdead resume on this
-    // process re-extends its own lease). A live foreign lease matches neither, so
-    // the upsert touches nothing and rowCount stays 0.
+    // process re-extends its own lease) OR the same-account arm (the owner reclaiming
+    // a stranded lease). A live lease that is none of those matches no arm, so the
+    // upsert touches nothing and rowCount stays 0.
     expect(sql).toContain(
-      'WHERE character_leases.expires_at < now() OR character_leases.holder = EXCLUDED.holder',
+      'WHERE character_leases.expires_at < now() OR character_leases.holder = EXCLUDED.holder OR character_leases.account_id = EXCLUDED.account_id',
     );
-    expect(sql).toContain('make_interval(secs => $5)');
-    // Params: character id, this process realm, the default holder, the nonce, the 90s TTL.
-    expect(firstParams()).toEqual([42, REALM, PROCESS_LEASE_HOLDER, 'nonce-1', 90]);
+    expect(sql).toContain('make_interval(secs => $6)');
+    // Params: character id, this process realm, the default holder, the nonce, the account id, the 90s TTL.
+    expect(firstParams()).toEqual([42, REALM, PROCESS_LEASE_HOLDER, 'nonce-1', 100, 90]);
   });
 
   it('passes an explicit holder through instead of the process default', async () => {
-    await acquireCharacterLease(7, 'nonce-x', 'other-holder');
-    expect(firstParams()).toEqual([7, REALM, 'other-holder', 'nonce-x', 90]);
+    await acquireCharacterLease(7, 100, 'nonce-x', 'other-holder');
+    expect(firstParams()).toEqual([7, REALM, 'other-holder', 'nonce-x', 100, 90]);
   });
 
   it('returns false (fail closed) when the upsert changes no row', async () => {
     dbMock.query.mockResolvedValueOnce({ rows: [], rowCount: 0 } as any);
-    expect(await acquireCharacterLease(42, 'nonce-1')).toBe(false);
+    expect(await acquireCharacterLease(42, 100, 'nonce-1')).toBe(false);
   });
 
   it('returns false when rowCount is absent rather than truthily defaulting', async () => {
     dbMock.query.mockResolvedValueOnce({ rows: [] } as any);
-    expect(await acquireCharacterLease(42, 'nonce-1')).toBe(false);
+    expect(await acquireCharacterLease(42, 100, 'nonce-1')).toBe(false);
   });
 });
 
@@ -156,16 +161,175 @@ describe('shutdown wiring (source pin)', () => {
     // (the join reconcile is the only heal). Match the awaited CALL forms so a
     // prose mention in a comment never shifts an index.
     const src = readFileSync(new URL('../server/main.ts', import.meta.url), 'utf8');
+    const saveAll = src.indexOf("await game.saveAll('shutdown')");
     const endSessions = src.indexOf('await game.endAllPlaySessions(');
     const sweep = src.indexOf('await releaseAllCharacterLeases(');
     const ledgerDrain = src.indexOf('await bankLedgerIdle()');
     const deedsDrain = src.indexOf('await deedRecordsIdle()');
     const poolEnd = src.indexOf('await pool.end()');
-    expect(endSessions).toBeGreaterThan(-1);
+    // The shutdown save runs FIRST, while this process still holds every lease:
+    // the saves are lease-fenced (a holder + nonce EXISTS inside the UPDATE), so
+    // a reorder below the sweep would fence out EVERY shutdown save (rowCount 0,
+    // nothing persisted) and silently drop all in-flight state on each restart.
+    expect(saveAll).toBeGreaterThan(-1);
+    expect(endSessions).toBeGreaterThan(saveAll);
     expect(ledgerDrain).toBeGreaterThan(endSessions);
     expect(deedsDrain).toBeGreaterThan(endSessions);
+    expect(sweep).toBeGreaterThan(saveAll);
     expect(sweep).toBeGreaterThan(ledgerDrain);
     expect(sweep).toBeGreaterThan(deedsDrain);
     expect(poolEnd).toBeGreaterThan(sweep);
+  });
+});
+
+// A checked-out-client stub for the two save fns that run their write on a
+// pool.connect() client (saveCharacterState via runWithStatementTimeout, and
+// saveCharacterAndMarketState directly). The character UPDATE reports the given
+// rowCount; every other statement (BEGIN / SET LOCAL / world_state / COMMIT /
+// ROLLBACK) resolves harmlessly. rowCount drives the lease-fence boolean.
+function checkedOutClient(updateRowCount: number | undefined) {
+  const query = vi.fn(async (sql: string, _values?: unknown[]) =>
+    /UPDATE characters/i.test(String(sql))
+      ? ({ rows: [], rowCount: updateRowCount } as any)
+      : ({ rows: [], rowCount: 0 } as any),
+  );
+  const release = vi.fn();
+  return { query, release };
+}
+
+const STATE = {
+  level: 7,
+  questLog: [],
+  questsDone: [],
+  inventory: [],
+} as unknown as CharacterState;
+const MARKET = { listings: [], collections: {} } as unknown as MarketSave;
+const MAIL = { mail: [], nextMailId: 1 } as unknown as MailSave;
+
+describe('acquireCharacterLease fail-closed form (a NULL account_id can never be stolen)', () => {
+  it('carries the same-account arm as PLAIN equality and never IS NOT DISTINCT FROM', async () => {
+    await acquireCharacterLease(42, 100, 'nonce-1');
+    const sql = firstSql();
+    // The third disjunct on its own: the same-account reclaim arm. Only the WHERE
+    // clause qualifies the column (the SET clause is the unqualified
+    // `account_id = EXCLUDED.account_id`), so this exact string exists ONLY as the
+    // steal arm and reds the moment it is dropped.
+    expect(sql).toContain('character_leases.account_id = EXCLUDED.account_id');
+    // Plain SQL equality is the fail-closed mechanism: a NULL account_id (a lease
+    // predating the column) fails every arm but expiry. IS NOT DISTINCT FROM would
+    // make NULL match NULL and let such a lease be stolen, so it must never appear.
+    expect(sql).not.toContain('IS NOT DISTINCT FROM');
+  });
+});
+
+describe('saveCharacterState lease fence', () => {
+  beforeEach(() => {
+    dbMock.connect.mockReset();
+  });
+
+  it('fences the write in ONE UPDATE (holder + nonce), with no separate SELECT pre-check', async () => {
+    const client = checkedOutClient(1);
+    dbMock.connect.mockResolvedValueOnce(client as any);
+
+    const ok = await saveCharacterState(42, 7, STATE, 'nonce-1');
+    expect(ok).toBe(true);
+
+    const stmts = client.query.mock.calls.map((c) => String(c[0]));
+    const updates = stmts.filter((s) => /UPDATE characters/i.test(s));
+    // Exactly one character write, and the lease check EXISTS-fences it in the SAME
+    // statement. A check-then-write pair would race a same-account takeover that
+    // steals the lease between the SELECT and the UPDATE.
+    expect(updates).toHaveLength(1);
+    expect(updates[0]).toContain('EXISTS');
+    expect(updates[0]).toContain('character_leases');
+    // No standalone SELECT statement (the EXISTS subquery rides inside the UPDATE).
+    expect(stmts.some((s) => /^\s*SELECT/i.test(s))).toBe(false);
+    // holder + nonce are bound into that one fenced statement.
+    const updateCall = client.query.mock.calls.find((c) => /UPDATE characters/i.test(String(c[0])));
+    expect(updateCall?.[1]).toEqual([42, 7, expect.any(String), PROCESS_LEASE_HOLDER, 'nonce-1']);
+    // The write runs on the checked-out client, never the bare pool.
+    expect(dbMock.query).not.toHaveBeenCalled();
+  });
+
+  it('resolves false when the fenced UPDATE matches no lease row (rowCount 0)', async () => {
+    const client = checkedOutClient(0);
+    dbMock.connect.mockResolvedValueOnce(client as any);
+    expect(await saveCharacterState(42, 7, STATE, 'nonce-1')).toBe(false);
+  });
+
+  it('resolves true when the fenced UPDATE matches the lease row (rowCount 1)', async () => {
+    const client = checkedOutClient(1);
+    dbMock.connect.mockResolvedValueOnce(client as any);
+    expect(await saveCharacterState(42, 7, STATE, 'nonce-1')).toBe(true);
+  });
+
+  it('the no-nonce legacy path issues an unfenced UPDATE and resolves true even on rowCount 0', async () => {
+    const client = checkedOutClient(0);
+    dbMock.connect.mockResolvedValueOnce(client as any);
+
+    const ok = await saveCharacterState(42, 7, STATE);
+    // Legacy path returns true regardless of rowCount (unconditional write, as before).
+    expect(ok).toBe(true);
+    const updateCall = client.query.mock.calls.find((c) => /UPDATE characters/i.test(String(c[0])));
+    // No lease fence, and the params stop at the JSON state (no holder / nonce).
+    expect(String(updateCall?.[0])).not.toContain('EXISTS');
+    expect(updateCall?.[1]).toEqual([42, 7, expect.any(String)]);
+  });
+});
+
+describe('saveCharacterAndMarketState lease fence', () => {
+  beforeEach(() => {
+    dbMock.connect.mockReset();
+    // The escrow flush writes the realm-market row, so it is gated on the boot
+    // backfill; open the gate so the transaction runs.
+    openMarketWriteGate();
+  });
+
+  it('the happy path writes both world_state escrows then COMMIT and resolves true', async () => {
+    const client = checkedOutClient(1);
+    dbMock.connect.mockResolvedValueOnce(client as any);
+
+    const ok = await saveCharacterAndMarketState(42, 7, STATE, MARKET, MAIL, 'nonce-1');
+    expect(ok).toBe(true);
+
+    const stmts = client.query.mock.calls.map((c) => String(c[0]));
+    // Both escrow halves (Market + Ravenpost mail), then COMMIT, no ROLLBACK.
+    expect(stmts.filter((s) => /world_state/i.test(s))).toHaveLength(2);
+    expect(stmts.some((s) => /^COMMIT/.test(s))).toBe(true);
+    expect(stmts.some((s) => /ROLLBACK/.test(s))).toBe(false);
+  });
+
+  it('a fenced-out character UPDATE (rowCount 0) rolls back, writes neither escrow, and resolves false', async () => {
+    const client = checkedOutClient(0);
+    dbMock.connect.mockResolvedValueOnce(client as any);
+
+    const ok = await saveCharacterAndMarketState(42, 7, STATE, MARKET, MAIL, 'nonce-1');
+    expect(ok).toBe(false);
+
+    const stmts = client.query.mock.calls.map((c) => String(c[0]));
+    // The bag half never landed, so the shared Market / Ravenpost escrow must not be
+    // overwritten by this displaced session: neither world_state upsert runs.
+    expect(stmts.some((s) => /world_state/i.test(s))).toBe(false);
+    expect(stmts.some((s) => /ROLLBACK/.test(s))).toBe(true);
+    expect(stmts.some((s) => /^COMMIT/.test(s))).toBe(false);
+  });
+
+  it('a save racing a takeover cannot clobber the reclaimed escrow', async () => {
+    // A same-account takeover rotated the lease nonce after this displaced save
+    // began, so the fenced character UPDATE matches no row (rowCount 0). The fence
+    // keys on holder + this save's own (now stale) nonce; the rotated nonce IS the miss.
+    const client = checkedOutClient(0);
+    dbMock.connect.mockResolvedValueOnce(client as any);
+
+    const ok = await saveCharacterAndMarketState(42, 7, STATE, MARKET, MAIL, 'stale-nonce');
+    expect(ok).toBe(false);
+
+    const charCall = client.query.mock.calls.find((c) => /UPDATE characters/i.test(String(c[0])));
+    expect(String(charCall?.[0])).toContain('EXISTS');
+    expect(charCall?.[1]).toEqual([42, 7, expect.any(String), PROCESS_LEASE_HOLDER, 'stale-nonce']);
+    // No further writes after the miss: no escrow upsert, no COMMIT.
+    const stmts = client.query.mock.calls.map((c) => String(c[0]));
+    expect(stmts.some((s) => /world_state/i.test(s))).toBe(false);
+    expect(stmts.some((s) => /^COMMIT/.test(s))).toBe(false);
   });
 });

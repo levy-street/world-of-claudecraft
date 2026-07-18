@@ -5,15 +5,177 @@
 // translate that key. The build (scripts/i18n_build.mjs) unflattens this map and
 // overlays it onto nested `en` to produce the dense resolved table; any key here
 // must be a real `en` leaf path: keys are typed `Partial<Record<TranslationKey,
-// string>>` so tsc rejects a structurally-wrong key, plus
-// tests/i18n_overlay_key_membership.test.ts catches a typo'd entity id the
-// template-literal key type cannot. Overlays are SPARSE: an
+// string>>` against the build-generated flat key union, so tsc rejects any key
+// that is not an exact `en` leaf path, typo'd entity ids included. Overlays are SPARSE: an
 // untranslated key is omitted and the build fills it from English, then the
 // registry (src/ui/i18n.status.json) marks it `pending`.
 
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.discord.roleTag.legend': 'ЛЕГЕНДА',
+  'hudChrome.discord.roleTag.shill': 'ГЛАШАТАЙ',
+  'entities.items.eastbrook_greatsword.name': 'Истврукский двуручный меч',
+  'entities.items.highwatch_greatsword.name': 'Двуручный меч Хайвотча',
+  'entities.items.highwatch_wallshield.name': 'Стенной щит Хайвотча',
+  'entities.items.eastbrook_buckler.name': 'Истврукский баклер',
+  'entities.abilities.avatar.name': 'Аватара',
+  'entities.abilities.bladestorm.name': 'Клинковая буря',
+  'entities.abilities.battle_stance.description':
+    'Агрессивная боевая стойка: вы создаете на 10% больше ярости. Стандартная стойка для веток «Оружие» и «Защита».',
+  'entities.abilities.battle_stance.name': 'Боевая стойка',
+  'entities.abilities.berserker_stance.description':
+    'Безрассудная боевая стойка: ваши критические удары проходят на 3% чаще и бьют на 3% сильнее. Воин ветки «Неистовство» всегда сражается в этой стойке.',
+  'entities.abilities.berserker_stance.name': 'Стойка берсерка',
+  'entities.abilities.breachmaker.description':
+    'Обрушивается на цель на урон оружием плюс {damage} и ломает ее защиту: ваши собственные атаки по ней наносят на 20% больше урона в течение 8 сек. (ветка «Оружие»)',
+  'entities.abilities.breachmaker.name': 'Брешь',
+  'entities.abilities.cleaving_blows.description':
+    'Кровавая жатва всегда возвращает заряд Двойного удара. (ветка «Неистовство»)',
+  'entities.abilities.cleaving_blows.name': 'Рассекающие удары',
+  'entities.abilities.deep_wounds.description':
+    'Пассивно: ваш Калечащий удар оставляет на цели кровотечение, нанося физический урон за 6 сек. (ветка «Оружие»)',
+  'entities.abilities.deep_wounds.name': 'Зияющие раны',
+  'entities.abilities.defiant_bellow.description':
+    'Дерзкий рев: каждый враг в пределах 10 м провоцируется и вынужден атаковать вас 3 сек. (ветка «Защита»)',
+  'entities.abilities.defiant_bellow.name': 'Дерзкий рев',
+  'entities.abilities.diabolical_twinstrike.description':
+    'Пока вы в Бешенстве, ваш Двойной удар наносит на 15% больше урона. (ветка «Неистовство»)',
+  'entities.abilities.diabolical_twinstrike.name': 'Дьявольский двойной удар',
+  'entities.abilities.die_by_sword.description':
+    'Защитная способность: в течение 8 сек вы получаете на 30% меньше урона и уклоняетесь от гораздо большего числа атак.',
+  'entities.abilities.die_by_sword.name': 'Погибель от меча',
+  'entities.abilities.emboldening_roar.description':
+    'Издает ободряющий рев: вы и дружественные игроки в пределах 40 м воодушевлены, а ваши следующие 3 способности гарантированно станут критическими ударами. (ветка «Неистовство»)',
+  'entities.abilities.emboldening_roar.name': 'Ободряющий рев',
+  'entities.abilities.enrage_passive.description':
+    'Пассивно: пока вы в Бешенстве, вы наносите на 7% больше урона, атакуете на 25% быстрее и двигаетесь на 10% быстрее в течение 4 сек. Кровопускание с вероятностью 30% приводит вас в Бешенство; Кровавая жатва делает это всегда. (ветка «Неистовство»)',
+  'entities.abilities.enrage_passive.name': 'Буйство',
+  'entities.abilities.faultline.description':
+    'Посылает ударную волну по земле: враги перед вами в пределах 8 м получают {damage} ед. урона и оглушаются на 3 сек. (ветка «Защита»)',
+  'entities.abilities.faultline.name': 'Разлом',
+  'entities.abilities.furious_mending.description':
+    'В течение 10 сек вы получаете на 20% меньше урона, и пока эффект длится, ваше Кровопускание исцеляет вас на 20% от максимального здоровья. (ветка «Неистовство»)',
+  'entities.abilities.furious_mending.name': 'Яростное исцеление',
+  'entities.abilities.heroic_leap.description':
+    'Прыгает в указанную область и при приземлении наносит {damage} ед. урона находящимся рядом противникам.',
+  'entities.abilities.heroic_leap.name': 'Героический прыжок',
+  'entities.abilities.intimidating_shout.description':
+    'Устрашающий крик, обращающий в бегство до 5 врагов в пределах 8 м на 8 сек. Урон может снять эффект.',
+  'entities.abilities.intimidating_shout.name': 'Устрашающий крик',
+  'entities.abilities.iron_resolve.description':
+    'Стисните зубы и игнорируйте боль: расходует до 40 ед. ярости (минимум 20), поглощая 4 ед. урона за каждую потраченную единицу ярости в течение не более 10 сек. (ветка «Защита»)',
+  'entities.abilities.iron_resolve.name': 'Железная решимость',
+  'entities.abilities.measured_fury.description':
+    'Ваша размеренная ярость оттачивает расход: ваши способности стоят на 10% меньше ярости. (ветка «Оружие»)',
+  'entities.abilities.measured_fury.name': 'Размеренная ярость',
+  'entities.abilities.piercing_howl.description':
+    'Пронзительный крик, замедляющий всех врагов в пределах 15 м на 50% на 8 сек.',
+  'entities.abilities.piercing_howl.name': 'Пронзительный вой',
+  'entities.abilities.raging_gale.description':
+    'Мгновенно бьет оружием дважды, каждый удар наносит 40% урона оружием плюс {damage}, и создает 8 ярости. Хранит до 2 зарядов. (ветка «Неистовство»)',
+  'entities.abilities.raging_gale.name': 'Двойной удар',
+  'entities.abilities.raised_guard.description':
+    'Прикрывается щитом: вы получаете на 50% меньше физического урона в течение 6 сек. Хранит до 2 зарядов. (ветка «Защита»)',
+  'entities.abilities.raised_guard.name': 'Заслон щитом',
+  'entities.abilities.rallying_cry.description':
+    'Издаёт доблестный рёв, на 10 сек. увеличивая максимальный запас здоровья вашего персонажа и членов группы в радиусе 40 м на 20%. Для участников со специализацией «Защита» получаемый урон также снижается на 5%.',
+  'entities.abilities.rallying_cry.name': 'Рёв доблести',
+  'entities.abilities.recklessness.description':
+    'Бешенство: создание вашей ярости повышается на 50%, а шанс критического удара на 20% в течение 12 сек.',
+  'entities.abilities.recklessness.name': 'Безрассудство',
+  'entities.abilities.red_harvest.description':
+    'Отдайте все: наносит три удара в исступлении, каждый на 65% урона оружием плюс {damage}, и всегда приводит вас в исступление. (ветка «Неистовство»)',
+  'entities.abilities.red_harvest.name': 'Кровавая жатва',
+  'entities.abilities.revenge.description':
+    'Атака широкой дугой, наносящая физический урон всем врагам перед вами. При более чем 5 целях урон снижается. При уклонении или парировании ваша следующая Месть может не потребовать ярости. (Protection)',
+  'entities.abilities.revenge.name': 'Месть',
+  'entities.abilities.sanguine_aura.description':
+    'Пропитывает ваше оружие кровью врагов: вы и ваши союзники ближнего боя получают 10% скорости атаки и 10% урона в течение 20 сек.',
+  'entities.abilities.sanguine_aura.name': 'Кровавая аура',
+  'entities.abilities.seasoned_soldier.description':
+    'Ваши критические автоатаки создают на 10% больше ярости. (ветка «Оружие»)',
+  'entities.abilities.seasoned_soldier.name': 'Бывалый солдат',
+  'entities.abilities.storm_bolt.description':
+    'Метает ваше оружие в цель на {damage}, оглушая ее на 3 сек.',
+  'entities.abilities.storm_bolt.name': 'Громовой разряд',
+  'entities.abilities.sudden_death.description':
+    'Ваши автоатаки могут позволить применить Раннюю могилу к цели с любым запасом здоровья, не потратив ярости. (ветка «Оружие»)',
+  'entities.abilities.sudden_death.name': 'Внезапная смерть',
+  'entities.abilities.sweeping_strikes.description':
+    'В течение 12 сек ваши атаки по одной цели также поражают 1 ближайшего врага с полным уроном. (ветка «Оружие»)',
+  'entities.abilities.sweeping_strikes.name': 'Расширяющаяся дуга',
+  'entities.abilities.victory_rush.description':
+    'Бьет на урон оружием плюс {damage} и исцеляет на 20% от максимального здоровья. Можно использовать только в течение 20 сек после убийства врага.',
+  'entities.abilities.victory_rush.name': 'Порыв победы',
+  'hudChrome.specPanel.complexity': 'Сложность',
+  'hudChrome.specPanel.complexityHigh': 'Высокая',
+  'hudChrome.specPanel.complexityLow': 'Низкая',
+  'hudChrome.specPanel.complexityMedium': 'Средняя',
+  'hudChrome.specPanel.exampleAbilities': 'Примеры способностей',
+  'hudChrome.specPanel.primaryAttr': 'Основная характеристика',
+  'hudChrome.specPanel.selectSpec': 'Выбрать специализацию',
+  'hudChrome.specPanel.viewTalents': 'Смотреть таланты',
+  'hudChrome.talentRows.comingSoon': 'Скоро',
+  'hudChrome.talentRows.defaultLoadout': 'Стандартная сборка',
+  'hudChrome.talentRows.tab': 'Выбор',
+  'hudChrome.talentRows.readoutSummary': 'Таланты: {head}, выбрано рядов: {spent}/{total}.',
+  'entities.abilities.aspect_of_the_wild.name': 'Облик дикого клыка',
+  'entities.abilities.avenging_wrath.name': 'Крыло возмездия',
+  'entities.abilities.berserk.name': 'Багровая дымка',
+  'entities.abilities.blink.name': 'Мерцающий шаг',
+  'entities.abilities.bloodlust.name': 'Боевые барабаны',
+  'entities.abilities.chain_lightning.name': 'Разветвленная молния',
+  'entities.abilities.chaos_bolt.name': 'Стрела погибели',
+  'entities.abilities.cleansing_verdict.name': 'Очищающий приговор',
+  'entities.abilities.cleansing_verdict.description':
+    'Рассеивает вредоносный магический эффект с союзника и восстанавливает ему {damage} ед. здоровья.',
+  'entities.abilities.cloak_of_shadows.name': 'Плащ теней',
+  'entities.abilities.cone_of_cold.name': 'Ледяной взмах',
+  'entities.abilities.curse_of_exhaustion.name': 'Свинцовое проклятие',
+  'entities.abilities.death_coil.name': 'Могильная спираль',
+  'entities.abilities.deep_freeze.name': 'Мертвый мороз',
+  'entities.abilities.desperate_prayer.name': 'Последняя молитва',
+  'entities.abilities.deterrence.name': 'Колючий страж',
+  'entities.abilities.divine_shield.name': 'Световой оберег',
+  'entities.abilities.earthbind.name': 'Хватка земли',
+  'entities.abilities.evocation.name': 'Эфирный колодец',
+  'entities.abilities.frenzied_regeneration.name': 'Дикое исцеление',
+  'entities.abilities.frost_trap.name': 'Инейная ловушка',
+  'entities.abilities.ghostly_strike.name': 'Призрачный удар',
+  'entities.abilities.hammer_of_wrath.name': 'Звонкий молот',
+  'entities.abilities.healing_stream.name': 'Источник',
+  'entities.abilities.holy_wrath.name': 'Гнев святого',
+  'entities.abilities.howl_of_terror.name': 'Вой ужаса',
+  'entities.abilities.ice_block.name': 'Холодный гроб',
+  'entities.abilities.inner_focus.name': 'Утихший разум',
+  'entities.abilities.innervate.name': 'Живой сок',
+  'entities.abilities.meteor.name': 'Небесный камень',
+  'entities.abilities.mind_sear.name': 'Выжигание мыслей',
+  'entities.abilities.multi_shot.name': 'Раздвоенный выстрел',
+  'entities.abilities.prayer_of_healing.name': 'Хоровое исцеление',
+  'entities.abilities.preparation.name': 'Запасной план',
+  'entities.abilities.presence_of_mind.name': 'Быстрый разум',
+  'entities.abilities.psychic_scream.name': 'Психический крик',
+  'entities.abilities.shadowstep.name': 'Теневой шаг',
+  'entities.abilities.silence.name': 'Безмолвие',
+  'entities.abilities.smoke_screen.name': 'Дымовая завеса',
+  'entities.abilities.smoke_screen.description':
+    'Вы скрываетесь в облаке дыма, повышая шанс уклонения на 30% на 8 сек.',
+  'entities.abilities.spellsteal.name': 'Похищение чар',
+  'entities.abilities.spellsteal.description':
+    'Похищает один положительный магический эффект у противника и переносит его на вас.',
+  'entities.abilities.startle_shot.name': 'Ошеломляющий выстрел',
+  'entities.abilities.startle_shot.description':
+    'Дикий выстрел дезориентирует цель на {duration} сек. Любой полученный урон прерывает эффект.',
+  'entities.abilities.tranquility.name': 'Песнь рощи',
+  'entities.abilities.typhoon.name': 'Тайфун',
+  'entities.abilities.typhoon.description':
+    'Порыв ветра отбрасывает всех врагов в радиусе 8 м и дезориентирует их, снижая скорость передвижения на 50% на 4 сек.',
+  'entities.abilities.voidfeast.name': 'Пир Бездны',
+  'entities.abilities.voidfeast.description':
+    'Поглощает один магический эффект (положительный с врага или отрицательный с союзника) и восстанавливает 6% от максимального запаса здоровья.',
+  'hudChrome.abilityError.shieldRequired': 'Необходимо экипировать щит.',
   'hudChrome.wocStore.title': 'Магазин WOC',
   'hudChrome.wocStore.close': 'Закрыть магазин WOC',
   'hudChrome.wocStore.tabsLabel': 'Разделы магазина WOC',
@@ -36,6 +198,24 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.armoryTitle': 'Арсенал',
   'hudChrome.wocStore.armoryBody':
     'Ограниченные облики оружия из Арсенала 1-го сезона. Общие для всей учётной записи, чисто косметические и видимые всем вокруг.',
+  'hudChrome.wocStore.wallet.title': 'Кошелёк Solana',
+  'hudChrome.wocStore.wallet.unlinked':
+    'Подключите приложение кошелька, затем один раз подпишите сообщение, чтобы привязать его публичный адрес к учётной записи WoC. Мы никогда не получаем вашу фразу восстановления или закрытый ключ.',
+  'hudChrome.wocStore.wallet.connectedUnlinked':
+    'Приложение кошелька подключено к этому браузеру, но его публичный адрес ещё не привязан к вашей учётной записи WoC.',
+  'hudChrome.wocStore.wallet.linkedDisconnected':
+    'Ваш публичный адрес привязан. Подключите этот кошелёк снова, когда захотите заплатить SOL или WOC.',
+  'hudChrome.wocStore.wallet.linkedConnected':
+    'Привязанный кошелёк подключён и готов к покупкам за SOL или WOC.',
+  'hudChrome.wocStore.wallet.mismatched':
+    'Подключён другой кошелёк. Подтвердите его, чтобы заменить привязанный адрес, или снова подключите привязанный кошелёк.',
+  'hudChrome.wocStore.wallet.connect': 'Подключить кошелёк',
+  'hudChrome.wocStore.wallet.verify': 'Подтвердить и привязать',
+  'hudChrome.wocStore.wallet.reconnect': 'Подключить кошелёк снова',
+  'hudChrome.wocStore.wallet.manage': 'Управление кошельком',
+  'wallet.bagConnect': 'Привязать кошелёк',
+  'wallet.bagLink': 'Подтвердить кошелёк',
+  'wallet.bagReconnect': 'Подключить кошелёк снова',
   'hudChrome.wocStore.collectionLine': 'Коллекция «{collection}»',
   'hudChrome.wocStore.collections.guildmark': 'Клеймо гильдии',
   'hudChrome.wocStore.collections.emberwrought': 'Закалённое углями',
@@ -267,6 +447,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.notInPartyError':
     'Чтобы начать проверку готовности, вы должны состоять в группе.',
   'hudChrome.readyCheck.inProgressError': 'Проверка готовности уже идёт.',
+  'entities.abilities.collective_reversal.name': 'Коллективный откат',
+  'entities.abilities.collective_reversal.description':
+    'Отматывает линию времени каждого погибшего участника группы или рейда и возвращает его к жизни у тела с 30% здоровья и маны. Нельзя применять в бою. (Хрономантия)',
+  'entities.abilities.temporal_hourglass.name': 'Песочные часы остановки',
+  'entities.abilities.temporal_hourglass.description':
+    'Помещает временные песочные часы в выбранную точку. Под врагом они останавливают его на {hostilePveDuration} сек. в PvE или на {hostilePvpDuration} сек. в PvP; любой урон снимает эффект. Под вами или союзником из группы они создают стазис на {duration} сек., защищают от урона, запрещают действовать и восстанавливают {healing}% максимального здоровья. Ваши способности восстанавливаются на {selfCooldownRecovery}% быстрее, а способности союзника на {allyCooldownRecovery}% быстрее. На пустой земле часы ждут {groundDuration} сек. и воздействуют на первую допустимую цель, которая на них наступит. Положительный эффект можно снять вручную.',
+  'hudChrome.auraEffect.temporalHourglass':
+    'Невосприимчивость к урону и невозможность действовать; восстанавливает здоровье и ускоряет способности. Щелкните правой кнопкой, чтобы отменить.',
   'hudChrome.auth.appleLoginCta': 'Продолжить с Apple',
   'hudChrome.auth.appleError': 'Не удалось войти через Apple. Попробуйте ещё раз.',
   'hudChrome.auth.appleChoiceIntro':
@@ -332,6 +520,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.spinButton': 'Крутить',
   'hudChrome.dailyRewards.tasks': 'Задания',
   'hudChrome.dailyRewards.taskMultiplier': 'Множитель x{multiplier}',
+  'hudChrome.dailyRewards.oneVsOneExcluded': 'Матчи 1 на 1 не приносят очки ежедневных наград.',
   'hudChrome.dailyRewards.pointsGained': 'Получено {points} очков ежедневных наград.',
   'hudChrome.dailyRewards.showChestButton': 'Показать сундук',
   'hudChrome.dailyRewards.hideChestButton': 'Скрыть сундук',
@@ -361,6 +550,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Цена WOC недоступна, награды временно заблокированы.',
   'hudChrome.dailyRewards.reason.banned':
     'Вам запрещено участвовать в ежедневных наградах. Причина: {reason}',
+  'hudChrome.dailyRewards.reason.bannedUntil':
+    'Запрет на участие в ежедневных наградах действует еще {remaining}. Доступ вернется {until}. Причина: {reason}',
   'hudChrome.keybinds.discord': 'Discord',
   'hudChrome.spectate.banner': 'Наблюдение за {name}',
   'hudChrome.readyCheck.prompt': '{name} начал проверку готовности. Вы готовы?',
@@ -373,8 +564,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemTooltip.requiresLevel': 'Требуется уровень {level}',
   'hudChrome.spellbook.addToBarAria': 'Добавить {name} на панель действий',
   'hudChrome.spellbook.removeFromBarAria': 'Убрать {name} с панели действий',
-  'hudChrome.nameplate.mob': '[{level}] {name}',
-  'hudChrome.nameplate.mobElite': '[{level}+] {name}',
   'hudChrome.mobTooltip.familyDemon': 'Демон',
   'hudChrome.mobTooltip.levelFamily': 'Уровень {level} {family}',
   'hudChrome.mobTooltip.hostile': 'Враждебный',
@@ -383,6 +572,28 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetFrame.lock': 'Закрепить рамку цели',
   'hudChrome.playerFrame.unlock': 'Переместить рамку игрока',
   'hudChrome.playerFrame.lock': 'Закрепить рамку игрока',
+  'hudChrome.partyFrames.section': 'Рамки группы и рейда',
+  'hudChrome.partyFrames.unlock': 'Переместить рамки группы и рейда',
+  'hudChrome.partyFrames.lock': 'Закрепить рамки группы и рейда',
+  'hudChrome.partyFrames.style': 'Стиль рамок',
+  'hudChrome.partyFrames.styleAutomatic': 'Автоматически',
+  'hudChrome.partyFrames.styleClassic': 'Классические рамки группы',
+  'hudChrome.partyFrames.styleRaid': 'Рамки рейда',
+  'hudChrome.partyFrames.scale': 'Масштаб рамок',
+  'hudChrome.partyFrames.width': 'Ширина рамок',
+  'hudChrome.partyFrames.height': 'Высота рамок',
+  'hudChrome.partyFrames.spacing': 'Интервал между рамками',
+  'hudChrome.partyFrames.columns': 'Столбцы рейда',
+  'hudChrome.partyFrames.healthText': 'Текст здоровья',
+  'hudChrome.partyFrames.healthPercent': 'Проценты',
+  'hudChrome.partyFrames.healthCurrent': 'Текущее',
+  'hudChrome.partyFrames.healthCurrentMax': 'Текущее / Максимум',
+  'hudChrome.partyFrames.sort': 'Сортировка игроков',
+  'hudChrome.partyFrames.sortGroup': 'Группа',
+  'hudChrome.partyFrames.showResource': 'Показывать ману, ярость и энергию',
+  'hudChrome.partyFrames.showAbsorbs': 'Показывать щиты поглощения',
+  'hudChrome.partyFrames.showAuras': 'Показывать усиления и ослабления',
+  'hudChrome.partyFrames.showSelf': 'Показывать вашу рамку',
   'hudChrome.frameReset.label': 'Сбросить положение рамок',
   'hudChrome.options.playerFrameScale': 'Размер рамки игрока',
   'hudChrome.options.targetFrameScale': 'Размер рамки цели',
@@ -504,6 +715,27 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.lootSettings.menuItem': 'Настройки добычи',
   'hudChrome.dungeonDifficulty.setHeroic': 'Установить сложность подземелий: героическая',
   'hudChrome.dungeonDifficulty.setNormal': 'Установить сложность подземелий: обычная',
+  'hudChrome.dungeonDifficulty.resetAll': 'Сбросить все подземелья',
+  'hudChrome.dungeonDifficulty.resetDone': 'Все подземелья сброшены.',
+  'hudChrome.dungeonDifficulty.resetNone': 'Нет подземелий для сброса.',
+  'hudChrome.dungeonDifficulty.resetOccupied':
+    'Нельзя сбросить подземелья, пока внутри кто-то находится.',
+  'hudChrome.dungeonDifficulty.resetSameDifficulty':
+    'Смените сложность подземелья перед сбросом этих подземелий. Пустые подземелья сбрасываются сами через 5 минут.',
+  'hudChrome.dungeonDifficulty.resetUsage':
+    'После смены сложности используйте /dungeon reset, чтобы отказаться от пустых подземелий.',
+  'hudChrome.dungeonDifficulty.resetLoot':
+    'Нельзя сбросить подземелья, пока внутри остаётся добыча.',
+  'hudChrome.dungeonDifficulty.resetConfirmTitle': 'Сбросить все подземелья?',
+  'hudChrome.dungeonDifficulty.resetConfirmBody':
+    'Это отменит пустые подземелья прежней выбранной сложности. Неполученная добыча не позволит выполнить сброс.',
+  'hudChrome.dungeonDifficulty.resetConfirm': 'Сбросить подземелья',
+  'hudChrome.dungeonDifficulty.resetCooldown':
+    'Подземелья можно сбрасывать только один раз в 5 минут.',
+  'hudChrome.dungeonDifficulty.entryMismatchNormal':
+    'Это подземелье настроено на обычную сложность. Используйте «Сбросить все подземелья», чтобы начать новое героическое прохождение.',
+  'hudChrome.dungeonDifficulty.entryMismatchHeroic':
+    'Это подземелье настроено на героическую сложность. Используйте «Сбросить все подземелья», чтобы начать новое обычное прохождение.',
   'hudChrome.lootSettings.method': 'Способ добычи',
   'hudChrome.lootSettings.rollThreshold': 'Порог броска',
   'hudChrome.lootSettings.groupLoot': 'Групповая добыча',
@@ -552,6 +784,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.theme.knob.energy': 'Энергия',
   'hudChrome.options.interfaceMode': 'Режим интерфейса',
   'hudChrome.options.groundReticle': 'Прицел наземного наведения',
+  'hudChrome.options.showAttackButton': 'Показывать кнопку атаки',
   'hudChrome.options.interfaceModeAuto': 'Авто',
   'hudChrome.options.interfaceModeDesktop': 'Компьютер',
   'hudChrome.options.interfaceModeTouch': 'Сенсорный',
@@ -571,6 +804,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.names.spellPower': 'Сила заклинаний',
   'hudChrome.statInfo.names.critRating': 'Рейтинг крит. удара',
   'hudChrome.statInfo.names.hasteRating': 'Рейтинг ускорения',
+  'hudChrome.statInfo.names.parry': 'Парирование',
+  'hudChrome.statInfo.desc.parry':
+    'Ваш шанс полностью парировать фронтальную атаку в ближнем бою и не получить урона. Удар со спины парировать нельзя.',
+  'hudChrome.statInfo.names.hitRating': 'Рейтинг меткости',
+  'hudChrome.statInfo.desc.hitRating':
+    'Рейтинг меткости от снаряжения и бонусов комплекта снижает частоту промахов ваших атак и сопротивления вашим заклинаниям, особенно против противников более высокого уровня. Примерно 10 рейтинга дают 1% меткости.',
   'hudChrome.statInfo.names.warfare': 'Боевая мощь',
   'hudChrome.statInfo.warfareValue': '+{increase}% к урону / -{reduction}% получаемого',
   'hudChrome.statInfo.desc.critRating':
@@ -725,6 +964,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.browserEffectsNote':
     'Авто снижает тяжёлые CSS-эффекты (размытие, свечение, движение фона) в зависимости от браузера и устройства. Если интерфейс тормозит, понизьте вручную.',
   'hudChrome.options.footstepSounds': 'Звуки шагов',
+  'hudChrome.options.interfaceSounds': 'Звуки интерфейса и откликов',
   'hudChrome.options.clickFeedback': 'Метка клика',
   'hudChrome.options.startAttackOnAbility': 'Автоатака при использовании способности',
   'hudChrome.options.walkByAutoloot': 'Автосбор добычи при проходе',
@@ -909,6 +1149,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'download.linuxCta': 'Скачать для Linux',
   'download.linuxHint':
     'Формат AppImage: сделайте файл исполняемым и запустите его, установка не требуется.',
+  'download.windowsCta': 'Скачать для Windows',
   'download.windowsPending': 'Сборка для Windows готовится.',
   'download.desc':
     'Загрузите отдельный клиент для оптимальной производительности и игры на весь экран.',
@@ -950,7 +1191,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'auth.changeRealm': 'Сменить игровой мир',
   'auth.characters': 'Персонажи:',
   'auth.createCharacter': 'Создать персонажа',
-  'auth.currentCharacter': 'Ваш текущий персонаж',
   'auth.characterName': 'Имя персонажа',
   'auth.characterNamePlaceholder': 'Имя персонажа',
   'auth.enterWorld': 'Войти в мир',
@@ -1029,12 +1269,46 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Привилегии держателя активны. Подключайте приложение, когда нужно подписать или потратить.',
   'wallet.extensionHelp':
     'Чтобы кошелек появился здесь, держите активным браузерное расширение кошелька, например Solflare Wallet.',
+  'wallet.mobileAppHelp':
+    'Выберите Phantom или Solflare. Приложение кошелька запросит подтверждение. Не закрывайте игру и вернитесь в нее после завершения.',
+  'wallet.standaloneAppHelp':
+    'Подключение кошелька пока недоступно в приложении с главного экрана. Для Phantom или Solflare откройте World of ClaudeCraft в Safari или Chrome.',
+  'wallet.openAppTitle': 'Продолжить в {wallet}',
+  'wallet.openAppHelp':
+    'Откройте {wallet}, чтобы проверить этот запрос. Не закрывайте вкладку с игрой, пока открыто приложение кошелька.',
+  'wallet.openAppButton': 'Открыть {wallet}',
+  'wallet.manualReturnBrowserHelp':
+    'После подтверждения вернитесь на вкладку с игрой. Если iOS откроет другой браузер, закройте его и вручную вернитесь в исходный браузер.',
+  'wallet.manualReturnStandaloneHelp':
+    'После подтверждения вернитесь в World of ClaudeCraft с экрана «Домой». Если iOS откроет браузер, закройте его и снова откройте приложение с экрана «Домой».',
+  'wallet.preparingAppButton': 'Подготовка {wallet}...',
+  'wallet.walletAppUnavailable':
+    'Не удалось подготовить {wallet}. Закройте это окно и повторите попытку.',
   'wallet.flowConnect': 'Выберите кошелек. Подтверждение продолжится автоматически.',
   'wallet.flowSign':
     'Подпишите сообщение подтверждения в приложении кошелька. Транзакция и SOL не требуются.',
   'wallet.flowVerify': 'Подтверждение владения кошельком...',
   'wallet.linkFailed': 'Не удалось подтвердить кошелек.',
   'wallet.verifyFailed': 'Не удалось подтвердить кошелек.',
+  'wallet.browser.eyebrow': 'Авторизация кошелька для приложения',
+  'wallet.browser.title': 'Подключить кошелек Solana',
+  'wallet.browser.linkBody':
+    'Выберите расширение кошелька в этом браузере. Подпишите сообщение проверки, затем вернитесь в приложение.',
+  'wallet.browser.paymentBody':
+    'Выберите кошелек, привязанный к аккаунту, и подтвердите транзакцию в этом браузере.',
+  'wallet.browser.extensionHelp':
+    'Совместимое расширение кошелька не найдено. Установите или разблокируйте Phantom, Solflare либо другой браузерный кошелек Solana и повторите попытку.',
+  'wallet.browser.safety':
+    'World of ClaudeCraft никогда не запрашивает фразу восстановления или закрытый ключ.',
+  'wallet.browser.continueWith': 'Продолжить с {wallet}',
+  'wallet.browser.reviewTitle': 'Проверьте запрос в кошельке',
+  'wallet.browser.reviewBody': 'Следуйте подсказке {wallet}. Не закрывайте эту страницу браузера.',
+  'wallet.browser.completeTitle': 'Авторизация кошелька завершена',
+  'wallet.browser.completeBody': 'Можно вернуться в приложение World of ClaudeCraft.',
+  'wallet.browser.returnButton': 'Вернуться в приложение',
+  'wallet.browser.failed':
+    'Авторизация кошелька не удалась или истекла. Вернитесь в приложение и повторите попытку.',
+  'wallet.browser.retry': 'Повторить',
   'wallet.unlinkFailed': 'Не удалось отвязать кошелек.',
   'wallet.holder': 'держатель $WOC',
   'wallet.holderTierTitle': '{tier}: держатель $WOC',
@@ -1188,6 +1462,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'loading.connectionLost': 'Соединение с сервером потеряно.',
   'loading.reconnecting': 'Соединение потеряно. Повторное подключение...',
   'loading.connectionRejected': 'Сервер закрыл соединение.',
+  'loading.realmFull':
+    'Этот мир сейчас переполнен. Пожалуйста, попробуйте снова через несколько минут.',
+  'loading.tooManyConnections':
+    'Из вашей сети открыто слишком много подключений к этому миру. Пожалуйста, закройте лишние игровые окна или попробуйте снова через несколько минут.',
   'errors.nothingInteract': 'Нет объекта для взаимодействия.',
   'errors.noEnemyNearby': 'Рядом нет врагов.',
   'errors.characterNameRequired': 'Введите имя персонажа.',
@@ -1239,11 +1517,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'realm.popTipLow':
     'Низкая населённость: сейчас в сети менее 15 игроков. Много места; отлично для нового старта.',
   'realm.popTipMedium':
-    'Средняя населённость: сейчас в сети от 15 до 39 игроков. Активный и живой мир.',
+    'Средняя населённость: сейчас в сети от 15 до 79 игроков. Активный и живой мир.',
   'realm.popTipHigh':
-    'Высокая населённость: сейчас в сети от 40 до 79 игроков. Оживлённо, много игроков.',
+    'Высокая населённость: сейчас в сети 80 и более игроков. Оживлённо, много игроков.',
   'realm.popTipFull':
-    'Полная населённость: сейчас в сети 80 и более игроков. Очень оживлённо; возможна очередь на вход.',
+    'Полная населённость: этот мир достиг лимита игроков. Новые подключения отклоняются, пока кто-то из игроков не выйдет.',
   'realm.popTipOffline': 'Не в сети: этот мир сейчас недоступен и к нему нельзя подключиться.',
   'realm.characterCountOne': '{count} персонаж',
   'realm.characterCountOther': '{count} персонажа',
@@ -1269,9 +1547,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'deleteCharacter.confirmLabel': 'Введите имя персонажа для подтверждения',
   'deleteCharacter.cancel': 'Отмена',
   'deleteCharacter.confirm': 'Удалить навсегда',
-  'glitchReroll.title': 'Начать заново?',
-  'glitchReroll.cancel': 'Оставить персонажа',
-  'glitchReroll.confirm': 'Начать заново',
   'classDetails.sections.startingStats': 'Начальные характеристики',
   'classDetails.sections.equipment': 'Снаряжение',
   'classDetails.sections.signatureAbilities': 'Ключевые умения',
@@ -1573,6 +1848,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.prompts.openTrade': 'Открыть обмен',
   'hud.prompts.duelRequest': '{name} вызвал вас на дуэль!',
   'hud.prompts.acceptDuel': 'Принять дуэль',
+  'hud.prompts.resurrectionOffer': '{name} предлагает воскресить вас. Принять?',
+  'hud.prompts.acceptResurrection': 'Принять воскрешение',
   'hud.prompts.decline': 'Отклонить',
   'hud.combat.floatingMiss': 'Промах',
   'hud.combat.floatingDodge': 'Уклон',
@@ -1739,7 +2016,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.pet.defensiveDesc': 'Атакует врагов, которые ранят вас или питомца.',
   'hud.pet.aggressiveDesc': 'Атакует ближайших враждебных врагов.',
   'hud.pet.rename': 'Переименовать питомца',
-  'hud.pet.revive': 'Воскресить питомца',
+  'hud.pet.revive': 'Подлатать',
   'hud.pet.abandon': 'Оставить питомца',
   'hud.pet.cancel': 'Отмена',
   'hud.pet.renameLabel': 'Выберите новое имя питомца.',
@@ -1833,6 +2110,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.actionBar.attackName': 'Атака',
   'abilityUi.actionBar.attackTooltip':
     'Включает или выключает автоатаку по вашей цели. Щелчок правой кнопкой по врагу также начинает атаку.',
+  'abilityUi.actionBar.attackRemoveHint':
+    'Щёлкните правой кнопкой, чтобы убрать её с панели и освободить ячейку.',
   'abilityUi.actionBar.emptySlot': 'Пустая ячейка',
   'abilityUi.actionBar.slotAria': 'Ячейка действия {slot}: {ability}',
   'abilityUi.actionBar.emptySlotAria': 'Ячейка действия {slot}: пусто',
@@ -1944,6 +2223,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.money.silver': 'серебро',
   'itemUi.money.copper': 'медь',
   'itemUi.slots.mainhand': 'Правая рука',
+  'itemUi.slots.twoHand': 'Двуручное',
+  'itemUi.slots.offhand': 'Левая рука',
   'itemUi.slots.chest': 'Грудь',
   'itemUi.slots.legs': 'Ноги',
   'itemUi.slots.feet': 'Ступни',
@@ -1979,6 +2260,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.stats.dps': 'Урон/сек',
   'itemUi.stats.critChance': 'Шанс крита',
   'itemUi.stats.dodge': 'Уклонение',
+  'itemUi.stats.parry': 'Парирование',
   'itemUi.tooltip.qualityKind': '{quality} {kind}',
   'itemUi.tooltip.currentlyEquipped': 'Сейчас надето',
   'itemUi.tooltip.ifYouEquip': 'Если надеть это',
@@ -2139,19 +2421,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.heroic_strike.description':
     'Мощная атака, увеличивающая урон в ближнем бою на {damage}. Срабатывает при следующем взмахе оружием.',
   'entities.abilities.battle_shout.name': 'Железный рёв',
-  'entities.abilities.battle_shout.description': 'Повышает вашу силу атаки на {buff} на 2 мин.',
-  'entities.abilities.commanding_shout.name': 'Ободряющий клич',
-  'entities.abilities.commanding_shout.description':
-    'Повышает вашу выносливость на {buff} на 2 мин.',
+  'entities.abilities.battle_shout.description':
+    'Боевой крик, повышающий силу атаки всех членов группы на {buff}% на 30 мин.',
   'entities.abilities.demoralizing_shout.name': 'Зловещий вой',
   'entities.abilities.demoralizing_shout.description':
-    'Издает устрашающий крик, снижая силу атаки всех противников поблизости на {buff} на 30 сек.',
+    'Издает устрашающий крик, снижая наносимый всеми противниками поблизости урон на {buff}% на 20 сек.',
   'entities.abilities.charge.name': 'Натиск',
   'entities.abilities.charge.description':
     'Вы бросаетесь к врагу, накапливаете 9 ярости и оглушаете его на 1 сек. Дальность 8-25 м.',
-  'entities.abilities.rend.name': 'Глубокий разрез',
-  'entities.abilities.rend.description':
-    'Ранит цель, вызывая кровотечение на {damage} ед. урона за {duration} сек.',
   'entities.abilities.thunder_clap.name': 'Сотрясающий удар',
   'entities.abilities.thunder_clap.description':
     'Поражает ближайших врагов на {damage} ед. урона и замедляет их атаки на 10% на 10 сек.',
@@ -2181,6 +2458,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.taunt.description':
     'Провоцирует цель: ваша угроза повышается до уровня самого ненавистного ей врага, и она вынуждена атаковать вас 3 сек.',
   'entities.abilities.fireball.name': 'Пепельная стрела',
+  'entities.abilities.fireball_form.name': 'Облик огненного шара',
+  'entities.abilities.fireball_form.description':
+    'Превращает вас в пылающий огненный шар и повышает скорость передвижения на {buff}%. В этом облике нельзя атаковать и применять заклинания. Повторное применение возвращает обычный облик.',
   'entities.abilities.rain_of_fire.name': 'Огненный дождь',
   'entities.abilities.rain_of_fire.description':
     'Обрушивает огненный дождь на указанную область на 4 сек., сжигая врагов и нанося {damage} ед. урона от огня каждую секунду.',
@@ -2510,6 +2790,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.barkskin.name': 'Дубовая шкура',
   'entities.abilities.barkskin.description':
     'Ваша кожа твердеет, как кора, повышая броню на 150 на 15 сек.',
+  'entities.abilities.sacred_bulwark.name': 'Священный оплот',
+  'entities.abilities.sacred_bulwark.description':
+    'В течение {duration} сек. следующий смертельный удар противника не убьет вас, а восстановит здоровье до 35% от максимума.',
+  'entities.abilities.primal_reflexes.name': 'Первобытные рефлексы',
+  'entities.abilities.primal_reflexes.description':
+    'Ваши инстинкты обостряются, повышая шанс уклонения на 50% на 6 сек.',
   'entities.abilities.starfire.name': 'Падение небес',
   'entities.abilities.starfire.description':
     'Обрушивает вспышку звездного огня, нанося {damage} ед. урона от тайной магии.',
@@ -2538,7 +2824,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Враг атакован роем насекомых и получает {damage} ед. урона от сил Природы в течение 12 сек.',
   'entities.abilities.tigers_fury.name': 'Волчья кровь',
   'entities.abilities.tigers_fury.description':
-    'Повышает силу атаки на 40 на 6 сек. Только в облике волка.',
+    'Повышает силу атаки на {buff} на {duration} сек. Только в облике волка.',
   'entities.abilities.rip.name': 'Разрывание',
   'entities.abilities.rip.description':
     'Завершающий прием, наносящий {damage} ед. урона от кровотечения в течение 12 сек. Расходует приемы серии. Только в облике волка.',
@@ -2590,9 +2876,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.name': 'Свежевание',
   'entities.abilities.rake.description':
     'Скрытная атака из засады, наносящая врагу урон оружием плюс {damage} и вызывающая кровотечение в течение 9 сек. Даёт 1 очко серии приёмов. Только в облике волка.',
-  'entities.abilities.revive_pet.name': 'Оживление питомца',
+  'entities.abilities.revive_pet.name': 'Подлатать',
   'entities.abilities.revive_pet.description':
-    'Оживляет вашего павшего питомца и возвращает его к вам.',
+    'Подлечивает питомца: если он жив, восстанавливает ему {overTime} ед. здоровья за 12 сек. с шагом в 3 сек. Если питомец мёртв, воскрешает его с 35% здоровья.',
   'entities.abilities.holy_shock.name': 'Шок небес',
   'entities.abilities.holy_shock.description':
     'Поражает дружественную цель энергией Света и исцеляет ее на {damage}. (знаковое умение Света)',
@@ -2611,7 +2897,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_power.name': 'Мощь тайной магии',
   'entities.abilities.arcane_power.description':
     'Повышает урон от заклинаний на 20% и скорость заклинаний на 10% на 10 сек. (знаковое умение Тайной магии)',
-  'entities.abilities.combustion.name': 'Возгорание',
+  'entities.abilities.combustion.name': 'Транс феникса',
   'entities.abilities.combustion.description':
     'Повышает шанс критического эффекта заклинаний на 50% на 15 сек. (знаковое умение Огня)',
   'entities.abilities.icy_veins.name': 'Ледяные жилы',
@@ -2715,6 +3001,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.tanned_leather_jerkin.name': 'Куртка из дубленой кожи',
   'entities.items.hobnail_boots.name': 'Подбитые гвоздями сапоги',
   'entities.items.eastbrook_wool_trousers.name': 'Истврукские шерстяные штаны',
+  'entities.items.eastbrook_ritual_vestments.name': 'Ритуальные одеяния Иствбрука',
+  'entities.items.eastbrook_druids_hide.name': 'Друидская шкура Иствбрука',
+  'entities.items.eastbrook_warded_leggings.name': 'Заговорённые поножи Иствбрука',
+  'entities.items.wardweave_cowl.name': 'Капюшон Стражеткани',
+  'entities.items.duskhide_wraps.name': 'Обмотки Сумеречной шкуры',
+  'entities.items.sootscale_mantle.name': 'Мантия Пепельной чешуи',
   'entities.items.gravecaller_blade.name': 'Широкий клинок Могильного Зова',
   'entities.items.widowfang_dirk.name': 'Кортик Вдовьего Клыка',
   'entities.items.gravecaller_staff.name': 'Посох Пустоты',
@@ -3095,6 +3387,26 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.heroic_quartermaster.title': 'Героический интендант',
   'entities.npcs.heroic_quartermaster.greeting':
     'Знаки героических глубин покупают лучшие кольца и кулоны Хайвотча. Покажи мне свои знаки.',
+  'entities.npcs.card_master.name': 'Карточный мастер',
+  'entities.npcs.card_master.title': 'Дилер удачи',
+  'entities.npcs.card_master.greeting':
+    'Не сыграть ли партию в карточную дуэль? До двух побед, победителю достанется слава.',
+  'cardDuel.title': 'Карточная дуэль',
+  'cardDuel.close': 'Закрыть',
+  'cardDuel.join': 'Встать в очередь',
+  'cardDuel.joinAria': 'Встать в очередь на карточную дуэль',
+  'cardDuel.leave': 'Покинуть очередь',
+  'cardDuel.leaveAria': 'Покинуть очередь на карточную дуэль',
+  'cardDuel.queued': 'Ожидание соперника...',
+  'cardDuel.vsOpponent': 'против {name}',
+  'cardDuel.round': 'Счёт раундов: {mine} - {theirs}',
+  'cardDuel.forfeit': 'Сдаться',
+  'cardDuel.forfeitAria': 'Сдаться в карточной дуэли',
+  'cardDuel.unavailable': 'Для карточной дуэли нужен ещё один игрок онлайн.',
+  'cardDuel.counts': 'Колода: {deck} · Сброс: {discard}',
+  'cardDuel.playCardAria': 'Разыграть карту {value}',
+  'cardDuel.waitingOnOpponent': 'Ожидание карты соперника...',
+  'cardDuel.yourTurn': 'Разыграйте карту',
   'entities.npcs.loremaster_caddis.name': 'Хранитель знаний Каддис',
   'entities.npcs.loremaster_caddis.title': 'Хранитель знаний',
   'entities.npcs.loremaster_caddis.greeting':
@@ -3109,10 +3421,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Омут пьёт лунный свет, {className}, и возвращает утопленников. Тридцать ночей я наблюдаю за теми вратами — и нынче ночью они открыты.',
   'entities.quests.q_prof_intro.title': 'Ремесло для каждой руки',
   'entities.quests.q_prof_intro.text':
-    'Каждая душа в Иствруке владеет ремеслом помимо меча, {playerName}. Вокруг города разбросаны рудные жилы - возьми кирку и принеси мне 5 кусков руды. Добудь их сам, учти: я отличу.',
+    'В Иствруке каждый владеет каким-нибудь ремеслом помимо меча, {playerName}. В скалах вокруг Медного прииска к юго-западу от города есть рудные жилы. Берите кирку и сами разработайте 5 жил — меня не обманешь, я замечу разницу.',
   'entities.quests.q_prof_intro.completion':
-    'Видишь? Руда в котомке, мозоли на руках. Продолжай добывать руду, валить лес и собирать травы в пути - а вернувшись в город, загляни на доску городского фокуса у рынка и на ближайший верстак. Честное ремесло ждёт тебя во всём этом, если пожелаешь.',
-  'entities.quests.q_prof_intro.objectives.0.label': 'Кусок руды',
+    'Вот видите? Руда добыта, а на руках появились мозоли. В дороге продолжайте добывать руду, рубить лес и собирать травы. Вернувшись в город, не забудьте о доске городского направления у рынка и ремесленном столе рядом. Если захотите, все эти занятия обеспечат честный заработок.',
+  'entities.quests.q_prof_intro.objectives.0.label': 'Рудная жила разработана',
   'entities.quests.q_wolves.title': 'Волки у дверей',
   'entities.quests.q_wolves.text':
     'Лесные волки осмелели и бросаются на путников у северной дороги, {playerName}. Убейте 8, чтобы Истврук вздохнул свободнее.',
@@ -3521,15 +3833,22 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_mogger.objectives.0.label': 'Моггер убит',
   'entities.quests.q_archetype_acceptance.title': 'Ремесло по душе',
   'entities.quests.q_archetype_acceptance.text':
-    'Рано или поздно каждый ремесленник Иствуда выбирает одно ремесло своим призванием. Докажи себя одним делом, {playerName}, и объяви свой путь.',
-  'entities.quests.q_archetype_acceptance.completion': 'Твой путь избран; иди по нему с честью.',
-  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Лесной волк убит',
+    'Мастерство — это знание, {playerName}, а настройка — обещание. Выберите два соседних ремесла, которые станут вашими основными, а затем принесите мне руду, добытую вами в долине.',
+  'entities.quests.q_archetype_acceptance.completion':
+    'Обещание скреплено. Эти два ремесла теперь ваши основные, а знание напротив них стало вашим увлечением.',
+  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Рудная жила разработана',
   'entities.quests.q_prof_make_amends.title': 'Искупление',
   'entities.quests.q_prof_make_amends.text':
-    'Чтобы оставить одно ремесло ради другого, ремесленник должен сперва искупить путь, которым не пошёл, {playerName}.',
+    'Вы уже владели этой парой ремёсел, {playerName}. Возвращение — не новая клятва. Помогите расчистить дорогу в долине, и работа напомнит вашим рукам прежние навыки.',
   'entities.quests.q_prof_make_amends.completion':
-    'Искупление свершилось; перед тобой открыт новый путь.',
+    'Прежний ритм вернулся. Ваша старая пара ремёсел снова активна.',
   'entities.quests.q_prof_make_amends.objectives.0.label': 'Лесной волк убит',
+  'entities.quests.q_prof_hobby_switch.title': 'Другое увлечение',
+  'entities.quests.q_prof_hobby_switch.text':
+    'Главные ремёсла требуют клятвы. Увлечение лишь спрашивает, куда ведёт твоё любопытство, {playerName}. Собери немного трав и реши, какое ремесло напротив твоих главных специальностей ты хочешь развивать.',
+  'entities.quests.q_prof_hobby_switch.completion':
+    'Выбор полегче, но полезный. Следуй за любопытством так далеко, как позволит работа редкого качества.',
+  'entities.quests.q_prof_hobby_switch.objectives.0.label': 'Собран участок трав',
   'entities.quests.q_drowned_choir.title': 'Утонувший хор',
   'entities.quests.q_drowned_choir.text':
     'Бродяги действуют не одни. Среди них ходят Утонувшие служители — культ, что затонул вместе с храмом, всё ещё в истлевших облачениях, всё ещё поющий молитву с прибрежных скал. Заставь умолкнуть восьмерых из них и принеси мне шесть подношений, что они несут. Хочу знать, что они задумали поднести своей богине.',
@@ -4171,6 +4490,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.thunzharr_stormling.name': 'Пробуждённый элементаль бури',
   'hudChrome.worldBoss.spawn': '{name} поднимается над Терновыми высотами!',
   'entities.items.stormcallers_spaulders.name': 'Наплечники Зова Бури',
+  'entities.items.bonewrought_greatsword.name': 'Костокованый двуручный меч',
+  'entities.items.direfang_greatblade.name': 'Великий клинок Лютого Клыка',
+  'entities.items.bonewrought_bulwark.name': 'Костокованый бастион',
+  'entities.items.wraithfire_orb.name': 'Сфера Призрачного пламени',
   'hud.chat.context.convertToRaid': 'Преобразовать в рейд',
   'hud.chat.context.convertToParty': 'Преобразовать в группу',
   'hudChrome.raidConvert.leaderOnly': 'Только лидер рейда может преобразовать рейд в группу.',
@@ -4278,7 +4601,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.questTracker.collapseHint': 'Свернуть трекер заданий',
   'hudChrome.questTracker.expandHint': 'Развернуть трекер заданий',
   'hudChrome.bags.cannotDestroy': 'Этот предмет нельзя уничтожить.',
-  'hudChrome.bags.rightClickDestroy': 'Shift+правый клик, чтобы уничтожить',
+  'hudChrome.bags.rightClickDestroy': 'Правый клик, чтобы уничтожить',
+  'hudChrome.bags.dragEquipHint': 'Перетащите на персонажа, чтобы надеть',
+  'hudChrome.bags.dragDestroyHint': 'Перетащите в мир, чтобы уничтожить',
+  'hudChrome.bags.reorderNeedsRecent':
+    'Сбросьте фильтр и выберите сортировку «Недавние», чтобы менять порядок в сумках',
   'hudChrome.bags.filterGroupAria': 'Фильтровать сумки по категории',
   'hudChrome.bags.filterAll': 'Все',
   'hudChrome.bags.filterWeapon': 'Оружие',
@@ -4330,14 +4657,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.deedsPage.intro':
     'Книга деяний ведет счет всему, что вы совершили в этом мире, от первых шагов из начальной долины до самых тяжелых сражений, какие только может предложить королевство. Зарабатывайте деяния по ходу игры, носите дарованные ими звания и смотрите, как растет ваша Известность.',
   'guide.deedsPage.renownBody':
-    'Известность отражает счет, стоящий за Книгой. Каждое заработанное деяние стоит определенное число очков, а ваш итог только растет, так что тихая неделя никогда не отнимет достигнутого. Некоторые деяния зависят от удачи, а не от умения, а Подвиги остаются честью особого рода, поэтому ни те ни другие не дают Известности вовсе.',
+    'Известность отражает счет, стоящий за Книгой. Каждое заработанное деяние стоит определенное число очков, а ваш итог только растет, так что тихая неделя никогда не отнимет достигнутого. Некоторые деяния зависят от удачи, а не от умения, а Подвиги остаются честью особого рода, поэтому ни те ни другие не дают Известности вовсе. Деяния без Известности всё равно засчитываются в завершение Книги, просто они никогда не приносят очков.',
   'guide.deedsPage.renownHeading': 'Известность',
   'guide.deedsPage.rewardBorder': 'Рамка',
   'guide.deedsPage.rewardsBody':
     'Награды нужны лишь для вида, и в этом весь смысл. Некоторые деяния даруют звание, которое можно носить, или рамку, обрамляющую ваше имя, но никогда ничего, что сделало бы вашего героя сильнее. Выберите желаемое звание в Книге деяний, и оно будет красоваться на вашей именной табличке, в чате и в рейтинговых таблицах у всех на виду.',
   'guide.deedsPage.rewardsHeading': 'Звания и рамки',
   'guide.deedsPage.standingsNote':
-    'Королевства ведут текущий подсчёт Известности по всем учётным записям. Чтобы увидеть, кто где стоит, откройте в игре таблицу лидеров и перейдите на вкладку Известности; рейтинг находится там, а не на вики.',
+    'Королевства ведут текущий подсчёт Известности по всем учётным записям: таблица лидеров ранжирует учётные записи целиком по накопленной Известности, каждое деяние засчитывается один раз для всех ваших персонажей, и показывается только Известность, поэтому деяния без Известности не влияют на рейтинг, даже если они засчитаны в вашей Книге. Чтобы увидеть, кто где стоит, откройте в игре таблицу лидеров и перейдите на вкладку Известности; рейтинг находится там, а не на вики.',
   'guide.delvesPage.affixesBody':
     'Прохождения посложнее выпадают с модификатором, что меняет ход спуска: от беспокойных мертвецов до спёртого воздуха и осыпающихся сводов. Он поднимает и опасность, и награду разом. Каждая вылазка черпает из модификаторов, что подходят её духу; по всему королевству набор выглядит так:',
   'guide.delvesPage.affixesHeading': 'Модификаторы прохождения',
@@ -4830,6 +5157,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.templeBody':
     'Утонувшее святилище в стороне от болотной дороги, ответвление для любопытных и хорошо подготовленных.',
   'guide.dungeonsPage.sanctumName': 'Святилище Могильного змия',
+  'guide.dungeonsPage.resetBody':
+    'Смените сложность, пока группа ещё удерживает занятые инстансы, и старые заявки какое-то время сохраняются, прежде чем очиститься сами. Лидер группы может отпустить их сразу: выберите «Сбросить все подземелья» в меню собственного портрета или введите /dungeon reset. Сброс срабатывает только после того, как сложность действительно изменена, только пока внутри никого не осталось, живого или павшего, а между сбросами проходит короткая передышка. Придёте к дверям не с той сложностью, и игра скажет об этом прямо, прежде чем начнётся прохождение. Рейд так не сбрасывается никогда: у него свои правила блокировки.',
+  'guide.dungeonsPage.resetTitle': 'Сброс инстансов',
   'guide.dungeonsPage.sanctumBody':
     'Темное сердце Терновых высот, где долгий труд культа достигает своего ужасающего пика.',
   'guide.dungeonsPage.raidName': 'Финальный рейд',
@@ -4859,8 +5189,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.charge': 'Рывок к далекому врагу, открывающий бой коротким оглушением.',
   'guide.abilityHook.cheap_shot':
     'Открытие из незаметности с оглушением и стартовым запасом серий приемов.',
-  'guide.abilityHook.commanding_shout':
-    'Повышает выносливость, так что у всех становится больше запаса прочности в бою.',
   'guide.abilityHook.concussive_shot':
     'Дезориентирует цель и замедляет ее, чтобы она не смогла до вас добраться.',
   'guide.abilityHook.conjure_food':
@@ -4880,6 +5208,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.eviscerate':
     'Тратит набранные серии приемов, чтобы добить цель всплеском урона.',
   'guide.abilityHook.fireball': 'Ваш основной огненный удар: бьет по цели и оставляет ее гореть.',
+  'guide.abilityHook.fireball_form':
+    'Превращает вас в живой огненный шар для быстрого движения по открытой местности.',
   'guide.abilityHook.flame_shock':
     'Мгновенный поджог, который бьет сразу и продолжает жечь со временем.',
   'guide.abilityHook.frost_armor':
@@ -4922,7 +5252,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Тяжелый удар в ближнем бою на случай, когда кто-то сократил с вами дистанцию.',
   'guide.abilityHook.rejuvenation':
     'Накладывается мгновенно и лечит союзника со временем, так что вы можете продолжать действовать.',
-  'guide.abilityHook.rend': 'Открывает кровотечение, которое изматывает цель со временем.',
   'guide.abilityHook.renew':
     'Лечение, которое идет со временем, удобно наложить и продолжать движение.',
   'guide.abilityHook.rockbiter_weapon':
@@ -5246,7 +5575,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.gear.intro':
     'Снаряжение, это экипировка, что носит ваш персонаж, и предметы, что вы несёте с собой. Снаряжение получше, это самый надёжный способ становиться сильнее, и большую его часть вы подбираете просто по ходу игры.',
   'guide.gear.itemLevelBody':
-    'Если нужен быстрый способ сравнить два предмета, включите «Показывать уровень предмета» в настройках. Тогда у снаряжения, добытого в мире, у врагов и за задания, появится уровень предмета, единое число, что примерно отражает его мощь исходя из того, откуда он взялся, так что вы с одного взгляда поймёте, какое улучшение весомее, даже между разными слотами. У вещей без такого источника, вроде простых товаров у торговцев и стартового снаряжения, уровня предмета нет, так что его отсутствие, это норма, а не изъян.',
+    'Если нужен быстрый способ сравнить два предмета, включите «Показывать уровень предмета» в настройках. Тогда у снаряжения с известным источником, будь то враги, задания или ремёсла, появится уровень предмета, единое число, что примерно отражает его мощь исходя из того, откуда он взялся, так что вы с одного взгляда поймёте, какое улучшение весомее, даже между разными слотами. У вещей без такого источника, вроде простых товаров у торговцев и стартового снаряжения, уровня предмета нет, так что его отсутствие, это норма, а не изъян.',
   'guide.gear.qualityBody':
     'У каждого предмета есть качество, а его название окрашено под стать ему, чтобы вы с первого взгляда понимали его ценность. От самого обычного до самого ценного:',
   'guide.gear.qualityCommon': 'Обычное',
@@ -5780,10 +6109,21 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.thorns': 'Наносит {value} единиц урона ({school}) атакующим',
   'hudChrome.auraEffect.slow': 'Снижает скорость передвижения на {pct}%',
   'hudChrome.auraEffect.speed': 'Повышает скорость передвижения на {pct}%',
+  'hudChrome.auraEffect.formFireball':
+    'Облик огненного шара: скорость повышена на {pct}%; атаки и заклинания недоступны',
   'hudChrome.auraEffect.attackSpeedSlow': 'Замедляет скорость атаки на {pct}%',
   'hudChrome.auraEffect.attackSpeedFast': 'Повышает скорость атаки на {pct}%',
   'hudChrome.auraEffect.haste': 'Повышает скорость атаки и произнесения заклинаний на {pct}%',
+  'hudChrome.auraEffect.dmgDone': 'Повышает наносимый урон на {pct}%',
+  'hudChrome.auraEffect.dmgDoneReduce': 'Снижает наносимый урон на {pct}%',
+  'hudChrome.auraEffect.elementalConvergencePrimed':
+    'Следующее заклинание другой стихийной школы активирует Стихийное слияние',
+  'hudChrome.auraEffect.heatingUp':
+    'Следующий критический удар огненного заклинания в серии дает «Полосу везения»; некритический удар снимает «Разогрев»',
   'hudChrome.auraEffect.tongues': 'Увеличивает время произнесения заклинаний на {pct}%',
+  'hudChrome.auraEffect.damageReduction': 'Уменьшает весь получаемый урон на {pct}%',
+  'hudChrome.auraEffect.guardianWard':
+    'Следующий смертельный удар противника вместо этого восстанавливает здоровье до {pct}%',
   'hudChrome.auraEffect.increase.ap': 'Повышает силу атаки на {value}',
   'hudChrome.auraEffect.increase.armor': 'Повышает броню на {value}',
   'hudChrome.auraEffect.increase.int': 'Повышает интеллект на {value}',
@@ -5863,7 +6203,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Скорость атаки и произнесения заклинаний повышается на 15%.',
   'entities.itemSets.necromancers.name': 'Одеяние Скорбного плетения',
   'entities.itemSets.necromancers.bonus2':
-    'Вас невозможно отбросить (100% сопротивление отбрасыванию).',
+    'Увеличивает силу заклинаний на 20. Получаемый урон больше не замедляет чтение ваших заклинаний (100% сопротивление замедлению чтения).',
   'entities.itemSets.necromancers.bonus3': 'Интеллект повышается на 10, выносливость на 10.',
   'entities.itemSets.necromancers.bonus4':
     'Ваши заклинания с вероятностью 10% даруют «Ясность», делая следующее заклинание бесплатным.',
@@ -5875,14 +6215,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Критические удары оружием наносят «Рваную рану»: цель теряет 6 ед. здоровья от кровотечения каждые 2 сек. в течение 12 сек. Суммируется до 3 раз.',
   'entities.itemSets.soulflame.name': 'Одеяние Призрачного пламени',
   'entities.itemSets.soulflame.bonus2':
-    'Вас невозможно отбросить (100% сопротивление отбрасыванию).',
+    'Увеличивает силу заклинаний на 20. Получаемый урон больше не замедляет чтение ваших заклинаний (100% сопротивление замедлению чтения).',
   'entities.itemSets.soulflame.bonus3':
     'Интеллект повышается на 15, дух на 15, а скорость атаки и произнесения заклинаний на 15%.',
   'entities.itemSets.soulflame.bonus4':
     'Ваши заклинания с вероятностью 10% даруют «Пламя души», увеличивая силу заклинаний на 40 на 10 сек.',
   'entities.itemSets.stormcallers.name': 'Одеяние Зова Бури',
   'entities.itemSets.stormcallers.bonus2':
-    'Вас невозможно отбросить (100% сопротивление отбрасыванию).',
+    'Увеличивает силу заклинаний на 20. Получаемый урон больше не замедляет чтение ваших заклинаний (100% сопротивление замедлению чтения).',
   'entities.itemSets.stormcallers.bonus3':
     'Интеллект повышается на 15, дух на 15, а скорость атаки и произнесения заклинаний на 15%.',
   'entities.itemSets.stormcallers.bonus4':
@@ -6029,6 +6369,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.voice.channel': 'В {channel}',
   'hudChrome.discord.swag.title': 'Мерч',
   'hudChrome.discord.swag.free': 'Бесплатно',
+  'hudChrome.fct.cheap': 'Дешевле!',
   'hudChrome.discord.swag.cost': '{points} очк.',
   'hudChrome.discord.relay.wts.label': 'Продам',
   'hudChrome.discord.relay.wtb.label': 'Куплю',
@@ -6042,6 +6383,44 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.craftedToast': 'Создано: {name}',
   'hudChrome.crafting.insufficientMaterials': 'У вас недостаточно материалов.',
   'hudChrome.crafting.unknownRecipe': 'Такого рецепта не существует.',
+  'hudChrome.crafting.comboRequires': 'Настройка: {craftA} + {craftB}, ранг {tier}.',
+  'hudChrome.crafting.comboMet': 'Готово.',
+  'hudChrome.crafting.comboSyncing': 'Проверяем настройку на сервере.',
+  'hudChrome.crafting.comboNotAttuned': 'Сначала выберите пару архетипа.',
+  'hudChrome.crafting.comboWrongPair': 'Для создания предмета активируйте именно эту пару.',
+  'hudChrome.crafting.comboTierUnmet': 'Повысьте оба главных ремесла до нужного ранга.',
+  'hudChrome.crafting.professionChoice': 'Выбор профессии',
+  'hudChrome.crafting.noProfessionChoice': 'Сейчас нет доступного выбора профессии.',
+  'hudChrome.crafting.attunementPreview':
+    'Результат: титул «{title}»; {majorA} и {majorB} станут главными ремёслами без потолка; {hobby} станет увлечением с потолком редкого качества; все остальные навыки сохранятся, но в неактивном состоянии будут ограничены обычным качеством.',
+  'hudChrome.crafting.hobbyPreview':
+    'Результат: {hobby} станет увлечением с потолком редкого качества. Оба главных ремесла и все сохранённые значения навыков останутся без изменений.',
+  'hudChrome.crafting.identity.title': 'Ремесленная специализация',
+  'hudChrome.crafting.identity.syncing': 'Ожидаем ремесленную специализацию от сервера.',
+  'hudChrome.crafting.identity.unattuned':
+    'Активной пары архетипа нет. Знания сохраняются, но для комбинированных рецептов нужна настроенная пара.',
+  'hudChrome.crafting.identity.titleLabel': 'Титул',
+  'hudChrome.crafting.identity.majorsLabel': 'Главные ремёсла',
+  'hudChrome.crafting.identity.hobbyLabel': 'Увлечение',
+  'hudChrome.crafting.identity.historyLabel': 'История',
+  'hudChrome.crafting.identity.history': 'Открыто пар: {pairs}, завершено возвращений: {returns}',
+  'hudChrome.crafting.identity.roleMajor': 'Главное ремесло',
+  'hudChrome.crafting.identity.roleHobby': 'Увлечение',
+  'hudChrome.crafting.identity.roleDormant': 'Неактивные знания',
+  'hudChrome.crafting.identity.roleUnattuned': 'Без настройки',
+  'hudChrome.crafting.identity.ceilingUnlimited': 'Без потолка усиления',
+  'hudChrome.crafting.identity.ceilingCommon': 'Потолок обычного качества',
+  'hudChrome.crafting.identity.skillAria': '{craft}, навык {skill}, ранг {tier}, {role}, {ceiling}',
+  'hudChrome.crafting.identity.colCraft': 'Ремесло',
+  'hudChrome.crafting.identity.colSkill': 'Навык',
+  'hudChrome.crafting.identity.colRole': 'Роль',
+  'hudChrome.crafting.identity.colCap': 'Потолок',
+  'hudChrome.crafting.identity.tutorial':
+    'Первый ранг: достигните навыка {skill} в одном ремесле. Успешные рецепты развивают это ремесло, не стирая остальные знания.',
+  'hudChrome.crafting.identity.nearTier':
+    'Ремеслу {craft} не хватает {points} навыка до следующего ранга.',
+  'hudChrome.crafting.identity.dormantKnowledge':
+    'Знания ремесла {craft} сохранены, но неактивны, пока не выбрана его пара или увлечение.',
   'hudChrome.devBadge.title': 'Разработчик',
   'hudChrome.devBadge.tiers.tinkerer': 'Мастеровой',
   'hudChrome.devBadge.tiers.artificer': 'Искусник',
@@ -6090,6 +6469,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.quit': 'Выйти',
   'desktop.crash.fatalBody':
     'World of ClaudeCraft столкнулась с непредвиденной ошибкой и будет закрыта.',
+  'gpuNotice.bodyDesktop':
+    'Игра работает без GPU-ускорения и будет сильно тормозить. Обновите драйверы видеокарты и перезапустите игру. В Windows также выберите для игры режим «Высокая производительность» в разделе Параметры > Система > Дисплей > Графика.',
+  'gpuNotice.bodyWeb':
+    'Игра работает без GPU-ускорения и будет сильно тормозить. Включите аппаратное ускорение в настройках браузера, обновите драйверы видеокарты и перезапустите браузер.',
+  'gpuNotice.dismiss': 'Закрыть',
   'editor.appTitle': 'Редактор карт',
   'editor.docTitle': 'Редактор карт - World of ClaudeCraft',
   'editor.untitledMap': 'Карта без названия',
@@ -6609,6 +6993,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Вы поднимаетесь обратно к брату Хальвену на краю топи.',
   'hudChrome.dailyRewards.endsIn': 'Осталось {time}',
   'hudChrome.dailyRewards.remainingHoursMinutes': '{hours}ч {minutes}м',
+  'hudChrome.dailyRewards.remainingDaysHours': '{days}д {hours}ч',
   'hudChrome.dailyRewards.remainingLessThanMinute': '<1м',
   'hudChrome.dailyRewards.remainingMinutes': '{minutes}м',
   'hudChrome.dailyRewards.sol': '{amount} SOL',
@@ -6667,6 +7052,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.body.unsupported_media_type': 'Неподдерживаемый формат запроса.',
   'apiError.deeds.invalid_input': 'Недопустимые данные.',
   'apiError.steam.disabled': 'Привязка Steam сейчас недоступна.',
+  'apiError.wallet.handoff_invalid':
+    'Срок действия авторизации кошелька истек или ее не удалось проверить. Повторите попытку.',
   'apiError.steam.invalid_ticket':
     'Steam не смог подтвердить этот запрос на привязку. Повторите попытку из настольного приложения.',
   'apiError.steam.banned': 'Этот аккаунт Steam нельзя привязать.',
@@ -6792,6 +7179,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.subject': 'То, что вы совершили во тьме',
   'entities.letters.letter_q_hollow.body':
     'Мало кто узнает, что было погребено в той лощине, и ещё меньше тех, кто поверит. Я знаю и не забуду.\n\nПусть ваша дорога будет светла.\n- Брат Алдрик',
+  'entities.letters.heroic_marks_reward.sender': 'Героический интендант',
+  'entities.letters.heroic_marks_reward.subject': 'Ваши героические знаки',
+  'entities.letters.heroic_marks_reward.body':
+    'Ваш отряд прошёл героическое испытание, пока вы сражались в тылу или лежали в пыли. Блокировка была наложена всё равно, поэтому ваша доля героических знаков прилетела к вам сюда, а не пропала. Расходуйте их с умом.\n\n- Героический интендант',
   'hudChrome.calendar.title': 'Календарь событий',
   'hudChrome.calendar.close': 'Закрыть календарь',
   'hudChrome.calendar.keybindLabel': 'Календарь событий',
@@ -6842,19 +7233,30 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.mining': 'Горное дело',
   'hudChrome.gathering.logging': 'Лесозаготовка',
   'hudChrome.gathering.herbalism': 'Травничество',
+  'hudChrome.gathering.notReady': 'Этот ресурсный узел еще не восстановился для вас.',
   'hudChrome.archetypeTitle.label': 'Титул',
   'hudChrome.archetypeTitle.none': 'Нет',
   'hudChrome.archetypeTitle.hobbyLabel': 'Хобби',
-  'hudChrome.archetypeTitle.armorcrafting': 'Бронник',
-  'hudChrome.archetypeTitle.weaponcrafting': 'Оружейник',
-  'hudChrome.archetypeTitle.jewelcrafting': 'Ювелир',
-  'hudChrome.archetypeTitle.alchemy': 'Алхимик',
-  'hudChrome.archetypeTitle.engineering': 'Механик',
-  'hudChrome.archetypeTitle.cooking': 'Повар',
-  'hudChrome.archetypeTitle.inscription': 'Писарь',
-  'hudChrome.archetypeTitle.enchanting': 'Зачарователь',
-  'hudChrome.archetypeTitle.tailoring': 'Портной',
-  'hudChrome.archetypeTitle.leatherworking': 'Кожевник',
+  'hudChrome.archetypePair.engineering+alchemy': 'Бомбардир',
+  'hudChrome.archetypePair.alchemy+cooking': 'Аптекарь',
+  'hudChrome.archetypePair.cooking+leatherworking': 'Зверолов',
+  'hudChrome.archetypePair.leatherworking+tailoring': 'Экипировщик',
+  'hudChrome.archetypePair.tailoring+inscription': 'Чароткач',
+  'hudChrome.archetypePair.inscription+enchanting': 'Чародей',
+  'hudChrome.archetypePair.enchanting+jewelcrafting': 'Камневяз',
+  'hudChrome.archetypePair.jewelcrafting+weaponcrafting': 'Клинкодел',
+  'hudChrome.archetypePair.weaponcrafting+armorcrafting': 'Кузнец',
+  'hudChrome.archetypePair.armorcrafting+engineering': 'Шестерёнщик',
+  'hudChrome.craftName.armorcrafting': 'Бронное дело',
+  'hudChrome.craftName.weaponcrafting': 'Оружейное дело',
+  'hudChrome.craftName.jewelcrafting': 'Ювелирное дело',
+  'hudChrome.craftName.alchemy': 'Алхимия',
+  'hudChrome.craftName.engineering': 'Инженерное дело',
+  'hudChrome.craftName.cooking': 'Кулинария',
+  'hudChrome.craftName.inscription': 'Начертание',
+  'hudChrome.craftName.enchanting': 'Наложение чар',
+  'hudChrome.craftName.tailoring': 'Портняжное дело',
+  'hudChrome.craftName.leatherworking': 'Кожевничество',
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
   // Protect Yumi locale fill (M16 wordy-key floor).
   'yumi.hud.collapse': 'Свернуть полосы Protect Yumi',
@@ -7380,9 +7782,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.charTitleNone': 'Звание не выбрано',
   'hudChrome.deeds.charOpenBook': 'Книга деяний',
   'hudChrome.deeds.lbTab': 'Известность',
-  'hudChrome.deeds.lbDeedsCol': 'Деяния',
   'hudChrome.deeds.lbTitleCol': 'Звание',
-  'hudChrome.deeds.lbSelf': 'Ваше место: {rank}, лучшие {percent} процентов',
+  'hudChrome.deeds.lbScopeNote':
+    'Учётные записи ранжируются по накопленной Известности. Каждое деяние засчитывается один раз для всех персонажей учётной записи.',
+  'hudChrome.deeds.lbSelfAccount':
+    'Ваша учётная запись: место {rank}, лучшие {percent} процентов, Известность {renown}',
+  'hudChrome.deeds.lbSelfRank': 'Ваша учётная запись: место {rank}, лучшие {percent} процентов',
   'hudChrome.deeds.lbEmpty': 'В рейтинге пока нет летописцев.',
   'hudChrome.deeds.broadcastsLabel': 'Делиться деяниями с гильдией и друзьями',
   'guide.deedsPage.catHeading': '{label} ({count})',
@@ -7434,7 +7839,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.bestiary.flavor.sethrael_palecoil':
     'Костисто-бледный змей, что скользит вдоль глубокого уступа Глиммермира, безмолвный страж вод, которые он объявил своими. Пловцы, делящие с ним озеро, редко всплывают снова.',
   'guide.combat.metersBody':
-    'Хотите узнать, как прошёл бой? Нажмите Z, чтобы открыть счётчики группы, которые подсчитывают урон, лечение и угрозу для вашей группы, схватка за схваткой.',
+    'Хотите узнать, как прошёл бой? Нажмите Shift+H, чтобы открыть счётчики группы, которые подсчитывают урон, лечение и угрозу для вашей группы, схватка за схваткой.',
   'guide.controls.arrowKeys': 'Клавиши со стрелками',
   'guide.controls.bothMouse': 'Обе кнопки мыши',
   'guide.controls.runForward': 'Бег вперёд',
@@ -7449,7 +7854,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Дневной предел на самые крупные повторяемые награды. Каждое героическое подземелье выдаёт одно прохождение в день, рейд считает обычный и героический режимы отдельно, а сбор добычи с мирового босса запускает ваш отсчёт. Пройденное подземелье на пять игроков остаётся открытым для своей же группы, а запертая дверь рейда не откроется до сброса.',
   'guide.glossary.lockoutTerm': 'Блокировка',
   'guide.glossary.metersDef':
-    'Окно со счётом группы за текущий бой: нанесённый урон, исцеление и то, у кого больше всего угрозы, ведётся по каждой схватке. Открывается своей клавишей (по умолчанию Z).',
+    'Окно со счётом группы за текущий бой: нанесённый урон, исцеление и то, у кого больше всего угрозы, ведётся по каждой схватке. Открывается своей клавишей (по умолчанию Shift+H).',
   'guide.glossary.metersTerm': 'Счётчики урона',
   'guide.glossary.petBarDef':
     'Ряд команд, который добавляет питомец охотника или чернокнижника: «Атака», «Стоп», «Провокация», «Оборона» и «Агрессия», по умолчанию привязанные к Ctrl и клавишам с 1 по 5.',
@@ -7466,7 +7871,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.models.groupForms': 'Облики друида',
   'guide.nav.sidebarLabel': 'Разделы руководства',
   'guide.professions.craftHowBody':
-    'Откройте окно ремесла (клавиша по умолчанию T), чтобы увидеть все известные вам рецепты, что нужно для каждого и что у вас есть под рукой; когда материалы на месте, один щелчок делает всю работу. Обычные рецепты можно изготавливать где угодно в мире. А несколько продвинутых рецептов инструментов требуют встать у ремесленного узла в Хайвотче.',
+    'Откройте окно ремесла (клавиша по умолчанию T), чтобы увидеть все известные вам рецепты, что нужно для каждого и что у вас есть под рукой; когда материалы на месте, один щелчок делает всю работу. Обычные рецепты можно изготавливать где угодно в мире. А несколько продвинутых рецептов, среди них инструменты высших ступеней и редкие доспехи заклинателей, требуют встать у ремесленного узла в Хайвотче.',
   'guide.professions.craftHowTitle': 'Окно ремесла',
   'guide.search.typeAbility': 'Способность',
   'guide.search.typeDeed': 'Деяние',
@@ -7486,6 +7891,357 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.social.slashBody':
     'Несколько повседневных команд стоит запомнить: /w Имя отправляет шёпот, а /r отвечает на последний полученный, /invite приглашает кого-то в вашу группу, /follow пристраивает вас следом за другом, /roll бросает кости на виду у группы, /who показывает, кто в сети, а /afk отмечает вас отошедшим. Введите /help в игре, чтобы увидеть полный список.',
   'guide.social.slashHeading': 'Удобные команды с косой чертой',
+  'guide.abilityHook.revenge':
+    'Поражает противников перед вами и может не требовать затрат после уклонения или парирования.',
+  'guide.abilityHook.hamstring': 'Ограничивает передвижение противника, не позволяя ему сбежать.',
+  'game.talents.choicesTab': 'Варианты',
+  'game.talents.readout.rowsSummary': 'Таланты: {head}, выбрано рядов {picked}/{unlocked}.',
+  'game.talents.rowUnlockToast': 'Доступен новый выбор таланта!',
+  'game.talents.rowUnlocks': 'Открывается на {level} уровне',
+  'hudChrome.fct.absorbed': 'Поглощено {amount}',
+  'entities.abilities.temporal_mend.name': 'Временная штопка',
+  'entities.abilities.temporal_mend.description':
+    'Продвигает союзника на мгновение вперед во времени, восстанавливая {damage} здоровья, пока тело принимает свой более здоровый будущий облик. (отличительная способность Хрономантии)',
+  'entities.abilities.temporal_barrier.name': 'Временный барьер',
+  'entities.abilities.temporal_barrier.description':
+    'Смещает цель на мгновение из настоящего: временная оболочка поглощает {damage} урона в течение 10 сек, после чего линия времени возвращается на место.',
+  'entities.abilities.temporal_echo.name': 'Временное эхо',
+  'entities.abilities.temporal_echo.description':
+    'Отмечает союзника эхом более здорового мгновения, мгновенно восполняя {damage} здоровья. В течение {duration} сек часть наносимого вами урона от тайной магии возвращается через эхо, исцеляя его.',
+  'entities.abilities.aura_surge.name': 'Рикошет рассвета',
+  'entities.abilities.aura_surge.description':
+    'Бросает выкованный на рассвете щит, наносящий {damage} ед. урона от Света и лишающий основную цель возможности произносить заклинания на 2 сек. Затем щит отскакивает не более чем к 2 другим противникам в радиусе 10 м, нанося 75% урона за отскок. (талант паладина)',
+  'entities.abilities.aspect_of_the_wild.description':
+    'Воодушевляет союзников в радиусе 30 м дикой силой, повышая их силу атаки на 45 и скорость атаки на 5% на 5 мин. (талант охотника)',
+  'entities.abilities.avenging_wrath.description':
+    'Призывает силу возмездия, повышая вашу силу атаки на 60 и силу заклинаний на 30 на 20 сек. (талант паладина)',
+  'entities.abilities.berserk.description':
+    'Повышает вашу силу атаки на 70 на 15 сек. (талант друида)',
+  'entities.abilities.blink.description':
+    'Телепортирует вас на 15 м вперед и снимает эффекты обездвиживания. (талант мага)',
+  'entities.abilities.bloodlust.description':
+    'Приводит союзников в радиусе 30 м в исступление, повышая их скорость атаки на 30% на 15 сек. (талант шамана)',
+  'entities.abilities.chain_lightning.description':
+    'Обрушивает молнию на выбранную область, нанося ближайшим противникам {damage} ед. урона. (талант шамана)',
+  'entities.abilities.chaos_bolt.description':
+    'Выпускает сгусток хаотического огня, наносящий {damage} ед. урона от Огня. (талант чернокнижника)',
+  'entities.abilities.cloak_of_shadows.description':
+    'Окутывает вас тенями, поглощающими 420 ед. урона в течение 5 сек. (талант разбойника)',
+  'entities.abilities.curse_of_exhaustion.description':
+    'Проклинает цель, снижая ее скорость передвижения на 30% на 12 сек. (талант чернокнижника)',
+  'entities.abilities.death_coil.description':
+    'Поражает противника, нанося {damage} ед. урона от Темной магии, а затем повергает его в ужас на 3 сек. (талант чернокнижника)',
+  'entities.abilities.deep_freeze.description':
+    'Глубоко замораживает цель, нанося {damage} ед. урона от льда и оглушая ее на 4 сек. (Талант мага)',
+  'entities.abilities.desperate_prayer.description':
+    'Мгновенно восстанавливает вам {damage} ед. здоровья. (талант жреца)',
+  'entities.abilities.deterrence.description':
+    'Повышает вероятность уклонения на 50 процентных пунктов на 10 сек. (талант охотника)',
+  'entities.abilities.divine_shield.description':
+    'Защищает вас святой силой, поглощающей 900 ед. урона в течение 8 сек. (талант паладина)',
+  'entities.abilities.earthbind.description':
+    'Привязывает ближайших противников к земле, обездвиживая их на 2 сек. (талант шамана)',
+  'entities.abilities.evocation.description': 'Быстро восполняет ману. (Талант мага)',
+  'entities.abilities.frenzied_regeneration.description':
+    'Восстанавливает 180 ед. здоровья за 10 сек. Только в облике медведя. (талант друида)',
+  'entities.abilities.frost_trap.description':
+    'Замораживает противников в выбранной области на 3 сек., не позволяя им двигаться или действовать. (талант охотника)',
+  'entities.abilities.ghostly_strike.description':
+    'Наносит противнику урон от оружия плюс {damage}, ненадолго повышает уклонение и дает 1 прием в серии. (талант разбойника)',
+  'entities.abilities.hammer_of_wrath.description':
+    'Бросает священный молот в раненого противника, нанося {damage} ед. урона от Света. Можно использовать только при запасе здоровья ниже 20%. (талант паладина)',
+  'entities.abilities.healing_stream.description':
+    'Восстанавливает союзной цели 120 ед. здоровья за 12 сек. (талант шамана)',
+  'entities.abilities.holy_wrath.description':
+    'Высвобождает святую силу, нанося ближайшим противникам {damage} ед. урона. (талант паладина)',
+  'entities.abilities.howl_of_terror.description':
+    'Пугает ближайших противников на срок до 3 сек. Урон может прервать эффект. (талант чернокнижника)',
+  'entities.abilities.ice_block.description':
+    'Заключает вас в лед, поглощающий огромный урон в течение 8 сек. (Талант мага)',
+  'entities.abilities.inner_focus.description':
+    'Ваше следующее заклинание не требует затрат. Действует 60 сек. (талант жреца)',
+  'entities.abilities.innervate.description':
+    'Живой сок наполняет вас в течение 10 сек. и волнами восполняет 20 ед. текущего ресурса: маны, ярости или энергии. Смена облика не прерывает эффект. Сон, оглушение или стазис останавливают течение сока. (талант друида)',
+  'entities.abilities.mend_pet.name': 'Перевязка',
+  'entities.abilities.mend_pet.description':
+    'Исцеляет союзную цель на {damage} ед. в течение 15 сек. (Талант охотника)',
+  'entities.abilities.meteor.description':
+    'Обрушивает метеор на выбранную область, нанося {damage} ед. урона от Огня. Затем противники в этой области получают от 12 до 18 ед. урона от Огня раз в 2 сек. в течение 6 сек. (талант мага)',
+  'entities.abilities.mind_sear.description':
+    'Поддерживает поток темной энергии в выбранной области, нанося ближайшим противникам {damage} ед. урона каждую секунду. (талант жреца)',
+  'entities.abilities.multi_shot.description':
+    'Выпускает веер стрел в выбранную область, нанося противникам в радиусе 8 м {damage} ед. физического урона. (талант охотника)',
+  'entities.abilities.prayer_of_healing.description':
+    'Восстанавливает ближайшим союзникам {damage} ед. здоровья. (талант жреца)',
+  'entities.abilities.preparation.description':
+    'Завершает восстановление «Спринта», «Уклонения» и «Исчезновения». (талант разбойника)',
+  'entities.abilities.presence_of_mind.description':
+    'Ваше следующее заклинание со временем произнесения становится мгновенным. Действует 60 сек. (Талант мага)',
+  'entities.abilities.psychic_scream.description':
+    'Пугает ближайших противников на срок до 4 сек. Урон может прервать эффект. (талант жреца)',
+  'entities.abilities.shadowstep.description':
+    'Вы проходите сквозь тени к своей цели. (талант разбойника)',
+  'entities.abilities.silence.description':
+    'Лишает цель возможности произносить заклинания на 4 сек. (талант жреца)',
+  'entities.abilities.tranquility.description':
+    'Поддерживает поток целительной энергии в течение 4 сек., восстанавливая союзникам в радиусе 30 м от 42 до 52 ед. здоровья каждую секунду. (талант друида)',
+  'hudChrome.auraEffect.combustionCrit': 'Ваши заклинания огня всегда наносят критический удар',
+  'hudChrome.auraEffect.overloadNext':
+    'Следующее заклинание усилено на {pct}%, но стоит на 50% больше маны',
+  'hudChrome.auraEffect.powerEchoNext':
+    'Следующее прямое заклинание повторяется по той же цели с {pct}% силы',
+  'hudChrome.auraEffect.iceFloesCasts':
+    'Следующие {n} заклинаний с временем чтения можно читать на бегу',
+  'hudChrome.auraEffect.freeCast': 'Следующее заклинание ничего не стоит',
+  'hudChrome.auraEffect.instantCast': 'Следующее заклинание с временем чтения станет мгновенным',
+  'hudChrome.auraEffect.cheapCast': 'Следующее заклинание стоит на {pct}% меньше',
+  'hudChrome.auraEffect.increase.sp': 'Повышает силу заклинаний на {value}',
+  'hudChrome.specPanel.specUnlockBanner': 'Специализация открыта!',
+  'hudChrome.specPanel.specUnlockHint': 'Нажмите N, чтобы выбрать специализацию.',
+  'entities.abilities.cone_of_cold.description':
+    'Обрушивает на ближайших врагов холод, нанося {damage} ед. урона от магии льда. (ключевая способность ветки «Лед»)',
+  'entities.abilities.avatar.description':
+    'Превращает вас в колосса на 20 сек., снимая с вас все эффекты контроля и повышая наносимый урон на 20%.',
+  'entities.abilities.bladestorm.description':
+    'Становится вихрем стали, поражая всех врагов в радиусе 6 м на {damage} ед. урона каждую секунду в течение 4 сек.',
+  'guide.abilityHook.ice_lance':
+    'Мгновенный осколок, расходующий ледяные эффекты и наносящий намного больше урона замороженной цели.',
+  'guide.abilityHook.flurry':
+    'Три быстрых ледяных снаряда охлаждают цель, и следующие ледяные атаки считают её замороженной.',
+  'guide.abilityHook.fingers_of_frost':
+    'Ледяные стрелы иногда усиливают «Ледяное копьё», позволяя ему считать цель замороженной.',
+  'guide.abilityHook.brain_freeze':
+    'Ледяные стрелы иногда делают следующую «Зимнюю плеть» мгновенной и более мощной.',
+  'guide.abilityHook.shatter':
+    'Заклинания гораздо чаще наносят критический урон замороженным целям.',
+  'guide.abilityHook.frozen_orb':
+    'Медленная ледяная сфера проходит сквозь группу врагов, охлаждает всех вокруг и вызывает ледяные эффекты.',
+  'guide.abilityHook.blizzard':
+    'Покрывает область льдом, нанося урон целой группе врагов и замедляя её.',
+  'guide.abilityHook.blink':
+    'Переносит вас на небольшое расстояние вперёд и снимает эффекты обездвиживания.',
+  'hud.pet.waterJet': 'Струя воды',
+  'hud.pet.waterJetTitle': 'Струя воды',
+  'hud.pet.waterJetDesc':
+    'Приказывает элементалю воды в течение 3 сек. поддерживать замедляющий поток. Восстановление: 8 сек. Щёлкните правой кнопкой, чтобы он применял способность автоматически, когда она готова.',
+  'entities.abilities.ice_lance.name': 'Ледяное копьё',
+  'entities.abilities.ice_lance.description':
+    'Бросает ледяное копьё, наносящее {damage} ед. урона от магии льда, втрое больше по замороженной цели. Расходует «Ледяные пальцы» или заряд «Зимней стужи», чтобы считать цель замороженной. (ветка «Лёд»)',
+  'entities.abilities.flurry.name': 'Зимняя плеть',
+  'entities.abilities.flurry.description':
+    'Выпускает три ледяных снаряда, каждый из которых наносит {damage} ед. урона от магии льда, и накладывает на цель «Зимнюю стужу»: следующие 2 подходящих заклинания считают её замороженной. «Заморозка мозгов» делает «Зимнюю плеть» мгновенной, усиливает на 30% и позволяет игнорировать время восстановления. (ветка «Лёд»)',
+  'entities.abilities.frozen_orb.name': 'Ледяной шар',
+  'entities.abilities.frozen_orb.description':
+    'Выпускает вихревой ледяной шар, который движется вперёд 8 сек., ежесекундно наносит ближайшим противникам {damage} ед. урона от магии льда и замедляет их на 30%. Попадания создают «Ледяные пальцы». (ветка «Лёд»)',
+  'entities.abilities.blizzard.name': 'Снежная буря',
+  'entities.abilities.blizzard.description':
+    'Обрушивает на выбранную область ледяную бурю на 6 сек., ежесекундно нанося {damage} ед. урона от магии льда и замедляя врагов на 40%. Каждый поражённый враг сокращает восстановление «Ледяного шара» на 0,5 сек., но не более чем на 3 сек. за одно применение. (ветка «Лёд»)',
+  'entities.abilities.glacial_spike.name': 'Ледяной шип',
+  'entities.abilities.glacial_spike.description':
+    'Создаёт огромный ледяной шип, расходуя 5 сосулек, чтобы нанести {damage} ед. урона от магии льда и приморозить цель к месту на 4 сек. (ветка «Лёд»)',
+  'entities.abilities.glacial_front.name': 'Ледниковый фронт',
+  'entities.abilities.glacial_front.description':
+    'Удерживайте, чтобы накопить расширяющийся фронт холода, затем выпустите его конусом. Чем дольше зарядка, тем больше дальность и урон. Все поражённые враги замедляются на 50% на 4 сек.; при полной зарядке они также обездвиживаются на 1 сек. (ветка «Лёд»)',
+  'entities.abilities.dragons_breath.name': 'Дыхание дракона',
+  'entities.abilities.dragons_breath.description':
+    'Удерживайте, чтобы накопить расширяющееся огненное дыхание, затем выпустите его конусом. Чем дольше зарядка, тем больше дальность и урон. Поражённые враги дезориентированы, пока урон не снимет эффект; при полной зарядке атака всегда критическая и один раз учитывается для «Полосы везения». (ветка «Огонь»)',
+  'entities.abilities.fingers_of_frost.name': 'Ледяные пальцы',
+  'entities.abilities.fingers_of_frost.description':
+    '«Копьё инея» с вероятностью 15% даёт заряд «Ледяных пальцев», вплоть до 2 зарядов: следующее «Ледяное копьё» считает цель замороженной. (ветка «Лёд»)',
+  'entities.abilities.brain_freeze.name': 'Заморозка мозгов',
+  'entities.abilities.brain_freeze.description':
+    '«Копьё инея» с вероятностью 20% делает следующую «Зимнюю плеть» мгновенной, усиливает её на 30% и позволяет игнорировать время восстановления. (ветка «Лёд»)',
+  'entities.abilities.shatter.name': 'Хрупкая погибель',
+  'entities.abilities.shatter.description':
+    'Вероятность критического эффекта ваших заклинаний против замороженных целей повышается на 50%, а урон таких критических ударов на 20%. «Ледяные пальцы» и «Зимняя стужа» также позволяют считать цель замороженной. (ветка «Лёд»)',
+  'entities.abilities.temporal_cascade.name': 'Временной каскад',
+  'entities.abilities.temporal_cascade.description':
+    'Пускает эхо по группе: мгновенно исцеляет цель и до четырёх ближайших к ней союзников и отмечает каждого на {duration} сек. Часть наносимого вами урона от тайной магии возвращается через эхо и исцеляет отмеченных союзников. (хрономантия)',
+  'entities.abilities.temporal_reversal.name': 'Обращение времени',
+  'entities.abilities.temporal_reversal.description':
+    'Обращает ход времени погибшего союзника, возвращая его к жизни рядом с телом с частью здоровья и маны даже во время боя. (хрономантия)',
+  'entities.abilities.temporal_rewind.name': 'Перемотка времени',
+  'entities.abilities.temporal_rewind.description':
+    'Посылает по группе или рейду волну тайной магии, отматывая время и восстанавливая каждому союзнику в радиусе 40 м 30% урона, полученного за последние 5 сек. (не более 35% максимального запаса здоровья). Эффект не может быть критическим. (хрономантия)',
+  'entities.abilities.temporal_acceleration.name': 'Ускорение времени',
+  'entities.abilities.temporal_acceleration.description':
+    'Ускоряет течение времени для группы или рейда, повышая скорость атак, произнесения и поддержания заклинаний на 30% на 15 сек. Союзники, недавно испытавшие «Ускорение времени» или «Жажду крови», слишком утомлены, чтобы получить эффект. (хрономантия)',
+  'entities.abilities.perfect_moment.name': 'Идеальный миг',
+  'entities.abilities.perfect_moment.description':
+    'Ловит идеальный миг: вы мгновенно получаете 4 чародейских заряда, и в течение 10 сек. «Эфирные стрелы» не расходуют их. (хрономантия)',
+  'entities.abilities.arcane_surge.name': 'Эфирный всплеск',
+  'entities.abilities.arcane_surge.description':
+    'Направляет в противника поток чистой тайной энергии, нанося {damage} ед. урона. Каждое применение оставляет чародейский заряд, повышающий урон и скорость произнесения следующего «Эфирного всплеска» (на 5% за заряд), но резко увеличивающий расход маны. Суммируется до 4 раз; «Эфирные стрелы» расходуют заряды. Применение также может подготовить «Эфирный рывок», и следующий «Эфирный всплеск» не потребует маны и будет произнесён вдвое быстрее.',
+  'entities.items.conjured_bread4.name': 'Сотворённый хлеб для пира',
+  'entities.items.conjured_water4.name': 'Сотворённая родниковая вода',
+  'entities.abilities.blazing_barrier.name': 'Пылающая преграда',
+  'entities.abilities.blazing_barrier.description':
+    'Окутывает вас пламенем, поглощая 130 ед. урона в течение 60 сек. (ветка «Огонь»)',
+  'entities.abilities.cold_snap.name': 'Зов зимы',
+  'entities.abilities.cold_snap.description':
+    'Мгновенно завершает восстановление «Мерцающего шага», «Морозной завесы» и «Великой невидимости». (талант мага)',
+  'entities.abilities.greater_invisibility.name': 'Великая невидимость',
+  'entities.abilities.greater_invisibility.description':
+    'Вы исчезаете на 20 сек.: снимает 2 эффекта периодического урона, а получаемый урон снижается на 90% во время невидимости и ненадолго после неё. (талант мага)',
+  'entities.abilities.hot_streak.name': 'Полоса везения',
+  'entities.abilities.hot_streak.description':
+    'Пассивно: два критических попадания подряд огненными заклинаниями («Огненный шар», «Огненный взрыв», «Ожог», «Огненная глыба» или «Огненный столб») делают следующую «Огненную глыбу» или «Огненный столб» мгновенными и бесплатными. Расходующие эффект заклинания, включая бесплатные, учитываются для следующей серии. «Огненный столб» учитывается один раз независимо от числа поражённых врагов, и только его первый удар может быть засчитан. (ветка «Огонь»)',
+  'entities.abilities.ice_floes.name': 'Плавучая льдина',
+  'entities.abilities.ice_floes.description':
+    'Следующие два заклинания со временем произнесения можно применять в движении. Время действия: 15 сек. (талант мага)',
+  'entities.abilities.ignition.name': 'Воспламенение',
+  'entities.abilities.ignition.description':
+    'Пассивно: критические эффекты ваших заклинаний поджигают цель, нанося 40% от причинённого урона за 6 сек. Эффект суммируется. (искусность ветки «Огонь»)',
+  'entities.abilities.mass_barrier.name': 'Массовый барьер',
+  'entities.abilities.mass_barrier.description':
+    'Окружает щитами вас и до 4 ближайших союзников в радиусе 30 м. Каждый щит поглощает 130 ед. урона в течение 60 сек. (талант мага)',
+  'entities.abilities.overload.name': 'Перегрузка',
+  'entities.abilities.overload.description':
+    'Следующее заклинание усиливается на 40%, но расходует на 50% больше маны. Время действия: 10 сек. (талант мага)',
+  'entities.abilities.power_echo.name': 'Эхо силы',
+  'entities.abilities.power_echo.description':
+    'Следующее заклинание прямого действия повторяется с 50% силы на той же цели. Время действия: 10 сек. (талант мага)',
+  'entities.abilities.rings_of_frost.name': 'Кольцо мороза',
+  'entities.abilities.rings_of_frost.description':
+    'Создаёт кольцо на 10 сек. Пересекающие его границу враги замораживаются на 4 сек. (талант мага)',
+  'entities.abilities.rune_of_power.name': 'Руна мощи',
+  'entities.abilities.rune_of_power.description':
+    'Начерчивает у ваших ног руну мощи на 15 сек. Союзники, стоящие в радиусе 8 м, наносят на 10% больше урона. (талант мага)',
+  'entities.abilities.summon_water_elemental.name': 'Призыв элементаля воды',
+  'entities.abilities.summon_water_elemental.description':
+    'Призывает элементаля воды, который сражается рядом с вами, бросает в вашу цель стрелы воды и поддерживает «Струю воды». (ветка «Лёд»)',
+  'entities.mobs.water_elemental.name': 'Элементаль воды',
+  'devCommand.actions.attune.description': 'Отметить все требования допуска выполненными.',
+  'devCommand.actions.attune.label': 'Открыть все допуски',
+  'devCommand.actions.bot.description': 'Создать неподвижного игрока, которому можно шепнуть.',
+  'devCommand.actions.bot.label': 'Создать социального бота',
+  'devCommand.actions.combatreset.description':
+    'Очистить состояние боя и угрозу со стороны противников.',
+  'devCommand.actions.combatreset.label': 'Сбросить бой',
+  'devCommand.actions.cooldowns.description': 'Сбросить таймеры способностей, ГКД и зелий.',
+  'devCommand.actions.cooldowns.label': 'Сбросить время восстановления',
+  'devCommand.actions.despawnall.description':
+    'Удалить всех существ, созданных этим разработчиком.',
+  'devCommand.actions.despawnall.label': 'Удалить моих существ',
+  'devCommand.actions.despawntarget.description':
+    'Удалить выбранное существо, созданное этим инструментом.',
+  'devCommand.actions.despawntarget.label': 'Удалить цель',
+  'devCommand.actions.dungeon.description': 'Войти в подземелье в обход ограничений разработчика.',
+  'devCommand.actions.dungeon.label': 'Войти в подземелье',
+  'devCommand.actions.gather.description': 'Повысить навык собирательной профессии.',
+  'devCommand.actions.gather.label': 'Дать навык сбора',
+  'devCommand.actions.give.description': 'Добавить предмет в инвентарь игрока.',
+  'devCommand.actions.give.label': 'Дать предмет',
+  'devCommand.actions.god.description': 'Переключить неуязвимость и повышенный урон.',
+  'devCommand.actions.god.label': 'Переключить режим бога',
+  'devCommand.actions.gold.description': 'Добавить золото в текущий кошелёк.',
+  'devCommand.actions.gold.label': 'Добавить золото',
+  'devCommand.actions.heal.description': 'Полностью восполнить здоровье.',
+  'devCommand.actions.heal.label': 'Восполнить здоровье',
+  'devCommand.actions.kill.description':
+    'Проверить переходы между состояниями смерти, призрака и трупа.',
+  'devCommand.actions.kill.label': 'Убить игрока',
+  'devCommand.actions.killtarget.description': 'Убить выбранное живое существо.',
+  'devCommand.actions.killtarget.label': 'Убить цель',
+  'devCommand.actions.level.description': 'Установить текущий уровень персонажа.',
+  'devCommand.actions.level.label': 'Установить уровень',
+  'devCommand.actions.lfgboard.description': 'Создать сценарий объявления готовой группы.',
+  'devCommand.actions.lfgboard.label': 'Заполнить доску объявлений',
+  'devCommand.actions.lfgqueue.description': 'Создать сценарий очереди поиска подземелий.',
+  'devCommand.actions.lfgqueue.label': 'Заполнить очередь поиска',
+  'devCommand.actions.lfgraid.description': 'Создать сценарий поиска рейда.',
+  'devCommand.actions.lfgraid.label': 'Заполнить поиск рейда',
+  'devCommand.actions.quest.description': 'Выполнить определённое задание по идентификатору.',
+  'devCommand.actions.quest.label': 'Выполнить задание',
+  'devCommand.actions.quests.description': 'Выполнить все задания в текущем журнале.',
+  'devCommand.actions.quests.label': 'Выполнить активные задания',
+  'devCommand.actions.raid.description': 'Войти прямо на арену Нитраксиса.',
+  'devCommand.actions.raid.label': 'Войти в рейд',
+  'devCommand.actions.raidreset.description': 'Сбросить текущие рейдовые блокировки.',
+  'devCommand.actions.raidreset.label': 'Сбросить блокировку рейда',
+  'devCommand.actions.resource.description': 'Полностью восполнить ману, ярость или энергию.',
+  'devCommand.actions.resource.label': 'Восполнить ресурс',
+  'devCommand.actions.revive.description': 'Воскреснуть обычным способом.',
+  'devCommand.actions.revive.label': 'Воскреснуть',
+  'devCommand.actions.spawn.description': 'Создать определённое существо рядом с игроком.',
+  'devCommand.actions.spawn.label': 'Создать существо',
+  'devCommand.actions.teleport.description': 'Переместиться в точные координаты мира.',
+  'devCommand.actions.teleport.label': 'Телепортироваться',
+  'devCommand.categories.inventory': 'Инвентарь',
+  'devCommand.categories.player': 'Игрок',
+  'devCommand.categories.progress': 'Прогресс',
+  'devCommand.categories.scenarios': 'Сценарии',
+  'devCommand.categories.spawns': 'Созданные существа',
+  'devCommand.categories.travel': 'Перемещение',
+  'devCommand.categoryNavAria': 'Категории команд разработчика',
+  'devCommand.closeAria': 'Закрыть команды разработчика',
+  'devCommand.dialogLabel': 'Центр команд разработчика',
+  'devCommand.difficulty.heroic': 'Героическая',
+  'devCommand.difficulty.normal': 'Обычная',
+  'devCommand.fields.amount': 'Количество',
+  'devCommand.fields.count': 'Число',
+  'devCommand.fields.difficulty': 'Сложность',
+  'devCommand.fields.dungeon': 'Подземелье',
+  'devCommand.fields.gold': 'Золото',
+  'devCommand.fields.item': 'Предмет',
+  'devCommand.fields.level': 'Уровень',
+  'devCommand.fields.mob': 'Существо',
+  'devCommand.fields.name': 'Имя',
+  'devCommand.fields.profession': 'Профессия',
+  'devCommand.fields.quest': 'Задание',
+  'devCommand.fields.x': 'X',
+  'devCommand.fields.z': 'Z',
+  'devCommand.filterLabel': 'Фильтр команд',
+  'devCommand.filterPlaceholder': 'Поиск в этой категории',
+  'devCommand.invalidValues': 'Выберите допустимые значения перед запуском этой команды.',
+  'devCommand.kicker': 'Инструменты разработчика',
+  'devCommand.noMatches': 'Нет подходящих команд.',
+  'devCommand.run': 'Выполнить',
+  'devCommand.sent': 'Отправлено: {command}',
+  'devCommand.serverRequirement': 'Для серверных читов всё ещё требуется ALLOW_DEV_COMMANDS=1.',
+  'devCommand.subtitle': 'Серверные средства управления для тестирования активного мира.',
+  'devCommand.title': 'Центр команд',
+  'hudChrome.claudium.railUsdc': 'USDC',
+  'hudChrome.claudium.usdcBalance': 'USDC: {amount}',
+  'hudChrome.partyFrames.healthNone': 'Нет',
+  'hudChrome.partyFrames.sortName': 'Имя',
+  'hudChrome.partyFrames.sortRole': 'Роль',
+  'apiError.welcome.invalid_input': 'Неверные входные данные.',
+  'welcome.back': 'С возвращением, {name}',
+  'welcome.level': 'Уровень {level}',
+  'welcome.lastPlayed': 'Последняя игра: {when}',
+  'welcome.continue': 'Войти в мир',
+  'welcome.continueHint': 'Enter, чтобы продолжить, Esc, чтобы пропустить',
+  'welcome.continueHintTouch': 'Нажмите, чтобы продолжить',
+  'welcome.discord.title': 'Сообщество живёт в Discord',
+  'welcome.discord.sub':
+    'Превью патчей, события, чат разработчиков и 2 бонусных банковских слота за привязку.',
+  'welcome.discord.join': 'Присоединиться к Discord',
+  'welcome.chest.ready': 'Ежедневный сундук готов',
+  'welcome.armory.cta': 'Открыть и просмотреть Арсенал',
+  'welcome.news.new': 'Новое',
+  'welcome.news.viewAll': 'Смотреть все обновления на GitHub',
+  'hudChrome.auraEffect.battleStance': 'Боевая стойка: на 10% больше создания ярости',
+  'hudChrome.auraEffect.berserkerStance': 'Стойка берсерка: крит. удары на 3% чаще и на 3% сильнее',
+  'hudChrome.auraEffect.crit': 'Повышает шанс критического удара на {pct}%',
+  'hudChrome.auraEffect.rageGen': 'Повышает создание ярости на {pct}%',
+  'hudChrome.auraEffect.reckless':
+    'Повышает шанс критического удара на {pct}% и создание ярости на {ragePct}%',
+  'hudChrome.auraEffect.avatar': 'Колосс: наносимый урон повышен на {pct}%',
+  'hudChrome.auraEffect.bloodbath': 'Повышает шанс критического удара и наносимый урон на {pct}%',
+  'hudChrome.auraEffect.dieBySword': 'Снижает получаемый урон на {pct}%',
+  'hudChrome.auraEffect.sanguine':
+    'Повышает скорость атаки на {hastePct}% и наносимый урон на {dmgPct}%',
+  'hudChrome.auraEffect.battleTrance':
+    'Ваш следующий Удар разорителя или Калечащий удар не потребует ярости',
+  'hudChrome.auraEffect.revengeFree': 'Ваша следующая Месть не потребует ярости',
+  'hudChrome.auraEffect.victoryRush': '«Порыв победы» готов',
+  'hudChrome.auraEffect.maxHpPct': 'Повышает максимальное здоровье на {pct}%',
+  'hud.combat.floatingParry': 'Парировано',
+  'hud.combat.parried': '{target} парирует ваш {ability}.',
+  'hudChrome.options.mouseoverCast': 'Применение по наведению на рамки группы',
+  'hudChrome.options.showTargetOfTarget': 'Показывать цель цели',
+  'hudChrome.unitFrame.targetOfTargetLabel': 'Цель цели',
   'hudChrome.glitchVoice.off': 'Голосовой чат выключен',
   'hudChrome.glitchVoice.connecting': 'Подключение к голосовому чату',
   'hudChrome.glitchVoice.on': 'Голосовой чат включён',

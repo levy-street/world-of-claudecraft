@@ -1,7 +1,7 @@
 {
-  "body": "{\"names\":[],\"ok\":true,\"players_online\":0,\"realm\":\"Claudemoon\",\"steam\":{\"enabled\":false}}",
+  "body": "{\"names\":[],\"ok\":true,\"players_cap\":5000,\"players_online\":0,\"realm\":\"Claudemoon\",\"steam\":{\"enabled\":false}}",
   "headers": {
-    "content-length": 88,
+    "content-length": 107,
     "content-type": "application/json",
     "cross-origin-opener-policy": "same-origin",
     "cross-origin-resource-policy": "same-origin",

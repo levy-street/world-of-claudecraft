@@ -20,6 +20,154 @@ export const en_CA: EnTranslations = {
     "rp": "RP",
     "rpPvp": "RP-PvP"
   },
+  "devCommand": {
+    "dialogLabel": "Developer Command Center",
+    "kicker": "Development tools",
+    "title": "Command Center",
+    "subtitle": "Authoritative test controls for the active world.",
+    "closeAria": "Close developer commands",
+    "categoryNavAria": "Developer command categories",
+    "categories": {
+      "player": "Player",
+      "spawns": "Spawns",
+      "inventory": "Inventory",
+      "progress": "Progress",
+      "travel": "Travel",
+      "scenarios": "Scenarios"
+    },
+    "filterLabel": "Filter commands",
+    "filterPlaceholder": "Search this category",
+    "noMatches": "No matching commands.",
+    "serverRequirement": "Server cheats still require ALLOW_DEV_COMMANDS=1.",
+    "invalidValues": "Choose valid values before running this command.",
+    "sent": "Sent: {command}",
+    "run": "Run",
+    "fields": {
+      "level": "Level",
+      "mob": "Mob",
+      "count": "Count",
+      "item": "Item",
+      "gold": "Gold",
+      "quest": "Quest",
+      "profession": "Profession",
+      "amount": "Amount",
+      "x": "X",
+      "z": "Z",
+      "dungeon": "Dungeon",
+      "difficulty": "Difficulty",
+      "name": "Name"
+    },
+    "difficulty": {
+      "normal": "Normal",
+      "heroic": "Heroic"
+    },
+    "actions": {
+      "heal": {
+        "label": "Restore health",
+        "description": "Fill the health pool."
+      },
+      "resource": {
+        "label": "Restore resource",
+        "description": "Fill mana, rage, or energy."
+      },
+      "cooldowns": {
+        "label": "Clear cooldowns",
+        "description": "Reset ability, GCD, and potion timers."
+      },
+      "god": {
+        "label": "Toggle god mode",
+        "description": "Toggle invulnerability and boosted damage."
+      },
+      "revive": {
+        "label": "Revive",
+        "description": "Revive through the normal resurrection path."
+      },
+      "kill": {
+        "label": "Kill player",
+        "description": "Test death, ghost, and corpse flows."
+      },
+      "combatreset": {
+        "label": "Reset combat",
+        "description": "Clear combat state and hostile threat."
+      },
+      "level": {
+        "label": "Set level",
+        "description": "Set the current character level."
+      },
+      "spawn": {
+        "label": "Spawn mob",
+        "description": "Create a concrete mob near the player."
+      },
+      "killtarget": {
+        "label": "Kill target",
+        "description": "Kill the selected living mob."
+      },
+      "despawntarget": {
+        "label": "Despawn target",
+        "description": "Remove a selected mob created by this tool."
+      },
+      "despawnall": {
+        "label": "Clear my spawns",
+        "description": "Remove every mob spawned by this developer."
+      },
+      "give": {
+        "label": "Give item",
+        "description": "Add an item to the player inventory."
+      },
+      "gold": {
+        "label": "Add gold",
+        "description": "Add gold to the current purse."
+      },
+      "quest": {
+        "label": "Complete quest",
+        "description": "Complete a specific quest by id."
+      },
+      "quests": {
+        "label": "Complete active quests",
+        "description": "Complete every quest in the current log."
+      },
+      "attune": {
+        "label": "Unlock attunements",
+        "description": "Mark all attunement requirements complete."
+      },
+      "gather": {
+        "label": "Grant gathering skill",
+        "description": "Increase a gathering profession."
+      },
+      "teleport": {
+        "label": "Teleport",
+        "description": "Move to exact world coordinates."
+      },
+      "dungeon": {
+        "label": "Enter dungeon",
+        "description": "Enter a dungeon with dev gate bypass."
+      },
+      "raid": {
+        "label": "Enter raid",
+        "description": "Enter the Nythraxis arena directly."
+      },
+      "raidreset": {
+        "label": "Reset raid lockout",
+        "description": "Clear the current raid lockouts."
+      },
+      "bot": {
+        "label": "Spawn social bot",
+        "description": "Create a whisperable stationary player."
+      },
+      "lfgqueue": {
+        "label": "Seed finder queue",
+        "description": "Create a Dungeon Finder queue scenario."
+      },
+      "lfgraid": {
+        "label": "Seed raid finder",
+        "description": "Create a raid finder scenario."
+      },
+      "lfgboard": {
+        "label": "Seed listing board",
+        "description": "Create a premade listing scenario."
+      }
+    }
+  },
   "game": {
     "xp": {
       "suffix": "XP",
@@ -85,6 +233,9 @@ export const en_CA: EnTranslations = {
       "title": "Talents",
       "classTab": "Class",
       "specTab": "Specialization",
+      "choicesTab": "Choices",
+      "rowUnlockToast": "New talent choice available!",
+      "rowUnlocks": "Unlocks at level {level}",
       "available": "Available",
       "spent": "Spent",
       "pointSource": "Earn 1 talent point each level from level {first} to {cap}. Level up to get more points.",
@@ -143,6 +294,7 @@ export const en_CA: EnTranslations = {
         "noTree": "Your class has no talent tree yet.",
         "locked": "You have not unlocked talents yet — they begin at level {level}.",
         "noSpec": "no specialization",
+        "rowsSummary": "Talents: {head}, {picked}/{unlocked} choice rows picked.",
         "summary": "Talents: {head} — {spent}/{total} points spent ({breakdown}).",
         "breakdownClass": "Class {classPts}",
         "breakdownSpec": "Class {classPts}, {spec} {specPts}",
@@ -178,6 +330,10 @@ export const en_CA: EnTranslations = {
       "resurrectAtCorpse": "Resurrect at Corpse",
       "resurrectAtHealer": "The Pale Keeper (Keeper's Toll)",
       "spiritHealerAlive": "The Pale Keeper watches over the dead. You are still among the living."
+    },
+    "fct": {
+      "absorbed": "Absorbed {amount}",
+      "cheap": "Cheap!"
     },
     "emotes": {
       "wave": "Wave",
@@ -215,6 +371,7 @@ export const en_CA: EnTranslations = {
       "remainingLessThanMinute": "<1m",
       "remainingMinutes": "{minutes}m",
       "remainingHoursMinutes": "{hours}h {minutes}m",
+      "remainingDaysHours": "{days}d {hours}h",
       "score": "Score",
       "walletValue": "Wallet Value (WOC)",
       "usd": "{amount} USD",
@@ -229,6 +386,7 @@ export const en_CA: EnTranslations = {
       "spinButton": "Spin",
       "tasks": "Tasks",
       "taskMultiplier": "x{multiplier} multiplier",
+      "oneVsOneExcluded": "1v1 matches do not grant daily reward points.",
       "pointsGained": "{points} daily rewards points gained.",
       "showChestButton": "Show Chest",
       "hideChestButton": "Hide Chest",
@@ -253,7 +411,8 @@ export const en_CA: EnTranslations = {
         "no_wallet": "Connect a wallet with at least $20 USD in WOC.",
         "under_minimum": "Wallet is below the $20 USD WOC minimum.",
         "price_unavailable": "WOC price is unavailable, rewards are temporarily locked.",
-        "banned": "You are banned from Daily Rewards. Reason: {reason}"
+        "banned": "You are banned from Daily Rewards. Reason: {reason}",
+        "bannedUntil": "You are banned from Daily Rewards for another {remaining}. Access returns {until}. Reason: {reason}"
       }
     },
     "wocStore": {
@@ -277,6 +436,18 @@ export const en_CA: EnTranslations = {
       "armoryEyebrow": "Season 1",
       "armoryTitle": "The Armory",
       "armoryBody": "Limited weapon skins from the Season 1 Armory. Account-wide, purely cosmetic, and shown to everyone around you.",
+      "wallet": {
+        "title": "Solana wallet",
+        "unlinked": "Connect a wallet app, then sign once to link its public address to your WoC account. We never receive your recovery phrase or private key.",
+        "connectedUnlinked": "The wallet app is connected to this browser, but its public address is not linked to your WoC account yet.",
+        "linkedDisconnected": "Your public address is linked. Reconnect that wallet app when you want to pay with SOL or WOC.",
+        "linkedConnected": "Your linked wallet app is connected and ready for SOL or WOC purchases.",
+        "mismatched": "A different wallet is connected. Verify it to replace the linked address, or reconnect the linked wallet.",
+        "connect": "Connect wallet",
+        "verify": "Verify and link",
+        "reconnect": "Reconnect wallet",
+        "manage": "Manage wallet"
+      },
       "collectionLine": "{collection} Collection",
       "collections": {
         "guildmark": "Guildmark",
@@ -478,6 +649,7 @@ export const en_CA: EnTranslations = {
       "balanceLabel": "Balance",
       "balanceUnit": "{amount} Claudium",
       "solBalance": "SOL: {amount}",
+      "usdcBalance": "USDC: {amount}",
       "wocBalance": "WOC: {amount}",
       "unavailable": "The Claudium store is unavailable right now. Your balance and purchases are unaffected; please check back shortly.",
       "disclosure": "Claudium is a one-way soft currency: buy it with money and spend it on cosmetics. It cannot be redeemed, transferred, or cashed out.",
@@ -485,10 +657,11 @@ export const en_CA: EnTranslations = {
       "railLabel": "Payment method",
       "railStripe": "Card",
       "railSol": "SOL",
+      "railUsdc": "USDC",
       "railWoc": "WOC",
       "railWocDiscount": "20% off",
       "railWocUnavailable": "WOC pricing is unavailable right now.",
-      "railNativeUnavailable": "SOL/WOC off.",
+      "railNativeUnavailable": "Crypto off.",
       "amountLabel": "Amount",
       "showAmounts": "Show all Claudium amounts",
       "hideAmounts": "Hide extra Claudium amounts",
@@ -568,6 +741,7 @@ export const en_CA: EnTranslations = {
       "playerLabel": "Your Hero",
       "targetLabel": "Your Mark",
       "targetAnnounce": "Mark {name}",
+      "targetOfTargetLabel": "Mark's Mark",
       "partyLabel": "Your Band",
       "partyChip": "Party",
       "partyGroup": "Group {n}",
@@ -856,6 +1030,7 @@ export const en_CA: EnTranslations = {
       "interfaceModeTouch": "Touch",
       "interfaceModeNote": "Auto picks desktop or touch controls from your device. Choose Desktop to force keyboard and mouse (useful on a tablet with a keyboard), or Touch for the on-screen controls.",
       "footstepSounds": "Footstep Sounds",
+      "interfaceSounds": "Interface and Feedback Sounds",
       "clickFeedback": "Click Marker",
       "lockCursorOnRotate": "Lock Cursor While Rotating",
       "keybindHelpLockCursorOnRotate": "Keeps the mouse cursor inside the window while you drag to rotate the camera, so it cannot reach the screen edge or move to another monitor. Turn off if you prefer a free cursor.",
@@ -871,13 +1046,37 @@ export const en_CA: EnTranslations = {
       "startAttackOnAbility": "Auto-Attack on Ability Use",
       "walkByAutoloot": "Walk-by Autoloot",
       "groundReticle": "Ground-Targeting Reticle",
+      "mouseoverCast": "Mouseover Cast on Party Frames",
       "showItemLevel": "Show Item Level",
       "itemLevelLine": "Item Level {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Show Secondary Action Bar",
+      "showTargetOfTarget": "Show Target of Target",
+      "showAttackButton": "Show Attack Button",
       "showDailyRewardsChest": "Show Daily Rewards Chest",
       "mobileCameraJoystick": "Camera joystick",
       "mobileLeftHanded": "Left-handed layout"
+    },
+    "talentRows": {
+      "tab": "Choices",
+      "defaultLoadout": "Default Loadout",
+      "comingSoon": "Coming soon",
+      "readoutSummary": "Talents: {head}, {spent}/{total} rows selected."
+    },
+    "abilityError": {
+      "shieldRequired": "You must have a shield equipped."
+    },
+    "specPanel": {
+      "primaryAttr": "Primary attribute",
+      "complexity": "Complexity",
+      "complexityLow": "Low",
+      "complexityMedium": "Medium",
+      "complexityHigh": "High",
+      "exampleAbilities": "Example abilities",
+      "viewTalents": "View talents",
+      "selectSpec": "Select specialization",
+      "specUnlockBanner": "Specialization Unlocked!",
+      "specUnlockHint": "Press N to choose your specialization."
     },
     "controller": {
       "title": "Controller",
@@ -990,6 +1189,8 @@ export const en_CA: EnTranslations = {
         "spellPower": "Spell Power",
         "critRating": "Crit Rating",
         "hasteRating": "Haste Rating",
+        "parry": "Parry",
+        "hitRating": "Hit Rating",
         "warfare": "Warfare"
       },
       "warfareValue": "+{increase}% dealt / -{reduction}% taken",
@@ -1005,8 +1206,10 @@ export const en_CA: EnTranslations = {
         "dps": "Your estimated weapon damage per second, combining your weapon's damage and speed with your attack power.",
         "critChance": "Your chance for an attack to strike critically, dealing double damage.",
         "dodge": "Your chance to completely avoid an incoming melee attack, taking no damage.",
-        "critRating": "Crit rating from your gear and set bonuses, raising your critical strike chance. About 10 rating grants 1% crit.",
-        "hasteRating": "Haste rating from your gear and set bonuses, speeding up your attacks and spellcasting. About 10 rating grants 1% haste.",
+        "critRating": "Crit rating from your gear and set bonuses, raising the critical strike chance of both your attacks and your spells. Every 10 rating grants exactly 1% crit.",
+        "hasteRating": "Haste rating from your gear and set bonuses, speeding up your attacks and spellcasting. Every 10 rating grants exactly 1% haste.",
+        "parry": "Your chance to fully parry a frontal melee attack, taking no damage. A blow from behind cannot be parried.",
+        "hitRating": "Hit rating from your gear and set bonuses, reducing how often your attacks miss and your spells are resisted, especially against higher-level enemies. Every 10 rating grants exactly 1% hit.",
         "warfare": "Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%."
       },
       "effects": {
@@ -1292,11 +1495,27 @@ export const en_CA: EnTranslations = {
     },
     "dungeonDifficulty": {
       "setHeroic": "Set Dungeon Difficulty: Heroic",
-      "setNormal": "Set Dungeon Difficulty: Normal"
+      "setNormal": "Set Dungeon Difficulty: Normal",
+      "resetAll": "Reset All Instances",
+      "resetDone": "All instances have been reset.",
+      "resetNone": "You have no instances to reset.",
+      "resetOccupied": "You cannot reset instances while someone is still inside.",
+      "resetSameDifficulty": "Change dungeon difficulty before resetting these instances. Empty instances reset on their own after 5 minutes.",
+      "resetLoot": "You cannot reset instances while loot remains inside.",
+      "resetConfirmTitle": "Reset All Instances?",
+      "resetConfirmBody": "This abandons empty instances from your previously selected difficulty. Unclaimed loot will prevent the reset.",
+      "resetConfirm": "Reset Instances",
+      "resetCooldown": "Instances can only be reset once every 5 minutes.",
+      "resetUsage": "Use /dungeon reset to abandon your empty instances after changing difficulty.",
+      "entryMismatchNormal": "This instance is set to Normal difficulty. Use Reset All Instances to start a fresh Heroic run.",
+      "entryMismatchHeroic": "This instance is set to Heroic difficulty. Use Reset All Instances to start a fresh Normal run."
     },
     "bags": {
       "cannotDestroy": "This item cannot be destroyed.",
-      "rightClickDestroy": "Shift+right-click to destroy",
+      "rightClickDestroy": "Right-click to destroy",
+      "dragEquipHint": "Drag onto your character to equip",
+      "dragDestroyHint": "Drag out into the world to destroy",
+      "reorderNeedsRecent": "Clear the filter and sort by Recent to rearrange your bags",
       "filterGroupAria": "Filter bags by category",
       "filterAll": "All",
       "filterWeapon": "Weapons",
@@ -1340,9 +1559,35 @@ export const en_CA: EnTranslations = {
       "attackSpeedSlow": "Slows attack speed by {pct}%",
       "attackSpeedFast": "Increases attack speed by {pct}%",
       "haste": "Increases attack and casting speed by {pct}%",
+      "dmgDone": "Increases damage dealt by {pct}%",
+      "dmgDoneReduce": "Reduces damage dealt by {pct}%",
+      "heatingUp": "Your next consecutive Fire builder critical strike grants Hot Streak; a non-critical builder removes Heating Up",
+      "elementalConvergencePrimed": "Your next spell from the other elemental school grants Elemental Convergence",
+      "battleStance": "Battle Stance: 10% more rage generation",
+      "berserkerStance": "Berserker Stance: crits 3% more often and hit 3% harder",
+      "crit": "Increases critical strike chance by {pct}%",
+      "rageGen": "Increases Rage generation by {pct}%",
+      "reckless": "Increases critical strike chance by {pct}% and Rage generation by {ragePct}%",
+      "avatar": "Colossus: damage dealt increased by {pct}%",
+      "bloodbath": "Increases critical strike chance and damage dealt by {pct}%",
+      "dieBySword": "Reduces damage taken by {pct}%",
+      "sanguine": "Increases attack speed by {hastePct}% and damage dealt by {dmgPct}%",
+      "battleTrance": "Your next Reaver Strike or Brute Swing costs no Rage",
+      "revengeFree": "Your next Revenge costs no Rage",
+      "victoryRush": "Victory Rush is ready",
+      "maxHpPct": "Increases maximum health by {pct}%",
+      "temporalHourglass": "Immune and unable to act; restores health and accelerates cooldown recovery. Right-click to cancel.",
       "tongues": "Increases casting time by {pct}%",
+      "combustionCrit": "Your Fire spells always critically strike",
+      "overloadNext": "Your next spell is amplified by {pct}% but costs 50% more mana",
+      "powerEchoNext": "Your next direct spell repeats at {pct}% power on the same target",
+      "iceFloesCasts": "Your next {n} spells with a cast time can be cast while moving",
+      "freeCast": "Your next cast costs nothing",
+      "instantCast": "Your next spell with a cast time is instant",
+      "cheapCast": "Your next spell costs {pct}% less",
       "increase": {
         "ap": "Increases attack power by {value}",
+        "sp": "Increases spell power by {value}",
         "armor": "Increases armor by {value}",
         "int": "Increases Intellect by {value}",
         "agi": "Increases Agility by {value}",
@@ -1369,6 +1614,8 @@ export const en_CA: EnTranslations = {
       },
       "dodge": "Increases dodge chance by {pct}%",
       "dodgeReduce": "Reduces dodge chance by {pct}%",
+      "damageReduction": "Reduces all damage taken by {pct}%",
+      "guardianWard": "The next lethal enemy hit restores you to {pct}% health instead",
       "armorFlat": "Reduces armor by {value}",
       "armorFlatStacks": "Reduces armor by {value} ({stacks} stacks)",
       "armorPct": "Reduces armor by {pct}%",
@@ -1392,8 +1639,9 @@ export const en_CA: EnTranslations = {
       "imbueRange": "Weapon imbued: {min} to {max} bonus damage on Verdict",
       "stealth": "Concealed; movement speed reduced by {pct}%",
       "formBear": "Bruin Form: increased health and armor",
-      "formCat": "Cat Form: melee damage and energy",
+      "formCat": "Wolf Form: melee damage and energy",
       "formTravel": "Fleet Form: movement speed increased by {pct}%",
+      "formFireball": "Ember Form: movement speed increased by {pct}%; attacks and spells are disabled",
       "defensiveStance": "Guarded Stance: reduced damage taken, more threat",
       "righteousFury": "Burning Oath: greatly increased threat from Holy damage",
       "scale": "Size increased by {pct}%",
@@ -1440,8 +1688,8 @@ export const en_CA: EnTranslations = {
       "removeFromBarAria": "Remove {name} from action bar"
     },
     "nameplate": {
-      "mob": "[{level}] {name}",
-      "mobElite": "[{level}+] {name}"
+      "mobLevel": "{level}",
+      "mobEliteLevel": "{level}+"
     },
     "mobTooltip": {
       "levelFamily": "Level {level} {family}",
@@ -1456,6 +1704,33 @@ export const en_CA: EnTranslations = {
     "playerFrame": {
       "unlock": "Move player frame",
       "lock": "Lock player frame"
+    },
+    "partyFrames": {
+      "section": "Party and Raid Frames",
+      "unlock": "Move party and raid frames",
+      "lock": "Lock party and raid frames",
+      "style": "Frame Style",
+      "styleAutomatic": "Automatic",
+      "styleClassic": "Classic Party Frames",
+      "styleRaid": "Raid Frames",
+      "scale": "Frame Scale",
+      "width": "Frame Width",
+      "height": "Frame Height",
+      "spacing": "Frame Spacing",
+      "columns": "Raid Columns",
+      "healthText": "Health Text",
+      "healthNone": "None",
+      "healthPercent": "Percent",
+      "healthCurrent": "Current",
+      "healthCurrentMax": "Current / Max",
+      "sort": "Sort Players",
+      "sortGroup": "Group",
+      "sortRole": "Role",
+      "sortName": "Name",
+      "showResource": "Show Mana, Rage, and Energy",
+      "showAbsorbs": "Show Absorb Shields",
+      "showAuras": "Show Buffs and Debuffs",
+      "showSelf": "Show Your Frame"
     },
     "frameReset": {
       "label": "Reset Frame Positions"
@@ -1818,22 +2093,37 @@ export const en_CA: EnTranslations = {
       "title": "Gathering",
       "mining": "Mining",
       "logging": "Logging",
-      "herbalism": "Herbalism"
+      "herbalism": "Herbalism",
+      "notReady": "This resource node has not respawned for you yet."
     },
     "archetypeTitle": {
       "label": "Title",
       "none": "None",
-      "hobbyLabel": "Hobby",
-      "armorcrafting": "Armorer",
-      "weaponcrafting": "Weaponsmith",
-      "jewelcrafting": "Jeweler",
-      "alchemy": "Alchemist",
-      "engineering": "Tinkerer",
-      "cooking": "Chef",
-      "inscription": "Scribe",
-      "enchanting": "Enchanter",
-      "tailoring": "Tailor",
-      "leatherworking": "Leathercrafter"
+      "hobbyLabel": "Hobby"
+    },
+    "archetypePair": {
+      "engineering+alchemy": "Bombardier",
+      "alchemy+cooking": "Apothecary",
+      "cooking+leatherworking": "Trapper",
+      "leatherworking+tailoring": "Outfitter",
+      "tailoring+inscription": "Mageweaver",
+      "inscription+enchanting": "Arcanist",
+      "enchanting+jewelcrafting": "Gembinder",
+      "jewelcrafting+weaponcrafting": "Bladewright",
+      "weaponcrafting+armorcrafting": "Smith",
+      "armorcrafting+engineering": "Cogsmith"
+    },
+    "craftName": {
+      "armorcrafting": "Armorcrafting",
+      "weaponcrafting": "Weaponcrafting",
+      "jewelcrafting": "Jewelcrafting",
+      "alchemy": "Alchemy",
+      "engineering": "Engineering",
+      "cooking": "Cooking",
+      "inscription": "Inscription",
+      "enchanting": "Enchanting",
+      "tailoring": "Tailoring",
+      "leatherworking": "Leatherworking"
     },
     "crafting": {
       "title": "Crafting",
@@ -1847,6 +2137,42 @@ export const en_CA: EnTranslations = {
       "insufficientMaterials": "You do not have the materials for that.",
       "unknownRecipe": "That recipe does not exist.",
       "comboRequirementUnmet": "You do not have both required crafts at the required tier for that recipe.",
+      "comboRequires": "Attunement: {craftA} + {craftB}, tier {tier}.",
+      "comboMet": "Ready.",
+      "comboSyncing": "Checking realm attunement.",
+      "comboNotAttuned": "Choose an archetype pair first.",
+      "comboWrongPair": "Activate this exact pair to craft it.",
+      "comboTierUnmet": "Raise both major crafts to the required tier.",
+      "professionChoice": "Profession choice",
+      "noProfessionChoice": "No valid profession choice is currently available.",
+      "pairOptionLabel": "{pair} ({craftA} + {craftB})",
+      "attunementPreview": "Result: {title} title; {majorA} and {majorB} become uncapped majors; {hobby} becomes the rare-capped hobby; all other skill knowledge is retained but capped at common while dormant.",
+      "hobbyPreview": "Result: {hobby} becomes the rare-capped hobby. Both majors and all retained skill values stay unchanged.",
+      "identity": {
+        "title": "Crafting Identity",
+        "syncing": "Waiting for your crafting identity from the realm.",
+        "unattuned": "No archetype pair is active. Your knowledge is retained, but combo recipes require an attuned pair.",
+        "titleLabel": "Title",
+        "majorsLabel": "Majors",
+        "hobbyLabel": "Hobby",
+        "historyLabel": "History",
+        "history": "{pairs} pairs discovered, {returns} returns completed",
+        "roleMajor": "Major",
+        "roleHobby": "Hobby",
+        "roleDormant": "Dormant knowledge",
+        "roleUnattuned": "Unattuned",
+        "ceilingUnlimited": "No empowerment cap",
+        "ceilingRare": "Rare cap",
+        "ceilingCommon": "Common cap",
+        "skillAria": "{craft}, skill {skill}, tier {tier}, {role}, {ceiling}",
+        "colCraft": "Craft",
+        "colSkill": "Skill",
+        "colRole": "Role",
+        "colCap": "Cap",
+        "tutorial": "First tier: reach skill {skill} in a craft. Successful recipes raise that craft without erasing knowledge elsewhere.",
+        "nearTier": "{craft} is {points} skill from its next tier.",
+        "dormantKnowledge": "{craft} knowledge is retained but dormant until its pair or hobby is active."
+      },
       "notAtHub": "You must be at the crafting hub, at the required level, to craft that.",
       "throttled": "You are crafting too quickly. Wait a moment and try again.",
       "recipeNotLearned": "You have not learned that recipe yet."
@@ -2009,9 +2335,10 @@ export const en_CA: EnTranslations = {
       "charTitleNone": "No title chosen",
       "charOpenBook": "Book of Deeds",
       "lbTab": "Renown",
-      "lbDeedsCol": "Deeds",
       "lbTitleCol": "Title",
-      "lbSelf": "Your standing: rank {rank}, top {percent} percent",
+      "lbScopeNote": "Accounts ranked by lifetime Renown. Each deed counts once across all characters on an account.",
+      "lbSelfAccount": "Your account: rank {rank}, top {percent} percent, {renown} Renown",
+      "lbSelfRank": "Your account: rank {rank}, top {percent} percent",
       "lbEmpty": "No ranked chroniclers yet.",
       "broadcastsLabel": "Share deed unlocks with guild and friends",
       "titledName": "{name} [{title}]"
@@ -2115,6 +2442,12 @@ export const en_CA: EnTranslations = {
       "already_linked": "Your account already has a linked Steam account.",
       "account_taken": "That Steam account is already linked to another account.",
       "upstream": "Steam did not respond. Try again in a moment."
+    },
+    "wallet": {
+      "handoff_invalid": "That wallet authorization expired or could not be verified. Try again."
+    },
+    "welcome": {
+      "invalid_input": "Invalid input."
     }
   },
   "guide": {
@@ -2408,7 +2741,7 @@ export const en_CA: EnTranslations = {
       "effectsTitle": "Buffs, debuffs, and crowd control",
       "effectsBody": "Many abilities apply an effect that lingers. Helpful ones (buffs) raise your stats, shield you, or heal you a little at a time; harmful ones (debuffs) drain your health with damage over time or weaken you. Watch the small icons in the top corner of the screen, beside the minimap, to see what is on you and how long it lasts.",
       "ccBody": "Crowd control is a special kind of debuff that limits what a target can do: stuns, roots and slows, silences that stop spellcasting, disarms, fears, and transformations that turn a foe harmless for a moment. Against other players, control wears thin with repetition: the same kind reapplied too quickly weakens and then fails outright, and a stun that opens from stealth is counted apart from the stuns that follow, so nobody can be chained helpless forever. The creatures of the world hold no such grudge: control never weakens with repetition against them, though many of the mightiest foes, named elites and the strongest bosses among them, cannot be controlled at all.",
-      "metersBody": "Curious how a fight went? Press Z to open the party meters, which tally damage, healing, and threat for your group, encounter by encounter.",
+      "metersBody": "Curious how a fight went? Press Shift+H to open the party meters, which tally damage, healing, and threat for your group, encounter by encounter.",
       "queueTitle": "Your next move is already loaded",
       "queueBody": "You do not have to time your presses to the frame. Press your next ability in the closing moments of the current cast and it is queued, firing the instant the cast completes, so practiced play flows without gaps. A press too early is simply refused, so nothing is wasted. Some melee strikes work the same way, riding out on your next weapon swing.",
       "deathTitle": "When you fall",
@@ -2469,7 +2802,7 @@ export const en_CA: EnTranslations = {
       "petBarTerm": "Pet bar",
       "petBarDef": "The command row a hunter or warlock pet adds: Attack, Stop, Taunt, Defensive, and Aggressive, bound to Ctrl plus 1 through 5 by default.",
       "metersTerm": "Damage meters",
-      "metersDef": "The party scoreboard window for the current fight: damage dealt, healing done, and who holds the most threat, kept per encounter. Open it with its keybind (Z by default).",
+      "metersDef": "The party scoreboard window for the current fight: damage dealt, healing done, and who holds the most threat, kept per encounter. Open it with its keybind (Shift+H by default).",
       "targetMarkerTerm": "Target marker",
       "targetMarkerDef": "A symbol any party or raid member can pin over a target so everyone focuses, or avoids, the same one. Eight symbols, one target per symbol.",
       "loadoutTerm": "Loadout",
@@ -2572,10 +2905,10 @@ export const en_CA: EnTranslations = {
     },
     "abilityHook": {
       "heroic_strike": "Queues a heavier swing that spends rage on your next hit.",
+      "revenge": "Sweeps enemies in front of you, with a chance to become free after a dodge or parry.",
+      "hamstring": "Cripples an enemy's movement to keep it from escaping.",
       "battle_shout": "A rallying cry that raises attack power for the party.",
-      "commanding_shout": "Bolsters stamina so everyone has more staying power in a fight.",
       "charge": "Rushes a distant enemy to open the fight with a brief stun.",
-      "rend": "Opens a bleed that wears the target down over time.",
       "thunder_clap": "Hits everything around you and slows their attacks.",
       "seal_of_righteousness": "Imbues your swings with Holy damage, then spend it with Verdict.",
       "holy_light": "A steady, sizable heal for topping off an ally or yourself.",
@@ -2608,9 +2941,18 @@ export const en_CA: EnTranslations = {
       "lightning_shield": "Charges you so attackers take Nature damage when they hit you.",
       "flame_shock": "An instant burn that hits up front and keeps searing over time.",
       "fireball": "Your main fire nuke, lands a hit and leaves the target burning.",
+      "fireball_form": "Become a living ember to cross open ground at high speed.",
       "frost_armor": "A lasting self-buff that hardens your armor before a fight.",
       "arcane_intellect": "Raises Intellect to deepen an ally's mana pool, cast it before the pull.",
       "frostbolt": "Strikes from range and slows the target so it cannot close on you.",
+      "ice_lance": "An instant shard for spending frost procs, it hits far harder on a frozen target.",
+      "flurry": "Three quick bolts that chill the target so your next frost hits land as if it were frozen.",
+      "fingers_of_frost": "Your frost bolts sometimes empower an Ice Lance to strike as if the target were frozen.",
+      "brain_freeze": "Your frost bolts sometimes make the next Flurry instant and harder-hitting.",
+      "shatter": "Your spells crit far more often against frozen targets.",
+      "frozen_orb": "Rolls a slow orb through the pack that chills everything and feeds your frost procs.",
+      "blizzard": "Blankets an area in ice to wear down and slow a whole pack.",
+      "blink": "Teleports you a short distance forward, breaking roots on the way out.",
       "conjure_water": "Conjures drinks that restore mana, so you can refill between pulls.",
       "conjure_food": "Conjures food that restores health when you sit down to eat.",
       "shadow_bolt": "A bolt of shadow you cast at a target, your go-to nuke.",
@@ -2798,6 +3140,8 @@ export const en_CA: EnTranslations = {
       "heroicRewardsTitle": "Heroic Marks and upgraded spoils",
       "heroicRewardsBody": "Heroic bosses drop the loot you know, upgraded and tagged Heroic on the tooltip, and the final boss of each run adds epics found nowhere else. That last kill also leaves Heroic Marks for every participant: a currency spent with Quartermaster Vex in Highwatch, whose stock of rings and necklaces is the only jewelry in the realm.",
       "heroicLockoutBody": "Normal dungeons can be run all day. Heroic asks patience: the final boss kill locks everyone in the run to one heroic clear of that dungeon per day, and the raid keeps a daily lockout for each difficulty. A cleared five-player run stays open to its own party for corpse runs and loot, so nobody is locked away from what they earned there. The raid is stricter: once its kill locks you, the door stays shut until the daily reset, so collect your spoils before you leave the arena.",
+      "resetTitle": "Resetting your instances",
+      "resetBody": "Switch difficulty while your group still holds claimed runs and the old claims linger for a while before clearing on their own. The party leader can let them go at once instead: choose Reset All Instances on their own portrait menu, or type /dungeon reset. A reset works only after the difficulty has actually been changed, only while nobody, living or fallen, remains inside, and a short cooldown separates one reset from the next. Arrive at the door on the wrong difficulty and the game says so before the run starts. The raid is never reset this way; its own lockout rules stand.",
       "templeLoreTitle": "The Drowned Temple, a little deeper",
       "templeLoreBody": "The temple has its own legend, older than the cult you chase elsewhere. On the shore of the Glimmermere, a tarn that drinks the moonlight and gives back the drowned, a lone watcher keeps a gate of pale light. Beneath the surface, a stair of cold stone runs down to it. The folk who sank there did not drown by misadventure: they were the Pale Choir, who went under in worship and never stopped singing. The old wardens scratched a single warning into the rocks before the water took them, a prayer to something they called the Drowned Moon, with a steadier hand adding two words beneath it: it only sleeps.",
       "cryptLeadTitle": "A door the dead were meant to keep shut",
@@ -2905,7 +3249,7 @@ export const en_CA: EnTranslations = {
       "howHeading": "How deeds work",
       "howBody": "Deeds are earned and kept one character at a time, so every hero you play builds a Book of their own; only the realm leaderboard gathers your Renown across every character you play, counting each deed just once. Each deed spells out plainly what it asks of you, right there in the Book of Deeds in game, so you always know what to chase, and you can set a watch on the ones you are after to keep them in sight while you play. A small few stay secret and reveal themselves only once you have earned them. The Book also keeps itself honest: whatever your past record can prove, it credits on the spot, so a veteran never opens it to an empty page; only the counting deeds begin their tally fresh.",
       "renownHeading": "Renown",
-      "renownBody": "Renown is the score behind the Book. Every deed you earn is worth a set amount, and your total only ever climbs, so a quiet week never costs you ground. A handful of deeds turn on luck rather than skill, and Feats are an honor of their own, so both of those are worth no Renown at all.",
+      "renownBody": "Renown is the score behind the Book. Every deed you earn is worth a set amount, and your total only ever climbs, so a quiet week never costs you ground. A handful of deeds turn on luck rather than skill, and Feats are an honor of their own, so both of those are worth no Renown at all. Deeds without Renown still count toward completion in your Book; they simply never score.",
       "rewardsHeading": "Titles and borders",
       "rewardsBody": "The rewards are all for show, and that is the point. Some deeds grant a title you can wear or a border to frame your name, and never anything that makes your hero stronger. Choose the title you want from the Book of Deeds and it rides along on your nameplate, in chat, and on the boards for everyone to see.",
       "chroniclesHeading": "Chronicles",
@@ -2914,7 +3258,7 @@ export const en_CA: EnTranslations = {
       "featsBody": "Feats are a shelf apart: records of legacy and world firsts, the deeds tied to a bygone era or a moment that will only ever happen once. They carry no Renown and sit outside the completion count, kept forever as a memory of what was done.",
       "catalogHeading": "The full roll of deeds",
       "catalogBody": "Here is every deed the Book can hold, gathered by category. The secret ones are left out on purpose, waiting for you to find them. Open the Book of Deeds in game to see exactly what each one asks.",
-      "standingsNote": "The realms keep a running tally of Renown across every account. To see who stands where, open the Leaderboard in game and turn to its Renown tab; the standings live there, not on the wiki.",
+      "standingsNote": "The realms keep a running tally of Renown across every account: the board ranks whole accounts by lifetime Renown, counting each deed once across all your characters, and it shows Renown alone, so deeds that carry none never move the standings even though they count in your Book. To see who stands where, open the Leaderboard in game and turn to its Renown tab; the standings live there, not on the wiki.",
       "catHeading": "{label} ({count})",
       "colName": "Deed",
       "colRenown": "Renown",
@@ -3005,7 +3349,7 @@ export const en_CA: EnTranslations = {
       "qualityNote": "Higher quality usually means better stats, but quality is a hint, not a rule. A well-matched piece for your class and level can beat a flashier one.",
       "upgradeTitle": "Keep your gear current",
       "upgradeBody": "Replacing an old piece with a fresh upgrade does more for you than playing perfectly in gear you have outgrown. When something better drops or a quest offers it, take it. Do not save your good items for later.",
-      "itemLevelBody": "If you want a quick way to compare two pieces, turn on Show Item Level in the options. Gear won out in the world, from enemies and quests, then shows an item level, a single figure for roughly how powerful it is based on where it came from, so you can tell at a glance which upgrade pulls more weight, even across different slots. Pieces with no such source, like plain vendor basics and starter gear, show no item level, so a missing figure is normal, not a fault.",
+      "itemLevelBody": "If you want a quick way to compare two pieces, turn on Show Item Level in the options. Gear with a known source, from enemies, quests, and the crafting trades, then shows an item level, a single figure for roughly how powerful it is based on where it came from, so you can tell at a glance which upgrade pulls more weight, even across different slots. Pieces with no such source, like plain vendor basics and starter gear, show no item level, so a missing figure is normal, not a fault.",
       "sourcesTitle": "Where gear comes from",
       "sourcesBody": "Most of your early upgrades are quest rewards, so it pays to finish quests rather than grind. Enemies drop gear when you defeat them, vendors in town sell solid basics, crafters turn gathered materials into wearable pieces, and the player market lets you buy from other adventurers. At the top of the hill, two mark currencies buy gear found nowhere else: Delve Marks at the delve keeper, and Heroic Marks at the heroic quartermaster.",
       "soulboundTitle": "Soulbound: yours and yours alone",
@@ -3049,19 +3393,19 @@ export const en_CA: EnTranslations = {
       "craftRecipesTitle": "Recipes and reagents",
       "craftRecipesBody": "Every recipe calls for specific reagents you gather or buy. The simplest recipes ask for nothing but common materials and are craftable from the very start, so you can begin working a trade the moment you pick it up. The recipe lists are still filling in: a few trades are waiting on their first recipes, and more arrive as the crafts grow.",
       "craftHowTitle": "The crafting window",
-      "craftHowBody": "Open the Crafting window (default key T) to see every recipe you know, what each one needs, and what you have on hand; when the materials are there, one click does the work. Common recipes can be crafted anywhere in the world. A handful of advanced tool recipes instead ask you to stand at the crafting hub in Highwatch.",
+      "craftHowBody": "Open the Crafting window (default key T) to see every recipe you know, what each one needs, and what you have on hand; when the materials are there, one click does the work. Common recipes can be crafted anywhere in the world. A handful of advanced recipes, higher-tier tools and rare caster armor among them, instead ask you to stand at the crafting hub in Highwatch.",
       "craftMasteryTitle": "Skill and mastery",
-      "craftMasteryBody": "Crafting successfully builds skill in that trade, and skill never locks a craft's recipes away: if you know a recipe and hold its materials, you can attempt it. What skill buys you instead is quality, a practiced hand turns out finer work. The one exception is combination recipes, which ask you to have proven yourself in both of their crafts before they open up.",
+      "craftMasteryBody": "Crafting successfully builds skill in that trade, and skill never locks a craft's recipes away: if you know a recipe and hold its materials, you can attempt it. What skill buys you instead is quality, a practiced hand turns out finer work. The one exception is combination recipes, which open only to a crafter attuned to the archetype that joins their two crafts, with proven skill in both.",
       "craftComboTitle": "Combination recipes",
-      "craftComboBody": "Beyond a single craft's own recipe list, the wheel also supports combination recipes that call on two neighboring crafts at once, rewarding a character who has invested in adjacent trades on the ring rather than one in isolation. The crafter must hold both trades themselves; a partner's skill cannot stand in for either half.",
+      "craftComboBody": "Beyond a single craft's own recipe list, the wheel also supports combination recipes that call on two neighboring crafts at once, rewarding a character who has invested in adjacent trades on the ring rather than one in isolation. The crafter must hold both trades themselves and carry the attunement that joins them; a partner's skill cannot stand in for either half.",
       "archetypeTitle": "The ten archetypes",
-      "archetypeIntro": "Each of the ten crafts also stands for an archetype, a broader identity you can adopt beyond just working that trade. Your active archetype is a single choice at a time, not a checklist: you carry one, and can change which one later if you choose to.",
+      "archetypeIntro": "Every two neighboring crafts on the wheel together form an archetype, a broader identity you can adopt beyond just working a trade, and each of the ten pairs carries a name of its own. Your active archetype is a single choice at a time, not a checklist: you carry one, and can change which one later if you choose to.",
       "archetypeChooseTitle": "Choosing your archetype",
-      "archetypeChooseBody": "Declaring an archetype will be a story moment: a quest that formally accepts you into that identity. That road is still being built, so for now every character walks the world with the choice ahead of them, and every craft advances to the rare quality tier in the meantime.",
+      "archetypeChooseBody": "Declaring an archetype is a story moment: a quest that formally accepts you into that identity. Until you declare, every craft advances to the rare quality tier. Once you take up a pair, its two trades open all the way, a craft from the far side of the wheel stays with you as a hobby that still works to the rare tier, and every other trade rests at the common tier while you carry that identity.",
       "archetypeSwitchTitle": "Changing your mind",
-      "archetypeSwitchBody": "Nor will a declaration be a life sentence. The plan is a repeatable act of making amends to your old trade before taking up a new one, with the amends growing steeper each time you switch, so the choice stays meaningful rather than costless. Like the declaration itself, it is still on its way.",
+      "archetypeSwitchBody": "Nor is a declaration a life sentence. Taking up a pair you have never carried is simply a fresh declaration, while returning to an identity you once held asks a repeatable act of making amends first, growing steeper with each switch you have made, so the choice stays meaningful rather than costless.",
       "archetypeIdentityTitle": "What your archetype means",
-      "archetypeIdentityBody": "Your active archetype is a statement about who your character is in the world, recognized in how others and the world address you. The exact rewards and recognition that come with it are still being finalized; check back as the system fills in."
+      "archetypeIdentityBody": "Your active archetype is a statement about who your character is in the world: each of the ten pairs carries a name of its own, worn as a title on your character sheet and in the crafting window."
     },
     "economy": {
       "intro": "Coin oils the whole world: it buys your gear, supplies, and travel kit, and changes hands between players. You pick all of this up just by playing, so think of this page as a map of where your money comes from and goes.",
@@ -3716,6 +4060,7 @@ export const en_CA: EnTranslations = {
     "title": "Download Desktop Launcher",
     "desc": "Get the standalone launcher for optimized performance and full-screen play.",
     "macCta": "Download for macOS",
+    "windowsCta": "Download for Windows",
     "linuxCta": "Download for Linux",
     "linuxHint": "AppImage: make it executable, then run it. No install needed.",
     "windowsPending": "Windows build pending."
@@ -3794,8 +4139,8 @@ export const en_CA: EnTranslations = {
   "wallet": {
     "label": "$WOC Wallet",
     "connect": "Verify Wallet",
-    "connectTitle": "Verify your Solana wallet",
-    "connectAria": "Verify your Solana wallet",
+    "connectTitle": "Connect a Solana wallet",
+    "connectAria": "Connect a Solana wallet",
     "verify": "Verify Wallet",
     "verifyNew": "Verify New Wallet",
     "verifyTitle": "Choose a wallet and sign once to verify ownership.",
@@ -3830,6 +4175,9 @@ export const en_CA: EnTranslations = {
     "balancePreviewTitle": "Connected wallet $WOC balance preview",
     "balancePreviewAria": "Connected wallet balance preview: {balance}. Link the wallet to verify holder flair.",
     "balanceAmount": "{amount} $WOC",
+    "bagConnect": "Link wallet",
+    "bagLink": "Verify wallet",
+    "bagReconnect": "Reconnect wallet",
     "connected": "Connected: {address}",
     "connectedWithBalance": "Connected: {balance} - {address}",
     "connectedLinked": "Verified: {address}",
@@ -3843,13 +4191,38 @@ export const en_CA: EnTranslations = {
     "helpLinkedWithBalance": "Holder perks are active. Wallet app connected on this browser.",
     "helpLinkedDisconnected": "Holder perks are active. Connect the app when you need to sign or spend.",
     "helpLinkedDisconnectedWithBalance": "Holder perks are active. Connect the app when you need to sign or spend.",
-    "extensionHelp": "To see a wallet here, keep a browser wallet extension such as Solflare Wallet active.",
+    "extensionHelp": "Choose an installed browser wallet, or open Reown AppKit for Phantom, Solflare, Backpack, and more.",
+    "mobileAppHelp": "Choose Phantom or Solflare. Your wallet app will ask for approval. Keep this game open and return to it when finished.",
+    "standaloneAppHelp": "Wallet connections are not available in the Home Screen app yet. Open World of ClaudeCraft in Safari or Chrome to use Phantom or Solflare.",
+    "openAppTitle": "Continue in {wallet}",
+    "openAppHelp": "Open {wallet} to review this request. Keep this game tab open while the wallet app is active.",
+    "openAppButton": "Open {wallet}",
+    "manualReturnBrowserHelp": "After approval, return to this game tab. If iOS opens another browser, close it and return to the original browser manually.",
+    "manualReturnStandaloneHelp": "After approval, return to World of ClaudeCraft from your Home Screen. If iOS opens a browser, close it and reopen the Home Screen app manually.",
+    "preparingAppButton": "Preparing {wallet}...",
+    "walletAppUnavailable": "{wallet} could not be prepared. Close this window and try again.",
     "flowConnect": "Choose a wallet. Verification continues automatically.",
     "flowSign": "Sign the verification message in your wallet app. No transaction or SOL required.",
     "flowVerify": "Verifying wallet ownership...",
     "linkFailed": "Wallet verification failed.",
     "verifyFailed": "Wallet verification failed.",
     "unlinkFailed": "Could not unlink wallet.",
+    "browser": {
+      "eyebrow": "Desktop wallet authorization",
+      "title": "Connect a Solana Wallet",
+      "linkBody": "Choose a wallet extension in this browser. You will sign a verification message, then return to the desktop app.",
+      "paymentBody": "Choose the wallet linked to your account and approve the transaction in this browser.",
+      "extensionHelp": "No compatible wallet extension was found. Install or unlock Phantom, Solflare, or another Solana browser wallet, then retry.",
+      "safety": "World of ClaudeCraft never asks for your recovery phrase or private key.",
+      "continueWith": "Continue with {wallet}",
+      "reviewTitle": "Review in your wallet",
+      "reviewBody": "Follow the prompt from {wallet}. Keep this browser page open.",
+      "completeTitle": "Wallet authorization complete",
+      "completeBody": "You can return to the World of ClaudeCraft desktop app.",
+      "returnButton": "Return to desktop app",
+      "failed": "Wallet authorization failed or expired. Return to the desktop app and try again.",
+      "retry": "Retry"
+    },
     "holder": "$WOC holder",
     "holderTierTitle": "{tier} $WOC holder",
     "holderTiers": {
@@ -4170,6 +4543,24 @@ export const en_CA: EnTranslations = {
   "heroicShop": {
     "balance": "Heroic Marks: {count}",
     "buyAria": "Buy {item} for {marks} Heroic Marks"
+  },
+  "cardDuel": {
+    "title": "Card Duel",
+    "close": "Close",
+    "join": "Join Queue",
+    "joinAria": "Join the Card Duel queue",
+    "leave": "Leave Queue",
+    "leaveAria": "Leave the Card Duel queue",
+    "forfeit": "Forfeit",
+    "forfeitAria": "Forfeit the Card Duel",
+    "queued": "Waiting for an opponent...",
+    "unavailable": "Card Duel requires another player online.",
+    "vsOpponent": "vs {name}",
+    "round": "Round score: {mine} - {theirs}",
+    "counts": "Deck: {deck} · Discard: {discard}",
+    "playCardAria": "Play the {value} card",
+    "waitingOnOpponent": "Waiting on your opponent's card...",
+    "yourTurn": "Play a card"
   },
   "delveUi": {
     "board": {
@@ -4604,6 +4995,8 @@ export const en_CA: EnTranslations = {
     "connectionLost": "Connection to the server was lost.",
     "reconnecting": "Connection lost. Reconnecting...",
     "connectionRejected": "The server closed the connection.",
+    "realmFull": "This world is full right now. Please try again in a few minutes.",
+    "tooManyConnections": "Too many connections to this world are coming from your network. Please close extra game windows or try again in a few minutes.",
     "tips": {
       "classes": "Tip: each of the 9 classes plays differently. Try a few before committing to one.",
       "talents": "Tip: you can reset your talents any time you are out of combat, so an early pick is never a trap.",
@@ -4668,6 +5061,11 @@ export const en_CA: EnTranslations = {
       "fatalBody": "World of ClaudeCraft hit an unexpected error and needs to close."
     }
   },
+  "gpuNotice": {
+    "bodyDesktop": "The game is running without GPU acceleration and will be slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
+    "bodyWeb": "The game is running without GPU acceleration and will be slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.",
+    "dismiss": "Dismiss"
+  },
   "realm": {
     "noRealms": "No worlds available.",
     "loading": "Loading worlds...",
@@ -4681,9 +5079,9 @@ export const en_CA: EnTranslations = {
     "medium": "Medium",
     "low": "Low",
     "popTipLow": "Low population: fewer than 15 players online right now. Plenty of room; great for a fresh start.",
-    "popTipMedium": "Medium population: 15 to 39 players online right now. A healthy, active world.",
-    "popTipHigh": "High population: 40 to 79 players online right now. Busy, with lots of players around.",
-    "popTipFull": "Full population: 80 or more players online right now. Very busy; you may wait in a login queue.",
+    "popTipMedium": "Medium population: 15 to 79 players online right now. A healthy, active world.",
+    "popTipHigh": "High population: 80 or more players online right now. Busy, with lots of players around.",
+    "popTipFull": "Full population: this world is at capacity right now. New logins are declined until a player logs out.",
     "popTipOffline": "Offline: this world is unreachable right now and cannot be joined.",
     "characterCountOne": "{count} character",
     "characterCountOther": "{count} characters",
@@ -4813,6 +5211,29 @@ export const en_CA: EnTranslations = {
     "heading": "The world is temporarily unavailable.",
     "body": "We are restarting the game service and expect Claudemoon to return shortly. This page will keep checking automatically.",
     "status": "Back soon"
+  },
+  "welcome": {
+    "back": "Welcome back, {name}",
+    "level": "Level {level}",
+    "lastPlayed": "Last played {when}",
+    "continue": "Enter World",
+    "continueHint": "Enter to continue, Esc to skip",
+    "continueHintTouch": "Tap to continue",
+    "discord": {
+      "title": "The community lives on Discord",
+      "sub": "Patch previews, events, dev chat, and 2 bonus bank slots for linking.",
+      "join": "Join our Discord"
+    },
+    "chest": {
+      "ready": "Daily chest ready"
+    },
+    "armory": {
+      "cta": "Enter and browse the Armory"
+    },
+    "news": {
+      "new": "New",
+      "viewAll": "View all updates on GitHub"
+    }
   },
   "hud": {
     "core": {
@@ -5071,11 +5492,14 @@ export const en_CA: EnTranslations = {
       "openTrade": "Open Trade",
       "duelRequest": "{name} has challenged you to a duel!",
       "acceptDuel": "Accept Duel",
+      "resurrectionOffer": "{name} wants to return you to life. Do you accept?",
+      "acceptResurrection": "Accept Resurrection",
       "decline": "Decline"
     },
     "combat": {
       "floatingMiss": "Miss",
       "floatingDodge": "Dodge",
+      "floatingParry": "Parry",
       "floatingResist": "Resist",
       "cannotMove": "Can't move!",
       "attack": "attack",
@@ -5085,6 +5509,7 @@ export const en_CA: EnTranslations = {
       "damageTakenCrit": "{source} critically hits you for {amount}.",
       "miss": "Your {ability} misses {target}.",
       "dodged": "Your {ability} is dodged by {target}.",
+      "parried": "Your {ability} is parried by {target}.",
       "resisted": "Your {ability} is resisted by {target}.",
       "healSelf": "Your {ability} heals you for {amount}.",
       "healSelfCrit": "Your {ability} critically heals you for {amount}.",
@@ -5245,6 +5670,7 @@ export const en_CA: EnTranslations = {
     },
     "pet": {
       "attack": "Attack",
+      "waterJet": "Water Jet",
       "taunt": "Taunt",
       "healDemon": "Heal Demon",
       "healPet": "Feed Pet",
@@ -5253,8 +5679,10 @@ export const en_CA: EnTranslations = {
       "aggressive": "Aggressive",
       "petAttackTitle": "Pet Attack",
       "petAttackDesc": "Command your pet to attack your current hostile target.",
+      "waterJetTitle": "Water Jet",
+      "waterJetDesc": "Command your Water Elemental to channel a slowing stream for 3 seconds. 8 second cooldown. Right-click to auto-cast it whenever it is off cooldown.",
       "petTauntTitle": "Pet Taunt",
-      "petTauntDesc": "Command your pet to engage and Growl when in range. 10 second cooldown.",
+      "petTauntDesc": "Command your pet to engage and Growl when in range. 10 second cooldown. Right-click to auto-cast it whenever it is off cooldown.",
       "healDemonDesc": "Spend mana to channel healing into your demon over 5 seconds.",
       "healPetDesc": "Click, then click food in your bags to feed your pet, healing it over 5 seconds.",
       "stanceTitle": "Pet Stance",
@@ -5263,7 +5691,7 @@ export const en_CA: EnTranslations = {
       "defensiveDesc": "Attacks enemies that hurt you or your pet.",
       "aggressiveDesc": "Attacks nearby hostile enemies.",
       "rename": "Rename Pet",
-      "revive": "Revive Pet",
+      "revive": "Patch Up",
       "abandon": "Abandon Pet",
       "cancel": "Cancel",
       "renameLabel": "Choose a new pet name.",
@@ -5375,6 +5803,7 @@ export const en_CA: EnTranslations = {
     "actionBar": {
       "attackName": "Attack",
       "attackTooltip": "Toggle auto-attack on your target. Right-clicking an enemy also attacks.",
+      "attackRemoveHint": "Right-click to remove it from the bar and free the slot.",
       "emptySlot": "Empty slot",
       "slotAria": "Action slot {slot}: {ability}",
       "emptySlotAria": "Action slot {slot}: empty",
@@ -5518,6 +5947,8 @@ export const en_CA: EnTranslations = {
     },
     "slots": {
       "mainhand": "Main Hand",
+      "twoHand": "Two-Hand",
+      "offhand": "Off Hand",
       "helmet": "Helmet",
       "neck": "Neck",
       "shoulder": "Shoulder",
@@ -5558,7 +5989,8 @@ export const en_CA: EnTranslations = {
       "attackPower": "Attack Power",
       "dps": "Damage/sec",
       "critChance": "Crit Chance",
-      "dodge": "Dodge"
+      "dodge": "Dodge",
+      "parry": "Parry"
     },
     "tooltip": {
       "qualityKind": "{quality} {kind}",
@@ -5784,7 +6216,7 @@ export const en_CA: EnTranslations = {
         "description": "Rains arrows on the target area for 3 sec, dealing {damage} damage every 0.5 sec to enemies caught in it."
       },
       "hurricane": {
-        "name": "Hurricane",
+        "name": "Galeheart",
         "description": "Calls a hurricane onto the target area for 6 sec, battering enemies for {damage} Nature damage each second."
       },
       "earthquake": {
@@ -5797,23 +6229,15 @@ export const en_CA: EnTranslations = {
       },
       "battle_shout": {
         "name": "Iron Bellow",
-        "description": "A shout that increases the attack power of all party members by {buff}% for 2 min."
-      },
-      "commanding_shout": {
-        "name": "Bolstering Cry",
-        "description": "Increases your Stamina by {buff} for 2 min."
+        "description": "A shout that increases the attack power of all party members by {buff}% for 30 min."
       },
       "demoralizing_shout": {
         "name": "Direhowl",
-        "description": "Lets out a fearsome shout, reducing the attack power of all nearby enemies by {buff} for 30 sec."
+        "description": "Lets out a fearsome shout, reducing the damage dealt by all nearby enemies by {buff}% for 20 sec."
       },
       "charge": {
         "name": "Onrush",
-        "description": "Charges an enemy, generating 9 rage and stunning it for 1 sec. 8-25 yd range."
-      },
-      "rend": {
-        "name": "Deep Gash",
-        "description": "Wounds the target, causing them to bleed for {damage} damage over {duration} sec."
+        "description": "Rushes an enemy, generating 9 rage and stunning it for 1 sec. 8-25 yd range."
       },
       "thunder_clap": {
         "name": "Quaking Blow",
@@ -5853,11 +6277,15 @@ export const en_CA: EnTranslations = {
       },
       "taunt": {
         "name": "Goad",
-        "description": "Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec."
+        "description": "Goads the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec."
       },
       "fireball": {
         "name": "Cinderbolt",
         "description": "Hurls a fiery ball that causes {damage} Fire damage plus additional damage over time."
+      },
+      "fireball_form": {
+        "name": "Ember Form",
+        "description": "Transform into a blazing ember, increasing movement speed by {buff}%. You cannot attack or cast spells while transformed. Recast to return to your normal form."
       },
       "frost_armor": {
         "name": "Hoarfrost Mantle",
@@ -5870,6 +6298,94 @@ export const en_CA: EnTranslations = {
       "frostbolt": {
         "name": "Rimelance",
         "description": "Launches a bolt of frost, causing {damage} Frost damage and slowing movement by 40%."
+      },
+      "blazing_barrier": {
+        "name": "Blazing Barrier",
+        "description": "Wreathe yourself in flame, absorbing 130 damage for 60 sec. (Fire)"
+      },
+      "cold_snap": {
+        "name": "Winter's Recall",
+        "description": "Finishes the cooldown on Flickerstep, Frostveil, and Greater Invisibility. (Mage talent)"
+      },
+      "greater_invisibility": {
+        "name": "Greater Invisibility",
+        "description": "Vanish for 20 sec: removes 2 damage-over-time effects and you take 90% less damage while invisible and shortly after. (Mage talent)"
+      },
+      "hot_streak": {
+        "name": "Hot Streak",
+        "description": "Passive: two critical strikes in a row with your Fire spells (Cinderbolt, Cinderfall, Scald, Pyrelance or Flamestrike) make your next Pyrelance or Flamestrike instant and free. The spenders count toward the NEXT streak, free casts included; a Flamestrike counts once however many enemies it strikes, and only the initial impact ever counts. (Fire)"
+      },
+      "ice_floes": {
+        "name": "Ice Floes",
+        "description": "Your next two spells with a cast time can be cast while moving. Lasts 15 sec. (Mage talent)"
+      },
+      "ignition": {
+        "name": "Ignition",
+        "description": "Passive: your spell critical strikes burn the target for 40% of the damage dealt over 6 sec, stacking. (Fire mastery)"
+      },
+      "mass_barrier": {
+        "name": "Mass Barrier",
+        "description": "Shields you and up to 4 nearby allies within 30 yd, each absorbing 130 damage for 60 sec. (Mage talent)"
+      },
+      "overload": {
+        "name": "Overload",
+        "description": "Your next spell is amplified by 40% but costs 50% more mana. Lasts 10 sec. (Mage talent)"
+      },
+      "power_echo": {
+        "name": "Power Echo",
+        "description": "Your next direct spell repeats at 50% power on the same target. Lasts 10 sec. (Mage talent)"
+      },
+      "rings_of_frost": {
+        "name": "Ring of Frost",
+        "description": "Summons a ring for 10 sec. Enemies crossing its perimeter are frozen for 4 sec. (Mage talent)"
+      },
+      "rune_of_power": {
+        "name": "Rune of Power",
+        "description": "Inscribe a rune of power at your feet for 15 sec: allies standing within 8 yd deal 10% more damage. (Mage talent)"
+      },
+      "summon_water_elemental": {
+        "name": "Summon Water Elemental",
+        "description": "Summon a Water Elemental to fight beside you, hurling Waterbolts at your target and channeling Water Jet. (Frost)"
+      },
+      "ice_lance": {
+        "name": "Ice Lance",
+        "description": "Hurl a shard of ice, dealing {damage} Frost damage, tripled against a frozen target. Spends Fingers of Frost, or a charge of Winter's Chill, to treat the target as frozen. (Frost)"
+      },
+      "flurry": {
+        "name": "Winterlash",
+        "description": "Loose three icy bolts for {damage} Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Winterlash instant, 30% harder, and skips its cooldown. (Frost)"
+      },
+      "frozen_orb": {
+        "name": "Frozen Orb",
+        "description": "Release an orb of swirling frost that drifts forward for 8 sec, dealing {damage} Frost damage each second to nearby enemies and slowing them by 30%. Its strikes generate Fingers of Frost. (Frost)"
+      },
+      "blizzard": {
+        "name": "Blizzard",
+        "description": "Calls an ice storm onto the target area for 6 sec, dealing {damage} Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frozen Orb, up to 3 sec per cast. (Frost)"
+      },
+      "glacial_spike": {
+        "name": "Glacial Spike",
+        "description": "Conjure a massive spike of ice, consuming 5 Icicles to deal {damage} Frost damage and freeze the target in place for 4 sec. (Frost)"
+      },
+      "glacial_front": {
+        "name": "Glacial Front",
+        "description": "Hold to gather a widening front of frost, then release it in a cone. Longer charges reach farther and deal more damage. All enemies hit are slowed by 50% for 4 sec; maximum charge also roots them for 1 sec. (Frost)"
+      },
+      "dragons_breath": {
+        "name": "Dragon's Breath",
+        "description": "Hold to gather a widening breath of flame, then release it in a cone. Longer charges reach farther and deal more damage. Enemies hit are disoriented and damage breaks the effect; maximum charge always critically strikes and counts once toward Hot Streak. (Fire)"
+      },
+      "fingers_of_frost": {
+        "name": "Fingers of Frost",
+        "description": "Rimelance has a 15% chance to grant Fingers of Frost, up to 2 charges: your next Ice Lance treats its target as frozen. (Frost)"
+      },
+      "brain_freeze": {
+        "name": "Brain Freeze",
+        "description": "Rimelance has a 20% chance to make your next Winterlash instant, 30% harder, and free of its cooldown. (Frost)"
+      },
+      "shatter": {
+        "name": "Brittle Ruin",
+        "description": "Your spells gain 50% critical strike chance against frozen targets, and those critical strikes deal 20% more damage. Fingers of Frost and Winter's Chill count as frozen. (Frost)"
       },
       "conjure_water": {
         "name": "Waterbind",
@@ -5901,7 +6417,7 @@ export const en_CA: EnTranslations = {
       },
       "scorch": {
         "name": "Scald",
-        "description": "Scorches the enemy for {damage} Fire damage. Quick to cast."
+        "description": "Scalds the enemy for {damage} Fire damage. Quick to cast."
       },
       "pyroblast": {
         "name": "Pyrelance",
@@ -5921,7 +6437,7 @@ export const en_CA: EnTranslations = {
       },
       "backstab": {
         "name": "Craven Thrust",
-        "description": "Backstab the target for 150% weapon damage plus {damage}. Must be behind the target. Requires a dagger. Awards 1 combo point."
+        "description": "Drive your dagger into the target's back for 150% weapon damage plus {damage}. Must be behind the target. Requires a dagger. Awards 1 combo point."
       },
       "gouge": {
         "name": "Eye Jab",
@@ -5945,7 +6461,7 @@ export const en_CA: EnTranslations = {
       },
       "ambush": {
         "name": "Lurker's Strike",
-        "description": "Ambush the target for 250% weapon damage plus {damage}. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point."
+        "description": "Strike from the shadows for 250% weapon damage plus {damage}. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point."
       },
       "stealth": {
         "name": "Duskveil",
@@ -5957,7 +6473,7 @@ export const en_CA: EnTranslations = {
       },
       "garrote": {
         "name": "Throat Wire",
-        "description": "Garrote the enemy, causing {damage} damage now and bleeding it for {overTime} over 18 sec. Must be stealthed. Awards 1 combo point."
+        "description": "Loop a wire around the enemy's throat, causing {damage} damage now and bleeding it for {overTime} over 18 sec. Must be stealthed. Awards 1 combo point."
       },
       "cheap_shot": {
         "name": "Gut Punch",
@@ -5981,7 +6497,7 @@ export const en_CA: EnTranslations = {
       },
       "vanish": {
         "name": "Smokestep",
-        "description": "Vanish from sight, entering Duskveil even in combat. You move 50% slower while hidden. Lasts up to 10 sec."
+        "description": "Melt from sight, entering Duskveil even in combat. You move 50% slower while hidden. Lasts up to 10 sec."
       },
       "instant_poison": {
         "name": "Adder's Bite",
@@ -5993,7 +6509,7 @@ export const en_CA: EnTranslations = {
       },
       "blind": {
         "name": "Dirt Toss",
-        "description": "Blinds the target, causing it to wander disoriented for 8 sec. Any damage breaks the effect."
+        "description": "Tosses dirt into the target's eyes, causing it to wander disoriented for 8 sec. Any damage breaks the effect."
       },
       "seal_of_righteousness": {
         "name": "Oathbrand",
@@ -6029,7 +6545,7 @@ export const en_CA: EnTranslations = {
       },
       "holy_taunt": {
         "name": "Sacred Goad",
-        "description": "Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec."
+        "description": "Goads the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec."
       },
       "flash_of_light": {
         "name": "Lightmend",
@@ -6265,7 +6781,7 @@ export const en_CA: EnTranslations = {
       },
       "growl": {
         "name": "Menace",
-        "description": "Growls at the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec. Bruin Form only."
+        "description": "Menaces the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec. Bruin Form only."
       },
       "cat_form": {
         "name": "Wolf Form",
@@ -6281,7 +6797,7 @@ export const en_CA: EnTranslations = {
       },
       "swipe": {
         "name": "Sweeping Claws",
-        "description": "Swipe nearby enemies for {damage} damage. Causes extra threat. Bruin Form only."
+        "description": "Sweep your claws through nearby enemies for {damage} damage. Causes extra threat. Bruin Form only."
       },
       "regrowth": {
         "name": "Second Bloom",
@@ -6290,6 +6806,14 @@ export const en_CA: EnTranslations = {
       "barkskin": {
         "name": "Oakhide",
         "description": "Your skin hardens like bark, increasing armor by 150 for 15 sec."
+      },
+      "sacred_bulwark": {
+        "name": "Sacred Bulwark",
+        "description": "For {duration} sec, the next enemy hit that would kill you is denied, restoring you to 35% health instead."
+      },
+      "primal_reflexes": {
+        "name": "Primal Reflexes",
+        "description": "Your instincts sharpen, increasing your chance to dodge by 50% for 6 sec."
       },
       "starfire": {
         "name": "Skyfall",
@@ -6329,7 +6853,7 @@ export const en_CA: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Wolfsblood",
-        "description": "Increases attack power by 40 for 6 sec. Wolf Form only."
+        "description": "Increases attack power by {buff} for {duration} sec. Wolf Form only."
       },
       "rip": {
         "name": "Rip",
@@ -6361,7 +6885,7 @@ export const en_CA: EnTranslations = {
       },
       "chain_heal": {
         "name": "Chain Heal",
-        "description": "Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 50% less with each jump. (Restoration signature)"
+        "description": "Heals a friendly target for 120 to 145, then jumps to up to 2 additional nearby allies, healing for 50% less with each jump. (Restoration signature)"
       },
       "metamorphosis": {
         "name": "Dread Aspect",
@@ -6371,9 +6895,13 @@ export const en_CA: EnTranslations = {
         "name": "Holy Shock",
         "description": "Shocks a friendly target with Holy energy to heal them, or an enemy for {damage} Holy damage. (Holy signature)"
       },
+      "aura_surge": {
+        "name": "Dawnward Ricochet",
+        "description": "Hurl a dawnforged shield for {damage} Holy damage and silence the primary target for 2 sec. It bounces to up to 2 additional enemies within 10 yd for 75% damage per bounce. (Paladin talent)"
+      },
       "holy_shield": {
         "name": "Hallowed Wall",
-        "description": "Hurls a radiant aegis at an enemy, dealing Holy damage and bouncing to 2 nearby enemies. (Protection signature)"
+        "description": "Hurls a radiant aegis at an enemy for 90 to 110 Holy damage, then bounces to 2 nearby enemies for 60 to 75 Holy damage each. (Protection signature)"
       },
       "bestial_wrath": {
         "name": "Howling Rage",
@@ -6392,8 +6920,8 @@ export const en_CA: EnTranslations = {
         "description": "Increases spell damage by 20% and spell haste by 10% for 10 sec. (Arcane signature)"
       },
       "combustion": {
-        "name": "Flashfire",
-        "description": "Increases spell critical chance by 50% for 15 sec. (Fire signature)"
+        "name": "Phoenix Trance",
+        "description": "Combust: for 10 sec your Fire spells always critically strike. These guaranteed crits do not build Hot Streak. (Fire signature)"
       },
       "icy_veins": {
         "name": "Icy Veins",
@@ -6433,7 +6961,7 @@ export const en_CA: EnTranslations = {
       },
       "conflagrate": {
         "name": "Conflagrate",
-        "description": "Consumes your Immolate on the enemy to ignite them for {damage} Fire damage. (Destruction signature)"
+        "description": "Consumes your Burning Pact on the enemy to ignite them for {damage} Fire damage. (Destruction signature)"
       },
       "moonkin_form": {
         "name": "Moonwing Form",
@@ -6475,6 +7003,246 @@ export const en_CA: EnTranslations = {
         "name": "Summon Wraithborn",
         "description": "Binds a Wraithborn to your will — an elite demon that rains heavy Shadow damage from afar. A long cooldown gates its devastating power. Summoning a new demon dismisses your current one. You may have one demon at a time."
       },
+      "battle_stance": {
+        "name": "Battle Stance",
+        "description": "An aggressive combat stance: you generate 10% more rage. The default stance for Arms and Protection."
+      },
+      "berserker_stance": {
+        "name": "Berserker Stance",
+        "description": "A reckless combat stance: your critical strikes land 3% more often and hit for 3% more. The Fury warrior always fights in this stance."
+      },
+      "sweeping_strikes": {
+        "name": "Widening Arc",
+        "description": "For 12 sec your single-target attacks also strike 1 nearby enemy for full damage. (Arms)"
+      },
+      "deep_wounds": {
+        "name": "Gaping Wounds",
+        "description": "Passive: your Maiming Strike leaves the target bleeding for Physical damage over 6 sec. (Arms)"
+      },
+      "enrage_passive": {
+        "name": "Mayhem",
+        "description": "Passive: while Enraged you deal 7% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)"
+      },
+      "raging_gale": {
+        "name": "Twinstrike",
+        "description": "Instantly strike with your weapon twice, each hit dealing 40% weapon damage plus {damage}, and generate 8 rage. Stores up to 2 charges. (Fury)"
+      },
+      "red_harvest": {
+        "name": "Red Harvest",
+        "description": "Spend everything: strike three times in a frenzy for 65% weapon damage plus {damage} each, always Enraging you. (Fury)"
+      },
+      "furious_mending": {
+        "name": "Furious Mending",
+        "description": "For 10 sec you take 20% reduced damage, and while it lasts your Bloodletting heals you for 20% of your maximum health. (Fury)"
+      },
+      "emboldening_roar": {
+        "name": "Emboldening Roar",
+        "description": "Lets loose an emboldening roar: you and friendly players within 40 yards are Emboldened, and your next 3 abilities are guaranteed critical strikes. (Fury)"
+      },
+      "raised_guard": {
+        "name": "Raised Guard",
+        "description": "Brace behind your shield: you take 50% reduced Physical damage for 6 sec. Stores up to 2 charges. (Protection)"
+      },
+      "iron_resolve": {
+        "name": "Iron Resolve",
+        "description": "Grit your teeth and ignore the pain: spends up to 40 rage (20 minimum) to absorb 4 damage per rage spent, lasting up to 10 sec. (Protection)"
+      },
+      "faultline": {
+        "name": "Faultline",
+        "description": "Send a shockwave through the ground: enemies in front of you within 8 yards take {damage} damage and are stunned for 3 sec. (Protection)"
+      },
+      "defiant_bellow": {
+        "name": "Defiant Bellow",
+        "description": "A defiant bellow: every enemy within 10 yards is taunted, compelled to attack you for 3 sec. (Protection)"
+      },
+      "breachmaker": {
+        "name": "Breachmaker",
+        "description": "Batter the target for weapon damage plus {damage} and crack its guard: your own attacks against it deal 20% more damage for 8 sec. (Arms)"
+      },
+      "measured_fury": {
+        "name": "Measured Fury",
+        "description": "Your measured fury sharpens your economy: your abilities cost 10% less rage. (Arms)"
+      },
+      "seasoned_soldier": {
+        "name": "Seasoned Soldier",
+        "description": "Your critical auto-attacks generate 10% more rage. (Arms)"
+      },
+      "diabolical_twinstrike": {
+        "name": "Diabolical Twinstrike",
+        "description": "While Enraged, your Twinstrike deals 15% more damage. (Fury)"
+      },
+      "cleaving_blows": {
+        "name": "Cleaving Blows",
+        "description": "Red Harvest always refunds a charge of Twinstrike. (Fury)"
+      },
+      "sudden_death": {
+        "name": "Sudden Death",
+        "description": "Your auto-attacks have a chance to let you cast Early Grave on a target at any health, costing no rage. (Arms)"
+      },
+      "storm_bolt": {
+        "name": "Storm Bolt",
+        "description": "Hurl your weapon at the target for {damage}, stunning it for 3 sec."
+      },
+      "piercing_howl": {
+        "name": "Piercing Howl",
+        "description": "A piercing shout that slows all enemies within 15 yards by 50% for 8 sec."
+      },
+      "die_by_sword": {
+        "name": "Die by the Sword",
+        "description": "Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks."
+      },
+      "recklessness": {
+        "name": "Recklessness",
+        "description": "Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec."
+      },
+      "sanguine_aura": {
+        "name": "Sanguine Aura",
+        "description": "Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec."
+      },
+      "victory_rush": {
+        "name": "Victory Rush",
+        "description": "Strike for weapon damage plus {damage} and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy."
+      },
+      "intimidating_shout": {
+        "name": "Intimidating Shout",
+        "description": "A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect."
+      },
+      "revenge": {
+        "name": "Revenge",
+        "description": "Attack in a wide arc, dealing 18 to 24 Physical damage to all enemies in front of you. Above 5 targets the damage is reduced. When you dodge or parry, your next Revenge may cost no rage. (Protection)"
+      },
+      "heroic_leap": {
+        "name": "Heroic Leap",
+        "description": "Leap to the target area, dealing {damage} damage to nearby enemies on landing."
+      },
+      "rallying_cry": {
+        "name": "Valor Roar",
+        "description": "Lets loose a valorous roar, granting you and party members within 40 yards 20% additional maximum health for 10 sec. Protection: they also take 5% less damage for the duration."
+      },
+      "aspect_of_the_wild": {
+        "name": "Wildfang Rally",
+        "description": "Inspires allies within 30 yd with wild strength, increasing attack power by 45 and attack speed by 5% for 5 min. (Hunter talent)"
+      },
+      "avatar": {
+        "name": "Avatar",
+        "description": "Transform into a colossus for 20 sec, breaking all control on you and increasing your damage dealt by 20%."
+      },
+      "avenging_wrath": {
+        "name": "Wrathwing",
+        "description": "Calls down avenging power, increasing attack power by 60 and spell power by 30 for 20 sec. (Paladin talent)"
+      },
+      "berserk": {
+        "name": "Red Haze",
+        "description": "Increases attack power by 70 for 15 sec. (Druid talent)"
+      },
+      "bladestorm": {
+        "name": "Bladestorm",
+        "description": "Become a whirling storm of steel, striking all enemies within 6 yards for {damage} every second for 4 sec."
+      },
+      "blink": {
+        "name": "Flickerstep",
+        "description": "Teleports you 15 yd forward and breaks roots. (Mage talent)"
+      },
+      "bloodlust": {
+        "name": "Storm Chorus",
+        "description": "Whips your group or raid into a frenzy, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Storm Chorus or Temporal Acceleration are too exhausted to benefit. (Shaman talent)"
+      },
+      "chain_lightning": {
+        "name": "Skybranch",
+        "description": "Hurls lightning at the target area, damaging nearby enemies for {damage}. (Shaman talent)"
+      },
+      "chaos_bolt": {
+        "name": "Ruinbolt",
+        "description": "Hurls a bolt of chaotic fire for {damage} Fire damage. (Warlock talent)"
+      },
+      "cleansing_verdict": {
+        "name": "Cleansing Verdict",
+        "description": "Purges a harmful magic effect from a friendly target and heals them for {damage} Holy."
+      },
+      "cloak_of_shadows": {
+        "name": "Shadecloak",
+        "description": "Wraps you in shadows, absorbing 420 damage for 5 sec. (Rogue talent)"
+      },
+      "cone_of_cold": {
+        "name": "Frostsweep",
+        "description": "Blasts nearby enemies with frost for {damage} Frost damage. (Mage talent)"
+      },
+      "counterspell": {
+        "name": "Spellbreak",
+        "description": "Counters enemy spellcasting, preventing any spell in that school from being cast for 6 sec. (Mage talent)"
+      },
+      "curse_of_exhaustion": {
+        "name": "Leaden Hex",
+        "description": "Curses the target, slowing movement by 30% for 12 sec. (Warlock talent)"
+      },
+      "death_coil": {
+        "name": "Morrowlash",
+        "description": "Strikes the enemy for {damage} Shadow damage, then horrifies them for 3 sec. (Warlock talent)"
+      },
+      "deep_freeze": {
+        "name": "Deadfrost",
+        "description": "Deep freezes the target, dealing {damage} Frost damage and stunning it for 4 sec. (Mage talent)"
+      },
+      "desperate_prayer": {
+        "name": "Last Prayer",
+        "description": "Instantly heals you for {damage}. (Priest talent)"
+      },
+      "deterrence": {
+        "name": "Bristleguard",
+        "description": "Increases your dodge chance by 25 percentage points and reduces all damage taken by 30% for 10 sec. (Hunter talent)"
+      },
+      "divine_shield": {
+        "name": "Lightward",
+        "description": "Shields you with holy power, absorbing 900 damage for 8 sec. (Paladin talent)"
+      },
+      "earthbind": {
+        "name": "Gripping Earth",
+        "description": "Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)"
+      },
+      "evocation": {
+        "name": "Aetherwell",
+        "description": "Channel for 6 sec: each second restores 100 mana and builds 8 spell power, stacking while you channel. (Mage talent)"
+      },
+      "frenzied_regeneration": {
+        "name": "Savage Mending",
+        "description": "Restores 180 health over 10 sec. Bruin Form only. (Druid talent)"
+      },
+      "frost_trap": {
+        "name": "Rime Snare",
+        "description": "Places a frost trap at your feet that arms after 1.5 sec. The first enemy to touch it is frozen for 3 sec, unable to move or act. One trap at a time. Lasts 60 sec. (Hunter talent)"
+      },
+      "ghostly_strike": {
+        "name": "Wraith Strike",
+        "description": "Strikes the enemy for weapon damage plus {damage} and briefly increases dodge. Awards 1 combo point. (Rogue talent)"
+      },
+      "hammer_of_wrath": {
+        "name": "Tolling Hammer",
+        "description": "Hurls a holy hammer at a wounded enemy for {damage} Holy damage. Only usable below 20% health. (Paladin talent)"
+      },
+      "healing_stream": {
+        "name": "Springwell",
+        "description": "Restores 120 health to a friendly target over 12 sec. (Shaman talent)"
+      },
+      "holy_wrath": {
+        "name": "Saint's Ire",
+        "description": "Unleashes holy power, damaging nearby enemies for {damage}. (Paladin talent)"
+      },
+      "howl_of_terror": {
+        "name": "Dread Chorus",
+        "description": "Frightens nearby enemies for up to 3 sec. Damage may break the effect. (Warlock talent)"
+      },
+      "ice_block": {
+        "name": "Cold Coffin",
+        "description": "Encases you in ice, absorbing a massive amount of damage for 8 sec. (Mage talent)"
+      },
+      "inner_focus": {
+        "name": "Stilled Mind",
+        "description": "Makes your next spell free. Lasts 60 sec. (Priest talent)"
+      },
+      "innervate": {
+        "name": "Lifesap",
+        "description": "Living sap wells up in you for 10 sec, restoring 20 of your current resource in waves: mana, Rage, or Energy, and shifting forms does not break it. Sleep, stun, or stasis stills the sap. (Druid talent)"
+      },
       "pummel": {
         "name": "Jawcrack",
         "description": "Interrupts the target's spellcast and prevents casting from that school for 4 sec."
@@ -6483,9 +7251,81 @@ export const en_CA: EnTranslations = {
         "name": "Boot",
         "description": "Interrupts the target's spellcast and prevents casting from that school for 4 sec."
       },
-      "counterspell": {
-        "name": "Spellbreak",
-        "description": "Counters the target's spellcast and prevents casting from that school for 6 sec."
+      "mend_pet": {
+        "name": "Patch Up",
+        "description": "Heals a friendly target for {damage} over 15 sec. (Hunter talent)"
+      },
+      "meteor": {
+        "name": "Skystone",
+        "description": "Calls down a meteor at the target area, dealing {damage} Fire damage and burning the ground. (Mage talent)"
+      },
+      "temporal_mend": {
+        "name": "Temporal Mend",
+        "description": "Draws an ally a moment forward in time, mending {damage} health as the body settles into its healthier future self. (Chronomancy signature)"
+      },
+      "temporal_barrier": {
+        "name": "Temporal Barrier",
+        "description": "Shifts the target a heartbeat out of the present, a temporal shell absorbing {damage} damage for 10 sec before the timeline snaps back."
+      },
+      "temporal_echo": {
+        "name": "Temporal Echo",
+        "description": "Marks an ally with an echo of a healthier moment, mending {damage} health at once. For {duration} sec, part of the Arcane damage you deal is drawn back through the echo to heal them."
+      },
+      "temporal_cascade": {
+        "name": "Temporal Cascade",
+        "description": "Sends an echo cascading through your group: the target and up to four of their nearest allies are mended at once and each marked for {duration} sec, drawing part of the Arcane damage you deal back through their echoes to heal them. (Chronomancy)"
+      },
+      "temporal_reversal": {
+        "name": "Temporal Reversal",
+        "description": "Rewinds a fallen ally's timeline, returning them to life at their body with a portion of their health and mana, even in the thick of combat. (Chronomancy)"
+      },
+      "collective_reversal": {
+        "name": "Collective Reversal",
+        "description": "Rewinds every fallen member of your group or raid, returning them to life at their body with 30% health and mana. Cannot be cast in combat. (Chronomancy)"
+      },
+      "temporal_rewind": {
+        "name": "Rewind",
+        "description": "Sends an arcane wave through your group or raid, rewinding time to restore 30% of the damage each ally within 40 yards took over the last 5 seconds (up to 35% of their maximum health). Cannot be a critical effect. (Chronomancy)"
+      },
+      "temporal_hourglass": {
+        "name": "Hourglass of Suspension",
+        "description": "Place a temporal hourglass at the selected location. Beneath an enemy, it suspends them for {hostilePveDuration} sec in PvE or {hostilePvpDuration} sec in PvP and prevents all actions; damage breaks the effect. At your feet or beneath a group ally, it grants stasis for {duration} sec, prevents damage and actions, restores {healing}% of maximum health, and makes cooldowns recover {selfCooldownRecovery}% faster for you or {allyCooldownRecovery}% faster for an ally. On empty ground, the hourglass waits for {groundDuration} sec and affects the first valid unit to step on it. The beneficial aura can be removed manually."
+      },
+      "temporal_acceleration": {
+        "name": "Temporal Acceleration",
+        "description": "Accelerates the flow of time for your group or raid, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Temporal Acceleration or Storm Chorus are too exhausted to benefit. (Chronomancy)"
+      },
+      "perfect_moment": {
+        "name": "Perfect Moment",
+        "description": "Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them. (Chronomancy)"
+      },
+      "arcane_surge": {
+        "name": "Aether Surge",
+        "description": "Draws a surge of raw aether through the enemy for {damage} damage. Each cast leaves an Arcane Charge that raises your next Aether Surge's damage and cast speed (5% faster each) but sharply raises its mana cost, stacking up to 4; Aether Darts spends the charges. Each cast can also arm Aether Rush, making your next Aether Surge free and twice as fast to cast."
+      },
+      "mind_sear": {
+        "name": "Thoughtburn",
+        "description": "Channels shadow energy at the target area, damaging nearby enemies each second for {damage}. (Priest talent)"
+      },
+      "multi_shot": {
+        "name": "Splitshot",
+        "description": "Loose a spread at the target area, dealing {damage} Physical damage to enemies within 8 yd. (Hunter talent)"
+      },
+      "prayer_of_healing": {
+        "name": "Choirmend",
+        "description": "Heals nearby allies for {damage}. (Priest talent)"
+      },
+      "preparation": {
+        "name": "Contingency",
+        "description": "Finishes the cooldown on Swift Heels, Ghostfoot, and Smokestep. (Rogue talent)"
+      },
+      "presence_of_mind": {
+        "name": "Racing Mind",
+        "description": "Makes your next spell with a cast time instant. Lasts 60 sec. (Mage talent)"
+      },
+      "psychic_scream": {
+        "name": "Terror Canticle",
+        "description": "Frightens nearby enemies for up to 4 sec. Damage may break the effect. (Priest talent)"
       },
       "counter_shot": {
         "name": "Hushing Shot",
@@ -6495,6 +7335,26 @@ export const en_CA: EnTranslations = {
         "name": "Reproach",
         "description": "Interrupts the target's spellcast and prevents casting from that school for 4 sec."
       },
+      "shadowstep": {
+        "name": "Shadeslip",
+        "description": "Steps through the shadows toward your target without breaking Duskveil. (Rogue talent)"
+      },
+      "silence": {
+        "name": "Hushword",
+        "description": "Silences the target for 4 sec. (Priest talent)"
+      },
+      "smoke_screen": {
+        "name": "Smoke Screen",
+        "description": "Vanish into a cloud of smoke, increasing your chance to dodge by 30% for 8 sec."
+      },
+      "spellsteal": {
+        "name": "Spellsteal",
+        "description": "Steals a beneficial magic effect from an enemy, transferring it to yourself."
+      },
+      "startle_shot": {
+        "name": "Startle Shot",
+        "description": "A wild shot that disorients the target for {duration} sec. Any damage breaks the effect."
+      },
       "skull_bash": {
         "name": "Headbutt",
         "description": "A lunging headbutt that interrupts the target's spellcast and locks that school for 4 sec."
@@ -6502,6 +7362,18 @@ export const en_CA: EnTranslations = {
       "spell_lock": {
         "name": "Gag Order",
         "description": "Silences the target mid-cast and prevents casting from that school for 5 sec."
+      },
+      "tranquility": {
+        "name": "Gladesong",
+        "description": "Channels restorative energy for 4 sec, healing allies within 30 yd for 42 to 52 each second. (Druid talent)"
+      },
+      "typhoon": {
+        "name": "Typhoon",
+        "description": "A blast of wind knocks back all enemies within 8 yd and dazes them, slowing their movement by 50% for 4 sec."
+      },
+      "voidfeast": {
+        "name": "Voidfeast",
+        "description": "Devours a magic effect (a beneficial one from an enemy, or a harmful one from an ally) and heals you for 6% of your maximum health. Only usable when there is an effect to devour."
       },
       "bear_charge": {
         "name": "Bruin Rush",
@@ -6520,8 +7392,8 @@ export const en_CA: EnTranslations = {
         "description": "A stealth opener that rakes the enemy for weapon damage plus {damage} and causes bleeding damage over 9 sec. Awards 1 combo point. Wolf Form only."
       },
       "revive_pet": {
-        "name": "Revive Pet",
-        "description": "Revives your dead pet and returns it to your side."
+        "name": "Patch Up",
+        "description": "Patch up your companion, restoring {overTime} health over 12 sec in 3-sec ticks while it is alive. If it is dead, revive it at 35% health."
       }
     },
     "items": {
@@ -6620,6 +7492,24 @@ export const en_CA: EnTranslations = {
       },
       "eastbrook_wool_trousers": {
         "name": "Eastbrook Wool Trousers"
+      },
+      "eastbrook_ritual_vestments": {
+        "name": "Eastbrook Ritual Vestments"
+      },
+      "eastbrook_druids_hide": {
+        "name": "Eastbrook Druid's Hide"
+      },
+      "eastbrook_warded_leggings": {
+        "name": "Eastbrook Warded Leggings"
+      },
+      "wardweave_cowl": {
+        "name": "Wardweave Cowl"
+      },
+      "duskhide_wraps": {
+        "name": "Duskhide Wraps"
+      },
+      "sootscale_mantle": {
+        "name": "Sootscale Mantle"
       },
       "gravecaller_blade": {
         "name": "Gravecaller's Broadblade"
@@ -7266,6 +8156,12 @@ export const en_CA: EnTranslations = {
       "emberglass_warstaff": {
         "name": "Emberglass Warstaff"
       },
+      "conjured_water4": {
+        "name": "Conjured Springwater"
+      },
+      "conjured_bread4": {
+        "name": "Conjured Feastloaf"
+      },
       "bristleback_maul": {
         "name": "Gallowglass Hammer"
       },
@@ -7734,6 +8630,18 @@ export const en_CA: EnTranslations = {
       "heroic_mark": {
         "name": "Heroic Mark"
       },
+      "eastbrook_buckler": {
+        "name": "Eastbrook Buckler"
+      },
+      "eastbrook_greatsword": {
+        "name": "Eastbrook Greatsword"
+      },
+      "highwatch_greatsword": {
+        "name": "Highwatch Greatsword"
+      },
+      "highwatch_wallshield": {
+        "name": "Highwatch Wallshield"
+      },
       "morthens_cryptforged_hauberk": {
         "name": "Morthen's Cryptforged Hauberk"
       },
@@ -7886,6 +8794,18 @@ export const en_CA: EnTranslations = {
       },
       "stormcallers_spaulders": {
         "name": "Galecall Spaulders"
+      },
+      "bonewrought_greatsword": {
+        "name": "Bonewrought Greatsword"
+      },
+      "direfang_greatblade": {
+        "name": "Direfang Greatblade"
+      },
+      "bonewrought_bulwark": {
+        "name": "Bonewrought Bulwark"
+      },
+      "wraithfire_orb": {
+        "name": "Wraithfire Orb"
       },
       "unknown_alien_weaponry": {
         "name": "Unknown Alien Weaponry"
@@ -8135,9 +9055,6 @@ export const en_CA: EnTranslations = {
       "nythraxis_skeleton_warrior": {
         "name": "Risen Royal Guard"
       },
-      "nythraxis_scourge_of_thornpeak": {
-        "name": "Nythraxis, Scourge of Thornpeak"
-      },
       "nythraxis_heroic_warrior_add": {
         "name": "Spirit of Aldren"
       },
@@ -8146,6 +9063,9 @@ export const en_CA: EnTranslations = {
       },
       "nythraxis_heroic_rogue_add": {
         "name": "Spirit of Voss"
+      },
+      "nythraxis_scourge_of_thornpeak": {
+        "name": "Nythraxis, Scourge of Thornpeak"
       },
       "reliquary_ledger_wraith": {
         "name": "Ledger Wraith"
@@ -8317,6 +9237,9 @@ export const en_CA: EnTranslations = {
       },
       "ysolei": {
         "name": "Ysolei, Avatar of the Drowned Moon"
+      },
+      "water_elemental": {
+        "name": "Water Elemental"
       }
     },
     "npcs": {
@@ -8435,6 +9358,11 @@ export const en_CA: EnTranslations = {
         "title": "The Gilded Strongbox",
         "greeting": "Welcome to the Gilded Strongbox. Your goods rest safe behind our locks."
       },
+      "card_master": {
+        "name": "Card Master",
+        "title": "Dealer of Chance",
+        "greeting": "Care for a Card Duel? Best of three, winner takes the bragging rights."
+      },
       "bursar_petra_vell": {
         "name": "Bursar Petra Vell",
         "title": "The Gilded Strongbox",
@@ -8494,11 +9422,11 @@ export const en_CA: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "A Trade for Every Hand",
-        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There's ore veins in the rocks around the Copper Dig, southwest of town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
-        "completion": "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
+        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There are ore veins in the rocks around the Copper Dig, southwest of town. Go swing a pick and work 5 of them yourself, mind; I'll know the difference.",
+        "completion": "See? Ore gathered and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
         "objectives": {
           "0": {
-            "label": "Chunk of Ore"
+            "label": "Ore vein harvested"
           }
         }
       },
@@ -9286,21 +10214,31 @@ export const en_CA: EnTranslations = {
       },
       "q_archetype_acceptance": {
         "title": "A Craft to Call Your Own",
-        "text": "Every artisan of Eastbrook eventually settles on one craft to call their own. Prove yourself with a single deed, {playerName}, and declare your path.",
-        "completion": "Your path is chosen; walk it well.",
+        "text": "Skill is knowledge, {playerName}, but attunement is a promise. Choose two neighboring crafts whose methods you will carry as your majors, then bring me ore worked from the Vale with your own hands.",
+        "completion": "The promise holds. These two crafts are now your majors, and the knowledge opposite them becomes your hobby.",
+        "objectives": {
+          "0": {
+            "label": "Ore vein harvested"
+          }
+        }
+      },
+      "q_prof_make_amends": {
+        "title": "Making Amends",
+        "text": "You have carried that pair before, {playerName}. Returning is no fresh vow. Help keep the Vale road clear, and the work will remind your hands what they once knew.",
+        "completion": "The old rhythm returns. Your former pair is active once more.",
         "objectives": {
           "0": {
             "label": "Forest Wolf slain"
           }
         }
       },
-      "q_prof_make_amends": {
-        "title": "Making Amends",
-        "text": "To set aside one craft for another, an artisan must first make amends for the path not walked, {playerName}.",
-        "completion": "Amends made; a new path is open to you.",
+      "q_prof_hobby_switch": {
+        "title": "A Different Pastime",
+        "text": "Majors demand a vow. A hobby only asks where your curiosity wanders, {playerName}. Gather a few herbs and decide which craft opposite your majors you want to pursue.",
+        "completion": "A lighter choice, but a useful one. Follow that curiosity as far as rare work will take it.",
         "objectives": {
           "0": {
-            "label": "Forest Wolf slain"
+            "label": "Herb patch harvested"
           }
         }
       },
@@ -9539,6 +10477,11 @@ export const en_CA: EnTranslations = {
         "sender": "Brother Aldric",
         "subject": "What you did in the dark",
         "body": "Few will ever know what was buried in that hollow, and fewer still would believe it. I know, and I will not forget.\n\nMay your road stay lit.\n- Brother Aldric"
+      },
+      "heroic_marks_reward": {
+        "sender": "The Heroic Quartermaster",
+        "subject": "Your Heroic Marks",
+        "body": "Your warband cleared the heroic trial while you fought from the back, or from the dirt. Your lockout was struck all the same, so your share of Heroic Marks flies to you here rather than being lost. Spend them well.\n\n- The Heroic Quartermaster"
       }
     },
     "itemSets": {
@@ -9550,7 +10493,7 @@ export const en_CA: EnTranslations = {
         "name": "Bonewrought Regalia",
         "bonus2": "Increases attack power by 40.",
         "bonus3": "Increases Strength by 15, Stamina by 15, and attack and casting speed by 15%.",
-        "bonus4": "Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 8 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus4": "Increases Hit by 6%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 8 damage every 2 sec for 12 sec. Stacks up to 3 times."
       },
       "deathlord": {
         "name": "Barrowlord Battlegear",
@@ -9564,7 +10507,7 @@ export const en_CA: EnTranslations = {
       },
       "necromancers": {
         "name": "Mournweave Raiment",
-        "bonus2": "Increases spell power by 20. You cannot be knocked back (100% knockback resistance).",
+        "bonus2": "Increases spell power by 20. Damage taken no longer delays your spellcasting (100% pushback resistance).",
         "bonus3": "Increases Intellect by 10 and Stamina by 10.",
         "bonus4": "Your spells have a 10% chance to grant Clearcasting, making your next spell free."
       },
@@ -9572,17 +10515,17 @@ export const en_CA: EnTranslations = {
         "name": "Direfang Pelt",
         "bonus2": "Increases attack power by 40.",
         "bonus3": "Increases Agility by 15, critical strike chance by 2%, and attack and casting speed by 15%.",
-        "bonus4": "Your weapon critical strikes tear a Ragged Gash, bleeding the target for 6 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus4": "Increases Hit by 6%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 6 damage every 2 sec for 12 sec. Stacks up to 3 times."
       },
       "soulflame": {
         "name": "Wraithfire Regalia",
-        "bonus2": "Increases spell power by 20. You cannot be knocked back (100% knockback resistance).",
+        "bonus2": "Increases spell power by 20. Damage taken no longer delays your spellcasting (100% pushback resistance).",
         "bonus3": "Increases Intellect by 15, Spirit by 15, and attack and casting speed by 15%.",
         "bonus4": "Your spells have a 10% chance to grant Soulblaze, increasing spell power by 40 for 10 sec."
       },
       "stormcallers": {
         "name": "Galecall Vestments",
-        "bonus2": "Increases spell power by 20. You cannot be knocked back (100% knockback resistance).",
+        "bonus2": "Increases spell power by 20. Damage taken no longer delays your spellcasting (100% pushback resistance).",
         "bonus3": "Increases Intellect by 15, Spirit by 15, and attack and casting speed by 15%.",
         "bonus4": "Your spells have a 10% chance to grant Soulblaze, increasing spell power by 40 for 10 sec."
       },

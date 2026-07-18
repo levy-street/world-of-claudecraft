@@ -163,35 +163,39 @@ describe('classic formulas', () => {
     expect(mobXpValue(2, 8)).toBe(0);
   });
 
-  it('spell hit falls off steeply above the caster level (anti-power-level)', () => {
-    expect(spellHitChance(5, 5)).toBeCloseTo(0.96); // equal level
-    expect(spellHitChance(3, 5)).toBeCloseTo(0.82); // +2 -> ~18% miss
-    expect(spellHitChance(3, 7)).toBeCloseTo(0.16); // +4 -> ~84% miss
+  it('spell resist rises with the level gap but is capped (~25% max)', () => {
+    expect(spellHitChance(5, 5)).toBeCloseTo(0.96); // equal level -> 4% resist
+    expect(spellHitChance(4, 5)).toBeCloseTo(0.935); // +1 -> 6.5% resist (preserved)
+    expect(spellHitChance(3, 5)).toBeCloseTo(0.82); // +2 -> ~18% resist
+    expect(spellHitChance(3, 7)).toBeCloseTo(0.75); // +4 -> capped ~25% resist
   });
 
-  it('melee/ranged miss scales steeply against higher-level targets', () => {
+  it('melee/ranged miss rises with the level gap but is capped (~26% max)', () => {
     expect(meleeMissChance(5, 5)).toBeCloseTo(0.05); // equal level -> 5% base
+    expect(meleeMissChance(4, 5)).toBeCloseTo(0.075); // +1 -> 7.5% miss (preserved)
     expect(meleeMissChance(3, 5)).toBeCloseTo(0.19); // +2 (L3 vs L5) -> ~19%
-    expect(meleeMissChance(3, 7)).toBeCloseTo(0.85); // +4 (L3 vs L7) -> 85%
-    expect(meleeMissChance(3, 9)).toBeCloseTo(0.95); // +6 -> capped at 95%
+    expect(meleeMissChance(3, 7)).toBeCloseTo(0.26); // +4 -> capped ~26%
+    expect(meleeMissChance(3, 9)).toBeCloseTo(0.26); // +6 -> still capped ~26%
     // hunter Auto Shot + wands resolve through meleeMissChance too, so this covers them
   });
 
   it('abilities unlock at the right levels with ranks', () => {
     const w1 = abilitiesKnownAt('warrior', 1).map((k) => k.def.id);
-    expect(w1).toEqual(['heroic_strike', 'battle_shout']);
+    expect(w1).toEqual(['heroic_strike', 'battle_shout', 'battle_stance']);
     const w10 = abilitiesKnownAt('warrior', 10);
     expect(w10.map((k) => k.def.id)).toContain('overpower');
     const hs10 = w10.find((k) => k.def.id === 'heroic_strike')!;
     expect(hs10.rank).toBe(2);
-    const m8 = abilitiesKnownAt('mage', 8).map((k) => k.def.id);
-    expect(m8).toContain('polymorph');
-    expect(m8).not.toContain('frost_nova'); // level 10
+    // Bewitch trains at 7 in the reworked mage kit; Icebind at 5.
+    const m7 = abilitiesKnownAt('mage', 7).map((k) => k.def.id);
+    expect(m7).toContain('polymorph');
+    expect(m7).toContain('frost_nova');
   });
 
   it('ranks and new abilities carry the kit through the 10-20 band', () => {
-    // warrior: heroic strike rank 4 at 20; execute unlocks at 14, not before
-    expect(abilitiesKnownAt('warrior', 13).map((k) => k.def.id)).not.toContain('execute');
+    // warrior: Heroic Strike reaches rank 4 at 20; Early Grave unlocks at 12
+    expect(abilitiesKnownAt('warrior', 11).map((k) => k.def.id)).not.toContain('execute');
+    expect(abilitiesKnownAt('warrior', 12).map((k) => k.def.id)).toContain('execute');
     const w20 = abilitiesKnownAt('warrior', 20);
     expect(w20.map((k) => k.def.id)).toContain('execute');
     const hs20 = w20.find((k) => k.def.id === 'heroic_strike')!;
@@ -385,7 +389,9 @@ describe('combat', () => {
     wolf.level = 20;
     sim.player.resource = 0;
     (sim as any).dealDamage(wolf, sim.player, 30, false, 'physical', null, 'hit');
-    expect(sim.player.resource).toBeCloseTo(1, 5);
+    // Redesigned Warrior incoming rage is damage / attacker level, then the
+    // default Battle Stance raises rage generation by 10%.
+    expect(sim.player.resource).toBeCloseTo((30 / 20) * 1.1, 5);
   });
 
   it('mob can kill the player; release rises as a ghost, healer resurrects', () => {
@@ -597,7 +603,7 @@ describe('combat', () => {
     expect(wolf.auras.some((a: any) => a.kind === 'polymorph')).toBe(false);
   });
 
-  it('overpower requires a dodge proc', () => {
+  it('Redhand is usable without a dodge proc', () => {
     const sim = makeSim('warrior');
     sim.setPlayerLevel(10);
     const wolf = nearestMob(sim, 'forest_wolf');
@@ -606,13 +612,7 @@ describe('combat', () => {
     facePlayerAt(sim, wolf);
     sim.player.resource = 50;
     sim.castAbility('overpower');
-    let _events = sim.tick();
-    // without a dodge proc it errors
-    expect(sim.counters.damageDealt).toBe(0);
-    // simulate a dodge proc
-    sim.player.overpowerUntil = sim.time + 5;
-    sim.castAbility('overpower');
-    _events = sim.tick();
+    sim.tick();
     expect(sim.counters.damageDealt).toBeGreaterThan(0);
   });
 });
@@ -654,6 +654,8 @@ describe('spell pushback', () => {
 
   it('a hit shaves a quarter off a channel instead of cancelling it', () => {
     const { sim, wolf } = castingMage(8);
+    // Aether Darts is Chronomancy-gated in the reworked kit; commit the spec first.
+    sim.setSpec('arcane');
     sim.castAbility('arcane_missiles');
     expect(sim.player.channeling).toBe(true);
     const remBefore = sim.player.castRemaining;
@@ -1476,13 +1478,17 @@ describe('food, drink, vendor', () => {
 describe('leveling', () => {
   it('levels up, heals to full, and learns new abilities', () => {
     const sim = makeSim('warrior');
-    expect(sim.known.map((k) => k.def.id)).toEqual(['heroic_strike', 'battle_shout']);
+    expect(sim.known.map((k) => k.def.id)).toEqual([
+      'heroic_strike',
+      'battle_shout',
+      'battle_stance',
+    ]);
     const _events: any[] = [];
     (sim as any).grantXp(xpForLevel(1) + xpForLevel(2) + xpForLevel(3) + 10);
     expect(sim.player.level).toBe(4);
     expect(sim.player.hp).toBe(sim.player.maxHp);
     expect(sim.known.map((k) => k.def.id)).toContain('charge');
-    expect(sim.known.map((k) => k.def.id)).toContain('rend');
+    expect(sim.known.map((k) => k.def.id)).toContain('overpower');
   });
 
   it('caps at max level', () => {

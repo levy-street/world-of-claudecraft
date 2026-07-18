@@ -8,7 +8,11 @@ import {
   weaponSkinCollectionLabel,
   weaponTypeLabel,
 } from './armory_labels';
-import { buildDailyRewardsView, type DailyRewardsView } from './daily_rewards_view';
+import {
+  buildDailyRewardsView,
+  type DailyRewardsView,
+  dailyRewardTaskDescription,
+} from './daily_rewards_view';
 import { markDialogRoot } from './dialog_root';
 import { tEntity } from './entity_i18n';
 import { esc } from './esc';
@@ -23,7 +27,33 @@ import {
   type WocStoreItemInput,
 } from './woc_store_view';
 
-function reasonText(eligibility: DailyRewardStatus['eligibility']): string {
+function remainingBanText(expiresAt: string, nowMs: number): string {
+  const totalMinutes = Math.max(0, Math.ceil((Date.parse(expiresAt) - nowMs) / 60_000));
+  const days = Math.floor(totalMinutes / 1_440);
+  const hours = Math.floor((totalMinutes % 1_440) / 60);
+  if (days > 0) {
+    return t('hudChrome.dailyRewards.remainingDaysHours', {
+      days: formatNumber(days, { maximumFractionDigits: 0 }),
+      hours: formatNumber(hours, { maximumFractionDigits: 0 }),
+    });
+  }
+  if (totalMinutes < 1) return t('hudChrome.dailyRewards.remainingLessThanMinute');
+  const minutes = totalMinutes % 60;
+  if (hours <= 0) {
+    return t('hudChrome.dailyRewards.remainingMinutes', {
+      minutes: formatNumber(minutes, { maximumFractionDigits: 0 }),
+    });
+  }
+  return t('hudChrome.dailyRewards.remainingHoursMinutes', {
+    hours: formatNumber(hours, { maximumFractionDigits: 0 }),
+    minutes: formatNumber(minutes, { maximumFractionDigits: 0 }),
+  });
+}
+
+export function dailyRewardReasonText(
+  eligibility: DailyRewardStatus['eligibility'],
+  nowMs = Date.now(),
+): string {
   switch (eligibility.reason) {
     case 'eligible':
       return t('hudChrome.dailyRewards.reason.eligible');
@@ -34,6 +64,19 @@ function reasonText(eligibility: DailyRewardStatus['eligibility']): string {
     case 'price_unavailable':
       return t('hudChrome.dailyRewards.reason.price_unavailable');
     case 'banned':
+      if (eligibility.banExpiresAt && Number.isFinite(Date.parse(eligibility.banExpiresAt))) {
+        return t('hudChrome.dailyRewards.reason.bannedUntil', {
+          reason: eligibility.banReason ?? t('hudChrome.dailyRewards.unknown'),
+          remaining: remainingBanText(eligibility.banExpiresAt, nowMs),
+          until: formatDateTime(new Date(eligibility.banExpiresAt), {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+          }),
+        });
+      }
       return t('hudChrome.dailyRewards.reason.banned', {
         reason: eligibility.banReason ?? t('hudChrome.dailyRewards.unknown'),
       });
@@ -620,9 +663,20 @@ export class DailyRewardsWindow {
   }
 
   private loadingHtml(storeEnabled: boolean): string {
+    // A visible loading state until the first snapshot paints: the window shows
+    // an opaque body the moment it opens, and the snapshot fetch has no
+    // deadline, so an empty body would read as a large black box. The store
+    // variant is aria-hidden because the tab strip's data-woc-store-loading
+    // indicator already announces busy; the rewards-only variant has no tab
+    // strip, so its loading block is the live status itself.
+    const spinner = (label: string, live: boolean): string =>
+      `<div class="cl-loading"${live ? ' role="status" aria-live="polite"' : ' aria-hidden="true"'}>` +
+      `<span class="cl-spinner" aria-hidden="true"></span>` +
+      `<span>${esc(label)}</span>` +
+      `</div>`;
     return storeEnabled
-      ? '<div id="woc-store-panel" class="dr-body woc-store-body" role="tabpanel" aria-labelledby="woc-store-tab-store"></div>'
-      : '<div class="dr-body woc-store-body"></div>';
+      ? `<div id="woc-store-panel" class="dr-body woc-store-body" role="tabpanel" aria-labelledby="woc-store-tab-store">${spinner(t('hudChrome.wocStore.loading'), false)}</div>`
+      : `<div class="dr-body woc-store-body">${spinner(t('hudChrome.dailyRewards.loading'), true)}</div>`;
   }
 
   private syncStoreLoading(): void {
@@ -657,7 +711,7 @@ export class DailyRewardsWindow {
         : t('hudChrome.dailyRewards.usd', {
             amount: `$${formatNumber(s.eligibility.usdValue, { maximumFractionDigits: 2 })}`,
           });
-    const reason = reasonText(s.eligibility);
+    const reason = dailyRewardReasonText(s.eligibility);
     return (
       `<p class="dr-intro">${esc(t('hudChrome.dailyRewards.intro'))}</p>` +
       `<p class="dr-disclaimer">${esc(t('hudChrome.dailyRewards.disclaimer'))}</p>` +
@@ -795,7 +849,12 @@ export class DailyRewardsWindow {
           typeof task.multiplier === 'number' && Number.isFinite(task.multiplier)
             ? `<em>${esc(t('hudChrome.dailyRewards.taskMultiplier', { multiplier: formatNumber(task.multiplier, { maximumFractionDigits: 2 }) }))}</em>`
             : '';
-        return `<li class="${task.completed ? 'done' : ''}"><span>${esc(task.title)}</span><small><span>${esc(task.description)}</span>${multiplier}</small><b>${formatNumber(task.points, { maximumFractionDigits: 0 })}</b></li>`;
+        const description = dailyRewardTaskDescription(
+          task.type,
+          task.description,
+          t('hudChrome.dailyRewards.oneVsOneExcluded'),
+        );
+        return `<li class="${task.completed ? 'done' : ''}"><span>${esc(task.title)}</span><small><span>${esc(description)}</span>${multiplier}</small><b>${formatNumber(task.points, { maximumFractionDigits: 0 })}</b></li>`;
       })
       .join('');
     return (

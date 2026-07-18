@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
-import { Aura, SimEvent } from '../src/sim/types';
+import type { Aura, SimEvent } from '../src/sim/types';
 
 function makeWorld() {
-  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+  return new Sim({ seed: 42, playerClass: 'mage', noPlayer: true });
 }
 
 function errors(events: SimEvent[]): Extract<SimEvent, { type: 'error' }>[] {
@@ -12,15 +12,22 @@ function errors(events: SimEvent[]): Extract<SimEvent, { type: 'error' }>[] {
 
 function timedAura(over: Partial<Aura>): Aura {
   return {
-    id: 'x', name: 'Effect', kind: 'dot', remaining: 10, duration: 10,
-    value: 0, sourceId: 0, school: 'physical', ...over,
+    id: 'x',
+    name: 'Effect',
+    kind: 'dot',
+    remaining: 10,
+    duration: 10,
+    value: 0,
+    sourceId: 0,
+    school: 'physical',
+    ...over,
   };
 }
 
 describe('/buffs command', () => {
   it('reports no active effects when the aura list is empty', () => {
     const sim = makeWorld();
-    const a = sim.addPlayer('warrior', 'Aleph');
+    const a = sim.addPlayer('mage', 'Aleph');
     sim.tick();
 
     sim.chat('/buffs', a);
@@ -32,22 +39,29 @@ describe('/buffs command', () => {
 
   it('lists each active aura with its ceil-rounded remaining seconds', () => {
     const sim = makeWorld();
-    const a = sim.addPlayer('warrior', 'Aleph');
+    const a = sim.addPlayer('mage', 'Aleph');
     sim.tick();
     const e = sim.entities.get(a)!;
-    e.auras.push(timedAura({ id: 'battle_shout', name: 'Battle Shout', kind: 'buff_ap', remaining: 118 }));
-    e.auras.push(timedAura({ id: 'rend', name: 'Rend', kind: 'dot', remaining: 3.2 }));
+    e.auras.push(
+      timedAura({
+        id: 'arcane_intellect',
+        name: 'Arcane Intellect',
+        kind: 'buff_int',
+        remaining: 118,
+      }),
+    );
+    e.auras.push(timedAura({ id: 'ignite', name: 'Ignite', kind: 'dot', remaining: 3.2 }));
 
     sim.chat('/buffs', a);
     const errs = errors(sim.tick());
     expect(errs.length).toBe(1);
     // 3.2s still ceils to 4s while the effect is live
-    expect(errs[0].text).toBe('Active effects (2): Battle Shout (118s), Rend (4s).');
+    expect(errs[0].text).toBe('Active effects (2): Arcane Intellect (118s), Ignite (4s).');
   });
 
   it('accepts the /buff and /auras aliases', () => {
     const sim = makeWorld();
-    const a = sim.addPlayer('warrior', 'Aleph');
+    const a = sim.addPlayer('mage', 'Aleph');
     sim.tick();
 
     for (const cmd of ['/buff', '/auras']) {
@@ -60,7 +74,7 @@ describe('/buffs command', () => {
 
   it('is self-only: produces no chat event and is not logged', () => {
     const sim = makeWorld();
-    const a = sim.addPlayer('warrior', 'Aleph');
+    const a = sim.addPlayer('mage', 'Aleph');
     sim.tick();
 
     const result = sim.chat('/buffs', a);

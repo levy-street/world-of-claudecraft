@@ -6,10 +6,11 @@
 // parity drives both world shapes to identical output.
 
 import { describe, expect, it, vi } from 'vitest';
-import { type AbilityDef, type ItemDef, MELEE_RANGE } from '../src/sim/types';
+import { type AbilityDef, type Aura, type ItemDef, MELEE_RANGE } from '../src/sim/types';
 import {
   ABILITY_ICON_PREFIX,
   type ActionBarAbility,
+  type ActionBarAuraInput,
   type ActionBarDeps,
   type ActionBarDescriptor,
   type ActionBarSlotDescriptor,
@@ -18,7 +19,7 @@ import {
   createActionBarView,
   EMPTY_ICON_KEY,
   ITEM_ICON_PREFIX,
-} from '../src/ui/action_bar_view';
+} from '../src/ui/hud/action_bar/action_bar_view';
 import { t as realT } from '../src/ui/i18n';
 import { assertAllocationStable } from './util/alloc_probe';
 
@@ -52,7 +53,7 @@ interface SlotOpts {
 function slot(slotIndex: number, opts: SlotOpts = {}): ActionBarSlotDescriptor {
   return {
     slotIndex,
-    isAttack: opts.attack ?? false,
+    isAttack: () => opts.attack ?? false,
     hasAction: () => opts.hasAction ?? (opts.ability != null || opts.item != null),
     ability: () => opts.ability ?? null,
     item: () => opts.item ?? null,
@@ -91,7 +92,9 @@ interface WorldOpts {
   targetPos?: { x: number; y: number; z: number } | null;
   targetDead?: boolean;
   inventory?: { itemId: string; count: number }[];
+  abilityCharges?: { [id: string]: { charges: number } | undefined };
   stealthed?: boolean;
+  auras?: ActionBarAuraInput[];
 }
 
 function world(opts: WorldOpts = {}): ActionBarWorldInput {
@@ -106,7 +109,9 @@ function world(opts: WorldOpts = {}): ActionBarWorldInput {
       potionCdRemaining: opts.potionCdRemaining ?? 0,
       queuedOnSwing: opts.queuedOnSwing ?? null,
       pos: opts.playerPos ?? { x: 0, y: 0, z: 0 },
+      abilityCharges: opts.abilityCharges,
       stealthed: opts.stealthed ?? false,
+      auras: opts.auras ?? [],
     },
     target: targetPos === null ? null : { dead: opts.targetDead ?? false, pos: targetPos },
     inventory: opts.inventory ?? [],
@@ -143,6 +148,42 @@ describe('actionBarView: the four slot kinds classify correctly', () => {
     expect(s[3].iconKey).toBe(EMPTY_ICON_KEY);
     expect(s[3].abilityId).toBeNull();
     expect(s[3].itemId).toBeNull();
+  });
+
+  it('slot 0 stops being Attack when isAttack() is false, rendering its assigned action', () => {
+    // The removable Attack button: with "Show Attack Button" off, the HUD makes
+    // slot 0's isAttack() return false and actionForSlot(0) resolve the assigned
+    // action, so the first slot renders as a normal ability slot, not Attack.
+    const view = createActionBarView(
+      descriptor(slot(0, { attack: false, ability: ability('frostbolt') })),
+      fakeDeps(),
+    );
+    const s = view.tick(world()).slots;
+    expect(s[0].kind).toBe('ability');
+    expect(s[0].iconKey).toBe(`${ABILITY_ICON_PREFIX}frostbolt`);
+    expect(s[0].abilityId).toBe('frostbolt');
+  });
+
+  it('slot 0 honors the live isAttack() accessor across ticks (toggle on/off)', () => {
+    // The Interface toggle flips slot 0 between Attack and a normal slot at runtime
+    // with no rebuild; the view must consult the accessor every tick, not cache it.
+    let showAttack = true;
+    const s0: ActionBarSlotDescriptor = {
+      slotIndex: 0,
+      isAttack: () => showAttack,
+      hasAction: () => !showAttack,
+      ability: () => (showAttack ? null : ability('fireball')),
+      item: () => null,
+      keybindLabel: () => 'K0',
+    };
+    const view = createActionBarView(descriptor(s0), fakeDeps());
+    expect(view.tick(world()).slots[0].kind).toBe('attack');
+    showAttack = false;
+    const off = view.tick(world()).slots[0];
+    expect(off.kind).toBe('ability');
+    expect(off.abilityId).toBe('fireball');
+    showAttack = true;
+    expect(view.tick(world()).slots[0].kind).toBe('attack');
   });
 
   it('an item slot wins over a stale ability binding (item-first precedence)', () => {
@@ -246,7 +287,9 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
 
   it('a range-0 targeted ability falls back to MELEE_RANGE for the range check', () => {
     const view = createActionBarView(
-      descriptor(slot(1, { ability: ability('rend', { requiresTarget: true, range: 0 }) })),
+      descriptor(
+        slot(1, { ability: ability('mortal_strike', { requiresTarget: true, range: 0 }) }),
+      ),
       fakeDeps(),
     );
     // range 0 -> the out-of-range check uses MELEE_RANGE (dist2d is on the x/z plane).
@@ -303,6 +346,222 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
     expect(view.tick(world({ queuedOnSwing: 'heroicStrike' })).slots[0].queued).toBe(true);
     expect(view.tick(world({ queuedOnSwing: null })).slots[0].queued).toBe(false);
   });
+
+  it('marks only scoped empowered abilities when a next-cast aura names ability ids', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, { ability: ability('holy_fire', { cost: 10 }) }),
+        slot(2, { ability: ability('smite', { cost: 10 }) }),
+      ),
+      fakeDeps(),
+    );
+    const state = view.tick(
+      world({
+        auras: [
+          {
+            kind: 'next_cast_free',
+            value: 0,
+            empowerAbilities: ['holy_fire'],
+          },
+        ],
+      }),
+    );
+
+    expect(state.slots[0].empowered).toBe(true);
+    expect(state.slots[1].empowered).toBe(false);
+  });
+
+  it('glows ONLY the free-proc-scoped abilities, not every button', () => {
+    // A Hot Streak / Aether Rush style next_cast_free names its spenders; only
+    // those slots may show the gold proc glow (freeCostAuraActive is scoped).
+    const view = createActionBarView(
+      descriptor(
+        slot(1, { ability: ability('pyroblast', { cost: 20 }) }),
+        slot(2, { ability: ability('fireball', { cost: 20 }) }),
+      ),
+      fakeDeps(),
+    );
+    const state = view.tick(
+      world({
+        auras: [{ kind: 'next_cast_free', value: 0, empowerAbilities: ['pyroblast'] }],
+      }),
+    );
+    expect(state.slots[0].procGlow).toBe(true); // named -> glows
+    expect(state.slots[1].procGlow).toBe(false); // not named -> no glow
+  });
+
+  it('lets unscoped next-cast auras empower every eligible ability slot', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, { ability: ability('fire_blast', { cost: 20 }) }),
+        slot(2, { ability: ability('battle_shout', { cost: 0 }) }),
+      ),
+      fakeDeps(),
+    );
+    const state = view.tick(world({ auras: [{ kind: 'next_cast_free', value: 0 }] }));
+
+    expect(state.slots[0].empowered).toBe(true);
+    expect(state.slots[1].empowered).toBe(false);
+  });
+
+  it('marks instant empowerment only on non-physical cast-time non-channel abilities', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, {
+          ability: ability('fireball', { cost: 20, castTime: 2.5, school: 'fire' }),
+        }),
+        slot(2, {
+          ability: ability('arcane_missiles', {
+            cost: 20,
+            castTime: 0,
+            channel: { duration: 3, ticks: 3 },
+            school: 'arcane',
+          }),
+        }),
+        slot(3, {
+          ability: ability('slam', { cost: 20, castTime: 1.5, school: 'physical' }),
+        }),
+      ),
+      fakeDeps(),
+    );
+    const state = view.tick(world({ auras: [{ kind: 'next_cast_instant', value: 0 }] }));
+
+    expect(state.slots[0].empowered).toBe(true);
+    expect(state.slots[1].empowered).toBe(false);
+    expect(state.slots[2].empowered).toBe(false);
+  });
+});
+
+describe('actionBarView: free-cost proc glow + kill-window (procGlow / usable)', () => {
+  it('a Battle Trance proc glows and frees exactly the scoped abilities at zero rage', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, { ability: ability('heroic_strike', { cost: 15 }) }),
+        slot(2, { ability: ability('hamstring', { cost: 10 }) }),
+      ),
+      fakeDeps(),
+    );
+    const state = view.tick(world({ resource: 0, auras: [{ kind: 'battle_trance' }] }));
+    // The covered ability is pressable and glows even with an empty rage bar.
+    expect(state.slots[0].procGlow).toBe(true);
+    expect(state.slots[0].usable).toBe(true);
+    // The out-of-scope ability still needs rage and never glows.
+    expect(state.slots[1].procGlow).toBe(false);
+    expect(state.slots[1].usable).toBe(false);
+  });
+
+  it('a scoped next_cast_free proc glows only the ability it covers', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, { ability: ability('mortal_strike', { cost: 30 }) }),
+        slot(2, { ability: ability('rend', { cost: 10 }) }),
+      ),
+      fakeDeps(),
+    );
+    const state = view.tick(
+      world({
+        resource: 0,
+        auras: [{ kind: 'next_cast_free', empowerAbilities: ['mortal_strike'] }],
+      }),
+    );
+    expect(state.slots[0].procGlow).toBe(true);
+    expect(state.slots[0].usable).toBe(true);
+    expect(state.slots[1].procGlow).toBe(false);
+    expect(state.slots[1].usable).toBe(false);
+  });
+
+  it('a 0-cost ability never lights the free-cost glow', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('battle_shout', { cost: 0 }) })),
+      fakeDeps(),
+    );
+    const state = view.tick(world({ auras: [{ kind: 'next_cast_free' }] }));
+    expect(state.slots[0].procGlow).toBe(false);
+  });
+
+  it('a kill-window ability (requiresAuraKind) is usable and glows only while armed', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, {
+          ability: ability('victory_rush', { cost: 0, requiresAuraKind: 'victory_rush' }),
+        }),
+      ),
+      fakeDeps(),
+    );
+    const closed = view.tick(world()).slots[0];
+    expect(closed.usable).toBe(false);
+    expect(closed.procGlow).toBe(false);
+    const open = view.tick(world({ auras: [{ kind: 'victory_rush' }] })).slots[0];
+    expect(open.usable).toBe(true);
+    expect(open.procGlow).toBe(true);
+  });
+});
+
+describe('actionBarView: next-cast empowerment highlight (empowered)', () => {
+  it('marks only scoped empowered abilities when a next-cast aura names ability ids', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, { ability: ability('holy_fire', { cost: 10 }) }),
+        slot(2, { ability: ability('smite', { cost: 10 }) }),
+      ),
+      fakeDeps(),
+    );
+    const state = view.tick(
+      world({
+        auras: [
+          {
+            kind: 'next_cast_free',
+            value: 0,
+            empowerAbilities: ['holy_fire'],
+          },
+        ],
+      }),
+    );
+
+    expect(state.slots[0].empowered).toBe(true);
+    expect(state.slots[1].empowered).toBe(false);
+  });
+
+  it('lets unscoped next-cast auras empower every eligible ability slot', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, { ability: ability('fire_blast', { cost: 20 }) }),
+        slot(2, { ability: ability('battle_shout', { cost: 0 }) }),
+      ),
+      fakeDeps(),
+    );
+    const state = view.tick(world({ auras: [{ kind: 'next_cast_free', value: 0 }] }));
+
+    expect(state.slots[0].empowered).toBe(true);
+    expect(state.slots[1].empowered).toBe(false);
+  });
+
+  it('marks instant empowerment only on non-physical cast-time non-channel abilities', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, {
+          ability: ability('fireball', { cost: 20, castTime: 2.5, school: 'fire' }),
+        }),
+        slot(2, {
+          ability: ability('arcane_missiles', {
+            cost: 20,
+            castTime: 0,
+            channel: { duration: 3, ticks: 3 },
+            school: 'arcane',
+          }),
+        }),
+        slot(3, {
+          ability: ability('slam', { cost: 20, castTime: 1.5, school: 'physical' }),
+        }),
+      ),
+      fakeDeps(),
+    );
+    const state = view.tick(world({ auras: [{ kind: 'next_cast_instant', value: 0 }] }));
+
+    expect(state.slots[0].empowered).toBe(true);
+    expect(state.slots[1].empowered).toBe(false);
+    expect(state.slots[2].empowered).toBe(false);
+  });
 });
 
 describe('actionBarView: attack + item slots', () => {
@@ -335,6 +594,27 @@ describe('actionBarView: attack + item slots', () => {
     const dead = view.tick(world({ dead: true, inventory: [{ itemId: 'potion', count: 1 }] }))
       .slots[0];
     expect(dead.usable).toBe(false);
+  });
+
+  it('badges the recharge-model charges (Frost second Ice Block: 1 + bonusCharges)', () => {
+    // An ability on the abilityCharges recharge model carries its extra uses as
+    // bonusCharges (not the Double Charge Map), so the max is 1 + bonusCharges and the
+    // live count comes from player.abilityCharges. This is what Frost's second Ice
+    // Block rode, which showed no badge before the fix.
+    const iceBlock: ActionBarAbility = { def: ability('ice_block').def, cost: 0, bonusCharges: 1 };
+    const view = createActionBarView(descriptor(slot(1, { ability: iceBlock })), fakeDeps());
+    // Before any cast (no abilityCharges entry): the full 2 charges show.
+    expect(view.tick(world()).slots[0].count).toBe('2');
+    // One spent: the live recharge-model count shows 1.
+    expect(view.tick(world({ abilityCharges: { ice_block: { charges: 1 } } })).slots[0].count).toBe(
+      '1',
+    );
+    // A single-charge ability (no bonusCharges) still shows no badge.
+    const single = createActionBarView(
+      descriptor(slot(1, { ability: ability('frostbolt') })),
+      fakeDeps(),
+    );
+    expect(single.tick(world()).slots[0].count).toBe('');
   });
 
   it('paints the shared potion cooldown swipe on a potion item-slot', () => {

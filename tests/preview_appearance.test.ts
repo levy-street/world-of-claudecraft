@@ -38,6 +38,7 @@ const appearance = (over: Partial<PreviewAppearance>): PreviewAppearance => ({
   skin: 0,
   skinCatalog: 'class',
   mainhandItemId: null,
+  offhandItemId: null,
   ...over,
 });
 
@@ -70,9 +71,12 @@ beforeEach(() => {
 
 describe('previewAppearanceVisual', () => {
   it('uses the class rig for a class-catalog character and holds its mainhand', () => {
-    const v = previewAppearanceVisual(appearance({ cls: 'mage', mainhandItemId: 'staff_x' }));
-    expect(v.visualKey).toBe('player_mage');
-    expect(v.weaponItemId).toBe('staff_x');
+    const v = previewAppearanceVisual(
+      appearance({ cls: 'rogue', mainhandItemId: 'dagger_x', offhandItemId: 'dagger_y' }),
+    );
+    expect(v.visualKey).toBe('player_rogue');
+    expect(v.weaponItemId).toBe('dagger_x');
+    expect(v.offhandItemId).toBe('dagger_y');
     expect(v.weaponOverride).toBeNull();
   });
 
@@ -87,19 +91,25 @@ describe('previewAppearanceVisual', () => {
     expect(v.visualKey).toBe('player_mech');
   });
 
-  it('mirrors the wearer class hand layout on the mech (rogue dual-wields)', () => {
+  it('mirrors the wearer class hand layout and actual offhand on the mech', () => {
     const rogue = previewAppearanceVisual(
-      appearance({ cls: 'rogue', skinCatalog: 'mech', mainhandItemId: 'dagger_x' }),
+      appearance({
+        cls: 'rogue',
+        skinCatalog: 'mech',
+        mainhandItemId: 'dagger_x',
+        offhandItemId: 'dagger_y',
+      }),
     );
     expect(rogue.visualKey).toBe('player_mech');
     expect(rogue.weaponItemId).toBe('dagger_x');
+    expect(rogue.offhandItemId).toBe('dagger_y');
     // Same override the in-world mech render applies for the dual-wield class.
     expect(rogue.weaponOverride).toEqual(mechHeldWeaponOverride('rogue'));
     expect(rogue.weaponOverride).not.toBeNull();
 
-    // A single-mainhand class keeps the mech's own default (no override).
+    // Winning Warrior also needs its independent shield / Fury offhand layout.
     const warrior = previewAppearanceVisual(appearance({ cls: 'warrior', skinCatalog: 'mech' }));
-    expect(warrior.weaponOverride).toBeNull();
+    expect(warrior.weaponOverride).toEqual(mechHeldWeaponOverride('warrior'));
   });
 });
 
@@ -113,6 +123,7 @@ describe('appearanceSignature', () => {
     expect(appearanceSignature({ ...base, skin: 3 })).not.toBe(sig);
     expect(appearanceSignature({ ...base, skinCatalog: 'mech' })).not.toBe(sig);
     expect(appearanceSignature({ ...base, mainhandItemId: 'b' })).not.toBe(sig);
+    expect(appearanceSignature({ ...base, offhandItemId: 'b' })).not.toBe(sig);
   });
 });
 
@@ -124,11 +135,12 @@ describe('CharacterPreview.setAppearance', () => {
       skin: 2,
       skinCatalog: 'mech',
       mainhandItemId: 'dagger_x',
+      offhandItemId: 'dagger_y',
     });
 
     preview.setAppearance(mech);
     expect(setVisualKey).toHaveBeenCalledOnce();
-    expect(setVisualKey).toHaveBeenLastCalledWith('player_rogue', 'dagger_x');
+    expect(setVisualKey).toHaveBeenLastCalledWith('player_rogue', 'dagger_x', null, 'dagger_y');
 
     await finishMechLoad();
 
@@ -138,6 +150,7 @@ describe('CharacterPreview.setAppearance', () => {
       'player_mech',
       'dagger_x',
       mechHeldWeaponOverride('rogue'),
+      'dagger_y',
     );
   });
 
@@ -149,11 +162,33 @@ describe('CharacterPreview.setAppearance', () => {
     );
 
     expect(setVisualKey).toHaveBeenCalledTimes(2);
-    expect(setVisualKey).toHaveBeenLastCalledWith('player_mage', 'staff_x', null);
+    expect(setVisualKey).toHaveBeenLastCalledWith('player_mage', 'staff_x', null, null);
 
     await finishMechLoad();
 
     expect(setVisualKey).toHaveBeenCalledTimes(2);
-    expect(setVisualKey).toHaveBeenLastCalledWith('player_mage', 'staff_x', null);
+    expect(setVisualKey).toHaveBeenLastCalledWith('player_mage', 'staff_x', null, null);
+  });
+});
+
+describe('CharacterPreview.setClass', () => {
+  it('shows starter offhands and accepts the live equipped hands from callers', () => {
+    const { preview, setVisualKey } = barePreview();
+
+    preview.setClass('warrior');
+    expect(setVisualKey).toHaveBeenLastCalledWith(
+      'player_warrior',
+      'worn_sword',
+      null,
+      'eastbrook_buckler',
+    );
+
+    preview.setClass('rogue', 'rusty_dagger', 'keen_dirk');
+    expect(setVisualKey).toHaveBeenLastCalledWith(
+      'player_rogue',
+      'rusty_dagger',
+      null,
+      'keen_dirk',
+    );
   });
 });

@@ -9,7 +9,7 @@ import {
   FINDER_PRE_SPEC_ROLES,
   finderActivity,
 } from '../src/sim/content/dungeon_finder';
-import { type Role, TALENTS } from '../src/sim/content/talents';
+import { FIRST_TALENT_LEVEL, type Role, TALENTS } from '../src/sim/content/talents';
 import { Sim } from '../src/sim/sim';
 import {
   assignFinderRoles,
@@ -40,7 +40,7 @@ interface Joined {
 }
 
 // Add `count` players of the given classes at `level`, select `roles` for each,
-// and (at level >= 10) pick a spec matching the first role.
+// and (at level >= FIRST_TALENT_LEVEL) pick a spec matching the first role.
 function addPlayers(
   sim: Sim,
   defs: { cls: PlayerClass; roles: Role[]; level: number; name?: string }[],
@@ -48,7 +48,7 @@ function addPlayers(
   return defs.map((d, i) => {
     const pid = sim.addPlayer(d.cls, d.name ?? `P${i}`);
     sim.setPlayerLevel(d.level, pid);
-    if (d.level >= 10) sim.setSpec(specIdFor(d.cls, d.roles[0]), pid);
+    if (d.level >= FIRST_TALENT_LEVEL) sim.setSpec(specIdFor(d.cls, d.roles[0]), pid);
     sim.dungeonFinderSetRoles(d.roles, pid);
     return pid;
   });
@@ -65,7 +65,7 @@ const errorsFor = (events: SimEvent[], pid: number) =>
     .filter((e) => e.type === 'error' && e.pid === pid)
     .map((e) => (e as { text: string }).text);
 
-// A standard eligible five for the Hollow Crypt (levels 7-10, pre-spec roles).
+// A standard eligible five for the Hollow Crypt (levels 7-10, spec roles).
 function queueFive(sim: Sim): Joined {
   const pids = addPlayers(sim, [
     { cls: 'warrior', roles: ['tank'], level: 8 },
@@ -175,31 +175,35 @@ describe('finder catalogue metadata', () => {
 // ---------------------------------------------------------------------------
 
 describe('compatibleFinderRoles', () => {
-  it('applies the fixed class table below level 10', () => {
-    expect(compatibleFinderRoles('warrior', 9, null)).toEqual(['tank', 'dps']);
-    expect(compatibleFinderRoles('paladin', 9, null)).toEqual(['tank', 'healer', 'dps']);
-    expect(compatibleFinderRoles('druid', 9, null)).toEqual(['tank', 'healer', 'dps']);
-    expect(compatibleFinderRoles('priest', 9, null)).toEqual(['healer', 'dps']);
-    expect(compatibleFinderRoles('shaman', 9, null)).toEqual(['healer', 'dps']);
-    expect(compatibleFinderRoles('mage', 9, null)).toEqual(['dps']);
-    expect(compatibleFinderRoles('rogue', 9, null)).toEqual(['dps']);
-    expect(compatibleFinderRoles('hunter', 9, null)).toEqual(['dps']);
-    expect(compatibleFinderRoles('warlock', 9, null)).toEqual(['dps']);
+  it('applies the fixed class table below level 5 (the spec unlock)', () => {
+    expect(compatibleFinderRoles('warrior', 4, null)).toEqual(['tank', 'dps']);
+    expect(compatibleFinderRoles('paladin', 4, null)).toEqual(['tank', 'healer', 'dps']);
+    expect(compatibleFinderRoles('druid', 4, null)).toEqual(['tank', 'healer', 'dps']);
+    expect(compatibleFinderRoles('priest', 4, null)).toEqual(['healer', 'dps']);
+    expect(compatibleFinderRoles('shaman', 4, null)).toEqual(['healer', 'dps']);
+    expect(compatibleFinderRoles('mage', 4, null)).toEqual(['dps']);
+    expect(compatibleFinderRoles('rogue', 4, null)).toEqual(['dps']);
+    expect(compatibleFinderRoles('hunter', 4, null)).toEqual(['dps']);
+    expect(compatibleFinderRoles('warlock', 4, null)).toEqual(['dps']);
   });
 
-  it('every class can dps below 10 (table completeness)', () => {
+  it('every class can dps below 5 (table completeness)', () => {
     expect(FINDER_PRE_SPEC_ROLES.dps).toHaveLength(9);
   });
 
-  it('from level 10 the active spec role is the only compatible role', () => {
+  it('from level 5 the active spec role is the only compatible role', () => {
+    expect(compatibleFinderRoles('warrior', 5, 'tank')).toEqual(['tank']);
     expect(compatibleFinderRoles('warrior', 10, 'tank')).toEqual(['tank']);
     expect(compatibleFinderRoles('druid', 20, 'healer')).toEqual(['healer']);
     expect(compatibleFinderRoles('mage', 20, 'dps')).toEqual(['dps']);
   });
 
-  it('no active spec at level 10+ means no compatible roles', () => {
+  it('no active spec at level 5+ means no compatible roles; level 4 is not spec-gated', () => {
+    expect(compatibleFinderRoles('warrior', 5, null)).toEqual([]);
     expect(compatibleFinderRoles('warrior', 10, null)).toEqual([]);
     expect(compatibleFinderRoles('druid', 20, null)).toEqual([]);
+    // One level below the unlock the class table still applies unspecced.
+    expect(compatibleFinderRoles('warrior', 4, null)).toEqual(['tank', 'dps']);
   });
 });
 
@@ -340,7 +344,7 @@ describe('automatic queue', () => {
     expect(sim.dungeonFinderInfoFor(high)?.queue).toBeNull();
   });
 
-  it('level 10+ without an active spec can neither select roles nor queue', () => {
+  it('level 5+ without an active spec can neither select roles nor queue', () => {
     const sim = makeSim();
     const pid = sim.addPlayer('warrior', 'NoSpec');
     sim.setPlayerLevel(20, pid);
@@ -350,29 +354,62 @@ describe('automatic queue', () => {
     expect(errorsFor(events, pid)).toContain('Choose a specialization to use the Dungeon Finder.');
     expect(sim.dungeonFinderInfoFor(pid)?.eligibleRoles).toEqual([]);
     expect(sim.dungeonFinderInfoFor(pid)?.queue).toBeNull();
+    // The gate starts exactly at the spec unlock (level 5)...
+    const atFive = sim.addPlayer('warrior', 'AtFive');
+    sim.setPlayerLevel(5, atFive);
+    sim.dungeonFinderSetRoles(['tank'], atFive);
+    const eventsAtFive = tickAll(sim, 1);
+    expect(errorsFor(eventsAtFive, atFive)).toContain(
+      'Choose a specialization to use the Dungeon Finder.',
+    );
+    expect(sim.dungeonFinderInfoFor(atFive)?.eligibleRoles).toEqual([]);
+    // ...and level 4 is NOT spec-gated: the class table applies unspecced.
+    const atFour = sim.addPlayer('warrior', 'AtFour');
+    sim.setPlayerLevel(4, atFour);
+    sim.dungeonFinderSetRoles(['tank'], atFour);
+    const eventsAtFour = tickAll(sim, 1);
+    expect(errorsFor(eventsAtFour, atFour)).toEqual([]);
+    expect(sim.dungeonFinderInfoFor(atFour)?.eligibleRoles).toEqual(['tank', 'dps']);
+    expect(sim.dungeonFinderInfoFor(atFour)?.roles).toEqual(['tank']);
   });
 
   it('rejects a role outside the class capability table', () => {
     const sim = makeSim();
+    // Below the spec unlock the fixed class table applies: a mage cannot tank.
     const pid = sim.addPlayer('mage', 'M');
-    sim.setPlayerLevel(8, pid);
+    sim.setPlayerLevel(4, pid);
     sim.dungeonFinderSetRoles(['tank'], pid);
     const events = tickAll(sim, 1);
     expect(errorsFor(events, pid)).toContain('You cannot fill that role.');
+    // From the spec unlock the active spec's role is the whole capability set.
+    const specced = sim.addPlayer('mage', 'M2');
+    sim.setPlayerLevel(8, specced);
+    sim.setSpec(specIdFor('mage', 'dps'), specced);
+    sim.dungeonFinderSetRoles(['tank'], specced);
+    const eventsSpecced = tickAll(sim, 1);
+    expect(errorsFor(eventsSpecced, specced)).toContain('You cannot fill that role.');
   });
 
-  it('assigns exactly one role to a multi-role player', () => {
+  it('assigns exactly one role to a multi-role selection (the active spec narrows it)', () => {
     const sim = makeSim();
-    const pids = addPlayers(sim, [
-      { cls: 'druid', roles: ['tank', 'healer'], level: 8 },
+    // A druid picks both tank and healer below the spec unlock; the sticky
+    // selection survives leveling up, but from level 5 the active spec is the
+    // whole capability set, so it collapses to one role at match time.
+    const druid = sim.addPlayer('druid', 'P0');
+    sim.setPlayerLevel(4, druid);
+    sim.dungeonFinderSetRoles(['tank', 'healer'], druid);
+    sim.setPlayerLevel(8, druid);
+    sim.setSpec(specIdFor('druid', 'healer'), druid);
+    const rest = addPlayers(sim, [
       { cls: 'warrior', roles: ['tank'], level: 8 },
       { cls: 'mage', roles: ['dps'], level: 8 },
       { cls: 'rogue', roles: ['dps'], level: 8 },
       { cls: 'hunter', roles: ['dps'], level: 8 },
     ]);
+    const pids = [druid, ...rest];
     for (const pid of pids) sim.dungeonFinderQueueJoin(['hollow_crypt_normal'], pid);
     tickAll(sim, 1);
-    // The warrior can only tank, so the flexible druid must heal.
+    // The restoration spec restricts the tank+healer selection to healing.
     expect(sim.dungeonFinderInfoFor(pids[0])?.proposal?.role).toBe('healer');
     expect(sim.dungeonFinderInfoFor(pids[1])?.proposal?.role).toBe('tank');
   });
@@ -859,6 +896,7 @@ describe('/dev lfg seeding', () => {
   it('queue mode spawns the complementary bots so my join pops a proposal', () => {
     const sim = makeDevSim();
     sim.setPlayerLevel(8);
+    sim.setSpec(specIdFor('warrior', 'tank'));
     sim.dungeonFinderSetRoles(['tank']);
     sim.chat('/dev lfg');
     tickAll(sim, 1);
@@ -893,6 +931,7 @@ describe('/dev lfg seeding', () => {
   it('board mode publishes bot listings and sends my listing an applicant', () => {
     const sim = makeDevSim();
     sim.setPlayerLevel(8);
+    sim.setSpec(specIdFor('warrior', 'tank'));
     sim.dungeonFinderSetRoles(['tank']);
     sim.dungeonFinderListingCreate('hollow_crypt_normal', ['first_run']);
     sim.chat('/dev lfg board');
@@ -904,11 +943,14 @@ describe('/dev lfg seeding', () => {
   it('asks for a role first and is inert without devCommands', () => {
     const sim = makeDevSim();
     sim.setPlayerLevel(8);
+    // Specced but no role selected: seeding must still refuse.
+    sim.setSpec(specIdFor('warrior', 'tank'));
     sim.chat('/dev lfg');
     tickAll(sim, 1);
     expect([...sim.players.values()].filter((m) => m.isDevBot)).toHaveLength(0);
     const prod = new Sim({ seed: 42, playerClass: 'warrior' });
     prod.setPlayerLevel(8);
+    prod.setSpec(specIdFor('warrior', 'tank'));
     prod.dungeonFinderSetRoles(['tank']);
     prod.chat('/dev lfg');
     tickAll(prod, 1);

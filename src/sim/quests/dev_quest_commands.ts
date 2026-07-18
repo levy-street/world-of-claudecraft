@@ -1,7 +1,7 @@
 import { QUESTS } from '../data';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import type { QuestDef, QuestProgress } from '../types';
+import { type QuestDef, type QuestProgress, questObjectiveRequired } from '../types';
 import { finalizeQuestAccept, questState, turnInQuestCore } from './quest_commands';
 
 // /dev quest-completion cheats (gated by ctx.devCommands / ALLOW_DEV_COMMANDS). They
@@ -19,22 +19,26 @@ function satisfyTrackedQuestForDev(
 ): void {
   let collectChanged = false;
   quest.objectives.forEach((obj, index) => {
+    const required = questObjectiveRequired(quest, qp, index);
     if (obj.type === 'collect' && obj.itemId) {
       const have = ctx.countItem(obj.itemId, meta.entityId);
-      if (have < obj.count) {
-        ctx.addItem(obj.itemId, obj.count - have, meta.entityId);
+      if (have < required) {
+        ctx.addItem(obj.itemId, required - have, meta.entityId);
         collectChanged = true;
       }
       return;
     }
-    const next = Math.max(qp.counts[index] ?? 0, obj.count);
+    const next = Math.max(qp.counts[index] ?? 0, required);
     if (next !== qp.counts[index]) {
       meta.counters.questProgress += next - (qp.counts[index] ?? 0);
       qp.counts[index] = next;
       ctx.emit({
         type: 'questProgress',
         questId: qp.questId,
-        text: `${obj.label}: ${qp.counts[index]}/${obj.count}`,
+        objectiveIndex: index,
+        current: qp.counts[index],
+        required,
+        text: `${obj.label}: ${qp.counts[index]}/${required}`,
         pid: meta.entityId,
       });
     }

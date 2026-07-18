@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { partyFrameSignature, selectPartyFrameMembers } from '../src/ui/party_frames';
+import {
+  DEFAULT_PARTY_FRAME_DISPLAY,
+  partyFrameAuraIsRelevant,
+  partyFrameHealthText,
+  partyFrameSignature,
+  resolvePartyFrameStyle,
+  selectPartyFrameMembers,
+} from '../src/ui/party_frames';
 import type { PartyInfo, PartyMemberInfo } from '../src/world_api';
 
 const member = (pid: number, group: 1 | 2, x = 0, z = 0): PartyMemberInfo => ({
@@ -9,6 +16,7 @@ const member = (pid: number, group: 1 | 2, x = 0, z = 0): PartyMemberInfo => ({
   level: 20,
   hp: 100,
   mhp: 100,
+  absorb: 0,
   res: 100,
   mres: 100,
   rtype: 'mana',
@@ -17,6 +25,36 @@ const member = (pid: number, group: 1 | 2, x = 0, z = 0): PartyMemberInfo => ({
   dead: 0,
   inCombat: 0,
   group,
+});
+
+describe('party frame style resolution', () => {
+  it('supports automatic, always classic, and always raid-frame presentation', () => {
+    expect(resolvePartyFrameStyle(0, false)).toBe('classic');
+    expect(resolvePartyFrameStyle(0, true)).toBe('raid');
+    expect(resolvePartyFrameStyle(1, true)).toBe('classic');
+    expect(resolvePartyFrameStyle(2, false)).toBe('raid');
+  });
+});
+
+describe('party frame aura relevance', () => {
+  it('hides passive maintenance buffs but keeps healer effects and harmful auras', () => {
+    expect(partyFrameAuraIsRelevant({ id: 'imbue', kind: 'imbue' })).toBe(false);
+    expect(partyFrameAuraIsRelevant({ id: 'arcane_intellect', kind: 'buff_int_pct' })).toBe(false);
+    expect(partyFrameAuraIsRelevant({ id: 'sacred_shield', kind: 'cast_shield' })).toBe(true);
+    expect(partyFrameAuraIsRelevant({ id: 'temporal_echo', kind: 'temporal_echo' })).toBe(true);
+    expect(partyFrameAuraIsRelevant({ id: 'renew', kind: 'hot' })).toBe(true);
+    expect(partyFrameAuraIsRelevant({ id: 'power_word_shield', kind: 'absorb' })).toBe(true);
+    expect(partyFrameAuraIsRelevant({ id: 'ice_block', kind: 'stasis' })).toBe(true);
+    expect(partyFrameAuraIsRelevant({ id: 'blessing_of_might', kind: 'buff_ap' })).toBe(false);
+    expect(partyFrameAuraIsRelevant({ id: 'evasion', kind: 'buff_dodge' })).toBe(true);
+    expect(partyFrameAuraIsRelevant({ id: 'aspect_of_the_monkey', kind: 'buff_dodge' })).toBe(
+      false,
+    );
+    expect(partyFrameAuraIsRelevant({ id: 'temporal_exhaustion', kind: 'sated' })).toBe(false);
+    expect(partyFrameAuraIsRelevant({ id: 'well_fed', kind: 'buff_sta' })).toBe(false);
+    expect(partyFrameAuraIsRelevant({ id: 'rend', kind: 'dot' })).toBe(true);
+    expect(partyFrameAuraIsRelevant({ id: 'wither', kind: 'buff_ap', neg: 1 })).toBe(true);
+  });
 });
 
 describe('party frame member selection', () => {
@@ -71,6 +109,81 @@ describe('party frame member selection', () => {
       oor: true,
     });
   });
+
+  it('supports a full 20-player UI roster and configurable self visibility', () => {
+    const info: PartyInfo = {
+      leader: 1,
+      raid: true,
+      master: { enabled: false, looter: 0, threshold: 'uncommon' },
+      members: Array.from({ length: 20 }, (_, i) => member(i + 1, i < 10 ? 1 : 2)),
+    };
+    expect(selectPartyFrameMembers(info, 1, { x: 0, z: 0 })).toHaveLength(19);
+    const shown = selectPartyFrameMembers(info, 1, { x: 0, z: 0 }, undefined, {
+      showSelf: true,
+      showResource: true,
+      showAbsorbs: true,
+      showAuras: true,
+      healthText: 1,
+      sort: 0,
+      presentation: 0,
+    });
+    expect(shown).toHaveLength(20);
+    expect(shown.find((m) => m.pid === 1)?.oor).toBe(false);
+  });
+
+  it('sorts deterministically by tank, healer, damage, then name', () => {
+    const info: PartyInfo = {
+      leader: 1,
+      raid: true,
+      master: { enabled: false, looter: 0, threshold: 'uncommon' },
+      members: [
+        { ...member(1, 1), role: 'dps', name: 'Self' },
+        { ...member(2, 2), role: 'dps', name: 'Zed' },
+        { ...member(3, 1), role: 'healer', name: 'Mend' },
+        { ...member(4, 2), role: 'tank', name: 'Guard' },
+      ],
+    };
+    const frames = selectPartyFrameMembers(info, 1, { x: 0, z: 0 }, undefined, {
+      showSelf: false,
+      showResource: true,
+      showAbsorbs: true,
+      showAuras: true,
+      healthText: 1,
+      sort: 1,
+      presentation: 0,
+    });
+    expect(frames.map((m) => m.pid)).toEqual([4, 3, 2]);
+  });
+});
+
+describe('party frame health text and tactical information', () => {
+  it('formats every supported health text mode', () => {
+    const format = (value: number, percent?: boolean) =>
+      percent ? `percent:${value}` : `number:${value}`;
+    expect(partyFrameHealthText(75, 100, 0, format)).toBe('');
+    expect(partyFrameHealthText(75, 100, 1, format)).toBe('percent:0.75');
+    expect(partyFrameHealthText(75, 100, 2, format)).toBe('number:75');
+    expect(partyFrameHealthText(75, 100, 3, format)).toBe('number:75 / number:100');
+  });
+
+  it('does not reveal Temporal Cascade target selection on party frames', () => {
+    const info: PartyInfo = {
+      leader: 1,
+      raid: true,
+      master: { enabled: false, looter: 0, threshold: 'uncommon' },
+      members: [
+        member(1, 1, 0, 0),
+        member(2, 1, 10, 0),
+        member(3, 1, 11, 0),
+        member(4, 2, 9, 0),
+        member(5, 2, 10, 1),
+        member(6, 2, 10, -1),
+        member(7, 2, 30, 0),
+      ],
+    };
+    const selected = selectPartyFrameMembers(info, 1, { x: 0, z: 0 });
+    expect(selected.every((member) => !('cascade' in member))).toBe(true);
+  });
 });
 
 describe('party frame signature (the per-frame short-circuit)', () => {
@@ -90,13 +203,13 @@ describe('party frame signature (the per-frame short-circuit)', () => {
   it('skips the local player but encodes every other member + leader / raid / group', () => {
     const sig = partyFrameSignature(info(), 1, { x: 0, z: 0 });
     // pid 1 is the local player (skipped); 2 and 3 are encoded.
-    expect(sig).not.toContain('1:1:');
-    expect(sig).toContain('2:1:');
-    expect(sig).toContain('3:1:');
+    expect(sig).not.toContain('1:Raid1:');
+    expect(sig).toContain('2:Raid2:');
+    expect(sig).toContain('3:Raid3:');
     expect(sig).toContain('L1:R0:G1');
   });
 
-  it('changes when any rendered field changes (hp, dead, level, leader, raid, out-of-range)', () => {
+  it('changes when any rendered field changes (hp, shield, dead, level, leader, raid, out-of-range)', () => {
     const pos = { x: 0, z: 0 };
     const base = partyFrameSignature(info(), 1, pos);
     const members = info().members;
@@ -105,6 +218,13 @@ describe('party frame signature (the per-frame short-circuit)', () => {
     expect(
       partyFrameSignature(
         info({ members: [members[0], { ...members[1], hp: 50 }, members[2]] }),
+        1,
+        pos,
+      ),
+    ).not.toBe(base);
+    expect(
+      partyFrameSignature(
+        info({ members: [members[0], { ...members[1], absorb: 25 }, members[2]] }),
         1,
         pos,
       ),
@@ -167,6 +287,29 @@ describe('party frame signature (the per-frame short-circuit)', () => {
         pos,
       ),
     ).toBe(base);
+  });
+
+  it('changes for every live display setting so the painter cannot stay stale', () => {
+    const party = info();
+    const pos = { x: 0, z: 0 };
+    const base = partyFrameSignature(party, 1, pos);
+    const variants = [
+      { showSelf: true },
+      { showResource: false },
+      { showAbsorbs: false },
+      { showAuras: false },
+      { healthText: 2 as const },
+      { sort: 1 as const },
+      { presentation: 2 as const },
+    ];
+    for (const variant of variants) {
+      expect(
+        partyFrameSignature(party, 1, pos, undefined, {
+          ...DEFAULT_PARTY_FRAME_DISPLAY,
+          ...variant,
+        }),
+      ).not.toBe(base);
+    }
   });
 });
 

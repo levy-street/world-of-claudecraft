@@ -82,7 +82,17 @@ else
 fi
 cat > /etc/caddy/Caddyfile <<CADDY
 $SITE {
-	reverse_proxy localhost:8787
+	# The ops endpoints answer only the in-container healthcheck and the host watchdog,
+	# never the public: /livez would otherwise be a public wedge oracle and /metrics
+	# exposes operational internals. Answer them 404 from outside. The healthcheck probes
+	# /livez on 127.0.0.1 inside the container, which never passes through Caddy.
+	@ops path /livez /readyz /metrics
+	handle @ops {
+		respond 404
+	}
+	handle {
+		reverse_proxy localhost:8787
+	}
 	encode gzip
 }
 CADDY
@@ -90,7 +100,15 @@ if [ -n "$ADMIN_DOMAIN" ]; then
   cat >> /etc/caddy/Caddyfile <<CADDY
 
 $ADMIN_DOMAIN {
-	reverse_proxy localhost:8787
+	# Same as the public site: keep the ops endpoints off the public edge (they are for
+	# the in-container healthcheck and the host watchdog, which never traverse Caddy).
+	@ops path /livez /readyz /metrics
+	handle @ops {
+		respond 404
+	}
+	handle {
+		reverse_proxy localhost:8787
+	}
 	encode gzip
 }
 CADDY
@@ -110,6 +128,31 @@ find "$BACKUP_DIR" -name '*.sql.gz' -mtime +14 -delete
 BACKUP
 chmod +x /usr/local/bin/eastbrook-backup
 echo "15 3 * * * root /usr/local/bin/eastbrook-backup" > /etc/cron.d/eastbrook-backup
+
+# --- game watchdog (restarts a wedged container) -----------------------------
+# Docker's restart policy only fires when the process EXITS, so a wedged-but-alive
+# game container is never restarted without an external watcher. The compose
+# healthcheck flags one (GET /livez answers 503 when the world loop stalls) and the
+# watchdog restarts it. Every minute is the right cadence: Docker cannot report
+# `unhealthy` sooner than start_period plus retries times interval anyway, so a
+# faster poll buys nothing, and a slower one adds pure latency to every lockup.
+# Cron output goes to a log file, not to mail: the watchdog is silent unless it
+# acts. This runs at first boot only; see DEPLOY.md to install it on a live host.
+install -m 755 "$APP_DIR/deploy/game_watchdog.sh" /usr/local/bin/eastbrook-watchdog
+install -d -m 755 /var/lib/eastbrook
+echo "* * * * * root /usr/local/bin/eastbrook-watchdog >> /var/log/eastbrook-watchdog.log 2>&1" \
+  > /etc/cron.d/eastbrook-watchdog
+# Keep the watchdog log bounded. copytruncate because cron appends to the open file.
+cat > /etc/logrotate.d/eastbrook-watchdog <<'ROTATE'
+/var/log/eastbrook-watchdog.log {
+  weekly
+  rotate 4
+  compress
+  missingok
+  notifempty
+  copytruncate
+}
+ROTATE
 
 echo "=== World of Claudecraft setup finished: $(date -u) ==="
 echo "Game:   http://localhost:8787 (behind Caddy on ${SITE})"

@@ -2,6 +2,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type {
   DailyRewardDb,
   DailyRewardInternalPayoutRow,
+  DailyRewardPayoutActor,
+  DailyRewardPayoutAttemptClaimResult,
+  DailyRewardPayoutClaimResult,
+  DailyRewardPayoutModerationResult,
   DailyRewardPayoutRow,
   DailyRewardScoreRow,
   DailyRewardSpinRow,
@@ -32,10 +36,12 @@ import {
   resetDailyRewardPriceCacheForTests,
   rewardDayForDate,
 } from '../server/daily_rewards';
-import { buildDailyRewardsView } from '../src/ui/daily_rewards_view';
+import { buildDailyRewardsView, dailyRewardTaskDescription } from '../src/ui/daily_rewards_view';
 
 class FakeDailyRewardDb implements DailyRewardDb {
   banReason: string | null = null;
+  banExpiresAt: string | null = null;
+  winnerAnnouncements: DailyRewardWinnerAnnouncement[] = [];
   score = 0;
   spin: { outcomeKey: string; points: number; createdAt: string } | null = null;
   tasks: DailyRewardTaskSeed[] = [];
@@ -48,8 +54,10 @@ class FakeDailyRewardDb implements DailyRewardDb {
   }[] = [];
 
   async ensureDay(): Promise<void> {}
-  async banForAccount(): Promise<{ reason: string } | null> {
-    return this.banReason === null ? null : { reason: this.banReason };
+  async banForAccount(): Promise<{ reason: string; expiresAt: string | null } | null> {
+    return this.banReason === null
+      ? null
+      : { reason: this.banReason, expiresAt: this.banExpiresAt };
   }
   async seedTasks(_day: string, tasks: DailyRewardTaskSeed[]): Promise<void> {
     this.tasks = tasks;
@@ -166,13 +174,37 @@ class FakeDailyRewardDb implements DailyRewardDb {
     return [];
   }
   async unannouncedWinnerDays(): Promise<DailyRewardWinnerAnnouncement[]> {
-    return [];
+    return this.winnerAnnouncements;
   }
   async markWinnersAnnounced(): Promise<boolean> {
     return true;
   }
   async markPayout(): Promise<boolean> {
     return true;
+  }
+  async claimPayout(): Promise<DailyRewardPayoutClaimResult> {
+    return { outcome: 'not_found' };
+  }
+  async claimPayoutResend(): Promise<DailyRewardPayoutAttemptClaimResult> {
+    return { outcome: 'not_found' };
+  }
+  async markPayoutResend(): Promise<boolean> {
+    return true;
+  }
+  async voidPayout(
+    _day: string,
+    _rank: number,
+    _reason: string,
+    _actor: DailyRewardPayoutActor,
+  ): Promise<DailyRewardPayoutModerationResult> {
+    return { outcome: 'not_found' };
+  }
+  async restorePayout(
+    _day: string,
+    _rank: number,
+    _actor: DailyRewardPayoutActor,
+  ): Promise<DailyRewardPayoutModerationResult> {
+    return { outcome: 'not_found' };
   }
 }
 
@@ -214,7 +246,8 @@ function stubRewardConfig(config: Partial<DailyRewardRuntimeConfig> = {}) {
     vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = new URL(String(input));
       expect(url.pathname).toBe('/daily-config');
-      expect((init?.headers as Record<string, string>)['x-woc-daily-reward-secret']).toBe('secret');
+      const headers = (init?.headers ?? {}) as Record<string, string>;
+      expect(headers['x-woc-daily-reward-secret']).toBe('secret');
       return new Response(JSON.stringify(rewardConfig(config)), { status: 200 });
     }),
   );
@@ -272,6 +305,21 @@ describe('daily rewards', () => {
     );
     expect(awarded).toBe(0);
     expect(db.events).toEqual([]);
+  });
+
+  it('includes the exact timed-ban expiry in player eligibility', async () => {
+    const db = new FakeDailyRewardDb();
+    db.banReason = 'Automated play was detected.';
+    db.banExpiresAt = '2026-07-16T06:00:00.000Z';
+
+    const status = await new DailyRewardService(db).status(1);
+
+    expect(status.eligibility).toMatchObject({
+      eligible: false,
+      reason: 'banned',
+      banReason: 'Automated play was detected.',
+      banExpiresAt: '2026-07-16T06:00:00.000Z',
+    });
   });
 
   it('uses live WOC and SOL prices from the payout service config', async () => {
@@ -337,7 +385,8 @@ describe('daily rewards', () => {
       const url = new URL(String(input));
       expect(url.pathname).toBe('/daily-config');
       expect(url.searchParams.get('day')).toBe('2026-06-30');
-      expect((init?.headers as Record<string, string>)['x-woc-daily-reward-secret']).toBe('secret');
+      const headers = (init?.headers ?? {}) as Record<string, string>;
+      expect(headers['x-woc-daily-reward-secret']).toBe('secret');
       return new Response(
         JSON.stringify(
           rewardConfig({
@@ -363,6 +412,89 @@ describe('daily rewards', () => {
     expect(db.tasks).toMatchObject([
       { id: 'quests_today', type: 'quest_completion', title: 'Quest push', basePoints: 12 },
     ]);
+  });
+
+  it('adds the current and next task names to Discord winner announcements', async () => {
+    const db = new FakeDailyRewardDb();
+    db.winnerAnnouncements = [
+      {
+        day: '2026-06-30',
+        realm: 'Claudemoon',
+        prizePoolUsd: 150,
+        finalizedAt: '2026-07-01T00:00:00.000Z',
+        payouts: [],
+      },
+    ];
+    resetDailyRewardPriceCacheForTests();
+    vi.mocked(fetch).mockImplementation(async (input: RequestInfo | URL) => {
+      const day = new URL(String(input)).searchParams.get('day');
+      const tasks: DailyRewardTaskSeed[] =
+        day === '2026-07-01'
+          ? [
+              {
+                id: 'arena_today',
+                type: 'arena_result',
+                title: 'Win an arena match',
+                description: 'Win an arena match.',
+                points: 10,
+                basePoints: 10,
+                sortOrder: 1,
+                active: true,
+                config: {},
+              },
+            ]
+          : [
+              {
+                id: 'inactive_task',
+                type: 'quest_completion',
+                title: 'Inactive task',
+                description: 'Inactive task.',
+                points: 10,
+                basePoints: 10,
+                sortOrder: 0,
+                active: false,
+                config: {},
+              },
+              {
+                id: 'later_task',
+                type: 'quest_completion',
+                title: 'Complete later task',
+                description: 'Complete later task.',
+                points: 10,
+                basePoints: 10,
+                sortOrder: 2,
+                active: true,
+                config: {},
+              },
+              {
+                id: 'quests_today',
+                type: 'quest_completion',
+                title: 'Complete quests',
+                description: 'Complete quests.',
+                points: 10,
+                basePoints: 10,
+                sortOrder: 1,
+                active: true,
+                config: {},
+              },
+            ];
+      return new Response(JSON.stringify(rewardConfig({ tasks })), { status: 200 });
+    });
+    const service = new DailyRewardService(db);
+    vi.spyOn(service, 'finalizePreviousDay').mockResolvedValue();
+
+    const result = (await service.discordWinnerAnnouncements(1)) as {
+      days: Array<{ day: string; taskName: string; nextTaskName: string }>;
+    };
+
+    expect(result.days).toEqual([
+      expect.objectContaining({
+        day: '2026-06-30',
+        taskName: 'Complete quests',
+        nextTaskName: 'Win an arena match',
+      }),
+    ]);
+    expect(vi.mocked(fetch)).toHaveBeenCalledTimes(2);
   });
 
   it('awards quest task points using the online-time multiplier', async () => {
@@ -455,29 +587,39 @@ describe('daily rewards', () => {
         new Date(`2026-06-30T12:${String(minute).padStart(2, '0')}:00.000Z`),
       );
     }
-    await service.recordArenaResult(1, {
+    const excluded = await service.recordArenaResult(1, {
       won: true,
       format: '1v1',
       ratingBefore: 1500,
       ratingAfter: 1516,
       completedAt: new Date('2026-06-30T13:00:00.000Z'),
     });
+    expect(excluded).toBe(0);
+    expect(db.events.filter((event) => event.kind === 'task')).toHaveLength(0);
+
+    await service.recordArenaResult(1, {
+      won: true,
+      format: '2v2',
+      ratingBefore: 1500,
+      ratingAfter: 1516,
+      completedAt: new Date('2026-06-30T13:01:00.000Z'),
+    });
     await service.recordArenaResult(1, {
       won: false,
-      format: '1v1',
+      format: '2v2',
       ratingBefore: 1516,
       ratingAfter: 1500,
-      completedAt: new Date('2026-06-30T13:01:00.000Z'),
+      completedAt: new Date('2026-06-30T13:02:00.000Z'),
     });
     const taskEvents = db.events.filter((event) => event.kind === 'task');
     expect(taskEvents).toHaveLength(2);
     expect(taskEvents[0]).toMatchObject({
       points: 60,
-      meta: { format: '1v1', won: true, onlineMinutes: 60, multiplier: 3, basePoints: 20 },
+      meta: { format: '2v2', won: true, onlineMinutes: 60, multiplier: 3, basePoints: 20 },
     });
     expect(taskEvents[1]).toMatchObject({
       points: 30,
-      meta: { format: '1v1', won: false, onlineMinutes: 60, multiplier: 3, basePoints: 10 },
+      meta: { format: '2v2', won: false, onlineMinutes: 60, multiplier: 3, basePoints: 10 },
     });
     expect(db.score).toBe(90);
   });
@@ -586,19 +728,28 @@ describe('daily rewards', () => {
       matchId: 42,
       completedAt: new Date('2026-06-30T13:01:00.000Z'),
     });
+    expect(db.events.filter((event) => event.kind === 'task')).toHaveLength(0);
+    expect(db.score).toBe(0);
+
+    await service.recordValeCupResult(1, {
+      won: true,
+      bracket: 2,
+      matchId: 45,
+      completedAt: new Date('2026-06-30T13:01:30.000Z'),
+    });
 
     const taskEvents = db.events.filter((event) => event.kind === 'task');
     expect(taskEvents).toHaveLength(1);
     expect(taskEvents[0]).toMatchObject({
       points: 75,
-      key: 'task:vale_cup_ranked_wins:vale_cup:42:win:2026-06-30T13:01:00.000Z',
+      key: 'task:vale_cup_ranked_wins:vale_cup:45:win:2026-06-30T13:01:30.000Z',
       meta: {
         taskId: 'vale_cup_ranked_wins',
         taskType: 'vale_cup_result',
-        bracket: 1,
-        matchId: 42,
+        bracket: 2,
+        matchId: 45,
         completionId: null,
-        completedAt: '2026-06-30T13:01:00.000Z',
+        completedAt: '2026-06-30T13:01:30.000Z',
         won: true,
         matchType: 'ranked',
         rated: true,
@@ -612,7 +763,7 @@ describe('daily rewards', () => {
 
     await service.recordValeCupResult(1, {
       won: true,
-      bracket: 1,
+      bracket: 2,
       matchId: 43,
       rated: false,
       hasBots: true,
@@ -626,7 +777,7 @@ describe('daily rewards', () => {
       meta: {
         taskId: 'vale_cup_ranked_wins',
         taskType: 'vale_cup_result',
-        bracket: 1,
+        bracket: 2,
         matchId: 43,
         completionId: null,
         completedAt: '2026-06-30T13:02:00.000Z',
@@ -644,7 +795,7 @@ describe('daily rewards', () => {
 
     await service.recordValeCupResult(1, {
       won: true,
-      bracket: 1,
+      bracket: 2,
       matchId: 44,
       rated: false,
       hasBots: true,
@@ -659,7 +810,7 @@ describe('daily rewards', () => {
       meta: {
         taskId: 'vale_cup_ranked_wins',
         taskType: 'vale_cup_result',
-        bracket: 1,
+        bracket: 2,
         matchId: 44,
         completionId: null,
         completedAt: '2026-06-30T13:03:00.000Z',
@@ -712,14 +863,14 @@ describe('daily rewards', () => {
       const completedAt = new Date('2026-06-30T20:59:00.000Z');
       const beforeRestartResult = {
         won: true,
-        bracket: 1,
+        bracket: 2,
         matchId: 7,
         completionId: 'before-restart-match-7',
         completedAt,
       };
       const afterRestartResult = {
         won: true,
-        bracket: 1,
+        bracket: 2,
         matchId: 7,
         completionId: 'after-restart-match-7',
         completedAt,
@@ -769,7 +920,7 @@ describe('daily rewards', () => {
         },
       ],
     });
-    const result = { won: true, bracket: 1, matchId: 7 };
+    const result = { won: true, bracket: 2, matchId: 7 };
     const firstCompletedAt = new Date('2026-06-30T13:20:00.000Z');
     const secondCompletedAt = new Date('2026-06-30T13:21:00.000Z');
 
@@ -1141,5 +1292,21 @@ describe('daily rewards', () => {
       },
     });
     expect(view).toMatchObject({ kind: 'ready', locked: true, lockReason: 'under_minimum' });
+  });
+
+  it('marks Arena and Vale Cup task descriptions with the 1v1 restriction', () => {
+    const restriction = '1v1 matches do not grant daily reward points.';
+    expect(dailyRewardTaskDescription('arena_result', 'Complete arena matches.', restriction)).toBe(
+      `Complete arena matches. ${restriction}`,
+    );
+    expect(
+      dailyRewardTaskDescription('vale_cup_result', 'Win Vale Cup matches.', restriction),
+    ).toBe(`Win Vale Cup matches. ${restriction}`);
+    expect(dailyRewardTaskDescription('quest_completion', 'Complete quests.', restriction)).toBe(
+      'Complete quests.',
+    );
+    expect(dailyRewardTaskDescription('delve_clear', 'Complete delves.', restriction)).toBe(
+      'Complete delves.',
+    );
   });
 });

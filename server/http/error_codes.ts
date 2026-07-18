@@ -190,6 +190,9 @@ export const ERROR_CODES = deepFreeze({
   'steam.account_taken': { params: [] },
   // The Steam Web API could not be reached or answered garbage (503).
   'steam.upstream': { params: [] },
+  // wallet: the desktop browser handoff was malformed, expired, or mismatched.
+  'wallet.handoff_invalid': { params: [] },
+  'welcome.invalid_input': { params: [] },
 } as const);
 
 /** A stable error code: one of the keys of ERROR_CODES. */

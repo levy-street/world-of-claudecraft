@@ -405,7 +405,7 @@ export const guideStrings = {
     ccBody:
       'Crowd control is a special kind of debuff that limits what a target can do: stuns, roots and slows, silences that stop spellcasting, disarms, fears, and transformations that turn a foe harmless for a moment. Against other players, control wears thin with repetition: the same kind reapplied too quickly weakens and then fails outright, and a stun that opens from stealth is counted apart from the stuns that follow, so nobody can be chained helpless forever. The creatures of the world hold no such grudge: control never weakens with repetition against them, though many of the mightiest foes, named elites and the strongest bosses among them, cannot be controlled at all.',
     metersBody:
-      'Curious how a fight went? Press Z to open the party meters, which tally damage, healing, and threat for your group, encounter by encounter.',
+      'Curious how a fight went? Press Shift+H to open the party meters, which tally damage, healing, and threat for your group, encounter by encounter.',
     // The one-slot ability queue: a press mid-cast is held and fired at cast end.
     queueTitle: 'Your next move is already loaded',
     queueBody:
@@ -492,7 +492,7 @@ export const guideStrings = {
       'The command row a hunter or warlock pet adds: Attack, Stop, Taunt, Defensive, and Aggressive, bound to Ctrl plus 1 through 5 by default.',
     metersTerm: 'Damage meters',
     metersDef:
-      'The party scoreboard window for the current fight: damage dealt, healing done, and who holds the most threat, kept per encounter. Open it with its keybind (Z by default).',
+      'The party scoreboard window for the current fight: damage dealt, healing done, and who holds the most threat, kept per encounter. Open it with its keybind (Shift+H by default).',
     targetMarkerTerm: 'Target marker',
     targetMarkerDef:
       'A symbol any party or raid member can pin over a target so everyone focuses, or avoids, the same one. Eight symbols, one target per symbol.',
@@ -625,10 +625,10 @@ export const guideStrings = {
   // press it). Keyed by the sim ability id.
   abilityHook: {
     heroic_strike: 'Queues a heavier swing that spends rage on your next hit.',
+    revenge: 'Sweeps enemies in front of you, with a chance to become free after a dodge or parry.',
+    hamstring: "Cripples an enemy's movement to keep it from escaping.",
     battle_shout: 'A rallying cry that raises attack power for the party.',
-    commanding_shout: 'Bolsters stamina so everyone has more staying power in a fight.',
     charge: 'Rushes a distant enemy to open the fight with a brief stun.',
-    rend: 'Opens a bleed that wears the target down over time.',
     thunder_clap: 'Hits everything around you and slows their attacks.',
     seal_of_righteousness: 'Imbues your swings with Holy damage, then spend it with Verdict.',
     holy_light: 'A steady, sizable heal for topping off an ally or yourself.',
@@ -662,9 +662,21 @@ export const guideStrings = {
     lightning_shield: 'Charges you so attackers take Nature damage when they hit you.',
     flame_shock: 'An instant burn that hits up front and keeps searing over time.',
     fireball: 'Your main fire nuke, lands a hit and leaves the target burning.',
+    fireball_form: 'Become a living ember to cross open ground at high speed.',
     frost_armor: 'A lasting self-buff that hardens your armor before a fight.',
     arcane_intellect: "Raises Intellect to deepen an ally's mana pool, cast it before the pull.",
     frostbolt: 'Strikes from range and slows the target so it cannot close on you.',
+    ice_lance: 'An instant shard for spending frost procs, it hits far harder on a frozen target.',
+    flurry:
+      'Three quick bolts that chill the target so your next frost hits land as if it were frozen.',
+    fingers_of_frost:
+      'Your frost bolts sometimes empower an Ice Lance to strike as if the target were frozen.',
+    brain_freeze: 'Your frost bolts sometimes make the next Flurry instant and harder-hitting.',
+    shatter: 'Your spells crit far more often against frozen targets.',
+    frozen_orb:
+      'Rolls a slow orb through the pack that chills everything and feeds your frost procs.',
+    blizzard: 'Blankets an area in ice to wear down and slow a whole pack.',
+    blink: 'Teleports you a short distance forward, breaking roots on the way out.',
     conjure_water: 'Conjures drinks that restore mana, so you can refill between pulls.',
     conjure_food: 'Conjures food that restores health when you sit down to eat.',
     shadow_bolt: 'A bolt of shadow you cast at a target, your go-to nuke.',
@@ -946,6 +958,12 @@ export const guideStrings = {
     heroicLockoutBody:
       'Normal dungeons can be run all day. Heroic asks patience: the final boss kill locks everyone in the run to one heroic clear of that dungeon per day, and the raid keeps a daily lockout for each difficulty. A cleared five-player run stays open to its own party for corpse runs and loot, so nobody is locked away from what they earned there. The raid is stricter: once its kill locks you, the door stays shut until the daily reset, so collect your spoils before you leave the arena.',
 
+    // Reset All Instances: the difficulty-transition escape hatch. Spoiler-safe: no exact
+    // cooldown or timer lengths in the prose.
+    resetTitle: 'Resetting your instances',
+    resetBody:
+      'Switch difficulty while your group still holds claimed runs and the old claims linger for a while before clearing on their own. The party leader can let them go at once instead: choose Reset All Instances on their own portrait menu, or type /dungeon reset. A reset works only after the difficulty has actually been changed, only while nobody, living or fallen, remains inside, and a short cooldown separates one reset from the next. Arrive at the door on the wrong difficulty and the game says so before the run starts. The raid is never reset this way; its own lockout rules stand.',
+
     // Standalone, spoiler-safe lore for the Drowned Temple card (the goddess twist and any
     // boss names are withheld).
     templeLoreTitle: 'The Drowned Temple, a little deeper',
@@ -1131,7 +1149,7 @@ export const guideStrings = {
       'Deeds are earned and kept one character at a time, so every hero you play builds a Book of their own; only the realm leaderboard gathers your Renown across every character you play, counting each deed just once. Each deed spells out plainly what it asks of you, right there in the Book of Deeds in game, so you always know what to chase, and you can set a watch on the ones you are after to keep them in sight while you play. A small few stay secret and reveal themselves only once you have earned them. The Book also keeps itself honest: whatever your past record can prove, it credits on the spot, so a veteran never opens it to an empty page; only the counting deeds begin their tally fresh.',
     renownHeading: 'Renown',
     renownBody:
-      'Renown is the score behind the Book. Every deed you earn is worth a set amount, and your total only ever climbs, so a quiet week never costs you ground. A handful of deeds turn on luck rather than skill, and Feats are an honor of their own, so both of those are worth no Renown at all.',
+      'Renown is the score behind the Book. Every deed you earn is worth a set amount, and your total only ever climbs, so a quiet week never costs you ground. A handful of deeds turn on luck rather than skill, and Feats are an honor of their own, so both of those are worth no Renown at all. Deeds without Renown still count toward completion in your Book; they simply never score.',
     rewardsHeading: 'Titles and borders',
     rewardsBody:
       'The rewards are all for show, and that is the point. Some deeds grant a title you can wear or a border to frame your name, and never anything that makes your hero stronger. Choose the title you want from the Book of Deeds and it rides along on your nameplate, in chat, and on the boards for everyone to see.',
@@ -1145,7 +1163,7 @@ export const guideStrings = {
     catalogBody:
       'Here is every deed the Book can hold, gathered by category. The secret ones are left out on purpose, waiting for you to find them. Open the Book of Deeds in game to see exactly what each one asks.',
     standingsNote:
-      'The realms keep a running tally of Renown across every account. To see who stands where, open the Leaderboard in game and turn to its Renown tab; the standings live there, not on the wiki.',
+      'The realms keep a running tally of Renown across every account: the board ranks whole accounts by lifetime Renown, counting each deed once across all your characters, and it shows Renown alone, so deeds that carry none never move the standings even though they count in your Book. To see who stands where, open the Leaderboard in game and turn to its Renown tab; the standings live there, not on the wiki.',
     // Catalog table: the per-category heading format, the column headers, and the two cell
     // labels (a Feat tag in place of a Renown number, and the word Border for a border reward).
     catHeading: '{label} ({count})',
@@ -1279,7 +1297,7 @@ export const guideStrings = {
     upgradeBody:
       'Replacing an old piece with a fresh upgrade does more for you than playing perfectly in gear you have outgrown. When something better drops or a quest offers it, take it. Do not save your good items for later.',
     itemLevelBody:
-      'If you want a quick way to compare two pieces, turn on Show Item Level in the options. Gear won out in the world, from enemies and quests, then shows an item level, a single figure for roughly how powerful it is based on where it came from, so you can tell at a glance which upgrade pulls more weight, even across different slots. Pieces with no such source, like plain vendor basics and starter gear, show no item level, so a missing figure is normal, not a fault.',
+      'If you want a quick way to compare two pieces, turn on Show Item Level in the options. Gear with a known source, from enemies, quests, and the crafting trades, then shows an item level, a single figure for roughly how powerful it is based on where it came from, so you can tell at a glance which upgrade pulls more weight, even across different slots. Pieces with no such source, like plain vendor basics and starter gear, show no item level, so a missing figure is normal, not a fault.',
 
     // Where gear comes from.
     sourcesTitle: 'Where gear comes from',
@@ -1374,32 +1392,32 @@ export const guideStrings = {
 
     craftHowTitle: 'The crafting window',
     craftHowBody:
-      'Open the Crafting window (default key T) to see every recipe you know, what each one needs, and what you have on hand; when the materials are there, one click does the work. Common recipes can be crafted anywhere in the world. A handful of advanced tool recipes instead ask you to stand at the crafting hub in Highwatch.',
+      'Open the Crafting window (default key T) to see every recipe you know, what each one needs, and what you have on hand; when the materials are there, one click does the work. Common recipes can be crafted anywhere in the world. A handful of advanced recipes, higher-tier tools and rare caster armor among them, instead ask you to stand at the crafting hub in Highwatch.',
 
     craftMasteryTitle: 'Skill and mastery',
     craftMasteryBody:
-      "Crafting successfully builds skill in that trade, and skill never locks a craft's recipes away: if you know a recipe and hold its materials, you can attempt it. What skill buys you instead is quality, a practiced hand turns out finer work. The one exception is combination recipes, which ask you to have proven yourself in both of their crafts before they open up.",
+      "Crafting successfully builds skill in that trade, and skill never locks a craft's recipes away: if you know a recipe and hold its materials, you can attempt it. What skill buys you instead is quality, a practiced hand turns out finer work. The one exception is combination recipes, which open only to a crafter attuned to the archetype that joins their two crafts, with proven skill in both.",
 
     craftComboTitle: 'Combination recipes',
     craftComboBody:
-      "Beyond a single craft's own recipe list, the wheel also supports combination recipes that call on two neighboring crafts at once, rewarding a character who has invested in adjacent trades on the ring rather than one in isolation. The crafter must hold both trades themselves; a partner's skill cannot stand in for either half.",
+      "Beyond a single craft's own recipe list, the wheel also supports combination recipes that call on two neighboring crafts at once, rewarding a character who has invested in adjacent trades on the ring rather than one in isolation. The crafter must hold both trades themselves and carry the attunement that joins them; a partner's skill cannot stand in for either half.",
 
     // Archetypes overview.
     archetypeTitle: 'The ten archetypes',
     archetypeIntro:
-      'Each of the ten crafts also stands for an archetype, a broader identity you can adopt beyond just working that trade. Your active archetype is a single choice at a time, not a checklist: you carry one, and can change which one later if you choose to.',
+      'Every two neighboring crafts on the wheel together form an archetype, a broader identity you can adopt beyond just working a trade, and each of the ten pairs carries a name of its own. Your active archetype is a single choice at a time, not a checklist: you carry one, and can change which one later if you choose to.',
 
     archetypeChooseTitle: 'Choosing your archetype',
     archetypeChooseBody:
-      'Declaring an archetype will be a story moment: a quest that formally accepts you into that identity. That road is still being built, so for now every character walks the world with the choice ahead of them, and every craft advances to the rare quality tier in the meantime.',
+      'Declaring an archetype is a story moment: a quest that formally accepts you into that identity. Until you declare, every craft advances to the rare quality tier. Once you take up a pair, its two trades open all the way, a craft from the far side of the wheel stays with you as a hobby that still works to the rare tier, and every other trade rests at the common tier while you carry that identity.',
 
     archetypeSwitchTitle: 'Changing your mind',
     archetypeSwitchBody:
-      'Nor will a declaration be a life sentence. The plan is a repeatable act of making amends to your old trade before taking up a new one, with the amends growing steeper each time you switch, so the choice stays meaningful rather than costless. Like the declaration itself, it is still on its way.',
+      'Nor is a declaration a life sentence. Taking up a pair you have never carried is simply a fresh declaration, while returning to an identity you once held asks a repeatable act of making amends first, growing steeper with each switch you have made, so the choice stays meaningful rather than costless.',
 
     archetypeIdentityTitle: 'What your archetype means',
     archetypeIdentityBody:
-      'Your active archetype is a statement about who your character is in the world, recognized in how others and the world address you. The exact rewards and recognition that come with it are still being finalized; check back as the system fills in.',
+      'Your active archetype is a statement about who your character is in the world: each of the ten pairs carries a name of its own, worn as a title on your character sheet and in the crafting window.',
   },
 
   economy: {

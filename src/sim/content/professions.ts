@@ -154,23 +154,22 @@ export const TOOL_EFFECT_IDS: ToolEffectId[] = [
 // no mechanic wiring: this file only defines the ring geometry (order, pole tags)
 // and the adjacency/opposite lookups derived from it. See issue #1125.
 //
-// Design-doc note (#1148 tuning pass): the canonical ring order lives at
-// https://woc.nervemart.com/docs/professions-system, which returned 403 Forbidden
-// when this file was authored and is reachable again as of this pass. The doc's
-// own ring text ("Engineering, Alchemy, Cooking, Leatherworking, Tailoring,
-// Inscription, Enchanting, Jewelcrafting, Weaponcrafting, Armorcrafting") differs
-// from the exact rotation below in SOME non-adjacent-pair placements, but every
-// adjacency this codebase has already committed to in real content is confirmed
-// consistent with it: armorcrafting-weaponcrafting (doc: adjacent, wrapping the
-// ring) and alchemy-engineering (doc: adjacent) are exactly the two pairs
-// content/recipes.ts COMBO_RECIPES already require. A full reorder to match the
-// doc craft-for-craft would also reshuffle every OTHER adjacency/opposite pair
-// (affecting future hobby/combo assignments) with a blast radius broader than
-// this pass's scope; deferred as its own follow-up rather than an unreviewed
-// reshuffle here. The 4 poles are this codebase's own grouping (not named in the
-// doc): Material (crafts that shape raw matter into gear), Experimental (crafts
-// driven by trial-and-error formulae), Formal (crafts built on exact patterns/
-// measurements), Cross-cutting (crafts that touch every other craft's output).
+// Design-doc note (#1148 tuning pass, reorder adopted in the Professions 2.0
+// Phase 1 blueprint): the canonical ring order lives at
+// https://woc.nervemart.com/docs/professions-system, and CRAFT_RING below now
+// matches the doc's ring text craft for craft ("Engineering, Alchemy, Cooking,
+// Leatherworking, Tailoring, Inscription, Enchanting, Jewelcrafting,
+// Weaponcrafting, Armorcrafting"). Both adjacencies this codebase commits to in
+// real content survive the reorder unchanged: armorcrafting-weaponcrafting
+// (adjacent, wrapping the ring) and alchemy-engineering (adjacent) are exactly
+// the two pairs content/recipes.ts COMBO_RECIPES requires, pinned by the
+// adjacency test in tests/professions.test.ts so a future reorder cannot
+// silently orphan a combo recipe. The 4 poles are this codebase's own grouping
+// (not named in the doc): Material (crafts that shape raw matter into gear),
+// Experimental (crafts driven by trial-and-error formulae), Formal (crafts
+// built on exact patterns/measurements), Cross-cutting (crafts that touch
+// every other craft's output). Each pole tag travels with its craft record, so
+// the reorder never re-grouped any craft.
 
 export type CraftPole = 'Material' | 'Experimental' | 'Formal' | 'Cross-cutting';
 
@@ -183,16 +182,16 @@ export interface CraftDef {
 // Fixed ring order (index is the ring position). Opposite crafts sit 5 positions
 // apart; adjacent crafts sit 1 position apart on either side.
 export const CRAFT_RING: CraftDef[] = [
-  { id: 'armorcrafting', name: 'Armorcrafting', pole: 'Material' },
-  { id: 'weaponcrafting', name: 'Weaponcrafting', pole: 'Material' },
-  { id: 'jewelcrafting', name: 'Jewelcrafting', pole: 'Material' },
-  { id: 'alchemy', name: 'Alchemy', pole: 'Experimental' },
   { id: 'engineering', name: 'Engineering', pole: 'Experimental' },
+  { id: 'alchemy', name: 'Alchemy', pole: 'Experimental' },
   { id: 'cooking', name: 'Cooking', pole: 'Cross-cutting' },
+  { id: 'leatherworking', name: 'Leatherworking', pole: 'Formal' },
+  { id: 'tailoring', name: 'Tailoring', pole: 'Formal' },
   { id: 'inscription', name: 'Inscription', pole: 'Cross-cutting' },
   { id: 'enchanting', name: 'Enchanting', pole: 'Cross-cutting' },
-  { id: 'tailoring', name: 'Tailoring', pole: 'Formal' },
-  { id: 'leatherworking', name: 'Leatherworking', pole: 'Formal' },
+  { id: 'jewelcrafting', name: 'Jewelcrafting', pole: 'Material' },
+  { id: 'weaponcrafting', name: 'Weaponcrafting', pole: 'Material' },
+  { id: 'armorcrafting', name: 'Armorcrafting', pole: 'Material' },
 ];
 
 const RING_SIZE = CRAFT_RING.length;
@@ -424,7 +423,7 @@ export interface CraftingHubStationDef {
 // carries no display "name" field of its own (avoiding a new player-visible
 // string surface in this pass) since a station is identified by its craft id,
 // which already has a localized display name (src/ui/i18n.catalog/hud_chrome.ts
-// `archetypeTitle.<craftId>` / `gathering.*`).
+// `craftName.<craftId>` / `gathering.*`).
 //
 // Has zero consumers today: forward content for that future render pass, kept
 // data-as-code (module-init cost is negligible, ten cheap trig calls). Its

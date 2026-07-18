@@ -2,17 +2,13 @@
 // the starting flow ever pointed a new player at gathering/crafting/town focus
 // (see the professions.ts GATHERING_PROFESSIONS comment: no level/quest/tool gate
 // exists at the mechanic level, so there was no natural "unlock" moment). This
-// covers both the content shape (q_prof_intro wiring) and that its collect
-// objective is actually satisfied by mining, not just any item gain.
+// covers both the content shape (q_prof_intro wiring) and that its gather
+// objective is actually satisfied by successful ore-node harvests.
 
 import { describe, expect, it } from 'vitest';
 import { GATHER_NODES, NPCS, QUEST_ORDER, QUESTS } from '../src/sim/data';
 import { NODE_HARVEST_TABLE } from '../src/sim/professions/gathering';
-import { onInventoryChangedForQuests } from '../src/sim/quests/quest_credit';
-import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
-import type { SimContext } from '../src/sim/sim_context';
-import type { QuestProgress, SimEvent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
 const ORE_NODE_ID = GATHER_NODES.find((n) => n.type === 'ore')!.id;
@@ -24,27 +20,6 @@ function teleportOntoNode(sim: Sim, pid: number, nodeId: string) {
   p.pos.z = node.pos.z;
   p.pos.y = terrainHeight(node.pos.x, node.pos.z, sim.cfg.seed);
   p.prevPos = { ...p.pos };
-}
-
-type FakeCtx = SimContext & { events: SimEvent[] };
-
-function makeCtx(itemCount: () => number): FakeCtx {
-  const events: SimEvent[] = [];
-  return {
-    events,
-    emit: (ev: SimEvent) => {
-      events.push(ev);
-    },
-    countItem: (_itemId: string, _pid?: number) => itemCount(),
-  } as unknown as FakeCtx;
-}
-
-function makeMeta(entityId = 1): PlayerMeta {
-  return {
-    entityId,
-    questLog: new Map<string, QuestProgress>(),
-    counters: { questProgress: 0 },
-  } as unknown as PlayerMeta;
 }
 
 describe('q_prof_intro content wiring', () => {
@@ -63,18 +38,14 @@ describe('q_prof_intro content wiring', () => {
     expect(QUEST_ORDER).toContain('q_prof_intro');
   });
 
-  it('its collect objective targets a dedicated quest item, not the shared mining-node reagent', () => {
+  it('uses a genuine ore gather objective rather than a dedicated quest item', () => {
     const quest = QUESTS.q_prof_intro;
     expect(quest.objectives).toHaveLength(1);
     const objective = quest.objectives[0];
-    expect(objective.type).toBe('collect');
-    // Pinned literal: `chunk_of_ore` is a kind 'quest' item, distinct from
-    // NODE_HARVEST_TABLE.ore.itemId (bone_fragments), the shared junk/reagent
-    // material every restless_bones kill, salvage roll, and market listing can
-    // also produce. Targeting THAT would let a player complete "mine them
-    // yourself" without ever mining (see #1708 review).
-    expect(objective.itemId).toBe('chunk_of_ore');
-    expect(objective.itemId).not.toBe(NODE_HARVEST_TABLE.ore.itemId);
+    expect(objective.type).toBe('gather');
+    if (objective.type !== 'gather') throw new Error('expected gather objective');
+    expect(objective.nodeType).toBe('ore');
+    expect(objective.itemId).toBeUndefined();
     expect(objective.count).toBe(5);
   });
 
@@ -90,8 +61,8 @@ describe('q_prof_intro content wiring', () => {
   });
 });
 
-describe('q_prof_intro: mining, and only mining, satisfies the collect objective', () => {
-  it('an ore-node harvest grants chunk_of_ore while the quest is active, not the shared bone_fragments material', () => {
+describe('q_prof_intro: mining, and only mining, satisfies the gather objective', () => {
+  it('an ore-node harvest advances progress and grants only the ordinary mining material', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
     const pid = sim.addPlayer('warrior', 'Miner');
     const giver = NPCS.foreman_odell;
@@ -108,16 +79,12 @@ describe('q_prof_intro: mining, and only mining, satisfies the collect objective
 
     expect(sim.countItem('chunk_of_ore', pid)).toBe(0);
     sim.harvestNode(ORE_NODE_ID, pid);
-    sim.tick();
-    // The harvest still grants the ordinary shared reagent too (the crafting
-    // economy is untouched), but ALSO grants the dedicated quest item: simply
-    // holding bone_fragments (from a kill, salvage, or the market) can never
-    // substitute for it.
     expect(sim.countItem(NODE_HARVEST_TABLE.ore.itemId, pid)).toBe(1);
-    expect(sim.countItem('chunk_of_ore', pid)).toBe(1);
+    expect(sim.countItem('chunk_of_ore', pid)).toBe(0);
+    expect(sim.meta(pid)!.questLog.get('q_prof_intro')?.counts).toEqual([1]);
   });
 
-  it('does not grant chunk_of_ore once the quest is no longer active (not accepted, or already turned in)', () => {
+  it('ordinary mining does not create the retired chunk_of_ore workaround item', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
     const pid = sim.addPlayer('warrior', 'NoQuest');
     teleportOntoNode(sim, pid, ORE_NODE_ID);
@@ -127,25 +94,31 @@ describe('q_prof_intro: mining, and only mining, satisfies the collect objective
     expect(sim.countItem('chunk_of_ore', pid)).toBe(0);
   });
 
-  it('promotes to ready once 5 ore chunks are held, same credit path every other collect quest uses', () => {
-    let held = 0;
-    const ctx = makeCtx(() => held);
-    const meta = makeMeta();
-    const quest = QUESTS.q_prof_intro;
-    const need = quest.objectives[0].count;
-    const qp: QuestProgress = { questId: 'q_prof_intro', counts: [0], state: 'active' };
-    meta.questLog.set('q_prof_intro', qp);
+  it('promotes after five granted ore harvests and can be turned in without collect items', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Miner');
+    const giver = NPCS.foreman_odell;
+    const player = sim.entities.get(pid)!;
+    player.pos.x = giver.pos.x;
+    player.pos.z = giver.pos.z;
+    player.pos.y = terrainHeight(giver.pos.x, giver.pos.z, sim.cfg.seed);
+    player.prevPos = { ...player.pos };
+    sim.acceptQuest('q_prof_intro', pid);
 
-    for (let i = 1; i <= need; i++) {
-      held = i;
-      onInventoryChangedForQuests(ctx, meta);
-      expect(qp.counts[0]).toBe(i);
-    }
-    expect(qp.state).toBe('ready');
-    expect(
-      ctx.events.some(
-        (e) => e.type === 'questReady' && (e as { questId?: string }).questId === 'q_prof_intro',
-      ),
-    ).toBe(true);
+    const oreNodes = GATHER_NODES.filter((node) => node.type === 'ore').slice(0, 5);
+    expect(oreNodes).toHaveLength(5);
+    oreNodes.forEach((node, index) => {
+      teleportOntoNode(sim, pid, node.id);
+      sim.harvestNode(node.id, pid);
+      expect(sim.meta(pid)!.questLog.get('q_prof_intro')?.counts).toEqual([index + 1]);
+    });
+    expect(sim.questState('q_prof_intro', pid)).toBe('ready');
+
+    player.pos.x = giver.pos.x;
+    player.pos.z = giver.pos.z;
+    player.pos.y = terrainHeight(giver.pos.x, giver.pos.z, sim.cfg.seed);
+    player.prevPos = { ...player.pos };
+    sim.turnInQuest('q_prof_intro', pid);
+    expect(sim.questState('q_prof_intro', pid)).toBe('done');
   });
 });

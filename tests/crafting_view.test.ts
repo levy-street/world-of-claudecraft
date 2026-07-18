@@ -108,11 +108,23 @@ describe('buildCraftingView combo-recipe gate (#1132 review)', () => {
 
   it('marks a combo recipe craftable once the player meets tier capability in both named crafts', () => {
     const items = table(item('recipe_combo_result'));
-    const view = buildCraftingView([comboRecipe('recipe_combo')], [], items, {
-      armorcrafting: 25,
-      weaponcrafting: 25,
-    });
+    const view = buildCraftingView(
+      [comboRecipe('recipe_combo')],
+      [],
+      items,
+      {
+        armorcrafting: 25,
+        weaponcrafting: 25,
+      },
+      {
+        synced: true,
+        activeArchetype: 'armorcrafting',
+        pairedMajor: 'weaponcrafting',
+        hobbyCraft: 'leatherworking',
+      },
+    );
     expect(view.recipes[0].craftable).toBe(true);
+    expect(view.recipes[0].comboRequirement).toMatchObject({ met: true, reason: null });
   });
 
   it('an unrelated craft, however high, never substitutes for a required craft', () => {
@@ -134,5 +146,34 @@ describe('buildCraftingView combo-recipe gate (#1132 review)', () => {
       {},
     );
     expect(view.recipes[0].craftable).toBe(true);
+  });
+
+  it('high raw skills do not unlock a combo without the exact active pair', () => {
+    const items = table(item('recipe_combo_result'));
+    const view = buildCraftingView(
+      [comboRecipe('recipe_combo')],
+      [],
+      items,
+      { armorcrafting: 100, weaponcrafting: 100 },
+      { synced: true, activeArchetype: null, pairedMajor: null, hobbyCraft: null },
+    );
+    expect(view.recipes[0].craftable).toBe(false);
+    expect(view.recipes[0].comboRequirement).toMatchObject({
+      met: false,
+      reason: 'not_attuned',
+    });
+  });
+
+  it('keeps the action available while the online crafting identity is still syncing', () => {
+    const items = table(item('recipe_combo_result'));
+    const view = buildCraftingView(
+      [comboRecipe('recipe_combo')],
+      [],
+      items,
+      {},
+      { synced: false, activeArchetype: null, pairedMajor: null, hobbyCraft: null },
+    );
+    expect(view.recipes[0].craftable).toBe(true);
+    expect(view.recipes[0].comboRequirement).toMatchObject({ met: null, reason: 'syncing' });
   });
 });

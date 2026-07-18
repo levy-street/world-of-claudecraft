@@ -294,12 +294,13 @@ describe('item level: every level-20 item is balanced to budget', () => {
     expect(offBudget, offBudget.join('\n')).toEqual([]);
   });
 
-  it('level-20 items of the same item level + slot share one budget', () => {
+  it('level-20 items of the same item level + slot + hand share one budget', () => {
     const groups = new Map<string, Set<number>>();
     for (const id of Object.keys(ITEMS)) {
       const item = ITEMS[id];
       if (!item.slot || itemSourceLevel(id) !== 20) continue;
-      const key = `${itemLevel(item)}:${item.quality}:${item.slot}`;
+      const hand = item.kind === 'weapon' && item.hand === 'twohand' ? 'twohand' : 'onehand';
+      const key = `${itemLevel(item)}:${item.quality}:${item.slot}:${hand}`;
       let sums = groups.get(key);
       if (!sums) {
         sums = new Set();
@@ -356,5 +357,41 @@ describe('heroic set: class coverage', () => {
       // Every class has at least one usable weapon.
       expect(slots.has('mainhand'), `${cls} has a weapon`).toBe(true);
     }
+  });
+});
+
+describe('item level: crafted gear derives its level from the recipe (content/recipes.ts)', () => {
+  // The three level-20, hub-gated caster pieces (issue #1965 review): budgeted at
+  // ITEM level (recipe level 20 + the rare QUALITY_ILVL_BONUS of 3 = 23), matching
+  // the level-20 rares in the same slots (boundstone_helm, gravewyrm_gauntlets,
+  // gravewyrm_mantle).
+  const CASTER_HUB_IDS = ['wardweave_cowl', 'duskhide_wraps', 'sootscale_mantle'];
+  const CASTER_COMMON_IDS = [
+    'eastbrook_ritual_vestments',
+    'eastbrook_druids_hide',
+    'eastbrook_warded_leggings',
+  ];
+
+  it('registers a source level for every crafted item with primary stats', () => {
+    for (const id of [...CASTER_HUB_IDS, ...CASTER_COMMON_IDS]) {
+      expect(itemSourceLevel(id), `${id} has a source level`).not.toBeUndefined();
+      expect(itemLevel(ITEMS[id]), `${id} has an item level`).not.toBeUndefined();
+    }
+  });
+
+  it('the hub caster pieces land at item level 23 and carry their exact stat budget', () => {
+    for (const id of CASTER_HUB_IDS) {
+      const item = ITEMS[id];
+      expect(itemLevel(item), `${id} item level`).toBe(23);
+      const budget = expectedStatBudget(item);
+      expect(budget, `${id} has a derivable budget`).not.toBeUndefined();
+      expect(primaryStatSum(item), `${id} stat sum == budget`).toBe(budget);
+    }
+  });
+
+  it('matches the existing level-20 rares sharing its slot (helmet 11, gloves 9, shoulder 10)', () => {
+    expect(primaryStatSum(ITEMS.wardweave_cowl)).toBe(primaryStatSum(ITEMS.boundstone_helm));
+    expect(primaryStatSum(ITEMS.duskhide_wraps)).toBe(primaryStatSum(ITEMS.gravewyrm_gauntlets));
+    expect(primaryStatSum(ITEMS.sootscale_mantle)).toBe(primaryStatSum(ITEMS.gravewyrm_mantle));
   });
 });

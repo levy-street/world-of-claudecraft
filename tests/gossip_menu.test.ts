@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { gossipMenuIsEmpty } from '../src/ui/gossip_menu';
+import { gossipMenuIsEmpty } from '../src/ui/hud/quest/gossip_menu';
 
 // Reproduces the tutorial bug report: after accepting/turning in the starter
 // quest with the Marshal (the only content a fresh character's gossip menu
@@ -16,6 +16,7 @@ describe('gossipMenuIsEmpty', () => {
         hasHeroicVendor: false,
         hasDelveBoard: false,
         hasVcup: false,
+        hasCardMaster: false,
       }),
     ).toBe(true);
   });
@@ -34,6 +35,7 @@ describe('gossipMenuIsEmpty', () => {
         hasHeroicVendor: false,
         hasDelveBoard: false,
         hasVcup: false,
+        hasCardMaster: false,
       }),
     ).toBe(true);
   });
@@ -48,6 +50,7 @@ describe('gossipMenuIsEmpty', () => {
         hasHeroicVendor: false,
         hasDelveBoard: false,
         hasVcup: false,
+        hasCardMaster: false,
       }),
     ).toBe(false);
   });
@@ -62,6 +65,7 @@ describe('gossipMenuIsEmpty', () => {
         hasHeroicVendor: false,
         hasDelveBoard: false,
         hasVcup: false,
+        hasCardMaster: false,
       }),
     ).toBe(false);
   });
@@ -76,6 +80,7 @@ describe('gossipMenuIsEmpty', () => {
         hasHeroicVendor: false,
         hasDelveBoard: false,
         hasVcup: false,
+        hasCardMaster: false,
       }),
     ).toBe(false);
     expect(
@@ -87,6 +92,7 @@ describe('gossipMenuIsEmpty', () => {
         hasHeroicVendor: false,
         hasDelveBoard: false,
         hasVcup: false,
+        hasCardMaster: false,
       }),
     ).toBe(false);
     expect(
@@ -98,6 +104,7 @@ describe('gossipMenuIsEmpty', () => {
         hasHeroicVendor: true,
         hasDelveBoard: false,
         hasVcup: false,
+        hasCardMaster: false,
       }),
     ).toBe(false);
     expect(
@@ -109,6 +116,7 @@ describe('gossipMenuIsEmpty', () => {
         hasHeroicVendor: false,
         hasDelveBoard: true,
         hasVcup: false,
+        hasCardMaster: false,
       }),
     ).toBe(false);
     expect(
@@ -120,6 +128,19 @@ describe('gossipMenuIsEmpty', () => {
         hasHeroicVendor: false,
         hasDelveBoard: false,
         hasVcup: true,
+        hasCardMaster: false,
+      }),
+    ).toBe(false);
+    expect(
+      gossipMenuIsEmpty({
+        questCount: 0,
+        discussionCount: 0,
+        hasVendor: false,
+        hasMarket: false,
+        hasHeroicVendor: false,
+        hasDelveBoard: false,
+        hasVcup: false,
+        hasCardMaster: true,
       }),
     ).toBe(false);
   });

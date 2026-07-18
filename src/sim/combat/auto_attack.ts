@@ -35,22 +35,29 @@ import { addThreat } from '../threat';
 import {
   angleTo,
   armorReduction,
+  BATTLE_TRANCE_CHANCE,
+  BATTLE_TRANCE_DURATION,
   DT,
   dist2d,
   type Entity,
   MELEE_ARC,
   MELEE_RANGE,
   normAngle,
+  STANCE_MASTERY_BERSERKER_HASTE,
   swingMissChance,
+  type WeaponInfo,
 } from '../types';
 import { drawWeapon } from '../weapon_stow';
-import { spendResource } from './casting_lifecycle';
-import { blindMissBonus, isDisarmed, isStunned } from './cc';
+import { applyRageSpendCooldownRefund, spendResource } from './casting_lifecycle';
+import { blindMissBonus, isDisarmed, isInStasis, isStunned } from './cc';
 import { consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
-import { baseSwingSpeed } from './form_swing';
+import { baseSwingSpeed, rangedAutoProfile } from './form_swing';
+import { isTravelFormAuraKind } from './forms';
 import { rangedShotProfile } from './ranged_shot';
+import { onCastCompleted, onMeleeSwing } from './talent_procs';
 import { applyThornsReaction } from './thorns_charge';
+import { warriorMeleeDefense } from './warrior_hit_table';
 
 // Fraction of the mainhand weapon's damage a hunter's Auto Shot deals. There is no
 // dedicated ranged-weapon slot, so the mainhand doubles as the "bow"; a full melee
@@ -59,14 +66,27 @@ import { applyThornsReaction } from './thorns_charge';
 // agility-driven ranged attack-power term is unaffected, and wands (the caster
 // sidearm, fixed class damage) are exempt.
 const RANGED_WEAPON_COEFF = 0.6;
+const DUAL_WIELD_WHITE_MISS_PENALTY = 0.1;
+const SUDDEN_DEATH_CHANCE = 0.1;
+const SUDDEN_DEATH_DURATION = 10;
 
 export function startAutoAttack(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const p = r.e;
   if (p.dead) return;
+  if (isInStasis(p)) return;
+  if (p.auras.some((a) => isTravelFormAuraKind(a.kind))) return;
   const t = p.targetId !== null ? ctx.entities.get(p.targetId) : null;
-  if (!t || t.dead || !ctx.isHostileTo(p, t)) {
+  // A target that just DIED (commonly the mob the engaging spell killed) is not a
+  // user error: engaging a corpse is a silent no-op. This stops the "Attack on
+  // Ability Use" QoL from popping a spurious "Invalid attack target." toast on a
+  // killing blow (e.g. a Fire mage's Cinderfall). Because this runs in the shared
+  // sim, the authoritative server drops a client engage sent against a stale
+  // still-alive snapshot just as quietly. A genuinely invalid target (none, or a
+  // friendly) still reports the error.
+  if (t?.dead) return;
+  if (!t || !ctx.isHostileTo(p, t)) {
     ctx.error(p.id, 'Invalid attack target.');
     return;
   }
@@ -109,13 +129,18 @@ export function stopAutoAttack(ctx: SimContext, pid?: number): void {
 
 export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
   p.swingTimer = Math.max(0, p.swingTimer - DT);
+  p.offhandSwingTimer = Math.max(0, p.offhandSwingTimer - DT);
+  if (p.auras.some((a) => isTravelFormAuraKind(a.kind))) {
+    p.autoAttack = false;
+    return;
+  }
   if (!p.autoAttack || p.castingAbility) return;
   const t = p.targetId !== null ? ctx.entities.get(p.targetId) : null;
   if (!t || t.dead || !ctx.isHostileTo(p, t)) {
     p.autoAttack = false;
     return;
   }
-  if (p.swingTimer > 0) return;
+  if (p.swingTimer > 0 && (!p.dualWielding || !p.offhandWeapon || p.offhandSwingTimer > 0)) return;
   if (isStunned(p)) return;
   if (isDisarmed(p)) return; // weapon knocked away: no auto-attack swings
   const d = dist2d(p.pos, t.pos);
@@ -123,8 +148,10 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
   if (facingDiff > MELEE_ARC) return;
 
   // ranged auto-attack: hunters (auto shot, dead zone inside minRange) and
-  // casters (wand-style, no dead zone so they don't run into melee — #94)
-  const ranged = CLASSES[meta.cls].ranged;
+  // casters (wand-style, no dead zone so they don't run into melee, #94).
+  // Form-aware: a druid keeps the class wand only in caster or Moonwing Form;
+  // bear/cat/travel resolve to undefined here and fall through to melee.
+  const ranged = rangedAutoProfile(p, meta.cls);
   if (ranged && d <= ranged.maxRange && d >= (ranged.wand ? 0 : ranged.minRange)) {
     if (!ctx.hasLineOfSight(p, t)) return;
     ctx.breakGhostWolf(p);
@@ -145,34 +172,121 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
   if (isArenaPos(p.pos.x) && !ctx.hasLineOfSight(p, t)) return;
   ctx.breakGhostWolf(p);
 
-  let bonus = 0;
-  let abilityName: string | null = null;
-  let threatFlat = 0;
-  let threatMult = 1;
-  if (p.queuedOnSwing) {
-    const queued = ctx.resolvedAbility(p.queuedOnSwing, p.id);
-    if (queued) {
-      const eff = queued.effects.find((e) => e.type === 'weaponDamage');
-      const queuedCost = p.queuedOnSwingFree === true ? 0 : queued.cost;
-      if (p.resource >= queuedCost && eff && eff.type === 'weaponDamage') {
-        spendResource(p, queuedCost);
-        // on-next-swing abilities (e.g. Raptor Strike) resolve here rather than
-        // in castAbility, so their cooldown must be applied on the swing too (#56)
-        if (queued.def.cooldown > 0) p.cooldowns.set(queued.def.id, queued.def.cooldown);
-        bonus = eff.bonus;
-        abilityName = queued.def.name;
-        threatFlat = queued.threatFlat;
-        threatMult = queued.threatMult;
+  if (p.swingTimer <= 0) {
+    let bonus = 0;
+    let abilityName: string | null = null;
+    let threatFlat = 0;
+    let threatMult = 1;
+    if (p.queuedOnSwing) {
+      const queued = ctx.resolvedAbility(p.queuedOnSwing, p.id);
+      if (queued) {
+        const eff = queued.effects.find((e) => e.type === 'weaponDamage');
+        const queuedCost =
+          p.queuedOnSwingFree === true
+            ? 0
+            : Math.ceil(queued.cost * (p.queuedOnSwingCostMultiplier ?? 1));
+        if (p.resource >= queuedCost && eff && eff.type === 'weaponDamage') {
+          spendResource(p, queuedCost);
+          applyRageSpendCooldownRefund(ctx, p, meta, p.resourceType === 'rage' ? queuedCost : 0);
+          // on-next-swing abilities (e.g. Raptor Strike) resolve here rather than
+          // in castAbility, so their cooldown must be applied on the swing too (#56)
+          if (queued.def.cooldown > 0) p.cooldowns.set(queued.def.id, queued.def.cooldown);
+          bonus = eff.bonus;
+          abilityName = queued.def.name;
+          threatFlat = queued.threatFlat;
+          threatMult = queued.threatMult;
+        }
       }
+      p.queuedOnSwing = null;
+      delete p.queuedOnSwingFree;
+      delete p.queuedOnSwingCostMultiplier;
     }
-    p.queuedOnSwing = null;
-    delete p.queuedOnSwingFree;
+    const connected = meleeSwing(ctx, p, t, bonus, abilityName, {
+      threatFlat,
+      threatMult,
+      whiteDualWieldPenalty: p.dualWielding && abilityName === null,
+    });
+    // Thuggery mastery (Sword Specialization shape): a landed mainhand auto has
+    // a chance to swing once more. The pct gate keeps the rng stream untouched
+    // for everyone without the mastery, and the extra swing cannot chain.
+    const extraAttackPct = ctx.playerMods(meta).global.extraAttackPct;
+    if (connected && abilityName === null && extraAttackPct > 0 && ctx.rng.chance(extraAttackPct)) {
+      meleeSwing(ctx, p, t, 0, null, {
+        whiteDualWieldPenalty: p.dualWielding,
+      });
+    }
+    maybeProcBattleTrance(ctx, p, meta, connected);
+    maybeProcSuddenDeath(ctx, p, meta, connected);
+    // Wolf Form swings at the rogue's fixed feral cadence, not the carried weapon's
+    // speed (see combat/form_swing.ts); everyone else uses their weapon speed. Melee
+    // haste (item-set bonus) then shortens whatever base interval that yields.
+    p.swingTimer =
+      (baseSwingSpeed(p) * ctx.swingIntervalMult(p)) /
+      ((1 + p.meleeHaste) * (1 + stanceMasteryAutoHaste(ctx, p, meta)));
   }
-  meleeSwing(ctx, p, t, bonus, abilityName, { threatFlat, threatMult });
-  // Wolf Form swings at the rogue's fixed feral cadence, not the carried weapon's
-  // speed (see combat/form_swing.ts); everyone else uses their weapon speed. Melee
-  // haste (item-set bonus) then shortens whatever base interval that yields.
-  p.swingTimer = (baseSwingSpeed(p) * ctx.swingIntervalMult(p)) / (1 + p.meleeHaste);
+  if (p.dualWielding && p.offhandWeapon && p.offhandSwingTimer <= 0) {
+    const offhand = p.offhandWeapon;
+    const connected = meleeSwing(ctx, p, t, 0, null, {
+      weapon: offhand,
+      weaponMult: 0.5,
+      apSwingSpeed: offhand.speed,
+      whiteDualWieldPenalty: true,
+    });
+    maybeProcBattleTrance(ctx, p, meta, connected);
+    maybeProcSuddenDeath(ctx, p, meta, connected);
+    p.offhandSwingTimer =
+      (offhand.speed * ctx.swingIntervalMult(p)) /
+      ((1 + p.meleeHaste) * (1 + stanceMasteryAutoHaste(ctx, p, meta)));
+  }
+}
+
+function stanceMasteryAutoHaste(ctx: SimContext, player: Entity, meta: PlayerMeta): number {
+  if (meta.cls !== 'warrior') return 0;
+  if (!player.auras.some((aura) => aura.kind === 'berserker_stance')) return 0;
+  return ctx.playerMods(meta).global.stanceMastery > 0 ? STANCE_MASTERY_BERSERKER_HASTE : 0;
+}
+
+function maybeProcBattleTrance(
+  ctx: SimContext,
+  player: Entity,
+  meta: PlayerMeta,
+  connected: boolean,
+): void {
+  if (!connected || meta.cls !== 'warrior') return;
+  const proc = ctx.rng.chance(BATTLE_TRANCE_CHANCE);
+  if (!proc || ctx.playerMods(meta).spec === 'fury') return;
+  ctx.applyAura(player, {
+    id: 'battle_trance',
+    name: 'Battle Trance',
+    kind: 'battle_trance',
+    remaining: BATTLE_TRANCE_DURATION,
+    duration: BATTLE_TRANCE_DURATION,
+    value: 0,
+    sourceId: player.id,
+    school: 'physical',
+  });
+}
+
+function maybeProcSuddenDeath(
+  ctx: SimContext,
+  p: Entity,
+  meta: PlayerMeta,
+  connected: boolean,
+): void {
+  if (!connected || meta.cls !== 'warrior') return;
+  if (ctx.playerMods(meta).spec !== 'arms') return;
+  if (!meta.known.some((known) => known.def.id === 'sudden_death' && known.def.passive)) return;
+  if (!ctx.rng.chance(SUDDEN_DEATH_CHANCE)) return;
+  ctx.applyAura(p, {
+    id: 'sudden_death',
+    name: 'Sudden Death',
+    kind: 'sudden_death',
+    remaining: SUDDEN_DEATH_DURATION,
+    duration: SUDDEN_DEATH_DURATION,
+    value: 0,
+    sourceId: p.id,
+    school: 'physical',
+  });
 }
 
 export const AUTO_SHOT_LABEL = 'Auto Shot';
@@ -191,8 +305,11 @@ export function rangedSwing(
     targetId: target.id,
     school,
     fx: 'projectile',
-    ...(ranged.wand ? {} : { attackAnimation: 'ranged-shot' as const }),
+    ...(ranged.wand ? { wand: true as const } : { attackAnimation: 'ranged-shot' as const }),
   });
+  if (!ranged.wand && attacker.kind === 'player') {
+    onCastCompleted(ctx, attacker, 'auto_shot', target);
+  }
   // The shot/bolt is in flight: its miss roll and damage land when it reaches the
   // target (projectile_travel), and fizzle if the target dies before impact.
   scheduleProjectile(ctx, attacker, target, (atk, tgt) => {
@@ -258,17 +375,30 @@ export function meleeSwing(
   abilityName: string | null,
   opts: {
     cannotBeDodged?: boolean;
+    weapon?: WeaponInfo;
     weaponMult?: number;
+    apSwingSpeed?: number;
     threatFlat?: number;
     threatMult?: number;
+    forceCrit?: boolean;
+    // Ability-scoped crit chance ADD (talent ResolvedAbilityMod.critPct); the
+    // weaponStrike path threads it here so per-ability crit talents reach the
+    // shared hit table.
+    critBonus?: number;
+    onDealt?: (amount: number) => void;
+    whiteDualWieldPenalty?: boolean;
   },
 ): boolean {
-  const missChance = swingMissChance(attacker, target) + blindMissBonus(attacker);
+  const missChance =
+    swingMissChance(attacker, target) +
+    blindMissBonus(attacker) +
+    (opts.whiteDualWieldPenalty ? DUAL_WIELD_WHITE_MISS_PENALTY : 0);
   const dodgeChance = opts.cannotBeDodged
     ? 0
     : target.kind === 'player'
       ? target.dodgeChance
       : 0.05 + Math.max(0, target.level - attacker.level) * 0.005;
+  const { parryChance, blockChance } = warriorMeleeDefense(target, attacker);
   const roll = ctx.rng.next();
   if (roll < missChance) {
     ctx.emit({
@@ -299,42 +429,64 @@ export function meleeSwing(
     if (attacker.kind === 'player') attacker.overpowerUntil = ctx.time + 5;
     return false;
   }
+  if (roll < missChance + dodgeChance + parryChance) {
+    ctx.emit({
+      type: 'damage',
+      sourceId: attacker.id,
+      targetId: target.id,
+      amount: 0,
+      crit: false,
+      school: 'physical',
+      ability: abilityName,
+      kind: 'parry',
+    });
+    ctx.enterCombat(attacker, target);
+    return false;
+  }
   const mult = opts.weaponMult ?? 1;
+  const weapon = opts.weapon ?? attacker.weapon;
+  const apSwingSpeed = opts.apSwingSpeed ?? baseSwingSpeed(attacker);
   // weapon imbues (seals, rockbiter) add flat damage to every swing
   let imbueBonus = 0;
   for (const a of attacker.auras) if (a.kind === 'imbue') imbueBonus += a.value;
   let dmg =
-    (ctx.rng.range(attacker.weapon.min, attacker.weapon.max) +
+    (ctx.rng.range(weapon.min, weapon.max) +
       // Normalize the attack-power contribution to the SAME cadence the swing
       // fires at: Wolf Form swings at the rogue speed (baseSwingSpeed), so its
       // AP-per-swing must use that speed too, not the slow staff's, or feral
       // would double-dip (fast swings AND heavy slow-weapon AP weighting).
-      (ctx.effectiveAttackPower(attacker) / 14) * baseSwingSpeed(attacker)) *
+      (ctx.effectiveAttackPower(attacker) / 14) * apSwingSpeed) *
       mult +
     bonus +
     imbueBonus;
   const critChance = Math.max(
     0.005,
-    attacker.critChance - Math.max(0, target.level - attacker.level) * 0.002,
+    attacker.critChance +
+      (opts.critBonus ?? 0) -
+      Math.max(0, target.level - attacker.level) * 0.002,
   );
-  const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, attacker) ? 1 : critChance);
+  const crit =
+    ctx.rng.chance(consumeNextAttackCrit(ctx, attacker) ? 1 : critChance) ||
+    opts.forceCrit === true;
   if (crit) dmg *= 2 + attacker.critDmgPhysBonus;
   dmg *= 1 - armorReduction(ctx.effectiveArmor(target), attacker.level);
-  ctx.dealDamage(
-    attacker,
-    target,
-    Math.max(1, Math.round(dmg)),
-    crit,
-    'physical',
-    abilityName,
-    'hit',
-    false,
-    { flat: opts.threatFlat ?? 0, mult: opts.threatMult ?? 1 },
-  );
+  if (blockChance > 0 && roll < missChance + dodgeChance + parryChance + blockChance) {
+    dmg = Math.max(1, dmg - target.blockValue);
+  }
+  const dealtAmount = Math.max(1, Math.round(dmg));
+  ctx.dealDamage(attacker, target, dealtAmount, crit, 'physical', abilityName, 'hit', false, {
+    flat: opts.threatFlat ?? 0,
+    mult: opts.threatMult ?? 1,
+  });
+  opts.onDealt?.(dealtAmount);
   // 4-piece set procs keyed to weapon crits (melee arm; covers auto-attack AND
   // the weaponStrike ability path, which resolves through this shell). Gated on
   // setProcs inside applySetProcs, so proc-less players draw no rng.
   if (crit && attacker.kind === 'player') ctx.applySetProcs(attacker, target, 'weaponCrit');
+  // Landed-swing talent responses resolve before the target retaliates or the
+  // weapon's on-hit proc fires. This is observable for defensive healing and
+  // preserves the authored Oathwheel, Venom Dividend, and imbue proc cadence.
+  if (attacker.kind === 'player') onMeleeSwing(ctx, attacker);
   // thorns / lightning shield: melee attackers take damage back. Charge-limited
   // thorns (Lightning Shield) consume a charge and gate on an internal cooldown.
   if (!attacker.dead) {

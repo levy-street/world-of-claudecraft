@@ -62,7 +62,10 @@ export type UiIconName =
   | 'lock'
   | 'mail'
   | 'ball'
-  | 'book';
+  | 'book'
+  | 'cards'
+  | 'trash'
+  | 'crafting';
 
 // Inner SVG markup per icon (one or more <path>). Default fill rule is nonzero
 // (correct for game-icons.net art incl. overlaps); the two hand-authored cut-out
@@ -131,6 +134,11 @@ const ICONS: Record<UiIconName, string> = {
   // ── hand-authored geometrics ─────────────────────────────────────────────
   close:
     '<path d="M115 80 256 221 397 80 432 115 291 256 432 397 397 432 256 291 115 432 80 397 221 256 80 115Z"/>',
+  // hand-authored: a waste bin (lid, body, two staves). The destructive-but-quiet
+  // affordance: the character-select delete control, which must READ as a delete
+  // without competing with the Enter World call to action beside it.
+  trash:
+    '<path d="M200 56h112a16 16 0 0 1 16 16v16h96v40H88V88h96V72a16 16 0 0 1 16-16zm16 32h80V80h-80zM120 152h272l-20 280a32 32 0 0 1-32 30H172a32 32 0 0 1-32-30zm88 48v216h32V200zm64 0v216h32V200z"/>',
   prev: '<path d="M336 96 136 256 336 416Z"/>',
   next: '<path d="M176 96 376 256 176 416Z"/>',
   more: '<path d="M94 256a34 34 0 1 0 68 0 34 34 0 1 0-68 0M222 256a34 34 0 1 0 68 0 34 34 0 1 0-68 0M350 256a34 34 0 1 0 68 0 34 34 0 1 0-68 0Z"/>',
@@ -168,6 +176,13 @@ const ICONS: Record<UiIconName, string> = {
   // hand-authored open book (the Book of Deeds): two page leaves meeting at a
   // spine dip, each page hollowed so the glyph reads at micro-button size
   book: '<path fill-rule="evenodd" d="M256 118c-44-26-104-38-172-38v312c68 0 128 12 172 38 44-26 104-38 172-38V80c-68 0-128 12-172 38zM124 122c40 4 76 13 104 28v246c-30-13-66-21-104-24V122zm264 0v250c-38 3-74 11-104 24V150c28-15 64-24 104-28z"/>',
+  // hand-authored playing card (the Card Duel minigame): a solid card body
+  // with a hollowed diamond pip so the glyph reads as "a card" at
+  // micro-button size (evenodd punches the pip through the body)
+  cards: '<path fill-rule="evenodd" d="M176 72h160v336H176zM256 110l40 40-40 40-40-40z"/>',
+  // hand-authored anvil (the Crafting window): a horned top slab over a waisted
+  // body and flared base, one solid silhouette so it reads at micro-button size
+  crafting: '<path d="M60 102l90-11h300v85h-100l-30 92v97h68v54H124v-54h68v-97l-30-92h-12z"/>',
 };
 
 export function hasUiIcon(name: string): name is UiIconName {

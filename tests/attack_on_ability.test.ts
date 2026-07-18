@@ -5,7 +5,7 @@ import {
   abilityStartsAutoAttack,
   deferAutoAttackUntilCastEnd,
   hasAutoAttackTarget,
-} from '../src/ui/attack_on_ability';
+} from '../src/ui/hud/action_bar/attack_on_ability';
 
 // Resolve a real ability's rank-1 effects by id, so the test pins behavior against
 // the actual content tables (not hand-mocked shapes that could drift).
@@ -50,6 +50,13 @@ describe('abilityStartsAutoAttack', () => {
     expect(abilityStartsAutoAttack([cc, dmg])).toBe(false);
   });
 
+  it('treats area fear as break-on-damage CC', () => {
+    const dmg: AbilityEffect = { type: 'directDamage', min: 8, max: 9 };
+    const fear: AbilityEffect = { type: 'aoeFear', duration: 4, radius: 8 };
+    expect(abilityStartsAutoAttack([dmg, fear])).toBe(false);
+    expect(abilityStartsAutoAttack([fear, dmg])).toBe(false);
+  });
+
   it('does not engage on an empty effect list', () => {
     expect(abilityStartsAutoAttack([])).toBe(false);
   });
@@ -64,6 +71,7 @@ describe('abilityStartsAutoAttack', () => {
     expect(abilityStartsAutoAttack(effectsOf('thunder_clap'))).toBe(true);
     expect(abilityStartsAutoAttack(effectsOf('consecration'))).toBe(true);
     expect(abilityStartsAutoAttack(effectsOf('cleave'))).toBe(true);
+    expect(abilityStartsAutoAttack(effectsOf('heroic_leap'))).toBe(true);
   });
 });
 

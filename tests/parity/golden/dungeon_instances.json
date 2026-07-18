@@ -16,7 +16,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 408,
+      "nextId": 409,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -30,9 +30,9 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 424,
-      "state": "0b549f6e",
-      "events": "8f0e000e",
+      "nextId": 425,
+      "state": "0a757cfc",
+      "events": "13be07ae",
       "rng": {
         "draws": 39,
         "digest": "40bc3d04"
@@ -63,6 +63,7 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
+              "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
             ]
@@ -75,10 +76,11 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 408,
+          "entityId": 409,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -93,8 +95,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 5,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -135,7 +136,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 410,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -157,8 +158,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 5,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -167,6 +167,19 @@
         {
           "aiState": "idle",
           "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3599.9,
+              "school": "physical",
+              "sourceId": 409
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 99.1,
           "comboUntil": -1,
           "critChance": 0.06,
@@ -174,13 +187,14 @@
           "dodgeChance": 0.06,
           "fiveSecondRule": 99.1,
           "hp": 50000,
-          "id": 408,
+          "id": 409,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -198,10 +212,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 20,
-            "armor": 110,
+            "armor": 144,
             "int": 10,
             "spi": 11,
-            "sta": 22,
+            "sta": 23,
             "str": 23
           },
           "templateId": "warrior",
@@ -222,7 +236,7 @@
           "fallStartY": -1.613579,
           "fiveSecondRule": 99.1,
           "hp": 50000,
-          "id": 409,
+          "id": 410,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -271,7 +285,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 437,
-          "id": 410,
+          "id": 411,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -315,7 +329,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 411,
+          "id": 412,
           "kind": "mob",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -359,7 +373,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 437,
-          "id": 412,
+          "id": 413,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -403,7 +417,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 413,
+          "id": 414,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -447,7 +461,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 437,
-          "id": 414,
+          "id": 415,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -491,7 +505,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 415,
+          "id": 416,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -535,7 +549,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 416,
-          "id": 416,
+          "id": 417,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -579,7 +593,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 460,
-          "id": 417,
+          "id": 418,
           "kind": "mob",
           "level": 9,
           "lootFfaTimer": "Infinity",
@@ -623,7 +637,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 695,
-          "id": 418,
+          "id": 419,
           "kind": "mob",
           "level": 9,
           "lootFfaTimer": "Infinity",
@@ -667,7 +681,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 419,
+          "id": 420,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -711,7 +725,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1191,
-          "id": 420,
+          "id": 421,
           "kind": "mob",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -755,7 +769,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 437,
-          "id": 421,
+          "id": 422,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -799,7 +813,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 437,
-          "id": 422,
+          "id": 423,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -842,7 +856,7 @@
           "dungeonId": "hollow_crypt",
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 423,
+          "id": 424,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -874,9 +888,9 @@
     {
       "tick": 4,
       "time": 0.2,
-      "nextId": 424,
-      "state": "652f4d5b",
-      "events": "788172e5",
+      "nextId": 425,
+      "state": "2ae05607",
+      "events": "e48723d0",
       "rng": {
         "draws": 47,
         "digest": "08510889"
@@ -911,6 +925,7 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
+              "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
             ]
@@ -931,10 +946,11 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 408,
+          "entityId": 409,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -949,8 +965,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 15,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -991,7 +1006,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 410,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1013,8 +1028,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 5,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -1023,6 +1037,8 @@
         {
           "aiState": "idle",
           "attackPower": 46,
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 99.2,
           "comboUntil": -1,
           "critChance": 0.06,
@@ -1031,13 +1047,14 @@
           "dodgeChance": 0.06,
           "fallStartY": -1.484002,
           "fiveSecondRule": 99.2,
-          "id": 408,
+          "id": 409,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -1056,10 +1073,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 20,
-            "armor": 110,
+            "armor": 144,
             "int": 10,
             "spi": 11,
-            "sta": 22,
+            "sta": 23,
             "str": 23
           },
           "templateId": "warrior",
@@ -1080,7 +1097,7 @@
           "fallStartY": 57.122741,
           "fiveSecondRule": 99.2,
           "hp": 50000,
-          "id": 409,
+          "id": 410,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1129,7 +1146,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 437,
-          "id": 410,
+          "id": 411,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -1173,7 +1190,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 411,
+          "id": 412,
           "kind": "mob",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -1217,7 +1234,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 437,
-          "id": 412,
+          "id": 413,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -1261,7 +1278,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 413,
+          "id": 414,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -1305,7 +1322,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 437,
-          "id": 414,
+          "id": 415,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -1349,7 +1366,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 415,
+          "id": 416,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -1393,7 +1410,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 416,
-          "id": 416,
+          "id": 417,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -1437,7 +1454,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 460,
-          "id": 417,
+          "id": 418,
           "kind": "mob",
           "level": 9,
           "lootFfaTimer": "Infinity",
@@ -1481,7 +1498,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 695,
-          "id": 418,
+          "id": 419,
           "kind": "mob",
           "level": 9,
           "lootFfaTimer": "Infinity",
@@ -1525,7 +1542,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 419,
+          "id": 420,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -1569,7 +1586,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1191,
-          "id": 420,
+          "id": 421,
           "kind": "mob",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -1613,7 +1630,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 437,
-          "id": 421,
+          "id": 422,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -1657,7 +1674,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 437,
-          "id": 422,
+          "id": 423,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -1700,7 +1717,7 @@
           "dungeonId": "hollow_crypt",
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 423,
+          "id": 424,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1732,9 +1749,9 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 424,
-      "state": "378dce30",
-      "events": "22429d6f",
+      "nextId": 425,
+      "state": "34affef0",
+      "events": "a194f506",
       "rng": {
         "draws": 47,
         "digest": "08510889"
@@ -1743,8 +1760,8 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 424,
-      "state": "826c834e",
+      "nextId": 425,
+      "state": "3f80e180",
       "events": "741638a5",
       "rng": {
         "draws": 47,
@@ -1754,8 +1771,8 @@
     {
       "tick": 15,
       "time": 0.75,
-      "nextId": 424,
-      "state": "d0c64c7c",
+      "nextId": 425,
+      "state": "d1ec9b7c",
       "events": "741638a5",
       "rng": {
         "draws": 47,
@@ -1765,9 +1782,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 424,
-      "state": "f1890a84",
-      "events": "2ad38728",
+      "nextId": 425,
+      "state": "409950c3",
+      "events": "d2d3057d",
       "rng": {
         "draws": 47,
         "digest": "08510889"
@@ -1776,8 +1793,8 @@
     {
       "tick": 24,
       "time": 1.2,
-      "nextId": 424,
-      "state": "9477b7d4",
+      "nextId": 425,
+      "state": "f996b443",
       "events": "741638a5",
       "rng": {
         "draws": 47,
@@ -1813,6 +1830,7 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
+              "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
             ]
@@ -1833,10 +1851,11 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 408,
+          "entityId": 409,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -1851,8 +1870,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 15,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -1905,7 +1923,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 410,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1927,8 +1945,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 15,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -1937,6 +1954,8 @@
         {
           "aiState": "idle",
           "attackPower": 46,
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 100.2,
           "comboUntil": -1,
           "critChance": 0.06,
@@ -1945,13 +1964,14 @@
           "dodgeChance": 0.06,
           "fallStartY": -1.484002,
           "fiveSecondRule": 100.2,
-          "id": 408,
+          "id": 409,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -1970,10 +1990,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 20,
-            "armor": 110,
+            "armor": 144,
             "int": 10,
             "spi": 11,
-            "sta": 22,
+            "sta": 23,
             "str": 23
           },
           "templateId": "warrior",
@@ -1994,7 +2014,7 @@
           "dodgeChance": 0.056,
           "fallStartY": -1.484002,
           "fiveSecondRule": 100.2,
-          "id": 409,
+          "id": 410,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2038,8 +2058,8 @@
     {
       "tick": 24,
       "time": 1.2,
-      "nextId": 424,
-      "state": "9477b7d4",
+      "nextId": 425,
+      "state": "f996b443",
       "events": "741638a5",
       "rng": {
         "draws": 47,
@@ -2075,6 +2095,7 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
+              "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
             ]
@@ -2095,10 +2116,11 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 408,
+          "entityId": 409,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -2113,8 +2135,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 15,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -2167,7 +2188,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 410,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -2189,8 +2210,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 15,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -2199,6 +2219,8 @@
         {
           "aiState": "idle",
           "attackPower": 46,
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 100.2,
           "comboUntil": -1,
           "critChance": 0.06,
@@ -2207,13 +2229,14 @@
           "dodgeChance": 0.06,
           "fallStartY": -1.484002,
           "fiveSecondRule": 100.2,
-          "id": 408,
+          "id": 409,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -2232,10 +2255,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 20,
-            "armor": 110,
+            "armor": 144,
             "int": 10,
             "spi": 11,
-            "sta": 22,
+            "sta": 23,
             "str": 23
           },
           "templateId": "warrior",
@@ -2256,7 +2279,7 @@
           "dodgeChance": 0.056,
           "fallStartY": -1.484002,
           "fiveSecondRule": 100.2,
-          "id": 409,
+          "id": 410,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",

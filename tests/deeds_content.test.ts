@@ -8,10 +8,29 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { POWERUPS } from '../src/sim/content/augments';
 import { DEED_ORDER, DEEDS, DEEDS_ERA } from '../src/sim/content/deeds';
+import { DELVE_MOBS } from '../src/sim/content/delves/mobs';
+import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
 import { FISHING_TABLES } from '../src/sim/content/items';
+import { MAGE_PET_MOBS } from '../src/sim/content/mage_pets';
 import { CRAFT_RING, GATHERING_PROFESSION_IDS } from '../src/sim/content/professions';
-import { DELVES, DUNGEONS, ITEMS, MOBS, NPCS, QUESTS, ZONES } from '../src/sim/data';
-import { MILESTONE_DEED_TO_LEGACY, VISITED_MARK_NAMESPACES } from '../src/sim/deeds';
+import { WARLOCK_PET_MOBS } from '../src/sim/content/warlock_pets';
+import { YUMI_TEMPLATE_ID } from '../src/sim/content/yumi';
+import {
+  DELVES,
+  DUNGEONS,
+  GROUND_OBJECTS,
+  ITEMS,
+  MOBS,
+  NPCS,
+  QUESTS,
+  ZONES,
+} from '../src/sim/data';
+import {
+  GROUND_PICKUP_PROVING_QUESTS,
+  MAX_CREDITABLE_MOB_LEVEL,
+  MILESTONE_DEED_TO_LEGACY,
+  VISITED_MARK_NAMESPACES,
+} from '../src/sim/deeds';
 import { DEED_STAT_KEYS, type DeedCategory, MILESTONES } from '../src/sim/types';
 
 const ALL = DEED_ORDER.map((id) => DEEDS[id]);
@@ -32,8 +51,8 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
   it('ships exactly 192 deeds worth 2365 total Renown', () => {
-    expect(DEED_ORDER.length).toBe(192);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2365);
+    expect(DEED_ORDER.length).toBe(193);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2370);
   });
 
   it('ships the audited per-category counts', () => {
@@ -46,7 +65,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       delve: 13,
       chronicle: 24,
       collection: 24,
-      pvp: 27,
+      pvp: 28,
       social: 16,
       exploration: 9,
       feat: 3,
@@ -65,6 +84,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'prog_tools_of_the_trade',
       'dgn_nythraxis_crypt',
       'chr_marsh_first_cast',
+      'pvp_card_duel_first_win',
     ]);
     expect(DEEDS.prog_crown_below.renown).toBe(25);
     expect(DEEDS.prog_mere_at_rest.renown).toBe(25);
@@ -72,6 +92,12 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     expect(DEEDS.prog_tools_of_the_trade.renown).toBe(10);
     expect(DEEDS.dgn_nythraxis_crypt.renown).toBe(10);
     expect(DEEDS.chr_marsh_first_cast.renown).toBe(5);
+    expect(DEEDS.pvp_card_duel_first_win.renown).toBe(5);
+    expect(DEEDS.pvp_card_duel_first_win.trigger).toEqual({
+      kind: 'stat',
+      stat: 'cardDuelsWon',
+      count: 1,
+    });
     // Full trigger literals: the evaluator's .every() is proven elsewhere, but
     // only a literal pin catches a quest id quietly dropped from a chain list.
     expect(DEEDS.prog_crown_below.trigger).toEqual({
@@ -140,7 +166,12 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // Regenerate after a DELIBERATE catalog change, then paste the printed hex
   // into FROZEN_CATALOG_SHA256 below (run from the repo root):
   //   npx tsx -e "import {DEED_ORDER,DEEDS} from './src/sim/content/deeds'; import {createHash} from 'node:crypto'; console.log(createHash('sha256').update(JSON.stringify(DEED_ORDER.map((id)=>[id,DEEDS[id].trigger,DEEDS[id].renown])),'utf8').digest('hex'))"
-  const FROZEN_CATALOG_SHA256 = 'e61f98af54cf091cd06f3e62f7852cc36b8b009665802584e3025427ea6495e3';
+  // v0.26 replaces the point tree before release, so prog_full_build's unreachable
+  // eleven-point threshold is deliberately migrated once to the canonical six rows.
+  // This new digest freezes that release contract; it is not permission for later edits.
+  // Re-baselined once more at the release/v0.27.0 base merge: the catalog now also
+  // carries the appended pvp_card_duel_first_win deed (Card Duel).
+  const FROZEN_CATALOG_SHA256 = '10ce166afae9bbe849d4a810ec66d9bfe02a01bca06265943a46bbc3a2262773';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -157,6 +188,85 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   });
 });
 
+describe('retro fallback proof sets stay anchored to the real tables', () => {
+  it('the ground-pickup proving quests are exactly the single-source collect quests', () => {
+    // A quest proves a sparkle pickup only when its collect objective's item
+    // can come from nowhere but the ground pickup path: any mob-loot or
+    // vendor source would break the inference, and interact objectives never
+    // bump the counter at all. Re-derive that set from the live tables and
+    // hold the pin to it, so a new ground object, loot entry, or vendor row
+    // forces a conscious re-decision here.
+    const groundItemIds = new Set(GROUND_OBJECTS.map((g) => g.itemId));
+    const lootItemIds = new Set(
+      Object.values(MOBS).flatMap((m) => (m.loot ?? []).map((l) => l.itemId)),
+    );
+    const vendorItemIds = new Set(Object.values(NPCS).flatMap((n) => n.vendorItems ?? []));
+    const derived: string[] = [];
+    for (const [questId, quest] of Object.entries(QUESTS)) {
+      const proves = quest.objectives.some(
+        (obj) =>
+          obj.type === 'collect' &&
+          groundItemIds.has(obj.itemId) &&
+          !lootItemIds.has(obj.itemId) &&
+          !vendorItemIds.has(obj.itemId),
+      );
+      if (proves) derived.push(questId);
+    }
+    expect([...GROUND_PICKUP_PROVING_QUESTS].sort()).toEqual(derived.sort());
+    // The pickup gate itself requires the item def to carry the quest id, so
+    // every proving quest's evidence chain resolves end to end.
+    for (const questId of GROUND_PICKUP_PROVING_QUESTS) {
+      const quest = QUESTS[questId];
+      expect(quest, questId).toBeDefined();
+      const collect = quest.objectives.find(
+        (o) => o.type === 'collect' && groundItemIds.has(o.itemId),
+      );
+      expect(collect, questId).toBeDefined();
+      const item = ITEMS[(collect as { itemId: string }).itemId];
+      // kind 'quest' is also the non-transferability guarantee: trade
+      // (social/trade.ts), mail (mail/post_office.ts), and the market
+      // (market.ts) all hard-block that kind, so questsDone proves THIS
+      // character performed the pickup, not a trading partner.
+      expect(item?.kind, questId).toBe('quest');
+      expect(item?.questId, questId).toBe(questId);
+      // A repeatable proving quest would weaken nothing, but none exists; a
+      // future one should be reconsidered here rather than slip in.
+      expect(quest.repeatable ?? false, questId).toBe(false);
+    }
+  });
+
+  it('the creditable mob-level ceiling is the heroic pin', () => {
+    // Giantslayer's stranded heal keys on the highest level a creditable mob
+    // can ever spawn at. Heroic instances pin every mob to one shared level;
+    // outside heroic no spawnable template exceeds the player cap. The only
+    // templates authored above the ceiling can never be credited: warlock
+    // and mage pets sync to their owner's level and die outside kill credit
+    // (combat/damage.ts owned-pet early return), and the Yumi cat's damage
+    // is intercepted before the death path (social/yumi.ts).
+    const heroicLevels = Object.values(HEROIC_DUNGEON_TUNING).map((t) => t.level);
+    expect(Math.max(...heroicLevels)).toBe(MAX_CREDITABLE_MOB_LEVEL);
+    const neverCreditable = new Set([
+      ...Object.keys(WARLOCK_PET_MOBS),
+      ...Object.keys(MAGE_PET_MOBS),
+      YUMI_TEMPLATE_ID,
+    ]);
+    for (const [id, m] of Object.entries(MOBS)) {
+      if (m.dummy || m.worldBoss || neverCreditable.has(id)) continue;
+      expect(m.maxLevel, id).toBeLessThanOrEqual(MAX_CREDITABLE_MOB_LEVEL);
+    }
+    // Delve spawns bypass maxLevel: the live level is minLevel plus the
+    // tier's enemyLevelBonus (delves/runs.ts). Guard the whole delve mob
+    // table against the highest bonus any delve ships, so a future tier or
+    // higher-level delve mob cannot silently pass the ceiling.
+    const maxDelveBonus = Math.max(
+      ...Object.values(DELVES).flatMap((d) => d.tiers.map((t) => t.enemyLevelBonus)),
+    );
+    for (const [id, m] of Object.entries(DELVE_MOBS)) {
+      expect(m.minLevel + maxDelveBonus, id).toBeLessThanOrEqual(MAX_CREDITABLE_MOB_LEVEL);
+    }
+  });
+});
+
 describe('table shape', () => {
   it('DEED_ORDER holds the append-only authored order (first and last pinned)', () => {
     // DEED_ORDER derives from the table keys, so covering DEEDS is inherent;
@@ -166,7 +276,7 @@ describe('table shape', () => {
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('chr_marsh_first_cast');
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('pvp_card_duel_first_win');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

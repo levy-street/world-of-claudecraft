@@ -87,6 +87,118 @@ export type Leaves<T, D extends number = 5> = [D] extends [never]
 export const en = {
   meta: { builtOn: 'Built {date}' },
   realmTypes: { normal: 'Normal', pvp: 'PvP', rp: 'RP', rpPvp: 'RP-PvP' },
+  devCommand: {
+    dialogLabel: 'Developer Command Center',
+    kicker: 'Development tools',
+    title: 'Command Center',
+    subtitle: 'Authoritative test controls for the active world.',
+    closeAria: 'Close developer commands',
+    categoryNavAria: 'Developer command categories',
+    categories: {
+      player: 'Player',
+      spawns: 'Spawns',
+      inventory: 'Inventory',
+      progress: 'Progress',
+      travel: 'Travel',
+      scenarios: 'Scenarios',
+    },
+    filterLabel: 'Filter commands',
+    filterPlaceholder: 'Search this category',
+    noMatches: 'No matching commands.',
+    serverRequirement: 'Server cheats still require ALLOW_DEV_COMMANDS=1.',
+    invalidValues: 'Choose valid values before running this command.',
+    sent: 'Sent: {command}',
+    run: 'Run',
+    fields: {
+      level: 'Level',
+      mob: 'Mob',
+      count: 'Count',
+      item: 'Item',
+      gold: 'Gold',
+      quest: 'Quest',
+      profession: 'Profession',
+      amount: 'Amount',
+      x: 'X',
+      z: 'Z',
+      dungeon: 'Dungeon',
+      difficulty: 'Difficulty',
+      name: 'Name',
+    },
+    difficulty: { normal: 'Normal', heroic: 'Heroic' },
+    actions: {
+      heal: { label: 'Restore health', description: 'Fill the health pool.' },
+      resource: {
+        label: 'Restore resource',
+        description: 'Fill mana, rage, or energy.',
+      },
+      cooldowns: {
+        label: 'Clear cooldowns',
+        description: 'Reset ability, GCD, and potion timers.',
+      },
+      god: {
+        label: 'Toggle god mode',
+        description: 'Toggle invulnerability and boosted damage.',
+      },
+      revive: {
+        label: 'Revive',
+        description: 'Revive through the normal resurrection path.',
+      },
+      kill: { label: 'Kill player', description: 'Test death, ghost, and corpse flows.' },
+      combatreset: {
+        label: 'Reset combat',
+        description: 'Clear combat state and hostile threat.',
+      },
+      level: { label: 'Set level', description: 'Set the current character level.' },
+      spawn: { label: 'Spawn mob', description: 'Create a concrete mob near the player.' },
+      killtarget: { label: 'Kill target', description: 'Kill the selected living mob.' },
+      despawntarget: {
+        label: 'Despawn target',
+        description: 'Remove a selected mob created by this tool.',
+      },
+      despawnall: {
+        label: 'Clear my spawns',
+        description: 'Remove every mob spawned by this developer.',
+      },
+      give: { label: 'Give item', description: 'Add an item to the player inventory.' },
+      gold: { label: 'Add gold', description: 'Add gold to the current purse.' },
+      quest: { label: 'Complete quest', description: 'Complete a specific quest by id.' },
+      quests: {
+        label: 'Complete active quests',
+        description: 'Complete every quest in the current log.',
+      },
+      attune: {
+        label: 'Unlock attunements',
+        description: 'Mark all attunement requirements complete.',
+      },
+      gather: {
+        label: 'Grant gathering skill',
+        description: 'Increase a gathering profession.',
+      },
+      teleport: { label: 'Teleport', description: 'Move to exact world coordinates.' },
+      dungeon: {
+        label: 'Enter dungeon',
+        description: 'Enter a dungeon with dev gate bypass.',
+      },
+      raid: { label: 'Enter raid', description: 'Enter the Nythraxis arena directly.' },
+      raidreset: {
+        label: 'Reset raid lockout',
+        description: 'Clear the current raid lockouts.',
+      },
+      bot: {
+        label: 'Spawn social bot',
+        description: 'Create a whisperable stationary player.',
+      },
+      lfgqueue: {
+        label: 'Seed finder queue',
+        description: 'Create a Dungeon Finder queue scenario.',
+      },
+      lfgraid: { label: 'Seed raid finder', description: 'Create a raid finder scenario.' },
+      lfgboard: {
+        label: 'Seed listing board',
+        description: 'Create a premade listing scenario.',
+      },
+    },
+  },
   game: gameStrings,
   hudChrome: hudChromeStrings,
   apiError: apiErrorStrings,
@@ -182,6 +294,7 @@ export const en = {
     title: 'Download Desktop Launcher',
     desc: 'Get the standalone launcher for optimized performance and full-screen play.',
     macCta: 'Download for macOS',
+    windowsCta: 'Download for Windows',
     linuxCta: 'Download for Linux',
     linuxHint: 'AppImage: make it executable, then run it. No install needed.',
     windowsPending: 'Windows build pending.',
@@ -264,8 +377,8 @@ export const en = {
   wallet: {
     label: '$WOC Wallet',
     connect: 'Verify Wallet',
-    connectTitle: 'Verify your Solana wallet',
-    connectAria: 'Verify your Solana wallet',
+    connectTitle: 'Connect a Solana wallet',
+    connectAria: 'Connect a Solana wallet',
     verify: 'Verify Wallet',
     verifyNew: 'Verify New Wallet',
     verifyTitle: 'Choose a wallet and sign once to verify ownership.',
@@ -303,6 +416,9 @@ export const en = {
     balancePreviewAria:
       'Connected wallet balance preview: {balance}. Link the wallet to verify holder flair.',
     balanceAmount: '{amount} $WOC',
+    bagConnect: 'Link wallet',
+    bagLink: 'Verify wallet',
+    bagReconnect: 'Reconnect wallet',
     connected: 'Connected: {address}',
     connectedWithBalance: 'Connected: {balance} - {address}',
     connectedLinked: 'Verified: {address}',
@@ -323,13 +439,46 @@ export const en = {
     helpLinkedDisconnectedWithBalance:
       'Holder perks are active. Connect the app when you need to sign or spend.',
     extensionHelp:
-      'To see a wallet here, keep a browser wallet extension such as Solflare Wallet active.',
+      'Choose an installed browser wallet, or open Reown AppKit for Phantom, Solflare, Backpack, and more.',
+    mobileAppHelp:
+      'Choose Phantom or Solflare. Your wallet app will ask for approval. Keep this game open and return to it when finished.',
+    standaloneAppHelp:
+      'Wallet connections are not available in the Home Screen app yet. Open World of ClaudeCraft in Safari or Chrome to use Phantom or Solflare.',
+    openAppTitle: 'Continue in {wallet}',
+    openAppHelp:
+      'Open {wallet} to review this request. Keep this game tab open while the wallet app is active.',
+    openAppButton: 'Open {wallet}',
+    manualReturnBrowserHelp:
+      'After approval, return to this game tab. If iOS opens another browser, close it and return to the original browser manually.',
+    manualReturnStandaloneHelp:
+      'After approval, return to World of ClaudeCraft from your Home Screen. If iOS opens a browser, close it and reopen the Home Screen app manually.',
+    preparingAppButton: 'Preparing {wallet}...',
+    walletAppUnavailable: '{wallet} could not be prepared. Close this window and try again.',
     flowConnect: 'Choose a wallet. Verification continues automatically.',
     flowSign: 'Sign the verification message in your wallet app. No transaction or SOL required.',
     flowVerify: 'Verifying wallet ownership...',
     linkFailed: 'Wallet verification failed.',
     verifyFailed: 'Wallet verification failed.',
     unlinkFailed: 'Could not unlink wallet.',
+    browser: {
+      eyebrow: 'Desktop wallet authorization',
+      title: 'Connect a Solana Wallet',
+      linkBody:
+        'Choose a wallet extension in this browser. You will sign a verification message, then return to the desktop app.',
+      paymentBody:
+        'Choose the wallet linked to your account and approve the transaction in this browser.',
+      extensionHelp:
+        'No compatible wallet extension was found. Install or unlock Phantom, Solflare, or another Solana browser wallet, then retry.',
+      safety: 'World of ClaudeCraft never asks for your recovery phrase or private key.',
+      continueWith: 'Continue with {wallet}',
+      reviewTitle: 'Review in your wallet',
+      reviewBody: 'Follow the prompt from {wallet}. Keep this browser page open.',
+      completeTitle: 'Wallet authorization complete',
+      completeBody: 'You can return to the World of ClaudeCraft desktop app.',
+      returnButton: 'Return to desktop app',
+      failed: 'Wallet authorization failed or expired. Return to the desktop app and try again.',
+      retry: 'Retry',
+    },
     holder: '$WOC holder',
     holderTierTitle: '{tier} $WOC holder',
     holderTiers: {
@@ -627,6 +776,26 @@ export const en = {
     // delve-shop keys; only the marks-specific strings live here.
     balance: 'Heroic Marks: {count}',
     buyAria: 'Buy {item} for {marks} Heroic Marks',
+  },
+  // The Card Master window (Card Duel minigame): queue join/leave affordance
+  // plus the in-match hand strip + round-score panel.
+  cardDuel: {
+    title: 'Card Duel',
+    close: 'Close',
+    join: 'Join Queue',
+    joinAria: 'Join the Card Duel queue',
+    leave: 'Leave Queue',
+    leaveAria: 'Leave the Card Duel queue',
+    forfeit: 'Forfeit',
+    forfeitAria: 'Forfeit the Card Duel',
+    queued: 'Waiting for an opponent...',
+    unavailable: 'Card Duel requires another player online.',
+    vsOpponent: 'vs {name}',
+    round: 'Round score: {mine} - {theirs}',
+    counts: 'Deck: {deck} · Discard: {discard}',
+    playCardAria: 'Play the {value} card',
+    waitingOnOpponent: "Waiting on your opponent's card...",
+    yourTurn: 'Play a card',
   },
   delveUi: {
     board: {
@@ -1076,6 +1245,10 @@ export const en = {
       kings_signet: { name: "King's Signet" },
       event_skin_token: { name: 'Mysterious Cosmetic Cache' },
       heroic_mark: { name: 'Heroic Mark' },
+      eastbrook_buckler: { name: 'Eastbrook Buckler' },
+      eastbrook_greatsword: { name: 'Eastbrook Greatsword' },
+      highwatch_greatsword: { name: 'Highwatch Greatsword' },
+      highwatch_wallshield: { name: 'Highwatch Wallshield' },
       morthens_cryptforged_hauberk: { name: "Morthen's Cryptforged Hauberk" },
       shadowpulse_handwraps: { name: 'Shadowpulse Handwraps' },
       bonechill_striders: { name: 'Bonechill Striders' },
@@ -1127,6 +1300,11 @@ export const en = {
       soulflame_mantle: { name: 'Wraithfire Mantle' },
       stormcallers_crown: { name: 'Galecall Crown' },
       stormcallers_spaulders: { name: 'Galecall Spaulders' },
+      // Nythraxis raid (normal): the offhand-slot + two-hander epics.
+      bonewrought_greatsword: { name: 'Bonewrought Greatsword' },
+      direfang_greatblade: { name: 'Direfang Greatblade' },
+      bonewrought_bulwark: { name: 'Bonewrought Bulwark' },
+      wraithfire_orb: { name: 'Wraithfire Orb' },
       unknown_alien_weaponry: { name: 'Unknown Alien Weaponry' },
       alien_armor_plate: { name: 'Alien Armor Plate' },
       amber_crimson_armor_plate: { name: 'Amber Crimson' },
@@ -1155,7 +1333,12 @@ export const en = {
       stormcallers_waistguard: { name: 'Galecall Waistguard' },
     },
     itemSets: itemSetEntityText,
-    mobs: { ...worldNames.en.entities.mobs, ...mergeEntities.en.mobs, ...mergeExtra.en.mobs },
+    mobs: {
+      ...worldNames.en.entities.mobs,
+      ...mergeEntities.en.mobs,
+      ...mergeExtra.en.mobs,
+      water_elemental: { name: 'Water Elemental' },
+    },
     npcs: { ...worldNames.en.entities.npcs, ...mergeExtra.en.npcs },
     quests: {
       ...worldNames.en.entities.quests,
@@ -1173,11 +1356,21 @@ export const en = {
 // ": EnTranslations" so tsc still red-fails any missing or renamed key.
 export type EnTranslations = typeof en;
 
-// Depth 6 so the deepest real leaves (entities.quests.<id>.objectives.<n>.label,
-// entities.zones.<id>.pois.<n>.label) are members. The sparse overlays are typed
-// `Partial<Record<TranslationKey, string>>`, so TranslationKey must reach
-// every overlay key; depth 5 stopped one segment short. (Measured: no tsc cost.)
-export type TranslationKey = Leaves<typeof en, 6>;
+// TranslationKey is the build-generated flat literal union of every dotted leaf
+// path in `en` (./translation_keys.generated.ts, emitted by scripts/i18n_build.mjs;
+// regenerate with `npm run i18n:gen`). It replaced the recursive computation
+// `Leaves<typeof en, 6>`: the recursive union normalized to thousands of string
+// literals plus 85 template-literal patterns (from the four Record-over-id entity
+// subtrees: abilities, item sets, quest objectives, zone POIs), whose
+// literal-times-pattern subsumption checks exceed TypeScript 7's native-compiler
+// work budget (TS2590; issue #1868 is the durable evidence trail), and the
+// patterns accepted ANY entity id, so a typo'd id type-checked. The generated
+// union keeps every legal key, rejects typo'd entity ids (strictly stronger
+// checking), and roughly halves tsc wall time. The sparse overlays stay typed
+// `Partial<Record<TranslationKey, string>>`, so TranslationKey still reaches
+// every overlay key. Leaves above stays exported for compatibility; it has no
+// other instantiations repo-wide.
+export type TranslationKey = import('./translation_keys.generated').TranslationKeyFlat;
 export type InterpolationValue = string | number;
 export type InterpolationValues = Record<string, InterpolationValue>;
 

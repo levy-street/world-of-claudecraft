@@ -12,6 +12,7 @@ import {
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import ffmpegPath from 'ffmpeg-static';
+import ffprobeStatic from 'ffprobe-static';
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error untyped zero-dependency authoring tool (scripts/*.mjs convention)
 import * as exportBundleModule from '../scripts/sfx_studio/export_bundle.mjs';
@@ -135,10 +136,13 @@ describe('SFX production bundle', () => {
       }
       writeFileSync(join(repository, 'scripts/sfx/sfx_mix.json'), '{"version":1,"clips":{}}\n');
 
-      const published = join(audioDirectory, 'foot_grass.mp3');
+      // foot_grass has several real takes now (no bare file), so corrupt an
+      // actually-referenced variant, not a filename the export builder would
+      // never look at.
+      const published = join(audioDirectory, 'foot_grass_1.mp3');
       writeFileSync(published, 'not audio');
       expect(() => buildSfxProductionBundle(repository)).toThrow(
-        'published SFX is not decodable: foot_grass.mp3',
+        'published SFX is not decodable: foot_grass_1.mp3',
       );
       execFileSync(ffmpegPath, [
         '-hide_banner',
@@ -158,12 +162,40 @@ describe('SFX production bundle', () => {
         published,
       ]);
       expect(() => buildSfxProductionBundle(repository)).toThrow(
-        'published SFX is not production-conforming: foot_grass.mp3',
+        'published SFX is not production-conforming: foot_grass_1.mp3',
       );
     } finally {
       rmSync(fixture, { recursive: true, force: true });
     }
   }, 30_000);
+
+  it('measures the production-conformance verdict with the bundled ffmpeg toolchain', () => {
+    // The export validator must resolve the same binaries that gate the checked-in
+    // assets (scripts/sfx_conform.mjs / npm run sfx:check use ffmpeg-static and
+    // ffprobe-static), not the PATH ffmpeg the Studio spawns for playback. A newer
+    // PATH ffmpeg measures MP3 duration a few tens of milliseconds shorter, which
+    // flips these clips across the one-second peak/LUFS branch boundary and rejects a
+    // clip the gate accepts. Pinning the resolution keeps that regression from
+    // silently returning.
+    expect(exportBundleModule.CONFORMANCE_FFMPEG_PATH).toBe(ffmpegPath);
+    expect(exportBundleModule.CONFORMANCE_FFPROBE_PATH).toBe(ffprobeStatic.path);
+    // The constants alone do not prove the validator USES them: pin the call-site
+    // wiring so a revert to the PATH binaries (which only misbehaves on machines
+    // whose PATH ffmpeg diverges from the bundled one) reds deterministically.
+    const exportSrc = readFileSync(join(ROOT, 'scripts/sfx_studio/export_bundle.mjs'), 'utf8');
+    expect(exportSrc).toContain('ffmpegPath: CONFORMANCE_FFMPEG_PATH');
+    expect(exportSrc).toContain('ffprobePath: CONFORMANCE_FFPROBE_PATH');
+    for (const clip of [
+      'mob_demon_hurt',
+      'mob_humanoid_hurt_2',
+      'mob_troll_hurt',
+      'mob_reptile_death_2',
+    ]) {
+      expect(assertExportableSfxTrack(join(ROOT, `public/audio/sfx/${clip}.mp3`)), clip).toMatch(
+        /^[a-f0-9]{64}$/,
+      );
+    }
+  });
 
   it('is byte deterministic and includes the exact published runtime state', () => {
     const first = buildSfxProductionBundle(ROOT);
@@ -351,21 +383,22 @@ describe('SFX production bundle', () => {
       for (const filename of ['sfx_gain_map.json', 'sfx_speed_map.json', 'sfx_mix.json']) {
         copyFileSync(join(ROOT, 'scripts/sfx', filename), join(profileDirectory, filename));
       }
-      const original = join(audioDirectory, 'foot_grass.mp3');
-      copyFileSync(original, join(audioDirectory, 'foot_grass_1.mp3'));
-      copyFileSync(original, join(audioDirectory, 'foot_grass_2.mp3'));
-      rmSync(original);
-
+      // foot_grass already has several real numbered takes now (no bare file
+      // to synthesize a 2-take scenario from); the loop above already copied
+      // every real variant, so this demonstrates round-robin ordering on
+      // real, not synthetic, multi-take data.
       const bundle = buildSfxProductionBundle(fixture);
       expect(
         bundle.runtimePack.clips.foot_grass.variants.map(({ id }: { id: string }) => id),
-      ).toEqual(['1', '2']);
+      ).toEqual(SFX_CLIPS.foot_grass.variants.map(({ id }) => id));
       expect(bundle.runtimePack.clips.foot_grass).toMatchObject({
         gain: SFX_CLIPS.foot_grass.gain,
         playbackRate: SFX_CLIPS.foot_grass.playbackRate,
       });
+      // No synthetic extra file anymore (the fixture loop above copies every
+      // real variant 1:1), so the count matches the real catalog exactly.
       expect(bundle.metadata.trackCount).toBe(
-        Object.values(SFX_CLIPS).reduce((sum, clip) => sum + clip.variants.length, 0) + 1,
+        Object.values(SFX_CLIPS).reduce((sum, clip) => sum + clip.variants.length, 0),
       );
 
       copyFileSync(

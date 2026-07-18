@@ -22,7 +22,15 @@ const FULL: Partial<Record<EquipSlot, string>> = {
 describe('char_view: paperdoll data model', () => {
   it('lays the classic two columns: head/neck/shoulder/chest/weapon, then hands/waist/legs/feet/rings', () => {
     expect(PAPERDOLL_LEFT_SLOTS).toEqual(['helmet', 'neck', 'shoulder', 'chest', 'mainhand']);
-    expect(PAPERDOLL_RIGHT_SLOTS).toEqual(['gloves', 'waist', 'legs', 'feet', 'ring1', 'ring2']);
+    expect(PAPERDOLL_RIGHT_SLOTS).toEqual([
+      'gloves',
+      'waist',
+      'legs',
+      'feet',
+      'ring1',
+      'ring2',
+      'offhand',
+    ]);
   });
 
   it('resolves every equipped slot to its item, in column order', () => {
@@ -41,6 +49,7 @@ describe('char_view: paperdoll data model', () => {
       'feet',
       'ring1',
       'ring2',
+      'offhand',
     ]);
     expect(view.left[0].item).toBe(ITEMS.cryptbone_helm);
     expect(view.left[4].item).toBe(ITEMS.worn_sword);

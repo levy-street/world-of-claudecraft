@@ -14,15 +14,16 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { TalentAllocation } from '../../src/sim/content/talents';
 import { ITEMS, QUESTS } from '../../src/sim/data';
+import { ALL_CLASSES } from '../../src/sim/types';
 import { ArenaWindow } from '../../src/ui/arena_window';
 import { BagsWindow } from '../../src/ui/bags_window';
 import { CharWindow } from '../../src/ui/char_window';
 import { FOCUSABLE_SELECTOR } from '../../src/ui/focus_manager';
+import { QuestLogWindow } from '../../src/ui/hud/quest/questlog_window';
 import { t } from '../../src/ui/i18n';
 import { LeaderboardWindow } from '../../src/ui/leaderboard_window';
 import { MarketWindow } from '../../src/ui/market_window';
 import { OptionsWindow } from '../../src/ui/options_window';
-import { QuestLogWindow } from '../../src/ui/questlog_window';
 import { SocialWindow } from '../../src/ui/social_window';
 import { SpellbookWindow } from '../../src/ui/spellbook_window';
 import { TalentsWindow } from '../../src/ui/talents_window';
@@ -136,21 +137,16 @@ describe('axe: talents window', () => {
   it('warrior talent tree is clean (dialog role + close button + tablist)', async () => {
     const root = host('talents-window');
     root.style.display = 'none';
-    let stage: TalentAllocation | null = null;
+    const allocation: TalentAllocation = { spec: null, rows: {} };
     const win = new TalentsWindow(
       stubDeps({
         root: () => root,
-        getStage: () => stage,
-        setStage: (s: TalentAllocation | null) => {
-          stage = s;
-        },
         playerClass: () => 'warrior',
-        totalPoints: () => 31,
-        currentAllocation: () => ({ ranks: {}, choices: {} }) as TalentAllocation,
+        playerLevel: () => 20,
+        currentAllocation: () => allocation,
         activeLoadout: () => -1,
         loadouts: () => [],
         currentBar: () => [],
-        buildDropdown: () => document.createElement('div'),
         captureFocus: () => null,
       }),
     );
@@ -158,6 +154,42 @@ describe('axe: talents window', () => {
     expect(root.getAttribute('role')).toBe('dialog');
     expect(root.querySelector('button[data-close]')).toBeTruthy();
     await expectClean(root);
+  });
+
+  it('puts every specialization role on its own line instead of joining the spec name', () => {
+    for (const cls of ALL_CLASSES) {
+      const root = host(`talents-window-${cls}`);
+      root.style.display = 'none';
+      const allocation: TalentAllocation = { spec: null, rows: {} };
+      const win = new TalentsWindow(
+        stubDeps({
+          root: () => root,
+          playerClass: () => cls,
+          playerLevel: () => 20,
+          currentAllocation: () => allocation,
+          activeLoadout: () => -1,
+          loadouts: () => [],
+          currentBar: () => [],
+          captureFocus: () => null,
+        }),
+      );
+      win.open();
+
+      const cards = Array.from(root.querySelectorAll<HTMLElement>('.ts-panel'));
+      expect(cards, `${cls} specialization cards`).toHaveLength(3);
+      for (const card of cards) {
+        const name = card.querySelector<HTMLElement>('.ts-name');
+        const role = card.querySelector<HTMLElement>('.ts-role');
+        expect(name, `${cls} spec name`).toBeTruthy();
+        expect(role, `${cls} spec role`).toBeTruthy();
+        expect(getComputedStyle(name!).display, `${cls} spec name display`).toBe('block');
+        expect(getComputedStyle(role!).display, `${cls} spec role display`).toBe('block');
+        expect(role!.getBoundingClientRect().top, `${cls} spec role line`).toBeGreaterThan(
+          name!.getBoundingClientRect().top,
+        );
+      }
+      root.remove();
+    }
   });
 });
 
@@ -231,7 +263,10 @@ describe('axe: spellbook window', () => {
     const win = new SpellbookWindow(
       stubDeps({
         root: () => root,
-        world: () => ({ cfg: { playerClass: 'warrior' }, known: [] }) as never,
+        // The render reads world.player.level for the spec/level learn gate
+        // (IWorld always carries a player); level 1 keeps every row locked.
+        world: () =>
+          ({ cfg: { playerClass: 'warrior' }, known: [], player: { level: 1 } }) as never,
         barAbilityIds: () => [],
         hasFreeSlot: () => true,
         hasFormBars: () => false,

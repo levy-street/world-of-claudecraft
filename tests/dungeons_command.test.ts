@@ -23,11 +23,15 @@ describe('/dungeons command', () => {
     const expected = `Dungeons (${parts.length}): ${parts.join(', ')}.`;
 
     sim.chat('/dungeons', a);
-    // The readout comes first, then the difficulty status line (heroic feature).
+    // The readout comes first, then the difficulty status line (heroic
+    // feature), then the reset usage line.
     const texts = errorTexts(sim.tick());
-    expect(texts[texts.length - 2]).toBe(expected);
-    expect(texts[texts.length - 1]).toBe(
+    expect(texts[texts.length - 3]).toBe(expected);
+    expect(texts[texts.length - 2]).toBe(
       'Dungeon difficulty: Normal. Use /dungeon heroic to change it.',
+    );
+    expect(texts[texts.length - 1]).toBe(
+      'Use /dungeon reset to abandon your empty instances after changing difficulty.',
     );
   });
 

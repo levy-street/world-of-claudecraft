@@ -29,6 +29,9 @@ import { DT, dist2d, MELEE_RANGE } from '../types';
 // Classic "trivial con" gap: a wild mob this far below the player's level stops
 // auto-aggroing from proximity. Moved with isTrivialTo (its only reader).
 const TRIVIAL_LEVEL_GAP = 10;
+const NYTHRAXIS_HEROIC_ROGUE_ADD_ID = 'nythraxis_heroic_rogue_add';
+const VOSS_TARGET_SHUFFLE_SECONDS = 3;
+const VOSS_FRONTLINE_CLASSES = new Set(['warrior', 'rogue', 'hunter']);
 
 // When a mob's target dies/leaves it swings to its next-highest-threat
 // attacker. With no living threat left, it evades home instead of grabbing a
@@ -67,7 +70,11 @@ export function retargetMob(ctx: SimContext, mob: Entity): void {
 export function highestThreatTarget(ctx: SimContext, mob: Entity): Entity | null {
   let best: Entity | null = null;
   let bestT = -1;
+  // Resolved once per walk, not per entry: the ctx member is a live getter chain
+  // and this loop is a per-entry hot path.
+  const counters = ctx.mobScanCounters;
   for (const [id, t] of mob.threat) {
+    counters.threatEntryVisits++;
     const e = ctx.entities.get(id);
     if (!e || e.dead) {
       mob.threat.delete(id);
@@ -95,6 +102,10 @@ export function tickForcedTarget(mob: Entity): void {
 // takes aggro past 110% of the current target's threat in melee range of
 // the mob, or past 130% at range. A taunt forces the target outright.
 export function updateMobTarget(ctx: SimContext, mob: Entity): void {
+  if (mob.templateId === NYTHRAXIS_HEROIC_ROGUE_ADD_ID) {
+    updateVossTarget(ctx, mob);
+    return;
+  }
   if (mob.forcedTargetTimer > 0) {
     mob.forcedTargetTimer -= DT;
     const forced = mob.forcedTargetId !== null ? ctx.entities.get(mob.forcedTargetId) : null;
@@ -121,7 +132,10 @@ export function updateMobTarget(ctx: SimContext, mob: Entity): void {
     MELEE_RANGE * 1.2,
     combatProfileForMob(mob.templateId, mob.scale).meleeRange,
   );
+  // Resolved once per walk, not per entry (same reason as highestThreatTarget).
+  const counters = ctx.mobScanCounters;
   for (const [id, t] of mob.threat) {
+    counters.threatEntryVisits++;
     if (id === cur.id || t <= bestT) continue;
     const e = ctx.entities.get(id);
     if (!e || e.dead) {
@@ -136,6 +150,37 @@ export function updateMobTarget(ctx: SimContext, mob: Entity): void {
     }
   }
   if (best !== cur) mob.aggroTargetId = best.id;
+}
+
+export function updateVossTarget(ctx: SimContext, mob: Entity): void {
+  mob.forcedTargetId = null;
+  mob.forcedTargetTimer = 0;
+  mob.shuffleTargetTimer = (mob.shuffleTargetTimer ?? 0) - DT;
+
+  const cur = mob.aggroTargetId !== null ? ctx.entities.get(mob.aggroTargetId) : null;
+  if (cur && !cur.dead && mob.shuffleTargetTimer > 0) return;
+
+  const candidates: Entity[] = [];
+  for (const [id] of mob.threat) {
+    const e = ctx.entities.get(id);
+    if (!e || e.dead) {
+      mob.threat.delete(id);
+      continue;
+    }
+    if (e.kind === 'player') candidates.push(e);
+  }
+  if (candidates.length === 0) {
+    mob.aggroTargetId = null;
+    return;
+  }
+
+  const preferred = candidates.filter((e) => !VOSS_FRONTLINE_CLASSES.has(e.templateId));
+  const pool = preferred.length > 0 ? preferred : candidates;
+  const idx = ctx.rng.int(0, pool.length - 1);
+  mob.aggroTargetId = pool[idx].id;
+  mob.aiState = 'chase';
+  mob.inCombat = true;
+  mob.shuffleTargetTimer = VOSS_TARGET_SHUFFLE_SECONDS;
 }
 
 // Classic "trivial con": a wild mob far below the player's level stops

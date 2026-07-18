@@ -932,10 +932,12 @@ describe('Guide deeds cross-page surfaces', () => {
       sub: 'dungeons',
       titleKey: 'guide.nav.dungeons',
     });
-    // The heroic explainer renders (difficulty, Marks economy, daily rhythm).
+    // The heroic explainer renders (difficulty, Marks economy, daily rhythm), and the
+    // difficulty-transition escape hatch renders beside it (Reset All Instances).
     expect(html).toContain('Heroic mode');
     expect(html).toContain('Heroic Marks');
     expect(html).toContain('/dungeon heroic');
+    expect(html).toContain('/dungeon reset');
     // Every generated dungeon card carries its deep-link anchor for site search.
     for (const d of GUIDE_DUNGEONS) {
       expect(html, `dungeon card missing anchor id "dungeon-${d.id}"`).toContain(

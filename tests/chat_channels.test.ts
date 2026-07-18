@@ -12,10 +12,12 @@ import {
   isChatTabChannel,
   parseChatTabs,
   sentLineChannel,
+  sentLineTarget,
+  sentLineTargetForHost,
   serializeChatTabs,
   WHISPER_TAB,
   WHISPER_TAB_LABEL_KEY,
-} from '../src/ui/chat_channels';
+} from '../src/ui/hud/chat/chat_channels';
 
 describe('chat channel tabs — pure model', () => {
   it('exposes the bindable channels without whisper (which has no standing channel)', () => {
@@ -211,7 +213,7 @@ describe('chat channel tabs — pure model', () => {
       expect(sentLineChannel('')).toBeNull();
     });
 
-    it('never maps the host-ambiguous bare /g (say offline, guild online)', () => {
+    it('never maps the host-ambiguous bare /g (general offline, guild online)', () => {
       // composeChatLine only ever emits /general for the general channel, and /g is
       // routed differently offline vs online, so it must not move the sticky channel.
       expect(sentLineChannel('/g hi')).toBeNull();
@@ -270,5 +272,82 @@ describe('chat channel tabs — pure model', () => {
     expect(isChatTabChannel('')).toBe(false);
     expect(isChatTabChannel(null)).toBe(false);
     expect(isChatTabChannel(7)).toBe(false);
+  });
+
+  it('passes a "!" community command through untouched (never wraps it in a channel prefix)', () => {
+    // The v0.26.0 regression prefixed non-slash lines, so "!lfg ..." became
+    // "/say !lfg ..." and the server "!" relay gate (text.startsWith("!")) missed it.
+    expect(composeChatLine('party', '!lfg need a healer')).toBe('!lfg need a healer');
+    expect(composeChatLine('say', '!events raid at the fountain')).toBe(
+      '!events raid at the fountain',
+    );
+    // A plain line still gets the channel prefix; an explicit slash still wins.
+    expect(composeChatLine('party', 'hello')).toBe('/p hello');
+    expect(composeChatLine('party', '/w Bob hi')).toBe('/w Bob hi');
+  });
+
+  it('a "!" community command is transient: it never resets the sticky channel to say', () => {
+    // noteSentChannel runs on every send; if a "!" line mapped like plain text
+    // it would return 'say' and firing "!lfg ..." mid-conversation would drop
+    // your NEXT plain line from party/general to say. It stays null, like the
+    // other transient commands (whispers, emotes, rolls).
+    expect(sentLineTarget('!lfg need a healer')).toBeNull();
+    expect(sentLineChannel('!events raid at the fountain')).toBeNull();
+  });
+
+  it('sentLineChannel maps the /1 shortcut to General (but never /g, which is guild online)', () => {
+    expect(sentLineChannel('/1 hey everyone')).toBe('general');
+    expect(sentLineChannel('/general hey everyone')).toBe('general');
+    expect(sentLineChannel('/p on my way')).toBe('party');
+    expect(sentLineChannel('/w Bob hi')).toBeNull();
+    expect(sentLineChannel('/r sure')).toBeNull();
+  });
+
+  it('sentLineTarget also sticks to whisper after a /r reply, so the input keeps replying', () => {
+    expect(sentLineTarget('/r sure thing')).toBe(WHISPER_TAB);
+    expect(sentLineTarget('/reply ok')).toBe(WHISPER_TAB);
+    // An explicit one-off "/w Name" does NOT stick (its next reply would target the
+    // wrong person); standing channels still carry through, including /1 -> general.
+    expect(sentLineTarget('/w Bob hi')).toBeNull();
+    expect(sentLineTarget('/1 hey')).toBe('general');
+    expect(sentLineTarget('/p on my way')).toBe('party');
+    expect(sentLineTarget('hello')).toBe('say');
+  });
+
+  describe('sentLineTargetForHost (host-aware sticky for the ambiguous /g alias)', () => {
+    it('sticks a bare /g send to guild online and general offline', () => {
+      // "/g" routes to GUILD online (the server intercepts it) but GENERAL offline
+      // (the sim), so the host-independent sentLineTarget leaves it null; the client
+      // knows its host and keeps the player in the channel they just spoke in.
+      expect(sentLineTargetForHost('/g raid tonight', { online: true })).toBe('guild');
+      expect(sentLineTargetForHost('/g raid tonight', { online: false })).toBe('general');
+    });
+
+    it('delegates every other line to the host-independent sentLineTarget', () => {
+      for (const online of [true, false]) {
+        expect(sentLineTargetForHost('/1 hey', { online })).toBe('general');
+        expect(sentLineTargetForHost('/general hey', { online })).toBe('general');
+        expect(sentLineTargetForHost('/gu ready', { online })).toBe('guild');
+        expect(sentLineTargetForHost('/p on my way', { online })).toBe('party');
+        expect(sentLineTargetForHost('/r sure', { online })).toBe(WHISPER_TAB);
+        expect(sentLineTargetForHost('hello', { online })).toBe('say');
+        expect(sentLineTargetForHost('/w Bob hi', { online })).toBeNull();
+      }
+    });
+
+    it('round-trips every send-capable channel prefix on both hosts', () => {
+      // Closure pin: a line composed with any channel's send prefix must resolve
+      // back to that same channel, so the sticky follows the player into ANY
+      // channel (yell included) and a future channel addition stays sticky-correct
+      // by construction.
+      for (const online of [true, false]) {
+        for (const channel of CHAT_TAB_CHANNELS) {
+          const line = channelSendPrefix(channel) + 'hello there';
+          expect(sentLineTargetForHost(line, { online }), `${channel} online=${online}`).toBe(
+            channel,
+          );
+        }
+      }
+    });
   });
 });

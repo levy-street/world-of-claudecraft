@@ -64,6 +64,7 @@ const EXPECTED_CODES = [
   'two_factor.not_enabled',
   'two_factor.setup_required',
   'validation.failed',
+  'wallet.handoff_invalid',
   'deeds.invalid_input',
   'steam.disabled',
   'steam.invalid_ticket',
@@ -71,6 +72,7 @@ const EXPECTED_CODES = [
   'steam.already_linked',
   'steam.account_taken',
   'steam.upstream',
+  'welcome.invalid_input',
 ];
 
 describe('ERROR_CODES catalog', () => {

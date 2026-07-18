@@ -1,4 +1,9 @@
-import { type LetterDef, QUEST_LETTERS, WELCOME_LETTER } from '../sim/content/letters';
+import {
+  HEROIC_MARK_LETTER,
+  type LetterDef,
+  QUEST_LETTERS,
+  WELCOME_LETTER,
+} from '../sim/content/letters';
 import {
   ABILITIES,
   CLASSES,
@@ -152,10 +157,12 @@ const CLASS_DESCRIPTION_KEYS: Record<PlayerClass, string> = {
 
 const fallbackLog = new Map<string, EntityTranslationFallback>();
 
-// Ravenpost authored letters by letterId (the welcome letter + the quest
-// thank-you letters), the canonical English source the 'letter' kind reads.
+// Ravenpost authored letters by letterId (the welcome letter, the Heroic Marks
+// reward letter, and the quest thank-you letters), the canonical English source
+// the 'letter' kind reads.
 const LETTERS_BY_ID: Record<string, LetterDef> = {
   [WELCOME_LETTER.letterId]: WELCOME_LETTER,
+  [HEROIC_MARK_LETTER.letterId]: HEROIC_MARK_LETTER,
 };
 for (const letter of Object.values(QUEST_LETTERS)) LETTERS_BY_ID[letter.letterId] = letter;
 
@@ -190,7 +197,13 @@ function interpolateSource(source: string, values?: InterpolationValues): string
     // timed effect's resolved duration ($t); hud.ts supplies all three.
     .replace(/\$o/g, String(values.overTime ?? '$o'))
     .replace(/\$b/g, String(values.buff ?? '$b'))
-    .replace(/\$t/g, String(values.duration ?? '$t'));
+    .replace(/\$t/g, String(values.duration ?? '$t'))
+    .replace(/\$h/g, String(values.healing ?? '$h'))
+    .replace(/\$e/g, String(values.hostilePveDuration ?? '$e'))
+    .replace(/\$p/g, String(values.hostilePvpDuration ?? '$p'))
+    .replace(/\$g/g, String(values.groundDuration ?? '$g'))
+    .replace(/\$s/g, String(values.selfCooldownRecovery ?? '$s'))
+    .replace(/\$a/g, String(values.allyCooldownRecovery ?? '$a'));
   return legacy.replace(/\{([A-Za-z0-9_]+)\}/g, (match, name: string) => {
     const value = values[name];
     return value === undefined ? match : String(value);

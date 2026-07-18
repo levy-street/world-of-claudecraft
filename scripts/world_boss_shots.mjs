@@ -15,7 +15,7 @@
 //   - boss has raid-tier hp (logged)
 //   - stormling adds appear at 66% threshold
 //   - corpse is lootable and contains the guaranteed trophy
-//   - equipping 2 soulflame pieces sets knockbackResistance to 1
+//   - equipping 2 soulflame pieces sets castPushbackReduction to 1
 //
 // Requires `npm run dev` (or GAME_URL env var). No src/ edits; all game
 // manipulation via page.evaluate at runtime.
@@ -213,7 +213,7 @@ await page.evaluate(() => {
 await sleep(200);
 
 // ---------------------------------------------------------------------------
-// 2-piece set bonus check: equip both soulflame pieces and read knockbackResistance
+// 2-piece set bonus check: equip both soulflame pieces and read castPushbackReduction
 // ---------------------------------------------------------------------------
 await page.evaluate(() => {
   const sim = window.__game.sim;
@@ -222,10 +222,10 @@ await page.evaluate(() => {
 });
 await sleep(300);
 
-const kbRes = await page.evaluate(() => {
-  return window.__game.sim.player.knockbackResistance ?? -1;
+const pushRes = await page.evaluate(() => {
+  return window.__game.sim.player.castPushbackReduction ?? -1;
 });
-check(kbRes >= 1, `2-piece Soulflame sets knockbackResistance to 1 (got ${kbRes})`);
+check(pushRes >= 1, `2-piece Soulflame sets castPushbackReduction to 1 (got ${pushRes})`);
 
 // ---------------------------------------------------------------------------
 // SECTION 2 - Force-spawn Thunzharr and capture the announcement

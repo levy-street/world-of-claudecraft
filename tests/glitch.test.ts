@@ -122,9 +122,8 @@ describe('Glitch platform integration', () => {
     expect(calls[0].url).toBe(
       `https://api.glitch.fun/api/titles/${TITLE_ID}/installs/${INSTALL_ID}/validate`,
     );
-    expect((calls[0].init?.headers as Record<string, string>).Authorization).toBe(
-      'Bearer title-token',
-    );
+    const headers = calls[0].init?.headers as Record<string, string> | undefined;
+    expect(headers?.Authorization).toBe('Bearer title-token');
   });
 
   it('recreates an install when validation reports INSTALL_NOT_FOUND', async () => {

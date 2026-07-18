@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { questTrackerView, type TrackedQuest } from '../src/ui/quest_tracker';
+import { questTrackerView, type TrackedQuest } from '../src/ui/hud/quest/quest_tracker';
 
 // Titles/labels are already resolved before the tracker receives them.
 const QUESTS: TrackedQuest[] = [

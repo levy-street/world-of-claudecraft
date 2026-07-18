@@ -127,6 +127,7 @@ const REALM_NAME = 'Claudemoon';
 function fakeRuntime(overrides: Partial<LeaderboardRuntime> = {}): LeaderboardRuntime {
   return {
     playersOnline: () => 0,
+    playersCap: () => 250,
     perfProfile: () => ({ ticks: 0 }),
     getLeaderboard: async () => [],
     getGuildLeaderboard: async () => [],
@@ -291,6 +292,9 @@ describe('response builders (convention B deferred: leaders key preserved)', () 
     const first = (body.leaders as Record<string, unknown>[])[0];
     expect(first.name).toBe('Chronicler1');
     expect(first.renown).toBe(499);
+    // deedCount stays POPULATED on the wire this release (deprecated
+    // wire-compat for stale clients, issue #2044); current clients never
+    // display it.
     expect(first.deedCount).toBe(39);
     expect(first.title).toBe('prog_veteran');
     expect('accountId' in first).toBe(false);
@@ -521,8 +525,8 @@ describe('readPublicSheet (FakeCharactersDb, resolved by name)', () => {
 // ---------------------------------------------------------------------------
 
 describe('status handler (name-list trim deviation)', () => {
-  it('returns counts only: { ok, realm, players_online, steam } with NO names list', async () => {
-    configureLeaderboardRuntime(fakeRuntime({ playersOnline: () => 4 }));
+  it('returns counts only: { ok, realm, players_online, players_cap, steam } with NO names list', async () => {
+    configureLeaderboardRuntime(fakeRuntime({ playersOnline: () => 4, playersCap: () => 250 }));
     const ctx = fakeCtx({ method: 'GET', url: '/api/status' });
     await handlerFor('/api/status')(ctx);
     const { status, body } = captured(ctx.res);
@@ -531,9 +535,22 @@ describe('status handler (name-list trim deviation)', () => {
       ok: true,
       realm: REALM_NAME,
       players_online: 4,
+      // The configured realm cap, advertised so the client realm list can show Full.
+      players_cap: 250,
       steam: { enabled: false },
     });
     expect('names' in (body as object)).toBe(false);
+  });
+
+  it('advertises players_cap 0 when the cap is disabled', async () => {
+    // A disabled cap (canonicalized to 0) still rides the field: the client reads
+    // 0 as "no refusal point" and never shows Full for this realm.
+    configureLeaderboardRuntime(fakeRuntime({ playersOnline: () => 4, playersCap: () => 0 }));
+    const ctx = fakeCtx({ method: 'GET', url: '/api/status' });
+    await handlerFor('/api/status')(ctx);
+    const { status, body } = captured(ctx.res);
+    expect(status).toBe(200);
+    expect((body as { players_cap: number }).players_cap).toBe(0);
   });
 
   it('adverts steam.enabled true when STEAM_ENABLED=1 (the capability advert)', async () => {
@@ -689,7 +706,8 @@ describe('leaderboard handler (through the injected cache-fronted runtime)', () 
     configureLeaderboardRuntime(
       fakeRuntime({
         getDeedsLeaderboard: async () => [deedsRow(1)],
-        deedsSelfRank: async (accountId) => (accountId === 77 ? { rank: 12, topPercent: 4 } : null),
+        deedsSelfRank: async (accountId) =>
+          accountId === 77 ? { rank: 12, topPercent: 4, renown: 1620 } : null,
       }),
     );
     const ctx = fakeCtx({
@@ -700,7 +718,9 @@ describe('leaderboard handler (through the injected cache-fronted runtime)', () 
     });
     await handlerFor('/api/leaderboard')(ctx);
     const b = captured(ctx.res).body as Record<string, unknown>;
-    expect(b.self).toEqual({ rank: 12, topPercent: 4 });
+    // The account's renown rides the self line verbatim (the client renders
+    // the Renown-carrying arm from it).
+    expect(b.self).toEqual({ rank: 12, topPercent: 4, renown: 1620 });
   });
 
   it('serves an authenticated but UNRANKED caller the board with no self key', async () => {

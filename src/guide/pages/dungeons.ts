@@ -60,6 +60,7 @@ export const dungeons: GuidePage = {
           'guide.dungeonsPage.heroicRewardsTitle',
           p('guide.dungeonsPage.heroicRewardsBody') + p('guide.dungeonsPage.heroicLockoutBody'),
         )}
+        ${section('guide.dungeonsPage.resetTitle', p('guide.dungeonsPage.resetBody'))}
         ${section('guide.dungeonsPage.templeLoreTitle', p('guide.dungeonsPage.templeLoreBody'))}
         ${section('guide.dungeonsPage.cryptLeadTitle', p('guide.dungeonsPage.cryptLeadBody'))}
         ${related([

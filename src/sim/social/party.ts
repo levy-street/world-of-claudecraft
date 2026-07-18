@@ -143,6 +143,10 @@ export class PartyMachine {
       color: '#aaf',
       pid: r.meta.entityId,
     });
+    // A dev test dummy ("/dev bot") has no client to click Accept: take the
+    // invite immediately, mirroring its whisper auto-reply, so party features
+    // (frames, mouseover heals) can be exercised offline.
+    if (target.isDevBot) this.partyAccept(targetPid);
   }
 
   partyAccept(pid?: number): void {
@@ -190,6 +194,7 @@ export class PartyMachine {
     party.members.push(r.meta.entityId);
     party.raidGroups.set(r.meta.entityId, raidGroup);
     this.partyByPid.set(r.meta.entityId, party.id);
+    this.ctx.inheritDungeonResetLocks(r.meta.entityId);
     // Forming the party is the inviter's join too; the accepter counts on
     // every successful join.
     if (created) this.ctx.bumpDeedStat(leaderMeta, 'partiesJoined', 1);
@@ -477,6 +482,10 @@ export class PartyMachine {
         party.members.push(pid);
         party.raidGroups.set(pid, raidGroup);
         this.partyByPid.set(pid, party.id);
+        // A finder merge is a join like any other: without this, a
+        // finder-formed member escapes the reset-cooldown inheritance the
+        // invite path (acceptInvite above) enforces.
+        this.ctx.inheritDungeonResetLocks(pid);
         const meta = this.ctx.players.get(pid);
         if (meta) this.ctx.bumpDeedStat(meta, 'partiesJoined', 1);
       }

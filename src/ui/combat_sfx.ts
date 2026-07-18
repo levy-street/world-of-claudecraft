@@ -7,7 +7,7 @@ type DamageEvent = Extract<SimEvent, { type: 'damage' }>;
 type SpellFxEvent = Extract<SimEvent, { type: 'spellfx' }>;
 type AuraEvent = Extract<SimEvent, { type: 'aura' }>;
 type MagicSchool = 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
-export type MobVoiceAction = 'aggro' | 'attack' | 'death' | 'hurt';
+export type MobVoiceAction = 'aggro' | 'attack' | 'death' | 'hurt' | 'idle';
 
 const SCHOOL_CUES = {
   fire: { cast: 'cast_fire', projectile: 'proj_fire', impact: 'impact_fire' },
@@ -17,6 +17,17 @@ const SCHOOL_CUES = {
   holy: { cast: 'cast_holy', projectile: 'proj_holy', impact: 'impact_holy' },
   nature: { cast: 'cast_nature', projectile: 'proj_nature', impact: 'impact_nature' },
 } as const satisfies Record<MagicSchool, { cast: SfxId; projectile: SfxId; impact: SfxId }>;
+
+// Wand auto-attack cues: distinct from a real spell cast's SCHOOL_CUES
+// projectile so a passive auto-attack doesn't sound identical to an actual
+// cast. Only the three wand-equipped classes (mage/arcane, priest/holy,
+// warlock/shadow, see classes.ts ranged.wand) have a dedicated cue; any other
+// school reaching here (should not happen) falls back to the real spell cue.
+const WAND_CUES: Partial<Record<MagicSchool, SfxId>> = {
+  arcane: 'wand_arcane',
+  holy: 'wand_holy',
+  shadow: 'wand_shadow',
+};
 
 // Exported (read-only, `as const`) purely so a test can pin its key set
 // against SFX_MOB_EXTENSION_FAMILIES: a family added to one and forgotten in
@@ -28,72 +39,84 @@ export const MOB_VOICE_CUES = {
     attack: 'mob_beast_attack',
     death: 'mob_beast_death',
     hurt: 'mob_beast_hurt',
+    idle: 'mob_beast_idle',
   },
   boar: {
     aggro: 'mob_boar_aggro',
     attack: 'mob_boar_attack',
     death: 'mob_boar_death',
     hurt: 'mob_boar_hurt',
+    idle: 'mob_boar_idle',
   },
   spider: {
     aggro: 'mob_spider_aggro',
     attack: 'mob_spider_attack',
     death: 'mob_spider_death',
     hurt: 'mob_spider_hurt',
+    idle: 'mob_spider_idle',
   },
   mudfin: {
     aggro: 'mob_mudfin_aggro',
     attack: 'mob_mudfin_attack',
     death: 'mob_mudfin_death',
     hurt: 'mob_mudfin_hurt',
+    idle: 'mob_mudfin_idle',
   },
   burrower: {
     aggro: 'mob_burrower_aggro',
     attack: 'mob_burrower_attack',
     death: 'mob_burrower_death',
     hurt: 'mob_burrower_hurt',
+    idle: 'mob_burrower_idle',
   },
   humanoid: {
     aggro: 'mob_humanoid_aggro',
     attack: 'mob_humanoid_attack',
     death: 'mob_humanoid_death',
     hurt: 'mob_humanoid_hurt',
+    idle: 'mob_humanoid_idle',
   },
   undead: {
     aggro: 'mob_undead_aggro',
     attack: 'mob_undead_attack',
     death: 'mob_undead_death',
     hurt: 'mob_undead_hurt',
+    idle: 'mob_undead_idle',
   },
   troll: {
     aggro: 'mob_troll_aggro',
     attack: 'mob_troll_attack',
     death: 'mob_troll_death',
     hurt: 'mob_troll_hurt',
+    idle: 'mob_troll_idle',
   },
   ogre: {
     aggro: 'mob_ogre_aggro',
     attack: 'mob_ogre_attack',
     death: 'mob_ogre_death',
     hurt: 'mob_ogre_hurt',
+    idle: 'mob_ogre_idle',
   },
   elemental: {
     aggro: 'mob_elemental_aggro',
     attack: 'mob_elemental_attack',
     death: 'mob_elemental_death',
     hurt: 'mob_elemental_hurt',
+    idle: 'mob_elemental_idle',
   },
   dragonkin: {
     aggro: 'mob_dragonkin_aggro',
     attack: 'mob_dragonkin_attack',
     death: 'mob_dragonkin_death',
     hurt: 'mob_dragonkin_hurt',
+    idle: 'mob_dragonkin_idle',
   },
   demon: {
     aggro: 'mob_demon_aggro',
     attack: 'mob_demon_attack',
     death: 'mob_demon_death',
     hurt: 'mob_demon_hurt',
+    idle: 'mob_demon_idle',
   },
   // deepfen_spearjaw (The Drowned Litany delve) is the family's first mob:
   // a velociraptor model, retagged from its former 'beast' mistag.
@@ -102,10 +125,11 @@ export const MOB_VOICE_CUES = {
     attack: 'mob_reptile_attack',
     death: 'mob_reptile_death',
     hurt: 'mob_reptile_hurt',
+    idle: 'mob_reptile_idle',
   },
 } as const satisfies Record<string, Record<MobVoiceAction, SfxId>>;
 
-type MobVoiceFamily = keyof typeof MOB_VOICE_CUES;
+type MobVoiceFamily = keyof typeof MOB_VOICE_CUES | 'water_elemental';
 const NO_CUE = (): boolean => false;
 
 // Templates that should share one recorded subfamily voice instead of each
@@ -149,7 +173,11 @@ export function spellFxCue(event: SpellFxEvent): { key: SfxId; anchorId: number 
   if (event.fx === 'projectile') {
     if (event.school === 'physical') return { key: 'melee_bow', anchorId: event.sourceId };
     const school = magicSchool(event.school);
-    return school ? { key: SCHOOL_CUES[school].projectile, anchorId: event.sourceId } : null;
+    if (!school) return null;
+    const key = event.wand
+      ? (WAND_CUES[school] ?? SCHOOL_CUES[school].projectile)
+      : SCHOOL_CUES[school].projectile;
+    return { key, anchorId: event.sourceId };
   }
   if (event.fx === 'nova') return { key: 'spell_nova', anchorId: event.targetId };
   return null;
@@ -192,6 +220,7 @@ export function playerSwingCueForDamage(event: DamageEvent, source: Entity | nul
 }
 
 export function mobVoiceFamily(templateId: string): MobVoiceFamily | null {
+  if (templateId === 'water_elemental') return 'water_elemental';
   if (templateId === 'wild_boar' || templateId === 'elder_bristleback') return 'boar';
   const family = MOBS[templateId]?.family;
   return family && family in MOB_VOICE_CUES ? (family as MobVoiceFamily) : null;
@@ -204,6 +233,13 @@ export function mobVoiceCue(
 ): string | null {
   const family = mobVoiceFamily(templateId);
   if (!family) return null;
+  if (family === 'water_elemental') {
+    // An owned summon: never an idle-bark candidate, and no idle buffer is
+    // staged for it, so the idle sweep must get null rather than a cue id
+    // that can never play.
+    if (action === 'idle') return null;
+    return `mob_water_elemental_${action === 'hurt' ? 'attack' : action}`;
+  }
   const subfamily = SUBFAMILY_ALIAS[templateId] ?? templateId;
   const specific = `mob_${family}_${subfamily}_${action}`;
   return hasCue(specific) ? specific : MOB_VOICE_CUES[family][action];

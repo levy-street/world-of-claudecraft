@@ -163,6 +163,17 @@ describe('locomotion animation state', () => {
     expect(desiredBaseState(state, true)).toBe('run');
     expect(locomotionTimeScale('run', state)).toBeLessThan(0);
   });
+
+  it('lets a self-centered Warrior whirl override cast and movement poses', () => {
+    const state = {
+      ...BASE_ANIM_STATE,
+      moving: true,
+      running: true,
+      casting: true,
+      spinning: true,
+    };
+    expect(desiredBaseState(state, true)).toBe('spin');
+  });
 });
 
 describe('pickProxyHeight (corpse pick-capsule flatten, issue 1486)', () => {

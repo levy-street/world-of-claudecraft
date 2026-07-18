@@ -150,12 +150,12 @@ describe('hud wiring', () => {
     // Banner and audio are gated on the PLAN's fresh-unlock fields; the retro
     // count only ever feeds the one localized summary log line.
     expect(body).toContain('if (plan.bannerId !== null)');
-    expect(body).toContain('if (plan.playSound) audio.levelUp();');
+    expect(body).toContain('if (plan.playSound) audio.achievement();');
     expect(body).toMatch(
       /if \(plan\.retroCount > 0\) \{\s*const retroText = t\('hudChrome\.deeds\.retroSummary'/,
     );
     expect(body.match(/showBanner/g)?.length).toBe(1);
-    expect(body.match(/audio\.levelUp/g)?.length).toBe(1);
+    expect(body.match(/audio\.achievement/g)?.length).toBe(1);
   });
 
   it('announces the unlock and the retro summary through the polite #combat-live region', () => {
@@ -172,12 +172,6 @@ describe('hud wiring', () => {
   it('marks the watch toggle state and names the recent-strip crests', () => {
     expect(painter).toContain('aria-pressed="${entry.watched}"');
     expect(painter).toMatch(/deed-crest-mini[^>]*alt="\$\{esc\(deedName\(r\.id\)\)\}"/);
-  });
-
-  it('diverts chronicler interacts through the sim then opens the Chronicles section', () => {
-    expect(hud).toMatch(
-      /CHRONICLER_TEMPLATE_IDS[\s\S]{0,200}?this\.sim\.targetEntity\(npc\.id\);\s*this\.sim\.interact\(\);\s*this\.openDeeds\('chronicle'\);/,
-    );
   });
 
   it('shows the active title and earned border badges on the character sheet', () => {

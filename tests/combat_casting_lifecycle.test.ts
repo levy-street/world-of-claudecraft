@@ -357,6 +357,7 @@ describe('casting_lifecycle: spell queue (#1360)', () => {
 
   it('carries the queued aim point through to the fired ground-targeted cast', () => {
     const { sim, p } = makeSim('mage', 20);
+    sim.setSpec('fire'); // Flamestrike is a DPS-spec ability (Chronomancy gating)
     spawnTarget(sim, p);
     castAbility(sim.ctx, 'fireball', p.id);
     while (p.castRemaining > CAST_QUEUE_WINDOW_SEC) sim.tick();
@@ -370,19 +371,26 @@ describe('casting_lifecycle: spell queue (#1360)', () => {
     while (p.queuedCastAbility) sim.tick();
     expect(p.queuedCastAbility).toBeNull();
     expect(p.queuedCastAim).toBeNull();
-    // flamestrike is instant (castTime 0): it resolves and clears castAim same-tick,
-    // so castingAbility being null (not left on fireball) plus the ability going on
-    // cooldown is the observable proof the fired cast actually ran with the aim.
-    expect(p.castingAbility).toBeNull();
+    // Flamestrike is a real 2s cast now (fire-spec redesign, instant only under Hot
+    // Streak): once the queued cast fires it becomes the active cast, carrying the
+    // queued aim point through. Draining it lands the blast and arms its cooldown.
+    expect(p.castingAbility).toBe('flamestrike');
+    // The queued aim point carried through (the cast resolves a y ground height).
+    expect(p.castAim?.x).toBe(aim.x);
+    expect(p.castAim?.z).toBe(aim.z);
+    while (p.castingAbility) sim.tick();
     expect(p.cooldowns.has('flamestrike')).toBe(true);
   });
 
   it('holds a queued cast that would complete before the arming GCD clears, and fires it once the GCD does', () => {
     const { sim, p } = makeSim('priest', 40);
     spawnTarget(sim, p);
-    p.spellHaste = 1; // halves cast time: a short cast completes well inside the 1.5s GCD
-    castAbility(sim.ctx, 'flash_heal', p.id); // starts a cast; GCD armed at flat 1.5s
-    expect(p.gcdRemaining).toBeCloseTo(1.5, 5);
+    // Owner 2026-07-13: haste now shortens the GCD too (floored at MIN_GCD). At +300%
+    // spell haste the cast shrinks to base/4 while the GCD floors at 0.75, so the cast
+    // still completes well inside the arming GCD (the case this test exercises).
+    p.spellHaste = 3;
+    castAbility(sim.ctx, 'flash_heal', p.id); // starts a cast; GCD armed at the floored 0.75s
+    expect(p.gcdRemaining).toBeCloseTo(0.75, 5);
     while (p.castRemaining > CAST_QUEUE_WINDOW_SEC) sim.tick();
 
     castAbility(sim.ctx, 'flash_heal', p.id);

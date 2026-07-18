@@ -37,13 +37,16 @@ type-checked by `npm run check:admin` (svelte-check over `tsconfig.admin.json`).
   `moderation_actions.ts` (request shaping + validation), `histogram_stats.ts` (pure stats for
   `DetectionCalibration`), `permissions.ts` (client mirror of the server permission vocabulary;
   parity pinned by `tests/admin_permissions.test.ts`). Enumerate: `ls src/admin/*.ts`.
-- Reused as-is: `api.ts` (fetch wrapper, `apiLogin/apiGet/apiPost`, `ApiError`, token in `localStorage`), `types.ts` (endpoint response shapes), `format.ts` (`fmtDuration/Date/Relative/Copper/Bytes/Number/Percent`), `i18n.ts` (+ `i18n.en.ts`, `i18n.locales/`, `i18n.resolved.generated/`).
+- Reused as-is: `api.ts` (fetch wrapper, `apiLogin/apiGet/apiPost`, `ApiError`, token in `localStorage`), `types.ts` (endpoint response shapes), `format.ts` (the locale-aware `fmt*` formatting helpers; enumerate via grep), `i18n.ts` (+ `i18n.en.ts`, `i18n.locales/`, `i18n.resolved.generated/`).
 
 Recent surfaces follow the same shape, permission-gated per page: `SuspiciousPlayers` +
 `DetectionCalibration` (`botdetector.read`; pure stats in `histogram_stats.ts`, exports in
 `calibration_export.ts`/`suspicious_sessions_export.ts`), `TickPerf` (`ops.perf`; on-demand
-`POST /perf/tick/capture`), `ModerationHistoryPage` (`moderation.read`), daily-rewards bans
-and account notes (`moderation.act`), reset-password (`accounts.password`).
+`POST /perf/tick/capture`), `ModerationHistoryPage` (`moderation.read`), timed
+daily-rewards bans (optional duration in hours, blank means permanent) and account notes
+(`moderation.act`), reset-password (`accounts.password`), and the AccountModal Reward
+Points event ledger (`accounts.read`; pure presentation in `daily_reward_event_log.ts`,
+pinned by `tests/admin/daily_reward_event_log.test.ts`).
 
 ## i18n: operators are users, so all rendered text routes through `t()`
 Admin has its OWN sparse-overlay catalog, independent of the game. Author English in

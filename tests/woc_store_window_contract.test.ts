@@ -160,12 +160,14 @@ describe('WOC Store window contract', () => {
     expect(containment?.[1]).toContain('contain: paint;');
     expect(containment?.[1]).toContain('isolation: isolate;');
     const stackSync = hud.slice(
-      hud.indexOf("document.body.classList.toggle(\n      'store-stack-open'"),
+      hud.indexOf("const storeWindow = document.getElementById('daily-rewards-window')"),
       hud.indexOf("document.body.classList.toggle(\n      'mobile-map-quest-open'"),
     );
     expect(stackSync).toContain('stackedWindowsVisible(');
     expect(stackSync).toContain('!!storeWindow && this.isWindowVisible(storeWindow)');
     expect(stackSync).toContain('!!claudiumWindow && this.isWindowVisible(claudiumWindow)');
+    expect(stackSync).toContain("document.body.classList.toggle('store-stack-open'");
+    expect(stackSync).toContain('recordStoreStackSample(');
     expect(hud).toContain('isWindowDragPreviewMutation(m.attributeName, m.target)');
     const dailyRewardsDeps = hud.slice(
       hud.indexOf('private readonly dailyRewardsWindow = new DailyRewardsWindow({'),
@@ -178,15 +180,44 @@ describe('WOC Store window contract', () => {
       hud.indexOf('// Spellbook window painter'),
     );
     expect(claudiumDeps).toContain("root: () => $('#claudium-window')");
+    expect(claudiumDeps).toContain('walletState: () => walletConnectionView()');
     expect(claudiumDeps).toContain('onVisibilityChange: () => this.syncAnyWindowOpenState()');
-    const stackedLayers = componentsCss.match(
-      /body\.store-stack-open #daily-rewards-window,\s*body\.store-stack-open #claudium-window \{([^}]*)\}/,
+    const walletUiSubscription = hud.slice(
+      hud.indexOf('onWalletUiChange(() => {'),
+      hud.indexOf("$('#pf-name').textContent"),
     );
-    expect(stackedLayers?.[1]).toContain('will-change: transform;');
+    expect(walletUiSubscription).toContain('this.claudiumWindow.onWalletChanged();');
+    // No conditional GPU promotion on the store windows: the old
+    // body.store-stack-open will-change rule dropped the promotion in the same
+    // frame a window's inline display flipped, racing Chromium's layer
+    // teardown. A promoted layer stranded by that race composites as an opaque
+    // near-black rectangle over the play area (the intermittent black-window
+    // report). contain: paint + isolation: isolate above stay; promotion must
+    // not come back conditionally or permanently.
+    expect(componentsCss).not.toMatch(/store-stack-open[^{}]*\{[^}]*will-change/);
+    expect(componentsCss).not.toMatch(/#(?:daily-rewards|claudium)-window[^{}]*\{[^}]*will-change/);
     expect(componentsCss).toContain(
       'body.window-drag-active .armory-section.rarity-legendary .armory-card',
     );
     expect(componentsCss).toContain('animation-play-state: paused;');
+  });
+
+  it('shows a visible loading state in the store body until the first snapshot paints', () => {
+    // An opaque store shell awaiting an un-timed snapshot fetch must read as
+    // "loading", never as a bare black box (the fallback black-window lead).
+    const start = storeWindow.indexOf('private loadingHtml');
+    const loading = storeWindow.slice(start, storeWindow.indexOf('private ', start + 1));
+    expect(loading).toContain('cl-loading');
+    expect(loading).toContain('cl-spinner');
+    expect(loading).toContain("t('hudChrome.wocStore.loading')");
+    expect(loading).toContain("t('hudChrome.dailyRewards.loading')");
+  });
+
+  it('routes the Escape close of both store windows through their painters', () => {
+    const dailyCase = hud.slice(hud.indexOf("case 'daily-rewards-window':"));
+    expect(dailyCase.slice(0, 300)).toContain('this.dailyRewardsWindow.close();');
+    const claudiumCase = hud.slice(hud.indexOf("case 'claudium-window':"));
+    expect(claudiumCase.slice(0, 300)).toContain('this.claudiumWindow.close();');
   });
 
   it('keeps storefront content mounted while a background refresh is loading', () => {
@@ -200,9 +231,8 @@ describe('WOC Store window contract', () => {
   });
 
   it('keeps the store, Claudium, and Daily Rewards surfaces out of native builds', () => {
-    expect(main).toContain(
-      'hud = new Hud(world, renderer, keybinds, { dailyRewardsEnabled: !NATIVE_APP });',
-    );
+    expect(main).toContain('dailyRewardsEnabled: !NATIVE_APP');
+    expect(main).toContain('devCommandsEnabled: import.meta.env.DEV');
     const economyWiring = main.slice(
       main.indexOf('if (!NATIVE_APP) {', main.indexOf('const claudiumHooks')),
       main.indexOf('function interactKey'),

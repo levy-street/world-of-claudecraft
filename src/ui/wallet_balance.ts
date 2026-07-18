@@ -7,10 +7,15 @@
 // lets the bag re-render when the value changes. The balance may be an
 // unverified connected-wallet preview, so callers that make public claims must
 // check the verified flag or read verifiedWocBalance().
+import { buildWalletConnectionView, type WalletConnectionView } from './wallet_connection_view';
+
 let enabled = false;
 let balance: number | null = null;
 let verified = false;
 let displayAvailable = false;
+let linkedAddress: string | null = null;
+let connectedAddress: string | null = null;
+let externalSignerAvailable = false;
 let listener: (() => void) | null = null;
 
 /** Whether the wallet feature is enabled in this client build. */
@@ -36,6 +41,34 @@ export function verifiedWocBalance(): number | null {
 /** Whether any wallet is connected in this browser or linked to the account. */
 export function walletDisplayAvailable(): boolean {
   return displayAvailable;
+}
+
+export function walletConnectionView(): WalletConnectionView {
+  return buildWalletConnectionView({
+    enabled,
+    linkedAddress,
+    connectedAddress,
+    linkedBalance: verified ? balance : null,
+    connectedBalance: !verified ? balance : null,
+    externalSignerAvailable,
+  });
+}
+
+export function setWalletConnectionAddresses(
+  linked: string | null,
+  connected: string | null,
+  externalSigner = false,
+): void {
+  if (
+    linkedAddress === linked &&
+    connectedAddress === connected &&
+    externalSignerAvailable === externalSigner
+  )
+    return;
+  linkedAddress = linked;
+  connectedAddress = connected;
+  externalSignerAvailable = externalSigner;
+  listener?.();
 }
 
 export function setWalletUiEnabled(value: boolean): void {

@@ -7,7 +7,7 @@ import { Sim } from '../src/sim/sim';
 import type { AbilityEffect, Entity, PlayerClass } from '../src/sim/types';
 
 function alloc(spec: string): TalentAllocation {
-  return { spec, ranks: {}, choices: {} };
+  return { spec, rows: {} };
 }
 
 function mastery(cls: PlayerClass, spec: string) {
@@ -57,8 +57,11 @@ describe('spec masteries', () => {
     expect(TALENTS.warlock?.specs.find((s) => s.id === 'affliction')?.mastery.effect).toEqual({
       global: { dotDmgPct: 0.2 },
     });
+    // Mage rework (owner leveling pass 2026-07-14): Fire's mastery is Ignition, a
+    // crit-triggered burn (ignitionPct) plus a static +2% crit chance, not the old
+    // Afterflame crit-damage bonus.
     expect(TALENTS.mage?.specs.find((s) => s.id === 'fire')?.mastery.effect).toEqual({
-      global: { critDmgSpellPct: 0.5 },
+      global: { ignitionPct: 0.4 },
       stats: { crit: 0.02 },
     });
     expect(TALENTS.mage?.specs.find((s) => s.id === 'frost')?.mastery.effect).toEqual({
@@ -74,8 +77,10 @@ describe('spec masteries', () => {
       global: { petDmgPct: 0.35 },
       stats: { maxHpPct: 0.08 },
     });
+    // Balance pass: the penalty is gone; the Sword Specialization extra-attack
+    // chance joined the haste.
     expect(TALENTS.rogue?.specs.find((s) => s.id === 'combat')?.mastery.effect).toEqual({
-      global: { meleeHastePct: 0.1, meleeDmgPct: -0.1 },
+      global: { meleeHastePct: 0.1, extraAttackPct: 0.05 },
     });
     expect(TALENTS.warlock?.specs.find((s) => s.id === 'demonology')?.mastery.effect).toEqual({
       global: { petDmgSharePct: 0.2 },
@@ -95,20 +100,32 @@ describe('spec masteries', () => {
       global: { meleeDmgPct: 0.2 },
       stats: { crit: 0.03 },
     });
+    // Balance pass: Quickblood is the evasive-skirmisher mastery.
     expect(TALENTS.hunter?.specs.find((s) => s.id === 'survival')?.mastery.effect).toEqual({
-      global: { meleeDmgPct: 0.15 },
-      stats: { agiPct: 0.15 },
+      stats: { agiPct: 0.15, dodge: 0.04 },
     });
+    // Mage rework: the 'arcane' internal id is now the Chronomancy healer (Chronoweave
+    // mastery), so its effect boosts healing/mana, not spell damage.
     expect(TALENTS.mage?.specs.find((s) => s.id === 'arcane')?.mastery.effect).toEqual({
-      global: { spellDmgPct: 0.15, spellHastePct: 0.1 },
+      global: { healPct: 0.15, manaPct: 0.05, manaRegenPct: 0.2 },
     });
+    // Balance pass: Redhanded is the scoped Craven Thrust crit (Improved
+    // Backstab shape) plus the Potent Poisons identity.
     expect(TALENTS.rogue?.specs.find((s) => s.id === 'assassination')?.mastery.effect).toEqual({
-      global: { dotDmgPct: 0.2 },
-      stats: { crit: 0.03 },
+      ability: [
+        { ability: 'backstab', critPct: 0.3 },
+        { ability: 'instant_poison', buffPct: 0.1 },
+        { ability: 'deadly_poison', buffPct: 0.1 },
+        { ability: 'crippling_poison', dmgPct: 0.1 },
+      ],
     });
+    // Balance pass: tuned down plus the Duskveil stealth-speed identity.
     expect(TALENTS.rogue?.specs.find((s) => s.id === 'subtlety')?.mastery.effect).toEqual({
-      global: { critDmgPhysPct: 0.4 },
-      stats: { agiPct: 0.1 },
+      global: { critDmgPhysPct: 0.25 },
+      ability: [
+        { ability: 'stealth', buffPct: 0.5 },
+        { ability: 'vanish', buffPct: 0.5 },
+      ],
     });
     expect(TALENTS.priest?.specs.find((s) => s.id === 'holy')?.mastery.effect).toEqual({
       global: { healPct: 0.2 },
@@ -124,10 +141,16 @@ describe('spec masteries', () => {
     });
     expect(TALENTS.druid?.specs.find((s) => s.id === 'feral')?.mastery.effect).toEqual({
       global: { meleeDmgPct: 0.15, dotDmgPct: 0.15, threatPct: 0.2 },
+      // The v0.27 Dire Bruin retune rides the mastery now that the old
+      // feral_choice_bear node is retired.
+      stats: { armorPct: 0.15 },
     });
+    // Balance pass (maintainer sheet): the scoped Ruinbolt/Gloom Bolt amp.
     expect(TALENTS.warlock?.specs.find((s) => s.id === 'destruction')?.mastery.effect).toEqual({
-      global: { critDmgSpellPct: 0.5 },
-      stats: { crit: 0.02 },
+      ability: [
+        { ability: 'chaos_bolt', dmgPct: 0.2 },
+        { ability: 'shadow_bolt', dmgPct: 0.2 },
+      ],
     });
   });
 
@@ -145,7 +168,9 @@ describe('spec masteries', () => {
     expect(known('shaman', 'healing_wave', 'restoration').cost).toBe(72);
 
     expect(effect(known('rogue', 'sinister_strike'), 'weaponStrike').bonus).toBe(18);
-    expect(effect(known('rogue', 'sinister_strike', 'combat'), 'weaponStrike').bonus).toBe(16);
+    // Balance pass: Scrapper's Edge lost the -10% cut, so the combat-specced
+    // bonus matches the base value.
+    expect(effect(known('rogue', 'sinister_strike', 'combat'), 'weaponStrike').bonus).toBe(18);
   });
 
   it('applies petDmgPct at BOTH the melee and ranged pet damage sites, not only the helper', () => {
@@ -325,6 +350,26 @@ describe('spec masteries', () => {
     expect(metaOf(sim, sim.player).talentMods.global.hotHealPct).toBeCloseTo(0.25, 10);
   });
 
+  it('re-bakes mastery-scaled passive stats when setPlayerLevel jumps without a respec', () => {
+    // The mage-rework Fire mastery also grants +2% crit chance (stats.crit 0.02) on top of
+    // its crit-damage bonus, and that passive stat must re-bake to the new level.
+    const sim = new Sim({ seed: 12, playerClass: 'mage', autoEquip: true });
+    sim.setPlayerLevel(10);
+    sim.setSpec('fire');
+
+    const noSpec10 = new Sim({ seed: 12, playerClass: 'mage', autoEquip: true });
+    noSpec10.setPlayerLevel(10);
+    const at10MasteryCrit = sim.player.critChance - noSpec10.player.critChance;
+    expect(at10MasteryCrit).toBeCloseTo(0.02 * (10 / 20), 10);
+
+    sim.setPlayerLevel(20);
+    const noSpec20 = new Sim({ seed: 12, playerClass: 'mage', autoEquip: true });
+    noSpec20.setPlayerLevel(20);
+    const at20MasteryCrit = sim.player.critChance - noSpec20.player.critChance;
+    expect(at20MasteryCrit).toBeCloseTo(0.02, 10);
+    expect(at20MasteryCrit).toBeGreaterThan(at10MasteryCrit);
+  });
+
   it('every spec ships its designated mastery-rating axis (PRD: Mastery rating readiness)', () => {
     // The future mastery stat (item rating, unimplemented) scales exactly one axis per
     // spec. This pins that the shipped mastery DATA carries that axis, so the rating PR
@@ -332,12 +377,12 @@ describe('spec masteries', () => {
     type Axis =
       | { global: string; value: number }
       | { stat: string; value: number }
-      | { abilities: string[]; dmgPct?: number; costPct?: number };
+      | { abilities: string[]; dmgPct?: number; costPct?: number; critPct?: number };
     const AXES: Record<string, Record<string, Axis>> = {
       warrior: {
-        arms: { global: 'meleeDmgPct', value: 0.15 },
-        fury: { stat: 'crit', value: 0.1 },
-        prot: { global: 'threatPct', value: 0.5 },
+        arms: { global: 'masteryTwoHandDmgPct', value: 0.1 },
+        fury: { stat: 'crit', value: 0.05 },
+        prot: { global: 'threatPct', value: 0.3 },
       },
       paladin: {
         holy: { global: 'critDmgHealPct', value: 0.5 },
@@ -347,17 +392,18 @@ describe('spec masteries', () => {
       hunter: {
         beast_mastery: { global: 'petDmgPct', value: 0.35 },
         marksmanship: { global: 'meleeDmgPct', value: 0.2 },
-        survival: { global: 'meleeDmgPct', value: 0.15 },
+        survival: { stat: 'agiPct', value: 0.15 },
       },
       mage: {
-        arcane: { global: 'spellDmgPct', value: 0.15 },
-        fire: { global: 'critDmgSpellPct', value: 0.5 },
+        // Mage rework: arcane is the Chronomancy healer (healing axis), fire is Ignition.
+        arcane: { global: 'healPct', value: 0.15 },
+        fire: { global: 'ignitionPct', value: 0.4 },
         frost: { abilities: ['frostbolt', 'frost_nova'], dmgPct: 0.25 },
       },
       rogue: {
-        assassination: { global: 'dotDmgPct', value: 0.2 },
+        assassination: { abilities: ['backstab'], critPct: 0.3 },
         combat: { global: 'meleeHastePct', value: 0.1 },
-        subtlety: { global: 'critDmgPhysPct', value: 0.4 },
+        subtlety: { global: 'critDmgPhysPct', value: 0.25 },
       },
       priest: {
         discipline: { global: 'absorbPct', value: 0.3 },
@@ -372,7 +418,7 @@ describe('spec masteries', () => {
       warlock: {
         affliction: { global: 'dotDmgPct', value: 0.2 },
         demonology: { global: 'petDmgSharePct', value: 0.2 },
-        destruction: { global: 'critDmgSpellPct', value: 0.5 },
+        destruction: { abilities: ['chaos_bolt', 'shadow_bolt'], dmgPct: 0.2 },
       },
       druid: {
         balance: { global: 'spellDmgPct', value: 0.15 },
@@ -401,6 +447,7 @@ describe('spec masteries', () => {
             expect(mod, `${cls}/${specId} ability axis ${ab}`).toBeTruthy();
             if (axis.dmgPct !== undefined) expect(mod?.dmgPct).toBeCloseTo(axis.dmgPct, 10);
             if (axis.costPct !== undefined) expect(mod?.costPct).toBeCloseTo(axis.costPct, 10);
+            if (axis.critPct !== undefined) expect(mod?.critPct).toBeCloseTo(axis.critPct, 10);
           }
         }
       }

@@ -41,6 +41,23 @@ export const WELCOME_LETTER: LetterDef = {
   delaySeconds: 0,
 };
 
+// Heroic Marks reward letter: posted to a heroic final-boss participant who took
+// the daily lockout but was not standing at the corpse to loot their marks (a
+// back-line healer, a fallen or released raider). The mark stacks ride as the
+// attachment; the PostOffice fills `items` per kill (marks vary by dungeon), so
+// this base carries none. Body stays count-free so the letterId localizes cleanly.
+export const HEROIC_MARK_LETTER: LetterDef = {
+  letterId: 'heroic_marks_reward',
+  senderName: 'The Heroic Quartermaster',
+  subject: 'Your Heroic Marks',
+  body:
+    'Your warband cleared the heroic trial while you fought from the back, or ' +
+    'from the dirt. Your lockout was struck all the same, so your share of ' +
+    'Heroic Marks flies to you here rather than being lost. Spend them well.\n\n' +
+    '- The Heroic Quartermaster',
+  delaySeconds: 0,
+};
+
 // Quest follow-up letters: the questgiver writes to you a little while after
 // the turn-in. Keyed by quest id; quests without an entry send nothing.
 export const QUEST_LETTERS: Record<string, LetterDef> = {

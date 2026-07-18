@@ -27,7 +27,7 @@ import {
 } from './content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from './content/heroic_vendor';
 import { FURY_STOCK, WARFARE_SOURCE_LEVEL } from './content/pvp_honor';
-import { DUNGEONS, ITEMS, MOBS, QUESTS } from './data';
+import { ALL_RECIPES, DUNGEONS, ITEMS, MOBS, QUESTS } from './data';
 // The pure budget primitives live in the leaf module ./item_budget (no ./data
 // import, so content/heroic_variants.ts can share them at data-eval time without a
 // cycle). Imported for internal use and re-exported so every existing importer of
@@ -42,6 +42,7 @@ import {
   QUALITY_STAT_MULT,
   SLOT_STAT_MULT,
   STAT_PER_ILVL,
+  TWOHAND_STAT_MULT,
 } from './item_budget';
 import type { ItemDef } from './types';
 
@@ -55,6 +56,7 @@ export {
   QUALITY_STAT_MULT,
   SLOT_STAT_MULT,
   STAT_PER_ILVL,
+  TWOHAND_STAT_MULT,
 };
 
 // Raid loot is one tier above same-level 5-player dungeon loot: a 10-player raid
@@ -187,6 +189,12 @@ function buildSourceIndex(): Map<string, ItemSource> {
       : HEROIC_VARIANT_SOURCE_LEVEL;
     bump(item.id, src, false);
   }
+  // Crafted gear (content/recipes.ts): a recipe's output is current at the recipe's
+  // own level (the level a character can learn/use it, mirroring how a mob's level
+  // stands in for its loot). Without this, any crafted item with primary stats has
+  // no derivable item level: the budget gates below skip it and the tooltip's item
+  // level/score lines never show. Not a raid source.
+  for (const recipe of ALL_RECIPES) bump(recipe.resultItemId, recipe.level, false);
   return idx;
 }
 
@@ -211,7 +219,9 @@ export function itemFromRaid(itemId: string): boolean {
 // quest objects, cosmetics) can exist in the item model, but should not get an
 // item-level readout or stat budget.
 export function isItemLevelEligible(item: ItemDef): boolean {
-  return !!item.slot && (item.kind === 'armor' || item.kind === 'weapon');
+  return (
+    !!item.slot && (item.kind === 'armor' || item.kind === 'weapon' || item.kind === 'held_offhand')
+  );
 }
 
 // The item level (tier number) shown in the tooltip, or undefined when there is no
@@ -227,11 +237,13 @@ export function itemLevel(item: ItemDef): number | undefined {
 }
 
 // The budget an item is expected to carry given its own source/quality/slot, or
-// undefined when the item has no derivable item level.
+// undefined when the item has no derivable item level. A two-handed weapon gives
+// up the offhand, so it carries twice the one-handed mainhand budget.
 export function expectedStatBudget(item: ItemDef): number | undefined {
   const level = itemLevel(item);
   if (level === undefined) return undefined;
-  return primaryStatBudget(level, item.quality, item.slot);
+  const base = primaryStatBudget(level, item.quality, item.slot);
+  return item.kind === 'weapon' && item.hand === 'twohand' ? base * TWOHAND_STAT_MULT : base;
 }
 
 // The sum of an item's primary stats (its realized stat budget).

@@ -527,15 +527,7 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     pos: { x: 4, z: 6 },
     facing: Math.PI,
     color: 0xb7950b,
-    questIds: [
-      'q_wolves',
-      'q_greyjaw',
-      'q_bandits',
-      'q_ringleader',
-      'q_mogger',
-      'q_archetype_acceptance',
-      'q_prof_make_amends',
-    ],
+    questIds: ['q_wolves', 'q_greyjaw', 'q_bandits', 'q_ringleader', 'q_mogger'],
     greeting: 'Keep your blade close, $C. The Vale is not what it was.',
   },
   trader_wilkes: {
@@ -604,12 +596,14 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     pos: { x: 7, z: 16.5 },
     facing: -2.7,
     color: 0x707b7c,
-    questIds: [],
+    questIds: ['q_archetype_acceptance', 'q_prof_make_amends', 'q_prof_hobby_switch'],
     vendorItems: [
       'eastbrook_arming_sword',
+      'eastbrook_greatsword',
       'bronzework_mace',
       'vale_carving_knife',
       'hickory_shortstaff',
+      'eastbrook_buckler',
       'eastbrook_chain_vest',
       'valespun_robe',
       'tanned_leather_jerkin',
@@ -656,6 +650,18 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     banker: true,
     greeting: 'Welcome to the Gilded Strongbox. Your goods rest safe behind our locks.',
   },
+  card_master: {
+    id: 'card_master',
+    name: 'Card Master',
+    title: 'Dealer of Chance',
+    // Across the square from the bank, out of the way of the well/Merchant traffic.
+    pos: { x: 13, z: 2 },
+    facing: -Math.PI / 2,
+    color: 0x7a2f8f,
+    questIds: [],
+    cardMaster: true,
+    greeting: 'Care for a Card Duel? Best of three, winner takes the bragging rights.',
+  },
   groundskeeper_bram: {
     id: 'groundskeeper_bram',
     name: 'Groundskeeper Bram',
@@ -701,26 +707,21 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
   // points a new player at them (see the professions.ts GATHERING_PROFESSIONS
   // comment: no level/quest/tool gate exists at the mechanic level either, so
   // there was no natural "unlock" moment to hang a quest off before this).
-  // A `collect` objective on the dedicated chunk_of_ore quest item (kind
-  // 'quest', src/sim/content/items.ts), not the mining node's shared
-  // bone_fragments yield: that material also drops from mobs, salvage, and
-  // the market (see #1708 review), so a collect objective targeting it could
-  // be completed without ever mining. chunk_of_ore is only ever granted by an
-  // ore-node harvest while this quest is active (the NODE_QUEST_GRANT gate in
-  // professions/gathering.ts, mirroring the mob-loot questId gate other
-  // collect quests use), and being kind 'quest' it can't be sold or lost to
-  // the vendor's Sell Junk button either. foreman_odell is the existing
-  // mine-themed NPC (already gives q_mine) so this reuses him rather than
-  // inventing a new trainer NPC.
+  // A genuine gather objective credits successful ore-node harvests directly.
+  // It deliberately does not target the node's shared bone_fragments output:
+  // that material also drops from mobs, salvage, and the market, so inventory
+  // ownership cannot prove that the player mined it. foreman_odell is the
+  // existing mine-themed NPC (already gives q_mine), so this reuses him rather
+  // than inventing a new trainer NPC.
   q_prof_intro: {
     id: 'q_prof_intro',
     name: 'A Trade for Every Hand',
     giverNpcId: 'foreman_odell',
     turnInNpcId: 'foreman_odell',
-    text: "Every soul in Eastbrook works a trade besides the sword, $N. There's ore veins in the rocks around the Copper Dig, southwest of town, so go swing a pick and bring me 5 chunks. Mine them yourself, mind; I'll know the difference.",
+    text: "Every soul in Eastbrook works a trade besides the sword, $N. There are ore veins in the rocks around the Copper Dig, southwest of town. Go swing a pick and work 5 of them yourself, mind; I'll know the difference.",
     completionText:
-      "See? Ore in your pack and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
-    objectives: [{ type: 'collect', itemId: 'chunk_of_ore', count: 5, label: 'Chunk of Ore' }],
+      "See? Ore gathered and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
+    objectives: [{ type: 'gather', nodeType: 'ore', count: 5, label: 'Ore vein harvested' }],
     xpReward: 150,
     copperReward: 50,
     itemRewards: {},
@@ -1031,50 +1032,61 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     minLevel: 6,
     suggestedPlayers: 3,
   },
-  // STUB, professions active-archetype (issue #1129, superseded scope): a
-  // placeholder zone-1 acceptance lore quest, and a placeholder repeatable
-  // "make amends" quest. Both stand in for real quest giver/turn-in NPC
-  // placement and dialogue authoring (out of scope for this change, see
-  // src/sim/professions/archetype.ts): they reuse marshal_redbrook as giver/
-  // turn-in and a trivial existing-mob objective purely so the QuestDef is
-  // valid content, NOT because that mob/NPC has any lore tie to professions.
-  // The actual archetype-switching STATE MACHINE (acceptArchetypeQuest /
-  // advanceAmendsProgress / switchArchetype) is fully implemented in
-  // archetype.ts and does not depend on these quests actually being
-  // completable in play; a follow-up wires real content + the turn-in hook.
+  // Profession attunement lives with Smith Haldren after the gathering intro.
+  // Every transition is selected on acceptance, persisted with the quest, and
+  // revalidated by the authoritative turn-in effect.
   q_archetype_acceptance: {
     id: 'q_archetype_acceptance',
     name: 'A Craft to Call Your Own',
-    giverNpcId: 'marshal_redbrook',
-    turnInNpcId: 'marshal_redbrook',
-    text: 'Every artisan of Eastbrook eventually settles on one craft to call their own. Prove yourself with a single deed, $N, and declare your path.',
-    completionText: 'Your path is chosen; walk it well.',
-    objectives: [
-      { type: 'kill', targetMobId: 'forest_wolf', count: 1, label: 'Forest Wolf slain' },
-    ],
-    xpReward: 100,
+    giverNpcId: 'smith_haldren',
+    turnInNpcId: 'smith_haldren',
+    text: 'Skill is knowledge, $N, but attunement is a promise. Choose two neighboring crafts whose methods you will carry as your majors, then bring me ore worked from the Vale with your own hands.',
+    completionText:
+      'The promise holds. These two crafts are now your majors, and the knowledge opposite them becomes your hobby.',
+    objectives: [{ type: 'gather', nodeType: 'ore', count: 3, label: 'Ore vein harvested' }],
+    xpReward: 150,
     copperReward: 0,
     itemRewards: {},
-    // Not wired to acceptArchetypeQuest yet: retired keeps it out of the live
-    // accept flow (computeQuestState -> 'unavailable') until that hook lands.
-    retired: true,
+    requiresQuest: 'q_prof_intro',
+    repeatable: true,
+    shareable: false,
+    completionEffect: { type: 'attunePair', mode: 'new' },
   },
   q_prof_make_amends: {
     id: 'q_prof_make_amends',
     name: 'Making Amends',
-    giverNpcId: 'marshal_redbrook',
-    turnInNpcId: 'marshal_redbrook',
-    text: 'To set aside one craft for another, an artisan must first make amends for the path not walked, $N.',
-    completionText: 'Amends made; a new path is open to you.',
+    giverNpcId: 'smith_haldren',
+    turnInNpcId: 'smith_haldren',
+    text: 'You have carried that pair before, $N. Returning is no fresh vow. Help keep the Vale road clear, and the work will remind your hands what they once knew.',
+    completionText: 'The old rhythm returns. Your former pair is active once more.',
     objectives: [
-      { type: 'kill', targetMobId: 'forest_wolf', count: 2, label: 'Forest Wolf slain' },
+      { type: 'kill', targetMobId: 'forest_wolf', count: 5, label: 'Forest Wolf slain' },
     ],
-    xpReward: 50,
+    xpReward: 100,
     copperReward: 0,
     itemRewards: {},
-    // Not wired to switchArchetype yet: retired keeps it out of the live
-    // accept flow (computeQuestState -> 'unavailable') until that hook lands.
-    retired: true,
+    requiresQuest: 'q_prof_intro',
+    repeatable: true,
+    shareable: false,
+    resolvedObjectiveCounts: 'archetypeAmends',
+    completionEffect: { type: 'attunePair', mode: 'return' },
+  },
+  q_prof_hobby_switch: {
+    id: 'q_prof_hobby_switch',
+    name: 'A Different Pastime',
+    giverNpcId: 'smith_haldren',
+    turnInNpcId: 'smith_haldren',
+    text: 'Majors demand a vow. A hobby only asks where your curiosity wanders, $N. Gather a few herbs and decide which craft opposite your majors you want to pursue.',
+    completionText:
+      'A lighter choice, but a useful one. Follow that curiosity as far as rare work will take it.',
+    objectives: [{ type: 'gather', nodeType: 'herb', count: 3, label: 'Herb patch harvested' }],
+    xpReward: 75,
+    copperReward: 0,
+    itemRewards: {},
+    requiresQuest: 'q_prof_intro',
+    repeatable: true,
+    shareable: false,
+    completionEffect: { type: 'switchHobby' },
   },
 };
 
@@ -1100,6 +1112,7 @@ export const ZONE1_QUEST_ORDER = [
   'q_mogger',
   'q_archetype_acceptance',
   'q_prof_make_amends',
+  'q_prof_hobby_switch',
 ];
 
 // ---------------------------------------------------------------------------

@@ -291,12 +291,12 @@ export function interactDrownedLitanyRite(
   run: DelveRun,
   objectId: number,
   pid: number,
-): boolean {
+): { handled: boolean; succeeded: boolean } {
   const st = run.drownedLitanyRite;
-  if (!st) return false;
+  if (!st) return { handled: false, succeeded: false };
 
   const state = run.objectState[objectId];
-  if (!state) return false;
+  if (!state) return { handled: false, succeeded: false };
 
   if (state.kind === 'drowned_reliquary') {
     if (state.looted && state.partyLoot?.[pid]?.length) {
@@ -304,31 +304,30 @@ export function interactDrownedLitanyRite(
       // auto-close radius and the collect gate, so the take-all can never fire
       // from there. Interacting with the reliquary is the recovery path: collect
       // this player's own slice directly (it re-checks kind and proximity).
-      collectDelveChestLoot(ctx, objectId, pid);
-      return true;
+      return { handled: true, succeeded: collectDelveChestLoot(ctx, objectId, pid) };
     }
     if (state.open) {
       ctx.emit({ type: 'log', text: 'The reliquary is empty.', color: '#aaa', pid });
-      return true;
+      return { handled: true, succeeded: false };
     }
     if (st.awaitingChoice) {
       // Open the difficulty popup client-side (personal cue).
       ctx.emit({ type: 'delveRiteChoosePrompt', reliquaryId: objectId, pid });
-      return true;
+      return { handled: true, succeeded: true };
     }
     ctx.error(pid, 'Complete the shrine rite to open the reliquary.');
-    return true;
+    return { handled: true, succeeded: false };
   }
 
   const shrineKind = state.kind as RiteShrineKind;
-  if (!RITE_SHRINE_KINDS.includes(shrineKind)) return false;
+  if (!RITE_SHRINE_KINDS.includes(shrineKind)) return { handled: false, succeeded: false };
 
   // Ignore shrine clicks before a difficulty is chosen at the reliquary.
-  if (st.awaitingChoice) return true;
-  if (!st.puzzleActive || st.opened) return true;
+  if (st.awaitingChoice) return { handled: true, succeeded: false };
+  if (!st.puzzleActive || st.opened) return { handled: true, succeeded: false };
   if (st.sequencePlaying) {
     ctx.error(pid, 'The shrines replay the rite. Wait.');
-    return true;
+    return { handled: true, succeeded: false };
   }
 
   const expected = st.sequence[st.currentIndex];
@@ -345,7 +344,7 @@ export function interactDrownedLitanyRite(
       // Finale completed on the last correct touch (not the out-of-tries path).
       deedsMod.onRiteFinaleForDeeds(ctx, pid, st.mistakes);
     }
-    return true;
+    return { handled: true, succeeded: true };
   }
 
   st.mistakes += 1;
@@ -360,7 +359,7 @@ export function interactDrownedLitanyRite(
   if (st.mistakes > st.mistakesAllowed) {
     // Out of tries: the reliquary opens on its meanest spoils.
     openDrownedReliquary(ctx, run, 'low', pid);
-    return true;
+    return { handled: true, succeeded: true };
   }
 
   // Tries remain: the wrong touch failed this attempt, so replay the sequence one
@@ -372,5 +371,5 @@ export function interactDrownedLitanyRite(
   st.playbackIndex = 0;
   st.playbackLoop = Math.max(0, st.playbacks - 1);
   st.playbackTimer = RITE_REPEAT_GAP;
-  return true;
+  return { handled: true, succeeded: true };
 }

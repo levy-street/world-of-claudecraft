@@ -74,6 +74,11 @@ const BODY_RADIUS = PLAYER_BODY_RADIUS;
 // full (mirrors the player out-of-combat window, so combat exits cleanly while the
 // damage meter keeps the finished segment's DPS).
 const DUMMY_RESET_SECONDS = 5;
+const NYTHRAXIS_HEROIC_ADD_IDS = new Set([
+  'nythraxis_heroic_warrior_add',
+  'nythraxis_heroic_priest_add',
+  'nythraxis_heroic_rogue_add',
+]);
 
 export function updateMob(ctx: SimContext, mob: Entity): void {
   if (mob.dead) {
@@ -119,6 +124,11 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     if (mob.combatTimer >= DUMMY_RESET_SECONDS) {
       mob.inCombat = false;
       mob.hp = mob.maxHp;
+      mob.aiState = 'idle';
+      mob.aggroTargetId = null;
+      mob.forcedTargetId = null;
+      mob.forcedTargetTimer = 0;
+      clearThreat(mob);
     } else {
       mob.inCombat = true;
     }
@@ -187,7 +197,10 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   // non-hostile mob is therefore a leak — exactly the "immortal, invalid
   // target" wolves players hit. Restore hostility so no mob can ever be left
   // permanently untargetable, whatever path corrupted it.
-  if (mob.templateId === NYTHRAXIS_ADD_ID && mob.despawnTimer !== undefined) {
+  if (
+    (mob.templateId === NYTHRAXIS_ADD_ID || NYTHRAXIS_HEROIC_ADD_IDS.has(mob.templateId)) &&
+    mob.despawnTimer !== undefined
+  ) {
     mob.hostile = false;
     mob.aiState = 'idle';
     mob.inCombat = false;
@@ -204,7 +217,8 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       mob.nythraxis &&
       (mob.nythraxis.phase === 'transition' ||
         mob.nythraxis.deathlessCastRemaining > 0 ||
-        mob.nythraxis.deathlessStunRemaining > 0);
+        mob.nythraxis.deathlessStunRemaining > 0 ||
+        (mob.nythraxis.heroicSummonChannelRemaining ?? 0) > 0);
     if (isNythraxis) {
       ctx.updateNythraxisEncounter(mob);
       if (
@@ -212,7 +226,8 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         (mob.nythraxis &&
           (mob.nythraxis.phase === 'transition' ||
             mob.nythraxis.deathlessCastRemaining > 0 ||
-            mob.nythraxis.deathlessStunRemaining > 0))
+            mob.nythraxis.deathlessStunRemaining > 0 ||
+            (mob.nythraxis.heroicSummonChannelRemaining ?? 0) > 0))
       )
         return;
     } else {
@@ -251,7 +266,21 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         const template = MOBS[mob.templateId];
         let detected: Entity | null = null;
         let detectedD = Infinity;
-        ctx.playerGrid.forEachInRadius(mob.pos.x, mob.pos.z, 25, (e, d2) => {
+        // Resolved once per scan, not per candidate: the ctx member is a live getter
+        // chain and this callback is a per-visit hot path.
+        const counters = ctx.mobScanCounters;
+        // Query only to MAX_AGGRO_RADIUS: both idle scans clamp the effective detection
+        // radius to it (the general branch's delve/stealth modifiers only shrink it
+        // further) and detect strictly (d < radius), so a wider query only visits
+        // never-detectable players. One caveat: the grid buckets by end-of-tick
+        // position with a 1 yd pad (spatial.ts), so a mid-tick displacement past the
+        // pad (a knockback) defers that player's detection to the next tick's
+        // rebucket. The former 25 yd query had the same one-tick-deferral miss
+        // class, but its 5 yd slack meant only displacements past ~6 yd could
+        // fall outside it; this query defers any inward displacement past the
+        // pad. Ruled acceptable: one 50 ms deferral, uniform across hosts.
+        ctx.playerGrid.forEachInRadius(mob.pos.x, mob.pos.z, MAX_AGGRO_RADIUS, (e, d2) => {
+          counters.aggroScanPlayerVisits++;
           if (e.dead) return;
           const radius = Math.max(
             4,
@@ -269,7 +298,10 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       const template = MOBS[mob.templateId];
       let detected: Entity | null = null;
       let detectedD = Infinity;
-      ctx.playerGrid.forEachInRadius(mob.pos.x, mob.pos.z, 25, (e, d2) => {
+      // Resolved once per scan, not per candidate (same reason as the boss branch).
+      const counters = ctx.mobScanCounters;
+      ctx.playerGrid.forEachInRadius(mob.pos.x, mob.pos.z, MAX_AGGRO_RADIUS, (e, d2) => {
+        counters.aggroScanPlayerVisits++;
         if (e.dead) return;
         if (isTrivialTo(mob, e)) return;
         let radius = Math.max(

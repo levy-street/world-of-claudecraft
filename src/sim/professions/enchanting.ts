@@ -77,6 +77,22 @@ const DISENCHANT_MATERIAL_BY_QUALITY: Readonly<Record<string, string>> = {
   legendary: 'arcane_shard',
 };
 
+/** The authoritative already-enchanted read for one instance payload: the
+ *  explicit `enchant` marker (written by resolveApplyEnchant below), or, for
+ *  legacy enchanted copies that predate the marker, bare rolled.stats WITHOUT
+ *  rolled.masterwork (before the Phase 2 masterwork model, applyEnchant was
+ *  the ONLY writer of rolled.stats, so bare stats meant enchanted; a
+ *  masterwork copy carries rolled.stats without being enchanted and must stay
+ *  enchantable exactly like a plain copy). This is what the
+ *  countEnchantableItem/removeEnchantableItem guards (sim.ts) key on, so
+ *  double-enchant prevention holds for both legacy and marker-carrying
+ *  copies. */
+export function isEnchantedInstance(instance: ItemInstancePayload): boolean {
+  return (
+    instance.enchant !== undefined || (!!instance.rolled?.stats && !instance.rolled.masterwork)
+  );
+}
+
 /** Eligible for disenchant: same eligibility as plain salvage (an equippable
  *  weapon or armor piece, at least `common` quality). */
 export function isDisenchantable(def: ItemDef | undefined): boolean {
@@ -170,10 +186,12 @@ export interface ApplyEnchantResult {
  *  enchant's stat bonus (ctx.addItemInstance): equipping THAT copy is what
  *  carries the bonus into recalcPlayerStats (see items.ts equipItem). If the
  *  consumed copy was itself instanced (a crafted rare+ piece carrying a
- *  signer/rolled.quality payload), that payload is merged into the new
- *  instance rather than dropped, so enchanting a crafted item does not erase
- *  its crafter attribution (battlefield_xp.ts) or rolled.quality (#1712
- *  round-3 review). */
+ *  signer payload, a Phase 2 masterwork copy carrying baked bonus stats, or a
+ *  legacy rolled.quality copy), that payload is merged into the new instance
+ *  rather than dropped (stats sum ADDITIVELY), so enchanting a crafted or
+ *  masterwork item does not erase its crafter attribution
+ *  (battlefield_xp.ts), its masterwork bonus, or legacy rolled.quality
+ *  (#1712 round-3 review). */
 export function resolveApplyEnchant(
   ctx: SimContext,
   pid: number,
@@ -200,7 +218,23 @@ export function resolveApplyEnchant(
   const merged: ItemInstancePayload = consumed
     ? cloneItemInstancePayload(consumed)
     : ({} as ItemInstancePayload);
-  merged.rolled = { ...merged.rolled, stats: { ...enchant.statBonus } };
+  // ADDITIVE stat merge (Phase 2): a masterwork copy's baked bonus
+  // (rolled.stats alongside rolled.masterwork) and the enchant's bonus must
+  // BOTH survive on the enchanted copy, so the enchant sums into any existing
+  // record instead of replacing it. signer, rolled.masterwork, and legacy
+  // rolled.quality ride through the clone above untouched. A consumed copy is
+  // never already enchanted (removeEnchantableItem guards on
+  // isEnchantedInstance), so this never stacks one enchant onto another.
+  const mergedStats: Record<string, number> = { ...merged.rolled?.stats };
+  for (const [stat, value] of Object.entries(enchant.statBonus)) {
+    if (value === undefined) continue;
+    mergedStats[stat] = (mergedStats[stat] ?? 0) + value;
+  }
+  merged.rolled = { ...merged.rolled, stats: mergedStats };
+  // The explicit already-enchanted marker (isEnchantedInstance above): keyed
+  // on the enchant itself rather than bare stats presence, so masterwork
+  // copies stay enchantable while double-enchant stays blocked.
+  merged.enchant = enchant.id;
   ctx.addItemInstance(itemId, merged, pid);
   const meta = ctx.players.get(pid);
   if (meta) {

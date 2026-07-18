@@ -19,6 +19,7 @@ import {
   type SfxEntry,
 } from './sfx_manifest.generated';
 import { loadRuntimeSfxPack } from './sfx_runtime_pack';
+import { type WaterElementalCue, waterElementalSamples } from './water_elemental_audio';
 
 const SAMPLE_GAIN = 0.85; // base level for sampled clips; sfxVolume multiplies this
 const MAX_VOICES = 24; // concurrent one-shot sources (frame-budget guard)
@@ -265,6 +266,16 @@ class Sfx {
     try {
       this.buffers.set('amb_crowd', this.makeCrowdBuffer(ctx, 6, false));
       this.buffers.set('vcup_crowd_roar', this.makeCrowdBuffer(ctx, 2.6, true));
+      for (const cue of [
+        'aggro',
+        'attack',
+        'death',
+      ] as const satisfies readonly WaterElementalCue[]) {
+        const samples = waterElementalSamples(cue, ctx.sampleRate);
+        const buffer = ctx.createBuffer(1, samples.length, ctx.sampleRate);
+        buffer.getChannelData(0).set(samples);
+        this.buffers.set(`mob_water_elemental_${cue}`, buffer);
+      }
     } catch {
       /* minimal AudioContext stubs may not implement buffer synthesis */
     }
@@ -393,12 +404,18 @@ class Sfx {
     return dx * dx + dz * dz > MAX_DISTANCE_SQ;
   }
 
-  /** Positional one-shot at world (x,y,z). */
-  playAt(key: string, x: number, y: number, z: number, opts?: PlayOpts): void {
+  /** Positional one-shot at world (x,y,z). Returns whether this call actually
+   *  scheduled a sound: false if the audio context is not yet initialized,
+   *  out of range, an unbuffered clip still loading, the voice cap, or a
+   *  per-key cooldown block. A caller that only wants to know "did MY
+   *  attempt make a sound, not some other source that beat me to this key's
+   *  cooldown" (e.g. the mob idle-bark sweep's per-entity cooldown stamping,
+   *  see src/ui/mob_idle_sfx.ts) needs this instead of firing blind. */
+  playAt(key: string, x: number, y: number, z: number, opts?: PlayOpts): boolean {
     const ctx = this.ctx,
       master = this.master;
-    if (!ctx || !master) return;
-    if (this.tooFar(x, z)) return;
+    if (!ctx || !master) return false;
+    if (this.tooFar(x, z)) return false;
     const variantIndex = this.nextVariantIndex(key);
     const cacheKey = assetCacheKey(key, variantIndex);
     const buf = this.buffers.get(cacheKey);
@@ -413,12 +430,12 @@ class Sfx {
           }
         });
       }
-      return;
+      return false;
     }
-    if (this.active >= MAX_VOICES) return;
+    if (this.active >= MAX_VOICES) return false;
     const now = ctx.currentTime;
     const cd = opts?.cooldown ?? 0.03;
-    if (now - (this.lastPlay.get(key) ?? -1) < cd) return;
+    if (now - (this.lastPlay.get(key) ?? -1) < cd) return false;
     this.lastPlay.set(key, now);
     this.commitVariant(key, variantIndex);
 
@@ -444,6 +461,7 @@ class Sfx {
       panner.disconnect();
     };
     this.applyEnvelope(src, g, peak, now, opts);
+    return true;
   }
 
   /** Set the gain envelope on a one-shot source and start it. With no
@@ -668,7 +686,7 @@ class Sfx {
     const key = FOOTSTEP_CUES[surface];
     if (!key) return;
     this.playAt(key, x, y, z, {
-      gain: running ? 0.8 : 0.55,
+      gain: running ? 0.5 : 0.35,
       rate: (running ? 1.06 : 1) * foot,
       cooldown: 0.05,
       release: running ? 0.17 : 0.22, // < the tightest stride gap (~0.22s at run)

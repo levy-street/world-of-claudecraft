@@ -5,6 +5,7 @@
 // tests/auras_painter.test.ts.
 
 import { describe, expect, it } from 'vitest';
+import { auraEffectDescriptor } from '../src/ui/aura_effect';
 import {
   type AuraInput,
   type AuraMode,
@@ -64,14 +65,15 @@ describe('isAuraDebuff: the allowlist classification (lifted into the core)', ()
     expect(isAuraDebuff(aura({ id: 'x', kind: 'buff_int', value: -20 }))).toBe(true);
   });
 
-  // This list MUST mirror the sim's HARMFUL_AURA_KINDS (src/sim/aura_classify.ts): the
-  // two classifiers are separate lists, so a kind added to one must be added to both or
-  // the HUD renders it with the wrong buff/debuff styling.
-  it('matches the exact set of harmful kinds (mirrors the sim classifier)', () => {
+  // The view re-exports the shared sim classification set. Pin its exact contents
+  // so an accidental removal changes every consumer loudly.
+  it('matches the exact shared set of harmful kinds', () => {
     expect([...DEBUFF_AURA_KINDS].sort()).toEqual(
       [
         'attackspeed',
         'blind',
+        'bleed_vuln',
+        'cauterize_fatigue',
         'corrode',
         'cost_tax',
         'critvuln',
@@ -87,6 +89,7 @@ describe('isAuraDebuff: the allowlist classification (lifted into the core)', ()
         'mortal_wound',
         'polymorph',
         'root',
+        'sated',
         'silence',
         'slow',
         'spellvuln',
@@ -103,7 +106,7 @@ describe('createAurasView: derivation per mode', () => {
   it("mode 'all' keeps every aura; mode 'debuffs' keeps only debuffs", () => {
     const auras = [
       aura({ id: 'might', kind: 'buff_ap', value: 50 }),
-      aura({ id: 'rend', kind: 'dot', value: 5 }),
+      aura({ id: 'deep_wounds', kind: 'dot', value: 5 }),
       aura({ id: 'sunder', kind: 'sunder', value: 0, stacks: 3 }),
     ];
     const all = createAurasView('all', deps()).tick(entity(auras));
@@ -111,7 +114,20 @@ describe('createAurasView: derivation per mode', () => {
 
     const debuffs = createAurasView('debuffs', deps()).tick(entity(auras));
     expect(debuffs.count).toBe(2);
-    expect(debuffs.slots.slice(0, 2).map((s) => s.key)).toEqual(['rend', 'sunder']);
+    expect(debuffs.slots.slice(0, 2).map((s) => s.key)).toEqual(['deep_wounds', 'sunder']);
+  });
+
+  it('renders bleed vulnerability as a non-cancelable debuff, never a helpful buff', () => {
+    const bleedVulnerability = aura({
+      id: 'hemorrhage_bleed_vuln',
+      kind: 'bleed_vuln',
+      value: 0.4,
+    });
+
+    const all = createAurasView('all', deps()).tick(entity([bleedVulnerability]));
+    expect(all.slots[0]).toMatchObject({ isDebuff: true, cancelable: false });
+    expect(createAurasView('buffs', deps()).tick(entity([bleedVulnerability])).count).toBe(0);
+    expect(createAurasView('debuffs', deps()).tick(entity([bleedVulnerability])).count).toBe(1);
   });
 
   it('emits one slot PER aura even when two share an id (no core-side dedup)', () => {
@@ -132,17 +148,59 @@ describe('createAurasView: derivation per mode', () => {
   it('derives icon key, debuff flag, duration text, stacks text, name, and remaining', () => {
     const state = createAurasView('all', deps()).tick(
       entity([
-        aura({ id: 'rend', name: 'Rend', kind: 'dot', remaining: 4.2, value: 5, stacks: 5 }),
+        aura({
+          id: 'deep_wounds',
+          name: 'Gaping Wounds',
+          kind: 'dot',
+          remaining: 4.2,
+          value: 5,
+          stacks: 5,
+        }),
       ]),
     );
     const s = state.slots[0];
-    expect(s.key).toBe('rend');
-    expect(s.iconKey).toBe('rend');
+    expect(s.key).toBe('deep_wounds');
+    expect(s.iconKey).toBe('deep_wounds');
     expect(s.isDebuff).toBe(true);
     expect(s.durationText).toBe('5s'); // ceil(4.2) = 5
     expect(s.stacksText).toBe('5');
-    expect(s.name).toBe('name:Rend');
+    expect(s.name).toBe('name:Gaping Wounds');
     expect(s.remaining).toBe(4.2);
+  });
+
+  it('renders Elemental Convergence effect text through the real top-right buff view path', () => {
+    const convergence = aura({
+      id: 'elemental_convergence',
+      name: 'Elemental Convergence',
+      kind: 'buff_dmg_done',
+      value: 0.15,
+    });
+    const viewDeps: AurasDeps = {
+      ...deps(),
+      auraEffectHtml: (input) => {
+        const descriptor = auraEffectDescriptor(input);
+        return descriptor ? `${descriptor.key}:${descriptor.nums?.pct ?? ''}` : '';
+      },
+    };
+
+    const slot = createAurasView('buffs', viewDeps).tick(entity([convergence])).slots[0];
+    expect(slot.effectHtml).toBe('hudChrome.auraEffect.dmgDone:15');
+  });
+
+  it('explains the first Elemental Convergence school marker in the top-right buff view', () => {
+    const primed = aura({
+      id: 'convergence_mark',
+      name: 'Elemental Convergence',
+      kind: 'internal_cd',
+      value: 0,
+    });
+    const viewDeps: AurasDeps = {
+      ...deps(),
+      auraEffectHtml: (input) => auraEffectDescriptor(input)?.key ?? '',
+    };
+
+    const slot = createAurasView('buffs', viewDeps).tick(entity([primed])).slots[0];
+    expect(slot.effectHtml).toBe('hudChrome.auraEffect.elementalConvergencePrimed');
   });
 
   it('derives the debuff school for the border tint (physical fallback; buffs carry none)', () => {
@@ -150,7 +208,7 @@ describe('createAurasView: derivation per mode', () => {
       entity([
         aura({ id: 'venom', kind: 'dot', school: 'nature' }),
         // No school on the aura (the wire omits 'physical') -> the physical fallback.
-        aura({ id: 'rend', kind: 'dot' }),
+        aura({ id: 'deep_wounds', kind: 'dot' }),
         // A buff never tints: school stays '' even when the aura carries one.
         aura({ id: 'might', kind: 'buff_ap', value: 50, school: 'holy' }),
       ]),
@@ -198,6 +256,14 @@ describe('createAurasView: derivation per mode', () => {
         .durationText,
     ).toBe('');
     expect(
+      v.tick(entity([aura({ id: 'moonkin_form', kind: 'form_moonkin', remaining: 3600 })])).slots[0]
+        .durationText,
+    ).toBe('');
+    expect(
+      v.tick(entity([aura({ id: 'shadowform', kind: 'form_shadow', remaining: 3600 })])).slots[0]
+        .durationText,
+    ).toBe('');
+    expect(
       v.tick(entity([aura({ id: 'ghost_wolf', kind: 'buff_speed', remaining: 3600 })])).slots[0]
         .durationText,
     ).toBe('');
@@ -206,6 +272,12 @@ describe('createAurasView: derivation per mode', () => {
       v.tick(entity([aura({ id: 'sprint', kind: 'buff_speed', remaining: 15 })])).slots[0]
         .durationText,
     ).toBe('15s');
+    // Greater Invisibility rides the stealth kind for its vanish but is a fixed
+    // 20s timed buff, so it overrides the kind suppression and shows its countdown.
+    expect(
+      v.tick(entity([aura({ id: 'greater_invisibility', kind: 'stealth', remaining: 20 })]))
+        .slots[0].durationText,
+    ).toBe('20s');
   });
 
   it('compactAuraDuration boundaries: seconds round UP, larger units to nearest', () => {
@@ -244,7 +316,10 @@ describe('createAurasView: derivation per mode', () => {
   it('is deterministic: identical inputs produce deep-equal slot state', () => {
     const build = () => {
       const state = createAurasView('all', deps()).tick(
-        entity([aura({ id: 'might', value: 50 }), aura({ id: 'rend', kind: 'dot', value: 5 })]),
+        entity([
+          aura({ id: 'might', value: 50 }),
+          aura({ id: 'deep_wounds', kind: 'dot', value: 5 }),
+        ]),
       );
       // Snapshot the PRIMITIVE fields (the slots are reused objects, so deep-compare
       // values, never the slot references).
@@ -296,14 +371,20 @@ describe('Sim-shaped and ClientWorld-mirror-shaped auras derive identically', ()
     // online mirror presents stacks:undefined where the Sim presents stacks:1. Both must
     // render no stacks badge and otherwise identical state.
     const simShaped = aura({
-      id: 'rend',
-      name: 'Rend',
+      id: 'deep_wounds',
+      name: 'Gaping Wounds',
       kind: 'dot',
       remaining: 6,
       value: 5,
       stacks: 1,
     });
-    const clientShaped = aura({ id: 'rend', name: 'Rend', kind: 'dot', remaining: 6, value: 5 });
+    const clientShaped = aura({
+      id: 'deep_wounds',
+      name: 'Gaping Wounds',
+      kind: 'dot',
+      remaining: 6,
+      value: 5,
+    });
     const fromSim = createAurasView('all', deps()).tick(entity([simShaped])).slots[0];
     const fromClient = createAurasView('all', deps()).tick(entity([clientShaped])).slots[0];
     expect({ ...fromClient }).toEqual({ ...fromSim });
@@ -367,7 +448,13 @@ describe('allocation budget (the reused-reference proxy)', () => {
       return view.tick(
         entity([
           aura({ id: 'might', value: 50, remaining: 30 - frame * 0.1 }),
-          aura({ id: 'rend', kind: 'dot', value: 5, remaining: 12 - frame * 0.05, stacks: frame }),
+          aura({
+            id: 'deep_wounds',
+            kind: 'dot',
+            value: 5,
+            remaining: 12 - frame * 0.05,
+            stacks: frame,
+          }),
         ]),
       );
     };

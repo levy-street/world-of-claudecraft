@@ -35,8 +35,8 @@ export const table: DeedLocaleTable = {
     desc: 'Gasta un punto de talento en un talento de la última fila.',
   },
   prog_full_build: {
-    name: 'Once de once',
-    desc: 'Gasta los once puntos de talento en una sola configuración.',
+    name: 'Los seis al completo',
+    desc: 'Selecciona una opción en las seis filas de talentos de una sola configuración.',
   },
   prog_veteran: {
     name: 'Veterano',

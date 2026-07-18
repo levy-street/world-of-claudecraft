@@ -158,6 +158,10 @@ export async function linkDiscordToAccount(
   if (owner !== null && owner !== accountId) return false;
   try {
     await pool.query(
+      // Repointing the link at a DIFFERENT Discord identity invalidates the old
+      // identity's bot-pushed guild meta (join date + special-role key), so both
+      // reset to NULL on an id change; a same-id relink keeps them (the bot
+      // re-pushes current values within one sync interval either way).
       `INSERT INTO discord_links (account_id, discord_user_id, discord_username, discord_avatar, discord_email, guild_member)
        VALUES ($1, $2, $3, $4, $5, $6)
        ON CONFLICT (account_id) DO UPDATE SET
@@ -166,6 +170,10 @@ export async function linkDiscordToAccount(
          discord_avatar = EXCLUDED.discord_avatar,
          discord_email = COALESCE(EXCLUDED.discord_email, discord_links.discord_email),
          guild_member = EXCLUDED.guild_member,
+         discord_joined_at = CASE WHEN discord_links.discord_user_id = EXCLUDED.discord_user_id
+                                  THEN discord_links.discord_joined_at ELSE NULL END,
+         discord_role = CASE WHEN discord_links.discord_user_id = EXCLUDED.discord_user_id
+                             THEN discord_links.discord_role ELSE NULL END,
          linked_at = now()`,
       [accountId, info.discordUserId, info.username, info.avatar, info.email, info.guildMember],
     );
@@ -555,6 +563,22 @@ export async function discordFlairForAccount(
     joinedAtMs: joined !== null && Number.isFinite(joined) ? joined : null,
     role: typeof row.discord_role === 'string' ? row.discord_role : null,
   };
+}
+
+/**
+ * The Discord user ids whose stored link still carries guild-membership state:
+ * the guild_member flag or a special-role key. The bot fetches this after a
+ * COMPLETE roster seed and diffs it against the live member list to clear flair
+ * for members who left while the bot was offline (the live GUILD_MEMBER_REMOVE
+ * path only covers leaves the bot observes). One seq scan over discord_links
+ * (one row per linked account), called once per gateway connect.
+ */
+export async function discordIdsWithGuildFlair(pool: Pool): Promise<string[]> {
+  const res = await pool.query(
+    `SELECT discord_user_id FROM discord_links
+      WHERE guild_member = TRUE OR discord_role IS NOT NULL`,
+  );
+  return res.rows.map((r) => String(r.discord_user_id));
 }
 
 /**

@@ -1,3 +1,6 @@
+// FIRST import on purpose: loads .env before realm.ts (or any other module
+// with an import-time process.env read) evaluates. See server/env.ts.
+import './env';
 import * as fs from 'node:fs';
 import * as http from 'node:http';
 import * as path from 'node:path';
@@ -172,7 +175,6 @@ import { createAccessLogSink } from './http/access_log';
 import { setAttackSignalSink } from './http/attack_signals';
 import { registerBusinessMetrics } from './http/business_metrics';
 import { handleClientError } from './http/client_error';
-import { registerClientPerfMetrics } from './http/client_perf_metrics';
 import { type Config, DEFAULT_DISPATCH, type DispatchMode, loadConfig } from './http/config';
 import {
   type ApiDelegate,
@@ -182,7 +184,13 @@ import {
 } from './http/dispatch';
 import { type GameStateSource, registerGameStateMetrics } from './http/game_metrics';
 import { setGameMetricsCounters } from './http/game_signals';
-import { handleLivez, handleMetricsGate, handleReadyz, markDraining } from './http/health';
+import {
+  handleLivez,
+  handleMetricsGate,
+  handleReadyz,
+  markDraining,
+  registerLivenessSource,
+} from './http/health';
 import { type Logger, logger } from './http/logger';
 import { createHttpMetrics } from './http/metrics';
 import { teeMetricSink } from './http/middleware/metric_sink';
@@ -243,6 +251,7 @@ import {
   recordAuthFailure,
   requestIp,
   setRateLimitTier2Store,
+  walletLinkRateLimited,
   wocBalanceRateLimited,
 } from './ratelimit';
 import { createPgRateLimitStore } from './ratelimit_db';
@@ -274,6 +283,10 @@ import {
 } from './user_assets_routes';
 import {
   configureWalletRuntime,
+  handleDesktopWalletHandoffClaim,
+  handleDesktopWalletHandoffComplete,
+  handleDesktopWalletHandoffCreate,
+  handleDesktopWalletHandoffResult,
   handleWalletChallenge,
   handleWalletGet,
   handleWalletLink,
@@ -307,6 +320,15 @@ export function resetActiveConfigForTests(): void {
   activeConfigCache = null;
 }
 
+// The realm player cap advertised on /api/status, canonicalized for the wire: a
+// configured 0 or negative (the cap disabled) is normalized to 0 so the field is
+// always a non-negative count. Both /api/status arms (the legacy handleApi twin
+// below and the migrated statusHandler via the injected leaderboard runtime) read
+// it here, so the players_cap field stays byte-identical across the two arms.
+function canonicalPlayersCap(): number {
+  return Math.max(0, activeConfig().maxPlayersPerRealm);
+}
+
 const STATIC_DIR = path.join(__dirname, '..', 'dist');
 const SFX_PACK_DIR = process.env.SFX_PACK_DIR?.trim()
   ? path.resolve(process.env.SFX_PACK_DIR.trim())
@@ -321,6 +343,8 @@ const STATIC_PAGE_ALIASES = new Map([
   ['/social-media-links/', '/links.html'],
   ['/play', '/play.html'],
   ['/play/', '/play.html'],
+  ['/wallet-handoff', '/wallet-handoff.html'],
+  ['/wallet-handoff/', '/wallet-handoff.html'],
   ['/privacy', '/privacy.html'],
   ['/privacy/', '/privacy.html'],
   ['/terms', '/terms.html'],
@@ -733,6 +757,7 @@ function characterListPayload(chars: CharacterRow[]): {
     playtimeSeconds: number;
     skinCatalog: 'class' | 'mech';
     mainhandItemId: string | null;
+    offhandItemId: string | null;
   }[];
 } {
   return {
@@ -748,9 +773,10 @@ function characterListPayload(chars: CharacterRow[]): {
       lastPlayed: c.last_played ? new Date(c.last_played).toISOString() : null,
       playtimeSeconds: Number(c.playtime_seconds ?? 0),
       // Real appearance for the char-select 3D preview (the client renders the
-      // Combat Mech cosmetic body and the equipped mainhand, matching the world).
+      // Combat Mech cosmetic body and both equipped hands, matching the world).
       skinCatalog: c.state?.skinCatalog === 'mech' ? 'mech' : 'class',
       mainhandItemId: c.state?.equipment?.mainhand ?? null,
+      offhandItemId: c.state?.equipment?.offhand ?? null,
     })),
   };
 }
@@ -1714,6 +1740,10 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         ok: true,
         realm: REALM,
         players_online: liveGame().clients.size,
+        // The configured realm player cap so the client realm list can display
+        // honestly; 0 means the cap is disabled. Dual-arm edit: the migrated
+        // statusHandler (server/leaderboard.ts) carries the same players_cap field.
+        players_cap: canonicalPlayersCap(),
         names: [...liveGame().clients.values()].map((s) => s.name),
         steam: { enabled: false },
       });
@@ -1953,6 +1983,27 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       return handleEmailUnsubscribe(res, token);
     }
     // Non-custodial Solana wallet linking, all account-scoped.
+    if (req.method === 'POST' && url === '/api/desktop-wallet/create') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (!walletLinkRateLimited(req, accountId).allowed) {
+        return json(res, 429, { error: 'rate limited' });
+      }
+      return handleDesktopWalletHandoffCreate(req, res, accountId);
+    }
+    if (req.method === 'POST' && url === '/api/desktop-wallet/claim') {
+      if (!publicReadRateLimited(req).allowed) return json(res, 429, { error: 'rate_limited' });
+      return handleDesktopWalletHandoffClaim(req, res);
+    }
+    if (req.method === 'POST' && url === '/api/desktop-wallet/complete') {
+      if (!publicReadRateLimited(req).allowed) return json(res, 429, { error: 'rate_limited' });
+      return handleDesktopWalletHandoffComplete(req, res);
+    }
+    if (req.method === 'POST' && url === '/api/desktop-wallet/result') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleDesktopWalletHandoffResult(req, res, accountId);
+    }
     if (req.method === 'POST' && url === '/api/wallet/link/challenge') {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
@@ -2257,6 +2308,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
 // `routes` array registry.ts already spread in can serve.
 configureLeaderboardRuntime({
   playersOnline: () => liveGame().clients.size,
+  playersCap: canonicalPlayersCap,
   perfProfile: () => liveGame().perfProfile(),
   getLeaderboard,
   getGuildLeaderboard,
@@ -2787,6 +2839,7 @@ export async function startServer(): Promise<http.Server> {
     bufferHandshakeMessages,
     requestMetadata,
     maxWsPerIpHard: config.maxWsPerIpHard,
+    maxPlayersPerRealm: config.maxPlayersPerRealm,
     acquireCharacterLease,
     releaseCharacterLease,
     bankBonusForAccount: async (id) => computeBankBonus(await bankBonusFactsForAccount(id)),
@@ -2805,18 +2858,22 @@ export async function startServer(): Promise<http.Server> {
     simEntities: () => game.sim.entities.size,
     simTickHz: () => game.simTickHz(),
     tickPhaseMillis: () => game.tickPhaseMillis(),
+    lastTickAt: () => game.lastTickAt(),
+    loopStartedAt: () => game.loopStartedAt(),
   };
   setGameMetricsCounters(registerGameStateMetrics(httpMetrics.registry, gameStateSource));
+  // Hand the same live source to /livez, so a wedged loop answers 503 from outside
+  // the process. Registered HERE rather than read from the route arm: the /livez arm
+  // must never touch liveGame() (a health probe constructing a GameServer is the bug
+  // tests/server/game_boot_order.test.ts pins against).
+  registerLivenessSource(gameStateSource);
 
-  // The app-aggregate /metrics collectors (Phase 3 business, Phase 4 client-perf):
-  // each registers bounded gauges on the SAME exporter registry and runs ONE cached
-  // Postgres aggregate on a fixed interval, so a scrape publishes the cached snapshot
-  // and never queries the DB. start() kicks off an immediate refresh plus the
-  // interval (both unref()'d); shutdown stops them below.
+  // Business gauges use isolated, staggered, timeout-protected engagement and
+  // funnel snapshots every 15 minutes. Scrapes publish only cached data and never
+  // query Postgres. Client FPS stays available in the admin tooling but is
+  // intentionally not polled for the business dashboard.
   const businessMetrics = registerBusinessMetrics(httpMetrics.registry);
-  const clientPerfMetrics = registerClientPerfMetrics(httpMetrics.registry);
   businessMetrics.start();
-  clientPerfMetrics.start();
 
   game.start();
   server.listen(config.port, () => {
@@ -2834,8 +2891,7 @@ export async function startServer(): Promise<http.Server> {
     // Stop the app-aggregate metric collectors so no refresh query races the pool
     // close below (their intervals are unref()'d, but an in-flight tick could still
     // fire before pool.end()).
-    businessMetrics.stop();
-    clientPerfMetrics.stop();
+    await businessMetrics.stop();
     game.stop();
     await game.saveAll('shutdown');
     await game.saveMarket();

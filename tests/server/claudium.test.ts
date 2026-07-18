@@ -32,6 +32,7 @@ import {
   setClaudiumDbForTests,
 } from '../../server/claudium';
 import { claudiumSpend, claudiumStore, claudiumStripeWebhook } from '../../server/claudium_proxy';
+import { desktopWalletHandoffs } from '../../server/desktop_wallet_handoff';
 import { compose } from '../../server/http/compose';
 import {
   CLAUDIUM_CONFIRM_MAX_PER_MINUTE,
@@ -72,6 +73,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  desktopWalletHandoffs.clear();
   resetClaudiumDbForTests();
   resetClaudiumMutationRateLimits();
   vi.unstubAllEnvs();
@@ -109,98 +111,98 @@ describe('Claudium spend entitlement mirroring', () => {
     }
   });
 
-  it.each(
-    MONETARY_MUTATION_ROUTES,
-  )('limits invalid-token floods on $path before they can perform unlimited DB reads', async ({
-    path,
-    limit,
-  }) => {
-    const accountAndScopeForToken = vi.fn(async () => null);
-    setClaudiumDbForTests({ accountAndScopeForToken });
-    const route = routes.find((entry) => entry.method === 'POST' && entry.path === path);
-    if (!route?.middleware) throw new Error(`missing mutation middleware for ${path}`);
-    const runMiddleware = compose([...route.middleware]);
+  it.each(MONETARY_MUTATION_ROUTES)(
+    'limits invalid-token floods on $path before they can perform unlimited DB reads',
+    async ({ path, limit }) => {
+      const accountAndScopeForToken = vi.fn(async () => null);
+      setClaudiumDbForTests({ accountAndScopeForToken });
+      const route = routes.find((entry) => entry.method === 'POST' && entry.path === path);
+      if (!route?.middleware) throw new Error(`missing mutation middleware for ${path}`);
+      const runMiddleware = compose([...route.middleware]);
 
-    for (let i = 0; i < limit; i++) {
-      const ctx = fakeCtx({
+      for (let i = 0; i < limit; i++) {
+        const ctx = fakeCtx({
+          method: 'POST',
+          url: path,
+          headers: { authorization: `Bearer ${'a'.repeat(64)}` },
+        });
+        await runMiddleware(ctx);
+        expect((ctx.res as unknown as FakeRes).statusCode).toBe(401);
+      }
+
+      const limited = fakeCtx({
         method: 'POST',
         url: path,
         headers: { authorization: `Bearer ${'a'.repeat(64)}` },
       });
-      await runMiddleware(ctx);
-      expect((ctx.res as unknown as FakeRes).statusCode).toBe(401);
-    }
+      await expect(runMiddleware(limited)).rejects.toMatchObject({ status: 429 });
+      expect(accountAndScopeForToken).toHaveBeenCalledTimes(limit);
+    },
+  );
 
-    const limited = fakeCtx({
-      method: 'POST',
-      url: path,
-      headers: { authorization: `Bearer ${'a'.repeat(64)}` },
-    });
-    await expect(runMiddleware(limited)).rejects.toMatchObject({ status: 429 });
-    expect(accountAndScopeForToken).toHaveBeenCalledTimes(limit);
-  });
+  it.each(MONETARY_MUTATION_ROUTES)(
+    'fuses authenticated $path limits across IP and account keys',
+    async ({ path, limit }) => {
+      const accountAndScopeForToken = vi.fn(async () => ({
+        accountId: 41,
+        scope: 'full' as const,
+      }));
+      const moderationStatusForAccount = vi.fn(async () => ({ locked: false }) as never);
+      setClaudiumDbForTests({ accountAndScopeForToken, moderationStatusForAccount });
+      const route = routes.find((entry) => entry.method === 'POST' && entry.path === path);
+      if (!route?.middleware) throw new Error(`missing mutation middleware for ${path}`);
+      const runMiddleware = compose([...route.middleware]);
 
-  it.each(
-    MONETARY_MUTATION_ROUTES,
-  )('fuses authenticated $path limits across IP and account keys', async ({ path, limit }) => {
-    const accountAndScopeForToken = vi.fn(async () => ({ accountId: 41, scope: 'full' as const }));
-    const moderationStatusForAccount = vi.fn(async () => ({ locked: false }) as never);
-    setClaudiumDbForTests({ accountAndScopeForToken, moderationStatusForAccount });
-    const route = routes.find((entry) => entry.method === 'POST' && entry.path === path);
-    if (!route?.middleware) throw new Error(`missing mutation middleware for ${path}`);
-    const runMiddleware = compose([...route.middleware]);
-
-    for (let i = 0; i < limit; i++) {
-      const ctx = fakeCtx({
-        method: 'POST',
-        url: path,
-        ip: `192.0.2.${i + 1}`,
-        headers: {
-          authorization: `Bearer ${'b'.repeat(64)}`,
-          'x-forwarded-for': `192.0.2.${i + 1}`,
-        },
-      });
-      await runMiddleware(ctx);
-      expect(ctx.account?.accountId).toBe(41);
-    }
-
-    const limited = fakeCtx({
-      method: 'POST',
-      url: path,
-      ip: '198.51.100.1',
-      headers: {
-        authorization: `Bearer ${'b'.repeat(64)}`,
-        'x-forwarded-for': '198.51.100.1',
-      },
-    });
-    await expect(runMiddleware(limited)).rejects.toMatchObject({ status: 429 });
-    expect(accountAndScopeForToken).toHaveBeenCalledTimes(limit + 1);
-  });
-
-  it.each(
-    MONETARY_MUTATION_ROUTES,
-  )('lets the legacy pre-auth helper stop $path before bearer resolution', async ({
-    path,
-    limit,
-  }) => {
-    const resolveBearer = vi.fn(async () => undefined);
-    const attempt = async (): Promise<boolean> => {
-      const outcome = claudiumPreAuthMutationRateLimited(
-        makeReq({
+      for (let i = 0; i < limit; i++) {
+        const ctx = fakeCtx({
           method: 'POST',
           url: path,
-          headers: { authorization: `Bearer ${'a'.repeat(64)}` },
-        }),
-      );
-      if (outcome && !outcome.allowed) return false;
-      await resolveBearer();
-      return true;
-    };
+          ip: `192.0.2.${i + 1}`,
+          headers: {
+            authorization: `Bearer ${'b'.repeat(64)}`,
+            'x-forwarded-for': `192.0.2.${i + 1}`,
+          },
+        });
+        await runMiddleware(ctx);
+        expect(ctx.account?.accountId).toBe(41);
+      }
 
-    for (let i = 0; i < limit; i++) expect(await attempt()).toBe(true);
-    expect(await attempt()).toBe(false);
-    expect(resolveBearer).toHaveBeenCalledTimes(limit);
-  });
+      const limited = fakeCtx({
+        method: 'POST',
+        url: path,
+        ip: '198.51.100.1',
+        headers: {
+          authorization: `Bearer ${'b'.repeat(64)}`,
+          'x-forwarded-for': '198.51.100.1',
+        },
+      });
+      await expect(runMiddleware(limited)).rejects.toMatchObject({ status: 429 });
+      expect(accountAndScopeForToken).toHaveBeenCalledTimes(limit + 1);
+    },
+  );
+
+  it.each(MONETARY_MUTATION_ROUTES)(
+    'lets the legacy pre-auth helper stop $path before bearer resolution',
+    async ({ path, limit }) => {
+      const resolveBearer = vi.fn(async () => undefined);
+      const attempt = async (): Promise<boolean> => {
+        const outcome = claudiumPreAuthMutationRateLimited(
+          makeReq({
+            method: 'POST',
+            url: path,
+            headers: { authorization: `Bearer ${'a'.repeat(64)}` },
+          }),
+        );
+        if (outcome && !outcome.allowed) return false;
+        await resolveBearer();
+        return true;
+      };
+
+      for (let i = 0; i < limit; i++) expect(await attempt()).toBe(true);
+      expect(await attempt()).toBe(false);
+      expect(resolveBearer).toHaveBeenCalledTimes(limit);
+    },
+  );
 
   it('filters retired catalog rows and unknown skins out of the game storefront', async () => {
     storeMock.mockResolvedValue({
@@ -427,7 +429,11 @@ describe('Claudium economy-service transport contract', () => {
       },
       {
         url: '/api/claudium/native/rails',
-        expected: { available: false, rails: { sol: false, woc: false } },
+        expected: { available: false, rails: { sol: false, usdc: false, woc: false } },
+      },
+      {
+        url: '/api/claudium/native/balance/usdc/walletowner',
+        expected: { owner: 'walletowner', amountBase: null },
       },
     ];
 
@@ -454,7 +460,12 @@ describe('Claudium economy-service transport contract', () => {
           });
         }
         if (url.endsWith('/native/rails')) {
-          return new Response(JSON.stringify({ rails: { sol: true, woc: true } }), {
+          return new Response(JSON.stringify({ rails: { sol: true, usdc: true, woc: true } }), {
+            status: 200,
+          });
+        }
+        if (url.endsWith('/native/balance/usdc/walletowner')) {
+          return new Response(JSON.stringify({ owner: 'walletowner', amountBase: '12345678' }), {
             status: 200,
           });
         }
@@ -475,7 +486,11 @@ describe('Claudium economy-service transport contract', () => {
       },
       {
         url: '/api/claudium/native/rails',
-        expected: { available: true, rails: { sol: true, woc: true } },
+        expected: { available: true, rails: { sol: true, usdc: true, woc: true } },
+      },
+      {
+        url: '/api/claudium/native/balance/usdc/walletowner',
+        expected: { owner: 'walletowner', amountBase: '12345678' },
       },
     ];
 
@@ -727,6 +742,65 @@ describe('Claudium economy-service transport contract', () => {
     const request = fetchMock.mock.calls[0]?.[1] as RequestInit;
     expect(JSON.parse(String(request.body))).toEqual({
       rail: 'sol',
+      sku: 'claudium_500',
+      payer: 'payer-address',
+      fulfillment: { kind: 'credit', accountId: 7 },
+    });
+  });
+
+  it('accepts USDC as a native quote rail', async () => {
+    vi.stubEnv('WOC_ECONOMY_SERVICE_URL', 'https://economy.example/v1/claudium/');
+    vi.stubEnv('WOC_ECONOMY_INTERNAL_SECRET', 'test-secret');
+    const quoteExpiryMs = Date.now() + 60_000;
+    const fetchMock = vi.fn(
+      async (_input: string | URL | Request, _init?: RequestInit) =>
+        new Response(
+          JSON.stringify({
+            reference: 'CLM_usdc',
+            rail: 'usdc',
+            claudium: 500,
+            amountBase: '4990000',
+            destination: 'treasury-owner',
+            mint: 'usdc-mint',
+            memo: 'CLM_usdc',
+            quoteExpiryMs,
+            transactionBase64: 'transaction',
+          }),
+          { status: 200 },
+        ),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+    const res = new FakeRes();
+
+    await handleClaudiumApi(
+      makeReq({
+        method: 'POST',
+        url: '/api/claudium/native/quote',
+        body: { rail: 'usdc', sku: 'claudium_500', payer: 'payer-address' },
+      }),
+      res as never,
+      7,
+      { rateLimitApplied: true },
+    );
+
+    expect(responseJson(res)).toMatchObject({
+      ok: true,
+      reference: 'CLM_usdc',
+      rail: 'usdc',
+      amountBase: '4990000',
+    });
+    const created = desktopWalletHandoffs.createTransaction(7, '198.51.100.8', {
+      reference: 'CLM_usdc',
+      expectedAddress: 'payer-address',
+    });
+    expect(desktopWalletHandoffs.claim(created.code, '198.51.100.8')).toMatchObject({
+      kind: 'transaction',
+      reference: 'CLM_usdc',
+      transactionBase64: 'transaction',
+      rail: 'usdc',
+    });
+    expect(JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body))).toEqual({
+      rail: 'usdc',
       sku: 'claudium_500',
       payer: 'payer-address',
       fulfillment: { kind: 'credit', accountId: 7 },

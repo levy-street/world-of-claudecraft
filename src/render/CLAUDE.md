@@ -28,6 +28,9 @@ Everything else is a sibling module in one of these families:
   Performance) and `crowd_lod.ts` (pure crowd policy: pulls character
   shadow/anim cadence in as rig counts climb; cosmetic-only, exempts what a
   player reacts to).
+- `view_create_retry.ts`: bounded cooldown state for fail-soft character builds
+  in per-frame paths, including required targets, form swaps, and visual-key
+  swaps (`tests/view_create_retry.test.ts`).
 - `self_motion.ts`/`facing_smooth.ts`: pure display-only self layers (bounded
   online pose extrapolation + rate-limited self yaw; never touch world state,
   see `src/net/CLAUDE.md`).
@@ -78,6 +81,15 @@ significant-contributor name glow lives there too. Narrow helpers:
   foliage, dungeon, critters, fish, gather nodes, mailbox, delve props,
   characters), loaded via `assets/loader.ts`, then baked/merged/instanced at
   build time.
+- **Creature GLBs take an explicit forward-yaw correction.** A Tripo creature
+  GLB's authored nose-to-tail axis is corrected per species via
+  `creatureForwardCorrectionYaw` (`critters.ts`), Box3 re-seated so its feet
+  sit at y=0, then wrapped in an outer `THREE.Group` so per-frame heading and
+  position writes never clobber the baked correction (the
+  `delve_props.ts`/`mailbox.ts` standalone-prop idiom). Never infer the
+  forward axis from a bounding-box long-axis heuristic: it measures the
+  widest silhouette, not nose-to-tail, and gets both the axis and the sign
+  wrong. Pinned by `tests/critters.test.ts`.
 
 ## Asset loading (`assets/`)
 `loader.ts` (`loadGltf`/`loadHdr`/`loadTexture`, one parse per URL) plus these
@@ -127,12 +139,13 @@ dungeon-aware wrapper (flat floor past `DUNGEON_X_THRESHOLD`); plain
 collision/movement.
 
 ## Performance discipline: this runs at frame rate
-- Three.js is **pinned at r0.165**; the post chain lives in `post.ts` (its header
-  comment documents the pass order and the N8AO subtleties) plus the `n8ao`
-  package (SSAO). The `postprocessing` dep in `package.json` is n8ao's peer
-  dependency, not imported directly, so don't remove it as "unused." Don't bump
-  Three or swap the chain casually: shaders here patch r165 chunks via
-  `onBeforeCompile`.
+- Three.js is **version-pinned in `package.json`**; the post chain lives in
+  `post.ts` (its header comment documents the pass order and the N8AO
+  subtleties) plus the `n8ao` package (SSAO). The `postprocessing` dep in
+  `package.json` is n8ao's peer dependency, not imported directly, so don't
+  remove it as "unused." Don't bump Three or swap the chain casually: shaders
+  here patch the pinned release's shader chunks via `onBeforeCompile`, so any
+  bump means re-verifying every patched chunk.
 - Reuse, don't allocate: instancing for repeats, merge one-offs per
   (material, z-band), share materials via `surfaceMat`, distance-cull/LOD in
   `sync` (see the `*_RANGE_SQ` constants). No per-frame `new THREE.*` in hot paths;

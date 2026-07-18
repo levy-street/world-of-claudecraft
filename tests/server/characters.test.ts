@@ -316,7 +316,11 @@ describe('character list handlers', () => {
       name: 'Aaa',
       class: 'warrior',
       level: 10,
-      state: st({ skin: 3 }),
+      state: st({
+        skin: 3,
+        skinCatalog: 'mech',
+        equipment: { mainhand: 'worn_sword', offhand: 'eastbrook_buckler' },
+      }),
       force_rename: false,
       last_played: new Date('2026-01-02T03:04:05.000Z'),
       playtime_seconds: '120',
@@ -348,6 +352,9 @@ describe('character list handlers', () => {
           forceRename: false,
           lastPlayed: '2026-01-02T03:04:05.000Z',
           playtimeSeconds: 120,
+          skinCatalog: 'mech',
+          mainhandItemId: 'worn_sword',
+          offhandItemId: 'eastbrook_buckler',
         },
         {
           id: 2,
@@ -359,6 +366,9 @@ describe('character list handlers', () => {
           forceRename: true,
           lastPlayed: null,
           playtimeSeconds: 0, // null -> 0
+          skinCatalog: 'class',
+          mainhandItemId: null,
+          offhandItemId: null,
         },
       ],
     };

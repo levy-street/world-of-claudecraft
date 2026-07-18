@@ -80,6 +80,8 @@ describe('standardized percent raid buffs', () => {
     const near = sim.addPlayer('warrior', 'Near');
     const far = sim.addPlayer('rogue', 'Far');
     formParty(sim, mage, [near, far]);
+    // The mage rework moved Aether Insight from learnLevel 1 to 3 (e0842ee38).
+    sim.setPlayerLevel(3, mage);
     teleport(sim, mage, 0, 0);
     teleport(sim, near, 5, 0);
     teleport(sim, far, 500, 500); // hundreds of yards away: still gets the buff
@@ -107,6 +109,8 @@ describe('standardized percent raid buffs', () => {
   it('a solo caster with no party still buffs itself', () => {
     const sim = makeWorld();
     const mage = sim.addPlayer('mage', 'Solo');
+    // The mage rework moved Aether Insight from learnLevel 1 to 3 (e0842ee38).
+    sim.setPlayerLevel(3, mage);
     const intBefore = sim.entities.get(mage)!.stats.int;
     ready(sim, mage);
     sim.castAbility('arcane_intellect', mage);
@@ -189,6 +193,35 @@ describe('standardized percent raid buffs', () => {
     expect(blessings[0].sourceId).toBe(second);
     expect(blessings[0].value).toBe(10);
     expect(blessings[0].remaining).toBe(1800);
+  });
+
+  it('does not stack Sureflight Aura from two hunters (same-class group buff)', () => {
+    // trueshot_aura (Sureflight Aura) is a talent-granted hunter aura applied as
+    // `${abilityId}_ap` by aoeAllyAttackPower. Two hunters used to stack two copies
+    // on the same target; now the second REPLACES the first (source-independent).
+    const sim = makeWorld();
+    const first = sim.addPlayer('hunter', 'Rax');
+    const second = sim.addPlayer('hunter', 'Vess');
+    const target = sim.entities.get(sim.addPlayer('warrior', 'War'))!;
+    const sureflight = (sourceId: number): Aura => ({
+      id: 'trueshot_aura_ap',
+      name: 'Sureflight Aura',
+      kind: 'buff_ap_pct',
+      remaining: 1800,
+      duration: 1800,
+      value: 10,
+      sourceId,
+      school: 'nature',
+    });
+    const applyAura = (a: Aura) =>
+      (sim as unknown as { applyAura(t: Entity, a: Aura): void }).applyAura(target, a);
+
+    applyAura(sureflight(first));
+    applyAura(sureflight(second));
+
+    const auras = target.auras.filter((a) => a.id === 'trueshot_aura_ap');
+    expect(auras).toHaveLength(1);
+    expect(auras[0].sourceId).toBe(second);
   });
 
   it('keeps the newest stronger Blessing of Might value', () => {

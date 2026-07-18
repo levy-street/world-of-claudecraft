@@ -6,6 +6,7 @@ import { Sim } from '../src/sim/sim';
 import {
   BEAR_FORM_THREAT_MULT,
   DEFENSIVE_STANCE_THREAT_MULT,
+  dropThreat,
   RIGHTEOUS_FURY_THREAT_MULT,
 } from '../src/sim/threat';
 import type { Entity } from '../src/sim/types';
@@ -73,6 +74,38 @@ function beefUp(mob: Entity) {
   mob.hp = 5000;
 }
 
+describe('dropThreat (single-attacker removal)', () => {
+  it('removes only that attacker and releases a taunt lock pointing at them', () => {
+    const mob = {
+      threat: new Map([
+        [1, 50],
+        [2, 80],
+      ]),
+      forcedTargetId: 1,
+      forcedTargetTimer: 2,
+    } as unknown as Entity;
+    dropThreat(mob, 1);
+    expect(mob.threat.has(1)).toBe(false);
+    expect(mob.threat.get(2)).toBe(80);
+    expect(mob.forcedTargetId).toBeNull();
+    expect(mob.forcedTargetTimer).toBe(0);
+  });
+
+  it('leaves a taunt lock held by a DIFFERENT attacker in place', () => {
+    const mob = {
+      threat: new Map([
+        [1, 50],
+        [2, 80],
+      ]),
+      forcedTargetId: 2,
+      forcedTargetTimer: 2,
+    } as unknown as Entity;
+    dropThreat(mob, 1);
+    expect(mob.forcedTargetId).toBe(2);
+    expect(mob.forcedTargetTimer).toBe(2);
+  });
+});
+
 describe('threat from damage', () => {
   it('damage lands on the hate table 1:1 without modifiers (plus the aggro seed)', () => {
     const sim = makeSim('warrior');
@@ -86,6 +119,7 @@ describe('threat from damage', () => {
   it('defensive stance: -10% damage dealt, x1.3 threat on what lands', () => {
     const sim = makeSim('warrior');
     sim.setPlayerLevel(10);
+    expect(sim.setSpec('arms')).toBe(true);
     sim.castAbility('defensive_stance');
     sim.tick();
     expect(sim.player.auras.some((a) => a.kind === 'defensive_stance')).toBe(true);
@@ -161,6 +195,7 @@ describe('threat from damage', () => {
     sim.setPlayerLevel(8);
     expect(sim.resolvedAbility('heroic_strike')!.threatFlat).toBe(39);
     sim.setPlayerLevel(10);
+    expect(sim.setSpec('prot')).toBe(true);
     expect(sim.resolvedAbility('sunder_armor')!.threatFlat).toBe(100);
   });
 });
@@ -414,6 +449,40 @@ describe('taunt and growl', () => {
     expect(wolf.forcedTargetTimer).toBeGreaterThan(0);
   });
 
+  it('Sacred Goad always lands (never resists), even against a higher-level mob', () => {
+    // The paladin taunt is holy-school (a spell), so on impact it used to roll a full
+    // resist. A resisted taunt silently breaks tanking, so taunts now skip the roll.
+    // Against a +3 mob the old roll would resist a large fraction of the time; across
+    // many seeds the taunt must now land every time and never emit a 'resist'.
+    for (let seed = 1; seed <= 40; seed++) {
+      const sim = new Sim({ seed, playerClass: 'paladin', noPlayer: true });
+      const tank = sim.entities.get(sim.addPlayer('paladin', 'Tank'))!;
+      const dps = sim.entities.get(sim.addPlayer('mage', 'Dps'))!;
+      sim.setPlayerLevel(10, tank.id);
+      const wolf = nearestMob(sim, 'forest_wolf', tank);
+      wolf.level = tank.level + 3; // a wide level gap: a spell would often fully resist
+      teleport(sim, tank, wolf.pos.x + 25, wolf.pos.z);
+      teleport(sim, dps, wolf.pos.x - 2, wolf.pos.z);
+      wolf.threat.set(dps.id, 1000);
+      wolf.aggroTargetId = dps.id;
+      wolf.aiState = 'chase';
+      wolf.inCombat = true;
+      sim.targetEntity(wolf.id, tank.id);
+      tank.facing = Math.atan2(wolf.pos.x - tank.pos.x, wolf.pos.z - tank.pos.z);
+
+      sim.castAbility('holy_taunt', tank.id);
+      let resisted = false;
+      for (let i = 0; i < 25; i++) {
+        for (const ev of sim.tick()) {
+          if (ev.type === 'damage' && ev.kind === 'resist' && ev.ability === 'Sacred Goad')
+            resisted = true;
+        }
+      }
+      expect(resisted, `seed ${seed}`).toBe(false);
+      expect(wolf.aggroTargetId, `seed ${seed}`).toBe(tank.id);
+    }
+  });
+
   it('growl requires bear form', () => {
     const sim = makeSim('druid');
     sim.setPlayerLevel(10);
@@ -434,6 +503,7 @@ describe('sunder armor', () => {
   it('stacks an armor debuff and generates stance-scaled flat threat', () => {
     const sim = makeSim('warrior');
     sim.setPlayerLevel(10);
+    expect(sim.setSpec('prot')).toBe(true);
     const wolf = nearestMob(sim, 'forest_wolf');
     teleport(sim, sim.player, wolf.pos.x + 2, wolf.pos.z);
     sim.targetEntity(wolf.id);

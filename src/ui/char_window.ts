@@ -25,12 +25,15 @@ import type { IWorld } from '../world_api';
 import { buildPaperdollView, type PaperdollSlot } from './char_view';
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName, itemDisplayName } from './entity_i18n';
+import { dropRequiredLevel, paperdollDropAction } from './equip_drop_core';
 import { esc } from './esc';
 import { buildGatheringProficiencyRows } from './gathering_view';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { iconDataUrl, QUALITY_COLOR } from './icons';
+import type { ItemDragState } from './item_drag_state';
 import type { PainterHostPresentation } from './painter_host';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
+import { tSim } from './sim_i18n';
 import type { StatId } from './stat_tooltip';
 import { svgIcon } from './ui_icons';
 
@@ -42,38 +45,63 @@ const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)';
 const SLOT_EMPTY_TEXT_COLOR = 'var(--color-slot-empty-text)';
 const SLOT_EMPTY_BORDER_COLOR = 'var(--color-slot-empty-border)';
 
-// The ten craft-archetype title keys (issue 1130), one per craft id on the ring (see
-// src/sim/content/professions.ts CRAFT_RING and src/sim/professions/archetype.ts
-// getArchetypeTitle: the title identifier IS the craft id). Every player-visible
-// string is a t() key, so this is a literal id-to-key table, never a built string.
-const ARCHETYPE_TITLE_KEYS: Record<string, TranslationKey> = {
-  armorcrafting: 'hudChrome.archetypeTitle.armorcrafting',
-  weaponcrafting: 'hudChrome.archetypeTitle.weaponcrafting',
-  jewelcrafting: 'hudChrome.archetypeTitle.jewelcrafting',
-  alchemy: 'hudChrome.archetypeTitle.alchemy',
-  engineering: 'hudChrome.archetypeTitle.engineering',
-  cooking: 'hudChrome.archetypeTitle.cooking',
-  inscription: 'hudChrome.archetypeTitle.inscription',
-  enchanting: 'hudChrome.archetypeTitle.enchanting',
-  tailoring: 'hudChrome.archetypeTitle.tailoring',
-  leatherworking: 'hudChrome.archetypeTitle.leatherworking',
+// The ten pair-archetype title keys (issue 1130, pair-named under Professions
+// 2.0 Phase 1), one per canonical pair id (see src/sim/professions/archetype.ts
+// ARCHETYPE_PAIR_TARGETS and getArchetypeTitle: the title identifier IS the
+// pair id). Every player-visible string is a t() key, so this is a literal
+// id-to-key table, never a built string.
+const ARCHETYPE_PAIR_TITLE_KEYS: Record<string, TranslationKey> = {
+  'engineering+alchemy': 'hudChrome.archetypePair.engineering+alchemy',
+  'alchemy+cooking': 'hudChrome.archetypePair.alchemy+cooking',
+  'cooking+leatherworking': 'hudChrome.archetypePair.cooking+leatherworking',
+  'leatherworking+tailoring': 'hudChrome.archetypePair.leatherworking+tailoring',
+  'tailoring+inscription': 'hudChrome.archetypePair.tailoring+inscription',
+  'inscription+enchanting': 'hudChrome.archetypePair.inscription+enchanting',
+  'enchanting+jewelcrafting': 'hudChrome.archetypePair.enchanting+jewelcrafting',
+  'jewelcrafting+weaponcrafting': 'hudChrome.archetypePair.jewelcrafting+weaponcrafting',
+  'weaponcrafting+armorcrafting': 'hudChrome.archetypePair.weaponcrafting+armorcrafting',
+  'armorcrafting+engineering': 'hudChrome.archetypePair.armorcrafting+engineering',
 };
 
-/** Localized text for the granted archetype title, or the "no title yet" copy
+// The ten per-craft display-name keys, one per craft id on the ring (see
+// src/sim/content/professions.ts CRAFT_RING). Used wherever a CRAFT (not a
+// title) is meant: the hobby line, skill rows, section headers, combo labels.
+const CRAFT_NAME_KEYS: Record<string, TranslationKey> = {
+  armorcrafting: 'hudChrome.craftName.armorcrafting',
+  weaponcrafting: 'hudChrome.craftName.weaponcrafting',
+  jewelcrafting: 'hudChrome.craftName.jewelcrafting',
+  alchemy: 'hudChrome.craftName.alchemy',
+  engineering: 'hudChrome.craftName.engineering',
+  cooking: 'hudChrome.craftName.cooking',
+  inscription: 'hudChrome.craftName.inscription',
+  enchanting: 'hudChrome.craftName.enchanting',
+  tailoring: 'hudChrome.craftName.tailoring',
+  leatherworking: 'hudChrome.craftName.leatherworking',
+};
+
+/** Localized text for the granted pair-archetype title (the input is the
+ *  canonical pair id from IWorld `archetypeTitle`), or the "no title yet" copy
  *  when the player has not completed the zone-1 acceptance quest (or the id is
  *  somehow unrecognized). Exported for the view-model test. */
-export function archetypeTitleText(craftId: string | null): string {
-  const key = craftId !== null ? ARCHETYPE_TITLE_KEYS[craftId] : undefined;
+export function archetypeTitleText(pairId: string | null): string {
+  const key = pairId !== null ? ARCHETYPE_PAIR_TITLE_KEYS[pairId] : undefined;
   return t(key ?? 'hudChrome.archetypeTitle.none');
 }
 
-/** Localized text for the hobby craft (issue 1294): the same per-craft name
- *  table as the archetype title (a hobby id IS a craft id on the ring), or
- *  the "no hobby yet" copy before an archetype has ever been chosen.
+/** Localized display name for one craft on the ring, or the same "none" copy
+ *  for null/unrecognized ids. Exported for the crafting window, identity card,
+ *  and quest dialog (every surface that names a CRAFT rather than a title). */
+export function craftNameText(craftId: string | null): string {
+  const key = craftId !== null ? CRAFT_NAME_KEYS[craftId] : undefined;
+  return t(key ?? 'hudChrome.archetypeTitle.none');
+}
+
+/** Localized text for the hobby craft (issue 1294): a hobby id IS a craft id
+ *  on the ring, so this renders the per-craft display name, or the "no hobby
+ *  yet" copy before an archetype has ever been chosen.
  *  Exported for the view-model test. */
 export function hobbyCraftText(craftId: string | null): string {
-  const key = craftId !== null ? ARCHETYPE_TITLE_KEYS[craftId] : undefined;
-  return t(key ?? 'hudChrome.archetypeTitle.none');
+  return craftNameText(craftId);
 }
 
 // The character-sheet stat cells, primaries down the left column and derived
@@ -91,9 +119,11 @@ const STAT_GRID: readonly StatId[] = [
   'critChance',
   'spi',
   'dodge',
+  'parry',
   'spellPower',
   'critRating',
   'hasteRating',
+  'hitRating',
   'warfare',
 ];
 
@@ -131,6 +161,13 @@ export interface CharWindowDeps extends PainterHostPresentation {
   openPrestige(): void;
   /** Open the Book of Deeds (the active-title line's button). */
   openDeeds(): void;
+  /** The shared in-flight bag-item drag (published by the bags grid). The paperdoll
+   *  sockets read it during dragover, where the DataTransfer payload is unreadable. */
+  dragState: ItemDragState;
+  /** Repaint the bags grid after a drop equipped a piece out of it. */
+  renderBags(): void;
+  /** Refusal toast for a drop the socket will not take. */
+  showError(text: string): void;
 }
 
 // Maps each gathering profession id to its hud_chrome display-name key (issue 1124).
@@ -193,7 +230,7 @@ export class CharWindow {
       world.hobbyCraft !== null
         ? `<span class="panel-subtitle char-hobby-craft">${esc(t('hudChrome.archetypeTitle.hobbyLabel'))}: ${esc(hobbyCraft)}</span>`
         : '';
-    let html = `<div class="panel-title char-title-portrait">${portraitChipHtml({ cls: world.cfg.playerClass, skin: p.skin ?? 0, name: p.name, variant: 'md' })}<span class="char-title-text" id="char-title">${esc(p.name)} <span class="panel-subtitle">${esc(t('itemUi.equipment.levelClass', { level, className }))}</span><span class="panel-subtitle char-archetype-title">${esc(t('hudChrome.archetypeTitle.label'))}: ${esc(archetypeTitle)}</span>${hobbyRow}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
+    let html = `<div class="panel-title char-title-portrait">${portraitChipHtml({ cls: world.cfg.playerClass, skin: p.skin ?? 0, name: p.name, variant: 'md' })}<span class="char-title-text" id="char-title">${esc(p.name)} <span class="panel-subtitle">${esc(t('itemUi.equipment.levelClass', { level, className }))}</span><span class="panel-subtitle char-archetype-title">${esc(t('hudChrome.archetypeTitle.label'))}: ${esc(archetypeTitle)}</span>${hobbyRow}<span class="panel-subtitle char-honor-balance">${esc(t('hudChrome.warfare.balance', { amount: formatNumber(world.honor, { maximumFractionDigits: 0 }) }))}</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
     html += `<div class="paperdoll">
       <div class="equip-col" id="equip-col-left"></div>
       <div class="char-model-panel">
@@ -261,6 +298,10 @@ export class CharWindow {
     // back to this slot (the rebuilt row may be empty, with no x to focus).
     row.id = `equip-slot-${slot}`;
     row.tabIndex = -1;
+    // The socket's equipment key, read by BOTH drop arms: the HTML5 drop below and
+    // the touch hit test (item_drop_hit_test.ts), which has no drop event to read.
+    row.dataset.equipSlot = slot;
+    this.bindEquipDropTarget(row, slot);
     const qColor = !item
       ? SLOT_EMPTY_TEXT_COLOR
       : (QUALITY_COLOR[item.quality ?? 'common'] ?? QUALITY_DEFAULT_COLOR);
@@ -308,6 +349,81 @@ export class CharWindow {
       row.addEventListener('contextmenu', (ev) => ev.preventDefault());
     }
     return row;
+  }
+
+  /** Equip a bag stack into the exact socket it was dropped on (both drag arms land
+   *  here). The refusals are pre-empted client-side with the sim's OWN wording
+   *  (tSim), so no doomed command is sent and the toast reads identically to the
+   *  authoritative one the server would emit; the sim re-validates regardless. */
+  dropOnEquipSlot(itemId: string, slot: EquipSlot): void {
+    const item = ITEMS[itemId];
+    if (!item) return;
+    const world = this.deps.world();
+    switch (paperdollDropAction(item, slot, world.cfg.playerClass, world.player.level)) {
+      case 'blockedSlot':
+        this.deps.showError(tSim('error.wrongEquipSlot'));
+        return;
+      case 'blockedClass':
+        this.deps.showError(tSim('error.cannotEquip'));
+        return;
+      case 'blockedLevel':
+        this.deps.showError(
+          tSim('error.equipLevel', {
+            level: formatNumber(dropRequiredLevel(item), { maximumFractionDigits: 0 }),
+          }),
+        );
+        return;
+      case 'equip':
+        world.equipItemToSlot(itemId, slot);
+        audio.click();
+        this.deps.hideTooltip();
+        this.deps.renderBags();
+        this.renderIfOpen();
+    }
+  }
+
+  /** Light up every socket that would ACCEPT the stack in flight (null clears them).
+   *  Only the accepting sockets light: the feedback is the same pure decision the
+   *  drop itself runs, so a lit socket always takes the piece. */
+  markDropTargets(itemId: string | null): void {
+    const el = this.deps.root();
+    const world = this.deps.world();
+    const item = itemId ? ITEMS[itemId] : undefined;
+    for (const row of el.querySelectorAll<HTMLElement>('.equip-slot[data-equip-slot]')) {
+      const slot = row.dataset.equipSlot as EquipSlot | undefined;
+      const accepts =
+        !!item &&
+        !!slot &&
+        paperdollDropAction(item, slot, world.cfg.playerClass, world.player.level) === 'equip';
+      row.classList.toggle('drop-target', accepts);
+    }
+  }
+
+  // A paperdoll socket as a drop target for a bag stack: dragover accepts only what
+  // the socket would really take (so the cursor never promises an equip the drop
+  // then refuses), and the drop routes into the one shared dropOnEquipSlot.
+  private bindEquipDropTarget(row: HTMLElement, slot: EquipSlot): void {
+    row.addEventListener('dragover', (e) => {
+      const drag = this.deps.dragState.get();
+      if (!drag) return;
+      const item = ITEMS[drag.itemId];
+      const world = this.deps.world();
+      if (
+        !item ||
+        paperdollDropAction(item, slot, world.cfg.playerClass, world.player.level) !== 'equip'
+      )
+        return;
+      e.preventDefault();
+      if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+    });
+    row.addEventListener('drop', (e) => {
+      const drag = this.deps.dragState.get();
+      if (!drag) return;
+      e.preventDefault();
+      this.deps.dragState.end();
+      this.markDropTargets(null);
+      this.dropOnEquipSlot(drag.itemId, slot);
+    });
   }
 
   // `keepFocus` hands focus back to the now-empty slot row after the unequip

@@ -3,6 +3,7 @@
 // and voice-presence shaping. Kept separate from the ws/fetch IO (gateway.ts,
 // discord_api.ts, server_client.ts) so it is unit-tested without a network. This
 // is the same pure/IO split the server uses (wallet_link.ts vs wallet.ts).
+import { specialRoleByKey, specialRoleByName } from '../src/sim/discord_roles';
 import { DISCORD_STATUS_DEFS, discordStatusByIndex } from '../src/sim/discord_tier';
 
 // ── Gateway ──────────────────────────────────────────────────────────────────
@@ -19,12 +20,19 @@ export const GATEWAY_OP = {
   DISPATCH: 0,
   HEARTBEAT: 1,
   IDENTIFY: 2,
+  REQUEST_GUILD_MEMBERS: 8,
   RESUME: 6,
   RECONNECT: 7,
   INVALID_SESSION: 9,
   HELLO: 10,
   HEARTBEAT_ACK: 11,
 } as const;
+
+// Members-count threshold above which Discord omits offline members from the
+// initial GUILD_CREATE member list. Sent as `large_threshold` in IDENTIFY (250 is
+// the max the gateway accepts): guilds up to this size deliver every member up
+// front; larger ones are backfilled with REQUEST_GUILD_MEMBERS (op 8).
+export const GUILD_LARGE_THRESHOLD = 250;
 
 /** Heartbeat interval from a HELLO payload (ms), defaulting to 41.25s. */
 export function heartbeatIntervalMs(hello: unknown): number {
@@ -41,6 +49,9 @@ export function identifyPayload(token: string): Record<string, unknown> {
     d: {
       token,
       intents: GATEWAY_INTENTS,
+      // Raise the offline-member cutoff to the max so guilds up to this size
+      // deliver every member (incl. offline staff) in GUILD_CREATE.
+      large_threshold: GUILD_LARGE_THRESHOLD,
       properties: { os: 'linux', browser: 'woc-bot', device: 'woc-bot' },
     },
   };
@@ -52,6 +63,22 @@ export function resumePayload(
   seq: number | null,
 ): Record<string, unknown> {
   return { op: GATEWAY_OP.RESUME, d: { token, session_id: sessionId, seq } };
+}
+
+/**
+ * REQUEST_GUILD_MEMBERS (op 8) for a guild's FULL member list. `query: ''` with
+ * `limit: 0` asks for every member (online AND offline); Discord streams them
+ * back as GUILD_MEMBERS_CHUNK dispatches. `presences: true` also returns each
+ * member's presence (the GUILD_PRESENCES intent is enabled) so online status
+ * stays accurate for members that were only learned about via the backfill.
+ * Sent after IDENTIFY so offline holders of a special role (e.g. Admins) are
+ * known even in guilds larger than `large_threshold`.
+ */
+export function requestGuildMembersPayload(guildId: string): Record<string, unknown> {
+  return {
+    op: GATEWAY_OP.REQUEST_GUILD_MEMBERS,
+    d: { guild_id: guildId, query: '', limit: 0, presences: true },
+  };
 }
 
 // ── Slash commands ───────────────────────────────────────────────────────────
@@ -118,6 +145,182 @@ export function computeRoleSync(opts: {
   const toAdd = desired && !have.has(desired) ? [desired] : [];
   const toRemove = [...have].filter((id) => allTierRoleIds.has(id) && id !== desired);
   return { toAdd, toRemove };
+}
+
+// ── Special (staff/community) roles ──────────────────────────────────────────
+// The bot caches each member's guild ROLE IDS (not names), so the id->key index
+// below is the id-based analog of `topSpecialRole(names)` in
+// src/sim/discord_roles.ts. Kept pure so both role-change reconciliation and the
+// top-role pick are unit-tested without the Discord API.
+
+/**
+ * Extract the string role-id array from a Discord member payload (a GUILD_CREATE
+ * member, a GUILD_MEMBER_ADD/UPDATE, or a GUILD_MEMBERS_CHUNK entry). Non-string
+ * entries are dropped.
+ */
+export function memberRolesFromPayload(d: Record<string, unknown>): string[] {
+  const roles = (d as { roles?: unknown }).roles;
+  return Array.isArray(roles) ? roles.filter((x): x is string => typeof x === 'string') : [];
+}
+
+/**
+ * Reconcile a member's cached role ids against a GUILD_MEMBER_UPDATE payload.
+ * Discord sends the member's COMPLETE current role list on every update, so the
+ * new cached state simply REPLACES the old one (a granted role appears, a removed
+ * one is gone), independent of the prior cache. Returns null when the payload
+ * carries no roles array, signalling the caller to leave the cache untouched.
+ */
+export function reconcileMemberRolesFromUpdate(
+  eventData: Record<string, unknown>,
+): string[] | null {
+  const roles = (eventData as { roles?: unknown }).roles;
+  if (!Array.isArray(roles)) return null;
+  return roles.filter((x): x is string => typeof x === 'string');
+}
+
+/**
+ * Build a guild-role-id -> special-role-key index from the guild's role list.
+ * EVERY role whose name (or alias) matches a special role is indexed, so when a
+ * guild has both an `Admin` and an `Admins` role (both aliasing key `admin`),
+ * BOTH ids map to `admin` and a holder of either resolves. (The old code kept
+ * only the first id per key, dropping holders of the other role.)
+ */
+export function indexSpecialRoleIds(
+  roles: readonly { id: string; name: string }[],
+): Map<string, string> {
+  const index = new Map<string, string>(); // guild role id -> special role key
+  for (const role of roles) {
+    const def = specialRoleByName(role.name);
+    if (def) index.set(role.id, def.key);
+  }
+  return index;
+}
+
+/**
+ * The highest-priority special-role key a member holds, or null. `roleIdToKey`
+ * maps each guild role id to a special-role key (built by indexSpecialRoleIds);
+ * several ids may share a key, and a holder of ANY of them resolves. Priority
+ * comes from the shared catalog so the pick matches the name-based topSpecialRole.
+ */
+export function topSpecialRoleKeyFor(
+  memberRoleIds: readonly string[],
+  roleIdToKey: ReadonlyMap<string, string>,
+): string | null {
+  let best: { key: string; priority: number } | null = null;
+  for (const id of memberRoleIds) {
+    const key = roleIdToKey.get(id);
+    if (!key) continue;
+    const def = specialRoleByKey(key);
+    if (def && (!best || def.priority > best.priority)) best = { key, priority: def.priority };
+  }
+  return best?.key ?? null;
+}
+
+// ── Members-meta push batching + clearing ────────────────────────────────────
+// A members-meta request is bounded TWICE server-side: the handler slices the
+// member array at 1000 entries, and readBody rejects any JSON body over 64 KiB,
+// which the handler coerces to an EMPTY list (200, updated: 0), silently
+// dropping the whole batch. The byte cap binds first: a worst-case member
+// record (a 20-char snowflake id, a 32-char name JSON-escaping to 6 bytes per
+// char, a full join date, the longest role key) serializes to about 300 bytes,
+// so the batch size is derived from BYTES (200 x ~300 = ~60 KiB, under the cap
+// with headroom), never from the 1000-entry slice. Capping the TOTAL instead
+// (a single slice) silently drops every member past the cutoff, so their
+// join-date and special-role flair are never pushed; tests pin both bounds.
+export const MEMBERS_META_BATCH = 200;
+
+/**
+ * Split an array into fixed-size batches (the last may be shorter). `size` is
+ * clamped to at least 1. Every element appears in exactly one batch, in order,
+ * so nothing is dropped. Pure so the members-meta batching is unit-tested.
+ */
+export function chunk<T>(items: readonly T[], size: number): T[][] {
+  const n = Math.max(1, Math.floor(size));
+  const out: T[][] = [];
+  for (let i = 0; i < items.length; i += n) out.push(items.slice(i, i + n));
+  return out;
+}
+
+/**
+ * A members-meta record that CLEARS an ex-member's stored flair: a null role key
+ * makes the server drop their special-role tag, and name/join-date are left null
+ * so nothing is re-asserted. Sent on GUILD_MEMBER_REMOVE alongside
+ * setMember(id, false) so a member who leaves loses their in-game verified /
+ * staff flair promptly instead of keeping it until some later relink.
+ */
+export function clearedMemberMeta(discordUserId: string): {
+  discord_user_id: string;
+  name: string | null;
+  joinedAtMs: number | null;
+  role: string | null;
+} {
+  return { discord_user_id: discordUserId, name: null, joinedAtMs: null, role: null };
+}
+
+/**
+ * Whether the member cache holds the guild's COMPLETE roster: at least
+ * member_count entries (GUILD_CREATE always carries member_count; the cache can
+ * briefly exceed it when someone joins mid-seed). The departed-member reconcile
+ * MUST only run against a complete roster: diffing a partial one (a large-guild
+ * GUILD_CREATE before the op 8 backfill, or a failed backfill) would misread
+ * merely-unseeded members as departed and wrongly clear their flair. A zero or
+ * missing member_count never counts as complete.
+ */
+export function rosterComplete(cachedCount: number, memberTotal: number): boolean {
+  return memberTotal > 0 && cachedCount >= memberTotal;
+}
+
+/**
+ * The server-flagged ids that are NOT in the live roster: members whose stored
+ * link still carries guild membership or a special-role key but who are no
+ * longer in the guild, i.e. they left while the bot was offline so
+ * GUILD_MEMBER_REMOVE never fired for them. The caller clears exactly these
+ * (and nothing else) through the existing member + members-meta endpoints.
+ */
+export function staleFlairedIds(
+  flaggedIds: readonly string[],
+  rosterIds: ReadonlySet<string>,
+): string[] {
+  return flaggedIds.filter((id) => !rosterIds.has(id));
+}
+
+/**
+ * Clear the server-side flair state for departed members: push a null-role
+ * members-meta record for each (batched under the same cap as the roster
+ * push), THEN drop each member's guild_member flag. IO arrives as injected
+ * callbacks so the ordering, batching, and the re-observed-member skip are
+ * unit-testable without a network: `isMember` is re-checked before EVERY write
+ * because a member can rejoin (GUILD_MEMBER_ADD) between the roster diff and
+ * these awaits, and the live event handlers own a present member's state.
+ * Returns the ids whose membership flag was cleared.
+ */
+export async function clearDepartedFlair(
+  staleIds: readonly string[],
+  isMember: (id: string) => boolean,
+  io: {
+    pushMembersMeta: (
+      records: {
+        discord_user_id: string;
+        name: string | null;
+        joinedAtMs: number | null;
+        role: string | null;
+      }[],
+    ) => Promise<unknown>;
+    setMember: (id: string, guildMember: boolean) => Promise<unknown>;
+  },
+  batchSize: number = MEMBERS_META_BATCH,
+): Promise<string[]> {
+  for (const batch of chunk(staleIds, batchSize)) {
+    const records = batch.filter((id) => !isMember(id)).map(clearedMemberMeta);
+    if (records.length) await io.pushMembersMeta(records);
+  }
+  const cleared: string[] = [];
+  for (const id of staleIds) {
+    if (isMember(id)) continue;
+    await io.setMember(id, false);
+    cleared.push(id);
+  }
+  return cleared;
 }
 
 // ── Level-on-name (Discord nickname) ─────────────────────────────────────────
@@ -435,6 +638,8 @@ export interface DailyRewardWinner {
 
 export interface DailyRewardWinnersDay {
   day: string;
+  taskName: string;
+  nextTaskName: string;
   realm: string;
   prizePoolUsd: number;
   finalizedAt: string | null;
@@ -469,12 +674,13 @@ export function buildDailyRewardWinnersMessage(
     embeds: [
       {
         color: 0xf0b743,
-        author: { name: 'Daily Rewards' },
+        author: { name: `Task: ${day.taskName}` },
         title: `Top ${Math.min(day.payouts.length, 10)} Winners - ${day.day}`,
         description,
         fields: [
           { name: 'Realm', value: day.realm, inline: true },
           { name: 'Prize Pool', value: usd(day.prizePoolUsd), inline: true },
+          { name: 'Next task', value: day.nextTaskName, inline: false },
         ],
         footer: { text: 'World of ClaudeCraft' },
       },

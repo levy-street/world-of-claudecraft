@@ -145,6 +145,229 @@ describe('trade module (direct, no Sim)', () => {
     );
   });
 
+  // A dedicated fake ctx factory, not the shared makeTradeCtx bag store: this one
+  // models real per-slot inventory arrays with instanced payloads explicitly,
+  // mirroring how removePreferFungible/addItemInstance behave on the real Sim
+  // (src/sim/items.ts), so the trade payload-preservation fix and the capacity
+  // gate (src/sim/social/trade.ts transferOffer/fitsAfterSwap) are exercised end
+  // to end. countFungibleItem/removeItem/countItem honor `s.count` and only
+  // treat `!s.instance` slots as fungible, matching the real sim.ts contract.
+  function makeInstancedTradeCtx(inv1: any[], inv2: any[]) {
+    const players = new Map<number, any>();
+    const entities = new Map<number, any>();
+    const trades = new Map<number, any>();
+    const tradeInvites = new Map<number, { fromPid: number; expires: number }>();
+    const partyInvites = new Map<number, { fromPid: number; expires: number }>();
+    const duelInvites = new Map<number, { fromPid: number; expires: number }>();
+    const events: any[] = [];
+    players.set(1, {
+      entityId: 1,
+      name: 'Ayla',
+      copper: 0,
+      inventory: inv1,
+      bags: [null, null, null, null],
+    });
+    players.set(2, {
+      entityId: 2,
+      name: 'Borin',
+      copper: 0,
+      inventory: inv2,
+      bags: [null, null, null, null],
+    });
+    entities.set(1, { id: 1, pos: { x: 0, y: 0, z: 0 }, dead: false });
+    entities.set(2, { id: 2, pos: { x: 1, y: 0, z: 0 }, dead: false });
+    const ctx = {
+      time: 0,
+      players,
+      entities,
+      trades,
+      tradeInvites,
+      partyInvites,
+      duelInvites,
+      resolve: (pid?: number) => {
+        const meta = players.get(pid!);
+        const e = entities.get(pid!);
+        return meta && e ? { meta, e } : null;
+      },
+      error: (pid: number, text: string) => events.push({ type: 'error', pid, text }),
+      bumpDeedStat: () => {},
+      emit: (ev: any) => events.push(ev),
+      hasPendingSocialInvite: (tp: number) =>
+        partyInvites.has(tp) || tradeInvites.has(tp) || duelInvites.has(tp),
+      countItem: (itemId: string, pid?: number) =>
+        players
+          .get(pid!)
+          .inventory.filter((s: any) => s.itemId === itemId)
+          .reduce((sum: number, s: any) => sum + s.count, 0),
+      countFungibleItem: (itemId: string, pid?: number) =>
+        players
+          .get(pid!)
+          .inventory.filter((s: any) => s.itemId === itemId && !s.instance)
+          .reduce((sum: number, s: any) => sum + s.count, 0),
+      removeFungibleItem: (itemId: string, count: number, pid?: number) => {
+        const inv = players.get(pid!).inventory;
+        let remaining = count;
+        for (let i = inv.length - 1; i >= 0 && remaining > 0; i--) {
+          if (inv[i].itemId !== itemId || inv[i].instance) continue;
+          const take = Math.min(inv[i].count, remaining);
+          inv[i].count -= take;
+          remaining -= take;
+        }
+        for (let i = inv.length - 1; i >= 0; i--) {
+          if (inv[i].itemId === itemId && !inv[i].instance && inv[i].count <= 0) inv.splice(i, 1);
+        }
+      },
+      addItem: (itemId: string, count: number, pid?: number) => {
+        const inv = players.get(pid!).inventory;
+        inv.push({ itemId, count });
+      },
+      addItemInstance: (itemId: string, inst: any, pid?: number) => {
+        players.get(pid!).inventory.push({ itemId, count: 1, instance: inst });
+      },
+      removeItem: (itemId: string, count: number, pid?: number) => {
+        const inv = players.get(pid!).inventory;
+        const removed: any[] = [];
+        for (let i = inv.length - 1; i >= 0 && removed.length < count; i--) {
+          if (inv[i].itemId !== itemId || !inv[i].instance) continue;
+          removed.push(inv[i].instance);
+          inv.splice(i, 1);
+        }
+        return removed;
+      },
+    } as unknown as SimContext;
+    return { ctx, players, events };
+  }
+
+  it('preserves an instanced item payload (enchant/signature/rolled quality) across a swap', () => {
+    const instance = { signer: 'Ayla', rolled: { quality: 'epic' } };
+    // pid 1 holds exactly one instanced copy of 'wolf_fang' (no plain copies).
+    const { ctx, players } = makeInstancedTradeCtx(
+      [{ itemId: 'wolf_fang', count: 1, instance }],
+      [],
+    );
+
+    tradeMod.tradeRequest(ctx, 2, 1);
+    tradeMod.tradeAccept(ctx, 2);
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'wolf_fang', count: 1 }], 0, 1);
+    tradeMod.tradeConfirm(ctx, 1);
+    tradeMod.tradeConfirm(ctx, 2);
+
+    expect(players.get(1).inventory).toHaveLength(0);
+    expect(players.get(2).inventory).toHaveLength(1);
+    // The bug this pins: a naive removeItem+addItem swap re-grants a PLAIN copy
+    // and silently drops `instance`, destroying the enchant/signature/quality.
+    expect(players.get(2).inventory[0].instance).toEqual(instance);
+  });
+
+  it('rejects a trade that would push the receiver over bag capacity via an instanced grant', () => {
+    // Reproduces the capacity-gate hole the fitsAfterSwap fix closes: the
+    // receiver is already at full (16-slot) capacity, one of those slots is a
+    // partial plain wolf_fang stack. addStacked/countFit would let a receive
+    // "stack" onto that partial slot, but the real transfer grants an
+    // instanced copy via addItemInstance, which never merges and always takes
+    // a fresh slot, so the receiver would end up over capacity.
+    const instance = { signer: 'Borin' };
+    const receiverInv = [
+      { itemId: 'wolf_fang', count: 1 }, // partial plain stack (room to stack, but not a free slot)
+      ...Array.from({ length: 15 }, (_, i) => ({ itemId: `filler_${i}`, count: 1 })),
+    ];
+    const { ctx, players, events } = makeInstancedTradeCtx(
+      [{ itemId: 'wolf_fang', count: 1, instance }],
+      receiverInv,
+    );
+    expect(players.get(2).inventory).toHaveLength(16);
+
+    tradeMod.tradeRequest(ctx, 2, 1);
+    tradeMod.tradeAccept(ctx, 2);
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'wolf_fang', count: 1 }], 0, 1);
+    tradeMod.tradeConfirm(ctx, 1);
+    tradeMod.tradeConfirm(ctx, 2);
+
+    // Trade must be rejected, not silently overflow the receiver to 17 slots.
+    expect(players.get(2).inventory).toHaveLength(16);
+    expect(players.get(1).inventory).toHaveLength(1);
+    expect(events.some((e) => e.type === 'error' && /not enough bag space/.test(e.text))).toBe(
+      true,
+    );
+  });
+
+  it('splits a mixed offer between the giver’s plain and instanced copies in one transfer', () => {
+    // Covers the untested arm: an offer count partly satisfied by plain copies
+    // and partly by an instanced one, so transferOffer's plainCount and
+    // instance arms both fire in the same call.
+    const instance = { signer: 'Ayla' };
+    const { ctx, players } = makeInstancedTradeCtx(
+      [
+        { itemId: 'wolf_fang', count: 1 },
+        { itemId: 'wolf_fang', count: 1, instance },
+      ],
+      [],
+    );
+
+    tradeMod.tradeRequest(ctx, 2, 1);
+    tradeMod.tradeAccept(ctx, 2);
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'wolf_fang', count: 2 }], 0, 1);
+    tradeMod.tradeConfirm(ctx, 1);
+    tradeMod.tradeConfirm(ctx, 2);
+
+    expect(players.get(1).inventory).toHaveLength(0);
+    expect(players.get(2).inventory).toHaveLength(2);
+    const plain = players.get(2).inventory.find((s: any) => !s.instance);
+    const instanced = players.get(2).inventory.find((s: any) => s.instance);
+    expect(plain?.count).toBe(1);
+    expect(instanced?.instance).toEqual(instance);
+  });
+
+  it('keeps full payloads (signer/charges/rolled/enchant/boundTo) for instances in both directions', () => {
+    // The phase acceptance criterion end to end: side A's offer mixes a plain
+    // copy with a fully-loaded instanced copy while side B offers a different
+    // instanced item in the SAME trade, so tradeConfirm's second transferOffer
+    // call (offerB, b to a) moves an instance too, and every payload field
+    // (signer, charges, rolled incl. the Phase 2 masterwork marker, the enchant
+    // marker, boundTo) must land intact on the right receiver's granted item.
+    const instA = {
+      signer: 'Ayla',
+      charges: { lifesteal: 2 },
+      rolled: { stats: { atk: 3 }, masterwork: true },
+      enchant: 'flame_weapon',
+      boundTo: 1,
+    };
+    const instB = {
+      signer: 'Borin',
+      charges: { warmth: 5 },
+      rolled: { stats: { sta: 2 }, masterwork: true },
+      enchant: 'hearth_ward',
+      boundTo: 2,
+    };
+    const { ctx, players } = makeInstancedTradeCtx(
+      [
+        { itemId: 'wolf_fang', count: 1 },
+        { itemId: 'wolf_fang', count: 1, instance: instA },
+      ],
+      [{ itemId: 'baked_bread', count: 1, instance: instB }],
+    );
+
+    tradeMod.tradeRequest(ctx, 2, 1);
+    tradeMod.tradeAccept(ctx, 2);
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'wolf_fang', count: 2 }], 0, 1);
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'baked_bread', count: 1 }], 0, 2);
+    tradeMod.tradeConfirm(ctx, 1);
+    tradeMod.tradeConfirm(ctx, 2);
+
+    // b to a: the instanced bread lands on A with its whole payload.
+    expect(players.get(1).inventory).toHaveLength(1);
+    expect(players.get(1).inventory[0].itemId).toBe('baked_bread');
+    expect(players.get(1).inventory[0].instance).toEqual(instB);
+    // a to b: one plain fang plus the instanced fang carrying instA, not instB.
+    expect(players.get(2).inventory).toHaveLength(2);
+    const plain = players.get(2).inventory.find((s: any) => !s.instance);
+    const instanced = players.get(2).inventory.find((s: any) => s.instance);
+    expect(plain?.itemId).toBe('wolf_fang');
+    expect(plain?.count).toBe(1);
+    expect(instanced?.itemId).toBe('wolf_fang');
+    expect(instanced?.instance).toEqual(instA);
+  });
+
   it('updateTradesAndInvites expires stale invites and cancels drifted trades', () => {
     const h = makeTradeCtx();
     h.addPlayer(1, 'Ayla', 0, 0);

@@ -38,7 +38,9 @@ describe('armor proficiencies', () => {
 
   it('allows warrior-style weapons for warriors, rogues, hunters, shamans, and paladins', () => {
     expect(equip('warrior', 'kingsbane_last_oath').equipment.mainhand).toBe('kingsbane_last_oath');
-    expect(equip('rogue', 'kingsbane_last_oath').equipment.mainhand).toBe('kingsbane_last_oath');
+    const rogue = equip('rogue', 'kingsbane_last_oath').equipment;
+    expect(rogue.mainhand).toBe('rusty_dagger');
+    expect(rogue.offhand).toBe('kingsbane_last_oath');
     expect(equip('hunter', 'kingsbane_last_oath').equipment.mainhand).toBe('kingsbane_last_oath');
     expect(equip('shaman', 'kingsbane_last_oath').equipment.mainhand).toBe('kingsbane_last_oath');
     expect(equip('paladin', 'kingsbane_last_oath').equipment.mainhand).toBe('kingsbane_last_oath');

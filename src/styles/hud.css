@@ -29,6 +29,8 @@
     text-shadow: 1px 1px 2px #000;
     white-space: nowrap;
     will-change: transform;
+    --nameplate-width: 80px;
+    --nameplate-text-shadow: 1px 1px 3px #000, -1px -1px 3px #000;
   }
   .nameplate.has-emote {
     z-index: 30;
@@ -37,17 +39,35 @@
     font-size: 12px;
     font-weight: bold;
     font-family: var(--title-font);
+    color: #fff;
+    text-shadow: var(--nameplate-text-shadow);
     letter-spacing: 0.3px;
     display: inline-block;
+    transition: font-size 0.1s linear;
     vertical-align: middle;
   }
+
+  .np-level {
+    font-size: 19px;
+    font-weight: bold;
+    font-family: var(--title-font);
+    text-shadow: var(--nameplate-text-shadow);
+    letter-spacing: 0.2px;
+    display: inline-block;
+    vertical-align: middle;
+    text-align: right;
+    line-height: 12px;
+    margin-right: 6px;
+  }
   .np-guild {
-    font-size: 10px;
+    text-shadow: var(--nameplate-text-shadow);
+    font-size: 11px;
     font-weight: 700;
     color: #c9dcfb;
     font-family: var(--title-font);
     letter-spacing: 0.2px;
     margin-top: -1px;
+    transition: font-size 0.1s linear;
   }
   /* Book of Deeds title: a subtitle line under a player's name */
   .np-title {
@@ -117,10 +137,11 @@
       0 1px 1px #000;
   }
   .np-hpbar {
-    width: 78px;
-    height: 6px;
+    box-sizing: content-box;
+    width: var(--nameplate-width, 80px);
+    height: 4px;
     background: #2a0000;
-    border: 1px solid #000;
+    border: 1px solid #0000;
     margin: 1px auto 0;
     border-radius: 2px;
   }
@@ -131,7 +152,7 @@
   }
   .np-castbar {
     position: relative;
-    width: 78px;
+    width: var(--nameplate-width, 80px);
     height: 8px;
     background: #1a1205;
     border: 1px solid #000;
@@ -160,25 +181,74 @@
   }
   /* threat plate: this mob is aggroed on me, red bar + soft glow */
   .nameplate.np-threat .np-hpbar {
-    border-color: #ff5a4a;
-    box-shadow: 0 0 6px #ff3b2e99;
+    box-shadow: 0 0 4px 4px #c0392b;
   }
+
   .nameplate.np-threat .np-hpfill {
     background: linear-gradient(#ff6b5e, #a01818);
   }
+
+  .nameplate.np-current-target .np-hpbar {
+    outline: solid 2px #fff8;
+  }
+
+  .nameplate.np-current-target .np-name {
+    font-size: 14px;
+    text-shadow: var(--nameplate-text-shadow);
+  }
+
+  .nameplate.np-current-target .np-guild {
+    font-size: 13px;
+  }
+
+  /* Hostile mobs: red name and red HP bar */
+  .nameplate.np-hostile .np-name {
+    color: #ff5555;
+  }
+
+  .nameplate.np-dead-enemy .np-name {
+    color: #bbb;
+  }
+
+  .nameplate.np-hostile .np-hpbar {
+    border-color: #2e0000;
+  }
+
+  .nameplate.np-hostile .np-hpfill {
+    background: linear-gradient(#ff5555, #cc0000);
+  }
+
+  /* Friendly pet: green name and green HP bar */
+  .nameplate.np-friendly-pet .np-hpbar {
+    border-color: #153701;
+  }
+
+  .nameplate.np-friendly-pet .np-hpfill {
+    background: linear-gradient(#9fdc7f, #5fa040);
+  }
+
+  /* Your pet: blue name and blue HP bar */
+  .nameplate.np-my-pet .np-hpbar {
+    border-color: #042243;
+  }
+
+  .nameplate.np-my-pet .np-hpfill {
+    background: linear-gradient(#7fb8ff, #4080ff);
+  }
+
   /* classic "dragon frame" cue: elite mobs get a golden bar frame, bosses a red one */
-  .np-hpbar.elite {
+  .nameplate .np-hpbar.elite {
     border-color: #f2c84b;
     box-shadow:
       0 0 5px 1px #f2c84baa,
       inset 0 0 2px #ffe9a0cc;
   }
-  .np-hpbar.boss {
-    border-color: #ff5a3c;
-    box-shadow:
-      0 0 7px 1px #ff5a3ccc,
-      inset 0 0 2px #ffd2a0dd;
+
+  .nameplate .np-hpbar.boss {
+    width: calc(1.25 * var(--nameplate-width, 80px));
+    border-width: 2px;
   }
+
   .np-marker {
     font-size: 24px;
     font-weight: bold;
@@ -535,6 +605,34 @@
     gap: 4px;
     max-width: 100%;
     pointer-events: auto;
+  }
+  /* Target of Target (showTargetOfTarget option): a smaller twin of the target
+     frame, a #target-frame child anchored under the frame's RIGHT edge so it clears
+     the debuff strip that hangs below-left. Shrunk with zoom (compounding the
+     target frame's children-zoom, so it stays proportional), and shown by its own
+     unit_frame painter only when the target-of-target is known. Portrait + name +
+     hp bar only: no resource rail, cast bar, elite tag, or level chip. */
+  #totarget-frame {
+    position: absolute;
+    right: -6px;
+    top: calc(100% + 6px);
+    z-index: 7;
+    zoom: 0.74;
+    display: none;
+  }
+  #totarget-frame .uf-bars {
+    order: 1;
+    width: 132px;
+    margin-left: 0;
+    margin-right: -16px;
+    border-radius: 6px 11px 11px 6px;
+    padding: 4px 22px 4px 8px;
+  }
+  #totarget-frame .portrait-wrap {
+    order: 2;
+  }
+  #totarget-frame .level-chip {
+    display: none;
   }
   /* Movable unit frames: the small corner toggle (built by MovableFrame in
      movable_frame.ts) that unlocks
@@ -983,22 +1081,30 @@
   body.auras-on-frame #debuff-bar {
     top: 14px;
   }
-  /* Party member mini aura strip: each row's own buffs/debuffs (the compact
-     wire summaries) as small icons under the bars. The .buff nodes reuse the
-     aura pool's styling; sized down here, with the (always empty) duration and
-     stacks labels hidden so the icons stay square. */
+  /* Party member mini aura strip: overlay the compact icons so gaining or losing
+     an aura never changes frame height or shifts the surrounding raid grid. */
   .party-frame .pfm-auras {
+    position: absolute;
+    right: 2px;
+    bottom: 2px;
+    z-index: 5;
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    max-width: calc(100% - 4px);
+    overflow: hidden;
     gap: 2px;
-    margin-top: 2px;
+    margin: 0;
     pointer-events: auto;
   }
   .pfm-auras .buff {
     width: 16px;
     height: 16px;
   }
-  .pfm-auras .buff .dur,
+  .pfm-auras .buff .dur {
+    display: block;
+    font-size: 8px;
+    line-height: 1;
+  }
   .pfm-auras .buff .stacks {
     display: none;
   }
@@ -1386,6 +1492,56 @@
     font-weight: bold;
     pointer-events: none;
   }
+  /* Warrior stance bar: a small in-flow row of stance toggles above the action
+     bars, only for warriors (JS flips display to flex; hidden by default). */
+  #stancebar {
+    display: none;
+    margin: 2px 0 0 0;
+    padding: 0;
+  }
+  .stancebar-group {
+    display: flex;
+    gap: 4px;
+  }
+  .stance-btn {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    position: relative;
+    border: 2px solid #4a3d1d;
+    border-radius: 6px;
+    background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f);
+    color: #f3df9a;
+    cursor: var(--cursor-point);
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+    user-select: none;
+    box-shadow:
+      inset 0 1px 0 #ffffff18,
+      0 2px 4px #0009;
+  }
+  .stance-btn .icon-label {
+    position: absolute;
+    inset: 1px;
+    border-radius: 4px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    pointer-events: none;
+  }
+  .stance-btn:hover {
+    border-color: var(--gold);
+  }
+  .stance-btn:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 1px;
+  }
+  .stance-btn.active {
+    border-color: var(--gold);
+    box-shadow:
+      inset 0 0 0 1px #ffd10066,
+      0 0 6px #ffd10033;
+  }
   #actionbar,
   #actionbar2 {
     display: flex;
@@ -1498,6 +1654,57 @@
     box-shadow:
       0 0 9px #ffd100cc,
       inset 0 1px 0 #ffffff18;
+  }
+  /* Free-cost proc glow (Battle Trance): the classic pulsing gold rim on the
+     covered abilities. Actionable info: never gated by a graphics tier; the
+     pulse (motion only) stops under reduced motion, the steady glow stays. */
+  .action-btn.proc {
+    border-color: #ffd97a;
+    box-shadow:
+      0 0 12px #ffcf40e6,
+      inset 0 0 6px #ffcf4066;
+    animation: abtn-proc-pulse 1.1s ease-in-out infinite alternate;
+  }
+  @keyframes abtn-proc-pulse {
+    from {
+      box-shadow:
+        0 0 7px #ffcf40b0,
+        inset 0 0 4px #ffcf4044;
+    }
+    to {
+      box-shadow:
+        0 0 15px #ffcf40f0,
+        inset 0 0 7px #ffcf4088;
+    }
+  }
+  .action-btn.empowered {
+    border-color: var(--gold);
+    box-shadow:
+      0 0 12px #ffd100dd,
+      inset 0 0 0 1px #fff0a6aa,
+      inset 0 1px 0 #ffffff28;
+    animation: action-empowered-pulse 1.15s ease-in-out infinite;
+  }
+  @keyframes action-empowered-pulse {
+    0%,
+    100% {
+      box-shadow:
+        0 0 9px #ffd100bb,
+        inset 0 0 0 1px #fff0a688,
+        inset 0 1px 0 #ffffff28;
+    }
+    50% {
+      box-shadow:
+        0 0 18px #ffd100,
+        inset 0 0 0 1px #fff6c8cc,
+        inset 0 1px 0 #ffffff34;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .action-btn.proc,
+    .action-btn.empowered {
+      animation: none;
+    }
   }
   .action-btn:not(.empty)[draggable="true"] {
     cursor: grab;
@@ -1628,6 +1835,20 @@
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.7);
     transform: translate(-50%, -50%) rotate(-45deg);
     pointer-events: none;
+  }
+  /* Short-viewport rescue: #side-buttons is bottom-anchored and grows upward,
+     so on a maximized 1366x768 laptop (about 660px usable height) the topmost
+     button (the Daily Rewards chest) is pushed off the top of the screen and
+     becomes unclickable. Compact the rail (shorter buttons, tighter gap) so
+     every launcher, including the chest, stays on screen. Pinned by the
+     rail-height budget test in tests/crafting_launcher.test.ts. */
+  @media (max-height: 720px) {
+    #side-buttons {
+      gap: 2px;
+    }
+    #side-buttons .micro-btn {
+      height: 24px;
+    }
   }
 
   /* ---------- chat frame ---------- */
@@ -2820,9 +3041,6 @@
     display: none !important;
   }
   body.desktop-app #token-ca,
-  body.desktop-app .cs-wallet,
-  body.desktop-app .cs-wallet-hidden-note,
-  body.desktop-app .account-wallet-card,
   body.desktop-app .official-site-copy {
     display: none !important;
   }
@@ -3063,6 +3281,9 @@
   .fct-damage-taken {
     color: #ff5544;
   }
+  .fct-absorb {
+    color: #9fd7ff;
+  }
   .fct-heal {
     color: #3ce63c;
   }
@@ -3181,7 +3402,14 @@
   }
   /* Reduce Motion, drop HUD animations/transitions (mirrors prefers-reduced-motion). */
   body.reduce-motion .fct {
-    animation-duration: 0.01ms !important;
+    /* NOT the 0.01ms shed below: fct-rise/fct-crit fill forwards and END at opacity 0,
+       so finishing the rise instantly freezes every damage number on its invisible end
+       keyframe for its whole pooled lifetime. Combat numbers are actionable feedback
+       no comfort/tier knob may hide (the same rule that keeps them on the low tier):
+       drop the MOTION outright and hold the number visible; the painter's TTL recycle
+       still removes the node on schedule. */
+    animation: none !important;
+    opacity: 1;
   }
   body.reduce-motion *,
   body.reduce-motion *::before,
@@ -3190,6 +3418,18 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+  /* Keep the phoenix proc overlay's gentle OPACITY fade even under reduce-motion:
+     an opacity fade is vestibular-safe (no transform / scale / parallax), and a
+     hard on/off snap reads as a glitch (owner report). This MUST live inside this
+     layer to beat the blanket above: for !important, a LAYERED rule wins over an
+     unlayered one, so an unlayered exemption in the phoenix section could never
+     win. Higher specificity here restores the 0.5s opacity transition. The
+     wing-beat ANIMATION still stops (animation-duration stays snapped; that is
+     real motion). */
+  body.reduce-motion #proc-overlay,
+  body.reduce-motion #proc-overlay * {
+    transition-duration: 0.7s !important;
   }
   /* Frosted Panels, opt-in backdrop blur behind HUD panels & windows. */
   body.frosted-panels .panel,
@@ -4114,7 +4354,7 @@
     top: 12px;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: var(--party-frame-spacing, 4px);
     z-index: 5;
   }
   /* The painter nests the member rows one level down in a .party-rows wrapper (so the
@@ -4124,19 +4364,107 @@
      .party-frame rule apply unchanged. Mobile re-declares the wrapper as its own
      2-column grid (hud.mobile.css). */
   #party-frames .party-rows {
-    display: contents;
+    display: grid;
+    grid-template-columns: repeat(var(--party-frame-columns, 1), var(--party-frame-width, 170px));
+    gap: var(--party-frame-spacing, 4px);
+    zoom: var(--party-frame-scale, 1);
   }
   #party-frames.below-target {
     top: 96px;
   }
   .party-frame {
     --cls: #7fb8ff;
-    width: 170px;
+    position: relative;
+    width: var(--party-frame-width, 170px);
+    min-height: var(--party-frame-height, 42px);
+    box-sizing: border-box;
     padding: 4px 8px 5px;
     cursor: var(--cursor-point);
     transition:
       opacity 0.2s ease,
       box-shadow 0.2s ease;
+  }
+  /* Compact WoW-style raid presentation. The existing pooled row and painter remain
+     unchanged: this profile only rearranges their stable DOM, so mouseover casts,
+     absorbs, incoming healing, threat, Rewind, and auras share one implementation. */
+  #party-frames.party-style-raid .party-frame {
+    height: var(--party-frame-height, 42px);
+    min-height: var(--party-frame-height, 42px);
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid #050505;
+    border-radius: 2px;
+    background: #101010;
+    box-shadow: inset 0 0 0 1px #ffffff14;
+  }
+  #party-frames.party-style-raid .party-frame .pfm-name {
+    position: absolute;
+    inset: 2px 4px 5px;
+    z-index: 4;
+    min-width: 0;
+    pointer-events: none;
+  }
+  #party-frames.party-style-raid .party-frame .pfm-name-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+  }
+  /* Compact raid cells read HP from the bar fill (WoW-style), so the centered
+     percent text is dropped here: in a narrow cell (e.g. landscape phone) it
+     collided with the member name. The bar still conveys HP, so no actionable
+     information is lost. */
+  #party-frames.party-style-raid .party-frame .pfm-hp-text {
+    display: none;
+  }
+  #party-frames.party-style-raid .party-frame .pfm-id {
+    min-width: 0;
+    color: #fff;
+  }
+  #party-frames.party-style-raid .party-frame .pfm-crest {
+    display: none;
+  }
+  #party-frames.party-style-raid .party-frame .bar.hp {
+    position: absolute;
+    inset: 0 0 3px;
+    height: auto;
+    margin: 0;
+    border: 0;
+    border-radius: 1px 1px 0 0;
+    background: #171717;
+  }
+  #party-frames.party-style-raid .party-frame .bar.hp .bar-fill {
+    background-color: var(--cls);
+    filter: saturate(0.82) brightness(0.82);
+  }
+  #party-frames.party-style-raid .party-frame > .bar:not(.hp) {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 4;
+    width: auto;
+    height: 3px;
+    margin: 0;
+    border: 0;
+    border-radius: 0 0 1px 1px;
+  }
+  #party-frames.party-style-raid .party-frame.pf-hide-resource .bar.hp {
+    bottom: 0;
+    border-radius: 1px;
+  }
+  #party-frames.party-style-raid .party-frame .pfm-auras {
+    left: auto;
+    right: 2px;
+    top: auto;
+    bottom: 4px;
+    translate: none;
+  }
+  #party-frames.party-style-raid .party-frame .pfm-auras .buff {
+    flex: 0 0 12px;
+    width: 12px;
+    height: 12px;
+    box-shadow: 0 1px 2px #000;
   }
   .party-loot {
     width: 170px;
@@ -4251,9 +4579,105 @@
     height: 9px;
     margin-top: 2px;
   }
+  .party-frame .bar.hp {
+    position: relative;
+  }
+  .party-frame .pfm-hp-text {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-light);
+    font-family: var(--ui-font);
+    font-size: 9px;
+    line-height: 1;
+    text-shadow: 1px 1px 1px #000;
+    pointer-events: none;
+  }
+  .party-frame .pfm-rewind {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--rewind-start, 0%);
+    width: 0;
+    z-index: 1;
+    background: repeating-linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-debuff-arcane) 55%, transparent) 0 4px,
+      color-mix(in srgb, var(--color-debuff-arcane) 20%, transparent) 4px 8px
+    );
+    pointer-events: none;
+  }
+  .party-frame .pfm-incoming {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--incoming-start, 0%);
+    width: 0;
+    z-index: 1;
+    background: color-mix(in srgb, var(--color-friendly) 55%, transparent);
+    pointer-events: none;
+  }
+  .party-frame.pf-hide-resource > .bar:not(.hp),
+  .party-frame.pf-hide-auras .pfm-auras {
+    display: none;
+  }
+  #party-frames > .party-loot {
+    zoom: var(--party-frame-scale, 1);
+  }
+  #party-frames > .tf-move-btn {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid var(--gold-dim);
+    border-radius: 50%;
+    display: none;
+    background: var(--panel-bg);
+    color: var(--color-text-muted);
+    cursor: var(--cursor-point);
+    z-index: 8;
+  }
+  #party-frames.party-present > .tf-move-btn {
+    display: block;
+  }
+  #party-frames > .tf-move-btn::before {
+    content: "\2194";
+  }
+  #party-frames > .tf-move-btn.active {
+    color: var(--gold);
+    border-color: var(--gold);
+  }
+  #party-frames.tf-unlocked {
+    cursor: move;
+    outline: 1px dashed var(--gold);
+    outline-offset: 4px;
+    touch-action: none;
+  }
+  body.party-frame-dragging,
+  body.party-frame-dragging * {
+    user-select: none;
+  }
+  body.mobile-touch #party-frames > .tf-move-btn {
+    display: none;
+  }
   /* Glow: decorative combat outer glow scales with --fx-shadow (0 at low). */
   .party-frame.combat {
     box-shadow: 0 0 calc(7px * var(--fx-shadow, 1)) #e74c3c99;
+  }
+  .party-frame.threat {
+    border-color: var(--color-hostile);
+    box-shadow:
+      inset 0 0 0 1px var(--color-hostile),
+      0 0 calc(9px * var(--fx-shadow, 1)) var(--color-hostile);
+  }
+  .party-frame.disconnected {
+    filter: grayscale(1);
+    opacity: 0.5;
   }
   .party-frame.dead {
     opacity: 0.7;
@@ -4287,12 +4711,6 @@
       opacity: 0.4;
     }
   }
-  #party-leave {
-    font-size: 10px;
-    padding: 2px 8px;
-    margin: 0;
-  }
-
   /* ---------- context menu ---------- */
   #ctx-menu {
     position: absolute;
@@ -4583,6 +5001,54 @@
   #target-frame.elite #tf-elite-tag {
     display: block;
   }
+  /* Boss rank replaces both the creature portrait and the platform-dependent
+     Unicode glyph with one generic dragon emblem. The real numeric level stays
+     in the lower center chip, matching the classic fantasy target-frame read. */
+  #target-frame.boss .portrait-wrap::before {
+    content: "";
+    position: absolute;
+    inset: -15px;
+    z-index: 2;
+    background: url("/ui/ranks/elite-dragon-frame.webp") center / contain no-repeat;
+    pointer-events: none;
+  }
+  #target-frame.boss .tf-move-btn {
+    top: -18px;
+    right: -30px;
+  }
+  #target-frame.boss .portrait {
+    border-color: transparent;
+    outline: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  #target-frame.boss .level-chip {
+    left: 50%;
+    right: auto;
+    bottom: -7px;
+    width: 24px;
+    height: 24px;
+    border-color: var(--gold-dim);
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, #4a3a14, #241c08);
+    box-shadow:
+      0 0 0 1px var(--color-bg-deep),
+      0 0 7px color-mix(in srgb, var(--gold) 45%, transparent);
+    transform: translateX(-50%);
+    text-shadow: 1px 1px 1px #000;
+    z-index: 4;
+  }
+  #target-frame.boss #tf-elite-tag {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
 
   #tf-debuffs {
     display: flex;
@@ -4666,4 +5132,674 @@
     pointer-events: none;
     filter: drop-shadow(0 2px 14px #000a);
   }
+}
+
+/* ------------------------------------------------------------------------ */
+/* Spell-activation proc overlay: the Rising Phoenix (owner design, replacing
+   the twin proc arcs). Heating Up lights the LEFT half; Hot Streak completes
+   the RIGHT, whitens the core and beats both wings once; the proc fading or
+   being spent puts the fire out. Drag it (proc_overlay_drag) to park it. */
+#proc-overlay {
+  position: fixed;
+  left: 50%;
+  top: 42%;
+  translate: -50% -50%;
+  width: 300px;
+  height: 232px;
+  z-index: 30;
+  opacity: 0;
+  pointer-events: none;
+  /* OFF transition = the gentle fade-out (owner: a bit slower, no hard snap);
+     the lit rules below override it with a quick ON transition so the bird still
+     lights crisply. Shared by the fire and the Chronomancy variants. */
+  transition: opacity 0.7s ease;
+}
+/* The login preview: for a few seconds after entering the world the whole
+   bird glows dimly, so the player can see where it lives and drag it BEFORE
+   any proc lights it for real. Placed before the proc rules so a real proc
+   arriving mid-preview wins the cascade. */
+#proc-overlay.preview {
+  opacity: 1;
+  pointer-events: auto;
+  cursor: grab;
+}
+#proc-overlay.preview .fire-embers {
+  opacity: 0.38;
+}
+#proc-overlay.heating,
+#proc-overlay.hot,
+#proc-overlay.combustion {
+  /* Lit but a touch translucent (owner: softer over the scene), shared with the
+     Chronomancy .c1 rule; fire is TWO procs (Heating Up, then Hot Streak). */
+  opacity: 0.85;
+  /* Grabbable only while it burns; hidden it can never eat a click. */
+  pointer-events: auto;
+  cursor: grab;
+  /* Quick to light (the ON transition); the slow OFF fade lives on the base. */
+  transition: opacity 0.2s ease;
+}
+#proc-overlay.dragging {
+  cursor: grabbing;
+}
+#proc-overlay .fire-bird {
+  position: absolute;
+  inset: 0;
+  user-select: none;
+}
+#proc-overlay .fire-bird::before,
+#proc-overlay .fire-bird::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 47%;
+  z-index: 2;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+}
+#proc-overlay .fire-bird::before {
+  width: 76px;
+  border: 2px solid rgba(255, 190, 64, 0.92);
+  background: repeating-conic-gradient(
+    from 0deg,
+    rgba(255, 238, 150, 0.92) 0deg 5deg,
+    transparent 5deg 22deg
+  );
+  mask: radial-gradient(circle, transparent 0 69%, #000 71% 100%);
+  filter: drop-shadow(0 0 6px rgba(255, 95, 24, 0.9));
+}
+#proc-overlay .fire-bird::after {
+  width: 100px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.98) 0,
+    rgba(255, 225, 112, 0.78) 15%,
+    rgba(255, 83, 24, 0.3) 43%,
+    transparent 70%
+  );
+  mix-blend-mode: screen;
+}
+#proc-overlay .fire-part {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  transition: opacity 0.7s ease;
+}
+#proc-overlay .fire-embers {
+  filter: saturate(0.72) brightness(0.42) contrast(1.14)
+    drop-shadow(0 0 8px rgba(180, 40, 16, 0.48));
+}
+#proc-overlay .fire-left {
+  clip-path: polygon(0 0, 50.5% 0, 50.5% 100%, 0 100%);
+}
+#proc-overlay .fire-right {
+  clip-path: polygon(49.5% 0, 100% 0, 100% 100%, 49.5% 100%);
+}
+#proc-overlay .fire-core {
+  clip-path: polygon(43% 0, 57% 0, 60% 100%, 40% 100%);
+}
+/* Heating Up shows the complete creature as a low ember silhouette. */
+#proc-overlay.heating .fire-embers {
+  opacity: 0.48;
+  transition: opacity 0.2s ease;
+}
+/* Combustion keeps a restrained flame silhouette alive between streaks. It must
+   not look identical to Hot Streak: full colour always means the free cast is
+   actually ready, while the dim state only communicates the cooldown window. */
+#proc-overlay.combustion .fire-embers {
+  opacity: 0.58;
+  filter: saturate(0.9) brightness(0.62) contrast(1.12)
+    drop-shadow(0 0 10px rgba(220, 58, 18, 0.58));
+}
+#proc-overlay.combustion .fire-left,
+#proc-overlay.combustion .fire-right {
+  opacity: 0.3;
+  transition: opacity 0.2s ease;
+}
+#proc-overlay.combustion .fire-core {
+  opacity: 0.4;
+  transition: opacity 0.2s ease;
+}
+/* Hot Streak alone ignites the complete creature. During Combustion it overrides
+   the restrained baseline, then falls back to that baseline when spent. */
+#proc-overlay.hot .fire-left,
+#proc-overlay.hot .fire-right,
+#proc-overlay.hot .fire-core {
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+#proc-overlay.hot .fire-embers {
+  opacity: 0.2;
+}
+#proc-overlay.hot:not(.combustion) .fire-left,
+#proc-overlay.combustion.combustion-enter .fire-left {
+  transform-origin: 52% 54%;
+  animation: fire-left-wing-beat 0.72s ease-out 1;
+}
+#proc-overlay.hot:not(.combustion) .fire-right,
+#proc-overlay.combustion.combustion-enter .fire-right {
+  transform-origin: 48% 54%;
+  animation: fire-right-wing-beat 0.72s ease-out 1;
+}
+#proc-overlay.hot:not(.combustion) .fire-bird::before,
+#proc-overlay.combustion.combustion-enter .fire-bird::before {
+  animation: fire-ring-burst 0.78s ease-out 1;
+}
+#proc-overlay.hot .fire-bird::after,
+#proc-overlay.combustion.combustion-enter .fire-bird::after {
+  animation: fire-core-flash 0.62s ease-out 1;
+}
+@keyframes fire-left-wing-beat {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  38% {
+    transform: rotate(-7deg) translateY(-2px);
+  }
+}
+@keyframes fire-right-wing-beat {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  38% {
+    transform: rotate(7deg) translateY(-2px);
+  }
+}
+@keyframes fire-ring-burst {
+  0% {
+    opacity: 0;
+    scale: 0.4;
+    rotate: -18deg;
+  }
+  24% {
+    opacity: 0.92;
+  }
+  100% {
+    opacity: 0;
+    scale: 1.58;
+    rotate: 16deg;
+  }
+}
+@keyframes fire-core-flash {
+  0% {
+    opacity: 0;
+    scale: 0.28;
+  }
+  22% {
+    opacity: 1;
+    scale: 0.72;
+  }
+  100% {
+    opacity: 0;
+    scale: 1.25;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #proc-overlay .fire-part,
+  #proc-overlay .fire-bird::before,
+  #proc-overlay .fire-bird::after {
+    animation: none !important;
+  }
+}
+body.reduce-motion #proc-overlay .fire-part,
+body.reduce-motion #proc-overlay .fire-bird::before,
+body.reduce-motion #proc-overlay .fire-bird::after {
+  animation: none !important;
+}
+
+/* ---- Chronomancy (arcane spec) variant of the phoenix ------------------- */
+/* One painted transparent phoenix is layered four times and clipped into readable
+   charge stages: left wing/tail, right wing/tail, body, then the full temporal
+   flare. Reusing one asset keeps the silhouette perfectly aligned at every stage. */
+#proc-overlay .chrono-bird {
+  display: none;
+  position: absolute;
+  inset: 0;
+  user-select: none;
+}
+#proc-overlay.chrono .fire-bird {
+  display: none;
+}
+#proc-overlay.chrono .chrono-bird {
+  display: block;
+}
+#proc-overlay.chrono .chrono-bird::before,
+#proc-overlay.chrono .chrono-bird::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+}
+/* A compact clock face blooms from the phoenix's chest at 4/4. The segmented
+   conic edge reads as temporal runes without putting a large disc over combat. */
+#proc-overlay.chrono .chrono-bird::before {
+  left: 50%;
+  top: 47%;
+  width: 72px;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border: 2px solid rgba(216, 180, 254, 0.92);
+  border-radius: 50%;
+  background: repeating-conic-gradient(
+    from -3deg,
+    rgba(103, 232, 249, 0.9) 0deg 3deg,
+    transparent 3deg 18deg
+  );
+  mask: radial-gradient(circle, transparent 0 68%, #000 70% 100%);
+  filter: drop-shadow(0 0 5px rgba(168, 85, 247, 0.9));
+}
+/* The white core flash stays local to the chest instead of washing the screen. */
+#proc-overlay.chrono .chrono-bird::after {
+  left: 50%;
+  top: 47%;
+  width: 96px;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.98) 0,
+    rgba(216, 180, 254, 0.72) 16%,
+    rgba(103, 232, 249, 0.24) 42%,
+    transparent 70%
+  );
+  mix-blend-mode: screen;
+}
+#proc-overlay.chrono .chrono-part {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  transition: opacity 0.7s ease;
+}
+/* Keep each wing's long tail feather with it while reserving the chest and head
+   for charge three. The slight overlap avoids a visible seam during the fade. */
+#proc-overlay.chrono .chrono-left {
+  clip-path: polygon(0 0, 47% 0, 47% 32%, 43% 62%, 49% 100%, 0 100%);
+}
+#proc-overlay.chrono .chrono-right {
+  clip-path: polygon(53% 0, 100% 0, 100% 100%, 51% 100%, 57% 62%, 53% 32%);
+}
+#proc-overlay.chrono .chrono-core {
+  clip-path: polygon(43% 0, 57% 0, 59% 100%, 41% 100%);
+}
+#proc-overlay.chrono .chrono-final {
+  mix-blend-mode: screen;
+  filter: saturate(1.18) brightness(1.2) drop-shadow(0 0 10px rgba(139, 92, 246, 0.8))
+    drop-shadow(0 0 24px rgba(103, 232, 249, 0.62));
+}
+/* Visible and grabbable once any charge is held (a touch translucent, matching
+   the fire bird's .heating/.hot opacity). */
+#proc-overlay.chrono.c1 {
+  opacity: 0.85;
+  pointer-events: auto;
+  cursor: grab;
+}
+/* Reveal order: left wing, right wing, central bird, final temporal flare. */
+#proc-overlay.chrono.c1 .chrono-left,
+#proc-overlay.chrono.c2 .chrono-right,
+#proc-overlay.chrono.c3 .chrono-core {
+  opacity: 1;
+  transition: opacity 0.22s ease;
+}
+#proc-overlay.chrono.c4 .chrono-final {
+  opacity: 0.28;
+  transition: opacity 0.16s ease;
+}
+#proc-overlay.chrono.c4 .chrono-left {
+  transform-origin: 52% 54%;
+  animation: chrono-left-wing-beat 0.72s ease-out 1;
+}
+#proc-overlay.chrono.c4 .chrono-right {
+  transform-origin: 48% 54%;
+  animation: chrono-right-wing-beat 0.72s ease-out 1;
+}
+#proc-overlay.chrono.c4 .chrono-bird::before {
+  animation: chrono-clock-burst 0.82s ease-out 1;
+}
+#proc-overlay.chrono.c4 .chrono-bird::after {
+  animation: chrono-core-flash 0.68s ease-out 1;
+}
+@keyframes chrono-left-wing-beat {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  38% {
+    transform: rotate(-7deg) translateY(-2px);
+  }
+}
+@keyframes chrono-right-wing-beat {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  38% {
+    transform: rotate(7deg) translateY(-2px);
+  }
+}
+@keyframes chrono-clock-burst {
+  0% {
+    opacity: 0;
+    scale: 0.45;
+    rotate: -25deg;
+  }
+  25% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0;
+    scale: 1.55;
+    rotate: 18deg;
+  }
+}
+@keyframes chrono-core-flash {
+  0% {
+    opacity: 0;
+    scale: 0.25;
+  }
+  22% {
+    opacity: 1;
+    scale: 0.72;
+  }
+  100% {
+    opacity: 0;
+    scale: 1.3;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #proc-overlay.chrono .chrono-final,
+  #proc-overlay.chrono .chrono-left,
+  #proc-overlay.chrono .chrono-right,
+  #proc-overlay.chrono .chrono-bird::before,
+  #proc-overlay.chrono .chrono-bird::after {
+    animation: none !important;
+  }
+}
+body.reduce-motion #proc-overlay.chrono .chrono-final,
+body.reduce-motion #proc-overlay.chrono .chrono-left,
+body.reduce-motion #proc-overlay.chrono .chrono-right,
+body.reduce-motion #proc-overlay.chrono .chrono-bird::before,
+body.reduce-motion #proc-overlay.chrono .chrono-bird::after {
+  animation: none !important;
+}
+
+/* ---- Frost spec variant: the Glacial Spike Icicle bank ------------------ */
+/* The complete frozen phoenix is visible from the first Icicle. Additional
+   Icicles glaze the same silhouette with brighter layers, and the fifth locks
+   it with a sharp crystal crown. */
+#proc-overlay .frost-bird {
+  display: none;
+  position: absolute;
+  inset: 0;
+  user-select: none;
+}
+#proc-overlay.frost {
+  transition: opacity 0.18s ease;
+}
+#proc-overlay.frost .fire-bird,
+#proc-overlay.frost .chrono-bird {
+  display: none;
+}
+#proc-overlay.frost .frost-bird {
+  display: block;
+}
+#proc-overlay.frost .frost-crystal {
+  --frost-crystal-angle: 0deg;
+  position: absolute;
+  z-index: 3;
+  width: 25px;
+  height: 50px;
+  translate: -50% -50%;
+  rotate: var(--frost-crystal-angle);
+  scale: 0.42;
+  opacity: 0;
+  pointer-events: none;
+  clip-path: polygon(50% 0, 100% 48%, 70% 100%, 30% 100%, 0 48%);
+  background: linear-gradient(
+    112deg,
+    rgba(240, 249, 255, 0.98) 0 18%,
+    rgba(125, 211, 252, 0.94) 38%,
+    rgba(14, 165, 233, 0.82) 72%,
+    rgba(30, 64, 175, 0.74) 100%
+  );
+  filter: drop-shadow(0 0 4px rgba(224, 247, 255, 0.98))
+    drop-shadow(0 0 11px rgba(14, 165, 233, 0.9));
+  transition:
+    opacity 0.12s ease,
+    scale 0.2s ease;
+}
+#proc-overlay.frost .frost-crystal-1 {
+  left: 50%;
+  top: 84%;
+}
+#proc-overlay.frost .frost-crystal-2 {
+  --frost-crystal-angle: -48deg;
+  left: 19%;
+  top: 65%;
+}
+#proc-overlay.frost .frost-crystal-3 {
+  --frost-crystal-angle: 48deg;
+  left: 81%;
+  top: 65%;
+}
+#proc-overlay.frost .frost-crystal-4 {
+  --frost-crystal-angle: -22deg;
+  left: 28%;
+  top: 27%;
+}
+#proc-overlay.frost .frost-crystal-5 {
+  --frost-crystal-angle: 22deg;
+  left: 72%;
+  top: 27%;
+}
+#proc-overlay.frost.f1 .frost-crystal-1,
+#proc-overlay.frost.f2 .frost-crystal-2,
+#proc-overlay.frost.f3 .frost-crystal-3,
+#proc-overlay.frost.f4 .frost-crystal-4,
+#proc-overlay.frost.f5 .frost-crystal-5 {
+  opacity: 0.94;
+  scale: 1;
+  animation: frost-crystal-ignite 0.3s ease-out 1;
+}
+#proc-overlay.frost.f5 .frost-crystal {
+  animation: frost-crown-lock 0.56s ease-out 1;
+}
+#proc-overlay.frost.f1 {
+  opacity: 0.88;
+  pointer-events: auto;
+  cursor: grab;
+}
+#proc-overlay.frost .frost-part {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  filter: saturate(1.08) brightness(0.96) drop-shadow(0 0 7px rgba(56, 189, 248, 0.5));
+  transition: opacity 0.2s ease;
+}
+/* Every layer keeps the complete silhouette. Their different intensity makes
+   the bank grow without cutting the phoenix into separate body parts. */
+#proc-overlay.frost .frost-tail {
+  filter: saturate(0.9) brightness(0.82) drop-shadow(0 0 5px rgba(56, 189, 248, 0.42));
+}
+#proc-overlay.frost .frost-left {
+  mix-blend-mode: screen;
+  filter: saturate(1.02) brightness(1.02) drop-shadow(0 0 7px rgba(56, 189, 248, 0.46));
+}
+#proc-overlay.frost .frost-right {
+  mix-blend-mode: screen;
+  filter: saturate(0.94) brightness(1.08) drop-shadow(0 0 9px rgba(125, 211, 252, 0.5));
+}
+#proc-overlay.frost .frost-core {
+  mix-blend-mode: screen;
+  filter: saturate(0.86) brightness(1.16) drop-shadow(0 0 11px rgba(186, 230, 253, 0.58));
+}
+#proc-overlay.frost .frost-ready {
+  mix-blend-mode: screen;
+  filter: saturate(0.82) brightness(1.34) drop-shadow(0 0 10px rgba(224, 247, 255, 0.9))
+    drop-shadow(0 0 24px rgba(14, 165, 233, 0.72));
+}
+#proc-overlay.frost.f1 .frost-tail {
+  opacity: 0.52;
+}
+#proc-overlay.frost.f2 .frost-left {
+  opacity: 0.2;
+}
+#proc-overlay.frost.f3 .frost-right {
+  opacity: 0.18;
+}
+#proc-overlay.frost.f4 .frost-core {
+  opacity: 0.2;
+}
+#proc-overlay.frost.f5 .frost-ready {
+  opacity: 0.34;
+  transform-origin: 50% 49%;
+  animation: frost-ready-snap 0.58s ease-out 1;
+}
+/* The ready burst is deliberately angular, never a circular clock or arcane
+   rune. It reads as a crown of ice shards around the chest. */
+#proc-overlay.frost .frost-bird::before,
+#proc-overlay.frost .frost-bird::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 49%;
+  z-index: 2;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  pointer-events: none;
+  opacity: 0;
+}
+#proc-overlay.frost .frost-bird::before {
+  width: 112px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.94),
+    rgba(125, 211, 252, 0.62) 24%,
+    transparent 64%
+  );
+  clip-path: polygon(
+    50% 0,
+    58% 34%,
+    96% 18%,
+    68% 47%,
+    100% 69%,
+    61% 61%,
+    50% 100%,
+    39% 61%,
+    0 73%,
+    32% 48%,
+    3% 20%,
+    42% 34%
+  );
+  filter: drop-shadow(0 0 7px rgba(186, 230, 253, 0.95));
+}
+#proc-overlay.frost .frost-bird::after {
+  width: 58px;
+  rotate: 45deg;
+  border: 2px solid rgba(240, 249, 255, 0.96);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(56, 189, 248, 0.2));
+  box-shadow: 0 0 18px rgba(125, 211, 252, 0.85);
+}
+#proc-overlay.frost.f5 .frost-bird::before {
+  animation: frost-shard-burst 0.72s ease-out 1;
+}
+#proc-overlay.frost.f5 .frost-bird::after {
+  animation: frost-core-lock 0.62s ease-out 1;
+}
+@keyframes frost-ready-snap {
+  0% {
+    opacity: 0;
+    scale: 0.96;
+  }
+  40% {
+    opacity: 0.52;
+    scale: 1.025;
+  }
+  100% {
+    opacity: 0.34;
+    scale: 1;
+  }
+}
+@keyframes frost-crystal-ignite {
+  0% {
+    opacity: 0;
+    scale: 0.3;
+  }
+  58% {
+    opacity: 1;
+    scale: 1.24;
+  }
+  100% {
+    opacity: 0.94;
+    scale: 1;
+  }
+}
+@keyframes frost-crown-lock {
+  0%,
+  100% {
+    opacity: 0.94;
+    scale: 1;
+  }
+  42% {
+    opacity: 1;
+    scale: 1.3;
+    filter: drop-shadow(0 0 7px rgba(255, 255, 255, 1)) drop-shadow(0 0 20px rgba(56, 189, 248, 1));
+  }
+}
+@keyframes frost-shard-burst {
+  0% {
+    opacity: 0;
+    scale: 0.3;
+    rotate: -12deg;
+  }
+  28% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0;
+    scale: 1.65;
+    rotate: 10deg;
+  }
+}
+@keyframes frost-core-lock {
+  0% {
+    opacity: 0;
+    scale: 0.18;
+  }
+  34% {
+    opacity: 0.92;
+    scale: 0.72;
+  }
+  100% {
+    opacity: 0;
+    scale: 1.28;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #proc-overlay.frost .frost-crystal,
+  #proc-overlay.frost .frost-ready,
+  #proc-overlay.frost .frost-bird::before,
+  #proc-overlay.frost .frost-bird::after {
+    animation: none !important;
+  }
+}
+body.reduce-motion #proc-overlay.frost .frost-ready,
+body.reduce-motion #proc-overlay.frost .frost-crystal,
+body.reduce-motion #proc-overlay.frost .frost-bird::before,
+body.reduce-motion #proc-overlay.frost .frost-bird::after {
+  animation: none !important;
 }

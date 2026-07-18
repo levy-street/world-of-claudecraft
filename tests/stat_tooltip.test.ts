@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { warriorParryChance } from '../src/sim/combat/warrior_hit_table';
 import { CLASSES } from '../src/sim/content/classes';
 import { ITEMS } from '../src/sim/data';
 import { recalcPlayerStats } from '../src/sim/entity';
@@ -40,6 +41,8 @@ function inputFor(cls: PlayerClass, p: ReturnType<typeof freshPlayer>): StatTool
     dodgeChance: p.dodgeChance,
     critRating: p.critRating,
     hasteRating: p.hasteRating,
+    hitRating: p.hitRating,
+    parryChance: cls === 'warrior' ? warriorParryChance(p.stats.str) : 0,
     dps: 0,
   };
 }
@@ -302,6 +305,8 @@ describe('upstream source breakdown reconciles to the displayed stat', () => {
       dodgeChance: p.dodgeChance,
       critRating: p.critRating,
       hasteRating: p.hasteRating,
+      hitRating: p.hitRating,
+      parryChance: cls === 'warrior' ? warriorParryChance(p.stats.str) : 0,
       dps: 0,
       gear,
       buffs,

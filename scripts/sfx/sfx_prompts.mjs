@@ -20,8 +20,15 @@
 
 import { UI_SFX_CATALOG } from './ui_sfx.mjs';
 
+// UI cues in the baked-tone generator's list that already have a real
+// recording dropped in over the synth placeholder (see gen_ui_sfx.mjs's
+// skip-if-exists behavior). Add a key here the same change a real recording
+// replaces its placeholder, so conform stops re-targeting its loudness.
+const UI_SFX_CUSTOM_OVERRIDES = new Set(['ui_level_up']);
+
 const FOOT = (key, surface) => ({
   key,
+  custom: true,
   duration: 0.5,
   prompt: `A single isolated footstep ${surface}. One step only, close and dry, no music, no voice.`,
 });
@@ -42,21 +49,25 @@ const mob = (family, who, aggro, attack, death, hurt, idle) => {
   const entries = [
     {
       key: `mob_${family}_aggro`,
+      custom: true,
       duration: 1.2,
       prompt: `${who} ${aggro}. A single short creature vocalization, no music, no human speech.`,
     },
     {
       key: `mob_${family}_attack`,
+      custom: true,
       duration: 0.9,
       prompt: `${who} ${attack}. A single short aggressive vocalization, no music, no human speech.`,
     },
     {
       key: `mob_${family}_death`,
+      custom: true,
       duration: 1.4,
       prompt: `${who} ${death}. A single dying vocalization fading out, no music, no human speech.`,
     },
     {
       key: `mob_${family}_hurt`,
+      custom: true,
       duration: 0.6,
       prompt: `${who} ${hurt}. A single short pained reaction vocalization, no music, no human speech.`,
     },
@@ -64,6 +75,7 @@ const mob = (family, who, aggro, attack, death, hurt, idle) => {
   if (idle !== undefined) {
     entries.push({
       key: `mob_${family}_idle`,
+      custom: true,
       duration: 1.6,
       prompt: `${who} ${idle}. A single relaxed ambient vocalization, no aggression, no music, no human speech.`,
     });
@@ -81,23 +93,27 @@ export const SFX = [
   FOOT('foot_water', 'splashing through shallow water, wet splash'),
   {
     key: 'move_jump',
+    custom: true,
     duration: 0.5,
     prompt:
       'A person leaping upward: a quick exertion of leather and gear with a soft fabric rustle. No voice, no music.',
   },
   {
     key: 'move_land',
+    custom: true,
     duration: 0.6,
     prompt:
       'A person landing from a jump: boots thud onto the ground with armor and gear settling. No voice, no music.',
   },
   {
     key: 'move_splash',
+    custom: true,
     duration: 0.9,
     prompt: 'A body plunging into water with a big heavy splash, then settling ripples. No music.',
   },
   {
     key: 'move_swim',
+    custom: true,
     duration: 0.8,
     prompt: 'One slow swimming stroke pushing through water, a gentle churning splash. No music.',
   },
@@ -105,30 +121,35 @@ export const SFX = [
   // --- Melee swings ---------------------------------------------------------
   {
     key: 'melee_swing_blade',
+    custom: true,
     duration: 0.5,
     prompt:
       'A sword slicing fast through the air, a sharp metallic whoosh. Single swing, no impact, no music.',
   },
   {
     key: 'melee_swing_heavy',
+    custom: true,
     duration: 0.6,
     prompt:
       'A heavy two-handed axe swung hard through the air, a deep powerful whoosh. Single swing, no impact, no music.',
   },
   {
     key: 'melee_swing_light',
+    custom: true,
     duration: 0.5,
     prompt:
       'A small dagger slashing quickly through the air, a light fast whoosh. Single swing, no impact, no music.',
   },
   {
     key: 'melee_unarmed',
+    custom: true,
     duration: 0.5,
     prompt:
       'A fist or claw swiping fast through the air, a dull quick whoosh. Single swing, no music.',
   },
   {
     key: 'melee_bow',
+    custom: true,
     duration: 0.5,
     prompt:
       'A bowstring releasing with a twang and an arrow zipping away fast. Single shot, no music.',
@@ -137,54 +158,64 @@ export const SFX = [
   // --- Physical impacts & defenses -----------------------------------------
   {
     key: 'impact_flesh',
+    custom: true,
     duration: 0.5,
     prompt: 'A blade striking flesh, a wet meaty thud. Single hit, no music.',
   },
   {
     key: 'impact_metal',
+    custom: true,
     duration: 0.5,
     prompt:
       'A weapon clanging hard against steel plate armor, a bright metallic ring. Single hit, no music.',
   },
   {
     key: 'impact_leather',
+    custom: true,
     duration: 0.5,
     prompt: 'A weapon striking leather armor and hide, a dull padded thud. Single hit, no music.',
   },
   {
     key: 'impact_bone',
+    custom: true,
     duration: 0.5,
     prompt: 'A weapon cracking dry bone, a sharp brittle crack. Single hit, no music.',
   },
   {
     key: 'combat_block',
+    custom: true,
     duration: 0.5,
     prompt: 'A shield blocking a heavy blow, a metallic clank. Single hit, no music.',
   },
   {
     key: 'combat_parry',
+    custom: true,
     duration: 0.5,
     prompt: 'Two metal blades clashing and sliding apart, a ringing parry. Single hit, no music.',
   },
   {
     key: 'combat_dodge',
+    custom: true,
     duration: 0.5,
     prompt:
       'A fast whoosh of an attack swinging past and missing, a clean whiff. No impact, no music.',
   },
   {
     key: 'combat_crit',
+    custom: true,
     duration: 0.6,
     prompt:
       'A brutal devastating critical strike: a heavy bone-crunching impact with a sharp metallic ring. Single hit, no music.',
   },
   {
     key: 'player_hurt',
+    custom: true,
     duration: 0.6,
     prompt: 'A human warrior grunting in sudden sharp pain from taking a hit. Single short grunt.',
   },
   {
     key: 'player_death',
+    custom: true,
     duration: 1.3,
     prompt:
       "A human warrior's final pained death cry as he collapses to the ground. Single death cry fading out.",
@@ -244,35 +275,41 @@ export const SFX = [
   // --- Spell projectiles ----------------------------------------------------
   {
     key: 'proj_fire',
+    custom: true,
     duration: 0.6,
     prompt:
       'A fireball launching and whooshing away through the air, roaring flame. Single launch, no music.',
   },
   {
     key: 'proj_frost',
+    custom: true,
     duration: 0.6,
     prompt: 'A frostbolt streaking through the air, an icy crystalline zip. Single shot, no music.',
   },
   {
     key: 'proj_arcane',
+    custom: true,
     duration: 0.5,
     prompt:
       'An arcane missile zapping through the air, a magical electric zip. Single shot, no music.',
   },
   {
     key: 'proj_shadow',
+    custom: true,
     duration: 0.6,
     prompt:
       'A shadow bolt flying through the air, a dark whooshing void streak. Single shot, no music.',
   },
   {
     key: 'proj_holy',
+    custom: true,
     duration: 0.5,
     prompt:
       'A bolt of holy light streaking through the air, a bright shimmering zip. Single shot, no music.',
   },
   {
     key: 'proj_nature',
+    custom: true,
     duration: 0.5,
     prompt:
       'A glob of nature energy flying through the air, an organic whoosh. Single shot, no music.',
@@ -281,39 +318,46 @@ export const SFX = [
   // --- Spell impacts --------------------------------------------------------
   {
     key: 'impact_fire',
+    custom: true,
     duration: 0.8,
     prompt:
       'A fireball exploding on impact, a fiery burst with crackling flames. Single explosion, no music.',
   },
   {
     key: 'impact_frost',
+    custom: true,
     duration: 0.7,
     prompt:
       'Ice shattering and freezing on impact, a crystalline crack and tinkle. Single hit, no music.',
   },
   {
     key: 'impact_arcane',
+    custom: true,
     duration: 0.6,
     prompt: 'An arcane burst exploding, a sparkly magical detonation. Single hit, no music.',
   },
   {
     key: 'impact_shadow',
+    custom: true,
     duration: 0.7,
     prompt: 'A shadow spell imploding darkly, an ominous magical burst. Single hit, no music.',
   },
   {
     key: 'impact_holy',
+    custom: true,
     duration: 0.7,
     prompt: 'A radiant burst of holy light, a shimmering divine impact. Single hit, no music.',
   },
   {
     key: 'impact_nature',
+    custom: true,
     duration: 0.7,
     prompt:
       'An earthy nature impact, a wet splat of poison and snapping vines. Single hit, no music.',
   },
   {
     key: 'spell_nova',
+    custom: true,
     duration: 0.9,
     prompt:
       'An expanding magical nova shockwave bursting outward in all directions. Single burst, no music.',
@@ -322,18 +366,21 @@ export const SFX = [
   // --- Heals & auras --------------------------------------------------------
   {
     key: 'heal_impact',
+    custom: true,
     duration: 0.8,
     prompt:
       'A gentle healing spell washing over someone, a soft restorative chime and warm glow. Single effect, no music.',
   },
   {
     key: 'buff_apply',
+    custom: true,
     duration: 0.7,
     prompt:
       'An empowering positive magical buff settling on a hero, an uplifting bright shimmer. Single effect, no music.',
   },
   {
     key: 'debuff_apply',
+    custom: true,
     duration: 0.7,
     prompt:
       'An ominous dark curse settling on a target, a sickly negative whoosh. Single effect, no music.',
@@ -347,6 +394,7 @@ export const SFX = [
     'lunging with a vicious biting snarl',
     'yelping and whimpering as it dies',
     'yelping sharply in sudden pain',
+    'panting quietly with a low idle whine',
   ),
   ...mob(
     'boar',
@@ -355,6 +403,7 @@ export const SFX = [
     'charging with a furious grunt',
     'squealing as it dies',
     'squealing sharply in sudden pain',
+    'snorting and shuffling calmly',
   ),
   ...mob(
     'spider',
@@ -363,6 +412,7 @@ export const SFX = [
     'lunging with a sharp hiss',
     'hissing weakly as it shrivels and dies',
     'chittering sharply in sudden pain',
+    'clicking mandibles softly in an idle chitter',
   ),
   ...mob(
     'mudfin',
@@ -371,6 +421,7 @@ export const SFX = [
     'croaking and gurgling as it strikes',
     'gurgling a wet death rattle',
     'croaking sharply in sudden pain',
+    'gurgling low and contentedly',
   ),
   ...mob(
     'burrower',
@@ -379,6 +430,7 @@ export const SFX = [
     'snarling and biting',
     'squealing as it dies',
     'yelping sharply in sudden pain',
+    'sniffing and grunting idly',
   ),
   ...mob(
     'humanoid',
@@ -387,6 +439,7 @@ export const SFX = [
     'grunting with effort as he strikes',
     'crying out in pain as he dies',
     'grunting sharply in sudden pain',
+    'muttering and shifting restlessly',
   ),
   ...mob(
     'undead',
@@ -395,6 +448,7 @@ export const SFX = [
     'moaning hollowly as it strikes',
     'clattering apart into a pile of bones',
     'rattling sharply in sudden impact',
+    'creaking and groaning low',
   ),
   ...mob(
     'troll',
@@ -403,6 +457,7 @@ export const SFX = [
     'grunting savagely as it strikes',
     'groaning heavily as it dies',
     'grunting sharply in sudden pain',
+    'grunting low and idle',
   ),
   ...mob(
     'ogre',
@@ -411,6 +466,7 @@ export const SFX = [
     'grunting heavily as it smashes down',
     'groaning a ground-shaking death',
     'bellowing sharply in sudden pain',
+    'grumbling low in a lazy idle',
   ),
   ...mob(
     'elemental',
@@ -419,6 +475,7 @@ export const SFX = [
     'bursting with surging energy as it strikes',
     'dissipating in a fading crackle',
     'crackling sharply in sudden disruption',
+    'humming a low idle crackle',
   ),
   ...mob(
     'dragonkin',
@@ -427,6 +484,7 @@ export const SFX = [
     'snapping a biting roar as it strikes',
     'roaring as it collapses dying',
     'roaring sharply in sudden pain',
+    'rumbling a low idle growl',
   ),
   ...mob(
     'demon',
@@ -435,6 +493,7 @@ export const SFX = [
     'shrieking a demonic strike',
     'wailing in agonized demonic death',
     'shrieking sharply in sudden pain',
+    'hissing softly in an idle murmur',
   ),
   ...mob(
     'reptile',
@@ -523,7 +582,7 @@ export const SFX = [
     prompt: 'A soft muffled snowy wind, quiet and cold. Seamless loop, no music.',
   },
 
-  // --- Quest events (custom recordings, not ElevenLabs) --------------------
+  // --- Custom recordings (not ElevenLabs) ----------------------------------
   { key: 'quest_accept', custom: true },
   { key: 'quest_ready', custom: true },
   { key: 'quest_complete', custom: true },
@@ -548,9 +607,31 @@ export const SFX = [
   { key: 'lockpick_trap', custom: true },
 
   // --- Interface and event feedback ----------------------------------------
-  // These are generated locally by scripts/gen_ui_sfx.mjs. Keeping them in the
-  // authoritative catalog makes every live GameAudio cue editable in SFX Studio.
-  ...UI_SFX_CATALOG,
+  // These are generated locally by scripts/gen_ui_sfx.mjs (baked synth tones,
+  // the default until a real recording replaces one, see gen_ui_sfx.mjs's
+  // skip-if-exists behavior). Keeping them in the authoritative catalog makes
+  // every live GameAudio cue editable in SFX Studio. UI_SFX_CUSTOM_OVERRIDES
+  // marks the keys that already have a real recording in place: conform
+  // treats those as pre-mastered (peak-safety only, never loudness-retargeted,
+  // see the `custom` flag's meaning in conform_audio.mjs), same as any other
+  // hand-authored key below.
+  ...UI_SFX_CATALOG.map((entry) =>
+    UI_SFX_CUSTOM_OVERRIDES.has(entry.key) ? { ...entry, custom: true } : entry,
+  ),
+
+  // Book of Deeds unlock chime (custom recording, not ElevenLabs/generated).
+  // Previously deed unlocks reused ui_level_up (audio.levelUp()), so the same
+  // sound fired for both real level-ups and every achievement, wearing thin
+  // fast. See handleDeedUnlocks in src/ui/hud.ts.
+  { key: 'ui_achievement', custom: true },
+  { key: 'temporal_clock', custom: true },
+
+  // --- Wand auto-attacks (custom recordings, not ElevenLabs) ----------------
+  // Distinct from the matching proj_<school> real-spell-cast sound, see
+  // WAND_CUES in src/ui/combat_sfx.ts (feature/sfx-wand-attack-cues, #1973).
+  { key: 'wand_arcane', custom: true },
+  { key: 'wand_holy', custom: true },
+  { key: 'wand_shadow', custom: true },
 ];
 
 // Family ids that have creature vocalizations (used by the integration layer to

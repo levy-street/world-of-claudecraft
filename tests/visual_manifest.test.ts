@@ -106,6 +106,41 @@ describe('character visual manifest', () => {
     expect(VISUALS.mob_boar.deathTimeScale).toBeUndefined();
   });
 
+  it('renders the Nythraxis phase-2 court as Aldren / Malric / Voss, not generic skeletons', () => {
+    // The heroic "Spirit of X" adds are the same characters risen again, so they
+    // must reuse each named crypt boss's visual. Without the MOB_KEYS entries they
+    // fall through to FAMILY_KEYS.undead (skel_minion) and the court renders as
+    // three identical grunts. Each add is pinned to its counterpart's key.
+    const court: Array<[string, string]> = [
+      ['nythraxis_heroic_warrior_add', 'fallen_captain_aldren'],
+      ['nythraxis_heroic_priest_add', 'corrupted_priest_malric'],
+      ['nythraxis_heroic_rogue_add', 'deathstalker_voss'],
+    ];
+    for (const [addId, namedId] of court) {
+      const addKey = visualKeyFor({ kind: 'mob', templateId: addId } as never);
+      const namedKey = visualKeyFor({ kind: 'mob', templateId: namedId } as never);
+      expect(addKey, addId).toBe(namedKey);
+      expect(addKey, addId).not.toBe('skel_minion');
+    }
+  });
+
+  it('gives the summoned Water Elemental its own untinted animated water body', async () => {
+    const key = visualKeyFor({ kind: 'mob', templateId: 'water_elemental' } as never);
+    expect(key).toBe('mob_water_elemental');
+
+    const visual = VISUALS[key];
+    expect(visual.url).toBe('models/creatures/water_elemental.glb');
+    expect(visual.tint).toBeUndefined();
+    expect(visual.clips.cast).toBe('Channel');
+    expect(visual.clips.attack).toEqual(['Cast']);
+
+    const animationNames = await glbAnimationNames(`public/${visual.url}`);
+    expect(animationNames.size).toBeGreaterThan(0);
+    expect(
+      [...new Set(expectedClipNames(visual.clips))].filter((name) => !animationNames.has(name)),
+    ).toEqual([]);
+  });
+
   it('points the Combat Mech manifest at animation clips baked into the GLB', async () => {
     const visual = VISUALS.player_mech;
     const animationNames = await glbAnimationNames(`public/${visual.url}`);
@@ -124,6 +159,20 @@ describe('character visual manifest', () => {
     expect(
       [...new Set(expectedClipNames(visual.clips))].filter((name) => !animationNames.has(name)),
     ).toEqual([]);
+  });
+
+  it('points the training dummy manifest at clips present in the GLB, with cast/jump deliberately absent', async () => {
+    const visual = VISUALS.mob_training_dummy;
+    const animationNames = await glbAnimationNames(`public/${visual.url}`);
+
+    expect(animationNames.size).toBeGreaterThan(0);
+    expect(
+      [...new Set(expectedClipNames(visual.clips))].filter((name) => !animationNames.has(name)),
+    ).toEqual([]);
+    expect(visual.clips.cast).toBeUndefined();
+    expect(visual.clips.jump).toBeUndefined();
+    expect(animationNames.has('Cast')).toBe(false);
+    expect(animationNames.has('Jump')).toBe(false);
   });
 
   it('points the baked wolf visuals (form_cat, mob_wolf, greyjaw) at clips in their GLBs', async () => {

@@ -9,10 +9,12 @@ import {
   wireStreamerLinks,
 } from '../src/sim/account_flair';
 import { verifyChallenge } from '../src/sim/client_challenge';
+import { echoVisibleTo } from '../src/sim/combat/chronomancy';
+import { damageTakenWithin } from '../src/sim/combat/damage_history';
+import { rewindHealAmount } from '../src/sim/combat/rewind';
 import { DEEDS } from '../src/sim/content/deeds';
 import { isFinderListingTag, isFinderRole } from '../src/sim/content/dungeon_finder';
 import { MECH_CHROMAS, mechChromaItemId, mechChromaSkinIndex } from '../src/sim/content/skins';
-import type { TalentAllocation } from '../src/sim/content/talents';
 import { SPORT_ROLES, VALE_CUP_BALL_TEMPLATE_ID, VC_NATION_IDS } from '../src/sim/content/vale_cup';
 import { withWeaponSkinApplied } from '../src/sim/content/weapon_skin_rules';
 import { isWeaponSkinType, WEAPON_SKINS } from '../src/sim/content/weapon_skins';
@@ -23,6 +25,7 @@ import {
   delveAt,
   dungeonAt,
   isDelvePos,
+  MOBS,
   ZONES,
   zoneAt,
 } from '../src/sim/data';
@@ -40,9 +43,22 @@ import {
 import type { PickAction } from '../src/sim/lockpick';
 import { sanitizeMarketQuery } from '../src/sim/market_query';
 import { parseMoveInputFrame } from '../src/sim/move_input';
+import {
+  partyFrameAbsorb,
+  partyFrameAggroTargets,
+  partyFrameAuras,
+  partyFrameIncomingHeals,
+  partyFrameRole,
+} from '../src/sim/party_frame_info';
 import type { PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
 import type { VcMatch } from '../src/sim/social/vale_cup';
+import {
+  parseTalentAllocation,
+  parseTalentLoadoutIndex,
+  parseTalentOptionId,
+  parseTalentRowLevel,
+} from '../src/sim/talent_allocation_input';
 import { stealthDetectionRadius, threatEntries } from '../src/sim/threat';
 import {
   type Aura,
@@ -54,6 +70,7 @@ import {
   emptyMoveInput,
   isDungeonDifficulty,
   MAX_LEVEL,
+  type MobFamily,
   PARTY_MEMBER_AURA_CAP,
   RUN_SPEED,
   type SimEvent,
@@ -128,9 +145,15 @@ import { forEachGuarded, runGuarded } from './guarded_iter';
 import { gameMetricsCounters } from './http/game_signals';
 import { IpBlockList } from './ip_block';
 import { loadActiveBlockedIps } from './ip_block_db';
+import { keepaliveSweepDelayed } from './keepalive_sweep';
 import { LINKDEAD_GRACE_MS, planJoin } from './linkdead';
 import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips';
 import { trackReachedLevel5 } from './meta_capi';
+import {
+  applyMobScanTick,
+  createMobScanTickStats,
+  resetMobScanCaptureAccumulators,
+} from './mob_scan_tick_stats';
 import {
   forceCharacterRename,
   moderateAccount,
@@ -239,6 +262,29 @@ const TICK_EMA_ALPHA = 0.05;
 const PERF_CAPTURE_MIN_MS = 3_000;
 const PERF_CAPTURE_MAX_MS = 30_000;
 const PERF_CAPTURE_DEFAULT_MS = 10_000;
+// The mob.update sim lap is additionally bucketed by mob family so a hot family
+// (a spider swarm, a pack of humanoids) shows up in the profile instead of hiding
+// inside one aggregate number. Every MobFamily value (src/sim/types.ts) plus an
+// 'other' catch-all for any templateId whose family does not resolve. A family
+// missing from this list would derive a bucket name TickProfiler never registered
+// and silently drop its timing: the satisfies clause rejects a non-family typo, and
+// the registry pin test type-checks union coverage and asserts the derived names as
+// literals. Exported for those pins.
+export const MOB_UPDATE_BUCKETS = [
+  'beast',
+  'humanoid',
+  'mudfin',
+  'spider',
+  'burrower',
+  'undead',
+  'troll',
+  'ogre',
+  'elemental',
+  'dragonkin',
+  'demon',
+  'reptile',
+  'other',
+] as const satisfies readonly (MobFamily | 'other')[];
 // sim.tick() internal phase names (already `sim.`-prefixed): must match the
 // lap?.(...) call sites in src/sim/sim.ts tick(). Fed by the injected cfg.perfLap
 // probe while a detailed capture is active (an admin capture or PERF_TICK_LOG=1).
@@ -249,6 +295,7 @@ export const SIM_LAP_PHASES = [
   'respawns',
   'worldBosses',
   'groundAoEs',
+  'frozenOrbs',
   'despawnDecay',
   'projectiles',
   'p.move',
@@ -262,6 +309,7 @@ export const SIM_LAP_PHASES = [
   'ent.misc',
   'engaged',
   'duels',
+  'cardDuel',
   'arena',
   'trades',
   'lootRolls',
@@ -274,6 +322,10 @@ export const SIM_LAP_PHASES = [
   'delayedEv',
   'deeds',
   'gridRefresh',
+  // Per-family mob.update buckets, appended after the base lap names so those
+  // stay byte-identical and first. The `sim.${n}` map turns each into the registered
+  // `sim.mob.update|<family>` the perfLap probe adds to.
+  ...MOB_UPDATE_BUCKETS.map((b) => `mob.update|${b}`),
 ].map((n) => `sim.${n}`);
 
 // Per-zone attribution buckets for the mob.update phase. The mob loop
@@ -360,10 +412,12 @@ type ClientMessage = Record<string, unknown> & {
   node?: string;
   npc?: number;
   objectId?: number;
+  optionId?: unknown;
   price?: number;
   q?: string;
   quest?: string;
   r?: string;
+  rid?: number;
   role?: string;
   roles?: unknown;
   rollId?: number;
@@ -372,7 +426,7 @@ type ClientMessage = Record<string, unknown> & {
   sig?: string;
   skin?: number;
   slot?: number | string;
-  spec?: string;
+  spec?: unknown;
   t?: string;
   tags?: unknown;
   text?: string;
@@ -380,42 +434,6 @@ type ClientMessage = Record<string, unknown> & {
   x?: number;
   z?: number;
 };
-
-function recordValue(value: unknown): Record<string, unknown> | null {
-  return value && typeof value === 'object' && !Array.isArray(value)
-    ? (value as Record<string, unknown>)
-    : null;
-}
-
-function numberRecord(value: unknown): Record<string, number> {
-  const source = recordValue(value);
-  if (!source) return {};
-  const out: Record<string, number> = {};
-  for (const [key, raw] of Object.entries(source)) {
-    if (typeof raw === 'number') out[key] = raw;
-  }
-  return out;
-}
-
-function stringRecord(value: unknown): Record<string, string> {
-  const source = recordValue(value);
-  if (!source) return {};
-  const out: Record<string, string> = {};
-  for (const [key, raw] of Object.entries(source)) {
-    if (typeof raw === 'string') out[key] = raw;
-  }
-  return out;
-}
-
-function talentAllocationFromWire(value: unknown): TalentAllocation | null {
-  const source = recordValue(value);
-  if (!source) return null;
-  return {
-    spec: typeof source.spec === 'string' ? source.spec : null,
-    ranks: numberRecord(source.ranks),
-    choices: stringRecord(source.choices),
-  };
-}
 
 function isPickAction(value: unknown): value is PickAction {
   return typeof value === 'string' && LOCKPICK_ACTIONS.has(value as PickAction);
@@ -463,9 +481,11 @@ const JAILED_BLOCKED_COMMANDS = new Set<string>([
   'enter_delve',
   'duel_req',
   'duel_accept',
+  'card_queue_join',
 ]);
 const HEAVY_SELF_CMDS = new Set<string>([
   'equip',
+  'inv_move', // rewrites the inventory array order: the self snapshot must resend it
   'unequip_item',
   'equip_bag',
   'unequip_bag',
@@ -485,6 +505,7 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'applyTalents',
   'respec',
   'setSpec',
+  'selectTalentRow',
   'saveLoadout',
   'switchLoadout',
   'deleteLoadout',
@@ -569,6 +590,7 @@ export interface ClientSession {
   alive: boolean;
   joinedAt: number;
   dbSessionId: number | null; // play_sessions row, set once the insert lands
+  metricsMaxLevel: number;
   left: boolean; // set in leave(); guards against the open-session insert landing after disconnect
   // linkdead grace: true while the socket has dropped but the character is
   // held in-world awaiting a reconnect. graceUntil is the epoch-ms deadline
@@ -779,6 +801,9 @@ interface WireAura {
   // client badge prefers this over stacks (auras_view). A pure cosmetic count, not actionable
   // information a graphics preset could hide, so it rides the wire unconditionally when present.
   charges?: number;
+  // Next-cast empowerment scope. Omitted for unscoped empowerment auras, which match any
+  // eligible cast just like the sim helper.
+  emp?: string[];
   // The caster's entity id, so the client's target strip can lead with and enlarge the
   // viewer's OWN dots/hots (auras_view ownFirst). A shared per-entity value (never
   // per-viewer), so the per-entity dyn cache keeps eliding; an old client ignores it and
@@ -806,6 +831,7 @@ function identityFields(e: Entity): Record<string, unknown> {
   if (e.skinCatalog === 'mech') out.cat = 'mech';
   if (e.skin) out.sk = e.skin;
   if (e.mainhandItemId) out.mh = e.mainhandItemId; // equipped mainhand → held weapon model (render-only)
+  if (e.offhandItemId) out.oh = e.offhandItemId; // equipped offhand → held weapon model (render-only)
   if (e.weaponSkinId) out.wsk = e.weaponSkinId; // active weapon-skin cosmetic (render-only, like mh)
   // Full worn set, for the inspect-another-player window. Players only and only
   // when something is equipped; rides the identity record (first appearance +
@@ -890,6 +916,9 @@ function wireAura(a: Aura): WireAura {
   // Carry the remaining charges only for a charge-limited aura (Lightning Shield), so the
   // buff icon can badge the count online exactly as offline; undefined for every other aura.
   if (a.charges !== undefined) w.charges = a.charges;
+  // Next-cast empowerment scope. Omitted for unscoped empowerment auras, which match any
+  // eligible cast just like the sim helper.
+  if (a.empowerAbilities !== undefined) w.emp = a.empowerAbilities;
   // The caster's entity id, for the client's own-aura prominence on the target strip
   // (auras_view ownFirst). Omitted for the rare 0/absent source, which decodes to 0.
   if (a.sourceId) w.src = a.sourceId;
@@ -930,7 +959,16 @@ function dynamicFields(e: Entity): Record<string, unknown> {
   if (e.sitting || e.eating || e.drinking) out.sit = 1;
   if (e.weaponStowed) out.ws = 1; // Z-key sheathe: weapons render on the back
   if (e.aggroTargetId !== null) out.aggro = e.aggroTargetId;
+  // A player's/bot's SELECTED target (mobs use aggroTargetId above): rides so the
+  // client can render the target-of-target frame for a PLAYER target, exactly as
+  // `aggro` already enables it for a mob/pet target. Emitted only for an entity that
+  // HAS a target (players/bots in combat), so idle mobs (targetId stays null) add
+  // nothing. The SELF record still carries its own precise `target` field.
+  if (e.targetId !== null) out.tgt = e.targetId;
   if (e.tappedById !== null) out.tap = e.tappedById;
+  // corpse harvest claim (single-use, first-come): the online corpse picker
+  // must stop offering a corpse another player already harvested
+  if (e.harvestClaimedBy !== null) out.hcb = e.harvestClaimedBy;
   if (e.ownerId !== null) out.own = e.ownerId;
   if (e.overheadEmoteId) {
     out.emo = e.overheadEmoteId;
@@ -940,6 +978,7 @@ function dynamicFields(e: Entity): Record<string, unknown> {
     out.pm = e.petMode;
     out.pt = round2(e.petTauntTimer);
     if (e.petAutoTaunt) out.pa = 1;
+    if (e.petAutoWaterJet) out.pw = 1;
   }
   if (e.rangedPower) out.rp = e.rangedPower;
   // top hate-table entries so the party threat meter shows real numbers
@@ -1046,6 +1085,10 @@ export interface PerfCaptureResult {
   maxTicksPerCallback: number;
   online: number; // live sessions at capture close
   simEntities: number; // sim entity count at capture close
+  aggroVisitsTotal: number; // aggro-scan player visits summed across the window
+  aggroVisitsMaxPerTick: number; // peak aggro-scan player visits in any one tick
+  threatVisitsTotal: number; // threat-table entry visits summed across the window
+  threatVisitsMaxPerTick: number; // peak threat-table entry visits in any one tick
   profile: ReturnType<TickProfiler['profile']>;
 }
 
@@ -1073,10 +1116,22 @@ export class GameServer {
   readonly social: SocialService;
   private readonly moderation: ModerationService<ClientSession>;
   private wireCache = new Map<number, EntityWireCache>();
+  // partyFrameAggroTargets / partyFrameIncomingHeals scan the whole entity set and
+  // are GLOBAL (identical for every grouped session), yet partyWire runs once per
+  // grouped session per tick. Memoize both once per tick so a 40-raid does one scan,
+  // not one per member. (see review #1864, finding 1)
+  private partyFrameGlobalsCache: {
+    tick: number;
+    aggroTargets: ReturnType<typeof partyFrameAggroTargets>;
+    incomingHeals: ReturnType<typeof partyFrameIncomingHeals>;
+  } | null = null;
   private lastWireSweepTick = 0;
   private interval: NodeJS.Timeout | null = null;
   private holderTierInterval: NodeJS.Timeout | null = null;
   private keepaliveInterval: NodeJS.Timeout | null = null;
+  // Wall-clock ms at which the keepalive sweep last ran, so a sweep can tell whether
+  // it fired on time. A late sweep proves the process stalled, not that clients died.
+  private lastKeepaliveSweepAt = Date.now();
   private holderTierRefreshing = false; // overlap guard for the refresh cycle
   private playtimeInterval: NodeJS.Timeout | null = null;
   private lastPlaytimeGrantAt = new Map<number, number>(); // accountId -> sim time of last grant
@@ -1113,6 +1168,17 @@ export class GameServer {
   // that actually sags. Rides the snapshot head (throttled) + perfProfile().
   private readonly tickRateMeter = new TickRateMeter();
   private tickHz: number | null = null;
+  // Wall clock (epoch millis) of the last COMPLETED tick pass, null until the
+  // first one lands. Written at the very END of the guarded body, so a pass that
+  // throws leaves it untouched: once one pass has completed, a loop that then wedges
+  // reads as stale. A loop that throws on its FIRST pass never stamps this at all, so
+  // liveness falls back to loopStartedAtMs to still catch a boot-time wedge.
+  private lastTickCompletedAt: number | null = null;
+  // Wall clock (epoch millis) when start() last installed the loop, null before it.
+  // The liveness backstop for the never-completed-a-pass case: without it, a loop that
+  // throws every tick from the first one leaves lastTickCompletedAt null forever and
+  // /livez would read that as warmup (200) for the life of the process.
+  private loopStartedAtMs: number | null = null;
   // sim.time (seconds) of the last head that carried tickHz; throttles the
   // scalar to TICK_HZ_HEAD_INTERVAL_S so it does not ride every 20 Hz head.
   private lastTickHzHeadTime: number | null = null;
@@ -1143,6 +1209,10 @@ export class GameServer {
   // The host-side mark the injected sim perfLap probe diffs against; refreshed just
   // before each sim.tick() call while a detailed capture is active.
   private simLapMark = 0n;
+  // templateId -> its registered `sim.mob.update|<family>` bucket name, so the perfLap
+  // probe pays one Map.get (plus one ring add) per mob per tick in steady state.
+  // Unbounded is fine: templateIds are a finite content set (MOBS).
+  private readonly mobUpdateBucketNames = new Map<string, string>();
   // On-demand capture state (admin-triggered). The deadline is wall-clock based:
   // a saturated sim may commit far fewer or many more ticks than nominal, but a
   // requested 30-second incident capture must still finish after about 30 seconds.
@@ -1164,6 +1234,10 @@ export class GameServer {
   private bcSerializeNs = 0n;
   private bcVisits = 0;
   private bcSerializes = 0;
+  // Mob-scan observability folded out of the loop body (server/mob_scan_tick_stats.ts):
+  // the latest tick's aggro/threat visit counts surfaced on the [perf] heartbeat, plus
+  // the four capture-window accumulators frozen into a PerfCaptureResult.
+  private readonly mobScanTickStats = createMobScanTickStats();
   // Ops kill-switch: SELF_SNAPSHOT_FULL=1 re-diffs every heavy self field every
   // tick (pre-optimization behavior), for A/B benchmarking or rollback.
   private readonly heavySelfGate = process.env.SELF_SNAPSHOT_FULL !== '1';
@@ -1194,10 +1268,14 @@ export class GameServer {
         const dt = Number(t - this.simLapMark) / 1e6;
         this.tickProfiler.add(`sim.${phase}`, dt);
         // The mob loop tags each mob.update lap with its entity, so the SAME measured
-        // slice also lands in that mob's per-zone bucket. One clock read,
-        // no extra wall-clock, no sim-side work: a mob.update blowup now localizes to a
-        // zone in the same [perf.sim] report instead of only the phase total.
-        if (entity !== undefined) this.tickProfiler.add(mobZonePhase(entity), dt);
+        // slice also lands in that mob's family bucket (via its templateId) AND its
+        // per-zone bucket. One clock read, no extra wall-clock, no sim-side work: a
+        // mob.update blowup now localizes to a family and a zone in the same
+        // [perf.sim] report instead of only the phase total.
+        if (entity !== undefined) {
+          this.tickProfiler.add(this.mobUpdateBucketName(entity.templateId), dt);
+          this.tickProfiler.add(mobZonePhase(entity), dt);
+        }
         this.simLapMark = t;
       },
       valeCupShowcase: true, // idle Sowfield auto-runs a bot exhibition to watch/bet on
@@ -1385,6 +1463,7 @@ export class GameServer {
     this.sim.arenaQueueLeave(target.pid);
     this.sim.vcupQueueLeave(target.pid);
     this.sim.vcupResolveDesertion(target.pid);
+    this.sim.leaveCardMinigameEntirely(target.pid);
     this.teleportJailedSession(target);
     // System notice (chat log), not the fading error toast: the prisoner must be
     // able to read the sentence after alt-tabbing back, like other moderation
@@ -1633,6 +1712,10 @@ export class GameServer {
   start(): void {
     let last = process.hrtime.bigint();
     let acc = 0;
+    // Stamp the loop-start clock before the first fire: it is the liveness backstop for
+    // a loop that never completes a pass (every tick throws), so /livez still goes stale
+    // instead of reading a boot-time wedge as warmup forever.
+    this.loopStartedAtMs = Date.now();
     this.interval = setInterval(() => {
       // The whole tick body runs guarded: an unguarded throw here (sim tick, a
       // broadcast, an autosave kick-off) would unwind the callback and skip the
@@ -1666,6 +1749,16 @@ export class GameServer {
             if (this.perfDetailActive) this.simLapMark = process.hrtime.bigint();
             const events = this.sim.tick();
             lap('tick');
+            // Fold this tick's mob-scan counts before the next tick resets them: the
+            // latest-tick values feed the heartbeat, and an in-flight capture sums and
+            // peaks them across its window.
+            const scan = this.sim.mobScanCounters;
+            applyMobScanTick(
+              this.mobScanTickStats,
+              scan.aggroScanPlayerVisits,
+              scan.threatEntryVisits,
+              this.perfCaptureDeadlineNs !== null,
+            );
             this.enforceJailStates();
             this.routeEvents(events);
             this.detectActivity(events);
@@ -1702,6 +1795,10 @@ export class GameServer {
               ? tickMs
               : this.tickMsAvg + TICK_EMA_ALPHA * (tickMs - this.tickMsAvg);
           this.flushPeriodicSaves(dt);
+          // LAST statement of the guarded body, deliberately: this timestamp is the
+          // liveness signal /livez reads, so only a pass that ran to completion may
+          // refresh it (a body that throws every tick must go stale, not look alive).
+          this.lastTickCompletedAt = Date.now();
         },
         (err) => console.error('[tick] guarded tick body threw, skipping this tick:', err),
       );
@@ -1719,6 +1816,7 @@ export class GameServer {
     this.dailyRewardActivityInterval = setInterval(() => {
       void this.recordDailyRewardActivity();
     }, DAILY_REWARD_ACTIVITY_MS);
+    this.lastKeepaliveSweepAt = Date.now();
     this.keepaliveInterval = setInterval(() => {
       this.pingLiveSessions();
     }, WS_KEEPALIVE_PING_MS);
@@ -1798,9 +1896,15 @@ export class GameServer {
   // client's reconnect backoff resumes within a ping interval or two (the
   // client tolerates that rejection mid-reconnect, src/net/reconnect_policy.ts).
   pingLiveSessions(): void {
+    const now = Date.now();
+    // A sweep that fired far later than its interval proves the process stalled, so
+    // pong silence is not evidence of a dead client: queued pong frames went
+    // unprocessed during the stall. On such a sweep terminate nobody; re-arm every
+    // live session (ping again) so the next on-time sweep can judge honestly.
+    const delayed = keepaliveSweepDelayed(now, this.lastKeepaliveSweepAt, WS_KEEPALIVE_PING_MS);
     for (const session of this.clients.values()) {
       if (session.linkdead || session.ws.readyState !== 1) continue;
-      if (session.awaitingPong) {
+      if (session.awaitingPong && !delayed) {
         const ws = session.ws;
         try {
           ws.terminate();
@@ -1817,6 +1921,7 @@ export class GameServer {
         /* socket torn down mid-iteration */
       }
     }
+    this.lastKeepaliveSweepAt = now;
   }
 
   stop(): void {
@@ -2412,6 +2517,7 @@ export class GameServer {
     // applied skin shows from the first snapshot (owned skins only).
     this.sim.setWeaponSkinLoadout(pid, this.ownedWeaponSkinLoadout(accountCosmetics));
     const sessionIp = meta.ip ?? '';
+    const initialLevel = this.sim.entities.get(pid)?.level ?? state?.level ?? 1;
     const botTrackingContext = this.botDetector.createTrackingContext(
       { accountId, characterId, name, ip: sessionIp },
       meta,
@@ -2431,6 +2537,7 @@ export class GameServer {
       alive: true,
       joinedAt: Date.now(),
       dbSessionId: null,
+      metricsMaxLevel: initialLevel,
       left: false,
       linkdead: false,
       graceUntil: 0,
@@ -2519,13 +2626,13 @@ export class GameServer {
     void deedRecordsIdle()
       .then(() => reconcileOnLogin(accountId))
       .catch(() => {});
-    openPlaySession(accountId, characterId, name, meta)
+    openPlaySession(accountId, characterId, name, meta, initialLevel)
       .then((id) => {
         session.dbSessionId = id;
         // If the player disconnected before this insert landed, leave() saw a
         // null id and skipped the close. Close it now so the row isn't orphaned.
         if (session.left) {
-          void closePlaySession(id).catch((err) =>
+          void closePlaySession(id, session.metricsMaxLevel).catch((err) =>
             console.error('failed to close play session:', err),
           );
         }
@@ -2740,7 +2847,7 @@ export class GameServer {
       .announcePresence({ characterId: session.characterId, name: session.name }, false)
       .catch((err) => console.error('presence announce failed:', err));
     if (session.dbSessionId !== null) {
-      void closePlaySession(session.dbSessionId).catch((err) =>
+      void closePlaySession(session.dbSessionId, session.metricsMaxLevel).catch((err) =>
         console.error('failed to close play session:', err),
       );
     }
@@ -2752,6 +2859,9 @@ export class GameServer {
     // remaining player's win/honor durable if both combatants disconnect close
     // together; removePlayer repeats the idempotent cleanup after the save.
     this.sim.arenaResolveDesertion(session.pid);
+    // Card Duel: drop the queue slot and forfeit any live match on disconnect,
+    // same idempotent-before-persistence shape as the two lines above.
+    this.sim.leaveCardMinigameEntirely(session.pid);
     // Freeze reward eligibility and reconcile pending loot before the leave
     // snapshot. saveCharacterOnLeave awaits the database; without this
     // synchronous prefix, a roll or boss death can mutate the character after
@@ -2847,22 +2957,54 @@ export class GameServer {
         // Use the SERIALIZED level (not e.level): during a 2v2 Fiesta bout e.level
         // is temporarily 20, but serializeCharacter reports the real level — so the
         // character-list/leaderboard `level` column never reflects the temp state.
+        let saved: boolean;
         if (opts.withMarket) {
           // Atomic on the leave path so a logout bag-flush can never tear away
           // from the global Market escrow (see saveCharacterAndMarketState). Run
           // through the market queue and capture the market snapshot at write
           // time so this commit can't clobber a newer one.
-          await this.enqueueMarketWrite(() =>
+          saved = await this.enqueueMarketWrite(() =>
             saveCharacterAndMarketState(
               session.characterId,
               state.level,
               state,
               this.sim.serializeMarket(),
               this.sim.serializeMail(),
+              session.leaseNonce,
             ),
           );
         } else {
-          await saveCharacterState(session.characterId, state.level, state);
+          saved = await saveCharacterState(
+            session.characterId,
+            state.level,
+            state,
+            session.leaseNonce,
+          );
+        }
+        // A same-account takeover can reclaim this character's lease and rotate the
+        // nonce out from under a displaced session; the lease-fenced save then matches
+        // no row and reports false, meaning nothing persisted. Skip every post-save
+        // step: never stamp lastSave (the write did not land) and never drain
+        // pendingDeedRecords into the durable index (a deed must never publish ahead
+        // of the blob that proves it). The ids stay queued and simply never drain for
+        // this doomed session; the live holder records its own unlocks from its own
+        // saves. Only an explicit false is a fence-out: the no-nonce legacy path
+        // returns true, so a strict comparison never mistakes an ordinary save for one.
+        if (saved === false) {
+          console.warn(
+            `character ${session.characterId} (${session.name}) save fenced out by a same-account takeover; skipping deed publish and lastSave`,
+          );
+          // The lease is gone: this session is a displaced zombie whose writes
+          // can never land again. Give the player the same explicit signal an
+          // in-process takeover sends instead of letting them keep playing an
+          // unsaved session. Deliberately not awaited: kickSession -> leave ->
+          // the leave save queues behind this closure on the per-character save
+          // queue, so awaiting here would deadlock. leave() is idempotent
+          // (session.left), so that leave save fencing out again cannot re-kick.
+          if (!session.left) {
+            void this.kickSession(session, 'character taken over', 'character taken over');
+          }
+          return;
         }
         session.lastSave = Date.now();
         // The blob is durable: publish every unlock it contains. A rejected
@@ -2971,7 +3113,7 @@ export class GameServer {
   async endAllPlaySessions(): Promise<void> {
     for (const session of this.clients.values()) {
       if (session.dbSessionId === null) continue;
-      await closePlaySession(session.dbSessionId).catch((err) =>
+      await closePlaySession(session.dbSessionId, session.metricsMaxLevel).catch((err) =>
         console.error('failed to close play session:', err),
       );
     }
@@ -3013,6 +3155,20 @@ export class GameServer {
     return this.tickHz == null ? null : round2(this.tickHz);
   }
 
+  // Wall clock (epoch millis) of the last COMPLETED tick pass for the /livez
+  // staleness read (server/http/health.ts), or null while the loop is still
+  // warming up (before its first pass completes).
+  lastTickAt(): number | null {
+    return this.lastTickCompletedAt;
+  }
+
+  // Wall clock (epoch millis) when start() last installed the loop, or null before it.
+  // The /livez staleness read (server/http/health.ts) falls back to this when no pass
+  // has completed yet, so a loop that starts but never completes one still goes stale.
+  loopStartedAt(): number | null {
+    return this.loopStartedAtMs;
+  }
+
   // Per-phase loop timing (p95 + max, in MILLISECONDS) for the /metrics exporter,
   // keyed by phase name. The exporter converts to seconds and surfaces only its
   // fixed WOC_TICK_PHASES subset, so the exported label set stays bounded.
@@ -3041,6 +3197,7 @@ export class GameServer {
     this.perfCaptureSimTicks = 0;
     this.perfCaptureCatchUpCallbacks = 0;
     this.perfCaptureMaxTicksPerCallback = 0;
+    resetMobScanCaptureAccumulators(this.mobScanTickStats);
     this.perfCaptureEndsAtMs = Date.now() + clamped;
     this.perfCaptureDeadlineNs = process.hrtime.bigint() + BigInt(clamped) * 1_000_000n;
     return this.perfCaptureStatus();
@@ -3066,6 +3223,19 @@ export class GameServer {
     this.perfCaptureMaxTicksPerCallback = Math.max(this.perfCaptureMaxTicksPerCallback, ticksRun);
   }
 
+  // Resolve (and memoize) the registered profiler bucket for a mob template. A
+  // templateId whose family does not resolve falls into 'other'; every result is a
+  // name registered via MOB_UPDATE_BUCKETS, so TickProfiler.add never drops it.
+  private mobUpdateBucketName(templateId: string): string {
+    let name = this.mobUpdateBucketNames.get(templateId);
+    if (name === undefined) {
+      const family = MOBS[templateId]?.family ?? 'other';
+      name = `sim.mob.update|${family}`;
+      this.mobUpdateBucketNames.set(templateId, name);
+    }
+    return name;
+  }
+
   // Close an in-flight capture once its monotonic deadline passes: freeze the profile
   // and revert the detailed-timing switch to its baseline (env, so PERF_TICK_LOG keeps
   // working). Called once per loop body, right after commit.
@@ -3083,6 +3253,10 @@ export class GameServer {
       maxTicksPerCallback: this.perfCaptureMaxTicksPerCallback,
       online: this.clients.size,
       simEntities: this.sim.entities.size,
+      aggroVisitsTotal: this.mobScanTickStats.aggroVisitsTotal,
+      aggroVisitsMaxPerTick: this.mobScanTickStats.aggroVisitsMaxPerTick,
+      threatVisitsTotal: this.mobScanTickStats.threatVisitsTotal,
+      threatVisitsMaxPerTick: this.mobScanTickStats.threatVisitsMaxPerTick,
       profile: this.tickProfiler.profile(),
     };
     this.perfCaptureDeadlineNs = null;
@@ -3105,7 +3279,7 @@ export class GameServer {
     console.log(
       `[perf] online=${this.clients.size} ents=${this.sim.entities.size} tickHz=${this.tickHz == null ? 'n/a' : round2(this.tickHz)} tickMs=${round2(tickMs)}${overBudget ? ' OVER' : ''}` +
         ` | p95/max ${['total', 'tick', 'broadcast', 'bcastSelf', 'bcastGrid', 'events', 'social'].map(fmt).join(' ')}` +
-        ` | visits=${this.bcVisits} serializes=${this.bcSerializes} serializeMs=${round2(Number(this.bcSerializeNs) / 1e6)}`,
+        ` | visits=${this.bcVisits} serializes=${this.bcSerializes} serializeMs=${round2(Number(this.bcSerializeNs) / 1e6)} aggroVisits=${this.mobScanTickStats.lastAggroScanVisits} threatVisits=${this.mobScanTickStats.lastThreatEntryVisits}`,
     );
     // The sim.tick() internal breakdown, mean-sorted so the phase that actually eats
     // the average (not just a spike) leads. Populated only while detailed timing is on.
@@ -3575,6 +3749,7 @@ export class GameServer {
     // straight back, ruining the match for everyone else in it.
     if (session.jailed && typeof msg.cmd === 'string' && JAILED_BLOCKED_COMMANDS.has(msg.cmd)) {
       this.sendChatNotice(session, 'You cannot do that while jailed.');
+      this.sendCommandOutcome(session, msg, false);
       return;
     }
     // A command that can change a heavy self field forces the next snapshot to
@@ -3599,7 +3774,19 @@ export class GameServer {
         }
         break;
       case 'cast':
-        if (typeof msg.ability === 'string') sim.castAbility(msg.ability, pid);
+        if (typeof msg.ability === 'string') {
+          // Optional mouseover-cast override: an explicit friendly-target id.
+          // The sim validates it (friendly, alive, in range) and falls back to
+          // the classic current-target-else-self resolution when invalid.
+          if (typeof msg.target === 'number') {
+            sim.castAbilityOn(msg.ability, msg.target | 0, pid);
+          } else {
+            sim.castAbility(msg.ability, pid);
+          }
+        }
+        break;
+      case 'releaseEmpowered':
+        if (typeof msg.ability === 'string') sim.releaseEmpoweredAbility(msg.ability, pid);
         break;
       case 'cancel_aura':
         if (typeof msg.aura === 'string') sim.cancelAura(msg.aura, pid);
@@ -3629,7 +3816,11 @@ export class GameServer {
         sim.interact(pid);
         break;
       case 'loot':
-        if (typeof msg.id === 'number') sim.lootCorpse(msg.id, pid);
+        this.sendCommandOutcome(
+          session,
+          msg,
+          typeof msg.id === 'number' && sim.lootCorpse(msg.id, pid),
+        );
         break;
       case 'autoloot':
         if (typeof msg.id === 'number') sim.autoLoot(msg.id, pid);
@@ -3660,11 +3851,19 @@ export class GameServer {
         }
         break;
       case 'pickup':
-        if (typeof msg.id === 'number') sim.pickUpObject(msg.id, pid);
+        this.sendCommandOutcome(
+          session,
+          msg,
+          typeof msg.id === 'number' && sim.pickUpObject(msg.id, pid),
+        );
         break;
       case 'accept':
         if (typeof msg.quest === 'string') {
-          sim.acceptQuest(msg.quest, pid);
+          sim.acceptQuest(
+            msg.quest,
+            typeof msg.selection === 'string' ? msg.selection : undefined,
+            pid,
+          );
           this.resyncQuests(session);
         }
         break;
@@ -3700,7 +3899,25 @@ export class GameServer {
         }
         break;
       case 'equip':
-        if (typeof msg.item === 'string') sim.equipItem(msg.item, pid);
+        if (typeof msg.item === 'string') {
+          // The optional aimed slot (the paperdoll drop target) is accepted only
+          // when it names a real equipment key; anything else falls back to the
+          // sim's own resolver rather than trusting the client. The sim then
+          // re-validates the slot against the item itself.
+          const aimed =
+            typeof msg.slot === 'string' && (EQUIP_SLOTS as readonly string[]).includes(msg.slot)
+              ? (msg.slot as EquipSlot)
+              : undefined;
+          if (aimed) sim.equipItemToSlot(msg.item, aimed, pid);
+          else sim.equipItem(msg.item, pid);
+        }
+        break;
+      case 'inv_move':
+        // Manual bag order (a drag between bag cells). Both indices are re-validated
+        // inside the sim against the live bag, so a bogus pair is simply refused.
+        if (typeof msg.from === 'number' && typeof msg.to === 'number') {
+          sim.moveInventoryItem(msg.from, msg.to, pid);
+        }
         break;
       case 'unequip_item':
         if (typeof msg.slot === 'string' && (EQUIP_SLOTS as readonly string[]).includes(msg.slot)) {
@@ -3731,7 +3948,11 @@ export class GameServer {
         if (typeof msg.item === 'string') sim.buyBackItem(msg.item, pid);
         break;
       case 'harvest_node':
-        if (typeof msg.node === 'string') sim.harvestNode(msg.node, pid);
+        this.sendCommandOutcome(
+          session,
+          msg,
+          typeof msg.node === 'string' && sim.harvestNode(msg.node, pid),
+        );
         break;
       case 'craft_item':
         if (typeof msg.recipe === 'string') sim.craftItem(msg.recipe, pid);
@@ -3798,7 +4019,10 @@ export class GameServer {
         sim.resurrectAtCorpse(pid);
         break;
       case 'resurrect_healer':
-        sim.resurrectAtSpiritHealer(pid);
+        this.sendCommandOutcome(session, msg, sim.resurrectAtSpiritHealer(pid));
+        break;
+      case 'resurrect_respond':
+        if (typeof msg.accept === 'boolean') sim.respondToResurrection(msg.accept, pid);
         break;
       case 'challengeResponse':
         if (typeof msg.n === 'string' && typeof msg.r === 'string' && typeof msg.sig === 'string') {
@@ -3971,11 +4195,17 @@ export class GameServer {
       case 'pet_attack':
         sim.petAttack(pid);
         break;
+      case 'pet_water_jet':
+        sim.petWaterJet(pid);
+        break;
       case 'pet_taunt':
         sim.petTaunt(pid);
         break;
       case 'pet_auto_taunt':
         if (typeof msg.enabled === 'boolean') sim.setPetAutoTaunt(msg.enabled, pid);
+        break;
+      case 'pet_auto_water_jet':
+        if (typeof msg.enabled === 'boolean') sim.setPetAutoWaterJet(msg.enabled, pid);
         break;
       case 'pet_feed':
         if (typeof msg.item === 'string') sim.feedPet(msg.item, pid);
@@ -4134,6 +4364,21 @@ export class GameServer {
         break;
       }
 
+      // Card Duel minigame (the Card Master NPC, docs: src/sim/social/card_duel.ts).
+      case 'card_queue_join':
+        sim.joinCardDuelQueue(pid);
+        break;
+      case 'card_queue_leave':
+        sim.leaveCardDuelQueue(pid);
+        break;
+      case 'play_card':
+        if (typeof msg.value === 'number' && Number.isInteger(msg.value))
+          sim.playCardInDuel(msg.value, pid);
+        break;
+      case 'card_forfeit':
+        sim.forfeitCardDuel(pid);
+        break;
+
       // The Vale Cup (boarball queue at the Sowfield, docs/prd/vale-cup.md).
       // Deliberately NOT in HEAVY_SELF_CMDS: queueing mutates no heavy self
       // field (queue state rides the throttled 'vcup' delta key + the pid-
@@ -4232,28 +4477,46 @@ export class GameServer {
 
       // Talents & Specializations — every allocation re-validated in the Sim.
       case 'applyTalents': {
-        const alloc = talentAllocationFromWire(msg.alloc);
+        const alloc = parseTalentAllocation(msg.alloc);
         if (alloc) sim.applyTalents(alloc, pid);
         break;
       }
       case 'respec':
         sim.respec(pid);
         break;
-      case 'setSpec':
-        sim.setSpec(typeof msg.spec === 'string' ? msg.spec : null, pid);
-        break;
-      case 'saveLoadout': {
-        const alloc = talentAllocationFromWire(msg.alloc) ?? undefined;
-        if (typeof msg.name === 'string')
-          sim.saveLoadout(msg.name, Array.isArray(msg.bar) ? msg.bar : [], pid, alloc);
+      case 'setSpec': {
+        const spec = parseTalentOptionId(msg.spec);
+        if (spec !== undefined) sim.setSpec(spec, pid);
         break;
       }
-      case 'switchLoadout':
-        if (typeof msg.index === 'number') sim.switchLoadout(msg.index | 0, pid);
+      case 'selectTalentRow': {
+        const level = parseTalentRowLevel(msg.level);
+        const optionId = parseTalentOptionId(msg.optionId);
+        if (level !== null && optionId !== undefined) sim.selectTalentRow(level, optionId, pid);
         break;
-      case 'deleteLoadout':
-        if (typeof msg.index === 'number') sim.deleteLoadout(msg.index | 0, pid);
+      }
+      case 'saveLoadout': {
+        const hasAlloc = Object.hasOwn(msg, 'alloc');
+        if (hasAlloc) {
+          const alloc = parseTalentAllocation(msg.alloc);
+          if (typeof msg.name === 'string' && alloc) {
+            sim.saveLoadout(msg.name, Array.isArray(msg.bar) ? msg.bar : [], pid, alloc);
+          }
+        } else if (typeof msg.name === 'string') {
+          sim.saveLoadout(msg.name, Array.isArray(msg.bar) ? msg.bar : [], pid);
+        }
         break;
+      }
+      case 'switchLoadout': {
+        const index = parseTalentLoadoutIndex(msg.index);
+        if (index !== null) sim.switchLoadout(index, pid);
+        break;
+      }
+      case 'deleteLoadout': {
+        const index = parseTalentLoadoutIndex(msg.index);
+        if (index !== null) sim.deleteLoadout(index, pid);
+        break;
+      }
       // World Market (the Merchant's auction house)
       case 'market_search':
         sim.marketSearch(
@@ -4492,13 +4755,20 @@ export class GameServer {
       case 'enter_dungeon': {
         // must actually be near that dungeon's door
         const dungeonId = msg.cmd === 'enter_crypt' ? 'hollow_crypt' : msg.dungeon;
-        if (typeof dungeonId !== 'string') break;
+        if (typeof dungeonId !== 'string') {
+          this.sendCommandOutcome(session, msg, false);
+          break;
+        }
         const e = sim.entities.get(pid);
         const door = [...sim.entities.values()].find(
           (x) => x.templateId === 'dungeon_door' && x.dungeonId === dungeonId,
         );
-        if (e && door && Math.hypot(e.pos.x - door.pos.x, e.pos.z - door.pos.z) < 8)
+        const succeeded =
+          !!e &&
+          !!door &&
+          Math.hypot(e.pos.x - door.pos.x, e.pos.z - door.pos.z) < 8 &&
           sim.enterDungeon(dungeonId, pid);
+        this.sendCommandOutcome(session, msg, succeeded);
         break;
       }
       case 'leave_crypt':
@@ -4511,7 +4781,7 @@ export class GameServer {
                 Math.hypot(e.pos.x - x.pos.x, e.pos.z - x.pos.z) < 8,
             )
           : null;
-        if (exit) sim.leaveDungeon(pid);
+        this.sendCommandOutcome(session, msg, !!exit && sim.leaveDungeon(pid));
         break;
       }
       case 'set_dungeon_difficulty': {
@@ -4542,8 +4812,11 @@ export class GameServer {
         break;
       }
       case 'delve_interact': {
-        if (typeof msg.objectId !== 'number') break;
-        sim.delveInteract(msg.objectId, pid);
+        this.sendCommandOutcome(
+          session,
+          msg,
+          typeof msg.objectId === 'number' && sim.delveInteract(msg.objectId, pid),
+        );
         break;
       }
       case 'companion_upgrade': {
@@ -4641,6 +4914,8 @@ export class GameServer {
       }
     }
     const head = `{"t":"snap","tick":${tick},"time":${round2(this.sim.time)}${tickHzJson}`;
+    const activeFrostRings = this.sim.activeFrostRings;
+    const activeTemporalHourglasses = this.sim.activeTemporalHourglasses;
     // Guard each session: a throw while building one player's snapshot must not
     // starve every other session of its snapshot this tick (server/CLAUDE.md).
     forEachGuarded(
@@ -4736,7 +5011,35 @@ export class GameServer {
         const selfJson = this.selfWireJson(session, anchorEntity, anchorMeta, anchorSession);
         if (this.perfDetailActive) this.bcastSelfNs += process.hrtime.bigint() - selfStart;
         const keepJson = keep.length > 0 ? `,"keep":[${keep.join(',')}]` : '';
-        this.sendRaw(session, `${head},"self":${selfJson},"ents":[${ents.join(',')}]${keepJson}}`);
+        const frostRings = activeFrostRings
+          .filter((ring) => {
+            const dx = ring.x - anchorEntity.pos.x;
+            const dz = ring.z - anchorEntity.pos.z;
+            const limit = INTEREST_QUERY_RADIUS + ring.radius;
+            return dx * dx + dz * dz <= limit * limit;
+          })
+          .map(
+            (ring) =>
+              `{"id":${JSON.stringify(ring.id)},"x":${round2(ring.x)},"z":${round2(ring.z)},"r":${round2(ring.radius)},"i":${round2(ring.innerRadius)},"dur":${round2(ring.duration)},"rem":${round2(ring.remaining)}}`,
+          );
+        const frostRingsJson = frostRings.length > 0 ? `,"rings":[${frostRings.join(',')}]` : '';
+        const temporalHourglasses = activeTemporalHourglasses
+          .filter((hourglass) => {
+            const dx = hourglass.x - anchorEntity.pos.x;
+            const dz = hourglass.z - anchorEntity.pos.z;
+            const limit = INTEREST_QUERY_RADIUS + hourglass.radius;
+            return dx * dx + dz * dz <= limit * limit;
+          })
+          .map(
+            (hourglass) =>
+              `{"id":${JSON.stringify(hourglass.id)},"x":${round2(hourglass.x)},"z":${round2(hourglass.z)},"r":${round2(hourglass.radius)},"dur":${round2(hourglass.duration)},"rem":${round2(hourglass.remaining)}}`,
+          );
+        const temporalHourglassesJson =
+          temporalHourglasses.length > 0 ? `,"hourglasses":[${temporalHourglasses.join(',')}]` : '';
+        this.sendRaw(
+          session,
+          `${head},"self":${selfJson},"ents":[${ents.join(',')}]${frostRingsJson}${temporalHourglassesJson}${keepJson}}`,
+        );
       },
       (err, session) =>
         console.error(`[snap] failed to build snapshot for pid ${session.pid}, skipping:`, err),
@@ -4839,6 +5142,7 @@ export class GameServer {
       dodge: p.dodgeChance,
       crat: p.critRating,
       hrat: p.hasteRating,
+      hirat: p.hitRating,
       eat: p.eating ? { remaining: round2(p.eating.remaining) } : null,
       drk: p.drinking ? { remaining: round2(p.drinking.remaining) } : null,
       opUntil: p.overpowerUntil > this.sim.time ? 1 : 0,
@@ -4877,12 +5181,38 @@ export class GameServer {
     // draws the corpse marker and gates the resurrect-at-corpse button on it.
     maybe('corpse', p.corpsePos);
     maybe('cds', Object.fromEntries([...p.cooldowns.entries()].map(([k, v]) => [k, round2(v)])));
+    // Per-player gather-node respawn cooldowns (#1866), same shape/semantics as
+    // `cds` above: remaining seconds AS OF THIS TICK, ticking down tick over
+    // tick (so `maybe` re-ships it while any node is still cooling down and
+    // drops a node's key the tick it clears), matching
+    // PlayerMeta.nodeHarvestReadyAt's own "absent means ready" contract (see
+    // src/sim/professions/gathering.ts isNodeHarvestableBy). Only entries with
+    // remaining time survive the filter, an already-elapsed timer reads as ready.
+    maybe(
+      'ncd',
+      Object.fromEntries(
+        Object.entries(meta.nodeHarvestReadyAt)
+          .filter(([, until]) => until > this.sim.time)
+          .map(([k, until]) => [k, round2(until - this.sim.time)]),
+      ),
+    );
+    // Charge-limited ability live counts (abilityCharges, the one recharge
+    // model: Twinstrike, Double Charge, Frost's second Ice Block): {abilityId:
+    // charges}. The empty-pool recharge timer rides `cds`; the client derives
+    // the max from its own known-list rebake (1 + bonusCharges).
+    maybe(
+      'achg',
+      p.abilityCharges
+        ? Object.fromEntries(Object.entries(p.abilityCharges).map(([k, v]) => [k, v.charges]))
+        : {},
+    );
     maybe('stats', p.stats);
     maybe('weapon', p.weapon);
     maybe('party', this.partyWire(anchorSession.pid));
     maybe('marks', this.markersWire(anchorSession.pid));
     maybe('trade', this.tradeWire(anchorSession.pid));
     maybe('duel', this.duelWire(anchorSession.pid));
+    maybe('cardDuel', this.sim.cardMinigameInfoFor(anchorSession.pid));
     // Small PvP-ledger scalars. Delta-guarded like delve marks: a fresh
     // session receives both, then they ride only on earn/spend changes.
     maybe('honor', meta.honor);
@@ -4939,6 +5269,9 @@ export class GameServer {
     // mirrors the raw per-craft proficiency map for the `gatheringProficiency`
     // IWorld data member (#1119), independent of the `professionsState` view.
     maybe('prof', this.sim.professionsStateFor(anchorSession.pid));
+    // Craft skills and identity must arrive as one value so the client never
+    // evaluates a recipe against a pair from one tick and skills from another.
+    maybe('cprof', this.sim.craftingIdentityFor(anchorSession.pid));
     maybe('tfocus', this.sim.townFocusFor(anchorSession.pid));
     // Raw gathering-profession proficiency map (IWorld `gatheringProficiency`,
     // #1119), a second small read alongside `prof` for the ORIGINAL flat-map
@@ -4990,8 +5323,6 @@ export class GameServer {
       // talents/spec/loadouts: the client recomputes its known abilities from this.
       maybe('tal', {
         alloc: meta.talents,
-        spec: meta.talentMods.spec,
-        role: meta.talentMods.role,
         loadouts: meta.loadouts,
         activeLoadout: meta.activeLoadout,
       });
@@ -5006,9 +5337,30 @@ export class GameServer {
     return extra === '' ? json : `${json.slice(0, -1)}${extra}}`;
   }
 
+  // Global party-frame aggregates (aggro holders + incoming heals), scanned once
+  // per tick and shared by every partyWire call in that tick.
+  private partyFrameGlobals(): {
+    aggroTargets: ReturnType<typeof partyFrameAggroTargets>;
+    incomingHeals: ReturnType<typeof partyFrameIncomingHeals>;
+  } {
+    const tick = this.sim.tickCount;
+    const cache = this.partyFrameGlobalsCache;
+    if (cache && cache.tick === tick) return cache;
+    const fresh = {
+      tick,
+      aggroTargets: partyFrameAggroTargets(this.sim.entities.values()),
+      incomingHeals: partyFrameIncomingHeals(this.sim.entities.values(), (abilityId, casterId) =>
+        this.sim.resolvedAbility(abilityId, casterId),
+      ),
+    };
+    this.partyFrameGlobalsCache = fresh;
+    return fresh;
+  }
+
   private partyWire(pid: number): unknown {
     const party = this.sim.partyOf(pid);
     if (!party) return null;
+    const { aggroTargets, incomingHeals } = this.partyFrameGlobals();
     return {
       leader: party.leader,
       raid: party.raid,
@@ -5034,15 +5386,21 @@ export class GameServer {
                 dead: e.dead ? 1 : 0,
                 inCombat: e.inCombat ? 1 : 0,
                 group: party.raidGroups.get(mPid) ?? 1,
-                // The mini aura strip under the member's party row (mirrors
-                // Sim.partyInfo): first N in aura order, id + kind + sap flag
-                // only, no countdown, so this payload changes only when the
-                // aura SET changes and the party delta elision keeps working.
-                auras: e.auras.slice(0, PARTY_MEMBER_AURA_CAP).map((a) => ({
-                  id: a.id,
-                  kind: a.kind,
-                  ...(a.value < 0 ? { neg: 1 } : {}),
-                })),
+                absorb: partyFrameAbsorb(e.auras),
+                role: partyFrameRole(meta.talentMods.role),
+                // Effective health Rewind could currently restore to this member
+                // (combat/rewind.ts); 0 for members with no recent recorded loss.
+                rewind: rewindHealAmount(damageTakenWithin(e, this.sim.tickCount), e.hp, e.maxHp),
+                connected:
+                  meta.isDevBot || (this.clients.has(mPid) && !this.clients.get(mPid)?.linkdead)
+                    ? 1
+                    : 0,
+                hasAggro: aggroTargets.has(mPid) ? 1 : 0,
+                incomingHeal: incomingHeals.get(mPid) ?? 0,
+                // Temporal Echo marks are filtered per-viewer to `pid`'s own, so
+                // other chronomancers' echoes (which still heal in the sim) never
+                // show in this player's group/raid strip.
+                auras: partyFrameAuras(e.auras.filter((a) => echoVisibleTo(a, pid))),
               }
             : null;
         })
@@ -5127,6 +5485,10 @@ export class GameServer {
           // must not spam their guild).
           if (ev.retro !== true) this.maybeBroadcastDeedUnlock(s, ev.deedId);
         }
+      }
+      if (ev.type === 'levelup' && ev.pid !== undefined) {
+        const session = this.clients.get(ev.pid);
+        if (session) session.metricsMaxLevel = Math.max(session.metricsMaxLevel, ev.level);
       }
       if (ev.type === 'levelup' && ev.level === 5 && ev.pid !== undefined) {
         const s = this.clients.get(ev.pid);
@@ -5376,7 +5738,7 @@ export class GameServer {
         }
         const mine: SimEvent[] = [];
         for (const ev of events) {
-          if (suppressedInvites !== null && suppressedInvites.has(ev)) continue;
+          if (suppressedInvites?.has(ev)) continue;
           // ignore list: drop chat originating from a character this player has
           // blocked, before it ever reaches their client
           if (
@@ -5937,6 +6299,11 @@ export class GameServer {
 
   private send(session: ClientSession, obj: unknown): void {
     this.sendRaw(session, JSON.stringify(obj));
+  }
+
+  private sendCommandOutcome(session: ClientSession, msg: ClientMessage, succeeded: boolean): void {
+    if (!Number.isSafeInteger(msg.rid) || (msg.rid ?? 0) <= 0) return;
+    this.send(session, { t: 'commandOutcome', rid: msg.rid, ok: succeeded });
   }
 
   private sendRaw(session: ClientSession, payload: string): void {

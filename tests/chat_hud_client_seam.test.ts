@@ -1,6 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ClientWorld } from '../src/net/online';
 import { Hud } from '../src/ui/hud';
+import {
+  ChatWindowController,
+  type ChatWindowControllerDeps,
+} from '../src/ui/hud/chat/chat_window_controller';
 
 vi.mock('../src/render/characters', () => ({ CharacterPreview: class {} }));
 vi.mock('../src/render/characters/assets', () => ({ preloadMechAssets: vi.fn() }));
@@ -17,14 +21,11 @@ describe('Hud to ClientWorld chat seam', () => {
     vi.stubGlobal('WebSocket', { OPEN: 1 });
     const hud = Object.create(Hud.prototype) as InstanceType<typeof Hud>;
     const state = hud as unknown as {
-      activeChatTab: string;
-      stickyChannel: string;
-      pendingChatLinks: readonly unknown[];
-      chatInputTintTarget(): string;
+      chatWindow: { composeSend(typed: string): string };
     };
-    state.activeChatTab = 'all';
-    state.stickyChannel = 'say';
-    state.pendingChatLinks = [];
+    state.chatWindow = {
+      composeSend: (typed) => `/say ${typed}`,
+    };
 
     const sent: unknown[] = [];
     const client = Object.create(ClientWorld.prototype) as ClientWorld;
@@ -34,9 +35,74 @@ describe('Hud to ClientWorld chat seam', () => {
       ws: { readyState: 1, send: (raw: string) => sent.push(JSON.parse(raw)) },
     });
 
-    expect(state.chatInputTintTarget()).toBe('say');
     client.chat(hud.composeChatSend('hello nearby players'));
 
     expect(sent).toEqual([{ t: 'cmd', cmd: 'chat', text: '/say hello nearby players' }]);
+  });
+
+  it('stays on the last channel sent, including a whisper reply (v0.26.0 regression)', () => {
+    vi.stubGlobal('WebSocket', { OPEN: 1 });
+    const hud = Object.create(Hud.prototype) as InstanceType<typeof Hud>;
+    // The Hud delegates chat compose/sticky state to its ChatWindowController; a
+    // bare instance never ran init, so its state is the field defaults (All tab,
+    // sticky say). No dep is exercised by compose/noteSent, so an empty deps
+    // object is enough here.
+    const controller = new ChatWindowController({} as ChatWindowControllerDeps);
+    (hud as unknown as { chatWindow: ChatWindowController }).chatWindow = controller;
+    const state = controller as unknown as {
+      stickyTarget: string;
+      inputTintTarget(): string;
+    };
+
+    // Send in party: the sticky target follows there.
+    hud.noteSentChannel(hud.composeChatSend('/p on my way'), true);
+    expect(state.stickyTarget).toBe('party');
+
+    // Reply to a whisper: the sticky target follows to whisper, and the NEXT plain
+    // line keeps replying (/r) instead of snapping back to party (the regression).
+    hud.noteSentChannel(hud.composeChatSend('/r sure thing'), true);
+    expect(state.stickyTarget).toBe('whisper');
+    expect(hud.composeChatSend('and thanks')).toBe('/r and thanks');
+    expect(state.inputTintTarget()).toBe('whisper');
+  });
+
+  it('stays in guild after a /g send online, instead of snapping back to General', () => {
+    // The reported bug: talk in General, then Guild via the classic /g command, and
+    // the next plain line reverts to General. "/g" reaches guild online but is not a
+    // host-independent standing channel, so the sticky target must follow it here.
+    vi.stubGlobal('WebSocket', { OPEN: 1 });
+    const hud = Object.create(Hud.prototype) as InstanceType<typeof Hud>;
+    // Same bare-instance setup as above: field defaults are the All tab and a
+    // sticky say target, and compose/noteSent exercise no dep.
+    const controller = new ChatWindowController({} as ChatWindowControllerDeps);
+    (hud as unknown as { chatWindow: ChatWindowController }).chatWindow = controller;
+    const state = controller as unknown as {
+      stickyTarget: string;
+      inputTintTarget(): string;
+    };
+
+    // Talk in General (the /1 shortcut), then in Guild (the classic /g), both online.
+    hud.noteSentChannel(hud.composeChatSend('/1 hey all'), true);
+    expect(state.stickyTarget).toBe('general');
+    hud.noteSentChannel(hud.composeChatSend('/g coming'), true);
+
+    // The next plain line stays in guild (/gu), not back to /general.
+    expect(state.stickyTarget).toBe('guild');
+    expect(hud.composeChatSend('on my way')).toBe('/gu on my way');
+    expect(state.inputTintTarget()).toBe('guild');
+  });
+
+  it('threads the host flag through: a bare /g send offline sticks to General', () => {
+    // The other arm of the host-aware resolution, exercised through the same
+    // Hud delegation: offline the sim routes bare /g to General, so the sticky
+    // follows it there (a controller that ignored the flag would fail here).
+    vi.stubGlobal('WebSocket', { OPEN: 1 });
+    const hud = Object.create(Hud.prototype) as InstanceType<typeof Hud>;
+    const controller = new ChatWindowController({} as ChatWindowControllerDeps);
+    (hud as unknown as { chatWindow: ChatWindowController }).chatWindow = controller;
+    const state = controller as unknown as { stickyTarget: string };
+
+    hud.noteSentChannel('/g anyone around', false);
+    expect(state.stickyTarget).toBe('general');
   });
 });

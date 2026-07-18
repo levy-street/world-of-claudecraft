@@ -62,10 +62,15 @@ Do not invent a new architecture. Pick the seam that matches the work:
   DOM-free pure view core (`src/ui/<name>_view.ts` or `_core.ts`, registered in the
   `UI_PURE_CORES` allowlist that `tests/architecture.test.ts` sweeps) plus a thin
   write-elided painter on the `PainterHost` seam (`src/ui/painter_host.ts`),
-  instance-parameterized (take a descriptor or id, no hardcoded element id). Reuse a
-  painter FAMILY before writing a bespoke one (a unit-style frame is a
-  `UnitFramePainter`; an extra action bar is a new `ActionBarPainter(descriptor)`).
-  Full recipe: `src/ui/CLAUDE.md`.
+  instance-parameterized (take a descriptor or id, no hardcoded element id). A
+  component that belongs to an extracted HUD domain lands in its
+  `src/ui/hud/<domain>/` directory and exports through that domain's `index.ts`
+  (domain modules never import the `Hud` class; they receive narrow dependency
+  bags; see `src/ui/hud/CLAUDE.md`); a standalone component stays a flat
+  `src/ui/` sibling. Reuse a painter FAMILY before writing a bespoke one (a
+  unit-style frame is a `UnitFramePainter`; an extra action bar is a new
+  `ActionBarPainter(descriptor)`). Full recipe: `src/ui/CLAUDE.md` and
+  `src/ui/hud/CLAUDE.md`.
 - **New server REST endpoint:** a `RouteDef` module (`server/<domain>.ts` exporting
   `routes`) registered in `server/http/registry.ts`, never an inline route in
   `main.ts`. Scaffold with `npm run new:endpoint`; see `server/http/CLAUDE.md`.
@@ -141,6 +146,12 @@ After an extraction or fix, these stay green (run the subset your change touches
   whole-tree `--write` (the repo defers global Biome debt, so a whole-tree write buries your
   change in thousands of unrelated reformats).
 - `npm run build` before a merge
+
+When the change is database-backed (SQL or a query call site, schema/indexes, query cadence
+or cardinality, pool/lock/timeout behavior, scheduled database work, or stored-data growth),
+get a read-only `database-performance-reviewer` checkpoint BEFORE implementing and carry its
+concrete bounds and evidence requirements into the test-first contract; re-run it on the
+finished diff.
 
 When you extract, the diff should read as move plus import, not rewrite. If you
 "improved" the moved code in the same change, that is scope creep: split it into a

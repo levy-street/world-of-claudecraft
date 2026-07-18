@@ -9,19 +9,33 @@ import {
   buildRelayMessage,
   buildWelcomeMessage,
   buildWhoamiContent,
+  chunk,
+  clearDepartedFlair,
+  clearedMemberMeta,
   computeRoleSync,
   GATEWAY_INTENTS,
+  GATEWAY_OP,
+  GUILD_LARGE_THRESHOLD,
   heartbeatIntervalMs,
   identifyPayload,
+  indexSpecialRoleIds,
   isSlashCommand,
   levelNickSuffix,
+  MEMBERS_META_BATCH,
+  memberRolesFromPayload,
   NICK_MAX,
   type RelayItem,
+  reconcileMemberRolesFromUpdate,
   relayAvatarUrl,
   relayRespondUrl,
+  requestGuildMembersPayload,
+  rosterComplete,
+  staleFlairedIds,
   tierRoleName,
+  topSpecialRoleKeyFor,
   voiceMembersForChannel,
 } from '../bot/logic';
+import { DEFAULT_JSON_BODY_MAX_BYTES } from '../server/http_util';
 
 describe('gateway protocol helpers', () => {
   it('requests the privileged member + presence intents', () => {
@@ -34,6 +48,245 @@ describe('gateway protocol helpers', () => {
     expect(heartbeatIntervalMs({ d: { heartbeat_interval: 41250 } })).toBe(41250);
     expect(heartbeatIntervalMs({ d: { heartbeat_interval: 10 } })).toBe(1000); // floored
     expect(heartbeatIntervalMs({})).toBe(41250); // default
+  });
+
+  it('raises the large_threshold so offline members ship in GUILD_CREATE', () => {
+    expect(GUILD_LARGE_THRESHOLD).toBe(250);
+    expect((identifyPayload('tok').d as Record<string, unknown>).large_threshold).toBe(250);
+  });
+
+  it('requests the full member list with op 8 (query "" / limit 0 / presences)', () => {
+    expect(GATEWAY_OP.REQUEST_GUILD_MEMBERS).toBe(8); // Discord opcode, pinned
+    expect(requestGuildMembersPayload('guild-1')).toEqual({
+      op: 8,
+      d: { guild_id: 'guild-1', query: '', limit: 0, presences: true },
+    });
+  });
+});
+
+describe('special-role resolution (staff flair)', () => {
+  // A guild that (as in the bug report) has BOTH an "Admin" and an "Admins" role,
+  // plus a higher-priority "Levy St" role and a non-special role.
+  const guildRoles = [
+    { id: 'r-admin', name: 'Admin' },
+    { id: 'r-admins', name: 'Admins' },
+    { id: 'r-levy', name: 'Levy St' },
+    { id: 'r-member', name: 'Member' },
+  ];
+
+  it('indexes ALL ids that map to a key so either "Admin" or "Admins" resolves', () => {
+    const index = indexSpecialRoleIds(guildRoles);
+    // Both admin-aliased role ids are kept (the old first-wins map dropped one).
+    expect(index.get('r-admin')).toBe('admin');
+    expect(index.get('r-admins')).toBe('admin');
+    expect(index.get('r-member')).toBeUndefined(); // not a special role
+    // A holder of EITHER admin role id resolves to the 'admin' flair.
+    expect(topSpecialRoleKeyFor(['r-admin'], index)).toBe('admin');
+    expect(topSpecialRoleKeyFor(['r-admins'], index)).toBe('admin');
+    expect(topSpecialRoleKeyFor(['r-member'], index)).toBeNull();
+  });
+
+  it('picks the highest-priority special role a member holds', () => {
+    const index = indexSpecialRoleIds(guildRoles);
+    // Levy St (priority 11) outranks Admin (10) per the shared catalog.
+    expect(topSpecialRoleKeyFor(['r-admins', 'r-levy'], index)).toBe('levyst');
+  });
+
+  it('reflects a live GUILD_MEMBER_UPDATE role grant in the resolved flair', () => {
+    const index = indexSpecialRoleIds(guildRoles);
+    // Before: the member holds only a non-special role -> no flair.
+    const before = ['r-member'];
+    expect(topSpecialRoleKeyFor(before, index)).toBeNull();
+    // A GUILD_MEMBER_UPDATE arrives granting the Admins role: Discord sends the
+    // member's COMPLETE role list, so the reconciled state replaces the cache.
+    const after = reconcileMemberRolesFromUpdate({ roles: ['r-member', 'r-admins'] });
+    expect(after).toEqual(['r-member', 'r-admins']);
+    // After: 'admin' now resolves where it did not before (the core bug fix).
+    expect(topSpecialRoleKeyFor(after ?? [], index)).toBe('admin');
+  });
+
+  it('leaves the cache untouched when an update carries no roles array', () => {
+    expect(reconcileMemberRolesFromUpdate({ nick: 'Nyx' })).toBeNull();
+    expect(reconcileMemberRolesFromUpdate({ roles: ['a', 2, 'b', null] })).toEqual(['a', 'b']);
+  });
+
+  it('extracts a member payload role-id array, dropping non-strings', () => {
+    expect(memberRolesFromPayload({ roles: ['x', 'y'] })).toEqual(['x', 'y']);
+    expect(memberRolesFromPayload({ roles: [1, 'z', {}] })).toEqual(['z']);
+    expect(memberRolesFromPayload({})).toEqual([]);
+  });
+});
+
+describe('members-meta batching + clearing', () => {
+  it('batches the full roster in cap-sized requests without dropping the tail', () => {
+    // The batch size is derived from the server's 64 KiB body cap (see the
+    // byte-budget test below), and must also stay at or under the server's
+    // 1000-entry slice (pinned server-side in tests/server/internal.test.ts).
+    expect(MEMBERS_META_BATCH).toBe(200);
+
+    // A large-guild backfill: 2500 members. The old single-slice push kept only
+    // the first 1000, so members 1000..2499 never got meta pushed. Batching must
+    // split at exactly the cap and cover the whole roster including the tail.
+    const ids = Array.from({ length: 2500 }, (_, i) => `u${i}`);
+    const batches = chunk(ids, MEMBERS_META_BATCH);
+
+    expect(batches.length).toBe(13); // 12 full batches of 200 + a 100 tail
+    for (const b of batches) expect(b.length).toBeLessThanOrEqual(MEMBERS_META_BATCH);
+    // Every member appears exactly once, in order (nothing dropped past the cap).
+    expect(batches.flat()).toEqual(ids);
+    expect(batches.flat()).toContain('u2499'); // the tail member is covered
+  });
+
+  it('a worst-case full batch serializes under the server JSON body cap', () => {
+    // readBody rejects request bodies over DEFAULT_JSON_BODY_MAX_BYTES, and the
+    // members-meta handler coerces that rejection to an EMPTY member list (200,
+    // updated: 0): the whole batch silently drops. So the batch size must be
+    // derived from BYTES, not the server's 1000-entry slice: a full batch of
+    // worst-case records (20-char snowflake ids, 32-char names where every char
+    // JSON-escapes to 6 bytes, full join dates, the longest role key) must fit
+    // under the cap. This is the pin that fails if MEMBERS_META_BATCH grows, a
+    // pushed field widens, or the server cap shrinks.
+    const worst = Array.from({ length: MEMBERS_META_BATCH }, () => ({
+      discord_user_id: '9'.repeat(20),
+      name: '\u0001'.repeat(32), // control chars: JSON.stringify emits \u0001 (6 bytes) each
+      joinedAtMs: 1_700_000_000_000,
+      role: 'contentcreator', // the longest key in DISCORD_SPECIAL_ROLES
+    }));
+    const bytes = Buffer.byteLength(JSON.stringify({ members: worst }), 'utf8');
+    expect(bytes).toBeLessThan(DEFAULT_JSON_BODY_MAX_BYTES);
+  });
+
+  it('chunk clamps a non-positive size and never emits empty batches', () => {
+    expect(chunk([], 1000)).toEqual([]); // empty roster -> no request
+    expect(chunk(['a', 'b', 'c'], 0)).toEqual([['a'], ['b'], ['c']]); // size clamped to 1
+    expect(chunk(['a', 'b', 'c'], 2)).toEqual([['a', 'b'], ['c']]);
+  });
+
+  it('builds a clearing meta record that drops an ex-member flair', () => {
+    // On GUILD_MEMBER_REMOVE the bot sends this (plus setMember(id, false)) so the
+    // ex-member loses their in-game verified/staff tag. A null role key is what the
+    // server treats as "clear the special-role flair"; name/join-date stay null so
+    // nothing is re-asserted. The old removal path only deleted the local cache and
+    // left this server state stale, so this record + its null role are the fix.
+    expect(clearedMemberMeta('123')).toEqual({
+      discord_user_id: '123',
+      name: null,
+      joinedAtMs: null,
+      role: null,
+    });
+  });
+});
+
+describe('departed-member reconcile (flair cleared after an offline leave)', () => {
+  it('rosterComplete requires a positive member_count fully covered by the cache', () => {
+    // The gate that keeps the reconcile from running against a PARTIAL roster
+    // (a large-guild GUILD_CREATE before the op 8 backfill lands): a partial
+    // diff would misread unseeded members as departed and clear real flair.
+    expect(rosterComplete(10, 10)).toBe(true);
+    expect(rosterComplete(11, 10)).toBe(true); // a join mid-seed can overshoot
+    expect(rosterComplete(9, 10)).toBe(false); // partial seed: never reconcile
+    expect(rosterComplete(0, 0)).toBe(false); // no member_count: never reconcile
+    expect(rosterComplete(5, 0)).toBe(false);
+  });
+
+  it('clearDepartedFlair pushes null-role meta BEFORE dropping the membership flag', async () => {
+    // The clear order matters for the reader: the meta row (role: null) is what
+    // drops the visible flair, so it lands before the membership flag flips.
+    const ops: string[] = [];
+    const io = {
+      pushMembersMeta: async (records: { discord_user_id: string }[]) => {
+        ops.push(`meta:${records.map((r) => r.discord_user_id).join(',')}`);
+      },
+      setMember: async (id: string, guildMember: boolean) => {
+        ops.push(`member:${id}:${guildMember}`);
+      },
+    };
+    const cleared = await clearDepartedFlair(['u1', 'u2'], () => false, io);
+    expect(ops).toEqual(['meta:u1,u2', 'member:u1:false', 'member:u2:false']);
+    expect(cleared).toEqual(['u1', 'u2']);
+  });
+
+  it('clearDepartedFlair batches the meta clears under the members-meta cap', async () => {
+    const ops: string[] = [];
+    const io = {
+      pushMembersMeta: async (records: unknown[]) => {
+        ops.push(`meta:${records.length}`);
+      },
+      setMember: async (id: string) => {
+        ops.push(`member:${id}`);
+      },
+    };
+    await clearDepartedFlair(['a', 'b', 'c'], () => false, io, 2);
+    // Split at the injected cap with the tail kept, and the ordering is GLOBAL:
+    // every meta batch lands before ANY membership flag flips (a per-batch
+    // interleave of meta and flag writes would fail here).
+    expect(ops).toEqual(['meta:2', 'meta:1', 'member:a', 'member:b', 'member:c']);
+  });
+
+  it('clearDepartedFlair re-evaluates membership FRESH before each flag write', async () => {
+    // u1 rejoins WHILE the meta push is in flight (GUILD_MEMBER_ADD mutates the
+    // live cache during the await). The flag phase must re-read membership and
+    // skip the rejoiner: an implementation that snapshots the non-member set
+    // once before the pushes would wrongly setMember('u1', false) here.
+    const members = new Set<string>();
+    const ops: string[] = [];
+    const io = {
+      pushMembersMeta: async (records: { discord_user_id: string }[]) => {
+        ops.push(`meta:${records.map((r) => r.discord_user_id).join(',')}`);
+        members.add('u1'); // the rejoin lands during this await
+      },
+      setMember: async (id: string, guildMember: boolean) => {
+        ops.push(`member:${id}:${guildMember}`);
+      },
+    };
+    const cleared = await clearDepartedFlair(['u1', 'u2'], (id) => members.has(id), io);
+    expect(ops).toEqual(['meta:u1,u2', 'member:u2:false']);
+    expect(cleared).toEqual(['u2']);
+  });
+
+  it('clearDepartedFlair skips a member re-observed between the diff and the writes', async () => {
+    // u2 rejoined (GUILD_MEMBER_ADD) after the roster diff flagged them: the
+    // membership predicate is re-checked before EVERY write, so u2 is neither
+    // meta-cleared nor unflagged, and the live event handlers keep their state.
+    const ops: string[] = [];
+    const io = {
+      pushMembersMeta: async (records: { discord_user_id: string }[]) => {
+        ops.push(`meta:${records.map((r) => r.discord_user_id).join(',')}`);
+      },
+      setMember: async (id: string, guildMember: boolean) => {
+        ops.push(`member:${id}:${guildMember}`);
+      },
+    };
+    const cleared = await clearDepartedFlair(['u1', 'u2'], (id) => id === 'u2', io);
+    expect(ops).toEqual(['meta:u1', 'member:u1:false']);
+    expect(cleared).toEqual(['u1']);
+  });
+
+  it('clearDepartedFlair makes no calls at all when everyone was re-observed', async () => {
+    let calls = 0;
+    const io = {
+      pushMembersMeta: async () => {
+        calls++;
+      },
+      setMember: async () => {
+        calls++;
+      },
+    };
+    expect(await clearDepartedFlair(['u1'], () => true, io)).toEqual([]);
+    expect(await clearDepartedFlair([], () => false, io)).toEqual([]);
+    expect(calls).toBe(0); // no empty meta push, no member write
+  });
+
+  it('staleFlairedIds returns exactly the flagged ids missing from the roster', () => {
+    // u2 left while the bot was offline (flagged server-side, not in the live
+    // roster); u1 is still a member and must NOT be cleared.
+    const roster = new Set(['u1', 'u3']);
+    expect(staleFlairedIds(['u1', 'u2'], roster)).toEqual(['u2']);
+    expect(staleFlairedIds(['u1'], roster)).toEqual([]); // nothing stale
+    expect(staleFlairedIds([], roster)).toEqual([]); // nothing flagged
+    // An empty roster set claims everyone flagged is stale, which is why the
+    // caller gates on rosterComplete before ever diffing.
+    expect(staleFlairedIds(['u1'], new Set())).toEqual(['u1']);
   });
 });
 
@@ -299,6 +552,8 @@ describe('daily rewards winner cards', () => {
   it('formats the top-10 daily rewards winners without pings', () => {
     const msg = buildDailyRewardWinnersMessage({
       day: '2026-06-30',
+      taskName: 'Complete quests',
+      nextTaskName: 'Win an arena match',
       realm: 'Claudemoon',
       prizePoolUsd: 150,
       finalizedAt: '2026-07-01T00:00:00.000Z',
@@ -327,6 +582,7 @@ describe('daily rewards winner cards', () => {
     }) as {
       allowed_mentions: unknown;
       embeds: Array<{
+        author: { name: string };
         title: string;
         description: string;
         fields: Array<{ name: string; value: string; inline: boolean }>;
@@ -334,13 +590,14 @@ describe('daily rewards winner cards', () => {
     };
 
     expect(msg.allowed_mentions).toEqual({ parse: [] });
+    expect(msg.embeds[0].author).toEqual({ name: 'Task: Complete quests' });
     expect(msg.embeds[0].title).toBe('Top 2 Winners - 2026-06-30');
     expect(msg.embeds[0].description).toContain('**#1** titoisking - 12,345 pts - $30.00 (20%)');
     expect(msg.embeds[0].description).toContain('**#2** alice - 1,000 pts - $22.50 (15%)');
-    expect(msg.embeds[0].fields).toContainEqual({
-      name: 'Prize Pool',
-      value: '$150.00',
-      inline: true,
-    });
+    expect(msg.embeds[0].fields).toEqual([
+      { name: 'Realm', value: 'Claudemoon', inline: true },
+      { name: 'Prize Pool', value: '$150.00', inline: true },
+      { name: 'Next task', value: 'Win an arena match', inline: false },
+    ]);
   });
 });

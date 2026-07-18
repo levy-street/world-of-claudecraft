@@ -13,7 +13,12 @@ import {
 } from '../src/sim/quests/quest_credit';
 import type { PlayerMeta } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
-import type { Entity, QuestProgress, SimEvent } from '../src/sim/types';
+import {
+  type Entity,
+  type QuestProgress,
+  questObjectiveRequired,
+  type SimEvent,
+} from '../src/sim/types';
 
 type FakeCtx = SimContext & { events: SimEvent[] };
 
@@ -67,6 +72,11 @@ describe('quest_credit: onMobKilledForQuests (kill credit)', () => {
     expect(event(ctx.events, 'questProgress').at(-1)?.text).toBe(
       `${quest.objectives[0].label}: ${need}/${need}`,
     );
+    expect(event(ctx.events, 'questProgress').at(-1)).toMatchObject({
+      objectiveIndex: 0,
+      current: need,
+      required: need,
+    });
     // checkQuestReady (via the trio) promoted exactly at the target
     expect(qp.state).toBe('ready');
     expect(event(ctx.events, 'questReady').some((e) => e.questId === 'q_wolves')).toBe(true);
@@ -170,5 +180,59 @@ describe('quest_credit: checkQuestReady (both arms)', () => {
     checkQuestReady(ctx, qp, meta);
     expect(qp.state).toBe('active');
     expect(ctx.events.length).toBe(0);
+  });
+});
+
+// Phase 1 (Professions 2.0): per-progress resolved counts. questObjectiveRequired
+// is the one read every credit/ready/turn-in/HUD site goes through, and the
+// credit loop must honor a snapshotted resolvedCounts override (the amends
+// escalation) over the static objective count.
+describe('questObjectiveRequired and resolvedCounts-aware credit', () => {
+  it('prefers the snapshotted resolvedCounts and falls back to the objective count', () => {
+    const quest = QUESTS.q_wolves; // static kill count 8
+    const staticNeed = quest.objectives[0].count;
+    const withOverride: QuestProgress = {
+      questId: 'q_wolves',
+      counts: [0],
+      state: 'active',
+      resolvedCounts: [2],
+    };
+    const withoutOverride: QuestProgress = { questId: 'q_wolves', counts: [0], state: 'active' };
+
+    expect(questObjectiveRequired(quest, withOverride, 0)).toBe(2);
+    expect(questObjectiveRequired(quest, withoutOverride, 0)).toBe(staticNeed);
+    expect(questObjectiveRequired(quest, undefined, 0)).toBe(staticNeed);
+    // An out-of-range objective index never invents a requirement.
+    expect(questObjectiveRequired(quest, withoutOverride, 5)).toBe(0);
+  });
+
+  it('kill credit stops and promotes at the RESOLVED count, not the static objective count', () => {
+    const ctx = makeCtx();
+    const meta = makeMeta();
+    const qp: QuestProgress = {
+      questId: 'q_wolves',
+      counts: [0],
+      state: 'active',
+      resolvedCounts: [2],
+    };
+    meta.questLog.set('q_wolves', qp);
+    const wolf = { templateId: 'forest_wolf' } as unknown as Entity;
+
+    onMobKilledForQuests(ctx, wolf, meta);
+    expect(qp.counts[0]).toBe(1);
+    expect(qp.state).toBe('active');
+
+    onMobKilledForQuests(ctx, wolf, meta);
+    expect(qp.counts[0]).toBe(2);
+    expect(qp.state).toBe('ready');
+    expect(event(ctx.events, 'questProgress').at(-1)).toMatchObject({
+      objectiveIndex: 0,
+      current: 2,
+      required: 2,
+    });
+
+    // Further kills never over-credit past the resolved requirement.
+    onMobKilledForQuests(ctx, wolf, meta);
+    expect(qp.counts[0]).toBe(2);
   });
 });

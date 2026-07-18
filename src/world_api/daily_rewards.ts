@@ -1,5 +1,6 @@
 export interface DailyRewardTaskView {
   id: string;
+  type: string;
   title: string;
   description: string;
   points: number;
@@ -47,6 +48,7 @@ export interface DailyRewardEligibilityView {
   eligible: boolean;
   reason: 'eligible' | 'no_wallet' | 'under_minimum' | 'price_unavailable' | 'banned';
   banReason?: string | null;
+  banExpiresAt?: string | null;
   walletPubkey: string | null;
   wocBalance: number | null;
   wocUsdPrice: number | null;

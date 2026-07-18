@@ -180,4 +180,10 @@ export const apiErrorStrings = {
     account_taken: 'That Steam account is already linked to another account.',
     upstream: 'Steam did not respond. Try again in a moment.',
   },
+  wallet: {
+    handoff_invalid: 'That wallet authorization expired or could not be verified. Try again.',
+  },
+  welcome: {
+    invalid_input: 'Invalid input.',
+  },
 };

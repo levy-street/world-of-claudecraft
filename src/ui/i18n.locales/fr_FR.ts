@@ -5,15 +5,328 @@
 // translate that key. The build (scripts/i18n_build.mjs) unflattens this map and
 // overlays it onto nested `en` to produce the dense resolved table; any key here
 // must be a real `en` leaf path: keys are typed `Partial<Record<TranslationKey,
-// string>>` so tsc rejects a structurally-wrong key, plus
-// tests/i18n_overlay_key_membership.test.ts catches a typo'd entity id the
-// template-literal key type cannot. Overlays are SPARSE: an
+// string>>` against the build-generated flat key union, so tsc rejects any key
+// that is not an exact `en` leaf path, typo'd entity ids included. Overlays are SPARSE: an
 // untranslated key is omitted and the build fills it from English, then the
 // registry (src/ui/i18n.status.json) marks it `pending`.
 
 import type { TranslationKey } from '../i18n.catalog';
 
 export const fr_FR: Partial<Record<TranslationKey, string>> = {
+  'entities.abilities.primal_reflexes.description':
+    "Vos instincts s'aiguisent, augmentant votre chance d'esquiver de 50 % pendant 6 sec.",
+  'entities.abilities.primal_reflexes.name': 'Réflexes primordiaux',
+  'entities.abilities.sacred_bulwark.description':
+    'Pendant {duration} sec, le prochain coup ennemi qui vous tuerait est annulé, vous restaurant à 35 % de vos points de vie à la place.',
+  'entities.abilities.sacred_bulwark.name': 'Rempart sacré',
+  'guide.family.reptile.desc':
+    "Des chasseurs à sang froid dotés d'un sifflement et d'un claquement qui leur sont propres, distincts des créatures à sang chaud.",
+  'guide.family.reptile.name': 'Reptiles',
+  'hudChrome.auraEffect.damageReduction': 'Réduit tous les dégâts subis de {pct} %',
+  'hudChrome.auraEffect.guardianWard':
+    'Le prochain coup ennemi fatal vous restaure à {pct} % de vos points de vie à la place',
+  'hudChrome.bags.dragDestroyHint': 'Faites glisser dans le monde pour détruire',
+  'hudChrome.bags.dragEquipHint': 'Faites glisser sur votre personnage pour équiper',
+  'hudChrome.bags.reorderNeedsRecent':
+    'Effacez le filtre et triez par Récents pour réorganiser vos sacs',
+  'hudChrome.bags.rightClickDestroy': 'Clic droit pour détruire',
+  'hudChrome.cameraPrompt.changeLater':
+    'Vous pouvez modifier ce réglage plus tard via Échap, Raccourcis clavier.',
+  'hudChrome.cameraPrompt.classicDesc':
+    'Maintenez le clic droit et déplacez la souris pour faire pivoter la caméra.',
+  'hudChrome.cameraPrompt.classicTitle': 'Caméra classique',
+  'hudChrome.cameraPrompt.confirm': 'Confirmer',
+  'hudChrome.cameraPrompt.intro': 'Choisissez comment la caméra suit votre personnage.',
+  'hudChrome.cameraPrompt.mouseDesc':
+    'Déplacez la souris pour faire pivoter la caméra sans maintenir de bouton.',
+  'hudChrome.cameraPrompt.title': 'Choisissez votre caméra',
+  'hudChrome.discord.link.joinServer': 'Rejoignez simplement le serveur Discord',
+  'hudChrome.discord.roleTag.contentcreator': 'Créateur de contenu',
+  'hudChrome.discord.roleTag.juniormods': 'Modérateur junior',
+  'hudChrome.discord.roleTag.legend': 'LÉGENDE',
+  'hudChrome.discord.roleTag.seniormods': 'Modérateur senior',
+  'hudChrome.discord.roleTag.shill': 'COMPLICE',
+  'hudChrome.finder.accept': 'Accepter',
+  'hudChrome.finder.acceptApplicantAria': 'Accepter {name}',
+  'hudChrome.finder.accepted': '{accepted} sur {size} confirmés',
+  'hudChrome.finder.acceptedWait': 'En attente des autres...',
+  'hudChrome.finder.activity': 'Activité',
+  'hudChrome.finder.applicants': 'Candidats',
+  'hudChrome.finder.apply': 'Postuler',
+  'hudChrome.finder.attunement': 'Harmonisation requise: {quest}',
+  'hudChrome.finder.back': 'Retour',
+  'hudChrome.finder.blockedLevel': 'Niveaux {min} à {max} uniquement',
+  'hudChrome.finder.blockedSpec': 'Nécessite une spécialisation',
+  'hudChrome.finder.boardEmpty': 'Aucune annonce pour le moment. Publiez-en une !',
+  'hudChrome.finder.boardLeaderGate': 'Seul le chef de groupe peut publier une annonce.',
+  'hudChrome.finder.chooseActivities': 'Choisir des activités',
+  'hudChrome.finder.clock': '{minutes}:{seconds}',
+  'hudChrome.finder.close': 'Fermer',
+  'hudChrome.finder.closeListing': "Fermer l'annonce",
+  'hudChrome.finder.cooldownNote': 'Vous pourrez rejoindre la file dans {seconds} s.',
+  'hudChrome.finder.decline': 'Refuser',
+  'hudChrome.finder.declineApplicantAria': 'Refuser {name}',
+  'hudChrome.finder.encounters': 'Rencontres',
+  'hudChrome.finder.entrance': 'Entrée: {zone}',
+  'hudChrome.finder.finalBoss': 'Boss final',
+  'hudChrome.finder.freeRoles': 'Tous les rôles bienvenus',
+  'hudChrome.finder.heroic': 'Héroïque',
+  'hudChrome.finder.heroicMarks': 'Marques héroïques: {count} par joueur',
+  'hudChrome.finder.joinQueue': 'Rejoindre la file',
+  'hudChrome.finder.kindDungeon': 'Donjon',
+  'hudChrome.finder.kindRaid': 'Raid',
+  'hudChrome.finder.kindSolo': 'Aventure en solo',
+  'hudChrome.finder.leader': 'Chef: {name}',
+  'hudChrome.finder.leaderNote': "Seul le chef de groupe peut mettre le groupe en file d'attente.",
+  'hudChrome.finder.leaveQueue': 'Quitter la file',
+  'hudChrome.finder.levelClass': 'Nv {level} {className}',
+  'hudChrome.finder.levelOne': 'Niveau {level}',
+  'hudChrome.finder.levels': 'Niveaux {min} à {max}',
+  'hudChrome.finder.lockedFor': 'Verrouillé environ {minutes} min',
+  'hudChrome.finder.lockoutDaily': 'Verrouillage quotidien sur le boss final',
+  'hudChrome.finder.lockoutNone': 'Aucun verrouillage',
+  'hudChrome.finder.lootChance': 'Chances de butin supplémentaires:',
+  'hudChrome.finder.lootGuaranteed': "L'un de ces objets tombe toujours:",
+  'hudChrome.finder.lootHeroic': "Bonus héroïque, l'un de ces objets tombe toujours:",
+  'hudChrome.finder.lootMaybe': "Au plus l'un de ces objets peut tomber:",
+  'hudChrome.finder.mech.deathless_rage': 'Fureur immortelle (interrompue aux pierres de garde)',
+  'hudChrome.finder.mech.deathstalker_cleave': 'Balayage du traqueur de mort (cleave frontal)',
+  'hudChrome.finder.mech.enrage': 'Entre en rage à faible santé',
+  'hudChrome.finder.mech.grave_cleaver': 'Faucheur de tombes (cleave frontal)',
+  'hudChrome.finder.mech.gravebreaker':
+    "Brise-sépulcre (cône frontal, orientez-le à l'opposé du raid)",
+  'hudChrome.finder.mech.lunar_tide': 'Marée lunaire (dégâts de zone pulsés)',
+  'hudChrome.finder.mech.mana_burn': 'Bénédiction desséchée (brûle le mana)',
+  'hudChrome.finder.mech.mist_surge': 'Déferlante de brume (dégâts de zone pulsés)',
+  'hudChrome.finder.mech.mortal_wound': 'Blessure oubliée (réduit les soins reçus)',
+  'hudChrome.finder.mech.necrotic_shockwave': 'Onde de choc nécrotique (dégâts de zone importants)',
+  'hudChrome.finder.mech.profane_mending': 'Soins profanes (soigne ses alliés)',
+  'hudChrome.finder.mech.raise_fallen': 'Relever les morts (vagues périodiques de renforts)',
+  'hudChrome.finder.mech.reaping_arc': 'Arc faucheur (cleave frontal)',
+  'hudChrome.finder.mech.sealbreak_shockwave': 'Onde de brise-sceau (explosion de zone)',
+  'hudChrome.finder.mech.shadow_nova': 'Nova des ombres (explosion de zone)',
+  'hudChrome.finder.mech.shadow_pulse': "Pulsation d'ombre (dégâts de zone pulsés)",
+  'hudChrome.finder.mech.shuddering_stomp': 'Piétinement tremblant (étourdissement de zone)',
+  'hudChrome.finder.mech.soul_rend':
+    "Déchirement de l'âme (les joueurs marqués doivent s'écarter et être soignés)",
+  'hudChrome.finder.mech.summons_adds': 'Invoque des renforts',
+  'hudChrome.finder.mech.wardstones': 'Canaux des pierres de garde (transition de phase)',
+  'hudChrome.finder.needs': 'Recherche {roles}',
+  'hudChrome.finder.needsSpec':
+    'Choisissez une spécialisation pour utiliser le Chercheur de donjons.',
+  'hudChrome.finder.noApplicants': "Aucun candidat pour l'instant.",
+  'hudChrome.finder.normal': 'Normal',
+  'hudChrome.finder.openListings': 'Annonces ouvertes',
+  'hudChrome.finder.pct': '{pct} %',
+  'hudChrome.finder.proposalRole': 'Votre rôle: {role}',
+  'hudChrome.finder.proposalTitle': 'Groupe trouvé: {name}',
+  'hudChrome.finder.publish': 'Publier',
+  'hudChrome.finder.publishListing': 'Publier une annonce',
+  'hudChrome.finder.remaining': '{seconds} s pour répondre',
+  'hudChrome.finder.roleCount': '{count} {role}',
+  'hudChrome.finder.roleDps': 'Dégâts',
+  'hudChrome.finder.roleHealer': 'Soigneur',
+  'hudChrome.finder.roleTank': 'Tank',
+  'hudChrome.finder.showOnMap': 'Afficher sur la carte',
+  'hudChrome.finder.slotState': '{role}: {accepted} sur {total} prêts',
+  'hudChrome.finder.slots': '{size}/{capacity}',
+  'hudChrome.finder.summoned': 'Gardien invoqué',
+  'hudChrome.finder.syncing': 'En attente du royaume...',
+  'hudChrome.finder.tabBoard': 'Groupes formés',
+  'hudChrome.finder.tabCatalogue': 'Catalogue',
+  'hudChrome.finder.tabQueue': 'Partie rapide',
+  'hudChrome.finder.tagFastRun': 'Run rapide',
+  'hudChrome.finder.tagFirstRun': 'Première visite',
+  'hudChrome.finder.tagFullClear': 'Nettoyage complet',
+  'hudChrome.finder.tagLearning': 'Débutants bienvenus',
+  'hudChrome.finder.tagQuestRun': 'Run de quête',
+  'hudChrome.finder.title': 'Chercheur de donjons',
+  'hudChrome.finder.travelNote':
+    "Le groupe se forme là où se trouvent les membres. Rejoignez l'entrée ensemble: personne n'est téléporté.",
+  'hudChrome.finder.waited': 'Temps en file: {time}',
+  'hudChrome.finder.withdraw': 'Retirer la candidature',
+  'hudChrome.finder.yourListing': 'Votre annonce',
+  'hudChrome.finder.yourRoles': 'Vos rôles',
+  'hudChrome.gathering.notReady': "Ce nœud de ressource n'a pas encore réapparu pour vous.",
+  'hudChrome.keybinds.sheathe': "Ranger/Dégainer l'arme",
+  'hudChrome.meters.autoShowHint':
+    'Les lignes apparaissent automatiquement dès que votre groupe inflige des dégâts ou des soins, et ce panneau se ferme quelques secondes après la fin du combat.',
+  'hudChrome.options.showAttackButton': "Afficher le bouton d'attaque",
+  'hudChrome.petFeed.disabledFullHp': 'Le familier est à pleine santé',
+  'hudChrome.petFeed.disabledNoFood':
+    'Aucune nourriture dans vos sacs ne peut soigner votre familier',
+  'hudChrome.plurals.finderPartySize.few': '{count} joueurs',
+  'hudChrome.plurals.finderPartySize.many': '{count} joueurs',
+  'hudChrome.plurals.finderPartySize.one': '{count} joueur',
+  'hudChrome.plurals.finderPartySize.other': '{count} joueurs',
+  'hudChrome.statInfo.desc.hitRating':
+    "La précision provenant de votre équipement et de vos bonus d'ensemble, réduisant la fréquence à laquelle vos attaques ratent et vos sorts sont résistés, notamment contre les ennemis de niveau supérieur. Environ 10 points de précision accordent 1 % de toucher.",
+  'hudChrome.statInfo.names.hitRating': 'Précision',
+  'abilityUi.actionBar.attackRemoveHint':
+    "Clic droit pour le retirer de la barre et libérer l'emplacement.",
+  'loading.realmFull':
+    'Ce monde est complet en ce moment. Veuillez réessayer dans quelques minutes.',
+  'loading.tooManyConnections':
+    'Trop de connexions à ce monde proviennent de votre réseau. Veuillez fermer les fenêtres de jeu superflues ou réessayer dans quelques minutes.',
+  'entities.items.eastbrook_greatsword.name': "Espadon d'Eastbrook",
+  'entities.items.highwatch_greatsword.name': 'Espadon de Highwatch',
+  'entities.items.highwatch_wallshield.name': 'Pavois de Highwatch',
+  'entities.items.eastbrook_buckler.name': "Rondache d'Eastbrook",
+  'entities.abilities.battle_stance.description':
+    'Posture de combat agressive: vous générez 10% de rage en plus. La posture par défaut pour Armes et Protection.',
+  'entities.abilities.battle_stance.name': 'Posture de combat',
+  'entities.abilities.berserker_stance.description':
+    'Posture de combat téméraire: vos coups critiques surviennent 3% plus souvent et infligent 3% de dégâts en plus. Le guerrier Fureur combat toujours dans cette posture.',
+  'entities.abilities.berserker_stance.name': 'Posture berserker',
+  'entities.abilities.breachmaker.description':
+    "Martèle la cible pour les dégâts de l'arme plus {damage} et fissure sa garde : vos propres attaques contre elle infligent 20% de dégâts en plus pendant 8 s. (Armes)",
+  'entities.abilities.breachmaker.name': 'Brise-garde',
+  'entities.abilities.cleaving_blows.description':
+    'Moisson rouge rend toujours une charge de Double frappe. (Fureur)',
+  'entities.abilities.cleaving_blows.name': 'Coups pourfendeurs',
+  'entities.abilities.deep_wounds.description':
+    'Passif : votre Frappe mutilante fait saigner la cible, infligeant des dégâts physiques sur 6 s. (Armes)',
+  'entities.abilities.deep_wounds.name': 'Plaies béantes',
+  'entities.abilities.defiant_bellow.description':
+    'Un beuglement de défi : tous les ennemis dans un rayon de 10 mètres sont provoqués et forcés de vous attaquer pendant 3 s. (Protection)',
+  'entities.abilities.defiant_bellow.name': 'Beuglement de défi',
+  'entities.abilities.diabolical_twinstrike.description':
+    'Tant que vous êtes enragé, votre Double frappe inflige 15% de dégâts en plus. (Fureur)',
+  'entities.abilities.diabolical_twinstrike.name': 'Double frappe diabolique',
+  'entities.abilities.die_by_sword.description':
+    "Recours défensif : pendant 8 s, vous subissez 30% de dégâts en moins et esquivez bien plus d'attaques.",
+  'entities.abilities.die_by_sword.name': "Périr par l'épée",
+  'entities.abilities.emboldening_roar.description':
+    'Pousse un rugissement galvanisant : vous et les joueurs alliés dans un rayon de 40 mètres êtes galvanisés, et vos 3 prochaines techniques sont des coups critiques garantis. (Fureur)',
+  'entities.abilities.emboldening_roar.name': 'Rugissement galvanisant',
+  'entities.abilities.enrage_passive.description':
+    'Passif : tant que vous êtes enragé, vous infligez 7% de dégâts en plus, attaquez 25% plus vite et vous déplacez 10% plus vite pendant 4 s. Saignée a 30% de chances de vous enrager ; Moisson rouge le fait toujours. (Fureur)',
+  'entities.abilities.enrage_passive.name': 'Carnage',
+  'entities.abilities.faultline.description':
+    'Envoie une onde de choc dans le sol : les ennemis devant vous dans un rayon de 8 mètres subissent {damage} points de dégâts et sont étourdis pendant 3 s. (Protection)',
+  'entities.abilities.faultline.name': 'Ligne de faille',
+  'entities.abilities.furious_mending.description':
+    "Pendant 10 s, vous subissez 20% de dégâts en moins et, tant que l'effet dure, votre Saignée vous soigne de 20% de votre vie maximale. (Fureur)",
+  'entities.abilities.furious_mending.name': 'Guérison furieuse',
+  'entities.abilities.heroic_leap.description':
+    'Bondit vers la zone ciblée et inflige {damage} points de dégâts aux ennemis proches à l’atterrissage.',
+  'entities.abilities.heroic_leap.name': 'Bond de guerre',
+  'entities.abilities.intimidating_shout.description':
+    "Un cri terrifiant qui fait fuir jusqu'à 5 ennemis dans un rayon de 8 mètres pendant 8 s. Les dégâts peuvent briser l'effet.",
+  'entities.abilities.intimidating_shout.name': 'Cri intimidant',
+  'entities.abilities.iron_resolve.description':
+    'Serrez les dents et ignorez la douleur : dépense jusqu’à 40 points de rage (20 minimum) pour absorber 4 points de dégâts par point de rage dépensé, pendant un maximum de 10 s. (Protection)',
+  'entities.abilities.iron_resolve.name': 'Résolution de fer',
+  'entities.abilities.measured_fury.description':
+    'Votre fureur mesurée affine votre économie : vos techniques coûtent 10% de rage en moins. (Armes)',
+  'entities.abilities.measured_fury.name': 'Fureur mesurée',
+  'entities.abilities.piercing_howl.description':
+    'Un cri perçant qui ralentit de 50% tous les ennemis dans un rayon de 15 mètres pendant 8 s.',
+  'entities.abilities.piercing_howl.name': 'Hurlement perçant',
+  'entities.abilities.raging_gale.description':
+    "Frappe instantanément deux fois avec votre arme, chaque coup infligeant 40% des dégâts de l'arme plus {damage}, et génère 8 points de rage. Cumule jusqu'à 2 charges. (Fureur)",
+  'entities.abilities.raging_gale.name': 'Double frappe',
+  'entities.abilities.raised_guard.description':
+    "Arc-boutez-vous derrière votre bouclier : vous subissez 50% de dégâts physiques en moins pendant 6 s. Cumule jusqu'à 2 charges. (Protection)",
+  'entities.abilities.raised_guard.name': 'Garde haute',
+  'entities.abilities.rallying_cry.description':
+    'Pousse un rugissement vaillant qui vous confère, ainsi qu’aux membres du groupe à moins de 40 mètres, 20% de points de vie maximum supplémentaires pendant 10 s. Protection : ils subissent également 5% de dégâts en moins pendant la durée.',
+  'entities.abilities.rallying_cry.name': 'Rugissement de vaillance',
+  'entities.abilities.recklessness.description':
+    'Enrage : votre génération de rage augmente de 50% et vos chances de coup critique de 20% pendant 12 s.',
+  'entities.abilities.recklessness.name': 'Témérité',
+  'entities.abilities.red_harvest.description':
+    "Dépensez tout : frappez trois fois dans une frénésie, chaque coup infligeant 65% des dégâts de l'arme plus {damage}, ce qui vous rend toujours enragé. (Fureur)",
+  'entities.abilities.red_harvest.name': 'Moisson rouge',
+  'entities.abilities.revenge.description':
+    'Attaque dans un large arc et inflige des dégâts physiques à tous les ennemis devant vous. Au-delà de 5 cibles, les dégâts sont réduits. Quand vous esquivez ou parez, votre prochaine Vengeance peut ne coûter aucune rage. (Protection)',
+  'entities.abilities.revenge.name': 'Vengeance',
+  'entities.abilities.sanguine_aura.description':
+    "Imprégnez votre arme du sang de vos ennemis : vous et vos alliés de mêlée gagnez 10% de vitesse d'attaque et 10% de dégâts pendant 20 s.",
+  'entities.abilities.sanguine_aura.name': 'Aura sanguine',
+  'entities.abilities.seasoned_soldier.description':
+    'Vos attaques automatiques critiques génèrent 10% de rage en plus. (Armes)',
+  'entities.abilities.seasoned_soldier.name': 'Soldat aguerri',
+  'entities.abilities.storm_bolt.description':
+    "Lancez votre arme sur la cible, infligeant {damage} et l'étourdissant pendant 3 s.",
+  'entities.abilities.storm_bolt.name': 'Projectile-tempête',
+  'entities.abilities.sudden_death.description':
+    'Vos attaques automatiques ont une chance de vous permettre de lancer Tombe précoce sur une cible quel que soit son niveau de vie, sans coût de rage. (Armes)',
+  'entities.abilities.sudden_death.name': 'Mort subite',
+  'entities.abilities.sweeping_strikes.description':
+    'Pendant 12 s, vos attaques monocibles frappent aussi 1 ennemi proche pour la totalité des dégâts. (Armes)',
+  'entities.abilities.sweeping_strikes.name': 'Arc élargi',
+  'entities.abilities.victory_rush.description':
+    "Frappe infligeant les dégâts de l'arme plus {damage} et vous soignant de 20% de votre vie maximale. Utilisable seulement dans les 20 s suivant la mort d'un ennemi.",
+  'entities.abilities.victory_rush.name': 'Ruée victorieuse',
+  'hudChrome.specPanel.complexity': 'Complexité',
+  'hudChrome.specPanel.complexityHigh': 'Élevée',
+  'hudChrome.specPanel.complexityLow': 'Faible',
+  'hudChrome.specPanel.complexityMedium': 'Moyenne',
+  'hudChrome.specPanel.exampleAbilities': 'Exemples de techniques',
+  'hudChrome.specPanel.primaryAttr': 'Caractéristique principale',
+  'hudChrome.specPanel.selectSpec': 'Choisir une spécialisation',
+  'hudChrome.specPanel.viewTalents': 'Voir les talents',
+  'hudChrome.talentRows.comingSoon': 'Bientôt disponible',
+  'hudChrome.talentRows.defaultLoadout': 'Configuration par défaut',
+  'hudChrome.talentRows.tab': 'Choix',
+  'hudChrome.talentRows.readoutSummary': 'Talents : {head}, {spent}/{total} rangées sélectionnées.',
+  'entities.abilities.aspect_of_the_wild.name': 'Apparence du Croc-sauvage',
+  'entities.abilities.avenging_wrath.name': 'Aile vengeresse',
+  'entities.abilities.berserk.name': 'Brume rouge',
+  'entities.abilities.blink.name': 'Pas scintillant',
+  'entities.abilities.bloodlust.name': 'Tambours de guerre',
+  'entities.abilities.chain_lightning.name': 'Éclair fourchu',
+  'entities.abilities.chaos_bolt.name': 'Trait de ruine',
+  'entities.abilities.cloak_of_shadows.name': 'Cape d’ombre',
+  'entities.abilities.cone_of_cold.name': 'Balayage de givre',
+  'entities.abilities.curse_of_exhaustion.name': 'Maléfice de plomb',
+  'entities.abilities.death_coil.name': 'Spirale funèbre',
+  'entities.abilities.deep_freeze.name': 'Gel mort',
+  'entities.abilities.desperate_prayer.name': 'Dernière prière',
+  'entities.abilities.deterrence.name': 'Garde-hérissée',
+  'entities.abilities.divine_shield.name': 'Garde-lumière',
+  'entities.abilities.earthbind.name': 'Terre agrippante',
+  'entities.abilities.evocation.name': 'Puits d’éther',
+  'entities.abilities.frenzied_regeneration.name': 'Régénération sauvage',
+  'entities.abilities.frost_trap.name': 'Piège de givre',
+  'entities.abilities.ghostly_strike.name': 'Frappe spectrale',
+  'entities.abilities.hammer_of_wrath.name': 'Marteau sonnant',
+  'entities.abilities.healing_stream.name': 'Puits de source',
+  'entities.abilities.holy_wrath.name': 'Courroux du saint',
+  'entities.abilities.howl_of_terror.name': 'Hurlement d’effroi',
+  'entities.abilities.ice_block.name': 'Cercueil froid',
+  'entities.abilities.inner_focus.name': 'Esprit apaisé',
+  'entities.abilities.innervate.name': 'Sève vitale',
+  'entities.abilities.meteor.name': 'Pierre du ciel',
+  'entities.abilities.mind_sear.name': 'Brûle-pensée',
+  'entities.abilities.multi_shot.name': 'Tir fendu',
+  'entities.abilities.prayer_of_healing.name': 'Soin du chœur',
+  'entities.abilities.preparation.name': 'Contingence',
+  'entities.abilities.presence_of_mind.name': 'Esprit fulgurant',
+  'entities.abilities.psychic_scream.name': 'Cri psychique',
+  'entities.abilities.shadowstep.name': 'Glissement d’ombre',
+  'entities.abilities.silence.name': 'Silence',
+  'entities.abilities.tranquility.name': 'Chant du bosquet',
+  'entities.abilities.cleansing_verdict.name': 'Verdict purificateur',
+  'entities.abilities.cleansing_verdict.description':
+    'Dissipe un effet magique néfaste sur une cible alliée et lui rend {damage} points de vie par la magie du Sacré.',
+  'entities.abilities.smoke_screen.name': 'Écran de fumée',
+  'entities.abilities.smoke_screen.description':
+    'Vous disparaissez dans un nuage de fumée, ce qui augmente vos chances d’esquiver de 30 % pendant 8 s.',
+  'entities.abilities.spellsteal.name': 'Vol de sort',
+  'entities.abilities.spellsteal.description':
+    'Vole un effet magique bénéfique à un ennemi et vous le transfère.',
+  'entities.abilities.startle_shot.name': 'Tir de stupeur',
+  'entities.abilities.startle_shot.description':
+    'Un tir sauvage qui désoriente la cible pendant {duration} s. Tout dégât interrompt cet effet.',
+  'entities.abilities.typhoon.name': 'Typhon',
+  'entities.abilities.typhoon.description':
+    'Une rafale de vent repousse tous les ennemis dans un rayon de 8 m et les hébète, réduisant leur vitesse de déplacement de 50 % pendant 4 s.',
+  'entities.abilities.voidfeast.name': 'Festin du Vide',
+  'entities.abilities.voidfeast.description':
+    'Dévore un effet magique (un effet bénéfique sur un ennemi ou un effet néfaste sur un allié) et vous rend 6 % de votre maximum de points de vie.',
+  'hudChrome.abilityError.shieldRequired': 'Vous devez équiper un bouclier.',
   'entities.abilities.chain_heal.description':
     'Rend une grande quantité de points de vie à une cible alliée, puis rebondit sur un maximum de 2 autres alliés proches, avec des soins réduits de 50 % à chaque rebond. (signature Restauration)',
   'entities.abilities.chain_heal.name': 'Salve de guérison',
@@ -368,6 +681,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.wtype.staff': 'Bâton',
   'hudChrome.wocStore.wtype.sword': 'Épée',
   'hudChrome.wocStore.wtype.wand': 'Baguette',
+  'entities.abilities.collective_reversal.name': 'Réversion collective',
+  'entities.abilities.collective_reversal.description':
+    'Rembobine la ligne temporelle de chaque membre mort de votre groupe ou raid et le ramène à la vie près de son corps avec 30% de ses points de vie et de mana. Ne peut pas être lancé en combat. (Chronomancie)',
   'entities.abilities.sport_boot.description':
     'Une longue balle bottée en cloche vers le point visé. La foule adore.',
   'entities.abilities.sport_boot.name': 'Grosse botte',
@@ -637,16 +953,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.walkUp': 'Approchez-vous du Pré de la Truie pour regarder depuis les tribunes.',
   'hudChrome.archetypeTitle.label': 'Titre',
   'hudChrome.archetypeTitle.none': 'Aucun',
-  'hudChrome.archetypeTitle.armorcrafting': 'Armurier',
-  'hudChrome.archetypeTitle.weaponcrafting': "Forgeron d'armes",
-  'hudChrome.archetypeTitle.jewelcrafting': 'Joaillier',
-  'hudChrome.archetypeTitle.alchemy': 'Alchimiste',
-  'hudChrome.archetypeTitle.engineering': 'Ingénieur',
-  'hudChrome.archetypeTitle.cooking': 'Cuisinier',
-  'hudChrome.archetypeTitle.inscription': 'Scribe',
-  'hudChrome.archetypeTitle.enchanting': 'Enchanteur',
-  'hudChrome.archetypeTitle.tailoring': 'Tailleur',
-  'hudChrome.archetypeTitle.leatherworking': 'Tanneur',
   'entities.itemSets.crownforged.bonus4':
     "Vos coups critiques d'arme lacèrent la cible avec Éclat d'os, lui infligeant 8 points de dégâts de saignement toutes les 2 s pendant 12 s. Se cumule jusqu'à 3 fois.",
   'entities.itemSets.deathlord.bonus4':
@@ -715,6 +1021,27 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.roleTag.coredevs': 'Développeur principal',
   'hudChrome.dungeonDifficulty.setHeroic': 'Définir la difficulté du donjon : Héroïque',
   'hudChrome.dungeonDifficulty.setNormal': 'Définir la difficulté du donjon : Normal',
+  'hudChrome.dungeonDifficulty.resetAll': 'Réinitialiser toutes les instances',
+  'hudChrome.dungeonDifficulty.resetDone': 'Toutes les instances ont été réinitialisées.',
+  'hudChrome.dungeonDifficulty.resetNone': "Vous n'avez aucune instance à réinitialiser.",
+  'hudChrome.dungeonDifficulty.resetOccupied':
+    "Vous ne pouvez pas réinitialiser les instances tant qu'une personne s'y trouve.",
+  'hudChrome.dungeonDifficulty.resetSameDifficulty':
+    "Changez la difficulté du donjon avant de réinitialiser ces instances. Les instances vides se réinitialisent d'elles-mêmes après 5 minutes.",
+  'hudChrome.dungeonDifficulty.resetUsage':
+    'Utilisez /dungeon reset pour abandonner vos instances vides après avoir changé la difficulté.',
+  'hudChrome.dungeonDifficulty.resetLoot':
+    "Vous ne pouvez pas réinitialiser les instances tant qu'il reste du butin à l'intérieur.",
+  'hudChrome.dungeonDifficulty.resetConfirmTitle': 'Réinitialiser toutes les instances ?',
+  'hudChrome.dungeonDifficulty.resetConfirmBody':
+    'Cette action abandonne les instances vides de la difficulté précédemment sélectionnée. Tout butin non récupéré empêchera la réinitialisation.',
+  'hudChrome.dungeonDifficulty.resetConfirm': 'Réinitialiser les instances',
+  'hudChrome.dungeonDifficulty.resetCooldown':
+    'Les instances ne peuvent être réinitialisées qu’une fois toutes les 5 minutes.',
+  'hudChrome.dungeonDifficulty.entryMismatchNormal':
+    'Cette instance est réglée sur la difficulté Normal. Utilisez Réinitialiser toutes les instances pour commencer une nouvelle partie Héroïque.',
+  'hudChrome.dungeonDifficulty.entryMismatchHeroic':
+    'Cette instance est réglée sur la difficulté Héroïque. Utilisez Réinitialiser toutes les instances pour commencer une nouvelle partie Normal.',
   'hudChrome.itemProc.attackSlow':
     "et ralentit la vitesse d'attaque de la cible de {pct}% pendant {duration} s",
   'hudChrome.itemProc.chainArc':
@@ -1364,6 +1691,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Masquer le coffre des récompenses quotidiennes ?',
   'hudChrome.dailyRewards.pointsGained': '{points} points de récompenses quotidiennes gagnés.',
   'hudChrome.dailyRewards.taskMultiplier': 'Multiplicateur x{multiplier}',
+  'hudChrome.dailyRewards.oneVsOneExcluded':
+    'Les matchs en 1 contre 1 ne rapportent pas de points de récompenses quotidiennes.',
   'hudChrome.dailyRewards.totalPlayer': "{count} joueur aujourd'hui",
   'hudChrome.dailyRewards.totalPlayers': "{count} joueurs aujourd'hui",
   'hudChrome.death.resurrectAtCorpse': 'Ressusciter près du cadavre',
@@ -1563,8 +1892,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.loot.chestTitle': 'Coffre',
   'hudChrome.spellbook.addToBarAria': "Ajouter {name} à la barre d'action",
   'hudChrome.spellbook.removeFromBarAria': "Retirer {name} de la barre d'action",
-  'hudChrome.nameplate.mob': '[{level}] {name}',
-  'hudChrome.nameplate.mobElite': '[{level}+] {name}',
   'hud.core.mapCanvasLabel': 'Carte',
   'hud.core.mapSummary': 'Carte de {zone}.',
   'hudChrome.castBar.playerAria': "Votre barre d'incantation",
@@ -1783,6 +2110,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.clickMoveLeft': 'Clic gauche',
   'hudChrome.options.clickMoveRight': 'Clic droit',
   'hudChrome.options.footstepSounds': 'Sons de pas',
+  'hudChrome.options.interfaceSounds': 'Sons d’interface et retours sonores',
   'hudChrome.options.showWalletOnCharacterScreen':
     'Afficher le portefeuille sur l’écran des personnages',
   'hudChrome.options.showWalletOnPlayerCard': 'Afficher le portefeuille sur la carte de joueur',
@@ -2751,7 +3079,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hud.pet.defensiveDesc': 'Attaque les ennemis qui vous blessent, vous ou votre familier.',
   'hud.pet.aggressiveDesc': 'Attaque les ennemis hostiles proches.',
   'hud.pet.rename': 'Renommer le familier',
-  'hud.pet.revive': 'Ranimer le familier',
+  'hud.pet.revive': 'Rafistoler',
   'hud.pet.abandon': 'Abandonner le familier',
   'hud.pet.cancel': 'Annuler',
   'hud.pet.renameLabel': 'Choisissez un nouveau nom de familier.',
@@ -2963,6 +3291,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'itemUi.money.silver': 'argent',
   'itemUi.money.copper': 'cuivre',
   'itemUi.slots.mainhand': 'Main droite',
+  'itemUi.slots.twoHand': 'Deux mains',
+  'itemUi.slots.offhand': 'Main gauche',
   'itemUi.slots.chest': 'Torse',
   'itemUi.slots.legs': 'Jambes',
   'itemUi.slots.feet': 'Pieds',
@@ -3160,19 +3490,13 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Une attaque puissante qui augmente les dégâts de mêlée de {damage}. S'active lors de votre prochaine frappe.",
   'entities.abilities.battle_shout.name': 'Beuglement de fer',
   'entities.abilities.battle_shout.description':
-    "Augmente votre puissance d'attaque de {buff} pendant 2 min.",
-  'entities.abilities.commanding_shout.name': 'Cri fortifiant',
-  'entities.abilities.commanding_shout.description':
-    'Augmente votre Endurance de {buff} pendant 2 min.',
+    "Un cri qui augmente de {buff}% la puissance d'attaque de tous les membres du groupe pendant 30 min.",
   'entities.abilities.demoralizing_shout.name': 'Direhowl',
   'entities.abilities.demoralizing_shout.description':
-    "Pousse un cri terrifiant qui réduit la puissance d'attaque de tous les ennemis proches de {buff} pendant 30 s.",
+    'Pousse un cri terrifiant qui réduit de {buff}% les dégâts infligés par tous les ennemis proches pendant 20 s.',
   'entities.abilities.charge.name': 'Ruée',
   'entities.abilities.charge.description':
     "Charge un ennemi, génère 9 rage et l'étourdit pendant 1 s. Portée de 8-25 m.",
-  'entities.abilities.rend.name': 'Entaille profonde',
-  'entities.abilities.rend.description':
-    'Blesse la cible et la fait saigner pour {damage} points de dégâts en {duration} s.',
   'entities.abilities.thunder_clap.name': 'Coup sismique',
   'entities.abilities.thunder_clap.description':
     'Frappe les ennemis proches pour {damage} points de dégâts et ralentit leurs attaques de 10% pendant 10 s.',
@@ -3227,6 +3551,42 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.frostbolt.name': 'Rimelance',
   'entities.abilities.frostbolt.description':
     'Lance un éclair de givre, inflige {damage} points de dégâts de Givre et ralentit le déplacement de 40%.',
+  'entities.abilities.blazing_barrier.name': 'Barrière flamboyante',
+  'entities.abilities.blazing_barrier.description':
+    'Vous enveloppe de flammes et absorbe 130 points de dégâts pendant 60 s. (Feu)',
+  'entities.abilities.cold_snap.name': "Rappel de l'hiver",
+  'entities.abilities.cold_snap.description':
+    'Met fin au temps de recharge de Pas scintillant, Voile de givre et Invisibilité supérieure. (Talent de mage)',
+  'entities.abilities.greater_invisibility.name': 'Invisibilité supérieure',
+  'entities.abilities.greater_invisibility.description':
+    'Vous disparaissez pendant 20 s : dissipe 2 effets de dégâts sur la durée et réduit les dégâts subis de 90% tant que vous êtes invisible et peu après. (Talent de mage)',
+  'entities.abilities.hot_streak.name': 'Bonne série',
+  'entities.abilities.hot_streak.description':
+    "Passif : deux coups critiques consécutifs avec vos sorts de Feu (Boule de feu, Trait de feu, Brûlure, Explosion pyrotechnique ou Choc de flammes) rendent votre prochaine Explosion pyrotechnique ou votre prochain Choc de flammes instantané et gratuit. Les sorts qui consomment cet effet comptent pour la série SUIVANTE, y compris les incantations gratuites ; Choc de flammes ne compte qu'une fois, quel que soit le nombre d'ennemis touchés, et seul l'impact initial peut compter. (Feu)",
+  'entities.abilities.ice_floes.name': 'Floes de glace',
+  'entities.abilities.ice_floes.description':
+    "Vos deux prochains sorts avec un temps d'incantation peuvent être lancés en vous déplaçant. Dure 15 s. (Talent de mage)",
+  'entities.abilities.ignition.name': 'Ignition',
+  'entities.abilities.ignition.description':
+    'Passif : les coups critiques de vos sorts brûlent la cible et infligent 40% des dégâts causés en 6 s, avec cumul. (Maîtrise du Feu)',
+  'entities.abilities.mass_barrier.name': 'Barrière de masse',
+  'entities.abilities.mass_barrier.description':
+    "Vous protège ainsi que jusqu'à 4 alliés proches dans un rayon de 30 m, chaque bouclier absorbant 130 points de dégâts pendant 60 s. (Talent de mage)",
+  'entities.abilities.overload.name': 'Surcharge',
+  'entities.abilities.overload.description':
+    'Votre prochain sort est amplifié de 40%, mais coûte 50% de mana supplémentaire. Dure 10 s. (Talent de mage)',
+  'entities.abilities.power_echo.name': 'Écho de puissance',
+  'entities.abilities.power_echo.description':
+    'Votre prochain sort direct se répète avec 50% de puissance sur la même cible. Dure 10 s. (Talent de mage)',
+  'entities.abilities.rings_of_frost.name': 'Anneau de givre',
+  'entities.abilities.rings_of_frost.description':
+    'Invoque un anneau pendant 10 s. Les ennemis qui en franchissent le périmètre sont gelés pendant 4 s. (Talent de mage)',
+  'entities.abilities.rune_of_power.name': 'Rune de puissance',
+  'entities.abilities.rune_of_power.description':
+    'Inscrit une rune de puissance à vos pieds pendant 15 s : les alliés se tenant dans un rayon de 8 m infligent 10% de dégâts supplémentaires. (Talent de mage)',
+  'entities.abilities.summon_water_elemental.name': "Invocation d'un élémentaire d'eau",
+  'entities.abilities.summon_water_elemental.description':
+    "Invoque un élémentaire d'eau qui combat à vos côtés, lance des Traits d'eau sur votre cible et canalise Jet d'eau. (Givre)",
   'entities.abilities.conjure_water.name': 'Waterbind',
   'entities.abilities.conjure_water.description':
     "Invoque 2 bouteilles d'eau qui restaurent du mana une fois bues. Les rangs supérieurs invoquent une eau plus pure.",
@@ -3555,7 +3915,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "L'ennemi est assailli par une nuée d'insectes, subissant {damage} points de dégâts de Nature sur 12 s.",
   'entities.abilities.tigers_fury.name': 'Wolfsblood',
   'entities.abilities.tigers_fury.description':
-    "Augmente la puissance d'attaque de 40 pendant 6 s. Forme de loup uniquement.",
+    "Augmente la puissance d'attaque de {buff} pendant {duration} s. Forme de loup uniquement.",
   'entities.abilities.rip.name': 'Lacération',
   'entities.abilities.rip.description':
     'Coup de grâce qui inflige {damage} points de dégâts de saignement sur 12 s. Consomme les points de combo. Forme de loup uniquement.',
@@ -3607,9 +3967,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.name': 'Écorcher',
   'entities.abilities.rake.description':
     "Une attaque d'ouverture en camouflage qui lacère l'ennemi pour les dégâts de l'arme plus {damage} et inflige des dégâts de saignement sur 9 sec. Octroie 1 point de combo. Forme de loup uniquement.",
-  'entities.abilities.revive_pet.name': 'Ranimer le familier',
+  'entities.abilities.revive_pet.name': 'Rafistoler',
   'entities.abilities.revive_pet.description':
-    'Ranime votre familier mort et le ramène à vos côtés.',
+    "Rafistole votre familier et lui rend {overTime} points de vie en 12 s, par pulsations toutes les 3 s, s'il est vivant. S'il est mort, le ranime avec 35 % de ses points de vie.",
   'entities.abilities.holy_shock.name': 'Horion sacré',
   'entities.abilities.holy_shock.description':
     'Frappe une cible alliée avec de l’énergie sacrée et lui rend {damage} points de vie. (signature Sacré)',
@@ -3628,7 +3988,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_power.name': 'Pouvoir des Arcanes',
   'entities.abilities.arcane_power.description':
     'Augmente les dégâts des sorts de 20% et la hâte des sorts de 10% pendant 10 s. (signature Arcane)',
-  'entities.abilities.combustion.name': 'Combustion',
+  'entities.abilities.combustion.name': 'Transe du phénix',
   'entities.abilities.combustion.description':
     'Augmente les chances de coup critique des sorts de 50% pendant 15 s. (signature Feu)',
   'entities.abilities.icy_veins.name': 'Veines glaciales',
@@ -3723,6 +4083,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.conjured_water.name': 'Eau de pluie invoquée',
   'entities.items.conjured_water2.name': 'Eau de puits invoquée',
   'entities.items.conjured_water3.name': 'Eau claire invoquée',
+  'entities.items.conjured_water4.name': 'Eau de source invoquée',
   'entities.items.eastbrook_arming_sword.name': "Épée d'armes d'Eastbrook",
   'entities.items.bronzework_mace.name': 'Masse ouvragée en bronze',
   'entities.items.vale_carving_knife.name': 'Couteau à découper du Val',
@@ -4704,6 +5065,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.conjured_bread.name': "Galette d'avoine invoquée",
   'entities.items.conjured_bread2.name': 'Pain noir invoqué',
   'entities.items.conjured_bread3.name': 'Gâteau au miel invoqué',
+  'entities.items.conjured_bread4.name': 'Pain de festin invoqué',
   'entities.items.glimmerfin_koi.name': 'Koï aux nageoires scintillantes',
   'entities.items.raw_bog_eel.name': 'Anguille des marais crue',
   'entities.items.raw_frostgill_trout.name': 'Truite aux ouïes givrées crue',
@@ -5055,6 +5417,10 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.thunzharr_stormling.name': 'Élémentaire de tempête éveillé',
   'hudChrome.worldBoss.spawn': '{name} se dresse sur les Hauteurs de Thornpeak !',
   'entities.items.stormcallers_spaulders.name': 'Spallières de Galecall',
+  'entities.items.bonewrought_greatsword.name': 'Espadon Bonewrought',
+  'entities.items.direfang_greatblade.name': 'Grande lame de Direfang',
+  'entities.items.bonewrought_bulwark.name': 'Rempart Bonewrought',
+  'entities.items.wraithfire_orb.name': 'Orbe Wraithfire',
   'hud.chat.context.convertToRaid': 'Convertir en raid',
   'hud.chat.context.convertToParty': 'Convertir en groupe',
   'hudChrome.raidConvert.leaderOnly': 'Seul le chef de raid peut convertir en groupe.',
@@ -5594,8 +5960,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Fonce sur un ennemi lointain pour ouvrir le combat avec un bref étourdissement.',
   'guide.abilityHook.cheap_shot':
     'Ouvrez depuis le camouflage avec un étourdissement et une avance sur vos points de combo.',
-  'guide.abilityHook.commanding_shout':
-    "Renforce l'endurance pour que chacun tienne plus longtemps au combat.",
   'guide.abilityHook.concussive_shot':
     "Hébète la cible et la ralentit pour qu'elle ne puisse pas vous atteindre.",
   'guide.abilityHook.conjure_food':
@@ -5660,7 +6024,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Un coup de mêlée puissant pour quand quelque chose comble la distance.',
   'guide.abilityHook.rejuvenation':
     "S'incante instantanément et soigne un allié dans la durée, pour continuer d'agir.",
-  'guide.abilityHook.rend': 'Ouvre un saignement qui use la cible dans la durée.',
   'guide.abilityHook.renew':
     "Un soin qui s'égrène dans la durée, pratique à lancer en continuant de bouger.",
   'guide.abilityHook.rockbiter_weapon':
@@ -5953,11 +6316,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.gear.fishingTitle': 'Pêche',
   'guide.gear.intro':
     "L'équipement, ce sont les pièces que porte votre personnage et les objets que vous transportez. Un meilleur équipement est la voie la plus sûre vers la puissance, et vous en ramassez l'essentiel rien qu'en jouant.",
-  'guide.gear.itemLevelBody':
-    "Si vous voulez un moyen rapide de comparer deux pièces, activez Afficher le niveau d'objet dans les options. L'équipement gagné dans le monde, auprès des ennemis et des quêtes, affiche alors un niveau d'objet, un chiffre unique indiquant grossièrement sa puissance selon sa provenance, pour que vous voyiez d'un coup d'œil quelle amélioration pèse le plus, même d'un emplacement à l'autre. Les pièces sans une telle origine, comme les articles de base des marchands et l'équipement de départ, n'affichent aucun niveau d'objet : un chiffre absent est donc normal, pas un défaut.",
-  'guide.gear.qualityBody':
-    "Chaque objet a une qualité, et son nom est coloré en conséquence pour que vous lisiez sa valeur d'un coup d'œil. Du plus commun au plus convoité :",
-  'guide.gear.qualityCommon': 'Commun',
   'guide.gear.qualityEpic': 'Épique',
   'guide.gear.qualityLegendary': 'Légendaire',
   'guide.gear.qualityNote':
@@ -6609,7 +6967,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Augmente la vitesse d'attaque et d'incantation de 15%.",
   'entities.itemSets.necromancers.name': 'Parure de Mournweave',
   'entities.itemSets.necromancers.bonus2':
-    'Vous ne pouvez pas être projeté en arrière (100% de résistance à la projection).',
+    'Augmente la puissance des sorts de 20. Les dégâts subis ne retardent plus vos incantations (100% de résistance au retard des sorts).',
   'entities.itemSets.necromancers.bonus3': "Augmente l'intelligence de 10 et l'endurance de 10.",
   'entities.itemSets.nighttalon.name': 'Peau de Direfang',
   'entities.itemSets.nighttalon.bonus2': "Augmente la puissance d'attaque de 40.",
@@ -6617,12 +6975,12 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Augmente l'agilité de 15, les chances de critique de 2% et la vitesse d'attaque et d'incantation de 15%.",
   'entities.itemSets.soulflame.name': "Tenue d'apparat Wraithfire",
   'entities.itemSets.soulflame.bonus2':
-    'Vous ne pouvez pas être projeté en arrière (100% de résistance à la projection).',
+    'Augmente la puissance des sorts de 20. Les dégâts subis ne retardent plus vos incantations (100% de résistance au retard des sorts).',
   'entities.itemSets.soulflame.bonus3':
     "Augmente l'intelligence de 15, l'esprit de 15 et la vitesse d'attaque et d'incantation de 15%.",
   'entities.itemSets.stormcallers.name': 'Vêtements de Galecall',
   'entities.itemSets.stormcallers.bonus2':
-    'Vous ne pouvez pas être projeté en arrière (100% de résistance à la projection).',
+    'Augmente la puissance des sorts de 20. Les dégâts subis ne retardent plus vos incantations (100% de résistance au retard des sorts).',
   'entities.itemSets.stormcallers.bonus3':
     "Augmente l'intelligence de 15, l'esprit de 15 et la vitesse d'attaque et d'incantation de 15%.",
   'entities.itemSets.vale_arcanist.name': "Tenue de l'arcaniste du Val",
@@ -6741,6 +7099,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.swag.claimed': 'Réclamé',
   'hudChrome.discord.swag.locked': 'Verrouillé',
   'hudChrome.discord.swag.free': 'Gratuit',
+  'hudChrome.fct.cheap': 'Coût réduit !',
   'hudChrome.discord.swag.cost': '{points} pts',
   'hudChrome.discord.swag.needTier': 'Atteignez un rang supérieur pour réclamer ceci.',
   'hudChrome.discord.swag.needPoints': 'Points insuffisants.',
@@ -6931,6 +7290,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'apiError.validation.failed':
     'Certains champs sont invalides. Vérifiez le formulaire puis réessayez.',
   'download.linuxCta': 'Télécharger pour Linux',
+  'download.windowsCta': 'Télécharger pour Windows',
   'download.linuxHint':
     'AppImage$1 rendez-le exécutable, puis exécutez-le. Aucune installation nécessaire.',
   'loading.reconnecting': 'Connexion perdue. Reconnexion...',
@@ -7043,15 +7403,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.mobileCameraJoystick': 'Manette de caméra',
   'hudChrome.options.mobileLeftHanded': 'Disposition pour gaucher',
   'entities.quests.q_archetype_acceptance.title': 'Un métier qui vous appartient',
-  'entities.quests.q_archetype_acceptance.text':
-    "Chaque artisan d'Eastbrook finit par choisir un métier qui lui est propre. Prouvez-vous avec un seul acte, {playerName}, et déclarez votre chemin.",
-  'entities.quests.q_archetype_acceptance.completion': 'Votre chemin est choisi ; marchez bien.',
-  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Loup des forêts tué',
   'entities.quests.q_prof_make_amends.title': 'Faire amende honorable',
-  'entities.quests.q_prof_make_amends.text':
-    "Pour réserver un métier à un autre, un artisan doit d'abord réparer le chemin non parcouru, {playerName}.",
-  'entities.quests.q_prof_make_amends.completion':
-    "Modifications apportées ; un nouveau chemin s'ouvre à vous.",
   'entities.quests.q_prof_make_amends.objectives.0.label': 'Loup des forêts tué',
   'entities.npcs.bursar_aldous_crane.greeting':
     'Chaque caisse, chaque coffret et chaque babiole est en sécurité au Coffre doré.',
@@ -7122,6 +7474,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Cisaille l'armure de la cible, la réduisant de {damage}% par application. Cumulable jusqu'à 5 fois. Génère beaucoup de menace.",
   'entities.mobs.training_dummy.name': "Mannequin d'entraînement",
   'entities.mobs.yumi_cat.name': 'Yumi',
+  'entities.mobs.water_elemental.name': "Élémentaire d'eau",
   'guide.arenaPage.yumiBody':
     "Protégez Yumi est un mode d'objectif en équipe qui se joue dans un labyrinthe : chaque camp garde son propre familier félin tout en traquant celui de l'adversaire. De temps à autre, les deux chats se téléportent vers de nouveaux recoins du labyrinthe, si bien que le combat oscille entre défense, chasse et course pour les retrouver. Mettez-vous en file en trois contre trois ou cinq contre cinq ; tomber au combat ne vous met sur la touche qu'un instant.",
   'guide.arenaPage.yumiHeading': 'Protégez Yumi',
@@ -7231,15 +7584,11 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.deedsPage.howHeading': 'Comment fonctionnent les hauts faits',
   'guide.deedsPage.intro':
     "Le Livre des hauts faits est l'endroit où le monde tient le compte de tout ce que vous avez accompli, de vos premiers pas hors de la vallée de départ aux combats les plus rudes que le royaume puisse offrir. Obtenez des hauts faits au fil du jeu, portez les titres qu'ils confèrent et regardez votre Renommée grimper.",
-  'guide.deedsPage.renownBody':
-    "La Renommée est le score qui se cache derrière le Livre. Chaque haut fait obtenu vaut un montant fixe, et votre total ne fait que grimper: une semaine calme ne vous fait jamais perdre de terrain. Une poignée de hauts faits tiennent à la chance plutôt qu'au talent, et les Prouesses sont un honneur à part; ni les uns ni les autres ne rapportent la moindre Renommée.",
   'guide.deedsPage.renownHeading': 'Renommée',
   'guide.deedsPage.rewardBorder': 'Bordure',
   'guide.deedsPage.rewardsBody':
     "Les récompenses sont purement d'apparat, et c'est bien le but. Certains hauts faits confèrent un titre à porter ou une bordure pour encadrer votre nom, jamais rien qui rende votre héros plus fort. Choisissez le titre qui vous plaît dans le Livre des hauts faits: il vous accompagne sur votre plaque de nom, dans le chat et sur les classements, à la vue de tous.",
   'guide.deedsPage.rewardsHeading': 'Titres et bordures',
-  'guide.deedsPage.standingsNote':
-    "Les royaumes tiennent un décompte continu de la Renommée sur l'ensemble des comptes. Pour savoir qui se place où, ouvrez le Classement en jeu et rendez-vous sur son onglet Renommée ; le classement se trouve là, pas sur le wiki.",
   'guide.nav.deeds': 'Livre des hauts faits',
   'hudChrome.deeds.broadcastLine': '{name} a accompli un haut fait: {deed}',
   'hudChrome.deeds.broadcastsLabel':
@@ -7273,9 +7622,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.filterNearly': 'Presque finis',
   'hudChrome.deeds.filterUnearned': 'À obtenir',
   'hudChrome.deeds.hiddenBadge': 'Secret',
-  'hudChrome.deeds.lbDeedsCol': 'Hauts faits',
   'hudChrome.deeds.lbEmpty': 'Aucun chroniqueur classé pour le moment.',
-  'hudChrome.deeds.lbSelf': 'Votre position: rang {rank}, dans le top {percent} %',
   'hudChrome.deeds.lbTab': 'Renommée',
   'hudChrome.deeds.lbTitleCol': 'Titre',
   'hudChrome.deeds.nearestLabel': 'Presque au but:',
@@ -7335,11 +7682,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.arcane_essence.name': 'Essence arcanique',
   'entities.items.arcane_shard.name': 'Éclat arcanique',
   'entities.items.chunk_of_ore.name': 'Morceau de minerai',
-  'entities.quests.q_prof_intro.completion':
-    'Vous voyez ? Du minerai dans votre sac et des cals aux mains. Continuez à miner, à couper du bois et à cueillir des plantes sur les routes. De retour en ville, pensez au tableau des Priorités de la ville près du marché et à l’établi d’artisanat juste à côté. Tout cela peut vous offrir un gagne-pain honorable, si le cœur vous en dit.',
-  'entities.quests.q_prof_intro.objectives.0.label': 'Morceau de minerai',
-  'entities.quests.q_prof_intro.text':
-    'À Eastbrook, tout le monde exerce un métier en plus de manier l’épée, {playerName}. Des filons de minerai sont dispersés autour de la ville, alors prenez une pioche et rapportez-moi 5 morceaux. Extrayez-les vous-même, attention, je saurai faire la différence.',
   'entities.quests.q_prof_intro.title': 'Un métier pour chaque main',
   'hudChrome.auth.appleChoiceExpired':
     'Cette connexion avec Apple a expiré. Veuillez vous reconnecter avec Apple.',
@@ -7371,7 +7713,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.bestiary.flavor.sethrael_palecoil':
     "Un serpent d'une pâleur d'os qui glisse dans les profondeurs du Glimmermere, gardien silencieux de l'eau qu'il a faite sienne. Les nageurs qui partagent le lac avec lui refont rarement surface.",
   'guide.combat.metersBody':
-    "Envie de savoir comment un combat s'est déroulé ? Appuyez sur Z pour ouvrir les compteurs de groupe, qui totalisent les dégâts, les soins et la menace de votre groupe, rencontre par rencontre.",
+    "Envie de savoir comment un combat s'est déroulé ? Appuyez sur Shift+H pour ouvrir les compteurs de groupe, qui totalisent les dégâts, les soins et la menace de votre groupe, rencontre par rencontre.",
   'guide.combat.queueBody':
     "Nul besoin de caler vos pressions à la frame près. Appuyez sur votre prochaine capacité dans les derniers instants de l'incantation en cours et elle se met en file d'attente, se déclenchant à la seconde où l'incantation s'achève, si bien qu'un jeu rodé s'enchaîne sans temps mort. Une pression trop hâtive est simplement refusée, donc rien n'est gâché. Certaines attaques de mêlée fonctionnent de la même manière, en s'exécutant sur votre prochain coup d'arme.",
   'guide.combat.queueTitle': 'Votre prochain geste est déjà armé',
@@ -7427,7 +7769,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Un plafond quotidien sur les plus grosses récompenses répétables. Chaque donjon héroïque n'accorde qu'un nettoyage par jour, le raid suit le normal et l'héroïque séparément, et piller un boss de monde déclenche le vôtre. Une expédition à cinq joueurs déjà nettoyée reste ouverte à son propre groupe ; la porte verrouillée du raid ne se rouvre qu'à la réinitialisation.",
   'guide.glossary.lockoutTerm': 'Verrouillage',
   'guide.glossary.metersDef':
-    'La fenêtre de tableau de bord du groupe pour le combat en cours : dégâts infligés, soins prodigués et qui détient le plus de menace, conservés par rencontre. Ouvrez-la avec son raccourci (Z par défaut).',
+    'La fenêtre de tableau de bord du groupe pour le combat en cours : dégâts infligés, soins prodigués et qui détient le plus de menace, conservés par rencontre. Ouvrez-la avec son raccourci (Shift+H par défaut).',
   'guide.glossary.metersTerm': 'Compteurs de dégâts',
   'guide.glossary.petBarDef':
     "La rangée de commandes qu'ajoute un familier de chasseur ou de démoniste : Attaquer, Arrêter, Provoquer, Défensif et Agressif, assignés par défaut à Ctrl plus 1 à 5.",
@@ -7458,12 +7800,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.models.formTravel': 'Forme de Fleet',
   'guide.models.groupForms': 'Formes de druide',
   'guide.nav.sidebarLabel': 'Rubriques du guide',
-  'guide.professions.craftHowBody':
-    "Ouvrez la fenêtre d'Artisanat (touche T par défaut) pour voir toutes les recettes que vous connaissez, ce que chacune réclame et ce que vous avez sous la main ; quand les matériaux sont là, un clic suffit. Les recettes courantes se fabriquent partout dans le monde. Une poignée de recettes d'outils avancées vous demandent en revanche de vous tenir à l'atelier d'artisanat de Highwatch.",
-  'guide.professions.craftHowTitle': "La fenêtre d'artisanat",
-  'guide.professions.focusBody':
-    "Chaque ville principale tient un panneau de Priorités de la ville pour les récolteurs de passage : tenez-vous en ville, ouvrez-le à côté de la minicarte, et affectez un petit budget de points de priorité aux types de composants qui vous importent. Plus vous accordez de priorité à un composant, plus il ressort fin et riche de chaque cadavre ultérieur ; votre répartition suit votre personnage où qu'il aille, et vous pouvez la remanier, gratuitement, à chaque passage ultérieur en ville.",
-  'guide.professions.focusTitle': 'Priorités de la ville',
   'guide.professions.harvestBody':
     "La récolte ne s'arrête pas aux gisements. Certaines bêtes abattues peuvent être dépecées pour des composants, cuirs, crocs, soie et choses plus étranges encore, directement sur le cadavre en plus de son butin ordinaire. Un seul récolteur par proie : le premier à dépecer rafle tout. Le choix vous appartient à chaque fois : prélevez tout ce que le cadavre offre, ou concentrez-vous sur un seul composant pour en tirer une qualité plus fine. N'importe quel personnage peut récolter, sans métier ni apprentissage requis, et un composant particulièrement fin porte même le nom de celui qui l'a récolté.",
   'guide.professions.harvestTitle': 'Dépecer la chasse elle-même',
@@ -7510,4 +7846,285 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.worldBossBody':
     "Tout là-haut sur Thornpeak, la tempête au-dessus de Stormcrag prend parfois forme. Thunzharr, le Pic éveillé s'y dresse à un rythme régulier, un élémentaire de la puissance d'un raid affronté en monde ouvert par quiconque répond à l'appel, et il devient d'autant plus redoutable que les prétendants se dressent nombreux contre lui. Chacun de ceux qui rejoignent le combat gagne son propre tirage de son butin, honoré selon les règles de verrouillage de raid, et sa chute s'attarde assez longtemps pour que les tombés reviennent en courant réclamer leur dû. Rassemblez plus d'épées que vous ne le pensez nécessaire.",
   'guide.worldPage.worldBossTitle': "Quand le pic s'éveille : le boss de monde",
+  'guide.abilityHook.revenge':
+    'Frappe les ennemis devant vous et peut devenir gratuite après une esquive ou une parade.',
+  'guide.abilityHook.hamstring': 'Entrave les déplacements d’un ennemi pour l’empêcher de fuir.',
+  'game.talents.choicesTab': 'Choix',
+  'game.talents.rowUnlockToast': 'Nouveau choix de talent disponible !',
+  'game.talents.rowUnlocks': 'Se débloque au niveau {level}',
+  'entities.abilities.aura_surge.name': "Ricochet de l'aube",
+  'entities.abilities.aura_surge.description':
+    "Projette un bouclier forgé à l'aube qui inflige {damage} dégâts sacrés, réduit la cible principale au silence pendant 2 s, puis rebondit sur jusqu'à 2 ennemis supplémentaires à moins de 10 m, infligeant 75 % des dégâts par rebond. (talent de Paladin)",
+  'entities.abilities.aspect_of_the_wild.description':
+    "Insuffle une force sauvage aux alliés à moins de 30 m, augmentant leur puissance d'attaque de 45 et leur vitesse d'attaque de 5 % pendant 5 min. (talent de Chasseur)",
+  'entities.abilities.avatar.name': 'Avatar',
+  'entities.abilities.avatar.description':
+    'Vous vous transformez en colosse pendant 20 s, ce qui dissipe tous les effets de contrôle vous affectant et augmente de 20% les dégâts que vous infligez.',
+  'entities.abilities.avenging_wrath.description':
+    "Invoque une puissance vengeresse, augmentant votre puissance d'attaque de 60 et votre puissance des sorts de 30 pendant 20 s. (talent de Paladin)",
+  'entities.abilities.berserk.description':
+    "Augmente votre puissance d'attaque de 70 pendant 15 s. (talent de Druide)",
+  'entities.abilities.bladestorm.name': 'Tempête de lames',
+  'entities.abilities.bladestorm.description':
+    'Vous devenez une tempête d’acier tourbillonnante qui inflige {damage} points de dégâts chaque seconde pendant 4 s à tous les ennemis à moins de 6 mètres.',
+  'entities.abilities.blink.description':
+    "Vous téléporte de 15 m vers l'avant et brise les immobilisations. (talent de Mage)",
+  'entities.abilities.bloodlust.description':
+    "Plonge les alliés à moins de 30 m dans une frénésie, augmentant leur vitesse d'attaque de 30 % pendant 15 s. (talent de Chaman)",
+  'entities.abilities.chain_lightning.description':
+    'Projette de la foudre sur la zone ciblée et inflige {damage} points de dégâts aux ennemis proches. (talent de Chaman)',
+  'entities.abilities.chaos_bolt.description':
+    'Projette un trait de feu chaotique qui inflige {damage} points de dégâts de Feu. (talent de Démoniste)',
+  'entities.abilities.cloak_of_shadows.description':
+    "Vous enveloppe d'ombres et absorbe 420 points de dégâts pendant 5 s. (talent de Voleur)",
+  'entities.abilities.cone_of_cold.description':
+    'Golpea a proches ennemis con escarcha e inflige {damage} de daño de Givre. (talent de mage)',
+  'entities.abilities.curse_of_exhaustion.description':
+    'Maudit la cible et réduit sa vitesse de déplacement de 30 % pendant 12 s. (talent de Démoniste)',
+  'entities.abilities.death_coil.description':
+    "Frappe l'ennemi et lui inflige {damage} points de dégâts d'Ombre, puis l'horrifie pendant 3 s. (talent de Démoniste)",
+  'entities.abilities.deep_freeze.description':
+    'Congela profundamente a cible, inflige {damage} de daño de Givre y lo aturde durante 4 s. (talent de mage)',
+  'entities.abilities.desperate_prayer.description':
+    'Vous rend instantanément {damage} points de vie. (talent de Prêtre)',
+  'entities.abilities.deterrence.description':
+    "Augmente vos chances d'esquiver de 50 points de pourcentage pendant 10 s. (talent de Chasseur)",
+  'entities.abilities.divine_shield.description':
+    'Vous protège par la puissance sacrée, absorbant 900 points de dégâts pendant 8 s. (talent de Paladin)',
+  'entities.abilities.earthbind.description':
+    'Lie les ennemis proches à la terre et les immobilise pendant 2 s. (talent de Chaman)',
+  'entities.abilities.evocation.description': 'Restaura mana rápidamente. (talent de mage)',
+  'entities.abilities.frenzied_regeneration.description':
+    "Rend 180 points de vie en 10 s. Forme d'ours uniquement. (talent de Druide)",
+  'entities.abilities.frost_trap.description':
+    "Gèle les ennemis dans la zone ciblée pendant 3 s, les empêchant de se déplacer et d'agir. (talent de Chasseur)",
+  'entities.abilities.ghostly_strike.description':
+    "Frappe l'ennemi et lui inflige les dégâts de l'arme plus {damage}, augmente brièvement l'esquive et octroie 1 point de combo. (talent de Voleur)",
+  'entities.abilities.hammer_of_wrath.description':
+    'Lance un marteau sacré sur un ennemi blessé et lui inflige {damage} points de dégâts du Sacré. Utilisable uniquement sous 20 % de points de vie. (talent de Paladin)',
+  'entities.abilities.healing_stream.description':
+    'Rend 120 points de vie à une cible alliée en 12 s. (talent de Chaman)',
+  'entities.abilities.holy_wrath.description':
+    'Libère une puissance sacrée et inflige {damage} points de dégâts aux ennemis proches. (talent de Paladin)',
+  'entities.abilities.howl_of_terror.description':
+    "Effraie les ennemis proches pendant un maximum de 3 s. Les dégâts peuvent interrompre l'effet. (talent de Démoniste)",
+  'entities.abilities.ice_block.description':
+    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (talent de mage)',
+  'entities.abilities.inner_focus.description':
+    'Votre prochain sort ne coûte rien. Dure 60 s. (talent de Prêtre)',
+  'entities.abilities.innervate.description':
+    "De la sève vivante afflue en vous pendant 10 s et restaure par vagues 20 points de votre ressource actuelle : mana, rage ou énergie. Changer de forme ne l'interrompt pas. Le sommeil, l'étourdissement ou la stase immobilisent la sève. (talent de Druide)",
+  'entities.abilities.mend_pet.name': 'Rapiécer',
+  'entities.abilities.mend_pet.description':
+    'Sana a cible alliée por {damage} durante 15 s. (talent de chasseur)',
+  'entities.abilities.meteor.description':
+    "Fait tomber un météore sur la zone ciblée et inflige {damage} points de dégâts de Feu, puis brûle les ennemis qui s'y trouvent de 12 à 18 points de dégâts de Feu toutes les 2 s pendant 6 s. (talent de Mage)",
+  'entities.abilities.mind_sear.description':
+    "Canalise de l'énergie d'Ombre sur la zone ciblée et inflige {damage} points de dégâts chaque seconde aux ennemis proches. (talent de Prêtre)",
+  'entities.abilities.multi_shot.description':
+    'Décoche une volée sur la zone ciblée et inflige {damage} points de dégâts physiques aux ennemis dans un rayon de 8 m. (talent de Chasseur)',
+  'entities.abilities.prayer_of_healing.description':
+    'Rend {damage} points de vie aux alliés proches. (talent de Prêtre)',
+  'entities.abilities.preparation.description':
+    'Met fin au temps de recharge de Sprint, Évasion et Disparition. (talent de Voleur)',
+  'entities.abilities.presence_of_mind.description':
+    'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 s. (talent de mage)',
+  'entities.abilities.psychic_scream.description':
+    "Effraie les ennemis proches pendant un maximum de 4 s. Les dégâts peuvent interrompre l'effet. (talent de Prêtre)",
+  'entities.abilities.shadowstep.description':
+    'Vous fait traverser les ombres en direction de votre cible. (talent de Voleur)',
+  'entities.abilities.silence.description':
+    'Réduit la cible au silence pendant 4 s. (talent de Prêtre)',
+  'entities.abilities.tranquility.description':
+    "Canalise de l'énergie réparatrice pendant 4 s et rend de 42 à 52 points de vie chaque seconde aux alliés à moins de 30 m. (talent de Druide)",
+  'game.talents.readout.rowsSummary':
+    'Talents : {head}, {picked}/{unlocked} rangées de choix sélectionnées.',
+  'hudChrome.fct.absorbed': 'Absorbé : {amount}',
+  'devCommand.actions.attune.description':
+    'Marque toutes les conditions d’harmonisation comme remplies.',
+  'devCommand.actions.attune.label': 'Déverrouiller les harmonisations',
+  'devCommand.actions.bot.description':
+    'Crée un joueur immobile auquel il est possible de chuchoter.',
+  'devCommand.actions.bot.label': 'Faire apparaître un bot social',
+  'devCommand.actions.combatreset.description': 'Efface l’état de combat et la menace hostile.',
+  'devCommand.actions.combatreset.label': 'Réinitialiser le combat',
+  'devCommand.actions.cooldowns.description':
+    'Réinitialise les temps de recharge des capacités, du GCD et des potions.',
+  'devCommand.actions.cooldowns.label': 'Réinitialiser les temps de recharge',
+  'devCommand.actions.despawnall.description':
+    'Supprime toutes les créatures invoquées par ce développeur.',
+  'devCommand.actions.despawnall.label': 'Supprimer mes créatures',
+  'devCommand.actions.despawntarget.description':
+    'Supprime une créature sélectionnée créée avec cet outil.',
+  'devCommand.actions.despawntarget.label': 'Faire disparaître la cible',
+  'devCommand.actions.dungeon.description':
+    'Entre dans un donjon sans tenir compte de la restriction de développement.',
+  'devCommand.actions.dungeon.label': 'Entrer dans un donjon',
+  'devCommand.actions.gather.description': 'Augmente la compétence d’un métier de récolte.',
+  'devCommand.actions.gather.label': 'Augmenter la compétence de récolte',
+  'devCommand.actions.give.description': 'Ajoute un objet à l’inventaire du joueur.',
+  'devCommand.actions.give.label': 'Donner un objet',
+  'devCommand.actions.god.description':
+    'Active ou désactive l’invulnérabilité et les dégâts augmentés.',
+  'devCommand.actions.god.label': 'Activer ou désactiver le mode divin',
+  'devCommand.actions.gold.description': 'Ajoute de l’or à la bourse actuelle.',
+  'devCommand.actions.gold.label': 'Ajouter de l’or',
+  'devCommand.actions.heal.description': 'Restaure tous les points de vie.',
+  'devCommand.actions.heal.label': 'Rétablir les points de vie',
+  'devCommand.actions.kill.description': 'Teste les séquences de mort, de fantôme et de cadavre.',
+  'devCommand.actions.kill.label': 'Tuer le joueur',
+  'devCommand.actions.killtarget.description': 'Tue la créature vivante sélectionnée.',
+  'devCommand.actions.killtarget.label': 'Tuer la cible',
+  'devCommand.actions.level.description': 'Définit le niveau du personnage actuel.',
+  'devCommand.actions.level.label': 'Définir le niveau',
+  'devCommand.actions.lfgboard.description': 'Crée un scénario d’annonce de groupe prédéfini.',
+  'devCommand.actions.lfgboard.label': 'Préparer le tableau des annonces',
+  'devCommand.actions.lfgqueue.description': 'Crée un scénario de file de recherche de donjons.',
+  'devCommand.actions.lfgqueue.label': 'Préparer la file de recherche',
+  'devCommand.actions.lfgraid.description': 'Crée un scénario de recherche de raids.',
+  'devCommand.actions.lfgraid.label': 'Préparer la recherche de raids',
+  'devCommand.actions.quest.description': 'Accomplit une quête précise par son ID.',
+  'devCommand.actions.quest.label': 'Accomplir la quête',
+  'devCommand.actions.quests.description': 'Accomplit toutes les quêtes du journal actuel.',
+  'devCommand.actions.quests.label': 'Accomplir les quêtes actives',
+  'devCommand.actions.raid.description': 'Entre directement dans l’arène de Nythraxis.',
+  'devCommand.actions.raid.label': 'Entrer dans le raid',
+  'devCommand.actions.raidreset.description': 'Efface les verrouillages de raid actuels.',
+  'devCommand.actions.raidreset.label': 'Réinitialiser le verrouillage de raid',
+  'devCommand.actions.resource.description': 'Restaure le mana, la rage ou l’énergie.',
+  'devCommand.actions.resource.label': 'Rétablir la ressource',
+  'devCommand.actions.revive.description':
+    'Réanime en suivant le processus normal de résurrection.',
+  'devCommand.actions.revive.label': 'Réanimer',
+  'devCommand.actions.spawn.description': 'Fait apparaître une créature précise près du joueur.',
+  'devCommand.actions.spawn.label': 'Faire apparaître une créature',
+  'devCommand.actions.teleport.description':
+    'Déplace le joueur vers des coordonnées exactes du monde.',
+  'devCommand.actions.teleport.label': 'Téléporter',
+  'devCommand.categories.inventory': 'Inventaire',
+  'devCommand.categories.player': 'Joueur',
+  'devCommand.categories.progress': 'Progression',
+  'devCommand.categories.scenarios': 'Scénarios',
+  'devCommand.categories.spawns': 'Apparitions',
+  'devCommand.categories.travel': 'Déplacement',
+  'devCommand.categoryNavAria': 'Catégories de commandes de développement',
+  'devCommand.closeAria': 'Fermer les commandes de développement',
+  'devCommand.dialogLabel': 'Centre de commandes de développement',
+  'devCommand.difficulty.heroic': 'Héroïque',
+  'devCommand.difficulty.normal': 'Normal',
+  'devCommand.fields.amount': 'Quantité',
+  'devCommand.fields.count': 'Nombre',
+  'devCommand.fields.difficulty': 'Difficulté',
+  'devCommand.fields.dungeon': 'Donjon',
+  'devCommand.fields.gold': 'Or',
+  'devCommand.fields.item': 'Objet',
+  'devCommand.fields.level': 'Niveau',
+  'devCommand.fields.mob': 'Créature',
+  'devCommand.fields.name': 'Nom',
+  'devCommand.fields.profession': 'Métier',
+  'devCommand.fields.quest': 'Quête',
+  'devCommand.fields.x': 'X',
+  'devCommand.fields.z': 'Z',
+  'devCommand.filterLabel': 'Filtrer les commandes',
+  'devCommand.filterPlaceholder': 'Rechercher dans cette catégorie',
+  'devCommand.invalidValues': 'Choisissez des valeurs valides avant d’exécuter cette commande.',
+  'devCommand.kicker': 'Outils de développement',
+  'devCommand.noMatches': 'Aucune commande correspondante.',
+  'devCommand.run': 'Exécuter',
+  'devCommand.sent': 'Envoyé : {command}',
+  'devCommand.serverRequirement':
+    'Les commandes de triche du serveur exigent toujours ALLOW_DEV_COMMANDS=1.',
+  'devCommand.subtitle': 'Commandes de test autoritatives pour le monde actif.',
+  'devCommand.title': 'Centre de commandes',
+  'entities.items.duskhide_wraps.name': 'Bandelettes en cuir crépusculaire',
+  'entities.items.eastbrook_druids_hide.name': 'Peau du druide d’Eastbrook',
+  'entities.items.eastbrook_ritual_vestments.name': 'Habits rituels d’Eastbrook',
+  'entities.items.eastbrook_warded_leggings.name': 'Jambières protégées d’Eastbrook',
+  'entities.items.sootscale_mantle.name': 'Pèlerine en écailles de suie',
+  'entities.items.wardweave_cowl.name': 'Capuche de tissage protecteur',
+  'hudChrome.claudium.railUsdc': 'USDC',
+  'hudChrome.claudium.usdcBalance': 'USDC : {amount}',
+  'hudChrome.dailyRewards.reason.bannedUntil':
+    'Vous êtes exclu des Récompenses quotidiennes pour encore {remaining}. L’accès sera rétabli {until}. Motif : {reason}',
+  'hudChrome.dailyRewards.remainingDaysHours': '{days} j {hours} h',
+  'hudChrome.partyFrames.columns': 'Colonnes de raid',
+  'hudChrome.partyFrames.healthCurrent': 'Actuels',
+  'hudChrome.partyFrames.healthCurrentMax': 'Actuels / max.',
+  'hudChrome.partyFrames.healthNone': 'Aucun',
+  'hudChrome.partyFrames.healthPercent': 'Pourcentage',
+  'hudChrome.partyFrames.healthText': 'Texte des points de vie',
+  'hudChrome.partyFrames.height': 'Hauteur du cadre',
+  'hudChrome.partyFrames.lock': 'Verrouiller les cadres de groupe et de raid',
+  'hudChrome.partyFrames.scale': 'Échelle du cadre',
+  'hudChrome.partyFrames.section': 'Cadres de groupe et de raid',
+  'hudChrome.partyFrames.showAbsorbs': 'Afficher les boucliers d’absorption',
+  'hudChrome.partyFrames.showAuras': 'Afficher les améliorations et affaiblissements',
+  'hudChrome.partyFrames.showResource': 'Afficher le mana, la rage et l’énergie',
+  'hudChrome.partyFrames.showSelf': 'Afficher votre cadre',
+  'hudChrome.partyFrames.sort': 'Trier les joueurs',
+  'hudChrome.partyFrames.sortGroup': 'Groupe',
+  'hudChrome.partyFrames.sortName': 'Nom',
+  'hudChrome.partyFrames.sortRole': 'Rôle',
+  'hudChrome.partyFrames.spacing': 'Espacement des cadres',
+  'hudChrome.partyFrames.style': 'Style des cadres',
+  'hudChrome.partyFrames.styleAutomatic': 'Automatique',
+  'hudChrome.partyFrames.styleClassic': 'Cadres de groupe classiques',
+  'hudChrome.partyFrames.styleRaid': 'Cadres de raid',
+  'hudChrome.partyFrames.unlock': 'Déplacer les cadres de groupe et de raid',
+  'hudChrome.partyFrames.width': 'Largeur du cadre',
+  'apiError.welcome.invalid_input': 'Saisie invalide.',
+  'welcome.back': 'Bon retour parmi nous, {name}',
+  'welcome.level': 'Niveau {level}',
+  'welcome.lastPlayed': 'Dernière partie : {when}',
+  'welcome.continue': 'Entrer dans le monde',
+  'welcome.continueHint': 'Entrée pour continuer, Échap pour passer',
+  'welcome.continueHintTouch': 'Touchez pour continuer',
+  'welcome.discord.title': 'La communauté vit sur Discord',
+  'welcome.discord.sub':
+    'Aperçus des patchs, événements, discussions avec les développeurs et 2 emplacements de banque bonus en liant votre compte Discord.',
+  'welcome.discord.join': 'Rejoindre notre Discord',
+  'welcome.chest.ready': 'Coffre des récompenses quotidiennes prêt',
+  'welcome.armory.cta': 'Entrer dans le monde et parcourir l’Armurerie',
+  'welcome.news.new': 'Nouveau',
+  'welcome.news.viewAll': 'Voir toutes les mises à jour sur GitHub',
+  'entities.letters.heroic_marks_reward.sender': 'Intendant héroïque',
+  'entities.letters.heroic_marks_reward.subject': 'Vos Marques héroïques',
+  'entities.letters.heroic_marks_reward.body':
+    'Votre groupe a triomphé de l’épreuve héroïque pendant que vous combattiez à l’arrière ou gisiez à terre. Votre verrouillage a tout de même été enregistré, alors votre part de Marques héroïques vous est envoyée ici au lieu d’être perdue. Faites-en bon usage.\n\n- Intendant héroïque',
+  'guide.dungeonsPage.resetTitle': 'Réinitialiser vos instances',
+  'guide.dungeonsPage.resetBody':
+    'Si vous changez de difficulté alors que votre groupe détient encore des parcours revendiqués, les anciennes revendications persistent un moment avant de disparaître. Le chef de groupe peut les abandonner immédiatement : choisissez Réinitialiser toutes les instances dans le menu de son portrait, ou saisissez /dungeon reset. La difficulté doit réellement avoir changé, personne, vivant ou mort, ne doit rester à l’intérieur, et un court délai sépare deux réinitialisations. Si vous arrivez à l’entrée avec la mauvaise difficulté, le jeu vous avertit avant le début. Le raid n’est jamais réinitialisé ainsi ; ses propres règles de verrouillage restent en vigueur.',
+  'guide.gear.itemLevelBody':
+    'Pour comparer rapidement deux pièces, activez Afficher le niveau d’objet dans les options. L’équipement dont la provenance est connue, obtenu sur les ennemis, par les quêtes ou les métiers, affiche alors un niveau d’objet : une valeur unique qui estime sa puissance d’après sa source et permet de repérer la meilleure amélioration, même entre emplacements différents. Les pièces sans telle provenance, comme les articles de base des marchands et l’équipement de départ, n’en affichent pas ; cette absence est normale.',
+  'guide.professions.craftHowBody':
+    'Ouvrez la fenêtre d’artisanat (touche T par défaut) pour voir toutes vos recettes, leurs composants et ce que vous possédez ; lorsque les matériaux sont réunis, un clic suffit. Les recettes courantes se fabriquent partout. Quelques recettes avancées, dont des outils de haut niveau et de rares armures de lanceur de sorts, exigent toutefois le centre d’artisanat de Highwatch.',
+  'guide.gear.qualityBody':
+    'Chaque objet possède une qualité, et son nom prend la couleur correspondante afin que sa valeur soit lisible en un coup d’œil. Du plus courant au plus précieux :',
+  'guide.gear.qualityCommon': 'Commun',
+  'guide.professions.craftHowTitle': 'La fenêtre d’artisanat',
+  'guide.professions.focusTitle': 'Focalisation de la ville',
+  'guide.professions.focusBody':
+    'Chaque ville principale propose un panneau de Focalisation de la ville aux récolteurs de passage : restez en ville, ouvrez-le près de la minicarte et attribuez un petit capital de points aux types de composants qui vous intéressent. Plus un composant reçoit de focalisation, plus les dépouilles suivantes en fournissent une version fine et abondante. Cette répartition suit votre personnage et peut être modifiée gratuitement lors de chaque visite en ville.',
+  'hudChrome.auraEffect.battleStance': 'Posture de combat : 10% de génération de rage en plus',
+  'hudChrome.auraEffect.berserkerStance':
+    'Posture berserker : coups critiques 3% plus fréquents et 3% plus puissants',
+  'hudChrome.auraEffect.crit': 'Augmente les chances de coup critique de {pct}%',
+  'hudChrome.auraEffect.rageGen': 'Augmente la génération de rage de {pct}%',
+  'hudChrome.auraEffect.reckless':
+    'Augmente les chances de coup critique de {pct}% et la génération de rage de {ragePct}%',
+  'hudChrome.auraEffect.avatar': 'Colosse : dégâts infligés augmentés de {pct}%',
+  'hudChrome.auraEffect.bloodbath':
+    'Augmente les chances de coup critique et les dégâts infligés de {pct}%',
+  'hudChrome.auraEffect.dieBySword': 'Réduit les dégâts subis de {pct}%',
+  'hudChrome.auraEffect.battleTrance':
+    'Votre prochaine Frappe du pillard ou Frappe mutilante ne coûte aucune rage',
+  'hudChrome.auraEffect.revengeFree': 'Votre prochaine Vengeance ne coûte aucune rage',
+  'hudChrome.auraEffect.victoryRush': 'Ruée victorieuse est prête',
+  'hudChrome.auraEffect.maxHpPct': 'Augmente les points de vie maximum de {pct}%',
+  'hudChrome.statInfo.names.parry': 'Parade',
+  'hudChrome.statInfo.desc.parry':
+    'Vos chances de parer entièrement une attaque de mêlée frontale, sans subir de dégâts. Un coup porté dans le dos ne peut pas être paré.',
+  'hudChrome.options.mouseoverCast': 'Incantation au survol sur les cadres de groupe',
+  'hudChrome.options.showTargetOfTarget': 'Afficher la cible de la cible',
+  'hudChrome.unitFrame.targetOfTargetLabel': 'Cible de la cible',
 };

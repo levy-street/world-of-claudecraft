@@ -1,57 +1,60 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { heroicVariantId } from '../src/sim/content/heroic_variants';
 import { ITEMS } from '../src/sim/data';
+import { itemDisplayName } from '../src/ui/entity_i18n';
+import type { ChatContextMenuPort } from '../src/ui/hud/chat/chat_window_controller';
+import { ChatWindowController } from '../src/ui/hud/chat/chat_window_controller';
 import { setLanguage } from '../src/ui/i18n';
-
-vi.mock('../src/render/characters', () => ({ CharacterPreview: class {} }));
-vi.mock('../src/render/characters/assets', () => ({ preloadMechAssets: vi.fn() }));
-vi.mock('../src/render/characters/portrait', () => ({
-  onPortraitsReady: vi.fn(),
-  playerPortraitDataUrl: vi.fn(),
-  visualPortraitDataUrl: vi.fn(),
-}));
+import { FakeDocument } from './helpers/fake_dom';
 
 afterEach(() => {
   setLanguage('en');
-  vi.unstubAllGlobals();
 });
 
 describe('item links in a chat draft', () => {
-  it('preserves distinct base and heroic item ids when their display names match', async () => {
-    const input = {
-      value: '',
-      placeholder: '',
-      style: { display: '' },
-      focus: vi.fn(),
+  it('preserves distinct base and heroic item ids when their display names match', () => {
+    const document = new FakeDocument();
+    document.element('chatlog-tabs');
+    const input = document.element('chat-input', 'input');
+    const chatLog = document.element('chatlog');
+    const combatLog = document.element('combatlog');
+    const menu = document.element('ctx-menu');
+    const contextMenu: ChatContextMenuPort = {
+      element: menu as unknown as HTMLElement,
+      opener: () => null,
+      setOpener: () => {},
+      close: () => {},
+      place: () => {},
+      bind: () => {},
     };
-    vi.stubGlobal('document', {
-      querySelector: vi.fn((selector: string) => (selector === '#chat-input' ? input : null)),
+    const controller = new ChatWindowController({
+      document: document as unknown as Document,
+      storage: { getItem: () => null, setItem: () => {} },
+      chatLog: chatLog as unknown as HTMLElement,
+      combatLog: combatLog as unknown as HTMLElement,
+      contextMenu,
+      sendChat: () => {},
+      isMobileLayout: () => false,
+      itemDisplayName: (itemId) => {
+        const item = ITEMS[itemId];
+        return item ? itemDisplayName(item) : null;
+      },
+      questTitle: (questId) => questId,
+      selectedQuestId: () => null,
+      hasQuest: () => false,
+      showError: () => {},
     });
-
-    const { Hud } = await import('../src/ui/hud');
-    const hud = Object.create(Hud.prototype) as InstanceType<typeof Hud>;
-    const draftHud = hud as unknown as {
-      pendingChatLinks: Map<string, string>;
-      activeChatTab: string;
-      stickyChannel: string;
-      activeChatPlaceholder: () => string;
-    };
-    draftHud.pendingChatLinks = new Map();
-    draftHud.activeChatTab = 'all';
-    // The All tab falls back to the sticky send channel; say is the neutral default
-    // (a bare Object.create instance skips the field initializer, so set it here).
-    draftHud.stickyChannel = 'say';
-    draftHud.activeChatPlaceholder = () => 'Chat';
+    controller.init();
 
     setLanguage('en');
     const baseId = 'moonshroud_robe';
     const heroicId = heroicVariantId(baseId);
     expect(ITEMS[heroicId].name).toBe(ITEMS[baseId].name);
 
-    hud.insertItemChatLink(baseId);
-    hud.insertItemChatLink(heroicId);
+    controller.insertItemLink(baseId);
+    controller.insertItemLink(heroicId);
 
     expect(input.value).toBe('[Moonwrack Robe] [Moonwrack Robe]');
-    expect(hud.composeChatSend(input.value)).toBe(`/say [[i:${baseId}]] [[i:${heroicId}]]`);
+    expect(controller.composeSend(input.value)).toBe(`/say [[i:${baseId}]] [[i:${heroicId}]]`);
   }, 15_000);
 });

@@ -37,13 +37,30 @@ describe('analyzePerfSuggestions', () => {
     expect(suggestions.map((s) => s.id)).toContain('hardware-acceleration');
   });
 
-  it('suggests low graphics for high-DPI sessions with bad frame windows', () => {
+  it('flags WARP (Windows D3D11 software fallback) as software rendering', () => {
     const suggestions = analyzePerfSuggestions({
       ...base,
-      windows: { last10s: { frames: 300, fps: 30, frameMs: { p95: 40, long50: 4 } } },
-      renderer: { ...base.renderer, pixelRatio: 2 },
-      device: { ...base.device, dpr: 2 },
-    }, '?foo=bar');
+      renderer: {
+        ...base.renderer,
+        glRenderer: 'ANGLE (Microsoft, Microsoft Basic Render Driver Direct3D11 vs_5_0 ps_5_0)',
+      },
+    });
+
+    const suggestion = suggestions.find((s) => s.id === 'hardware-acceleration');
+    expect(suggestion).toBeDefined();
+    expect(suggestion?.title).toBe('Software rendering (no real GPU)');
+  });
+
+  it('suggests low graphics for high-DPI sessions with bad frame windows', () => {
+    const suggestions = analyzePerfSuggestions(
+      {
+        ...base,
+        windows: { last10s: { frames: 300, fps: 30, frameMs: { p95: 40, long50: 4 } } },
+        renderer: { ...base.renderer, pixelRatio: 2 },
+        device: { ...base.device, dpr: 2 },
+      },
+      '?foo=bar',
+    );
 
     const highDpi = suggestions.find((s) => s.id === 'high-dpi');
     expect(highDpi?.action?.href).toContain('gfx=low');
@@ -65,12 +82,14 @@ describe('analyzePerfSuggestions', () => {
   });
 
   it('warns when high graphics is forced during bad performance', () => {
-    const suggestions = analyzePerfSuggestions({
-      ...base,
-      windows: { last10s: { frames: 280, fps: 28, frameMs: { p95: 45, long50: 8 } } },
-    }, '?gfx=ultra');
+    const suggestions = analyzePerfSuggestions(
+      {
+        ...base,
+        windows: { last10s: { frames: 280, fps: 28, frameMs: { p95: 45, long50: 8 } } },
+      },
+      '?gfx=ultra',
+    );
 
     expect(suggestions.map((s) => s.id)).toContain('forced-high-graphics');
   });
 });
-

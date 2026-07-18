@@ -15,16 +15,52 @@
       "output": "heroic_strike.webp"
     },
     {
+      "abilityId": "pursuit",
+      "sourcePack": "custom-chatgpt-sheet",
+      "sourceFile": "C:/Users/joseg/Desktop/habilidades6.png [1]",
+      "output": "pursuit.webp"
+    },
+    {
+      "abilityId": "furious_mending",
+      "sourcePack": "custom-chatgpt-sheet",
+      "sourceFile": "C:/Users/joseg/Desktop/todos menos el segundo que es arremetida enfurecida.png [1]",
+      "output": "furious_mending.webp"
+    },
+    {
       "abilityId": "battle_shout",
-      "sourcePack": "warrior",
-      "sourceFile": "43.png",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/grito de guerra.png",
       "output": "battle_shout.webp"
     },
     {
-      "abilityId": "commanding_shout",
-      "sourcePack": "berserker",
-      "sourceFile": "48.png",
-      "output": "commanding_shout.webp"
+      "abilityId": "raised_guard",
+      "sourcePack": "custom-chatgpt-sheet",
+      "sourceFile": "C:/Users/joseg/Desktop/iconos.png [1. BLOQUEAR CON ESCUDO]",
+      "output": "raised_guard.webp"
+    },
+    {
+      "abilityId": "iron_resolve",
+      "sourcePack": "custom-chatgpt-sheet",
+      "sourceFile": "C:/Users/joseg/Desktop/iconos.png [2. IGNORAR DOLOR]",
+      "output": "iron_resolve.webp"
+    },
+    {
+      "abilityId": "faultline",
+      "sourcePack": "custom-chatgpt-sheet",
+      "sourceFile": "C:/Users/joseg/Desktop/iconos.png [3. OLA DE CHOQUE]",
+      "output": "faultline.webp"
+    },
+    {
+      "abilityId": "defiant_bellow",
+      "sourcePack": "custom-chatgpt-sheet",
+      "sourceFile": "C:/Users/joseg/Desktop/iconos.png [4. GRITO DESAFIANTE]",
+      "output": "defiant_bellow.webp"
+    },
+    {
+      "abilityId": "revenge",
+      "sourcePack": "custom-chatgpt-sheet",
+      "sourceFile": "C:/Users/joseg/Desktop/iconos.png [5. REVANCHA]",
+      "output": "revenge.webp"
     },
     {
       "abilityId": "charge",
@@ -33,10 +69,10 @@
       "output": "charge.webp"
     },
     {
-      "abilityId": "rend",
-      "sourcePack": "berserker",
-      "sourceFile": "44.png",
-      "output": "rend.webp"
+      "abilityId": "lingering_dread",
+      "sourcePack": "custom-chatgpt-sheet",
+      "sourceFile": "C:/Users/joseg/Desktop/habilidades6.png [2]",
+      "output": "lingering_dread.webp"
     },
     {
       "abilityId": "thunder_clap",
@@ -57,15 +93,33 @@
       "output": "bloodrage.webp"
     },
     {
+      "abilityId": "anger_management",
+      "sourcePack": "custom-chatgpt-sheet",
+      "sourceFile": "C:/Users/joseg/Desktop/habilidades6.png [3]",
+      "output": "anger_management.webp"
+    },
+    {
+      "abilityId": "battle_rhythm",
+      "sourcePack": "custom-chatgpt-sheet",
+      "sourceFile": "C:/Users/joseg/Desktop/habilidades6.png [4]",
+      "output": "battle_rhythm.webp"
+    },
+    {
       "abilityId": "overpower",
       "sourcePack": "berserker",
       "sourceFile": "12.png",
       "output": "overpower.webp"
     },
     {
+      "abilityId": "raging_gale",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/arremetida enfurecida wow.png",
+      "output": "raging_gale.webp"
+    },
+    {
       "abilityId": "execute",
-      "sourcePack": "berserker",
-      "sourceFile": "35.png",
+      "sourcePack": "custom-chatgpt-sheet",
+      "sourceFile": "C:/Users/joseg/Desktop/habilidades6.png [6]",
       "output": "execute.webp"
     },
     {
@@ -75,15 +129,51 @@
       "output": "slam.webp"
     },
     {
+      "abilityId": "red_harvest",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/Desenfreno wow.png",
+      "output": "red_harvest.webp"
+    },
+    {
+      "abilityId": "heroic_leap",
+      "sourcePack": "custom-chatgpt-sheet",
+      "sourceFile": "C:/Users/joseg/Desktop/cd.png [2]",
+      "output": "heroic_leap.webp"
+    },
+    {
+      "abilityId": "attack",
+      "sourcePack": "custom-chatgpt-sheet",
+      "sourceFile": "C:/Users/joseg/Desktop/cd.png [3]",
+      "output": "attack.webp"
+    },
+    {
+      "abilityId": "emboldening_roar",
+      "sourcePack": "custom-chatgpt-sheet",
+      "sourceFile": "C:/Users/joseg/Desktop/todos menos el segundo que es arremetida enfurecida.png [3]",
+      "output": "emboldening_roar.webp"
+    },
+    {
+      "abilityId": "rallying_cry",
+      "sourcePack": "custom-chatgpt-sheet",
+      "sourceFile": "C:/Users/joseg/Desktop/iconos.png [6. GRITO DE GUERRA]",
+      "output": "rallying_cry.webp"
+    },
+    {
       "abilityId": "cleave",
       "sourcePack": "warrior",
       "sourceFile": "1.png",
       "output": "cleave.webp"
     },
     {
+      "abilityId": "battle_stance",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/Actitud ofensiva.png",
+      "output": "battle_stance.webp"
+    },
+    {
       "abilityId": "defensive_stance",
-      "sourcePack": "warrior",
-      "sourceFile": "9.png",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/Actitud defensiva wow.png",
       "output": "defensive_stance.webp"
     },
     {
@@ -91,6 +181,30 @@
       "sourcePack": "warrior",
       "sourceFile": "36.png",
       "output": "demoralizing_shout.webp"
+    },
+    {
+      "abilityId": "berserker_stance",
+      "sourcePack": "custom-chatgpt-sheet",
+      "sourceFile": "C:/Users/joseg/Desktop/iconos.png [7. BERSERKER STANCE]",
+      "output": "berserker_stance.webp"
+    },
+    {
+      "abilityId": "bladestorm",
+      "sourcePack": "custom-chatgpt-sheet",
+      "sourceFile": "C:/Users/joseg/Desktop/todos menos el segundo que es arremetida enfurecida.png [4]",
+      "output": "bladestorm.webp"
+    },
+    {
+      "abilityId": "colossal_might",
+      "sourcePack": "custom-chatgpt-sheet",
+      "sourceFile": "C:/Users/joseg/Desktop/todos menos el segundo que es arremetida enfurecida.png [5]",
+      "output": "colossal_might.webp"
+    },
+    {
+      "abilityId": "intimidating_shout",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/Fear en area wow.png",
+      "output": "intimidating_shout.webp"
     },
     {
       "abilityId": "sunder_armor",
@@ -111,10 +225,82 @@
       "output": "bloodthirst.webp"
     },
     {
+      "abilityId": "recklessness",
+      "sourcePack": "custom-chatgpt-sheet",
+      "sourceFile": "C:/Users/joseg/Desktop/iconos.png [8. RECKLESSNESS]",
+      "output": "recklessness.webp"
+    },
+    {
+      "abilityId": "avatar",
+      "sourcePack": "custom-chatgpt-sheet",
+      "sourceFile": "C:/Users/joseg/Desktop/iconos.png [9. AVATAR]",
+      "output": "avatar.webp"
+    },
+    {
+      "abilityId": "bloodbath",
+      "sourcePack": "custom-chatgpt-sheet",
+      "sourceFile": "C:/Users/joseg/Desktop/iconos.png [10. BLOODBATH]",
+      "output": "bloodbath.webp"
+    },
+    {
       "abilityId": "shield_slam",
       "sourcePack": "berserker",
       "sourceFile": "25.png",
       "output": "shield_slam.webp"
+    },
+    {
+      "abilityId": "sanguine_aura",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/Aura espada.png",
+      "output": "sanguine_aura.webp"
+    },
+    {
+      "abilityId": "pummel",
+      "sourcePack": "custom-chatgpt-sheet",
+      "sourceFile": "C:/Users/joseg/Desktop/habilidades6.png [5]",
+      "output": "pummel.webp"
+    },
+    {
+      "abilityId": "sweeping_strikes",
+      "sourcePack": "custom-chatgpt-sheet",
+      "sourceFile": "C:/Users/joseg/Desktop/orcos.png [1]",
+      "output": "sweeping_strikes.webp"
+    },
+    {
+      "abilityId": "breachmaker",
+      "sourcePack": "custom-chatgpt-sheet",
+      "sourceFile": "C:/Users/joseg/Desktop/orcos.png [2]",
+      "output": "breachmaker.webp"
+    },
+    {
+      "abilityId": "victory_rush",
+      "sourcePack": "custom-chatgpt-sheet",
+      "sourceFile": "C:/Users/joseg/Desktop/todos menos el segundo que es arremetida enfurecida.png [6]",
+      "output": "victory_rush.webp"
+    },
+    {
+      "abilityId": "die_by_sword",
+      "sourcePack": "custom-chatgpt-sheet",
+      "sourceFile": "C:/Users/joseg/Desktop/todos menos el segundo que es arremetida enfurecida.png [7]",
+      "output": "die_by_sword.webp"
+    },
+    {
+      "abilityId": "storm_bolt",
+      "sourcePack": "custom-chatgpt-sheet",
+      "sourceFile": "C:/Users/joseg/Desktop/todos menos el segundo que es arremetida enfurecida.png [8]",
+      "output": "storm_bolt.webp"
+    },
+    {
+      "abilityId": "second_wind",
+      "sourcePack": "custom-chatgpt-sheet",
+      "sourceFile": "C:/Users/joseg/Desktop/todos menos el segundo que es arremetida enfurecida.png [9]",
+      "output": "second_wind.webp"
+    },
+    {
+      "abilityId": "piercing_howl",
+      "sourcePack": "custom-chatgpt-sheet",
+      "sourceFile": "C:/Users/joseg/Desktop/todos menos el segundo que es arremetida enfurecida.png [10]",
+      "output": "piercing_howl.webp"
     },
     {
       "abilityId": "whirlwind",
@@ -133,6 +319,24 @@
       "sourcePack": "generic-skill100",
       "sourceFile": "skill icon 37.png",
       "output": "taunt.webp"
+    },
+    {
+      "abilityId": "double_charge",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/Doble carga.png",
+      "output": "double_charge.webp"
+    },
+    {
+      "abilityId": "crushing_charge",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/el otro cargar.png",
+      "output": "crushing_charge.webp"
+    },
+    {
+      "abilityId": "combat_mastery",
+      "sourcePack": "custom-user",
+      "sourceFile": "C:/Users/joseg/Desktop/Nuevo talento.png",
+      "output": "combat_mastery.webp"
     }
   ],
   "deferredStayProcedural": {}

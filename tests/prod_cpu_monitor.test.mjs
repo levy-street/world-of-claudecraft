@@ -72,16 +72,12 @@ describe('production CPU monitor parsing', () => {
     expect(parseCpuSamples(' 95.01%\n199.8%\n96%\n')).toEqual([95.01, 199.8, 96]);
   });
 
-  it.each([
-    '',
-    '--',
-    'NaN%',
-    '-1%',
-    '95',
-    '95%\ninvalid%',
-  ])('rejects malformed CPU output %j', (raw) => {
-    expect(() => parseCpuSamples(raw)).toThrow();
-  });
+  it.each(['', '--', 'NaN%', '-1%', '95', '95%\ninvalid%'])(
+    'rejects malformed CPU output %j',
+    (raw) => {
+      expect(() => parseCpuSamples(raw)).toThrow();
+    },
+  );
 
   it('uses a strict threshold and a two-of-three confirmation by default', () => {
     expect(shouldTriggerProfile([95, 95, 95], 95, 2)).toBe(false);

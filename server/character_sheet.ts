@@ -13,15 +13,16 @@
 // recalcPlayerStats (through characterDerivedStats), zone via zoneAt, spec via
 // the talents specLabel, virtualLevel via the types helper.
 
-import { DEEDS } from '../src/sim/content/deeds';
+import { DEED_ORDER, DEEDS } from '../src/sim/content/deeds';
 import {
   computeTalentModifiers,
-  emptyAllocation,
+  repairAllocation,
   specLabel,
   type TalentAllocation,
   type TalentModifiers,
 } from '../src/sim/content/talents';
 import { zoneAt } from '../src/sim/data';
+import { completionCounts } from '../src/sim/deeds_completion';
 import { characterDerivedStats } from '../src/sim/entity';
 import type { CharacterState } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
@@ -96,6 +97,10 @@ export const SHEET_RECENT_DEEDS = 5;
 // two sources are DELIBERATELY allowed to diverge transiently (a returning
 // veteran's blob back-credits before the fire-and-forget index rows land);
 // do not collapse them into one source.
+// earnedCount follows the shared completion predicate
+// (src/sim/deeds_completion.ts): non-feat live-catalog deeds, hidden ones
+// counting once earned, so this number equals the character's own Book of
+// Deeds header and never includes feats or removed-content ids.
 export interface SheetDeeds {
   renown: number;
   earnedCount: number;
@@ -157,14 +162,12 @@ export function splitCopper(copper: number): MoneySplit {
   return { gold: Math.floor(c / 10000), silver: Math.floor(c / 100) % 100, copper: c % 100 };
 }
 
-function normalizeAllocation(state: CharacterState): TalentAllocation {
-  const a = state.talents;
-  if (!a || typeof a !== 'object') return emptyAllocation();
-  return {
-    spec: typeof a.spec === 'string' ? a.spec : null,
-    ranks: a.ranks && typeof a.ranks === 'object' ? a.ranks : {},
-    choices: a.choices && typeof a.choices === 'object' ? a.choices : {},
-  };
+function normalizeAllocation(
+  cls: PlayerClass,
+  state: CharacterState,
+  level: number,
+): TalentAllocation {
+  return repairAllocation(cls, state.talents, level);
 }
 
 function talentMods(
@@ -175,7 +178,7 @@ function talentMods(
   try {
     // Pass the character's level so mastery level-scaling matches the live sim
     // (a sub-20 character's sheet must not report full-strength mastery stats).
-    return computeTalentModifiers(cls, normalizeAllocation(state), level);
+    return computeTalentModifiers(cls, normalizeAllocation(cls, state, level), level);
   } catch {
     return undefined; // never let a malformed allocation break a public read
   }
@@ -223,7 +226,7 @@ export function characterSheet(input: CharacterSheetInput): CharacterSheet {
     realm,
     class: cls,
     classLabel: CLASS_LABELS[cls] ?? cls,
-    spec: specLabel(cls, normalizeAllocation(state)),
+    spec: specLabel(cls, normalizeAllocation(cls, state, level)),
     level,
     virtualLevel: virtualLevel(lifetimeXp),
     prestigeRank: state.prestigeRank ?? 0,
@@ -234,7 +237,13 @@ export function characterSheet(input: CharacterSheetInput): CharacterSheet {
     arena: arenaBrackets(state),
     deeds: {
       renown: state.renown ?? 0,
-      earnedCount: Object.keys(state.deeds ?? {}).length,
+      // The shared completion predicate (src/sim/deeds_completion.ts): non-feat
+      // live-catalog deeds, hidden ones once earned; equals the Book of Deeds
+      // header for this character. The COUNT including earned hidden deeds
+      // reveals no hidden id (the Book shows the owner the same number), and
+      // feats plus removed-content ids deliberately no longer inflate it.
+      earnedCount: completionCounts(new Set(Object.keys(state.deeds ?? {})), DEEDS, DEED_ORDER)
+        .earned,
       activeTitle: state.activeTitle ?? null,
       // Hidden deeds are invisible until earned, existence included, so the
       // PUBLIC arm strips them (a third-party viewer who has not earned one

@@ -89,8 +89,9 @@ Per-frame HUD code (anything reached from `Hud.update()`) holds these:
   layout-thrash killer); drives the non-pooled painters through a `makeWriterFacet` loop
   asserting establishing-write + elision for BOTH a Sim- and a `ClientWorld`-shaped input; and
   (gated behind `HUD_PERF_BUDGET_TOUR=1`) asserts on EVERY viewport the run-length-INDEPENDENT
-  elision-bypass COUNT `hudHotDomWrites <= 153` (a COUNT, NOT the skip RATIO, whose denominator
-  is the frame count and jitters run-to-run), plus the FCT pool stays at/under `FCT_POOL_CAP`.
+  elision-bypass COUNT `hudHotDomWrites` at or below the committed baseline anchor (a COUNT,
+  NOT the skip RATIO, whose denominator is the frame count and jitters run-to-run), plus the
+  FCT pool stays at/under `FCT_POOL_CAP`.
   The committed baseline (`tests/hud_perf_budget.baseline.md`) is READ for both anchors (it
   throws if absent, never defaults).
 - **Two controllers stay separate.** HUD tier knobs read the STATIC graphics preset via
@@ -142,10 +143,14 @@ number (the region list drifts too fast to copy here). The non-greppable facts:
 **Where a new UI feature lands (module-first).** Every new window, panel, frame, or bar is its
 own small `src/ui/` module built by the recipe below (pure `*_view`/`*_core` plus a thin
 painter on the `PainterHost` seam), composed by `Hud`, NEVER a new banner section or method
-cluster in `hud.ts` (see the root Modularity section). Its test is a Vitest in
-`tests/<name>.test.ts` driving the pure core directly. Bug fixes are test-first: a failing
-test that reproduces the bug (extract the buried unit into its own module if needed), then the
-smallest change that turns it green.
+cluster in `hud.ts` (see the root Modularity section). A component that belongs to an
+extracted HUD domain lands under `src/ui/hud/<domain>/` instead, exposed through that domain's
+`index.ts` barrel; the domain shape (controllers with narrow dependency bags, never importing
+`Hud`) and the preservation contract live in `src/ui/hud/CLAUDE.md`. Components with no
+extracted domain stay flat `src/ui/` modules. Its test is a Vitest in `tests/<name>.test.ts`
+driving the pure core directly. Bug fixes are test-first: a failing test that reproduces the
+bug (extract the buried unit into its own module if needed), then the smallest change that
+turns it green.
 
 ### Authoring a new HUD component (the recipe)
 One recipe for a new window/panel or a per-frame frame/bar, and for migrating one out of
@@ -171,7 +176,8 @@ follow the root `extract-and-test` skill for the move-not-rewrite mechanics. The
   the governor), and apply the matching canvas hot-path technique.
 - **Reuse a FAMILY before building bespoke:** a unit-style frame is a new `UnitFramePainter`
   instance (`unit_frame.ts` + `unit_frame_painter.ts`); an extra action bar is another
-  `ActionBarPainter` from a new bar descriptor (`action_bar_view.ts` + `action_bar_painter.ts`).
+  `ActionBarPainter` from a new bar descriptor (`hud/action_bar/action_bar_view.ts` +
+  `action_bar_painter.ts`).
 - **`Hud` stays the orchestrator.** Keep `open<Window>`/`close<Window>` in `Hud` (cross-window
   coordination needs its private state); the per-render method shrinks to: resolve the entity,
   build the view, call the module with `deps`.
@@ -181,14 +187,24 @@ The locale data is split; touch the right file (full model + locked-terms glossa
 `docs/i18n-scaling/translation-workflow.md`):
 - **`i18n.catalog/`** is the authoritative English source catalog (nested domain modules
   `shell`/`hud`/`hud_chrome`/`abilities`/`quests`/`items`/`game`/`merge`/`guide`/`editor`/
-  `api_error` + an `index.ts` barrel) that drives `TranslationKey = Leaves<typeof en, 6>`, the
-  dotted-path type every `t()` uses. Add a new English string in the matching domain module.
+  `api_error` + an `index.ts` barrel, which also defines a few namespaces inline in `en`, for
+  example `meta`, `realmTypes`, and the dev command GUI's `devCommand`, next to the
+  `worldEntityText` merge) that drives `TranslationKey`, the dotted-path type every
+  `t()` uses. `TranslationKey` re-exports the BUILD-GENERATED flat literal union of every `en`
+  leaf path (`i18n.catalog/translation_keys.generated.ts`, emitted by `scripts/i18n_build.mjs`,
+  committed, freshness-gated like the resolved table); it replaced the recursive
+  `Leaves<typeof en, 6>` computation, which TypeScript 7's native compiler rejects (TS2590) and
+  whose template-literal members accepted any entity id. Add a new English string in the
+  matching domain module (or, for the inline namespaces, in `index.ts` itself), then
+  `npm run i18n:gen` regenerates the union in the same command.
 - **`i18n.locales/<lang>.ts`** are the non-English flat sparse overlays
   (`Partial<Record<TranslationKey,string>>`), the ONLY files a translator edits (the
   contributor rules are in the workflow below).
 - **`i18n.resolved.generated/`** is the generated dense table the runtime imports (committed,
-  regenerated by `npm run i18n:build`; the `i18n.status.json` registry is gitignored, only the
-  counts-only `i18n.status.summary.json` is committed).
+  regenerated by `npm run i18n:build`; the `i18n.status.json` registry and the counts-only
+  `i18n.status.summary.json` are both gitignored: the audit trail is the CI step in both jobs
+  that posts the coverage counts to the GitHub job summary via
+  `scripts/i18n_coverage_summary.mjs`).
 - **`i18n.ts`** is the thin runtime: `t()`/`tOptional`/`tPlural`, `hasTranslation`, the
   formatters, language get/set. The locale set derives from `SUPPORTED_LANGUAGES` in the
   generated `loaders.ts`. **Lazy locale flip:** only `en`/`en_XA`/`pending`/`loaders` are
@@ -196,11 +212,18 @@ The locale data is split; touch the right file (full model + locked-terms glossa
   is synchronous and does NOT load; `main.ts` awaits `ensureLocaleLoaded` before localized
   paint and each picker switch.
 
-**Generated-artifact merge conflicts** (`i18n.status.summary.json`, `i18n.resolved.sha256`,
-any `i18n.resolved.generated/` slice) are **never hand-resolved**: take either side, run
-`npm run i18n:gen`, and `git add` the result. The output is deterministic, so a second
-`i18n:gen` must leave the tree clean (your proof; CI's freshness step checks the same). A
-rising `pending` count after merging a `release/**` branch is expected and fine at PR tier.
+**Generated-artifact merge conflicts** (any `i18n.resolved.generated/` slice) are **never
+hand-resolved**: take either side, run `npm run i18n:gen`, and `git add` the result. The
+committed slices are line-item (sorted, one item per line, no counts, hashes, or timestamps),
+so the full-universe locale slices auto-merge byte-perfectly; the global aggregates
+(`i18n.status.summary.json`, `i18n.resolved.sha256`) are no longer committed. One slice can
+still conflict: `pending.ts` is a small sorted per-locale list, so two concurrent new-key PRs
+often insert at the same tail line. That conflict is expected, resolves with the exact recipe
+above (take either side, regen, add), and a durable fix (the same-as-English
+inversion) is specced in the toolchain packet's close-out summary on issue #1868. The output is
+deterministic, so a second `i18n:gen` must leave the tree clean (your proof; CI's freshness
+step checks the same). A rising `pending` count after merging a `release/**` branch is
+expected and fine at PR tier.
 
 `t(key)` **throws on an untracked key in dev/test**, renders English for a `pending` key on
 **non-release builds only**, and **hard-fails a pending key on a release build**
@@ -215,9 +238,9 @@ rising `pending` count after merging a `release/**` branch is expected and fine 
    a matcher RULE in the table matching the emit's ORIGIN (`sim_i18n.ts` for a `src/sim/` emit,
    `server_i18n.ts` for a `server/` emit) in the SAME change. The S3 guard
    (`tests/localization_fixes.test.ts`) fails if a new emit is recognized by neither.
-3. Run `npm run i18n:scan` / `i18n:build` (+ `i18n:hash -- --write` if the resolved table
-   changed) and commit the regenerated files. The PR is green at the PR-tier gate; the
-   release-tier gate (`I18N_RELEASE_TIER=1`) hard-fails on any `pending` row.
+3. Run `npm run i18n:scan` / `i18n:build` and commit the regenerated files. The PR is green
+   at the PR-tier gate; the release-tier gate (`I18N_RELEASE_TIER=1`) hard-fails on any
+   `pending` row.
    - **The one PR-tier i18n exception (M16).** A new English value that is *wordy* (a run of
      4+ consecutive lowercase letters after stripping `{tokens}`, i.e. most real prose) also
      needs its five non-Latin fills (`zh_CN`/`zh_TW`/`ja_JP`/`ko_KR`/`ru_RU`) in the SAME
@@ -307,8 +330,9 @@ index is the `UI_PURE_CORES` allowlist in `tests/architecture.test.ts`, and each
 header carries its own contract.
 - **unit_portrait.ts** / **unit_portrait_painter.ts**: the canonical template pair (DOM-free
   geometry + crest-id core, thin DPR-aware painter); player and target frames share it.
-- **vendor_view.ts** / **vendor_window.ts**: the first window migrated out of `hud.ts` by the
-  recipe above (pure view decides the rows; thin consumer paints from injected `deps`).
+- **hud/vendor/vendor_view.ts** / **vendor_window.ts**: the first window migrated out of
+  `hud.ts` by the recipe above (pure view decides the rows; thin consumer paints from
+  injected `deps`).
 - **options_view.ts** / **options_window.ts** (+ **settings_controls.ts**): the Esc options
   window. A new setting is a declarative entry in the pure model (control kind, setting key,
   label key, value coercion) painted with the shared `settings_controls.ts` builders; a

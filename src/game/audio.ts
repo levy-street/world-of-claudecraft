@@ -16,12 +16,14 @@ const UI_CUES = {
   click: 'ui_click',
   coin: 'ui_coin',
   levelUp: 'ui_level_up',
+  achievement: 'ui_achievement',
   lootItem: 'ui_loot_item',
   questAccept: 'ui_quest_accept',
   questDone: 'ui_quest_done',
   whisper: 'ui_whisper',
   sheep: 'ui_sheep',
   death: 'ui_death',
+  playerDeath: 'player_death',
   error: 'ui_error',
   duelChallenge: 'ui_duel_challenge',
   duelCountdown: 'ui_duel_countdown',
@@ -45,6 +47,11 @@ export class GameAudio {
   private cueCtx: AudioContext | null = null;
   private cueMaster: GainNode | null = null;
   private noiseBuf: AudioBuffer | null = null;
+  // Gates the discrete interface/feedback cues (loot, level, quest, whisper, error,
+  // ...) plus the combat avoid cues the HUD reads via `feedbackEnabled`. On by
+  // default; driven by the `interfaceSfx` setting. World/spatial sounds and the
+  // gameplay-timing cues (ready check, duel countdown) are unaffected.
+  private feedbackOn = true;
 
   /** Set SFX volume (0..1). Safe before init(). */
   setVolume(value: number): void {
@@ -57,6 +64,19 @@ export class GameAudio {
 
   get volume(): number {
     return this.vol;
+  }
+
+  /** Enable/disable the interface and feedback cues (the `interfaceSfx` setting).
+   *  On by default; when off, the notification "beeps" fall silent while the SFX
+   *  volume slider and the spatial world sounds are untouched. Safe before init(). */
+  setFeedbackEnabled(value: boolean): void {
+    this.feedbackOn = value;
+  }
+
+  /** Whether the interface/feedback cues are on. The HUD reads this to gate the
+   *  combat avoid cues (miss/dodge/parry) it plays through the spatial engine. */
+  get feedbackEnabled(): boolean {
+    return this.feedbackOn;
   }
 
   /** Initialize sampled playback. Safe to call repeatedly after a user gesture. */
@@ -164,6 +184,13 @@ export class GameAudio {
     sfx.playUi(key, { jitter: false });
   }
 
+  /** Play a cue only when interface/feedback sounds are enabled. The notification
+   *  cues (loot, level, quest, whisper, error, polymorph, death) route through here;
+   *  the gameplay-timing cues (ready check, duel countdown) call `play` directly. */
+  private playFeedback(key: UiCue): void {
+    if (this.feedbackOn) this.play(key);
+  }
+
   bagOpen(): void {
     this.play(UI_CUES.bagOpen);
   }
@@ -177,23 +204,35 @@ export class GameAudio {
   }
 
   coin(): void {
-    this.play(UI_CUES.coin);
+    this.playFeedback(UI_CUES.coin);
   }
 
   levelUp(): void {
-    this.play(UI_CUES.levelUp);
+    this.playFeedback(UI_CUES.levelUp);
+  }
+
+  achievement(): void {
+    this.play(UI_CUES.achievement);
+  }
+
+  // Your OWN character actually dying (the 'playerDeath' sim event), not a
+  // minigame/PvP loss chime (fiesta, Yumi, arena rating, Vale Cup all still
+  // use death() below): plays the real custom death vocalization instead of
+  // the generic UI stinger.
+  playerDeath(): void {
+    this.play(UI_CUES.playerDeath);
   }
 
   lootItem(): void {
-    this.play(UI_CUES.lootItem);
+    this.playFeedback(UI_CUES.lootItem);
   }
 
   questAccept(): void {
-    this.play(UI_CUES.questAccept);
+    this.playFeedback(UI_CUES.questAccept);
   }
 
   questDone(): void {
-    this.play(UI_CUES.questDone);
+    this.playFeedback(UI_CUES.questDone);
   }
 
   readyCheck(): void {
@@ -215,19 +254,19 @@ export class GameAudio {
   }
 
   whisper(): void {
-    this.play(UI_CUES.whisper);
+    this.playFeedback(UI_CUES.whisper);
   }
 
   sheep(): void {
-    this.play(UI_CUES.sheep);
+    this.playFeedback(UI_CUES.sheep);
   }
 
   death(): void {
-    this.play(UI_CUES.death);
+    this.playFeedback(UI_CUES.death);
   }
 
   error(): void {
-    this.play(UI_CUES.error);
+    this.playFeedback(UI_CUES.error);
   }
 
   duelChallenge(): void {

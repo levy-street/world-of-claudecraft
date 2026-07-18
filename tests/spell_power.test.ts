@@ -114,23 +114,26 @@ describe('Spell Power balance band (cap)', () => {
     expect(share).toBeLessThan(0.45);
   });
 
-  it('a warrior bleed (Rend) folds melee Attack Power into each DoT tick', () => {
-    const { sim, p } = leveled('warrior');
+  it('Maiming Strike folds melee Attack Power into each Gaping Wounds tick', () => {
+    const { sim, pid, p } = leveled('warrior');
+    expect(sim.setSpec('arms', pid)).toBe(true);
     const dummy = spawnDummy(sim, p);
     p.targetId = dummy.id;
-    p.resource = 100; // rage to pay for Rend
-    const rend = abilitiesKnownAt('warrior', MAX_LEVEL).find((k) => k.def.id === 'rend')!;
-    const dot = rend.effects.find((e) => e.type === 'dot') as {
+    p.resource = 100;
+    const mortalStrike = abilitiesKnownAt('warrior', MAX_LEVEL, sim.meta(pid)!.talentMods).find(
+      (k) => k.def.id === 'mortal_strike',
+    )!;
+    const dot = mortalStrike.effects.find((e) => e.type === 'dot') as {
       total: number;
       duration: number;
       interval: number;
     };
-    sim.castAbility('rend', p.id);
+    sim.castAbility('mortal_strike', p.id);
     sim.tick();
-    const aura = dummy.auras.find((a) => a.kind === 'dot' && a.id === 'rend')!;
+    const aura = dummy.auras.find((a) => a.kind === 'dot' && a.id === 'deep_wounds')!;
     expect(aura).toBeDefined();
     const basePerTick = Math.max(1, Math.round(dot.total / (dot.duration / dot.interval)));
-    const bonusPerTick = dotTickBonus(p.attackPower, rend.def, dot.duration, dot.interval);
+    const bonusPerTick = dotTickBonus(p.attackPower, mortalStrike.def, dot.duration, dot.interval);
     expect(bonusPerTick).toBeGreaterThan(0);
     expect(aura.value).toBe(basePerTick + bonusPerTick);
   });
@@ -180,10 +183,15 @@ describe('Spell Power end-to-end through the sim', () => {
   });
 
   it('each Arcane Missiles channel tick deals fixed base + Spell Power bonus', () => {
-    const { sim, p } = leveled('mage');
+    const { sim, pid, p } = leveled('mage');
+    // The mage rework gated Aether Darts (arcane_missiles) behind the Chronomancy
+    // (arcane) spec, so commit the spec before resolving the known ability.
+    expect(sim.setSpec('arcane', pid)).toBe(true);
     const dummy = spawnDummy(sim, p);
     p.targetId = dummy.id;
-    const am = abilitiesKnownAt('mage', MAX_LEVEL).find((k) => k.def.id === 'arcane_missiles')!;
+    const am = abilitiesKnownAt('mage', MAX_LEVEL, sim.meta(pid)!.talentMods).find(
+      (k) => k.def.id === 'arcane_missiles',
+    )!;
     const dd = am.effects.find((e) => e.type === 'directDamage') as { min: number; max: number };
     expect(dd.min).toBe(dd.max); // fixed per-missile base, no roll variance
     const perTickBonus = channelTickBonus(p.spellPower, am.def);

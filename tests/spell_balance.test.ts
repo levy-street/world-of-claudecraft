@@ -9,14 +9,23 @@
 // so a future damage edit cannot quietly make a slow nuke worthless again.
 import { describe, expect, it } from 'vitest';
 import { ABILITIES, abilitiesKnownAt, type KnownAbility } from '../src/sim/content/classes';
+import { computeTalentModifiers, emptyAllocation } from '../src/sim/content/talents';
 import type { PlayerClass } from '../src/sim/types';
 import { GCD, MAX_LEVEL } from '../src/sim/types';
 
 // Base damage per second of occupancy (avg hit / effective cast), ignoring Spell
 // Power and crit (which scale every nuke about equally). The pure proportionality
 // signal.
+// The mage DPS kit is spec-gated since Chronomancy: resolve mage nukes under a
+// fire-spec build (fire keeps every nuke this file compares).
+const FIRE_MODS = computeTalentModifiers('mage', {
+  ...emptyAllocation(),
+  spec: 'fire',
+} as never);
+
 function nukeBaseDps(cls: PlayerClass, id: string): number {
-  const k = abilitiesKnownAt(cls, MAX_LEVEL).find((a) => a.def.id === id)!;
+  const mods = cls === 'mage' ? FIRE_MODS : undefined;
+  const k = abilitiesKnownAt(cls, MAX_LEVEL, mods).find((a) => a.def.id === id)!;
   const dd = k.effects.find((e) => e.type === 'directDamage') as { min: number; max: number };
   const avg = (dd.min + dd.max) / 2;
   return avg / Math.max(k.castTime, GCD);

@@ -3,7 +3,12 @@ import {
   type ClaudiumNativeConfirm,
   confirmNativeSettlement,
   EconomyClient,
+  startClaudiumPurchase,
 } from '../src/net/economy_sdk';
+
+vi.mock('../src/net/wallet', () => ({
+  currentWallet: () => ({ address: 'wallet-owner', isConnected: true }),
+}));
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -122,7 +127,7 @@ describe('EconomyClient pack snapshot', () => {
         }
         if (url.endsWith('/api/claudium/native/rails')) {
           return new Response(
-            JSON.stringify({ available: true, rails: { sol: true, woc: true } }),
+            JSON.stringify({ available: true, rails: { sol: true, usdc: true, woc: true } }),
             { status: 200 },
           );
         }
@@ -139,7 +144,7 @@ describe('EconomyClient pack snapshot', () => {
       available: true,
       balance: 250,
       skus: [{ sku: 'claudium_500', usd: 4.99, claudium: 500 }],
-      nativeRails: { sol: true, woc: true },
+      nativeRails: { sol: true, usdc: true, woc: true },
     });
   });
 
@@ -162,7 +167,10 @@ describe('EconomyClient pack snapshot', () => {
         }
         if (url.endsWith('/api/claudium/native/rails')) {
           return new Response(
-            JSON.stringify({ available: false, rails: { sol: false, woc: false } }),
+            JSON.stringify({
+              available: false,
+              rails: { sol: false, usdc: false, woc: false },
+            }),
             { status: 200 },
           );
         }
@@ -179,7 +187,101 @@ describe('EconomyClient pack snapshot', () => {
       available: false,
       balance: 250,
       skus: [{ sku: 'claudium_500', usd: 4.99, claudium: 500 }],
-      nativeRails: { sol: false, woc: false },
+      nativeRails: { sol: false, usdc: false, woc: false },
+    });
+  });
+
+  it('reads the connected wallet USDC balance through the narrow game proxy', async () => {
+    const fetchMock = vi.fn(
+      async (_input: string | URL | Request) =>
+        new Response(JSON.stringify({ owner: 'wallet-owner', amountBase: '12345678' }), {
+          status: 200,
+        }),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    const balance = await new EconomyClient({
+      token: () => 'token',
+      base: 'https://game.example',
+    }).usdcBalance('wallet-owner');
+
+    expect(balance).toEqual({ owner: 'wallet-owner', amountBase: '12345678' });
+    expect(String(fetchMock.mock.calls[0]?.[0])).toContain(
+      '/api/claudium/native/balance/usdc/wallet-owner',
+    );
+  });
+});
+
+describe('startClaudiumPurchase', () => {
+  it('signs and confirms a service-built USDC transaction through Wallet Standard', async () => {
+    const client = new EconomyClient({ token: () => 'token', base: 'https://game.example' });
+    const quote = vi.spyOn(client, 'nativeQuote').mockResolvedValue({
+      ok: true,
+      reference: 'CLM_usdc',
+      rail: 'usdc',
+      claudium: 500,
+      amountBase: '4990000',
+      destination: 'usdc-token-account',
+      mint: 'usdc-mint',
+      memo: 'CLM_usdc',
+      quoteExpiryMs: Date.now() + 60_000,
+      transactionBase64: 'AQID',
+      reason: null,
+    });
+    const confirm = vi.spyOn(client, 'nativeConfirm').mockResolvedValue({
+      settled: true,
+      balance: 500,
+      reason: null,
+    });
+    const signer = vi.fn(async () => 'usdc-signature');
+
+    const result = await startClaudiumPurchase(client, 'usdc', 'claudium_500', {
+      nativeSignAndSend: signer,
+    });
+
+    expect(quote).toHaveBeenCalledWith({
+      rail: 'usdc',
+      sku: 'claudium_500',
+      payer: 'wallet-owner',
+    });
+    expect(signer).toHaveBeenCalledWith('AQID', 'usdc', 'CLM_usdc');
+    expect(confirm).toHaveBeenCalledWith({
+      reference: 'CLM_usdc',
+      signature: 'usdc-signature',
+    });
+    expect(result).toEqual({ settled: true, balance: 500, reason: null });
+  });
+
+  it('uses a linked-only desktop payer when no wallet is connected in the renderer', async () => {
+    const client = new EconomyClient({ token: () => 'token', base: 'https://game.example' });
+    const quote = vi.spyOn(client, 'nativeQuote').mockResolvedValue({
+      ok: true,
+      reference: 'CLM_desktop',
+      rail: 'sol',
+      claudium: 500,
+      amountBase: '123',
+      destination: 'treasury',
+      mint: null,
+      memo: 'CLM_desktop',
+      quoteExpiryMs: Date.now() + 60_000,
+      transactionBase64: 'AQID',
+      reason: null,
+    });
+    vi.spyOn(client, 'nativeConfirm').mockResolvedValue({
+      settled: true,
+      balance: 500,
+      reason: null,
+    });
+
+    await startClaudiumPurchase(client, 'sol', 'claudium_500', {
+      nativePayer: 'linked-desktop-wallet',
+      nativeSignAndSend: async () => 'signature',
+    });
+
+    expect(quote).toHaveBeenCalledWith({
+      rail: 'sol',
+      sku: 'claudium_500',
+      payer: 'linked-desktop-wallet',
     });
   });
 });

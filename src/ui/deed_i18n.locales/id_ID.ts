@@ -35,8 +35,8 @@ export const table: DeedLocaleTable = {
     desc: 'Gunakan satu poin talenta pada talenta di baris terakhir.',
   },
   prog_full_build: {
-    name: 'Sebelas Penuh',
-    desc: 'Habiskan seluruh sebelas poin talenta pada satu build.',
+    name: 'Enam Lengkap',
+    desc: 'Pilih satu opsi pada keenam baris talenta dalam satu build.',
   },
   prog_veteran: {
     name: 'Veteran',

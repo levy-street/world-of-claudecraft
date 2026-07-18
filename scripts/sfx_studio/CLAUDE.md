@@ -35,8 +35,11 @@ bundled into the game client or server. Root `CLAUDE.md` and
 - Apply the fixed production conform pass after slicing, fades, loop seam
   construction, tone, dynamics, limiter, and output channel layout. Every exact
   preview and publish must be a decoded-QA-verified 44.1 kHz, 192 kbps MP3 using
-  true-peak normalization below one second and LUFS normalization at or above one
-  second.
+  true-peak normalization below one second and, at or above one second, LUFS
+  normalization bounded by the post-encode true-peak ceiling: a peak-constrained
+  clip may publish under the LUFS target and is marked `peakLimited`
+  (`conformSfxAudio` in `scripts/sfx/conform_audio.mjs`, pinned by
+  `tests/sfx_conform.test.ts`).
 - The catalog loop flag is a runtime contract. Loop cues must publish through
   seam processing and one-shots must not. Runtime playback rate changes the
   wall-clock loop duration without changing the rendered seam samples.
@@ -45,8 +48,10 @@ bundled into the game client or server. Root `CLAUDE.md` and
   Recheck the original source codec and bitrate at render time so legacy drafts
   cannot bypass the lossy floor. Require a conformed public MP3 before publish.
 - Cross-clip mix gain has two additive dB layers: the category baseline and the
-  per-key fine tune. Their resolved sum must stay at or below 0 dB so runtime
-  playback cannot defeat peak QA.
+  per-key fine tune. Their resolved sum must stay at or below the key's ceiling
+  (0 dB for every key by default; a `custom: true` key may have its own higher
+  computed ceiling, see `scripts/sfx/sfx_gain_ceiling.mjs` and `SFX_GAIN_LIMITS`
+  in the generated manifest) so runtime playback cannot defeat peak QA.
 - Keep studio-only waveform, prompt, analysis, and history data out of the game
   bundle. Trim, slices, fades, seam construction, reverse, EQ, dynamics,
   loudness, and encoding stay baked in the published asset. Category baseline

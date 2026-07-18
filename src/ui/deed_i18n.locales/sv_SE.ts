@@ -32,8 +32,8 @@ export const table: DeedLocaleTable = {
     desc: 'Lägg en talangpoäng i en talang på den nedersta raden.',
   },
   prog_full_build: {
-    name: 'Hela elvan',
-    desc: 'Lägg alla elva talangpoäng på ett och samma bygge.',
+    name: 'Hela sexan',
+    desc: 'Välj ett alternativ i alla sex talangrader i ett och samma bygge.',
   },
   prog_veteran: { name: 'Veteran', desc: 'Tjäna sammanlagt 250 000 erfarenhet.', title: 'Veteran' },
   prog_champion: {

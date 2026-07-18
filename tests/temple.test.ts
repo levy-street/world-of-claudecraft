@@ -3,10 +3,10 @@
 // set, that Ysolei's boss mechanics fire, the new 'temple' interior collides,
 // and the lead-up quest chain + boss loot table hang together.
 import { describe, expect, it } from 'vitest';
+import { isBlocked } from '../src/sim/colliders';
+import { DUNGEON_LIST, DUNGEONS, ITEMS, instanceOrigin, MOBS, NPCS, QUESTS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import { dist2d } from '../src/sim/types';
-import { DUNGEONS, DUNGEON_LIST, ITEMS, MOBS, NPCS, QUESTS, instanceOrigin } from '../src/sim/data';
-import { isBlocked } from '../src/sim/colliders';
 import { groundHeight } from '../src/sim/world';
 
 function makeWorld() {
@@ -15,17 +15,22 @@ function makeWorld() {
 
 function teleport(sim: Sim, pid: number, x: number, z: number) {
   const e = sim.entities.get(pid)!;
-  e.pos.x = x; e.pos.z = z;
+  e.pos.x = x;
+  e.pos.z = z;
   e.pos.y = groundHeight(x, z, sim.cfg.seed);
   e.prevPos = { ...e.pos };
 }
 
 function nearestMob(sim: Sim, templateId: string, from: { x: number; z: number }) {
-  let best: any = null, bestD = Infinity;
+  let best: any = null,
+    bestD = Infinity;
   for (const e of sim.entities.values()) {
     if (e.kind !== 'mob' || e.dead || e.templateId !== templateId) continue;
     const d = Math.hypot(e.pos.x - from.x, e.pos.z - from.z);
-    if (d < bestD) { bestD = d; best = e; }
+    if (d < bestD) {
+      bestD = d;
+      best = e;
+    }
   }
   return best;
 }
@@ -76,10 +81,14 @@ describe('The Drowned Temple', () => {
     const ysolei = nearestMob(sim, 'ysolei', origin);
     expect(ysolei).toBeTruthy();
     expect(ysolei.enraged).toBe(false);
-    const moonspawnNear = () => [...sim.entities.values()].filter(
-      (e) => e.kind === 'mob' && !e.dead && e.templateId === 'moonspawn'
-        && Math.abs(e.pos.x - origin.x) < 120,
-    ).length;
+    const moonspawnNear = () =>
+      [...sim.entities.values()].filter(
+        (e) =>
+          e.kind === 'mob' &&
+          !e.dead &&
+          e.templateId === 'moonspawn' &&
+          Math.abs(e.pos.x - origin.x) < 120,
+      ).length;
     expect(moonspawnNear()).toBe(0);
 
     ysolei.inCombat = true;
@@ -125,7 +134,14 @@ describe('The Drowned Temple', () => {
   it('the Tidewatcher offers a self-contained chain ending at the 5-player finale', () => {
     const ondrel = NPCS.tidewatcher_ondrel;
     expect(ondrel).toBeTruthy();
-    const chain = ['q_glimmermere_light', 'q_tarn_waders', 'q_drowned_choir', 'q_palecoil', 'q_silence_the_choir', 'q_drowned_moon'];
+    const chain = [
+      'q_glimmermere_light',
+      'q_tarn_waders',
+      'q_drowned_choir',
+      'q_palecoil',
+      'q_silence_the_choir',
+      'q_drowned_moon',
+    ];
     for (const q of chain) {
       expect(QUESTS[q], `quest ${q}`).toBeTruthy();
       expect(ondrel.questIds).toContain(q);
@@ -136,6 +152,9 @@ describe('The Drowned Temple', () => {
     expect(QUESTS.q_silence_the_choir.requiresQuest).toBe('q_drowned_choir');
     expect(QUESTS.q_drowned_moon.requiresQuest).toBe('q_silence_the_choir');
     expect(QUESTS.q_drowned_moon.suggestedPlayers).toBe(5);
-    expect(QUESTS.q_drowned_moon.objectives[0].targetMobId).toBe('ysolei');
+    const objective = QUESTS.q_drowned_moon.objectives[0];
+    expect(objective.type).toBe('kill');
+    if (objective.type !== 'kill') throw new Error('q_drowned_moon must be a kill quest');
+    expect(objective.targetMobId).toBe('ysolei');
   });
 });

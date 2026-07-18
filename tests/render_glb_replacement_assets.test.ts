@@ -7,10 +7,14 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
 import { critterPreloadInternalsForTest } from '../src/render/critters';
+import { marshDressingPreloadInternalsForTest } from '../src/render/delve_marsh_dressing';
 import { delvePropsPreloadInternalsForTest } from '../src/render/delve_props';
+import { doorPortalPreloadInternalsForTest } from '../src/render/door_portal';
 import { fishPreloadInternalsForTest } from '../src/render/fish';
 import { gatherNodePreloadInternalsForTest } from '../src/render/gather_nodes';
 import { mailboxPreloadInternalsForTest } from '../src/render/mailbox';
+import { questObjectPreloadInternalsForTest } from '../src/render/quest_objects';
+import { yumiMazePreloadInternalsForTest } from '../src/render/yumi_maze';
 
 const publicDir = path.join(__dirname, '..', 'public');
 
@@ -46,6 +50,28 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
 
   it('standalone delve prop assets', () => {
     for (const url of Object.values(delvePropsPreloadInternalsForTest.standalonePropUrl)) {
+      expectAssetExistsAndManifested(url);
+    }
+  });
+
+  it('marsh dressing anchor assets', () => {
+    for (const url of Object.values(marshDressingPreloadInternalsForTest.marshAssetUrl)) {
+      expectAssetExistsAndManifested(url);
+    }
+  });
+
+  it('yumi maze brazier and torch assets', () => {
+    for (const url of Object.values(yumiMazePreloadInternalsForTest.yumiMazeAssetUrl)) {
+      expectAssetExistsAndManifested(url);
+    }
+  });
+
+  it('dungeon door arch asset', () => {
+    expectAssetExistsAndManifested(doorPortalPreloadInternalsForTest.doorArchAssetUrl);
+  });
+
+  it('quest object assets', () => {
+    for (const url of Object.values(questObjectPreloadInternalsForTest.questObjectUrl)) {
       expectAssetExistsAndManifested(url);
     }
   });

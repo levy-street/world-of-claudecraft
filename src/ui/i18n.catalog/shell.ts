@@ -41,6 +41,9 @@ export const shellStrings = {
       connectionLost: 'Connection to the server was lost.',
       reconnecting: 'Connection lost. Reconnecting...',
       connectionRejected: 'The server closed the connection.',
+      realmFull: 'This world is full right now. Please try again in a few minutes.',
+      tooManyConnections:
+        'Too many connections to this world are coming from your network. Please close extra game windows or try again in a few minutes.',
       tips: {
         classes:
           'Tip: each of the 9 classes plays differently. Try a few before committing to one.',
@@ -116,6 +119,18 @@ export const shellStrings = {
         fatalBody: 'World of ClaudeCraft hit an unexpected error and needs to close.',
       },
     },
+    // Software-rendering notice (src/ui/gpu_notice_toast.ts): shown once when
+    // the session runs on a software rasterizer (WARP/SwiftShader). Two body
+    // variants because the fix differs: inside the desktop shell there is no
+    // "browser setting" to enable, so that copy points at drivers and the
+    // Windows per-app graphics setting instead.
+    gpuNotice: {
+      bodyDesktop:
+        'The game is running without GPU acceleration and will be slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.',
+      bodyWeb:
+        'The game is running without GPU acceleration and will be slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.',
+      dismiss: 'Dismiss',
+    },
     realm: {
       noRealms: 'No worlds available.',
       loading: 'Loading worlds...',
@@ -131,11 +146,11 @@ export const shellStrings = {
       popTipLow:
         'Low population: fewer than 15 players online right now. Plenty of room; great for a fresh start.',
       popTipMedium:
-        'Medium population: 15 to 39 players online right now. A healthy, active world.',
+        'Medium population: 15 to 79 players online right now. A healthy, active world.',
       popTipHigh:
-        'High population: 40 to 79 players online right now. Busy, with lots of players around.',
+        'High population: 80 or more players online right now. Busy, with lots of players around.',
       popTipFull:
-        'Full population: 80 or more players online right now. Very busy; you may wait in a login queue.',
+        'Full population: this world is at capacity right now. New logins are declined until a player logs out.',
       popTipOffline: 'Offline: this world is unreachable right now and cannot be joined.',
       characterCountOne: '{count} character',
       characterCountOther: '{count} characters',
@@ -278,6 +293,29 @@ export const shellStrings = {
       heading: 'The world is temporarily unavailable.',
       body: 'We are restarting the game service and expect Claudemoon to return shortly. This page will keep checking automatically.',
       status: 'Back soon',
+    },
+    welcome: {
+      back: 'Welcome back, {name}',
+      level: 'Level {level}',
+      lastPlayed: 'Last played {when}',
+      continue: 'Enter World',
+      continueHint: 'Enter to continue, Esc to skip',
+      continueHintTouch: 'Tap to continue',
+      discord: {
+        title: 'The community lives on Discord',
+        sub: 'Patch previews, events, dev chat, and 2 bonus bank slots for linking.',
+        join: 'Join our Discord',
+      },
+      chest: {
+        ready: 'Daily chest ready',
+      },
+      armory: {
+        cta: 'Enter and browse the Armory',
+      },
+      news: {
+        new: 'New',
+        viewAll: 'View all updates on GitHub',
+      },
     },
   },
   es: {

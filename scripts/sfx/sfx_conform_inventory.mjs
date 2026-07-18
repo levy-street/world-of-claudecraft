@@ -89,6 +89,20 @@ export function buildSfxConformPolicy(catalog, discoveredEntries, sourceFilename
     return undefined;
   }
 
+  // A custom (hand-recorded, already-mastered) key is pre-mastered material,
+  // not raw or generated content: conform must never re-target its loudness
+  // against a metric (integrated LUFS) that may not match how the author
+  // actually mixed it, only guard against real true-peak overshoot. See the
+  // `custom` flag's meaning in conform_audio.mjs.
+  function isCustomMaster(filename) {
+    const value = stem(filename);
+    const direct = catalogByKey.get(value);
+    if (direct) return direct.custom === true;
+    const variant = parseCatalogSfxVariantStem(value, catalogKeys);
+    if (variant) return catalogByKey.get(variant.key)?.custom === true;
+    return false;
+  }
+
   return {
     violations,
     recognizes(filename) {
@@ -99,5 +113,6 @@ export function buildSfxConformPolicy(catalog, discoveredEntries, sourceFilename
     expectedChannels(filename) {
       return expectedChannelsForStem(stem(filename));
     },
+    isCustomMaster,
   };
 }

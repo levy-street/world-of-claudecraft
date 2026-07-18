@@ -20,11 +20,14 @@ fails=()
 
 echo "pre-push QA floor: typecheck, guard tests, lint, copy rules..."
 
-# The checks below need an installed toolchain. If it is missing (a fresh clone), say so clearly
-# and skip them rather than reporting a misleading failure; the copy scan still runs (no tools).
+# The checks below need an installed toolchain. If it is missing (a fresh clone) or broken, say
+# so clearly and skip them rather than reporting a misleading failure; the copy scan still runs
+# (no tools). tsc is probed by EXECUTION, not existence: a TypeScript 7 install without its
+# platform optionalDependency leaves a node_modules/.bin/tsc that exists but fails at runtime.
 tools_ok=1
-if [ ! -x node_modules/.bin/tsc ] || [ ! -x node_modules/.bin/vitest ] || [ ! -x node_modules/.bin/biome ]; then
-  echo "  note: dependencies not installed (run 'npm install'); skipping typecheck, tests, and lint"
+if ! node_modules/.bin/tsc --version >/dev/null 2>&1 \
+  || [ ! -x node_modules/.bin/vitest ] || [ ! -x node_modules/.bin/biome ]; then
+  echo "  note: dependencies not installed or tsc not runnable (run 'npm install'); skipping typecheck, tests, and lint"
   tools_ok=0
 fi
 

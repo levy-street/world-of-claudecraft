@@ -16,6 +16,10 @@ const itemStringsEn = {
     },
     slots: {
       mainhand: 'Main Hand',
+      // The tooltip label for hand:'twohand' weapons (the classic "Two-Hand"
+      // line), rendered instead of the mainhand slot name.
+      twoHand: 'Two-Hand',
+      offhand: 'Off Hand',
       helmet: 'Helmet',
       neck: 'Neck',
       shoulder: 'Shoulder',
@@ -54,6 +58,7 @@ const itemStringsEn = {
       dps: 'Damage/sec',
       critChance: 'Crit Chance',
       dodge: 'Dodge',
+      parry: 'Parry',
     },
     tooltip: {
       qualityKind: '{quality} {kind}',
@@ -210,6 +215,8 @@ export const itemStrings = {
       },
       slots: {
         mainhand: 'Mano principal',
+        twoHand: 'Dos manos',
+        offhand: 'Mano secundaria',
         helmet: 'Cabeza',
         neck: 'Cuello',
         shoulder: 'Hombros',
@@ -247,6 +254,7 @@ export const itemStrings = {
         dps: 'Daño/seg',
         critChance: 'Prob. de crítico',
         dodge: 'Esquiva',
+        parry: 'Parada',
       },
       tooltip: {
         qualityKind: '{kind} {quality}',
@@ -370,6 +378,8 @@ export const itemStrings = {
       },
       slots: {
         mainhand: 'Main droite',
+        twoHand: 'Deux mains',
+        offhand: 'Main gauche',
         helmet: 'Tête',
         neck: 'Cou',
         shoulder: 'Épaules',
@@ -407,6 +417,7 @@ export const itemStrings = {
         dps: 'Dégâts/s',
         critChance: 'Chances de critique',
         dodge: 'Esquive',
+        parry: 'Parade',
       },
       tooltip: {
         qualityKind: '{kind} {quality}',
@@ -531,6 +542,8 @@ export const itemStrings = {
       },
       slots: {
         mainhand: 'Mano principale',
+        twoHand: 'Due mani',
+        offhand: 'Mano secondaria',
         helmet: 'Testa',
         neck: 'Collo',
         shoulder: 'Spalle',
@@ -568,6 +581,7 @@ export const itemStrings = {
         dps: 'Danni/sec',
         critChance: 'Prob. critico',
         dodge: 'Schivata',
+        parry: 'Parata',
       },
       tooltip: {
         qualityKind: '{kind} {quality}',
@@ -688,6 +702,8 @@ export const itemStrings = {
       },
       slots: {
         mainhand: 'Waffenhand',
+        twoHand: 'Zweihändig',
+        offhand: 'Nebenhand',
         helmet: 'Kopf',
         neck: 'Hals',
         shoulder: 'Schultern',
@@ -725,6 +741,7 @@ export const itemStrings = {
         dps: 'Schaden/Sek.',
         critChance: 'Krit. Chance',
         dodge: 'Ausweichen',
+        parry: 'Parieren',
       },
       tooltip: {
         qualityKind: '{quality} {kind}',
@@ -847,6 +864,8 @@ export const itemStrings = {
       },
       slots: {
         mainhand: '主手',
+        twoHand: '双手',
+        offhand: '副手',
         helmet: '头部',
         neck: '颈部',
         shoulder: '肩部',
@@ -884,6 +903,7 @@ export const itemStrings = {
         dps: '每秒伤害',
         critChance: '暴击几率',
         dodge: '躲闪',
+        parry: '招架',
       },
       tooltip: {
         qualityKind: '{quality}{kind}',
@@ -999,6 +1019,8 @@ export const itemStrings = {
       },
       slots: {
         mainhand: '主手',
+        twoHand: '雙手',
+        offhand: '副手',
         helmet: '頭部',
         neck: '頸部',
         shoulder: '肩部',
@@ -1036,6 +1058,7 @@ export const itemStrings = {
         dps: '每秒傷害',
         critChance: '暴擊機率',
         dodge: '閃躲',
+        parry: '招架',
       },
       tooltip: {
         qualityKind: '{quality}{kind}',
@@ -1151,6 +1174,8 @@ export const itemStrings = {
       },
       slots: {
         mainhand: '주장비',
+        twoHand: '양손',
+        offhand: '보조장비',
         helmet: '머리',
         neck: '목',
         shoulder: '어깨',
@@ -1188,6 +1213,7 @@ export const itemStrings = {
         dps: '초당 피해',
         critChance: '치명타율',
         dodge: '회피',
+        parry: '무기 막기',
       },
       tooltip: {
         qualityKind: '{quality} {kind}',
@@ -1307,6 +1333,8 @@ export const itemStrings = {
       },
       slots: {
         mainhand: 'メインハンド',
+        twoHand: '両手',
+        offhand: 'オフハンド',
         helmet: '頭',
         neck: '首',
         shoulder: '肩',
@@ -1344,6 +1372,7 @@ export const itemStrings = {
         dps: '秒間ダメージ',
         critChance: 'クリティカル率',
         dodge: '回避',
+        parry: '受け流し',
       },
       tooltip: {
         qualityKind: '{quality} {kind}',
@@ -1463,6 +1492,8 @@ export const itemStrings = {
       },
       slots: {
         mainhand: 'Mão principal',
+        twoHand: 'Duas mãos',
+        offhand: 'Mão secundária',
         helmet: 'Cabeça',
         neck: 'Pescoço',
         shoulder: 'Ombros',
@@ -1500,6 +1531,7 @@ export const itemStrings = {
         dps: 'Dano/s',
         critChance: 'Chance crítica',
         dodge: 'Esquiva',
+        parry: 'Aparo',
       },
       tooltip: {
         qualityKind: '{kind} {quality}',
@@ -1619,6 +1651,8 @@ export const itemStrings = {
       },
       slots: {
         mainhand: 'Правая рука',
+        twoHand: 'Двуручное',
+        offhand: 'Левая рука',
         helmet: 'Голова',
         neck: 'Шея',
         shoulder: 'Плечи',
@@ -1656,6 +1690,7 @@ export const itemStrings = {
         dps: 'Урон/сек',
         critChance: 'Шанс крита',
         dodge: 'Уклонение',
+        parry: 'Парирование',
       },
       tooltip: {
         qualityKind: '{quality} {kind}',
@@ -1802,6 +1837,12 @@ const ITEM_ENTITY_IDS = [
   'tanned_leather_jerkin',
   'hobnail_boots',
   'eastbrook_wool_trousers',
+  'eastbrook_ritual_vestments',
+  'eastbrook_druids_hide',
+  'eastbrook_warded_leggings',
+  'wardweave_cowl',
+  'duskhide_wraps',
+  'sootscale_mantle',
   'gravecaller_blade',
   'widowfang_dirk',
   'gravecaller_staff',
@@ -2040,6 +2081,14 @@ function itemTranslations(names: readonly string[]): ItemEntityTranslations {
   return translations;
 }
 
+function itemTranslationsEn(names: readonly string[]) {
+  return {
+    ...itemTranslations(names),
+    conjured_water4: { name: 'Conjured Springwater' },
+    conjured_bread4: { name: 'Conjured Feastloaf' },
+  };
+}
+
 const itemNamesEn = {
   itemUi: {
     ...itemStrings.en.itemUi,
@@ -2058,7 +2107,7 @@ const itemNamesEn = {
   },
   entities: {
     ...classAbilityNamesEn.entities,
-    items: itemTranslations([
+    items: itemTranslationsEn([
       'Pitted Shortsword',
       'Bogoak Staff',
       'Rusty Dagger',
@@ -2091,6 +2140,12 @@ const itemNamesEn = {
       'Tanned Leather Jerkin',
       'Hobnailed Boots',
       'Eastbrook Wool Trousers',
+      'Eastbrook Ritual Vestments',
+      "Eastbrook Druid's Hide",
+      'Eastbrook Warded Leggings',
+      'Wardweave Cowl',
+      'Duskhide Wraps',
+      'Sootscale Mantle',
       "Gravecaller's Broadblade",
       'Widowfang Dirk',
       'Staff of the Hollow',
@@ -2363,6 +2418,12 @@ export const itemNames = {
         'Jubón de cuero curtido',
         'Botas claveteadas',
         'Pantalones de lana de Eastbrook',
+        'Vestiduras Rituales de Eastbrook',
+        'Piel de Druida de Eastbrook',
+        'Grebas Protegidas de Eastbrook',
+        'Capucha Tejeguardia',
+        'Envolturas Pielnocturna',
+        'Manto Escamacenizada',
         'Mandoble de Gravecaller',
         'Puñal Colmillo de Viuda',
         'Bastón del Hueco',
@@ -2633,6 +2694,12 @@ export const itemNames = {
         'Pourpoint en cuir tanné',
         'Bottes cloutées',
         "Pantalon de laine d'Eastbrook",
+        "Vêtements Rituels d'Eastbrook",
+        "Peau de Druide d'Eastbrook",
+        "Jambières Protégées d'Eastbrook",
+        'Capuche Tissegarde',
+        'Enveloppes Peaucrépuscule',
+        'Mante Écaillecendrée',
         'Grande lame de Gravecaller',
         'Dague Croc-de-veuve',
         'Bâton du Creux',
@@ -2904,6 +2971,12 @@ export const itemNames = {
         'Giaco di cuoio conciato',
         'Stivali chiodati',
         'Pantaloni di lana di Eastbrook',
+        'Vesti Rituali di Eastbrook',
+        'Pelle del Druido di Eastbrook',
+        'Gambali Protetti di Eastbrook',
+        'Cappuccio Tessitutela',
+        'Fasce Pellecrepuscolo',
+        'Manto Scagliacenere',
         'Lama larga di Gravecaller',
         'Pugnale Zanna di Vedova',
         'Bastone del Vuoto',
@@ -3173,6 +3246,12 @@ export const itemNames = {
         'Gegerbtes Lederwams',
         'Nagelstiefel',
         'Eastbrook-Wollhose',
+        'Eastbrook-Ritualgewänder',
+        'Eastbrook-Druidenhaut',
+        'Eastbrook-Schutzbeinlinge',
+        'Wardweave-Kapuze',
+        'Duskhide-Bandagen',
+        'Sootscale-Umhang',
         'Gravecallers Breitschwert',
         'Witwenzahn-Dolch',
         'Stab der Höhlung',
@@ -3442,6 +3521,12 @@ export const itemNames = {
         '鞣制皮甲',
         '钉底靴',
         '东溪羊毛长裤',
+        '东溪仪典法衣',
+        '东溪德鲁伊兽皮',
+        '东溪护法护腿',
+        '织卫兜帽',
+        '暮影裹手',
+        '灰鳞披肩',
         '唤墓者宽刃剑',
         '寡妇牙短匕',
         '空洞法杖',
@@ -3711,6 +3796,12 @@ export const itemNames = {
         '鞣製皮甲',
         '釘底靴',
         '東溪羊毛長褲',
+        '東溪儀典法衣',
+        '東溪德魯伊獸皮',
+        '東溪護法護腿',
+        '織衛兜帽',
+        '暮影裹手',
+        '灰鱗披肩',
         '喚墓者寬刃劍',
         '寡婦牙短匕',
         '空洞法杖',
@@ -3980,6 +4071,12 @@ export const itemNames = {
         '무두질한 가죽 웃옷',
         '징박은 장화',
         '이스트브룩 양모 바지',
+        '이스트브룩 의식 예복',
+        '이스트브룩 드루이드 가죽',
+        '이스트브룩 방호 각반',
+        '워드위브 두건',
+        '더스크하이드 손목보호대',
+        '수트스케일 망토',
         '무덤부름 넓은날검',
         '과부송곳니 더크',
         '공허의 지팡이',
@@ -4249,6 +4346,12 @@ export const itemNames = {
         'なめし革のジャーキン',
         '鋲打ちブーツ',
         'イーストブルックの羊毛ズボン',
+        'イーストブルックの儀式衣装',
+        'イーストブルックのドルイドの皮',
+        'イーストブルックの守護レギンス',
+        'ワードウィーヴのフード',
+        'ダスクハイドの手甲',
+        'ススウロコのマント',
         'グレイブコーラーの大刃',
         'ウィドウファングのダーク',
         '虚ろの杖',
@@ -4518,6 +4621,12 @@ export const itemNames = {
         'Gibão de couro curtido',
         'Botas cravejadas',
         'Calças de lã de Eastbrook',
+        'Vestes Rituais de Eastbrook',
+        'Pele de Druida de Eastbrook',
+        'Perneiras Protegidas de Eastbrook',
+        'Capuz Guardatecido',
+        'Faixas Peledopôr',
+        'Manto Escamacinza',
         'Lâmina larga de Gravecaller',
         'Punhal Presa-de-viúva',
         'Cajado do Vazio',
@@ -4787,6 +4896,12 @@ export const itemNames = {
         'Куртка из дубленой кожи',
         'Подбитые гвоздями сапоги',
         'Истврукские шерстяные штаны',
+        'Ритуальные одеяния Иствбрука',
+        'Друидская шкура Иствбрука',
+        'Заговорённые поножи Иствбрука',
+        'Капюшон Стражеткани',
+        'Обмотки Сумеречной шкуры',
+        'Мантия Пепельной чешуи',
         'Широкий клинок Могильного Зова',
         'Кортик Вдовьего Клыка',
         'Посох Пустоты',
@@ -5007,5 +5122,5 @@ export const itemNames = {
   },
 };
 
-itemNames.es_ES = itemNames.es;
-itemNames.fr_CA = itemNames.fr_FR;
+itemNames.es_ES = itemNames.es as unknown as typeof itemNames.es_ES;
+itemNames.fr_CA = itemNames.fr_FR as unknown as typeof itemNames.fr_CA;

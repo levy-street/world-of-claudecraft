@@ -26,6 +26,7 @@
 import { bagCapacity, bagsFullError, countFit, removeStacked } from '../bags';
 import { QUESTS, questRewardItemId } from '../data';
 import { formatMoney } from '../format_money';
+import type { ArchetypeState } from '../professions/archetype';
 import { questFallbackGrants } from '../quest_fallback';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -36,8 +37,15 @@ import {
   type QuestDef,
   type QuestProgress,
   type QuestState,
+  questObjectiveRequired,
   questTurnInNpcIds,
 } from '../types';
+import {
+  applyProfessionQuestEffect,
+  professionQuestSelectionTargets,
+  resolvedQuestObjectiveCounts,
+  validateProfessionQuestSelection,
+} from './profession_quest_effects';
 
 // Pure quest-state computation, shared by the sim and the network client. Relocated
 // from sim.ts (W4) and re-exported from sim.ts so the ClientWorld import
@@ -47,22 +55,36 @@ export function computeQuestState(
   questLog: Map<string, QuestProgress>,
   questsDone: Set<string>,
   playerLevel: number,
+  professionState?: ArchetypeState,
 ): QuestState {
-  if (questsDone.has(questId)) return 'done';
   const qp = questLog.get(questId);
   if (qp) return qp.state === 'ready' ? 'ready' : 'active';
   const quest = QUESTS[questId];
   if (!quest) return 'unavailable';
+  if (questsDone.has(questId) && !quest.repeatable) return 'done';
   if (quest.requiresQuest && !questsDone.has(quest.requiresQuest)) return 'unavailable';
   if (quest.minLevel && playerLevel < quest.minLevel) return 'unavailable';
   if (quest.retired) return 'unavailable';
+  if (
+    quest.completionEffect &&
+    professionState &&
+    professionQuestSelectionTargets(quest, professionState).length === 0
+  ) {
+    return 'unavailable';
+  }
   return 'available';
 }
 
 export function questState(ctx: SimContext, questId: string, pid?: number): QuestState {
   const r = ctx.resolve(pid);
   if (!r) return 'unavailable';
-  return computeQuestState(questId, r.meta.questLog, r.meta.questsDone, r.e.level);
+  return computeQuestState(
+    questId,
+    r.meta.questLog,
+    r.meta.questsDone,
+    r.e.level,
+    r.meta.archetype,
+  );
 }
 
 function questNpcFor(
@@ -93,8 +115,16 @@ export function finalizeQuestAccept(
   questId: string,
   quest: QuestDef,
   meta: PlayerMeta,
-): void {
-  meta.questLog.set(questId, { questId, counts: quest.objectives.map(() => 0), state: 'active' });
+  selection?: string,
+): boolean {
+  if (!validateProfessionQuestSelection(quest, meta, selection)) return false;
+  meta.questLog.set(questId, {
+    questId,
+    counts: quest.objectives.map(() => 0),
+    state: 'active',
+    ...(selection === undefined ? {} : { selection }),
+    resolvedCounts: resolvedQuestObjectiveCounts(quest, meta),
+  });
   for (const itemId of questFallbackGrants(quest, (id) => ctx.countItem(id, meta.entityId) > 0)) {
     ctx.addItem(itemId, 1, meta.entityId);
   }
@@ -106,10 +136,18 @@ export function finalizeQuestAccept(
     pid: meta.entityId,
   });
   ctx.onInventoryChangedForQuests(meta);
+  return true;
 }
 
-export function acceptQuest(ctx: SimContext, questId: string, pid?: number): void {
-  const r = ctx.resolve(pid);
+export function acceptQuest(
+  ctx: SimContext,
+  questId: string,
+  selectionOrPid?: string | number,
+  pid?: number,
+): void {
+  const selection = typeof selectionOrPid === 'string' ? selectionOrPid : undefined;
+  const resolvedPid = typeof selectionOrPid === 'number' ? selectionOrPid : pid;
+  const r = ctx.resolve(resolvedPid);
   if (!r) return;
   const quest = QUESTS[questId];
   const { meta, e: p } = r;
@@ -126,12 +164,16 @@ export function acceptQuest(ctx: SimContext, questId: string, pid?: number): voi
     ctx.error(meta.entityId, 'That quest is not available.');
     return;
   }
+  if (!validateProfessionQuestSelection(quest, meta, selection)) {
+    ctx.error(meta.entityId, 'That profession choice is not available.');
+    return;
+  }
   const nearby = questNpcFor(ctx, questId, 'giver', p);
   if (!nearby.npc) {
     ctx.error(meta.entityId, nearby.tooFar ? 'Too far away.' : 'That quest giver is not nearby.');
     return;
   }
-  finalizeQuestAccept(ctx, questId, quest, meta);
+  finalizeQuestAccept(ctx, questId, quest, meta, selection);
 }
 
 export function acceptLinkedQuest(
@@ -201,6 +243,10 @@ export function turnInQuest(ctx: SimContext, questId: string, pid?: number): voi
     ctx.error(meta.entityId, 'That quest is not complete.');
     return;
   }
+  if (!validateProfessionQuestSelection(quest, meta, qp.selection)) {
+    ctx.error(meta.entityId, 'That profession choice is no longer available.');
+    return;
+  }
   const nearby = questNpcFor(ctx, questId, 'turnIn', p);
   if (!nearby.npc) {
     ctx.error(meta.entityId, nearby.tooFar ? 'Too far away.' : 'That quest turn-in is not nearby.');
@@ -212,7 +258,10 @@ export function turnInQuest(ctx: SimContext, questId: string, pid?: number): voi
   if (rewardItem) {
     const scratch = meta.inventory.map((s) => ({ ...s }));
     for (const obj of quest.objectives) {
-      if (obj.type === 'collect' && obj.itemId) removeStacked(scratch, obj.itemId, obj.count);
+      if (obj.type === 'collect' && obj.itemId) {
+        const index = quest.objectives.indexOf(obj);
+        removeStacked(scratch, obj.itemId, questObjectiveRequired(quest, qp, index));
+      }
     }
     if (countFit(scratch, bagCapacity(meta.bags), rewardItem, 1) < 1) {
       bagsFullError(ctx, meta.entityId);
@@ -234,16 +283,20 @@ export function turnInQuestCore(
   questId: string,
   quest: QuestDef,
   meta: PlayerMeta,
-): void {
+): boolean {
   const qp = meta.questLog.get(questId);
-  if (!qp) return;
-  for (const obj of quest.objectives) {
-    if (obj.type === 'collect' && obj.itemId) ctx.removeItem(obj.itemId, obj.count, meta.entityId);
+  if (!qp) return false;
+  if (!applyProfessionQuestEffect(ctx, quest, qp, meta)) return false;
+  for (const [index, obj] of quest.objectives.entries()) {
+    if (obj.type === 'collect' && obj.itemId) {
+      ctx.removeItem(obj.itemId, questObjectiveRequired(quest, qp, index), meta.entityId);
+    }
   }
   qp.state = 'done';
   meta.questLog.delete(questId);
+  const firstCompletion = !meta.questsDone.has(questId);
   meta.questsDone.add(questId);
-  meta.counters.questsCompleted++;
+  if (firstCompletion) meta.counters.questsCompleted++;
   // Quest and chapter deed predicates read questsDone, so re-check this player.
   ctx.markDeedsDirty(meta.entityId);
   if (quest.copperReward > 0) {
@@ -267,4 +320,5 @@ export function turnInQuestCore(
   // Quests with an authored Ravenpost letter have their giver write to the
   // player a little while after the turn-in (mail/post_office.ts).
   ctx.queueQuestLetter(questId, meta.entityId);
+  return true;
 }

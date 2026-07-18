@@ -229,6 +229,70 @@ describe('Nythraxis encounter module (N1)', () => {
     expect(boss.auras.some((a) => a.id === 'nythraxis_deathless_stun')).toBe(true);
   });
 
+  it('heroic Dread Curse stacks on the active tank and resets on a tank swap', () => {
+    const { ctx, boss, tank, dps } = setup({ difficulty: 'heroic' });
+    const st = nythraxis.initNythraxisEncounter(boss);
+    st.phase = 1;
+    st.dreadCurseTimer = 0.01;
+    nythraxis.updateNythraxisDreadCurse(ctx, boss, st);
+    let curse = tank.auras.find((a) => a.id === 'nythraxis_dread_curse');
+    expect(curse?.stacks).toBe(1);
+    expect(curse?.value).toBeCloseTo(0.1);
+
+    st.dreadCurseTimer = 0.01;
+    nythraxis.updateNythraxisDreadCurse(ctx, boss, st);
+    curse = tank.auras.find((a) => a.id === 'nythraxis_dread_curse');
+    expect(curse?.stacks).toBe(2);
+    expect(curse?.value).toBeCloseTo(0.2);
+
+    boss.aggroTargetId = dps[0].id;
+    st.dreadCurseTimer = 0.01;
+    nythraxis.updateNythraxisDreadCurse(ctx, boss, st);
+    const swapped = dps[0].auras.find((a) => a.id === 'nythraxis_dread_curse');
+    expect(swapped?.stacks).toBe(1);
+    expect(swapped?.value).toBeCloseTo(0.1);
+  });
+
+  it('heroic wardstone interrupt leads to a three second add summon channel', () => {
+    const { sim, ctx, boss, dps } = setup({ difficulty: 'heroic' });
+    const st = nythraxis.initNythraxisEncounter(boss);
+    st.phase = 2;
+    nythraxis.startNythraxisDeathlessRage(ctx, boss, st);
+    const wards = [...ctx.entities.values()]
+      .filter(
+        (e) =>
+          e.kind === 'object' &&
+          e.objectItemId === 'bastion_ward_stone' &&
+          dist2d(e.pos, boss.spawnPos) < 100,
+      )
+      .sort((a, b) => a.id - b.id) as AnyEntity[];
+    wards.forEach((ward, i) => {
+      const channeler = dps[i];
+      teleport(sim, channeler, ward.pos.x, ward.pos.z, ward.pos.y);
+      expect(nythraxis.tryStartNythraxisWardChannel(ctx, ward, channeler)).toBe(true);
+    });
+    for (const c of st.wardChannels) c.complete = true;
+    nythraxis.updateNythraxisDeathlessRage(ctx, boss, st);
+    expect(st.deathlessStunRemaining).toBeGreaterThan(0);
+
+    st.deathlessStunRemaining = 0.01;
+    nythraxis.updateNythraxisEncounter(ctx, boss);
+    expect(st.heroicSummonChannelRemaining).toBeGreaterThan(0);
+    expect(boss.castingAbility).toBe('nythraxis_heroic_summon');
+
+    const before = boss.summonedIds.length;
+    for (let i = 0; i < 20 * 3 + 1; i++) nythraxis.updateNythraxisHeroicSummon(ctx, boss, st);
+    const spawned = boss.summonedIds
+      .slice(before)
+      .map((id) => ctx.entities.get(id)?.templateId)
+      .sort();
+    expect(spawned).toEqual([
+      'nythraxis_heroic_priest_add',
+      'nythraxis_heroic_rogue_add',
+      'nythraxis_heroic_warrior_add',
+    ]);
+  });
+
   it('a wardstone with no boss in range falls through (overworld Sunken Bastion stone)', () => {
     const { ctx, dps } = setup();
     // A lone ward stone far from any Nythraxis boss: tryStart must return false so the

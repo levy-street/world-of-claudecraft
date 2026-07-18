@@ -15,6 +15,10 @@ sessions.
 3. Inspect production paths, tests, module seams, and relevant project documentation.
 4. Use bounded parallel exploration for independent subsystems.
 5. Fetch current official documentation for version-sensitive external interfaces.
+6. When work adds or changes SQL, a database call site, stored-data growth, scheduled database
+   work, pool sizing or admission, transaction or lock scope, or timeout policy; a database
+   driver/dependency version, or PostgreSQL engine/resource/configuration/topology, use
+   `woc_database_performance` for a read-only scaling pass.
 
 Do not create planning files until the goal, scope, and important constraints are
 understood. Ask the user when a choice would materially change architecture or product
@@ -25,7 +29,10 @@ behavior.
 Record current behavior and ownership, desired behavior and acceptance criteria,
 affected systems and platforms, constraining invariants, decisions already made, truly
 blocking open decisions, and compatibility, migration, localization, privacy, security,
-and testing implications. Reference canonical instructions instead of copying them.
+database performance, and testing implications. For database-backed work, record expected
+query frequency and cardinality, the index/cache/pagination strategy, pool and lock impact,
+version-sensitive timeout/planner assumptions, and the measured evidence the implementation must
+produce. Reference canonical instructions instead of copying them.
 
 ## Build vertical phases
 
